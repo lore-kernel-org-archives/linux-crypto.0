@@ -2,252 +2,349 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0094C41513
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Oct 2023 19:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD10CDB483
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Oct 2023 20:27:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231723AbjJRT6U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Oct 2023 15:58:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54950 "EHLO
+        id S229963AbjJRU1N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 18 Oct 2023 16:27:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229921AbjJRT6T (ORCPT
+        with ESMTP id S229605AbjJRU1M (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Oct 2023 15:58:19 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DA4911D;
-        Wed, 18 Oct 2023 12:58:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697659097; x=1729195097;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=b51keTvs74PmwNNmuwKF8ljn+hboHUyj8N19nOqhfZA=;
-  b=AGi08hpjLTGIiO0RGxMK6Bv4a/GdgqYpI6UWf2CSdXE3CZ5MwA2F83P6
-   hbSsTRL5vNr1jf1wAo1lvz/75Ec9bkYeX2BrNWjAU4m9M/gIkXhhed1KA
-   FusU6/+fOe7fjZco9Ht3tMAsCjS+hDo63bAZjVo+iznOiCczt546dsa5m
-   IEFthehKip3rFhPAaEiLVdk2oi1wLJajbWoJBYTKTjXcOvBAL4EwYo9pK
-   2lnvZDP/YAk8loWd+lnqxf2TYFoLFyeZ8+uNjalINX79+9rAPh7w4QSVH
-   nVCFbAF5kF48pjjUVmD2VPFFz0cM5twvUojPj2LFPA6Qi+3/07W2NJwN/
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="383317737"
-X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="383317737"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 12:58:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="750227117"
-X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="750227117"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Oct 2023 12:58:14 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 18 Oct 2023 12:58:14 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Wed, 18 Oct 2023 12:58:14 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Wed, 18 Oct 2023 12:58:13 -0700
+        Wed, 18 Oct 2023 16:27:12 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2069.outbound.protection.outlook.com [40.107.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2989A4;
+        Wed, 18 Oct 2023 13:27:09 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JDGefYCRB6YJaoseaMZeInc9av6nsu/t+BWd265vlYel91WSCBCV0oWoTR9u/t3cHqEyAak3k9+0rNehoSFbCVl6UzjfGqhHuQMsVHY0o5xqrJx2foHf+OD4rWLXKvzUNuMWH3n+5vdkohosR83fyZ6JKJOjgz/bYtOR6xCAxSUXXNoeWykQD/rT1FsTHpuzJqhQOemQAyqSF0jquQt+B/HCuh1e60xWZiH8h+sWr+AdDkXvNrYfQoCyDP9jtOQPtxSEy9oTVlZKtOAaM5Bb63B/O4AqWObeHRursU0oRqLmv5cRDuQWT7YaUpJJCjt2CqhSOSk4gGE90xXeYA/o+w==
+ b=IcXDUbhyWn9T+jx75G0ZdYct4O9hXXAwi0sGxtAtzifUGYVPSv5xU7rKsGcONo8evNqaWFlNmh06cJ+ikZLRebb9JbmlxzaoT/q9ptRVtLn/eCGLFVdooOxHL6E4rKfnSisEaICQSxZh3X9QjDSYCaQTV6bO5j44bq+0YTsbd7vDEIM31PheOHiwBYX8Zqi3wRBfHU07jfx5Af8GMXDx0F6H5STpJ9YPwK5xcFvc9jKcfeDZzZF+xH9qyD7qAVpkATV++OWMFqoNrk8cwZzYgyRl7MSqZX0zVGdi6pQfV1iQIZdVnmORP0UbSz11V7ueFUSt2vAtbx6BYkyYz3ZILQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cnXFRT8QxFUGRWInX0u/VGuz74I6OwAwsT5aSon5Thg=;
- b=D145xGM80QCR5whYOEyP7odgEADvQepS8u2y9TFNxp1PsEnED4oX8QnGwKE5IlRNxsAPpdQfm4iomxnDChe2ZlVcOncyaBp3Z3Gp59cmMoTC9b+zk/xmzNLEGQKKv0MN+5YrtvYChmcl+H823nQjacJbpeDhDkFXEmU9CPqC83PPYK3RU/MS6iroXiu0fO1ginTCgB1DgjS9mP2Opy4SNZkeiBi+w92o5SPdDNUbwmTSO79CtJUzoBGj9v47E9LVCW5Sr7TkUrRTyKSu6bQPwqyZdp3aCCxvdhnhumImC2UI/iwfXiMQPRV3/K30nIxV6J6OM7FsHP96sbv1xoaiXQ==
+ bh=L/weRuittkt8e4EBns2qpQvAvdMKdQENgKYlm96Hvd0=;
+ b=TXXAowlargLokgDlcdGT2/hsjS3Y4gJ1Vl1zsDP9z5IqS/LbXApGu8hjVOUZhEXvjDQXpT8nblTD7x4kTUMNdLvbtqtOPa3cgAtqBkVQj+k3bHnvOlnQc9bh4Ss/PNqzmddxIwzpEutZQqxZHU0ND2niCjS5fMuFG7eHIev1bDWonQmJnLcd+WWeF+p3LLwFqbeFams5aOfR9rDuz+gySh1YBsPgJBtXr7GLuUGMLSN4sKv7JVuDhqtIILWmdawzokSaBNjpvjguAN7CLpnUrvpqlea35BAAjafu8lnOgnQ7kpwdQnQUWvxA//kHhc7iqq7kHrKEN/C8Q/15HLYnWA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=L/weRuittkt8e4EBns2qpQvAvdMKdQENgKYlm96Hvd0=;
+ b=sAOIHAz5yWQeVUU2rTzDEdJbh4Lb7Fl/3pNhQ6adOEawxRF18pMSkSIW2SZGyYBl0cz0xe2Y2/pfMSPvoRM4B2pONPD/Yg2kLEzthlkNwz7c/WNnXosV0MQOhBLyMZM69NCw/A95XMuAhRXQIIgxT4yhuJgvU4SNyAdnZl96NeI=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
- by CY8PR11MB7291.namprd11.prod.outlook.com (2603:10b6:930:9b::20) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by IA0PR12MB8840.namprd12.prod.outlook.com (2603:10b6:208:490::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.21; Wed, 18 Oct
- 2023 19:58:04 +0000
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::7978:1ba5:6ed0:717d]) by PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::7978:1ba5:6ed0:717d%4]) with mapi id 15.20.6886.034; Wed, 18 Oct 2023
- 19:58:04 +0000
-Date:   Wed, 18 Oct 2023 12:58:01 -0700
-From:   Dan Williams <dan.j.williams@intel.com>
-To:     Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Lukas Wunner <lukas@wunner.de>
-CC:     Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Alex Williamson" <alex.williamson@redhat.com>,
-        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        "Wilfred Mallawa" <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        "Tom Lendacky" <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 12/12] PCI/CMA: Grant guests exclusive control of
- authentication
-Message-ID: <653038c93a054_780ef294e9@dwillia2-xfh.jf.intel.com.notmuch>
-References: <cover.1695921656.git.lukas@wunner.de>
- <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
- <20231003164048.0000148c@Huawei.com>
- <20231003193058.GA16417@wunner.de>
- <20231006103020.0000174f@Huawei.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231006103020.0000174f@Huawei.com>
-X-ClientProxiedBy: MW4PR03CA0271.namprd03.prod.outlook.com
- (2603:10b6:303:b5::6) To PH8PR11MB8107.namprd11.prod.outlook.com
- (2603:10b6:510:256::6)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Wed, 18 Oct
+ 2023 20:27:06 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::6ac8:eb30:6faf:32b2]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::6ac8:eb30:6faf:32b2%5]) with mapi id 15.20.6886.034; Wed, 18 Oct 2023
+ 20:27:06 +0000
+Message-ID: <09556ee3-3d9c-0ecc-0b4a-3df2d6bb5255@amd.com>
+Date:   Wed, 18 Oct 2023 15:27:03 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH v10 48/50] KVM: SEV: Provide support for SNP_GUEST_REQUEST
+ NAE event
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Alexey Kardashevskiy <aik@amd.com>
+Cc:     Dionna Amalie Glaze <dionnaglaze@google.com>,
+        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        jarkko@kernel.org, nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
+        liam.merwick@oracle.com, zhi.a.wang@intel.com,
+        Brijesh Singh <brijesh.singh@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-49-michael.roth@amd.com>
+ <CAAH4kHb=hNH88poYw-fj+ewYgt8F-hseZcRuLDdvbgpSQ5FDZQ@mail.gmail.com>
+ <ZS614OSoritrE1d2@google.com> <b9da2fed-b527-4242-a588-7fc3ee6c9070@amd.com>
+ <ZS_iS4UOgBbssp7Z@google.com>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <ZS_iS4UOgBbssp7Z@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9P223CA0015.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:806:26::20) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|CY8PR11MB7291:EE_
-X-MS-Office365-Filtering-Correlation-Id: f8cbb68c-14fa-4f71-335e-08dbd0148a5d
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|IA0PR12MB8840:EE_
+X-MS-Office365-Filtering-Correlation-Id: 04fa3703-f907-42df-56c0-08dbd018986c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1q7Nyyn3c78v0KJr+qcVpPVkQwIY8xH3LmePN0JvnWkPXYpVBr2t/cvj2FYCkPsT5xunWLlRF2W76EO1DKXva/seyDd4mo7vS/l3sQaI53Rd4TkRvY1qzs7CtLMymxT3l/N2wuuotHW4top/vYxOvMuetBYt9Xg0azW5tHxSIDCL6+yudpOcWcDoMKuJbqkCzjNmwU1Nk/6wPx+dDcWj4Me1xMd64gWL9B0UkDKHnYYg65E+aYaVK+cHkVapzqVf+sgKoapPwwFBHHHXAwn3D/+l8ZIFRvGaYXhX9Kw8i9RiQKioOhaHY8g2hYH2svgRY5c0CFA759IvR2CF0YF2wLpeHuTirNrSdHZvS3QFls5nGmmCVCfNYapDjWQ1wjK9i2e0nYkxnoCJWR47gbH7cf5CNSTa7A/gClPAusGyHMyOpTZEafX5Y5sWIyqM9+p6mODsWCy5NRCp++Tq3K7dXA3SFR9f7env8bPNpZeWi3bKNenywTJnhX2p/6cLHsI/69xHCqIwLoAmk/yvQW0J9kk6PVub5etWCp5P0LUJfcu1pBhQQum720ZYdqowfkwX
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(396003)(366004)(39860400002)(136003)(230922051799003)(451199024)(1800799009)(64100799003)(186009)(66946007)(7416002)(2906002)(86362001)(4326008)(41300700001)(8676002)(110136005)(66476007)(8936002)(5660300002)(54906003)(66556008)(316002)(26005)(83380400001)(82960400001)(6512007)(38100700002)(9686003)(6666004)(6506007)(6486002)(478600001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: n4pPuwAn+ip3Zc0bps996/l0DockWkGcxozh8HhuqCa6haWOyLMWwTUvYiGLGJH7RM8z0sLiuNJZvE2YyBiLqp5cv9WHjS6aiaUVKOvxa/W0B+5kO+qNtBlOK2TxMo8fpUOrLGuLbiIB+khAYoJ/TmOq49dwfgoqwR2MPfzYkSSVZhm1UEdger7z5S6RTSejFs4u0gr7byn8uyIYxj/u8GQpeQ8Gghc5MelrKa1ASad1RDG25kpPmw0c44dvgUli6/ypBt88svZamRAjvBhY4f9778Zy+frJ4gs7eO+CIUl6c7bv9UCCtX2VEuzow258dlshZgE/G0UUdLlPDAc9Fjp3dFbnGLOw3mNGmJ5ISm6ycuU81FETPp+c3XemaZHFT/y75vUNy7M70kMQZ4P1nEF9lXFTT1BOW0rmSKi8RoOH79T/t6wzYP5M5sC9LBxcwwAjLhBp5Dia9VyZg5DxbvqFIyenznAx4qT+w7YNT3HyZrRav2ZkeoEu4LNyI/I9WO7Wxnz0hiuukFK9EWO26ueT0vXJy8jPRSoRbQgrwp/ZWElQCDW2rGeipf99myMfJ/7i7DAlaKMiKSqrdp7CRivy5ZXsqV+q4D2K6mqVR/HWATLPOKqyu0N2TGjAYtAHz/UKJKCJ/GxoKw5vnayJoQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(346002)(136003)(366004)(376002)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(2616005)(54906003)(6666004)(478600001)(66556008)(66476007)(66946007)(110136005)(6486002)(6636002)(53546011)(6512007)(6506007)(41300700001)(26005)(316002)(7406005)(7416002)(4326008)(2906002)(8936002)(5660300002)(36756003)(8676002)(83380400001)(86362001)(31696002)(38100700002)(66899024)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Aawo2S6LfnPzWvyoxHtVrFTHQXN27J9dCWT95JQEvLysXb6EKauXmYGBfgXe?=
- =?us-ascii?Q?BPWQtJNu0RUCe6ZyMD6NabYoemfKUPuMUQ23ivap8mhXma0gp+WlY6WxnI9E?=
- =?us-ascii?Q?a+DeXR0DijT6k2/pxo9dtkoJBYA2HhEzuaxJgzQCYjJ+Tb5K9jAARVN163FY?=
- =?us-ascii?Q?lhO4uzGoFqeO9Kedw08kslTkFgZvi7aqiZ7IsfRdOl84bJqZoZ3kkAnPd14G?=
- =?us-ascii?Q?hEITZPFJpbosxn3nsxjFTgVnPukuKAWtcOlkCJBVfXQ78QRPDUUDyejk9ZOB?=
- =?us-ascii?Q?8VYmb/Bt1aD18x4e7xStJMhETftAQlAR0l0W8ZiVhE/2jkePNSle2G7olc5O?=
- =?us-ascii?Q?TmCRVPpbmiOJRU3QbAn2dT5OUr/IOuSEMq5ln76u9LELJUAi7qN3PCRChasM?=
- =?us-ascii?Q?/oZO7smxBAWu3w1+qgj17dit3HOEKU/0GOoK/I7GEh6KwPd1RtUgqk/ijn2g?=
- =?us-ascii?Q?2qbjGxOsUpMYZkQdvoYU678Xbku8GTPNFMLjlBOTC81n+60QWzbkpR6F50Et?=
- =?us-ascii?Q?ZFyhHY75sl3IOLVRwbX+7OkR0WfzJwunmXajCoI2KtqB0aDUJvW0PkJwvdIX?=
- =?us-ascii?Q?+tiD6HD6ST71zS6zzCJq0ksJi6NmGDOFQg69WsvMiewuS8bXGsy8U94EbYnn?=
- =?us-ascii?Q?OChYvNAR6k/5fdAdSf+v0FIUfV1ZJYY1Cxtx/OgbmJyKFE2EaO7IjCHsdIRk?=
- =?us-ascii?Q?CCJxJ2oPdqSuZ3azXltJMqcKuCsi3H2QxPmeAAB3YaA0+manqOyxPgiWvlOo?=
- =?us-ascii?Q?JL+JQ8BORlDrKiFScoEyJi7mf+I/pBr9ZMWWfH5yYVMwB1KG/an32VWskJuW?=
- =?us-ascii?Q?Gw3iEkkn8boRl1mwRpZeNLFfI13fMojTe43N+LSJdTX98TR3FC6CV8mzc7g0?=
- =?us-ascii?Q?0hG85wyJuKaoBMT6OQq+C6BMh/SVgl8PnUeib9dmatsESN7T0/NgdMtaB+g7?=
- =?us-ascii?Q?o1OLicKUtFtV/dbE/7lulVeb0fZQgM6FW+2KfbLIHProR/4mtFMPKub4FK5U?=
- =?us-ascii?Q?1E13qm3St7vgSFCYDqyov6bN87HLbo2sl7++tJ76vdm9Df95lF8oCU3PVZHF?=
- =?us-ascii?Q?DZozaagQGKND2VK9ubOp723XpUeDSm2aU5Fn0P4+YQWW9lRV3hwCDFbPJQ0z?=
- =?us-ascii?Q?nKC7tYj3IUFvrbfWq5bytwDq7Z3g2JwMkysxucX9LqF2QWLb2LD7EW0r4NvX?=
- =?us-ascii?Q?3n1GJ5dVsFld0e5j0ZOuLglPpnLWoKlSuU2rBvfRDBWAP0I3wgHDylw33T3r?=
- =?us-ascii?Q?vSdrxWDRnsLl06uvoqlVQuOwt4GE22l9+yd6VSFiJPvEkWZmvSHC671e4xVQ?=
- =?us-ascii?Q?acPiUvsqnCfMy1VOUUk16WticeDtSSqMDg2xp1YJIUL3fgQmrSvZ7crb52/X?=
- =?us-ascii?Q?ksa0eN6PW1pwOxmnJBrx+1hwzpz7cVwrv2JxwvrjyMiMXaF6oRewvTD7CCt7?=
- =?us-ascii?Q?L9WjHk5C8eab2RrMWIn8RUOrhfDaW+lYbZrGQVDgLNAk1DyMj4qBmL/2n9Bf?=
- =?us-ascii?Q?q6HuS4KBxfxtZ3qT2ZjH77c8eqhf40wLEj0qBBFYpal52LRY4XMB6gRqB11T?=
- =?us-ascii?Q?b8LwEaQwbxXWx2i3hEMAg7xzO2/+jxyP8poBSDr9FFKG+8EW54fndCcabFPH?=
- =?us-ascii?Q?Cw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8cbb68c-14fa-4f71-335e-08dbd0148a5d
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cmxMcXZJeGpvcXcrQVd6bjhyeTZ2cWdrY3p1K2tQYnQvdnc4VUxxSzU4TUpT?=
+ =?utf-8?B?NVZRcEcyYnVrNVRSczBWMCtQK0JwRUwxcEpNU3lRMGdyOC9qZkNGeUFKeTJm?=
+ =?utf-8?B?Mzg0YVA4RTlyVENCUmJIVXlxUHZPSWFFblhGMzBNSGFYbDdDenRYbEYvMFBa?=
+ =?utf-8?B?SzRKL0s3K2Q5U1ZFMFNtem5MaDYrZW56V0pqenc4YitaOGVheGVDS0NJYnFG?=
+ =?utf-8?B?R2thbGdGSnNCUm5KenpwQmxuVDUwRS85bDQrQXpZQW9jeFRubnlKNTU0NjNj?=
+ =?utf-8?B?ZWxIbERiY280TmxOcFNPZ1ZxN0t0ckllYmpKY0RkM2E5c05hOWR6RmlwU29j?=
+ =?utf-8?B?bDcvVU4rR0JhL2ZOVEQ5U3BRZ29yNHVOR0ZFRjZaVW1iTXdGZ1F2TlB2Vy8w?=
+ =?utf-8?B?QU5JYUZ5MzNkVzZ4M1ZPYmt5VEMvRC9xb0YwTjlMMVMvcDNVa3ltWlFRNG5Z?=
+ =?utf-8?B?ekxpMUpHeStXU3BpaWN3U2VXZ1h4a2ttdUs0cWlGWHJ0Zi9TOXhUVFpQenB5?=
+ =?utf-8?B?MUxDWDZDWFZiSUY3QTMvQlNIb2lBRkpjZHlpU3FhT24yRlFlenJsNXBtdmpO?=
+ =?utf-8?B?QytvaUhKUHNOSjU1OHBPbG1KRjloQkF5ZXZMT2tqTDljN2ZieFFqNDZCMVd5?=
+ =?utf-8?B?TDZhdk8yVVYxbk9ERWk3Z0dYNHB4a3RjVTRxNUp5VTd5S1ppNisxZDkwRjZW?=
+ =?utf-8?B?bTZkVlUvWUtnMnczb0N0d3hLZXQ1ci9PSGVJQXdzUjBLTHJoSHZ6MjQ1MGFh?=
+ =?utf-8?B?UjB0a0xEZkFSRlNVb3VDNXFyQkRmRnJpUGl6UGNGN3NxY1F5emh5cXZ2MWpj?=
+ =?utf-8?B?SXVFWXpOSHQzM2xQMSs0S0JvZ0UxNUxsSytlck8xMExLVzNLaW14SGREWkJv?=
+ =?utf-8?B?WHlUVVhxRkRHNzE5U2VvVlo1NnNLZkJZbCtlL0t2Z1FON3JKeEZNNGFZbWo1?=
+ =?utf-8?B?d29rcU1OZVJ3cWV1SzBCSlgzVnZEUytyVzNaRXhvRkE0bW5QUyt5b0pKeGp2?=
+ =?utf-8?B?TWR0L3Z6T0JZR2s2R1pCQmhGeXk1NVJubjV4Yzc1VlQ4TFpIUmg3NVkxUWNw?=
+ =?utf-8?B?Q3JLMG14eTRUU1hhOGtkR2tDb3dCMDlZVG05cVNTZll4dm1aRWRjLzRjc2JQ?=
+ =?utf-8?B?VHpyZ01yWXpLNER2SVArZloyQXUxU0JDSzJZTE5PSHRkemVZTXRMdnJBWDc4?=
+ =?utf-8?B?dGRmVFI4eEFSK3hGbmx1cldBdUpZeWYxZVg2OFlFSThaTnAvZ1V0UTd2SUI3?=
+ =?utf-8?B?MkZ6dWNmQ3ZMU254UmEvOGFhMldvUW9SNjkzRUJVUUoxNFRKdERMYXpRUmhw?=
+ =?utf-8?B?WDJNVFY4eXE0VHo1Mmg0Q3luNlc3WkRVS2lPNTFsU1dRNFlYRW9iSER2Q3VY?=
+ =?utf-8?B?a2poTGJMR3ZMT3M4UTNhRGNxRGl0Z3lWVWxvM1YwSWdHeWZIaXUxVkV1U0FT?=
+ =?utf-8?B?VGp4Q01XR1NhYXFoelh3eXNaWG90VFhkYy9QR3VzV3ZDS3VWc0xlSUp1Zm01?=
+ =?utf-8?B?djVHUGt0VUZzRnZiQ1NLOFNBZjk1bElyYzY5Mll6cWtOYnpyamY3aHg1emp4?=
+ =?utf-8?B?bHc3YVQ1Q3o5Y291UEd5ZGc0NUJpZ1E5NEJIVHlBbXZHUlludDY1M2tnRHoz?=
+ =?utf-8?B?NXR5YTRpT0ZTazFLVTJlaVMvbFRBcS9kODE0c2JONXRHMmdtc3c4dmJMNTM3?=
+ =?utf-8?B?aHdrWlRTNTRFc1kwM3FKZU5iZjZiMXgvaEdqK1J4SGZxSlNPZUJFb3dXY1Y2?=
+ =?utf-8?B?UmU1bHlnbC9QMnVwWDJTQnNoRmtSaEQrakxjaDlCZkhQTllFNVoyTUJ3TGVR?=
+ =?utf-8?B?aFFjSWNjQWd6WDZLRlE4cDZIbFA4cm1BVkZCaGQzK2JHdXEzN3htdHNPaXlv?=
+ =?utf-8?B?eE9vbHFxc1pMS3VseUpOeDZwaCt2SHRRMWgrSC9rTkx2Um1leUJ6bk5xaDY5?=
+ =?utf-8?B?LyttSFlBNkJ4bHBMaW1mV0ZYZkRXN1ZScG44Z3FTK2NqZlhYU2dEOVlHeVZZ?=
+ =?utf-8?B?aFpkK2cwOEdhZnlQL3Exb1M5VkdUeCtCbFVhV3E4M0Z2bUpWOXF5aEZqeVlP?=
+ =?utf-8?B?SStRdTlRRGdCblRKRlZOYWw1QjlDd0htRjdoOWlNYU9DNThGQjJ1TXcrQkJ2?=
+ =?utf-8?Q?r+PA48miOS0DfefWfkpLr8lVA?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 04fa3703-f907-42df-56c0-08dbd018986c
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 19:58:04.4330
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 20:27:05.9725
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xSizCBDq5dXuT4LJ7l18pO4VChexfHWY4a+JuuY+um/u3yaNMxNjYculbBNydcThYpdTD4ggxMNfpH0kPuDrwWxo716XISW8OkAXV3JEFso=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7291
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: Twkt6Db/9mmDQSzMcGWd33JpqHZETELK3IG7gi0m4i+a2LmdG9tbVw4QW/waM9hjRLoYvUN1Wf86QxGc9njSsA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8840
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jonathan Cameron wrote:
-> On Tue, 3 Oct 2023 21:30:58 +0200
-> Lukas Wunner <lukas@wunner.de> wrote:
+On 10/18/2023 8:48 AM, Sean Christopherson wrote:
+> On Wed, Oct 18, 2023, Alexey Kardashevskiy wrote:
+>>
+>> On 18/10/23 03:27, Sean Christopherson wrote:
+>>> On Mon, Oct 16, 2023, Dionna Amalie Glaze wrote:
+>>>>> +
+>>>>> +       /*
+>>>>> +        * If a VMM-specific certificate blob hasn't been provided, grab the
+>>>>> +        * host-wide one.
+>>>>> +        */
+>>>>> +       snp_certs = sev_snp_certs_get(sev->snp_certs);
+>>>>> +       if (!snp_certs)
+>>>>> +               snp_certs = sev_snp_global_certs_get();
+>>>>> +
+>>>>
+>>>> This is where the generation I suggested adding would get checked. If
+>>>> the instance certs' generation is not the global generation, then I
+>>>> think we need a way to return to the VMM to make that right before
+>>>> continuing to provide outdated certificates.
+>>>> This might be an unreasonable request, but the fact that the certs and
+>>>> reported_tcb can be set while a VM is running makes this an issue.
+>>>
+>>> Before we get that far, the changelogs need to explain why the kernel is storing
+>>> userspace blobs in the first place.  The whole thing is a bit of a mess.
+>>>
+>>> sev_snp_global_certs_get() has data races that could lead to variations of TOCTOU
+>>> bugs: sev_ioctl_snp_set_config() can overwrite psp_master->sev_data->snp_certs
+>>> while sev_snp_global_certs_get() is running.  If the compiler reloads snp_certs
+>>> between bumping the refcount and grabbing the pointer, KVM will end up leaking a
+>>> refcount and consuming a pointer without a refcount.
+>>>
+>>> 	if (!kref_get_unless_zero(&certs->kref))
+>>> 		return NULL;
+>>>
+>>> 	return certs;
+>>
+>> I'm missing something here. The @certs pointer is on the stack,
 > 
-> > On Tue, Oct 03, 2023 at 04:40:48PM +0100, Jonathan Cameron wrote:
-> > > On Thu, 28 Sep 2023 19:32:42 +0200 Lukas Wunner <lukas@wunner.de> wrote:  
-> > > > At any given time, only a single entity in a physical system may have
-> > > > an SPDM connection to a device.  That's because the GET_VERSION request
-> > > > (which begins an authentication sequence) resets "the connection and all
-> > > > context associated with that connection" (SPDM 1.3.0 margin no 158).
-> > > > 
-> > > > Thus, when a device is passed through to a guest and the guest has
-> > > > authenticated it, a subsequent authentication by the host would reset
-> > > > the device's CMA-SPDM session behind the guest's back.
-> > > > 
-> > > > Prevent by letting the guest claim exclusive CMA ownership of the device
-> > > > during passthrough.  Refuse CMA reauthentication on the host as long.
-> > > > After passthrough has concluded, reauthenticate the device on the host.  
-> > > 
-> > > Is there anything stopping a PF presenting multiple CMA capable DOE
-> > > instances?  I'd expect them to have their own contexts if they do..  
-> > 
-> > The spec does not seem to *explicitly* forbid a PF having multiple
-> > CMA-capable DOE instances, but PCIe r6.1 sec 6.31.3 says:
-> > "The instance of DOE used for CMA-SPDM must support ..."
-> > 
-> > Note the singular ("The instance").  It seems to suggest that the
-> > spec authors assumed there's only a single DOE instance for CMA-SPDM.
+> No, nothing guarantees that @certs is on the stack and will never be reloaded.
+> sev_snp_certs_get() is in full view of sev_snp_global_certs_get(), so it's entirely
+> possible that it can be inlined.  Then you end up with:
 > 
-> It's a little messy and a bit of American vs British English I think.
-> If it said
-> "The instance of DOE used for a specific CMA-SPDM must support..." 
-> then it would clearly allow multiple instances.  However, conversely,
-> I don't read that sentence as blocking multiple instances (even though
-> I suspect you are right and the author was thinking of there being one).
+> 	struct sev_device *sev;
 > 
-> > 
-> > Could you (as an English native speaker) comment on the clarity of the
-> > two sentences "Prevent ... as long." above, as Ilpo objected to them?
-> > 
-> > The antecedent of "Prevent" is the undesirable behaviour in the preceding
-> > sentence (host resets guest's SPDM connection).
-> > 
-> > The antecedent of "as long" is "during passthrough" in the preceding
-> > sentence.
-> > 
-> > Is that clear and understandable for an English native speaker or
-> > should I rephrase?
+> 	if (!psp_master || !psp_master->sev_data)
+> 		return NULL;
 > 
-> Not clear enough to me as it stands.  That "as long" definitely feels
-> like there is more to follow it as Ilpo noted.
+> 	sev = psp_master->sev_data;
+> 	if (!sev->snp_initialized)
+> 		return NULL;
 > 
-> Maybe reword as something like 
+> 	if (!sev->snp_certs)
+> 		return NULL;
 > 
-> Prevent this by letting the guest claim exclusive ownership of the device
-> during passthrough ensuring problematic CMA reauthentication by the host
-> is blocked.
+> 	if (!kref_get_unless_zero(&sev->snp_certs->kref))
+> 		return NULL;
+> 
+> 	return sev->snp_certs;
+> 
+> At which point the compiler could choose to omit a local variable entirely, it
+> could store @certs in a register and reload after kref_get_unless_zero(), etc.
+> If psp_master->sev_data->snp_certs is changed at any point, odd thing can happen.
+> 
+> That atomic operation in kref_get_unless_zero() might prevent a reload between
+> getting the kref and the return, but it wouldn't prevent a reload between the
+> !NULL check and kref_get_unless_zero().
+> 
+>>> If userspace wants to provide garbage to the guest, so be it, not KVM's problem.
+>>> That way, whether the VM gets the global cert or a per-VM cert is purely a userspace
+>>> concern.
+>>
+>> The global cert lives in CCP (/dev/sev), the per VM cert lives in kvmvm_fd.
+>> "A la vcpu->run" is fine for the latter but for the former we need something
+>> else.
+> 
+> Why?  The cert ultimately comes from userspace, no?  Make userspace deal with it.
+> 
+>> And there is scenario when one global certs blob is what is needed and
+>> copying it over multiple VMs seems suboptimal.
+> 
+> That's a solvable problem.  I'm not sure I like the most obvious solution, but it
+> is a solution: let userspace define a KVM-wide blob pointer, either via .mmap()
+> or via an ioctl().
+> 
+> FWIW, there's no need to do .mmap() shenanigans, e.g. an ioctl() to set the
+> userspace pointer would suffice.  The benefit of a kernel controlled pointer is
+> that it doesn't require copying to a kernel buffer (or special code to copy from
+> userspace into guest).
+> 
+> Actually, looking at the flow again, AFAICT there's nothing special about the
+> target DATA_PAGE.  It must be SHARED *before* SVM_VMGEXIT_EXT_GUEST_REQUEST, i.e.
+> KVM doesn't need to do conversions, there's no kernel priveleges required, etc.
+> And the GHCB doesn't dictate ordering between storing the certificates and doing
+> the request.  
 
-My contribution to the prose here is to clarify that this mechanism is
-less about "appoint the guest as the exslusive owner" and more about
-"revoke the bare-metal host as the authentication owner".
+That's true.
 
-In fact I don't see how the guest can ever claim to "own" CMA since
-config-space is always emulated to the guest. So the guest will always
-be in a situation where it needs to proxy SPDM related operations. The
-proxy is either terminated in the host as native SPDM on behalf of the
-guest, or further proxied to the platform-TSM.
+>That means the certificate stuff can be punted entirely to usersepace.
 
-So let's just clarify that at assignment, host control is revoked, and
-the guest is afforded the opportunity to re-establish authentication
-either by asking the host re-authenticate on the guest's behalf, or
-asking the platform-tsm to authenticate the device on the guest's
-behalf.
+> 
+> Heh, typing up the below, there's another bug: KVM will incorrectly "return" '0'
+> for non-SNP guests:
+> 
+> 	unsigned long exitcode = 0;
+> 	u64 data_gpa;
+> 	int err, rc;
+> 
+> 	if (!sev_snp_guest(vcpu->kvm)) {
+> 		rc = SEV_RET_INVALID_GUEST; <= sets "rc", not "exitcode"
+> 		goto e_fail;
+> 	}
+> 
+> e_fail:
+> 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, exitcode);
+> 
+> Which really highlights that we need to get test infrastructure up and running
+> for SEV-ES, SNP, and TDX.
+> 
+> Anyways, back to punting to userspace.  Here's a rough sketch.  The only new uAPI
+> is the definition of KVM_HC_SNP_GET_CERTS and its arguments.
+> 
+> static void snp_handle_guest_request(struct vcpu_svm *svm)
+> {
+> 	struct vmcb_control_area *control = &svm->vmcb->control;
+> 	struct sev_data_snp_guest_request data = {0};
+> 	struct kvm_vcpu *vcpu = &svm->vcpu;
+> 	struct kvm *kvm = vcpu->kvm;
+> 	struct kvm_sev_info *sev;
+> 	gpa_t req_gpa = control->exit_info_1;
+> 	gpa_t resp_gpa = control->exit_info_2;
+> 	unsigned long rc;
+> 	int err;
+> 
+> 	if (!sev_snp_guest(vcpu->kvm)) {
+> 		rc = SEV_RET_INVALID_GUEST;
+> 		goto e_fail;
+> 	}
+> 
+> 	sev = &to_kvm_svm(kvm)->sev_info;
+> 
+> 	mutex_lock(&sev->guest_req_lock);
+> 
+> 	rc = snp_setup_guest_buf(svm, &data, req_gpa, resp_gpa);
+> 	if (rc)
+> 		goto unlock;
+> 
+> 	rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, &err);
+> 	if (rc)
+> 		/* Ensure an error value is returned to guest. */
+> 		rc = err ? err : SEV_RET_INVALID_ADDRESS;
+> 
+> 	snp_cleanup_guest_buf(&data, &rc);
+> 
+> unlock:
+> 	mutex_unlock(&sev->guest_req_lock);
+> 
+> e_fail:
+> 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, rc);
+> }
+> 
+> static int snp_complete_ext_guest_request(struct kvm_vcpu *vcpu)
+> {
+> 	u64 certs_exitcode = vcpu->run->hypercall.args[2];
+> 	struct vcpu_svm *svm = to_svm(vcpu);
+> 
+> 	if (certs_exitcode)
+> 		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, certs_exitcode);
+> 	else
+> 		snp_handle_guest_request(svm);
+> 	return 1;
+> }
+> 
+> static int snp_handle_ext_guest_request(struct vcpu_svm *svm)
+> {
+> 	struct kvm_vcpu *vcpu = &svm->vcpu;
+> 	struct kvm *kvm = vcpu->kvm;
+> 	struct kvm_sev_info *sev;
+> 	unsigned long exitcode;
+> 	u64 data_gpa;
+> 
+> 	if (!sev_snp_guest(vcpu->kvm)) {
+> 		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SEV_RET_INVALID_GUEST);
+> 		return 1;
+> 	}
+> 
+> 	data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
+> 	if (!IS_ALIGNED(data_gpa, PAGE_SIZE)) {
+> 		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SEV_RET_INVALID_ADDRESS);
+> 		return 1;
+> 	}
+> 
+> 	vcpu->run->hypercall.nr		 = KVM_HC_SNP_GET_CERTS;
+> 	vcpu->run->hypercall.args[0]	 = data_gpa;
+> 	vcpu->run->hypercall.args[1]	 = vcpu->arch.regs[VCPU_REGS_RBX];
+> 	vcpu->run->hypercall.flags	 = KVM_EXIT_HYPERCALL_LONG_MODE;
+> 	vcpu->arch.complete_userspace_io = snp_complete_ext_guest_request;
+> 	return 0;
+> }
+> 
 
-...and even there the guest does not know if it is accessing a 1:1 VF:PF
-device representation, or one VF instance of PF where the PF
-authentication answer only occurs once for all potential VFs.
+IIRC, the important consideration here is to ensure that getting the 
+attestation report and retrieving the certificates appears atomic to the 
+guest. When SNP live migration is supported we don't want a case where 
+the guest could have migrated between the call to obtain the 
+certificates and obtaining the attestation report, which can potentially 
+cause failure of validation of the attestation report.
 
-Actually, that brings up a question about when to revoke host
-authentication in the VF assignment case? That seems to be a policy
-decision that the host needs to make globally for all VFs of a PF. If
-the guest is going to opt-in to relying on the host's authentication
-decision then the revoking early may not make sense. It may be a
-decision that needs to be deferred until the guest makes its intentions
-clear, and the host will need to have policy around how to resolve
-conflicts between guestA wants "native" and guestB wants "platform-TSM".
-If the VFs those guests are using map to the same PF then only one
-policy can be in effect.
+Thanks,
+Ashish
