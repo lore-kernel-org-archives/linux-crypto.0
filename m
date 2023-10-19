@@ -2,356 +2,366 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95390CDB483
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Oct 2023 02:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34BC8CDB465
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Oct 2023 05:47:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232589AbjJSCtK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Oct 2023 22:49:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37100 "EHLO
+        id S232621AbjJSFrv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Oct 2023 01:47:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232592AbjJSCtH (ORCPT
+        with ESMTP id S232694AbjJSFru (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Oct 2023 22:49:07 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2052.outbound.protection.outlook.com [40.107.223.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A1DD12C;
-        Wed, 18 Oct 2023 19:49:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e44sMuoMWcJZf3YLqNjNmI8162QcO/75TfC2F92+bpBdmFzKCCUghGVBe6RJ07zevXvsvovHL0CcVEldqp3UQANoSg+GsYXWg287KtqlfPzFXK4BEGTw/RdNhArdvixz+4QHG/BqVYXEapCm/Nd8anA/yOsFXSplQd6uWOdOd6tikbslkjn4Brl3xa1qLmgILW8DwiH12EUx/K8kow62WJvU1swwMyIK9DcLmfwg1fQIRhjC/BwrtfElXfYNU3Jo8Txlfa379DKG2ETCN0PdtxDHZqwzEOHGAlgS3ZR83idt31pIWqxVqvYIL8dL11jL8c33aChWBpLGwByRRT5Azw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=q75WRsg9zaLqjI5Ls/eaC6LNAr2oOqKQfdFy0VzIxnU=;
- b=VwdV/gAVpQsU2tgw1WBw7Fs2gUZ6zEB3yGwViiUFWNQ8VLCmUH7+gJ13tZnneGWTlyU8uJsvyee0OsDFDev/ojl5CEk03d2EvwHAmO5T5B4sA2YvrUy23mVjHoKo83qASbiCw/pusGEYbWewyyh98beGzswoC1Oap9Y9EU2o+wd5lZwj5DIu/3Tj9M/Gkb2KDllM4NHc+xorsabUBMuaLB+nS1VQMbEmlHiEqlp/3YS6013LlUhIuRDezoWwEzqq42zQxZALfHS6MIuvCMHiil1mEUxWnH5JeNHFE8FqcD8E4kCipoqvsXbvJ+KHpt2i+3xNSS+5r2aTtPnBc9DE4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q75WRsg9zaLqjI5Ls/eaC6LNAr2oOqKQfdFy0VzIxnU=;
- b=rKcHOYEqc2uTBSXN191mFMOxF/qdsAIyKxp++7WeXX1nDJrMC4zXZiBfBwTdc0U9lSTnYwNEFldQFtgXm02OLsX3E6le4AH8OvNqOX9KciXSY7YLDteWT8vDx1+UNpjhiWYMIcq8NitT9DZI1fA00Iq4hq9ltuHa4Vh0NPSlSm0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by PH7PR12MB9256.namprd12.prod.outlook.com (2603:10b6:510:2fe::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.43; Thu, 19 Oct
- 2023 02:48:57 +0000
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::16da:8b28:d454:ad5a]) by CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::16da:8b28:d454:ad5a%3]) with mapi id 15.20.6863.043; Thu, 19 Oct 2023
- 02:48:56 +0000
-Message-ID: <924b755a-977a-4476-9525-a7626d728e18@amd.com>
-Date:   Thu, 19 Oct 2023 13:48:26 +1100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 48/50] KVM: SEV: Provide support for SNP_GUEST_REQUEST
- NAE event
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Dionna Amalie Glaze <dionnaglaze@google.com>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
-        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-        pankaj.gupta@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-49-michael.roth@amd.com>
- <CAAH4kHb=hNH88poYw-fj+ewYgt8F-hseZcRuLDdvbgpSQ5FDZQ@mail.gmail.com>
- <ZS614OSoritrE1d2@google.com> <b9da2fed-b527-4242-a588-7fc3ee6c9070@amd.com>
- <ZS_iS4UOgBbssp7Z@google.com>
-From:   Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <ZS_iS4UOgBbssp7Z@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SY5PR01CA0075.ausprd01.prod.outlook.com
- (2603:10c6:10:1f4::11) To CH3PR12MB9194.namprd12.prod.outlook.com
- (2603:10b6:610:19f::7)
+        Thu, 19 Oct 2023 01:47:50 -0400
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.161])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B828124
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Oct 2023 22:47:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1697694285; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=a1csoRkctLhqvtY3usOZp4So6YbfKrLBqsfzuj+pDbvhLl6+Bl982E6Ro9OnPZuCtC
+    3PhrJLwuLe+S8yBoU1ISUrjh9FRdLfHfJ9g90EAMGd0YdOmKvT+VMaFdpRHX267lXKGJ
+    HocaPYe3ONR+k/HT1TIXyb7ODjdtD2S3BhuQr/Cbus9Eyj2Mp1Qfj5AVJu641VBudRBZ
+    djHmbzoEbgL+cAc//zllAar2xOwufCb47Oiix5SHsuMiFhUQCaN8KFW19asQsfv4G3Ye
+    rACiq1IqbaOxnjhAAR3zQH6+8O/rC2BAlw0Qu+a2E+JcgGOA+4gd5yxdZaTSwspFhIhE
+    QMCA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1697694285;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=en6MA+0nNqYor3VGLy6bMayIhQuf3jpkidi2zdIQeCg=;
+    b=Ax0IXhHWcilGk3vGKsnJCAg6IUJxcEw/XWXs4H6oMq+Lho2MiPYJ0Y/plJHscXzVWp
+    IEK81CWHIoXOXerO15zYY7R6SdovL1dNoaVfdbI002UIHo2FIiuUf+t3nroabTZ0r3kf
+    4NS6R8oQIbNtOAEvRC3PTptV56s83vaHh/6QK5yrzuGWEUdDk5WMn4UKIqH4+Y0k/nhV
+    jazEwR90fvfXzwlpW2CEi82Rpe0KT1gptYwpVztZftYxN4nxAQgEHtxSFMP0BdQqbNTz
+    TSXiRzDKO+CIaPFqw2D090RNHyBz758FE/JJZ2CeV088G/o4RMv/G/91A0k+D9uzbLiM
+    7SKg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1697694285;
+    s=strato-dkim-0002; d=chronox.de;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=en6MA+0nNqYor3VGLy6bMayIhQuf3jpkidi2zdIQeCg=;
+    b=IdoPgV2Ij+s7yEte4ia9Dc7DF01QyiJxybTlvkl2ehZb7Vyc74b0Il32lpkH+NrRLr
+    jOmwGIQabSJzfWOBSsTCdcWeQjLPoqaJjZvKlDdb85q87mREIkpH3OW9R8nkza4yHYV+
+    TkbmkxfsYbosRRQtf8xXiyDh2l0Gd/u9LtX4JF6ZCWewyNoly5vbTTDbnbdCn2b/WcnZ
+    JJh2w06VWCzVbVP+x8BASpE+b2QelozyL+BUP2VQ4qZgpvqY9DR6j7F8+FzercX+QMcp
+    8LIg2ysdLkN+eU0gUuj6T6N6amkMz8/o+iTth9XvemkvFf1RTu0y6X4xsKgXToN1qMEH
+    ZENw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1697694285;
+    s=strato-dkim-0003; d=chronox.de;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=en6MA+0nNqYor3VGLy6bMayIhQuf3jpkidi2zdIQeCg=;
+    b=CuoeCa5ljBDn7ukR4RyHRIY5KoMYICyTGtrnwWC3Po0BYNFmeIrN6qZLhfYOnFf+Dc
+    5o4LJBO9NW465anZezAA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9y2gdNk2TvDr2d0i04sY="
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 49.9.0 DYNA|AUTH)
+    with ESMTPSA id 22e7d3z9J5iiGxw
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Thu, 19 Oct 2023 07:44:44 +0200 (CEST)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, "Ospan, Abylay" <aospan@amazon.com>,
+        Joachim Vandersmissen <git@jvdsn.com>
+Subject: [PATCH] crypto: jitter - use permanent health test storage
+Date:   Thu, 19 Oct 2023 07:44:42 +0200
+Message-ID: <5719392.DvuYhMxLoT@positron.chronox.de>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|PH7PR12MB9256:EE_
-X-MS-Office365-Filtering-Correlation-Id: 068660b4-d522-47b6-e1ad-08dbd04def2c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lh5/0oyNVMewlcefv6a/erMyrMMUZdd5u5DTAxbuKt9NQi2R5sDctMcOEpjzaoOVQKkSvN/P0h0pusRobl1+H7QGw/kLs2yuu3VBrgbrCVu+2fjU3Enwjcsi1qRj8v9Zqt+Uh2EiqswOlfkbRmhZ0/hV204qG9RVYWSmvkzX6et2HWgFBW91Nx9Rl817khfZVD6bwika6+XxNhXE6EqSx1nL+V5kZS/V3rEuGdpEEjUtd4y47zVoprrLHMbzxFsmAg8Yr7tf1WiigMpHg18tx315SjL9ZdtgWSeIrZEEC+okQRVIY34S9/9sThCGPd22c210PPsSJChcZJsuG9HyTqz9hjD7S03jDbKViE1EAkmMiT8X2TAI/DurTjuLf58WKYqOyMSmDPfVAQtukvEKjokxLCys9RfF24oEjXS5Oh21176gKaqVRaRv2MBa2TCqgPZvB98DNovYaZlo8BQ7kHGWzR1IG9w6ym6UG5hQhySt/oISK4DW/QYiDKk06f9JHkVlIO7oTIhuARBYfe9AM9mzCzuuKA34FSRdcrTLSBRIp+4sV2RFZRCNUcvUIWkBI5WU2bhbPCE9bVK0BtQ4K5g0BsuiabV4EIRaDci3/LwHctYQBD4eWXSnejp0tJUibDUds9Q1x5OO3rZKV0TLjg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(39860400002)(376002)(396003)(346002)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(4326008)(66946007)(66476007)(54906003)(8936002)(66556008)(8676002)(6486002)(6916009)(5660300002)(316002)(31686004)(41300700001)(7406005)(6512007)(7416002)(66899024)(2906002)(26005)(83380400001)(2616005)(31696002)(53546011)(38100700002)(6666004)(478600001)(6506007)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WTAzQUFkZHpIWGh2ZFZRSi95amcxSTNtUTJVcnlZMVdlL2ZTc0tvYWErNUow?=
- =?utf-8?B?L3dNczNYYUc0U3o4R0twR2YyT2JaRXB4RTZBckE0MnNoSVRndWkxWGpjV2lG?=
- =?utf-8?B?UzRMbStsSFRsZDlSdll1SFBsNnBvdjdoOXVxSjZhZTVXWnFUYU4xZENOZTU4?=
- =?utf-8?B?QjE0bjBlZE80aENaU0UvbDdpc1ZiV216QU9tOVRaQWkrcG5ISjEyN05FdTdJ?=
- =?utf-8?B?L0N4ODRrYkp6R243LzloSWN4SGV6L2RIV2U0QnZIYzAwMFpkYjBKNjdJcGZ4?=
- =?utf-8?B?NXRtc0o1emY5ZXg5U1pMLzdVQmltbmpNWUxsYXFtcktJTmlBYTRjOWRTS2dq?=
- =?utf-8?B?TWlGUnFwelhqaXZNUXhibUp0YmdpTEZYcUwwTWU2S09KeHNpdUJHc2x2UER1?=
- =?utf-8?B?OTgxT05wUnFwbkxob2Z2LzVBOUhFZUZ6bkNSNEhXbDg0SmpJeE5MWXVheTJQ?=
- =?utf-8?B?ODJoNFoxanVaa3RJdnZuVEdXSjlyZ0hwZjZOWE4wVkwwdmsyWFpJR3llTHln?=
- =?utf-8?B?MFJxeXdLNW45NksvazJ1MEFzdVVzL3FqR0psT0VnVlV0RDR4WW5TWFFwcUd1?=
- =?utf-8?B?aHJmU1g1N1R3Zm5wbTRzdWtjcjhDVzRZYlM2QTYwaVVldkJkNU1jRFZheSth?=
- =?utf-8?B?T0VETjZxRk83aThmTlh1MlNVQndjSDNUdmFPQXhGbXNIT280N09qUTRMSlBX?=
- =?utf-8?B?VWdzZisvWlJDSjY0a0hmZk9RRTAvUTNycm1Nb0JoMG1aZ0duLzVaUVNyTkxn?=
- =?utf-8?B?L2l6NW8xOE9RVHJGeTc0TWNCeVlpOW1kNTJtelo0NXlsVUgzdmtZd2cvNWoz?=
- =?utf-8?B?c21BaTFSamh6Q0tkMVIzcGRGRUNDLzhpZ01pUno2L25Sb3RsM0pDV3dpUm8y?=
- =?utf-8?B?eTdaaFFSRXZqRVZCMDFhWlhDMk9UTnVsbGx4dUVqUUMxN3BINkdJLyt3bjM4?=
- =?utf-8?B?RUcrZnoxTzY2VGdKUGczcDJteXUyVytYRUt6UkJhM25SUGF4Smo5MEZOZEk5?=
- =?utf-8?B?T21kZHBHSk1lRHQ2MmRhZFR1TGxobUFqQ2UreWtHZEUvbk1pdUYxbDZxRnpP?=
- =?utf-8?B?cytmbkh4NmpId281akQ1bFVBb0phQkt2YjluMERrcGFoMThUbStaRkQ1MU5D?=
- =?utf-8?B?LzFEUG11bVJUMXJDYjRjdU9Zc2VNY0NBRHJxQ3hHanlXemhnYTlNV202Tyt6?=
- =?utf-8?B?WkZBK0JVUTNabkFOdU9YNmxMaEY1d3lDckRtVkNIUXNmOEVoU0c1dVhmcmNj?=
- =?utf-8?B?ekw0VjhnMW1oZ3JmRXNyQVpZU3FTcVRrM0piL0xlcVZZZHNrZ2xIdi9HWW1Z?=
- =?utf-8?B?dHJLQ3dEYVRuYTJwZWhhMHR5bm9sZFFmc2s3cmV4Y2o3aDlEY3NHVmNhcHJB?=
- =?utf-8?B?R3BjdE0veFZTNld6LzhQYVR0VTcxbExsRFJ3TWZPTjZKcjV2clIwamFTVnNS?=
- =?utf-8?B?K01KYkQ1TUZXZmRWSmtiLzhVQmZCZlhuKzZMc1daTkdCSkc4eUVkakw4bjI4?=
- =?utf-8?B?eDBGc2s3WVRvRXJmL3ZqY3NybDk0eEVXbllHL0gxSktLMSt3REIwZENvQ1Qv?=
- =?utf-8?B?NmxFZGlhWjRsRGw4MHYzaHcxbnZEOXhxcWZJTmphRUlwTkVGYXRrZzVmYldn?=
- =?utf-8?B?eXlaNEV2Y0Y0MmZyVnRnRUtzK0hudXE4STNGSVBkU1N2OURLS3ZmaHgydE1I?=
- =?utf-8?B?VHBLbmlERCtQdjY3ZVlCT0MvcWVEQ3VZMXVjMERhd0JJQUdoYzNoR3R0Uk9i?=
- =?utf-8?B?VUh1L0wvMElONkdFK1dveG1zcGpFVlI3UExyQ3NJK1pLWVVKaEhEQjZ6ZFZZ?=
- =?utf-8?B?SllqYjUrcUx3RlliU2JncTVLOFhMcnBiaEZXdisyNFFLTy9GL0kxN01oRVBp?=
- =?utf-8?B?QVFyazczYmY1ckFxNHFXWGhBS1g5ZWxPNC9OWjBFN2o0NzJtbUVuUzhsZ0ph?=
- =?utf-8?B?WVNCTHI1ckN2YjQ2MXd6Smh0bDB0a2hSTmdURzQxYnJKZTUrckV5bUFqandD?=
- =?utf-8?B?d1BCVGlmVHJ5VmZoSFJOd0Fjd1E2bFRqYjBtMHhCTldwWlVVNnhTR21haURv?=
- =?utf-8?B?VUlUdVZxQ3lGK2ZsYlNXMWRyaGhEcjlleDZUWi9FNFFsRFFodU1LOUpRQ0Fy?=
- =?utf-8?Q?jJv40YW5+4e/Mj5HOA6x26/Uf?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 068660b4-d522-47b6-e1ad-08dbd04def2c
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 02:48:55.3196
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kcLiFAEDfJViBKl5ZgD3MPpXEdt6uAVQ/6KU7jSPwVuW224q8z+UV7vrgSibgPybkJAm+kMAM23JGlKntohVhQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9256
+Autocrypt: addr=smueller@chronox.de;
+ keydata=
+ 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
+ kBFBHm+xdudNab2U0OpfqrWerOw3WcGd2
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+The health test result in the current code is only given for the currently
+processed raw time stamp. This implies that to react on the health test error,
+the result must be checked after each raw time stamp being processed. To
+avoid this constant checking requirement, any health test error is recorded
+and stored to be analyzed at a later time, if needed.
 
-On 19/10/23 00:48, Sean Christopherson wrote:
-> On Wed, Oct 18, 2023, Alexey Kardashevskiy wrote:
->>
->> On 18/10/23 03:27, Sean Christopherson wrote:
->>> On Mon, Oct 16, 2023, Dionna Amalie Glaze wrote:
->>>>> +
->>>>> +       /*
->>>>> +        * If a VMM-specific certificate blob hasn't been provided, grab the
->>>>> +        * host-wide one.
->>>>> +        */
->>>>> +       snp_certs = sev_snp_certs_get(sev->snp_certs);
->>>>> +       if (!snp_certs)
->>>>> +               snp_certs = sev_snp_global_certs_get();
->>>>> +
->>>>
->>>> This is where the generation I suggested adding would get checked. If
->>>> the instance certs' generation is not the global generation, then I
->>>> think we need a way to return to the VMM to make that right before
->>>> continuing to provide outdated certificates.
->>>> This might be an unreasonable request, but the fact that the certs and
->>>> reported_tcb can be set while a VM is running makes this an issue.
->>>
->>> Before we get that far, the changelogs need to explain why the kernel is storing
->>> userspace blobs in the first place.  The whole thing is a bit of a mess.
->>>
->>> sev_snp_global_certs_get() has data races that could lead to variations of TOCTOU
->>> bugs: sev_ioctl_snp_set_config() can overwrite psp_master->sev_data->snp_certs
->>> while sev_snp_global_certs_get() is running.  If the compiler reloads snp_certs
->>> between bumping the refcount and grabbing the pointer, KVM will end up leaking a
->>> refcount and consuming a pointer without a refcount.
->>>
->>> 	if (!kref_get_unless_zero(&certs->kref))
->>> 		return NULL;
->>>
->>> 	return certs;
->>
->> I'm missing something here. The @certs pointer is on the stack,
-> 
-> No, nothing guarantees that @certs is on the stack and will never be reloaded.
-> sev_snp_certs_get() is in full view of sev_snp_global_certs_get(), so it's entirely
-> possible that it can be inlined.  Then you end up with:
-> 
-> 	struct sev_device *sev;
-> 
-> 	if (!psp_master || !psp_master->sev_data)
-> 		return NULL;
-> 
-> 	sev = psp_master->sev_data;
-> 	if (!sev->snp_initialized)
-> 		return NULL;
-> 
-> 	if (!sev->snp_certs)
-> 		return NULL;
-> 
-> 	if (!kref_get_unless_zero(&sev->snp_certs->kref))
-> 		return NULL;
-> 
-> 	return sev->snp_certs;
-> 
-> At which point the compiler could choose to omit a local variable entirely, it
-> could store @certs in a register and reload after kref_get_unless_zero(), etc.
-> If psp_master->sev_data->snp_certs is changed at any point, odd thing can happen.
-> 
-> That atomic operation in kref_get_unless_zero() might prevent a reload between
-> getting the kref and the return, but it wouldn't prevent a reload between the
-> !NULL check and kref_get_unless_zero().
+This change ensures that the power-up test catches any health test error.
+Without that patch, the power-up health test result is not enforced.
 
-Oh. The function is exported so I thought gcc would not go that far but 
-yeah it is possible. So this needs an explicit READ_ONCE barrier.
+The introduced changes are already in use with the user space version of
+the Jitter RNG.
 
+Fixes: 04597c8dd6c4 ("jitter - add RCT/APT support for different OSRs")
+Reported-by: Joachim Vandersmissen <git@jvdsn.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/jitterentropy.c | 125 ++++++++++++++++++++++++-----------------
+ 1 file changed, 74 insertions(+), 51 deletions(-)
 
->>> If userspace wants to provide garbage to the guest, so be it, not KVM's problem.
->>> That way, whether the VM gets the global cert or a per-VM cert is purely a userspace
->>> concern.
->>
->> The global cert lives in CCP (/dev/sev), the per VM cert lives in kvmvm_fd.
->> "A la vcpu->run" is fine for the latter but for the former we need something
->> else.
-> 
-> Why?  The cert ultimately comes from userspace, no?  Make userspace deal with it.
->
->> And there is scenario when one global certs blob is what is needed and
->> copying it over multiple VMs seems suboptimal.
-> 
-> That's a solvable problem.  I'm not sure I like the most obvious solution, but it
-> is a solution: let userspace define a KVM-wide blob pointer, either via .mmap()
-> or via an ioctl().
-> 
-> FWIW, there's no need to do .mmap() shenanigans, e.g. an ioctl() to set the
-> userspace pointer would suffice.  The benefit of a kernel controlled pointer is
-> that it doesn't require copying to a kernel buffer (or special code to copy from
-> userspace into guest).
-
-Just to clarify - like, a small userspace non-qemu program which just 
-holds a pointer with the certs blob, or embed it into libvirt or systemd?
-
-
-> Actually, looking at the flow again, AFAICT there's nothing special about the
-> target DATA_PAGE.  It must be SHARED *before* SVM_VMGEXIT_EXT_GUEST_REQUEST, i.e.
-> KVM doesn't need to do conversions, there's no kernel priveleges required, etc.
-> And the GHCB doesn't dictate ordering between storing the certificates and doing
-> the request.  That means the certificate stuff can be punted entirely to usersepace.
-
-All true.
-
-> Heh, typing up the below, there's another bug: KVM will incorrectly "return" '0'
-> for non-SNP guests:
-> 
-> 	unsigned long exitcode = 0;
-> 	u64 data_gpa;
-> 	int err, rc;
-> 
-> 	if (!sev_snp_guest(vcpu->kvm)) {
-> 		rc = SEV_RET_INVALID_GUEST; <= sets "rc", not "exitcode"
-> 		goto e_fail;
-> 	}
-> 
-> e_fail:
-> 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, exitcode);
-> 
-> Which really highlights that we need to get test infrastructure up and running
-> for SEV-ES, SNP, and TDX.
-> 
-> Anyways, back to punting to userspace.  Here's a rough sketch.  The only new uAPI
-> is the definition of KVM_HC_SNP_GET_CERTS and its arguments.
-> 
-> static void snp_handle_guest_request(struct vcpu_svm *svm)
-> {
-> 	struct vmcb_control_area *control = &svm->vmcb->control;
-> 	struct sev_data_snp_guest_request data = {0};
-> 	struct kvm_vcpu *vcpu = &svm->vcpu;
-> 	struct kvm *kvm = vcpu->kvm;
-> 	struct kvm_sev_info *sev;
-> 	gpa_t req_gpa = control->exit_info_1;
-> 	gpa_t resp_gpa = control->exit_info_2;
-> 	unsigned long rc;
-> 	int err;
-> 
-> 	if (!sev_snp_guest(vcpu->kvm)) {
-> 		rc = SEV_RET_INVALID_GUEST;
-> 		goto e_fail;
-> 	}
-> 
-> 	sev = &to_kvm_svm(kvm)->sev_info;
-> 
-> 	mutex_lock(&sev->guest_req_lock);
-> 
-> 	rc = snp_setup_guest_buf(svm, &data, req_gpa, resp_gpa);
-> 	if (rc)
-> 		goto unlock;
-> 
-> 	rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, &err);
-> 	if (rc)
-> 		/* Ensure an error value is returned to guest. */
-> 		rc = err ? err : SEV_RET_INVALID_ADDRESS;
-> 
-> 	snp_cleanup_guest_buf(&data, &rc);
-> 
-> unlock:
-> 	mutex_unlock(&sev->guest_req_lock);
-> 
-> e_fail:
-> 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, rc);
-> }
-> 
-> static int snp_complete_ext_guest_request(struct kvm_vcpu *vcpu)
-> {
-> 	u64 certs_exitcode = vcpu->run->hypercall.args[2];
-> 	struct vcpu_svm *svm = to_svm(vcpu);
-> 
-> 	if (certs_exitcode)
-> 		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, certs_exitcode);
-> 	else
-> 		snp_handle_guest_request(svm);
-> 	return 1;
-> }
-> 
-> static int snp_handle_ext_guest_request(struct vcpu_svm *svm)
-> {
-> 	struct kvm_vcpu *vcpu = &svm->vcpu;
-> 	struct kvm *kvm = vcpu->kvm;
-> 	struct kvm_sev_info *sev;
-> 	unsigned long exitcode;
-> 	u64 data_gpa;
-> 
-> 	if (!sev_snp_guest(vcpu->kvm)) {
-> 		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SEV_RET_INVALID_GUEST);
-> 		return 1;
-> 	}
-> 
-> 	data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
-> 	if (!IS_ALIGNED(data_gpa, PAGE_SIZE)) {
-> 		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SEV_RET_INVALID_ADDRESS);
-> 		return 1;
-> 	}
-> 
-> 	vcpu->run->hypercall.nr		 = KVM_HC_SNP_GET_CERTS;
-> 	vcpu->run->hypercall.args[0]	 = data_gpa;
-> 	vcpu->run->hypercall.args[1]	 = vcpu->arch.regs[VCPU_REGS_RBX];
-> 	vcpu->run->hypercall.flags	 = KVM_EXIT_HYPERCALL_LONG_MODE;
-
-btw why is it _LONG_MODE and not just _64? :)
-
-> 	vcpu->arch.complete_userspace_io = snp_complete_ext_guest_request;
-> 	return 0;
-> }
-
-This should work the KVM stored certs nicely but not for the global 
-certs. Although I am not all convinced that global certs is all that 
-valuable but I do not know the history of that, happened before I joined 
-so I let others to comment on that. Thanks,
-
-
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index 09c9db90c154..edd865157a3c 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -100,6 +100,8 @@ struct rand_data {
+ 	unsigned int apt_observations;	/* Number of collected observations */
+ 	unsigned int apt_count;		/* APT counter */
+ 	unsigned int apt_base;		/* APT base reference */
++	unsigned int health_failure;	/* Record health failure */
++
+ 	unsigned int apt_base_set:1;	/* APT base reference set? */
+ };
+ 
+@@ -121,6 +123,13 @@ struct rand_data {
+ #define JENT_EHASH	       11 /* Hash self test failed */
+ #define JENT_EMEM	       12 /* Can't allocate memory for initialization */
+ 
++#define JENT_RCT_FAILURE	1 /* Failure in RCT health test. */
++#define JENT_APT_FAILURE	2 /* Failure in APT health test. */
++#define JENT_PERMANENT_FAILURE_SHIFT	16
++#define JENT_PERMANENT_FAILURE(x)	(x << JENT_PERMANENT_FAILURE_SHIFT)
++#define JENT_RCT_FAILURE_PERMANENT	JENT_PERMANENT_FAILURE(JENT_RCT_FAILURE)
++#define JENT_APT_FAILURE_PERMANENT	JENT_PERMANENT_FAILURE(JENT_APT_FAILURE)
++
+ /*
+  * The output n bits can receive more than n bits of min entropy, of course,
+  * but the fixed output of the conditioning function can only asymptotically
+@@ -215,26 +224,22 @@ static void jent_apt_insert(struct rand_data *ec, unsigned int delta_masked)
+ 		return;
+ 	}
+ 
+-	if (delta_masked == ec->apt_base)
++	if (delta_masked == ec->apt_base) {
+ 		ec->apt_count++;
+ 
++		/* Note, ec->apt_count starts with one. */
++		if (ec->apt_count >= ec->apt_cutoff_permanent)
++			ec->health_failure |= JENT_APT_FAILURE_PERMANENT;
++		else if (ec->apt_count >= ec->apt_cutoff)
++			ec->health_failure |= JENT_APT_FAILURE;
++	}
++
+ 	ec->apt_observations++;
+ 
+ 	if (ec->apt_observations >= JENT_APT_WINDOW_SIZE)
+ 		jent_apt_reset(ec, delta_masked);
+ }
+ 
+-/* APT health test failure detection */
+-static int jent_apt_permanent_failure(struct rand_data *ec)
+-{
+-	return (ec->apt_count >= ec->apt_cutoff_permanent) ? 1 : 0;
+-}
+-
+-static int jent_apt_failure(struct rand_data *ec)
+-{
+-	return (ec->apt_count >= ec->apt_cutoff) ? 1 : 0;
+-}
+-
+ /***************************************************************************
+  * Stuck Test and its use as Repetition Count Test
+  *
+@@ -261,6 +266,30 @@ static void jent_rct_insert(struct rand_data *ec, int stuck)
+ {
+ 	if (stuck) {
+ 		ec->rct_count++;
++
++		/*
++		 * The cutoff value is based on the following consideration:
++		 * alpha = 2^-30 or 2^-60 as recommended in SP800-90B.
++		 * In addition, we require an entropy value H of 1/osr as this
++		 * is the minimum entropy required to provide full entropy.
++		 * Note, we collect (DATA_SIZE_BITS + ENTROPY_SAFETY_FACTOR)*osr
++		 * deltas for inserting them into the entropy pool which should
++		 * then have (close to) DATA_SIZE_BITS bits of entropy in the
++		 * conditioned output.
++		 *
++		 * Note, ec->rct_count (which equals to value B in the pseudo
++		 * code of SP800-90B section 4.4.1) starts with zero. Hence
++		 * we need to subtract one from the cutoff value as calculated
++		 * following SP800-90B. Thus C = ceil(-log_2(alpha)/H) = 30*osr
++		 * or 60*osr.
++		 */
++		if ((unsigned int)ec->rct_count >= (60 * ec->osr)) {
++			ec->rct_count = -1;
++			ec->health_failure |= JENT_RCT_FAILURE_PERMANENT;
++		} else if ((unsigned int)ec->rct_count >= (30 * ec->osr)) {
++			ec->rct_count = -1;
++			ec->health_failure |= JENT_RCT_FAILURE;
++		}
+ 	} else {
+ 		/* Reset RCT */
+ 		ec->rct_count = 0;
+@@ -316,38 +345,24 @@ static int jent_stuck(struct rand_data *ec, __u64 current_delta)
+ }
+ 
+ /*
+- * The cutoff value is based on the following consideration:
+- * alpha = 2^-30 or 2^-60 as recommended in SP800-90B.
+- * In addition, we require an entropy value H of 1/osr as this is the minimum
+- * entropy required to provide full entropy.
+- * Note, we collect (DATA_SIZE_BITS + ENTROPY_SAFETY_FACTOR)*osr deltas for
+- * inserting them into the entropy pool which should then have (close to)
+- * DATA_SIZE_BITS bits of entropy in the conditioned output.
+- *
+- * Note, ec->rct_count (which equals to value B in the pseudo code of SP800-90B
+- * section 4.4.1) starts with zero. Hence we need to subtract one from the
+- * cutoff value as calculated following SP800-90B. Thus
+- * C = ceil(-log_2(alpha)/H) = 30*osr or 60*osr.
++ * Report any health test failures
++ *
++ * @ec [in] Reference to entropy collector
++ *
++ * @return a bitmask indicating which tests failed
++ *	0 No health test failure
++ *	1 RCT failure
++ *	2 APT failure
++ *	1<<JENT_PERMANENT_FAILURE_SHIFT RCT permanent failure
++ *	2<<JENT_PERMANENT_FAILURE_SHIFT APT permanent failure
+  */
+-static int jent_rct_permanent_failure(struct rand_data *ec)
++unsigned int jent_health_failure(struct rand_data *ec)
+ {
+-	return (ec->rct_count >= (60 * ec->osr)) ? 1 : 0;
+-}
++	/* Test is only enabled in FIPS mode */
++	if (!fips_enabled)
++		return 0;
+ 
+-static int jent_rct_failure(struct rand_data *ec)
+-{
+-	return (ec->rct_count >= (30 * ec->osr)) ? 1 : 0;
+-}
+-
+-/* Report of health test failures */
+-static int jent_health_failure(struct rand_data *ec)
+-{
+-	return jent_rct_failure(ec) | jent_apt_failure(ec);
+-}
+-
+-static int jent_permanent_health_failure(struct rand_data *ec)
+-{
+-	return jent_rct_permanent_failure(ec) | jent_apt_permanent_failure(ec);
++	return ec->health_failure;
+ }
+ 
+ /***************************************************************************
+@@ -594,11 +609,12 @@ int jent_read_entropy(struct rand_data *ec, unsigned char *data,
+ 		return -1;
+ 
+ 	while (len > 0) {
+-		unsigned int tocopy;
++		unsigned int tocopy, health_test_result;
+ 
+ 		jent_gen_entropy(ec);
+ 
+-		if (jent_permanent_health_failure(ec)) {
++		health_test_result = jent_health_failure(ec);
++		if (health_test_result > JENT_PERMANENT_FAILURE_SHIFT) {
+ 			/*
+ 			 * At this point, the Jitter RNG instance is considered
+ 			 * as a failed instance. There is no rerun of the
+@@ -606,13 +622,18 @@ int jent_read_entropy(struct rand_data *ec, unsigned char *data,
+ 			 * is assumed to not further use this instance.
+ 			 */
+ 			return -3;
+-		} else if (jent_health_failure(ec)) {
++		} else if (health_test_result) {
+ 			/*
+ 			 * Perform startup health tests and return permanent
+ 			 * error if it fails.
+ 			 */
+-			if (jent_entropy_init(0, 0, NULL, ec))
++			if (jent_entropy_init(0, 0, NULL, ec)) {
++				/* Mark the permanent error */
++				ec->health_failure &=
++					JENT_RCT_FAILURE_PERMANENT |
++					JENT_APT_FAILURE_PERMANENT;
+ 				return -3;
++			}
+ 
+ 			return -2;
+ 		}
+@@ -695,6 +716,7 @@ int jent_entropy_init(unsigned int osr, unsigned int flags, void *hash_state,
+ 	 */
+ 	struct rand_data *ec = p_ec;
+ 	int i, time_backwards = 0, ret = 0, ec_free = 0;
++	unsigned int health_test_result;
+ 
+ 	if (!ec) {
+ 		ec = jent_entropy_collector_alloc(osr, flags, hash_state);
+@@ -708,6 +730,9 @@ int jent_entropy_init(unsigned int osr, unsigned int flags, void *hash_state,
+ 		ec->apt_base_set = 0;
+ 		/* Reset the RCT */
+ 		ec->rct_count = 0;
++		/* Reset intermittent, leave permanent health test result */
++		ec->health_failure &= (~JENT_RCT_FAILURE);
++		ec->health_failure &= (~JENT_APT_FAILURE);
+ 	}
+ 
+ 	/* We could perform statistical tests here, but the problem is
+@@ -788,12 +813,10 @@ int jent_entropy_init(unsigned int osr, unsigned int flags, void *hash_state,
+ 	}
+ 
+ 	/* Did we encounter a health test failure? */
+-	if (jent_rct_failure(ec)) {
+-		ret = JENT_ERCT;
+-		goto out;
+-	}
+-	if (jent_apt_failure(ec)) {
+-		ret = JENT_EHEALTH;
++	health_test_result = jent_health_failure(ec);
++	if (health_test_result) {
++		ret = (health_test_result & JENT_RCT_FAILURE) ? JENT_ERCT :
++								JENT_EHEALTH;
+ 		goto out;
+ 	}
+ 
 -- 
-Alexey
+2.42.0
+
+
 
 
