@@ -2,378 +2,249 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EECC4CDB483
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Oct 2023 07:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7C25C41513
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Oct 2023 07:59:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232769AbjJSHky (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Oct 2023 03:40:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38668 "EHLO
+        id S232784AbjJSH7U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Oct 2023 03:59:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232829AbjJSHkw (ORCPT
+        with ESMTP id S230297AbjJSH7T (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Oct 2023 03:40:52 -0400
-X-Greylist: delayed 6954 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 19 Oct 2023 00:40:49 PDT
-Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [85.215.255.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B31479F
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Oct 2023 00:40:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1697701243; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=T1KHfsJsgC1qrrVYhev5HTlMfS+W4PN0ajInkiWZWete0CyLrUMNuuz0Esm4/UcYXK
-    ynlZeyJeZAagEulxobWtrfcoyz25aDCaPUXfurtNrT8Rbc4WimfExWu5PJfL+QujLL+F
-    zX76ZewOm4BeOSBUn+2ILyFRGgB8Xko8Vkfqc4s8Cy2UQFaRjjB0pozR8siinXWFUxk8
-    YnUo+cx9INArv63FEWze7iZcR4/QdtIeQAd54KO8iQy7meZ4lZwWourEaK0b+NuSbRAW
-    X7bb6WM880H4sN3Kmmb42XBaf5Fp4vGZWFp3RgusXRuSGIgM5L7nkpCtvnxjfOXsoftq
-    SZhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1697701243;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=Xdq9MV72gklsfeloY9hL4VpaBuGQWEgj4k53dl+ObuQ=;
-    b=epiRz4jbeWoG66qjCaO0kORKv7sIRjxpMeFQYiBv9CMBuim3Siyi9mYVWidD9NZTBp
-    cErCR4I5kYGLb2cLag6VBp4kijz8Kfj974fNBphuIGXoYvyM6AJJFX3aDP0eUuIW9tOk
-    JbcM59Wv3rnJUUDNsIaaNCvTO/TViCsIu8wXZ34o1apXTt5wMHr0iJyhYAXNBOdeFr4c
-    7MS4bR6RJp43hZVDTF1I9C+e+xVOcXj/7G6gLkDqz9Qm+rE4OMG1L46kUx5a8tb+5XcN
-    eRp4XDZi0muG8P6HfOFKaTOf2VlQZZdMoyJi3+DClbBcI+trRUq4sGf1DZlMzEKoayPH
-    yyHg==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1697701243;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=Xdq9MV72gklsfeloY9hL4VpaBuGQWEgj4k53dl+ObuQ=;
-    b=jsvjNpZGy423s5t51IwF+qtcUwjfn8Qaas4Xp49vJXxDUiaOELvwwRcvqVuzhNAlea
-    0IDW5pvS9e4oiyFyW/wo7kdmtMWQRW4zLW01cUWrC+Fe4w0A3UzAjWMP4CTTpJLT4jN8
-    W72v8ZCcPpLu+fIyrkcMZv5ERMxgG306bwI9gOph4zXd36Q3L/zf2N8EbS7ni8OnpprN
-    o/RH9jbI0itZfhEdNv/LdqV2xZYB5I94AXkz7lHjQ6MuYBie2PWOd64O0XMFIQORthL/
-    sn+I+OVCqXGmomnOIHXJj+hYIb/oj33ULEZUAneppZfNF9nkKNBqXSrGFg85QGsOlqI8
-    L/zw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1697701243;
-    s=strato-dkim-0003; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=Xdq9MV72gklsfeloY9hL4VpaBuGQWEgj4k53dl+ObuQ=;
-    b=VzUK6Z2Km0L6G7Y7/ZDVCHKf79Y7+gXfFu8DpcU8qjAyVhJBKa2HGAfAtu7jw5p2wQ
-    japelSBIpHK59TkZi7Ag==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9y2gdNk2TvDr2d0i04sY="
-Received: from positron.chronox.de
-    by smtp.strato.de (RZmta 49.9.0 DYNA|AUTH)
-    with ESMTPSA id 22e7d3z9J7egHZM
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Thu, 19 Oct 2023 09:40:42 +0200 (CEST)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, "Ospan, Abylay" <aospan@amazon.com>,
-        Joachim Vandersmissen <git@jvdsn.com>
-Subject: [PATCH v2] crypto: jitter - use permanent health test storage
-Date:   Thu, 19 Oct 2023 09:40:42 +0200
-Message-ID: <2706159.mvXUDI8C0e@positron.chronox.de>
-In-Reply-To: <5719392.DvuYhMxLoT@positron.chronox.de>
-References: <5719392.DvuYhMxLoT@positron.chronox.de>
+        Thu, 19 Oct 2023 03:59:19 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2082.outbound.protection.outlook.com [40.107.212.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 394CD115;
+        Thu, 19 Oct 2023 00:59:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eXK4VG1dFhjDYtUX/cgnnSXItiLJ2tKiE6f/7IzXAQzb8Df6a8Jkz2FkZayBa6RlhIqqLMr77qM95sumVfqJ127ApLgSvcCvkF603AvsHcflOWxE3JA6TBDGJJuS/sGEsCD8u66K48l+K9jZtZJJpCJrDRT8rmiK4mbxZOMRCQBWe9GChqQtia81txkfMgVwreHc5huwaZgbO69FNVlj8SGGOywvpBZpiUdh2qVxWNb6+nzYqo46GGfwhqm3dijw1jb47AUjVp1rUnjpaNYFFpNq+y08k2SK/BzJPDXU2dOq3rovPUXcE4B9p03nYD2dS+sg69KLEVzJDATXF3GmTQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QHAmxlFJLIR2mo7V348R9DtlGxEENwP09jhhvhi6GNI=;
+ b=TkIGb/mySE5+DLQRHsPYOXMp+JI3jpL9kQSA/LRSI1BA3A33HqYrkLqMHZr33g26JcmiuFn86WZEiV3Zsrz8LvOhu+wezAtzXquGf494xxFEMf+l1K7cayNocTLrxI05U7jAMbYumkU0elkap5otQQLHnIS5MwTWOYRfK8IsYH2wRfUlxUe2edeghPVkLhXwjicEM+9LpAehJa9bvBmDJ37ZUQfJSW/K+SaN4a4rhC7TkHSukcKZb17v8+9wFZEHM9YxEa5hlK0YqoE5b8dLOMbkhd2+gkPg6PckkoGAIsXkvJGQotIS/yoVish6ziG6QuAX6t3C+haqa1Mh/jnytg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QHAmxlFJLIR2mo7V348R9DtlGxEENwP09jhhvhi6GNI=;
+ b=KPNSk+w/PKal9tKbC6xYfOulZ/QLIIlSJj7iPx2/pSiP20bspkP/rbtNngvfFMYzsvcsqrNCWa9MefGpP4Vn0zHKQaDCvEL3g1CtBQTXr0AzpAyZ564Kziw86ruXVY7+Ojblxka0KTikTsgZGggjrJ/SBzV/lho62gVDX2DmruY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by DS0PR12MB7630.namprd12.prod.outlook.com (2603:10b6:8:11d::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.21; Thu, 19 Oct
+ 2023 07:59:13 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::16da:8b28:d454:ad5a]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::16da:8b28:d454:ad5a%3]) with mapi id 15.20.6863.043; Thu, 19 Oct 2023
+ 07:59:13 +0000
+Message-ID: <38d0c5ce-7de2-47fb-bfaf-50f900b7f747@amd.com>
+Date:   Thu, 19 Oct 2023 18:58:51 +1100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 12/12] PCI/CMA: Grant guests exclusive control of
+ authentication
+Content-Language: en-US
+To:     Dan Williams <dan.j.williams@intel.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Lukas Wunner <lukas@wunner.de>
+Cc:     Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+References: <cover.1695921656.git.lukas@wunner.de>
+ <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
+ <20231003164048.0000148c@Huawei.com> <20231003193058.GA16417@wunner.de>
+ <20231006103020.0000174f@Huawei.com>
+ <653038c93a054_780ef294e9@dwillia2-xfh.jf.intel.com.notmuch>
+From:   Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <653038c93a054_780ef294e9@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SY4P282CA0013.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:10:a0::23) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 MIME-Version: 1.0
-Autocrypt: addr=smueller@chronox.de;
- keydata=
- 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
- kBFBHm+xdudNab2U0OpfqrWerOw3WcGd2
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|DS0PR12MB7630:EE_
+X-MS-Office365-Filtering-Correlation-Id: 91ab2573-c898-4ec6-a03c-08dbd07948a0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IDUqrjQ1313Kb0j3POvF3LrFYK8vdz9GNEGXQuW/qHz++bBeNLrFckor3a+t0t1tt/5UChUtE5Y1zWVHLJfVl0gfM5jF3DjHryGF8eicRZy91FLpDU020D8pufhSyrwfE+B8qFkyRyqMexkS2vXsIlZOudJixsns19K5vUDR7yI+V1mE9WsKbhJNZ7f2gOFPFi9UFcXkVNZXDNDLtMKtRUfN8FVW9GsAJwrVHxYcasqqhtKFQTA4SXIolnp3lQ/UWmwIL9hRPqK0wxkJ2GVe8MwDpVyTujBSchklCPbASVns47zsBNIpsktgcYv8Y+xiMlEJfSdC9tDa2jZEtNbouCc8gWSqNnhfWOEaOPelJOLz3M0/br9/7XcLdAp2PpnAx/XwkzutapGN9PCpf7Jk71ptViECtUyQVo8zRbKThSrL/M78rWMXPGKwYfsWs/awBqCfyNbbLbob4TckxjjGKxhDaCRDrW0eDVX0YSd7bmNhqP1JmAa2lESYSPRXmawgrYngembkJKvMPl+CkF7QpUKdQGcWV62VJOL8zLZAp/X3NpXdArhH2VkK32gQiiOq5VJImuNTYqqLOF2a6uMhYEDGiIb9yY1EIFgcQr3ObJ0jz9EegQSsMJrZGOvv0iJSc8V81QZAECzvaynfbXH/TQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(396003)(136003)(346002)(39860400002)(230922051799003)(451199024)(186009)(64100799003)(1800799009)(41300700001)(7416002)(53546011)(5660300002)(8936002)(8676002)(4326008)(38100700002)(36756003)(31686004)(2906002)(83380400001)(31696002)(66946007)(54906003)(66556008)(66476007)(316002)(26005)(2616005)(6512007)(6666004)(110136005)(6506007)(6486002)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Sm9GNUVJczhLUUhXd1k2QzhNNStHbHpMT1J0dk1PWWNFM29OazgraEZyVlBE?=
+ =?utf-8?B?VTJjNzBhMHJYWDE5Tnc4TUhxZHNneVdma3dHdm9zN0xWdENwSGlLanNIMDVF?=
+ =?utf-8?B?MnA2Ynl5cm14b0FhU0tFcWJJS3hxdW5BVW5oTmZocTFRcm5YbDErdVRkcllF?=
+ =?utf-8?B?VDNObVl1RjY0SjZIeml5TnR3Y3N3UVBHSktrSE5KbmJpV1RibXg0SFpGR2h5?=
+ =?utf-8?B?M0piaDQ2MTlnWE85OVpEcElZeGxUcHRtR3N1UHZoQ0VyNkd2cmxjcWZRMFhM?=
+ =?utf-8?B?aGpiWFRPWmx0cml3aFhqQnZTR2pzRURBTVVjeGNHbVB2RDA4UzVyNnFSWE50?=
+ =?utf-8?B?NVFMQitIWnNvQmZvTVF0MThxem5xbU0rWUl3UnYrVmd3MEIxT3JaQ1ltWG9Z?=
+ =?utf-8?B?eC9CNUNnREZkY0VzczhFeDZKa0l3aUlPc29iNVNzUFpvQUNEUWg3eWtEdHFn?=
+ =?utf-8?B?VHR5MDhyUTAyRkYwUWR1anBFcUd1eE9oKzJwTjRJbTk1WWtKTFdmcS92eWVL?=
+ =?utf-8?B?Vzl0Q3VXZWtvNnZXU250eWlaa1NhU2x4aUVuVjVZWDZDMkNKUWV1c3ZaV0pL?=
+ =?utf-8?B?ZDRYTTduN1BndGJ4SFpXRmZLNjBxU2pZU3NWZXdPTDBTcThrYXVCNVdUN0oz?=
+ =?utf-8?B?Q1BxMnk3aDhieDhZN0cybHVFNHBhakVKaEdNcGU0UzBvcGJRZFJ3TXFlSElS?=
+ =?utf-8?B?Ujh3K2NWWHhFVGx3SDEwbmROM2tIVG43U1RxYjBldjIra0YycmsrWkJBaGFK?=
+ =?utf-8?B?Z3dnRHZpWkVPZmJNdnRCWlRsWHF5MUlvbUxZbE12T3FoRzB3eDBrazlnR0tq?=
+ =?utf-8?B?NDd2UDVqTzRCK3NyNUltUWxlVEc4Q1RvakhGdXlNbzgrZHBMNmxWMjM4cmM2?=
+ =?utf-8?B?OWMrZ3E3OGllZldldGpoQkxXLzYxOUtFZU1SMXJEbHgxSmtxc2J4YUR3ajdC?=
+ =?utf-8?B?ZGxyMGdoTWljdnlhMjVkdnU1dCtNeGo1dmVMWXd5RnBtb1dVY2pOSUVLY2J6?=
+ =?utf-8?B?ZEpNbG9LOHozUzllbFJPR3dMR2QzRGdobnEraUs1KzNjWjB2NkNoSWtMeCs0?=
+ =?utf-8?B?M3pMRTV6Rkw1TlRFWDhiVUozaThFKzdFSm1PMk5pZ3JEOEpDSGRuT1lwMVBO?=
+ =?utf-8?B?TkxJcHZxNzNmZDdXaW52b05wSXNwalcrSGtQVDRnUGpIVTFhMjRRV2dkd3lq?=
+ =?utf-8?B?L003TzJVelVIcjkwUWJMcEcxb25vUUp0TUNhekkzNEE5QjdiOUpYWkNTS2dG?=
+ =?utf-8?B?cmVIN3ZrMndqU2ZTZmpUUk9lYldZeWxlVUF2RnIzcm9jZGZ3SWFWNnl5SHI4?=
+ =?utf-8?B?R1ZkVDJzN21SMEVBV09Sc0daUHRYRmpEeDJ1NnU3cFZSckZoSndXNVpMTDFa?=
+ =?utf-8?B?cDJaZmtsc2xQb2djZ3A3ZWcxd29DalppSUM3R2dzckhWTm93VVI1YnFSOFI4?=
+ =?utf-8?B?dlBLNEhpUkpvKzJSbytMcFBodVFFTVQwaXFIaDF0UkxuMVJHNUZpVkgwRUdX?=
+ =?utf-8?B?enhSK0dFZVRTZmVqTUN3WjhOclNyR3d6WmI0bTNJOGd1cWpUVmltRVBkcnFF?=
+ =?utf-8?B?eDdNMEtUYWRQUjgySkMvM0ZjWmlNd2ZJYit0SjducVdiQ081ZGlYRm1UV0Na?=
+ =?utf-8?B?ZFRQc1lGY2NKOWFGUFdLcFl5WXlTVFZEYWxUT1pBSjYwUkJKczRyTldVK1lR?=
+ =?utf-8?B?N0FLRGZ5NldkYVRvV05GRGxSZ2dNR3RYTW1zS25obkk5eWZZQUt1cWRiTmdI?=
+ =?utf-8?B?dGFnelJZeEJ1bFMrQUJ6c0hkYnBDb01mdkluQ1NqZ29GaXRSYXNiQlZockFu?=
+ =?utf-8?B?Z05FeDBPZDVDYSttSE4xOUhGWkhKaThJbWJpMytQUjM5K3dsWnN2ei9CUDNU?=
+ =?utf-8?B?dTY1UnUvN0ZZcXpQdXBjaWx0TkNyYVB3QW00T2NhWUNkUlZ2RlVWeWplMXhy?=
+ =?utf-8?B?cWNTZ2VPd0QwL083YkpsVjlDMFY5blJLaXZsQVdyQkczU05zV295RDdaU0Ir?=
+ =?utf-8?B?Q1RCTlFOVWIyQjBHcHN4QXdGUG5MSGZadjd3N3RjYUx1TG5MRGorT3ZGQ1JL?=
+ =?utf-8?B?SWZYSzc2Q1VMZmZ1ZzJJVDFlYlFYRHFDZW9mK0NTcHNhRitocWhxWnFCbDVp?=
+ =?utf-8?Q?aceT1WWKd87kuq2vabtINvBzw?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91ab2573-c898-4ec6-a03c-08dbd07948a0
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 07:59:13.4263
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: W2ZoLnxvGDDJWF1YRbLxzGMLKxGIyOQ0HZ5l6rsIz74kGLNY+T/FTwaixa+VbbXUrvwvOTjvOEWKoIni2GBe6Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7630
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Changes v2:
 
-- mark function jent_health_failure as static
+On 19/10/23 06:58, Dan Williams wrote:
+> Jonathan Cameron wrote:
+>> On Tue, 3 Oct 2023 21:30:58 +0200
+>> Lukas Wunner <lukas@wunner.de> wrote:
+>>
+>>> On Tue, Oct 03, 2023 at 04:40:48PM +0100, Jonathan Cameron wrote:
+>>>> On Thu, 28 Sep 2023 19:32:42 +0200 Lukas Wunner <lukas@wunner.de> wrote:
+>>>>> At any given time, only a single entity in a physical system may have
+>>>>> an SPDM connection to a device.  That's because the GET_VERSION request
+>>>>> (which begins an authentication sequence) resets "the connection and all
+>>>>> context associated with that connection" (SPDM 1.3.0 margin no 158).
+>>>>>
+>>>>> Thus, when a device is passed through to a guest and the guest has
+>>>>> authenticated it, a subsequent authentication by the host would reset
+>>>>> the device's CMA-SPDM session behind the guest's back.
+>>>>>
+>>>>> Prevent by letting the guest claim exclusive CMA ownership of the device
+>>>>> during passthrough.  Refuse CMA reauthentication on the host as long.
+>>>>> After passthrough has concluded, reauthenticate the device on the host.
+>>>>
+>>>> Is there anything stopping a PF presenting multiple CMA capable DOE
+>>>> instances?  I'd expect them to have their own contexts if they do..
+>>>
+>>> The spec does not seem to *explicitly* forbid a PF having multiple
+>>> CMA-capable DOE instances, but PCIe r6.1 sec 6.31.3 says:
+>>> "The instance of DOE used for CMA-SPDM must support ..."
+>>>
+>>> Note the singular ("The instance").  It seems to suggest that the
+>>> spec authors assumed there's only a single DOE instance for CMA-SPDM.
+>>
+>> It's a little messy and a bit of American vs British English I think.
+>> If it said
+>> "The instance of DOE used for a specific CMA-SPDM must support..."
+>> then it would clearly allow multiple instances.  However, conversely,
+>> I don't read that sentence as blocking multiple instances (even though
+>> I suspect you are right and the author was thinking of there being one).
+>>
+>>>
+>>> Could you (as an English native speaker) comment on the clarity of the
+>>> two sentences "Prevent ... as long." above, as Ilpo objected to them?
+>>>
+>>> The antecedent of "Prevent" is the undesirable behaviour in the preceding
+>>> sentence (host resets guest's SPDM connection).
+>>>
+>>> The antecedent of "as long" is "during passthrough" in the preceding
+>>> sentence.
+>>>
+>>> Is that clear and understandable for an English native speaker or
+>>> should I rephrase?
+>>
+>> Not clear enough to me as it stands.  That "as long" definitely feels
+>> like there is more to follow it as Ilpo noted.
+>>
+>> Maybe reword as something like
+>>
+>> Prevent this by letting the guest claim exclusive ownership of the device
+>> during passthrough ensuring problematic CMA reauthentication by the host
+>> is blocked.
+> 
+> My contribution to the prose here is to clarify that this mechanism is
+> less about "appoint the guest as the exslusive owner" and more about
+> "revoke the bare-metal host as the authentication owner".
+> 
+> In fact I don't see how the guest can ever claim to "own" CMA since
+> config-space is always emulated to the guest.
 
----8<---
+No difference to the PSP and the baremetal linux for this matter as the 
+PSP does not have direct access to the config space either.
 
-The health test result in the current code is only given for the currently
-processed raw time stamp. This implies to react on the health test error,
-the result must be checked after each raw time stamp being processed. To
-avoid this constant checking requirement, any health test error is recorded
-and stored to be analyzed at a later time, if needed.
+> So the guest will always
+> be in a situation where it needs to proxy SPDM related operations. The
+> proxy is either terminated in the host as native SPDM on behalf of the
+> guest, or further proxied to the platform-TSM.
+> 
+> So let's just clarify that at assignment, host control is revoked, and
+> the guest is afforded the opportunity to re-establish authentication
+> either by asking the host re-authenticate on the guest's behalf, or
+> asking the platform-tsm to authenticate the device on the guest's
+> behalf.
+> ...and even there the guest does not know if it is accessing a 1:1 VF:PF
+> device representation, or one VF instance of PF where the PF
+> authentication answer only occurs once for all potential VFs.
+> 
+> Actually, that brings up a question about when to revoke host
+> authentication in the VF assignment case? That seems to be a policy
+> decision that the host needs to make globally for all VFs of a PF. If
+> the guest is going to opt-in to relying on the host's authentication
+> decision then the revoking early may not make sense.
 
-This change ensures that the power-up test catches any health test error.
-Without that patch, the power-up health test result is not enforced.
+> It may be a
+> decision that needs to be deferred until the guest makes its intentions
+> clear, and the host will need to have policy around how to resolve
+> conflicts between guestA wants "native" and guestB wants "platform-TSM".
+> If the VFs those guests are using map to the same PF then only one
+> policy can be in effect.
 
-The introduced changes are already in use with the user space version of
-the Jitter RNG.
+To own IDE, the guest will have to have exclusive access to the portion 
+of RC responsible for the IDE keys. Which is doable but requires passing 
+through both RC and the device and probably everything between these 
+two.  It is going to be quite different "host-native" and 
+"guest-native". How IDE keys are going to be programmed into the RC on 
+Intel?
 
-Fixes: 04597c8dd6c4 ("jitter - add RCT/APT support for different OSRs")
-Reported-by: Joachim Vandersmissen <git@jvdsn.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/jitterentropy.c | 125 ++++++++++++++++++++++++-----------------
- 1 file changed, 74 insertions(+), 51 deletions(-)
 
-diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
-index 09c9db90c154..26a9048bc893 100644
---- a/crypto/jitterentropy.c
-+++ b/crypto/jitterentropy.c
-@@ -100,6 +100,8 @@ struct rand_data {
- 	unsigned int apt_observations;	/* Number of collected observations */
- 	unsigned int apt_count;		/* APT counter */
- 	unsigned int apt_base;		/* APT base reference */
-+	unsigned int health_failure;	/* Record health failure */
-+
- 	unsigned int apt_base_set:1;	/* APT base reference set? */
- };
- 
-@@ -121,6 +123,13 @@ struct rand_data {
- #define JENT_EHASH	       11 /* Hash self test failed */
- #define JENT_EMEM	       12 /* Can't allocate memory for initialization */
- 
-+#define JENT_RCT_FAILURE	1 /* Failure in RCT health test. */
-+#define JENT_APT_FAILURE	2 /* Failure in APT health test. */
-+#define JENT_PERMANENT_FAILURE_SHIFT	16
-+#define JENT_PERMANENT_FAILURE(x)	(x << JENT_PERMANENT_FAILURE_SHIFT)
-+#define JENT_RCT_FAILURE_PERMANENT	JENT_PERMANENT_FAILURE(JENT_RCT_FAILURE)
-+#define JENT_APT_FAILURE_PERMANENT	JENT_PERMANENT_FAILURE(JENT_APT_FAILURE)
-+
- /*
-  * The output n bits can receive more than n bits of min entropy, of course,
-  * but the fixed output of the conditioning function can only asymptotically
-@@ -215,26 +224,22 @@ static void jent_apt_insert(struct rand_data *ec, unsigned int delta_masked)
- 		return;
- 	}
- 
--	if (delta_masked == ec->apt_base)
-+	if (delta_masked == ec->apt_base) {
- 		ec->apt_count++;
- 
-+		/* Note, ec->apt_count starts with one. */
-+		if (ec->apt_count >= ec->apt_cutoff_permanent)
-+			ec->health_failure |= JENT_APT_FAILURE_PERMANENT;
-+		else if (ec->apt_count >= ec->apt_cutoff)
-+			ec->health_failure |= JENT_APT_FAILURE;
-+	}
-+
- 	ec->apt_observations++;
- 
- 	if (ec->apt_observations >= JENT_APT_WINDOW_SIZE)
- 		jent_apt_reset(ec, delta_masked);
- }
- 
--/* APT health test failure detection */
--static int jent_apt_permanent_failure(struct rand_data *ec)
--{
--	return (ec->apt_count >= ec->apt_cutoff_permanent) ? 1 : 0;
--}
--
--static int jent_apt_failure(struct rand_data *ec)
--{
--	return (ec->apt_count >= ec->apt_cutoff) ? 1 : 0;
--}
--
- /***************************************************************************
-  * Stuck Test and its use as Repetition Count Test
-  *
-@@ -261,6 +266,30 @@ static void jent_rct_insert(struct rand_data *ec, int stuck)
- {
- 	if (stuck) {
- 		ec->rct_count++;
-+
-+		/*
-+		 * The cutoff value is based on the following consideration:
-+		 * alpha = 2^-30 or 2^-60 as recommended in SP800-90B.
-+		 * In addition, we require an entropy value H of 1/osr as this
-+		 * is the minimum entropy required to provide full entropy.
-+		 * Note, we collect (DATA_SIZE_BITS + ENTROPY_SAFETY_FACTOR)*osr
-+		 * deltas for inserting them into the entropy pool which should
-+		 * then have (close to) DATA_SIZE_BITS bits of entropy in the
-+		 * conditioned output.
-+		 *
-+		 * Note, ec->rct_count (which equals to value B in the pseudo
-+		 * code of SP800-90B section 4.4.1) starts with zero. Hence
-+		 * we need to subtract one from the cutoff value as calculated
-+		 * following SP800-90B. Thus C = ceil(-log_2(alpha)/H) = 30*osr
-+		 * or 60*osr.
-+		 */
-+		if ((unsigned int)ec->rct_count >= (60 * ec->osr)) {
-+			ec->rct_count = -1;
-+			ec->health_failure |= JENT_RCT_FAILURE_PERMANENT;
-+		} else if ((unsigned int)ec->rct_count >= (30 * ec->osr)) {
-+			ec->rct_count = -1;
-+			ec->health_failure |= JENT_RCT_FAILURE;
-+		}
- 	} else {
- 		/* Reset RCT */
- 		ec->rct_count = 0;
-@@ -316,38 +345,24 @@ static int jent_stuck(struct rand_data *ec, __u64 current_delta)
- }
- 
- /*
-- * The cutoff value is based on the following consideration:
-- * alpha = 2^-30 or 2^-60 as recommended in SP800-90B.
-- * In addition, we require an entropy value H of 1/osr as this is the minimum
-- * entropy required to provide full entropy.
-- * Note, we collect (DATA_SIZE_BITS + ENTROPY_SAFETY_FACTOR)*osr deltas for
-- * inserting them into the entropy pool which should then have (close to)
-- * DATA_SIZE_BITS bits of entropy in the conditioned output.
-- *
-- * Note, ec->rct_count (which equals to value B in the pseudo code of SP800-90B
-- * section 4.4.1) starts with zero. Hence we need to subtract one from the
-- * cutoff value as calculated following SP800-90B. Thus
-- * C = ceil(-log_2(alpha)/H) = 30*osr or 60*osr.
-+ * Report any health test failures
-+ *
-+ * @ec [in] Reference to entropy collector
-+ *
-+ * @return a bitmask indicating which tests failed
-+ *	0 No health test failure
-+ *	1 RCT failure
-+ *	2 APT failure
-+ *	1<<JENT_PERMANENT_FAILURE_SHIFT RCT permanent failure
-+ *	2<<JENT_PERMANENT_FAILURE_SHIFT APT permanent failure
-  */
--static int jent_rct_permanent_failure(struct rand_data *ec)
-+static unsigned int jent_health_failure(struct rand_data *ec)
- {
--	return (ec->rct_count >= (60 * ec->osr)) ? 1 : 0;
--}
-+	/* Test is only enabled in FIPS mode */
-+	if (!fips_enabled)
-+		return 0;
- 
--static int jent_rct_failure(struct rand_data *ec)
--{
--	return (ec->rct_count >= (30 * ec->osr)) ? 1 : 0;
--}
--
--/* Report of health test failures */
--static int jent_health_failure(struct rand_data *ec)
--{
--	return jent_rct_failure(ec) | jent_apt_failure(ec);
--}
--
--static int jent_permanent_health_failure(struct rand_data *ec)
--{
--	return jent_rct_permanent_failure(ec) | jent_apt_permanent_failure(ec);
-+	return ec->health_failure;
- }
- 
- /***************************************************************************
-@@ -594,11 +609,12 @@ int jent_read_entropy(struct rand_data *ec, unsigned char *data,
- 		return -1;
- 
- 	while (len > 0) {
--		unsigned int tocopy;
-+		unsigned int tocopy, health_test_result;
- 
- 		jent_gen_entropy(ec);
- 
--		if (jent_permanent_health_failure(ec)) {
-+		health_test_result = jent_health_failure(ec);
-+		if (health_test_result > JENT_PERMANENT_FAILURE_SHIFT) {
- 			/*
- 			 * At this point, the Jitter RNG instance is considered
- 			 * as a failed instance. There is no rerun of the
-@@ -606,13 +622,18 @@ int jent_read_entropy(struct rand_data *ec, unsigned char *data,
- 			 * is assumed to not further use this instance.
- 			 */
- 			return -3;
--		} else if (jent_health_failure(ec)) {
-+		} else if (health_test_result) {
- 			/*
- 			 * Perform startup health tests and return permanent
- 			 * error if it fails.
- 			 */
--			if (jent_entropy_init(0, 0, NULL, ec))
-+			if (jent_entropy_init(0, 0, NULL, ec)) {
-+				/* Mark the permanent error */
-+				ec->health_failure &=
-+					JENT_RCT_FAILURE_PERMANENT |
-+					JENT_APT_FAILURE_PERMANENT;
- 				return -3;
-+			}
- 
- 			return -2;
- 		}
-@@ -695,6 +716,7 @@ int jent_entropy_init(unsigned int osr, unsigned int flags, void *hash_state,
- 	 */
- 	struct rand_data *ec = p_ec;
- 	int i, time_backwards = 0, ret = 0, ec_free = 0;
-+	unsigned int health_test_result;
- 
- 	if (!ec) {
- 		ec = jent_entropy_collector_alloc(osr, flags, hash_state);
-@@ -708,6 +730,9 @@ int jent_entropy_init(unsigned int osr, unsigned int flags, void *hash_state,
- 		ec->apt_base_set = 0;
- 		/* Reset the RCT */
- 		ec->rct_count = 0;
-+		/* Reset intermittent, leave permanent health test result */
-+		ec->health_failure &= (~JENT_RCT_FAILURE);
-+		ec->health_failure &= (~JENT_APT_FAILURE);
- 	}
- 
- 	/* We could perform statistical tests here, but the problem is
-@@ -788,12 +813,10 @@ int jent_entropy_init(unsigned int osr, unsigned int flags, void *hash_state,
- 	}
- 
- 	/* Did we encounter a health test failure? */
--	if (jent_rct_failure(ec)) {
--		ret = JENT_ERCT;
--		goto out;
--	}
--	if (jent_apt_failure(ec)) {
--		ret = JENT_EHEALTH;
-+	health_test_result = jent_health_failure(ec);
-+	if (health_test_result) {
-+		ret = (health_test_result & JENT_RCT_FAILURE) ? JENT_ERCT :
-+								JENT_EHEALTH;
- 		goto out;
- 	}
- 
 -- 
-2.42.0
-
-
+Alexey
 
 
