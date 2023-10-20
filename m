@@ -2,432 +2,176 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD58DC0032E
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Oct 2023 15:55:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96766CDB474
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Oct 2023 18:00:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377836AbjJTPzu (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Oct 2023 11:55:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46972 "EHLO
+        id S230028AbjJTSAZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Oct 2023 14:00:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377825AbjJTPzr (ORCPT
+        with ESMTP id S229437AbjJTSAY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Oct 2023 11:55:47 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8050D6E
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 08:55:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697817344; x=1729353344;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=oE3sf3lxOEM0BPVFNvdSImHbUhvpxjn2zIJPeKTylhY=;
-  b=U1ihjvANv158hBiWOYj747MQjd4ZX7jkRI25SCf5ZtTavqfGRx7dHBEM
-   zEAZC0zhZ28YaC5MAOZas6aLbi0gStH2h969C/LTob8ZTLjqmhVRMsmAp
-   pxm4ZDOt4XFrW24mGCl5iAy8Lq7SPl0rn5+b8zxrM2r5D3+mI2iJeB7De
-   AFwBKB2bl4J03hD8CJwhH6cbw/YPZjjGb7xeQ6GGtdwmkUbJX/Bh4oOYq
-   UeIdk6S8DxQkJOCxcQnlbCwQrPZXw1Gu5JRCwKxYl+Lbg7G0mM8JxNN3J
-   bYVofhMWhchUv5sAUohQr799gAsP/R5w3UdADlywBLYJmC3tVquKhTu71
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="472745507"
-X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="472745507"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 08:55:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="827764440"
-X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="827764440"
-Received: from fl31ca105gs0706.deacluster.intel.com (HELO fl31ca105gs0706..) ([10.45.133.167])
-  by fmsmga004.fm.intel.com with ESMTP; 20 Oct 2023 08:55:43 -0700
-From:   Shashank Gupta <shashank.gupta@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Damian Muszynski <damian.muszynski@intel.com>,
-        Shashank Gupta <shashank.gupta@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-Subject: [PATCH] crypto: qat - add heartbeat error simulator
-Date:   Fri, 20 Oct 2023 16:55:26 +0100
-Message-ID: <20231020155541.240695-1-shashank.gupta@intel.com>
-X-Mailer: git-send-email 2.41.0
-MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+        Fri, 20 Oct 2023 14:00:24 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0FAED51
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 11:00:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kSFLeBna9ilidroeMPwRPYzZQxo9PgHjmxnCnuwquu5V42EDQbmbdvom8FxLc2NAtw1x5l45+s6RdTU1eCRr+Ah8cJAj8+SJW2Nn1MBPSqsV4h8ggZKccq+RiS6REyQNDNGIE8qJiPBhQxdtAXMFhbMZiqcYAJkOczQRBG34k3n2otAr5TsrnJF0n80H7EmG7bnaxYWl5O63EO14zTxb1TvowpKhNhuJgRJkkGTMz5Nx5l2pqupQfFy1HGlr5Ep10ZlVhUmpVVA3nG9L7Gq0eodOiQ6C3hmhX19dNXMY82VZn54eRXl6dNF+Ygbh8jDHX81tBBcIJ/gpO4PzhbSpQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GWsZLdnpQhI+vTUlzPaENK59wHu8UKDfbT2zyGoHjhc=;
+ b=VvsLLAaF731ZdEpHlIsoFiF2NKwGMXnBjvH3216QP/Yyfj1R26mq3YAJEQQJpM/sYkR6jzepTDOvfUcCQ0xxMg+81EEakHJFF9ZnxM/nDTFo2seQNWj/E0kCYdki5WwYCnadWTWEPOKOkGt3FsKUX7OFucVxhKEmDgUj9HBUkzzOZoXDmOwQC/Ad+zkwaKlsuOq7BLkzxNUL2WO/XTWluO5S9so6F/3Bjac39Oeg0r2beUbEE7JYqY/LEQkTRV5m8gIqHsdL4qBJin8s0QNwMJgIq1y3w7g3YHv60KRIPszI239ULTMSPDLdcxSLBPBt4QCubGuIhWNEUxakkSWzow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GWsZLdnpQhI+vTUlzPaENK59wHu8UKDfbT2zyGoHjhc=;
+ b=c17/xVfSQsHRg6hZfixJ1N6+cs98VyjK8YlKWrJMRR5ht2LYbq/tXqVmb71iKXzF1OiGsI3WLW6LMSYJjuzTpdP1kTyOFIXy0Sfx2ueD1wQfawpxYr3EPY8nY6D5gVQY6HHUAC0Ft/LmfnsuB7BuWAZkrmn4zTSnIvSRCkuUtqU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by DM6PR12MB5518.namprd12.prod.outlook.com (2603:10b6:5:1b9::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Fri, 20 Oct
+ 2023 18:00:18 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::a13:336d:96a5:b7bf]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::a13:336d:96a5:b7bf%4]) with mapi id 15.20.6907.025; Fri, 20 Oct 2023
+ 18:00:18 +0000
+Message-ID: <1e60c9b4-a3c1-6379-6ee5-dad78b6fa28d@amd.com>
+Date:   Fri, 20 Oct 2023 13:00:14 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 14/42] crypto: ccp/sp - Convert to platform remove
+ callback returning void
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     John Allen <john.allen@amd.com>, linux-crypto@vger.kernel.org,
+        kernel@pengutronix.de
+References: <20231020075521.2121571-44-u.kleine-koenig@pengutronix.de>
+ <20231020075521.2121571-58-u.kleine-koenig@pengutronix.de>
+Content-Language: en-US
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20231020075521.2121571-58-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SN6PR2101CA0010.namprd21.prod.outlook.com
+ (2603:10b6:805:106::20) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|DM6PR12MB5518:EE_
+X-MS-Office365-Filtering-Correlation-Id: 18047c7f-1983-4a66-9ed3-08dbd1966b7b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: t699Xv4KRj6spQg0Rb0GaEjudxmcY7DUAQDQ1ahoPkB+yFAPCP5TJLH+ag4quFKeflnGbgRKsXI7rR2nJzL68dGYX4M+ApWJMEjh4zzWo1vqx04KGLDsQ4vthM6cae5qDVu7jhsCUs/3HloHQiW67N8Yt0jziFP4eXrs6S7//eql5u5XWIZyp4LZIDYHf/dejDziaS3/eBsPF0lcxFIYz3ocHOOwZm9vC6JbYnuFxiBkG1tN17jj0Go8PGBlqZoctfeGY6i6NkyUMHFarlCqaqy015nL+wO6+7OA9namMMrJ0NUcdL8lyvafdG5VptGVbEin4WZ6UH21p7XEHMEe7GpaneXLkqgp3LJ66k1KKoyeV+d91N+LVBsVrHHpyHPeWzY7WKHFkz6jcehzprusMKJRYUFlOF9xYC40Iiayw4cIBwozMofLybtmu1/Hwh0umX64YTDVttiFlY00XoNiFWdGF7ymNG3UR501j0GpQp8TcXr35aKUc/IQkOA6kdfjPZzHCYvos4zTCRMQadLLxZTQ+pLdQAYGwWNFCl4bOPU4i1d62uvLOZpSlDCe6cjYzz2Fz8Q0pUUi8wtSLye36f6cNrrwbFiBTli3APXowR7HwIevGlwwTs2UvWrGF9o76Gr4Wwf6i6JogBChiwkZpQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(346002)(366004)(376002)(396003)(230922051799003)(451199024)(1800799009)(64100799003)(186009)(2906002)(66476007)(66946007)(66556008)(110136005)(6486002)(316002)(8936002)(8676002)(6666004)(478600001)(4326008)(41300700001)(86362001)(83380400001)(36756003)(5660300002)(31696002)(38100700002)(6506007)(26005)(53546011)(2616005)(6512007)(66574015)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MzE2NytqMnFmVUUzQ0J5V3JzSDZNcG1vZVg0RXBnbkZxVEo1cEltRFNDWHpQ?=
+ =?utf-8?B?bDBtNFZXRHJMNWRObjJ5aEVmL1MyYmdTemxXN3pxWTF1QWJpZ3dPclAyNk83?=
+ =?utf-8?B?bjlBSUxhT1RaUXBjMEsrSXlCaGJZUFlQbmVwcm8xZ2sxN1ZTYWI0RmJoMy9V?=
+ =?utf-8?B?SzdkZ0lrQ0F2NllRRWVQWkxqeDF3dWQxSFlGOHNENzhjck1WYi9xd0d2VVZv?=
+ =?utf-8?B?SDRUSWZscEozVXlEckszdDJTaXBrdTJvTG1yRFN4WCs4bXdzcWRTcGFrM1li?=
+ =?utf-8?B?Z2pkUmRLNWdMSVdtV1pGMHF4UmlmdTdIUkxqSFdJSHBrN0hjRGVDQUJXelZs?=
+ =?utf-8?B?WEFCa2lWVnZYb0RKUmttSnFwNHlNUSt3Mm0xeld3MEhsUjNMdmQ2NHp2ZzIr?=
+ =?utf-8?B?Z1hGcEU3Q0Y4OFloR1VCTjdOMlcyUmoxcnlZd01iaXlTZy9RVk5SM1J5VjVO?=
+ =?utf-8?B?MHVqRGN0WFhoSjV2bDV0RXlLRjJlUHcwTFdZQjV3QzdJcWFtTHEzWmpHalpY?=
+ =?utf-8?B?L3dxZVN1TSs3cGZiS25NN2VzZUMzMk90QS9mUklubUVPbWhFQlkxOW5CZk9s?=
+ =?utf-8?B?UUYvcUtqblhlNlhvMFVRZVIrbU5wWGFiYmpmZHlZMWNEMThlVytoUS9iVW1G?=
+ =?utf-8?B?ak82d2h6UHdFRlIydStyYmtrcTU1TE5ycmNJbll1L2pxTER5Q04yLzd4Vkly?=
+ =?utf-8?B?YVNYbjhNTzU4a05pU1J5V2I4NXJsTFVLd045TWhvd0FrbFl4RFkrWlp2akVR?=
+ =?utf-8?B?cXBxTDBoZFZUVm9KbUN1SHpCZGpxNjVGbDhhcFNhbVhIbWtZRDBVa3gzQlN0?=
+ =?utf-8?B?dXR1bXlGOE5UY0F3OXZLUndSS3VQQUI5Q2w4VDhLQWx1b3REZTNvR2kyREM5?=
+ =?utf-8?B?N0dtUUtOT2hKbXVDODhRWlB6L2FPdFNMRlI4M3RjZjloZ0g4T0w2QXRqNEYy?=
+ =?utf-8?B?ZnViOHVCODduYXRtTGFLNzhFaDdLSTZFVm9DKzhKeXNaZ2pYWFJaYUZuQ1l3?=
+ =?utf-8?B?ZmZhck5OSUJLRkpabzFVZ0s3dHI0c1Vud1lXSGN4d0R2cUVON1RQZjNuc3No?=
+ =?utf-8?B?WE90WnhPY3VtUkdYbCs4QnIrWDdZcWRsSUwvT2ZNQUxqdHJMTnRzbVpKNjdN?=
+ =?utf-8?B?dFhDY0pPUVBFOEZBODZZOEkvbmdCckJ5QTlSKzN0WjY5S2NpSnRsNTE3NFFa?=
+ =?utf-8?B?aVpQUkE3d0tabHo2WU5aSWhURzhxb1YyR1piNi9TQ21RdTViRytLalBQT0xB?=
+ =?utf-8?B?QjFGQUJ2OFBGaklYYTBVUUJyVFloVEpSSHJYdmhoMVlaRnlpdEdyQVJBY2xL?=
+ =?utf-8?B?RUl5R3RXUHRIWndXemNyU2czQWpxV1hFK2VHZ2IxNVZOR1RqWEJKME9qa1Nx?=
+ =?utf-8?B?VUVrMWlXWjFNM25KZ3BDcXpvVlZMNENsMVFsQ1R1WTRvTFVQc0NEckk4OVJN?=
+ =?utf-8?B?dEIzMkxVVDdVS1pGVkNuSE9ZZTJRbE1sL0VSaVZVdERBQ2FXNzU1a0s5MVVJ?=
+ =?utf-8?B?d29YUFFPUE44VW9sNURxRzkzbDlnOEM1RHpkNzhVTGR1MGdlK1p1d3h3T3Iv?=
+ =?utf-8?B?VWFkaWFSVnMwaUhwNk5sanFjTWtaZ3lmSTU4NjdmZStIM1JzcldFdk5SWnZS?=
+ =?utf-8?B?cU9qSGVZRHlOZ25jYlE2aEY2aGYrYjI3UnBJTzJmeC9ZSVg4S1VKYUlKSWFm?=
+ =?utf-8?B?ZXJSTTZ2clFiTUdTVnQweXJHNGxuU0E0aDB0WTRocG1lKzRDWmZrcjZUNUQ1?=
+ =?utf-8?B?cGIxUWtCcDM2NUxUY3VZb1FCNzFNM3NEUG9ZVWs1dkIwbmxjajhoY1BWeTBy?=
+ =?utf-8?B?eTNIZmNROW9NU0VBbmJyVHA4VUk0K1JWM2NmOExxNG40Rk4zNjNQRUpRSldS?=
+ =?utf-8?B?bDAxVnhNOFloRDlybnlOalNtaFhwT2l3K1JyaHdxWExxYnlCVU5EbHpjajJn?=
+ =?utf-8?B?RndCN1ViWGR6cVAzMVhTV08zVFNFVUxEYzZRT1phNVduS2RWdncvWHRBdUhw?=
+ =?utf-8?B?OHJZSVNyVzRNVjIrdDBQNEJob3ZFdzgza3ZSajNYVm9GMlcwNkFiaUNMemho?=
+ =?utf-8?B?SGNGOTZUNGdlTmZaSWhQMUZ1TlhoTGlqcWV2cVlFNmY3S0JmOTBUYWpoMW9K?=
+ =?utf-8?Q?KIYltzg82I5vGDAr6FPUnp6dw?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18047c7f-1983-4a66-9ed3-08dbd1966b7b
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 18:00:18.3355
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TWGb1ynndiPxf8XECclwVELfkyYShzx0Vjr72EeD4wF7tZVumofAVywfO2cDpKDWzLgwdpYvhrHhxFHKU/BWEw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB5518
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Damian Muszynski <damian.muszynski@intel.com>
+On 10/20/23 02:55, Uwe Kleine-König wrote:
+> The .remove() callback for a platform driver returns an int which makes
+> many driver authors wrongly assume it's possible to do error handling by
+> returning an error code. However the value returned is ignored (apart
+> from emitting a warning) and this typically results in resource leaks.
+> 
+> To improve here there is a quest to make the remove callback return
+> void. In the first step of this quest all drivers are converted to
+> .remove_new(), which already returns void. Eventually after all drivers
+> are converted, .remove_new() will be renamed to .remove().
+> 
+> Trivially convert this driver from always returning zero in the remove
+> callback to the void returning variant.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-Add a mechanism that allows to inject a heartbeat error for testing
-purposes.
-A new attribute `inject_error` is added to debugfs for each QAT device.
-Upon a write on this attribute, the driver will inject an error on the
-device which can then be detected by the heartbeat feature.
-Errors are breaking the device functionality thus they require a
-device reset in order to be recovered.
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-This functionality is not compiled by default, to enable it
-CRYPTO_DEV_QAT_ERROR_INJECTION must be set.
-
-Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
-Co-developed-by: Shashank Gupta <shashank.gupta@intel.com>
-Signed-off-by: Shashank Gupta <shashank.gupta@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
----
- Documentation/ABI/testing/debugfs-driver-qat  | 26 +++++++
- drivers/crypto/intel/qat/Kconfig              | 15 ++++
- drivers/crypto/intel/qat/qat_common/Makefile  |  4 +
- .../intel/qat/qat_common/adf_common_drv.h     |  3 +
- .../intel/qat/qat_common/adf_heartbeat.c      |  6 --
- .../intel/qat/qat_common/adf_heartbeat.h      | 12 +++
- .../qat/qat_common/adf_heartbeat_dbgfs.c      | 48 ++++++++++++
- .../qat/qat_common/adf_heartbeat_inject.c     | 76 +++++++++++++++++++
- .../intel/qat/qat_common/adf_hw_arbiter.c     | 34 +++++++++
- 9 files changed, 218 insertions(+), 6 deletions(-)
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat_inject.c
-
-diff --git a/Documentation/ABI/testing/debugfs-driver-qat b/Documentation/ABI/testing/debugfs-driver-qat
-index b2db010d851e..b9ee628cdf62 100644
---- a/Documentation/ABI/testing/debugfs-driver-qat
-+++ b/Documentation/ABI/testing/debugfs-driver-qat
-@@ -60,6 +60,32 @@ Description:	(RO) Read returns the device health status.
- 		The driver does not monitor for Heartbeat. It is left for a user
- 		to poll the status periodically.
- 
-+What:		/sys/kernel/debug/qat_<device>_<BDF>/heartbeat/inject_error
-+Date:		January 2024
-+KernelVersion:	6.7
-+Contact:	qat-linux@intel.com
-+Description:	(WO) Write to inject an error that simulates an heartbeat
-+		failure. This is to be used for testing purposes.
-+
-+		After writing this file, the driver stops arbitration on a
-+		random engine and disables the fetching of heartbeat counters.
-+		If a workload is running on the device, a job submitted to the
-+		accelerator might not get a response and a read of the
-+		`heartbeat/status` attribute might report -1, i.e. device
-+		unresponsive.
-+		The error is unrecoverable thus the device must be restarted to
-+		restore its functionality.
-+
-+		This attribute is available only when the kernel is built with
-+		CONFIG_CRYPTO_DEV_QAT_ERROR_INJECTION=y.
-+
-+		A write of 1 enables error injection.
-+
-+		The following example shows how to enable error injection::
-+
-+			# cd /sys/kernel/debug/qat_<device>_<BDF>
-+			# echo 1 > heartbeat/inject_error
-+
- What:		/sys/kernel/debug/qat_<device>_<BDF>/pm_status
- Date:		January 2024
- KernelVersion:	6.7
-diff --git a/drivers/crypto/intel/qat/Kconfig b/drivers/crypto/intel/qat/Kconfig
-index 1220cc86f910..30340f61700d 100644
---- a/drivers/crypto/intel/qat/Kconfig
-+++ b/drivers/crypto/intel/qat/Kconfig
-@@ -95,3 +95,18 @@ config CRYPTO_DEV_QAT_C62XVF
- 
- 	  To compile this as a module, choose M here: the module
- 	  will be called qat_c62xvf.
-+
-+config CRYPTO_DEV_QAT_ERROR_INJECTION
-+	bool "Support for Intel(R) QAT Devices Heartbeat Error Injection"
-+	default n
-+	depends on CRYPTO_DEV_QAT
-+	depends on DEBUG_FS
-+	help
-+	  Enables a mechanism that allows to inject a heartbeat error on
-+	  Intel(R) QuickAssist devices for testing purposes.
-+
-+	  This is intended for developer use only.
-+	  If unsure, say N.
-+
-+	  This functionality is available via debugfs entry of the Intel(R)
-+	  QuickAssist device
-diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 779a8aa0b8d2..08a993124034 100644
---- a/drivers/crypto/intel/qat/qat_common/Makefile
-+++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -49,3 +49,7 @@ intel_qat-$(CONFIG_PCI_IOV) += adf_sriov.o adf_vf_isr.o adf_pfvf_utils.o \
- 			       adf_pfvf_pf_msg.o adf_pfvf_pf_proto.o \
- 			       adf_pfvf_vf_msg.o adf_pfvf_vf_proto.o \
- 			       adf_gen2_pfvf.o adf_gen4_pfvf.o
-+
-+intel_qat-$(CONFIG_CRYPTO_DEV_QAT_ERROR_INJECTION) += adf_heartbeat_inject.o
-+
-+ccflags-$(CONFIG_CRYPTO_DEV_QAT_ERROR_INJECTION) += -DQAT_HB_ERROR_INJECTION
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-index f06188033a93..c0d3c2ddbce6 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-@@ -90,6 +90,9 @@ void adf_exit_aer(void);
- int adf_init_arb(struct adf_accel_dev *accel_dev);
- void adf_exit_arb(struct adf_accel_dev *accel_dev);
- void adf_update_ring_arb(struct adf_etr_ring_data *ring);
-+#ifdef QAT_HB_ERROR_INJECTION
-+int adf_disable_arb_thd(struct adf_accel_dev *accel_dev, u32 ae, u32 thr);
-+#endif
- 
- int adf_dev_get(struct adf_accel_dev *accel_dev);
- void adf_dev_put(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
-index 13f48d2f6da8..f88b1bc6857e 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
-@@ -23,12 +23,6 @@
- 
- #define ADF_HB_EMPTY_SIG 0xA5A5A5A5
- 
--/* Heartbeat counter pair */
--struct hb_cnt_pair {
--	__u16 resp_heartbeat_cnt;
--	__u16 req_heartbeat_cnt;
--};
--
- static int adf_hb_check_polling_freq(struct adf_accel_dev *accel_dev)
- {
- 	u64 curr_time = adf_clock_get_current_time();
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
-index b22e3cb29798..9405a4b6bc66 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
-@@ -19,6 +19,12 @@ enum adf_device_heartbeat_status {
- 	HB_DEV_UNSUPPORTED,
- };
- 
-+/* Heartbeat counter pair */
-+struct hb_cnt_pair {
-+	__u16 resp_heartbeat_cnt;
-+	__u16 req_heartbeat_cnt;
-+};
-+
- struct adf_heartbeat {
- 	unsigned int hb_sent_counter;
- 	unsigned int hb_failed_counter;
-@@ -35,6 +41,9 @@ struct adf_heartbeat {
- 		struct dentry *cfg;
- 		struct dentry *sent;
- 		struct dentry *failed;
-+#ifdef QAT_HB_ERROR_INJECTION
-+		struct dentry *inject_error;
-+#endif
- 	} dbgfs;
- };
- 
-@@ -50,6 +59,9 @@ int adf_heartbeat_save_cfg_param(struct adf_accel_dev *accel_dev,
- void adf_heartbeat_status(struct adf_accel_dev *accel_dev,
- 			  enum adf_device_heartbeat_status *hb_status);
- void adf_heartbeat_check_ctrs(struct adf_accel_dev *accel_dev);
-+#ifdef QAT_HB_ERROR_INJECTION
-+int adf_heartbeat_inject_error(struct adf_accel_dev *accel_dev);
-+#endif
- 
- #else
- static inline int adf_heartbeat_init(struct adf_accel_dev *accel_dev)
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c
-index 2661af6a2ef6..e59b5bd54828 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c
-@@ -155,6 +155,45 @@ static const struct file_operations adf_hb_cfg_fops = {
- 	.write = adf_hb_cfg_write,
- };
- 
-+#ifdef QAT_HB_ERROR_INJECTION
-+static ssize_t adf_hb_error_inject_write(struct file *file,
-+					 const char __user *user_buf,
-+					 size_t count, loff_t *ppos)
-+{
-+	struct adf_accel_dev *accel_dev = file->private_data;
-+	size_t written_chars;
-+	char buf[3];
-+	int ret;
-+
-+	/* last byte left as string termination */
-+	if (count != 2)
-+		return -EINVAL;
-+
-+	written_chars = simple_write_to_buffer(buf, sizeof(buf) - 1,
-+					       ppos, user_buf, count);
-+	if (buf[0] != '1')
-+		return -EINVAL;
-+
-+	ret = adf_heartbeat_inject_error(accel_dev);
-+	if (ret) {
-+		dev_err(&GET_DEV(accel_dev),
-+			"Heartbeat error injection failed with status %d\n",
-+			ret);
-+		return ret;
-+	}
-+
-+	dev_info(&GET_DEV(accel_dev), "Heartbeat error injection enabled\n");
-+
-+	return written_chars;
-+}
-+
-+static const struct file_operations adf_hb_error_inject_fops = {
-+	.owner = THIS_MODULE,
-+	.open = simple_open,
-+	.write = adf_hb_error_inject_write,
-+};
-+#endif
-+
- void adf_heartbeat_dbgfs_add(struct adf_accel_dev *accel_dev)
- {
- 	struct adf_heartbeat *hb = accel_dev->heartbeat;
-@@ -171,6 +210,11 @@ void adf_heartbeat_dbgfs_add(struct adf_accel_dev *accel_dev)
- 					       &hb->hb_failed_counter, &adf_hb_stats_fops);
- 	hb->dbgfs.cfg = debugfs_create_file("config", 0600, hb->dbgfs.base_dir,
- 					    accel_dev, &adf_hb_cfg_fops);
-+#ifdef QAT_HB_ERROR_INJECTION
-+	hb->dbgfs.inject_error = debugfs_create_file("inject_error", 0200,
-+						     hb->dbgfs.base_dir, accel_dev,
-+						     &adf_hb_error_inject_fops);
-+#endif
- }
- EXPORT_SYMBOL_GPL(adf_heartbeat_dbgfs_add);
- 
-@@ -189,6 +233,10 @@ void adf_heartbeat_dbgfs_rm(struct adf_accel_dev *accel_dev)
- 	hb->dbgfs.failed = NULL;
- 	debugfs_remove(hb->dbgfs.cfg);
- 	hb->dbgfs.cfg = NULL;
-+#ifdef QAT_HB_ERROR_INJECTION
-+	debugfs_remove(hb->dbgfs.inject_error);
-+	hb->dbgfs.inject_error = NULL;
-+#endif
- 	debugfs_remove(hb->dbgfs.base_dir);
- 	hb->dbgfs.base_dir = NULL;
- }
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat_inject.c b/drivers/crypto/intel/qat/qat_common/adf_heartbeat_inject.c
-new file mode 100644
-index 000000000000..a3b474bdef6c
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat_inject.c
-@@ -0,0 +1,76 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright(c) 2023 Intel Corporation */
-+#include <linux/random.h>
-+
-+#include "adf_admin.h"
-+#include "adf_common_drv.h"
-+#include "adf_heartbeat.h"
-+
-+#define MAX_HB_TICKS 0xFFFFFFFF
-+
-+static int adf_hb_set_timer_to_max(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+
-+	accel_dev->heartbeat->hb_timer = 0;
-+
-+	if (hw_data->stop_timer)
-+		hw_data->stop_timer(accel_dev);
-+
-+	return adf_send_admin_hb_timer(accel_dev, MAX_HB_TICKS);
-+}
-+
-+static void adf_set_hb_counters_fail(struct adf_accel_dev *accel_dev, u32 ae,
-+				     u32 thr)
-+{
-+	struct hb_cnt_pair *stats = accel_dev->heartbeat->dma.virt_addr;
-+	struct adf_hw_device_data *hw_device = accel_dev->hw_device;
-+	const size_t max_aes = hw_device->get_num_aes(hw_device);
-+	const size_t hb_ctrs = hw_device->num_hb_ctrs;
-+	size_t thr_id = ae * hb_ctrs + thr;
-+	u16 num_rsp = stats[thr_id].resp_heartbeat_cnt;
-+
-+	/*
-+	 * Inject live.req != live.rsp and live.rsp == last.rsp
-+	 * to trigger the heartbeat error detection
-+	 */
-+	stats[thr_id].req_heartbeat_cnt++;
-+	stats += (max_aes * hb_ctrs);
-+	stats[thr_id].resp_heartbeat_cnt = num_rsp;
-+}
-+
-+int adf_heartbeat_inject_error(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_hw_device_data *hw_device = accel_dev->hw_device;
-+	const size_t max_aes = hw_device->get_num_aes(hw_device);
-+	const size_t hb_ctrs = hw_device->num_hb_ctrs;
-+	u32 rand, rand_ae, rand_thr;
-+	unsigned long ae_mask;
-+	int ret;
-+
-+	ae_mask = hw_device->ae_mask;
-+
-+	do {
-+		/* Ensure we have a valid ae */
-+		get_random_bytes(&rand, sizeof(rand));
-+		rand_ae = rand % max_aes;
-+	} while (!test_bit(rand_ae, &ae_mask));
-+
-+	get_random_bytes(&rand, sizeof(rand));
-+	rand_thr = rand % hb_ctrs;
-+
-+	/* Increase the heartbeat timer to prevent FW updating HB counters */
-+	ret = adf_hb_set_timer_to_max(accel_dev);
-+	if (ret)
-+		return ret;
-+
-+	/* Configure worker threads to stop processing any packet */
-+	ret = adf_disable_arb_thd(accel_dev, rand_ae, rand_thr);
-+	if (ret)
-+		return ret;
-+
-+	/* Change HB counters memory to simulate a hang */
-+	adf_set_hb_counters_fail(accel_dev, rand_ae, rand_thr);
-+
-+	return 0;
-+}
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_hw_arbiter.c b/drivers/crypto/intel/qat/qat_common/adf_hw_arbiter.c
-index da6956699246..8592bb961b9f 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_hw_arbiter.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_hw_arbiter.c
-@@ -103,3 +103,37 @@ void adf_exit_arb(struct adf_accel_dev *accel_dev)
- 		csr_ops->write_csr_ring_srv_arb_en(csr, i, 0);
- }
- EXPORT_SYMBOL_GPL(adf_exit_arb);
-+
-+#ifdef QAT_HB_ERROR_INJECTION
-+static void adf_write_arb_wt2sam(void __iomem *csr_addr, u32 csr_offset,
-+				 u32 wrk_to_ser_map_offset, size_t index, u32 value)
-+{
-+	WRITE_CSR_ARB_WT2SAM(csr_addr, csr_offset, wrk_to_ser_map_offset, index,
-+			     value);
-+}
-+
-+int adf_disable_arb_thd(struct adf_accel_dev *accel_dev, u32 ae, u32 thr)
-+{
-+	void __iomem *csr = accel_dev->transport->banks[0].csr_addr;
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	const u32 *thd_2_arb_cfg;
-+	struct arb_info info;
-+	u32 ae_thr_map;
-+
-+	if (ADF_AE_STRAND0_THREAD == thr || ADF_AE_STRAND1_THREAD == thr)
-+		thr = ADF_AE_ADMIN_THREAD;
-+
-+	hw_data->get_arb_info(&info);
-+	thd_2_arb_cfg = hw_data->get_arb_mapping(accel_dev);
-+	if (!thd_2_arb_cfg)
-+		return -EFAULT;
-+
-+	/* Disable scheduling for this particular AE and thread */
-+	ae_thr_map = *(thd_2_arb_cfg + ae);
-+	ae_thr_map &= ~(0x0F << (thr * 4));
-+
-+	adf_write_arb_wt2sam(csr, info.arb_offset, info.wt2sam_offset, ae,
-+			     ae_thr_map);
-+	return 0;
-+}
-+#endif
-
-base-commit: 36c3294e09436a7616dc68c9134ece30bb2d4578
--- 
-2.41.0
-
+> ---
+>   drivers/crypto/ccp/sp-platform.c | 6 ++----
+>   1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
+> index 7d79a8744f9a..473301237760 100644
+> --- a/drivers/crypto/ccp/sp-platform.c
+> +++ b/drivers/crypto/ccp/sp-platform.c
+> @@ -180,7 +180,7 @@ static int sp_platform_probe(struct platform_device *pdev)
+>   	return ret;
+>   }
+>   
+> -static int sp_platform_remove(struct platform_device *pdev)
+> +static void sp_platform_remove(struct platform_device *pdev)
+>   {
+>   	struct device *dev = &pdev->dev;
+>   	struct sp_device *sp = dev_get_drvdata(dev);
+> @@ -188,8 +188,6 @@ static int sp_platform_remove(struct platform_device *pdev)
+>   	sp_destroy(sp);
+>   
+>   	dev_notice(dev, "disabled\n");
+> -
+> -	return 0;
+>   }
+>   
+>   #ifdef CONFIG_PM
+> @@ -222,7 +220,7 @@ static struct platform_driver sp_platform_driver = {
+>   #endif
+>   	},
+>   	.probe = sp_platform_probe,
+> -	.remove = sp_platform_remove,
+> +	.remove_new = sp_platform_remove,
+>   #ifdef CONFIG_PM
+>   	.suspend = sp_platform_suspend,
+>   	.resume = sp_platform_resume,
