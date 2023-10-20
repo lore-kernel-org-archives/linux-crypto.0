@@ -2,60 +2,49 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B070CDB474
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Oct 2023 05:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC68CDB47E
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Oct 2023 05:54:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235620AbjJTFyp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Oct 2023 01:54:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37694 "EHLO
+        id S235628AbjJTFyx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Oct 2023 01:54:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233509AbjJTFyo (ORCPT
+        with ESMTP id S235630AbjJTFyv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Oct 2023 01:54:44 -0400
+        Fri, 20 Oct 2023 01:54:51 -0400
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A456F11B;
-        Thu, 19 Oct 2023 22:54:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52E20D64;
+        Thu, 19 Oct 2023 22:54:48 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qtiSv-0097bi-Io; Fri, 20 Oct 2023 13:54:34 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Oct 2023 13:54:39 +0800
-Date:   Fri, 20 Oct 2023 13:54:39 +0800
+        id 1qtiT2-0097br-3n; Fri, 20 Oct 2023 13:54:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Oct 2023 13:54:45 +0800
+Date:   Fri, 20 Oct 2023 13:54:45 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: mscode_parser: remove sha224 authenticode support
-Message-ID: <ZTIWHwTr7YKvvov0@gondor.apana.org.au>
-References: <20231010212530.63470-1-dimitri.ledkov@canonical.com>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] module: Do not offer sha224 for built-in module signing
+Message-ID: <ZTIWJYNNu5mQlqky@gondor.apana.org.au>
+References: <20231010212633.64042-1-dimitri.ledkov@canonical.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231010212530.63470-1-dimitri.ledkov@canonical.com>
+In-Reply-To: <20231010212633.64042-1-dimitri.ledkov@canonical.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 10, 2023 at 10:25:29PM +0100, Dimitri John Ledkov wrote:
-> It is possible to stand up own certificates and sign PE-COFF binaries
-> using SHA-224. However it never became popular or needed since it has
-> similar costs as SHA-256. Windows Authenticode infrastructure never
-> had support for SHA-224, and all secureboot keys used fro linux
-> vmlinuz have always been using at least SHA-256.
-> 
-> Given the point of mscode_parser is to support interoperatiblity with
-> typical de-facto hashes, remove support for SHA-224 to avoid
-> posibility of creating interoperatibility issues with rhboot/shim,
-> grub, and non-linux systems trying to sign or verify vmlinux.
-> 
-> SHA-224 itself is not removed from the kernel, as it is truncated
-> SHA-256. If requested I can write patches to remove SHA-224 support
-> across all of the drivers.
+On Tue, Oct 10, 2023 at 10:26:33PM +0100, Dimitri John Ledkov wrote:
+> sha224 does not provide enough security against collision attacks
+> relative to the default keys used for signing (RSA 4k & P-384). Also
+> sha224 never became popular, as sha256 got widely adopter ahead of
+> sha224 being introduced.
 > 
 > Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
 > ---
->  crypto/asymmetric_keys/mscode_parser.c | 3 ---
->  1 file changed, 3 deletions(-)
+>  kernel/module/Kconfig | 5 -----
+>  1 file changed, 5 deletions(-)
 
 Patch applied.  Thanks.
 -- 
