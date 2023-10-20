@@ -2,144 +2,162 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89174C001DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Oct 2023 14:09:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D24EBCDB474
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Oct 2023 14:53:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377495AbjJTOJS (ORCPT
+        id S1377562AbjJTOxI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Oct 2023 10:09:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41616 "EHLO
+        Fri, 20 Oct 2023 10:53:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377429AbjJTOJR (ORCPT
+        with ESMTP id S1377585AbjJTOxI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Oct 2023 10:09:17 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2541AB
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 07:09:15 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c4fe37f166so12525781fa.1
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 07:09:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697810954; x=1698415754; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mAk8jT42K0k51X/whGDwwkWdg31+jN6q/2Mef/7UWrE=;
-        b=jSVpmLQEr4Era56fUg/4RV2Oqtj9V4Q0lFzMgv98eGNViwILp/BJM1Uzg5gJqcWR0D
-         WoCUQ66JzHqKIlJSAZzPBaz28uiUtzeyKIjPfF3eO0WTDc1aTAibKorgU+f+M6MbxOJ/
-         xA7hGrPiGI2ZV3iY8mR0/5zhSIWOzPcstujNmpjabiJM37g/Wqw2Bf6PdyiH3N1crJgS
-         y/3gde0ktC9O9zEmoNwjavQZFh+PrlFhjsDvD8ei4qmRv3r18czZeRQJGr45GrAmPa4t
-         WgciBsdQ9DvviHC9BvnrT2YaFdgnXcvL2Hf/g1hiC5h5wMdyWBcbHblBCBWrSDgbIRGa
-         vgjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697810954; x=1698415754;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mAk8jT42K0k51X/whGDwwkWdg31+jN6q/2Mef/7UWrE=;
-        b=ctV96h5EfRAzNRjSVHU1PtLrFFuCBhYT+LACy3JbGq4YeXxJ8mYDEdDOxBNbeCDKN3
-         7gepWyqWhGE7c67ZDQOT15gXORGWXGJd6QwitwkmkBTeTaePnIQGmTk75ulhzT581FWK
-         rSSp6fW53PkjbVJ0aPAASJA2zkTRhqx9ADQbYS1whakl+jqu4MtrvQ1QEWQ7W2mtkKAQ
-         91T8zvc+mnhL50r8t2MRM0Q6/qVTXzDzfguVVvaP0ywzJpbkQEhoWc40KyGfpRWyfv4z
-         /ofAIosxaomZ4XA79uQvcmotkeSGBD+qsxPUvz+1YAKwW7c/1HCRpMgVtCDJGWbTKKZq
-         64mQ==
-X-Gm-Message-State: AOJu0YzgO7KnsPIjWHRWO9PiQLwQwceT4dUgygzwIZ/Rd4+0EN7WMHu4
-        Peq05zitM4Au9zeaLJYpM60=
-X-Google-Smtp-Source: AGHT+IEcjRrEpDSqzSmBRW8cEQW7ATxuQF+r5HjzhQL71YF4PNK4hVxqHzayJTA6OlG1si/9bOF1Ng==
-X-Received: by 2002:a05:651c:a0a:b0:2bb:a28b:58e1 with SMTP id k10-20020a05651c0a0a00b002bba28b58e1mr2191009ljq.41.1697810953817;
-        Fri, 20 Oct 2023 07:09:13 -0700 (PDT)
-Received: from jernej-laptop.localnet (82-149-12-148.dynamic.telemach.net. [82.149.12.148])
-        by smtp.gmail.com with ESMTPSA id l23-20020a1c7917000000b004063cced50bsm2248792wme.23.2023.10.20.07.09.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 07:09:13 -0700 (PDT)
-From:   Jernej =?utf-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Uwe =?ISO-8859-1?Q?Kleine=2DK=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Samuel Holland <samuel@sholland.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Rob Herring <robh@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
-        kernel@pengutronix.de
-Subject: Re: [PATCH 03/42] crypto: sun8i-ss - Convert to platform remove callback
- returning void
-Date:   Fri, 20 Oct 2023 16:09:11 +0200
-Message-ID: <1885790.tdWV9SEqCh@jernej-laptop>
-In-Reply-To: <20231020075521.2121571-47-u.kleine-koenig@pengutronix.de>
-References: <20231020075521.2121571-44-u.kleine-koenig@pengutronix.de>
- <20231020075521.2121571-47-u.kleine-koenig@pengutronix.de>
+        Fri, 20 Oct 2023 10:53:08 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39713D52
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 07:53:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697813585; x=1729349585;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Iwg8hMQeepKOeZw+ct/TlXyADbXL37f3doFX8wujw5Y=;
+  b=QBtMTm3HRcednU1clpR+q3//Kpjzlm+2O17m3Pybc1c7xku03OZukqg3
+   REzEWEMEWDS6wjcusB6AmqzEe3kQkmVl4Wg5MaXLvnRvUusBzplnkiHNq
+   xu4oMfAOq07/OO6iAYuqLm6zRYSzsb/wXUY6KO94dVWYVxtPaLlgcJeuT
+   xuUwjmt/cybqQghV+CDl4jf6XY7OCupCPIWX8D+7GJK8gqCmtDl+KRDuP
+   7NCzT7i5zokCkOFhmkGrsg5P0z4sCYYIo5Ri3aWJknO6lAKES5ixbPoCr
+   AMtR0BggOpBu7kM/ynv6kVeg0rpI6ppkj/AkpZWrw92F+h6ZM+eDQhLW/
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="376889198"
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="376889198"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 07:53:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="5135234"
+Received: from unknown (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.216])
+  by orviesa001.jf.intel.com with ESMTP; 20 Oct 2023 07:51:51 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Damian Muszynski <damian.muszynski@intel.com>
+Subject: [PATCH] crypto: qat - move adf_cfg_services
+Date:   Fri, 20 Oct 2023 15:52:51 +0100
+Message-ID: <20231020145257.61933-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dne petek, 20. oktober 2023 ob 09:55:25 CEST je Uwe Kleine-K=F6nig napisal(=
-a):
-> The .remove() callback for a platform driver returns an int which makes
-> many driver authors wrongly assume it's possible to do error handling by
-> returning an error code. However the value returned is ignored (apart
-> from emitting a warning) and this typically results in resource leaks.
->=20
-> To improve here there is a quest to make the remove callback return
-> void. In the first step of this quest all drivers are converted to
-> .remove_new(), which already returns void. Eventually after all drivers
-> are converted, .remove_new() will be renamed to .remove().
->=20
-> Trivially convert this driver from always returning zero in the remove
-> callback to the void returning variant.
->=20
-> Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
-> ---
+The file adf_cfg_services.h cannot be included in header files since it
+instantiates the structure adf_cfg_services. Move that structure to its
+own file and export the symbol.
 
-Reviewed-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+This does not introduce any functional change.
 
-Best regards,
-Jernej
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Damian Muszynski <damian.muszynski@intel.com>
+---
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |  2 +-
+ drivers/crypto/intel/qat/qat_common/Makefile  |  1 +
+ .../intel/qat/qat_common/adf_cfg_services.c   | 21 +++++++++++++++++++
+ .../intel/qat/qat_common/adf_cfg_services.h   | 14 ++-----------
+ 4 files changed, 25 insertions(+), 13 deletions(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_cfg_services.c
 
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/=
-crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> index 4a9587285c04..f14c60359d19 100644
-> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> @@ -908,7 +908,7 @@ static int sun8i_ss_probe(struct platform_device *pde=
-v)
->  	return err;
->  }
-> =20
-> -static int sun8i_ss_remove(struct platform_device *pdev)
-> +static void sun8i_ss_remove(struct platform_device *pdev)
->  {
->  	struct sun8i_ss_dev *ss =3D platform_get_drvdata(pdev);
-> =20
-> @@ -921,8 +921,6 @@ static int sun8i_ss_remove(struct platform_device *pd=
-ev)
->  	sun8i_ss_free_flows(ss, MAXFLOW - 1);
-> =20
->  	sun8i_ss_pm_exit(ss);
-> -
-> -	return 0;
->  }
-> =20
->  static const struct of_device_id sun8i_ss_crypto_of_match_table[] =3D {
-> @@ -936,7 +934,7 @@ MODULE_DEVICE_TABLE(of, sun8i_ss_crypto_of_match_tabl=
-e);
-> =20
->  static struct platform_driver sun8i_ss_driver =3D {
->  	.probe		 =3D sun8i_ss_probe,
-> -	.remove		 =3D sun8i_ss_remove,
-> +	.remove_new	 =3D sun8i_ss_remove,
->  	.driver		 =3D {
->  		.name		=3D "sun8i-ss",
->  		.pm             =3D &sun8i_ss_pm_ops,
->=20
+diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
+index 2bba58a2c76f..0faedb5b2eb5 100644
+--- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
+@@ -4,6 +4,7 @@
+ #include <adf_accel_devices.h>
+ #include <adf_admin.h>
+ #include <adf_cfg.h>
++#include <adf_cfg_services.h>
+ #include <adf_clock.h>
+ #include <adf_common_drv.h>
+ #include <adf_gen4_dc.h>
+@@ -13,7 +14,6 @@
+ #include "adf_gen4_ras.h"
+ #include <adf_gen4_timer.h>
+ #include "adf_4xxx_hw_data.h"
+-#include "adf_cfg_services.h"
+ #include "icp_qat_hw.h"
+ 
+ #define ADF_AE_GROUP_0		GENMASK(3, 0)
+diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
+index 800ad5eba16b..779a8aa0b8d2 100644
+--- a/drivers/crypto/intel/qat/qat_common/Makefile
++++ b/drivers/crypto/intel/qat/qat_common/Makefile
+@@ -4,6 +4,7 @@ ccflags-y += -DDEFAULT_SYMBOL_NAMESPACE=CRYPTO_QAT
+ intel_qat-objs := adf_cfg.o \
+ 	adf_isr.o \
+ 	adf_ctl_drv.o \
++	adf_cfg_services.o \
+ 	adf_dev_mgr.o \
+ 	adf_init.o \
+ 	adf_accel_engine.o \
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_cfg_services.c b/drivers/crypto/intel/qat/qat_common/adf_cfg_services.c
+new file mode 100644
+index 000000000000..e34dcedee556
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_cfg_services.c
+@@ -0,0 +1,21 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright(c) 2023 Intel Corporation */
++
++#include <linux/export.h>
++#include "adf_cfg_services.h"
++#include "adf_cfg_strings.h"
++
++const char *const adf_cfg_services[] = {
++	[SVC_CY] = ADF_CFG_CY,
++	[SVC_CY2] = ADF_CFG_ASYM_SYM,
++	[SVC_DC] = ADF_CFG_DC,
++	[SVC_DCC] = ADF_CFG_DCC,
++	[SVC_SYM] = ADF_CFG_SYM,
++	[SVC_ASYM] = ADF_CFG_ASYM,
++	[SVC_DC_ASYM] = ADF_CFG_DC_ASYM,
++	[SVC_ASYM_DC] = ADF_CFG_ASYM_DC,
++	[SVC_DC_SYM] = ADF_CFG_DC_SYM,
++	[SVC_SYM_DC] = ADF_CFG_SYM_DC,
++};
++EXPORT_SYMBOL_GPL(adf_cfg_services);
++
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_cfg_services.h b/drivers/crypto/intel/qat/qat_common/adf_cfg_services.h
+index b353d40c5c6d..f78fd697b4be 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_cfg_services.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_cfg_services.h
+@@ -16,19 +16,9 @@ enum adf_services {
+ 	SVC_ASYM_DC,
+ 	SVC_DC_SYM,
+ 	SVC_SYM_DC,
++	SVC_COUNT
+ };
+ 
+-static const char *const adf_cfg_services[] = {
+-	[SVC_CY] = ADF_CFG_CY,
+-	[SVC_CY2] = ADF_CFG_ASYM_SYM,
+-	[SVC_DC] = ADF_CFG_DC,
+-	[SVC_DCC] = ADF_CFG_DCC,
+-	[SVC_SYM] = ADF_CFG_SYM,
+-	[SVC_ASYM] = ADF_CFG_ASYM,
+-	[SVC_DC_ASYM] = ADF_CFG_DC_ASYM,
+-	[SVC_ASYM_DC] = ADF_CFG_ASYM_DC,
+-	[SVC_DC_SYM] = ADF_CFG_DC_SYM,
+-	[SVC_SYM_DC] = ADF_CFG_SYM_DC,
+-};
++extern const char *const adf_cfg_services[SVC_COUNT];
+ 
+ #endif
 
-
-
+base-commit: 2ce0d7cbc00a0fc65bb26203efed7ecdc98ba849
+-- 
+2.41.0
 
