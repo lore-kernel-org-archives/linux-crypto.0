@@ -2,113 +2,101 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45448C001DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Oct 2023 10:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40524CDB474
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Oct 2023 10:35:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376722AbjJTKN3 convert rfc822-to-8bit (ORCPT
+        id S1376794AbjJTKfF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Oct 2023 06:13:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50984 "EHLO
+        Fri, 20 Oct 2023 06:35:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376842AbjJTKNN (ORCPT
+        with ESMTP id S1376746AbjJTKfE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Oct 2023 06:13:13 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A71B5D72
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 03:12:39 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3EB082F4;
-        Fri, 20 Oct 2023 03:13:20 -0700 (PDT)
-Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A0FDF3F5A1;
-        Fri, 20 Oct 2023 03:12:37 -0700 (PDT)
-Date:   Fri, 20 Oct 2023 11:12:35 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Samuel Holland <samuel@sholland.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Rob Herring <robh@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
-        kernel@pengutronix.de
-Subject: Re: [PATCH 03/42] crypto: sun8i-ss - Convert to platform remove
- callback returning void
-Message-ID: <20231020111235.413fc617@donnerap.manchester.arm.com>
-In-Reply-To: <20231020075521.2121571-47-u.kleine-koenig@pengutronix.de>
-References: <20231020075521.2121571-44-u.kleine-koenig@pengutronix.de>
-        <20231020075521.2121571-47-u.kleine-koenig@pengutronix.de>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        Fri, 20 Oct 2023 06:35:04 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F69A114
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 03:35:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697798103; x=1729334103;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LHn20pPbCuQYuTNlV/yWEo2J5qdC7rdX6OC7/TlX9Ts=;
+  b=dNCsegei2ri+nnslZQWr+GHTVT7fgtDDBVdTrHCnmeCU6uDcgpCPyDP8
+   eOR09EncBCr3I8E6YwrGBGaXuBeBRKPPtcV0tirOLoOZYvXOtwkzlXiNT
+   fPWzT1jZMZpSi+P4uOJiahrJ8VLG4rAXt1Hf9jnW19OgEatVJLmsO1mOx
+   fNJzgjYT9mpvhzdwG/cwiVDqwlIUw1ds3oXTO1u/3A5YjBzSK0xnpEkP4
+   6koMxRrP0FddaRp6sCZQcknzNJzmx9cgWzP9QQBELUpSepUf8qfh3n/sz
+   2SP00Rh6RCi0Ww1OCXjMCUbym+NgcJeCJenlaNPBiaxV0upoMpwM50VOa
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="383686698"
+X-IronPort-AV: E=Sophos;i="6.03,238,1694761200"; 
+   d="scan'208";a="383686698"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 03:35:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="792369915"
+X-IronPort-AV: E=Sophos;i="6.03,238,1694761200"; 
+   d="scan'208";a="792369915"
+Received: from fl31ca105gs0706.deacluster.intel.com (HELO fl31ca105gs0706..) ([10.45.133.167])
+  by orsmga001.jf.intel.com with ESMTP; 20 Oct 2023 03:35:01 -0700
+From:   Shashank Gupta <shashank.gupta@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Shashank Gupta <shashank.gupta@intel.com>
+Subject: [PATCH 0/9] add ras error detection and reporting for GEN4 devices
+Date:   Fri, 20 Oct 2023 11:32:44 +0100
+Message-ID: <20231020103431.230671-1-shashank.gupta@intel.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 20 Oct 2023 09:55:25 +0200
-Uwe Kleine-König <u.kleine-koenig@pengutronix.de> wrote:
+This set introduces the required infrastructure to detect, report, and count errors in the QAT drivers and enables the reporting of errors in QAT GEN4 devices.
+In particular, it enables the reporting of correctable, nonfatal, and fatal errors.
+In addition, exposes the number of occurrences of each type of error through sysfs.
 
-Hi,
+The first patch adds the common infrastructures for error reporting for all generations of QAT.
+Patches from 2 to 5 and 7 enable the reporting of errors flagged through the register ERRSOUx for GEN4 devices.
+ERRSOUx error reporting for GEN4 devices.
+Patch 6 adds a helper to retrieve the base address of the aram bar.
+Patch 8 introduces the ras counter interface for counting QAT-specific errors, and exposes such counters through sysfs.
+Patch 9 adds logic to count correctable, nonfatal, and fatal errors for GEN4 devices.
 
-> The .remove() callback for a platform driver returns an int which makes
-> many driver authors wrongly assume it's possible to do error handling by
-> returning an error code. However the value returned is ignored (apart
-> from emitting a warning) and this typically results in resource leaks.
-> 
-> To improve here there is a quest to make the remove callback return
-> void. In the first step of this quest all drivers are converted to
-> .remove_new(), which already returns void. Eventually after all drivers
-> are converted, .remove_new() will be renamed to .remove().
-> 
-> Trivially convert this driver from always returning zero in the remove
-> callback to the void returning variant.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Shashank Gupta (9):
+  crypto: qat - add infrastructure for error reporting
+  crypto: qat - add reporting of correctable errors for QAT GEN4
+  crypto: qat - add reporting of errors from ERRSOU1 for QAT GEN4
+  crypto: qat - add handling of errors from ERRSOU2 for QAT GEN4
+  crypto: qat - add handling of compression related errors for QAT GEN4
+  crypto: qat - add adf_get_aram_base() helper function
+  crypto: qat - add handling of errors from ERRSOU3 for QAT GEN4
+  crypto: qat - add error counters
+  crypto: qat - count QAT GEN4 errors
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+ .../ABI/testing/sysfs-driver-qat_ras          |   42 +
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |   13 +
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.h     |   17 +
+ drivers/crypto/intel/qat/qat_4xxx/adf_drv.c   |    1 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |    2 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |   34 +
+ .../intel/qat/qat_common/adf_common_drv.h     |   10 +
+ .../intel/qat/qat_common/adf_gen4_ras.c       | 1566 +++++++++++++++++
+ .../intel/qat/qat_common/adf_gen4_ras.h       |  825 +++++++++
+ .../crypto/intel/qat/qat_common/adf_init.c    |    9 +
+ drivers/crypto/intel/qat/qat_common/adf_isr.c |   18 +
+ .../qat/qat_common/adf_sysfs_ras_counters.c   |  112 ++
+ .../qat/qat_common/adf_sysfs_ras_counters.h   |   28 +
+ 13 files changed, 2677 insertions(+)
+ create mode 100644 Documentation/ABI/testing/sysfs-driver-qat_ras
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_ras.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_ras.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.h
 
-Cheers,
-Andre
-
-> ---
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> index 4a9587285c04..f14c60359d19 100644
-> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> @@ -908,7 +908,7 @@ static int sun8i_ss_probe(struct platform_device *pdev)
->  	return err;
->  }
->  
-> -static int sun8i_ss_remove(struct platform_device *pdev)
-> +static void sun8i_ss_remove(struct platform_device *pdev)
->  {
->  	struct sun8i_ss_dev *ss = platform_get_drvdata(pdev);
->  
-> @@ -921,8 +921,6 @@ static int sun8i_ss_remove(struct platform_device *pdev)
->  	sun8i_ss_free_flows(ss, MAXFLOW - 1);
->  
->  	sun8i_ss_pm_exit(ss);
-> -
-> -	return 0;
->  }
->  
->  static const struct of_device_id sun8i_ss_crypto_of_match_table[] = {
-> @@ -936,7 +934,7 @@ MODULE_DEVICE_TABLE(of, sun8i_ss_crypto_of_match_table);
->  
->  static struct platform_driver sun8i_ss_driver = {
->  	.probe		 = sun8i_ss_probe,
-> -	.remove		 = sun8i_ss_remove,
-> +	.remove_new	 = sun8i_ss_remove,
->  	.driver		 = {
->  		.name		= "sun8i-ss",
->  		.pm             = &sun8i_ss_pm_ops,
+-- 
+2.41.0
 
