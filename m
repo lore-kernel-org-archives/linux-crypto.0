@@ -2,86 +2,86 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B275CDB474
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Oct 2023 13:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5A8DC001DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Oct 2023 13:50:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377405AbjJTNuU (ORCPT
+        id S1377274AbjJTNu0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Oct 2023 09:50:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38352 "EHLO
+        Fri, 20 Oct 2023 09:50:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377395AbjJTNuS (ORCPT
+        with ESMTP id S1377304AbjJTNuV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Oct 2023 09:50:18 -0400
+        Fri, 20 Oct 2023 09:50:21 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B912ACA
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 06:50:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8D593
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 06:50:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697809816; x=1729345816;
+  t=1697809820; x=1729345820;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=jq4nS4tvy3im0kjDjxUZ+Nvi845EiJC6fWoucNyDfSs=;
-  b=XeZCuUNRpmQCXqMPINtRw/6118UfXBTi7auFZTZm1AYhhunua55UL5VQ
-   dMv53ZoGGJvDnpv1wNTR5pDtgBKgvVkvQ6vqKAQSZ7+RANreE8ZB5azdu
-   s+NqoprB4FrKRdH1jryiItIQP7uhOJtFTWboBe28BgFSGuxmBIBBuBoQS
-   lHgCLdwwVdpEMue5OjcRa4H712GUX+zdYEiS3BK9OhfhkXHnebTljkk8b
-   1ij9D/A5DKqzdIIrOs2451AJgtgqM7B5VQWf0sVm2DRFUIHWzu8PtTCJq
-   bD+XLMNBFxm/s8Xtfkjt5Z+N4Xr8NTBdSERFCEWgit7mBmslitdu9/1Sv
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="385376709"
+  bh=aSiqd+TCmSSnpiwKxnBHjE3UQOrnnu4zIT8HmNI9e24=;
+  b=U5LQYMVjfuboY9R2XW1iGWlExtgj53CxM+vOCcMYZZxo6kGm0Qt/WhMx
+   ZxyT+CMTozilpPHs8/PUHiUpzoYeHMdY0KLiEZac1Y63m4Va1mcA0q1o0
+   m/bWc94HK57qQyWTGpDG/CoidIQC1dA5ZBPDoeXNMeM3cfPCy+mXzWdn2
+   Kwy7lR/vMCyS4RE8LsGmOwfaLSzmEfVDy5Mt42bfGuW2pd9nnEKherHrZ
+   3vDhSBSVMbVgBSFMLWww/pNBEx4LsATGCbVdBAPuRS7+RGO+xll73vA8F
+   cpS9IdmZWtUDz9r9kVTt46yCffwFLtil3ll0EQT4xjfWrCCwTJxhM9Z3n
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="385376734"
 X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="385376709"
+   d="scan'208";a="385376734"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 06:50:16 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 06:50:20 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="931012623"
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="931012664"
 X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="931012623"
+   d="scan'208";a="931012664"
 Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Oct 2023 06:50:16 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Oct 2023 06:50:19 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
  ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Fri, 20 Oct 2023 06:50:15 -0700
+ 15.1.2507.32; Fri, 20 Oct 2023 06:50:19 -0700
 Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Fri, 20 Oct 2023 06:50:15 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ 15.1.2507.32 via Frontend Transport; Fri, 20 Oct 2023 06:50:19 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Fri, 20 Oct 2023 06:50:15 -0700
+ 15.1.2507.32; Fri, 20 Oct 2023 06:50:19 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GLrShgs4JL5+tfih6JIKnuGkhNrkEFA0Cf7cnFOkwTZM17tquAh8gqsC92Zd5ot4r+R3n1U3MsuKcI27Y5b47oTuHK1Q/0r1rj8bDw5y/qn7pNAHkiOsQdwyD6/DDzog9gKLy/7ZHuNswOfgROO33+2Mwq5rVrtrDK8UjUubjisDdpoHXR+BJtClaKW0tbHY4VduD+5X42vpjAGlGAfnfBPStb/d1EOwocTimQFdUWcGcwVOzxNmCABZZnl19QhtVAo2LChuaAqgctZQSxdhCVIDM8yQFoohvLXCeEqpq1rKzz+kQZrGkj4TCZ46TX+5+0R1eXSgnPEANiPtrlgSqg==
+ b=ajo9Q7KFxRXzVKs63cjZ8kOh4Nh3HwJzx4yvv8dTszQh9MzKO6iSR0aOzz/VSQ2e227zR9Kf9Sn0ULAVmaT1W40n7ZjmUtMseTo6dbfx1N7Rvs2efzr76sq9hZZmE3R1Fu+hFGIuKWPuu2+upX0Y2cFGaNQRVeYui7BVB6oWWtwJ0V0pF/SPY0LuvGzvb8/zbNOgq9qet1T5vWTimPShOLNqamXrRyoBYivKqY5++EgiweAyryfXsFOlgbLENxNf3WeUROacW+Z1RLaKlsao8IRnVFZI20T70QzwW4jsmyDT40RnZ7h8AMMoaytLse8/JUUOSrMTSWDcqCeJlzHxpA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gRvYgiPo5YIxcu+t5W6Dwor0XqqnLr1KYcv0QplImhg=;
- b=dYlvgE2SK7Ilm2IqFZrmtfVHEX6KUCuZdBr3DY38CJkk003hFFB9J5TOGAT66wQP4tEcTP1tFWRzyNbtPt5VZ6oYV/iWDdidAwTK9unqDpH1L0/xw31HEDv1B33b0xr3BzudfR8P9sW9BFXiUEaYwBVKOjDCdCRVFyde1PDbVYKSTETPlyjkvUfUH/0mEX3+k7dF1pC6IvAIAos2+AMSfQLIPIr3HvIrMaTdxAqFgpn5TyoRuTkG9rJIPD4tqO/qzFJHg0KuEusRc40IEDdCGiGK7Thw14yad/0SulJdyS1upGwhCnwN4O0S/A8jqqhwwQhBGD+j/skVLM0uHpeNTg==
+ bh=PcVaaLCrUauKSHt/K12clGOZkcYE4/fCVRqTRSTbuRk=;
+ b=R4/dVYGmRWe45gT5wYMyCqiCvX9oUT/NHy1uEic0xPjYr4ySMjfsYaxj+tavcRzTCyC2FgwrJ0KWlJzlBZ5/sv3lfMlY04ugOf9kZ3dHVEoUB4N6euCDFwrwLIdy6s718LFk11W9/CXXprqQQNVUKIIN3rZHDWy64JL1Ru47ncIrFkh2Wy9J55G17AQVLIX8HzKeapCzBYOBXVLfBxSNhDM3uPSoVgV3OLttW3DX4XNzbx6E+GfWeASS++OnsuC7+OqcFAw72BI2p8Q7WKiyN3XDP8Z6qEay3l47aPuep4fehIZcYSRkf/g540v1HICQxwTEtk4vFlEDCYFZxggfAg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from BYAPR11MB3734.namprd11.prod.outlook.com (2603:10b6:a03:fe::29)
- by PH7PR11MB8035.namprd11.prod.outlook.com (2603:10b6:510:245::21) with
+ by BL3PR11MB6363.namprd11.prod.outlook.com (2603:10b6:208:3b6::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.24; Fri, 20 Oct
- 2023 13:50:14 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Fri, 20 Oct
+ 2023 13:50:17 +0000
 Received: from BYAPR11MB3734.namprd11.prod.outlook.com
  ([fe80::95aa:def7:9d78:d6c9]) by BYAPR11MB3734.namprd11.prod.outlook.com
  ([fe80::95aa:def7:9d78:d6c9%4]) with mapi id 15.20.6863.032; Fri, 20 Oct 2023
- 13:50:14 +0000
+ 13:50:16 +0000
 From:   Damian Muszynski <damian.muszynski@intel.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <qat-linux@intel.com>,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Damian Muszynski <damian.muszynski@intel.com>,
         Tero Kristo <tero.kristo@linux.intel.com>
-Subject: [PATCH v2 02/11] crypto: qat - use masks for AE groups
-Date:   Fri, 20 Oct 2023 15:49:22 +0200
-Message-ID: <20231020134931.7530-3-damian.muszynski@intel.com>
+Subject: [PATCH v2 03/11] crypto: qat - fix ring to service map for QAT GEN4
+Date:   Fri, 20 Oct 2023 15:49:23 +0200
+Message-ID: <20231020134931.7530-4-damian.muszynski@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231020134931.7530-1-damian.muszynski@intel.com>
 References: <20231020134931.7530-1-damian.muszynski@intel.com>
@@ -93,52 +93,52 @@ X-ClientProxiedBy: FR5P281CA0027.DEUP281.PROD.OUTLOOK.COM
  (2603:10b6:a03:fe::29)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3734:EE_|PH7PR11MB8035:EE_
-X-MS-Office365-Filtering-Correlation-Id: 98375f33-ef05-4839-576b-08dbd1737c45
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3734:EE_|BL3PR11MB6363:EE_
+X-MS-Office365-Filtering-Correlation-Id: 21bb3ad1-4348-4356-da66-08dbd1737df4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: V8MmUmDpx+lm6fmw9+XvJ8J/+yr63c3RGYjLYqVE5sD2gokB+gakbpEByXRJyLzyVPkBwqN6brOIn17EzKWgUxDNepm+jBBblkb9vq/vZO3mFmKTt41zcDbeNnCOfU4qNJ9wa1se6K0T260cNMH+Q11fKmtF0gq8qnVU6k/CoZrtdVYvhbtxBhh+DF/Cb7CfIskq8o//tPcPP9kKhfDzlibDffgAiYuuIP7hBt8ka9nLho25Y7OnjpqoJ/lGHsHoVX0NXHKpselMo1Kmz43QuPx+I7B8c4fOglzgIhQ6s5mRfP4NPfXWLhhr26MYzUc700mi9paJHvWf1fEoKhWYPQcfYWxCjRkXxK+hrAVvLPvOTZusF/GzXFl29W9V8nEaTd2/IRe2w7GRokKPmGk/s3eVcv9s0CoRFJZV9chyhL7qp3WOwVMK14553IsC8AACsgLuQTxQ1YvmdvfTPVdM65vFP89Ovaxm12u2QZipIryNjWmmOw4Cj4O27LZxvF4freda8+8/3ykddTH7cWfvyyz3pGVdArwH5951n+iEdn0VaGz9GCCz1AHK4MqQO+uV
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(39860400002)(366004)(376002)(136003)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(83380400001)(54906003)(38100700002)(6916009)(66476007)(41300700001)(6512007)(36756003)(2616005)(1076003)(86362001)(44832011)(2906002)(4326008)(66946007)(5660300002)(8676002)(8936002)(6666004)(36916002)(316002)(66556008)(6506007)(6486002)(478600001)(26005)(82960400001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: q7ynVN26ZnwHJlaVnARzCy4bxl81H5l8xoFx7N8zyiNH1cf/3tTvkq+rg/PDtk1cPJjGLru4lbPPnWTMEsixfhiwdibzW3M5rTg7AI9dla6j0LOJcJBio2MXapXXQM9/LSaQD9IUd4F5uoCMTQbFTDNIHRuTSTuFUfh5nA2sG7EYxFnSgg7ZOnvirYEa2hbSdMsyt6CF0WEEn4i3Zz6dqG3RXp+E24/xS/My5HckIKYnq+U+0eRq6NCgtu8P/6hPv7wsa6X0M7szqx+8ZiwMPwhUNUBU4ZPGe5ftfLX4Ma10CVOul0K0XizgU+Rs5wX60d4R/29Uhj33XanVoEHUmggnj8/75VLZ7wzo3IrwyzXgIthDXsHuue48uYTzC2L4HCDsbhFgaSyd8Rr8XJ01OBoome3Ld+4ZD/YASqqn95hRhOVYmcfefMlVNPcLvL4XZImgfhvA4mev1fspFcDgo18slWlVCKZDBBjeEcPrnWEjqwaSwnN3R4k2qyvZVclgqzUlBmLh2AzwtttcrT+2WkgCtFBlyYPAulF78hynKok=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(39860400002)(346002)(396003)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(66556008)(6666004)(54906003)(66476007)(478600001)(6916009)(83380400001)(6486002)(66946007)(6512007)(38100700002)(1076003)(41300700001)(26005)(36916002)(316002)(2616005)(6506007)(82960400001)(36756003)(86362001)(8676002)(8936002)(44832011)(2906002)(5660300002)(4326008);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ppe91UXvyTGyeD3EFSfPIgb8H5mX1Xl/+35e2HkijbRP9ZBtZXcxWU8hzYOs?=
- =?us-ascii?Q?kHwskFfjNlCUkzyUbWagiLPpkxHidhf2DaEeAOyyMdkG0btT+bEPy677Lw/k?=
- =?us-ascii?Q?bhhD2mmX/jnYBwyDFpdatn8N8exXALZr6NepFtjppg3AWGVFW0+BcxbrXdzQ?=
- =?us-ascii?Q?sobrMZA3OeDaHXOnz/QfpayU874vhZedekrzFc5/jGhfJZELY3PBx3X7twe1?=
- =?us-ascii?Q?at4jxdx+1qSf1pghTgwaTFbxFXiJQAZE/vREpWst2CpMOW6mW/KXgV1bktSg?=
- =?us-ascii?Q?QS6cd3H7f261Utik7dEnAlvquS9U/mWu6Ht8q9excZM35cyOVVsIsAJM1+k3?=
- =?us-ascii?Q?zREyXBvT3pbKeXTFX/sgHc9vYwO8WR5L8Pl74Do+OdYkQwf9H+YRW4zhBTUn?=
- =?us-ascii?Q?zwVKktWTg5MV+DTbTbMAWzM5+rX/xO+KwAA2vr2UJlWLJPf+xPNA8d3vMkxB?=
- =?us-ascii?Q?PzIVohr4ISd/CFImMiQOZstacB1zykdicNSJ+xiTGm8Y1Ugq9fONwDq6GvFW?=
- =?us-ascii?Q?y3bWd9ublXCOw23jqT3GXLrbmM98L5QjkNy6oLSCGlmy0W6ybgve+1eKEbwk?=
- =?us-ascii?Q?x/aS11PvxmXJ5yMD1RHJVp+Ep8fBi1mgJcSsdTpApmTrcHoU/Rwf7sG13cII?=
- =?us-ascii?Q?pdQSK7t1fP8Gcxzi0UfS1UnF6ML/7UqMX254jQBxt8Jik37+VywNcVEf9rcd?=
- =?us-ascii?Q?aa5fyNlajtr8op70s1IQz/5n5PVpS6BaNg8BqMY9ge1q3W+CXN9unA2NqRiE?=
- =?us-ascii?Q?Gq6kYZ1OVjmF/e4dXw2gDQped0kLsoQtvVqjv7lbO/D3ktsLMncZ28VdJwZT?=
- =?us-ascii?Q?VZoJGLWEx5bVJlVwV/SOK93ylVa+cNVWxtEb7p4cg/UBU45x+TON5B5F7bg8?=
- =?us-ascii?Q?BY1rIM7nRmWed3mJo2SVCfjdrWrqe/gZ/DVUsYbjGyJiI1awtB7ULRQbN3fL?=
- =?us-ascii?Q?jR7b/ECtbFMCRoZANT8+sEbhvHseNtI+Dx4JT/4OjRT3m3jdUZX8G6rBQV6J?=
- =?us-ascii?Q?ypkwp4Y7mqGdQG3fKYoLFxCVspiiC3v4Zcehux7/LDQUHD17M8BT+/V+fhJD?=
- =?us-ascii?Q?1bWDydhVWVwijbkFq+HowR+sYlwBnqhYt2chZ/ueQb/CnmSbU6+gdj5lX331?=
- =?us-ascii?Q?chbXRELHiIEfrM1g0zOXiK9rwnkncbqrToauMCPKnZ1yQE0mYnamaeAaXyAO?=
- =?us-ascii?Q?aVrsyMzPOvtW8oZIkK5dZaYx20gQtxG5cD74A4KAbgJxhr4gsRfXTKIatZs2?=
- =?us-ascii?Q?rpYBdcWJJCqmmgKQ959pwM8apkXqRScsQm00mYT3Y4cfysmViXpL9Ftsoa6n?=
- =?us-ascii?Q?EgiuTa0gEyXee2IpFWI8uordgjplszmKSKD0LPCqjH09AyYbG+QElZoAbs6e?=
- =?us-ascii?Q?ozDWlZNQi+HKdRj+iHJg29ihLBeRRZKN9uyWa1MTCLPkcmqXilxo7lg1Mqul?=
- =?us-ascii?Q?a6soXGCoAo/MRt4S3lHePnJYK7JObKptyMkRIxuvOJVg26IeZexN3bshoJca?=
- =?us-ascii?Q?2Oii3sPLzEPoOmG4idb+bflGfhG+a8sYd5WVUoITBx3N2Hh+IdaWrDAzf0m9?=
- =?us-ascii?Q?wIo1bNHtomdCBs4NS6yE61uNxChHS+hBqocr2TSpP/qMCQchFNG2sbWrHLmE?=
- =?us-ascii?Q?dA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 98375f33-ef05-4839-576b-08dbd1737c45
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MmJvO6IMrx6iknyXKfAmN7ZV3+9h4lPeybPYMdEaw50dN7b30dOv9qo1ZSN8?=
+ =?us-ascii?Q?zKeNGRYaaIzerhq7SYOY4HV9dQWL+3352zUqd7wTMP7Ykn2V0I+Wu/O5VHIr?=
+ =?us-ascii?Q?XjuuRXN2a+eToDxHmaNkb2bHRNrFycosGI7io4xt+RyeyyGqf2bBiwkA4dCx?=
+ =?us-ascii?Q?AjPJ8Odow23YrNZGHrQ7qT8LtYWLx+CJ6epJMycSHkgyf5JnQsH74lrmzK/g?=
+ =?us-ascii?Q?d7jIINjYZYJqPJ1ElmVRIsD+madhxqx/Q66y7nZhBH8BmZ/dKQVdOHUfMQV4?=
+ =?us-ascii?Q?W93j4BlgiWWoPy1bMbNm5vZuZhQ0k6Ld07vusGypPg3bZqOydlyafWwfgCSr?=
+ =?us-ascii?Q?YmAdV4vdgwualgpWVp9oW+3NkhWu2jEZK+ecZjtKQ2cga6ylQ0pTmY6E3CdO?=
+ =?us-ascii?Q?9FSKi6GfHHSlACFAMn9shPE2wrehWspvaaWaH68FeMz7JJtzFgHQbKGELNU6?=
+ =?us-ascii?Q?XZs10xeQm1bIhQte1Oi3cbjgxmsc/5c9DHOxphcy+d9T2JggQyGVzox874Mf?=
+ =?us-ascii?Q?fyjDb4rr0JHhIX3cTMNPEwDkS41lfuf51DiqS1guxVoY00KUoaH2QCqeqzG8?=
+ =?us-ascii?Q?xpspbMuCyeiI712bgH0l2GnP7J+t/FHrjZBfmH2g90Iwmo+SUb9SHFbNnw0/?=
+ =?us-ascii?Q?aQ4HaswUfO/nhGJ7Wc29hYRQ54Oy08IDqg23oJecOLEn3XFMYTltEWmWGIqF?=
+ =?us-ascii?Q?RIRze/JKXAlSEEBhXAtmDVLSTm3VXHhxwSlJxKMjWMOtrZGjwxm9rr8cqg1s?=
+ =?us-ascii?Q?Wr7mzKFTjFVoEPbBtSgwPQhPszU/bWvNcSPCaoRTIIC6WonAHb0EJbtCRXs7?=
+ =?us-ascii?Q?6vVXuEVj2Z2lDO9ii/qtwQlOdDnHW9DbjwLxtMJV03BXFJbrZ7U8OFQ3NzJ6?=
+ =?us-ascii?Q?82cvZ4Ooxgm6B6SQxfhRT1X1Uu5YAUCpZyMsBzVtsjleFBPmDvFPK/VAgrrE?=
+ =?us-ascii?Q?d8OX44hiWbS3jvPA6cZ2IZk5MXmxYIBfNl6yY6bAVU7bKmac6OHjr3nTZ81g?=
+ =?us-ascii?Q?xiLRUkRKYe4kJ2LRRVUTCtCpwsjOX+pGEor5SeSTMXk4pZiWH12dL7UkttL+?=
+ =?us-ascii?Q?0Nbx+TfSO7bL5u72M8p9edtm3HEXUfCDO+W+7r8k2tl/TTjyk93/14RKiY2I?=
+ =?us-ascii?Q?q3XnRap9pdjH35oEjLFPNEOmhoi82/oSSFD/IKOAxqJ25UMdHI+Fes/QyKJM?=
+ =?us-ascii?Q?NJ3i6gQQZQ2ocBT01+1UE5wcCy9GOgcdryS6NAJbP+wHmA+urpvoBc2OS8VP?=
+ =?us-ascii?Q?nqk7QFw13KQ04tOOck0zwk6PY6fN/FRvqQe7ZCcFxTfJJWEPOvM5tB47IZXL?=
+ =?us-ascii?Q?9n1wPXehNO23dHNHL8GyGIJ0KRU1qjKqaaZgVWY19VkGu8xSPiuR5s5NwYyo?=
+ =?us-ascii?Q?XGtY14qVgN1voNtJ61Ah++wKtqYqueT+bm7EJO3o+z+ue2k4p3FXwBWkFkw7?=
+ =?us-ascii?Q?QEjZJwBbGM5LaR5cVhnxcNJD2drL+3aPZ0wUEtag+AvtT8fVfjb98SQZ/Yh/?=
+ =?us-ascii?Q?onStkuL+DIyrRp/VxFHUrWleHFLvXZ6MNNLNPvqKj9zjzGd+Dz2eKDkv7lx8?=
+ =?us-ascii?Q?MHJ+TCKoc3o2ShgAXPI+vCq4FXB7DuTCkoB6QINKeslgbp9gnGwqz6G85fYS?=
+ =?us-ascii?Q?2w=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21bb3ad1-4348-4356-da66-08dbd1737df4
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3734.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 13:50:14.1831
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 13:50:16.8860
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NJeKZ82DBbIK+AjIiI70wKx/0ZmCMzwP9ivfClZQV4AF3zV7em6NAnZa2L05l36X+DJ6AVMt15lQk9rLEp/UlZ9tA9nE+gTFC3lSYj3Hykg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8035
+X-MS-Exchange-CrossTenant-UserPrincipalName: /tHydgnq6bApau+j/DMtG6JeqVfLP2nCboo3DiaLsDdzbtDhz0dX30Kg5TGjGK2jfWE5UokINrgACrPFuLyL13Ko43/+tYd03byjitw4uq0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6363
 X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -146,101 +146,122 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-The adf_fw_config structures hardcode a bit mask that represents the
-acceleration engines (AEs) where a certain firmware image will have to
-be loaded to. Remove the hardcoded masks and replace them with defines.
+The 4xxx drivers hardcode the ring to service mapping. However, when
+additional configurations where added to the driver, the mappings were
+not updated. This implies that an incorrect mapping might be reported
+through pfvf for certain configurations.
 
-This does not introduce any functional change.
+Add an algorithm that computes the correct ring to service mapping based
+on the firmware loaded on the device.
 
+Fixes: 0cec19c761e5 ("crypto: qat - add support for compression for 4xxx")
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Reviewed-by: Damian Muszynski <damian.muszynski@intel.com>
 Reviewed-by: Tero Kristo <tero.kristo@linux.intel.com>
 ---
- .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     | 46 ++++++++++---------
- 1 file changed, 25 insertions(+), 21 deletions(-)
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     | 54 +++++++++++++++++++
+ .../intel/qat/qat_common/adf_accel_devices.h  |  1 +
+ .../crypto/intel/qat/qat_common/adf_init.c    |  3 ++
+ 3 files changed, 58 insertions(+)
 
 diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-index 3ea4bfc91bfe..1f1e318eeabe 100644
+index 1f1e318eeabe..37bb2b3618cd 100644
 --- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
 +++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -15,6 +15,10 @@
- #include "adf_cfg_services.h"
- #include "icp_qat_hw.h"
+@@ -424,6 +424,59 @@ static const struct adf_fw_config *get_fw_config(struct adf_accel_dev *accel_dev
+ 	}
+ }
  
-+#define ADF_AE_GROUP_0		GENMASK(3, 0)
-+#define ADF_AE_GROUP_1		GENMASK(7, 4)
-+#define ADF_AE_GROUP_2		BIT(8)
++enum adf_rp_groups {
++	RP_GROUP_0 = 0,
++	RP_GROUP_1,
++	RP_GROUP_COUNT
++};
 +
- enum adf_fw_objs {
- 	ADF_FW_SYM_OBJ,
- 	ADF_FW_ASYM_OBJ,
-@@ -42,45 +46,45 @@ struct adf_fw_config {
- };
++static u16 get_ring_to_svc_map(struct adf_accel_dev *accel_dev)
++{
++	enum adf_cfg_service_type rps[RP_GROUP_COUNT];
++	const struct adf_fw_config *fw_config;
++	u16 ring_to_svc_map;
++	int i, j;
++
++	fw_config = get_fw_config(accel_dev);
++	if (!fw_config)
++		return 0;
++
++	for (i = 0; i < RP_GROUP_COUNT; i++) {
++		switch (fw_config[i].ae_mask) {
++		case ADF_AE_GROUP_0:
++			j = RP_GROUP_0;
++			break;
++		case ADF_AE_GROUP_1:
++			j = RP_GROUP_1;
++			break;
++		default:
++			return 0;
++		}
++
++		switch (fw_config[i].obj) {
++		case ADF_FW_SYM_OBJ:
++			rps[j] = SYM;
++			break;
++		case ADF_FW_ASYM_OBJ:
++			rps[j] = ASYM;
++			break;
++		case ADF_FW_DC_OBJ:
++			rps[j] = COMP;
++			break;
++		default:
++			rps[j] = 0;
++			break;
++		}
++	}
++
++	ring_to_svc_map = rps[RP_GROUP_0] << ADF_CFG_SERV_RING_PAIR_0_SHIFT |
++			  rps[RP_GROUP_1] << ADF_CFG_SERV_RING_PAIR_1_SHIFT |
++			  rps[RP_GROUP_0] << ADF_CFG_SERV_RING_PAIR_2_SHIFT |
++			  rps[RP_GROUP_1] << ADF_CFG_SERV_RING_PAIR_3_SHIFT;
++
++	return ring_to_svc_map;
++}
++
+ static const char *uof_get_name(struct adf_accel_dev *accel_dev, u32 obj_num,
+ 				const char * const fw_objs[], int num_objs)
+ {
+@@ -530,6 +583,7 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data, u32 dev_id)
+ 	hw_data->uof_get_ae_mask = uof_get_ae_mask;
+ 	hw_data->set_msix_rttable = set_msix_default_rttable;
+ 	hw_data->set_ssm_wdtimer = adf_gen4_set_ssm_wdtimer;
++	hw_data->get_ring_to_svc_map = get_ring_to_svc_map;
+ 	hw_data->disable_iov = adf_disable_sriov;
+ 	hw_data->ring_pair_reset = adf_gen4_ring_pair_reset;
+ 	hw_data->enable_pm = adf_gen4_enable_pm;
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+index 197e10eb5534..1c11d90bd9f3 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+@@ -212,6 +212,7 @@ struct adf_hw_device_data {
+ 	void (*get_arb_info)(struct arb_info *arb_csrs_info);
+ 	void (*get_admin_info)(struct admin_info *admin_csrs_info);
+ 	enum dev_sku_info (*get_sku)(struct adf_hw_device_data *self);
++	u16 (*get_ring_to_svc_map)(struct adf_accel_dev *accel_dev);
+ 	int (*alloc_irq)(struct adf_accel_dev *accel_dev);
+ 	void (*free_irq)(struct adf_accel_dev *accel_dev);
+ 	void (*enable_error_correction)(struct adf_accel_dev *accel_dev);
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_init.c b/drivers/crypto/intel/qat/qat_common/adf_init.c
+index 00a32efdfc59..ef51c4d028d2 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_init.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_init.c
+@@ -97,6 +97,9 @@ static int adf_dev_init(struct adf_accel_dev *accel_dev)
+ 		return -EFAULT;
+ 	}
  
- static const struct adf_fw_config adf_fw_cy_config[] = {
--	{0xF0, ADF_FW_SYM_OBJ},
--	{0xF, ADF_FW_ASYM_OBJ},
--	{0x100, ADF_FW_ADMIN_OBJ},
-+	{ADF_AE_GROUP_1, ADF_FW_SYM_OBJ},
-+	{ADF_AE_GROUP_0, ADF_FW_ASYM_OBJ},
-+	{ADF_AE_GROUP_2, ADF_FW_ADMIN_OBJ},
- };
- 
- static const struct adf_fw_config adf_fw_dc_config[] = {
--	{0xF0, ADF_FW_DC_OBJ},
--	{0xF, ADF_FW_DC_OBJ},
--	{0x100, ADF_FW_ADMIN_OBJ},
-+	{ADF_AE_GROUP_1, ADF_FW_DC_OBJ},
-+	{ADF_AE_GROUP_0, ADF_FW_DC_OBJ},
-+	{ADF_AE_GROUP_2, ADF_FW_ADMIN_OBJ},
- };
- 
- static const struct adf_fw_config adf_fw_sym_config[] = {
--	{0xF0, ADF_FW_SYM_OBJ},
--	{0xF, ADF_FW_SYM_OBJ},
--	{0x100, ADF_FW_ADMIN_OBJ},
-+	{ADF_AE_GROUP_1, ADF_FW_SYM_OBJ},
-+	{ADF_AE_GROUP_0, ADF_FW_SYM_OBJ},
-+	{ADF_AE_GROUP_2, ADF_FW_ADMIN_OBJ},
- };
- 
- static const struct adf_fw_config adf_fw_asym_config[] = {
--	{0xF0, ADF_FW_ASYM_OBJ},
--	{0xF, ADF_FW_ASYM_OBJ},
--	{0x100, ADF_FW_ADMIN_OBJ},
-+	{ADF_AE_GROUP_1, ADF_FW_ASYM_OBJ},
-+	{ADF_AE_GROUP_0, ADF_FW_ASYM_OBJ},
-+	{ADF_AE_GROUP_2, ADF_FW_ADMIN_OBJ},
- };
- 
- static const struct adf_fw_config adf_fw_asym_dc_config[] = {
--	{0xF0, ADF_FW_ASYM_OBJ},
--	{0xF, ADF_FW_DC_OBJ},
--	{0x100, ADF_FW_ADMIN_OBJ},
-+	{ADF_AE_GROUP_1, ADF_FW_ASYM_OBJ},
-+	{ADF_AE_GROUP_0, ADF_FW_DC_OBJ},
-+	{ADF_AE_GROUP_2, ADF_FW_ADMIN_OBJ},
- };
- 
- static const struct adf_fw_config adf_fw_sym_dc_config[] = {
--	{0xF0, ADF_FW_SYM_OBJ},
--	{0xF, ADF_FW_DC_OBJ},
--	{0x100, ADF_FW_ADMIN_OBJ},
-+	{ADF_AE_GROUP_1, ADF_FW_SYM_OBJ},
-+	{ADF_AE_GROUP_0, ADF_FW_DC_OBJ},
-+	{ADF_AE_GROUP_2, ADF_FW_ADMIN_OBJ},
- };
- 
- static const struct adf_fw_config adf_fw_dcc_config[] = {
--	{0xF0, ADF_FW_DC_OBJ},
--	{0xF, ADF_FW_SYM_OBJ},
--	{0x100, ADF_FW_ADMIN_OBJ},
-+	{ADF_AE_GROUP_1, ADF_FW_DC_OBJ},
-+	{ADF_AE_GROUP_0, ADF_FW_SYM_OBJ},
-+	{ADF_AE_GROUP_2, ADF_FW_ADMIN_OBJ},
- };
- 
- static_assert(ARRAY_SIZE(adf_fw_cy_config) == ARRAY_SIZE(adf_fw_dc_config));
++	if (hw_data->get_ring_to_svc_map)
++		hw_data->ring_to_svc_map = hw_data->get_ring_to_svc_map(accel_dev);
++
+ 	if (adf_ae_init(accel_dev)) {
+ 		dev_err(&GET_DEV(accel_dev),
+ 			"Failed to initialise Acceleration Engine\n");
 -- 
 2.34.1
 
