@@ -2,124 +2,115 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9485AC0032E
-	for <linux-crypto@archiver.kernel.org>; Sat, 21 Oct 2023 00:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6345BC001E0
+	for <linux-crypto@archiver.kernel.org>; Sat, 21 Oct 2023 06:47:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232269AbjJUARd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Oct 2023 20:17:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60306 "EHLO
+        id S229503AbjJUGrC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 21 Oct 2023 02:47:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230446AbjJUARc (ORCPT
+        with ESMTP id S229472AbjJUGrC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Oct 2023 20:17:32 -0400
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9F2BD6E
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 17:17:27 -0700 (PDT)
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 0FAA63F18D
-        for <linux-crypto@vger.kernel.org>; Sat, 21 Oct 2023 00:17:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1697847446;
-        bh=PuueNGchp+/Mt3jvaX6HDVjE2P5ULCrANke79lmr0h0=;
-        h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-         MIME-Version;
-        b=HFT5HOnLPuyovfj57WXkrT2dencna+mqDtvPuzYwCy1T+mF3xOEWJKJbEpZOUik/N
-         XRTK1NQcdttGq+nLaxGLc8efewuYnb5Ci6TJ281J6/caLDC69rgdqmCXj8NUxsAb42
-         cE5clIni1VL/ZrMuyaoqwOsDvuaKwMmMVno9r93frvRRPRQ8jFjrVYL4EAbEOp+Tub
-         aRKVnjWNhuf3U2VsO9ASL/Ext9wnE8Qkv68XNOV9olBsarca7nDESrzaOb3wjsKs9e
-         H90JX14HlXbxwePWoC6ox7U4PA1UwLUntjVjsBZI3uz8tX4KA3f/qnSh9+mOSX/hvm
-         xY4K1KHghGQaA==
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40839252e81so7983555e9.3
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 17:17:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697847445; x=1698452245;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PuueNGchp+/Mt3jvaX6HDVjE2P5ULCrANke79lmr0h0=;
-        b=N6ducr3I3RdR8RAEZlJeXL2oWxOoxuQYAD0QnG3jzbReSteQvYBTM5Lc3EAHSnY53O
-         NXarcIs403H9lQ7DxCMMKxplngmPc5DPFZE14u2Gmtlv7gOfrFODxGWvEbW0yKKPecAX
-         BuGc4xqvNHWl9+eRNs0SMBV71OETigL/qeHQEQdJkAcUmjq0mf/3IgkNZ559gKbcezDI
-         dk93mxRqiZwugzeKwsc9u1R43zUR5ookyO5xWRA2Zd1Rb9aiwgLIdpCVBJMZe46A2eC0
-         SOw2jgf/okcqgbfzwZKFk1sA+VCwn0ibSgVb689wTG1FOFcJ4+nOLV4g7QsWPUJIPOJA
-         otzw==
-X-Gm-Message-State: AOJu0YwVGnIe+baRyNka3oq1Dkfnaycmv3bfH/K0JmoPGoBXfjv5v0b6
-        2ACnG8IoKCm44N5D3TFGNGD5PfTcAMYPH44Jie9lzLfZXw5jJxeQJFc9hw5lGv2rPIOHfbV7Lfs
-        dP9RF6ENWTExEVQ3XP5YuGIZkILtmO/Kq8GzXcJj9Yg==
-X-Received: by 2002:a05:600c:4f12:b0:401:bdd7:49ae with SMTP id l18-20020a05600c4f1200b00401bdd749aemr2887980wmq.18.1697847445116;
-        Fri, 20 Oct 2023 17:17:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHMVZnMB+J/FgQa8VZj36mJZ4kpObp0cRp5CFimotrdvSauQhycWrR5IHWAFgVCgfAWTIETmQ==
-X-Received: by 2002:a05:600c:4f12:b0:401:bdd7:49ae with SMTP id l18-20020a05600c4f1200b00401bdd749aemr2887969wmq.18.1697847444697;
-        Fri, 20 Oct 2023 17:17:24 -0700 (PDT)
-Received: from localhost ([2001:67c:1560:8007::aac:c15c])
-        by smtp.gmail.com with ESMTPSA id j6-20020a05600c488600b004080f0376a0sm3207801wmp.42.2023.10.20.17.17.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 17:17:24 -0700 (PDT)
-From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-To:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] crypto: mscode_parser - remove sha224 authenticode support
-Date:   Sat, 21 Oct 2023 01:16:58 +0100
-Message-Id: <20231021001658.1602526-1-dimitri.ledkov@canonical.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231010212530.63470-1-dimitri.ledkov@canonical.com>
-References: <20231010212530.63470-1-dimitri.ledkov@canonical.com>
+        Sat, 21 Oct 2023 02:47:02 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5679D52
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Oct 2023 23:46:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697870816; x=1729406816;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BMmN8PvjKtY+UEnVZR8hGDWrMHsSetH3EUV6qoiVuI4=;
+  b=CNIWdbFQ9zga2xCPhIfv7Enb+PXNCwb03KhXADwTMvnp7KAeXl5+nwzC
+   MfNcJiuIx5xbs0srKQsWAmyOAINY8jWENTlbACiy6uBdpHftakv8GSupu
+   tj6Ox7IjsYfDCywIEI1GCJ7GAtuPPVVbk351Njxr3MYT0bMVuJYPF35IC
+   bZOWIkSE5inC42wZ2+Ncl3Bh4GZBM526GaZRuoX3T3MLSPpbnNABworkt
+   fZffTA5tV1RPnYhrbv//Gfh7ob/nG7OCDTnFEDBhNY4pbLosKjLjXlqxH
+   cWOBPzdVAtIA/mGHUZJ45oCctqZXRahlRT5ClYvRSwlP2fA1/wnJyJlk1
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="385506388"
+X-IronPort-AV: E=Sophos;i="6.03,240,1694761200"; 
+   d="scan'208";a="385506388"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 23:46:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="901328780"
+X-IronPort-AV: E=Sophos;i="6.03,240,1694761200"; 
+   d="scan'208";a="901328780"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 20 Oct 2023 23:44:42 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qu5l5-0004X8-2h;
+        Sat, 21 Oct 2023 06:46:51 +0000
+Date:   Sat, 21 Oct 2023 14:46:18 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Srujana Challa <schalla@marvell.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc:     oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
+        bbrezillon@kernel.org, arno@natisbad.org, kuba@kernel.org,
+        ndabilpuram@marvell.com, schalla@marvell.com
+Subject: Re: [PATCH 03/10] crypto: octeontx2: add devlink option to set
+ max_rxc_icb_cnt
+Message-ID: <202310211411.QqrLly6F-lkp@intel.com>
+References: <20231016064934.1913964-4-schalla@marvell.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016064934.1913964-4-schalla@marvell.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-It is possible to stand up your own certificates and sign PE-COFF
-binaries using SHA-224. However it never became popular or needed
-since it has similar costs as SHA-256. Windows Authenticode
-infrastructure never had support for SHA-224, and all secureboot keys
-used for linux vmlinuz have always been using at least SHA-256.
+Hi Srujana,
 
-Given the point of mscode_parser is to support interoperability with
-typical de-facto hashes, remove support for SHA-224 to avoid the
-possibility of creating interoperability issues with rhboot/shim,
-grub, and non-linux systems trying to sign or verify vmlinux.
+kernel test robot noticed the following build errors:
 
-SHA-224 itself is not removed from the kernel, as it is truncated
-SHA-256. If requested I can write patches to remove SHA-224 support
-across all of the drivers.
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on herbert-crypto-2.6/master linus/master v6.6-rc6 next-20231020]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+url:    https://github.com/intel-lab-lkp/linux/commits/Srujana-Challa/crypto-octeontx2-remove-CPT-block-reset/20231017-141612
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20231016064934.1913964-4-schalla%40marvell.com
+patch subject: [PATCH 03/10] crypto: octeontx2: add devlink option to set max_rxc_icb_cnt
+config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20231021/202310211411.QqrLly6F-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231021/202310211411.QqrLly6F-lkp@intel.com/reproduce)
 
-Changes since v1:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310211411.QqrLly6F-lkp@intel.com/
 
- * Correct spelling and grammatical mistakes in the commit
-   message. This is a request to replace c1d760a471 ("crypto:
-   mscode_parser - remove sha224 authenticode support") in cryptodev
-   repository with this one.
+All errors (new ones prefixed by >>):
 
- crypto/asymmetric_keys/mscode_parser.c | 3 ---
- 1 file changed, 3 deletions(-)
+   drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c: In function 'rvu_cpt_init':
+>> drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c:1222:36: error: implicit declaration of function 'is_cn10ka_a0'; did you mean 'is_cnf10ka_a0'? [-Werror=implicit-function-declaration]
+    1222 |             (!is_rvu_otx2(rvu) && !is_cn10ka_a0(rvu) && !is_cn10ka_a1(rvu))) {
+         |                                    ^~~~~~~~~~~~
+         |                                    is_cnf10ka_a0
+>> drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c:1222:58: error: implicit declaration of function 'is_cn10ka_a1'; did you mean 'is_cnf10ka_a0'? [-Werror=implicit-function-declaration]
+    1222 |             (!is_rvu_otx2(rvu) && !is_cn10ka_a0(rvu) && !is_cn10ka_a1(rvu))) {
+         |                                                          ^~~~~~~~~~~~
+         |                                                          is_cnf10ka_a0
+   cc1: some warnings being treated as errors
 
-diff --git a/crypto/asymmetric_keys/mscode_parser.c b/crypto/asymmetric_keys/mscode_parser.c
-index 6416bded0e..855cbc46a9 100644
---- a/crypto/asymmetric_keys/mscode_parser.c
-+++ b/crypto/asymmetric_keys/mscode_parser.c
-@@ -84,9 +84,6 @@ int mscode_note_digest_algo(void *context, size_t hdrlen,
- 	case OID_sha512:
- 		ctx->digest_algo = "sha512";
- 		break;
--	case OID_sha224:
--		ctx->digest_algo = "sha224";
--		break;
- 
- 	case OID__NR:
- 		sprint_oid(value, vlen, buffer, sizeof(buffer));
+
+vim +1222 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+
+  1214	
+  1215	int rvu_cpt_init(struct rvu *rvu)
+  1216	{
+  1217		u64 reg_val;
+  1218	
+  1219		/* Retrieve CPT PF number */
+  1220		rvu->cpt_pf_num = get_cpt_pf_num(rvu);
+  1221		if (is_block_implemented(rvu->hw, BLKADDR_CPT0) &&
+> 1222		    (!is_rvu_otx2(rvu) && !is_cn10ka_a0(rvu) && !is_cn10ka_a1(rvu))) {
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
