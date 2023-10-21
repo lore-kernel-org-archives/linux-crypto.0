@@ -2,135 +2,227 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A41FC001E0
-	for <linux-crypto@archiver.kernel.org>; Sat, 21 Oct 2023 10:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF927C25B43
+	for <linux-crypto@archiver.kernel.org>; Sat, 21 Oct 2023 11:23:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230105AbjJUKEK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 21 Oct 2023 06:04:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40862 "EHLO
+        id S229765AbjJULXt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 21 Oct 2023 07:23:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229680AbjJUKEJ (ORCPT
+        with ESMTP id S229478AbjJULXt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 21 Oct 2023 06:04:09 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E69E51A4
-        for <linux-crypto@vger.kernel.org>; Sat, 21 Oct 2023 03:04:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697882644; x=1729418644;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LDhf8SqgIzRjwu7NTPeGKJ/7xAfgLZBLFeqSrJvgaBk=;
-  b=gwekXyCfOlIJ9M2bIl8O+c6yaHsCIJvKjDiDHmcnj0xK5ipgooI7TNs3
-   9FCmZwSqfQVwz2QycSgyKwuB8+agoObL4IP5sycz9/RUFsp+N+IGj7aeO
-   WZjGaF7z7OndTacc43DeAQ/vMfVfe6wH9SLms8GELVyfW3fmO3R5P+v/0
-   KojF/4sAJLUi4ON0YhjJqe5LWdXI8djVyN7xa6YCNEyzlEicAM0owJ+/1
-   Va49N9T6R3LB/mYgYNjZ2/chVr8l6a94YvVlGhmvZZHFUWZxjVB6POPP9
-   tQePCkIExfLSD3KaPHteQ8wv7PvbOwWiq/pyy8Y+ZmnRmhYvQOQqveWyo
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="371692002"
-X-IronPort-AV: E=Sophos;i="6.03,240,1694761200"; 
-   d="scan'208";a="371692002"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2023 03:04:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="751172339"
-X-IronPort-AV: E=Sophos;i="6.03,240,1694761200"; 
-   d="scan'208";a="751172339"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 21 Oct 2023 03:04:02 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qu8pr-0004iY-23;
-        Sat, 21 Oct 2023 10:03:59 +0000
-Date:   Sat, 21 Oct 2023 18:03:58 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Srujana Challa <schalla@marvell.com>, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc:     oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
-        bbrezillon@kernel.org, arno@natisbad.org, kuba@kernel.org,
-        ndabilpuram@marvell.com, schalla@marvell.com
-Subject: Re: [PATCH 04/10] crypto: octeontx2: add devlink option to set t106
- mode
-Message-ID: <202310211716.02lrxOQo-lkp@intel.com>
-References: <20231016064934.1913964-5-schalla@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231016064934.1913964-5-schalla@marvell.com>
+        Sat, 21 Oct 2023 07:23:49 -0400
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA5CC1A4;
+        Sat, 21 Oct 2023 04:23:43 -0700 (PDT)
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+         client-signature RSA-PSS (4096 bits) client-digest SHA256)
+        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
+        by bmailout2.hostsharing.net (Postfix) with ESMTPS id 71EBC2800B75F;
+        Sat, 21 Oct 2023 13:23:41 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+        id 64FAB11768A; Sat, 21 Oct 2023 13:23:41 +0200 (CEST)
+Message-Id: <143690ecc1102c0f67fa7faec437ec7b02bb2304.1697885975.git.lukas@wunner.de>
+From:   Lukas Wunner <lukas@wunner.de>
+Date:   Sat, 21 Oct 2023 13:23:44 +0200
+Subject: [PATCH] treewide: Add SPDX identifier to IETF ASN.1 modules
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-spdx@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
+        Tadeusz Struk <tadeusz.struk@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Hyunchul Lee <hyc.lee@gmail.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        Taehee Yoo <ap420073@gmail.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>, coreteam@netfilter.org,
+        netfilter-devel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Srujana,
+Per section 4.c. of the IETF Trust Legal Provisions, "Code Components"
+in IETF Documents are licensed on the terms of the BSD-3-Clause license:
 
-kernel test robot noticed the following build errors:
+https://trustee.ietf.org/documents/trust-legal-provisions/tlp-5/
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master linus/master v6.6-rc6 next-20231020]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+The term "Code Components" specifically includes ASN.1 modules:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Srujana-Challa/crypto-octeontx2-remove-CPT-block-reset/20231017-141612
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20231016064934.1913964-5-schalla%40marvell.com
-patch subject: [PATCH 04/10] crypto: octeontx2: add devlink option to set t106 mode
-config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20231021/202310211716.02lrxOQo-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231021/202310211716.02lrxOQo-lkp@intel.com/reproduce)
+https://trustee.ietf.org/documents/trust-legal-provisions/code-components-list-3/
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310211716.02lrxOQo-lkp@intel.com/
+Add an SPDX identifier as well as a copyright notice pursuant to section
+6.d. of the Trust Legal Provisions to all ASN.1 modules in the tree
+which are derived from IETF Documents.
 
-All errors (new ones prefixed by >>):
+Section 4.d. of the Trust Legal Provisions requests that each Code
+Component identify the RFC from which it is taken, so link that RFC
+in every ASN.1 module.
 
-   drivers/crypto/marvell/octeontx2/otx2_cpt_devlink.c: In function 'otx2_cpt_register_dl':
->> drivers/crypto/marvell/octeontx2/otx2_cpt_devlink.c:208:9: error: implicit declaration of function 'devlink_params_publish'; did you mean 'devlink_params_register'? [-Werror=implicit-function-declaration]
-     208 |         devlink_params_publish(dl);
-         |         ^~~~~~~~~~~~~~~~~~~~~~
-         |         devlink_params_register
-   cc1: some warnings being treated as errors
+Signed-off-by: Lukas Wunner <lukas@wunner.de>
+---
+ I'm adding a new IETF ASN.1 module for PCI device authentication, hence
+ had to research what the correct license is.  Thought I'd fix this up
+ treewide while at it.
 
+ Not included here is fs/smb/client/cifs_spnego_negtokeninit.asn1,
+ which is similar to fs/smb/client/ksmbd_spnego_negtokeninit.asn1,
+ but contains a Microsoft extension published as Open Specifications
+ Documentation.  It's unclear to me what license they use:
+ https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-spng/
 
-vim +208 drivers/crypto/marvell/octeontx2/otx2_cpt_devlink.c
+ crypto/asymmetric_keys/pkcs7.asn1            | 7 +++++++
+ crypto/asymmetric_keys/pkcs8.asn1            | 6 ++++++
+ crypto/asymmetric_keys/x509.asn1             | 7 +++++++
+ crypto/asymmetric_keys/x509_akid.asn1        | 5 +++++
+ crypto/rsaprivkey.asn1                       | 7 +++++++
+ crypto/rsapubkey.asn1                        | 7 +++++++
+ fs/smb/server/ksmbd_spnego_negtokeninit.asn1 | 8 ++++++++
+ fs/smb/server/ksmbd_spnego_negtokentarg.asn1 | 7 +++++++
+ net/ipv4/netfilter/nf_nat_snmp_basic.asn1    | 8 ++++++++
+ 9 files changed, 62 insertions(+)
 
-   181	
-   182	int otx2_cpt_register_dl(struct otx2_cptpf_dev *cptpf)
-   183	{
-   184		struct device *dev = &cptpf->pdev->dev;
-   185		struct otx2_cpt_devlink *cpt_dl;
-   186		struct devlink *dl;
-   187		int ret;
-   188	
-   189		dl = devlink_alloc(&otx2_cpt_devlink_ops,
-   190				   sizeof(struct otx2_cpt_devlink), dev);
-   191		if (!dl) {
-   192			dev_warn(dev, "devlink_alloc failed\n");
-   193			return -ENOMEM;
-   194		}
-   195	
-   196		cpt_dl = devlink_priv(dl);
-   197		cpt_dl->dl = dl;
-   198		cpt_dl->cptpf = cptpf;
-   199		cptpf->dl = dl;
-   200		ret = devlink_params_register(dl, otx2_cpt_dl_params,
-   201					      ARRAY_SIZE(otx2_cpt_dl_params));
-   202		if (ret) {
-   203			dev_err(dev, "devlink params register failed with error %d",
-   204				ret);
-   205			devlink_free(dl);
-   206			return ret;
-   207		}
- > 208		devlink_params_publish(dl);
-   209		devlink_register(dl);
-   210	
-   211		return 0;
-   212	}
-   213	
-
+diff --git a/crypto/asymmetric_keys/pkcs7.asn1 b/crypto/asymmetric_keys/pkcs7.asn1
+index 1eca740..28e1f4a 100644
+--- a/crypto/asymmetric_keys/pkcs7.asn1
++++ b/crypto/asymmetric_keys/pkcs7.asn1
+@@ -1,3 +1,10 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2009 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc5652#section-3
++
+ PKCS7ContentInfo ::= SEQUENCE {
+ 	contentType	ContentType ({ pkcs7_check_content_type }),
+ 	content		[0] EXPLICIT SignedData OPTIONAL
+diff --git a/crypto/asymmetric_keys/pkcs8.asn1 b/crypto/asymmetric_keys/pkcs8.asn1
+index 702c41a..a2a8af2 100644
+--- a/crypto/asymmetric_keys/pkcs8.asn1
++++ b/crypto/asymmetric_keys/pkcs8.asn1
+@@ -1,3 +1,9 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2010 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc5958#section-2
+ --
+ -- This is the unencrypted variant
+ --
+diff --git a/crypto/asymmetric_keys/x509.asn1 b/crypto/asymmetric_keys/x509.asn1
+index 92d59c3..feb9573 100644
+--- a/crypto/asymmetric_keys/x509.asn1
++++ b/crypto/asymmetric_keys/x509.asn1
+@@ -1,3 +1,10 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2008 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc5280#section-4
++
+ Certificate ::= SEQUENCE {
+ 	tbsCertificate		TBSCertificate ({ x509_note_tbs_certificate }),
+ 	signatureAlgorithm	AlgorithmIdentifier,
+diff --git a/crypto/asymmetric_keys/x509_akid.asn1 b/crypto/asymmetric_keys/x509_akid.asn1
+index 1a33231..164b2ed 100644
+--- a/crypto/asymmetric_keys/x509_akid.asn1
++++ b/crypto/asymmetric_keys/x509_akid.asn1
+@@ -1,3 +1,8 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2008 IETF Trust and the persons identified as authors
++-- of the code
++--
+ -- X.509 AuthorityKeyIdentifier
+ -- rfc5280 section 4.2.1.1
+ 
+diff --git a/crypto/rsaprivkey.asn1 b/crypto/rsaprivkey.asn1
+index 4ce0675..76865124 100644
+--- a/crypto/rsaprivkey.asn1
++++ b/crypto/rsaprivkey.asn1
+@@ -1,3 +1,10 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2016 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc8017#appendix-A.1.2
++
+ RsaPrivKey ::= SEQUENCE {
+ 	version		INTEGER,
+ 	n		INTEGER ({ rsa_get_n }),
+diff --git a/crypto/rsapubkey.asn1 b/crypto/rsapubkey.asn1
+index 725498e..0d32b1c 100644
+--- a/crypto/rsapubkey.asn1
++++ b/crypto/rsapubkey.asn1
+@@ -1,3 +1,10 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2016 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc8017#appendix-A.1.1
++
+ RsaPubKey ::= SEQUENCE {
+ 	n INTEGER ({ rsa_get_n }),
+ 	e INTEGER ({ rsa_get_e })
+diff --git a/fs/smb/server/ksmbd_spnego_negtokeninit.asn1 b/fs/smb/server/ksmbd_spnego_negtokeninit.asn1
+index 0065f19..00151380 100644
+--- a/fs/smb/server/ksmbd_spnego_negtokeninit.asn1
++++ b/fs/smb/server/ksmbd_spnego_negtokeninit.asn1
+@@ -1,3 +1,11 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 1998, 2000 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc2478#section-3.2.1
++-- https://www.rfc-editor.org/rfc/rfc2743#section-3.1
++
+ GSSAPI ::=
+ 	[APPLICATION 0] IMPLICIT SEQUENCE {
+ 		thisMech
+diff --git a/fs/smb/server/ksmbd_spnego_negtokentarg.asn1 b/fs/smb/server/ksmbd_spnego_negtokentarg.asn1
+index 1151933..797e485 100644
+--- a/fs/smb/server/ksmbd_spnego_negtokentarg.asn1
++++ b/fs/smb/server/ksmbd_spnego_negtokentarg.asn1
+@@ -1,3 +1,10 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 1998 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc2478#section-3.2.1
++
+ GSSAPI ::=
+ 	CHOICE {
+ 		negTokenInit
+diff --git a/net/ipv4/netfilter/nf_nat_snmp_basic.asn1 b/net/ipv4/netfilter/nf_nat_snmp_basic.asn1
+index 24b7326..dc2cc57 100644
+--- a/net/ipv4/netfilter/nf_nat_snmp_basic.asn1
++++ b/net/ipv4/netfilter/nf_nat_snmp_basic.asn1
+@@ -1,3 +1,11 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 1990, 2002 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc1157#section-4
++-- https://www.rfc-editor.org/rfc/rfc3416#section-3
++
+ Message ::=
+ 	SEQUENCE {
+ 		version
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.40.1
+
