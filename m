@@ -2,110 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC32C07545
-	for <linux-crypto@archiver.kernel.org>; Sat, 21 Oct 2023 13:26:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C784C004C0
+	for <linux-crypto@archiver.kernel.org>; Sat, 21 Oct 2023 17:23:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229831AbjJUN0H (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 21 Oct 2023 09:26:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56006 "EHLO
+        id S231783AbjJURXe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 21 Oct 2023 13:23:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjJUN0G (ORCPT
+        with ESMTP id S231356AbjJURXd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 21 Oct 2023 09:26:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C035D6B
-        for <linux-crypto@vger.kernel.org>; Sat, 21 Oct 2023 06:24:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697894655;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sAJJoylF1cW1oW2mCcwy+DSGsa9dllVFEwoULjFHt7U=;
-        b=A9EQoDI2r7GS0h6DLPg21qT/Px4dbp7Z7PPm4GRJoCJ7RhE4S5qOm/OYi43qiasxrOwCe5
-        sHxzbPy0KZbl6RP7Cp0Z3hGtHEHcv1D05RkV4F08NmGwd11hPgFSHy1ArEnvc+CDind5od
-        3SENhSEU9NKOG/Je2TUYGYN3d8axhqE=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-640-zbgpUdHPPPaMc0UKGHYHqw-1; Sat, 21 Oct 2023 09:24:08 -0400
-X-MC-Unique: zbgpUdHPPPaMc0UKGHYHqw-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-53e2acda9d6so1084854a12.2
-        for <linux-crypto@vger.kernel.org>; Sat, 21 Oct 2023 06:24:07 -0700 (PDT)
+        Sat, 21 Oct 2023 13:23:33 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AA9D188
+        for <linux-crypto@vger.kernel.org>; Sat, 21 Oct 2023 10:23:27 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32da4ffd7e5so1085786f8f.0
+        for <linux-crypto@vger.kernel.org>; Sat, 21 Oct 2023 10:23:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697909005; x=1698513805; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q/B060x0z3e8JVT+CDyvjumdRFqrHNlOMqjo2TVRNGo=;
+        b=C4AnOo9dBLXGH8m6qzr6sV9fdZHuETmEJmepPoBTKT3Q2BlZJNuc3LplsWt9uV4juR
+         jG5O+Ivk+HKTgFYqUAL6olizl2L6JDw4VadJImOMedd+vxdJMrYc1dxTatjgbolHBYZR
+         7b5gJ88RbaK2NDM7hmw0OFhb9ujui4GIAie6VrD1ivh0fx1lvMjOjXa8S5WH2UJOGbsH
+         s47hx7JXEW45t3aR1GZl+Tw+X1/Z9gt8AKNxPh9EfmE2ccn0izyZoS+BCY32p69qlOWW
+         zU86E9ded30blykNvPfiI365K2nWghO/EU3n89SZAGmgd9Ho4MpHE3AIrM90Lx//cJU/
+         9QNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697894647; x=1698499447;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sAJJoylF1cW1oW2mCcwy+DSGsa9dllVFEwoULjFHt7U=;
-        b=NCTMBzqL7rJKJlf2hinrU18PXUCProH48kZpoKDI2A9MMVtdbqjwGHf0LM4ME6SaKT
-         o/5wee5jT0sUZju5bdSl6BE/4q7WzAYUB40oo8Omg05CLpgY5XHboM5pypMWpBS0lQeN
-         cImurittn/wDp2XHBHYuldvBTPt6IONZ4ZoD62Cak+19Pdcd4H7WrNp5cqDV5fvd1KcA
-         ofCPuCbw0dDVmQTqPbxlXkXRMh1PEZP4QuD60X0yRxB8EC7kEcD5McqvSCRBR42jY2b4
-         6ngRkVG4Z5kYBCAAQhwVBsmzma7yjxCPF14IsBkXpwC18+fx6ZjOtZVgIjD0hFc2pC8E
-         Mvvg==
-X-Gm-Message-State: AOJu0Yw+FdNFO8oHdR0LvkKvSsj2pfBbUPiwaPsJlhMWsXzJ1O+AlSjc
-        Poig0HJoToRy0ENmv4Bl0+452MCgDsLFNlfr+LxNGvn3CXCnwCuuBkNy22NMZqvNDegpKc9g+Rl
-        JKbIIO/bflZgiajVMnnR38ILyaHiA5zQqPVQQfDel
-X-Received: by 2002:a50:aacf:0:b0:53e:1388:cb2e with SMTP id r15-20020a50aacf000000b0053e1388cb2emr3332758edc.35.1697894647030;
-        Sat, 21 Oct 2023 06:24:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEyy9uSFCMUqfgN2rj17ch/G/jvq1QTWJGPAXTF5FtC6Qouo5v3kERhMpzgMczbfZXe5FR3mAcf/aFuBhBAvjs=
-X-Received: by 2002:a50:aacf:0:b0:53e:1388:cb2e with SMTP id
- r15-20020a50aacf000000b0053e1388cb2emr3332740edc.35.1697894646692; Sat, 21
- Oct 2023 06:24:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697909005; x=1698513805;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q/B060x0z3e8JVT+CDyvjumdRFqrHNlOMqjo2TVRNGo=;
+        b=d4yM+7BtV+Oxuq32p6cP3/DarjH3xFeVYiKb7cUAu2pHgIVNxKQL9nGyz1+gsSF4qi
+         7xaE6f26gDxdcHk6QZz+leHga3wAwr89tlPHfF4Ur3wmq212rC07TsK8Gb47ljdJo/Vi
+         wqnJ3Egfl6KHpscZUT3/VskfevDGgbMWaUTrZKyX5AD9uFKkqih3esjZkupndSwpOmWb
+         1kYnkWzza5m3BGhT/2m4WBY9/iKhe35pX/JGg7e1cUq9IGoy8p6BncScpKqo9cfhBfzk
+         WpzlbwjW89RCZXeo22DZNbuuG7oXtdm3MTO1u12SEGKQ9+DW1A2srF6MwptGP+YMNNsP
+         QcwA==
+X-Gm-Message-State: AOJu0YxWCZccQXRwZAw1GxPZ9J9HnOkQamgkJZ3slLrCGODp0JP18Dz/
+        wR4l9/5bAEZWcJd+kLWuvvcQCQ==
+X-Google-Smtp-Source: AGHT+IH+v5iAfxWEV/FCka8QfasfLlcxqmQ85Ug3mXOd53qZb7OFudt4QWnfga9ot7HqQ5cJtVM/Cw==
+X-Received: by 2002:a5d:594b:0:b0:32d:9d03:29e6 with SMTP id e11-20020a5d594b000000b0032d9d0329e6mr4526132wri.27.1697909005415;
+        Sat, 21 Oct 2023 10:23:25 -0700 (PDT)
+Received: from [10.66.66.3] (9.ip-51-91-159.eu. [51.91.159.9])
+        by smtp.gmail.com with ESMTPSA id n18-20020a5d4852000000b0032db4e660d9sm4026394wrs.56.2023.10.21.10.23.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 21 Oct 2023 10:23:25 -0700 (PDT)
+Message-ID: <d049f717-46f5-4715-894e-59bcfd040391@linaro.org>
+Date:   Sat, 21 Oct 2023 19:23:24 +0200
 MIME-Version: 1.0
-References: <143690ecc1102c0f67fa7faec437ec7b02bb2304.1697885975.git.lukas@wunner.de>
-In-Reply-To: <143690ecc1102c0f67fa7faec437ec7b02bb2304.1697885975.git.lukas@wunner.de>
-From:   Richard Fontana <rfontana@redhat.com>
-Date:   Sat, 21 Oct 2023 09:23:55 -0400
-Message-ID: <CAC1cPGx-cb+YZ9KgEFvSjtf+fp9Dhcn4sm9qHmFFDRDxb=7fHg@mail.gmail.com>
-Subject: Re: [PATCH] treewide: Add SPDX identifier to IETF ASN.1 modules
-To:     Lukas Wunner <lukas@wunner.de>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-spdx@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        Tadeusz Struk <tadeusz.struk@linaro.org>,
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 33/42] crypto: qcom-rng - Convert to platform remove
+ callback returning void
+Content-Language: en-US
+To:     =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Hyunchul Lee <hyc.lee@gmail.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        Taehee Yoo <ap420073@gmail.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>, coreteam@netfilter.org,
-        netfilter-devel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        kernel@pengutronix.de
+References: <20231020075521.2121571-44-u.kleine-koenig@pengutronix.de>
+ <20231020075521.2121571-77-u.kleine-koenig@pengutronix.de>
+From:   Konrad Dybcio <konrad.dybcio@linaro.org>
+In-Reply-To: <20231020075521.2121571-77-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Oct 21, 2023 at 7:25=E2=80=AFAM Lukas Wunner <lukas@wunner.de> wrot=
-e:
->
-> Per section 4.c. of the IETF Trust Legal Provisions, "Code Components"
-> in IETF Documents are licensed on the terms of the BSD-3-Clause license:
->
-> https://trustee.ietf.org/documents/trust-legal-provisions/tlp-5/
->
-> The term "Code Components" specifically includes ASN.1 modules:
->
-> https://trustee.ietf.org/documents/trust-legal-provisions/code-components=
--list-3/
 
-Sorry if this seems super-pedantic but I am pretty sure the license
-text in the IETF Trust Legal Provisions does not actually match SPDX
-`BSD-3-Clause` because of one additional word in clause 3 ("specific"
-before "contributors"), so IMO you should get SPDX to modify its
-definition of `BSD-3-Clause` prior to applying this patch (or get IETF
-to change its version of the license, but I imagine that would be more
-difficult). This issue of a multitude of nonsubstantively different,
-non-matching versions of clause 3 is a common issue that has been
-coming up in the Fedora project's adoption of SPDX identifiers for
-license metadata.
 
-Richard
+On 10/20/23 09:55, Uwe Kleine-König wrote:
+> The .remove() callback for a platform driver returns an int which makes
+> many driver authors wrongly assume it's possible to do error handling by
+> returning an error code. However the value returned is ignored (apart
+> from emitting a warning) and this typically results in resource leaks.
+> 
+> To improve here there is a quest to make the remove callback return
+> void. In the first step of this quest all drivers are converted to
+> .remove_new(), which already returns void. Eventually after all drivers
+> are converted, .remove_new() will be renamed to .remove().
+> 
+> Trivially convert this driver from always returning zero in the remove
+> callback to the void returning variant.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> ---
+Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 
+Konrad
