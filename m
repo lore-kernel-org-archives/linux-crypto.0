@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3643C25B45
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Oct 2023 08:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B518C25B41
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Oct 2023 08:19:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231622AbjJVIS7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 22 Oct 2023 04:18:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37252 "EHLO
+        id S231616AbjJVITB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 22 Oct 2023 04:19:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231616AbjJVISt (ORCPT
+        with ESMTP id S231631AbjJVISv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 22 Oct 2023 04:18:49 -0400
+        Sun, 22 Oct 2023 04:18:51 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 975CBCF
-        for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 01:18:46 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 663F9C433CA
-        for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 08:18:46 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DA80D6
+        for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 01:18:47 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E216C433CC
+        for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 08:18:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697962726;
-        bh=BCF/IKknJGOxDyL3q/kFif5oBmpkW4H+u9uUhiQNKGQ=;
+        s=k20201202; t=1697962727;
+        bh=lPPbYdbgfbrKCmPW4nPEZ82xkcPLGV4O1S80gtxQjyY=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=dCjVk8Evzos/U2XOb73dRrrAjDEX1tGQzlC09kLYTptC7Z7F82oVbyS7430Pqy+Uq
-         dP/xyN1CsoiTKJNZaSa7NRkDevazmWfTO8LIETwe7Tmh4z+sIEmOfxBfvfsB8udYO5
-         d4OJZwPjUD9vOIb7RnRDsljpi54x+mwPGCUEYkLAT5FpIAJ9/ieN2AGy4ftjolt9Lp
-         LsiR07s74ZUPOKrfrPOzxYjlz/TfKOKRt/hTKfJsdoonIwvGUjPaq6ZM21xIjRqQBf
-         VkDFLHo1fvjawePtKQ2uLEIGKpZ0gshdt6SBJQlvrCAlriTUYU0x4Vq7i9w/3nqNDP
-         zR8ntNDad/zDw==
+        b=Sd7ohR2WSW6S7WS3R0eCP+i7ycUf40DYiIVa+XPL0RZyFhRr5eleXwQpXyLtetlp1
+         yOu6AANCTGrtZigsB/nwrx+G79dXoPONxbXZwzalf+oghh+clBNeYWQS9FpTcxc6/I
+         7D8n9c40RZDh9FWOh7Rfph0vVT4UcxfrzFJjr+dPm1RtE2a517NSuLvnPqxNy/mLfa
+         4/RN+ouXC6eAeBrr4dpp3mWAErv/+HpeX19KZ9ihHGqdME2PXBPl+C5NQxodmbtNFC
+         UP2LFEnEwVImn+YfvpKqlfYN8xEZMUbobGLxjXKxIBqNu97sZjpn+X3F6JySXaI1HM
+         IBuOqJa+FcZdA==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 13/30] crypto: stm32 - remove unnecessary alignmask for ahashes
-Date:   Sun, 22 Oct 2023 01:10:43 -0700
-Message-ID: <20231022081100.123613-14-ebiggers@kernel.org>
+Subject: [PATCH 16/30] crypto: authencesn - stop using alignmask of ahash
+Date:   Sun, 22 Oct 2023 01:10:46 -0700
+Message-ID: <20231022081100.123613-17-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231022081100.123613-1-ebiggers@kernel.org>
 References: <20231022081100.123613-1-ebiggers@kernel.org>
@@ -43,467 +43,165 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-The crypto API's support for alignmasks for ahash algorithms is nearly
-useless, as its only effect is to cause the API to align the key and
-result buffers.  The drivers that happen to be specifying an alignmask
-for ahash rarely actually need it.  When they do, it's easily fixable,
-especially considering that these buffers cannot be used for DMA.
-
-In preparation for removing alignmask support from ahash, this patch
-makes the stm32 driver no longer use it.  This driver didn't actually
-rely on it; it only writes to the result buffer in stm32_hash_finish(),
-simply using memcpy().  And stm32_hash_setkey() does not assume any
-alignment for the key buffer.
+Now that the alignmask for ahash and shash algorithms is always 0,
+simplify the code in authenc accordingly.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/stm32/stm32-hash.c | 20 --------------------
- 1 file changed, 20 deletions(-)
+ crypto/authencesn.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index 2b2382d4332c5..34e0d7e381a8c 100644
---- a/drivers/crypto/stm32/stm32-hash.c
-+++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -1276,21 +1276,20 @@ static struct ahash_engine_alg algs_md5[] = {
- 			.digestsize = MD5_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "md5",
- 				.cra_driver_name = "stm32-md5",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1306,21 +1305,20 @@ static struct ahash_engine_alg algs_md5[] = {
- 			.digestsize = MD5_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(md5)",
- 				.cra_driver_name = "stm32-hmac-md5",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_hmac_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	}
- };
-@@ -1338,21 +1336,20 @@ static struct ahash_engine_alg algs_sha1[] = {
- 			.digestsize = SHA1_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha1",
- 				.cra_driver_name = "stm32-sha1",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA1_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1368,21 +1365,20 @@ static struct ahash_engine_alg algs_sha1[] = {
- 			.digestsize = SHA1_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha1)",
- 				.cra_driver_name = "stm32-hmac-sha1",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA1_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_hmac_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- };
-@@ -1400,21 +1396,20 @@ static struct ahash_engine_alg algs_sha224[] = {
- 			.digestsize = SHA224_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha224",
- 				.cra_driver_name = "stm32-sha224",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA224_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1430,21 +1425,20 @@ static struct ahash_engine_alg algs_sha224[] = {
- 			.digestsize = SHA224_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha224)",
- 				.cra_driver_name = "stm32-hmac-sha224",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA224_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_hmac_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- };
-@@ -1462,21 +1456,20 @@ static struct ahash_engine_alg algs_sha256[] = {
- 			.digestsize = SHA256_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha256",
- 				.cra_driver_name = "stm32-sha256",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA256_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1492,21 +1485,20 @@ static struct ahash_engine_alg algs_sha256[] = {
- 			.digestsize = SHA256_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha256)",
- 				.cra_driver_name = "stm32-hmac-sha256",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA256_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_hmac_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- };
-@@ -1524,21 +1516,20 @@ static struct ahash_engine_alg algs_sha384_sha512[] = {
- 			.digestsize = SHA384_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha384",
- 				.cra_driver_name = "stm32-sha384",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA384_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1554,21 +1545,20 @@ static struct ahash_engine_alg algs_sha384_sha512[] = {
- 			.digestsize = SHA384_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha384)",
- 				.cra_driver_name = "stm32-hmac-sha384",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA384_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_hmac_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1583,21 +1573,20 @@ static struct ahash_engine_alg algs_sha384_sha512[] = {
- 			.digestsize = SHA512_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha512",
- 				.cra_driver_name = "stm32-sha512",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA512_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1613,21 +1602,20 @@ static struct ahash_engine_alg algs_sha384_sha512[] = {
- 			.digestsize = SHA512_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha512)",
- 				.cra_driver_name = "stm32-hmac-sha512",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA512_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_hmac_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- };
-@@ -1645,21 +1633,20 @@ static struct ahash_engine_alg algs_sha3[] = {
- 			.digestsize = SHA3_224_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha3-224",
- 				.cra_driver_name = "stm32-sha3-224",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA3_224_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_sha3_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1675,21 +1662,20 @@ static struct ahash_engine_alg algs_sha3[] = {
- 			.digestsize = SHA3_224_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha3-224)",
- 				.cra_driver_name = "stm32-hmac-sha3-224",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA3_224_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_sha3_hmac_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1704,21 +1690,20 @@ static struct ahash_engine_alg algs_sha3[] = {
- 			.digestsize = SHA3_256_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha3-256",
- 				.cra_driver_name = "stm32-sha3-256",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA3_256_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_sha3_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1734,21 +1719,20 @@ static struct ahash_engine_alg algs_sha3[] = {
- 			.digestsize = SHA3_256_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha3-256)",
- 				.cra_driver_name = "stm32-hmac-sha3-256",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA3_256_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_sha3_hmac_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1763,21 +1747,20 @@ static struct ahash_engine_alg algs_sha3[] = {
- 			.digestsize = SHA3_384_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha3-384",
- 				.cra_driver_name = "stm32-sha3-384",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA3_384_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_sha3_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1793,21 +1776,20 @@ static struct ahash_engine_alg algs_sha3[] = {
- 			.digestsize = SHA3_384_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha3-384)",
- 				.cra_driver_name = "stm32-hmac-sha3-384",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA3_384_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_sha3_hmac_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1822,21 +1804,20 @@ static struct ahash_engine_alg algs_sha3[] = {
- 			.digestsize = SHA3_512_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha3-512",
- 				.cra_driver_name = "stm32-sha3-512",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA3_512_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_sha3_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	},
- 	{
-@@ -1852,21 +1833,20 @@ static struct ahash_engine_alg algs_sha3[] = {
- 			.digestsize = SHA3_512_DIGEST_SIZE,
- 			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha3-512)",
- 				.cra_driver_name = "stm32-hmac-sha3-512",
- 				.cra_priority = 200,
- 				.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 				.cra_blocksize = SHA3_512_BLOCK_SIZE,
- 				.cra_ctxsize = sizeof(struct stm32_hash_ctx),
--				.cra_alignmask = 3,
- 				.cra_init = stm32_hash_cra_sha3_hmac_init,
- 				.cra_exit = stm32_hash_cra_exit,
- 				.cra_module = THIS_MODULE,
- 			}
- 		},
- 		.op = {
- 			.do_one_request = stm32_hash_one_request,
- 		},
- 	}
- };
+diff --git a/crypto/authencesn.c b/crypto/authencesn.c
+index 60e9568f023f6..2cc933e2f7901 100644
+--- a/crypto/authencesn.c
++++ b/crypto/authencesn.c
+@@ -80,25 +80,22 @@ static int crypto_authenc_esn_setkey(struct crypto_aead *authenc_esn, const u8 *
+ 	err = crypto_skcipher_setkey(enc, keys.enckey, keys.enckeylen);
+ out:
+ 	memzero_explicit(&keys, sizeof(keys));
+ 	return err;
+ }
+ 
+ static int crypto_authenc_esn_genicv_tail(struct aead_request *req,
+ 					  unsigned int flags)
+ {
+ 	struct crypto_aead *authenc_esn = crypto_aead_reqtfm(req);
+-	struct crypto_authenc_esn_ctx *ctx = crypto_aead_ctx(authenc_esn);
+ 	struct authenc_esn_request_ctx *areq_ctx = aead_request_ctx(req);
+-	struct crypto_ahash *auth = ctx->auth;
+-	u8 *hash = PTR_ALIGN((u8 *)areq_ctx->tail,
+-			     crypto_ahash_alignmask(auth) + 1);
++	u8 *hash = areq_ctx->tail;
+ 	unsigned int authsize = crypto_aead_authsize(authenc_esn);
+ 	unsigned int assoclen = req->assoclen;
+ 	unsigned int cryptlen = req->cryptlen;
+ 	struct scatterlist *dst = req->dst;
+ 	u32 tmp[2];
+ 
+ 	/* Move high-order bits of sequence number back. */
+ 	scatterwalk_map_and_copy(tmp, dst, 4, 4, 0);
+ 	scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 0);
+ 	scatterwalk_map_and_copy(tmp, dst, 0, 8, 1);
+@@ -115,22 +112,21 @@ static void authenc_esn_geniv_ahash_done(void *data, int err)
+ 	aead_request_complete(req, err);
+ }
+ 
+ static int crypto_authenc_esn_genicv(struct aead_request *req,
+ 				     unsigned int flags)
+ {
+ 	struct crypto_aead *authenc_esn = crypto_aead_reqtfm(req);
+ 	struct authenc_esn_request_ctx *areq_ctx = aead_request_ctx(req);
+ 	struct crypto_authenc_esn_ctx *ctx = crypto_aead_ctx(authenc_esn);
+ 	struct crypto_ahash *auth = ctx->auth;
+-	u8 *hash = PTR_ALIGN((u8 *)areq_ctx->tail,
+-			     crypto_ahash_alignmask(auth) + 1);
++	u8 *hash = areq_ctx->tail;
+ 	struct ahash_request *ahreq = (void *)(areq_ctx->tail + ctx->reqoff);
+ 	unsigned int authsize = crypto_aead_authsize(authenc_esn);
+ 	unsigned int assoclen = req->assoclen;
+ 	unsigned int cryptlen = req->cryptlen;
+ 	struct scatterlist *dst = req->dst;
+ 	u32 tmp[2];
+ 
+ 	if (!authsize)
+ 		return 0;
+ 
+@@ -217,22 +213,21 @@ static int crypto_authenc_esn_encrypt(struct aead_request *req)
+ static int crypto_authenc_esn_decrypt_tail(struct aead_request *req,
+ 					   unsigned int flags)
+ {
+ 	struct crypto_aead *authenc_esn = crypto_aead_reqtfm(req);
+ 	unsigned int authsize = crypto_aead_authsize(authenc_esn);
+ 	struct authenc_esn_request_ctx *areq_ctx = aead_request_ctx(req);
+ 	struct crypto_authenc_esn_ctx *ctx = crypto_aead_ctx(authenc_esn);
+ 	struct skcipher_request *skreq = (void *)(areq_ctx->tail +
+ 						  ctx->reqoff);
+ 	struct crypto_ahash *auth = ctx->auth;
+-	u8 *ohash = PTR_ALIGN((u8 *)areq_ctx->tail,
+-			      crypto_ahash_alignmask(auth) + 1);
++	u8 *ohash = areq_ctx->tail;
+ 	unsigned int cryptlen = req->cryptlen - authsize;
+ 	unsigned int assoclen = req->assoclen;
+ 	struct scatterlist *dst = req->dst;
+ 	u8 *ihash = ohash + crypto_ahash_digestsize(auth);
+ 	u32 tmp[2];
+ 
+ 	if (!authsize)
+ 		goto decrypt;
+ 
+ 	/* Move high-order bits of sequence number back. */
+@@ -265,22 +260,21 @@ static void authenc_esn_verify_ahash_done(void *data, int err)
+ }
+ 
+ static int crypto_authenc_esn_decrypt(struct aead_request *req)
+ {
+ 	struct crypto_aead *authenc_esn = crypto_aead_reqtfm(req);
+ 	struct authenc_esn_request_ctx *areq_ctx = aead_request_ctx(req);
+ 	struct crypto_authenc_esn_ctx *ctx = crypto_aead_ctx(authenc_esn);
+ 	struct ahash_request *ahreq = (void *)(areq_ctx->tail + ctx->reqoff);
+ 	unsigned int authsize = crypto_aead_authsize(authenc_esn);
+ 	struct crypto_ahash *auth = ctx->auth;
+-	u8 *ohash = PTR_ALIGN((u8 *)areq_ctx->tail,
+-			      crypto_ahash_alignmask(auth) + 1);
++	u8 *ohash = areq_ctx->tail;
+ 	unsigned int assoclen = req->assoclen;
+ 	unsigned int cryptlen = req->cryptlen;
+ 	u8 *ihash = ohash + crypto_ahash_digestsize(auth);
+ 	struct scatterlist *dst = req->dst;
+ 	u32 tmp[2];
+ 	int err;
+ 
+ 	cryptlen -= authsize;
+ 
+ 	if (req->src != dst) {
+@@ -337,22 +331,21 @@ static int crypto_authenc_esn_init_tfm(struct crypto_aead *tfm)
+ 
+ 	null = crypto_get_default_null_skcipher();
+ 	err = PTR_ERR(null);
+ 	if (IS_ERR(null))
+ 		goto err_free_skcipher;
+ 
+ 	ctx->auth = auth;
+ 	ctx->enc = enc;
+ 	ctx->null = null;
+ 
+-	ctx->reqoff = ALIGN(2 * crypto_ahash_digestsize(auth),
+-			    crypto_ahash_alignmask(auth) + 1);
++	ctx->reqoff = 2 * crypto_ahash_digestsize(auth);
+ 
+ 	crypto_aead_set_reqsize(
+ 		tfm,
+ 		sizeof(struct authenc_esn_request_ctx) +
+ 		ctx->reqoff +
+ 		max_t(unsigned int,
+ 		      crypto_ahash_reqsize(auth) +
+ 		      sizeof(struct ahash_request),
+ 		      sizeof(struct skcipher_request) +
+ 		      crypto_skcipher_reqsize(enc)));
+@@ -424,22 +417,21 @@ static int crypto_authenc_esn_create(struct crypto_template *tmpl,
+ 		goto err_free_inst;
+ 
+ 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+ 		     "authencesn(%s,%s)", auth_base->cra_driver_name,
+ 		     enc->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+ 		goto err_free_inst;
+ 
+ 	inst->alg.base.cra_priority = enc->base.cra_priority * 10 +
+ 				      auth_base->cra_priority;
+ 	inst->alg.base.cra_blocksize = enc->base.cra_blocksize;
+-	inst->alg.base.cra_alignmask = auth_base->cra_alignmask |
+-				       enc->base.cra_alignmask;
++	inst->alg.base.cra_alignmask = enc->base.cra_alignmask;
+ 	inst->alg.base.cra_ctxsize = sizeof(struct crypto_authenc_esn_ctx);
+ 
+ 	inst->alg.ivsize = enc->ivsize;
+ 	inst->alg.chunksize = enc->chunksize;
+ 	inst->alg.maxauthsize = auth->digestsize;
+ 
+ 	inst->alg.init = crypto_authenc_esn_init_tfm;
+ 	inst->alg.exit = crypto_authenc_esn_exit_tfm;
+ 
+ 	inst->alg.setkey = crypto_authenc_esn_setkey;
 -- 
 2.42.0
 
