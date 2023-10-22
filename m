@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC74C00A8F
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Oct 2023 08:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA75DC001DF
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Oct 2023 08:19:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231853AbjJVITN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 22 Oct 2023 04:19:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37302 "EHLO
+        id S231877AbjJVITO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 22 Oct 2023 04:19:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231696AbjJVISw (ORCPT
+        with ESMTP id S231722AbjJVISx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 22 Oct 2023 04:18:52 -0400
+        Sun, 22 Oct 2023 04:18:53 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 572E2D52
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69E30D53
         for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 01:18:49 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD22FC433D9
-        for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 08:18:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 307F8C433C7
+        for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 08:18:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697962728;
-        bh=Jyn1t2greDYzdz7O1r+I/8upwMzEU2EOZa2ql2m36SU=;
+        s=k20201202; t=1697962729;
+        bh=ji3lKzqwdzm3b5FtRsxKYlJDL+v3S0VySToriL6uwC4=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=cO6D7C3jr/jsnZEnRO3A2HnkD0kHQT928PblRT4aqi7RsMdAwxsEg5wi2rp74RJjr
-         8rNiVqDNHG7Qjy6YRCkZ4RoqFy34vNiCdSxBIcTObYr8ssUoRI6qada44djgDS3fqG
-         GWKTBLqi3aW47+u1IpOblRtEQPgX0CyvtepsBZ8lkqnTL39FrAYkX8G80gtBf0NaoT
-         0y6eElC/oz/hC4nbKvj8lZuxmLM8cpJtnRHbkXqBfYvNOH5guTtexoK1PMYtKGAzAF
-         KSueuPBAiqBNpNHfMKH2OCzaHInMC7kMQrHlEkpeG6EvLWNrdTmboAYGtsLD+Io+ci
-         XgyD6hrFBAqLw==
+        b=tdyNRRNLpkK4MxpRc3j3/km9Jwaty08JLzhB9aZfw7S8X+YFUT6sM6uG2ztvBOK3c
+         GNgrSL9djBNzTYfFKCLZvdIL9/fgLqR3yhXijwlk2JpK+1ODiQUGjPtex2KAK+lk8P
+         g1401dS87fpPrhvQzED5qr1K+Npm1iT/e+kozKeNqYDK38FaO8iNN3lJA4/rpeTbYr
+         dlYV/RG+pm7+inWjhZZmzdnN+h9obwPsNtupVwndxJ5kqCU27DKJl8Phcwppb3YwkL
+         c3nyVa0GVJSdM+TrRD6dTeCmmPJVcQGdPJEpynuT1bu9AMBwwjEUL9c0XAd57hBwCR
+         QejP4ZTuer2rQ==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 24/30] crypto: ahash - remove struct ahash_request_priv
-Date:   Sun, 22 Oct 2023 01:10:54 -0700
-Message-ID: <20231022081100.123613-25-ebiggers@kernel.org>
+Subject: [PATCH 26/30] crypto: chelsio - stop using crypto_ahash::init
+Date:   Sun, 22 Oct 2023 01:10:56 -0700
+Message-ID: <20231022081100.123613-27-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231022081100.123613-1-ebiggers@kernel.org>
 References: <20231022081100.123613-1-ebiggers@kernel.org>
@@ -43,46 +43,72 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-struct ahash_request_priv is unused, so remove it.
+The function pointer crypto_ahash::init is an internal implementation
+detail of the ahash API that exists to help it support both ahash and
+shash algorithms.  With an upcoming refactoring of how the ahash API
+supports shash algorithms, this field will be removed.
+
+Some drivers are invoking crypto_ahash::init to call into their own
+code, which is unnecessary and inefficient.  The chelsio driver is one
+of those drivers.  Make it just call its own code directly.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/ahash.c | 8 --------
- 1 file changed, 8 deletions(-)
+ drivers/crypto/chelsio/chcr_algo.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 744fd3b8ea258..556c950100936 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -18,28 +18,20 @@
- #include <linux/seq_file.h>
- #include <linux/string.h>
- #include <net/netlink.h>
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 16298ae4a00bf..177428480c7d1 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -1913,39 +1913,46 @@ static int chcr_ahash_finup(struct ahash_request *req)
+ 	set_wr_txq(skb, CPL_PRIORITY_DATA, req_ctx->txqidx);
+ 	chcr_send_wr(skb);
+ 	return -EINPROGRESS;
+ unmap:
+ 	chcr_hash_dma_unmap(&u_ctx->lldi.pdev->dev, req);
+ err:
+ 	chcr_dec_wrcount(dev);
+ 	return error;
+ }
  
- #include "hash.h"
- 
- #define CRYPTO_ALG_TYPE_AHASH_MASK	0x0000000e
- 
- static const struct crypto_type crypto_ahash_type;
- 
--struct ahash_request_priv {
--	crypto_completion_t complete;
--	void *data;
--	u8 *result;
--	u32 flags;
--	void *ubuf[] CRYPTO_MINALIGN_ATTR;
--};
--
- static int hash_walk_next(struct crypto_hash_walk *walk)
++static int chcr_hmac_init(struct ahash_request *areq);
++static int chcr_sha_init(struct ahash_request *areq);
++
+ static int chcr_ahash_digest(struct ahash_request *req)
  {
- 	unsigned int offset = walk->offset;
- 	unsigned int nbytes = min(walk->entrylen,
- 				  ((unsigned int)(PAGE_SIZE)) - offset);
+ 	struct chcr_ahash_req_ctx *req_ctx = ahash_request_ctx(req);
+ 	struct crypto_ahash *rtfm = crypto_ahash_reqtfm(req);
+ 	struct chcr_dev *dev = h_ctx(rtfm)->dev;
+ 	struct uld_ctx *u_ctx = ULD_CTX(h_ctx(rtfm));
+ 	struct chcr_context *ctx = h_ctx(rtfm);
+ 	struct sk_buff *skb;
+ 	struct hash_wr_param params;
+ 	u8  bs;
+ 	int error;
+ 	unsigned int cpu;
  
- 	walk->data = kmap_local_page(walk->pg);
- 	walk->data += offset;
- 	walk->entrylen -= nbytes;
- 	return nbytes;
+ 	cpu = get_cpu();
+ 	req_ctx->txqidx = cpu % ctx->ntxq;
+ 	req_ctx->rxqidx = cpu % ctx->nrxq;
+ 	put_cpu();
+ 
+-	rtfm->init(req);
++	if (is_hmac(crypto_ahash_tfm(rtfm)))
++		chcr_hmac_init(req);
++	else
++		chcr_sha_init(req);
++
+ 	bs = crypto_tfm_alg_blocksize(crypto_ahash_tfm(rtfm));
+ 	error = chcr_inc_wrcount(dev);
+ 	if (error)
+ 		return -ENXIO;
+ 
+ 	if (unlikely(cxgb4_is_crypto_q_full(u_ctx->lldi.ports[0],
+ 						req_ctx->txqidx) &&
+ 		(!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))) {
+ 			error = -ENOSPC;
+ 			goto err;
 -- 
 2.42.0
 
