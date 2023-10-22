@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E39C00A8F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED080C25B42
 	for <linux-crypto@archiver.kernel.org>; Sun, 22 Oct 2023 08:18:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231669AbjJVISw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 22 Oct 2023 04:18:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37202 "EHLO
+        id S231770AbjJVISx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 22 Oct 2023 04:18:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231463AbjJVISr (ORCPT
+        with ESMTP id S231594AbjJVISr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sun, 22 Oct 2023 04:18:47 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EADDEE7
-        for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 01:18:45 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89BDFC433D9
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30221F4
+        for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 01:18:46 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1D6CC43395
         for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 08:18:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697962725;
-        bh=ONmdFDGh+bdASoYWSvdDq7sIj09NLUwaduP/l6rcSpA=;
+        s=k20201202; t=1697962726;
+        bh=WXgzK4O6+fvazhY9rDTpzwXQKpRF0dnRpBE1ykWmc+k=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=ICc33dfXP9GE11uZHc2PmYJrJYcHN/hRmoX4WA9v95VLTCpdb1eznoHL/sJZszu52
-         hav8ltLlbvgRUSC/OAqj+fk8qe3/3Hix5GvSo8x5OQESiqxA+RdnQO7Lc5uskTxJVE
-         m8p3Ojo5nBkiFOuJQJpkdsufjQu6v9BhBkkMQPXF/jJcSBUXHR5A/gB1ZMpFzPOlpa
-         VYtfZpanksWJLJqkISyg7aU9iBTnUGuNRL0P08lg1/4qw021SHtsdrf5hw10aIqKZz
-         4F8/M/YFJiAjhHSYm0ULvPwl23PyxFVdrIUvVA9UwDSE+/4snqPaaRQeYZrP934INz
-         gExJ2UFN+HjkQ==
+        b=NjH2+gb9AhK/ol8kAreWX6MEOf75cm233hTnviYBhIgDJoaI5+SwzaLYa3KADhxDN
+         xN+BCk9FAsdVR+ErQ0+sadJSOD6g/3Pmool03s/+n1xM1EvsXAUnWuL5q9ATjF1QFw
+         vE4bBDGl81OGIawB369aqMNAbg2Mnwk/Qz1qIPT4ccFnvpl34mWok20gvihlvk1jop
+         XxvPrtSzLTM99c+4LfM0gsh2Moo5a7146rtMyDO9ohEzRq5NSJwcWjfVItCkFqJ9CJ
+         jY9nRjh00+mCtnYxACacznKBoDEfl9ESUfdCwcCPTEQBwX6UbU2cWyQS0WRB+yYq6i
+         OrPHjO3VJICNQ==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 09/30] crypto: talitos - remove unnecessary alignmask for ahashes
-Date:   Sun, 22 Oct 2023 01:10:39 -0700
-Message-ID: <20231022081100.123613-10-ebiggers@kernel.org>
+Subject: [PATCH 11/30] crypto: rockchip - remove unnecessary alignmask for ahashes
+Date:   Sun, 22 Oct 2023 01:10:41 -0700
+Message-ID: <20231022081100.123613-12-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231022081100.123613-1-ebiggers@kernel.org>
 References: <20231022081100.123613-1-ebiggers@kernel.org>
@@ -50,44 +50,84 @@ for ahash rarely actually need it.  When they do, it's easily fixable,
 especially considering that these buffers cannot be used for DMA.
 
 In preparation for removing alignmask support from ahash, this patch
-makes the talitos driver no longer use it.  This driver didn't actually
-rely on it; it only writes to the result buffer in
-common_nonsnoop_hash_unmap(), simply using memcpy().  And this driver's
-"ahash_setkey()" function does not assume any alignment for the key
-buffer.
+makes the rockchip driver no longer use it.  This driver didn't actually
+rely on it; it only writes to the result buffer in rk_hash_run(),
+already using put_unaligned_le32().  And this driver only supports
+unkeyed hash algorithms, so the key buffer need not be considered.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/talitos.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/rockchip/rk3288_crypto_ahash.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 4ca4fbd227bce..e8f710d87007b 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -3252,21 +3252,21 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 		dev_err(dev, "unknown algorithm type %d\n", t_alg->algt.type);
- 		devm_kfree(dev, t_alg);
- 		return ERR_PTR(-EINVAL);
- 	}
+diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+index 8c143180645e5..1b13b4aa16ecc 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
++++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+@@ -386,21 +386,20 @@ struct rk_crypto_tmp rk_ahash_sha1 = {
+ 			 .digestsize = SHA1_DIGEST_SIZE,
+ 			 .statesize = sizeof(struct sha1_state),
+ 			 .base = {
+ 				  .cra_name = "sha1",
+ 				  .cra_driver_name = "rk-sha1",
+ 				  .cra_priority = 300,
+ 				  .cra_flags = CRYPTO_ALG_ASYNC |
+ 					       CRYPTO_ALG_NEED_FALLBACK,
+ 				  .cra_blocksize = SHA1_BLOCK_SIZE,
+ 				  .cra_ctxsize = sizeof(struct rk_ahash_ctx),
+-				  .cra_alignmask = 3,
+ 				  .cra_module = THIS_MODULE,
+ 			}
+ 		}
+ 	},
+ 	.alg.hash.op = {
+ 		.do_one_request = rk_hash_run,
+ 	},
+ };
  
- 	alg->cra_module = THIS_MODULE;
- 	if (t_alg->algt.priority)
- 		alg->cra_priority = t_alg->algt.priority;
- 	else
- 		alg->cra_priority = TALITOS_CRA_PRIORITY;
--	if (has_ftr_sec1(priv))
-+	if (has_ftr_sec1(priv) && t_alg->algt.type != CRYPTO_ALG_TYPE_AHASH)
- 		alg->cra_alignmask = 3;
- 	else
- 		alg->cra_alignmask = 0;
- 	alg->cra_ctxsize = sizeof(struct talitos_ctx);
- 	alg->cra_flags |= CRYPTO_ALG_KERN_DRIVER_ONLY;
+ struct rk_crypto_tmp rk_ahash_sha256 = {
+@@ -419,21 +418,20 @@ struct rk_crypto_tmp rk_ahash_sha256 = {
+ 			 .digestsize = SHA256_DIGEST_SIZE,
+ 			 .statesize = sizeof(struct sha256_state),
+ 			 .base = {
+ 				  .cra_name = "sha256",
+ 				  .cra_driver_name = "rk-sha256",
+ 				  .cra_priority = 300,
+ 				  .cra_flags = CRYPTO_ALG_ASYNC |
+ 					       CRYPTO_ALG_NEED_FALLBACK,
+ 				  .cra_blocksize = SHA256_BLOCK_SIZE,
+ 				  .cra_ctxsize = sizeof(struct rk_ahash_ctx),
+-				  .cra_alignmask = 3,
+ 				  .cra_module = THIS_MODULE,
+ 			}
+ 		}
+ 	},
+ 	.alg.hash.op = {
+ 		.do_one_request = rk_hash_run,
+ 	},
+ };
  
- 	t_alg->dev = dev;
- 
- 	return t_alg;
- }
+ struct rk_crypto_tmp rk_ahash_md5 = {
+@@ -452,19 +450,18 @@ struct rk_crypto_tmp rk_ahash_md5 = {
+ 			 .digestsize = MD5_DIGEST_SIZE,
+ 			 .statesize = sizeof(struct md5_state),
+ 			 .base = {
+ 				  .cra_name = "md5",
+ 				  .cra_driver_name = "rk-md5",
+ 				  .cra_priority = 300,
+ 				  .cra_flags = CRYPTO_ALG_ASYNC |
+ 					       CRYPTO_ALG_NEED_FALLBACK,
+ 				  .cra_blocksize = SHA1_BLOCK_SIZE,
+ 				  .cra_ctxsize = sizeof(struct rk_ahash_ctx),
+-				  .cra_alignmask = 3,
+ 				  .cra_module = THIS_MODULE,
+ 			}
+ 		}
+ 	},
+ 	.alg.hash.op = {
+ 		.do_one_request = rk_hash_run,
+ 	},
+ };
 -- 
 2.42.0
 
