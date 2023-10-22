@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA75DC001DF
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Oct 2023 08:19:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A50DAC25B41
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Oct 2023 08:19:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231877AbjJVITO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S231722AbjJVITO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Sun, 22 Oct 2023 04:19:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37286 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231722AbjJVISx (ORCPT
+        with ESMTP id S231739AbjJVISx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sun, 22 Oct 2023 04:18:53 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69E30D53
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A38C2D63
         for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 01:18:49 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 307F8C433C7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64860C433CC
         for <linux-crypto@vger.kernel.org>; Sun, 22 Oct 2023 08:18:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1697962729;
-        bh=ji3lKzqwdzm3b5FtRsxKYlJDL+v3S0VySToriL6uwC4=;
+        bh=DgquwnLDj9ZPnrfqI9YyHmqxn4/fEiZRBImpandoewA=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=tdyNRRNLpkK4MxpRc3j3/km9Jwaty08JLzhB9aZfw7S8X+YFUT6sM6uG2ztvBOK3c
-         GNgrSL9djBNzTYfFKCLZvdIL9/fgLqR3yhXijwlk2JpK+1ODiQUGjPtex2KAK+lk8P
-         g1401dS87fpPrhvQzED5qr1K+Npm1iT/e+kozKeNqYDK38FaO8iNN3lJA4/rpeTbYr
-         dlYV/RG+pm7+inWjhZZmzdnN+h9obwPsNtupVwndxJ5kqCU27DKJl8Phcwppb3YwkL
-         c3nyVa0GVJSdM+TrRD6dTeCmmPJVcQGdPJEpynuT1bu9AMBwwjEUL9c0XAd57hBwCR
-         QejP4ZTuer2rQ==
+        b=P0+onzynMVCsOEuYEz7Hg51zOOiTWIIIFg3RkOhc66SHFaqgNVukgXCXvj/RRPtQ8
+         trSlHDhVr9qt84p3x/8cHMd1A958kKbC89WnlVpkE98LyekpL00l2Migsl2kGH4Wwh
+         exlSQcP3HuWXQ506FRCE1MUt9NPw7p48La27XljFLfbRxethCZ0etslZlOhZeP8RA+
+         4GL527iwIE0Z/ORbcyscREwE0ze66gfeGnxZf6khw0RY0KylnNYaP4b5cCSJTyjRpr
+         VdkDAPF+cesDHqQWlLJVGN5nDckz58j5C3qkKfwISQVAFyF8mLliGPD8e32p9AfYGE
+         RA/2CwvC4+OgQ==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 26/30] crypto: chelsio - stop using crypto_ahash::init
-Date:   Sun, 22 Oct 2023 01:10:56 -0700
-Message-ID: <20231022081100.123613-27-ebiggers@kernel.org>
+Subject: [PATCH 27/30] crypto: talitos - stop using crypto_ahash::init
+Date:   Sun, 22 Oct 2023 01:10:57 -0700
+Message-ID: <20231022081100.123613-28-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231022081100.123613-1-ebiggers@kernel.org>
 References: <20231022081100.123613-1-ebiggers@kernel.org>
@@ -49,66 +49,76 @@ shash algorithms.  With an upcoming refactoring of how the ahash API
 supports shash algorithms, this field will be removed.
 
 Some drivers are invoking crypto_ahash::init to call into their own
-code, which is unnecessary and inefficient.  The chelsio driver is one
+code, which is unnecessary and inefficient.  The talitos driver is one
 of those drivers.  Make it just call its own code directly.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/chelsio/chcr_algo.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/crypto/talitos.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 16298ae4a00bf..177428480c7d1 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -1913,39 +1913,46 @@ static int chcr_ahash_finup(struct ahash_request *req)
- 	set_wr_txq(skb, CPL_PRIORITY_DATA, req_ctx->txqidx);
- 	chcr_send_wr(skb);
- 	return -EINPROGRESS;
- unmap:
- 	chcr_hash_dma_unmap(&u_ctx->lldi.pdev->dev, req);
- err:
- 	chcr_dec_wrcount(dev);
- 	return error;
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index e8f710d87007b..e39fc46a0718e 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2112,27 +2112,28 @@ static int ahash_finup(struct ahash_request *areq)
+ {
+ 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
+ 
+ 	req_ctx->last = 1;
+ 
+ 	return ahash_process_req(areq, areq->nbytes);
  }
  
-+static int chcr_hmac_init(struct ahash_request *areq);
-+static int chcr_sha_init(struct ahash_request *areq);
-+
- static int chcr_ahash_digest(struct ahash_request *req)
+ static int ahash_digest(struct ahash_request *areq)
  {
- 	struct chcr_ahash_req_ctx *req_ctx = ahash_request_ctx(req);
- 	struct crypto_ahash *rtfm = crypto_ahash_reqtfm(req);
- 	struct chcr_dev *dev = h_ctx(rtfm)->dev;
- 	struct uld_ctx *u_ctx = ULD_CTX(h_ctx(rtfm));
- 	struct chcr_context *ctx = h_ctx(rtfm);
- 	struct sk_buff *skb;
- 	struct hash_wr_param params;
- 	u8  bs;
- 	int error;
- 	unsigned int cpu;
+-	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
+-	struct crypto_ahash *ahash = crypto_ahash_reqtfm(areq);
+-
+-	ahash->init(areq);
+-	req_ctx->last = 1;
++	ahash_init(areq);
++	return ahash_finup(areq);
++}
  
- 	cpu = get_cpu();
- 	req_ctx->txqidx = cpu % ctx->ntxq;
- 	req_ctx->rxqidx = cpu % ctx->nrxq;
- 	put_cpu();
+-	return ahash_process_req(areq, areq->nbytes);
++static int ahash_digest_sha224_swinit(struct ahash_request *areq)
++{
++	ahash_init_sha224_swinit(areq);
++	return ahash_finup(areq);
+ }
  
--	rtfm->init(req);
-+	if (is_hmac(crypto_ahash_tfm(rtfm)))
-+		chcr_hmac_init(req);
-+	else
-+		chcr_sha_init(req);
-+
- 	bs = crypto_tfm_alg_blocksize(crypto_ahash_tfm(rtfm));
- 	error = chcr_inc_wrcount(dev);
- 	if (error)
- 		return -ENXIO;
+ static int ahash_export(struct ahash_request *areq, void *out)
+ {
+ 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
+ 	struct talitos_export_state *export = out;
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
+ 	struct device *dev = ctx->dev;
+ 	dma_addr_t dma;
+@@ -3235,20 +3236,22 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
  
- 	if (unlikely(cxgb4_is_crypto_q_full(u_ctx->lldi.ports[0],
- 						req_ctx->txqidx) &&
- 		(!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))) {
- 			error = -ENOSPC;
- 			goto err;
+ 		if (!(priv->features & TALITOS_FTR_HMAC_OK) &&
+ 		    !strncmp(alg->cra_name, "hmac", 4)) {
+ 			devm_kfree(dev, t_alg);
+ 			return ERR_PTR(-ENOTSUPP);
+ 		}
+ 		if (!(priv->features & TALITOS_FTR_SHA224_HWINIT) &&
+ 		    (!strcmp(alg->cra_name, "sha224") ||
+ 		     !strcmp(alg->cra_name, "hmac(sha224)"))) {
+ 			t_alg->algt.alg.hash.init = ahash_init_sha224_swinit;
++			t_alg->algt.alg.hash.digest =
++				ahash_digest_sha224_swinit;
+ 			t_alg->algt.desc_hdr_template =
+ 					DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+ 					DESC_HDR_SEL0_MDEUA |
+ 					DESC_HDR_MODE0_MDEU_SHA256;
+ 		}
+ 		break;
+ 	default:
+ 		dev_err(dev, "unknown algorithm type %d\n", t_alg->algt.type);
+ 		devm_kfree(dev, t_alg);
+ 		return ERR_PTR(-EINVAL);
 -- 
 2.42.0
 
