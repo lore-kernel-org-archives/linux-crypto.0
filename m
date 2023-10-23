@@ -2,165 +2,240 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EE70CDB474
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Oct 2023 13:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39389C00A8F
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Oct 2023 15:38:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230110AbjJWN7B (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Oct 2023 09:59:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37896 "EHLO
+        id S230420AbjJWPiF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 23 Oct 2023 11:38:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230461AbjJWN7A (ORCPT
+        with ESMTP id S229569AbjJWPiE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Oct 2023 09:59:00 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F150D68;
-        Mon, 23 Oct 2023 06:58:57 -0700 (PDT)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39NDSprr028469;
-        Mon, 23 Oct 2023 13:58:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2023-03-30;
- bh=t+a/F6HLTZLr8QMWM4d8hU19xWHbpG+qdOi9BR1Oqhc=;
- b=oedIN9hVtKgilWyCUKdZyxeY1NkH6vZZiyl7Oor1yB8o3vSxItt5KEtHOHGJJBxjaqk+
- lMKQonNfEk/NV60avRQF44nbY//8fBui8UwFmIPsNuDQ4v/Fhnq8GvI109l68l9FRdY6
- qij1d8r6Yy4vSbiopKZO7xXwCX7HVPc1OOLyQ65s87WHQKZ3c9W8JqWUQ4oGSErzW9z1
- cUoABmY7Ro4lqABvPA8ga0dGdv2FL9xwVLZCiCi6FoMAZtvqCGIMGpA49/MLdIUYMwsh
- YGTYggGUhnlx8v4UNbye/S3nwvlIRxaUHZ16FNxRHsZpi0jKhrMzdZO6ZnABYF4MEmVh rA== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tv5e335bv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Oct 2023 13:58:52 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39NCUKh7015128;
-        Mon, 23 Oct 2023 13:58:37 GMT
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2040.outbound.protection.outlook.com [104.47.56.40])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3tv534033d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Oct 2023 13:58:37 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mOdmEq5PB/5nJXtxUm+qKHZSvu6EdxveaqyPQUi2vqW+cJvzBQhGleJUrMsNflz+vxoaS7RTNgM8tz412+JqN4CYQif2u2gJRqm2+CuWWH8faTPv3a/+U1zpIEtnjdaOR7M/WAzEaWEXQUvov1GGvoFUOJpLFeZkvO1JmvbF32NMp7yDB/jiCzLJfJ2R5z2Ia1j70t87GjGFyPnrycjt6FgeDB8ZQF4se9WkkeAz7YeUtUkdge5gFiBsivplDsnZF69G9UV5DL4M7sREpj+51f7X92drB2SlyGoCSwL10NXG01Z3KcMXvB0Llp/F2gVPZhoKihZV2CcnDSbEeJPC1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=t+a/F6HLTZLr8QMWM4d8hU19xWHbpG+qdOi9BR1Oqhc=;
- b=FX7NYAEqRB/C+A8lO2O9XJ8AT9ldnWhIRwjy0m21d8yUtaUFhkwnTYvQu3PW2NtvsCbB9ImbOwD/SO0NEF2wPN46jsNuKfcdakg7i/kj/nVu1uWb4GSFPa+Ac0XKjX1I1foWAzohDvLR+Qb3k57Qo12GfcqB/qme09siuZJkl2ZuHAJzpSo0a6BdyzBZRx2RDTQ1xLrqzg3/6r9F4RNJ0GiE9tiguSy6+eyQRBjlg4mvHaCrVGU4uY9yasBDAoSHWd8YYVqebtANXGaxQ0Cn5yh3DpWuyUcERDI2B8oQMtygDE604fxWCH/PgdWs1J2VGjdiZMtE3B7HJP2bSfCQ6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t+a/F6HLTZLr8QMWM4d8hU19xWHbpG+qdOi9BR1Oqhc=;
- b=sS8oRUZ8juKvq+TgH6bIkBCrsk6FGLmdkPMntEg0sksaingxpOILu8ZVFCpYBGGH8hnQQse8IG2bwvGoWdNzTOp8XbBYrQAy1qz4mJk0pAyPP8JoQ39Hl+4mAW0pJg7Q9SpjV6Fk0lLkuompy2JRWM+yPglPRqxCKMZ3EnOOVjo=
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
- by SJ0PR10MB4413.namprd10.prod.outlook.com (2603:10b6:a03:2d9::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Mon, 23 Oct
- 2023 13:58:33 +0000
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::c0d2:a35b:46a0:d4ad]) by SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::c0d2:a35b:46a0:d4ad%6]) with mapi id 15.20.6907.032; Mon, 23 Oct 2023
- 13:58:33 +0000
-Date:   Mon, 23 Oct 2023 09:58:29 -0400
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     WangJinchao <wangjinchao@xfusion.com>,
-        steffen.klassert@secunet.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stone.xulei@xfusion.com
-Subject: Re: [PATCH v4] padata: Fix refcnt handling in padata_free_shell()
-Message-ID: <nqc5zfj5hjgk476o4iyehhmyadxvzjkz76ama72fzaasxjrpk3@liejkxexgg35>
-References: <202310160854+0800-wangjinchao@xfusion.com>
- <ZTIKP94KBuqhyj/k@gondor.apana.org.au>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZTIKP94KBuqhyj/k@gondor.apana.org.au>
-X-ClientProxiedBy: BL1PR13CA0166.namprd13.prod.outlook.com
- (2603:10b6:208:2bd::21) To SA1PR10MB5711.namprd10.prod.outlook.com
- (2603:10b6:806:23e::20)
+        Mon, 23 Oct 2023 11:38:04 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42248A9;
+        Mon, 23 Oct 2023 08:38:02 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57122C433CA;
+        Mon, 23 Oct 2023 15:37:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698075481;
+        bh=+7sxujCsz7fhFdaQKZ5gvA6XFkli0RKQBHNxU9igRO4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=CauCbHomgV3Pqhze715gE+HXa3kd18QQbm85tZ5slSuNo7E+uCtK+gb42iaHDj7eL
+         d3Hpl/dbruQAREzN4GEG+kb+EkOjcqUCYGz0URZdXFZLPzwCm7x1NRhQypbOslcue8
+         e7UvCxHRRFNcJEtTaBg30PfvQyCJX5wclP/dAWTMa34QMekW6men+DV0QJ4jG2E34a
+         KIBlz8Z9dCej1FfIWF8+IudLMtYeb+nLE7cFYDYjYepKqk0gmBVRubHPWwKaL8y3bT
+         uiYPj018EucQiDyPKjKtzU+RCESjj31Vg4xtKmkTERfystBDEb/TUlpLEWMCMv50M8
+         YAbSWDQsG2UGA==
+Date:   Mon, 23 Oct 2023 16:37:54 +0100
+From:   Conor Dooley <conor@kernel.org>
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Eric DeVolder <eric.devolder@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH 1/2] kexec: fix KEXEC_FILE dependencies
+Message-ID: <20231023-thievish-imitation-c7c4b36d76f1@spud>
+References: <20231023110308.1202042-1-arnd@kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR10MB5711:EE_|SJ0PR10MB4413:EE_
-X-MS-Office365-Filtering-Correlation-Id: b836bcd8-3c3b-49e9-1948-08dbd3d02533
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GpL3KEbZmaDJCZTch/iWKLtK3D1e6FM90Xj81KUbrLPTfWGm6Cqb8r1SzYzFMOmuC83Bjzw+a9rQGBA7H0fKe6ig2r+tAhusRbywpe9hAyTIU03zqoYOSfCeKNkwjeIoPopoedLWssp0A963wB8J1Hp4L1WnavmyJPm2ZAvMly8n4hsuNoFMU2OlP1Ijad/PWvY+/LjyH/bxlWY7LdwgSPIR5iVOJ2WZDpk71P2XAf6LRocETuhBWZmqDnJpG7zGXL5nCIGQr/n+KnGDXQxSNPp20LEyWIWmE6Cx+4S2reHaQjyU1qR6/mGui2VEj0S8+KCzoah9OfIWjyRkWtVJhN316s3I8REcKzhdDbD1ZslM8pRIRbmrPYQrlTW0yfqWK+O38blIpbEE2ev0fo8Rz7vptPcXDPl3+BaY9yxUVZVxocsr+Puz6O8L0254AGm78E7sNA9vhSctOV4IkvmoIJQGrHqwgX43dlWHmhPWQJGDd3nDXRqhVnUgC6yqZjp3K9RdpwWbBI/0DD1dJXZz9SRxFuJiKFwclSnvnaCp1E0nsRUGQP3UZraBmUDgyAWX
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(346002)(366004)(376002)(39860400002)(396003)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(26005)(33716001)(38100700002)(2906002)(4744005)(41300700001)(86362001)(5660300002)(8676002)(8936002)(4326008)(478600001)(6506007)(6916009)(66476007)(316002)(6666004)(66946007)(66556008)(83380400001)(6486002)(9686003)(6512007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MsIgK/xJHmyRpUWPTp8PdGjwAp9GwxfdHe6bicPnJxX2jcmKIOczivRmj6m0?=
- =?us-ascii?Q?OEXm3pR0vaSKYdkwdzWpWctv54SjoRkku4qloNLTuAbPmkX87SILVDtfMZzi?=
- =?us-ascii?Q?m2eUoWd2CpV5H4XFDJietFkCggDbemdtoHrqs6+mKwhAcH6m0sYiZkd2UcLt?=
- =?us-ascii?Q?SQmL69fRYdiP4r5DFullF13Lsl5QB8fjIsWC2eyVfO3dAfoZIcC8CxgwThkb?=
- =?us-ascii?Q?lVKHKucwsLk93lnx98gnypLWRZNp0UI1PvJrfQj6K5bwFA1L8wvutZeFh9mm?=
- =?us-ascii?Q?iiUwZmd3WFX951P5rXYOR2pHR3FYh84n2DY/55eqka5C7xEDAO2JC/GIEDZE?=
- =?us-ascii?Q?11DcCcASQ5gyMESmwaaQxvED8WmKcu+gUEK96EaubOHc012CpvdIlX6g31/d?=
- =?us-ascii?Q?nEz6wJaaYmr/r94rqBrb/2pJDOw/ZJ57q64s4g3lOjugWGnKzRIqTH1jjiL9?=
- =?us-ascii?Q?Kxz0Nn2aEW8hibjad4U2TzVw6oB8oXKd5a18PVB9Xf7G21ZlJfbjGl59w/Kg?=
- =?us-ascii?Q?KC0X/4U1ZdAzO5qxedEHI19QJdqCukS92+sSfVL7vnKOfWip5u4k2Vq/gC5Q?=
- =?us-ascii?Q?+6XHvPAe84WwlpKYfCftGoPcziR+mrssHeHdreOmbNeMecLcrNAoBD/AYSGB?=
- =?us-ascii?Q?faNINcRgohLz4KMQSSyYVOMqcIj+bLV8T0dGNK+fxKc/RJ1c9R1Wst1150+S?=
- =?us-ascii?Q?aIRMuyPrSSPa9Q3STfFLx5vTT2s5GTQoUO8dVJmMX1ShIUjW+3G3RT4bLvcJ?=
- =?us-ascii?Q?u9+sL1GqIGufIPLbt0vHRLhZhujaaA3aBfwWGsBTpOJGLUDCtdyRJgMXsyJO?=
- =?us-ascii?Q?kl1+1q0yXkDpAoVRvq77Aj+ZOQN7dFbeFDMlvExgbeJjvQurHsbX6kfC3cgn?=
- =?us-ascii?Q?Qe3F0ytKtMq2tCd+/hKjZjj/2qhpl4C+l9Lm+tzu0F1acblhsLlXdEUPgIxc?=
- =?us-ascii?Q?NjfXqDKJzGbAyHdlGPWUagPk6sW8Rh5xOVX9i7wtA9oHyajITDHcUz4DWCb4?=
- =?us-ascii?Q?o4z1Ejj+qxkjdCPtLQMc3UdCJXNK/SCf8KGgVXBT/sK7fQ04bAl6GkF5uJlO?=
- =?us-ascii?Q?KHlSjiRG9ZKAlBWjwauUSiYXjc+V43MRx1/R8ql09YdZhDxISqtJwxacmINP?=
- =?us-ascii?Q?L+KOci02naSP6IJMTD3F6s88DN1y4YWgwbHi/Bx/s/M9mjCeS1cl7Y/BtHLG?=
- =?us-ascii?Q?NtE4rMFkxanK50QJ2orbs4CrHt5Odotikt+ZJm1b2sWLO3YTuRy91yj4gTRd?=
- =?us-ascii?Q?6/jC113720yuZXGtpL9vyzKAFhJZmfAI2Yh/IVV+OCZBytHYX6HjyR/MoZzk?=
- =?us-ascii?Q?HqnfqwQHBfiegam/bfVrio6OGFfat/a2AvcjPSVj4zmB3xPKMdAaI1/yqr8A?=
- =?us-ascii?Q?lfbnBjA3pVxyATxGpy9aAmsjvfdFUxed4jLJXR4nUwus85+BJ+XPccWwmd8x?=
- =?us-ascii?Q?UCV+0zA9Q2E/uPb0TOuX+z+Qy2i+IyOkxTHqkaJ9JDMnR4G7t8+t0FhUrus2?=
- =?us-ascii?Q?Op2l3wKBIgqUAB5LEh/UDz03gI1X5oSuLdC7M1jLfEdngVRjudITxXlgXCHT?=
- =?us-ascii?Q?gw683rj7EPDyC29DnkJqF3Q51IlGBWMT5VHgJ5z9v5Evb42pwXAl6PQBMFLi?=
- =?us-ascii?Q?pA=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: iObDny2ZKWvZlo2KWNCSbE0gqtDoHowgxBQGJShRZx+s2AVBTOnXNMON9lqTg2LTILnrCzzMn37JgAPB/py3QogMuDVISn0OMXhw+Srk/aanS/B+WN3gz2Bps+fAH6ESlpWx4HM5N4A/7xwRBK/dGSUDE4NPebBl3hXkBc1/auIPXvcl4FNI2NxhywjTQYx8V1WkEWwYB3yu0wTDLwRMj6yK0EZoUKUzYarRhMwdO3d9vnF/sHxHGceFVj8gOTUV6djuzpxHJ7sDeuiaUIXDKqrMVSiSXqufr8lPnqx4PXX0Ie2sLk7cdC2Zmay9NIkZqf0kLIOR+T5PWOx8nR6t5M+9uE/WXz6zm/JFALegAUhVmpoM8x3HypoyGJ8683H1/+4uW+xnB3aSSZLBG+mDxOmT4vQvJmy8WeTMIsFujxKpPcZh1SwMKYJYs4nbAqIXaz03s8EHaIWbl0TtvNPQ+K1utaGaJs1HEwKDu6zKDR0/9P9xa1O+eyxN4tuQKXaPXq+cCRFlDD6Ieu4ZeIGpL5MaB0Ibq07/boUm7IrJKK0G4RvGAb6NFhfYlWD1H7pliytBBopjnBY5Nm9+kMSQIL3hPadwRdRvCyIClGOr75P+WN27FqR51O9davQMXU5Z/OKgB7CSYQQSUNFYaEn/bds6IDSrVIIFbDlxbXKliBTiep48m/eb4zU4m3+40bjpzm3onf7zDhJYPjZSCGWrpl2aLrGTdo13s8//UX6uRTIk0xzVf0hqo2fZXzzojsHf/tihwUYOBvBGQBiAfgyfuEWiRN4iz68mOFzLedzMCLDo76XdCWZrG5fd8jllxrX7bSrB6v5Z28F8wiVEicoZVzFZa8ozmre4odgQmpQlMh1cuEM0lY9+4PJlJ9eW+k0A
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b836bcd8-3c3b-49e9-1948-08dbd3d02533
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2023 13:58:33.6026
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Rgxt629Nq80tjikfrsjCpcahkI/mUk/Ni95v0j0VAydTOv92MmEwDa8O19KKaR1+VVeyJ9mErHr62/AbGexK1lHwzEScdLxFCpRUm+DfQxc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4413
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-23_12,2023-10-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
- bulkscore=0 mlxscore=0 spamscore=0 malwarescore=0 suspectscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310170001 definitions=main-2310230122
-X-Proofpoint-GUID: ALoZDMAd3qPrD4GekJ7wCwUNfNFnFVoq
-X-Proofpoint-ORIG-GUID: ALoZDMAd3qPrD4GekJ7wCwUNfNFnFVoq
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="mRjpzI3+zD7u3ldz"
+Content-Disposition: inline
+In-Reply-To: <20231023110308.1202042-1-arnd@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 20, 2023 at 01:03:59PM +0800, Herbert Xu wrote:
-> WangJinchao <wangjinchao@xfusion.com> wrote:
-> > diff --git a/kernel/padata.c b/kernel/padata.c
-> > index 222d60195de6..73108ac75f03 100644
-> > --- a/kernel/padata.c
-> > +++ b/kernel/padata.c
-> > @@ -1102,12 +1102,15 @@ EXPORT_SYMBOL(padata_alloc_shell);
-> >  */
-> > void padata_free_shell(struct padata_shell *ps)
-> > {
-> > +       struct parallel_data *pd;
-> >        if (!ps)
-> >                return;
 
-The \n after the declaration disappeared in this version but would be
-nice for consistency with the file.  Maybe when applying, no need for
-another post.
+--mRjpzI3+zD7u3ldz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Daniel, could you please reconfirm that you're still with v4?
+On Mon, Oct 23, 2023 at 01:01:54PM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+>=20
+> The cleanup for the CONFIG_KEXEC Kconfig logic accidentally changed the
+> 'depends on CRYPTO=3Dy' dependency to a plain 'depends on CRYPTO', which
+> causes a link failure when all the crypto support is in a loadable module
+> and kexec_file support is built-in:
+>=20
+> x86_64-linux-ld: vmlinux.o: in function `__x64_sys_kexec_file_load':
+> (.text+0x32e30a): undefined reference to `crypto_alloc_shash'
+> x86_64-linux-ld: (.text+0x32e58e): undefined reference to `crypto_shash_u=
+pdate'
+> x86_64-linux-ld: (.text+0x32e6ee): undefined reference to `crypto_shash_f=
+inal'
+>=20
+> Both s390 and x86 have this problem, while ppc64 and riscv have the
+> correct dependency already. On riscv, the dependency is only used
+> for the purgatory, not for the kexec_file code itself, which may
+> be a bit surprising as it means that with CONFIG_CRYPTO=3Dm, it is
+> possible to enable KEXEC_FILE but then the purgatory code is silently
+> left out.
+>=20
+> Move this into the common Kconfig.kexec file in a way that is
+> correct everywhere, using the dependency on CRYPTO_SHA256=3Dy only
+> when the purgatory code is available. This requires reversing the
+> dependency between ARCH_SUPPORTS_KEXEC_PURGATORY and KEXEC_FILE,
+> but the effect remains the same, other than making riscv behave
+> like the other ones.
+>=20
+> On s390, there is an additional dependency on CRYPTO_SHA256_S390, which
+> should technically not be required but gives better performance. Remove
+> this dependency here, noting that it was not present in the initial
+> Kconfig code but was brought in without an explanation in commit
+> 71406883fd357 ("s390/kexec_file: Add kexec_file_load system call").
+>=20
+> Fixes: 6af5138083005 ("x86/kexec: refactor for kernel/Kconfig.kexec")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  arch/powerpc/Kconfig | 4 ++--
 
-Yes, regardless of above,
-Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+>  arch/riscv/Kconfig   | 4 +---
+
+This doesn't appear to work for rv32. The defconfig build in our
+patchwork automation complains:
+  /tmp/tmp.Aq21JVRQTx/arch/riscv/purgatory/entry.S:29:2: error: instruction=
+ requires the following: RV64I Base Instruction Set
+
+>  arch/s390/Kconfig    | 4 ++--
+>  arch/x86/Kconfig     | 4 ++--
+>  kernel/Kconfig.kexec | 1 +
+>  5 files changed, 8 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+> index d5d5388973ac7..4640cee33f123 100644
+> --- a/arch/powerpc/Kconfig
+> +++ b/arch/powerpc/Kconfig
+> @@ -607,10 +607,10 @@ config ARCH_SUPPORTS_KEXEC
+>  	def_bool PPC_BOOK3S || PPC_E500 || (44x && !SMP)
+> =20
+>  config ARCH_SUPPORTS_KEXEC_FILE
+> -	def_bool PPC64 && CRYPTO=3Dy && CRYPTO_SHA256=3Dy
+> +	def_bool PPC64
+> =20
+>  config ARCH_SUPPORTS_KEXEC_PURGATORY
+> -	def_bool KEXEC_FILE
+> +	def_bool y
+> =20
+>  config ARCH_SELECTS_KEXEC_FILE
+>  	def_bool y
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index 25474f8c12b79..f571bad2d22d0 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -687,9 +687,7 @@ config ARCH_SELECTS_KEXEC_FILE
+>  	select KEXEC_ELF
+> =20
+>  config ARCH_SUPPORTS_KEXEC_PURGATORY
+> -	def_bool KEXEC_FILE
+> -	depends on CRYPTO=3Dy
+> -	depends on CRYPTO_SHA256=3Dy
+> +	def_bool y
+
+This being the problem, KEXEC_FILE is 64-bit only.
+
+IIRC I commented on this same thing during the original conversion
+patches.
+
+Cheers,
+Conor.
+
+> =20
+>  config ARCH_SUPPORTS_CRASH_DUMP
+>  	def_bool y
+> diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+> index b0d67ac8695f9..ec77106af4137 100644
+> --- a/arch/s390/Kconfig
+> +++ b/arch/s390/Kconfig
+> @@ -253,13 +253,13 @@ config ARCH_SUPPORTS_KEXEC
+>  	def_bool y
+> =20
+>  config ARCH_SUPPORTS_KEXEC_FILE
+> -	def_bool CRYPTO && CRYPTO_SHA256 && CRYPTO_SHA256_S390
+> +	def_bool y
+> =20
+>  config ARCH_SUPPORTS_KEXEC_SIG
+>  	def_bool MODULE_SIG_FORMAT
+> =20
+>  config ARCH_SUPPORTS_KEXEC_PURGATORY
+> -	def_bool KEXEC_FILE
+> +	def_bool y
+> =20
+>  config ARCH_SUPPORTS_CRASH_DUMP
+>  	def_bool y
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 94efde80ebf35..f9975b15ccd57 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -2073,7 +2073,7 @@ config ARCH_SUPPORTS_KEXEC
+>  	def_bool y
+> =20
+>  config ARCH_SUPPORTS_KEXEC_FILE
+> -	def_bool X86_64 && CRYPTO && CRYPTO_SHA256
+> +	def_bool X86_64
+> =20
+>  config ARCH_SELECTS_KEXEC_FILE
+>  	def_bool y
+> @@ -2081,7 +2081,7 @@ config ARCH_SELECTS_KEXEC_FILE
+>  	select HAVE_IMA_KEXEC if IMA
+> =20
+>  config ARCH_SUPPORTS_KEXEC_PURGATORY
+> -	def_bool KEXEC_FILE
+> +	def_bool y
+> =20
+>  config ARCH_SUPPORTS_KEXEC_SIG
+>  	def_bool y
+> diff --git a/kernel/Kconfig.kexec b/kernel/Kconfig.kexec
+> index 7aff28ded2f48..bfc636d64ff2b 100644
+> --- a/kernel/Kconfig.kexec
+> +++ b/kernel/Kconfig.kexec
+> @@ -36,6 +36,7 @@ config KEXEC
+>  config KEXEC_FILE
+>  	bool "Enable kexec file based system call"
+>  	depends on ARCH_SUPPORTS_KEXEC_FILE
+> +	depends on CRYPTO_SHA256=3Dy || !ARCH_SUPPORTS_KEXEC_PURGATORY
+>  	select KEXEC_CORE
+>  	help
+>  	  This is new version of kexec system call. This system call is
+> --=20
+> 2.39.2
+>=20
+>=20
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
+
+--mRjpzI3+zD7u3ldz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZTaTUQAKCRB4tDGHoIJi
+0jQmAP9v+uwdj5uO4bmAsvYAS/mBJ+2BjVxZTAaQAidZQdF3ggD+LzhE+bC2da+g
+DCs8WnrAasntuvfNZbHoXsUkKgUB9gI=
+=uyT2
+-----END PGP SIGNATURE-----
+
+--mRjpzI3+zD7u3ldz--
