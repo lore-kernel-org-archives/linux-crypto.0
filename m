@@ -2,176 +2,189 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CD5C25B47
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Oct 2023 16:40:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C96FC00A8F
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Oct 2023 17:04:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343899AbjJXQkE (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Oct 2023 12:40:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40764 "EHLO
+        id S233233AbjJXREj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 24 Oct 2023 13:04:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343912AbjJXQkD (ORCPT
+        with ESMTP id S232329AbjJXREi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Oct 2023 12:40:03 -0400
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ACFBD7D;
-        Tue, 24 Oct 2023 09:40:00 -0700 (PDT)
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5845213c583so1594680eaf.0;
-        Tue, 24 Oct 2023 09:40:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698165599; x=1698770399;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4dgLAi1M/nR9fJIQpQVSn3gxY5AOxSN1+8PQWp2ZK3E=;
-        b=dJEL+fgbBkqa2Hxr8owONWDH6pO4QAKL8M6N0LblYDn0D+mvusaM9LI019LIX+Wr3i
-         SBvjWPRMymU3blibDCev3SK/2zggSLh7i4IpkcLL7+56UwaN+3Q+SvbKam8pCpGxanbT
-         He27KYjc4yS6cs4vdNENuanBRdI3kaR7tLAO5bj36M1FDWyM3CJw3cp0SmL52BmqFpit
-         BdEzxk39cE/f7g8NzIovM7D42nhpblBaxWAThWlKCuq1CXkrmypanbfJwfKuwEnp/Q8S
-         InLGUYhaL1tKdHvTD1oRCIWiQ8RKhoO9Sv7r+HPRugFqxsbmNwjwBGYgYl7NZvibTWWM
-         mHUQ==
-X-Gm-Message-State: AOJu0YxSrNVMn+fgX2LQrUQlYDXBSzDJcV9rjwPhKfF+AMIxCWFlyWiP
-        Fy1vX2SNzu3oZN9A3IdBaw==
-X-Google-Smtp-Source: AGHT+IH7r1RypTRYYRKdrh1wNi7leTTNBWI9FBY2oTxpLiREvX3LYW7p4YgROHwYcoRP/a6v+9+WQw==
-X-Received: by 2002:a4a:df11:0:b0:582:28e:93a8 with SMTP id i17-20020a4adf11000000b00582028e93a8mr12468463oou.3.1698165599325;
-        Tue, 24 Oct 2023 09:39:59 -0700 (PDT)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id f22-20020a4ad816000000b0057aef3cab33sm2002659oov.21.2023.10.24.09.39.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Oct 2023 09:39:58 -0700 (PDT)
-Received: (nullmailer pid 4062523 invoked by uid 1000);
-        Tue, 24 Oct 2023 16:39:56 -0000
-Date:   Tue, 24 Oct 2023 11:39:56 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Cc:     Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-        alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org,
-        olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com,
-        mchehab@kernel.org, fabrice.gasnier@foss.st.com,
-        andi.shyti@kernel.org, ulf.hansson@linaro.org, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, hugues.fruchet@foss.st.com,
-        lee@kernel.org, will@kernel.org, catalin.marinas@arm.com,
-        arnd@kernel.org, richardcochran@gmail.com,
-        Frank Rowand <frowand.list@gmail.com>, peng.fan@oss.nxp.com,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        netdev@vger.kernel.org, linux-p.hy@lists.infradead.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-usb@vger.kernel.org
-Subject: Re: [PATCH v6 10/11] ARM: dts: stm32: add ETZPC as a system bus for
- STM32MP15x boards
-Message-ID: <20231024163956.GA4049342-robh@kernel.org>
-References: <20231010125719.784627-1-gatien.chevallier@foss.st.com>
- <20231010125719.784627-11-gatien.chevallier@foss.st.com>
- <20231010184212.GA1221641-robh@kernel.org>
- <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
- <20231012153012.GA698406-robh@kernel.org>
- <b16ed06f-66fd-457b-9610-a67ad07deb60@foss.st.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        Tue, 24 Oct 2023 13:04:38 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC55118;
+        Tue, 24 Oct 2023 10:04:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698167077; x=1729703077;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=wuFFBBOF0f6sohSN/+TPeeYaDHLCjsfu7LYve0DKGWs=;
+  b=BGkjjU0E4ld7596VAZL7PIH7OwdDLKBfQRsMieAiZQucLxutdFq/fXUG
+   4ofQ75TM1L5rS72BmAVROc1oF59FwU+XlE6KPfoDV+ixDNy7pb54SnISw
+   zRs0ZKDT1wZiDaifZCtDVj32BJOzV0A6FNb311yc+tfeJ+r5SlF8F/FEt
+   VjmuxxA6ZW/+1Jsi4KldNZcYpGVrDx7ihWT5wi1ytrHyB4koeel2fy9a/
+   OdfV7ZauSfHimiUBl7wNEqJb67AK30olCdoGEweG68xQxcbDDaKjWPVpZ
+   LxZuCQOfVRUUhlVxa8C9QmRV+lJdv/HnNAhNI4uTSq90hQxXNGHs/5EIM
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="418239378"
+X-IronPort-AV: E=Sophos;i="6.03,248,1694761200"; 
+   d="scan'208";a="418239378"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2023 10:04:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="793574435"
+X-IronPort-AV: E=Sophos;i="6.03,248,1694761200"; 
+   d="scan'208";a="793574435"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Oct 2023 10:04:30 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 24 Oct 2023 10:04:30 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 24 Oct 2023 10:04:29 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Tue, 24 Oct 2023 10:04:29 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Tue, 24 Oct 2023 10:04:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KB5edfZs82atOEzWv2TJPJIoYfV2woRH5bqdKYMGC58o4A7IHNel1DOGzHXSTp97DjdR5os3nwcpbiUEWE8AcMCWOlEpE/O3VbGLr5UKRRwQuH4pWp96BtiuzYI1Nlxa07sNkMENLsSf1Yqipn3CiX3uT9FW3INPSXC3rqpJfRgUagbexsTY4TZQ0qtXQ73akGPJ5L7bdf+b/xTe5felf5RI2Ht7veWlURDls4NMHOCy6Stm9kwqT6EihGMhX57DYF8P1R/IooIYr3TYZxRl88N9AOGIlJ6YDGw4bp92geanpsrb4gbFPj44FgSeEQ+vRx1Q6Q7eGJQZ604GS/yvHQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BZFMaI0bXeqmzCJLz/EnbTzAw2PMgJmDHYH1Zj4FkJw=;
+ b=ag27CMUMTGDkeCtJPUsjUn/iBwsSLt1jo5enQOnTyl8I7DmiKy0fPmWfdLDeR4YGYnMv9B9FXz/qzOkf0KWtJmN3byKMpuZPmHpxOVqEqphklOVdVaamxIKt1ubmBlsruiwXJjoVsYTTA1u8vhgQG7kOKnFkL0fQUL5+B3i7HL4KCn4QA4ozPrO+FCc6FWLt7KjLU6AxkeziM16KwDZYniP8L3WWR4wxl7s+BIHgYHBHEStyqZ91uYBy4Ctq1BldKcWz46jw7GApw4Pnez3GCuCCBHuKams6GnIUrQHBJ/8NL6T5KmQvwlBePLg6XUBLBASGupY1s2+n5o6qLrqPGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by DM4PR11MB7327.namprd11.prod.outlook.com (2603:10b6:8:105::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.29; Tue, 24 Oct
+ 2023 17:04:22 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::e75f:ec47:9be1:e9e4]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::e75f:ec47:9be1:e9e4%4]) with mapi id 15.20.6907.032; Tue, 24 Oct 2023
+ 17:04:22 +0000
+Date:   Tue, 24 Oct 2023 10:04:18 -0700
+From:   Dan Williams <dan.j.williams@intel.com>
+To:     Alexey Kardashevskiy <aik@amd.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Lukas Wunner <lukas@wunner.de>
+CC:     Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Alex Williamson" <alex.williamson@redhat.com>,
+        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        "Tom Lendacky" <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 12/12] PCI/CMA: Grant guests exclusive control of
+ authentication
+Message-ID: <6537f912dbb83_7258329424@dwillia2-xfh.jf.intel.com.notmuch>
+References: <cover.1695921656.git.lukas@wunner.de>
+ <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
+ <20231003164048.0000148c@Huawei.com>
+ <20231003193058.GA16417@wunner.de>
+ <20231006103020.0000174f@Huawei.com>
+ <653038c93a054_780ef294e9@dwillia2-xfh.jf.intel.com.notmuch>
+ <38d0c5ce-7de2-47fb-bfaf-50f900b7f747@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <b16ed06f-66fd-457b-9610-a67ad07deb60@foss.st.com>
+In-Reply-To: <38d0c5ce-7de2-47fb-bfaf-50f900b7f747@amd.com>
+X-ClientProxiedBy: MW2PR2101CA0002.namprd21.prod.outlook.com
+ (2603:10b6:302:1::15) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|DM4PR11MB7327:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2bf37a73-4756-42f6-2e8b-08dbd4b344f9
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: svskZXefIWhY95qrWjTShqGCwp0FHwnLy3cqKun0cEVKonan9q+W5E4JtdHwEsM6fvzELvbfeoe9F/DLnExHa/LPCX6FrLsJr716fKzR1ocRhS5L8Gbh5CIGRL7suMBZxiHLWBCIXTCEKf6TpGewS/VuW3qr8MhlvYVNS/jkqYuDkrFBDaxe+SuMzjwrLb8uzMbDzUQlAJZ4DodRxLpD5Uetf6Wvy908qDy8Jfs7f0pnQx6jmfxqT8IS5QiTBP18k8N38jr3xhHiZ/JtOXAyFX5d9fKf4/xXPRNgN+PdP42BJeHOdxBJAuNYHVfKE9a/5HMgl82gV+B8+MPwZOUYlkofh4vAKVYRPaa2VH95jz+OIYdNlWr2ykS9w4grpEBlzdsnrgPkOy50xYiX1p7EfabuaIW4ycz1rAoY+zA4XXQRJeQnXcHMQ3eIYObbALogWz40eBi4T2LSJOgGDIm0nmrIRm4BNoS79oESF4M+NpK8KopCf6X4S/A5WKMzHimxgPxW3brLUFQ71Wao7fCTHyWWXIZy6J0UzkHOpvTzz4XUdqpi59Ojh7iyvdgSvgOw
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(376002)(366004)(346002)(136003)(230922051799003)(451199024)(186009)(64100799003)(1800799009)(4744005)(2906002)(5660300002)(8936002)(8676002)(38100700002)(4326008)(7416002)(41300700001)(66946007)(54906003)(66476007)(86362001)(478600001)(6486002)(110136005)(6666004)(6506007)(316002)(9686003)(6512007)(26005)(83380400001)(82960400001)(66556008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xLPzBIxHuhLmt+Y86UZ0l2prwOBIF6/P95r82JZAbc6fPjwxS+/8IweKEPRD?=
+ =?us-ascii?Q?ewwxfNiYRkr/HHpQntw9PivzrqjFSPHp2w4dfQrkm2qAPoKfelHesZE8IwwU?=
+ =?us-ascii?Q?mqied0p7n55pp5Ymm0ecrEn7RgwtQq15/NHPmOVlDPYjw6mCTYyhNSJIJxGk?=
+ =?us-ascii?Q?19NVRaGq8lCv6RBWvSNDf/ZhQvS+nt7T5jF72f29FfRz7t0jkjGpWP9rzuZi?=
+ =?us-ascii?Q?LBk1+Fgwwo3sec2TR4lluPaO7YON0AyJ43Zs8olfZ5BWZ4tO+z+wKkj71llw?=
+ =?us-ascii?Q?wWvu6IhFygZkg3a7TVkj6lqdUGQJ8O242YaJxRHQTcHADUBwSDI99XcrcyTI?=
+ =?us-ascii?Q?s/c/uZvlLd+FANsTxiIHoW6Nozbst9AlsW22SFUutGndnW767Ow5bixL3g/I?=
+ =?us-ascii?Q?AAUtSulu6nGiFcN3NNAQwSAuOTBszJhgT+ggbrWbpbNwh/AKj7bzbnttASp0?=
+ =?us-ascii?Q?y09fAQ3r1KVRLa8NxmbnAqhXzSxKHoBD8lgjY3hM1WV6W6Z/ZnPoVDwbdo0/?=
+ =?us-ascii?Q?aF6pnt0Rj+rKbSxThp6ZgWd0I5qfgJjQpy1HJRgOIR1f1XnI3A3Y4bpM6O6C?=
+ =?us-ascii?Q?QGvjG7RtJJaeTPLSdvTi9V2bEGDu9nA//0BRiZ8SADPvD6bCbTfTPqpPJGZU?=
+ =?us-ascii?Q?YRw2lwp/l206HTXrbEMuoUWgB15HkRKWxXL9QPcMkFKEKnoFKdYAicWABqBv?=
+ =?us-ascii?Q?wo4s5Gb86oFwd2APr1rAqH12GmCmFZlSu0JbSFaBwHeY06fgDRdR4OjdYIGa?=
+ =?us-ascii?Q?QHs/izaEi/rhAszzloSHXsjx/iHjHyaQ2jUHLSnyg/aWi209QOBvcozpMFPF?=
+ =?us-ascii?Q?HN5yk2x/iwbgH9YhcCZlkZ6gEhIDvrlU4LsbuGI2R1n3bvKg6hLbyjxy19hb?=
+ =?us-ascii?Q?XBlk244k7e0OSiqNy3llN9EklSym+GZlnW/tWih+ZtsBdsCgHHH36Jlo0s7h?=
+ =?us-ascii?Q?YItrguhwfeotRFbJEbKjoHKMEnBTGa2jPW6xcL5/yeffLZ31pbyGZRPV/eyX?=
+ =?us-ascii?Q?eoieVurCKfFMfUPFf49M/nQFXmybrpBjRgtvZUktNupM0H2f/L7pf7/aE1uN?=
+ =?us-ascii?Q?7PIpv9mM0fXigOo5qCdfTPB7ci3vwA7dG7RyJ8iD0cyrukiJiYfhSuoaPp/R?=
+ =?us-ascii?Q?JSGheIGj8fUTojMBYCBIrBSSX2Iv/JYSbcu8rpGazxIT5IeFwRUknaW/Zi99?=
+ =?us-ascii?Q?nqb6W4jitqkKsowxhj/FsmqMfv2L1ekHz7JjoKx6l5YrmXycYjry5iicNeP2?=
+ =?us-ascii?Q?fEbR7x241lKvo/388l1HQ2k9BKfJjvCwcITBixIdfDjmfyzJlV/DJGfceqeo?=
+ =?us-ascii?Q?Q2SzQS4zyizNFbT+bTUPhKeGCXMPyux4KAtRMmBh64jEGVhzCCX5fVmQh+W/?=
+ =?us-ascii?Q?rRYhJHUJUKZZJ5oBj8zKCuxjWf2ZDnXa9xfADnM9st6zJP/VkffgQOBRHKMD?=
+ =?us-ascii?Q?pOOadvQuT4bt3Osd+WGX3KsclfPHV5hdaAReCGnOa1PE6dzZ7jx+Amp/pGm1?=
+ =?us-ascii?Q?SpJYz4fYAQsfLsOBcPVpji/HBIrsCZ4Vu7u1XnQEfyJFT7YBh/q3bJoAHTVO?=
+ =?us-ascii?Q?q/f5dgHI9EP7olvG6fU5/CL1qs8vNaWnurCW5fCYNCXfZLhnz6HSEYtOVM2j?=
+ =?us-ascii?Q?XA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2bf37a73-4756-42f6-2e8b-08dbd4b344f9
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 17:04:22.7143
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lt/2q3zPqnlV2piswBHuZWpagEggOrkDHKTk3h6Scu4wNkKilcdASI5lMUzJSYdQWwmSKL3ntAtgRcULWW5DdN6vPyJkl+As4Lz36uO9AI4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7327
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 16, 2023 at 02:02:39PM +0200, Gatien CHEVALLIER wrote:
-> Hi Rob,
-> 
-> On 10/12/23 17:30, Rob Herring wrote:
-> > On Wed, Oct 11, 2023 at 10:49:58AM +0200, Gatien CHEVALLIER wrote:
-> > > Hi Rob,
-> > > 
-> > > On 10/10/23 20:42, Rob Herring wrote:
-> > > > On Tue, Oct 10, 2023 at 02:57:18PM +0200, Gatien Chevallier wrote:
-> > > > > ETZPC is a firewall controller. Put all peripherals filtered by the
-> > > > > ETZPC as ETZPC subnodes and reference ETZPC as an
-> > > > > access-control-provider.
-> > > > > 
-> > > > > For more information on which peripheral is securable or supports MCU
-> > > > > isolation, please read the STM32MP15 reference manual.
-> > > > > 
-> > > > > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> > > > > ---
-> > > > > 
-> > > > > Changes in V6:
-> > > > >       	- Renamed access-controller to access-controllers
-> > > > >       	- Removal of access-control-provider property
-> > > > > 
-> > > > > Changes in V5:
-> > > > >       	- Renamed feature-domain* to access-control*
-> > > > > 
-> > > > >    arch/arm/boot/dts/st/stm32mp151.dtsi  | 2756 +++++++++++++------------
-> > > > >    arch/arm/boot/dts/st/stm32mp153.dtsi  |   52 +-
-> > > > >    arch/arm/boot/dts/st/stm32mp15xc.dtsi |   19 +-
-> > > > >    3 files changed, 1450 insertions(+), 1377 deletions(-)
-> > > > 
-> > > > This is not reviewable. Change the indentation and any non-functional
-> > > > change in one patch and then actual changes in another.
-> > > 
-> > > Ok, I'll make it easier to read.
-> > > 
-> > > > 
-> > > > This is also an ABI break. Though I'm not sure it's avoidable. All the
-> > > > devices below the ETZPC node won't probe on existing kernel. A
-> > > > simple-bus fallback for ETZPC node should solve that.
-> > > > 
-> > > 
-> > > I had one issue when trying with a simple-bus fallback that was the
-> > > drivers were probing even though the access rights aren't correct.
-> > > Hence the removal of the simple-bus compatible in the STM32MP25 patch.
-> > 
-> > But it worked before, right? So the difference is you have either added
-> > new devices which need setup or your firmware changed how devices are
-> > setup (or not setup). Certainly can't fix the latter case. You just need
-> > to be explicit about what you are doing to users.
-> > 
-> 
-> I should've specified it was during a test where I deliberately set
-> incorrect rights on a peripheral and enabled its node to see if the
-> firewall would allow the creation of the device.
-> 
-> > 
-> > > Even though a node is tagged with the OF_POPULATED flag when checking
-> > > the access rights with the firewall controller, it seems that when
-> > > simple-bus is probing, there's no check of this flag.
-> > 
-> > It shouldn't. Those flags are for creating the devices (or not) and
-> > removing only devices of_platform_populate() created.
-> > 
-> 
-> About the "simple-bus" being a fallback, I think I understood why I saw
-> that the devices were created.
-> 
-> All devices under a node whose compatible is "simple-bus" are created
-> in of_platform_device_create_pdata(), called by
-> of_platform_default_populate_init() at arch_initcall level. This
-> before the firewall-controller has a chance to populate it's bus.
-> 
-> Therefore, when I flag nodes when populating the firewall-bus, the
-> devices are already created. The "simple-bus" mechanism is not a
-> fallback here as it precedes the driver probe.
-> 
-> Is there a safe way to safely remove/disable a device created this way?
+Alexey Kardashevskiy wrote:
+[..]
+> To own IDE, the guest will have to have exclusive access to the portion 
+> of RC responsible for the IDE keys. Which is doable but requires passing 
+> through both RC and the device and probably everything between these 
+> two.  It is going to be quite different "host-native" and 
+> "guest-native". How IDE keys are going to be programmed into the RC on 
+> Intel?
 
-There's 2 ways to handle this. Either controlling creating the device or 
-controlling probing the device. The latter should just work with 
-fw_devlink dependency. The former probably needs some adjustment to 
-simple-pm-bus driver if you have 'simple-bus' compatible. You want it to 
-probe on old kernels and not probe on new kernels with your firewall 
-driver. Look at the commit history for simple-pm-bus. There was some 
-discussion on it as well.
+I do not think the guest can "own IDE" in any meaningful. It is always
+going to be a PF level policy coordinated either by the host or the
+platform-TSM, and as far as I can see all end user interest currently
+lies in the platform-TSM case.
 
-> Devices that are under the firewall controller (simple-bus) node
-> should not be probed before it as they're child of it.
-
-fw_devlink should take care of parent/child dependencies without any 
-explicit handling of the access ctrl binding.
-
-Rob
+Now, there is definitely value in considering how a guest can maximize
+security in the absence of a platform-TSM in the code design, but that
+does not diminish the need for a path for the guest to coordinate the
+life-cycle through the platform-TSM. Otherwise, as you mention, passing
+through the host-bridge resources and the VF has challenges.
