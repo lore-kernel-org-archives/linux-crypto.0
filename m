@@ -2,249 +2,176 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39354C00A8F
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Oct 2023 16:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CD5C25B47
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Oct 2023 16:40:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344006AbjJXQVQ (ORCPT
+        id S1343899AbjJXQkE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Oct 2023 12:21:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33912 "EHLO
+        Tue, 24 Oct 2023 12:40:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343885AbjJXQVA (ORCPT
+        with ESMTP id S1343912AbjJXQkD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Oct 2023 12:21:00 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E44411702
-        for <linux-crypto@vger.kernel.org>; Tue, 24 Oct 2023 09:20:53 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-53e3e7e478bso7077063a12.0
-        for <linux-crypto@vger.kernel.org>; Tue, 24 Oct 2023 09:20:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sigma-star.at; s=google; t=1698164452; x=1698769252; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+qntkmutwprS+2oQeQzgmaP97TAaIsTbzLeg5qvDo3I=;
-        b=HcRwS17ufuRUW3CRl/tZfzLcNU/Yl2oyBRikCVDTyXaWBaE/Mpt0ru0TZTba95TNwT
-         aTU9VHu++Ye2UXcFhuSkFnnRwJOrJ7OC6ZScNW9XdfaA52SuzW+9w+jfcwRXs12vJ/45
-         lTNXJlkBqjXUonDu7wYpa3f+MN92iOCZmjuJsrDOJDcJm6R0ufXCFcBc8zellwSkeJKR
-         6Un6reyGpehkT/Sbzmo+phF0Obts3pxhH1/DLJamoMLho8SyShJW3kyGzmYAZfypaN0r
-         nyqTOHaTd/GWs4MI4FYeXKPzVh/MxEv7eiqrjjNBpIrIGc6QKop3nh5ozN9cUgX953A9
-         8o4g==
+        Tue, 24 Oct 2023 12:40:03 -0400
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ACFBD7D;
+        Tue, 24 Oct 2023 09:40:00 -0700 (PDT)
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5845213c583so1594680eaf.0;
+        Tue, 24 Oct 2023 09:40:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698164452; x=1698769252;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+qntkmutwprS+2oQeQzgmaP97TAaIsTbzLeg5qvDo3I=;
-        b=dEZMzH1Q5GiUu3rpT/FeE/OjKDVKYPjeZgjznTw8rnS3Wp8KI0oOQ02D9mr6E9rkcE
-         Fk9U1hmu9FXj+qq5E8h6NACt4nEhPfBQKkuPXeJJp0KsVHeLhvnMJtlbwXcrZ/jfGfJi
-         90V6C+NxmyikGsq1f/j6qEM3ODbuW5LI5LM3+EHx1Vnn29TtPe7lP0mkWQhjbOBJshKD
-         t+CQVRYw6ryodvwO4Mx7UrPZ5MJFmhRjupkxgT8Hk+rAlFsCS2w18U5qHmLu+qXtDLS/
-         m9xkRkg3y7wZJj2vQ+sIuZyYi1aa219lcdbjt8sHn8JXpa9OaM++vmqi+QZ31u/Jf95y
-         omFQ==
-X-Gm-Message-State: AOJu0Yx0LGI0JFCEEQ9lyjV+82uLHUv+RwD9a+DIBwPuJRuBFHTg8pav
-        cP8mXaBYexqzh+vI9/+X7PiZ4g==
-X-Google-Smtp-Source: AGHT+IF0iLrbDbUm1V98XXFpcmmPGqY4cfPlX1aQoOtBifDgtK4ig3PeyUmZMmyPcMbx9I21p02aGQ==
-X-Received: by 2002:a05:6402:5106:b0:53e:4dc6:a2e8 with SMTP id m6-20020a056402510600b0053e4dc6a2e8mr11045680edd.19.1698164451864;
-        Tue, 24 Oct 2023 09:20:51 -0700 (PDT)
-Received: from localhost (clnet-p106-198.ikbnet.co.at. [83.175.106.198])
-        by smtp.gmail.com with UTF8SMTPSA id dk18-20020a0564021d9200b005402c456892sm4624084edb.33.2023.10.24.09.20.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 09:20:51 -0700 (PDT)
-From:   David Gstir <david@sigma-star.at>
-To:     Mimi Zohar <zohar@linux.ibm.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     David Gstir <david@sigma-star.at>, Shawn Guo <shawnguo@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        sigma star Kernel Team <upstream+dcp@sigma-star.at>,
-        David Howells <dhowells@redhat.com>,
-        Li Yang <leoyang.li@nxp.com>, Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Tejun Heo <tj@kernel.org>,
-        "Steven Rostedt (Google)" <rostedt@goodmis.org>,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org,
-        linux-security-module@vger.kernel.org,
-        Richard Weinberger <richard@nod.at>,
-        David Oberhollenzer <david.oberhollenzer@sigma-star.at>
-Subject: [PATCH v4 5/5] docs: trusted-encrypted: add DCP as new trust source
-Date:   Tue, 24 Oct 2023 18:20:19 +0200
-Message-ID: <20231024162024.51260-6-david@sigma-star.at>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231024162024.51260-1-david@sigma-star.at>
-References: <20231024162024.51260-1-david@sigma-star.at>
+        d=1e100.net; s=20230601; t=1698165599; x=1698770399;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4dgLAi1M/nR9fJIQpQVSn3gxY5AOxSN1+8PQWp2ZK3E=;
+        b=dJEL+fgbBkqa2Hxr8owONWDH6pO4QAKL8M6N0LblYDn0D+mvusaM9LI019LIX+Wr3i
+         SBvjWPRMymU3blibDCev3SK/2zggSLh7i4IpkcLL7+56UwaN+3Q+SvbKam8pCpGxanbT
+         He27KYjc4yS6cs4vdNENuanBRdI3kaR7tLAO5bj36M1FDWyM3CJw3cp0SmL52BmqFpit
+         BdEzxk39cE/f7g8NzIovM7D42nhpblBaxWAThWlKCuq1CXkrmypanbfJwfKuwEnp/Q8S
+         InLGUYhaL1tKdHvTD1oRCIWiQ8RKhoO9Sv7r+HPRugFqxsbmNwjwBGYgYl7NZvibTWWM
+         mHUQ==
+X-Gm-Message-State: AOJu0YxSrNVMn+fgX2LQrUQlYDXBSzDJcV9rjwPhKfF+AMIxCWFlyWiP
+        Fy1vX2SNzu3oZN9A3IdBaw==
+X-Google-Smtp-Source: AGHT+IH7r1RypTRYYRKdrh1wNi7leTTNBWI9FBY2oTxpLiREvX3LYW7p4YgROHwYcoRP/a6v+9+WQw==
+X-Received: by 2002:a4a:df11:0:b0:582:28e:93a8 with SMTP id i17-20020a4adf11000000b00582028e93a8mr12468463oou.3.1698165599325;
+        Tue, 24 Oct 2023 09:39:59 -0700 (PDT)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id f22-20020a4ad816000000b0057aef3cab33sm2002659oov.21.2023.10.24.09.39.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Oct 2023 09:39:58 -0700 (PDT)
+Received: (nullmailer pid 4062523 invoked by uid 1000);
+        Tue, 24 Oct 2023 16:39:56 -0000
+Date:   Tue, 24 Oct 2023 11:39:56 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+Cc:     Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+        alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org,
+        olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com,
+        mchehab@kernel.org, fabrice.gasnier@foss.st.com,
+        andi.shyti@kernel.org, ulf.hansson@linaro.org, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, hugues.fruchet@foss.st.com,
+        lee@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+        arnd@kernel.org, richardcochran@gmail.com,
+        Frank Rowand <frowand.list@gmail.com>, peng.fan@oss.nxp.com,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, linux-p.hy@lists.infradead.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-usb@vger.kernel.org
+Subject: Re: [PATCH v6 10/11] ARM: dts: stm32: add ETZPC as a system bus for
+ STM32MP15x boards
+Message-ID: <20231024163956.GA4049342-robh@kernel.org>
+References: <20231010125719.784627-1-gatien.chevallier@foss.st.com>
+ <20231010125719.784627-11-gatien.chevallier@foss.st.com>
+ <20231010184212.GA1221641-robh@kernel.org>
+ <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
+ <20231012153012.GA698406-robh@kernel.org>
+ <b16ed06f-66fd-457b-9610-a67ad07deb60@foss.st.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b16ed06f-66fd-457b-9610-a67ad07deb60@foss.st.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Update the documentation for trusted and encrypted KEYS with DCP as new
-trust source:
+On Mon, Oct 16, 2023 at 02:02:39PM +0200, Gatien CHEVALLIER wrote:
+> Hi Rob,
+> 
+> On 10/12/23 17:30, Rob Herring wrote:
+> > On Wed, Oct 11, 2023 at 10:49:58AM +0200, Gatien CHEVALLIER wrote:
+> > > Hi Rob,
+> > > 
+> > > On 10/10/23 20:42, Rob Herring wrote:
+> > > > On Tue, Oct 10, 2023 at 02:57:18PM +0200, Gatien Chevallier wrote:
+> > > > > ETZPC is a firewall controller. Put all peripherals filtered by the
+> > > > > ETZPC as ETZPC subnodes and reference ETZPC as an
+> > > > > access-control-provider.
+> > > > > 
+> > > > > For more information on which peripheral is securable or supports MCU
+> > > > > isolation, please read the STM32MP15 reference manual.
+> > > > > 
+> > > > > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> > > > > ---
+> > > > > 
+> > > > > Changes in V6:
+> > > > >       	- Renamed access-controller to access-controllers
+> > > > >       	- Removal of access-control-provider property
+> > > > > 
+> > > > > Changes in V5:
+> > > > >       	- Renamed feature-domain* to access-control*
+> > > > > 
+> > > > >    arch/arm/boot/dts/st/stm32mp151.dtsi  | 2756 +++++++++++++------------
+> > > > >    arch/arm/boot/dts/st/stm32mp153.dtsi  |   52 +-
+> > > > >    arch/arm/boot/dts/st/stm32mp15xc.dtsi |   19 +-
+> > > > >    3 files changed, 1450 insertions(+), 1377 deletions(-)
+> > > > 
+> > > > This is not reviewable. Change the indentation and any non-functional
+> > > > change in one patch and then actual changes in another.
+> > > 
+> > > Ok, I'll make it easier to read.
+> > > 
+> > > > 
+> > > > This is also an ABI break. Though I'm not sure it's avoidable. All the
+> > > > devices below the ETZPC node won't probe on existing kernel. A
+> > > > simple-bus fallback for ETZPC node should solve that.
+> > > > 
+> > > 
+> > > I had one issue when trying with a simple-bus fallback that was the
+> > > drivers were probing even though the access rights aren't correct.
+> > > Hence the removal of the simple-bus compatible in the STM32MP25 patch.
+> > 
+> > But it worked before, right? So the difference is you have either added
+> > new devices which need setup or your firmware changed how devices are
+> > setup (or not setup). Certainly can't fix the latter case. You just need
+> > to be explicit about what you are doing to users.
+> > 
+> 
+> I should've specified it was during a test where I deliberately set
+> incorrect rights on a peripheral and enabled its node to see if the
+> firewall would allow the creation of the device.
+> 
+> > 
+> > > Even though a node is tagged with the OF_POPULATED flag when checking
+> > > the access rights with the firewall controller, it seems that when
+> > > simple-bus is probing, there's no check of this flag.
+> > 
+> > It shouldn't. Those flags are for creating the devices (or not) and
+> > removing only devices of_platform_populate() created.
+> > 
+> 
+> About the "simple-bus" being a fallback, I think I understood why I saw
+> that the devices were created.
+> 
+> All devices under a node whose compatible is "simple-bus" are created
+> in of_platform_device_create_pdata(), called by
+> of_platform_default_populate_init() at arch_initcall level. This
+> before the firewall-controller has a chance to populate it's bus.
+> 
+> Therefore, when I flag nodes when populating the firewall-bus, the
+> devices are already created. The "simple-bus" mechanism is not a
+> fallback here as it precedes the driver probe.
+> 
+> Is there a safe way to safely remove/disable a device created this way?
 
-- Describe security properties of DCP trust source
-- Describe key usage
-- Document blob format
+There's 2 ways to handle this. Either controlling creating the device or 
+controlling probing the device. The latter should just work with 
+fw_devlink dependency. The former probably needs some adjustment to 
+simple-pm-bus driver if you have 'simple-bus' compatible. You want it to 
+probe on old kernels and not probe on new kernels with your firewall 
+driver. Look at the commit history for simple-pm-bus. There was some 
+discussion on it as well.
 
-Co-developed-by: Richard Weinberger <richard@nod.at>
-Signed-off-by: Richard Weinberger <richard@nod.at>
-Co-developed-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
-Signed-off-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
-Signed-off-by: David Gstir <david@sigma-star.at>
----
- .../security/keys/trusted-encrypted.rst       | 85 +++++++++++++++++++
- 1 file changed, 85 insertions(+)
+> Devices that are under the firewall controller (simple-bus) node
+> should not be probed before it as they're child of it.
 
-diff --git a/Documentation/security/keys/trusted-encrypted.rst b/Documentation/security/keys/trusted-encrypted.rst
-index 9bc9db8ec651..4452070afbe9 100644
---- a/Documentation/security/keys/trusted-encrypted.rst
-+++ b/Documentation/security/keys/trusted-encrypted.rst
-@@ -42,6 +42,14 @@ safe.
-          randomly generated and fused into each SoC at manufacturing time.
-          Otherwise, a common fixed test key is used instead.
- 
-+     (4) DCP (Data Co-Processor: crypto accelerator of various i.MX SoCs)
-+
-+         Rooted to a one-time programmable key (OTP) that is generally burnt
-+         in the on-chip fuses and is accessible to the DCP encryption engine only.
-+         DCP provides two keys that can be used as root of trust: the OTP key
-+         and the UNIQUE key. Default is to use the UNIQUE key, but selecting
-+         the OTP key can be done via a module parameter (dcp_use_otp_key).
-+
-   *  Execution isolation
- 
-      (1) TPM
-@@ -57,6 +65,12 @@ safe.
- 
-          Fixed set of operations running in isolated execution environment.
- 
-+     (4) DCP
-+
-+         Fixed set of cryptographic operations running in isolated execution
-+         environment. Only basic blob key encryption is executed there.
-+         The actual key sealing/unsealing is done on main processor/kernel space.
-+
-   * Optional binding to platform integrity state
- 
-      (1) TPM
-@@ -79,6 +93,11 @@ safe.
-          Relies on the High Assurance Boot (HAB) mechanism of NXP SoCs
-          for platform integrity.
- 
-+     (4) DCP
-+
-+         Relies on Secure/Trusted boot process (called HAB by vendor) for
-+         platform integrity.
-+
-   *  Interfaces and APIs
- 
-      (1) TPM
-@@ -94,6 +113,11 @@ safe.
- 
-          Interface is specific to silicon vendor.
- 
-+     (4) DCP
-+
-+         Vendor-specific API that is implemented as part of the DCP crypto driver in
-+         ``drivers/crypto/mxs-dcp.c``.
-+
-   *  Threat model
- 
-      The strength and appropriateness of a particular trust source for a given
-@@ -129,6 +153,13 @@ selected trust source:
-      CAAM HWRNG, enable CRYPTO_DEV_FSL_CAAM_RNG_API and ensure the device
-      is probed.
- 
-+  *  DCP (Data Co-Processor: crypto accelerator of various i.MX SoCs)
-+
-+     The DCP hardware device itself does not provide a dedicated RNG interface,
-+     so the kernel default RNG is used. SoCs with DCP like the i.MX6ULL do have
-+     a dedicated hardware RNG that is independent from DCP which can be enabled
-+     to back the kernel RNG.
-+
- Users may override this by specifying ``trusted.rng=kernel`` on the kernel
- command-line to override the used RNG with the kernel's random number pool.
- 
-@@ -231,6 +262,19 @@ Usage::
- CAAM-specific format.  The key length for new keys is always in bytes.
- Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
- 
-+Trusted Keys usage: DCP
-+-----------------------
-+
-+Usage::
-+
-+    keyctl add trusted name "new keylen" ring
-+    keyctl add trusted name "load hex_blob" ring
-+    keyctl print keyid
-+
-+"keyctl print" returns an ASCII hex copy of the sealed key, which is in format
-+specific to this DCP key-blob implementation.  The key length for new keys is
-+always in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
-+
- Encrypted Keys usage
- --------------------
- 
-@@ -426,3 +470,44 @@ string length.
- privkey is the binary representation of TPM2B_PUBLIC excluding the
- initial TPM2B header which can be reconstructed from the ASN.1 octed
- string length.
-+
-+DCP Blob Format
-+---------------
-+
-+The Data Co-Processor (DCP) provides hardware-bound AES keys using its
-+AES encryption engine only. It does not provide direct key sealing/unsealing.
-+To make DCP hardware encryption keys usable as trust source, we define
-+our own custom format that uses a hardware-bound key to secure the sealing
-+key stored in the key blob.
-+
-+Whenever a new trusted key using DCP is generated, we generate a random 128-bit
-+blob encryption key (BEK) and 128-bit nonce. The BEK and nonce are used to
-+encrypt the trusted key payload using AES-128-GCM.
-+
-+The BEK itself is encrypted using the hardware-bound key using the DCP's AES
-+encryption engine with AES-128-ECB. The encrypted BEK, generated nonce,
-+BEK-encrypted payload and authentication tag make up the blob format together
-+with a version number, payload length and authentication tag::
-+
-+    /*
-+     * struct dcp_blob_fmt - DCP BLOB format.
-+     *
-+     * @fmt_version: Format version, currently being %1
-+     * @blob_key: Random AES 128 key which is used to encrypt @payload,
-+     *            @blob_key itself is encrypted with OTP or UNIQUE device key in
-+     *            AES-128-ECB mode by DCP.
-+     * @nonce: Random nonce used for @payload encryption.
-+     * @payload_len: Length of the plain text @payload.
-+     * @payload: The payload itself, encrypted using AES-128-GCM and @blob_key,
-+     *           GCM auth tag of size AES_BLOCK_SIZE is attached at the end of it.
-+     *
-+     * The total size of a DCP BLOB is sizeof(struct dcp_blob_fmt) + @payload_len +
-+     * AES_BLOCK_SIZE.
-+     */
-+    struct dcp_blob_fmt {
-+            __u8 fmt_version;
-+            __u8 blob_key[AES_KEYSIZE_128];
-+            __u8 nonce[AES_KEYSIZE_128];
-+            __le32 payload_len;
-+            __u8 payload[];
-+    } __packed;
--- 
-2.35.3
+fw_devlink should take care of parent/child dependencies without any 
+explicit handling of the access ctrl binding.
 
+Rob
