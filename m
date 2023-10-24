@@ -2,194 +2,172 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27443C00A8F
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Oct 2023 13:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D844C00A8F
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Oct 2023 16:20:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234176AbjJXNRz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Oct 2023 09:17:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42930 "EHLO
+        id S234704AbjJXQUi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 24 Oct 2023 12:20:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232084AbjJXNRy (ORCPT
+        with ESMTP id S234658AbjJXQUg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Oct 2023 09:17:54 -0400
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91364C1;
-        Tue, 24 Oct 2023 06:17:52 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id CEEBB5C017D;
-        Tue, 24 Oct 2023 09:17:51 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Tue, 24 Oct 2023 09:17:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1698153471; x=1698239871; bh=ju
-        LUN5EOf1oun38yO5yy2NS/PjvfZz4177Yn5+hz4yQ=; b=n5JuawavBckG+td4zd
-        9bgRwuRpqQu0e1li/e77umwTpwdBwy0DLjFX3CyNt7mh81Xb8VYW0gXvlCFWRw6B
-        hj+fijwsz4eR49wI1VEhiMuAzHMpeRbELUPOmwyMHvqXjYp/QUR+9/Se6UYL+T4L
-        WDLTJHnW+8emUnHY2/S3SYHChMwDWnqqUAr12P0GwcRPCfjHc/Vx6zet1zUiY9Ab
-        QW3noxYanY1quUXitS/QIyprE60azjurUOVXm3jRf8IdUBLJOPQUfQwF1h0Y5NGi
-        6gLzeDZxr2RnAK37E9QNOt1pBZVPzuFw/z/XlaaIMV9UrlXcEYm5x7VM6gugIv8o
-        UBfw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; t=1698153471; x=1698239871; bh=juLUN5EOf1oun
-        38yO5yy2NS/PjvfZz4177Yn5+hz4yQ=; b=ho066+fpz4vqxQspl7eYkBvf670M0
-        QafoG/BnV/LA3QmmYpX25gHOuy6e1KX2q/EJoviBgTiQ8bEtGXhlgixr0PdEtdHP
-        UdgVO0ss1ZYKXyYAaPFpHpAb7uNyOApEx16iBFvqNHtzguv2pCDNgoXgDvDBXbx2
-        Eum49PB45Qv1wQwNAXunVGDvSL4OeJfcTdyC4QaVURCUcVN4eVgopaLx8oMT2E7V
-        cq9G95XNfiV1VTUkmn6go/PuJpp4x55ovVtU75KGke9BYIzfPM9PljR5ZiBtKHN/
-        HPitZ1g+BQNBBD4GmNtyUC4pTpD3oY2cjimFc6ZnqS4klc1L3cWmqG2ZQ==
-X-ME-Sender: <xms:_8M3ZWnJnKjq_-kk6s0hEnizc7y7AA36OyfNpqdFxNL3KSw6-4sY1Q>
-    <xme:_8M3Zd0zeKpSAD9_8WXmQGhYKMSP-M1Q-xFKuHbxpV6DepRGPaO4shdXDsw2hw3Al
-    eIRSW-rISm1gEikWDE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrkeekgdeiudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    hnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:_8M3ZUr74gAI76OAf2EDNunWuT_V6DLiFSCudIcNRc7aC5BeecLhVA>
-    <xmx:_8M3ZanmhGeqVetdMi6TitKDZMbJNC4wsgyPPj9eM5Vi7_rKEQrMbQ>
-    <xmx:_8M3ZU3Q4egefEBR3jYS0LbN2LFQKF0qlsVLKvLUFuM8mUjpwbnnCQ>
-    <xmx:_8M3ZVJKz9SsDBha72wGsT4j53_R7egs9Gz0MK1aBidGMKZdv-co3Q>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 5ADF0B60089; Tue, 24 Oct 2023 09:17:51 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1048-g9229b632c5-fm-20231019.001-g9229b632
+        Tue, 24 Oct 2023 12:20:36 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4F4883
+        for <linux-crypto@vger.kernel.org>; Tue, 24 Oct 2023 09:20:33 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-53e04b17132so7285555a12.0
+        for <linux-crypto@vger.kernel.org>; Tue, 24 Oct 2023 09:20:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sigma-star.at; s=google; t=1698164432; x=1698769232; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TRO+xCDaQbDKnIXJCwBi3Y2yF65udPG/2rEKc0aYwBQ=;
+        b=R7vVo7ccej2Kfs+GhsAisurVFY5nd6/bOfFqi0lXMDbO7a2l8lPqzysC4bL6r+RnYp
+         h2R/+0PJJi1Juys2Ad2ooxjzYS/0EDXJM7BdmV0MUNYn7QFt0XbrdtIplDW4DahSmNjX
+         PQX5zN5YeCI6VJiOP3yuD3AyyKoSp3hjbq2X75cVYz5IyFfFO5deMPQPoQvUWAnRkd4m
+         S3G10SyPHpyl1NzNqhUGPHcVoJS2a311Tmny59lwn45IDHKio7va1vx+DmiZyi9HySY/
+         aWF9w345QCcIP8HGqiHwa8uhb44Dg/NNcWWXf6bJuKLrlUONDjMW9bmMNTUPE84JayzK
+         4cww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698164432; x=1698769232;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TRO+xCDaQbDKnIXJCwBi3Y2yF65udPG/2rEKc0aYwBQ=;
+        b=YY3sJT9hAbutIc/TrLV0OCZhMM2ebxoyrmJl/oow1pkyXAASDZhjx1fOeLKx26oRdi
+         MHweSibNDPeglSqMHOKZo51xcV4kpVQ4XYG2VTJeyPes6LUhWZqmVUZ8FuiLU86uUDld
+         dWqHCPtmW0bA+Sc3bXJmsGTJ4Bk8t1I5+qIMc4T592oFCSByISMNQUPSy2vZ4OG9xOxB
+         Sx/fQKZCXjDx2Dj+5jYt9+lFsG+qBbMO8deN1kdN2Z5o+KCJhE9cG+f1Opha23zoMju+
+         ITlspJmeWsC8krvc0iLHO0UleWyCeyBtEQka00ZWOuO7Vhjz9kl15zu6fUabE/eP70t6
+         6n7g==
+X-Gm-Message-State: AOJu0Yy04fhmcGU4YPb+Zn36EgqkJeE/XpcE1TCCa5QqWhrBviww+9eo
+        +0ew84CLoTTFSqAPiDlcKoqdVQ==
+X-Google-Smtp-Source: AGHT+IEIk3iJ6GCsHRYMeMdo8uw1QNTL6gntpg/5SaGUAZHqkqQekLyT81Tgpt8fo9diZdiabupYpQ==
+X-Received: by 2002:a17:907:c0d:b0:9be:8693:66bb with SMTP id ga13-20020a1709070c0d00b009be869366bbmr9625930ejc.59.1698164431055;
+        Tue, 24 Oct 2023 09:20:31 -0700 (PDT)
+Received: from localhost (clnet-p106-198.ikbnet.co.at. [83.175.106.198])
+        by smtp.gmail.com with UTF8SMTPSA id cw11-20020a170906c78b00b009add084a00csm8489556ejb.36.2023.10.24.09.20.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Oct 2023 09:20:30 -0700 (PDT)
+From:   David Gstir <david@sigma-star.at>
+To:     Mimi Zohar <zohar@linux.ibm.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     David Gstir <david@sigma-star.at>, Shawn Guo <shawnguo@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        sigma star Kernel Team <upstream+dcp@sigma-star.at>,
+        David Howells <dhowells@redhat.com>,
+        Li Yang <leoyang.li@nxp.com>, Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Tejun Heo <tj@kernel.org>,
+        "Steven Rostedt (Google)" <rostedt@goodmis.org>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org,
+        linux-security-module@vger.kernel.org
+Subject: [PATCH v4 0/5] DCP as trusted keys backend
+Date:   Tue, 24 Oct 2023 18:20:14 +0200
+Message-ID: <20231024162024.51260-1-david@sigma-star.at>
+X-Mailer: git-send-email 2.42.0
 MIME-Version: 1.0
-Message-Id: <b71034f4-5cdc-44e0-b72f-1a8ffae0593e@app.fastmail.com>
-In-Reply-To: <ZTe8NOgAjvKDA6z0@MiWiFi-R3L-srv>
-References: <20231023110308.1202042-1-arnd@kernel.org>
- <ZTe8NOgAjvKDA6z0@MiWiFi-R3L-srv>
-Date:   Tue, 24 Oct 2023 15:17:30 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Baoquan He" <bhe@redhat.com>
-Cc:     "Vivek Goyal" <vgoyal@redhat.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, kexec@lists.infradead.org,
-        x86@kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-crypto@vger.kernel.org, eric_devolder@yahoo.com
-Subject: Re: [PATCH 1/2] kexec: fix KEXEC_FILE dependencies
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 24, 2023, at 14:44, Baoquan He wrote:
-> Just add people and mailing list to CC since I didn't find this mail in
-> my box, just drag it via 'b4 am'.
->
-> On 10/23/23 at 01:01pm, Arnd Bergmann wrote:
-> ......
+This is a revival of the previous patch set submitted by Richard Weinberger:
+https://lore.kernel.org/linux-integrity/20210614201620.30451-1-richard@nod.at/
 
->> diff --git a/kernel/Kconfig.kexec b/kernel/Kconfig.kexec
->> index 7aff28ded2f48..bfc636d64ff2b 100644
->> --- a/kernel/Kconfig.kexec
->> +++ b/kernel/Kconfig.kexec
->> @@ -36,6 +36,7 @@ config KEXEC
->>  config KEXEC_FILE
->>  	bool "Enable kexec file based system call"
->>  	depends on ARCH_SUPPORTS_KEXEC_FILE
->> +	depends on CRYPTO_SHA256=y || !ARCH_SUPPORTS_KEXEC_PURGATORY
->
-> I am not sure if the logic is correct. In theory, kexec_file code
-> utilizes purgatory to verify the checksum digested during kernel loading
-> when try to jump to the kernel. That means kexec_file depends on
-> purgatory, but not contrary?
+v3 is here:
+https://lore.kernel.org/keyrings/20230918141826.8139-1-david@sigma-star.at/
 
-The expression I wrote is a bit confusing, but I think this just
-keeps the existing behavior:
+v3 -> v4:
+- Split changes on MAINTAINERS and documentation into dedicated patches
+- Use more concise wording in commit messages as suggested by Jarkko Sakkinen
+v2 -> v3:
+- Addressed review comments from Jarkko Sakkinen
+v1 -> v2:
+- Revive and rebase to latest version
+- Include review comments from Ahmad Fatoum
 
-- on architectures that select ARCH_SUPPORTS_KEXEC_PURGATORY
-  (powerpc, riscv, s390 and x86), we also require CRYPTO_SHA256
-  to be built-in.
-- on architectures that do not have ARCH_SUPPORTS_KEXEC_PURGATORY
-  (arm64 and parisc), CRYPTO_SHA256 is not used and can be disabled
-  or =m.
+The Data CoProcessor (DCP) is an IP core built into many NXP SoCs such
+as i.mx6ull.
 
-Since ARCH_SUPPORTS_KEXEC_PURGATORY is a 'bool' symbol, it could
-be written as
+Similar to the CAAM engine used in more powerful SoCs, DCP can AES-
+encrypt/decrypt user data using a unique, never-disclosed,
+device-specific key. Unlike CAAM though, it cannot directly wrap and
+unwrap blobs in hardware. As DCP offers only the bare minimum feature
+set and a blob mechanism needs aid from software. A blob in this case
+is a piece of sensitive data (e.g. a key) that is encrypted and
+authenticated using the device-specific key so that unwrapping can only
+be done on the hardware where the blob was wrapped.
 
-depends on (ARCH_SUPPORTS_KEXEC_PURGATORY && CRYPTO_SHA256=y) \
-           || !ARCH_SUPPORTS_KEXEC_PURGATORY
+This patch series adds a DCP based, trusted-key backend and is similar
+in spirit to the one by Ahmad Fatoum [0] that does the same for CAAM.
+It is of interest for similar use cases as the CAAM patch set, but for
+lower end devices, where CAAM is not available.
 
-if you find that clearer. I see that the second patch
-actually gets this wrong, it should actually do
+Because constructing and parsing the blob has to happen in software,
+we needed to decide on a blob format and chose the following:
 
-select CRYPTO if ARCH_SUPPORTS_KEXEC_PURGATORY
-select CRYPTO_SHA256 if ARCH_SUPPORTS_KEXEC_PURGATORY
+struct dcp_blob_fmt {
+	__u8 fmt_version;
+	__u8 blob_key[AES_KEYSIZE_128];
+	__u8 nonce[AES_KEYSIZE_128];
+	__le32 payload_len;
+	__u8 payload[];
+} __packed;
 
-> With these changes, we can achieve the goal to avoid building issue,
-> whereas the code logic becomes confusing. E.g people could disable
-> CONFIG_KEXEC_FILE, but still get purgatory code built in which is
-> totally useless.
->
-> Not sure if I think too much over this.
+The `fmt_version` is currently 1.
 
-I see your point here, and I would suggest changing the
-CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY symbol to just indicate
-the availability of the purgatory code for the arch, rather
-than actually controlling the code itself. I already mentioned
-this for s390, but riscv would need the same thing on top.
+The encrypted key is stored in the payload area. It is AES-128-GCM
+encrypted using `blob_key` and `nonce`, GCM auth tag is attached at
+the end of the payload (`payload_len` does not include the size of
+the auth tag).
 
-I think the change below should address your concern.
+The `blob_key` itself is encrypted in AES-128-ECB mode by DCP using
+the OTP or UNIQUE device key. A new `blob_key` and `nonce` are generated
+randomly, when sealing/exporting the DCP blob.
 
-     Arnd
+This patchset was tested with dm-crypt on an i.MX6ULL board.
 
-diff --git a/arch/riscv/kernel/elf_kexec.c b/arch/riscv/kernel/elf_kexec.c
-index e60fbd8660c4..3ac341d296db 100644
---- a/arch/riscv/kernel/elf_kexec.c
-+++ b/arch/riscv/kernel/elf_kexec.c
-@@ -266,7 +266,7 @@ static void *elf_kexec_load(struct kimage *image, char *kernel_buf,
-                cmdline = modified_cmdline;
-        }
- 
--#ifdef CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY
-+#ifdef CONFIG_KEXEC_FILE
-        /* Add purgatory to the image */
-        kbuf.top_down = true;
-        kbuf.mem = KEXEC_BUF_MEM_UNKNOWN;
-@@ -280,7 +280,7 @@ static void *elf_kexec_load(struct kimage *image, char *kernel_buf,
-                                             sizeof(kernel_start), 0);
-        if (ret)
-                pr_err("Error update purgatory ret=%d\n", ret);
--#endif /* CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY */
-+#endif /* CONFIG_KEXEC_FILE */
- 
-        /* Add the initrd to the image */
-        if (initrd != NULL) {
-diff --git a/arch/riscv/Kbuild b/arch/riscv/Kbuild
-index d25ad1c19f88..ab181d187c23 100644
---- a/arch/riscv/Kbuild
-+++ b/arch/riscv/Kbuild
-@@ -5,7 +5,7 @@ obj-$(CONFIG_BUILTIN_DTB) += boot/dts/
- obj-y += errata/
- obj-$(CONFIG_KVM) += kvm/
- 
--obj-$(CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY) += purgatory/
-+obj-$(CONFIG_KEXEC_FILE) += purgatory/
- 
- # for cleaning
- subdir- += boot
-diff --git a/arch/s390/Kbuild b/arch/s390/Kbuild
-index a5d3503b353c..361aa01dbd49 100644
---- a/arch/s390/Kbuild
-+++ b/arch/s390/Kbuild
-@@ -7,7 +7,7 @@ obj-$(CONFIG_S390_HYPFS)        += hypfs/
- obj-$(CONFIG_APPLDATA_BASE)    += appldata/
- obj-y                          += net/
- obj-$(CONFIG_PCI)              += pci/
--obj-$(CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY) += purgatory/
-+obj-$(CONFIG_KEXEC_FILE)       += purgatory/
- 
- # for cleaning
- subdir- += boot tools
+[0] https://lore.kernel.org/keyrings/20220513145705.2080323-1-a.fatoum@pengutronix.de/
+
+David Gstir (5):
+  crypto: mxs-dcp: Add support for hardware-bound keys
+  KEYS: trusted: Introduce NXP DCP-backed trusted keys
+  MAINTAINERS: add entry for DCP-based trusted keys
+  docs: document DCP-backed trusted keys kernel params
+  docs: trusted-encrypted: add DCP as new trust source
+
+ .../admin-guide/kernel-parameters.txt         |  13 +
+ .../security/keys/trusted-encrypted.rst       |  85 +++++
+ MAINTAINERS                                   |   9 +
+ drivers/crypto/mxs-dcp.c                      | 104 +++++-
+ include/keys/trusted_dcp.h                    |  11 +
+ include/soc/fsl/dcp.h                         |  17 +
+ security/keys/trusted-keys/Kconfig            |   9 +-
+ security/keys/trusted-keys/Makefile           |   2 +
+ security/keys/trusted-keys/trusted_core.c     |   6 +-
+ security/keys/trusted-keys/trusted_dcp.c      | 311 ++++++++++++++++++
+ 10 files changed, 554 insertions(+), 13 deletions(-)
+ create mode 100644 include/keys/trusted_dcp.h
+ create mode 100644 include/soc/fsl/dcp.h
+ create mode 100644 security/keys/trusted-keys/trusted_dcp.c
+
+-- 
+2.35.3
 
