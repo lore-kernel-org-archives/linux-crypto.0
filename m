@@ -2,533 +2,125 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A8C2C25B6B
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 06:59:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF83AC0032E
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 07:26:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232398AbjJYG7Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Oct 2023 02:59:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37700 "EHLO
+        id S232809AbjJYH0e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Oct 2023 03:26:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232464AbjJYG7V (ORCPT
+        with ESMTP id S232777AbjJYH0c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Oct 2023 02:59:21 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2088.outbound.protection.outlook.com [40.107.223.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ABB11AC;
-        Tue, 24 Oct 2023 23:59:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UYoVhyQpjfAJPdwn5HryczDm2oDITOZRDPT5N3I/u2cpn0AyPSELD5ZrGXp4/DzNJOu0Wxu1V0CwuqVutdrnPILr0xJPxL5bFTYMbJbNEQ4n/JFNlj7kFl7KbWaSCMMyCvSLL6vWk3PWzfF744oRvYoED3R88PnHtQibyFg8TbzS2REXUwcK0HdyA6G8laD5PI7biq1rW0AECvwAH5ycdd415tXm3Mm+s+zsOkPKR9xYOO141cc8icPy25v0r5zz7qrAmRb+Va1RSbX/flx7jQ8K9FB7h1G5y2hDbJMjqlrOviXJAygWjYVYKJr7rViQKlpDgElsM3ak/zWsXZIA4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ckWBEZeidJZReDK1hNwwgvj0byokhOBvzxlNdWHB8Uo=;
- b=b796Gc5uv9AGadvntMnRvfsoLcFSK0GtoxuCIJeH2MF6YsAvnqCP73EqqsEkmxneFlF3qfQDdWG/ocZazOhq0fB1wz1nUIQFx2yMPsEPZbLteqCxXutCiBiBav7KCTAufwbIN6d5RC0Bk+lgWhHy/CibG8t0KNDBb1RHH60NOymMbnM/GUyKgCwbj+YOi6OFhQxfklYL+yeN16G0Ns+VkgE03HL5i+sD0Ay3eMOnlVN+OPK3Ejp1RIn/BibCeG/L6+xOtdhHpE8pCAE97gmY94B5GfmnEBpsyUVA5puRxUOPcqoYtnKvd4CxePuFynpORpr3kGNkwztJddZezdHhNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ckWBEZeidJZReDK1hNwwgvj0byokhOBvzxlNdWHB8Uo=;
- b=rx2R9HXLyx0wpvaHzzRBjEeLwvqcv0HYX+2W7VFkjhAuI33PmUkI08WQYKfXO0j9T+5n+df8aDAHnEkwsNm9IO3fAW4BadoQjIMTJrIWa2fvc1tpLHRlpRGVwziwqQDFvcwl5GepOQqQ2RmJNeMZO29yG449Oc1BgSKGGhRNSJI=
-Received: from SA0PR13CA0004.namprd13.prod.outlook.com (2603:10b6:806:130::9)
- by SA1PR12MB9248.namprd12.prod.outlook.com (2603:10b6:806:3a3::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Wed, 25 Oct
- 2023 06:59:12 +0000
-Received: from SN1PEPF0002BA4E.namprd03.prod.outlook.com
- (2603:10b6:806:130:cafe::c) by SA0PR13CA0004.outlook.office365.com
- (2603:10b6:806:130::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.19 via Frontend
- Transport; Wed, 25 Oct 2023 06:59:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF0002BA4E.mail.protection.outlook.com (10.167.242.71) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6933.15 via Frontend Transport; Wed, 25 Oct 2023 06:59:12 +0000
-Received: from andbang9.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 25 Oct
- 2023 01:59:06 -0500
-From:   jeshwank <JESHWANTHKUMAR.NK@amd.com>
-To:     <thomas.lendacky@amd.com>, <john.allen@amd.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <jens.wiklander@linaro.org>, <sumit.garg@linaro.org>,
-        <jarkko.nikula@linux.intel.com>, <mario.limonciello@amd.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <op-tee@lists.trustedfirmware.org>
-CC:     <Mythri.Pandeshwarakrishna@amd.com>, <Devaraj.Rangasamy@amd.com>,
-        <Rijo-john.Thomas@amd.com>, <nimesh.easow@amd.com>,
-        <JESHWANTHKUMAR.NK@amd.com>
-Subject: [PATCH 3/3] tee: amdtee: Use psp_tee_alloc_buffer() and psp_tee_free_buffer()
-Date:   Wed, 25 Oct 2023 12:27:00 +0530
-Message-ID: <20231025065700.1556152-4-JESHWANTHKUMAR.NK@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231025065700.1556152-1-JESHWANTHKUMAR.NK@amd.com>
-References: <20231025065700.1556152-1-JESHWANTHKUMAR.NK@amd.com>
+        Wed, 25 Oct 2023 03:26:32 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6250E5
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 00:26:29 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-32dc9ff4a8fso3581362f8f.1
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 00:26:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1698218788; x=1698823588; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hFZGMkXUg4RTKKDxNnBfB5PKNPaqSYkfEF3TgYKEoFE=;
+        b=PxR5KsL5G6sQqeZs/iXOJFgyShru7+b9idlmaBNMMMJNFze37Rcu7CnK5ohBGcmPvH
+         cWBvr9aLTBZCpqE0gHEaxdG/IlLhd1aJzpKdckikDOjd/jM4bJNc+kfmFlkiSR4hG6Iz
+         srdNSSSf4g6hHUfg+PyXwv0dUwfUygfpQpRUhlFUTN593VwpWiSHDJEb+ZRmpxymgH0J
+         6vfRZzWKP3/9TnlJRvmzmdh0wQF5XG8PGHv9LGSqeyG8vZ+Bd3ueLf+aUcvl+tA7upFu
+         GznmadL0WCsJ8CKLS0PXvFqnK07QhM/kY38B1zAE/YFokQbdL7W7VB30z9DwqwulrGP7
+         NjMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698218788; x=1698823588;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hFZGMkXUg4RTKKDxNnBfB5PKNPaqSYkfEF3TgYKEoFE=;
+        b=s0QcF+tPeagkviL1TFbnUmrP0f0WiI1IHFNwI52V/qcMAZmyXN3hrzePgL5f2iyqxF
+         f//8cQP/LSLhkONwTNPr+6hC8ojX4H8xo3o0WGglbVfkyWjYKukoOe+SKQAhY+9mLm0x
+         Bb+x+acjblBdmjQT7ySSyyCv94ta/ydsKW+VyOfcSBDBsMsWYXNxzsxAez1ieHIP5tYh
+         sL97Yf+7WSqOfad1rYwBH2Qhz10OR/nFuo6koD76wt7bKuRYMddastF7BPXqujGIFIKz
+         jfb1j2XNZvoqVRupeMZIbPMYWSMS2OTqKImqezIUBTR8hUC/3qUiSzBiDi/fCXXSK/cC
+         C1mA==
+X-Gm-Message-State: AOJu0YzhYVJ7yPorj5t7k5nnl1Ji5f0t/ndo5wTXR/iyBw0tkH0KwBm4
+        AAtOy1PjMIHTQRcLYYLfjF/sFLQ6Qd+29EW3DgMzsjCI
+X-Google-Smtp-Source: AGHT+IHRO7nOAEgsVsc+r3HSZhiKCm6mKMemwUFkJ3Wjf1yZADR53GIsH6Je5vQup/knzzVMXTQ6ew==
+X-Received: by 2002:adf:f711:0:b0:32c:eeee:d438 with SMTP id r17-20020adff711000000b0032ceeeed438mr10859100wrp.54.1698218788026;
+        Wed, 25 Oct 2023 00:26:28 -0700 (PDT)
+Received: from arrakeen.starnux.net ([2a01:e0a:982:cbb0:52eb:f6ff:feb3:451a])
+        by smtp.gmail.com with ESMTPSA id o7-20020a056000010700b003232d122dbfsm11387445wrx.66.2023.10.25.00.26.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Oct 2023 00:26:27 -0700 (PDT)
+From:   Neil Armstrong <neil.armstrong@linaro.org>
+Date:   Wed, 25 Oct 2023 09:26:26 +0200
+Subject: [PATCH] dt-bindings: crypto: qcom,inline-crypto-engine: document
+ the SM8650 ICE
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA4E:EE_|SA1PR12MB9248:EE_
-X-MS-Office365-Filtering-Correlation-Id: ccbb4be3-d714-4d6f-f8e1-08dbd527e4cb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ePNOO5RsFvvqkseZfG7EvqL+dpPE4OUNihJ1u3yEo/veR3R0YjMhqhJj8tMMKhPtvbZMA28VSv2T+O1qtlhXWoKqXWR3fl9r8jkVE0zmLfMYL3Wj4oxdonxOk2m4duLaeDb5k837soCWHx85n4Bq+hxoa8MAiciwPFUUzfrXEAHcfwT3Pe7J41sFskMduiqhZWmDS1qrFMm2ECuHa0ib7aFayfqNCHKSc+Fzy/3lL55JrSY+GYfEOUIgbsWnd0ImWoPgeULQLNYHCiKNYHDDHpeOL4W8wEFMD3bbfyA3cvfh5K/VEUh0MLAfgo07AmVCsp7qxal2NSchSXj3xLETy3C+ffQ29jdTFyq2AGSdsL73uZCVirqwmdoRRn5VoPcumYsVPrHVmkgx0l3wzpKeIdWZ5NUY4M53Jy4h/KA4P9NDvoG149fDRe6Mqe6ve3Y+NQtTEm1fqIIgzNLHEU3lACZW/m+/MmQVkPdDQw+kGncLjM0gfJau9ZZvE+lhixLSl541t+OU5X+CkSXy63qRGPS+u0dkoAaNkawFrOuS140ZHuRBR9J1Lor/KrM3ikLCUGIuYNBRIAKbi2bDDP+5WeEzpd5qRBXWn3IrJapRcK3e4QUdbaZw8V8vTN/VhHyqU/AttFkscR5tn/TCvGJ85hfs/D1IDXJnw4P8WdOPfO4BCTpoYEwWfPutNZGiCjE3kWrUZVeumah4Bp3rrWUlWTIO0RfEv9VIRt2oIlZ/9werPnwbvvvrefjkYgKZgI++UEU0bhNpJWqBQAOs7nkYnadzXrTfyLrGfKr6+8x8wt13/vnDdtwe5bHVAFTA9Eoj
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(346002)(396003)(39860400002)(376002)(230922051799003)(64100799003)(451199024)(1800799009)(82310400011)(186009)(36840700001)(46966006)(40470700004)(36756003)(81166007)(40480700001)(2616005)(110136005)(336012)(40460700003)(316002)(41300700001)(54906003)(70206006)(26005)(6666004)(16526019)(82740400003)(478600001)(1076003)(426003)(7696005)(70586007)(86362001)(47076005)(36860700001)(356005)(2906002)(5660300002)(30864003)(33656002)(4326008)(83380400001)(8676002)(8936002)(921008)(43062005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 06:59:12.1602
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ccbb4be3-d714-4d6f-f8e1-08dbd527e4cb
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF0002BA4E.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9248
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20231025-topic-sm8650-upstream-bindings-ice-v1-1-6b2bc14e71db@linaro.org>
+X-B4-Tracking: v=1; b=H4sIACHDOGUC/x3NQQ6CMBBG4auQWTtJSy2IVyEusEzxX1CaDhoTw
+ t1tXH6b9w5SKRCle3NQkQ8UW6qwl4bCa0qLMOZqak3rrLEd71tGYF1vnTf8zroXmVZ+Is1IizK
+ CcPR9HHrnrt4NVEO5SMT3Pxkf5/kDJ0uqSXQAAAA=
+To:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>
+Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Neil Armstrong <neil.armstrong@linaro.org>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1290;
+ i=neil.armstrong@linaro.org; h=from:subject:message-id;
+ bh=TfbZhtTr6JCUE3rn7VVswLJ81woB8n7GnmkkjwpPq38=;
+ b=owEBbAKT/ZANAwAKAXfc29rIyEnRAcsmYgBlOMMi2B1aswsPGCUOxirWk8lM3fVELV8H80Qpdy74
+ 26hgTHCJAjIEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZTjDIgAKCRB33NvayMhJ0ZqvD/
+ jr8mzxxVZY0DZIeJ55L1ONGiHuVDZlK41w46fiq5TtOw2kLtEpArHHRBp3iLg4qTC0BVxM2+2bDVjt
+ FYRUuGJLLfIBirxrzbAgxjjBucsNZGbWwpoU3qBUwDizKPkOoXAH15Ys29g9FnLfqx09CTjpzjbKhH
+ krkG6Ptn1zwjovWLRVJwqG5w5TWoHCE86480oudQqAh5mR9WZiuC1V1tb5xgbn9VkyoS0RNlzg+xSf
+ 4UJoVismpHV5Gub+GAjDv/lgNgJvf0r9n5u6V146sn0V3BS2u1RoFrcmjv2+sARt9W/Q89uyP1lHfk
+ 2Ne597Ne/UXJE7T2AIzi2vtq0dBjTFhEcE8awvX6By1gPhshliu1FW8jLC/kIw+QjppRNk+w9minU9
+ fRu2gu9fBXE8jIcqJVl1egN+Z8SQjr/LzuQH3dElhAUJCQk0FhfvRXx/3itc+b775MrLUCKZV1rYrp
+ z06PvgENLGUn2IsoUC5avwco5Lq6k+dG0Z/wWKfc42mNxxKf1zzOzotA6Vbf5XtHEpQv0xABP3+Lc9
+ bgYyVI4hcB9o+EIUsdNj28VncgAyhPb1yg+/EVL6sRJ1FIAhmWzgCXukwLnLMfAaj8hyErj5Eqdpmd
+ AMMfkcxyvYfS3N+tiUbJQbEQFVVQBMWfNhvyjJrRMYb8nGKghMTtFyDyPX
+X-Developer-Key: i=neil.armstrong@linaro.org; a=openpgp;
+ fpr=89EC3D058446217450F22848169AB7B1A4CFF8AE
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Rijo Thomas <Rijo-john.Thomas@amd.com>
+Document the Inline Crypto Engine (ICE) on the SM8650 Platform.
 
-Allocate shared memory using psp_tee_alloc_buffer(), and free shared
-memory using psp_tee_free_buffer().
-
-As part of cleanup, memory allocation using get_free_pages() is replaced
-with DMA APIs.
-
-Signed-off-by: Rijo Thomas <Rijo-john.Thomas@amd.com>
-Signed-off-by: Jeshwanth Kumar <JESHWANTHKUMAR.NK@amd.com>
+Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
 ---
- drivers/tee/amdtee/amdtee_private.h | 18 +++----
- drivers/tee/amdtee/call.c           | 74 +++++++++++++----------------
- drivers/tee/amdtee/core.c           | 72 +++++++++++++++++-----------
- drivers/tee/amdtee/shm_pool.c       | 21 ++------
- 4 files changed, 89 insertions(+), 96 deletions(-)
+For convenience, a regularly refreshed linux-next based git tree containing
+all the SM8650 related work is available at:
+https://git.codelinaro.org/neil.armstrong/linux/-/tree/topic/sm85650/upstream/integ
+---
+ Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/tee/amdtee/amdtee_private.h b/drivers/tee/amdtee/amdtee_private.h
-index 6d0f7062bb87..e2bb0a21942c 100644
---- a/drivers/tee/amdtee/amdtee_private.h
-+++ b/drivers/tee/amdtee/amdtee_private.h
-@@ -13,6 +13,7 @@
- #include <linux/kref.h>
- #include <linux/types.h>
- #include "amdtee_if.h"
-+#include <linux/psp-tee.h>
+diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+index ca4f7d1cefaa..09e43157cc71 100644
+--- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
++++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+@@ -16,6 +16,7 @@ properties:
+           - qcom,sa8775p-inline-crypto-engine
+           - qcom,sm8450-inline-crypto-engine
+           - qcom,sm8550-inline-crypto-engine
++          - qcom,sm8650-inline-crypto-engine
+       - const: qcom,inline-crypto-engine
  
- #define DRIVER_NAME	"amdtee"
- #define DRIVER_AUTHOR   "AMD-TEE Linux driver team"
-@@ -78,19 +79,14 @@ struct amdtee_driver_data {
- 	struct amdtee *amdtee;
- };
- 
--struct shmem_desc {
--	void *kaddr;
--	u64 size;
--};
--
- /**
-  * struct amdtee_shm_data - Shared memory data
-- * @kaddr:	Kernel virtual address of shared memory
-+ * @shm_buf:	Pointer to shared memory buffer
-  * @buf_id:	Buffer id of memory mapped by TEE_CMD_ID_MAP_SHARED_MEM
-  */
- struct amdtee_shm_data {
- 	struct  list_head shm_node;
--	void    *kaddr;
-+	struct	psp_tee_buffer *shm_buf;
- 	u32     buf_id;
- };
- 
-@@ -145,11 +141,11 @@ int amdtee_invoke_func(struct tee_context *ctx,
- 
- int amdtee_cancel_req(struct tee_context *ctx, u32 cancel_id, u32 session);
- 
--int amdtee_map_shmem(struct tee_shm *shm);
-+int amdtee_alloc_shmem(struct tee_shm *shm);
- 
--void amdtee_unmap_shmem(struct tee_shm *shm);
-+void amdtee_free_shmem(struct tee_shm *shm);
- 
--int handle_load_ta(void *data, u32 size,
-+int handle_load_ta(struct psp_tee_buffer *buf,
- 		   struct tee_ioctl_open_session_arg *arg);
- 
- int handle_unload_ta(u32 ta_handle);
-@@ -159,7 +155,7 @@ int handle_open_session(struct tee_ioctl_open_session_arg *arg, u32 *info,
- 
- int handle_close_session(u32 ta_handle, u32 info);
- 
--int handle_map_shmem(u32 count, struct shmem_desc *start, u32 *buf_id);
-+int handle_map_shmem(struct psp_tee_buffer *shm_buf, u32 *buf_id);
- 
- void handle_unmap_shmem(u32 buf_id);
- 
-diff --git a/drivers/tee/amdtee/call.c b/drivers/tee/amdtee/call.c
-index e9b63dcb3194..031d37cc975c 100644
---- a/drivers/tee/amdtee/call.c
-+++ b/drivers/tee/amdtee/call.c
-@@ -283,53 +283,44 @@ int handle_invoke_cmd(struct tee_ioctl_invoke_arg *arg, u32 sinfo,
- 	return ret;
- }
- 
--int handle_map_shmem(u32 count, struct shmem_desc *start, u32 *buf_id)
-+int handle_map_shmem(struct psp_tee_buffer *shm_buf, u32 *buf_id)
- {
- 	struct tee_cmd_map_shared_mem *cmd;
--	phys_addr_t paddr;
--	int ret, i;
- 	u32 status;
-+	int ret;
- 
--	if (!count || !start || !buf_id)
-+	if (!shm_buf || !shm_buf->vaddr || !buf_id)
- 		return -EINVAL;
- 
- 	cmd = kzalloc(sizeof(*cmd), GFP_KERNEL);
- 	if (!cmd)
- 		return -ENOMEM;
- 
--	/* Size must be page aligned */
--	for (i = 0; i < count ; i++) {
--		if (!start[i].kaddr || (start[i].size & (PAGE_SIZE - 1))) {
--			ret = -EINVAL;
--			goto free_cmd;
--		}
--
--		if ((u64)start[i].kaddr & (PAGE_SIZE - 1)) {
--			pr_err("map shared memory: page unaligned. addr 0x%llx",
--			       (u64)start[i].kaddr);
--			ret = -EINVAL;
--			goto free_cmd;
--		}
-+	/* Size and address must be page aligned */
-+	if (shm_buf->size & (PAGE_SIZE - 1)) {
-+		ret = -EINVAL;
-+		goto free_cmd;
- 	}
- 
--	cmd->sg_list.count = count;
--
--	/* Create buffer list */
--	for (i = 0; i < count ; i++) {
--		paddr = __psp_pa(start[i].kaddr);
--		cmd->sg_list.buf[i].hi_addr = upper_32_bits(paddr);
--		cmd->sg_list.buf[i].low_addr = lower_32_bits(paddr);
--		cmd->sg_list.buf[i].size = start[i].size;
--		cmd->sg_list.size += cmd->sg_list.buf[i].size;
--
--		pr_debug("buf[%d]:hi addr = 0x%x\n", i,
--			 cmd->sg_list.buf[i].hi_addr);
--		pr_debug("buf[%d]:low addr = 0x%x\n", i,
--			 cmd->sg_list.buf[i].low_addr);
--		pr_debug("buf[%d]:size = 0x%x\n", i, cmd->sg_list.buf[i].size);
--		pr_debug("list size = 0x%x\n", cmd->sg_list.size);
-+	if ((u64)shm_buf->vaddr & (PAGE_SIZE - 1)) {
-+		pr_err("map shared memory: page unaligned. addr 0x%llx",
-+		       (u64)shm_buf->vaddr);
-+		ret = -EINVAL;
-+		goto free_cmd;
- 	}
- 
-+	/* Update sg list */
-+	cmd->sg_list.count = 1;
-+	cmd->sg_list.buf[0].hi_addr = upper_32_bits(shm_buf->paddr);
-+	cmd->sg_list.buf[0].low_addr = lower_32_bits(shm_buf->paddr);
-+	cmd->sg_list.buf[0].size = shm_buf->size;
-+	cmd->sg_list.size = cmd->sg_list.buf[0].size;
-+
-+	pr_debug("buf: hi addr = 0x%x\n", cmd->sg_list.buf[0].hi_addr);
-+	pr_debug("buf: low addr = 0x%x\n", cmd->sg_list.buf[0].low_addr);
-+	pr_debug("buf: size = 0x%x\n", cmd->sg_list.buf[0].size);
-+	pr_debug("list size = 0x%x\n", cmd->sg_list.size);
-+
- 	*buf_id = 0;
- 
- 	ret = psp_tee_process_cmd(TEE_CMD_ID_MAP_SHARED_MEM, (void *)cmd,
-@@ -396,25 +387,24 @@ int handle_open_session(struct tee_ioctl_open_session_arg *arg, u32 *info,
- 	return ret;
- }
- 
--int handle_load_ta(void *data, u32 size, struct tee_ioctl_open_session_arg *arg)
-+int handle_load_ta(struct psp_tee_buffer *buf,
-+		   struct tee_ioctl_open_session_arg *arg)
- {
- 	struct tee_cmd_unload_ta unload_cmd = {};
- 	struct tee_cmd_load_ta load_cmd = {};
--	phys_addr_t blob;
- 	int ret;
- 
--	if (size == 0 || !data || !arg)
-+	if (buf->size == 0 || !buf->paddr || !arg)
- 		return -EINVAL;
- 
--	blob = __psp_pa(data);
--	if (blob & (PAGE_SIZE - 1)) {
--		pr_err("load TA: page unaligned. blob 0x%llx", blob);
-+	if (buf->dma & (PAGE_SIZE - 1)) {
-+		pr_err("load TA: page unaligned. addr 0x%llx", buf->dma);
- 		return -EINVAL;
- 	}
- 
--	load_cmd.hi_addr = upper_32_bits(blob);
--	load_cmd.low_addr = lower_32_bits(blob);
--	load_cmd.size = size;
-+	load_cmd.hi_addr = upper_32_bits(buf->paddr);
-+	load_cmd.low_addr = lower_32_bits(buf->paddr);
-+	load_cmd.size = buf->size;
- 
- 	mutex_lock(&ta_refcount_mutex);
- 
-diff --git a/drivers/tee/amdtee/core.c b/drivers/tee/amdtee/core.c
-index 3c15f6a9e91c..37784360fc10 100644
---- a/drivers/tee/amdtee/core.c
-+++ b/drivers/tee/amdtee/core.c
-@@ -17,6 +17,7 @@
- #include "amdtee_private.h"
- #include "../tee_private.h"
- #include <linux/psp-tee.h>
-+#include <linux/psp.h>
- 
- static struct amdtee_driver_data *drv_data;
- static DEFINE_MUTEX(session_list_mutex);
-@@ -158,7 +159,8 @@ u32 get_buffer_id(struct tee_shm *shm)
- 
- 	mutex_lock(&ctxdata->shm_mutex);
- 	list_for_each_entry(shmdata, &ctxdata->shm_list, shm_node)
--		if (shmdata->kaddr == shm->kaddr) {
-+		if (shmdata->shm_buf &&
-+		    shmdata->shm_buf->vaddr == shm->kaddr) {
- 			buf_id = shmdata->buf_id;
- 			break;
- 		}
-@@ -168,11 +170,13 @@ u32 get_buffer_id(struct tee_shm *shm)
- }
- 
- static DEFINE_MUTEX(drv_mutex);
--static int copy_ta_binary(struct tee_context *ctx, void *ptr, void **ta,
--			  size_t *ta_size)
-+static int copy_ta_binary(struct tee_context *ctx, void *ptr,
-+			  struct psp_tee_buffer **bufp)
- {
- 	const struct firmware *fw;
- 	char fw_name[TA_PATH_MAX];
-+	struct psp_tee_buffer *buf;
-+	unsigned long size;
- 	struct {
- 		u32 lo;
- 		u16 mid;
-@@ -201,15 +205,16 @@ static int copy_ta_binary(struct tee_context *ctx, void *ptr, void **ta,
- 		goto unlock;
- 	}
- 
--	*ta_size = roundup(fw->size, PAGE_SIZE);
--	*ta = (void *)__get_free_pages(GFP_KERNEL, get_order(*ta_size));
--	if (!*ta) {
--		pr_err("%s: get_free_pages failed\n", __func__);
-+	size = roundup(fw->size, PAGE_SIZE);
-+	buf = psp_tee_alloc_buffer(size, GFP_KERNEL);
-+	if (!buf) {
-+		pr_err("TA binary memory allocation failed\n");
- 		rc = -ENOMEM;
- 		goto rel_fw;
- 	}
-+	memcpy(buf->vaddr, fw->data, fw->size);
-+	*bufp = buf;
- 
--	memcpy(*ta, fw->data, fw->size);
- rel_fw:
- 	release_firmware(fw);
- unlock:
-@@ -234,24 +239,23 @@ int amdtee_open_session(struct tee_context *ctx,
- {
- 	struct amdtee_context_data *ctxdata = ctx->data;
- 	struct amdtee_session *sess = NULL;
-+	struct psp_tee_buffer *buf;
- 	u32 session_info, ta_handle;
--	size_t ta_size;
- 	int rc, i;
--	void *ta;
- 
- 	if (arg->clnt_login != TEE_IOCTL_LOGIN_PUBLIC) {
- 		pr_err("unsupported client login method\n");
- 		return -EINVAL;
- 	}
- 
--	rc = copy_ta_binary(ctx, &arg->uuid[0], &ta, &ta_size);
-+	rc = copy_ta_binary(ctx, &arg->uuid[0], &buf);
- 	if (rc) {
- 		pr_err("failed to copy TA binary\n");
- 		return rc;
- 	}
- 
- 	/* Load the TA binary into TEE environment */
--	handle_load_ta(ta, ta_size, arg);
-+	handle_load_ta(buf, arg);
- 	if (arg->ret != TEEC_SUCCESS)
- 		goto out;
- 
-@@ -298,7 +302,7 @@ int amdtee_open_session(struct tee_context *ctx,
- 	}
- 
- out:
--	free_pages((u64)ta, get_order(ta_size));
-+	psp_tee_free_buffer(buf);
- 	return rc;
- }
- 
-@@ -338,51 +342,62 @@ int amdtee_close_session(struct tee_context *ctx, u32 session)
- 	return 0;
- }
- 
--int amdtee_map_shmem(struct tee_shm *shm)
-+int amdtee_alloc_shmem(struct tee_shm *shm)
- {
- 	struct amdtee_context_data *ctxdata;
- 	struct amdtee_shm_data *shmnode;
--	struct shmem_desc shmem;
--	int rc, count;
-+	struct psp_tee_buffer *shm_buf;
- 	u32 buf_id;
-+	int rc;
- 
- 	if (!shm)
- 		return -EINVAL;
- 
--	shmnode = kmalloc(sizeof(*shmnode), GFP_KERNEL);
--	if (!shmnode)
-+	shm_buf = psp_tee_alloc_buffer(shm->size, GFP_KERNEL | __GFP_ZERO);
-+	if (!shm_buf)
- 		return -ENOMEM;
- 
--	count = 1;
--	shmem.kaddr = shm->kaddr;
--	shmem.size = shm->size;
-+	shm->kaddr = shm_buf->vaddr;
-+	shm->paddr = __psp_pa(shm_buf->vaddr);
-+
-+	shmnode = kmalloc(sizeof(*shmnode), GFP_KERNEL);
-+	if (!shmnode) {
-+		rc = -ENOMEM;
-+		goto free_dmabuf;
-+	}
- 
- 	/*
- 	 * Send a MAP command to TEE and get the corresponding
- 	 * buffer Id
- 	 */
--	rc = handle_map_shmem(count, &shmem, &buf_id);
-+	rc = handle_map_shmem(shm_buf, &buf_id);
- 	if (rc) {
- 		pr_err("map_shmem failed: ret = %d\n", rc);
--		kfree(shmnode);
--		return rc;
-+		goto free_shmnode;
- 	}
- 
--	shmnode->kaddr = shm->kaddr;
-+	shmnode->shm_buf = shm_buf;
- 	shmnode->buf_id = buf_id;
- 	ctxdata = shm->ctx->data;
- 	mutex_lock(&ctxdata->shm_mutex);
- 	list_add(&shmnode->shm_node, &ctxdata->shm_list);
- 	mutex_unlock(&ctxdata->shm_mutex);
- 
--	pr_debug("buf_id :[%x] kaddr[%p]\n", shmnode->buf_id, shmnode->kaddr);
-+	pr_debug("buf_id :[%x] kaddr[%p]\n", shmnode->buf_id, shm->kaddr);
- 
- 	return 0;
-+
-+free_shmnode:
-+	kfree(shmnode);
-+free_dmabuf:
-+	psp_tee_free_buffer(shm_buf);
-+	return rc;
- }
- 
--void amdtee_unmap_shmem(struct tee_shm *shm)
-+void amdtee_free_shmem(struct tee_shm *shm)
- {
- 	struct amdtee_context_data *ctxdata;
-+	struct psp_tee_buffer *shm_buf = NULL;
- 	struct amdtee_shm_data *shmnode;
- 	u32 buf_id;
- 
-@@ -390,6 +405,7 @@ void amdtee_unmap_shmem(struct tee_shm *shm)
- 		return;
- 
- 	buf_id = get_buffer_id(shm);
-+
- 	/* Unmap the shared memory from TEE */
- 	handle_unmap_shmem(buf_id);
- 
-@@ -398,10 +414,12 @@ void amdtee_unmap_shmem(struct tee_shm *shm)
- 	list_for_each_entry(shmnode, &ctxdata->shm_list, shm_node)
- 		if (buf_id == shmnode->buf_id) {
- 			list_del(&shmnode->shm_node);
-+			shm_buf = shmnode->shm_buf;
- 			kfree(shmnode);
- 			break;
- 		}
- 	mutex_unlock(&ctxdata->shm_mutex);
-+	psp_tee_free_buffer(shm_buf);
- }
- 
- int amdtee_invoke_func(struct tee_context *ctx,
-diff --git a/drivers/tee/amdtee/shm_pool.c b/drivers/tee/amdtee/shm_pool.c
-index f0303126f199..443874c82611 100644
---- a/drivers/tee/amdtee/shm_pool.c
-+++ b/drivers/tee/amdtee/shm_pool.c
-@@ -12,25 +12,13 @@ static int pool_op_alloc(struct tee_shm_pool *pool, struct tee_shm *shm,
- 			 size_t size, size_t align)
- {
- 	unsigned int order = get_order(size);
--	unsigned long va;
- 	int rc;
- 
--	/*
--	 * Ignore alignment since this is already going to be page aligned
--	 * and there's no need for any larger alignment.
--	 */
--	va = __get_free_pages(GFP_KERNEL | __GFP_ZERO, order);
--	if (!va)
--		return -ENOMEM;
--
--	shm->kaddr = (void *)va;
--	shm->paddr = __psp_pa((void *)va);
- 	shm->size = PAGE_SIZE << order;
- 
--	/* Map the allocated memory in to TEE */
--	rc = amdtee_map_shmem(shm);
-+	/* Allocate and map memory in to TEE */
-+	rc = amdtee_alloc_shmem(shm);
- 	if (rc) {
--		free_pages(va, order);
- 		shm->kaddr = NULL;
- 		return rc;
- 	}
-@@ -41,8 +29,9 @@ static int pool_op_alloc(struct tee_shm_pool *pool, struct tee_shm *shm,
- static void pool_op_free(struct tee_shm_pool *pool, struct tee_shm *shm)
- {
- 	/* Unmap the shared memory from TEE */
--	amdtee_unmap_shmem(shm);
--	free_pages((unsigned long)shm->kaddr, get_order(shm->size));
-+	amdtee_free_shmem(shm);
-+
-+	shm->size = 0;
- 	shm->kaddr = NULL;
- }
- 
+   reg:
+
+---
+base-commit: fe1998aa935b44ef873193c0772c43bce74f17dc
+change-id: 20231016-topic-sm8650-upstream-bindings-ice-f57f97334539
+
+Best regards,
 -- 
-2.25.1
+Neil Armstrong <neil.armstrong@linaro.org>
 
