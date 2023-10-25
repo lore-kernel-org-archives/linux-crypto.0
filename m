@@ -2,128 +2,107 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FCBEC0032E
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 13:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BABDC07545
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 13:32:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344716AbjJYNcA (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Oct 2023 09:32:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42294 "EHLO
+        id S235027AbjJYNcf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Oct 2023 09:32:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235018AbjJYNbc (ORCPT
+        with ESMTP id S235021AbjJYNcV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Oct 2023 09:31:32 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D56710D0
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 06:31:13 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-4079ed65582so44321535e9.1
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 06:31:13 -0700 (PDT)
+        Wed, 25 Oct 2023 09:32:21 -0400
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 343F81BCB
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 06:31:44 -0700 (PDT)
+Received: by mail-oi1-x231.google.com with SMTP id 5614622812f47-3af609c4dfeso3694283b6e.1
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 06:31:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1698240672; x=1698845472; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WJHhodEo9Mg5Sb1D06HbWzBXmtfErODVASwmg4rpCew=;
-        b=ThrkpWW6DcHqv6j3ND/GS9JQtqTItxY8GLOtAVhCW9RrwDEN7Js7tUCgKZ60/D8E0Z
-         oif5nfKlqZzTRFyBW3jQmUUdweDc1tFJzC5sRg3+YJTdvETa9i+HTvBPmkFZDxYFcN4Y
-         Q5r0DHYmqac1erbgJCotv1qVgPRRdmxumH+3rE9Zd3ryZXv7Re+P4b3olYl5PsFN3g+A
-         uheGwtaw4lLp5CSaLhkH32aV1ejEooptbR4iYH48Fk5aoLAqrSxpTvRN5GQ2jcdobu3M
-         WMqEJ4AyEXwN4EQPDyjWj7j92fNNAjws+d1suqeEMx+N49Lg53B4YLWyeB3zNkUqAeyB
-         wppA==
+        d=linaro.org; s=google; t=1698240703; x=1698845503; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZDeLJegtyrSMQs47LqN+x1DHWKzJbsn6ZNyTsWNzhD0=;
+        b=poNHIo88GlChypeADbhU097d9YMRUhAnPbjgvnE0pGsjh/3EOZExa9cUNtqNkh74Re
+         lzicw6lgi0zMEAVLLes+BairaaUKEL9pO5LM8OqVsOV6CyATcRCKfMHU3HvfKmyfMHjb
+         ZDIJIOD6nvLC0HtFU/tYmiZT/+SCYqDOQVP4f078GMr5X94KUo7s9Di4tsQcMTTUAckc
+         J6VfAAPDCJIvvzI0OzAaDhu3Hr8lkSjOJuQ1o3Cuvb7nlswXhpbFNkR9nWLQvV0ekQgs
+         04dykbr7fGeESFkhwH7OupNg7jv9q2InCx5Gsei1iYyzxD03c4mNd8k/La7HczboVovX
+         t0OQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698240672; x=1698845472;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WJHhodEo9Mg5Sb1D06HbWzBXmtfErODVASwmg4rpCew=;
-        b=ul5d8qijJWCZaOKCXgdUf/dxQUktSthKCFoZOsCGZDUax1NIlPQWA1Yn413qaP3Pp8
-         4JfUALJ4BFVT8i8hDY/Ml5XA6QT4ZEWyUCflSOAJ1N1j12Q+yeP8SPeCtrwE5SyBFwxL
-         qbCtAGb8YZBXr5QLxdMyJ8thQ6+kwzWQlCOVqpQpMYYvLuZCT7stuozHpNZjthQyQCXL
-         apATDHPnaHhoxEPMGKXlfCV1P0Jfudavn3eHxq9uE9U9svORqOFszxiO47rjrKNPOMt3
-         jQhvYrrU1xkQLfoHSdhMpMB4vpLafgx7l5NpIV7r5AOO8+a45J/MnVnDkc2egETmgfe+
-         e9iQ==
-X-Gm-Message-State: AOJu0YxA4NvgUrt7F7YAOUP2CqnZwTJAQhw3lEeM5mx95GTwsL9GNusb
-        akuQXIGJynJ25Y1kBQhjAAQYUQ==
-X-Google-Smtp-Source: AGHT+IG5TmoQSWagYVZDYEFtA3xQyjVPh4wRtdL4nDgviNvJdR54Bqa+t6mU4jxmEiLEOP/aqcQnpg==
-X-Received: by 2002:adf:e943:0:b0:329:6bdc:5a60 with SMTP id m3-20020adfe943000000b003296bdc5a60mr10530917wrn.12.1698240671827;
-        Wed, 25 Oct 2023 06:31:11 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id f4-20020a5d50c4000000b0032da319a27asm12213088wrt.9.2023.10.25.06.31.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 06:31:11 -0700 (PDT)
-Date:   Wed, 25 Oct 2023 15:31:09 +0200
-From:   Corentin LABBE <clabbe@baylibre.com>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Heiko Stuebner <heiko@sntech.de>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-rockchip@lists.infradead.org, kernel@pengutronix.de
-Subject: Re: [PATCH 34/42] crypto: rockchip/rk3288 - Convert to platform
- remove callback returning void
-Message-ID: <ZTkYnTY7VxIaIUak@Red>
-References: <20231020075521.2121571-44-u.kleine-koenig@pengutronix.de>
- <20231020075521.2121571-78-u.kleine-koenig@pengutronix.de>
+        d=1e100.net; s=20230601; t=1698240703; x=1698845503;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZDeLJegtyrSMQs47LqN+x1DHWKzJbsn6ZNyTsWNzhD0=;
+        b=iP9TRZ71S2399Fw/lD1yXi/Zohr3hLbjY21ektjGPxNbqpTYqTom9NOGZhjTIHPxC5
+         +fjqLxfUKRei9i8fgmk/uq9vDpX06TYbJh1ucacG6/eRE7nRDUTsYrIxHuVXlnag4xTG
+         gfAYzN+A4tdvvN1AJJIR8VhUgM2JFfrDh9rWi3aoO5IMzBrctLhkKcn+XiNKUGDh664/
+         5zX7o/8vW77t/6I57x/LjPoERDZ+cdybztzL6UANtctumJf1kL1S1qTHO6sZLbmD7MYY
+         5GgCw/H+h+RHIXshj2dXEbF2VdAQFkSD1lZJi+n57bva9rsaMN1xjRhacTptiFK5GFeL
+         lQEA==
+X-Gm-Message-State: AOJu0Yz59Y8znEEozVPoXqpeQ4MnctHd6Q8VCEjAUo3XsOnO9ZOJej9R
+        g3JqNkHIbviBUXiuvBziRLMBNyVy4hSZun3qkZ8hkQ==
+X-Google-Smtp-Source: AGHT+IHvVVWmzAv/4OQ7DckVr1zNALKZ+0FxM3O1RwNGzG2CeTimbYZdVJ7078LCw5pcHLanhYVCEflo58qYF4oANWU=
+X-Received: by 2002:a05:6808:aa3:b0:3ab:7f46:ecc5 with SMTP id
+ r3-20020a0568080aa300b003ab7f46ecc5mr15434307oij.35.1698240703272; Wed, 25
+ Oct 2023 06:31:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231020075521.2121571-78-u.kleine-koenig@pengutronix.de>
+References: <20231025065700.1556152-1-JESHWANTHKUMAR.NK@amd.com>
+In-Reply-To: <20231025065700.1556152-1-JESHWANTHKUMAR.NK@amd.com>
+From:   Sumit Garg <sumit.garg@linaro.org>
+Date:   Wed, 25 Oct 2023 19:01:31 +0530
+Message-ID: <CAFA6WYPKXFftMzqJ4GnXT-zqu21_Jzn8aKti_wU-pQ4KpEVNrA@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Introduce DMA APIs to allocate and free TEE shared memory
+To:     jeshwank <JESHWANTHKUMAR.NK@amd.com>
+Cc:     thomas.lendacky@amd.com, john.allen@amd.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jens.wiklander@linaro.org, jarkko.nikula@linux.intel.com,
+        mario.limonciello@amd.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, op-tee@lists.trustedfirmware.org,
+        Mythri.Pandeshwarakrishna@amd.com, Devaraj.Rangasamy@amd.com,
+        Rijo-john.Thomas@amd.com, nimesh.easow@amd.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Fri, Oct 20, 2023 at 09:55:56AM +0200, Uwe Kleine-König a écrit :
-> The .remove() callback for a platform driver returns an int which makes
-> many driver authors wrongly assume it's possible to do error handling by
-> returning an error code. However the value returned is ignored (apart
-> from emitting a warning) and this typically results in resource leaks.
-> 
-> To improve here there is a quest to make the remove callback return
-> void. In the first step of this quest all drivers are converted to
-> .remove_new(), which already returns void. Eventually after all drivers
-> are converted, .remove_new() will be renamed to .remove().
-> 
-> Trivially convert this driver from always returning zero in the remove
-> callback to the void returning variant.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> ---
->  drivers/crypto/rockchip/rk3288_crypto.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-> index 77d5705a5d96..70edf40bc523 100644
-> --- a/drivers/crypto/rockchip/rk3288_crypto.c
-> +++ b/drivers/crypto/rockchip/rk3288_crypto.c
-> @@ -405,7 +405,7 @@ static int rk_crypto_probe(struct platform_device *pdev)
->  	return err;
->  }
->  
-> -static int rk_crypto_remove(struct platform_device *pdev)
-> +static void rk_crypto_remove(struct platform_device *pdev)
->  {
->  	struct rk_crypto_info *crypto_tmp = platform_get_drvdata(pdev);
->  	struct rk_crypto_info *first;
-> @@ -424,12 +424,11 @@ static int rk_crypto_remove(struct platform_device *pdev)
->  	}
->  	rk_crypto_pm_exit(crypto_tmp);
->  	crypto_engine_exit(crypto_tmp->engine);
-> -	return 0;
->  }
->  
->  static struct platform_driver crypto_driver = {
->  	.probe		= rk_crypto_probe,
-> -	.remove		= rk_crypto_remove,
-> +	.remove_new	= rk_crypto_remove,
->  	.driver		= {
->  		.name	= "rk3288-crypto",
->  		.pm		= &rk_crypto_pm_ops,
-> -- 
-> 2.42.0
-> 
+Hi Jeshwank,
 
-Acked-by: Corentin Labbe <clabbe@baylibre.com>
+On Wed, 25 Oct 2023 at 12:27, jeshwank <JESHWANTHKUMAR.NK@amd.com> wrote:
+>
+> From: Jeshwanth Kumar N K <JESHWANTHKUMAR.NK@amd.com>
+>
+> At present, the shared memory for TEE ring buffer, command buffer and
+> data buffer is allocated using get_free_pages(). The driver shares the
+> physical address of these buffers with PSP so that it can be mapped by
+> the Trusted OS.
+>
+> In this patch series we have replaced get_free_pages() with
+> dma_alloc_coherent() to allocate shared memory to cleanup the existing
+> allocation method.
 
-Thanks
+Thanks for putting this together but I can't find the reasoning behind
+this change neither in this commit message and nor in the patch
+descriptions. Care to explain why?
+
+-Sumit
+
+>
+> Rijo Thomas (3):
+>   crypto: ccp - Add function to allocate and free memory using DMA APIs
+>   crypto: ccp - Use psp_tee_alloc_buffer() and psp_tee_free_buffer()
+>   tee: amdtee: Use psp_tee_alloc_buffer() and psp_tee_free_buffer()
+>
+>  drivers/crypto/ccp/psp-dev.c        |   3 +
+>  drivers/crypto/ccp/tee-dev.c        | 119 ++++++++++++++++++----------
+>  drivers/crypto/ccp/tee-dev.h        |  11 +--
+>  drivers/tee/amdtee/amdtee_private.h |  18 ++---
+>  drivers/tee/amdtee/call.c           |  74 ++++++++---------
+>  drivers/tee/amdtee/core.c           |  72 ++++++++++-------
+>  drivers/tee/amdtee/shm_pool.c       |  21 ++---
+>  include/linux/psp-tee.h             |  47 +++++++++++
+>  8 files changed, 221 insertions(+), 144 deletions(-)
+>
+> --
+> 2.25.1
+>
