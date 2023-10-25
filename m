@@ -2,101 +2,348 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3546FC07545
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 17:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D79C0032E
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 17:40:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229557AbjJYRe0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Oct 2023 13:34:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39486 "EHLO
+        id S232329AbjJYRkb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Oct 2023 13:40:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbjJYReZ (ORCPT
+        with ESMTP id S229485AbjJYRk3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Oct 2023 13:34:25 -0400
-Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12AFA137;
-        Wed, 25 Oct 2023 10:34:23 -0700 (PDT)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 05B4C40E00B1;
-        Wed, 25 Oct 2023 17:34:20 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-        header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 7Pf1WCNFuvJb; Wed, 25 Oct 2023 17:34:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-        t=1698255257; bh=cWIDMNOmR3ejJPcU9ueROUfewQ1CyI98mmrkHIjnZ44=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=g6VLSRnRm5zCmwYW7CVRcW/eVYsEK3mhd4c3sl/AfsohA2o2R1IXnFQaZk8uvMonR
-         xUnzHqJaAxFj6ztSQ29uPqXt/mVG0zKrfKKr3+unht/AshxNaXRxKIccmGS3l+8Ckm
-         QEx1rfg9VC7PTlrPV9la72GosU9iwiSVuIG8KwsbAhHLsAtOSRWlO9pPq5NuriOzWu
-         KzIyf/6JQjTe9YgoEt39cyJprQp4aeue5zmmjF3nhG59IjNztQ9xkuxNre/qEKJQrU
-         HsGxkqT2V6+6DFhClTwx/qHV5J1BHDnnItTn4CM5EaY/lPPW1zZYgFMCN/k29KJK3l
-         xKizx5105HyvvpFZ+aq87XaKSH9dvbrWxo3J1CG/YWCAfBr8cF4WwFBheWLW6R91+v
-         fgjtzs77e3LuESXRQnLNSXKSmScZFqNeXvGDTUglNtPLOAzRoeRHEXV5RpveuAKx59
-         7AwfyjPkdIzBUKBSTC6KkKe9x1ZNgJqRUj6RdSLxYnVItRqoqrpN2CrNx9Hz5KsxFw
-         n1zVRlT8bSixc2z4YX4Ea4utNAqf/RYC3Y27/Ei7NGc6OOXqA7jWXBr1X3IfSrKmoA
-         s6xwu3gstPtxWNXyYcB9b9X9i925IhMy0522+oreqktadtrynCM2YYc4tdtHa+CTtt
-         agJepz0t8AYaGiH8fapHIGKY=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-        (No client certificate requested)
-        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AAE5E40E0199;
-        Wed, 25 Oct 2023 17:33:36 +0000 (UTC)
-Date:   Wed, 25 Oct 2023 19:33:31 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-        pankaj.gupta@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Kim Phillips <kim.phillips@amd.com>
-Subject: Re: [PATCH v10 05/50] x86/speculation: Do not enable Automatic IBRS
- if SEV SNP is enabled
-Message-ID: <20231025173331.GCZTlRa3Tzfc1fHvCu@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-6-michael.roth@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-6-michael.roth@amd.com>
+        Wed, 25 Oct 2023 13:40:29 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8861137;
+        Wed, 25 Oct 2023 10:40:26 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0BECC433C8;
+        Wed, 25 Oct 2023 17:40:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698255626;
+        bh=vowI2I62ibmckfqS1BgsmGmzvGGzK48iOcs0vXDIj9o=;
+        h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+        b=hrrZD3YaKFG3WBXkYLbm7jYNKJBa04fRbCGoe3D/K3LG8t8zMnWNsGnXu44/TXr6W
+         XdE54VqBFQPnpj8cixVjGYzwGgFex+KrvYPQKU58ryTRbw6MU8902YuWNTXrFYp3+h
+         bhJ7NqAlAP2omqduFtpZF1QtumtB/xhkkBjyjXf8voavmR2I+myq7XSP07c12bSnBx
+         3XMYb8Ql3VBuUXpyEb/CTbkINIp5PVxXpBdoXgeTAcAM7tb0TNSqeW1uc6jF8LBtD0
+         44etvTgFq99q5a3CcGI2T/Ltjis3Q1JIR5Q3ii5d2MTsZWKqd7fPTH6rcsKflO/bfr
+         LK5epcBcKa3cQ==
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date:   Wed, 25 Oct 2023 20:40:17 +0300
+Message-Id: <CWHPDGHI9EJK.WMPDVUJUR67I@suppilovahvero>
+Subject: Re: [PATCH v4 1/5] crypto: mxs-dcp: Add support for hardware-bound
+ keys
+From:   "Jarkko Sakkinen" <jarkko@kernel.org>
+To:     "David Gstir" <david@sigma-star.at>,
+        "Mimi Zohar" <zohar@linux.ibm.com>,
+        "James Bottomley" <jejb@linux.ibm.com>,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     "Shawn Guo" <shawnguo@kernel.org>,
+        "Jonathan Corbet" <corbet@lwn.net>,
+        "Sascha Hauer" <s.hauer@pengutronix.de>,
+        "Pengutronix Kernel Team" <kernel@pengutronix.de>,
+        "Fabio Estevam" <festevam@gmail.com>,
+        "NXP Linux Team" <linux-imx@nxp.com>,
+        "Ahmad Fatoum" <a.fatoum@pengutronix.de>,
+        "sigma star Kernel Team" <upstream+dcp@sigma-star.at>,
+        "David Howells" <dhowells@redhat.com>,
+        "Li Yang" <leoyang.li@nxp.com>, "Paul Moore" <paul@paul-moore.com>,
+        "James Morris" <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        "Randy Dunlap" <rdunlap@infradead.org>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        "Tejun Heo" <tj@kernel.org>,
+        "Steven Rostedt (Google)" <rostedt@goodmis.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-integrity@vger.kernel.org>, <keyrings@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linuxppc-dev@lists.ozlabs.org>,
+        <linux-security-module@vger.kernel.org>,
+        "Richard Weinberger" <richard@nod.at>,
+        "David Oberhollenzer" <david.oberhollenzer@sigma-star.at>
+X-Mailer: aerc 0.15.2
+References: <20231024162024.51260-1-david@sigma-star.at>
+ <20231024162024.51260-2-david@sigma-star.at>
+In-Reply-To: <20231024162024.51260-2-david@sigma-star.at>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 16, 2023 at 08:27:34AM -0500, Michael Roth wrote:
-> From: Kim Phillips <kim.phillips@amd.com>
-> 
-> Without SEV-SNP, Automatic IBRS protects only the kernel. But when
-> SEV-SNP is enabled, the Automatic IBRS protection umbrella widens to all
-> host-side code, including userspace. This protection comes at a cost:
-> reduced userspace indirect branch performance.
-> 
-> To avoid this performance loss, don't use Automatic IBRS on SEV-SNP
-> hosts. Fall back to retpolines instead.
-> 
-> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
-> [mdr: squash in changes from review discussion]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+On Tue Oct 24, 2023 at 7:20 PM EEST, David Gstir wrote:
+> DCP is capable of performing AES with two hardware-bound keys:
+>
+> - The one-time programmable (OTP) key which is burnt via on-chip fuses
+> - The unique key (UK) which is derived from the OTP key
+>
+> In addition to the two hardware-bound keys, DCP also supports
+> storing keys in 4 dedicated key slots within its secure memory area
+> (internal SRAM).
+>
+> These keys are not stored in main memory and are therefore
+> not directly accessible by the operating system. To use them
+> for AES operations, a one-byte key reference has to supplied
+> with the DCP operation descriptor in the control register.
+>
+> This adds support for using any of these 6 keys through the crypto API
+> via their key reference after they have been set up. The main purpose
+> is to add support for DCP-backed trusted keys. Other use cases are
+> possible too (see similar existing paes implementations), but these
+> should carefully be evaluated as e.g. enabling AF_ALG will give
+> userspace full access to use keys. In scenarios with untrustworthy
+> userspace, this will enable en-/decryption oracles.
+>
+> Co-developed-by: Richard Weinberger <richard@nod.at>
+> Signed-off-by: Richard Weinberger <richard@nod.at>
+> Co-developed-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+> Signed-off-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+> Signed-off-by: David Gstir <david@sigma-star.at>
 > ---
->  arch/x86/kernel/cpu/common.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  drivers/crypto/mxs-dcp.c | 104 ++++++++++++++++++++++++++++++++++-----
+>  include/soc/fsl/dcp.h    |  17 +++++++
+>  2 files changed, 110 insertions(+), 11 deletions(-)
+>  create mode 100644 include/soc/fsl/dcp.h
+>
+> diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+> index f6b7bce0e656..2dc664fb2faf 100644
+> --- a/drivers/crypto/mxs-dcp.c
+> +++ b/drivers/crypto/mxs-dcp.c
+> @@ -15,6 +15,7 @@
+>  #include <linux/platform_device.h>
+>  #include <linux/stmp_device.h>
+>  #include <linux/clk.h>
+> +#include <soc/fsl/dcp.h>
+> =20
+>  #include <crypto/aes.h>
+>  #include <crypto/sha1.h>
+> @@ -101,6 +102,7 @@ struct dcp_async_ctx {
+>  	struct crypto_skcipher		*fallback;
+>  	unsigned int			key_len;
+>  	uint8_t				key[AES_KEYSIZE_128];
+> +	bool				key_referenced;
+>  };
+> =20
+>  struct dcp_aes_req_ctx {
+> @@ -155,6 +157,7 @@ static struct dcp *global_sdcp;
+>  #define MXS_DCP_CONTROL0_HASH_TERM		(1 << 13)
+>  #define MXS_DCP_CONTROL0_HASH_INIT		(1 << 12)
+>  #define MXS_DCP_CONTROL0_PAYLOAD_KEY		(1 << 11)
+> +#define MXS_DCP_CONTROL0_OTP_KEY		(1 << 10)
+>  #define MXS_DCP_CONTROL0_CIPHER_ENCRYPT		(1 << 8)
+>  #define MXS_DCP_CONTROL0_CIPHER_INIT		(1 << 9)
+>  #define MXS_DCP_CONTROL0_ENABLE_HASH		(1 << 6)
+> @@ -168,6 +171,8 @@ static struct dcp *global_sdcp;
+>  #define MXS_DCP_CONTROL1_CIPHER_MODE_ECB	(0 << 4)
+>  #define MXS_DCP_CONTROL1_CIPHER_SELECT_AES128	(0 << 0)
+> =20
+> +#define MXS_DCP_CONTROL1_KEY_SELECT_SHIFT	8
+> +
+>  static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
+>  {
+>  	int dma_err;
+> @@ -224,13 +229,16 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *ac=
+tx,
+>  	struct dcp *sdcp =3D global_sdcp;
+>  	struct dcp_dma_desc *desc =3D &sdcp->coh->desc[actx->chan];
+>  	struct dcp_aes_req_ctx *rctx =3D skcipher_request_ctx(req);
+> +	bool key_referenced =3D actx->key_referenced;
+>  	int ret;
+> =20
+> -	key_phys =3D dma_map_single(sdcp->dev, sdcp->coh->aes_key,
+> -				  2 * AES_KEYSIZE_128, DMA_TO_DEVICE);
+> -	ret =3D dma_mapping_error(sdcp->dev, key_phys);
+> -	if (ret)
+> -		return ret;
+> +	if (!key_referenced) {
+> +		key_phys =3D dma_map_single(sdcp->dev, sdcp->coh->aes_key,
+> +					  2 * AES_KEYSIZE_128, DMA_TO_DEVICE);
+> +		ret =3D dma_mapping_error(sdcp->dev, key_phys);
+> +		if (ret)
+> +			return ret;
+> +	}
+> =20
+>  	src_phys =3D dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
+>  				  DCP_BUF_SZ, DMA_TO_DEVICE);
+> @@ -255,8 +263,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *act=
+x,
+>  		    MXS_DCP_CONTROL0_INTERRUPT |
+>  		    MXS_DCP_CONTROL0_ENABLE_CIPHER;
+> =20
+> -	/* Payload contains the key. */
+> -	desc->control0 |=3D MXS_DCP_CONTROL0_PAYLOAD_KEY;
+> +	if (key_referenced)
+> +		/* Set OTP key bit to select the key via KEY_SELECT. */
+> +		desc->control0 |=3D MXS_DCP_CONTROL0_OTP_KEY;
+> +	else
+> +		/* Payload contains the key. */
+> +		desc->control0 |=3D MXS_DCP_CONTROL0_PAYLOAD_KEY;
+> =20
+>  	if (rctx->enc)
+>  		desc->control0 |=3D MXS_DCP_CONTROL0_CIPHER_ENCRYPT;
+> @@ -270,6 +282,9 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx=
+,
+>  	else
+>  		desc->control1 |=3D MXS_DCP_CONTROL1_CIPHER_MODE_CBC;
+> =20
+> +	if (key_referenced)
+> +		desc->control1 |=3D sdcp->coh->aes_key[0] << MXS_DCP_CONTROL1_KEY_SELE=
+CT_SHIFT;
+> +
+>  	desc->next_cmd_addr =3D 0;
+>  	desc->source =3D src_phys;
+>  	desc->destination =3D dst_phys;
+> @@ -284,9 +299,9 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx=
+,
+>  err_dst:
+>  	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+>  err_src:
+> -	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
+> -			 DMA_TO_DEVICE);
+> -
+> +	if (!key_referenced)
+> +		dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
+> +				 DMA_TO_DEVICE);
+>  	return ret;
+>  }
+> =20
+> @@ -453,7 +468,7 @@ static int mxs_dcp_aes_enqueue(struct skcipher_reques=
+t *req, int enc, int ecb)
+>  	struct dcp_aes_req_ctx *rctx =3D skcipher_request_ctx(req);
+>  	int ret;
+> =20
+> -	if (unlikely(actx->key_len !=3D AES_KEYSIZE_128))
+> +	if (unlikely(actx->key_len !=3D AES_KEYSIZE_128 && !actx->key_reference=
+d))
+>  		return mxs_dcp_block_fallback(req, enc);
+> =20
+>  	rctx->enc =3D enc;
+> @@ -500,6 +515,7 @@ static int mxs_dcp_aes_setkey(struct crypto_skcipher =
+*tfm, const u8 *key,
+>  	 * there can still be an operation in progress.
+>  	 */
+>  	actx->key_len =3D len;
+> +	actx->key_referenced =3D false;
+>  	if (len =3D=3D AES_KEYSIZE_128) {
+>  		memcpy(actx->key, key, len);
+>  		return 0;
+> @@ -516,6 +532,32 @@ static int mxs_dcp_aes_setkey(struct crypto_skcipher=
+ *tfm, const u8 *key,
+>  	return crypto_skcipher_setkey(actx->fallback, key, len);
+>  }
+> =20
+> +static int mxs_dcp_aes_setrefkey(struct crypto_skcipher *tfm, const u8 *=
+key,
+> +				 unsigned int len)
+> +{
+> +	struct dcp_async_ctx *actx =3D crypto_skcipher_ctx(tfm);
+> +
+> +	if (len !=3D DCP_PAES_KEYSIZE)
+> +		return -EINVAL;
+> +
+> +	switch (key[0]) {
+> +	case DCP_PAES_KEY_SLOT0:
+> +	case DCP_PAES_KEY_SLOT1:
+> +	case DCP_PAES_KEY_SLOT2:
+> +	case DCP_PAES_KEY_SLOT3:
+> +	case DCP_PAES_KEY_UNIQUE:
+> +	case DCP_PAES_KEY_OTP:
+> +		memcpy(actx->key, key, len);
+> +		actx->key_len =3D len;
+> +		actx->key_referenced =3D true;
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int mxs_dcp_aes_fallback_init_tfm(struct crypto_skcipher *tfm)
+>  {
+>  	const char *name =3D crypto_tfm_alg_name(crypto_skcipher_tfm(tfm));
+> @@ -539,6 +581,13 @@ static void mxs_dcp_aes_fallback_exit_tfm(struct cry=
+pto_skcipher *tfm)
+>  	crypto_free_skcipher(actx->fallback);
+>  }
+> =20
+> +static int mxs_dcp_paes_init_tfm(struct crypto_skcipher *tfm)
+> +{
+> +	crypto_skcipher_set_reqsize(tfm, sizeof(struct dcp_aes_req_ctx));
+> +
+> +	return 0;
+> +}
+> +
+>  /*
+>   * Hashing (SHA1/SHA256)
+>   */
+> @@ -889,6 +938,39 @@ static struct skcipher_alg dcp_aes_algs[] =3D {
+>  		.ivsize			=3D AES_BLOCK_SIZE,
+>  		.init			=3D mxs_dcp_aes_fallback_init_tfm,
+>  		.exit			=3D mxs_dcp_aes_fallback_exit_tfm,
+> +	}, {
+> +		.base.cra_name		=3D "ecb(paes)",
+> +		.base.cra_driver_name	=3D "ecb-paes-dcp",
+> +		.base.cra_priority	=3D 401,
+> +		.base.cra_alignmask	=3D 15,
+> +		.base.cra_flags		=3D CRYPTO_ALG_ASYNC | CRYPTO_ALG_INTERNAL,
+> +		.base.cra_blocksize	=3D AES_BLOCK_SIZE,
+> +		.base.cra_ctxsize	=3D sizeof(struct dcp_async_ctx),
+> +		.base.cra_module	=3D THIS_MODULE,
+> +
+> +		.min_keysize		=3D DCP_PAES_KEYSIZE,
+> +		.max_keysize		=3D DCP_PAES_KEYSIZE,
+> +		.setkey			=3D mxs_dcp_aes_setrefkey,
+> +		.encrypt		=3D mxs_dcp_aes_ecb_encrypt,
+> +		.decrypt		=3D mxs_dcp_aes_ecb_decrypt,
+> +		.init			=3D mxs_dcp_paes_init_tfm,
+> +	}, {
+> +		.base.cra_name		=3D "cbc(paes)",
+> +		.base.cra_driver_name	=3D "cbc-paes-dcp",
+> +		.base.cra_priority	=3D 401,
+> +		.base.cra_alignmask	=3D 15,
+> +		.base.cra_flags		=3D CRYPTO_ALG_ASYNC | CRYPTO_ALG_INTERNAL,
+> +		.base.cra_blocksize	=3D AES_BLOCK_SIZE,
+> +		.base.cra_ctxsize	=3D sizeof(struct dcp_async_ctx),
+> +		.base.cra_module	=3D THIS_MODULE,
+> +
+> +		.min_keysize		=3D DCP_PAES_KEYSIZE,
+> +		.max_keysize		=3D DCP_PAES_KEYSIZE,
+> +		.setkey			=3D mxs_dcp_aes_setrefkey,
+> +		.encrypt		=3D mxs_dcp_aes_cbc_encrypt,
+> +		.decrypt		=3D mxs_dcp_aes_cbc_decrypt,
+> +		.ivsize			=3D AES_BLOCK_SIZE,
+> +		.init			=3D mxs_dcp_paes_init_tfm,
+>  	},
+>  };
+> =20
+> diff --git a/include/soc/fsl/dcp.h b/include/soc/fsl/dcp.h
+> new file mode 100644
+> index 000000000000..cda89e260c46
+> --- /dev/null
+> +++ b/include/soc/fsl/dcp.h
+> @@ -0,0 +1,17 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2021 sigma star gmbh
+> + */
+> +
+> +#ifndef MXS_DCP_H
+> +#define MXS_DCP_H
+> +
+> +#define DCP_PAES_KEYSIZE 1
+> +#define DCP_PAES_KEY_SLOT0 0x00
+> +#define DCP_PAES_KEY_SLOT1 0x01
+> +#define DCP_PAES_KEY_SLOT2 0x02
+> +#define DCP_PAES_KEY_SLOT3 0x03
+> +#define DCP_PAES_KEY_UNIQUE 0xfe
+> +#define DCP_PAES_KEY_OTP 0xff
+> +
+> +#endif /* MXS_DCP_H */
 
-Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
+For me this looks quite reasonable.
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+BR, Jarkko
