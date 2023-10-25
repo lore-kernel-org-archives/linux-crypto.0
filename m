@@ -2,107 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BABDC07545
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 13:32:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C00C25B47
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 16:12:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235027AbjJYNcf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Oct 2023 09:32:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54034 "EHLO
+        id S233357AbjJYQMx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Oct 2023 12:12:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235021AbjJYNcV (ORCPT
+        with ESMTP id S233033AbjJYQMw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Oct 2023 09:32:21 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 343F81BCB
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 06:31:44 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id 5614622812f47-3af609c4dfeso3694283b6e.1
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 06:31:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698240703; x=1698845503; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZDeLJegtyrSMQs47LqN+x1DHWKzJbsn6ZNyTsWNzhD0=;
-        b=poNHIo88GlChypeADbhU097d9YMRUhAnPbjgvnE0pGsjh/3EOZExa9cUNtqNkh74Re
-         lzicw6lgi0zMEAVLLes+BairaaUKEL9pO5LM8OqVsOV6CyATcRCKfMHU3HvfKmyfMHjb
-         ZDIJIOD6nvLC0HtFU/tYmiZT/+SCYqDOQVP4f078GMr5X94KUo7s9Di4tsQcMTTUAckc
-         J6VfAAPDCJIvvzI0OzAaDhu3Hr8lkSjOJuQ1o3Cuvb7nlswXhpbFNkR9nWLQvV0ekQgs
-         04dykbr7fGeESFkhwH7OupNg7jv9q2InCx5Gsei1iYyzxD03c4mNd8k/La7HczboVovX
-         t0OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698240703; x=1698845503;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZDeLJegtyrSMQs47LqN+x1DHWKzJbsn6ZNyTsWNzhD0=;
-        b=iP9TRZ71S2399Fw/lD1yXi/Zohr3hLbjY21ektjGPxNbqpTYqTom9NOGZhjTIHPxC5
-         +fjqLxfUKRei9i8fgmk/uq9vDpX06TYbJh1ucacG6/eRE7nRDUTsYrIxHuVXlnag4xTG
-         gfAYzN+A4tdvvN1AJJIR8VhUgM2JFfrDh9rWi3aoO5IMzBrctLhkKcn+XiNKUGDh664/
-         5zX7o/8vW77t/6I57x/LjPoERDZ+cdybztzL6UANtctumJf1kL1S1qTHO6sZLbmD7MYY
-         5GgCw/H+h+RHIXshj2dXEbF2VdAQFkSD1lZJi+n57bva9rsaMN1xjRhacTptiFK5GFeL
-         lQEA==
-X-Gm-Message-State: AOJu0Yz59Y8znEEozVPoXqpeQ4MnctHd6Q8VCEjAUo3XsOnO9ZOJej9R
-        g3JqNkHIbviBUXiuvBziRLMBNyVy4hSZun3qkZ8hkQ==
-X-Google-Smtp-Source: AGHT+IHvVVWmzAv/4OQ7DckVr1zNALKZ+0FxM3O1RwNGzG2CeTimbYZdVJ7078LCw5pcHLanhYVCEflo58qYF4oANWU=
-X-Received: by 2002:a05:6808:aa3:b0:3ab:7f46:ecc5 with SMTP id
- r3-20020a0568080aa300b003ab7f46ecc5mr15434307oij.35.1698240703272; Wed, 25
- Oct 2023 06:31:43 -0700 (PDT)
+        Wed, 25 Oct 2023 12:12:52 -0400
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC506136;
+        Wed, 25 Oct 2023 09:12:49 -0700 (PDT)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.nyi.internal (Postfix) with ESMTP id 573BF5C022F;
+        Wed, 25 Oct 2023 12:12:49 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Wed, 25 Oct 2023 12:12:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
+         h=cc:cc:content-type:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to; s=fm2; t=1698250369; x=
+        1698336769; bh=hzZnckzsfVdY/d5nAAxnaS/VZqgX4l6X8qsQLMXgz7o=; b=k
+        SUpR7nXsLdnBZj+3/LnwISTaSJJaqialZ41pOIpB33smuanqY2izcAgEB9/fiQsp
+        4+3yYiNLtHSaIYFDHhPJgJOPf8qUO4k27xfgm31CUKX+L0EGjUCFBJh5sGBPCqzz
+        bb4DMCQ8xYjKE5JebX2dHlj9Ox2Kk4ycTj+dKsJWO7Bcl6blzyoX1ByAVyEgNcsz
+        wzRdhRv9yMbvpQ12FL4tkbh8KScw3Y28TDdg/sT6LrHzvf21CnMlKf6yT+XRE448
+        PRG6pOlCtUP4VVE6gaBcaKjpWs8nqoFj5yDZ2eB6Paiag9x3bhf6EaB19tojQ1Tc
+        wU4ubSJ43fMS1lXtMgeBg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm3; t=1698250369; x=1698336769; bh=hzZnckzsfVdY/
+        d5nAAxnaS/VZqgX4l6X8qsQLMXgz7o=; b=dCNya2qKKdzLspnFePdcw751pGDMG
+        UlYrMwNIB4gIgnv3Xz7eVaxaN+Fg8SLcZ/QBtED5tO16HQ8BoTLoav0u1ceJo18O
+        6o9GaJ+ns5ZEhveyeLwZCVgIxZEYyle796CqxdvJkp7zAjE2bimBsRA1NvUDVigc
+        hiQmTTuWqDgwz0ksx7jQdGORty7cw5KYO1CkeQTN63Y/SxXWShDYSyInAFtWgFvk
+        cSsXIhnfo6YbB17F1VIL29kQ6lQlchyLnjUkiEnH3P0MKkMY5plB0a41CILfss/8
+        V8SbnJJDAgicfuxwoi86E64Fo7N4b2SDVbAsf0xYJdG+N29tdPwlp1OLg==
+X-ME-Sender: <xms:gD45ZcRe13O5wUwMc8-8RBYn7VADT0Yk_Mi8F9-6BTfkQQjcpz5zPQ>
+    <xme:gD45ZZyNfW6ZZ1jtNFrWlgKn6faSsVz8YIdBFD5c0bKKEnYdbunCWFnFBJYtkzdPj
+    urg57uAjv4x4WGx1cU>
+X-ME-Received: <xmr:gD45ZZ3L36OsQ4bRuQ8Kk7ZVCKqgqRAejWtAxucXF2t89DQVwhPWZ9AYx4a06qKzzDAX6f6vebSymqA-1M0y3c6g6Fr-MAM8bYCI>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrledtgdeljecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjfgesthdtredttderjeenucfhrhhomhepuegvnhcu
+    uehovggtkhgvlhcuoehmvgessggvnhgsohgvtghkvghlrdhnvghtqeenucggtffrrghtth
+    gvrhhnpeffleegffevleekffekheeigfdtleeuvddtgffhtddvfefgjeehffduueevkedv
+    vdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmvg
+    essggvnhgsohgvtghkvghlrdhnvght
+X-ME-Proxy: <xmx:gD45ZQAs2PaCTsuG1J_IaF9Iw5lxGylttujSuJ6O8Dkns-j11ThMKA>
+    <xmx:gD45ZViA1h1JU86CPz7iP4sk3YPNG16pvI-UIA0FJpcirCXMFNAiRg>
+    <xmx:gD45ZcpRqo2LKQPI79EJt1MaLc11MBwOSKxIWBt1COFUbJiaER830Q>
+    <xmx:gT45ZQprAFt55ukZEyvkkzpm5SXB2mh1Z3pDmqgxV4UWxy5n_9Bt8g>
+Feedback-ID: iffc1478b:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 25 Oct 2023 12:12:48 -0400 (EDT)
+Date:   Wed, 25 Oct 2023 12:12:47 -0400
+From:   Ben Boeckel <me@benboeckel.net>
+To:     Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Cc:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-modules@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] docs: module-signing: adjust guide after sha1 and sha224
+ support is gone
+Message-ID: <ZTk+fytHiyfbgNFC@farprobe>
+References: <20231025104212.12738-1-lukas.bulwahn@gmail.com>
+ <CADWks+ZoLs1FUJx0sSg5FBYK5BtD+Po7bRORVT4uBLM6QJxXJQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20231025065700.1556152-1-JESHWANTHKUMAR.NK@amd.com>
-In-Reply-To: <20231025065700.1556152-1-JESHWANTHKUMAR.NK@amd.com>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Wed, 25 Oct 2023 19:01:31 +0530
-Message-ID: <CAFA6WYPKXFftMzqJ4GnXT-zqu21_Jzn8aKti_wU-pQ4KpEVNrA@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Introduce DMA APIs to allocate and free TEE shared memory
-To:     jeshwank <JESHWANTHKUMAR.NK@amd.com>
-Cc:     thomas.lendacky@amd.com, john.allen@amd.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jens.wiklander@linaro.org, jarkko.nikula@linux.intel.com,
-        mario.limonciello@amd.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, op-tee@lists.trustedfirmware.org,
-        Mythri.Pandeshwarakrishna@amd.com, Devaraj.Rangasamy@amd.com,
-        Rijo-john.Thomas@amd.com, nimesh.easow@amd.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CADWks+ZoLs1FUJx0sSg5FBYK5BtD+Po7bRORVT4uBLM6QJxXJQ@mail.gmail.com>
+User-Agent: Mutt/2.2.9 (2022-11-12)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jeshwank,
+On Wed, Oct 25, 2023 at 13:57:08 +0100, Dimitri John Ledkov wrote:
+> Sorry for not patching documentation at the same time as the code
+> changes that made documentation out of date.
 
-On Wed, 25 Oct 2023 at 12:27, jeshwank <JESHWANTHKUMAR.NK@amd.com> wrote:
->
-> From: Jeshwanth Kumar N K <JESHWANTHKUMAR.NK@amd.com>
->
-> At present, the shared memory for TEE ring buffer, command buffer and
-> data buffer is allocated using get_free_pages(). The driver shares the
-> physical address of these buffers with PSP so that it can be mapped by
-> the Trusted OS.
->
-> In this patch series we have replaced get_free_pages() with
-> dma_alloc_coherent() to allocate shared memory to cleanup the existing
-> allocation method.
+Should this, perhaps, get a `Fixes` trailer then?
 
-Thanks for putting this together but I can't find the reasoning behind
-this change neither in this commit message and nor in the patch
-descriptions. Care to explain why?
-
--Sumit
-
->
-> Rijo Thomas (3):
->   crypto: ccp - Add function to allocate and free memory using DMA APIs
->   crypto: ccp - Use psp_tee_alloc_buffer() and psp_tee_free_buffer()
->   tee: amdtee: Use psp_tee_alloc_buffer() and psp_tee_free_buffer()
->
->  drivers/crypto/ccp/psp-dev.c        |   3 +
->  drivers/crypto/ccp/tee-dev.c        | 119 ++++++++++++++++++----------
->  drivers/crypto/ccp/tee-dev.h        |  11 +--
->  drivers/tee/amdtee/amdtee_private.h |  18 ++---
->  drivers/tee/amdtee/call.c           |  74 ++++++++---------
->  drivers/tee/amdtee/core.c           |  72 ++++++++++-------
->  drivers/tee/amdtee/shm_pool.c       |  21 ++---
->  include/linux/psp-tee.h             |  47 +++++++++++
->  8 files changed, 221 insertions(+), 144 deletions(-)
->
-> --
-> 2.25.1
->
+--Ben
