@@ -2,106 +2,140 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A179C25B6B
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 10:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C641C0032E
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 12:57:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234917AbjJYKnX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Oct 2023 06:43:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33024 "EHLO
+        id S234938AbjJYM5u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Oct 2023 08:57:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343522AbjJYKmy (ORCPT
+        with ESMTP id S234926AbjJYM5u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Oct 2023 06:42:54 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AD6F10FD;
-        Wed, 25 Oct 2023 03:42:18 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-507a62d4788so8673363e87.0;
-        Wed, 25 Oct 2023 03:42:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698230536; x=1698835336; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=USY4fw267Go83RxyHyFwK1+6pc6Q77CrkKJFbgSONJU=;
-        b=ShlEeboAgNI0keEKRxCp1TNhPFyAOyjzExRBcVJ4Z3oV86IulG0uOM0dL4VVVXzabv
-         A8bFrjCSoJ90aAMkJ0MW2GsAHvMMmYoFZaCM6+9Xnx3gRSGRnwZ+ajEaa9b2R3rkxE7i
-         PRDe1CslYMWmm81JE1cauzr3omMjBBCLXznW78hFyBz93gQ85N0cy6iUMYqgsg4X84qS
-         LbLgaFwuRApfltyVOjoauHhfgq7f8athyNYeWOVKsHTrWsDFk1UTfub7s5fKBjuI6XeB
-         qkL6knTUYxqbiJkugTeJGWSUe2YAe8A9B2VuC2wDi0zQDacWZZe+/srh/PgI48Q1KqOQ
-         SYnQ==
+        Wed, 25 Oct 2023 08:57:50 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C2EEAC
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 05:57:47 -0700 (PDT)
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id DB677413B6
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 12:57:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1698238664;
+        bh=YZ12GF+aERDoIF3r6TEMZGT37W8A+JNypJswAaYxRhM=;
+        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+         To:Cc:Content-Type;
+        b=A+2z6dTGHZQNQZl/dKcLBiUFzdK9FxC0+Jsn7GnhcJkd6FJEmp3aCCqPA43lb5k8D
+         DCMAiNZ93i3bcP6thD3qMOJ7UCAEqqLloLWEGR4oZCS1q5AheXOFbb2OoTop1O0RL/
+         PvsPQ/I0D2dCbUibNYQr2pAWM99wd+5SNSbV0M1tNL0AR7kQ8Vs/fgOpciJb4E9YRC
+         t/YMx78ys7O8Xp+nH2HZF1nHW94HL6iJEZmHn4JUKT1VHXsuEv02ql82O8lgIOiECH
+         oFqKgPBv3LTIcpZiuysbsoJksxuuMneFxn91vIIivKBofR89OM4zz2CywlbmnNGrge
+         Y7jpAGbKHvUkw==
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-32da215295fso2273075f8f.2
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 05:57:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698230536; x=1698835336;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=USY4fw267Go83RxyHyFwK1+6pc6Q77CrkKJFbgSONJU=;
-        b=r+foBiem2wNeURN/xnH8D5gGVbw36TmTzWbyyjN34e08LsnbiWYsdEHlWxGZR+Ck8w
-         oTw8Gz0TMaFkBzpzRVMbW5eFpCt6b4aBqldzT8mDBrcyBWuFQJ5cErPD076xk4NPj/4E
-         gUGNwwvBJFJoXiJ/xOkMUB1qJzANrqvS4LzOuRtwpNgk69zySKTuUeRS6PiE964SPCVd
-         G1m8Wqc6vqJz9meb6ortXTkdbT7xIVvMbFSBSpyFqHQOe9qCUDL/tcCxXm1L5JW2BXek
-         dLmtNvAbr5WvJWpRDySrdF8AbKcy5pHHplSJ6Ecjeg9jtWKNRAUUXSY0KpgfvxCzte/z
-         UJvg==
-X-Gm-Message-State: AOJu0YyCQpp8kydZquV+WIK1ebNkY/ayhRFew93lF1taZEQUOb3/nDch
-        rQkUW/AZE/qvgcclheuNlwU=
-X-Google-Smtp-Source: AGHT+IH+mKnvmoscLzowQ7hAev3IlVRR9DHwfFnnTp13am39rRDQgcxMoWLTpMzT+6bZeJXrYawGfA==
-X-Received: by 2002:a19:5212:0:b0:505:6e21:32e1 with SMTP id m18-20020a195212000000b005056e2132e1mr10207820lfb.10.1698230536071;
-        Wed, 25 Oct 2023 03:42:16 -0700 (PDT)
-Received: from felia.fritz.box ([2a02:810d:7e40:14b0:2cbd:f9ec:f035:ebea])
-        by smtp.gmail.com with ESMTPSA id t12-20020a05640203cc00b0053e67bcb3e7sm9179868edw.82.2023.10.25.03.42.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 03:42:15 -0700 (PDT)
-From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
-To:     Dimitri John Ledkov <dimitri.ledkov@canonical.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        d=1e100.net; s=20230601; t=1698238664; x=1698843464;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YZ12GF+aERDoIF3r6TEMZGT37W8A+JNypJswAaYxRhM=;
+        b=nPBOMg057T6OhTh46b5Y/q025NChMRc2AQOExdlFoYlgIZ4URWljfG8LUoSjDcbzeJ
+         bG53tuJf1Mgc/HFrlOaZiQEGMvOm4TQF2kHM6MlIPOkRtqr/1GiBNt0QJ17I1UhluD88
+         5/0FskNLZVsIsb+J1IYEmI/IXOPxh0slt3UYe/cD2xIIdNTk/7lbe2ALrZEegDkFWQmm
+         WitRxDpDUl0+MnDuCJ9QmWaDExR6bSXG1sbJE3YfslZB3XWgQXiK1u/dmMU8ZIS7BTtm
+         Jk7MrATf6mHUGsokY8SHV8TZj2dsElbmltXmqonfqIV7lI6ZNUgR+9T9KTC4Eu/WSRpK
+         Xvlw==
+X-Gm-Message-State: AOJu0YzAVeQkplMl33ovra6k2/T2kEixT4aIGpXfKFohUFa3MyLI+jUo
+        txIbCjRjoIkSDccSGaZ5lk6YPd9f++oBDNyogZD/3fiypdNqEjaFEBo4SaktteUEjzxpcUr6KXZ
+        MatsNj1sxIWljTNcUVjbc4x47bxX3lzA7bxLIYF9oY822dlDmkroPgCPJfQ==
+X-Received: by 2002:adf:edc2:0:b0:32d:a57b:8c8d with SMTP id v2-20020adfedc2000000b0032da57b8c8dmr12438001wro.69.1698238664536;
+        Wed, 25 Oct 2023 05:57:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHaI9gj2ovxx4sLpIcOCYpedqxIgHFi3Wcs69w/nw0GZB5lBOAnarl0/VEXOqC/394g7rDDa9Lg2WtTwOg2eIM=
+X-Received: by 2002:adf:edc2:0:b0:32d:a57b:8c8d with SMTP id
+ v2-20020adfedc2000000b0032da57b8c8dmr12437987wro.69.1698238664182; Wed, 25
+ Oct 2023 05:57:44 -0700 (PDT)
+MIME-Version: 1.0
+References: <20231025104212.12738-1-lukas.bulwahn@gmail.com>
+In-Reply-To: <20231025104212.12738-1-lukas.bulwahn@gmail.com>
+From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Date:   Wed, 25 Oct 2023 13:57:08 +0100
+Message-ID: <CADWks+ZoLs1FUJx0sSg5FBYK5BtD+Po7bRORVT4uBLM6QJxXJQ@mail.gmail.com>
+Subject: Re: [PATCH] docs: module-signing: adjust guide after sha1 and sha224
+ support is gone
+To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         David Howells <dhowells@redhat.com>,
         David Woodhouse <dwmw2@infradead.org>,
         Jonathan Corbet <corbet@lwn.net>,
         Luis Chamberlain <mcgrof@kernel.org>,
         linux-modules@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH] docs: module-signing: adjust guide after sha1 and sha224 support is gone
-Date:   Wed, 25 Oct 2023 12:42:12 +0200
-Message-Id: <20231025104212.12738-1-lukas.bulwahn@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Commit 16ab7cb5825f ("crypto: pkcs7 - remove sha1 support") and commit
-fc3225fd6f1e ("module: Do not offer sha224 for built-in module signing")
-removes sha1 and sha224 support for kernel module signing.
+Hi,
 
-Adjust the module-signing admin guide documentation to those changes.
+On Wed, 25 Oct 2023 at 11:42, Lukas Bulwahn <lukas.bulwahn@gmail.com> wrote:
+>
+> Commit 16ab7cb5825f ("crypto: pkcs7 - remove sha1 support") and commit
+> fc3225fd6f1e ("module: Do not offer sha224 for built-in module signing")
+> removes sha1 and sha224 support for kernel module signing.
+>
+> Adjust the module-signing admin guide documentation to those changes.
+>
+> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
 
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
----
- Documentation/admin-guide/module-signing.rst | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Note I have submitted this change as part of the patch series that
+adds SHA-3 over at
+https://lore.kernel.org/linux-crypto/20231022182208.188714-1-dimitri.ledkov@canonical.com/T/#m81c32a65341a4de39596b72743ba38d46899016f
 
-diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
-index 2898b2703297..e3ea1def4c0c 100644
---- a/Documentation/admin-guide/module-signing.rst
-+++ b/Documentation/admin-guide/module-signing.rst
-@@ -30,8 +30,8 @@ This facility uses X.509 ITU-T standard certificates to encode the public keys
- involved.  The signatures are not themselves encoded in any industrial standard
- type.  The facility currently only supports the RSA public key encryption
- standard (though it is pluggable and permits others to be used).  The possible
--hash algorithms that can be used are SHA-1, SHA-224, SHA-256, SHA-384, and
--SHA-512 (the algorithm is selected by data in the signature).
-+hash algorithms that can be used are SHA-256, SHA-384, and SHA-512 (the
-+algorithm is selected by data in the signature).
- 
- 
- ==========================
-@@ -81,8 +81,6 @@ This has a number of options available:
-      sign the modules with:
- 
-         =============================== ==========================================
--	``CONFIG_MODULE_SIG_SHA1``	:menuselection:`Sign modules with SHA-1`
--	``CONFIG_MODULE_SIG_SHA224``	:menuselection:`Sign modules with SHA-224`
- 	``CONFIG_MODULE_SIG_SHA256``	:menuselection:`Sign modules with SHA-256`
- 	``CONFIG_MODULE_SIG_SHA384``	:menuselection:`Sign modules with SHA-384`
- 	``CONFIG_MODULE_SIG_SHA512``	:menuselection:`Sign modules with SHA-512`
+But indeed, if that patch series doesn't make it into the cryptodev
+tree, then this documentation should go in, and the sha-3 one rebased
+/ adjusted.
+
+Sorry for not patching documentation at the same time as the code
+changes that made documentation out of date.
+
+Acked-by: Dimitri John ledkov <dimitri.ledkov@canonical.com>
+
+> ---
+>  Documentation/admin-guide/module-signing.rst | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
+> index 2898b2703297..e3ea1def4c0c 100644
+> --- a/Documentation/admin-guide/module-signing.rst
+> +++ b/Documentation/admin-guide/module-signing.rst
+> @@ -30,8 +30,8 @@ This facility uses X.509 ITU-T standard certificates to encode the public keys
+>  involved.  The signatures are not themselves encoded in any industrial standard
+>  type.  The facility currently only supports the RSA public key encryption
+>  standard (though it is pluggable and permits others to be used).  The possible
+> -hash algorithms that can be used are SHA-1, SHA-224, SHA-256, SHA-384, and
+> -SHA-512 (the algorithm is selected by data in the signature).
+> +hash algorithms that can be used are SHA-256, SHA-384, and SHA-512 (the
+> +algorithm is selected by data in the signature).
+>
+>
+>  ==========================
+> @@ -81,8 +81,6 @@ This has a number of options available:
+>       sign the modules with:
+>
+>          =============================== ==========================================
+> -       ``CONFIG_MODULE_SIG_SHA1``      :menuselection:`Sign modules with SHA-1`
+> -       ``CONFIG_MODULE_SIG_SHA224``    :menuselection:`Sign modules with SHA-224`
+>         ``CONFIG_MODULE_SIG_SHA256``    :menuselection:`Sign modules with SHA-256`
+>         ``CONFIG_MODULE_SIG_SHA384``    :menuselection:`Sign modules with SHA-384`
+>         ``CONFIG_MODULE_SIG_SHA512``    :menuselection:`Sign modules with SHA-512`
+> --
+> 2.17.1
+>
+
+
 -- 
-2.17.1
+okurrr,
 
+Dimitri
