@@ -2,137 +2,189 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5310FC25B6B
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 08:06:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C9FFC25B47
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 09:59:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234548AbjJYIG2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Oct 2023 04:06:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57392 "EHLO
+        id S234201AbjJYJ7G (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Oct 2023 05:59:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234447AbjJYIGT (ORCPT
+        with ESMTP id S232584AbjJYJ7F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Oct 2023 04:06:19 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5016412A
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 01:06:10 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-53e2dc8fa02so8276315a12.2
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 01:06:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698221169; x=1698825969; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=t5qoKRMuRTVh1eNErjr+GxaK0XwaV1QUo+yps0cPzP4=;
-        b=RKAvMJccyqZ+z5o29ChUNVmtwVPYBHmP3LIiJB8I2dyW+A7VAOD93tukl/FphD2yLa
-         +3RdyH5PHpN7EcuRwhMuBKhp8+8tvo7S9HkKg0QSgzvsuUiDH5f4CA4ImaRoXEW8S7Kk
-         aOi2EHeAAFCL9vM5NPdmJoN7Zahglb7Aq9gvthgBSBTJ4Hq8dkAh0zY7T658+rNcuSLo
-         6dhnHTv8eAoLo7BBmxNMAjLujFC9iGHmr1hURwVGBPo0T9oaMPa8lpM2Q5SGyRjYQ22g
-         EKG+SOXvV6D3ai559IYERNAIwKXwSr6yNbzbFd4SF+Xtb5WscwCWOwPPZOn2E68ZP/N0
-         MIRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698221169; x=1698825969;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t5qoKRMuRTVh1eNErjr+GxaK0XwaV1QUo+yps0cPzP4=;
-        b=MGuzup/8oz6r8VzMAQJ8YSkBKUwsWbfcobQDOQsmG/mOiSbq+6FzPlrhYKCqjRdl0V
-         DTTztP6hUqQxdmFLjvKLmaNedjPVAMvfVS9Rh9RQyuZfVby3HAEoNV++QYyGJR8kOdm1
-         JZtoDaHcp8eXzXUGMGPHzcjw/xHJYMje4xTL6ojRJPNu0g6KVpYznQc32hT6DUH/eCOT
-         tan1DIwnKI8NFLH4YA8uipeWHfnFY/OWEbBeWooPTWeXvKtkHsOSKvqtpLJrRXwN8vTE
-         ZxaI0vhfut5sI0uf8q26lm/EiFp7Y1uASc2anQ1UtpIsIk56AWkeHx2t+eKcBLSLvzQd
-         flxQ==
-X-Gm-Message-State: AOJu0YwsYBqQh9QkUbC1+FMnFdW4uQ1VrymXL3Y7I+tJ+HBm1q8gJ5J0
-        GfWrqBcBOgahrCHPYEOxwna07w==
-X-Google-Smtp-Source: AGHT+IEl5EtyuGcRpyIxeP5JkY5sMqX2zjL1kc9Icirs4kFVmQt/QadCDreOYVFJpS2AE/tO0LTN0A==
-X-Received: by 2002:a05:6402:518c:b0:53d:a7d9:5149 with SMTP id q12-20020a056402518c00b0053da7d95149mr10418840edd.6.1698221168749;
-        Wed, 25 Oct 2023 01:06:08 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.218.126])
-        by smtp.gmail.com with ESMTPSA id q8-20020a50c348000000b005407ac82f4csm3500508edb.97.2023.10.25.01.06.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Oct 2023 01:06:08 -0700 (PDT)
-Message-ID: <5c38b351-84ea-48c3-bcfb-ee1da5dd866b@linaro.org>
-Date:   Wed, 25 Oct 2023 10:06:05 +0200
+        Wed, 25 Oct 2023 05:59:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A1D211F
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 02:58:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698227898;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hY1uTHtPvGX6qPxYPyCytvqtD0NKbkwvoAm0a0RsVuk=;
+        b=dsPTp+U0yUxkJQkthcLgvT81LOVLGMEZvQIvsctDmK5qfQ5NZF3C8cKO79/Wslj8Q0/Jyu
+        9sVxVR3AVJv/A0yYJOu6+EBr2pTcDSqKJ6p2Kc6rzVaEvQmbwmxEgf9MkS9hQdm8+woTC4
+        vlq0QCUiN+9cBezyMjnHiNW6qHE71EQ=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-347-4ArESoOsO4WzaKRFgFR3qQ-1; Wed,
+ 25 Oct 2023 05:58:14 -0400
+X-MC-Unique: 4ArESoOsO4WzaKRFgFR3qQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0F3B73C0E237;
+        Wed, 25 Oct 2023 09:58:14 +0000 (UTC)
+Received: from localhost (unknown [10.72.112.53])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0ADFA40C6F79;
+        Wed, 25 Oct 2023 09:58:12 +0000 (UTC)
+Date:   Wed, 25 Oct 2023 17:58:10 +0800
+From:   Baoquan He <bhe@redhat.com>
+To:     Arnd Bergmann <arnd@arndb.de>, eric_devolder@yahoo.com
+Cc:     Vivek Goyal <vgoyal@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, kexec@lists.infradead.org,
+        x86@kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 1/2] kexec: fix KEXEC_FILE dependencies
+Message-ID: <ZTjmsku919U6u6wt@MiWiFi-R3L-srv>
+References: <20231023110308.1202042-1-arnd@kernel.org>
+ <ZTe8NOgAjvKDA6z0@MiWiFi-R3L-srv>
+ <b71034f4-5cdc-44e0-b72f-1a8ffae0593e@app.fastmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: crypto: qcom,inline-crypto-engine: document
- the SM8650 ICE
-Content-Language: en-US
-To:     Neil Armstrong <neil.armstrong@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>
-Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231025-topic-sm8650-upstream-bindings-ice-v1-1-6b2bc14e71db@linaro.org>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231025-topic-sm8650-upstream-bindings-ice-v1-1-6b2bc14e71db@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b71034f4-5cdc-44e0-b72f-1a8ffae0593e@app.fastmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 25/10/2023 09:26, Neil Armstrong wrote:
-> Document the Inline Crypto Engine (ICE) on the SM8650 Platform.
+On 10/24/23 at 03:17pm, Arnd Bergmann wrote:
+> On Tue, Oct 24, 2023, at 14:44, Baoquan He wrote:
+> > Just add people and mailing list to CC since I didn't find this mail in
+> > my box, just drag it via 'b4 am'.
+> >
+> > On 10/23/23 at 01:01pm, Arnd Bergmann wrote:
+> > ......
 > 
-> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
-> For convenience, a regularly refreshed linux-next based git tree containing
-> all the SM8650 related work is available at:
-> https://git.codelinaro.org/neil.armstrong/linux/-/tree/topic/sm85650/upstream/integ
+> >> diff --git a/kernel/Kconfig.kexec b/kernel/Kconfig.kexec
+> >> index 7aff28ded2f48..bfc636d64ff2b 100644
+> >> --- a/kernel/Kconfig.kexec
+> >> +++ b/kernel/Kconfig.kexec
+> >> @@ -36,6 +36,7 @@ config KEXEC
+> >>  config KEXEC_FILE
+> >>  	bool "Enable kexec file based system call"
+> >>  	depends on ARCH_SUPPORTS_KEXEC_FILE
+> >> +	depends on CRYPTO_SHA256=y || !ARCH_SUPPORTS_KEXEC_PURGATORY
+> >
+> > I am not sure if the logic is correct. In theory, kexec_file code
+> > utilizes purgatory to verify the checksum digested during kernel loading
+> > when try to jump to the kernel. That means kexec_file depends on
+> > purgatory, but not contrary?
+> 
+> The expression I wrote is a bit confusing, but I think this just
+> keeps the existing behavior:
+> 
+> - on architectures that select ARCH_SUPPORTS_KEXEC_PURGATORY
+>   (powerpc, riscv, s390 and x86), we also require CRYPTO_SHA256
+>   to be built-in.
+> - on architectures that do not have ARCH_SUPPORTS_KEXEC_PURGATORY
+>   (arm64 and parisc), CRYPTO_SHA256 is not used and can be disabled
+>   or =m.
+> 
+> Since ARCH_SUPPORTS_KEXEC_PURGATORY is a 'bool' symbol, it could
+> be written as
+> 
+> depends on (ARCH_SUPPORTS_KEXEC_PURGATORY && CRYPTO_SHA256=y) \
+>            || !ARCH_SUPPORTS_KEXEC_PURGATORY
 
+Yes, this seems to be clearer to me. Thanks.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> 
+> if you find that clearer. I see that the second patch
+> actually gets this wrong, it should actually do
+> 
+> select CRYPTO if ARCH_SUPPORTS_KEXEC_PURGATORY
+> select CRYPTO_SHA256 if ARCH_SUPPORTS_KEXEC_PURGATORY
 
-Best regards,
-Krzysztof
+Yeah, makes sense to me.
+
+Hi Eric,
+
+Do you have comment about these?
+
+> 
+> > With these changes, we can achieve the goal to avoid building issue,
+> > whereas the code logic becomes confusing. E.g people could disable
+> > CONFIG_KEXEC_FILE, but still get purgatory code built in which is
+> > totally useless.
+> >
+> > Not sure if I think too much over this.
+> 
+> I see your point here, and I would suggest changing the
+> CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY symbol to just indicate
+> the availability of the purgatory code for the arch, rather
+> than actually controlling the code itself. I already mentioned
+> this for s390, but riscv would need the same thing on top.
+> 
+> I think the change below should address your concern.
+> 
+>      Arnd
+> 
+> diff --git a/arch/riscv/kernel/elf_kexec.c b/arch/riscv/kernel/elf_kexec.c
+> index e60fbd8660c4..3ac341d296db 100644
+> --- a/arch/riscv/kernel/elf_kexec.c
+> +++ b/arch/riscv/kernel/elf_kexec.c
+> @@ -266,7 +266,7 @@ static void *elf_kexec_load(struct kimage *image, char *kernel_buf,
+>                 cmdline = modified_cmdline;
+>         }
+>  
+> -#ifdef CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY
+> +#ifdef CONFIG_KEXEC_FILE
+>         /* Add purgatory to the image */
+>         kbuf.top_down = true;
+>         kbuf.mem = KEXEC_BUF_MEM_UNKNOWN;
+> @@ -280,7 +280,7 @@ static void *elf_kexec_load(struct kimage *image, char *kernel_buf,
+>                                              sizeof(kernel_start), 0);
+>         if (ret)
+>                 pr_err("Error update purgatory ret=%d\n", ret);
+> -#endif /* CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY */
+> +#endif /* CONFIG_KEXEC_FILE */
+
+If so, we don't need the CONFIG_KEXEC_FILE ifdeffery because the
+file elf_kexec.c relied on CONFIG_KEXEC_FILE enabling to build in.
+We can just remove the "#ifdef CONFIG_KEXEC_FILE..#endif" as x86 does.
+
+>  
+>         /* Add the initrd to the image */
+>         if (initrd != NULL) {
+> diff --git a/arch/riscv/Kbuild b/arch/riscv/Kbuild
+> index d25ad1c19f88..ab181d187c23 100644
+> --- a/arch/riscv/Kbuild
+> +++ b/arch/riscv/Kbuild
+> @@ -5,7 +5,7 @@ obj-$(CONFIG_BUILTIN_DTB) += boot/dts/
+>  obj-y += errata/
+>  obj-$(CONFIG_KVM) += kvm/
+>  
+> -obj-$(CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY) += purgatory/
+> +obj-$(CONFIG_KEXEC_FILE) += purgatory/
+>  
+>  # for cleaning
+>  subdir- += boot
+> diff --git a/arch/s390/Kbuild b/arch/s390/Kbuild
+> index a5d3503b353c..361aa01dbd49 100644
+> --- a/arch/s390/Kbuild
+> +++ b/arch/s390/Kbuild
+> @@ -7,7 +7,7 @@ obj-$(CONFIG_S390_HYPFS)        += hypfs/
+>  obj-$(CONFIG_APPLDATA_BASE)    += appldata/
+>  obj-y                          += net/
+>  obj-$(CONFIG_PCI)              += pci/
+> -obj-$(CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY) += purgatory/
+> +obj-$(CONFIG_KEXEC_FILE)       += purgatory/
+>  
+>  # for cleaning
+>  subdir- += boot tools
+> 
 
