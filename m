@@ -2,53 +2,54 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E057C25B6E
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 18:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2193C07545
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 18:37:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229522AbjJYSg7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Oct 2023 14:36:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58128 "EHLO
+        id S234846AbjJYShG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Oct 2023 14:37:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229583AbjJYSg6 (ORCPT
+        with ESMTP id S234757AbjJYShB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Oct 2023 14:36:58 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 047E4111
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 11:36:56 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-584a761b301so71165a12.3
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 11:36:55 -0700 (PDT)
+        Wed, 25 Oct 2023 14:37:01 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19C29115
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 11:37:00 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-5a9bc2ec556so91978a12.0
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 11:37:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1698259015; x=1698863815; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MeoxSvV9LV2U+gpMh6CC2wXStEN6WTZDI/w5L7HPlVc=;
-        b=d69maL/8QW+dkKV5fM+y9P9f/aFJHeoBonfDoUS9BeL0bblCh6gNheYaG7m4lZszJh
-         O14KGc8cV71WRc31Hu9JjP8dhMnn+DtoUKbOUUg6h+BMCecQen8iWSsKO6UnnBc7V7mN
-         rwW0/QIxddv4wYH7emaO6bjYU4xYPUY2irEcrr/DdlbnC5gjFBAlT+8Y1xQa2W+L/VGC
-         OiilhfzKsu3lIo2zBccgILsM0f6rmj8clBfy0Dm/FFfWtLKh7jxzpQ58T5s+uUcZovg4
-         yyOJXCpv4p56MYHvhx2ge/jRP+ewdTo6tAV8vN6WS1D7ak7nvO9M4RJEL5iwk5HQl8Lj
-         U7Tw==
+        d=sifive.com; s=google; t=1698259019; x=1698863819; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/AQWefridDFzEX+S3QZsEdRxceu5Syx5iK5d77pjmdM=;
+        b=BEk/TZiyK9j8wTcqs7wcZdkD0N+ykp+xXIBbXRNUL9uCTlc9wcGaIJhk3jJ4wlWBmN
+         4CyoPG5wg8UnGZLqnLHvjRnfggn3SP7l+ThtNAMXeUWbhmIrZSeuwhJG2/sJlxvi/2Vz
+         e9/YTTyBokdGQFJhPDNCXMqnGrQPJYkd7IcIx0WgErwVX623U8vgo5ipUY91SDucXeBt
+         7fpqvk2JchFvE2BVh9YQR3VanCGzZ6G1OP+MdDqS7+YtxnX3TZIsz01NBqHYWUEv3ZV6
+         9+XPxx1eSBiVkdfyclPoQbAVgIPKKbuiEoYHzi8DmI1oLvQ9uyTIKCVAs2YYfHgddsYE
+         b8Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698259015; x=1698863815;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MeoxSvV9LV2U+gpMh6CC2wXStEN6WTZDI/w5L7HPlVc=;
-        b=N1hxrBlmEe+ay8p6FaZgEghWHhpNcVfY2KeE2n3wkdKqO90Pw6AwcrWyp+VdYLfzLx
-         MZw6M6YXOxW+IIFWDmF4Quckoa4NhYUyyIF4khi1fz9WS0lxd2xDnSQKoM9Z6QrnSME/
-         /QURyYZ45ETZl+CJtEhal8I1oCZyswX/X9XTwIUW927beGoBmXZX/wgJ8BtzAQ6gyFi9
-         Jqedd6WlXc0aUzM4rBA/+5Gp5EWCnNwj2MgfGUOTU3CDMr6htbvJLcJ0sp70ZFCLV+qA
-         1tCIy1oxWNstobTl8qBZ2mdH5Sx5lJqWop7C7iPYKIKvYm22JBL7LrnOFuyRmRKzhEfs
-         oOhw==
-X-Gm-Message-State: AOJu0YxVDM2l2Q6G88u0DOs0hByNFBWaPhH3+AkGQciWS35vorJg7qan
-        6sME4JAY2BG1oOM+POQT329pFw==
-X-Google-Smtp-Source: AGHT+IFfd/y0Uqk6Sja7NmgNAKBqvxI3L0l/mRT4fBC9syHwD+hKKysPTBLuWSSVBYm0Fq+qEbn5ZA==
-X-Received: by 2002:a17:90a:7066:b0:27d:4d98:6812 with SMTP id f93-20020a17090a706600b0027d4d986812mr16981848pjk.38.1698259015482;
-        Wed, 25 Oct 2023 11:36:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698259019; x=1698863819;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/AQWefridDFzEX+S3QZsEdRxceu5Syx5iK5d77pjmdM=;
+        b=rhJwCtGayfhqXQWxcKaZwe83f+ir5hyXzNdFE64w6Rf1rI/pt07y/h64GoPkw4KZjl
+         Ks5iCQah3NTK1QHdvT5w94T+WEM2j4VH8ld1VT+jd62G4v0dZkZUAYhbk2g92l4PilaS
+         gtgEVKW295n8K82VRjtlVkZt85RSJ3DRYozndSBrHmQQYKvSouh8C1WQ8CjGphum1OxG
+         5Bi8SCYJRKMuc4GJ24lOGsCQLleQXBypIgQ183uPwaN40kXbSbgewrSITChZGAKCDRA0
+         HXF28dGfE9ugzAE6W48B54sfCjaqNLdK6LjXvqC8UciRfBECQOblfvlnmVHQQr3TUPUz
+         9twA==
+X-Gm-Message-State: AOJu0YyRtDAkPD9//E6uVt66+uIQZxB/hGnJ+MKFq9ih5TNRgMcHklBt
+        vW7jI9NLRZ+3z9q8tQ83u62Z+A==
+X-Google-Smtp-Source: AGHT+IFi/NboaaxSjvkdMStkpkrWMbnIqk4WWFJWYRx8koDO2Zab0WQxKwEoeYJQcTe6ecrly6nnFw==
+X-Received: by 2002:a17:90a:17c5:b0:27d:2100:b57c with SMTP id q63-20020a17090a17c500b0027d2100b57cmr14411038pja.37.1698259019481;
+        Wed, 25 Oct 2023 11:36:59 -0700 (PDT)
 Received: from localhost.localdomain ([49.216.222.119])
-        by smtp.gmail.com with ESMTPSA id g3-20020a17090adb0300b00278f1512dd9sm212367pjv.32.2023.10.25.11.36.51
+        by smtp.gmail.com with ESMTPSA id g3-20020a17090adb0300b00278f1512dd9sm212367pjv.32.2023.10.25.11.36.55
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 25 Oct 2023 11:36:54 -0700 (PDT)
+        Wed, 25 Oct 2023 11:36:59 -0700 (PDT)
 From:   Jerry Shih <jerry.shih@sifive.com>
 To:     paul.walmsley@sifive.com, palmer@dabbelt.com,
         aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
@@ -59,125 +60,57 @@ Cc:     andy.chiu@sifive.com, greentime.hu@sifive.com,
         phoebe.chen@sifive.com, hongrong.hsu@sifive.com,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH 00/12] RISC-V: provide some accelerated cryptography implementations using vector extensions
-Date:   Thu, 26 Oct 2023 02:36:32 +0800
-Message-Id: <20231025183644.8735-1-jerry.shih@sifive.com>
+Subject: [PATCH 01/12] RISC-V: add helper function to read the vector VLEN
+Date:   Thu, 26 Oct 2023 02:36:33 +0800
+Message-Id: <20231025183644.8735-2-jerry.shih@sifive.com>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20231025183644.8735-1-jerry.shih@sifive.com>
+References: <20231025183644.8735-1-jerry.shih@sifive.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series provides cryptographic implementations using the vector crypto
-extensions[1] including:
-1. AES cipher
-2. AES with CBC/CTR/ECB/XTS block modes
-3. ChaCha20 stream cipher
-4. GHASH for GCM
-5. SHA-224/256 and SHA-384/512 hash
-6. SM3 hash
-7. SM4 cipher
+From: Heiko Stuebner <heiko.stuebner@vrull.eu>
 
-This patch set is based on Heiko Stuebner's work at:
-Link: https://lore.kernel.org/all/20230711153743.1970625-1-heiko@sntech.de/
+VLEN describes the length of each vector register and some instructions
+need specific minimal VLENs to work correctly.
 
-The implementations reuse the perl-asm scripts from OpenSSL[2] with some
-changes adapting for the kernel crypto framework.
-The perl-asm scripts generate the opcodes into `.S` files instead of asm
-mnemonics. The reason for using opcodes is because the assembler hasn't
-supported the vector-crypto extensions yet.
+The vector code already includes a variable riscv_v_vsize that contains
+the value of "32 vector registers with vlenb length" that gets filled
+during boot. vlenb is the value contained in the CSR_VLENB register and
+the value represents "VLEN / 8".
 
-All changes pass the kernel run-time crypto self tests and the extra tests
-with vector-crypto-enabled qemu.
-Link: https://lists.gnu.org/archive/html/qemu-devel/2023-10/msg08822.html
+So add riscv_vector_vlen() to return the actual VLEN value for in-kernel
+users when they need to check the available VLEN.
 
-This series depend on:
-1. kernel 6.6-rc7
-Link: https://github.com/torvalds/linux/commit/05d3ef8bba77c1b5f98d941d8b2d4aeab8118ef1
-2. support kernel-mode vector
-Link: https://lore.kernel.org/all/20230721112855.1006-1-andy.chiu@sifive.com/
-3. vector crypto extensions detection
-Link: https://lore.kernel.org/lkml/20231017131456.2053396-1-cleger@rivosinc.com/
-4. fix the error message:
-    alg: skcipher: skipping comparison tests for xts-aes-aesni because
-    xts(ecb(aes-generic)) is unavailable
-Link: https://lore.kernel.org/linux-crypto/20231009023116.266210-1-ebiggers@kernel.org/
+Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+Signed-off-by: Jerry Shih <jerry.shih@sifive.com>
+---
+ arch/riscv/include/asm/vector.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Here is a branch on github applying with all dependent patches:
-Link: https://github.com/JerryShih/linux/tree/dev/jerrys/vector-crypto-upstream
-
-[1]
-Link: https://github.com/riscv/riscv-crypto/blob/56ed7952d13eb5bdff92e2b522404668952f416d/doc/vector/riscv-crypto-spec-vector.adoc
-[2]
-Link: https://github.com/openssl/openssl/pull/21923
-
-Heiko Stuebner (2):
-  RISC-V: add helper function to read the vector VLEN
-  RISC-V: hook new crypto subdir into build-system
-
-Jerry Shih (10):
-  RISC-V: crypto: add OpenSSL perl module for vector instructions
-  RISC-V: crypto: add Zvkned accelerated AES implementation
-  crypto: scatterwalk - Add scatterwalk_next() to get the next
-    scatterlist in scatter_walk
-  RISC-V: crypto: add accelerated AES-CBC/CTR/ECB/XTS implementations
-  RISC-V: crypto: add Zvkg accelerated GCM GHASH implementation
-  RISC-V: crypto: add Zvknha/b accelerated SHA224/256 implementations
-  RISC-V: crypto: add Zvknhb accelerated SHA384/512 implementations
-  RISC-V: crypto: add Zvksed accelerated SM4 implementation
-  RISC-V: crypto: add Zvksh accelerated SM3 implementation
-  RISC-V: crypto: add Zvkb accelerated ChaCha20 implementation
-
- arch/riscv/Kbuild                             |    1 +
- arch/riscv/crypto/Kconfig                     |  122 ++
- arch/riscv/crypto/Makefile                    |   68 +
- .../crypto/aes-riscv64-block-mode-glue.c      |  486 +++++++
- arch/riscv/crypto/aes-riscv64-glue.c          |  163 +++
- arch/riscv/crypto/aes-riscv64-glue.h          |   28 +
- .../crypto/aes-riscv64-zvbb-zvkg-zvkned.pl    |  944 +++++++++++++
- arch/riscv/crypto/aes-riscv64-zvkb-zvkned.pl  |  416 ++++++
- arch/riscv/crypto/aes-riscv64-zvkned.pl       | 1198 +++++++++++++++++
- arch/riscv/crypto/chacha-riscv64-glue.c       |  120 ++
- arch/riscv/crypto/chacha-riscv64-zvkb.pl      |  322 +++++
- arch/riscv/crypto/ghash-riscv64-glue.c        |  191 +++
- arch/riscv/crypto/ghash-riscv64-zvkg.pl       |  100 ++
- arch/riscv/crypto/riscv.pm                    |  828 ++++++++++++
- arch/riscv/crypto/sha256-riscv64-glue.c       |  140 ++
- .../sha256-riscv64-zvkb-zvknha_or_zvknhb.pl   |  318 +++++
- arch/riscv/crypto/sha512-riscv64-glue.c       |  133 ++
- .../crypto/sha512-riscv64-zvkb-zvknhb.pl      |  266 ++++
- arch/riscv/crypto/sm3-riscv64-glue.c          |  121 ++
- arch/riscv/crypto/sm3-riscv64-zvksh.pl        |  230 ++++
- arch/riscv/crypto/sm4-riscv64-glue.c          |  120 ++
- arch/riscv/crypto/sm4-riscv64-zvksed.pl       |  268 ++++
- arch/riscv/include/asm/vector.h               |   11 +
- crypto/Kconfig                                |    3 +
- include/crypto/scatterwalk.h                  |    9 +-
- 25 files changed, 6604 insertions(+), 2 deletions(-)
- create mode 100644 arch/riscv/crypto/Kconfig
- create mode 100644 arch/riscv/crypto/Makefile
- create mode 100644 arch/riscv/crypto/aes-riscv64-block-mode-glue.c
- create mode 100644 arch/riscv/crypto/aes-riscv64-glue.c
- create mode 100644 arch/riscv/crypto/aes-riscv64-glue.h
- create mode 100644 arch/riscv/crypto/aes-riscv64-zvbb-zvkg-zvkned.pl
- create mode 100644 arch/riscv/crypto/aes-riscv64-zvkb-zvkned.pl
- create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned.pl
- create mode 100644 arch/riscv/crypto/chacha-riscv64-glue.c
- create mode 100644 arch/riscv/crypto/chacha-riscv64-zvkb.pl
- create mode 100644 arch/riscv/crypto/ghash-riscv64-glue.c
- create mode 100644 arch/riscv/crypto/ghash-riscv64-zvkg.pl
- create mode 100644 arch/riscv/crypto/riscv.pm
- create mode 100644 arch/riscv/crypto/sha256-riscv64-glue.c
- create mode 100644 arch/riscv/crypto/sha256-riscv64-zvkb-zvknha_or_zvknhb.pl
- create mode 100644 arch/riscv/crypto/sha512-riscv64-glue.c
- create mode 100644 arch/riscv/crypto/sha512-riscv64-zvkb-zvknhb.pl
- create mode 100644 arch/riscv/crypto/sm3-riscv64-glue.c
- create mode 100644 arch/riscv/crypto/sm3-riscv64-zvksh.pl
- create mode 100644 arch/riscv/crypto/sm4-riscv64-glue.c
- create mode 100644 arch/riscv/crypto/sm4-riscv64-zvksed.pl
-
---
+diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/vector.h
+index 9fb2dea66abd..1fd3e5510b64 100644
+--- a/arch/riscv/include/asm/vector.h
++++ b/arch/riscv/include/asm/vector.h
+@@ -244,4 +244,15 @@ void kernel_vector_allow_preemption(void);
+ #define kernel_vector_allow_preemption()	do {} while (0)
+ #endif
+ 
++/*
++ * Return the implementation's vlen value.
++ *
++ * riscv_v_vsize contains the value of "32 vector registers with vlenb length"
++ * so rebuild the vlen value in bits from it.
++ */
++static inline int riscv_vector_vlen(void)
++{
++	return riscv_v_vsize / 32 * 8;
++}
++
+ #endif /* ! __ASM_RISCV_VECTOR_H */
+-- 
 2.28.0
 
