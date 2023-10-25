@@ -2,96 +2,84 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C00C25B47
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 16:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04963C0032E
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 16:20:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233357AbjJYQMx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Oct 2023 12:12:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45208 "EHLO
+        id S229655AbjJYQUr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Oct 2023 12:20:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233033AbjJYQMw (ORCPT
+        with ESMTP id S232800AbjJYQUq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Oct 2023 12:12:52 -0400
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC506136;
-        Wed, 25 Oct 2023 09:12:49 -0700 (PDT)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.nyi.internal (Postfix) with ESMTP id 573BF5C022F;
-        Wed, 25 Oct 2023 12:12:49 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Wed, 25 Oct 2023 12:12:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
-         h=cc:cc:content-type:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm2; t=1698250369; x=
-        1698336769; bh=hzZnckzsfVdY/d5nAAxnaS/VZqgX4l6X8qsQLMXgz7o=; b=k
-        SUpR7nXsLdnBZj+3/LnwISTaSJJaqialZ41pOIpB33smuanqY2izcAgEB9/fiQsp
-        4+3yYiNLtHSaIYFDHhPJgJOPf8qUO4k27xfgm31CUKX+L0EGjUCFBJh5sGBPCqzz
-        bb4DMCQ8xYjKE5JebX2dHlj9Ox2Kk4ycTj+dKsJWO7Bcl6blzyoX1ByAVyEgNcsz
-        wzRdhRv9yMbvpQ12FL4tkbh8KScw3Y28TDdg/sT6LrHzvf21CnMlKf6yT+XRE448
-        PRG6pOlCtUP4VVE6gaBcaKjpWs8nqoFj5yDZ2eB6Paiag9x3bhf6EaB19tojQ1Tc
-        wU4ubSJ43fMS1lXtMgeBg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; t=1698250369; x=1698336769; bh=hzZnckzsfVdY/
-        d5nAAxnaS/VZqgX4l6X8qsQLMXgz7o=; b=dCNya2qKKdzLspnFePdcw751pGDMG
-        UlYrMwNIB4gIgnv3Xz7eVaxaN+Fg8SLcZ/QBtED5tO16HQ8BoTLoav0u1ceJo18O
-        6o9GaJ+ns5ZEhveyeLwZCVgIxZEYyle796CqxdvJkp7zAjE2bimBsRA1NvUDVigc
-        hiQmTTuWqDgwz0ksx7jQdGORty7cw5KYO1CkeQTN63Y/SxXWShDYSyInAFtWgFvk
-        cSsXIhnfo6YbB17F1VIL29kQ6lQlchyLnjUkiEnH3P0MKkMY5plB0a41CILfss/8
-        V8SbnJJDAgicfuxwoi86E64Fo7N4b2SDVbAsf0xYJdG+N29tdPwlp1OLg==
-X-ME-Sender: <xms:gD45ZcRe13O5wUwMc8-8RBYn7VADT0Yk_Mi8F9-6BTfkQQjcpz5zPQ>
-    <xme:gD45ZZyNfW6ZZ1jtNFrWlgKn6faSsVz8YIdBFD5c0bKKEnYdbunCWFnFBJYtkzdPj
-    urg57uAjv4x4WGx1cU>
-X-ME-Received: <xmr:gD45ZZ3L36OsQ4bRuQ8Kk7ZVCKqgqRAejWtAxucXF2t89DQVwhPWZ9AYx4a06qKzzDAX6f6vebSymqA-1M0y3c6g6Fr-MAM8bYCI>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrledtgdeljecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjfgesthdtredttderjeenucfhrhhomhepuegvnhcu
-    uehovggtkhgvlhcuoehmvgessggvnhgsohgvtghkvghlrdhnvghtqeenucggtffrrghtth
-    gvrhhnpeffleegffevleekffekheeigfdtleeuvddtgffhtddvfefgjeehffduueevkedv
-    vdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmvg
-    essggvnhgsohgvtghkvghlrdhnvght
-X-ME-Proxy: <xmx:gD45ZQAs2PaCTsuG1J_IaF9Iw5lxGylttujSuJ6O8Dkns-j11ThMKA>
-    <xmx:gD45ZViA1h1JU86CPz7iP4sk3YPNG16pvI-UIA0FJpcirCXMFNAiRg>
-    <xmx:gD45ZcpRqo2LKQPI79EJt1MaLc11MBwOSKxIWBt1COFUbJiaER830Q>
-    <xmx:gT45ZQprAFt55ukZEyvkkzpm5SXB2mh1Z3pDmqgxV4UWxy5n_9Bt8g>
-Feedback-ID: iffc1478b:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 25 Oct 2023 12:12:48 -0400 (EDT)
-Date:   Wed, 25 Oct 2023 12:12:47 -0400
-From:   Ben Boeckel <me@benboeckel.net>
-To:     Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Cc:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-modules@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] docs: module-signing: adjust guide after sha1 and sha224
- support is gone
-Message-ID: <ZTk+fytHiyfbgNFC@farprobe>
-References: <20231025104212.12738-1-lukas.bulwahn@gmail.com>
- <CADWks+ZoLs1FUJx0sSg5FBYK5BtD+Po7bRORVT4uBLM6QJxXJQ@mail.gmail.com>
+        Wed, 25 Oct 2023 12:20:46 -0400
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7651C123;
+        Wed, 25 Oct 2023 09:20:44 -0700 (PDT)
+Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3b2e07e5f3aso532125b6e.0;
+        Wed, 25 Oct 2023 09:20:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698250844; x=1698855644;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xTi1+MQ4t5FTtGD8dbognkLQKmg8VuTrouDfFHJxxvg=;
+        b=jmHODSsUnCilpbO9SSx7d1k1sV7YWM5i+bpzgTEFOksiEKk0+cIZ8nV9+qeojJIL18
+         fkoXvA/36oTO8Ug7SvSOmrMhXZ53Rc2vhUTIRX+lV+pkQb+F6uw+tAAlTLZ0FY1gWuGt
+         PoRmCzkBBkTeiyCbQYiJPNU4730leGJFrwxMp14I0nxjpCJW0Tnu5EZzm5MMTmWR0UfE
+         U/I+8AYiqRsuB5p5H9h8Rk6p40/N8X3K2Gw3X2BnrwFGNSDIAF0+D5eEeipxfvh6U3Ou
+         q0uM1CuFXmDVB2YrxAaQ36LsD03AIyd3504l2jb20oTT9VrluJfdrpyPEbPM49BzXYCb
+         mvKA==
+X-Gm-Message-State: AOJu0YyzHTK+4GskYmtr6L+ufD3xudS8rr9DIZyRtCg3nJyIS+qx3NF4
+        deYN3u0+wPcOn5e2z2LeAQ==
+X-Google-Smtp-Source: AGHT+IFNkQAiovnifVoCOG0FDk5ccKTxGEA6hkgbVB3f+JzjJ2T/9bxxl6xbSMUFLnLq2Te8QIJqUA==
+X-Received: by 2002:a54:4710:0:b0:3ad:fa4b:4875 with SMTP id k16-20020a544710000000b003adfa4b4875mr83648oik.11.1698250843735;
+        Wed, 25 Oct 2023 09:20:43 -0700 (PDT)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id l17-20020a05683016d100b006cd093a0ea0sm2283200otr.5.2023.10.25.09.20.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Oct 2023 09:20:43 -0700 (PDT)
+Received: (nullmailer pid 380335 invoked by uid 1000);
+        Wed, 25 Oct 2023 16:20:42 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] hwrng: ingenic: Replace of_device.h with explicit of.h include
+Date:   Wed, 25 Oct 2023 11:20:34 -0500
+Message-ID: <20231025162034.380152-1-robh@kernel.org>
+X-Mailer: git-send-email 2.42.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CADWks+ZoLs1FUJx0sSg5FBYK5BtD+Po7bRORVT4uBLM6QJxXJQ@mail.gmail.com>
-User-Agent: Mutt/2.2.9 (2022-11-12)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 25, 2023 at 13:57:08 +0100, Dimitri John Ledkov wrote:
-> Sorry for not patching documentation at the same time as the code
-> changes that made documentation out of date.
+The DT of_device.h and of_platform.h date back to the separate
+of_platform_bus_type before it as merged into the regular platform bus.
+As part of that merge prepping Arm DT support 13 years ago, they
+"temporarily" include each other and pull in various other headers. In
+preparation to fix this, adjust the includes for what is actually needed.
 
-Should this, perhaps, get a `Fixes` trailer then?
+of_device.h isn't needed, but of.h is and was implicitly included by it.
 
---Ben
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+ drivers/char/hw_random/ingenic-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/char/hw_random/ingenic-rng.c b/drivers/char/hw_random/ingenic-rng.c
+index 4f18c3fa5427..c74ded64fbe3 100644
+--- a/drivers/char/hw_random/ingenic-rng.c
++++ b/drivers/char/hw_random/ingenic-rng.c
+@@ -11,7 +11,7 @@
+ #include <linux/io.h>
+ #include <linux/iopoll.h>
+ #include <linux/module.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ 
+-- 
+2.42.0
+
