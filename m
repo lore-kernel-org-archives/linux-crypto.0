@@ -2,40 +2,42 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D689BC25B47
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Oct 2023 01:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B27C0032E
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Oct 2023 01:45:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232366AbjJZB0O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Oct 2023 21:26:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46278 "EHLO
+        id S229772AbjJZBpZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Oct 2023 21:45:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232112AbjJZB0N (ORCPT
+        with ESMTP id S229638AbjJZBpZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Oct 2023 21:26:13 -0400
+        Wed, 25 Oct 2023 21:45:25 -0400
 Received: from wxsgout04.xfusion.com (wxsgout04.xfusion.com [36.139.87.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B84113A;
-        Wed, 25 Oct 2023 18:26:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B571BD;
+        Wed, 25 Oct 2023 18:45:22 -0700 (PDT)
 Received: from wuxshcsitd00600.xfusion.com (unknown [10.32.133.213])
-        by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4SG7NJ3bZDz9yNtW;
-        Thu, 26 Oct 2023 09:23:28 +0800 (CST)
+        by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4SG7pW2zRkz9yNtn;
+        Thu, 26 Oct 2023 09:42:43 +0800 (CST)
 Received: from localhost (10.82.147.3) by wuxshcsitd00600.xfusion.com
  (10.32.133.213) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 26 Oct
- 2023 09:26:03 +0800
-Date:   Thu, 26 Oct 2023 09:26:03 +0800
+ 2023 09:45:18 +0800
+Date:   Thu, 26 Oct 2023 09:45:18 +0800
 From:   Wang Jinchao <wangjinchao@xfusion.com>
 To:     Daniel Jordan <daniel.m.jordan@oracle.com>
 CC:     Steffen Klassert <steffen.klassert@secunet.com>,
         <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <stone.xulei@xfusion.com>
-Subject: Re: [RFC v2] padata: Simplify sysfs cpumask and sequencing logic
-Message-ID: <ZTnAK8MZzsFirDEg@fedora>
-References: <202310121006-wangjinchao@xfusion.com>
- <mtuckinkekec6b5jolatrshnaodj7q2572itq6glfmvdf4yy2v@q2xmkhwegbnn>
+Subject: Re: [RFC/REFACT] Refactoring and significantly reducing code
+ complexity
+Message-ID: <ZTnEruSMS1ldSR4j@fedora>
+References: <ZRU/EjubEH/5QLlG@fedora>
+ <x7jww3a7lebhjbwfxwabtypqzq2s752nh6xo4vpchuz2dnsefo@45aftcl4wlyx>
+ <ZTm9FtrdLXekn5Rm@fedora>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <mtuckinkekec6b5jolatrshnaodj7q2572itq6glfmvdf4yy2v@q2xmkhwegbnn>
+In-Reply-To: <ZTm9FtrdLXekn5Rm@fedora>
 X-Originating-IP: [10.82.147.3]
 X-ClientProxiedBy: wuxshcsitd00602.xfusion.com (10.32.132.250) To
  wuxshcsitd00600.xfusion.com (10.32.133.213)
@@ -43,34 +45,50 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 25, 2023 at 02:17:32PM -0400, Daniel Jordan wrote:
-> Hello,
-> 
-> On Thu, Oct 12, 2023 at 10:06:40AM +0800, Wang Jinchao wrote:
-> > Utilizing the WQ_SYSFS from workqueue to support sysfs
-> > ======================================================
-> >
-> > Padata relies on workqueue, and since workqueue has already implemented
-> > support for cpumask through WQ_SYSFS, we can reuse this functionality
-> > and avoid redundant implementation.
-> > Link: https://docs.kernel.org/core-api/workqueue.html#affinity-scopes
-> 
-> Keeping the existing padata sysfs paths seems best, as mentioned in the
-> other thread.  
-Symlinks can serve both purposes, keeping the original path and simplifying the code.
-I will incorporate this in the subsequent patches.
-> 
-> > Using completion to ensure the sequencing of the 'serial()'
-> > ===========================================================
-> 
-> I responded in the other RFC thread.
-> 
-> 
-> Thanks.
-The extensive changes in RFC v1 indeed made it challenging to read.
-Thank you very much for your patience. In RFC v2, I only wrote the
-core logic instead of lengthy patches,making it a true RFC.
-I've carefully considered your and Steffen's feedback,
-which will be addressed in RFC v3.
-
-Thanks.
+On Thu, Oct 26, 2023 at 09:12:54AM +0800, Wang Jinchao wrote:
+> On Wed, Oct 25, 2023 at 02:12:31PM -0400, Daniel Jordan wrote:
+> > On Thu, Sep 28, 2023 at 04:53:38PM +0800, Wang Jinchao wrote:
+> > > -/**
+> > > - * struct parallel_data - Internal control structure, covers everything
+> > > - * that depends on the cpumask in use.
+> > > - *
+> > > - * @ps: padata_shell object.
+> > > - * @reorder_list: percpu reorder lists
+> > > - * @squeue: percpu padata queues used for serialuzation.
+> > > - * @refcnt: Number of objects holding a reference on this parallel_data.
+> > > - * @seq_nr: Sequence number of the parallelized data object.
+> > > - * @processed: Number of already processed objects.
+> > > - * @cpu: Next CPU to be processed.
+> > > - * @cpumask: The cpumasks in use for parallel and serial workers.
+> > > - * @reorder_work: work struct for reordering.
+> > > - * @lock: Reorder lock.
+> > > - */
+> > > -struct parallel_data {
+> > > -	struct padata_shell		*ps;
+> > > -	struct padata_list		__percpu *reorder_list;
+> > > -	struct padata_serial_queue	__percpu *squeue;
+> > > -	refcount_t			refcnt;
+> > > -	unsigned int			seq_nr;
+> > > -	unsigned int			processed;
+> > > -	int				cpu;
+> > > -	struct padata_cpumask		cpumask;
+> > > -	struct work_struct		reorder_work;
+> > > -	spinlock_t                      ____cacheline_aligned lock;
+> > > -};
+> > 
+> > reorder_list used to serialize one sequence of objects per padata_shell,
+> > but now serial_wq serializes all sequences of objects in one list of
+> > work_structs.  That works in theory, since a total order can maintain
+> > each sequence's order, but it's possible (not sure yet, need to think
+> > more) that this could lead to deadlocks or other issues in odd cases
+> > such as the one that padata_shell was introduced for in bbefa1dd6a6d
+> > ("crypto: pcrypt - Avoid deadlock by using per-instance padata queues").
+> > 
+> Yes, you are correct. This version is not only ordered at the padata_shell
+> level but at the instance level, which indeed doesn't align with the design.
+> Apart from potential deadlocks, it may also cause a padata_shell_B that
+> should have completed earlier to be blocked by an unrelated padata_shell_B.
+> I will address this issue in subsequent patches.
+Apart from potential deadlocks, it may also cause a padata_shell_B that
+should have completed earlier to be blocked by an unrelated padata_shell_A.
+I will address this issue in subsequent patches.
