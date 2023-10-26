@@ -2,126 +2,126 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A936CC0032E
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 21:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02CB1C25B47
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Oct 2023 01:07:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229797AbjJYV0q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Oct 2023 17:26:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58288 "EHLO
+        id S230086AbjJZBHj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Oct 2023 21:07:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232329AbjJYV0n (ORCPT
+        with ESMTP id S230034AbjJZBHi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Oct 2023 17:26:43 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52B331A6;
-        Wed, 25 Oct 2023 14:26:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698269200; x=1729805200;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=QcRbBDBn8sT6LCxeJ7pPH2h7F8dhTxOz4sMgSXosL4c=;
-  b=UKTCnw2fK3L++u4iJojX0f6Hy/3wX293pc0R5Pwu9yrfaXHl4ayLB8J4
-   lLmI4YaKiR1SRezn31GpFTu23Y6HJxmk6EamO715UQ/Kh5v6KUlad9sae
-   7aUUbYR7jMOuUyL7gg/uFZcZdRMfAddS78BasuB+vWHh70gKIsvTN5okt
-   sHROKJLuFb3wMauLGaFv9VcTqlX2WrWwAJ7mwp+UlWJfjj3aqdqWsnVRW
-   aSEFyrPwRSZYqTGasyN99q91I5ugPosceHiXbJv7saQvW16BglQsxBmly
-   v5kzLkhNH75pHh7R1Rt8WRlGWGBfrhwHR8MAm/keE0sZai5KlX1bSqLjp
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="366750725"
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="366750725"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 14:26:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="902697016"
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="902697016"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 25 Oct 2023 14:24:12 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qvlOc-0009D4-02;
-        Wed, 25 Oct 2023 21:26:34 +0000
-Date:   Thu, 26 Oct 2023 05:26:13 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     jeshwank <JESHWANTHKUMAR.NK@amd.com>, thomas.lendacky@amd.com,
-        john.allen@amd.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, jens.wiklander@linaro.org,
-        sumit.garg@linaro.org, jarkko.nikula@linux.intel.com,
-        mario.limonciello@amd.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, op-tee@lists.trustedfirmware.org
-Cc:     oe-kbuild-all@lists.linux.dev, Mythri.Pandeshwarakrishna@amd.com,
-        Devaraj.Rangasamy@amd.com, Rijo-john.Thomas@amd.com,
-        nimesh.easow@amd.com, JESHWANTHKUMAR.NK@amd.com
-Subject: Re: [PATCH 2/3] crypto: ccp - Use psp_tee_alloc_buffer() and
- psp_tee_free_buffer()
-Message-ID: <202310260529.GEey5HQc-lkp@intel.com>
-References: <20231025065700.1556152-3-JESHWANTHKUMAR.NK@amd.com>
+        Wed, 25 Oct 2023 21:07:38 -0400
+Received: from wxsgout04.xfusion.com (wxsgout03.xfusion.com [36.139.52.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5A1DA4;
+        Wed, 25 Oct 2023 18:07:33 -0700 (PDT)
+Received: from wuxshcsitd00600.xfusion.com (unknown [10.32.133.213])
+        by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4SG6yv1NmRz9xn1w;
+        Thu, 26 Oct 2023 09:04:55 +0800 (CST)
+Received: from localhost (10.82.147.3) by wuxshcsitd00600.xfusion.com
+ (10.32.133.213) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 26 Oct
+ 2023 09:07:24 +0800
+Date:   Thu, 26 Oct 2023 09:07:24 +0800
+From:   Wang Jinchao <wangjinchao@xfusion.com>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+CC:     Steffen Klassert <steffen.klassert@secunet.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stone.xulei@xfusion.com>
+Subject: Re: [RFC/REFACT] Refactoring and significantly reducing code
+ complexity
+Message-ID: <ZTm7zMh6nWU4aJtR@fedora>
+References: <ZRU/EjubEH/5QLlG@fedora>
+ <pn2lkox4qj7ylx44jnqjf4kfpenaexbnw33xsebekeg4yz6yw4@y464o5qyj4f2>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20231025065700.1556152-3-JESHWANTHKUMAR.NK@amd.com>
+In-Reply-To: <pn2lkox4qj7ylx44jnqjf4kfpenaexbnw33xsebekeg4yz6yw4@y464o5qyj4f2>
+X-Originating-IP: [10.82.147.3]
+X-ClientProxiedBy: wuxshcsitd00602.xfusion.com (10.32.132.250) To
+ wuxshcsitd00600.xfusion.com (10.32.133.213)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi jeshwank,
+On Wed, Oct 25, 2023 at 02:07:18PM -0400, Daniel Jordan wrote:
+> Hello,
+> 
+> On Thu, Sep 28, 2023 at 04:53:38PM +0800, Wang Jinchao wrote:
+> > This is a refactored version with the following main changes:
+> 
+> The RFC overall is a nice simplification, and the basic approach of using an
+> ordered workqueue seems to work.
+> 
+> > - The parallel workqueue no longer uses the WQ_UNBOUND attribute
+> 
+> What's the justification here?  If it improves performance, please show
+> numbers.  Earlier tests[0] showed a large improvement when adding this
+> flag.
+> 
+> [0] https://lore.kernel.org/linux-crypto/20190906014029.3345-1-daniel.m.jordan@oracle.com/
+> 
+When I wrote the email on September 28th, I only used the "pcrypt_aead01"
+test case from LTP. Thank you for you and Steffen's responses. I now have
+more test cases, but I haven't tested them yet.
+> > - Removal of CPU-related logic, sysfs-related interfaces
+> 
+> I agree with Steffen that we should continue to honor the cpumasks that the
+> user sets.
+> 
+> The simplest way I see to make the parallel mask work with your refactor is to
+> just make the parallel workqueue unbound again, since setting workqueue
+> attributes is only allowed for unbound, and bring back some of the plumbing
+> that leads to the apply_workqueue_attrs call.
+You've convinced me, and I agree with your stance on keeping the cpumask.
+So, using WQ_UNBOUND is the right choice, and this will be reflected in
+my upcoming patches.
 
-kernel test robot noticed the following build warnings:
+> 
+> The serial mask is trickier.  Changing attributes of an ordered workqueue (the
+> cpumask in this case) makes the kernel throw a warning...
+> 
+> static int apply_workqueue_attrs_locked
+>         ...
+>         /* creating multiple pwqs breaks ordering guarantee */                   
+>         if (!list_empty(&wq->pwqs)) {                                            
+>                 if (WARN_ON(wq->flags & __WQ_ORDERED_EXPLICIT))                  
+>                         return -EINVAL;                                          
+>                                                                                  
+>                 wq->flags &= ~__WQ_ORDERED;                                      
+>         }
+> 
+> ...but I'm not sure this is a fundamental limitation.  The changelog of
+> 0a94efb5acbb ("workqueue: implicit ordered attribute should be overridable")
+> says changes to "max_active and some attribute changes" are rejected, but it
+> might be possible to relax the warning to allow setting a cpumask while still
+> rejecting other changes.
+Workqueue provides the alloc_ordered_workqueue method, which may be more suitable
+for serial workers.
 
-[auto build test WARNING on herbert-crypto-2.6/master]
-[also build test WARNING on linus/master v6.6-rc7]
-[cannot apply to herbert-cryptodev-2.6/master next-20231025]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/jeshwank/crypto-ccp-Add-function-to-allocate-and-free-memory-using-DMA-APIs/20231025-150420
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
-patch link:    https://lore.kernel.org/r/20231025065700.1556152-3-JESHWANTHKUMAR.NK%40amd.com
-patch subject: [PATCH 2/3] crypto: ccp - Use psp_tee_alloc_buffer() and psp_tee_free_buffer()
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20231026/202310260529.GEey5HQc-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231026/202310260529.GEey5HQc-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310260529.GEey5HQc-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/crypto/ccp/tee-dev.c:123:24: warning: no previous prototype for 'tee_alloc_cmd_buffer' [-Wmissing-prototypes]
-     123 | struct psp_tee_buffer *tee_alloc_cmd_buffer(struct psp_tee_device *tee)
-         |                        ^~~~~~~~~~~~~~~~~~~~
-
-
-vim +/tee_alloc_cmd_buffer +123 drivers/crypto/ccp/tee-dev.c
-
-   122	
- > 123	struct psp_tee_buffer *tee_alloc_cmd_buffer(struct psp_tee_device *tee)
-   124	{
-   125		struct tee_init_ring_cmd *cmd;
-   126		struct psp_tee_buffer *cmd_buffer;
-   127	
-   128		cmd_buffer = psp_tee_alloc_buffer(sizeof(*cmd),
-   129						  GFP_KERNEL | __GFP_ZERO);
-   130		if (!cmd_buffer)
-   131			return NULL;
-   132	
-   133		cmd = (struct tee_init_ring_cmd *)cmd_buffer->vaddr;
-   134		cmd->hi_addr = upper_32_bits(tee->rb_mgr.ring_buf->paddr);
-   135		cmd->low_addr = lower_32_bits(tee->rb_mgr.ring_buf->paddr);
-   136		cmd->size = tee->rb_mgr.ring_buf->size;
-   137	
-   138		dev_dbg(tee->dev, "tee: ring address: high = 0x%x low = 0x%x size = %u\n",
-   139			cmd->hi_addr, cmd->low_addr, cmd->size);
-   140	
-   141		return cmd_buffer;
-   142	}
-   143	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> 
+> > Testing was conducted using ltp's pcrypt_aead01, and the execution time
+> > comparison between the old and new versions is as follows:
+> > 
+> > Old Version:
+> > real 0m27.451s
+> > user 0m0.031s
+> > sys 0m0.260s
+> > 
+> > New Version:
+> > real 0m21.351s
+> > user 0m0.023s
+> > sys 0m0.260s
+> 
+> Great speedup.  A test that runs many requests for a long time in parallel is
+> also good to run, such as [0].
+> 
+I will conduct the test as previously mentioned.
+> > @@ -986,57 +281,27 @@ struct padata_instance *padata_alloc(const char *name)
+> ...
+> > +	pinst->serial_wq = alloc_ordered_workqueue ("%s_serial",
+> > +									WQ_MEM_RECLAIM | WQ_FREEZABLE,
+> > +									name);
+> 
+> Why add these two WQ_ flags?  Also, whitespace is kinda funky.
+You're right, I need to adjust this part of the code.
