@@ -2,76 +2,133 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C8E9C25B47
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Oct 2023 10:54:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE6B6C25B47
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Oct 2023 10:54:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345488AbjJ0Kya (ORCPT
+        id S1345648AbjJ0Kyt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Oct 2023 06:54:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33468 "EHLO
+        Fri, 27 Oct 2023 06:54:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345696AbjJ0Ky1 (ORCPT
+        with ESMTP id S1345649AbjJ0Kys (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Oct 2023 06:54:27 -0400
+        Fri, 27 Oct 2023 06:54:48 -0400
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D74E51A5;
-        Fri, 27 Oct 2023 03:54:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0846C9C
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Oct 2023 03:54:46 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qwKTd-00BeXP-1r; Fri, 27 Oct 2023 18:54:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Oct 2023 18:54:11 +0800
-Date:   Fri, 27 Oct 2023 18:54:11 +0800
+        id 1qwKUD-00Bead-Iy; Fri, 27 Oct 2023 18:54:42 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Oct 2023 18:54:47 +0800
+Date:   Fri, 27 Oct 2023 18:54:47 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Longfang Liu <liulongfang@huawei.com>
-Cc:     wangzhou1@hisilicon.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: hisilicon/qm - prevent soft lockup in receive
- loop
-Message-ID: <ZTuW09if6KVsvhVM@gondor.apana.org.au>
-References: <20231020093558.16695-1-liulongfang@huawei.com>
+To:     Damian Muszynski <damian.muszynski@intel.com>
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com
+Subject: Re: [PATCH v2 00/11] crypto: qat - add rate limiting feature to
+ qat_4xxx
+Message-ID: <ZTuW9021lj8iut8j@gondor.apana.org.au>
+References: <20231020134931.7530-1-damian.muszynski@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231020093558.16695-1-liulongfang@huawei.com>
+In-Reply-To: <20231020134931.7530-1-damian.muszynski@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 20, 2023 at 05:35:58PM +0800, Longfang Liu wrote:
-> In the scenario where the accelerator business is fully loaded.
-> When the workqueue receiving messages and performing callback
-> processing, there are a large number of messages that need to be
-> received, and there are continuously messages that have been
-> processed and need to be received.
-> This will cause the receive loop here to be locked for a long time.
-> This scenario will cause watchdog timeout problems on OS with kernel
-> preemption turned off.
+On Fri, Oct 20, 2023 at 03:49:20PM +0200, Damian Muszynski wrote:
+> This set enables hardware rate limiting capabilities on QAT 4xxx
+> accelerators. Rate Limiting allows to control the rate of the requests
+> that can be submitted to a ring pair (RP). This allows sharing
+> a QAT device among multiple users while ensuring guaranteed throughput.
 > 
-> The error logs:
-> watchdog: BUG: soft lockup - CPU#23 stuck for 23s! [kworker/u262:1:1407]
-> [ 1461.978428][   C23] Call trace:
-> [ 1461.981890][   C23]  complete+0x8c/0xf0
-> [ 1461.986031][   C23]  kcryptd_async_done+0x154/0x1f4 [dm_crypt]
-> [ 1461.992154][   C23]  sec_skcipher_callback+0x7c/0xf4 [hisi_sec2]
-> [ 1461.998446][   C23]  sec_req_cb+0x104/0x1f4 [hisi_sec2]
-> [ 1462.003950][   C23]  qm_poll_req_cb+0xcc/0x150 [hisi_qm]
-> [ 1462.009531][   C23]  qm_work_process+0x60/0xc0 [hisi_qm]
-> [ 1462.015101][   C23]  process_one_work+0x1c4/0x470
-> [ 1462.020052][   C23]  worker_thread+0x150/0x3c4
-> [ 1462.024735][   C23]  kthread+0x108/0x13c
-> [ 1462.028889][   C23]  ret_from_fork+0x10/0x18
+> The driver provides a mechanism that allows users to set policies, through
+> a sysfs interface, that are then programmed to the device. The device is
+> then enforcing the policies.
 > 
-> Therefore, it is necessary to add an actively scheduled operation in the
-> while loop to prevent this problem.
-> After adding it, no matter whether the OS turns on or off the kernel
-> preemption function. Neither will cause watchdog timeout issues.
+> The first six commits are refactoring and additions in preparation for
+>   the feature.
+> Patch #6 introduces a mechanism for retrieving firmware feature
+>   capabilities.
+> Patch #8 implements the core of the rate limiting feature by providing
+>   mechanisms to set rate limiting policies (aka SLAs).
+> The final three commits add the required sysfs interface that allow
+>   users to configure SLAs.
 > 
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> ---
->  drivers/crypto/hisilicon/qm.c | 2 ++
->  1 file changed, 2 insertions(+)
+> Changes since v1:
+> - Removed unnecessary check
+> - Simplified a few error paths
+> - Reduced a few local variables
+> - Fixed repeated error message
+> - Moved mutex lock above sla_id existence check.
+> - Added Reviewed-by tag from Tero Kristo received from an internal review
+>   of the set.
+> 
+> Ciunas Bennett (3):
+>   crypto: qat - add rate limiting sysfs interface
+>   crypto: qat - add rp2svc sysfs attribute
+>   crypto: qat - add num_rps sysfs attribute
+> 
+> Damian Muszynski (4):
+>   units: Add BYTES_PER_*BIT
+>   crypto: qat - add bits.h to icp_qat_hw.h
+>   crypto: qat - add retrieval of fw capabilities
+>   crypto: qat - add rate limiting feature to qat_4xxx
+> 
+> Giovanni Cabiddu (4):
+>   crypto: qat - refactor fw config related functions
+>   crypto: qat - use masks for AE groups
+>   crypto: qat - fix ring to service map for QAT GEN4
+>   crypto: qat - move admin api
+> 
+>  Documentation/ABI/testing/sysfs-driver-qat    |   46 +
+>  Documentation/ABI/testing/sysfs-driver-qat_rl |  227 ++++
+>  .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |  190 ++-
+>  .../intel/qat/qat_4xxx/adf_4xxx_hw_data.h     |   13 +-
+>  .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |    1 +
+>  .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |    1 +
+>  drivers/crypto/intel/qat/qat_common/Makefile  |    3 +
+>  .../intel/qat/qat_common/adf_accel_devices.h  |   11 +
+>  .../crypto/intel/qat/qat_common/adf_admin.c   |   71 +
+>  .../crypto/intel/qat/qat_common/adf_admin.h   |   27 +
+>  .../crypto/intel/qat/qat_common/adf_clock.c   |    1 +
+>  .../intel/qat/qat_common/adf_cnv_dbgfs.c      |    1 +
+>  .../intel/qat/qat_common/adf_common_drv.h     |   10 -
+>  .../intel/qat/qat_common/adf_fw_counters.c    |    1 +
+>  .../intel/qat/qat_common/adf_gen4_hw_data.h   |    7 +
+>  .../crypto/intel/qat/qat_common/adf_gen4_pm.c |    1 +
+>  .../qat/qat_common/adf_gen4_pm_debugfs.c      |    1 +
+>  .../intel/qat/qat_common/adf_gen4_timer.c     |    1 +
+>  .../intel/qat/qat_common/adf_heartbeat.c      |    1 +
+>  .../qat/qat_common/adf_heartbeat_dbgfs.c      |    1 +
+>  .../crypto/intel/qat/qat_common/adf_init.c    |   13 +
+>  drivers/crypto/intel/qat/qat_common/adf_rl.c  | 1169 +++++++++++++++++
+>  drivers/crypto/intel/qat/qat_common/adf_rl.h  |  176 +++
+>  .../intel/qat/qat_common/adf_rl_admin.c       |   97 ++
+>  .../intel/qat/qat_common/adf_rl_admin.h       |   18 +
+>  .../crypto/intel/qat/qat_common/adf_sysfs.c   |   80 ++
+>  .../intel/qat/qat_common/adf_sysfs_rl.c       |  451 +++++++
+>  .../intel/qat/qat_common/adf_sysfs_rl.h       |   11 +
+>  .../qat/qat_common/icp_qat_fw_init_admin.h    |   41 +
+>  .../crypto/intel/qat/qat_common/icp_qat_hw.h  |    2 +
+>  .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |    1 +
+>  include/linux/units.h                         |    4 +
+>  32 files changed, 2605 insertions(+), 73 deletions(-)
+>  create mode 100644 Documentation/ABI/testing/sysfs-driver-qat_rl
+>  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_admin.h
+>  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_rl.c
+>  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_rl.h
+>  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_rl_admin.c
+>  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_rl_admin.h
+>  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_sysfs_rl.c
+>  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_sysfs_rl.h
+> 
+> 
+> base-commit: 1bb03421eab67940b6509fe0869ff43df5fbe3e6
+> -- 
+> 2.34.1
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
