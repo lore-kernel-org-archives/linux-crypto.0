@@ -2,127 +2,90 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D3FC25B67
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Oct 2023 10:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D29C25B47
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Oct 2023 10:52:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230101AbjJ0Kuw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Oct 2023 06:50:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50860 "EHLO
+        id S230101AbjJ0Kw4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 Oct 2023 06:52:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231302AbjJ0Kuv (ORCPT
+        with ESMTP id S231340AbjJ0Kw4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Oct 2023 06:50:51 -0400
+        Fri, 27 Oct 2023 06:52:56 -0400
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F47A1A6;
-        Fri, 27 Oct 2023 03:50:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E7A911F
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Oct 2023 03:52:53 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qwKQI-00BeP2-A7; Fri, 27 Oct 2023 18:50:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Oct 2023 18:50:44 +0800
-Date:   Fri, 27 Oct 2023 18:50:44 +0800
+        id 1qwKSO-00BeVS-Tr; Fri, 27 Oct 2023 18:52:49 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Oct 2023 18:52:55 +0800
+Date:   Fri, 27 Oct 2023 18:52:55 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     WangJinchao <wangjinchao@xfusion.com>
-Cc:     steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stone.xulei@xfusion.com
-Subject: Re: [PATCH v4] padata: Fix refcnt handling in padata_free_shell()
-Message-ID: <ZTuWBHYUKzsBkX6S@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 00/17] crypto: stop supporting alignmask in shash
+Message-ID: <ZTuWh1niYjwal6/e@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202310160854+0800-wangjinchao@xfusion.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20231019055343.588846-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-WangJinchao <wangjinchao@xfusion.com> wrote:
-> In a high-load arm64 environment, the pcrypt_aead01 test in LTP can lead
-> to system UAF (Use-After-Free) issues. Due to the lengthy analysis of
-> the pcrypt_aead01 function call, I'll describe the problem scenario
-> using a simplified model:
+Eric Biggers <ebiggers@kernel.org> wrote:
+> The alignmask support in the shash algorithm type is virtually unused
+> and has no real point.  This patch series removes it in order to reduce
+> API overhead and complexity.
 > 
-> Suppose there's a user of padata named `user_function` that adheres to
-> the padata requirement of calling `padata_free_shell` after `serial()`
-> has been invoked, as demonstrated in the following code:
+> This series does not change anything for ahash.
 > 
-> ```c
-> struct request {
->    struct padata_priv padata;
->    struct completion *done;
-> };
+> Eric Biggers (17):
+>  crypto: sparc/crc32c - stop using the shash alignmask
+>  crypto: stm32 - remove unnecessary alignmask
+>  crypto: xilinx/zynqmp-sha - remove unnecessary alignmask
+>  crypto: mips/crc32 - remove redundant setting of alignmask to 0
+>  crypto: loongarch/crc32 - remove redundant setting of alignmask to 0
+>  crypto: cbcmac - remove unnecessary alignment logic
+>  crypto: cmac - remove unnecessary alignment logic
+>  crypto: hmac - remove unnecessary alignment logic
+>  crypto: vmac - don't set alignmask
+>  crypto: xcbc - remove unnecessary alignment logic
+>  crypto: shash - remove support for nonzero alignmask
+>  libceph: stop checking crypto_shash_alignmask
+>  crypto: drbg - stop checking crypto_shash_alignmask
+>  crypto: testmgr - stop checking crypto_shash_alignmask
+>  crypto: adiantum - stop using alignmask of shash_alg
+>  crypto: hctr2 - stop using alignmask of shash_alg
+>  crypto: shash - remove crypto_shash_alignmask
 > 
-> void parallel(struct padata_priv *padata) {
->    do_something();
-> }
+> arch/loongarch/crypto/crc32-loongarch.c |   2 -
+> arch/mips/crypto/crc32-mips.c           |   2 -
+> arch/sparc/crypto/crc32c_glue.c         |  45 +++++----
+> crypto/adiantum.c                       |   3 +-
+> crypto/ccm.c                            |  17 ++--
+> crypto/cmac.c                           |  39 ++------
+> crypto/drbg.c                           |   2 +-
+> crypto/hctr2.c                          |   3 +-
+> crypto/hmac.c                           |  56 ++++-------
+> crypto/shash.c                          | 128 ++----------------------
+> crypto/testmgr.c                        |   5 +-
+> crypto/vmac.c                           |   1 -
+> crypto/xcbc.c                           |  32 ++----
+> drivers/crypto/stm32/stm32-crc32.c      |   2 -
+> drivers/crypto/xilinx/zynqmp-sha.c      |   1 -
+> include/crypto/hash.h                   |   6 --
+> net/ceph/messenger_v2.c                 |   4 -
+> 17 files changed, 87 insertions(+), 261 deletions(-)
 > 
-> void serial(struct padata_priv *padata) {
->    struct request *request = container_of(padata,
->                                struct request,
->                                padata);
->    complete(request->done);
-> }
 > 
-> void user_function() {
->    DECLARE_COMPLETION(done)
->    padata->parallel = parallel;
->    padata->serial = serial;
->    padata_do_parallel();
->    wait_for_completion(&done);
->    padata_free_shell();
-> }
-> ```
-> 
-> In the corresponding padata.c file, there's the following code:
-> 
-> ```c
-> static void padata_serial_worker(struct work_struct *serial_work) {
->    ...
->    cnt = 0;
-> 
->    while (!list_empty(&local_list)) {
->        ...
->        padata->serial(padata);
->        cnt++;
->    }
-> 
->    local_bh_enable();
-> 
->    if (refcount_sub_and_test(cnt, &pd->refcnt))
->        padata_free_pd(pd);
-> }
-> ```
-> 
-> Because of the high system load and the accumulation of unexecuted
-> softirq at this moment, `local_bh_enable()` in padata takes longer
-> to execute than usual. Subsequently, when accessing `pd->refcnt`,
-> `pd` has already been released by `padata_free_shell()`, resulting
-> in a UAF issue with `pd->refcnt`.
-> 
-> The fix is straightforward: add `refcount_dec_and_test` before calling
-> `padata_free_pd` in `padata_free_shell`.
-> 
-> Fixes: 07928d9bfc81 ("padata: Remove broken queue flushing")
-> 
-> Signed-off-by: WangJinchao <wangjinchao@xfusion.com>
-> Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-> ---
-> V4:
->    Included Daniel's ack
->    Included Herbert's ack
-> V3: https://lore.kernel.org/all/ZSDWAcUxXcwD4YUZ@fedora/
->    Included Daniel's ack
->    introduced wrong patch 
-> V2: https://lore.kernel.org/all/ZRTLHY5A+VqIKhA2@fedora/
->    To satisfy Sparse, use rcu_dereference_protected.
->    Reported-by: kernel test robot <lkp@intel.com>
->    Closes: https://lore.kernel.org/oe-kbuild-all/202309270829.xHgTOMKw-lkp@intel.com/
-> 
-> V1: https://lore.kernel.org/all/ZRE4XvOOhz4HSOgR@fedora/
-> kernel/padata.c | 5 ++++-
-> 1 file changed, 4 insertions(+), 1 deletion(-)
+> base-commit: 5b90073defd1a52aa8120403d79f6e0fc10c87ee
+> prerequisite-patch-id: 77bd65b07cfc27f172b1698e0c4d43d6aba7ad8f
+> prerequisite-patch-id: 3ccf94d7048db0fee9407b5b5fa48554e115b56b
+> prerequisite-patch-id: e447f81a392f2f3955206357d72032cf691c7e11
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
