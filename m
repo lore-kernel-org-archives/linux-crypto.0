@@ -2,76 +2,51 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4896C25B6E
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Oct 2023 05:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC96C25B47
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Oct 2023 09:41:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345112AbjJ0FYP (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Oct 2023 01:24:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36486 "EHLO
+        id S231345AbjJ0Jlu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 Oct 2023 05:41:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231221AbjJ0FYO (ORCPT
+        with ESMTP id S230502AbjJ0Jlt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Oct 2023 01:24:14 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B08011A7;
-        Thu, 26 Oct 2023 22:24:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YAsKIDzf4gfIILb946Asaebuapv/jhJwoXiTxwG1mzc=; b=Yz5gNp6lCx2bdtSt09UjsOV2D/
-        cWTbXqSmKRKy6Ppwecx5a0JfqmX/wgWxa7NSCMJzxVrF9SyLYghv6VsvgCoxup32SR1NYEjqOzqhL
-        Yg9e7twQ+pQZj6TmRGdmxTIOd3LvCDxxp8Nyw0+ugpiccx1RJnzSl2LPkTyvNl/YC2xufil6+BAC6
-        TGO1bXTr/VM0ZcuNFtp7pkKM8gGPOOvoG+h142c2f9M0io3RjGzD0M+lvm7aRa+yehzGhe7vxKWTj
-        2XYSpcOXgLsqI54UfZUmoGb9y6J9CeSToHdoc/aq2FmGwVouq49hBetgHILisweJoQB4pEOIFW8et
-        3gtzro6g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qwFKH-00FcK0-20;
-        Fri, 27 Oct 2023 05:24:05 +0000
-Date:   Thu, 26 Oct 2023 22:24:05 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     jeshwank <JESHWANTHKUMAR.NK@amd.com>
-Cc:     thomas.lendacky@amd.com, john.allen@amd.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jens.wiklander@linaro.org, sumit.garg@linaro.org,
-        jarkko.nikula@linux.intel.com, mario.limonciello@amd.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        op-tee@lists.trustedfirmware.org,
-        Mythri.Pandeshwarakrishna@amd.com, Devaraj.Rangasamy@amd.com,
-        Rijo-john.Thomas@amd.com, nimesh.easow@amd.com
-Subject: Re: [PATCH 1/3] crypto: ccp - Add function to allocate and free
- memory using DMA APIs
-Message-ID: <ZTtJdU5a/P4kg/Ss@infradead.org>
-References: <20231025065700.1556152-1-JESHWANTHKUMAR.NK@amd.com>
- <20231025065700.1556152-2-JESHWANTHKUMAR.NK@amd.com>
+        Fri, 27 Oct 2023 05:41:49 -0400
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1EAD9C
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Oct 2023 02:41:46 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qwJLZ-00Bd08-86; Fri, 27 Oct 2023 17:41:42 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Oct 2023 17:41:47 +0800
+Date:   Fri, 27 Oct 2023 17:41:47 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Shashank Gupta <shashank.gupta@intel.com>
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Damian Muszynski <damian.muszynski@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Subject: Re: [PATCH] crypto: qat - add heartbeat error simulator
+Message-ID: <ZTuF2zSPKl9PzVJW@gondor.apana.org.au>
+References: <20231020155541.240695-1-shashank.gupta@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231025065700.1556152-2-JESHWANTHKUMAR.NK@amd.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20231020155541.240695-1-shashank.gupta@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 25, 2023 at 12:26:58PM +0530, jeshwank wrote:
-> +	tee_buf->vaddr = dma_alloc_coherent(psp->dev, size, &tee_buf->dma, gfp);
-> +	if (!tee_buf->vaddr || !tee_buf->dma) {
-> +		kfree(tee_buf);
-> +		return NULL;
-> +	}
-> +
-> +	tee_buf->size = size;
-> +
-> +	/* Check whether IOMMU is present. If present, translate IOVA
-> +	 * to physical address, else the dma handle is the physical
-> +	 * address.
-> +	 */
-> +	dom = iommu_get_domain_for_dev(psp->dev);
-> +	if (dom)
-> +		tee_buf->paddr = iommu_iova_to_phys(dom, tee_buf->dma);
-> +	else
+On Fri, Oct 20, 2023 at 04:55:26PM +0100, Shashank Gupta wrote:
+>
+> +config CRYPTO_DEV_QAT_ERROR_INJECTION
+> +	bool "Support for Intel(R) QAT Devices Heartbeat Error Injection"
+> +	default n
 
-No, you can't mix the DMA API and iommu API.  You need to stick to one
-or the other.
+Please remove this line as n is the default.
 
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
