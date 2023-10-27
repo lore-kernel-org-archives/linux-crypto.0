@@ -2,83 +2,76 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED584C25B6E
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Oct 2023 21:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4896C25B6E
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Oct 2023 05:24:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232027AbjJZVaU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Oct 2023 17:30:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57762 "EHLO
+        id S1345112AbjJ0FYP (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 Oct 2023 01:24:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234816AbjJZVaR (ORCPT
+        with ESMTP id S231221AbjJ0FYO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Oct 2023 17:30:17 -0400
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 883A11B8;
-        Thu, 26 Oct 2023 14:30:15 -0700 (PDT)
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6c496719a9aso696183a34.0;
-        Thu, 26 Oct 2023 14:30:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698355815; x=1698960615;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uumGThsJ2tlUaZjqU3bdbGfVUfgLKIQvS1lFDTq8c1w=;
-        b=Xf3I8DQBAiralYV1Jj+Qen1VW85y5mi+4USd2HhHhIrhRzFR2ZNBez47loA6zcuWtf
-         n+16yqsI+z8aIYoXzn2VQyCgGgIh7gz2ltxV/I//8a2oTl7iwB3VIYEzilldbKBo88Nx
-         9d+qTGnC7zNPj6Rs7sJH5t9rPe6JKu5s4Yl2WdKnSMHOeMzyHGhsBBmcOoxv/eiq2Jvi
-         esUPl3yVFp9WSSjVNLtiHhmyecFcshEwvafPw1If8PTmpUj+RNzqP9jmqad96Icr+gkz
-         O5zY3QZu89zleIjVEVIOLm9wUkbwXVYN9gFWkuC8NLYB/yhhNzAf2Ipx01+2yt4aID7Z
-         C5jA==
-X-Gm-Message-State: AOJu0Yw+C4NiJmr4V3KVTORvU0FuzCOvQoOEirqh0BR5A4PjhtdIRW4m
-        eVwVj1M+4HlpmMfvcoq2KA==
-X-Google-Smtp-Source: AGHT+IHpAIzrvCKKP9M3qSm4lSVVUNNQifVFkf7JpI2Hg+LQCSJEKd/X1+kX9BNdDutzrXnjp/OvKQ==
-X-Received: by 2002:a05:6830:349b:b0:6c7:c1b0:19f1 with SMTP id c27-20020a056830349b00b006c7c1b019f1mr2676824otu.1.1698355814815;
-        Thu, 26 Oct 2023 14:30:14 -0700 (PDT)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id q20-20020a056830019400b006c631df1690sm20775ota.69.2023.10.26.14.30.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 14:30:14 -0700 (PDT)
-Received: (nullmailer pid 431241 invoked by uid 1000);
-        Thu, 26 Oct 2023 21:30:13 -0000
-Date:   Thu, 26 Oct 2023 16:30:13 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Neil Armstrong <neil.armstrong@linaro.org>
-Cc:     linux-arm-msm@vger.kernel.org,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        devicetree@vger.kernel.org,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Vinod Koul <vkoul@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        Andy Gross <agross@kernel.org>
-Subject: Re: [PATCH] dt-bindings: crypto: qcom,prng: document SM8650
-Message-ID: <169835581287.431203.13078545461412266189.robh@kernel.org>
-References: <20231025-topic-sm8650-upstream-bindings-rng-v1-1-6b6a020e3441@linaro.org>
+        Fri, 27 Oct 2023 01:24:14 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B08011A7;
+        Thu, 26 Oct 2023 22:24:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=YAsKIDzf4gfIILb946Asaebuapv/jhJwoXiTxwG1mzc=; b=Yz5gNp6lCx2bdtSt09UjsOV2D/
+        cWTbXqSmKRKy6Ppwecx5a0JfqmX/wgWxa7NSCMJzxVrF9SyLYghv6VsvgCoxup32SR1NYEjqOzqhL
+        Yg9e7twQ+pQZj6TmRGdmxTIOd3LvCDxxp8Nyw0+ugpiccx1RJnzSl2LPkTyvNl/YC2xufil6+BAC6
+        TGO1bXTr/VM0ZcuNFtp7pkKM8gGPOOvoG+h142c2f9M0io3RjGzD0M+lvm7aRa+yehzGhe7vxKWTj
+        2XYSpcOXgLsqI54UfZUmoGb9y6J9CeSToHdoc/aq2FmGwVouq49hBetgHILisweJoQB4pEOIFW8et
+        3gtzro6g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qwFKH-00FcK0-20;
+        Fri, 27 Oct 2023 05:24:05 +0000
+Date:   Thu, 26 Oct 2023 22:24:05 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     jeshwank <JESHWANTHKUMAR.NK@amd.com>
+Cc:     thomas.lendacky@amd.com, john.allen@amd.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jens.wiklander@linaro.org, sumit.garg@linaro.org,
+        jarkko.nikula@linux.intel.com, mario.limonciello@amd.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        op-tee@lists.trustedfirmware.org,
+        Mythri.Pandeshwarakrishna@amd.com, Devaraj.Rangasamy@amd.com,
+        Rijo-john.Thomas@amd.com, nimesh.easow@amd.com
+Subject: Re: [PATCH 1/3] crypto: ccp - Add function to allocate and free
+ memory using DMA APIs
+Message-ID: <ZTtJdU5a/P4kg/Ss@infradead.org>
+References: <20231025065700.1556152-1-JESHWANTHKUMAR.NK@amd.com>
+ <20231025065700.1556152-2-JESHWANTHKUMAR.NK@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231025-topic-sm8650-upstream-bindings-rng-v1-1-6b6a020e3441@linaro.org>
+In-Reply-To: <20231025065700.1556152-2-JESHWANTHKUMAR.NK@amd.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, Oct 25, 2023 at 12:26:58PM +0530, jeshwank wrote:
+> +	tee_buf->vaddr = dma_alloc_coherent(psp->dev, size, &tee_buf->dma, gfp);
+> +	if (!tee_buf->vaddr || !tee_buf->dma) {
+> +		kfree(tee_buf);
+> +		return NULL;
+> +	}
+> +
+> +	tee_buf->size = size;
+> +
+> +	/* Check whether IOMMU is present. If present, translate IOVA
+> +	 * to physical address, else the dma handle is the physical
+> +	 * address.
+> +	 */
+> +	dom = iommu_get_domain_for_dev(psp->dev);
+> +	if (dom)
+> +		tee_buf->paddr = iommu_iova_to_phys(dom, tee_buf->dma);
+> +	else
 
-On Wed, 25 Oct 2023 09:28:54 +0200, Neil Armstrong wrote:
-> Document SM8650 compatible for the True Random Number Generator.
-> 
-> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
-> For convenience, a regularly refreshed linux-next based git tree containing
-> all the SM8650 related work is available at:
-> https://git.codelinaro.org/neil.armstrong/linux/-/tree/topic/sm85650/upstream/integ
-> ---
->  Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
-
-Acked-by: Rob Herring <robh@kernel.org>
+No, you can't mix the DMA API and iommu API.  You need to stick to one
+or the other.
 
