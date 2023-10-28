@@ -2,120 +2,193 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BDCFC27C4A
-	for <linux-crypto@archiver.kernel.org>; Sat, 28 Oct 2023 10:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9563C27C47
+	for <linux-crypto@archiver.kernel.org>; Sat, 28 Oct 2023 10:39:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229774AbjJ1KWm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 28 Oct 2023 06:22:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59430 "EHLO
+        id S229728AbjJ1Kjz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 28 Oct 2023 06:39:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229736AbjJ1KWl (ORCPT
+        with ESMTP id S229449AbjJ1Kjz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 28 Oct 2023 06:22:41 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26FAFE5;
-        Sat, 28 Oct 2023 03:22:38 -0700 (PDT)
+        Sat, 28 Oct 2023 06:39:55 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BE57F3;
+        Sat, 28 Oct 2023 03:39:51 -0700 (PDT)
 Received: from kwepemm000009.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SHb7m371wzpWWH;
-        Sat, 28 Oct 2023 18:17:40 +0800 (CST)
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SHbXn5JS2zVlcb;
+        Sat, 28 Oct 2023 18:35:53 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  kwepemm000009.china.huawei.com (7.193.23.227) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Sat, 28 Oct 2023 18:22:35 +0800
+ 15.1.2507.31; Sat, 28 Oct 2023 18:39:48 +0800
 From:   Weili Qian <qianweili@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <liulongfang@huawei.com>, Weili Qian <qianweili@huawei.com>
-Subject: [PATCH] crypto: hisilicon/qm - print device abnormal information
-Date:   Sat, 28 Oct 2023 18:22:44 +0800
-Message-ID: <20231028102244.43918-1-qianweili@huawei.com>
+        <liulongfang@huawei.com>
+Subject: [PATCH] crypto: hisilicon/qm - remove incorrect type cast
+Date:   Sat, 28 Oct 2023 18:40:12 +0800
+Message-ID: <20231028104012.8648-2-qianweili@huawei.com>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20231028104012.8648-1-qianweili@huawei.com>
+References: <20231028104012.8648-1-qianweili@huawei.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
 X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  kwepemm000009.china.huawei.com (7.193.23.227)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When device is abnormal and reports abnormal interrupt event to driver,
-the driver can print device information for error analysis. This patch
-adds some device error-related information output after the device reports
-an abnormal interrupt.
+The 'offset' type is unsigned long in 'struct debugfs_reg32',
+so type of values casts to unsigned long long is incorrect, and the
+values do not require type cast, remove them.
 
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+ drivers/crypto/hisilicon/debugfs.c      | 50 +++++++++++------------
+ drivers/crypto/hisilicon/zip/zip_main.c | 54 ++++++++++++-------------
+ 2 files changed, 52 insertions(+), 52 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 18599f3634c3..4d91a249be74 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -129,16 +129,21 @@
- #define QM_FIFO_OVERFLOW_TYPE		0xc0
- #define QM_FIFO_OVERFLOW_TYPE_SHIFT	6
- #define QM_FIFO_OVERFLOW_VF		0x3f
-+#define QM_FIFO_OVERFLOW_QP_SHIFT	16
- #define QM_ABNORMAL_INF01		0x100014
- #define QM_DB_TIMEOUT_TYPE		0xc0
- #define QM_DB_TIMEOUT_TYPE_SHIFT	6
- #define QM_DB_TIMEOUT_VF		0x3f
-+#define QM_DB_TIMEOUT_QP_SHIFT		16
-+#define QM_ABNORMAL_INF02		0x100018
-+#define QM_AXI_POISON_ERR		BIT(22)
- #define QM_RAS_CE_ENABLE		0x1000ec
- #define QM_RAS_FE_ENABLE		0x1000f0
- #define QM_RAS_NFE_ENABLE		0x1000f4
- #define QM_RAS_CE_THRESHOLD		0x1000f8
- #define QM_RAS_CE_TIMES_PER_IRQ		1
- #define QM_OOO_SHUTDOWN_SEL		0x1040f8
-+#define QM_AXI_RRESP_ERR		BIT(0)
- #define QM_ECC_MBIT			BIT(2)
- #define QM_DB_TIMEOUT			BIT(10)
- #define QM_OF_FIFO_OF			BIT(11)
-@@ -1406,7 +1411,7 @@ static void qm_log_hw_error(struct hisi_qm *qm, u32 error_status)
- {
- 	const struct hisi_qm_hw_error *err;
- 	struct device *dev = &qm->pdev->dev;
--	u32 reg_val, type, vf_num;
-+	u32 reg_val, type, vf_num, qp_id;
- 	int i;
+diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
+index 7e8186fe0512..415139b4abc1 100644
+--- a/drivers/crypto/hisilicon/debugfs.c
++++ b/drivers/crypto/hisilicon/debugfs.c
+@@ -53,34 +53,34 @@ static struct qm_dfx_item qm_dfx_files[] = {
+ #define CNT_CYC_REGS_NUM		10
+ static const struct debugfs_reg32 qm_dfx_regs[] = {
+ 	/* XXX_CNT are reading clear register */
+-	{"QM_ECC_1BIT_CNT               ",  0x104000ull},
+-	{"QM_ECC_MBIT_CNT               ",  0x104008ull},
+-	{"QM_DFX_MB_CNT                 ",  0x104018ull},
+-	{"QM_DFX_DB_CNT                 ",  0x104028ull},
+-	{"QM_DFX_SQE_CNT                ",  0x104038ull},
+-	{"QM_DFX_CQE_CNT                ",  0x104048ull},
+-	{"QM_DFX_SEND_SQE_TO_ACC_CNT    ",  0x104050ull},
+-	{"QM_DFX_WB_SQE_FROM_ACC_CNT    ",  0x104058ull},
+-	{"QM_DFX_ACC_FINISH_CNT         ",  0x104060ull},
+-	{"QM_DFX_CQE_ERR_CNT            ",  0x1040b4ull},
+-	{"QM_DFX_FUNS_ACTIVE_ST         ",  0x200ull},
+-	{"QM_ECC_1BIT_INF               ",  0x104004ull},
+-	{"QM_ECC_MBIT_INF               ",  0x10400cull},
+-	{"QM_DFX_ACC_RDY_VLD0           ",  0x1040a0ull},
+-	{"QM_DFX_ACC_RDY_VLD1           ",  0x1040a4ull},
+-	{"QM_DFX_AXI_RDY_VLD            ",  0x1040a8ull},
+-	{"QM_DFX_FF_ST0                 ",  0x1040c8ull},
+-	{"QM_DFX_FF_ST1                 ",  0x1040ccull},
+-	{"QM_DFX_FF_ST2                 ",  0x1040d0ull},
+-	{"QM_DFX_FF_ST3                 ",  0x1040d4ull},
+-	{"QM_DFX_FF_ST4                 ",  0x1040d8ull},
+-	{"QM_DFX_FF_ST5                 ",  0x1040dcull},
+-	{"QM_DFX_FF_ST6                 ",  0x1040e0ull},
+-	{"QM_IN_IDLE_ST                 ",  0x1040e4ull},
++	{"QM_ECC_1BIT_CNT               ",  0x104000},
++	{"QM_ECC_MBIT_CNT               ",  0x104008},
++	{"QM_DFX_MB_CNT                 ",  0x104018},
++	{"QM_DFX_DB_CNT                 ",  0x104028},
++	{"QM_DFX_SQE_CNT                ",  0x104038},
++	{"QM_DFX_CQE_CNT                ",  0x104048},
++	{"QM_DFX_SEND_SQE_TO_ACC_CNT    ",  0x104050},
++	{"QM_DFX_WB_SQE_FROM_ACC_CNT    ",  0x104058},
++	{"QM_DFX_ACC_FINISH_CNT         ",  0x104060},
++	{"QM_DFX_CQE_ERR_CNT            ",  0x1040b4},
++	{"QM_DFX_FUNS_ACTIVE_ST         ",  0x200},
++	{"QM_ECC_1BIT_INF               ",  0x104004},
++	{"QM_ECC_MBIT_INF               ",  0x10400c},
++	{"QM_DFX_ACC_RDY_VLD0           ",  0x1040a0},
++	{"QM_DFX_ACC_RDY_VLD1           ",  0x1040a4},
++	{"QM_DFX_AXI_RDY_VLD            ",  0x1040a8},
++	{"QM_DFX_FF_ST0                 ",  0x1040c8},
++	{"QM_DFX_FF_ST1                 ",  0x1040cc},
++	{"QM_DFX_FF_ST2                 ",  0x1040d0},
++	{"QM_DFX_FF_ST3                 ",  0x1040d4},
++	{"QM_DFX_FF_ST4                 ",  0x1040d8},
++	{"QM_DFX_FF_ST5                 ",  0x1040dc},
++	{"QM_DFX_FF_ST6                 ",  0x1040e0},
++	{"QM_IN_IDLE_ST                 ",  0x1040e4},
+ };
  
- 	for (i = 0; i < ARRAY_SIZE(qm_hw_error); i++) {
-@@ -1422,19 +1427,24 @@ static void qm_log_hw_error(struct hisi_qm *qm, u32 error_status)
- 			type = (reg_val & QM_DB_TIMEOUT_TYPE) >>
- 			       QM_DB_TIMEOUT_TYPE_SHIFT;
- 			vf_num = reg_val & QM_DB_TIMEOUT_VF;
--			dev_err(dev, "qm %s doorbell timeout in function %u\n",
--				qm_db_timeout[type], vf_num);
-+			qp_id = reg_val >> QM_DB_TIMEOUT_QP_SHIFT;
-+			dev_err(dev, "qm %s doorbell timeout in function %u qp %u\n",
-+				qm_db_timeout[type], vf_num, qp_id);
- 		} else if (err->int_msk & QM_OF_FIFO_OF) {
- 			reg_val = readl(qm->io_base + QM_ABNORMAL_INF00);
- 			type = (reg_val & QM_FIFO_OVERFLOW_TYPE) >>
- 			       QM_FIFO_OVERFLOW_TYPE_SHIFT;
- 			vf_num = reg_val & QM_FIFO_OVERFLOW_VF;
--
-+			qp_id = reg_val >> QM_FIFO_OVERFLOW_QP_SHIFT;
- 			if (type < ARRAY_SIZE(qm_fifo_overflow))
--				dev_err(dev, "qm %s fifo overflow in function %u\n",
--					qm_fifo_overflow[type], vf_num);
-+				dev_err(dev, "qm %s fifo overflow in function %u qp %u\n",
-+					qm_fifo_overflow[type], vf_num, qp_id);
- 			else
- 				dev_err(dev, "unknown error type\n");
-+		} else if (err->int_msk & QM_AXI_RRESP_ERR) {
-+			reg_val = readl(qm->io_base + QM_ABNORMAL_INF02);
-+			if (reg_val & QM_AXI_POISON_ERR)
-+				dev_err(dev, "qm axi poison error happened\n");
- 		}
- 	}
- }
+ static const struct debugfs_reg32 qm_vf_dfx_regs[] = {
+-	{"QM_DFX_FUNS_ACTIVE_ST         ",  0x200ull},
++	{"QM_DFX_FUNS_ACTIVE_ST         ",  0x200},
+ };
+ 
+ /* define the QM's dfx regs region and region length */
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index db4c964cd649..d6672b777efc 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -270,28 +270,28 @@ static const u64 core_offsets[] = {
+ };
+ 
+ static const struct debugfs_reg32 hzip_dfx_regs[] = {
+-	{"HZIP_GET_BD_NUM                ",  0x00ull},
+-	{"HZIP_GET_RIGHT_BD              ",  0x04ull},
+-	{"HZIP_GET_ERROR_BD              ",  0x08ull},
+-	{"HZIP_DONE_BD_NUM               ",  0x0cull},
+-	{"HZIP_WORK_CYCLE                ",  0x10ull},
+-	{"HZIP_IDLE_CYCLE                ",  0x18ull},
+-	{"HZIP_MAX_DELAY                 ",  0x20ull},
+-	{"HZIP_MIN_DELAY                 ",  0x24ull},
+-	{"HZIP_AVG_DELAY                 ",  0x28ull},
+-	{"HZIP_MEM_VISIBLE_DATA          ",  0x30ull},
+-	{"HZIP_MEM_VISIBLE_ADDR          ",  0x34ull},
+-	{"HZIP_CONSUMED_BYTE             ",  0x38ull},
+-	{"HZIP_PRODUCED_BYTE             ",  0x40ull},
+-	{"HZIP_COMP_INF                  ",  0x70ull},
+-	{"HZIP_PRE_OUT                   ",  0x78ull},
+-	{"HZIP_BD_RD                     ",  0x7cull},
+-	{"HZIP_BD_WR                     ",  0x80ull},
+-	{"HZIP_GET_BD_AXI_ERR_NUM        ",  0x84ull},
+-	{"HZIP_GET_BD_PARSE_ERR_NUM      ",  0x88ull},
+-	{"HZIP_ADD_BD_AXI_ERR_NUM        ",  0x8cull},
+-	{"HZIP_DECOMP_STF_RELOAD_CURR_ST ",  0x94ull},
+-	{"HZIP_DECOMP_LZ77_CURR_ST       ",  0x9cull},
++	{"HZIP_GET_BD_NUM                ",  0x00},
++	{"HZIP_GET_RIGHT_BD              ",  0x04},
++	{"HZIP_GET_ERROR_BD              ",  0x08},
++	{"HZIP_DONE_BD_NUM               ",  0x0c},
++	{"HZIP_WORK_CYCLE                ",  0x10},
++	{"HZIP_IDLE_CYCLE                ",  0x18},
++	{"HZIP_MAX_DELAY                 ",  0x20},
++	{"HZIP_MIN_DELAY                 ",  0x24},
++	{"HZIP_AVG_DELAY                 ",  0x28},
++	{"HZIP_MEM_VISIBLE_DATA          ",  0x30},
++	{"HZIP_MEM_VISIBLE_ADDR          ",  0x34},
++	{"HZIP_CONSUMED_BYTE             ",  0x38},
++	{"HZIP_PRODUCED_BYTE             ",  0x40},
++	{"HZIP_COMP_INF                  ",  0x70},
++	{"HZIP_PRE_OUT                   ",  0x78},
++	{"HZIP_BD_RD                     ",  0x7c},
++	{"HZIP_BD_WR                     ",  0x80},
++	{"HZIP_GET_BD_AXI_ERR_NUM        ",  0x84},
++	{"HZIP_GET_BD_PARSE_ERR_NUM      ",  0x88},
++	{"HZIP_ADD_BD_AXI_ERR_NUM        ",  0x8c},
++	{"HZIP_DECOMP_STF_RELOAD_CURR_ST ",  0x94},
++	{"HZIP_DECOMP_LZ77_CURR_ST       ",  0x9c},
+ };
+ 
+ static const struct debugfs_reg32 hzip_com_dfx_regs[] = {
+@@ -303,11 +303,11 @@ static const struct debugfs_reg32 hzip_com_dfx_regs[] = {
+ };
+ 
+ static const struct debugfs_reg32 hzip_dump_dfx_regs[] = {
+-	{"HZIP_GET_BD_NUM                ",  0x00ull},
+-	{"HZIP_GET_RIGHT_BD              ",  0x04ull},
+-	{"HZIP_GET_ERROR_BD              ",  0x08ull},
+-	{"HZIP_DONE_BD_NUM               ",  0x0cull},
+-	{"HZIP_MAX_DELAY                 ",  0x20ull},
++	{"HZIP_GET_BD_NUM                ",  0x00},
++	{"HZIP_GET_RIGHT_BD              ",  0x04},
++	{"HZIP_GET_ERROR_BD              ",  0x08},
++	{"HZIP_DONE_BD_NUM               ",  0x0c},
++	{"HZIP_MAX_DELAY                 ",  0x20},
+ };
+ 
+ /* define the ZIP's dfx regs region and region length */
 -- 
 2.33.0
 
