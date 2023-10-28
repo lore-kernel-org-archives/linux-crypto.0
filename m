@@ -2,164 +2,120 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC6EC27C48
-	for <linux-crypto@archiver.kernel.org>; Sat, 28 Oct 2023 00:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BDCFC27C4A
+	for <linux-crypto@archiver.kernel.org>; Sat, 28 Oct 2023 10:22:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231569AbjJ1AZG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Oct 2023 20:25:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44350 "EHLO
+        id S229774AbjJ1KWm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 28 Oct 2023 06:22:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbjJ1AZG (ORCPT
+        with ESMTP id S229736AbjJ1KWl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Oct 2023 20:25:06 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 240FA1B9;
-        Fri, 27 Oct 2023 17:25:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698452704; x=1729988704;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3btZhMeeHcq78slgVZVvUBLc3+r/j9Mw1EtMte4xFmU=;
-  b=A0twDkLfa7AZwwasq7+AuRGbK+tZ5CTe4pP0hj1354BB6w3TW+LZgdzq
-   zCaW7RqX120RCOOp8kaP6CcRtmpSFq1Z1qNDytNGCRJk79spsmZpRrzuC
-   U66V9AsJ86hG/SjiYR92vbf6+ap7FF5X5mgNN/imc7fV8YYb31jcyNjpG
-   IlPUwccoSPCSf1X0NgQiIuwpXfUKV0T57BuzGQu1R/tuCqORUYi+LYMN5
-   B3KyUZC3Ed7bZUJwliBauWcLBa22Zjx+wDvwo54XMdNDwqACPSFYNwE2B
-   21EpkUvb6CKQgncwjMgHZzG0W3FfbjKrqfNj+xGHdpocgXj7jAzWn0Eh4
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="418978419"
-X-IronPort-AV: E=Sophos;i="6.03,257,1694761200"; 
-   d="scan'208";a="418978419"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 17:25:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="763381068"
-X-IronPort-AV: E=Sophos;i="6.03,257,1694761200"; 
-   d="scan'208";a="763381068"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by fmsmga007.fm.intel.com with ESMTP; 27 Oct 2023 17:25:01 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qwX8N-000BJ5-0F;
-        Sat, 28 Oct 2023 00:24:59 +0000
-Date:   Sat, 28 Oct 2023 08:24:57 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Vadim Fedorenko <vadfed@meta.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Mykola Lysenko <mykolal@fb.com>
-Cc:     oe-kbuild-all@lists.linux.dev, Vadim Fedorenko <vadfed@meta.com>,
-        bpf@vger.kernel.org, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2 1/2] bpf: add skcipher API support to TC/XDP
- programs
-Message-ID: <202310280854.tycUngCC-lkp@intel.com>
-References: <20231027172039.1365917-1-vadfed@meta.com>
+        Sat, 28 Oct 2023 06:22:41 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26FAFE5;
+        Sat, 28 Oct 2023 03:22:38 -0700 (PDT)
+Received: from kwepemm000009.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SHb7m371wzpWWH;
+        Sat, 28 Oct 2023 18:17:40 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ kwepemm000009.china.huawei.com (7.193.23.227) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Sat, 28 Oct 2023 18:22:35 +0800
+From:   Weili Qian <qianweili@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <liulongfang@huawei.com>, Weili Qian <qianweili@huawei.com>
+Subject: [PATCH] crypto: hisilicon/qm - print device abnormal information
+Date:   Sat, 28 Oct 2023 18:22:44 +0800
+Message-ID: <20231028102244.43918-1-qianweili@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231027172039.1365917-1-vadfed@meta.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm000009.china.huawei.com (7.193.23.227)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Vadim,
+When device is abnormal and reports abnormal interrupt event to driver,
+the driver can print device information for error analysis. This patch
+adds some device error-related information output after the device reports
+an abnormal interrupt.
 
-kernel test robot noticed the following build warnings:
+Signed-off-by: Weili Qian <qianweili@huawei.com>
+---
+ drivers/crypto/hisilicon/qm.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-[auto build test WARNING on bpf-next/master]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/selftests-bpf-crypto-skcipher-algo-selftests/20231028-020332
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20231027172039.1365917-1-vadfed%40meta.com
-patch subject: [PATCH bpf-next v2 1/2] bpf: add skcipher API support to TC/XDP programs
-config: mips-allyesconfig (https://download.01.org/0day-ci/archive/20231028/202310280854.tycUngCC-lkp@intel.com/config)
-compiler: mips-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231028/202310280854.tycUngCC-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310280854.tycUngCC-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> kernel/bpf/crypto.c:74: warning: Function parameter or member 'palgo' not described in 'bpf_crypto_skcipher_ctx_create'
->> kernel/bpf/crypto.c:74: warning: Function parameter or member 'pkey' not described in 'bpf_crypto_skcipher_ctx_create'
->> kernel/bpf/crypto.c:74: warning: Function parameter or member 'err' not described in 'bpf_crypto_skcipher_ctx_create'
->> kernel/bpf/crypto.c:74: warning: Excess function parameter 'algo' description in 'bpf_crypto_skcipher_ctx_create'
->> kernel/bpf/crypto.c:74: warning: Excess function parameter 'key' description in 'bpf_crypto_skcipher_ctx_create'
-
-
-vim +74 kernel/bpf/crypto.c
-
-    58	
-    59	/**
-    60	 * bpf_crypto_skcipher_ctx_create() - Create a mutable BPF crypto context.
-    61	 *
-    62	 * Allocates a crypto context that can be used, acquired, and released by
-    63	 * a BPF program. The crypto context returned by this function must either
-    64	 * be embedded in a map as a kptr, or freed with bpf_crypto_skcipher_ctx_release().
-    65	 *
-    66	 * bpf_crypto_skcipher_ctx_create() allocates memory using the BPF memory
-    67	 * allocator, and will not block. It may return NULL if no memory is available.
-    68	 * @algo: bpf_dynptr which holds string representation of algorithm.
-    69	 * @key:  bpf_dynptr which holds cipher key to do crypto.
-    70	 */
-    71	__bpf_kfunc struct bpf_crypto_skcipher_ctx *
-    72	bpf_crypto_skcipher_ctx_create(const struct bpf_dynptr_kern *palgo,
-    73				       const struct bpf_dynptr_kern *pkey, int *err)
-  > 74	{
-    75		struct bpf_crypto_skcipher_ctx *ctx;
-    76		char *algo;
-    77	
-    78		if (__bpf_dynptr_size(palgo) > CRYPTO_MAX_ALG_NAME) {
-    79			*err = -EINVAL;
-    80			return NULL;
-    81		}
-    82	
-    83		algo = __bpf_dynptr_data_ptr(palgo);
-    84	
-    85		if (!crypto_has_skcipher(algo, CRYPTO_ALG_TYPE_SKCIPHER, CRYPTO_ALG_TYPE_MASK)) {
-    86			*err = -EOPNOTSUPP;
-    87			return NULL;
-    88		}
-    89	
-    90		ctx = kmalloc(sizeof(*ctx), GFP_KERNEL);
-    91		if (!ctx) {
-    92			*err = -ENOMEM;
-    93			return NULL;
-    94		}
-    95	
-    96		memset(ctx, 0, sizeof(*ctx));
-    97	
-    98		ctx->tfm = crypto_alloc_sync_skcipher(algo, 0, 0);
-    99		if (IS_ERR(ctx->tfm)) {
-   100			*err = PTR_ERR(ctx->tfm);
-   101			ctx->tfm = NULL;
-   102			goto err;
-   103		}
-   104	
-   105		*err = crypto_sync_skcipher_setkey(ctx->tfm, __bpf_dynptr_data_ptr(pkey),
-   106						   __bpf_dynptr_size(pkey));
-   107		if (*err)
-   108			goto err;
-   109	
-   110		refcount_set(&ctx->usage, 1);
-   111	
-   112		return ctx;
-   113	err:
-   114		if (ctx->tfm)
-   115			crypto_free_sync_skcipher(ctx->tfm);
-   116		kfree(ctx);
-   117	
-   118		return NULL;
-   119	}
-   120	
-
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 18599f3634c3..4d91a249be74 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -129,16 +129,21 @@
+ #define QM_FIFO_OVERFLOW_TYPE		0xc0
+ #define QM_FIFO_OVERFLOW_TYPE_SHIFT	6
+ #define QM_FIFO_OVERFLOW_VF		0x3f
++#define QM_FIFO_OVERFLOW_QP_SHIFT	16
+ #define QM_ABNORMAL_INF01		0x100014
+ #define QM_DB_TIMEOUT_TYPE		0xc0
+ #define QM_DB_TIMEOUT_TYPE_SHIFT	6
+ #define QM_DB_TIMEOUT_VF		0x3f
++#define QM_DB_TIMEOUT_QP_SHIFT		16
++#define QM_ABNORMAL_INF02		0x100018
++#define QM_AXI_POISON_ERR		BIT(22)
+ #define QM_RAS_CE_ENABLE		0x1000ec
+ #define QM_RAS_FE_ENABLE		0x1000f0
+ #define QM_RAS_NFE_ENABLE		0x1000f4
+ #define QM_RAS_CE_THRESHOLD		0x1000f8
+ #define QM_RAS_CE_TIMES_PER_IRQ		1
+ #define QM_OOO_SHUTDOWN_SEL		0x1040f8
++#define QM_AXI_RRESP_ERR		BIT(0)
+ #define QM_ECC_MBIT			BIT(2)
+ #define QM_DB_TIMEOUT			BIT(10)
+ #define QM_OF_FIFO_OF			BIT(11)
+@@ -1406,7 +1411,7 @@ static void qm_log_hw_error(struct hisi_qm *qm, u32 error_status)
+ {
+ 	const struct hisi_qm_hw_error *err;
+ 	struct device *dev = &qm->pdev->dev;
+-	u32 reg_val, type, vf_num;
++	u32 reg_val, type, vf_num, qp_id;
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(qm_hw_error); i++) {
+@@ -1422,19 +1427,24 @@ static void qm_log_hw_error(struct hisi_qm *qm, u32 error_status)
+ 			type = (reg_val & QM_DB_TIMEOUT_TYPE) >>
+ 			       QM_DB_TIMEOUT_TYPE_SHIFT;
+ 			vf_num = reg_val & QM_DB_TIMEOUT_VF;
+-			dev_err(dev, "qm %s doorbell timeout in function %u\n",
+-				qm_db_timeout[type], vf_num);
++			qp_id = reg_val >> QM_DB_TIMEOUT_QP_SHIFT;
++			dev_err(dev, "qm %s doorbell timeout in function %u qp %u\n",
++				qm_db_timeout[type], vf_num, qp_id);
+ 		} else if (err->int_msk & QM_OF_FIFO_OF) {
+ 			reg_val = readl(qm->io_base + QM_ABNORMAL_INF00);
+ 			type = (reg_val & QM_FIFO_OVERFLOW_TYPE) >>
+ 			       QM_FIFO_OVERFLOW_TYPE_SHIFT;
+ 			vf_num = reg_val & QM_FIFO_OVERFLOW_VF;
+-
++			qp_id = reg_val >> QM_FIFO_OVERFLOW_QP_SHIFT;
+ 			if (type < ARRAY_SIZE(qm_fifo_overflow))
+-				dev_err(dev, "qm %s fifo overflow in function %u\n",
+-					qm_fifo_overflow[type], vf_num);
++				dev_err(dev, "qm %s fifo overflow in function %u qp %u\n",
++					qm_fifo_overflow[type], vf_num, qp_id);
+ 			else
+ 				dev_err(dev, "unknown error type\n");
++		} else if (err->int_msk & QM_AXI_RRESP_ERR) {
++			reg_val = readl(qm->io_base + QM_ABNORMAL_INF02);
++			if (reg_val & QM_AXI_POISON_ERR)
++				dev_err(dev, "qm axi poison error happened\n");
+ 		}
+ 	}
+ }
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.33.0
+
