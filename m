@@ -2,150 +2,206 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE909C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Oct 2023 06:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD10C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Oct 2023 06:21:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229923AbjJ3GGO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Oct 2023 02:06:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41828 "EHLO
+        id S231339AbjJ3GVb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Oct 2023 02:21:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231230AbjJ3GGN (ORCPT
+        with ESMTP id S230458AbjJ3GVa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Oct 2023 02:06:13 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2088.outbound.protection.outlook.com [40.107.223.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0458A9;
-        Sun, 29 Oct 2023 23:06:10 -0700 (PDT)
+        Mon, 30 Oct 2023 02:21:30 -0400
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2043.outbound.protection.outlook.com [40.107.95.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE8169C;
+        Sun, 29 Oct 2023 23:21:26 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Sd4TOzoOf0mFdHHE1LJntTez+fkSArF2sCupHsn/gtl4auOC9b5ametOR2P69flPG5oxv4uDTQDuXri751/GK5Yruh3/LAGviGHCOuPtcGofT7VOLkk5mYaNI/7vLmXkuRg6KeXUwcblbX1joxg+UR8gMdMW3kdwNWwRLbci6U9EVBfJbVCnWuNtv3O0QxWDTjg3FoaVkicSxeYwKDdp7HnGS3v2qxXX/CPJ6v+/OWyzkdHUcg8jtJZX/MsGnaE4n9VsuXyb1MBP718lgrxKgDkWgt8UZa9n52o1rPb9zDaYmfvUHYSGryHbyHz6dGukwAodQHlKxfgLMLuHKkT/jw==
+ b=JSq+z239JhBexnCGQLaxuWAgHpiZ78U9tzmjRLw1Xq9vEia6iArzf++BPejuLFjhuW+AC997PmDBgmly/rfx1IBMKBfDGZ2NNhk1jdcGRRyHNp6vPCVKhKgv4DvbWWnHNe6wWZ8I0cwwkxcY5wTccEziaYsfNhYhwampmHFooPSgwydMGumW3UW2rjIeuBSa932RfaHoT278csnK0YdIYlav1ovSPDBto4jGzjFoigNR3/P5caWiCXPlmL5kgTj2V0WOvXIIFPK3i5bwdFiwfC0gNIieXcxMoWa5B4Q6fE2myq7ZQcxfZ32R7llHztLQzRDTYR90O0PiPQO8zNlwfw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yn8fssoxg2/GxH8MzhZZVuW2+aYbk+P8uR6t2K6peWI=;
- b=S2613paPRmf0FR+t2ZLMTh3sE7c57IUW3Sr32cXjhF4ZXUb6IgtbD9ezUjccWH/YMIWTzwu707i08T7G6haNRKxsHRqgWq6BNkM/iBSdVLTa3ssuujZ9UmkoosHjja3OS8NiLwOKDiJ6Txu9pxjhgEQiypP78jPHDigPVONFduc2kN16Ltju7yZfgd1M5tNPTsTyd3aC44Hw12sTQqbDyn+ajWyBn3ju1DxKBhybwbcRlPFytF/vEDfqPxFswE05VmOl3BoL88avq6Ymd5ryhtKWHnpS9T3TFF5Gd6Ah6q+Ri5XPm2mpuNDzhvriCVuAFWND9MaVatCmX0lcEW8GvQ==
+ bh=WEC3kG0rh3rcdPKSFcNNmuzpIgh3dy+3Kym4Jiu8dhw=;
+ b=MnJypaRIn0ae7YSq7zPhSWZT3W2QtN13O96IMbsFa6FxqwiWfUOQyRi298/afxFIDql7NvULndfAHOlbMuF1HH5aRPA/cWJ71iG0OwH/D6dTeuDj2hJEGLwNjWqjeaF0FYNDdID5SYJ7vT5DewtUKcfQxrDxjmxqidtle/XMLRqDZlWeDFELvWGIhzXP8YSmi72bYVqz8UQKFHnBU7YcNuPrza3Y7jP1keEPT0FqfpFV0X/dHeQdMaDAn6ykYeta9jpXJa+eT8KRZ2zlqqZmuurcEDFVam2RAC0e6BrKssmqStGbHTJLrLuBCpMfu/CbcHR2UONAghy9n0cdCBPlcA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yn8fssoxg2/GxH8MzhZZVuW2+aYbk+P8uR6t2K6peWI=;
- b=Nm97d/tejiyNwA6u3umXNVZBEBJAfrLGOst82tfxCauA0adBF4pEXhngMSYLSpmRr22bGnj/qyO92sIDuKN9pgwjYcW9fSc5Vb3LGguJme9h5acqxRzhEN0SeKnWpDYI5TPP4xDgrEqvS4HrsjS7kXTO2tgP02Qm5b6UUd33IZA=
+ bh=WEC3kG0rh3rcdPKSFcNNmuzpIgh3dy+3Kym4Jiu8dhw=;
+ b=qJ+8Gf07Ibgcr+Ppsds97yVxA6f0qUIE+hvPS9Fgg9YC0GcS37ls0Qvpqzg6C/kPhEuNy3P97vH/ZpcUjwl+Cb9eYCWCpCQ9JRKsRm3eRPj2NPTmremZAbUgg+gUgvI6fr7K2f8BC+dvYE+Mwoy2YVMXXzW1QySZKG8bFmUkEcE=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from SA1PR12MB8641.namprd12.prod.outlook.com (2603:10b6:806:388::18)
- by SA1PR12MB6994.namprd12.prod.outlook.com (2603:10b6:806:24d::18) with
+ by DM6PR12MB4282.namprd12.prod.outlook.com (2603:10b6:5:223::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.28; Mon, 30 Oct
- 2023 06:06:08 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.26; Mon, 30 Oct
+ 2023 06:21:24 +0000
 Received: from SA1PR12MB8641.namprd12.prod.outlook.com
  ([fe80::9b29:df63:fce7:8b3e]) by SA1PR12MB8641.namprd12.prod.outlook.com
  ([fe80::9b29:df63:fce7:8b3e%2]) with mapi id 15.20.6933.028; Mon, 30 Oct 2023
- 06:06:08 +0000
-Message-ID: <be7a774e-54d7-4ebf-8476-de137c47f020@amd.com>
-Date:   Mon, 30 Oct 2023 11:35:57 +0530
+ 06:21:24 +0000
+Message-ID: <f21143fb-91d2-4186-938e-0d147e32aa76@amd.com>
+Date:   Mon, 30 Oct 2023 11:51:06 +0530
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] crypto: ccp - Add function to allocate and free
- memory using DMA APIs
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     thomas.lendacky@amd.com, john.allen@amd.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jens.wiklander@linaro.org, sumit.garg@linaro.org,
+Subject: Re: [PATCH 0/3] Introduce DMA APIs to allocate and free TEE shared
+ memory
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Sumit Garg <sumit.garg@linaro.org>
+Cc:     john.allen@amd.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, jens.wiklander@linaro.org,
         jarkko.nikula@linux.intel.com, mario.limonciello@amd.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         op-tee@lists.trustedfirmware.org,
         Mythri.Pandeshwarakrishna@amd.com, Devaraj.Rangasamy@amd.com,
-        Rijo-john.Thomas@amd.com, nimesh.easow@amd.com
+        Rijo-john.Thomas@amd.com, nimesh.easow@amd.com, ray.huang@amd.com,
+        stefano.stabellini@amd.com
 References: <20231025065700.1556152-1-JESHWANTHKUMAR.NK@amd.com>
- <20231025065700.1556152-2-JESHWANTHKUMAR.NK@amd.com>
- <ZTtJdU5a/P4kg/Ss@infradead.org>
+ <CAFA6WYPKXFftMzqJ4GnXT-zqu21_Jzn8aKti_wU-pQ4KpEVNrA@mail.gmail.com>
+ <4a261870-03e0-49f8-b968-4cbcf646d9eb@amd.com>
+ <b743d759-8f6b-b4f8-afc6-d8f11a5562ff@amd.com>
+Content-Language: en-US
 From:   "NK, JESHWANTHKUMAR" <jeshwanthkumar.nk@amd.com>
-In-Reply-To: <ZTtJdU5a/P4kg/Ss@infradead.org>
+In-Reply-To: <b743d759-8f6b-b4f8-afc6-d8f11a5562ff@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0023.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:97::13) To SA1PR12MB8641.namprd12.prod.outlook.com
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN3PR01CA0086.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:9a::8) To SA1PR12MB8641.namprd12.prod.outlook.com
  (2603:10b6:806:388::18)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR12MB8641:EE_|SA1PR12MB6994:EE_
-X-MS-Office365-Filtering-Correlation-Id: 87b75436-3f02-4075-8bfc-08dbd90e4eec
+X-MS-TrafficTypeDiagnostic: SA1PR12MB8641:EE_|DM6PR12MB4282:EE_
+X-MS-Office365-Filtering-Correlation-Id: a6d88522-9acf-494b-5200-08dbd910705c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2W+YF7UN/r+tD7JpWd5QLGu9xdCJiR3YWSYu5XknlCZnNyqztEkXEfscWFXvCI2uJwlOEIEL9+m3FxP8GsOGotkVT5/G7+miiDRLSu2YuFU1MHqqRQseUThSVcLPnIaLeUgEb3dE6wMPMTRdfT6O1KxxHDy0julFaxD5oLxmC/uY/JT1sPhA72o2seCmeU0b/49ftF7rrtDuJr5yRYZUrkIjs+YjonaKUWR2KDDKTq/eflV89T3PpJnUjY9ZZA0VSVj0YwUT5nfrUxrYwNcPlLy7UQLRECbmMRuvHGM2FPdgoHe29u5EpuT6JDM/0mc5C3b385YEJmm1WKySa2jdsw4fyIc8wnvXNfPRD+fZBveBSpFC84XrxE236gjbdXyySd+O0szTNW4yV11RFcoRjq2RNSpbLxIG1pEZZIBtYyrOhiifjkhzcOgS9SxVgJS6gHMqmA5jjhdyhpARE273TqkOQQq0XQe96vp7ps7Rca+2g1V4I/7FtJOS3sCrcWbra2ragIL8vWhdX0EDZvwUwAh/Hueb7g3T7Dz2T78F06OMaia1QjpkpCe21ydhOgVe9vO4GPqL13iTKTY6yOk1TeqOGUEtFbtTQKw/V4xDw5p4Z8dkKghJUUXb0ulFQxbceFrX4bzvV+5f8+IJIGXyjg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB8641.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(366004)(39860400002)(346002)(396003)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(41300700001)(6916009)(316002)(66556008)(66476007)(66946007)(26005)(4744005)(8676002)(4326008)(8936002)(31686004)(2906002)(6486002)(5660300002)(478600001)(6506007)(53546011)(6512007)(36756003)(2616005)(6666004)(38100700002)(86362001)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 9v0YA9Me6HPRa6Z0jx4ESrE8SFBrcIhLNH+nADefmMXe40WytxJWYTcftbydzh6qxOy6Y6f/7r5jnTt4rs9QUIYepZB1FQPIPAyUttGTJrLQe63/hFmMLWB59j4otY6Rgjs/1h0HVKjuwpJK/mUg74b3u/iWFuB6Wk/fwjpZlKds4p24yGaplMqqmA7Iax0kfTj1EAbEHd7ayS5n+X5OnKA+eEsue9yBsD5xCsPy5p1lNoTFLAGvMJr35oUjnICmEonxgpGXwAbzJLAR5D3lTxXUlaUdYUpf8R5J1Y4+ryn0L4GcMsS4kB59X7aJ0apSsymmlbsKOmkuv/MCNxxf/42fSccwohb3yIS6tiuUiqe8cwRh2J1zSydnlOzMaUKwcbJRk+LFdZmZFJtJV4eQZItRX8MzGxbcuk4T5jXV3vv3dXAACyWSunoCLgtKiouGn3vvrMGscTRQCZJ4ijiiiUCxc3zzAsc1Z2aMVyXSH2msuh24yIH3nAnOhQUV26nujZ9woDDI+VxbEQzo8p1r9k+nTa5aqvqnakqgYs4PmKBOP12Awh3FvZk0QBwdt+zVY5Q2T2vaUtpTU78VxeKOxwmZ7VPMI7svkX+Yfhg2T+s5wnIDlGQ03j3fnPqQXTG/Z6wNDheBZHuY2GUWKrbzFg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB8641.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(366004)(346002)(376002)(136003)(230922051799003)(186009)(451199024)(64100799003)(1800799009)(83380400001)(26005)(38100700002)(2616005)(316002)(110136005)(66946007)(66556008)(66476007)(5660300002)(4326008)(8676002)(8936002)(53546011)(6666004)(41300700001)(6506007)(2906002)(6486002)(6512007)(478600001)(36756003)(86362001)(31696002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QXAxZFdVaFFqbW9nNWp6L0ZHS2xmMjczYzEvNTJ3Vkd1a3ZrMjBQd1NRbERo?=
- =?utf-8?B?SWk2SVpGWlA0dThSYVprbGV4dnJHbFRMWkp3U1gvS3ZPRHZKaWJFblZaM3JY?=
- =?utf-8?B?WitUMmRqUC9PUzNTZ1NLVU12alRGMUZ2aDdPaGFGT01LNCtJc0lVODk4WG1X?=
- =?utf-8?B?WXVPVTNXUmtWUVFtSy9Md0VqbU1IVzlpZjFxNGZKTHUwaHdIZS8yWnNVMlV2?=
- =?utf-8?B?Mmp3Z2N5Z21UbUFZeU9vc2lFRFVjNHI1dmxpMFJqTkRQeGpETW9hYVVmalh6?=
- =?utf-8?B?aTlmRTRhd2FJM0xRVUJHMmFxalpKWXFCdVZqbFY4U2ptWGRMeWxTaWI3RElW?=
- =?utf-8?B?NElIRXhYaXFnVTZVcUR5MDFFN0tBRHY4OVp5QWdtUkpJaTl2WEc1bTVJQ3d3?=
- =?utf-8?B?bituRlFCM0xQUmVTdDh0Ukdoc2REdEp5eWJqT011SURzbVgzS0IvZlZrbTcz?=
- =?utf-8?B?QnRDY0ZSNGdxWmtzY3lnSnh6YXp1eTNjN2JycWs1SG1iNEp0NmxmQm0veEhV?=
- =?utf-8?B?cTh5M3hpRC8yNzlaZGJqYVNjbzlzUkNYY3Mwd2NhSVEyanB1SkFEMDZ3WHRU?=
- =?utf-8?B?RldiTFlCN0xDUXNXallRREVIdHZha1RackhVUmFzOTR5RVpYbklDWTJyOWpn?=
- =?utf-8?B?Vm8yM1ZqYjljcTd2Y2IvcnJjUTJWNmtsNlAyTzNtMEpVK21UdTNUdjhtOUx6?=
- =?utf-8?B?TGw3R1pZQVU5enBKb25xelRENDZicm5lZDd2ZUI0ZjNFOW1MUWF2SGNBTG1G?=
- =?utf-8?B?VEI3T1JEVmZsazlLeE1mZDEvK2lVbk05V3pOb3dtbDFQNktjb29McjR0S1RV?=
- =?utf-8?B?OCtCWmZEY0w5MitUNXVyRFdOaC9UZWdKMEY3QXNrS1c3QTlvMWZvdXhHL0lF?=
- =?utf-8?B?dkFlWS9IaE1RTEpyUVc2aU01QkFCSVlkKzBSZnBNSEx1Y3F6RW5JR0RKSlJT?=
- =?utf-8?B?UWxvL2p5elhCdHBGUjFsaWR0Q3BRQnlKUkJEZklhZmlvaktWZFdjVlpSS0cy?=
- =?utf-8?B?TWJQMXR5a3Joc1NHSTM0MTAxdWFXZ0xrUmJlakdiYTRIYzNPUmtmVlJidzVR?=
- =?utf-8?B?VWZhVDQ0TWx3eU9NS3dVNWRJWHU0YWJmT1ViTHVDWWFlbnlzR0cwZktqK0p5?=
- =?utf-8?B?a1NGbzE5Q0VrOW5PTUFLdjlhbmZIbjhtU3YxWEdjWWFiU2JFLzQrV2dXZ0Nt?=
- =?utf-8?B?bWFweU5iblBvU0lYM2NiWnJTOVFZb2Qxd1U3dE9vU0JPUUI3VWErM0kvcmdu?=
- =?utf-8?B?RUJGNkNuNGxNWjdweGtKMnJhZGFwR2hDd2l1Vi81c2xPamNUSlhjL0l6SjJO?=
- =?utf-8?B?WllQeThqWFdZWFp2aFFoZmt3K295Z2UvMUlpaEJrMmk3blRpYkhEeTFlUzBC?=
- =?utf-8?B?TkZJWjRtVjhZYUp3RlNqbnNMQWlicFp4NDdhUDZoVE1jcWlIeWxpTVVtK1gy?=
- =?utf-8?B?OXZBWGRZK01RSmNjd2REcFJ1V3loaGhYd0h2eHBIbjlZaFhOaWV1NW9DWDJM?=
- =?utf-8?B?L1d2VXJoZ1dpRmF0Z0lSZm9TeXhCRnMxWEs3K0I3em51L0UxeU85eFNqck9I?=
- =?utf-8?B?Vzl1SU9GQzFRZExLbzdQb2NxclZDOHU2cDFRQlk5RGQzUHdFYzVLd042WmJj?=
- =?utf-8?B?bmp0NjBxeWNDa0U5OUxWaUt1ZHg3WHowWHVpZEEwK2pZQktleHhIR2NGdXBO?=
- =?utf-8?B?T1k3dUlYaERteURWYm43RXVZLzFaL2xTWXZUaW1wOEdYL2VkUWV1MnRWdXh1?=
- =?utf-8?B?OUhqRDM5QzRVVGo0WUdaREFDbFQySE9zV1BhYk5MaXVNbUprS1llRnQrUUNx?=
- =?utf-8?B?VVYxTTZDREhoV1JzMzQ2bjhra0RsN0YrcFMxN1JtNDF5MUFrekRYVSs2QU8z?=
- =?utf-8?B?UW04Wi9zN3dpMHhjakZOazB2aEhWeUlqMzh6SW1JTURWNHhWS21xbitFVzNQ?=
- =?utf-8?B?c1ZnMmRlZThSWmw2cnM5bTE4bU9jTm1KYlZlalJ4d25sdC9EV1B1L1kvSHZ2?=
- =?utf-8?B?NWlpZlBvSnY1cHpxblVwQXc0eVhKdnpSaHB6cnZrUktteXhFOGlqM3dJZXJM?=
- =?utf-8?B?SzdlMHVVbzcyUWZnRjNNaXVWNWRTb0g2ZXN4c3NUTXZIbXQvR2JCS1lSWkRy?=
- =?utf-8?Q?B5TiGqp3kC36pgwQ6Q3GrJAFG?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dVVzREltUjRZZXB4dTFnRUY5dFZSMk8rWWJhT2kzQkRTZFRUdTgzVGkxdmVR?=
+ =?utf-8?B?Zy9KRW8zeXFETmJ0ekhmTGQ0andsQWJjZmNnbUlYdjFXUTBMZVpIMlF4cDdy?=
+ =?utf-8?B?aGNTQlFoamMxQTB3QUNuelljYXkyd2xuZlZHaEpFVWliWWRqVkZGcjErUHZm?=
+ =?utf-8?B?VDFnWE9kSmhxcHpnUEZITUdJQVIvUHB6UXFSZXNoM3liRGlzL0JSeEhkUzRX?=
+ =?utf-8?B?TkdPbE1MRGtUa210RHFDdXEweUUwb1haVWxLOCtFQkM3aEdDSkJDWmV3eDQ3?=
+ =?utf-8?B?S2hvVmhwWnNkRld1YlA2NDJOR3B5MGNYcTI5ZzQzcGw2NjVJbk81djlybHdX?=
+ =?utf-8?B?RURzTXBoNHJCa2ZpckR0bUw0QU5nSlV4dURZekpvVXVNS1l3SnVPeTR4N1VU?=
+ =?utf-8?B?RndPMElDamVmMnhqNjRYQmlmemViODA0UThudWxGSjdsaXdnUGtUY1Q0L3px?=
+ =?utf-8?B?S2lzOFBSemhJVHZROWZla2U0b2RUR3FjMTgvS04zeXc3OHpML2x2UFlsT08v?=
+ =?utf-8?B?RFlodnJ6UlJXZDV4U1BBeHVUQmFCTFZ5SE5iV3FOQVRZZ3pKeloxc3FJYUNO?=
+ =?utf-8?B?MTRuNjJyK2czMWdLRnRZdWRPV3VYSU95QUN1WThhVGJhcGhXODErcTNQaUJZ?=
+ =?utf-8?B?WnNkZUhHQU0yUGt2a2p4S1ZEVy9Hb2Q2ZHF6Z2ZtWFdMQStpRGZHOVJBZXN6?=
+ =?utf-8?B?cnNjVEQ1VVFDaVZUdWt4T1UvVW9ScWg2MHloMDZyUXRLRktGb3A4eWdCMldQ?=
+ =?utf-8?B?RDkxTGlUYmRZTm9SWmFBQisxVjJrTWpUZFhyUWpvbndMY2dYQ3pKbG1QOVhX?=
+ =?utf-8?B?dVNENGZsVGtZeVlRZE8zU3lrQW9oQ3RXYkFoV25oMFdXS2F4MStoeWlIZ0lK?=
+ =?utf-8?B?U1VOZEhMVldjNi85Q0FEV2dyVVRRTUlDbW5NaFdteFAzUlIySDlHcUJkald4?=
+ =?utf-8?B?VHlVUFhvb1h4TFN2NFlOd3dxbFAySGRkckMyaUxVWFFvbEtZdFp1NGlsa1Rj?=
+ =?utf-8?B?Mk1JNVMrR1hJcWRXaGp3UnJXZ1ZQVCtoMzZpTmZlVDNjT2JMRE9PcDl0eUM1?=
+ =?utf-8?B?UlBWYXRxWlJzQWg2c2pwQ2lxRFd0SThsVk9PRno3d0xhNzJvSnh1YXBSUVBs?=
+ =?utf-8?B?bzltZjFxdEk2YnhxdlJFQ2RJc1JINVBCcllNYW5hRU9zM3l5eHFlaTlaU3FO?=
+ =?utf-8?B?aitxTWI5Tm9xMXBRNFNiZ3FZeXQ1dkRxT2F2Y2tFWW9IZVFuYTJTVyt4TG8v?=
+ =?utf-8?B?c0t2c2lmamRRMGxvQ3ErTjE4NU1zMW1Sc3dNeWJOeGp2Q3lQSWZxSFloeVEz?=
+ =?utf-8?B?b0R0c1ArSHlyeXJrajArVkphNlpydFJXSGhuT1FFSzlRYk5PeEhGbENSa1Bo?=
+ =?utf-8?B?SUJ3a25EQ00zNTFEbHJZZndRZUNRRVlEUlRmREpxUTdTL0xNb2pYa2wrRDZx?=
+ =?utf-8?B?THZDUWc3RENKaDFjVTdJdVU1cUdxZVAzU2VXSVRVeDZ5Ym1LTVdMaVJHSEdR?=
+ =?utf-8?B?NEwzTzhDTW9hNFRZeFVGeHhwUVFqL3VBZWpTVHZCbWF1M1c3OVUyek5YRUll?=
+ =?utf-8?B?WVVSeDgzcGNUUFZjOUUxWDhMdU9SelRBZW9ySzdHRDFCd0NSTVRrOVNGWDFl?=
+ =?utf-8?B?dDNXRlBDeUFGb2dyMkdYdFI2Y09xd09WdHlmYkl1NkVkend2eEVnK1Z5UHNk?=
+ =?utf-8?B?K244cUFHT1ltUXQ4cnJjN25yVmx3TGI3UkFyRXY4V3FTQmJCUEJ3YXdFOHo5?=
+ =?utf-8?B?OHVlKzFURlA4bGlCUVN4cENJakZmMEhMZnFhbGNHRXk4UzBmVXpwS3YxQmgr?=
+ =?utf-8?B?UURXMGpzRFNQQVV6VlJISEkreDJFN2lSWFpDQlJuT1lqN1lwLzdyNjNXZFBK?=
+ =?utf-8?B?QmJINDFlS040QkRza2JMNzBaZlNIa1VUdTQ0cHFLRjl6RmwySEpCUmZCLzBJ?=
+ =?utf-8?B?RVdJbnJubURSaXNYOWdFMmRYaHRjUGg4R1RKbmY2UFlpR0g1QUJib1BTd2lq?=
+ =?utf-8?B?QjkwZENmdWZCSjlxdzhDajVIWWRUVStrM3lnVkd0UC9TLzE3T2krZUlSRFZy?=
+ =?utf-8?B?VDVVTm1aMHBtRzNRMlN1QU9BZG91SG96Nmh4d2kxdTNLNGdIN2g3OERXTklU?=
+ =?utf-8?Q?MQeCLn5kQAo0bmMkduVmx2TYb?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87b75436-3f02-4075-8bfc-08dbd90e4eec
+X-MS-Exchange-CrossTenant-Network-Message-Id: a6d88522-9acf-494b-5200-08dbd910705c
 X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB8641.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 06:06:08.0778
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 06:21:23.6460
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lvjU8aBHEFyXGDIOqjIzy/KrQNsku3J0rAWexLZeefWOFTEL11fN8Cni79SjG0mkKIKikqm0yLmzTTybpEoehg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6994
+X-MS-Exchange-CrossTenant-UserPrincipalName: dCG2kTTg/XpXUOmqIJGXM9+cRtPPy9x202Cx/mVbauavXLQXyEP6p1LrN79rFfmaHtGzv71dkvth8q8XP6maAA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4282
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Christoph,
+Hi Tom,
 
-On 27-Oct-23 10:54 AM, Christoph Hellwig wrote:
-> On Wed, Oct 25, 2023 at 12:26:58PM +0530, jeshwank wrote:
->> +	tee_buf->vaddr = dma_alloc_coherent(psp->dev, size, &tee_buf->dma, gfp);
->> +	if (!tee_buf->vaddr || !tee_buf->dma) {
->> +		kfree(tee_buf);
->> +		return NULL;
->> +	}
->> +
->> +	tee_buf->size = size;
->> +
->> +	/* Check whether IOMMU is present. If present, translate IOVA
->> +	 * to physical address, else the dma handle is the physical
->> +	 * address.
->> +	 */
->> +	dom = iommu_get_domain_for_dev(psp->dev);
->> +	if (dom)
->> +		tee_buf->paddr = iommu_iova_to_phys(dom, tee_buf->dma);
->> +	else
-> No, you can't mix the DMA API and iommu API.  You need to stick to one
-> or the other.
-Can you please elaborate?
+On 26-Oct-23 8:23 PM, Tom Lendacky wrote:
+> On 10/26/23 05:30, NK, JESHWANTHKUMAR wrote:
+>>
+>> On 25-Oct-23 7:01 PM, Sumit Garg wrote:
+>>> Hi Jeshwank,
+>>>
+>>> On Wed, 25 Oct 2023 at 12:27, jeshwank <JESHWANTHKUMAR.NK@amd.com> 
+>>> wrote:
+>>>> From: Jeshwanth Kumar N K <JESHWANTHKUMAR.NK@amd.com>
+>>>>
+>>>> At present, the shared memory for TEE ring buffer, command buffer and
+>>>> data buffer is allocated using get_free_pages(). The driver shares the
+>>>> physical address of these buffers with PSP so that it can be mapped by
+>>>> the Trusted OS.
+>>>>
+>>>> In this patch series we have replaced get_free_pages() with
+>>>> dma_alloc_coherent() to allocate shared memory to cleanup the existing
+>>>> allocation method.
+>>> Thanks for putting this together but I can't find the reasoning behind
+>>> this change neither in this commit message and nor in the patch
+>>> descriptions. Care to explain why?
+>>>
+>>> -Sumit
+>> Hi Sumit,
+>>
+>> We see that there is an advantage in using dma_alloc_coherent() over 
+>> get_free_pages(). The dma-ops associated with PSP PCIe device can be 
+>> overridden. This capability will be helpful when we enable 
+>> virtualization support. We plan to post a virtualization related 
+>> patch in future.
+>
+> To be specific, you are referring to Xen virtualization support, 
+> correct? Because I don't see how this works in a Qemu/KVM environment 
+> where you would get a GPA and not an SPA.
+
+The patch is not specific to Xen. We have verified it in Qemu/KVM and 
+Xen PV mode. Support for Xen PVH mode will be added as a separate patch.
+
+>
+> If that is the case, you should clearly specify that. Also, this looks 
+> like it should be introduced with the virtualization support that you 
+> submit in the future and not before.
+
+I will update the commit message in the next version of the patch series 
+to include these details.
+
+> Thanks,
+> Tom
+>
+>>
+>> Regards,
+>>
+>> Jeshwanth
+>>
+>>>
+>>>> Rijo Thomas (3):
+>>>>    crypto: ccp - Add function to allocate and free memory using DMA 
+>>>> APIs
+>>>>    crypto: ccp - Use psp_tee_alloc_buffer() and psp_tee_free_buffer()
+>>>>    tee: amdtee: Use psp_tee_alloc_buffer() and psp_tee_free_buffer()
+>>>>
+>>>>   drivers/crypto/ccp/psp-dev.c        |   3 +
+>>>>   drivers/crypto/ccp/tee-dev.c        | 119 
+>>>> ++++++++++++++++++----------
+>>>>   drivers/crypto/ccp/tee-dev.h        |  11 +--
+>>>>   drivers/tee/amdtee/amdtee_private.h |  18 ++---
+>>>>   drivers/tee/amdtee/call.c           |  74 ++++++++---------
+>>>>   drivers/tee/amdtee/core.c           |  72 ++++++++++-------
+>>>>   drivers/tee/amdtee/shm_pool.c       |  21 ++---
+>>>>   include/linux/psp-tee.h             |  47 +++++++++++
+>>>>   8 files changed, 221 insertions(+), 144 deletions(-)
+>>>>
+>>>> -- 
+>>>> 2.25.1
+>>>>
