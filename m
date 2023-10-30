@@ -2,70 +2,74 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04740C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Oct 2023 12:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31100C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Oct 2023 12:06:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233184AbjJ3MGF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Oct 2023 08:06:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33796 "EHLO
+        id S233103AbjJ3MGU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Oct 2023 08:06:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233181AbjJ3MGA (ORCPT
+        with ESMTP id S233238AbjJ3MGJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Oct 2023 08:06:00 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B42DE
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 05:05:52 -0700 (PDT)
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com [209.85.167.72])
+        Mon, 30 Oct 2023 08:06:09 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 264641A8
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 05:06:00 -0700 (PDT)
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com [209.85.167.71])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id C7B583FADC
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 12:05:49 +0000 (UTC)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 4AD4C3F213
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 12:05:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1698667549;
-        bh=h5yxdWuSdqlkaRjQHxke+23X5/FDQMoqzJ+o1pD1n2g=;
+        s=20210705; t=1698667559;
+        bh=euOHMKbk4HXdz0uT+/ZbQgWhVnv6TwkCQv8wxSBXEso=;
         h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
          MIME-Version;
-        b=wHipatmLkErybjajkJFvY3wB4wIWBnYeNvTLYgeORRKS2sfvgVr4t7ZWEtnk7bvaJ
-         kJlvRnt7Bvcu/wa6rjtzREGYXMay1TMX2QQhmYq0Um3rveCQ6ntANf0StMFCGRu5Lx
-         ltYe39SFtj6bwrDzHYB5PXOoqm7Rc3zjY9Dwd+xloIz2+lqRtF0trODA5v5/090QH9
-         8Ti62ejSyVZk21Vn/gB2NbIDONdmxv5IAWWqJb+HQt5BKodQoOO+ishwH7/fEgZniJ
-         iZfqSkNlKVV0FZ2bdAVi3pyjAiJrdB0/jzlul0d/QXnXGyAH2KNOgti1T/dKDmyq03
-         RR9ImP1LmFmyA==
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-507cafb69e8so4600675e87.1
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 05:05:49 -0700 (PDT)
+        b=VN/+/SoZd+s92QbdYMv3tJ3OcKS++Fc6m7K5FQK1tZJswxlEcln3Ta3o+hsLAa75Y
+         RLt9tGFlP+LSbqNbmytLw286q/W96dzn73zxoLwUgZ9SWRLA7f5qYmGClZaoWyQx17
+         D/s0K6AIqzqf+0bJgr43aIPqkWEC3ILHocCsCVffmkF5Hyc1UXQ364aryoYiGPxkoU
+         mVLiFN/TdjmI2p925arm4fO8h4/B460Ki8lwyNvcSuKc3HVDKLVV4SdjIl+D2R9hT3
+         LljluUJR90L2NTi11zKha9XWSKM7yFpeW+eomB4gyCb/K6X1hlPQnne0kuByb8RX67
+         /XpOlcZ05QOBw==
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5079fd9754cso4756317e87.0
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 05:05:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698667549; x=1699272349;
+        d=1e100.net; s=20230601; t=1698667558; x=1699272358;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h5yxdWuSdqlkaRjQHxke+23X5/FDQMoqzJ+o1pD1n2g=;
-        b=MXhIVN8mlXDd8jTLntHnOPqqg3hN3f12VIr036sJHhFa9xKZA9jpmbV612BDUdUw6Q
-         MEjZuU6NrZPvwtPFxstS+T4tnpm2Gdt/2V+QBW3CfoB8pCARjDfq70VsouN8m1+r8CTp
-         CWvS6kNJ2Tuhe3bedaOod/a8/OlmBRBkvblm40VxPp3Fb1IEnxX61ucIiXt5Yy4XuVAm
-         +he0beqB6pZXUAB8SfhBBec7jCFsLVtoBNKOkrMl94fAFiyXhHrj9xW5OWui7mfAU1ju
-         ZPdFTqDF3frnhhZxAlFUTbce972SwYEfxcsBNbNzJFuA1awUhT7UKF+2+nDp+Or4SWEe
-         68JA==
-X-Gm-Message-State: AOJu0YzUC64i4O3O5qTLjECJKlKcM564OOgLOoI85KUMuNzpM47BclaJ
-        Teav2wg805HK4eqncbrQ51MUfndBxmYnRF7bAwMz/ejliBbjD5IPSMxHR2LEkOpQohyDkVIR5B7
-        iq7j0+peIMNUgBruPLgPrnVz+fz7uLoNW5vB8BBoTEQ==
-X-Received: by 2002:ac2:521b:0:b0:507:f0f2:57bd with SMTP id a27-20020ac2521b000000b00507f0f257bdmr6364247lfl.66.1698667549183;
-        Mon, 30 Oct 2023 05:05:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFzM3QtUi+dspzOERuStp8X/ZdIJwFRluVwj+L9z7NdGcBGQtHPJC6K3zP92shMJUTXtLLeDQ==
-X-Received: by 2002:ac2:521b:0:b0:507:f0f2:57bd with SMTP id a27-20020ac2521b000000b00507f0f257bdmr6364236lfl.66.1698667548933;
-        Mon, 30 Oct 2023 05:05:48 -0700 (PDT)
+        bh=euOHMKbk4HXdz0uT+/ZbQgWhVnv6TwkCQv8wxSBXEso=;
+        b=fVdrhBj040/nRU3guy4wu9CTMEB0FdJ78jtb/uqnOTutkeZc+zixZdCNRWV8aNIrIx
+         5Xo9NT5RArH1f7AXWLk8bq+rgznAW/WqVZsKvUYPrP5zP7Nl/F9sJiqV64zC+HJkV2A9
+         LuxMBjfL4jdzOjA1T6ZyUU0BZ0TiQLLjPY/VItfkg1hUqou49325ysWnaik5LmNps4/8
+         4Cd++fOSO5K31U7uO8Rmf2w72tPddaWBH6x7zRabJEhwOcW/oPS93KFWE3EA94Aass4U
+         BzlLm4qqcNJa7st65PvdvFdpYR6amwXgsSuggcMTlWj40VtLtMvIjUEdI+Q7ekJOllPx
+         2P/w==
+X-Gm-Message-State: AOJu0YyL0PUGxxQmVucvOCe9C1WBPzSbCPdlr5D8qI4UTC6fFCLmp5a2
+        3ni22efHi7srpW1nTbOyjaqfI8Tv2CBihz+Z4KTt0Ve/F9ZyLnIRfqfkmCB81liD5Hk5l4hSX2I
+        EAeaOEkwyTDru+tOQ7dUBY1b4MoAdI/sok93uf/0ygg==
+X-Received: by 2002:a05:6512:1116:b0:506:8d2a:5653 with SMTP id l22-20020a056512111600b005068d2a5653mr9066700lfg.47.1698667558574;
+        Mon, 30 Oct 2023 05:05:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHobGoxATHBl1iHIySw8NC+ytmlfmxCTt4WgEOGt3ZVe5k5kQZ1w74gV7uAK8lEOt8it1GpZA==
+X-Received: by 2002:a05:6512:1116:b0:506:8d2a:5653 with SMTP id l22-20020a056512111600b005068d2a5653mr9066667lfg.47.1698667558264;
+        Mon, 30 Oct 2023 05:05:58 -0700 (PDT)
 Received: from localhost ([159.148.223.140])
-        by smtp.gmail.com with ESMTPSA id r27-20020ac25f9b000000b005079a4cf2c1sm1407367lfe.239.2023.10.30.05.05.47
+        by smtp.gmail.com with ESMTPSA id o19-20020ac24353000000b00507962dd2aesm1416736lfl.207.2023.10.30.05.05.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 05:05:48 -0700 (PDT)
+        Mon, 30 Oct 2023 05:05:57 -0700 (PDT)
 From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>
 Cc:     smueller@chronox.de, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/4] crypto: drbg - ensure drbg hmac sha512 is used in FIPS selftests
-Date:   Mon, 30 Oct 2023 14:05:15 +0200
-Message-Id: <20231030120517.39424-4-dimitri.ledkov@canonical.com>
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH v2 4/4] crypto: drbg - Remove SHA1 from drbg
+Date:   Mon, 30 Oct 2023 14:05:16 +0200
+Message-Id: <20231030120517.39424-5-dimitri.ledkov@canonical.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231030120517.39424-1-dimitri.ledkov@canonical.com>
 References: <20231029204823.663930-1-dimitri.ledkov@canonical.com>
@@ -76,61 +80,133 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Update code comment, self test & healthcheck to use HMAC SHA512,
-instead of HMAC SHA256. These changes are in dead-code, or FIPS
-enabled code-paths only and have not effect on usual kernel builds.
+SP800-90C 3rd draft states that SHA-1 will be removed from all
+specifications, including drbg by end of 2030. Given kernels built
+today will be operating past that date, start complying with upcoming
+requirements.
 
-On systems booting in FIPS mode that has the effect of switch sanity
-selftest to HMAC sha512 based (which has been the default DRBG).
-
-This patch updates code from 9b7b94683a ("crypto: DRBG - switch to
-HMAC SHA512 DRBG as default DRBG"), but is not interesting to
-cherry-pick for stable updates, because it doesn't affect regular
-builds, nor has any tangible effect on FIPS certifcation.
+No functional change, as SHA-256 / SHA-512 based DRBG have always been
+the preferred ones.
 
 Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
 Reviewed-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/drbg.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ crypto/drbg.c    | 16 ----------------
+ crypto/testmgr.c | 25 ++++---------------------
+ 2 files changed, 4 insertions(+), 37 deletions(-)
 
 diff --git a/crypto/drbg.c b/crypto/drbg.c
-index b120e2866b..99666193d9 100644
+index 99666193d9..bccadaedcf 100644
 --- a/crypto/drbg.c
 +++ b/crypto/drbg.c
-@@ -111,9 +111,9 @@
-  * as stdrng. Each DRBG receives an increasing cra_priority values the later
-  * they are defined in this array (see drbg_fill_array).
-  *
-- * HMAC DRBGs are favored over Hash DRBGs over CTR DRBGs, and
-- * the SHA256 / AES 256 over other ciphers. Thus, the favored
-- * DRBGs are the latest entries in this array.
-+ * HMAC DRBGs are favored over Hash DRBGs over CTR DRBGs, and the
-+ * HMAC-SHA512 / SHA256 / AES 256 over other ciphers. Thus, the
-+ * favored DRBGs are the latest entries in this array.
-  */
- static const struct drbg_core drbg_cores[] = {
- #ifdef CONFIG_CRYPTO_DRBG_CTR
-@@ -1475,8 +1475,8 @@ static int drbg_generate(struct drbg_state *drbg,
- 		int err = 0;
- 		pr_devel("DRBG: start to perform self test\n");
- 		if (drbg->core->flags & DRBG_HMAC)
--			err = alg_test("drbg_pr_hmac_sha256",
--				       "drbg_pr_hmac_sha256", 0, 0);
-+			err = alg_test("drbg_pr_hmac_sha512",
-+				       "drbg_pr_hmac_sha512", 0, 0);
- 		else if (drbg->core->flags & DRBG_CTR)
- 			err = alg_test("drbg_pr_ctr_aes256",
- 				       "drbg_pr_ctr_aes256", 0, 0);
-@@ -2023,7 +2023,7 @@ static inline int __init drbg_healthcheck_sanity(void)
- 	drbg_convert_tfm_core("drbg_nopr_sha256", &coreref, &pr);
- #endif
+@@ -139,12 +139,6 @@ static const struct drbg_core drbg_cores[] = {
+ #endif /* CONFIG_CRYPTO_DRBG_CTR */
+ #ifdef CONFIG_CRYPTO_DRBG_HASH
+ 	{
+-		.flags = DRBG_HASH | DRBG_STRENGTH128,
+-		.statelen = 55, /* 440 bits */
+-		.blocklen_bytes = 20,
+-		.cra_name = "sha1",
+-		.backend_cra_name = "sha1",
+-	}, {
+ 		.flags = DRBG_HASH | DRBG_STRENGTH256,
+ 		.statelen = 111, /* 888 bits */
+ 		.blocklen_bytes = 48,
+@@ -166,12 +160,6 @@ static const struct drbg_core drbg_cores[] = {
+ #endif /* CONFIG_CRYPTO_DRBG_HASH */
  #ifdef CONFIG_CRYPTO_DRBG_HMAC
--	drbg_convert_tfm_core("drbg_nopr_hmac_sha256", &coreref, &pr);
-+	drbg_convert_tfm_core("drbg_nopr_hmac_sha512", &coreref, &pr);
- #endif
+ 	{
+-		.flags = DRBG_HMAC | DRBG_STRENGTH128,
+-		.statelen = 20, /* block length of cipher */
+-		.blocklen_bytes = 20,
+-		.cra_name = "hmac_sha1",
+-		.backend_cra_name = "hmac(sha1)",
+-	}, {
+ 		.flags = DRBG_HMAC | DRBG_STRENGTH256,
+ 		.statelen = 48, /* block length of cipher */
+ 		.blocklen_bytes = 48,
+@@ -648,8 +636,6 @@ MODULE_ALIAS_CRYPTO("drbg_pr_hmac_sha384");
+ MODULE_ALIAS_CRYPTO("drbg_nopr_hmac_sha384");
+ MODULE_ALIAS_CRYPTO("drbg_pr_hmac_sha256");
+ MODULE_ALIAS_CRYPTO("drbg_nopr_hmac_sha256");
+-MODULE_ALIAS_CRYPTO("drbg_pr_hmac_sha1");
+-MODULE_ALIAS_CRYPTO("drbg_nopr_hmac_sha1");
  
- 	drbg = kzalloc(sizeof(struct drbg_state), GFP_KERNEL);
+ /* update function of HMAC DRBG as defined in 10.1.2.2 */
+ static int drbg_hmac_update(struct drbg_state *drbg, struct list_head *seed,
+@@ -768,8 +754,6 @@ MODULE_ALIAS_CRYPTO("drbg_pr_sha384");
+ MODULE_ALIAS_CRYPTO("drbg_nopr_sha384");
+ MODULE_ALIAS_CRYPTO("drbg_pr_sha256");
+ MODULE_ALIAS_CRYPTO("drbg_nopr_sha256");
+-MODULE_ALIAS_CRYPTO("drbg_pr_sha1");
+-MODULE_ALIAS_CRYPTO("drbg_nopr_sha1");
+ 
+ /*
+  * Increment buffer
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 216878c8bc..209b21ef79 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4849,14 +4849,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.drbg = __VECS(drbg_nopr_ctr_aes256_tv_template)
+ 		}
+-	}, {
+-		/*
+-		 * There is no need to specifically test the DRBG with every
+-		 * backend cipher -- covered by drbg_nopr_hmac_sha256 test
+-		 */
+-		.alg = "drbg_nopr_hmac_sha1",
+-		.fips_allowed = 1,
+-		.test = alg_test_null,
+ 	}, {
+ 		.alg = "drbg_nopr_hmac_sha256",
+ 		.test = alg_test_drbg,
+@@ -4865,7 +4857,10 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			.drbg = __VECS(drbg_nopr_hmac_sha256_tv_template)
+ 		}
+ 	}, {
+-		/* covered by drbg_nopr_hmac_sha256 test */
++		/*
++		 * There is no need to specifically test the DRBG with every
++		 * backend cipher -- covered by drbg_nopr_hmac_sha512 test
++		 */
+ 		.alg = "drbg_nopr_hmac_sha384",
+ 		.test = alg_test_null,
+ 	}, {
+@@ -4875,10 +4870,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.drbg = __VECS(drbg_nopr_hmac_sha512_tv_template)
+ 		}
+-	}, {
+-		.alg = "drbg_nopr_sha1",
+-		.fips_allowed = 1,
+-		.test = alg_test_null,
+ 	}, {
+ 		.alg = "drbg_nopr_sha256",
+ 		.test = alg_test_drbg,
+@@ -4910,10 +4901,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.alg = "drbg_pr_ctr_aes256",
+ 		.fips_allowed = 1,
+ 		.test = alg_test_null,
+-	}, {
+-		.alg = "drbg_pr_hmac_sha1",
+-		.fips_allowed = 1,
+-		.test = alg_test_null,
+ 	}, {
+ 		.alg = "drbg_pr_hmac_sha256",
+ 		.test = alg_test_drbg,
+@@ -4929,10 +4916,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.alg = "drbg_pr_hmac_sha512",
+ 		.test = alg_test_null,
+ 		.fips_allowed = 1,
+-	}, {
+-		.alg = "drbg_pr_sha1",
+-		.fips_allowed = 1,
+-		.test = alg_test_null,
+ 	}, {
+ 		.alg = "drbg_pr_sha256",
+ 		.test = alg_test_drbg,
 -- 
 2.34.1
 
