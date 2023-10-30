@@ -2,143 +2,59 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14196C4167D
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Nov 2023 22:53:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2B7CC41535
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Nov 2023 04:58:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376281AbjKCWxY (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Nov 2023 18:53:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33904 "EHLO
+        id S234594AbjKDE6V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 4 Nov 2023 00:58:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230326AbjKCWxY (ORCPT
+        with ESMTP id S234497AbjKDE6U (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Nov 2023 18:53:24 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 904831A8;
-        Fri,  3 Nov 2023 15:53:21 -0700 (PDT)
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3MkrGb010990;
-        Fri, 3 Nov 2023 22:53:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=qcppdkim1;
- bh=C0DFSQTjA3poU/K9tRR+t9DLMKQK2kSePoJ4WQEd1Gs=;
- b=awHe4lJ1BrWqcPJtgMsL9Mi/5NyOg8g2iY3hhSUMg1TzzKn0GcVbxbm/jUJYOTNUE+7g
- CLgqk+k6yFHFs+0OiVRJia7ExACDOs4ljS2jS1H3j73MWoM74ubMV5XcG/dVH7ZbwPHI
- pQPJGXQ51KZKtepanWdzT0UZ9SgcnRswbwhONE+TBl+VJyMokA7VXpnSaehJ/1Dq0KRX
- NixRyMDugvdOeN6JpfSBM/5eRELjLPz/IqTdUt3GOr9dd9VJdw0hAK8O6+hUOdFDqRfx
- YYInMMIzNePV9ZpIOYVQ/CNEyPrhMhBNz1Yzbj1DFi0zYTQKhG2RsVlPJs5xKITTrTRt Rg== 
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3u4sfta5xu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Nov 2023 22:53:14 +0000
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-        by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3A3MrDD3005266
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 3 Nov 2023 22:53:13 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Fri, 3 Nov 2023 15:53:12 -0700
-From:   Elliot Berman <quic_eberman@quicinc.com>
-To:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Rob Herring" <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>
-CC:     Conor Dooley <conor.dooley@microchip.com>,
-        Elliot Berman <quic_eberman@quicinc.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [RESEND PATCH] dt-bindings: crypto: qcom,prng: Add SM8450
-Date:   Fri, 3 Nov 2023 15:52:54 -0700
-Message-ID: <20231103225255.867243-1-quic_eberman@quicinc.com>
-X-Mailer: git-send-email 2.41.0
+        Sat, 4 Nov 2023 00:58:20 -0400
+X-Greylist: delayed 4281 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 03 Nov 2023 21:58:12 PDT
+Received: from mail.profitpathwaygo.com (mail.profitpathwaygo.com [141.94.21.238])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA01AD52
+        for <linux-crypto@vger.kernel.org>; Fri,  3 Nov 2023 21:58:12 -0700 (PDT)
+Received: by mail.profitpathwaygo.com (Postfix, from userid 1002)
+        id 592A04DDE8; Mon, 30 Oct 2023 08:30:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=profitpathwaygo.com;
+        s=mail; t=1698654712;
+        bh=qp3Ofokho6Ql+WtI8ZPVilyHYhskXL7fod7u9CWs8W4=;
+        h=Date:From:To:Subject:From;
+        b=HaGQuZDrGKh/pyaTjasN3ym0U/Jk9GJ0hclMtqBM9BZxPjFQboXDASBLgtKC6x8uQ
+         /Bt8ghlVf8k374VzS+dHiLLgUxoLNKYBiCDBJ6KnyWh22pUmuJ5n1uGgwbCUnVaudw
+         9dKe4kfzj2A2hA2UI4n0CbnqurUwB2di05SVRlBAYxCCxEss8H6asNXM3rlBrPZKdi
+         ZBO8NmAR0vATMjE4IG2C+2pOfZuSjUH9LXByWVCQX7G+xSq7XMSUn2uSnsaJQxH3nN
+         b5i0LuJTQeIXxr7ENHRdgMZJtUWDtebNfnEv3kba+f4GtCL8lOCRBs57G8Vzq9GZDq
+         ABr/OEch0u/Vw==
+Received: by mail.profitpathwaygo.com for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 08:30:28 GMT
+Message-ID: <20231030074500-0.1.2s.1548l.0.jdu3idjega@profitpathwaygo.com>
+Date:   Mon, 30 Oct 2023 08:30:28 GMT
+From:   "Adam Charachuta" <adam.charachuta@profitpathwaygo.com>
+To:     <linux-crypto@vger.kernel.org>
+Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania_?=
+X-Mailer: mail.profitpathwaygo.com
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.49.16.6]
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: -rgFJIMbNoK7N737qefsnRhtlog7LCKR
-X-Proofpoint-ORIG-GUID: -rgFJIMbNoK7N737qefsnRhtlog7LCKR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-03_21,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 adultscore=0 spamscore=0 mlxscore=0 malwarescore=0
- mlxlogscore=884 suspectscore=0 impostorscore=0 lowpriorityscore=0
- phishscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311030194
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
+Dzie=C5=84 dobry,
 
-SM8450's PRNG does not require a core clock reference. Add a new
-compatible with a qcom,prng-ee fallback and handle that.
+zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
+=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
+o dalszych rozm=C3=B3w.=20
 
-Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
----
-I noticed this patch got missed while running make dtbs_check. No
-changes to this patch from the original version:
+Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
+=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
+=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
+strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
 
-https://lore.kernel.org/all/2c208796-5ad6-c362-dabc-1228b978ca1d@linaro.org/
+Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
 
- .../devicetree/bindings/crypto/qcom,prng.yaml | 24 +++++++++++++++----
- 1 file changed, 19 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-index bb42f4588b40..36b0ebd9a44b 100644
---- a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-+++ b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-@@ -11,9 +11,13 @@ maintainers:
- 
- properties:
-   compatible:
--    enum:
--      - qcom,prng  # 8916 etc.
--      - qcom,prng-ee  # 8996 and later using EE
-+    oneOf:
-+      - enum:
-+          - qcom,prng  # 8916 etc.
-+          - qcom,prng-ee  # 8996 and later using EE
-+      - items:
-+          - const: qcom,sm8450-prng-ee
-+          - const: qcom,prng-ee
- 
-   reg:
-     maxItems: 1
-@@ -28,8 +32,18 @@ properties:
- required:
-   - compatible
-   - reg
--  - clocks
--  - clock-names
-+
-+allOf:
-+  - if:
-+      not:
-+        properties:
-+          compatible:
-+            contains:
-+              const: qcom,sm8450-prng-ee
-+    then:
-+      required:
-+        - clocks
-+        - clock-names
- 
- additionalProperties: false
- 
--- 
-2.41.0
-
+Pozdrawiam serdecznie
+Adam Charachuta
