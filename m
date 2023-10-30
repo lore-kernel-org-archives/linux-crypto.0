@@ -2,105 +2,98 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48137C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Oct 2023 11:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D8DC4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Oct 2023 12:05:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232936AbjJ3LUp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Oct 2023 07:20:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59286 "EHLO
+        id S233050AbjJ3MFp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Oct 2023 08:05:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232294AbjJ3LUo (ORCPT
+        with ESMTP id S233103AbjJ3MFo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Oct 2023 07:20:44 -0400
-Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [81.169.146.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F417BB3;
-        Mon, 30 Oct 2023 04:20:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1698664832; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=Mm02NCKuU0Thm9w5RBoDg+s36tDjuHMXpViOFYEEnGCOpTftapCaakSlLKpu83Xxhr
-    mYOzDqE5zt/r6082tAE92YVJu+eghIPrviwt2Mczeqg0rjlMYQMUgPBpsCPRBnvQ5RdN
-    eAsFN/hm/zIT2sgSIvtro+2eC7tpGk6sKoYzLOgLYieeXb8B4xUQgzfRC0ggy86DuYy8
-    Z3GYxkbTbxtJfCR9Oz5gS3E9u7CF5PDSYRyofJEA6fN1uBl8GF/MYVQs7jexFlAEL8nm
-    C84QZiWoyS5dEiJ6neRHjBWsnqa4/U/PzV7S8x5oARyubab2bh+Y5gBlcnR9z7wjEZ0b
-    Tq9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1698664832;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=RKJ07SNymskf0t+1fsv83/i0WSlIOVRZ9TdRpl1TvZY=;
-    b=DCDF92/V2tLnAz5TorpoD/eng/Xwnfh9tsDU6lRbY4WwY+qEyeK6R/Vl3/tcYpCBzg
-    Z1trDiD+w87dglsoHHnPhp9lCU+qp3DdCUIk+77solrc1T+y+F45d6/2atj4iK+QGjvg
-    CMT/+nBW1IdSqV3NLKqf3hwZaiw1Fx1LA8HUzlJ0Vx63wEfu9ryFnQxfYGVdiqBBWOBa
-    QkWHVq5k2KOBppxTbW6lRw7hHPYUjUHqhhE50q6eMaZhS5p7HjvmegwULt6Km/U+pBT1
-    OyWiBs18L8mFXogn2ZFtao9tuwaKQPiPRJYuiTpy+vxOtX7Sa0Crb0QbT5zJMMjYicrh
-    hGLQ==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo02
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1698664832;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=RKJ07SNymskf0t+1fsv83/i0WSlIOVRZ9TdRpl1TvZY=;
-    b=KV5VGEJLUr5+xTYo2wk/3Cm84I6My52WBVF+CFrwwc+4GfCSxpB1zpx2vxUn66Y2Cr
-    MbJxG44lVzELkNCP/j4oVyLYBhDn4tJH+rsQBpgZNc5ivaKBN4nyRHx9DGWtZBOzUfHS
-    XhJ0AZ8ZAgHu05cTqKOs8WIQnBciBJXe7704bNkiA5G9CQFHcl1WrE9IRlaSV7enO+X4
-    3q7kSnBhIHV7SyTqGjf98zSI8iUTi6dNd00xckeVUflVAnh0eFxSlabb7n+15GE4MfGH
-    V2LcT6kHj6IxYXm5pLnp2nMtvPt4EKcgeF4wYtA4wZEuqUdLQv4mMZa7oZegUBySr/BZ
-    qfBA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1698664832;
-    s=strato-dkim-0003; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=RKJ07SNymskf0t+1fsv83/i0WSlIOVRZ9TdRpl1TvZY=;
-    b=GCLMbwHESCbjm7mtI/4BeY6JHr+BAU7Zs5PZ8pHhZTIFJyifQg79xCgjuev7V/Ry57
-    2N1UyTl2wFbxUL+UfOBg==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9yWsdNeEDyFXR1lg3JD8="
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 49.9.1 AUTH)
-    with ESMTPSA id 6b1cadz9UBKSU4Q
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Mon, 30 Oct 2023 12:20:28 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
+        Mon, 30 Oct 2023 08:05:44 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A087C9
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 05:05:41 -0700 (PDT)
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com [209.85.167.71])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 9F5673F213
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 12:05:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1698667538;
+        bh=7WB8+dzA+A9FwbTE3H0wb8DTd4y1xgyz1TXm5BpP+xY=;
+        h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+         MIME-Version;
+        b=PgDzzPHkaQaSIiTHAgPzsxlMhhOh1xplxctwqUpQoEnqyWl5wJQHlpdvJRxLScfNp
+         MRBD28uuxJUv6gx+vK4HYq2meexeZIFH+OUhAMkynnyf0eCLtsUyoqSmU3Caa7hSZj
+         /0p9Hl5vfheWkcWw5klP6X5R9yx+roCYGhtc74DNrL6QTI5o1FR/nHIhebZ8RjbscH
+         LhAT6haczj8/UBo7ceSB8SCiEEuZL2AL7jc8EWGkmy8gmmbmDqgZykAfh0NV1S6AuW
+         UuyBhwYlaD3HWO3qbqDGx1j4heHYxtA9ok0950n7eNwXHhnH+d0/iRSf77MiCXaGQh
+         bQI2q5E141Tpw==
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5079f6c127cso4922364e87.3
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 05:05:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698667538; x=1699272338;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7WB8+dzA+A9FwbTE3H0wb8DTd4y1xgyz1TXm5BpP+xY=;
+        b=p79dg02bsfRVPiu0C5zpJSieNPtQuu7EMKFS3TP2QgHH35t0ambwtztS1crCHd9rzz
+         LPNdKjU8E/8825svklx3AzT7SdSM/VNx+YX3db9AZRy1yFkg52ZCVFQfPirm6S9p3duf
+         ovNwucwGFqHHFW2xzy//4ft4pZNsSa0un/HxafY54ICTq+wBNssCfiQN5aAbe+HzrWV/
+         S/bgd//Te727SjwuoUZtYsQ6rSlrZUoWyK9hgOgVhMGfGtP+mrm0L4DtVWvQI7wfS0p3
+         /jswy1WouYma/hfr2DhDHAsxwhdJbIqSK2IoSJBNM9qG5bdeovnnpzoXPTKAmgkvekm0
+         7WkQ==
+X-Gm-Message-State: AOJu0YyfXKBzeM3OYRjUdaFtfZCZatbSUqwCsR6w1B1gE7vuFllFQ0Sn
+        1TYyrSktruOCLXBUN01RLLCsqFnjTkitwJh8hhe2vG2MiM7J9MirVKzxyuc016K/o+HF7EgONlZ
+        8ind1L0SRL3epGpg5KOH6B5zhehItfDqJg3sK8tkAEw==
+X-Received: by 2002:ac2:44c4:0:b0:509:dd0:9414 with SMTP id d4-20020ac244c4000000b005090dd09414mr3826080lfm.24.1698667538079;
+        Mon, 30 Oct 2023 05:05:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEHsT8rkWtZkhjznGWEjGRHTYYV0lbpkqqzlBl/OJ07Ds5/1iMxxgqafP2qYC8sQC6/xf/vdg==
+X-Received: by 2002:ac2:44c4:0:b0:509:dd0:9414 with SMTP id d4-20020ac244c4000000b005090dd09414mr3826063lfm.24.1698667537725;
+        Mon, 30 Oct 2023 05:05:37 -0700 (PDT)
+Received: from localhost ([159.148.223.140])
+        by smtp.gmail.com with ESMTPSA id f18-20020ac25332000000b00507f0d2b32bsm1420458lfh.249.2023.10.30.05.05.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Oct 2023 05:05:37 -0700 (PDT)
+From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Cc:     simo@redhat.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 4/4] crypto: drbg - Remove SHA1 from drbg
-Date:   Mon, 30 Oct 2023 12:20:27 +0100
-Message-ID: <5821221.9qqs2JS0CK@tauon.chronox.de>
-In-Reply-To: <20231029204823.663930-4-dimitri.ledkov@canonical.com>
+        "David S. Miller" <davem@davemloft.net>
+Cc:     smueller@chronox.de, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/4] drbg small fixes
+Date:   Mon, 30 Oct 2023 14:05:12 +0200
+Message-Id: <20231030120517.39424-1-dimitri.ledkov@canonical.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231029204823.663930-1-dimitri.ledkov@canonical.com>
 References: <20231029204823.663930-1-dimitri.ledkov@canonical.com>
- <20231029204823.663930-4-dimitri.ledkov@canonical.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Sonntag, 29. Oktober 2023, 21:48:23 CET schrieb Dimitri John Ledkov:
+This is v2 update of the
+https://lore.kernel.org/linux-crypto/5821221.9qqs2JS0CK@tauon.chronox.de/T/#u
+patch series.
 
-Hi Dimitri,
+Added Review-by Stephan, and changed patch descriptions to drop Fixes:
+metadata and explicitely mention that backporting this patches to
+stable series will not bring any benefits per se (as they patch dead
+code, fips_enabled only code, that doesn't affect certification).
 
-> SP800-90C 3rd draft states that SHA-1 will be removed from all
-> specifications, including drbg by end of 2030. Given kernels built
-> today will be operating past that date, start complying with upcoming
-> requirements.
-> 
-> No functional change, as SHA-256 / SHA-512 based DRBG have always been
-> the preferred ones.
+Dimitri John Ledkov (4):
+  crypto: drbg - ensure most preferred type is FIPS health checked
+  crypto: drbg - update FIPS CTR self-checks to aes256
+  crypto: drbg - ensure drbg hmac sha512 is used in FIPS selftests
+  crypto: drbg - Remove SHA1 from drbg
 
-Reviewed-by: Stephan Mueller <smueller@chronox.de>
+ crypto/drbg.c    | 40 +++++++++++++---------------------------
+ crypto/testmgr.c | 25 ++++---------------------
+ 2 files changed, 17 insertions(+), 48 deletions(-)
 
-Ciao
-Stephan
-
+-- 
+2.34.1
 
