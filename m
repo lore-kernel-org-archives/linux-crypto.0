@@ -2,79 +2,83 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 099FBC4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Oct 2023 10:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48137C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Oct 2023 11:20:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232624AbjJ3Kfg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Oct 2023 06:35:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57184 "EHLO
+        id S232936AbjJ3LUp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Oct 2023 07:20:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232535AbjJ3Kff (ORCPT
+        with ESMTP id S232294AbjJ3LUo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Oct 2023 06:35:35 -0400
-Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [85.215.255.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9297B4;
-        Mon, 30 Oct 2023 03:35:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1698662130; cv=none;
+        Mon, 30 Oct 2023 07:20:44 -0400
+Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [81.169.146.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F417BB3;
+        Mon, 30 Oct 2023 04:20:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1698664832; cv=none;
     d=strato.com; s=strato-dkim-0002;
-    b=akDGj953efFQEJfaAaz3wJPWsZqsl8dwjZHGf/QuEY6dAdSLtBA8JXUDXIO4/lsTGq
-    RuJ65IyGjEewgBgucWwV/1bSbfCcIMsumuDXTiJPTYzH5TE5IDXlWVWuI1tvrKEofaP0
-    e8YVZNmq+OZeaJx2tleu0BUgwT9fNDE4AX9iFVV6CEHY1Bo8lpW8rvRCylXVhT9OMAVf
-    6cLOxRXR6Hc6R3sKxjVld8SwyYeEpAlxwP6QR2w6GFXQ9E2wW/gwGcIsB0882RqPY1f7
-    dPAQvQBnqHo2kXpj8HPpkuYCcCSSaZs9pRd75A3UaaDfn77E0PEh6Jvw+3oWIGNz8F3r
-    nONg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1698662130;
+    b=Mm02NCKuU0Thm9w5RBoDg+s36tDjuHMXpViOFYEEnGCOpTftapCaakSlLKpu83Xxhr
+    mYOzDqE5zt/r6082tAE92YVJu+eghIPrviwt2Mczeqg0rjlMYQMUgPBpsCPRBnvQ5RdN
+    eAsFN/hm/zIT2sgSIvtro+2eC7tpGk6sKoYzLOgLYieeXb8B4xUQgzfRC0ggy86DuYy8
+    Z3GYxkbTbxtJfCR9Oz5gS3E9u7CF5PDSYRyofJEA6fN1uBl8GF/MYVQs7jexFlAEL8nm
+    C84QZiWoyS5dEiJ6neRHjBWsnqa4/U/PzV7S8x5oARyubab2bh+Y5gBlcnR9z7wjEZ0b
+    Tq9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1698664832;
     s=strato-dkim-0002; d=strato.com;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=C4AOi4HruYGw3hZLrT2mTKcCjB4YO62MIePJfTz8dds=;
-    b=tmIv/pfzXtbYehKUaGKdXc4V0AHypbPsF8JYFUw52XWKgQi3m70Rxx7tt0USV6h4ch
-    ZNB+fB9BWi3cdu+1jVcCH8GC+aB+2GBCR5WRBMQCm57YyVT5NPdKnJCiAs+m8MSBjYAN
-    yyvmeT/dv4iQbbYOxeRodoTbMywSovsvXiFI3bpOXatXOZ8uJeyHmvPDzmUjVzb0+exW
-    LwbIHyh/VOBQZ8+gJGoxijP4BuuCM/HaTrItUlgsCWhv4YKmM+jYR2SXZO2fy7ZcCPOk
-    DDtguFJxT7oiC5QWqDUo59X73SpxuGaY2omHuo2Xc6CkcuA8ZWmIcavwpEV4pCWEPwBD
-    wDkg==
+    bh=RKJ07SNymskf0t+1fsv83/i0WSlIOVRZ9TdRpl1TvZY=;
+    b=DCDF92/V2tLnAz5TorpoD/eng/Xwnfh9tsDU6lRbY4WwY+qEyeK6R/Vl3/tcYpCBzg
+    Z1trDiD+w87dglsoHHnPhp9lCU+qp3DdCUIk+77solrc1T+y+F45d6/2atj4iK+QGjvg
+    CMT/+nBW1IdSqV3NLKqf3hwZaiw1Fx1LA8HUzlJ0Vx63wEfu9ryFnQxfYGVdiqBBWOBa
+    QkWHVq5k2KOBppxTbW6lRw7hHPYUjUHqhhE50q6eMaZhS5p7HjvmegwULt6Km/U+pBT1
+    OyWiBs18L8mFXogn2ZFtao9tuwaKQPiPRJYuiTpy+vxOtX7Sa0Crb0QbT5zJMMjYicrh
+    hGLQ==
 ARC-Authentication-Results: i=1; strato.com;
     arc=none;
     dkim=none
 X-RZG-CLASS-ID: mo02
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1698662130;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1698664832;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=C4AOi4HruYGw3hZLrT2mTKcCjB4YO62MIePJfTz8dds=;
-    b=W1+Bx6ohvt5grgmuq91SISNICpxt6EpRDg90q4HrlzmfoN6LTFPWOOMjA2pHTWXkY9
-    ya81fMapmB3JiEShzxktNkBAtnTNWJYoCbToMpG68gFPEWW727/vLt9EYOZt+g/sRp9s
-    BeBLdU0EPtdpvJVhUT+c2O9YWBSUv5lzh3/Hkm/zj3nJytsPj59p/YBaAZzYccHmTcsW
-    r2sG04fXRu72h0ekdKsiIwitijyDlwYEcXigBbbIO1LX9oRLRaslF6KvrpsjBEOkl31o
-    YbXG+DGcMkXapFWvHEakA4avQjSDuXi/yIkVaudzehxvTLmlvKP0xJ/+CHwXumoO5lxT
-    I/CA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1698662130;
+    bh=RKJ07SNymskf0t+1fsv83/i0WSlIOVRZ9TdRpl1TvZY=;
+    b=KV5VGEJLUr5+xTYo2wk/3Cm84I6My52WBVF+CFrwwc+4GfCSxpB1zpx2vxUn66Y2Cr
+    MbJxG44lVzELkNCP/j4oVyLYBhDn4tJH+rsQBpgZNc5ivaKBN4nyRHx9DGWtZBOzUfHS
+    XhJ0AZ8ZAgHu05cTqKOs8WIQnBciBJXe7704bNkiA5G9CQFHcl1WrE9IRlaSV7enO+X4
+    3q7kSnBhIHV7SyTqGjf98zSI8iUTi6dNd00xckeVUflVAnh0eFxSlabb7n+15GE4MfGH
+    V2LcT6kHj6IxYXm5pLnp2nMtvPt4EKcgeF4wYtA4wZEuqUdLQv4mMZa7oZegUBySr/BZ
+    qfBA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1698664832;
     s=strato-dkim-0003; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=C4AOi4HruYGw3hZLrT2mTKcCjB4YO62MIePJfTz8dds=;
-    b=SYVIZLhY6r8eGwhWoshmHTlqz1V8OliewM+S5cGopHPqNQUMWi7l1ge2qW1ffkUqgA
-    jKlp2mAnEGd5bdzLrlBQ==
+    bh=RKJ07SNymskf0t+1fsv83/i0WSlIOVRZ9TdRpl1TvZY=;
+    b=GCLMbwHESCbjm7mtI/4BeY6JHr+BAU7Zs5PZ8pHhZTIFJyifQg79xCgjuev7V/Ry57
+    2N1UyTl2wFbxUL+UfOBg==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9yWsdNeEDyFXR1lg3JD8="
 Received: from tauon.chronox.de
     by smtp.strato.de (RZmta 49.9.1 AUTH)
-    with ESMTPSA id 6b1cadz9UAZTTj9
+    with ESMTPSA id 6b1cadz9UBKSU4Q
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Mon, 30 Oct 2023 11:35:29 +0100 (CET)
+    Mon, 30 Oct 2023 12:20:28 +0100 (CET)
 From:   Stephan Mueller <smueller@chronox.de>
-To:     Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, simo@redhat.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] crypto: drbg - update FIPS CTR self-checks to aes256
-Date:   Mon, 30 Oct 2023 11:35:28 +0100
-Message-ID: <1906073.RjUZ0rb3Up@tauon.chronox.de>
-In-Reply-To: <CADWks+Z0b8GPSg37=TQK_5LqVejC_CzbOxn_TUsvkQ45TOyuYw@mail.gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Cc:     simo@redhat.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 4/4] crypto: drbg - Remove SHA1 from drbg
+Date:   Mon, 30 Oct 2023 12:20:27 +0100
+Message-ID: <5821221.9qqs2JS0CK@tauon.chronox.de>
+In-Reply-To: <20231029204823.663930-4-dimitri.ledkov@canonical.com>
 References: <20231029204823.663930-1-dimitri.ledkov@canonical.com>
- <6413919.eMfrkXpHmx@tauon.chronox.de>
- <CADWks+Z0b8GPSg37=TQK_5LqVejC_CzbOxn_TUsvkQ45TOyuYw@mail.gmail.com>
+ <20231029204823.663930-4-dimitri.ledkov@canonical.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="us-ascii"
@@ -82,88 +86,19 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Montag, 30. Oktober 2023, 11:30:32 CET schrieb Dimitri John Ledkov:
+Am Sonntag, 29. Oktober 2023, 21:48:23 CET schrieb Dimitri John Ledkov:
 
 Hi Dimitri,
 
-> On Mon, 30 Oct 2023 at 12:23, Stephan Mueller <smueller@chronox.de> wrote:
-> > Am Sonntag, 29. Oktober 2023, 21:48:21 CET schrieb Dimitri John Ledkov:
-> > 
-> > Hi Dimitri,
-> > 
-> > > When originally drbg was introduced FIPS self-checks for all types but
-> > > CTR were using the most preferred parameters for each type of
-> > > DRBG. Update CTR self-check to use aes256.
-> > > 
-> > > Fixes: 541af946fe ("crypto: drbg - SP800-90A Deterministic Random Bit
-> > > Generator") Signed-off-by: Dimitri John Ledkov
-> > > <dimitri.ledkov@canonical.com>
-> > > 
-> > > 
-> > > 
-> > > ---
-> > > 
-> > >  crypto/drbg.c | 6 +++---
-> > >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/crypto/drbg.c b/crypto/drbg.c
-> > > index 2cce18dcfc..b120e2866b 100644
-> > > --- a/crypto/drbg.c
-> > > +++ b/crypto/drbg.c
-> > > @@ -1478,8 +1478,8 @@ static int drbg_generate(struct drbg_state *drbg,
-> > > 
-> > >                       err = alg_test("drbg_pr_hmac_sha256",
-> > >                       
-> > >                                      "drbg_pr_hmac_sha256", 0, 0);
-> > >               
-> > >               else if (drbg->core->flags & DRBG_CTR)
-> > > 
-> > > -                     err = alg_test("drbg_pr_ctr_aes128",
-> > > -                                    "drbg_pr_ctr_aes128", 0, 0);
-> > > +                     err = alg_test("drbg_pr_ctr_aes256",
-> > > +                                    "drbg_pr_ctr_aes256", 0, 0);
-> > > 
-> > >               else
-> > >               
-> > >                       err = alg_test("drbg_pr_sha256",
-> > >                       
-> > >                                      "drbg_pr_sha256", 0, 0);
-> > > 
-> > > @@ -2017,7 +2017,7 @@ static inline int __init
-> > > drbg_healthcheck_sanity(void) return 0;
-> > > 
-> > >  #ifdef CONFIG_CRYPTO_DRBG_CTR
-> > > 
-> > > -     drbg_convert_tfm_core("drbg_nopr_ctr_aes128", &coreref, &pr);
-> > > +     drbg_convert_tfm_core("drbg_nopr_ctr_aes256", &coreref, &pr);
-> > > 
-> > >  #endif
-> > >  #ifdef CONFIG_CRYPTO_DRBG_HASH
-> > >  
-> > >       drbg_convert_tfm_core("drbg_nopr_sha256", &coreref, &pr);
-> > 
-> > I am not sure again whether this warrants a "Fixes" tag, because the first
-> > modification is in a commented-out code section and the latter again
-> > intends to test the DRBG thresholds and thus just needs "a" DRBG.
+> SP800-90C 3rd draft states that SHA-1 will be removed from all
+> specifications, including drbg by end of 2030. Given kernels built
+> today will be operating past that date, start complying with upcoming
+> requirements.
 > 
-> Agreed, it is more of a reference. But yes, I don't believe this needs
-> to trigger stable backports - because yes it is like dead code, or
-> fips only code which majority kernels don't do. Maybe I should
-> reference that commit in description only?
+> No functional change, as SHA-256 / SHA-512 based DRBG have always been
+> the preferred ones.
 
-I think this would be good to avoid the need to trigger backports for this 
-"trivial" patch.
-
-Thanks a lot.
-> 
-> > Anyhow:
-> > 
-> > Reviewed-by: Stephan Mueller <smueller@chronox.de>
-> > 
-> > 
-> > Ciao
-> > Stephan
-
+Reviewed-by: Stephan Mueller <smueller@chronox.de>
 
 Ciao
 Stephan
