@@ -2,47 +2,65 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA3BC4167D
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Oct 2023 13:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0DA4C4167B
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Oct 2023 13:33:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233385AbjJ3N2Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Oct 2023 09:28:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49746 "EHLO
+        id S233481AbjJ3NdU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Oct 2023 09:33:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233308AbjJ3N2Z (ORCPT
+        with ESMTP id S233499AbjJ3NdS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Oct 2023 09:28:25 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3E3AC6
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 06:28:19 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id D70A26732A; Mon, 30 Oct 2023 14:28:16 +0100 (CET)
-Date:   Mon, 30 Oct 2023 14:28:16 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] nvme-auth: use crypto_shash_tfm_digest()
-Message-ID: <20231030132816.GC21741@lst.de>
-References: <20231029050040.154563-1-ebiggers@kernel.org>
+        Mon, 30 Oct 2023 09:33:18 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92A7AF9;
+        Mon, 30 Oct 2023 06:33:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=clnWS5S2l82Uc/OUwdJCZ2x+yq3BrnA/RwiazfTz46c=; b=f82SbE5WJfSrrMk6FgJN5X+gH+
+        Gh6p509Joxcb9ORuMDHbRKqy2KG8/HbXxb/kQCykhu9oynlrcA1btSmcc7BefR15WoA089/azdk5Y
+        jVhQ+qzrN7fxI67xmvC4pcG3kCx4jYmbmkWx80nVz3+GYkU/RIj0vdn2qnjScVjwZBY8eLczbsWcn
+        JDcgBkAR9xDaTa3c7hewLtC9QY3R+BzVfENIopHpcb4xyPXbOecw5ZNTq1LEB9dN6BmYTbdyrTRkI
+        kp/QmL8enm18eMIY44PlPJYwNKTFHpWQC9h7ycQkxFrUMh0uarBJ/Nl98CCZ4TFlQls8uXKuuXME6
+        vqf99kHA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qxSO9-003Q1x-20;
+        Mon, 30 Oct 2023 13:33:05 +0000
+Date:   Mon, 30 Oct 2023 06:33:05 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     "NK, JESHWANTHKUMAR" <jeshwanthkumar.nk@amd.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, thomas.lendacky@amd.com,
+        john.allen@amd.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, jens.wiklander@linaro.org,
+        sumit.garg@linaro.org, jarkko.nikula@linux.intel.com,
+        mario.limonciello@amd.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, op-tee@lists.trustedfirmware.org,
+        Mythri.Pandeshwarakrishna@amd.com, Devaraj.Rangasamy@amd.com,
+        Rijo-john.Thomas@amd.com, nimesh.easow@amd.com
+Subject: Re: [PATCH 1/3] crypto: ccp - Add function to allocate and free
+ memory using DMA APIs
+Message-ID: <ZT+wkcITIz0ThWU7@infradead.org>
+References: <20231025065700.1556152-1-JESHWANTHKUMAR.NK@amd.com>
+ <20231025065700.1556152-2-JESHWANTHKUMAR.NK@amd.com>
+ <ZTtJdU5a/P4kg/Ss@infradead.org>
+ <94059f5c-10dd-4d75-a69c-76b21ff49546@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231029050040.154563-1-ebiggers@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <94059f5c-10dd-4d75-a69c-76b21ff49546@amd.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Oct 28, 2023 at 10:00:40PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Simplify nvme_auth_augmented_challenge() by using
-> crypto_shash_tfm_digest() instead of an alloc+init+update+final
-> sequence.  This should also improve performance.
+On Fri, Oct 27, 2023 at 07:05:17PM +0530, NK, JESHWANTHKUMAR wrote:
+> Can you please elaborate a bit more?
 
-Nice:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Becasue the DMA API is a blackbox.  You can pass the dma_addr_t to
+hardware, and you can use the kernel virtual address.  That it can
+sometimes be implemented using the IMMU API is an implementation
+detail.  Similarly you can only feeds iovas generated by the IOMMU
+API into the IOMMU API, not any random other scalar value, which
+is what you can get from the DMA API.
