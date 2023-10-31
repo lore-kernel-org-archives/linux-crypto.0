@@ -2,550 +2,198 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D5EC4167B
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Oct 2023 13:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74507C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Oct 2023 14:53:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344649AbjJaNtY (ORCPT
+        id S1344545AbjJaOxV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Oct 2023 09:49:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53296 "EHLO
+        Tue, 31 Oct 2023 10:53:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344603AbjJaNtX (ORCPT
+        with ESMTP id S1344518AbjJaOxU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Oct 2023 09:49:23 -0400
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B33EF5;
-        Tue, 31 Oct 2023 06:49:20 -0700 (PDT)
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39V7VoAh028735;
-        Tue, 31 Oct 2023 06:49:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=LkUTGUGgIACPujC658fHfC9yGZbeiM4D/ap1lU2H1QM=;
- b=aPYe4WT8elBeZNxX0qZi8jZxo+jpeZkqoVL5Bs5+c1enyMBCi9nKnsJNrcvYmt/VgN/S
- Cc1ME7GEwSrNRzu86zNJ+K0J4/F1j6DFV8DeXIssqaHzqRCT1CyEe+/fhaktiEuzbE5z
- aVrKVMWUpUaO47xjXPaXjYWHHlkrdRR0UR1XhDt0kdlCxhV3w/0YB+usDcOxuWg66Q8W
- maniu5hGVjCGyH/GaE3JVNqId9BupAQMijEnBQ5+806qyBm3j5LVPPRJCf/sx8gK9nVZ
- dQnPpiZ0lab+WCD/cYmPJjRRlJ0rHlsHxg8flf2FqCQJVKSA0gCB/eFiAyDyp6mF4cLF Uw== 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3u2j6vw9yy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Tue, 31 Oct 2023 06:49:13 -0700
-Received: from devvm4158.cln0.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c085:11d::8) with Microsoft SMTP Server id
- 15.1.2507.34; Tue, 31 Oct 2023 06:49:10 -0700
-From:   Vadim Fedorenko <vadfed@meta.com>
-To:     Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Mykola Lysenko <mykolal@fb.com>
-CC:     Vadim Fedorenko <vadfed@meta.com>, <bpf@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-Subject: [PATCH bpf-next v3 2/2] selftests: bpf: crypto skcipher algo selftests
-Date:   Tue, 31 Oct 2023 06:49:00 -0700
-Message-ID: <20231031134900.1432945-2-vadfed@meta.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20231031134900.1432945-1-vadfed@meta.com>
-References: <20231031134900.1432945-1-vadfed@meta.com>
+        Tue, 31 Oct 2023 10:53:20 -0400
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E98FDB
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 07:53:17 -0700 (PDT)
+Received: from pps.filterd (m0150245.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39V8C2J2018846;
+        Tue, 31 Oct 2023 14:53:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : subject :
+ date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pps0720;
+ bh=yJLKGx0IUbgRIVO+1RFwSJdCYeCaB3DK9EMnY4J10/k=;
+ b=LqApjkWnD3qhDawUcTiNEAejyqUsBCw81lNie6E/Okpt7vJRqerwyTqaQY3jx8C67gpp
+ Hjt0SyCEv/LLYW8QccwgMVDx+5Yxw33c0G8AhmshEibcJXvBIxMHqGMitLu7Z+3AM96G
+ 8wKl5ZrtPWrf+EhoVD9Gpllday7+4DukDxU5Ua+nqjLZPLoVZlg8YmkxmTlntzx7PFTy
+ 0pQqf6r2kvdsMv2H0F6NsFtXklKeAfXJ9JdNUGUyxovWgi2wQ0emRImAi82zkFRFoZYl
+ ttfsIhJninCi/+4T35Q3AWp70cc8mw2G87oTvO329TaYI7j9MnqGaPfa9aGyob0sg2/9 JA== 
+Received: from p1lg14879.it.hpe.com ([16.230.97.200])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3u2wuvd5vq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Oct 2023 14:53:06 +0000
+Received: from p1wg14924.americas.hpqcorp.net (unknown [10.119.18.113])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 99CAD132C0;
+        Tue, 31 Oct 2023 14:53:04 +0000 (UTC)
+Received: from p1wg14928.americas.hpqcorp.net (10.119.18.116) by
+ p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Tue, 31 Oct 2023 02:52:56 -1200
+Received: from p1wg14920.americas.hpqcorp.net (16.230.19.123) by
+ p1wg14928.americas.hpqcorp.net (10.119.18.116) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.42
+ via Frontend Transport; Tue, 31 Oct 2023 02:52:55 -1200
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (192.58.206.35)
+ by edge.it.hpe.com (16.230.19.123) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Tue, 31 Oct 2023 02:52:55 -1200
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iXM7chaUMAU6bjfQJe2WRfuITVYB0RK0njXXDLc42gfFD1jy/v+gSwAI0p1ONx3UXrx18DFdjRDZICSJyw0K/aBZ7UsTUZbuKnI2QzOrR6+JTFEN0HlGYaqZs3C33UqChN7wKbfUYkSzEsSTaOJYW8blLX/lBglo7FAjl/DBnldIYs0wKMR4eKWp6UmKw2L4qHbLasOjAOslMs2Ijje2r6xIM5m2XOfyMX4rYJS+/1XLUj7UdXevHsXN9Ei2FMljy41HkBCxDoZj5nhA9KxuZy1aLGxpF225r/syz5wPclUCv4p6RP/M3CxMK1hGQe6gzrYAKmaIdVIxp6LwdXXi8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yJLKGx0IUbgRIVO+1RFwSJdCYeCaB3DK9EMnY4J10/k=;
+ b=bx3aE9wL8ESht4C39/WJrlKtFp6iT0anJeK7co/idXLzeeH6Tz4DZzuUBq+H/U9JUOcvti1P6bSGf2niFAEdVEzVMOIGqRvQQG4jplQC18eYjNn7OUBOnLbACtbiX4iOo+kG9H9L7ba48vA6bwcZWxygbnUZdj5hUNZfsYU+ulu5up+arjnWABsmtySODD8Y/7fS4J24F7l+Zk+C5siWSfbQjHzu4cHD7BBbQ8lk5GRudAhkLI2EPVEkRYaooT9+GWdTlHwj/t7a8y/HWkk0Gy1v0JHmD26Je0tTx2Y/6vENhsv/hwlMd2iHEbQlsyJZbDmQApnXMHUkASkmJ+bvrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
+ header.d=hpe.com; arc=none
+Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c4::18)
+ by PH0PR84MB1479.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:172::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.27; Tue, 31 Oct
+ 2023 14:52:53 +0000
+Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::142e:16d6:da8f:c983]) by MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::142e:16d6:da8f:c983%3]) with mapi id 15.20.6933.026; Tue, 31 Oct 2023
+ 14:52:53 +0000
+From:   "Elliott, Robert (Servers)" <elliott@hpe.com>
+To:     Roxana Nicolescu <roxana.nicolescu@canonical.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: [PATCH] crypto: x86/sha256 - autoload if SHA-NI detected
+Thread-Topic: [PATCH] crypto: x86/sha256 - autoload if SHA-NI detected
+Thread-Index: AQHaCicmZVMxCgObPEK5838Zzgto+bBj5VuAgAAX9FA=
+Date:   Tue, 31 Oct 2023 14:52:53 +0000
+Message-ID: <MW5PR84MB1842C4652CCCB7738AE7FA4BABA0A@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+References: <20231029051555.157720-1-ebiggers@kernel.org>
+ <34843a86-6516-47d2-88dd-5ca0aa86a052@canonical.com>
+In-Reply-To: <34843a86-6516-47d2-88dd-5ca0aa86a052@canonical.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW5PR84MB1842:EE_|PH0PR84MB1479:EE_
+x-ms-office365-filtering-correlation-id: fc5d21df-d2ac-426d-32f6-08dbda210f70
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: mnFAWnv3P0ZuOYHR+gwWvxFE9mhwpr39dAc+JluhrY/Jv2F/VqNmzXEb0iJ7gXrJbzEemker1SunE9UefQSR4K4OounKZ2TzbyUyg7NkWdtT3bb8elSYmS78Z2FuOaniPycW46jUSNoxFd1iTO+6vyH/o2/6OC2QH9wANYm4Jlg9YLtXYSIdZXLdeyV59RyXmWcTrtzkfhLjt9euseA0N7xs+b9p4C5b+/niLvT6p/uOatXW74iW3b4VTvOMLiU9HPN4awv7rcd7G8/LL7oC8CA77DURHev0SNJgu176lCaJksedpHVtU9TMNx/1jkNY6nI8kGnzu0NZiN+8lcH6Q/9gWhy7G6WNz7Fn0WzS62v73tZQIRtoZeKb1ZzZ9Retv2ut2jOwxayQqBYZys3dZ1eM8+mvzCHx6EsBP6kIQlB9T7CIjNvp2ibrw70AooC5bXyuoK0/qglOLSti7gV4/n/kEe5643CfTGNIXPvc60jJwyBsOZwW0xDREYmXnn+PTLxL6r0c1dwucmgFWhEp3dHnFahDQIMMhjmHGCc8eWdHMlS87NMH3OiwlKI69p5AGbeVyobHfiXI544YjLrCgKo9l8PXRVq2wmvs1aZygEQK4gY+3GLhDQcYu70eILY+
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(136003)(346002)(376002)(366004)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(2906002)(8676002)(8936002)(52536014)(66476007)(66556008)(110136005)(64756008)(76116006)(66446008)(66946007)(316002)(5660300002)(55016003)(478600001)(41300700001)(71200400001)(9686003)(7696005)(6506007)(26005)(38070700009)(83380400001)(53546011)(82960400001)(122000001)(86362001)(33656002)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?aVY3MHl4OGdIcEVJTnJUS2JGYVkrWSsvZnJYN08wQ3drWnVaL3paRzg3d2pW?=
+ =?utf-8?B?SjdJVERkaE4vR3I2aDRmTWVOa3h6c21nbzhBNFZFM0lTeGVVUDUzSDZHcGQy?=
+ =?utf-8?B?R1dLYWZCRmt4a3U4YXJyM0RaOHZuVjhtTWJOSlREaFM4YjRWQ0Q2UjZlNnFr?=
+ =?utf-8?B?MWovMFRWVUFCOGR6MVRyYVAvOTlGYm5idkZ5dlF3VkdFbmNJWkY0QWFNMzVq?=
+ =?utf-8?B?bEhCTFBqRFRIZk81b1NINk0rU0o1QnU5VVQ2RGVtS3A1SC9UbXFGamZGc01y?=
+ =?utf-8?B?RzhsQlZQZExuMDRZQVlyaElyVk53ekVuRnVnb1o0ZjNISDNTS2VZNHFyVi9V?=
+ =?utf-8?B?dENkMGt4SlBXdFp4VEdZOEMxdmlzTVF0dFZwbnhBbjlpMUgyYnhuK3RSMk5D?=
+ =?utf-8?B?Z0ZtY3FHWXNOVk1FdGlaK0RONFlaQjhSZnNqclZ2RDZUOXNnUmdCODIyMlQr?=
+ =?utf-8?B?UFM2aHFPMHBnV2k3TmM1Zy9sMGV5OVB2L3FuMC9DMWdnUC92d0xzRG8zUFZE?=
+ =?utf-8?B?QmZZVEdoditVRjM2dmU0Smw1YTA2cXRxSWdNTi9TUzB6YlZmc202Mmg0VGRO?=
+ =?utf-8?B?d3Q4aERLMTZiZVlOcTVjNzdZNCt6YjBST0NxUFM0ek1tZVdoN0VvZVg5Tmt1?=
+ =?utf-8?B?aWtJYW1WSWVQU0JnSFZ0K0FkMStaUENNN3hRZkgwWGl2dWlDMTBaM24vakFS?=
+ =?utf-8?B?RGJhSHF2cWhNVTEwaVdJWDlNUk9hRGVLanJMbEh3THowS1hFMVJlWFIrN2hM?=
+ =?utf-8?B?UVZOR0VJYTRPOU9JZHMwbmpSVjFKdjFySk44Mng2Ym1Xb28rSTFoWTZDTTZp?=
+ =?utf-8?B?c1greElmZ3c0K2F6WVZtOGZiaDZSdXc4Nmx2bm5Qemd4UnhDTUNuRS80ZmNl?=
+ =?utf-8?B?cmc4ZXdTZWhBTHZlWjdFTjYzWWphQVhNNEVuM2hJMUN2enhlWlpBK1llNkdN?=
+ =?utf-8?B?c0o1MTJ2N3hyeCtIZ1UyMDhMY09ET1NJVmc0bjkxTEtDYzN4YVZraHZkMmo2?=
+ =?utf-8?B?STRpRXVNOXR0eGNzSFlZLzVpN2E0ellLSGE0ZGliSjV2QWFlYVNOUjM0eVVw?=
+ =?utf-8?B?VzVZTHdWZThHYTFvelN3WHFaQzNUMVZ0elhQR1Jpb1BiaDRCOFdZUy9CMERh?=
+ =?utf-8?B?cUxlL1JLWlZ1YW0vVjlaVUVQUnJxSEI5VG5rdUJuZll3TTBRc0tWSjkwcElr?=
+ =?utf-8?B?WVVvZGdkVjJ5cEhLNlZOWDQvVjhJMUFRYWpmdXQ1NmJxRVlydktKWExNa1h5?=
+ =?utf-8?B?cjd2RXljYkpjaVB1dm9SaUdnNXpwYTVLc1oyY05BcVlEblorZTlnUFdIYlNl?=
+ =?utf-8?B?c2lRKzl2YS8yb3JvWWNRTHd5OTFoUmsrS3pWVDBuOVNoUXRJcVJaNUpxUy95?=
+ =?utf-8?B?VTR0S0Zvc2VtN0d5UGVGbDhweXZWQXpNU3I0UTJ1WDNXT1pKOS9NeVloK2dG?=
+ =?utf-8?B?dUhtZEZ2ZittSm9memh3MTB5T1RLckp3T1U3RUkyWGtSRTBHOHNXSDBVVmpE?=
+ =?utf-8?B?Y0llV2pEWkRGd2RheFVveTRqcGZUendKSUdZV09HWXJOV0VvTkVlcnh3WEJi?=
+ =?utf-8?B?MDN1MmkwZytyUS8yQ2dQa2ZNRWRWdGVIQkZ2dklOYUtpZUdoUmpSalVka0Ur?=
+ =?utf-8?B?c21MYitXU0M5M3NZdkdMZTRRV0w4Vko0UTBIby81ZExtNGswemNjeTZ5UnZH?=
+ =?utf-8?B?SnVWRFFEN29rVTNFMXhkNXN3RFFNN3JqUlg5eW9XL2pBU2hNVVRLa0xSaE5o?=
+ =?utf-8?B?QkpvREF3RVEzclhESWN4ZGNsRDZFdm41VGlmWG5ieXlTcGxwMkpxM3MzQi9h?=
+ =?utf-8?B?WCs2UytXaktDVDFBYzNyZFY3ZUE2UVJBaVRVOXpOb0FaZklZSVhsSUk4cStP?=
+ =?utf-8?B?TkNQQ1pvSkIxUUxEMnVQdXNadG1ZdXNmQ283NTNsYUdrVWJ5ckFhNEVWZkFN?=
+ =?utf-8?B?ekt5TG9DWTlyQmg3MWRWNzJtRU1zWGlqRkhHOXNvV1EvRDIxZkcrVUpwWis3?=
+ =?utf-8?B?MElRaGdSbzZ4ZXEzRWdyOHY1bk5mMFBzU2tqMlY4ZXd3WURnOUdac1pEYm1u?=
+ =?utf-8?B?aGRnU2FjVkJlMWFnRjZDTElJUVJIV2xiV3VWN2M1Tk9NUmUxWWo0aStZRVpu?=
+ =?utf-8?Q?f3cA=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [2620:10d:c085:208::f]
-X-Proofpoint-ORIG-GUID: 7x9YL6y3-E_OnSe8F1ighE5V3llfuvoH
-X-Proofpoint-GUID: 7x9YL6y3-E_OnSe8F1ighE5V3llfuvoH
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc5d21df-d2ac-426d-32f6-08dbda210f70
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Oct 2023 14:52:53.0517
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: wd2nMqrJ3ai35WExKMe2+hNxQSr1gqMFnrve26d/h3c6Suz2NHuKH9KYtqrypN/a
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR84MB1479
+X-OriginatorOrg: hpe.com
+X-Proofpoint-GUID: KtsaAW3n6NmXaTf5B38Fq2wiEX06SfJN
+X-Proofpoint-ORIG-GUID: KtsaAW3n6NmXaTf5B38Fq2wiEX06SfJN
+X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-10-31_01,2023-10-31_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ mlxlogscore=999 phishscore=0 clxscore=1011 impostorscore=0 suspectscore=0
+ bulkscore=0 lowpriorityscore=0 spamscore=0 priorityscore=1501 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2310240000
+ definitions=main-2310310118
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add simple tc hook selftests to show the way to work with new crypto
-BPF API. Some weird structre and map are added to setup program to make
-verifier happy about dynptr initialization from memory. Simple AES-ECB
-algo is used to demonstrate encryption and decryption of fixed size
-buffers.
-
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
-v2 -> v3:
-- disable tests on s390 and aarch64 because of unknown Fatal exception
-  in sg_init_one
-v1 -> v2:
-- add CONFIG_CRYPTO_AES and CONFIG_CRYPTO_ECB to selftest build config
-  suggested by Daniel
-
- kernel/bpf/crypto.c                           |   5 +-
- tools/testing/selftests/bpf/DENYLIST.aarch64  |   1 +
- tools/testing/selftests/bpf/DENYLIST.s390x    |   1 +
- tools/testing/selftests/bpf/config            |   3 +
- .../selftests/bpf/prog_tests/crypto_sanity.c  | 129 +++++++++++++++
- .../selftests/bpf/progs/crypto_common.h       | 103 ++++++++++++
- .../selftests/bpf/progs/crypto_sanity.c       | 154 ++++++++++++++++++
- 7 files changed, 394 insertions(+), 2 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
- create mode 100644 tools/testing/selftests/bpf/progs/crypto_common.h
- create mode 100644 tools/testing/selftests/bpf/progs/crypto_sanity.c
-
-diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
-index c2a0703934fc..4ee6193165ca 100644
---- a/kernel/bpf/crypto.c
-+++ b/kernel/bpf/crypto.c
-@@ -65,8 +65,9 @@ static void *__bpf_dynptr_data_ptr(const struct bpf_dynptr_kern *ptr)
-  *
-  * bpf_crypto_skcipher_ctx_create() allocates memory using the BPF memory
-  * allocator, and will not block. It may return NULL if no memory is available.
-- * @algo: bpf_dynptr which holds string representation of algorithm.
-- * @key:  bpf_dynptr which holds cipher key to do crypto.
-+ * @palgo: bpf_dynptr which holds string representation of algorithm.
-+ * @pkey:  bpf_dynptr which holds cipher key to do crypto.
-+ * @err:   integer to store error code when NULL is returned
-  */
- __bpf_kfunc struct bpf_crypto_skcipher_ctx *
- bpf_crypto_skcipher_ctx_create(const struct bpf_dynptr_kern *palgo,
-diff --git a/tools/testing/selftests/bpf/DENYLIST.aarch64 b/tools/testing/selftests/bpf/DENYLIST.aarch64
-index 5c2cc7e8c5d0..72c7ef3e5872 100644
---- a/tools/testing/selftests/bpf/DENYLIST.aarch64
-+++ b/tools/testing/selftests/bpf/DENYLIST.aarch64
-@@ -1,5 +1,6 @@
- bpf_cookie/multi_kprobe_attach_api               # kprobe_multi_link_api_subtest:FAIL:fentry_raw_skel_load unexpected error: -3
- bpf_cookie/multi_kprobe_link_api                 # kprobe_multi_link_api_subtest:FAIL:fentry_raw_skel_load unexpected error: -3
-+crypto_sanity					 # sg_init_one has exception on aarch64
- exceptions					 # JIT does not support calling kfunc bpf_throw: -524
- fexit_sleep                                      # The test never returns. The remaining tests cannot start.
- kprobe_multi_bench_attach                        # needs CONFIG_FPROBE
-diff --git a/tools/testing/selftests/bpf/DENYLIST.s390x b/tools/testing/selftests/bpf/DENYLIST.s390x
-index 1a63996c0304..8ab7485bedb1 100644
---- a/tools/testing/selftests/bpf/DENYLIST.s390x
-+++ b/tools/testing/selftests/bpf/DENYLIST.s390x
-@@ -1,5 +1,6 @@
- # TEMPORARY
- # Alphabetical order
-+crypto_sanity				 # sg_init_one has exception on s390					       (exceptions)
- exceptions				 # JIT does not support calling kfunc bpf_throw				       (exceptions)
- get_stack_raw_tp                         # user_stack corrupted user stack                                             (no backchain userspace)
- stacktrace_build_id                      # compare_map_keys stackid_hmap vs. stackmap err -2 errno 2                   (?)
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index 02dd4409200e..48b570fd1752 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -14,6 +14,9 @@ CONFIG_CGROUP_BPF=y
- CONFIG_CRYPTO_HMAC=y
- CONFIG_CRYPTO_SHA256=y
- CONFIG_CRYPTO_USER_API_HASH=y
-+CONFIG_CRYPTO_SKCIPHER=y
-+CONFIG_CRYPTO_ECB=y
-+CONFIG_CRYPTO_AES=y
- CONFIG_DEBUG_INFO=y
- CONFIG_DEBUG_INFO_BTF=y
- CONFIG_DEBUG_INFO_DWARF4=y
-diff --git a/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c b/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
-new file mode 100644
-index 000000000000..a43969da6d15
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
-@@ -0,0 +1,129 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2022 Meta Platforms, Inc. and affiliates. */
-+
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+#include <net/if.h>
-+#include <linux/in6.h>
-+
-+#include "test_progs.h"
-+#include "network_helpers.h"
-+#include "crypto_sanity.skel.h"
-+
-+#define NS_TEST "crypto_sanity_ns"
-+#define IPV6_IFACE_ADDR "face::1"
-+#define UDP_TEST_PORT 7777
-+static const char plain_text[] = "stringtoencrypt0";
-+static const char crypted_data[] = "\x5B\x59\x39\xEA\xD9\x7A\x2D\xAD\xA7\xE0\x43" \
-+				   "\x37\x8A\x77\x17\xB2";
-+
-+void test_crypto_sanity(void)
-+{
-+	LIBBPF_OPTS(bpf_tc_hook, qdisc_hook, .attach_point = BPF_TC_EGRESS);
-+	LIBBPF_OPTS(bpf_tc_opts, tc_attach_enc);
-+	LIBBPF_OPTS(bpf_tc_opts, tc_attach_dec);
-+	LIBBPF_OPTS(bpf_test_run_opts, opts,
-+		    .data_in = crypted_data,
-+		    .data_size_in = sizeof(crypted_data),
-+		    .repeat = 1,
-+	);
-+	struct nstoken *nstoken = NULL;
-+	struct crypto_sanity *skel;
-+	struct sockaddr_in6 addr;
-+	int sockfd, err, pfd;
-+	socklen_t addrlen;
-+
-+	skel = crypto_sanity__open();
-+	if (!ASSERT_OK_PTR(skel, "skel open"))
-+		return;
-+
-+	bpf_program__set_autoload(skel->progs.skb_crypto_setup, true);
-+
-+	SYS(fail, "ip netns add %s", NS_TEST);
-+	SYS(fail, "ip -net %s -6 addr add %s/128 dev lo nodad", NS_TEST, IPV6_IFACE_ADDR);
-+	SYS(fail, "ip -net %s link set dev lo up", NS_TEST);
-+
-+	err = crypto_sanity__load(skel);
-+	if (!ASSERT_OK(err, "crypto_sanity__load"))
-+		goto fail;
-+
-+	nstoken = open_netns(NS_TEST);
-+	if (!ASSERT_OK_PTR(nstoken, "open_netns"))
-+		goto fail;
-+
-+	qdisc_hook.ifindex = if_nametoindex("lo");
-+	if (!ASSERT_GT(qdisc_hook.ifindex, 0, "if_nametoindex lo"))
-+		goto fail;
-+
-+	err = crypto_sanity__attach(skel);
-+	if (!ASSERT_OK(err, "crypto_sanity__attach"))
-+		goto fail;
-+
-+	pfd = bpf_program__fd(skel->progs.skb_crypto_setup);
-+	if (!ASSERT_GT(pfd, 0, "skb_crypto_setup fd"))
-+		goto fail;
-+
-+	err = bpf_prog_test_run_opts(pfd, &opts);
-+	if (!ASSERT_OK(err, "skb_crypto_setup") ||
-+	    !ASSERT_OK(opts.retval, "skb_crypto_setup retval"))
-+		goto fail;
-+
-+	if (!ASSERT_OK(skel->bss->status, "skb_crypto_setup status"))
-+		goto fail;
-+
-+	err = bpf_tc_hook_create(&qdisc_hook);
-+	if (!ASSERT_OK(err, "create qdisc hook"))
-+		goto fail;
-+
-+	addrlen = sizeof(addr);
-+	err = make_sockaddr(AF_INET6, IPV6_IFACE_ADDR, UDP_TEST_PORT,
-+			    (void *)&addr, &addrlen);
-+	if (!ASSERT_OK(err, "make_sockaddr"))
-+		goto fail;
-+
-+	tc_attach_dec.prog_fd = bpf_program__fd(skel->progs.decrypt_sanity);
-+	err = bpf_tc_attach(&qdisc_hook, &tc_attach_dec);
-+	if (!ASSERT_OK(err, "attach decrypt filter"))
-+		goto fail;
-+
-+	sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
-+	if (!ASSERT_NEQ(sockfd, -1, "decrypt socket"))
-+		goto fail;
-+	err = sendto(sockfd, crypted_data, 16, 0, (void *)&addr, addrlen);
-+	close(sockfd);
-+	if (!ASSERT_EQ(err, 16, "decrypt send"))
-+		goto fail;
-+
-+	bpf_tc_detach(&qdisc_hook, &tc_attach_dec);
-+	if (!ASSERT_OK(skel->bss->status, "decrypt status"))
-+		goto fail;
-+	if (!ASSERT_STRNEQ(skel->bss->dst, plain_text, sizeof(plain_text), "decrypt"))
-+		goto fail;
-+
-+	tc_attach_enc.prog_fd = bpf_program__fd(skel->progs.encrypt_sanity);
-+	err = bpf_tc_attach(&qdisc_hook, &tc_attach_enc);
-+	if (!ASSERT_OK(err, "attach encrypt filter"))
-+		goto fail;
-+
-+	sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
-+	if (!ASSERT_NEQ(sockfd, -1, "encrypt socket"))
-+		goto fail;
-+	err = sendto(sockfd, plain_text, 16, 0, (void *)&addr, addrlen);
-+	close(sockfd);
-+	if (!ASSERT_EQ(err, 16, "encrypt send"))
-+		goto fail;
-+
-+	bpf_tc_detach(&qdisc_hook, &tc_attach_enc);
-+	if (!ASSERT_OK(skel->bss->status, "encrypt status"))
-+		goto fail;
-+	if (!ASSERT_STRNEQ(skel->bss->dst, crypted_data, sizeof(crypted_data), "encrypt"))
-+		goto fail;
-+
-+fail:
-+	if (nstoken) {
-+		bpf_tc_hook_destroy(&qdisc_hook);
-+		close_netns(nstoken);
-+	}
-+	SYS_NOFAIL("ip netns del " NS_TEST " &> /dev/null");
-+	crypto_sanity__destroy(skel);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/crypto_common.h b/tools/testing/selftests/bpf/progs/crypto_common.h
-new file mode 100644
-index 000000000000..584378bb6df8
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/crypto_common.h
-@@ -0,0 +1,103 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) 2023 Meta Platforms, Inc. and affiliates. */
-+
-+#ifndef _CRYPTO_COMMON_H
-+#define _CRYPTO_COMMON_H
-+
-+#include "errno.h"
-+#include <stdbool.h>
-+
-+#define private(name) SEC(".bss." #name) __hidden __attribute__((aligned(8)))
-+private(CTX) static struct bpf_crypto_skcipher_ctx __kptr * global_crypto_ctx;
-+
-+struct bpf_crypto_skcipher_ctx *bpf_crypto_skcipher_ctx_create(const struct bpf_dynptr *algo,
-+							       const struct bpf_dynptr *key,
-+							       int *err) __ksym;
-+struct bpf_crypto_skcipher_ctx *bpf_crypto_skcipher_ctx_acquire(struct bpf_crypto_skcipher_ctx *ctx) __ksym;
-+void bpf_crypto_skcipher_ctx_release(struct bpf_crypto_skcipher_ctx *ctx) __ksym;
-+int bpf_crypto_skcipher_encrypt(struct bpf_crypto_skcipher_ctx *ctx,
-+				const struct bpf_dynptr *src, struct bpf_dynptr *dst,
-+				const struct bpf_dynptr *iv) __ksym;
-+int bpf_crypto_skcipher_decrypt(struct bpf_crypto_skcipher_ctx *ctx,
-+				const struct bpf_dynptr *src, struct bpf_dynptr *dst,
-+				const struct bpf_dynptr *iv) __ksym;
-+
-+struct __crypto_skcipher_ctx_value {
-+	struct bpf_crypto_skcipher_ctx __kptr * ctx;
-+};
-+
-+struct crypto_conf_value {
-+	__u8 algo[32];
-+	__u32 algo_size;
-+	__u8 key[32];
-+	__u32 key_size;
-+	__u8 iv[32];
-+	__u32 iv_size;
-+	__u8 dst[32];
-+	__u32 dst_size;
-+};
-+
-+struct array_conf_map {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__type(key, int);
-+	__type(value, struct crypto_conf_value);
-+	__uint(max_entries, 1);
-+} __crypto_conf_map SEC(".maps");
-+
-+struct array_map {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__type(key, int);
-+	__type(value, struct __crypto_skcipher_ctx_value);
-+	__uint(max_entries, 1);
-+} __crypto_skcipher_ctx_map SEC(".maps");
-+
-+static inline struct crypto_conf_value *crypto_conf_lookup(void)
-+{
-+	struct crypto_conf_value *v, local = {};
-+	u32 key = 0;
-+
-+	v = bpf_map_lookup_elem(&__crypto_conf_map, &key);
-+	if (v)
-+		return v;
-+
-+	bpf_map_update_elem(&__crypto_conf_map, &key, &local, 0);
-+	return bpf_map_lookup_elem(&__crypto_conf_map, &key);
-+}
-+
-+static inline struct __crypto_skcipher_ctx_value *crypto_skcipher_ctx_value_lookup(void)
-+{
-+	u32 key = 0;
-+
-+	return bpf_map_lookup_elem(&__crypto_skcipher_ctx_map, &key);
-+}
-+
-+static inline int crypto_skcipher_ctx_insert(struct bpf_crypto_skcipher_ctx *ctx)
-+{
-+	struct __crypto_skcipher_ctx_value local, *v;
-+	long status;
-+	struct bpf_crypto_skcipher_ctx *old;
-+	u32 key = 0;
-+
-+	local.ctx = NULL;
-+	status = bpf_map_update_elem(&__crypto_skcipher_ctx_map, &key, &local, 0);
-+	if (status) {
-+		bpf_crypto_skcipher_ctx_release(ctx);
-+		return status;
-+	}
-+
-+	v = bpf_map_lookup_elem(&__crypto_skcipher_ctx_map, &key);
-+	if (!v) {
-+		bpf_crypto_skcipher_ctx_release(ctx);
-+		return -ENOENT;
-+	}
-+
-+	old = bpf_kptr_xchg(&v->ctx, ctx);
-+	if (old) {
-+		bpf_crypto_skcipher_ctx_release(old);
-+		return -EEXIST;
-+	}
-+
-+	return 0;
-+}
-+
-+#endif /* _CRYPTO_COMMON_H */
-diff --git a/tools/testing/selftests/bpf/progs/crypto_sanity.c b/tools/testing/selftests/bpf/progs/crypto_sanity.c
-new file mode 100644
-index 000000000000..71a172d8d2a2
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/crypto_sanity.c
-@@ -0,0 +1,154 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2023 Meta Platforms, Inc. and affiliates. */
-+
-+#include "vmlinux.h"
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_endian.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_misc.h"
-+#include "bpf_kfuncs.h"
-+#include "crypto_common.h"
-+
-+#define UDP_TEST_PORT 7777
-+unsigned char crypto_key[16] = "testtest12345678";
-+char crypto_algo[9] = "ecb(aes)";
-+char dst[32] = {};
-+int status;
-+
-+static inline int skb_validate_test(const struct __sk_buff *skb)
-+{
-+	struct ipv6hdr ip6h;
-+	struct udphdr udph;
-+	u32 offset;
-+
-+	if (skb->protocol != __bpf_constant_htons(ETH_P_IPV6))
-+		return -1;
-+
-+	if (bpf_skb_load_bytes(skb, ETH_HLEN, &ip6h, sizeof(ip6h)))
-+		return -1;
-+
-+	if (ip6h.nexthdr != IPPROTO_UDP)
-+		return -1;
-+
-+	if (bpf_skb_load_bytes(skb, ETH_HLEN + sizeof(ip6h), &udph, sizeof(udph)))
-+		return -1;
-+
-+	if (udph.dest != __bpf_constant_htons(UDP_TEST_PORT))
-+		return -1;
-+
-+	offset = ETH_HLEN + sizeof(ip6h) + sizeof(udph);
-+	if (skb->len < offset + 16)
-+		return -1;
-+
-+	return offset;
-+}
-+
-+SEC("?fentry.s/bpf_fentry_test1")
-+int BPF_PROG(skb_crypto_setup)
-+{
-+	struct crypto_conf_value *c;
-+	struct bpf_dynptr algo, key;
-+	int err = 0;
-+
-+	status = 0;
-+
-+	c = crypto_conf_lookup();
-+	if (!c) {
-+		status = -EINVAL;
-+		return 0;
-+	}
-+
-+	bpf_dynptr_from_mem(crypto_algo, sizeof(crypto_algo), 0, &algo);
-+	bpf_dynptr_from_mem(crypto_key, sizeof(crypto_key), 0, &key);
-+	struct bpf_crypto_skcipher_ctx *cctx = bpf_crypto_skcipher_ctx_create(&algo, &key, &err);
-+
-+	if (!cctx) {
-+		status = err;
-+		return 0;
-+	}
-+
-+	err = crypto_skcipher_ctx_insert(cctx);
-+	if (err && err != -EEXIST)
-+		status = err;
-+
-+	return 0;
-+}
-+
-+SEC("tc")
-+int decrypt_sanity(struct __sk_buff *skb)
-+{
-+	struct __crypto_skcipher_ctx_value *v;
-+	struct bpf_crypto_skcipher_ctx *ctx;
-+	struct bpf_dynptr psrc, pdst, iv;
-+	int err;
-+
-+	err = skb_validate_test(skb);
-+	if (err < 0) {
-+		status = err;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	v = crypto_skcipher_ctx_value_lookup();
-+	if (!v) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	ctx = v->ctx;
-+	if (!ctx) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	bpf_dynptr_from_skb(skb, 0, &psrc);
-+	bpf_dynptr_adjust(&psrc, err, err + 16);
-+	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
-+	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-+
-+	bpf_crypto_skcipher_decrypt(ctx, &psrc, &pdst, &iv);
-+
-+	status = 0;
-+
-+	return TC_ACT_SHOT;
-+}
-+
-+SEC("tc")
-+int encrypt_sanity(struct __sk_buff *skb)
-+{
-+	struct __crypto_skcipher_ctx_value *v;
-+	struct bpf_crypto_skcipher_ctx *ctx;
-+	struct bpf_dynptr psrc, pdst, iv;
-+	int err;
-+
-+	status = 0;
-+
-+	err = skb_validate_test(skb);
-+	if (err < 0) {
-+		status = err;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	v = crypto_skcipher_ctx_value_lookup();
-+	if (!v) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	ctx = v->ctx;
-+	if (!ctx) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	bpf_dynptr_from_skb(skb, 0, &psrc);
-+	bpf_dynptr_adjust(&psrc, err, err + 16);
-+	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
-+	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-+
-+	bpf_crypto_skcipher_encrypt(ctx, &psrc, &pdst, &iv);
-+
-+	return TC_ACT_SHOT;
-+}
-+
-+char __license[] SEC("license") = "GPL";
--- 
-2.39.3
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBSb3hhbmEgTmljb2xlc2N1IDxy
+b3hhbmEubmljb2xlc2N1QGNhbm9uaWNhbC5jb20+DQo+IFNlbnQ6IFR1ZXNkYXksIE9jdG9iZXIg
+MzEsIDIwMjMgODoxOSBBTQ0KPiBUbzogRXJpYyBCaWdnZXJzIDxlYmlnZ2Vyc0BrZXJuZWwub3Jn
+PjsgbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIXSBj
+cnlwdG86IHg4Ni9zaGEyNTYgLSBhdXRvbG9hZCBpZiBTSEEtTkkgZGV0ZWN0ZWQNCj4gDQo+IE9u
+IDI5LzEwLzIwMjMgMDY6MTUsIEVyaWMgQmlnZ2VycyB3cm90ZToNCj4gPiBGcm9tOiBFcmljIEJp
+Z2dlcnMgPGViaWdnZXJzQGdvb2dsZS5jb20+DQo+ID4NCj4gPiBUaGUgeDg2IFNIQS0yNTYgbW9k
+dWxlIGNvbnRhaW5zIGZvdXIgaW1wbGVtZW50YXRpb25zOiBTU1NFMywgQVZYLCBBVlgyLA0KPiA+
+IGFuZCBTSEEtTkkuICBDb21taXQgMWM0M2MwZjFmODRhICgiY3J5cHRvOiB4ODYvc2hhIC0gbG9h
+ZCBtb2R1bGVzIGJhc2VkDQo+ID4gb24gQ1BVIGZlYXR1cmVzIikgbWFkZSB0aGUgbW9kdWxlIGJl
+IGF1dG9sb2FkZWQgd2hlbiBTU1NFMywgQVZYLCBvciBBVlgyDQo+ID4gaXMgZGV0ZWN0ZWQuICBU
+aGUgb21pc3Npb24gb2YgU0hBLU5JIGFwcGVhcnMgdG8gYmUgYW4gb3ZlcnNpZ2h0LCBwZXJoYXBz
+DQo+ID4gYmVjYXVzZSBvZiB0aGUgb3V0ZGF0ZWQgZmlsZS1sZXZlbCBjb21tZW50LiAgVGhpcyBw
+YXRjaCBmaXhlcyB0aGlzLA0KPiA+IHRob3VnaCBpbiBwcmFjdGljZSB0aGlzIG1ha2VzIG5vIGRp
+ZmZlcmVuY2UgYmVjYXVzZSBTU1NFMyBpcyBhIHN1YnNldCBvZg0KPiA+IHRoZSBvdGhlciB0aHJl
+ZSBmZWF0dXJlcyBhbnl3YXkuICBJbmRlZWQsIHNoYTI1Nl9uaV90cmFuc2Zvcm0oKSBleGVjdXRl
+cw0KPiA+IFNTU0UzIGluc3RydWN0aW9ucyBzdWNoIGFzIHBzaHVmYi4NCj4gPg0KPiA+IENjOiBS
+b3hhbmEgTmljb2xlc2N1IDxyb3hhbmEubmljb2xlc2N1QGNhbm9uaWNhbC5jb20+DQo+ID4gU2ln
+bmVkLW9mZi1ieTogRXJpYyBCaWdnZXJzIDxlYmlnZ2Vyc0Bnb29nbGUuY29tPg0KPiANCj4gSW5k
+ZWVkLCBpdCB3YXMgYW4gb3ZlcnNpZ2h0Lg0KPiANCj4gUmV2aWV3ZWQtYnk6IFJveGFuYSBOaWNv
+bGVzY3UgPHJveGFuYS5uaWNvbGVzY3VAY2Fub25pY2FsLmNvbT4NCj4gPiAtLS0NCj4gPiAgIGFy
+Y2gveDg2L2NyeXB0by9zaGEyNTZfc3NzZTNfZ2x1ZS5jIHwgNSArKystLQ0KPiA+ICAgMSBmaWxl
+IGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYg
+LS1naXQgYS9hcmNoL3g4Ni9jcnlwdG8vc2hhMjU2X3Nzc2UzX2dsdWUuYw0KPiBiL2FyY2gveDg2
+L2NyeXB0by9zaGEyNTZfc3NzZTNfZ2x1ZS5jDQo+ID4gaW5kZXggNGMwMzgzYTkwZTExLi5hMTM1
+Y2Y5YmFjYTMgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC94ODYvY3J5cHRvL3NoYTI1Nl9zc3NlM19n
+bHVlLmMNCi4uLg0KPiA+DQo+ID4gICBzdGF0aWMgY29uc3Qgc3RydWN0IHg4Nl9jcHVfaWQgbW9k
+dWxlX2NwdV9pZHNbXSA9IHsNCj4gPiArCVg4Nl9NQVRDSF9GRUFUVVJFKFg4Nl9GRUFUVVJFX1NI
+QV9OSSwgTlVMTCksDQoNClVubGVzcyBzb21ldGhpbmcgZWxzZSBoYXMgY2hhbmdlZCwgdGhpcyBu
+ZWVkcyB0byBiZSBpbnNpZGUgaWZkZWZzLCBhcyBkaXNjb3ZlcmVkDQppbiB0aGUgcHJvcG9zZWQg
+cGF0Y2ggc2VyaWVzIGxhc3QgeWVhcjoNCg0KZm9yIHNoYTFfc3NlM19nbHVlLmM6DQojaWZkZWYg
+Q09ORklHX0FTX1NIQTFfTkkNCiAgICAgICAgWDg2X01BVENIX0ZFQVRVUkUoWDg2X0ZFQVRVUkVf
+U0hBX05JLCBOVUxMKSwNCiNlbmRpZg0KDQpmb3Igc2hhMjU2X3NzZTNfZ2x1ZS5jOg0KKyNpZmRl
+ZiBDT05GSUdfQVNfU0hBMjU2X05JDQorICAgICAgIFg4Nl9NQVRDSF9GRUFUVVJFKFg4Nl9GRUFU
+VVJFX1NIQV9OSSwgTlVMTCksDQorI2VuZGlmDQoNCj4gPiAgIAlYODZfTUFUQ0hfRkVBVFVSRShY
+ODZfRkVBVFVSRV9BVlgyLCBOVUxMKSwNCj4gPiAgIAlYODZfTUFUQ0hfRkVBVFVSRShYODZfRkVB
+VFVSRV9BVlgsIE5VTEwpLA0KPiA+ICAgCVg4Nl9NQVRDSF9GRUFUVVJFKFg4Nl9GRUFUVVJFX1NT
+U0UzLCBOVUxMKSwNCj4gPiAgIAl7fQ0KPiA+ICAgfTsNCj4gPiAgIE1PRFVMRV9ERVZJQ0VfVEFC
+TEUoeDg2Y3B1LCBtb2R1bGVfY3B1X2lkcyk7DQoNCg==
