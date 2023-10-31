@@ -2,138 +2,143 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 865D2C4167D
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Oct 2023 12:10:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD10C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Oct 2023 12:41:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344256AbjJaMKY (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Oct 2023 08:10:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55324 "EHLO
+        id S234943AbjJaMll (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 31 Oct 2023 08:41:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236290AbjJaMKD (ORCPT
+        with ESMTP id S229642AbjJaMll (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Oct 2023 08:10:03 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19A1312D;
-        Tue, 31 Oct 2023 05:09:04 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39VC5BWp013894;
-        Tue, 31 Oct 2023 12:08:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : content-type :
- content-transfer-encoding : mime-version : subject : message-id : date :
- cc : to; s=pp1; bh=V6NmdaSgVW3N030dFBGJpeC6MoCP5aKmyx/pwxFz4oU=;
- b=CTjsHXGLX6w751KhemgPlBkc3w1Bvlc0RMZt2+5hCbfMqXFry9ci9h7zjo3hrGXNlXf4
- FisY5mAhqrHU2KxX+5CuFRL79vQsCyDtWUxl+0JAz5UJ8O8CrDBVvJD4WSG3JPb+fPo+
- sst9pZSkDo8Xjvnf3jF61hXx9mkMbFxDDqejNPt1TvTrCTRLvJXwXSdv0v74c52IIq6W
- /TSxpvFQ6QAud9DRyL0kvBskceUDXoca0wI/+ouh2KHnB6OTl6hTsvUBwNrBc2vo483i
- nGf/YInzKDpyJc5Z5lIn5/SvGXY+kW62Ulc+sWPl8VvYIyRzOqoxHdjlXYXY8h+JNrrO 6A== 
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u319c88gs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Oct 2023 12:08:57 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39V9qwgV031377;
-        Tue, 31 Oct 2023 12:08:50 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1fb1ynbf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Oct 2023 12:08:50 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39VC8mVa7471658
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 31 Oct 2023 12:08:48 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 316AD2004B;
-        Tue, 31 Oct 2023 12:08:48 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 047C320040;
-        Tue, 31 Oct 2023 12:08:47 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.43.119.159])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 31 Oct 2023 12:08:46 +0000 (GMT)
-From:   Sachin Sant <sachinp@linux.ibm.com>
-Content-Type: text/plain;
-        charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.100.2.1.4\))
-Subject: [ppc64le] WARN at crypto/testmgr.c:5804 
-Message-Id: <2721FCA5-6113-4B2E-8DA9-893105EE966C@linux.ibm.com>
-Date:   Tue, 31 Oct 2023 17:38:35 +0530
-Cc:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-next@vger.kernel.org
-To:     linux-crypto@vger.kernel.org, dimitri.ledkov@canonical.com
-X-Mailer: Apple Mail (2.3774.100.2.1.4)
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: A9dzOTInhVy5uIoT3uDy9CKCFJsy_JPi
-X-Proofpoint-ORIG-GUID: A9dzOTInhVy5uIoT3uDy9CKCFJsy_JPi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-31_01,2023-10-31_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 impostorscore=0 mlxscore=0 malwarescore=0
- mlxlogscore=668 priorityscore=1501 adultscore=0 spamscore=0 suspectscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2310310095
+        Tue, 31 Oct 2023 08:41:41 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92D4D97
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 05:41:38 -0700 (PDT)
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id A10E03F129
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 12:41:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1698756095;
+        bh=zcGwSBRA6ufPKm+xyJIjCt95bg5XiP7QWvMBR4La2F8=;
+        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+         To:Cc:Content-Type;
+        b=cits1b2XH22GGGQUBue4Jim6BzPPeuAhM1oREQY43RC0t+bZpYAWtUuJSpURBmB0g
+         EgocXKcgijtnZwHA4o6c86EwFuhVa1BKu2kH8B8OoPhkAVt53lq9huOJHVP+3/h7Mn
+         OnXFYFaDlSQ7im3D7PHAPQgOFEoRLbmj3mfBlNyc8wAxmMpCWgjgdGTjfsiLsdpk++
+         GTolQ/1Lq1B1fW+o96qyrexY2NqIkGDIVIZVZaqJWRPBTFFJRVHvcBBAdyTYJ2ftoh
+         pmBXwW9PlPB4IUAimY94iUQtCO9cN+WzF2JErOGFm8DgJE3fagHj5tAN0GyhOeX1lI
+         QEmzVoVnNMpCg==
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-30932d15a30so2861992f8f.1
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 05:41:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698756095; x=1699360895;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zcGwSBRA6ufPKm+xyJIjCt95bg5XiP7QWvMBR4La2F8=;
+        b=LsGOLZ/5nc3ke1xAK/KuDx+3/QVrUEjs5iFDctTXIz8XHouj7HHatlhg4+T47xEJJ5
+         +DTQOZp2E8hbLAnitbldVHM7atWuTYqEvVjbesJLhP4DC4ZYCxXcgpLCFAWrJOkP1LTn
+         IkCqAI5OFqSa5RoHc7sX0I5scO7uwHbFB3QQISYSV9jU8GTFf3A4AJQiyVtQUB9EBCVp
+         4dr2y/4Uiz51noPcjWkkIvB72DN/6bxsPdhRAVMcLFb1kZw3cQNXGFB6YBctShRIMvN8
+         v/8O9iULXt0KMpFx6Onb6yli8vJSoFme0GJuK1RkOeTgMIN77CcdxeQGcI2/war+uA5f
+         XA9w==
+X-Gm-Message-State: AOJu0Yx9kuDpWWm9OO3pAS0qdyvxpsSnzPRyUYowbkmYH4pr6CtAXYMo
+        QbIaamhNTwcdn7EuG4Z1BINMEX5784H7F0Wg6yA+GoUvNO2+dqlfs7KfJX1Z4VP57i0zwmtxcoJ
+        bbCR5RjNARONPJe3poC773OD1OOmDfFjXjs11KN3V7YJeSd/iO9vE+1IbAQ==
+X-Received: by 2002:a5d:4f05:0:b0:32d:9b30:9a76 with SMTP id c5-20020a5d4f05000000b0032d9b309a76mr12226050wru.47.1698756095225;
+        Tue, 31 Oct 2023 05:41:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQoFQGsD1Ihypw2/jpfhpY7bzRCcEMDnxwA66KZ1VN7MkenpcifOB9eZ5ck56tKF0CIdMs+JEYnxdHwuaMnMo=
+X-Received: by 2002:a5d:4f05:0:b0:32d:9b30:9a76 with SMTP id
+ c5-20020a5d4f05000000b0032d9b309a76mr12226036wru.47.1698756094789; Tue, 31
+ Oct 2023 05:41:34 -0700 (PDT)
+MIME-Version: 1.0
+References: <20231027195206.46643-1-ebiggers@kernel.org>
+In-Reply-To: <20231027195206.46643-1-ebiggers@kernel.org>
+From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Date:   Tue, 31 Oct 2023 14:40:58 +0200
+Message-ID: <CADWks+ZZV4-0Vcnhm+U8OK848TLbKM2z2PuvjBwvcqDHenpq8g@mail.gmail.com>
+Subject: Re: [PATCH] crypto: testmgr - move pkcs1pad(rsa,sha3-*) to correct place
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Following warning is observed during boot of latest -next
-kernel (6.6.0-rc7-next-20231030 and todays -next) on IBM Power server.
+On Fri, 27 Oct 2023, 22:52 Eric Biggers, <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> alg_test_descs[] needs to be in sorted order, since it is used for
+> binary search.  This fixes the following boot-time warning:
+>
+>     testmgr: alg_test_descs entries in wrong order: 'pkcs1pad(rsa,sha512)' before 'pkcs1pad(rsa,sha3-256)'
+>
+> Fixes: ee62afb9d02d ("crypto: rsa-pkcs1pad - Add FIPS 202 SHA-3 support")
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-[ 0.085775] workingset: timestamp_bits=3D38 max_order=3D20 =
-bucket_order=3D0
-[ 0.085801] zbud: loaded
-[ 0.086473] ------------[ cut here ]------------
-[ 0.086477] WARNING: CPU: 23 PID: 211 at crypto/testmgr.c:5804 =
-alg_test.part.33+0x308/0x740
-[ 0.086486] Modules linked in:
-[ 0.086489] CPU: 23 PID: 211 Comm: cryptomgr_test Not tainted =
-6.6.0-rc7-next-20231030 #1
-[ 0.086493] Hardware name: IBM,9080-HEX POWER10 (raw) 0x800200 0xf000006 =
-of:IBM,FW1030.20 (NH1030_058) hv:phyp pSeries
-[ 0.086497] NIP: c000000000765068 LR: c000000000764ff4 CTR: =
-c00000000075da00
-[ 0.086500] REGS: c00000000ed7bb50 TRAP: 0700 Not tainted =
-(6.6.0-rc7-next-20231030)
-[ 0.086503] MSR: 8000000000029033 <SF,EE,ME,IR,DR,RI,LE> CR: 80000284 =
-XER: 20040002
-[ 0.086511] CFAR: c000000000765318 IRQMASK: 1=20
-GPR00: c000000000764ff4 c00000000ed7bdf0 c000000001482000 =
-0000000000000002=20
-GPR04: c00000000ed7be60 000000000000000e 000000000000002f =
-fffffffffffe0000=20
-GPR08: 0000ff000000ffff 0000000000000001 0000000000000008 =
-0000000000000000=20
-GPR12: c00000000075da00 c000000aa7cec700 c00000000019da88 =
-c000000006df9cc0=20
-GPR16: 0000000000000000 0000000000000000 c000000001309f98 =
-0000000000000000=20
-GPR20: c000000001308d50 c000000001308d98 c000000000ffeaf0 =
-c000000001309fb0=20
-GPR24: c000000000ffb330 c000000000ffdf30 0000000000000400 =
-c000000019bfd480=20
-GPR28: 0000000000000002 c000000019bfd400 c000000002bcf633 =
-000000000000000e=20
-[ 0.086547] NIP [c000000000765068] alg_test.part.33+0x308/0x740
-[ 0.086552] LR [c000000000764ff4] alg_test.part.33+0x294/0x740
-[ 0.086556] Call Trace:
-[ 0.086557] [c00000000ed7bdf0] [c000000000764ff4] =
-alg_test.part.33+0x294/0x740 (unreliable)
-[ 0.086563] [c00000000ed7bf60] [c00000000075da34] =
-cryptomgr_test+0x34/0x70
-[ 0.086568] [c00000000ed7bf90] [c00000000019dbb8] kthread+0x138/0x140
-[ 0.086573] [c00000000ed7bfe0] [c00000000000df98] =
-start_kernel_thread+0x14/0x18
-[ 0.086578] Code: fb210138 fb810150 3af76d20 3b80ffff 3a526d38 3a946d50 =
-3ab56d98 3b380040 3ad837c0 2f9c0000 7d301026 5529f7fe <0b090000> =
-7f890034 5529d97e 419d03a4=20
-[ 0.086589] ---[ end trace 0000000000000000 ]---
-[ 0.086592] testmgr: alg_test_descs entries in wrong order: =
-'pkcs1pad(rsa,sha512)' before 'pkcs1pad(rsa,sha3-256)=E2=80=99
+Noted, and will check for this in the future. I didn't know that order matters.
 
-Git bisect points to following patch:
-commit ee62afb9d02dd279a7b73245614f13f8fe777a6d
-    crypto: rsa-pkcs1pad - Add FIPS 202 SHA-3 support
+Reviewed-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
 
-- Sachin=
+> ---
+>  crypto/testmgr.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index 1dc93bf608d4..15c7a3011269 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -5450,37 +5450,37 @@ static const struct alg_test_desc alg_test_descs[] = {
+>                 .test = alg_test_null,
+>                 .fips_allowed = 1,
+>         }, {
+>                 .alg = "pkcs1pad(rsa,sha256)",
+>                 .test = alg_test_akcipher,
+>                 .fips_allowed = 1,
+>                 .suite = {
+>                         .akcipher = __VECS(pkcs1pad_rsa_tv_template)
+>                 }
+>         }, {
+> -               .alg = "pkcs1pad(rsa,sha384)",
+> +               .alg = "pkcs1pad(rsa,sha3-256)",
+>                 .test = alg_test_null,
+>                 .fips_allowed = 1,
+>         }, {
+> -               .alg = "pkcs1pad(rsa,sha512)",
+> +               .alg = "pkcs1pad(rsa,sha3-384)",
+>                 .test = alg_test_null,
+>                 .fips_allowed = 1,
+>         }, {
+> -               .alg = "pkcs1pad(rsa,sha3-256)",
+> +               .alg = "pkcs1pad(rsa,sha3-512)",
+>                 .test = alg_test_null,
+>                 .fips_allowed = 1,
+>         }, {
+> -               .alg = "pkcs1pad(rsa,sha3-384)",
+> +               .alg = "pkcs1pad(rsa,sha384)",
+>                 .test = alg_test_null,
+>                 .fips_allowed = 1,
+>         }, {
+> -               .alg = "pkcs1pad(rsa,sha3-512)",
+> +               .alg = "pkcs1pad(rsa,sha512)",
+>                 .test = alg_test_null,
+>                 .fips_allowed = 1,
+>         }, {
+>                 .alg = "poly1305",
+>                 .test = alg_test_hash,
+>                 .suite = {
+>                         .hash = __VECS(poly1305_tv_template)
+>                 }
+>         }, {
+>                 .alg = "polyval",
+>
+> base-commit: f2b88bab69c86d4dab2bfd25a0e741d7df411f7a
+> --
+> 2.42.0
+>
