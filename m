@@ -2,134 +2,128 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B53C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Oct 2023 22:42:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D5E8C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Oct 2023 02:17:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229672AbjJ3Wm2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Oct 2023 18:42:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44738 "EHLO
+        id S234256AbjJaCRX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Oct 2023 22:17:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbjJ3Wm2 (ORCPT
+        with ESMTP id S233608AbjJaCRW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Oct 2023 18:42:28 -0400
-Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27D28E
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 15:42:25 -0700 (PDT)
-Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-457bac7c3f5so2009234137.2
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 15:42:25 -0700 (PDT)
+        Mon, 30 Oct 2023 22:17:22 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 436EBE9
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 19:17:19 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-2800229592aso3488951a91.2
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2023 19:17:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698705745; x=1699310545; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=sifive.com; s=google; t=1698718639; x=1699323439; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H4Xfwsz1oJlkefwpBB8y7aaULUoJ88otHslpIuLKkVg=;
-        b=gNqgjGHCyjrLSeV8iaStXHtpf7OojJqoFIVODfWOIn2PxIFTYqdLbJbazTjS0t7TSw
-         V7hBdHGaphsXfjEdBRReoPaewFF3mYIoqxJphA+kDcXnIN1rcQp2uQuAe2k3aUBOd4cc
-         OkLhsKFUj5cE6qYPXJbdLGaQznDmTBWdx4uYbw6betA8wrmxzfNGTOQkHNFrj5hOoO0O
-         MbDd8GJKK++pA7y1HnixKWg1CwxVmfQRDphwkpa5TBOfV3l4LvnQMvtsWj8D6z92KmBC
-         CEkZa8SvKCpLnDtipj6zcCLBwQH9/dToF0aFN233DWJhS8IIZ9F3P0MUrB+z9crItmTL
-         LdyA==
+        bh=2FYXELKOgFv1uqwcp59pbFz1ZZ95RxWQk/gFtrN2AhA=;
+        b=HtWpxrS9yntTaHRw84hdzQ51raRJjOAF/oBhZHiEKlnZ1T5QDbOu0fqE9NmFNVOKcu
+         DMv7mzhQ9tQyVpiQCZEjH2BjATJHuTUOdwCcgOzR8egZokz0tSFoz85TSEE1lx5ls87+
+         lAOMBVaxuRsT7ay4XHVYSEsBb/mp61kXr3o+ubFAG03pSAqGJJjo9+PwS25bpO/TaEbJ
+         lbhaNeSIEyRoteo7GTx7w7pstn3gh0V4O1QpfX4bYR8hmxh1Ap+N0L8PESN6k06AlxOl
+         P44Qsah0zkKHJAs6Oa2PSDRTrGPEhC7B4/TOiwx5p0sFy0ADb56NxqiP4P4kh0Kgna5J
+         JI0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698705745; x=1699310545;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1698718639; x=1699323439;
+        h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=H4Xfwsz1oJlkefwpBB8y7aaULUoJ88otHslpIuLKkVg=;
-        b=aOvHWq55TQ2mwcMTmDVWEEGzFDAwvu/+PT0K9OFcniO0qEpkB/2FosQZ10EBwxjbon
-         ec9nFOOeYKnUwGzFaHnO4N4vIEGVi8u25/hbWPrGWonN3eEiyeNPk4Xq+pDL5Hb6SpT4
-         gquehfFGz6bsRCcI6DiYD9F3PqkN9HouBDqWVoc7z45C0qZXHX4MkwjnJxrxU9wCl1wi
-         ridXI2bHXKwpB5YtzUo5vpGq32L440CI7KZmgKU5/mVFJUKzMCzxdV8bz7ue5pAYpDip
-         40MWYerrnUR6XlwmPw5tYbecwRfK9yyo0iWh5K4DdKTFWsVHS/BzSeebsbI5Atvz0Nle
-         Jvkw==
-X-Gm-Message-State: AOJu0YxOFuz2rstj6QFD1zr6X78aA5oekvN3RtHTUnzKbsYHpYzM4ece
-        blQ5kgcZfXT7FNUfbnNq/LS0B4qiBbsM8cn7GdxjYQ==
-X-Google-Smtp-Source: AGHT+IElSIreengSYfX3J9F+wjAA/z8qeUHV2jxyky2FMN1F5OkngNrqiAGehwXeGLl8fUjyDlcjlGhUu07FRU3iJEo=
-X-Received: by 2002:a67:e0c9:0:b0:457:cd8b:57bb with SMTP id
- m9-20020a67e0c9000000b00457cd8b57bbmr8964903vsl.29.1698705744671; Mon, 30 Oct
- 2023 15:42:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20231030023351.6041-1-ebiggers@kernel.org>
-In-Reply-To: <20231030023351.6041-1-ebiggers@kernel.org>
-From:   Sami Tolvanen <samitolvanen@google.com>
-Date:   Mon, 30 Oct 2023 15:41:46 -0700
-Message-ID: <CABCJKufw9qsPKZw9iQVFWzVrp6Qh5LPWQY2yc+8Wadn5R7ecOA@mail.gmail.com>
-Subject: Re: [PATCH] dm-verity: hash blocks with shash import+finup when possible
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev,
-        linux-crypto@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>
-Content-Type: text/plain; charset="UTF-8"
+        bh=2FYXELKOgFv1uqwcp59pbFz1ZZ95RxWQk/gFtrN2AhA=;
+        b=bSiU7EUQJFq6qZgDSktXu3Di+6y5ZhCxgTbs7x7FVP0uKPRYMg0oYQFdLPYKyPxHhX
+         5KUq2jNJOlWJEEco3GzpfyIQY8DNjgckytLOjsyX2WLWOKucF5bgv1AEVXqaRI0Iyr/W
+         Wf3lPEkJIKKn4eNZ3ZsYAihX5mf5z7QXUyVNpEa/b//pyj6Z43oDfTVw50MxfhVQCa8J
+         bwxXH1Gh3NFTfwBoWf0wodPGRl5WW9dYu47KE/YrbUF+ElOgZAH0TolaQjBQaPYRWG48
+         2ySoYbxeGRS2XcHf96TVhZgvt0T8y8KU2i8zXM+YvBGl6upJt2j4oJXiqwe/Yr1tSZCa
+         Fitw==
+X-Gm-Message-State: AOJu0YwT1fx23N6d6ahnVJLNCqC9afXNF22WRU08q7ama8Rxfcs0qt6M
+        BTj897hQEvOasb4DJPfa06dB/Q==
+X-Google-Smtp-Source: AGHT+IGJ28lY1cTChUE7onXf43JzC58/5Bp1fU+0G9i9fxk6B9LmIgoCIzVyIkzsla7jJzZ+dWFUiw==
+X-Received: by 2002:a17:90a:7:b0:27c:fdc6:c52 with SMTP id 7-20020a17090a000700b0027cfdc60c52mr8199049pja.30.1698718638711;
+        Mon, 30 Oct 2023 19:17:18 -0700 (PDT)
+Received: from ?IPv6:2402:7500:5d5:c8ac:c44a:458:311d:fb2c? ([2402:7500:5d5:c8ac:c44a:458:311d:fb2c])
+        by smtp.gmail.com with ESMTPSA id gq9-20020a17090b104900b002609cadc56esm133548pjb.11.2023.10.30.19.17.13
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 30 Oct 2023 19:17:16 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
+Subject: Re: [PATCH v4 00/12] RISC-V: support some cryptography accelerations
+From:   Jerry Shih <jerry.shih@sifive.com>
+In-Reply-To: <20231006194741.GA68531@google.com>
+Date:   Tue, 31 Oct 2023 10:17:11 +0800
+Cc:     Charlie Jenkins <charlie@rivosinc.com>,
+        Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
+        paul.walmsley@sifive.com, aou@eecs.berkeley.edu,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        christoph.muellner@vrull.eu,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>
+Reply-To: 20231006194741.GA68531@google.com
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <AB98E114-A8DE-492E-B078-7394EE4FA83E@sifive.com>
+References: <20230711153743.1970625-1-heiko@sntech.de>
+ <20230914001144.GA924@sol.localdomain> <ZQJdnCwf99Glggin@ghost>
+ <3A0F6A71-C521-44A5-A56C-076AF3E13897@gmail.com>
+ <DD3113B1-AB9F-4D6D-BD6E-8F75A83DA45D@sifive.com>
+ <20231006194741.GA68531@google.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+X-Mailer: Apple Mail (2.3445.9.7)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+On Oct 7, 2023, at 03:47, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Fri, Sep 15, 2023 at 11:21:28AM +0800, Jerry Shih wrote:
+>> On Sep 15, 2023, at 09:48, He-Jie Shih <bignose1007@gmail.com> wrote:
+>>=20
+>> The OpenSSL PR is at [1].
+>> And we are from SiFive.
+>>=20
+>> -Jerry
+>>=20
+>> [1]
+>> https://github.com/openssl/openssl/pull/21923
+>=20
+> Hi Jerry, I'm wondering if you have an update on this?  Do you need =
+any help?
 
-On Sun, Oct 29, 2023 at 7:34=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
-wrote:
->
-> From: Eric Biggers <ebiggers@google.com>
->
-> Commit d1ac3ff008fb ("dm verity: switch to using asynchronous hash
-> crypto API"), from Linux v4.12, made dm-verity do its hashing using the
-> ahash API instead of the shash API.  While this added support for
-> hardware (off-CPU) hashing offload, it slightly hurt performance for
-> everyone else due to additional crypto API overhead.  This API overhead
-> is becoming increasingly significant as I/O speeds increase and CPUs
-> achieve increasingly high SHA-2 speeds using native SHA-2 instructions.
->
-> Recent crypto API patches
-> (https://lore.kernel.org/linux-crypto/20231022081100.123613-1-ebiggers@ke=
-rnel.org)
-> are reducing that overhead.  However, it cannot be eliminated.
->
-> Meanwhile, another crypto API related sub-optimality of how dm-verity
-> currently implements block hashing is that it always computes each hash
-> using multiple calls to the crypto API.  The most common case is:
->
->     1. crypto_ahash_init()
->     2. crypto_ahash_update() [salt]
->     3. crypto_ahash_update() [data]
->     4. crypto_ahash_final()
->
-> With less common dm-verity settings, the update of the salt can happen
-> after the data, or the data can require multiple updates.
->
-> Regardless, each call adds some API overhead.  Again, that's being
-> reduced by recent crypto API patches, but it cannot be eliminated; each
-> init, update, or final step necessarily involves an indirect call to the
-> actual "algorithm", which is expensive on modern CPUs, especially when
-> mitigations for speculative execution vulnerabilities are enabled.
->
-> A significantly more optimal sequence for the common case is to do an
-> import (crypto_ahash_import(), then a finup (crypto_ahash_finup()).
-> This results in as few as one indirect call, the one for finup.
->
-> Implementing the shash and import+finup optimizations independently
-> would result in 4 code paths, which seems a bit excessive.  This patch
-> therefore takes a slightly simpler approach.  It implements both
-> optimizations, but only together.  So, dm-verity now chooses either the
-> existing, fully general ahash method; or it chooses the new shash
-> import+finup method which is optimized for what most dm-verity users
-> want: CPU-based hashing with the most common dm-verity settings.
->
-> The new method is used automatically when appropriate, i.e. when the
-> ahash API and shash APIs resolve to the same underlying algorithm, the
-> dm-verity version is not 0 (so that the salt is hashed before the data),
-> and the data block size is not greater than the page size.
->
-> In benchmarks with veritysetup's default parameters (SHA-256, 4K data
-> and hash block sizes, 32-byte salt), which also match the parameters
-> that Android currently uses, this patch improves block hashing
-> performance by about 15% on an x86_64 system that supports the SHA-NI
-> instructions, or by about 5% on an arm64 system that supports the ARMv8
-> SHA2 instructions.  This was with CONFIG_CRYPTO_STATS disabled; an even
-> larger improvement can be expected if that option is enabled.
+The RISC-V vector crypto OpenSSL pr[1] is merged.
+And we also sent the vector-crypto patch based on Heiko's and OpenSSL
+works.
+Here is the link:
+https://lore.kernel.org/all/20231025183644.8735-1-jerry.shih@sifive.com/
 
-That's an impressive performance improvement. Thanks for the patch!
+[1]
+https://github.com/openssl/openssl/pull/21923
 
-Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
+> I'm also wondering about riscv.pm and the choice of generating the =
+crypto
+> instructions from .words instead of using the assembler.  It makes it
+> significantly harder to review the code, IMO.  Can we depend on =
+assembler
+> support for these instructions, or is that just not ready yet?
+>=20
+> - Eric
 
-Sami
+There is no public assembler supports the vector-crypto asm mnemonics.
+We should still use `opcode` for vector-crypto instructions. But we =
+might
+use asm for standard rvv parts.
+In order to reuse the codes in OpenSSL as much as possible,  we still =
+use
+the `riscv.pm` for all standard rvv and vector-crypto instructions. If =
+the asm
+mnemonic is still a better approach,  I will `rewrite` all standard rvv =
+parts
+with asm mnemonics in next patch.
+
+-Jerry
+
+
