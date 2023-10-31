@@ -2,145 +2,191 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2CAC4167D
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Oct 2023 12:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 127ABC4167D
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Oct 2023 13:18:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344295AbjJaMnf (ORCPT
+        id S1344489AbjJaNSc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Oct 2023 08:43:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57288 "EHLO
+        Tue, 31 Oct 2023 09:18:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344246AbjJaMne (ORCPT
+        with ESMTP id S1344461AbjJaNSb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Oct 2023 08:43:34 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28B1398
-        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 05:43:32 -0700 (PDT)
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        Tue, 31 Oct 2023 09:18:31 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41FCFDF
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 06:18:29 -0700 (PDT)
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com [209.85.218.69])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 8274D3FAE8
-        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 12:43:30 +0000 (UTC)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 197AF3F1D9
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 13:18:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1698756210;
-        bh=TWlHvfqzW08hhviWU907m+JvbPrmK9OV3LEKQy9qTqk=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=NLPnIcniBiMKc00WRYMDIf6/JGyNNmiJ577sXwUkcPcDULq22wcELI5WN0imxsKqN
-         ekT1OyduLRB1jVwR88n/taKC6bGxFtRIuHMHm2+vAyubPdkGRq3N3dxJ0EhX+uYDnq
-         LNeizgcBA9Tmv31BeaIKVARq61TDw4WrxddpmFDqb5xDD/pwRnyW4+6fjysT0MDzLH
-         sRSxwOAnaRkjsnMuS0DRBPTfKdBbffzW54WnK1wdOBLiSZMi7KHYtsrE9tAfe7ULLD
-         7DxP43Yt8kgZdLoO+pDHjD0q+H1pCrOYpEw6ITAGp+DvYHP856twk9ejIYs/SVga5p
-         02zvENSmoMMgg==
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-32deb4e2eb7so2621786f8f.1
-        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 05:43:30 -0700 (PDT)
+        s=20210705; t=1698758308;
+        bh=uvHqCrq9wXa0TDS7Jj958/xFYGi/3ExdWX51LoPq1wo=;
+        h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+         In-Reply-To:Content-Type;
+        b=p6hSyH9B0oFam85mRnWKGXaLQSJP5YJd/VdlzdWuYoozqVwWlGbyIlL76jlicpqoJ
+         S2XpPSse5HRg83qaixk7zC0ergtuqor86IGn2d5SvsnCXD0lzCU8AS2jsDEyWfExzQ
+         k0+nXv5FXoUcsyxGMa2kkfrXNUmsdnaaT9IzT0p0iUG2rmjkK7OfjmLss3ApZe25RW
+         Vr7CWvQaHgYXeTWwZQvbkaZpya+wPSM9n5o8h4wna/I/IPcD/88xh2UrAOd3ilgZQW
+         9OgTa1GPsDwmEazyW0nUkXl//vsG/f3Y77bJ5OEZMtSDMfbIoa+qe3RX7GkF6/IcK7
+         Wm8hVAvs39snQ==
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9c749c28651so390454566b.0
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 06:18:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698756208; x=1699361008;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TWlHvfqzW08hhviWU907m+JvbPrmK9OV3LEKQy9qTqk=;
-        b=hYJmFT9vCznyGICGU/ANQd8nMupI2wIWRur9gv1FccjQuDygcwrL7x0YTuXXzxPlli
-         kfnIFSp/xPzxLkYrw8an9LqGEEthP4hooI/xuYJlAhHDbVf1SAKjruOFb3FRmucI9cj4
-         qDspI21Q/tXM1shF0b4+d0tGBZSpoSEGq2RYgIaX/cnCerF8CoBgPhc2qU4gzIVZu99b
-         VenDQAFxDnhaXweyN/4+jOjvfNPwN84sjewLAGATNSwKb9zGvk0Aqzd1rPXCyyIIJuJZ
-         PeCIA+0sTkgJrSCvsoKWv9DZdpoh5YSwWTBH7du1VIqZ5dwPZWRaJ0Utl1bhwKWgoaQl
-         FOIg==
-X-Gm-Message-State: AOJu0YyOi8pK96am9NpQzkWk8Dmr5FB2jBZxpJhR6+xGpeAS2yTD0BfQ
-        IvZx85wCPd7AtcAh7Hditmm9v9oFleW5YxLyYnbkGiwewK6vWeAa8alJ5inRWLnH/u5UieH90XN
-        Geju8z1Om+/obZNqXXe6Erf4JcAO44XreEU37TQ2y06vTqP7OWokbp9aHYgI019CW7nEIbxh3Lw
-        ==
-X-Received: by 2002:a05:6000:2cb:b0:32f:7f2c:de2e with SMTP id o11-20020a05600002cb00b0032f7f2cde2emr7611015wry.36.1698756208350;
-        Tue, 31 Oct 2023 05:43:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF2Bt006mBK17Bc+TrTxp8GQwF9PfVFIAW7TfjXGIuFHSfstzZosDHrkRwJhCuJGaEX2N4iuuxX+GvsjnIAIR8=
-X-Received: by 2002:a05:6000:2cb:b0:32f:7f2c:de2e with SMTP id
- o11-20020a05600002cb00b0032f7f2cde2emr7611001wry.36.1698756208055; Tue, 31
- Oct 2023 05:43:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698758307; x=1699363107;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uvHqCrq9wXa0TDS7Jj958/xFYGi/3ExdWX51LoPq1wo=;
+        b=sVnf0c960ffBTO8juB8z9pt5Zzrk5RInI3Bj/AAAg/b1+1xWX7HoF4IhV0gkjTo0TT
+         c/+haIwZ9OHoWn+N8iee3iydrKXJaKY26PPxJ6hgdtN1otGNRYR9OvG0wpz0oPipdbyF
+         WPvT7W2CKeZcqVVNR3n633/TvYYPz99J1PkRmO5ZV/8zXB7IJ7SKsDLA3DKW/Ux9bTGf
+         3wM3/cE5xSNZs2bTwnPN8UHDtqpsVQmMH1SbznLAyNI0BFXH17bU5kKhfGKxJ0Wn8kTq
+         UpaWqCMm8X3ukF4AUlz5aq9gz1Hn2ENyynz+SdWKu4vAMOJol2PH0j7hSrJftVONuXA8
+         P2Zg==
+X-Gm-Message-State: AOJu0Yz0VsvbP+i7sKjp0HXQHD5EehiuB5gQkgvzVXzO/g2YAA82X6Ed
+        Kx+iAjV5sEBMDdnwr2FanNzRCR2d2a5RwnswoZ+1DYDSpt6HZJv9aNcRC+ettU75jFIITnKVkUp
+        xHQtgFiib2xXIK6Jr4C01BOcg3aYQMzNtFqQBVvyIwg==
+X-Received: by 2002:a17:907:3185:b0:9b2:b95e:3825 with SMTP id xe5-20020a170907318500b009b2b95e3825mr9980124ejb.39.1698758307215;
+        Tue, 31 Oct 2023 06:18:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGT1VS9GgAUUWEi5p+w5LhjfUT5qrZ5qhNVLePrSdvHEVQnR5qmG3ZVfyZUj+tRKZfqBpptTA==
+X-Received: by 2002:a17:907:3185:b0:9b2:b95e:3825 with SMTP id xe5-20020a170907318500b009b2b95e3825mr9980105ejb.39.1698758306840;
+        Tue, 31 Oct 2023 06:18:26 -0700 (PDT)
+Received: from [192.168.0.189] (77-169-125-32.fixed.kpn.net. [77.169.125.32])
+        by smtp.gmail.com with ESMTPSA id p16-20020a1709060e9000b009786c8249d6sm973306ejf.175.2023.10.31.06.18.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Oct 2023 06:18:26 -0700 (PDT)
+Message-ID: <32541ecd-690d-4db6-aa00-6e7bd6389822@canonical.com>
+Date:   Tue, 31 Oct 2023 14:18:25 +0100
 MIME-Version: 1.0
-References: <2721FCA5-6113-4B2E-8DA9-893105EE966C@linux.ibm.com>
-In-Reply-To: <2721FCA5-6113-4B2E-8DA9-893105EE966C@linux.ibm.com>
-From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Date:   Tue, 31 Oct 2023 14:42:52 +0200
-Message-ID: <CADWks+a9UJM9trjJf-VOi21rfA9eetXP8KPyThqP56kKpZ-yug@mail.gmail.com>
-Subject: Re: [ppc64le] WARN at crypto/testmgr.c:5804
-To:     Sachin Sant <sachinp@linux.ibm.com>
-Cc:     linux-crypto@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-next@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: x86/sha1 - autoload if SHA-NI detected
+To:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+References: <20231029051535.157605-1-ebiggers@kernel.org>
+Content-Language: en-US
+From:   Roxana Nicolescu <roxana.nicolescu@canonical.com>
+Autocrypt: addr=roxana.nicolescu@canonical.com; keydata=
+ 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 Og==
+In-Reply-To: <20231029051535.157605-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 31 Oct 2023 at 14:09, Sachin Sant <sachinp@linux.ibm.com> wrote:
->
-> Following warning is observed during boot of latest -next
-> kernel (6.6.0-rc7-next-20231030 and todays -next) on IBM Power server.
->
-> [ 0.085775] workingset: timestamp_bits=3D38 max_order=3D20 bucket_order=
-=3D0
-> [ 0.085801] zbud: loaded
-> [ 0.086473] ------------[ cut here ]------------
-> [ 0.086477] WARNING: CPU: 23 PID: 211 at crypto/testmgr.c:5804 alg_test.p=
-art.33+0x308/0x740
-> [ 0.086486] Modules linked in:
-> [ 0.086489] CPU: 23 PID: 211 Comm: cryptomgr_test Not tainted 6.6.0-rc7-n=
-ext-20231030 #1
-> [ 0.086493] Hardware name: IBM,9080-HEX POWER10 (raw) 0x800200 0xf000006 =
-of:IBM,FW1030.20 (NH1030_058) hv:phyp pSeries
-> [ 0.086497] NIP: c000000000765068 LR: c000000000764ff4 CTR: c00000000075d=
-a00
-> [ 0.086500] REGS: c00000000ed7bb50 TRAP: 0700 Not tainted (6.6.0-rc7-next=
--20231030)
-> [ 0.086503] MSR: 8000000000029033 <SF,EE,ME,IR,DR,RI,LE> CR: 80000284 XER=
-: 20040002
-> [ 0.086511] CFAR: c000000000765318 IRQMASK: 1
-> GPR00: c000000000764ff4 c00000000ed7bdf0 c000000001482000 000000000000000=
-2
-> GPR04: c00000000ed7be60 000000000000000e 000000000000002f fffffffffffe000=
-0
-> GPR08: 0000ff000000ffff 0000000000000001 0000000000000008 000000000000000=
-0
-> GPR12: c00000000075da00 c000000aa7cec700 c00000000019da88 c000000006df9cc=
-0
-> GPR16: 0000000000000000 0000000000000000 c000000001309f98 000000000000000=
-0
-> GPR20: c000000001308d50 c000000001308d98 c000000000ffeaf0 c000000001309fb=
-0
-> GPR24: c000000000ffb330 c000000000ffdf30 0000000000000400 c000000019bfd48=
-0
-> GPR28: 0000000000000002 c000000019bfd400 c000000002bcf633 000000000000000=
-e
-> [ 0.086547] NIP [c000000000765068] alg_test.part.33+0x308/0x740
-> [ 0.086552] LR [c000000000764ff4] alg_test.part.33+0x294/0x740
-> [ 0.086556] Call Trace:
-> [ 0.086557] [c00000000ed7bdf0] [c000000000764ff4] alg_test.part.33+0x294/=
-0x740 (unreliable)
-> [ 0.086563] [c00000000ed7bf60] [c00000000075da34] cryptomgr_test+0x34/0x7=
-0
-> [ 0.086568] [c00000000ed7bf90] [c00000000019dbb8] kthread+0x138/0x140
-> [ 0.086573] [c00000000ed7bfe0] [c00000000000df98] start_kernel_thread+0x1=
-4/0x18
-> [ 0.086578] Code: fb210138 fb810150 3af76d20 3b80ffff 3a526d38 3a946d50 3=
-ab56d98 3b380040 3ad837c0 2f9c0000 7d301026 5529f7fe <0b090000> 7f890034 55=
-29d97e 419d03a4
-> [ 0.086589] ---[ end trace 0000000000000000 ]---
-> [ 0.086592] testmgr: alg_test_descs entries in wrong order: 'pkcs1pad(rsa=
-,sha512)' before 'pkcs1pad(rsa,sha3-256)=E2=80=99
->
-> Git bisect points to following patch:
-> commit ee62afb9d02dd279a7b73245614f13f8fe777a6d
->     crypto: rsa-pkcs1pad - Add FIPS 202 SHA-3 support
->
-> - Sachin
 
-Patch to address this was submitted at
-https://lore.kernel.org/all/20231027195206.46643-1-ebiggers@kernel.org/
-and should address this issue.
+On 29/10/2023 06:15, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+>
+> The x86 SHA-1 module contains four implementations: SSSE3, AVX, AVX2,
+> and SHA-NI.  Commit 1c43c0f1f84a ("crypto: x86/sha - load modules based
+> on CPU features") made the module be autoloaded when SSSE3, AVX, or AVX2
+> is detected.  The omission of SHA-NI appears to be an oversight, perhaps
+> because of the outdated file-level comment.  This patch fixes this,
+> though in practice this makes no difference because SSSE3 is a subset of
+> the other three features anyway.  Indeed, sha1_ni_transform() executes
+> SSSE3 instructions such as pshufb.
+>
+> Cc: Roxana Nicolescu <roxana.nicolescu@canonical.com>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
---
-okurrr,
+Indeed, it was an oversight.
 
-Dimitri
+
+Reviewed-by: Roxana Nicolescu <roxana.nicolescu@canonical.com>
+> ---
+>   arch/x86/crypto/sha1_ssse3_glue.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+> index 959afa705e95..d88991f2cb3a 100644
+> --- a/arch/x86/crypto/sha1_ssse3_glue.c
+> +++ b/arch/x86/crypto/sha1_ssse3_glue.c
+> @@ -1,16 +1,16 @@
+>   // SPDX-License-Identifier: GPL-2.0-or-later
+>   /*
+>    * Cryptographic API.
+>    *
+> - * Glue code for the SHA1 Secure Hash Algorithm assembler implementation using
+> - * Supplemental SSE3 instructions.
+> + * Glue code for the SHA1 Secure Hash Algorithm assembler implementations
+> + * using SSSE3, AVX, AVX2, and SHA-NI instructions.
+>    *
+>    * This file is based on sha1_generic.c
+>    *
+>    * Copyright (c) Alan Smithee.
+>    * Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>
+>    * Copyright (c) Jean-Francois Dive <jef@linuxbe.org>
+>    * Copyright (c) Mathias Krause <minipli@googlemail.com>
+>    * Copyright (c) Chandramouli Narayanan <mouli@linux.intel.com>
+>    */
+>   
+> @@ -21,20 +21,21 @@
+>   #include <linux/init.h>
+>   #include <linux/module.h>
+>   #include <linux/mm.h>
+>   #include <linux/types.h>
+>   #include <crypto/sha1.h>
+>   #include <crypto/sha1_base.h>
+>   #include <asm/cpu_device_id.h>
+>   #include <asm/simd.h>
+>   
+>   static const struct x86_cpu_id module_cpu_ids[] = {
+> +	X86_MATCH_FEATURE(X86_FEATURE_SHA_NI, NULL),
+>   	X86_MATCH_FEATURE(X86_FEATURE_AVX2, NULL),
+>   	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
+>   	X86_MATCH_FEATURE(X86_FEATURE_SSSE3, NULL),
+>   	{}
+>   };
+>   MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
+>   
+>   static int sha1_update(struct shash_desc *desc, const u8 *data,
+>   			     unsigned int len, sha1_block_fn *sha1_xform)
+>   {
+>
+> base-commit: f2b88bab69c86d4dab2bfd25a0e741d7df411f7a
