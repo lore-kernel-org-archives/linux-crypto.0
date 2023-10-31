@@ -2,72 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 127ABC4167D
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Oct 2023 13:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA1BC4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Oct 2023 13:19:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344489AbjJaNSc (ORCPT
+        id S1344458AbjJaNTP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Oct 2023 09:18:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56850 "EHLO
+        Tue, 31 Oct 2023 09:19:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344461AbjJaNSb (ORCPT
+        with ESMTP id S1344452AbjJaNTO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Oct 2023 09:18:31 -0400
+        Tue, 31 Oct 2023 09:19:14 -0400
 Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41FCFDF
-        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 06:18:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D215E6
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 06:19:12 -0700 (PDT)
 Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com [209.85.218.69])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 197AF3F1D9
-        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 13:18:28 +0000 (UTC)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 1A8813F129
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 13:19:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1698758308;
-        bh=uvHqCrq9wXa0TDS7Jj958/xFYGi/3ExdWX51LoPq1wo=;
+        s=20210705; t=1698758351;
+        bh=xQ1LVChD2C7G1Q9HJV1xfv3RT5SOZzgcjNNAFs0Kmno=;
         h=Message-ID:Date:MIME-Version:Subject:To:References:From:
          In-Reply-To:Content-Type;
-        b=p6hSyH9B0oFam85mRnWKGXaLQSJP5YJd/VdlzdWuYoozqVwWlGbyIlL76jlicpqoJ
-         S2XpPSse5HRg83qaixk7zC0ergtuqor86IGn2d5SvsnCXD0lzCU8AS2jsDEyWfExzQ
-         k0+nXv5FXoUcsyxGMa2kkfrXNUmsdnaaT9IzT0p0iUG2rmjkK7OfjmLss3ApZe25RW
-         Vr7CWvQaHgYXeTWwZQvbkaZpya+wPSM9n5o8h4wna/I/IPcD/88xh2UrAOd3ilgZQW
-         9OgTa1GPsDwmEazyW0nUkXl//vsG/f3Y77bJ5OEZMtSDMfbIoa+qe3RX7GkF6/IcK7
-         Wm8hVAvs39snQ==
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9c749c28651so390454566b.0
-        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 06:18:28 -0700 (PDT)
+        b=nkeFF1XYkEzOWBF/8A8LgVG16wG3zvnmiwepugOzU8rpZfH8f3n+U7aIvAguRXFFn
+         nLqUpoESHzH+SDPpSjduVf5VFHQj+Y+fRDDeoUXTb65tmoynXibZ8ZtKsEaYlHBSNe
+         cQTNlDG8CHgPTLpALdXM55cJONb5VbcVlAe56SEoPnILMPkERdZiABcd+4x5H2czgz
+         T3YqoN6ptMvsfVWgPlUN/nSRtaG40xvaAz3jlydPZKhPtH3R9peMoQdUnX6vG245kx
+         rvnrapNSn1GPau5sHy+TuZRpfeHoQ8hwIwdgaKNFEmLXdiHeKS3QKCsgeVwaC20WSp
+         IMafizasAi9yg==
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9d25d0788b8so171184566b.1
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 06:19:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698758307; x=1699363107;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uvHqCrq9wXa0TDS7Jj958/xFYGi/3ExdWX51LoPq1wo=;
-        b=sVnf0c960ffBTO8juB8z9pt5Zzrk5RInI3Bj/AAAg/b1+1xWX7HoF4IhV0gkjTo0TT
-         c/+haIwZ9OHoWn+N8iee3iydrKXJaKY26PPxJ6hgdtN1otGNRYR9OvG0wpz0oPipdbyF
-         WPvT7W2CKeZcqVVNR3n633/TvYYPz99J1PkRmO5ZV/8zXB7IJ7SKsDLA3DKW/Ux9bTGf
-         3wM3/cE5xSNZs2bTwnPN8UHDtqpsVQmMH1SbznLAyNI0BFXH17bU5kKhfGKxJ0Wn8kTq
-         UpaWqCMm8X3ukF4AUlz5aq9gz1Hn2ENyynz+SdWKu4vAMOJol2PH0j7hSrJftVONuXA8
-         P2Zg==
-X-Gm-Message-State: AOJu0Yz0VsvbP+i7sKjp0HXQHD5EehiuB5gQkgvzVXzO/g2YAA82X6Ed
-        Kx+iAjV5sEBMDdnwr2FanNzRCR2d2a5RwnswoZ+1DYDSpt6HZJv9aNcRC+ettU75jFIITnKVkUp
-        xHQtgFiib2xXIK6Jr4C01BOcg3aYQMzNtFqQBVvyIwg==
-X-Received: by 2002:a17:907:3185:b0:9b2:b95e:3825 with SMTP id xe5-20020a170907318500b009b2b95e3825mr9980124ejb.39.1698758307215;
-        Tue, 31 Oct 2023 06:18:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGT1VS9GgAUUWEi5p+w5LhjfUT5qrZ5qhNVLePrSdvHEVQnR5qmG3ZVfyZUj+tRKZfqBpptTA==
-X-Received: by 2002:a17:907:3185:b0:9b2:b95e:3825 with SMTP id xe5-20020a170907318500b009b2b95e3825mr9980105ejb.39.1698758306840;
-        Tue, 31 Oct 2023 06:18:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698758350; x=1699363150;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xQ1LVChD2C7G1Q9HJV1xfv3RT5SOZzgcjNNAFs0Kmno=;
+        b=XfzNh+EuaNOiNmt6YOcC+FfrRt0pd4pabQKd6LUasQzr/6AhXWewqAeu8pAW6iX+Yc
+         d/STUsq5HLsoRjwCaL2BSkpAlrTxtIT7KKLKiS1BF+KxiVbIA+R80+OHLT38X9MtcTjf
+         EFTsQ8n8nHUYPFaNF6CV3O/pTTBGy0/c7tqCosPUTOCq0eKi6Wmlg1RBrQwBTrCyQLO2
+         5kfmp2LsykTHPKnhrp78yTIarOAVQXIgqQiHZ8bVd+iyeeCjo91EzeL29+zQ4yTwYiz+
+         AEYJ9Tlg/aslspaaAljqSKT2zM5NyHt4kVFStQ/9Yn7BUUTsEae4dumSFLdHRBSiL27g
+         XDCg==
+X-Gm-Message-State: AOJu0Yz5CPS6oJQNSSlymLgsGS0ouedwF5AYEDXcEWg9Xxk9dP6/IoSN
+        4s0fODTmm8rf0mvO7+ZO1E931EGJg6nqlTf/ikhid6sXwe6yelu5SYt+6ZoDOECY+WNgdYcKnZ8
+        w9DCm0FE0pLEm5NEeYW/KyoUWA3rBFc6GwJyn4SvJdw==
+X-Received: by 2002:a17:907:1c25:b0:9ae:50e3:7e40 with SMTP id nc37-20020a1709071c2500b009ae50e37e40mr10757300ejc.52.1698758350680;
+        Tue, 31 Oct 2023 06:19:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEm55lPblLBrefD7AlrP935q+lJPO0fxTIlCYa44XkJ2BglY0/OKYolk5xZn4YQU9z5ivjN8Q==
+X-Received: by 2002:a17:907:1c25:b0:9ae:50e3:7e40 with SMTP id nc37-20020a1709071c2500b009ae50e37e40mr10757281ejc.52.1698758350351;
+        Tue, 31 Oct 2023 06:19:10 -0700 (PDT)
 Received: from [192.168.0.189] (77-169-125-32.fixed.kpn.net. [77.169.125.32])
-        by smtp.gmail.com with ESMTPSA id p16-20020a1709060e9000b009786c8249d6sm973306ejf.175.2023.10.31.06.18.25
+        by smtp.gmail.com with ESMTPSA id p16-20020a1709060e9000b009786c8249d6sm973306ejf.175.2023.10.31.06.19.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Oct 2023 06:18:26 -0700 (PDT)
-Message-ID: <32541ecd-690d-4db6-aa00-6e7bd6389822@canonical.com>
-Date:   Tue, 31 Oct 2023 14:18:25 +0100
+        Tue, 31 Oct 2023 06:19:09 -0700 (PDT)
+Message-ID: <34843a86-6516-47d2-88dd-5ca0aa86a052@canonical.com>
+Date:   Tue, 31 Oct 2023 14:19:09 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: x86/sha1 - autoload if SHA-NI detected
-To:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-References: <20231029051535.157605-1-ebiggers@kernel.org>
+Subject: Re: [PATCH] crypto: x86/sha256 - autoload if SHA-NI detected
 Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+References: <20231029051555.157720-1-ebiggers@kernel.org>
 From:   Roxana Nicolescu <roxana.nicolescu@canonical.com>
 Autocrypt: addr=roxana.nicolescu@canonical.com; keydata=
  xsFNBGOz8dUBEACbW6iR0smNW8BxmNcHzzktKmKImDxMdQlHZDYbKfQLBwNPGXaBq9b8vq2h
@@ -112,7 +111,7 @@ Autocrypt: addr=roxana.nicolescu@canonical.com; keydata=
  jn99r9WDQokRITZRW4GCUDFY/K6p8MBfGM+sm3oi50hGXi4SRIYD0dZpC7QWRYNmhR9AsxWR
  EGoQV+X6XMEh1XFcBpExwvFrIpD+5SZrWp4e/lGLGA70EBHKFO15YL1Pv+fChskp3wRYr4mG
  Ao8E1tCv1TJZdkVZ7z93qUroOf8qi71FSzApqEHX7OyT3ad5/fYRzeme+3VlwGS6MHMWnpuo Og==
-In-Reply-To: <20231029051535.157605-1-ebiggers@kernel.org>
+In-Reply-To: <20231029051555.157720-1-ebiggers@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -123,13 +122,13 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 On 29/10/2023 06:15, Eric Biggers wrote:
 > From: Eric Biggers <ebiggers@google.com>
 >
-> The x86 SHA-1 module contains four implementations: SSSE3, AVX, AVX2,
+> The x86 SHA-256 module contains four implementations: SSSE3, AVX, AVX2,
 > and SHA-NI.  Commit 1c43c0f1f84a ("crypto: x86/sha - load modules based
 > on CPU features") made the module be autoloaded when SSSE3, AVX, or AVX2
 > is detected.  The omission of SHA-NI appears to be an oversight, perhaps
 > because of the outdated file-level comment.  This patch fixes this,
 > though in practice this makes no difference because SSSE3 is a subset of
-> the other three features anyway.  Indeed, sha1_ni_transform() executes
+> the other three features anyway.  Indeed, sha256_ni_transform() executes
 > SSSE3 instructions such as pshufb.
 >
 > Cc: Roxana Nicolescu <roxana.nicolescu@canonical.com>
@@ -140,41 +139,40 @@ Indeed, it was an oversight.
 
 Reviewed-by: Roxana Nicolescu <roxana.nicolescu@canonical.com>
 > ---
->   arch/x86/crypto/sha1_ssse3_glue.c | 5 +++--
+>   arch/x86/crypto/sha256_ssse3_glue.c | 5 +++--
 >   1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-> index 959afa705e95..d88991f2cb3a 100644
-> --- a/arch/x86/crypto/sha1_ssse3_glue.c
-> +++ b/arch/x86/crypto/sha1_ssse3_glue.c
-> @@ -1,16 +1,16 @@
->   // SPDX-License-Identifier: GPL-2.0-or-later
+> diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+> index 4c0383a90e11..a135cf9baca3 100644
+> --- a/arch/x86/crypto/sha256_ssse3_glue.c
+> +++ b/arch/x86/crypto/sha256_ssse3_glue.c
+> @@ -1,15 +1,15 @@
 >   /*
 >    * Cryptographic API.
 >    *
-> - * Glue code for the SHA1 Secure Hash Algorithm assembler implementation using
-> - * Supplemental SSE3 instructions.
-> + * Glue code for the SHA1 Secure Hash Algorithm assembler implementations
+> - * Glue code for the SHA256 Secure Hash Algorithm assembler
+> - * implementation using supplemental SSE3 / AVX / AVX2 instructions.
+> + * Glue code for the SHA256 Secure Hash Algorithm assembler implementations
 > + * using SSSE3, AVX, AVX2, and SHA-NI instructions.
 >    *
->    * This file is based on sha1_generic.c
+>    * This file is based on sha256_generic.c
 >    *
->    * Copyright (c) Alan Smithee.
->    * Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>
->    * Copyright (c) Jean-Francois Dive <jef@linuxbe.org>
->    * Copyright (c) Mathias Krause <minipli@googlemail.com>
->    * Copyright (c) Chandramouli Narayanan <mouli@linux.intel.com>
->    */
->   
-> @@ -21,20 +21,21 @@
->   #include <linux/init.h>
->   #include <linux/module.h>
->   #include <linux/mm.h>
->   #include <linux/types.h>
->   #include <crypto/sha1.h>
->   #include <crypto/sha1_base.h>
+>    * Copyright (C) 2013 Intel Corporation.
+>    *
+>    * Author:
+>    *     Tim Chen <tim.c.chen@linux.intel.com>
+>    *
+>    * This program is free software; you can redistribute it and/or modify it
+>    * under the terms of the GNU General Public License as published by the Free
+> @@ -38,20 +38,21 @@
+>   #include <crypto/sha2.h>
+>   #include <crypto/sha256_base.h>
+>   #include <linux/string.h>
 >   #include <asm/cpu_device_id.h>
 >   #include <asm/simd.h>
+>   
+>   asmlinkage void sha256_transform_ssse3(struct sha256_state *state,
+>   				       const u8 *data, int blocks);
 >   
 >   static const struct x86_cpu_id module_cpu_ids[] = {
 > +	X86_MATCH_FEATURE(X86_FEATURE_SHA_NI, NULL),
@@ -185,8 +183,8 @@ Reviewed-by: Roxana Nicolescu <roxana.nicolescu@canonical.com>
 >   };
 >   MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
 >   
->   static int sha1_update(struct shash_desc *desc, const u8 *data,
->   			     unsigned int len, sha1_block_fn *sha1_xform)
+>   static int _sha256_update(struct shash_desc *desc, const u8 *data,
+>   			  unsigned int len, sha256_block_fn *sha256_xform)
 >   {
 >
 > base-commit: f2b88bab69c86d4dab2bfd25a0e741d7df411f7a
