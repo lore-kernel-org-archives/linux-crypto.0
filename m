@@ -2,95 +2,98 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E251C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Nov 2023 12:04:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B42C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Nov 2023 12:48:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235308AbjKAME5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Nov 2023 08:04:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55516 "EHLO
+        id S235151AbjKAMsS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Nov 2023 08:48:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231463AbjKAME5 (ORCPT
+        with ESMTP id S235137AbjKAMsS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Nov 2023 08:04:57 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52237F7
-        for <linux-crypto@vger.kernel.org>; Wed,  1 Nov 2023 05:04:51 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1qy9xo-0001cN-9r; Wed, 01 Nov 2023 13:04:48 +0100
-Message-ID: <070dd167-9278-42fa-aef5-66621a602fd3@leemhuis.info>
-Date:   Wed, 1 Nov 2023 13:04:45 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] dm_crypt essiv ciphers do not use async driver
- mv-aes-cbc anymore
-Content-Language: en-US, de-DE
-To:     Yureka <yuka@yuka.dev>
-Cc:     linux-crypto@vger.kernel.org, regressions@lists.linux.dev,
-        Mikulas Patocka <mpatocka@redhat.com>, dm-devel@redhat.com,
-        Boris Brezillon <bbrezillon@kernel.org>,
+        Wed, 1 Nov 2023 08:48:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D500613D
+        for <linux-crypto@vger.kernel.org>; Wed,  1 Nov 2023 05:47:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698842843;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=L18jqjZ/YFC+R7qqPrcdbK+tbLtkdiO++O5gj8jOKcw=;
+        b=PdmLmuX6e69O76KMBg86YgHverjauZuoC/N1zRpeGJlDHCtTZ8bF2/SDvxWDpVlx7tg1JL
+        GECrIokmRQ/9QQ8FfoF6adpa16b3r4jpXGvRQooGPr7M9uWpF8bkW9DlcZXDMQaeokqRAv
+        /5Xhp1AuWIiAOiyJxygO3LBxbFHhDoc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-210-9Mgdi-T9MmaKi_n3PhP7mA-1; Wed, 01 Nov 2023 08:47:20 -0400
+X-MC-Unique: 9Mgdi-T9MmaKi_n3PhP7mA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7035E811E8F;
+        Wed,  1 Nov 2023 12:47:19 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D9A24C1290F;
+        Wed,  1 Nov 2023 12:47:18 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+        id C096130C2A86; Wed,  1 Nov 2023 12:47:18 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+        by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id BDD333FB77;
+        Wed,  1 Nov 2023 13:47:18 +0100 (CET)
+Date:   Wed, 1 Nov 2023 13:47:18 +0100 (CET)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+To:     Linux regressions mailing list <regressions@lists.linux.dev>
+cc:     Yureka <yuka@yuka.dev>, linux-crypto@vger.kernel.org,
+        dm-devel@redhat.com, Boris Brezillon <bbrezillon@kernel.org>,
         Arnaud Ebalard <arno@natisbad.org>,
         Srujana Challa <schalla@marvell.com>,
-        Eric Biggers <ebiggers@kernel.org>
-References: <53f57de2-ef58-4855-bb3c-f0d54472dc4d@yuka.dev>
- <20230929224327.GA11839@google.com>
-From:   "Linux regression tracking (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <20230929224327.GA11839@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1698840291;2c6ccb74;
-X-HE-SMSGID: 1qy9xo-0001cN-9r
+        Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [REGRESSION] dm_crypt essiv ciphers do not use async driver
+ mv-aes-cbc anymore
+In-Reply-To: <070dd167-9278-42fa-aef5-66621a602fd3@leemhuis.info>
+Message-ID: <518e373e-673e-82a-24ff-b9e8b3927c85@redhat.com>
+References: <53f57de2-ef58-4855-bb3c-f0d54472dc4d@yuka.dev> <20230929224327.GA11839@google.com> <070dd167-9278-42fa-aef5-66621a602fd3@leemhuis.info>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-n 30.09.23 00:43, Eric Biggers wrote:
-> On Fri, Sep 29, 2023 at 11:08:55PM +0200, Yureka wrote:
->>
->> I am running the NixOS distribution cross-compiled from x86_64 to a Marvell
->> Armada 388 armv7 SoC.
->>
->> I am not getting expected speeds when reading/writing on my encrypted hard
->> drive with 6.5.5, while it is fast on 5.4.257. Volume is formatted like this:
->> `cryptsetup luksFormat -c aes-cbc-essiv:sha256 /dev/sda`.
->>
->> Specifically, I tracked this down to the changes to crypto/essiv.c from
->> 7bcb2c99f8ed mentioned above. Reverting those changes on top of a 6.5.5 kernel
->> provides working (see applicable diff further below).
->>
->> I'm *guessing* that this is related to the mv-aes-cbc crypto driver (from the
->> marvell-cesa module) being registered as async (according to /proc/crypto),
->> and I *suspect* that async drivers are not being used anymore by essiv or
->> dm_crypt. Going by the commit description, which sounds more like a refactor,
->> this does not seem intentional.
-> 
-> This is actually from commit b8aa7dc5c753 ("crypto: drivers - set the flag
-> CRYPTO_ALG_ALLOCATES_MEMORY"), which set CRYPTO_ALG_ALLOCATES_MEMORY in
-> marvell-cesa.  7bcb2c99f8ed is just one of the prerequisite commits.
-> 
-> I understand that the dm-crypt developers did this as an intentional bug fix in
-> order to prevent dm-crypt from using crypto drivers that are known to cause
-> deadlocks due to allocating memory during requests.
-> 
-> If you are interested in still being able to use marvell-cesa with dm-crypt, I
-> believe it would need to be fixed to meet the requirements for not needing
-> CRYPTO_ALG_ALLOCATES_MEMORY.  I've Cc'ed the maintainers of that driver.
-> 
-> #regzbot introduced: b8aa7dc5c753
 
-BTW: Eric, thx for this.
 
-Boris, Arnaud, Srujana, and Mikulas, could you maybe comment on this? I
-understand that this is not some everyday regression due to deadlock
-risk, but it nevertheless would be good to get this resolved somehow to
-stay in line with our "no regressions" rule.
+On Wed, 1 Nov 2023, Linux regression tracking (Thorsten Leemhuis) wrote:
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
+> > #regzbot introduced: b8aa7dc5c753
+> 
+> BTW: Eric, thx for this.
+> 
+> Boris, Arnaud, Srujana, and Mikulas, could you maybe comment on this? I
+> understand that this is not some everyday regression due to deadlock
+> risk, but it nevertheless would be good to get this resolved somehow to
+> stay in line with our "no regressions" rule.
+> 
+> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
 
-#regzbot poke
+Hi
+
+The driver drivers/crypto/marvell/cesa/cipher.c uses GFP_ATOMIC 
+allocations (see mv_cesa_skcipher_dma_req_init). So, it is not really safe 
+to use it for dm-crypt.
+
+GFP_ATOMIC allocations may fail anytime (for example, they fill fail if 
+the machine receives too many network packets in a short timeframe and 
+runs temporarily out of memory). And when the GFP_ATOMIC allocation fails, 
+you get a write I/O error and data corruption.
+
+It could be possible to change it to use GFP_NOIO allocations, then we 
+would risk deadlock instead of data corruption. The best thing would be to 
+convert the driver to use mempools.
+
+Mikulas
+
