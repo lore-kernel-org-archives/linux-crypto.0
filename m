@@ -2,108 +2,147 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B685C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Nov 2023 13:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFD3C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Nov 2023 14:12:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343828AbjKAN00 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Nov 2023 09:26:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45758 "EHLO
+        id S235554AbjKAOMh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Nov 2023 10:12:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344071AbjKAN0Z (ORCPT
+        with ESMTP id S235523AbjKAOMg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Nov 2023 09:26:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4E5D103
-        for <linux-crypto@vger.kernel.org>; Wed,  1 Nov 2023 06:25:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698845142;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5vuuw2hgFSjYMbIsoJnBkA458K2z+JiLRYE0TFB3z/Q=;
-        b=FyDwE40id3B+I1StnmclzA7Zb2ect/dG8dNPflteUutQQpIdLIFbVUgftnPdaGqq6TENQg
-        IiCllp/pYdKA9nPmyma9PIVoxVRtKBH+TxjAU27Mo/NypaNBSvLTFkJExIh+gKc+ZYDCmO
-        GA8HF4r6oojvWFwWxhQ1jDWxKFxHWro=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-319-9xMMn1IYP0KOZYPpfTEUVQ-1; Wed, 01 Nov 2023 09:25:40 -0400
-X-MC-Unique: 9xMMn1IYP0KOZYPpfTEUVQ-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9a62adedadbso475248166b.1
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Nov 2023 06:25:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698845139; x=1699449939;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5vuuw2hgFSjYMbIsoJnBkA458K2z+JiLRYE0TFB3z/Q=;
-        b=A+TTRyHjox4pBFmiNCVB7FmKx5ZDiHk77xgSWnE9vdq4V919jkEMkfKJUwgWSWRWEN
-         gnpck/Bhbk1ehSeWGRo39VbOjuN/hhDoU43vzR4njGtfZjc6sUV0IiL3JqjF1zZVrNfq
-         +qC3Cxoh10lwqWZ2Chgw/uG//qWOAK03nKRbPS0yNFjNuoIyLHF+U20IWs9HPXM1p9kA
-         kJVv+NrrTcaDV6kRZHjWWwh5lKvoOKN/F4kVCbA0Y5uF5IpNhCBUnz1hAEW0fuFU8bsO
-         w50QrZNym6Zq3zpYsF2FvkOe4hb65REBMrZ+AG3wlQV8BQZU5mMaF8ESQxqICrNCWInt
-         bpHw==
-X-Gm-Message-State: AOJu0YwApVrVWyX6l2i26E5pHbgV758MAnNnJYXfyIsw2Ze3qMWHwCIs
-        yePkTmHMF7RvbYlWdNOhqm/cwQMlxe2cfEFEpT960cEpkGEdY4zSvx8s/m2PTI8SByq4OINNVSx
-        AGh1LCS27xrm/4AH5Lkj9yWJP
-X-Received: by 2002:a17:907:da1:b0:9d7:139:ca02 with SMTP id go33-20020a1709070da100b009d70139ca02mr1593789ejc.18.1698845139551;
-        Wed, 01 Nov 2023 06:25:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGH01EOmDvR1VZ1Vpqwf7/m2EHCZhBOjFFX6rLdJc7iyoXzWszkpEDc8Iv42M1PCJjd0h1kjg==
-X-Received: by 2002:a17:907:da1:b0:9d7:139:ca02 with SMTP id go33-20020a1709070da100b009d70139ca02mr1593777ejc.18.1698845139229;
-        Wed, 01 Nov 2023 06:25:39 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:1f7:e470:9af7:1504:1b35:8a09])
-        by smtp.gmail.com with ESMTPSA id cl21-20020a170906c4d500b0099bd1a78ef5sm2397533ejb.74.2023.11.01.06.25.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Nov 2023 06:25:38 -0700 (PDT)
-Date:   Wed, 1 Nov 2023 09:25:33 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jason Wang <jasowang@redhat.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>
-Subject: Re: virtcrypto_dataq_callback calls crypto_finalize_request() from
- irq context
-Message-ID: <20231101092521-mutt-send-email-mst@kernel.org>
-References: <20230922154546.4f7447ce.pasic@linux.ibm.com>
- <ed47fb73ad634ca395bd6c8e979dda8e@huawei.com>
- <20230924193941.6a02237f.pasic@linux.ibm.com>
+        Wed, 1 Nov 2023 10:12:36 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2071.outbound.protection.outlook.com [40.107.223.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6425B83;
+        Wed,  1 Nov 2023 07:12:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=C8elzXfRSeWIwj1WMOav63ZaoXZV9xpCMy8leIAWrO9dQrQU523padYvMw0Zxj+ZjJft3vAf1FIkakN7sjH+SRvSdnc9LYbPTKKl/gmHHR7JR3t4R7/OeNUpLThweeifsidZFh5yRjQB7OsDiU2L3yXl/P05ur/n1Sb+IZYeN5ldfYcPhxnplNg7SzgCiTSkOzUszgbEZjQpBMpoykNuHVKoERs+zGxqZ0aFjSqOhvO3nQs8FQvQ6OQJKMD9OY0GQfOwe8SUvw6hJFofZEwU83t1LX/IZg0a+nYODz2lzXzVECixTy/0ErGo66fxpVfEOj39aPc9S+arn96F1G03FA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S/HOO6S2f1Q4bmcAWouHRq8lvufSNEf/syKLVn4zn/E=;
+ b=iWbFDOx5E7wIK8jT4OYtOiRslVH8B7FSWD4hm8h6P0wwmGkkjX5hEqwSS7E9Pz0AbmXowZbo87/iLfysrdOZ2kvpQcXMP1KcOjGmvCdA/GH7Y9eMkVaMbnosZHn/2ll3zqUxNBghdWAlEuzcwjZEwn/iTNrmJOL6P8Gw+tQpiwJHjX5LcxBf0REB/iChANozIvYk1aIOUaF6V3vfCfbNQcQJ3FtSq7EI+/SmQ9lYqS8AqiW02Budn4NkZECNznH91R9XMRg52ZUTvSawNklikClc1QD7fi89UNrPW5FhGbpCbh+ZjY6YfaMmbdguJ8PDKZftvHtSKteEYeD6z30KgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S/HOO6S2f1Q4bmcAWouHRq8lvufSNEf/syKLVn4zn/E=;
+ b=cdmZEmr3/37oLu8vDRXi32TDtwdBzNWkN2CkjkdSB7QYdZmYcDpR1M6jLsA16HLRrfhQqIxGXUCFScpd7MwRqWVlKondzXbgt9FIXyye0zWEQFxxk5YkjY6tfZ6j0aTfKuoiz2XxCVGBRKsTnvL2KgYFUNZW9v8w8C7U7YTQ+L0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SA1PR12MB8641.namprd12.prod.outlook.com (2603:10b6:806:388::18)
+ by CY8PR12MB7436.namprd12.prod.outlook.com (2603:10b6:930:50::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.19; Wed, 1 Nov
+ 2023 14:12:26 +0000
+Received: from SA1PR12MB8641.namprd12.prod.outlook.com
+ ([fe80::9b29:df63:fce7:8b3e]) by SA1PR12MB8641.namprd12.prod.outlook.com
+ ([fe80::9b29:df63:fce7:8b3e%2]) with mapi id 15.20.6933.028; Wed, 1 Nov 2023
+ 14:12:26 +0000
+Message-ID: <9505fea9-1175-4427-a6b6-1783329b8c93@amd.com>
+Date:   Wed, 1 Nov 2023 19:42:16 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] crypto: ccp - Add function to allocate and free
+ memory using DMA APIs
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     thomas.lendacky@amd.com, john.allen@amd.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jens.wiklander@linaro.org, sumit.garg@linaro.org,
+        jarkko.nikula@linux.intel.com, mario.limonciello@amd.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        op-tee@lists.trustedfirmware.org,
+        Mythri.Pandeshwarakrishna@amd.com, Devaraj.Rangasamy@amd.com,
+        Rijo-john.Thomas@amd.com, nimesh.easow@amd.com
+References: <20231025065700.1556152-1-JESHWANTHKUMAR.NK@amd.com>
+ <20231025065700.1556152-2-JESHWANTHKUMAR.NK@amd.com>
+ <ZTtJdU5a/P4kg/Ss@infradead.org>
+ <94059f5c-10dd-4d75-a69c-76b21ff49546@amd.com>
+ <ZT+wkcITIz0ThWU7@infradead.org>
+From:   "NK, JESHWANTHKUMAR" <jeshwanthkumar.nk@amd.com>
+In-Reply-To: <ZT+wkcITIz0ThWU7@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0230.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:eb::15) To SA1PR12MB8641.namprd12.prod.outlook.com
+ (2603:10b6:806:388::18)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230924193941.6a02237f.pasic@linux.ibm.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA1PR12MB8641:EE_|CY8PR12MB7436:EE_
+X-MS-Office365-Filtering-Correlation-Id: 11968a13-3955-4348-7e0a-08dbdae49355
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: //zSMU8OefcHMCtmVP/cwPb+yV4FdcBbJZxqZ8vr8A3UZI/gHfuB54p0Z3ZYcjBShHaxC1VifgqG4BMO25Dqdvz/dXP0/AAd91qWU+T39f9vHNm4NiUhdx5U1OaNU0a916AHGNKpSKbvAPk38qJRH8x0jbrxEa6wc5v80O1kSWgA+You0ijLbGDoI0d89FrmHcsYzXx8poj2QClYBtCRUTdlCMlX6y2G5Z8IgOYxszJYJsi8JuRM3DvPfEH8CszxZ22ZPqGU8z9xAca1gEHCI2ILgFhVGGy8PfwG/Jlx/pY6dt2ckE7VF+0taBP4qHQ9NlLU6WRri+apqd4oKgApiNo2Oi8jftKqZnhgQ4WWRI7YNOgFsCHjhC0yByH32Z+EsU2/De1/ZAUDGCToiXBrawOi45YlwYVy09La/0gfOJrlBe5Ml4sP+JGA9xMqBXrgnJguIep+vz/jEpMD48eWUXxELQ6RkE6x2ja76+uo3fQ8Z/w8oPyRQkGgNSnNzyXbRsUp/4XCFbaCQ1zYEwVyKiu6sCHBup337b/KQ+OP/AZ3onCqZ4TMiq4fyOxuZAtt+9XyHecwCiqesHQCQAD632Rjyo+dCLp95gU0oGMdlc4zPY6bNNmWIKrXqkeuCOf1nDEnM+GZg+0veQ4jw6Bjfw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB8641.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(366004)(376002)(346002)(396003)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(26005)(6512007)(2616005)(6666004)(478600001)(53546011)(6506007)(2906002)(4744005)(5660300002)(8676002)(41300700001)(6916009)(66946007)(8936002)(66556008)(4326008)(6486002)(66476007)(316002)(38100700002)(31696002)(36756003)(86362001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WEY2WkFnT1V0UitzbjVlc3d4RXIvQkZxb1kyUWU2eE9qMXZnUEZwQndzVERQ?=
+ =?utf-8?B?djJiSDE3T2ZXQnFrMGhrbHlKUCt1UHRrWnZ4djNIZk9WTThIK3lwaE9PQXdZ?=
+ =?utf-8?B?cHNxdGNXeHhjK3gzUE9HYjF4c1lOOW5rY09qUXhKNlVFamxucko3MkxTS2Iw?=
+ =?utf-8?B?eTlhOU1QM0hwZkt5NXhZbTQ1WFU3OVJ4N3J0cktqZzh0alJ5Tmxudkd2WTB6?=
+ =?utf-8?B?YThwcHlsc05KQjkwNSs1cStCUHpESW5BWDZkZk1QVGRMSEZYZkQ4NlNOZXNt?=
+ =?utf-8?B?S25TakZUc2ovQW54MHR1R09za2FLeFlxcDVJMSsvck1LVFdtTFdGKzF5cmJy?=
+ =?utf-8?B?TUVvVDM3blFRQWVuMFlnUC9tdkY0SG1PWU5XYTN6VTNkZ211elEzVTQ0enVO?=
+ =?utf-8?B?T0o3RDF6R2p6OWwyQkhlTmRzMGpFZHlxdXRNOW82SzhuTjgxdVJmbnV2bGZU?=
+ =?utf-8?B?ZHM1YzFnUXZRNmhzTnpOcC9jVlVhNW5LMVF6TjNvWGJNZGtlbXhiTVRzeStD?=
+ =?utf-8?B?SzgyS1o3RDFXMEdkaFVGQ0xqU3BRYmdUaERqd09Jck43SVVsWGpFS1kzU3Qy?=
+ =?utf-8?B?TlBTTVNlQzZkSWx2UHRUMUNVWTRLWmlueDVHVVV3bXBocmNIQVpLK1RNVWNZ?=
+ =?utf-8?B?bzB0VHcrUzZ5UEVBUEVaZXEralN0QTZqSGFLUXhxc21ZdFZ5RDlzVjJNcHpw?=
+ =?utf-8?B?Q0hLcytBaFBIWElqTENoajc3aEtOb0t1VnNBWFFjUmVKMVpVNGhDRTdOaW5z?=
+ =?utf-8?B?YW5Tck15QkZzSk5pckRsNTVnRmdlanRvRXZJbC9vVk5Ca0k2QjZZSFNqQS9H?=
+ =?utf-8?B?cXZNYWlqa0pKQkswQkR1VzV0Sk5FTnkyZk5wbTMxeDZNNzlTaHdwUytuSTk5?=
+ =?utf-8?B?NEM3SnEydEh4VTRORm40UEg2STl0SXZ3bzU2TmxSOW5PUS92WHZBMDBUMnh4?=
+ =?utf-8?B?OXpGZksyM2lFNUQ4bjhrbmxYWHlIaC9IQ3lPMzZBbVE1M21Ub1N0TXNMb0Zx?=
+ =?utf-8?B?czgwNW84SmNBdDgvOThpZFdxNDFwcE14S2lCNWVnVEVWMk9qVm5RalBqcVdm?=
+ =?utf-8?B?d0lEQXNzNi8vekYrZlNadk1IdEJyK29IUUNiTFBCSEdVdGE5dWhyY1BrSXJV?=
+ =?utf-8?B?YnZnNUE5NlYrUkRxdStoQkJIVWNhQW1NVC8zdjRoekk5K1VBa2pxNFUxb0FT?=
+ =?utf-8?B?QStQY0VtYVZpVzlsa2NhS2M0NlAxbUY2cTdaYUE0ZHFwSnRySjQ3N3FRT2hz?=
+ =?utf-8?B?TFprbHA2dlkySHBHRzI3S2hZOStlY3BvOWxwcnFpd052Zm9qWU53dkxuNEtM?=
+ =?utf-8?B?amMyUXFYRUNHdytreGN2RkxCbnZRWnpmdG0vWkd0OEZZRE9LY0g3VmZDMVF3?=
+ =?utf-8?B?MDA5SWtWWk1uREkwcGNQWnIvS0xRcUtBMU9OSThnaksrWDU4WDJjbHB2VEFY?=
+ =?utf-8?B?U1Y4YmpoY2oyUGFidk9TOHBGeG9NZlVUcHZvVFEvYXIrc1VvOWFGSkJNMXln?=
+ =?utf-8?B?eVYxT0hVeVhaSEhoNmt4QS9qZzhpTFRSU2xmbE1VeHBpcTRYZmdsc09BTEk1?=
+ =?utf-8?B?bFI5NnMxQXFudlRremxnanFMTzlIYm5BdEhTTUpMSHh1eXJ3Y0xTVnRFdTRL?=
+ =?utf-8?B?MG56QmtmUUJjM3NkcE5ZSHdsWkgyYzJrOExHR3MvVGtWZ1VxbnBkcXlUSC9Q?=
+ =?utf-8?B?bVZxNVBmODk5K0hESnN1MU5MWDIxTTFXeVJDTFA3WkVES3IweUsrY0ErbnNK?=
+ =?utf-8?B?V3ovL2VCTUdpTlNEOGwwMzQ1UytCaUJKVmlEWTZ3SWFPRy94OFhLSXM5c3JP?=
+ =?utf-8?B?Tk5qbFdTZ20wS0g2Q1lUS1RmL0VTK092RnFVSXQzNEorOUt1TDdHbElaUDha?=
+ =?utf-8?B?K3lGRlhlalcyUE1uUm5mczVlSVNOUEtWRXlKSXZVUStyK3pCNzVIbW5LQ2c0?=
+ =?utf-8?B?SVNIWGRoMG8rd3FaVGJPOEk0TXhwN3l1SkovK2hBdXZaN3laWlU5RU9ZQ05T?=
+ =?utf-8?B?aS9yUmlsZW53UWgwaDc0L011azBSSTUzaFAvUXFRVEZETytvd2RNREJBeXZL?=
+ =?utf-8?B?K2JramZBQ2JoVUZiZlJVaDExWmdIV2s1KzlycUZhV1JPSzRhR0tJVjlxZlNK?=
+ =?utf-8?Q?OzqrnFaDciniXkvR4ywT3JPUO?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11968a13-3955-4348-7e0a-08dbdae49355
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB8641.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2023 14:12:26.5487
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DBsAqNDq82Lsv/Q0Sua7joO9fi4N0K8hU4MXQNeSm3kK/GLG+/CXI0t7lI+j3BMbyQwl4vXis7PO2+QWavGDVw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7436
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Sep 24, 2023 at 07:39:41PM +0200, Halil Pasic wrote:
-> On Sun, 24 Sep 2023 11:56:25 +0000
-> "Gonglei (Arei)" <arei.gonglei@huawei.com> wrote:
-> 
-> > Hi Halil,
-> > 
-> > Commit 4058cf08945 introduced a check for detecting crypto completion function 
-> > called with enable BH, and indeed the virtio-crypto driver didn't disable BH, which needs
-> > a patch to fix it.
-> > 
-> > P.S.: https://lore.kernel.org/lkml/20220221120833.2618733-5-clabbe@baylibre.com/T/
-> > 
-> > Regards,
-> > -Gonglei
-> 
-> Thanks Gonglei!
-> 
-> Thanks! I would be glad to test that fix on s390x. Are you about to send
-> one?
-> 
-> Regards,
-> Halil
+Hi Christoph,
 
+On 30-Oct-23 7:03 PM, Christoph Hellwig wrote:
+> On Fri, Oct 27, 2023 at 07:05:17PM +0530, NK, JESHWANTHKUMAR wrote:
+>> Can you please elaborate a bit more?
+> Becasue the DMA API is a blackbox.  You can pass the dma_addr_t to
+> hardware, and you can use the kernel virtual address.  That it can
+> sometimes be implemented using the IMMU API is an implementation
+> detail.  Similarly you can only feeds iovas generated by the IOMMU
+> API into the IOMMU API, not any random other scalar value, which
+> is what you can get from the DMA API.
 
-Gonglei did you intend to send a fix?
+Thanks for the explanation, I will send a new version of the patch.
+
+Regards,
+
+Jeshwanth
 
