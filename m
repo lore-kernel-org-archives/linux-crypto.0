@@ -2,98 +2,108 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B42C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Nov 2023 12:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B685C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Nov 2023 13:26:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235151AbjKAMsS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Nov 2023 08:48:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52004 "EHLO
+        id S1343828AbjKAN00 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Nov 2023 09:26:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235137AbjKAMsS (ORCPT
+        with ESMTP id S1344071AbjKAN0Z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Nov 2023 08:48:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D500613D
-        for <linux-crypto@vger.kernel.org>; Wed,  1 Nov 2023 05:47:24 -0700 (PDT)
+        Wed, 1 Nov 2023 09:26:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4E5D103
+        for <linux-crypto@vger.kernel.org>; Wed,  1 Nov 2023 06:25:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698842843;
+        s=mimecast20190719; t=1698845142;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=L18jqjZ/YFC+R7qqPrcdbK+tbLtkdiO++O5gj8jOKcw=;
-        b=PdmLmuX6e69O76KMBg86YgHverjauZuoC/N1zRpeGJlDHCtTZ8bF2/SDvxWDpVlx7tg1JL
-        GECrIokmRQ/9QQ8FfoF6adpa16b3r4jpXGvRQooGPr7M9uWpF8bkW9DlcZXDMQaeokqRAv
-        /5Xhp1AuWIiAOiyJxygO3LBxbFHhDoc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=5vuuw2hgFSjYMbIsoJnBkA458K2z+JiLRYE0TFB3z/Q=;
+        b=FyDwE40id3B+I1StnmclzA7Zb2ect/dG8dNPflteUutQQpIdLIFbVUgftnPdaGqq6TENQg
+        IiCllp/pYdKA9nPmyma9PIVoxVRtKBH+TxjAU27Mo/NypaNBSvLTFkJExIh+gKc+ZYDCmO
+        GA8HF4r6oojvWFwWxhQ1jDWxKFxHWro=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-210-9Mgdi-T9MmaKi_n3PhP7mA-1; Wed, 01 Nov 2023 08:47:20 -0400
-X-MC-Unique: 9Mgdi-T9MmaKi_n3PhP7mA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7035E811E8F;
-        Wed,  1 Nov 2023 12:47:19 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D9A24C1290F;
-        Wed,  1 Nov 2023 12:47:18 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-        id C096130C2A86; Wed,  1 Nov 2023 12:47:18 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-        by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id BDD333FB77;
-        Wed,  1 Nov 2023 13:47:18 +0100 (CET)
-Date:   Wed, 1 Nov 2023 13:47:18 +0100 (CET)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-To:     Linux regressions mailing list <regressions@lists.linux.dev>
-cc:     Yureka <yuka@yuka.dev>, linux-crypto@vger.kernel.org,
-        dm-devel@redhat.com, Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Srujana Challa <schalla@marvell.com>,
-        Eric Biggers <ebiggers@kernel.org>,
+ us-mta-319-9xMMn1IYP0KOZYPpfTEUVQ-1; Wed, 01 Nov 2023 09:25:40 -0400
+X-MC-Unique: 9xMMn1IYP0KOZYPpfTEUVQ-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9a62adedadbso475248166b.1
+        for <linux-crypto@vger.kernel.org>; Wed, 01 Nov 2023 06:25:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698845139; x=1699449939;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5vuuw2hgFSjYMbIsoJnBkA458K2z+JiLRYE0TFB3z/Q=;
+        b=A+TTRyHjox4pBFmiNCVB7FmKx5ZDiHk77xgSWnE9vdq4V919jkEMkfKJUwgWSWRWEN
+         gnpck/Bhbk1ehSeWGRo39VbOjuN/hhDoU43vzR4njGtfZjc6sUV0IiL3JqjF1zZVrNfq
+         +qC3Cxoh10lwqWZ2Chgw/uG//qWOAK03nKRbPS0yNFjNuoIyLHF+U20IWs9HPXM1p9kA
+         kJVv+NrrTcaDV6kRZHjWWwh5lKvoOKN/F4kVCbA0Y5uF5IpNhCBUnz1hAEW0fuFU8bsO
+         w50QrZNym6Zq3zpYsF2FvkOe4hb65REBMrZ+AG3wlQV8BQZU5mMaF8ESQxqICrNCWInt
+         bpHw==
+X-Gm-Message-State: AOJu0YwApVrVWyX6l2i26E5pHbgV758MAnNnJYXfyIsw2Ze3qMWHwCIs
+        yePkTmHMF7RvbYlWdNOhqm/cwQMlxe2cfEFEpT960cEpkGEdY4zSvx8s/m2PTI8SByq4OINNVSx
+        AGh1LCS27xrm/4AH5Lkj9yWJP
+X-Received: by 2002:a17:907:da1:b0:9d7:139:ca02 with SMTP id go33-20020a1709070da100b009d70139ca02mr1593789ejc.18.1698845139551;
+        Wed, 01 Nov 2023 06:25:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGH01EOmDvR1VZ1Vpqwf7/m2EHCZhBOjFFX6rLdJc7iyoXzWszkpEDc8Iv42M1PCJjd0h1kjg==
+X-Received: by 2002:a17:907:da1:b0:9d7:139:ca02 with SMTP id go33-20020a1709070da100b009d70139ca02mr1593777ejc.18.1698845139229;
+        Wed, 01 Nov 2023 06:25:39 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:1f7:e470:9af7:1504:1b35:8a09])
+        by smtp.gmail.com with ESMTPSA id cl21-20020a170906c4d500b0099bd1a78ef5sm2397533ejb.74.2023.11.01.06.25.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Nov 2023 06:25:38 -0700 (PDT)
+Date:   Wed, 1 Nov 2023 09:25:33 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     "Gonglei (Arei)" <arei.gonglei@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [REGRESSION] dm_crypt essiv ciphers do not use async driver
- mv-aes-cbc anymore
-In-Reply-To: <070dd167-9278-42fa-aef5-66621a602fd3@leemhuis.info>
-Message-ID: <518e373e-673e-82a-24ff-b9e8b3927c85@redhat.com>
-References: <53f57de2-ef58-4855-bb3c-f0d54472dc4d@yuka.dev> <20230929224327.GA11839@google.com> <070dd167-9278-42fa-aef5-66621a602fd3@leemhuis.info>
+        Jason Wang <jasowang@redhat.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>
+Subject: Re: virtcrypto_dataq_callback calls crypto_finalize_request() from
+ irq context
+Message-ID: <20231101092521-mutt-send-email-mst@kernel.org>
+References: <20230922154546.4f7447ce.pasic@linux.ibm.com>
+ <ed47fb73ad634ca395bd6c8e979dda8e@huawei.com>
+ <20230924193941.6a02237f.pasic@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230924193941.6a02237f.pasic@linux.ibm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On Wed, 1 Nov 2023, Linux regression tracking (Thorsten Leemhuis) wrote:
-
-> > #regzbot introduced: b8aa7dc5c753
+On Sun, Sep 24, 2023 at 07:39:41PM +0200, Halil Pasic wrote:
+> On Sun, 24 Sep 2023 11:56:25 +0000
+> "Gonglei (Arei)" <arei.gonglei@huawei.com> wrote:
 > 
-> BTW: Eric, thx for this.
+> > Hi Halil,
+> > 
+> > Commit 4058cf08945 introduced a check for detecting crypto completion function 
+> > called with enable BH, and indeed the virtio-crypto driver didn't disable BH, which needs
+> > a patch to fix it.
+> > 
+> > P.S.: https://lore.kernel.org/lkml/20220221120833.2618733-5-clabbe@baylibre.com/T/
+> > 
+> > Regards,
+> > -Gonglei
 > 
-> Boris, Arnaud, Srujana, and Mikulas, could you maybe comment on this? I
-> understand that this is not some everyday regression due to deadlock
-> risk, but it nevertheless would be good to get this resolved somehow to
-> stay in line with our "no regressions" rule.
+> Thanks Gonglei!
 > 
-> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> Thanks! I would be glad to test that fix on s390x. Are you about to send
+> one?
+> 
+> Regards,
+> Halil
 
-Hi
 
-The driver drivers/crypto/marvell/cesa/cipher.c uses GFP_ATOMIC 
-allocations (see mv_cesa_skcipher_dma_req_init). So, it is not really safe 
-to use it for dm-crypt.
-
-GFP_ATOMIC allocations may fail anytime (for example, they fill fail if 
-the machine receives too many network packets in a short timeframe and 
-runs temporarily out of memory). And when the GFP_ATOMIC allocation fails, 
-you get a write I/O error and data corruption.
-
-It could be possible to change it to use GFP_NOIO allocations, then we 
-would risk deadlock instead of data corruption. The best thing would be to 
-convert the driver to use mempools.
-
-Mikulas
+Gonglei did you intend to send a fix?
 
