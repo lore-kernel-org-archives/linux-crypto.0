@@ -2,102 +2,58 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D467DC4332F
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Nov 2023 03:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07BF5C4167B
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Nov 2023 04:51:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231253AbjKADWH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Oct 2023 23:22:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52936 "EHLO
+        id S1346905AbjKAEvf (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Nov 2023 00:51:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231252AbjKADWG (ORCPT
+        with ESMTP id S1345092AbjKAEve (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Oct 2023 23:22:06 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B504B4
-        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 20:22:04 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95AF4C433C8;
-        Wed,  1 Nov 2023 03:22:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698808923;
-        bh=wkjH40ySEh0ASsRlzj3fbA4t4h1zRFcVUvMt06fXibk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=M4SIwKo7I9dMCFDRpozaNJF11+tziJ3GT5UKWqBJi/XSEAoFkfKAV+dqPlJCSqjlv
-         2PbOhgYbkqGQlhSDljKuFwi9XMnm0uqUzfvnfLjh8FpPeiIlzbdvegx8X3nYKXlKcA
-         bZtbF2ap9QCuIQlnpNsHSaK5KLfY7nPRLzfBEOwti+p2RJtNmn/jbL9Aeygec9Ce9a
-         bQHzFVDipovy/n8Xyet596cScgbM5dFeKsAPQgxi8NB6jquukj2sL8svYSQBvaJoGL
-         IeMaZ+YrNmGT985jwYERB4iINkEfHv2Iq27Is9H7ZYyVyYGaLInxV9ezoSMid3mjv7
-         m2pxU3Xkuk5IQ==
-Date:   Tue, 31 Oct 2023 20:22:02 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Elliott, Robert (Servers)" <elliott@hpe.com>
-Cc:     Roxana Nicolescu <roxana.nicolescu@canonical.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] crypto: x86/sha256 - autoload if SHA-NI detected
-Message-ID: <20231101032202.GA1830@sol.localdomain>
-References: <20231029051555.157720-1-ebiggers@kernel.org>
- <34843a86-6516-47d2-88dd-5ca0aa86a052@canonical.com>
- <MW5PR84MB1842C4652CCCB7738AE7FA4BABA0A@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+        Wed, 1 Nov 2023 00:51:34 -0400
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04A59101
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Oct 2023 21:51:27 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qy3C9-00D9Tv-4j; Wed, 01 Nov 2023 12:51:10 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 01 Nov 2023 12:51:15 +0800
+Date:   Wed, 1 Nov 2023 12:51:15 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     agk@redhat.com, snitzer@kernel.org, dm-devel@lists.linux.dev,
+        linux-crypto@vger.kernel.org, gilad@benyossef.com,
+        samitolvanen@google.com
+Subject: Re: [PATCH] dm-verity: hash blocks with shash import+finup when
+ possible
+Message-ID: <ZUHZQ3tJH0WSV9dX@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MW5PR84MB1842C4652CCCB7738AE7FA4BABA0A@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+In-Reply-To: <20231030023351.6041-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 31, 2023 at 02:52:53PM +0000, Elliott, Robert (Servers) wrote:
-> > -----Original Message-----
-> > From: Roxana Nicolescu <roxana.nicolescu@canonical.com>
-> > Sent: Tuesday, October 31, 2023 8:19 AM
-> > To: Eric Biggers <ebiggers@kernel.org>; linux-crypto@vger.kernel.org
-> > Subject: Re: [PATCH] crypto: x86/sha256 - autoload if SHA-NI detected
-> > 
-> > On 29/10/2023 06:15, Eric Biggers wrote:
-> > > From: Eric Biggers <ebiggers@google.com>
-> > >
-> > > The x86 SHA-256 module contains four implementations: SSSE3, AVX, AVX2,
-> > > and SHA-NI.  Commit 1c43c0f1f84a ("crypto: x86/sha - load modules based
-> > > on CPU features") made the module be autoloaded when SSSE3, AVX, or AVX2
-> > > is detected.  The omission of SHA-NI appears to be an oversight, perhaps
-> > > because of the outdated file-level comment.  This patch fixes this,
-> > > though in practice this makes no difference because SSSE3 is a subset of
-> > > the other three features anyway.  Indeed, sha256_ni_transform() executes
-> > > SSSE3 instructions such as pshufb.
-> > >
-> > > Cc: Roxana Nicolescu <roxana.nicolescu@canonical.com>
-> > > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > 
-> > Indeed, it was an oversight.
-> > 
-> > Reviewed-by: Roxana Nicolescu <roxana.nicolescu@canonical.com>
-> > > ---
-> > >   arch/x86/crypto/sha256_ssse3_glue.c | 5 +++--
-> > >   1 file changed, 3 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/arch/x86/crypto/sha256_ssse3_glue.c
-> > b/arch/x86/crypto/sha256_ssse3_glue.c
-> > > index 4c0383a90e11..a135cf9baca3 100644
-> > > --- a/arch/x86/crypto/sha256_ssse3_glue.c
-> ...
-> > >
-> > >   static const struct x86_cpu_id module_cpu_ids[] = {
-> > > +	X86_MATCH_FEATURE(X86_FEATURE_SHA_NI, NULL),
-> 
-> Unless something else has changed, this needs to be inside ifdefs, as discovered
-> in the proposed patch series last year:
-> 
-> for sha1_sse3_glue.c:
-> #ifdef CONFIG_AS_SHA1_NI
->         X86_MATCH_FEATURE(X86_FEATURE_SHA_NI, NULL),
-> #endif
-> 
-> for sha256_sse3_glue.c:
-> +#ifdef CONFIG_AS_SHA256_NI
-> +       X86_MATCH_FEATURE(X86_FEATURE_SHA_NI, NULL),
-> +#endif
+Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> +       driver_name = crypto_ahash_driver_name(ahash);
+> +       if (v->version >= 1 /* salt prepended, not appended? */ &&
+> +           1 << v->data_dev_block_bits <= PAGE_SIZE) {
+> +               shash = crypto_alloc_shash(alg_name, 0, 0);
 
-Right, thanks for pointing that out.  It compiles either way, but we shouldn't
-autoload on SHA-NI when the code using SHA-NI isn't being built.  Sent out v2
-with this fixed.
+I'm sorry but this is disgusting.
 
-- Eric
+Can't we do the same optimisation for the ahash import+finup path?
+
+On a side note, if we're going to use shash for bulk data then we
+should reintroduce the can/cannot sleep flag.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
