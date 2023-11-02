@@ -2,148 +2,126 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 235EFC4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 17:47:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56DCBC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 20:44:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234026AbjKBRrc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Nov 2023 13:47:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54442 "EHLO
+        id S229671AbjKBUo6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Nov 2023 16:44:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234112AbjKBRr2 (ORCPT
+        with ESMTP id S229459AbjKBUo5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2023 13:47:28 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B82B137;
-        Thu,  2 Nov 2023 10:47:22 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9d2c54482fbso199383866b.2;
-        Thu, 02 Nov 2023 10:47:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698947241; x=1699552041; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8LZVQdmd+E8mUtJWBLZRWGzqUC4FZBj+7S3JJxwc7EY=;
-        b=B/fNRAxwjHjApPsPjHqM9Gb4EGHfr6yz4yD75i2IH64fiXsTvOCKy14zKJMQ8zoYFe
-         rtkiQiTFaT0pyaW80JlsSWd5lWeQGbxZN0pP6gHq80AiveLvqZZv0szWOjCGH91HWGxW
-         oAfDB5n3WHZZsiIuuvQ1z8WO8JsAB5g67yZEUx+zVCXWRnOFK1NprvdNAupKFPzhhGGk
-         EW3IBVTxVj/+eKU3ilIkij3aUvtssHTI8+A1DVBiQwL+UGovirAOTVNRHf6WTO0Oq9ik
-         4t4yecapsyn4+2ncWM0vrdxvKD/Xj4o6143XroD62PdI8gXh428apHfViJWC01gC45OH
-         8O3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698947241; x=1699552041;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8LZVQdmd+E8mUtJWBLZRWGzqUC4FZBj+7S3JJxwc7EY=;
-        b=HetJz9/TRKdByt3MiKcwttj4huKhOqlkCusfvrGqIVb6JqOg9NcDG++gkR9VfSwSor
-         QeZ7OPXI1zhWXGBe9Eu+ywUvScx0kwy8q6pf0DqebAc5XxzATqXtPBZQBHvIYcxFAAr2
-         VrvHtAMzcACpxiKv+pjbHTTlGDiQA0xZ+C9HR9eyFN2oyQP6TtX7iXMq1BxH+zKwsZL5
-         xM+jLT97jox2kYW+A2SNE4RbCV9gTI7CmHLLlMD9Uo/C1LWOZ2NyL2sWYzOPMc2v3nO9
-         qwu/T7SJ4faUaSjThCaLak9Ff5RHmbQzs+oEcUwqI5UNtogjzv1KZSH7sGoaWxaKJ2mr
-         v84w==
-X-Gm-Message-State: AOJu0YxkqcfOr0dK0Ex6EuBAJVrzqNrjZSNUCHteySt5nj6HHDHhftSl
-        FFr+9XImQwGaWErSr8LENlmWYjsNWe/trcMNkN8=
-X-Google-Smtp-Source: AGHT+IEqunsdVFO/zR+l4k+OY5SPbC2+r41lSgaeXTaeLzAUAHVWSFxDpOZN1gkb3gyrg7M8zYWMhAs/ewfgBaArRoI=
-X-Received: by 2002:a17:907:1c17:b0:9be:fc60:32d9 with SMTP id
- nc23-20020a1709071c1700b009befc6032d9mr4697800ejc.47.1698947240709; Thu, 02
- Nov 2023 10:47:20 -0700 (PDT)
+        Thu, 2 Nov 2023 16:44:57 -0400
+Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66FEF184;
+        Thu,  2 Nov 2023 13:44:51 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailout.west.internal (Postfix) with ESMTP id 773813200960;
+        Thu,  2 Nov 2023 16:44:49 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Thu, 02 Nov 2023 16:44:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1698957889; x=1699044289; bh=Xy
+        ycHQGm8Ach4EeAq+P26zFx4Ln6IaVWO2c9NZBcYRY=; b=rvAXTBjhdU0m58NjHJ
+        U6gwyWJCxDxpmw1lOfbIKAoGy5DDWwg7V7ecnPardZMIcFwq1L6pt9LmRDFTxO5N
+        IP15LRgOcS5+zoUQAe00C3oTF6yM9JAL+JaY+0ybGTdHb+wJUm6UdeI+HCVADtOI
+        QW/xFkqJo7TJx4jYgEGlgLK9VYWQz5RjXBfeyz+Pv9RO3MZjvhKBEG6vjF8vZmHu
+        Fy8SwaFRjKcPg/qfrBKPwRftAv09mYzpAikJ6S8nw+bNKfAv2qLBSXL6+j8MZ++w
+        kcP7j2vc05WlIcxVkFx7b4R2t3IF9G95A6ZKkJbRm56WOv9OS5gQUxlsRnpIveUB
+        7vTQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm3; t=1698957889; x=1699044289; bh=XyycHQGm8Ach4
+        EeAq+P26zFx4Ln6IaVWO2c9NZBcYRY=; b=EPf4RoNFbPerLrUsQ0ziFzgWBD9ej
+        ETW2jQt+mwMWTQ7SjUR+NJj3cOv41qFp+mRaYqs1YF0knrxFJuQd+ZdmZYUHXVNX
+        zDt1+rjGfTxkFqiyuDsXzuxaHqAtqBLxzpa7pec82j0rkpoFoRjEXaH4Xm0ghph+
+        sD05AHDy6tJcjHaic/X77MBxaFZBZOZMNreYNbVOL46RZybHOFd7rxMCDpDTNKks
+        3tCwAcNEYuqg6TjYoWX/+pSF8V9q7iAotNUMVTTxbsqhuapOMiIYeya6XSoYWSPd
+        Idh1wHZz9+Dj86IVMXljCuzCX1l4KFJFcPiXNbWdKcsfDo1znc1qo5bAg==
+X-ME-Sender: <xms:PgpEZQ9FuFqoZrhBPGQr8vehDcU_MEpxVkyUt9t4Ei0F3Y88mH9A-Q>
+    <xme:PgpEZYv9SiJXJ3lbkr8Zj2h3_GMkUi3A2uImCPvA_KmM_Getlw-w-K32EtuHU4j8j
+    d8pDYTLzRKDaK0idkE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedruddtiedgudegtdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedt
+    keetffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:PgpEZWAuPTeXJ2bHRqiB7wkXgC-w1zuW2X8yaPX749rP_cxLXcRLAA>
+    <xmx:PgpEZQdrGsJvgChd1n4Ib2l1hUau3QdY3Tvam7kN1HIRtieJQU4_hw>
+    <xmx:PgpEZVOgH1qx5qpFw-MSQQKqZkZFzE_oYP5eLL6br6a7m7psonkQUQ>
+    <xmx:QQpEZalAFkT1r6QEX3XWGdEo67G6arGBUQK7W5-IfDg4JmwEpJDDeA>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 6048EB6008D; Thu,  2 Nov 2023 16:44:46 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-1108-g3a29173c6d-fm-20231031.005-g3a29173c
 MIME-Version: 1.0
-References: <20231031134900.1432945-1-vadfed@meta.com> <dac97b74-5ff1-172b-9cd5-4cdcf07386ec@linux.dev>
- <91a6d5a7-7b18-48a2-9a74-7c00509467f8@linux.dev> <6947046d-27e3-90ee-3419-0b480af0abb0@linux.dev>
- <4258aabd-5f7b-4b7f-ab43-408b69bfdc58@linux.dev> <CAADnVQ+9pp33zv9DxouEmg24o7w27OKFUcvKChHuby_+d6-bLg@mail.gmail.com>
- <c4e6296d-f273-4b27-a33a-eee5c8f54aab@linux.dev>
-In-Reply-To: <c4e6296d-f273-4b27-a33a-eee5c8f54aab@linux.dev>
-From:   Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date:   Thu, 2 Nov 2023 10:47:08 -0700
-Message-ID: <CAEf4BzYrjPhvKpfhLAtZ9T-7yqpZin57VhPumtXextSmnwDV=A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 1/2] bpf: add skcipher API support to TC/XDP programs
-To:     Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc:     Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Song Liu <song@kernel.org>, bpf <bpf@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Mykola Lysenko <mykolal@fb.com>,
-        Vadim Fedorenko <vadfed@meta.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-Id: <d554f8f6-6e2d-471a-b266-3775c349276a@app.fastmail.com>
+In-Reply-To: <2023110207-payphone-unlit-8590@gregkh>
+References: <20231011213522.51781-1-graf@amazon.com>
+ <6b836c66-dbbf-417f-8fbe-dfd67f464a64@amazon.com>
+ <2023110207-payphone-unlit-8590@gregkh>
+Date:   Thu, 02 Nov 2023 21:44:24 +0100
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        "Alexander Graf" <graf@amazon.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "Olivia Mackall" <olivia@selenic.com>,
+        "Petre Eftime" <petre.eftime@gmail.com>,
+        "Erdem Meydanlli" <meydanli@amazon.nl>,
+        "Benjamin Herrenschmidt" <benh@kernel.crashing.org>,
+        "David Woodhouse" <dwmw@amazon.co.uk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Jason Wang" <jasowang@redhat.com>,
+        "Xuan Zhuo" <xuanzhuo@linux.alibaba.com>,
+        "Christophe JAILLET" <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH v7] misc: Add Nitro Secure Module driver
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 2, 2023 at 9:14=E2=80=AFAM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
+On Thu, Nov 2, 2023, at 12:29, Greg Kroah-Hartman wrote:
+> On Thu, Nov 02, 2023 at 10:54:34AM +0100, Alexander Graf wrote:
+>> On 11.10.23 23:35, Alexander Graf wrote:
+>> > When running Linux inside a Nitro Enclave, the hypervisor provides a
+>> > special virtio device called "Nitro Security Module" (NSM). This device
+>> > has 3 main functions:
+>> > 
+>> >    1) Provide attestation reports
+>> >    2) Modify PCR state
+>> >    3) Provide entropy
+>> > 
+>> > This patch adds a driver for NSM that exposes a /dev/nsm device node which
+>> > user space can issue an ioctl on this device with raw NSM CBOR formatted
+>> > commands to request attestation documents, influence PCR states, read
+>> > entropy and enumerate status of the device. In addition, the driver
+>> > implements a hwrng backend.
+>> > 
+>> > Originally-by: Petre Eftime <petre.eftime@gmail.com>
+>> > Signed-off-by: Alexander Graf <graf@amazon.com>
+>> 
+>> 
+>> Ping for inclusion? I haven't seen any further comments on v7 of this patch,
+>> so I'd assume it's good to go? :)
 >
-> On 02/11/2023 15:36, Alexei Starovoitov wrote:
-> > On Thu, Nov 2, 2023 at 6:44=E2=80=AFAM Vadim Fedorenko
-> > <vadim.fedorenko@linux.dev> wrote:
-> >>
-> >> On 01/11/2023 23:41, Martin KaFai Lau wrote:
-> >>> On 11/1/23 3:50=E2=80=AFPM, Vadim Fedorenko wrote:
-> >>>>>> +static void *__bpf_dynptr_data_ptr(const struct bpf_dynptr_kern *=
-ptr)
-> >>>>>> +{
-> >>>>>> +    enum bpf_dynptr_type type;
-> >>>>>> +
-> >>>>>> +    if (!ptr->data)
-> >>>>>> +        return NULL;
-> >>>>>> +
-> >>>>>> +    type =3D bpf_dynptr_get_type(ptr);
-> >>>>>> +
-> >>>>>> +    switch (type) {
-> >>>>>> +    case BPF_DYNPTR_TYPE_LOCAL:
-> >>>>>> +    case BPF_DYNPTR_TYPE_RINGBUF:
-> >>>>>> +        return ptr->data + ptr->offset;
-> >>>>>> +    case BPF_DYNPTR_TYPE_SKB:
-> >>>>>> +        return skb_pointer_if_linear(ptr->data, ptr->offset,
-> >>>>>> __bpf_dynptr_size(ptr));
-> >>>>>> +    case BPF_DYNPTR_TYPE_XDP:
-> >>>>>> +    {
-> >>>>>> +        void *xdp_ptr =3D bpf_xdp_pointer(ptr->data, ptr->offset,
-> >>>>>> __bpf_dynptr_size(ptr));
-> >>>>>
-> >>>>> I suspect what it is doing here (for skb and xdp in particular) is
-> >>>>> very similar to bpf_dynptr_slice. Please check if
-> >>>>> bpf_dynptr_slice(ptr, 0, NULL, sz) will work.
-> >>>>>
-> >>>>
-> >>>> Well, yes, it's simplified version of bpf_dynptr_slice. The problem =
-is
-> >>>> that bpf_dynptr_slice bpf_kfunc which cannot be used in another
-> >>>> bpf_kfunc. Should I refactor the code to use it in both places? Like
-> >>>
-> >>> Sorry, scrolled too fast in my earlier reply :(
-> >>>
-> >>> I am not aware of this limitation. What error does it have?
-> >>> The bpf_dynptr_slice_rdwr kfunc() is also calling the bpf_dynptr_slic=
-e()
-> >>> kfunc.
-> >>>
-> >>>> create __bpf_dynptr_slice() which will be internal part of bpf_kfunc=
-?
-> >>
-> >> Apparently Song has a patch to expose these bpf_dynptr_slice* function=
-s
-> >> ton in-kernel users.
-> >>
-> >> https://lore.kernel.org/bpf/20231024235551.2769174-2-song@kernel.org/
-> >>
-> >> Should I wait for it to be merged before sending next version?
-> >
-> > If you need something from another developer it's best to ask them
-> > explicitly :)
-> > In this case Song can respin with just that change that you need.
->
-> Got it. I actually need 2 different changes from the same patchset, I'll
-> ping Song in the appropriate thread, thanks!
->
+> Ah, I thought there would be a new version for some reason, sorry about
+> that.  I'll review it after -rc1 is out, in the middle of the merge
+> window right now, I can't add anything to my trees, but new drivers can
+> always be added after that.
 
-Please also check my ramblings in [0]
+FWIW, all my comments have been addressed in this version. I'm not
+exactly happy with the design, but none of the alternatives we looked
+at were better, so I guess merging this version is better than having
+it maintained out of tree.
 
-  [0] https://patchwork.kernel.org/project/netdevbpf/patch/20231024235551.2=
-769174-2-song@kernel.org/
+Reviewed-by: Arnd Bergmann <arnd@arndb.de>
