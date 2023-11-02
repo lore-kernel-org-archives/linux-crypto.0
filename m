@@ -2,59 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30785C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 04:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C637C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 04:43:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348489AbjKBEbv (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Nov 2023 00:31:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55426 "EHLO
+        id S231574AbjKBEnn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Nov 2023 00:43:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348480AbjKBEbu (ORCPT
+        with ESMTP id S229727AbjKBEnm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2023 00:31:50 -0400
+        Thu, 2 Nov 2023 00:43:42 -0400
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 840C2189;
-        Wed,  1 Nov 2023 21:31:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4395A6
+        for <linux-crypto@vger.kernel.org>; Wed,  1 Nov 2023 21:43:36 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qyPLp-00DS8w-RW; Thu, 02 Nov 2023 12:30:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Nov 2023 12:30:44 +0800
-Date:   Thu, 2 Nov 2023 12:30:44 +0800
+        id 1qyPYC-00DSL0-8z; Thu, 02 Nov 2023 12:43:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Nov 2023 12:43:31 +0800
+Date:   Thu, 2 Nov 2023 12:43:31 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Yuran Pereira <yuran.pereira@hotmail.com>,
-        linux-crypto@vger.kernel.org, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        linux-kernel@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH 0/7] crypto: Proper Initialization of `struct
- skcipher_walk` in x86 Glue Files
-Message-ID: <ZUMl9BJcEXta1Spg@gondor.apana.org.au>
-References: <DB3PR10MB683562E7BD2DC73A48BEA3C8E8A6A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
- <20231102042043.GD1498@sol.localdomain>
+Cc:     agk@redhat.com, snitzer@kernel.org, dm-devel@lists.linux.dev,
+        linux-crypto@vger.kernel.org, gilad@benyossef.com,
+        samitolvanen@google.com
+Subject: Re: [PATCH] dm-verity: hash blocks with shash import+finup when
+ possible
+Message-ID: <ZUMo87EMeYxiCZLX@gondor.apana.org.au>
+References: <20231030023351.6041-1-ebiggers@kernel.org>
+ <ZUHZQ3tJH0WSV9dX@gondor.apana.org.au>
+ <20231101054856.GA140941@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231102042043.GD1498@sol.localdomain>
+In-Reply-To: <20231101054856.GA140941@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 01, 2023 at 09:20:43PM -0700, Eric Biggers wrote:
+On Tue, Oct 31, 2023 at 10:48:56PM -0700, Eric Biggers wrote:
 >
-> Updating all callers of skcipher_walk_virt() seems like the wrong approach.
-> Shouldn't skcipher_walk_virt() be fixed to initialize the flags to 0 instead?
+> Note that dm-verity also has to use an ugly and error-prone workaround to use
+> ahash at all, since its hash blocks can be cached in vmalloc memory; see
+> verity_hash_update().  shash handles vmalloc memory much more naturally, since
+> no translation from vmalloc address to page to linear address is needed.
 
-The bits of the flags that are used are initialised in skcipher_walk_next.
+So why not drop ahash and always use shash? Does anybody care about
+offload for dm-verity?
 
-> Also, does this fix affect any behavior, or is it just to fix a KMSAN warning?
-> It needs to be fixed either way, but it's helpful to understand the effect of
-> the fix so that people can decide whether it needs to be backported or not.
+Alternatively, we could incorporate this into ahash itself.  Then
+you could have an optimised code path that does not do SGs if the
+underlying algorithm is shash.
 
-Does this actually trigger a KMSAN warning? If so I'd like to see
-it.  If it's just a static analyser then I'm not applying this.
+I really do not wish to see this ahash/shash paradigm proliferate.
+
+> > On a side note, if we're going to use shash for bulk data then we
+> > should reintroduce the can/cannot sleep flag.
+> 
+> This patch limits the use of shash to blocks of at most PAGE_SIZE (*), which is
+> the same as what ahash does internally.
+> 
+> (*) Except when the data block size is <= PAGE_SIZE but the hash block size is
+>     > PAGE_SIZE.  I think that's an uncommon configuration that's not worth
+>     worrying too much about, but it could be excluded from the shash-based code.
+
+OK.  But we do still have the module signature verification code
+path and I think that one still needs the can-sleep flag.
 
 Thanks,
 -- 
