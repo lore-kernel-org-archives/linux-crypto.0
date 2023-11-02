@@ -2,182 +2,97 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 543EEC4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 08:04:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 067ADC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 09:55:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234569AbjKBIEW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Nov 2023 04:04:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52578 "EHLO
+        id S1345969AbjKBJzL (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Nov 2023 05:55:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234560AbjKBIEU (ORCPT
+        with ESMTP id S1346094AbjKBJzK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2023 04:04:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7FBC133
-        for <linux-crypto@vger.kernel.org>; Thu,  2 Nov 2023 01:03:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698912210;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WvS8MNTF0hgInyS69OR8wJBPNbNz7HePMphlox+7hLE=;
-        b=fcTF0gxIVJzslkih70n+4dzOYeUWHO/wZtfrrUPs7uVIvTUhJv7EC65LWSZqa5Wl4G5/uO
-        cFy3eVU/mBFtpWF3IFtLyl+BXAj1/KbLsLgmMXfQdGJ7x5wWfLZTqMmvgvmDNgsTFrQL68
-        /75kWWrq2EL2DxRLqSnjQi9/+JzCCaY=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-127-ZXeI0wL_OGCPKuuv_BOOQg-1; Thu,
- 02 Nov 2023 04:03:23 -0400
-X-MC-Unique: ZXeI0wL_OGCPKuuv_BOOQg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5121F3810D23;
-        Thu,  2 Nov 2023 08:03:23 +0000 (UTC)
-Received: from localhost (unknown [10.72.113.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F192492BE0;
-        Thu,  2 Nov 2023 08:03:21 +0000 (UTC)
-Date:   Thu, 2 Nov 2023 16:03:18 +0800
-From:   Baoquan He <bhe@redhat.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Vivek Goyal <vgoyal@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, kexec@lists.infradead.org,
-        x86@kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-crypto@vger.kernel.org, eric_devolder@yahoo.com
-Subject: Re: [PATCH 1/2] kexec: fix KEXEC_FILE dependencies
-Message-ID: <ZUNXxp9AIkjQkP9s@MiWiFi-R3L-srv>
-References: <20231023110308.1202042-1-arnd@kernel.org>
- <ZTe8NOgAjvKDA6z0@MiWiFi-R3L-srv>
- <b71034f4-5cdc-44e0-b72f-1a8ffae0593e@app.fastmail.com>
+        Thu, 2 Nov 2023 05:55:10 -0400
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02DC1123;
+        Thu,  2 Nov 2023 02:55:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1698918907; x=1730454907;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=ty2pZC8GieEaKxoyIj+QktVwP/871rX0khhasjva50E=;
+  b=lvZV2w1O481bKr2AQZl+zo9X1UEB6FlAEDpsCjiSzzQTL2VnNucyBe1t
+   TX/qzkin88ZOpPTX0AZCQWIZioFKoPH3hlNHhVA+zgAYwn0qhxITDhPAB
+   y8TGuhxwRuhe/NKZC+vtkD1HZrz1J8B+Famr9cfiz3K4uBI/TOOFrAcBF
+   g=;
+X-IronPort-AV: E=Sophos;i="6.03,271,1694736000"; 
+   d="scan'208";a="374009157"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 09:55:00 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+        by email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com (Postfix) with ESMTPS id 0635B48A2D;
+        Thu,  2 Nov 2023 09:54:55 +0000 (UTC)
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:54569]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.251:2525] with esmtp (Farcaster)
+ id 30586fe6-8734-472c-ba27-ac04058e2bba; Thu, 2 Nov 2023 09:54:55 +0000 (UTC)
+X-Farcaster-Flow-ID: 30586fe6-8734-472c-ba27-ac04058e2bba
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Thu, 2 Nov 2023 09:54:54 +0000
+Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Thu, 2 Nov
+ 2023 09:54:45 +0000
+Message-ID: <6b836c66-dbbf-417f-8fbe-dfd67f464a64@amazon.com>
+Date:   Thu, 2 Nov 2023 10:54:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b71034f4-5cdc-44e0-b72f-1a8ffae0593e@app.fastmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7] misc: Add Nitro Secure Module driver
+Content-Language: en-US
+From:   Alexander Graf <graf@amazon.com>
+To:     <linux-kernel@vger.kernel.org>
+CC:     <linux-crypto@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Olivia Mackall <olivia@selenic.com>,
+        "Petre Eftime" <petre.eftime@gmail.com>,
+        Erdem Meydanlli <meydanli@amazon.nl>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        "Christophe JAILLET" <christophe.jaillet@wanadoo.fr>
+References: <20231011213522.51781-1-graf@amazon.com>
+In-Reply-To: <20231011213522.51781-1-graf@amazon.com>
+X-Originating-IP: [10.253.83.51]
+X-ClientProxiedBy: EX19D038UWC004.ant.amazon.com (10.13.139.229) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Arnd,
-
-On 10/24/23 at 03:17pm, Arnd Bergmann wrote:
-> On Tue, Oct 24, 2023, at 14:44, Baoquan He wrote:
-> > Just add people and mailing list to CC since I didn't find this mail in
-> > my box, just drag it via 'b4 am'.
-> >
-> > On 10/23/23 at 01:01pm, Arnd Bergmann wrote:
-> > ......
-> 
-> >> diff --git a/kernel/Kconfig.kexec b/kernel/Kconfig.kexec
-> >> index 7aff28ded2f48..bfc636d64ff2b 100644
-> >> --- a/kernel/Kconfig.kexec
-> >> +++ b/kernel/Kconfig.kexec
-> >> @@ -36,6 +36,7 @@ config KEXEC
-> >>  config KEXEC_FILE
-> >>  	bool "Enable kexec file based system call"
-> >>  	depends on ARCH_SUPPORTS_KEXEC_FILE
-> >> +	depends on CRYPTO_SHA256=y || !ARCH_SUPPORTS_KEXEC_PURGATORY
-> >
-> > I am not sure if the logic is correct. In theory, kexec_file code
-> > utilizes purgatory to verify the checksum digested during kernel loading
-> > when try to jump to the kernel. That means kexec_file depends on
-> > purgatory, but not contrary?
-> 
-> The expression I wrote is a bit confusing, but I think this just
-> keeps the existing behavior:
-> 
-> - on architectures that select ARCH_SUPPORTS_KEXEC_PURGATORY
->   (powerpc, riscv, s390 and x86), we also require CRYPTO_SHA256
->   to be built-in.
-> - on architectures that do not have ARCH_SUPPORTS_KEXEC_PURGATORY
->   (arm64 and parisc), CRYPTO_SHA256 is not used and can be disabled
->   or =m.
-> 
-> Since ARCH_SUPPORTS_KEXEC_PURGATORY is a 'bool' symbol, it could
-> be written as
-> 
-> depends on (ARCH_SUPPORTS_KEXEC_PURGATORY && CRYPTO_SHA256=y) \
->            || !ARCH_SUPPORTS_KEXEC_PURGATORY
-> 
-> if you find that clearer. I see that the second patch
-> actually gets this wrong, it should actually do
-> 
-> select CRYPTO if ARCH_SUPPORTS_KEXEC_PURGATORY
-> select CRYPTO_SHA256 if ARCH_SUPPORTS_KEXEC_PURGATORY
-> 
-> > With these changes, we can achieve the goal to avoid building issue,
-> > whereas the code logic becomes confusing. E.g people could disable
-> > CONFIG_KEXEC_FILE, but still get purgatory code built in which is
-> > totally useless.
-> >
-> > Not sure if I think too much over this.
-> 
-> I see your point here, and I would suggest changing the
-> CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY symbol to just indicate
-> the availability of the purgatory code for the arch, rather
-> than actually controlling the code itself. I already mentioned
-> this for s390, but riscv would need the same thing on top.
-> 
-> I think the change below should address your concern.
-
-Since no new comment, do you mind spinning v2 to wrap all these up?
-
-Thanks
-Baoquan
-
-> 
->      Arnd
-> 
-> diff --git a/arch/riscv/kernel/elf_kexec.c b/arch/riscv/kernel/elf_kexec.c
-> index e60fbd8660c4..3ac341d296db 100644
-> --- a/arch/riscv/kernel/elf_kexec.c
-> +++ b/arch/riscv/kernel/elf_kexec.c
-> @@ -266,7 +266,7 @@ static void *elf_kexec_load(struct kimage *image, char *kernel_buf,
->                 cmdline = modified_cmdline;
->         }
->  
-> -#ifdef CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY
-> +#ifdef CONFIG_KEXEC_FILE
->         /* Add purgatory to the image */
->         kbuf.top_down = true;
->         kbuf.mem = KEXEC_BUF_MEM_UNKNOWN;
-> @@ -280,7 +280,7 @@ static void *elf_kexec_load(struct kimage *image, char *kernel_buf,
->                                              sizeof(kernel_start), 0);
->         if (ret)
->                 pr_err("Error update purgatory ret=%d\n", ret);
-> -#endif /* CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY */
-> +#endif /* CONFIG_KEXEC_FILE */
->  
->         /* Add the initrd to the image */
->         if (initrd != NULL) {
-> diff --git a/arch/riscv/Kbuild b/arch/riscv/Kbuild
-> index d25ad1c19f88..ab181d187c23 100644
-> --- a/arch/riscv/Kbuild
-> +++ b/arch/riscv/Kbuild
-> @@ -5,7 +5,7 @@ obj-$(CONFIG_BUILTIN_DTB) += boot/dts/
->  obj-y += errata/
->  obj-$(CONFIG_KVM) += kvm/
->  
-> -obj-$(CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY) += purgatory/
-> +obj-$(CONFIG_KEXEC_FILE) += purgatory/
->  
->  # for cleaning
->  subdir- += boot
-> diff --git a/arch/s390/Kbuild b/arch/s390/Kbuild
-> index a5d3503b353c..361aa01dbd49 100644
-> --- a/arch/s390/Kbuild
-> +++ b/arch/s390/Kbuild
-> @@ -7,7 +7,7 @@ obj-$(CONFIG_S390_HYPFS)        += hypfs/
->  obj-$(CONFIG_APPLDATA_BASE)    += appldata/
->  obj-y                          += net/
->  obj-$(CONFIG_PCI)              += pci/
-> -obj-$(CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY) += purgatory/
-> +obj-$(CONFIG_KEXEC_FILE)       += purgatory/
->  
->  # for cleaning
->  subdir- += boot tools
-> 
+T24gMTEuMTAuMjMgMjM6MzUsIEFsZXhhbmRlciBHcmFmIHdyb3RlOgo+IFdoZW4gcnVubmluZyBM
+aW51eCBpbnNpZGUgYSBOaXRybyBFbmNsYXZlLCB0aGUgaHlwZXJ2aXNvciBwcm92aWRlcyBhCj4g
+c3BlY2lhbCB2aXJ0aW8gZGV2aWNlIGNhbGxlZCAiTml0cm8gU2VjdXJpdHkgTW9kdWxlIiAoTlNN
+KS4gVGhpcyBkZXZpY2UKPiBoYXMgMyBtYWluIGZ1bmN0aW9uczoKPgo+ICAgIDEpIFByb3ZpZGUg
+YXR0ZXN0YXRpb24gcmVwb3J0cwo+ICAgIDIpIE1vZGlmeSBQQ1Igc3RhdGUKPiAgICAzKSBQcm92
+aWRlIGVudHJvcHkKPgo+IFRoaXMgcGF0Y2ggYWRkcyBhIGRyaXZlciBmb3IgTlNNIHRoYXQgZXhw
+b3NlcyBhIC9kZXYvbnNtIGRldmljZSBub2RlIHdoaWNoCj4gdXNlciBzcGFjZSBjYW4gaXNzdWUg
+YW4gaW9jdGwgb24gdGhpcyBkZXZpY2Ugd2l0aCByYXcgTlNNIENCT1IgZm9ybWF0dGVkCj4gY29t
+bWFuZHMgdG8gcmVxdWVzdCBhdHRlc3RhdGlvbiBkb2N1bWVudHMsIGluZmx1ZW5jZSBQQ1Igc3Rh
+dGVzLCByZWFkCj4gZW50cm9weSBhbmQgZW51bWVyYXRlIHN0YXR1cyBvZiB0aGUgZGV2aWNlLiBJ
+biBhZGRpdGlvbiwgdGhlIGRyaXZlcgo+IGltcGxlbWVudHMgYSBod3JuZyBiYWNrZW5kLgo+Cj4g
+T3JpZ2luYWxseS1ieTogUGV0cmUgRWZ0aW1lIDxwZXRyZS5lZnRpbWVAZ21haWwuY29tPgo+IFNp
+Z25lZC1vZmYtYnk6IEFsZXhhbmRlciBHcmFmIDxncmFmQGFtYXpvbi5jb20+CgoKUGluZyBmb3Ig
+aW5jbHVzaW9uPyBJIGhhdmVuJ3Qgc2VlbiBhbnkgZnVydGhlciBjb21tZW50cyBvbiB2NyBvZiB0
+aGlzIApwYXRjaCwgc28gSSdkIGFzc3VtZSBpdCdzIGdvb2QgdG8gZ28/IDopCgoKQWxleAoKCgoK
+QW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAx
+MTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRo
+YW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIg
+SFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
 
