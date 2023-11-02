@@ -2,228 +2,87 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C34C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 05:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF089C4167B
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 05:40:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348526AbjKBFQp (ORCPT
+        id S1348567AbjKBFkN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Nov 2023 01:16:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38766 "EHLO
+        Thu, 2 Nov 2023 01:40:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348472AbjKBFQo (ORCPT
+        with ESMTP id S1348472AbjKBFkM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2023 01:16:44 -0400
+        Thu, 2 Nov 2023 01:40:12 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D40112;
-        Wed,  1 Nov 2023 22:16:42 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35137C433C8;
-        Thu,  2 Nov 2023 05:16:41 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44753116
+        for <linux-crypto@vger.kernel.org>; Wed,  1 Nov 2023 22:40:10 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A64B4C433C9;
+        Thu,  2 Nov 2023 05:40:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698902201;
-        bh=CkuAO4YfABv6nx78RNeYwkWi8XTCIrEQLGEg/E2HryQ=;
+        s=k20201202; t=1698903609;
+        bh=Vc50y+ilngpLAjJrj+ek3spiWbd5yxysMlqquUorDrg=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=XSYepTXPWoR7riWtRFAmmKQQiXRHmxeMoohJRM6BkLJCkcAMhVOZ0cSdG97H8j8V6
-         y9f1XRke/cmD38xmbDgTOw2vWKPYf4pqhWW+XSNfB26nOJEwU0/FvYTZa9E9qdBS7O
-         WC3M2Cu/4qsdWwxQrvF8qpAu3vskQL6bcWoG/kf25kll8Yw2cvvLIbedJwP4Wv2Chq
-         z1RGVvl4IV0hrLcIII8OFI139lUeY0uNi9RwKQKo+Ae20xJb2Juarh4X76vMhZCCrK
-         /cN3ZT6W/WymVFEybO+/l2+0M3igefmmqCfTu9CJ2P+Sy05tkrENxaote4Oiy+NzdE
-         G6z9zz6IW+hKA==
-Date:   Wed, 1 Nov 2023 22:16:39 -0700
+        b=JZtLwpA51+YEB/qeOsXEQjiO6eXm6+5fLMz9rqtZEMgySbUjGcViwN/cz5GoBhfJ5
+         qc5MM2rIZ0hj3SRPA7SNjU5gi9HeLnHp3LhiIVHR715l1z9fEoDY3p63HgjUiM0uMP
+         G2Y3R8lQ+FwIcimkJ2X9Ms6zAlwtyg80c7h1ccMEB+kdYnvz2xa6c6fnbZeNviIYhg
+         OeAFvevrp2szhzMSIxRln3T4P2aw2za4Uqls7x4xnDkEYRWVlFkWRoaR+jpk75B38O
+         8k5TkmIOY4AqB+APIWGiKE8q3f/oXopVbmNeGHa28WuDbPo7fC1AdO/oEpv9Zz01Gq
+         sz2x5Rn033oSA==
+Date:   Wed, 1 Nov 2023 22:40:08 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jerry Shih <jerry.shih@sifive.com>
-Cc:     paul.walmsley@sifive.com, palmer@dabbelt.com,
-        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
-        davem@davemloft.net, andy.chiu@sifive.com, greentime.hu@sifive.com,
-        conor.dooley@microchip.com, guoren@kernel.org, bjorn@rivosinc.com,
-        heiko@sntech.de, ardb@kernel.org, phoebe.chen@sifive.com,
-        hongrong.hsu@sifive.com, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 06/12] RISC-V: crypto: add accelerated
- AES-CBC/CTR/ECB/XTS implementations
-Message-ID: <20231102051639.GF1498@sol.localdomain>
-References: <20231025183644.8735-1-jerry.shih@sifive.com>
- <20231025183644.8735-7-jerry.shih@sifive.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     agk@redhat.com, snitzer@kernel.org, dm-devel@lists.linux.dev,
+        linux-crypto@vger.kernel.org, gilad@benyossef.com,
+        samitolvanen@google.com
+Subject: Re: [PATCH] dm-verity: hash blocks with shash import+finup when
+ possible
+Message-ID: <20231102054008.GG1498@sol.localdomain>
+References: <20231030023351.6041-1-ebiggers@kernel.org>
+ <ZUHZQ3tJH0WSV9dX@gondor.apana.org.au>
+ <20231101054856.GA140941@sol.localdomain>
+ <ZUMo87EMeYxiCZLX@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231025183644.8735-7-jerry.shih@sifive.com>
+In-Reply-To: <ZUMo87EMeYxiCZLX@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 26, 2023 at 02:36:38AM +0800, Jerry Shih wrote:
-> +config CRYPTO_AES_BLOCK_RISCV64
-> +	default y if RISCV_ISA_V
-> +	tristate "Ciphers: AES, modes: ECB/CBC/CTR/XTS"
-> +	depends on 64BIT && RISCV_ISA_V
-> +	select CRYPTO_AES_RISCV64
-> +	select CRYPTO_SKCIPHER
-> +	help
-> +	  Length-preserving ciphers: AES cipher algorithms (FIPS-197)
-> +	  with block cipher modes:
-> +	  - ECB (Electronic Codebook) mode (NIST SP 800-38A)
-> +	  - CBC (Cipher Block Chaining) mode (NIST SP 800-38A)
-> +	  - CTR (Counter) mode (NIST SP 800-38A)
-> +	  - XTS (XOR Encrypt XOR Tweakable Block Cipher with Ciphertext
-> +	    Stealing) mode (NIST SP 800-38E and IEEE 1619)
-> +
-> +	  Architecture: riscv64 using:
-> +	  - Zvbb vector extension (XTS)
-> +	  - Zvkb vector crypto extension (CTR/XTS)
-> +	  - Zvkg vector crypto extension (XTS)
-> +	  - Zvkned vector crypto extension
+On Thu, Nov 02, 2023 at 12:43:31PM +0800, Herbert Xu wrote:
+> On Tue, Oct 31, 2023 at 10:48:56PM -0700, Eric Biggers wrote:
+> >
+> > Note that dm-verity also has to use an ugly and error-prone workaround to use
+> > ahash at all, since its hash blocks can be cached in vmalloc memory; see
+> > verity_hash_update().  shash handles vmalloc memory much more naturally, since
+> > no translation from vmalloc address to page to linear address is needed.
+> 
+> So why not drop ahash and always use shash? Does anybody care about
+> offload for dm-verity?
 
-Maybe list Zvkned first since it's the most important one in this context.
+I'd love to do that; it's what I did in fsverity.  Someone did intentionally
+convert dm-verity from shash to ahash in 2017, though; see commit d1ac3ff008fb.
+So we'd be reverting that.  Maybe there are people who'd still care.  Maybe not.
+I haven't yet gotten any complaints about switching fsverity to shash in v6.5
+(and I only used ahash originally because of the precedent of dm-verity).
 
-> +#define AES_BLOCK_VALID_SIZE_MASK (~(AES_BLOCK_SIZE - 1))
-> +#define AES_BLOCK_REMAINING_SIZE_MASK (AES_BLOCK_SIZE - 1)
+> Alternatively, we could incorporate this into ahash itself.  Then
+> you could have an optimised code path that does not do SGs if the
+> underlying algorithm is shash.
+> 
+> I really do not wish to see this ahash/shash paradigm proliferate.
 
-I think it would be easier to read if these values were just used directly.
+Do you have in mind making struct ahash_request specify the data by either
+scatterlist or by virtual address?  It might be possible.  It would be necessary
+to wire up all possible combinations of (SG, virt) x (ahash_alg, shash_alg),
+with the vmalloc_to_page() hack for the virt + ahash_alg case.
 
-> +static int ecb_encrypt(struct skcipher_request *req)
-> +{
-> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> +	const struct riscv64_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +	struct skcipher_walk walk;
-> +	unsigned int nbytes;
-> +	int err;
-> +
-> +	/* If we have error here, the `nbytes` will be zero. */
-> +	err = skcipher_walk_virt(&walk, req, false);
-> +	while ((nbytes = walk.nbytes)) {
-> +		kernel_vector_begin();
-> +		rv64i_zvkned_ecb_encrypt(walk.src.virt.addr, walk.dst.virt.addr,
-> +					 nbytes & AES_BLOCK_VALID_SIZE_MASK,
-> +					 &ctx->key);
-> +		kernel_vector_end();
-> +		err = skcipher_walk_done(
-> +			&walk, nbytes & AES_BLOCK_REMAINING_SIZE_MASK);
-> +	}
-> +
-> +	return err;
-> +}
+> OK.  But we do still have the module signature verification code
+> path and I think that one still needs the can-sleep flag.
 
-There's no fallback for !crypto_simd_usable() here.  I really like it this way.
-However, for it to work (for skciphers and aeads), RISC-V needs to allow the
-vector registers to be used in softirq context.  Is that already the case?
-
-> +/* ctr */
-> +static int ctr_encrypt(struct skcipher_request *req)
-> +{
-> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> +	const struct riscv64_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +	struct skcipher_walk walk;
-> +	unsigned int ctr32;
-> +	unsigned int nbytes;
-> +	unsigned int blocks;
-> +	unsigned int current_blocks;
-> +	unsigned int current_length;
-> +	int err;
-> +
-> +	/* the ctr iv uses big endian */
-> +	ctr32 = get_unaligned_be32(req->iv + 12);
-> +	err = skcipher_walk_virt(&walk, req, false);
-> +	while ((nbytes = walk.nbytes)) {
-> +		if (nbytes != walk.total) {
-> +			nbytes &= AES_BLOCK_VALID_SIZE_MASK;
-> +			blocks = nbytes / AES_BLOCK_SIZE;
-> +		} else {
-> +			/* This is the last walk. We should handle the tail data. */
-> +			blocks = (nbytes + (AES_BLOCK_SIZE - 1)) /
-> +				 AES_BLOCK_SIZE;
-
-'(nbytes + (AES_BLOCK_SIZE - 1)) / AES_BLOCK_SIZE' can be replaced with
-'DIV_ROUND_UP(nbytes, AES_BLOCK_SIZE)'
-
-> +static int xts_crypt(struct skcipher_request *req, aes_xts_func func)
-> +{
-> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> +	const struct riscv64_aes_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +	struct skcipher_request sub_req;
-> +	struct scatterlist sg_src[2], sg_dst[2];
-> +	struct scatterlist *src, *dst;
-> +	struct skcipher_walk walk;
-> +	unsigned int walk_size = crypto_skcipher_walksize(tfm);
-> +	unsigned int tail_bytes;
-> +	unsigned int head_bytes;
-> +	unsigned int nbytes;
-> +	unsigned int update_iv = 1;
-> +	int err;
-> +
-> +	/* xts input size should be bigger than AES_BLOCK_SIZE */
-> +	if (req->cryptlen < AES_BLOCK_SIZE)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * The tail size should be small than walk_size. Thus, we could make sure the
-> +	 * walk size for tail elements could be bigger than AES_BLOCK_SIZE.
-> +	 */
-> +	if (req->cryptlen <= walk_size) {
-> +		tail_bytes = req->cryptlen;
-> +		head_bytes = 0;
-> +	} else {
-> +		if (req->cryptlen & AES_BLOCK_REMAINING_SIZE_MASK) {
-> +			tail_bytes = req->cryptlen &
-> +				     AES_BLOCK_REMAINING_SIZE_MASK;
-> +			tail_bytes = walk_size + tail_bytes - AES_BLOCK_SIZE;
-> +			head_bytes = req->cryptlen - tail_bytes;
-> +		} else {
-> +			tail_bytes = 0;
-> +			head_bytes = req->cryptlen;
-> +		}
-> +	}
-> +
-> +	riscv64_aes_encrypt_zvkned(&ctx->ctx2, req->iv, req->iv);
-> +
-> +	if (head_bytes && tail_bytes) {
-> +		skcipher_request_set_tfm(&sub_req, tfm);
-> +		skcipher_request_set_callback(
-> +			&sub_req, skcipher_request_flags(req), NULL, NULL);
-> +		skcipher_request_set_crypt(&sub_req, req->src, req->dst,
-> +					   head_bytes, req->iv);
-> +		req = &sub_req;
-> +	}
-> +
-> +	if (head_bytes) {
-> +		err = skcipher_walk_virt(&walk, req, false);
-> +		while ((nbytes = walk.nbytes)) {
-> +			if (nbytes == walk.total)
-> +				update_iv = (tail_bytes > 0);
-> +
-> +			nbytes &= AES_BLOCK_VALID_SIZE_MASK;
-> +			kernel_vector_begin();
-> +			func(walk.src.virt.addr, walk.dst.virt.addr, nbytes,
-> +			     &ctx->ctx1.key, req->iv, update_iv);
-> +			kernel_vector_end();
-> +
-> +			err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
-> +		}
-> +		if (err || !tail_bytes)
-> +			return err;
-> +
-> +		dst = src = scatterwalk_next(sg_src, &walk.in);
-> +		if (req->dst != req->src)
-> +			dst = scatterwalk_next(sg_dst, &walk.out);
-> +		skcipher_request_set_crypt(req, src, dst, tail_bytes, req->iv);
-> +	}
-> +
-> +	/* tail */
-> +	err = skcipher_walk_virt(&walk, req, false);
-> +	if (err)
-> +		return err;
-> +	if (walk.nbytes != tail_bytes)
-> +		return -EINVAL;
-> +	kernel_vector_begin();
-> +	func(walk.src.virt.addr, walk.dst.virt.addr, walk.nbytes,
-> +	     &ctx->ctx1.key, req->iv, 0);
-> +	kernel_vector_end();
-> +
-> +	return skcipher_walk_done(&walk, 0);
-> +}
-
-This function looks a bit weird.  I see it's also the only caller of the
-scatterwalk_next() function that you're adding.  I haven't looked at this super
-closely, but I expect that there's a cleaner way of handling the "tail" than
-this -- maybe use scatterwalk_map_and_copy() to copy from/to a stack buffer?
+Well, struct shash_desc used to have that flag, but it never did anything.  The
+few use cases like this might be more simply served by just having a helper
+function crypto_shash_update_large() that passes the data in chunks to
+crypto_shash_update().
 
 - Eric
