@@ -2,32 +2,32 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 253B3C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 05:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0199BC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 05:58:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbjKBFnc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Nov 2023 01:43:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57352 "EHLO
+        id S230172AbjKBF6y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Nov 2023 01:58:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbjKBFnc (ORCPT
+        with ESMTP id S230478AbjKBF6w (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2023 01:43:32 -0400
+        Thu, 2 Nov 2023 01:58:52 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE326112;
-        Wed,  1 Nov 2023 22:43:29 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 041C9C433C8;
-        Thu,  2 Nov 2023 05:43:28 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 901EF133;
+        Wed,  1 Nov 2023 22:58:50 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C3A4C433C8;
+        Thu,  2 Nov 2023 05:58:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698903809;
-        bh=ptXWBqG/5/N20EjAoLJcSbKkpw8UYizDxZ7qmFczEZ8=;
+        s=k20201202; t=1698904730;
+        bh=oUrhkOmCghkLFx1zd+9/LkzSpQOub+y8mn4lj0eMIsM=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NsUDOcegxMfT3N0PyIitMJFmWqA9uGO2I2KjwtRvGVRyd1yvaBKsxKne2Sb3j6t1x
-         XUtHyz2ZrrTUFPOY8E4D08VGM/rw0/JMNKF3PZJ7KXJTQpNXkz7w2QcVlR92d9h/iG
-         NwZXHzzw9hdU0exJQ8vqMfuHIzVcmdGa0EN59WblZC1jE3we3uh+TATRUqEfIDI7p2
-         zdBuobfnYOOIVb3WPUua8EtmvWNqUEiJ6n7moiiF8oMfApkLJ2mQ3XUzNrgtZpJi2a
-         hZtTtzUc748wFeyvg27BlTsBcbd1qeCMZEE6cxKXj1xHkhKj8Ayoz0X48NpSzaBPwj
-         3Jsi0k7n0l6wQ==
-Date:   Wed, 1 Nov 2023 22:43:27 -0700
+        b=FoO7W5dP6rK5/nNsWQFdXanVXH0kpgIwBmFQhcebu/94h+pw+Df88gFyVNHm2/6kt
+         HCTKBZ+WN1QLpNa+TEpa8ELkFvYXXy5u8EJC6zSVau1NdLGyxgFMlWZpHm3VBMok0p
+         zcN2YsbEjYzTG92e9c7NC85r3m6Yc8MFaDQ0zQBcTWXIgmWnnkXiNYftONEjIVMU0Y
+         3wSys/hs8+bKMAgixXJuMsVQAoZyHFG37YJs9tYMKQJhhDUaZR3N7mENY90whleBkm
+         Fr7nnqJUTeYlso7zBFSVjz6/0bMj1M6CFYNFugI9M70COlsuq/IGq1/YexkDhNYPqn
+         DcLq41GcY+EEw==
+Date:   Wed, 1 Nov 2023 22:58:48 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Jerry Shih <jerry.shih@sifive.com>
 Cc:     paul.walmsley@sifive.com, palmer@dabbelt.com,
@@ -37,71 +37,37 @@ Cc:     paul.walmsley@sifive.com, palmer@dabbelt.com,
         heiko@sntech.de, ardb@kernel.org, phoebe.chen@sifive.com,
         hongrong.hsu@sifive.com, linux-riscv@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 12/12] RISC-V: crypto: add Zvkb accelerated ChaCha20
+Subject: Re: [PATCH 10/12] RISC-V: crypto: add Zvksed accelerated SM4
  implementation
-Message-ID: <20231102054327.GH1498@sol.localdomain>
+Message-ID: <20231102055848.GI1498@sol.localdomain>
 References: <20231025183644.8735-1-jerry.shih@sifive.com>
- <20231025183644.8735-13-jerry.shih@sifive.com>
+ <20231025183644.8735-11-jerry.shih@sifive.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231025183644.8735-13-jerry.shih@sifive.com>
+In-Reply-To: <20231025183644.8735-11-jerry.shih@sifive.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 26, 2023 at 02:36:44AM +0800, Jerry Shih wrote:
-> +static struct skcipher_alg riscv64_chacha_alg_zvkb[] = { {
-> +	.base = {
-> +		.cra_name = "chacha20",
-> +		.cra_driver_name = "chacha20-riscv64-zvkb",
-> +		.cra_priority = 300,
-> +		.cra_blocksize = 1,
-> +		.cra_ctxsize = sizeof(struct chacha_ctx),
-> +		.cra_module = THIS_MODULE,
+On Thu, Oct 26, 2023 at 02:36:42AM +0800, Jerry Shih wrote:
+> +struct crypto_alg riscv64_sm4_zvksed_alg = {
+> +	.cra_name = "sm4",
+> +	.cra_driver_name = "sm4-riscv64-zvkb-zvksed",
+> +	.cra_module = THIS_MODULE,
+> +	.cra_priority = 300,
+> +	.cra_flags = CRYPTO_ALG_TYPE_CIPHER,
+> +	.cra_blocksize = SM4_BLOCK_SIZE,
+> +	.cra_ctxsize = sizeof(struct sm4_ctx),
+> +	.cra_cipher = {
+> +		.cia_min_keysize = SM4_KEY_SIZE,
+> +		.cia_max_keysize = SM4_KEY_SIZE,
+> +		.cia_setkey = riscv64_sm4_setkey_zvksed,
+> +		.cia_encrypt = riscv64_sm4_encrypt_zvksed,
+> +		.cia_decrypt = riscv64_sm4_decrypt_zvksed,
 > +	},
-> +	.min_keysize = CHACHA_KEY_SIZE,
-> +	.max_keysize = CHACHA_KEY_SIZE,
-> +	.ivsize = CHACHA_IV_SIZE,
-> +	.chunksize = CHACHA_BLOCK_SIZE,
-> +	.walksize = CHACHA_BLOCK_SIZE * 4,
-> +	.setkey = chacha20_setkey,
-> +	.encrypt = chacha20_encrypt,
-> +	.decrypt = chacha20_encrypt,
-> +} };
-> +
-> +static inline bool check_chacha20_ext(void)
-> +{
-> +	return riscv_isa_extension_available(NULL, ZVKB) &&
-> +	       riscv_vector_vlen() >= 128;
-> +}
-> +
-> +static int __init riscv64_chacha_mod_init(void)
-> +{
-> +	if (check_chacha20_ext())
-> +		return crypto_register_skciphers(
-> +			riscv64_chacha_alg_zvkb,
-> +			ARRAY_SIZE(riscv64_chacha_alg_zvkb));
-> +
-> +	return -ENODEV;
-> +}
-> +
-> +static void __exit riscv64_chacha_mod_fini(void)
-> +{
-> +	if (check_chacha20_ext())
-> +		crypto_unregister_skciphers(
-> +			riscv64_chacha_alg_zvkb,
-> +			ARRAY_SIZE(riscv64_chacha_alg_zvkb));
-> +}
+> +};
 
-When there's just one algorithm being registered/unregistered,
-crypto_register_skcipher() and crypto_unregister_skcipher() can be used.
-
-> +# - RV64I
-> +# - RISC-V Vector ('V') with VLEN >= 128
-> +# - RISC-V Vector Cryptography Bit-manipulation extension ('Zvkb')
-> +# - RISC-V Zicclsm(Main memory supports misaligned loads/stores)
-
-How is the presence of the Zicclsm extension guaranteed?
+This should be 'static'.
 
 - Eric
