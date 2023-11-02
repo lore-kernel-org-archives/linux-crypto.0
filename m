@@ -2,134 +2,102 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 030D1C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 13:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50389C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 13:44:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376474AbjKBNZn convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Nov 2023 09:25:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55274 "EHLO
+        id S234971AbjKBNoi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Nov 2023 09:44:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376414AbjKBNZm (ORCPT
+        with ESMTP id S229822AbjKBNoh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2023 09:25:42 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C97191;
-        Thu,  2 Nov 2023 06:25:35 -0700 (PDT)
-Received: from kwepemi500023.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SLl0h6D4FzrTrP;
-        Thu,  2 Nov 2023 21:22:28 +0800 (CST)
-Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
- kwepemi500023.china.huawei.com (7.221.188.76) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 2 Nov 2023 21:25:31 +0800
-Received: from dggpemm500006.china.huawei.com ([7.185.36.236]) by
- dggpemm500006.china.huawei.com ([7.185.36.236]) with mapi id 15.01.2507.031;
- Thu, 2 Nov 2023 21:25:31 +0800
-From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Halil Pasic <pasic@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jason Wang <jasowang@redhat.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>
-Subject: RE: virtcrypto_dataq_callback calls crypto_finalize_request() from
- irq context
-Thread-Topic: virtcrypto_dataq_callback calls crypto_finalize_request() from
- irq context
-Thread-Index: AQHZ7VsjRTMxo/hUEkmU1GjtoDjS1rAp3v1A///cYoCAO3GWgIACEayQ//9+LICAAIbrcA==
-Date:   Thu, 2 Nov 2023 13:25:31 +0000
-Message-ID: <6e1792a31c1646f4a301faf1a1b42cc1@huawei.com>
-References: <20230922154546.4f7447ce.pasic@linux.ibm.com>
-        <ed47fb73ad634ca395bd6c8e979dda8e@huawei.com>
-        <20230924193941.6a02237f.pasic@linux.ibm.com>
-        <20231101092521-mutt-send-email-mst@kernel.org>
-        <5d9ebbdb042845009b47e6a9ee149231@huawei.com>
- <20231102091548-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231102091548-mutt-send-email-mst@kernel.org>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.149.11]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Thu, 2 Nov 2023 09:44:37 -0400
+X-Greylist: delayed 164772 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 02 Nov 2023 06:44:31 PDT
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54AF8A6;
+        Thu,  2 Nov 2023 06:44:31 -0700 (PDT)
+Message-ID: <4258aabd-5f7b-4b7f-ab43-408b69bfdc58@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1698932669;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DTwsvEmzpAhkFeS3ka+z/7oD+5A+b+o8OiW8/532NK8=;
+        b=mmRYxBfTPMqUnOevJs2i2n/PQ2FSWXnoLZCAPkqb9GifUye+mw9JQnOpVepQ2pc1PZJpMG
+        pfhMcilABjbX0HwQ7maZZoGrTWGQ9YvLfCD3LyflGCjlJ9/KoqG8XeBAwUs1f8xh16zQzf
+        z3x7MMzpz6wTy02+tXcoku2JycRmiek=
+Date:   Thu, 2 Nov 2023 13:44:24 +0000
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Subject: Re: [PATCH bpf-next v3 1/2] bpf: add skcipher API support to TC/XDP
+ programs
+Content-Language: en-US
+To:     Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>
+Cc:     bpf@vger.kernel.org, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Mykola Lysenko <mykolal@fb.com>,
+        Vadim Fedorenko <vadfed@meta.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+References: <20231031134900.1432945-1-vadfed@meta.com>
+ <dac97b74-5ff1-172b-9cd5-4cdcf07386ec@linux.dev>
+ <91a6d5a7-7b18-48a2-9a74-7c00509467f8@linux.dev>
+ <6947046d-27e3-90ee-3419-0b480af0abb0@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <6947046d-27e3-90ee-3419-0b480af0abb0@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Thursday, November 2, 2023 9:17 PM
-> To: Gonglei (Arei) <arei.gonglei@huawei.com>
-> Cc: Halil Pasic <pasic@linux.ibm.com>; Herbert Xu
-> <herbert@gondor.apana.org.au>; Jason Wang <jasowang@redhat.com>;
-> virtualization@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
-> linux-crypto@vger.kernel.org; Marc Hartmayer <mhartmay@linux.ibm.com>
-> Subject: Re: virtcrypto_dataq_callback calls crypto_finalize_request() from irq
-> context
+On 01/11/2023 23:41, Martin KaFai Lau wrote:
+> On 11/1/23 3:50 PM, Vadim Fedorenko wrote:
+>>>> +static void *__bpf_dynptr_data_ptr(const struct bpf_dynptr_kern *ptr)
+>>>> +{
+>>>> +    enum bpf_dynptr_type type;
+>>>> +
+>>>> +    if (!ptr->data)
+>>>> +        return NULL;
+>>>> +
+>>>> +    type = bpf_dynptr_get_type(ptr);
+>>>> +
+>>>> +    switch (type) {
+>>>> +    case BPF_DYNPTR_TYPE_LOCAL:
+>>>> +    case BPF_DYNPTR_TYPE_RINGBUF:
+>>>> +        return ptr->data + ptr->offset;
+>>>> +    case BPF_DYNPTR_TYPE_SKB:
+>>>> +        return skb_pointer_if_linear(ptr->data, ptr->offset, 
+>>>> __bpf_dynptr_size(ptr));
+>>>> +    case BPF_DYNPTR_TYPE_XDP:
+>>>> +    {
+>>>> +        void *xdp_ptr = bpf_xdp_pointer(ptr->data, ptr->offset, 
+>>>> __bpf_dynptr_size(ptr));
+>>>
+>>> I suspect what it is doing here (for skb and xdp in particular) is 
+>>> very similar to bpf_dynptr_slice. Please check if 
+>>> bpf_dynptr_slice(ptr, 0, NULL, sz) will work.
+>>>
+>>
+>> Well, yes, it's simplified version of bpf_dynptr_slice. The problem is
+>> that bpf_dynptr_slice bpf_kfunc which cannot be used in another
+>> bpf_kfunc. Should I refactor the code to use it in both places? Like
 > 
-> On Thu, Nov 02, 2023 at 01:04:07PM +0000, Gonglei (Arei) wrote:
-> >
-> >
-> > > -----Original Message-----
-> > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > > Sent: Wednesday, November 1, 2023 9:26 PM
-> > > To: Halil Pasic <pasic@linux.ibm.com>
-> > > Cc: Gonglei (Arei) <arei.gonglei@huawei.com>; Herbert Xu
-> > > <herbert@gondor.apana.org.au>; Jason Wang <jasowang@redhat.com>;
-> > > virtualization@lists.linux-foundation.org;
-> > > linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org; Marc
-> > > Hartmayer <mhartmay@linux.ibm.com>
-> > > Subject: Re: virtcrypto_dataq_callback calls
-> > > crypto_finalize_request() from irq context
-> > >
-> > > On Sun, Sep 24, 2023 at 07:39:41PM +0200, Halil Pasic wrote:
-> > > > On Sun, 24 Sep 2023 11:56:25 +0000 "Gonglei (Arei)"
-> > > > <arei.gonglei@huawei.com> wrote:
-> > > >
-> > > > > Hi Halil,
-> > > > >
-> > > > > Commit 4058cf08945 introduced a check for detecting crypto
-> > > > > completion function called with enable BH, and indeed the
-> > > > > virtio-crypto driver didn't disable BH, which needs a patch to fix it.
-> > > > >
-> > > > > P.S.:
-> > > > > https://lore.kernel.org/lkml/20220221120833.2618733-5-clabbe@bay
-> > > > > libr
-> > > > > e.com/T/
-> > > > >
-> > > > > Regards,
-> > > > > -Gonglei
-> > > >
-> > > > Thanks Gonglei!
-> > > >
-> > > > Thanks! I would be glad to test that fix on s390x. Are you about
-> > > > to send one?
-> > > >
-> > > > Regards,
-> > > > Halil
-> > >
-> > >
-> > > Gonglei did you intend to send a fix?
-> >
-> > Actually I sent a patch a month ago, pls see another thread.
-> >
-> >
-> > Regards,
-> > -Gonglei
+> Sorry, scrolled too fast in my earlier reply :(
 > 
-> And I think there was an issue with that patch that you wanted to fix?
-> config changed callback got fixed but this still didn't.
+> I am not aware of this limitation. What error does it have?
+> The bpf_dynptr_slice_rdwr kfunc() is also calling the bpf_dynptr_slice() 
+> kfunc.
 > 
-Now my concern is whether or not the judgement (commit 4058cf08945c1) is reasonable.
+>> create __bpf_dynptr_slice() which will be internal part of bpf_kfunc?
 
-Regards,
--Gonglei
+Apparently Song has a patch to expose these bpf_dynptr_slice* functions
+ton in-kernel users.
+
+https://lore.kernel.org/bpf/20231024235551.2769174-2-song@kernel.org/
+
+Should I wait for it to be merged before sending next version?
