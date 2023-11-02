@@ -2,56 +2,228 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D7FC4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 05:00:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C34C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 05:16:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229516AbjKBFA4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Nov 2023 01:00:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47142 "EHLO
+        id S1348526AbjKBFQp (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Nov 2023 01:16:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbjKBFA4 (ORCPT
+        with ESMTP id S1348472AbjKBFQo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2023 01:00:56 -0400
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D29A9FB;
-        Wed,  1 Nov 2023 22:00:49 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qyPoT-00DSTI-9c; Thu, 02 Nov 2023 13:00:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Nov 2023 13:00:20 +0800
-Date:   Thu, 2 Nov 2023 13:00:20 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Yuran Pereira <yuran.pereira@hotmail.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, linux-kernel@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH 0/7] crypto: Proper Initialization of `struct
- skcipher_walk` in x86 Glue Files
-Message-ID: <ZUMs5C2FLQL4POO+@gondor.apana.org.au>
-References: <DB3PR10MB683562E7BD2DC73A48BEA3C8E8A6A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
- <20231102042043.GD1498@sol.localdomain>
- <ZUMl9BJcEXta1Spg@gondor.apana.org.au>
- <DB3PR10MB683587925DA82E44BD8D5D6EE8A6A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
+        Thu, 2 Nov 2023 01:16:44 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D40112;
+        Wed,  1 Nov 2023 22:16:42 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35137C433C8;
+        Thu,  2 Nov 2023 05:16:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698902201;
+        bh=CkuAO4YfABv6nx78RNeYwkWi8XTCIrEQLGEg/E2HryQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=XSYepTXPWoR7riWtRFAmmKQQiXRHmxeMoohJRM6BkLJCkcAMhVOZ0cSdG97H8j8V6
+         y9f1XRke/cmD38xmbDgTOw2vWKPYf4pqhWW+XSNfB26nOJEwU0/FvYTZa9E9qdBS7O
+         WC3M2Cu/4qsdWwxQrvF8qpAu3vskQL6bcWoG/kf25kll8Yw2cvvLIbedJwP4Wv2Chq
+         z1RGVvl4IV0hrLcIII8OFI139lUeY0uNi9RwKQKo+Ae20xJb2Juarh4X76vMhZCCrK
+         /cN3ZT6W/WymVFEybO+/l2+0M3igefmmqCfTu9CJ2P+Sy05tkrENxaote4Oiy+NzdE
+         G6z9zz6IW+hKA==
+Date:   Wed, 1 Nov 2023 22:16:39 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Jerry Shih <jerry.shih@sifive.com>
+Cc:     paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
+        davem@davemloft.net, andy.chiu@sifive.com, greentime.hu@sifive.com,
+        conor.dooley@microchip.com, guoren@kernel.org, bjorn@rivosinc.com,
+        heiko@sntech.de, ardb@kernel.org, phoebe.chen@sifive.com,
+        hongrong.hsu@sifive.com, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 06/12] RISC-V: crypto: add accelerated
+ AES-CBC/CTR/ECB/XTS implementations
+Message-ID: <20231102051639.GF1498@sol.localdomain>
+References: <20231025183644.8735-1-jerry.shih@sifive.com>
+ <20231025183644.8735-7-jerry.shih@sifive.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <DB3PR10MB683587925DA82E44BD8D5D6EE8A6A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
+In-Reply-To: <20231025183644.8735-7-jerry.shih@sifive.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 02, 2023 at 10:27:41AM +0530, Yuran Pereira wrote:
->
-> I noticed that, but since skcipher_walk_first can return with failure, there seems
-> to be a chance that those bits are never initialized.
+On Thu, Oct 26, 2023 at 02:36:38AM +0800, Jerry Shih wrote:
+> +config CRYPTO_AES_BLOCK_RISCV64
+> +	default y if RISCV_ISA_V
+> +	tristate "Ciphers: AES, modes: ECB/CBC/CTR/XTS"
+> +	depends on 64BIT && RISCV_ISA_V
+> +	select CRYPTO_AES_RISCV64
+> +	select CRYPTO_SKCIPHER
+> +	help
+> +	  Length-preserving ciphers: AES cipher algorithms (FIPS-197)
+> +	  with block cipher modes:
+> +	  - ECB (Electronic Codebook) mode (NIST SP 800-38A)
+> +	  - CBC (Cipher Block Chaining) mode (NIST SP 800-38A)
+> +	  - CTR (Counter) mode (NIST SP 800-38A)
+> +	  - XTS (XOR Encrypt XOR Tweakable Block Cipher with Ciphertext
+> +	    Stealing) mode (NIST SP 800-38E and IEEE 1619)
+> +
+> +	  Architecture: riscv64 using:
+> +	  - Zvbb vector extension (XTS)
+> +	  - Zvkb vector crypto extension (CTR/XTS)
+> +	  - Zvkg vector crypto extension (XTS)
+> +	  - Zvkned vector crypto extension
 
-The API is such that if an error is returned by walk_first/next,
-then you must not call into the skcipher_walk_* functions again.
+Maybe list Zvkned first since it's the most important one in this context.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> +#define AES_BLOCK_VALID_SIZE_MASK (~(AES_BLOCK_SIZE - 1))
+> +#define AES_BLOCK_REMAINING_SIZE_MASK (AES_BLOCK_SIZE - 1)
+
+I think it would be easier to read if these values were just used directly.
+
+> +static int ecb_encrypt(struct skcipher_request *req)
+> +{
+> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +	const struct riscv64_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +	struct skcipher_walk walk;
+> +	unsigned int nbytes;
+> +	int err;
+> +
+> +	/* If we have error here, the `nbytes` will be zero. */
+> +	err = skcipher_walk_virt(&walk, req, false);
+> +	while ((nbytes = walk.nbytes)) {
+> +		kernel_vector_begin();
+> +		rv64i_zvkned_ecb_encrypt(walk.src.virt.addr, walk.dst.virt.addr,
+> +					 nbytes & AES_BLOCK_VALID_SIZE_MASK,
+> +					 &ctx->key);
+> +		kernel_vector_end();
+> +		err = skcipher_walk_done(
+> +			&walk, nbytes & AES_BLOCK_REMAINING_SIZE_MASK);
+> +	}
+> +
+> +	return err;
+> +}
+
+There's no fallback for !crypto_simd_usable() here.  I really like it this way.
+However, for it to work (for skciphers and aeads), RISC-V needs to allow the
+vector registers to be used in softirq context.  Is that already the case?
+
+> +/* ctr */
+> +static int ctr_encrypt(struct skcipher_request *req)
+> +{
+> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +	const struct riscv64_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +	struct skcipher_walk walk;
+> +	unsigned int ctr32;
+> +	unsigned int nbytes;
+> +	unsigned int blocks;
+> +	unsigned int current_blocks;
+> +	unsigned int current_length;
+> +	int err;
+> +
+> +	/* the ctr iv uses big endian */
+> +	ctr32 = get_unaligned_be32(req->iv + 12);
+> +	err = skcipher_walk_virt(&walk, req, false);
+> +	while ((nbytes = walk.nbytes)) {
+> +		if (nbytes != walk.total) {
+> +			nbytes &= AES_BLOCK_VALID_SIZE_MASK;
+> +			blocks = nbytes / AES_BLOCK_SIZE;
+> +		} else {
+> +			/* This is the last walk. We should handle the tail data. */
+> +			blocks = (nbytes + (AES_BLOCK_SIZE - 1)) /
+> +				 AES_BLOCK_SIZE;
+
+'(nbytes + (AES_BLOCK_SIZE - 1)) / AES_BLOCK_SIZE' can be replaced with
+'DIV_ROUND_UP(nbytes, AES_BLOCK_SIZE)'
+
+> +static int xts_crypt(struct skcipher_request *req, aes_xts_func func)
+> +{
+> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +	const struct riscv64_aes_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +	struct skcipher_request sub_req;
+> +	struct scatterlist sg_src[2], sg_dst[2];
+> +	struct scatterlist *src, *dst;
+> +	struct skcipher_walk walk;
+> +	unsigned int walk_size = crypto_skcipher_walksize(tfm);
+> +	unsigned int tail_bytes;
+> +	unsigned int head_bytes;
+> +	unsigned int nbytes;
+> +	unsigned int update_iv = 1;
+> +	int err;
+> +
+> +	/* xts input size should be bigger than AES_BLOCK_SIZE */
+> +	if (req->cryptlen < AES_BLOCK_SIZE)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * The tail size should be small than walk_size. Thus, we could make sure the
+> +	 * walk size for tail elements could be bigger than AES_BLOCK_SIZE.
+> +	 */
+> +	if (req->cryptlen <= walk_size) {
+> +		tail_bytes = req->cryptlen;
+> +		head_bytes = 0;
+> +	} else {
+> +		if (req->cryptlen & AES_BLOCK_REMAINING_SIZE_MASK) {
+> +			tail_bytes = req->cryptlen &
+> +				     AES_BLOCK_REMAINING_SIZE_MASK;
+> +			tail_bytes = walk_size + tail_bytes - AES_BLOCK_SIZE;
+> +			head_bytes = req->cryptlen - tail_bytes;
+> +		} else {
+> +			tail_bytes = 0;
+> +			head_bytes = req->cryptlen;
+> +		}
+> +	}
+> +
+> +	riscv64_aes_encrypt_zvkned(&ctx->ctx2, req->iv, req->iv);
+> +
+> +	if (head_bytes && tail_bytes) {
+> +		skcipher_request_set_tfm(&sub_req, tfm);
+> +		skcipher_request_set_callback(
+> +			&sub_req, skcipher_request_flags(req), NULL, NULL);
+> +		skcipher_request_set_crypt(&sub_req, req->src, req->dst,
+> +					   head_bytes, req->iv);
+> +		req = &sub_req;
+> +	}
+> +
+> +	if (head_bytes) {
+> +		err = skcipher_walk_virt(&walk, req, false);
+> +		while ((nbytes = walk.nbytes)) {
+> +			if (nbytes == walk.total)
+> +				update_iv = (tail_bytes > 0);
+> +
+> +			nbytes &= AES_BLOCK_VALID_SIZE_MASK;
+> +			kernel_vector_begin();
+> +			func(walk.src.virt.addr, walk.dst.virt.addr, nbytes,
+> +			     &ctx->ctx1.key, req->iv, update_iv);
+> +			kernel_vector_end();
+> +
+> +			err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
+> +		}
+> +		if (err || !tail_bytes)
+> +			return err;
+> +
+> +		dst = src = scatterwalk_next(sg_src, &walk.in);
+> +		if (req->dst != req->src)
+> +			dst = scatterwalk_next(sg_dst, &walk.out);
+> +		skcipher_request_set_crypt(req, src, dst, tail_bytes, req->iv);
+> +	}
+> +
+> +	/* tail */
+> +	err = skcipher_walk_virt(&walk, req, false);
+> +	if (err)
+> +		return err;
+> +	if (walk.nbytes != tail_bytes)
+> +		return -EINVAL;
+> +	kernel_vector_begin();
+> +	func(walk.src.virt.addr, walk.dst.virt.addr, walk.nbytes,
+> +	     &ctx->ctx1.key, req->iv, 0);
+> +	kernel_vector_end();
+> +
+> +	return skcipher_walk_done(&walk, 0);
+> +}
+
+This function looks a bit weird.  I see it's also the only caller of the
+scatterwalk_next() function that you're adding.  I haven't looked at this super
+closely, but I expect that there's a cleaner way of handling the "tail" than
+this -- maybe use scatterwalk_map_and_copy() to copy from/to a stack buffer?
+
+- Eric
