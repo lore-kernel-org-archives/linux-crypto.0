@@ -2,74 +2,157 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C637C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 04:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2BA1C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Nov 2023 04:51:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231574AbjKBEnn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Nov 2023 00:43:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57452 "EHLO
+        id S231302AbjKBEv7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Nov 2023 00:51:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229727AbjKBEnm (ORCPT
+        with ESMTP id S229516AbjKBEv7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2023 00:43:42 -0400
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4395A6
-        for <linux-crypto@vger.kernel.org>; Wed,  1 Nov 2023 21:43:36 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qyPYC-00DSL0-8z; Thu, 02 Nov 2023 12:43:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Nov 2023 12:43:31 +0800
-Date:   Thu, 2 Nov 2023 12:43:31 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     agk@redhat.com, snitzer@kernel.org, dm-devel@lists.linux.dev,
-        linux-crypto@vger.kernel.org, gilad@benyossef.com,
-        samitolvanen@google.com
-Subject: Re: [PATCH] dm-verity: hash blocks with shash import+finup when
- possible
-Message-ID: <ZUMo87EMeYxiCZLX@gondor.apana.org.au>
-References: <20231030023351.6041-1-ebiggers@kernel.org>
- <ZUHZQ3tJH0WSV9dX@gondor.apana.org.au>
- <20231101054856.GA140941@sol.localdomain>
+        Thu, 2 Nov 2023 00:51:59 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5764C1;
+        Wed,  1 Nov 2023 21:51:56 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C998EC433C7;
+        Thu,  2 Nov 2023 04:51:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698900716;
+        bh=N5PhYckyJitNvUVEQLxwfu9qQj+65o8OQSQa8fX1Z4I=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=l1SQS0MHoqVwhvRH46guTdDbWvcHFjJubtcCBXl2LP/liJt/QnAk4oIMabRWHzSBu
+         tfNJ03Bil97OTREOXuvpb9/fihGxVpjy+TaOx1bDzqK+E5zVRNRq4Uo6ngrQ1BRXHQ
+         rTWCcO+YvS9Xv7aRJgBYt8q1+b9D7p1EMHK6GuZTB8uFX+5eKNNbtAjZ/bib7XlbmP
+         1COfydaKwVcY73i+IKI68UB5xFvl2fsXz9Kda4l40itjtgc6I2N1Tja1kuSwY4+/xT
+         xbt19c6AmHbu0hPjDm3E/KbqXASc2o4C+SSUVm74K8fFLdviT2obMlPEcB3yx5kZOC
+         gq9miRdJL3iEg==
+Date:   Wed, 1 Nov 2023 21:51:54 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Jerry Shih <jerry.shih@sifive.com>
+Cc:     paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
+        davem@davemloft.net, andy.chiu@sifive.com, greentime.hu@sifive.com,
+        conor.dooley@microchip.com, guoren@kernel.org, bjorn@rivosinc.com,
+        heiko@sntech.de, ardb@kernel.org, phoebe.chen@sifive.com,
+        hongrong.hsu@sifive.com, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 04/12] RISC-V: crypto: add Zvkned accelerated AES
+ implementation
+Message-ID: <20231102045154.GE1498@sol.localdomain>
+References: <20231025183644.8735-1-jerry.shih@sifive.com>
+ <20231025183644.8735-5-jerry.shih@sifive.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231101054856.GA140941@sol.localdomain>
+In-Reply-To: <20231025183644.8735-5-jerry.shih@sifive.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 31, 2023 at 10:48:56PM -0700, Eric Biggers wrote:
->
-> Note that dm-verity also has to use an ugly and error-prone workaround to use
-> ahash at all, since its hash blocks can be cached in vmalloc memory; see
-> verity_hash_update().  shash handles vmalloc memory much more naturally, since
-> no translation from vmalloc address to page to linear address is needed.
+On Thu, Oct 26, 2023 at 02:36:36AM +0800, Jerry Shih wrote:
+> diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
+> index 10d60edc0110..500938317e71 100644
+> --- a/arch/riscv/crypto/Kconfig
+> +++ b/arch/riscv/crypto/Kconfig
+> @@ -2,4 +2,16 @@
+>  
+>  menu "Accelerated Cryptographic Algorithms for CPU (riscv)"
+>  
+> +config CRYPTO_AES_RISCV64
+> +	default y if RISCV_ISA_V
+> +	tristate "Ciphers: AES"
+> +	depends on 64BIT && RISCV_ISA_V
+> +	select CRYPTO_AES
+> +	select CRYPTO_ALGAPI
+> +	help
+> +	  Block ciphers: AES cipher algorithms (FIPS-197)
+> +
+> +	  Architecture: riscv64 using:
+> +	  - Zvkned vector crypto extension
 
-So why not drop ahash and always use shash? Does anybody care about
-offload for dm-verity?
+kconfig options should default to off.
 
-Alternatively, we could incorporate this into ahash itself.  Then
-you could have an optimised code path that does not do SGs if the
-underlying algorithm is shash.
+I.e., remove the line "default y if RISCV_ISA_V"
 
-I really do not wish to see this ahash/shash paradigm proliferate.
+> + *
+> + * All zvkned-based functions use encryption expending keys for both encryption
+> + * and decryption.
+> + */
 
-> > On a side note, if we're going to use shash for bulk data then we
-> > should reintroduce the can/cannot sleep flag.
-> 
-> This patch limits the use of shash to blocks of at most PAGE_SIZE (*), which is
-> the same as what ahash does internally.
-> 
-> (*) Except when the data block size is <= PAGE_SIZE but the hash block size is
->     > PAGE_SIZE.  I think that's an uncommon configuration that's not worth
->     worrying too much about, but it could be excluded from the shash-based code.
+The above comment is a bit confusing.  It's describing the 'key' field of struct
+aes_key; maybe there should be a comment there instead:
 
-OK.  But we do still have the module signature verification code
-path and I think that one still needs the can-sleep flag.
+    struct aes_key {
+            u32 key[AES_MAX_KEYLENGTH_U32]; /* round keys in encryption order */
+            u32 rounds;
+    };
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> +int riscv64_aes_setkey(struct riscv64_aes_ctx *ctx, const u8 *key,
+> +		       unsigned int keylen)
+> +{
+> +	/*
+> +	 * The RISC-V AES vector crypto key expending doesn't support AES-192.
+> +	 * We just use the generic software key expending here to simplify the key
+> +	 * expending flow.
+> +	 */
+
+expending => expanding
+
+> +	u32 aes_rounds;
+> +	u32 key_length;
+> +	int ret;
+> +
+> +	ret = aes_expandkey(&ctx->fallback_ctx, key, keylen);
+> +	if (ret < 0)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * Copy the key from `crypto_aes_ctx` to `aes_key` for zvkned-based AES
+> +	 * implementations.
+> +	 */
+> +	aes_rounds = aes_round_num(keylen);
+> +	ctx->key.rounds = aes_rounds;
+> +	key_length = AES_BLOCK_SIZE * (aes_rounds + 1);
+> +	memcpy(ctx->key.key, ctx->fallback_ctx.key_enc, key_length);
+> +
+> +	return 0;
+> +}
+
+Ideally this would use the same crypto_aes_ctx for both the fallback and the
+assembly code.  I suppose we don't want to diverge from the OpenSSL code (unless
+it gets rewritten), though.  So I guess this is fine for now.
+
+> void riscv64_aes_encrypt_zvkned(const struct riscv64_aes_ctx *ctx, u8 *dst,
+>                                const u8 *src)
+
+These functions can be called from a different module (aes-block-riscv64), so
+they need EXPORT_SYMBOL_GPL.
+
+> +static inline bool check_aes_ext(void)
+> +{
+> +	return riscv_isa_extension_available(NULL, ZVKNED) &&
+> +	       riscv_vector_vlen() >= 128;
+> +}
+> +
+> +static int __init riscv64_aes_mod_init(void)
+> +{
+> +	if (check_aes_ext())
+> +		return crypto_register_alg(&riscv64_aes_alg_zvkned);
+> +
+> +	return -ENODEV;
+> +}
+> +
+> +static void __exit riscv64_aes_mod_fini(void)
+> +{
+> +	if (check_aes_ext())
+> +		crypto_unregister_alg(&riscv64_aes_alg_zvkned);
+> +}
+> +
+> +module_init(riscv64_aes_mod_init);
+> +module_exit(riscv64_aes_mod_fini);
+
+module_exit can only run if module_init succeeded.  So, in cases like this it's
+not necessary to check for CPU features before unregistering the algorithm.
+
+- Eric
