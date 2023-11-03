@@ -2,74 +2,127 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C5EC4332F
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Nov 2023 02:37:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD0BC4332F
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Nov 2023 05:33:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235631AbjKCChl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Nov 2023 22:37:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55922 "EHLO
+        id S229527AbjKCFda (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 3 Nov 2023 01:33:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344031AbjKCChk (ORCPT
+        with ESMTP id S229436AbjKCFda (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2023 22:37:40 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5014111;
-        Thu,  2 Nov 2023 19:37:38 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 71973C433C7;
-        Fri,  3 Nov 2023 02:37:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698979058;
-        bh=WMgjxWCo6SyAR8qQ3SczccWNmzKLgKe1P7YcdIRyByg=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=HTj0uj84MW4ixSM+XWshw+fS4/yKKRqlGHfeIHNDsva3DIwmTCqaTUW6VYNf6XB7T
-         Re7rIe357HIrTpbsVHnhCwXuPswWtXnh2x4/R8Sf2KIRBukv+lgrX44EtlGAM+gD3I
-         +BWoA9b8QXVcFlmiHyzx2JYc5WC/rqtYVSOSl+nH+CMnKiNS+VPyPskXwf4v2xUtOd
-         su+fVgrWTIqHvj2wbwUorVK08mWDJgHKg5eXG86IemI6x3PBAd/rtgn4wz7H+vFooc
-         DOsW4RSvLUfWbAGdK8DKkrD1Pyc5tzUyPRXfem0wQJfdpQPeVqCZ7Rqcb2XlcJw2aa
-         IYtzhmMTlsXUQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 60DAFC395F0;
-        Fri,  3 Nov 2023 02:37:38 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Update for 6.7
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
-References: <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
- <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
- <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
- <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
- <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
- <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
- <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
- <ZOxnTFhchkTvKpZV@gondor.apana.org.au> <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.7-p1
-X-PR-Tracked-Commit-Id: a312e07a65fb598ed239b940434392721385c722
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: bc3012f4e3a9765de81f454cb8f9bb16aafc6ff5
-Message-Id: <169897905838.11650.13981583074688101494.pr-tracker-bot@kernel.org>
-Date:   Fri, 03 Nov 2023 02:37:38 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Fri, 3 Nov 2023 01:33:30 -0400
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B35E018B;
+        Thu,  2 Nov 2023 22:33:24 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2L8vPV025634;
+        Thu, 2 Nov 2023 22:33:12 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=++u2QPmCV6gWswyCJVglrBgtKR9wwnznpwMNf3rdKew=;
+ b=cVL8B6Tq2H2EuAR6RKBUzeNXM7l2XNwksELNjSG+OZ7GPbYIDpI5HR50aRe3oazcFIJS
+ ZXPsfuT+kL0G5/7WDpCJZr6Szz7w3LY1v5atQ9SilI8NfS3Di+zUe3WZhfQ7HPBVr+2o
+ pynLmrbSnqAw09veleHkmNrHzh/h/QHH8ZNMyOq9roZEhIKybilxsstTuERGXLp7xQRj
+ T3LoZ6tSjtIrFJdmosZ5jPvRyy5JdHosKZip4uCcDyJcat3LbJt/EN5fit5y/MFnRrBx
+ NMA5R/JihkCQCRtVhO1I2Mdif/SPEUpnKWImLvEBhv9lqXIpnuAI0ypBnsg/cglH6WsI 4Q== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+        by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3u3y235dxr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Thu, 02 Nov 2023 22:33:12 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 2 Nov
+ 2023 22:33:10 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 2 Nov 2023 22:33:10 -0700
+Received: from localhost.localdomain (unknown [10.28.36.175])
+        by maili.marvell.com (Postfix) with ESMTP id 86F2C3F7070;
+        Thu,  2 Nov 2023 22:33:07 -0700 (PDT)
+From:   Srujana Challa <schalla@marvell.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <bbrezillon@kernel.org>,
+        <arno@natisbad.org>, <kuba@kernel.org>, <ndabilpuram@marvell.com>,
+        <sgoutham@marvell.com>, <schalla@marvell.com>
+Subject: [PATCH v1 00/10] Add Marvell CN10KB/CN10KA B0 support
+Date:   Fri, 3 Nov 2023 11:02:56 +0530
+Message-ID: <20231103053306.2259753-1-schalla@marvell.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: rk-1i1-YhAlpep0PIGw0aEJl15nvYkxf
+X-Proofpoint-GUID: rk-1i1-YhAlpep0PIGw0aEJl15nvYkxf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-03_05,2023-11-02_03,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Thu, 2 Nov 2023 14:56:05 +0800:
+Marvell OcteonTX2's next gen platform CN10KB/CN10KA B0
+introduced changes in CPT SG input format(SGv2) to make
+it compatibile with NIX SG input format, to support inline
+IPsec in SG mode.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.7-p1
+This patchset modifies the octeontx2 CPT driver code to
+support SGv2 format for CN10KB/CN10KA B0. And also adds
+code to configure newly introduced HW registers.
+This patchset also implements SW workaround for couple of
+HW erratas.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/bc3012f4e3a9765de81f454cb8f9bb16aafc6ff5
+---
+v1:
+- Documented devlink parameters supported by octeontx2 CPT
+  driver.
+---
 
-Thank you!
+Nithin Dabilpuram (2):
+  crypto/octeontx2: register error interrupts for inline cptlf
+  crypto: octeontx2: support setting ctx ilen for inline CPT LF
+
+Srujana Challa (8):
+  crypto: octeontx2: remove CPT block reset
+  crypto: octeontx2: add SGv2 support for CN10KB or CN10KA B0
+  crypto: octeontx2: add devlink option to set max_rxc_icb_cnt
+  crypto: octeontx2: add devlink option to set t106 mode
+  crypto: octeontx2: remove errata workaround for CN10KB or CN10KA B0
+    chip.
+  crypto: octeontx2: add LF reset on queue disable
+  octeontx2-af: update CPT inbound inline IPsec mailbox
+  crypto: octeontx2: add ctx_val workaround
+
+ Documentation/crypto/device_drivers/index.rst |   9 +
+ .../crypto/device_drivers/octeontx2.rst       |  29 ++
+ Documentation/crypto/index.rst                |   1 +
+ drivers/crypto/marvell/octeontx2/cn10k_cpt.c  |  87 +++++-
+ drivers/crypto/marvell/octeontx2/cn10k_cpt.h  |  25 ++
+ .../marvell/octeontx2/otx2_cpt_common.h       |  68 +++-
+ .../marvell/octeontx2/otx2_cpt_devlink.c      |  88 +++++-
+ .../marvell/octeontx2/otx2_cpt_hw_types.h     |   9 +-
+ .../marvell/octeontx2/otx2_cpt_mbox_common.c  |  26 ++
+ .../marvell/octeontx2/otx2_cpt_reqmgr.h       | 293 ++++++++++++++++++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.c | 131 +++++---
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.h | 102 ++++--
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   4 +
+ .../marvell/octeontx2/otx2_cptpf_main.c       |  76 ++---
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       |  81 ++++-
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      |  49 +--
+ .../marvell/octeontx2/otx2_cptpf_ucode.h      |   3 +-
+ drivers/crypto/marvell/octeontx2/otx2_cptvf.h |   2 +
+ .../marvell/octeontx2/otx2_cptvf_algs.c       |  31 ++
+ .../marvell/octeontx2/otx2_cptvf_algs.h       |   5 +
+ .../marvell/octeontx2/otx2_cptvf_main.c       |  25 +-
+ .../marvell/octeontx2/otx2_cptvf_mbox.c       |  27 ++
+ .../marvell/octeontx2/otx2_cptvf_reqmgr.c     | 162 +---------
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  20 ++
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  14 +
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   1 +
+ 26 files changed, 1063 insertions(+), 305 deletions(-)
+ create mode 100644 Documentation/crypto/device_drivers/index.rst
+ create mode 100644 Documentation/crypto/device_drivers/octeontx2.rst
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.25.1
+
