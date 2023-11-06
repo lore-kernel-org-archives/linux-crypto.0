@@ -2,199 +2,123 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F18FC4332F
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Nov 2023 15:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B71A3C41535
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Nov 2023 17:05:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232072AbjKFP0F (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Nov 2023 10:26:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54390 "EHLO
+        id S229974AbjKFRFw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Nov 2023 12:05:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232077AbjKFP0E (ORCPT
+        with ESMTP id S231792AbjKFRFv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Nov 2023 10:26:04 -0500
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.165])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA4F8125;
-        Mon,  6 Nov 2023 07:25:59 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1699284356; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=UCypJLI2/6Im0BcJK2hsUf5uWGwEgvC6d7BF+zVrib0j+3ldCtveiqz0JlHaqubsQ/
-    F1ZDbHMuh1mLc8BG6iaMiAOVz01HCqzmF6bj9463VXt0myJ7i3flaZL8x2DSbgNEFdeP
-    NCd52aTp/wLkAqqQjZJ6/KyOUsnMi05g5oGr0JZCesYFiUdcI3ARx2hDUmcb1D1RTHV9
-    Tq0CzEPH5S4JwCg8XuGKLsPZOCVYkP4ez1MvsxSqNxB1Vl6srjhggvP1RsNMpDqP3g6c
-    Ulx8vcwSu+9z6AiUeVVRQgnzqyeTbz7WOv+S13qSkkTGHiXmRJTU+9y7cZ3+VjwocCI7
-    gTjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1699284356;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=4+7Xy5eB573jOAnhsPwiB88+6XPcbZGKnLQ8s6Ckgzo=;
-    b=m8RlJIOtDcYSysLv/GKbiCjSuEGVVhagrGvDMTdNm1I/CGp/Q7inMUdeLeZXnDLBwt
-    64skjjyNhIuRMS5pdlMPqP5VgZOzWNuwfxvMDaS9f+JsvF6Z6PozFSJGBajcAEd0SkiC
-    OrUEAlAaCR+b9Q3XXpFdYfCTJG5QDkDCo8z2nX0ZIOWsfT7esEGubqUMASP+BUSjpxlV
-    LF4NYJcLsHHKshDH4qh1is6cMsRXpPrFt6+qH+VAR5RxlCDDc9XoZTuyp6k4h0hq8fAy
-    IR1r1wBb3+6S/T4qqvFAL3apQrRxG84iICrSFc6EnPx0LFpUZl9AWAM+8TYFOCKskZom
-    AG5w==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1699284356;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=4+7Xy5eB573jOAnhsPwiB88+6XPcbZGKnLQ8s6Ckgzo=;
-    b=XRo1mPwdu9PLzhUr5RqXiezTiv3NxqcdNsI2ctoiy915GEbsgr6s3cpS0iAMHX6ohh
-    lRmW6+I4XrtQyIOQwmbuf6EiBP1RsC43HQiD9KptwKxi7fzXGG4enR141j+QXw7yMaPQ
-    InNFinFzTemGQdMgpWfJFgFzsz3FrY60w/n9Rx586ohS3VDAX9v5Ve0dBLhvZTFUDrGn
-    lF+u5n5GoxL70duglcOkpumo06UzSvKk2hudk1HwPZAbSwcskylIcfll2e/Ye4i68woZ
-    CmedpbHoBsD06z/GpLbNd06w1Pz5lZd08QYDdScoAlfr8OePD5iFn+cpqvWnYIc6tDWO
-    kN6g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1699284356;
-    s=strato-dkim-0003; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=4+7Xy5eB573jOAnhsPwiB88+6XPcbZGKnLQ8s6Ckgzo=;
-    b=oOrkLeqOsc787HxWrD7wGw20Eu/e6FHS9dXU5xvGR5f0Minu2DVhDTYXxVW1r0Leum
-    LswCVbMvhD62XWy7DzBg==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmwdP57PWmc+BP1jdA=="
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 49.9.1 AUTH)
-    with ESMTPSA id 6b1cadzA6FPrBht
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Mon, 6 Nov 2023 16:25:53 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH] crypto: jitterentropy - Hide esoteric Kconfig options under FIPS
- and EXPERT
-Date:   Mon, 06 Nov 2023 16:25:51 +0100
-Message-ID: <3094055.QNPB7aoccF@tauon.chronox.de>
-In-Reply-To: <ZUi5KMUaNkp0c1Ds@gondor.apana.org.au>
-References: <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
- <CAHk-=wh=xH7TNHeaYdsrVW6p1fCQEV5PZMpaFNsZyXYqzn8Stg@mail.gmail.com>
- <ZUi5KMUaNkp0c1Ds@gondor.apana.org.au>
+        Mon, 6 Nov 2023 12:05:51 -0500
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E552191;
+        Mon,  6 Nov 2023 09:05:48 -0800 (PST)
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A6ARCgu025332;
+        Mon, 6 Nov 2023 17:05:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=wnNHnFEMyfOZMGjEKUau1Yf64RRAah49EJ8lArNY59Q=;
+ b=BtGTw+AzMmJD0qTvfHNn6fwP3qJXAUztU7Z/Kh4NguxnCxNaa+NlGiUPF3a3dAEI9fAA
+ Xcfa4xWKpXg2gHB+dXaTvH3/etceFJ8eDTFKQnq607ecTKfbyXAvzXAjqnYYiTTYE0er
+ dqh+DGb3TuW0QiZiAtX8/qoundcZ9+VVkvSLTmsQVHXhEhgWZJTQGTg074wWBbDgg3O9
+ GLgPQ0igDhTMg2L/QtxMvPL1zzSXMJBBP5VT1kFVdoDQcGW1gQqkNj/MFPOVIdHp4LwH
+ CKKYyLSes4Lh/kgvofkp++C2NafIdF/dqQ3JSzp3MSdORTbnXsO5HFl3ZU7CwZopJ06Y Zw== 
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3u5efymwhy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Nov 2023 17:05:37 +0000
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+        by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3A6H5aMk002573
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 6 Nov 2023 17:05:36 GMT
+Received: from [10.71.108.203] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Mon, 6 Nov
+ 2023 09:05:36 -0800
+Message-ID: <e2b73ea0-c659-431e-9275-88d1a98f37cf@quicinc.com>
+Date:   Mon, 6 Nov 2023 09:05:36 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RESEND PATCH] dt-bindings: crypto: qcom,prng: Add SM8450
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>
+CC:     Conor Dooley <conor.dooley@microchip.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20231103225255.867243-1-quic_eberman@quicinc.com>
+ <04707003-531c-4c58-af74-e770d22d85e4@linaro.org>
+Content-Language: en-US
+From:   Elliot Berman <quic_eberman@quicinc.com>
+In-Reply-To: <04707003-531c-4c58-af74-e770d22d85e4@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: o_DmlOkt3kEXJKMkLTRMgQjammDGuK-L
+X-Proofpoint-ORIG-GUID: o_DmlOkt3kEXJKMkLTRMgQjammDGuK-L
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-06_12,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=986 priorityscore=1501 malwarescore=0 mlxscore=0 clxscore=1015
+ phishscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311060139
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Montag, 6. November 2023, 11:00:08 CET schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Thu, Nov 02, 2023 at 08:32:36PM -1000, Linus Torvalds wrote:
-> > I think that would help the situation, but I assume the sizing for the
-> > jitter buffer is at least partly due to trying to account for cache
-> > sizing or similar issues?
-> > 
-> > Which really means that I assume any static compile-time answer to
-> > that question is always wrong - whether you are an expert or not.
-> > Unless you are just building the thing for one particular machine.
-> > 
-> > So I do think the problem is deeper than "this is a question only for
-> > experts". I definitely don't think you should ask a regular user (or
-> > even a distro kernel package manager). I suspect it's likely that the
-> > question is just wrong in general - because any particular one buffer
-> > size for any number of machines simply cannot be the right answer.
-> > 
-> > I realize that the commit says "*allow* for configuration of memory
-> > size", but I really question the whole approach.
-> 
-> Yes I think these are all valid points.  I just noticed that I
-> forgot to cc the author so let's see if Stephan has anything to
-> add.
-
-I concur that these questions are more for experts. 
-> 
-> > But yes - hiding these questions from any reasonable normal user is at
-> > least a good first step.
-> 
-> OK here's the patch:
-> 
-> ---8<---
-> As JITTERENTROPY is selected by default if you enable the CRYPTO
-> API, any Kconfig options added there will show up for every single
-> user.  Hide the esoteric options under EXPERT as well as FIPS so
-> that only distro makers will see them.
-> 
-> Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index bbf51d55724e..70661f58ee41 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -1297,10 +1297,12 @@ config CRYPTO_JITTERENTROPY
-> 
->  	  See https://www.chronox.de/jent.html
-> 
-> +if CRYPTO_JITTERENTROPY
-> +if CRYPTO_FIPS && EXPERT
-> +
->  choice
->  	prompt "CPU Jitter RNG Memory Size"
->  	default CRYPTO_JITTERENTROPY_MEMSIZE_2
-> -	depends on CRYPTO_JITTERENTROPY
->  	help
->  	  The Jitter RNG measures the execution time of memory accesses.
->  	  Multiple consecutive memory accesses are performed. If the memory
-> @@ -1344,7 +1346,6 @@ config CRYPTO_JITTERENTROPY_OSR
->  	int "CPU Jitter RNG Oversampling Rate"
->  	range 1 15
->  	default 1
-> -	depends on CRYPTO_JITTERENTROPY
->  	help
->  	  The Jitter RNG allows the specification of an oversampling rate (OSR).
->  	  The Jitter RNG operation requires a fixed amount of timing
-> @@ -1359,7 +1360,6 @@ config CRYPTO_JITTERENTROPY_OSR
-> 
->  config CRYPTO_JITTERENTROPY_TESTINTERFACE
->  	bool "CPU Jitter RNG Test Interface"
-> -	depends on CRYPTO_JITTERENTROPY
->  	help
->  	  The test interface allows a privileged process to capture
->  	  the raw unconditioned high resolution time stamp noise that
-> @@ -1377,6 +1377,28 @@ config CRYPTO_JITTERENTROPY_TESTINTERFACE
-> 
->  	  If unsure, select N.
-> 
-> +endif	# if CRYPTO_FIPS && EXPERT
-> +
-> +if !(CRYPTO_FIPS && EXPERT)
-> +
-> +config CRYPTO_JITTERENTROPY_MEMORY_BLOCKS
-> +	int
-> +	default 64
-> +
-> +config CRYPTO_JITTERENTROPY_MEMORY_BLOCKSIZE
-> +	int
-> +	default 32
-> +
-> +config CRYPTO_JITTERENTROPY_OSR
-> +	int
-> +	default 1
-> +
-> +config CRYPTO_JITTERENTROPY_TESTINTERFACE
-> +	bool
-> +
-> +endif	# if !(CRYPTO_FIPS && EXPERT)
-> +endif	# if CRYPTO_JITTERENTROPY
-> +
->  config CRYPTO_KDF800108_CTR
->  	tristate
->  	select CRYPTO_HMAC
-
-Reviewed-by: Stephan Mueller <smueller@chronox.de>
 
 
-Ciao
-Stephan
+On 11/5/2023 5:03 AM, Krzysztof Kozlowski wrote:
+> On 03/11/2023 23:52, Elliot Berman wrote:
+>> From: Konrad Dybcio <konrad.dybcio@linaro.org>
+>>
+>> SM8450's PRNG does not require a core clock reference. Add a new
+>> compatible with a qcom,prng-ee fallback and handle that.
+>>
+>> Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+>> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+>> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
+>> ---
+>> I noticed this patch got missed while running make dtbs_check. No
+>> changes to this patch from the original version:
+>>
+>> https://lore.kernel.org/all/2c208796-5ad6-c362-dabc-1228b978ca1d@linaro.org/
+>>
+> 
+> I don't understand why do you send this. This is not a correct patch,
+> was rejected. Different patch was already merged.
 
+I see that 6.6 has
 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/arm64/boot/dts/qcom/sm8450.dtsi?h=v6.6#n1741
+
+but bindings not updated:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/crypto/qcom,prng.yaml?h=v6.6
+
+I came up with similar-ish fix offline, then found Konrad had posted the patch when searching lore.
+I didn't find any other patch on lore. 
+
+I think you rejected a proposal to drop "p" from "prng", but this patch
+doesn't do that and we stayed course with naming scheme.
+
+Thanks,
+
+Elliot
