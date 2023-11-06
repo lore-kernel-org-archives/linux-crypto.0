@@ -2,59 +2,67 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5AD4C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Nov 2023 10:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C20C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Nov 2023 10:11:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229922AbjKFKJB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Nov 2023 05:09:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39206 "EHLO
+        id S229478AbjKFKL3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Nov 2023 05:11:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229974AbjKFKJB (ORCPT
+        with ESMTP id S229689AbjKFKL2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Nov 2023 05:09:01 -0500
+        Mon, 6 Nov 2023 05:11:28 -0500
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3266CFA;
-        Mon,  6 Nov 2023 02:08:58 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E43D9A9
+        for <linux-crypto@vger.kernel.org>; Mon,  6 Nov 2023 02:11:25 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qzwX7-00EXgv-7O; Mon, 06 Nov 2023 18:08:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Nov 2023 18:08:44 +0800
-Date:   Mon, 6 Nov 2023 18:08:44 +0800
+        id 1qzwZY-00EXk2-2P; Mon, 06 Nov 2023 18:11:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Nov 2023 18:11:15 +0800
+Date:   Mon, 6 Nov 2023 18:11:15 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pizhenwei@bytedance.com" <pizhenwei@bytedance.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH] crypto: virtio-crypto: call finalize with bh disabled
-Message-ID: <ZUi7LNhFFAumgRZ2@gondor.apana.org.au>
-References: <1914739e2de14ed396e5674aa2d4766c@huawei.com>
- <20230926184158.4ca2c0c3.pasic@linux.ibm.com>
- <adb0c5f790dc408887f9d98548373919@huawei.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     agk@redhat.com, snitzer@kernel.org, dm-devel@lists.linux.dev,
+        linux-crypto@vger.kernel.org, gilad@benyossef.com,
+        samitolvanen@google.com
+Subject: Re: [PATCH] dm-verity: hash blocks with shash import+finup when
+ possible
+Message-ID: <ZUi7ww5BMr7V+axG@gondor.apana.org.au>
+References: <20231030023351.6041-1-ebiggers@kernel.org>
+ <ZUHZQ3tJH0WSV9dX@gondor.apana.org.au>
+ <20231101054856.GA140941@sol.localdomain>
+ <ZUMo87EMeYxiCZLX@gondor.apana.org.au>
+ <20231102054008.GG1498@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <adb0c5f790dc408887f9d98548373919@huawei.com>
+In-Reply-To: <20231102054008.GG1498@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 02, 2023 at 01:01:09PM +0000, Gonglei (Arei) wrote:
+On Wed, Nov 01, 2023 at 10:40:08PM -0700, Eric Biggers wrote:
 >
-> > So I think the core of this question is: Can we call crypto_finalize_request() in
-> > the upper half of the interrupt?
+> Do you have in mind making struct ahash_request specify the data by either
+> scatterlist or by virtual address?  It might be possible.  It would be necessary
+> to wire up all possible combinations of (SG, virt) x (ahash_alg, shash_alg),
+> with the vmalloc_to_page() hack for the virt + ahash_alg case.
 
-The finalize path originates from the network stack.  So the conditions
-are the same as that of the network stack receive side.  That means
-hard IRQ paths are unacceptable but softirq is OK.
+Yes that's what I had in mind.  We need to do something similar
+for akcipher now that the top-level interface is linear only but
+the drivers are still SG-based.
 
-Cheers,
+> Well, struct shash_desc used to have that flag, but it never did anything.  The
+> few use cases like this might be more simply served by just having a helper
+> function crypto_shash_update_large() that passes the data in chunks to
+> crypto_shash_update().
+
+Are you volunteering to add this interface? :)
+
+The module signature path is really broken right now, at least on
+non-preemptible kernels.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
