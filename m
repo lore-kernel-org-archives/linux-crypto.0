@@ -1,22 +1,22 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D895231A60
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 15:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9730315AB
+	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 15:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HNQryBwy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C5D3C433CA;
-	Tue,  7 Nov 2023 15:51:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OssHrQqm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7460AC433C9;
+	Tue,  7 Nov 2023 15:52:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699372311;
-	bh=JRaCMmeUHOpkMsD5FM5wVvtts7+xQvT5yXIyazYQIx8=;
+	s=k20201202; t=1699372374;
+	bh=PsjWDKrvCnrYkyQWoxTiJemIijmjf0M5UJ0Pzvb3jBg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HNQryBwy0flcsyG1rgjFnp/Rkdtjb3PsFio9DaI1lttXZolHCnNFWJTJZGL6fx6RE
-	 R+S9z/tHfB8cgssJM74FAQ+cCFgeHw4pnzBIMpt8vLbBcTX0FaJIDj78FMEhfWr433
-	 wzs81zuG9Ak/HAejXKj38SDcBkXlo6JAJZFxjtc8xEZd1Z+jhPjqpRFh/Sm9KvMLsE
-	 cnDpQLyP3nW7KmlmapOtMVeUnFnppovnKpzrovsceiyzOMT6d8OfnBpQH4M+wXlBhF
-	 uOTY24wor3TJ31n74OjtrpDV2tafCk1CmjVxyZSExYlUTDpSja8F/DUFovcGfx25Vv
-	 C2WpYRdwW9kaA==
+	b=OssHrQqmgyI6F0q7ncw3ivdswPlnhRVCx9OG3i7W4/uKSjI9Igftf3OFpbeOKJBOn
+	 /LbKaObMCs3IDAxMednkOw8OWVCe45VU+/ju5olqKPTyGzVHQhLlkJjIh9iXCcaiSP
+	 YG4lQtdIcXXaEBX+tRF5qe+o0+n4hPLEhAZIx3IRIEb0tnEnmzWLzXNI2HXK5UZx7d
+	 GSm5mnsR4vTn9HEN4aA+rc+x3pTgffTO1YwPB2u6b6nr0SZrZCxjFxD5orlHcA6p/n
+	 qqRsRCmQbkuX8UU/zmPAFygC9ZLBBZ3BRez39MhyjelDz1hxnh8BKe4jPcuj+UkrQL
+	 WNul4jN1BNUXg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -28,12 +28,12 @@ Cc: Lu Jialin <lujialin4@huawei.com>,
 	davem@davemloft.net,
 	daniel.m.jordan@oracle.com,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 02/22] crypto: pcrypt - Fix hungtask for PADATA_RESET
-Date: Tue,  7 Nov 2023 10:51:11 -0500
-Message-ID: <20231107155146.3767610-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 02/16] crypto: pcrypt - Fix hungtask for PADATA_RESET
+Date: Tue,  7 Nov 2023 10:52:21 -0500
+Message-ID: <20231107155249.3768098-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231107155146.3767610-1-sashal@kernel.org>
-References: <20231107155146.3767610-1-sashal@kernel.org>
+In-Reply-To: <20231107155249.3768098-1-sashal@kernel.org>
+References: <20231107155249.3768098-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,7 +42,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.137
+X-stable-base: Linux 5.10.199
 Content-Transfer-Encoding: 8bit
 
 From: Lu Jialin <lujialin4@huawei.com>
@@ -131,10 +131,10 @@ index 9d10b846ccf73..005a36cb21bc4 100644
  	return err;
  }
 diff --git a/kernel/padata.c b/kernel/padata.c
-index c17f772cc315a..495fea06e11b1 100644
+index 11ca3ebd8b123..ece4a2b77d32b 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -194,7 +194,7 @@ int padata_do_parallel(struct padata_shell *ps,
+@@ -207,7 +207,7 @@ int padata_do_parallel(struct padata_shell *ps,
  		*cb_cpu = cpu;
  	}
  
