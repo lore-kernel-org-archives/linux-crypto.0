@@ -1,146 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D99315AB
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 15:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14075315BE
+	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 15:55:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DFlkUy2R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37E22C4339A;
-	Tue,  7 Nov 2023 15:55:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699372512;
-	bh=rN34HJccc0MgnxiL7U+b7CMTWpNgY13wMW9CktmJ3bI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=DFlkUy2RX3kAUtDXc76yeVcvkDWX1yimD8IhcWFctJ92Coin61EnYdf+bFm5CKmut
-	 X1Yahvd5630OLxovMoTu33Toa0sdviSelQQ+1a7AnQeTYBUSP1r+zfrpa68lCJKFhm
-	 CwtwTyX4D5mP/7WHdJPuUN84y+AFapnJ/d9EhzNIOtKnqyw14HWY+TAt7sXv5kVzTr
-	 0upRfMXGJ0hqs5w8GmPGwQjqQ9lRJXrQyHJMLCMSD+hRqnwmOj+rPzu9RxbM3Lz/kq
-	 c7+74Yc0sHHUV6oQ9URfH10zFcUstGTVaflhxBdabSsPu7gUPfzuTc18PN8EmnT1Em
-	 S2ck/52HDnK0Q==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Lu Jialin <lujialin4@huawei.com>,
-	Guo Zihua <guozihua@huawei.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Sasha Levin <sashal@kernel.org>,
-	steffen.klassert@secunet.com,
-	davem@davemloft.net,
-	daniel.m.jordan@oracle.com,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 1/9] crypto: pcrypt - Fix hungtask for PADATA_RESET
-Date: Tue,  7 Nov 2023 10:54:51 -0500
-Message-ID: <20231107155509.3769038-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.42.0
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="lb1Z3uYh"
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 518EF46B6
+	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 07:55:46 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-507ad511315so8432593e87.0
+        for <linux-crypto@vger.kernel.org>; Tue, 07 Nov 2023 07:55:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1699372544; x=1699977344; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dwIY2rn/dEbSPVpdhU2+f4uOVwzcygzYY5LLYZc61cU=;
+        b=lb1Z3uYhdRyz+ZQZdcQkp/JsP7erLsukxm7K8ttXw7a4MDTx7nAjWilC6/ykwBsSiz
+         9ah6PDdkJFggacY5pjPL/Dq9458r7WcbRlWSuHNZrawPl+jMNbPcocRSU9L1BsGC77GW
+         FW9k5tqQQ8MZmTjtZWEEPfP74P6wO0N2OKZ/SjGTjTtmLjx4/x06Z09vLqa4MJhaPx5E
+         NPoDdY6iEM7EFGmVlMzlAOqj5jw/Flee7uU1q+yourjDzxHunDhuyLDrpCDqGQMDdHmr
+         3IJKP8KAXqO/2agU9twgDZHpNndk2Uxwycnu60orLpYw6bUYHcN//VsfEJVr2kBmC6qu
+         h1BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699372544; x=1699977344;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dwIY2rn/dEbSPVpdhU2+f4uOVwzcygzYY5LLYZc61cU=;
+        b=onhmzsXACSXfIE40NvPKzOWvDNLyhDmSdWdUy9eYGBAqHXnRlQGCHP4Ys794KLAZXq
+         HjM0Ggp0wdDoqY7eFmoCUvCSlEKblD1Ftwbv7wo2OCkNdkMqraV6fH+OOr/2uHkxHcmV
+         Vdhu/Ezn3n+zPughblhEqZoGExPdd7FGUwgAjx7Q4/XFzvADbLxK2TrAzlJzN9ikQFer
+         LvrgFXrQJXTQRyMNb9SmIl+ZRlINKWADgdztjv62QYNywr+CF2+QK5HeJFEdNPsaU0bq
+         oMxCzvQFo49b437M7TYLQI8lRwdiyAccyzs2ulcudpQS6dQ7fHPizD09uL92wVrDNb33
+         GWaA==
+X-Gm-Message-State: AOJu0YwSHzLmYWrG74n0rANmafTmgQpFknrPTTAbqZ4YcK0tdYEzz6R+
+	8bKVLcGAavxUFiD3AcqOLgse5Q==
+X-Google-Smtp-Source: AGHT+IEW/M54tsfmWAXd/ApYtb7f8HXdpcpbgcYJR/UxDO6jor1uWlDWpgFp9h1Fwj1h6vqEmi/WOg==
+X-Received: by 2002:ac2:430a:0:b0:503:257a:7f5d with SMTP id l10-20020ac2430a000000b00503257a7f5dmr21683796lfh.31.1699372544418;
+        Tue, 07 Nov 2023 07:55:44 -0800 (PST)
+Received: from arnold.baylibre (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.googlemail.com with ESMTPSA id f6-20020a05600c4e8600b003fefb94ccc9sm16579085wmq.11.2023.11.07.07.55.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 07:55:43 -0800 (PST)
+From: Corentin Labbe <clabbe@baylibre.com>
+To: davem@davemloft.net,
+	heiko@sntech.de,
+	herbert@gondor.apana.org.au,
+	krzysztof.kozlowski+dt@linaro.org,
+	mturquette@baylibre.com,
+	p.zabel@pengutronix.de,
+	robh+dt@kernel.org,
+	sboyd@kernel.org
+Cc: ricardo@pardini.net,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-clk@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH 0/6] crypto: rockchip: add support for rk3588/rk3568
+Date: Tue,  7 Nov 2023 15:55:26 +0000
+Message-Id: <20231107155532.3747113-1-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.14.328
 Content-Transfer-Encoding: 8bit
 
-From: Lu Jialin <lujialin4@huawei.com>
+Hello
 
-[ Upstream commit 8f4f68e788c3a7a696546291258bfa5fdb215523 ]
+This patch serie add support for the new crypto rockchip IP found on
+rk3568 and rk3588.
+It was tested with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
 
-We found a hungtask bug in test_aead_vec_cfg as follows:
+I would like to thanks all people which helped to test this driver
 
-INFO: task cryptomgr_test:391009 blocked for more than 120 seconds.
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-Call trace:
- __switch_to+0x98/0xe0
- __schedule+0x6c4/0xf40
- schedule+0xd8/0x1b4
- schedule_timeout+0x474/0x560
- wait_for_common+0x368/0x4e0
- wait_for_completion+0x20/0x30
- wait_for_completion+0x20/0x30
- test_aead_vec_cfg+0xab4/0xd50
- test_aead+0x144/0x1f0
- alg_test_aead+0xd8/0x1e0
- alg_test+0x634/0x890
- cryptomgr_test+0x40/0x70
- kthread+0x1e0/0x220
- ret_from_fork+0x10/0x18
- Kernel panic - not syncing: hung_task: blocked tasks
+Regards
 
-For padata_do_parallel, when the return err is 0 or -EBUSY, it will call
-wait_for_completion(&wait->completion) in test_aead_vec_cfg. In normal
-case, aead_request_complete() will be called in pcrypt_aead_serial and the
-return err is 0 for padata_do_parallel. But, when pinst->flags is
-PADATA_RESET, the return err is -EBUSY for padata_do_parallel, and it
-won't call aead_request_complete(). Therefore, test_aead_vec_cfg will
-hung at wait_for_completion(&wait->completion), which will cause
-hungtask.
+Corentin Labbe (6):
+  dt-bindings: crypto: add support for rockchip,crypto-rk3588
+  MAINTAINERS: add new dt-binding doc to the right entry
+  ARM64: dts: rk3588: add crypto node
+  ARM64: dts: rk356x: add crypto node
+  reset: rockchip: secure reset must be used by SCMI
+  crypto: rockchip: add rk3588 driver
 
-The problem comes as following:
-(padata_do_parallel)                 |
-    rcu_read_lock_bh();              |
-    err = -EINVAL;                   |   (padata_replace)
-                                     |     pinst->flags |= PADATA_RESET;
-    err = -EBUSY                     |
-    if (pinst->flags & PADATA_RESET) |
-        rcu_read_unlock_bh()         |
-        return err
+ .../crypto/rockchip,rk3588-crypto.yaml        |  65 ++
+ MAINTAINERS                                   |   1 +
+ arch/arm64/boot/dts/rockchip/rk356x.dtsi      |  12 +
+ arch/arm64/boot/dts/rockchip/rk3588s.dtsi     |  12 +
+ drivers/clk/rockchip/rst-rk3588.c             |  42 -
+ drivers/crypto/Kconfig                        |  29 +
+ drivers/crypto/rockchip/Makefile              |   5 +
+ drivers/crypto/rockchip/rk2_crypto.c          | 739 ++++++++++++++++++
+ drivers/crypto/rockchip/rk2_crypto.h          | 246 ++++++
+ drivers/crypto/rockchip/rk2_crypto_ahash.c    | 344 ++++++++
+ drivers/crypto/rockchip/rk2_crypto_skcipher.c | 576 ++++++++++++++
+ .../dt-bindings/reset/rockchip,rk3588-cru.h   |  68 +-
+ 12 files changed, 2063 insertions(+), 76 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml
+ create mode 100644 drivers/crypto/rockchip/rk2_crypto.c
+ create mode 100644 drivers/crypto/rockchip/rk2_crypto.h
+ create mode 100644 drivers/crypto/rockchip/rk2_crypto_ahash.c
+ create mode 100644 drivers/crypto/rockchip/rk2_crypto_skcipher.c
 
-In order to resolve the problem, we replace the return err -EBUSY with
--EAGAIN, which means parallel_data is changing, and the caller should call
-it again.
-
-v3:
-remove retry and just change the return err.
-v2:
-introduce padata_try_do_parallel() in pcrypt_aead_encrypt and
-pcrypt_aead_decrypt to solve the hungtask.
-
-Signed-off-by: Lu Jialin <lujialin4@huawei.com>
-Signed-off-by: Guo Zihua <guozihua@huawei.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- crypto/pcrypt.c | 4 ++++
- kernel/padata.c | 2 +-
- 2 files changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 62e11835f220e..1e9de81ef84fa 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -174,6 +174,8 @@ static int pcrypt_aead_encrypt(struct aead_request *req)
- 	err = pcrypt_do_parallel(padata, &ctx->cb_cpu, &pencrypt);
- 	if (!err)
- 		return -EINPROGRESS;
-+	if (err == -EBUSY)
-+		return -EAGAIN;
- 
- 	return err;
- }
-@@ -218,6 +220,8 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
- 	err = pcrypt_do_parallel(padata, &ctx->cb_cpu, &pdecrypt);
- 	if (!err)
- 		return -EINPROGRESS;
-+	if (err == -EBUSY)
-+		return -EAGAIN;
- 
- 	return err;
- }
-diff --git a/kernel/padata.c b/kernel/padata.c
-index f56ec63f60ba8..82f6d5bf5cb45 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -120,7 +120,7 @@ int padata_do_parallel(struct padata_instance *pinst,
- 	if (!cpumask_test_cpu(cb_cpu, pd->cpumask.cbcpu))
- 		goto out;
- 
--	err =  -EBUSY;
-+	err = -EBUSY;
- 	if ((pinst->flags & PADATA_RESET))
- 		goto out;
- 
 -- 
-2.42.0
+2.41.0
 
