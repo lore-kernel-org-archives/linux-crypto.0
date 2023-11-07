@@ -1,22 +1,22 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE92315AC
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 15:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E375A315AB
+	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 15:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e/qtbT9C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABFCCC433C7;
-	Tue,  7 Nov 2023 15:53:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XczKj+Xo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95B72C433C8;
+	Tue,  7 Nov 2023 15:54:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699372426;
-	bh=t5ELZNCIML39X1OpTlA9h4f70gLhWrjCCSxwMpd/wkU=;
+	s=k20201202; t=1699372473;
+	bh=2WdsVUiAfYxrVcPeYECimo+kHKgZIJKwzaynU8H25qc=;
 	h=From:To:Cc:Subject:Date:From;
-	b=e/qtbT9CzY2GUCmqLufaJ+PAFG2wfvLPdmrCSbCRlLedM/U7trT9uSuVnspsD662F
-	 8cWIqitqiobbmwfvhG2WGbO/HKiyEpG1nCYl6S7BeAt2fpVRR/bWzXLH4IkuZYXjhS
-	 4ihfFffMXzKZBkrvDFsNpXcxRv8oWfYCECmY8z+r1wNlhIyIU7v+0WHGjWUTmWdr+a
-	 LoFPP7CUHiRK3HxZjEcx0pInZ/SUn7mehct5QHm6V+kLWqi+9Tf54mHUCXv3eKLf19
-	 +k9uDe3BlkNI9M+W7lsDQU/12UvFiHyAb1yceRk5y1beoSz1URH6I97vpVRWDgu0Nm
-	 nxBKi2ob1D0Ag==
+	b=XczKj+XoqEJ3o8tWljioNqDxgFHV7oSjGWRKJ1r48CqWZE8IpEODRK97tYEVi/ODz
+	 i2Gudo0kaZ0y1yGp0yYonpShUPbRp6pw4Mkd8vJZOKn9TUsCV6pSnpxsv+CIVvN3i7
+	 2L57aw3rrAqVKJyA7a33dYzrtW7uL0kx18zcW1G0NkZT3Kexoiezw8lYK+BN3WWGD6
+	 JLfjOQiN3s+wxKUxGogkb/tJAjDTWch03SjMSPLqvev9oHa2ZKm17iGSH/bh7MvR0y
+	 BbT59QVAUQXY3XRDLFzyWZGkMyxij4bhzlcv4sYp7B9XXXXra6p8dSlpkkjtSYJ8cD
+	 7R0pWPwd3144g==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -28,9 +28,9 @@ Cc: Lu Jialin <lujialin4@huawei.com>,
 	davem@davemloft.net,
 	daniel.m.jordan@oracle.com,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 01/12] crypto: pcrypt - Fix hungtask for PADATA_RESET
-Date: Tue,  7 Nov 2023 10:53:19 -0500
-Message-ID: <20231107155343.3768464-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 01/11] crypto: pcrypt - Fix hungtask for PADATA_RESET
+Date: Tue,  7 Nov 2023 10:54:09 -0500
+Message-ID: <20231107155430.3768779-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -40,7 +40,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.259
+X-stable-base: Linux 4.19.297
 Content-Transfer-Encoding: 8bit
 
 From: Lu Jialin <lujialin4@huawei.com>
@@ -107,11 +107,11 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 276d2fd9e911c..63e64164900e8 100644
+index 62e11835f220e..1e9de81ef84fa 100644
 --- a/crypto/pcrypt.c
 +++ b/crypto/pcrypt.c
-@@ -118,6 +118,8 @@ static int pcrypt_aead_encrypt(struct aead_request *req)
- 	err = padata_do_parallel(ictx->psenc, padata, &ctx->cb_cpu);
+@@ -174,6 +174,8 @@ static int pcrypt_aead_encrypt(struct aead_request *req)
+ 	err = pcrypt_do_parallel(padata, &ctx->cb_cpu, &pencrypt);
  	if (!err)
  		return -EINPROGRESS;
 +	if (err == -EBUSY)
@@ -119,8 +119,8 @@ index 276d2fd9e911c..63e64164900e8 100644
  
  	return err;
  }
-@@ -165,6 +167,8 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
- 	err = padata_do_parallel(ictx->psdec, padata, &ctx->cb_cpu);
+@@ -218,6 +220,8 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
+ 	err = pcrypt_do_parallel(padata, &ctx->cb_cpu, &pdecrypt);
  	if (!err)
  		return -EINPROGRESS;
 +	if (err == -EBUSY)
@@ -129,12 +129,12 @@ index 276d2fd9e911c..63e64164900e8 100644
  	return err;
  }
 diff --git a/kernel/padata.c b/kernel/padata.c
-index 92a4867e8adc7..a544da60014c0 100644
+index 7f2b6d369fd47..a9e14183e1884 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -130,7 +130,7 @@ int padata_do_parallel(struct padata_shell *ps,
- 		*cb_cpu = cpu;
- 	}
+@@ -121,7 +121,7 @@ int padata_do_parallel(struct padata_instance *pinst,
+ 	if (!cpumask_test_cpu(cb_cpu, pd->cpumask.cbcpu))
+ 		goto out;
  
 -	err =  -EBUSY;
 +	err = -EBUSY;
