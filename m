@@ -1,50 +1,50 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E555328B5
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 16:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD4B5328B5
+	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 16:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ayaTK5st"
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D03E94C06
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 08:21:14 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-53e08b60febso10027447a12.1
-        for <linux-crypto@vger.kernel.org>; Tue, 07 Nov 2023 08:21:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LxOMbnM1"
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83C6B6A68
+	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 08:21:45 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-53d8320f0easo9730742a12.3
+        for <linux-crypto@vger.kernel.org>; Tue, 07 Nov 2023 08:21:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699374073; x=1699978873; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1699374103; x=1699978903; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0tQ0nokKlwqKeRkYo4v+0v7kcjD57bGjmv3wzxxTcqM=;
-        b=ayaTK5strpbCreIcdrwJK1nzECwqE3ErgzBFTpWlGdnF4AYBrq4JqGbFbj18DkGnL6
-         MNTmeuDRpI3f7XR5JuXzmGIKBrv4VqG2y3mUqfsAuhMMqr0E1cq+Y3D0Pr1B6L/3uVUM
-         tCH9TeUHrkEhHOb6XvXRM6iLxJ59K6mBFe1uTgwz6k5OQYGlr4BsP90qVsH6vyZgFglh
-         w77R1BThEva8AlPpK66WOvGcs/pXcfbfIOUefAMkFy8oYBBk31bzPZQXAfJMet62G2b7
-         4kZEHIYE7HFjqb9/6zUvVEjPIFd4TBlckeSQ6pC3GigzX3tcrTlpM9tuarpBBF/wv1Fx
-         sTxA==
+        bh=P6cJcwuvihNnLF2YQLxKlTugJMXpQ2ttiCERfY4UZxM=;
+        b=LxOMbnM1AC2cewhVD80WR5S7XabWAyodVKoJ4AHrmi6KC9/4qzleV8ZCQ7tHixnyEL
+         M51+muy6yxCnikfghIKC7qTElsTFIsT0HEOlrOzNlXdRJbeyzmDhwBq6uqNc6lhGdRad
+         hMdUELww7QobqImsx4FbmmjOLeqciDjHRizTfdBpuR1dazBWZZsHDa7tAkyoi6kryUnJ
+         nQ6FoKzJNOHfgmJfNhLbXZLydvmxFv9k+vdx/8OPbfKHR/uCu+bFFdmMiMQlLGJgFRnB
+         GuXkFcbSbAGyY0yG47pgxq7xlunp2WE6Ra0JYkfkRXJTiY3ru9sHQxDmWDZGmaw4cgTi
+         OkEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699374073; x=1699978873;
+        d=1e100.net; s=20230601; t=1699374103; x=1699978903;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0tQ0nokKlwqKeRkYo4v+0v7kcjD57bGjmv3wzxxTcqM=;
-        b=iRC56WjunpYzhYv/fGPBWSDQg2eNQY4WxrHSJ4Qqx/gMRP/++HXurhBnZ6OABYumCv
-         TnuoHh52Tve1qorrCJE3wZn74A2EL0NxOTlXA4SljhsgaN3t77XIiSvQGHjoo1ZmD9yw
-         9AGi/cVLya4LJvZQa16QsIRO+sRciFF0E1nQ4y+t0YTNGw1V0Vwm5kEAl0E8yR8IEcF5
-         GBvqxNgFET4dwjMp17DFHda3/YPcaEkIr6q02ZfAX6HxBpHrDsMEAQB6CzfkBlCksYQT
-         a8qSVxMNB9aJEXy9bFLxFHof4xCOdssrU7Wjg1olL1MLcccZD/gRIj4UZHlMkz848pO2
-         lHIg==
-X-Gm-Message-State: AOJu0YwUupu6nKm66GDmSngmfgWFWls65+laIk34Z1lnDP5PZnW5cQwX
-	t3t5oD1+2Ixo308l7EHxS3+EJs3zzMEFlm1tabI=
-X-Google-Smtp-Source: AGHT+IFm3mDvwj9odN4lYrTK5zy5+vVcFGDxSQV36f6AXKoF3yMQdDoCy0vkRDn8kmRb00MX3CpsFw==
-X-Received: by 2002:a17:907:360c:b0:9a5:7759:19c0 with SMTP id bk12-20020a170907360c00b009a5775919c0mr15021188ejc.64.1699374073125;
-        Tue, 07 Nov 2023 08:21:13 -0800 (PST)
+        bh=P6cJcwuvihNnLF2YQLxKlTugJMXpQ2ttiCERfY4UZxM=;
+        b=VtZw4xlGTWb/SMnzmS2U5BXzK9U3CBD9ekz2CVv75cYOowuTxc4XhoMzDsns2l54PU
+         mxpfSygtFLwcBgAee46B/oLl7coG/RaGSXzAdKCQ9uNdClb1+bU7RKMwFUCAHWwEqYjo
+         v7n1gFjtoiw6ws+qt+HBDDKPbxRB2H8RmSLONi2ZIhGP50SdJwMVdnpBSvn7Es03VzOt
+         lTuL7MA/PdTGIxEXtfxe9is8/Zgh21TanLDRjf7jhEuyAix2d1HGnnT7z95mpARlmv0c
+         GlL/Nb4SQTSZo0CCAKBHh13hI+BX8mNHfDi0QdOvNUBueia4PmldJd4P/5EJ28Ia11hL
+         TkeQ==
+X-Gm-Message-State: AOJu0YwSjm96L1Zw9WU7rzB6IjPbMdTE+3y4whgiaNriXF2Z4gAYMt3L
+	o8QRZm/U/vqv9XRJ+voLTzTTMQ==
+X-Google-Smtp-Source: AGHT+IHMcnqcX1KOx4IwQmJdHSpU1iqC1ZQH9Na+lXlbMWTf2/YjUsigjr+OL8QF0iqtqK2lh1Hsdg==
+X-Received: by 2002:a17:906:1915:b0:9bd:a73a:7a0a with SMTP id a21-20020a170906191500b009bda73a7a0amr13093000eje.58.1699374103172;
+        Tue, 07 Nov 2023 08:21:43 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.218.126])
-        by smtp.gmail.com with ESMTPSA id cw25-20020a170906c79900b0099c53c44083sm1212333ejb.79.2023.11.07.08.21.11
+        by smtp.gmail.com with ESMTPSA id cw25-20020a170906c79900b0099c53c44083sm1212333ejb.79.2023.11.07.08.21.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Nov 2023 08:21:12 -0800 (PST)
-Message-ID: <55ace120-9b0f-4e0e-89c3-6feed059436d@linaro.org>
-Date: Tue, 7 Nov 2023 17:21:11 +0100
+        Tue, 07 Nov 2023 08:21:42 -0800 (PST)
+Message-ID: <f1b24f19-c210-4f55-b40f-ab063e7eeb22@linaro.org>
+Date: Tue, 7 Nov 2023 17:21:41 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/6] ARM64: dts: rk356x: add crypto node
+Subject: Re: [PATCH 5/6] reset: rockchip: secure reset must be used by SCMI
 Content-Language: en-US
 To: Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
  heiko@sntech.de, herbert@gondor.apana.org.au,
@@ -63,7 +63,7 @@ Cc: ricardo@pardini.net, devicetree@vger.kernel.org,
  linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-rockchip@lists.infradead.org
 References: <20231107155532.3747113-1-clabbe@baylibre.com>
- <20231107155532.3747113-5-clabbe@baylibre.com>
+ <20231107155532.3747113-6-clabbe@baylibre.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -109,40 +109,134 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231107155532.3747113-5-clabbe@baylibre.com>
+In-Reply-To: <20231107155532.3747113-6-clabbe@baylibre.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 07/11/2023 16:55, Corentin Labbe wrote:
-> Both RK3566 and RK3568 have a crypto IP handled by the rk3588 crypto driver so adds a
-> node for it.
+> While working on the rk3588 crypto driver, I loose lot of time
+> understanding why resetting the IP failed.
+> This is due to RK3588_SECURECRU_RESET_OFFSET being in the secure world,
+> so impossible to operate on it from the kernel.
+> All resets in this block must be handled via SCMI call.
 > 
-> Tested-by: Ricardo Pardini <ricardo@pardini.net>
 > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 > ---
->  arch/arm64/boot/dts/rockchip/rk356x.dtsi | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/rockchip/rk356x.dtsi b/arch/arm64/boot/dts/rockchip/rk356x.dtsi
-> index 0964761e3ce9..c94a1b535c32 100644
-> --- a/arch/arm64/boot/dts/rockchip/rk356x.dtsi
-> +++ b/arch/arm64/boot/dts/rockchip/rk356x.dtsi
-> @@ -1070,6 +1070,18 @@ sdhci: mmc@fe310000 {
->  		status = "disabled";
->  	};
->  
-> +	crypto: crypto@fe380000 {
-> +		compatible = "rockchip,rk3568-crypto";
-> +		reg = <0x0 0xfe380000 0x0 0x2000>;
-> +		interrupts = <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
-> +		clocks = <&cru ACLK_CRYPTO_NS>, <&cru HCLK_CRYPTO_NS>,
-> +			 <&cru CLK_CRYPTO_NS_CORE>;
-> +		clock-names = "aclk", "hclk", "core";
-> +		resets = <&cru SRST_CRYPTO_NS_CORE>;
-> +		reset-names = "core";
-> +		status = "okay";
+>  drivers/clk/rockchip/rst-rk3588.c             | 42 ------------
+>  .../dt-bindings/reset/rockchip,rk3588-cru.h   | 68 +++++++++----------
 
-Drop
+Please run scripts/checkpatch.pl and fix reported warnings. Some
+warnings can be ignored, but the code here looks like it needs a fix.
+Feel free to get in touch if the warning is not clear.
+
+>  2 files changed, 34 insertions(+), 76 deletions(-)
+> 
+> diff --git a/drivers/clk/rockchip/rst-rk3588.c b/drivers/clk/rockchip/rst-rk3588.c
+> index e855bb8d5413..6556d9d3c7ab 100644
+> --- a/drivers/clk/rockchip/rst-rk3588.c
+> +++ b/drivers/clk/rockchip/rst-rk3588.c
+> @@ -16,9 +16,6 @@
+>  /* 0xFD7C8000 + 0x0A00 */
+>  #define RK3588_PHPTOPCRU_RESET_OFFSET(id, reg, bit) [id] = (0x8000*4 + reg * 16 + bit)
+>  
+> -/* 0xFD7D0000 + 0x0A00 */
+> -#define RK3588_SECURECRU_RESET_OFFSET(id, reg, bit) [id] = (0x10000*4 + reg * 16 + bit)
+> -
+>  /* 0xFD7F0000 + 0x0A00 */
+>  #define RK3588_PMU1CRU_RESET_OFFSET(id, reg, bit) [id] = (0x30000*4 + reg * 16 + bit)
+>  
+> @@ -806,45 +803,6 @@ static const int rk3588_register_offset[] = {
+>  	RK3588_PMU1CRU_RESET_OFFSET(SRST_P_PMU0IOC, 5, 4),
+>  	RK3588_PMU1CRU_RESET_OFFSET(SRST_P_GPIO0, 5, 5),
+>  	RK3588_PMU1CRU_RESET_OFFSET(SRST_GPIO0, 5, 6),
+> -
+> -	/* SECURECRU_SOFTRST_CON00 */
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_A_SECURE_NS_BIU, 0, 10),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_SECURE_NS_BIU, 0, 11),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_A_SECURE_S_BIU, 0, 12),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_SECURE_S_BIU, 0, 13),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_P_SECURE_S_BIU, 0, 14),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_CRYPTO_CORE, 0, 15),
+> -
+> -	/* SECURECRU_SOFTRST_CON01 */
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_CRYPTO_PKA, 1, 0),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_CRYPTO_RNG, 1, 1),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_A_CRYPTO, 1, 2),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_CRYPTO, 1, 3),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_KEYLADDER_CORE, 1, 9),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_KEYLADDER_RNG, 1, 10),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_A_KEYLADDER, 1, 11),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_KEYLADDER, 1, 12),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_P_OTPC_S, 1, 13),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_OTPC_S, 1, 14),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_WDT_S, 1, 15),
+> -
+> -	/* SECURECRU_SOFTRST_CON02 */
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_T_WDT_S, 2, 0),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_BOOTROM, 2, 1),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_A_DCF, 2, 2),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_P_DCF, 2, 3),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_BOOTROM_NS, 2, 5),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_P_KEYLADDER, 2, 14),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_TRNG_S, 2, 15),
+> -
+> -	/* SECURECRU_SOFTRST_CON03 */
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_TRNG_NS, 3, 0),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_D_SDMMC_BUFFER, 3, 1),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_SDMMC, 3, 2),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_SDMMC_BUFFER, 3, 3),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_SDMMC, 3, 4),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_P_TRNG_CHK, 3, 5),
+> -	RK3588_SECURECRU_RESET_OFFSET(SRST_TRNG_S, 3, 6),
+>  };
+>  
+>  void rk3588_rst_init(struct device_node *np, void __iomem *reg_base)
+> diff --git a/include/dt-bindings/reset/rockchip,rk3588-cru.h b/include/dt-bindings/reset/rockchip,rk3588-cru.h
+> index d4264db2a07f..c0d08ae78cd5 100644
+> --- a/include/dt-bindings/reset/rockchip,rk3588-cru.h
+> +++ b/include/dt-bindings/reset/rockchip,rk3588-cru.h
+> @@ -716,39 +716,39 @@
+>  #define SRST_P_GPIO0			627
+>  #define SRST_GPIO0			628
+>  
+> -#define SRST_A_SECURE_NS_BIU		629
+> -#define SRST_H_SECURE_NS_BIU		630
+> -#define SRST_A_SECURE_S_BIU		631
+> -#define SRST_H_SECURE_S_BIU		632
+> -#define SRST_P_SECURE_S_BIU		633
+> -#define SRST_CRYPTO_CORE		634
+> -
+> -#define SRST_CRYPTO_PKA			635
+> -#define SRST_CRYPTO_RNG			636
+> -#define SRST_A_CRYPTO			637
+> -#define SRST_H_CRYPTO			638
+> -#define SRST_KEYLADDER_CORE		639
+> -#define SRST_KEYLADDER_RNG		640
+> -#define SRST_A_KEYLADDER		641
+> -#define SRST_H_KEYLADDER		642
+> -#define SRST_P_OTPC_S			643
+> -#define SRST_OTPC_S			644
+> -#define SRST_WDT_S			645
+> -
+> -#define SRST_T_WDT_S			646
+> -#define SRST_H_BOOTROM			647
+> -#define SRST_A_DCF			648
+> -#define SRST_P_DCF			649
+> -#define SRST_H_BOOTROM_NS		650
+> -#define SRST_P_KEYLADDER		651
+> -#define SRST_H_TRNG_S			652
+> -
+> -#define SRST_H_TRNG_NS			653
+> -#define SRST_D_SDMMC_BUFFER		654
+> -#define SRST_H_SDMMC			655
+> -#define SRST_H_SDMMC_BUFFER		656
+> -#define SRST_SDMMC			657
+> -#define SRST_P_TRNG_CHK			658
+> -#define SRST_TRNG_S			659
+> +#define SRST_A_SECURE_NS_BIU		10
+
+NAK. You just broke all users.
+
 
 Best regards,
 Krzysztof
