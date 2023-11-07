@@ -1,48 +1,48 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077B131A82
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 15:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23F131A8E
+	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 15:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="dpY4L3eW"
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 538864785
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 07:55:50 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-407da05f05aso40785955e9.3
-        for <linux-crypto@vger.kernel.org>; Tue, 07 Nov 2023 07:55:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="lVDSo+hw"
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 303914780
+	for <linux-crypto@vger.kernel.org>; Tue,  7 Nov 2023 07:55:52 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40859c46447so36696515e9.1
+        for <linux-crypto@vger.kernel.org>; Tue, 07 Nov 2023 07:55:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1699372549; x=1699977349; darn=vger.kernel.org;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1699372550; x=1699977350; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BkfSHGrIpem8wzkvHrBk/3Gkd85Ebnq+lcLBg87ITvo=;
-        b=dpY4L3eWa4flhXLc67MqZnrpxEIJMf0+wX5MqxWeKAUCPWoN9bdiHmuoqlI28BOFlz
-         M/xTcEG33KRQWa05Aaz1bQxE7r3zmBXQc0Zda+6xnqZyCv+FkTuc4As+A5um5WV6kPsa
-         +gyZZt67wq/aEP1WbvF8YjmsQD4NkMg+otY3rNyS94ruLbBrvZA6mkgFyxqZA6AZPzlh
-         nsSquFgJHHl8vYze7deTu1VaC4jR0jEXHhE07z+3i2s+BMN/pCdVYDMf7hwfRNHJPo2H
-         DeFnEj5yK6Lzdr4MlN/sh//IbQzUsmh5XW3tm/OkXmfBP8uj8yb4vUYK8FGSFIHBtj42
-         7lfw==
+        bh=s+UV3k4yizYTMdoa5VrKE6ofk04X3OR5xKj9uFZuHk4=;
+        b=lVDSo+hwfrXEtn8u9vZOOnxf4KRs0For6f7dFb4P0JC4AHFlXPHjRSmIXEvmXounHu
+         v0uTKkjeXjGatJp3NMBWy/zpdDsSZqwAHvNmOG0qVxAkEMUDtsS/xw948KYJu2Z2ZbSK
+         drin7q9Allj8aM68qBi51qemPiud7aGC5hmh3IAs49Ry3Ep0hi3iip4JQA9OMLJesF2t
+         vJ0hZDN5rBtlOQOUrmCd3UirooFgQobEr3rhH5NCwisxnwmvQlbJlUtvrzO6e7n/6GVk
+         d+E5vpe21xkUYIpfzmNorTEnTpn3gCKuJ59AdVzzFndSc5yvLrDAlHbLKTsaw3rIeDAA
+         r1cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699372549; x=1699977349;
+        d=1e100.net; s=20230601; t=1699372550; x=1699977350;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BkfSHGrIpem8wzkvHrBk/3Gkd85Ebnq+lcLBg87ITvo=;
-        b=gs5RcvjDucHOTKGd4RCfdDHJ03TlaCI4vHb+76tQBaRGdtQEIaSp04Oaw9L4RKSKWc
-         rzSwYQcyY/WV8cpqT5rKb4MilZy3XYRsdlZ825gfuMLvWP6bhLpsPwqlzSwgtjabDyMl
-         ZRjFCGJB8qtwG8EpopjMTLheujbgGl4BDEtHDkup3wuaIBZi38RnLdDoJvkR8RJNAAG5
-         /w3Y2q3bvDW58quKQ9zsNPX/D0EgXTdWIQisAegDunWsrnd76yKjUL5whodqEg4gJXq6
-         qBpuc3uMdPEYNH+oZDvs7T10KpCfL0XwtRu//GmnmayUSbph0FT9rptDv192DDXXvWEr
-         2hbw==
-X-Gm-Message-State: AOJu0YyJDf2wTK+5W0Lnq37w0RL3RikusLRV8vVBK/mGgIH716uqgvbh
-	V7cdrytf7yQtmcJLXKemTTx7NA==
-X-Google-Smtp-Source: AGHT+IHpnyjFtHnxiqNRaHl8atDMuhe0j+p3O/OrAQ+Bopbx3/CIOAepx72DV4yXbiUhAx69OJKUiw==
-X-Received: by 2002:a05:600c:1913:b0:408:3cdf:32c with SMTP id j19-20020a05600c191300b004083cdf032cmr3353377wmq.41.1699372548745;
-        Tue, 07 Nov 2023 07:55:48 -0800 (PST)
+        bh=s+UV3k4yizYTMdoa5VrKE6ofk04X3OR5xKj9uFZuHk4=;
+        b=XzVJax+c/VS15Flr/Q6APOCvoHuXa8ZHAJ2kLUAVeo2g9H+hxyZ/HtU8dHV2ko+zuk
+         oYmgqWnVXmxI7EBySj4ToFrU3NM77CBVZdBg5ew/viO2v46mnC/G1giTXOq7cG7noOvG
+         Y+7x0K8bKHSEpmcdptYIvxHItll6iyD8edfKujMMteyE2PjqtnPwnlnzXd95nSwpb4WT
+         22btyr7d4nERQJw+Tm7Qy4XFi+eyFCcGm5UlfmvOSpH7QB2G+YzXPktImQMscjH0Io4s
+         x9Iuh1soVtqtjBCgknz60t5hiI5ozae4d4YShKF34dF8ETI2kkUyZ3viW/me/vYLc2od
+         2i8w==
+X-Gm-Message-State: AOJu0Yyh9R4dDtNoeFYU3swHI0pU4RvDCtU3M8jYv0dhSefJCjgWcOzl
+	hUDglIQgkMKHbuW2hHznPSQTzg==
+X-Google-Smtp-Source: AGHT+IHkZ5GDVZhysvqM4521kZZywfOXQBII4ImWf3CF24yhLceufV+jdRnRjPS4MYfSNa8U4v6jHw==
+X-Received: by 2002:a05:600c:548e:b0:405:4daa:6e3d with SMTP id iv14-20020a05600c548e00b004054daa6e3dmr2628006wmb.39.1699372550578;
+        Tue, 07 Nov 2023 07:55:50 -0800 (PST)
 Received: from arnold.baylibre (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id f6-20020a05600c4e8600b003fefb94ccc9sm16579085wmq.11.2023.11.07.07.55.46
+        by smtp.googlemail.com with ESMTPSA id f6-20020a05600c4e8600b003fefb94ccc9sm16579085wmq.11.2023.11.07.07.55.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 07:55:47 -0800 (PST)
+        Tue, 07 Nov 2023 07:55:49 -0800 (PST)
 From: Corentin Labbe <clabbe@baylibre.com>
 To: davem@davemloft.net,
 	heiko@sntech.de,
@@ -60,9 +60,9 @@ Cc: ricardo@pardini.net,
 	linux-kernel@vger.kernel.org,
 	linux-rockchip@lists.infradead.org,
 	Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 2/6] MAINTAINERS: add new dt-binding doc to the right entry
-Date: Tue,  7 Nov 2023 15:55:28 +0000
-Message-Id: <20231107155532.3747113-3-clabbe@baylibre.com>
+Subject: [PATCH 3/6] ARM64: dts: rk3588: add crypto node
+Date: Tue,  7 Nov 2023 15:55:29 +0000
+Message-Id: <20231107155532.3747113-4-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231107155532.3747113-1-clabbe@baylibre.com>
 References: <20231107155532.3747113-1-clabbe@baylibre.com>
@@ -74,25 +74,37 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Rockchip crypto driver have a new file to be added.
+The rk3588 has a crypto IP handled by the rk3588 crypto driver so adds a
+node for it.
 
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/boot/dts/rockchip/rk3588s.dtsi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8a43b16aecaa..f9ae35a13e70 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -18697,6 +18697,7 @@ M:	Corentin Labbe <clabbe@baylibre.com>
- L:	linux-crypto@vger.kernel.org
- S:	Maintained
- F:	Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-+F:	Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml
- F:	drivers/crypto/rockchip/
+diff --git a/arch/arm64/boot/dts/rockchip/rk3588s.dtsi b/arch/arm64/boot/dts/rockchip/rk3588s.dtsi
+index 7064c0e9179f..a2ba5ebec38d 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3588s.dtsi
++++ b/arch/arm64/boot/dts/rockchip/rk3588s.dtsi
+@@ -1523,6 +1523,18 @@ sdhci: mmc@fe2e0000 {
+ 		status = "disabled";
+ 	};
  
- ROCKCHIP I2S TDM DRIVER
++	crypto: crypto@fe370000 {
++		compatible = "rockchip,rk3588-crypto";
++		reg = <0x0 0xfe370000 0x0 0x2000>;
++		interrupts = <GIC_SPI 209 IRQ_TYPE_LEVEL_HIGH 0>;
++		clocks = <&scmi_clk SCMI_CRYPTO_CORE>, <&scmi_clk SCMI_ACLK_SECURE_NS>,
++			 <&scmi_clk SCMI_HCLK_SECURE_NS>;
++		clock-names = "core", "aclk", "hclk";
++		resets = <&scmi_reset SRST_CRYPTO_CORE>;
++		reset-names = "core";
++		status = "okay";
++	};
++
+ 	i2s0_8ch: i2s@fe470000 {
+ 		compatible = "rockchip,rk3588-i2s-tdm";
+ 		reg = <0x0 0xfe470000 0x0 0x1000>;
 -- 
 2.41.0
 
