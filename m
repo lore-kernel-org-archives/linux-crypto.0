@@ -1,39 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF796AB1
-	for <linux-crypto@vger.kernel.org>; Thu,  9 Nov 2023 07:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2600010945
+	for <linux-crypto@vger.kernel.org>; Thu,  9 Nov 2023 08:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b53gh+xj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EDEAC433C7;
-	Thu,  9 Nov 2023 07:16:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a9N819J2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22C00C433C7;
+	Thu,  9 Nov 2023 08:05:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699514186;
-	bh=bXtq92H2lB9I1j4FNYbEXcH9mwbTZ3yucWnUpEsvSu8=;
+	s=k20201202; t=1699517151;
+	bh=4KAQB4Wpla32XTpJALIgLJy2ciB1pEC384jhuNFgK+A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b53gh+xjIAMX5TIJgr2iD0QbJEC/4hWxmS8AAAUQYv7lmKQ9umk4k9gi9TCo1tw+M
-	 svu0/XvTdxJaZQA0lEBUbNkhDZB/L1yO9RA6pzgMHzL6rEnaRyljRDVxg2mQfwkCwh
-	 Kv/B2Oi0+gdx5gHMETqbd4aS93Zdnt7J811QH/+cqB+9Lk1LrOyy+haKhyJ6jNUiep
-	 9Ifm795/MqeHQa93xPifVoL7kn+wWIxkH0HqpRVGVzcuJr3ayofZwDBrg1uTL6a4Ys
-	 ut7HSxk6F8+NeWPjlRw4F3AaE6eagdYCANS8dzcSjXNf+WbLnKeBmxj/B1XCS0JIRC
-	 Vw9az8ujLLo9w==
-Date: Wed, 8 Nov 2023 23:16:23 -0800
+	b=a9N819J2K0NWZLwJPTFGyvwa5otCJ6W5svAs9pDSaWppP6MTKUGIwUfmlf7LSA9U6
+	 ZavbgthqdS33/iBwjm4jR5a0npnZAEL1FmjpC7CWq9aNfoILljmsNgozGUVCXJgqne
+	 dAbMBLmczhgrn1q21qgXbaBHM0g1LHfVB0MTcMlU/qCSYIg9J/zmSFnvIcg13LSoE2
+	 E4r9AJx+X+0qEOuycZUKHJ/ZtxjtFD00NI5uje7T5acrFBBgu7j971Dl4LjpFur0B8
+	 VFMiFmESewu9VBr2iO26i7SKBi5y9IoyTTVuwj4dRkbEzGSWIWwJVbEcSCZHvGsGhi
+	 jvrtNlurh4g5w==
+Date: Thu, 9 Nov 2023 00:05:49 -0800
 From: Eric Biggers <ebiggers@kernel.org>
 To: Jerry Shih <jerry.shih@sifive.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, palmer@dabbelt.com,
-	Albert Ou <aou@eecs.berkeley.edu>, herbert@gondor.apana.org.au,
-	davem@davemloft.net, andy.chiu@sifive.com, greentime.hu@sifive.com,
+Cc: paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	andy.chiu@sifive.com, greentime.hu@sifive.com,
 	conor.dooley@microchip.com, guoren@kernel.org, bjorn@rivosinc.com,
 	heiko@sntech.de, ardb@kernel.org, phoebe.chen@sifive.com,
 	hongrong.hsu@sifive.com, linux-riscv@lists.infradead.org,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Subject: Re: [PATCH 06/12] RISC-V: crypto: add accelerated
  AES-CBC/CTR/ECB/XTS implementations
-Message-ID: <20231109071623.GB1245@sol.localdomain>
+Message-ID: <20231109080549.GC1245@sol.localdomain>
 References: <20231025183644.8735-1-jerry.shih@sifive.com>
  <20231025183644.8735-7-jerry.shih@sifive.com>
- <20231102051639.GF1498@sol.localdomain>
- <39126F19-8FEB-4E18-B61D-4494B59C43A1@sifive.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,47 +40,62 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <39126F19-8FEB-4E18-B61D-4494B59C43A1@sifive.com>
+In-Reply-To: <20231025183644.8735-7-jerry.shih@sifive.com>
 
-On Tue, Nov 07, 2023 at 04:53:13PM +0800, Jerry Shih wrote:
-> On Nov 2, 2023, at 13:16, Eric Biggers <ebiggers@kernel.org> wrote:
-> > On Thu, Oct 26, 2023 at 02:36:38AM +0800, Jerry Shih wrote:
-> >> +static int ecb_encrypt(struct skcipher_request *req)
-> >> +{
-> >> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> >> +	const struct riscv64_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >> +	struct skcipher_walk walk;
-> >> +	unsigned int nbytes;
-> >> +	int err;
-> >> +
-> >> +	/* If we have error here, the `nbytes` will be zero. */
-> >> +	err = skcipher_walk_virt(&walk, req, false);
-> >> +	while ((nbytes = walk.nbytes)) {
-> >> +		kernel_vector_begin();
-> >> +		rv64i_zvkned_ecb_encrypt(walk.src.virt.addr, walk.dst.virt.addr,
-> >> +					 nbytes & AES_BLOCK_VALID_SIZE_MASK,
-> >> +					 &ctx->key);
-> >> +		kernel_vector_end();
-> >> +		err = skcipher_walk_done(
-> >> +			&walk, nbytes & AES_BLOCK_REMAINING_SIZE_MASK);
-> >> +	}
-> >> +
-> >> +	return err;
-> >> +}
-> > 
-> > There's no fallback for !crypto_simd_usable() here.  I really like it this way.
-> > However, for it to work (for skciphers and aeads), RISC-V needs to allow the
-> > vector registers to be used in softirq context.  Is that already the case?
-> 
-> The kernel-mode-vector could be enabled in softirq, but we don't have nesting
-> vector contexts. Will we have the case that kernel needs to jump to softirq for
-> encryptions during the regular crypto function? If yes, we need to have fallbacks
-> for all algorithms.
+On Thu, Oct 26, 2023 at 02:36:38AM +0800, Jerry Shih wrote:
+> +# prepare input data(v24), iv(v28), bit-reversed-iv(v16), bit-reversed-iv-multiplier(v20)
+> +sub init_first_round {
+> +    my $code=<<___;
+> +    # load input
+> +    @{[vsetvli $VL, $LEN32, "e32", "m4", "ta", "ma"]}
+> +    @{[vle32_v $V24, $INPUT]}
+> +
+> +    li $T0, 5
+> +    # We could simplify the initialization steps if we have `block<=1`.
+> +    blt $LEN32, $T0, 1f
+> +
+> +    # Note: We use `vgmul` for GF(2^128) multiplication. The `vgmul` uses
+> +    # different order of coefficients. We should use`vbrev8` to reverse the
+> +    # data when we use `vgmul`.
+> +    @{[vsetivli "zero", 4, "e32", "m1", "ta", "ma"]}
+> +    @{[vbrev8_v $V0, $V28]}
+> +    @{[vsetvli "zero", $LEN32, "e32", "m4", "ta", "ma"]}
+> +    @{[vmv_v_i $V16, 0]}
+> +    # v16: [r-IV0, r-IV0, ...]
+> +    @{[vaesz_vs $V16, $V0]}
+> +
+> +    # Prepare GF(2^128) multiplier [1, x, x^2, x^3, ...] in v8.
+> +    slli $T0, $LEN32, 2
+> +    @{[vsetvli "zero", $T0, "e32", "m1", "ta", "ma"]}
+> +    # v2: [`1`, `1`, `1`, `1`, ...]
+> +    @{[vmv_v_i $V2, 1]}
+> +    # v3: [`0`, `1`, `2`, `3`, ...]
+> +    @{[vid_v $V3]}
+> +    @{[vsetvli "zero", $T0, "e64", "m2", "ta", "ma"]}
+> +    # v4: [`1`, 0, `1`, 0, `1`, 0, `1`, 0, ...]
+> +    @{[vzext_vf2 $V4, $V2]}
+> +    # v6: [`0`, 0, `1`, 0, `2`, 0, `3`, 0, ...]
+> +    @{[vzext_vf2 $V6, $V3]}
+> +    slli $T0, $LEN32, 1
+> +    @{[vsetvli "zero", $T0, "e32", "m2", "ta", "ma"]}
+> +    # v8: [1<<0=1, 0, 0, 0, 1<<1=x, 0, 0, 0, 1<<2=x^2, 0, 0, 0, ...]
+> +    @{[vwsll_vv $V8, $V4, $V6]}
+> +
+> +    # Compute [r-IV0*1, r-IV0*x, r-IV0*x^2, r-IV0*x^3, ...] in v16
+> +    @{[vsetvli "zero", $LEN32, "e32", "m4", "ta", "ma"]}
+> +    @{[vbrev8_v $V8, $V8]}
+> +    @{[vgmul_vv $V16, $V8]}
+> +
+> +    # Compute [IV0*1, IV0*x, IV0*x^2, IV0*x^3, ...] in v28.
+> +    # Reverse the bits order back.
+> +    @{[vbrev8_v $V28, $V16]}
 
-Are you asking what happens if a softirq is taken while the CPU is between
-kernel_vector_begin() and kernel_vector_end()?  I think that needs to be
-prevented by making kernel_vector_begin() and kernel_vector_end() disable and
-re-enable softirqs, like what kernel_neon_begin() and kernel_neon_end() do on
-arm64.  Refer to commit 13150149aa6ded which implemented that behavior on arm64.
+This code assumes that '1 << i' fits in 64 bits, for 0 <= i < vl.
+
+I think that works out to an implicit assumption that VLEN <= 2048.  I.e.,
+AES-XTS encryption/decryption would produce the wrong result on RISC-V
+implementations with VLEN > 2048.
+
+Perhaps it should be explicitly checked that VLEN <= 2048?
 
 - Eric
