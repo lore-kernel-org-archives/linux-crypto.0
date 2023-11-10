@@ -1,43 +1,43 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B493C6B0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733DA3C09B;
 	Fri, 10 Nov 2023 22:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mxZ9ME16"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JKEStwqN"
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3799B4229;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E044205;
 	Fri, 10 Nov 2023 14:28:36 -0800 (PST)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAHifV1019404;
-	Fri, 10 Nov 2023 22:28:07 GMT
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAHiIss020588;
+	Fri, 10 Nov 2023 22:28:00 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2023-03-30;
- bh=PF3adVbDuDOrhrzIcst51oqzg2T1uPdLomNy2PQ/df0=;
- b=mxZ9ME161Tpx/sUIktn5cCgEWbUPkYCT4Gopk0IPusYQd16bQbEA2QDRqW10AV2lYExP
- YTcDZA5XkdVOuwUYunT6X/fKMLtEp+iV8uuT+hi7EA3Qzt4nP6hhA86rKg7UIE4oxHgt
- MrQSbIwPspaP9IA/psV5wjEFSnqJxICshWAapxdunaKp2GOuWlwZJIOTiwSX4+9tbZ8d
- htPPyXRjFuljRKUELcpioVxqQJ+tUYjMRSWii2R3xmOrcJ0phC4FxU9SMW1Uz8I+zxAK
- z9NhWcd06DeWGgueO8zqe+TfI19O0bhPPjrgyYH+nZn+HZRvdi64oMVqYS59RZPdwM17 3w== 
+ bh=/J1USLKHYBG5hNrFfPe8N+O7zw8z5jTGeKyBk6ktFDs=;
+ b=JKEStwqNcvsIrDsZNjZ5V4YNXqFLwc1qV/gKiDuBlhfCbHfJJ61nkI4HI/jbCio+9HVv
+ gJAvAv1/IXwDt1y6WZ5NVHks5/B7w0AgSQB3PCqSv5XWDKc7Keh7SgJ+KNM8D5cgtY/j
+ VOX+GebU+LxmthsRrl5jkHmMfCM6GI86Kv0oCVVxUC/graN4obP+v9C0qj9zCjcmotN6
+ hcF6YRgZUdtHM9aQJKbSwD2cpeBLgApl49VDdpGhbkf17ipI/aacaEy0ER5EGZqzEDaw
+ GMAKxh5L+Yg2ACoJ34mxyr4pQqaBfnhfTMC8gmr5y8V8utWJ0N1v/oXca8hErBgZz0P5 PQ== 
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3u7w2370up-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3u7w23pys4-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Nov 2023 22:28:07 +0000
+	Fri, 10 Nov 2023 22:27:59 +0000
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAM4utL023964;
-	Fri, 10 Nov 2023 22:28:05 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AALP7lN023839;
+	Fri, 10 Nov 2023 22:27:58 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nb37-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nb0n-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 10 Nov 2023 22:28:05 +0000
+	Fri, 10 Nov 2023 22:27:57 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AAMRsaK039112;
-	Fri, 10 Nov 2023 22:28:05 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AAMRsa4039112;
+	Fri, 10 Nov 2023 22:27:57 GMT
 Received: from ovs113.us.oracle.com (ovs113.us.oracle.com [10.149.224.213])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nayh-12
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nayh-4
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 10 Nov 2023 22:28:05 +0000
+	Fri, 10 Nov 2023 22:27:57 +0000
 From: Ross Philipson <ross.philipson@oracle.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org,
         linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -49,9 +49,9 @@ Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
         James.Bottomley@hansenpartnership.com, luto@amacapital.net,
         nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
         trenchboot-devel@googlegroups.com
-Subject: [PATCH v7 11/13] reboot: Secure Launch SEXIT support on reboot paths
-Date: Fri, 10 Nov 2023 17:27:49 -0500
-Message-Id: <20231110222751.219836-12-ross.philipson@oracle.com>
+Subject: [PATCH v7 03/13] x86: Secure Launch Kconfig
+Date: Fri, 10 Nov 2023 17:27:41 -0500
+Message-Id: <20231110222751.219836-4-ross.philipson@oracle.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20231110222751.219836-1-ross.philipson@oracle.com>
 References: <20231110222751.219836-1-ross.philipson@oracle.com>
@@ -69,73 +69,40 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 p
  spamscore=0 mlxscore=0 adultscore=0 malwarescore=0 bulkscore=0
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311060000 definitions=main-2311100187
-X-Proofpoint-GUID: dUuthkw529cAhBfrt5o13aJ6-FhLAJsi
-X-Proofpoint-ORIG-GUID: dUuthkw529cAhBfrt5o13aJ6-FhLAJsi
+X-Proofpoint-GUID: AIdzskOBHWGssm5ENHrSQTwL5gDLOSDY
+X-Proofpoint-ORIG-GUID: AIdzskOBHWGssm5ENHrSQTwL5gDLOSDY
 
-If the MLE kernel is being powered off, rebooted or halted,
-then SEXIT must be called. Note that the SEXIT GETSEC leaf
-can only be called after a machine_shutdown() has been done on
-these paths. The machine_shutdown() is not called on a few paths
-like when poweroff action does not have a poweroff callback (into
-ACPI code) or when an emergency reset is done. In these cases,
-just the TXT registers are finalized but SEXIT is skipped.
+Initial bits to bring in Secure Launch functionality. Add Kconfig
+options for compiling in/out the Secure Launch code.
 
 Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
 ---
- arch/x86/kernel/reboot.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ arch/x86/Kconfig | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
-index 830425e6d38e..668cfc5e4c92 100644
---- a/arch/x86/kernel/reboot.c
-+++ b/arch/x86/kernel/reboot.c
-@@ -12,6 +12,7 @@
- #include <linux/delay.h>
- #include <linux/objtool.h>
- #include <linux/pgtable.h>
-+#include <linux/slaunch.h>
- #include <acpi/reboot.h>
- #include <asm/io.h>
- #include <asm/apic.h>
-@@ -766,6 +767,7 @@ static void native_machine_restart(char *__unused)
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 3762f41bb092..1b983e336611 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -2066,6 +2066,18 @@ config EFI_RUNTIME_MAP
  
- 	if (!reboot_force)
- 		machine_shutdown();
-+	slaunch_finalize(!reboot_force);
- 	__machine_emergency_restart(0);
- }
+ 	  See also Documentation/ABI/testing/sysfs-firmware-efi-runtime-map.
  
-@@ -776,6 +778,9 @@ static void native_machine_halt(void)
- 
- 	tboot_shutdown(TB_SHUTDOWN_HALT);
- 
-+	/* SEXIT done after machine_shutdown() to meet TXT requirements */
-+	slaunch_finalize(1);
++config SECURE_LAUNCH
++	bool "Secure Launch support"
++	default n
++	depends on X86_64 && X86_X2APIC
++	help
++	   The Secure Launch feature allows a kernel to be loaded
++	   directly through an Intel TXT measured launch. Intel TXT
++	   establishes a Dynamic Root of Trust for Measurement (DRTM)
++	   where the CPU measures the kernel image. This feature then
++	   continues the measurement chain over kernel configuration
++	   information and init images.
 +
- 	stop_this_cpu(NULL);
- }
+ source "kernel/Kconfig.hz"
  
-@@ -784,8 +789,12 @@ static void native_machine_power_off(void)
- 	if (kernel_can_power_off()) {
- 		if (!reboot_force)
- 			machine_shutdown();
-+		slaunch_finalize(!reboot_force);
- 		do_kernel_power_off();
-+	} else {
-+		slaunch_finalize(0);
- 	}
-+
- 	/* A fallback in case there is no PM info available */
- 	tboot_shutdown(TB_SHUTDOWN_HALT);
- }
-@@ -813,6 +822,7 @@ void machine_shutdown(void)
- 
- void machine_emergency_restart(void)
- {
-+	slaunch_finalize(0);
- 	__machine_emergency_restart(1);
- }
- 
+ config ARCH_SUPPORTS_KEXEC
 -- 
 2.39.3
 
