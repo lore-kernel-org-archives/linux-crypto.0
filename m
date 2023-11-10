@@ -1,43 +1,43 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B163D38F;
-	Fri, 10 Nov 2023 22:28:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40223D392;
+	Fri, 10 Nov 2023 22:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="m6+XqwLo"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ccsZ1Zwd"
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57541448C;
-	Fri, 10 Nov 2023 14:28:36 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55FF444B6;
+	Fri, 10 Nov 2023 14:28:38 -0800 (PST)
 Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAHiI7g020606;
-	Fri, 10 Nov 2023 22:28:05 GMT
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAHiIst020588;
+	Fri, 10 Nov 2023 22:28:09 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2023-03-30;
- bh=pTEEykeNC3Q3SWEcX9fjXti3Z4HD4e/23AnxgHkyIf8=;
- b=m6+XqwLoXr3IN+ulTzisoWOfsRt76aviUWUUS79mCgXx9Jn13E0qnUI5bTgzx1RXJnLd
- 77BylWpZ5Dn2dj7NkbTR45eDTsyb1fkmbsgv7drmKX2Zso5LRalR9LOqeqv0CJ4P+jmH
- qKATz4OyJTbagAnCw4BNaDs9HhHb78u42scbPXbNLo8xIgMRk3LlALMb+CCjRASN9tBR
- TxsrpDESkiYLD4LED7QT1qBK5a2OIeuJZPce+xnA1Z2l7SAnjvEAiKRKx7KwZo3YFQIV
- cZydfxUbOINm4PoN0nWGKR2e5rs3zEbIOY+OoxyUW16eM/e8MRkLyCiF4OHD+Vafi3nV 4g== 
+ bh=GKauPTtNdSk3fkzWv10kdNJl8kVDWJLiFM0GZ5EYFVs=;
+ b=ccsZ1ZwdERjPOTms27WSUyLPwC3u2weuulczZ9YCnwNnhjeslyOAFjGJ6a2QGDFccWqy
+ kb4Qedsf7Z7uvw7avVNdgXQ/R1bsvwmhYF2pllLMaA5nI7M95OCIUicdpforwMMeErIZ
+ hXZNTlk0d+lBB//sgnQT5sq1uwMwccOcrWcMFGTmEpCuVInhSBtOCANTJRn2eQZt699H
+ irj2EVTR2EVII+5gcde9sQGeW+julk8fjmVPYfjnOjafW7Y9NSDIa13ik1bN3r8QQUAm
+ Na2nc1Ofjm+qwc7UD8p8VVfqxglIHE+XPPUbdwwPBmc8gXPF0FV2S3IrbTmq95Vu9UiD Jg== 
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3u7w23pys9-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3u7w23pysd-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Nov 2023 22:28:05 +0000
+	Fri, 10 Nov 2023 22:28:09 +0000
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAK2YaR023798;
-	Fri, 10 Nov 2023 22:28:03 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAK53Y6023844;
+	Fri, 10 Nov 2023 22:28:07 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nb2c-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nb42-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 10 Nov 2023 22:28:03 +0000
+	Fri, 10 Nov 2023 22:28:07 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AAMRsaG039112;
-	Fri, 10 Nov 2023 22:28:03 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AAMRsaO039112;
+	Fri, 10 Nov 2023 22:28:07 GMT
 Received: from ovs113.us.oracle.com (ovs113.us.oracle.com [10.149.224.213])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nayh-10
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nayh-14
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 10 Nov 2023 22:28:03 +0000
+	Fri, 10 Nov 2023 22:28:06 +0000
 From: Ross Philipson <ross.philipson@oracle.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org,
         linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -49,9 +49,9 @@ Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
         James.Bottomley@hansenpartnership.com, luto@amacapital.net,
         nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
         trenchboot-devel@googlegroups.com
-Subject: [PATCH v7 09/13] x86: Secure Launch SMP bringup support
-Date: Fri, 10 Nov 2023 17:27:47 -0500
-Message-Id: <20231110222751.219836-10-ross.philipson@oracle.com>
+Subject: [PATCH v7 13/13] tpm: Allow locality 2 to be set when initializing the TPM for Secure Launch
+Date: Fri, 10 Nov 2023 17:27:51 -0500
+Message-Id: <20231110222751.219836-14-ross.philipson@oracle.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20231110222751.219836-1-ross.philipson@oracle.com>
 References: <20231110222751.219836-1-ross.philipson@oracle.com>
@@ -69,206 +69,51 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 p
  spamscore=0 mlxscore=0 adultscore=0 malwarescore=0 bulkscore=0
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311060000 definitions=main-2311100187
-X-Proofpoint-GUID: Anb6ZhN2o_e8OD1XbDk3zxexIPZW-3Qs
-X-Proofpoint-ORIG-GUID: Anb6ZhN2o_e8OD1XbDk3zxexIPZW-3Qs
+X-Proofpoint-GUID: EU4eaKX42DB7eE9dHiylfHKU3qY5XorR
+X-Proofpoint-ORIG-GUID: EU4eaKX42DB7eE9dHiylfHKU3qY5XorR
 
-On Intel, the APs are left in a well documented state after TXT performs
-the late launch. Specifically they cannot have #INIT asserted on them so
-a standard startup via INIT/SIPI/SIPI cannot be performed. Instead the
-early SL stub code uses MONITOR and MWAIT to park the APs. The realmode/init.c
-code updates the jump address for the waiting APs with the location of the
-Secure Launch entry point in the RM piggy after it is loaded and fixed up.
-As the APs are woken up by writing the monitor, the APs jump to the Secure
-Launch entry point in the RM piggy which mimics what the real mode code would
-do then jumps to the standard RM piggy protected mode entry point.
+The Secure Launch MLE environment uses PCRs that are only accessible from
+the DRTM locality 2. By default the TPM drivers always initialize the
+locality to 0. When a Secure Launch is in progress, initialize the
+locality to 2.
 
 Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
 ---
- arch/x86/include/asm/realmode.h      |  3 ++
- arch/x86/kernel/smpboot.c            | 56 +++++++++++++++++++++++++++-
- arch/x86/realmode/init.c             |  3 ++
- arch/x86/realmode/rm/header.S        |  3 ++
- arch/x86/realmode/rm/trampoline_64.S | 32 ++++++++++++++++
- 5 files changed, 96 insertions(+), 1 deletion(-)
+ drivers/char/tpm/tpm-chip.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/realmode.h b/arch/x86/include/asm/realmode.h
-index 87e5482acd0d..339b48e2543d 100644
---- a/arch/x86/include/asm/realmode.h
-+++ b/arch/x86/include/asm/realmode.h
-@@ -38,6 +38,9 @@ struct real_mode_header {
- #ifdef CONFIG_X86_64
- 	u32	machine_real_restart_seg;
- #endif
-+#ifdef CONFIG_SECURE_LAUNCH
-+	u32	sl_trampoline_start32;
-+#endif
- };
- 
- /* This must match data at realmode/rm/trampoline_{32,64}.S */
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index 2cc2aa120b4b..6f2a5ee458ce 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -60,6 +60,7 @@
- #include <linux/stackprotector.h>
- #include <linux/cpuhotplug.h>
- #include <linux/mc146818rtc.h>
+diff --git a/drivers/char/tpm/tpm-chip.c b/drivers/char/tpm/tpm-chip.c
+index 42b1062e33cd..0217ceb96c42 100644
+--- a/drivers/char/tpm/tpm-chip.c
++++ b/drivers/char/tpm/tpm-chip.c
+@@ -23,6 +23,7 @@
+ #include <linux/major.h>
+ #include <linux/tpm_eventlog.h>
+ #include <linux/hw_random.h>
 +#include <linux/slaunch.h>
+ #include "tpm.h"
  
- #include <asm/acpi.h>
- #include <asm/cacheinfo.h>
-@@ -986,6 +987,56 @@ int common_cpu_up(unsigned int cpu, struct task_struct *idle)
- 	return 0;
- }
+ DEFINE_IDR(dev_nums_idr);
+@@ -39,12 +40,18 @@ dev_t tpm_devt;
  
-+#ifdef CONFIG_SECURE_LAUNCH
-+
-+static bool slaunch_is_txt_launch(void)
-+{
-+	if ((slaunch_get_flags() & (SL_FLAG_ACTIVE|SL_FLAG_ARCH_TXT)) ==
-+	    (SL_FLAG_ACTIVE | SL_FLAG_ARCH_TXT))
-+		return true;
-+
-+	return false;
-+}
-+
-+/*
-+ * TXT AP startup is quite different than normal. The APs cannot have #INIT
-+ * asserted on them or receive SIPIs. The early Secure Launch code has parked
-+ * the APs using monitor/mwait. This will wake the APs by writing the monitor
-+ * and have them jump to the protected mode code in the rmpiggy where the rest
-+ * of the SMP boot of the AP will proceed normally.
-+ */
-+static void slaunch_wakeup_cpu_from_txt(int cpu, int apicid)
-+{
-+	struct sl_ap_wake_info *ap_wake_info;
-+	struct sl_ap_stack_and_monitor *stack_monitor = NULL;
-+
-+	ap_wake_info = slaunch_get_ap_wake_info();
-+
-+	stack_monitor = (struct sl_ap_stack_and_monitor *)__va(ap_wake_info->ap_wake_block +
-+							       ap_wake_info->ap_stacks_offset);
-+
-+	for (unsigned int i = TXT_MAX_CPUS - 1; i >= 0; i--) {
-+		if (stack_monitor[i].apicid == apicid) {
-+			/* Write the monitor */
-+			stack_monitor[i].monitor = 1;
-+			break;
-+		}
-+	}
-+}
-+
-+#else
-+
-+static inline bool slaunch_is_txt_launch(void)
-+{
-+	return false;
-+}
-+
-+static inline void slaunch_wakeup_cpu_from_txt(int cpu, int apicid)
-+{
-+}
-+
-+#endif  /* !CONFIG_SECURE_LAUNCH */
-+
- /*
-  * NOTE - on most systems this is a PHYSICAL apic ID, but on multiquad
-  * (ie clustered apic addressing mode), this is a LOGICAL apic ID.
-@@ -1040,12 +1091,15 @@ static int do_boot_cpu(u32 apicid, int cpu, struct task_struct *idle)
+ static int tpm_request_locality(struct tpm_chip *chip)
+ {
++	int locality;
+ 	int rc;
  
- 	/*
- 	 * Wake up a CPU in difference cases:
-+	 * - Intel TXT DRTM launch uses its own method to wake the APs
- 	 * - Use a method from the APIC driver if one defined, with wakeup
- 	 *   straight to 64-bit mode preferred over wakeup to RM.
- 	 * Otherwise,
- 	 * - Use an INIT boot APIC message
- 	 */
--	if (apic->wakeup_secondary_cpu_64)
-+	if (slaunch_is_txt_launch())
-+		slaunch_wakeup_cpu_from_txt(cpu, apicid);
-+	else if (apic->wakeup_secondary_cpu_64)
- 		ret = apic->wakeup_secondary_cpu_64(apicid, start_ip);
- 	else if (apic->wakeup_secondary_cpu)
- 		ret = apic->wakeup_secondary_cpu(apicid, start_ip);
-diff --git a/arch/x86/realmode/init.c b/arch/x86/realmode/init.c
-index 788e5559549f..b548b3376765 100644
---- a/arch/x86/realmode/init.c
-+++ b/arch/x86/realmode/init.c
-@@ -4,6 +4,7 @@
- #include <linux/memblock.h>
- #include <linux/cc_platform.h>
- #include <linux/pgtable.h>
-+#include <linux/slaunch.h>
+ 	if (!chip->ops->request_locality)
+ 		return 0;
  
- #include <asm/set_memory.h>
- #include <asm/realmode.h>
-@@ -210,6 +211,8 @@ void __init init_real_mode(void)
+-	rc = chip->ops->request_locality(chip, 0);
++	if (slaunch_get_flags() & SL_FLAG_ACTIVE)
++		locality = 2;
++	else
++		locality = 0;
++
++	rc = chip->ops->request_locality(chip, locality);
+ 	if (rc < 0)
+ 		return rc;
  
- 	setup_real_mode();
- 	set_real_mode_permissions();
-+
-+	slaunch_fixup_jump_vector();
- }
- 
- static int __init do_init_real_mode(void)
-diff --git a/arch/x86/realmode/rm/header.S b/arch/x86/realmode/rm/header.S
-index 2eb62be6d256..3b5cbcbbfc90 100644
---- a/arch/x86/realmode/rm/header.S
-+++ b/arch/x86/realmode/rm/header.S
-@@ -37,6 +37,9 @@ SYM_DATA_START(real_mode_header)
- #ifdef CONFIG_X86_64
- 	.long	__KERNEL32_CS
- #endif
-+#ifdef CONFIG_SECURE_LAUNCH
-+	.long	pa_sl_trampoline_start32
-+#endif
- SYM_DATA_END(real_mode_header)
- 
- 	/* End signature, used to verify integrity */
-diff --git a/arch/x86/realmode/rm/trampoline_64.S b/arch/x86/realmode/rm/trampoline_64.S
-index c9f76fae902e..526d449d5383 100644
---- a/arch/x86/realmode/rm/trampoline_64.S
-+++ b/arch/x86/realmode/rm/trampoline_64.S
-@@ -120,6 +120,38 @@ SYM_CODE_END(sev_es_trampoline_start)
- 
- 	.section ".text32","ax"
- 	.code32
-+#ifdef CONFIG_SECURE_LAUNCH
-+	.balign 4
-+SYM_CODE_START(sl_trampoline_start32)
-+	/*
-+	 * The early secure launch stub AP wakeup code has taken care of all
-+	 * the vagaries of launching out of TXT. This bit just mimics what the
-+	 * 16b entry code does and jumps off to the real startup_32.
-+	 */
-+	cli
-+	wbinvd
-+
-+	/*
-+	 * The %ebx provided is not terribly useful since it is the physical
-+	 * address of tb_trampoline_start and not the base of the image.
-+	 * Use pa_real_mode_base, which is fixed up, to get a run time
-+	 * base register to use for offsets to location that do not have
-+	 * pa_ symbols.
-+	 */
-+	movl    $pa_real_mode_base, %ebx
-+
-+	LOCK_AND_LOAD_REALMODE_ESP lock_pa=1
-+
-+	lgdt    tr_gdt(%ebx)
-+	lidt    tr_idt(%ebx)
-+
-+	movw	$__KERNEL_DS, %dx	# Data segment descriptor
-+
-+	/* Jump to where the 16b code would have jumped */
-+	ljmpl	$__KERNEL32_CS, $pa_startup_32
-+SYM_CODE_END(sl_trampoline_start32)
-+#endif
-+
- 	.balign 4
- SYM_CODE_START(startup_32)
- 	movl	%edx, %ss
 -- 
 2.39.3
 
