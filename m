@@ -1,217 +1,231 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF7BD51F
-	for <linux-crypto@vger.kernel.org>; Fri, 10 Nov 2023 09:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5EE3AF80;
-	Fri, 10 Nov 2023 01:04:51 -0800 (PST)
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-d9c66e70ebdso1843023276.2;
-        Fri, 10 Nov 2023 01:04:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699607091; x=1700211891;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WHZPpTTWcN/qBtcyGF24DlgLlsqCltsVlukIwu8/1iQ=;
-        b=QiYKoo/QUg++OBz4Mna7w7ILuBGUOiWQYItNKUu+AfYr2EfW8cvfmn+flNQjapSixE
-         Z6mHN0nfOyVFvLbJGiqWGEEC4lyIDURfkftU26TrIw1tXdPCPSHdxYvm+R/fJrxEcXKL
-         EPvFe21+Va9CDkBr2QgY5usptWnWBU7CcEphBAN/1OvREB9t/SROT23hLrbCk8fWqj3Q
-         +COSxbSCZo/DlYg2cVHKw78jdn7rTpln/Wstn7WxhKWELYOtpNKZsNPOw2nak2zSN4yw
-         OGR83qmhtmrOwJDjEU6iPMb1+qtjnSm0KbPjWHOyZXGG+/ib7yS73FyYib2AMd+64BG9
-         1K7w==
-X-Gm-Message-State: AOJu0Yw9tJfdHIJh68sVqpefpk8PF6eOdJdnMIbRN9Pd8Ut9WEIk9NRV
-	KesGUyJsApzfcjHiTbk//ZPsWhbMDCEgKw==
-X-Google-Smtp-Source: AGHT+IEEa4GrP5RKDm7nfjuGhV+kD81VRn41CavZ63GmDswLUYsSSe4/1yhToJgXSgvu1T206jClXQ==
-X-Received: by 2002:a25:e441:0:b0:d78:f32:5849 with SMTP id b62-20020a25e441000000b00d780f325849mr6958918ybh.24.1699607090762;
-        Fri, 10 Nov 2023 01:04:50 -0800 (PST)
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com. [209.85.128.175])
-        by smtp.gmail.com with ESMTPSA id g10-20020a5b070a000000b00da041da21e7sm7718137ybq.65.2023.11.10.01.04.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Nov 2023 01:04:50 -0800 (PST)
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5a7af52ee31so21843487b3.2;
-        Fri, 10 Nov 2023 01:04:50 -0800 (PST)
-X-Received: by 2002:a0d:dc85:0:b0:5a7:baae:329f with SMTP id
- f127-20020a0ddc85000000b005a7baae329fmr7246797ywe.15.1699607089817; Fri, 10
- Nov 2023 01:04:49 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F54D179AB
+	for <linux-crypto@vger.kernel.org>; Fri, 10 Nov 2023 11:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="lT1GjfV1"
+Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C1531E5F;
+	Fri, 10 Nov 2023 03:52:23 -0800 (PST)
+Received: from [10.30.9.95] (unknown [195.13.248.78])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id E5431401DD;
+	Fri, 10 Nov 2023 11:52:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1699617141;
+	bh=272zjwdWnAlT1OR38ZdU7azH6pr5RExUaNQfqUz83Vs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type;
+	b=lT1GjfV1UovksAQ5doa3wNWJ+PmuHF8Y/ScljcKMdTW7v9vdOZXJMu4cId9Dpenvo
+	 BSU/atzFBSbtTjhSkrkeFXmLBGVuV/KFgOCMBWucIFHJlAs36ZqgXdtWxyWJHbqfP9
+	 rLT+OXsA+6UIXlT9QOqBJK6gK1C/3W0K6rliicG9bEedoMYrtlFwduKHN5FlbB5Leg
+	 XteUt3+JzmTs499WOFvSN9DjGZMikctwttvewUtZ+un8Cd1wx38xJDLDjuyM60Pbhv
+	 3SS/CmiM6/xrlhNZoYRFC+9BC+h63plE04FK+mv1plLMsqmG2wP8FfcNdVhR0dLoQA
+	 w1mGRJ3C/XHMA==
+Message-ID: <9a2daab5-c9c8-4f62-8012-b851631d2b26@canonical.com>
+Date: Fri, 10 Nov 2023 03:52:18 -0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Yzv0wXi4Uu2WND37@gondor.apana.org.au> <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
- <Y/MDmL02XYfSz8XX@gondor.apana.org.au> <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
- <ZJ0RSuWLwzikFr9r@gondor.apana.org.au> <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
- <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au> <CAHk-=wj0-QNH5gMeYs3b+LU-isJyE4Eu9p8vVH9fb-vHHmUw0g@mail.gmail.com>
- <ZUSKk6Tb7+0n9X5s@gondor.apana.org.au> <CAHk-=wh=xH7TNHeaYdsrVW6p1fCQEV5PZMpaFNsZyXYqzn8Stg@mail.gmail.com>
- <ZUi5KMUaNkp0c1Ds@gondor.apana.org.au>
-In-Reply-To: <ZUi5KMUaNkp0c1Ds@gondor.apana.org.au>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 10 Nov 2023 10:04:38 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdWWMABFmejXPEuKyvDC7CgUZSeWU6cR8qpBdVa9KiBdUQ@mail.gmail.com>
-Message-ID: <CAMuHMdWWMABFmejXPEuKyvDC7CgUZSeWU6cR8qpBdVa9KiBdUQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: jitterentropy - Hide esoteric Kconfig options
- under FIPS and EXPERT
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>, 
-	Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] apparmor: switch SECURITY_APPARMOR_HASH from sha1 to
+ sha256
+Content-Language: en-US
+To: Dimitri John Ledkov <dimitri.ledkov@canonical.com>,
+ Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>
+Cc: linux-crypto@vger.kernel.org, apparmor@lists.ubuntu.com,
+ linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231022194026.313584-1-dimitri.ledkov@canonical.com>
+From: John Johansen <john.johansen@canonical.com>
+Autocrypt: addr=john.johansen@canonical.com; keydata=
+ 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 lT9Q
+Organization: Canonical
+In-Reply-To: <20231022194026.313584-1-dimitri.ledkov@canonical.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Herbert, Yamada-san,
+On 10/22/23 12:40, Dimitri John Ledkov wrote:
+> sha1 is insecure and has colisions, thus it is not useful for even
+> lightweight policy hash checks. Switch to sha256, which on modern
+> hardware is fast enough.
+> 
+> Separately as per NIST Policy on Hash Functions, sha1 usage must be
+> withdrawn by 2030. This config option currently is one of many that
+> holds up sha1 usage.
+> 
+> Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
 
-On Mon, Nov 6, 2023 at 11:00=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
-> On Thu, Nov 02, 2023 at 08:32:36PM -1000, Linus Torvalds wrote:
-> > I think that would help the situation, but I assume the sizing for the
-> > jitter buffer is at least partly due to trying to account for cache
-> > sizing or similar issues?
-> >
-> > Which really means that I assume any static compile-time answer to
-> > that question is always wrong - whether you are an expert or not.
-> > Unless you are just building the thing for one particular machine.
-> >
-> > So I do think the problem is deeper than "this is a question only for
-> > experts". I definitely don't think you should ask a regular user (or
-> > even a distro kernel package manager). I suspect it's likely that the
-> > question is just wrong in general - because any particular one buffer
-> > size for any number of machines simply cannot be the right answer.
-> >
-> > I realize that the commit says "*allow* for configuration of memory
-> > size", but I really question the whole approach.
->
-> Yes I think these are all valid points.  I just noticed that I
-> forgot to cc the author so let's see if Stephan has anything to
-> add.
->
-> > But yes - hiding these questions from any reasonable normal user is at
-> > least a good first step.
->
-> OK here's the patch:
->
-> ---8<---
-> As JITTERENTROPY is selected by default if you enable the CRYPTO
-> API, any Kconfig options added there will show up for every single
-> user.  Hide the esoteric options under EXPERT as well as FIPS so
-> that only distro makers will see them.
->
-> Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-by: John Johansen <john.johansen@canonical.com>
 
-Thanks for your patch, which is now commit e7ed6473c2c8c4e4 ("crypto:
-jitterentropy - Hide esoteric Kconfig options under FIPS and EXPERT").
+I am pulling this into apparmor-next-queue and plan to drop this into
+apparmor-next as soon as 6.7-r1 is released.
 
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -1297,10 +1297,12 @@ config CRYPTO_JITTERENTROPY
->
->           See https://www.chronox.de/jent.html
->
-> +if CRYPTO_JITTERENTROPY
-> +if CRYPTO_FIPS && EXPERT
-> +
->  choice
->         prompt "CPU Jitter RNG Memory Size"
->         default CRYPTO_JITTERENTROPY_MEMSIZE_2
-> -       depends on CRYPTO_JITTERENTROPY
->         help
->           The Jitter RNG measures the execution time of memory accesses.
->           Multiple consecutive memory accesses are performed. If the memo=
-ry
-> @@ -1344,7 +1346,6 @@ config CRYPTO_JITTERENTROPY_OSR
->         int "CPU Jitter RNG Oversampling Rate"
->         range 1 15
->         default 1
-> -       depends on CRYPTO_JITTERENTROPY
->         help
->           The Jitter RNG allows the specification of an oversampling rate=
- (OSR).
->           The Jitter RNG operation requires a fixed amount of timing
-> @@ -1359,7 +1360,6 @@ config CRYPTO_JITTERENTROPY_OSR
->
->  config CRYPTO_JITTERENTROPY_TESTINTERFACE
->         bool "CPU Jitter RNG Test Interface"
-> -       depends on CRYPTO_JITTERENTROPY
->         help
->           The test interface allows a privileged process to capture
->           the raw unconditioned high resolution time stamp noise that
-> @@ -1377,6 +1377,28 @@ config CRYPTO_JITTERENTROPY_TESTINTERFACE
->
->           If unsure, select N.
->
-> +endif  # if CRYPTO_FIPS && EXPERT
-> +
-> +if !(CRYPTO_FIPS && EXPERT)
-> +
-> +config CRYPTO_JITTERENTROPY_MEMORY_BLOCKS
-> +       int
-> +       default 64
-> +
-> +config CRYPTO_JITTERENTROPY_MEMORY_BLOCKSIZE
-> +       int
-> +       default 32
-> +
-> +config CRYPTO_JITTERENTROPY_OSR
-> +       int
-> +       default 1
-> +
-> +config CRYPTO_JITTERENTROPY_TESTINTERFACE
-> +       bool
+> ---
+>   security/apparmor/Kconfig      | 12 ++++++------
+>   security/apparmor/apparmorfs.c | 16 ++++++++--------
+>   security/apparmor/crypto.c     |  6 +++---
+>   3 files changed, 17 insertions(+), 17 deletions(-)
+> 
+> diff --git a/security/apparmor/Kconfig b/security/apparmor/Kconfig
+> index e0d1dd0a19..64cc3044a4 100644
+> --- a/security/apparmor/Kconfig
+> +++ b/security/apparmor/Kconfig
+> @@ -57,10 +57,10 @@ config SECURITY_APPARMOR_INTROSPECT_POLICY
+>   	  cpu is paramount.
+>   
+>   config SECURITY_APPARMOR_HASH
+> -	bool "Enable introspection of sha1 hashes for loaded profiles"
+> +	bool "Enable introspection of sha256 hashes for loaded profiles"
+>   	depends on SECURITY_APPARMOR_INTROSPECT_POLICY
+>   	select CRYPTO
+> -	select CRYPTO_SHA1
+> +	select CRYPTO_SHA256
+>   	default y
+>   	help
+>   	  This option selects whether introspection of loaded policy
+> @@ -74,10 +74,10 @@ config SECURITY_APPARMOR_HASH_DEFAULT
+>          depends on SECURITY_APPARMOR_HASH
+>          default y
+>          help
+> -         This option selects whether sha1 hashing of loaded policy
+> -	 is enabled by default. The generation of sha1 hashes for
+> -	 loaded policy provide system administrators a quick way
+> -	 to verify that policy in the kernel matches what is expected,
+> +	 This option selects whether sha256 hashing of loaded policy
+> +	 is enabled by default. The generation of sha256 hashes for
+> +	 loaded policy provide system administrators a quick way to
+> +	 verify that policy in the kernel matches what is expected,
+>   	 however it can slow down policy load on some devices. In
+>   	 these cases policy hashing can be disabled by default and
+>   	 enabled only if needed.
+> diff --git a/security/apparmor/apparmorfs.c b/security/apparmor/apparmorfs.c
+> index a608a6bd76..082581397d 100644
+> --- a/security/apparmor/apparmorfs.c
+> +++ b/security/apparmor/apparmorfs.c
+> @@ -1474,7 +1474,7 @@ int __aa_fs_create_rawdata(struct aa_ns *ns, struct aa_loaddata *rawdata)
+>   	rawdata->dents[AAFS_LOADDATA_REVISION] = dent;
+>   
+>   	if (aa_g_hash_policy) {
+> -		dent = aafs_create_file("sha1", S_IFREG | 0444, dir,
+> +		dent = aafs_create_file("sha256", S_IFREG | 0444, dir,
+>   					      rawdata, &seq_rawdata_hash_fops);
+>   		if (IS_ERR(dent))
+>   			goto fail;
+> @@ -1644,11 +1644,11 @@ static const char *rawdata_get_link_base(struct dentry *dentry,
+>   	return target;
+>   }
+>   
+> -static const char *rawdata_get_link_sha1(struct dentry *dentry,
+> +static const char *rawdata_get_link_sha256(struct dentry *dentry,
+>   					 struct inode *inode,
+>   					 struct delayed_call *done)
+>   {
+> -	return rawdata_get_link_base(dentry, inode, done, "sha1");
+> +	return rawdata_get_link_base(dentry, inode, done, "sha256");
+>   }
+>   
+>   static const char *rawdata_get_link_abi(struct dentry *dentry,
+> @@ -1665,8 +1665,8 @@ static const char *rawdata_get_link_data(struct dentry *dentry,
+>   	return rawdata_get_link_base(dentry, inode, done, "raw_data");
+>   }
+>   
+> -static const struct inode_operations rawdata_link_sha1_iops = {
+> -	.get_link	= rawdata_get_link_sha1,
+> +static const struct inode_operations rawdata_link_sha256_iops = {
+> +	.get_link	= rawdata_get_link_sha256,
+>   };
+>   
+>   static const struct inode_operations rawdata_link_abi_iops = {
+> @@ -1739,7 +1739,7 @@ int __aafs_profile_mkdir(struct aa_profile *profile, struct dentry *parent)
+>   	profile->dents[AAFS_PROF_ATTACH] = dent;
+>   
+>   	if (profile->hash) {
+> -		dent = create_profile_file(dir, "sha1", profile,
+> +		dent = create_profile_file(dir, "sha256", profile,
+>   					   &seq_profile_hash_fops);
+>   		if (IS_ERR(dent))
+>   			goto fail;
+> @@ -1749,9 +1749,9 @@ int __aafs_profile_mkdir(struct aa_profile *profile, struct dentry *parent)
+>   #ifdef CONFIG_SECURITY_APPARMOR_EXPORT_BINARY
+>   	if (profile->rawdata) {
+>   		if (aa_g_hash_policy) {
+> -			dent = aafs_create("raw_sha1", S_IFLNK | 0444, dir,
+> +			dent = aafs_create("raw_sha256", S_IFLNK | 0444, dir,
+>   					   profile->label.proxy, NULL, NULL,
+> -					   &rawdata_link_sha1_iops);
+> +					   &rawdata_link_sha256_iops);
+>   			if (IS_ERR(dent))
+>   				goto fail;
+>   			aa_get_proxy(profile->label.proxy);
+> diff --git a/security/apparmor/crypto.c b/security/apparmor/crypto.c
+> index 6724e2ff6d..aad486b2fc 100644
+> --- a/security/apparmor/crypto.c
+> +++ b/security/apparmor/crypto.c
+> @@ -106,16 +106,16 @@ static int __init init_profile_hash(void)
+>   	if (!apparmor_initialized)
+>   		return 0;
+>   
+> -	tfm = crypto_alloc_shash("sha1", 0, 0);
+> +	tfm = crypto_alloc_shash("sha256", 0, 0);
+>   	if (IS_ERR(tfm)) {
+>   		int error = PTR_ERR(tfm);
+> -		AA_ERROR("failed to setup profile sha1 hashing: %d\n", error);
+> +		AA_ERROR("failed to setup profile sha256 hashing: %d\n", error);
+>   		return error;
+>   	}
+>   	apparmor_tfm = tfm;
+>   	apparmor_hash_size = crypto_shash_digestsize(apparmor_tfm);
+>   
+> -	aa_info_message("AppArmor sha1 policy hashing enabled");
+> +	aa_info_message("AppArmor sha256 policy hashing enabled");
+>   
+>   	return 0;
+>   }
 
-This duplicates the symbols in the CRYPTO_FIPS && EXPERT section above,
-which is fragile.
-
-For the int and bool symbols, this can be handled without duplication
-using:
-
-     config CRYPTO_JITTERENTROPY_OSR
-    -       int "CPU Jitter RNG Oversampling Rate"
-    +       int "CPU Jitter RNG Oversampling Rate" if CRYPTO_FIPS && EXPERT
-
-     config CRYPTO_JITTERENTROPY_TESTINTERFACE
-    -       bool "CPU Jitter RNG Test Interface"
-    +       bool "CPU Jitter RNG Test Interface" if CRYPTO_FIPS && EXPERT
-
-Unfortunately the following does not work for the choice statement,
-although kconfig does not report an error:
-
-     choice
-    -       prompt "CPU Jitter RNG Memory Size"
-    +       prompt "CPU Jitter RNG Memory Size" if CRYPTO_FIPS && EXPERT
-             default CRYPTO_JITTERENTROPY_MEMSIZE_2
-
-Unlike for other symbol types, which just become silent if
-!(CRYPTO_FIPS && EXPERT), the choice is skipped completely if
-!(CRYPTO_FIPS && EXPERT), and CRYPTO_JITTERENTROPY_MEMSIZE_2 is not set.
-
-Yamada-san: Do you know why choice behaves differently?
-Is this easy to fix?
-
-Thanks!
-
-> +
-> +endif  # if !(CRYPTO_FIPS && EXPERT)
-> +endif  # if CRYPTO_JITTERENTROPY
-> +
->  config CRYPTO_KDF800108_CTR
->         tristate
->         select CRYPTO_HMAC
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
