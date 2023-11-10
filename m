@@ -1,43 +1,43 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3A33D3B4;
-	Fri, 10 Nov 2023 22:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF483D3B9;
+	Fri, 10 Nov 2023 22:28:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cL+OXa8n"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="xsuEJCtm"
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B2DC4205;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BB6C44BD;
 	Fri, 10 Nov 2023 14:28:40 -0800 (PST)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAHiSsU017445;
-	Fri, 10 Nov 2023 22:28:01 GMT
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAHiMrC020649;
+	Fri, 10 Nov 2023 22:28:08 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2023-03-30;
- bh=gXRwIVrmLnsEI+SIy8umjRWfPejqq8Dn2F0xGyqXM64=;
- b=cL+OXa8nEVTirEBlO9fyzn/Pai4BBReANEp22a7zUM7gzu0uTPVBtHqPaBiIPI4nYxdf
- ngDZA6ZtbhytEQGwC82scMz+zRNypVMuXAiflytmyrxlI8annDm56jnAa3GvWLdX+Ady
- I+bHqUi35+OMdWPKsuKkq83DvAPpYBUL0AZe9Ozxo8kL7eQ6r65YEjDBxJ624ucuX/iD
- w0x06Sscm3uxySWFkYL44nOEC02oC8TBDvqXLETMUeTeC0Po+BD6VRlIV7qmBXlkypK6
- eEov+26grf0TtMAwQS5d6fhDSpixyPg++P1mIR2Q+FBhzoqmgKlLcXd72iKdn2S/9btL 4g== 
+ content-transfer-encoding; s=corp-2023-03-30;
+ bh=mY67GlGNJ/1PY9vGRU/Aa9QnDZm6Krew2PubEC3OAa4=;
+ b=xsuEJCtmWrlM3EFdA8avxD1hZampt239W9u2zhoW2ghiXeS5QXmba+jUTXc/ut+e8S2Y
+ S1wtiK6nfpwk0Ca5gT5oxx6+iM3jc3KukU2WA9TiGmxU0IRVArkD4YCI+pdRHqlTi9x4
+ 4Fs46et0icxiUzzlPWPuEyJHv46MIHg8MC5EwOJkOX0Meb7vZDIc0lnvUCJCMvOE9dZi
+ 1Vlj4CklxYlnCzREVptwfQedxF0onHc5rJGceMhs63Q/h55LqD4gtJRRRG8d9giEUZaU
+ xWbD2JbkIU5plP85xBB3kZQIgQSZg0uctjPRHb95TqMwEfwExMQbMBxP4GRVI/uLxTo8 7A== 
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3u7w26xx6r-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3u7w23pysb-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Nov 2023 22:28:01 +0000
+	Fri, 10 Nov 2023 22:28:08 +0000
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAKP0Q3023879;
-	Fri, 10 Nov 2023 22:27:59 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAK96dx023887;
+	Fri, 10 Nov 2023 22:28:06 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nb16-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nb3m-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 10 Nov 2023 22:27:59 +0000
+	Fri, 10 Nov 2023 22:28:06 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AAMRsa8039112;
-	Fri, 10 Nov 2023 22:27:59 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AAMRsaM039112;
+	Fri, 10 Nov 2023 22:28:06 GMT
 Received: from ovs113.us.oracle.com (ovs113.us.oracle.com [10.149.224.213])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nayh-6
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nayh-13
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 10 Nov 2023 22:27:59 +0000
+	Fri, 10 Nov 2023 22:28:05 +0000
 From: Ross Philipson <ross.philipson@oracle.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org,
         linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -49,9 +49,9 @@ Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
         James.Bottomley@hansenpartnership.com, luto@amacapital.net,
         nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
         trenchboot-devel@googlegroups.com
-Subject: [PATCH v7 05/13] x86: Secure Launch main header file
-Date: Fri, 10 Nov 2023 17:27:43 -0500
-Message-Id: <20231110222751.219836-6-ross.philipson@oracle.com>
+Subject: [PATCH v7 12/13] x86: Secure Launch late initcall platform module
+Date: Fri, 10 Nov 2023 17:27:50 -0500
+Message-Id: <20231110222751.219836-13-ross.philipson@oracle.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20231110222751.219836-1-ross.philipson@oracle.com>
 References: <20231110222751.219836-1-ross.philipson@oracle.com>
@@ -61,7 +61,6 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
@@ -70,566 +69,564 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 p
  spamscore=0 mlxscore=0 adultscore=0 malwarescore=0 bulkscore=0
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311060000 definitions=main-2311100187
-X-Proofpoint-GUID: ZoVkGDt7LHf8UleI1y4l-26IrtiRULJg
-X-Proofpoint-ORIG-GUID: ZoVkGDt7LHf8UleI1y4l-26IrtiRULJg
+X-Proofpoint-GUID: Totms05ECkRCyD0UJeNvUKDMAVMGkzjp
+X-Proofpoint-ORIG-GUID: Totms05ECkRCyD0UJeNvUKDMAVMGkzjp
 
-Introduce the main Secure Launch header file used in the early SL stub
-and the early setup code.
+From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
 
+The Secure Launch platform module is a late init module. During the
+init call, the TPM event log is read and measurements taken in the
+early boot stub code are located. These measurements are extended
+into the TPM PCRs using the mainline TPM kernel driver.
+
+The platform module also registers the securityfs nodes to allow
+access to TXT register fields on Intel along with the fetching of
+and writing events to the late launch TPM log.
+
+Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
+Signed-off-by: garnetgrimm <grimmg@ainfosec.com>
 Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
 ---
- include/linux/slaunch.h | 542 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 542 insertions(+)
- create mode 100644 include/linux/slaunch.h
+ arch/x86/kernel/Makefile   |   1 +
+ arch/x86/kernel/slmodule.c | 517 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 518 insertions(+)
+ create mode 100644 arch/x86/kernel/slmodule.c
 
-diff --git a/include/linux/slaunch.h b/include/linux/slaunch.h
+diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+index 5848ea310175..948346ff4595 100644
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
+@@ -75,6 +75,7 @@ obj-$(CONFIG_IA32_EMULATION)	+= tls.o
+ obj-y				+= step.o
+ obj-$(CONFIG_INTEL_TXT)		+= tboot.o
+ obj-$(CONFIG_SECURE_LAUNCH)	+= slaunch.o
++obj-$(CONFIG_SECURE_LAUNCH)	+= slmodule.o
+ obj-$(CONFIG_ISA_DMA_API)	+= i8237.o
+ obj-y				+= stacktrace.o
+ obj-y				+= cpu/
+diff --git a/arch/x86/kernel/slmodule.c b/arch/x86/kernel/slmodule.c
 new file mode 100644
-index 000000000000..da2988e32ada
+index 000000000000..992469bf15a4
 --- /dev/null
-+++ b/include/linux/slaunch.h
-@@ -0,0 +1,542 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
++++ b/arch/x86/kernel/slmodule.c
+@@ -0,0 +1,517 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Main Secure Launch header file.
++ * Secure Launch late validation/setup, securityfs exposure and finalization.
 + *
++ * Copyright (c) 2022 Apertus Solutions, LLC
++ * Copyright (c) 2021 Assured Information Security, Inc.
 + * Copyright (c) 2022, Oracle and/or its affiliates.
-+ */
-+
-+#ifndef _LINUX_SLAUNCH_H
-+#define _LINUX_SLAUNCH_H
-+
-+/*
-+ * Secure Launch Defined State Flags
-+ */
-+#define SL_FLAG_ACTIVE		0x00000001
-+#define SL_FLAG_ARCH_SKINIT	0x00000002
-+#define SL_FLAG_ARCH_TXT	0x00000004
-+
-+/*
-+ * Secure Launch CPU Type
-+ */
-+#define SL_CPU_AMD	1
-+#define SL_CPU_INTEL	2
-+
-+#if IS_ENABLED(CONFIG_SECURE_LAUNCH)
-+
-+#define __SL32_CS	0x0008
-+#define __SL32_DS	0x0010
-+
-+/*
-+ * Intel Safer Mode Extensions (SMX)
 + *
-+ * Intel SMX provides a programming interface to establish a Measured Launched
-+ * Environment (MLE). The measurement and protection mechanisms supported by the
-+ * capabilities of an Intel Trusted Execution Technology (TXT) platform. SMX is
-+ * the processor’s programming interface in an Intel TXT platform.
-+ *
-+ * See Intel SDM Volume 2 - 6.1 "Safer Mode Extensions Reference"
++ * Co-developed-by: Garnet T. Grimm <grimmg@ainfosec.com>
++ * Signed-off-by: Garnet T. Grimm <grimmg@ainfosec.com>
++ * Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
 + */
 +
-+/*
-+ * SMX GETSEC Leaf Functions
-+ */
-+#define SMX_X86_GETSEC_SEXIT	5
-+#define SMX_X86_GETSEC_SMCTRL	7
-+#define SMX_X86_GETSEC_WAKEUP	8
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+/*
-+ * Intel Trusted Execution Technology MMIO Registers Banks
-+ */
-+#define TXT_PUB_CONFIG_REGS_BASE	0xfed30000
-+#define TXT_PRIV_CONFIG_REGS_BASE	0xfed20000
-+#define TXT_NR_CONFIG_PAGES     ((TXT_PUB_CONFIG_REGS_BASE - \
-+				  TXT_PRIV_CONFIG_REGS_BASE) >> PAGE_SHIFT)
-+
-+/*
-+ * Intel Trusted Execution Technology (TXT) Registers
-+ */
-+#define TXT_CR_STS			0x0000
-+#define TXT_CR_ESTS			0x0008
-+#define TXT_CR_ERRORCODE		0x0030
-+#define TXT_CR_CMD_RESET		0x0038
-+#define TXT_CR_CMD_CLOSE_PRIVATE	0x0048
-+#define TXT_CR_DIDVID			0x0110
-+#define TXT_CR_VER_EMIF			0x0200
-+#define TXT_CR_CMD_UNLOCK_MEM_CONFIG	0x0218
-+#define TXT_CR_SINIT_BASE		0x0270
-+#define TXT_CR_SINIT_SIZE		0x0278
-+#define TXT_CR_MLE_JOIN			0x0290
-+#define TXT_CR_HEAP_BASE		0x0300
-+#define TXT_CR_HEAP_SIZE		0x0308
-+#define TXT_CR_SCRATCHPAD		0x0378
-+#define TXT_CR_CMD_OPEN_LOCALITY1	0x0380
-+#define TXT_CR_CMD_CLOSE_LOCALITY1	0x0388
-+#define TXT_CR_CMD_OPEN_LOCALITY2	0x0390
-+#define TXT_CR_CMD_CLOSE_LOCALITY2	0x0398
-+#define TXT_CR_CMD_SECRETS		0x08e0
-+#define TXT_CR_CMD_NO_SECRETS		0x08e8
-+#define TXT_CR_E2STS			0x08f0
-+
-+/* TXT default register value */
-+#define TXT_REGVALUE_ONE		0x1ULL
-+
-+/* TXTCR_STS status bits */
-+#define TXT_SENTER_DONE_STS		BIT(0)
-+#define TXT_SEXIT_DONE_STS		BIT(1)
-+
-+/*
-+ * SINIT/MLE Capabilities Field Bit Definitions
-+ */
-+#define TXT_SINIT_MLE_CAP_WAKE_GETSEC	0
-+#define TXT_SINIT_MLE_CAP_WAKE_MONITOR	1
-+
-+/*
-+ * OS/MLE Secure Launch Specific Definitions
-+ */
-+#define TXT_OS_MLE_STRUCT_VERSION	1
-+#define TXT_OS_MLE_MAX_VARIABLE_MTRRS	32
-+
-+/*
-+ * TXT Heap Table Enumeration
-+ */
-+#define TXT_BIOS_DATA_TABLE		1
-+#define TXT_OS_MLE_DATA_TABLE		2
-+#define TXT_OS_SINIT_DATA_TABLE		3
-+#define TXT_SINIT_MLE_DATA_TABLE	4
-+#define TXT_SINIT_TABLE_MAX		TXT_SINIT_MLE_DATA_TABLE
-+
-+/*
-+ * Secure Launch Defined Error Codes used in MLE-initiated TXT resets.
-+ *
-+ * TXT Specification
-+ * Appendix I ACM Error Codes
-+ */
-+#define SL_ERROR_GENERIC		0xc0008001
-+#define SL_ERROR_TPM_INIT		0xc0008002
-+#define SL_ERROR_TPM_INVALID_LOG20	0xc0008003
-+#define SL_ERROR_TPM_LOGGING_FAILED	0xc0008004
-+#define SL_ERROR_REGION_STRADDLE_4GB	0xc0008005
-+#define SL_ERROR_TPM_EXTEND		0xc0008006
-+#define SL_ERROR_MTRR_INV_VCNT		0xc0008007
-+#define SL_ERROR_MTRR_INV_DEF_TYPE	0xc0008008
-+#define SL_ERROR_MTRR_INV_BASE		0xc0008009
-+#define SL_ERROR_MTRR_INV_MASK		0xc000800a
-+#define SL_ERROR_MSR_INV_MISC_EN	0xc000800b
-+#define SL_ERROR_INV_AP_INTERRUPT	0xc000800c
-+#define SL_ERROR_INTEGER_OVERFLOW	0xc000800d
-+#define SL_ERROR_HEAP_WALK		0xc000800e
-+#define SL_ERROR_HEAP_MAP		0xc000800f
-+#define SL_ERROR_REGION_ABOVE_4GB	0xc0008010
-+#define SL_ERROR_HEAP_INVALID_DMAR	0xc0008011
-+#define SL_ERROR_HEAP_DMAR_SIZE		0xc0008012
-+#define SL_ERROR_HEAP_DMAR_MAP		0xc0008013
-+#define SL_ERROR_HI_PMR_BASE		0xc0008014
-+#define SL_ERROR_HI_PMR_SIZE		0xc0008015
-+#define SL_ERROR_LO_PMR_BASE		0xc0008016
-+#define SL_ERROR_LO_PMR_MLE		0xc0008017
-+#define SL_ERROR_INITRD_TOO_BIG		0xc0008018
-+#define SL_ERROR_HEAP_ZERO_OFFSET	0xc0008019
-+#define SL_ERROR_WAKE_BLOCK_TOO_SMALL	0xc000801a
-+#define SL_ERROR_MLE_BUFFER_OVERLAP	0xc000801b
-+#define SL_ERROR_BUFFER_BEYOND_PMR	0xc000801c
-+#define SL_ERROR_OS_SINIT_BAD_VERSION	0xc000801d
-+#define SL_ERROR_EVENTLOG_MAP		0xc000801e
-+#define SL_ERROR_TPM_NUMBER_ALGS	0xc000801f
-+#define SL_ERROR_TPM_UNKNOWN_DIGEST	0xc0008020
-+#define SL_ERROR_TPM_INVALID_EVENT	0xc0008021
-+#define SL_ERROR_INVALID_SLRT		0xc0008022
-+#define SL_ERROR_SLRT_MISSING_ENTRY	0xc0008023
-+#define SL_ERROR_SLRT_MAP		0xc0008024
-+
-+/*
-+ * Secure Launch Defined Limits
-+ */
-+#define TXT_MAX_CPUS		512
-+#define TXT_BOOT_STACK_SIZE	128
-+
-+/*
-+ * Secure Launch event log entry type. The TXT specification defines the
-+ * base event value as 0x400 for DRTM values.
-+ */
-+#define TXT_EVTYPE_BASE			0x400
-+#define TXT_EVTYPE_SLAUNCH		(TXT_EVTYPE_BASE + 0x102)
-+#define TXT_EVTYPE_SLAUNCH_START	(TXT_EVTYPE_BASE + 0x103)
-+#define TXT_EVTYPE_SLAUNCH_END		(TXT_EVTYPE_BASE + 0x104)
-+
-+/*
-+ * Measured Launch PCRs
-+ */
-+#define SL_DEF_DLME_DETAIL_PCR17	17
-+#define SL_DEF_DLME_AUTHORITY_PCR18	18
-+#define SL_ALT_DLME_AUTHORITY_PCR19	19
-+#define SL_ALT_DLME_DETAIL_PCR20	20
-+
-+/*
-+ * MLE scratch area offsets
-+ */
-+#define SL_SCRATCH_AP_EBX		0
-+#define SL_SCRATCH_AP_JMP_OFFSET	4
-+#define SL_SCRATCH_AP_STACKS_OFFSET	8
-+
-+#ifndef __ASSEMBLY__
-+
++#include <linux/fs.h>
++#include <linux/init.h>
++#include <linux/linkage.h>
++#include <linux/mm.h>
 +#include <linux/io.h>
-+#include <linux/tpm.h>
-+#include <linux/tpm_eventlog.h>
++#include <linux/uaccess.h>
++#include <linux/security.h>
++#include <linux/memblock.h>
++#include <asm/segment.h>
++#include <asm/sections.h>
++#include <crypto/sha2.h>
++#include <linux/slr_table.h>
++#include <linux/slaunch.h>
 +
 +/*
-+ * Secure Launch AP stack and monitor block
++ * The macro DECLARE_TXT_PUB_READ_U is used to read values from the TXT
++ * public registers as unsigned values.
 + */
-+struct sl_ap_stack_and_monitor {
-+	u32 monitor;
-+	u32 cache_pad[15];
-+	u32 stack_pad[15];
-+	u32 apicid;
-+} __packed;
++#define DECLARE_TXT_PUB_READ_U(size, fmt, msg_size)			\
++static ssize_t txt_pub_read_u##size(unsigned int offset,		\
++		loff_t *read_offset,					\
++		size_t read_len,					\
++		char __user *buf)					\
++{									\
++	char msg_buffer[msg_size];					\
++	u##size reg_value = 0;						\
++	void __iomem *txt;						\
++									\
++	txt = ioremap(TXT_PUB_CONFIG_REGS_BASE,				\
++			TXT_NR_CONFIG_PAGES * PAGE_SIZE);		\
++	if (!txt)							\
++		return -EFAULT;						\
++	memcpy_fromio(&reg_value, txt + offset, sizeof(u##size));	\
++	iounmap(txt);							\
++	snprintf(msg_buffer, msg_size, fmt, reg_value);			\
++	return simple_read_from_buffer(buf, read_len, read_offset,	\
++			&msg_buffer, msg_size);				\
++}
++
++DECLARE_TXT_PUB_READ_U(8, "%#04x\n", 6);
++DECLARE_TXT_PUB_READ_U(32, "%#010x\n", 12);
++DECLARE_TXT_PUB_READ_U(64, "%#018llx\n", 20);
++
++#define DECLARE_TXT_FOPS(reg_name, reg_offset, reg_size)		\
++static ssize_t txt_##reg_name##_read(struct file *flip,			\
++		char __user *buf, size_t read_len, loff_t *read_offset)	\
++{									\
++	return txt_pub_read_u##reg_size(reg_offset, read_offset,	\
++			read_len, buf);					\
++}									\
++static const struct file_operations reg_name##_ops = {			\
++	.read = txt_##reg_name##_read,					\
++}
++
++DECLARE_TXT_FOPS(sts, TXT_CR_STS, 64);
++DECLARE_TXT_FOPS(ests, TXT_CR_ESTS, 8);
++DECLARE_TXT_FOPS(errorcode, TXT_CR_ERRORCODE, 32);
++DECLARE_TXT_FOPS(didvid, TXT_CR_DIDVID, 64);
++DECLARE_TXT_FOPS(e2sts, TXT_CR_E2STS, 64);
++DECLARE_TXT_FOPS(ver_emif, TXT_CR_VER_EMIF, 32);
++DECLARE_TXT_FOPS(scratchpad, TXT_CR_SCRATCHPAD, 64);
 +
 +/*
-+ * Secure Launch AP wakeup information fetched in SMP boot code.
++ * Securityfs exposure
 + */
-+struct sl_ap_wake_info {
-+	u32 ap_wake_block;
-+	u32 ap_wake_block_size;
-+	u32 ap_jmp_offset;
-+	u32 ap_stacks_offset;
++struct memfile {
++	char *name;
++	void *addr;
++	size_t size;
 +};
 +
-+/*
-+ * TXT heap extended data elements.
-+ */
-+struct txt_heap_ext_data_element {
-+	u32 type;
-+	u32 size;
-+	/* Data */
-+} __packed;
++static struct memfile sl_evtlog = {"eventlog", NULL, 0};
++static void *txt_heap;
++static struct txt_heap_event_log_pointer2_1_element *evtlog20;
++static DEFINE_MUTEX(sl_evt_log_mutex);
 +
-+#define TXT_HEAP_EXTDATA_TYPE_END			0
-+
-+struct txt_heap_end_element {
-+	u32 type;
-+	u32 size;
-+} __packed;
-+
-+#define TXT_HEAP_EXTDATA_TYPE_TPM_EVENT_LOG_PTR		5
-+
-+struct txt_heap_event_log_element {
-+	u64 event_log_phys_addr;
-+} __packed;
-+
-+#define TXT_HEAP_EXTDATA_TYPE_EVENT_LOG_POINTER2_1	8
-+
-+struct txt_heap_event_log_pointer2_1_element {
-+	u64 phys_addr;
-+	u32 allocated_event_container_size;
-+	u32 first_record_offset;
-+	u32 next_record_offset;
-+} __packed;
-+
-+/*
-+ * Secure Launch defined OS/MLE TXT Heap table
-+ */
-+struct txt_os_mle_data {
-+	u32 version;
-+	u32 boot_params_addr;
-+	u64 slrt;
-+	u64 txt_info;
-+	u32 ap_wake_block;
-+	u32 ap_wake_block_size;
-+	u8 mle_scratch[64];
-+} __packed;
-+
-+/*
-+ * TXT specification defined BIOS data TXT Heap table
-+ */
-+struct txt_bios_data {
-+	u32 version; /* Currently 5 for TPM 1.2 and 6 for TPM 2.0 */
-+	u32 bios_sinit_size;
-+	u64 reserved1;
-+	u64 reserved2;
-+	u32 num_logical_procs;
-+	/* Versions >= 5 with updates in version 6 */
-+	u32 sinit_flags;
-+	u32 mle_flags;
-+	/* Versions >= 4 */
-+	/* Ext Data Elements */
-+} __packed;
-+
-+/*
-+ * TXT specification defined OS/SINIT TXT Heap table
-+ */
-+struct txt_os_sinit_data {
-+	u32 version; /* Currently 6 for TPM 1.2 and 7 for TPM 2.0 */
-+	u32 flags;
-+	u64 mle_ptab;
-+	u64 mle_size;
-+	u64 mle_hdr_base;
-+	u64 vtd_pmr_lo_base;
-+	u64 vtd_pmr_lo_size;
-+	u64 vtd_pmr_hi_base;
-+	u64 vtd_pmr_hi_size;
-+	u64 lcp_po_base;
-+	u64 lcp_po_size;
-+	u32 capabilities;
-+	/* Version = 5 */
-+	u64 efi_rsdt_ptr;
-+	/* Versions >= 6 */
-+	/* Ext Data Elements */
-+} __packed;
-+
-+/*
-+ * TXT specification defined SINIT/MLE TXT Heap table
-+ */
-+struct txt_sinit_mle_data {
-+	u32 version;             /* Current values are 6 through 9 */
-+	/* Versions <= 8 */
-+	u8 bios_acm_id[20];
-+	u32 edx_senter_flags;
-+	u64 mseg_valid;
-+	u8 sinit_hash[20];
-+	u8 mle_hash[20];
-+	u8 stm_hash[20];
-+	u8 lcp_policy_hash[20];
-+	u32 lcp_policy_control;
-+	/* Versions >= 7 */
-+	u32 rlp_wakeup_addr;
-+	u32 reserved;
-+	u32 num_of_sinit_mdrs;
-+	u32 sinit_mdrs_table_offset;
-+	u32 sinit_vtd_dmar_table_size;
-+	u32 sinit_vtd_dmar_table_offset;
-+	/* Versions >= 8 */
-+	u32 processor_scrtm_status;
-+	/* Versions >= 9 */
-+	/* Ext Data Elements */
-+} __packed;
-+
-+/*
-+ * TXT data reporting structure for memory types
-+ */
-+struct txt_sinit_memory_descriptor_record {
-+	u64 address;
-+	u64 length;
-+	u8 type;
-+	u8 reserved[7];
-+} __packed;
-+
-+/*
-+ * TXT data structure used by a responsive local processor (RLP) to start
-+ * execution in response to a GETSEC[WAKEUP].
-+ */
-+struct smx_rlp_mle_join {
-+	u32 rlp_gdt_limit;
-+	u32 rlp_gdt_base;
-+	u32 rlp_seg_sel;     /* cs (ds, es, ss are seg_sel+8) */
-+	u32 rlp_entry_point; /* phys addr */
-+} __packed;
-+
-+/*
-+ * TPM event log structures defined in both the TXT specification and
-+ * the TCG documentation.
-+ */
-+#define TPM12_EVTLOG_SIGNATURE "TXT Event Container"
-+
-+struct tpm12_event_log_header {
-+	char signature[20];
-+	char reserved[12];
-+	u8 container_ver_major;
-+	u8 container_ver_minor;
-+	u8 pcr_event_ver_major;
-+	u8 pcr_event_ver_minor;
-+	u32 container_size;
-+	u32 pcr_events_offset;
-+	u32 next_event_offset;
-+	/* PCREvents[] */
-+} __packed;
-+
-+/*
-+ * Functions to extract data from the Intel TXT Heap Memory. The layout
-+ * of the heap is as follows:
-+ *  +----------------------------+
-+ *  | Size Bios Data table (u64) |
-+ *  +----------------------------+
-+ *  | Bios Data table            |
-+ *  +----------------------------+
-+ *  | Size OS MLE table (u64)    |
-+ *  +----------------------------+
-+ *  | OS MLE table               |
-+ *  +--------------------------- +
-+ *  | Size OS SINIT table (u64)  |
-+ *  +----------------------------+
-+ *  | OS SINIT table             |
-+ *  +----------------------------+
-+ *  | Size SINIT MLE table (u64) |
-+ *  +----------------------------+
-+ *  | SINIT MLE table            |
-+ *  +----------------------------+
-+ *
-+ *  NOTE: the table size fields include the 8 byte size field itself.
-+ */
-+static inline u64 txt_bios_data_size(void *heap)
++static ssize_t sl_evtlog_read(struct file *file, char __user *buf,
++			      size_t count, loff_t *pos)
 +{
-+	return *((u64 *)heap);
++	ssize_t size;
++
++	if (!sl_evtlog.addr)
++		return 0;
++
++	mutex_lock(&sl_evt_log_mutex);
++	size = simple_read_from_buffer(buf, count, pos, sl_evtlog.addr,
++				       sl_evtlog.size);
++	mutex_unlock(&sl_evt_log_mutex);
++
++	return size;
 +}
 +
-+static inline void *txt_bios_data_start(void *heap)
++static ssize_t sl_evtlog_write(struct file *file, const char __user *buf,
++			       size_t datalen, loff_t *ppos)
 +{
-+	return heap + sizeof(u64);
-+}
++	ssize_t result;
++	char *data;
 +
-+static inline u64 txt_os_mle_data_size(void *heap)
-+{
-+	return *((u64 *)(heap + txt_bios_data_size(heap)));
-+}
++	if (!sl_evtlog.addr)
++		return 0;
 +
-+static inline void *txt_os_mle_data_start(void *heap)
-+{
-+	return heap + txt_bios_data_size(heap) + sizeof(u64);
-+}
++	/* No partial writes. */
++	result = -EINVAL;
++	if (*ppos != 0)
++		goto out;
 +
-+static inline u64 txt_os_sinit_data_size(void *heap)
-+{
-+	return *((u64 *)(heap + txt_bios_data_size(heap) +
-+			txt_os_mle_data_size(heap)));
-+}
-+
-+static inline void *txt_os_sinit_data_start(void *heap)
-+{
-+	return heap + txt_bios_data_size(heap) +
-+		txt_os_mle_data_size(heap) + sizeof(u64);
-+}
-+
-+static inline u64 txt_sinit_mle_data_size(void *heap)
-+{
-+	return *((u64 *)(heap + txt_bios_data_size(heap) +
-+			txt_os_mle_data_size(heap) +
-+			txt_os_sinit_data_size(heap)));
-+}
-+
-+static inline void *txt_sinit_mle_data_start(void *heap)
-+{
-+	return heap + txt_bios_data_size(heap) +
-+		txt_os_mle_data_size(heap) +
-+		txt_os_sinit_data_size(heap) + sizeof(u64);
-+}
-+
-+/*
-+ * TPM event logging functions.
-+ */
-+static inline struct txt_heap_event_log_pointer2_1_element*
-+tpm20_find_log2_1_element(struct txt_os_sinit_data *os_sinit_data)
-+{
-+	struct txt_heap_ext_data_element *ext_elem;
-+
-+	/* The extended element array as at the end of this table */
-+	ext_elem = (struct txt_heap_ext_data_element *)
-+		((u8 *)os_sinit_data + sizeof(struct txt_os_sinit_data));
-+
-+	while (ext_elem->type != TXT_HEAP_EXTDATA_TYPE_END) {
-+		if (ext_elem->type ==
-+		    TXT_HEAP_EXTDATA_TYPE_EVENT_LOG_POINTER2_1) {
-+			return (struct txt_heap_event_log_pointer2_1_element *)
-+				((u8 *)ext_elem +
-+					sizeof(struct txt_heap_ext_data_element));
-+		}
-+		ext_elem =
-+			(struct txt_heap_ext_data_element *)
-+			((u8 *)ext_elem + ext_elem->size);
++	data = memdup_user(buf, datalen);
++	if (IS_ERR(data)) {
++		result = PTR_ERR(data);
++		goto out;
 +	}
 +
-+	return NULL;
++	mutex_lock(&sl_evt_log_mutex);
++	if (evtlog20)
++		result = tpm20_log_event(evtlog20, sl_evtlog.addr,
++					 sl_evtlog.size, datalen, data);
++	else
++		result = tpm12_log_event(sl_evtlog.addr, sl_evtlog.size,
++					 datalen, data);
++	mutex_unlock(&sl_evt_log_mutex);
++
++	kfree(data);
++out:
++	return result;
 +}
 +
-+static inline int tpm12_log_event(void *evtlog_base, u32 evtlog_size,
-+				  u32 event_size, void *event)
++static const struct file_operations sl_evtlog_ops = {
++	.read = sl_evtlog_read,
++	.write = sl_evtlog_write,
++	.llseek	= default_llseek,
++};
++
++struct sfs_file {
++	const char *name;
++	const struct file_operations *fops;
++};
++
++#define SL_TXT_ENTRY_COUNT	7
++static const struct sfs_file sl_txt_files[] = {
++	{ "sts", &sts_ops },
++	{ "ests", &ests_ops },
++	{ "errorcode", &errorcode_ops },
++	{ "didvid", &didvid_ops },
++	{ "ver_emif", &ver_emif_ops },
++	{ "scratchpad", &scratchpad_ops },
++	{ "e2sts", &e2sts_ops }
++};
++
++/* sysfs file handles */
++static struct dentry *slaunch_dir;
++static struct dentry *event_file;
++static struct dentry *txt_dir;
++static struct dentry *txt_entries[SL_TXT_ENTRY_COUNT];
++
++static long slaunch_expose_securityfs(void)
 +{
-+	struct tpm12_event_log_header *evtlog =
-+		(struct tpm12_event_log_header *)evtlog_base;
++	long ret = 0;
++	int i;
 +
-+	if (memcmp(evtlog->signature, TPM12_EVTLOG_SIGNATURE,
-+		   sizeof(TPM12_EVTLOG_SIGNATURE)))
-+		return -EINVAL;
++	slaunch_dir = securityfs_create_dir("slaunch", NULL);
++	if (IS_ERR(slaunch_dir))
++		return PTR_ERR(slaunch_dir);
 +
-+	if (evtlog->container_size > evtlog_size)
-+		return -EINVAL;
++	if (slaunch_get_flags() & SL_FLAG_ARCH_TXT) {
++		txt_dir = securityfs_create_dir("txt", slaunch_dir);
++		if (IS_ERR(txt_dir)) {
++			ret = PTR_ERR(txt_dir);
++			goto remove_slaunch;
++		}
 +
-+	if (evtlog->next_event_offset + event_size > evtlog->container_size)
-+		return -E2BIG;
++		for (i = 0; i < ARRAY_SIZE(sl_txt_files); i++) {
++			txt_entries[i] = securityfs_create_file(
++						sl_txt_files[i].name, 0440,
++						txt_dir, NULL,
++						sl_txt_files[i].fops);
++			if (IS_ERR(txt_entries[i])) {
++				ret = PTR_ERR(txt_entries[i]);
++				goto remove_files;
++			}
++		}
++	}
 +
-+	memcpy(evtlog_base + evtlog->next_event_offset, event, event_size);
-+	evtlog->next_event_offset += event_size;
++	if (sl_evtlog.addr) {
++		event_file = securityfs_create_file(sl_evtlog.name, 0440,
++						    slaunch_dir, NULL,
++						    &sl_evtlog_ops);
++		if (IS_ERR(event_file)) {
++			ret = PTR_ERR(event_file);
++			goto remove_files;
++		}
++	}
 +
 +	return 0;
++
++remove_files:
++	if (slaunch_get_flags() & SL_FLAG_ARCH_TXT) {
++		while (--i >= 0)
++			securityfs_remove(txt_entries[i]);
++		securityfs_remove(txt_dir);
++	}
++
++remove_slaunch:
++	securityfs_remove(slaunch_dir);
++
++	return ret;
 +}
 +
-+static inline int tpm20_log_event(struct txt_heap_event_log_pointer2_1_element *elem,
-+				  void *evtlog_base, u32 evtlog_size,
-+				  u32 event_size, void *event)
++static void slaunch_teardown_securityfs(void)
 +{
-+	struct tcg_pcr_event *header =
-+		(struct tcg_pcr_event *)evtlog_base;
++	int i;
 +
-+	/* Has to be at least big enough for the signature */
-+	if (header->event_size < sizeof(TCG_SPECID_SIG))
-+		return -EINVAL;
++	securityfs_remove(event_file);
++	if (sl_evtlog.addr) {
++		memunmap(sl_evtlog.addr);
++		sl_evtlog.addr = NULL;
++	}
++	sl_evtlog.size = 0;
 +
-+	if (memcmp((u8 *)header + sizeof(struct tcg_pcr_event),
-+		   TCG_SPECID_SIG, sizeof(TCG_SPECID_SIG)))
-+		return -EINVAL;
++	if (slaunch_get_flags() & SL_FLAG_ARCH_TXT) {
++		for (i = 0; i < ARRAY_SIZE(sl_txt_files); i++)
++			securityfs_remove(txt_entries[i]);
 +
-+	if (elem->allocated_event_container_size > evtlog_size)
-+		return -EINVAL;
++		securityfs_remove(txt_dir);
 +
-+	if (elem->next_record_offset + event_size >
-+	    elem->allocated_event_container_size)
-+		return -E2BIG;
++		if (txt_heap) {
++			memunmap(txt_heap);
++			txt_heap = NULL;
++		}
++	}
 +
-+	memcpy(evtlog_base + elem->next_record_offset, event, event_size);
-+	elem->next_record_offset += event_size;
-+
-+	return 0;
++	securityfs_remove(slaunch_dir);
 +}
 +
-+/*
-+ * External functions avalailable in mainline kernel.
-+ */
-+void slaunch_setup_txt(void);
-+void slaunch_fixup_jump_vector(void);
-+u32 slaunch_get_flags(void);
-+struct sl_ap_wake_info *slaunch_get_ap_wake_info(void);
-+struct acpi_table_header *slaunch_get_dmar_table(struct acpi_table_header *dmar);
-+void __noreturn slaunch_txt_reset(void __iomem *txt,
-+					 const char *msg, u64 error);
-+extern void slaunch_finalize(int do_sexit);
-+
-+#endif /* !__ASSEMBLY */
-+
-+#else
-+
-+static inline void slaunch_setup_txt(void)
++static void slaunch_intel_evtlog(void __iomem *txt)
 +{
++	struct slr_entry_log_info *log_info;
++	struct txt_os_mle_data *params;
++	struct slr_table *slrt;
++	void *os_sinit_data;
++	u64 base, size;
++
++	memcpy_fromio(&base, txt + TXT_CR_HEAP_BASE, sizeof(base));
++	memcpy_fromio(&size, txt + TXT_CR_HEAP_SIZE, sizeof(size));
++
++	/* now map TXT heap */
++	txt_heap = memremap(base, size, MEMREMAP_WB);
++	if (!txt_heap)
++		slaunch_txt_reset(txt,
++				  "Error failed to memremap TXT heap\n",
++				  SL_ERROR_HEAP_MAP);
++
++	params = (struct txt_os_mle_data *)txt_os_mle_data_start(txt_heap);
++
++	/* Get the SLRT and remap it */
++	slrt = memremap(params->slrt, sizeof(*slrt), MEMREMAP_WB);
++	if (!slrt)
++		slaunch_txt_reset(txt,
++				  "Error failed to memremap SLR Table\n",
++				  SL_ERROR_SLRT_MAP);
++	size = slrt->size;
++	memunmap(slrt);
++
++	slrt = memremap(params->slrt, size, MEMREMAP_WB);
++	if (!slrt)
++		slaunch_txt_reset(txt,
++				  "Error failed to memremap SLR Table\n",
++				  SL_ERROR_SLRT_MAP);
++
++	log_info = (struct slr_entry_log_info *)slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_LOG_INFO);
++	if (!log_info)
++		slaunch_txt_reset(txt,
++				  "Error failed to memremap SLR Table\n",
++				  SL_ERROR_SLRT_MISSING_ENTRY);
++
++	sl_evtlog.size = log_info->size;
++	sl_evtlog.addr = memremap(log_info->addr, log_info->size,
++				  MEMREMAP_WB);
++	if (!sl_evtlog.addr)
++		slaunch_txt_reset(txt,
++				  "Error failed to memremap TPM event log\n",
++				  SL_ERROR_EVENTLOG_MAP);
++
++	memunmap(slrt);
++
++	/* Determine if this is TPM 1.2 or 2.0 event log */
++	if (memcmp(sl_evtlog.addr + sizeof(struct tcg_pcr_event),
++		    TCG_SPECID_SIG, sizeof(TCG_SPECID_SIG)))
++		return; /* looks like it is not 2.0 */
++
++	/* For TPM 2.0 logs, the extended heap element must be located */
++	os_sinit_data = txt_os_sinit_data_start(txt_heap);
++
++	evtlog20 = tpm20_find_log2_1_element(os_sinit_data);
++
++	/*
++	 * If this fails, things are in really bad shape. Any attempt to write
++	 * events to the log will fail.
++	 */
++	if (!evtlog20)
++		slaunch_txt_reset(txt,
++				  "Error failed to find TPM20 event log element\n",
++				  SL_ERROR_TPM_INVALID_LOG20);
 +}
 +
-+static inline void slaunch_fixup_jump_vector(void)
++static void slaunch_tpm20_extend_event(struct tpm_chip *tpm, void __iomem *txt,
++				       struct tcg_pcr_event2_head *event)
 +{
++	u16 *alg_id_field = (u16 *)((u8 *)event + sizeof(struct tcg_pcr_event2_head));
++	struct tpm_digest *digests;
++	u8 *dptr;
++	int ret;
++	u32 i, j;
++
++	digests = kcalloc(tpm->nr_allocated_banks, sizeof(*digests),
++			  GFP_KERNEL);
++	if (!digests)
++		slaunch_txt_reset(txt,
++				  "Failed to allocate array of digests\n",
++				  SL_ERROR_GENERIC);
++
++	for (i = 0; i < tpm->nr_allocated_banks; i++)
++		digests[i].alg_id = tpm->allocated_banks[i].alg_id;
++
++	/* Early SL code ensured there was a max count of 2 digests */
++	for (i = 0; i < event->count; i++) {
++		dptr = (u8 *)alg_id_field + sizeof(u16);
++
++		for (j = 0; j < tpm->nr_allocated_banks; j++) {
++			if (digests[j].alg_id != *alg_id_field)
++				continue;
++
++			switch (digests[j].alg_id) {
++			case TPM_ALG_SHA256:
++				memcpy(&digests[j].digest[0], dptr,
++				       SHA256_DIGEST_SIZE);
++				alg_id_field = (u16 *)((u8 *)alg_id_field +
++					SHA256_DIGEST_SIZE + sizeof(u16));
++				break;
++			case TPM_ALG_SHA1:
++				memcpy(&digests[j].digest[0], dptr,
++				       SHA1_DIGEST_SIZE);
++				alg_id_field = (u16 *)((u8 *)alg_id_field +
++					SHA1_DIGEST_SIZE + sizeof(u16));
++			default:
++				break;
++			}
++		}
++	}
++
++	ret = tpm_pcr_extend(tpm, event->pcr_idx, digests);
++	if (ret) {
++		pr_err("Error extending TPM20 PCR, result: %d\n", ret);
++		slaunch_txt_reset(txt,
++				  "Failed to extend TPM20 PCR\n",
++				  SL_ERROR_TPM_EXTEND);
++	}
++
++	kfree(digests);
 +}
 +
-+static inline u32 slaunch_get_flags(void)
++static void slaunch_tpm20_extend(struct tpm_chip *tpm, void __iomem *txt)
 +{
-+	return 0;
++	struct tcg_pcr_event *event_header;
++	struct tcg_pcr_event2_head *event;
++	int start = 0, end = 0, size;
++
++	event_header = (struct tcg_pcr_event *)(sl_evtlog.addr +
++						evtlog20->first_record_offset);
++
++	/* Skip first TPM 1.2 event to get to first TPM 2.0 event */
++	event = (struct tcg_pcr_event2_head *)((u8 *)event_header +
++						sizeof(struct tcg_pcr_event) +
++						event_header->event_size);
++
++	while ((void  *)event < sl_evtlog.addr + evtlog20->next_record_offset) {
++		size = __calc_tpm2_event_size(event, event_header, false);
++		if (!size)
++			slaunch_txt_reset(txt,
++					  "TPM20 invalid event in event log\n",
++					  SL_ERROR_TPM_INVALID_EVENT);
++
++		/*
++		 * Marker events indicate where the Secure Launch early stub
++		 * started and ended adding post launch events.
++		 */
++		if (event->event_type == TXT_EVTYPE_SLAUNCH_END) {
++			end = 1;
++			break;
++		} else if (event->event_type == TXT_EVTYPE_SLAUNCH_START) {
++			start = 1;
++			goto next;
++		}
++
++		if (start)
++			slaunch_tpm20_extend_event(tpm, txt, event);
++
++next:
++		event = (struct tcg_pcr_event2_head *)((u8 *)event + size);
++	}
++
++	if (!start || !end)
++		slaunch_txt_reset(txt,
++				  "Missing start or end events for extending TPM20 PCRs\n",
++				  SL_ERROR_TPM_EXTEND);
 +}
 +
-+static inline struct acpi_table_header *slaunch_get_dmar_table(struct acpi_table_header *dmar)
++static void slaunch_tpm12_extend(struct tpm_chip *tpm, void __iomem *txt)
 +{
-+	return dmar;
++	struct tpm12_event_log_header *event_header;
++	struct tcg_pcr_event *event;
++	struct tpm_digest digest;
++	int start = 0, end = 0;
++	int size, ret;
++
++	event_header = (struct tpm12_event_log_header *)sl_evtlog.addr;
++	event = (struct tcg_pcr_event *)((u8 *)event_header +
++				sizeof(struct tpm12_event_log_header));
++
++	while ((void  *)event < sl_evtlog.addr + event_header->next_event_offset) {
++		size = sizeof(struct tcg_pcr_event) + event->event_size;
++
++		/*
++		 * Marker events indicate where the Secure Launch early stub
++		 * started and ended adding post launch events.
++		 */
++		if (event->event_type == TXT_EVTYPE_SLAUNCH_END) {
++			end = 1;
++			break;
++		} else if (event->event_type == TXT_EVTYPE_SLAUNCH_START) {
++			start = 1;
++			goto next;
++		}
++
++		if (start) {
++			memset(&digest.digest[0], 0, TPM_MAX_DIGEST_SIZE);
++			digest.alg_id = TPM_ALG_SHA1;
++			memcpy(&digest.digest[0], &event->digest[0],
++			       SHA1_DIGEST_SIZE);
++
++			ret = tpm_pcr_extend(tpm, event->pcr_idx, &digest);
++			if (ret) {
++				pr_err("Error extending TPM12 PCR, result: %d\n", ret);
++				slaunch_txt_reset(txt,
++						  "Failed to extend TPM12 PCR\n",
++						  SL_ERROR_TPM_EXTEND);
++			}
++		}
++
++next:
++		event = (struct tcg_pcr_event *)((u8 *)event + size);
++	}
++
++	if (!start || !end)
++		slaunch_txt_reset(txt,
++				  "Missing start or end events for extending TPM12 PCRs\n",
++				  SL_ERROR_TPM_EXTEND);
 +}
 +
-+static inline void slaunch_finalize(int do_sexit)
++static void slaunch_pcr_extend(void __iomem *txt)
 +{
++	struct tpm_chip *tpm;
++
++	tpm = tpm_default_chip();
++	if (!tpm)
++		slaunch_txt_reset(txt,
++				  "Could not get default TPM chip\n",
++				  SL_ERROR_TPM_INIT);
++	if (evtlog20)
++		slaunch_tpm20_extend(tpm, txt);
++	else
++		slaunch_tpm12_extend(tpm, txt);
 +}
 +
-+#endif /* !IS_ENABLED(CONFIG_SECURE_LAUNCH) */
++static int __init slaunch_module_init(void)
++{
++	void __iomem *txt;
 +
-+#endif /* _LINUX_SLAUNCH_H */
++	/* Check to see if Secure Launch happened */
++	if ((slaunch_get_flags() & (SL_FLAG_ACTIVE|SL_FLAG_ARCH_TXT)) !=
++	    (SL_FLAG_ACTIVE | SL_FLAG_ARCH_TXT))
++		return 0;
++
++	txt = ioremap(TXT_PRIV_CONFIG_REGS_BASE, TXT_NR_CONFIG_PAGES *
++		      PAGE_SIZE);
++	if (!txt)
++		panic("Error ioremap of TXT priv registers\n");
++
++	/* Only Intel TXT is supported at this point */
++	slaunch_intel_evtlog(txt);
++	slaunch_pcr_extend(txt);
++	iounmap(txt);
++
++	return slaunch_expose_securityfs();
++}
++
++static void __exit slaunch_module_exit(void)
++{
++	slaunch_teardown_securityfs();
++}
++
++late_initcall(slaunch_module_init);
++__exitcall(slaunch_module_exit);
 -- 
 2.39.3
 
