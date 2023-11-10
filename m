@@ -1,557 +1,263 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404312230F;
-	Fri, 10 Nov 2023 20:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A913C697;
+	Fri, 10 Nov 2023 22:08:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Kd977tnS"
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49EA01BFF;
-	Fri, 10 Nov 2023 12:35:29 -0800 (PST)
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAH7gAq023574;
-	Fri, 10 Nov 2023 12:35:18 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=xH/B8tISI4B9JcvunkqzKV7YENhbUam4Qz7awUTc11s=;
- b=Kd977tnSakI7KDniTrgp0ywSHBDrjeplPPHCcICmJ/8GHIIRGFw8XmssTcoG9sUufGpR
- A8+6XKK2K+Ue+DhuQSveee0vkEBQS6r29qv/lLVb6ZLizgx3xJuvzIUqaKMX4WiSzrd2
- KHAYvgFtoLnjrDtoWcqG8FZ48Qjo6WtyR9SAsS4WyodBwg3pVmgdN2KY13a4n+NGUdx8
- 9XIEd7i/sdEc/DGr7OzBcuR8wBBHysrzIpkETtuy2GWj7Z4lsVYcQjLJon6tY3LK1TNa
- rZAUHKuxYlMEQWzxGnyNmLgTUAVezCuxvBjlAHCk7LJQPk+Ix1Jbhr6/IKHXhnRmt0zS Yg== 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3u9cx461c9-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Fri, 10 Nov 2023 12:35:18 -0800
-Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a8:83::8) with Microsoft SMTP Server id
- 15.1.2507.34; Fri, 10 Nov 2023 12:35:16 -0800
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Jakub Kicinski
-	<kuba@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Andrii Nakryiko
-	<andrii@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko
-	<mykolal@fb.com>
-CC: Vadim Fedorenko <vadfed@meta.com>, <bpf@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-Subject: [PATCH bpf-next v4 2/2] selftests: bpf: crypto skcipher algo selftests
-Date: Fri, 10 Nov 2023 12:35:00 -0800
-Message-ID: <20231110203500.2787316-2-vadfed@meta.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20231110203500.2787316-1-vadfed@meta.com>
-References: <20231110203500.2787316-1-vadfed@meta.com>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Ets9i2x0"
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2079.outbound.protection.outlook.com [40.107.94.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A0374205;
+	Fri, 10 Nov 2023 14:08:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AtTV5tuSrQmacUVva3gQgEPlITnlswwmezhuONTzXoTTI8pI0NaWIyeZ6runTvLDab+3mm2PQ/5I0F6mT3S12woLvSOrkJhiIGLZIqRu62lrnT0PHb5pzHP40Pay3Vq+O6Z+fg7L6qHHCkrKDlOULqd0clAXXiwkMxDDvndMdNHUwbjtu8rUn2Fj34Ws1gr5rEw9u8RY+NtELBG+xwCVkfqJYgP3JV8MJy/JFBubLFN2wPOAqGbnHmFi3uO3jbGbc2LSK7Ym64DTK8mimgKkBpxGHgIpYByt2pCAdBAqW84kMLUq6lwnOeudhK+bmtKp0ac1/gFZZjxu9v1eEVVwOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Qa3PqD4sOPR/HFdOo2x936pkipuYUXli9vflwTmetfw=;
+ b=OJTYiXFQkm5rjRjqYW3aCxREDyMcC7GiR/hGfZvLWDJV4jLC0D3Au6auy87PKmcpQYVskY1sGBlIk4AaYcDOc1yEyee+apbR46A8GLK5OUNPbtJEKcuWzBwqr/nD7z7eFRr8IUGXgoV/Taley5rhlxl9wlhmdHsa3Sd5GF+zgYJBl6EmUgTGgO+1l66M+eIYSjdN+RSyTY/tgVJXzfpn3js6dqlojYrR1SAlmpSHBa53owtlRJ4/gSJ+MpN0puV4YJvljaHgp+J7oc7MgUZD5ytgJdk9qJw8LhgQSq44hS+XdJ/wq6oa6hmd7VRpf9KC0bS/sn1yQKTl9kT/2qghqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Qa3PqD4sOPR/HFdOo2x936pkipuYUXli9vflwTmetfw=;
+ b=Ets9i2x0ODGncJohlvy4ilibYmZB/E+lEAFH3XVwlvkFi8+ud3SdciGy+wh8YVlReIwXyzpRCseFrTKmoRqCsucGJN/b8G/bYQwF5xNyEd/Z8gzFXfliChKO7javE/5jMG+MuemmLn5AWsLKnkCDcioMO8K4lZi0iBrMalbzwxA=
+Received: from CY5PR03CA0029.namprd03.prod.outlook.com (2603:10b6:930:8::30)
+ by CY8PR12MB7196.namprd12.prod.outlook.com (2603:10b6:930:58::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.19; Fri, 10 Nov
+ 2023 22:08:13 +0000
+Received: from CY4PEPF0000EE3B.namprd03.prod.outlook.com
+ (2603:10b6:930:8:cafe::22) by CY5PR03CA0029.outlook.office365.com
+ (2603:10b6:930:8::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.19 via Frontend
+ Transport; Fri, 10 Nov 2023 22:08:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE3B.mail.protection.outlook.com (10.167.242.15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6977.21 via Frontend Transport; Fri, 10 Nov 2023 22:08:12 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Fri, 10 Nov
+ 2023 16:08:12 -0600
+Date: Fri, 10 Nov 2023 16:07:56 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Alexey Kardashevskiy <aik@amd.com>, Dionna Amalie Glaze
+	<dionnaglaze@google.com>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
+	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
+	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
+	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
+	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 48/50] KVM: SEV: Provide support for
+ SNP_GUEST_REQUEST NAE event
+Message-ID: <20231110220756.7hhiy36jc6jiu7nm@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-49-michael.roth@amd.com>
+ <CAAH4kHb=hNH88poYw-fj+ewYgt8F-hseZcRuLDdvbgpSQ5FDZQ@mail.gmail.com>
+ <ZS614OSoritrE1d2@google.com>
+ <b9da2fed-b527-4242-a588-7fc3ee6c9070@amd.com>
+ <ZS_iS4UOgBbssp7Z@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [2620:10d:c0a8:1b::2d]
-X-Proofpoint-GUID: aYZixrvgsoTKn0f2KLlfYhgkx8bk-e3e
-X-Proofpoint-ORIG-GUID: aYZixrvgsoTKn0f2KLlfYhgkx8bk-e3e
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-10_18,2023-11-09_01,2023-05-22_02
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZS_iS4UOgBbssp7Z@google.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3B:EE_|CY8PR12MB7196:EE_
+X-MS-Office365-Filtering-Correlation-Id: 74160f65-08e6-4019-9370-08dbe2398842
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1xpUF3nGWUErzC/4Un2J4zzu+1i3Q1dcMo1MGqVFf2IPWgXgdQdqk9+CLGeHDioH9D9KNuoFGXbXujCPyn149MjS8s7BPIyj/qvU23hhBfPdOPrUcgAHxSDkUaUXy7NHTwS/QvT9SlY49Ay7kX+YC8DdfPdEK1gOeHf47vDadSXPf3mwTM3gZYsgrZDV6Z/p7k1NR5DuCvABB6nXpmQJgJGuDXHrbP3MMqbxfxKjEracfEBCA3odA75c3M+jeqRftEcONhpp4WdIcfL3aua7uupBVHO/9KSDLwO3wojh9zby023Ik+DUQu+2BfTOn5A+iBgT/rWrkf+1BwuMhodcGQdOKxHIy+412MIi7SoVxLciwX8GYI5kykTp5HFhPPZdC6Plte9BM8KB/CrnGRMaCKqbb2+ruyKMv+N5a8R3EvrF9tvCc+DsYMRk27R3ZH9MRuw5C+PUzSYGEujZq3CHx9W1BI7mv6PT388CDMJ3ouAPi7B4dS2DCMTfZJRqTJ1KBlM+Cd5Ni/qJbMB53P8npXYichVe1KL1BT5kxL66k+CAPySJMjNlO2jXDwA5ODtb6qspwP2SKSlYDjhoVCt0Sc2Uu6GC8SrR2s+FsHbJR2QPZ6UzCdLR4ImKyFMHtULUTbxX0QQ+kcdfGXotyZXz75JbMxQQbS1rnrz0K+ky2QrY1IOeT6lu6bnXNMJplvkMxxJTy/cyI47K2C2zNLhG6EtbzCvyFqqH7uZBy+7coe3XZlwDCNQuSH1hsuNg1owEjTH8PiubDhaIdHZ6pcBBIg==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(346002)(396003)(136003)(230922051799003)(1800799009)(451199024)(64100799003)(82310400011)(186009)(46966006)(36840700001)(40470700004)(36860700001)(478600001)(53546011)(6666004)(47076005)(26005)(16526019)(83380400001)(426003)(54906003)(316002)(40480700001)(70586007)(6916009)(70206006)(2616005)(1076003)(7406005)(5660300002)(82740400003)(40460700003)(44832011)(8676002)(66899024)(4326008)(8936002)(336012)(7416002)(41300700001)(36756003)(86362001)(2906002)(356005)(81166007)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2023 22:08:12.8728
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74160f65-08e6-4019-9370-08dbe2398842
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE3B.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7196
 
-Add simple tc hook selftests to show the way to work with new crypto
-BPF API. Some weird structre and map are added to setup program to make
-verifier happy about dynptr initialization from memory. Simple AES-ECB
-algo is used to demonstrate encryption and decryption of fixed size
-buffers.
+On Wed, Oct 18, 2023 at 06:48:59AM -0700, Sean Christopherson wrote:
+> On Wed, Oct 18, 2023, Alexey Kardashevskiy wrote:
+> > 
+> > On 18/10/23 03:27, Sean Christopherson wrote:
+> > > On Mon, Oct 16, 2023, Dionna Amalie Glaze wrote:
+> > > > > +
+> > > > > +       /*
+> > > > > +        * If a VMM-specific certificate blob hasn't been provided, grab the
+> > > > > +        * host-wide one.
+> > > > > +        */
+> > > > > +       snp_certs = sev_snp_certs_get(sev->snp_certs);
+> > > > > +       if (!snp_certs)
+> > > > > +               snp_certs = sev_snp_global_certs_get();
+> > > > > +
+> > > > 
+> > > > This is where the generation I suggested adding would get checked. If
+> > > > the instance certs' generation is not the global generation, then I
+> > > > think we need a way to return to the VMM to make that right before
+> > > > continuing to provide outdated certificates.
+> > > > This might be an unreasonable request, but the fact that the certs and
+> > > > reported_tcb can be set while a VM is running makes this an issue.
+> > > 
+> > > Before we get that far, the changelogs need to explain why the kernel is storing
+> > > userspace blobs in the first place.  The whole thing is a bit of a mess.
+> > > 
+> > > sev_snp_global_certs_get() has data races that could lead to variations of TOCTOU
+> > > bugs: sev_ioctl_snp_set_config() can overwrite psp_master->sev_data->snp_certs
+> > > while sev_snp_global_certs_get() is running.  If the compiler reloads snp_certs
+> > > between bumping the refcount and grabbing the pointer, KVM will end up leaking a
+> > > refcount and consuming a pointer without a refcount.
+> > > 
+> > > 	if (!kref_get_unless_zero(&certs->kref))
+> > > 		return NULL;
+> > > 
+> > > 	return certs;
+> > 
+> > I'm missing something here. The @certs pointer is on the stack,
+> 
+> No, nothing guarantees that @certs is on the stack and will never be reloaded.
+> sev_snp_certs_get() is in full view of sev_snp_global_certs_get(), so it's entirely
+> possible that it can be inlined.  Then you end up with:
+> 
+> 	struct sev_device *sev;
+> 
+> 	if (!psp_master || !psp_master->sev_data)
+> 		return NULL;
+> 
+> 	sev = psp_master->sev_data;
+> 	if (!sev->snp_initialized)
+> 		return NULL;
+> 
+> 	if (!sev->snp_certs)
+> 		return NULL;
+> 
+> 	if (!kref_get_unless_zero(&sev->snp_certs->kref))
+> 		return NULL;
+> 
+> 	return sev->snp_certs;
+> 
+> At which point the compiler could choose to omit a local variable entirely, it
+> could store @certs in a register and reload after kref_get_unless_zero(), etc.
+> If psp_master->sev_data->snp_certs is changed at any point, odd thing can happen.
+> 
+> That atomic operation in kref_get_unless_zero() might prevent a reload between
+> getting the kref and the return, but it wouldn't prevent a reload between the
+> !NULL check and kref_get_unless_zero().
+> 
+> > > If userspace wants to provide garbage to the guest, so be it, not KVM's problem.
+> > > That way, whether the VM gets the global cert or a per-VM cert is purely a userspace
+> > > concern.
+> > 
+> > The global cert lives in CCP (/dev/sev), the per VM cert lives in kvmvm_fd.
+> > "A la vcpu->run" is fine for the latter but for the former we need something
+> > else.
+> 
+> Why?  The cert ultimately comes from userspace, no?  Make userspace deal with it.
+> 
+> > And there is scenario when one global certs blob is what is needed and
+> > copying it over multiple VMs seems suboptimal.
+> 
+> That's a solvable problem.  I'm not sure I like the most obvious solution, but it
+> is a solution: let userspace define a KVM-wide blob pointer, either via .mmap()
+> or via an ioctl().
+> 
+> FWIW, there's no need to do .mmap() shenanigans, e.g. an ioctl() to set the
+> userspace pointer would suffice.  The benefit of a kernel controlled pointer is
+> that it doesn't require copying to a kernel buffer (or special code to copy from
+> userspace into guest).
+> 
+> Actually, looking at the flow again, AFAICT there's nothing special about the
+> target DATA_PAGE.  It must be SHARED *before* SVM_VMGEXIT_EXT_GUEST_REQUEST, i.e.
+> KVM doesn't need to do conversions, there's no kernel priveleges required, etc.
+> And the GHCB doesn't dictate ordering between storing the certificates and doing
+> the request.  That means the certificate stuff can be punted entirely to usersepace.
+> 
+> Heh, typing up the below, there's another bug: KVM will incorrectly "return" '0'
+> for non-SNP guests:
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
-v3 -> v4:
-- adjust selftests to use new syntax of helpers
-- add tests for acquire and release
-v2 -> v3:
-- disable tests on s390 and aarch64 because of unknown Fatal exception
-  in sg_init_one
-v1 -> v2:
-- add CONFIG_CRYPTO_AES and CONFIG_CRYPTO_ECB to selftest build config
-  suggested by Daniel
----
- tools/testing/selftests/bpf/DENYLIST.aarch64  |   1 +
- tools/testing/selftests/bpf/DENYLIST.s390x    |   1 +
- tools/testing/selftests/bpf/config            |   3 +
- .../selftests/bpf/prog_tests/crypto_sanity.c  | 148 ++++++++++++++
- .../selftests/bpf/progs/crypto_common.h       |  69 +++++++
- .../selftests/bpf/progs/crypto_sanity.c       | 193 ++++++++++++++++++
- 6 files changed, 415 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
- create mode 100644 tools/testing/selftests/bpf/progs/crypto_common.h
- create mode 100644 tools/testing/selftests/bpf/progs/crypto_sanity.c
+Thanks for the catch, will fix that up.
 
-diff --git a/tools/testing/selftests/bpf/DENYLIST.aarch64 b/tools/testing/selftests/bpf/DENYLIST.aarch64
-index 5c2cc7e8c5d0..72c7ef3e5872 100644
---- a/tools/testing/selftests/bpf/DENYLIST.aarch64
-+++ b/tools/testing/selftests/bpf/DENYLIST.aarch64
-@@ -1,5 +1,6 @@
- bpf_cookie/multi_kprobe_attach_api               # kprobe_multi_link_api_subtest:FAIL:fentry_raw_skel_load unexpected error: -3
- bpf_cookie/multi_kprobe_link_api                 # kprobe_multi_link_api_subtest:FAIL:fentry_raw_skel_load unexpected error: -3
-+crypto_sanity					 # sg_init_one has exception on aarch64
- exceptions					 # JIT does not support calling kfunc bpf_throw: -524
- fexit_sleep                                      # The test never returns. The remaining tests cannot start.
- kprobe_multi_bench_attach                        # needs CONFIG_FPROBE
-diff --git a/tools/testing/selftests/bpf/DENYLIST.s390x b/tools/testing/selftests/bpf/DENYLIST.s390x
-index 1a63996c0304..8ab7485bedb1 100644
---- a/tools/testing/selftests/bpf/DENYLIST.s390x
-+++ b/tools/testing/selftests/bpf/DENYLIST.s390x
-@@ -1,5 +1,6 @@
- # TEMPORARY
- # Alphabetical order
-+crypto_sanity				 # sg_init_one has exception on s390					       (exceptions)
- exceptions				 # JIT does not support calling kfunc bpf_throw				       (exceptions)
- get_stack_raw_tp                         # user_stack corrupted user stack                                             (no backchain userspace)
- stacktrace_build_id                      # compare_map_keys stackid_hmap vs. stackmap err -2 errno 2                   (?)
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index 3ec5927ec3e5..81e521e9c0e9 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -14,6 +14,9 @@ CONFIG_CGROUP_BPF=y
- CONFIG_CRYPTO_HMAC=y
- CONFIG_CRYPTO_SHA256=y
- CONFIG_CRYPTO_USER_API_HASH=y
-+CONFIG_CRYPTO_SKCIPHER=y
-+CONFIG_CRYPTO_ECB=y
-+CONFIG_CRYPTO_AES=y
- CONFIG_DEBUG_INFO=y
- CONFIG_DEBUG_INFO_BTF=y
- CONFIG_DEBUG_INFO_DWARF4=y
-diff --git a/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c b/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
-new file mode 100644
-index 000000000000..eb2cf7677797
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
-@@ -0,0 +1,148 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2023 Meta Platforms, Inc. and affiliates. */
-+
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+#include <net/if.h>
-+#include <linux/in6.h>
-+
-+#include "test_progs.h"
-+#include "network_helpers.h"
-+#include "crypto_sanity.skel.h"
-+
-+#define NS_TEST "crypto_sanity_ns"
-+#define IPV6_IFACE_ADDR "face::1"
-+#define UDP_TEST_PORT 7777
-+static const char plain_text[] = "stringtoencrypt0";
-+static const char crypted_data[] = "\x5B\x59\x39\xEA\xD9\x7A\x2D\xAD\xA7\xE0\x43" \
-+				   "\x37\x8A\x77\x17\xB2";
-+
-+void test_crypto_sanity(void)
-+{
-+	LIBBPF_OPTS(bpf_tc_hook, qdisc_hook, .attach_point = BPF_TC_EGRESS);
-+	LIBBPF_OPTS(bpf_tc_opts, tc_attach_enc);
-+	LIBBPF_OPTS(bpf_tc_opts, tc_attach_dec);
-+	LIBBPF_OPTS(bpf_test_run_opts, opts,
-+		    .repeat = 1,
-+	);
-+	struct nstoken *nstoken = NULL;
-+	struct crypto_sanity *skel;
-+	struct sockaddr_in6 addr;
-+	int sockfd, err, pfd;
-+	socklen_t addrlen;
-+
-+	skel = crypto_sanity__open();
-+	if (!ASSERT_OK_PTR(skel, "skel open"))
-+		return;
-+
-+	bpf_program__set_autoload(skel->progs.crypto_accuire, true);
-+
-+	err = crypto_sanity__load(skel);
-+	if (!ASSERT_ERR(err, "crypto_accuire unexpected load success"))
-+		goto fail;
-+
-+	crypto_sanity__destroy(skel);
-+
-+	skel = crypto_sanity__open();
-+	if (!ASSERT_OK_PTR(skel, "skel open"))
-+		return;
-+
-+	bpf_program__set_autoload(skel->progs.crypto_accuire, false);
-+
-+	SYS(fail, "ip netns add %s", NS_TEST);
-+	SYS(fail, "ip -net %s -6 addr add %s/128 dev lo nodad", NS_TEST, IPV6_IFACE_ADDR);
-+	SYS(fail, "ip -net %s link set dev lo up", NS_TEST);
-+
-+	err = crypto_sanity__load(skel);
-+	if (!ASSERT_OK(err, "crypto_sanity__load"))
-+		goto fail;
-+
-+	nstoken = open_netns(NS_TEST);
-+	if (!ASSERT_OK_PTR(nstoken, "open_netns"))
-+		goto fail;
-+
-+	qdisc_hook.ifindex = if_nametoindex("lo");
-+	if (!ASSERT_GT(qdisc_hook.ifindex, 0, "if_nametoindex lo"))
-+		goto fail;
-+
-+	err = crypto_sanity__attach(skel);
-+	if (!ASSERT_OK(err, "crypto_sanity__attach"))
-+		goto fail;
-+
-+	pfd = bpf_program__fd(skel->progs.crypto_release);
-+	if (!ASSERT_GT(pfd, 0, "crypto_release fd"))
-+		goto fail;
-+
-+	err = bpf_prog_test_run_opts(pfd, &opts);
-+	if (!ASSERT_OK(err, "crypto_release") ||
-+	    !ASSERT_OK(opts.retval, "crypto_release retval"))
-+		goto fail;
-+
-+	pfd = bpf_program__fd(skel->progs.skb_crypto_setup);
-+	if (!ASSERT_GT(pfd, 0, "skb_crypto_setup fd"))
-+		goto fail;
-+
-+	err = bpf_prog_test_run_opts(pfd, &opts);
-+	if (!ASSERT_OK(err, "skb_crypto_setup") ||
-+	    !ASSERT_OK(opts.retval, "skb_crypto_setup retval"))
-+		goto fail;
-+
-+	if (!ASSERT_OK(skel->bss->status, "skb_crypto_setup status"))
-+		goto fail;
-+
-+	err = bpf_tc_hook_create(&qdisc_hook);
-+	if (!ASSERT_OK(err, "create qdisc hook"))
-+		goto fail;
-+
-+	addrlen = sizeof(addr);
-+	err = make_sockaddr(AF_INET6, IPV6_IFACE_ADDR, UDP_TEST_PORT,
-+			    (void *)&addr, &addrlen);
-+	if (!ASSERT_OK(err, "make_sockaddr"))
-+		goto fail;
-+
-+	tc_attach_dec.prog_fd = bpf_program__fd(skel->progs.decrypt_sanity);
-+	err = bpf_tc_attach(&qdisc_hook, &tc_attach_dec);
-+	if (!ASSERT_OK(err, "attach decrypt filter"))
-+		goto fail;
-+
-+	sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
-+	if (!ASSERT_NEQ(sockfd, -1, "decrypt socket"))
-+		goto fail;
-+	err = sendto(sockfd, crypted_data, 16, 0, (void *)&addr, addrlen);
-+	close(sockfd);
-+	if (!ASSERT_EQ(err, 16, "decrypt send"))
-+		goto fail;
-+
-+	bpf_tc_detach(&qdisc_hook, &tc_attach_dec);
-+	if (!ASSERT_OK(skel->bss->status, "decrypt status"))
-+		goto fail;
-+	if (!ASSERT_STRNEQ(skel->bss->dst, plain_text, sizeof(plain_text), "decrypt"))
-+		goto fail;
-+
-+	tc_attach_enc.prog_fd = bpf_program__fd(skel->progs.encrypt_sanity);
-+	err = bpf_tc_attach(&qdisc_hook, &tc_attach_enc);
-+	if (!ASSERT_OK(err, "attach encrypt filter"))
-+		goto fail;
-+
-+	sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
-+	if (!ASSERT_NEQ(sockfd, -1, "encrypt socket"))
-+		goto fail;
-+	err = sendto(sockfd, plain_text, 16, 0, (void *)&addr, addrlen);
-+	close(sockfd);
-+	if (!ASSERT_EQ(err, 16, "encrypt send"))
-+		goto fail;
-+
-+	bpf_tc_detach(&qdisc_hook, &tc_attach_enc);
-+	if (!ASSERT_OK(skel->bss->status, "encrypt status"))
-+		goto fail;
-+	if (!ASSERT_STRNEQ(skel->bss->dst, crypted_data, sizeof(crypted_data), "encrypt"))
-+		goto fail;
-+
-+fail:
-+	if (nstoken) {
-+		bpf_tc_hook_destroy(&qdisc_hook);
-+		close_netns(nstoken);
-+	}
-+	SYS_NOFAIL("ip netns del " NS_TEST " &> /dev/null");
-+	crypto_sanity__destroy(skel);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/crypto_common.h b/tools/testing/selftests/bpf/progs/crypto_common.h
-new file mode 100644
-index 000000000000..6874bc7b84dd
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/crypto_common.h
-@@ -0,0 +1,69 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) 2023 Meta Platforms, Inc. and affiliates. */
-+
-+#ifndef _CRYPTO_COMMON_H
-+#define _CRYPTO_COMMON_H
-+
-+#include "errno.h"
-+#include <stdbool.h>
-+
-+struct bpf_crypto_skcipher_ctx *bpf_crypto_skcipher_ctx_create(const char *algo__str,
-+							       const struct bpf_dynptr *key,
-+							       int *err) __ksym;
-+struct bpf_crypto_skcipher_ctx *bpf_crypto_skcipher_ctx_acquire(struct bpf_crypto_skcipher_ctx *ctx) __ksym;
-+void bpf_crypto_skcipher_ctx_release(struct bpf_crypto_skcipher_ctx *ctx) __ksym;
-+int bpf_crypto_skcipher_encrypt(struct bpf_crypto_skcipher_ctx *ctx,
-+				const struct bpf_dynptr *src, struct bpf_dynptr *dst,
-+				struct bpf_dynptr *iv) __ksym;
-+int bpf_crypto_skcipher_decrypt(struct bpf_crypto_skcipher_ctx *ctx,
-+				const struct bpf_dynptr *src, struct bpf_dynptr *dst,
-+				struct bpf_dynptr *iv) __ksym;
-+
-+struct __crypto_skcipher_ctx_value {
-+	struct bpf_crypto_skcipher_ctx __kptr * ctx;
-+};
-+
-+struct array_map {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__type(key, int);
-+	__type(value, struct __crypto_skcipher_ctx_value);
-+	__uint(max_entries, 1);
-+} __crypto_skcipher_ctx_map SEC(".maps");
-+
-+static inline struct __crypto_skcipher_ctx_value *crypto_skcipher_ctx_value_lookup(void)
-+{
-+	u32 key = 0;
-+
-+	return bpf_map_lookup_elem(&__crypto_skcipher_ctx_map, &key);
-+}
-+
-+static inline int crypto_skcipher_ctx_insert(struct bpf_crypto_skcipher_ctx *ctx)
-+{
-+	struct __crypto_skcipher_ctx_value local, *v;
-+	struct bpf_crypto_skcipher_ctx *old;
-+	u32 key = 0;
-+	int err;
-+
-+	local.ctx = NULL;
-+	err = bpf_map_update_elem(&__crypto_skcipher_ctx_map, &key, &local, 0);
-+	if (err) {
-+		bpf_crypto_skcipher_ctx_release(ctx);
-+		return err;
-+	}
-+
-+	v = bpf_map_lookup_elem(&__crypto_skcipher_ctx_map, &key);
-+	if (!v) {
-+		bpf_crypto_skcipher_ctx_release(ctx);
-+		return -ENOENT;
-+	}
-+
-+	old = bpf_kptr_xchg(&v->ctx, ctx);
-+	if (old) {
-+		bpf_crypto_skcipher_ctx_release(old);
-+		return -EEXIST;
-+	}
-+
-+	return 0;
-+}
-+
-+#endif /* _CRYPTO_COMMON_H */
-diff --git a/tools/testing/selftests/bpf/progs/crypto_sanity.c b/tools/testing/selftests/bpf/progs/crypto_sanity.c
-new file mode 100644
-index 000000000000..26fe9aff8b74
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/crypto_sanity.c
-@@ -0,0 +1,193 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2023 Meta Platforms, Inc. and affiliates. */
-+
-+#include "vmlinux.h"
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_endian.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_misc.h"
-+#include "bpf_kfuncs.h"
-+#include "crypto_common.h"
-+
-+#define UDP_TEST_PORT 7777
-+unsigned char crypto_key[16] = "testtest12345678";
-+const char crypto_algo[9] = "ecb(aes)";
-+char dst[32] = {};
-+int status;
-+
-+static int skb_dynptr_validate(struct __sk_buff *skb, struct bpf_dynptr *psrc)
-+{
-+	struct ipv6hdr ip6h;
-+	struct udphdr udph;
-+	u32 offset;
-+
-+	if (skb->protocol != __bpf_constant_htons(ETH_P_IPV6))
-+		return -1;
-+
-+	if (bpf_skb_load_bytes(skb, ETH_HLEN, &ip6h, sizeof(ip6h)))
-+		return -1;
-+
-+	if (ip6h.nexthdr != IPPROTO_UDP)
-+		return -1;
-+
-+	if (bpf_skb_load_bytes(skb, ETH_HLEN + sizeof(ip6h), &udph, sizeof(udph)))
-+		return -1;
-+
-+	if (udph.dest != __bpf_constant_htons(UDP_TEST_PORT))
-+		return -1;
-+
-+	offset = ETH_HLEN + sizeof(ip6h) + sizeof(udph);
-+	if (skb->len < offset + 16)
-+		return -1;
-+
-+	bpf_dynptr_from_skb(skb, 0, psrc);
-+	bpf_dynptr_adjust(psrc, offset, offset + 16);
-+
-+	return 0;
-+}
-+
-+SEC("fentry.s/bpf_fentry_test1")
-+int BPF_PROG(skb_crypto_setup)
-+{
-+	struct bpf_crypto_skcipher_ctx *cctx;
-+	struct bpf_dynptr key = {};
-+	int err = 0;
-+
-+	status = 0;
-+
-+	bpf_dynptr_from_mem(crypto_key, sizeof(crypto_key), 0, &key);
-+	cctx = bpf_crypto_skcipher_ctx_create(crypto_algo, &key, &err);
-+
-+	if (!cctx) {
-+		status = err;
-+		return 0;
-+	}
-+
-+	err = crypto_skcipher_ctx_insert(cctx);
-+	if (err && err != -EEXIST)
-+		status = err;
-+
-+	return 0;
-+}
-+
-+SEC("fentry.s/bpf_fentry_test1")
-+int BPF_PROG(crypto_release)
-+{
-+	struct bpf_crypto_skcipher_ctx *cctx;
-+	struct bpf_dynptr key = {};
-+	int err = 0;
-+
-+	status = 0;
-+
-+	bpf_dynptr_from_mem(crypto_key, sizeof(crypto_key), 0, &key);
-+	cctx = bpf_crypto_skcipher_ctx_create(crypto_algo, &key, &err);
-+
-+	if (!cctx) {
-+		status = err;
-+		return 0;
-+	}
-+
-+	bpf_crypto_skcipher_ctx_release(cctx);
-+
-+	return 0;
-+}
-+
-+SEC("?fentry.s/bpf_fentry_test1")
-+__failure __msg("Unreleased reference")
-+int BPF_PROG(crypto_accuire)
-+{
-+	struct bpf_crypto_skcipher_ctx *cctx;
-+	struct bpf_dynptr key = {};
-+	int err = 0;
-+
-+	status = 0;
-+
-+	bpf_dynptr_from_mem(crypto_key, sizeof(crypto_key), 0, &key);
-+	cctx = bpf_crypto_skcipher_ctx_create(crypto_algo, &key, &err);
-+
-+	if (!cctx) {
-+		status = err;
-+		return 0;
-+	}
-+
-+	cctx = bpf_crypto_skcipher_ctx_acquire(cctx);
-+	if (!cctx)
-+		return -EINVAL;
-+
-+	bpf_crypto_skcipher_ctx_release(cctx);
-+
-+	return 0;
-+}
-+
-+SEC("tc")
-+int decrypt_sanity(struct __sk_buff *skb)
-+{
-+	struct __crypto_skcipher_ctx_value *v;
-+	struct bpf_crypto_skcipher_ctx *ctx;
-+	struct bpf_dynptr psrc, pdst, iv;
-+	int err;
-+
-+	err = skb_dynptr_validate(skb, &psrc);
-+	if (err < 0) {
-+		status = err;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	v = crypto_skcipher_ctx_value_lookup();
-+	if (!v) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	ctx = v->ctx;
-+	if (!ctx) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
-+	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-+
-+	status = bpf_crypto_skcipher_decrypt(ctx, &psrc, &pdst, &iv);
-+
-+	return TC_ACT_SHOT;
-+}
-+
-+SEC("tc")
-+int encrypt_sanity(struct __sk_buff *skb)
-+{
-+	struct __crypto_skcipher_ctx_value *v;
-+	struct bpf_crypto_skcipher_ctx *ctx;
-+	struct bpf_dynptr psrc, pdst, iv;
-+	int err;
-+
-+	status = 0;
-+
-+	err = skb_dynptr_validate(skb, &psrc);
-+	if (err < 0) {
-+		status = err;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	v = crypto_skcipher_ctx_value_lookup();
-+	if (!v) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	ctx = v->ctx;
-+	if (!ctx) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
-+	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-+
-+	status = bpf_crypto_skcipher_encrypt(ctx, &psrc, &pdst, &iv);
-+
-+	return TC_ACT_SHOT;
-+}
-+
-+char __license[] SEC("license") = "GPL";
--- 
-2.39.3
+> 
+> 	unsigned long exitcode = 0;
+> 	u64 data_gpa;
+> 	int err, rc;
+> 
+> 	if (!sev_snp_guest(vcpu->kvm)) {
+> 		rc = SEV_RET_INVALID_GUEST; <= sets "rc", not "exitcode"
+> 		goto e_fail;
+> 	}
+> 
+> e_fail:
+> 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, exitcode);
+> 
+> Which really highlights that we need to get test infrastructure up and running
+> for SEV-ES, SNP, and TDX.
+> 
+> Anyways, back to punting to userspace.  Here's a rough sketch.  The only new uAPI
+> is the definition of KVM_HC_SNP_GET_CERTS and its arguments.
 
+This sketch seems like a good, flexible way to handle per-VM certs, but
+it does complicate things from a userspace perspective. As a basic
+requirement, all userspaces will need to provide a way to specify the
+initial blob (either a very verbose base64-encoded userspace cmdline param,
+or a filepatch that needs additional management to store and handle
+permissions/etc.), and also a means to update it (e.g. a HMP/QMP command
+for QEMU, some libvirt wrappers, etc.).
+
+That's all well and good if you want to make use of per-VM certs, but we
+don't necessarily expect that most deployments will necessarily want to deal
+with per-VM certs, and would be happy with a system-wide one where they could
+simply issue the /dev/sev ioctl to inject one automatically for all guests.
+
+So we're sort of complicating the more common case to support a more niche
+one (as far as userspace is concerned anyway; as far as kernel goes, your
+approach is certainly simplest :)).
+
+Instead, maybe a compromise is warranted so the requirements on userspace
+side are less complicated for a more basic deployment:
+
+  1) If /dev/sev is used to set a global certificate, then that will be
+     used unconditionally by KVM, protected by simple dumb mutex during
+     usage/update.
+  2) If /dev/sev is not used to set the global certificate is the value
+     is NULL, we assume userspace wants full responsibility for managing
+     certificates and exit to userspace to request the certs in the manner
+     you suggested.
+
+Sean, Dionna, would this cover your concerns and address the certificate
+update use-case?
+
+-Mike
