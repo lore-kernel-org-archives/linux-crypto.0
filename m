@@ -1,43 +1,43 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40223D392;
-	Fri, 10 Nov 2023 22:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B642C3D385;
+	Fri, 10 Nov 2023 22:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ccsZ1Zwd"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="vBqmg1d8"
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55FF444B6;
-	Fri, 10 Nov 2023 14:28:38 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6602449A;
+	Fri, 10 Nov 2023 14:28:36 -0800 (PST)
 Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAHiIst020588;
-	Fri, 10 Nov 2023 22:28:09 GMT
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAHiJLR020622;
+	Fri, 10 Nov 2023 22:27:57 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2023-03-30;
- bh=GKauPTtNdSk3fkzWv10kdNJl8kVDWJLiFM0GZ5EYFVs=;
- b=ccsZ1ZwdERjPOTms27WSUyLPwC3u2weuulczZ9YCnwNnhjeslyOAFjGJ6a2QGDFccWqy
- kb4Qedsf7Z7uvw7avVNdgXQ/R1bsvwmhYF2pllLMaA5nI7M95OCIUicdpforwMMeErIZ
- hXZNTlk0d+lBB//sgnQT5sq1uwMwccOcrWcMFGTmEpCuVInhSBtOCANTJRn2eQZt699H
- irj2EVTR2EVII+5gcde9sQGeW+julk8fjmVPYfjnOjafW7Y9NSDIa13ik1bN3r8QQUAm
- Na2nc1Ofjm+qwc7UD8p8VVfqxglIHE+XPPUbdwwPBmc8gXPF0FV2S3IrbTmq95Vu9UiD Jg== 
+ bh=Bnh/jsO288oZNYgrOSrsCN18bQgzJILZGG0JJNquEks=;
+ b=vBqmg1d8Zay88TPXWfLXIRqnZcWtG3OGmVXfMUa/i+HvCMc67w0CpOuliZlmyN7Z5Yu7
+ 0kbxzUbs68qmTbgaXfubM7hvU0+0FATFyWIXMk/dZkr25HYdFYRrR8YOett+7JBF+w2S
+ YO6esCorTozvBn6j3bd70zgWxFYSYNy2kkLludGHBywJlwmgKx9PdAbbgWZcRfeqqkW1
+ GlbWBJObRCAWnJQTrU/N+0DNHf81vUWhrjvDt31LF1GUDCM1YO53kG+mMdHxoHU7j8Tt
+ E8y0covBi0bdoVvsW/xiifsHmGGKFbcZqUo59MH2L/afiFCEZf5vCbKiChDmwu6EK3+z Kw== 
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3u7w23pysd-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3u7w23pys2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Nov 2023 22:28:09 +0000
+	Fri, 10 Nov 2023 22:27:57 +0000
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAK53Y6023844;
-	Fri, 10 Nov 2023 22:28:07 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAKJi7g023824;
+	Fri, 10 Nov 2023 22:27:56 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nb42-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nb00-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 10 Nov 2023 22:28:07 +0000
+	Fri, 10 Nov 2023 22:27:55 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AAMRsaO039112;
-	Fri, 10 Nov 2023 22:28:07 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AAMRsa0039112;
+	Fri, 10 Nov 2023 22:27:55 GMT
 Received: from ovs113.us.oracle.com (ovs113.us.oracle.com [10.149.224.213])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nayh-14
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nayh-2
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 10 Nov 2023 22:28:06 +0000
+	Fri, 10 Nov 2023 22:27:55 +0000
 From: Ross Philipson <ross.philipson@oracle.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org,
         linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -49,9 +49,9 @@ Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
         James.Bottomley@hansenpartnership.com, luto@amacapital.net,
         nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
         trenchboot-devel@googlegroups.com
-Subject: [PATCH v7 13/13] tpm: Allow locality 2 to be set when initializing the TPM for Secure Launch
-Date: Fri, 10 Nov 2023 17:27:51 -0500
-Message-Id: <20231110222751.219836-14-ross.philipson@oracle.com>
+Subject: [PATCH v7 01/13] x86/boot: Place kernel_info at a fixed offset
+Date: Fri, 10 Nov 2023 17:27:39 -0500
+Message-Id: <20231110222751.219836-2-ross.philipson@oracle.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20231110222751.219836-1-ross.philipson@oracle.com>
 References: <20231110222751.219836-1-ross.philipson@oracle.com>
@@ -69,51 +69,129 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 p
  spamscore=0 mlxscore=0 adultscore=0 malwarescore=0 bulkscore=0
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311060000 definitions=main-2311100187
-X-Proofpoint-GUID: EU4eaKX42DB7eE9dHiylfHKU3qY5XorR
-X-Proofpoint-ORIG-GUID: EU4eaKX42DB7eE9dHiylfHKU3qY5XorR
+X-Proofpoint-GUID: o1egD0xU47nZQwpHyX4XqmqfnioFjPy3
+X-Proofpoint-ORIG-GUID: o1egD0xU47nZQwpHyX4XqmqfnioFjPy3
 
-The Secure Launch MLE environment uses PCRs that are only accessible from
-the DRTM locality 2. By default the TPM drivers always initialize the
-locality to 0. When a Secure Launch is in progress, initialize the
-locality to 2.
+From: Arvind Sankar <nivedita@alum.mit.edu>
 
+There are use cases for storing the offset of a symbol in kernel_info.
+For example, the trenchboot series [0] needs to store the offset of the
+Measured Launch Environment header in kernel_info.
+
+Since commit (note: commit ID from tip/master)
+
+commit 527afc212231 ("x86/boot: Check that there are no run-time relocations")
+
+run-time relocations are not allowed in the compressed kernel, so simply
+using the symbol in kernel_info, as
+
+	.long	symbol
+
+will cause a linker error because this is not position-independent.
+
+With kernel_info being a separate object file and in a different section
+from startup_32, there is no way to calculate the offset of a symbol
+from the start of the image in a position-independent way.
+
+To enable such use cases, put kernel_info into its own section which is
+placed at a predetermined offset (KERNEL_INFO_OFFSET) via the linker
+script. This will allow calculating the symbol offset in a
+position-independent way, by adding the offset from the start of
+kernel_info to KERNEL_INFO_OFFSET.
+
+Ensure that kernel_info is aligned, and use the SYM_DATA.* macros
+instead of bare labels. This stores the size of the kernel_info
+structure in the ELF symbol table.
+
+Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
+Cc: Ross Philipson <ross.philipson@oracle.com>
 Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
 ---
- drivers/char/tpm/tpm-chip.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ arch/x86/boot/compressed/kernel_info.S | 19 +++++++++++++++----
+ arch/x86/boot/compressed/kernel_info.h | 12 ++++++++++++
+ arch/x86/boot/compressed/vmlinux.lds.S |  6 ++++++
+ 3 files changed, 33 insertions(+), 4 deletions(-)
+ create mode 100644 arch/x86/boot/compressed/kernel_info.h
 
-diff --git a/drivers/char/tpm/tpm-chip.c b/drivers/char/tpm/tpm-chip.c
-index 42b1062e33cd..0217ceb96c42 100644
---- a/drivers/char/tpm/tpm-chip.c
-+++ b/drivers/char/tpm/tpm-chip.c
-@@ -23,6 +23,7 @@
- #include <linux/major.h>
- #include <linux/tpm_eventlog.h>
- #include <linux/hw_random.h>
-+#include <linux/slaunch.h>
- #include "tpm.h"
+diff --git a/arch/x86/boot/compressed/kernel_info.S b/arch/x86/boot/compressed/kernel_info.S
+index f818ee8fba38..c18f07181dd5 100644
+--- a/arch/x86/boot/compressed/kernel_info.S
++++ b/arch/x86/boot/compressed/kernel_info.S
+@@ -1,12 +1,23 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
  
- DEFINE_IDR(dev_nums_idr);
-@@ -39,12 +40,18 @@ dev_t tpm_devt;
++#include <linux/linkage.h>
+ #include <asm/bootparam.h>
++#include "kernel_info.h"
  
- static int tpm_request_locality(struct tpm_chip *chip)
- {
-+	int locality;
- 	int rc;
- 
- 	if (!chip->ops->request_locality)
- 		return 0;
- 
--	rc = chip->ops->request_locality(chip, 0);
-+	if (slaunch_get_flags() & SL_FLAG_ACTIVE)
-+		locality = 2;
-+	else
-+		locality = 0;
+-	.section ".rodata.kernel_info", "a"
++/*
++ * If a field needs to hold the offset of a symbol from the start
++ * of the image, use the macro below, eg
++ *	.long	rva(symbol)
++ * This will avoid creating run-time relocations, which are not
++ * allowed in the compressed kernel.
++ */
 +
-+	rc = chip->ops->request_locality(chip, locality);
- 	if (rc < 0)
- 		return rc;
++#define rva(X) (((X) - kernel_info) + KERNEL_INFO_OFFSET)
  
+-	.global kernel_info
++	.section ".rodata.kernel_info", "a"
+ 
+-kernel_info:
++	.balign	16
++SYM_DATA_START(kernel_info)
+ 	/* Header, Linux top (structure). */
+ 	.ascii	"LToP"
+ 	/* Size. */
+@@ -19,4 +30,4 @@ kernel_info:
+ 
+ kernel_info_var_len_data:
+ 	/* Empty for time being... */
+-kernel_info_end:
++SYM_DATA_END_LABEL(kernel_info, SYM_L_LOCAL, kernel_info_end)
+diff --git a/arch/x86/boot/compressed/kernel_info.h b/arch/x86/boot/compressed/kernel_info.h
+new file mode 100644
+index 000000000000..c127f84aec63
+--- /dev/null
++++ b/arch/x86/boot/compressed/kernel_info.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef BOOT_COMPRESSED_KERNEL_INFO_H
++#define BOOT_COMPRESSED_KERNEL_INFO_H
++
++#ifdef CONFIG_X86_64
++#define KERNEL_INFO_OFFSET 0x500
++#else /* 32-bit */
++#define KERNEL_INFO_OFFSET 0x100
++#endif
++
++#endif /* BOOT_COMPRESSED_KERNEL_INFO_H */
+diff --git a/arch/x86/boot/compressed/vmlinux.lds.S b/arch/x86/boot/compressed/vmlinux.lds.S
+index 083ec6d7722a..718c52f3f1e6 100644
+--- a/arch/x86/boot/compressed/vmlinux.lds.S
++++ b/arch/x86/boot/compressed/vmlinux.lds.S
+@@ -7,6 +7,7 @@ OUTPUT_FORMAT(CONFIG_OUTPUT_FORMAT)
+ 
+ #include <asm/cache.h>
+ #include <asm/page_types.h>
++#include "kernel_info.h"
+ 
+ #ifdef CONFIG_X86_64
+ OUTPUT_ARCH(i386:x86-64)
+@@ -27,6 +28,11 @@ SECTIONS
+ 		HEAD_TEXT
+ 		_ehead = . ;
+ 	}
++	.rodata.kernel_info KERNEL_INFO_OFFSET : {
++		*(.rodata.kernel_info)
++	}
++	ASSERT(ABSOLUTE(kernel_info) == KERNEL_INFO_OFFSET, "kernel_info at bad address!")
++
+ 	.rodata..compressed : {
+ 		*(.rodata..compressed)
+ 	}
 -- 
 2.39.3
 
