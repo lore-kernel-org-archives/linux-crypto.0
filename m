@@ -1,43 +1,43 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CD73D3A4;
-	Fri, 10 Nov 2023 22:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720523C6B0;
+	Fri, 10 Nov 2023 22:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qKZX2i6b"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="vj0hLftK"
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BABEA44B8;
-	Fri, 10 Nov 2023 14:28:38 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 712DA44B3;
+	Fri, 10 Nov 2023 14:28:37 -0800 (PST)
 Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAHicQh030763;
-	Fri, 10 Nov 2023 22:28:02 GMT
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAHicQr030766;
+	Fri, 10 Nov 2023 22:28:06 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2023-03-30;
- bh=XAsDXij3MP4A24VAlsCQB2bAmr9/A1dvk/cNf1BVoW4=;
- b=qKZX2i6bfqbx/IpT24ZeMDP0AXvRt5ue2++cORoVSocTgQDw8BTEF66GPoGDRw3oNe4l
- TXwBU0w0B6uCsh3qYYjQxUr1FM9zPttGkt0Xw/8b+8oxMrw2KT+bz+1uOtVg+4Z+K1b3
- 7HBqKR70t/Va7eo+vKLSoSJ64rh8miuuqjvaY45x1Vqhm3PK053ZixBrnCSn6tkBA3M0
- FFhCUkxqfy87h794WnOWZ6/7XXIDiUSb1cJ8roosiFrTDTqMSRst1XybvaXe/HXG3IdG
- uIEgxiooN4W/NzHV/uuyvQnDFjVPcag6/PdKlcWNkllr0nUGKKuHa92QSIRZPQfnP68L Dg== 
+ bh=gwoQSTFNy3RtIL8T+foWx21Moncd5kBk5OKc+70Uqks=;
+ b=vj0hLftKmTueUFZnT7YbDXUV0ofTsfBjveVC0L+vy9cuqE6YSONESudmQYTsjBO1fpBt
+ mAcKxOIQI+k1Lc7iufJsfjmhiOS9QsWXSZg6tWuqBp2cPuKqIyctK5d/1bB2lvBBcuMR
+ g33y8j/NtsgSCAVzSug+aa9wbr+8F6O754fv80ZqY8y31OcU5CecewN7Y+HkShjXc1c0
+ FPWKBJJMAcbdwLU36mPFpPsPmgNV+GOu/oAI47l0VwVhrPv/S+CuxnlcmTag3HOFrwCd
+ Xi4Bu6Vm3i0Es1PodeEn60iTOPm64dtyF+QLSQDLJJDmFizvbcO0xdLoigwV9nrih796 ZQ== 
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3u7w23q0v1-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3u7w23q0v4-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Nov 2023 22:28:02 +0000
+	Fri, 10 Nov 2023 22:28:06 +0000
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAKA3tF024240;
-	Fri, 10 Nov 2023 22:28:00 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AAK96dw023887;
+	Fri, 10 Nov 2023 22:28:04 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nb1d-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nb2v-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 10 Nov 2023 22:28:00 +0000
+	Fri, 10 Nov 2023 22:28:04 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AAMRsaA039112;
-	Fri, 10 Nov 2023 22:28:00 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AAMRsaI039112;
+	Fri, 10 Nov 2023 22:28:04 GMT
 Received: from ovs113.us.oracle.com (ovs113.us.oracle.com [10.149.224.213])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nayh-7
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3u7w28nayh-11
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 10 Nov 2023 22:28:00 +0000
+	Fri, 10 Nov 2023 22:28:04 +0000
 From: Ross Philipson <ross.philipson@oracle.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org,
         linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -49,9 +49,9 @@ Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
         James.Bottomley@hansenpartnership.com, luto@amacapital.net,
         nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
         trenchboot-devel@googlegroups.com
-Subject: [PATCH v7 06/13] x86: Add early SHA support for Secure Launch early measurements
-Date: Fri, 10 Nov 2023 17:27:44 -0500
-Message-Id: <20231110222751.219836-7-ross.philipson@oracle.com>
+Subject: [PATCH v7 10/13] kexec: Secure Launch kexec SEXIT support
+Date: Fri, 10 Nov 2023 17:27:48 -0500
+Message-Id: <20231110222751.219836-11-ross.philipson@oracle.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20231110222751.219836-1-ross.philipson@oracle.com>
 References: <20231110222751.219836-1-ross.philipson@oracle.com>
@@ -69,180 +69,122 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 p
  spamscore=0 mlxscore=0 adultscore=0 malwarescore=0 bulkscore=0
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311060000 definitions=main-2311100187
-X-Proofpoint-ORIG-GUID: ojsq13qR-0XI81QkowQNNlH01txBhpsA
-X-Proofpoint-GUID: ojsq13qR-0XI81QkowQNNlH01txBhpsA
+X-Proofpoint-ORIG-GUID: 43ATF9mZ3V2tyDpoBPzgW1Mws0it0kPj
+X-Proofpoint-GUID: 43ATF9mZ3V2tyDpoBPzgW1Mws0it0kPj
 
-From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
+Prior to running the next kernel via kexec, the Secure Launch code
+closes down private SMX resources and does an SEXIT. This allows the
+next kernel to start normally without any issues starting the APs etc.
 
-The SHA algorithms are necessary to measure configuration information into
-the TPM as early as possible before using the values. This implementation
-uses the established approach of #including the SHA libraries directly in
-the code since the compressed kernel is not uncompressed at this point.
-
-The SHA code here has its origins in the code from the main kernel:
-
-commit c4d5b9ffa31f ("crypto: sha1 - implement base layer for SHA-1")
-
-A modified version of this code was introduced to the lib/crypto/sha1.c
-to bring it in line with the sha256 code and allow it to be pulled into the
-setup kernel in the same manner as sha256 is.
-
-Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
 Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
 ---
- arch/x86/boot/compressed/Makefile       |  2 +
- arch/x86/boot/compressed/early_sha1.c   | 12 ++++
- arch/x86/boot/compressed/early_sha256.c |  6 ++
- include/crypto/sha1.h                   |  1 +
- lib/crypto/sha1.c                       | 81 +++++++++++++++++++++++++
- 5 files changed, 102 insertions(+)
- create mode 100644 arch/x86/boot/compressed/early_sha1.c
- create mode 100644 arch/x86/boot/compressed/early_sha256.c
+ arch/x86/kernel/slaunch.c | 73 +++++++++++++++++++++++++++++++++++++++
+ kernel/kexec_core.c       |  4 +++
+ 2 files changed, 77 insertions(+)
 
-diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-index 71fc531b95b4..07a2f56cd571 100644
---- a/arch/x86/boot/compressed/Makefile
-+++ b/arch/x86/boot/compressed/Makefile
-@@ -118,6 +118,8 @@ vmlinux-objs-$(CONFIG_EFI) += $(obj)/efi.o
- vmlinux-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_mixed.o
- vmlinux-objs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
+diff --git a/arch/x86/kernel/slaunch.c b/arch/x86/kernel/slaunch.c
+index cd5aa34e395c..32b0c24a6484 100644
+--- a/arch/x86/kernel/slaunch.c
++++ b/arch/x86/kernel/slaunch.c
+@@ -523,3 +523,76 @@ void __init slaunch_setup_txt(void)
  
-+vmlinux-objs-$(CONFIG_SECURE_LAUNCH) += $(obj)/early_sha1.o $(obj)/early_sha256.o
-+
- $(obj)/vmlinux: $(vmlinux-objs-y) FORCE
- 	$(call if_changed,ld)
- 
-diff --git a/arch/x86/boot/compressed/early_sha1.c b/arch/x86/boot/compressed/early_sha1.c
-new file mode 100644
-index 000000000000..0c7cf6f8157a
---- /dev/null
-+++ b/arch/x86/boot/compressed/early_sha1.c
-@@ -0,0 +1,12 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2022 Apertus Solutions, LLC.
-+ */
-+
-+#include <linux/init.h>
-+#include <linux/linkage.h>
-+#include <linux/string.h>
-+#include <asm/boot.h>
-+#include <asm/unaligned.h>
-+
-+#include "../../../../lib/crypto/sha1.c"
-diff --git a/arch/x86/boot/compressed/early_sha256.c b/arch/x86/boot/compressed/early_sha256.c
-new file mode 100644
-index 000000000000..54930166ffee
---- /dev/null
-+++ b/arch/x86/boot/compressed/early_sha256.c
-@@ -0,0 +1,6 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2022 Apertus Solutions, LLC
-+ */
-+
-+#include "../../../../lib/crypto/sha256.c"
-diff --git a/include/crypto/sha1.h b/include/crypto/sha1.h
-index 044ecea60ac8..d715dd5332e1 100644
---- a/include/crypto/sha1.h
-+++ b/include/crypto/sha1.h
-@@ -42,5 +42,6 @@ extern int crypto_sha1_finup(struct shash_desc *desc, const u8 *data,
- #define SHA1_WORKSPACE_WORDS	16
- void sha1_init(__u32 *buf);
- void sha1_transform(__u32 *digest, const char *data, __u32 *W);
-+void sha1(const u8 *data, unsigned int len, u8 *out);
- 
- #endif /* _CRYPTO_SHA1_H */
-diff --git a/lib/crypto/sha1.c b/lib/crypto/sha1.c
-index 1aebe7be9401..10152125b338 100644
---- a/lib/crypto/sha1.c
-+++ b/lib/crypto/sha1.c
-@@ -137,4 +137,85 @@ void sha1_init(__u32 *buf)
+ 	pr_info("Intel TXT setup complete\n");
  }
- EXPORT_SYMBOL(sha1_init);
++
++static inline void smx_getsec_sexit(void)
++{
++	asm volatile (".byte 0x0f,0x37\n"
++		      : : "a" (SMX_X86_GETSEC_SEXIT));
++}
++
++/*
++ * Used during kexec and on reboot paths to finalize the TXT state
++ * and do an SEXIT exiting the DRTM and disabling SMX mode.
++ */
++void slaunch_finalize(int do_sexit)
++{
++	u64 one = TXT_REGVALUE_ONE, val;
++	void __iomem *config;
++
++	if ((slaunch_get_flags() & (SL_FLAG_ACTIVE | SL_FLAG_ARCH_TXT)) !=
++	    (SL_FLAG_ACTIVE | SL_FLAG_ARCH_TXT))
++		return;
++
++	config = ioremap(TXT_PRIV_CONFIG_REGS_BASE, TXT_NR_CONFIG_PAGES *
++			 PAGE_SIZE);
++	if (!config) {
++		pr_emerg("Error SEXIT failed to ioremap TXT private reqs\n");
++		return;
++	}
++
++	/* Clear secrets bit for SEXIT */
++	memcpy_toio(config + TXT_CR_CMD_NO_SECRETS, &one, sizeof(one));
++	memcpy_fromio(&val, config + TXT_CR_E2STS, sizeof(val));
++
++	/* Unlock memory configurations */
++	memcpy_toio(config + TXT_CR_CMD_UNLOCK_MEM_CONFIG, &one, sizeof(one));
++	memcpy_fromio(&val, config + TXT_CR_E2STS, sizeof(val));
++
++	/* Close the TXT private register space */
++	memcpy_toio(config + TXT_CR_CMD_CLOSE_PRIVATE, &one, sizeof(one));
++	memcpy_fromio(&val, config + TXT_CR_E2STS, sizeof(val));
++
++	/*
++	 * Calls to iounmap are not being done because of the state of the
++	 * system this late in the kexec process. Local IRQs are disabled and
++	 * iounmap causes a TLB flush which in turn causes a warning. Leaving
++	 * thse mappings is not an issue since the next kernel is going to
++	 * completely re-setup memory management.
++	 */
++
++	/* Map public registers and do a final read fence */
++	config = ioremap(TXT_PUB_CONFIG_REGS_BASE, TXT_NR_CONFIG_PAGES *
++			 PAGE_SIZE);
++	if (!config) {
++		pr_emerg("Error SEXIT failed to ioremap TXT public reqs\n");
++		return;
++	}
++
++	memcpy_fromio(&val, config + TXT_CR_E2STS, sizeof(val));
++
++	pr_emerg("TXT clear secrets bit and unlock memory complete.\n");
++
++	if (!do_sexit)
++		return;
++
++	if (smp_processor_id() != 0)
++		panic("Error TXT SEXIT must be called on CPU 0\n");
++
++	/* Disable SMX mode */
++	cr4_set_bits(X86_CR4_SMXE);
++
++	/* Do the SEXIT SMX operation */
++	smx_getsec_sexit();
++
++	pr_info("TXT SEXIT complete.\n");
++}
+diff --git a/kernel/kexec_core.c b/kernel/kexec_core.c
+index be5642a4ec49..98b2db21a952 100644
+--- a/kernel/kexec_core.c
++++ b/kernel/kexec_core.c
+@@ -40,6 +40,7 @@
+ #include <linux/hugetlb.h>
+ #include <linux/objtool.h>
+ #include <linux/kmsg_dump.h>
++#include <linux/slaunch.h>
  
-+static void __sha1_transform(u32 *digest, const char *data)
-+{
-+       u32 ws[SHA1_WORKSPACE_WORDS];
+ #include <asm/page.h>
+ #include <asm/sections.h>
+@@ -1264,6 +1265,9 @@ int kernel_kexec(void)
+ 		cpu_hotplug_enable();
+ 		pr_notice("Starting new kernel\n");
+ 		machine_shutdown();
 +
-+       sha1_transform(digest, data, ws);
-+
-+       memzero_explicit(ws, sizeof(ws));
-+}
-+
-+static void sha1_update(struct sha1_state *sctx, const u8 *data, unsigned int len)
-+{
-+	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
-+
-+	sctx->count += len;
-+
-+	if (likely((partial + len) >= SHA1_BLOCK_SIZE)) {
-+		int blocks;
-+
-+		if (partial) {
-+			int p = SHA1_BLOCK_SIZE - partial;
-+
-+			memcpy(sctx->buffer + partial, data, p);
-+			data += p;
-+			len -= p;
-+
-+			__sha1_transform(sctx->state, sctx->buffer);
-+		}
-+
-+		blocks = len / SHA1_BLOCK_SIZE;
-+		len %= SHA1_BLOCK_SIZE;
-+
-+		if (blocks) {
-+			while (blocks--) {
-+				__sha1_transform(sctx->state, data);
-+				data += SHA1_BLOCK_SIZE;
-+			}
-+		}
-+		partial = 0;
-+	}
-+
-+	if (len)
-+		memcpy(sctx->buffer + partial, data, len);
-+}
-+
-+static void sha1_final(struct sha1_state *sctx, u8 *out)
-+{
-+	const int bit_offset = SHA1_BLOCK_SIZE - sizeof(__be64);
-+	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
-+	__be64 *bits = (__be64 *)(sctx->buffer + bit_offset);
-+	__be32 *digest = (__be32 *)out;
-+	int i;
-+
-+	sctx->buffer[partial++] = 0x80;
-+	if (partial > bit_offset) {
-+		memset(sctx->buffer + partial, 0x0, SHA1_BLOCK_SIZE - partial);
-+		partial = 0;
-+
-+		__sha1_transform(sctx->state, sctx->buffer);
-+	}
-+
-+	memset(sctx->buffer + partial, 0x0, bit_offset - partial);
-+	*bits = cpu_to_be64(sctx->count << 3);
-+	__sha1_transform(sctx->state, sctx->buffer);
-+
-+	for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(__be32); i++)
-+		put_unaligned_be32(sctx->state[i], digest++);
-+
-+	*sctx = (struct sha1_state){};
-+}
-+
-+void sha1(const u8 *data, unsigned int len, u8 *out)
-+{
-+	struct sha1_state sctx = {0};
-+
-+	sha1_init(sctx.state);
-+	sctx.count = 0;
-+	sha1_update(&sctx, data, len);
-+	sha1_final(&sctx, out);
-+}
-+EXPORT_SYMBOL(sha1);
-+
- MODULE_LICENSE("GPL");
++		/* Finalize TXT registers and do SEXIT */
++		slaunch_finalize(1);
+ 	}
+ 
+ 	kmsg_dump(KMSG_DUMP_SHUTDOWN);
 -- 
 2.39.3
 
