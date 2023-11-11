@@ -1,146 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CD81B287
-	for <linux-crypto@vger.kernel.org>; Sat, 11 Nov 2023 17:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A6181C293
+	for <linux-crypto@vger.kernel.org>; Sat, 11 Nov 2023 18:19:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hQ1cu9so"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEABDC433C7;
-	Sat, 11 Nov 2023 17:52:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699725145;
-	bh=Orr1lVXJAQNOiV1zw2p7Bmk4rVn6JX2v4Z6LPYrVrlM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hQ1cu9soq/zEhp4wwheNh28rvVac5cdJuUhrhjg1ieBqtxHdDcQGzSeh+l0jLEuS1
-	 pMbUagz8aIk6uakbvaLu0nr8d/5tXNbJPEu1ojHzqO2DsdFkS1vUs0bVEdwIEJ+IGK
-	 LlD5OlQWylD6m5ysrBy91/014CtokHp+hrLPZc5kqkp8/jkOuBea80D9ms7mhGCPwf
-	 ZrDxaVKE9OoOzlRjtM+kuGPgk6EwV/V9rvIlK85/A1aYgbuVmjzh+nmW5o/Y8ry4kO
-	 HxJepwXPUbUzoeF//ymz+RnVJIoCswOX1nGRxOFYHurlneNr1a9Rcu2sxui9HxKkzT
-	 Qza1qWAJKQDbQ==
-Date: Sat, 11 Nov 2023 09:52:22 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Andy Chiu <andy.chiu@sifive.com>, Jerry Shih <jerry.shih@sifive.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>, palmer@dabbelt.com,
-	Albert Ou <aou@eecs.berkeley.edu>, herbert@gondor.apana.org.au,
-	davem@davemloft.net, greentime.hu@sifive.com,
-	conor.dooley@microchip.com, guoren@kernel.org, bjorn@rivosinc.com,
-	heiko@sntech.de, phoebe.chen@sifive.com, hongrong.hsu@sifive.com,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 06/12] RISC-V: crypto: add accelerated
- AES-CBC/CTR/ECB/XTS implementations
-Message-ID: <20231111175222.GB998@sol.localdomain>
-References: <20231025183644.8735-1-jerry.shih@sifive.com>
- <20231025183644.8735-7-jerry.shih@sifive.com>
- <20231102051639.GF1498@sol.localdomain>
- <39126F19-8FEB-4E18-B61D-4494B59C43A1@sifive.com>
- <20231109071623.GB1245@sol.localdomain>
- <CABgGipXnGVB770ZA=60rD-6Hi5Fv_wh3tST+G+VFbTmMYzz0Mw@mail.gmail.com>
- <20231110054428.GC6572@sol.localdomain>
- <CAMj1kXHGWmdnOChbmiYhEib2Dgun0k8PVW5v_kLb-6c1BEhS=Q@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="JPeefGKl"
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D453A85
+	for <linux-crypto@vger.kernel.org>; Sat, 11 Nov 2023 10:19:14 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-32faea0fa1fso1785567f8f.1
+        for <linux-crypto@vger.kernel.org>; Sat, 11 Nov 2023 10:19:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=citrix.com; s=google; t=1699726753; x=1700331553; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AwX19YfB6xOhuhaF7AppkIuMTVamx0JcuT0ZkB4r4gk=;
+        b=JPeefGKltNE5iHQjlhMW1ZtRuy77a6KdZazye1IEpUqU8AY3Y/jrDvtBjZ/7lZIR5C
+         5shHQVcRsfVPLNJAKSpNlv+X9mcZRtrn7njn50O60UXj5bbf3rGKCgwsY+SHQVxDXtF9
+         4tDqGmy7wwP/Zvfcwp+BOLipYaowBaLVLDkd4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699726753; x=1700331553;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AwX19YfB6xOhuhaF7AppkIuMTVamx0JcuT0ZkB4r4gk=;
+        b=Ov/AnLgRX56/WvbcRDI1XyJ1aMcx5bf0Wo4HcI22mNqrgRa2d20i7MZShJrjLWNf8f
+         8FW/LIGQx+SgjViyvvDaEhmB7J2L5huYZzVzOphBtWknMABwKfV6kWGQKllr2QcH3pcD
+         BkdoreFTLOhGIq7u6PQrz46CM5S254zTkMikT9mBYAZKsX+J3Y1DwT8Reh3YDfMbwgKF
+         1Gz+T0pzyoA2q8FIDEZRhaFoxmPrWVBIMSMNvRZvCUx9OamlYQyV/Zap646gnw1PiTwl
+         Ks4UOM/r95r0y5mQA7c8s3AOWeUYUYbqbnZ2c+EwJBEWll18HFUtcroP4H9A73nBgHHB
+         joJw==
+X-Gm-Message-State: AOJu0Yzenv1gdarfSSDduxLFrDmY8wAkIplAPn+nw0pTNLs3FmGxYJD8
+	uQxYriX/Cqz8CGGg71/jrarVdg==
+X-Google-Smtp-Source: AGHT+IHg5soWlnqBqQeGVF4JBHuusXQx/LK1k/VZf2vI1qK7tIwInDyjuvITGYsQf3WL7k0RSZyESQ==
+X-Received: by 2002:a5d:5a87:0:b0:32f:7d50:62f8 with SMTP id bp7-20020a5d5a87000000b0032f7d5062f8mr7611665wrb.3.1699726753314;
+        Sat, 11 Nov 2023 10:19:13 -0800 (PST)
+Received: from [192.168.1.10] (host-92-26-107-252.as13285.net. [92.26.107.252])
+        by smtp.gmail.com with ESMTPSA id p11-20020a05600c1d8b00b003fe15ac0934sm6453897wms.1.2023.11.11.10.19.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 11 Nov 2023 10:19:13 -0800 (PST)
+Message-ID: <a16d44c5-2e1a-4e9a-8ca1-c7ca564f61cd@citrix.com>
+Date: Sat, 11 Nov 2023 18:19:12 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 06/13] x86: Add early SHA support for Secure Launch
+ early measurements
+Content-Language: en-GB
+To: Eric Biggers <ebiggers@kernel.org>,
+ Ross Philipson <ross.philipson@oracle.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+ linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+ kexec@lists.infradead.org, linux-efi@vger.kernel.org,
+ dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, hpa@zytor.com, ardb@kernel.org, mjg59@srcf.ucam.org,
+ James.Bottomley@hansenpartnership.com, luto@amacapital.net,
+ nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
+ trenchboot-devel@googlegroups.com
+References: <20231110222751.219836-1-ross.philipson@oracle.com>
+ <20231110222751.219836-7-ross.philipson@oracle.com>
+ <20231111174435.GA998@sol.localdomain>
+From: Andrew Cooper <andrew.cooper3@citrix.com>
+Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
+ 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
+ 6+ahAA==
+In-Reply-To: <20231111174435.GA998@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMj1kXHGWmdnOChbmiYhEib2Dgun0k8PVW5v_kLb-6c1BEhS=Q@mail.gmail.com>
 
-On Sat, Nov 11, 2023 at 09:08:31PM +1000, Ard Biesheuvel wrote:
-> On Fri, 10 Nov 2023 at 15:44, Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > On Fri, Nov 10, 2023 at 12:58:12PM +0800, Andy Chiu wrote:
-> > > Hi Eric,
-> > >
-> > > On Thu, Nov 9, 2023 at 3:16 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> > > >
-> > > > On Tue, Nov 07, 2023 at 04:53:13PM +0800, Jerry Shih wrote:
-> > > > > On Nov 2, 2023, at 13:16, Eric Biggers <ebiggers@kernel.org> wrote:
-> > > > > > On Thu, Oct 26, 2023 at 02:36:38AM +0800, Jerry Shih wrote:
-> > > > > >> +static int ecb_encrypt(struct skcipher_request *req)
-> > > > > >> +{
-> > > > > >> +  struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> > > > > >> +  const struct riscv64_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> > > > > >> +  struct skcipher_walk walk;
-> > > > > >> +  unsigned int nbytes;
-> > > > > >> +  int err;
-> > > > > >> +
-> > > > > >> +  /* If we have error here, the `nbytes` will be zero. */
-> > > > > >> +  err = skcipher_walk_virt(&walk, req, false);
-> > > > > >> +  while ((nbytes = walk.nbytes)) {
-> > > > > >> +          kernel_vector_begin();
-> > > > > >> +          rv64i_zvkned_ecb_encrypt(walk.src.virt.addr, walk.dst.virt.addr,
-> > > > > >> +                                   nbytes & AES_BLOCK_VALID_SIZE_MASK,
-> > > > > >> +                                   &ctx->key);
-> > > > > >> +          kernel_vector_end();
-> > > > > >> +          err = skcipher_walk_done(
-> > > > > >> +                  &walk, nbytes & AES_BLOCK_REMAINING_SIZE_MASK);
-> > > > > >> +  }
-> > > > > >> +
-> > > > > >> +  return err;
-> > > > > >> +}
-> > > > > >
-> > > > > > There's no fallback for !crypto_simd_usable() here.  I really like it this way.
-> > > > > > However, for it to work (for skciphers and aeads), RISC-V needs to allow the
-> > > > > > vector registers to be used in softirq context.  Is that already the case?
-> > > > >
-> > > > > The kernel-mode-vector could be enabled in softirq, but we don't have nesting
-> > > > > vector contexts. Will we have the case that kernel needs to jump to softirq for
-> > > > > encryptions during the regular crypto function? If yes, we need to have fallbacks
-> > > > > for all algorithms.
-> > > >
-> > > > Are you asking what happens if a softirq is taken while the CPU is between
-> > > > kernel_vector_begin() and kernel_vector_end()?  I think that needs to be
-> > > > prevented by making kernel_vector_begin() and kernel_vector_end() disable and
-> > > > re-enable softirqs, like what kernel_neon_begin() and kernel_neon_end() do on
-> > > > arm64.  Refer to commit 13150149aa6ded which implemented that behavior on arm64.
-> > >
-> > > Yes, if making Vector available to softirq context is a must, then it
-> > > is reasonable to call local_bh_disable() in kernel_vector_begin().
-> > > However, softirq would not be the only user for Vector and disabling
-> > > it may cause extra latencies. Meanwhile, simply disabling bh in
-> > > kernel_vector_begin() will conflict with the patch[1] that takes an
-> > > approach to run Preemptible Vector. Though it is not clear yet on
-> > > whether we should run Vector without turning off preemption, I have
-> > > tested running preemptible Vector and observed some latency
-> > > improvements without sacrificing throughput. We will have a discussion
-> > > on LPC2023[2] and it'd be great if you could join or continue to
-> > > discuss it here.
-> > >
-> > > Approaches can be done such as nesting, if running Vector in softirq
-> > > is required. Since it requires extra save/restore on nesting, I think
-> > > we should run some tests to get more performance (latency/throughput)
-> > > figure let the result decide the final direction. For example, we
-> > > could run Vector in either nesting with preempt-V and  non-nesting
-> > > without preempt-V and compare the following performance catachristics:
-> > >  - System-wide latency impact
-> > >  - Latency and throughput of softirq-Vector itself
-> >
-> > The skcipher and aead APIs do indeed need to work in softirq context.
-> >
-> > It's possible to use a fallback, either by falling back to scalar instructions
-> > or by punting the encryption/decryption operation to a workqueue using
-> > crypto/simd.c.  However, both approaches have some significant disadvantages.
-> > It was nice that the need for them on arm64 was eliminated by commit
-> > 13150149aa6ded.  Note that it's possible to yield the vector unit occasionally,
-> > to keep preemption and softirqs from being disabled for too long.
-> >
-> 
-> It is also quite feasible to start out with an implementation of
-> kernel_vector_begin() that preserves all vector registers eagerly in a
-> special per-CPU allocation if the call is made in softirq context (and
-> BUG when called in hardirq/NMI context). This was my initial approach
-> on arm64 too.
-> 
-> Assuming that RiSC-V systems with vector units are not flooding the
-> market just yet, this gives you some time to study the issue without
-> the need to implement non-vector fallback crypto algorithms
-> everywhere.
+On 11/11/2023 5:44 pm, Eric Biggers wrote:
+> On Fri, Nov 10, 2023 at 05:27:44PM -0500, Ross Philipson wrote:
+>>  arch/x86/boot/compressed/early_sha1.c   | 12 ++++
+>>  lib/crypto/sha1.c                       | 81 +++++++++++++++++++++++++
+> It's surprising to still see this new use of SHA-1 after so many people objected
+> to it in the v6 patchset.  It's also frustrating that the SHA-1 support is still
+> being obfuscated by being combined in one patch with SHA-2 support, perhaps in
+> an attempt to conflate the two algorithms and avoid having to give a rationale
+> for the inclusion of SHA-1.  Finally, new functions should not be added to
+> lib/crypto/sha1.c unless those functions have multiple users.
 
-Yes, that solution would be fine too.
+The rational was given.  Let me reiterate it.
 
-- Eric
+There are real TPMs in the world that can't use SHA-2.  The use of SHA-1
+is necessary to support DRTM on such systems, and there are real users
+of such configurations.
+
+DRTM with SHA-1-only is a damnsight better than no DTRM, even if SHA-1
+is getting a little long in the tooth.
+
+So unless you have a credible plan to upgrade every non-SHA-2 TPM in the
+world, you are deliberately breaking part of the usecase paying for the
+effort of trying to upstream DRTM support into Linux.
+
+~Andrew
