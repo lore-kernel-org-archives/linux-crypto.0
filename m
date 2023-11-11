@@ -1,116 +1,252 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2626FBE;
-	Sat, 11 Nov 2023 20:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4551BDEA;
+	Sat, 11 Nov 2023 20:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="WTKYSRyG";
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="WTKYSRyG"
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F26EFD72;
-	Sat, 11 Nov 2023 12:36:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1699734993;
-	bh=ON6trIcp7+DuqniQpmZTvh3ZoJcgh3VkSs5gIMRrdsU=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=WTKYSRyGsv4eOSdLugUtX+cv+QbiPhjvvPrjnW6sMArcM4T1WD6UeH9iTOwjh3jSy
-	 iDmBEDpKUiUTUzOc+RxDoRUhRi+yd4bObhI4YYIWNXPtmKxefuQmnf3XHKNGuj24PY
-	 3sDecx94xUTHeTf5WpLpoRx7VMq4BuZeD5vV7GLA=
-Received: from localhost (localhost [127.0.0.1])
-	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 3BB58128609B;
-	Sat, 11 Nov 2023 15:36:33 -0500 (EST)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
- by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
- with ESMTP id z2rW164A0x_h; Sat, 11 Nov 2023 15:36:33 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1699734993;
-	bh=ON6trIcp7+DuqniQpmZTvh3ZoJcgh3VkSs5gIMRrdsU=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=WTKYSRyGsv4eOSdLugUtX+cv+QbiPhjvvPrjnW6sMArcM4T1WD6UeH9iTOwjh3jSy
-	 iDmBEDpKUiUTUzOc+RxDoRUhRi+yd4bObhI4YYIWNXPtmKxefuQmnf3XHKNGuj24PY
-	 3sDecx94xUTHeTf5WpLpoRx7VMq4BuZeD5vV7GLA=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::c14])
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VllkWX9Y"
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 169CE2D73;
+	Sat, 11 Nov 2023 12:51:20 -0800 (PST)
+Received: from mercury (cola.collaboradmins.com [195.201.22.229])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 33B2B1286097;
-	Sat, 11 Nov 2023 15:36:31 -0500 (EST)
-Message-ID: <87f56530b85ea894036a74be1824d6f2716f70de.camel@HansenPartnership.com>
-Subject: Re: [PATCH v7 06/13] x86: Add early SHA support for Secure Launch
- early measurements
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Andrew Cooper <andrew.cooper3@citrix.com>, Eric Biggers
-	 <ebiggers@kernel.org>, Ross Philipson <ross.philipson@oracle.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
- linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org, 
- kexec@lists.infradead.org, linux-efi@vger.kernel.org, 
- dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de,  hpa@zytor.com, ardb@kernel.org, mjg59@srcf.ucam.org,
- luto@amacapital.net,  nivedita@alum.mit.edu, kanth.ghatraju@oracle.com, 
- trenchboot-devel@googlegroups.com
-Date: Sat, 11 Nov 2023 15:36:29 -0500
-In-Reply-To: <a16d44c5-2e1a-4e9a-8ca1-c7ca564f61cd@citrix.com>
-References: <20231110222751.219836-1-ross.philipson@oracle.com>
-	 <20231110222751.219836-7-ross.philipson@oracle.com>
-	 <20231111174435.GA998@sol.localdomain>
-	 <a16d44c5-2e1a-4e9a-8ca1-c7ca564f61cd@citrix.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: sre)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 262F96607399;
+	Sat, 11 Nov 2023 20:51:18 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1699735878;
+	bh=vd0GSRMWIAOZt0WFx2rYw8aFeL4aemj6wZ3FIw2qniE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VllkWX9Y108aRmPO2jdH//XkpUtjjH0KcbNQMm1wgtWPxoB70LohgFZnScxFntlv4
+	 x7ZcHPD6zV0TA9Ki1LJ4Jqv8jxWXZdN0Z6cOqjxtUPdgv16oKav4KvM1VERBg1E0OO
+	 jIzMSTrNyxo6GS/ZUX1D3URAo5y+3NqTrGdC5RRmN044ffpYcwQAJtVP19+jWuHd4l
+	 PkNrsVYP0r9q+MqW7uWuR/Hpexo84P5pN9KwGnk+rCXmiCd+YDP9B5PjLspJtvp1t7
+	 M1jw05ZKj3rJgDOz6Qx8VMoUfft9MGlmRbFOPKp2nIKPu4rlmg3CxRqE2ORAqTpWu1
+	 izlBQhU1lDq1g==
+Received: by mercury (Postfix, from userid 1000)
+	id 826B41062B49; Sat, 11 Nov 2023 21:51:15 +0100 (CET)
+Date: Sat, 11 Nov 2023 21:51:15 +0100
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Heiko =?utf-8?Q?St=C3=BCbner?= <heiko@sntech.de>,
+	Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
+	herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
+	mturquette@baylibre.com, p.zabel@pengutronix.de, robh+dt@kernel.org,
+	sboyd@kernel.org, ricardo@pardini.net, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH 5/6] reset: rockchip: secure reset must be used by SCMI
+Message-ID: <20231111205115.6hkhjj37ypeq45ax@mercury.elektranox.org>
+References: <20231107155532.3747113-1-clabbe@baylibre.com>
+ <20231107155532.3747113-6-clabbe@baylibre.com>
+ <f1b24f19-c210-4f55-b40f-ab063e7eeb22@linaro.org>
+ <11278271.CDJkKcVGEf@diego>
+ <d82865bc-29a7-4150-876e-489e0d797699@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2wirqy36iysfq2nl"
+Content-Disposition: inline
+In-Reply-To: <d82865bc-29a7-4150-876e-489e0d797699@linaro.org>
 
-On Sat, 2023-11-11 at 18:19 +0000, Andrew Cooper wrote:
-> On 11/11/2023 5:44 pm, Eric Biggers wrote:
-> > On Fri, Nov 10, 2023 at 05:27:44PM -0500, Ross Philipson wrote:
-> > >  arch/x86/boot/compressed/early_sha1.c   | 12 ++++
-> > >  lib/crypto/sha1.c                       | 81
-> > > +++++++++++++++++++++++++
-> > It's surprising to still see this new use of SHA-1 after so many
-> > people objected to it in the v6 patchset.  It's also frustrating
-> > that the SHA-1 support is still being obfuscated by being combined
-> > in one patch with SHA-2 support, perhaps in an attempt to conflate
-> > the two algorithms and avoid having to give a rationale for the
-> > inclusion of SHA-1.  Finally, new functions should not be added to
-> > lib/crypto/sha1.c unless those functions have multiple users.
-> 
-> The rational was given.  Let me reiterate it.
-> 
-> There are real TPMs in the world that can't use SHA-2.  The use of
-> SHA-1 is necessary to support DRTM on such systems, and there are
-> real users of such configurations.
 
-Given that TPM 2.0 has been shipping in bulk since Windows 10 (2015)
-and is required for Windows 11 (2021), are there really such huge
-numbers of TPM 1.2 systems involved in security functions?
+--2wirqy36iysfq2nl
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> DRTM with SHA-1-only is a damnsight better than no DTRM, even if SHA-
-> 1 is getting a little long in the tooth.
+Hi,
 
-That's not the problem.  The problem is that sha1 is seen as a
-compromised algorithm by NIST which began deprecating it in 2011 and is
-now requiring it to be removed from all systems supplied to the US
-government by 2030
+On Tue, Nov 07, 2023 at 06:45:03PM +0100, Krzysztof Kozlowski wrote:
+> On 07/11/2023 18:35, Heiko St=FCbner wrote:
+> > Am Dienstag, 7. November 2023, 17:21:41 CET schrieb Krzysztof Kozlowski:
+> >> On 07/11/2023 16:55, Corentin Labbe wrote:
+> >>> While working on the rk3588 crypto driver, I loose lot of time
+> >>> understanding why resetting the IP failed.
+> >>> This is due to RK3588_SECURECRU_RESET_OFFSET being in the secure worl=
+d,
+> >>> so impossible to operate on it from the kernel.
+> >>> All resets in this block must be handled via SCMI call.
+> >>>
+> >>> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> >>> ---
+> >>>  drivers/clk/rockchip/rst-rk3588.c             | 42 ------------
+> >>>  .../dt-bindings/reset/rockchip,rk3588-cru.h   | 68 +++++++++--------=
+--
+> >>
+> >> Please run scripts/checkpatch.pl and fix reported warnings. Some
+> >> warnings can be ignored, but the code here looks like it needs a fix.
+> >> Feel free to get in touch if the warning is not clear.
+> >>
+> >>>  2 files changed, 34 insertions(+), 76 deletions(-)
+> >>>
+> >>> diff --git a/drivers/clk/rockchip/rst-rk3588.c b/drivers/clk/rockchip=
+/rst-rk3588.c
+> >>> index e855bb8d5413..6556d9d3c7ab 100644
+> >>> --- a/drivers/clk/rockchip/rst-rk3588.c
+> >>> +++ b/drivers/clk/rockchip/rst-rk3588.c
+> >>> @@ -16,9 +16,6 @@
+> >>>  /* 0xFD7C8000 + 0x0A00 */
+> >>>  #define RK3588_PHPTOPCRU_RESET_OFFSET(id, reg, bit) [id] =3D (0x8000=
+*4 + reg * 16 + bit)
+> >>> =20
+> >>> -/* 0xFD7D0000 + 0x0A00 */
+> >>> -#define RK3588_SECURECRU_RESET_OFFSET(id, reg, bit) [id] =3D (0x1000=
+0*4 + reg * 16 + bit)
+> >>> -
+> >>>  /* 0xFD7F0000 + 0x0A00 */
+> >>>  #define RK3588_PMU1CRU_RESET_OFFSET(id, reg, bit) [id] =3D (0x30000*=
+4 + reg * 16 + bit)
+> >>> =20
+> >>> @@ -806,45 +803,6 @@ static const int rk3588_register_offset[] =3D {
+> >>>  	RK3588_PMU1CRU_RESET_OFFSET(SRST_P_PMU0IOC, 5, 4),
+> >>>  	RK3588_PMU1CRU_RESET_OFFSET(SRST_P_GPIO0, 5, 5),
+> >>>  	RK3588_PMU1CRU_RESET_OFFSET(SRST_GPIO0, 5, 6),
+> >>> -
+> >>> -	/* SECURECRU_SOFTRST_CON00 */
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_A_SECURE_NS_BIU, 0, 10),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_SECURE_NS_BIU, 0, 11),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_A_SECURE_S_BIU, 0, 12),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_SECURE_S_BIU, 0, 13),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_P_SECURE_S_BIU, 0, 14),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_CRYPTO_CORE, 0, 15),
+> >>> -
+> >>> -	/* SECURECRU_SOFTRST_CON01 */
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_CRYPTO_PKA, 1, 0),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_CRYPTO_RNG, 1, 1),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_A_CRYPTO, 1, 2),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_CRYPTO, 1, 3),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_KEYLADDER_CORE, 1, 9),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_KEYLADDER_RNG, 1, 10),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_A_KEYLADDER, 1, 11),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_KEYLADDER, 1, 12),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_P_OTPC_S, 1, 13),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_OTPC_S, 1, 14),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_WDT_S, 1, 15),
+> >>> -
+> >>> -	/* SECURECRU_SOFTRST_CON02 */
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_T_WDT_S, 2, 0),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_BOOTROM, 2, 1),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_A_DCF, 2, 2),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_P_DCF, 2, 3),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_BOOTROM_NS, 2, 5),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_P_KEYLADDER, 2, 14),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_TRNG_S, 2, 15),
+> >>> -
+> >>> -	/* SECURECRU_SOFTRST_CON03 */
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_TRNG_NS, 3, 0),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_D_SDMMC_BUFFER, 3, 1),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_SDMMC, 3, 2),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_H_SDMMC_BUFFER, 3, 3),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_SDMMC, 3, 4),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_P_TRNG_CHK, 3, 5),
+> >>> -	RK3588_SECURECRU_RESET_OFFSET(SRST_TRNG_S, 3, 6),
+> >>>  };
+> >>> =20
+> >>>  void rk3588_rst_init(struct device_node *np, void __iomem *reg_base)
+> >>> diff --git a/include/dt-bindings/reset/rockchip,rk3588-cru.h b/includ=
+e/dt-bindings/reset/rockchip,rk3588-cru.h
+> >>> index d4264db2a07f..c0d08ae78cd5 100644
+> >>> --- a/include/dt-bindings/reset/rockchip,rk3588-cru.h
+> >>> +++ b/include/dt-bindings/reset/rockchip,rk3588-cru.h
+> >>> @@ -716,39 +716,39 @@
+> >>>  #define SRST_P_GPIO0			627
+> >>>  #define SRST_GPIO0			628
+> >>> =20
+> >>> -#define SRST_A_SECURE_NS_BIU		629
+> >>> -#define SRST_H_SECURE_NS_BIU		630
+> >>> -#define SRST_A_SECURE_S_BIU		631
+> >>> -#define SRST_H_SECURE_S_BIU		632
+> >>> -#define SRST_P_SECURE_S_BIU		633
+> >>> -#define SRST_CRYPTO_CORE		634
+> >>> -
+> >>> -#define SRST_CRYPTO_PKA			635
+> >>> -#define SRST_CRYPTO_RNG			636
+> >>> -#define SRST_A_CRYPTO			637
+> >>> -#define SRST_H_CRYPTO			638
+> >>> -#define SRST_KEYLADDER_CORE		639
+> >>> -#define SRST_KEYLADDER_RNG		640
+> >>> -#define SRST_A_KEYLADDER		641
+> >>> -#define SRST_H_KEYLADDER		642
+> >>> -#define SRST_P_OTPC_S			643
+> >>> -#define SRST_OTPC_S			644
+> >>> -#define SRST_WDT_S			645
+> >>> -
+> >>> -#define SRST_T_WDT_S			646
+> >>> -#define SRST_H_BOOTROM			647
+> >>> -#define SRST_A_DCF			648
+> >>> -#define SRST_P_DCF			649
+> >>> -#define SRST_H_BOOTROM_NS		650
+> >>> -#define SRST_P_KEYLADDER		651
+> >>> -#define SRST_H_TRNG_S			652
+> >>> -
+> >>> -#define SRST_H_TRNG_NS			653
+> >>> -#define SRST_D_SDMMC_BUFFER		654
+> >>> -#define SRST_H_SDMMC			655
+> >>> -#define SRST_H_SDMMC_BUFFER		656
+> >>> -#define SRST_SDMMC			657
+> >>> -#define SRST_P_TRNG_CHK			658
+> >>> -#define SRST_TRNG_S			659
+> >>> +#define SRST_A_SECURE_NS_BIU		10
+> >>
+> >> NAK. You just broke all users.
+> >=20
+> > If I'm reading the commit message correctly, all resets in that area
+> > couldn't have any users to begin with, as the registers controlling them
+> > are in the secure space, and need a higher exception level
+> >=20
+> > So if  anything is trying to handle these resets, would end up with some
+> > security exception right now.
+> >=20
+> > Though I guess we might want to use different names and not reuse the
+> > existing ones. scmi clocks use a SCMI_CLK_* id scheme, so maybe SCMI_SR=
+ST_* ?
+>=20
+> I don't quite get what the patch wants to achieve. Why dropping driver
+> support for given reset ID is connected with changing the value of
+> binding for given reset?
+>=20
+> What is the point of this define SRST_A_SECURE_NS_BIU 10?
 
-https://www.nist.gov/news-events/news/2022/12/nist-retires-sha-1-cryptographic-algorithm
+This is about two different reset controllers. The IDs defined here
+are used by the operating system to access the correct registers.
+The kernel has a LUT from the ID to a register addresses, which is
+something you asked for during upstreaming.
 
-That means we have to control all uses of sha1 in the kernel and have
-an option to build without it.  FIPS has an even tighter timetable: it
-requires sha1 to be out by 2025.
+The ID defined by Corentin is for reset control via SCMI firmware,
+which has different number scheme than Linux. To me the suggestion
+=66rom Heiko looks sensible (i.e. create a new ID scheme and keep the
+current one unchanged).
 
-> So unless you have a credible plan to upgrade every non-SHA-2 TPM in
-> the world, you are deliberately breaking part of the usecase paying
-> for the effort of trying to upstream DRTM support into Linux.
+Greetings,
 
-Given that most CSOs follow NIST and FIPS it seems a little strange
-that there would be a huge demand for such an intricate security
-protocol as Dynamic Launch on a system that can't be FIPS 140-3
-certified.
+-- Sebastian
 
-James
+--2wirqy36iysfq2nl
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmVP6ToACgkQ2O7X88g7
++pp22g//RQCNh/wWsCawBz03xeDAIaJe/Os0GoNhvXwLp854ltQt9yEy9EZUqrvt
+QYxOW5q1b3HiA+OwHHn0gGwY2+rIhpdZ2RztoeWVzVznl04x14oPuF6g8hnZ4LlE
+hkaxKae2mgv65YcliU+5qKoZc2ElJPC8XUjsWzng/4VnvWfR6i7OsMQox1AMyvJJ
+q9oKCPPjDO6Nw8jI7eXT3wzDAtqp+THogKbHW2+7Sy3tEl5ammeFi6S5BZJnK2Nz
+CKxfb+HFH9CHroj5P48rE2wrXcbpwQ70xzVpU66RKv07ZQwCcTR6gnO1LfyqTqKD
+aKO2fH5lX+XnbcijlE84JqU+w1YH4WZOnr0Sw8AdnMaH6diJ/iDPAlWml6UmAjKd
+zOZv1QU73gXn4VbQvNQZJCNCUWYTzYQ4JJzrD0S+ujlIAq9mjrqmw9n8qsKGa3Ff
+pGUAIF+Oiccset9juteCF2qq+pFJtXQmfaWyPbWVMo11MxfHa91MXKohker0z8az
+oKzOAYT3fpTfbLdRLc7j3d4uGzWBoiE4vCfGyfY1nGs++bfJSXW2iFqtcUhHd7p8
+U3R0o1ryXNWxjQfrZFTizEKRazs2NRkSYfzgjdGsqGvS+aps9fI4AxAjLqKAp5R1
+OqBvcPBKi1/OhECzmMheGjMLvzy/BukKMdfBgYxibQkhzx5bzk8=
+=+Mmt
+-----END PGP SIGNATURE-----
+
+--2wirqy36iysfq2nl--
