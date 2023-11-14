@@ -1,71 +1,182 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFBCBA31
-	for <linux-crypto@vger.kernel.org>; Tue, 14 Nov 2023 04:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE58CC2C5
+	for <linux-crypto@vger.kernel.org>; Tue, 14 Nov 2023 05:05:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SdS2+F7G"
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62BC4A4;
-	Mon, 13 Nov 2023 20:52:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=r3sYe9WZdqxnfaXhk9h2yztgf0ciQLfjChsoT0hl1Bc=; b=SdS2+F7GNRyfTcAwoaswtLhNaj
-	RSohOUDC7WZWk9Pm++YzplZtEXC14cTUULZzF6MPfSDb8W5Ulq84dbP9pjvQ4/FZWi5fIQ6/o4dhw
-	Y84fko9XK/C0kYQ+3lyrYQxLVaG8kmA5ICy6B3LAWrwDrDpDGNYSIrFk/mhEWEUf5W9rKZbOhbfIJ
-	p4Pl9HghOZJT8+Nsd6vgiWBMzjvsc5TcM4vpGlpBBPWt7buVAPdXhYtPQ2xxZTOjxORnKGE+yuu6m
-	zdPsXDzuCZKDrhk/XBrx+vwCL5qBeSe8ph1f+TesFUN1liZsBW+oTTSMc/AmAaHVLxH4bDibHiyOZ
-	FygeyKYA==;
-Received: from [50.53.46.231] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1r2lPB-00FAos-1c;
-	Tue, 14 Nov 2023 04:52:05 +0000
-Message-ID: <1553cd01-37fe-48c6-a6e3-b6ea9974d40b@infradead.org>
-Date: Mon, 13 Nov 2023 20:52:03 -0800
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="Kw18bmOw"
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B59019B
+	for <linux-crypto@vger.kernel.org>; Mon, 13 Nov 2023 21:05:37 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1cc5b705769so47396895ad.0
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Nov 2023 21:05:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1699938337; x=1700543137; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KeJZ0BkEz890tOtEJnUzJU6ocGohii4ZisT86ZKWgxs=;
+        b=Kw18bmOw3jdXFZzsGms3CZbK6kEM2TC3sOyPNT1ZYTJ7H1RehSdPj2KbGMQQolk9mn
+         khr74OZ9OAVBcZIcds+ej5aDVUbfVl+cbCPIljgKYox9ATF7pEWUIfneVY7ab+cXlya2
+         0shdwg0amXjrwsjZq0OhETod1M5wPdYhwZClg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699938337; x=1700543137;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KeJZ0BkEz890tOtEJnUzJU6ocGohii4ZisT86ZKWgxs=;
+        b=LaDlyzKbDIvftnCbIT02Jni3XjfSGoPmiKaAJdCAuNDiEk97rX1zJjboE/bOMuN0cX
+         SxUfP/F1A/ihCXLvzhnU45UrjwqygERPM++8pvyq16SVGIE9wrdbx9/MNzdZj59ZjqKV
+         2gzSDHvRoIm+lheUdNJv/V/VZoHcFZRIuTRpeD200xlZvzj8h6tXphSsp29rZKDHphua
+         ZzjCN2vmrajcJveCMMD0vjZqL3skprwbYV/WM6ubGbC4KlqnDgJbuE7r2a2bu5T4EJWn
+         fErrrJcADruu5IyMt4C06LsmcfEgT1N13Yq/HilSpNcgwRvLEuZEQ/AnKX4PjmFfIGKh
+         5VTQ==
+X-Gm-Message-State: AOJu0YyoRPvQ7Ff8Nyc1p8LpiJa14ZRrJlO56jtS38DyJvHq2cxJUNWo
+	LhenjIOK32Car+xux4YHOgzw9g==
+X-Google-Smtp-Source: AGHT+IG5gf04tmYjJYh8HrL2WBHITMcCDj+KVIbAoWxkB4aBytCegzLO89WqJa4PD9/a52MS/92iTQ==
+X-Received: by 2002:a17:902:bd41:b0:1cc:4fbe:9271 with SMTP id b1-20020a170902bd4100b001cc4fbe9271mr1340916plx.22.1699938336864;
+        Mon, 13 Nov 2023 21:05:36 -0800 (PST)
+Received: from localhost.localdomain ([103.108.57.9])
+        by smtp.gmail.com with ESMTPSA id a20-20020a170902ee9400b001b896686c78sm4910131pld.66.2023.11.13.21.05.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Nov 2023 21:05:36 -0800 (PST)
+From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+To: herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org
+Cc: manjunath.hadli@vayavyalabs.com,
+	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH 0/4] Add crypto spacc driver to support cipher, hash and aead
+Date: Tue, 14 Nov 2023 10:35:21 +0530
+Message-Id: <20231114050525.471854-1-pavitrakumarm@vayavyalabs.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Non-existing CONFIG_ options are used in source code
-Content-Language: en-US
-To: sunying@isrc.iscas.ac.cn, linux-kernel@vger.kernel.org,
- Neal Liu <neal_liu@aspeedtech.com>, David Howells <dhowells@redhat.com>,
- =?UTF-8?Q?Michael_B=C3=BCsch?= <m@bues.ch>
-Cc: linux-crypto@vger.kernel.org, "pengpeng@iscas.ac.cn"
- <pengpeng@iscas.ac.cn>, "renyanjie01@gmail.com" <renyanjie01@gmail.com>
-References: <4e8525fe.607e2.18a8ddfdce8.Coremail.sunying@isrc.iscas.ac.cn>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <4e8525fe.607e2.18a8ddfdce8.Coremail.sunying@isrc.iscas.ac.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Add the driver for SPAcc(Security Protocol Accelerator), which is a
+crypto acceleration IP from Synopsys. The SPAcc supports many cipher,
+hash and aead algorithms and various modes.The driver currently supports
+below modes
 
+aead:
+- ccm(sm4)
+- ccm(aes)
+- gcm(sm4)
+- gcm(aes)
+- rfc8998(gcm(sm4))
+- rfc7539(chacha20,poly1305)
 
-On 9/13/23 02:29, sunying@isrc.iscas.ac.cn wrote:
-> The following configuration options are not defined
->  (they may have been deleted or not yet added)
->  but are used in the source files.
-> 
-> Is there something in these that might need fixing?
-> 
-> ===============================================
-> 1. CONFIG_NETFS_DEBUG
-> fs/netfs/internal.h:122:#elif defined(CONFIG_NETFS_DEBUG)
-> 
-> 2. CONFIG_SSB_DEBUG
-> include/linux/ssb/ssb.h:626:#ifdef CONFIG_SSB_DEBUG
-> 
-> 3. CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO_DEBUG
-> drivers/crypto/aspeed/aspeed-hace-crypto.c:19:#ifdef CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO_DEBUG
-> ===============================================
+cipher:
+- cbc(sm4)
+- ecb(sm4)
+- ofb(sm4)
+- cfb(sm4)
+- ctr(sm4)
+- cbc(aes)
+- ecb(aes)
+- ctr(aes)
+- xts(aes)
+- cts(cbc(aes))
+- cbc(des)
+- ecb(des)
+- cbc(des3_ede)
+- ecb(des3_ede)
+- chacha20
+- xts(sm4)
+- cts(cbc(sm4))
+- ecb(kasumi)
+- f8(kasumi)
+- snow3g_uea2
+- cs1(cbc(aes))
+- cs2(cbc(aes))
+- cs1(cbc(sm4))
+- cs2(cbc(sm4))
+- f8(sm4)
 
-Yes, please send separate patches to remove each of them.
+hash:
+- michael_mic
+- sm3
+- hmac(sm3)
+- sha3-512
+- sha3-384
+- sha3-256
+- sha3-224
+- hmac(sha512)
+- hmac(sha384)
+- hmac(sha256)
+- hmac(sha224)
+- sha512
+- sha384
+- sha256
+- sha224
+- sha1
+- hmac(sha1)
+- md5
+- hmac(md5)
+- cmac(sm4)
+- xcbc(aes)
+- cmac(aes)
+- xcbc(sm4) 
+- sha512-224
+- hmac(sha512-224)
+- sha512-256
+- hmac(sha512-256)
+- mac(kasumi_f9)
+- mac(snow3g)
+- mac(zuc)
+- sslmac(sha1)
+- shake128
+- shake256
+- cshake128
+- cshake256
+- kcmac128
+- kcmac256
+- kcmacxof128
+- kcmacxof256
+- sslmac(md5)
 
-thanks.
+Pavitrakumar M (4):
+  Add SPACC driver to Linux kernel
+  Add SPACC Kconfig and Makefile
+  Add SPAcc dts overlay
+  Enable Driver compilation in crypto Kconfig and Makefile file
+
+ arch/arm64/boot/dts/xilinx/Makefile           |    3 +
+ .../arm64/boot/dts/xilinx/snps-dwc-spacc.dtso |   35 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/dwc-spacc/Kconfig              |   95 +
+ drivers/crypto/dwc-spacc/Makefile             |   16 +
+ drivers/crypto/dwc-spacc/spacc_aead.c         | 1352 ++++++++
+ drivers/crypto/dwc-spacc/spacc_ahash.c        | 1241 +++++++
+ drivers/crypto/dwc-spacc/spacc_core.c         | 3044 +++++++++++++++++
+ drivers/crypto/dwc-spacc/spacc_core.h         |  821 +++++
+ drivers/crypto/dwc-spacc/spacc_device.c       |  322 ++
+ drivers/crypto/dwc-spacc/spacc_device.h       |  238 ++
+ drivers/crypto/dwc-spacc/spacc_hal.c          |  390 +++
+ drivers/crypto/dwc-spacc/spacc_hal.h          |  113 +
+ drivers/crypto/dwc-spacc/spacc_interrupt.c    |  216 ++
+ drivers/crypto/dwc-spacc/spacc_manager.c      |  707 ++++
+ drivers/crypto/dwc-spacc/spacc_skcipher.c     |  629 ++++
+ 17 files changed, 9224 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/xilinx/snps-dwc-spacc.dtso
+ create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+ create mode 100644 drivers/crypto/dwc-spacc/Makefile
+ create mode 100755 drivers/crypto/dwc-spacc/spacc_aead.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+ create mode 100755 drivers/crypto/dwc-spacc/spacc_core.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+ create mode 100755 drivers/crypto/dwc-spacc/spacc_device.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+ create mode 100755 drivers/crypto/dwc-spacc/spacc_hal.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
+
 -- 
-~Randy
+2.25.1
+
