@@ -1,71 +1,70 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8E739F
-	for <linux-crypto@vger.kernel.org>; Wed, 15 Nov 2023 02:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A4E10F5
+	for <linux-crypto@vger.kernel.org>; Wed, 15 Nov 2023 02:03:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hSfXbXiU"
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24A14D6
-	for <linux-crypto@vger.kernel.org>; Tue, 14 Nov 2023 18:02:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BMwSVNLA"
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41F21DA
+	for <linux-crypto@vger.kernel.org>; Tue, 14 Nov 2023 18:03:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700013728; x=1731549728;
+  t=1700013813; x=1731549813;
   h=date:from:to:cc:subject:message-id:in-reply-to:
    mime-version;
-  bh=2zEQ5sQbmFRlcI7u2JHK6NQ+gAzCv9v1pB+ihl7DjMs=;
-  b=hSfXbXiUgTEuJsWIAlL10AqtJId3bJlfx5M4KIBFs+/e6rkbWzlOoWEV
-   X9xkH6dQbShfK48h3be2aObE4qq6j6l+BS6iBjVk8Cw7oLrI8DoSlHA4P
-   y3frXr9WCY1XHC2eI7Fkalhv5LWQces+Z45cupa1iAkxvjshztGzRRI+D
-   attxFviYcYmRM6fVWfLGtJ5rL1DnfETROTY6MIqJBdsM/Kk8DqiBeN4Sv
-   fma30lDc1FyQdqB0KkBcRo4XmaHMMV+QvCFkxSdZHAsdS3WAdOg8QFDI5
-   89agiHizGku+ydscBBjClHMBaWFwwkboFcV9SQzs4XW9/x6b0wEqU0Gf4
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="455083717"
+  bh=uFiTzspUT255vZ1F9pkykVSRnszhap58MDKBjV4Xtzw=;
+  b=BMwSVNLA+XXMR/9/beF4yGT6LP9OpZww6Z86bySdS/2LqR6oGbMjKKN3
+   BvCri2jCbOvAn05SB+qaXfsQ89jK3fnt/1K2bnB8iVug0ATyG2930luWY
+   J2zT6vxC853U8Li+Wu4j8NwysSpEvlXARmipuic2Mj1jn+Qa1+NRoX+me
+   RwnMxAubv2vPFRvyP70PGEW3xmwRKl8s43QzoBwjMiIaEavzZ8DY/WK3U
+   2rI3AnrSf/wDMJ50t/d+AYMoOVLobBqiCthtbCCnLq3bSUOk9pl4wH9Kh
+   s5PcYDNLITWat0QDBgLPTvHDsu3srMnTstHYL0BjNkUQ9rs9E6K0cbzIB
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="457291947"
 X-IronPort-AV: E=Sophos;i="6.03,303,1694761200"; 
-   d="scan'208";a="455083717"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 18:02:07 -0800
+   d="scan'208";a="457291947"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 18:03:32 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="835248818"
 X-IronPort-AV: E=Sophos;i="6.03,303,1694761200"; 
-   d="scan'208";a="835248818"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Nov 2023 18:02:07 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+   d="scan'208";a="6259680"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Nov 2023 18:03:31 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 14 Nov 2023 18:02:06 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ 15.1.2507.34; Tue, 14 Nov 2023 18:03:30 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Tue, 14 Nov 2023 18:02:06 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ 15.1.2507.34 via Frontend Transport; Tue, 14 Nov 2023 18:03:30 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Tue, 14 Nov 2023 18:02:05 -0800
+ 15.1.2507.34; Tue, 14 Nov 2023 18:03:30 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SgkSx/rXLFsH2N+9woHrqTT3EPr1BTEzNcUme1d0fkwMPiGP1WDe1pjKntQ8chE1oQ5sckW4zcdfP9YVAArragaSKaQY6SdKZl01DXtyKtxKoRxsD1e+6VzaxA3gdYsPCCjc+BGkVrv2aWQxril5HKpR1VS6dm93xkt+SMpNwh7kqufIrluAZK2iLRzjd9A17ZTvthJ2myq60zCECkS8YKE0Bq2Ofc4VTDZmQQJg7x0YdPytDODYSVKiE7St3z6Jqk/n2lC9+ulW39qp326TT+cd/xReZ5pUHgy+COdznVoWUH6RPe4wWBgYX5YkP2bL/B9rOaj0j/w0xMHz4YBfGw==
+ b=UyYuIGr7GJsl4J03lhEtuQK4/XexDmiOaYW0mZNnEr0tVWsk0PuuUl2uEicFaCCpEe0tKdvMDpe50uRCDP6qM7VUe7Ap9ryBJyBL4riJpBntdC2A+REOUnpdyeoYXLoVWuwQwY79FFkLLQO5rajVlEwjMbV8cGyx3L2aJ2/omwnKlw11pXCTHPQpko46tzOrGDBITKVBNzWcC3ECDcf3Y80CgDuGxIssk2GVHe3eUJc+b5mnNSzvAkX1ZV5EM0DbMB63cGawkFXY3g+3k3EQVN2ghNnT6D0g9ZSzXIfby0sQ4cgcxd8JV7nfF7z19b05ktzVaiEfLI2bmiHc20rTvA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oKbI0j6pc/rdAO3cP0b9jc3CKq61IFwO5KJBUEY6ghc=;
- b=OGAj9wmLIyNZZZzVRbG2FHPcu9sKWnt6gvS7lgWQRcLHjIaWuHMiZr+A/iEgutUckWKPwh6WZSSnQrrpB0cM56vIxrv0e38B2maSE5Aci5Ri+nEhSWv9UAhr3FYxgikgdhZBuLPHX7oaxI70H22KFRszQni78VjoZnU/87F3kM5ZEJx0KgeKOBgQY7rxrpXdy5zDMhvJYAopIiZY053l4tDezPhsgkPXbzz3M7zJlSKWuziVWsHutZK68S0eqtMtvO6+8LYY1K5WSuP7Jq+MP9AJK26itcBFygx9BtETRx1OnSwtwe1h0h1ObVcMpfZtTfG5dfbGFC9Ba1ukmSDaag==
+ bh=V7Jf1fior4+Cv27m6IH30bJ6HLn8OB/LOUX5mLaNObQ=;
+ b=EgzrWAZQCNigg0X0VW22H3HaEH8SaiMeMMLJGAkeWAEhJ+5i0LlhNdpm0GSUW4I/Citx4rE1z1zpiHuV+1ceo7iYJNx8WYUpmvk9UxQbghKzqjyIb0imEn2xwQmCMl5SKx0InXRFy6L5LKvrYfaAvH7qXMOAtZwsqys3RVQEqymeN2HqYP0yyNprNKRu3wQWi4EAd66s53SNfah0bk1xckRzOa7NbZooxMSn719m52Vv+h9TnuqrpG5QMnxP7Oi81OrfOalntazj9OfabZaAJWrCH7IGoRBPQLcJfDl5HZo+PwROvwRcjfP2PBPguGxWDsCssD6/855lJcWw/d+R8Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from CY5PR11MB6392.namprd11.prod.outlook.com (2603:10b6:930:37::15)
- by MW3PR11MB4521.namprd11.prod.outlook.com (2603:10b6:303:55::13) with
+ by LV2PR11MB6045.namprd11.prod.outlook.com (2603:10b6:408:17b::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.17; Wed, 15 Nov
- 2023 02:02:03 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.31; Wed, 15 Nov
+ 2023 02:03:28 +0000
 Received: from CY5PR11MB6392.namprd11.prod.outlook.com
  ([fe80::15d3:7425:a09e:1c86]) by CY5PR11MB6392.namprd11.prod.outlook.com
  ([fe80::15d3:7425:a09e:1c86%4]) with mapi id 15.20.6933.028; Wed, 15 Nov 2023
- 02:02:03 +0000
-Date: Wed, 15 Nov 2023 09:57:21 +0800
+ 02:03:28 +0000
+Date: Wed, 15 Nov 2023 09:58:46 +0800
 From: kernel test robot <yujie.liu@intel.com>
 To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
 	<herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
@@ -74,13 +73,12 @@ CC: <oe-kbuild-all@lists.linux.dev>, <manjunath.hadli@vayavyalabs.com>,
 	<shwetar@vayavyalabs.com>, Ruud Derwig <Ruud.Derwig@synopsys.com>
 Subject: Re: [PATCH 4/4] Enable Driver compilation in crypto Kconfig and
  Makefile file
-Message-ID: <202311141830.g6TK9OTS-lkp@intel.com>
+Message-ID: <202311141906.Ai9VGcKQ-lkp@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
 In-Reply-To: <20231114050525.471854-5-pavitrakumarm@vayavyalabs.com>
-X-ClientProxiedBy: SG2PR02CA0036.apcprd02.prod.outlook.com
- (2603:1096:3:18::24) To CY5PR11MB6392.namprd11.prod.outlook.com
- (2603:10b6:930:37::15)
+X-ClientProxiedBy: SGAP274CA0016.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::28)
+ To CY5PR11MB6392.namprd11.prod.outlook.com (2603:10b6:930:37::15)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -88,51 +86,51 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6392:EE_|MW3PR11MB4521:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a612835-6630-495e-2371-08dbe57edc6f
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6392:EE_|LV2PR11MB6045:EE_
+X-MS-Office365-Filtering-Correlation-Id: ddf6898b-8367-4841-6715-08dbe57f0f01
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: d7TGKmK9Xt/lQpRTOkOLXrHpqB4AfegLbXTZYQwQAf30C3zqXtb+Jo1wl4a8+gTYZwQJd99CpKSusS2UpU6B70f4uAkthC+VZB/6P2/Q0Yns4TYX8XwWtgP86Ie87OOscaCEzT9EnKXbeoxK/zOeBa0sFUkO4yKz0Doyu818VLwyXUAk/ybeuKssBUwKYzfMY7fwSX2wW1920ab/Gjp+0+H3h/eiO7yGFIHlyXc4kbVzfkOd3THqmMag40bTUANGTJDPh3lkoSVT5Rotu6eI/+Ntl4HVR4jr/EchJxVGyAV3YV/j4f6w8LVdljTRY77cAHboWOwVAuLJOCjAqc9WUz4kmG+u4oqN7i5GhlfEUvdHEh1rPjufdd54uNYch1KME1PPJX77UunHKBFSIBsSReIiUfKdY30gHoAIb0LKclsBezC2eWtEXfWU3F/Y3cSIjCcyYmj7f4mlVkdgRFVOgdU4eDwrhUpTkmlCZktIK17aRga3n0juD+73stfFVvjX4umzDYFte9oYGASMe4ujytltWhzQcegHVLLQvcC8P+Pztn1iIdcrXI1exBgYHP65qUZRYk5yOYs3QbxTkdhcVXmjLl/TnRY9E/8ExCNXJxOcGsO8j4Cx/99NPZ+7dUKGEJOUZCCfz3/pmqA3wCfv5Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6392.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(346002)(366004)(396003)(136003)(230173577357003)(230922051799003)(230273577357003)(64100799003)(451199024)(1800799009)(186009)(6486002)(966005)(66556008)(54906003)(66476007)(66946007)(1076003)(5660300002)(478600001)(316002)(8936002)(8676002)(4326008)(6666004)(6506007)(6512007)(41300700001)(86362001)(82960400001)(83380400001)(2616005)(36756003)(38100700002)(30864003)(26005)(2906002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: CMNSbv+FgzNbbkgknQjGkw5ThyWnPQXA75/hdjJDtyv70VjCx/7CGkYwvM4cfAdmgw1T5FTmk51PdPtAmIkHyE7XOxugsiSPGgAKucKuQ09iEh1Pq/3yEfggV+xjWdCjziE99cQePB5iN6xjXiJb/QoZCU6X1MoKdJDtlD3qRMRAXeTjJUfb+7UtrPuzYLpTqvgZJlMv7cMGkAUm19Hnp9HwDn3LaJjo8RHYjfhiYwmKr6pXxHc5Kg1untuf8VQvjk+7TBRLdQ6v1996D/uqUNvvlCE5uMyE5tRR7kHPb6S5T0tNAzmBy/B/FKVbjZ1ntE1N3bHTu4H00KYrWtzDYXDNdsQcNDQ+S4qNFh+o9U2drOL30AwKX8sQ2C3TwysoF8tX2pYCEk6T9MLPnQm/N3B+o6oDMUMX1PzbwLay3iTnxnZlIlYP74H+QLMHi0CQxlrhBxxDU8Hw9hP7ljDD5hq3AtnVYhGGe4B+Cz/WysBB/uUDDaabJDYKJLixbXg4SIrtXgaiL7LueJBiqV7dQmAIIK3DQEaviLvmStObp0b9kbfs5BC9TefOJw6wIu3NkUOO1ScBo9t90pzCG74vgA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6392.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(39860400002)(376002)(396003)(366004)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(86362001)(83380400001)(38100700002)(66476007)(82960400001)(66946007)(316002)(66556008)(54906003)(8936002)(36756003)(6666004)(6512007)(2616005)(1076003)(26005)(478600001)(6486002)(966005)(41300700001)(4001150100001)(2906002)(6506007)(4326008)(8676002)(5660300002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2Sia1DnT63hhT+zaKqo04NshXRI4aQGlY8q5z+zjmfLRt/xv3KgiDBsQCYUk?=
- =?us-ascii?Q?OOsShCDNQbviANDm163WvDU1evgh34NSlCOnSb7b9k4XG6QRRzhiTFo4uJ1n?=
- =?us-ascii?Q?i1lXFL4Q60faTDSlQdAgLzfqGBFfcjR0Z6d5IqiL3p7nAXIbstv84xcLvCAS?=
- =?us-ascii?Q?IBtAC/ZGoCgSWx3HaLoiYwRIxddpDPLB7E2ZD57PZ/L5x4pB/21Ry+mQv1A7?=
- =?us-ascii?Q?LNb7z0Ugygsq6LbuoiEfCI0vpa40rPoD5Jki7yem6jdxkLWGnQadQTVekNPc?=
- =?us-ascii?Q?fo/TEz5G+GzqADeZjVLNm+TedfrhISQBjEL/0FwSuksbKUhODPsqU3EeiVrg?=
- =?us-ascii?Q?xMzrKp6jWACPB3GhhcrwiDLfLbZosvNdBcbZg2id6FxKpuBgV1qhdUEyFQ+h?=
- =?us-ascii?Q?VSvbZU+LutKLPwV3IY4NdKcKkx/WrB11WADps5tiBSkRuoahrhL5DI4mCZP/?=
- =?us-ascii?Q?h73f6cr4lzYZPvaxN3G23sVSTT6eYnTlV4+jUYZRXdkrZ2opKaSZD2zWVLtH?=
- =?us-ascii?Q?3sWO3JW9bEDjYFy8Z8nPCt/PduHyNjQ9z0Ee7VqGuvSnlQzAfp0Z6y2B09OV?=
- =?us-ascii?Q?zzjwFojDdnyxDlaMycsKPz4nr7O7Gci6p9KSrrmn5kNAs2uA8mvb7ryOmKoB?=
- =?us-ascii?Q?lN548+4HC5AiW/mUT7kwMaIY9tgOIEU+lJwBGBWhANxLEm6UoATdUU03nbfB?=
- =?us-ascii?Q?2zLSk5ZqX2ImmCy7JbC6Xa76t63jxRH6NeG7PWJK2GFmKWwmJPiCinLtDSZX?=
- =?us-ascii?Q?7YiH9d4svr8HsCp6AJ0NjfvAwX2udI7TgH3q9GF+LCnyDenPMZZVUFPf9cIv?=
- =?us-ascii?Q?xx+mR7E0Eaj81tXIgRs59I9ihpYDy/yTk6/oWglgTXhk/fXb/AqLLD4bgpwY?=
- =?us-ascii?Q?eXXvfNTPkP9z2WXjdhpAZuXf4ShQ6iSXuPbGypOPbik1j5T4TPKRpjkMroZP?=
- =?us-ascii?Q?e26fubtoX9R2QzzRug+OvLBb8/1gd470h11nuZyNpUgEeBddfloBW8XCzfZ7?=
- =?us-ascii?Q?m41yvAxnr6VBY9ZyBH6mX1eOM4ZQDmxcV6mT7aVtk7edRSY1J8RrTXju5ol5?=
- =?us-ascii?Q?iU8ygkQBItGkPmNGFsJMIDAuOngC2NFOwrcXO8rFsjaCKE+G7NDjyhxlPc6r?=
- =?us-ascii?Q?XGAa/LAhPqFM9V7SmvweYKtrf0nw5367cnYKUFSJWkyqaQu/1qPwB4e0Bjd3?=
- =?us-ascii?Q?F0zMgB/f4oL4NPS50SMvWKItmZDJp/y1cR5642gBWaV2nKMmNd3JWu8dhXYV?=
- =?us-ascii?Q?l+LWDqaP8DftzGqFvfDPUy2tWnGryVtQTiYKUuBqLTp4u1oIE+jB+xtuncUU?=
- =?us-ascii?Q?P9on/HA8gNObcpU8UY8p5Mv5sazO2+EraENx5vA89xcbHn2uLagumR6a9Vmy?=
- =?us-ascii?Q?Tz0obNCp8VausB9RlVesQPUuqCp7yjsqkGQgoPaQ79l2h0F8ZjkTe2wIxIqR?=
- =?us-ascii?Q?Gb0zhx5CbBJfNyhBYj+3sb5P52cDDaHhmlnOk/IXfpvT/Vp3NZwGG2o9odTr?=
- =?us-ascii?Q?L0M0ng405Hklub17GvuqyR5wvyiNj9Yunn+ocn38dZk/ASP6V3Ky7XD3dImX?=
- =?us-ascii?Q?gk9+kzACR3PfGmE4MLEINPcfBPMxTN6k38aGJ1gh?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a612835-6630-495e-2371-08dbe57edc6f
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SpausN2cFtBXXzHgykGSzY8qUWuwR3ZjBNDUg7lmIdy31/bMUjGPHe/fxrua?=
+ =?us-ascii?Q?GYyJDTlfDh7sdDRzOoq/toV4EdlvlLE1ueSjcyccHahUdbRmIEiKox27qWAC?=
+ =?us-ascii?Q?ZtbYDwZKMPeTdIozVKGha2R7RQUHrd1dHeglMK9jjo+281b1P1cf1kOiIPvo?=
+ =?us-ascii?Q?HU4se9USOEPxDuSacohVXAdrm5APbweOvRM1I7F+CE/rPYa285Vz7BY44Oyh?=
+ =?us-ascii?Q?Td+Q+MU3qS5lKdsI5DYAsWLD0bZEVXGSVP1BqY75pLDTXD80WijirfOkfsQa?=
+ =?us-ascii?Q?tqUVgOxewjOBdZPCn6dYDNkzVj2CoWkgAH6e8koOdjDpifA1HdBJyzx2zs2g?=
+ =?us-ascii?Q?xzxTdN4MSqObIlDw1I8zQWF3KCw9Zw05O1DS1sjSAGdv2Ky0tcb545wMdy36?=
+ =?us-ascii?Q?G8sYKkkxkx6lL+YfwVmV7lHLwW4vjE6z/aZh68CkkxGkKYtXznOrlQ04E+L6?=
+ =?us-ascii?Q?xxJlY6864jiIS9V4mgQOtkJk5643ALPlYRnPn1GB7uCAEk5M0jFBNdU7buvO?=
+ =?us-ascii?Q?idpaN7LhnjrhHNCBV0jf8LXKUlyWsobEuYTJvl8CNZ4a0twC1YpJnmPsY35b?=
+ =?us-ascii?Q?eJd6/MvHFtpaK1MaN8dTS2Ea883zFJCeHy1g3aLL/b5pqKDmDoFIMZ3XPA/u?=
+ =?us-ascii?Q?9/sWQaSX0XXi3Zt2aNe44ZaQ6uucI98WaZRi9LutMlwE5n2lTV5PuxcFwKTS?=
+ =?us-ascii?Q?eCw0EwqhRw/ZcAN41Offliz6hP9YmzkJHx0Dv4M/Ti475eO2/W++BZuj3GFB?=
+ =?us-ascii?Q?w9hu2wOOJDRF68fGk1lnbnFOwQY6YzGaUDt9Rek2683rzcMEddJs/8rEZict?=
+ =?us-ascii?Q?n9cIlv8kSzDJyRlfWIT3yrOUYswxc5/4q3gbmXKiZn9Vqjp075HdFO6pPpyt?=
+ =?us-ascii?Q?9vIMv6lkrsTSfL9KJm1HMlQmBQOEQbaXW4aGxkBpLvQgBHEAcGnaSsTmZTd/?=
+ =?us-ascii?Q?yZwimD/YD1wTiRfL79uO/k2tTKL4Epi9YOJeoYGuTczLiD8tO02w9UNFT1Bd?=
+ =?us-ascii?Q?uknJejs1ldAar8WTquCJlK5rZi2OWZP5qxwz6ZB3VPaWxSQ7XfgM1Ja2pc7U?=
+ =?us-ascii?Q?oiX5gJG0JsX3eO5+bzfRXJDxb2/5JEDdj2LJPl9cWBkdunKuNgqkckPgOyOF?=
+ =?us-ascii?Q?yQvdQfq8wfeaVo1MIvHls0NBlamPIYHtEdBYVwRmng/BwbAGV79i8bDoL+Bl?=
+ =?us-ascii?Q?I5buAUT0Q/yrYCRFRk2f0Twshv3NZEXFuj8aINXbWbl9N3r1pdPihfU4jRRl?=
+ =?us-ascii?Q?i0f9qkUwjzRRaYTES6vr7tWuDcw4IhSgnAMUawwARyIbfBCcCS1XLv2udML1?=
+ =?us-ascii?Q?uesodhl8rUmQCDNMOfDAD7lu9IQbWvz/JTCUWRAQBv8uy8WpQ0tmaSo7pp42?=
+ =?us-ascii?Q?BOMxFzLfW2LGXz2dUryshqinm1wqxG0RVrnblp0xUU6l5ZJUJLGzsynIGb5g?=
+ =?us-ascii?Q?5qVE6xKjgj0uDXuvWu2pEZ3vQpn2VFUGNR7kmF5uAG8Lu6JxetQCGpl9+JF3?=
+ =?us-ascii?Q?PLQyHlDQ3tcuq9WSu57Zv43wxaM2AxbGOnaIrkBui6SVmTw+H1iwBT4vEL9G?=
+ =?us-ascii?Q?LgAoEfkStKTaeSWE+b7rB5BwoKmkfD644C42WmqG?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddf6898b-8367-4841-6715-08dbe57f0f01
 X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6392.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2023 02:02:03.3607
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2023 02:03:28.1288
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1eghzLcs7SLYkPGPuTi5rpesiElaDMZIdMawD4Qfb7pytshg1xX+XGLP63twHvmhL2dzm1j5cuGLg6I/WOLlnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4521
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZmbcOE94gNaTJD1CzoZB3pmOBp2T6Qrbg9vqeUOcgGHptVU4uB37l9Yz1uyrrwB9ZJjJ3BSAe4hZsZ3RauUjUQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR11MB6045
 X-OriginatorOrg: intel.com
 
 Hi Pavitrakumar,
@@ -150,203 +148,105 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Pavitrakumar-M/Add-SPACC-
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
 patch link:    https://lore.kernel.org/r/20231114050525.471854-5-pavitrakumarm%40vayavyalabs.com
 patch subject: [PATCH 4/4] Enable Driver compilation in crypto Kconfig and Makefile file
-config: csky-randconfig-001-20231114 (https://download.01.org/0day-ci/archive/20231114/202311141830.g6TK9OTS-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231114/202311141830.g6TK9OTS-lkp@intel.com/reproduce)
+config: microblaze-defconfig (https://download.01.org/0day-ci/archive/20231114/202311141906.Ai9VGcKQ-lkp@intel.com/config)
+compiler: microblaze-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231114/202311141906.Ai9VGcKQ-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <yujie.liu@intel.com>
-| Closes: https://lore.kernel.org/r/202311141830.g6TK9OTS-lkp@intel.com/
+| Closes: https://lore.kernel.org/r/202311141906.Ai9VGcKQ-lkp@intel.com/
 
-All error/warnings (new ones prefixed by >>):
+All errors (new ones prefixed by >>):
 
->> drivers/crypto/dwc-spacc/spacc_skcipher.c:87:5: warning: no previous prototype for 'spacc_skcipher_fallback' [-Wmissing-prototypes]
-      87 | int spacc_skcipher_fallback(unsigned char *name, struct skcipher_request *req,
-         |     ^~~~~~~~~~~~~~~~~~~~~~~
-   drivers/crypto/dwc-spacc/spacc_skcipher.c: In function 'spacc_cipher_cb':
->> drivers/crypto/dwc-spacc/spacc_skcipher.c:131:18: warning: variable 'rc' set but not used [-Wunused-but-set-variable]
-     131 |         int err, rc;
-         |                  ^~
-   drivers/crypto/dwc-spacc/spacc_skcipher.c: At top level:
->> drivers/crypto/dwc-spacc/spacc_skcipher.c:155:5: warning: no previous prototype for 'spacc_cipher_init_dma' [-Wmissing-prototypes]
-     155 | int spacc_cipher_init_dma(struct device *dev, struct skcipher_request *req)
-         |     ^~~~~~~~~~~~~~~~~~~~~
->> drivers/crypto/dwc-spacc/spacc_skcipher.c:179:5: warning: no previous prototype for 'spacc_cipher_cra_init' [-Wmissing-prototypes]
-     179 | int spacc_cipher_cra_init(struct crypto_tfm *tfm)
-         |     ^~~~~~~~~~~~~~~~~~~~~
->> drivers/crypto/dwc-spacc/spacc_skcipher.c:210:5: warning: no previous prototype for 'spacc_cipher_setkey' [-Wmissing-prototypes]
-     210 | int spacc_cipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
-         |     ^~~~~~~~~~~~~~~~~~~
->> drivers/crypto/dwc-spacc/spacc_skcipher.c:283:5: warning: no previous prototype for 'spacc_cipher_process' [-Wmissing-prototypes]
-     283 | int spacc_cipher_process(struct skcipher_request *req, int enc_dec)
-         |     ^~~~~~~~~~~~~~~~~~~~
-   drivers/crypto/dwc-spacc/spacc_skcipher.c: In function 'spacc_cipher_process':
->> drivers/crypto/dwc-spacc/spacc_skcipher.c:293:13: warning: variable 'ivsize' set but not used [-Wunused-but-set-variable]
-     293 |         int ivsize;
-         |             ^~~~~~
-   drivers/crypto/dwc-spacc/spacc_skcipher.c: At top level:
->> drivers/crypto/dwc-spacc/spacc_skcipher.c:473:5: warning: no previous prototype for 'spacc_cipher_encrypt' [-Wmissing-prototypes]
-     473 | int spacc_cipher_encrypt(struct skcipher_request *req)
-         |     ^~~~~~~~~~~~~~~~~~~~
->> drivers/crypto/dwc-spacc/spacc_skcipher.c:487:5: warning: no previous prototype for 'spacc_cipher_decrypt' [-Wmissing-prototypes]
-     487 | int spacc_cipher_decrypt(struct skcipher_request *req)
-         |     ^~~~~~~~~~~~~~~~~~~~
-   drivers/crypto/dwc-spacc/spacc_skcipher.c: In function 'probe_ciphers':
->> drivers/crypto/dwc-spacc/spacc_skcipher.c:533:59: warning: '%s' directive output may be truncated writing up to 5299 bytes into a region of size 128 [-Wformat-truncation=]
-     533 |         snprintf(calg->cra_name, sizeof(calg->cra_name), "%s", mode->name);
-         |                                                           ^~
-   In function 'spacc_init_calg',
-       inlined from 'spacc_register_cipher' at drivers/crypto/dwc-spacc/spacc_skcipher.c:549:2,
-       inlined from 'probe_ciphers' at drivers/crypto/dwc-spacc/spacc_skcipher.c:596:11:
-   drivers/crypto/dwc-spacc/spacc_skcipher.c:533:9: note: 'snprintf' output between 1 and 5300 bytes into a destination of size 128
-     533 |         snprintf(calg->cra_name, sizeof(calg->cra_name), "%s", mode->name);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/crypto/dwc-spacc/spacc_skcipher.c: In function 'probe_ciphers':
-   drivers/crypto/dwc-spacc/spacc_skcipher.c:535:25: warning: '%s' directive output may be truncated writing up to 5299 bytes into a region of size 122 [-Wformat-truncation=]
-     535 |                  "spacc-%s", mode->name);
-         |                         ^~
-   In function 'spacc_init_calg',
-       inlined from 'spacc_register_cipher' at drivers/crypto/dwc-spacc/spacc_skcipher.c:549:2,
-       inlined from 'probe_ciphers' at drivers/crypto/dwc-spacc/spacc_skcipher.c:596:11:
-   drivers/crypto/dwc-spacc/spacc_skcipher.c:534:9: note: 'snprintf' output between 7 and 5306 bytes into a destination of size 128
-     534 |         snprintf(calg->cra_driver_name, sizeof(calg->cra_driver_name),
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     535 |                  "spacc-%s", mode->name);
-         |                  ~~~~~~~~~~~~~~~~~~~~~~~
---
->> drivers/crypto/dwc-spacc/spacc_core.c:1113:5: warning: no previous prototype for 'spacc_sgs_to_ddt' [-Wmissing-prototypes]
-    1113 | int spacc_sgs_to_ddt(struct device *dev,
-         |     ^~~~~~~~~~~~~~~~
->> drivers/crypto/dwc-spacc/spacc_core.c:1179:5: warning: no previous prototype for 'modify_scatterlist' [-Wmissing-prototypes]
-    1179 | int modify_scatterlist(struct scatterlist *src, struct scatterlist *dst,
-         |     ^~~~~~~~~~~~~~~~~~
->> drivers/crypto/dwc-spacc/spacc_core.c:1215:5: warning: no previous prototype for 'spacc_sg_to_ddt' [-Wmissing-prototypes]
-    1215 | int spacc_sg_to_ddt(struct device *dev, struct scatterlist *sg,
-         |     ^~~~~~~~~~~~~~~
->> drivers/crypto/dwc-spacc/spacc_core.c:2991:12: warning: 'spacc_load_skp' defined but not used [-Wunused-function]
-    2991 | static int spacc_load_skp(struct spacc_device *spacc, uint32_t *key, int keysz,
-         |            ^~~~~~~~~~~~~~
->> drivers/crypto/dwc-spacc/spacc_core.c:2849:13: warning: 'spacc_set_secure_mode' defined but not used [-Wunused-function]
-    2849 | static void spacc_set_secure_mode(struct spacc_device *spacc, int src, int dst,
-         |             ^~~~~~~~~~~~~~~~~~~~~
->> drivers/crypto/dwc-spacc/spacc_core.c:974:26: warning: 'names' defined but not used [-Wunused-const-variable=]
-     974 | static const char *const names[] = {
-         |                          ^~~~~
-   In file included from <command-line>:
-   In function 'spacc_sg_chain',
-       inlined from 'fixup_sg' at drivers/crypto/dwc-spacc/spacc_core.c:1105:4,
-       inlined from 'spacc_sgs_to_ddt' at drivers/crypto/dwc-spacc/spacc_core.c:1132:16:
->> include/linux/compiler_types.h:425:45: error: call to '__compiletime_assert_235' declared with attribute error: BUILD_BUG_ON failed: IS_ENABLED(CONFIG_DEBUG_SG)
-     425 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |                                             ^
-   include/linux/compiler_types.h:406:25: note: in definition of macro '__compiletime_assert'
-     406 |                         prefix ## suffix();                             \
-         |                         ^~~~~~
-   include/linux/compiler_types.h:425:9: note: in expansion of macro '_compiletime_assert'
-     425 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ^~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-      50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-         |         ^~~~~~~~~~~~~~~~
-   drivers/crypto/dwc-spacc/spacc_core.c:1072:9: note: in expansion of macro 'BUILD_BUG_ON'
-    1072 |         BUILD_BUG_ON(IS_ENABLED(CONFIG_DEBUG_SG));
-         |         ^~~~~~~~~~~~
-   In function 'spacc_sg_chain',
-       inlined from 'fixup_sg' at drivers/crypto/dwc-spacc/spacc_core.c:1105:4,
-       inlined from 'spacc_sg_to_ddt' at drivers/crypto/dwc-spacc/spacc_core.c:1222:15:
->> include/linux/compiler_types.h:425:45: error: call to '__compiletime_assert_235' declared with attribute error: BUILD_BUG_ON failed: IS_ENABLED(CONFIG_DEBUG_SG)
-     425 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |                                             ^
-   include/linux/compiler_types.h:406:25: note: in definition of macro '__compiletime_assert'
-     406 |                         prefix ## suffix();                             \
-         |                         ^~~~~~
-   include/linux/compiler_types.h:425:9: note: in expansion of macro '_compiletime_assert'
-     425 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ^~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-      50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-         |         ^~~~~~~~~~~~~~~~
-   drivers/crypto/dwc-spacc/spacc_core.c:1072:9: note: in expansion of macro 'BUILD_BUG_ON'
-    1072 |         BUILD_BUG_ON(IS_ENABLED(CONFIG_DEBUG_SG));
-         |         ^~~~~~~~~~~~
---
->> drivers/crypto/dwc-spacc/spacc_ahash.c:499:5: warning: no previous prototype for 'do_shash' [-Wmissing-prototypes]
-     499 | int do_shash(unsigned char *name, unsigned char *result,
-         |     ^~~~~~~~
-   drivers/crypto/dwc-spacc/spacc_ahash.c: In function 'spacc_hash_final':
->> drivers/crypto/dwc-spacc/spacc_ahash.c:1007:13: warning: variable 'err' set but not used [-Wunused-but-set-variable]
-    1007 |         int err;
-         |             ^~~
-   drivers/crypto/dwc-spacc/spacc_ahash.c: In function 'probe_hashes':
->> drivers/crypto/dwc-spacc/spacc_ahash.c:177:59: warning: '%s' directive output may be truncated writing up to 8479 bytes into a region of size 128 [-Wformat-truncation=]
-     177 |         snprintf(calg->cra_name, sizeof(calg->cra_name), "%s", mode->name);
-         |                                                           ^~
-   In function 'spacc_init_calg',
-       inlined from 'spacc_register_hash' at drivers/crypto/dwc-spacc/spacc_ahash.c:1164:2,
-       inlined from 'probe_hashes' at drivers/crypto/dwc-spacc/spacc_ahash.c:1211:9:
-   drivers/crypto/dwc-spacc/spacc_ahash.c:177:9: note: 'snprintf' output between 1 and 8480 bytes into a destination of size 128
-     177 |         snprintf(calg->cra_name, sizeof(calg->cra_name), "%s", mode->name);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/crypto/dwc-spacc/spacc_ahash.c: In function 'probe_hashes':
-   drivers/crypto/dwc-spacc/spacc_ahash.c:179:25: warning: '%s' directive output may be truncated writing up to 8479 bytes into a region of size 122 [-Wformat-truncation=]
-     179 |                  "spacc-%s", mode->name);
-         |                         ^~
-   In function 'spacc_init_calg',
-       inlined from 'spacc_register_hash' at drivers/crypto/dwc-spacc/spacc_ahash.c:1164:2,
-       inlined from 'probe_hashes' at drivers/crypto/dwc-spacc/spacc_ahash.c:1211:9:
-   drivers/crypto/dwc-spacc/spacc_ahash.c:178:9: note: 'snprintf' output between 7 and 8486 bytes into a destination of size 128
-     178 |         snprintf(calg->cra_driver_name, sizeof(calg->cra_driver_name),
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     179 |                  "spacc-%s", mode->name);
-         |                  ~~~~~~~~~~~~~~~~~~~~~~~
---
->> drivers/crypto/dwc-spacc/spacc_interrupt.c:188:6: warning: no previous prototype for 'spacc_disable_int' [-Wmissing-prototypes]
-     188 | void spacc_disable_int (struct spacc_device *spacc)
-         |      ^~~~~~~~~~~~~~~~~
->> drivers/crypto/dwc-spacc/spacc_interrupt.c:194:13: warning: no previous prototype for 'spacc_irq_handler' [-Wmissing-prototypes]
-     194 | irqreturn_t spacc_irq_handler(int irq, void *dev)
-         |             ^~~~~~~~~~~~~~~~~
---
-   drivers/crypto/dwc-spacc/spacc_hal.c: In function 'pdu_get_version':
->> drivers/crypto/dwc-spacc/spacc_hal.c:19:28: warning: variable 'ver' set but not used [-Wunused-but-set-variable]
-      19 |         unsigned long tmp, ver;
-         |                            ^~~
-   drivers/crypto/dwc-spacc/spacc_hal.c: At top level:
->> drivers/crypto/dwc-spacc/spacc_hal.c:374:5: warning: no previous prototype for 'pdu_sg_to_ddt' [-Wmissing-prototypes]
-     374 | int pdu_sg_to_ddt(struct scatterlist *sg, int sg_count, struct pdu_ddt *ddt)
-         |     ^~~~~~~~~~~~~
---
-   drivers/crypto/dwc-spacc/spacc_aead.c: In function 'spacc_aead_init_dma':
->> drivers/crypto/dwc-spacc/spacc_aead.c:256:31: warning: variable 'buf' set but not used [-Wunused-but-set-variable]
-     256 |                         char *buf = sg_virt(req->src);
-         |                               ^~~
+   microblaze-linux-ld: drivers/crypto/dwc-spacc/spacc_ahash.o: in function `zero_message_process':
+>> drivers/crypto/dwc-spacc/spacc_ahash.c:427:(.text+0x284): undefined reference to `sm3_zero_message_hash'
 
 
-vim +/__compiletime_assert_235 +425 include/linux/compiler_types.h
+vim +427 drivers/crypto/dwc-spacc/spacc_ahash.c
 
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  411  
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  412  #define _compiletime_assert(condition, msg, prefix, suffix) \
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  413  	__compiletime_assert(condition, msg, prefix, suffix)
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  414  
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  415  /**
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  416   * compiletime_assert - break build and emit msg if condition is false
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  417   * @condition: a compile-time constant condition to check
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  418   * @msg:       a message to emit if condition is false
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  419   *
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  420   * In tradition of POSIX assert, this macro will break the build if the
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  421   * supplied condition is *false*, emitting the supplied error message if the
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  422   * compiler has support to do so.
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  423   */
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  424  #define compiletime_assert(condition, msg) \
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21 @425  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-eb5c2d4b45e3d2d5 Will Deacon 2020-07-21  426  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  417  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  418  static int zero_message_process(struct ahash_request *req)
+188d801c0d4bbe Pavitrakumar M 2023-11-14  419  {
+188d801c0d4bbe Pavitrakumar M 2023-11-14  420  	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  421  	int digest_sz = crypto_ahash_digestsize(tfm);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  422  	const struct spacc_alg *salg = spacc_tfm_ahash(&tfm->base);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  423  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  424  	switch (salg->mode->id) {
+188d801c0d4bbe Pavitrakumar M 2023-11-14  425  	case CRYPTO_MODE_HASH_SM3:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  426  	case CRYPTO_MODE_HMAC_SM3:
+188d801c0d4bbe Pavitrakumar M 2023-11-14 @427  		memcpy(req->result, sm3_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  428  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  429  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  430  	case CRYPTO_MODE_HMAC_SHA224:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  431  	case CRYPTO_MODE_HASH_SHA224:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  432  		memcpy(req->result, sha224_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  433  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  434  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  435  	case CRYPTO_MODE_HMAC_SHA256:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  436  	case CRYPTO_MODE_HASH_SHA256:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  437  		memcpy(req->result, sha256_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  438  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  439  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  440  	case CRYPTO_MODE_HMAC_SHA384:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  441  	case CRYPTO_MODE_HASH_SHA384:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  442  		memcpy(req->result, sha384_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  443  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  444  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  445  	case CRYPTO_MODE_HMAC_SHA512:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  446  	case CRYPTO_MODE_HASH_SHA512:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  447  		memcpy(req->result, sha512_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  448  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  449  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  450  	case CRYPTO_MODE_HMAC_MD5:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  451  	case CRYPTO_MODE_HASH_MD5:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  452  		memcpy(req->result, md5_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  453  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  454  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  455  	case CRYPTO_MODE_HMAC_SHA1:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  456  	case CRYPTO_MODE_HASH_SHA1:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  457  		memcpy(req->result, sha1_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  458  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  459  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  460  	case CRYPTO_MODE_MAC_XCBC:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  461  		memcpy(req->result, xcbc_aes_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  462  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  463  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  464  	case CRYPTO_MODE_MAC_CMAC:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  465  		memcpy(req->result, cmac_aes_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  466  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  467  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  468  	case CRYPTO_MODE_HASH_SHA3_224:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  469  		memcpy(req->result, sha3_224_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  470  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  471  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  472  	case CRYPTO_MODE_HASH_SHA3_256:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  473  		memcpy(req->result, sha3_256_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  474  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  475  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  476  	case CRYPTO_MODE_HASH_SHA3_384:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  477  		memcpy(req->result, sha3_384_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  478  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  479  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  480  	case CRYPTO_MODE_HASH_SHA3_512:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  481  		memcpy(req->result, sha3_512_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  482  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  483  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  484  	case CRYPTO_MODE_MAC_MICHAEL:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  485  		memcpy(req->result, michael_mic_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  486  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  487  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  488  	case CRYPTO_MODE_MAC_SM4_XCBC:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  489  		memcpy(req->result, sm4_xcbc128_zero_message_hash, digest_sz);
+188d801c0d4bbe Pavitrakumar M 2023-11-14  490  		break;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  491  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  492  	default:
+188d801c0d4bbe Pavitrakumar M 2023-11-14  493  		return -EINVAL;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  494  	}
+188d801c0d4bbe Pavitrakumar M 2023-11-14  495  
+188d801c0d4bbe Pavitrakumar M 2023-11-14  496  	return 0;
+188d801c0d4bbe Pavitrakumar M 2023-11-14  497  }
+188d801c0d4bbe Pavitrakumar M 2023-11-14  498  
 
 -- 
 0-DAY CI Kernel Test Service
