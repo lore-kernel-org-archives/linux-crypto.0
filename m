@@ -1,119 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RzbWT8/i"
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C9C1B6;
-	Wed, 15 Nov 2023 11:21:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700076109; x=1731612109;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=G5x7wUs4spnSEklWHslegWXInUYrR+I+P7R4aBKmcxU=;
-  b=RzbWT8/ircM1SHAl8CgJ6wE0Pu9J71GsHR+s6KDlKGVjLW4LXeS1DFvs
-   UPSS/rmrSlYbqXNEt6eIIS0l8yb8G7QnKUFuEtD/zQXciJw1m2oFH2DOo
-   xw17o6SVNXRCyeir3gnGmdPQiItZS2CRTIznlJupKnwbi7yvKFm2rtt1G
-   h2H5I1+jQB3aITBugGZmVxXtMuG9vFd/cnetjZRaXxaLZ5FvS1gK3eq7Z
-   PJ5uB9zSgqcY0IdbDUxUhKmi+fmcP3MX96HKZcV/vHwjL5dMm5rUQO4PS
-   cpFgoAzxy/tmRDY95Zc/4t4U1Ez8oXlUvX6PaYqCC+CTxoCg6QWJCS1Am
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="455227990"
-X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
-   d="scan'208";a="455227990"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 11:21:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
-   d="scan'208";a="6265205"
-Received: from mmatragr-mobl1.amr.corp.intel.com (HELO [10.255.229.105]) ([10.255.229.105])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 11:21:44 -0800
-Message-ID: <541fff8a-ad8f-43f5-9a44-c64302698029@intel.com>
-Date: Wed, 15 Nov 2023 11:21:41 -0800
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59FE11A7;
+	Wed, 15 Nov 2023 13:02:44 -0800 (PST)
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6d33298f8fdso49178a34.1;
+        Wed, 15 Nov 2023 13:02:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700082163; x=1700686963;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xTi1+MQ4t5FTtGD8dbognkLQKmg8VuTrouDfFHJxxvg=;
+        b=mjoZqnDe8MUnwwGlpMZ99z59jIWVvqJ3k/eqr9rq7GXs8PB11z4PcmLsqN0NvzIsne
+         yK2r1tDRWJ6Xs8He5UNVtEkPCd9zxah1u82aZaM2OYRfhKm9nQZttPXwIBxuKxmSxNhF
+         3f+Sb/RIb8JoY+P4Gvgscoac8YTB41OhKWFpSzWemIENByBkRlfjALCKNEFj01or8iFe
+         NOZrEPGR86tN64mf8KzZbvGENwmW7sL8/AZguJTSQjIVRYmMzKh4daLTCM8g3je5BWYH
+         JQ9RuwiG/+nye72CCQmZdxCNhuKnsPQyLrgbNBX+nPF1Ip06bwgQfgNxQsg0I70U1WAT
+         71MQ==
+X-Gm-Message-State: AOJu0Yxn69PJ57CkJdZG2lIScUgKVs7lZx+TVqLHZSeS4GzkYVSuUD//
+	1EoVqxAEuEhrCqKOF9A0POXiHO01gA==
+X-Google-Smtp-Source: AGHT+IEitGC+5jlDZ7EaZ0678OAJ949TtdOz5HBhiVZghOLkf7I0tD27/xf5oMCnotNNPXveWv/0NA==
+X-Received: by 2002:a05:6830:4414:b0:6ce:2789:7195 with SMTP id q20-20020a056830441400b006ce27897195mr7902852otv.31.1700082163575;
+        Wed, 15 Nov 2023 13:02:43 -0800 (PST)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id s30-20020a056830439e00b006ce2e464a45sm693017otv.29.2023.11.15.13.02.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Nov 2023 13:02:42 -0800 (PST)
+Received: (nullmailer pid 3744532 invoked by uid 1000);
+	Wed, 15 Nov 2023 21:02:42 -0000
+From: Rob Herring <robh@kernel.org>
+To: Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RESEND PATCH] hwrng: ingenic: Replace of_device.h with explicit of.h include
+Date: Wed, 15 Nov 2023 15:02:37 -0600
+Message-ID: <20231115210238.3744406-1-robh@kernel.org>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] crypto: x86/sm2 -add Zhaoxin SM2 algorithm
- implementation
-Content-Language: en-US
-To: kernel test robot <lkp@intel.com>, LeoLiu-oc <LeoLiu-oc@zhaoxin.com>,
- herbert@gondor.apana.org.au, davem@davemloft.net, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- hpa@zytor.com, seanjc@google.com, kim.phillips@amd.com, pbonzini@redhat.com,
- babu.moger@amd.com, jiaxi.chen@linux.intel.com, jmattson@google.com,
- pawan.kumar.gupta@linux.intel.com, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, CobeChen@zhaoxin.com,
- TonyWWang@zhaoxin.com, YunShen@zhaoxin.com, Leoliu@zhaoxin.com
-References: <20231115071724.575356-1-LeoLiu-oc@zhaoxin.com>
- <202311160022.csCILGmA-lkp@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <202311160022.csCILGmA-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+The DT of_device.h and of_platform.h date back to the separate
+of_platform_bus_type before it as merged into the regular platform bus.
+As part of that merge prepping Arm DT support 13 years ago, they
+"temporarily" include each other and pull in various other headers. In
+preparation to fix this, adjust the includes for what is actually needed.
 
-> vim +/asm +43 arch/x86/crypto/sm2-zhaoxin-gmi_glue.c
-> 
->     35	
->     36	/* Zhaoxin sm2 verify function */
->     37	static inline int zhaoxin_gmi_sm2_verify(unsigned char *key, unsigned char *hash, unsigned char *sig,
->     38					unsigned char *scratch)
->     39	{
->     40		uint64_t cword, f_ok;
->     41		cword = (uint64_t)0x8;
->     42	
->   > 43		asm(".byte 0xf2, 0x0f, 0xa6, 0xc0"
->     44			:"=c"(f_ok), "+a"(hash), "+b"(key), "+d"(cword), "+S"(scratch), "+D"(sig));
->     45	
->     46		return f_ok;
->     47	}
->     48	
+of_device.h isn't needed, but of.h is and was implicitly included by it.
 
-When you go fix your compile error, can you please look around the tree
-and see what folks do for replacing .byte?  AS_SHA1_NI, for example.
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+ drivers/char/hw_random/ingenic-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/char/hw_random/ingenic-rng.c b/drivers/char/hw_random/ingenic-rng.c
+index 4f18c3fa5427..c74ded64fbe3 100644
+--- a/drivers/char/hw_random/ingenic-rng.c
++++ b/drivers/char/hw_random/ingenic-rng.c
+@@ -11,7 +11,7 @@
+ #include <linux/io.h>
+ #include <linux/iopoll.h>
+ #include <linux/module.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ 
+-- 
+2.42.0
+
