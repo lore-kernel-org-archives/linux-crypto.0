@@ -1,84 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B00451AD;
-	Wed, 15 Nov 2023 18:18:04 -0800 (PST)
-Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
-	by fd01.gateway.ufhost.com (Postfix) with ESMTP id 511DB7FFC;
-	Thu, 16 Nov 2023 10:18:03 +0800 (CST)
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX166.cuchost.com
- (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 16 Nov
- 2023 10:18:03 +0800
-Received: from ubuntu.localdomain (202.188.176.82) by EXMBX168.cuchost.com
- (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 16 Nov
- 2023 10:18:00 +0800
-From: Jia Jie Ho <jiajie.ho@starfivetech.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
-	<davem@davemloft.net>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: starfive - Pad adata with zeroes
-Date: Thu, 16 Nov 2023 10:17:52 +0800
-Message-ID: <20231116021752.420680-1-jiajie.ho@starfivetech.com>
-X-Mailer: git-send-email 2.34.1
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9863BD73;
+	Wed, 15 Nov 2023 20:36:01 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1r3U6W-000CFS-Lr; Thu, 16 Nov 2023 12:35:49 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Nov 2023 12:35:56 +0800
+Date: Thu, 16 Nov 2023 12:35:56 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jia Jie Ho <jiajie.ho@starfivetech.com>
+Cc: "David S . Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: starfive - Pad adata with zeroes
+Message-ID: <ZVWcLJOoLdElVsDd@gondor.apana.org.au>
+References: <20231116021752.420680-1-jiajie.ho@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [202.188.176.82]
-X-ClientProxiedBy: EXCAS062.cuchost.com (172.16.6.22) To EXMBX168.cuchost.com
- (172.16.6.78)
-X-YovoleRuleAgent: yovoleflag
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231116021752.420680-1-jiajie.ho@starfivetech.com>
 
-Ensure padding for adata is filled with zeroes. Additional bytes for
-padding affects the ccm tag output even though input ad len has been
-provided to the hardware.
+On Thu, Nov 16, 2023 at 10:17:52AM +0800, Jia Jie Ho wrote:
+>
+> diff --git a/drivers/crypto/starfive/jh7110-aes.c b/drivers/crypto/starfive/jh7110-aes.c
+> index 9378e6682f0e..e0fe599f8192 100644
+> --- a/drivers/crypto/starfive/jh7110-aes.c
+> +++ b/drivers/crypto/starfive/jh7110-aes.c
+> @@ -500,7 +500,7 @@ static int starfive_aes_prepare_req(struct skcipher_request *req,
+>  	scatterwalk_start(&cryp->out_walk, rctx->out_sg);
+>  
+>  	if (cryp->assoclen) {
+> -		rctx->adata = kzalloc(ALIGN(cryp->assoclen, AES_BLOCK_SIZE), GFP_KERNEL);
+> +		rctx->adata = kzalloc(cryp->assoclen + AES_BLOCK_SIZE, GFP_KERNEL);
 
-Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
----
- drivers/crypto/starfive/jh7110-aes.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Please explain why you're changing the allocation size here.
 
-diff --git a/drivers/crypto/starfive/jh7110-aes.c b/drivers/crypto/starfi=
-ve/jh7110-aes.c
-index 9378e6682f0e..e0fe599f8192 100644
---- a/drivers/crypto/starfive/jh7110-aes.c
-+++ b/drivers/crypto/starfive/jh7110-aes.c
-@@ -500,7 +500,7 @@ static int starfive_aes_prepare_req(struct skcipher_r=
-equest *req,
- 	scatterwalk_start(&cryp->out_walk, rctx->out_sg);
-=20
- 	if (cryp->assoclen) {
--		rctx->adata =3D kzalloc(ALIGN(cryp->assoclen, AES_BLOCK_SIZE), GFP_KER=
-NEL);
-+		rctx->adata =3D kzalloc(cryp->assoclen + AES_BLOCK_SIZE, GFP_KERNEL);
- 		if (!rctx->adata)
- 			return dev_err_probe(cryp->dev, -ENOMEM,
- 					     "Failed to alloc memory for adata");
-@@ -569,7 +569,7 @@ static int starfive_aes_aead_do_one_req(struct crypto=
-_engine *engine, void *areq
- 	struct starfive_cryp_ctx *ctx =3D
- 		crypto_aead_ctx(crypto_aead_reqtfm(req));
- 	struct starfive_cryp_dev *cryp =3D ctx->cryp;
--	struct starfive_cryp_request_ctx *rctx =3D ctx->rctx;
-+	struct starfive_cryp_request_ctx *rctx;
- 	u32 block[AES_BLOCK_32];
- 	u32 stat;
- 	int err;
-@@ -579,6 +579,8 @@ static int starfive_aes_aead_do_one_req(struct crypto=
-_engine *engine, void *areq
- 	if (err)
- 		return err;
-=20
-+	rctx =3D ctx->rctx;
-+
- 	if (!cryp->assoclen)
- 		goto write_text;
-=20
---=20
-2.34.1
+This needs to go into the patch description.
 
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
