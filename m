@@ -1,264 +1,261 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qoOcWce6"
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92CCFAD
-	for <linux-crypto@vger.kernel.org>; Thu, 16 Nov 2023 06:43:00 -0800 (PST)
-Received: by mail-oi1-x22e.google.com with SMTP id 5614622812f47-3b6a837a2e1so505538b6e.0
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Nov 2023 06:43:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="vzH9jCb2";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Wrh+Wijz"
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C46189;
+	Thu, 16 Nov 2023 09:56:34 -0800 (PST)
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AGHi28t005380;
+	Thu, 16 Nov 2023 17:55:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-03-30;
+ bh=mH7PwsriJEN60Wkfoa5wsKCXMcqvnnG23vrj+arswvQ=;
+ b=vzH9jCb2nZilWH2DauVkaZXM9Sz3O7VkGG+9hl/6rcgbIqUUi1vVl17y3eGz67hWpZ2F
+ wem2BrWYm7QzpNEk5h4fGzQolfunlrUgGAp+piZo0AqAq+IkaLknc13sCLVKx/aToezn
+ /w+rY0VyeA25FU++nVwPa9RA6yhTni80ejTPb0ZMt6QjTZp4oQ1aOmtoKFKsJazB5Gt+
+ Ijgf53/HotRMlSa1isMsUwQg/lwWV7fCN5AgSe/qzn/Ntw7cR5oFttCVgdFyLl4WTqoD
+ A93tQcPpELYfojZF2GLNRbT9rZkPANlEu/z8eZPy1tGCzdUDxftGZcdaqa8WmmFwLGc2 Cg== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3ua2qdbk13-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 16 Nov 2023 17:55:50 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3AGHsNbF038411;
+	Thu, 16 Nov 2023 17:55:50 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3uaxq10fyc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 16 Nov 2023 17:55:49 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OzyWyNyVeHacguEvqVLO4dqcnB5e0ar4gAhsPoUixfaon4vLP1hBMj4NYmHHzasqb3JWAb1Sd+D2aApB9FJ5uTxMXuFDsr7wa5//zRILna1jYc5yEHo//WGRvEFu/OV8fjOKkGMu1OOcBE3COg0475vkaGx6i0we2ZQUfVAtJEpwnqgMzevxA/+svsesQKbtZ/xfaj6NHuFXVlvTuFdDX+jVuC6UkMq7+tM/y92TNp2dLIPyRz+UPUKmasfdozOE8BDaaov9tbXNzqO/jCGjivOaeFYZspNM+JBsvMy9ZIyYIx/XY3TSO6Zi3jFM1vZILziC0AwAskPLZBwupeB8EA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mH7PwsriJEN60Wkfoa5wsKCXMcqvnnG23vrj+arswvQ=;
+ b=BAZC4UlIcCq7kkxxqXWZRNOVPNN1ra+I+hX769WIdVJ8K6R9oUCscxP0D19jYWe5AGRIGE6U+V6DJ9YKobuI1IghCkh+kCEjoCIMVR8jbmxFEEn8RPFticXdymA4dGMqJQjqdqRhrKBsH8mqy21BJo7LUyQcf0Jwmo6NIBhMbA62jETKc2XcLfKTNSvtYdUwIMvhkyDX4Qiss0Rc1w239RTnhrQunXSYl5g5QXRFGOWzja+VQnGr/vtI2U3YmFTV/JqStiGAw9ew+emewuATlo3O/8i7pPWt5ILR8H5Kpbm6rdfId+IGGPzM0RwrQoxQyvDvRH5DxTQXWSFAidi1Xw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700145780; x=1700750580; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5dkiDOD0edMHc6i19uEv53Dbvkb1NCyGOSkmTqkZ2w8=;
-        b=qoOcWce6j5Y25SebhJINMYwA6+bLrLFuExKQutFeyaFW1ykOGs7QAKkhKN/pBG5UX+
-         Ka6WhQ3lUwZx5ipy8/CT/pSI17r64Lq6jZTM/zdA1bh0vy9fHtS2CVJ4HBvb81bEsZ//
-         cpPF4CGdx38RrX7cS93DFExvI8AwwIaisKcnwACHlqQPPztnOvr9QnVfi/3pm8eKgd5W
-         Phr9Z2hEEEP3bvpnjkBQjWjKik4L4Fxl+1pPenfHp/IchREMRRCoRWpkIzUWW4iyoJ7X
-         x+IEcuR2NvJodAfev4aB8wGVmUz6RkKopqYeXtcVC1fSHRAaS9D6D4niZd6lo1mlC1NU
-         S4pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700145780; x=1700750580;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5dkiDOD0edMHc6i19uEv53Dbvkb1NCyGOSkmTqkZ2w8=;
-        b=QuFIYlI5sIGd5gim5F3+aHE1BHqBUHV00WnZg+eZZMNCJE6pFV/MZe0wYpcIg6B5j+
-         LzX4Q7WZzD2z4toE2DeT/rijFA/FF6mBtKjXClQkI/AlEOf9GlJTmMJTbErEJdbccd+2
-         IgtZIQp3JyEYGMvPvXkr50SIpkaXunYEHDMpWrB0HSL+WsmENM00cDxiEZam34sYkEuC
-         PAgRwQJ0KKy6Q5IrY1ylz+SnSByEe+xvKcC8SYa4c5YJ6Pl3OCsW7NhJxdwgesxEcSzv
-         /ZpY3/tAJfpanM0gbfRcEtSxWa5eX6fXPMbb3ILXQnn4IfNLI34m360Xa8mtNNP7ILkZ
-         owBQ==
-X-Gm-Message-State: AOJu0YyAzeEUT5DRYHwEaFIZzkBwjQbCz9DmXwN/qiJYBosh1XOfpulJ
-	pthm/pfJegd2nInB6pfTXoZ+kA==
-X-Google-Smtp-Source: AGHT+IHfGUDJksX+0tKafsL4AYpamlQdbfqzvjOkxCaacxXW43sLD+zdxeuck9zaP1DCwr2lNjXSoA==
-X-Received: by 2002:a05:6808:4449:b0:3b6:d04c:d9b0 with SMTP id ep9-20020a056808444900b003b6d04cd9b0mr20127533oib.0.1700145779871;
-        Thu, 16 Nov 2023 06:42:59 -0800 (PST)
-Received: from [10.50.4.74] ([50.201.115.146])
-        by smtp.gmail.com with ESMTPSA id o17-20020a05620a131100b007659935ce64sm4290257qkj.71.2023.11.16.06.42.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Nov 2023 06:42:59 -0800 (PST)
-Message-ID: <3f9f31e9-ead3-438a-bbd9-818b98ba1b3b@linaro.org>
-Date: Thu, 16 Nov 2023 15:42:58 +0100
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mH7PwsriJEN60Wkfoa5wsKCXMcqvnnG23vrj+arswvQ=;
+ b=Wrh+WijzL/ZtD6wOVC3i5SD0BwGJ1XZKMpI9k1MRL5vX5JZD7CNpGinhg2zcZJRV5J/S3kv/YN9nEmY3rwdsUQjyvQacBv/XQ2kM4HixpTGvxkKKPb60a5GaJs4ir5shKeNk++wfLMe3/Ya4odZips8Nos9PvXCmjcvWTBlHLE8=
+Received: from BY5PR10MB3793.namprd10.prod.outlook.com (2603:10b6:a03:1f6::14)
+ by DS7PR10MB5070.namprd10.prod.outlook.com (2603:10b6:5:3a7::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.21; Thu, 16 Nov
+ 2023 17:55:47 +0000
+Received: from BY5PR10MB3793.namprd10.prod.outlook.com
+ ([fe80::37de:88fd:becd:7e3f]) by BY5PR10MB3793.namprd10.prod.outlook.com
+ ([fe80::37de:88fd:becd:7e3f%3]) with mapi id 15.20.7002.019; Thu, 16 Nov 2023
+ 17:55:47 +0000
+Message-ID: <f9360f2d-ad2d-4f06-bf01-85b2630cd237@oracle.com>
+Date: Thu, 16 Nov 2023 09:55:42 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 02/13] Documentation/x86: Secure Launch kernel
+ documentation
+To: Alyssa Ross <hi@alyssa.is>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
+        dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, ardb@kernel.org, mjg59@srcf.ucam.org,
+        James.Bottomley@hansenpartnership.com, luto@amacapital.net,
+        nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
+        trenchboot-devel@googlegroups.com
+References: <20231110222751.219836-1-ross.philipson@oracle.com>
+ <20231110222751.219836-3-ross.philipson@oracle.com>
+ <scpu273f2mprr2uvjlyk2xrjjtcduhse2eb45lmj7givn6jh4u@i2v4f2vbldu4>
+Content-Language: en-US
+From: ross.philipson@oracle.com
+In-Reply-To: <scpu273f2mprr2uvjlyk2xrjjtcduhse2eb45lmj7givn6jh4u@i2v4f2vbldu4>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PH8PR05CA0006.namprd05.prod.outlook.com
+ (2603:10b6:510:2cc::6) To BY5PR10MB3793.namprd10.prod.outlook.com
+ (2603:10b6:a03:1f6::14)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: crypto: convert Inside Secure SafeXcel to
- the json-schema
-Content-Language: en-US
-To: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>
-Cc: Antoine Tenart <atenart@kernel.org>, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
- <rafal@milecki.pl>
-References: <20231116130620.4787-1-zajec5@gmail.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231116130620.4787-1-zajec5@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BY5PR10MB3793:EE_|DS7PR10MB5070:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2d373ba4-e543-4709-b630-08dbe6cd4272
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	bk/1e695liSWubryden5/tfRS0FF27eGl+q0O/7+4J0zi76GKQV/jKyDgGECwtaTWwTWKvQXiIfO6gBis/KD6ikRsaSdIN2tPc8gXkGZYSIywX9TleiQwSJxO8Tseuqpu6Czr+Qh9hKRB2k4ebbeeq6GCHOjlgKL1FOpsB+x5HrThN4jk9eBYgNXB4ZU/MsQYR+Brds3xS3eqGocWYZ1d7P1kqT6RNxVj8IErfWm3d9rE5CVg/SKq+OlEg4YffaLCj+3LjsCacRY4YODnLWCWxS+3RcG/Gk9qSWZh4pLZ1526absyol2lqODolCbDA/AmSfBulJBc9WCs1zhPwIo3yZiwiGNIF/Vx2kn8M5clLZFBR9VH4s+bzFeWSrn7kN282+8lbMoEpSAvW/Fcmt9xsWAJDJihOSStjlnB+4PnBltWdm/cKnMrOdfgMR+uwyEtU2YI4C1AtU1OR2bsComMuLVemi675EUWNthc3BsMZLV+S7msISdgkAvF7DOsK9KFzm39A1FyKSbrFJ47XIKCq0c28xJiwOJl5OGSVezkWGLhytqQVFCybslYrCSQWfggFvZ2Fk9CQvd4/xIL1kYFD4M2ZSPL6AsBLWDybEYm4WlpeFD8EE5Y07+ZG+52k759r3fIBT9j7AtJ7vfOt2AFfJthEXrtKBINIkV7AH+LlQ=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR10MB3793.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(346002)(136003)(396003)(366004)(230273577357003)(230173577357003)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(36756003)(31686004)(31696002)(86362001)(6486002)(9686003)(478600001)(66946007)(66556008)(6512007)(6666004)(66476007)(6916009)(316002)(6506007)(53546011)(4326008)(8936002)(8676002)(26005)(2616005)(2906002)(83380400001)(7416002)(5660300002)(41300700001)(38100700002)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?RXdtUjFtWXVSWUp0QkNPSTQ5c0I4RUpKUG0rTml5UTJVNzhqUW44cWUxV2lF?=
+ =?utf-8?B?YkVyN0VxMVoyUUxxcm1ZWW4rWTR1azg0VHRXcGJkMSs4OUZrVVY3clh1a1hn?=
+ =?utf-8?B?WUVQL2hWSURZbmN4VEFBbFp2TFZTOXZqRDBCSDRNMG1FMElGMnducWRSSHNG?=
+ =?utf-8?B?aUYxcER6ZEJYY2FOTysyb09DaTIwaXZnQXVxNXNYemgxWUloSDl4alJjSEpC?=
+ =?utf-8?B?eUxjQm1VVmxNMDVnL1dsbDNlc3l0VjdGcC83RlJkWEIxaUEyNzU0Tk9URnV2?=
+ =?utf-8?B?aExmak5abEp6YmwzT2lXc2RES2xTb2pvMXA4dkg2UkRqcEV4TmplUzhFTkRQ?=
+ =?utf-8?B?dTZ6bUpoMldHcmFlQlJmRXdZNzAwQ29jUDhvT3A2L1IwNjlQajMwRzltNWgr?=
+ =?utf-8?B?eEFoOUs0TGh0cHA2cUMvbUxCQTJhdmZJQXhBRUNlM3B3b1FIK1dld3I4azRl?=
+ =?utf-8?B?WDUwYTcyRDdERVpsZDNzSElZb0w3N3lvT2FVNDhmVVQ4NFFCZENpbzhxa3BL?=
+ =?utf-8?B?a3A3T292UzB6S3hSdVJ3SXJISUNnRkQ2WUc4Q0VMek5HUkMzVTVkS2x3UU42?=
+ =?utf-8?B?bXREM09TUUNLTk1WNnRZN1c3Zjgrem9ZT1RvTWJ4SHdQL2tvM3VhUWZGaXJL?=
+ =?utf-8?B?NlhkMHgwZWh3ODdoWXhJdjU2VlRqeUJwRnBabWVLemJITWRpcjJ1cGhMbGQy?=
+ =?utf-8?B?ai9Xbkh1ZHNDNklEekFZcElvYVZsS0t2clFWMnY3QnpTVFRISW1BcWhzL2du?=
+ =?utf-8?B?TlQ1Z1dZU25Lc3VFeEsyNjEydmNwaVkwb3N2WkQ2TkdvYTJ2Tlgvbis0MFZ4?=
+ =?utf-8?B?UVB0NGEvRnRsWm9Kell0Uy9YOFN2cllwR3FBMzVXU3VOZytLTklRbXJScWZn?=
+ =?utf-8?B?cWJSUEJ0TktMTnVwdHhPcmFBU0hxbVBCMkdVUm1BTGJ4L25LVFlyNkFMWGox?=
+ =?utf-8?B?Qkl5T3JvQW1VbW1hL2FHTjdabmFuZGZSKytyVnRzMUNxTm9kZmxuenh5MnU4?=
+ =?utf-8?B?QlQ5cEFGV3A3a3Q2aXBsZjc5OGNTeUJYNmxQQ1BaRkE3RWRYVVc5NkRiUnkv?=
+ =?utf-8?B?d1VmT0VpeXg4elJKeEdGbFBWaVNlc3dFRWFjcEVBaXQyNHJEYVg0R0x5NWUy?=
+ =?utf-8?B?R21LclJiRFFvZ2NUMGNMM1BXZzFmUXRBM1RTdFhFQzViWEZXRmVzb29ZaFJO?=
+ =?utf-8?B?TWt4UkU0TGFJSkxhaWE5QU1iQm9pMXExaVdNOE1rdFF5NWJwT0dGTDIrSGtL?=
+ =?utf-8?B?VzNDcHBKaC9kUytuOTlsa1MzdzVpNUlSNEFKd2l4dndCVExkWWxoeFFTOTl1?=
+ =?utf-8?B?VjJRaTV0aGdCUDFvbGdCVW94MjZ2Yk90a01hKzhweTkwQXh2Und2eUpLRitt?=
+ =?utf-8?B?eUFZcE5wOC9pNXJQbENVUTk2K2ZURERiaGxHdEwxa2lrbFVISksvbWVlMGRu?=
+ =?utf-8?B?b1pObkVNTVQ5cGt0UTZ5QlBZNXZ0V2owY1plbmRaQUppTHlzTFoyYlQxR1Rr?=
+ =?utf-8?B?ODl1VkVoNEJPSWhxOFY2SncvY01lU2ExbGFDZXBrNGFBUndjMDBvOXFRdUhv?=
+ =?utf-8?B?SE5YWDA4UXd4R1hGT3F5Q2JxcTFLNUExd3I3V1R5d29Zelk5UGRpUTlEa2Ri?=
+ =?utf-8?B?M2xDT3ZOMnZBa0owVGw4K0ZkVkRQaTIrSk1xT1BJY2Vuem93a2I2M3NRZjRM?=
+ =?utf-8?B?MlIraU0wcHR1WEtpbUF4S0hYN1VocEVJRHUzeDZvblBEcVRmUUR5K1VkYjkw?=
+ =?utf-8?B?NHNrVlBTTkkvZ0EwaGxCVmhYeXB6STA3UW5iWlF6ZkpPT29BMDlHOTV1SmdW?=
+ =?utf-8?B?dm5PVFN2Q2lQclhkWUpPRkVHZ1AzRzJDRXI5UWdrTzgzSlhwbVhkSlplK2Ez?=
+ =?utf-8?B?VWdTSmZKSFNyelhKNXNsaGo5ZXQyLzgvSHcwUlJleVY2c2xwbVpLMWhaSEV6?=
+ =?utf-8?B?cG5rcFdLZG9yMHp0VzV4cVBCSkdGdFdyWG9iNkp6Ti9UMHRPSlJHemVQK2Rh?=
+ =?utf-8?B?S0pmWnhtU1JsckZ2eSs0eDcrcFNOT1E2M21VaWNsWndvaWFkcU84RWFZKy9G?=
+ =?utf-8?B?cEI4ZzBXNHE2WjhVUTR6RDhDbXduVWN0K2dPaG1ZSFIvQ2cvUE9IengyK1I0?=
+ =?utf-8?B?V05qbHJEeUR6RmdIU2twVzVtYnVTN3RBTXpsMVU4ODE1ZHlQdnI5RzAvUUQ4?=
+ =?utf-8?B?aXc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	=?utf-8?B?TXlLMDRvTy9RdDQ2WnowdElKai83bEhvY0NZajh5ZXU2WXQ5bHhLM2NIKzh2?=
+ =?utf-8?B?eFBsYk5sKzBCQ3ZNbDNLUDJUdzRJZkZ6TXlzYVNYS0YycXVMU09UakVaTVpr?=
+ =?utf-8?B?cnBwRkVvZVJsVXBtbk13UGw5WTJBWDRNQUhFQ0hUK01ub0Q1ZFhJNU1pZzVH?=
+ =?utf-8?B?c3A1UkE1ajh4d1VKU3JiamRobGNWQmdMODZQYzhzd3NOVWE0emhtSmhaSjBs?=
+ =?utf-8?B?N3pEVWRJYTMwcGFVdnVVNlVkbjFJS3dDcmhWMTBuOExIOHR5NmRlbDQ3Tnkx?=
+ =?utf-8?B?bWcrTnUyd2lGVU5UNUhwSGRIWkJxaGZyR2x3QWxjOWFmWFlaSU1KaEJPUStC?=
+ =?utf-8?B?b1JvVEsxOWxuQUd1WnhFMzlBUVIxUnA4SDAyOW9iMmp4WTBMUjh0TndsbmRr?=
+ =?utf-8?B?VXI3ZDA0dDNMTmdpRFZTRFY2THFMRzloRG4rUllFMXVmR29NUndVOEFVanJq?=
+ =?utf-8?B?OHJYUlp4S2ttTktMZDBBUUNwM0ZvOGpBNjNMckFlMk9mbXNOT0tBZ2ZYUVFE?=
+ =?utf-8?B?bmpDelFYTE5seS92d1NEYldLa0F1WnE5NEVkaEF5b0dWVXVPaTBqd3pVVndl?=
+ =?utf-8?B?a1B6WFdnRjZmNlhGbS9lamc3dlNBTGtUNmxHSHJFeWpoUW5VRnFFTVRmK3ov?=
+ =?utf-8?B?UHp6YlBTU1U4ZS9mazI0ekJJbndOOWNENUxIUlJWVmR6ZTQwb1VjNHdUVTk3?=
+ =?utf-8?B?c1lrR3MxNFRxb3NCMVNTMDJQbjg0Um1vZm03YVphVXQ1Nlo3eElJM1Q2Sk9X?=
+ =?utf-8?B?MWVKUGVXcUZyd04rTWx0UTl0L3BKYVRPaGR6SFV4eW1IVThlOTBMTTlOQ0Jk?=
+ =?utf-8?B?MmZhU0tnMHJoTnA1anE0QXFuRmlJZE50VlJSWUE4UlNLZThQWENmRVBYQVV1?=
+ =?utf-8?B?WDVyU0JUc3Jab0sySS9xdlZpdmc4NVV3UHNSQ1JDWHJCWUxmTEFjZmNTRUJv?=
+ =?utf-8?B?MjZYY2puUkM1YU1jS1RjU1BremVCM0dOTUVlaGFFNndLdWxxbzgxRjF1ZnFK?=
+ =?utf-8?B?TExiSTBGSlNMSDFtZWV4YXd1RUZBbEl1SGo1dEJoMUM1cXRiQjBwQldKZmJJ?=
+ =?utf-8?B?dmhaUzMrcytFRjRXSVRldmNCakF6cEN0QUlLOG53N2JnR3FpZFNyS3ljZDF4?=
+ =?utf-8?B?LzNRSHMyRmN0eVA5RGZlcDdiNHo3a2x3UXU0NTI2V3lzSklza1FuYmtBZjY5?=
+ =?utf-8?B?OXdWQnZoL25XLzlWWEpYMEZvYkZ3amN4UlpQNW5hZUZPNTNJQk5tRCtrQlUz?=
+ =?utf-8?B?cmZlN1NOZkYxczdYYTI0NWZIWkl5aTBDV2MwRDhDeVJBOG1VYmNpZEc3Zy9K?=
+ =?utf-8?B?V3g5Y0M2SGpualhOZXYrdXhXemg5VG9jRkNXVi82VlprSSs5OU5xVkEwb3Jt?=
+ =?utf-8?B?VzNXR0hjMEhxdmVldC9KUmpUcmJlL0hHTkl0TnNwR3Z4RWhzNk5OdTlldjN1?=
+ =?utf-8?B?ZXpZQ3k5c1NTNlk4T2dyZmh5cHJaY1RkQitOUy9vTzhmYS9WdkFOSEF4NnF3?=
+ =?utf-8?B?K3FWVXpvY3BkR2FqYTRMbVFDRXg4WDE4eUdXcFpESVNFbU9DM0FuQ3Q3Qits?=
+ =?utf-8?B?cHN3ZzNSMTBoOW4rRFp0SkxZY2NXUHdGcDl1RWEya2xlaTU0NUZxcnNJR3Ry?=
+ =?utf-8?B?c3ArT3VyQnVXakVJOXY5OVpnTnBDTVlNSDFIeXcwOUJlSU9UclJJcm93Z2I0?=
+ =?utf-8?B?YzRNeFByVE8wSUFzWUMvVmpCODd2aFZNMVJWT05qZFZldXNqc284U012T3NO?=
+ =?utf-8?B?Q0RwWFFjVEhiSXlxaElPMlJZS1RLeDJPNHIyZVNIZ25WVDUvaUxCazZ0bFUv?=
+ =?utf-8?B?VEZpRWtaNGFxQ2dUbkc0QT09?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d373ba4-e543-4709-b630-08dbe6cd4272
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR10MB3793.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2023 17:55:46.9372
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cQZEfYB4oKdkOy0ugUVcM13N1m1Q5t8PVgiqfaSK8DLGmaFPL9adiQzsCE779Xr/77IVRU+zBbH34HPjNs/de9HUaDAJMwAT1kAIS2RjmOw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5070
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-16_19,2023-11-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0
+ phishscore=0 mlxscore=0 bulkscore=0 spamscore=0 suspectscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311160141
+X-Proofpoint-ORIG-GUID: yKGFYHt22MuYq_Za1nipAg2Dace2of0y
+X-Proofpoint-GUID: yKGFYHt22MuYq_Za1nipAg2Dace2of0y
 
-On 16/11/2023 14:06, Rafał Miłecki wrote:
-> From: Rafał Miłecki <rafal@milecki.pl>
+On 11/12/23 10:07 AM, Alyssa Ross wrote:
+>> +Load-time Integrity
+>> +-------------------
+>> +
+>> +It is critical to understand what load-time integrity establishes about a
+>> +system and what is assumed, i.e. what is being trusted. Load-time integrity is
+>> +when a trusted entity, i.e. an entity with an assumed integrity, takes an
+>> +action to assess an entity being loaded into memory before it is used. A
+>> +variety of mechanisms may be used to conduct the assessment, each with
+>> +different properties. A particular property is whether the mechanism creates an
+>> +evidence of the assessment. Often either cryptographic signature checking or
+>> +hashing are the common assessment operations used.
+>> +
+>> +A signature checking assessment functions by requiring a representation of the
+>> +accepted authorities and uses those representations to assess if the entity has
+>> +been signed by an accepted authority. The benefit to this process is that
+>> +assessment process includes an adjudication of the assessment. The drawbacks
+>> +are that 1) the adjudication is susceptible to tampering by the Trusted
+>> +Computing Base (TCB), 2) there is no evidence to assert that an untampered
+>> +adjudication was completed, and 3) the system must be an active participant in
+>> +the key management infrastructure.
+>> +
+>> +A cryptographic hashing assessment does not adjudicate the assessment but
+>> +instead, generates evidence of the assessment to be adjudicated independently.
+>> +The benefits to this approach is that the assessment may be simple such that it
+>> +may be implemented in an immutable mechanism, e.g. in hardware.  Additionally,
+>> +it is possible for the adjudication to be conducted where it cannot be tampered
+>> +with by the TCB. The drawback is that a compromised environment will be allowed
+>> +to execute until an adjudication can be completed.
+>> +
+>> +Ultimately, load-time integrity provides confidence that the correct entity was
+>> +loaded and in the absence of a run-time integrity mechanism assumes, i.e.
+>> +trusts, that the entity will never become corrupted.
 > 
-> This helps validating DTS files.
+> I'm somewhat familiar with this area, but not massively (so probably the
+> sort of person this documentation is aimed at!), and this was the only
+> section of the documentation I had trouble understanding.
 > 
-> Cc: Antoine Tenart <atenart@kernel.org>
-> Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
-> ---
->  .../crypto/inside-secure-safexcel.txt         | 40 ---------
->  .../crypto/inside-secure-safexcel.yaml        | 84 +++++++++++++++++++
->  2 files changed, 84 insertions(+), 40 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
->  create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure-safexcel.yaml
+> The thing that confused me was that the first time I read this, I was
+> thinking that a hashing assessment would be comparing the generated hash
+> to a baked-in known good hash, simliar to how e.g. a verity root hash
+> might be specified on the kernel command line, baked in to the OS image.
+> This made me wonder why it wasn't considered to be adjudicated during
+> assessment.  Upon reading it a second time, I now understand that what
+> it's actually talking about is generating a hash, but not comparing it
+> automatically against anything, and making it available for external
+> adjudication somehow.
+
+Yes there is nothing baked into an image in the way we currently use is. 
+I take what you call a hashing assessment to be what we would call 
+remote attestation where an independent agent assesses the state of the 
+measured launch. This is indeed one of the primary use cases. There is 
+another use case closer to the baked in one where secrets on the system 
+are sealed to the TPM using a known good PCR configuration. Only by 
+launching and attaining that known good state can the secrets be unsealed.
+
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
-> deleted file mode 100644
-> index 3bbf144c9988..000000000000
-> --- a/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
-> +++ /dev/null
-> @@ -1,40 +0,0 @@
-> -Inside Secure SafeXcel cryptographic engine
-> -
-> -Required properties:
-> -- compatible: Should be "inside-secure,safexcel-eip197b",
-> -	      "inside-secure,safexcel-eip197d" or
-> -              "inside-secure,safexcel-eip97ies".
-> -- reg: Base physical address of the engine and length of memory mapped region.
-> -- interrupts: Interrupt numbers for the rings and engine.
-> -- interrupt-names: Should be "ring0", "ring1", "ring2", "ring3", "eip", "mem".
-> -
-> -Optional properties:
-> -- clocks: Reference to the crypto engine clocks, the second clock is
-> -          needed for the Armada 7K/8K SoCs.
-> -- clock-names: mandatory if there is a second clock, in this case the
-> -               name must be "core" for the first clock and "reg" for
-> -               the second one.
-> -
-> -Backward compatibility:
-> -Two compatibles are kept for backward compatibility, but shouldn't be used for
-> -new submissions:
-> -- "inside-secure,safexcel-eip197" is equivalent to
-> -  "inside-secure,safexcel-eip197b".
-> -- "inside-secure,safexcel-eip97" is equivalent to
-> -  "inside-secure,safexcel-eip97ies".
-> -
-> -Example:
-> -
-> -	crypto: crypto@800000 {
-> -		compatible = "inside-secure,safexcel-eip197b";
-> -		reg = <0x800000 0x200000>;
-> -		interrupts = <GIC_SPI 34 IRQ_TYPE_LEVEL_HIGH>,
-> -			     <GIC_SPI 54 IRQ_TYPE_LEVEL_HIGH>,
-> -			     <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
-> -			     <GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>,
-> -			     <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
-> -			     <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>;
-> -		interrupt-names = "mem", "ring0", "ring1", "ring2", "ring3",
-> -				  "eip";
-> -		clocks = <&cpm_syscon0 1 26>;
-> -	};
-> diff --git a/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.yaml b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.yaml
-> new file mode 100644
-> index 000000000000..4dfd5ddd90bb
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.yaml
+> I don't know if the approach I first thought of is used in early boot
+> at all, but it might be worth contrasting the cryptographic hashing
+> assessment described here with it, because I imagine that I'm not going
+> to be the only reader who's more used to thinking about integrity
+> slightly later in the boot process where adjudicating based on a static
+> hash is common, and who's mind is going to go to that when they read
+> about a "cryptographic hashing assessment".
+> 
+> The rest of the documentation was easy to understand and very helpful to
+> understanding system launch integrity.  Thanks!
 
-Filename like compatible, so:
-inside-secure,safexcel.yaml
+I am glad it was helpful. We will revisit the section that caused 
+confusion and see if we can make it clearer.
 
-> @@ -0,0 +1,84 @@
-> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/crypto/inside-secure-safexcel.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Inside Secure SafeXcel cryptographic engine
-> +
-> +maintainers:
-> +  - Antoine Tenart <atenart@kernel.org>
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - const: inside-secure,safexcel-eip197b
-> +      - const: inside-secure,safexcel-eip197d
-> +      - const: inside-secure,safexcel-eip97ies
-> +      - const: inside-secure,safexcel-eip197
-> +        description: Equivalent of inside-secure,safexcel-eip197b
-> +        deprecated: true
-> +      - const: inside-secure,safexcel-eip97
-> +        description: Equivalent of inside-secure,safexcel-eip97ies
-> +        deprecated: true
-
-Wait, some new entries appear here and commit msg said nothing about
-changes in the binding. Commit says it is pure conversion. You must
-document all changes made.
-
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    minItems: 6
-
-Drop
-
-> +    maxItems: 6
-> +
-> +  interrupt-names:
-> +    items:
-> +      - const: ring0
-> +      - const: ring1
-> +      - const: ring2
-> +      - const: ring3
-> +      - const: eip
-> +      - const: mem
-> +
-> +  clocks:
-> +    minItems: 1
-> +    maxItems: 2
-> +
-> +  clock-names:
-> +    minItems: 1
-> +    items:
-> +      - const: core
-> +      - const: reg
-> +
-> +allOf:
-> +  - if:
-> +      properties:
-> +        clocks:
-> +          minItems: 2
-> +    then:
-> +      required:
-> +        - clock-names
-
-Did you test that it actually works? Considering other patchset which
-you did not, I have doubts that this was...
-
-> +
-> +additionalProperties: false
-> +
-> +required:
-
-required goes just after properties:.
-
-> +  - reg
-> +  - interrupts
-> +  - interrupt-names
-
-Best regards,
-Krzysztof
-
+Thank you,
+Ross
