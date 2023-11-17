@@ -1,19 +1,24 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31E73131;
-	Fri, 17 Nov 2023 02:29:02 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32C7218B;
+	Fri, 17 Nov 2023 02:35:42 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r3w5k-000bqL-KA; Fri, 17 Nov 2023 18:28:53 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Nov 2023 18:29:00 +0800
-Date: Fri, 17 Nov 2023 18:29:00 +0800
+	id 1r3wBy-000cFS-4p; Fri, 17 Nov 2023 18:35:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Nov 2023 18:35:26 +0800
+Date: Fri, 17 Nov 2023 18:35:25 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Chen Ni <nichen@iscas.ac.cn>
-Cc: davem@davemloft.net, t-kristo@ti.com, j-keerthy@ti.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	nichen@iscas.ac.cn
-Subject: Re: [PATCH] crypto: sa2ul - Add check for crypto_aead_setkey
-Message-ID: <ZVdAbHSItfzhl++h@gondor.apana.org.au>
+To: LeoLiu-oc <LeoLiu-oc@zhaoxin.com>
+Cc: olivia@selenic.com, martin@kaiser.cx, jiajie.ho@starfivetech.com,
+	jenny.zhang@starfivetech.com, mmyangfl@gmail.com, robh@kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	CobeChen@zhaoxin.com, TonyWWang@zhaoxin.com, YunShen@zhaoxin.com,
+	LeoLiu@zhaoxin.com
+Subject: Re: [PATCH v2] hwrng: add Zhaoxin rng driver base on rep_xstore
+ instruction
+Message-ID: <ZVdB7ZyjLay61mLp@gondor.apana.org.au>
+References: <20231107070900.496827-1-LeoLiu-oc@zhaoxin.com>
+ <20231108073454.521726-1-LeoLiu-oc@zhaoxin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -22,43 +27,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231107063152.529830-1-nichen@iscas.ac.cn>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20231108073454.521726-1-LeoLiu-oc@zhaoxin.com>
 
-Chen Ni <nichen@iscas.ac.cn> wrote:
-> Add check for crypto_aead_setkey() and return the error if it fails
-> in order to transfer the error.
+On Wed, Nov 08, 2023 at 03:34:54PM +0800, LeoLiu-oc wrote:
+> From: LeoLiuoc <LeoLiu-oc@zhaoxin.com>
 > 
-> Fixes: d2c8ac187fc9 ("crypto: sa2ul - Add AEAD algorithm support")
-> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+> Add support for Zhaoxin hardware random number generator.
+> This driver base on rep_xstore instruction and uses the same
+> X86_FEATURE_XSTORE as via-rng driver. Therefore, modify the x86_cpu_id
+> array in the via-rng driver, so that the corresponding driver can be
+> correctly loader on respective platforms.
+> 
 > ---
-> drivers/crypto/sa2ul.c | 5 ++++-
-> 1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-> index 6846a8429574..6bac2382e261 100644
-> --- a/drivers/crypto/sa2ul.c
-> +++ b/drivers/crypto/sa2ul.c
-> @@ -1806,6 +1806,7 @@ static int sa_aead_setkey(struct crypto_aead *authenc,
->        int cmdl_len;
->        struct sa_cmdl_cfg cfg;
->        int key_idx;
-> +       int error;
+> v1 -> v2:
+> 1. Fix assembler code errors
+> 2. Remove redundant CPU model check codes
 > 
->        if (crypto_authenc_extractkeys(&keys, key, keylen) != 0)
->                return -EINVAL;
-> @@ -1869,7 +1870,9 @@ static int sa_aead_setkey(struct crypto_aead *authenc,
->        crypto_aead_set_flags(ctx->fallback.aead,
->                              crypto_aead_get_flags(authenc) &
->                              CRYPTO_TFM_REQ_MASK);
-> -       crypto_aead_setkey(ctx->fallback.aead, key, keylen);
-> +       error = crypto_aead_setkey(ctx->fallback.aead, key, keylen);
-> +       if (error)
-> +               return error;
+> Signed-off-by: LeoLiuoc <LeoLiu-oc@zhaoxin.com>
+> ---
+>  drivers/char/hw_random/Kconfig       | 13 ++++
+>  drivers/char/hw_random/Makefile      |  1 +
+>  drivers/char/hw_random/via-rng.c     | 23 +++----
+>  drivers/char/hw_random/zhaoxin-rng.c | 95 ++++++++++++++++++++++++++++
+>  4 files changed, 119 insertions(+), 13 deletions(-)
+>  create mode 100644 drivers/char/hw_random/zhaoxin-rng.c
 
-This should be
-
-	return crypto_aead_setkey(ctx->fallback.aead, key, keylen);
+Please cc x86@vger.kernel.org as the same comments to the other
+zhaoxin driver seems to be applicable here.
 
 Thanks,
 -- 
