@@ -1,25 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6777A1A5
-	for <linux-crypto@vger.kernel.org>; Fri, 17 Nov 2023 01:07:20 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90D87B7;
+	Fri, 17 Nov 2023 01:20:48 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r3uok-000a36-RN; Fri, 17 Nov 2023 17:07:15 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Nov 2023 17:07:22 +0800
-Date: Fri, 17 Nov 2023 17:07:22 +0800
+	id 1r3v0v-000aCz-Kl; Fri, 17 Nov 2023 17:19:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Nov 2023 17:19:57 +0800
+Date: Fri, 17 Nov 2023 17:19:57 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH 4/8] crypto: skcipher - Add lskcipher
-Message-ID: <ZVctSuGp2SgRUjAM@gondor.apana.org.au>
-References: <20230914082828.895403-1-herbert@gondor.apana.org.au>
- <20230914082828.895403-5-herbert@gondor.apana.org.au>
- <20230920062551.GB2739@sol.localdomain>
- <ZQvHUc9rd4ud2NCB@gondor.apana.org.au>
- <20230922031030.GB935@sol.localdomain>
- <ZVb38sHNJYJ9x0po@gondor.apana.org.au>
- <20231117054231.GC972@sol.localdomain>
+To: David Gstir <david@sigma-star.at>
+Cc: Mimi Zohar <zohar@linux.ibm.com>, James Bottomley <jejb@linux.ibm.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Shawn Guo <shawnguo@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Ahmad Fatoum <a.fatoum@pengutronix.de>,
+	sigma star Kernel Team <upstream+dcp@sigma-star.at>,
+	David Howells <dhowells@redhat.com>, Li Yang <leoyang.li@nxp.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Tejun Heo <tj@kernel.org>,
+	"Steven Rostedt (Google)" <rostedt@goodmis.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-security-module@vger.kernel.org,
+	Richard Weinberger <richard@nod.at>,
+	David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+Subject: Re: [PATCH v4 1/5] crypto: mxs-dcp: Add support for hardware-bound
+ keys
+Message-ID: <ZVcwPUEbu3Frp61X@gondor.apana.org.au>
+References: <20231024162024.51260-1-david@sigma-star.at>
+ <20231024162024.51260-2-david@sigma-star.at>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -28,20 +48,43 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231117054231.GC972@sol.localdomain>
+In-Reply-To: <20231024162024.51260-2-david@sigma-star.at>
 
-On Thu, Nov 16, 2023 at 09:42:31PM -0800, Eric Biggers wrote:
-.
-> crypto_lskcipher_crypt_sg() assumes that a single en/decryption operation can be
-> broken up into multiple ones.  I think you're arguing that since there's no
+On Tue, Oct 24, 2023 at 06:20:15PM +0200, David Gstir wrote:
+> DCP is capable of performing AES with two hardware-bound keys:
+> 
+> - The one-time programmable (OTP) key which is burnt via on-chip fuses
+> - The unique key (UK) which is derived from the OTP key
+> 
+> In addition to the two hardware-bound keys, DCP also supports
+> storing keys in 4 dedicated key slots within its secure memory area
+> (internal SRAM).
+> 
+> These keys are not stored in main memory and are therefore
+> not directly accessible by the operating system. To use them
+> for AES operations, a one-byte key reference has to supplied
+> with the DCP operation descriptor in the control register.
+> 
+> This adds support for using any of these 6 keys through the crypto API
+> via their key reference after they have been set up. The main purpose
+> is to add support for DCP-backed trusted keys. Other use cases are
+> possible too (see similar existing paes implementations), but these
+> should carefully be evaluated as e.g. enabling AF_ALG will give
+> userspace full access to use keys. In scenarios with untrustworthy
+> userspace, this will enable en-/decryption oracles.
+> 
+> Co-developed-by: Richard Weinberger <richard@nod.at>
+> Signed-off-by: Richard Weinberger <richard@nod.at>
+> Co-developed-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+> Signed-off-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+> Signed-off-by: David Gstir <david@sigma-star.at>
+> ---
+>  drivers/crypto/mxs-dcp.c | 104 ++++++++++++++++++++++++++++++++++-----
+>  include/soc/fsl/dcp.h    |  17 +++++++
+>  2 files changed, 110 insertions(+), 11 deletions(-)
+>  create mode 100644 include/soc/fsl/dcp.h
 
-Good point.  It means that we'd have to linearise the buffer for
-such algorithms, or just write an SG implementation as we do now
-in addition to the lskcipher.
-
-Let me think about this a bit more.
-
-Thanks,
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
