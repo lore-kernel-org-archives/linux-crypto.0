@@ -1,18 +1,21 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BE8211F
-	for <linux-crypto@vger.kernel.org>; Fri, 17 Nov 2023 03:23:33 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 874F4A6;
+	Fri, 17 Nov 2023 03:23:50 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r3wwZ-000dJk-Qx; Fri, 17 Nov 2023 19:23:28 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Nov 2023 19:23:35 +0800
-Date: Fri, 17 Nov 2023 19:23:35 +0800
+	id 1r3wwj-000dKF-QR; Fri, 17 Nov 2023 19:23:38 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Nov 2023 19:23:45 +0800
+Date: Fri, 17 Nov 2023 19:23:45 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: shash - don't exclude async statuses from error
- stats
-Message-ID: <ZVdNN/M+pNmFjoG3@gondor.apana.org.au>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Mahmoud Adam <mngyadam@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] crypto: rsa - add a check for allocation failure
+Message-ID: <ZVdNQV7GLhUsQ97L@gondor.apana.org.au>
+References: <d870c278-3f0e-4386-a58d-c9e2c97a7c6c@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -21,20 +24,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231029051659.157987-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi
+In-Reply-To: <d870c278-3f0e-4386-a58d-c9e2c97a7c6c@moroto.mountain>
 
-Eric Biggers <ebiggers@kernel.org> wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Mon, Oct 30, 2023 at 12:02:59PM +0300, Dan Carpenter wrote:
+> Static checkers insist that the mpi_alloc() allocation can fail so add
+> a check to prevent a NULL dereference.  Small allocations like this
+> can't actually fail in current kernels, but adding a check is very
+> simple and makes the static checkers happy.
 > 
-> EINPROGRESS and EBUSY have special meaning for async operations.
-> However, shash is always synchronous, so these statuses have no special
-> meaning for shash and don't need to be excluded when handling errors.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Fixes: 6637e11e4ad2 ("crypto: rsa - allow only odd e and restrict value in FIPS mode")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > ---
-> crypto/shash.c | 6 +-----
-> 1 file changed, 1 insertion(+), 5 deletions(-)
+>  crypto/rsa.c | 2 ++
+>  1 file changed, 2 insertions(+)
 
 Patch applied.  Thanks.
 -- 
