@@ -1,60 +1,116 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B91A9D4C;
-	Sun, 19 Nov 2023 08:12:17 -0800 (PST)
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-1f066fc2a2aso1624915fac.0;
-        Sun, 19 Nov 2023 08:12:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700410336; x=1701015136;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ULIuyBBp"
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3978911A;
+	Sun, 19 Nov 2023 08:56:51 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-32fadd4ad09so2687591f8f.1;
+        Sun, 19 Nov 2023 08:56:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700413009; x=1701017809; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=U9wcYFKu/4xwRGovh8aoKJ15XNK5juyU7wr0t4x+NYk=;
-        b=ljqIYSHzIntXMPWLRcKiNlag8AFB04m3NlVVwoOu9zPz0mS6SAseQdiaAZ8Ysvhope
-         3btVUubVHQm2SP4vZ2YYxEpZbJjysmiVIFDZlgl0Ah2P3i6kjgoxYTA3R/3q7n9h6B/D
-         lUpHXQzmFMdOzBJG3GvG5IJ0ecQeqtr5gagVfs1/8IWxMwT7ZW+2lLoQvdExyg2JhN/2
-         0OUOFSqoclquDd0vXI+5CITGVlUTK0bhc1VfDtW7OG5biT/RlzWKGS01EKeqBdTTR0hD
-         eAdFHo2wVbxiN/HQ61pn8lG5WIX+t5kEuIKp1AXqHGyN+XWJuhxAgpdjId/Q5GDF9hw4
-         /Mow==
-X-Gm-Message-State: AOJu0Yydwk6/Jqj+NWqJIekUXgh6ySFKZLIG/ClBk1+gXQDfTzcrGwxL
-	c5peEdtXwVoFz874y/qo/A==
-X-Google-Smtp-Source: AGHT+IFCMFrZti8PpN/lFswF46l2wJq6Hul90zROrny7QB9J/yWMCYjnlFUfsW9EBVsNr0UEmHva6g==
-X-Received: by 2002:a05:6871:a417:b0:1ea:2447:5181 with SMTP id vz23-20020a056871a41700b001ea24475181mr3714421oab.9.1700410336292;
-        Sun, 19 Nov 2023 08:12:16 -0800 (PST)
-Received: from herring.priv ([2607:fb90:45e3:889f:15b4:1348:6d64:224b])
-        by smtp.gmail.com with ESMTPSA id w8-20020a9d6748000000b006d4760cc054sm895328otm.3.2023.11.19.08.12.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 08:12:12 -0800 (PST)
-Received: (nullmailer pid 276534 invoked by uid 1000);
-	Sun, 19 Nov 2023 16:12:08 -0000
-Date: Sun, 19 Nov 2023 10:12:08 -0600
-From: Rob Herring <robh@kernel.org>
-To: David Wronek <davidwronek@gmail.com>
-Cc: cros-qcom-dts-watchers@chromium.org, Kishon Vijay Abraham I <kishon@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, Avri Altman <avri.altman@wdc.com>, Andy Gross <agross@kernel.org>, Alim Akhtar <alim.akhtar@samsung.com>, Bart Van Assche <bvanassche@acm.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>, Joe Mason <buddyjojo06@outlook.com>, Bjorn Andersson <andersson@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, Rob Herring <robh+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, hexdump0815@googlemail.com, ~postmarketos/upstreaming@lists.sr.ht, linux-kernel@vger.kernel.org, phone-devel@vger.kernel.org, devicetree@vger.kernel.org, Manivannan Sadhasivam <mani@kernel.org>
-Subject: Re: [PATCH v2 3/8] dt-bindings: phy: Add QMP UFS PHY compatible for
- SC7180
-Message-ID: <170041032722.276472.12995165912744202570.robh@kernel.org>
-References: <20231117201720.298422-1-davidwronek@gmail.com>
- <20231117201720.298422-4-davidwronek@gmail.com>
+        bh=7wIX8ORXLGy4iPlNpzgFGE4EPRBwYYYCdBAHOnzVq8k=;
+        b=ULIuyBBpng4LRBCxeJ3S8O0R19NZ1zZOS4e43Q7u5u4KJW+bSpKZfdKFpfRyHRptcr
+         XDuewq3gKMwAU3APLNtexDxZ2hWfYXJ0VgnhiHlX6XFUTYran58dL26lMwVGU9wr9dFr
+         BeXYTIHwlgST0bb6PeH9gTUT545Gqn6uakC5WZzjOLx0TC6KPqd4g3aLNEDx8sX+26lt
+         Gdd0bDToKRRa8ygjTHnXAhyZx0mXig0uo70tJn9xxv7MEfMTT2Fwnd5RxtuA+HbyP/DB
+         ZwstDQVMJpSecnBaAgmPKUJTrpNXqtsInH4P48DCAyM6kJQMGmcg9QJi+zUwulH8w9K6
+         pcNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700413009; x=1701017809;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7wIX8ORXLGy4iPlNpzgFGE4EPRBwYYYCdBAHOnzVq8k=;
+        b=a6KKiqg0LbRSSUjRNSHfjvCdU57O/TJ2JJhq6uo6chSql8vxEWTC0ik54W/Awx37en
+         l6tDPY1ttWMc/pzDgCIMSaNZb+c0k3V63Qow9sNssYGQK3oTqynz7MoDL3n5nW55yGhO
+         Qgd1AW+pl9yvrkxIf9rbRHiwrO2k2fFPf3fM4f8JGBnmdtJ5XwOruQvnbhA3cGmUR6Yy
+         RS4WgVIpLF4t5xWn7Hd1XdM1DzngmajHlduAbpeC4ok6bG3xDT1sE2X0kDFuvfXY0kA2
+         avQHCHt87TQVykaSNFrznEZGt4dNBvvdTbpVfIUBAzOUhgDDgOfkQhkIwnRo1ZhXZunS
+         uI+w==
+X-Gm-Message-State: AOJu0YxztpIqyIR61Z2lMbh3Na1Zc4TmRC8slYLN9RM/VKVnkXvquyI7
+	QLqeOqVM/Qk8AN+cNCbCxRvGb5A8ZlzCJZfsG1M=
+X-Google-Smtp-Source: AGHT+IFulNsssn+l6xqU9rqBq3L25Id628JbtMByDUp68JRj97BiSucEGCH6QTStb+jPqIiCUJQ2iAedBfKWlYdWxNc=
+X-Received: by 2002:a5d:5886:0:b0:32d:ad05:906c with SMTP id
+ n6-20020a5d5886000000b0032dad05906cmr4403585wrf.3.1700413009333; Sun, 19 Nov
+ 2023 08:56:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231117201720.298422-4-davidwronek@gmail.com>
+References: <20231118225451.2132137-1-vadfed@meta.com> <CAADnVQLBE1ex-B=F07R0xQKo-r22M0L6eiS8DjOAtsur-hEbFQ@mail.gmail.com>
+ <862c832a-da98-4bef-80ef-8294be1d4601@linux.dev> <CAADnVQJ7__C06a=v0RfMvGQ_ohT21n=-1EUuaxqBe3aYU1izEg@mail.gmail.com>
+ <312531ec-aba5-4050-b236-dc9b456c7280@linux.dev>
+In-Reply-To: <312531ec-aba5-4050-b236-dc9b456c7280@linux.dev>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 19 Nov 2023 08:56:37 -0800
+Message-ID: <CAADnVQLKsOs7LSFWGbAtJ8WfZjnQ0B_7gwFA-ZMdLPmukMGZ1A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 1/2] bpf: add skcipher API support to TC/XDP programs
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Vadim Fedorenko <vadfed@meta.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Network Development <netdev@vger.kernel.org>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Sat, Nov 18, 2023 at 3:46=E2=80=AFPM Vadim Fedorenko
+<vadim.fedorenko@linux.dev> wrote:
+>
+> On 18/11/2023 18:35, Alexei Starovoitov wrote:
+> > On Sat, Nov 18, 2023 at 3:32=E2=80=AFPM Vadim Fedorenko
+> > <vadim.fedorenko@linux.dev> wrote:
+> >>
+> >> On 18/11/2023 18:23, Alexei Starovoitov wrote:
+> >>> On Sat, Nov 18, 2023 at 2:55=E2=80=AFPM Vadim Fedorenko <vadfed@meta.=
+com> wrote:
+> >>>>
+> >>>> +/**
+> >>>> + * struct bpf_crypto_lskcipher_ctx - refcounted BPF sync skcipher c=
+ontext structure
+> >>>> + * @tfm:       The pointer to crypto_sync_skcipher struct.
+> >>>> + * @rcu:       The RCU head used to free the crypto context with RC=
+U safety.
+> >>>> + * @usage:     Object reference counter. When the refcount goes to =
+0, the
+> >>>> + *             memory is released back to the BPF allocator, which =
+provides
+> >>>> + *             RCU safety.
+> >>>> + */
+> >>>> +struct bpf_crypto_lskcipher_ctx {
+> >>>> +       struct crypto_lskcipher *tfm;
+> >>>> +       struct rcu_head rcu;
+> >>>> +       refcount_t usage;
+> >>>> +};
+> >>>> +
+> >>>> +__bpf_kfunc_start_defs();
+> >>>> +
+> >>>> +/**
+> >>>> + * bpf_crypto_lskcipher_ctx_create() - Create a mutable BPF crypto =
+context.
+> >>>
+> >>> Let's drop 'lskcipher' from the kfunc names and ctx struct.
+> >>> bpf users don't need to know the internal implementation details.
+> >>> bpf_crypto_encrypt/decrypt() is clear enough.
+> >>
+> >> The only reason I added it was the existence of AEAD subset of crypto
+> >> API. And this subset can also be implemented in bpf later, and there
+> >> will be inconsistency in naming then if we add aead in future names.
+> >> WDYT?
+> >
+> > You mean future async apis ? Just bpf_crypto_encrypt_async() ?
+>
+> Well, not only async. It's about Authenticated Encryption With
+> Associated Data (AEAD) Cipher API defined in crypto/aead.h. It's
+> ciphers with additional hmac function, like
+> 'authenc(hmac(sha256),cbc(aes))'. It has very similar API with only
+> difference of having Authenticated data in the encrypted block.
 
-On Fri, 17 Nov 2023 21:08:35 +0100, David Wronek wrote:
-> Document the QMP UFS PHY compatible for SC7180
-> 
-> Signed-off-by: David Wronek <davidwronek@gmail.com>
-> ---
->  .../devicetree/bindings/phy/qcom,sc8280xp-qmp-ufs-phy.yaml      | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-
-Acked-by: Rob Herring <robh@kernel.org>
-
+and ? I'm not following what you're trying to say.
+Where is the inconsistency ?
+My point again is that lskcipher vs skcipher vs foo is an implementation
+detail that shouldn't be exposed in the name.
