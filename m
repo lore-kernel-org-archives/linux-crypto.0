@@ -1,90 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JU7p+2a5"
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A1B3BC;
-	Sat, 18 Nov 2023 15:46:33 -0800 (PST)
-Message-ID: <312531ec-aba5-4050-b236-dc9b456c7280@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1700351191;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QM8QT/k8fOPOf+R6uNUKbagXWYnL1hlJFDhRfR2aifM=;
-	b=JU7p+2a5nhRB4lri6DvDNouV9NVjtEBjdA8H+Y28Jj4rie9b4EVjRIrNuOoCzwRXbg0JWN
-	I+ySZNJ/M0iz4OcNSMcOQzHCNMCAf2svrKolJcsNOpoflpvjkKMKSLmVgmOGhZqv6agyd3
-	XRQJ5xN450lEpCmYkBk9l+qIqTe8nMs=
-Date: Sat, 18 Nov 2023 23:46:29 +0000
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2ADA126;
+	Sun, 19 Nov 2023 08:12:06 -0800 (PST)
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6d3260385b5so1840376a34.0;
+        Sun, 19 Nov 2023 08:12:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700410326; x=1701015126;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xEu0nuOXzWy7wH5tn0mHCily9PWBQhKrF+Z00A3ebI8=;
+        b=Rjw3yeOJH3eN8J+vBbSzkSHvaVbOQInmZ8jeR764JCByCVe9jRR6q/5eU3lQ9l9qqE
+         2JWoc+JmpI9wRL0WplPd03gOMSjIdDvGAvkkCqJsbMiXoLQnNgLwxWq1LsyXG5s2l2Wa
+         EAXWOE55KQAwxkbDpN2ymg1wBhjrj96nFZHo8ETGmzcxkXjupaPa1wd5EHYGIWn9+lvk
+         9J7MaPO5srhrVo6eMP9o3TVvzXPQ+MfotYAQF5EGTZfieQf/j0GR+XpDMRc0zworwY7D
+         V30EJznw5pBYelSdIfsQrsR+rIbuPDBA+lZSgDULbUPzoIfky9ZbNYcnYhrbshn+4cS+
+         l6dg==
+X-Gm-Message-State: AOJu0YyRb6GdAVu7gSZVN6poCQybysf3cOiANDkJBv4zwXt2XBeENugz
+	DM+3laVrI72d4fRJtBbi8Q==
+X-Google-Smtp-Source: AGHT+IHGGM8ZAa1lSr23KAzSyTH5dGZQdtx5KG4w1Okx17TDG9eIKkTbs2icl7eKgrEN3ubKijy84A==
+X-Received: by 2002:a9d:628b:0:b0:6cd:9f4:e088 with SMTP id x11-20020a9d628b000000b006cd09f4e088mr5199714otk.5.1700410326260;
+        Sun, 19 Nov 2023 08:12:06 -0800 (PST)
+Received: from herring.priv ([2607:fb90:45e3:889f:15b4:1348:6d64:224b])
+        by smtp.gmail.com with ESMTPSA id c3-20020a9d67c3000000b006ce28044207sm893035otn.58.2023.11.19.08.11.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 19 Nov 2023 08:12:01 -0800 (PST)
+Received: (nullmailer pid 276187 invoked by uid 1000);
+	Sun, 19 Nov 2023 16:11:56 -0000
+Date: Sun, 19 Nov 2023 10:11:56 -0600
+From: Rob Herring <robh@kernel.org>
+To: David Wronek <davidwronek@gmail.com>
+Cc: Kishon Vijay Abraham I <kishon@kernel.org>, Rob Herring <robh+dt@kernel.org>, "David S . Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, Bjorn Andersson <andersson@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Alim Akhtar <alim.akhtar@samsung.com>, linux-phy@lists.infradead.org, Manivannan Sadhasivam <mani@kernel.org>, Vinod Koul <vkoul@kernel.org>, linux-scsi@vger.kernel.org, hexdump0815@googlemail.com, linux-kernel@vger.kernel.org, ~postmarketos/upstreaming@lists.sr.ht, linux-arm-msm@vger.kernel.org, Avri Altman <avri.altman@wdc.com>, Joe Mason <buddyjojo06@outlook.com>, cros-qcom-dts-watchers@chromium.org, Herbert Xu <herbert@gondor.apana.org.au>, devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, phone-devel@vger.kernel.org, Andy Gross <agross@kernel.org>, Bart Van Assche <bvanassche@acm.org>, Konrad Dybcio <konrad.dybcio@linaro.org>
+Subject: Re: [PATCH v2 1/8] dt-bindings: crypto: ice: Document SC7180 inline
+ crypto engine
+Message-ID: <170041031632.276154.11804659126094035319.robh@kernel.org>
+References: <20231117201720.298422-1-davidwronek@gmail.com>
+ <20231117201720.298422-2-davidwronek@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v5 1/2] bpf: add skcipher API support to TC/XDP
- programs
-Content-Language: en-US
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Vadim Fedorenko <vadfed@meta.com>, Jakub Kicinski <kuba@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko
- <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Network Development <netdev@vger.kernel.org>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- bpf <bpf@vger.kernel.org>
-References: <20231118225451.2132137-1-vadfed@meta.com>
- <CAADnVQLBE1ex-B=F07R0xQKo-r22M0L6eiS8DjOAtsur-hEbFQ@mail.gmail.com>
- <862c832a-da98-4bef-80ef-8294be1d4601@linux.dev>
- <CAADnVQJ7__C06a=v0RfMvGQ_ohT21n=-1EUuaxqBe3aYU1izEg@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CAADnVQJ7__C06a=v0RfMvGQ_ohT21n=-1EUuaxqBe3aYU1izEg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231117201720.298422-2-davidwronek@gmail.com>
 
-On 18/11/2023 18:35, Alexei Starovoitov wrote:
-> On Sat, Nov 18, 2023 at 3:32 PM Vadim Fedorenko
-> <vadim.fedorenko@linux.dev> wrote:
->>
->> On 18/11/2023 18:23, Alexei Starovoitov wrote:
->>> On Sat, Nov 18, 2023 at 2:55 PM Vadim Fedorenko <vadfed@meta.com> wrote:
->>>>
->>>> +/**
->>>> + * struct bpf_crypto_lskcipher_ctx - refcounted BPF sync skcipher context structure
->>>> + * @tfm:       The pointer to crypto_sync_skcipher struct.
->>>> + * @rcu:       The RCU head used to free the crypto context with RCU safety.
->>>> + * @usage:     Object reference counter. When the refcount goes to 0, the
->>>> + *             memory is released back to the BPF allocator, which provides
->>>> + *             RCU safety.
->>>> + */
->>>> +struct bpf_crypto_lskcipher_ctx {
->>>> +       struct crypto_lskcipher *tfm;
->>>> +       struct rcu_head rcu;
->>>> +       refcount_t usage;
->>>> +};
->>>> +
->>>> +__bpf_kfunc_start_defs();
->>>> +
->>>> +/**
->>>> + * bpf_crypto_lskcipher_ctx_create() - Create a mutable BPF crypto context.
->>>
->>> Let's drop 'lskcipher' from the kfunc names and ctx struct.
->>> bpf users don't need to know the internal implementation details.
->>> bpf_crypto_encrypt/decrypt() is clear enough.
->>
->> The only reason I added it was the existence of AEAD subset of crypto
->> API. And this subset can also be implemented in bpf later, and there
->> will be inconsistency in naming then if we add aead in future names.
->> WDYT?
+
+On Fri, 17 Nov 2023 21:08:33 +0100, David Wronek wrote:
+> Document the compatible used for the inline crypto engine found on
+> SC7180.
 > 
-> You mean future async apis ? Just bpf_crypto_encrypt_async() ?
+> Signed-off-by: David Wronek <davidwronek@gmail.com>
+> ---
+>  .../devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml    | 1 +
+>  1 file changed, 1 insertion(+)
+> 
 
-Well, not only async. It's about Authenticated Encryption With
-Associated Data (AEAD) Cipher API defined in crypto/aead.h. It's
-ciphers with additional hmac function, like
-'authenc(hmac(sha256),cbc(aes))'. It has very similar API with only
-difference of having Authenticated data in the encrypted block.
+Acked-by: Rob Herring <robh@kernel.org>
 
-I'm not sure though if there is explicit sync implementation, but I do
-believe async ciphers can be filtered out for this interface too.
