@@ -1,116 +1,150 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D4A134AD;
+	Sun, 19 Nov 2023 19:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ULIuyBBp"
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3978911A;
-	Sun, 19 Nov 2023 08:56:51 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-32fadd4ad09so2687591f8f.1;
-        Sun, 19 Nov 2023 08:56:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700413009; x=1701017809; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7wIX8ORXLGy4iPlNpzgFGE4EPRBwYYYCdBAHOnzVq8k=;
-        b=ULIuyBBpng4LRBCxeJ3S8O0R19NZ1zZOS4e43Q7u5u4KJW+bSpKZfdKFpfRyHRptcr
-         XDuewq3gKMwAU3APLNtexDxZ2hWfYXJ0VgnhiHlX6XFUTYran58dL26lMwVGU9wr9dFr
-         BeXYTIHwlgST0bb6PeH9gTUT545Gqn6uakC5WZzjOLx0TC6KPqd4g3aLNEDx8sX+26lt
-         Gdd0bDToKRRa8ygjTHnXAhyZx0mXig0uo70tJn9xxv7MEfMTT2Fwnd5RxtuA+HbyP/DB
-         ZwstDQVMJpSecnBaAgmPKUJTrpNXqtsInH4P48DCAyM6kJQMGmcg9QJi+zUwulH8w9K6
-         pcNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700413009; x=1701017809;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7wIX8ORXLGy4iPlNpzgFGE4EPRBwYYYCdBAHOnzVq8k=;
-        b=a6KKiqg0LbRSSUjRNSHfjvCdU57O/TJ2JJhq6uo6chSql8vxEWTC0ik54W/Awx37en
-         l6tDPY1ttWMc/pzDgCIMSaNZb+c0k3V63Qow9sNssYGQK3oTqynz7MoDL3n5nW55yGhO
-         Qgd1AW+pl9yvrkxIf9rbRHiwrO2k2fFPf3fM4f8JGBnmdtJ5XwOruQvnbhA3cGmUR6Yy
-         RS4WgVIpLF4t5xWn7Hd1XdM1DzngmajHlduAbpeC4ok6bG3xDT1sE2X0kDFuvfXY0kA2
-         avQHCHt87TQVykaSNFrznEZGt4dNBvvdTbpVfIUBAzOUhgDDgOfkQhkIwnRo1ZhXZunS
-         uI+w==
-X-Gm-Message-State: AOJu0YxztpIqyIR61Z2lMbh3Na1Zc4TmRC8slYLN9RM/VKVnkXvquyI7
-	QLqeOqVM/Qk8AN+cNCbCxRvGb5A8ZlzCJZfsG1M=
-X-Google-Smtp-Source: AGHT+IFulNsssn+l6xqU9rqBq3L25Id628JbtMByDUp68JRj97BiSucEGCH6QTStb+jPqIiCUJQ2iAedBfKWlYdWxNc=
-X-Received: by 2002:a5d:5886:0:b0:32d:ad05:906c with SMTP id
- n6-20020a5d5886000000b0032dad05906cmr4403585wrf.3.1700413009333; Sun, 19 Nov
- 2023 08:56:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NDebwZKR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E537C433C7;
+	Sun, 19 Nov 2023 19:49:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700423375;
+	bh=Y65QvSsXHqm7VX9AgZ5BI+hkRtsvRDz99qPdNHT4aK8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NDebwZKRzTY+jbu34I1hOcnskpgvZxP1VCMbL15KXFLd06R0pzFNB/x58zVKpNCuc
+	 6scI15eSTKaDeIsb4QjT4GQ+w0FaPGLIk8cnW0rYrPtPgBjsGcWyucqn/asayFHZAN
+	 WK8vLf40QTB+aT7pc3FK/xueJlV8ElIrEcgsaOIUH/oR5fhrri7uen9KFk2kwLwzfu
+	 Tfo6cs/DnI07Dz8nNIA0SICm5u0ZFAw2cWRDnNoe2gkuaRsQe8WpirvvwzPMq0HHTU
+	 p3yk/BVUI+XR4XXgvjKw+9EUm6yvVj4SkAQ+WNpST5lniVxsnzhuxolkXYJMmXsIEJ
+	 Xpkcm+ne9B6/w==
+Date: Sun, 19 Nov 2023 19:49:30 +0000
+From: Simon Horman <horms@kernel.org>
+To: Srujana Challa <schalla@marvell.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, bbrezillon@kernel.org, arno@natisbad.org,
+	kuba@kernel.org, ndabilpuram@marvell.com, sgoutham@marvell.com
+Subject: Re: [PATCH v1 02/10] crypto: octeontx2: add SGv2 support for CN10KB
+ or CN10KA B0
+Message-ID: <20231119194930.GG186930@vergenet.net>
+References: <20231103053306.2259753-1-schalla@marvell.com>
+ <20231103053306.2259753-3-schalla@marvell.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231118225451.2132137-1-vadfed@meta.com> <CAADnVQLBE1ex-B=F07R0xQKo-r22M0L6eiS8DjOAtsur-hEbFQ@mail.gmail.com>
- <862c832a-da98-4bef-80ef-8294be1d4601@linux.dev> <CAADnVQJ7__C06a=v0RfMvGQ_ohT21n=-1EUuaxqBe3aYU1izEg@mail.gmail.com>
- <312531ec-aba5-4050-b236-dc9b456c7280@linux.dev>
-In-Reply-To: <312531ec-aba5-4050-b236-dc9b456c7280@linux.dev>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sun, 19 Nov 2023 08:56:37 -0800
-Message-ID: <CAADnVQLKsOs7LSFWGbAtJ8WfZjnQ0B_7gwFA-ZMdLPmukMGZ1A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 1/2] bpf: add skcipher API support to TC/XDP programs
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Vadim Fedorenko <vadfed@meta.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko <andrii@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Network Development <netdev@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231103053306.2259753-3-schalla@marvell.com>
 
-On Sat, Nov 18, 2023 at 3:46=E2=80=AFPM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
->
-> On 18/11/2023 18:35, Alexei Starovoitov wrote:
-> > On Sat, Nov 18, 2023 at 3:32=E2=80=AFPM Vadim Fedorenko
-> > <vadim.fedorenko@linux.dev> wrote:
-> >>
-> >> On 18/11/2023 18:23, Alexei Starovoitov wrote:
-> >>> On Sat, Nov 18, 2023 at 2:55=E2=80=AFPM Vadim Fedorenko <vadfed@meta.=
-com> wrote:
-> >>>>
-> >>>> +/**
-> >>>> + * struct bpf_crypto_lskcipher_ctx - refcounted BPF sync skcipher c=
-ontext structure
-> >>>> + * @tfm:       The pointer to crypto_sync_skcipher struct.
-> >>>> + * @rcu:       The RCU head used to free the crypto context with RC=
-U safety.
-> >>>> + * @usage:     Object reference counter. When the refcount goes to =
-0, the
-> >>>> + *             memory is released back to the BPF allocator, which =
-provides
-> >>>> + *             RCU safety.
-> >>>> + */
-> >>>> +struct bpf_crypto_lskcipher_ctx {
-> >>>> +       struct crypto_lskcipher *tfm;
-> >>>> +       struct rcu_head rcu;
-> >>>> +       refcount_t usage;
-> >>>> +};
-> >>>> +
-> >>>> +__bpf_kfunc_start_defs();
-> >>>> +
-> >>>> +/**
-> >>>> + * bpf_crypto_lskcipher_ctx_create() - Create a mutable BPF crypto =
-context.
-> >>>
-> >>> Let's drop 'lskcipher' from the kfunc names and ctx struct.
-> >>> bpf users don't need to know the internal implementation details.
-> >>> bpf_crypto_encrypt/decrypt() is clear enough.
-> >>
-> >> The only reason I added it was the existence of AEAD subset of crypto
-> >> API. And this subset can also be implemented in bpf later, and there
-> >> will be inconsistency in naming then if we add aead in future names.
-> >> WDYT?
-> >
-> > You mean future async apis ? Just bpf_crypto_encrypt_async() ?
->
-> Well, not only async. It's about Authenticated Encryption With
-> Associated Data (AEAD) Cipher API defined in crypto/aead.h. It's
-> ciphers with additional hmac function, like
-> 'authenc(hmac(sha256),cbc(aes))'. It has very similar API with only
-> difference of having Authenticated data in the encrypted block.
+On Fri, Nov 03, 2023 at 11:02:58AM +0530, Srujana Challa wrote:
 
-and ? I'm not following what you're trying to say.
-Where is the inconsistency ?
-My point again is that lskcipher vs skcipher vs foo is an implementation
-detail that shouldn't be exposed in the name.
+Hi Srujana,
+
+some minor feedback from my side.
+
+> Scatter Gather input format for CPT has changed on CN10KB/CN10KA B0 HW
+> to make it comapatible with NIX Scatter Gather format to support SG mode
+
+nit: compatible
+
+> for inline IPsec. This patch modifies the code to make the driver works
+> for the same. This patch also enables CPT firmware load for these chips.
+> 
+> Signed-off-by: Srujana Challa <schalla@marvell.com>
+
+...
+
+> diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
+
+...
+
+> +static inline int sgv2io_components_setup(struct pci_dev *pdev,
+> +					  struct otx2_cpt_buf_ptr *list,
+> +					  int buf_count, u8 *buffer)
+> +{
+> +	struct cn10kb_cpt_sglist_component *sg_ptr = NULL;
+> +	int ret = 0, i, j;
+> +	int components;
+> +
+> +	if (unlikely(!list)) {
+> +		dev_err(&pdev->dev, "Input list pointer is NULL\n");
+> +		return -EFAULT;
+> +	}
+> +
+> +	for (i = 0; i < buf_count; i++) {
+> +		if (unlikely(!list[i].vptr))
+> +			continue;
+> +		list[i].dma_addr = dma_map_single(&pdev->dev, list[i].vptr,
+> +						  list[i].size,
+> +						  DMA_BIDIRECTIONAL);
+> +		if (unlikely(dma_mapping_error(&pdev->dev, list[i].dma_addr))) {
+> +			dev_err(&pdev->dev, "Dma mapping failed\n");
+> +			ret = -EIO;
+> +			goto sg_cleanup;
+> +		}
+> +	}
+> +	components = buf_count / 3;
+> +	sg_ptr = (struct cn10kb_cpt_sglist_component *)buffer;
+> +	for (i = 0; i < components; i++) {
+> +		sg_ptr->len0 = list[i * 3 + 0].size;
+> +		sg_ptr->len1 = list[i * 3 + 1].size;
+> +		sg_ptr->len2 = list[i * 3 + 2].size;
+> +		sg_ptr->ptr0 = list[i * 3 + 0].dma_addr;
+> +		sg_ptr->ptr1 = list[i * 3 + 1].dma_addr;
+> +		sg_ptr->ptr2 = list[i * 3 + 2].dma_addr;
+> +		sg_ptr->valid_segs = 3;
+> +		sg_ptr++;
+> +	}
+> +	components = buf_count % 3;
+> +
+> +	sg_ptr->valid_segs = components;
+> +	switch (components) {
+> +	case 2:
+> +		sg_ptr->len1 = list[i * 3 + 1].size;
+> +		sg_ptr->ptr1 = list[i * 3 + 1].dma_addr;
+> +		fallthrough;
+> +	case 1:
+> +		sg_ptr->len0 = list[i * 3 + 0].size;
+> +		sg_ptr->ptr0 = list[i * 3 + 0].dma_addr;
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +	return ret;
+
+The above fields of sg_ptr all have big-endian types
+but are being assigned values in host byte-order.
+
+As flagged by Sparse.
+
+> +
+> +sg_cleanup:
+> +	for (j = 0; j < i; j++) {
+> +		if (list[j].dma_addr) {
+> +			dma_unmap_single(&pdev->dev, list[j].dma_addr,
+> +					 list[j].size, DMA_BIDIRECTIONAL);
+> +		}
+> +
+> +		list[j].dma_addr = 0;
+> +	}
+> +	return ret;
+> +}
+> +
+> +static inline struct otx2_cpt_inst_info *cn10k_sgv2_info_create(struct pci_dev *pdev,
+> +					      struct otx2_cpt_req_info *req,
+> +					      gfp_t gfp)
+
+nit: I think it would be nicer to format the above as in a way
+that indentation isn't pushed so far to the right that alignment
+with the opening parentheses becomes impossible:
+
+static inline struct otx2_cpt_inst_info *
+cn10k_sgv2_info_create(struct pci_dev *pdev, struct otx2_cpt_req_info *req,
+		       gfp_t gfp)
+
+Running ./checkpatch.pl --strict over this patch-set might also be useful.
+
+...
