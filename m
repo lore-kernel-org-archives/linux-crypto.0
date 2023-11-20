@@ -1,43 +1,43 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="XCfQaYGD"
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4DA182
-	for <linux-crypto@vger.kernel.org>; Sun, 19 Nov 2023 18:55:21 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1cf57430104so5648295ad.1
-        for <linux-crypto@vger.kernel.org>; Sun, 19 Nov 2023 18:55:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Va+2qlGg"
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D7331A1
+	for <linux-crypto@vger.kernel.org>; Sun, 19 Nov 2023 18:55:46 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-5a9bc2ec556so2186400a12.0
+        for <linux-crypto@vger.kernel.org>; Sun, 19 Nov 2023 18:55:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1700448921; x=1701053721; darn=vger.kernel.org;
+        d=sifive.com; s=google; t=1700448946; x=1701053746; darn=vger.kernel.org;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Yg0x+T7ON9fvA/nzihMoJz0oESLmev7sCZPefVlmBec=;
-        b=XCfQaYGD3kim/PryMxmOLrrxKGGu7Y4LoX3vYagam2aQvIUe0ppG46YC8TpxkAJDjp
-         vOjA2FkUyTDlm6ovhnd7CnCcXO+0aieBdEYU1GEcCLSmQ18odyrzTRARE/sy+FG1bQ+x
-         44TYvwPQxmW1cEBg1eejTF7JLOkX4bc2bshcws0fstFIycDhTou6d9TS/yR8K5Ud4V70
-         hmjfZ27S6wohFeeZ46R0nlgMpBgc/yUH2FNWRa0z2olW8BdChWlmn1+4fI33LEHfVvvS
-         Vzh6c6ogfSkaxfmP2URVPLi1gefO0/mDc7o+mC8Y0T9sAUi0WLNzPOscA1ZWA41Ox3xC
-         wjpA==
+        bh=CQLpISrSuWQBWBAvuQbodwZBDAWI6iXmTyJBLfM/8EA=;
+        b=Va+2qlGgfHeXJry07RcSqdKxGcHU6vSJ0KARWOExaC+NF96HGf3zGrhH8m6EaRyiI0
+         MSIH1GeFEhVxTcjU1sYI8gnjE0kAeYwNPFvu5D9Mc/+7RKa/SDc+ku/dGqgVgzdRAroJ
+         I5EduSEpISjBCYIhJoH0ttgi8A0RXhoUeLlOmR4A8w+9wkN5WDAR0EFXuG+oF6tyQDz1
+         6r5sunZnoXyehyYCOx7VPpNw/iKSyTcY0HhqthJLdnmXtnzdtVlU7Ir22RgQoarwvv7Z
+         LwGjs3cSWoYKA7drcl6w9rbEEHIYAHYmVrNzhuX5T8urXzifF7AMcEkz0s9tGAEzCXjo
+         nxcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700448921; x=1701053721;
+        d=1e100.net; s=20230601; t=1700448946; x=1701053746;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Yg0x+T7ON9fvA/nzihMoJz0oESLmev7sCZPefVlmBec=;
-        b=QtHz66X/FUdF9a/zFcux719DrMTQXYC2z1Q04GaN9Sl6OQnMSQQn5Qd+y3p8gQqFax
-         xQDWpnHuAMrEAqLJZfOupTP+Ah5EKs2T8I0czUC8n5oji1D3vHL2xDqHJ2pT6TAhvVmF
-         iBZtK9C/Irodf49xSP7jzJyakNGM0nFJK259Ygf3qCzK8MebW1vwKBZelqWnhcyQEpW2
-         gytZb1VAYPgz9R+jFbi1VXUFiT+5IBN2ypmDoBZGZ2tFoLdDr+wCpOpwO1rDFyK5+IuS
-         UZvZajO1XpIrh6RdRh6/TQQN1A+8uhJ0O3oyVnSzk1K0TpWX+GpWiIqxc+vD66PSiIiA
-         FB/w==
-X-Gm-Message-State: AOJu0Yy/krQXFDIE9ZNBvzhbRYkcZPB5dxx/xLL9nPtjRkT6UM628BkN
-	s85Ts2I3CAnlOYpgOXKadwZarA==
-X-Google-Smtp-Source: AGHT+IFuUjPi2Oe7rzisQHOcyNkxqx5t2yhJXAk9a4Ri2HQ4FV08v9d3S1jEA/pZSew+J7asN5OR5A==
-X-Received: by 2002:a17:902:8b85:b0:1ca:86b:7ed9 with SMTP id ay5-20020a1709028b8500b001ca086b7ed9mr4657249plb.40.1700448920948;
-        Sun, 19 Nov 2023 18:55:20 -0800 (PST)
+        bh=CQLpISrSuWQBWBAvuQbodwZBDAWI6iXmTyJBLfM/8EA=;
+        b=NkB9tWPrHQxmloN1I0iLlclo6a08aLJtySHb9kQFxRmNrSWXy271Y/fLu7ADJ03Ncg
+         Xu1TIXx/rtQYC5zm5esotfPZ23YVSpDijpOi8IMrl4fpwAl+ec7xBiOyysW1xsU+ct2+
+         CPgzW3WHO2/uejIWNpw/nscMXGk670JFbkyaNXetHsCJXPbozsZFFH4OrMTdi1N3+3U8
+         jfyCkv+eo/Jzbt24CC7mknA4X94xPd11tgog+SKtnCzLewy4ttzA7zwfIqfa3GAC0L5P
+         IlH+ta4W7UL/byzjkCzzWiNMWuzdhZgOFf/FOqIb2X6RAnhVT9N6U+EiEY6EMiaxY7Sg
+         vbXA==
+X-Gm-Message-State: AOJu0YwH2gRqOxSqNe5nrVUEYXfLlYvaXBaSBfzIvr3BkXwYA+ZnuREH
+	sN9HM1/XZobxUfEPuZGKZpe0WQ==
+X-Google-Smtp-Source: AGHT+IEw6BVjKQe+wHImLyjUr3AymFfea4UwO2aOMC/OMRsrnoV+SV3vD2csl5EOmm9ds1wLTdzCfQ==
+X-Received: by 2002:a05:6a20:2d1e:b0:187:a119:909d with SMTP id g30-20020a056a202d1e00b00187a119909dmr4195928pzl.13.1700448945925;
+        Sun, 19 Nov 2023 18:55:45 -0800 (PST)
 Received: from ?IPv6:2402:7500:5d5:bc21:3420:fefa:20d4:2a2f? ([2402:7500:5d5:bc21:3420:fefa:20d4:2a2f])
-        by smtp.gmail.com with ESMTPSA id y12-20020a170902ed4c00b001cc256ce1besm4928265plb.138.2023.11.19.18.55.17
+        by smtp.gmail.com with ESMTPSA id y12-20020a170902ed4c00b001cc256ce1besm4928265plb.138.2023.11.19.18.55.42
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 19 Nov 2023 18:55:20 -0800 (PST)
+        Sun, 19 Nov 2023 18:55:45 -0800 (PST)
 Content-Type: text/plain;
 	charset=us-ascii
 Precedence: bulk
@@ -46,11 +46,11 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
-Subject: Re: [PATCH 12/12] RISC-V: crypto: add Zvkb accelerated ChaCha20
+Subject: Re: [PATCH 10/12] RISC-V: crypto: add Zvksed accelerated SM4
  implementation
 From: Jerry Shih <jerry.shih@sifive.com>
-In-Reply-To: <20231102054327.GH1498@sol.localdomain>
-Date: Mon, 20 Nov 2023 10:55:15 +0800
+In-Reply-To: <20231102055848.GI1498@sol.localdomain>
+Date: Mon, 20 Nov 2023 10:55:41 +0800
 Cc: Paul Walmsley <paul.walmsley@sifive.com>,
  palmer@dabbelt.com,
  Albert Ou <aou@eecs.berkeley.edu>,
@@ -69,74 +69,38 @@ Cc: Paul Walmsley <paul.walmsley@sifive.com>,
  linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <90E2B1B4-ACC1-4316-81CD-E919D3BD03BA@sifive.com>
+Message-Id: <078F58E9-7CCF-4A59-BD29-8E87F9EE434B@sifive.com>
 References: <20231025183644.8735-1-jerry.shih@sifive.com>
- <20231025183644.8735-13-jerry.shih@sifive.com>
- <20231102054327.GH1498@sol.localdomain>
+ <20231025183644.8735-11-jerry.shih@sifive.com>
+ <20231102055848.GI1498@sol.localdomain>
 To: Eric Biggers <ebiggers@kernel.org>
 X-Mailer: Apple Mail (2.3445.9.7)
 
-On Nov 2, 2023, at 13:43, Eric Biggers <ebiggers@kernel.org> wrote:
-> On Thu, Oct 26, 2023 at 02:36:44AM +0800, Jerry Shih wrote:
->> +static struct skcipher_alg riscv64_chacha_alg_zvkb[] = { {
->> +	.base = {
->> +		.cra_name = "chacha20",
->> +		.cra_driver_name = "chacha20-riscv64-zvkb",
->> +		.cra_priority = 300,
->> +		.cra_blocksize = 1,
->> +		.cra_ctxsize = sizeof(struct chacha_ctx),
->> +		.cra_module = THIS_MODULE,
+On Nov 2, 2023, at 13:58, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Thu, Oct 26, 2023 at 02:36:42AM +0800, Jerry Shih wrote:
+>> +struct crypto_alg riscv64_sm4_zvksed_alg = {
+>> +	.cra_name = "sm4",
+>> +	.cra_driver_name = "sm4-riscv64-zvkb-zvksed",
+>> +	.cra_module = THIS_MODULE,
+>> +	.cra_priority = 300,
+>> +	.cra_flags = CRYPTO_ALG_TYPE_CIPHER,
+>> +	.cra_blocksize = SM4_BLOCK_SIZE,
+>> +	.cra_ctxsize = sizeof(struct sm4_ctx),
+>> +	.cra_cipher = {
+>> +		.cia_min_keysize = SM4_KEY_SIZE,
+>> +		.cia_max_keysize = SM4_KEY_SIZE,
+>> +		.cia_setkey = riscv64_sm4_setkey_zvksed,
+>> +		.cia_encrypt = riscv64_sm4_encrypt_zvksed,
+>> +		.cia_decrypt = riscv64_sm4_decrypt_zvksed,
 >> +	},
->> +	.min_keysize = CHACHA_KEY_SIZE,
->> +	.max_keysize = CHACHA_KEY_SIZE,
->> +	.ivsize = CHACHA_IV_SIZE,
->> +	.chunksize = CHACHA_BLOCK_SIZE,
->> +	.walksize = CHACHA_BLOCK_SIZE * 4,
->> +	.setkey = chacha20_setkey,
->> +	.encrypt = chacha20_encrypt,
->> +	.decrypt = chacha20_encrypt,
->> +} };
->> +
->> +static inline bool check_chacha20_ext(void)
->> +{
->> +	return riscv_isa_extension_available(NULL, ZVKB) &&
->> +	       riscv_vector_vlen() >= 128;
->> +}
->> +
->> +static int __init riscv64_chacha_mod_init(void)
->> +{
->> +	if (check_chacha20_ext())
->> +		return crypto_register_skciphers(
->> +			riscv64_chacha_alg_zvkb,
->> +			ARRAY_SIZE(riscv64_chacha_alg_zvkb));
->> +
->> +	return -ENODEV;
->> +}
->> +
->> +static void __exit riscv64_chacha_mod_fini(void)
->> +{
->> +	if (check_chacha20_ext())
->> +		crypto_unregister_skciphers(
->> +			riscv64_chacha_alg_zvkb,
->> +			ARRAY_SIZE(riscv64_chacha_alg_zvkb));
->> +}
+>> +};
 > 
-> When there's just one algorithm being registered/unregistered,
-> crypto_register_skcipher() and crypto_unregister_skcipher() can be used.
-
-Fixed.
-
->> +# - RV64I
->> +# - RISC-V Vector ('V') with VLEN >= 128
->> +# - RISC-V Vector Cryptography Bit-manipulation extension ('Zvkb')
->> +# - RISC-V Zicclsm(Main memory supports misaligned loads/stores)
-> 
-> How is the presence of the Zicclsm extension guaranteed?
+> This should be 'static'.
 > 
 > - Eric
 
-I have the addition extension parser for `Zicclsm` in the v2 patch set.
+Thx.
+Fixed.
 
 
 -Jerry
-
