@@ -1,43 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BABF54BF5
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2023 23:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073C52BAF7
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2023 23:51:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OczUUkhb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E285C433C8;
-	Tue, 21 Nov 2023 23:37:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Viv7M/P9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02D1BC433C7;
+	Tue, 21 Nov 2023 23:51:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700609865;
-	bh=bmtlZPe6HRvoqFtBNOxqiOuOPnz7I9kdhgGgVtH1RBM=;
+	s=k20201202; t=1700610671;
+	bh=3dyir6hn+yCj4QQvn9hjT6LOtunjwshoOwuVacKmLPM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OczUUkhbcsyD+OnEaKiPo0eYCn/bsbWnHoaDchnGxAkffAOyOOioHOYl3xC8ONEhh
-	 4ImjoXjIelG7PdgZEluQLCmZxSOO8czzHqi1Psoq5Larss8FDmSx1LNErTILXGFJ2s
-	 M6QlsMPuOaGYOmYSyzqPMseEjwOopUldyDA/xpUfkMJRRBRNZ5352JhjswqhKyQOlH
-	 0ZCu6Kl3ltfza8nyoINplyaa/ep/m0WAymkAYkb3iDiol2xMTmEQavpjMxfJRlG4zz
-	 d7ZMpQ9pJscFNDAp8b1/ELlKJNiFG4TYXduD/2nE75aKWvQ5B4Qox6j7KjdgIGvrea
-	 uSsiDzI6H8IFg==
-Date: Tue, 21 Nov 2023 15:37:43 -0800
+	b=Viv7M/P9qyRl2VwZUlURi91OfI/4U9msYDGubL5WGF0EsH8lrLL5mLBzZ6NGtsz8o
+	 qAe1Cx6Zn20b3qNeSML9ESPa19ZjTNqAhUFQRc29WWBTMHkoaMNqp4dm6bU34MeR98
+	 N54rNvtavGdNtCKw9I06lWeDnm3ES/Ly8r8uY22ETe69Nagxnph64vPyauJmyrHBuk
+	 Bh9uf0yHvfQGk+jvq3HweYu40XpicTDFszLX1ZTuVjWDhrYr4TFcgfvMuAQ68s1xzC
+	 A8dBQkpI/Rrfn3nIhxxF/SQJoptq17e2/Pm+pfc7W9rsDrp72UFaiUATXVXZmj9RM1
+	 BeBaMD+UQIC/w==
+Date: Tue, 21 Nov 2023 15:51:09 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Conor Dooley <conor.dooley@microchip.com>
-Cc: Jerry Shih <jerry.shih@sifive.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>, palmer@dabbelt.com,
-	Albert Ou <aou@eecs.berkeley.edu>, herbert@gondor.apana.org.au,
-	davem@davemloft.net, andy.chiu@sifive.com, greentime.hu@sifive.com,
-	guoren@kernel.org, bjorn@rivosinc.com, heiko@sntech.de,
-	ardb@kernel.org, phoebe.chen@sifive.com, hongrong.hsu@sifive.com,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 12/12] RISC-V: crypto: add Zvkb accelerated ChaCha20
- implementation
-Message-ID: <20231121233743.GD2172@sol.localdomain>
-References: <20231025183644.8735-1-jerry.shih@sifive.com>
- <20231025183644.8735-13-jerry.shih@sifive.com>
- <20231102054327.GH1498@sol.localdomain>
- <90E2B1B4-ACC1-4316-81CD-E919D3BD03BA@sifive.com>
- <20231120191856.GA964@sol.localdomain>
- <9724E3A5-F43C-4239-9031-2B33B72C4EF4@sifive.com>
- <20231121-knelt-resource-5d71c9246015@wendy>
+To: Jerry Shih <jerry.shih@sifive.com>
+Cc: Charlie Jenkins <charlie@rivosinc.com>,
+	Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
+	paul.walmsley@sifive.com, aou@eecs.berkeley.edu,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	christoph.muellner@vrull.eu,
+	Heiko Stuebner <heiko.stuebner@vrull.eu>
+Subject: Re: [PATCH v4 00/12] RISC-V: support some cryptography accelerations
+Message-ID: <20231121235109.GE2172@sol.localdomain>
+References: <20230711153743.1970625-1-heiko@sntech.de>
+ <20230914001144.GA924@sol.localdomain>
+ <ZQJdnCwf99Glggin@ghost>
+ <3A0F6A71-C521-44A5-A56C-076AF3E13897@gmail.com>
+ <DD3113B1-AB9F-4D6D-BD6E-8F75A83DA45D@sifive.com>
+ <20231006194741.GA68531@google.com>
+ <AB98E114-A8DE-492E-B078-7394EE4FA83E@sifive.com>
+ <20231102040333.GC1498@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,83 +46,63 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231121-knelt-resource-5d71c9246015@wendy>
+In-Reply-To: <20231102040333.GC1498@sol.localdomain>
 
-On Tue, Nov 21, 2023 at 01:14:47PM +0000, Conor Dooley wrote:
-> On Tue, Nov 21, 2023 at 06:55:07PM +0800, Jerry Shih wrote:
-> > On Nov 21, 2023, at 03:18, Eric Biggers <ebiggers@kernel.org> wrote:
-> > > First, I can see your updated patchset at branch
-> > > "dev/jerrys/vector-crypto-upstream-v2" of https://github.com/JerryShih/linux,
-> > > but I haven't seen it on the mailing list yet.  Are you planning to send it out?
+On Wed, Nov 01, 2023 at 09:03:33PM -0700, Eric Biggers wrote:
 > > 
-> > I will send it out soon.
-> > 
-> > > Second, with your updated patchset, I'm not seeing any of the RISC-V optimized
-> > > algorithms be registered when I boot the kernel in QEMU.  This is caused by the
-> > > new check 'riscv_isa_extension_available(NULL, ZICCLSM)' not passing.  Is
-> > > checking for "Zicclsm" the correct way to determine whether unaligned memory
-> > > accesses are supported?
-> > > 
-> > > I'm using 'qemu-system-riscv64 -cpu max -machine virt', with the very latest
-> > > QEMU commit (af9264da80073435), so it should have all the CPU features.
-> > > 
-> > > - Eric
-> > 
-> > Sorry, I just use my `internal` qemu with vector-crypto and rva22 patches.
-> > 
-> > The public qemu haven't supported rva22 profiles. Here is the qemu patch[1] for
-> > that. But here is the discussion why the qemu doesn't export these
-> > `named extensions`(e.g. Zicclsm).
-> > I try to add Zicclsm in DT in the v2 patch set. Maybe we will have more discussion
-> > about the rva22 profiles in kernel DT.
+> > There is no public assembler supports the vector-crypto asm mnemonics.
+> > We should still use `opcode` for vector-crypto instructions. But we might
+> > use asm for standard rvv parts.
+> > In order to reuse the codes in OpenSSL as much as possible,  we still use
+> > the `riscv.pm` for all standard rvv and vector-crypto instructions. If the asm
+> > mnemonic is still a better approach,  I will `rewrite` all standard rvv parts
+> > with asm mnemonics in next patch.
 > 
-> Please do, that'll be fun! Please take some time to read what the
-> profiles spec actually defines Zicclsm fore before you send those patches
-> though. I think you might come to find you have misunderstood what it
-> means - certainly I did the first time I saw it!
+> Tip-of-tree gcc + binutils seems to support them.  Building some of the sample
+> code from the riscv-crypto repository:
 > 
-> > [1]
-> > LINK: https://lore.kernel.org/all/d1d6f2dc-55b2-4dce-a48a-4afbbf6df526@ventanamicro.com/#t
-> > 
-> > I don't know whether it's a good practice to check unaligned access using
-> > `Zicclsm`. 
-> > 
-> > Here is another related cpu feature for unaligned access:
-> > RISCV_HWPROBE_MISALIGNED_*
-> > But it looks like it always be initialized with `RISCV_HWPROBE_MISALIGNED_SLOW`[2].
-> > It implies that linux kernel always supports unaligned access. But we have the
-> > actual HW which doesn't support unaligned access for vector unit.
+>     $ riscv64-linux-gnu-as --version
+>     GNU assembler (GNU Binutils) 2.41.50.20231021
+>     $ riscv64-linux-gnu-gcc --version
+>     riscv64-linux-gnu-gcc (GCC) 14.0.0 20231021 (experimental)
+>     $ riscv64-linux-gnu-gcc -march=rv64ivzvkned -c riscv-crypto/doc/vector/code-samples/zvkned.s
 > 
-> https://docs.kernel.org/arch/riscv/uabi.html#misaligned-accesses
+> And tip-of-tree clang supports them experimentally:
 > 
-> Misaligned accesses are part of the user ABI & the hwprobe stuff for
-> that allows userspace to figure out whether they're fast (likely
-> implemented in hardware), slow (likely emulated in firmware) or emulated
-> in the kernel.
+>     $ clang --version
+>     clang version 18.0.0 (https://github.com/llvm/llvm-project 30416f39be326b403e19f23da387009736483119)
+>     $ clang -menable-experimental-extensions -target riscv64-linux-gnu -march=rv64ivzvkned1 -c riscv-crypto/doc/vector/code-samples/zvkned.s
 > 
-> Cheers,
-> Conor.
+> It would be nice to use a real assembler, so that people won't have to worry
+> about potential mistakes or inconsistencies in the perl-based "assembler".  Also
+> keep in mind that if we allow people to compile this code without the real
+> assembler support from the beginning, it might end up staying that way for quite
+> a while in order to avoid breaking the build for people.
 > 
-> > 
-> > [2]
-> > LINK: https://github.com/torvalds/linux/blob/98b1cc82c4affc16f5598d4fa14b1858671b2263/arch/riscv/kernel/cpufeature.c#L575
-> > 
-> > I will still use `Zicclsm` checking in this stage for reviewing. And I will create qemu
-> > branch with Zicclsm enabled feature for testing.
-> > 
+> Ultimately it's up to you though; I think that you and others who have been
+> working on RISC-V crypto can make the best decision about what to do here.  I
+> also don't want this patchset to be delayed waiting for other projects, so maybe
+> that indeed means the perl-based "assembler" needs to be used for now.
+> 
 
-According to https://github.com/riscv/riscv-profiles/blob/main/profiles.adoc,
-Zicclsm means that "main memory supports misaligned loads/stores", but they
-"might execute extremely slowly."
+Just wanted to bump up this discussion again.  In binutils, the vector crypto
+v1.0.0 support was released 4 months ago in 2.41.  See the NEWS file at
+https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=blob_plain;f=binutils/NEWS;hb=refs/heads/binutils-2_41-branch
 
-In general, the vector crypto routines that Jerry is adding assume that
-misaligned vector loads/stores are supported *and* are fast.  I think the kernel
-mustn't register those algorithms if that isn't the case.  Zicclsm sounds like
-the wrong thing to check.  Maybe RISCV_HWPROBE_MISALIGNED_FAST is the right
-thing to check?
+    * The RISC-V port now supports the following new standard extensions:
+      - Zicond (conditional zero instructions)
+      - Zfa (additional floating-point instructions)
+      - Zvbb, Zvbc, Zvkg, Zvkned, Zvknh[ab], Zvksed, Zvksh, Zvkn, Zvknc, Zvkng,
+        Zvks, Zvksc, Zvkg, Zvkt (vector crypto instructions)
 
-BTW, something else I was wondering about is endianness.  Most of the vector
-crypto routines also assume little endian byte order, but I don't see that being
-explicitly checked for anywhere.  Should it be?
+That's every extension listed in the vector crypto v1.0.0 specification
+(https://github.com/riscv/riscv-crypto/releases/download/v1.0.0/riscv-crypto-spec-vector.pdf).
+
+LLVM still has the vector crypto extensions marked as "experimental" extensions.
+However, there is an open pull request to mark them non-experimental:
+https://github.com/llvm/llvm-project/pull/69000
+
+Could we just go ahead and remove riscv.pm, develop with binutils for now, and
+prioritize getting the LLVM support finished?
 
 - Eric
