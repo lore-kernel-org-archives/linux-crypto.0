@@ -1,132 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lK9ornm2"
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB6ABA7;
-	Mon, 20 Nov 2023 19:40:51 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6b87c1edfd5so4119437b3a.1;
-        Mon, 20 Nov 2023 19:40:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700538051; x=1701142851; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IZoBJdbZp36CmyvB8Khs+7svIVR+I1y53CDxKBQCWdg=;
-        b=lK9ornm2E2bqBCgk5CAwDrZm3TqWQu1sxZkjvApiYfR9o6RmydQ9omDpfVRlhiPm43
-         Cf4KmhurMKeQ0TokRCcRpGduSEvn81fkzho75HqS8ph2/K+2kBuruaiZ1RK4if4f99Pj
-         j1jJWJJqtshUClOrlB19m1uGnjF8sC6XPHBiADJNtxUtgfd+Co/rMfAnO2QdbTP2X7cG
-         +LnPUeXiboMlGywJYrvxFwM0IHmbhC+1WDx3pvd5tGbjf8K61jSqsfYp3Qnej5pOYB+N
-         R9297Jbk16Jx7c4RRXdqbxIHjKaaTagO2Vccd4hZJpKHuys+ebtQIhmhPkgHGVuRNHHB
-         PRAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700538051; x=1701142851;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IZoBJdbZp36CmyvB8Khs+7svIVR+I1y53CDxKBQCWdg=;
-        b=bhnAqL12B/7q4gx0ZbJnzZeF6YL9iKVcpN7DaQQlNbxOyKkF0M/9ycjnGiqE3KIqqE
-         1uhQ+67D5B3A04+tq0XsK0dW7JrCjeebg5fe6wgAzwf9vR6cY3PdpeR2cPR74LDyt0Cr
-         6RIoN1/eAEtrVnuwvLbDvQvudeqi5wSpMHt2n++Zq0ijA8dYSLRRu18j9g60NJuRLFH0
-         OIYf3bOtTrlZAxJWVTR2wtO2VRPVS5K9usJKrx4BjBuWQlZLITkKj/FFIhl5Cw/F++BP
-         pOFb/QztCYJpBE/ZmZ4OEq9UTJF6QVju6je0rwHjwxSLTBgbAwWhpwto/EvJxQ6iayDx
-         16sw==
-X-Gm-Message-State: AOJu0Yxeck4mhTp+jp38mRmRTcW+J54RMdz8CQOJtaN8BfDd2je0i1qr
-	iqdDez/WdNE6l3a5d8v6NqgdAetZjRq8kA==
-X-Google-Smtp-Source: AGHT+IFa3t8GraPV4UkdOb+JpXKEhE/IcU4J6HGAQT8ZBsEJNgfkoK6EaFNXIxTkbtYjYbsx8mDvQg==
-X-Received: by 2002:a05:6a21:1446:b0:17d:f127:d435 with SMTP id oc6-20020a056a21144600b0017df127d435mr5724123pzb.45.1700538051158;
-        Mon, 20 Nov 2023 19:40:51 -0800 (PST)
-Received: from localhost.localdomain ([154.85.51.139])
-        by smtp.gmail.com with ESMTPSA id w16-20020a170902d71000b001c61acd5bd2sm6753152ply.112.2023.11.20.19.40.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 19:40:50 -0800 (PST)
-From: Yusong Gao <a869920004@gmail.com>
-To: jarkko@kernel.org,
-	davem@davemloft.net,
-	dhowells@redhat.com,
-	dwmw2@infradead.org,
-	juergh@proton.me,
-	zohar@linux.ibm.com,
-	herbert@gondor.apana.org.au,
-	lists@sapience.com,
-	dimitri.ledkov@canonical.com
-Cc: keyrings@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH v3] sign-file: Fix incorrect return values check
-Date: Tue, 21 Nov 2023 03:40:44 +0000
-Message-Id: <20231121034044.847642-1-a869920004@gmail.com>
-X-Mailer: git-send-email 2.34.1
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 959BEC8
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2023 00:04:26 -0800 (PST)
+X-ASG-Debug-ID: 1700553863-1eb14e538c1b410001-Xm9f1P
+Received: from ZXSHMBX2.zhaoxin.com (ZXSHMBX2.zhaoxin.com [10.28.252.164]) by mx2.zhaoxin.com with ESMTP id mfwIhfALunJr26Ki (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Tue, 21 Nov 2023 16:04:23 +0800 (CST)
+X-Barracuda-Envelope-From: LeoLiu-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
+Received: from ZXBJMBX02.zhaoxin.com (10.29.252.6) by ZXSHMBX2.zhaoxin.com
+ (10.28.252.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 21 Nov
+ 2023 16:04:22 +0800
+Received: from [192.168.1.204] (125.76.214.122) by ZXBJMBX02.zhaoxin.com
+ (10.29.252.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 21 Nov
+ 2023 16:04:20 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
+Message-ID: <49da551d-a43c-48b8-af31-965103a390ec@zhaoxin.com>
+X-Barracuda-RBL-Trusted-Forwarder: 192.168.1.204
+Date: Tue, 21 Nov 2023 16:04:19 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] crypto: x86/sm2 -add Zhaoxin SM2 algorithm
+ implementation
+To: Dave Hansen <dave.hansen@intel.com>, kernel test robot <lkp@intel.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<x86@kernel.org>, <hpa@zytor.com>, <seanjc@google.com>,
+	<kim.phillips@amd.com>, <pbonzini@redhat.com>, <babu.moger@amd.com>,
+	<jiaxi.chen@linux.intel.com>, <jmattson@google.com>,
+	<pawan.kumar.gupta@linux.intel.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+X-ASG-Orig-Subj: Re: [PATCH v2] crypto: x86/sm2 -add Zhaoxin SM2 algorithm
+ implementation
+CC: <oe-kbuild-all@lists.linux.dev>, <CobeChen@zhaoxin.com>,
+	<TonyWWang@zhaoxin.com>, <YunShen@zhaoxin.com>, <Leoliu@zhaoxin.com>
+References: <20231115071724.575356-1-LeoLiu-oc@zhaoxin.com>
+ <202311160022.csCILGmA-lkp@intel.com>
+ <541fff8a-ad8f-43f5-9a44-c64302698029@intel.com>
+From: LeoLiu-oc <leoliu-oc@zhaoxin.com>
+In-Reply-To: <541fff8a-ad8f-43f5-9a44-c64302698029@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [125.76.214.122]
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ ZXBJMBX02.zhaoxin.com (10.29.252.6)
+X-Barracuda-Connect: ZXSHMBX2.zhaoxin.com[10.28.252.164]
+X-Barracuda-Start-Time: 1700553863
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 973
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.117045
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-There are some wrong return values check in sign-file when call OpenSSL
-API. The ERR() check cond is wrong because of the program only check the
-return value is < 0 instead of <= 0. For example:
-1. CMS_final() return 1 for success or 0 for failure.
-2. i2d_CMS_bio_stream() returns 1 for success or 0 for failure.
-3. i2d_TYPEbio() return 1 for success and 0 for failure.
-4. BIO_free() return 1 for success and 0 for failure.
 
-Link: https://www.openssl.org/docs/manmaster/man3/
-Fixes: e5a2e3c84782 ("scripts/sign-file.c: Add support for signing with a raw signature")
 
-Signed-off-by: Yusong Gao <a869920004@gmail.com>
----
-V1, V2: Clarify the description of git message.
----
- scripts/sign-file.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+在 2023/11/16 3:21, Dave Hansen 写道:
+> 
+>> vim +/asm +43 arch/x86/crypto/sm2-zhaoxin-gmi_glue.c
+>>
+>>      35	
+>>      36	/* Zhaoxin sm2 verify function */
+>>      37	static inline int zhaoxin_gmi_sm2_verify(unsigned char *key, unsigned char *hash, unsigned char *sig,
+>>      38					unsigned char *scratch)
+>>      39	{
+>>      40		uint64_t cword, f_ok;
+>>      41		cword = (uint64_t)0x8;
+>>      42	
+>>    > 43		asm(".byte 0xf2, 0x0f, 0xa6, 0xc0"
+>>      44			:"=c"(f_ok), "+a"(hash), "+b"(key), "+d"(cword), "+S"(scratch), "+D"(sig));
+>>      45	
+>>      46		return f_ok;
+>>      47	}
+>>      48	
+> 
+> When you go fix your compile error, can you please look around the tree
+> and see what folks do for replacing .byte?  AS_SHA1_NI, for example.
 
-diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-index 598ef5465f82..dcebbcd6bebd 100644
---- a/scripts/sign-file.c
-+++ b/scripts/sign-file.c
-@@ -322,7 +322,7 @@ int main(int argc, char **argv)
- 				     CMS_NOSMIMECAP | use_keyid |
- 				     use_signed_attrs),
- 		    "CMS_add1_signer");
--		ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) < 0,
-+		ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) <= 0,
- 		    "CMS_final");
- 
- #else
-@@ -341,10 +341,10 @@ int main(int argc, char **argv)
- 			b = BIO_new_file(sig_file_name, "wb");
- 			ERR(!b, "%s", sig_file_name);
- #ifndef USE_PKCS7
--			ERR(i2d_CMS_bio_stream(b, cms, NULL, 0) < 0,
-+			ERR(i2d_CMS_bio_stream(b, cms, NULL, 0) <= 0,
- 			    "%s", sig_file_name);
- #else
--			ERR(i2d_PKCS7_bio(b, pkcs7) < 0,
-+			ERR(i2d_PKCS7_bio(b, pkcs7) <= 0,
- 			    "%s", sig_file_name);
- #endif
- 			BIO_free(b);
-@@ -374,9 +374,9 @@ int main(int argc, char **argv)
- 
- 	if (!raw_sig) {
- #ifndef USE_PKCS7
--		ERR(i2d_CMS_bio_stream(bd, cms, NULL, 0) < 0, "%s", dest_name);
-+		ERR(i2d_CMS_bio_stream(bd, cms, NULL, 0) <= 0, "%s", dest_name);
- #else
--		ERR(i2d_PKCS7_bio(bd, pkcs7) < 0, "%s", dest_name);
-+		ERR(i2d_PKCS7_bio(bd, pkcs7) <= 0, "%s", dest_name);
- #endif
- 	} else {
- 		BIO *b;
-@@ -396,7 +396,7 @@ int main(int argc, char **argv)
- 	ERR(BIO_write(bd, &sig_info, sizeof(sig_info)) < 0, "%s", dest_name);
- 	ERR(BIO_write(bd, magic_number, sizeof(magic_number) - 1) < 0, "%s", dest_name);
- 
--	ERR(BIO_free(bd) < 0, "%s", dest_name);
-+	ERR(BIO_free(bd) <= 0, "%s", dest_name);
- 
- 	/* Finally, if we're signing in place, replace the original. */
- 	if (replace_orig)
--- 
-2.34.1
+Thank you for your advice. We have found the root cause of the compile 
+error and conducted detailed testing again. A corrected version will be 
+released soon.
+
+Sincerely.
+Leoliu-oc
+
+
 
