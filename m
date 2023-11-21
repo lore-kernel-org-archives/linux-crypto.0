@@ -1,23 +1,45 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 959BEC8
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2023 00:04:26 -0800 (PST)
-X-ASG-Debug-ID: 1700553863-1eb14e538c1b410001-Xm9f1P
-Received: from ZXSHMBX2.zhaoxin.com (ZXSHMBX2.zhaoxin.com [10.28.252.164]) by mx2.zhaoxin.com with ESMTP id mfwIhfALunJr26Ki (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Tue, 21 Nov 2023 16:04:23 +0800 (CST)
-X-Barracuda-Envelope-From: LeoLiu-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-Received: from ZXBJMBX02.zhaoxin.com (10.29.252.6) by ZXSHMBX2.zhaoxin.com
- (10.28.252.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 21 Nov
- 2023 16:04:22 +0800
-Received: from [192.168.1.204] (125.76.214.122) by ZXBJMBX02.zhaoxin.com
- (10.29.252.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 21 Nov
- 2023 16:04:20 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-Message-ID: <49da551d-a43c-48b8-af31-965103a390ec@zhaoxin.com>
-X-Barracuda-RBL-Trusted-Forwarder: 192.168.1.204
-Date: Tue, 21 Nov 2023 16:04:19 +0800
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tm6j2nNV"
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1768B100
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2023 01:04:50 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-9ff26d7c0a6so222153666b.2
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2023 01:04:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1700557488; x=1701162288; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GukcAJTXaEcK6cCKjc0EvDHkgaKB4BbuYgEOBg/XBvk=;
+        b=tm6j2nNV0iVM11tZBJ23GzOS36mEo+Ze0iZzzPslYhu8WxMLMyn+JqAYOpVY/e6PCm
+         TEnn8P7udM9CzkY1gq8N0gGVG3xkaQ1AyjpRVlEQXFh5LWXkdz9sfaVwCpL/OjZd/78V
+         xpV8a4sxKnC1Y+aZ2JuSQ91NHCo7j5N3YSudmNxpxTS9p4e64C3vLhccFPu46Oe8nFgd
+         CKF3dadtaGxCVuYEYOYQfBclACjycjAf4CtbYwfLWrrIEsusIYJKIgvk1y8nuw0DBx9e
+         AnFOEnzgEW07Jn/tvhcdpEgwrxYC4vuMZCT5ncM9bRmOLX7zfkXW+N4zKm6SZW3l6+x2
+         vSug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700557488; x=1701162288;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GukcAJTXaEcK6cCKjc0EvDHkgaKB4BbuYgEOBg/XBvk=;
+        b=XVKt9yVWyrvIbNyiIyzuYxdp8Djx29gXc8nRdZWkFVndkR0dE9N00tTiQcGjJ93Hir
+         nV7JUcx7lOFLWLZJCSmVQreqMOKbypzRWILzIrMiwL4cUhp/5kAzqRIUUN8cDVYgMWL5
+         iUzu7RvauonsTC5VqufkjxZJ69agI+ur6d2Ga83qQgauCBZOzTlGTPnyMIBO6rbzluPQ
+         dxOeiEKdtb2iLOuYhxWvrUy9WZfJALE5u+RWZMTr6Mn4QFqwp5/5da3GdzidQrrHd5xw
+         mGstVldcsoBVb0bsazXW61clpZkFvJQ0UNdQoQ4c1mP/B5dyRQScNB0onPHI95FYcL0m
+         ZARw==
+X-Gm-Message-State: AOJu0Yxw7hxbuhE3GLEI+VwKUQmf1e7PuXArXCRZ1p/1NBkZIy9RMSfZ
+	XakHQ68JpbdyGoCCzn0pzZ/K1A==
+X-Google-Smtp-Source: AGHT+IFw/fChnLtQDrJ85x+SlOQmSaBGi00oWSh52e0vhvjTdVwRpkmxeJQ8shyJVIBFhhmtWclQ9w==
+X-Received: by 2002:a17:906:5185:b0:9e4:6500:7540 with SMTP id y5-20020a170906518500b009e465007540mr7789843ejk.58.1700557488426;
+        Tue, 21 Nov 2023 01:04:48 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.11])
+        by smtp.gmail.com with ESMTPSA id w17-20020a170906481100b009fc576e26e6sm2952926ejq.80.2023.11.21.01.04.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Nov 2023 01:04:48 -0800 (PST)
+Message-ID: <8eba3bf9-6736-41a0-a799-2eac53ab75b4@linaro.org>
+Date: Tue, 21 Nov 2023 10:04:45 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -25,75 +47,105 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] crypto: x86/sm2 -add Zhaoxin SM2 algorithm
- implementation
-To: Dave Hansen <dave.hansen@intel.com>, kernel test robot <lkp@intel.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, <hpa@zytor.com>, <seanjc@google.com>,
-	<kim.phillips@amd.com>, <pbonzini@redhat.com>, <babu.moger@amd.com>,
-	<jiaxi.chen@linux.intel.com>, <jmattson@google.com>,
-	<pawan.kumar.gupta@linux.intel.com>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-X-ASG-Orig-Subj: Re: [PATCH v2] crypto: x86/sm2 -add Zhaoxin SM2 algorithm
- implementation
-CC: <oe-kbuild-all@lists.linux.dev>, <CobeChen@zhaoxin.com>,
-	<TonyWWang@zhaoxin.com>, <YunShen@zhaoxin.com>, <Leoliu@zhaoxin.com>
-References: <20231115071724.575356-1-LeoLiu-oc@zhaoxin.com>
- <202311160022.csCILGmA-lkp@intel.com>
- <541fff8a-ad8f-43f5-9a44-c64302698029@intel.com>
-From: LeoLiu-oc <leoliu-oc@zhaoxin.com>
-In-Reply-To: <541fff8a-ad8f-43f5-9a44-c64302698029@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [125.76.214.122]
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- ZXBJMBX02.zhaoxin.com (10.29.252.6)
-X-Barracuda-Connect: ZXSHMBX2.zhaoxin.com[10.28.252.164]
-X-Barracuda-Start-Time: 1700553863
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 973
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.117045
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+Subject: Re: [PATCH 1/6] dt-bindings: crypto: add support for
+ rockchip,crypto-rk3588
+Content-Language: en-US
+To: Corentin LABBE <clabbe@baylibre.com>
+Cc: davem@davemloft.net, heiko@sntech.de, herbert@gondor.apana.org.au,
+ krzysztof.kozlowski+dt@linaro.org, mturquette@baylibre.com,
+ p.zabel@pengutronix.de, robh+dt@kernel.org, sboyd@kernel.org,
+ ricardo@pardini.net, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rockchip@lists.infradead.org
+References: <20231107155532.3747113-1-clabbe@baylibre.com>
+ <20231107155532.3747113-2-clabbe@baylibre.com>
+ <97ae9fa0-0a6c-41d2-8a6c-1706b920d7ea@linaro.org> <ZVtS7YBhhtqCQX8w@Red>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <ZVtS7YBhhtqCQX8w@Red>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 20/11/2023 13:37, Corentin LABBE wrote:
 
-
-在 2023/11/16 3:21, Dave Hansen 写道:
-> 
->> vim +/asm +43 arch/x86/crypto/sm2-zhaoxin-gmi_glue.c
+>>> diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml
+>>> new file mode 100644
+>>> index 000000000000..07024cf4fb0e
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml
+>>> @@ -0,0 +1,65 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/crypto/rockchip,rk3588-crypto.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: Rockchip cryptographic offloader V2
 >>
->>      35	
->>      36	/* Zhaoxin sm2 verify function */
->>      37	static inline int zhaoxin_gmi_sm2_verify(unsigned char *key, unsigned char *hash, unsigned char *sig,
->>      38					unsigned char *scratch)
->>      39	{
->>      40		uint64_t cword, f_ok;
->>      41		cword = (uint64_t)0x8;
->>      42	
->>    > 43		asm(".byte 0xf2, 0x0f, 0xa6, 0xc0"
->>      44			:"=c"(f_ok), "+a"(hash), "+b"(key), "+d"(cword), "+S"(scratch), "+D"(sig));
->>      45	
->>      46		return f_ok;
->>      47	}
->>      48	
+>> v2? Where is any documentation of this versioning? From where does it
+>> come from?
+>>
 > 
-> When you go fix your compile error, can you please look around the tree
-> and see what folks do for replacing .byte?  AS_SHA1_NI, for example.
+> Hello
+> 
+> Datasheet/TRM has no naming or codename.
+> But vendor source call it crypto v2, so I kept the name.
 
-Thank you for your advice. We have found the root cause of the compile 
-error and conducted detailed testing again. A corrected version will be 
-released soon.
+I would suggest using information from datasheet/manual or just SoC
+name, so:
 
-Sincerely.
-Leoliu-oc
+Rockchip RK3588 Cryptographic Offloader
+
+How can you be sure that downstream source used v2 for hardware, not
+driver? Poor-quality downstream source is rarely a source of proper
+solution...
 
 
+
+Best regards,
+Krzysztof
 
