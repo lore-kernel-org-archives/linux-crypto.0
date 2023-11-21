@@ -1,315 +1,130 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="eVwqUMJq"
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1FE2112;
-	Tue, 21 Nov 2023 08:22:41 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0FE4A40E0031;
-	Tue, 21 Nov 2023 16:22:39 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id oGV3VnjCGa0l; Tue, 21 Nov 2023 16:22:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1700583756; bh=KxtFZyD5p+0QcjGE2q3dM11exyBdBO+J4w/uEQye0ts=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eVwqUMJqsVBloXiFRt+258PJZFxtbn4wup872Xc1eoqsrYQJz+sNNzMfmerWNy9Ye
-	 gJS9fWp4qQRzMrP/8h2ZCNfdu0EyfGQjIx/4dXPX/YYQ+/s5+bhQQsWsxBhwnzpteO
-	 sRlbZz6JKXOrk4JPgu3m9+bf2ulEoQJyAGr5xRvZQv3QffnTgXrj8i/6DT0ZD2MMCG
-	 a7F/anwpZmcKO4rgvu/vfInEj0icBwTmo9dyjASF19D5fWnlRnQz7gZvEixvsDzY7I
-	 dMsaKp1tq3jRgTCizTvL2E/10HFgE27HT64RIbLAM76/wiXAiLf2iHI0OsvDfS+AkY
-	 FVrgvhJjTphltPocEVyzTEoq+YCP8d3m/cg6cPLIKRBGPJmmWlWR8TutanG6QMYtDL
-	 /7lFAyeO4IZ3hZgxOlAEZQn0kff60spdv8O8ugxapdgUvPqiXzKrjSAJ40sOUl3Say
-	 P1+0IsBOsneK/9T2yy2gTJ/7e8OIgsBU7bM+HJbyGHb3kKm97uMyq8UAcGfVnYG6M4
-	 YPInq/u+smERJV4XSqxngcedV06ZTkID1BHdNOqgucK9mlKQLChBTKtiGAheZNy7jM
-	 x7+ghE5Nr1+wm+4Rn3W12IJbzDp+jqAnUCfodqx+BMXrNfZ21JeHa/naTZq8kOfIU6
-	 bJClC6oA6/aymqRh/j5YGUlg=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6FCF940E0032;
-	Tue, 21 Nov 2023 16:21:55 +0000 (UTC)
-Date: Tue, 21 Nov 2023 17:21:49 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, marcorr@google.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 11/50] x86/sev: Add helper functions for RMPUPDATE
- and PSMASH instruction
-Message-ID: <20231121162149.GFZVzZHQB1g2bdvJie@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-12-michael.roth@amd.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZGpYHbMm"
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B842412C
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2023 09:16:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700586984; x=1732122984;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=378f8ZfeWKP+BLdvDXl3gC8NgLBp3YBizx6o3f+VOg4=;
+  b=ZGpYHbMmynsF8UuAYvO/5k9gKGdTUBNfSbwJ7AysPb60gjau8R0O0AcF
+   t/cBYSNZheLtITjceS1fZs7O1efINEzn1eztAQM5iu3rGYyj0eCVsKABD
+   8aWZ8URhjCy8uIe5IFsuW9kAKCYfNSA3pgzWqkSRJplQzeS2hJ2i4QwUJ
+   9PdKDZfp5WCmikIqKvXYTK+Hk2xVEnKXrRbJlHVwbQorATZg5ILF3eVVp
+   Q9ZZupfKz4uRtln1bHk9VrwPgf/ozI/k7zE9B5p2Lrc0HwW/83e3UjuOv
+   rQzrPpWxaALi0Y3ntDlfDXcdIMRQqkP6LoxfDGS4mtkuAAUbsTWOaBeLJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="5081530"
+X-IronPort-AV: E=Sophos;i="6.04,216,1695711600"; 
+   d="scan'208";a="5081530"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 09:16:24 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="940159258"
+X-IronPort-AV: E=Sophos;i="6.04,216,1695711600"; 
+   d="scan'208";a="940159258"
+Received: from r031s002_zp31l10c01.deacluster.intel.com (HELO localhost.localdomain) ([10.219.171.29])
+  by orsmga005.jf.intel.com with ESMTP; 21 Nov 2023 09:16:22 -0800
+From: Damian Muszynski <damian.muszynski@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Damian Muszynski <damian.muszynski@intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Ahsan Atta <ahsan.atta@intel.com>
+Subject: [PATCH] crypto: qat - add sysfs_added flag for ras
+Date: Tue, 21 Nov 2023 17:59:45 +0100
+Message-ID: <20231121170046.8097-1-damian.muszynski@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-12-michael.roth@amd.com>
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 16, 2023 at 08:27:40AM -0500, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> The RMPUPDATE instruction writes a new RMP entry in the RMP Table. The
-> hypervisor will use the instruction to add pages to the RMP table. See
-> APM3 for details on the instruction operations.
-> 
-> The PSMASH instruction expands a 2MB RMP entry into a corresponding set
-> of contiguous 4KB-Page RMP entries. The hypervisor will use this
+The qat_ras sysfs attribute group is registered within the
+adf_dev_start() function, alongside other driver components.
+If any of the functions preceding the group registration fails,
+the adf_dev_start() function returns, and the caller, to undo the
+operation, invokes adf_dev_stop() followed by adf_dev_shutdown().
+However, the current flow lacks information about whether the
+registration of the qat_ras attribute group was successful or not.
 
-s/-Page//
+In cases where this condition is encountered, an error similar to
+the following might be reported:
 
-> instruction to adjust the RMP entry without invalidating the previous
-> RMP entry.
+    4xxx 0000:6b:00.0: Starting device qat_dev0
+    4xxx 0000:6b:00.0: qat_dev0 started 9 acceleration engines
+    4xxx 0000:6b:00.0: Failed to send init message
+    4xxx 0000:6b:00.0: Failed to start device qat_dev0
+    sysfs group 'qat_ras' not found for kobject '0000:6b:00.0'
+    ...
+    sysfs_remove_groups+0x29/0x50
+    adf_sysfs_stop_ras+0x4b/0x80 [intel_qat]
+    adf_dev_stop+0x43/0x1d0 [intel_qat]
+    adf_dev_down+0x4b/0x150 [intel_qat]
+    ...
+    4xxx 0000:6b:00.0: qat_dev0 stopped 9 acceleration engines
+    4xxx 0000:6b:00.0: Resetting device qat_dev0
 
-"... without invalidating it."
+To prevent attempting to remove attributes from a group that has not
+been added yet, a flag named 'sysfs_added' is introduced. This flag
+is set to true upon the successful registration of the attribute group.
 
-This below is useless text in the commit message - that should be all
-visible from the patch itself.
+Fixes: 532d7f6bc458 ("crypto: qat - add error counters")
+Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
+---
+ drivers/crypto/intel/qat/qat_common/adf_accel_devices.h    | 1 +
+ .../crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c   | 7 ++++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-> Add the following external interface API functions:
-> 
-> psmash(): Used to smash a 2MB aligned page into 4K pages while
-> preserving the Validated bit in the RMP.
-> 
-> rmp_make_private(): Used to assign a page to guest using the RMPUPDATE
-> instruction.
-> 
-> rmp_make_shared(): Used to transition a page to hypervisor/shared
-> state using the RMPUPDATE instruction.
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+index 4ff5729a3496..9d5fdd529a2e 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+@@ -92,6 +92,7 @@ enum ras_errors {
+ 
+ struct adf_error_counters {
+ 	atomic_t counter[ADF_RAS_ERRORS];
++	bool sysfs_added;
+ 	bool enabled;
+ };
+ 
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c b/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c
+index cffe2d722995..e97c67c87b3c 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c
+@@ -99,6 +99,8 @@ void adf_sysfs_start_ras(struct adf_accel_dev *accel_dev)
+ 	if (device_add_group(&GET_DEV(accel_dev), &qat_ras_group))
+ 		dev_err(&GET_DEV(accel_dev),
+ 			"Failed to create qat_ras attribute group.\n");
++
++	accel_dev->ras_errors.sysfs_added = true;
+ }
+ 
+ void adf_sysfs_stop_ras(struct adf_accel_dev *accel_dev)
+@@ -106,7 +108,10 @@ void adf_sysfs_stop_ras(struct adf_accel_dev *accel_dev)
+ 	if (!accel_dev->ras_errors.enabled)
+ 		return;
+ 
+-	device_remove_group(&GET_DEV(accel_dev), &qat_ras_group);
++	if (accel_dev->ras_errors.sysfs_added) {
++		device_remove_group(&GET_DEV(accel_dev), &qat_ras_group);
++		accel_dev->ras_errors.sysfs_added = false;
++	}
+ 
+ 	ADF_RAS_ERR_CTR_CLEAR(accel_dev->ras_errors);
+ }
 
-> 
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-
-Since Brijesh is the author, first comes his SOB, then Ashish's and then
-yours.
-
-> [mdr: add RMPUPDATE retry logic for transient FAIL_OVERLAP errors]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/include/asm/sev-common.h | 14 +++++
->  arch/x86/include/asm/sev-host.h   | 10 ++++
->  arch/x86/virt/svm/sev.c           | 89 +++++++++++++++++++++++++++++++
->  3 files changed, 113 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-> index 1e6fb93d8ab0..93ec8c12c91d 100644
-> --- a/arch/x86/include/asm/sev-common.h
-> +++ b/arch/x86/include/asm/sev-common.h
-> @@ -173,8 +173,22 @@ struct snp_psc_desc {
->  #define GHCB_ERR_INVALID_INPUT		5
->  #define GHCB_ERR_INVALID_EVENT		6
->  
-> +/* RMUPDATE detected 4K page and 2MB page overlap. */
-> +#define RMPUPDATE_FAIL_OVERLAP		4
-> +
->  /* RMP page size */
->  #define RMP_PG_SIZE_4K			0
-> +#define RMP_PG_SIZE_2M			1
-
-RMP_PG_LEVEL_2M
-
->  #define RMP_TO_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
-> +#define X86_TO_RMP_PG_LEVEL(level)	(((level) == PG_LEVEL_4K) ? RMP_PG_SIZE_4K : RMP_PG_SIZE_2M)
-> +
-> +struct rmp_state {
-> +	u64 gpa;
-> +	u8 assigned;
-> +	u8 pagesize;
-> +	u8 immutable;
-> +	u8 rsvd;
-> +	u32 asid;
-> +} __packed;
->  
->  #endif
-> diff --git a/arch/x86/include/asm/sev-host.h b/arch/x86/include/asm/sev-host.h
-> index bb06c57f2909..1df989411334 100644
-> --- a/arch/x86/include/asm/sev-host.h
-> +++ b/arch/x86/include/asm/sev-host.h
-> @@ -16,9 +16,19 @@
->  #ifdef CONFIG_KVM_AMD_SEV
->  int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level);
->  void sev_dump_hva_rmpentry(unsigned long address);
-> +int psmash(u64 pfn);
-> +int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
-> +int rmp_make_shared(u64 pfn, enum pg_level level);
->  #else
->  static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return -ENXIO; }
->  static inline void sev_dump_hva_rmpentry(unsigned long address) {}
-> +static inline int psmash(u64 pfn) { return -ENXIO; }
-> +static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid,
-> +				   bool immutable)
-> +{
-> +	return -ENXIO;
-> +}
-> +static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENXIO; }
->  #endif
->  
->  #endif
-> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> index cac3e311c38f..24a695af13a5 100644
-> --- a/arch/x86/virt/svm/sev.c
-> +++ b/arch/x86/virt/svm/sev.c
-> @@ -367,3 +367,92 @@ void sev_dump_hva_rmpentry(unsigned long hva)
->  	sev_dump_rmpentry(pte_pfn(*pte));
->  }
->  EXPORT_SYMBOL_GPL(sev_dump_hva_rmpentry);
-> +
-> +/*
-> + * PSMASH a 2MB aligned page into 4K pages in the RMP table while preserving the
-> + * Validated bit.
-> + */
-> +int psmash(u64 pfn)
-> +{
-> +	unsigned long paddr = pfn << PAGE_SHIFT;
-> +	int ret;
-> +
-> +	pr_debug("%s: PFN: 0x%llx\n", __func__, pfn);
-
-Left over?
-
-> +
-> +	if (!pfn_valid(pfn))
-> +		return -EINVAL;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return -ENXIO;
-
-That needs to happen first in the function.
-
-> +
-> +	/* Binutils version 2.36 supports the PSMASH mnemonic. */
-> +	asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"
-> +		      : "=a"(ret)
-> +		      : "a"(paddr)
-
-Add an empty space between the " and the (
-
-> +		      : "memory", "cc");
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(psmash);
-> +
-> +static int rmpupdate(u64 pfn, struct rmp_state *val)
-
-rmp_state *state
-
-so that it is clear what this is.
-
-> +{
-> +	unsigned long paddr = pfn << PAGE_SHIFT;
-> +	int ret, level, npages;
-> +	int attempts = 0;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return -ENXIO;
-> +
-> +	do {
-> +		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
-> +		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
-> +			     : "=a"(ret)
-> +			     : "a"(paddr), "c"((unsigned long)val)
-
-Add an empty space between the " and the (
-
-> +			     : "memory", "cc");
-> +
-> +		attempts++;
-> +	} while (ret == RMPUPDATE_FAIL_OVERLAP);
-
-What's the logic here? Loop as long as it says "overlap"?
-
-How "transient" is that overlapping condition?
-
-What's the upper limit of that loop?
-
-This loop should check a generously chosen upper limit of attempts and
-then break if that limit is reached.
-
-> +	if (ret) {
-> +		pr_err("RMPUPDATE failed after %d attempts, ret: %d, pfn: %llx, npages: %d, level: %d\n",
-> +		       attempts, ret, pfn, npages, level);
-
-You're dumping here uninitialized stack variables npages and level.
-Looks like leftover from some prior version of this function.
-
-> +		sev_dump_rmpentry(pfn);
-> +		dump_stack();
-
-This is going to become real noisy on a huge machine with a lot of SNP
-guests.
-
-> +		return -EFAULT;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Assign a page to guest using the RMPUPDATE instruction.
-> + */
-
-One-line comment works too.
-
-/* Assign ... */
-
-> +int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable)
-> +{
-> +	struct rmp_state val;
-> +
-> +	memset(&val, 0, sizeof(val));
-> +	val.assigned = 1;
-> +	val.asid = asid;
-> +	val.immutable = immutable;
-> +	val.gpa = gpa;
-> +	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
-> +
-> +	return rmpupdate(pfn, &val);
-> +}
-> +EXPORT_SYMBOL_GPL(rmp_make_private);
-> +
-> +/*
-> + * Transition a page to hypervisor/shared state using the RMPUPDATE instruction.
-> + */
-
-Ditto.
-
-> +int rmp_make_shared(u64 pfn, enum pg_level level)
-> +{
-> +	struct rmp_state val;
-> +
-> +	memset(&val, 0, sizeof(val));
-> +	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
-> +
-> +	return rmpupdate(pfn, &val);
-> +}
-> +EXPORT_SYMBOL_GPL(rmp_make_shared);
-> -- 
-
-Thx.
-
+base-commit: f36285cc1e99472bb4c6741981594a5934ad4c4e
+prerequisite-patch-id: 1375fd7754ab07f7e90594b4f4893487400a7052
 -- 
-Regards/Gruss,
-    Boris.
+2.41.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
