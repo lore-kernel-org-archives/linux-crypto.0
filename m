@@ -1,142 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BFF2D6F;
-	Tue, 21 Nov 2023 05:43:55 -0800 (PST)
-Received: from dggpemd200003.china.huawei.com (unknown [172.30.72.56])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SZQTC07mWzMnGF;
-	Tue, 21 Nov 2023 21:39:11 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- dggpemd200003.china.huawei.com (7.185.36.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1258.28; Tue, 21 Nov 2023 21:43:53 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<shenyang39@huawei.com>
-Subject: [PATCH fot-next] hisilicon/zip: Add ZIP comp high perf configuration
-Date: Tue, 21 Nov 2023 21:40:24 +0800
-Message-ID: <20231121134024.114476-1-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.30.0
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="gEyYscIO"
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A41122;
+	Tue, 21 Nov 2023 07:24:45 -0800 (PST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A375A40E0031;
+	Tue, 21 Nov 2023 15:24:42 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id drDDm86i-tax; Tue, 21 Nov 2023 15:24:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1700580279; bh=a0pSPzA4YzTjhILwwoujLhIc7aMp0osSFxqzbXIqYJc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gEyYscIOlX6+wyUppG5aTmb6ifnJpO9nqTc0YTlouPrLhK9NAlxcWGTglO5rpeW6a
+	 bPcq5i/0niDSIOGT4mQauo0ENmzaaTj1DgMApeINw4U1TuJDE/1IaqXHcNtRXvWVXA
+	 qxH3Ii9pnyJbUuUdiuLQoMr6J/0zRA9aumcdAJlk2VXdKfXrAzagDWe/enfYKdExhe
+	 kKjUONYwdQFMBnxqYRjHp9iTJR8TGIsZZSlWgzt/cLUVxs2Pp7E/xiggcwqgt+EG2r
+	 cBcedfdVjpCkfj8Yjbz/ycV3bRmEZLj5xhttCFGXJUXyRHp6n6xCuvl8+lqjRu92Ta
+	 aq8afF6OGmHMezir7DLVbWUAqasz+ysaFXsr6mHpuRprlXnkNZkiVkPfe3WFGN59g/
+	 PWWyqSbHNsAfJ9rEw7Tqsuc3a7aUu1GwpCuYoJKubCKKRfDjxz2l8YX4XwTKFJwMAK
+	 JFj0WHiXG5IZHiULgNY3o6AgoOeZuRnR7BH1+mi9TkM72GEU5Yny/jZBBd/fmjzRmW
+	 cJlbQvZUn3jxKQWGYbbMk775n5JLr5rsFp+Zq35/Xf/v2iPQz1QMhM5A5+Xp+xflNH
+	 LCfNhTvSX9oITztDnJ3LbmrKDnkWHdchEfngAF8tkpV7OSyXb4XyLlCdS3/ZQWyrJ6
+	 Wsj0dt1yUXgUUysRR3z5d3io=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1ED0040E01AD;
+	Tue, 21 Nov 2023 15:24:00 +0000 (UTC)
+Date: Tue, 21 Nov 2023 16:23:53 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+	tony.luck@intel.com, marcorr@google.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com
+Subject: Re: [PATCH v10 10/50] x86/fault: Report RMP page faults for kernel
+ addresses
+Message-ID: <20231121152353.GEZVzLiUK7HY+2eRg0@fat_crate.local>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-11-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.2]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemd200003.china.huawei.com (7.185.36.122)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231016132819.1002933-11-michael.roth@amd.com>
 
-To meet specific application scenarios, the function of switching between
-the high performance mode and the high compression mode is added.
+On Mon, Oct 16, 2023 at 08:27:39AM -0500, Michael Roth wrote:
+> RMP #PFs on kernel addresses are fatal and should never happen in
 
-Use the perf_mode=0/1 configuration to set the compression high-perf mode,
-0(default, high compression mode), 1(high performance mode).
+s/#PFs/faults/
 
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
----
- drivers/crypto/hisilicon/zip/zip_main.c | 64 +++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
-
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index d6672b777efc..4309cfb41374 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -107,6 +107,14 @@
- #define HZIP_CLOCK_GATED_EN		(HZIP_CORE_GATED_EN | \
- 					 HZIP_CORE_GATED_OOO_EN)
- 
-+/* zip comp high performance */
-+#define HZIP_HIGH_PERF_OFFSET		0x301208
-+
-+enum {
-+	HZIP_HIGH_COMP_RATE,
-+	HZIP_HIGH_COMP_PERF,
-+};
-+
- static const char hisi_zip_name[] = "hisi_zip";
- static struct dentry *hzip_debugfs_root;
- 
-@@ -352,6 +360,36 @@ static int hzip_diff_regs_show(struct seq_file *s, void *unused)
- 	return 0;
- }
- DEFINE_SHOW_ATTRIBUTE(hzip_diff_regs);
-+
-+static int perf_mode_set(const char *val, const struct kernel_param *kp)
-+{
-+	int ret;
-+	u32 n;
-+
-+	if (!val)
-+		return -EINVAL;
-+
-+	ret = kstrtou32(val, 10, &n);
-+	if (ret != 0 || (n != HZIP_HIGH_COMP_PERF &&
-+			 n != HZIP_HIGH_COMP_RATE))
-+		return -EINVAL;
-+
-+	return param_set_int(val, kp);
-+}
-+
-+static const struct kernel_param_ops zip_com_perf_ops = {
-+	.set = perf_mode_set,
-+	.get = param_get_int,
-+};
-+
-+/*
-+ * perf_mode = 0 means enable high compression rate mode,
-+ * perf_mode = 1 means enable high compression performance mode.
-+ */
-+static u32 perf_mode = HZIP_HIGH_COMP_RATE;
-+module_param_cb(perf_mode, &zip_com_perf_ops, &perf_mode, 0444);
-+MODULE_PARM_DESC(perf_mode, "ZIP high perf mode 0(default), 1(enable)");
-+
- static const struct kernel_param_ops zip_uacce_mode_ops = {
- 	.set = uacce_mode_set,
- 	.get = param_get_int,
-@@ -417,6 +455,28 @@ bool hisi_zip_alg_support(struct hisi_qm *qm, u32 alg)
- 	return false;
- }
- 
-+static int hisi_zip_set_high_perf(struct hisi_qm *qm)
-+{
-+	u32 val;
-+	int ret;
-+
-+	val = readl_relaxed(qm->io_base + HZIP_HIGH_PERF_OFFSET);
-+	if (perf_mode == HZIP_HIGH_COMP_PERF)
-+		val |= HZIP_HIGH_COMP_PERF;
-+	else
-+		val &= ~HZIP_HIGH_COMP_PERF;
-+
-+	/* Set perf mode */
-+	writel(val, qm->io_base + HZIP_HIGH_PERF_OFFSET);
-+	ret = readl_relaxed_poll_timeout(qm->io_base + HZIP_HIGH_PERF_OFFSET,
-+					 val, val == perf_mode, HZIP_DELAY_1_US,
-+					 HZIP_POLL_TIMEOUT_US);
-+	if (ret)
-+		pci_err(qm->pdev, "failed to set perf mode\n");
-+
-+	return ret;
-+}
-+
- static int hisi_zip_set_qm_algs(struct hisi_qm *qm)
- {
- 	struct device *dev = &qm->pdev->dev;
-@@ -1115,6 +1175,10 @@ static int hisi_zip_pf_probe_init(struct hisi_zip *hisi_zip)
- 	if (ret)
- 		return ret;
- 
-+	ret = hisi_zip_set_high_perf(qm);
-+	if (ret)
-+		return ret;
-+
- 	hisi_zip_open_sva_prefetch(qm);
- 	hisi_qm_dev_err_init(qm);
- 	hisi_zip_debug_regs_clear(qm);
 -- 
-2.30.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
