@@ -1,151 +1,144 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tm6j2nNV"
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1768B100
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2023 01:04:50 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-9ff26d7c0a6so222153666b.2
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2023 01:04:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="XgSV4SHM"
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8049A11A
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2023 02:55:14 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-28396255b81so2971579a91.0
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2023 02:55:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700557488; x=1701162288; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GukcAJTXaEcK6cCKjc0EvDHkgaKB4BbuYgEOBg/XBvk=;
-        b=tm6j2nNV0iVM11tZBJ23GzOS36mEo+Ze0iZzzPslYhu8WxMLMyn+JqAYOpVY/e6PCm
-         TEnn8P7udM9CzkY1gq8N0gGVG3xkaQ1AyjpRVlEQXFh5LWXkdz9sfaVwCpL/OjZd/78V
-         xpV8a4sxKnC1Y+aZ2JuSQ91NHCo7j5N3YSudmNxpxTS9p4e64C3vLhccFPu46Oe8nFgd
-         CKF3dadtaGxCVuYEYOYQfBclACjycjAf4CtbYwfLWrrIEsusIYJKIgvk1y8nuw0DBx9e
-         AnFOEnzgEW07Jn/tvhcdpEgwrxYC4vuMZCT5ncM9bRmOLX7zfkXW+N4zKm6SZW3l6+x2
-         vSug==
+        d=sifive.com; s=google; t=1700564114; x=1701168914; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MzKhOUKLZx+pr4SVfAMWtXoFfmy98an63KyE2M6t84k=;
+        b=XgSV4SHMNAUCMicuOlSC3Ue+eIOT4uw3mBv0wXdpVmkEA1S6fWvKK937eb8bYnRaIo
+         lYcn/K/eA7j7QNkeyx+IgAyS7sVgPXJ//8aolU1bkSI5tVFUYmaMU4YTENjV+YOQHpzM
+         FC2cSmexK5dbsQ2nfJWJh4Ifqq5QP6zGOGyAdsHkUQrMjuoA6WwXjk2MEPzuzMwEBy9x
+         6EceSVgtL+tk+1308yb+xMBZeYk3XtuCiu1V9mj+YlW0LhajLq5sk/PEBMx4gFusvx0d
+         p5ZT3VTNjIQOh2jx+7k7WW1DqKsfYKJvYKFpM1gjfNJlpej5+50A+a30UaiJGN3mW2x/
+         Lgxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700557488; x=1701162288;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GukcAJTXaEcK6cCKjc0EvDHkgaKB4BbuYgEOBg/XBvk=;
-        b=XVKt9yVWyrvIbNyiIyzuYxdp8Djx29gXc8nRdZWkFVndkR0dE9N00tTiQcGjJ93Hir
-         nV7JUcx7lOFLWLZJCSmVQreqMOKbypzRWILzIrMiwL4cUhp/5kAzqRIUUN8cDVYgMWL5
-         iUzu7RvauonsTC5VqufkjxZJ69agI+ur6d2Ga83qQgauCBZOzTlGTPnyMIBO6rbzluPQ
-         dxOeiEKdtb2iLOuYhxWvrUy9WZfJALE5u+RWZMTr6Mn4QFqwp5/5da3GdzidQrrHd5xw
-         mGstVldcsoBVb0bsazXW61clpZkFvJQ0UNdQoQ4c1mP/B5dyRQScNB0onPHI95FYcL0m
-         ZARw==
-X-Gm-Message-State: AOJu0Yxw7hxbuhE3GLEI+VwKUQmf1e7PuXArXCRZ1p/1NBkZIy9RMSfZ
-	XakHQ68JpbdyGoCCzn0pzZ/K1A==
-X-Google-Smtp-Source: AGHT+IFw/fChnLtQDrJ85x+SlOQmSaBGi00oWSh52e0vhvjTdVwRpkmxeJQ8shyJVIBFhhmtWclQ9w==
-X-Received: by 2002:a17:906:5185:b0:9e4:6500:7540 with SMTP id y5-20020a170906518500b009e465007540mr7789843ejk.58.1700557488426;
-        Tue, 21 Nov 2023 01:04:48 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.222.11])
-        by smtp.gmail.com with ESMTPSA id w17-20020a170906481100b009fc576e26e6sm2952926ejq.80.2023.11.21.01.04.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Nov 2023 01:04:48 -0800 (PST)
-Message-ID: <8eba3bf9-6736-41a0-a799-2eac53ab75b4@linaro.org>
-Date: Tue, 21 Nov 2023 10:04:45 +0100
+        d=1e100.net; s=20230601; t=1700564114; x=1701168914;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MzKhOUKLZx+pr4SVfAMWtXoFfmy98an63KyE2M6t84k=;
+        b=TtB9s+Yvk32Ncgc60+WqZnbhZG5DHx3p5TUJqi3ue48bZyqHNddC6V5l6kWB3l0CBu
+         YsoDTNrF3dKePmS9fLXOeFD0i14GW2zxMuUn62fOCskzO9/hFhr30hSeFdo+oyNVt9Rt
+         8gP3760fgGZAYFE7H8oYpYeLxOnQv63Y0E54f1ii4p1wIVyEY6wBtpSMrqNLhgD7+VQm
+         JtFU8lQ+e4qDHHVrqSkS0eAj6sbI2hAgNijpWp0fqwDGTMrvg58hDHWitHIOSiZrGnNE
+         Lichcn+SUMuWrO1+Sj7Ad4McKukDvaz0aNuXaTYy3H9s0oLOZtJpB/SPScXY+SHPTrEy
+         eSkw==
+X-Gm-Message-State: AOJu0Yw7308zypD+4FkS+Z+fLjkHkCCSjPQHIhKDgt0ZYJBNlK6PK50g
+	C/B5JsXxjAU3zNAoGxFoJHMlYA==
+X-Google-Smtp-Source: AGHT+IGpo4GmETcpbWDFdme7zudYwMnFovLtMACr2PLZcHekMbKtafj/QTIGaeb+fzIx1InGwWUNwA==
+X-Received: by 2002:a17:90b:3ec2:b0:27e:31a:2ab2 with SMTP id rm2-20020a17090b3ec200b0027e031a2ab2mr7901807pjb.34.1700564113881;
+        Tue, 21 Nov 2023 02:55:13 -0800 (PST)
+Received: from ?IPv6:2402:7500:4ce:5aed:1852:f03:f8df:692b? ([2402:7500:4ce:5aed:1852:f03:f8df:692b])
+        by smtp.gmail.com with ESMTPSA id g21-20020a17090a579500b002777001ee76sm8937627pji.18.2023.11.21.02.55.10
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 21 Nov 2023 02:55:13 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/6] dt-bindings: crypto: add support for
- rockchip,crypto-rk3588
-Content-Language: en-US
-To: Corentin LABBE <clabbe@baylibre.com>
-Cc: davem@davemloft.net, heiko@sntech.de, herbert@gondor.apana.org.au,
- krzysztof.kozlowski+dt@linaro.org, mturquette@baylibre.com,
- p.zabel@pengutronix.de, robh+dt@kernel.org, sboyd@kernel.org,
- ricardo@pardini.net, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rockchip@lists.infradead.org
-References: <20231107155532.3747113-1-clabbe@baylibre.com>
- <20231107155532.3747113-2-clabbe@baylibre.com>
- <97ae9fa0-0a6c-41d2-8a6c-1706b920d7ea@linaro.org> <ZVtS7YBhhtqCQX8w@Red>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <ZVtS7YBhhtqCQX8w@Red>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
+Subject: Re: [PATCH 12/12] RISC-V: crypto: add Zvkb accelerated ChaCha20
+ implementation
+From: Jerry Shih <jerry.shih@sifive.com>
+In-Reply-To: <20231120191856.GA964@sol.localdomain>
+Date: Tue, 21 Nov 2023 18:55:07 +0800
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+ palmer@dabbelt.com,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ herbert@gondor.apana.org.au,
+ davem@davemloft.net,
+ andy.chiu@sifive.com,
+ greentime.hu@sifive.com,
+ conor.dooley@microchip.com,
+ guoren@kernel.org,
+ bjorn@rivosinc.com,
+ heiko@sntech.de,
+ ardb@kernel.org,
+ phoebe.chen@sifive.com,
+ hongrong.hsu@sifive.com,
+ linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <9724E3A5-F43C-4239-9031-2B33B72C4EF4@sifive.com>
+References: <20231025183644.8735-1-jerry.shih@sifive.com>
+ <20231025183644.8735-13-jerry.shih@sifive.com>
+ <20231102054327.GH1498@sol.localdomain>
+ <90E2B1B4-ACC1-4316-81CD-E919D3BD03BA@sifive.com>
+ <20231120191856.GA964@sol.localdomain>
+To: Eric Biggers <ebiggers@kernel.org>
+X-Mailer: Apple Mail (2.3445.9.7)
 
-On 20/11/2023 13:37, Corentin LABBE wrote:
+On Nov 21, 2023, at 03:18, Eric Biggers <ebiggers@kernel.org> wrote:
+> First, I can see your updated patchset at branch
+> "dev/jerrys/vector-crypto-upstream-v2" of =
+https://github.com/JerryShih/linux,
+> but I haven't seen it on the mailing list yet.  Are you planning to =
+send it out?
 
->>> diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml
->>> new file mode 100644
->>> index 000000000000..07024cf4fb0e
->>> --- /dev/null
->>> +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml
->>> @@ -0,0 +1,65 @@
->>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->>> +%YAML 1.2
->>> +---
->>> +$id: http://devicetree.org/schemas/crypto/rockchip,rk3588-crypto.yaml#
->>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->>> +
->>> +title: Rockchip cryptographic offloader V2
->>
->> v2? Where is any documentation of this versioning? From where does it
->> come from?
->>
-> 
-> Hello
-> 
-> Datasheet/TRM has no naming or codename.
-> But vendor source call it crypto v2, so I kept the name.
+I will send it out soon.
 
-I would suggest using information from datasheet/manual or just SoC
-name, so:
+> Second, with your updated patchset, I'm not seeing any of the RISC-V =
+optimized
+> algorithms be registered when I boot the kernel in QEMU.  This is =
+caused by the
+> new check 'riscv_isa_extension_available(NULL, ZICCLSM)' not passing.  =
+Is
+> checking for "Zicclsm" the correct way to determine whether unaligned =
+memory
+> accesses are supported?
+>=20
+> I'm using 'qemu-system-riscv64 -cpu max -machine virt', with the very =
+latest
+> QEMU commit (af9264da80073435), so it should have all the CPU =
+features.
+>=20
+> - Eric
 
-Rockchip RK3588 Cryptographic Offloader
+Sorry, I just use my `internal` qemu with vector-crypto and rva22 =
+patches.
 
-How can you be sure that downstream source used v2 for hardware, not
-driver? Poor-quality downstream source is rarely a source of proper
-solution...
+The public qemu haven't supported rva22 profiles. Here is the qemu =
+patch[1] for
+that. But here is the discussion why the qemu doesn't export these
+`named extensions`(e.g. Zicclsm).
+I try to add Zicclsm in DT in the v2 patch set. Maybe we will have more =
+discussion
+about the rva22 profiles in kernel DT.
 
+[1]
+LINK: =
+https://lore.kernel.org/all/d1d6f2dc-55b2-4dce-a48a-4afbbf6df526@ventanami=
+cro.com/#t
 
+I don't know whether it's a good practice to check unaligned access =
+using
+`Zicclsm`.=20
 
-Best regards,
-Krzysztof
+Here is another related cpu feature for unaligned access:
+RISCV_HWPROBE_MISALIGNED_*
+But it looks like it always be initialized with =
+`RISCV_HWPROBE_MISALIGNED_SLOW`[2].
+It implies that linux kernel always supports unaligned access. But we =
+have the
+actual HW which doesn't support unaligned access for vector unit.
 
+[2]
+LINK: =
+https://github.com/torvalds/linux/blob/98b1cc82c4affc16f5598d4fa14b1858671=
+b2263/arch/riscv/kernel/cpufeature.c#L575
+
+I will still use `Zicclsm` checking in this stage for reviewing. And I =
+will create qemu
+branch with Zicclsm enabled feature for testing.
+
+-Jerry=
