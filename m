@@ -1,117 +1,160 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ezKokMNo"
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 270C6101;
-	Wed, 22 Nov 2023 06:26:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700663163; x=1732199163;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=QgvmqZnHKYGQO8m1urYDXTVptQkkjyv/RBOOU7WLG+0=;
-  b=ezKokMNo6d4gnFFPXINvubrCY+7CNRCARZqB8WLEAbJy6r4AB+Fjdk8p
-   z7bnRhiCdlOefSKacivO17Wy6xNFtl39e/pv+MoKzW6f44+dWeUTZ1e6K
-   gazfJ6KsEjGPpVYvXXVH9psNbPtlIFEMt8TnV8U+VOEX7MH/u+zWPzw7Q
-   KoA6imnm/EGKfWMGpxTT9yMREwnzSyw+KnNMVuup0rv8IaCFjt0ZZrzWN
-   RzatFPWPHJcT6q87vfzbpeplIX2bOUoQnolLOATqYMv2TWQOc++YktWwP
-   Rm/2fR7d/nizdlQ3/p1ODqpD/ko4XHYqZlf26QAFda4uSa44EIW6IYrlp
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="10724054"
-X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
-   d="scan'208";a="10724054"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 06:26:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="1098427727"
-X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
-   d="scan'208";a="1098427727"
-Received: from dwbabcoc-mobl.amr.corp.intel.com (HELO [10.251.20.82]) ([10.251.20.82])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 06:26:01 -0800
-Message-ID: <aa7bbecc-dcd5-4757-8f8a-1eb2ab0d529b@intel.com>
-Date: Wed, 22 Nov 2023 06:26:00 -0800
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="AJ5CJHSD"
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C29101A8
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Nov 2023 09:37:41 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1cc5fa0e4d5so81685ad.0
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Nov 2023 09:37:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1700674661; x=1701279461; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YB+axD1Vcc97GiHQ3MbqEUMAVWCgEbLU/Yl6K+bGqgI=;
+        b=AJ5CJHSD40bQf0osWlhqm5fgwJfC41Rii+W6khK47Sa4yANV9Zc2Rko5iOy5ZYsbvS
+         DpgjjSqObdeErInOP57p3EEwrWL/Rq2uN1r2P89TJ44ththbu+fUbHpMlA57qrerQLVs
+         Uz5VqXmA3urKZryUyKLiTjvM8bV3nlPJw9nGufOkpiHkvBMjVVmSNFEilBsjmYedx9Yu
+         NCaZOPeNZ/pHq26gxK7gPG4uzWXMOtJ+t5Iih7nt2z48wwOQstgS5FPN3zwPRmgqtZFN
+         +smpG/KVv4ZV1u9qDoO+WQYQunx8eVBdZ95u69WA2Pg5gMwTClHNNRpXtyWFpTwCixLM
+         mZWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700674661; x=1701279461;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YB+axD1Vcc97GiHQ3MbqEUMAVWCgEbLU/Yl6K+bGqgI=;
+        b=mjWtyow/+1iklq0r6N1e0F1c9KiDdf8cshedlTY+Y8A0H5MpoDFwUKu9CCnqjTN8Xg
+         VDTvXT6OBdYPlQnI0fzda5RNsbj9htiS+uvTpQGXRZuVU+Wu2Mv5g21m9bzqWYP9umTB
+         psNgTWUP7Tk84w7gn5tAHgXVA87HO1EgBGaGm646Jqtfgt79ASqk+N7nn4LdPXplQ5ww
+         nsb4QQ6dkLsXIksHkCgcTcqMydOVtcZAGLCI+GD6E9dlCHXkGl3GSzRIS8c/MbkTuJ+L
+         wGA6MEBLRkbpXEg61LZCwG6pZUn2+AeXppJIUtAZm3WFYV+jKgbIklkEqoMcs/J464lC
+         pFRg==
+X-Gm-Message-State: AOJu0YwXODjnOfSqSg4ttxJtdlSr7dVBzbMZZ7xaXjXXFUjjRHYMNY/7
+	XceQvwP4FvvQeiC1X9BD328zYj86zhaQldAKVz45HA==
+X-Google-Smtp-Source: AGHT+IF46NJ+qL5ZN5PT+NT5x4N0gK+lFvsXp00qpP0ZTSDTMzWCcTLDobwk4fc21ZcVVM0Kfc+aRw==
+X-Received: by 2002:a17:902:bd06:b0:1cc:3544:ea41 with SMTP id p6-20020a170902bd0600b001cc3544ea41mr2553752pls.46.1700674661156;
+        Wed, 22 Nov 2023 09:37:41 -0800 (PST)
+Received: from ?IPv6:2402:7500:4ce:5a5b:a845:b3e1:8307:922c? ([2402:7500:4ce:5a5b:a845:b3e1:8307:922c])
+        by smtp.gmail.com with ESMTPSA id 19-20020a170902c11300b001bc6e6069a6sm8165114pli.122.2023.11.22.09.37.36
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 22 Nov 2023 09:37:40 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] crypto: x86/sm2 -add Zhaoxin SM2 algorithm
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
+Subject: Re: [PATCH 12/12] RISC-V: crypto: add Zvkb accelerated ChaCha20
  implementation
-Content-Language: en-US
-To: LeoLiu-oc <LeoLiu-oc@zhaoxin.com>, herbert@gondor.apana.org.au,
- davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, kim.phillips@amd.com, pbonzini@redhat.com,
- babu.moger@amd.com, jiaxi.chen@linux.intel.com, jmattson@google.com,
- pawan.kumar.gupta@linux.intel.com, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: CobeChen@zhaoxin.com, TonyWWang@zhaoxin.com, YunShen@zhaoxin.com,
- Leoliu@zhaoxin.com
-References: <20231109094744.545887-1-LeoLiu-oc@zhaoxin.com>
- <20231122064355.638946-1-LeoLiu-oc@zhaoxin.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzUVEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
- LmNvbT7CwXgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
- lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
- MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
- IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
- aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
- I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
- E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
- F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
- CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
- P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
- 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lczsFNBFRjzmoBEACyAxbvUEhd
- GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
- MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
- Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
- lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
- 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
- qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
- BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
- 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
- vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
- FCRl0Bvyj1YZUql+ZkptgGjikQARAQABwsFfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
- l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
- yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
- +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
- asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
- WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
- sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
- KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
- MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
- hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
- vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20231122064355.638946-1-LeoLiu-oc@zhaoxin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Jerry Shih <jerry.shih@sifive.com>
+In-Reply-To: <20231121-knelt-resource-5d71c9246015@wendy>
+Date: Thu, 23 Nov 2023 01:37:33 +0800
+Cc: Eric Biggers <ebiggers@kernel.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>,
+ palmer@dabbelt.com,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ herbert@gondor.apana.org.au,
+ davem@davemloft.net,
+ andy.chiu@sifive.com,
+ greentime.hu@sifive.com,
+ guoren@kernel.org,
+ bjorn@rivosinc.com,
+ heiko@sntech.de,
+ ardb@kernel.org,
+ phoebe.chen@sifive.com,
+ hongrong.hsu@sifive.com,
+ linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <3BDE7B86-0078-4C77-A383-1C83C88E44DA@sifive.com>
+References: <20231025183644.8735-1-jerry.shih@sifive.com>
+ <20231025183644.8735-13-jerry.shih@sifive.com>
+ <20231102054327.GH1498@sol.localdomain>
+ <90E2B1B4-ACC1-4316-81CD-E919D3BD03BA@sifive.com>
+ <20231120191856.GA964@sol.localdomain>
+ <9724E3A5-F43C-4239-9031-2B33B72C4EF4@sifive.com>
+ <20231121-knelt-resource-5d71c9246015@wendy>
+To: Conor Dooley <conor.dooley@microchip.com>
+X-Mailer: Apple Mail (2.3445.9.7)
 
-> +/* Zhaoxin sm2 verify function */
-> +static inline size_t zhaoxin_gmi_sm2_verify(unsigned char *key, unsigned char *hash,
-> +				unsigned char *sig, unsigned char *scratch)
-> +{
-> +	size_t result;
-> +
-> +	asm volatile(
-> +		".byte 0xf2, 0x0f, 0xa6, 0xc0"
-> +		:"=c"(result)
-> +		:"a"(hash), "b"(key), "d"(SM2_CWORD_VERIFY), "S"(scratch), "D"(sig)
-> +		:"memory");
-> +
-> +	return result;
-> +}
+On Nov 21, 2023, at 21:14, Conor Dooley <conor.dooley@microchip.com> =
+wrote:
+> On Tue, Nov 21, 2023 at 06:55:07PM +0800, Jerry Shih wrote:
+>> Sorry, I just use my `internal` qemu with vector-crypto and rva22 =
+patches.
+>>=20
+>> The public qemu haven't supported rva22 profiles. Here is the qemu =
+patch[1] for
+>> that. But here is the discussion why the qemu doesn't export these
+>> `named extensions`(e.g. Zicclsm).
+>> I try to add Zicclsm in DT in the v2 patch set. Maybe we will have =
+more discussion
+>> about the rva22 profiles in kernel DT.
+>=20
+> Please do, that'll be fun! Please take some time to read what the
+> profiles spec actually defines Zicclsm fore before you send those =
+patches
+> though. I think you might come to find you have misunderstood what it
+> means - certainly I did the first time I saw it!
 
-What version of binutils supports this new instruction?
+=46rom the rva22 profile:
+  This requires misaligned support for all regular load and store =
+instructions (including
+  scalar and ``vector``)
+
+The spec includes the explicit `vector` keyword.
+So, I still think we could use Zicclsm checking for these vector-crypto =
+implementations.
+
+My proposed patch is just a simple patch which only update the DT =
+document and
+update the isa string parser for Zicclsm. If it's still not recommend to =
+use Zicclsm
+checking, I will turn to use `RISCV_HWPROBE_MISALIGNED_*` instead.
+
+>> [1]
+>> LINK: =
+https://lore.kernel.org/all/d1d6f2dc-55b2-4dce-a48a-4afbbf6df526@ventanami=
+cro.com/#t
+>>=20
+>> I don't know whether it's a good practice to check unaligned access =
+using
+>> `Zicclsm`.=20
+>>=20
+>> Here is another related cpu feature for unaligned access:
+>> RISCV_HWPROBE_MISALIGNED_*
+>> But it looks like it always be initialized with =
+`RISCV_HWPROBE_MISALIGNED_SLOW`[2].
+>> It implies that linux kernel always supports unaligned access. But we =
+have the
+>> actual HW which doesn't support unaligned access for vector unit.
+>=20
+> https://docs.kernel.org/arch/riscv/uabi.html#misaligned-accesses
+>=20
+> Misaligned accesses are part of the user ABI & the hwprobe stuff for
+> that allows userspace to figure out whether they're fast (likely
+> implemented in hardware), slow (likely emulated in firmware) or =
+emulated
+> in the kernel.
+
+The HWPROBE_MISALIGNED_* checking function is at:
+=
+https://github.com/torvalds/linux/blob/c2d5304e6c648ebcf653bace7e51e0e6742=
+e46c8/arch/riscv/kernel/cpufeature.c#L564-L647
+The tests are all scalar. No `vector` test inside. So, I'm not sure the
+HWPROBE_MISALIGNED_* is related to vector unit or not.
+
+The goal is to check whether `vector` support unaligned access or not
+in this crypto patch.
+
+I haven't seen the emulated path for unaligned-vector-access in OpenSBI
+and kernel. Is the unaligned-vector-access included in user ABI?
+
+Thanks,
+Jerry
+
+
 
