@@ -1,142 +1,79 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="C4ZWuUa1"
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 280D519A4;
-	Fri, 24 Nov 2023 06:37:22 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7046940E0258;
-	Fri, 24 Nov 2023 14:37:19 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id PRqga3sbJpbf; Fri, 24 Nov 2023 14:37:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1700836637; bh=ohccp6emLwawWzvtIzIh09L/4m/V7F4sqEbEIpoSnq0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C4ZWuUa1L7kfp2HdFjJoJ/VJsOFVSUnC0gO9qFwTG3YmBCUPdTYsVqDGWCWhKhwWt
-	 bPMfC5FW5UvB9dmwy2CIqzCbKbi5cBjMdkDEa0CeXp+5M+QzDtnelk9TLL/EgQ5NHj
-	 McXjzfHSJsgjpj9MqRmHPWcJCCMrAogxjUm0/Jsc72ebMXkCNQAv2djjGq5eNffoAf
-	 OMq7FM/q2dgI4mAq6K/W2UfryaZEHOZo9PgaPQCJavHEyqMeOtbKdsxzha219KEvZA
-	 X4wIE/IZYEGPevYKN2YBtPnPL5DpnWEEeMQiu/VmvTlcQD+X7yrx99Yo3AdwDF84Ox
-	 hyEAoTZMYPGcbo29lPJ7jZX5gfw9buYqXMNsN85LAYacotEiG6IZhHOjIZnf6V/qGJ
-	 D4elq+EAdSdHpU94MOeTRjyBVHsxMDXkGH0vd/cN/mdU/okeck6NZxDB9cxZmMQxdS
-	 DdAcDBO8v99bXDYNhp74RKKFrlGzQVHoUWww+ITXNOeS5ImW+fkWgECNI4J6p5HHzc
-	 tWYWb2LREZVw1alEGmVBJNZW9xdLYefPQ2qHOTWEU8lOdrrttsoCdCD/HPkTNRKylD
-	 PudnxC5CBKqZvR0VTaguz2OUBxIbOEGUGX5BFTAzbznuxMmWe5UgIF62+gJycHagac
-	 eB1F7hjjZjigIKjjHsZGVU5M=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AD93F40E014B;
-	Fri, 24 Nov 2023 14:36:36 +0000 (UTC)
-Date: Fri, 24 Nov 2023 15:36:30 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, marcorr@google.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 13/50] crypto: ccp: Define the SEV-SNP commands
-Message-ID: <20231124143630.GKZWC07hjqxkf60ni4@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-14-michael.roth@amd.com>
+	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="PvbSTSIB"
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB29519BD;
+	Fri, 24 Nov 2023 07:05:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=public-files.de;
+	s=s31663417; t=1700838301; x=1701443101; i=frank-w@public-files.de;
+	bh=Ix7kpbSVl/E0T/0d1Pht1rYCZKqw3dVgDyb07vLVcGc=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:
+	 References;
+	b=PvbSTSIB4lffJljSG4x3vZo9axQe2k91WFc0HvK06Uksi2okqG7+tSkyoV+MGlHi
+	 qB+NxwOL5rjz/C1NKlxPEBU4JtSY+l6QEUeNAiFun+qWx+A/C6a8HpCi9Yve0BCkW
+	 FRd62tCPZrx93DokOlSHqhy5/ghscbSYDPq/uvmJC0jc5BRS15u4KvDi/Q2drr1kk
+	 qvgomya4GLFbA+omT80QTN7MyzCXaa5gH4g7zjoGEDnBn8qgzpwXV6+j5/wjRHqDN
+	 PHZDE/aS5AcUn7qvi7qsL/5CNZ1vlzAGWFMCx9aDGUmRaQTKTU7GgDTztTGjpnvG/
+	 BR/ekAfiQ+xol7YibA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [80.245.79.113] ([80.245.79.113]) by web-mail.gmx.net
+ (3c-app-gmx-bs48.server.lan [172.19.170.101]) (via HTTP); Fri, 24 Nov 2023
+ 16:05:01 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-14-michael.roth@amd.com>
+Message-ID: <trinity-a9a71294-1396-43e4-9ed5-9ee2914ef093-1700838301802@3c-app-gmx-bs48>
+From: Frank Wunderlich <frank-w@public-files.de>
+To: Corentin LABBE <clabbe@baylibre.com>
+Cc: davem@davemloft.net, heiko@sntech.de, herbert@gondor.apana.org.au,
+ krzysztof.kozlowski+dt@linaro.org, mturquette@baylibre.com,
+ p.zabel@pengutronix.de, robh+dt@kernel.org, sboyd@kernel.org,
+ ricardo@pardini.net, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rockchip@lists.infradead.org
+Subject: Aw: Re:  [PATCH 6/6] crypto: rockchip: add rk3588 driver
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 24 Nov 2023 16:05:01 +0100
+Importance: normal
+Sensitivity: Normal
+In-Reply-To: <ZVtVkACNHTcCjqGp@Red>
+References: <20231107155532.3747113-1-clabbe@baylibre.com>
+ <20231107155532.3747113-7-clabbe@baylibre.com>
+ <trinity-a0ee3146-f23d-4f6c-b29c-5fe446c4d4ad-1699797868421@3c-app-gmx-bs50>
+ <ZVtVkACNHTcCjqGp@Red>
+X-UI-Message-Type: mail
+X-Priority: 3
+X-Provags-ID: V03:K1:KZY66OmMPVZRMlmi74pw8ADByftw6rLqB4krhDPt1n6lm6PqszSx4cKvc4cZjMaxiCH9q
+ 9l76vJDnRyCKy+eXbolThC+wwdw4dv1bdU4iTgErQSSMfaGhXdFf9Hw8m2d54Obzs6CpDsrq/18q
+ TEe0LEFYkOe/u47SsG/Cz/fazr5GJSKcscqOCYKIKUI5ZS4Qz2H5T/mWYX/BAwcWhjtWXQ3IyITK
+ gWvtkulcLy4Ksr8Efpa7xkFttn5SYux8Z7cGFDgcF33skBoacgmIdOyvNt6ysMKaEToS9LDLnTZO
+ zw=
+UI-OutboundReport: notjunk:1;M01:P0:nU8MkRQpVF4=;cW5EMDZ6CBFw9FyqPe6KBZB/V18
+ K6E987HH1iAQnNOcy5ZBHGefyE25N6rxX+3pirLkOnU/zCkzodgk9FOxD9Cr1RQOJ9kCBB5OU
+ jUboXEL0DRyXxqDsfqi+UATzF3N2/tp/G4gWip+pFqinf6NKT2XWejdO50yHxVXgc0Af3J+F1
+ Yyz8h5CY0RZKPd0b5Gd23VSlmq+/Widrj5RK8DDKMX3Ak3oAFl2MGRuaFGFbPG+eE8UB3exU/
+ J5W38CPcFE84FhhfxqzfTTr0LrEezSrHh5LDp93NU1UK4ECk6y0qJ+f0iaBMTkv3kIHI+Ohhf
+ XoOWmrQcoaXHHv8IDCUz5B2NhyK1EiUtuK4DEHcksp3BynkMeM2/ymRpEIKNY0ulRuyzJRPm3
+ +orjVtzoZWjdd2CkjhJfF2ah+uPoDp2pd1Z16SvQwmR5SfJMcvgt53OVp+jtSBC8rD314ggIe
+ 902t/NJ/xbV+W/bATfBPqX7Cx6WRmBvHwOng3dgR5Rv0TwPBwhGVzR57K9ZiGspS0M4liI+Q6
+ QSIIBMjJBkamkRUnn3O+G06PooaSgO+99XkvoWNuE6Jv8W/tggIVAanoHtTD8Xy7G9M4ha71F
+ sLwihv1Y8dsoJNQNwXtvU5jsUM4GpCu5fJCT6sGXsVdiVlD/bpKhgyViHDS0jQQmgqklkrrp0
+ 5lRwUv//M/OuJEbtmb5K01CzVlpVt/ik0vohNwuLlOfjMtRiU+Yd5AP5tLXBnrHcWy35cO6yb
+ ItPBMt4lQN8fZGopD7NmXSoIQbY0GHqO8OzCdo6IPY5G1Q0n9QR7v9LEVt6g3JsDKOL/yg8qQ
+ cQQlCI0IDm0t3wNCSzVHhNIA==
 
-On Mon, Oct 16, 2023 at 08:27:42AM -0500, Michael Roth wrote:
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index 7fd17e82bab4..a7f92e74564d 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -78,6 +78,36 @@ enum sev_cmd {
->  	SEV_CMD_DBG_DECRYPT		= 0x060,
->  	SEV_CMD_DBG_ENCRYPT		= 0x061,
->
-> +	/* SNP specific commands */
-> +	SEV_CMD_SNP_INIT			= 0x81,
+Hi
 
-The other commands start with "0x0" - pls do that too here or unify with
-a pre-patch.
+> Gesendet: Montag, 20. November 2023 um 13:48 Uhr
+> Von: "Corentin LABBE" <clabbe@baylibre.com>
 
-> +	SEV_CMD_SNP_SHUTDOWN			= 0x82,
-> +	SEV_CMD_SNP_PLATFORM_STATUS		= 0x83,
-> +	SEV_CMD_SNP_DF_FLUSH			= 0x84,
-> +	SEV_CMD_SNP_INIT_EX			= 0x85,
-> +	SEV_CMD_SNP_SHUTDOWN_EX			= 0x86,
-> +	SEV_CMD_SNP_DECOMMISSION		= 0x90,
-> +	SEV_CMD_SNP_ACTIVATE			= 0x91,
-> +	SEV_CMD_SNP_GUEST_STATUS		= 0x92,
-> +	SEV_CMD_SNP_GCTX_CREATE			= 0x93,
-> +	SEV_CMD_SNP_GUEST_REQUEST		= 0x94,
-> +	SEV_CMD_SNP_ACTIVATE_EX			= 0x95,
-> +	SEV_CMD_SNP_LAUNCH_START		= 0xA0,
-> +	SEV_CMD_SNP_LAUNCH_UPDATE		= 0xA1,
-> +	SEV_CMD_SNP_LAUNCH_FINISH		= 0xA2,
-> +	SEV_CMD_SNP_DBG_DECRYPT			= 0xB0,
-> +	SEV_CMD_SNP_DBG_ENCRYPT			= 0xB1,
-> +	SEV_CMD_SNP_PAGE_SWAP_OUT		= 0xC0,
-> +	SEV_CMD_SNP_PAGE_SWAP_IN		= 0xC1,
-> +	SEV_CMD_SNP_PAGE_MOVE			= 0xC2,
-> +	SEV_CMD_SNP_PAGE_MD_INIT		= 0xC3,
-> +	SEV_CMD_SNP_PAGE_SET_STATE		= 0xC6,
-> +	SEV_CMD_SNP_PAGE_RECLAIM		= 0xC7,
-> +	SEV_CMD_SNP_PAGE_UNSMASH		= 0xC8,
-> +	SEV_CMD_SNP_CONFIG			= 0xC9,
-> +	SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX	= 0xCA,
+> You are using kcapi-rng but the driver do not support RNG yet. (and probably never if I continue to fail having good results with it).
+> So it is normal values does not change.
 
-You don't have to vertically align those to a different column due to
-this command's name not fitting - just do:
+which functions does the driver support atm? or how can i test correctly
+(and which kernel options i need for this)?
 
-        SEV_CMD_SNP_CONFIG              = 0x0C9,
-        SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX = 0x0CA,
-        SEV_CMD_SNP_COMMIT              = 0x0CB,
-
-
-
-
-> +	SEV_CMD_SNP_COMMIT			= 0xCB,
-> +	SEV_CMD_SNP_VLEK_LOAD			= 0xCD,
-> +
->  	SEV_CMD_MAX,
->  };
-
-...
-
-> +/**
-> + * struct sev_data_snp_launch_start - SNP_LAUNCH_START command params
-> + *
-> + * @gctx_addr: system physical address of guest context page
-> + * @policy: guest policy
-> + * @ma_gctx_addr: system physical address of migration agent
-> + * @imi_en: launch flow is launching an IMI for the purpose of
-
-What is an "IMI"?
-
-Define it once for the readers pls.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+regards Frank
