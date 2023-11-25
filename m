@@ -1,217 +1,159 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pl1-f205.google.com (mail-pl1-f205.google.com [209.85.214.205])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC198B7
-	for <linux-crypto@vger.kernel.org>; Sat, 25 Nov 2023 05:21:27 -0800 (PST)
-Received: by mail-pl1-f205.google.com with SMTP id d9443c01a7336-1cfb2811203so5400205ad.1
-        for <linux-crypto@vger.kernel.org>; Sat, 25 Nov 2023 05:21:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700918487; x=1701523287;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XSYiGfAAMAcRis1TVQ3Zrz9Kz4BF0k5UJY3eSxQoyKI=;
-        b=bT10g/GHosbBFoKDTyLzPApFEf6Kx7K+cjIROY0IukPruC/TaxcXEDG9oYKANEyAK7
-         DC8IXcv/x+gNnDTcPLBarJbJUaSr4z3l5aaAgJI58bNTg+veXi0uTwHWTWQ6Uu/BaR45
-         67UWFiCAXdDEfrr1UX4dlkhb88DG7Zkp7Bh6zR2f1djm/0a5YV8117fPJfzPKhKEKFdm
-         nj/OrtzSyMW6F6YTILZ0OzJCE/FChQf5NO01TrEa/LWap46USWPH46UfbYDa7DebYY7x
-         0zKkaVNf22KmX8jBHJLpK9+WNfBCXVf3zr/irOKHUmOSDexJfZpbxkN1xWASKIi/mzcn
-         S+KA==
-X-Gm-Message-State: AOJu0Yy1uBieMvAXbWFs4wLnAw891D+uFvUYVD7HGl7MFaVpk00hsiho
-	+JJM9TGlhCmXcTAiVlwXSJkLIqgMBRGFgNakV15pabC5DDFS
-X-Google-Smtp-Source: AGHT+IGqp3Y75FgghXsxU/FPfMOoM9MT5kJ+jGpKKk2gh5/Lj1pIzRkeGSpeyOWlDoVcqt5pX1Vju38kom1BdTJz8ul2rZi9aKkP
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lz7RqUO8"
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D73F7;
+	Sat, 25 Nov 2023 07:10:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BVz7Vfqhm9zD0s/E8C3htys+ChdIgENG4qmq9JXWHdycyTFP2wJAB9M4y1HdwZ05En/ChuBXEbTYSUxizEGUfffvwecJrARsrZ1X35ZyTlX+tpOuWv35qaZmMhmS4+WHiRKpeE1g1c4aNdbnIPUCKsoy2derouIPtG/8f+K06d1fqYFuyAvgcF3eZ1WGCF+UbiFe/pbiG69hCAs7Pn1njuFyb/ZEYLe7j7N4PJBSNMJ2H9hF3uP9MhzisZ17dEoHRaqVWE6qdXSw5RfuSwB3sjtxeeSWoVLQNV9KSnbUtFZ/99XjBQiY7lqlsVawJi9a3ERBtr+CaMvlhCVrpvbqOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Dvul4LiikNP004wiqil+r2jbimyKb+4r4TP4iu/7Fhk=;
+ b=NK8mdkbmt63Tc0RGKXeHDwcnp0v7IWFEcrX7PkhUA0xfQZlbk7rA9JyUEIM+nUPnBjhcpmtmfYCDF/RpFUBjOvbzVjGG2z3G21f6AYbBPhK9fnj6pVqYD5thSOhLupRnBBP1+zCp7o+pLgPgYKeQTKqwmDYKlCWzzqFlhJBuuvXI0PrTeH8C1PPGIMyiWebuflvVgOGitllg5fkCpFEI86m3k9jERUsZxGcizjGEG2LfK002U1r2dJltbn1CFzwg9UvoUFGsUyTD+lMLK2T6INXZMcNqvHzrYDwHpg5kZELEUTTcPBNIfOVnUeW9ScBmnXh4gBJhSsM0Gy68lJGcgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Dvul4LiikNP004wiqil+r2jbimyKb+4r4TP4iu/7Fhk=;
+ b=lz7RqUO8FcS0IwIzI61rujKE40D0k+ONoGKHkcSDbWSvzsNtdpeW8C/nlpKksEJv9EC7HNbsTmaW2hfg0LFGfGaHC0t2OPuFEP6h146It8VTaHXtCHmz3uAdTI9f4N4xMI174gg/hFtyBf+8E/akLGjcoZJT+kfodGTbEFlcuvo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by CH3PR12MB9343.namprd12.prod.outlook.com (2603:10b6:610:1c0::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.22; Sat, 25 Nov
+ 2023 15:10:12 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1d68:1eb8:d7dc:4b43]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1d68:1eb8:d7dc:4b43%6]) with mapi id 15.20.7025.022; Sat, 25 Nov 2023
+ 15:10:12 +0000
+Message-ID: <3f033585-91c6-1d70-be1e-f083fc855aed@amd.com>
+Date: Sat, 25 Nov 2023 09:10:09 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] crypto: ccp - fix memleak in ccp_init_dm_workarea
+Content-Language: en-US
+To: Dinghao Liu <dinghao.liu@zju.edu.cn>
+Cc: John Allen <john.allen@amd.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231123070337.11600-1-dinghao.liu@zju.edu.cn>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20231123070337.11600-1-dinghao.liu@zju.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR10CA0027.namprd10.prod.outlook.com
+ (2603:10b6:806:a7::32) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:902:e0ca:b0:1cc:2c44:58f4 with SMTP id
- e10-20020a170902e0ca00b001cc2c4458f4mr1575340pla.1.1700918487510; Sat, 25 Nov
- 2023 05:21:27 -0800 (PST)
-Date: Sat, 25 Nov 2023 05:21:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003d77e6060af9f233@google.com>
-Subject: [syzbot] [crypto?] INFO: task hung in hwrng_fillfn
-From: syzbot <syzbot+c52ab18308964d248092@syzkaller.appspotmail.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	olivia@selenic.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|CH3PR12MB9343:EE_
+X-MS-Office365-Filtering-Correlation-Id: d4a3699a-38a3-4f23-183d-08dbedc89edf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	weL7pahs3Ay/2ceu30JqAvnh2uhpLdHqhyTCwje/RdbP836SwLFOuVNIlJfkpWlKKQnY1fDbAPhqHiGLVP1cDCFGlaDjr8q3eFnWCBvbENs0ieVXP5pVV31djCR9c0nD6xeoQeoxAvSjpYEOvjT3GpRUFGuTWOt9wMViQdE+VuiBKJOMLWWrxWl8bCCt0DhuALGUgMRqrzj8lfaAiFlUnKXLx3ZXZ96lghRI5gL80c8KfmBPIHKUqaWJe/rkpMP2vY29RFsFUTP9BwVMJ3CROspKK3KNJwHrI4yRlFmM9gPJs0rzo48rFlE+XoGZqgr68AIA6TpU9X2XIWTSlfZSVhErRIfdkrQCxSWlJPGTP5WNBTn/QEw0iyAY0+aS35CFY79JeiCtf7DZPlfFJqaJri5mTqxbVzy0Yamw8MBKHjmmdjBP3V2L8zYeI3A/IYc0lA2bT5WkxhKC0WisikSxjm6tXbfGCdFWBnRxor3++9gQGR6r3qXkr78JJS4wUogjERKUJ2Zs/th8AqI0xTGikLFAKQW4nD4NO+KiB5mDtgCzaOeu8yP8IQrK7pKTQ32VxAJyYM3u8ZNE5IH3vRSfYkO2B23+GHbICtCwGXBmUlSp4xA4XWRsgZiAddRzrjDWdu9ynKrXzZFd7GSg1+eBYQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(366004)(136003)(396003)(346002)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(41300700001)(36756003)(5660300002)(2906002)(31696002)(86362001)(6512007)(6666004)(53546011)(6506007)(26005)(83380400001)(478600001)(6486002)(2616005)(38100700002)(8936002)(54906003)(316002)(6916009)(66946007)(66556008)(66476007)(31686004)(4326008)(8676002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?QWVQbXNBMnVsWmloWjVYaWtTczVqNVFGTTh1eFlOcjEzQ0dTNGc1YU0rdm50?=
+ =?utf-8?B?NkZqRGh2alg4TS81dzd5TmxQVXRKTTFiN2V3REN1Q3F6TWRRVmJBaWpQSHdn?=
+ =?utf-8?B?Zml3c0NjSy8yWUIya2Nscnpwb3M0TzJ6d1FVNllWSVhkbEZWOTQvRVhoMVk1?=
+ =?utf-8?B?a2NnSURRUEMvSFZIakV4T1RVVTBIQVRiekVTTTdmYlFXekFFQUF5WXRZT0pz?=
+ =?utf-8?B?L3IvRzVPOXZpbHJGdmZaM3BlQ21ndjh3enhhTDdmTDk1ZTkvRWdrNGVmMk55?=
+ =?utf-8?B?S2dvcFFNa0pFd1drYXE3UTFWd0ROMmlpem81SUcrQVJkR0h2NGg3ZUNLWHcy?=
+ =?utf-8?B?elRUMkQzNTZjWHNlcmdSWlU2ZmR4d21aeDZXUDBQU1ZWSnp4Y1c1QjZEUlhY?=
+ =?utf-8?B?UkdaL1JrY2ZXMW9oZ0ZNMmJzMFNCb1N6VEZTb2pDRjNaQmNoam95NzNUelJQ?=
+ =?utf-8?B?MWQyWHVjYUJLTTNvd29JRXpHOGFhMEt5d2xPRUh1alZmblREbGVKUXdURDdC?=
+ =?utf-8?B?Z2xCR1BhRzY1TTBlRDRoNS82Njl3NUFRVWxlZnN0YlZZY05EWTNCcFNyL0hm?=
+ =?utf-8?B?SmYxb2V0RklnVTlMTUNURXk1QWxJVzV6Y0Z5Uks0YzR3TG9wMU5LejI4emx3?=
+ =?utf-8?B?RDlDQ21uLzY0YytPNEl5OXIzVkJzUkFVbnBjcFkvWFRKR3VQYy9xZ0w1WG90?=
+ =?utf-8?B?ZEk0OFMvYkNYNXNYWVNRajVJZ3FwQ3NrUmlaNjBUdEk3UGV4NTZtcm96NmZ4?=
+ =?utf-8?B?UU9tMGhIWUpwcFFja0RDdlg3aW0zUXV0dHJERG0xYWxVYm1KMjZUUlZCa2Rv?=
+ =?utf-8?B?Z3Q4U2tvRGplMFpXMlRWdWNzR2tzMUVCYnVseWR3RVMwandpMGRxSzVpTG1u?=
+ =?utf-8?B?cDJFOXBCZG9qWkJPMzFZSWtKVmRjdGs0R2JpOENVVXVkaVlDUEluQlo5WlFu?=
+ =?utf-8?B?ZnpXZzB1K3pDR0xIeTB5dXh5K29JaHRYSHZaWGoxWEhLUThCczlZakhGNmRq?=
+ =?utf-8?B?ekFCOUJ6Sk1BVEFneXFQR0FWVCtyTWQ4Q1J3SFJ2QWxkakpINnVFMnNhNnFX?=
+ =?utf-8?B?RlVQTzFNR0FHSjBDS3ZvNUxvYlpzK3J3L2hQQVhva1BOclhEaGU5WFlBbkw1?=
+ =?utf-8?B?TTVkaDdFSXFReDVDV0t6Ui9Lc0NHYVFPUWtVdTB4czRVSG5KOTdjRi9DNE9y?=
+ =?utf-8?B?UWsyTVA3K2tvM0EwK1UrakZSZCs1ckwvWFZJRExxY01kUDB3eVFWZzJzcVZN?=
+ =?utf-8?B?YUJjUjZLUko5RndOYTBoVThxdUFVY0RRMkZPVXBucHQrZURiV1lKZTBYcmJw?=
+ =?utf-8?B?a21tSExHRVFBVHVDT2E3RCtoSXZ1YUVzMGRoa2pzZXc4WXlhSjI1Y3BaNlgy?=
+ =?utf-8?B?MVg3N3VFdkhweUc3NHRSSkNyeExZUisvanV1SU9ZUTZEdnJ4cWVtT2NQV1Rv?=
+ =?utf-8?B?Q283VHZoa2pCNStaN0d2ek5Fd2tnMWY4RUhrTlJ5ZDR4dzl4cnNFVTh5Z2tu?=
+ =?utf-8?B?WEdGc3FtM2NZMWlJVjc4dmdjUnZxV0NVQ0o3Y0JyYmNQNHdDVXpya0xaRVQ3?=
+ =?utf-8?B?VEg0cGVIUHpXUnFWVVZtdHVtL2p4VndVN2dFb2lsTGJLeURVQS9scWZkS0J5?=
+ =?utf-8?B?SlM1aWxFWk5pQlowVnNEbjBzdEdxYzdZVDFhbHVXTUgxcytLNjBJUEtaOEVO?=
+ =?utf-8?B?dit1YzRIRGNrQUZHM1VUZWdGSDJwUWlOb3g5dTlRVjhiU05LUW9zVmlTMm1G?=
+ =?utf-8?B?b1NpSjhIU1FWYzkyeUt0L1lZSFJub2VoYkY4WW5JcFNhbWIvVzJoUnB3WHFt?=
+ =?utf-8?B?US9mQzdITXduRGdhZmhBeFYwNVJHUGZTOFUrcE1JTVRYQVBhOW85NWVVYVpS?=
+ =?utf-8?B?a0VNTjVoUDdJdy9kbzB3NlFWSFRTYUtKMHZGQWZqenQwWDdiN20wSG4xVVlz?=
+ =?utf-8?B?dXUxbVFLTnBoWDhPTmJHWUVZN28yVlorMWFYNG9yMjN2NS90aGtRdE5CMmow?=
+ =?utf-8?B?TVQvc3Y4NGhRZjBYVndSVGNUNFBDVnVDV0F5L3Y5NmVOWG9ORUxZVDVaL1VF?=
+ =?utf-8?B?b2tHQlRxVGsvS2w2UG43SjllSjlrRGVYRDNIM2E4U1dueVJjdGJVaUFVV096?=
+ =?utf-8?Q?sm1a32f5LOrlD9BaUVAN4BOcS?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4a3699a-38a3-4f23-183d-08dbedc89edf
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2023 15:10:11.8985
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iFvNNc9xuJdaws5yW/1zsisfDBnxdUqqmodSTRVQROxWSPUU+5jyjZWSX0hjiH9veGHpCd89rVXwjabH2sU1gw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9343
 
-Hello,
+On 11/23/23 01:03, Dinghao Liu wrote:
+> When dma_map_single() fails, we should free wa->address to
+> prevent potential memleak.
 
-syzbot found the following issue on:
+You should expand on this a bit more. The ccp_dm_free() function is 
+normally called to free that memory, but many of the call spots don't 
+expect to have to call ccp_dm_free() on an error return from 
+ccp_init_dm_workarea(). Because of that, the memory is freed in 
+ccp_init_dm_workarea().
 
-HEAD commit:    98b1cc82c4af Linux 6.7-rc2
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12e89e10e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6ae1a4ee971a7305
-dashboard link: https://syzkaller.appspot.com/bug?extid=c52ab18308964d248092
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=174f0bd4e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14b83b84e80000
+So a more detailed commit message about why this change is needed should 
+be provided.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/39c6cdad13fc/disk-98b1cc82.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5a77b5daef9b/vmlinux-98b1cc82.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/5e09ae712e0d/bzImage-98b1cc82.xz
+> 
+> Fixes: 63b945091a07 ("crypto: ccp - CCP device driver and interface support")
+> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+> ---
+>   drivers/crypto/ccp/ccp-ops.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+> index aa4e1a500691..45552ae6347e 100644
+> --- a/drivers/crypto/ccp/ccp-ops.c
+> +++ b/drivers/crypto/ccp/ccp-ops.c
+> @@ -179,8 +179,10 @@ static int ccp_init_dm_workarea(struct ccp_dm_workarea *wa,
+>   
+>   		wa->dma.address = dma_map_single(wa->dev, wa->address, len,
+>   						 dir);
+> -		if (dma_mapping_error(wa->dev, wa->dma.address))
+> +		if (dma_mapping_error(wa->dev, wa->dma.address)) {
+> +			kfree(wa->address);
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c52ab18308964d248092@syzkaller.appspotmail.com
+If future changes should result in ccp_dm_free() being called on an error 
+returned from ccp_init_dm_workarea(), you should add:
 
-INFO: task hwrng:749 blocked for more than 143 seconds.
-      Not tainted 6.7.0-rc2-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:hwrng           state:D stack:29040 pid:749   tgid:749   ppid:2      flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5376 [inline]
- __schedule+0xedb/0x5af0 kernel/sched/core.c:6688
- __schedule_loop kernel/sched/core.c:6763 [inline]
- schedule+0xe9/0x270 kernel/sched/core.c:6778
- schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6835
- __mutex_lock_common kernel/locking/mutex.c:679 [inline]
- __mutex_lock+0x5b9/0x9d0 kernel/locking/mutex.c:747
- hwrng_fillfn+0x145/0x430 drivers/char/hw_random/core.c:504
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
+			wa->address = NULL;
 
-Showing all locks held in the system:
-1 lock held by khungtaskd/29:
- #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:301 [inline]
- #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:747 [inline]
- #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x75/0x340 kernel/locking/lockdep.c:6613
-2 locks held by kswapd0/86:
-1 lock held by hwrng/749:
- #0: ffffffff8dbafee8 (reading_mutex){+.+.}-{3:3}, at: hwrng_fillfn+0x145/0x430 drivers/char/hw_random/core.c:504
-2 locks held by getty/4824:
- #0: ffff888025fa10a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
- #1: ffffc90002f062f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xfc6/0x1490 drivers/tty/n_tty.c:2201
-2 locks held by syz-executor391/5105:
-2 locks held by syz-executor391/5106:
+Thanks,
+Tom
 
-=============================================
-
-NMI backtrace for cpu 1
-CPU: 1 PID: 29 Comm: khungtaskd Not tainted 6.7.0-rc2-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
- nmi_cpu_backtrace+0x277/0x390 lib/nmi_backtrace.c:113
- nmi_trigger_cpumask_backtrace+0x299/0x300 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:222 [inline]
- watchdog+0xf87/0x1210 kernel/hung_task.c:379
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 PID: 5105 Comm: syz-executor391 Not tainted 6.7.0-rc2-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-RIP: 0010:__lock_acquire+0x30/0x3b10 kernel/locking/lockdep.c:4992
-Code: f6 41 55 41 54 49 89 fc 55 89 d5 53 44 89 cb 48 81 ec f0 00 00 00 48 8b 84 24 28 01 00 00 48 c7 84 24 90 00 00 00 b3 8a b5 41 <44> 89 44 24 08 44 8b ac 24 48 01 00 00 48 c7 84 24 98 00 00 00 1b
-RSP: 0018:ffffc900044271d8 EFLAGS: 00000086
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000002
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff8cfabce0
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff8f1934d7 R11: 0000000000000002 R12: ffffffff8cfabce0
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007f3c785f96c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005565d7bb9be7 CR3: 000000001af30000 CR4: 0000000000350ef0
-Call Trace:
- <NMI>
- </NMI>
- <TASK>
- lock_acquire kernel/locking/lockdep.c:5753 [inline]
- lock_acquire+0x1ae/0x520 kernel/locking/lockdep.c:5718
- rcu_lock_acquire include/linux/rcupdate.h:301 [inline]
- rcu_read_lock include/linux/rcupdate.h:747 [inline]
- get_mem_cgroup_from_mm+0x4b/0x4c0 mm/memcontrol.c:1081
- __mem_cgroup_charge+0x1c/0x140 mm/memcontrol.c:7224
- mem_cgroup_charge include/linux/memcontrol.h:684 [inline]
- __filemap_add_folio+0x88c/0xed0 mm/filemap.c:854
- filemap_add_folio+0xb1/0x1e0 mm/filemap.c:937
- page_cache_ra_unbounded+0x1d0/0x5f0 mm/readahead.c:250
- do_page_cache_ra mm/readahead.c:299 [inline]
- page_cache_ra_order+0x72b/0xa80 mm/readahead.c:546
- do_sync_mmap_readahead mm/filemap.c:3141 [inline]
- filemap_fault+0x16a8/0x3570 mm/filemap.c:3233
- __do_fault+0x107/0x600 mm/memory.c:4265
- do_cow_fault mm/memory.c:4662 [inline]
- do_fault mm/memory.c:4764 [inline]
- do_pte_missing mm/memory.c:3730 [inline]
- handle_pte_fault mm/memory.c:5038 [inline]
- __handle_mm_fault+0x3a8d/0x3d70 mm/memory.c:5179
- handle_mm_fault+0x47a/0xa10 mm/memory.c:5344
- do_user_addr_fault+0x3d1/0x1000 arch/x86/mm/fault.c:1413
- handle_page_fault arch/x86/mm/fault.c:1505 [inline]
- exc_page_fault+0x5d/0xc0 arch/x86/mm/fault.c:1561
- asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:570
-RIP: 0010:rep_movs_alternative+0x57/0x70 arch/x86/lib/copy_user_64.S:80
-Code: 00 66 90 48 8b 06 48 89 07 48 83 c6 08 48 83 c7 08 83 e9 08 74 df 83 f9 08 73 e8 eb c9 eb 01 c3 48 89 c8 48 c1 e9 03 83 e0 07 <f3> 48 a5 89 c1 85 c9 75 b3 c3 48 8d 0c c8 eb ac 66 0f 1f 84 00 00
-RSP: 0018:ffffc90004427bb0 EFLAGS: 00050246
-RAX: 0000000000000000 RBX: 0000000000000040 RCX: 0000000000000008
-RDX: ffffed1028a4ab48 RSI: ffff888145255a00 RDI: 0000000020019980
-RBP: 0000000020019980 R08: 0000000000000000 R09: ffffed1028a4ab47
-R10: ffff888145255a3f R11: 0000000000000001 R12: ffff888145255a00
-R13: 00000000200199c0 R14: 0000000000000000 R15: dffffc0000000000
- copy_user_generic arch/x86/include/asm/uaccess_64.h:112 [inline]
- raw_copy_to_user arch/x86/include/asm/uaccess_64.h:133 [inline]
- _copy_to_user lib/usercopy.c:41 [inline]
- _copy_to_user+0xa8/0xb0 lib/usercopy.c:34
- copy_to_user include/linux/uaccess.h:191 [inline]
- rng_dev_read+0x184/0x580 drivers/char/hw_random/core.c:255
- do_loop_readv_writev fs/read_write.c:755 [inline]
- do_loop_readv_writev fs/read_write.c:743 [inline]
- do_iter_read+0x567/0x830 fs/read_write.c:797
- vfs_readv+0x12d/0x1a0 fs/read_write.c:915
- do_preadv fs/read_write.c:1007 [inline]
- __do_sys_preadv fs/read_write.c:1057 [inline]
- __se_sys_preadv fs/read_write.c:1052 [inline]
- __x64_sys_preadv+0x228/0x300 fs/read_write.c:1052
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f3c78638b29
-Code: Unable to access opcode bytes at 0x7f3c78638aff.
-RSP: 002b:00007f3c785f9168 EFLAGS: 00000246 ORIG_RAX: 0000000000000127
-RAX: ffffffffffffffda RBX: 00007f3c786c2328 RCX: 00007f3c78638b29
-RDX: 0000000000000001 RSI: 0000000020001880 RDI: 0000000000000003
-RBP: 00007f3c786c2320 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f3c786c232c
-R13: 0000000000000000 R14: 00007ffc8a220310 R15: 00007ffc8a2203f8
- </TASK>
-INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.464 msecs
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>   			return -ENOMEM;
+> +		}
+>   
+>   		wa->dma.length = len;
+>   	}
