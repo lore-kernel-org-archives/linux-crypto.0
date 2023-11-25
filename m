@@ -1,388 +1,217 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF6A710EB;
-	Sat, 25 Nov 2023 03:50:12 -0800 (PST)
-Received: from kwepemm000009.china.huawei.com (unknown [172.30.72.54])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Scqs30W1QzvQvp;
-	Sat, 25 Nov 2023 19:49:43 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- kwepemm000009.china.huawei.com (7.193.23.227) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sat, 25 Nov 2023 19:50:10 +0800
-From: Weili Qian <qianweili@huawei.com>
-To: <herbert@gondor.apana.org.au>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<liulongfang@huawei.com>
-Subject: [PATCH 2/3] crypto: hisilicon/qm - simplify the status of qm
-Date: Sat, 25 Nov 2023 19:50:10 +0800
-Message-ID: <20231125115011.22519-3-qianweili@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20231125115011.22519-1-qianweili@huawei.com>
-References: <20231125115011.22519-1-qianweili@huawei.com>
+Received: from mail-pl1-f205.google.com (mail-pl1-f205.google.com [209.85.214.205])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC198B7
+	for <linux-crypto@vger.kernel.org>; Sat, 25 Nov 2023 05:21:27 -0800 (PST)
+Received: by mail-pl1-f205.google.com with SMTP id d9443c01a7336-1cfb2811203so5400205ad.1
+        for <linux-crypto@vger.kernel.org>; Sat, 25 Nov 2023 05:21:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700918487; x=1701523287;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XSYiGfAAMAcRis1TVQ3Zrz9Kz4BF0k5UJY3eSxQoyKI=;
+        b=bT10g/GHosbBFoKDTyLzPApFEf6Kx7K+cjIROY0IukPruC/TaxcXEDG9oYKANEyAK7
+         DC8IXcv/x+gNnDTcPLBarJbJUaSr4z3l5aaAgJI58bNTg+veXi0uTwHWTWQ6Uu/BaR45
+         67UWFiCAXdDEfrr1UX4dlkhb88DG7Zkp7Bh6zR2f1djm/0a5YV8117fPJfzPKhKEKFdm
+         nj/OrtzSyMW6F6YTILZ0OzJCE/FChQf5NO01TrEa/LWap46USWPH46UfbYDa7DebYY7x
+         0zKkaVNf22KmX8jBHJLpK9+WNfBCXVf3zr/irOKHUmOSDexJfZpbxkN1xWASKIi/mzcn
+         S+KA==
+X-Gm-Message-State: AOJu0Yy1uBieMvAXbWFs4wLnAw891D+uFvUYVD7HGl7MFaVpk00hsiho
+	+JJM9TGlhCmXcTAiVlwXSJkLIqgMBRGFgNakV15pabC5DDFS
+X-Google-Smtp-Source: AGHT+IGqp3Y75FgghXsxU/FPfMOoM9MT5kJ+jGpKKk2gh5/Lj1pIzRkeGSpeyOWlDoVcqt5pX1Vju38kom1BdTJz8ul2rZi9aKkP
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm000009.china.huawei.com (7.193.23.227)
-X-CFilter-Loop: Reflected
+X-Received: by 2002:a17:902:e0ca:b0:1cc:2c44:58f4 with SMTP id
+ e10-20020a170902e0ca00b001cc2c4458f4mr1575340pla.1.1700918487510; Sat, 25 Nov
+ 2023 05:21:27 -0800 (PST)
+Date: Sat, 25 Nov 2023 05:21:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003d77e6060af9f233@google.com>
+Subject: [syzbot] [crypto?] INFO: task hung in hwrng_fillfn
+From: syzbot <syzbot+c52ab18308964d248092@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	olivia@selenic.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The 'QM_INIT' and 'QM_CLOSE' status of qm and 'QP_INIT'
-and 'QP_CLOSE' status of queue are not actually used. Currently,
-driver only needs to switch status when the device or queue
-is enabled or stopped, Therefore, remove unneeded status to
-simplify driver. In addition, rename'QM_START to'QM_WORK' for
-ease to understand.
+Hello,
 
-Signed-off-by: Weili Qian <qianweili@huawei.com>
+syzbot found the following issue on:
+
+HEAD commit:    98b1cc82c4af Linux 6.7-rc2
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12e89e10e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6ae1a4ee971a7305
+dashboard link: https://syzkaller.appspot.com/bug?extid=c52ab18308964d248092
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=174f0bd4e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14b83b84e80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/39c6cdad13fc/disk-98b1cc82.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5a77b5daef9b/vmlinux-98b1cc82.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5e09ae712e0d/bzImage-98b1cc82.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c52ab18308964d248092@syzkaller.appspotmail.com
+
+INFO: task hwrng:749 blocked for more than 143 seconds.
+      Not tainted 6.7.0-rc2-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:hwrng           state:D stack:29040 pid:749   tgid:749   ppid:2      flags:0x00004000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5376 [inline]
+ __schedule+0xedb/0x5af0 kernel/sched/core.c:6688
+ __schedule_loop kernel/sched/core.c:6763 [inline]
+ schedule+0xe9/0x270 kernel/sched/core.c:6778
+ schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6835
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0x5b9/0x9d0 kernel/locking/mutex.c:747
+ hwrng_fillfn+0x145/0x430 drivers/char/hw_random/core.c:504
+ kthread+0x2c6/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/29:
+ #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:301 [inline]
+ #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:747 [inline]
+ #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x75/0x340 kernel/locking/lockdep.c:6613
+2 locks held by kswapd0/86:
+1 lock held by hwrng/749:
+ #0: ffffffff8dbafee8 (reading_mutex){+.+.}-{3:3}, at: hwrng_fillfn+0x145/0x430 drivers/char/hw_random/core.c:504
+2 locks held by getty/4824:
+ #0: ffff888025fa10a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
+ #1: ffffc90002f062f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xfc6/0x1490 drivers/tty/n_tty.c:2201
+2 locks held by syz-executor391/5105:
+2 locks held by syz-executor391/5106:
+
+=============================================
+
+NMI backtrace for cpu 1
+CPU: 1 PID: 29 Comm: khungtaskd Not tainted 6.7.0-rc2-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+ nmi_cpu_backtrace+0x277/0x390 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x299/0x300 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:222 [inline]
+ watchdog+0xf87/0x1210 kernel/hung_task.c:379
+ kthread+0x2c6/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 PID: 5105 Comm: syz-executor391 Not tainted 6.7.0-rc2-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+RIP: 0010:__lock_acquire+0x30/0x3b10 kernel/locking/lockdep.c:4992
+Code: f6 41 55 41 54 49 89 fc 55 89 d5 53 44 89 cb 48 81 ec f0 00 00 00 48 8b 84 24 28 01 00 00 48 c7 84 24 90 00 00 00 b3 8a b5 41 <44> 89 44 24 08 44 8b ac 24 48 01 00 00 48 c7 84 24 98 00 00 00 1b
+RSP: 0018:ffffc900044271d8 EFLAGS: 00000086
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000002
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff8cfabce0
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffff8f1934d7 R11: 0000000000000002 R12: ffffffff8cfabce0
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+FS:  00007f3c785f96c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005565d7bb9be7 CR3: 000000001af30000 CR4: 0000000000350ef0
+Call Trace:
+ <NMI>
+ </NMI>
+ <TASK>
+ lock_acquire kernel/locking/lockdep.c:5753 [inline]
+ lock_acquire+0x1ae/0x520 kernel/locking/lockdep.c:5718
+ rcu_lock_acquire include/linux/rcupdate.h:301 [inline]
+ rcu_read_lock include/linux/rcupdate.h:747 [inline]
+ get_mem_cgroup_from_mm+0x4b/0x4c0 mm/memcontrol.c:1081
+ __mem_cgroup_charge+0x1c/0x140 mm/memcontrol.c:7224
+ mem_cgroup_charge include/linux/memcontrol.h:684 [inline]
+ __filemap_add_folio+0x88c/0xed0 mm/filemap.c:854
+ filemap_add_folio+0xb1/0x1e0 mm/filemap.c:937
+ page_cache_ra_unbounded+0x1d0/0x5f0 mm/readahead.c:250
+ do_page_cache_ra mm/readahead.c:299 [inline]
+ page_cache_ra_order+0x72b/0xa80 mm/readahead.c:546
+ do_sync_mmap_readahead mm/filemap.c:3141 [inline]
+ filemap_fault+0x16a8/0x3570 mm/filemap.c:3233
+ __do_fault+0x107/0x600 mm/memory.c:4265
+ do_cow_fault mm/memory.c:4662 [inline]
+ do_fault mm/memory.c:4764 [inline]
+ do_pte_missing mm/memory.c:3730 [inline]
+ handle_pte_fault mm/memory.c:5038 [inline]
+ __handle_mm_fault+0x3a8d/0x3d70 mm/memory.c:5179
+ handle_mm_fault+0x47a/0xa10 mm/memory.c:5344
+ do_user_addr_fault+0x3d1/0x1000 arch/x86/mm/fault.c:1413
+ handle_page_fault arch/x86/mm/fault.c:1505 [inline]
+ exc_page_fault+0x5d/0xc0 arch/x86/mm/fault.c:1561
+ asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:570
+RIP: 0010:rep_movs_alternative+0x57/0x70 arch/x86/lib/copy_user_64.S:80
+Code: 00 66 90 48 8b 06 48 89 07 48 83 c6 08 48 83 c7 08 83 e9 08 74 df 83 f9 08 73 e8 eb c9 eb 01 c3 48 89 c8 48 c1 e9 03 83 e0 07 <f3> 48 a5 89 c1 85 c9 75 b3 c3 48 8d 0c c8 eb ac 66 0f 1f 84 00 00
+RSP: 0018:ffffc90004427bb0 EFLAGS: 00050246
+RAX: 0000000000000000 RBX: 0000000000000040 RCX: 0000000000000008
+RDX: ffffed1028a4ab48 RSI: ffff888145255a00 RDI: 0000000020019980
+RBP: 0000000020019980 R08: 0000000000000000 R09: ffffed1028a4ab47
+R10: ffff888145255a3f R11: 0000000000000001 R12: ffff888145255a00
+R13: 00000000200199c0 R14: 0000000000000000 R15: dffffc0000000000
+ copy_user_generic arch/x86/include/asm/uaccess_64.h:112 [inline]
+ raw_copy_to_user arch/x86/include/asm/uaccess_64.h:133 [inline]
+ _copy_to_user lib/usercopy.c:41 [inline]
+ _copy_to_user+0xa8/0xb0 lib/usercopy.c:34
+ copy_to_user include/linux/uaccess.h:191 [inline]
+ rng_dev_read+0x184/0x580 drivers/char/hw_random/core.c:255
+ do_loop_readv_writev fs/read_write.c:755 [inline]
+ do_loop_readv_writev fs/read_write.c:743 [inline]
+ do_iter_read+0x567/0x830 fs/read_write.c:797
+ vfs_readv+0x12d/0x1a0 fs/read_write.c:915
+ do_preadv fs/read_write.c:1007 [inline]
+ __do_sys_preadv fs/read_write.c:1057 [inline]
+ __se_sys_preadv fs/read_write.c:1052 [inline]
+ __x64_sys_preadv+0x228/0x300 fs/read_write.c:1052
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7f3c78638b29
+Code: Unable to access opcode bytes at 0x7f3c78638aff.
+RSP: 002b:00007f3c785f9168 EFLAGS: 00000246 ORIG_RAX: 0000000000000127
+RAX: ffffffffffffffda RBX: 00007f3c786c2328 RCX: 00007f3c78638b29
+RDX: 0000000000000001 RSI: 0000000020001880 RDI: 0000000000000003
+RBP: 00007f3c786c2320 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f3c786c232c
+R13: 0000000000000000 R14: 00007ffc8a220310 R15: 00007ffc8a2203f8
+ </TASK>
+INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.464 msecs
+
+
 ---
- Documentation/ABI/testing/debugfs-hisi-hpre |   2 +-
- Documentation/ABI/testing/debugfs-hisi-sec  |   2 +-
- Documentation/ABI/testing/debugfs-hisi-zip  |   2 +-
- drivers/crypto/hisilicon/debugfs.c          |   4 +
- drivers/crypto/hisilicon/qm.c               | 130 +++-----------------
- drivers/crypto/hisilicon/qm_common.h        |   4 -
- include/linux/hisi_acc_qm.h                 |   8 +-
- 7 files changed, 25 insertions(+), 127 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/Documentation/ABI/testing/debugfs-hisi-hpre b/Documentation/ABI/testing/debugfs-hisi-hpre
-index 82abf92df429..8e8de49c5cc6 100644
---- a/Documentation/ABI/testing/debugfs-hisi-hpre
-+++ b/Documentation/ABI/testing/debugfs-hisi-hpre
-@@ -101,7 +101,7 @@ What:		/sys/kernel/debug/hisi_hpre/<bdf>/qm/status
- Date:		Apr 2020
- Contact:	linux-crypto@vger.kernel.org
- Description:	Dump the status of the QM.
--		Four states: initiated, started, stopped and closed.
-+		Two states: work, stop.
- 		Available for both PF and VF, and take no other effect on HPRE.
- 
- What:		/sys/kernel/debug/hisi_hpre/<bdf>/qm/diff_regs
-diff --git a/Documentation/ABI/testing/debugfs-hisi-sec b/Documentation/ABI/testing/debugfs-hisi-sec
-index 93c530d1bf0f..deeefe2c735e 100644
---- a/Documentation/ABI/testing/debugfs-hisi-sec
-+++ b/Documentation/ABI/testing/debugfs-hisi-sec
-@@ -81,7 +81,7 @@ What:		/sys/kernel/debug/hisi_sec2/<bdf>/qm/status
- Date:		Apr 2020
- Contact:	linux-crypto@vger.kernel.org
- Description:	Dump the status of the QM.
--		Four states: initiated, started, stopped and closed.
-+		Two states: work, stop.
- 		Available for both PF and VF, and take no other effect on SEC.
- 
- What:		/sys/kernel/debug/hisi_sec2/<bdf>/qm/diff_regs
-diff --git a/Documentation/ABI/testing/debugfs-hisi-zip b/Documentation/ABI/testing/debugfs-hisi-zip
-index fd3f314cf8d1..593714afaed2 100644
---- a/Documentation/ABI/testing/debugfs-hisi-zip
-+++ b/Documentation/ABI/testing/debugfs-hisi-zip
-@@ -94,7 +94,7 @@ What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/status
- Date:		Apr 2020
- Contact:	linux-crypto@vger.kernel.org
- Description:	Dump the status of the QM.
--		Four states: initiated, started, stopped and closed.
-+		Two states: work, stop.
- 		Available for both PF and VF, and take no other effect on ZIP.
- 
- What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/diff_regs
-diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
-index 415139b4abc1..80ed4b2d209c 100644
---- a/drivers/crypto/hisilicon/debugfs.c
-+++ b/drivers/crypto/hisilicon/debugfs.c
-@@ -31,6 +31,10 @@ static const char * const qm_debug_file_name[] = {
- 	[CLEAR_ENABLE] = "clear_enable",
- };
- 
-+static const char * const qm_s[] = {
-+	"work", "stop",
-+};
-+
- struct qm_dfx_item {
- 	const char *name;
- 	u32 offset;
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 4d91a249be74..7d22412774ba 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -402,10 +402,6 @@ static const char * const qm_fifo_overflow[] = {
- 	"cq", "eq", "aeq",
- };
- 
--static const char * const qp_s[] = {
--	"none", "init", "start", "stop", "close",
--};
--
- struct qm_typical_qos_table {
- 	u32 start;
- 	u32 end;
-@@ -433,85 +429,6 @@ static struct qm_typical_qos_table shaper_cbs_s[] = {
- 
- static void qm_irqs_unregister(struct hisi_qm *qm);
- 
--static bool qm_avail_state(struct hisi_qm *qm, enum qm_state new)
--{
--	enum qm_state curr = atomic_read(&qm->status.flags);
--	bool avail = false;
--
--	switch (curr) {
--	case QM_INIT:
--		if (new == QM_START || new == QM_CLOSE)
--			avail = true;
--		break;
--	case QM_START:
--		if (new == QM_STOP)
--			avail = true;
--		break;
--	case QM_STOP:
--		if (new == QM_CLOSE || new == QM_START)
--			avail = true;
--		break;
--	default:
--		break;
--	}
--
--	dev_dbg(&qm->pdev->dev, "change qm state from %s to %s\n",
--		qm_s[curr], qm_s[new]);
--
--	if (!avail)
--		dev_warn(&qm->pdev->dev, "Can not change qm state from %s to %s\n",
--			 qm_s[curr], qm_s[new]);
--
--	return avail;
--}
--
--static bool qm_qp_avail_state(struct hisi_qm *qm, struct hisi_qp *qp,
--			      enum qp_state new)
--{
--	enum qm_state qm_curr = atomic_read(&qm->status.flags);
--	enum qp_state qp_curr = 0;
--	bool avail = false;
--
--	if (qp)
--		qp_curr = atomic_read(&qp->qp_status.flags);
--
--	switch (new) {
--	case QP_INIT:
--		if (qm_curr == QM_START || qm_curr == QM_INIT)
--			avail = true;
--		break;
--	case QP_START:
--		if ((qm_curr == QM_START && qp_curr == QP_INIT) ||
--		    (qm_curr == QM_START && qp_curr == QP_STOP))
--			avail = true;
--		break;
--	case QP_STOP:
--		if ((qm_curr == QM_START && qp_curr == QP_START) ||
--		    (qp_curr == QP_INIT))
--			avail = true;
--		break;
--	case QP_CLOSE:
--		if ((qm_curr == QM_START && qp_curr == QP_INIT) ||
--		    (qm_curr == QM_START && qp_curr == QP_STOP) ||
--		    (qm_curr == QM_STOP && qp_curr == QP_STOP)  ||
--		    (qm_curr == QM_STOP && qp_curr == QP_INIT))
--			avail = true;
--		break;
--	default:
--		break;
--	}
--
--	dev_dbg(&qm->pdev->dev, "change qp state from %s to %s in QM %s\n",
--		qp_s[qp_curr], qp_s[new], qm_s[qm_curr]);
--
--	if (!avail)
--		dev_warn(&qm->pdev->dev,
--			 "Can not change qp state from %s to %s in QM %s\n",
--			 qp_s[qp_curr], qp_s[new], qm_s[qm_curr]);
--
--	return avail;
--}
--
- static u32 qm_get_hw_error_status(struct hisi_qm *qm)
- {
- 	return readl(qm->io_base + QM_ABNORMAL_INT_STATUS);
-@@ -1853,8 +1770,10 @@ static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type)
- 	struct hisi_qp *qp;
- 	int qp_id;
- 
--	if (!qm_qp_avail_state(qm, NULL, QP_INIT))
-+	if (atomic_read(&qm->status.flags) == QM_STOP) {
-+		dev_info_ratelimited(dev, "failed to create qp as qm is stop!\n");
- 		return ERR_PTR(-EPERM);
-+	}
- 
- 	if (qm->qp_in_used == qm->qp_num) {
- 		dev_info_ratelimited(dev, "All %u queues of QM are busy!\n",
-@@ -1881,7 +1800,6 @@ static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type)
- 	qp->alg_type = alg_type;
- 	qp->is_in_kernel = true;
- 	qm->qp_in_used++;
--	atomic_set(&qp->qp_status.flags, QP_INIT);
- 
- 	return qp;
- }
-@@ -1924,11 +1842,6 @@ static void hisi_qm_release_qp(struct hisi_qp *qp)
- 
- 	down_write(&qm->qps_lock);
- 
--	if (!qm_qp_avail_state(qm, qp, QP_CLOSE)) {
--		up_write(&qm->qps_lock);
--		return;
--	}
--
- 	qm->qp_in_used--;
- 	idr_remove(&qm->qp_idr, qp->qp_id);
- 
-@@ -2008,8 +1921,10 @@ static int qm_start_qp_nolock(struct hisi_qp *qp, unsigned long arg)
- 	u32 pasid = arg;
- 	int ret;
- 
--	if (!qm_qp_avail_state(qm, qp, QP_START))
-+	if (atomic_read(&qm->status.flags) == QM_STOP) {
-+		dev_info_ratelimited(dev, "failed to start qp as qm is stop!\n");
- 		return -EPERM;
-+	}
- 
- 	ret = qm_qp_ctx_cfg(qp, qp_id, pasid);
- 	if (ret)
-@@ -2131,21 +2046,17 @@ static int qm_stop_qp_nolock(struct hisi_qp *qp)
- 	 * is_resetting flag should be set negative so that this qp will not
- 	 * be restarted after reset.
- 	 */
--	if (atomic_read(&qp->qp_status.flags) == QP_STOP) {
-+	if (atomic_read(&qp->qp_status.flags) != QP_START) {
- 		qp->is_resetting = false;
- 		return 0;
- 	}
- 
--	if (!qm_qp_avail_state(qp->qm, qp, QP_STOP))
--		return -EPERM;
--
- 	atomic_set(&qp->qp_status.flags, QP_STOP);
- 
- 	ret = qm_drain_qp(qp);
- 	if (ret)
- 		dev_err(dev, "Failed to drain out data for stopping!\n");
- 
--
- 	flush_workqueue(qp->qm->wq);
- 	if (unlikely(qp->is_resetting && atomic_read(&qp->qp_status.used)))
- 		qp_stop_fail_cb(qp);
-@@ -2865,13 +2776,8 @@ void hisi_qm_uninit(struct hisi_qm *qm)
- {
- 	qm_cmd_uninit(qm);
- 	hisi_qm_unint_work(qm);
--	down_write(&qm->qps_lock);
--
--	if (!qm_avail_state(qm, QM_CLOSE)) {
--		up_write(&qm->qps_lock);
--		return;
--	}
- 
-+	down_write(&qm->qps_lock);
- 	hisi_qm_memory_uninit(qm);
- 	hisi_qm_set_state(qm, QM_NOT_READY);
- 	up_write(&qm->qps_lock);
-@@ -3045,11 +2951,6 @@ int hisi_qm_start(struct hisi_qm *qm)
- 
- 	down_write(&qm->qps_lock);
- 
--	if (!qm_avail_state(qm, QM_START)) {
--		up_write(&qm->qps_lock);
--		return -EPERM;
--	}
--
- 	dev_dbg(dev, "qm start with %u queue pairs\n", qm->qp_num);
- 
- 	if (!qm->qp_num) {
-@@ -3059,10 +2960,12 @@ int hisi_qm_start(struct hisi_qm *qm)
- 	}
- 
- 	ret = __hisi_qm_start(qm);
--	if (!ret)
--		atomic_set(&qm->status.flags, QM_START);
-+	if (ret)
-+		goto err_unlock;
- 
-+	atomic_set(&qm->status.flags, QM_WORK);
- 	hisi_qm_set_state(qm, QM_READY);
-+
- err_unlock:
- 	up_write(&qm->qps_lock);
- 	return ret;
-@@ -3159,10 +3062,11 @@ int hisi_qm_stop(struct hisi_qm *qm, enum qm_stop_reason r)
- 	down_write(&qm->qps_lock);
- 
- 	qm->status.stop_reason = r;
--	if (!qm_avail_state(qm, QM_STOP)) {
--		ret = -EPERM;
-+	if (atomic_read(&qm->status.flags) == QM_STOP)
- 		goto err_unlock;
--	}
-+
-+	/* Stop all the request sending at first. */
-+	atomic_set(&qm->status.flags, QM_STOP);
- 
- 	if (qm->status.stop_reason == QM_SOFT_RESET ||
- 	    qm->status.stop_reason == QM_DOWN) {
-@@ -3186,7 +3090,6 @@ int hisi_qm_stop(struct hisi_qm *qm, enum qm_stop_reason r)
- 	}
- 
- 	qm_clear_queues(qm);
--	atomic_set(&qm->status.flags, QM_STOP);
- 
- err_unlock:
- 	up_write(&qm->qps_lock);
-@@ -5350,7 +5253,6 @@ int hisi_qm_init(struct hisi_qm *qm)
- 		goto err_free_qm_memory;
- 
- 	qm_cmd_init(qm);
--	atomic_set(&qm->status.flags, QM_INIT);
- 
- 	return 0;
- 
-diff --git a/drivers/crypto/hisilicon/qm_common.h b/drivers/crypto/hisilicon/qm_common.h
-index 7b0b15c83ec1..0760bf55f13e 100644
---- a/drivers/crypto/hisilicon/qm_common.h
-+++ b/drivers/crypto/hisilicon/qm_common.h
-@@ -72,10 +72,6 @@ struct qm_aeqc {
- 	__le32 dw6;
- };
- 
--static const char * const qm_s[] = {
--	"init", "start", "close", "stop",
--};
--
- int qm_set_and_get_xqc(struct hisi_qm *qm, u8 cmd, void *xqc, u32 qp_id, bool op);
- void hisi_qm_show_last_dfx_regs(struct hisi_qm *qm);
- void hisi_qm_set_algqos_init(struct hisi_qm *qm);
-diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-index ddc7ebb70523..e3c0a1297b2c 100644
---- a/include/linux/hisi_acc_qm.h
-+++ b/include/linux/hisi_acc_qm.h
-@@ -108,17 +108,13 @@ enum qm_stop_reason {
- };
- 
- enum qm_state {
--	QM_INIT = 0,
--	QM_START,
--	QM_CLOSE,
-+	QM_WORK = 0,
- 	QM_STOP,
- };
- 
- enum qp_state {
--	QP_INIT = 1,
--	QP_START,
-+	QP_START = 1,
- 	QP_STOP,
--	QP_CLOSE,
- };
- 
- enum qm_hw_ver {
--- 
-2.33.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
