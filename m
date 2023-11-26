@@ -1,159 +1,191 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lz7RqUO8"
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D73F7;
-	Sat, 25 Nov 2023 07:10:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BVz7Vfqhm9zD0s/E8C3htys+ChdIgENG4qmq9JXWHdycyTFP2wJAB9M4y1HdwZ05En/ChuBXEbTYSUxizEGUfffvwecJrARsrZ1X35ZyTlX+tpOuWv35qaZmMhmS4+WHiRKpeE1g1c4aNdbnIPUCKsoy2derouIPtG/8f+K06d1fqYFuyAvgcF3eZ1WGCF+UbiFe/pbiG69hCAs7Pn1njuFyb/ZEYLe7j7N4PJBSNMJ2H9hF3uP9MhzisZ17dEoHRaqVWE6qdXSw5RfuSwB3sjtxeeSWoVLQNV9KSnbUtFZ/99XjBQiY7lqlsVawJi9a3ERBtr+CaMvlhCVrpvbqOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Dvul4LiikNP004wiqil+r2jbimyKb+4r4TP4iu/7Fhk=;
- b=NK8mdkbmt63Tc0RGKXeHDwcnp0v7IWFEcrX7PkhUA0xfQZlbk7rA9JyUEIM+nUPnBjhcpmtmfYCDF/RpFUBjOvbzVjGG2z3G21f6AYbBPhK9fnj6pVqYD5thSOhLupRnBBP1+zCp7o+pLgPgYKeQTKqwmDYKlCWzzqFlhJBuuvXI0PrTeH8C1PPGIMyiWebuflvVgOGitllg5fkCpFEI86m3k9jERUsZxGcizjGEG2LfK002U1r2dJltbn1CFzwg9UvoUFGsUyTD+lMLK2T6INXZMcNqvHzrYDwHpg5kZELEUTTcPBNIfOVnUeW9ScBmnXh4gBJhSsM0Gy68lJGcgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Dvul4LiikNP004wiqil+r2jbimyKb+4r4TP4iu/7Fhk=;
- b=lz7RqUO8FcS0IwIzI61rujKE40D0k+ONoGKHkcSDbWSvzsNtdpeW8C/nlpKksEJv9EC7HNbsTmaW2hfg0LFGfGaHC0t2OPuFEP6h146It8VTaHXtCHmz3uAdTI9f4N4xMI174gg/hFtyBf+8E/akLGjcoZJT+kfodGTbEFlcuvo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
- by CH3PR12MB9343.namprd12.prod.outlook.com (2603:10b6:610:1c0::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.22; Sat, 25 Nov
- 2023 15:10:12 +0000
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::1d68:1eb8:d7dc:4b43]) by BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::1d68:1eb8:d7dc:4b43%6]) with mapi id 15.20.7025.022; Sat, 25 Nov 2023
- 15:10:12 +0000
-Message-ID: <3f033585-91c6-1d70-be1e-f083fc855aed@amd.com>
-Date: Sat, 25 Nov 2023 09:10:09 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] crypto: ccp - fix memleak in ccp_init_dm_workarea
-Content-Language: en-US
-To: Dinghao Liu <dinghao.liu@zju.edu.cn>
-Cc: John Allen <john.allen@amd.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231123070337.11600-1-dinghao.liu@zju.edu.cn>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20231123070337.11600-1-dinghao.liu@zju.edu.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR10CA0027.namprd10.prod.outlook.com
- (2603:10b6:806:a7::32) To BL1PR12MB5732.namprd12.prod.outlook.com
- (2603:10b6:208:387::17)
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="LvJk6adi"
+Received: from out203-205-221-231.mail.qq.com (out203-205-221-231.mail.qq.com [203.205.221.231])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5514FB;
+	Sat, 25 Nov 2023 23:07:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1700982458; bh=nh8oXDZrE99UzNjND6tyL+laThRQuP8L/2BY7Nqu3gE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=LvJk6adiXzOAuGLVp1zj41ax5A8ekbs13jXJcAjlX6o/GKXA++Fe5YGxilO28uwyV
+	 19foL57tcy6C9h9uIzBOmLcHHtgdUyH1hEdPPgFMSYvlkto+ZfOVyfri87kMKRTYgw
+	 GRMjcDk9E0fa3peeIwnqReHbkiC+lUCPYqGcHvWk=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+	by newxmesmtplogicsvrsza10-0.qq.com (NewEsmtp) with SMTP
+	id 1E40CC1A; Sun, 26 Nov 2023 15:07:36 +0800
+X-QQ-mid: xmsmtpt1700982456t1x138g0f
+Message-ID: <tencent_97BC6EC36EF24C91A7E7C6DFD2C106688906@qq.com>
+X-QQ-XMAILINFO: OKkKo7I1HxIeI0hB7WvsBqfntZuCEqsWCguVkXJ0exKDD9z5GDKAXVeRtxt30r
+	 8Q25KbtGSORdOE5B3u3kCMf7HseurkQtlwTO4rWJg5NIycAzBD7vw4sB+jp4qUCOGr2JK7uTKITw
+	 CpXbA0TSAjAAmmm65nXw9FBzm2/uZipgsLZQpPc+j5mu/35J6L4v6zhSXUx3JLMfVD3Z8SdEC6pM
+	 U7+uP+kJbrhCGLjhdsZfIcqMuI/dOnCigcfTm9TjeXrcpL+sjHUIRYLNugN9ccpqGyZXYQBp5J4d
+	 j4AkNWeQJvdOnz61E3almNNmmWsKLhvCV8yIPKEV/9eSamc8vNHagE41nou1IJ0eBwud+2R9Csh+
+	 1w6bPMZ/Xgjqn+/6EH+BIbDrqPOax+aTcV6bWcpMH0CqXcq3vR7A8XAFIvU7v/SX3NnGKFofYcYT
+	 B8EQzNpHzeB7/7STUaqW1WwIEIvw8gNsrknbyzvaY7XYgLpQUuDMZcDgvFFqCiewuYRQUQX7MF8f
+	 wbFDv3dmL2U1Gk5snZZuxBDTzcDeRKbDNXYZTjLJMf+GbVHFto6DHgMqiRpRU+8KIE6nZVO6VTF7
+	 7RIFCN0fIucfjQ/YIhpQowpbiWZHDrQxY/vup0WRjvIsYLFt+He38JJR9UOWpPRS2j0eBW50C8FB
+	 ImpnegBFlMbtZeBvo2AE4x9ihOF1IADYbvYAHB726V66mwTwSEaEdiK6xy3Hitt9crTjPZxJrA74
+	 2KA+VST3FcU1otwbNVsxrGpEtOW4KNTw4N9Jsk9qyw9HZkpUUi6QX99jdIt6C5f7b+5cGlWfZW8w
+	 erFpbzF+lOFpZD0GjlK1ly6wHwv0K3KDUpAX9M2jLaNQupJswcmIKSZM/Jfb3kzRk6rINNZQubna
+	 XJB508pqK4G2Qjt39xf1lBcH6pPkV0rIBHF0N4F4bTjbIdi/ff9Y2Qa2NW8ylCb6H2Uy9tfsnl
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+c52ab18308964d248092@syzkaller.appspotmail.com
+Cc: davem@davemloft.net,
+	herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	olivia@selenic.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] hwrng: core - fix task hung in hwrng_fillfn
+Date: Sun, 26 Nov 2023 15:07:36 +0800
+X-OQ-MSGID: <20231126070735.462195-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <0000000000003d77e6060af9f233@google.com>
+References: <0000000000003d77e6060af9f233@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|CH3PR12MB9343:EE_
-X-MS-Office365-Filtering-Correlation-Id: d4a3699a-38a3-4f23-183d-08dbedc89edf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	weL7pahs3Ay/2ceu30JqAvnh2uhpLdHqhyTCwje/RdbP836SwLFOuVNIlJfkpWlKKQnY1fDbAPhqHiGLVP1cDCFGlaDjr8q3eFnWCBvbENs0ieVXP5pVV31djCR9c0nD6xeoQeoxAvSjpYEOvjT3GpRUFGuTWOt9wMViQdE+VuiBKJOMLWWrxWl8bCCt0DhuALGUgMRqrzj8lfaAiFlUnKXLx3ZXZ96lghRI5gL80c8KfmBPIHKUqaWJe/rkpMP2vY29RFsFUTP9BwVMJ3CROspKK3KNJwHrI4yRlFmM9gPJs0rzo48rFlE+XoGZqgr68AIA6TpU9X2XIWTSlfZSVhErRIfdkrQCxSWlJPGTP5WNBTn/QEw0iyAY0+aS35CFY79JeiCtf7DZPlfFJqaJri5mTqxbVzy0Yamw8MBKHjmmdjBP3V2L8zYeI3A/IYc0lA2bT5WkxhKC0WisikSxjm6tXbfGCdFWBnRxor3++9gQGR6r3qXkr78JJS4wUogjERKUJ2Zs/th8AqI0xTGikLFAKQW4nD4NO+KiB5mDtgCzaOeu8yP8IQrK7pKTQ32VxAJyYM3u8ZNE5IH3vRSfYkO2B23+GHbICtCwGXBmUlSp4xA4XWRsgZiAddRzrjDWdu9ynKrXzZFd7GSg1+eBYQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(366004)(136003)(396003)(346002)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(41300700001)(36756003)(5660300002)(2906002)(31696002)(86362001)(6512007)(6666004)(53546011)(6506007)(26005)(83380400001)(478600001)(6486002)(2616005)(38100700002)(8936002)(54906003)(316002)(6916009)(66946007)(66556008)(66476007)(31686004)(4326008)(8676002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QWVQbXNBMnVsWmloWjVYaWtTczVqNVFGTTh1eFlOcjEzQ0dTNGc1YU0rdm50?=
- =?utf-8?B?NkZqRGh2alg4TS81dzd5TmxQVXRKTTFiN2V3REN1Q3F6TWRRVmJBaWpQSHdn?=
- =?utf-8?B?Zml3c0NjSy8yWUIya2Nscnpwb3M0TzJ6d1FVNllWSVhkbEZWOTQvRVhoMVk1?=
- =?utf-8?B?a2NnSURRUEMvSFZIakV4T1RVVTBIQVRiekVTTTdmYlFXekFFQUF5WXRZT0pz?=
- =?utf-8?B?L3IvRzVPOXZpbHJGdmZaM3BlQ21ndjh3enhhTDdmTDk1ZTkvRWdrNGVmMk55?=
- =?utf-8?B?S2dvcFFNa0pFd1drYXE3UTFWd0ROMmlpem81SUcrQVJkR0h2NGg3ZUNLWHcy?=
- =?utf-8?B?elRUMkQzNTZjWHNlcmdSWlU2ZmR4d21aeDZXUDBQU1ZWSnp4Y1c1QjZEUlhY?=
- =?utf-8?B?UkdaL1JrY2ZXMW9oZ0ZNMmJzMFNCb1N6VEZTb2pDRjNaQmNoam95NzNUelJQ?=
- =?utf-8?B?MWQyWHVjYUJLTTNvd29JRXpHOGFhMEt5d2xPRUh1alZmblREbGVKUXdURDdC?=
- =?utf-8?B?Z2xCR1BhRzY1TTBlRDRoNS82Njl3NUFRVWxlZnN0YlZZY05EWTNCcFNyL0hm?=
- =?utf-8?B?SmYxb2V0RklnVTlMTUNURXk1QWxJVzV6Y0Z5Uks0YzR3TG9wMU5LejI4emx3?=
- =?utf-8?B?RDlDQ21uLzY0YytPNEl5OXIzVkJzUkFVbnBjcFkvWFRKR3VQYy9xZ0w1WG90?=
- =?utf-8?B?ZEk0OFMvYkNYNXNYWVNRajVJZ3FwQ3NrUmlaNjBUdEk3UGV4NTZtcm96NmZ4?=
- =?utf-8?B?UU9tMGhIWUpwcFFja0RDdlg3aW0zUXV0dHJERG0xYWxVYm1KMjZUUlZCa2Rv?=
- =?utf-8?B?Z3Q4U2tvRGplMFpXMlRWdWNzR2tzMUVCYnVseWR3RVMwandpMGRxSzVpTG1u?=
- =?utf-8?B?cDJFOXBCZG9qWkJPMzFZSWtKVmRjdGs0R2JpOENVVXVkaVlDUEluQlo5WlFu?=
- =?utf-8?B?ZnpXZzB1K3pDR0xIeTB5dXh5K29JaHRYSHZaWGoxWEhLUThCczlZakhGNmRq?=
- =?utf-8?B?ekFCOUJ6Sk1BVEFneXFQR0FWVCtyTWQ4Q1J3SFJ2QWxkakpINnVFMnNhNnFX?=
- =?utf-8?B?RlVQTzFNR0FHSjBDS3ZvNUxvYlpzK3J3L2hQQVhva1BOclhEaGU5WFlBbkw1?=
- =?utf-8?B?TTVkaDdFSXFReDVDV0t6Ui9Lc0NHYVFPUWtVdTB4czRVSG5KOTdjRi9DNE9y?=
- =?utf-8?B?UWsyTVA3K2tvM0EwK1UrakZSZCs1ckwvWFZJRExxY01kUDB3eVFWZzJzcVZN?=
- =?utf-8?B?YUJjUjZLUko5RndOYTBoVThxdUFVY0RRMkZPVXBucHQrZURiV1lKZTBYcmJw?=
- =?utf-8?B?a21tSExHRVFBVHVDT2E3RCtoSXZ1YUVzMGRoa2pzZXc4WXlhSjI1Y3BaNlgy?=
- =?utf-8?B?MVg3N3VFdkhweUc3NHRSSkNyeExZUisvanV1SU9ZUTZEdnJ4cWVtT2NQV1Rv?=
- =?utf-8?B?Q283VHZoa2pCNStaN0d2ek5Fd2tnMWY4RUhrTlJ5ZDR4dzl4cnNFVTh5Z2tu?=
- =?utf-8?B?WEdGc3FtM2NZMWlJVjc4dmdjUnZxV0NVQ0o3Y0JyYmNQNHdDVXpya0xaRVQ3?=
- =?utf-8?B?VEg0cGVIUHpXUnFWVVZtdHVtL2p4VndVN2dFb2lsTGJLeURVQS9scWZkS0J5?=
- =?utf-8?B?SlM1aWxFWk5pQlowVnNEbjBzdEdxYzdZVDFhbHVXTUgxcytLNjBJUEtaOEVO?=
- =?utf-8?B?dit1YzRIRGNrQUZHM1VUZWdGSDJwUWlOb3g5dTlRVjhiU05LUW9zVmlTMm1G?=
- =?utf-8?B?b1NpSjhIU1FWYzkyeUt0L1lZSFJub2VoYkY4WW5JcFNhbWIvVzJoUnB3WHFt?=
- =?utf-8?B?US9mQzdITXduRGdhZmhBeFYwNVJHUGZTOFUrcE1JTVRYQVBhOW85NWVVYVpS?=
- =?utf-8?B?a0VNTjVoUDdJdy9kbzB3NlFWSFRTYUtKMHZGQWZqenQwWDdiN20wSG4xVVlz?=
- =?utf-8?B?dXUxbVFLTnBoWDhPTmJHWUVZN28yVlorMWFYNG9yMjN2NS90aGtRdE5CMmow?=
- =?utf-8?B?TVQvc3Y4NGhRZjBYVndSVGNUNFBDVnVDV0F5L3Y5NmVOWG9ORUxZVDVaL1VF?=
- =?utf-8?B?b2tHQlRxVGsvS2w2UG43SjllSjlrRGVYRDNIM2E4U1dueVJjdGJVaUFVV096?=
- =?utf-8?Q?sm1a32f5LOrlD9BaUVAN4BOcS?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d4a3699a-38a3-4f23-183d-08dbedc89edf
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2023 15:10:11.8985
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iFvNNc9xuJdaws5yW/1zsisfDBnxdUqqmodSTRVQROxWSPUU+5jyjZWSX0hjiH9veGHpCd89rVXwjabH2sU1gw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9343
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: ***
 
-On 11/23/23 01:03, Dinghao Liu wrote:
-> When dma_map_single() fails, we should free wa->address to
-> prevent potential memleak.
+[Syz repo]
+INFO: task hwrng:749 blocked for more than 143 seconds.
+      Not tainted 6.7.0-rc2-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:hwrng           state:D stack:29040 pid:749   tgid:749   ppid:2      flags:0x00004000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5376 [inline]
+ __schedule+0xedb/0x5af0 kernel/sched/core.c:6688
+ __schedule_loop kernel/sched/core.c:6763 [inline]
+ schedule+0xe9/0x270 kernel/sched/core.c:6778
+ schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6835
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0x5b9/0x9d0 kernel/locking/mutex.c:747
+ hwrng_fillfn+0x145/0x430 drivers/char/hw_random/core.c:504
+ kthread+0x2c6/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
 
-You should expand on this a bit more. The ccp_dm_free() function is 
-normally called to free that memory, but many of the call spots don't 
-expect to have to call ccp_dm_free() on an error return from 
-ccp_init_dm_workarea(). Because of that, the memory is freed in 
-ccp_init_dm_workarea().
+...
 
-So a more detailed commit message about why this change is needed should 
-be provided.
+RIP: 0010:rep_movs_alternative+0x57/0x70 arch/x86/lib/copy_user_64.S:80
+Code: 00 66 90 48 8b 06 48 89 07 48 83 c6 08 48 83 c7 08 83 e9 08 74 df 83 f9 08 73 e8 eb c9 eb 01 c3 48 89 c8 48 c1 e9 03 83 e0 07 <f3> 48 a5 89 c1 85 c9 75 b3 c3 48 8d 0c c8 eb ac 66 0f 1f 84 00 00
+RSP: 0018:ffffc90004427bb0 EFLAGS: 00050246
+RAX: 0000000000000000 RBX: 0000000000000040 RCX: 0000000000000008
+RDX: ffffed1028a4ab48 RSI: ffff888145255a00 RDI: 0000000020019980
+RBP: 0000000020019980 R08: 0000000000000000 R09: ffffed1028a4ab47
+R10: ffff888145255a3f R11: 0000000000000001 R12: ffff888145255a00
+R13: 00000000200199c0 R14: 0000000000000000 R15: dffffc0000000000
+ copy_user_generic arch/x86/include/asm/uaccess_64.h:112 [inline]
+ raw_copy_to_user arch/x86/include/asm/uaccess_64.h:133 [inline]
+ _copy_to_user lib/usercopy.c:41 [inline]
+ _copy_to_user+0xa8/0xb0 lib/usercopy.c:34
+ copy_to_user include/linux/uaccess.h:191 [inline]
+ rng_dev_read+0x184/0x580 drivers/char/hw_random/core.c:255
+ do_loop_readv_writev fs/read_write.c:755 [inline]
+ do_loop_readv_writev fs/read_write.c:743 [inline]
+ do_iter_read+0x567/0x830 fs/read_write.c:797
+ vfs_readv+0x12d/0x1a0 fs/read_write.c:915
+ do_preadv fs/read_write.c:1007 [inline]
+ __do_sys_preadv fs/read_write.c:1057 [inline]
+ __se_sys_preadv fs/read_write.c:1052 [inline]
+ __x64_sys_preadv+0x228/0x300 fs/read_write.c:1052
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-> 
-> Fixes: 63b945091a07 ("crypto: ccp - CCP device driver and interface support")
-> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
-> ---
->   drivers/crypto/ccp/ccp-ops.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-> index aa4e1a500691..45552ae6347e 100644
-> --- a/drivers/crypto/ccp/ccp-ops.c
-> +++ b/drivers/crypto/ccp/ccp-ops.c
-> @@ -179,8 +179,10 @@ static int ccp_init_dm_workarea(struct ccp_dm_workarea *wa,
->   
->   		wa->dma.address = dma_map_single(wa->dev, wa->address, len,
->   						 dir);
-> -		if (dma_mapping_error(wa->dev, wa->dma.address))
-> +		if (dma_mapping_error(wa->dev, wa->dma.address)) {
-> +			kfree(wa->address);
+[Analysis]
+The lock reading_mutex in rng_dev_read() has been occupied for too long, 
+causing the thread callback function hwrng_fillfn() to wait for a timeout.
 
-If future changes should result in ccp_dm_free() being called on an error 
-returned from ccp_init_dm_workarea(), you should add:
+[Fix]
+Move code that does not require this lock protection out of the critical area.
 
-			wa->address = NULL;
+Reported-and-tested-by: syzbot+c52ab18308964d248092@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ drivers/char/hw_random/core.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
-Thanks,
-Tom
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 420f155d251f..7323ddc958ce 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -225,17 +225,18 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
+ 			goto out;
+ 		}
+ 
+-		if (mutex_lock_interruptible(&reading_mutex)) {
+-			err = -ERESTARTSYS;
+-			goto out_put;
+-		}
+ 		if (!data_avail) {
++			if (mutex_lock_interruptible(&reading_mutex)) {
++				err = -ERESTARTSYS;
++				goto out_put;
++			}
+ 			bytes_read = rng_get_data(rng, rng_buffer,
+ 				rng_buffer_size(),
+ 				!(filp->f_flags & O_NONBLOCK));
++			mutex_unlock(&reading_mutex);
+ 			if (bytes_read < 0) {
+ 				err = bytes_read;
+-				goto out_unlock_reading;
++				goto out_put;
+ 			}
+ 			data_avail = bytes_read;
+ 		}
+@@ -243,7 +244,7 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
+ 		if (!data_avail) {
+ 			if (filp->f_flags & O_NONBLOCK) {
+ 				err = -EAGAIN;
+-				goto out_unlock_reading;
++				goto out_put;
+ 			}
+ 		} else {
+ 			len = data_avail;
+@@ -255,14 +256,13 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
+ 			if (copy_to_user(buf + ret, rng_buffer + data_avail,
+ 								len)) {
+ 				err = -EFAULT;
+-				goto out_unlock_reading;
++				goto out_put;
+ 			}
+ 
+ 			size -= len;
+ 			ret += len;
+ 		}
+ 
+-		mutex_unlock(&reading_mutex);
+ 		put_rng(rng);
+ 
+ 		if (need_resched())
+@@ -276,8 +276,6 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
+ out:
+ 	return ret ? : err;
+ 
+-out_unlock_reading:
+-	mutex_unlock(&reading_mutex);
+ out_put:
+ 	put_rng(rng);
+ 	goto out;
+@@ -501,7 +499,10 @@ static int hwrng_fillfn(void *unused)
+ 		rng = get_current_rng();
+ 		if (IS_ERR(rng) || !rng)
+ 			break;
+-		mutex_lock(&reading_mutex);
++		if (mutex_lock_interruptible(&reading_mutex)) {
++			put_rng(rng);
++			return -ERESTARTSYS;
++		}
+ 		rc = rng_get_data(rng, rng_fillbuf,
+ 				  rng_buffer_size(), 1);
+ 		if (current_quality != rng->quality)
+-- 
+2.25.1
 
->   			return -ENOMEM;
-> +		}
->   
->   		wa->dma.length = len;
->   	}
