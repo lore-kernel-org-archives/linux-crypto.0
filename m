@@ -1,43 +1,43 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ag7MrEnE"
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECA37110
-	for <linux-crypto@vger.kernel.org>; Sun, 26 Nov 2023 18:14:33 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6c398717726so2920538b3a.2
-        for <linux-crypto@vger.kernel.org>; Sun, 26 Nov 2023 18:14:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="UnTj1Uac"
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6BC210F
+	for <linux-crypto@vger.kernel.org>; Sun, 26 Nov 2023 18:49:11 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1cfd78f8a12so639405ad.2
+        for <linux-crypto@vger.kernel.org>; Sun, 26 Nov 2023 18:49:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1701051273; x=1701656073; darn=vger.kernel.org;
+        d=sifive.com; s=google; t=1701053351; x=1701658151; darn=vger.kernel.org;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qQuCTKkjoab2EfyY20C3fybDK6Ql2G05fa9QjwE7uds=;
-        b=ag7MrEnEez3mjHPzhmWO7eP5KpzOrOq8iR7X7TlOKpQ09p/TFNsC3a+9thyah0Dffw
-         ICI6SOOyga/rXyUoM6Mvb7StVcKBS+8ia+4EkPVW/NgoSIO5QVW4gsvNC8wILMrJSj9s
-         cSXyE/Ckgyz4DjiTa7USt/ou67dxNYFz1y4BHylxS0yD+LKWDRczNgs5cvsRXdd4uu9q
-         OWmGwO5XD1Og+/UgFSaZ5ce1+KhAk+sEoLO53b0Ps7X95vaOou1ioo1ABNLITOnG7XbN
-         nsXDsE/8ElW172x7/DqodrE4ZZvq0eEVSpHcCcTjOzonIO52tQvsBCgdFzPE5qsaQotn
-         HQdA==
+        bh=DKAcGhLjW+Mvs5EpwSa0BHJFl4vGnQQP4AO9iXzVC3M=;
+        b=UnTj1UacMJKgFE4IjPRh7dJS5+/MaaRy2zAEleoHRt/iAtu3Rmeg7SvBMNBvvECl2n
+         d1KNL4YueVueRSlk6LJoVSuxCP3K3qJnkkO4Xzr/vHHvelsaHxcswWR3SVB5fNTTJ18N
+         cqfQpVSgSzZJyYPV8T0g+ElMHV1ZpmToLH9ZIrW6dUvldv8myzoGs/d5XWNr8Ao/JOId
+         SQMrelHj3w+JX63p9ZRSskpYz9+xInFNq13bH4RMkR5vpUZzuLL0bn+oB6jWxbfxnhCn
+         C912OuMu3m/wmZzCnU6QvhR3PMobNkHrDA3e5hBv1aPsqD0BbHxeEutX8R8Lul6hp5JP
+         +KMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701051273; x=1701656073;
+        d=1e100.net; s=20230601; t=1701053351; x=1701658151;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qQuCTKkjoab2EfyY20C3fybDK6Ql2G05fa9QjwE7uds=;
-        b=qHD2JBJiO/460XvmvLzavBozrr0LIOBYWNkOydl8iezpqYNX0DBxw66yNaEK1oZ8tc
-         6voPkm+ayewUIkKx3ULGmAGcUcZNHOguaItg/HtQtIrwnYHGMbfFiWINNrGGz0Qry6vf
-         nojWZGZnczdyOTdABIaXSedhId+seyiEFwKFLSAMengf6IfkRqKyMeJKGbpAf0hTqQ6f
-         gYp0Bbw039RwYOjAZcA4nwLW8tN7BYAL3Tnc9RBtj5bC27wxwR+TvNV4UjL9HXBcKUjH
-         y4pt5bTGj9O7HblP3hvKcKBovkDBSrlQ7mnF2ngfUadVga9i+XwuIqA06u1Q4nYycYl6
-         GoFw==
-X-Gm-Message-State: AOJu0YyGPZg/MJ/q+BRuE8HuWq8/I522kv/EMyhYGFn5EswVSo7kK88t
-	HtDtZ3BRY3rTl57yR/XqT94ThQ==
-X-Google-Smtp-Source: AGHT+IGCytZMxu7H10W/RpstzoB24pSc/2pOM0mtxh/XBOupAfkyHHRrNPwHxAWsSzb0+rVLqYYqmg==
-X-Received: by 2002:a05:6a20:8403:b0:18b:a011:f955 with SMTP id c3-20020a056a20840300b0018ba011f955mr10693520pzd.60.1701051273409;
-        Sun, 26 Nov 2023 18:14:33 -0800 (PST)
+        bh=DKAcGhLjW+Mvs5EpwSa0BHJFl4vGnQQP4AO9iXzVC3M=;
+        b=H/ot7JPd9PqrLnsPMNg3bzxfn4SOuN2gspOUeIJzTCOGA2KrzFzNKzcuEHVRzKPUKd
+         JG+o9hP/sZ3HrsRXZO/5OHoETz9KwABiWZh2kQSVCJxyXYLM4plcO/YKaHBttMHRbhk2
+         +BVVbQXUaMQ9k5+PZHuvZ+LDeUoq8jxcTZoL56W1P3Qq1mw8LNBukuoKUm33JG1FdyNK
+         Kc+R1OwLaS4G66yScRpkB3/IAQ/C+ZUpjD4Sfu492CExXwWrcrF30iSc1Cm5gUcpu3pe
+         iE1DrcscjNxI6S02BApXPazZKJHihxDHp0O/5Jee5Z8BxLQzxP8kchU/dBGk3v/Ozqqu
+         p5xg==
+X-Gm-Message-State: AOJu0Yy6MmwUwpVzs88jhlXqv1OHnj5JXC4JXpQepbqTjjF3UBF/Dc/e
+	bRyW1anDLACKOAkIEZ1o5BFL5WG2RV5Viy3TBJmKmw==
+X-Google-Smtp-Source: AGHT+IEJDX1ywIRA2yybgn0V12rpBI4hcbgHrdWUbOpGdBuIKseg3QyOMxgm76BvwV0ixIdrwd6rOQ==
+X-Received: by 2002:a17:902:9f87:b0:1cc:4e46:3e45 with SMTP id g7-20020a1709029f8700b001cc4e463e45mr11188671plq.49.1701053351105;
+        Sun, 26 Nov 2023 18:49:11 -0800 (PST)
 Received: from ?IPv6:2402:7500:4ce:95c7:2856:b238:775:b338? ([2402:7500:4ce:95c7:2856:b238:775:b338])
-        by smtp.gmail.com with ESMTPSA id q16-20020a63cc50000000b0059b782e8541sm6831644pgi.28.2023.11.26.18.14.29
+        by smtp.gmail.com with ESMTPSA id o4-20020a1709026b0400b001b898595be7sm7028182plk.291.2023.11.26.18.49.07
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 26 Nov 2023 18:14:32 -0800 (PST)
+        Sun, 26 Nov 2023 18:49:10 -0800 (PST)
 Content-Type: text/plain;
 	charset=us-ascii
 Precedence: bulk
@@ -46,11 +46,11 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
-Subject: Re: [PATCH 12/12] RISC-V: crypto: add Zvkb accelerated ChaCha20
+Subject: Re: [PATCH 07/12] RISC-V: crypto: add Zvkg accelerated GCM GHASH
  implementation
 From: Jerry Shih <jerry.shih@sifive.com>
-In-Reply-To: <20231122012933.GG2172@sol.localdomain>
-Date: Mon, 27 Nov 2023 10:14:27 +0800
+In-Reply-To: <20231122014216.GI2172@sol.localdomain>
+Date: Mon, 27 Nov 2023 10:49:05 +0800
 Cc: Paul Walmsley <paul.walmsley@sifive.com>,
  palmer@dabbelt.com,
  Albert Ou <aou@eecs.berkeley.edu>,
@@ -69,125 +69,170 @@ Cc: Paul Walmsley <paul.walmsley@sifive.com>,
  linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <69B2D415-3626-4D6C-B559-0724EC1CD853@sifive.com>
+Message-Id: <D1C10635-7799-4400-B85E-746D156D714A@sifive.com>
 References: <20231025183644.8735-1-jerry.shih@sifive.com>
- <20231025183644.8735-13-jerry.shih@sifive.com>
- <20231122012933.GG2172@sol.localdomain>
+ <20231025183644.8735-8-jerry.shih@sifive.com>
+ <20231122014216.GI2172@sol.localdomain>
 To: Eric Biggers <ebiggers@kernel.org>
 X-Mailer: Apple Mail (2.3445.9.7)
 
-On Nov 22, 2023, at 09:29, Eric Biggers <ebiggers@kernel.org> wrote:
-> On Thu, Oct 26, 2023 at 02:36:44AM +0800, Jerry Shih wrote:
->> diff --git a/arch/riscv/crypto/chacha-riscv64-glue.c =
-b/arch/riscv/crypto/chacha-riscv64-glue.c
->> new file mode 100644
->> index 000000000000..72011949f705
->> --- /dev/null
->> +++ b/arch/riscv/crypto/chacha-riscv64-glue.c
->> @@ -0,0 +1,120 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Port of the OpenSSL ChaCha20 implementation for RISC-V 64
->> + *
->> + * Copyright (C) 2023 SiFive, Inc.
->> + * Author: Jerry Shih <jerry.shih@sifive.com>
->> + */
+On Nov 22, 2023, at 09:42, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Thu, Oct 26, 2023 at 02:36:39AM +0800, Jerry Shih wrote:
+>> +struct riscv64_ghash_context {
+>> +	be128 key;
+>> +};
 >> +
->> +#include <asm/simd.h>
->> +#include <asm/vector.h>
->> +#include <crypto/internal/chacha.h>
->> +#include <crypto/internal/simd.h>
->> +#include <crypto/internal/skcipher.h>
->> +#include <linux/crypto.h>
->> +#include <linux/module.h>
->> +#include <linux/types.h>
->> +
->> +#define CHACHA_BLOCK_VALID_SIZE_MASK (~(CHACHA_BLOCK_SIZE - 1))
->> +#define CHACHA_BLOCK_REMAINING_SIZE_MASK (CHACHA_BLOCK_SIZE - 1)
->> +#define CHACHA_KEY_OFFSET 4
->> +#define CHACHA_IV_OFFSET 12
->> +
->> +/* chacha20 using zvkb vector crypto extension */
->> +void ChaCha20_ctr32_zvkb(u8 *out, const u8 *input, size_t len, const =
-u32 *key,
->> +			 const u32 *counter);
->> +
->> +static int chacha20_encrypt(struct skcipher_request *req)
->> +{
->> +	u32 state[CHACHA_STATE_WORDS];
+>> +struct riscv64_ghash_desc_ctx {
+>> +	be128 shash;
+>> +	u8 buffer[GHASH_BLOCK_SIZE];
+>> +	u32 bytes;
+>> +};
 >=20
-> This function doesn't need to create the whole state matrix on the =
-stack, since
-> the underlying assembly function takes as input the key and counter, =
-not the
-> state matrix.  I recommend something like the following:
->=20
-> diff --git a/arch/riscv/crypto/chacha-riscv64-glue.c =
-b/arch/riscv/crypto/chacha-riscv64-glue.c
-> index df185d0663fcc..216b4cd9d1e01 100644
-> --- a/arch/riscv/crypto/chacha-riscv64-glue.c
-> +++ b/arch/riscv/crypto/chacha-riscv64-glue.c
-> @@ -16,45 +16,42 @@
-> #include <linux/module.h>
-> #include <linux/types.h>
->=20
-> -#define CHACHA_KEY_OFFSET 4
-> -#define CHACHA_IV_OFFSET 12
-> -
-> /* chacha20 using zvkb vector crypto extension */
-> asmlinkage void ChaCha20_ctr32_zvkb(u8 *out, const u8 *input, size_t =
-len,
-> 				    const u32 *key, const u32 *counter);
->=20
-> static int chacha20_encrypt(struct skcipher_request *req)
-> {
-> -	u32 state[CHACHA_STATE_WORDS];
-> 	u8 block_buffer[CHACHA_BLOCK_SIZE];
-> 	struct crypto_skcipher *tfm =3D crypto_skcipher_reqtfm(req);
-> 	const struct chacha_ctx *ctx =3D crypto_skcipher_ctx(tfm);
-> 	struct skcipher_walk walk;
-> 	unsigned int nbytes;
-> 	unsigned int tail_bytes;
-> +	u32 iv[4];
-> 	int err;
->=20
-> -	chacha_init_generic(state, ctx->key, req->iv);
-> +	iv[0] =3D get_unaligned_le32(req->iv);
-> +	iv[1] =3D get_unaligned_le32(req->iv + 4);
-> +	iv[2] =3D get_unaligned_le32(req->iv + 8);
-> +	iv[3] =3D get_unaligned_le32(req->iv + 12);
->=20
-> 	err =3D skcipher_walk_virt(&walk, req, false);
-> 	while (walk.nbytes) {
-> -		nbytes =3D walk.nbytes & (~(CHACHA_BLOCK_SIZE - 1));
-> +		nbytes =3D walk.nbytes & ~(CHACHA_BLOCK_SIZE - 1);
-> 		tail_bytes =3D walk.nbytes & (CHACHA_BLOCK_SIZE - 1);
-> 		kernel_vector_begin();
-> 		if (nbytes) {
-> 			ChaCha20_ctr32_zvkb(walk.dst.virt.addr,
-> 					    walk.src.virt.addr, nbytes,
-> -					    state + CHACHA_KEY_OFFSET,
-> -					    state + CHACHA_IV_OFFSET);
-> -			state[CHACHA_IV_OFFSET] +=3D nbytes / =
-CHACHA_BLOCK_SIZE;
-> +					    ctx->key, iv);
-> +			iv[0] +=3D nbytes / CHACHA_BLOCK_SIZE;
-> 		}
-> 		if (walk.nbytes =3D=3D walk.total && tail_bytes > 0) {
-> 			memcpy(block_buffer, walk.src.virt.addr + =
-nbytes,
-> 			       tail_bytes);
-> 			ChaCha20_ctr32_zvkb(block_buffer, block_buffer,
-> -					    CHACHA_BLOCK_SIZE,
-> -					    state + CHACHA_KEY_OFFSET,
-> -					    state + CHACHA_IV_OFFSET);
-> +					    CHACHA_BLOCK_SIZE, ctx->key, =
-iv);
-> 			memcpy(walk.dst.virt.addr + nbytes, =
-block_buffer,
-> 			       tail_bytes);
-> 			tail_bytes =3D 0;
+> I recommend calling the first struct 'riscv64_ghash_tfm_ctx', and =
+making the
+> pointers to it be named 'tctx'.  That would more clearly distinguish =
+it from the
+> desc_ctx / dctx.
 
 Fixed.
-We will only use the iv instead of the full chacha state matrix.
 
+>> +
+>> +typedef void (*ghash_func)(be128 *Xi, const be128 *H, const u8 *inp,
+>> +			   size_t len);
+>> +
+>> +static inline void ghash_blocks(const struct riscv64_ghash_context =
+*ctx,
+>> +				struct riscv64_ghash_desc_ctx *dctx,
+>> +				const u8 *src, size_t srclen, ghash_func =
+func)
+>> +	if (crypto_simd_usable()) {
+>> +		kernel_vector_begin();
+>> +		func(&dctx->shash, &ctx->key, src, srclen);
+>> +		kernel_vector_end();
+>=20
+> The indirection to ghash_func is unnecessary, since the only value is
+> gcm_ghash_rv64i_zvkg.
+>=20
+> This also means that ghash_update() should be folded into =
+ghash_update_zvkg(),
+> and ghash_final() into ghash_final_zvkg().
+
+Fixed. The `gcm_ghash_rv64i_zvkg()` is folded into `ghash_update_zvkg()` =
+and
+`ghash_final_zvkg()`.
+
+>> +	} else {
+>> +		while (srclen >=3D GHASH_BLOCK_SIZE) {
+>> +			crypto_xor((u8 *)&dctx->shash, src, =
+GHASH_BLOCK_SIZE);
+>> +			gf128mul_lle(&dctx->shash, &ctx->key);
+>> +			srclen -=3D GHASH_BLOCK_SIZE;
+>> +			src +=3D GHASH_BLOCK_SIZE;
+>> +		}
+>> +	}
+>=20
+> The assembly code uses the equivalent of the following do-while loop =
+instead:
+>=20
+>        do {
+>                srclen -=3D GHASH_BLOCK_SIZE;
+>        } while (srclen);
+>=20
+> I.e., it assumes the length here is nonzero and a multiple of 16, =
+which it is.
+>=20
+> To avoid confusion, I recommend making the C code use the same =
+do-while loop.
+
+Fixed.
+
+>>       const struct riscv64_ghash_context *ctx =3D
+>>              crypto_tfm_ctx(crypto_shash_tfm(desc->tfm));
+>=20
+> crypto_tfm_ctx(crypto_shash_tfm(tfm)) should be crypto_shash_ctx(tfm)
+
+Fixed.
+But the original code do the same thing.
+
+>> +static int ghash_final(struct shash_desc *desc, u8 *out, ghash_func =
+func)
+>> +{
+>> +	const struct riscv64_ghash_context *ctx =3D
+>> +		crypto_tfm_ctx(crypto_shash_tfm(desc->tfm));
+>> +	struct riscv64_ghash_desc_ctx *dctx =3D shash_desc_ctx(desc);
+>> +	int i;
+>> +
+>> +	if (dctx->bytes) {
+>> +		for (i =3D dctx->bytes; i < GHASH_BLOCK_SIZE; i++)
+>> +			dctx->buffer[i] =3D 0;
+>> +
+>> +		ghash_blocks(ctx, dctx, dctx->buffer, GHASH_BLOCK_SIZE, =
+func);
+>> +		dctx->bytes =3D 0;
+>> +	}
+>> +
+>=20
+> Setting dctx->bytes above is unnecessary.
+
+Fixed.
+
+>> +static int ghash_init(struct shash_desc *desc)
+>> +{
+>> +	struct riscv64_ghash_desc_ctx *dctx =3D shash_desc_ctx(desc);
+>> +
+>> +	*dctx =3D (struct riscv64_ghash_desc_ctx){};
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int ghash_update_zvkg(struct shash_desc *desc, const u8 *src,
+>> +			     unsigned int srclen)
+>> +{
+>> +	return ghash_update(desc, src, srclen, gcm_ghash_rv64i_zvkg);
+>> +}
+>> +
+>> +static int ghash_final_zvkg(struct shash_desc *desc, u8 *out)
+>> +{
+>> +	return ghash_final(desc, out, gcm_ghash_rv64i_zvkg);
+>> +}
+>> +
+>> +static int ghash_setkey(struct crypto_shash *tfm, const u8 *key,
+>> +			unsigned int keylen)
+>> +{
+>> +	struct riscv64_ghash_context *ctx =3D
+>> +		crypto_tfm_ctx(crypto_shash_tfm(tfm));
+>> +
+>> +	if (keylen !=3D GHASH_BLOCK_SIZE)
+>> +		return -EINVAL;
+>> +
+>> +	memcpy(&ctx->key, key, GHASH_BLOCK_SIZE);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static struct shash_alg riscv64_ghash_alg_zvkg =3D {
+>> +	.digestsize =3D GHASH_DIGEST_SIZE,
+>> +	.init =3D ghash_init,
+>> +	.update =3D ghash_update_zvkg,
+>> +	.final =3D ghash_final_zvkg,
+>> +	.setkey =3D ghash_setkey,
+>=20
+> IMO it's helpful to order the shash functions as follows, both in =
+their
+> definitions and their fields in struct shash_alg:
+>=20
+>    setkey
+>    init
+>    update
+>    final
+>=20
+> That matches the order in which they're called.
+
+I have different opinion. I reorder the initialization in the order =
+declared.
+That will help us to check whether the function/member is missed.
+
+> - Eric
+
+
+-Jerry=
