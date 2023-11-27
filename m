@@ -1,40 +1,40 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Awf7/dH"
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD842183
-	for <linux-crypto@vger.kernel.org>; Mon, 27 Nov 2023 04:23:15 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5cfe0b63eeeso16146837b3.0
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Nov 2023 04:23:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IGfCc31Z"
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 246A090
+	for <linux-crypto@vger.kernel.org>; Mon, 27 Nov 2023 04:23:18 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5c5daf2baccso52662247b3.3
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Nov 2023 04:23:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701087795; x=1701692595; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701087797; x=1701692597; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p/Ch/7P7gbGGJgSxsuR+ilVTc8c1SGXumgwmkI4FD94=;
-        b=4Awf7/dH26FDONZbYGB+1hdCXXRfoe8ERJzCTZBckMzCfOQbsfmumufZSooq2QgIo8
-         9d4UccWZ2Z81b7HkORIMivJgEgev/X7ZJkS30VAUUsFeDmsJQC88GnBizCUTmZ7cyVRm
-         4wLS2hiIHgT6gdKurdKoqIZlrk0lRVCApWSAPdlt8/vgiRQEvBOW9j5OrQrC0SsfLMcc
-         Vn2JIkbT3vhaZGwRRdwlEr1nywNioL6vUrsH6MgQkIEytx7DqSKPCXXhHSXgs7/jtR2o
-         /zzqiUnvSCQ6z33jS51HeaaxS2VyLB23wsXT/S60gbeLaa6uZSVu3xzzRqaOGBi9R/1r
-         9AxA==
+        bh=PqLlpO64Fd8jrWutb7/V7hApVe27wWzkVubKvzlDbiw=;
+        b=IGfCc31ZWJXBZO5pKZiT68uCL0kGdi7tDonZtiXu3PQsgIpd29OFzcbKo6o4owStp5
+         UU3Y13VtLuhp9FoH4WLZgVrbXOvsVjo9Tb/vjs7hHbinBWKm1AEf5HaTL8PgkzuZO6MR
+         kCKwAYDrTVJBiDKWF46spyMiqeF+XxKkdlaX27ueAENS0igVTUiLKbnHiN/xzSeDCM9Z
+         Li3ydrHa/WBX5Kproeks4q9ClgNApZDesgmAZPTTtFmqrwOA/VZHLnqBG6dSgRicthvT
+         RGE3D6UTumoha6HRAxClsfi9so+cLiKFT6ja/vXjwrYYNxXOyB9+8QYyWL+kywZncNUO
+         Fm3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701087795; x=1701692595;
+        d=1e100.net; s=20230601; t=1701087797; x=1701692597;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p/Ch/7P7gbGGJgSxsuR+ilVTc8c1SGXumgwmkI4FD94=;
-        b=mCPW7y8jGJOochsp1PM0ZwBHUjrwCfp/csuPoi7IPqgHyj+y9bAlfL/3VV5YwoR1qj
-         VYdpAQ3rCU281kX2ikvJbCvguNcvzDc/zbC77QSd2jGSLhpJa5LZX81lJW+VmW9I5CY6
-         UJcAZ0wB9xrh0HgnPIdVS3T89gKkGlIsJGUXC3BiR2N32G8AcW9s1n7hx73vxEsa8G87
-         G9z62IuBEkPwPsGSjyYZNHtE2RVMunRVQkoX+CGJ/nl6yLzAlIi1W/38xFhQtM10LZ3i
-         BvrlQwG0smFrVzCJkeG/tlkVgez1PJBOEle4oXTzE0GdyDpFwoYhbEBkkAOVLnrkl+j+
-         9scQ==
-X-Gm-Message-State: AOJu0YxgRG8Wa/Yc9GL7ib3ZZMxjwyA4T56ZwE3YpUldxgs6aEEWtkWX
-	7VDSpWdzsrgUPXudc22865Lc9TAh
-X-Google-Smtp-Source: AGHT+IF139AT3aSFpqii6704dz6/8G3AqH52BUM1m6DcXw4sMHUwiDAh6VdtyvMa9xONH3X0O6krylhX
+        bh=PqLlpO64Fd8jrWutb7/V7hApVe27wWzkVubKvzlDbiw=;
+        b=D/UZpxwlV7iuT/W9fnIl0V5XHZaiujuIzVcoO7h3WvkqaK/ElIJU8RUYroEN56bT7K
+         bOVq2qx2UaotXF1EM4FGZdvdZYjkJGWNB21/7OiWwp5iaqUPXxC+a8ncwGwv4J7xruHe
+         +mcIo41RzsefUXdQUHxLhdYfNsIb09uPufIL1X/m3dbFHXuOZEBItYJkGeuqaCrurPMe
+         cvtL0HaYfODfCs6DLLo0g4qeFQjZOY0kwiY4wOVF/8/cys2HnkVJogaHjYmUt8oxJ2Eb
+         CX7Z/KVRtMsh1i09FE4KLR63LJgW46e0fmVFztWwiKzFvRzHmXAsAZHddMPM4ASYIOwW
+         6oLA==
+X-Gm-Message-State: AOJu0YyrGbm+TH+kzdKJkTphIfB2ga5LcszpQ8UH4TdzVH7KwIndTBnW
+	FdRwTAbE92yR+2RkDoCKgvlLAWjS
+X-Google-Smtp-Source: AGHT+IF3us8uZbMqzB0v4/kcJQErPPc0HYSXC91eYkm5Lm013FLAD+dXmS1x3DwIBp7wPzVvyGRPY2P1
 X-Received: from palermo.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:118a])
- (user=ardb job=sendgmr) by 2002:a05:690c:3301:b0:5c9:6d54:de9e with SMTP id
- fj1-20020a05690c330100b005c96d54de9emr345006ywb.10.1701087794943; Mon, 27 Nov
- 2023 04:23:14 -0800 (PST)
-Date: Mon, 27 Nov 2023 13:23:01 +0100
+ (user=ardb job=sendgmr) by 2002:a05:690c:844:b0:5cd:c47d:d89e with SMTP id
+ bz4-20020a05690c084400b005cdc47dd89emr332658ywb.1.1701087797441; Mon, 27 Nov
+ 2023 04:23:17 -0800 (PST)
+Date: Mon, 27 Nov 2023 13:23:02 +0100
 In-Reply-To: <20231127122259.2265164-7-ardb@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -44,14 +44,15 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231127122259.2265164-7-ardb@google.com>
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7220; i=ardb@kernel.org;
- h=from:subject; bh=XBBn0M5ow9wFIvsftiDNXJYygKjCB9+fC9f2YPlvdKk=;
- b=owGbwMvMwCFmkMcZplerG8N4Wi2JITWlS/V6/6d1n0MvC6470mSewDi94qBCYYjr3AeShbYHU
- o2WHtvaUcrCIMbBICumyCIw+++7nacnStU6z5KFmcPKBDKEgYtTACZygp2RYQvXzl9rNTsezxd1
- PeFaeu/a76YHmqZW9YlbNP+GPZxespzhn47Co+bgrs+9j/a/61FfKzH93EEnrv1LO4V6I/eJfrt 0mQsA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9003; i=ardb@kernel.org;
+ h=from:subject; bh=8hdapRxOdUgx0Dc+73UbIjfUG7AYLk13Xi+bCvpKXZE=;
+ b=owGbwMvMwCFmkMcZplerG8N4Wi2JITWlS016jcXSfWc2cW9evPmA2Y6e59vW+E3Ouy28xbJiQ
+ 7BfS8jUjlIWBjEOBlkxRRaB2X/f7Tw9UarWeZYszBxWJpAhDFycAjCR61sY/idvubZIs7TXJbn/
+ 0HRh391d5rrJPkvW/IzMtp/HsdlD7Tgjw9UtOpMm3Llz5WVc8yXWlF2LdONiZu+47L1kxtPTakv 5JFkB
 X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
-Message-ID: <20231127122259.2265164-8-ardb@google.com>
-Subject: [PATCH v3 1/5] arm64: fpsimd: Drop unneeded 'busy' flag
+Message-ID: <20231127122259.2265164-9-ardb@google.com>
+Subject: [PATCH v3 2/5] arm64: fpsimd: Preserve/restore kernel mode NEON at
+ context switch
 From: Ard Biesheuvel <ardb@google.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, 
@@ -63,201 +64,240 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Ard Biesheuvel <ardb@kernel.org>
 
-Kernel mode NEON will preserve the user mode FPSIMD state by saving it
-into the task struct before clobbering the registers. In order to avoid
-the need for preserving kernel mode state too, we disallow nested use of
-kernel mode NEON, i..e, use in softirq context while the interrupted
-task context was using kernel mode NEON too.
+Currently, the FPSIMD register file is not preserved and restored along
+with the general registers on exception entry/exit or context switch.
+For this reason, we disable preemption when enabling FPSIMD for kernel
+mode use in task context, and suspend the processing of softirqs so that
+there are no concurrent uses in the kernel. (Kernel mode FPSIMD may not
+be used at all in other contexts).
 
-Originally, this policy was implemented using a per-CPU flag which was
-exposed via may_use_simd(), requiring the users of the kernel mode NEON
-to deal with the possibility that it might return false, and having NEON
-and non-NEON code paths. This policy was changed by commit
-13150149aa6ded1 ("arm64: fpsimd: run kernel mode NEON with softirqs
-disabled"), and now, softirq processing is disabled entirely instead,
-and so may_use_simd() can never fail when called from task or softirq
-context.
+Disabling preemption while doing CPU intensive work on inputs of
+potentially unbounded size is bad for real-time performance, which is
+why we try and ensure that SIMD crypto code does not operate on more
+than ~4k at a time, which is an arbitrary limit and requires assembler
+code to implement efficiently.
 
-This means we can drop the fpsimd_context_busy flag entirely, and
-instead, ensure that we disable softirq processing in places where we
-formerly relied on the flag for preventing races in the FPSIMD preserve
-routines.
+We can avoid the need for disabling preemption if we can ensure that any
+in-kernel users of the NEON will not lose the FPSIMD register state
+across a context switch. And given that disabling softirqs implicitly
+disables preemption as well, we will also have to ensure that a softirq
+that runs code using FPSIMD can safely interrupt an in-kernel user.
+
+So introduce a thread_info flag TIF_USING_KMODE_FPSIMD, and modify the
+context switch hook for FPSIMD to preserve and restore the kernel mode
+FPSIMD to/from struct thread_struct when it is set. This avoids any
+scheduling blackouts due to prolonged use of FPSIMD in kernel mode,
+without the need for manual yielding.
+
+In order to support softirq processing while FPSIMD is being used in
+kernel task context, use the same flag to decide whether the kernel mode
+FPSIMD state needs to be preserved and restored before allowing FPSIMD
+to be used in softirq context.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 Reviewed-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/simd.h | 11 +---
- arch/arm64/kernel/fpsimd.c    | 53 +++++---------------
- 2 files changed, 13 insertions(+), 51 deletions(-)
+ arch/arm64/include/asm/processor.h   |  2 +
+ arch/arm64/include/asm/thread_info.h |  1 +
+ arch/arm64/kernel/fpsimd.c           | 92 ++++++++++++++++----
+ 3 files changed, 77 insertions(+), 18 deletions(-)
 
-diff --git a/arch/arm64/include/asm/simd.h b/arch/arm64/include/asm/simd.h
-index 6a75d7ecdcaa..8e86c9e70e48 100644
---- a/arch/arm64/include/asm/simd.h
-+++ b/arch/arm64/include/asm/simd.h
-@@ -12,8 +12,6 @@
- #include <linux/preempt.h>
- #include <linux/types.h>
+diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+index e5bc54522e71..dcb51c0571af 100644
+--- a/arch/arm64/include/asm/processor.h
++++ b/arch/arm64/include/asm/processor.h
+@@ -167,6 +167,8 @@ struct thread_struct {
+ 	unsigned long		fault_address;	/* fault info */
+ 	unsigned long		fault_code;	/* ESR_EL1 value */
+ 	struct debug_info	debug;		/* debugging */
++
++	struct user_fpsimd_state	kmode_fpsimd_state;
+ #ifdef CONFIG_ARM64_PTR_AUTH
+ 	struct ptrauth_keys_user	keys_user;
+ #ifdef CONFIG_ARM64_PTR_AUTH_KERNEL
+diff --git a/arch/arm64/include/asm/thread_info.h b/arch/arm64/include/asm/thread_info.h
+index 553d1bc559c6..6b254cf90e8b 100644
+--- a/arch/arm64/include/asm/thread_info.h
++++ b/arch/arm64/include/asm/thread_info.h
+@@ -80,6 +80,7 @@ void arch_setup_new_exec(void);
+ #define TIF_TAGGED_ADDR		26	/* Allow tagged user addresses */
+ #define TIF_SME			27	/* SME in use */
+ #define TIF_SME_VL_INHERIT	28	/* Inherit SME vl_onexec across exec */
++#define TIF_USING_KMODE_FPSIMD	29	/* Task is in a kernel mode FPSIMD section */
  
--DECLARE_PER_CPU(bool, fpsimd_context_busy);
--
- #ifdef CONFIG_KERNEL_MODE_NEON
- 
- /*
-@@ -28,17 +26,10 @@ static __must_check inline bool may_use_simd(void)
- 	/*
- 	 * We must make sure that the SVE has been initialized properly
- 	 * before using the SIMD in kernel.
--	 * fpsimd_context_busy is only set while preemption is disabled,
--	 * and is clear whenever preemption is enabled. Since
--	 * this_cpu_read() is atomic w.r.t. preemption, fpsimd_context_busy
--	 * cannot change under our feet -- if it's set we cannot be
--	 * migrated, and if it's clear we cannot be migrated to a CPU
--	 * where it is set.
- 	 */
- 	return !WARN_ON(!system_capabilities_finalized()) &&
- 	       system_supports_fpsimd() &&
--	       !in_hardirq() && !irqs_disabled() && !in_nmi() &&
--	       !this_cpu_read(fpsimd_context_busy);
-+	       !in_hardirq() && !irqs_disabled() && !in_nmi();
- }
- 
- #else /* ! CONFIG_KERNEL_MODE_NEON */
+ #define _TIF_SIGPENDING		(1 << TIF_SIGPENDING)
+ #define _TIF_NEED_RESCHED	(1 << TIF_NEED_RESCHED)
 diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 1559c706d32d..ccc4a78a70e4 100644
+index ccc4a78a70e4..198918805bf6 100644
 --- a/arch/arm64/kernel/fpsimd.c
 +++ b/arch/arm64/kernel/fpsimd.c
-@@ -85,13 +85,13 @@
-  * softirq kicks in. Upon vcpu_put(), KVM will save the vcpu FP state and
-  * flag the register state as invalid.
-  *
-- * In order to allow softirq handlers to use FPSIMD, kernel_neon_begin() may
-- * save the task's FPSIMD context back to task_struct from softirq context.
-- * To prevent this from racing with the manipulation of the task's FPSIMD state
-- * from task context and thereby corrupting the state, it is necessary to
-- * protect any manipulation of a task's fpsimd_state or TIF_FOREIGN_FPSTATE
-- * flag with {, __}get_cpu_fpsimd_context(). This will still allow softirqs to
-- * run but prevent them to use FPSIMD.
-+ * In order to allow softirq handlers to use FPSIMD, kernel_neon_begin() may be
-+ * called from softirq context, which will save the task's FPSIMD context back
-+ * to task_struct. To prevent this from racing with the manipulation of the
-+ * task's FPSIMD state from task context and thereby corrupting the state, it
-+ * is necessary to protect any manipulation of a task's fpsimd_state or
-+ * TIF_FOREIGN_FPSTATE flag with get_cpu_fpsimd_context(), which will suspend
-+ * softirq servicing entirely until put_cpu_fpsimd_context() is called.
-  *
-  * For a certain task, the sequence may look something like this:
-  * - the task gets scheduled in; if both the task's fpsimd_cpu field
-@@ -209,27 +209,14 @@ static inline void sme_free(struct task_struct *t) { }
- 
- #endif
- 
--DEFINE_PER_CPU(bool, fpsimd_context_busy);
--EXPORT_PER_CPU_SYMBOL(fpsimd_context_busy);
--
- static void fpsimd_bind_task_to_cpu(void);
- 
--static void __get_cpu_fpsimd_context(void)
--{
--	bool busy = __this_cpu_xchg(fpsimd_context_busy, true);
--
--	WARN_ON(busy);
--}
--
- /*
-  * Claim ownership of the CPU FPSIMD context for use by the calling context.
-  *
-  * The caller may freely manipulate the FPSIMD context metadata until
-  * put_cpu_fpsimd_context() is called.
-  *
-- * The double-underscore version must only be called if you know the task
-- * can't be preempted.
-- *
-  * On RT kernels local_bh_disable() is not sufficient because it only
-  * serializes soft interrupt related sections via a local lock, but stays
-  * preemptible. Disabling preemption is the right choice here as bottom
-@@ -242,14 +229,6 @@ static void get_cpu_fpsimd_context(void)
- 		local_bh_disable();
- 	else
- 		preempt_disable();
--	__get_cpu_fpsimd_context();
--}
--
--static void __put_cpu_fpsimd_context(void)
--{
--	bool busy = __this_cpu_xchg(fpsimd_context_busy, false);
--
--	WARN_ON(!busy); /* No matching get_cpu_fpsimd_context()? */
- }
- 
- /*
-@@ -261,18 +240,12 @@ static void __put_cpu_fpsimd_context(void)
-  */
- static void put_cpu_fpsimd_context(void)
- {
--	__put_cpu_fpsimd_context();
- 	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
- 		local_bh_enable();
- 	else
- 		preempt_enable();
- }
- 
--static bool have_cpu_fpsimd_context(void)
--{
--	return !preemptible() && __this_cpu_read(fpsimd_context_busy);
--}
--
- unsigned int task_get_vl(const struct task_struct *task, enum vec_type type)
- {
- 	return task->thread.vl[type];
-@@ -383,7 +356,7 @@ static void task_fpsimd_load(void)
- 	bool restore_ffr;
+@@ -357,6 +357,7 @@ static void task_fpsimd_load(void)
  
  	WARN_ON(!system_supports_fpsimd());
--	WARN_ON(!have_cpu_fpsimd_context());
-+	WARN_ON(preemptible());
+ 	WARN_ON(preemptible());
++	WARN_ON(test_thread_flag(TIF_USING_KMODE_FPSIMD));
  
  	if (system_supports_sve() || system_supports_sme()) {
  		switch (current->thread.fp_type) {
-@@ -467,7 +440,7 @@ static void fpsimd_save(void)
- 	unsigned int vl;
+@@ -379,7 +380,7 @@ static void task_fpsimd_load(void)
+ 		default:
+ 			/*
+ 			 * This indicates either a bug in
+-			 * fpsimd_save() or memory corruption, we
++			 * fpsimd_save_user_state() or memory corruption, we
+ 			 * should always record an explicit format
+ 			 * when we save. We always at least have the
+ 			 * memory allocated for FPSMID registers so
+@@ -430,7 +431,7 @@ static void task_fpsimd_load(void)
+  * than via current, if we are saving KVM state then it will have
+  * ensured that the type of registers to save is set in last->to_save.
+  */
+-static void fpsimd_save(void)
++static void fpsimd_save_user_state(void)
+ {
+ 	struct cpu_fp_state const *last =
+ 		this_cpu_ptr(&fpsimd_last_state);
+@@ -861,7 +862,7 @@ int vec_set_vector_length(struct task_struct *task, enum vec_type type,
+ 	if (task == current) {
+ 		get_cpu_fpsimd_context();
  
- 	WARN_ON(!system_supports_fpsimd());
--	WARN_ON(!have_cpu_fpsimd_context());
-+	WARN_ON(preemptible());
+-		fpsimd_save();
++		fpsimd_save_user_state();
+ 	}
  
- 	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
- 		return;
-@@ -1507,7 +1480,7 @@ void fpsimd_thread_switch(struct task_struct *next)
- 	if (!system_supports_fpsimd())
- 		return;
+ 	fpsimd_flush_task_state(task);
+@@ -1473,6 +1474,16 @@ void do_fpsimd_exc(unsigned long esr, struct pt_regs *regs)
+ 		       current);
+ }
  
--	__get_cpu_fpsimd_context();
-+	WARN_ON_ONCE(!irqs_disabled());
++static void fpsimd_load_kernel_state(struct task_struct *task)
++{
++	fpsimd_load_state(&task->thread.kmode_fpsimd_state);
++}
++
++static void fpsimd_save_kernel_state(struct task_struct *task)
++{
++	fpsimd_save_state(&task->thread.kmode_fpsimd_state);
++}
++
+ void fpsimd_thread_switch(struct task_struct *next)
+ {
+ 	bool wrong_task, wrong_cpu;
+@@ -1483,19 +1494,28 @@ void fpsimd_thread_switch(struct task_struct *next)
+ 	WARN_ON_ONCE(!irqs_disabled());
  
  	/* Save unsaved fpsimd state, if any: */
- 	fpsimd_save();
-@@ -1523,8 +1496,6 @@ void fpsimd_thread_switch(struct task_struct *next)
+-	fpsimd_save();
++	if (!test_thread_flag(TIF_USING_KMODE_FPSIMD))
++		fpsimd_save_user_state();
++	else
++		fpsimd_save_kernel_state(current);
  
- 	update_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE,
- 			       wrong_task || wrong_cpu);
--
--	__put_cpu_fpsimd_context();
+-	/*
+-	 * Fix up TIF_FOREIGN_FPSTATE to correctly describe next's
+-	 * state.  For kernel threads, FPSIMD registers are never loaded
+-	 * and wrong_task and wrong_cpu will always be true.
+-	 */
+-	wrong_task = __this_cpu_read(fpsimd_last_state.st) !=
+-					&next->thread.uw.fpsimd_state;
+-	wrong_cpu = next->thread.fpsimd_cpu != smp_processor_id();
++	if (test_tsk_thread_flag(next, TIF_USING_KMODE_FPSIMD)) {
++		fpsimd_load_kernel_state(next);
++		set_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE);
++	} else {
++		/*
++		 * Fix up TIF_FOREIGN_FPSTATE to correctly describe next's
++		 * state.  For kernel threads, FPSIMD registers are never
++		 * loaded with user mode FPSIMD state and so wrong_task and
++		 * wrong_cpu will always be true.
++		 */
++		wrong_task = __this_cpu_read(fpsimd_last_state.st) !=
++			&next->thread.uw.fpsimd_state;
++		wrong_cpu = next->thread.fpsimd_cpu != smp_processor_id();
+ 
+-	update_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE,
+-			       wrong_task || wrong_cpu);
++		update_tsk_thread_flag(next, TIF_FOREIGN_FPSTATE,
++				       wrong_task || wrong_cpu);
++	}
  }
  
  static void fpsimd_flush_thread_vl(enum vec_type type)
-@@ -1829,10 +1800,10 @@ void fpsimd_save_and_flush_cpu_state(void)
- 	if (!system_supports_fpsimd())
+@@ -1585,7 +1605,7 @@ void fpsimd_preserve_current_state(void)
  		return;
- 	WARN_ON(preemptible());
--	__get_cpu_fpsimd_context();
-+	get_cpu_fpsimd_context();
- 	fpsimd_save();
- 	fpsimd_flush_cpu_state();
--	__put_cpu_fpsimd_context();
-+	put_cpu_fpsimd_context();
+ 
+ 	get_cpu_fpsimd_context();
+-	fpsimd_save();
++	fpsimd_save_user_state();
+ 	put_cpu_fpsimd_context();
  }
  
- #ifdef CONFIG_KERNEL_MODE_NEON
+@@ -1801,7 +1821,7 @@ void fpsimd_save_and_flush_cpu_state(void)
+ 		return;
+ 	WARN_ON(preemptible());
+ 	get_cpu_fpsimd_context();
+-	fpsimd_save();
++	fpsimd_save_user_state();
+ 	fpsimd_flush_cpu_state();
+ 	put_cpu_fpsimd_context();
+ }
+@@ -1835,10 +1855,37 @@ void kernel_neon_begin(void)
+ 	get_cpu_fpsimd_context();
+ 
+ 	/* Save unsaved fpsimd state, if any: */
+-	fpsimd_save();
++	if (!test_thread_flag(TIF_USING_KMODE_FPSIMD)) {
++		fpsimd_save_user_state();
++
++		/*
++		 * Set the thread flag so that the kernel mode FPSIMD state
++		 * will be context switched along with the rest of the task
++		 * state.
++		 *
++		 * On non-PREEMPT_RT, softirqs may interrupt task level kernel
++		 * mode FPSIMD, but the task will not be preemptible so setting
++		 * TIF_USING_KMODE_FPSIMD for those would be both wrong (as it
++		 * would mark the task context FPSIMD state as requiring a
++		 * context switch) and unnecessary.
++		 *
++		 * On PREEMPT_RT, softirqs are serviced from a separate thread,
++		 * which is scheduled as usual, and this guarantees that these
++		 * softirqs are not interrupting use of the FPSIMD in kernel
++		 * mode in task context. So in this case, setting the flag here
++		 * is always appropriate.
++		 */
++		if (IS_ENABLED(CONFIG_PREEMPT_RT) || !in_serving_softirq())
++			set_thread_flag(TIF_USING_KMODE_FPSIMD);
++	} else {
++		BUG_ON(IS_ENABLED(CONFIG_PREEMPT_RT) || !in_serving_softirq());
++		fpsimd_save_kernel_state(current);
++	}
+ 
+ 	/* Invalidate any task state remaining in the fpsimd regs: */
+ 	fpsimd_flush_cpu_state();
++
++	put_cpu_fpsimd_context();
+ }
+ EXPORT_SYMBOL_GPL(kernel_neon_begin);
+ 
+@@ -1856,7 +1903,16 @@ void kernel_neon_end(void)
+ 	if (!system_supports_fpsimd())
+ 		return;
+ 
+-	put_cpu_fpsimd_context();
++	/*
++	 * If we are returning from a nested use of kernel mode FPSIMD, restore
++	 * the task context kernel mode FPSIMD state. This can only happen when
++	 * running in softirq context on non-PREEMPT_RT.
++	 */
++	if (!IS_ENABLED(CONFIG_PREEMPT_RT) && in_serving_softirq() &&
++	    test_thread_flag(TIF_USING_KMODE_FPSIMD))
++		fpsimd_load_kernel_state(current);
++	else
++		clear_thread_flag(TIF_USING_KMODE_FPSIMD);
+ }
+ EXPORT_SYMBOL_GPL(kernel_neon_end);
+ 
 -- 
 2.43.0.rc1.413.gea7ed67945-goog
 
