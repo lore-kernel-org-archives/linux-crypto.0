@@ -1,42 +1,40 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZMn+ZwjG"
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F9E7210C
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 09:56:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gVuf14B6"
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A1419BC
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 09:58:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701194186; x=1732730186;
+  t=1701194313; x=1732730313;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=jANSly3SCs0KMx1UgUvYj11BDQWDzndCBmMmO7qQydo=;
-  b=ZMn+ZwjG/HYIUTKi738nHUsAOZol3rdkRC9FFE1xrvkQIuLmrashb1Ia
-   zlOp9Xi99Gpz+r/k93Ar1vr84uMaCO3wgoVBFC73kBuIDblsUvbncMxsm
-   Bs6HRQtR5eLq+0rbW4FZhiL1x6IDp+FE8URGykJjuxXqdo7kQ/deWBPSP
-   tlTClE6Mibc1im/JvPTAN1lWBZsVVYs2awYGy5HlJ6zZLBHc7pq7caeED
-   H1rC2eSf2LrobpfH5mwOQrASP11o2TnaxXqYpw3I/fYBKfmSbIiwhqQak
-   E0QjE9rqB1L9Opd09iEnWiNMftuIeXZHZ3qQqX4T3U4/nruRwNxHaBtaq
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="383367885"
+  bh=mwIB5m3wu/n6AhYUpJiPbBD+ig/ptoxTgVFtM5xU7qc=;
+  b=gVuf14B6QUUqGcIZUDAM2aGd9QOC/SL8odbPjzw4ue20RvOC3X3hUlPc
+   vV/9njHlblDTMpwMLXsz1RErkIdYIu9g6YcIz/LtDuE1K4LakjHCMaVs2
+   FUYVihkQXvexzGbO4EYHE6Z9oaEsV0IaqxgPVgv1mQ3IrO2qMXFw7jj7S
+   QvjNimqSkOY1TZG/77LktvhyGopEp5Xjci5xKWj6A1Ggr3gsExtZV3puz
+   dzxSsyrB4GxnKKJzOErDseh4BRd4povLPpomzopegvW7anCDo+DR5wGqN
+   Zoe3MHddYrdecM2Qyv5zjqu9oih8OpzjBlOVneP8VCUBmv0hppfg0k0Ld
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="392729683"
 X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="383367885"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 09:56:25 -0800
+   d="scan'208";a="392729683"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 09:58:32 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="886489477"
 X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="886489477"
+   d="scan'208";a="16687600"
 Received: from r031s002_zp31l10c01.deacluster.intel.com (HELO localhost.localdomain) ([10.219.171.29])
-  by fmsmga002.fm.intel.com with ESMTP; 28 Nov 2023 09:56:24 -0800
+  by orviesa001.jf.intel.com with ESMTP; 28 Nov 2023 09:58:31 -0800
 From: Damian Muszynski <damian.muszynski@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	qat-linux@intel.com,
 	Damian Muszynski <damian.muszynski@intel.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - fix error path in add_update_sla()
-Date: Tue, 28 Nov 2023 18:37:32 +0100
-Message-ID: <20231128173828.84083-1-damian.muszynski@intel.com>
+Subject: [PATCH] crypto: qat - fix mutex ordering in adf_rl
+Date: Tue, 28 Nov 2023 18:39:30 +0100
+Message-ID: <20231128174053.84356-1-damian.muszynski@intel.com>
 X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -47,52 +45,40 @@ MIME-Version: 1.0
 Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
 
-The input argument `sla_in` is a pointer to a structure that contains
-the parameters of the SLA which is being added or updated.
-If this pointer is NULL, the function should return an error as
-the data required for the algorithm is not available.
-By mistake, the logic jumps to the error path which dereferences
-the pointer.
-
-This results in a warnings reported by the static analyzer Smatch when
-executed without a database:
-
-    drivers/crypto/intel/qat/qat_common/adf_rl.c:871 add_update_sla()
-    error: we previously assumed 'sla_in' could be null (see line 812)
-
-This issue was not found in internal testing as the pointer cannot be
-NULL. The function add_update_sla() is only called (indirectly) by
-the rate limiting sysfs interface implementation in adf_sysfs_rl.c
-which ensures that the data structure is allocated and valid. This is
-also proven by the fact that Smatch executed with a database does not
-report such error.
-
-Fix it by returning with error if the pointer `sla_in` is NULL.
+If the function validate_user_input() returns an error, the error path
+attempts to unlock an unacquired mutex.
+Acquire the mutex before calling validate_user_input(). This is not
+strictly necessary but simplifies the code.
 
 Fixes: d9fb8408376e ("crypto: qat - add rate limiting feature to qat_4xxx")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
 Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/intel/qat/qat_common/adf_rl.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/crypto/intel/qat/qat_common/adf_rl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_rl.c b/drivers/crypto/intel/qat/qat_common/adf_rl.c
-index 86e3e2152b1b..f2de3cd7d05d 100644
+index f2de3cd7d05d..de1b214dba1f 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_rl.c
 +++ b/drivers/crypto/intel/qat/qat_common/adf_rl.c
-@@ -812,8 +812,7 @@ static int add_update_sla(struct adf_accel_dev *accel_dev,
- 	if (!sla_in) {
- 		dev_warn(&GET_DEV(accel_dev),
- 			 "SLA input data pointer is missing\n");
--		ret = -EFAULT;
--		goto ret_err;
-+		return -EFAULT;
+@@ -815,13 +815,13 @@ static int add_update_sla(struct adf_accel_dev *accel_dev,
+ 		return -EFAULT;
  	}
  
++	mutex_lock(&rl_data->rl_lock);
++
  	/* Input validation */
+ 	ret = validate_user_input(accel_dev, sla_in, is_update);
+ 	if (ret)
+ 		goto ret_err;
+ 
+-	mutex_lock(&rl_data->rl_lock);
+-
+ 	if (is_update) {
+ 		ret = validate_sla_id(accel_dev, sla_in->sla_id);
+ 		if (ret)
 
-base-commit: 27265511a765f4380257319b0c088097b9cf1a71
+base-commit: ed628a28e67c93d65400e7f00e0ff5d4f7a87070
 -- 
 2.41.0
 
