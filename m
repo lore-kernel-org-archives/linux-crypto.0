@@ -1,98 +1,137 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 591AEF5
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 00:25:46 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r7tPY-004Jtw-Sw; Tue, 28 Nov 2023 16:25:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 28 Nov 2023 16:25:49 +0800
-Date: Tue, 28 Nov 2023 16:25:49 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: af_alg - Disallow multiple in-flight AIO requests
-Message-ID: <ZWWkDZRR33ypncn7@gondor.apana.org.au>
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="jrl1bmce"
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85FEE182
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 00:57:43 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6cd89f2af9dso2167878b3a.1
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 00:57:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1701161863; x=1701766663; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BTYsamGNaQ8fRNjNMaxridTGMNfJmuFsAlfcl9yavQs=;
+        b=jrl1bmceyHOFSDtvQApVUTf5TVwt6J7Mv/Mq6VjJic6wS1BHy8agCIMRXABStPzYOw
+         WmGDF2ELP6qmx6LyxcP+KwWnLsahstorvThiBWPTRZGDOrQNF1rg3Irv0yS0JxZpAzVK
+         +0uo5DLXF828BUL6NXVFSIssdFrHdF09t+NwEQ0zNYo9VXWOAMrrm1TgOoRgreRtRcF2
+         CIk7oAr2rjiSDFZU/pTD6x+OGzyH1/7K01yTO2VDaNV5kn5q7xr97kgu5fvPJz7EVVNI
+         tPP0pw6WF8zTDk/rJtadRqtw+LHUaHM5rrz1+FTZCKHQfxK87KOiHxJ1vUbpEUr2IGFg
+         /m3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701161863; x=1701766663;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BTYsamGNaQ8fRNjNMaxridTGMNfJmuFsAlfcl9yavQs=;
+        b=MZvIDCHehmoTaweXcBAK/SPqh8S/sKFGlWonMdhcDMthETTE8ONvWeGm0zuzptISbH
+         lRXsf7AmiGwI1Aats/y4OAmNGvRferib4oB0gWGSoHpDFwfAdLw5gNsq8kQD0mSqJ75M
+         LsQGzE7T0qo8I9lJ8QfdbdY0CIDqfeMk8qrnUx6OubdHSwFJBhZ+ol460OtsBEGlK2In
+         L2B7DQLShhnVzcpE3fbh/V7yYnEcSbAYCTnsAOK8sKnovcwz2YX2Ird1aogdlcQF6sI9
+         hP6Q6hqlZCW1nGmdWHecRGx6CtCU+dJ8RAjaiTpUPvX+WidWyTfJNxuiY+kN4+Yr/PG+
+         17aw==
+X-Gm-Message-State: AOJu0YxC+l5pHXf0qwuEhk/BXtCAVsAL71VeRiu28tmB7bwAD1cQmk+I
+	JOoeJ3OBwpQ6z2W3XCCTumlOWw==
+X-Google-Smtp-Source: AGHT+IE/fng9QOuiUZBluDfizhRPgWmYcOqQIfRFSizRR9MTI4Ihwkn53PdiTZ2Of0dfq0nFdnkdKA==
+X-Received: by 2002:a05:6a20:5650:b0:18b:9053:d865 with SMTP id is16-20020a056a20565000b0018b9053d865mr15666672pzc.42.1701161862894;
+        Tue, 28 Nov 2023 00:57:42 -0800 (PST)
+Received: from ?IPv6:2402:7500:4ce:8338:14c0:b892:2482:e230? ([2402:7500:4ce:8338:14c0:b892:2482:e230])
+        by smtp.gmail.com with ESMTPSA id g8-20020a056a00078800b00694fee1011asm8522232pfu.208.2023.11.28.00.57.39
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 28 Nov 2023 00:57:42 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
+Subject: Re: [PATCH v2 13/13] RISC-V: crypto: add Zvkb accelerated ChaCha20
+ implementation
+From: Jerry Shih <jerry.shih@sifive.com>
+In-Reply-To: <20231128042503.GL1463@sol.localdomain>
+Date: Tue, 28 Nov 2023 16:57:38 +0800
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+ palmer@dabbelt.com,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ herbert@gondor.apana.org.au,
+ davem@davemloft.net,
+ conor.dooley@microchip.com,
+ ardb@kernel.org,
+ heiko@sntech.de,
+ phoebe.chen@sifive.com,
+ hongrong.hsu@sifive.com,
+ linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <3B3784E0-0DE2-4A99-878E-657BB0E0765D@sifive.com>
+References: <20231127070703.1697-1-jerry.shih@sifive.com>
+ <20231127070703.1697-14-jerry.shih@sifive.com>
+ <20231128042503.GL1463@sol.localdomain>
+To: Eric Biggers <ebiggers@kernel.org>
+X-Mailer: Apple Mail (2.3445.9.7)
 
-Having multiple in-flight AIO requests results in unpredictable
-output because they all share the same IV.  Fix this by only allowing
-one request at a time.
+On Nov 28, 2023, at 12:25, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Mon, Nov 27, 2023 at 03:07:03PM +0800, Jerry Shih wrote:
+>> +config CRYPTO_CHACHA20_RISCV64
+>=20
+> Can you call this kconfig option just CRYPTO_CHACHA_RISCV64?  I.e. =
+drop the
+> "20".  The ChaCha family of ciphers includes more than just ChaCha20.
+>=20
+> The other architectures do use "CHACHA20" in their equivalent option, =
+even when
+> they implement XChaCha12 too.  But that's for historical reasons -- we =
+didn't
+> want to break anything by renaming the kconfig options.  For a new =
+option we
+> should use the more general name from the beginning, even if initially =
+only
+> ChaCha20 is implemented (which is fine).
 
-Fixes: 83094e5e9e49 ("crypto: af_alg - add async support to algif_aead")
-Fixes: a596999b7ddf ("crypto: algif - change algif_skcipher to be asynchronous")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/af_alg.c         | 14 +++++++++++++-
- include/crypto/if_alg.h |  3 +++
- 2 files changed, 16 insertions(+), 1 deletion(-)
+I will use `CRYPTO_CHACHA_RISCV64` instead.
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index ea6fb8e89d06..68cc9290cabe 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -1116,9 +1116,13 @@ EXPORT_SYMBOL_GPL(af_alg_sendmsg);
- void af_alg_free_resources(struct af_alg_async_req *areq)
- {
- 	struct sock *sk = areq->sk;
-+	struct af_alg_ctx *ctx;
- 
- 	af_alg_free_areq_sgls(areq);
- 	sock_kfree_s(sk, areq, areq->areqlen);
-+
-+	ctx = alg_sk(sk)->private;
-+	ctx->inflight = false;
- }
- EXPORT_SYMBOL_GPL(af_alg_free_resources);
- 
-@@ -1188,11 +1192,19 @@ EXPORT_SYMBOL_GPL(af_alg_poll);
- struct af_alg_async_req *af_alg_alloc_areq(struct sock *sk,
- 					   unsigned int areqlen)
- {
--	struct af_alg_async_req *areq = sock_kmalloc(sk, areqlen, GFP_KERNEL);
-+	struct af_alg_ctx *ctx = alg_sk(sk)->private;
-+	struct af_alg_async_req *areq;
- 
-+	/* Only one AIO request can be in flight. */
-+	if (ctx->inflight)
-+		return ERR_PTR(-EBUSY);
-+
-+	areq = sock_kmalloc(sk, areqlen, GFP_KERNEL);
- 	if (unlikely(!areq))
- 		return ERR_PTR(-ENOMEM);
- 
-+	ctx->inflight = true;
-+
- 	areq->areqlen = areqlen;
- 	areq->sk = sk;
- 	areq->first_rsgl.sgl.sgt.sgl = areq->first_rsgl.sgl.sgl;
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index ef8ce86b1f78..08b803a4fcde 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -136,6 +136,7 @@ struct af_alg_async_req {
-  *			recvmsg is invoked.
-  * @init:		True if metadata has been sent.
-  * @len:		Length of memory allocated for this data structure.
-+ * @inflight:		Non-zero when AIO requests are in flight.
-  */
- struct af_alg_ctx {
- 	struct list_head tsgl_list;
-@@ -154,6 +155,8 @@ struct af_alg_ctx {
- 	bool init;
- 
- 	unsigned int len;
-+
-+	unsigned int inflight;
- };
- 
- int af_alg_register_type(const struct af_alg_type *type);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>> +static int chacha20_encrypt(struct skcipher_request *req)
+>=20
+> riscv64_chacha_crypt(), please.  chacha20_encrypt() is dangerously =
+close to
+> being the same name as chacha20_crypt() which already exists in =
+crypto/chacha.h.
+
+The function will will have additional prefix/suffix.
+
+>> +static inline bool check_chacha20_ext(void)
+>> +{
+>> +	return riscv_isa_extension_available(NULL, ZVKB) &&
+>> +	       riscv_vector_vlen() >=3D 128;
+>> +}
+>=20
+> Just to double check: your intent is to simply require VLEN >=3D 128 =
+for all the
+> RISC-V vector crypto code, even when some might work with a shorter =
+VLEN?  I
+> don't see anything in chacha-riscv64-zvkb.pl that assumes VLEN >=3D =
+128, for
+> example.  I think it would even work with VLEN =3D=3D 32.
+
+Yes, the chacha algorithm here only needs the VLEN>=3D32. But I think we =
+will not get
+benefits with that kind of hw.
+
+> I think requiring VLEN >=3D 128 anyway makes sense so that we don't =
+have to worry
+> about validating the code with shorter VLEN.  And "application =
+processors" are
+> supposed to have VLEN >=3D 128.  But I just wanted to make sure this =
+is what you
+> intended too.
+
+The standard "V" extension assumes VLEN>=3D128. I just follow that =
+assumption.
+=
+https://github.com/riscv/riscv-v-spec/blob/master/v-spec.adoc#183-v-vector=
+-extension-for-application-processors
+
+-Jerry
+
