@@ -1,81 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2785B5DE
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 17:54:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hsiw/925"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D643EC433C9;
-	Tue, 28 Nov 2023 17:54:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701194094;
-	bh=N3vZMmlwPmMLxmgsU8NU5aW8UlcCxY+iRKRi4fSgJas=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hsiw/925cVatmSVS2Mjf+lwGsahVcUe9gEJwVlcmNPn+zWbmwNZ2MPg9C24I1RYFq
-	 skwNvzE0segMkYvoLC58hDXsNzhnsX3tfykvPEfkeBlgAQXPLVjPalu2EOmmIgvATQ
-	 aoxfGaC2vUW1mpXBAFr/E2qRXkpGsa6WRLj3i45jI8GsHf/aJokHiMdpDsswRmp4Ah
-	 DfMLen3NJkBkTvG87EMmW3JR0n8L0v4+iXgXwtJcN0VoeGH7M1OgsO9pWPe5lQyExH
-	 iZTLYaSNqnPLlBpXSFPrzBksF+fRvVV8C9J7TpdYC6shFoTQk/+7WWgpHw8LPVNmEh
-	 zdq2ORS22eNSg==
-Date: Tue, 28 Nov 2023 17:54:49 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Jerry Shih <jerry.shih@sifive.com>
-Cc: paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	conor.dooley@microchip.com, ebiggers@kernel.org, ardb@kernel.org,
-	heiko@sntech.de, phoebe.chen@sifive.com, hongrong.hsu@sifive.com,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 04/13] RISC-V: crypto: add Zvkned accelerated AES
- implementation
-Message-ID: <20231128-await-tipper-2094715466f2@spud>
-References: <20231127070703.1697-1-jerry.shih@sifive.com>
- <20231127070703.1697-5-jerry.shih@sifive.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZMn+ZwjG"
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F9E7210C
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 09:56:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701194186; x=1732730186;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=jANSly3SCs0KMx1UgUvYj11BDQWDzndCBmMmO7qQydo=;
+  b=ZMn+ZwjG/HYIUTKi738nHUsAOZol3rdkRC9FFE1xrvkQIuLmrashb1Ia
+   zlOp9Xi99Gpz+r/k93Ar1vr84uMaCO3wgoVBFC73kBuIDblsUvbncMxsm
+   Bs6HRQtR5eLq+0rbW4FZhiL1x6IDp+FE8URGykJjuxXqdo7kQ/deWBPSP
+   tlTClE6Mibc1im/JvPTAN1lWBZsVVYs2awYGy5HlJ6zZLBHc7pq7caeED
+   H1rC2eSf2LrobpfH5mwOQrASP11o2TnaxXqYpw3I/fYBKfmSbIiwhqQak
+   E0QjE9rqB1L9Opd09iEnWiNMftuIeXZHZ3qQqX4T3U4/nruRwNxHaBtaq
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="383367885"
+X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
+   d="scan'208";a="383367885"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 09:56:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="886489477"
+X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
+   d="scan'208";a="886489477"
+Received: from r031s002_zp31l10c01.deacluster.intel.com (HELO localhost.localdomain) ([10.219.171.29])
+  by fmsmga002.fm.intel.com with ESMTP; 28 Nov 2023 09:56:24 -0800
+From: Damian Muszynski <damian.muszynski@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Damian Muszynski <damian.muszynski@intel.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - fix error path in add_update_sla()
+Date: Tue, 28 Nov 2023 18:37:32 +0100
+Message-ID: <20231128173828.84083-1-damian.muszynski@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="c+Bx+5YDpVONEprp"
-Content-Disposition: inline
-In-Reply-To: <20231127070703.1697-5-jerry.shih@sifive.com>
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Transfer-Encoding: 8bit
 
+The input argument `sla_in` is a pointer to a structure that contains
+the parameters of the SLA which is being added or updated.
+If this pointer is NULL, the function should return an error as
+the data required for the algorithm is not available.
+By mistake, the logic jumps to the error path which dereferences
+the pointer.
 
---c+Bx+5YDpVONEprp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This results in a warnings reported by the static analyzer Smatch when
+executed without a database:
 
-> +static inline bool check_aes_ext(void)
-> +{
-> +	return riscv_isa_extension_available(NULL, ZVKNED) &&
-> +	       riscv_vector_vlen() >= 128;
-> +}
+    drivers/crypto/intel/qat/qat_common/adf_rl.c:871 add_update_sla()
+    error: we previously assumed 'sla_in' could be null (see line 812)
 
-I'm not keen on this construct, where you are checking vlen greater than
-128 and the presence of Zvkned without checking for the presence of V
-itself. Can you use "has_vector()" in any places where you depend on the
-presence of vector please?
+This issue was not found in internal testing as the pointer cannot be
+NULL. The function add_update_sla() is only called (indirectly) by
+the rate limiting sysfs interface implementation in adf_sysfs_rl.c
+which ensures that the data structure is allocated and valid. This is
+also proven by the fact that Smatch executed with a database does not
+report such error.
 
-Also, there are potentially a lot of places in this drivers where you
-can replace "riscv_isa_extension_available()" with
-"riscv_has_extension_likely()". The latter is optimised with
-alternatives, so in places that are going to be evaluated frequently it
-may be beneficial for you.
+Fix it by returning with error if the pointer `sla_in` is NULL.
 
-Cheers,
-Conor.
+Fixes: d9fb8408376e ("crypto: qat - add rate limiting feature to qat_4xxx")
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ drivers/crypto/intel/qat/qat_common/adf_rl.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
---c+Bx+5YDpVONEprp
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_rl.c b/drivers/crypto/intel/qat/qat_common/adf_rl.c
+index 86e3e2152b1b..f2de3cd7d05d 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_rl.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_rl.c
+@@ -812,8 +812,7 @@ static int add_update_sla(struct adf_accel_dev *accel_dev,
+ 	if (!sla_in) {
+ 		dev_warn(&GET_DEV(accel_dev),
+ 			 "SLA input data pointer is missing\n");
+-		ret = -EFAULT;
+-		goto ret_err;
++		return -EFAULT;
+ 	}
+ 
+ 	/* Input validation */
 
------BEGIN PGP SIGNATURE-----
+base-commit: 27265511a765f4380257319b0c088097b9cf1a71
+-- 
+2.41.0
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZWYpaQAKCRB4tDGHoIJi
-0gizAQClyXLat6AoDqeEMU7fszIl0aqY562jWFVvkg9MjgR24gEAzNdLynP6jTGp
-PoJqYxyEhhUhpsxklOCYQbwZPyDf8ws=
-=ixTm
------END PGP SIGNATURE-----
-
---c+Bx+5YDpVONEprp--
