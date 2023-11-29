@@ -1,144 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="VNPbU2vf"
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86B6B94
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 23:00:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1701241249; x=1701500449;
-	bh=13n/FbsdAD63nCkWt8PGe520xE44G8Ft09Wg1OcHD3Q=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=VNPbU2vfX5cEqEWL5/9Mpla20+qB55j4wsDkMY1tUWUxDP72Ks8TLJqMjT7vC3eFq
-	 GgjgoxuwPeiLvKi+HE12lkn2O7SkFlEQG01i0NpP3MRMloJ9iS4zKpIJVjhnXehHXp
-	 Xz6qEKCIZeb3Tk2z+ZQsOGR7R/PH8tb9MWhdLUngoWnQw4dwATYkmFf4uAZfy4OhwM
-	 oBneMrWzlmVWQC2BcEyOMiKbtxGeZN+1y/DznwLOOa8PD3PSoOSs/THR+6qdai5tyK
-	 aZYRe7Z+rGkqjJrIOUBq44MZqb9JhkySb0d8maQtOL2UzjO4bmAO3E5bwMqf7E1PZL
-	 23GPOiq3xulKQ==
-Date: Wed, 29 Nov 2023 07:00:42 +0000
-To: Yusong Gao <a869920004@gmail.com>
-From: Juerg Haefliger <juergh@proton.me>
-Cc: jarkko@kernel.org, davem@davemloft.net, dhowells@redhat.com, dwmw2@infradead.org, zohar@linux.ibm.com, herbert@gondor.apana.org.au, lists@sapience.com, dimitri.ledkov@canonical.com, keyrings@vger.kernel.org, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v5] sign-file: Fix incorrect return values check
-Message-ID: <20231129080033.12c4efe3@smeagol>
-In-Reply-To: <20231127033456.452151-1-a869920004@gmail.com>
-References: <20231127033456.452151-1-a869920004@gmail.com>
-Feedback-ID: 45149698:user:proton
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EBFEDA
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 23:24:30 -0800 (PST)
+X-ASG-Debug-ID: 1701242666-1eb14e538b24120001-Xm9f1P
+Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx2.zhaoxin.com with ESMTP id twgbnlQnld3dfeFl (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Wed, 29 Nov 2023 15:24:26 +0800 (CST)
+X-Barracuda-Envelope-From: LeoLiu-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Received: from ZXBJMBX03.zhaoxin.com (10.29.252.7) by ZXSHMBX1.zhaoxin.com
+ (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 29 Nov
+ 2023 15:24:26 +0800
+Received: from [192.168.1.204] (125.76.214.122) by ZXBJMBX03.zhaoxin.com
+ (10.29.252.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 29 Nov
+ 2023 15:24:24 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Message-ID: <8c2cca04-140a-4b0c-b478-5bdc437b5413@zhaoxin.com>
+X-Barracuda-RBL-Trusted-Forwarder: 192.168.1.204
+Date: Wed, 29 Nov 2023 15:24:23 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="b1_bqlWVBJFFpdDPXWzuVv4Sbw8of9oHqNZBSjRct5izU"
-
-This is a multi-part message in MIME format.
-
---b1_bqlWVBJFFpdDPXWzuVv4Sbw8of9oHqNZBSjRct5izU
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, 27 Nov 2023 03:34:56 +0000
-"Yusong Gao" <a869920004@gmail.com> wrote:
-
-> There are some wrong return values check in sign-file when call OpenSSL
-> API. The ERR() check cond is wrong because of the program only check the
-> return value is < 0 which ignored the return val is 0. For example:
-> 1. CMS_final() return 1 for success or 0 for failure.
-> 2. i2d_CMS_bio_stream() returns 1 for success or 0 for failure.
-> 3. i2d_TYPEbio() return 1 for success and 0 for failure.
-> 4. BIO_free() return 1 for success and 0 for failure.
->=20
-> Link: https://www.openssl.org/docs/manmaster/man3/
-> Fixes: e5a2e3c84782 ("scripts/sign-file.c: Add support for signing with a=
- raw signature")
-> Signed-off-by: Yusong Gao <a869920004@gmail.com>
-> ---
-> V1, V2: Clarify the description of git message.
-> V3: Removed redundant empty line.
-> V4: Change to more strict check mode.
-> ---
->  scripts/sign-file.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->=20
-> diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-> index 598ef5465f82..3edb156ae52c 100644
-> --- a/scripts/sign-file.c
-> +++ b/scripts/sign-file.c
-> @@ -322,7 +322,7 @@ int main(int argc, char **argv)
->  =09=09=09=09     CMS_NOSMIMECAP | use_keyid |
->  =09=09=09=09     use_signed_attrs),
->  =09=09    "CMS_add1_signer");
-> -=09=09ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) < 0,
-> +=09=09ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) !=3D 1,
->  =09=09    "CMS_final");
->=20
->  #else
-> @@ -341,10 +341,10 @@ int main(int argc, char **argv)
->  =09=09=09b =3D BIO_new_file(sig_file_name, "wb");
->  =09=09=09ERR(!b, "%s", sig_file_name);
->  #ifndef USE_PKCS7
-> -=09=09=09ERR(i2d_CMS_bio_stream(b, cms, NULL, 0) < 0,
-> +=09=09=09ERR(i2d_CMS_bio_stream(b, cms, NULL, 0) !=3D 1,
->  =09=09=09    "%s", sig_file_name);
->  #else
-> -=09=09=09ERR(i2d_PKCS7_bio(b, pkcs7) < 0,
-> +=09=09=09ERR(i2d_PKCS7_bio(b, pkcs7) !=3D 1,
->  =09=09=09    "%s", sig_file_name);
->  #endif
->  =09=09=09BIO_free(b);
-> @@ -374,9 +374,9 @@ int main(int argc, char **argv)
->=20
->  =09if (!raw_sig) {
->  #ifndef USE_PKCS7
-> -=09=09ERR(i2d_CMS_bio_stream(bd, cms, NULL, 0) < 0, "%s", dest_name);
-> +=09=09ERR(i2d_CMS_bio_stream(bd, cms, NULL, 0) !=3D 1, "%s", dest_name);
->  #else
-> -=09=09ERR(i2d_PKCS7_bio(bd, pkcs7) < 0, "%s", dest_name);
-> +=09=09ERR(i2d_PKCS7_bio(bd, pkcs7) !=3D 1, "%s", dest_name);
->  #endif
->  =09} else {
->  =09=09BIO *b;
-> @@ -396,7 +396,7 @@ int main(int argc, char **argv)
->  =09ERR(BIO_write(bd, &sig_info, sizeof(sig_info)) < 0, "%s", dest_name);
->  =09ERR(BIO_write(bd, magic_number, sizeof(magic_number) - 1) < 0, "%s", =
-dest_name);
->=20
-> -=09ERR(BIO_free(bd) < 0, "%s", dest_name);
-> +=09ERR(BIO_free(bd) !=3D 1, "%s", dest_name);
->=20
->  =09/* Finally, if we're signing in place, replace the original. */
->  =09if (replace_orig)
-> --
-> 2.34.1
->=20
-
-Nit: v5 in the email subject should be v4.
-
-Reviewed-by: Juerg Haefliger <juerg.haefliger@canonical.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] crypto: x86/sm2 -add Zhaoxin SM2 algorithm
+ implementation
+To: Dave Hansen <dave.hansen@intel.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+	<hpa@zytor.com>, <seanjc@google.com>, <kim.phillips@amd.com>,
+	<pbonzini@redhat.com>, <babu.moger@amd.com>, <jiaxi.chen@linux.intel.com>,
+	<jmattson@google.com>, <pawan.kumar.gupta@linux.intel.com>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+X-ASG-Orig-Subj: Re: [PATCH v3] crypto: x86/sm2 -add Zhaoxin SM2 algorithm
+ implementation
+CC: <CobeChen@zhaoxin.com>, <TonyWWang@zhaoxin.com>, <YunShen@zhaoxin.com>,
+	<Leoliu@zhaoxin.com>
+References: <20231109094744.545887-1-LeoLiu-oc@zhaoxin.com>
+ <20231122064355.638946-1-LeoLiu-oc@zhaoxin.com>
+ <aa7bbecc-dcd5-4757-8f8a-1eb2ab0d529b@intel.com>
+From: LeoLiu-oc <leoliu-oc@zhaoxin.com>
+In-Reply-To: <aa7bbecc-dcd5-4757-8f8a-1eb2ab0d529b@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ ZXBJMBX03.zhaoxin.com (10.29.252.7)
+X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
+X-Barracuda-Start-Time: 1701242666
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 745
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.117408
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
 
---b1_bqlWVBJFFpdDPXWzuVv4Sbw8of9oHqNZBSjRct5izU
-Content-Type: application/pgp-signature; name=attachment.sig
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=attachment.sig
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NCg0KaVFJekJBRUJDZ0FkRmlFRWhaZlU5Nkl1
-cHJ2aUxkZUxEOU9MQ1F1bVFyY0ZBbVZtNFpFQUNna1FEOU9MQ1F1bQ0KUXJjeWJSQUFpQjJsK1FQ
-TkRTaWxTTTJmVW14dVJFS2xXdDFCclp3Q001QU53U2JpcHZBSVV1VUJFUW9wNGhhOQ0KZ2t5dTVH
-YVJMc0RXRVVPdjBROVA1ZEtyUVRhWUdkc3M0aXlOZHFLbmRhNXpsNWhSNEVNR0tYb1JDeGozam54
-Rg0KQ2ZCb3VDblVacUZWeTdETjQ5ZTVqU2JuNEtRREhRdHJ5dm5XSEk2ck10dm5XbnhsY0tpMnpj
-RFNSTzdHN1NuYg0Ka3YwQ2ZkZ0hYbUkyRlZXREU1QkNQdjB0ay9janFLUW1JcmY1c0E3Wmozby9P
-b1Z6SDRaOE5Ha01oMlRsL3lmUQ0KVGk3S0RSWFlaNzllZTVRV2lPUzd3bjQ0SG9Vb0xiN0tPMnF5
-TmJ4bVM1VTRNZDdmejJRL0F5VDkwTmFEU293Mw0KaWJUQ2dYVS8wd0xCNzdhdnR0WVhoL1lUaWxF
-ZjB1VVB1RDVxOWh1YTBwdFgzRnFWWURWZndvUi8vQU1MNjFMaA0KVXFTVTRzY0FtSkc4S2h0bW9r
-NlhKS0RVRno2Y0FSQXg3RmFoaGJqT01CMjFxcFhSMk8vSzNGd1N5ZFZXbElUZA0KeHZYSWZsWSt5
-ZEJTZXhQQi9oeFFnZ2VQYUdZVzdSUUh5OHV5ZnREaHZ2bk5zRjZibjFzNTQ4WGtmeW96dGhWMA0K
-WUZKeVlXVVFyVnNjbTM5VGwwT09GSjRlUlNVUlU4ZWc1TkFTdVVRQW5HbTNNYTEzeHZ0RkZ4OEp4
-MW13Y01jZg0KSGhsQkx6aG12c2g4RWRDZy93V1NTK1BtRDZRVXd2NzlLY3BKMjFEY0RtaDhZbHBL
-VHBnT2tVNVVKelhJZk52dQ0KaG5uNTQyOTV3QU5iRE5QVXJqWXlkTVdrRnFDei9KeG1yeTBQLzhY
-dVlYSXROYmc1SWRvPQ0KPWxvWVQNCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
+在 2023/11/22 22:26, Dave Hansen 写道:
+>> +/* Zhaoxin sm2 verify function */
+>> +static inline size_t zhaoxin_gmi_sm2_verify(unsigned char *key, unsigned char *hash,
+>> +				unsigned char *sig, unsigned char *scratch)
+>> +{
+>> +	size_t result;
+>> +
+>> +	asm volatile(
+>> +		".byte 0xf2, 0x0f, 0xa6, 0xc0"
+>> +		:"=c"(result)
+>> +		:"a"(hash), "b"(key), "d"(SM2_CWORD_VERIFY), "S"(scratch), "D"(sig)
+>> +		:"memory");
+>> +
+>> +	return result;
+>> +}
+> 
+> What version of binutils supports this new instruction?
+> 
 
---b1_bqlWVBJFFpdDPXWzuVv4Sbw8of9oHqNZBSjRct5izU--
+The instruction has not yet been submitted to binutils. It will only be 
+used in the Zhaoxin-rng driver, and we are evaluating the necessity of 
+submitting it to binutils.
 
+Yours sincerely,
+Leoliu-oc
