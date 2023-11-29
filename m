@@ -1,102 +1,166 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFFB51BE2
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Nov 2023 00:04:38 -0800 (PST)
-X-ASG-Debug-ID: 1701245075-1eb14e538b241f0001-Xm9f1P
-Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx2.zhaoxin.com with ESMTP id pbUlX32vwyUxf8ir (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Wed, 29 Nov 2023 16:04:35 +0800 (CST)
-X-Barracuda-Envelope-From: LeoLiu-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
-Received: from ZXBJMBX03.zhaoxin.com (10.29.252.7) by ZXSHMBX3.zhaoxin.com
- (10.28.252.165) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 29 Nov
- 2023 16:04:35 +0800
-Received: from [192.168.1.204] (125.76.214.122) by ZXBJMBX03.zhaoxin.com
- (10.29.252.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 29 Nov
- 2023 16:04:33 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
-Message-ID: <f9a1d0d9-12ae-45ff-a030-93615df21ec5@zhaoxin.com>
-X-Barracuda-RBL-Trusted-Forwarder: 192.168.1.204
-Date: Wed, 29 Nov 2023 16:04:32 +0800
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iLyQ+KVR"
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 668FC1735;
+	Wed, 29 Nov 2023 00:19:24 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1cfc2bcffc7so26117455ad.1;
+        Wed, 29 Nov 2023 00:19:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701245964; x=1701850764; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pitQD+gW5dzBAjSz8pHlIhLJL8YzOCm583XKc/zjIKE=;
+        b=iLyQ+KVRM9VTloiu9AfhrVbVZPaV/ZByzozTri2/QEh66YuXYeIomCGC/b+/38SrZg
+         DxTOwu7XoCpX7b6S7tbgsbt+gcbEFTIA4f03MIm/jW9ENCS2zW0XILhVIoZPeOGt3yhb
+         rpGA/XNrg+Sk9iGOe1pvL9i3Cp9CndfNGfw1LTrH7Uli7i2NyMZzC6sFEAAowt5E1Ib8
+         CJtcFxPQaAcToN81mNWUkXMNzoBhXz/RG8hq9wlGpTdcVgxoQOcHLOQxMunYKpNmU5+6
+         0FU/Gz10h0FbTRE609AS2NZGefmKT6k8SP9BHJ1c9GfwpF2NOgG0OEp4DpvK0YoMHXK0
+         aIyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701245964; x=1701850764;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pitQD+gW5dzBAjSz8pHlIhLJL8YzOCm583XKc/zjIKE=;
+        b=JhyWNZxLUd3LLGEuNUmDMvVcBsGItxZcxumv3kpXEGthNyW0NJhJ28MmJPKOlMDWSa
+         2RQLN3SViRRGRdRC1Bh8oljE8RlESvuOdBPkAD4fd5310YzfDl1/1AcqrJEZswjOUOWw
+         y3VciuRMEuzBxae8zI3Au1RbFx3/OBT9oKJ4PTjzgp5mVJ2TcJQIkx33OJzmEuPe4pqK
+         Q7P7qweCWpw7ALgRJlyThkp+8Ikg645t3sIFUCaItlPsNDp5kivsMebFxi/Is3654ypo
+         PjymTp94tpDrcqKEvGfqUOCrVWioV/Mn9ziMtOfzhDudUNvOY5kP541dQTYD3mDQB5h3
+         nbXw==
+X-Gm-Message-State: AOJu0YxOxC3xrE6BAs1G2hwv5kZgJvccRY0ansib0Qma3vYQSuNLrrhO
+	3qlGrZA3N0eTSxJz5UCdWTo=
+X-Google-Smtp-Source: AGHT+IHnwCpZL6ALoY5W5b8E7P3Bbp+sX02k5cXjC692O8hzZh0gkO3k4cS7ftIWftUNaMVcH9dodQ==
+X-Received: by 2002:a17:902:dac7:b0:1cf:c397:8f09 with SMTP id q7-20020a170902dac700b001cfc3978f09mr13907496plx.55.1701245963796;
+        Wed, 29 Nov 2023 00:19:23 -0800 (PST)
+Received: from localhost.localdomain ([154.85.51.139])
+        by smtp.gmail.com with ESMTPSA id x10-20020a170902ea8a00b001cfcd2fb7b0sm5470932plb.285.2023.11.29.00.19.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 00:19:23 -0800 (PST)
+From: Yusong Gao <a869920004@gmail.com>
+To: jarkko@kernel.org,
+	davem@davemloft.net,
+	dhowells@redhat.com,
+	dwmw2@infradead.org,
+	juergh@proton.me,
+	zohar@linux.ibm.com,
+	herbert@gondor.apana.org.au,
+	lists@sapience.com,
+	dimitri.ledkov@canonical.com,
+	a869920004@gmail.com
+Cc: keyrings@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v5] sign-file: Fix incorrect return values check
+Date: Wed, 29 Nov 2023 08:19:06 +0000
+Message-Id: <20231129081906.504149-1-a869920004@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231129080033.12c4efe3@smeagol>
+References: <20231129080033.12c4efe3@smeagol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] crypto: x86/sm2 -add Zhaoxin SM2 algorithm
- implementation
-From: LeoLiu-oc <leoliu-oc@zhaoxin.com>
-X-ASG-Orig-Subj: Re: [PATCH v3] crypto: x86/sm2 -add Zhaoxin SM2 algorithm
- implementation
-To: Dave Hansen <dave.hansen@intel.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-	<hpa@zytor.com>, <seanjc@google.com>, <kim.phillips@amd.com>,
-	<pbonzini@redhat.com>, <babu.moger@amd.com>, <jiaxi.chen@linux.intel.com>,
-	<jmattson@google.com>, <pawan.kumar.gupta@linux.intel.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <CobeChen@zhaoxin.com>, <TonyWWang@zhaoxin.com>, <YunShen@zhaoxin.com>,
-	<Leoliu@zhaoxin.com>
-References: <20231109094744.545887-1-LeoLiu-oc@zhaoxin.com>
- <20231122064355.638946-1-LeoLiu-oc@zhaoxin.com>
- <aa7bbecc-dcd5-4757-8f8a-1eb2ab0d529b@intel.com>
- <8c2cca04-140a-4b0c-b478-5bdc437b5413@zhaoxin.com>
-In-Reply-To: <8c2cca04-140a-4b0c-b478-5bdc437b5413@zhaoxin.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- ZXBJMBX03.zhaoxin.com (10.29.252.7)
-X-Barracuda-Connect: ZXSHMBX3.zhaoxin.com[10.28.252.165]
-X-Barracuda-Start-Time: 1701245075
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 1034
-X-Barracuda-BRTS-Status: 0
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.117411
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
 
 
 
-在 2023/11/29 15:24, LeoLiu-oc 写道:
-> 
-> 
-> 在 2023/11/22 22:26, Dave Hansen 写道:
->>> +/* Zhaoxin sm2 verify function */
->>> +static inline size_t zhaoxin_gmi_sm2_verify(unsigned char *key, 
->>> unsigned char *hash,
->>> +                unsigned char *sig, unsigned char *scratch)
->>> +{
->>> +    size_t result;
->>> +
->>> +    asm volatile(
->>> +        ".byte 0xf2, 0x0f, 0xa6, 0xc0"
->>> +        :"=c"(result)
->>> +        :"a"(hash), "b"(key), "d"(SM2_CWORD_VERIFY), "S"(scratch), 
->>> "D"(sig)
->>> +        :"memory");
->>> +
->>> +    return result;
->>> +}
->>
->> What version of binutils supports this new instruction?
->>
-> 
-> The instruction has not yet been submitted to binutils. It will only be 
-> used in the Zhaoxin sm2 driver, and we are evaluating the necessity of 
-> submitting it to binutils.
-> 
-> Yours sincerely,
-> Leoliu-oc
+On Wed, Nov 29, 2023 at 3:00 PM Juerg Haefliger <juergh@proton.me>
+wrote:
+>
+> On Mon, 27 Nov 2023 03:34:56 +0000
+> "Yusong Gao" <a869920004@gmail.com> wrote:
+>
+> > There are some wrong return values check in sign-file when call
+> > OpenSSL
+> > API. The ERR() check cond is wrong because of the program only check
+> > the
+> > return value is < 0 which ignored the return val is 0. For example:
+> > 1. CMS_final() return 1 for success or 0 for failure.
+> > 2. i2d_CMS_bio_stream() returns 1 for success or 0 for failure.
+> > 3. i2d_TYPEbio() return 1 for success and 0 for failure.
+> > 4. BIO_free() return 1 for success and 0 for failure.
+> >
+> > Link: https://www.openssl.org/docs/manmaster/man3/
+> > Fixes: e5a2e3c84782 ("scripts/sign-file.c: Add support for signing
+> > with a raw signature")
+> > Signed-off-by: Yusong Gao <a869920004@gmail.com>
+> > ---
+> > V1, V2: Clarify the description of git message.
+> > V3: Removed redundant empty line.
+> > V4: Change to more strict check mode.
+> > ---
+> >  scripts/sign-file.c | 12 ++++++------
+> >  1 file changed, 6 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/scripts/sign-file.c b/scripts/sign-file.c
+> > index 598ef5465f82..3edb156ae52c 100644
+> > --- a/scripts/sign-file.c
+> > +++ b/scripts/sign-file.c
+> > @@ -322,7 +322,7 @@ int main(int argc, char **argv)
+> >                                    CMS_NOSMIMECAP | use_keyid |
+> >                                    use_signed_attrs),
+> >                   "CMS_add1_signer");
+> > -             ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY)
+> > < 0,
+> > +             ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY)
+> > != 1,
+> >                   "CMS_final");
+> >
+> >  #else
+> > @@ -341,10 +341,10 @@ int main(int argc, char **argv)
+> >                       b = BIO_new_file(sig_file_name, "wb");
+> >                       ERR(!b, "%s", sig_file_name);
+> >  #ifndef USE_PKCS7
+> > -                     ERR(i2d_CMS_bio_stream(b, cms, NULL, 0) < 0,
+> > +                     ERR(i2d_CMS_bio_stream(b, cms, NULL, 0) != 1,
+> >                           "%s", sig_file_name);
+> >  #else
+> > -                     ERR(i2d_PKCS7_bio(b, pkcs7) < 0,
+> > +                     ERR(i2d_PKCS7_bio(b, pkcs7) != 1,
+> >                           "%s", sig_file_name);
+> >  #endif
+> >                       BIO_free(b);
+> > @@ -374,9 +374,9 @@ int main(int argc, char **argv)
+> >
+> >       if (!raw_sig) {
+> >  #ifndef USE_PKCS7
+> > -             ERR(i2d_CMS_bio_stream(bd, cms, NULL, 0) < 0, "%s",
+> > dest_name);
+> > +             ERR(i2d_CMS_bio_stream(bd, cms, NULL, 0) != 1, "%s",
+> > dest_name);
+> >  #else
+> > -             ERR(i2d_PKCS7_bio(bd, pkcs7) < 0, "%s", dest_name);
+> > +             ERR(i2d_PKCS7_bio(bd, pkcs7) != 1, "%s", dest_name);
+> >  #endif
+> >       } else {
+> >               BIO *b;
+> > @@ -396,7 +396,7 @@ int main(int argc, char **argv)
+> >       ERR(BIO_write(bd, &sig_info, sizeof(sig_info)) < 0, "%s",
+> >       dest_name);
+> >       ERR(BIO_write(bd, magic_number, sizeof(magic_number) - 1) < 0,
+> >       "%s", dest_name);
+> >
+> > -     ERR(BIO_free(bd) < 0, "%s", dest_name);
+> > +     ERR(BIO_free(bd) != 1, "%s", dest_name);
+> >
+> >       /* Finally, if we're signing in place, replace the original.
+> >       */
+> >       if (replace_orig)
+> > --
+> > 2.34.1
+> >
+>
+> Nit: v5 in the email subject should be v4.
 
-Sorry, Correct a clerical error. "Zhaoxin-rng" --> "Zhaoxin sm2".
+Yeah, thanks for point out, I get it. 
 
-Yours sincerely,
-Leoliu-oc
+>
+> Reviewed-by: Juerg Haefliger <juerg.haefliger@canonical.com>
+>
+
+
+BR, Yusong Gao
