@@ -1,334 +1,119 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RPQpPMW9"
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1F1361A1;
-	Tue, 28 Nov 2023 13:16:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701206195; x=1732742195;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=u3LLIxB0xpITkynhMFsp2gJVUo9d/a86JchoCpeKieE=;
-  b=RPQpPMW9tqmz+W1p3C3qrvhNPyHF8A+pzA5IdL03AJqOLDpvib5R9CdI
-   aphGyj8XUo4hCniQtTDNp3+Ic8bC1+DODyFZhz/H2hYycvHOsSyt87zvq
-   FqyOmsOOGNVwhtuN5FIBDEIpFCK4jmNvbwT7BBQwQwwXPpje+X7V9PZMO
-   fRVB1iks5gQ4WiUh7XJz6z1aCO5RkUhJ8gkK/9fb8TOrzpY5qg2XFle1z
-   DVCIJUOe3LyvuYBlZfOPM4je8cqmkmNaEWEMKIifoor70ZcwKVtWZe1BR
-   biLjOU65N3cf+2z9iWmvkrnBo8DPWLEXq1JTWPNJNyyV0bUe3HCe4+3EO
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="14594451"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="14594451"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 13:09:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="886574132"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="886574132"
-Received: from arelysna-mobl3.amr.corp.intel.com ([10.209.144.161])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 13:09:26 -0800
-Message-ID: <e0d1e4441dc7976450efd07322be0fe5a7526efe.camel@linux.intel.com>
-Subject: Re: [PATCH v10 14/14] dmaengine: idxd: Add support for device/wq
- defaults
-From: Tom Zanussi <tom.zanussi@linux.intel.com>
-To: Fenghua Yu <fenghua.yu@intel.com>, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, vkoul@kernel.org
-Cc: dave.jiang@intel.com, tony.luck@intel.com, wajdi.k.feghali@intel.com, 
- james.guilford@intel.com, kanchana.p.sridhar@intel.com,
- vinodh.gopal@intel.com,  giovanni.cabiddu@intel.com, pavel@ucw.cz,
- linux-kernel@vger.kernel.org,  linux-crypto@vger.kernel.org,
- dmaengine@vger.kernel.org
-Date: Tue, 28 Nov 2023 15:09:06 -0600
-In-Reply-To: <00aa3b9f-d81e-3dc2-3fb0-bb79e16564d3@intel.com>
-References: <20231127202704.1263376-1-tom.zanussi@linux.intel.com>
-	 <20231127202704.1263376-15-tom.zanussi@linux.intel.com>
-	 <00aa3b9f-d81e-3dc2-3fb0-bb79e16564d3@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="C1PiVOef"
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4703C1735
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 18:40:03 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1cfcc9b3b5cso26127505ad.0
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 18:40:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1701225603; x=1701830403; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V5x5B0c437a2X9lDq0UQuEQp64iHtOX/XVWyXOOCW84=;
+        b=C1PiVOefUlAZHTQ0GuFJuT4q1hAhtdRFNnh1uRC3xtDYnehCo/BAcmzmQ/RFW2Z9tR
+         14z5atUH8tfWWmrygjBafEcX0uN0bRTSU/sb0LQv6CRiM/azx4XyM8ZkG18HGOmCQ67q
+         5y7MFsvYEcUZ4D/EFM3hjTL6lqFnb565zPwcyLYXUr03cx4Zf58eV44LFL8Zx9EniDrP
+         Ey06cEt3wTVD8zfxqAQHE7WbDtKNBNJwLnlzeK7mlSM0cNfyAySsjxGrx2hyNSq1nJBt
+         JVD8vUNhCZVH2HrGPnvedfg9NWK0U1wvKz4kpEHtTR4zm8m1Y6mYhIMqSLKSvysmuaSI
+         NwLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701225603; x=1701830403;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V5x5B0c437a2X9lDq0UQuEQp64iHtOX/XVWyXOOCW84=;
+        b=I8q1qklLWV3mw0Gx6DVlrZV57MRG9GVpOADbqJO+LZv6Qj54A1VcddeQ1E7Yq4kwXx
+         50PbafPFW0zxHcy011u+SYhh4IS0C4HVauM1wk9yL76dvxeu1f2GOaSTsE0j8+S0BN/b
+         XhxFu0oL47bIuvsGcmxnsNHeLDNC6GDVS0E7s9dYqpUIw9uU6SVRmEtXl0UWc3G2uVTW
+         BcGyB9KU1V2g+4wiedJU+EOe6iDbV4Z0EY2M4c96pvOIf8YUMjck4ZWWKrEKb8ZvmHNc
+         pG2SMErvxkmVDyhPlVAu2ZhNoIVpteT+G+wzvwby4ufJDwj6g2ruL8nus1YHZC4GVET7
+         Jisw==
+X-Gm-Message-State: AOJu0Yyiwl5V62MBTntJ6ELVmSIrlVd1rgvRFGMWTvSgwF9X0QZzVdlV
+	zzDZnkKimmFGaBQRy7FYTZpq5lHg5ykilM0N0Ow=
+X-Google-Smtp-Source: AGHT+IHciKY2OrzZ9uzKYCblSTprxoTaxuGcqxj9qIEPOv32IWeYHV5K+GkoXvaXcNdlaGNzpGPu9g==
+X-Received: by 2002:a17:902:ce84:b0:1cf:b7ea:fea with SMTP id f4-20020a170902ce8400b001cfb7ea0feamr15805442plg.1.1701225602758;
+        Tue, 28 Nov 2023 18:40:02 -0800 (PST)
+Received: from ?IPv6:2402:7500:4ce:5a34:50a0:78b5:5013:4cf4? ([2402:7500:4ce:5a34:50a0:78b5:5013:4cf4])
+        by smtp.gmail.com with ESMTPSA id y4-20020a17090322c400b001cfcd4eca11sm4806771plg.114.2023.11.28.18.39.59
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 28 Nov 2023 18:40:02 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
+Subject: Re: [PATCH v2 04/13] RISC-V: crypto: add Zvkned accelerated AES
+ implementation
+From: Jerry Shih <jerry.shih@sifive.com>
+In-Reply-To: <20231128201228.GE1148@sol.localdomain>
+Date: Wed, 29 Nov 2023 10:39:56 +0800
+Cc: Conor Dooley <conor@kernel.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>,
+ palmer@dabbelt.com,
+ aou@eecs.berkeley.edu,
+ herbert@gondor.apana.org.au,
+ davem@davemloft.net,
+ conor.dooley@microchip.com,
+ ardb@kernel.org,
+ heiko@sntech.de,
+ phoebe.chen@sifive.com,
+ hongrong.hsu@sifive.com,
+ linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <E78B3BF9-8E49-417B-A89E-05F72690A92F@sifive.com>
+References: <20231127070703.1697-1-jerry.shih@sifive.com>
+ <20231127070703.1697-5-jerry.shih@sifive.com>
+ <20231128-await-tipper-2094715466f2@spud>
+ <20231128201228.GE1148@sol.localdomain>
+To: Eric Biggers <ebiggers@kernel.org>
+X-Mailer: Apple Mail (2.3445.9.7)
 
-Hi Fenghua,
+On Nov 29, 2023, at 04:12, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Tue, Nov 28, 2023 at 05:54:49PM +0000, Conor Dooley wrote:
+>>> +static inline bool check_aes_ext(void)
+>>> +{
+>>> +	return riscv_isa_extension_available(NULL, ZVKNED) &&
+>>> +	       riscv_vector_vlen() >=3D 128;
+>>> +}
+>>=20
+>> I'm not keen on this construct, where you are checking vlen greater =
+than
+>> 128 and the presence of Zvkned without checking for the presence of V
+>> itself. Can you use "has_vector()" in any places where you depend on =
+the
+>> presence of vector please?
+>=20
+> Shouldn't both of those things imply vector support already?
 
-On Tue, 2023-11-28 at 12:31 -0800, Fenghua Yu wrote:
-> Hi, Tom,
->=20
-> On 11/27/23 12:27, Tom Zanussi wrote:
-> > Add a load_device_defaults() function pointer to struct
-> > idxd_driver_data, which if defined, will be called when an idxd
-> > device
-> > is probed and will allow the idxd device to be configured with
-> > default
-> > values.
-> >=20
-> > The load_device_defaults() function is passed an idxd device to
-> > work
-> > with to set specific device attributes.
-> >=20
-> > Also add a load_device_defaults() implementation IAA devices;
-> > future
-> > patches would add default functions for other device types such as
-> > DSA.
-> >=20
-> > The way idxd device probing works, if the device configuration is
-> > valid at that point e.g. at least one workqueue and engine is
-> > properly
-> > configured then the device will be enabled and ready to go.
-> >=20
-> > The IAA implementation, idxd_load_iaa_device_defaults(), configures
-> > a
-> > single workqueue (wq0) for each device with the following default
-> > values:
-> >=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mode=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 "dedicated"
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 threshold=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A00
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 size=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A016
->=20
-> Why is it 16?
->=20
-> If wqcap supports less than 16, configuring wq size 16 will fail.
-> If wqcap supports more than 16, wq size 16 uses less wq size than=20
-> capable and less performance.
->=20
-> Is it better to set wq size as total wq size reported in wqcap?
+The vector crypto extensions imply `V` extension. Should we still need =
+to check
+the `V` explicitly?
+=
+https://github.com/riscv/riscv-crypto/blob/main/doc/vector/riscv-crypto-sp=
+ec-vector.adoc#1-extensions-overview
 
-Yes, good point.  I'll calculate this based on wqcap.
-
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 priority=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A010
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0IDXD_WQT_KERNEL
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 group=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A00
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "iaa_crypto"
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 driver_name=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 "crypto"
-> >=20
-> > Note that this now adds another configuration step for any users
-> > that
-> > want to configure their own devices/workqueus with something
-> > different
-> > in that they'll first need to disable (in the case of IAA) wq0 and
-> > the
-> > device itself before they can set their own attributes and re-
-> > enable,
-> > since they've been already been auto-enabled.=C2=A0 Note also that in
-> > order
-> > for the new configuration to be applied to the deflate-iaa crypto
-> > algorithm the iaa_crypto module needs to unregister the old
-> > version,
-> > which is accomplished by removing the iaa_crypto module, and
-> > re-registering it with the new configuration by reinserting the
-> > iaa_crypto module.
-> >=20
-> > Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
-> > ---
-> > =C2=A0 drivers/dma/idxd/Makefile=C2=A0=C2=A0 |=C2=A0 2 +-
-> > =C2=A0 drivers/dma/idxd/defaults.c | 53
-> > +++++++++++++++++++++++++++++++++++++
-> > =C2=A0 drivers/dma/idxd/idxd.h=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 4 +++
-> > =C2=A0 drivers/dma/idxd/init.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 7 +++++
-> > =C2=A0 4 files changed, 65 insertions(+), 1 deletion(-)
-> > =C2=A0 create mode 100644 drivers/dma/idxd/defaults.c
-> >=20
-> > diff --git a/drivers/dma/idxd/Makefile b/drivers/dma/idxd/Makefile
-> > index c5e679070e46..2b4a0d406e1e 100644
-> > --- a/drivers/dma/idxd/Makefile
-> > +++ b/drivers/dma/idxd/Makefile
-> > @@ -4,7 +4,7 @@ obj-$(CONFIG_INTEL_IDXD_BUS) +=3D idxd_bus.o
-> > =C2=A0 idxd_bus-y :=3D bus.o
-> > =C2=A0=20
-> > =C2=A0 obj-$(CONFIG_INTEL_IDXD) +=3D idxd.o
-> > -idxd-y :=3D init.o irq.o device.o sysfs.o submit.o dma.o cdev.o
-> > debugfs.o
-> > +idxd-y :=3D init.o irq.o device.o sysfs.o submit.o dma.o cdev.o
-> > debugfs.o defaults.o
-> > =C2=A0=20
-> > =C2=A0 idxd-$(CONFIG_INTEL_IDXD_PERFMON) +=3D perfmon.o
-> > =C2=A0=20
-> > diff --git a/drivers/dma/idxd/defaults.c
-> > b/drivers/dma/idxd/defaults.c
-> > new file mode 100644
-> > index 000000000000..a0c9faad8efe
-> > --- /dev/null
-> > +++ b/drivers/dma/idxd/defaults.c
-> > @@ -0,0 +1,53 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/* Copyright(c) 2023 Intel Corporation. All rights rsvd. */
-> > +#include <linux/kernel.h>
-> > +#include "idxd.h"
-> > +
-> > +int idxd_load_iaa_device_defaults(struct idxd_device *idxd)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct idxd_engine *engine;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct idxd_group *group;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct idxd_wq *wq;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!test_bit(IDXD_FLAG_CONF=
-IGURABLE, &idxd->flags))
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0return 0;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0wq =3D idxd->wqs[0];
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (wq->state !=3D IDXD_WQ_D=
-ISABLED)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0return -EPERM;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set mode to "dedicated" *=
-/
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0set_bit(WQ_FLAG_DEDICATED, &=
-wq->flags);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0wq->threshold =3D 0;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set size to 16 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0wq->size =3D 16;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set priority to 10 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0wq->priority =3D 10;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set type to "kernel" */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0wq->type =3D IDXD_WQT_KERNEL=
-;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set wq group to 0 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0group =3D idxd->groups[0];
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0wq->group =3D group;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0group->num_wqs++;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set name to "iaa_crypto" =
-*/
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0memset(wq->name, 0, WQ_NAME_=
-SIZE + 1);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0strscpy(wq->name, "iaa_crypt=
-o", WQ_NAME_SIZE + 1);
+>> Also, there are potentially a lot of places in this drivers where you
+>> can replace "riscv_isa_extension_available()" with
+>> "riscv_has_extension_likely()". The latter is optimised with
+>> alternatives, so in places that are going to be evaluated frequently =
+it
+>> may be beneficial for you.
 >=20
-> Is strcpy(wq->name, "iaa_crypto") simpler than memset() and
-> strscpy()?
+> These extension checks are only executed in module_init functions, so =
+they're
+> not performance critical.
 
-That's what I originally had, but checkpatch complained about it,
-suggesting strscpy, so I changed it to make checkpatch happy.
+All `riscv_isa_extension_available()` calls in crypto drivers are called =
+once
+in the module init calls. Should we still need that =
+`riscv_has_extension_likely()`
+with a little more code size?
 
->=20
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set driver_name to "crypt=
-o" */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0memset(wq->driver_name, 0, D=
-RIVER_NAME_SIZE + 1);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0strscpy(wq->driver_name, "cr=
-ypto", DRIVER_NAME_SIZE + 1);
->=20
-> Is strcpy(wq->driver_name, "crypto") simpler?
-
-Same here.
-
-Thanks,
-
-Tom
-
->=20
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0engine =3D idxd->engines[0];
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set engine group to 0 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0engine->group =3D idxd->grou=
-ps[0];
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0engine->group->num_engines++=
-;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
-> > +}
-> > diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-> > index 62ea21b25906..47de3f93ff1e 100644
-> > --- a/drivers/dma/idxd/idxd.h
-> > +++ b/drivers/dma/idxd/idxd.h
-> > @@ -277,6 +277,8 @@ struct idxd_dma_dev {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct dma_device dma;
-> > =C2=A0 };
-> > =C2=A0=20
-> > +typedef int (*load_device_defaults_fn_t) (struct idxd_device
-> > *idxd);
-> > +
-> > =C2=A0 struct idxd_driver_data {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *name_prefix=
-;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0enum idxd_type type;
-> > @@ -286,6 +288,7 @@ struct idxd_driver_data {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int evl_cr_off;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int cr_status_off;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int cr_result_off;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0load_device_defaults_fn_t lo=
-ad_device_defaults;
-> > =C2=A0 };
-> > =C2=A0=20
-> > =C2=A0 struct idxd_evl {
-> > @@ -730,6 +733,7 @@ void idxd_unregister_devices(struct idxd_device
-> > *idxd);
-> > =C2=A0 void idxd_wqs_quiesce(struct idxd_device *idxd);
-> > =C2=A0 bool idxd_queue_int_handle_resubmit(struct idxd_desc *desc);
-> > =C2=A0 void multi_u64_to_bmap(unsigned long *bmap, u64 *val, int count)=
-;
-> > +int idxd_load_iaa_device_defaults(struct idxd_device *idxd);
-> > =C2=A0=20
-> > =C2=A0 /* device interrupt control */
-> > =C2=A0 irqreturn_t idxd_misc_thread(int vec, void *data);
-> > diff --git a/drivers/dma/idxd/init.c b/drivers/dma/idxd/init.c
-> > index 0eb1c827a215..14df1f1347a8 100644
-> > --- a/drivers/dma/idxd/init.c
-> > +++ b/drivers/dma/idxd/init.c
-> > @@ -59,6 +59,7 @@ static struct idxd_driver_data idxd_driver_data[]
-> > =3D {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0.evl_cr_off =3D offsetof(struct iax_evl_entry, c=
-r),
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0.cr_status_off =3D offsetof(struct
-> > iax_completion_record, status),
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0.cr_result_off =3D offsetof(struct
-> > iax_completion_record, error_code),
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0.load_device_defaults =3D
-> > idxd_load_iaa_device_defaults,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0},
-> > =C2=A0 };
-> > =C2=A0=20
-> > @@ -745,6 +746,12 @@ static int idxd_pci_probe(struct pci_dev
-> > *pdev, const struct pci_device_id *id)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0goto err;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > =C2=A0=20
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (data->load_device_defaul=
-ts) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0rc =3D data->load_device_defaults(idxd);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (rc)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dev_wa=
-rn(dev, "IDXD loading device defaults
-> > failed\n");
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0rc =3D idxd_register_de=
-vices(idxd);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (rc) {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0dev_err(dev, "IDXD sysfs setup failed\n");
->=20
-> Thanks.
->=20
-> -Fenghua
+> - Eric
 
