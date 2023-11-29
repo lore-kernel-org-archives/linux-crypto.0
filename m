@@ -1,23 +1,22 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 29 Nov 2023 07:20:20 PST
 Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22D9584;
-	Wed, 29 Nov 2023 07:20:20 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C05CEC9;
+	Wed, 29 Nov 2023 07:21:51 -0800 (PST)
 Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
  (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Wed, 29 Nov
- 2023 18:19:14 +0300
+ 2023 18:21:50 +0300
 Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Wed, 29 Nov
- 2023 18:19:14 +0300
+ 2023 18:21:49 +0300
 From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
 To: Antoine Tenart <atenart@kernel.org>
 CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Herbert Xu
 	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
 	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: crypto: safexcel - Add error handling for dma_map_sg() calls
-Date: Wed, 29 Nov 2023 07:19:04 -0800
-Message-ID: <20231129151904.7693-1-n.zhandarovich@fintech.ru>
+Subject: [PATCH] crypto: safexcel - Add error handling for dma_map_sg() calls
+Date: Wed, 29 Nov 2023 07:21:45 -0800
+Message-ID: <20231129152145.7767-1-n.zhandarovich@fintech.ru>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
