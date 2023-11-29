@@ -1,193 +1,144 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 153DE198
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 22:29:46 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r8E4r-004jF7-MY; Wed, 29 Nov 2023 14:29:42 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 29 Nov 2023 14:29:50 +0800
-From: "Herbert Xu" <herbert@gondor.apana.org.au>
-Date: Wed, 29 Nov 2023 14:29:50 +0800
-Subject: [PATCH 4/4] crypto: algif_skcipher - Fix stream cipher chaining
-References: <ZWbZEnSPIP5aHydB@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Ard Biesheuvel <ardb@kernel.org>
-Message-Id: <E1r8E4r-004jF7-MY@formenos.hmeau.com>
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="VNPbU2vf"
+Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86B6B94
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 23:00:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1701241249; x=1701500449;
+	bh=13n/FbsdAD63nCkWt8PGe520xE44G8Ft09Wg1OcHD3Q=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=VNPbU2vfX5cEqEWL5/9Mpla20+qB55j4wsDkMY1tUWUxDP72Ks8TLJqMjT7vC3eFq
+	 GgjgoxuwPeiLvKi+HE12lkn2O7SkFlEQG01i0NpP3MRMloJ9iS4zKpIJVjhnXehHXp
+	 Xz6qEKCIZeb3Tk2z+ZQsOGR7R/PH8tb9MWhdLUngoWnQw4dwATYkmFf4uAZfy4OhwM
+	 oBneMrWzlmVWQC2BcEyOMiKbtxGeZN+1y/DznwLOOa8PD3PSoOSs/THR+6qdai5tyK
+	 aZYRe7Z+rGkqjJrIOUBq44MZqb9JhkySb0d8maQtOL2UzjO4bmAO3E5bwMqf7E1PZL
+	 23GPOiq3xulKQ==
+Date: Wed, 29 Nov 2023 07:00:42 +0000
+To: Yusong Gao <a869920004@gmail.com>
+From: Juerg Haefliger <juergh@proton.me>
+Cc: jarkko@kernel.org, davem@davemloft.net, dhowells@redhat.com, dwmw2@infradead.org, zohar@linux.ibm.com, herbert@gondor.apana.org.au, lists@sapience.com, dimitri.ledkov@canonical.com, keyrings@vger.kernel.org, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v5] sign-file: Fix incorrect return values check
+Message-ID: <20231129080033.12c4efe3@smeagol>
+In-Reply-To: <20231127033456.452151-1-a869920004@gmail.com>
+References: <20231127033456.452151-1-a869920004@gmail.com>
+Feedback-ID: 45149698:user:proton
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="b1_bqlWVBJFFpdDPXWzuVv4Sbw8of9oHqNZBSjRct5izU"
 
-Unlike algif_aead which is always issued in one go (thus limiting
-the maximum size of the request), algif_skcipher has always allowed
-unlimited input data by cutting them up as necessary and feeding
-the fragments to the underlying algorithm one at a time.
+This is a multi-part message in MIME format.
 
-However, because of deficiencies in the API, this has been broken
-for most stream ciphers such as arc4 or chacha.  This is because
-they have an internal state in addition to the IV that must be
-preserved in order to continue processing.
+--b1_bqlWVBJFFpdDPXWzuVv4Sbw8of9oHqNZBSjRct5izU
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Fix this by using the new skcipher state API.
+On Mon, 27 Nov 2023 03:34:56 +0000
+"Yusong Gao" <a869920004@gmail.com> wrote:
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+> There are some wrong return values check in sign-file when call OpenSSL
+> API. The ERR() check cond is wrong because of the program only check the
+> return value is < 0 which ignored the return val is 0. For example:
+> 1. CMS_final() return 1 for success or 0 for failure.
+> 2. i2d_CMS_bio_stream() returns 1 for success or 0 for failure.
+> 3. i2d_TYPEbio() return 1 for success and 0 for failure.
+> 4. BIO_free() return 1 for success and 0 for failure.
+>=20
+> Link: https://www.openssl.org/docs/manmaster/man3/
+> Fixes: e5a2e3c84782 ("scripts/sign-file.c: Add support for signing with a=
+ raw signature")
+> Signed-off-by: Yusong Gao <a869920004@gmail.com>
+> ---
+> V1, V2: Clarify the description of git message.
+> V3: Removed redundant empty line.
+> V4: Change to more strict check mode.
+> ---
+>  scripts/sign-file.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/scripts/sign-file.c b/scripts/sign-file.c
+> index 598ef5465f82..3edb156ae52c 100644
+> --- a/scripts/sign-file.c
+> +++ b/scripts/sign-file.c
+> @@ -322,7 +322,7 @@ int main(int argc, char **argv)
+>  =09=09=09=09     CMS_NOSMIMECAP | use_keyid |
+>  =09=09=09=09     use_signed_attrs),
+>  =09=09    "CMS_add1_signer");
+> -=09=09ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) < 0,
+> +=09=09ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY) !=3D 1,
+>  =09=09    "CMS_final");
+>=20
+>  #else
+> @@ -341,10 +341,10 @@ int main(int argc, char **argv)
+>  =09=09=09b =3D BIO_new_file(sig_file_name, "wb");
+>  =09=09=09ERR(!b, "%s", sig_file_name);
+>  #ifndef USE_PKCS7
+> -=09=09=09ERR(i2d_CMS_bio_stream(b, cms, NULL, 0) < 0,
+> +=09=09=09ERR(i2d_CMS_bio_stream(b, cms, NULL, 0) !=3D 1,
+>  =09=09=09    "%s", sig_file_name);
+>  #else
+> -=09=09=09ERR(i2d_PKCS7_bio(b, pkcs7) < 0,
+> +=09=09=09ERR(i2d_PKCS7_bio(b, pkcs7) !=3D 1,
+>  =09=09=09    "%s", sig_file_name);
+>  #endif
+>  =09=09=09BIO_free(b);
+> @@ -374,9 +374,9 @@ int main(int argc, char **argv)
+>=20
+>  =09if (!raw_sig) {
+>  #ifndef USE_PKCS7
+> -=09=09ERR(i2d_CMS_bio_stream(bd, cms, NULL, 0) < 0, "%s", dest_name);
+> +=09=09ERR(i2d_CMS_bio_stream(bd, cms, NULL, 0) !=3D 1, "%s", dest_name);
+>  #else
+> -=09=09ERR(i2d_PKCS7_bio(bd, pkcs7) < 0, "%s", dest_name);
+> +=09=09ERR(i2d_PKCS7_bio(bd, pkcs7) !=3D 1, "%s", dest_name);
+>  #endif
+>  =09} else {
+>  =09=09BIO *b;
+> @@ -396,7 +396,7 @@ int main(int argc, char **argv)
+>  =09ERR(BIO_write(bd, &sig_info, sizeof(sig_info)) < 0, "%s", dest_name);
+>  =09ERR(BIO_write(bd, magic_number, sizeof(magic_number) - 1) < 0, "%s", =
+dest_name);
+>=20
+> -=09ERR(BIO_free(bd) < 0, "%s", dest_name);
+> +=09ERR(BIO_free(bd) !=3D 1, "%s", dest_name);
+>=20
+>  =09/* Finally, if we're signing in place, replace the original. */
+>  =09if (replace_orig)
+> --
+> 2.34.1
+>=20
 
- crypto/algif_skcipher.c |   71 +++++++++++++++++++++++++++++++++++++++++++++---
- include/crypto/if_alg.h |    2 +
- 2 files changed, 70 insertions(+), 3 deletions(-)
+Nit: v5 in the email subject should be v4.
 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 9ada9b741af8..59dcc6fc74a2 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -47,6 +47,52 @@ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
- 	return af_alg_sendmsg(sock, msg, size, ivsize);
- }
- 
-+static int algif_skcipher_export(struct sock *sk, struct skcipher_request *req)
-+{
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct crypto_skcipher *tfm;
-+	struct af_alg_ctx *ctx;
-+	struct alg_sock *pask;
-+	unsigned statesize;
-+	struct sock *psk;
-+	int err;
-+
-+	if (!(req->base.flags & CRYPTO_SKCIPHER_REQ_NOTFINAL))
-+		return 0;
-+
-+	ctx = ask->private;
-+	psk = ask->parent;
-+	pask = alg_sk(psk);
-+	tfm = pask->private;
-+
-+	statesize = crypto_skcipher_statesize(tfm);
-+	ctx->state = sock_kmalloc(sk, statesize, GFP_ATOMIC);
-+	if (!ctx->state)
-+		return -ENOMEM;
-+
-+	err = crypto_skcipher_export(req, ctx->state);
-+	if (err) {
-+		sock_kzfree_s(sk, ctx->state, statesize);
-+		ctx->state = NULL;
-+	}
-+
-+	return err;
-+}
-+
-+static void algif_skcipher_done(void *data, int err)
-+{
-+	struct af_alg_async_req *areq = data;
-+	struct sock *sk = areq->sk;
-+
-+	if (err)
-+		goto out;
-+
-+	err = algif_skcipher_export(sk, &areq->cra_u.skcipher_req);
-+
-+out:
-+	af_alg_async_cb(data, err);
-+}
-+
- static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 			     size_t ignored, int flags)
- {
-@@ -58,6 +104,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	struct crypto_skcipher *tfm = pask->private;
- 	unsigned int bs = crypto_skcipher_chunksize(tfm);
- 	struct af_alg_async_req *areq;
-+	unsigned cflags = 0;
- 	int err = 0;
- 	size_t len = 0;
- 
-@@ -82,8 +129,10 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	 * If more buffers are to be expected to be processed, process only
- 	 * full block size buffers.
- 	 */
--	if (ctx->more || len < ctx->used)
-+	if (ctx->more || len < ctx->used) {
- 		len -= len % bs;
-+		cflags |= CRYPTO_SKCIPHER_REQ_NOTFINAL;
-+	}
- 
- 	/*
- 	 * Create a per request TX SGL for this request which tracks the
-@@ -107,6 +156,16 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	skcipher_request_set_crypt(&areq->cra_u.skcipher_req, areq->tsgl,
- 				   areq->first_rsgl.sgl.sgt.sgl, len, ctx->iv);
- 
-+	if (ctx->state) {
-+		err = crypto_skcipher_import(&areq->cra_u.skcipher_req,
-+					     ctx->state);
-+		sock_kzfree_s(sk, ctx->state, crypto_skcipher_statesize(tfm));
-+		ctx->state = NULL;
-+		if (err)
-+			goto free;
-+		cflags |= CRYPTO_SKCIPHER_REQ_CONT;
-+	}
-+
- 	if (msg->msg_iocb && !is_sync_kiocb(msg->msg_iocb)) {
- 		/* AIO operation */
- 		sock_hold(sk);
-@@ -116,8 +175,9 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 		areq->outlen = len;
- 
- 		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
-+					      cflags |
- 					      CRYPTO_TFM_REQ_MAY_SLEEP,
--					      af_alg_async_cb, areq);
-+					      algif_skcipher_done, areq);
- 		err = ctx->enc ?
- 			crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
- 			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req);
-@@ -130,6 +190,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	} else {
- 		/* Synchronous operation */
- 		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
-+					      cflags |
- 					      CRYPTO_TFM_REQ_MAY_SLEEP |
- 					      CRYPTO_TFM_REQ_MAY_BACKLOG,
- 					      crypto_req_done, &ctx->wait);
-@@ -137,8 +198,11 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 			crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
- 			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req),
- 						 &ctx->wait);
--	}
- 
-+		if (!err)
-+			err = algif_skcipher_export(
-+				sk, &areq->cra_u.skcipher_req);
-+	}
- 
- free:
- 	af_alg_free_resources(areq);
-@@ -301,6 +365,7 @@ static void skcipher_sock_destruct(struct sock *sk)
- 
- 	af_alg_pull_tsgl(sk, ctx->used, NULL, 0);
- 	sock_kzfree_s(sk, ctx->iv, crypto_skcipher_ivsize(tfm));
-+	sock_kzfree_s(sk, ctx->state, crypto_skcipher_statesize(tfm));
- 	sock_kfree_s(sk, ctx, ctx->len);
- 	af_alg_release_parent(sk);
- }
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 08b803a4fcde..78ecaf5db04c 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -121,6 +121,7 @@ struct af_alg_async_req {
-  *
-  * @tsgl_list:		Link to TX SGL
-  * @iv:			IV for cipher operation
-+ * @state:		Existing state for continuing operation
-  * @aead_assoclen:	Length of AAD for AEAD cipher operations
-  * @completion:		Work queue for synchronous operation
-  * @used:		TX bytes sent to kernel. This variable is used to
-@@ -142,6 +143,7 @@ struct af_alg_ctx {
- 	struct list_head tsgl_list;
- 
- 	void *iv;
-+	void *state;
- 	size_t aead_assoclen;
- 
- 	struct crypto_wait wait;
+Reviewed-by: Juerg Haefliger <juerg.haefliger@canonical.com>
+
+
+--b1_bqlWVBJFFpdDPXWzuVv4Sbw8of9oHqNZBSjRct5izU
+Content-Type: application/pgp-signature; name=attachment.sig
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=attachment.sig
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NCg0KaVFJekJBRUJDZ0FkRmlFRWhaZlU5Nkl1
+cHJ2aUxkZUxEOU9MQ1F1bVFyY0ZBbVZtNFpFQUNna1FEOU9MQ1F1bQ0KUXJjeWJSQUFpQjJsK1FQ
+TkRTaWxTTTJmVW14dVJFS2xXdDFCclp3Q001QU53U2JpcHZBSVV1VUJFUW9wNGhhOQ0KZ2t5dTVH
+YVJMc0RXRVVPdjBROVA1ZEtyUVRhWUdkc3M0aXlOZHFLbmRhNXpsNWhSNEVNR0tYb1JDeGozam54
+Rg0KQ2ZCb3VDblVacUZWeTdETjQ5ZTVqU2JuNEtRREhRdHJ5dm5XSEk2ck10dm5XbnhsY0tpMnpj
+RFNSTzdHN1NuYg0Ka3YwQ2ZkZ0hYbUkyRlZXREU1QkNQdjB0ay9janFLUW1JcmY1c0E3Wmozby9P
+b1Z6SDRaOE5Ha01oMlRsL3lmUQ0KVGk3S0RSWFlaNzllZTVRV2lPUzd3bjQ0SG9Vb0xiN0tPMnF5
+TmJ4bVM1VTRNZDdmejJRL0F5VDkwTmFEU293Mw0KaWJUQ2dYVS8wd0xCNzdhdnR0WVhoL1lUaWxF
+ZjB1VVB1RDVxOWh1YTBwdFgzRnFWWURWZndvUi8vQU1MNjFMaA0KVXFTVTRzY0FtSkc4S2h0bW9r
+NlhKS0RVRno2Y0FSQXg3RmFoaGJqT01CMjFxcFhSMk8vSzNGd1N5ZFZXbElUZA0KeHZYSWZsWSt5
+ZEJTZXhQQi9oeFFnZ2VQYUdZVzdSUUh5OHV5ZnREaHZ2bk5zRjZibjFzNTQ4WGtmeW96dGhWMA0K
+WUZKeVlXVVFyVnNjbTM5VGwwT09GSjRlUlNVUlU4ZWc1TkFTdVVRQW5HbTNNYTEzeHZ0RkZ4OEp4
+MW13Y01jZg0KSGhsQkx6aG12c2g4RWRDZy93V1NTK1BtRDZRVXd2NzlLY3BKMjFEY0RtaDhZbHBL
+VHBnT2tVNVVKelhJZk52dQ0KaG5uNTQyOTV3QU5iRE5QVXJqWXlkTVdrRnFDei9KeG1yeTBQLzhY
+dVlYSXROYmc1SWRvPQ0KPWxvWVQNCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
+
+--b1_bqlWVBJFFpdDPXWzuVv4Sbw8of9oHqNZBSjRct5izU--
+
