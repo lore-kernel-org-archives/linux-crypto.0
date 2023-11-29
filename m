@@ -1,84 +1,77 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="XehcGEKn"
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B5519B2
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 21:32:17 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1cfc2d03b3aso25511225ad.1
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 21:32:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1701235936; x=1701840736; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sj4mmJIBUQjwsLyHUMay3Il1zQC/QaufE2Lzb1TCd5k=;
-        b=XehcGEKnQllIjLwTV125DL3Q5TcTaQyhujMtSCEIB9bYMk4ynuO1fsPWRACWBwrQ8w
-         wAynnqFls6La8FoXFw8GU3wB/5hCCTEOXzzLjtXtYBd+5vSeSEvSbb8R2bGfmk4nf9Sn
-         eRxIF4EH8/WJLA+UmiC+xyVEuxslBf5+H7plw4KZ4E0yl8IgqBQ2y0RbZ2zUmlgToUWd
-         mn1xzD5wWSACfZ9l5Rjlv/LO0NV9vV+VPnfzD8D8SP2IkmNWBHtxHa3eRu+pbNyWwqqY
-         tJ2cPRhYgs+HuAOKnC1hlkPSfobG0tkijodZL5ja18ezEH0nkI7kqy1Zfle1Wf+jrlpn
-         KMrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701235936; x=1701840736;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sj4mmJIBUQjwsLyHUMay3Il1zQC/QaufE2Lzb1TCd5k=;
-        b=ciFo9lYD/rellf3SL9gBI6AAuEzwYbasvVmQ3oH3fWGbls4HTvuD1APPzk9mvVMwHU
-         gvOuKBaUGTbJyo3r3ZpGUR2nD9ilpqtKwXROX8WJIkAh3/T3mfekbD4cmMIxIlbQUJ9d
-         LIq9zH5kgaxlABe2caQiAcXCMJ4fPtYbFDr/7ou+09l9NTkFqXeHVQJuIfSxlWO3mkyL
-         p8hpYoeqTWFEp7vEYjpc03NC89ais0E64iTkHY6OViAV54wWfJp93WpVTEzz6Wbg12S7
-         9tZPNllcLWrekZM5WrYqv2GiQf4kC8FwtI9OVXF/OsxNXhtHWOcYCrOgzGW1dL8QV5cN
-         6nqA==
-X-Gm-Message-State: AOJu0Yw0XTeLVbZArpAhjNlPz0HwaolxVG8l5Fxt73k/t6fIxvsp2tgM
-	2dSzcZfa0oaHWZoOObml10Qs6g==
-X-Google-Smtp-Source: AGHT+IGFsjXCW/Ho6O60mLG49EAl+1QT8CzD7tPecYI3HFKFAodNBvFnLj0US/gDsjpY2a1LcMzpWA==
-X-Received: by 2002:a17:902:7005:b0:1cf:d795:5e4a with SMTP id y5-20020a170902700500b001cfd7955e4amr6885924plk.15.1701235936505;
-        Tue, 28 Nov 2023 21:32:16 -0800 (PST)
-Received: from ?IPv6:2402:7500:4ce:5a34:50a0:78b5:5013:4cf4? ([2402:7500:4ce:5a34:50a0:78b5:5013:4cf4])
-        by smtp.gmail.com with ESMTPSA id ix6-20020a170902f80600b001d00c25c282sm1236711plb.18.2023.11.28.21.32.13
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 28 Nov 2023 21:32:16 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C73C171D
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2023 22:24:16 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1r8DzV-004j9l-SB; Wed, 29 Nov 2023 14:24:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 29 Nov 2023 14:24:18 +0800
+Date: Wed, 29 Nov 2023 14:24:18 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH 0/4] crypto: Fix chaining support for stream ciphers (arc4
+ only for now)
+Message-ID: <ZWbZEnSPIP5aHydB@gondor.apana.org.au>
+References: <20230914082828.895403-1-herbert@gondor.apana.org.au>
+ <20230914082828.895403-5-herbert@gondor.apana.org.au>
+ <20230920062551.GB2739@sol.localdomain>
+ <ZQvHUc9rd4ud2NCB@gondor.apana.org.au>
+ <20230922031030.GB935@sol.localdomain>
+ <ZVb38sHNJYJ9x0po@gondor.apana.org.au>
+ <20231117054231.GC972@sol.localdomain>
+ <ZVctSuGp2SgRUjAM@gondor.apana.org.au>
+ <ZWB6jQv4jjBTrRGB@gondor.apana.org.au>
+ <20231127222803.GC1463@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
-Subject: Re: [PATCH v2 12/13] RISC-V: crypto: add Zvksh accelerated SM3
- implementation
-From: Jerry Shih <jerry.shih@sifive.com>
-In-Reply-To: <20231128041314.GK1463@sol.localdomain>
-Date: Wed, 29 Nov 2023 13:32:11 +0800
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
- palmer@dabbelt.com,
- Albert Ou <aou@eecs.berkeley.edu>,
- herbert@gondor.apana.org.au,
- davem@davemloft.net,
- conor.dooley@microchip.com,
- ardb@kernel.org,
- heiko@sntech.de,
- phoebe.chen@sifive.com,
- hongrong.hsu@sifive.com,
- linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <2E9C9E5D-D03B-4038-AA6F-D30540390816@sifive.com>
-References: <20231127070703.1697-1-jerry.shih@sifive.com>
- <20231127070703.1697-13-jerry.shih@sifive.com>
- <20231128041314.GK1463@sol.localdomain>
-To: Eric Biggers <ebiggers@kernel.org>
-X-Mailer: Apple Mail (2.3445.9.7)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231127222803.GC1463@sol.localdomain>
 
-On Nov 28, 2023, at 12:13, Eric Biggers <ebiggers@kernel.org> wrote:
-> On Mon, Nov 27, 2023 at 03:07:02PM +0800, Jerry Shih wrote:
->> +static int __init riscv64_riscv64_sm3_mod_init(void)
-> 
-> There's an extra "_riscv64" in this function name.
-> 
-> - Eric
+On Mon, Nov 27, 2023 at 02:28:03PM -0800, Eric Biggers wrote:
+>
+> As far as I can tell, currently "chaining" is only implemented by CBC and CTR.
+> So this really seems like an issue in AF_ALG, not the skcipher API per se.
+> AF_ALG should not support splitting up encryption/decryption operations on
+> algorithms that don't support it.
 
-Fixed.
+Yes I can see your view.  But it really is only a very small number
+of algorithms (basically arc4 and chacha) that are currently broken
+in this way.  CTS is similarly broken but for a different reason.
 
+Yes we could change the way af_alg operates by removing the ability
+to process unlimited amounts of data and instead switching to the
+AEAD model where all data is presented together.
+
+However, I think this would be an unnecessary limitation since there
+is a way to solve the chaining issue for stream ciphers and others
+such as CTS.
+
+So here is my attempt at this, hopefully without causing too much
+churn or breakage:
+
+Herbert Xu (4):
+  crypto: skcipher - Add internal state support
+  crypto: skcipher - Make use of internal state
+  crypto: arc4 - Add internal state
+  crypto: algif_skcipher - Fix stream cipher chaining
+
+ crypto/algif_skcipher.c   |  71 +++++++++++++++++++++++++--
+ crypto/arc4.c             |   8 ++-
+ crypto/cbc.c              |   6 ++-
+ crypto/ecb.c              |  10 ++--
+ crypto/lskcipher.c        |  42 ++++++++++++----
+ crypto/skcipher.c         |  64 +++++++++++++++++++++++-
+ include/crypto/if_alg.h   |   2 +
+ include/crypto/skcipher.h | 100 +++++++++++++++++++++++++++++++++++++-
+ 8 files changed, 280 insertions(+), 23 deletions(-)
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
