@@ -1,166 +1,123 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA9444385
+	for <linux-crypto@vger.kernel.org>; Wed, 29 Nov 2023 11:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iLyQ+KVR"
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 668FC1735;
-	Wed, 29 Nov 2023 00:19:24 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1cfc2bcffc7so26117455ad.1;
-        Wed, 29 Nov 2023 00:19:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701245964; x=1701850764; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pitQD+gW5dzBAjSz8pHlIhLJL8YzOCm583XKc/zjIKE=;
-        b=iLyQ+KVRM9VTloiu9AfhrVbVZPaV/ZByzozTri2/QEh66YuXYeIomCGC/b+/38SrZg
-         DxTOwu7XoCpX7b6S7tbgsbt+gcbEFTIA4f03MIm/jW9ENCS2zW0XILhVIoZPeOGt3yhb
-         rpGA/XNrg+Sk9iGOe1pvL9i3Cp9CndfNGfw1LTrH7Uli7i2NyMZzC6sFEAAowt5E1Ib8
-         CJtcFxPQaAcToN81mNWUkXMNzoBhXz/RG8hq9wlGpTdcVgxoQOcHLOQxMunYKpNmU5+6
-         0FU/Gz10h0FbTRE609AS2NZGefmKT6k8SP9BHJ1c9GfwpF2NOgG0OEp4DpvK0YoMHXK0
-         aIyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701245964; x=1701850764;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pitQD+gW5dzBAjSz8pHlIhLJL8YzOCm583XKc/zjIKE=;
-        b=JhyWNZxLUd3LLGEuNUmDMvVcBsGItxZcxumv3kpXEGthNyW0NJhJ28MmJPKOlMDWSa
-         2RQLN3SViRRGRdRC1Bh8oljE8RlESvuOdBPkAD4fd5310YzfDl1/1AcqrJEZswjOUOWw
-         y3VciuRMEuzBxae8zI3Au1RbFx3/OBT9oKJ4PTjzgp5mVJ2TcJQIkx33OJzmEuPe4pqK
-         Q7P7qweCWpw7ALgRJlyThkp+8Ikg645t3sIFUCaItlPsNDp5kivsMebFxi/Is3654ypo
-         PjymTp94tpDrcqKEvGfqUOCrVWioV/Mn9ziMtOfzhDudUNvOY5kP541dQTYD3mDQB5h3
-         nbXw==
-X-Gm-Message-State: AOJu0YxOxC3xrE6BAs1G2hwv5kZgJvccRY0ansib0Qma3vYQSuNLrrhO
-	3qlGrZA3N0eTSxJz5UCdWTo=
-X-Google-Smtp-Source: AGHT+IHnwCpZL6ALoY5W5b8E7P3Bbp+sX02k5cXjC692O8hzZh0gkO3k4cS7ftIWftUNaMVcH9dodQ==
-X-Received: by 2002:a17:902:dac7:b0:1cf:c397:8f09 with SMTP id q7-20020a170902dac700b001cfc3978f09mr13907496plx.55.1701245963796;
-        Wed, 29 Nov 2023 00:19:23 -0800 (PST)
-Received: from localhost.localdomain ([154.85.51.139])
-        by smtp.gmail.com with ESMTPSA id x10-20020a170902ea8a00b001cfcd2fb7b0sm5470932plb.285.2023.11.29.00.19.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 00:19:23 -0800 (PST)
-From: Yusong Gao <a869920004@gmail.com>
-To: jarkko@kernel.org,
-	davem@davemloft.net,
-	dhowells@redhat.com,
-	dwmw2@infradead.org,
-	juergh@proton.me,
-	zohar@linux.ibm.com,
-	herbert@gondor.apana.org.au,
-	lists@sapience.com,
-	dimitri.ledkov@canonical.com,
-	a869920004@gmail.com
-Cc: keyrings@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uHW9BMYg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 518E2C433C8;
+	Wed, 29 Nov 2023 11:12:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701256341;
+	bh=/coNSpmuwlu7aZMGLXJ3EaK+coscmuirD3fIRDyp1uM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uHW9BMYgIEhTEqKl/kgeus1mAfaC24bTLFknNCVdCgivrIV4xIareTJc1aZl+7sg8
+	 tcJX1bZeT2v9L+VJjvSiC5P1wvRy/Kaa7TCTB/wtLhA9wymeZk/tG2lN3rTphc1yN7
+	 xIDXXbyvd7kPzrMMaO0T7Et6s2qh57vQaCxKBuIdNBMubVuxknQru14j89u+71Jv2R
+	 nPuTTXXcT8FyQS0Spn1TW/ubqWFQJSlS4+aBBoBUP5lels3jhRndKCOYNkjFn8yCfC
+	 AXmM2L+J/u2dSrpUShsC1fUBQQ+/CTFTF0wg/cU46H+b/BIadIzGxYgmqVR0kR+5kl
+	 GxePfv72XOs8A==
+Date: Wed, 29 Nov 2023 11:12:16 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Jerry Shih <jerry.shih@sifive.com>, Andy Chiu <andy.chiu@sifive.com>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>, palmer@dabbelt.com,
+	aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
+	davem@davemloft.net, conor.dooley@microchip.com, ardb@kernel.org,
+	heiko@sntech.de, phoebe.chen@sifive.com, hongrong.hsu@sifive.com,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v5] sign-file: Fix incorrect return values check
-Date: Wed, 29 Nov 2023 08:19:06 +0000
-Message-Id: <20231129081906.504149-1-a869920004@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231129080033.12c4efe3@smeagol>
-References: <20231129080033.12c4efe3@smeagol>
+Subject: Re: [PATCH v2 04/13] RISC-V: crypto: add Zvkned accelerated AES
+ implementation
+Message-ID: <20231129-subtitle-unlinked-c0871a28ac88@spud>
+References: <20231127070703.1697-1-jerry.shih@sifive.com>
+ <20231127070703.1697-5-jerry.shih@sifive.com>
+ <20231128-await-tipper-2094715466f2@spud>
+ <20231128201228.GE1148@sol.localdomain>
+ <E78B3BF9-8E49-417B-A89E-05F72690A92F@sifive.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="YXU66bvB/doJduzO"
+Content-Disposition: inline
+In-Reply-To: <E78B3BF9-8E49-417B-A89E-05F72690A92F@sifive.com>
 
 
+--YXU66bvB/doJduzO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 29, 2023 at 3:00 PM Juerg Haefliger <juergh@proton.me>
-wrote:
->
-> On Mon, 27 Nov 2023 03:34:56 +0000
-> "Yusong Gao" <a869920004@gmail.com> wrote:
->
-> > There are some wrong return values check in sign-file when call
-> > OpenSSL
-> > API. The ERR() check cond is wrong because of the program only check
-> > the
-> > return value is < 0 which ignored the return val is 0. For example:
-> > 1. CMS_final() return 1 for success or 0 for failure.
-> > 2. i2d_CMS_bio_stream() returns 1 for success or 0 for failure.
-> > 3. i2d_TYPEbio() return 1 for success and 0 for failure.
-> > 4. BIO_free() return 1 for success and 0 for failure.
-> >
-> > Link: https://www.openssl.org/docs/manmaster/man3/
-> > Fixes: e5a2e3c84782 ("scripts/sign-file.c: Add support for signing
-> > with a raw signature")
-> > Signed-off-by: Yusong Gao <a869920004@gmail.com>
-> > ---
-> > V1, V2: Clarify the description of git message.
-> > V3: Removed redundant empty line.
-> > V4: Change to more strict check mode.
-> > ---
-> >  scripts/sign-file.c | 12 ++++++------
-> >  1 file changed, 6 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-> > index 598ef5465f82..3edb156ae52c 100644
-> > --- a/scripts/sign-file.c
-> > +++ b/scripts/sign-file.c
-> > @@ -322,7 +322,7 @@ int main(int argc, char **argv)
-> >                                    CMS_NOSMIMECAP | use_keyid |
-> >                                    use_signed_attrs),
-> >                   "CMS_add1_signer");
-> > -             ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY)
-> > < 0,
-> > +             ERR(CMS_final(cms, bm, NULL, CMS_NOCERTS | CMS_BINARY)
-> > != 1,
-> >                   "CMS_final");
-> >
-> >  #else
-> > @@ -341,10 +341,10 @@ int main(int argc, char **argv)
-> >                       b = BIO_new_file(sig_file_name, "wb");
-> >                       ERR(!b, "%s", sig_file_name);
-> >  #ifndef USE_PKCS7
-> > -                     ERR(i2d_CMS_bio_stream(b, cms, NULL, 0) < 0,
-> > +                     ERR(i2d_CMS_bio_stream(b, cms, NULL, 0) != 1,
-> >                           "%s", sig_file_name);
-> >  #else
-> > -                     ERR(i2d_PKCS7_bio(b, pkcs7) < 0,
-> > +                     ERR(i2d_PKCS7_bio(b, pkcs7) != 1,
-> >                           "%s", sig_file_name);
-> >  #endif
-> >                       BIO_free(b);
-> > @@ -374,9 +374,9 @@ int main(int argc, char **argv)
-> >
-> >       if (!raw_sig) {
-> >  #ifndef USE_PKCS7
-> > -             ERR(i2d_CMS_bio_stream(bd, cms, NULL, 0) < 0, "%s",
-> > dest_name);
-> > +             ERR(i2d_CMS_bio_stream(bd, cms, NULL, 0) != 1, "%s",
-> > dest_name);
-> >  #else
-> > -             ERR(i2d_PKCS7_bio(bd, pkcs7) < 0, "%s", dest_name);
-> > +             ERR(i2d_PKCS7_bio(bd, pkcs7) != 1, "%s", dest_name);
-> >  #endif
-> >       } else {
-> >               BIO *b;
-> > @@ -396,7 +396,7 @@ int main(int argc, char **argv)
-> >       ERR(BIO_write(bd, &sig_info, sizeof(sig_info)) < 0, "%s",
-> >       dest_name);
-> >       ERR(BIO_write(bd, magic_number, sizeof(magic_number) - 1) < 0,
-> >       "%s", dest_name);
-> >
-> > -     ERR(BIO_free(bd) < 0, "%s", dest_name);
-> > +     ERR(BIO_free(bd) != 1, "%s", dest_name);
-> >
-> >       /* Finally, if we're signing in place, replace the original.
-> >       */
-> >       if (replace_orig)
-> > --
-> > 2.34.1
-> >
->
-> Nit: v5 in the email subject should be v4.
+On Wed, Nov 29, 2023 at 10:39:56AM +0800, Jerry Shih wrote:
+> On Nov 29, 2023, at 04:12, Eric Biggers <ebiggers@kernel.org> wrote:
+> > On Tue, Nov 28, 2023 at 05:54:49PM +0000, Conor Dooley wrote:
+> >>> +static inline bool check_aes_ext(void)
+> >>> +{
+> >>> +	return riscv_isa_extension_available(NULL, ZVKNED) &&
+> >>> +	       riscv_vector_vlen() >=3D 128;
+> >>> +}
+> >>=20
+> >> I'm not keen on this construct, where you are checking vlen greater th=
+an
+> >> 128 and the presence of Zvkned without checking for the presence of V
+> >> itself. Can you use "has_vector()" in any places where you depend on t=
+he
+> >> presence of vector please?
+> >=20
+> > Shouldn't both of those things imply vector support already?
+>=20
+> The vector crypto extensions imply `V` extension. Should we still need to=
+ check
+> the `V` explicitly?
+> https://github.com/riscv/riscv-crypto/blob/main/doc/vector/riscv-crypto-s=
+pec-vector.adoc#1-extensions-overview
 
-Yeah, thanks for point out, I get it. 
+The check for Zkvned is only for whether or not Zvkned has been provided
+in the DT or ACPI tables, it doesn't mean that the kernel supports the V
+extension. I could see something like a hypervisor that does not support
+vector parsing the "v" out of the DT or ACPI tables but not eliminating
+every single extension that may depend on vector support.
 
->
-> Reviewed-by: Juerg Haefliger <juerg.haefliger@canonical.com>
->
+The latter check is, IMO, an implementation detail and also should not
+be used to imply that vector is supported.
 
+Actually, Andy - questions for you. If the vsize is not homogeneous we do
+not support vector for userspace and we disable vector in hwcap, but
+riscv_v_size will have been set by riscv_fill_hwcap(). Is the disabling
+of vector propagated to other locations in the kernel that inform
+userspace, like hwprobe? I only skimmed the in-kernel vector patchset,
+but I could not see anything there that ensures homogeneity either.
+Should has_vector() calls start to fail if the vsize is not homogeneous?
+I feel like they should, but I might very well be missing something here.
 
-BR, Yusong Gao
+> >> Also, there are potentially a lot of places in this drivers where you
+> >> can replace "riscv_isa_extension_available()" with
+> >> "riscv_has_extension_likely()". The latter is optimised with
+> >> alternatives, so in places that are going to be evaluated frequently it
+> >> may be beneficial for you.
+> >=20
+> > These extension checks are only executed in module_init functions, so t=
+hey're
+> > not performance critical.
+
+That's fine, they can continue as they are so.
+
+Cheers,
+Conor.
+
+--YXU66bvB/doJduzO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZWccjwAKCRB4tDGHoIJi
+0i5BAP9Hco6K4yVD6S5aXOUTYMtHVQcZxhQ+VfDhgiERySBDLgD+LCnaxJynwJot
+3xWQVY1/DM6nF8Rg8OJO6T63AZfqYQI=
+=4b6u
+-----END PGP SIGNATURE-----
+
+--YXU66bvB/doJduzO--
