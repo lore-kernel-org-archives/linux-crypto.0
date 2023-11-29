@@ -1,23 +1,39 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C05CEC9;
-	Wed, 29 Nov 2023 07:21:51 -0800 (PST)
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Wed, 29 Nov
- 2023 18:21:50 +0300
-Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Wed, 29 Nov
- 2023 18:21:49 +0300
-From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-To: Antoine Tenart <atenart@kernel.org>
-CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: safexcel - Add error handling for dma_map_sg() calls
-Date: Wed, 29 Nov 2023 07:21:45 -0800
-Message-ID: <20231129152145.7767-1-n.zhandarovich@fintech.ru>
-X-Mailer: git-send-email 2.25.1
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="FFNQH6Hw"
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC105D46;
+	Wed, 29 Nov 2023 07:41:57 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ATFABW7011752;
+	Wed, 29 Nov 2023 07:41:41 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=uDTkRMfs9Qm60lNSIgRLVb/C/VJq9P7BSiKI4joTZxw=;
+ b=FFNQH6HwumzIcB+CJRj8YrHOdbcvWMk5hBRq4wKCrom8ecjKU2FKo23miePA5XHuqNxa
+ y7wuZcEiphVBoS7lCPvnZRlXDXhL3t7oslfkNq2lcp11GW8jeTnKE2qtRra5rD3WQjGE
+ JDevQTKMrCbW2sCqO6TrgjvM1FFS3Q4A8ZrWH6u5D8ul+YISw5/5OcNoiBZ2MMuQNWuS
+ DZjevm+DwV6sKBcG9Tvyq8O7MVIKomJcV81GVb88lKF5jnUsFcEanr/+wu9yefRrF6Jd
+ LlJ1c6ENkMJgkYbbTqY0U5B/YpqccdKXQmVRFmXFqTFjmFH2p6imBkSpQjMJoiHrdkvp PA== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3up4x195e0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 07:41:40 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 29 Nov
+ 2023 07:41:39 -0800
+Received: from bharat-OptiPlex-3070.marvell.com (10.69.176.80) by
+ DC5-EXCH02.marvell.com (10.69.176.39) with Microsoft SMTP Server id
+ 15.0.1497.48 via Frontend Transport; Wed, 29 Nov 2023 07:41:35 -0800
+From: Bharat Bhushan <bbhushan2@marvell.com>
+To: <bbrezillon@kernel.org>, <arno@natisbad.org>, <schalla@marvell.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <alobakin@pm.me>,
+        <tj@kernel.org>, <masahiroy@kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Bharat Bhushan <bbhushan2@marvell.com>
+Subject: [PATCH] crypto/octeontx2: By default allocate one CPT LF per CPT VF
+Date: Wed, 29 Nov 2023 21:11:33 +0530
+Message-ID: <20231129154133.1529898-1-bbhushan2@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -26,63 +42,61 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
- (10.0.10.18)
+X-Proofpoint-GUID: zbAX0USzo1Ti34vsFOnbJWog6Q7QpWXx
+X-Proofpoint-ORIG-GUID: zbAX0USzo1Ti34vsFOnbJWog6Q7QpWXx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-29_13,2023-11-29_01,2023-05-22_02
 
-Macro dma_map_sg() may return 0 on error. This patch enables
-checks in case of the macro failure and ensures unmapping of
-previously mapped buffers with dma_unmap_sg().
+There are limited number CPT LFs (example 64 LFs on cn10k) and
+these LFs are allocated/attached to CPT VF on its creation.
+cptpf sysfs parameter "kvf_limits" defines number of CPT LFs
+per CPT VF. Default "kvf_limits" is initialized to zero and if
+kvf_limits is zero then number of LF allocated are equal to
+online cpus in system.
 
-Found by Linux Verification Center (linuxtesting.org) with static
-analysis tool SVACE.
+For example on 24 core system, 24 CPT LFs will be attached per VF.
+That means no CPT LF available when creating more than 2 CPT VFs
+on system which have total 64 LFs. Although VFs gets created but
+no LF attached to it.
 
-Fixes: 49186a7d9e46 ("crypto: inside_secure - Avoid dma map if size is zero")
-Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+There seems no reason to default allocate as many LFs as many
+online cpus in system. This patch initializes "kvf_limits" to
+one to limit one LF allocated per CPT VF. "kvf_limits" can
+be changed in range of 1 to number-of-online-cpus via sysfs.
 
- drivers/crypto/inside-secure/safexcel_cipher.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+---
+ drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c | 1 +
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c | 3 +--
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 272c28b5a088..ca660f31c15f 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -742,9 +742,9 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
- 				max(totlen_src, totlen_dst));
- 			return -EINVAL;
- 		}
--		if (sreq->nr_src > 0)
--			dma_map_sg(priv->dev, src, sreq->nr_src,
--				   DMA_BIDIRECTIONAL);
-+		if ((sreq->nr_src > 0) &&
-+		    (!dma_map_sg(priv->dev, src, sreq->nr_src, DMA_BIDIRECTIONAL)))
-+			return -ENOMEM;
- 	} else {
- 		if (unlikely(totlen_src && (sreq->nr_src <= 0))) {
- 			dev_err(priv->dev, "Source buffer not large enough (need %d bytes)!",
-@@ -752,8 +752,9 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
- 			return -EINVAL;
- 		}
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+index e34223daa327..b13df6a49644 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+@@ -797,6 +797,7 @@ static int otx2_cptpf_probe(struct pci_dev *pdev,
+ 		goto destroy_afpf_mbox;
  
--		if (sreq->nr_src > 0)
--			dma_map_sg(priv->dev, src, sreq->nr_src, DMA_TO_DEVICE);
-+		if ((sreq->nr_src > 0) &&
-+		    (!dma_map_sg(priv->dev, src, sreq->nr_src, DMA_TO_DEVICE)))
-+			return -ENOMEM;
+ 	cptpf->max_vfs = pci_sriov_get_totalvfs(pdev);
++	cptpf->kvf_limits = 1;
  
- 		if (unlikely(totlen_dst && (sreq->nr_dst <= 0))) {
- 			dev_err(priv->dev, "Dest buffer not large enough (need %d bytes)!",
-@@ -762,9 +763,11 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
- 			goto unmap;
- 		}
+ 	err = cn10k_cptpf_lmtst_init(cptpf);
+ 	if (err)
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+index bac729c885f9..69a447d3702c 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+@@ -277,8 +277,7 @@ static int cptvf_lf_init(struct otx2_cptvf_dev *cptvf)
+ 	if (ret)
+ 		return ret;
  
--		if (sreq->nr_dst > 0)
--			dma_map_sg(priv->dev, dst, sreq->nr_dst,
--				   DMA_FROM_DEVICE);
-+		if ((sreq->nr_dst > 0) &&
-+		    (!dma_map_sg(priv->dev, dst, sreq->nr_dst, DMA_FROM_DEVICE))) {
-+			ret = -ENOMEM;
-+			goto unmap;
-+		}
- 	}
+-	lfs_num = cptvf->lfs.kvf_limits ? cptvf->lfs.kvf_limits :
+-		  num_online_cpus();
++	lfs_num = cptvf->lfs.kvf_limits;
  
- 	memcpy(ctx->base.ctxr->data, ctx->key, ctx->key_len);
+ 	otx2_cptlf_set_dev_info(lfs, cptvf->pdev, cptvf->reg_base,
+ 				&cptvf->pfvf_mbox, cptvf->blkaddr);
+-- 
+2.34.1
+
