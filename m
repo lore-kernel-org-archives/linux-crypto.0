@@ -1,17 +1,17 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A8C51B3
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 04:27:46 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75A04D46
+	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 04:27:48 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r8g8r-005IId-Uu; Thu, 30 Nov 2023 20:27:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Nov 2023 20:27:51 +0800
+	id 1r8g8u-005IIl-2N; Thu, 30 Nov 2023 20:27:45 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Nov 2023 20:27:53 +0800
 From: "Herbert Xu" <herbert@gondor.apana.org.au>
-Date: Thu, 30 Nov 2023 20:27:51 +0800
-Subject: [PATCH 1/19] crypto: arm64/sm4 - Remove cfb(sm4)
+Date: Thu, 30 Nov 2023 20:27:53 +0800
+Subject: [PATCH 2/19] crypto: x86/sm4 - Remove cfb(sm4)
 References: <ZWh/nV+g46zhURa9@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Message-Id: <E1r8g8r-005IId-Uu@formenos.hmeau.com>
+Message-Id: <E1r8g8u-005IIl-2N@formenos.hmeau.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -23,344 +23,228 @@ Remove the unused CFB implementation.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- arch/arm64/crypto/Kconfig         |    6 -
- arch/arm64/crypto/sm4-ce-core.S   |  158 --------------------------------------
- arch/arm64/crypto/sm4-ce-glue.c   |  108 -------------------------
- arch/arm64/crypto/sm4-ce.h        |    3 
- arch/arm64/crypto/sm4-neon-core.S |  113 ---------------------------
- arch/arm64/crypto/sm4-neon-glue.c |  105 -------------------------
- 6 files changed, 4 insertions(+), 489 deletions(-)
+ arch/x86/crypto/Kconfig                 |    8 -
+ arch/x86/crypto/sm4-aesni-avx-asm_64.S  |   52 ------------
+ arch/x86/crypto/sm4-aesni-avx2-asm_64.S |   55 -------------
+ arch/x86/crypto/sm4-avx.h               |    4 
+ arch/x86/crypto/sm4_aesni_avx2_glue.c   |   26 ------
+ arch/x86/crypto/sm4_aesni_avx_glue.c    |  130 --------------------------------
+ 6 files changed, 4 insertions(+), 271 deletions(-)
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index 6d06b448a66e..eb7b423ba463 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -231,7 +231,7 @@ config CRYPTO_SM4_ARM64_CE
- 	  - NEON (Advanced SIMD) extensions
+diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
+index 9bbfd01cfa2f..c9e59589a1ce 100644
+--- a/arch/x86/crypto/Kconfig
++++ b/arch/x86/crypto/Kconfig
+@@ -189,7 +189,7 @@ config CRYPTO_SERPENT_AVX2_X86_64
+ 	  Processes 16 blocks in parallel.
  
- config CRYPTO_SM4_ARM64_CE_BLK
--	tristate "Ciphers: SM4, modes: ECB/CBC/CFB/CTR/XTS (ARMv8 Crypto Extensions)"
-+	tristate "Ciphers: SM4, modes: ECB/CBC/CTR/XTS (ARMv8 Crypto Extensions)"
- 	depends on KERNEL_MODE_NEON
+ config CRYPTO_SM4_AESNI_AVX_X86_64
+-	tristate "Ciphers: SM4 with modes: ECB, CBC, CFB, CTR (AES-NI/AVX)"
++	tristate "Ciphers: SM4 with modes: ECB, CBC, CTR (AES-NI/AVX)"
+ 	depends on X86 && 64BIT
  	select CRYPTO_SKCIPHER
+ 	select CRYPTO_SIMD
+@@ -197,7 +197,7 @@ config CRYPTO_SM4_AESNI_AVX_X86_64
  	select CRYPTO_SM4
-@@ -240,7 +240,6 @@ config CRYPTO_SM4_ARM64_CE_BLK
- 	  with block cipher modes:
- 	  - ECB (Electronic Codebook) mode (NIST SP800-38A)
- 	  - CBC (Cipher Block Chaining) mode (NIST SP800-38A)
--	  - CFB (Cipher Feedback) mode (NIST SP800-38A)
- 	  - CTR (Counter) mode (NIST SP800-38A)
- 	  - XTS (XOR Encrypt XOR with ciphertext stealing) mode (NIST SP800-38E
- 	    and IEEE 1619)
-@@ -250,7 +249,7 @@ config CRYPTO_SM4_ARM64_CE_BLK
- 	  - NEON (Advanced SIMD) extensions
+ 	help
+ 	  Length-preserving ciphers: SM4 cipher algorithms
+-	  (OSCCA GB/T 32907-2016) with ECB, CBC, CFB, and CTR modes
++	  (OSCCA GB/T 32907-2016) with ECB, CBC, and CTR modes
  
- config CRYPTO_SM4_ARM64_NEON_BLK
--	tristate "Ciphers: SM4, modes: ECB/CBC/CFB/CTR (NEON)"
-+	tristate "Ciphers: SM4, modes: ECB/CBC/CTR (NEON)"
- 	depends on KERNEL_MODE_NEON
+ 	  Architecture: x86_64 using:
+ 	  - AES-NI (AES New Instructions)
+@@ -210,7 +210,7 @@ config CRYPTO_SM4_AESNI_AVX_X86_64
+ 	  If unsure, say N.
+ 
+ config CRYPTO_SM4_AESNI_AVX2_X86_64
+-	tristate "Ciphers: SM4 with modes: ECB, CBC, CFB, CTR (AES-NI/AVX2)"
++	tristate "Ciphers: SM4 with modes: ECB, CBC, CTR (AES-NI/AVX2)"
+ 	depends on X86 && 64BIT
  	select CRYPTO_SKCIPHER
- 	select CRYPTO_SM4
-@@ -259,7 +258,6 @@ config CRYPTO_SM4_ARM64_NEON_BLK
- 	  with block cipher modes:
- 	  - ECB (Electronic Codebook) mode (NIST SP800-38A)
- 	  - CBC (Cipher Block Chaining) mode (NIST SP800-38A)
--	  - CFB (Cipher Feedback) mode (NIST SP800-38A)
- 	  - CTR (Counter) mode (NIST SP800-38A)
+ 	select CRYPTO_SIMD
+@@ -219,7 +219,7 @@ config CRYPTO_SM4_AESNI_AVX2_X86_64
+ 	select CRYPTO_SM4_AESNI_AVX_X86_64
+ 	help
+ 	  Length-preserving ciphers: SM4 cipher algorithms
+-	  (OSCCA GB/T 32907-2016) with ECB, CBC, CFB, and CTR modes
++	  (OSCCA GB/T 32907-2016) with ECB, CBC, and CTR modes
  
- 	  Architecture: arm64 using:
-diff --git a/arch/arm64/crypto/sm4-ce-core.S b/arch/arm64/crypto/sm4-ce-core.S
-index 877b80c54a0d..1f3625c2c67e 100644
---- a/arch/arm64/crypto/sm4-ce-core.S
-+++ b/arch/arm64/crypto/sm4-ce-core.S
-@@ -402,164 +402,6 @@ SYM_FUNC_START(sm4_ce_cbc_cts_dec)
- 	ret
- SYM_FUNC_END(sm4_ce_cbc_cts_dec)
- 
--.align 3
--SYM_FUNC_START(sm4_ce_cfb_enc)
+ 	  Architecture: x86_64 using:
+ 	  - AES-NI (AES New Instructions)
+diff --git a/arch/x86/crypto/sm4-aesni-avx-asm_64.S b/arch/x86/crypto/sm4-aesni-avx-asm_64.S
+index e2668d2fe6ce..2bf611eaa191 100644
+--- a/arch/x86/crypto/sm4-aesni-avx-asm_64.S
++++ b/arch/x86/crypto/sm4-aesni-avx-asm_64.S
+@@ -534,55 +534,3 @@ SYM_TYPED_FUNC_START(sm4_aesni_avx_cbc_dec_blk8)
+ 	FRAME_END
+ 	RET;
+ SYM_FUNC_END(sm4_aesni_avx_cbc_dec_blk8)
+-
+-/*
+- * void sm4_aesni_avx_cfb_dec_blk8(const u32 *rk, u8 *dst,
+- *                                 const u8 *src, u8 *iv)
+- */
+-SYM_TYPED_FUNC_START(sm4_aesni_avx_cfb_dec_blk8)
 -	/* input:
--	 *   x0: round key array, CTX
--	 *   x1: dst
--	 *   x2: src
--	 *   x3: iv (big endian, 128 bit)
--	 *   w4: nblocks
+-	 *	%rdi: round key array, CTX
+-	 *	%rsi: dst (8 blocks)
+-	 *	%rdx: src (8 blocks)
+-	 *	%rcx: iv
 -	 */
--	SM4_PREPARE(x0)
+-	FRAME_BEGIN
 -
--	ld1		{RIV.16b}, [x3]
+-	/* Load input */
+-	vmovdqu (%rcx), RA0;
+-	vmovdqu 0 * 16(%rdx), RA1;
+-	vmovdqu 1 * 16(%rdx), RA2;
+-	vmovdqu 2 * 16(%rdx), RA3;
+-	vmovdqu 3 * 16(%rdx), RB0;
+-	vmovdqu 4 * 16(%rdx), RB1;
+-	vmovdqu 5 * 16(%rdx), RB2;
+-	vmovdqu 6 * 16(%rdx), RB3;
 -
--.Lcfb_enc_loop_4x:
--	cmp		w4, #4
--	blt		.Lcfb_enc_loop_1x
+-	/* Update IV */
+-	vmovdqu 7 * 16(%rdx), RNOT;
+-	vmovdqu RNOT, (%rcx);
 -
--	sub		w4, w4, #4
+-	call __sm4_crypt_blk8;
 -
--	ld1		{v0.16b-v3.16b}, [x2], #64
+-	vpxor (0 * 16)(%rdx), RA0, RA0;
+-	vpxor (1 * 16)(%rdx), RA1, RA1;
+-	vpxor (2 * 16)(%rdx), RA2, RA2;
+-	vpxor (3 * 16)(%rdx), RA3, RA3;
+-	vpxor (4 * 16)(%rdx), RB0, RB0;
+-	vpxor (5 * 16)(%rdx), RB1, RB1;
+-	vpxor (6 * 16)(%rdx), RB2, RB2;
+-	vpxor (7 * 16)(%rdx), RB3, RB3;
 -
--	rev32		v8.16b, RIV.16b
--	SM4_CRYPT_BLK_BE(v8)
--	eor		v0.16b, v0.16b, v8.16b
+-	vmovdqu RA0, (0 * 16)(%rsi);
+-	vmovdqu RA1, (1 * 16)(%rsi);
+-	vmovdqu RA2, (2 * 16)(%rsi);
+-	vmovdqu RA3, (3 * 16)(%rsi);
+-	vmovdqu RB0, (4 * 16)(%rsi);
+-	vmovdqu RB1, (5 * 16)(%rsi);
+-	vmovdqu RB2, (6 * 16)(%rsi);
+-	vmovdqu RB3, (7 * 16)(%rsi);
 -
--	rev32		v8.16b, v0.16b
--	SM4_CRYPT_BLK_BE(v8)
--	eor		v1.16b, v1.16b, v8.16b
+-	vzeroall;
+-	FRAME_END
+-	RET;
+-SYM_FUNC_END(sm4_aesni_avx_cfb_dec_blk8)
+diff --git a/arch/x86/crypto/sm4-aesni-avx2-asm_64.S b/arch/x86/crypto/sm4-aesni-avx2-asm_64.S
+index 98ede9459287..9ff5ba075591 100644
+--- a/arch/x86/crypto/sm4-aesni-avx2-asm_64.S
++++ b/arch/x86/crypto/sm4-aesni-avx2-asm_64.S
+@@ -439,58 +439,3 @@ SYM_TYPED_FUNC_START(sm4_aesni_avx2_cbc_dec_blk16)
+ 	FRAME_END
+ 	RET;
+ SYM_FUNC_END(sm4_aesni_avx2_cbc_dec_blk16)
 -
--	rev32		v8.16b, v1.16b
--	SM4_CRYPT_BLK_BE(v8)
--	eor		v2.16b, v2.16b, v8.16b
--
--	rev32		v8.16b, v2.16b
--	SM4_CRYPT_BLK_BE(v8)
--	eor		v3.16b, v3.16b, v8.16b
--
--	st1		{v0.16b-v3.16b}, [x1], #64
--	mov		RIV.16b, v3.16b
--
--	cbz		w4, .Lcfb_enc_end
--	b		.Lcfb_enc_loop_4x
--
--.Lcfb_enc_loop_1x:
--	sub		w4, w4, #1
--
--	ld1		{v0.16b}, [x2], #16
--
--	SM4_CRYPT_BLK(RIV)
--	eor		RIV.16b, RIV.16b, v0.16b
--
--	st1		{RIV.16b}, [x1], #16
--
--	cbnz		w4, .Lcfb_enc_loop_1x
--
--.Lcfb_enc_end:
--	/* store new IV */
--	st1		{RIV.16b}, [x3]
--
--	ret
--SYM_FUNC_END(sm4_ce_cfb_enc)
--
--.align 3
--SYM_FUNC_START(sm4_ce_cfb_dec)
+-/*
+- * void sm4_aesni_avx2_cfb_dec_blk16(const u32 *rk, u8 *dst,
+- *                                   const u8 *src, u8 *iv)
+- */
+-SYM_TYPED_FUNC_START(sm4_aesni_avx2_cfb_dec_blk16)
 -	/* input:
--	 *   x0: round key array, CTX
--	 *   x1: dst
--	 *   x2: src
--	 *   x3: iv (big endian, 128 bit)
--	 *   w4: nblocks
+-	 *	%rdi: round key array, CTX
+-	 *	%rsi: dst (16 blocks)
+-	 *	%rdx: src (16 blocks)
+-	 *	%rcx: iv
 -	 */
--	SM4_PREPARE(x0)
+-	FRAME_BEGIN
 -
--	ld1		{RIV.16b}, [x3]
+-	vzeroupper;
 -
--.Lcfb_dec_loop_8x:
--	sub		w4, w4, #8
--	tbnz		w4, #31, .Lcfb_dec_4x
+-	/* Load input */
+-	vmovdqu (%rcx), RNOTx;
+-	vinserti128 $1, (%rdx), RNOT, RA0;
+-	vmovdqu (0 * 32 + 16)(%rdx), RA1;
+-	vmovdqu (1 * 32 + 16)(%rdx), RA2;
+-	vmovdqu (2 * 32 + 16)(%rdx), RA3;
+-	vmovdqu (3 * 32 + 16)(%rdx), RB0;
+-	vmovdqu (4 * 32 + 16)(%rdx), RB1;
+-	vmovdqu (5 * 32 + 16)(%rdx), RB2;
+-	vmovdqu (6 * 32 + 16)(%rdx), RB3;
 -
--	ld1		{v0.16b-v3.16b}, [x2], #64
--	ld1		{v4.16b-v7.16b}, [x2], #64
+-	/* Update IV */
+-	vmovdqu (7 * 32 + 16)(%rdx), RNOTx;
+-	vmovdqu RNOTx, (%rcx);
 -
--	rev32		v8.16b, RIV.16b
--	rev32		v9.16b, v0.16b
--	rev32		v10.16b, v1.16b
--	rev32		v11.16b, v2.16b
--	rev32		v12.16b, v3.16b
--	rev32		v13.16b, v4.16b
--	rev32		v14.16b, v5.16b
--	rev32		v15.16b, v6.16b
+-	call __sm4_crypt_blk16;
 -
--	SM4_CRYPT_BLK8_BE(v8, v9, v10, v11, v12, v13, v14, v15)
+-	vpxor (0 * 32)(%rdx), RA0, RA0;
+-	vpxor (1 * 32)(%rdx), RA1, RA1;
+-	vpxor (2 * 32)(%rdx), RA2, RA2;
+-	vpxor (3 * 32)(%rdx), RA3, RA3;
+-	vpxor (4 * 32)(%rdx), RB0, RB0;
+-	vpxor (5 * 32)(%rdx), RB1, RB1;
+-	vpxor (6 * 32)(%rdx), RB2, RB2;
+-	vpxor (7 * 32)(%rdx), RB3, RB3;
 -
--	mov		RIV.16b, v7.16b
+-	vmovdqu RA0, (0 * 32)(%rsi);
+-	vmovdqu RA1, (1 * 32)(%rsi);
+-	vmovdqu RA2, (2 * 32)(%rsi);
+-	vmovdqu RA3, (3 * 32)(%rsi);
+-	vmovdqu RB0, (4 * 32)(%rsi);
+-	vmovdqu RB1, (5 * 32)(%rsi);
+-	vmovdqu RB2, (6 * 32)(%rsi);
+-	vmovdqu RB3, (7 * 32)(%rsi);
 -
--	eor		v0.16b, v0.16b, v8.16b
--	eor		v1.16b, v1.16b, v9.16b
--	eor		v2.16b, v2.16b, v10.16b
--	eor		v3.16b, v3.16b, v11.16b
--	eor		v4.16b, v4.16b, v12.16b
--	eor		v5.16b, v5.16b, v13.16b
--	eor		v6.16b, v6.16b, v14.16b
--	eor		v7.16b, v7.16b, v15.16b
--
--	st1		{v0.16b-v3.16b}, [x1], #64
--	st1		{v4.16b-v7.16b}, [x1], #64
--
--	cbz		w4, .Lcfb_dec_end
--	b		.Lcfb_dec_loop_8x
--
--.Lcfb_dec_4x:
--	add		w4, w4, #8
--	cmp		w4, #4
--	blt		.Lcfb_dec_loop_1x
--
--	sub		w4, w4, #4
--
--	ld1		{v0.16b-v3.16b}, [x2], #64
--
--	rev32		v8.16b, RIV.16b
--	rev32		v9.16b, v0.16b
--	rev32		v10.16b, v1.16b
--	rev32		v11.16b, v2.16b
--
--	SM4_CRYPT_BLK4_BE(v8, v9, v10, v11)
--
--	mov		RIV.16b, v3.16b
--
--	eor		v0.16b, v0.16b, v8.16b
--	eor		v1.16b, v1.16b, v9.16b
--	eor		v2.16b, v2.16b, v10.16b
--	eor		v3.16b, v3.16b, v11.16b
--
--	st1		{v0.16b-v3.16b}, [x1], #64
--
--	cbz		w4, .Lcfb_dec_end
--
--.Lcfb_dec_loop_1x:
--	sub		w4, w4, #1
--
--	ld1		{v0.16b}, [x2], #16
--
--	SM4_CRYPT_BLK(RIV)
--
--	eor		RIV.16b, RIV.16b, v0.16b
--	st1		{RIV.16b}, [x1], #16
--
--	mov		RIV.16b, v0.16b
--
--	cbnz		w4, .Lcfb_dec_loop_1x
--
--.Lcfb_dec_end:
--	/* store new IV */
--	st1		{RIV.16b}, [x3]
--
--	ret
--SYM_FUNC_END(sm4_ce_cfb_dec)
--
- .align 3
- SYM_FUNC_START(sm4_ce_ctr_enc)
- 	/* input:
-diff --git a/arch/arm64/crypto/sm4-ce-glue.c b/arch/arm64/crypto/sm4-ce-glue.c
-index 0a2d32ed3bde..43741bed874e 100644
---- a/arch/arm64/crypto/sm4-ce-glue.c
-+++ b/arch/arm64/crypto/sm4-ce-glue.c
-@@ -37,10 +37,6 @@ asmlinkage void sm4_ce_cbc_cts_enc(const u32 *rkey, u8 *dst, const u8 *src,
- 				   u8 *iv, unsigned int nbytes);
- asmlinkage void sm4_ce_cbc_cts_dec(const u32 *rkey, u8 *dst, const u8 *src,
- 				   u8 *iv, unsigned int nbytes);
--asmlinkage void sm4_ce_cfb_enc(const u32 *rkey, u8 *dst, const u8 *src,
--			       u8 *iv, unsigned int nblks);
--asmlinkage void sm4_ce_cfb_dec(const u32 *rkey, u8 *dst, const u8 *src,
--			       u8 *iv, unsigned int nblks);
- asmlinkage void sm4_ce_ctr_enc(const u32 *rkey, u8 *dst, const u8 *src,
- 			       u8 *iv, unsigned int nblks);
- asmlinkage void sm4_ce_xts_enc(const u32 *rkey1, u8 *dst, const u8 *src,
-@@ -56,7 +52,6 @@ asmlinkage void sm4_ce_mac_update(const u32 *rkey_enc, u8 *digest,
- EXPORT_SYMBOL(sm4_ce_expand_key);
- EXPORT_SYMBOL(sm4_ce_crypt_block);
- EXPORT_SYMBOL(sm4_ce_cbc_enc);
--EXPORT_SYMBOL(sm4_ce_cfb_enc);
+-	vzeroall;
+-	FRAME_END
+-	RET;
+-SYM_FUNC_END(sm4_aesni_avx2_cfb_dec_blk16)
+diff --git a/arch/x86/crypto/sm4-avx.h b/arch/x86/crypto/sm4-avx.h
+index 1bceab7516aa..b5b5e67e40ed 100644
+--- a/arch/x86/crypto/sm4-avx.h
++++ b/arch/x86/crypto/sm4-avx.h
+@@ -14,10 +14,6 @@ int sm4_cbc_encrypt(struct skcipher_request *req);
+ int sm4_avx_cbc_decrypt(struct skcipher_request *req,
+ 			unsigned int bsize, sm4_crypt_func func);
  
- struct sm4_xts_ctx {
- 	struct sm4_ctx key1;
-@@ -280,90 +275,6 @@ static int sm4_cbc_cts_decrypt(struct skcipher_request *req)
- 	return sm4_cbc_cts_crypt(req, false);
+-int sm4_cfb_encrypt(struct skcipher_request *req);
+-int sm4_avx_cfb_decrypt(struct skcipher_request *req,
+-			unsigned int bsize, sm4_crypt_func func);
+-
+ int sm4_avx_ctr_crypt(struct skcipher_request *req,
+ 			unsigned int bsize, sm4_crypt_func func);
+ 
+diff --git a/arch/x86/crypto/sm4_aesni_avx2_glue.c b/arch/x86/crypto/sm4_aesni_avx2_glue.c
+index 84bc718f49a3..1148fd4cd57f 100644
+--- a/arch/x86/crypto/sm4_aesni_avx2_glue.c
++++ b/arch/x86/crypto/sm4_aesni_avx2_glue.c
+@@ -23,8 +23,6 @@ asmlinkage void sm4_aesni_avx2_ctr_enc_blk16(const u32 *rk, u8 *dst,
+ 					const u8 *src, u8 *iv);
+ asmlinkage void sm4_aesni_avx2_cbc_dec_blk16(const u32 *rk, u8 *dst,
+ 					const u8 *src, u8 *iv);
+-asmlinkage void sm4_aesni_avx2_cfb_dec_blk16(const u32 *rk, u8 *dst,
+-					const u8 *src, u8 *iv);
+ 
+ static int sm4_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			unsigned int key_len)
+@@ -41,12 +39,6 @@ static int cbc_decrypt(struct skcipher_request *req)
  }
  
--static int sm4_cfb_encrypt(struct skcipher_request *req)
+ 
+-static int cfb_decrypt(struct skcipher_request *req)
 -{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct skcipher_walk walk;
--	unsigned int nbytes;
--	int err;
--
--	err = skcipher_walk_virt(&walk, req, false);
--
--	while ((nbytes = walk.nbytes) > 0) {
--		const u8 *src = walk.src.virt.addr;
--		u8 *dst = walk.dst.virt.addr;
--		unsigned int nblks;
--
--		kernel_neon_begin();
--
--		nblks = BYTES2BLKS(nbytes);
--		if (nblks) {
--			sm4_ce_cfb_enc(ctx->rkey_enc, dst, src, walk.iv, nblks);
--			dst += nblks * SM4_BLOCK_SIZE;
--			src += nblks * SM4_BLOCK_SIZE;
--			nbytes -= nblks * SM4_BLOCK_SIZE;
--		}
--
--		/* tail */
--		if (walk.nbytes == walk.total && nbytes > 0) {
--			u8 keystream[SM4_BLOCK_SIZE];
--
--			sm4_ce_crypt_block(ctx->rkey_enc, keystream, walk.iv);
--			crypto_xor_cpy(dst, src, keystream, nbytes);
--			nbytes = 0;
--		}
--
--		kernel_neon_end();
--
--		err = skcipher_walk_done(&walk, nbytes);
--	}
--
--	return err;
+-	return sm4_avx_cfb_decrypt(req, SM4_CRYPT16_BLOCK_SIZE,
+-				sm4_aesni_avx2_cfb_dec_blk16);
 -}
 -
--static int sm4_cfb_decrypt(struct skcipher_request *req)
--{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct skcipher_walk walk;
--	unsigned int nbytes;
--	int err;
--
--	err = skcipher_walk_virt(&walk, req, false);
--
--	while ((nbytes = walk.nbytes) > 0) {
--		const u8 *src = walk.src.virt.addr;
--		u8 *dst = walk.dst.virt.addr;
--		unsigned int nblks;
--
--		kernel_neon_begin();
--
--		nblks = BYTES2BLKS(nbytes);
--		if (nblks) {
--			sm4_ce_cfb_dec(ctx->rkey_enc, dst, src, walk.iv, nblks);
--			dst += nblks * SM4_BLOCK_SIZE;
--			src += nblks * SM4_BLOCK_SIZE;
--			nbytes -= nblks * SM4_BLOCK_SIZE;
--		}
--
--		/* tail */
--		if (walk.nbytes == walk.total && nbytes > 0) {
--			u8 keystream[SM4_BLOCK_SIZE];
--
--			sm4_ce_crypt_block(ctx->rkey_enc, keystream, walk.iv);
--			crypto_xor_cpy(dst, src, keystream, nbytes);
--			nbytes = 0;
--		}
--
--		kernel_neon_end();
--
--		err = skcipher_walk_done(&walk, nbytes);
--	}
--
--	return err;
--}
--
- static int sm4_ctr_crypt(struct skcipher_request *req)
+ static int ctr_crypt(struct skcipher_request *req)
  {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-@@ -542,22 +453,6 @@ static struct skcipher_alg sm4_algs[] = {
- 		.setkey		= sm4_setkey,
+ 	return sm4_avx_ctr_crypt(req, SM4_CRYPT16_BLOCK_SIZE,
+@@ -87,24 +79,6 @@ static struct skcipher_alg sm4_aesni_avx2_skciphers[] = {
+ 		.setkey		= sm4_skcipher_setkey,
  		.encrypt	= sm4_cbc_encrypt,
- 		.decrypt	= sm4_cbc_decrypt,
+ 		.decrypt	= cbc_decrypt,
 -	}, {
 -		.base = {
--			.cra_name		= "cfb(sm4)",
--			.cra_driver_name	= "cfb-sm4-ce",
--			.cra_priority		= 400,
+-			.cra_name		= "__cfb(sm4)",
+-			.cra_driver_name	= "__cfb-sm4-aesni-avx2",
+-			.cra_priority		= 500,
+-			.cra_flags		= CRYPTO_ALG_INTERNAL,
 -			.cra_blocksize		= 1,
 -			.cra_ctxsize		= sizeof(struct sm4_ctx),
 -			.cra_module		= THIS_MODULE,
@@ -369,179 +253,31 @@ index 0a2d32ed3bde..43741bed874e 100644
 -		.max_keysize	= SM4_KEY_SIZE,
 -		.ivsize		= SM4_BLOCK_SIZE,
 -		.chunksize	= SM4_BLOCK_SIZE,
--		.setkey		= sm4_setkey,
+-		.walksize	= 16 * SM4_BLOCK_SIZE,
+-		.setkey		= sm4_skcipher_setkey,
 -		.encrypt	= sm4_cfb_encrypt,
--		.decrypt	= sm4_cfb_decrypt,
+-		.decrypt	= cfb_decrypt,
  	}, {
  		.base = {
- 			.cra_name		= "ctr(sm4)",
-@@ -869,12 +764,11 @@ static void __exit sm4_exit(void)
- module_cpu_feature_match(SM4, sm4_init);
- module_exit(sm4_exit);
+ 			.cra_name		= "__ctr(sm4)",
+diff --git a/arch/x86/crypto/sm4_aesni_avx_glue.c b/arch/x86/crypto/sm4_aesni_avx_glue.c
+index 7800f77d68ad..85b4ca78b47b 100644
+--- a/arch/x86/crypto/sm4_aesni_avx_glue.c
++++ b/arch/x86/crypto/sm4_aesni_avx_glue.c
+@@ -27,8 +27,6 @@ asmlinkage void sm4_aesni_avx_ctr_enc_blk8(const u32 *rk, u8 *dst,
+ 				const u8 *src, u8 *iv);
+ asmlinkage void sm4_aesni_avx_cbc_dec_blk8(const u32 *rk, u8 *dst,
+ 				const u8 *src, u8 *iv);
+-asmlinkage void sm4_aesni_avx_cfb_dec_blk8(const u32 *rk, u8 *dst,
+-				const u8 *src, u8 *iv);
  
--MODULE_DESCRIPTION("SM4 ECB/CBC/CFB/CTR/XTS using ARMv8 Crypto Extensions");
-+MODULE_DESCRIPTION("SM4 ECB/CBC/CTR/XTS using ARMv8 Crypto Extensions");
- MODULE_ALIAS_CRYPTO("sm4-ce");
- MODULE_ALIAS_CRYPTO("sm4");
- MODULE_ALIAS_CRYPTO("ecb(sm4)");
- MODULE_ALIAS_CRYPTO("cbc(sm4)");
--MODULE_ALIAS_CRYPTO("cfb(sm4)");
- MODULE_ALIAS_CRYPTO("ctr(sm4)");
- MODULE_ALIAS_CRYPTO("cts(cbc(sm4))");
- MODULE_ALIAS_CRYPTO("xts(sm4)");
-diff --git a/arch/arm64/crypto/sm4-ce.h b/arch/arm64/crypto/sm4-ce.h
-index 109c21b37590..1e235c4371eb 100644
---- a/arch/arm64/crypto/sm4-ce.h
-+++ b/arch/arm64/crypto/sm4-ce.h
-@@ -11,6 +11,3 @@ void sm4_ce_crypt_block(const u32 *rkey, u8 *dst, const u8 *src);
- 
- void sm4_ce_cbc_enc(const u32 *rkey_enc, u8 *dst, const u8 *src,
- 		    u8 *iv, unsigned int nblocks);
--
--void sm4_ce_cfb_enc(const u32 *rkey_enc, u8 *dst, const u8 *src,
--		    u8 *iv, unsigned int nblocks);
-diff --git a/arch/arm64/crypto/sm4-neon-core.S b/arch/arm64/crypto/sm4-neon-core.S
-index f295b4b7d70a..734dc7193610 100644
---- a/arch/arm64/crypto/sm4-neon-core.S
-+++ b/arch/arm64/crypto/sm4-neon-core.S
-@@ -437,119 +437,6 @@ SYM_FUNC_START(sm4_neon_cbc_dec)
- 	ret
- SYM_FUNC_END(sm4_neon_cbc_dec)
- 
--.align 3
--SYM_FUNC_START(sm4_neon_cfb_dec)
--	/* input:
--	 *   x0: round key array, CTX
--	 *   x1: dst
--	 *   x2: src
--	 *   x3: iv (big endian, 128 bit)
--	 *   w4: nblocks
--	 */
--	SM4_PREPARE()
--
--	ld1		{v0.16b}, [x3]
--
--.Lcfb_dec_loop_8x:
--	sub		w4, w4, #8
--	tbnz		w4, #31, .Lcfb_dec_4x
--
--	ld1		{v1.16b-v3.16b}, [x2], #48
--	ld4		{v4.4s-v7.4s}, [x2]
--
--	transpose_4x4(v0, v1, v2, v3)
--
--	SM4_CRYPT_BLK8(v0, v1, v2, v3, v4, v5, v6, v7)
--
--	sub		x2, x2, #48
--	ld1		{RTMP0.16b-RTMP3.16b}, [x2], #64
--	ld1		{RTMP4.16b-RTMP7.16b}, [x2], #64
--
--	eor		v0.16b, v0.16b, RTMP0.16b
--	eor		v1.16b, v1.16b, RTMP1.16b
--	eor		v2.16b, v2.16b, RTMP2.16b
--	eor		v3.16b, v3.16b, RTMP3.16b
--	eor		v4.16b, v4.16b, RTMP4.16b
--	eor		v5.16b, v5.16b, RTMP5.16b
--	eor		v6.16b, v6.16b, RTMP6.16b
--	eor		v7.16b, v7.16b, RTMP7.16b
--
--	st1		{v0.16b-v3.16b}, [x1], #64
--	st1		{v4.16b-v7.16b}, [x1], #64
--
--	mov		v0.16b, RTMP7.16b
--
--	cbz		w4, .Lcfb_dec_end
--	b		.Lcfb_dec_loop_8x
--
--.Lcfb_dec_4x:
--	add		w4, w4, #8
--	cmp		w4, #4
--	blt		.Lcfb_dec_tail
--
--	sub		w4, w4, #4
--
--	ld1		{v4.16b-v7.16b}, [x2], #64
--
--	rev32		v0.16b, v0.16b		/* v0 is IV register */
--	rev32		v1.16b, v4.16b
--	rev32		v2.16b, v5.16b
--	rev32		v3.16b, v6.16b
--
--	transpose_4x4(v0, v1, v2, v3)
--
--	SM4_CRYPT_BLK4_BE(v0, v1, v2, v3)
--
--	eor		v0.16b, v0.16b, v4.16b
--	eor		v1.16b, v1.16b, v5.16b
--	eor		v2.16b, v2.16b, v6.16b
--	eor		v3.16b, v3.16b, v7.16b
--
--	st1		{v0.16b-v3.16b}, [x1], #64
--
--	mov		v0.16b, v7.16b
--
--	cbz		w4, .Lcfb_dec_end
--
--.Lcfb_dec_tail:
--	cmp		w4, #2
--	ld1		{v4.16b}, [x2], #16
--	blt		.Lcfb_dec_tail_load_done
--	ld1		{v5.16b}, [x2], #16
--	beq		.Lcfb_dec_tail_load_done
--	ld1		{v6.16b}, [x2], #16
--
--.Lcfb_dec_tail_load_done:
--	rev32		v0.16b, v0.16b		/* v0 is IV register */
--	rev32		v1.16b, v4.16b
--	rev32		v2.16b, v5.16b
--
--	transpose_4x4(v0, v1, v2, v3)
--
--	SM4_CRYPT_BLK4_BE(v0, v1, v2, v3)
--
--	cmp		w4, #2
--	eor		v0.16b, v0.16b, v4.16b
--	st1		{v0.16b}, [x1], #16
--	mov		v0.16b, v4.16b
--	blt		.Lcfb_dec_end
--
--	eor		v1.16b, v1.16b, v5.16b
--	st1		{v1.16b}, [x1], #16
--	mov		v0.16b, v5.16b
--	beq		.Lcfb_dec_end
--
--	eor		v2.16b, v2.16b, v6.16b
--	st1		{v2.16b}, [x1], #16
--	mov		v0.16b, v6.16b
--
--.Lcfb_dec_end:
--	/* store new IV */
--	st1		{v0.16b}, [x3]
--
--	ret
--SYM_FUNC_END(sm4_neon_cfb_dec)
--
- .align 3
- SYM_FUNC_START(sm4_neon_ctr_crypt)
- 	/* input:
-diff --git a/arch/arm64/crypto/sm4-neon-glue.c b/arch/arm64/crypto/sm4-neon-glue.c
-index 7b19accf5c03..e3500aca2d18 100644
---- a/arch/arm64/crypto/sm4-neon-glue.c
-+++ b/arch/arm64/crypto/sm4-neon-glue.c
-@@ -22,8 +22,6 @@ asmlinkage void sm4_neon_crypt(const u32 *rkey, u8 *dst, const u8 *src,
- 			       unsigned int nblocks);
- asmlinkage void sm4_neon_cbc_dec(const u32 *rkey_dec, u8 *dst, const u8 *src,
- 				 u8 *iv, unsigned int nblocks);
--asmlinkage void sm4_neon_cfb_dec(const u32 *rkey_enc, u8 *dst, const u8 *src,
--				 u8 *iv, unsigned int nblocks);
- asmlinkage void sm4_neon_ctr_crypt(const u32 *rkey_enc, u8 *dst, const u8 *src,
- 				   u8 *iv, unsigned int nblocks);
- 
-@@ -142,90 +140,6 @@ static int sm4_cbc_decrypt(struct skcipher_request *req)
- 	return err;
+ static int sm4_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			unsigned int key_len)
+@@ -188,116 +186,6 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 				sm4_aesni_avx_cbc_dec_blk8);
  }
  
--static int sm4_cfb_encrypt(struct skcipher_request *req)
+-int sm4_cfb_encrypt(struct skcipher_request *req)
 -{
 -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
 -	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
@@ -580,8 +316,10 @@ index 7b19accf5c03..e3500aca2d18 100644
 -
 -	return err;
 -}
+-EXPORT_SYMBOL_GPL(sm4_cfb_encrypt);
 -
--static int sm4_cfb_decrypt(struct skcipher_request *req)
+-int sm4_avx_cfb_decrypt(struct skcipher_request *req,
+-			unsigned int bsize, sm4_crypt_func func)
 -{
 -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
 -	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
@@ -594,21 +332,38 @@ index 7b19accf5c03..e3500aca2d18 100644
 -	while ((nbytes = walk.nbytes) > 0) {
 -		const u8 *src = walk.src.virt.addr;
 -		u8 *dst = walk.dst.virt.addr;
--		unsigned int nblocks;
 -
--		nblocks = nbytes / SM4_BLOCK_SIZE;
--		if (nblocks) {
--			kernel_neon_begin();
+-		kernel_fpu_begin();
 -
--			sm4_neon_cfb_dec(ctx->rkey_enc, dst, src,
--					 walk.iv, nblocks);
+-		while (nbytes >= bsize) {
+-			func(ctx->rkey_enc, dst, src, walk.iv);
+-			dst += bsize;
+-			src += bsize;
+-			nbytes -= bsize;
+-		}
 -
--			kernel_neon_end();
+-		while (nbytes >= SM4_BLOCK_SIZE) {
+-			u8 keystream[SM4_BLOCK_SIZE * 8];
+-			unsigned int nblocks = min(nbytes >> 4, 8u);
 -
+-			memcpy(keystream, walk.iv, SM4_BLOCK_SIZE);
+-			if (nblocks > 1)
+-				memcpy(&keystream[SM4_BLOCK_SIZE], src,
+-					(nblocks - 1) * SM4_BLOCK_SIZE);
+-			memcpy(walk.iv, src + (nblocks - 1) * SM4_BLOCK_SIZE,
+-				SM4_BLOCK_SIZE);
+-
+-			sm4_aesni_avx_crypt8(ctx->rkey_enc, keystream,
+-						keystream, nblocks);
+-
+-			crypto_xor_cpy(dst, src, keystream,
+-					nblocks * SM4_BLOCK_SIZE);
 -			dst += nblocks * SM4_BLOCK_SIZE;
 -			src += nblocks * SM4_BLOCK_SIZE;
 -			nbytes -= nblocks * SM4_BLOCK_SIZE;
 -		}
+-
+-		kernel_fpu_end();
 -
 -		/* tail */
 -		if (walk.nbytes == walk.total && nbytes > 0) {
@@ -624,19 +379,27 @@ index 7b19accf5c03..e3500aca2d18 100644
 -
 -	return err;
 -}
+-EXPORT_SYMBOL_GPL(sm4_avx_cfb_decrypt);
 -
- static int sm4_ctr_crypt(struct skcipher_request *req)
+-static int cfb_decrypt(struct skcipher_request *req)
+-{
+-	return sm4_avx_cfb_decrypt(req, SM4_CRYPT8_BLOCK_SIZE,
+-				sm4_aesni_avx_cfb_dec_blk8);
+-}
+-
+ int sm4_avx_ctr_crypt(struct skcipher_request *req,
+ 			unsigned int bsize, sm4_crypt_func func)
  {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-@@ -301,22 +215,6 @@ static struct skcipher_alg sm4_algs[] = {
- 		.setkey		= sm4_setkey,
+@@ -406,24 +294,6 @@ static struct skcipher_alg sm4_aesni_avx_skciphers[] = {
+ 		.setkey		= sm4_skcipher_setkey,
  		.encrypt	= sm4_cbc_encrypt,
- 		.decrypt	= sm4_cbc_decrypt,
+ 		.decrypt	= cbc_decrypt,
 -	}, {
 -		.base = {
--			.cra_name		= "cfb(sm4)",
--			.cra_driver_name	= "cfb-sm4-neon",
--			.cra_priority		= 200,
+-			.cra_name		= "__cfb(sm4)",
+-			.cra_driver_name	= "__cfb-sm4-aesni-avx",
+-			.cra_priority		= 400,
+-			.cra_flags		= CRYPTO_ALG_INTERNAL,
 -			.cra_blocksize		= 1,
 -			.cra_ctxsize		= sizeof(struct sm4_ctx),
 -			.cra_module		= THIS_MODULE,
@@ -645,23 +408,10 @@ index 7b19accf5c03..e3500aca2d18 100644
 -		.max_keysize	= SM4_KEY_SIZE,
 -		.ivsize		= SM4_BLOCK_SIZE,
 -		.chunksize	= SM4_BLOCK_SIZE,
--		.setkey		= sm4_setkey,
+-		.walksize	= 8 * SM4_BLOCK_SIZE,
+-		.setkey		= sm4_skcipher_setkey,
 -		.encrypt	= sm4_cfb_encrypt,
--		.decrypt	= sm4_cfb_decrypt,
+-		.decrypt	= cfb_decrypt,
  	}, {
  		.base = {
- 			.cra_name		= "ctr(sm4)",
-@@ -349,12 +247,11 @@ static void __exit sm4_exit(void)
- module_init(sm4_init);
- module_exit(sm4_exit);
- 
--MODULE_DESCRIPTION("SM4 ECB/CBC/CFB/CTR using ARMv8 NEON");
-+MODULE_DESCRIPTION("SM4 ECB/CBC/CTR using ARMv8 NEON");
- MODULE_ALIAS_CRYPTO("sm4-neon");
- MODULE_ALIAS_CRYPTO("sm4");
- MODULE_ALIAS_CRYPTO("ecb(sm4)");
- MODULE_ALIAS_CRYPTO("cbc(sm4)");
--MODULE_ALIAS_CRYPTO("cfb(sm4)");
- MODULE_ALIAS_CRYPTO("ctr(sm4)");
- MODULE_AUTHOR("Tianjia Zhang <tianjia.zhang@linux.alibaba.com>");
- MODULE_LICENSE("GPL v2");
+ 			.cra_name		= "__ctr(sm4)",
