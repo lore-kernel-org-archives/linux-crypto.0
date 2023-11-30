@@ -1,17 +1,17 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FE8DD4A
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 04:27:50 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95E391B3
+	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 04:27:52 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r8g8w-005IIw-5u; Thu, 30 Nov 2023 20:27:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Nov 2023 20:27:55 +0800
+	id 1r8g8y-005IJ6-8o; Thu, 30 Nov 2023 20:27:49 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Nov 2023 20:27:57 +0800
 From: "Herbert Xu" <herbert@gondor.apana.org.au>
-Date: Thu, 30 Nov 2023 20:27:55 +0800
-Subject: [PATCH 3/19] crypto: crypto4xx - Remove cfb and ofb
+Date: Thu, 30 Nov 2023 20:27:57 +0800
+Subject: [PATCH 4/19] crypto: aspeed - Remove cfb and ofb
 References: <ZWh/nV+g46zhURa9@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Message-Id: <E1r8g8w-005IIw-5u@formenos.hmeau.com>
+Message-Id: <E1r8g8y-005IJ6-8o@formenos.hmeau.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -23,117 +23,303 @@ Remove the unused CFB/OFB implementation.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/crypto/amcc/crypto4xx_alg.c  |   14 ------------
- drivers/crypto/amcc/crypto4xx_core.c |   40 -----------------------------------
- drivers/crypto/amcc/crypto4xx_core.h |    4 ---
- 3 files changed, 58 deletions(-)
+ drivers/crypto/aspeed/Kconfig              |    4 
+ drivers/crypto/aspeed/aspeed-hace-crypto.c |  230 -----------------------------
+ 2 files changed, 1 insertion(+), 233 deletions(-)
 
-diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
-index ded732242732..e0af611a95d8 100644
---- a/drivers/crypto/amcc/crypto4xx_alg.c
-+++ b/drivers/crypto/amcc/crypto4xx_alg.c
-@@ -181,13 +181,6 @@ int crypto4xx_setkey_aes_cbc(struct crypto_skcipher *cipher,
- 				    CRYPTO_FEEDBACK_MODE_NO_FB);
+diff --git a/drivers/crypto/aspeed/Kconfig b/drivers/crypto/aspeed/Kconfig
+index db6c5b4cdc40..e93f2f82b418 100644
+--- a/drivers/crypto/aspeed/Kconfig
++++ b/drivers/crypto/aspeed/Kconfig
+@@ -38,14 +38,12 @@ config CRYPTO_DEV_ASPEED_HACE_CRYPTO
+ 	select CRYPTO_DES
+ 	select CRYPTO_ECB
+ 	select CRYPTO_CBC
+-	select CRYPTO_CFB
+-	select CRYPTO_OFB
+ 	select CRYPTO_CTR
+ 	help
+ 	  Select here to enable Aspeed Hash & Crypto Engine (HACE)
+ 	  crypto driver.
+ 	  Supports AES/DES symmetric-key encryption and decryption
+-	  with ECB/CBC/CFB/OFB/CTR options.
++	  with ECB/CBC/CTR options.
+ 
+ config CRYPTO_DEV_ASPEED_ACRY
+ 	bool "Enable Aspeed ACRY RSA Engine"
+diff --git a/drivers/crypto/aspeed/aspeed-hace-crypto.c b/drivers/crypto/aspeed/aspeed-hace-crypto.c
+index f0eddb7854e5..a72dfebc53ff 100644
+--- a/drivers/crypto/aspeed/aspeed-hace-crypto.c
++++ b/drivers/crypto/aspeed/aspeed-hace-crypto.c
+@@ -473,30 +473,6 @@ static int aspeed_tdes_ctr_encrypt(struct skcipher_request *req)
+ 				HACE_CMD_TRIPLE_DES);
  }
  
--int crypto4xx_setkey_aes_cfb(struct crypto_skcipher *cipher,
--			     const u8 *key, unsigned int keylen)
+-static int aspeed_tdes_ofb_decrypt(struct skcipher_request *req)
 -{
--	return crypto4xx_setkey_aes(cipher, key, keylen, CRYPTO_MODE_CFB,
--				    CRYPTO_FEEDBACK_MODE_128BIT_CFB);
+-	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_OFB |
+-				HACE_CMD_TRIPLE_DES);
 -}
 -
- int crypto4xx_setkey_aes_ecb(struct crypto_skcipher *cipher,
- 			     const u8 *key, unsigned int keylen)
+-static int aspeed_tdes_ofb_encrypt(struct skcipher_request *req)
+-{
+-	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_OFB |
+-				HACE_CMD_TRIPLE_DES);
+-}
+-
+-static int aspeed_tdes_cfb_decrypt(struct skcipher_request *req)
+-{
+-	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CFB |
+-				HACE_CMD_TRIPLE_DES);
+-}
+-
+-static int aspeed_tdes_cfb_encrypt(struct skcipher_request *req)
+-{
+-	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CFB |
+-				HACE_CMD_TRIPLE_DES);
+-}
+-
+ static int aspeed_tdes_cbc_decrypt(struct skcipher_request *req)
  {
-@@ -195,13 +188,6 @@ int crypto4xx_setkey_aes_ecb(struct crypto_skcipher *cipher,
- 				    CRYPTO_FEEDBACK_MODE_NO_FB);
+ 	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CBC |
+@@ -533,30 +509,6 @@ static int aspeed_des_ctr_encrypt(struct skcipher_request *req)
+ 				HACE_CMD_SINGLE_DES);
  }
  
--int crypto4xx_setkey_aes_ofb(struct crypto_skcipher *cipher,
--			     const u8 *key, unsigned int keylen)
+-static int aspeed_des_ofb_decrypt(struct skcipher_request *req)
 -{
--	return crypto4xx_setkey_aes(cipher, key, keylen, CRYPTO_MODE_OFB,
--				    CRYPTO_FEEDBACK_MODE_64BIT_OFB);
+-	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_OFB |
+-				HACE_CMD_SINGLE_DES);
 -}
 -
- int crypto4xx_setkey_rfc3686(struct crypto_skcipher *cipher,
- 			     const u8 *key, unsigned int keylen)
+-static int aspeed_des_ofb_encrypt(struct skcipher_request *req)
+-{
+-	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_OFB |
+-				HACE_CMD_SINGLE_DES);
+-}
+-
+-static int aspeed_des_cfb_decrypt(struct skcipher_request *req)
+-{
+-	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CFB |
+-				HACE_CMD_SINGLE_DES);
+-}
+-
+-static int aspeed_des_cfb_encrypt(struct skcipher_request *req)
+-{
+-	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CFB |
+-				HACE_CMD_SINGLE_DES);
+-}
+-
+ static int aspeed_des_cbc_decrypt(struct skcipher_request *req)
  {
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 8d53372245ad..6006703fb6d7 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -1209,26 +1209,6 @@ static struct crypto4xx_alg_common crypto4xx_alg[] = {
- 		.init = crypto4xx_sk_init,
- 		.exit = crypto4xx_sk_exit,
- 	} },
--	{ .type = CRYPTO_ALG_TYPE_SKCIPHER, .u.cipher = {
--		.base = {
--			.cra_name = "cfb(aes)",
--			.cra_driver_name = "cfb-aes-ppc4xx",
--			.cra_priority = CRYPTO4XX_CRYPTO_PRIORITY,
--			.cra_flags = CRYPTO_ALG_ASYNC |
--				CRYPTO_ALG_KERN_DRIVER_ONLY,
--			.cra_blocksize = 1,
--			.cra_ctxsize = sizeof(struct crypto4xx_ctx),
--			.cra_module = THIS_MODULE,
--		},
--		.min_keysize = AES_MIN_KEY_SIZE,
--		.max_keysize = AES_MAX_KEY_SIZE,
--		.ivsize	= AES_IV_SIZE,
--		.setkey	= crypto4xx_setkey_aes_cfb,
--		.encrypt = crypto4xx_encrypt_iv_stream,
--		.decrypt = crypto4xx_decrypt_iv_stream,
--		.init = crypto4xx_sk_init,
--		.exit = crypto4xx_sk_exit,
--	} },
- 	{ .type = CRYPTO_ALG_TYPE_SKCIPHER, .u.cipher = {
- 		.base = {
- 			.cra_name = "ctr(aes)",
-@@ -1289,26 +1269,6 @@ static struct crypto4xx_alg_common crypto4xx_alg[] = {
- 		.init = crypto4xx_sk_init,
- 		.exit = crypto4xx_sk_exit,
- 	} },
--	{ .type = CRYPTO_ALG_TYPE_SKCIPHER, .u.cipher = {
--		.base = {
--			.cra_name = "ofb(aes)",
--			.cra_driver_name = "ofb-aes-ppc4xx",
--			.cra_priority = CRYPTO4XX_CRYPTO_PRIORITY,
--			.cra_flags = CRYPTO_ALG_ASYNC |
--				CRYPTO_ALG_KERN_DRIVER_ONLY,
--			.cra_blocksize = 1,
--			.cra_ctxsize = sizeof(struct crypto4xx_ctx),
--			.cra_module = THIS_MODULE,
--		},
--		.min_keysize = AES_MIN_KEY_SIZE,
--		.max_keysize = AES_MAX_KEY_SIZE,
--		.ivsize	= AES_IV_SIZE,
--		.setkey	= crypto4xx_setkey_aes_ofb,
--		.encrypt = crypto4xx_encrypt_iv_stream,
--		.decrypt = crypto4xx_decrypt_iv_stream,
--		.init = crypto4xx_sk_init,
--		.exit = crypto4xx_sk_exit,
--	} },
+ 	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CBC |
+@@ -659,26 +611,6 @@ static int aspeed_aes_ctr_encrypt(struct skcipher_request *req)
+ 	return aspeed_aes_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CTR);
+ }
  
- 	/* AEAD */
- 	{ .type = CRYPTO_ALG_TYPE_AEAD, .u.aead = {
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
-index 56c10668c0ab..96355d463b04 100644
---- a/drivers/crypto/amcc/crypto4xx_core.h
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -162,14 +162,10 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
- 		       struct scatterlist *dst_tmp);
- int crypto4xx_setkey_aes_cbc(struct crypto_skcipher *cipher,
- 			     const u8 *key, unsigned int keylen);
--int crypto4xx_setkey_aes_cfb(struct crypto_skcipher *cipher,
--			     const u8 *key, unsigned int keylen);
- int crypto4xx_setkey_aes_ctr(struct crypto_skcipher *cipher,
- 			     const u8 *key, unsigned int keylen);
- int crypto4xx_setkey_aes_ecb(struct crypto_skcipher *cipher,
- 			     const u8 *key, unsigned int keylen);
--int crypto4xx_setkey_aes_ofb(struct crypto_skcipher *cipher,
--			     const u8 *key, unsigned int keylen);
- int crypto4xx_setkey_rfc3686(struct crypto_skcipher *cipher,
- 			     const u8 *key, unsigned int keylen);
- int crypto4xx_encrypt_ctr(struct skcipher_request *req);
+-static int aspeed_aes_ofb_decrypt(struct skcipher_request *req)
+-{
+-	return aspeed_aes_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_OFB);
+-}
+-
+-static int aspeed_aes_ofb_encrypt(struct skcipher_request *req)
+-{
+-	return aspeed_aes_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_OFB);
+-}
+-
+-static int aspeed_aes_cfb_decrypt(struct skcipher_request *req)
+-{
+-	return aspeed_aes_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CFB);
+-}
+-
+-static int aspeed_aes_cfb_encrypt(struct skcipher_request *req)
+-{
+-	return aspeed_aes_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CFB);
+-}
+-
+ static int aspeed_aes_cbc_decrypt(struct skcipher_request *req)
+ {
+ 	return aspeed_aes_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CBC);
+@@ -790,60 +722,6 @@ static struct aspeed_hace_alg aspeed_crypto_algs[] = {
+ 			.do_one_request = aspeed_crypto_do_request,
+ 		},
+ 	},
+-	{
+-		.alg.skcipher.base = {
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.setkey		= aspeed_aes_setkey,
+-			.encrypt	= aspeed_aes_cfb_encrypt,
+-			.decrypt	= aspeed_aes_cfb_decrypt,
+-			.init		= aspeed_crypto_cra_init,
+-			.exit		= aspeed_crypto_cra_exit,
+-			.base = {
+-				.cra_name		= "cfb(aes)",
+-				.cra_driver_name	= "aspeed-cfb-aes",
+-				.cra_priority		= 300,
+-				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
+-							  CRYPTO_ALG_ASYNC |
+-							  CRYPTO_ALG_NEED_FALLBACK,
+-				.cra_blocksize		= 1,
+-				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
+-				.cra_alignmask		= 0x0f,
+-				.cra_module		= THIS_MODULE,
+-			}
+-		},
+-		.alg.skcipher.op = {
+-			.do_one_request = aspeed_crypto_do_request,
+-		},
+-	},
+-	{
+-		.alg.skcipher.base = {
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.setkey		= aspeed_aes_setkey,
+-			.encrypt	= aspeed_aes_ofb_encrypt,
+-			.decrypt	= aspeed_aes_ofb_decrypt,
+-			.init		= aspeed_crypto_cra_init,
+-			.exit		= aspeed_crypto_cra_exit,
+-			.base = {
+-				.cra_name		= "ofb(aes)",
+-				.cra_driver_name	= "aspeed-ofb-aes",
+-				.cra_priority		= 300,
+-				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
+-							  CRYPTO_ALG_ASYNC |
+-							  CRYPTO_ALG_NEED_FALLBACK,
+-				.cra_blocksize		= 1,
+-				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
+-				.cra_alignmask		= 0x0f,
+-				.cra_module		= THIS_MODULE,
+-			}
+-		},
+-		.alg.skcipher.op = {
+-			.do_one_request = aspeed_crypto_do_request,
+-		},
+-	},
+ 	{
+ 		.alg.skcipher.base = {
+ 			.min_keysize	= DES_KEY_SIZE,
+@@ -897,60 +775,6 @@ static struct aspeed_hace_alg aspeed_crypto_algs[] = {
+ 			.do_one_request = aspeed_crypto_do_request,
+ 		},
+ 	},
+-	{
+-		.alg.skcipher.base = {
+-			.ivsize		= DES_BLOCK_SIZE,
+-			.min_keysize	= DES_KEY_SIZE,
+-			.max_keysize	= DES_KEY_SIZE,
+-			.setkey		= aspeed_des_setkey,
+-			.encrypt	= aspeed_des_cfb_encrypt,
+-			.decrypt	= aspeed_des_cfb_decrypt,
+-			.init		= aspeed_crypto_cra_init,
+-			.exit		= aspeed_crypto_cra_exit,
+-			.base = {
+-				.cra_name		= "cfb(des)",
+-				.cra_driver_name	= "aspeed-cfb-des",
+-				.cra_priority		= 300,
+-				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
+-							  CRYPTO_ALG_ASYNC |
+-							  CRYPTO_ALG_NEED_FALLBACK,
+-				.cra_blocksize		= DES_BLOCK_SIZE,
+-				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
+-				.cra_alignmask		= 0x0f,
+-				.cra_module		= THIS_MODULE,
+-			}
+-		},
+-		.alg.skcipher.op = {
+-			.do_one_request = aspeed_crypto_do_request,
+-		},
+-	},
+-	{
+-		.alg.skcipher.base = {
+-			.ivsize		= DES_BLOCK_SIZE,
+-			.min_keysize	= DES_KEY_SIZE,
+-			.max_keysize	= DES_KEY_SIZE,
+-			.setkey		= aspeed_des_setkey,
+-			.encrypt	= aspeed_des_ofb_encrypt,
+-			.decrypt	= aspeed_des_ofb_decrypt,
+-			.init		= aspeed_crypto_cra_init,
+-			.exit		= aspeed_crypto_cra_exit,
+-			.base = {
+-				.cra_name		= "ofb(des)",
+-				.cra_driver_name	= "aspeed-ofb-des",
+-				.cra_priority		= 300,
+-				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
+-							  CRYPTO_ALG_ASYNC |
+-							  CRYPTO_ALG_NEED_FALLBACK,
+-				.cra_blocksize		= DES_BLOCK_SIZE,
+-				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
+-				.cra_alignmask		= 0x0f,
+-				.cra_module		= THIS_MODULE,
+-			}
+-		},
+-		.alg.skcipher.op = {
+-			.do_one_request = aspeed_crypto_do_request,
+-		},
+-	},
+ 	{
+ 		.alg.skcipher.base = {
+ 			.min_keysize	= DES3_EDE_KEY_SIZE,
+@@ -1004,60 +828,6 @@ static struct aspeed_hace_alg aspeed_crypto_algs[] = {
+ 			.do_one_request = aspeed_crypto_do_request,
+ 		},
+ 	},
+-	{
+-		.alg.skcipher.base = {
+-			.ivsize		= DES_BLOCK_SIZE,
+-			.min_keysize	= DES3_EDE_KEY_SIZE,
+-			.max_keysize	= DES3_EDE_KEY_SIZE,
+-			.setkey		= aspeed_des_setkey,
+-			.encrypt	= aspeed_tdes_cfb_encrypt,
+-			.decrypt	= aspeed_tdes_cfb_decrypt,
+-			.init		= aspeed_crypto_cra_init,
+-			.exit		= aspeed_crypto_cra_exit,
+-			.base = {
+-				.cra_name		= "cfb(des3_ede)",
+-				.cra_driver_name	= "aspeed-cfb-tdes",
+-				.cra_priority		= 300,
+-				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
+-							  CRYPTO_ALG_ASYNC |
+-							  CRYPTO_ALG_NEED_FALLBACK,
+-				.cra_blocksize		= DES_BLOCK_SIZE,
+-				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
+-				.cra_alignmask		= 0x0f,
+-				.cra_module		= THIS_MODULE,
+-			}
+-		},
+-		.alg.skcipher.op = {
+-			.do_one_request = aspeed_crypto_do_request,
+-		},
+-	},
+-	{
+-		.alg.skcipher.base = {
+-			.ivsize		= DES_BLOCK_SIZE,
+-			.min_keysize	= DES3_EDE_KEY_SIZE,
+-			.max_keysize	= DES3_EDE_KEY_SIZE,
+-			.setkey		= aspeed_des_setkey,
+-			.encrypt	= aspeed_tdes_ofb_encrypt,
+-			.decrypt	= aspeed_tdes_ofb_decrypt,
+-			.init		= aspeed_crypto_cra_init,
+-			.exit		= aspeed_crypto_cra_exit,
+-			.base = {
+-				.cra_name		= "ofb(des3_ede)",
+-				.cra_driver_name	= "aspeed-ofb-tdes",
+-				.cra_priority		= 300,
+-				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
+-							  CRYPTO_ALG_ASYNC |
+-							  CRYPTO_ALG_NEED_FALLBACK,
+-				.cra_blocksize		= DES_BLOCK_SIZE,
+-				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
+-				.cra_alignmask		= 0x0f,
+-				.cra_module		= THIS_MODULE,
+-			}
+-		},
+-		.alg.skcipher.op = {
+-			.do_one_request = aspeed_crypto_do_request,
+-		},
+-	},
+ };
+ 
+ static struct aspeed_hace_alg aspeed_crypto_algs_g6[] = {
