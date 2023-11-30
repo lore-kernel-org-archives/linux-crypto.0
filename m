@@ -1,66 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC42E3C071
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 10:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FGZCAyHD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17286C4339A;
-	Thu, 30 Nov 2023 10:36:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701340606;
-	bh=RjaFcjIuRnKdKLcTUCaGL4xoFcvpDOQ03stuLQOnP14=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=FGZCAyHDyUdYCijgPEpxSVnYG+480sL/RcWgg6kgXt/Tyy6oVPC8IpjrL3T4w9Rzv
-	 Fc6UcvwVFWcLKDpY8I7CihM+7/XKwbMDD+cYA3/Mt66F3Ke/QSbuFVHqHDtmLH465f
-	 PvnMHs2Q/VUiHc8ld5EXPEbProdwAiIm3yFayoFkyNX0mw8QX6SUCZNc3m38Fp9jz8
-	 YNjbsZWGbtPgiE1mVaTUNDG8AdvsSVSC09a0nNipqmRMLW1vO3NiPZtL1x9i0m4QWs
-	 ZR+kgfNyfzPTaLaogVQ/yCTLncTgyFbnHFuzaxXwwv8CVeg869xIY//0hx8/VrHzou
-	 N8F4BWPTKOZXA==
-Content-Type: text/plain; charset="utf-8"
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 644291B3
+	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 04:27:05 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1r8g8B-005IHN-SW; Thu, 30 Nov 2023 20:27:00 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Nov 2023 20:27:09 +0800
+Date: Thu, 30 Nov 2023 20:27:09 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH 0/19] crypto: Remove cfb and ofb
+Message-ID: <ZWh/nV+g46zhURa9@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20231129152145.7767-1-n.zhandarovich@fintech.ru>
-References: <20231129152145.7767-1-n.zhandarovich@fintech.ru>
-Subject: Re: [PATCH] crypto: safexcel - Add error handling for dma_map_sg() calls
-From: Antoine Tenart <atenart@kernel.org>
-Cc: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Herbert Xu <herbert@gondor.apana.org.au>, David S. Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-Date: Thu, 30 Nov 2023 11:36:43 +0100
-Message-ID: <170134060353.9758.8481937396435146454@kwain>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hello Nikita,
+This patch series removes the unused algorithms cfb and ofb.  The
+rule for kernel crypto algorithms is that there must be at least
+one in-kernel user.  CFB used to have a user but it has now gone
+away.  OFB never had any user.
 
-Quoting Nikita Zhandarovich (2023-11-29 16:21:45)
->=20
-> diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/cry=
-pto/inside-secure/safexcel_cipher.c
-> index 272c28b5a088..ca660f31c15f 100644
-> --- a/drivers/crypto/inside-secure/safexcel_cipher.c
-> +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-> @@ -742,9 +742,9 @@ static int safexcel_send_req(struct crypto_async_requ=
-est *base, int ring,
->                                 max(totlen_src, totlen_dst));
->                         return -EINVAL;
->                 }
-> -               if (sreq->nr_src > 0)
-> -                       dma_map_sg(priv->dev, src, sreq->nr_src,
-> -                                  DMA_BIDIRECTIONAL);
-> +               if ((sreq->nr_src > 0) &&
-> +                   (!dma_map_sg(priv->dev, src, sreq->nr_src, DMA_BIDIRE=
-CTIONAL)))
-> +                       return -ENOMEM;
+Herbert Xu (19):
+  crypto: arm64/sm4 - Remove cfb(sm4)
+  crypto: x86/sm4 - Remove cfb(sm4)
+  crypto: crypto4xx - Remove cfb and ofb
+  crypto: aspeed - Remove cfb and ofb
+  crypto: atmel - Remove cfb and ofb
+  crypto: cpt - Remove cfb
+  crypto: nitrox - Remove cfb
+  crypto: ccp - Remove cfb and ofb
+  crypto: hifn_795x - Remove cfb and ofb
+  crypto: hisilicon/sec2 - Remove cfb and ofb
+  crypto: safexcel - Remove cfb and ofb
+  crypto: octeontx - Remove cfb
+  crypto: n2 - Remove cfb
+  crypto: starfive - Remove cfb and ofb
+  crypto: bcm - Remove ofb
+  crypto: ccree - Remove ofb
+  crypto: tcrypt - Remove cfb and ofb
+  crypto: testmgr - Remove cfb and ofb
+  crypto: cfb,ofb - Remove cfb and ofb
 
-You can remove one level of parenthesis. Also I'm not sure -ENOMEM is
-the right error to return. Looking around it seems people got creative
-about that, IMHO -EIO would be best, but not 100% sure.
+ arch/arm64/crypto/Kconfig                     |    6 +-
+ arch/arm64/crypto/sm4-ce-core.S               |  158 ---
+ arch/arm64/crypto/sm4-ce-glue.c               |  108 +-
+ arch/arm64/crypto/sm4-ce.h                    |    3 -
+ arch/arm64/crypto/sm4-neon-core.S             |  113 --
+ arch/arm64/crypto/sm4-neon-glue.c             |  105 +-
+ arch/x86/crypto/Kconfig                       |    8 +-
+ arch/x86/crypto/sm4-aesni-avx-asm_64.S        |   52 -
+ arch/x86/crypto/sm4-aesni-avx2-asm_64.S       |   55 -
+ arch/x86/crypto/sm4-avx.h                     |    4 -
+ arch/x86/crypto/sm4_aesni_avx2_glue.c         |   26 -
+ arch/x86/crypto/sm4_aesni_avx_glue.c          |  130 --
+ crypto/Kconfig                                |   23 -
+ crypto/Makefile                               |    2 -
+ crypto/cfb.c                                  |  254 ----
+ crypto/ofb.c                                  |  106 --
+ crypto/tcrypt.c                               |   76 --
+ crypto/testmgr.c                              |   39 -
+ crypto/testmgr.h                              | 1148 -----------------
+ drivers/crypto/amcc/crypto4xx_alg.c           |   14 -
+ drivers/crypto/amcc/crypto4xx_core.c          |   40 -
+ drivers/crypto/amcc/crypto4xx_core.h          |    4 -
+ drivers/crypto/aspeed/Kconfig                 |    4 +-
+ drivers/crypto/aspeed/aspeed-hace-crypto.c    |  230 ----
+ drivers/crypto/atmel-aes.c                    |  214 +--
+ drivers/crypto/atmel-tdes.c                   |  205 +--
+ drivers/crypto/bcm/cipher.c                   |   57 -
+ drivers/crypto/cavium/cpt/cptvf_algs.c        |   24 -
+ .../crypto/cavium/nitrox/nitrox_skcipher.c    |   19 -
+ drivers/crypto/ccp/ccp-crypto-aes.c           |   18 -
+ drivers/crypto/ccree/cc_cipher.c              |   35 -
+ drivers/crypto/hifn_795x.c                    |  126 +-
+ drivers/crypto/hisilicon/sec2/sec_crypto.c    |   24 -
+ drivers/crypto/inside-secure/safexcel.c       |    4 -
+ drivers/crypto/inside-secure/safexcel.h       |    4 -
+ .../crypto/inside-secure/safexcel_cipher.c    |  152 ---
+ .../crypto/marvell/octeontx/otx_cptvf_algs.c  |   23 -
+ drivers/crypto/n2_core.c                      |   27 +-
+ drivers/crypto/starfive/jh7110-aes.c          |   62 -
+ 39 files changed, 21 insertions(+), 3681 deletions(-)
+ delete mode 100644 crypto/cfb.c
+ delete mode 100644 crypto/ofb.c
 
-Same comments for the other chunks.
-
-Thanks,
-Antoine
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
