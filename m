@@ -1,53 +1,118 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vision-links.com header.i=@vision-links.com header.b="wh4cubwV"
-X-Greylist: delayed 464 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 30 Nov 2023 05:15:34 PST
-Received: from wxpm09.wadax-sv.jp (wxpm09.wadax-sv.jp [203.183.42.83])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04B5CD6C
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 05:15:34 -0800 (PST)
-Received: from wxpm09.wadax-sv.jp (localhost.localdomain [127.0.0.1])
-	by wxpm09.wadax-sv.jp (Proxmox) with ESMTP id 921EB43BD3
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 22:07:48 +0900 (JST)
-Received: from wx116.wadax-sv.jp (wx116.wadax-sv.jp [153.123.7.49])
-	by wxpm09.wadax-sv.jp (Proxmox) with ESMTPS id BADB443BBE
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 22:07:47 +0900 (JST)
-Received: by wx116.wadax-sv.jp (Postfix, from userid 10151)
-	id B2A97E36C5DD2; Thu, 30 Nov 2023 22:07:47 +0900 (JST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vision-links.com;
-	s=default; t=1701349667;
-	bh=S6p5cM8pQWqzmDufR0659+ir6ekty0xZTHakn7J5tUs=; h=To:Subject:From;
-	b=wh4cubwVqmTRGrd0/4jFh3S4sJrCL0URI2QhNZRHUl7GlZGDSc5N7vZZ2i3ZMOD5h
-	 8p4UREErXohhwze7mOzw1AbkIpkuc+KHZw7a43jZs9MOL3iNzMMFUiuSfEKRdffO9h
-	 I9w+xPS25GPPAa6E/dJscF5N9RnO8XeJ4ZVkFSYo=
-To: linux-crypto@vger.kernel.org
-Subject: SMEs AID
-Date: Thu, 30 Nov 2023 22:07:47 +0900
-From: HILTON FOUNDATION <support@vision-links.com>
-Reply-To: hiltonfoundations@gmail.com
-Message-ID: <d1e9c25a5e77334069282b901ff7d858@www.vision-links.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GJXFB4Cb"
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A0A410D5;
+	Thu, 30 Nov 2023 07:18:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701357500; x=1732893500;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=10fw+r5XbxUYA5SnJKr/duWs+Vhz0TMSzhkjID0W420=;
+  b=GJXFB4CbgvGFTlp8q1gPOhKjKxDUWPhtI1eIM7Hs6MLWiZ/3vPloI5Bm
+   s5e1gY0nzHcyoLQR0oyhaYXZLzG9lQ875FyIRl+hw84duB9hSxGzULvvT
+   n2QMtPO8NEZJaRIxautD330A0Gt66S3ugv3iH4kCkEMgwb6xE683ieGhY
+   Vb8MC6UX6vTKANq15azrQ9G/HLdCPhWVyYQVDR4uaZfWQqlhVUghb7TOo
+   PU9siSzGH0FeIjP3bAp+m3Jr7dJ3SVo8j/uh5/atgMsG/dfnsjnHYYj3V
+   FwYgKrhOdb6yUkgYaedbn0RdWYrYSHy9I+cGCP04CLKyUFKwX+gozrpX3
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="383734059"
+X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
+   d="scan'208";a="383734059"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 07:18:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
+   d="scan'208";a="17434854"
+Received: from rafaelfl-mobl.amr.corp.intel.com ([10.212.26.103])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 07:18:19 -0800
+Message-ID: <29ea34917cbfabf2b98b4957b7770683f5994873.camel@linux.intel.com>
+Subject: Re: [PATCH v10 14/14] dmaengine: idxd: Add support for device/wq
+ defaults
+From: Tom Zanussi <tom.zanussi@linux.intel.com>
+To: "Yu, Fenghua" <fenghua.yu@intel.com>, "herbert@gondor.apana.org.au"
+ <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
+  "vkoul@kernel.org" <vkoul@kernel.org>
+Cc: "Jiang, Dave" <dave.jiang@intel.com>, "Luck, Tony"
+ <tony.luck@intel.com>,  "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
+ "Guilford, James" <james.guilford@intel.com>, "Sridhar, Kanchana P"
+ <kanchana.p.sridhar@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>, 
+ "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>, "pavel@ucw.cz"
+ <pavel@ucw.cz>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-crypto@vger.kernel.org"
+ <linux-crypto@vger.kernel.org>, "dmaengine@vger.kernel.org"
+ <dmaengine@vger.kernel.org>
+Date: Thu, 30 Nov 2023 09:18:17 -0600
+In-Reply-To: <IA1PR11MB6097D7EE44240E62DEA9AC769B82A@IA1PR11MB6097.namprd11.prod.outlook.com>
+References: <20231127202704.1263376-1-tom.zanussi@linux.intel.com>
+	 <20231127202704.1263376-15-tom.zanussi@linux.intel.com>
+	 <00aa3b9f-d81e-3dc2-3fb0-bb79e16564d3@intel.com>
+	 <e0d1e4441dc7976450efd07322be0fe5a7526efe.camel@linux.intel.com>
+	 <IA1PR11MB6097D7EE44240E62DEA9AC769B82A@IA1PR11MB6097.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Spam-Level: **
 
-My name is Conrad N. Hilton, CEO of The Hilton Foundations. 
+Hi Fenghua,
 
-I am working with the Centers for Disease Control (CDC)  and The Hilton Foundations, We are offering business grants to your neighborhood as a relief package for SMEs. 
- 
-For more information, visit our website: https://www.hiltonfoundation.org/grants
- 
- We wish you a very happy Christmas.
+On Thu, 2023-11-30 at 00:31 +0000, Yu, Fenghua wrote:
+> Hi, Tom,
+>=20
+> > From: Tom Zanussi <tom.zanussi@linux.intel.com>
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set name to "iaa_cryp=
+to" */
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0memset(wq->name, 0, WQ_N=
+AME_SIZE + 1);
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0strscpy(wq->name, "iaa_c=
+rypto", WQ_NAME_SIZE + 1);
+> > >=20
+> > > Is strcpy(wq->name, "iaa_crypto") simpler than memset() and
+> > > strscpy()?
+> >=20
+> > That's what I originally had, but checkpatch complained about it,
+> > suggesting
+> > strscpy, so I changed it to make checkpatch happy.
+>=20
+> Why is size WQ_NAME_SIZE+1 instead of WQ_NAME_SIZE? Will
+> WQ_NAME_SIZE+1 cause mem corruption because wq->name is defined as a
+> string with WQ_NAME_SIZE?
 
-Best Regards 
+No, wq->name actually is:
 
+        char name[WQ_NAME_SIZE + 1];
 
+This code is doing the same thing as elsewhere in the idxd driver
+except instead of sprintf() it uses strscpy().
 
-Conrad N. Hilton
-Email:    hiltonfoundations@gmail.com
-Phone:   254-271-0344
-Hilton Foundation Customer Success Story | Sage Intact
+> >=20
+> > >=20
+> > > > +
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set driver_name to "c=
+rypto" */
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0memset(wq->driver_name, =
+0, DRIVER_NAME_SIZE + 1);
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0strscpy(wq->driver_name,=
+ "crypto", DRIVER_NAME_SIZE +
+> > > > 1);
+> > >=20
+> > > Is strcpy(wq->driver_name, "crypto") simpler?
+> >=20
+> > Same here.
+>=20
+> Ditto.
+>=20
 
+Same.
+
+Tom
+
+> Thanks.
+>=20
+> -Fenghua
 
