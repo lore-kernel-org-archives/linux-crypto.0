@@ -1,17 +1,17 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38A1ED4A
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 04:28:03 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 438831B3
+	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 04:28:05 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r8g98-005IKY-Pz; Thu, 30 Nov 2023 20:27:59 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Nov 2023 20:28:07 +0800
+	id 1r8g9A-005ILj-Sb; Thu, 30 Nov 2023 20:28:01 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Nov 2023 20:28:10 +0800
 From: "Herbert Xu" <herbert@gondor.apana.org.au>
-Date: Thu, 30 Nov 2023 20:28:07 +0800
-Subject: [PATCH 9/19] crypto: hifn_795x - Remove cfb and ofb
+Date: Thu, 30 Nov 2023 20:28:10 +0800
+Subject: [PATCH 10/19] crypto: hisilicon/sec2 - Remove cfb and ofb
 References: <ZWh/nV+g46zhURa9@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Message-Id: <E1r8g98-005IKY-Pz@formenos.hmeau.com>
+Message-Id: <E1r8g9A-005ILj-Sb@formenos.hmeau.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -23,208 +23,60 @@ Remove the unused CFB/OFB implementation.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/crypto/hifn_795x.c |  126 +--------------------------------------------
- 1 file changed, 3 insertions(+), 123 deletions(-)
+ drivers/crypto/hisilicon/sec2/sec_crypto.c |   24 ------------------------
+ 1 file changed, 24 deletions(-)
 
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index 7bddc3c786c1..b4a4ec35bce0 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -2096,16 +2096,6 @@ static inline int hifn_encrypt_aes_cbc(struct skcipher_request *req)
- 	return hifn_setup_crypto(req, ACRYPTO_OP_ENCRYPT,
- 			ACRYPTO_TYPE_AES_128, ACRYPTO_MODE_CBC);
- }
--static inline int hifn_encrypt_aes_cfb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_ENCRYPT,
--			ACRYPTO_TYPE_AES_128, ACRYPTO_MODE_CFB);
--}
--static inline int hifn_encrypt_aes_ofb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_ENCRYPT,
--			ACRYPTO_TYPE_AES_128, ACRYPTO_MODE_OFB);
--}
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 6fcabbc87860..a1b65391f792 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -879,15 +879,11 @@ static int sec_setkey_##name(struct crypto_skcipher *tfm, const u8 *key,\
+ GEN_SEC_SETKEY_FUNC(aes_ecb, SEC_CALG_AES, SEC_CMODE_ECB)
+ GEN_SEC_SETKEY_FUNC(aes_cbc, SEC_CALG_AES, SEC_CMODE_CBC)
+ GEN_SEC_SETKEY_FUNC(aes_xts, SEC_CALG_AES, SEC_CMODE_XTS)
+-GEN_SEC_SETKEY_FUNC(aes_ofb, SEC_CALG_AES, SEC_CMODE_OFB)
+-GEN_SEC_SETKEY_FUNC(aes_cfb, SEC_CALG_AES, SEC_CMODE_CFB)
+ GEN_SEC_SETKEY_FUNC(aes_ctr, SEC_CALG_AES, SEC_CMODE_CTR)
+ GEN_SEC_SETKEY_FUNC(3des_ecb, SEC_CALG_3DES, SEC_CMODE_ECB)
+ GEN_SEC_SETKEY_FUNC(3des_cbc, SEC_CALG_3DES, SEC_CMODE_CBC)
+ GEN_SEC_SETKEY_FUNC(sm4_xts, SEC_CALG_SM4, SEC_CMODE_XTS)
+ GEN_SEC_SETKEY_FUNC(sm4_cbc, SEC_CALG_SM4, SEC_CMODE_CBC)
+-GEN_SEC_SETKEY_FUNC(sm4_ofb, SEC_CALG_SM4, SEC_CMODE_OFB)
+-GEN_SEC_SETKEY_FUNC(sm4_cfb, SEC_CALG_SM4, SEC_CMODE_CFB)
+ GEN_SEC_SETKEY_FUNC(sm4_ctr, SEC_CALG_SM4, SEC_CMODE_CTR)
  
- /*
-  * AES decryption functions.
-@@ -2120,16 +2110,6 @@ static inline int hifn_decrypt_aes_cbc(struct skcipher_request *req)
- 	return hifn_setup_crypto(req, ACRYPTO_OP_DECRYPT,
- 			ACRYPTO_TYPE_AES_128, ACRYPTO_MODE_CBC);
- }
--static inline int hifn_decrypt_aes_cfb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_DECRYPT,
--			ACRYPTO_TYPE_AES_128, ACRYPTO_MODE_CFB);
--}
--static inline int hifn_decrypt_aes_ofb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_DECRYPT,
--			ACRYPTO_TYPE_AES_128, ACRYPTO_MODE_OFB);
--}
- 
- /*
-  * DES ecryption functions.
-@@ -2144,16 +2124,6 @@ static inline int hifn_encrypt_des_cbc(struct skcipher_request *req)
- 	return hifn_setup_crypto(req, ACRYPTO_OP_ENCRYPT,
- 			ACRYPTO_TYPE_DES, ACRYPTO_MODE_CBC);
- }
--static inline int hifn_encrypt_des_cfb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_ENCRYPT,
--			ACRYPTO_TYPE_DES, ACRYPTO_MODE_CFB);
--}
--static inline int hifn_encrypt_des_ofb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_ENCRYPT,
--			ACRYPTO_TYPE_DES, ACRYPTO_MODE_OFB);
--}
- 
- /*
-  * DES decryption functions.
-@@ -2168,16 +2138,6 @@ static inline int hifn_decrypt_des_cbc(struct skcipher_request *req)
- 	return hifn_setup_crypto(req, ACRYPTO_OP_DECRYPT,
- 			ACRYPTO_TYPE_DES, ACRYPTO_MODE_CBC);
- }
--static inline int hifn_decrypt_des_cfb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_DECRYPT,
--			ACRYPTO_TYPE_DES, ACRYPTO_MODE_CFB);
--}
--static inline int hifn_decrypt_des_ofb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_DECRYPT,
--			ACRYPTO_TYPE_DES, ACRYPTO_MODE_OFB);
--}
- 
- /*
-  * 3DES ecryption functions.
-@@ -2192,16 +2152,6 @@ static inline int hifn_encrypt_3des_cbc(struct skcipher_request *req)
- 	return hifn_setup_crypto(req, ACRYPTO_OP_ENCRYPT,
- 			ACRYPTO_TYPE_3DES, ACRYPTO_MODE_CBC);
- }
--static inline int hifn_encrypt_3des_cfb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_ENCRYPT,
--			ACRYPTO_TYPE_3DES, ACRYPTO_MODE_CFB);
--}
--static inline int hifn_encrypt_3des_ofb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_ENCRYPT,
--			ACRYPTO_TYPE_3DES, ACRYPTO_MODE_OFB);
--}
- 
- /* 3DES decryption functions. */
- static inline int hifn_decrypt_3des_ecb(struct skcipher_request *req)
-@@ -2214,16 +2164,6 @@ static inline int hifn_decrypt_3des_cbc(struct skcipher_request *req)
- 	return hifn_setup_crypto(req, ACRYPTO_OP_DECRYPT,
- 			ACRYPTO_TYPE_3DES, ACRYPTO_MODE_CBC);
- }
--static inline int hifn_decrypt_3des_cfb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_DECRYPT,
--			ACRYPTO_TYPE_3DES, ACRYPTO_MODE_CFB);
--}
--static inline int hifn_decrypt_3des_ofb(struct skcipher_request *req)
--{
--	return hifn_setup_crypto(req, ACRYPTO_OP_DECRYPT,
--			ACRYPTO_TYPE_3DES, ACRYPTO_MODE_OFB);
--}
- 
- struct hifn_alg_template {
- 	char name[CRYPTO_MAX_ALG_NAME];
-@@ -2234,28 +2174,8 @@ struct hifn_alg_template {
- 
- static const struct hifn_alg_template hifn_alg_templates[] = {
- 	/*
--	 * 3DES ECB, CBC, CFB and OFB modes.
-+	 * 3DES ECB and CBC modes.
- 	 */
--	{
--		.name = "cfb(des3_ede)", .drv_name = "cfb-3des", .bsize = 8,
--		.skcipher = {
--			.min_keysize	=	HIFN_3DES_KEY_LENGTH,
--			.max_keysize	=	HIFN_3DES_KEY_LENGTH,
--			.setkey		=	hifn_des3_setkey,
--			.encrypt	=	hifn_encrypt_3des_cfb,
--			.decrypt	=	hifn_decrypt_3des_cfb,
--		},
--	},
--	{
--		.name = "ofb(des3_ede)", .drv_name = "ofb-3des", .bsize = 8,
--		.skcipher = {
--			.min_keysize	=	HIFN_3DES_KEY_LENGTH,
--			.max_keysize	=	HIFN_3DES_KEY_LENGTH,
--			.setkey		=	hifn_des3_setkey,
--			.encrypt	=	hifn_encrypt_3des_ofb,
--			.decrypt	=	hifn_decrypt_3des_ofb,
--		},
--	},
- 	{
- 		.name = "cbc(des3_ede)", .drv_name = "cbc-3des", .bsize = 8,
- 		.skcipher = {
-@@ -2279,28 +2199,8 @@ static const struct hifn_alg_template hifn_alg_templates[] = {
- 	},
- 
- 	/*
--	 * DES ECB, CBC, CFB and OFB modes.
-+	 * DES ECB and CBC modes.
- 	 */
--	{
--		.name = "cfb(des)", .drv_name = "cfb-des", .bsize = 8,
--		.skcipher = {
--			.min_keysize	=	HIFN_DES_KEY_LENGTH,
--			.max_keysize	=	HIFN_DES_KEY_LENGTH,
--			.setkey		=	hifn_setkey,
--			.encrypt	=	hifn_encrypt_des_cfb,
--			.decrypt	=	hifn_decrypt_des_cfb,
--		},
--	},
--	{
--		.name = "ofb(des)", .drv_name = "ofb-des", .bsize = 8,
--		.skcipher = {
--			.min_keysize	=	HIFN_DES_KEY_LENGTH,
--			.max_keysize	=	HIFN_DES_KEY_LENGTH,
--			.setkey		=	hifn_setkey,
--			.encrypt	=	hifn_encrypt_des_ofb,
--			.decrypt	=	hifn_decrypt_des_ofb,
--		},
--	},
- 	{
- 		.name = "cbc(des)", .drv_name = "cbc-des", .bsize = 8,
- 		.skcipher = {
-@@ -2324,7 +2224,7 @@ static const struct hifn_alg_template hifn_alg_templates[] = {
- 	},
- 
- 	/*
--	 * AES ECB, CBC, CFB and OFB modes.
-+	 * AES ECB and CBC modes.
- 	 */
- 	{
- 		.name = "ecb(aes)", .drv_name = "ecb-aes", .bsize = 16,
-@@ -2347,26 +2247,6 @@ static const struct hifn_alg_template hifn_alg_templates[] = {
- 			.decrypt	=	hifn_decrypt_aes_cbc,
- 		},
+ static int sec_cipher_pbuf_map(struct sec_ctx *ctx, struct sec_req *req,
+@@ -2197,16 +2193,6 @@ static struct sec_skcipher sec_skciphers[] = {
+ 		.alg = SEC_SKCIPHER_ALG("xts(aes)", sec_setkey_aes_xts,	SEC_XTS_MIN_KEY_SIZE,
+ 					SEC_XTS_MAX_KEY_SIZE, AES_BLOCK_SIZE, AES_BLOCK_SIZE),
  	},
 -	{
--		.name = "cfb(aes)", .drv_name = "cfb-aes", .bsize = 16,
--		.skcipher = {
--			.min_keysize	=	AES_MIN_KEY_SIZE,
--			.max_keysize	=	AES_MAX_KEY_SIZE,
--			.setkey		=	hifn_setkey,
--			.encrypt	=	hifn_encrypt_aes_cfb,
--			.decrypt	=	hifn_decrypt_aes_cfb,
--		},
+-		.alg_msk = BIT(4),
+-		.alg = SEC_SKCIPHER_ALG("ofb(aes)", sec_setkey_aes_ofb,	AES_MIN_KEY_SIZE,
+-					AES_MAX_KEY_SIZE, SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE),
 -	},
 -	{
--		.name = "ofb(aes)", .drv_name = "ofb-aes", .bsize = 16,
--		.skcipher = {
--			.min_keysize	=	AES_MIN_KEY_SIZE,
--			.max_keysize	=	AES_MAX_KEY_SIZE,
--			.setkey		=	hifn_setkey,
--			.encrypt	=	hifn_encrypt_aes_ofb,
--			.decrypt	=	hifn_decrypt_aes_ofb,
--		},
+-		.alg_msk = BIT(5),
+-		.alg = SEC_SKCIPHER_ALG("cfb(aes)", sec_setkey_aes_cfb,	AES_MIN_KEY_SIZE,
+-					AES_MAX_KEY_SIZE, SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE),
 -	},
- };
- 
- static int hifn_init_tfm(struct crypto_skcipher *tfm)
+ 	{
+ 		.alg_msk = BIT(12),
+ 		.alg = SEC_SKCIPHER_ALG("cbc(sm4)", sec_setkey_sm4_cbc,	AES_MIN_KEY_SIZE,
+@@ -2222,16 +2208,6 @@ static struct sec_skcipher sec_skciphers[] = {
+ 		.alg = SEC_SKCIPHER_ALG("xts(sm4)", sec_setkey_sm4_xts,	SEC_XTS_MIN_KEY_SIZE,
+ 					SEC_XTS_MIN_KEY_SIZE, AES_BLOCK_SIZE, AES_BLOCK_SIZE),
+ 	},
+-	{
+-		.alg_msk = BIT(15),
+-		.alg = SEC_SKCIPHER_ALG("ofb(sm4)", sec_setkey_sm4_ofb,	AES_MIN_KEY_SIZE,
+-					AES_MIN_KEY_SIZE, SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE),
+-	},
+-	{
+-		.alg_msk = BIT(16),
+-		.alg = SEC_SKCIPHER_ALG("cfb(sm4)", sec_setkey_sm4_cfb,	AES_MIN_KEY_SIZE,
+-					AES_MIN_KEY_SIZE, SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE),
+-	},
+ 	{
+ 		.alg_msk = BIT(23),
+ 		.alg = SEC_SKCIPHER_ALG("ecb(des3_ede)", sec_setkey_3des_ecb, SEC_DES3_3KEY_SIZE,
