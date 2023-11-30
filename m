@@ -1,118 +1,61 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CD555772;
+	Thu, 30 Nov 2023 16:56:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GJXFB4Cb"
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A0A410D5;
-	Thu, 30 Nov 2023 07:18:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701357500; x=1732893500;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=10fw+r5XbxUYA5SnJKr/duWs+Vhz0TMSzhkjID0W420=;
-  b=GJXFB4CbgvGFTlp8q1gPOhKjKxDUWPhtI1eIM7Hs6MLWiZ/3vPloI5Bm
-   s5e1gY0nzHcyoLQR0oyhaYXZLzG9lQ875FyIRl+hw84duB9hSxGzULvvT
-   n2QMtPO8NEZJaRIxautD330A0Gt66S3ugv3iH4kCkEMgwb6xE683ieGhY
-   Vb8MC6UX6vTKANq15azrQ9G/HLdCPhWVyYQVDR4uaZfWQqlhVUghb7TOo
-   PU9siSzGH0FeIjP3bAp+m3Jr7dJ3SVo8j/uh5/atgMsG/dfnsjnHYYj3V
-   FwYgKrhOdb6yUkgYaedbn0RdWYrYSHy9I+cGCP04CLKyUFKwX+gozrpX3
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="383734059"
-X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="383734059"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 07:18:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="17434854"
-Received: from rafaelfl-mobl.amr.corp.intel.com ([10.212.26.103])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 07:18:19 -0800
-Message-ID: <29ea34917cbfabf2b98b4957b7770683f5994873.camel@linux.intel.com>
-Subject: Re: [PATCH v10 14/14] dmaengine: idxd: Add support for device/wq
- defaults
-From: Tom Zanussi <tom.zanussi@linux.intel.com>
-To: "Yu, Fenghua" <fenghua.yu@intel.com>, "herbert@gondor.apana.org.au"
- <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
-  "vkoul@kernel.org" <vkoul@kernel.org>
-Cc: "Jiang, Dave" <dave.jiang@intel.com>, "Luck, Tony"
- <tony.luck@intel.com>,  "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
- "Guilford, James" <james.guilford@intel.com>, "Sridhar, Kanchana P"
- <kanchana.p.sridhar@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>, 
- "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>, "pavel@ucw.cz"
- <pavel@ucw.cz>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-crypto@vger.kernel.org"
- <linux-crypto@vger.kernel.org>, "dmaengine@vger.kernel.org"
- <dmaengine@vger.kernel.org>
-Date: Thu, 30 Nov 2023 09:18:17 -0600
-In-Reply-To: <IA1PR11MB6097D7EE44240E62DEA9AC769B82A@IA1PR11MB6097.namprd11.prod.outlook.com>
-References: <20231127202704.1263376-1-tom.zanussi@linux.intel.com>
-	 <20231127202704.1263376-15-tom.zanussi@linux.intel.com>
-	 <00aa3b9f-d81e-3dc2-3fb0-bb79e16564d3@intel.com>
-	 <e0d1e4441dc7976450efd07322be0fe5a7526efe.camel@linux.intel.com>
-	 <IA1PR11MB6097D7EE44240E62DEA9AC769B82A@IA1PR11MB6097.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Ep5mfn6/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59C48C433C9;
+	Thu, 30 Nov 2023 16:56:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1701363418;
+	bh=jNTamNThZ0rAs2o+KORaTzGsMmcQ2kdIW/zV+pisW9M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ep5mfn6/d/046KNhMrPxYSVs2b/H1SbZQJJM57P3hzC8hmlHC+aL7jEbzQHe/bzLV
+	 ZDl9UEr14ekcpfCJk6RDza5apPq9i/1g5VSUREK4wQ/5Ib8LBFZY5NsHmgDKwcsJd5
+	 raSV/4nqny+fZeQRHQXL35saZ9wB+AO2cAuRD2YA=
+Date: Thu, 30 Nov 2023 08:56:57 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Baoquan He <bhe@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Vivek Goyal <vgoyal@redhat.com>,
+ linux-kernel@vger.kernel.org, kexec@lists.infradead.org, x86@kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
+ eric_devolder@yahoo.com
+Subject: Re: [PATCH 1/2] kexec: fix KEXEC_FILE dependencies
+Message-Id: <20231130085657.6f7f500cc17b663747e4ee76@linux-foundation.org>
+In-Reply-To: <ZUNXxp9AIkjQkP9s@MiWiFi-R3L-srv>
+References: <20231023110308.1202042-1-arnd@kernel.org>
+	<ZTe8NOgAjvKDA6z0@MiWiFi-R3L-srv>
+	<b71034f4-5cdc-44e0-b72f-1a8ffae0593e@app.fastmail.com>
+	<ZUNXxp9AIkjQkP9s@MiWiFi-R3L-srv>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Fenghua,
+On Thu, 2 Nov 2023 16:03:18 +0800 Baoquan He <bhe@redhat.com> wrote:
 
-On Thu, 2023-11-30 at 00:31 +0000, Yu, Fenghua wrote:
-> Hi, Tom,
->=20
-> > From: Tom Zanussi <tom.zanussi@linux.intel.com>
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set name to "iaa_cryp=
-to" */
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0memset(wq->name, 0, WQ_N=
-AME_SIZE + 1);
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0strscpy(wq->name, "iaa_c=
-rypto", WQ_NAME_SIZE + 1);
-> > >=20
-> > > Is strcpy(wq->name, "iaa_crypto") simpler than memset() and
-> > > strscpy()?
-> >=20
-> > That's what I originally had, but checkpatch complained about it,
-> > suggesting
-> > strscpy, so I changed it to make checkpatch happy.
->=20
-> Why is size WQ_NAME_SIZE+1 instead of WQ_NAME_SIZE? Will
-> WQ_NAME_SIZE+1 cause mem corruption because wq->name is defined as a
-> string with WQ_NAME_SIZE?
+> > > CONFIG_KEXEC_FILE, but still get purgatory code built in which is
+> > > totally useless.
+> > >
+> > > Not sure if I think too much over this.
+> > 
+> > I see your point here, and I would suggest changing the
+> > CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY symbol to just indicate
+> > the availability of the purgatory code for the arch, rather
+> > than actually controlling the code itself. I already mentioned
+> > this for s390, but riscv would need the same thing on top.
+> > 
+> > I think the change below should address your concern.
+> 
+> Since no new comment, do you mind spinning v2 to wrap all these up?
 
-No, wq->name actually is:
-
-        char name[WQ_NAME_SIZE + 1];
-
-This code is doing the same thing as elsewhere in the idxd driver
-except instead of sprintf() it uses strscpy().
-
-> >=20
-> > >=20
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* set driver_name to "c=
-rypto" */
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0memset(wq->driver_name, =
-0, DRIVER_NAME_SIZE + 1);
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0strscpy(wq->driver_name,=
- "crypto", DRIVER_NAME_SIZE +
-> > > > 1);
-> > >=20
-> > > Is strcpy(wq->driver_name, "crypto") simpler?
-> >=20
-> > Same here.
->=20
-> Ditto.
->=20
-
-Same.
-
-Tom
-
-> Thanks.
->=20
-> -Fenghua
-
+This patchset remains in mm-hotfixes-unstable from the previous -rc
+cycle.  Eric, do you have any comments?  Arnd, do you plan on a v2?  If
+not, should I merge v1?  If so, should I now add cc:stable?
