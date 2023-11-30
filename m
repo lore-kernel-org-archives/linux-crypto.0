@@ -1,198 +1,464 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0435A19F
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 04:28:20 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D60319F
+	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 04:28:24 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r8g9P-005IPq-Jl; Thu, 30 Nov 2023 20:28:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Nov 2023 20:28:24 +0800
+	id 1r8g9T-005IQo-PV; Thu, 30 Nov 2023 20:28:20 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Nov 2023 20:28:28 +0800
 From: "Herbert Xu" <herbert@gondor.apana.org.au>
-Date: Thu, 30 Nov 2023 20:28:24 +0800
-Subject: [PATCH 17/19] crypto: tcrypt - Remove cfb and ofb
+Date: Thu, 30 Nov 2023 20:28:28 +0800
+Subject: [PATCH 19/19] crypto: cfb,ofb - Remove cfb and ofb
 References: <ZWh/nV+g46zhURa9@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Message-Id: <E1r8g9P-005IPq-Jl@formenos.hmeau.com>
+Message-Id: <E1r8g9T-005IQo-PV@formenos.hmeau.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-Remove tests for CFB/OFB.
+Remove the unused algorithms CFB/OFB.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/tcrypt.c |   76 --------------------------------------------------------
- 1 file changed, 76 deletions(-)
+ crypto/Kconfig  |   23 -----
+ crypto/Makefile |    2 
+ crypto/cfb.c    |  254 --------------------------------------------------------
+ crypto/ofb.c    |  106 -----------------------
+ 4 files changed, 385 deletions(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 202ca1a3105d..ea4d1cea9c06 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1524,8 +1524,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 		ret = min(ret, tcrypt_test("xts(aes)"));
- 		ret = min(ret, tcrypt_test("ctr(aes)"));
- 		ret = min(ret, tcrypt_test("rfc3686(ctr(aes))"));
--		ret = min(ret, tcrypt_test("ofb(aes)"));
--		ret = min(ret, tcrypt_test("cfb(aes)"));
- 		ret = min(ret, tcrypt_test("xctr(aes)"));
- 		break;
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 70661f58ee41..7d156c75f15f 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -661,15 +661,6 @@ config CRYPTO_CBC
  
-@@ -1845,14 +1843,12 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 	case 191:
- 		ret = min(ret, tcrypt_test("ecb(sm4)"));
- 		ret = min(ret, tcrypt_test("cbc(sm4)"));
--		ret = min(ret, tcrypt_test("cfb(sm4)"));
- 		ret = min(ret, tcrypt_test("ctr(sm4)"));
- 		ret = min(ret, tcrypt_test("xts(sm4)"));
- 		break;
- 	case 192:
- 		ret = min(ret, tcrypt_test("ecb(aria)"));
- 		ret = min(ret, tcrypt_test("cbc(aria)"));
--		ret = min(ret, tcrypt_test("cfb(aria)"));
- 		ret = min(ret, tcrypt_test("ctr(aria)"));
- 		break;
- 	case 200:
-@@ -1880,10 +1876,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				speed_template_16_24_32);
- 		test_cipher_speed("ctr(aes)", DECRYPT, sec, NULL, 0,
- 				speed_template_16_24_32);
--		test_cipher_speed("cfb(aes)", ENCRYPT, sec, NULL, 0,
--				speed_template_16_24_32);
--		test_cipher_speed("cfb(aes)", DECRYPT, sec, NULL, 0,
--				speed_template_16_24_32);
- 		break;
+ 	  This block cipher mode is required for IPSec ESP (XFRM_ESP).
  
- 	case 201:
-@@ -2115,10 +2107,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				speed_template_16);
- 		test_cipher_speed("cts(cbc(sm4))", DECRYPT, sec, NULL, 0,
- 				speed_template_16);
--		test_cipher_speed("cfb(sm4)", ENCRYPT, sec, NULL, 0,
--				speed_template_16);
--		test_cipher_speed("cfb(sm4)", DECRYPT, sec, NULL, 0,
--				speed_template_16);
- 		test_cipher_speed("ctr(sm4)", ENCRYPT, sec, NULL, 0,
- 				speed_template_16);
- 		test_cipher_speed("ctr(sm4)", DECRYPT, sec, NULL, 0,
-@@ -2198,10 +2186,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				  speed_template_16_24_32);
- 		test_cipher_speed("cbc(aria)", DECRYPT, sec, NULL, 0,
- 				  speed_template_16_24_32);
--		test_cipher_speed("cfb(aria)", ENCRYPT, sec, NULL, 0,
--				  speed_template_16_24_32);
--		test_cipher_speed("cfb(aria)", DECRYPT, sec, NULL, 0,
--				  speed_template_16_24_32);
- 		test_cipher_speed("ctr(aria)", ENCRYPT, sec, NULL, 0,
- 				  speed_template_16_24_32);
- 		test_cipher_speed("ctr(aria)", DECRYPT, sec, NULL, 0,
-@@ -2436,14 +2420,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				   speed_template_16_24_32);
- 		test_acipher_speed("ctr(aes)", DECRYPT, sec, NULL, 0,
- 				   speed_template_16_24_32);
--		test_acipher_speed("cfb(aes)", ENCRYPT, sec, NULL, 0,
--				   speed_template_16_24_32);
--		test_acipher_speed("cfb(aes)", DECRYPT, sec, NULL, 0,
--				   speed_template_16_24_32);
--		test_acipher_speed("ofb(aes)", ENCRYPT, sec, NULL, 0,
--				   speed_template_16_24_32);
--		test_acipher_speed("ofb(aes)", DECRYPT, sec, NULL, 0,
--				   speed_template_16_24_32);
- 		test_acipher_speed("rfc3686(ctr(aes))", ENCRYPT, sec, NULL, 0,
- 				   speed_template_20_28_36);
- 		test_acipher_speed("rfc3686(ctr(aes))", DECRYPT, sec, NULL, 0,
-@@ -2463,18 +2439,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 		test_acipher_speed("cbc(des3_ede)", DECRYPT, sec,
- 				   des3_speed_template, DES3_SPEED_VECTORS,
- 				   speed_template_24);
--		test_acipher_speed("cfb(des3_ede)", ENCRYPT, sec,
--				   des3_speed_template, DES3_SPEED_VECTORS,
--				   speed_template_24);
--		test_acipher_speed("cfb(des3_ede)", DECRYPT, sec,
--				   des3_speed_template, DES3_SPEED_VECTORS,
--				   speed_template_24);
--		test_acipher_speed("ofb(des3_ede)", ENCRYPT, sec,
--				   des3_speed_template, DES3_SPEED_VECTORS,
--				   speed_template_24);
--		test_acipher_speed("ofb(des3_ede)", DECRYPT, sec,
--				   des3_speed_template, DES3_SPEED_VECTORS,
--				   speed_template_24);
- 		break;
+-config CRYPTO_CFB
+-	tristate "CFB (Cipher Feedback)"
+-	select CRYPTO_SKCIPHER
+-	select CRYPTO_MANAGER
+-	help
+-	  CFB (Cipher Feedback) mode (NIST SP800-38A)
+-
+-	  This block cipher mode is required for TPM2 Cryptography.
+-
+ config CRYPTO_CTR
+ 	tristate "CTR (Counter)"
+ 	select CRYPTO_SKCIPHER
+@@ -735,20 +726,6 @@ config CRYPTO_LRW
  
- 	case 502:
-@@ -2486,14 +2450,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				   speed_template_8);
- 		test_acipher_speed("cbc(des)", DECRYPT, sec, NULL, 0,
- 				   speed_template_8);
--		test_acipher_speed("cfb(des)", ENCRYPT, sec, NULL, 0,
--				   speed_template_8);
--		test_acipher_speed("cfb(des)", DECRYPT, sec, NULL, 0,
--				   speed_template_8);
--		test_acipher_speed("ofb(des)", ENCRYPT, sec, NULL, 0,
--				   speed_template_8);
--		test_acipher_speed("ofb(des)", DECRYPT, sec, NULL, 0,
--				   speed_template_8);
- 		break;
+ 	  See https://people.csail.mit.edu/rivest/pubs/LRW02.pdf
  
- 	case 503:
-@@ -2632,10 +2588,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				speed_template_16);
- 		test_acipher_speed("cbc(sm4)", DECRYPT, sec, NULL, 0,
- 				speed_template_16);
--		test_acipher_speed("cfb(sm4)", ENCRYPT, sec, NULL, 0,
--				speed_template_16);
--		test_acipher_speed("cfb(sm4)", DECRYPT, sec, NULL, 0,
--				speed_template_16);
- 		test_acipher_speed("ctr(sm4)", ENCRYPT, sec, NULL, 0,
- 				speed_template_16);
- 		test_acipher_speed("ctr(sm4)", DECRYPT, sec, NULL, 0,
-@@ -2682,14 +2634,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				       speed_template_16_24_32, num_mb);
- 		test_mb_skcipher_speed("ctr(aes)", DECRYPT, sec, NULL, 0,
- 				       speed_template_16_24_32, num_mb);
--		test_mb_skcipher_speed("cfb(aes)", ENCRYPT, sec, NULL, 0,
--				       speed_template_16_24_32, num_mb);
--		test_mb_skcipher_speed("cfb(aes)", DECRYPT, sec, NULL, 0,
--				       speed_template_16_24_32, num_mb);
--		test_mb_skcipher_speed("ofb(aes)", ENCRYPT, sec, NULL, 0,
--				       speed_template_16_24_32, num_mb);
--		test_mb_skcipher_speed("ofb(aes)", DECRYPT, sec, NULL, 0,
--				       speed_template_16_24_32, num_mb);
- 		test_mb_skcipher_speed("rfc3686(ctr(aes))", ENCRYPT, sec, NULL,
- 				       0, speed_template_20_28_36, num_mb);
- 		test_mb_skcipher_speed("rfc3686(ctr(aes))", DECRYPT, sec, NULL,
-@@ -2709,18 +2653,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 		test_mb_skcipher_speed("cbc(des3_ede)", DECRYPT, sec,
- 				       des3_speed_template, DES3_SPEED_VECTORS,
- 				       speed_template_24, num_mb);
--		test_mb_skcipher_speed("cfb(des3_ede)", ENCRYPT, sec,
--				       des3_speed_template, DES3_SPEED_VECTORS,
--				       speed_template_24, num_mb);
--		test_mb_skcipher_speed("cfb(des3_ede)", DECRYPT, sec,
--				       des3_speed_template, DES3_SPEED_VECTORS,
--				       speed_template_24, num_mb);
--		test_mb_skcipher_speed("ofb(des3_ede)", ENCRYPT, sec,
--				       des3_speed_template, DES3_SPEED_VECTORS,
--				       speed_template_24, num_mb);
--		test_mb_skcipher_speed("ofb(des3_ede)", DECRYPT, sec,
--				       des3_speed_template, DES3_SPEED_VECTORS,
--				       speed_template_24, num_mb);
- 		break;
- 
- 	case 602:
-@@ -2732,14 +2664,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				       speed_template_8, num_mb);
- 		test_mb_skcipher_speed("cbc(des)", DECRYPT, sec, NULL, 0,
- 				       speed_template_8, num_mb);
--		test_mb_skcipher_speed("cfb(des)", ENCRYPT, sec, NULL, 0,
--				       speed_template_8, num_mb);
--		test_mb_skcipher_speed("cfb(des)", DECRYPT, sec, NULL, 0,
--				       speed_template_8, num_mb);
--		test_mb_skcipher_speed("ofb(des)", ENCRYPT, sec, NULL, 0,
--				       speed_template_8, num_mb);
--		test_mb_skcipher_speed("ofb(des)", DECRYPT, sec, NULL, 0,
--				       speed_template_8, num_mb);
- 		break;
- 
- 	case 603:
+-config CRYPTO_OFB
+-	tristate "OFB (Output Feedback)"
+-	select CRYPTO_SKCIPHER
+-	select CRYPTO_MANAGER
+-	help
+-	  OFB (Output Feedback) mode (NIST SP800-38A)
+-
+-	  This mode makes a block cipher into a synchronous
+-	  stream cipher. It generates keystream blocks, which are then XORed
+-	  with the plaintext blocks to get the ciphertext. Flipping a bit in the
+-	  ciphertext produces a flipped bit in the plaintext at the same
+-	  location. This property allows many error correcting codes to function
+-	  normally even when applied before encryption.
+-
+ config CRYPTO_PCBC
+ 	tristate "PCBC (Propagating Cipher Block Chaining)"
+ 	select CRYPTO_SKCIPHER
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 5ac6876f935a..408f0a1f9ab9 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -92,7 +92,6 @@ obj-$(CONFIG_CRYPTO_BLAKE2B) += blake2b_generic.o
+ CFLAGS_blake2b_generic.o := -Wframe-larger-than=4096 #  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105930
+ obj-$(CONFIG_CRYPTO_ECB) += ecb.o
+ obj-$(CONFIG_CRYPTO_CBC) += cbc.o
+-obj-$(CONFIG_CRYPTO_CFB) += cfb.o
+ obj-$(CONFIG_CRYPTO_PCBC) += pcbc.o
+ obj-$(CONFIG_CRYPTO_CTS) += cts.o
+ obj-$(CONFIG_CRYPTO_LRW) += lrw.o
+@@ -186,7 +185,6 @@ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
+ obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
+ obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
+-obj-$(CONFIG_CRYPTO_OFB) += ofb.o
+ obj-$(CONFIG_CRYPTO_ECC) += ecc.o
+ obj-$(CONFIG_CRYPTO_ESSIV) += essiv.o
+ obj-$(CONFIG_CRYPTO_CURVE25519) += curve25519-generic.o
+diff --git a/crypto/cfb.c b/crypto/cfb.c
+deleted file mode 100644
+index 5c36b7b65e2a..000000000000
+--- a/crypto/cfb.c
++++ /dev/null
+@@ -1,254 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/*
+- * CFB: Cipher FeedBack mode
+- *
+- * Copyright (c) 2018 James.Bottomley@HansenPartnership.com
+- *
+- * CFB is a stream cipher mode which is layered on to a block
+- * encryption scheme.  It works very much like a one time pad where
+- * the pad is generated initially from the encrypted IV and then
+- * subsequently from the encrypted previous block of ciphertext.  The
+- * pad is XOR'd into the plain text to get the final ciphertext.
+- *
+- * The scheme of CFB is best described by wikipedia:
+- *
+- * https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#CFB
+- *
+- * Note that since the pad for both encryption and decryption is
+- * generated by an encryption operation, CFB never uses the block
+- * decryption function.
+- */
+-
+-#include <crypto/algapi.h>
+-#include <crypto/internal/cipher.h>
+-#include <crypto/internal/skcipher.h>
+-#include <linux/err.h>
+-#include <linux/init.h>
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <linux/string.h>
+-
+-static unsigned int crypto_cfb_bsize(struct crypto_skcipher *tfm)
+-{
+-	return crypto_cipher_blocksize(skcipher_cipher_simple(tfm));
+-}
+-
+-static void crypto_cfb_encrypt_one(struct crypto_skcipher *tfm,
+-					  const u8 *src, u8 *dst)
+-{
+-	crypto_cipher_encrypt_one(skcipher_cipher_simple(tfm), dst, src);
+-}
+-
+-/* final encrypt and decrypt is the same */
+-static void crypto_cfb_final(struct skcipher_walk *walk,
+-			     struct crypto_skcipher *tfm)
+-{
+-	const unsigned long alignmask = crypto_skcipher_alignmask(tfm);
+-	u8 tmp[MAX_CIPHER_BLOCKSIZE + MAX_CIPHER_ALIGNMASK];
+-	u8 *stream = PTR_ALIGN(tmp + 0, alignmask + 1);
+-	u8 *src = walk->src.virt.addr;
+-	u8 *dst = walk->dst.virt.addr;
+-	u8 *iv = walk->iv;
+-	unsigned int nbytes = walk->nbytes;
+-
+-	crypto_cfb_encrypt_one(tfm, iv, stream);
+-	crypto_xor_cpy(dst, stream, src, nbytes);
+-}
+-
+-static int crypto_cfb_encrypt_segment(struct skcipher_walk *walk,
+-				      struct crypto_skcipher *tfm)
+-{
+-	const unsigned int bsize = crypto_cfb_bsize(tfm);
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
+-	u8 *dst = walk->dst.virt.addr;
+-	u8 *iv = walk->iv;
+-
+-	do {
+-		crypto_cfb_encrypt_one(tfm, iv, dst);
+-		crypto_xor(dst, src, bsize);
+-		iv = dst;
+-
+-		src += bsize;
+-		dst += bsize;
+-	} while ((nbytes -= bsize) >= bsize);
+-
+-	memcpy(walk->iv, iv, bsize);
+-
+-	return nbytes;
+-}
+-
+-static int crypto_cfb_encrypt_inplace(struct skcipher_walk *walk,
+-				      struct crypto_skcipher *tfm)
+-{
+-	const unsigned int bsize = crypto_cfb_bsize(tfm);
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
+-	u8 *iv = walk->iv;
+-	u8 tmp[MAX_CIPHER_BLOCKSIZE];
+-
+-	do {
+-		crypto_cfb_encrypt_one(tfm, iv, tmp);
+-		crypto_xor(src, tmp, bsize);
+-		iv = src;
+-
+-		src += bsize;
+-	} while ((nbytes -= bsize) >= bsize);
+-
+-	memcpy(walk->iv, iv, bsize);
+-
+-	return nbytes;
+-}
+-
+-static int crypto_cfb_encrypt(struct skcipher_request *req)
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct skcipher_walk walk;
+-	unsigned int bsize = crypto_cfb_bsize(tfm);
+-	int err;
+-
+-	err = skcipher_walk_virt(&walk, req, false);
+-
+-	while (walk.nbytes >= bsize) {
+-		if (walk.src.virt.addr == walk.dst.virt.addr)
+-			err = crypto_cfb_encrypt_inplace(&walk, tfm);
+-		else
+-			err = crypto_cfb_encrypt_segment(&walk, tfm);
+-		err = skcipher_walk_done(&walk, err);
+-	}
+-
+-	if (walk.nbytes) {
+-		crypto_cfb_final(&walk, tfm);
+-		err = skcipher_walk_done(&walk, 0);
+-	}
+-
+-	return err;
+-}
+-
+-static int crypto_cfb_decrypt_segment(struct skcipher_walk *walk,
+-				      struct crypto_skcipher *tfm)
+-{
+-	const unsigned int bsize = crypto_cfb_bsize(tfm);
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
+-	u8 *dst = walk->dst.virt.addr;
+-	u8 *iv = walk->iv;
+-
+-	do {
+-		crypto_cfb_encrypt_one(tfm, iv, dst);
+-		crypto_xor(dst, src, bsize);
+-		iv = src;
+-
+-		src += bsize;
+-		dst += bsize;
+-	} while ((nbytes -= bsize) >= bsize);
+-
+-	memcpy(walk->iv, iv, bsize);
+-
+-	return nbytes;
+-}
+-
+-static int crypto_cfb_decrypt_inplace(struct skcipher_walk *walk,
+-				      struct crypto_skcipher *tfm)
+-{
+-	const unsigned int bsize = crypto_cfb_bsize(tfm);
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
+-	u8 * const iv = walk->iv;
+-	u8 tmp[MAX_CIPHER_BLOCKSIZE];
+-
+-	do {
+-		crypto_cfb_encrypt_one(tfm, iv, tmp);
+-		memcpy(iv, src, bsize);
+-		crypto_xor(src, tmp, bsize);
+-		src += bsize;
+-	} while ((nbytes -= bsize) >= bsize);
+-
+-	return nbytes;
+-}
+-
+-static int crypto_cfb_decrypt_blocks(struct skcipher_walk *walk,
+-				     struct crypto_skcipher *tfm)
+-{
+-	if (walk->src.virt.addr == walk->dst.virt.addr)
+-		return crypto_cfb_decrypt_inplace(walk, tfm);
+-	else
+-		return crypto_cfb_decrypt_segment(walk, tfm);
+-}
+-
+-static int crypto_cfb_decrypt(struct skcipher_request *req)
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct skcipher_walk walk;
+-	const unsigned int bsize = crypto_cfb_bsize(tfm);
+-	int err;
+-
+-	err = skcipher_walk_virt(&walk, req, false);
+-
+-	while (walk.nbytes >= bsize) {
+-		err = crypto_cfb_decrypt_blocks(&walk, tfm);
+-		err = skcipher_walk_done(&walk, err);
+-	}
+-
+-	if (walk.nbytes) {
+-		crypto_cfb_final(&walk, tfm);
+-		err = skcipher_walk_done(&walk, 0);
+-	}
+-
+-	return err;
+-}
+-
+-static int crypto_cfb_create(struct crypto_template *tmpl, struct rtattr **tb)
+-{
+-	struct skcipher_instance *inst;
+-	struct crypto_alg *alg;
+-	int err;
+-
+-	inst = skcipher_alloc_instance_simple(tmpl, tb);
+-	if (IS_ERR(inst))
+-		return PTR_ERR(inst);
+-
+-	alg = skcipher_ialg_simple(inst);
+-
+-	/* CFB mode is a stream cipher. */
+-	inst->alg.base.cra_blocksize = 1;
+-
+-	/*
+-	 * To simplify the implementation, configure the skcipher walk to only
+-	 * give a partial block at the very end, never earlier.
+-	 */
+-	inst->alg.chunksize = alg->cra_blocksize;
+-
+-	inst->alg.encrypt = crypto_cfb_encrypt;
+-	inst->alg.decrypt = crypto_cfb_decrypt;
+-
+-	err = skcipher_register_instance(tmpl, inst);
+-	if (err)
+-		inst->free(inst);
+-
+-	return err;
+-}
+-
+-static struct crypto_template crypto_cfb_tmpl = {
+-	.name = "cfb",
+-	.create = crypto_cfb_create,
+-	.module = THIS_MODULE,
+-};
+-
+-static int __init crypto_cfb_module_init(void)
+-{
+-	return crypto_register_template(&crypto_cfb_tmpl);
+-}
+-
+-static void __exit crypto_cfb_module_exit(void)
+-{
+-	crypto_unregister_template(&crypto_cfb_tmpl);
+-}
+-
+-subsys_initcall(crypto_cfb_module_init);
+-module_exit(crypto_cfb_module_exit);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("CFB block cipher mode of operation");
+-MODULE_ALIAS_CRYPTO("cfb");
+-MODULE_IMPORT_NS(CRYPTO_INTERNAL);
+diff --git a/crypto/ofb.c b/crypto/ofb.c
+deleted file mode 100644
+index b630fdecceee..000000000000
+--- a/crypto/ofb.c
++++ /dev/null
+@@ -1,106 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-
+-/*
+- * OFB: Output FeedBack mode
+- *
+- * Copyright (C) 2018 ARM Limited or its affiliates.
+- * All rights reserved.
+- */
+-
+-#include <crypto/algapi.h>
+-#include <crypto/internal/cipher.h>
+-#include <crypto/internal/skcipher.h>
+-#include <linux/err.h>
+-#include <linux/init.h>
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-
+-static int crypto_ofb_crypt(struct skcipher_request *req)
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct crypto_cipher *cipher = skcipher_cipher_simple(tfm);
+-	const unsigned int bsize = crypto_cipher_blocksize(cipher);
+-	struct skcipher_walk walk;
+-	int err;
+-
+-	err = skcipher_walk_virt(&walk, req, false);
+-
+-	while (walk.nbytes >= bsize) {
+-		const u8 *src = walk.src.virt.addr;
+-		u8 *dst = walk.dst.virt.addr;
+-		u8 * const iv = walk.iv;
+-		unsigned int nbytes = walk.nbytes;
+-
+-		do {
+-			crypto_cipher_encrypt_one(cipher, iv, iv);
+-			crypto_xor_cpy(dst, src, iv, bsize);
+-			dst += bsize;
+-			src += bsize;
+-		} while ((nbytes -= bsize) >= bsize);
+-
+-		err = skcipher_walk_done(&walk, nbytes);
+-	}
+-
+-	if (walk.nbytes) {
+-		crypto_cipher_encrypt_one(cipher, walk.iv, walk.iv);
+-		crypto_xor_cpy(walk.dst.virt.addr, walk.src.virt.addr, walk.iv,
+-			       walk.nbytes);
+-		err = skcipher_walk_done(&walk, 0);
+-	}
+-	return err;
+-}
+-
+-static int crypto_ofb_create(struct crypto_template *tmpl, struct rtattr **tb)
+-{
+-	struct skcipher_instance *inst;
+-	struct crypto_alg *alg;
+-	int err;
+-
+-	inst = skcipher_alloc_instance_simple(tmpl, tb);
+-	if (IS_ERR(inst))
+-		return PTR_ERR(inst);
+-
+-	alg = skcipher_ialg_simple(inst);
+-
+-	/* OFB mode is a stream cipher. */
+-	inst->alg.base.cra_blocksize = 1;
+-
+-	/*
+-	 * To simplify the implementation, configure the skcipher walk to only
+-	 * give a partial block at the very end, never earlier.
+-	 */
+-	inst->alg.chunksize = alg->cra_blocksize;
+-
+-	inst->alg.encrypt = crypto_ofb_crypt;
+-	inst->alg.decrypt = crypto_ofb_crypt;
+-
+-	err = skcipher_register_instance(tmpl, inst);
+-	if (err)
+-		inst->free(inst);
+-
+-	return err;
+-}
+-
+-static struct crypto_template crypto_ofb_tmpl = {
+-	.name = "ofb",
+-	.create = crypto_ofb_create,
+-	.module = THIS_MODULE,
+-};
+-
+-static int __init crypto_ofb_module_init(void)
+-{
+-	return crypto_register_template(&crypto_ofb_tmpl);
+-}
+-
+-static void __exit crypto_ofb_module_exit(void)
+-{
+-	crypto_unregister_template(&crypto_ofb_tmpl);
+-}
+-
+-subsys_initcall(crypto_ofb_module_init);
+-module_exit(crypto_ofb_module_exit);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("OFB block cipher mode of operation");
+-MODULE_ALIAS_CRYPTO("ofb");
+-MODULE_IMPORT_NS(CRYPTO_INTERNAL);
