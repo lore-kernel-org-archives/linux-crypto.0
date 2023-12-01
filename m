@@ -1,62 +1,112 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="fQjRHmY5"
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38076F2
-	for <linux-crypto@vger.kernel.org>; Fri,  1 Dec 2023 12:04:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=dxveFagBNj5/ty55lDPJPyZWurWMS/8ve7eeXES38tY=;
-	t=1701461074; x=1702670674; b=fQjRHmY55FQ0y5++oc7gX3SbqbIeYIr57eRzHqXWxx/Auj8
-	CU2GP2cC87NUSO75aZBESr8Xpz0aW2SMxtOL1peqOcNwVC0lYW8LVhqTT4oFj9CCg+VSCFs9y4tVn
-	3UT9C53TnTGvAAADzjAgD2unG82TlgnxqwdPxRxUw24SWxuEbl7WEVKF11nBcAfGNn67fcm4aD+gN
-	uVxK9NasihFAMs7XIXO+vzUpg3x2O6YCcxYyK9lP+s+ngXOPygy5IeVMH9WaUhliDyk5mDCH3844X
-	nTi0olAcwH93E7rLJ6sYubX4hiO86Q9PXvyqUa/tp/Ra5fxmPFCytd1dLehsZYyA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1r99kV-0000000BRhY-1WHh;
-	Fri, 01 Dec 2023 21:04:31 +0100
-Message-ID: <640c12810b336aa99584697e21215f3cacb13c79.camel@sipsolutions.net>
-Subject: Re: jitterentropy vs. simulation
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Simo Sorce <simo@redhat.com>, Anton Ivanov
- <anton.ivanov@kot-begemot.co.uk>,  linux-um@lists.infradead.org
-Cc: linux-crypto@vger.kernel.org, Stephan =?ISO-8859-1?Q?M=FCller?=
-	 <smueller@chronox.de>
-Date: Fri, 01 Dec 2023 21:04:30 +0100
-In-Reply-To: <e1b3ccb744d67e6214cf206ba8480cb3e35694cf.camel@redhat.com>
-References: 
-	<e4800de3138d3987d9f3c68310fcd9f3abc7a366.camel@sipsolutions.net>
-	 <7db861e3-60e4-0ed4-9b28-25a89069a9db@kot-begemot.co.uk>
-	 <8ddb48606cebe4e404d17a627138aa5c5af6dccd.camel@sipsolutions.net>
-	 <e1b3ccb744d67e6214cf206ba8480cb3e35694cf.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C5uqzDXJ"
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482AF103;
+	Fri,  1 Dec 2023 12:11:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701461463; x=1732997463;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=buoGPdrkkKx4hhUIceeTcYHbzYQ9xgtGVojseC0ReWs=;
+  b=C5uqzDXJOig6els6eSQNIsYQ2lgRZi4t8SJhob8WhbWElTM/cJq9NqYD
+   e18jEd66G/gVWAafZyDQlt2x24Kt09CQmjzJrcLf6Z9aBAc+1/0p2/STG
+   4BUS6f2zdFD5ZRbg9qLTrBs40oS4l7m0l6V8ErANfzh+PPf+/7qsztzEX
+   gwAg5yjGZzFqw9Aqn7xB3dS+vyHwgB864F2Ou3E5sPWjU5GxPG2kpe5cn
+   x/Kpwi/gR53Qd/H5aG0S3KmrMOeBIeDT3h0WVii8f/tsvy8gwcmeOEtfN
+   WG8P2++S1EYdDuzutkNtKjs91dUE7WAeywN8haCBEzUWKV8vQ2PDUWkEQ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="427749"
+X-IronPort-AV: E=Sophos;i="6.04,242,1695711600"; 
+   d="scan'208";a="427749"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 12:10:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="860671125"
+X-IronPort-AV: E=Sophos;i="6.04,242,1695711600"; 
+   d="scan'208";a="860671125"
+Received: from temersox-mobl2.amr.corp.intel.com (HELO tzanussi-mobl1.amr.corp.intel.com) ([10.213.166.197])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 12:10:41 -0800
+From: Tom Zanussi <tom.zanussi@linux.intel.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	fenghua.yu@intel.com,
+	vkoul@kernel.org
+Cc: dave.jiang@intel.com,
+	tony.luck@intel.com,
+	wajdi.k.feghali@intel.com,
+	james.guilford@intel.com,
+	kanchana.p.sridhar@intel.com,
+	vinodh.gopal@intel.com,
+	giovanni.cabiddu@intel.com,
+	pavel@ucw.cz,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org
+Subject: [PATCH v11 01/14] dmaengine: idxd: add external module driver support for dsa_bus_type
+Date: Fri,  1 Dec 2023 14:10:22 -0600
+Message-Id: <20231201201035.172465-2-tom.zanussi@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231201201035.172465-1-tom.zanussi@linux.intel.com>
+References: <20231201201035.172465-1-tom.zanussi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
 
-On Fri, 2023-12-01 at 14:25 -0500, Simo Sorce wrote:
->=20
-> Doesn't this imply the simulation is not complete
+From: Dave Jiang <dave.jiang@intel.com>
 
-Kind of?
+Add support to allow an external driver to be registered to the
+dsa_bus_type and also auto-loaded.
 
->  and you need to add
-> clock jitter for the simulation to be more useful?
->=20
+Signed-off-by: Dave Jiang <dave.jiang@intel.com>
+Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+Reviewed-by: Fenghua Yu <fenghua.yu@intel.com>
+Acked-by: Vinod Koul <vkoul@kernel.org>
+---
+ drivers/dma/idxd/bus.c  | 6 ++++++
+ drivers/dma/idxd/idxd.h | 3 +++
+ 2 files changed, 9 insertions(+)
 
-No, it's more _intentionally_ incomplete. This works fine in normal
-ARCH=3Dum, but with time-travel variants we have more of a discrete event-
-based simulation, to integrates well with other things (e.g. SystemC or
-similar based device simulations). So this is quite intentional, and
-yes, it breaks in a few spots such as this one.
+diff --git a/drivers/dma/idxd/bus.c b/drivers/dma/idxd/bus.c
+index 6f84621053c6..0c9e689a2e77 100644
+--- a/drivers/dma/idxd/bus.c
++++ b/drivers/dma/idxd/bus.c
+@@ -67,11 +67,17 @@ static void idxd_config_bus_remove(struct device *dev)
+ 	idxd_drv->remove(idxd_dev);
+ }
+ 
++static int idxd_bus_uevent(const struct device *dev, struct kobj_uevent_env *env)
++{
++	return add_uevent_var(env, "MODALIAS=" IDXD_DEVICES_MODALIAS_FMT, 0);
++}
++
+ struct bus_type dsa_bus_type = {
+ 	.name = "dsa",
+ 	.match = idxd_config_bus_match,
+ 	.probe = idxd_config_bus_probe,
+ 	.remove = idxd_config_bus_remove,
++	.uevent = idxd_bus_uevent,
+ };
+ EXPORT_SYMBOL_GPL(dsa_bus_type);
+ 
+diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
+index 1e89c80a07fc..e541d19f14d0 100644
+--- a/drivers/dma/idxd/idxd.h
++++ b/drivers/dma/idxd/idxd.h
+@@ -655,6 +655,9 @@ static inline int idxd_wq_driver_name_match(struct idxd_wq *wq, struct device *d
+ 	return (strncmp(wq->driver_name, dev->driver->name, strlen(dev->driver->name)) == 0);
+ }
+ 
++#define MODULE_ALIAS_IDXD_DEVICE(type) MODULE_ALIAS("idxd:t" __stringify(type) "*")
++#define IDXD_DEVICES_MODALIAS_FMT "idxd:t%d"
++
+ int __must_check __idxd_driver_register(struct idxd_device_driver *idxd_drv,
+ 					struct module *module, const char *mod_name);
+ #define idxd_driver_register(driver) \
+-- 
+2.34.1
 
-johannes
