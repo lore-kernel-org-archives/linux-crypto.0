@@ -1,228 +1,132 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="K9gFhz8Q"
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EA0713E
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 18:09:48 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-5c632a97786so48066a12.0
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 18:09:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1701396588; x=1702001388; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZARUzLOCPbgkdrEMse1VgYWmJt+Qe6ydA0SeWnrZFk4=;
-        b=K9gFhz8QY0cvt1mt2tGSzYFp053wIkTePGGFlpUGikKYuPxdpO+ajWDIpFtBK/MDGv
-         HQqoUtdtONom96jUqC3Sg3LyDKRrPC+E7VwOklnpr5p3GVZuZs+thXf1RU1Av1+vozwz
-         EMahE4kwwUxf2YFHIVuLS//Vpax0NeDx6+8oAOSAtUfOhzWLbw8/1nEondWYBYw1BZk4
-         WONFRBRZWhOgrT6cRLNFSwfumWyZt77ZRaSYGcxN+5Woj3qZgkTdXeZQQXnccmyS31ZR
-         pxXhq1ZA32iRe3Bvrf/oJSWZvGhCPGTnUWQ5zEVxpoZPInw1DE9aogLTA+F7FufndDec
-         mJzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701396588; x=1702001388;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZARUzLOCPbgkdrEMse1VgYWmJt+Qe6ydA0SeWnrZFk4=;
-        b=nEHOWEnEWOlpXyXVCPsBuEimz/oZ+8R6iVJo59SbGj0m2Jbh2r3QRwHZZRTrmzv0Z0
-         d9LqUxhI/ETi82e7s5dD1ajJxkXe8ySGl9MujlPqZy+V7i6eGECicJnoQmF9/2RXRBJA
-         hZsAwjosZr28moxZAZOpMS+cAIiClJqWUvknHGq9WuVE01Lazjzlqb8EtCdLOGxDhbtQ
-         LLcUhJq74Bm6oviM9csESfXbGFqCCg1nORb42uRReIAfvG88c11jE4vXubTLNLL9mgv7
-         4fElA3xEcrg9IDucrh5EynRYS0ak7U3PmOtI9uz4k7NwQsHCtqCKSzjGRKRjPr2c2Syj
-         3l4g==
-X-Gm-Message-State: AOJu0Ywj9YvzlUVYSJ4VnghSqSRiM5xsilLcf2nuRJu/tq0UPCD3fm7y
-	NliueF5Il7Tli6t5bPhzCpI8kA==
-X-Google-Smtp-Source: AGHT+IFrFltqEh9QH9Yno5D9numI3ZTsffVOt7/NhqriRU6xzwbOediCIeDoxAviM9Lpx+G4Hg5LGg==
-X-Received: by 2002:a05:6a20:8409:b0:18b:8dfa:88e8 with SMTP id c9-20020a056a20840900b0018b8dfa88e8mr25889206pzd.43.1701396587726;
-        Thu, 30 Nov 2023 18:09:47 -0800 (PST)
-Received: from ?IPv6:2402:7500:4ce:83aa:9da8:481:b9cc:c515? ([2402:7500:4ce:83aa:9da8:481:b9cc:c515])
-        by smtp.gmail.com with ESMTPSA id e12-20020a17090301cc00b001cc436e9806sm2092007plh.81.2023.11.30.18.09.44
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 30 Nov 2023 18:09:47 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6FBF12B
+	for <linux-crypto@vger.kernel.org>; Thu, 30 Nov 2023 19:38:02 -0800 (PST)
+Received: from kwepemm000005.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ShJf16jcxzWhf2
+	for <linux-crypto@vger.kernel.org>; Fri,  1 Dec 2023 11:37:13 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemm000005.china.huawei.com (7.193.23.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 1 Dec 2023 11:38:00 +0800
+Subject: Re: [PATCH 10/19] crypto: hisilicon/sec2 - Remove cfb and ofb
+To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto Mailing List
+	<linux-crypto@vger.kernel.org>
+References: <ZWh/nV+g46zhURa9@gondor.apana.org.au>
+ <E1r8g9A-005ILj-Sb@formenos.hmeau.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <2f75977b-1383-908d-bf32-5084ef260c53@huawei.com>
+Date: Fri, 1 Dec 2023 11:37:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
-Subject: Re: [PATCH v2 05/13] crypto: simd - Update `walksize` in simd
- skcipher
-From: Jerry Shih <jerry.shih@sifive.com>
-In-Reply-To: <20231128172204.GB1148@sol.localdomain>
-Date: Fri, 1 Dec 2023 10:09:43 +0800
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
- palmer@dabbelt.com,
- Albert Ou <aou@eecs.berkeley.edu>,
- herbert@gondor.apana.org.au,
- davem@davemloft.net,
- conor.dooley@microchip.com,
- ardb@kernel.org,
- heiko@sntech.de,
- phoebe.chen@sifive.com,
- hongrong.hsu@sifive.com,
- linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <9F698DA6-51EB-4819-AE5C-1E6B145B4EF2@sifive.com>
-References: <20231127070703.1697-1-jerry.shih@sifive.com>
- <20231127070703.1697-6-jerry.shih@sifive.com>
- <20231128035814.GH1463@sol.localdomain>
- <56F07E23-CA7D-466B-84C7-643F2839E199@sifive.com>
- <20231128172204.GB1148@sol.localdomain>
-To: Eric Biggers <ebiggers@kernel.org>
-X-Mailer: Apple Mail (2.3445.9.7)
+MIME-Version: 1.0
+In-Reply-To: <E1r8g9A-005ILj-Sb@formenos.hmeau.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm000005.china.huawei.com (7.193.23.27)
+X-CFilter-Loop: Reflected
 
-On Nov 29, 2023, at 01:22, Eric Biggers <ebiggers@kernel.org> wrote:
-> On Tue, Nov 28, 2023 at 01:38:29PM +0800, Jerry Shih wrote:
->> On Nov 28, 2023, at 11:58, Eric Biggers <ebiggers@kernel.org> wrote:
->>> On Mon, Nov 27, 2023 at 03:06:55PM +0800, Jerry Shih wrote:
->>>> The `walksize` assignment is missed in simd skcipher.
->>>>=20
->>>> Signed-off-by: Jerry Shih <jerry.shih@sifive.com>
->>>> ---
->>>> crypto/cryptd.c | 1 +
->>>> crypto/simd.c   | 1 +
->>>> 2 files changed, 2 insertions(+)
->>>>=20
->>>> diff --git a/crypto/cryptd.c b/crypto/cryptd.c
->>>> index bbcc368b6a55..253d13504ccb 100644
->>>> --- a/crypto/cryptd.c
->>>> +++ b/crypto/cryptd.c
->>>> @@ -405,6 +405,7 @@ static int cryptd_create_skcipher(struct =
-crypto_template *tmpl,
->>>> 		(alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
->>>> 	inst->alg.ivsize =3D crypto_skcipher_alg_ivsize(alg);
->>>> 	inst->alg.chunksize =3D crypto_skcipher_alg_chunksize(alg);
->>>> +	inst->alg.walksize =3D crypto_skcipher_alg_walksize(alg);
->>>> 	inst->alg.min_keysize =3D crypto_skcipher_alg_min_keysize(alg);
->>>> 	inst->alg.max_keysize =3D crypto_skcipher_alg_max_keysize(alg);
->>>>=20
->>>> diff --git a/crypto/simd.c b/crypto/simd.c
->>>> index edaa479a1ec5..ea0caabf90f1 100644
->>>> --- a/crypto/simd.c
->>>> +++ b/crypto/simd.c
->>>> @@ -181,6 +181,7 @@ struct simd_skcipher_alg =
-*simd_skcipher_create_compat(const char *algname,
->>>>=20
->>>> 	alg->ivsize =3D ialg->ivsize;
->>>> 	alg->chunksize =3D ialg->chunksize;
->>>> +	alg->walksize =3D ialg->walksize;
->>>> 	alg->min_keysize =3D ialg->min_keysize;
->>>> 	alg->max_keysize =3D ialg->max_keysize;
->>>=20
->>> What are the consequences of this bug?  I wonder if it actually =
-matters?  The
->>> "inner" algorithm is the one that actually gets used for the "walk", =
-right?
->>>=20
->>> - Eric
->>=20
->> Without this, we might still use chunksize or cra_blocksize as the =
-walksize
->> even though we setup with the larger walksize.
->>=20
->> Here is the code for the walksize default value:
->> 	static int skcipher_prepare_alg(struct skcipher_alg *alg)
->> 	{
->> 		...
->> 		if (!alg->chunksize)
->> 			alg->chunksize =3D base->cra_blocksize;
->> 		if (!alg->walksize)
->> 			alg->walksize =3D alg->chunksize;
->>=20
->> And we already have the bigger walksize for x86 aes-xts.
->> 		.base =3D {
->> 			.cra_name		=3D "__xts(aes)",
->> 			...
->> 		},
->> 		.walksize	=3D 2 * AES_BLOCK_SIZE,
->>=20
->> The x86 aes-xts only uses one `walk` to handle the tail elements. It =
-assumes
->> that the walksize contains 2 aes blocks. If walksize is not set =
-correctly, maybe
->> some tail elements is not processed in simd-cipher mode for x86 =
-aes-xts.
->=20
-> With the SIMD helper there are three "algorithms": the underlying =
-algorithm, the
-> cryptd algorithm, and the simd algorithm.  This patch makes the =
-"walksize"
-> property be propagated from the underlying algorithm to the cryptd and =
-simd
-> algorithms.  I don't see how that actually makes a difference, since =
-the only
-> place the skcipher_walk happens is on the underlying algorithm.  So it =
-uses the
-> "walksize" from the underlying algorithm, right?
->=20
-> - Eric
+On 2023/11/30 20:28, Herbert Xu wrote:
+> Remove the unused CFB/OFB implementation.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+> 
+>  drivers/crypto/hisilicon/sec2/sec_crypto.c |   24 ------------------------
+>  1 file changed, 24 deletions(-)
+> 
+> diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+> index 6fcabbc87860..a1b65391f792 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
+> +++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+> @@ -879,15 +879,11 @@ static int sec_setkey_##name(struct crypto_skcipher *tfm, const u8 *key,\
+>  GEN_SEC_SETKEY_FUNC(aes_ecb, SEC_CALG_AES, SEC_CMODE_ECB)
+>  GEN_SEC_SETKEY_FUNC(aes_cbc, SEC_CALG_AES, SEC_CMODE_CBC)
+>  GEN_SEC_SETKEY_FUNC(aes_xts, SEC_CALG_AES, SEC_CMODE_XTS)
+> -GEN_SEC_SETKEY_FUNC(aes_ofb, SEC_CALG_AES, SEC_CMODE_OFB)
+> -GEN_SEC_SETKEY_FUNC(aes_cfb, SEC_CALG_AES, SEC_CMODE_CFB)
+>  GEN_SEC_SETKEY_FUNC(aes_ctr, SEC_CALG_AES, SEC_CMODE_CTR)
+>  GEN_SEC_SETKEY_FUNC(3des_ecb, SEC_CALG_3DES, SEC_CMODE_ECB)
+>  GEN_SEC_SETKEY_FUNC(3des_cbc, SEC_CALG_3DES, SEC_CMODE_CBC)
+>  GEN_SEC_SETKEY_FUNC(sm4_xts, SEC_CALG_SM4, SEC_CMODE_XTS)
+>  GEN_SEC_SETKEY_FUNC(sm4_cbc, SEC_CALG_SM4, SEC_CMODE_CBC)
+> -GEN_SEC_SETKEY_FUNC(sm4_ofb, SEC_CALG_SM4, SEC_CMODE_OFB)
+> -GEN_SEC_SETKEY_FUNC(sm4_cfb, SEC_CALG_SM4, SEC_CMODE_CFB)
+>  GEN_SEC_SETKEY_FUNC(sm4_ctr, SEC_CALG_SM4, SEC_CMODE_CTR)
+>  
+>  static int sec_cipher_pbuf_map(struct sec_ctx *ctx, struct sec_req *req,
+> @@ -2197,16 +2193,6 @@ static struct sec_skcipher sec_skciphers[] = {
+>  		.alg = SEC_SKCIPHER_ALG("xts(aes)", sec_setkey_aes_xts,	SEC_XTS_MIN_KEY_SIZE,
+>  					SEC_XTS_MAX_KEY_SIZE, AES_BLOCK_SIZE, AES_BLOCK_SIZE),
+>  	},
+> -	{
+> -		.alg_msk = BIT(4),
+> -		.alg = SEC_SKCIPHER_ALG("ofb(aes)", sec_setkey_aes_ofb,	AES_MIN_KEY_SIZE,
+> -					AES_MAX_KEY_SIZE, SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE),
+> -	},
+> -	{
+> -		.alg_msk = BIT(5),
+> -		.alg = SEC_SKCIPHER_ALG("cfb(aes)", sec_setkey_aes_cfb,	AES_MIN_KEY_SIZE,
+> -					AES_MAX_KEY_SIZE, SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE),
+> -	},
+>  	{
+>  		.alg_msk = BIT(12),
+>  		.alg = SEC_SKCIPHER_ALG("cbc(sm4)", sec_setkey_sm4_cbc,	AES_MIN_KEY_SIZE,
+> @@ -2222,16 +2208,6 @@ static struct sec_skcipher sec_skciphers[] = {
+>  		.alg = SEC_SKCIPHER_ALG("xts(sm4)", sec_setkey_sm4_xts,	SEC_XTS_MIN_KEY_SIZE,
+>  					SEC_XTS_MIN_KEY_SIZE, AES_BLOCK_SIZE, AES_BLOCK_SIZE),
+>  	},
+> -	{
+> -		.alg_msk = BIT(15),
+> -		.alg = SEC_SKCIPHER_ALG("ofb(sm4)", sec_setkey_sm4_ofb,	AES_MIN_KEY_SIZE,
+> -					AES_MIN_KEY_SIZE, SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE),
+> -	},
+> -	{
+> -		.alg_msk = BIT(16),
+> -		.alg = SEC_SKCIPHER_ALG("cfb(sm4)", sec_setkey_sm4_cfb,	AES_MIN_KEY_SIZE,
+> -					AES_MIN_KEY_SIZE, SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE),
+> -	},
+>  	{
+>  		.alg_msk = BIT(23),
+>  		.alg = SEC_SKCIPHER_ALG("ecb(des3_ede)", sec_setkey_3des_ecb, SEC_DES3_3KEY_SIZE,
+> 
+> .
+>
+Hi,Herbert:
+Removed OFB and CFB modes. There are still some codes that need to be deleted.
+I wrote the complete patch content below:
 
-Yes, you are right.
-I re-check the cryptd and simd cipher flow. They use the underlying =
-algorithms.
-So, the actual `walksize` in the underlying algorithm is set by the user =
-in
-skcipher_alg def.
-The x86 aes-xts works correctly for both cryptd and simd-cipher case.
-
-This patch becomes fixing the `walksize` display error in =
-`/proc/crypto`.
-
-The aes-xts skcipher_alg def:
-	...
-	.ivsize =3D AES_BLOCK_SIZE,
-	.chunksize =3D AES_BLOCK_SIZE,
-	.walksize =3D AES_BLOCK_SIZE * 8,
-	.base =3D {
-		.cra_flags =3D CRYPTO_ALG_INTERNAL,
-		.cra_name =3D "__xts(aes)",
-		.cra_driver_name =3D =
-"__xts-aes-riscv64-zvkned-zvbb-zvkg",
-		...
-	},
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+ static int sec_cipher_pbuf_map(struct sec_ctx *ctx, struct sec_req *req,
+@@ -2032,8 +2028,6 @@ static int sec_skcipher_cryptlen_check(struct sec_ctx *ctx,
+ 			ret = -EINVAL;
+ 		}
+ 		break;
+-	case SEC_CMODE_CFB:
+-	case SEC_CMODE_OFB:
+ 	case SEC_CMODE_CTR:
+ 		if (unlikely(ctx->sec->qm.ver < QM_HW_V3)) {
+ 			dev_err(dev, "skcipher HW version error!\n");
 
 
-Without patch:=09
-The original skcipher:
-	name         : __xts(aes)
-	driver       : __xts-aes-riscv64-zvkned-zvbb-zvkg
-	internal     : yes
-	async        : no
-	...
-	walksize     : 128
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+@@ -37,8 +37,6 @@ enum sec_mac_len {
+ enum sec_cmode {
+ 	SEC_CMODE_ECB    = 0x0,
+ 	SEC_CMODE_CBC    = 0x1,
+-	SEC_CMODE_CFB    = 0x2,
+-	SEC_CMODE_OFB    = 0x3,
+ 	SEC_CMODE_CTR    = 0x4,
+ 	SEC_CMODE_CCM    = 0x5,
+ 	SEC_CMODE_GCM    = 0x6,
 
-The async skcipher registered by simd_register_skciphers_compat:
-	name         : xts(aes)
-	driver       : xts-aes-riscv64-zvkned-zvbb-zvkg
-	internal     : no
-	async        : yes
-	...
-	walksize     : 16
 
-	...
-	name         : __xts(aes)
-	driver       : cryptd(__xts-aes-riscv64-zvkned-zvbb-zvkg)
-	internal     : yes
-	async        : yes
-	...
-	walksize     : 16
-
-With patch:
-	name         : xts(aes)
-	driver       : xts-aes-riscv64-zvkned-zvbb-zvkg
-	internal     : no
-	async        : yes
-	...
-	walksize     : 128
-
-	...
-	name         : __xts(aes)
-	driver       : cryptd(__xts-aes-riscv64-zvkned-zvbb-zvkg)
-	internal     : yes
-	async        : yes
-	...
-	walksize     : 128
-
+Thanks,
+Longfang.
