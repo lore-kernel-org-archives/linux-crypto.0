@@ -1,67 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="XEFyTw9Y"
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63D2B197
-	for <linux-crypto@vger.kernel.org>; Fri,  1 Dec 2023 10:35:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=fG2Fz4H3y08YKpGEdC2oAWvh9beJ6Xli5gxvnBYWfVU=;
-	t=1701455715; x=1702665315; b=XEFyTw9Y+h+QCzl6gRDFFx4QuVn/ODExXKfw/qJ7pehvo+n
-	SBPe867rINz8dr6EL7HP6JDPrvkhCSwIVPRVkyS5UHEO9k5yuOR9kFkP8M9GXm32pnRkktb3MYclK
-	AeO8OiUvYQ8t2nFvKHbnexAUdmztRljv/Ckrt9gnjJT9NWwtYz9POOLN7NThDGe46sm09TvzfkCpA
-	Sw7HxgYarqTugZJC+Hlao+HZyLcd/HrDzVCDkD46Fx5nWuM4d6WgVt2A8NXWCWfHkBf1MNsFGOZ+B
-	Ic1pAUcEh/wKnY3RXNuR58DZNcXDHtABHN81QzxJRAOWBGMSpCPmwGpammF4eF2g==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1r98M4-0000000BPGG-1voz;
-	Fri, 01 Dec 2023 19:35:12 +0100
-Message-ID: <8ddb48606cebe4e404d17a627138aa5c5af6dccd.camel@sipsolutions.net>
-Subject: Re: jitterentropy vs. simulation
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Anton Ivanov <anton.ivanov@kot-begemot.co.uk>, 
-	linux-um@lists.infradead.org
-Cc: linux-crypto@vger.kernel.org, Stephan =?ISO-8859-1?Q?M=FCller?=
-	 <smueller@chronox.de>
-Date: Fri, 01 Dec 2023 19:35:11 +0100
-In-Reply-To: <7db861e3-60e4-0ed4-9b28-25a89069a9db@kot-begemot.co.uk>
-References: 
-	<e4800de3138d3987d9f3c68310fcd9f3abc7a366.camel@sipsolutions.net>
-	 <7db861e3-60e4-0ed4-9b28-25a89069a9db@kot-begemot.co.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+X-Greylist: delayed 1799 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 01 Dec 2023 10:40:27 PST
+Received: from bues.ch (bues.ch [IPv6:2a01:138:9005::1:4])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F32FE10EA
+	for <linux-crypto@vger.kernel.org>; Fri,  1 Dec 2023 10:40:27 -0800 (PST)
+Received: by bues.ch with esmtpsa (Exim 4.96)
+	(envelope-from <m@bues.ch>)
+	id 1r97gb-00045v-36;
+	Fri, 01 Dec 2023 18:52:21 +0100
+Date: Fri, 1 Dec 2023 18:51:12 +0100
+From: Michael =?UTF-8?B?QsO8c2No?= <m@bues.ch>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: sunying@isrc.iscas.ac.cn, linux-kernel@vger.kernel.org, Neal Liu
+ <neal_liu@aspeedtech.com>, David Howells <dhowells@redhat.com>,
+ linux-crypto@vger.kernel.org, "pengpeng@iscas.ac.cn"
+ <pengpeng@iscas.ac.cn>, "renyanjie01@gmail.com" <renyanjie01@gmail.com>
+Subject: Re: Non-existing CONFIG_ options are used in source code
+Message-ID: <20231201185112.1499c5ab@barney>
+In-Reply-To: <1553cd01-37fe-48c6-a6e3-b6ea9974d40b@infradead.org>
+References: <4e8525fe.607e2.18a8ddfdce8.Coremail.sunying@isrc.iscas.ac.cn>
+	<1553cd01-37fe-48c6-a6e3-b6ea9974d40b@infradead.org>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: multipart/signed; boundary="Sig_/F1enqjq600B0_Bs.sGSFFKE";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
 
-[I guess we should keep the CCs so other see it]
+--Sig_/F1enqjq600B0_Bs.sGSFFKE
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> Looking at the stuck check it will be bogus in simulations.
+On Mon, 13 Nov 2023 20:52:03 -0800
+Randy Dunlap <rdunlap@infradead.org> wrote:
 
-True.
-
-> You might as well ifdef that instead.
+> On 9/13/23 02:29, sunying@isrc.iscas.ac.cn wrote:
+> > The following configuration options are not defined
+> >  (they may have been deleted or not yet added)
+> >  but are used in the source files.
+> >=20
+> > Is there something in these that might need fixing?
+> >=20
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > 1. CONFIG_NETFS_DEBUG
+> > fs/netfs/internal.h:122:#elif defined(CONFIG_NETFS_DEBUG)
+> >=20
+> > 2. CONFIG_SSB_DEBUG
+> > include/linux/ssb/ssb.h:626:#ifdef CONFIG_SSB_DEBUG
+> >=20
+> > 3. CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO_DEBUG
+> > drivers/crypto/aspeed/aspeed-hace-crypto.c:19:#ifdef
+> > CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO_DEBUG
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =20
 >=20
-> If a simulation is running insert the entropy regardless and do not compu=
-te the derivatives used in the check.
+> Yes, please send separate patches to remove each of them.
 
-Actually you mostly don't want anything inserted in that case, so it's
-not bad to skip it.
+I agree for CONFIG_SSB_DEBUG.
 
-I was mostly thinking this might be better than adding a completely
-unrelated ifdef. Also I guess in real systems with a bad implementation
-of random_get_entropy(), the second/third derivates might be
-constant/zero for quite a while, so may be better to abort?
+The function __ssb_dma_not_implemented() where CONFIG_SSB_DEBUG is used
+can be removed and the switch-default where __ssb_dma_not_implemented()
+is called can also be removed.
 
-In any case, I couldn't figure out any way to not configure this into
-the kernel when any kind of crypto is also in ...
+--=20
+Michael B=C3=BCsch
+https://bues.ch/
 
-johannes
+--Sig_/F1enqjq600B0_Bs.sGSFFKE
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEihRzkKVZOnT2ipsS9TK+HZCNiw4FAmVqHRAACgkQ9TK+HZCN
+iw61rA/9EKvsLfN9tBm61ftuiqXy5aDQd25tJicd1GEyHQANvatVK+gAgjileilU
+4EvnGqVXSPC+9+41vFPAII7ZevON38mtnoW8AU1xh5j5YD075cuT0uu1nPaILjW1
+Uuj/66Kj/ZEFaPHLbDZuhUeT+TtZw7I9pkSxkyqhm7RpYH4lzHal47c/4yi8oRM4
+xnjzvK98MtUymNjRUz0ofTreCjqnTNIZ32rIaQgv8ln/SevxYFPoYIHBtJxoY70F
+lTLLi5YHrAjtp/WWHP7JTx7b6RhfDuOhhbd5HcXZgP8FrG7P4Ud1xk+MLRoJsm1u
+Z8ZGhrRTQKZsrtY3dp2dwoOfBfC/THMY4q73SlSqyuNbu7vTlH0/nHxks0Rp+Kxx
+L9CH6ACEpkjq22gaFP/cE2fSnlBpzvv5v9aL0kMNYdPjXNDCMsgLQHmE0qID0ZJG
+74xZvD2v1STgS0j55ZykQuN+NMEPda1tSzYd2B/M9hevHd7PCUx0+z/E/hYHzVms
+KHfBiwxOK9mOxakcujjeMZtJmXUhhchmoEVKFPKEQ3XciAv3irPe3nJKI6TaOeeM
+ypDiU7tuBHJHSHIEdptStnDIkbJ15ununTKTJ/im5V6s1Ofl+4BTPGcDpkBnrtCw
+lOvy8Li4FbsP/9fH9q2alzIGwQUl1GXnUF9xIGWPalJWr+DrkWo=
+=/Ulg
+-----END PGP SIGNATURE-----
+
+--Sig_/F1enqjq600B0_Bs.sGSFFKE--
