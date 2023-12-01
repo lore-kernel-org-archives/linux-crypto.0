@@ -1,92 +1,111 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="TEz1kNwK"
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692A8A8
-	for <linux-crypto@vger.kernel.org>; Fri,  1 Dec 2023 02:20:40 -0800 (PST)
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 3B19RQ37024616;
-	Fri, 1 Dec 2023 11:20:17 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=eH7QCL/HgO5fMZ7eXd5hJkyiBFa7hbWuKmQuQSf7qKI=; b=TE
-	z1kNwKlDmzJP+OwK1OHW9tZaQ0/A8j84HNEgR3hFEhHgxnCYQ05z83TJvwgPygdD
-	zxt0CU6ijgVu9qS2FGaDKs5tbu6NSyX6rzejYv+JyWB+tCsmXPuC14B55b1qOLMt
-	MXUaz5t0UgKnb8y1Yfe9HQEYJAKawaeVUWrV7HzuYpLZVyf8ybRIqpxeFlQaMAav
-	dm4W1NGngQJJ+SNCxneAXlssVU0MmbC34Do0ptkFARoQTP8VfoCj6NYANK1H3sIC
-	my8PYYwLXAa9uOUqJwvzf5nJF/JmMAU+sGUiNttWQnCx53rNv+sgCuPR3WdkrvcF
-	i/OykepDz6X3S74RhYfg==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3uk8pkakfb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 11:20:17 +0100 (CET)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 7E33C100079;
-	Fri,  1 Dec 2023 11:20:15 +0100 (CET)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 7622E215152;
-	Fri,  1 Dec 2023 11:20:15 +0100 (CET)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 1 Dec
- 2023 11:20:14 +0100
-Message-ID: <94981d84-52c4-4c9a-8042-c622d73d1e0e@foss.st.com>
-Date: Fri, 1 Dec 2023 11:18:59 +0100
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Jw8F8MW3"
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 335D5CC
+	for <linux-crypto@vger.kernel.org>; Fri,  1 Dec 2023 02:21:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=fAPRMgCuD7LRyrAM3c4Hjh0YOMt2p9kLheGGBT4T6NE=; t=1701426118; x=1702635718; 
+	b=Jw8F8MW3nnCUoTH59aENJ3SUHjSw08rIKACX/fG+gL5LhHpzhDUKaRkEeBDDhge8HCdwIIk1kGr
+	opHZLv2JWXLB0WNPUQ2BgOqMWrcXVrKbSB5T+CJoPgBVVPMskmuYKyPGwiAHmaIK1DJBrtGQH4A+s
+	OzLWMsHBR8b0j46vdRCxpBW5O/5rVF/XTpxH5XBCeT/eQFKPWPYf1ASYhZeEs/dDhouM93aIGf8XI
+	yU8bWXJNsgffi4l3Ls5gu4OGFFpHaTNK/YkSX7SPURsaAC76suoFeU/hCNp5u8adikxkvnOn3/shC
+	V+ej04VOmO3cS6VfZo05wDz58xsPiW7J9TUg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1r90eg-0000000BAoz-2lO2;
+	Fri, 01 Dec 2023 11:21:54 +0100
+Message-ID: <e4800de3138d3987d9f3c68310fcd9f3abc7a366.camel@sipsolutions.net>
+Subject: jitterentropy vs. simulation
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc: linux-um@lists.infradead.org, linux-crypto@vger.kernel.org
+Date: Fri, 01 Dec 2023 11:21:53 +0100
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] hwrng: stm32 - add missing clk_disable_unprepare() in
- stm32_rng_init()
-To: Yang Yingliang <yangyingliang@huaweicloud.com>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>
-CC: <herbert@gondor.apana.org.au>, <mcoquelin.stm32@gmail.com>,
-        <alexandre.torgue@foss.st.com>, <yangyingliang@huawei.com>
-References: <20231201082048.1975940-1-yangyingliang@huaweicloud.com>
-Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20231201082048.1975940-1-yangyingliang@huaweicloud.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-01_08,2023-11-30_01,2023-05-22_02
+X-malware-bazaar: not-scanned
 
-Hi Yang,
+Hi,
 
-Good spot, thank you.
+In ARCH=3Dum, we have a mode where we simulate clocks completely, and even
+simulate that the CPU is infinitely fast. Thus, reading the clock will
+return completely predictable values regardless of the work happening.
 
-Reviewed-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+This is clearly incompatible with jitterentropy, but now jitterentropy
+seems to be mandatory on pretty much every system that needs any crypto,
+so we can't just seem to turn it off (any more?)
 
-Best regards,
-Gatien
+Now given that the (simulated) clock doesn't have jitter, it's derivates
+are all constant/zero, and so jent_measure_jitter() - called via
+jent_entropy_collector_alloc() - will always detect a stuck measurement,
+and thus jent_gen_entropy() loops infinitely.
 
-On 12/1/23 09:20, Yang Yingliang wrote:
-> From: Yang Yingliang <yangyingliang@huawei.com>
-> 
-> Add clk_disable_unprepare() in the error path in stm32_rng_init().
-> 
-> Fixes: 6b85a7e141cb ("hwrng: stm32 - implement STM32MP13x support")
-> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
-> ---
->   drivers/char/hw_random/stm32-rng.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-> index 41e1dbea5d2e..efd6edcd7066 100644
-> --- a/drivers/char/hw_random/stm32-rng.c
-> +++ b/drivers/char/hw_random/stm32-rng.c
-> @@ -325,6 +325,7 @@ static int stm32_rng_init(struct hwrng *rng)
->   							(!(reg & RNG_CR_CONDRST)),
->   							10, 50000);
->   		if (err) {
-> +			clk_disable_unprepare(priv->clk);
->   			dev_err((struct device *)priv->rng.priv,
->   				"%s: timeout %x!\n", __func__, reg);
->   			return -EINVAL;
+I wonder what you'd think about a patch like this?
+
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -552,10 +552,13 @@ static int jent_measure_jitter(struct rand_data *ec, =
+__u64 *ret_current_delta)
+  * Function fills rand_data->hash_state
+  *
+  * @ec [in] Reference to entropy collector
++ *
++ * Return: 0 if entropy reading failed (was stuck), 1 otherwise
+  */
+-static void jent_gen_entropy(struct rand_data *ec)
++static int jent_gen_entropy(struct rand_data *ec)
+ {
+ 	unsigned int k =3D 0, safety_factor =3D 0;
++	unsigned int stuck_counter =3D 0;
+=20
+ 	if (fips_enabled)
+ 		safety_factor =3D JENT_ENTROPY_SAFETY_FACTOR;
+@@ -565,8 +568,13 @@ static void jent_gen_entropy(struct rand_data *ec)
+=20
+ 	while (!jent_health_failure(ec)) {
+ 		/* If a stuck measurement is received, repeat measurement */
+-		if (jent_measure_jitter(ec, NULL))
++		if (jent_measure_jitter(ec, NULL)) {
++			if (stuck_counter++ > 100)
++				return 0;
+ 			continue;
++		}
++
++		stuck_counter =3D 0;
+=20
+ 		/*
+ 		 * We multiply the loop value with ->osr to obtain the
+@@ -575,6 +583,8 @@ static void jent_gen_entropy(struct rand_data *ec)
+ 		if (++k >=3D ((DATA_SIZE_BITS + safety_factor) * ec->osr))
+ 			break;
+ 	}
++
++	return 1;
+ }
+=20
+ /*
+@@ -611,7 +621,8 @@ int jent_read_entropy(struct rand_data *ec, unsigned ch=
+ar *data,
+ 	while (len > 0) {
+ 		unsigned int tocopy, health_test_result;
+=20
+-		jent_gen_entropy(ec);
++		if (!jent_gen_entropy(ec))
++			return -3;
+=20
+ 		health_test_result =3D jent_health_failure(ec);
+ 		if (health_test_result > JENT_PERMANENT_FAILURE_SHIFT) {
+
+
+johannes
