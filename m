@@ -1,19 +1,18 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 415F0DC;
-	Fri,  1 Dec 2023 02:10:44 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E3A784;
+	Fri,  1 Dec 2023 02:11:31 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r90Th-005hiX-2F; Fri, 01 Dec 2023 18:10:34 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 01 Dec 2023 18:10:42 +0800
-Date: Fri, 1 Dec 2023 18:10:42 +0800
+	id 1r90UM-005hjr-EA; Fri, 01 Dec 2023 18:11:15 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 01 Dec 2023 18:11:23 +0800
+Date: Fri, 1 Dec 2023 18:11:23 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Gonglei Arei <arei.gonglei@huawei.com>
-Cc: linux-crypto@vger.kernel.org, pasic@linux.ibm.com, mst@redhat.com,
-	jasowang@redhat.com, virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org, wangyangxin1@huawei.com,
-	arei.gonglei@huawei.com
-Subject: Re: [PATCH] crypto: virtio-crypto: Handle dataq logic  with tasklet
-Message-ID: <ZWmxInHyFboXMWZ6@gondor.apana.org.au>
+To: Jia Jie Ho <jiajie.ho@starfivetech.com>
+Cc: Olivia Mackall <olivia@selenic.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hwrng: starfive - Fix dev_err_probe return error
+Message-ID: <ZWmxSzlRL7T9PmAz@gondor.apana.org.au>
+References: <20231120151121.60942-1-jiajie.ho@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -22,22 +21,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b2fe5c6a60984a9e91bd9dea419c5154@huawei.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel,apana.lists.os.linux.virtualization
+In-Reply-To: <20231120151121.60942-1-jiajie.ho@starfivetech.com>
 
-Gonglei Arei <arei.gonglei@huawei.com> wrote:
-> Doing ipsec produces a spinlock recursion warning.
-> This is due to crypto_finalize_request() being called in the upper half.
-> Move virtual data queue processing of virtio-crypto driver to tasklet.
+On Mon, Nov 20, 2023 at 11:11:21PM +0800, Jia Jie Ho wrote:
+> Current dev_err_probe will return 0 instead of proper error code if
+> driver failed to get irq number. Fix the return err code.
 > 
-> Fixes: dbaf0624ffa57 ("crypto: add virtio-crypto driver")
-> Reported-by: Halil Pasic <pasic@linux.ibm.com>
-> Signed-off-by: wangyangxin <wangyangxin1@huawei.com>
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Dan Carpenter <error27@gmail.com>
+> Closes: https://lore.kernel.org/r/202311160649.3GhKCfhd-lkp@intel.com/
 > ---
-> drivers/crypto/virtio/virtio_crypto_common.h |  2 ++
-> drivers/crypto/virtio/virtio_crypto_core.c   | 23 +++++++++++++----------
-> 2 files changed, 15 insertions(+), 10 deletions(-)
+>  drivers/char/hw_random/jh7110-trng.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
