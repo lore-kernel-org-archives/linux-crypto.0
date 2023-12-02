@@ -1,9 +1,9 @@
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93D2F1A6;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769901A4;
 	Sat,  2 Dec 2023 01:20:58 -0800 (PST)
-Received: from dggpeml500005.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Sj47t2nPfzsRbK;
-	Sat,  2 Dec 2023 17:17:14 +0800 (CST)
+Received: from dggpeml500005.china.huawei.com (unknown [172.30.72.54])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Sj47s56G1zsRZf;
+	Sat,  2 Dec 2023 17:17:13 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  dggpeml500005.china.huawei.com (7.185.36.59) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -13,9 +13,9 @@ To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<wangzhou1@hisilicon.com>, <fanghao11@huawei.com>, <liulongfang@huawei.com>,
 	<qianweili@huawei.com>, <shenyang39@huawei.com>
-Subject: [PATCH 5/5] crypto: hisilicon/zip - save capability registers in probe process
-Date: Sat, 2 Dec 2023 17:17:22 +0800
-Message-ID: <20231202091722.1974582-6-songzhiqi1@huawei.com>
+Subject: [PATCH 2/5] crypto: hisilicon/qm - save capability registers in qm init process
+Date: Sat, 2 Dec 2023 17:17:19 +0800
+Message-ID: <20231202091722.1974582-3-songzhiqi1@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20231202091722.1974582-1-songzhiqi1@huawei.com>
 References: <20231202091722.1974582-1-songzhiqi1@huawei.com>
@@ -31,151 +31,249 @@ X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
  dggpeml500005.china.huawei.com (7.185.36.59)
 X-CFilter-Loop: Reflected
 
-Pre-store the valid value of the zip alg support related capability
-register in hisi_zip_qm_init(), which will be called by hisi_zip_probe().
-It can reduce the number of capability register queries and avoid
-obtaining incorrect values in abnormal scenarios, such as reset failed
-and the memory space disabled.
+In previous capability register implementation, qm irq related values
+were read from capability registers dynamically when needed. But in
+abnormal scenario, e.g. the core is timeout and the device needs to
+soft reset and reset failed after disabling the MSE, the device can
+not be removed normally, causing the following call trace:
 
-Fixes: db700974b69d ("crypto: hisilicon/zip - support zip capability")
+	| Call trace:
+        |  pci_irq_vector+0xfc/0x140
+        |  hisi_qm_uninit+0x278/0x3b0 [hisi_qm]
+        |  hpre_remove+0x16c/0x1c0 [hisi_hpre]
+        |  pci_device_remove+0x6c/0x264
+        |  device_release_driver_internal+0x1ec/0x3e0
+        |  device_release_driver+0x3c/0x60
+        |  pci_stop_bus_device+0xfc/0x22c
+        |  pci_stop_and_remove_bus_device+0x38/0x70
+        |  pci_iov_remove_virtfn+0x108/0x1c0
+        |  sriov_disable+0x7c/0x1e4
+        |  pci_disable_sriov+0x4c/0x6c
+        |  hisi_qm_sriov_disable+0x90/0x160 [hisi_qm]
+        |  hpre_remove+0x1a8/0x1c0 [hisi_hpre]
+        |  pci_device_remove+0x6c/0x264
+        |  device_release_driver_internal+0x1ec/0x3e0
+        |  driver_detach+0x168/0x2d0
+        |  bus_remove_driver+0xc0/0x230
+        |  driver_unregister+0x58/0xdc
+        |  pci_unregister_driver+0x40/0x220
+        |  hpre_exit+0x34/0x64 [hisi_hpre]
+        |  __arm64_sys_delete_module+0x374/0x620
+        [...]
+
+        | Call trace:
+        |  free_msi_irqs+0x25c/0x300
+        |  pci_disable_msi+0x19c/0x264
+        |  pci_free_irq_vectors+0x4c/0x70
+        |  hisi_qm_pci_uninit+0x44/0x90 [hisi_qm]
+        |  hisi_qm_uninit+0x28c/0x3b0 [hisi_qm]
+        |  hpre_remove+0x16c/0x1c0 [hisi_hpre]
+        |  pci_device_remove+0x6c/0x264
+        [...]
+
+The reason for this call trace is that when the MSE is disabled, the value
+of capability registers in the BAR space become invalid. This will make the
+subsequent unregister process get the wrong irq vector through capability
+registers and get the wrong irq number by pci_irq_vector().
+
+So add a capability table structure to pre-store the valid value of the irq
+information capability register in qm init process, avoid obtaining invalid
+capability register value after the MSE is disabled.
+
+Fixes: 3536cc55cada ("crypto: hisilicon/qm - support get device irq information from hardware registers")
 Signed-off-by: Zhiqi Song <songzhiqi1@huawei.com>
 ---
- drivers/crypto/hisilicon/zip/zip_main.c | 73 ++++++++++++++++++++-----
- 1 file changed, 60 insertions(+), 13 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 62 +++++++++++++++++++++++++++++------
+ include/linux/hisi_acc_qm.h   | 12 +++++++
+ 2 files changed, 64 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 2934de25efa4..479ba8a1d6b5 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -249,6 +249,26 @@ static struct hisi_qm_cap_info zip_basic_cap_info[] = {
- 	{ZIP_CAP_MAX, 0x317c, 0, GENMASK(0, 0), 0x0, 0x0, 0x0}
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 4170c24c2ed1..d05ad2b16d0a 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -301,6 +301,13 @@ enum qm_basic_type {
+ 	QM_VF_IRQ_NUM_CAP,
  };
  
-+enum zip_pre_store_cap_idx {
-+	ZIP_CORE_NUM_CAP_IDX = 0x0,
-+	ZIP_CLUSTER_COMP_NUM_CAP_IDX,
-+	ZIP_CLUSTER_DECOMP_NUM_CAP_IDX,
-+	ZIP_DECOMP_ENABLE_BITMAP_IDX,
-+	ZIP_COMP_ENABLE_BITMAP_IDX,
-+	ZIP_DRV_ALG_BITMAP_IDX,
-+	ZIP_DEV_ALG_BITMAP_IDX,
++enum qm_pre_store_cap_idx {
++	QM_EQ_IRQ_TYPE_CAP_IDX = 0x0,
++	QM_AEQ_IRQ_TYPE_CAP_IDX,
++	QM_ABN_IRQ_TYPE_CAP_IDX,
++	QM_PF2VF_IRQ_TYPE_CAP_IDX,
 +};
 +
-+static const u32 zip_pre_store_caps[] = {
-+	ZIP_CORE_NUM_CAP,
-+	ZIP_CLUSTER_COMP_NUM_CAP,
-+	ZIP_CLUSTER_DECOMP_NUM_CAP,
-+	ZIP_DECOMP_ENABLE_BITMAP,
-+	ZIP_COMP_ENABLE_BITMAP,
-+	ZIP_DRV_ALG_BITMAP,
-+	ZIP_DEV_ALG_BITMAP,
+ static const struct hisi_qm_cap_info qm_cap_info_comm[] = {
+ 	{QM_SUPPORT_DB_ISOLATION, 0x30,   0, BIT(0),  0x0, 0x0, 0x0},
+ 	{QM_SUPPORT_FUNC_QOS,     0x3100, 0, BIT(8),  0x0, 0x0, 0x1},
+@@ -330,6 +337,13 @@ static const struct hisi_qm_cap_info qm_basic_info[] = {
+ 	{QM_VF_IRQ_NUM_CAP,     0x311c,   0,  GENMASK(15, 0), 0x1,       0x2,       0x3},
+ };
+ 
++static const u32 qm_pre_store_caps[] = {
++	QM_EQ_IRQ_TYPE_CAP,
++	QM_AEQ_IRQ_TYPE_CAP,
++	QM_ABN_IRQ_TYPE_CAP,
++	QM_PF2VF_IRQ_TYPE_CAP,
 +};
 +
- enum {
- 	HZIP_COMP_CORE0,
- 	HZIP_COMP_CORE1,
-@@ -443,7 +463,7 @@ bool hisi_zip_alg_support(struct hisi_qm *qm, u32 alg)
- {
- 	u32 cap_val;
+ struct qm_mailbox {
+ 	__le16 w0;
+ 	__le16 queue_num;
+@@ -4774,7 +4788,7 @@ static void qm_unregister_abnormal_irq(struct hisi_qm *qm)
+ 	if (qm->fun_type == QM_HW_VF)
+ 		return;
  
--	cap_val = hisi_qm_get_hw_info(qm, zip_basic_cap_info, ZIP_DRV_ALG_BITMAP, qm->cap_ver);
-+	cap_val = qm->cap_tables.dev_cap_table[ZIP_DRV_ALG_BITMAP_IDX].cap_val;
- 	if ((alg & cap_val) == alg)
- 		return true;
+-	val = hisi_qm_get_hw_info(qm, qm_basic_info, QM_ABN_IRQ_TYPE_CAP, qm->cap_ver);
++	val = qm->cap_tables.qm_cap_table[QM_ABN_IRQ_TYPE_CAP_IDX].cap_val;
+ 	if (!((val >> QM_IRQ_TYPE_SHIFT) & QM_ABN_IRQ_TYPE_MASK))
+ 		return;
  
-@@ -568,10 +588,8 @@ static int hisi_zip_set_user_domain_and_cache(struct hisi_qm *qm)
- 	}
+@@ -4791,7 +4805,7 @@ static int qm_register_abnormal_irq(struct hisi_qm *qm)
+ 	if (qm->fun_type == QM_HW_VF)
+ 		return 0;
  
- 	/* let's open all compression/decompression cores */
--	dcomp_bm = hisi_qm_get_hw_info(qm, zip_basic_cap_info,
--				       ZIP_DECOMP_ENABLE_BITMAP, qm->cap_ver);
--	comp_bm = hisi_qm_get_hw_info(qm, zip_basic_cap_info,
--				      ZIP_COMP_ENABLE_BITMAP, qm->cap_ver);
-+	dcomp_bm = qm->cap_tables.dev_cap_table[ZIP_DECOMP_ENABLE_BITMAP_IDX].cap_val;
-+	comp_bm = qm->cap_tables.dev_cap_table[ZIP_COMP_ENABLE_BITMAP_IDX].cap_val;
- 	writel(HZIP_DECOMP_CHECK_ENABLE | dcomp_bm | comp_bm, base + HZIP_CLOCK_GATE_CTRL);
+-	val = hisi_qm_get_hw_info(qm, qm_basic_info, QM_ABN_IRQ_TYPE_CAP, qm->cap_ver);
++	val = qm->cap_tables.qm_cap_table[QM_ABN_IRQ_TYPE_CAP_IDX].cap_val;
+ 	if (!((val >> QM_IRQ_TYPE_SHIFT) & QM_ABN_IRQ_TYPE_MASK))
+ 		return 0;
  
- 	/* enable sqc,cqc writeback */
-@@ -798,9 +816,8 @@ static int hisi_zip_core_debug_init(struct hisi_qm *qm)
- 	char buf[HZIP_BUF_SIZE];
- 	int i;
+@@ -4808,7 +4822,7 @@ static void qm_unregister_mb_cmd_irq(struct hisi_qm *qm)
+ 	struct pci_dev *pdev = qm->pdev;
+ 	u32 irq_vector, val;
  
--	zip_core_num = hisi_qm_get_hw_info(qm, zip_basic_cap_info, ZIP_CORE_NUM_CAP, qm->cap_ver);
--	zip_comp_core_num = hisi_qm_get_hw_info(qm, zip_basic_cap_info, ZIP_CLUSTER_COMP_NUM_CAP,
--						qm->cap_ver);
-+	zip_core_num = qm->cap_tables.dev_cap_table[ZIP_CORE_NUM_CAP_IDX].cap_val;
-+	zip_comp_core_num = qm->cap_tables.dev_cap_table[ZIP_CLUSTER_COMP_NUM_CAP_IDX].cap_val;
+-	val = hisi_qm_get_hw_info(qm, qm_basic_info, QM_PF2VF_IRQ_TYPE_CAP, qm->cap_ver);
++	val = qm->cap_tables.qm_cap_table[QM_PF2VF_IRQ_TYPE_CAP_IDX].cap_val;
+ 	if (!((val >> QM_IRQ_TYPE_SHIFT) & QM_IRQ_TYPE_MASK))
+ 		return;
  
- 	for (i = 0; i < zip_core_num; i++) {
- 		if (i < zip_comp_core_num)
-@@ -942,7 +959,7 @@ static int hisi_zip_show_last_regs_init(struct hisi_qm *qm)
- 	u32 zip_core_num;
- 	int i, j, idx;
+@@ -4822,7 +4836,7 @@ static int qm_register_mb_cmd_irq(struct hisi_qm *qm)
+ 	u32 irq_vector, val;
+ 	int ret;
  
--	zip_core_num = hisi_qm_get_hw_info(qm, zip_basic_cap_info, ZIP_CORE_NUM_CAP, qm->cap_ver);
-+	zip_core_num = qm->cap_tables.dev_cap_table[ZIP_CORE_NUM_CAP_IDX].cap_val;
+-	val = hisi_qm_get_hw_info(qm, qm_basic_info, QM_PF2VF_IRQ_TYPE_CAP, qm->cap_ver);
++	val = qm->cap_tables.qm_cap_table[QM_PF2VF_IRQ_TYPE_CAP_IDX].cap_val;
+ 	if (!((val >> QM_IRQ_TYPE_SHIFT) & QM_IRQ_TYPE_MASK))
+ 		return 0;
  
- 	debug->last_words = kcalloc(core_dfx_regs_num * zip_core_num + com_dfx_regs_num,
- 				    sizeof(unsigned int), GFP_KERNEL);
-@@ -998,9 +1015,9 @@ static void hisi_zip_show_last_dfx_regs(struct hisi_qm *qm)
- 				 hzip_com_dfx_regs[i].name, debug->last_words[i], val);
- 	}
+@@ -4839,7 +4853,7 @@ static void qm_unregister_aeq_irq(struct hisi_qm *qm)
+ 	struct pci_dev *pdev = qm->pdev;
+ 	u32 irq_vector, val;
  
--	zip_core_num = hisi_qm_get_hw_info(qm, zip_basic_cap_info, ZIP_CORE_NUM_CAP, qm->cap_ver);
--	zip_comp_core_num = hisi_qm_get_hw_info(qm, zip_basic_cap_info, ZIP_CLUSTER_COMP_NUM_CAP,
--						qm->cap_ver);
-+	zip_core_num = qm->cap_tables.dev_cap_table[ZIP_CORE_NUM_CAP_IDX].cap_val;
-+	zip_comp_core_num = qm->cap_tables.dev_cap_table[ZIP_CLUSTER_COMP_NUM_CAP_IDX].cap_val;
-+
- 	for (i = 0; i < zip_core_num; i++) {
- 		if (i < zip_comp_core_num)
- 			scnprintf(buf, sizeof(buf), "Comp_core-%d", i);
-@@ -1156,6 +1173,28 @@ static int hisi_zip_pf_probe_init(struct hisi_zip *hisi_zip)
- 	return ret;
+-	val = hisi_qm_get_hw_info(qm, qm_basic_info, QM_AEQ_IRQ_TYPE_CAP, qm->cap_ver);
++	val = qm->cap_tables.qm_cap_table[QM_AEQ_IRQ_TYPE_CAP_IDX].cap_val;
+ 	if (!((val >> QM_IRQ_TYPE_SHIFT) & QM_IRQ_TYPE_MASK))
+ 		return;
+ 
+@@ -4853,7 +4867,7 @@ static int qm_register_aeq_irq(struct hisi_qm *qm)
+ 	u32 irq_vector, val;
+ 	int ret;
+ 
+-	val = hisi_qm_get_hw_info(qm, qm_basic_info, QM_AEQ_IRQ_TYPE_CAP, qm->cap_ver);
++	val = qm->cap_tables.qm_cap_table[QM_AEQ_IRQ_TYPE_CAP_IDX].cap_val;
+ 	if (!((val >> QM_IRQ_TYPE_SHIFT) & QM_IRQ_TYPE_MASK))
+ 		return 0;
+ 
+@@ -4871,7 +4885,7 @@ static void qm_unregister_eq_irq(struct hisi_qm *qm)
+ 	struct pci_dev *pdev = qm->pdev;
+ 	u32 irq_vector, val;
+ 
+-	val = hisi_qm_get_hw_info(qm, qm_basic_info, QM_EQ_IRQ_TYPE_CAP, qm->cap_ver);
++	val = qm->cap_tables.qm_cap_table[QM_EQ_IRQ_TYPE_CAP_IDX].cap_val;
+ 	if (!((val >> QM_IRQ_TYPE_SHIFT) & QM_IRQ_TYPE_MASK))
+ 		return;
+ 
+@@ -4885,7 +4899,7 @@ static int qm_register_eq_irq(struct hisi_qm *qm)
+ 	u32 irq_vector, val;
+ 	int ret;
+ 
+-	val = hisi_qm_get_hw_info(qm, qm_basic_info, QM_EQ_IRQ_TYPE_CAP, qm->cap_ver);
++	val = qm->cap_tables.qm_cap_table[QM_EQ_IRQ_TYPE_CAP_IDX].cap_val;
+ 	if (!((val >> QM_IRQ_TYPE_SHIFT) & QM_IRQ_TYPE_MASK))
+ 		return 0;
+ 
+@@ -4973,7 +4987,29 @@ static int qm_get_qp_num(struct hisi_qm *qm)
+ 	return 0;
  }
  
-+static int zip_pre_store_cap_reg(struct hisi_qm *qm)
+-static void qm_get_hw_caps(struct hisi_qm *qm)
++static int qm_pre_store_irq_type_caps(struct hisi_qm *qm)
 +{
-+	struct hisi_qm_cap_record *zip_cap;
++	struct hisi_qm_cap_record *qm_cap;
 +	struct pci_dev *pdev = qm->pdev;
 +	size_t i, size;
 +
-+	size = ARRAY_SIZE(zip_pre_store_caps);
-+	zip_cap = devm_kzalloc(&pdev->dev, sizeof(*zip_cap) * size, GFP_KERNEL);
-+	if (!zip_cap)
++	size = ARRAY_SIZE(qm_pre_store_caps);
++	qm_cap = devm_kzalloc(&pdev->dev, sizeof(*qm_cap) * size, GFP_KERNEL);
++	if (!qm_cap)
 +		return -ENOMEM;
 +
 +	for (i = 0; i < size; i++) {
-+		zip_cap[i].type = zip_pre_store_caps[i];
-+		zip_cap[i].cap_val = hisi_qm_get_hw_info(qm, zip_basic_cap_info,
-+				     zip_pre_store_caps[i], qm->cap_ver);
++		qm_cap[i].type = qm_pre_store_caps[i];
++		qm_cap[i].cap_val = hisi_qm_get_hw_info(qm, qm_basic_info,
++							qm_pre_store_caps[i], qm->cap_ver);
 +	}
 +
-+	qm->cap_tables.dev_cap_table = zip_cap;
++	qm->cap_tables.qm_cap_table = qm_cap;
 +
 +	return 0;
 +}
 +
- static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
++static int qm_get_hw_caps(struct hisi_qm *qm)
  {
- 	u64 alg_msk;
-@@ -1194,7 +1233,15 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 		return ret;
+ 	const struct hisi_qm_cap_info *cap_info = qm->fun_type == QM_HW_PF ?
+ 						  qm_cap_info_pf : qm_cap_info_vf;
+@@ -5004,6 +5040,9 @@ static void qm_get_hw_caps(struct hisi_qm *qm)
+ 		if (val)
+ 			set_bit(cap_info[i].type, &qm->caps);
+ 	}
++
++	/* Fetch and save the value of irq type related capability registers */
++	return qm_pre_store_irq_type_caps(qm);
+ }
+ 
+ static int qm_get_pci_res(struct hisi_qm *qm)
+@@ -5025,7 +5064,10 @@ static int qm_get_pci_res(struct hisi_qm *qm)
+ 		goto err_request_mem_regions;
  	}
  
--	alg_msk = hisi_qm_get_hw_info(qm, zip_basic_cap_info, ZIP_DEV_ALG_BITMAP, qm->cap_ver);
-+	/* Fetch and save the value of capability registers */
-+	ret = zip_pre_store_cap_reg(qm);
-+	if (ret) {
-+		pci_err(qm->pdev, "Failed to pre-store capability registers!\n");
-+		hisi_qm_uninit(qm);
-+		return ret;
-+	}
+-	qm_get_hw_caps(qm);
++	ret = qm_get_hw_caps(qm);
++	if (ret)
++		goto err_ioremap;
 +
-+	alg_msk = qm->cap_tables.dev_cap_table[ZIP_DEV_ALG_BITMAP_IDX].cap_val;
- 	ret = hisi_qm_set_algs(qm, alg_msk, zip_dev_algs, ARRAY_SIZE(zip_dev_algs));
- 	if (ret) {
- 		pci_err(qm->pdev, "Failed to set zip algs!\n");
+ 	if (test_bit(QM_SUPPORT_DB_ISOLATION, &qm->caps)) {
+ 		qm->db_interval = QM_QP_DB_INTERVAL;
+ 		qm->db_phys_base = pci_resource_start(pdev, PCI_BAR_4);
+diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+index cdc979f66dba..5f4c74facf6a 100644
+--- a/include/linux/hisi_acc_qm.h
++++ b/include/linux/hisi_acc_qm.h
+@@ -266,6 +266,16 @@ struct hisi_qm_cap_info {
+ 	u32 v3_val;
+ };
+ 
++struct hisi_qm_cap_record {
++	u32 type;
++	u32 cap_val;
++};
++
++struct hisi_qm_cap_tables {
++	struct hisi_qm_cap_record *qm_cap_table;
++	struct hisi_qm_cap_record *dev_cap_table;
++};
++
+ struct hisi_qm_list {
+ 	struct mutex lock;
+ 	struct list_head list;
+@@ -376,6 +386,8 @@ struct hisi_qm {
+ 	u32 mb_qos;
+ 	u32 type_rate;
+ 	struct qm_err_isolate isolate_data;
++
++	struct hisi_qm_cap_tables cap_tables;
+ };
+ 
+ struct hisi_qp_status {
 -- 
 2.30.0
 
