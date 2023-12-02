@@ -1,284 +1,192 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FE83D7E
-	for <linux-crypto@vger.kernel.org>; Fri,  1 Dec 2023 19:50:24 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A40BD6C
+	for <linux-crypto@vger.kernel.org>; Fri,  1 Dec 2023 19:50:28 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r9H1H-00611o-Qr; Sat, 02 Dec 2023 11:50:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 02 Dec 2023 11:50:29 +0800
+	id 1r9H1M-00612B-10; Sat, 02 Dec 2023 11:50:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 02 Dec 2023 11:50:33 +0800
 From: "Herbert Xu" <herbert@gondor.apana.org.au>
-Date: Sat, 02 Dec 2023 11:50:29 +0800
-Subject: [v3 PATCH 2/4] crypto: skcipher - Make use of internal state
+Date: Sat, 02 Dec 2023 11:50:33 +0800
+Subject: [v3 PATCH 4/4] crypto: algif_skcipher - Fix stream cipher chaining
 References: <ZWqpPTHXuMvRmWi+@gondor.apana.org.au>
 To: Eric Biggers <ebiggers@kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Ard Biesheuvel <ardb@kernel.org>, Vadim Fedorenko <vadfed@meta.com>
-Message-Id: <E1r9H1H-00611o-Qr@formenos.hmeau.com>
+Message-Id: <E1r9H1M-00612B-10@formenos.hmeau.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-This patch adds code to the skcipher/lskcipher API to make use
-of the internal state if present.  In particular, the skcipher
-lskcipher wrapper will allocate a buffer for the IV/state and
-feed that to the underlying lskcipher algorithm.
+Unlike algif_aead which is always issued in one go (thus limiting
+the maximum size of the request), algif_skcipher has always allowed
+unlimited input data by cutting them up as necessary and feeding
+the fragments to the underlying algorithm one at a time.
+
+However, because of deficiencies in the API, this has been broken
+for most stream ciphers such as arc4 or chacha.  This is because
+they have an internal state in addition to the IV that must be
+preserved in order to continue processing.
+
+Fix this by using the new skcipher state API.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/lskcipher.c        |   34 ++++++++++++++++---
- crypto/skcipher.c         |   80 ++++++++++++++++++++++++++++++++++++++++++++--
- include/crypto/skcipher.h |   33 ++++++++++++++++++
- 3 files changed, 139 insertions(+), 8 deletions(-)
+ crypto/algif_skcipher.c |   71 +++++++++++++++++++++++++++++++++++++++++++++---
+ include/crypto/if_alg.h |    2 +
+ 2 files changed, 70 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/lskcipher.c b/crypto/lskcipher.c
-index 51bcf85070c7..e6b87787bd64 100644
---- a/crypto/lskcipher.c
-+++ b/crypto/lskcipher.c
-@@ -90,6 +90,7 @@ static int crypto_lskcipher_crypt_unaligned(
- 	u8 *iv, int (*crypt)(struct crypto_lskcipher *tfm, const u8 *src,
- 			     u8 *dst, unsigned len, u8 *iv, u32 flags))
- {
-+	unsigned statesize = crypto_lskcipher_statesize(tfm);
- 	unsigned ivsize = crypto_lskcipher_ivsize(tfm);
- 	unsigned bs = crypto_lskcipher_blocksize(tfm);
- 	unsigned cs = crypto_lskcipher_chunksize(tfm);
-@@ -104,7 +105,7 @@ static int crypto_lskcipher_crypt_unaligned(
- 	if (!tiv)
- 		return -ENOMEM;
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 9ada9b741af8..59dcc6fc74a2 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -47,6 +47,52 @@ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	return af_alg_sendmsg(sock, msg, size, ivsize);
+ }
  
--	memcpy(tiv, iv, ivsize);
-+	memcpy(tiv, iv, ivsize + statesize);
- 
- 	p = kmalloc(PAGE_SIZE, GFP_ATOMIC);
- 	err = -ENOMEM;
-@@ -132,7 +133,7 @@ static int crypto_lskcipher_crypt_unaligned(
- 	err = len ? -EINVAL : 0;
- 
- out:
--	memcpy(iv, tiv, ivsize);
-+	memcpy(iv, tiv, ivsize + statesize);
- 	kfree_sensitive(p);
- 	kfree_sensitive(tiv);
- 	return err;
-@@ -197,25 +198,45 @@ EXPORT_SYMBOL_GPL(crypto_lskcipher_decrypt);
- static int crypto_lskcipher_crypt_sg(struct skcipher_request *req,
- 				     int (*crypt)(struct crypto_lskcipher *tfm,
- 						  const u8 *src, u8 *dst,
--						  unsigned len, u8 *iv,
-+						  unsigned len, u8 *ivs,
- 						  u32 flags))
- {
- 	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
- 	struct crypto_lskcipher **ctx = crypto_skcipher_ctx(skcipher);
-+	u8 *ivs = skcipher_request_ctx(req);
- 	struct crypto_lskcipher *tfm = *ctx;
- 	struct skcipher_walk walk;
-+	unsigned ivsize;
-+	u32 flags;
- 	int err;
- 
-+	ivsize = crypto_lskcipher_ivsize(tfm);
-+	ivs = PTR_ALIGN(ivs, crypto_skcipher_alignmask(skcipher) + 1);
-+
-+	flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
-+
-+	if (req->base.flags & CRYPTO_SKCIPHER_REQ_CONT)
-+		flags |= CRYPTO_LSKCIPHER_FLAG_CONT;
-+	else
-+		memcpy(ivs, req->iv, ivsize);
++static int algif_skcipher_export(struct sock *sk, struct skcipher_request *req)
++{
++	struct alg_sock *ask = alg_sk(sk);
++	struct crypto_skcipher *tfm;
++	struct af_alg_ctx *ctx;
++	struct alg_sock *pask;
++	unsigned statesize;
++	struct sock *psk;
++	int err;
 +
 +	if (!(req->base.flags & CRYPTO_SKCIPHER_REQ_NOTFINAL))
-+		flags |= CRYPTO_LSKCIPHER_FLAG_FINAL;
++		return 0;
 +
- 	err = skcipher_walk_virt(&walk, req, false);
- 
- 	while (walk.nbytes) {
- 		err = crypt(tfm, walk.src.virt.addr, walk.dst.virt.addr,
--			    walk.nbytes, walk.iv,
--			    walk.nbytes == walk.total ?
--			    CRYPTO_LSKCIPHER_FLAG_FINAL : 0);
-+			    walk.nbytes, ivs,
-+			    flags & ~(walk.nbytes == walk.total ?
-+				      0 : CRYPTO_LSKCIPHER_FLAG_FINAL));
- 		err = skcipher_walk_done(&walk, err);
-+		flags |= CRYPTO_LSKCIPHER_FLAG_CONT;
- 	}
- 
-+	if (flags & CRYPTO_LSKCIPHER_FLAG_FINAL)
-+		memcpy(req->iv, ivs, ivsize);
++	ctx = ask->private;
++	psk = ask->parent;
++	pask = alg_sk(psk);
++	tfm = pask->private;
 +
- 	return err;
- }
- 
-@@ -278,6 +299,7 @@ static void __maybe_unused crypto_lskcipher_show(
- 	seq_printf(m, "max keysize  : %u\n", skcipher->co.max_keysize);
- 	seq_printf(m, "ivsize       : %u\n", skcipher->co.ivsize);
- 	seq_printf(m, "chunksize    : %u\n", skcipher->co.chunksize);
-+	seq_printf(m, "statesize    : %u\n", skcipher->co.statesize);
- }
- 
- static int __maybe_unused crypto_lskcipher_report(
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index ac8b8c042654..bc70e159d27d 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -698,6 +698,64 @@ int crypto_skcipher_decrypt(struct skcipher_request *req)
- }
- EXPORT_SYMBOL_GPL(crypto_skcipher_decrypt);
- 
-+static int crypto_lskcipher_export(struct skcipher_request *req, void *out)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	u8 *ivs = skcipher_request_ctx(req);
++	statesize = crypto_skcipher_statesize(tfm);
++	ctx->state = sock_kmalloc(sk, statesize, GFP_ATOMIC);
++	if (!ctx->state)
++		return -ENOMEM;
 +
-+	ivs = PTR_ALIGN(ivs, crypto_skcipher_alignmask(tfm) + 1);
++	err = crypto_skcipher_export(req, ctx->state);
++	if (err) {
++		sock_kzfree_s(sk, ctx->state, statesize);
++		ctx->state = NULL;
++	}
 +
-+	memcpy(out, ivs + crypto_skcipher_ivsize(tfm),
-+	       crypto_skcipher_statesize(tfm));
-+
-+	return 0;
++	return err;
 +}
 +
-+static int crypto_lskcipher_import(struct skcipher_request *req, const void *in)
++static void algif_skcipher_done(void *data, int err)
 +{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	u8 *ivs = skcipher_request_ctx(req);
++	struct af_alg_async_req *areq = data;
++	struct sock *sk = areq->sk;
 +
-+	ivs = PTR_ALIGN(ivs, crypto_skcipher_alignmask(tfm) + 1);
++	if (err)
++		goto out;
 +
-+	memcpy(ivs + crypto_skcipher_ivsize(tfm), in,
-+	       crypto_skcipher_statesize(tfm));
++	err = algif_skcipher_export(sk, &areq->cra_u.skcipher_req);
 +
-+	return 0;
++out:
++	af_alg_async_cb(data, err);
 +}
 +
-+static int skcipher_noexport(struct skcipher_request *req, void *out)
-+{
-+	return 0;
-+}
-+
-+static int skcipher_noimport(struct skcipher_request *req, const void *in)
-+{
-+	return 0;
-+}
-+
-+int crypto_skcipher_export(struct skcipher_request *req, void *out)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
-+
-+	if (alg->co.base.cra_type != &crypto_skcipher_type)
-+		return crypto_lskcipher_export(req, out);
-+	return alg->export(req, out);
-+}
-+EXPORT_SYMBOL_GPL(crypto_skcipher_export);
-+
-+int crypto_skcipher_import(struct skcipher_request *req, const void *in)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
-+
-+	if (alg->co.base.cra_type != &crypto_skcipher_type)
-+		return crypto_lskcipher_import(req, in);
-+	return alg->import(req, in);
-+}
-+EXPORT_SYMBOL_GPL(crypto_skcipher_import);
-+
- static void crypto_skcipher_exit_tfm(struct crypto_tfm *tfm)
+ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 			     size_t ignored, int flags)
  {
- 	struct crypto_skcipher *skcipher = __crypto_skcipher_cast(tfm);
-@@ -713,8 +771,17 @@ static int crypto_skcipher_init_tfm(struct crypto_tfm *tfm)
+@@ -58,6 +104,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	struct crypto_skcipher *tfm = pask->private;
+ 	unsigned int bs = crypto_skcipher_chunksize(tfm);
+ 	struct af_alg_async_req *areq;
++	unsigned cflags = 0;
+ 	int err = 0;
+ 	size_t len = 0;
  
- 	skcipher_set_needkey(skcipher);
- 
--	if (tfm->__crt_alg->cra_type != &crypto_skcipher_type)
-+	if (tfm->__crt_alg->cra_type != &crypto_skcipher_type) {
-+		unsigned am = crypto_skcipher_alignmask(skcipher);
-+		unsigned reqsize;
-+
-+		reqsize = am & ~(crypto_tfm_ctx_alignment() - 1);
-+		reqsize += crypto_skcipher_ivsize(skcipher);
-+		reqsize += crypto_skcipher_statesize(skcipher);
-+		crypto_skcipher_set_reqsize(skcipher, reqsize);
-+
- 		return crypto_init_lskcipher_ops_sg(tfm);
+@@ -82,8 +129,10 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	 * If more buffers are to be expected to be processed, process only
+ 	 * full block size buffers.
+ 	 */
+-	if (ctx->more || len < ctx->used)
++	if (ctx->more || len < ctx->used) {
+ 		len -= len % bs;
++		cflags |= CRYPTO_SKCIPHER_REQ_NOTFINAL;
 +	}
  
- 	if (alg->exit)
- 		skcipher->base.exit = crypto_skcipher_exit_tfm;
-@@ -756,6 +823,7 @@ static void crypto_skcipher_show(struct seq_file *m, struct crypto_alg *alg)
- 	seq_printf(m, "ivsize       : %u\n", skcipher->ivsize);
- 	seq_printf(m, "chunksize    : %u\n", skcipher->chunksize);
- 	seq_printf(m, "walksize     : %u\n", skcipher->walksize);
-+	seq_printf(m, "statesize    : %u\n", skcipher->statesize);
+ 	/*
+ 	 * Create a per request TX SGL for this request which tracks the
+@@ -107,6 +156,16 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	skcipher_request_set_crypt(&areq->cra_u.skcipher_req, areq->tsgl,
+ 				   areq->first_rsgl.sgl.sgt.sgl, len, ctx->iv);
+ 
++	if (ctx->state) {
++		err = crypto_skcipher_import(&areq->cra_u.skcipher_req,
++					     ctx->state);
++		sock_kzfree_s(sk, ctx->state, crypto_skcipher_statesize(tfm));
++		ctx->state = NULL;
++		if (err)
++			goto free;
++		cflags |= CRYPTO_SKCIPHER_REQ_CONT;
++	}
++
+ 	if (msg->msg_iocb && !is_sync_kiocb(msg->msg_iocb)) {
+ 		/* AIO operation */
+ 		sock_hold(sk);
+@@ -116,8 +175,9 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		areq->outlen = len;
+ 
+ 		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
++					      cflags |
+ 					      CRYPTO_TFM_REQ_MAY_SLEEP,
+-					      af_alg_async_cb, areq);
++					      algif_skcipher_done, areq);
+ 		err = ctx->enc ?
+ 			crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
+ 			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req);
+@@ -130,6 +190,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	} else {
+ 		/* Synchronous operation */
+ 		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
++					      cflags |
+ 					      CRYPTO_TFM_REQ_MAY_SLEEP |
+ 					      CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 					      crypto_req_done, &ctx->wait);
+@@ -137,8 +198,11 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 			crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
+ 			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req),
+ 						 &ctx->wait);
+-	}
+ 
++		if (!err)
++			err = algif_skcipher_export(
++				sk, &areq->cra_u.skcipher_req);
++	}
+ 
+ free:
+ 	af_alg_free_resources(areq);
+@@ -301,6 +365,7 @@ static void skcipher_sock_destruct(struct sock *sk)
+ 
+ 	af_alg_pull_tsgl(sk, ctx->used, NULL, 0);
+ 	sock_kzfree_s(sk, ctx->iv, crypto_skcipher_ivsize(tfm));
++	sock_kzfree_s(sk, ctx->state, crypto_skcipher_statesize(tfm));
+ 	sock_kfree_s(sk, ctx, ctx->len);
+ 	af_alg_release_parent(sk);
  }
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index 08b803a4fcde..78ecaf5db04c 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -121,6 +121,7 @@ struct af_alg_async_req {
+  *
+  * @tsgl_list:		Link to TX SGL
+  * @iv:			IV for cipher operation
++ * @state:		Existing state for continuing operation
+  * @aead_assoclen:	Length of AAD for AEAD cipher operations
+  * @completion:		Work queue for synchronous operation
+  * @used:		TX bytes sent to kernel. This variable is used to
+@@ -142,6 +143,7 @@ struct af_alg_ctx {
+ 	struct list_head tsgl_list;
  
- static int __maybe_unused crypto_skcipher_report(
-@@ -870,7 +938,9 @@ int skcipher_prepare_alg_common(struct skcipher_alg_common *alg)
- 	struct crypto_istat_cipher *istat = skcipher_get_stat_common(alg);
- 	struct crypto_alg *base = &alg->base;
+ 	void *iv;
++	void *state;
+ 	size_t aead_assoclen;
  
--	if (alg->ivsize > PAGE_SIZE / 8 || alg->chunksize > PAGE_SIZE / 8)
-+	if (alg->ivsize > PAGE_SIZE / 8 || alg->chunksize > PAGE_SIZE / 8 ||
-+	    alg->statesize > PAGE_SIZE / 2 ||
-+	    (alg->ivsize + alg->statesize) > PAGE_SIZE / 2)
- 		return -EINVAL;
- 
- 	if (!alg->chunksize)
-@@ -899,6 +969,12 @@ static int skcipher_prepare_alg(struct skcipher_alg *alg)
- 	if (!alg->walksize)
- 		alg->walksize = alg->chunksize;
- 
-+	if (!alg->statesize) {
-+		alg->import = skcipher_noimport;
-+		alg->export = skcipher_noexport;
-+	} else if (!(alg->import && alg->export))
-+		return -EINVAL;
-+
- 	base->cra_type = &crypto_skcipher_type;
- 	base->cra_flags |= CRYPTO_ALG_TYPE_SKCIPHER;
- 
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 5302f8f33afc..f881740df194 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -746,6 +746,39 @@ int crypto_skcipher_encrypt(struct skcipher_request *req);
-  */
- int crypto_skcipher_decrypt(struct skcipher_request *req);
- 
-+/**
-+ * crypto_skcipher_export() - export partial state
-+ * @req: reference to the skcipher_request handle that holds all information
-+ *	 needed to perform the operation
-+ * @out: output buffer of sufficient size that can hold the state
-+ *
-+ * Export partial state of the transformation. This function dumps the
-+ * entire state of the ongoing transformation into a provided block of
-+ * data so it can be @import 'ed back later on. This is useful in case
-+ * you want to save partial result of the transformation after
-+ * processing certain amount of data and reload this partial result
-+ * multiple times later on for multiple re-use. No data processing
-+ * happens at this point.
-+ *
-+ * Return: 0 if the cipher operation was successful; < 0 if an error occurred
-+ */
-+int crypto_skcipher_export(struct skcipher_request *req, void *out);
-+
-+/**
-+ * crypto_skcipher_import() - import partial state
-+ * @req: reference to the skcipher_request handle that holds all information
-+ *	 needed to perform the operation
-+ * @in: buffer holding the state
-+ *
-+ * Import partial state of the transformation. This function loads the
-+ * entire state of the ongoing transformation from a provided block of
-+ * data so the transformation can continue from this point onward. No
-+ * data processing happens at this point.
-+ *
-+ * Return: 0 if the cipher operation was successful; < 0 if an error occurred
-+ */
-+int crypto_skcipher_import(struct skcipher_request *req, const void *in);
-+
- /**
-  * crypto_lskcipher_encrypt() - encrypt plaintext
-  * @tfm: lskcipher handle
+ 	struct crypto_wait wait;
