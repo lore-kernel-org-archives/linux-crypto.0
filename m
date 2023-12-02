@@ -1,192 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A40BD6C
-	for <linux-crypto@vger.kernel.org>; Fri,  1 Dec 2023 19:50:28 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD75E1B3;
+	Fri,  1 Dec 2023 19:52:06 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1r9H1M-00612B-10; Sat, 02 Dec 2023 11:50:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 02 Dec 2023 11:50:33 +0800
-From: "Herbert Xu" <herbert@gondor.apana.org.au>
-Date: Sat, 02 Dec 2023 11:50:33 +0800
-Subject: [v3 PATCH 4/4] crypto: algif_skcipher - Fix stream cipher chaining
-References: <ZWqpPTHXuMvRmWi+@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Ard Biesheuvel <ardb@kernel.org>, Vadim Fedorenko <vadfed@meta.com>
-Message-Id: <E1r9H1M-00612B-10@formenos.hmeau.com>
+	id 1r9H2m-006148-2O; Sat, 02 Dec 2023 11:51:53 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 02 Dec 2023 11:52:01 +0800
+Date: Sat, 2 Dec 2023 11:52:01 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v7 2/3] bpf: crypto: add skcipher to bpf crypto
+Message-ID: <ZWqp4VF+4rX/plpX@gondor.apana.org.au>
+References: <20231202010604.1877561-1-vadfed@meta.com>
+ <20231202010604.1877561-2-vadfed@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231202010604.1877561-2-vadfed@meta.com>
 
-Unlike algif_aead which is always issued in one go (thus limiting
-the maximum size of the request), algif_skcipher has always allowed
-unlimited input data by cutting them up as necessary and feeding
-the fragments to the underlying algorithm one at a time.
+On Fri, Dec 01, 2023 at 05:06:03PM -0800, Vadim Fedorenko wrote:
+>
+> +static int bpf_crypto_lskcipher_encrypt(void *tfm, const u8 *src, u8 *dst,
+> +					unsigned int len, u8 *iv)
+> +{
+> +	return crypto_lskcipher_encrypt(tfm, src, dst, len, iv);
+> +}
 
-However, because of deficiencies in the API, this has been broken
-for most stream ciphers such as arc4 or chacha.  This is because
-they have an internal state in addition to the IV that must be
-preserved in order to continue processing.
+Please note that the API has been updated and the iv field is now
+the siv.  For algorithms with a non-zero statesize, that means that
+the IV must be followed by enough memory to store the internal state,
+i.e., crypto_lskcipher_statesize(tfm).
 
-Fix this by using the new skcipher state API.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
-
- crypto/algif_skcipher.c |   71 +++++++++++++++++++++++++++++++++++++++++++++---
- include/crypto/if_alg.h |    2 +
- 2 files changed, 70 insertions(+), 3 deletions(-)
-
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 9ada9b741af8..59dcc6fc74a2 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -47,6 +47,52 @@ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
- 	return af_alg_sendmsg(sock, msg, size, ivsize);
- }
- 
-+static int algif_skcipher_export(struct sock *sk, struct skcipher_request *req)
-+{
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct crypto_skcipher *tfm;
-+	struct af_alg_ctx *ctx;
-+	struct alg_sock *pask;
-+	unsigned statesize;
-+	struct sock *psk;
-+	int err;
-+
-+	if (!(req->base.flags & CRYPTO_SKCIPHER_REQ_NOTFINAL))
-+		return 0;
-+
-+	ctx = ask->private;
-+	psk = ask->parent;
-+	pask = alg_sk(psk);
-+	tfm = pask->private;
-+
-+	statesize = crypto_skcipher_statesize(tfm);
-+	ctx->state = sock_kmalloc(sk, statesize, GFP_ATOMIC);
-+	if (!ctx->state)
-+		return -ENOMEM;
-+
-+	err = crypto_skcipher_export(req, ctx->state);
-+	if (err) {
-+		sock_kzfree_s(sk, ctx->state, statesize);
-+		ctx->state = NULL;
-+	}
-+
-+	return err;
-+}
-+
-+static void algif_skcipher_done(void *data, int err)
-+{
-+	struct af_alg_async_req *areq = data;
-+	struct sock *sk = areq->sk;
-+
-+	if (err)
-+		goto out;
-+
-+	err = algif_skcipher_export(sk, &areq->cra_u.skcipher_req);
-+
-+out:
-+	af_alg_async_cb(data, err);
-+}
-+
- static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 			     size_t ignored, int flags)
- {
-@@ -58,6 +104,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	struct crypto_skcipher *tfm = pask->private;
- 	unsigned int bs = crypto_skcipher_chunksize(tfm);
- 	struct af_alg_async_req *areq;
-+	unsigned cflags = 0;
- 	int err = 0;
- 	size_t len = 0;
- 
-@@ -82,8 +129,10 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	 * If more buffers are to be expected to be processed, process only
- 	 * full block size buffers.
- 	 */
--	if (ctx->more || len < ctx->used)
-+	if (ctx->more || len < ctx->used) {
- 		len -= len % bs;
-+		cflags |= CRYPTO_SKCIPHER_REQ_NOTFINAL;
-+	}
- 
- 	/*
- 	 * Create a per request TX SGL for this request which tracks the
-@@ -107,6 +156,16 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	skcipher_request_set_crypt(&areq->cra_u.skcipher_req, areq->tsgl,
- 				   areq->first_rsgl.sgl.sgt.sgl, len, ctx->iv);
- 
-+	if (ctx->state) {
-+		err = crypto_skcipher_import(&areq->cra_u.skcipher_req,
-+					     ctx->state);
-+		sock_kzfree_s(sk, ctx->state, crypto_skcipher_statesize(tfm));
-+		ctx->state = NULL;
-+		if (err)
-+			goto free;
-+		cflags |= CRYPTO_SKCIPHER_REQ_CONT;
-+	}
-+
- 	if (msg->msg_iocb && !is_sync_kiocb(msg->msg_iocb)) {
- 		/* AIO operation */
- 		sock_hold(sk);
-@@ -116,8 +175,9 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 		areq->outlen = len;
- 
- 		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
-+					      cflags |
- 					      CRYPTO_TFM_REQ_MAY_SLEEP,
--					      af_alg_async_cb, areq);
-+					      algif_skcipher_done, areq);
- 		err = ctx->enc ?
- 			crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
- 			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req);
-@@ -130,6 +190,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	} else {
- 		/* Synchronous operation */
- 		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
-+					      cflags |
- 					      CRYPTO_TFM_REQ_MAY_SLEEP |
- 					      CRYPTO_TFM_REQ_MAY_BACKLOG,
- 					      crypto_req_done, &ctx->wait);
-@@ -137,8 +198,11 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 			crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
- 			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req),
- 						 &ctx->wait);
--	}
- 
-+		if (!err)
-+			err = algif_skcipher_export(
-+				sk, &areq->cra_u.skcipher_req);
-+	}
- 
- free:
- 	af_alg_free_resources(areq);
-@@ -301,6 +365,7 @@ static void skcipher_sock_destruct(struct sock *sk)
- 
- 	af_alg_pull_tsgl(sk, ctx->used, NULL, 0);
- 	sock_kzfree_s(sk, ctx->iv, crypto_skcipher_ivsize(tfm));
-+	sock_kzfree_s(sk, ctx->state, crypto_skcipher_statesize(tfm));
- 	sock_kfree_s(sk, ctx, ctx->len);
- 	af_alg_release_parent(sk);
- }
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 08b803a4fcde..78ecaf5db04c 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -121,6 +121,7 @@ struct af_alg_async_req {
-  *
-  * @tsgl_list:		Link to TX SGL
-  * @iv:			IV for cipher operation
-+ * @state:		Existing state for continuing operation
-  * @aead_assoclen:	Length of AAD for AEAD cipher operations
-  * @completion:		Work queue for synchronous operation
-  * @used:		TX bytes sent to kernel. This variable is used to
-@@ -142,6 +143,7 @@ struct af_alg_ctx {
- 	struct list_head tsgl_list;
- 
- 	void *iv;
-+	void *state;
- 	size_t aead_assoclen;
- 
- 	struct crypto_wait wait;
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
