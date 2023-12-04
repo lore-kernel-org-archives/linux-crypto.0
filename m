@@ -1,55 +1,151 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZVhRD2HI"
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB95DDF;
-	Mon,  4 Dec 2023 04:56:40 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6ce387bcb06so628336b3a.0;
-        Mon, 04 Dec 2023 04:56:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701694600; x=1702299400; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SiTkejtvRYVLhFZqAXG9p6TOPgqQOE7vaa3in2MHCt4=;
-        b=ZVhRD2HIC8xAsubofu9ieu2G2Lf/WZ4hANay+NQrtjO6VMmweoF4yEUFW0qz2zFevs
-         4BdHITMnv2ao66/eV9yWmbQnZInUXx8Je04ejBmMPouf4DrVJq/1GGvEJrmjBd1Me6J5
-         whK1zH+0epNYiNhBzL0L0Go8r0/KF6Tyn3WPNHR7uULxYzM5UQZSjjpvX8t0VhpYDIch
-         7hENSRH6piKiSxHppD3ZVz7YXkjHMQXXdDor8rhXJVnrxCfwifYg3RGsWk61NurWaVui
-         j9Bg5HFDBLGt4PQDynPnggX2DHKfPGPnp+EZNqq1iCqVxoNv2IOpxcS8fVKvIzqog76l
-         uTnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701694600; x=1702299400;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SiTkejtvRYVLhFZqAXG9p6TOPgqQOE7vaa3in2MHCt4=;
-        b=WcXNz9+IyHe6uZ+V2ioohU5aSN/vDT5WtoWQSn04D6XaDnt0okKOL0XyfMlfnbNvER
-         ucs70nxdcbxPGj9rD4srUfAAKtsgkNX9DxKMuwkzT9DSCobw8PCbFbZvbqoAPyVa5RBT
-         uphQstRr+e5mBbVg/ltEKcz/O+UUgfr9Abx5JHCk3DNo6NqPlLe4hZ9OECOtjYp9inAf
-         uZZfrc55ILv/D1IZujDPNhlysc7yduvbeJBQpaXc2u1CiAMqT9CNm7CqxdiekiusMdIh
-         p3u7t0IJpKoR3hJQL6S9Wa7ky0xEISrJMkOyYAe2/SUWfyO2xsW4Op7wExF6BxDQ/uOs
-         gbYw==
-X-Gm-Message-State: AOJu0Ywvkge+zmo+SRHR9kbp/9iJ9xCVgCDG/i+MNxtZLk2QzWxEsbzh
-	5Ssp138wB9sQ3MH2rideRSa6MmFCgIGRbC0KPgM=
-X-Google-Smtp-Source: AGHT+IF2aGT8hDg7ETvZLRKXX9I5/MjXS1Njyqa5rTCmPrtZiOHhjI0KlyEesJYWGSW1HARZzt7rbLa+CFtT4lF3BqQ=
-X-Received: by 2002:a05:6a21:1c84:b0:18f:97c:8258 with SMTP id
- sf4-20020a056a211c8400b0018f097c8258mr1282336pzb.98.1701694599894; Mon, 04
- Dec 2023 04:56:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mb0OmF+/"
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BAE5B3;
+	Mon,  4 Dec 2023 07:00:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701702054; x=1733238054;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=I27skRL2mlo5Di+ZOkkxTCHHmHLE279HG6eNMJsqcPo=;
+  b=mb0OmF+/8cbcRE46plwrsQmaCSEJW5ehM1nUFNaC038Kji9SpjhLjeYX
+   fnx/RKCKpSjagZe50b90AU5AZUW0ogWnSYf47/1s8gTITLvfq1DDZUpEn
+   HQqjPNJ/k3gYEPagMrZTFUcla6eOGB6P3IjJIjJGn2e7MiULsn+JHPqWP
+   lS0LVhptUlsaoUVl2pJQbUef6mcxEBra9c9ouphIYsXgq8+DncW+uQil8
+   mj+LjtQethJr4G6qkS4bSEcgc62uSTLsG3xOxoYtwGWFXj69PmvwVNcMJ
+   WhDKxg5KBvTOtQTnBeWiyAZvUqsGU7YXbYXCz8eT/u5dX3yvvsaVatxg0
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="812253"
+X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
+   d="scan'208";a="812253"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 07:00:46 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="720344488"
+X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
+   d="scan'208";a="720344488"
+Received: from rex-z390-aorus-pro.sh.intel.com ([10.239.161.21])
+  by orsmga003.jf.intel.com with ESMTP; 04 Dec 2023 07:00:38 -0800
+From: Rex Zhang <rex.zhang@intel.com>
+To: tom.zanussi@linux.intel.com
+Cc: dave.jiang@intel.com,
+	davem@davemloft.net,
+	dmaengine@vger.kernel.org,
+	fenghua.yu@intel.com,
+	giovanni.cabiddu@intel.com,
+	herbert@gondor.apana.org.au,
+	james.guilford@intel.com,
+	kanchana.p.sridhar@intel.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pavel@ucw.cz,
+	tony.luck@intel.com,
+	vinodh.gopal@intel.com,
+	vkoul@kernel.org,
+	wajdi.k.feghali@intel.com
+Subject: Re: [PATCH v11 11/14] crypto: iaa - Add support for deflate-iaa compression algorithm
+Date: Mon,  4 Dec 2023 23:00:28 +0800
+Message-Id: <20231204150028.3544490-1-rex.zhang@intel.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20231201201035.172465-12-tom.zanussi@linux.intel.com>
+References: <20231201201035.172465-12-tom.zanussi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: xingwei lee <xrivendell7@gmail.com>
-Date: Mon, 4 Dec 2023 20:56:27 +0800
-Message-ID: <CABOYnLzjtGnP35qE3VVyiu_mawizPtiugFATSaWwmdL1w+pqWA@mail.gmail.com>
-Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in __crc32c_le_base (3)
-To: syzbot+a6d6b8fffa294705dbd8@syzkaller.appspotmail.com
-Cc: davem@davemloft.net, glider@google.com, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello
-I reproduced this bug with repro.c and repro.txt
-Because the file is relatively large, please see
-https://gist.github.com/xrivendell7/c7bb6ddde87a892818ed1ce206a429c4
+Hi, Tom,
+
+On 2023-12-01 at 14:10:32 -0600, Tom Zanussi wrote:
+
+[snip]
+
+> +static int iaa_wq_put(struct idxd_wq *wq)
+> +{
+> +	struct idxd_device *idxd = wq->idxd;
+> +	struct iaa_wq *iaa_wq;
+> +	bool free = false;
+> +	int ret = 0;
+> +
+> +	spin_lock(&idxd->dev_lock);
+> +	iaa_wq = idxd_wq_get_private(wq);
+> +	if (iaa_wq) {
+> +		iaa_wq->ref--;
+> +		if (iaa_wq->ref == 0 && iaa_wq->remove) {
+> +			__free_iaa_wq(iaa_wq);
+> +			idxd_wq_set_private(wq, NULL);
+> +			free = true;
+> +		}
+> +		idxd_wq_put(wq);
+> +	} else {
+> +		ret = -ENODEV;
+> +	}
+> +	spin_unlock(&idxd->dev_lock);
+__free_iaa_wq() may cause schedule, whether it should be move out of the
+context between spin_lock() and spin_unlock()?
+> +	if (free)
+> +		kfree(iaa_wq);
+> +
+> +	return ret;
+> +}
+
+[snip]
+
+> @@ -800,12 +1762,38 @@ static void iaa_crypto_remove(struct idxd_dev *idxd_dev)
+>  
+>  	remove_iaa_wq(wq);
+>  
+> +	spin_lock(&idxd->dev_lock);
+> +	iaa_wq = idxd_wq_get_private(wq);
+> +	if (!iaa_wq) {
+> +		spin_unlock(&idxd->dev_lock);
+> +		pr_err("%s: no iaa_wq available to remove\n", __func__);
+> +		goto out;
+> +	}
+> +
+> +	if (iaa_wq->ref) {
+> +		iaa_wq->remove = true;
+> +	} else {
+> +		wq = iaa_wq->wq;
+> +		__free_iaa_wq(iaa_wq);
+> +		idxd_wq_set_private(wq, NULL);
+> +		free = true;
+> +	}
+> +	spin_unlock(&idxd->dev_lock);
+__free_iaa_wq() may cause schedule, whether it should be move out of the
+context between spin_lock() and spin_unlock()?
+> +
+> +	if (free)
+> +		kfree(iaa_wq);
+> +
+>  	idxd_drv_disable_wq(wq);
+>  	rebalance_wq_table();
+>  
+> -	if (nr_iaa == 0)
+> +	if (nr_iaa == 0) {
+> +		iaa_crypto_enabled = false;
+Is it necessary to add iaa_unregister_compression_device() here?
+All iaa devices are disabled cause the variable first_wq will be true,
+if enable wq, iaa_register_compression_device() will fail due to the
+algorithm is existed.
+>  		free_wq_table();
+> +		module_put(THIS_MODULE);
+>  
+> +		pr_info("iaa_crypto now DISABLED\n");
+> +	}
+> +out:
+>  	mutex_unlock(&iaa_devices_lock);
+>  	mutex_unlock(&wq->wq_lock);
+>  }
+
+[snip]
+
+Thanks,
+Rex Zhang
+> -- 
+> 2.34.1
+> 
