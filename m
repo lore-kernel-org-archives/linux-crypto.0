@@ -1,31 +1,31 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZUfYM7kc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lGhmsV0F"
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ED0DA5;
-	Tue,  5 Dec 2023 13:25:57 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFA9F1B1;
+	Tue,  5 Dec 2023 13:26:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701811557; x=1733347557;
+  t=1701811562; x=1733347562;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+16TGDFbGczjwVEHR20VFjlDoX6KPg2OQQUQCG8p4LE=;
-  b=ZUfYM7kcdAnv72JDHO3ilISWEJYt1HLpRfJs1cx7QhIWPEule+POwOfs
-   OIXQEZFeA2U4U1aX3p6dV1CoOVKlbGcyQ0KUgMq+lp6Edq8VtAp7Rl+Er
-   hHv6XU33926JnsF1wI6RvUMFUspTmKT0Ph4gkmkJSMrvLaxXMzPcAR3Bc
-   RvkME1v6GY+watjZvsMiC+qCAfZXsKM4Z8XhNJJ36deJsvJnHLZWG53+1
-   ybjP537ZAur6995vbn78KXrjj3ii/DokCYW3GNX8j2CH+jpf3iDe/LpLK
-   2IlxaKX1LzDKNAK2ql3gir4zl2CboA61hc1FjVDbnbalFqKmKf7kyjJV6
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="396751635"
+  bh=exPEJ2NHytrZASgF46XH+MN564oA5CR2jV1mTYa4zNo=;
+  b=lGhmsV0FviLKGf8U3YcHgvF3wotGoJC1eyZGHvbJHzyNijl3LN3Se/NY
+   Jh2Fa/gle3xhoTbsd1XXzTGVTQYtuOLj7gw0k/sXwA/pUjRREW3StEyfV
+   gXOpuoF+h+fcRh1XTukp8dMdO0TgMuJFv3KLuV4BHbE/sA1oZ32WH9GFj
+   JCltUdsyc06WbOLjK/QDYoxLONjAJIUT6Y0/CaqJaajX5D308PuM90Z9R
+   lQN/6h+xhOFyne5dDmmdO9StgTU0Cn9Kra6YV7TNW4AIOIKKZ06Sd+Boo
+   owXo9uL7flOHRkQtecbRokF5Zs7+1EU9lVtihYxc+8NemWf70Yaf7VynX
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="396751652"
 X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="396751635"
+   d="scan'208";a="396751652"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 13:25:57 -0800
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 13:26:02 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="19102628"
+   d="scan'208";a="19102656"
 Received: from jsamonte-mobl.amr.corp.intel.com (HELO tzanussi-mobl1.amr.corp.intel.com) ([10.212.71.180])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 13:25:55 -0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 13:26:00 -0800
 From: Tom Zanussi <tom.zanussi@linux.intel.com>
 To: herbert@gondor.apana.org.au,
 	davem@davemloft.net,
@@ -42,9 +42,9 @@ Cc: dave.jiang@intel.com,
 	linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
 	dmaengine@vger.kernel.org
-Subject: [PATCH v12 06/14] dmaengine: idxd: add callback support for iaa crypto
-Date: Tue,  5 Dec 2023 15:25:22 -0600
-Message-Id: <20231205212530.285671-7-tom.zanussi@linux.intel.com>
+Subject: [PATCH v12 08/14] crypto: iaa - Add Intel IAA Compression Accelerator crypto driver core
+Date: Tue,  5 Dec 2023 15:25:24 -0600
+Message-Id: <20231205212530.285671-9-tom.zanussi@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231205212530.285671-1-tom.zanussi@linux.intel.com>
 References: <20231205212530.285671-1-tom.zanussi@linux.intel.com>
@@ -56,286 +56,475 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Create a lightweight callback interface to allow idxd sub-drivers to
-be notified when work sent to idxd wqs has completed.
+The Intel Analytics Accelerator (IAA) is a hardware accelerator that
+provides very high thoughput compression/decompression compatible with
+the DEFLATE compression standard described in RFC 1951, which is the
+compression/decompression algorithm exported by this module.
 
-For a sub-driver to be notified of work completion, it needs to:
+Users can select IAA compress/decompress acceleration by specifying
+one of the deflate-iaa* algorithms as the compression algorithm to use
+by whatever facility allows asynchronous compression algorithms to be
+selected.
 
-  - Set the descriptor's 'Request Completion Interrupt'
-    (IDXD_OP_FLAG_RCI)
+For example, zswap can select the IAA fixed deflate algorithm
+'deflate-iaa' via:
 
-  - Set the sub-driver desc_complete() callback when registering the
-    sub-driver e.g.:
+  # echo deflate-iaa > /sys/module/zswap/parameters/compressor
 
-      struct idxd_device_driver my_drv = {
-            .probe = my_probe,
-            .desc_complete = my_complete,
-      }
+This patch adds iaa_crypto as an idxd sub-driver and tracks iaa
+devices and workqueues as they are probed or removed.
 
-  - Set the sub-driver-specific context in the sub-driver's descriptor
-    e.g:
+[ Based on work originally by George Powley, Jing Lin and Kyung Min
+Park ]
 
-      idxd_desc->crypto.req = req;
-      idxd_desc->crypto.tfm = tfm;
-      idxd_desc->crypto.src_addr = src_addr;
-      idxd_desc->crypto.dst_addr = dst_addr;
-
-When the work completes and the completion irq fires, idxd will invoke
-the desc_complete() callback with pointers to the descriptor, context,
-and completion_type.
-
-Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
-Reviewed-by: Fenghua Yu <fenghua.yu@intel.com>
-Acked-by: Vinod Koul <vkoul@kernel.org>
 ---
- drivers/dma/idxd/device.c |  2 +-
- drivers/dma/idxd/dma.c    |  3 +-
- drivers/dma/idxd/idxd.h   | 62 ++++++++++++++++++++++++++++++++-------
- drivers/dma/idxd/irq.c    | 12 ++++----
- drivers/dma/idxd/submit.c |  6 ++--
- 5 files changed, 65 insertions(+), 20 deletions(-)
+ MAINTAINERS                                |   7 +
+ drivers/crypto/intel/Kconfig               |   1 +
+ drivers/crypto/intel/Makefile              |   1 +
+ drivers/crypto/intel/iaa/Kconfig           |  10 +
+ drivers/crypto/intel/iaa/Makefile          |  10 +
+ drivers/crypto/intel/iaa/iaa_crypto.h      |  30 ++
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 323 +++++++++++++++++++++
+ 7 files changed, 382 insertions(+)
+ create mode 100644 drivers/crypto/intel/iaa/Kconfig
+ create mode 100644 drivers/crypto/intel/iaa/Makefile
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto.h
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_main.c
 
-diff --git a/drivers/dma/idxd/device.c b/drivers/dma/idxd/device.c
-index e6176de0e12b..f43d81128b96 100644
---- a/drivers/dma/idxd/device.c
-+++ b/drivers/dma/idxd/device.c
-@@ -1271,7 +1271,7 @@ static void idxd_flush_pending_descs(struct idxd_irq_entry *ie)
- 		tx = &desc->txd;
- 		tx->callback = NULL;
- 		tx->callback_result = NULL;
--		idxd_dma_complete_txd(desc, ctype, true);
-+		idxd_dma_complete_txd(desc, ctype, true, NULL, NULL);
- 	}
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 97f51d5ec1cf..686ff0e1ce34 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10719,6 +10719,13 @@ S:	Supported
+ Q:	https://patchwork.kernel.org/project/linux-dmaengine/list/
+ F:	drivers/dma/ioat*
  
-diff --git a/drivers/dma/idxd/dma.c b/drivers/dma/idxd/dma.c
-index e7043e235408..cd835eabd31b 100644
---- a/drivers/dma/idxd/dma.c
-+++ b/drivers/dma/idxd/dma.c
-@@ -22,7 +22,7 @@ static inline struct idxd_wq *to_idxd_wq(struct dma_chan *c)
- 
- void idxd_dma_complete_txd(struct idxd_desc *desc,
- 			   enum idxd_complete_type comp_type,
--			   bool free_desc)
-+			   bool free_desc, void *ctx, u32 *status)
- {
- 	struct idxd_device *idxd = desc->wq->idxd;
- 	struct dma_async_tx_descriptor *tx;
-@@ -359,6 +359,7 @@ static enum idxd_dev_type dev_types[] = {
- struct idxd_device_driver idxd_dmaengine_drv = {
- 	.probe = idxd_dmaengine_drv_probe,
- 	.remove = idxd_dmaengine_drv_remove,
-+	.desc_complete = idxd_dma_complete_txd,
- 	.name = "dmaengine",
- 	.type = dev_types,
- };
-diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-index 4b67181f4396..62ea21b25906 100644
---- a/drivers/dma/idxd/idxd.h
-+++ b/drivers/dma/idxd/idxd.h
-@@ -13,6 +13,7 @@
- #include <linux/bitmap.h>
- #include <linux/perf_event.h>
- #include <linux/iommu.h>
++INTEL IAA CRYPTO DRIVER
++M:	Tom Zanussi <tom.zanussi@linux.intel.com>
++L:	linux-crypto@vger.kernel.org
++S:	Supported
++F:	Documentation/driver-api/crypto/iaa/iaa-crypto.rst
++F:	drivers/crypto/intel/iaa/*
++
+ INTEL IDLE DRIVER
+ M:	Jacob Pan <jacob.jun.pan@linux.intel.com>
+ M:	Len Brown <lenb@kernel.org>
+diff --git a/drivers/crypto/intel/Kconfig b/drivers/crypto/intel/Kconfig
+index 3d90c87d4094..f38cd62a3f67 100644
+--- a/drivers/crypto/intel/Kconfig
++++ b/drivers/crypto/intel/Kconfig
+@@ -3,3 +3,4 @@
+ source "drivers/crypto/intel/keembay/Kconfig"
+ source "drivers/crypto/intel/ixp4xx/Kconfig"
+ source "drivers/crypto/intel/qat/Kconfig"
++source "drivers/crypto/intel/iaa/Kconfig"
+diff --git a/drivers/crypto/intel/Makefile b/drivers/crypto/intel/Makefile
+index b3d0352ae188..2f56f6d34cf0 100644
+--- a/drivers/crypto/intel/Makefile
++++ b/drivers/crypto/intel/Makefile
+@@ -3,3 +3,4 @@
+ obj-y += keembay/
+ obj-y += ixp4xx/
+ obj-$(CONFIG_CRYPTO_DEV_QAT) += qat/
++obj-$(CONFIG_CRYPTO_DEV_IAA_CRYPTO) += iaa/
+diff --git a/drivers/crypto/intel/iaa/Kconfig b/drivers/crypto/intel/iaa/Kconfig
+new file mode 100644
+index 000000000000..fcccb6ff7e29
+--- /dev/null
++++ b/drivers/crypto/intel/iaa/Kconfig
+@@ -0,0 +1,10 @@
++config CRYPTO_DEV_IAA_CRYPTO
++	tristate "Support for Intel(R) IAA Compression Accelerator"
++	depends on CRYPTO_DEFLATE
++	depends on INTEL_IDXD
++	default n
++	help
++	  This driver supports acceleration for compression and
++	  decompression with the Intel Analytics Accelerator (IAA)
++	  hardware using the cryptographic API.  If you choose 'M'
++	  here, the module will be called iaa_crypto.
+diff --git a/drivers/crypto/intel/iaa/Makefile b/drivers/crypto/intel/iaa/Makefile
+new file mode 100644
+index 000000000000..03859431c897
+--- /dev/null
++++ b/drivers/crypto/intel/iaa/Makefile
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Makefile for IAA crypto device drivers
++#
++
++ccflags-y += -I $(srctree)/drivers/dma/idxd -DDEFAULT_SYMBOL_NAMESPACE=IDXD
++
++obj-$(CONFIG_CRYPTO_DEV_IAA_CRYPTO) := iaa_crypto.o
++
++iaa_crypto-y := iaa_crypto_main.o
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto.h b/drivers/crypto/intel/iaa/iaa_crypto.h
+new file mode 100644
+index 000000000000..5d1fff7f4b8e
+--- /dev/null
++++ b/drivers/crypto/intel/iaa/iaa_crypto.h
+@@ -0,0 +1,30 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright(c) 2021 Intel Corporation. All rights rsvd. */
++
++#ifndef __IAA_CRYPTO_H__
++#define __IAA_CRYPTO_H__
++
 +#include <linux/crypto.h>
- #include <uapi/linux/idxd.h>
- #include "registers.h"
- 
-@@ -57,11 +58,23 @@ enum idxd_type {
- #define IDXD_ENQCMDS_RETRIES		32
- #define IDXD_ENQCMDS_MAX_RETRIES	64
- 
-+enum idxd_complete_type {
-+	IDXD_COMPLETE_NORMAL = 0,
-+	IDXD_COMPLETE_ABORT,
-+	IDXD_COMPLETE_DEV_FAIL,
++#include <linux/idxd.h>
++#include <uapi/linux/idxd.h>
++
++#define IDXD_SUBDRIVER_NAME		"crypto"
++
++/* Representation of IAA workqueue */
++struct iaa_wq {
++	struct list_head	list;
++	struct idxd_wq		*wq;
++
++	struct iaa_device	*iaa_device;
 +};
 +
-+struct idxd_desc;
++/* Representation of IAA device with wqs, populated by probe */
++struct iaa_device {
++	struct list_head		list;
++	struct idxd_device		*idxd;
 +
- struct idxd_device_driver {
- 	const char *name;
- 	enum idxd_dev_type *type;
- 	int (*probe)(struct idxd_dev *idxd_dev);
- 	void (*remove)(struct idxd_dev *idxd_dev);
-+	void (*desc_complete)(struct idxd_desc *desc,
-+			      enum idxd_complete_type comp_type,
-+			      bool free_desc,
-+			      void *ctx, u32 *status);
- 	struct device_driver drv;
- };
- 
-@@ -174,12 +187,6 @@ enum idxd_op_type {
- 	IDXD_OP_NONBLOCK = 1,
- };
- 
--enum idxd_complete_type {
--	IDXD_COMPLETE_NORMAL = 0,
--	IDXD_COMPLETE_ABORT,
--	IDXD_COMPLETE_DEV_FAIL,
--};
--
- struct idxd_dma_chan {
- 	struct dma_chan chan;
- 	struct idxd_wq *wq;
-@@ -378,6 +385,14 @@ static inline unsigned int evl_size(struct idxd_device *idxd)
- 	return idxd->evl->size * evl_ent_size(idxd);
- }
- 
-+struct crypto_ctx {
-+	struct acomp_req *req;
-+	struct crypto_tfm *tfm;
-+	dma_addr_t src_addr;
-+	dma_addr_t dst_addr;
-+	bool compress;
++	int				n_wq;
++	struct list_head		wqs;
 +};
 +
- /* IDXD software descriptor */
- struct idxd_desc {
- 	union {
-@@ -390,7 +405,10 @@ struct idxd_desc {
- 		struct iax_completion_record *iax_completion;
- 	};
- 	dma_addr_t compl_dma;
--	struct dma_async_tx_descriptor txd;
-+	union {
-+		struct dma_async_tx_descriptor txd;
-+		struct crypto_ctx crypto;
-+	};
- 	struct llist_node llnode;
- 	struct list_head list;
- 	int id;
-@@ -417,6 +435,15 @@ enum idxd_completion_status {
- #define idxd_dev_to_idxd(idxd_dev) container_of(idxd_dev, struct idxd_device, idxd_dev)
- #define idxd_dev_to_wq(idxd_dev) container_of(idxd_dev, struct idxd_wq, idxd_dev)
- 
-+static inline struct idxd_device_driver *wq_to_idxd_drv(struct idxd_wq *wq)
-+{
-+	struct device *dev = wq_confdev(wq);
-+	struct idxd_device_driver *idxd_drv =
-+		container_of(dev->driver, struct idxd_device_driver, drv);
++#endif
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+new file mode 100644
+index 000000000000..9a662ae49106
+--- /dev/null
++++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+@@ -0,0 +1,323 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright(c) 2021 Intel Corporation. All rights rsvd. */
 +
-+	return idxd_drv;
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/pci.h>
++#include <linux/device.h>
++#include <linux/iommu.h>
++#include <uapi/linux/idxd.h>
++#include <linux/highmem.h>
++#include <linux/sched/smt.h>
++
++#include "idxd.h"
++#include "iaa_crypto.h"
++
++#ifdef pr_fmt
++#undef pr_fmt
++#endif
++
++#define pr_fmt(fmt)			"idxd: " IDXD_SUBDRIVER_NAME ": " fmt
++
++/* number of iaa instances probed */
++static unsigned int nr_iaa;
++
++static LIST_HEAD(iaa_devices);
++static DEFINE_MUTEX(iaa_devices_lock);
++
++static struct iaa_device *iaa_device_alloc(void)
++{
++	struct iaa_device *iaa_device;
++
++	iaa_device = kzalloc(sizeof(*iaa_device), GFP_KERNEL);
++	if (!iaa_device)
++		return NULL;
++
++	INIT_LIST_HEAD(&iaa_device->wqs);
++
++	return iaa_device;
 +}
 +
- static inline struct idxd_device *confdev_to_idxd(struct device *dev)
- {
- 	struct idxd_dev *idxd_dev = confdev_to_idxd_dev(dev);
-@@ -678,6 +705,24 @@ void idxd_driver_unregister(struct idxd_device_driver *idxd_drv);
- #define module_idxd_driver(__idxd_driver) \
- 	module_driver(__idxd_driver, idxd_driver_register, idxd_driver_unregister)
- 
-+void idxd_free_desc(struct idxd_wq *wq, struct idxd_desc *desc);
-+void idxd_dma_complete_txd(struct idxd_desc *desc,
-+			   enum idxd_complete_type comp_type,
-+			   bool free_desc, void *ctx, u32 *status);
-+
-+static inline void idxd_desc_complete(struct idxd_desc *desc,
-+				      enum idxd_complete_type comp_type,
-+				      bool free_desc)
++static void iaa_device_free(struct iaa_device *iaa_device)
 +{
-+	struct idxd_device_driver *drv;
-+	u32 status;
++	struct iaa_wq *iaa_wq, *next;
 +
-+	drv = wq_to_idxd_drv(desc->wq);
-+	if (drv->desc_complete)
-+		drv->desc_complete(desc, comp_type, free_desc,
-+				   &desc->txd, &status);
++	list_for_each_entry_safe(iaa_wq, next, &iaa_device->wqs, list) {
++		list_del(&iaa_wq->list);
++		kfree(iaa_wq);
++	}
++
++	kfree(iaa_device);
 +}
 +
- int idxd_register_bus_type(void);
- void idxd_unregister_bus_type(void);
- int idxd_register_devices(struct idxd_device *idxd);
-@@ -731,14 +776,11 @@ int idxd_wq_request_irq(struct idxd_wq *wq);
- /* submission */
- int idxd_submit_desc(struct idxd_wq *wq, struct idxd_desc *desc);
- struct idxd_desc *idxd_alloc_desc(struct idxd_wq *wq, enum idxd_op_type optype);
--void idxd_free_desc(struct idxd_wq *wq, struct idxd_desc *desc);
- int idxd_enqcmds(struct idxd_wq *wq, void __iomem *portal, const void *desc);
- 
- /* dmaengine */
- int idxd_register_dma_device(struct idxd_device *idxd);
- void idxd_unregister_dma_device(struct idxd_device *idxd);
--void idxd_dma_complete_txd(struct idxd_desc *desc,
--			   enum idxd_complete_type comp_type, bool free_desc);
- 
- /* cdev */
- int idxd_cdev_register(void);
-diff --git a/drivers/dma/idxd/irq.c b/drivers/dma/idxd/irq.c
-index 2183d7f9cdbd..c8a0aa874b11 100644
---- a/drivers/dma/idxd/irq.c
-+++ b/drivers/dma/idxd/irq.c
-@@ -123,7 +123,7 @@ static void idxd_abort_invalid_int_handle_descs(struct idxd_irq_entry *ie)
- 
- 	list_for_each_entry_safe(d, t, &flist, list) {
- 		list_del(&d->list);
--		idxd_dma_complete_txd(d, IDXD_COMPLETE_ABORT, true);
-+		idxd_desc_complete(d, IDXD_COMPLETE_ABORT, true);
- 	}
- }
- 
-@@ -534,7 +534,7 @@ static void idxd_int_handle_resubmit_work(struct work_struct *work)
- 		 */
- 		if (rc != -EAGAIN) {
- 			desc->completion->status = IDXD_COMP_DESC_ABORT;
--			idxd_dma_complete_txd(desc, IDXD_COMPLETE_ABORT, false);
-+			idxd_desc_complete(desc, IDXD_COMPLETE_ABORT, false);
- 		}
- 		idxd_free_desc(wq, desc);
- 	}
-@@ -575,11 +575,11 @@ static void irq_process_pending_llist(struct idxd_irq_entry *irq_entry)
- 			 * and 0xff, which DSA_COMP_STATUS_MASK can mask out.
- 			 */
- 			if (unlikely(desc->completion->status == IDXD_COMP_DESC_ABORT)) {
--				idxd_dma_complete_txd(desc, IDXD_COMPLETE_ABORT, true);
-+				idxd_desc_complete(desc, IDXD_COMPLETE_ABORT, true);
- 				continue;
- 			}
- 
--			idxd_dma_complete_txd(desc, IDXD_COMPLETE_NORMAL, true);
-+			idxd_desc_complete(desc, IDXD_COMPLETE_NORMAL, true);
- 		} else {
- 			spin_lock(&irq_entry->list_lock);
- 			list_add_tail(&desc->list,
-@@ -618,11 +618,11 @@ static void irq_process_work_list(struct idxd_irq_entry *irq_entry)
- 		 * and 0xff, which DSA_COMP_STATUS_MASK can mask out.
- 		 */
- 		if (unlikely(desc->completion->status == IDXD_COMP_DESC_ABORT)) {
--			idxd_dma_complete_txd(desc, IDXD_COMPLETE_ABORT, true);
-+			idxd_desc_complete(desc, IDXD_COMPLETE_ABORT, true);
- 			continue;
- 		}
- 
--		idxd_dma_complete_txd(desc, IDXD_COMPLETE_NORMAL, true);
-+		idxd_desc_complete(desc, IDXD_COMPLETE_NORMAL, true);
- 	}
- }
- 
-diff --git a/drivers/dma/idxd/submit.c b/drivers/dma/idxd/submit.c
-index 5e651e216094..f927743a5ba2 100644
---- a/drivers/dma/idxd/submit.c
-+++ b/drivers/dma/idxd/submit.c
-@@ -127,7 +127,8 @@ static void llist_abort_desc(struct idxd_wq *wq, struct idxd_irq_entry *ie,
- 	spin_unlock(&ie->list_lock);
- 
- 	if (found)
--		idxd_dma_complete_txd(found, IDXD_COMPLETE_ABORT, false);
-+		idxd_dma_complete_txd(found, IDXD_COMPLETE_ABORT, false,
-+				      NULL, NULL);
- 
- 	/*
- 	 * completing the descriptor will return desc to allocator and
-@@ -137,7 +138,8 @@ static void llist_abort_desc(struct idxd_wq *wq, struct idxd_irq_entry *ie,
- 	 */
- 	list_for_each_entry_safe(d, t, &flist, list) {
- 		list_del_init(&d->list);
--		idxd_dma_complete_txd(found, IDXD_COMPLETE_ABORT, true);
-+		idxd_dma_complete_txd(found, IDXD_COMPLETE_ABORT, true,
-+				      NULL, NULL);
- 	}
- }
- 
++static bool iaa_has_wq(struct iaa_device *iaa_device, struct idxd_wq *wq)
++{
++	struct iaa_wq *iaa_wq;
++
++	list_for_each_entry(iaa_wq, &iaa_device->wqs, list) {
++		if (iaa_wq->wq == wq)
++			return true;
++	}
++
++	return false;
++}
++
++static struct iaa_device *add_iaa_device(struct idxd_device *idxd)
++{
++	struct iaa_device *iaa_device;
++
++	iaa_device = iaa_device_alloc();
++	if (!iaa_device)
++		return NULL;
++
++	iaa_device->idxd = idxd;
++
++	list_add_tail(&iaa_device->list, &iaa_devices);
++
++	nr_iaa++;
++
++	return iaa_device;
++}
++
++static void del_iaa_device(struct iaa_device *iaa_device)
++{
++	list_del(&iaa_device->list);
++
++	iaa_device_free(iaa_device);
++
++	nr_iaa--;
++}
++
++static int add_iaa_wq(struct iaa_device *iaa_device, struct idxd_wq *wq,
++		      struct iaa_wq **new_wq)
++{
++	struct idxd_device *idxd = iaa_device->idxd;
++	struct pci_dev *pdev = idxd->pdev;
++	struct device *dev = &pdev->dev;
++	struct iaa_wq *iaa_wq;
++
++	iaa_wq = kzalloc(sizeof(*iaa_wq), GFP_KERNEL);
++	if (!iaa_wq)
++		return -ENOMEM;
++
++	iaa_wq->wq = wq;
++	iaa_wq->iaa_device = iaa_device;
++	idxd_wq_set_private(wq, iaa_wq);
++
++	list_add_tail(&iaa_wq->list, &iaa_device->wqs);
++
++	iaa_device->n_wq++;
++
++	if (new_wq)
++		*new_wq = iaa_wq;
++
++	dev_dbg(dev, "added wq %d to iaa device %d, n_wq %d\n",
++		wq->id, iaa_device->idxd->id, iaa_device->n_wq);
++
++	return 0;
++}
++
++static void del_iaa_wq(struct iaa_device *iaa_device, struct idxd_wq *wq)
++{
++	struct idxd_device *idxd = iaa_device->idxd;
++	struct pci_dev *pdev = idxd->pdev;
++	struct device *dev = &pdev->dev;
++	struct iaa_wq *iaa_wq;
++
++	list_for_each_entry(iaa_wq, &iaa_device->wqs, list) {
++		if (iaa_wq->wq == wq) {
++			list_del(&iaa_wq->list);
++			iaa_device->n_wq--;
++
++			dev_dbg(dev, "removed wq %d from iaa_device %d, n_wq %d, nr_iaa %d\n",
++				wq->id, iaa_device->idxd->id,
++				iaa_device->n_wq, nr_iaa);
++
++			if (iaa_device->n_wq == 0)
++				del_iaa_device(iaa_device);
++			break;
++		}
++	}
++}
++
++static int save_iaa_wq(struct idxd_wq *wq)
++{
++	struct iaa_device *iaa_device, *found = NULL;
++	struct idxd_device *idxd;
++	struct pci_dev *pdev;
++	struct device *dev;
++	int ret = 0;
++
++	list_for_each_entry(iaa_device, &iaa_devices, list) {
++		if (iaa_device->idxd == wq->idxd) {
++			idxd = iaa_device->idxd;
++			pdev = idxd->pdev;
++			dev = &pdev->dev;
++			/*
++			 * Check to see that we don't already have this wq.
++			 * Shouldn't happen but we don't control probing.
++			 */
++			if (iaa_has_wq(iaa_device, wq)) {
++				dev_dbg(dev, "same wq probed multiple times for iaa_device %p\n",
++					iaa_device);
++				goto out;
++			}
++
++			found = iaa_device;
++
++			ret = add_iaa_wq(iaa_device, wq, NULL);
++			if (ret)
++				goto out;
++
++			break;
++		}
++	}
++
++	if (!found) {
++		struct iaa_device *new_device;
++		struct iaa_wq *new_wq;
++
++		new_device = add_iaa_device(wq->idxd);
++		if (!new_device) {
++			ret = -ENOMEM;
++			goto out;
++		}
++
++		ret = add_iaa_wq(new_device, wq, &new_wq);
++		if (ret) {
++			del_iaa_device(new_device);
++			goto out;
++		}
++	}
++
++	if (WARN_ON(nr_iaa == 0))
++		return -EINVAL;
++out:
++	return 0;
++}
++
++static void remove_iaa_wq(struct idxd_wq *wq)
++{
++	struct iaa_device *iaa_device;
++
++	list_for_each_entry(iaa_device, &iaa_devices, list) {
++		if (iaa_has_wq(iaa_device, wq)) {
++			del_iaa_wq(iaa_device, wq);
++			break;
++		}
++	}
++}
++
++static int iaa_crypto_probe(struct idxd_dev *idxd_dev)
++{
++	struct idxd_wq *wq = idxd_dev_to_wq(idxd_dev);
++	struct idxd_device *idxd = wq->idxd;
++	struct idxd_driver_data *data = idxd->data;
++	struct device *dev = &idxd_dev->conf_dev;
++	int ret = 0;
++
++	if (idxd->state != IDXD_DEV_ENABLED)
++		return -ENXIO;
++
++	if (data->type != IDXD_TYPE_IAX)
++		return -ENODEV;
++
++	mutex_lock(&wq->wq_lock);
++
++	if (!idxd_wq_driver_name_match(wq, dev)) {
++		dev_dbg(dev, "wq %d.%d driver_name match failed: wq driver_name %s, dev driver name %s\n",
++			idxd->id, wq->id, wq->driver_name, dev->driver->name);
++		idxd->cmd_status = IDXD_SCMD_WQ_NO_DRV_NAME;
++		ret = -ENODEV;
++		goto err;
++	}
++
++	wq->type = IDXD_WQT_KERNEL;
++
++	ret = idxd_drv_enable_wq(wq);
++	if (ret < 0) {
++		dev_dbg(dev, "enable wq %d.%d failed: %d\n",
++			idxd->id, wq->id, ret);
++		ret = -ENXIO;
++		goto err;
++	}
++
++	mutex_lock(&iaa_devices_lock);
++
++	ret = save_iaa_wq(wq);
++	if (ret)
++		goto err_save;
++
++	mutex_unlock(&iaa_devices_lock);
++out:
++	mutex_unlock(&wq->wq_lock);
++
++	return ret;
++
++err_save:
++	idxd_drv_disable_wq(wq);
++err:
++	wq->type = IDXD_WQT_NONE;
++
++	goto out;
++}
++
++static void iaa_crypto_remove(struct idxd_dev *idxd_dev)
++{
++	struct idxd_wq *wq = idxd_dev_to_wq(idxd_dev);
++
++	idxd_wq_quiesce(wq);
++
++	mutex_lock(&wq->wq_lock);
++	mutex_lock(&iaa_devices_lock);
++
++	remove_iaa_wq(wq);
++	idxd_drv_disable_wq(wq);
++
++	mutex_unlock(&iaa_devices_lock);
++	mutex_unlock(&wq->wq_lock);
++}
++
++static enum idxd_dev_type dev_types[] = {
++	IDXD_DEV_WQ,
++	IDXD_DEV_NONE,
++};
++
++static struct idxd_device_driver iaa_crypto_driver = {
++	.probe = iaa_crypto_probe,
++	.remove = iaa_crypto_remove,
++	.name = IDXD_SUBDRIVER_NAME,
++	.type = dev_types,
++};
++
++static int __init iaa_crypto_init_module(void)
++{
++	int ret = 0;
++
++	ret = idxd_driver_register(&iaa_crypto_driver);
++	if (ret) {
++		pr_debug("IAA wq sub-driver registration failed\n");
++		goto out;
++	}
++
++	pr_debug("initialized\n");
++out:
++	return ret;
++}
++
++static void __exit iaa_crypto_cleanup_module(void)
++{
++	idxd_driver_unregister(&iaa_crypto_driver);
++
++	pr_debug("cleaned up\n");
++}
++
++MODULE_IMPORT_NS(IDXD);
++MODULE_LICENSE("GPL");
++MODULE_ALIAS_IDXD_DEVICE(0);
++MODULE_AUTHOR("Intel Corporation");
++MODULE_DESCRIPTION("IAA Compression Accelerator Crypto Driver");
++
++module_init(iaa_crypto_init_module);
++module_exit(iaa_crypto_cleanup_module);
 -- 
 2.34.1
 
