@@ -1,37 +1,37 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k5eGPypx"
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE938109;
-	Tue,  5 Dec 2023 12:19:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OeGSaUz9"
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7836A5;
+	Tue,  5 Dec 2023 13:15:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701807592; x=1733343592;
+  t=1701810956; x=1733346956;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=8Te1EPKT9Apvr/qvCbHF708uBV9mKYf+FGDtRDTDGng=;
-  b=k5eGPypxnV56D5OzumaA2i4tFC1Io64yY4TfE1QkbJN1dJmAA8RMMCX3
-   FjytbxjZ9roLOla+D9KFM4G/ytnyVn+PfjYVRxCYM326ogpafDaWLUXO6
-   MyoRW/Z4Se2Ty8ZDuUIY1y7pjb3mYgY1OrUMf/Ptqgw1m7Qbbq01KD+Hr
-   Fx+FtEn1AxkGwjA6g0080vxeMhGaYFW0hfrtK54qvhw69TUG0HhQG4LGH
-   RtYDhs2Ig5iWG6+AKs3BUVie3upr09+joJFX90rq8zZTQIBbHu83UOiC8
-   tCbufpy7HAwTw300ozGHGiXBhZx0wg9g00cKFyv2pDGWSC0c4wBlrRPr1
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="849885"
+  bh=ogrbkej1C6j1SgmkqoFwO0g7oaDZworPVFJs/PMsK4g=;
+  b=OeGSaUz9KxnJLQD1yZRC5ArNTsUWe3iISI5TPLMhL3KiHHc8IZj0RvlI
+   nYdEEypZXXlyrGb7YPHI4+Amjs5X33Iv8pnOCExaoCE8s+IARSONWo3xV
+   jSDlld9MkUV4XtjoiMj5shTfcqX/ZFWwK0LcutT0SY8+3F+Utp+nXP+kG
+   +95RtDEDOQ+Jc8RgvXqAJVieS8cUP+VrCLckqer2Pc2gQUwEcvR8DUive
+   XsDgPV5EK3jaNSNgBeMZsP1clAQqiqxeaNGJmcsDZS9YTlRsZ67R20/6j
+   8fECnl6TFV+pLkpgDFcB9AK0Ke9YxsGnxRgREwD6YPvY7t6DhVzlUEUw3
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="391127124"
 X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="849885"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 12:19:51 -0800
+   d="scan'208";a="391127124"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 13:15:56 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="841594336"
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="944407746"
 X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="841594336"
+   d="scan'208";a="944407746"
 Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga004.fm.intel.com with ESMTP; 05 Dec 2023 12:19:47 -0800
+  by orsmga005.jf.intel.com with ESMTP; 05 Dec 2023 13:15:53 -0800
 Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1rAbtR-0009fL-18;
-	Tue, 05 Dec 2023 20:19:45 +0000
-Date: Wed, 6 Dec 2023 04:19:15 +0800
+	id 1rAcli-0009kO-1u;
+	Tue, 05 Dec 2023 21:15:50 +0000
+Date: Wed, 6 Dec 2023 05:15:02 +0800
 From: kernel test robot <lkp@intel.com>
 To: Vadim Fedorenko <vadfed@meta.com>,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
@@ -41,12 +41,11 @@ To: Vadim Fedorenko <vadfed@meta.com>,
 	Alexei Starovoitov <ast@kernel.org>,
 	Mykola Lysenko <mykolal@fb.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	bpf@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org
 Subject: Re: [PATCH bpf-next v7 1/3] bpf: make common crypto API for TC/XDP
  programs
-Message-ID: <202312060457.bRXN2xnb-lkp@intel.com>
+Message-ID: <202312060500.uMJaMydz-lkp@intel.com>
 References: <20231202010604.1877561-1-vadfed@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -68,70 +67,21 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/bpf-crypt
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
 patch link:    https://lore.kernel.org/r/20231202010604.1877561-1-vadfed%40meta.com
 patch subject: [PATCH bpf-next v7 1/3] bpf: make common crypto API for TC/XDP programs
-config: x86_64-buildonly-randconfig-001-20231202 (https://download.01.org/0day-ci/archive/20231206/202312060457.bRXN2xnb-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231206/202312060457.bRXN2xnb-lkp@intel.com/reproduce)
+config: m68k-randconfig-r081-20231202 (https://download.01.org/0day-ci/archive/20231206/202312060500.uMJaMydz-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231206/202312060500.uMJaMydz-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312060457.bRXN2xnb-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312060500.uMJaMydz-lkp@intel.com/
 
 All warnings (new ones prefixed by >>):
 
->> kernel/bpf/crypto.c:159:6: warning: variable 'ctx' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-           if (!key) {
-               ^~~~
-   kernel/bpf/crypto.c:192:6: note: uninitialized use occurs here
-           if (ctx->tfm)
-               ^~~
-   kernel/bpf/crypto.c:159:2: note: remove the 'if' if its condition is always false
-           if (!key) {
-           ^~~~~~~~~~~
-   kernel/bpf/crypto.c:154:6: warning: variable 'ctx' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-           if (!key_len) {
-               ^~~~~~~~
-   kernel/bpf/crypto.c:192:6: note: uninitialized use occurs here
-           if (ctx->tfm)
-               ^~~
-   kernel/bpf/crypto.c:154:2: note: remove the 'if' if its condition is always false
-           if (!key_len) {
-           ^~~~~~~~~~~~~~~
-   kernel/bpf/crypto.c:148:6: warning: variable 'ctx' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-           if (authsize && !type->setauthsize) {
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   kernel/bpf/crypto.c:192:6: note: uninitialized use occurs here
-           if (ctx->tfm)
-               ^~~
-   kernel/bpf/crypto.c:148:2: note: remove the 'if' if its condition is always false
-           if (authsize && !type->setauthsize) {
-           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   kernel/bpf/crypto.c:143:6: warning: variable 'ctx' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-           if (!authsize && type->setauthsize) {
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   kernel/bpf/crypto.c:192:6: note: uninitialized use occurs here
-           if (ctx->tfm)
-               ^~~
-   kernel/bpf/crypto.c:143:2: note: remove the 'if' if its condition is always false
-           if (!authsize && type->setauthsize) {
-           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   kernel/bpf/crypto.c:138:6: warning: variable 'ctx' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-           if (!type->has_algo(algo__str)) {
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   kernel/bpf/crypto.c:192:6: note: uninitialized use occurs here
-           if (ctx->tfm)
-               ^~~
-   kernel/bpf/crypto.c:138:2: note: remove the 'if' if its condition is always false
-           if (!type->has_algo(algo__str)) {
-           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   kernel/bpf/crypto.c:128:28: note: initialize the variable 'ctx' to silence this warning
-           struct bpf_crypto_ctx *ctx;
-                                     ^
-                                      = NULL
-   5 warnings generated.
+>> kernel/bpf/crypto.c:126: warning: Function parameter or member 'authsize' not described in 'bpf_crypto_ctx_create'
 
 
-vim +159 kernel/bpf/crypto.c
+vim +126 kernel/bpf/crypto.c
 
    105	
    106	/**
@@ -154,7 +104,7 @@ vim +159 kernel/bpf/crypto.c
    123	bpf_crypto_ctx_create(const char *type__str, const char *algo__str,
    124			      const struct bpf_dynptr_kern *pkey,
    125			      unsigned int authsize, int *err)
-   126	{
+ > 126	{
    127		const struct bpf_crypto_type *type = bpf_crypto_get_type(type__str);
    128		struct bpf_crypto_ctx *ctx;
    129		const u8 *key;
@@ -187,7 +137,7 @@ vim +159 kernel/bpf/crypto.c
    156			goto err;
    157		}
    158		key = __bpf_dynptr_data(pkey, key_len);
- > 159		if (!key) {
+   159		if (!key) {
    160			*err = -EINVAL;
    161			goto err;
    162		}
