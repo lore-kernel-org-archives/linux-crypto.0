@@ -1,43 +1,43 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="PPBdSIMs"
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89327181
-	for <linux-crypto@vger.kernel.org>; Tue,  5 Dec 2023 01:28:29 -0800 (PST)
-Received: by mail-oi1-x22a.google.com with SMTP id 5614622812f47-3b2e330033fso3072445b6e.3
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Dec 2023 01:28:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Qu3dTaUV"
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E2C710C3
+	for <linux-crypto@vger.kernel.org>; Tue,  5 Dec 2023 01:28:37 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-5be30d543c4so2022982a12.2
+        for <linux-crypto@vger.kernel.org>; Tue, 05 Dec 2023 01:28:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1701768508; x=1702373308; darn=vger.kernel.org;
+        d=sifive.com; s=google; t=1701768517; x=1702373317; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I9NcydlPjJuZdBvk47SliSWRPXO51iH+ClRWgIXdngI=;
-        b=PPBdSIMsiEiHJtO9YF1DSrwoPWPWwDY0lsXcg4j+Y51g526eF34dm5awrHZ23cMmZf
-         OpRi+1KVrTZp3F+UsdMKOHsRsfxIzegbcoODaiDj6vbg0Yd+UqhOTOIeVYD6MfHEZH/p
-         G59V4KhcWb2H4Zf5DLhHzcRc84wIgXFwJ+rAwJ4LzRw42gDkV1fzbbKNqXIS4jNZqtxe
-         +cB33zA05jv1vvEAjtKFaPl/MzDy6bShulOXkmaPyEDG6mXkerKAdW6lECPueppU+blh
-         vxf/vuecRsGO6qiMVMFaUMLT9t9nMHuw/P1FoFwfafAfx532BBB/CCWqQr5ujiwDbjTk
-         Vqzg==
+        bh=TqgLdIh7ZFE1gYel11FicvzVIx+QwNFkbGHDaWfBExY=;
+        b=Qu3dTaUVC8Vuz+6YtMoAyNHbUu79IehSszb38tdZn7EfH+BORgAFpWDQX6ghW1hCGk
+         f8bpqrciatiIvDOW1IO9icr9PXW453jKsoxB8q+tkfQ1dmteaBzn2rA1uFU8L91P0K/F
+         +sXgl18F2bj8ypTTUthQZ5zfvGga9B6KjeWp0pt6q8TKLAV0mBpFLC6ZR5fWDiDO4PCV
+         kb+WYrcroDa/uCYlJVapLbbVrKKirvmf2gDfd0elbyqP6ekY9RnU6bMojrDP0Weo4Org
+         rPNZ1AhUIrMFv8a31tYCKZQTEFSRbJ0SJOifTeg7PTZARZfJXda9VcY9jbkkm0ugcJqm
+         fBhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701768508; x=1702373308;
+        d=1e100.net; s=20230601; t=1701768517; x=1702373317;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I9NcydlPjJuZdBvk47SliSWRPXO51iH+ClRWgIXdngI=;
-        b=V6SdiVoaEDSP+my/sW1tgRiwDtDkp29/HBS99nngYj0s0fTGWOXCcvRS90AMGPv3Ik
-         1tbjFlWyRvTiCHt3sCGsyKbwlGL6v5wiCRDqkv/7XRHv9j4I/7aIQbbGju9pUwDB2eFm
-         d7F4/SIDgJhc0Mw+8Q1UbYyuXwLP3L7P+C13IwTVPrHhvTRedA040wN57xVUVjb4Aa0i
-         x13eJupZmRfzQeN0VRGeMj1CdFsK9EHLcdNW4z5L6km3JXfTxbuQt8O69Lu2WBU9gvUU
-         wIHV/fmQUVbx3h4oVnTPPWcIttd231iBMJizzPkJ53ugJFNYozcnwQYUyEMbfOJpcrhW
-         4cIQ==
-X-Gm-Message-State: AOJu0Yw+hCU2ejWIOwZQnFP3/PGDAAO2Se2a8ha6TjJ4b1O8UhMdPJnQ
-	vJqvbSHFCxeth5Jw5G965NHrhw==
-X-Google-Smtp-Source: AGHT+IHZ3EK+AWz07LHe5BsDXoplI+8JX1FVHrlgMUB8wBmoWXqufxaT2Ka9FS50Dim4x8aDAfAYQQ==
-X-Received: by 2002:a05:6808:16a7:b0:3b8:44dc:7ce0 with SMTP id bb39-20020a05680816a700b003b844dc7ce0mr7330943oib.2.1701768508622;
-        Tue, 05 Dec 2023 01:28:28 -0800 (PST)
+        bh=TqgLdIh7ZFE1gYel11FicvzVIx+QwNFkbGHDaWfBExY=;
+        b=wXUaAGmP6O1ibOle4d8Alt3aS96YJ1s1uAPADoQ5jnhlI0wTIo6/YGUvGZdCfbtycP
+         IQzFk7/zLMUPPONYJFeBg3A2csRufuE1IozVPGy3YC4jsZ8TQY5eiOvbPhypjjeqryGO
+         QnYhETgHxeZachURT5S4z21/8AV0n7Pu9Th2qIYSey0G9VHt5yRoTVKcXyRo8amO950f
+         pWA6WaDFPk9Q3Tt8HzIygCDZLt1Amoq853yEgwZZcOex4zqgbGXQ1bKP58ib7ORaYz46
+         oCWMwOKILzX/oJSoN2dRuw7TGYUaVnGt8oN+rKonVyIpD7PNMy0FrKi0q4hBjhn+mYp2
+         B9cQ==
+X-Gm-Message-State: AOJu0YyFHjPSrrN5nVJT72qgsjQTcvOL/0uZH8M5cTRDZkELQlBN+omF
+	16eB1mcA6wziROuGY9PXbpjANA==
+X-Google-Smtp-Source: AGHT+IFq0drciTkZXIld809/gA8+vG+lQq4S7/UbBc5Z5Plazz8vtmMWy6JN/F/D8ld5FPtdHnAdww==
+X-Received: by 2002:a05:6a20:c906:b0:187:a4df:4e57 with SMTP id gx6-20020a056a20c90600b00187a4df4e57mr4180155pzb.20.1701768516597;
+        Tue, 05 Dec 2023 01:28:36 -0800 (PST)
 Received: from localhost.localdomain ([101.10.93.135])
-        by smtp.gmail.com with ESMTPSA id l6-20020a056a00140600b006cdd723bb6fsm8858788pfu.115.2023.12.05.01.28.25
+        by smtp.gmail.com with ESMTPSA id l6-20020a056a00140600b006cdd723bb6fsm8858788pfu.115.2023.12.05.01.28.33
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Dec 2023 01:28:28 -0800 (PST)
+        Tue, 05 Dec 2023 01:28:36 -0800 (PST)
 From: Jerry Shih <jerry.shih@sifive.com>
 To: paul.walmsley@sifive.com,
 	palmer@dabbelt.com,
@@ -54,9 +54,9 @@ Cc: heiko@sntech.de,
 	linux-riscv@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH v3 05/12] crypto: simd - Update `walksize` in simd skcipher
-Date: Tue,  5 Dec 2023 17:27:54 +0800
-Message-Id: <20231205092801.1335-6-jerry.shih@sifive.com>
+Subject: [PATCH v3 07/12] RISC-V: crypto: add Zvkg accelerated GCM GHASH implementation
+Date: Tue,  5 Dec 2023 17:27:56 +0800
+Message-Id: <20231205092801.1335-8-jerry.shih@sifive.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20231205092801.1335-1-jerry.shih@sifive.com>
 References: <20231205092801.1335-1-jerry.shih@sifive.com>
@@ -66,40 +66,374 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The `walksize` assignment is missed in simd skcipher.
+Add a gcm hash implementation using the Zvkg extension from OpenSSL
+(openssl/openssl#21923).
 
+The perlasm here is different from the original implementation in OpenSSL.
+The OpenSSL assumes that the H is stored in little-endian. Thus, it needs
+to convert the H to big-endian for Zvkg instructions. In kernel, we have
+the big-endian H directly. There is no need for endian conversion.
+
+Co-developed-by: Christoph Müllner <christoph.muellner@vrull.eu>
+Signed-off-by: Christoph Müllner <christoph.muellner@vrull.eu>
+Co-developed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 Signed-off-by: Jerry Shih <jerry.shih@sifive.com>
 ---
- crypto/cryptd.c | 1 +
- crypto/simd.c   | 1 +
- 2 files changed, 2 insertions(+)
+Changelog v3:
+ - Use asm mnemonics for the instructions in RVV 1.0 extension.
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index bbcc368b6a55..253d13504ccb 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -405,6 +405,7 @@ static int cryptd_create_skcipher(struct crypto_template *tmpl,
- 		(alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
- 	inst->alg.ivsize = crypto_skcipher_alg_ivsize(alg);
- 	inst->alg.chunksize = crypto_skcipher_alg_chunksize(alg);
-+	inst->alg.walksize = crypto_skcipher_alg_walksize(alg);
- 	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg);
- 	inst->alg.max_keysize = crypto_skcipher_alg_max_keysize(alg);
+Changelog v2:
+ - Do not turn on kconfig `GHASH_RISCV64` option by default.
+ - Add `asmlinkage` qualifier for crypto asm function.
+ - Update the ghash fallback path in ghash_blocks().
+ - Rename structure riscv64_ghash_context to riscv64_ghash_tfm_ctx.
+ - Fold ghash_update_zvkg() and ghash_final_zvkg().
+ - Reorder structure riscv64_ghash_alg_zvkg members initialization in the
+   order declared.
+---
+ arch/riscv/crypto/Kconfig               |  10 ++
+ arch/riscv/crypto/Makefile              |   7 +
+ arch/riscv/crypto/ghash-riscv64-glue.c  | 175 ++++++++++++++++++++++++
+ arch/riscv/crypto/ghash-riscv64-zvkg.pl | 100 ++++++++++++++
+ 4 files changed, 292 insertions(+)
+ create mode 100644 arch/riscv/crypto/ghash-riscv64-glue.c
+ create mode 100644 arch/riscv/crypto/ghash-riscv64-zvkg.pl
+
+diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
+index 9d991ddda289..6863f01a2ab0 100644
+--- a/arch/riscv/crypto/Kconfig
++++ b/arch/riscv/crypto/Kconfig
+@@ -34,4 +34,14 @@ config CRYPTO_AES_BLOCK_RISCV64
+ 	  - Zvkb vector crypto extension (CTR/XTS)
+ 	  - Zvkg vector crypto extension (XTS)
  
-diff --git a/crypto/simd.c b/crypto/simd.c
-index edaa479a1ec5..ea0caabf90f1 100644
---- a/crypto/simd.c
-+++ b/crypto/simd.c
-@@ -181,6 +181,7 @@ struct simd_skcipher_alg *simd_skcipher_create_compat(const char *algname,
++config CRYPTO_GHASH_RISCV64
++	tristate "Hash functions: GHASH"
++	depends on 64BIT && RISCV_ISA_V
++	select CRYPTO_GCM
++	help
++	  GCM GHASH function (NIST SP 800-38D)
++
++	  Architecture: riscv64 using:
++	  - Zvkg vector crypto extension
++
+ endmenu
+diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
+index 9574b009762f..94a7f8eaa8a7 100644
+--- a/arch/riscv/crypto/Makefile
++++ b/arch/riscv/crypto/Makefile
+@@ -9,6 +9,9 @@ aes-riscv64-y := aes-riscv64-glue.o aes-riscv64-zvkned.o
+ obj-$(CONFIG_CRYPTO_AES_BLOCK_RISCV64) += aes-block-riscv64.o
+ aes-block-riscv64-y := aes-riscv64-block-mode-glue.o aes-riscv64-zvkned-zvbb-zvkg.o aes-riscv64-zvkned-zvkb.o
  
- 	alg->ivsize = ialg->ivsize;
- 	alg->chunksize = ialg->chunksize;
-+	alg->walksize = ialg->walksize;
- 	alg->min_keysize = ialg->min_keysize;
- 	alg->max_keysize = ialg->max_keysize;
++obj-$(CONFIG_CRYPTO_GHASH_RISCV64) += ghash-riscv64.o
++ghash-riscv64-y := ghash-riscv64-glue.o ghash-riscv64-zvkg.o
++
+ quiet_cmd_perlasm = PERLASM $@
+       cmd_perlasm = $(PERL) $(<) void $(@)
  
+@@ -21,6 +24,10 @@ $(obj)/aes-riscv64-zvkned-zvbb-zvkg.S: $(src)/aes-riscv64-zvkned-zvbb-zvkg.pl
+ $(obj)/aes-riscv64-zvkned-zvkb.S: $(src)/aes-riscv64-zvkned-zvkb.pl
+ 	$(call cmd,perlasm)
+ 
++$(obj)/ghash-riscv64-zvkg.S: $(src)/ghash-riscv64-zvkg.pl
++	$(call cmd,perlasm)
++
+ clean-files += aes-riscv64-zvkned.S
+ clean-files += aes-riscv64-zvkned-zvbb-zvkg.S
+ clean-files += aes-riscv64-zvkned-zvkb.S
++clean-files += ghash-riscv64-zvkg.S
+diff --git a/arch/riscv/crypto/ghash-riscv64-glue.c b/arch/riscv/crypto/ghash-riscv64-glue.c
+new file mode 100644
+index 000000000000..b01ab5714677
+--- /dev/null
++++ b/arch/riscv/crypto/ghash-riscv64-glue.c
+@@ -0,0 +1,175 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * RISC-V optimized GHASH routines
++ *
++ * Copyright (C) 2023 VRULL GmbH
++ * Author: Heiko Stuebner <heiko.stuebner@vrull.eu>
++ *
++ * Copyright (C) 2023 SiFive, Inc.
++ * Author: Jerry Shih <jerry.shih@sifive.com>
++ */
++
++#include <asm/simd.h>
++#include <asm/vector.h>
++#include <crypto/ghash.h>
++#include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
++#include <linux/crypto.h>
++#include <linux/linkage.h>
++#include <linux/module.h>
++#include <linux/types.h>
++
++/* ghash using zvkg vector crypto extension */
++asmlinkage void gcm_ghash_rv64i_zvkg(be128 *Xi, const be128 *H, const u8 *inp,
++				     size_t len);
++
++struct riscv64_ghash_tfm_ctx {
++	be128 key;
++};
++
++struct riscv64_ghash_desc_ctx {
++	be128 shash;
++	u8 buffer[GHASH_BLOCK_SIZE];
++	u32 bytes;
++};
++
++static inline void ghash_blocks(const struct riscv64_ghash_tfm_ctx *tctx,
++				struct riscv64_ghash_desc_ctx *dctx,
++				const u8 *src, size_t srclen)
++{
++	/* The srclen is nonzero and a multiple of 16. */
++	if (crypto_simd_usable()) {
++		kernel_vector_begin();
++		gcm_ghash_rv64i_zvkg(&dctx->shash, &tctx->key, src, srclen);
++		kernel_vector_end();
++	} else {
++		do {
++			crypto_xor((u8 *)&dctx->shash, src, GHASH_BLOCK_SIZE);
++			gf128mul_lle(&dctx->shash, &tctx->key);
++			srclen -= GHASH_BLOCK_SIZE;
++			src += GHASH_BLOCK_SIZE;
++		} while (srclen);
++	}
++}
++
++static int ghash_init(struct shash_desc *desc)
++{
++	struct riscv64_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
++
++	*dctx = (struct riscv64_ghash_desc_ctx){};
++
++	return 0;
++}
++
++static int ghash_update_zvkg(struct shash_desc *desc, const u8 *src,
++			     unsigned int srclen)
++{
++	size_t len;
++	const struct riscv64_ghash_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
++	struct riscv64_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
++
++	if (dctx->bytes) {
++		if (dctx->bytes + srclen < GHASH_BLOCK_SIZE) {
++			memcpy(dctx->buffer + dctx->bytes, src, srclen);
++			dctx->bytes += srclen;
++			return 0;
++		}
++		memcpy(dctx->buffer + dctx->bytes, src,
++		       GHASH_BLOCK_SIZE - dctx->bytes);
++
++		ghash_blocks(tctx, dctx, dctx->buffer, GHASH_BLOCK_SIZE);
++
++		src += GHASH_BLOCK_SIZE - dctx->bytes;
++		srclen -= GHASH_BLOCK_SIZE - dctx->bytes;
++		dctx->bytes = 0;
++	}
++	len = srclen & ~(GHASH_BLOCK_SIZE - 1);
++
++	if (len) {
++		ghash_blocks(tctx, dctx, src, len);
++		src += len;
++		srclen -= len;
++	}
++
++	if (srclen) {
++		memcpy(dctx->buffer, src, srclen);
++		dctx->bytes = srclen;
++	}
++
++	return 0;
++}
++
++static int ghash_final_zvkg(struct shash_desc *desc, u8 *out)
++{
++	const struct riscv64_ghash_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
++	struct riscv64_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
++	int i;
++
++	if (dctx->bytes) {
++		for (i = dctx->bytes; i < GHASH_BLOCK_SIZE; i++)
++			dctx->buffer[i] = 0;
++
++		ghash_blocks(tctx, dctx, dctx->buffer, GHASH_BLOCK_SIZE);
++	}
++
++	memcpy(out, &dctx->shash, GHASH_DIGEST_SIZE);
++
++	return 0;
++}
++
++static int ghash_setkey(struct crypto_shash *tfm, const u8 *key,
++			unsigned int keylen)
++{
++	struct riscv64_ghash_tfm_ctx *tctx = crypto_shash_ctx(tfm);
++
++	if (keylen != GHASH_BLOCK_SIZE)
++		return -EINVAL;
++
++	memcpy(&tctx->key, key, GHASH_BLOCK_SIZE);
++
++	return 0;
++}
++
++static struct shash_alg riscv64_ghash_alg_zvkg = {
++	.init = ghash_init,
++	.update = ghash_update_zvkg,
++	.final = ghash_final_zvkg,
++	.setkey = ghash_setkey,
++	.descsize = sizeof(struct riscv64_ghash_desc_ctx),
++	.digestsize = GHASH_DIGEST_SIZE,
++	.base = {
++		.cra_blocksize = GHASH_BLOCK_SIZE,
++		.cra_ctxsize = sizeof(struct riscv64_ghash_tfm_ctx),
++		.cra_priority = 303,
++		.cra_name = "ghash",
++		.cra_driver_name = "ghash-riscv64-zvkg",
++		.cra_module = THIS_MODULE,
++	},
++};
++
++static inline bool check_ghash_ext(void)
++{
++	return riscv_isa_extension_available(NULL, ZVKG) &&
++	       riscv_vector_vlen() >= 128;
++}
++
++static int __init riscv64_ghash_mod_init(void)
++{
++	if (check_ghash_ext())
++		return crypto_register_shash(&riscv64_ghash_alg_zvkg);
++
++	return -ENODEV;
++}
++
++static void __exit riscv64_ghash_mod_fini(void)
++{
++	crypto_unregister_shash(&riscv64_ghash_alg_zvkg);
++}
++
++module_init(riscv64_ghash_mod_init);
++module_exit(riscv64_ghash_mod_fini);
++
++MODULE_DESCRIPTION("GCM GHASH (RISC-V accelerated)");
++MODULE_AUTHOR("Heiko Stuebner <heiko.stuebner@vrull.eu>");
++MODULE_LICENSE("GPL");
++MODULE_ALIAS_CRYPTO("ghash");
+diff --git a/arch/riscv/crypto/ghash-riscv64-zvkg.pl b/arch/riscv/crypto/ghash-riscv64-zvkg.pl
+new file mode 100644
+index 000000000000..a414d77554d2
+--- /dev/null
++++ b/arch/riscv/crypto/ghash-riscv64-zvkg.pl
+@@ -0,0 +1,100 @@
++#! /usr/bin/env perl
++# SPDX-License-Identifier: Apache-2.0 OR BSD-2-Clause
++#
++# This file is dual-licensed, meaning that you can use it under your
++# choice of either of the following two licenses:
++#
++# Copyright 2023 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License"). You can obtain
++# a copy in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++#
++# or
++#
++# Copyright (c) 2023, Christoph Müllner <christoph.muellner@vrull.eu>
++# Copyright (c) 2023, Jerry Shih <jerry.shih@sifive.com>
++# All rights reserved.
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++#
++# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++
++# - RV64I
++# - RISC-V Vector ('V') with VLEN >= 128
++# - RISC-V Vector GCM/GMAC extension ('Zvkg')
++
++use strict;
++use warnings;
++
++use FindBin qw($Bin);
++use lib "$Bin";
++use lib "$Bin/../../perlasm";
++use riscv;
++
++# $output is the last argument if it looks like a file (it has an extension)
++# $flavour is the first argument if it doesn't look like a file
++my $output = $#ARGV >= 0 && $ARGV[$#ARGV] =~ m|\.\w+$| ? pop : undef;
++my $flavour = $#ARGV >= 0 && $ARGV[0] !~ m|\.| ? shift : undef;
++
++$output and open STDOUT,">$output";
++
++my $code=<<___;
++.text
++___
++
++###############################################################################
++# void gcm_ghash_rv64i_zvkg(be128 *Xi, const be128 *H, const u8 *inp, size_t len)
++#
++# input: Xi: current hash value
++#        H: hash key
++#        inp: pointer to input data
++#        len: length of input data in bytes (multiple of block size)
++# output: Xi: Xi+1 (next hash value Xi)
++{
++my ($Xi,$H,$inp,$len) = ("a0","a1","a2","a3");
++my ($vXi,$vH,$vinp,$Vzero) = ("v1","v2","v3","v4");
++
++$code .= <<___;
++.p2align 3
++.globl gcm_ghash_rv64i_zvkg
++.type gcm_ghash_rv64i_zvkg,\@function
++gcm_ghash_rv64i_zvkg:
++    vsetivli zero, 4, e32, m1, ta, ma
++    vle32.v $vH, ($H)
++    vle32.v $vXi, ($Xi)
++
++Lstep:
++    vle32.v $vinp, ($inp)
++    add $inp, $inp, 16
++    add $len, $len, -16
++    @{[vghsh_vv $vXi, $vH, $vinp]}
++    bnez $len, Lstep
++
++    vse32.v $vXi, ($Xi)
++    ret
++
++.size gcm_ghash_rv64i_zvkg,.-gcm_ghash_rv64i_zvkg
++___
++}
++
++print $code;
++
++close STDOUT or die "error closing STDOUT: $!";
 -- 
 2.28.0
 
