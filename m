@@ -1,43 +1,43 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="npuOWRMl"
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E4D298
-	for <linux-crypto@vger.kernel.org>; Tue,  5 Dec 2023 01:28:15 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-5c21e185df5so3051731a12.1
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Dec 2023 01:28:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="WQd4Rz90"
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D22F98
+	for <linux-crypto@vger.kernel.org>; Tue,  5 Dec 2023 01:28:18 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6cbd24d9557so4314180b3a.1
+        for <linux-crypto@vger.kernel.org>; Tue, 05 Dec 2023 01:28:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1701768495; x=1702373295; darn=vger.kernel.org;
+        d=sifive.com; s=google; t=1701768498; x=1702373298; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2+Duv2eL4Rh6BmoQvomNjrPNP7WadF4MX+fx63CbvwQ=;
-        b=npuOWRMl7QM4Mt3i1dtM3vrIJQJeroBuwn1gjmvWDNQY6qx6lD0SyRMTuU/lLEq8/x
-         90lm00lWlHm89Yo4KOdOnePWBUSXN3JLLcNYRwScPja02eOnqzwpELIa7Um7TIPftpho
-         3LBCfrJ+uzgOGED/nWL0r7ORz/xms0o1//MPlIDMXv4khxkUJpN6kio4ShhknsO29KHJ
-         RYcl5sX9Yd7yXoAB0ryc7A0uJerxYBMCZs3vfMLDKINIU8n67rdkRj6f+ntdkl2kIzPF
-         3znjaQIIv0AOqzeaqOKc8PSAOFVa0pOViUsWNUsi6ByycoQ0jyNMmw57JRDVExxM8wpy
-         hRGg==
+        bh=5Ww+t+x4EF+o8Iz1q4xD0rNSq2UgrGpxhIva2EbXP3U=;
+        b=WQd4Rz90XOrJAD0wvBSaA0RZETBsG2VzReNSLplzy+/P//EiOtHblYd5upcyeQGq+w
+         J3RoD5OHQT8q+3IHewwRRnD5NsFhPnXAiWCYw4Hs5QGNUIgeFZV+YGAt/hbooNuds0mz
+         iF8+iJFXWbuAlWLgYTrG7qFTpy17EzpT5j5JHGfoUEhHAn/VIPFUCrjJrBE5jHMh6rX7
+         ikfq9/TQ3lXm/euJj2cHnIS8RHs0KssxBX8Cqzl20QRecoURA6MxVhI8K4UrrH+j2eja
+         mLN14jt+13Z5S93TIrAEjS8kgKhJBd+V1jI/PaI7odB+Hn0W3ZPU7OF378Y7zldLizw8
+         eW7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701768495; x=1702373295;
+        d=1e100.net; s=20230601; t=1701768498; x=1702373298;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2+Duv2eL4Rh6BmoQvomNjrPNP7WadF4MX+fx63CbvwQ=;
-        b=f07F5gO7tMYnbrc09TD3iOY6SEx84739e9eVwntjJGJZEKqNhAeftAj4E6jQibhuw/
-         lTWS5YxdIRmX4QccNsiQHkqTRts+UXaqgwaMJ6/QOa5s4un1/fddOcHCrHtjdwc/6zRR
-         UV1GJ4/pFGs3oedEKM2srh1KqXr+CKBSx5TwCXuLDn+PHWfnNrb/dxXpGixQujIUQcty
-         fck6ObQMOdbwazp2ljaKSRsHGfcohfNkM/oQIkakqdUbRAHz5SEFammb2yC6plbNLgF+
-         fxDXazZpqMNH13ycjTsFKcVXhVN5glpIZCLSDuEtbmm4dhJ2IXAUJmiZFBDqo0icmnuI
-         9Q1Q==
-X-Gm-Message-State: AOJu0Yxg7Yl8rCSQyDjx8wFfm/BB1p+ck6rb7R0hZiys02V1T4Raa1hb
-	R5wwUjfAzbBsS7jo4o85e5GaxQ==
-X-Google-Smtp-Source: AGHT+IHo8qyIK+a7xAlqBDFbhHitNbdyhcjGou5e7sEK1zHUFcXdJWS5bgBXVVX5Sw11ZixDo6r/6Q==
-X-Received: by 2002:a05:6a20:160a:b0:18f:97c:9778 with SMTP id l10-20020a056a20160a00b0018f097c9778mr7394313pzj.96.1701768494761;
-        Tue, 05 Dec 2023 01:28:14 -0800 (PST)
+        bh=5Ww+t+x4EF+o8Iz1q4xD0rNSq2UgrGpxhIva2EbXP3U=;
+        b=o5XYv13bW+2gzWcGP/swAGfUmhwmWAX4HULGAYryJ46vkTyYcpCcRmvP+Ob85/AChz
+         GKe4TllxEZwj7PvDJ5VyUVYfwRJqtGiuC7VCpuchEksTJxAYZfp5yvex8TuOSDYCQ5qC
+         rnbGkm2qdJrzsQiYNXQA92Fzu/NmuubvtpZ3PjPFgXU2DLal9lI1aAtCNDQdd1UdKHRX
+         lb0SW9OLqoDGbWi/J6R8PggUR3fBgNhOdK9Db9/o2PzkPqKA6K79rBjsPtCHeC0v+NzD
+         BrUA36Nxa/X/rK5ioNDVb8mXowS0pcqglPhfYbTDutBYW4gUv786DFUXfFI2MZX+uALW
+         pDSw==
+X-Gm-Message-State: AOJu0YxdGhISeWvCx03PLRcXTQv2aQwXckDLZByhg+DNYhH0JB1XBrHL
+	bWpUPuQJJP5YWu2fETAY5HG7NA==
+X-Google-Smtp-Source: AGHT+IFaWRkKbZw7DstMCEBheFGlYTaPcp/3Zi4NlnL96zF+Y1cISDdKfBWTpwQP+FRgk8CWXY1DdQ==
+X-Received: by 2002:a05:6a00:893:b0:6ce:2757:7866 with SMTP id q19-20020a056a00089300b006ce27577866mr1216195pfj.33.1701768498058;
+        Tue, 05 Dec 2023 01:28:18 -0800 (PST)
 Received: from localhost.localdomain ([101.10.93.135])
-        by smtp.gmail.com with ESMTPSA id l6-20020a056a00140600b006cdd723bb6fsm8858788pfu.115.2023.12.05.01.28.11
+        by smtp.gmail.com with ESMTPSA id l6-20020a056a00140600b006cdd723bb6fsm8858788pfu.115.2023.12.05.01.28.15
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Dec 2023 01:28:14 -0800 (PST)
+        Tue, 05 Dec 2023 01:28:17 -0800 (PST)
 From: Jerry Shih <jerry.shih@sifive.com>
 To: paul.walmsley@sifive.com,
 	palmer@dabbelt.com,
@@ -54,9 +54,9 @@ Cc: heiko@sntech.de,
 	linux-riscv@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH v3 01/12] RISC-V: add helper function to read the vector VLEN
-Date: Tue,  5 Dec 2023 17:27:50 +0800
-Message-Id: <20231205092801.1335-2-jerry.shih@sifive.com>
+Subject: [PATCH v3 02/12] RISC-V: hook new crypto subdir into build-system
+Date: Tue,  5 Dec 2023 17:27:51 +0800
+Message-Id: <20231205092801.1335-3-jerry.shih@sifive.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20231205092801.1335-1-jerry.shih@sifive.com>
 References: <20231205092801.1335-1-jerry.shih@sifive.com>
@@ -70,44 +70,68 @@ Content-Transfer-Encoding: 8bit
 
 From: Heiko Stuebner <heiko.stuebner@vrull.eu>
 
-VLEN describes the length of each vector register and some instructions
-need specific minimal VLENs to work correctly.
-
-The vector code already includes a variable riscv_v_vsize that contains
-the value of "32 vector registers with vlenb length" that gets filled
-during boot. vlenb is the value contained in the CSR_VLENB register and
-the value represents "VLEN / 8".
-
-So add riscv_vector_vlen() to return the actual VLEN value for in-kernel
-users when they need to check the available VLEN.
+Create a crypto subdirectory for added accelerated cryptography routines
+and hook it into the riscv Kbuild and the main crypto Kconfig.
 
 Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 Reviewed-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Jerry Shih <jerry.shih@sifive.com>
 ---
- arch/riscv/include/asm/vector.h | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ arch/riscv/Kbuild          | 1 +
+ arch/riscv/crypto/Kconfig  | 5 +++++
+ arch/riscv/crypto/Makefile | 4 ++++
+ crypto/Kconfig             | 3 +++
+ 4 files changed, 13 insertions(+)
+ create mode 100644 arch/riscv/crypto/Kconfig
+ create mode 100644 arch/riscv/crypto/Makefile
 
-diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/vector.h
-index 9fb2dea66abd..1fd3e5510b64 100644
---- a/arch/riscv/include/asm/vector.h
-+++ b/arch/riscv/include/asm/vector.h
-@@ -244,4 +244,15 @@ void kernel_vector_allow_preemption(void);
- #define kernel_vector_allow_preemption()	do {} while (0)
- #endif
+diff --git a/arch/riscv/Kbuild b/arch/riscv/Kbuild
+index d25ad1c19f88..2c585f7a0b6e 100644
+--- a/arch/riscv/Kbuild
++++ b/arch/riscv/Kbuild
+@@ -2,6 +2,7 @@
  
-+/*
-+ * Return the implementation's vlen value.
-+ *
-+ * riscv_v_vsize contains the value of "32 vector registers with vlenb length"
-+ * so rebuild the vlen value in bits from it.
-+ */
-+static inline int riscv_vector_vlen(void)
-+{
-+	return riscv_v_vsize / 32 * 8;
-+}
+ obj-y += kernel/ mm/ net/
+ obj-$(CONFIG_BUILTIN_DTB) += boot/dts/
++obj-$(CONFIG_CRYPTO) += crypto/
+ obj-y += errata/
+ obj-$(CONFIG_KVM) += kvm/
+ 
+diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
+new file mode 100644
+index 000000000000..10d60edc0110
+--- /dev/null
++++ b/arch/riscv/crypto/Kconfig
+@@ -0,0 +1,5 @@
++# SPDX-License-Identifier: GPL-2.0
 +
- #endif /* ! __ASM_RISCV_VECTOR_H */
++menu "Accelerated Cryptographic Algorithms for CPU (riscv)"
++
++endmenu
+diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
+new file mode 100644
+index 000000000000..b3b6332c9f6d
+--- /dev/null
++++ b/arch/riscv/crypto/Makefile
+@@ -0,0 +1,4 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# linux/arch/riscv/crypto/Makefile
++#
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 650b1b3620d8..c7b23d2c58e4 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1436,6 +1436,9 @@ endif
+ if PPC
+ source "arch/powerpc/crypto/Kconfig"
+ endif
++if RISCV
++source "arch/riscv/crypto/Kconfig"
++endif
+ if S390
+ source "arch/s390/crypto/Kconfig"
+ endif
 -- 
 2.28.0
 
