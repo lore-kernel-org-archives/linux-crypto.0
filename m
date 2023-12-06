@@ -1,248 +1,133 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gEvQ5dcC"
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46030120;
-	Tue,  5 Dec 2023 15:11:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701817901; x=1733353901;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=FEiwVoMjtr/9HH+TNv5nMVsA9bg9zsnik0gar7NDCKI=;
-  b=gEvQ5dcCne0OsaiWkYuYRePjv5amyS6SJm3kPxdsM0ssoDD8aIdQVKNF
-   zJ8MSeZngqHEdX+DkqVDy31TMJgT2PXH3vgtveoLk4E5retLk4adEKsu3
-   YECWnRhRjsvKfOcFQAlGWPAMJUUu+Of1P5/feDPi6qmPnBnb6TxnoHbLP
-   JHMM3vmZaWwS8DWHeJ9tBWvfWxbPtFOyS8eyP5/TegLRtLbhireps0GpH
-   QakZXsGbnF9Zxgr0pZZMrXI6Ysv1dIboOmTK8zHG2rPh8WXchzN66gkJV
-   Am3mmFLw+vVbmOk/8VCtcyKjZsh3rUxvIbSaJP/8eWFB+gmeRIgVN9SUR
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="396766459"
-X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="396766459"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 15:11:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="771091214"
-X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="771091214"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Dec 2023 15:11:40 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 5 Dec 2023 15:11:40 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 5 Dec 2023 15:11:39 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 5 Dec 2023 15:11:39 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Tue, 5 Dec 2023 15:11:38 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gVEN94BNZEsqS+4H4pgnPe1ev8CXjuYX697jWnnDqDWrozQofYaHAimi6U1Azg9HZRgrk9MewPoVxc+qJrT4DFDNS4VnUKyRRpqgucG1ID282eg+RH+Fcp0EgYV59pebgmaPOy8KAvDZN84z1iBrJWrW0SrVGJ7avdCs/562zA8BiD2LGrOdEFuRBTYsY3AMgf7mDRgc5ZXifHFfDxJNTQXg9lPpf3nD+3pxaReslUvckFpxm49zsNYrgo1MEtKqyA2N2+6A2ATv+MC0JtwZAb4K5GfdJryLSDoJI4QRVMT2dgCG/TdmrqNd9VMtMum3m9zZWZejth8BRuv8aAW5bQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0lL9utMbn/uyp5GBaNk5//QndzjR07pxk/lf/iXpc4s=;
- b=TOodwkTcPcQSKwmgmAUbT3xNWuU7BHnO55hVd617luakFIIsthGOTq00ec2X/GWZ/cpjpXGOf791P5jzvmWvSTwvARjHyj+/hwwy9fJPfPYuB4LGj5AHawGSOFXzme/OhASBlN1swE7Qm4ipxr9D31STmHo42S8ODk3sm+NrjE5G0ysq7DxHl65as5i5QdJN4EFZztG/gLrP0jOVT5b7iGnKmmfmjdoAdd3hG9SJtbhiRj+rQQSuZTHP8cAPnLggCl4qV8ubM8OCrR6BCS1/TPaIv/t7dW6cvjUTqJWP9f59x7QE7TtkW/o6wMMrq9bShZx4i+L4GQ6OnBAgL3oGfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
- by PH8PR11MB7142.namprd11.prod.outlook.com (2603:10b6:510:22e::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Tue, 5 Dec
- 2023 23:11:36 +0000
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6362:763e:f84b:4169]) by PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6362:763e:f84b:4169%5]) with mapi id 15.20.7046.033; Tue, 5 Dec 2023
- 23:11:35 +0000
-Date: Tue, 5 Dec 2023 15:11:30 -0800
-From: Dan Williams <dan.j.williams@intel.com>
-To: Dionna Amalie Glaze <dionnaglaze@google.com>, Dan Williams
-	<dan.j.williams@intel.com>
-CC: Sean Christopherson <seanjc@google.com>, Michael Roth
-	<michael.roth@amd.com>, Alexey Kardashevskiy <aik@amd.com>,
-	<kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
-	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
-	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
-	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
-	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-	Brijesh Singh <brijesh.singh@amd.com>, <dan.middleton@intel.com>
-Subject: Re: [PATCH v10 48/50] KVM: SEV: Provide support for
- SNP_GUEST_REQUEST NAE event
-Message-ID: <656fae221bf90_45e01294d2@dwillia2-xfh.jf.intel.com.notmuch>
-References: <ZS614OSoritrE1d2@google.com>
- <b9da2fed-b527-4242-a588-7fc3ee6c9070@amd.com>
- <ZS_iS4UOgBbssp7Z@google.com>
- <20231110220756.7hhiy36jc6jiu7nm@amd.com>
- <ZU6zGgvfhga0Oiob@google.com>
- <CAAH4kHYPAiS+_KKhb1=8q=OkS+XBsES8J3K_acJ_5YcNZPi=kA@mail.gmail.com>
- <656e6f0aa1c5_4568a29451@dwillia2-xfh.jf.intel.com.notmuch>
- <CAAH4kHb7cfMetpC=AYy=FjTTve6g0W8NZdeSwQ8uVxkqi2491Q@mail.gmail.com>
- <656f82b4b1972_45e012944e@dwillia2-xfh.jf.intel.com.notmuch>
- <CAAH4kHb9O9FeaTmNuNAkhrdrDLJPo8qgD5vNow3w-sY-DA4Ung@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAH4kHb9O9FeaTmNuNAkhrdrDLJPo8qgD5vNow3w-sY-DA4Ung@mail.gmail.com>
-X-ClientProxiedBy: MW2PR2101CA0002.namprd21.prod.outlook.com
- (2603:10b6:302:1::15) To PH8PR11MB8107.namprd11.prod.outlook.com
- (2603:10b6:510:256::6)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QvTjp1Kl"
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 472E0C6
+	for <linux-crypto@vger.kernel.org>; Tue,  5 Dec 2023 16:43:16 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-54c77d011acso2657a12.1
+        for <linux-crypto@vger.kernel.org>; Tue, 05 Dec 2023 16:43:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701823395; x=1702428195; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0CGpNMJzqHfBBmrth6e1MGteUUzf7hdy/lyzvmA95dY=;
+        b=QvTjp1KlEWSQySGsfIuBlHX2OhzZ6h7tYxCZcNM+Q5LS9XTLc0ChHEP78AUt0qDsha
+         KzixpmwLIzoF87f0S/AoLpsnp3LagWd5hlzSmCBmZ4Dw7ue7yV2SsNUDinmhi91UaEqY
+         8jjcA6sHmEHiJ07S7M6cfZrsPSJxd8BHReJzbYeWpWUsnu3W08X63VDzMp3V71dyYscr
+         O+j7rB71uGXBloj74qhq+PoWiOzG+VN9/+ZDY2MQD4s9HCYElr/npFtHMpBVng5I0L55
+         K0bd062uyRJH9q3y1MudQyAQpIo78DkObbrDvs0kPHiSJ9GfPAwhO/QiolkD+PrLn4Io
+         mo5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701823395; x=1702428195;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0CGpNMJzqHfBBmrth6e1MGteUUzf7hdy/lyzvmA95dY=;
+        b=PUSEnU+g1CWPaFYgMRKmmoLoIIjdAjf7qf6Fo8JPbyf9NlRXqj31ePDzXcFQhhOl5x
+         RmycLFVCOWgG7hiuw8N5JGvlqyQzVIgyhKczKl7jMh/6ITjz028UzDvUaGaGGKLEqesk
+         Xm3RMmCcD9pRjnC9mcsEi3t5KkQJtQKw5NPeyBRhei/xqRLwnuAKS8w0nVngFES0sAVd
+         QkeakKeEOVV38mEpEusxSqh1/m6OdgtPEUt1tsDRy7RWnplY49ZmqWtGxPtVWGHFDsS6
+         WClrD0S7VeSaTtsar2ORU34I6agI8eTRG0pgwXg7krz9AKXQ3w4TNIQz6YYT8UD/Kwoj
+         KU9A==
+X-Gm-Message-State: AOJu0YzXfpQmxBXBO3lAaRmFJ+x39Dg4ngxYNpg0wUlcwjGWM4Z6LsaX
+	1nMdRoX4y6Tw9CfgnpRxOtJNPjbKGIBOcUwM6cxHbQ==
+X-Google-Smtp-Source: AGHT+IHnxQI+DCFCxmScTp7bseun1ubBzYz2vloVjxDiicjaclByuyc4HtX+jd86aOQ5xnHQeVkN+gBTvB5g8n8nI7I=
+X-Received: by 2002:a50:c35d:0:b0:54c:79ed:a018 with SMTP id
+ q29-20020a50c35d000000b0054c79eda018mr44800edb.2.1701823394564; Tue, 05 Dec
+ 2023 16:43:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|PH8PR11MB7142:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1132f261-ff9a-4ae0-99af-08dbf5e786cd
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: foLDqGQtKwoF3bGTbLVvQ66dW+oecTefgBu1s5RTqa6KuzGCTGFb+BUa4d/ZD5NeHakgpaLPTyUmDDNVLWMBwpK4b1EaROJgO9dbm3K2l297L9GLk0JGOcgrDKdLGoKjKvhtAVvBLUTQvqw9CldUElyhSKfltrorFLmK7YKIia7Npqb76v5Hmt5h9SCfTBs5WA6r36Pc3at8sJXAE6mbAUuBQOzRKvolhBfgAI/1Vz987Xa3FacOp2/qh0CNczlETjjQHn/r4/yOyK8HuxNzhEZMFDWqfZzwWLFVE8tRNW2tK3Xq72pnjUIBhm7hxsl/I56IORg+aDsa0fyLJZUg4X9SvLpVjtq3M2Cp38OY4AznbuJUOHuCXVd7hcN6bnss0yXNQjCZuUsKntCb6Haix8STFD4t5REfm5MUivf2+D4gAeLb1vVh8A2aYpNEk4bK0U4C0fusfQLxNUdYkKmORNRrBtBnIqRgE0emBLtYZxF+baVmCe+sHV3xAGTVvueFEksg1CyK913W0nn6bT/bHwRh1hrU/HwJhHzHdoFOccg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(366004)(396003)(376002)(346002)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(7406005)(7416002)(5660300002)(2906002)(6666004)(9686003)(6486002)(6512007)(38100700002)(966005)(316002)(110136005)(82960400001)(8936002)(478600001)(53546011)(4326008)(66946007)(54906003)(6506007)(83380400001)(26005)(86362001)(66476007)(41300700001)(8676002)(66556008);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YTdNNU1Ea3VuYk1JK1VuWnB2b2tNd1ViZFA3cjhLSXRsdHVNM2F6YkFtcDBq?=
- =?utf-8?B?YU8xb1pDWTI2QjY1T05yeFdRUlQveFAvMCtvRi9QYTdwNWhBdXJFSUFKdFcw?=
- =?utf-8?B?VFZWUWR2ZHVyRms2TWV0REd3ZkhEeXJGaHZ4ckVJQ0Y5ekg2UC9OVkFrd0Zw?=
- =?utf-8?B?YVZMNnQ2RnRSYWR0S3M1ZVJiOHYrL2lBZVAraVFURk4zei9raW9KSm8wWS9V?=
- =?utf-8?B?VjlxMkRJRHZBWEV4M0JlWHd0eVJJanh3Q2M4eHdSTWFUY010SHBNOUlaQTk4?=
- =?utf-8?B?cEtISTNEWnZ3ZStEUFpIYlk2NDhFVm1NTlRzSUdNNGFWK0Zlalh4VURFZmcy?=
- =?utf-8?B?eFF0WlpuL3pxMzJHeTZhdVZsbXRRSEZETGFQSkFpV0NjMW1PTmcvc3MwOEFF?=
- =?utf-8?B?VWV6dG1Ca0ZFZERjR3JUVXZZZndpM0dJTGhBQnRaNDh6Q1h6V3JWZ1Z4ZVB5?=
- =?utf-8?B?MFlqdmtzUGF2VEM4Q01SVi9SaWZialZKbzRwS2YwTnhRcWx0SWFBK3N0aWl0?=
- =?utf-8?B?MW45UXY0SU01UE54S3BYeEt2VTEzUGRNVzRvdWxSN2psUk51V1JQZTFmZGkz?=
- =?utf-8?B?amJ3VjhNNDdKRFYzaG5JT1lUdnBESmxpREpYMEk3M2xzWlhIM09qaVJWS1cr?=
- =?utf-8?B?S3NIdUk5d3RPdzhEczZVb0lLN3ovZUVLZlNPQW5LdzRwVS9jc0t3NkVSZ0Uw?=
- =?utf-8?B?b0pxbzk5bDZuT3BMTDcwZnNWTXhqVVVxYkZ4b1k1MlJJZlhqYS9OVmNTbzRF?=
- =?utf-8?B?aTBDS1BjZlUxajd1N3NKZHIyVGxhdnoyM3NDYnhIMUVlSEk3VDlqS2R6dFRv?=
- =?utf-8?B?RmtUWFN4ZHRqRmxkT2s4MzFONGRUMXBqd2YvRnZ1bHJmOE1qK3Y1bXU3UjVB?=
- =?utf-8?B?K3NXc2ZOcndScUxuMXVlSGJaVWtYTFdEOHV5ZXFlaC9iSDN2UG0wNzM3MHky?=
- =?utf-8?B?R0Z6VDR1Y0I4YmVaazNEaExvME5nenEvQUNJeDRNSUp4NU1mcENiOUJBc3Uy?=
- =?utf-8?B?aWpvVzBqTVlDMVlWUnFOY200WG8vdmpzSzhzejEzVmVVRU5ScFE2WFhERnJ0?=
- =?utf-8?B?bS9VQWNseEppQUdSNlFpVUQ2V2M2cUxjZExGb05PdzM0eWNRRlBvRlVvTHdh?=
- =?utf-8?B?c05zMUt3TEpZRVMrZlBXZWRrd29Ra3A2U010ZlZ5MldxUkpVczVQU2hxUWlD?=
- =?utf-8?B?eHBEZzczZUlFaS8xQXNPVlAyWk15dGxlWHo4RjhxcGZDTUl4MXVIYzhuNnJG?=
- =?utf-8?B?cXZvejNXRG44cDFLWGdGektZS0MvNXdwWkNoRUk5QzFCWGJlcDNSNGU0NEkr?=
- =?utf-8?B?NzVRMWdna2E2eUdkVnhPZkVaS2NJQmh2cWhsTm5hbzY4QlZ4bzZ4YjVBZE9t?=
- =?utf-8?B?N2dEY2xoTC9ob0pseWpRbm1nRVNKMytLMzlhOXppMWQ3eGVlZUZYa1VZWmdM?=
- =?utf-8?B?cXBiRUVUWmdvMEV0ditjRmcxYmJORTFjbWhvRnk5cDVhaUJFQlhtd2Y0Sllt?=
- =?utf-8?B?Vm5xdmtWMnpINnZiTWdIVjJXZkR6d2FkNCtFTm56ajVSc1NsSkxnaFVUaGFQ?=
- =?utf-8?B?SjFLMVlnMStCNThEaExxM1VwelAvSXBtMlB1dng3Qk5ZVG9OdXIrWU5rS3d5?=
- =?utf-8?B?MXJkb3AxaENTK0I5L3NrSEM1ZHdsRk5BekI5T3YrdWxRcThpNENGc3RpN2Iw?=
- =?utf-8?B?STkwRVpDL0RjM0pYV3VrZFMzTTdXVlEwaVJNeEJNNFZXclhtRlVtTGZBWGpN?=
- =?utf-8?B?WVNkSGVJV2tqRFQ0Q2xXRFdaUStzQW9Ka0pRTG5PUC8wc241Vm5Dek9NcW5q?=
- =?utf-8?B?VGVjUFFFbzNWcWw5VzJ1U01PV0o5L1lJNjdIeEdLZUNDRlJ5N0pLUFJZWDA4?=
- =?utf-8?B?R3Q0ZUE1aWt1R05BcnBWMy9tK1ExNHVHMm4wWlZUcm0yS0N4elZxV3RBV045?=
- =?utf-8?B?OC9nSnBMMmxER2V5bUlNazBZSE5ML3NHeGw2SDNFS1dteFpWVHRCY2RtT0Ew?=
- =?utf-8?B?RHNlbEFCNjdqYktwKzhOcFhxbjdyVVVNMDJwNlBNeHNzS01uMkF3Q2s3SGhq?=
- =?utf-8?B?REhCdmFXMzNrTGNjeUNzN08wZDNPeGM4TCtHMzBPTFU0UUorSzUzZ1c4Ynpu?=
- =?utf-8?B?V29GV1dyeEVaOW4wVE5Sck1Bb2MySTZaa2g3SzBiamw5MzA2SzVNWFk4Z0No?=
- =?utf-8?B?d2c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1132f261-ff9a-4ae0-99af-08dbf5e786cd
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 23:11:35.3690
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZvCJnY0XNFt17GRw7ikruh+CkOtYrgImIibjRX6E59c0D2S7khlKhYSaf1MYmnsE9wrUJRE4+0yOwulfdeKqiWg7cQc0dTk/VqG/7pPtJIc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7142
-X-OriginatorOrg: intel.com
+References: <ZS614OSoritrE1d2@google.com> <b9da2fed-b527-4242-a588-7fc3ee6c9070@amd.com>
+ <ZS_iS4UOgBbssp7Z@google.com> <20231110220756.7hhiy36jc6jiu7nm@amd.com>
+ <ZU6zGgvfhga0Oiob@google.com> <CAAH4kHYPAiS+_KKhb1=8q=OkS+XBsES8J3K_acJ_5YcNZPi=kA@mail.gmail.com>
+ <656e6f0aa1c5_4568a29451@dwillia2-xfh.jf.intel.com.notmuch>
+ <CAAH4kHb7cfMetpC=AYy=FjTTve6g0W8NZdeSwQ8uVxkqi2491Q@mail.gmail.com>
+ <656f82b4b1972_45e012944e@dwillia2-xfh.jf.intel.com.notmuch>
+ <CAAH4kHb9O9FeaTmNuNAkhrdrDLJPo8qgD5vNow3w-sY-DA4Ung@mail.gmail.com> <656fae221bf90_45e01294d2@dwillia2-xfh.jf.intel.com.notmuch>
+In-Reply-To: <656fae221bf90_45e01294d2@dwillia2-xfh.jf.intel.com.notmuch>
+From: Dionna Amalie Glaze <dionnaglaze@google.com>
+Date: Tue, 5 Dec 2023 16:43:03 -0800
+Message-ID: <CAAH4kHY0Bcq+nCLhX6XrqkR=Jb7eYcC+61n6F1J5qamOZxn4bA@mail.gmail.com>
+Subject: Re: [PATCH v10 48/50] KVM: SEV: Provide support for SNP_GUEST_REQUEST
+ NAE event
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Michael Roth <michael.roth@amd.com>, 
+	Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+	pbonzini@redhat.com, vkuznets@redhat.com, jmattson@google.com, 
+	luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com, 
+	pgonda@google.com, peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, dan.middleton@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dionna Amalie Glaze wrote:
-> On Tue, Dec 5, 2023 at 12:06 PM Dan Williams <dan.j.williams@intel.com> wrote:
-> >
-> > [ add Ard for the SBOM sysfs ABI commentary ]
-> >
-> > Dionna Amalie Glaze wrote:
-> > [..]
-> > > > > My own plan for SEV-SNP was to have a bespoke signed measurement of
-> > > > > the UEFI in the GUID table, but that doesn't extend to TDX. If we're
-> > > > > looking more at an industry alignment on coRIM for SBOM formats (yes
-> > > > > please), then it'd be great to start getting that kind of info plumbed
-> > > > > to the user in a uniform way that doesn't have to rely on servers
-> > > > > providing the endorsements.
-> > > > >
-> > > > > [1] https://uefi.org/blog/firmware-sbom-proposal
-> > > >
-> > > > Honestly my first reaction for this ABI would be for a new file under
-> > > > /sys/firmware/efi/efivars or similar.
-> > >
-> > > For UEFI specifically that could make sense, yes. Not everyone has
-> > > been mounting efivars, so it's been a bit of an uphill battle for that
-> > > one.
-> >
-> > I wonder what the concern is with mounting efivarfs vs configfs? In any
-> > event this seems distinct enough to be its own /sys/firmware/efi/sbom
-> > file. I would defer to Ard, but I think SBOM is a generally useful
-> > concept that would be out of place as a blob returned from configfs-tsm.
-> >
-> > > Still there's the matter of cached TDI RIMs. NVIDIA would have
-> >
-> > I am not immediatly sure what a "TDI RIM" is?
-> >
-> 
-> I might just be making up terms. Any trusted hardware device that has
-> its own attestation will (hopefully) have signed reference
-> measurements, or a Reference Integrity Manifest as TCG calls them.
+> So it's not only SBOM that you are concerned about, but instead want to
+> have a one stop shop for auxiliary evidence and get the vendors agree on
+> following the same GUID+blob precedent that is already there for the AMD
+> cert chain? That sounds reasonable, but I still feel it should be
+> limited to things that do not fit into an existing ABI namespace.
+>
 
-Ah, ok.
+The tl;dr is I want something simple for a hard problem and I'll
+probably lose this argument.
 
-> 
-> > > everyone send attestation requests to their servers every quote
-> > > request in the NRAS architecture, but we're looking at other ways to
-> >
-> > "NRAS" does not parse for me either.
-> >
-> 
-> That would be this https://docs.attestation.nvidia.com/api-docs/nras.html
+The unfortunate state of affairs here is that it is "vendor dependent"
+whatever pathway they choose to provide reference material for
+attestations. Even with the RATS framework, "reference value provider"
+is just a bubble in a diagram and not a federated service protocol
+that we've all agreed on. TCG's recommendation for delivering the RIM
+in the efi volume doesn't quite work in the cloud setting, since
+images own that and not us as the firmware provider. There's no
+standard for how to inform a user where to get a RIM other than that
+:(
 
-Thanks!
+> ...unless its evidence / material that only a TVM would ever need.
 
-> > > provide reliable attestation without a third party service, albeit
-> > > with slightly different security properties.
-> >
-> > Setting the above confusion aside, I would just say that in general yes,
-> > the kernel needs to understand its role in an end-to-end attestation
-> > architecture that is not beholden to a single vendor, but also allows
-> > the kernel to enforce ABI stability / mitigate regressions based on
-> > binary format changes.
-> >
-> 
-> I'm mainly holding on to hope that I don't have to introduce a new
-> runtime dependency on a service that gives a source of truth about the
-> software that's running in the VM.
-> If we can have a GUID table with a flexible size that the host can
-> request of the guest, then we can version ABI changes with new GUID
-> entries.
-> It's a big enough value space without vanity naming opportunities that
-> we can pretty easily make changes without incurring any guest kernel
-> changes.
+There's the rub. Evidence may be provided to the TVM to forward to
+verifiers, but really it's the verifiers that are tasked with
+gathering all this attestation collateral. The TVM doesn't have to do
+anything, even provide machine-specific certificates. That's pretty
+dreadful system design though, since you end up with global services
+in your hot path rather than getting cached data from the machine
+you're getting an attestation from. My first stab at it is to just
+have a storage bucket with objects named based on expected measurement
+values, so you just construct a URL and download the endorsement if
+you need it. I'd really rather just make that part of what the guest
+can get from auxblob since they pay the bandwidth of forwarding it to
+verifiers rather than my cost center paying for the storage bucket
+bandwidth (is this the real reason I'm pushing on this? I'm unsure).
 
-So it's not only SBOM that you are concerned about, but instead want to
-have a one stop shop for auxiliary evidence and get the vendors agree on
-following the same GUID+blob precedent that is already there for the AMD
-cert chain? That sounds reasonable, but I still feel it should be
-limited to things that do not fit into an existing ABI namespace.
+If you're instead asking if this information would need to get piped
+to a non-TVM (say, a non-confidential VM with a virtual TPM), then the
+answer is maa~aaa~aaybe but probably not. PCR0 in the cloud really
+needs its own profile, since the TCG platform firmware profile (PFP)
+is unsuitable. There's not a whole lot of point delivering a signed
+endorsement of a firmware measurement that we don't include in the
+event log anyway for stability reasons, even if that's against the PFP
+spec. So probably not. I think we're pretty clear that host-cached
+data would only need to be for TVMs.
 
-...unless its evidence / material that only a TVM would ever need.
+If you ask the folks I've been talking to at Intel or NVIDIA, they'd
+probably say to put a service in your dependencies and be done with
+it; it's the vendor's responsibility to provide an available enough
+service to provide all the evidence that an attestation verifier may
+want. That's quite unfriendly to the smaller players in the field, but
+maybe it's easy to integrate with something like Veraison's
+endorsement provisioning API [1] or Intel's Trust Authority (n=C3=A9e
+Project Amber). I haven't done it.
+
+[1] https://github.com/veraison/docs/tree/main/api/endorsement-provisioning
+
+--=20
+-Dionna Glaze, PhD (she/her)
