@@ -1,230 +1,163 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="UbDOGqzh"
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EAD8181;
-	Wed,  6 Dec 2023 12:22:21 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 105A740E00C9;
-	Wed,  6 Dec 2023 20:22:18 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id vf3DdiCh_Bav; Wed,  6 Dec 2023 20:22:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1701894135; bh=ryopeQNWNsQaqPkdyPy2Qh1IoKrpD4SJ99n33evI0kE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UbDOGqzhT8SuBANzPSeO7uZMrzZFS6G5Yh2HNhk2HegKohiJfxIDQN77Ma2zi4cUh
-	 FkIKDvOSSC3jQ0U/kVDh16WgxcjVd+GDAWbR7aLgoJJxK/lIb23uuOsk0/urT1veO6
-	 aPwUE1J/6EHR72e15S9tRf+2oD47a3Sycw2f/+pKXLky53sRg01SW6BQgfdY5JCw6d
-	 CTyfmKlwGZR8+hba3NmOfB6QRBYWt4wjmKrIcMU+rQuY5aMzaYQ/qH3WR00MBpHEmF
-	 HhZQ4ZrSrz29MDvd5tRfM51JL5c6GmGYC2kWd4yKRqaidORAJPlC11sPNMWJ7n7N4A
-	 cMT2XvefsFMF296xYANuCsgQ1luRRjgyRMfijw3Crvwa9GT7q2ffOUoRLv18sS0MTH
-	 exmaXvh9oKovzvQrlLRmaXsqLecG5b1YIhJhs3eZy+RPkV3FvGKT4RUIW3HnRD5Ir4
-	 o8N/9LRffc/q2IKWxEKyQG6h0tEtX8BRohVbxCVamkUl+gWbtHjK7w7hcdp/hMEfsP
-	 U9bjUsjj0Oy//hj4Yn2veXG5QPHc+s7bJN6BWrXiPK+zqfGdEttztXevAmSiEYuf0S
-	 PynQAgjQmGgPj099UA8jHKCDQ+SgO5bzwGgRzv4K2PZeMRyGxsSwEfMNsf00kmBhbf
-	 CEERiDwlaIi1VkTFDTYrwphs=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BAD8640E00C6;
-	Wed,  6 Dec 2023 20:21:34 +0000 (UTC)
-Date: Wed, 6 Dec 2023 21:21:28 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, marcorr@google.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 15/50] crypto: ccp: Provide API to issue SEV and SNP
- commands
-Message-ID: <20231206202128.GDZXDXyIjW4eKEFyvB@fat_crate.local>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="aY3pPK1t"
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ADB7D5C;
+	Wed,  6 Dec 2023 12:35:36 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oTofi2Jj1mdRyQU7bRZbh5143R+wLEJ/nDfvZMPXHQP11DQR0vcvkC87RlZZcINyHcTkhAjxfvdz4JVBGClyW9nvwQhS4P3DkyLBK5r4XRIlpg7TR2xR6kLiT9t2Rwzr33powKv1QBSNCoOrv1qqq0Vm2RgJnV3WZahdchoX+tU60aQfbBmSciXBnRIJ+100lPUnC/9nM3pY0BM8Qd3xifJpXt5J0mwdPaPo2khnoCEi2fJzDFSSIbfOUYiv3MpIH7uPgnZg+9W1mZyd8KJVFLgIZWOqiQD1iNi1IPCA+6A5uEgrkRCl0/PGElLphXibq9h/sfnh32IHv22Aj2VZXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yf5A6/Q53LugxL4lu4tYjyI2OkN8idTKGkvO/tsL4bg=;
+ b=LCNWyG9Jwdt46G1wMrbB0D7Me8AU4EeIz34bSwGgbUqrKH9nmx2F0pwZRyIYHA3yfOKxgASUAVVSpY8opfA1fd/GULz6axjGsEqQ0RCf0VcIVpvLN+8i25v8uq53tVU0qQEIKT5AYkoFMKzBPRTW8KHhQdnaorpl2xzfsFzIsWWKiONAjxp0KLpnwJwmEkt/3Dx4dAZiCx0aNSp6SKv/WuPdluZ2lXzU7SaNv56Qf+QbVL5l2960QWRijPF/RleXz4OnYVm8CmMt/lTwu+Fq/2lyl2fbR5XpuWTOMq2zHAR6s/TqhPQTgUeUgMjQIZgRTl1wzIvhuGY3/4q5Q/VwKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yf5A6/Q53LugxL4lu4tYjyI2OkN8idTKGkvO/tsL4bg=;
+ b=aY3pPK1tg19SgjLi8YY0xxdZ9WbTV+E5Xj7tmg9NUElZEmgVxyytbkxB7Rqpw+o+XoK8P4RDLo/d05UrAia1Taq+/FmmRT6BTc6XwZXXYWkce8Hcp8bSGUR/ZlvklYGN3KT5CrcxOaOKhapqfV6xkhYATioQBOq8k4IJN1ju+uA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by PH0PR12MB7908.namprd12.prod.outlook.com (2603:10b6:510:28e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Wed, 6 Dec
+ 2023 20:35:32 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::3341:faaf:5974:f152]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::3341:faaf:5974:f152%7]) with mapi id 15.20.7046.034; Wed, 6 Dec 2023
+ 20:35:32 +0000
+Message-ID: <9af9b10f-0ab6-1fe8-eaec-c9f98e14a203@amd.com>
+Date: Wed, 6 Dec 2023 14:35:28 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH v10 14/50] crypto: ccp: Add support to initialize the
+ AMD-SP for SEV-SNP
+Content-Language: en-US
+To: Borislav Petkov <bp@alien8.de>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+ dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
+ ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
+ liam.merwick@oracle.com, zhi.a.wang@intel.com,
+ Brijesh Singh <brijesh.singh@amd.com>, Jarkko Sakkinen <jarkko@profian.com>
 References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-16-michael.roth@amd.com>
+ <20231016132819.1002933-15-michael.roth@amd.com>
+ <20231127095937.GLZWRoiaqGlJMX54Xb@fat_crate.local>
+ <d5242390-8904-7ec5-d8a1-9e3fb8f6423c@amd.com>
+ <20231206170807.GBZXCqd0z8uu2rlhpn@fat_crate.local>
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <20231206170807.GBZXCqd0z8uu2rlhpn@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9P221CA0024.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:806:25::29) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-16-michael.roth@amd.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|PH0PR12MB7908:EE_
+X-MS-Office365-Filtering-Correlation-Id: 758ae55f-f5b6-43cf-43cc-08dbf69ae438
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	666IGnSyk5vqfMUgq8LL2his7GkBHoGqlU3bamZhQFmN7R5r4FdQd6CvNqXhcwmR1/uPAWDogd3ACSu49XFGsNagrd4VX1cuzsi36rJwBck1+LZpAXkB1JkclfdkUTnNXBftaqywEVVT3xprML6n/b9X5F6FgWHOwh8osqrpXv1h6zBom93AUJYIUp6oRsgWA+LFFCcJ9vbRHpqDgbN2OoibXsrCJj1WyWwq6oJOULufiwhx04v1U8R2fIsStlm12iPW/MTtiMcDcMa7g7eiHI/WpzGiYao7mYK0s4P9mo5ULz/h9ni/07y2/gOHgEvjlWa2u0WiQzy4+X3sS9L6zLCGzKPnq2oAxVUJN5mKp7Vw9ML6lLCR+qUg0U4Yl2WA4a/WjNsyvgprda6KjJvM4hbpSZ94J5wZ1O/gi7/+FAnggas3ep1JhDj9GPa811N9CZKdlV2c4hO5103SLBZWfH1t1CCND6o6d2XiidsKWItPA2qrlu9yA6BoDKDiGFiySYFC+nUI1dtgeTf1XgVvRLsclGcuCVhATYMjlYrwdMi5n8SbnoTDwQxtodhcDbdkyQcU1EpSRDKskqRHaraNkPQia6zmqax7O7KMkFNB2NKURpJvfiUjq1QBCNxxSzrKaRhfHoVlVmiweeSKcheLOw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(366004)(39860400002)(346002)(376002)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(41300700001)(36756003)(7406005)(7416002)(5660300002)(86362001)(2906002)(26005)(2616005)(6512007)(83380400001)(478600001)(53546011)(6506007)(6666004)(6486002)(38100700002)(31686004)(8676002)(8936002)(6916009)(316002)(54906003)(31696002)(4326008)(66556008)(66946007)(66476007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SXMzSTZvYm5iZ0dHYnZkNmlUQmdvVE5nNy9nR2NKMXNmK05Va0dkVUxJRWJ2?=
+ =?utf-8?B?K0NkYUV0T1VKRWZOWnE5QnFDbjhlcDZNWmw2cjZxU2hKVmdla3FuNk9SWXNv?=
+ =?utf-8?B?VGtDQlRmbEZGNGFuR2tVanhHMzBmQ3NyQnZRUGd0Mkh2Q2VhNHdSYXJNQlo5?=
+ =?utf-8?B?bmNvanJnR2VjeXlobmN2UGNLUDBlOTdQbzk5MFRnMFEzTjNiaXhRcG01N2RM?=
+ =?utf-8?B?NEJsMTJZYTdJOTE1Mk8xMS9kcGlMdHJRUUlrU0xsR29tbEgrQzlwcGpOaGE0?=
+ =?utf-8?B?TlBveDlLMTFPajFiSTl5Z1l3RlFEQ1VqR0t3M21adUMzeGRTMVNmSVZ4d3dy?=
+ =?utf-8?B?VG9pdWVEelZhTXo0RDdjQnJ3S2ErY2lGSW1HU0tXa0tKUyt4cUxLK3NETkQx?=
+ =?utf-8?B?UkZZMHRmZVV5VnJvOFo1UW1Qb0NZbUxQZG5Uc0JhQXFHUmtvTkJ6LzRoTkh5?=
+ =?utf-8?B?NXlyU2FsaVlhMFc3akt1a3BhOW5DbktqKzl1QnFLMDBFUFVwSjFFMVVpR24x?=
+ =?utf-8?B?ei9zL0pPb1QwUmFpeUwzSXdBZlBBQU5pT3crWU1LQld1c3JGam5pOGpXWlF3?=
+ =?utf-8?B?bWkxUi9iUVlzRFBzdVZ3THQ3Wm4rWnhLNHN6dmluKzdHWlhaUjhIeTZlSGJo?=
+ =?utf-8?B?V25CRWpaNTNna3dTL3g0UlZseXE4QVhsWjlKeVpvN2FJenJzM3pmT0xlTDBm?=
+ =?utf-8?B?ZktXOXNVNnFUMmN5QlJadnJBeDNlYnpsaHhKdm5wWE90ZkpiMlorZWtXQ1JR?=
+ =?utf-8?B?d1hiUy9NYy9LbmdtL0tXUHg2ekZiNUloS1ZNWldUUXE0MFpvbFlLcjdqOU1j?=
+ =?utf-8?B?SUNvelRicytXTTlNRUYyNUJ6dm9RKy9Sb1pRSFUrc3N3anpNRHc1Z2tMcmdR?=
+ =?utf-8?B?WGU4TlZmc1lhSjRsZnkrS1o5RXZXRmE5SEVRR2c1K3dXZU93cUx6RUpxRFhL?=
+ =?utf-8?B?d1Q1VEhwbFpNMFN2bnBZdE5pUUpSeDRabzRicWNTNE80cTJLM2JYbE5VMmxl?=
+ =?utf-8?B?MFZxTG9zd0VHVHltYVV5WXdDZktTWHVVRG16c2tNdHNISjA5KytYc0RnUllX?=
+ =?utf-8?B?dms1bjArR1lQaDRqaWdiWEZieHltRlJMbEpSNUN5aFlEUmhHQStFd1V2M1BZ?=
+ =?utf-8?B?RXpLdnBYZTl1dVRxYWd2WFdJclN1OXlOcTFXWGh5WC9ERTdGZFl3SmZtbGFz?=
+ =?utf-8?B?OHp0Yk4wK29nMWNOdGhscUV1MW9yWlZETzBqUGF4NGp1dXljUGxIRThhNGVQ?=
+ =?utf-8?B?ckNSVno4TmR3M09VaEJWclcvT05EQk5OdHlhSFZTbXVjVmNZWFlURTQ5dXhQ?=
+ =?utf-8?B?UjdjUXp4cXZuellDa1hSaXZIMzllRXRwejZJT3ZCd3BTN0kxU0ZmZ0E2RUdN?=
+ =?utf-8?B?YTN6dDFnais2ODNMNWRTeSt5aWZveWJIT1dsOWdNY1pCTXd1dTQwODBpeXB2?=
+ =?utf-8?B?bHg2Wkd2SVFUYllRdHhrMnZnWXd3eVZiMFNocnpFTjJjdkZ6M1hJSk0wZUIy?=
+ =?utf-8?B?MTdZbk05b0FZOXpnYnR0NlFYMDM3TGZBanhYRE1sYUF1THVSYThWb3p5UitN?=
+ =?utf-8?B?dmFvMzZmaTdkK3RKZ1VaM3pONVJZZmRVVlVQZlhySjROU05EUU56QW5aa3hj?=
+ =?utf-8?B?czVUZi9OemJneHhWaWM0SnkvQTNsc2M1Tyt1ZDFUeW9zbU9VNWNEa3lHS1ll?=
+ =?utf-8?B?UERudE1mOTNHVEpJS1VURUpKNGdGdFRXWkN4WWEzMC82T2RFdlRSTUIydnRR?=
+ =?utf-8?B?a2ZQRXdNQ1hOV0ZZZ3hzNitadmVCUHNnQkdJWTNiVDhNTmhVL0l1eVFTY0cr?=
+ =?utf-8?B?dkF2OFU5RU15RTB2QTgvMFpKandzRnpuV2hhUEFCL2dvZ0RHcWE4YVVhQ1RV?=
+ =?utf-8?B?MUVuYlhNa2UxbkJGRHpXZDBxUjhSaDk0OEpyZElVN0VDdFNEOTBEZVRHVTNu?=
+ =?utf-8?B?VE0yVEpaYWxSTE9FUUlVdE5LelIyaUg5d2Z1SXFxNG1FUkNnbjJ5NEYwdXJr?=
+ =?utf-8?B?YkM3TWlYeEhRckhESEZWV2ZVMWJmWFpSaWtYL3AxNE1Ka2xGZHp2V3V5SjV3?=
+ =?utf-8?B?TlFyUE4xOTJZRXVLcmtoU1JrNWhNSTNpQ2hDUGRrZFR0VUd4ODVKUlVEd3pa?=
+ =?utf-8?Q?RZrg+6YpoH2S1drzKYe2uRcSS?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 758ae55f-f5b6-43cf-43cc-08dbf69ae438
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 20:35:31.9005
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nq44Zt4tZmxh+PibsdgkI8ZIVKzkMd1OVk81LX+fe26rfqzn63pn8fzcyhwUtKtYSrjsqkj1rKWXVgMVTcuT1A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7908
 
-On Mon, Oct 16, 2023 at 08:27:44AM -0500, Michael Roth wrote:
+Hello Boris,
 
-> Subject: Re: [PATCH v10 15/50] crypto: ccp: Provide API to issue SEV and SNP commands
-
-"...: Export sev_do_cmd() as a generic API..."
-
-> From: Brijesh Singh <brijesh.singh@amd.com>
+On 12/6/2023 11:08 AM, Borislav Petkov wrote:
+> On Wed, Nov 29, 2023 at 08:13:52PM -0600, Kalra, Ashish wrote:
+>> It surely seems hard to follow up, so i am anyway going to clean it up by:
+>>
+>> Adding the "probe" parameter to sev_platform_init() where the parameter
+>> being true indicates that we only want to do SNP initialization on probe,
+>> the same parameter will get passed on to
+>> __sev_platform_init_locked().
 > 
-> Make sev_do_cmd() a generic API interface for the hypervisor
-> to issue commands to manage an SEV and SNP guest. The commands
-> for SEV and SNP are defined in the SEV and SEV-SNP firmware
-> specifications.
+> That's exactly what you should *not* do - the probe parameter controls
+> whether
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
+> 	if (psp_init_on_probe)
+> 		__sev_platform_init_locked(error);
+> 
+> and so on should get executed or not.
+>
 
-...
+Not actually.
 
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index a7f92e74564d..61bb5849ebf2 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -883,6 +883,20 @@ int sev_guest_df_flush(int *error);
->   */
->  int sev_guest_decommission(struct sev_data_decommission *data, int *error);
->  
-> +/**
+The main use case for the probe parameter is to control if we want to do 
+legacy SEV/SEV-ES INIT during probe. There is a usage case where we want 
+to delay legacy SEV INIT till an actual SEV/SEV-ES guest is being 
+launched. So essentially the probe parameter controls if we want to
+execute __sev_do_init_locked() or not.
 
-See below for the output of
+We always want to do SNP INIT at probe time.
 
-./scripts/kernel-doc -none include/linux/psp-sev.h
-
-I understand that you want to kernel-doc stuff but you should do it
-right.
-
-> + * sev_do_cmd - perform SEV command
-
-"Issue an SEV or an SEV-SNP command"
-
-> + *
-> + * @error: SEV command return code
-
-That must be @psp_ret.
-
-And to quote the abovementioned script:
-
-include/linux/psp-sev.h:898: warning: Function parameter or member 'cmd' not described in 'sev_do_cmd'
-include/linux/psp-sev.h:898: warning: Function parameter or member 'data' not described in 'sev_do_cmd'
-include/linux/psp-sev.h:898: warning: Function parameter or member 'psp_ret' not described in 'sev_do_cmd'
-include/linux/psp-sev.h:898: warning: Excess function parameter 'error' description in 'sev_do_cmd'
-
-> + *
-> + * Returns:
-> + * 0 if the SEV successfully processed the command
-
-"the SEV"?
-
-You mean the "SEV device"?
-
-> + * -%ENODEV    if the SEV device is not available
-> + * -%ENOTSUPP  if the SEV does not support SEV
-> + * -%ETIMEDOUT if the SEV command timed out
-> + * -%EIO       if the SEV returned a non-zero return code
-> + */
-> +int sev_do_cmd(int cmd, void *data, int *psp_ret);
-> +
->  void *psp_copy_user_blob(u64 uaddr, u32 len);
->  
->  #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
-> @@ -898,6 +912,9 @@ sev_guest_deactivate(struct sev_data_deactivate *data, int *error) { return -ENO
->  static inline int
->  sev_guest_decommission(struct sev_data_decommission *data, int *error) { return -ENODEV; }
->  
-> +static inline int
-> +sev_do_cmd(int cmd, void *data, int *psp_ret) { return -ENODEV; }
-> +
->  static inline int
->  sev_guest_activate(struct sev_data_activate *data, int *error) { return -ENODEV; }
->  
-
-include/linux/psp-sev.h:20: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
- * SEV platform state
-include/linux/psp-sev.h:31: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
- * SEV platform and guest management commands
-include/linux/psp-sev.h:126: warning: Function parameter or member 'reserved' not described in 'sev_data_init'
-include/linux/psp-sev.h:146: warning: Function parameter or member 'reserved' not described in 'sev_data_init_ex'
-include/linux/psp-sev.h:175: warning: expecting prototype for struct sev_data_cert_import. Prototype was for struct sev_data_pek_cert_import instead
-include/linux/psp-sev.h:212: warning: Function parameter or member 'pdh_cert_address' not described in 'sev_data_pdh_cert_export'
-include/linux/psp-sev.h:212: warning: Function parameter or member 'pdh_cert_len' not described in 'sev_data_pdh_cert_export'
-include/linux/psp-sev.h:212: warning: Function parameter or member 'reserved' not described in 'sev_data_pdh_cert_export'
-include/linux/psp-sev.h:276: warning: Function parameter or member 'reserved' not described in 'sev_data_launch_start'
-include/linux/psp-sev.h:290: warning: Function parameter or member 'reserved' not described in 'sev_data_launch_update_data'
-include/linux/psp-sev.h:304: warning: Function parameter or member 'reserved' not described in 'sev_data_launch_update_vmsa'
-include/linux/psp-sev.h:318: warning: Function parameter or member 'reserved' not described in 'sev_data_launch_measure'
-include/linux/psp-sev.h:342: warning: Function parameter or member 'reserved1' not described in 'sev_data_launch_secret'
-include/linux/psp-sev.h:342: warning: Function parameter or member 'reserved2' not described in 'sev_data_launch_secret'
-include/linux/psp-sev.h:342: warning: Function parameter or member 'reserved3' not described in 'sev_data_launch_secret'
-include/linux/psp-sev.h:381: warning: Function parameter or member 'reserved1' not described in 'sev_data_send_start'
-include/linux/psp-sev.h:381: warning: Function parameter or member 'reserved2' not described in 'sev_data_send_start'
-include/linux/psp-sev.h:381: warning: Function parameter or member 'reserved3' not described in 'sev_data_send_start'
-include/linux/psp-sev.h:405: warning: expecting prototype for struct sev_data_send_update. Prototype was for struct sev_data_send_update_data instead
-include/linux/psp-sev.h:428: warning: expecting prototype for struct sev_data_send_update. Prototype was for struct sev_data_send_update_vmsa instead
-include/linux/psp-sev.h:465: warning: Function parameter or member 'policy' not described in 'sev_data_receive_start'
-include/linux/psp-sev.h:465: warning: Function parameter or member 'reserved1' not described in 'sev_data_receive_start'
-include/linux/psp-sev.h:489: warning: Function parameter or member 'reserved1' not described in 'sev_data_receive_update_data'
-include/linux/psp-sev.h:489: warning: Function parameter or member 'reserved2' not described in 'sev_data_receive_update_data'
-include/linux/psp-sev.h:489: warning: Function parameter or member 'reserved3' not described in 'sev_data_receive_update_data'
-include/linux/psp-sev.h:513: warning: Function parameter or member 'reserved1' not described in 'sev_data_receive_update_vmsa'
-include/linux/psp-sev.h:513: warning: Function parameter or member 'reserved2' not described in 'sev_data_receive_update_vmsa'
-include/linux/psp-sev.h:513: warning: Function parameter or member 'reserved3' not described in 'sev_data_receive_update_vmsa'
-include/linux/psp-sev.h:538: warning: Function parameter or member 'reserved' not described in 'sev_data_dbg'
-include/linux/psp-sev.h:554: warning: Function parameter or member 'reserved' not described in 'sev_data_attestation_report'
-include/linux/psp-sev.h:585: warning: Function parameter or member 'gctx_paddr' not described in 'sev_data_snp_addr'
-include/linux/psp-sev.h:605: warning: Function parameter or member 'gctx_paddr' not described in 'sev_data_snp_launch_start'
-include/linux/psp-sev.h:605: warning: Function parameter or member 'ma_gctx_paddr' not described in 'sev_data_snp_launch_start'
-include/linux/psp-sev.h:605: warning: Function parameter or member 'rsvd' not described in 'sev_data_snp_launch_start'
-include/linux/psp-sev.h:605: warning: Function parameter or member 'gosvw' not described in 'sev_data_snp_launch_start'
-include/linux/psp-sev.h:644: warning: Function parameter or member 'gctx_paddr' not described in 'sev_data_snp_launch_update'
-include/linux/psp-sev.h:644: warning: Function parameter or member 'rsvd' not described in 'sev_data_snp_launch_update'
-include/linux/psp-sev.h:644: warning: Function parameter or member 'rsvd2' not described in 'sev_data_snp_launch_update'
-include/linux/psp-sev.h:644: warning: Function parameter or member 'rsvd3' not described in 'sev_data_snp_launch_update'
-include/linux/psp-sev.h:644: warning: Function parameter or member 'rsvd4' not described in 'sev_data_snp_launch_update'
-include/linux/psp-sev.h:659: warning: Function parameter or member 'gctx_paddr' not described in 'sev_data_snp_launch_finish'
-include/linux/psp-sev.h:659: warning: Function parameter or member 'id_block_paddr' not described in 'sev_data_snp_launch_finish'
-include/linux/psp-sev.h:659: warning: Function parameter or member 'id_auth_paddr' not described in 'sev_data_snp_launch_finish'
-include/linux/psp-sev.h:659: warning: Function parameter or member 'id_block_en' not described in 'sev_data_snp_launch_finish'
-include/linux/psp-sev.h:659: warning: Function parameter or member 'auth_key_en' not described in 'sev_data_snp_launch_finish'
-include/linux/psp-sev.h:659: warning: Function parameter or member 'rsvd' not described in 'sev_data_snp_launch_finish'
-include/linux/psp-sev.h:659: warning: Function parameter or member 'host_data' not described in 'sev_data_snp_launch_finish'
-include/linux/psp-sev.h:705: warning: expecting prototype for struct sev_data_dbg. Prototype was for struct sev_data_snp_dbg instead
-include/linux/psp-sev.h:718: warning: expecting prototype for struct sev_snp_guest_request. Prototype was for struct sev_data_snp_guest_request instead
-include/linux/psp-sev.h:734: warning: expecting prototype for struct sev_data_snp_init. Prototype was for struct sev_data_snp_init_ex instead
-include/linux/psp-sev.h:746: warning: Function parameter or member 'rsvd' not described in 'sev_data_range'
-include/linux/psp-sev.h:758: warning: Function parameter or member 'rsvd' not described in 'sev_data_range_list'
-include/linux/psp-sev.h:770: warning: Function parameter or member 'rsvd1' not described in 'sev_data_snp_shutdown_ex'
-include/linux/psp-sev.h:825: warning: Function parameter or member 'filep' not described in 'sev_issue_cmd_external_user'
-include/linux/psp-sev.h:825: warning: Function parameter or member 'id' not described in 'sev_issue_cmd_external_user'
-include/linux/psp-sev.h:825: warning: Function parameter or member 'data' not described in 'sev_issue_cmd_external_user'
-include/linux/psp-sev.h:840: warning: Function parameter or member 'data' not described in 'sev_guest_deactivate'
-include/linux/psp-sev.h:840: warning: Function parameter or member 'error' not described in 'sev_guest_deactivate'
-include/linux/psp-sev.h:840: warning: Excess function parameter 'deactivate' description in 'sev_guest_deactivate'
-include/linux/psp-sev.h:840: warning: Excess function parameter 'sev_ret' description in 'sev_guest_deactivate'
-include/linux/psp-sev.h:855: warning: Function parameter or member 'data' not described in 'sev_guest_activate'
-include/linux/psp-sev.h:855: warning: Function parameter or member 'error' not described in 'sev_guest_activate'
-include/linux/psp-sev.h:855: warning: Excess function parameter 'activate' description in 'sev_guest_activate'
-include/linux/psp-sev.h:855: warning: Excess function parameter 'sev_ret' description in 'sev_guest_activate'
-include/linux/psp-sev.h:869: warning: Function parameter or member 'error' not described in 'sev_guest_df_flush'
-include/linux/psp-sev.h:869: warning: Excess function parameter 'sev_ret' description in 'sev_guest_df_flush'
-include/linux/psp-sev.h:884: warning: Function parameter or member 'data' not described in 'sev_guest_decommission'
-include/linux/psp-sev.h:884: warning: Function parameter or member 'error' not described in 'sev_guest_decommission'
-include/linux/psp-sev.h:884: warning: Excess function parameter 'decommission' description in 'sev_guest_decommission'
-include/linux/psp-sev.h:884: warning: Excess function parameter 'sev_ret' description in 'sev_guest_decommission'
-include/linux/psp-sev.h:898: warning: Function parameter or member 'cmd' not described in 'sev_do_cmd'
-include/linux/psp-sev.h:898: warning: Function parameter or member 'data' not described in 'sev_do_cmd'
-include/linux/psp-sev.h:898: warning: Function parameter or member 'psp_ret' not described in 'sev_do_cmd'
-include/linux/psp-sev.h:898: warning: Excess function parameter 'error' description in 'sev_do_cmd'
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+Ashish
