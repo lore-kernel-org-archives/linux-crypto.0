@@ -1,19 +1,28 @@
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9187D4B;
-	Wed,  6 Dec 2023 18:33:43 -0800 (PST)
-Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
-	by fd01.gateway.ufhost.com (Postfix) with ESMTP id A81898008;
-	Thu,  7 Dec 2023 10:33:42 +0800 (CST)
-Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX166.cuchost.com
- (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 7 Dec
- 2023 10:33:42 +0800
-Received: from [192.168.155.133] (202.188.176.82) by EXMBX068.cuchost.com
- (172.16.6.68) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 7 Dec
- 2023 10:33:39 +0800
-Message-ID: <fca024e0-de9e-4165-8a84-0429e2fc2683@starfivetech.com>
-Date: Thu, 7 Dec 2023 10:33:38 +0800
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="oGzDlgAj"
+X-Greylist: delayed 450 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 06 Dec 2023 22:29:50 PST
+Received: from smtp.smtpout.orange.fr (smtp-15.smtpout.orange.fr [80.12.242.15])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B1B2BD6D
+	for <linux-crypto@vger.kernel.org>; Wed,  6 Dec 2023 22:29:50 -0800 (PST)
+Received: from [192.168.1.18] ([92.140.202.140])
+	by smtp.orange.fr with ESMTPA
+	id B7m1rSAZd33VXB7m1r3STG; Thu, 07 Dec 2023 07:22:18 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1701930138;
+	bh=4vdrRLFCnP7xUS6SueOm2vXaBS/ChKMge64ed0bJe/Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=oGzDlgAjZhGZsLfCXgMx4vh6mcwWYU4wJJ89qpihCpC0qh2bAASqzT6aCsQhYlCMr
+	 Cn2I5kYl9JUN4HCkYLnS6p0uiAVR+8hKwQ3L6VDustH20bs0ujFxhB+UIZV3aF4KQs
+	 n/Ar2QVdoAaG24X7vNFkSnW8r/E/XETIDvzKA3CbO3aWF/x8oszLUytVXjIetj97UD
+	 ROTqo48ZvCQDMjtaP/NjabzdhQqJ0aTjH+b1dAuNmgYDCk1vWiQx4YXDlIVg0nn2kJ
+	 AixU20WdOLBSL97KJrjuz+hzcTZC5PRO+BUFIYJDp9XFTE6b9sAlcivLRIhMMmfSxk
+	 mWFZybIfDLRrg==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Thu, 07 Dec 2023 07:22:18 +0100
+X-ME-IP: 92.140.202.140
+Message-ID: <4f53df8e-0957-44b6-b18e-e4362800e180@wanadoo.fr>
+Date: Thu, 7 Dec 2023 07:22:12 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -21,54 +30,49 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] dt-bindings: rng: starfive: Add jh8100 compatible
- string
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Olivia Mackall
-	<olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring
-	<robh+dt@kernel.org>, Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
-	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20231206014236.1109832-1-jiajie.ho@starfivetech.com>
- <20231206014236.1109832-2-jiajie.ho@starfivetech.com>
- <c006dd3a-07a2-4d14-899b-72373540ad37@linaro.org>
-Content-Language: en-US
-From: Jia Jie Ho <jiajie.ho@starfivetech.com>
-In-Reply-To: <c006dd3a-07a2-4d14-899b-72373540ad37@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EXCAS062.cuchost.com (172.16.6.22) To EXMBX068.cuchost.com
- (172.16.6.68)
-X-YovoleRuleAgent: yovoleflag
+Subject: Re: [PATCH v12 13/14] crypto: iaa - Add IAA Compression Accelerator
+ stats
+Content-Language: fr
+To: Tom Zanussi <tom.zanussi@linux.intel.com>, herbert@gondor.apana.org.au,
+ davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org
+Cc: dave.jiang@intel.com, tony.luck@intel.com, wajdi.k.feghali@intel.com,
+ james.guilford@intel.com, kanchana.p.sridhar@intel.com,
+ vinodh.gopal@intel.com, giovanni.cabiddu@intel.com, pavel@ucw.cz,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ dmaengine@vger.kernel.org
+References: <20231205212530.285671-1-tom.zanussi@linux.intel.com>
+ <20231205212530.285671-14-tom.zanussi@linux.intel.com>
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20231205212530.285671-14-tom.zanussi@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 6/12/2023 6:17 pm, Krzysztof Kozlowski wrote:
-> On 06/12/2023 02:42, Jia Jie Ho wrote:
->> Add compatible string for StarFive JH8100 trng.
->> 
->> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
->> ---
->>  .../devicetree/bindings/rng/starfive,jh7110-trng.yaml         | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->> 
->> diff --git a/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml b/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
->> index 2b76ce25acc4..d275bdc4d009 100644
->> --- a/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
->> +++ b/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
->> @@ -11,7 +11,9 @@ maintainers:
->>  
->>  properties:
->>    compatible:
->> -    const: starfive,jh7110-trng
->> +    enum:
->> +      - starfive,jh7110-trng
->> +      - starfive,jh8100-trng
+Le 05/12/2023 à 22:25, Tom Zanussi a écrit :
+> Add support for optional debugfs statistics support for the IAA
+> Compression Accelerator.  This is enabled by the kernel config item:
 > 
-> Your driver change suggests these are compatible, so express this here
-> and drop driver change.
+>    CRYPTO_DEV_IAA_CRYPTO_STATS
 > 
+> When enabled, the IAA crypto driver will generate statistics which can
+> be accessed at /sys/kernel/debug/iaa-crypto/.
+> 
+> See Documentation/driver-api/crypto/iax/iax-crypto.rst for details.
+> 
+> Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+> ---
 
-I'll update the series accordingly. Thanks for reviewing this.
+> +void update_max_adecomp_delay_ns(u64 start_time_ns)
+> +{
+> +	u64 time_diff;
+> +
+> +	time_diff = ktime_get_ns() - start_time_ns;
+> +
+> +	if (time_diff > max_adecomp_delay_ns)
+> +
 
-Best regards,
-Jia Jie
+Nit: unneeded NL.
 
+> +		max_adecomp_delay_ns = time_diff;
+> +}
+
+CJ
