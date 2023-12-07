@@ -1,163 +1,212 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="jCyaOTKk"
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA2A10E6
-	for <linux-crypto@vger.kernel.org>; Thu,  7 Dec 2023 07:31:33 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-50c04ebe1bbso836847e87.1
-        for <linux-crypto@vger.kernel.org>; Thu, 07 Dec 2023 07:31:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1701963091; x=1702567891; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FtiqskbcnjDsrUAbUuslefnc5brEtYif6q3+FyG2PFY=;
-        b=jCyaOTKkw5F46rIkMqCj08yiy4EOcJmeFOCfGoux3CKP4CbWwdi2Rzyrj+BdXfnGTv
-         ZEUWTWC7IA7iOPTj+Q0IFe8TqYvCypmgUsM9hQeDWwPkFkrsjdvCfpSHFLNn/sXZqdqD
-         iJbLco53IlI0bBiMQyfMupIoyJZAKjvbeOpt5uL/vLIF/d54iv+6UvpF0y167zDuw4m1
-         Iz9Zid7dXWxVaWBRx2ob48PZNn8sd5QM2tKZC+8Dxl8VRj4Rczu2GzdT3l2Cblx6VhDZ
-         oWxJTIpYEhhZZMg3jTTcCM9pc+gK9pbTKwZ8b7R4oFeMZEyo5PO2kUtGXaAgzKt50K4M
-         99eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701963091; x=1702567891;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FtiqskbcnjDsrUAbUuslefnc5brEtYif6q3+FyG2PFY=;
-        b=b1dVNUKzpWCtLaUflQ3U+7CbRzFttvRnl9ol+A+qR4cqC0Wp1euPesf1rUNAYqpsQK
-         1mzJNvgfQZ5lmVMK0l4UhCM+YfYIx5bFWUvqCflg896HXunK59YvtRI3DK7CXnbJFwqh
-         u8CrxSbzNaFVuLH3sycANeFin0DQSnWyQIszRZ2EBrG41oOFLqxouFsrORts1d/ljpcK
-         QYSMWNjc86LtRX/LDgcYUectjUI6Htkb7nf2PrmERhL0RLK/l87y+iY3IlUWyT8tnjoS
-         UpT3vmK01VBWA5lXZGBeSnXkH68leEXvWEtRJiM0pa3VVHx6+7cg9duKYGfy/2Uf2Qwt
-         qDSQ==
-X-Gm-Message-State: AOJu0YzxHTp8IU3rwaei5o6SrpYazfGzIc4VVCq96xbgPMgA+pB21so7
-	pqwJJuMZnoIkG1Hvc+ntMQQYCGNKoH5SSnKsEXTDrA==
-X-Google-Smtp-Source: AGHT+IFlA9HTmihxqP9eI8R5gPdPM/Z8JG8U15RyZk88XiZ+K7z6TR3eNC4WO8VGtec4ngEHJsTq9LU+nvqWPHIWwIA=
-X-Received: by 2002:a05:6512:4015:b0:50b:f52b:e337 with SMTP id
- br21-20020a056512401500b0050bf52be337mr4185096lfb.1.1701963091444; Thu, 07
- Dec 2023 07:31:31 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xxTXJx3G";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="TGD6PJiW";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xxTXJx3G";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="TGD6PJiW"
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 373E3D4A;
+	Thu,  7 Dec 2023 08:20:38 -0800 (PST)
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 49D4A1FB8F;
+	Thu,  7 Dec 2023 16:20:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1701966036; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R9gDJpilOFtri5BMtSk1bR16VKzmy1EoAMg8XN+4Hs8=;
+	b=xxTXJx3GPoOl7SBcxIJqOQY+tneUAmrvullQZsq6Y0AdZHg7xq11tltLJ6XCWQKwQxYcwk
+	HT33a4nMU2w3w9MG+rUa8S0IjxZBChoNpEM/Fk61JsRbYhku/KT2ETpZ6RCdOFtcJMjyDz
+	IKKnYkKtyOjkwmj0q+ZaOkeGmOSUCXE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1701966036;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R9gDJpilOFtri5BMtSk1bR16VKzmy1EoAMg8XN+4Hs8=;
+	b=TGD6PJiW4rWFAKNCxeLhi1pT83vgP+nsYq+vHBQVED9NbLzgVnBTcoOEz45J5WokkGcnPi
+	EpQoh63MFcmvc0Bw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1701966036; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R9gDJpilOFtri5BMtSk1bR16VKzmy1EoAMg8XN+4Hs8=;
+	b=xxTXJx3GPoOl7SBcxIJqOQY+tneUAmrvullQZsq6Y0AdZHg7xq11tltLJ6XCWQKwQxYcwk
+	HT33a4nMU2w3w9MG+rUa8S0IjxZBChoNpEM/Fk61JsRbYhku/KT2ETpZ6RCdOFtcJMjyDz
+	IKKnYkKtyOjkwmj0q+ZaOkeGmOSUCXE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1701966036;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R9gDJpilOFtri5BMtSk1bR16VKzmy1EoAMg8XN+4Hs8=;
+	b=TGD6PJiW4rWFAKNCxeLhi1pT83vgP+nsYq+vHBQVED9NbLzgVnBTcoOEz45J5WokkGcnPi
+	EpQoh63MFcmvc0Bw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E7DE013B6A;
+	Thu,  7 Dec 2023 16:20:35 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id liI5ONPwcWWzXwAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Thu, 07 Dec 2023 16:20:35 +0000
+Message-ID: <0e84720f-bb52-c77f-e496-40d91e94a4f6@suse.cz>
+Date: Thu, 7 Dec 2023 17:20:35 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231206074155.GA43833@sol.localdomain> <mhng-9f5b6a98-57f4-40a8-becc-93319bbed97c@palmer-ri-x1c9>
-In-Reply-To: <mhng-9f5b6a98-57f4-40a8-becc-93319bbed97c@palmer-ri-x1c9>
-From: Andy Chiu <andy.chiu@sifive.com>
-Date: Thu, 7 Dec 2023 23:31:19 +0800
-Message-ID: <CABgGipVad0ohfhWc4tA0865atKLMLazwJ4u-3e3MF=aesVKQSg@mail.gmail.com>
-Subject: Re: [PATCH v3 00/12] RISC-V: provide some accelerated cryptography
- implementations using vector extensions
-To: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: ebiggers@kernel.org, jerry.shih@sifive.com, 
-	Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, 
-	Conor Dooley <conor.dooley@microchip.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Conor Dooley <conor@kernel.org>, heiko@sntech.de, phoebe.chen@sifive.com, 
-	hongrong.hsu@sifive.com, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v10 16/50] x86/sev: Introduce snp leaked pages list
+To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+ dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, kirill@shutemov.name,
+ ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-17-michael.roth@amd.com>
+Content-Language: en-US
+From: Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20231016132819.1002933-17-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-3.10 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 R_RATELIMIT(0.00)[to_ip_from(RL81e5qggtdx371s8ik49ru6xr)];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 RCPT_COUNT_TWELVE(0.00)[39];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -3.10
 
-Hi Palmer,
+On 10/16/23 15:27, Michael Roth wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> Pages are unsafe to be released back to the page-allocator, if they
+> have been transitioned to firmware/guest state and can't be reclaimed
+> or transitioned back to hypervisor/shared state. In this case add
+> them to an internal leaked pages list to ensure that they are not freed
 
-On Thu, Dec 7, 2023 at 1:07=E2=80=AFAM Palmer Dabbelt <palmer@dabbelt.com> =
-wrote:
->
-> On Tue, 05 Dec 2023 23:41:55 PST (-0800), ebiggers@kernel.org wrote:
-> > Hi Jerry,
-> >
-> > On Wed, Dec 06, 2023 at 03:02:40PM +0800, Jerry Shih wrote:
-> >> On Dec 6, 2023, at 08:46, Eric Biggers <ebiggers@kernel.org> wrote:
-> >> > On Tue, Dec 05, 2023 at 05:27:49PM +0800, Jerry Shih wrote:
-> >> >> This series depend on:
-> >> >> 2. support kernel-mode vector
-> >> >> Link: https://lore.kernel.org/all/20230721112855.1006-1-andy.chiu@s=
-ifive.com/
-> >> >> 3. vector crypto extensions detection
-> >> >> Link: https://lore.kernel.org/lkml/20231017131456.2053396-1-cleger@=
-rivosinc.com/
-> >> >
-> >> > What's the status of getting these prerequisites merged?
-> >> >
-> >> > - Eric
-> >>
-> >> The latest extension detection patch version is v5.
-> >> Link: https://lore.kernel.org/lkml/20231114141256.126749-1-cleger@rivo=
-sinc.com/
-> >> It's still under reviewing.
-> >> But I think the checking codes used in this crypto patch series will n=
-ot change.
-> >> We could just wait and rebase when it's merged.
-> >>
-> >> The latest kernel-mode vector patch version is v3.
-> >> Link: https://lore.kernel.org/all/20231019154552.23351-1-andy.chiu@sif=
-ive.com/
-> >> This patch doesn't work with qemu(hit kernel panic when using vector).=
- It's not
-> >> clear for the status. Could we still do the reviewing process for the =
-gluing code and
-> >> the crypto asm parts?
-> >
-> > I'm almost ready to give my Reviewed-by for this whole series.  The pro=
-blem is
-> > that it can't be merged until its prerequisites are merged.
-> >
-> > Andy Chiu's last patchset "riscv: support kernel-mode Vector" was 2 mon=
-ths ago,
-> > but he also gave a talk at Plumbers about it more recently
-> > (https://www.youtube.com/watch?v=3Deht3PccEn5o).  So I assume he's stil=
-l working
-> > on it.  It sounds like he's also going to include support for preemptio=
-n, and
-> > optimizations to memcpy, memset, memmove, and copy_{to,from}_user.
->
-> So I think we just got blocked on not knowing if turning on vector
-> everywhere in the kernel was a good idea -- it's not what any other port
-> does despite there having been some discussions floating around, but we
-> never really figured out why.  I can come up with some possible
-> performance pathologies related to having vector on in many contexts,
-> but it's all theory as there's not really any vector hardware that works
-> upstream (though the K230 is starting to come along, so maybe that'll
-> sort itself out).
->
-> Last we talked I think the general consensus is that we'd waited long
-> enough, if nobody has a concrete objection we should just take it and
-> see -- sure maybe there's some possible issues, but anything could have
-> issues.
->
-> > I think it would be a good idea to split out the basic support for
-> > kernel_vector_{begin,end} so that the users of them, as well as the pre=
-emption
-> > support, can be considered and merged separately.  Maybe patch 1 of the=
- series
-> > (https://lore.kernel.org/r/20231019154552.23351-2-andy.chiu@sifive.com)=
- is all
-> > that's needed initially?
->
-> I'm fine with that sort of approach too, it's certainly more in line
-> with other ports to just restrict the kernel-mode vector support to
-> explicitly enabled sections.  Sure maybe there's other stuff to do in
-> kernel vector land, but we can at least get something going.
+Note the adding to the list doesn't ensure anything like that. Not dropping
+the refcount to zero does. But tracking them might indeed not be bad for
+e.g. crashdump investigations so no objection there.
 
-With the current approach of preempt_v we still need
-kernel_vector_begin/end to explicitly mark enabled sections. But
-indeed, preempt_v will make it easy to do function-wise, thread-wise
-enable if people need it.
+> or touched/accessed to cause fatal page faults.
+> 
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> [mdr: relocate to arch/x86/coco/sev/host.c]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/include/asm/sev-host.h |  3 +++
+>  arch/x86/virt/svm/sev.c         | 28 ++++++++++++++++++++++++++++
+>  2 files changed, 31 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/sev-host.h b/arch/x86/include/asm/sev-host.h
+> index 1df989411334..7490a665e78f 100644
+> --- a/arch/x86/include/asm/sev-host.h
+> +++ b/arch/x86/include/asm/sev-host.h
+> @@ -19,6 +19,8 @@ void sev_dump_hva_rmpentry(unsigned long address);
+>  int psmash(u64 pfn);
+>  int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
+>  int rmp_make_shared(u64 pfn, enum pg_level level);
+> +void snp_leak_pages(u64 pfn, unsigned int npages);
+> +
+>  #else
+>  static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return -ENXIO; }
+>  static inline void sev_dump_hva_rmpentry(unsigned long address) {}
+> @@ -29,6 +31,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int as
+>  	return -ENXIO;
+>  }
+>  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENXIO; }
+> +static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
+>  #endif
+>  
+>  #endif
+> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+> index bf9b97046e05..29a69f4b8cfb 100644
+> --- a/arch/x86/virt/svm/sev.c
+> +++ b/arch/x86/virt/svm/sev.c
+> @@ -59,6 +59,12 @@ struct rmpentry {
+>  static struct rmpentry *rmptable_start __ro_after_init;
+>  static u64 rmptable_max_pfn __ro_after_init;
+>  
+> +/* list of pages which are leaked and cannot be reclaimed */
+> +static LIST_HEAD(snp_leaked_pages_list);
+> +static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
+> +
+> +static atomic_long_t snp_nr_leaked_pages = ATOMIC_LONG_INIT(0);
+> +
+>  #undef pr_fmt
+>  #define pr_fmt(fmt)	"SEV-SNP: " fmt
+>  
+> @@ -518,3 +524,25 @@ int rmp_make_shared(u64 pfn, enum pg_level level)
+>  	return rmpupdate(pfn, &val);
+>  }
+>  EXPORT_SYMBOL_GPL(rmp_make_shared);
+> +
+> +void snp_leak_pages(u64 pfn, unsigned int npages)
+> +{
+> +	struct page *page = pfn_to_page(pfn);
+> +
+> +	pr_debug("%s: leaking PFN range 0x%llx-0x%llx\n", __func__, pfn, pfn + npages);
+> +
+> +	spin_lock(&snp_leaked_pages_list_lock);
+> +	while (npages--) {
+> +		/*
+> +		 * Reuse the page's buddy list for chaining into the leaked
+> +		 * pages list. This page should not be on a free list currently
+> +		 * and is also unsafe to be added to a free list.
+> +		 */
+> +		list_add_tail(&page->buddy_list, &snp_leaked_pages_list);
+> +		sev_dump_rmpentry(pfn);
+> +		pfn++;
 
->
-> > Andy, what do you think?
->
-> I'll wait on Andy to see, but I generally agree we should merge
-> something for this cycle.
->
-> Andy: maybe just send a patch set with what you think is the best way to
-> go?  Then we have one target approach and we can get things moving.
+You increment pfn, but not page, which is always pointing to the page of the
+initial pfn, so need to do page++ too.
+But that assumes it's all order-0 pages (hard to tell for me whether that's
+true as we start with a pfn), if there can be compound pages, it would be
+best to only add the head page and skip the tail pages - it's not expected
+to use page->buddy_list of tail pages.
 
-Yes, I think we can split. It will introduce some overhead on my side,
-but at least we can get some parts moving. I was preempted by some
-higher priority tasks. Luckily I am back now. Please expect v4 by next
-week, I hope it won't be too late for the cycle.
+> +	}
+> +	spin_unlock(&snp_leaked_pages_list_lock);
+> +	atomic_long_inc(&snp_nr_leaked_pages);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_leak_pages);
 
->
-> > - Eric
