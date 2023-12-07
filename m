@@ -1,97 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="LM4o/RoK"
-Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF1D698;
-	Wed,  6 Dec 2023 12:43:51 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 12D1D40E00C6;
-	Wed,  6 Dec 2023 20:43:49 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id m30YgIGcggVv; Wed,  6 Dec 2023 20:43:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1701895427; bh=j+6bz83E2E5dhWoENXiIOXBWe60E3WSbl+pDFm9fzsk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LM4o/RoKTlfqVTgEMpR9zOTLNvLJSmCPkEQiJwkww8JbI83wwN5V1leOR33s2LgB0
-	 IU5UQFrwXGoLHoJ8/+d+j12OSsYdb3l1KUbbsF/NEjw+ltB6CZA6PSR5j2nAhbjn1i
-	 2iVk2ROUEoSSBFksKlMqB58zTz18ZxfJkzzgHKw62hNfTLJdpoX4z3CKmJ2D5s8tae
-	 LZz2McpBMV/ZlwUp9cVWZCHsc58tozR9Kyk/klayj60ydKVjVCbifDiCL/F8U65UQi
-	 4QxoJ5pKprtxf+6vPkIMceEb5HzuEGJYlVfNwZXw0XLOcJi0B/bAgPl9/AGg8d+Bog
-	 wTb1Qf7l4fR/J+U00gEoJhy/X+3cpef8CGimOKNh/cJAQbSaVL/z4HtcMGZa7qejQx
-	 eC0a9M+U8BsqnQu+6FPBop4xtCBDBuTt1qse4X9kYLHj2Iqk5tzPVjuW5EHoCf3sDF
-	 EJV0X72LClA8Hm4Zj9XdLr+xnrJoCAfObfBSsZnu7Nrhw/JYIkn8W4XMgTSEjzg7UM
-	 keG9P4keiRiFWlaA3QLnQlLwdz/0W05YiwTyynjqX1YbucPuiqrTDz4TulS/xxBS0J
-	 Za98XTVjJWzRDVLVrZAa53J8/kiAXZQZ9WjMslOeyclszZw2YjSll9AeqHMSKrVHWG
-	 z0QlPr2KYAJDJyHGCcJhlq0s=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 952EE40E00A9;
-	Wed,  6 Dec 2023 20:43:07 +0000 (UTC)
-Date: Wed, 6 Dec 2023 21:42:55 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, marcorr@google.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com
-Subject: Re: [PATCH v10 16/50] x86/sev: Introduce snp leaked pages list
-Message-ID: <20231206204255.GEZXDcz9yfyMiyYQ1H@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-17-michael.roth@amd.com>
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9187D4B;
+	Wed,  6 Dec 2023 18:33:43 -0800 (PST)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+	by fd01.gateway.ufhost.com (Postfix) with ESMTP id A81898008;
+	Thu,  7 Dec 2023 10:33:42 +0800 (CST)
+Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 7 Dec
+ 2023 10:33:42 +0800
+Received: from [192.168.155.133] (202.188.176.82) by EXMBX068.cuchost.com
+ (172.16.6.68) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 7 Dec
+ 2023 10:33:39 +0800
+Message-ID: <fca024e0-de9e-4165-8a84-0429e2fc2683@starfivetech.com>
+Date: Thu, 7 Dec 2023 10:33:38 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-17-michael.roth@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] dt-bindings: rng: starfive: Add jh8100 compatible
+ string
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Olivia Mackall
+	<olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring
+	<robh+dt@kernel.org>, Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20231206014236.1109832-1-jiajie.ho@starfivetech.com>
+ <20231206014236.1109832-2-jiajie.ho@starfivetech.com>
+ <c006dd3a-07a2-4d14-899b-72373540ad37@linaro.org>
+Content-Language: en-US
+From: Jia Jie Ho <jiajie.ho@starfivetech.com>
+In-Reply-To: <c006dd3a-07a2-4d14-899b-72373540ad37@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EXCAS062.cuchost.com (172.16.6.22) To EXMBX068.cuchost.com
+ (172.16.6.68)
+X-YovoleRuleAgent: yovoleflag
 
-On Mon, Oct 16, 2023 at 08:27:45AM -0500, Michael Roth wrote:
-> +	spin_lock(&snp_leaked_pages_list_lock);
-> +	while (npages--) {
-> +		/*
-> +		 * Reuse the page's buddy list for chaining into the leaked
-> +		 * pages list. This page should not be on a free list currently
-> +		 * and is also unsafe to be added to a free list.
-> +		 */
-> +		list_add_tail(&page->buddy_list, &snp_leaked_pages_list);
-> +		sev_dump_rmpentry(pfn);
-> +		pfn++;
-> +	}
-> +	spin_unlock(&snp_leaked_pages_list_lock);
-> +	atomic_long_inc(&snp_nr_leaked_pages);
+On 6/12/2023 6:17 pm, Krzysztof Kozlowski wrote:
+> On 06/12/2023 02:42, Jia Jie Ho wrote:
+>> Add compatible string for StarFive JH8100 trng.
+>> 
+>> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+>> ---
+>>  .../devicetree/bindings/rng/starfive,jh7110-trng.yaml         | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml b/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
+>> index 2b76ce25acc4..d275bdc4d009 100644
+>> --- a/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
+>> +++ b/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
+>> @@ -11,7 +11,9 @@ maintainers:
+>>  
+>>  properties:
+>>    compatible:
+>> -    const: starfive,jh7110-trng
+>> +    enum:
+>> +      - starfive,jh7110-trng
+>> +      - starfive,jh8100-trng
+> 
+> Your driver change suggests these are compatible, so express this here
+> and drop driver change.
+> 
 
-How is this supposed to count?
+I'll update the series accordingly. Thanks for reviewing this.
 
-You're leaking @npages as the function's parameter but are incrementing
-snp_nr_leaked_pages only once?
+Best regards,
+Jia Jie
 
-Just make it a bog-normal unsigned long and increment it inside the
-locked section.
-
-Or do at the beginning of the function:
-
-	atomic_long_add(npages, &snp_nr_leaked_pages);
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
