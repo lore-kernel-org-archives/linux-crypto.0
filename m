@@ -1,59 +1,111 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C89B1716;
-	Thu,  7 Dec 2023 20:10:19 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rBSBq-008Imt-3s; Fri, 08 Dec 2023 12:10:15 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Dec 2023 12:10:23 +0800
-Date: Fri, 8 Dec 2023 12:10:23 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Zhiqi Song <songzhiqi1@huawei.com>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, wangzhou1@hisilicon.com,
-	fanghao11@huawei.com, liulongfang@huawei.com, qianweili@huawei.com,
-	shenyang39@huawei.com
-Subject: Re: [PATCH 0/5] crypto: hisilicon - fix the process to obtain
- capability register value
-Message-ID: <ZXKXL7zTnD2Yxdum@gondor.apana.org.au>
-References: <20231202091722.1974582-1-songzhiqi1@huawei.com>
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="UMJjJUs5"
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00579171C
+	for <linux-crypto@vger.kernel.org>; Thu,  7 Dec 2023 20:18:44 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-5c664652339so1314650a12.1
+        for <linux-crypto@vger.kernel.org>; Thu, 07 Dec 2023 20:18:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1702009124; x=1702613924; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R5Tnty8uGnrsIVXtmr+TvgEkcR6UqhS9WZGqa9cLAzU=;
+        b=UMJjJUs5zN4ZD9xrC8PvcPqrsXHoXvrBCm4jrddzgnKeFOmXi9ivbn+7ldA6gJ/SnU
+         Tmfk0jzvEC44Su9lU/j+abLVxsgbV6UXvp9suAW1Fjnru8ET/ztmZ/iR4sz4pW+PguXm
+         if2Aj27cDUn8YINGO1UHpCwfhPls8XXDLvn0aR+dWo6diTYnEYKKxKHwfwwNAGWdCPkr
+         oqpWQa4NSQ0cfO+0H1JjcXdP8oTY729u0otwFDKYI+wWjqK2CbYFjbtq5/Uhx1+NvbsF
+         Nm71oELv6uKInx6I+WQq10JLmuNcgz2qbGzr2BxmaqW8J1JX6np67Z8Ysg6kJ+0+ZhsD
+         TbHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702009124; x=1702613924;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R5Tnty8uGnrsIVXtmr+TvgEkcR6UqhS9WZGqa9cLAzU=;
+        b=mH9X5uZQv0nyNh/pNkFfCGNOdqyiohrQZJIABV7MW6dIzNO6MOXvKN0QoCQ+HpXelL
+         psvRROqezvpE0o90w9/BD4RnqGn4SPWJmwS26hWqLhlG7pX4Y3GdVhJQV5xv4Owrd6X3
+         QT6BACu6q1H7k8anc5qBbOb6O9nzFgHcpBxmnp/onF5c4IeTMCUdf7o0lWuXHuHPgBwj
+         KT8vNz5jamVIFnElB8ELX2fJJaROWd2hbFwV75Q0rYF3XTzDk0WbiVCOL59qY9FgKUBz
+         dMnk6NTDyj8Av2ijpgmDiILcFQUghOR+TT5HPcTGkuK7qj0acenGc6ZeVX4u0g7pzhdw
+         sYpQ==
+X-Gm-Message-State: AOJu0YxwGobd+Zi2ZWGZX5V6O8tytFbeUKq8IgD2TvE1qXxzEzicBLpk
+	oGKNidiVJMlIwmMARaJytFqPJw==
+X-Google-Smtp-Source: AGHT+IFp9iNb7QqJ7wb16q4wxd1kROAdjldRBrd9Y5SAmktLgQrezvI5AuaKkgiGqBj1DHg2d5+eYA==
+X-Received: by 2002:a17:90b:3b44:b0:286:815b:8c75 with SMTP id ot4-20020a17090b3b4400b00286815b8c75mr3090891pjb.16.1702009124417;
+        Thu, 07 Dec 2023 20:18:44 -0800 (PST)
+Received: from ?IPv6:2402:7500:4d5:3ce7:e047:b0e5:91bf:940? ([2402:7500:4d5:3ce7:e047:b0e5:91bf:940])
+        by smtp.gmail.com with ESMTPSA id dw8-20020a17090b094800b0028862dc530bsm2235275pjb.25.2023.12.07.20.18.41
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 07 Dec 2023 20:18:44 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231202091722.1974582-1-songzhiqi1@huawei.com>
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
+Subject: Re: [PATCH v2 05/13] crypto: simd - Update `walksize` in simd
+ skcipher
+From: Jerry Shih <jerry.shih@sifive.com>
+In-Reply-To: <ZXKV/nLAQpUx6AX0@gondor.apana.org.au>
+Date: Fri, 8 Dec 2023 12:18:39 +0800
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+ palmer@dabbelt.com,
+ aou@eecs.berkeley.edu,
+ davem@davemloft.net,
+ conor.dooley@microchip.com,
+ ebiggers@kernel.org,
+ ardb@kernel.org,
+ heiko@sntech.de,
+ phoebe.chen@sifive.com,
+ hongrong.hsu@sifive.com,
+ linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5684F139-A0DE-4A9A-B937-9DF5130E5BD7@sifive.com>
+References: <20231127070703.1697-1-jerry.shih@sifive.com>
+ <20231127070703.1697-6-jerry.shih@sifive.com>
+ <ZXKV/nLAQpUx6AX0@gondor.apana.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+X-Mailer: Apple Mail (2.3445.9.7)
 
-On Sat, Dec 02, 2023 at 05:17:17PM +0800, Zhiqi Song wrote:
-> This patchset fixes the process to obtain the value of capability
-> registers related to irq and alg support info. Pre-store the valid
-> values of them.
-> 
-> Wenkai Lin (1):
->   crypto: hisilicon/qm - add a function to set qm algs
-> 
-> Zhiqi Song (4):
->   crypto: hisilicon/qm - save capability registers in qm init process
->   crypto: hisilicon/hpre - save capability registers in probe process
->   crypto: hisilicon/sec2 - save capability registers in probe process
->   crypto: hisilicon/zip - save capability registers in probe process
-> 
->  drivers/crypto/hisilicon/hpre/hpre_main.c  | 122 +++++++++++----------
->  drivers/crypto/hisilicon/qm.c              |  98 +++++++++++++++--
->  drivers/crypto/hisilicon/sec2/sec.h        |   7 ++
->  drivers/crypto/hisilicon/sec2/sec_crypto.c |  10 +-
->  drivers/crypto/hisilicon/sec2/sec_main.c   |  70 ++++++------
->  drivers/crypto/hisilicon/zip/zip_main.c    | 120 +++++++++++---------
->  include/linux/hisi_acc_qm.h                |  20 +++-
->  7 files changed, 293 insertions(+), 154 deletions(-)
-> 
-> -- 
-> 2.30.0
+On Dec 8, 2023, at 12:05, Herbert Xu <herbert@gondor.apana.org.au> =
+wrote:
+> On Mon, Nov 27, 2023 at 03:06:55PM +0800, Jerry Shih wrote:
+>> The `walksize` assignment is missed in simd skcipher.
+>>=20
+>> Signed-off-by: Jerry Shih <jerry.shih@sifive.com>
+>> ---
+>> crypto/cryptd.c | 1 +
+>> crypto/simd.c   | 1 +
+>> 2 files changed, 2 insertions(+)
+>>=20
+>> diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+>> index bbcc368b6a55..253d13504ccb 100644
+>> --- a/crypto/cryptd.c
+>> +++ b/crypto/cryptd.c
+>> @@ -405,6 +405,7 @@ static int cryptd_create_skcipher(struct =
+crypto_template *tmpl,
+>> 		(alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
+>> 	inst->alg.ivsize =3D crypto_skcipher_alg_ivsize(alg);
+>> 	inst->alg.chunksize =3D crypto_skcipher_alg_chunksize(alg);
+>> +	inst->alg.walksize =3D crypto_skcipher_alg_walksize(alg);
+>> 	inst->alg.min_keysize =3D crypto_skcipher_alg_min_keysize(alg);
+>> 	inst->alg.max_keysize =3D crypto_skcipher_alg_max_keysize(alg);
+>=20
+> Sorry but this patch doesn't apply any more now that we have
+> lskcipher.
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+The lskcipher is merged in kernel `6.7`. I will rebase the v3 series to =
+`6.7` later.
+Link: =
+https://lore.kernel.org/all/20231205092801.1335-1-jerry.shih@sifive.com/
+
+Some dependent patches are not applicable to `6.7` now. I will check the =
+status for the
+dependent patches.
+
+-Jerry=
