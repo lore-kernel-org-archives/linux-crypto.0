@@ -1,24 +1,19 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEAC7D53;
-	Thu,  7 Dec 2023 19:28:17 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 394EB1712;
+	Thu,  7 Dec 2023 20:04:29 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rBRX6-008IE0-47; Fri, 08 Dec 2023 11:28:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Dec 2023 11:28:17 +0800
-Date: Fri, 8 Dec 2023 11:28:17 +0800
+	id 1rBS66-008Ias-LB; Fri, 08 Dec 2023 12:04:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Dec 2023 12:04:28 +0800
+Date: Fri, 8 Dec 2023 12:04:28 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	wangyangxin <wangyangxin1@huawei.com>,
-	Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH v2] crypto: virtio-crypto: Handle dataq logic  with
- tasklet
-Message-ID: <ZXKNUdXNV7G3ED3P@gondor.apana.org.au>
-References: <ad8c946eb2294a7bb9eef26066c06b72@huawei.com>
+To: Dinghao Liu <dinghao.liu@zju.edu.cn>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [v2] crypto: ccp - fix memleak in ccp_init_dm_workarea
+Message-ID: <ZXKVzGnviCY5Hb6+@gondor.apana.org.au>
+References: <20231127034710.23413-1-dinghao.liu@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -27,28 +22,29 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ad8c946eb2294a7bb9eef26066c06b72@huawei.com>
+In-Reply-To: <20231127034710.23413-1-dinghao.liu@zju.edu.cn>
 
-On Wed, Dec 06, 2023 at 11:52:51AM +0000, Gonglei (Arei) wrote:
-> Doing ipsec produces a spinlock recursion warning.
-> This is due to crypto_finalize_request() being called in the upper half.
-> Move virtual data queue processing of virtio-crypto driver to tasklet.
+On Mon, Nov 27, 2023 at 11:47:10AM +0800, Dinghao Liu wrote:
+> When dma_map_single() fails, wa->address is supposed to be freed
+> by the callers of ccp_init_dm_workarea() through ccp_dm_free().
+> However, many of the call spots don't expect to have to call
+> ccp_dm_free() on failure of ccp_init_dm_workarea(), which may
+> lead to a memleak. Let's free wa->address in ccp_init_dm_workarea()
+> when dma_map_single() fails.
 > 
-> Fixes: dbaf0624ffa5 ("crypto: add virtio-crypto driver")
-> Reported-by: Halil Pasic <pasic@linux.ibm.com>
-> Signed-off-by: wangyangxin <wangyangxin1@huawei.com>
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+> Fixes: 63b945091a07 ("crypto: ccp - CCP device driver and interface support")
+> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
 > ---
->  v2: calling tasklet_kill() in virtcrypto_remove(), thanks for MST.
 > 
->  drivers/crypto/virtio/virtio_crypto_common.h |  2 ++
->  drivers/crypto/virtio/virtio_crypto_core.c   | 26 ++++++++++++++++----------
->  2 files changed, 18 insertions(+), 10 deletions(-)
+> Changelog:
+> 
+> v2: -Improve the commit message.
+>     -Set wa->address to NULL after kfree() to prevent double-free.
+> ---
+>  drivers/crypto/ccp/ccp-ops.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
-Your patch has already been merged.  So please send this as
-an incremental patch.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
