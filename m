@@ -1,242 +1,336 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="EKzYzcPu"
-Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2F5710C4;
-	Sat,  9 Dec 2023 08:21:08 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 31F6E40E00C6;
-	Sat,  9 Dec 2023 16:21:06 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id p5DJ6hin4UHr; Sat,  9 Dec 2023 16:21:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1702138862; bh=HyDzrkPoCfW4PayZZjMMTzRt/urnsGOPJgwMOc9fuMk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EKzYzcPuer8tSrZAB0fNhs7FnIOpN4mxmIrqVcEiCSbKlecHHLj/m5zD4jrsUb+uX
-	 lOHSxV5iQJZvtPa+W+GaoYyhVYU4PbecAXzUWkWeQf/MD0qR6QGX/4jSb/NIHRJsNE
-	 TqobEUwJLQpfPlj243QLLqPQ5Zj8iQcW3HvXcLpQi7XeaIqbAVB766/4lZaIR6B2tn
-	 ugiddztA2CfiMsDKwmYLZ7Dqbyfoci5UZ5zd+LgnOdY3WqSfevLwy74F2W5samFLjB
-	 yODqDWgs8mUG0DGrQrndyMf7qh/PizWiRMziSOOLUjXwU3Tt1l3TFLzwuTpBjLryWu
-	 rI9hs7EpZPybT66NM260GDI1Uz3IzM9uOqZ+sCKMpCwWshQa5xFvgTO5B2K0Q4XQTA
-	 CMHok9o+X8fUi0PYdfb5SizFgHbrQnAcSd8vUQ751dRBLvMzQBRAgtnsip59aRwnmE
-	 HDphyIdN5o2jdbGEOwrCM1NUfcr35ozkcywmRRlh7Ib6OjB1tSD/jTAFedXDK6C9zx
-	 RY7+4KRaFo7XX1d5EA13GG904GziO16r8M8rTm3kul9avChAItC1vNunWcFOb3ixec
-	 PpLlM5i8J8lAsVlJXW3mZTt2aKW/eaOTZsBpniTohc/fA5UjHTYeVv0gIPi0ic0D0Z
-	 tsnjY1f7MPLBAEmzKn5WAGno=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3144440E00A9;
-	Sat,  9 Dec 2023 16:20:21 +0000 (UTC)
-Date: Sat, 9 Dec 2023 17:20:15 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-	linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, marcorr@google.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
-	liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>,
-	Jarkko Sakkinen <jarkko@profian.com>
-Subject: Re: [PATCH v10 14/50] crypto: ccp: Add support to initialize the
- AMD-SP for SEV-SNP
-Message-ID: <20231209162015.GBZXSTv738J09Htf51@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-15-michael.roth@amd.com>
- <20231127095937.GLZWRoiaqGlJMX54Xb@fat_crate.local>
- <d5242390-8904-7ec5-d8a1-9e3fb8f6423c@amd.com>
- <20231206170807.GBZXCqd0z8uu2rlhpn@fat_crate.local>
- <9af9b10f-0ab6-1fe8-eaec-c9f98e14a203@amd.com>
+X-Greylist: delayed 1173 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 10 Dec 2023 02:39:21 PST
+Received: from wxsgout04.xfusion.com (wxsgout04.xfusion.com [36.139.87.180])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DACA118
+	for <linux-crypto@vger.kernel.org>; Sun, 10 Dec 2023 02:39:20 -0800 (PST)
+Received: from wuxshcsitd00600.xfusion.com (unknown [10.32.133.213])
+	by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4Sp14K6v2fz9yQBw;
+	Sun, 10 Dec 2023 18:16:17 +0800 (CST)
+Received: from localhost (10.82.147.3) by wuxshcsitd00600.xfusion.com
+ (10.32.133.213) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Sun, 10 Dec
+ 2023 18:19:42 +0800
+Date: Sun, 10 Dec 2023 18:19:41 +0800
+From: WangJinchao <wangjinchao@xfusion.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, Steffen Klassert <steffen.klassert@secunet.com>,
+	Daniel Jordan <daniel.m.jordan@oracle.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <stone.xulei@xfusion.com>, <wangjinchao@xfusion.com>
+Subject: [PATCH] crypto: tcrypt - add script tcrypt_speed_compare.py
+Message-ID: <202312101758+0800-wangjinchao@xfusion.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <9af9b10f-0ab6-1fe8-eaec-c9f98e14a203@amd.com>
+X-ClientProxiedBy: wuxshcsitd00603.xfusion.com (10.32.134.231) To
+ wuxshcsitd00600.xfusion.com (10.32.133.213)
 
-On Wed, Dec 06, 2023 at 02:35:28PM -0600, Kalra, Ashish wrote:
-> The main use case for the probe parameter is to control if we want to do
-> legacy SEV/SEV-ES INIT during probe. There is a usage case where we want to
-> delay legacy SEV INIT till an actual SEV/SEV-ES guest is being launched. So
-> essentially the probe parameter controls if we want to
-> execute __sev_do_init_locked() or not.
-> 
-> We always want to do SNP INIT at probe time.
+Create a script for comparing tcrypt speed test logs.
+The script will systematically analyze differences item
+by item and provide a summary (average).
+This tool is useful for evaluating the stability of
+cryptographic module algorithms and assisting with
+performance optimization.
 
-Here's what I mean (diff ontop):
+The script produces comparisons in two scenes:
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index fae1fd45eccd..830d74fcf950 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -479,11 +479,16 @@ static inline int __sev_do_init_locked(int *psp_ret)
- 		return __sev_init_locked(psp_ret);
- }
- 
--static int ___sev_platform_init_locked(int *error, bool probe)
-+/*
-+ * Legacy guests cannot be running while SNP_INIT(_EX) is executing,
-+ * so perform SEV-SNP initialization at probe time.
-+ */
-+static int __sev_platform_init_snp_locked(int *error)
- {
--	int rc, psp_ret = SEV_RET_NO_FW_CALL;
-+
- 	struct psp_device *psp = psp_master;
- 	struct sev_device *sev;
-+	int rc;
- 
- 	if (!psp || !psp->sev_data)
- 		return -ENODEV;
-@@ -493,10 +498,6 @@ static int ___sev_platform_init_locked(int *error, bool probe)
- 	if (sev->state == SEV_STATE_INIT)
- 		return 0;
- 
--	/*
--	 * Legacy guests cannot be running while SNP_INIT(_EX) is executing,
--	 * so perform SEV-SNP initialization at probe time.
--	 */
- 	rc = __sev_snp_init_locked(error);
- 	if (rc && rc != -ENODEV) {
- 		/*
-@@ -506,8 +507,21 @@ static int ___sev_platform_init_locked(int *error, bool probe)
- 		dev_err(sev->dev, "SEV-SNP: failed to INIT rc %d, error %#x\n", rc, *error);
- 	}
- 
--	/* Delay SEV/SEV-ES support initialization */
--	if (probe && !psp_init_on_probe)
-+	return rc;
-+}
-+
-+static int __sev_platform_init_locked(int *error)
-+{
-+	int rc, psp_ret = SEV_RET_NO_FW_CALL;
-+	struct psp_device *psp = psp_master;
-+	struct sev_device *sev;
-+
-+	if (!psp || !psp->sev_data)
-+		return -ENODEV;
-+
-+	sev = psp->sev_data;
-+
-+	if (sev->state == SEV_STATE_INIT)
- 		return 0;
- 
- 	if (!sev_es_tmr) {
-@@ -563,33 +577,32 @@ static int ___sev_platform_init_locked(int *error, bool probe)
- 	return 0;
- }
- 
--static int __sev_platform_init_locked(int *error)
--{
--	return ___sev_platform_init_locked(error, false);
--}
--
--int sev_platform_init(int *error)
-+static int _sev_platform_init_locked(int *error, bool probe)
- {
- 	int rc;
- 
--	mutex_lock(&sev_cmd_mutex);
--	rc = __sev_platform_init_locked(error);
--	mutex_unlock(&sev_cmd_mutex);
-+	rc = __sev_platform_init_snp_locked(error);
-+	if (rc)
-+		return rc;
- 
--	return rc;
-+	/* Delay SEV/SEV-ES support initialization */
-+	if (probe && !psp_init_on_probe)
-+		return 0;
-+
-+	return __sev_platform_init_locked(error);
- }
--EXPORT_SYMBOL_GPL(sev_platform_init);
- 
--static int sev_platform_init_on_probe(int *error)
-+int sev_platform_init(int *error)
- {
- 	int rc;
- 
- 	mutex_lock(&sev_cmd_mutex);
--	rc = ___sev_platform_init_locked(error, true);
-+	rc = _sev_platform_init_locked(error, false);
- 	mutex_unlock(&sev_cmd_mutex);
- 
- 	return rc;
- }
-+EXPORT_SYMBOL_GPL(sev_platform_init);
- 
- static int __sev_platform_shutdown_locked(int *error)
- {
-@@ -691,7 +704,7 @@ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool wr
- 		return -EPERM;
- 
- 	if (sev->state == SEV_STATE_UNINIT) {
--		rc = __sev_platform_init_locked(&argp->error);
-+		rc = _sev_platform_init_locked(&argp->error, false);
- 		if (rc)
- 			return rc;
- 	}
-@@ -734,7 +747,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
- 
- cmd:
- 	if (sev->state == SEV_STATE_UNINIT) {
--		ret = __sev_platform_init_locked(&argp->error);
-+		ret = _sev_platform_init_locked(&argp->error, false);
- 		if (ret)
- 			goto e_free_blob;
- 	}
-@@ -1115,7 +1128,7 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
- 
- 	/* If platform is not in INIT state then transition it to INIT */
- 	if (sev->state != SEV_STATE_INIT) {
--		ret = __sev_platform_init_locked(&argp->error);
-+		ret = _sev_platform_init_locked(&argp->error, false);
- 		if (ret)
- 			goto e_free_oca;
- 	}
-@@ -1246,7 +1259,7 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- 		if (!writable)
- 			return -EPERM;
- 
--		ret = __sev_platform_init_locked(&argp->error);
-+		ret = _sev_platform_init_locked(&argp->error, false);
- 		if (ret)
- 			return ret;
- 	}
-@@ -1608,7 +1621,9 @@ void sev_pci_init(void)
- 	}
- 
- 	/* Initialize the platform */
--	rc = sev_platform_init_on_probe(&error);
-+	mutex_lock(&sev_cmd_mutex);
-+	rc = _sev_platform_init_locked(&error, true);
-+	mutex_unlock(&sev_cmd_mutex);
- 	if (rc)
- 		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
- 			error, rc);
+1. For operations in seconds
+===========================================================================
+rfc4106(gcm(aes)) (pcrypt(rfc4106(gcm_base(ctr(aes-generic),ghash-generic))
+                         encryption
+---------------------------------------------------------------------------
+bit key | byte blocks | base ops    | new ops     | differ(%)
+160     | 16          | 60276       | 47081       | -21.89
+160     | 64          | 55307       | 45430       | -17.86
+160     | 256         | 53196       | 41391       | -22.19
+160     | 512         | 45629       | 38511       | -15.6
+160     | 1024        | 37489       | 44333       | 18.26
+160     | 1420        | 32963       | 32815       | -0.45
+160     | 4096        | 18416       | 18356       | -0.33
+160     | 8192        | 11878       | 10701       | -9.91
+224     | 16          | 55332       | 56620       | 2.33
+224     | 64          | 59551       | 55006       | -7.63
+224     | 256         | 53144       | 49892       | -6.12
+224     | 512         | 46655       | 44010       | -5.67
+224     | 1024        | 38379       | 35988       | -6.23
+224     | 1420        | 33125       | 31529       | -4.82
+224     | 4096        | 17750       | 17351       | -2.25
+224     | 8192        | 10213       | 10046       | -1.64
+288     | 16          | 64662       | 56571       | -12.51
+288     | 64          | 57780       | 54815       | -5.13
+288     | 256         | 54679       | 50110       | -8.36
+288     | 512         | 46895       | 43201       | -7.88
+288     | 1024        | 36286       | 35860       | -1.17
+288     | 1420        | 31175       | 32327       | 3.7
+288     | 4096        | 16686       | 16699       | 0.08
+288     | 8192        | 9662        | 9548        | -1.18
+---------------------------------------------------------------------------
+average differ(%s)    | total_differ(%)
+---------------------------------------------------------------------------
+-5.60                 | 7.28
+===========================================================================
 
+2. For avg cycles of operation
+===========================================================================
+rfc4309(ccm(aes)) (rfc4309(ccm_base(ctr(aes-generic),cbcmac(aes-generic))))
+                         encryption
+---------------------------------------------------------------------------
+bit key | byte blocks | base ops    | new ops     | differ(%)
+152     | 16          | 792483      | 801555      | 1.14
+152     | 64          | 552470      | 557953      | 0.99
+152     | 256         | 254997      | 260518      | 2.17
+152     | 512         | 148486      | 153241      | 3.2
+152     | 1024        | 80925       | 83446       | 3.12
+152     | 1420        | 59601       | 60999       | 2.35
+152     | 4096        | 21714       | 22064       | 1.61
+152     | 8192        | 10984       | 11301       | 2.89
+---------------------------------------------------------------------------
+average differ(%s)    | total_differ(%)
+---------------------------------------------------------------------------
+2.18                  | -1.53
+===========================================================================
 
+Signed-off-by: WangJinchao <wangjinchao@xfusion.com>
+---
+ MAINTAINERS                                 |   5 +
+ tools/crypto/tcrypt/tcrypt_speed_compare.py | 179 ++++++++++++++++++++
+ 2 files changed, 184 insertions(+)
+ create mode 100755 tools/crypto/tcrypt/tcrypt_speed_compare.py
+
+To: Daniel Jordan <daniel.m.jordan@oracle.com>
+After spending a considerable amount of time analyzing and 
+benchmarking, I've found that although my approach could simplify
+the code logic, it leads to a performance decrease. Therefore,
+I have decided to abandon the code optimization effort.
+During the performance comparison, I utilized the Python script
+from this commit and found it to be valuable.
+Despite not optimizing padata, I would like to share this tool,
+which is helpful for analyzing cryptographic performance, 
+for the benefit of others.
+
+Additionally, thank you for your assistance throughout this process.
+
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Thank you for providing the testing method. Based on the approach
+you suggested, I conducted performance comparisons for padata.
+You were correct; the scheduling overhead is significant compared
+to 'parallel()' calls. During profiling, approximately 80% of the
+time was spent on operations related to 'queue_work_on' and locks.
+
+Furthermore, I observed a substantial number of 'pcrypt(pcrypt(...'
+structures during multiple 'modprobe' runs for pcrypt.
+To address this, I adjusted the testing procedure by removing the
+pcrypt module before each test, as indicated in the comments of this commit.
+
+In summary, I appreciate your guidance. This serves as a conclusion
+to my attempt at modifying padata, which I have decided to abandon.
+
+Thank you
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a0fb0df07b43..5690ab99f107 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -5535,6 +5535,11 @@ F:	include/crypto/
+ F:	include/linux/crypto*
+ F:	lib/crypto/
+ 
++CRYPTO SPEED TEST COMPARE
++M:	WangJinchao <wangjinchao@xfusion.com>
++L:	linux-crypto@vger.kernel.org
++F:	tools/crypto/tcrypt/tcrypt_speed_compare.py
++
+ CRYPTOGRAPHIC RANDOM NUMBER GENERATOR
+ M:	Neil Horman <nhorman@tuxdriver.com>
+ L:	linux-crypto@vger.kernel.org
+diff --git a/tools/crypto/tcrypt/tcrypt_speed_compare.py b/tools/crypto/tcrypt/tcrypt_speed_compare.py
+new file mode 100755
+index 000000000000..789d24013d8e
+--- /dev/null
++++ b/tools/crypto/tcrypt/tcrypt_speed_compare.py
+@@ -0,0 +1,179 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++#
++# Copyright (C) xFusion Digital Technologies Co., Ltd., 2023
++#
++# Author: WangJinchao <wangjinchao@xfusion.com>
++#
++"""
++A tool for comparing tcrypt speed test logs.
++
++Both support test for operations in one second and cycles of operation
++for example, use it in bellow bash script
++
++```bash
++#!/bin/bash
++
++seq_num=1
++sec=1
++num_mb=8
++mode=211
++
++# base speed test
++lsmod | grep pcrypt && modprobe -r pcrypt
++dmesg -C
++modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
++modprobe tcrypt mode=${mode} sec=${sec} num_mb=${num_mb}
++dmesg > ${seq_num}_base_dmesg.log
++
++# new speed test
++lsmod | grep pcrypt && modprobe -r pcrypt
++dmesg -C
++modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
++modprobe tcrypt mode=${mode} sec=${sec} num_mb=${num_mb}
++dmesg > ${seq_num}_new_dmesg.log
++lsmod | grep pcrypt && modprobe -r pcrypt
++
++./tcrypt_speed_compare.py ${seq_num}_base_dmesg.log ${seq_num}_new_dmesg.log  >${seq_num}_compare.log
++grep 'average' -A2 -B0 --group-separator="" ${seq_num}_compare.log
++```
++"""
++
++import sys
++import re
++
++
++def parse_title(line):
++    pattern = r'tcrypt: testing speed of (.*?) (encryption|decryption)'
++    match = re.search(pattern, line)
++    if match:
++        alg = match.group(1)
++        op = match.group(2)
++        return alg, op
++    else:
++        return "", ""
++
++
++def parse_item(line):
++    pattern_operations = r'\((\d+) bit key, (\d+) byte blocks\): (\d+) operations'
++    pattern_cycles = r'\((\d+) bit key, (\d+) byte blocks\): 1 operation in (\d+) cycles'
++    match = re.search(pattern_operations, line)
++    if match:
++        res = {
++            "bit_key": int(match.group(1)),
++            "byte_blocks": int(match.group(2)),
++            "operations": int(match.group(3)),
++        }
++        return res
++
++    match = re.search(pattern_cycles, line)
++    if match:
++        res = {
++            "bit_key": int(match.group(1)),
++            "byte_blocks": int(match.group(2)),
++            "cycles": int(match.group(3)),
++        }
++        return res
++
++    return None
++
++
++def parse(filepath):
++    result = {}
++    alg, op = "", ""
++    with open(filepath, 'r') as file:
++        for line in file:
++            if not line:
++                continue
++            _alg, _op = parse_title(line)
++            if _alg:
++                alg, op = _alg, _op
++                if alg not in result:
++                    result[alg] = {}
++                if op not in result[alg]:
++                    result[alg][op] = []
++                continue
++            parsed_result = parse_item(line)
++            if parsed_result:
++                result[alg][op].append(parsed_result)
++    return result
++
++
++def merge(base, new):
++    merged = {}
++    for alg in base.keys():
++        merged[alg] = {}
++        for op in base[alg].keys():
++            if op not in merged[alg]:
++                merged[alg][op] = []
++            for index in range(len(base[alg][op])):
++                merged_item = {
++                    "bit_key": base[alg][op][index]["bit_key"],
++                    "byte_blocks": base[alg][op][index]["byte_blocks"],
++                }
++                if "operations" in base[alg][op][index].keys():
++                    merged_item["base_ops"] = base[alg][op][index]["operations"]
++                    merged_item["new_ops"] = new[alg][op][index]["operations"]
++                else:
++                    merged_item["base_cycles"] = base[alg][op][index]["cycles"]
++                    merged_item["new_cycles"] = new[alg][op][index]["cycles"]
++
++                merged[alg][op].append(merged_item)
++    return merged
++
++
++def format(merged):
++    for alg in merged.keys():
++        for op in merged[alg].keys():
++            base_sum = 0
++            new_sum = 0
++            differ_sum = 0
++            differ_cnt = 0
++            print()
++            hlen = 80
++            print("="*hlen)
++            print(f"{alg}")
++            print(f"{' '*(len(alg)//3) + op}")
++            print("-"*hlen)
++            key = ""
++            if "base_ops" in merged[alg][op][0]:
++                key = "ops"
++                print(f"bit key | byte blocks | base ops    | new ops     | differ(%)")
++            else:
++                key = "cycles"
++                print(f"bit key | byte blocks | base cycles | new cycles  | differ(%)")
++            for index in range(len(merged[alg][op])):
++                item = merged[alg][op][index]
++                base_cnt = item[f"base_{key}"]
++                new_cnt = item[f"new_{key}"]
++                base_sum += base_cnt
++                new_sum += new_cnt
++                differ = round((new_cnt - base_cnt)*100/base_cnt, 2)
++                differ_sum += differ
++                differ_cnt += 1
++                bit_key = item["bit_key"]
++                byte_blocks = item["byte_blocks"]
++                print(
++                    f"{bit_key:<7} | {byte_blocks:<11} | {base_cnt:<11} | {new_cnt:<11} | {differ:<8}")
++            average_speed_up = "{:.2f}".format(differ_sum/differ_cnt)
++            ops_total_speed_up = "{:.2f}".format(
++                (base_sum - new_sum) * 100 / base_sum)
++            print('-'*hlen)
++            print(f"average differ(%s)    | total_differ(%)")
++            print('-'*hlen)
++            print(f"{average_speed_up:<21} | {ops_total_speed_up:<10}")
++            print('='*hlen)
++
++
++def main(base_log, new_log):
++    base = parse(base_log)
++    new = parse(new_log)
++    merged = merge(base, new)
++    format(merged)
++
++
++if __name__ == "__main__":
++    if len(sys.argv) != 3:
++        print(f"usage: {sys.argv[0]} base_log new_log")
++        exit(-1)
++    main(sys.argv[1], sys.argv[2])
 -- 
-Regards/Gruss,
-    Boris.
+2.40.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
