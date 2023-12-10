@@ -1,29 +1,34 @@
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9022F2
-	for <linux-crypto@vger.kernel.org>; Sun, 10 Dec 2023 14:12:51 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45211F3
+	for <linux-crypto@vger.kernel.org>; Sun, 10 Dec 2023 14:12:52 -0800 (PST)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rCS2a-0006P1-HV; Sun, 10 Dec 2023 23:12:48 +0100
+	id 1rCS2W-0006Oy-UR; Sun, 10 Dec 2023 23:12:44 +0100
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rCS2V-00ExYL-4i; Sun, 10 Dec 2023 23:12:43 +0100
+	id 1rCS2U-00ExYC-Do; Sun, 10 Dec 2023 23:12:42 +0100
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rCS2U-000RWc-Rr; Sun, 10 Dec 2023 23:12:42 +0100
+	id 1rCS2U-000RWQ-4g; Sun, 10 Dec 2023 23:12:42 +0100
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Martin Kaiser <martin@kaiser.cx>,
-	Yangtao Li <frank.li@vivo.com>,
+Cc: Avi Fishman <avifishman70@gmail.com>,
+	Tomer Maimon <tmaimon77@gmail.com>,
+	Tali Perry <tali.perry1@gmail.com>,
+	Patrick Venture <venture@google.com>,
+	Nancy Yuen <yuenn@google.com>,
+	Benjamin Fair <benjaminfair@google.com>,
+	openbmc@lists.ozlabs.org,
 	linux-crypto@vger.kernel.org,
 	kernel@pengutronix.de
-Subject: [PATCH 11/12] hwrng: timeriomem - Convert to platform remove callback returning void
-Date: Sun, 10 Dec 2023 23:12:26 +0100
-Message-ID:  <e0179f207f9a2ab4666c72815dfbe3be6148d807.1702245873.git.u.kleine-koenig@pengutronix.de>
+Subject: [PATCH 08/12] hwrng: npcm - Convert to platform remove callback returning void
+Date: Sun, 10 Dec 2023 23:12:23 +0100
+Message-ID:  <a6cf7061713748667743e445ec00aa31f7c824b0.1702245873.git.u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <cover.1702245873.git.u.kleine-koenig@pengutronix.de>
 References: <cover.1702245873.git.u.kleine-koenig@pengutronix.de>
@@ -34,7 +39,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1826; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=GoyYhW4hqUD9otfip9b0ONnav2BwKPc9Zk90sy92jcc=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBldjfMZsY79aVg6OTRVxuPEwEwxPs3Oa6gJt+uI I5yFQJcnDuJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZXY3zAAKCRCPgPtYfRL+ TuzEB/9Csdi0tK9fgYn3RExFiJcfEWtBoVJj+JqHIcP+uaCOL9mOblmxi5Mpi2R197nNFLAggt0 nNZwf0s4jVQoB1Zdqv6hyCOUPooH3QUogSM1R6RH44xVmw7OwM0sU8C4ZFS6ruTGvKivcVgr4Rn 7FbVq7I1VNTH+9Mc3NlLPywE2qdhAZ2VryTk9NsY3OUev43p6K1yesniobyWC+OyeX5OF0ISuH0 oTgCYllJwukj5QkHp6sDgdWXl/VnFdmsmfSBh2vrHCltKPW0yI1xMWNQqg9b1XuPfWmnPGxKwW/ 5aKm3bUmkGn0MRGhybRbVKpF8iblIXuaNFHCr5WL7Zn+CZcu
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1787; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=MuGl9Pi4du6aDKFhb44ZUIU1I3q41zByvx0vfz3i41g=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBldjfI6ggc1VYruEGcrSh92NPHvPtjsOYybF78I 0GLTXesNLGJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZXY3yAAKCRCPgPtYfRL+ ToIjB/0cwvqloENXYLTCrsQoQM5KyK7tYCvgofA5HhRvmFooSWKH622upb1j9DGqYeIWYP1+blz WTD9Yh2+AeiHGILYNCQlnTZioP1F5dOwoMZINC1vA5xF0HnHV9R62osPbvGnTyMz7oVr4YZb/+O e43ibfm6Gx++mMH4OZJ4Vi2g78dP4lWFSSdwQyD7ojkfGi1XeHpljA41ujzJd35ddCbiaYJI7k+ Mf6ohtSWKCxf5mjZLL0EFuenz28xFuroQS9W28iBu+zbG+kRIhCHaz+unE7q7tpNxzDq62DKr2B y9l3aB+uStiRgEONbP3l1ula+SJ4WFylwXMKXcWzTr3MXZ5O
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -57,37 +62,39 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/char/hw_random/timeriomem-rng.c | 6 ++----
+ drivers/char/hw_random/npcm-rng.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/char/hw_random/timeriomem-rng.c b/drivers/char/hw_random/timeriomem-rng.c
-index 3db9d868efb1..65b8260339f5 100644
---- a/drivers/char/hw_random/timeriomem-rng.c
-+++ b/drivers/char/hw_random/timeriomem-rng.c
-@@ -174,13 +174,11 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
+diff --git a/drivers/char/hw_random/npcm-rng.c b/drivers/char/hw_random/npcm-rng.c
+index 8a304b754217..bce8c4829a1f 100644
+--- a/drivers/char/hw_random/npcm-rng.c
++++ b/drivers/char/hw_random/npcm-rng.c
+@@ -126,15 +126,13 @@ static int npcm_rng_probe(struct platform_device *pdev)
  	return 0;
  }
  
--static int timeriomem_rng_remove(struct platform_device *pdev)
-+static void timeriomem_rng_remove(struct platform_device *pdev)
+-static int npcm_rng_remove(struct platform_device *pdev)
++static void npcm_rng_remove(struct platform_device *pdev)
  {
- 	struct timeriomem_rng_private *priv = platform_get_drvdata(pdev);
+ 	struct npcm_rng *priv = platform_get_drvdata(pdev);
  
- 	hrtimer_cancel(&priv->timer);
+ 	devm_hwrng_unregister(&pdev->dev, &priv->rng);
+ 	pm_runtime_disable(&pdev->dev);
+ 	pm_runtime_set_suspended(&pdev->dev);
 -
 -	return 0;
  }
  
- static const struct of_device_id timeriomem_rng_match[] = {
-@@ -195,7 +193,7 @@ static struct platform_driver timeriomem_rng_driver = {
- 		.of_match_table	= timeriomem_rng_match,
+ #ifdef CONFIG_PM
+@@ -178,7 +176,7 @@ static struct platform_driver npcm_rng_driver = {
+ 		.of_match_table = of_match_ptr(rng_dt_id),
  	},
- 	.probe		= timeriomem_rng_probe,
--	.remove		= timeriomem_rng_remove,
-+	.remove_new	= timeriomem_rng_remove,
+ 	.probe		= npcm_rng_probe,
+-	.remove		= npcm_rng_remove,
++	.remove_new	= npcm_rng_remove,
  };
  
- module_platform_driver(timeriomem_rng_driver);
+ module_platform_driver(npcm_rng_driver);
 -- 
 2.42.0
 
