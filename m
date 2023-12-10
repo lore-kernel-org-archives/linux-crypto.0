@@ -1,32 +1,28 @@
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A5F0D5
-	for <linux-crypto@vger.kernel.org>; Sun, 10 Dec 2023 14:12:53 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF64D8
+	for <linux-crypto@vger.kernel.org>; Sun, 10 Dec 2023 14:12:49 -0800 (PST)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rCS2X-0006Od-KH; Sun, 10 Dec 2023 23:12:45 +0100
+	id 1rCS2W-0006Ox-Ky; Sun, 10 Dec 2023 23:12:44 +0100
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rCS2S-00ExXr-IF; Sun, 10 Dec 2023 23:12:40 +0100
+	id 1rCS2U-00ExY9-6N; Sun, 10 Dec 2023 23:12:42 +0100
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rCS2S-000RVo-98; Sun, 10 Dec 2023 23:12:40 +0100
+	id 1rCS2T-000RWM-TM; Sun, 10 Dec 2023 23:12:41 +0100
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Rob Herring <robh@kernel.org>,
+Cc: Rob Herring <robh@kernel.org>,
 	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
 	kernel@pengutronix.de
-Subject: [PATCH 01/12] hwrng: atmel - Convert to platform remove callback returning void
-Date: Sun, 10 Dec 2023 23:12:16 +0100
-Message-ID:  <89f6eebfa85b31c635b774e613f19b84b32f3e1f.1702245873.git.u.kleine-koenig@pengutronix.de>
+Subject: [PATCH 07/12] hwrng: n2 - Convert to platform remove callback returning void
+Date: Sun, 10 Dec 2023 23:12:22 +0100
+Message-ID:  <8a470b0d899f42d49c679ff763d3133a109830b2.1702245873.git.u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <cover.1702245873.git.u.kleine-koenig@pengutronix.de>
 References: <cover.1702245873.git.u.kleine-koenig@pengutronix.de>
@@ -37,7 +33,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1870; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=GmbNDaUhHwKyIVnew22ILj2umAeQoC+JyFObDDBbKhg=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBldjfAjlFLaqqtL+Rs91coinoQ6dAlqCg7J72OO U7JTxxI/Y+JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZXY3wAAKCRCPgPtYfRL+ TqT9B/9AzeQcDsubCeCc7ASpZHLCqp+QZFrbL0YBSSbkX93vuDAfIqvoNgCBknvBjhxaS3h6Uoe cPQ2w5nBHLg0OGAoO3sva4O0Oc3TDc6Rg6C3/NI4VdevUI7TabhW6TVJVSC+BTfhCfQQvYdUzwK QkLDycHQniRHNd1j6kT11x0a2OaUtjnPCdbcZSthUYQLMs6IV5UgijayXtIu6kaW1ST9G9Xi5Zs j4eUaO3pkqJ5I6z0snz36okix/e8MYl3otboKmmWvpawPtm5aKYNN6W/QCsOsGgIH1oJF1tuv4v aLKGy1kprQW1gDXR/lieS/ezgbW97z1k2fwQAYm/DBl1CxQO
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1785; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=8DSLRtuH+m4SMxX9zwxvj2v6domeulWXdRnv2oPApBI=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBldjfHJdbX/wTFWIIxAplaJw+kOoz5Zd89+LgU3 3YIdsB068qJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZXY3xwAKCRCPgPtYfRL+ TtyvCACKcLL8YKWZbPbDToddG6ilsbTeNS/VGvFFmodKoqHEueCRgZnOLr7vgTbtgLfp4V6XRl+ UMh/cGqLnmbyCQ22EChCtuvmrOnKrsLZF9NfyUZ6G/Tqx7E+ekeCMHqfHQ4QqfbwlWF/T/EfZYG Xopwqfa2I3X4cEyE48cCuDopkpF7kdm9kn18jca18OyOmuiAV94/QNl531XCY8MauZ+vnlc9ofS x55CEQAuRt213ThTbN2xYNsWmOl8G+ve0zwTuvU29MnN1YXZfTnv/RqUbVPu3prGR2enUC4DmQX GSX5p014NuOMcUxK0D1TkfY2qQ+jsYbctshTBbTQFa27MWFc
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -60,39 +56,40 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/char/hw_random/atmel-rng.c | 6 ++----
+ drivers/char/hw_random/n2-drv.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
-index a37367ebcbac..e9157255f851 100644
---- a/drivers/char/hw_random/atmel-rng.c
-+++ b/drivers/char/hw_random/atmel-rng.c
-@@ -161,15 +161,13 @@ static int atmel_trng_probe(struct platform_device *pdev)
- 	return ret;
+diff --git a/drivers/char/hw_random/n2-drv.c b/drivers/char/hw_random/n2-drv.c
+index aaae16b98475..2e669e7c14d3 100644
+--- a/drivers/char/hw_random/n2-drv.c
++++ b/drivers/char/hw_random/n2-drv.c
+@@ -781,7 +781,7 @@ static int n2rng_probe(struct platform_device *op)
+ 	return err;
  }
  
--static int atmel_trng_remove(struct platform_device *pdev)
-+static void atmel_trng_remove(struct platform_device *pdev)
+-static int n2rng_remove(struct platform_device *op)
++static void n2rng_remove(struct platform_device *op)
  {
- 	struct atmel_trng *trng = platform_get_drvdata(pdev);
+ 	struct n2rng *np = platform_get_drvdata(op);
  
- 	atmel_trng_cleanup(trng);
- 	pm_runtime_disable(&pdev->dev);
- 	pm_runtime_set_suspended(&pdev->dev);
+@@ -790,8 +790,6 @@ static int n2rng_remove(struct platform_device *op)
+ 	cancel_delayed_work_sync(&np->work);
+ 
+ 	sun4v_hvapi_unregister(HV_GRP_RNG);
 -
 -	return 0;
  }
  
- static int __maybe_unused atmel_trng_runtime_suspend(struct device *dev)
-@@ -218,7 +216,7 @@ MODULE_DEVICE_TABLE(of, atmel_trng_dt_ids);
+ static struct n2rng_template n2_template = {
+@@ -860,7 +858,7 @@ static struct platform_driver n2rng_driver = {
+ 		.of_match_table = n2rng_match,
+ 	},
+ 	.probe		= n2rng_probe,
+-	.remove		= n2rng_remove,
++	.remove_new	= n2rng_remove,
+ };
  
- static struct platform_driver atmel_trng_driver = {
- 	.probe		= atmel_trng_probe,
--	.remove		= atmel_trng_remove,
-+	.remove_new	= atmel_trng_remove,
- 	.driver		= {
- 		.name	= "atmel-trng",
- 		.pm	= pm_ptr(&atmel_trng_pm_ops),
+ module_platform_driver(n2rng_driver);
 -- 
 2.42.0
 
