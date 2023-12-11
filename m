@@ -1,35 +1,35 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="YQOuVbeO"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="j+OG/A9I"
 Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08F18B8;
-	Mon, 11 Dec 2023 10:33:26 -0800 (PST)
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 3BBHuP9D013382;
-	Mon, 11 Dec 2023 19:32:43 +0100
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DDB7B4;
+	Mon, 11 Dec 2023 10:33:33 -0800 (PST)
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 3BBBp5CV026654;
+	Mon, 11 Dec 2023 19:32:42 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
 	from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:content-type; s=
-	selector1; bh=G/SSrGNa9qLchii1X2t3Tln2wB/m3cDbB3B7BrJxj14=; b=YQ
-	OuVbeOhRUr13654Z5eN2Zv4BN9VyRdQnPlI0+A88J5i/8eti801sw+R6oINSsTcj
-	OVTIs8CyDQ4rYzD8maB3Gl1ERJ8NlcJbZK1R/Ip4sZ5uEykR6Es9z3Ea7/vId5Rw
-	eBhQciboUjuJnUesVp5SHPjK58lZz6/f7u6aNlsuTTj35/3k555iA+5mGWSs8vnC
-	eAsd3/lejfhmQ8UgLGSuoVMaE3WwKVuUPErfu/I09SHh/0qhMYAeiJPXVJOzwvmr
-	fS1XXkejfnrTuMYsKnq1YkpK9LoMx+ymlMjw1LfOu1e5tzziwi4SKvZJhiKpRBvu
-	G9H8GTl5gunyJDhMhNiQ==
+	selector1; bh=Yx/iN2e/UUXXv4odNw1PrUQv1/sBds6u8ptetj9Y7lY=; b=j+
+	OG/A9I1IKBdAWxX2NrSkvaZTb92O6JLyMzrMTQUqCQnjr4ZH5QUV1ST7sgq2eVaZ
+	8yLxSMwXjiWfDwVMOBSIarCAVDoayeN5uhWb66D8oprFEuifzSTIljZBFQvx5XZF
+	B0EVyYVG4PX3RpokIQf5bkCIm0sNIUnnbax8zRLee3Op9851xw2qoqjff13jDu2Z
+	2pF644bnjtY4/UVxd8w/6e5z/5hsd0Xxjfxfzfw4g6CcBiO1CzNblb9Xeo5IdydB
+	dpVPTdV7LOumlYDNe+DIZxVvsp4TTHbVF3LEsZkAiSH11Yel2u8xceYUlMAdPBvX
+	uYkrZqmJxVZtUcC/I8DA==
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3uw2p4p2qf-1
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3uvgf1g0s5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 19:32:43 +0100 (CET)
+	Mon, 11 Dec 2023 19:32:42 +0100 (CET)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 43D3710005C;
-	Mon, 11 Dec 2023 19:32:43 +0100 (CET)
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id F321210005C;
+	Mon, 11 Dec 2023 19:32:41 +0100 (CET)
 Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 36C5323BE03;
-	Mon, 11 Dec 2023 19:32:43 +0100 (CET)
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id E2DBB23BE03;
+	Mon, 11 Dec 2023 19:32:41 +0100 (CET)
 Received: from localhost (10.252.9.5) by SHFDAG1NODE1.st.com (10.75.129.69)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 11 Dec
- 2023 19:32:42 +0100
+ 2023 19:32:41 +0100
 From: Gatien Chevallier <gatien.chevallier@foss.st.com>
 To: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
         <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
@@ -55,9 +55,9 @@ CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-usb@vger.kernel.org>,
         Gatien Chevallier
 	<gatien.chevallier@foss.st.com>
-Subject: [PATCH v7 06/13] of: property: fw_devlink: Add support for "access-controller"
-Date: Mon, 11 Dec 2023 19:30:37 +0100
-Message-ID: <20231211183044.808204-7-gatien.chevallier@foss.st.com>
+Subject: [PATCH v7 04/13] dt-bindings: bus: document ETZPC
+Date: Mon, 11 Dec 2023 19:30:35 +0100
+Message-ID: <20231211183044.808204-5-gatien.chevallier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231211183044.808204-1-gatien.chevallier@foss.st.com>
 References: <20231211183044.808204-1-gatien.chevallier@foss.st.com>
@@ -75,43 +75,130 @@ X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-12-11_08,2023-12-07_01,2023-05-22_02
 
-Allows tracking dependencies between devices and their access
-controller.
+Document ETZPC (Extended TrustZone protection controller). ETZPC is a
+firewall controller.
 
 Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 ---
 
 Changes in V6:
     	- Renamed access-controller to access-controllers
+    	- Removal of access-control-provider property
+    	- Removal of access-controller and access-controller-names
+    	  declaration in the patternProperties field. Add
+    	  additionalProperties: true in this field.
 
 Changes in V5:
-	- Rename feature-domain* to access-control*
+	- Renamed feature-domain* to access-control*
 
-Patch not present in V1
+Changes in V2:
+	- Corrected errors highlighted by Rob's robot
+	- No longer define the maxItems for the "feature-domains"
+	  property
+	- Fix example (node name, status)
+	- Declare "feature-domain-names" as an optional
+	  property for child nodes
+	- Fix description of "feature-domains" property
+	- Reordered the properties so it matches ETZPC
+	- Add missing "feature-domain-controller" property
 
- drivers/of/property.c | 2 ++
- 1 file changed, 2 insertions(+)
+ .../bindings/bus/st,stm32-etzpc.yaml          | 87 +++++++++++++++++++
+ 1 file changed, 87 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
 
-diff --git a/drivers/of/property.c b/drivers/of/property.c
-index afdaefbd03f6..7f737eac91b2 100644
---- a/drivers/of/property.c
-+++ b/drivers/of/property.c
-@@ -1268,6 +1268,7 @@ DEFINE_SIMPLE_PROP(leds, "leds", NULL)
- DEFINE_SIMPLE_PROP(backlight, "backlight", NULL)
- DEFINE_SIMPLE_PROP(panel, "panel", NULL)
- DEFINE_SIMPLE_PROP(msi_parent, "msi-parent", "#msi-cells")
-+DEFINE_SIMPLE_PROP(access_controllers, "access-controllers", "#access-controller-cells")
- DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
- DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
- 
-@@ -1363,6 +1364,7 @@ static const struct supplier_bindings of_supplier_bindings[] = {
- 	{ .parse_prop = parse_regulators, },
- 	{ .parse_prop = parse_gpio, },
- 	{ .parse_prop = parse_gpios, },
-+	{ .parse_prop = parse_access_controllers, },
- 	{}
- };
- 
+diff --git a/Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml b/Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
+new file mode 100644
+index 000000000000..9ca0ad39bc19
+--- /dev/null
++++ b/Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
+@@ -0,0 +1,87 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/bus/st,stm32-etzpc.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: STM32 Extended TrustZone protection controller
++
++description: |
++  The ETZPC configures TrustZone security in a SoC having bus masters and
++  devices with programmable-security attributes (securable resources).
++
++maintainers:
++  - Gatien Chevallier <gatien.chevallier@foss.st.com>
++
++properties:
++  compatible:
++    contains:
++      const: st,stm32-etzpc
++
++  reg:
++    maxItems: 1
++
++  "#address-cells":
++    const: 1
++
++  "#size-cells":
++    const: 1
++
++  ranges: true
++
++  "#access-controller-cells":
++    const: 1
++    description:
++      Contains the firewall ID associated to the peripheral.
++
++patternProperties:
++  "^.*@[0-9a-f]+$":
++    description: Peripherals
++    type: object
++
++    additionalProperties: true
++
++    required:
++      - access-controllers
++
++required:
++  - compatible
++  - reg
++  - "#address-cells"
++  - "#size-cells"
++  - "#access-controller-cells"
++  - ranges
++
++additionalProperties: false
++
++examples:
++  - |
++    // In this example, the usart2 device refers to rifsc as its access
++    // controller.
++    // Access rights are verified before creating devices.
++
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/clock/stm32mp13-clks.h>
++    #include <dt-bindings/reset/stm32mp13-resets.h>
++
++    etzpc: bus@5c007000 {
++        compatible = "st,stm32-etzpc";
++        reg = <0x5c007000 0x400>;
++        #address-cells = <1>;
++        #size-cells = <1>;
++        #access-controller-cells = <1>;
++        ranges;
++
++        usart2: serial@4c001000 {
++            compatible = "st,stm32h7-uart";
++            reg = <0x4c001000 0x400>;
++            interrupts-extended = <&exti 27 IRQ_TYPE_LEVEL_HIGH>;
++            clocks = <&rcc USART2_K>;
++            resets = <&rcc USART2_R>;
++            wakeup-source;
++            dmas = <&dmamux1 43 0x400 0x5>,
++                    <&dmamux1 44 0x400 0x1>;
++            dma-names = "rx", "tx";
++            access-controllers = <&etzpc 17>;
++        };
++    };
 -- 
 2.35.3
 
