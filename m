@@ -1,115 +1,112 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="2iwH3yc5"
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7E2BFE
-	for <linux-crypto@vger.kernel.org>; Mon, 11 Dec 2023 00:58:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1702285121; x=1733821121;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hnUoUwUq1XC7m3eX4krct50rHCSyImYnGb3EmPQUoEY=;
-  b=2iwH3yc5MhKaRYtVq26mI0+7sMOdw24ca0NmUgMPg/YUlP0c6J59GYUd
-   W/7cb3KCmomPedTUloKZGIDuThxoRY50Vs4kG4wZxPTCxho2KkB0vgsW2
-   jSSTAeBYjQPSmIvsO1IVGPssvmDrhCn+r3X+tTuVhnHXsV2ddve1L41tc
-   EK7zbaG4096kYLkbYzbkwNRVVwMqf90HNpq3kPAT/dT4QB9vK+v10TicM
-   c0vOBHyOQLxoTMG/6zAw1yrSc4HZJhTRhLFjcmDicuwv8m+bbVBPTVaIJ
-   MKr7gU4IShR3HrMvvDbHpvDo3yRAmp7SWh0aIUtee9I1SnJaR2ESmeQ1k
-   g==;
-X-CSE-ConnectionGUID: QwuSQWWcQjGLWaHUNBS8GQ==
-X-CSE-MsgGUID: Pnu145umRx2ZiW2FToAXZw==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
-   d="scan'208";a="13979817"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Dec 2023 01:58:41 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Dec 2023 01:58:22 -0700
-Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Mon, 11 Dec 2023 01:58:20 -0700
-Message-ID: <e2360a12-7c1d-4eb6-80a3-8ca48f63f281@microchip.com>
-Date: Mon, 11 Dec 2023 09:57:39 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mBdve7xW"
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C359791;
+	Mon, 11 Dec 2023 02:24:25 -0800 (PST)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5d7692542beso41161077b3.3;
+        Mon, 11 Dec 2023 02:24:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702290265; x=1702895065; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HxjdC9gG0FASpcYRfeHrDm90rNJUB49UE6RBV0eXfa8=;
+        b=mBdve7xWbRlPWlYMo43wviUIdttIA6OBkqiuM5sHVu6+jn53FTmB3UmP+AWHopRHZC
+         a7z5Vq/IHDotZA1U9YLjWPm4d2eJRDO3gGoW8aSX2TYkMdTA+MCZ0kmc96F0UBR4Y+dQ
+         gEF6HMMHXiiRywJTO4pJrrPHtPkYuYUvIuXL10o/jicHp6uZPnoxksdBAHyXAORnfu5y
+         2WtAwCAa+D2oYp+UUEH7V1X6W0vBkmu/tZ35uEtMPtIhCjoGyfLFLt/KYsE251q2GVdC
+         UTUQ8JBz3hDzYm52oBptbs7jTy2PTVjxrV62uIR927ca6oghr2EYRweIIKE9cfZWxNG1
+         bb2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702290265; x=1702895065;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HxjdC9gG0FASpcYRfeHrDm90rNJUB49UE6RBV0eXfa8=;
+        b=slJJIFKzxWik3fbJ6P6yN/b/aBfnkJ5fpMiuyDIoB0rGN+jBAREzW767PFIVgRzngE
+         bjJonFCKPvSMtqHjzriW4bvWuV2Q2Z81gQt47JY14feTq2AtMbZfm637AQc8cVzJy6NH
+         uJhF/fKYGWsakZBbYx7RYBnDIjZmVy0LUdeaiDCTBK3w5W7EwS6pALhWv9tE2dekTjMi
+         NOzpoOI6kLgfONLrkSngDvELbWgpp3dfg4xNaaCAjotwxkURbECC6gn0GpQgM3IcXpwP
+         yfs/I0ysbx5cFft9N8Fnl/Dblbu1LvJqzgnJaQFOe7fD7GcpT48oYYzse9RrRPLMj68P
+         Scng==
+X-Gm-Message-State: AOJu0YygGw1MZhnoiCWO43CcY6mds8kVaXyby10ZGPECSIDf95QVn8xn
+	53HGe9TySGPPsH0svBl6G0Ox/tJLesM3Ni0rhEQ=
+X-Google-Smtp-Source: AGHT+IGmF7rCGzSyqKfqD2TRI9vyoiPLZLomxHRnO/Mazk7erhr/oeot7BOADdKT5S1gzsmsdTlRbMDAuhmPh48JXnE=
+X-Received: by 2002:a0d:d007:0:b0:5d7:1940:53d9 with SMTP id
+ s7-20020a0dd007000000b005d7194053d9mr3123865ywd.81.1702290264941; Mon, 11 Dec
+ 2023 02:24:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/12] hwrng: atmel - Convert to platform remove callback
- returning void
-Content-Language: en-US, fr-FR
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, Olivia
- Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>
-CC: Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea
-	<claudiu.beznea@tuxon.dev>, Rob Herring <robh@kernel.org>,
-	<linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kernel@pengutronix.de>
-References: <cover.1702245873.git.u.kleine-koenig@pengutronix.de>
- <89f6eebfa85b31c635b774e613f19b84b32f3e1f.1702245873.git.u.kleine-koenig@pengutronix.de>
-From: Nicolas Ferre <nicolas.ferre@microchip.com>
-Organization: microchip
-In-Reply-To: <89f6eebfa85b31c635b774e613f19b84b32f3e1f.1702245873.git.u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <CAFSh4UwYYAOb0YpC=WAL6SD+8jTLuSkhgrgjh8JmogUb10V=zw@mail.gmail.com>
+ <ZXMGqjm1466fQ3g2@archie.me>
+In-Reply-To: <ZXMGqjm1466fQ3g2@archie.me>
+From: Tom Cook <tom.k.cook@gmail.com>
+Date: Mon, 11 Dec 2023 10:24:14 +0000
+Message-ID: <CAFSh4Uz4jMhR8jV2xjcDg4i05neJMsBewtgcxmG_csETzYdq3A@mail.gmail.com>
+Subject: Re: Building signed debs
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Kernel Build System <linux-kbuild@vger.kernel.org>, 
+	Linux Crypto API <linux-crypto@vger.kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Nick Terrell <terrelln@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/12/2023 at 23:12, Uwe Kleine-König wrote:
-> The .remove() callback for a platform driver returns an int which makes
-> many driver authors wrongly assume it's possible to do error handling by
-> returning an error code. However the value returned is ignored (apart
-> from emitting a warning) and this typically results in resource leaks.
-> 
-> To improve here there is a quest to make the remove callback return
-> void. In the first step of this quest all drivers are converted to
-> .remove_new(), which already returns void. Eventually after all drivers
-> are converted, .remove_new() will be renamed to .remove().
-> 
-> Trivially convert this driver from always returning zero in the remove
-> callback to the void returning variant.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+On Fri, Dec 8, 2023 at 12:06=E2=80=AFPM Bagas Sanjaya <bagasdotme@gmail.com=
+> wrote:
+> On Fri, Dec 08, 2023 at 11:14:35AM +0000, Tom Cook wrote:
+> > Unsetting CONFIG_MODULE_COMPRESS_ZSTD is a workaround (ie disable
+> > module compression).
+> >
+>
+> Seriously? Unrelated option becomes a workaround?
 
-Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+"Workaround" as in "With this options set, `make deb-pkg` crashes out with =
+the
+reported error, while with this option unset it produces a deb package
+of a signed
+kernel and modules."  This looks like a defect in the build system to me an=
+d the
+workaround allows me to build a package in the meantime.
 
-> ---
->   drivers/char/hw_random/atmel-rng.c | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
-> index a37367ebcbac..e9157255f851 100644
-> --- a/drivers/char/hw_random/atmel-rng.c
-> +++ b/drivers/char/hw_random/atmel-rng.c
-> @@ -161,15 +161,13 @@ static int atmel_trng_probe(struct platform_device *pdev)
->          return ret;
->   }
-> 
-> -static int atmel_trng_remove(struct platform_device *pdev)
-> +static void atmel_trng_remove(struct platform_device *pdev)
->   {
->          struct atmel_trng *trng = platform_get_drvdata(pdev);
-> 
->          atmel_trng_cleanup(trng);
->          pm_runtime_disable(&pdev->dev);
->          pm_runtime_set_suspended(&pdev->dev);
-> -
-> -       return 0;
->   }
-> 
->   static int __maybe_unused atmel_trng_runtime_suspend(struct device *dev)
-> @@ -218,7 +216,7 @@ MODULE_DEVICE_TABLE(of, atmel_trng_dt_ids);
-> 
->   static struct platform_driver atmel_trng_driver = {
->          .probe          = atmel_trng_probe,
-> -       .remove         = atmel_trng_remove,
-> +       .remove_new     = atmel_trng_remove,
->          .driver         = {
->                  .name   = "atmel-trng",
->                  .pm     = pm_ptr(&atmel_trng_pm_ops),
-> --
-> 2.42.0
-> 
+> > Is there a way to build a .deb of a signed kernel with compressed modul=
+es?
+> >
+> > Thanks for any help,
+> > Tom
+> >
+> >   INSTALL debian/linux-libc-dev/usr/include
+> >   SIGN    debian/linux-image/lib/modules/6.6.0-local/kernel/arch/x86/ev=
+ents/amd/amd-uncore.ko
+> >   SIGN    debian/linux-image/lib/modules/6.6.0-local/kernel/arch/x86/ev=
+ents/intel/intel-cstate.ko
+> > At main.c:298:
+> > - SSL error:FFFFFFFF80000002:system library::No such file or
+> > directory: ../crypto/bio/bss_file.c:67
+>
+> Above means that you don't have a valid certificate/keypair set in
+> CONFIG_MODULE_SIG_KEY. If you keep the option value on `certs/signing_key=
+.pem`
+> (which is the default), the key should be automatically generated
+> (with your observation, only if `certs/x509.genkey` doesn't already exist=
+).
+> After building the kernel with `make all`, you should check if the certif=
+icate
+> pointed in CONFIG_MODULE_SIG_KEY is present or not. If it isn't the case,
+> you have to generate the certificate yourself. For more information, see
+> Documentation/admin-guide/module.signing.rst in the kernel sources.
 
+Sorry for being unclear - I'm not building with `make all`, I'm
+building with `make deb-pkg`.
+If I had to guess, I'd say the .deb depends on the uncompressed modules
+rather than the dependency depending on whether module compression is turne=
+d
+on or not, but it's only a guess.
+
+Regards,
+Tom
