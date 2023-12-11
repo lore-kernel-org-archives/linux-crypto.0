@@ -1,112 +1,115 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mBdve7xW"
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C359791;
-	Mon, 11 Dec 2023 02:24:25 -0800 (PST)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5d7692542beso41161077b3.3;
-        Mon, 11 Dec 2023 02:24:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702290265; x=1702895065; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HxjdC9gG0FASpcYRfeHrDm90rNJUB49UE6RBV0eXfa8=;
-        b=mBdve7xWbRlPWlYMo43wviUIdttIA6OBkqiuM5sHVu6+jn53FTmB3UmP+AWHopRHZC
-         a7z5Vq/IHDotZA1U9YLjWPm4d2eJRDO3gGoW8aSX2TYkMdTA+MCZ0kmc96F0UBR4Y+dQ
-         gEF6HMMHXiiRywJTO4pJrrPHtPkYuYUvIuXL10o/jicHp6uZPnoxksdBAHyXAORnfu5y
-         2WtAwCAa+D2oYp+UUEH7V1X6W0vBkmu/tZ35uEtMPtIhCjoGyfLFLt/KYsE251q2GVdC
-         UTUQ8JBz3hDzYm52oBptbs7jTy2PTVjxrV62uIR927ca6oghr2EYRweIIKE9cfZWxNG1
-         bb2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702290265; x=1702895065;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HxjdC9gG0FASpcYRfeHrDm90rNJUB49UE6RBV0eXfa8=;
-        b=slJJIFKzxWik3fbJ6P6yN/b/aBfnkJ5fpMiuyDIoB0rGN+jBAREzW767PFIVgRzngE
-         bjJonFCKPvSMtqHjzriW4bvWuV2Q2Z81gQt47JY14feTq2AtMbZfm637AQc8cVzJy6NH
-         uJhF/fKYGWsakZBbYx7RYBnDIjZmVy0LUdeaiDCTBK3w5W7EwS6pALhWv9tE2dekTjMi
-         NOzpoOI6kLgfONLrkSngDvELbWgpp3dfg4xNaaCAjotwxkURbECC6gn0GpQgM3IcXpwP
-         yfs/I0ysbx5cFft9N8Fnl/Dblbu1LvJqzgnJaQFOe7fD7GcpT48oYYzse9RrRPLMj68P
-         Scng==
-X-Gm-Message-State: AOJu0YygGw1MZhnoiCWO43CcY6mds8kVaXyby10ZGPECSIDf95QVn8xn
-	53HGe9TySGPPsH0svBl6G0Ox/tJLesM3Ni0rhEQ=
-X-Google-Smtp-Source: AGHT+IGmF7rCGzSyqKfqD2TRI9vyoiPLZLomxHRnO/Mazk7erhr/oeot7BOADdKT5S1gzsmsdTlRbMDAuhmPh48JXnE=
-X-Received: by 2002:a0d:d007:0:b0:5d7:1940:53d9 with SMTP id
- s7-20020a0dd007000000b005d7194053d9mr3123865ywd.81.1702290264941; Mon, 11 Dec
- 2023 02:24:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ahYdx3K6"
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8843A91;
+	Mon, 11 Dec 2023 02:29:35 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BB9IESH009898;
+	Mon, 11 Dec 2023 02:29:19 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=nsBAaQAk
+	6+iqnQuGjH/wnFj9Ex5Xo4ZsOzI88aF91z0=; b=ahYdx3K6yy3De4BjLkkV6FSw
+	BK+MOPBo2MtD2LCwyCnxMFkTlbEDLfQEsvjgk3IM5l0gH+EnDDHLA1pgs+7cXM33
+	WHI8F56LCFW//fp0KDwfExRSJoiAknh6TkaztCuTyFe8AWmN6z73J1MyKIhRUUBD
+	Qagb07a86RCtNhlk6cCfjqz6YvgwDowk+GDUB1ww14K+iZz9iYfJ1Qzczv5/dV/B
+	psG/e9qVM540pDDH67cHQ2WfJlVwJGJFczZ0nRWQ45yqcjzHuhBLQIyBuiu15P4Q
+	FzQTdb2WhK5kI0r/IEC2rUDoF/6r91hso7VsJv5SnbvadI5r5IpRUbqgczf86A==
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uwyp4g92c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 11 Dec 2023 02:29:19 -0800 (PST)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 11 Dec
+ 2023 02:29:17 -0800
+Received: from bharat-OptiPlex-3070.marvell.com (10.69.176.80) by
+ DC5-EXCH02.marvell.com (10.69.176.39) with Microsoft SMTP Server id
+ 15.0.1497.48 via Frontend Transport; Mon, 11 Dec 2023 02:29:14 -0800
+From: Bharat Bhushan <bbhushan2@marvell.com>
+To: <brezillon@kernel.org>, <arno@natisbad.org>, <schalla@marvell.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <alobakin@pm.me>,
+        <masahiroy@kernel.org>, <tj@kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Bharat Bhushan <bbhushan2@marvell.com>
+Subject: [PATCH v2] crypto: octeontx2: Fix cptvf driver cleanup
+Date: Mon, 11 Dec 2023 15:59:11 +0530
+Message-ID: <20231211102911.249450-1-bbhushan2@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAFSh4UwYYAOb0YpC=WAL6SD+8jTLuSkhgrgjh8JmogUb10V=zw@mail.gmail.com>
- <ZXMGqjm1466fQ3g2@archie.me>
-In-Reply-To: <ZXMGqjm1466fQ3g2@archie.me>
-From: Tom Cook <tom.k.cook@gmail.com>
-Date: Mon, 11 Dec 2023 10:24:14 +0000
-Message-ID: <CAFSh4Uz4jMhR8jV2xjcDg4i05neJMsBewtgcxmG_csETzYdq3A@mail.gmail.com>
-Subject: Re: Building signed debs
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Kernel Build System <linux-kbuild@vger.kernel.org>, 
-	Linux Crypto API <linux-crypto@vger.kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Nick Terrell <terrelln@fb.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: pU-xNzYHult9wYEbwZNuSc3ZHqRiAHDr
+X-Proofpoint-GUID: pU-xNzYHult9wYEbwZNuSc3ZHqRiAHDr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-On Fri, Dec 8, 2023 at 12:06=E2=80=AFPM Bagas Sanjaya <bagasdotme@gmail.com=
-> wrote:
-> On Fri, Dec 08, 2023 at 11:14:35AM +0000, Tom Cook wrote:
-> > Unsetting CONFIG_MODULE_COMPRESS_ZSTD is a workaround (ie disable
-> > module compression).
-> >
->
-> Seriously? Unrelated option becomes a workaround?
+This patch fixes following cleanup issues:
+ - Missing instruction queue free on cleanup. This
+   will lead to memory leak.
+ - lfs->lfs_num is set to zero before cleanup, which
+   will lead to improper cleanup.
 
-"Workaround" as in "With this options set, `make deb-pkg` crashes out with =
-the
-reported error, while with this option unset it produces a deb package
-of a signed
-kernel and modules."  This looks like a defect in the build system to me an=
-d the
-workaround allows me to build a package in the meantime.
+Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+---
+v1->v2:
+ - Instruction queue disable needed to be done before
+   unregistering for alog, so keep that as it was before.
 
-> > Is there a way to build a .deb of a signed kernel with compressed modul=
-es?
-> >
-> > Thanks for any help,
-> > Tom
-> >
-> >   INSTALL debian/linux-libc-dev/usr/include
-> >   SIGN    debian/linux-image/lib/modules/6.6.0-local/kernel/arch/x86/ev=
-ents/amd/amd-uncore.ko
-> >   SIGN    debian/linux-image/lib/modules/6.6.0-local/kernel/arch/x86/ev=
-ents/intel/intel-cstate.ko
-> > At main.c:298:
-> > - SSL error:FFFFFFFF80000002:system library::No such file or
-> > directory: ../crypto/bio/bss_file.c:67
->
-> Above means that you don't have a valid certificate/keypair set in
-> CONFIG_MODULE_SIG_KEY. If you keep the option value on `certs/signing_key=
-.pem`
-> (which is the default), the key should be automatically generated
-> (with your observation, only if `certs/x509.genkey` doesn't already exist=
-).
-> After building the kernel with `make all`, you should check if the certif=
-icate
-> pointed in CONFIG_MODULE_SIG_KEY is present or not. If it isn't the case,
-> you have to generate the certificate yourself. For more information, see
-> Documentation/admin-guide/module.signing.rst in the kernel sources.
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.c      | 6 ++++--
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c | 3 +++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-Sorry for being unclear - I'm not building with `make all`, I'm
-building with `make deb-pkg`.
-If I had to guess, I'd say the .deb depends on the uncompressed modules
-rather than the dependency depending on whether module compression is turne=
-d
-on or not, but it's only a guess.
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
+index 6edd27ff8c4e..e4bd3f030cec 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
+@@ -419,8 +419,8 @@ int otx2_cptlf_init(struct otx2_cptlfs_info *lfs, u8 eng_grp_mask, int pri,
+ 	return 0;
+ 
+ free_iq:
+-	otx2_cpt_free_instruction_queues(lfs);
+ 	cptlf_hw_cleanup(lfs);
++	otx2_cpt_free_instruction_queues(lfs);
+ detach_rsrcs:
+ 	otx2_cpt_detach_rsrcs_msg(lfs);
+ clear_lfs_num:
+@@ -431,11 +431,13 @@ EXPORT_SYMBOL_NS_GPL(otx2_cptlf_init, CRYPTO_DEV_OCTEONTX2_CPT);
+ 
+ void otx2_cptlf_shutdown(struct otx2_cptlfs_info *lfs)
+ {
+-	lfs->lfs_num = 0;
+ 	/* Cleanup LFs hardware side */
+ 	cptlf_hw_cleanup(lfs);
++	/* Free instruction queues */
++	otx2_cpt_free_instruction_queues(lfs);
+ 	/* Send request to detach LFs */
+ 	otx2_cpt_detach_rsrcs_msg(lfs);
++	lfs->lfs_num = 0;
+ }
+ EXPORT_SYMBOL_NS_GPL(otx2_cptlf_shutdown, CRYPTO_DEV_OCTEONTX2_CPT);
+ 
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+index 69a447d3702c..7358fa656a5e 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+@@ -249,8 +249,11 @@ static void cptvf_lf_shutdown(struct otx2_cptlfs_info *lfs)
+ 	otx2_cptlf_unregister_interrupts(lfs);
+ 	/* Cleanup LFs software side */
+ 	lf_sw_cleanup(lfs);
++	/* Free instruction queues */
++	otx2_cpt_free_instruction_queues(lfs);
+ 	/* Send request to detach LFs */
+ 	otx2_cpt_detach_rsrcs_msg(lfs);
++	lfs->lfs_num = 0;
+ }
+ 
+ static int cptvf_lf_init(struct otx2_cptvf_dev *cptvf)
+-- 
+2.34.1
 
-Regards,
-Tom
