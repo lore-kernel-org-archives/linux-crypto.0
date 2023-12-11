@@ -1,279 +1,137 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qgq0uhGv";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="5icEo1eW";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qgq0uhGv";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="5icEo1eW"
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2a07:de40:b251:101:10:150:64:2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B03BB9F;
-	Mon, 11 Dec 2023 05:24:36 -0800 (PST)
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 185611FB92;
-	Mon, 11 Dec 2023 13:24:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1702301075; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GMgnxyitx5biXn0pgd3cG6sZC67XFgXymWiCAbEeFTU=;
-	b=qgq0uhGvq6aIfA5kdV6s+QP77h0xXawLNa4A29TZgm39fmSyEMcNuUNl/UJlXlQZ6TlVII
-	zUPmDYi0fH0Yt0D7dLkXicNuqDMiJaxJ5heDUfk+mrsPuy6M1oh6T0tY9SMzDlOSlV4LgP
-	QY8JDDt5fKiuyhv186WN/KT6tMWo6a0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1702301075;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GMgnxyitx5biXn0pgd3cG6sZC67XFgXymWiCAbEeFTU=;
-	b=5icEo1eWkvwddWdmXQVEWIOUzUs2xYmB+HjHHoXSDtcBu2H6WH1b4L1DKOEh4M/mvL1rSS
-	DA8zHNEP7Ohx7sCQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1702301075; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GMgnxyitx5biXn0pgd3cG6sZC67XFgXymWiCAbEeFTU=;
-	b=qgq0uhGvq6aIfA5kdV6s+QP77h0xXawLNa4A29TZgm39fmSyEMcNuUNl/UJlXlQZ6TlVII
-	zUPmDYi0fH0Yt0D7dLkXicNuqDMiJaxJ5heDUfk+mrsPuy6M1oh6T0tY9SMzDlOSlV4LgP
-	QY8JDDt5fKiuyhv186WN/KT6tMWo6a0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1702301075;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GMgnxyitx5biXn0pgd3cG6sZC67XFgXymWiCAbEeFTU=;
-	b=5icEo1eWkvwddWdmXQVEWIOUzUs2xYmB+HjHHoXSDtcBu2H6WH1b4L1DKOEh4M/mvL1rSS
-	DA8zHNEP7Ohx7sCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CE1C0133DE;
-	Mon, 11 Dec 2023 13:24:34 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id IoIJMpINd2W+DAAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 11 Dec 2023 13:24:34 +0000
-Message-ID: <20e52d79-7eff-1aad-2f77-24ed7fd56fa7@suse.cz>
-Date: Mon, 11 Dec 2023 14:24:34 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JLUZYGk0"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40B6D479A
+	for <linux-crypto@vger.kernel.org>; Mon, 11 Dec 2023 06:00:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702303199;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jNtOY4LpZQRmFFwaKjy6gBWig0U9E1fsIgKhcHzr1a8=;
+	b=JLUZYGk0tqtYaPJ5kVPbIjFzzfHonixcfZP0yrCmCO8K54K7BensbDTstb4FMgU/QszSQl
+	/8X1w74FjmOe5EtlzRd6cR/rfBZxCVy5YanV436wY2/bYOmH5eS0AabyG8IMwtErBLPA9W
+	28YNXI2TBVfL9DRSk535gQnFpk827iE=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-660-vjNXav4SPFefOL-DTOlDEA-1; Mon, 11 Dec 2023 08:59:57 -0500
+X-MC-Unique: vjNXav4SPFefOL-DTOlDEA-1
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-6ce6fa748c5so5309529b3a.3
+        for <linux-crypto@vger.kernel.org>; Mon, 11 Dec 2023 05:59:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702303197; x=1702907997;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jNtOY4LpZQRmFFwaKjy6gBWig0U9E1fsIgKhcHzr1a8=;
+        b=AVe2VHnt7V0Uf3B8V23eTlpd2Uk+XKcMZmhC67zR/BDVc3S0WDoG3OtZ61hAUnR4aq
+         R7hWgQFfQp/XOwihcahCURugEuG/ZjUZRnSbajowD9C1qhQU6f+mpRdCdqnjOa8JiIyd
+         hsN6+F44TjcK05CmUsu11s9a1l/TM9kYwYCF81TxvhxAO5OmG6oPvmo3BvumTzbagPun
+         NduK6up4VzN2jPRSAo9udNXNiRuM1mKL+tVRqOrsEfO45xytChJV/S8CcPHoCVyiXM/c
+         LFP6EbfL8mUpXgv9e88ot0wHzKH5MBm9WxMSTfN6nMOL2cKvhO7qssF00r8b5vO2FJZj
+         JkYg==
+X-Gm-Message-State: AOJu0YwZte4OQBvEYQCmd8g+Y5YXEucBJ9GddkKwBMJ2kRXjPLoNF8Rh
+	GRpm2sTDsz4Q5nufYxSipzGjaAAoc//OOALVfHo+xWAmDkuiIzOViT5KbalcAduhtUQf7j//LgR
+	EWFs5L+sdzO4IsaVrsVuQoRXu
+X-Received: by 2002:a05:6a00:4b05:b0:6cd:8a19:c324 with SMTP id kq5-20020a056a004b0500b006cd8a19c324mr5065047pfb.3.1702303196833;
+        Mon, 11 Dec 2023 05:59:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFH8pcpJUYWrPme/AvUNGcFfSPB3UcpRig9J/TmAImLAZ/9Rz5Hmp0l8B3NXjdGvBgSAZW9vA==
+X-Received: by 2002:a05:6a00:4b05:b0:6cd:8a19:c324 with SMTP id kq5-20020a056a004b0500b006cd8a19c324mr5065039pfb.3.1702303196506;
+        Mon, 11 Dec 2023 05:59:56 -0800 (PST)
+Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
+        by smtp.gmail.com with ESMTPSA id ei43-20020a056a0080eb00b006ce6e431292sm6280383pfb.38.2023.12.11.05.59.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 05:59:56 -0800 (PST)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: dhowells@redhat.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shigeru Yoshida <syoshida@redhat.com>
+Subject: [PATCH] crypto: af_alg/hash: Fix uninit-value access in af_alg_free_sg()
+Date: Mon, 11 Dec 2023 22:59:49 +0900
+Message-ID: <20231211135949.689204-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v10 23/50] KVM: SEV: Make AVIC backing, VMSA and VMCB
- memory allocation SNP safe
-Content-Language: en-US
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
- pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
- jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
- slp@redhat.com, pgonda@google.com, peterz@infradead.org,
- srinivas.pandruvada@linux.intel.com, rientjes@google.com,
- dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, kirill@shutemov.name,
- ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
- pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
- Brijesh Singh <brijesh.singh@amd.com>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-24-michael.roth@amd.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20231016132819.1002933-24-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spam-Score: -4.30
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -4.30
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 R_RATELIMIT(0.00)[to_ip_from(RL81e5qggtdx371s8ik49ru6xr)];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-0.20)[-0.999];
-	 RCPT_COUNT_TWELVE(0.00)[40];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
 
-On 10/16/23 15:27, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> Implement a workaround for an SNP erratum where the CPU will incorrectly
-> signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
-> RMP entry of a VMCB, VMSA or AVIC backing page.
-> 
-> When SEV-SNP is globally enabled, the CPU marks the VMCB, VMSA, and AVIC
-> backing pages as "in-use" via a reserved bit in the corresponding RMP
-> entry after a successful VMRUN. This is done for _all_ VMs, not just
-> SNP-Active VMs.
-> 
-> If the hypervisor accesses an in-use page through a writable
-> translation, the CPU will throw an RMP violation #PF. On early SNP
-> hardware, if an in-use page is 2mb aligned and software accesses any
-> part of the associated 2mb region with a hupage, the CPU will
-> incorrectly treat the entire 2mb region as in-use and signal a spurious
-> RMP violation #PF.
-> 
-> The recommended is to not use the hugepage for the VMCB, VMSA or
-> AVIC backing page for similar reasons. Add a generic allocator that will
-> ensure that the page returns is not hugepage (2mb or 1gb) and is safe to
+KMSAN reported the following uninit-value access issue:
 
-This is a bit confusing wording as we are not avoiding "using a
-hugepage" but AFAIU, avoiding using a (4k) page that has a hugepage
-aligned physical address, right?
+=====================================================
+BUG: KMSAN: uninit-value in af_alg_free_sg+0x1c1/0x270 crypto/af_alg.c:547
+ af_alg_free_sg+0x1c1/0x270 crypto/af_alg.c:547
+ hash_sendmsg+0x188f/0x1ce0 crypto/algif_hash.c:172
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x997/0xd60 net/socket.c:2584
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x2fa/0x4a0 net/socket.c:2674
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-> be used when SEV-SNP is enabled. Also implement similar handling for the
-> VMCB/VMSA pages of nested guests.
-> 
-> Co-developed-by: Marc Orr <marcorr@google.com>
-> Signed-off-by: Marc Orr <marcorr@google.com>
-> Reported-by: Alper Gun <alpergun@google.com> # for nested VMSA case
-> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> [mdr: squash in nested guest handling from Ashish]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
+Uninit was created at:
+ slab_post_alloc_hook+0x103/0x9e0 mm/slab.h:768
+ slab_alloc_node mm/slub.c:3478 [inline]
+ __kmem_cache_alloc_node+0x5d5/0x9b0 mm/slub.c:3517
+ __do_kmalloc_node mm/slab_common.c:1006 [inline]
+ __kmalloc+0x118/0x410 mm/slab_common.c:1020
+ kmalloc include/linux/slab.h:604 [inline]
+ sock_kmalloc+0x104/0x1a0 net/core/sock.c:2681
+ hash_accept_parent_nokey crypto/algif_hash.c:418 [inline]
+ hash_accept_parent+0xbc/0x470 crypto/algif_hash.c:445
+ af_alg_accept+0x1d8/0x810 crypto/af_alg.c:439
+ hash_accept+0x368/0x800 crypto/algif_hash.c:254
+ do_accept+0x803/0xa70 net/socket.c:1927
+ __sys_accept4_file net/socket.c:1967 [inline]
+ __sys_accept4+0x170/0x340 net/socket.c:1997
+ __do_sys_accept4 net/socket.c:2008 [inline]
+ __se_sys_accept4 net/socket.c:2005 [inline]
+ __x64_sys_accept4+0xc0/0x150 net/socket.c:2005
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-<snip>
+CPU: 0 PID: 14168 Comm: syz-executor.2 Not tainted 6.7.0-rc4-00009-gbee0e7762ad2 #13
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
+=====================================================
 
-> +
-> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
-> +{
-> +	unsigned long pfn;
-> +	struct page *p;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +
-> +	/*
-> +	 * Allocate an SNP safe page to workaround the SNP erratum where
-> +	 * the CPU will incorrectly signal an RMP violation  #PF if a
-> +	 * hugepage (2mb or 1gb) collides with the RMP entry of VMCB, VMSA
-> +	 * or AVIC backing page. The recommeded workaround is to not use the
-> +	 * hugepage.
+In hash_sendmsg(), hash_alloc_result() may fail and return -ENOMEM if
+sock_kmalloc() fails. In this case, hash_sendmsg() jumps to the unlock_free
+label and calls af_alg_free_sg() with ctx->sgl.sgt.sgl uninitialized. This
+causes the above uninit-value access issue for ctx->sgl.sgt.sgl.
 
-Same here "not use the hugepage"
+This patch fixes this issue by initializing ctx->sgl.sgt.sgl when the
+structure is allocated in hash_accept_parent_nokey().
 
-> +	 *
-> +	 * Allocate one extra page, use a page which is not 2mb aligned
-> +	 * and free the other.
+Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+---
+ crypto/algif_hash.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-This makes more sense.
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index 82c44d4899b9..a51b58d36d60 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -419,6 +419,7 @@ static int hash_accept_parent_nokey(void *private, struct sock *sk)
+ 	if (!ctx)
+ 		return -ENOMEM;
+ 
++	ctx->sgl.sgt.sgl = NULL;
+ 	ctx->result = NULL;
+ 	ctx->len = len;
+ 	ctx->more = false;
+-- 
+2.41.0
 
-> +	 */
-> +	p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
-> +	if (!p)
-> +		return NULL;
-> +
-> +	split_page(p, 1);
-
-Yeah I think that's a sensible use of split_page(), as we don't have
-support for forcefully non-aligned allocations or specific "page
-coloring" in the page allocator.
-So even with my wording concerns:
-
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
-
-> +
-> +	pfn = page_to_pfn(p);
-> +	if (IS_ALIGNED(pfn, PTRS_PER_PMD))
-> +		__free_page(p++);
-> +	else
-> +		__free_page(p + 1);
-> +
-> +	return p;
-> +}
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 1e7fb1ea45f7..8e4ef0cd968a 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -706,7 +706,7 @@ static int svm_cpu_init(int cpu)
->  	int ret = -ENOMEM;
->  
->  	memset(sd, 0, sizeof(struct svm_cpu_data));
-> -	sd->save_area = alloc_page(GFP_KERNEL | __GFP_ZERO);
-> +	sd->save_area = snp_safe_alloc_page(NULL);
->  	if (!sd->save_area)
->  		return ret;
->  
-> @@ -1425,7 +1425,7 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
->  	svm = to_svm(vcpu);
->  
->  	err = -ENOMEM;
-> -	vmcb01_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +	vmcb01_page = snp_safe_alloc_page(vcpu);
->  	if (!vmcb01_page)
->  		goto out;
->  
-> @@ -1434,7 +1434,7 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
->  		 * SEV-ES guests require a separate VMSA page used to contain
->  		 * the encrypted register state of the guest.
->  		 */
-> -		vmsa_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +		vmsa_page = snp_safe_alloc_page(vcpu);
->  		if (!vmsa_page)
->  			goto error_free_vmcb_page;
->  
-> @@ -4876,6 +4876,16 @@ static int svm_vm_init(struct kvm *kvm)
->  	return 0;
->  }
->  
-> +static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
-> +{
-> +	struct page *page = snp_safe_alloc_page(vcpu);
-> +
-> +	if (!page)
-> +		return NULL;
-> +
-> +	return page_address(page);
-> +}
-> +
->  static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.name = KBUILD_MODNAME,
->  
-> @@ -5007,6 +5017,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  
->  	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
->  	.vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
-> +	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
->  };
->  
->  /*
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index c13070d00910..b7b8bf73cbb9 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -694,6 +694,7 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm);
->  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
->  void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
->  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
-> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
->  
->  /* vmenter.S */
->  
