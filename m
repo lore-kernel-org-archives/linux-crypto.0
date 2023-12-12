@@ -1,87 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068FB53815
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2023 10:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U8p/TsfR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FF15C433C8;
-	Tue, 12 Dec 2023 10:55:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702378519;
-	bh=s2JNh92769JXDjX+tRer5QC+0r1XR8VxRjUPp8VSJ8U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U8p/TsfRprRxToug9Ovpb7T/deNKuOKurqqDMt0NItyspaQyCNHZ31rCnU2/SXOre
-	 +E8AK5v/qGWws8ra/mlXrVIByKSrUrNIY9n8jbWB4QXaN6giXmwXYgX2Z0uH4/FAfn
-	 hKPGUzVJ4NB8FlzE3DwdT1oHsbzuoq7zD6udN9QGfX4MnM0XIE4tiiKycWiTWNhjq9
-	 uKTOI06vIL2YuqPj4ifBxCNdUC4ir7ENeBuzGz+UkKfxYmeNbVj9cFIJoMvsCw7OGU
-	 Xpm71dWXkAVCzuoIsW6DjIqYzfCdrvqw7RVgp+x6/3amnu7YBk9z67NMVxfh6SH5UG
-	 dPblU6q9AOpQw==
-Date: Tue, 12 Dec 2023 10:55:13 +0000
-From: Will Deacon <will@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Ard Biesheuvel <ardb@google.com>, linux-arm-kernel@lists.infradead.org,
-	catalin.marinas@arm.com, kernel-team@android.com,
-	Mark Rutland <mark.rutland@arm.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Eric Biggers <ebiggers@google.com>,
-	Kees Cook <keescook@chromium.org>, Marc Zyngier <maz@kernel.org>,
-	Mark Brown <broonie@kernel.org>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 0/4] arm64: Run kernel mode NEON with preemption
- enabled
-Message-ID: <20231212105513.GA28416@willie-the-truck>
-References: <20231208113218.3001940-6-ardb@google.com>
- <170231871028.1857077.10318072500676133330.b4-ty@kernel.org>
- <CAMj1kXE=2H_Jqyuv_gDp6QS2g2Vzdgf=fngp=ZXEUBXKOYWnbQ@mail.gmail.com>
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27AAED5;
+	Tue, 12 Dec 2023 03:28:05 -0800 (PST)
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-5e19bfb258cso11246447b3.3;
+        Tue, 12 Dec 2023 03:28:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702380484; x=1702985284;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3dBqkhGNCaNrIeJofjxToRgBDnB1BjUt2Wc8SAYBh/U=;
+        b=OXP0LkwoVcQ1xuCB+l80jIdUZY52VQNKmZjDy3YJuHh2rarVdbLnrqHVNItFtT4Syp
+         8QSRyPFymg/avr2Dz+9p3Ut9JN+WR7Not8SxxmHhvbusY+2cw5fGn6UC7J+LN53iEW0I
+         e52mVFGPbjg1MbnY4fCrdhjBcdBh5ruOetBsjzgFiBeSuoxJuDveBzEVQgNPoc/FoWbD
+         ejn33Y1ig+LW3ZB5noe7Dw1Rn5/6BWK8vmHztNMEi9sj639IFgTUI/q4fZRxOoF7vo8H
+         evPour4HO1kmR35w2MP2/GQutjGI6bQ/D5+XwCXcJjy88XCLmqP8vLILLqTxbzEHyWk2
+         Ta1Q==
+X-Gm-Message-State: AOJu0YypEl0fanl9K4fRZRYDYhZIHOvLJLYCvWuUd/pyI0L7al8r8Dg4
+	Nc8+K+UXMKlsvDq8gnoweNiPOWxOXprcLA==
+X-Google-Smtp-Source: AGHT+IGQIl2x2gU/UCg/qi2Nmd5zHDHBC+GRHU8eOI8QNJoWzlmZDfJABG427Lu02D89Zh6uBF15fw==
+X-Received: by 2002:a81:7183:0:b0:5d7:31ca:c631 with SMTP id m125-20020a817183000000b005d731cac631mr5287973ywc.59.1702380484141;
+        Tue, 12 Dec 2023 03:28:04 -0800 (PST)
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com. [209.85.219.181])
+        by smtp.gmail.com with ESMTPSA id h198-20020a816ccf000000b005e1ac5d8035sm619221ywc.110.2023.12.12.03.28.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Dec 2023 03:28:02 -0800 (PST)
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-db54611b920so5071426276.3;
+        Tue, 12 Dec 2023 03:28:02 -0800 (PST)
+X-Received: by 2002:a25:2581:0:b0:dbc:b2db:d6e7 with SMTP id
+ l123-20020a252581000000b00dbcb2dbd6e7mr1371483ybl.39.1702380482366; Tue, 12
+ Dec 2023 03:28:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXE=2H_Jqyuv_gDp6QS2g2Vzdgf=fngp=ZXEUBXKOYWnbQ@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20231208113218.3001940-6-ardb@google.com> <20231208113218.3001940-7-ardb@google.com>
+In-Reply-To: <20231208113218.3001940-7-ardb@google.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 12 Dec 2023 12:27:50 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdWewWJ1msJTcPNcbAf296gt+Kait3ECXjsJrSN+uerWyA@mail.gmail.com>
+Message-ID: <CAMuHMdWewWJ1msJTcPNcbAf296gt+Kait3ECXjsJrSN+uerWyA@mail.gmail.com>
+Subject: Re: [PATCH v4 1/4] arm64: fpsimd: Drop unneeded 'busy' flag
+To: Ard Biesheuvel <ardb@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, 
+	Ard Biesheuvel <ardb@kernel.org>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Mark Brown <broonie@kernel.org>, 
+	Eric Biggers <ebiggers@google.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 12, 2023 at 09:16:13AM +0100, Ard Biesheuvel wrote:
-> On Mon, 11 Dec 2023 at 21:27, Will Deacon <will@kernel.org> wrote:
-> > [1/4] arm64: fpsimd: Drop unneeded 'busy' flag
-> >       https://git.kernel.org/arm64/c/e109130b0e5e
-> > [2/4] arm64: fpsimd: Preserve/restore kernel mode NEON at context switch
-> >       https://git.kernel.org/arm64/c/1e3a3de1ff6c
-> 
-> I spotted a typo in the commit log of this patch:
-> 
-> TIF_USING_KMODE_FPSIMD -> TIF_KERNEL_FPSTATE
+Hi Ard,
 
-Cheers, I'll go in and fix that (so the SHAs will change).
+On Fri, Dec 8, 2023 at 12:34=E2=80=AFPM Ard Biesheuvel <ardb@google.com> wr=
+ote:
+> From: Ard Biesheuvel <ardb@kernel.org>
+> Kernel mode NEON will preserve the user mode FPSIMD state by saving it
+> into the task struct before clobbering the registers. In order to avoid
+> the need for preserving kernel mode state too, we disallow nested use of
+> kernel mode NEON, i..e, use in softirq context while the interrupted
+> task context was using kernel mode NEON too.
+>
+> Originally, this policy was implemented using a per-CPU flag which was
+> exposed via may_use_simd(), requiring the users of the kernel mode NEON
+> to deal with the possibility that it might return false, and having NEON
+> and non-NEON code paths. This policy was changed by commit
+> 13150149aa6ded1 ("arm64: fpsimd: run kernel mode NEON with softirqs
+> disabled"), and now, softirq processing is disabled entirely instead,
+> and so may_use_simd() can never fail when called from task or softirq
+> context.
+>
+> This means we can drop the fpsimd_context_busy flag entirely, and
+> instead, ensure that we disable softirq processing in places where we
+> formerly relied on the flag for preventing races in the FPSIMD preserve
+> routines.
+>
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> Reviewed-by: Mark Brown <broonie@kernel.org>
 
-> > [3/4] arm64: fpsimd: Implement lazy restore for kernel mode FPSIMD
-> >       https://git.kernel.org/arm64/c/035262623959
-> >
-> > It would be nice to have an Ack from Herbert on the last one so that
-> > he's aware of the possible conflicts.
-> >
-> > The other thing I tangentially wondered about is what happens now if code
-> > calls uaccess routines (e.g. get_user()) within a kernel_neon_{begin,end}
-> > section? I think previously the fact that preemption had to be disabled
-> > would've caused the might_fault() to explode, but now I suppose the BUG_ON()
-> > in kernel_neon_begin() will save us. Is that right?
-> >
-> 
-> Not sure what you mean by 'save us'. Is there anything fundamentally
-> wrong with doing user access from a kernel mode NEON region if
-> preemption remains enabled?
-> 
-> The BUG_ON() will only catch uses from hardirq/NMI context, or cases
-> where FP/SIMD is not implemented/enabled in the first place so it will
-> not trigger on a user access.
+Thanks for your patch, which is now commit e109130b0e5ec3fd
+("arm64: fpsimd: Drop unneeded 'busy' flag") in arm64/for-next/core
+and next-20231212.
 
-As discussed off-list, the vague concern was if kernel_neon_begin() is
-nested off the back of a user fault. The BUG_ON() should fire in that case,
-so we're all good.
+I have bisected the following warning during boot (on Salvator-XS with
+R-Car H3 ES2.0 and on White-Hawk with R-Car V4H) followed by a lock-up
+(on Salvator-XS) to this commit:
 
-Thanks!
+Reverting commits 035262623959cbe1 ("arm64: fpsimd: Implement lazy
+restore for kernel mode FPSIMD"), 1e3a3de1ff6ca6b1 ("arm64: fpsimd:
+Preserve/restore kernel mode NEON at context switch"), and this commit
+fixes the issue.
 
-Will
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
