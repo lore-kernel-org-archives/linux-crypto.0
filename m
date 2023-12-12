@@ -1,141 +1,185 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="bWViSQ/W";
-	dkim=permerror (0-bit key) header.d=linaro.org header.i=@linaro.org header.b="RMfAAful"
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AECB10A;
-	Tue, 12 Dec 2023 00:55:50 -0800 (PST)
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BC8W0X3023252;
-	Tue, 12 Dec 2023 08:55:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:content-type:mime-version:list-id:content-transfer-encoding; s=
-	qcppdkim1; bh=lDPE/Wh8ZqRTx07oUVbXiwpN0yIqml4Pf3dHashn5bE=; b=bW
-	ViSQ/WzhrjABmZ/SeOZc8o1I9kahz/MBn50s8TSRoKAMWVOnbIPva6rQT/8hEjkl
-	oQuy9sm2fSdI8J/1GXqypQDpTHY7dKxcT+WbROcWd/evAmUUv4Y2LP6GB5Gkt3gT
-	QQ3YospkH3SXUMub9Xnq8PGjApQNPx+t8ZW5lWF3GUOLHYKpY8l03H+3p4XX0zOa
-	beJTsDkLIYDXmB7pIj70SFdXPEpNEpo/14Rk4JnDTo6a33C/nH3Pz9W165e83Ie2
-	ndAA32mBXZFgvWroEk3I8B7NUepKqTmhQf+3+mrWFJNvyNCj8NYpjmBCPoXeiFa/
-	ctHrUPipXVzJ/Exffx2w==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uxa8jh7b8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Dec 2023 08:55:39 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BC8tcdr014732
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Dec 2023 08:55:38 GMT
-Received: from hu-omprsing-hyd.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 12 Dec 2023 00:55:32 -0800
-From: Om Prakash Singh <quic_omprsing@quicinc.com>
-To: quic_omprsing@quicinc.com, Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc: neil.armstrong@linaro.org, devicetree@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marijn.suijten@somainline.org,
-        vkoul@kernel.org, cros-qcom-dts-watchers@chromium.org,
-        Rob Herring <robh@kernel.org>
-Subject: [PATCH] dt-bindings: crypto: qcom-qce: document the SM8650 crypto engine
-Date: Tue, 12 Dec 2023 14:24:54 +0530
-Message-ID: <20231025-topic-sm8650-upstream-bindings-qce-v1-1-7e30dba20dbf@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231212085454.1238896-1-quic_omprsing@quicinc.com>
-References: <20231212085454.1238896-1-quic_omprsing@quicinc.com>
-Content-Type: text/plain; charset="utf-8"
-X-Patchwork-Submitter: Neil Armstrong <neil.armstrong@linaro.org>
-X-Patchwork-Id: 13435556
-X-Patchwork-Delegate: herbert@gondor.apana.org.au
-Received: from vger.kernel.org (vger.kernel.org [23.128.96.18]) by smtp.lore.kernel.org (Postfix) with ESMTP id 81C94C0032E for <linux-crypto@archiver.kernel.org>; Wed, 25 Oct 2023 07:28:31 +0000 (UTC)
-Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand id S232579AbjJYH2a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>); Wed, 25 Oct 2023 03:28:30 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d]) by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75E15DE for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 00:28:26 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-4083f613272so44979505e9.1 for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2023 00:28:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google; t=1698218905; x=1698823705; darn=vger.kernel.org; h=cc:to:message-id:content-transfer-encoding:mime-version:subject :date:from:from:to:cc:subject:date:message-id:reply-to; bh=JJ2oRpaoJhce9I8GPs6HN/A2iLP6BscGnxopX3PgLBM=; b=RMfAAfulNGvcxjip3liXEbYW6VGMPpYhK0i00RfK4zZCK2Kxo1E8L5r007nG+t43Ig ZaP9QFFJ3BGlfXEEmA28ckUpebTbOvdwYb77rWLgIYywx26DaM+6hiYP+gI6LOHf7oK3 kYBR/ynzHFeZqoPrywRXIBgKrRn/Y37dsaGEj9LspbRdXhh0KdQGAdShtVfu+dMLnH6J JJGNy8wIxtbut+BErM0XWn8E3OfOz3Hw/xfGN8NhzGzmJdSntLoPTTVXKOte6o8APvtF KyVetCh5wcLze81nvSBmwnfaYs6dQgvkGHkxe7Xk7l5Z5uhwYQkzf4o8kyVdJ/RcayXr em7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20230601; t=1698218905; x=1698823705; h=cc:to:message-id:content-transfer-encoding:mime-version:subject :date:from:x-gm-message-state:from:to:cc:subject:date:message-id :reply-to; bh=JJ2oRpaoJhce9I8GPs6HN/A2iLP6BscGnxopX3PgLBM=; b=WGLmRRc6B2A2DOSHqbeYatw2q0Fype1/JBBbk78GBn//3VP4F5jgU1nXizXXuGj7Tj UAlrjHEC/4zLVpzNzC5UXdYnIW3UXiLtitIeQBsGQT0cX1rIoBA0KZWRJyPHUDABzQLl R79OB31Ak/WA4Cj9LeoIbp6dQkR+F8VIqz2/+deemVGagvgPJeJOEJOBH4erxT3dlK/k noKrD1twSY7GHW134wy8Us25tqOGqAzxd3lx8DE41/Bp+jotVMuEMu1AXH9Vx5PwPQSo 0TmvhKrgffb5jbsxMcdA5PlRATQa6Rdyrt/ibWsE79Qvwy1CXPMF9uR/RVL7QjAwqhbV /9Mg==
-X-Gm-Message-State: AOJu0Yy/rM5A8Olzgwl87vMgLyA2L1OPlqycgDzsn/pm1nEC9zuhrwJu Qj7sIHqvecSBgvcXURqzbT0e4Q==
-X-Google-Smtp-Source: AGHT+IFor3h+dAr5oQsSJ1vHc/MU2j9muM4tBS5eoWssbySl5NgMcsBNmIBjd7BJk1YIpCgKCjIEkg==
-X-Received: by 2002:a05:600c:198a:b0:3fb:a0fc:1ba1 with SMTP id t10-20020a05600c198a00b003fba0fc1ba1mr11964689wmq.35.1698218904902; Wed, 25 Oct 2023 00:28:24 -0700 (PDT)
-Received: from arrakeen.starnux.net ([2a01:e0a:982:cbb0:52eb:f6ff:feb3:451a]) by smtp.gmail.com with ESMTPSA id r9-20020a05600c320900b0040644e699a0sm18495839wmp.45.2023.10.25.00.28.23 (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256); Wed, 25 Oct 2023 00:28:24 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="TbwLiRSc"
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D01F10A;
+	Tue, 12 Dec 2023 01:31:35 -0800 (PST)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20231212093134euoutp0245dd94e5990b4d8142a32097159cc707~gC6xZ0X_g1498914989euoutp02L;
+	Tue, 12 Dec 2023 09:31:34 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20231212093134euoutp0245dd94e5990b4d8142a32097159cc707~gC6xZ0X_g1498914989euoutp02L
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1702373494;
+	bh=9lfAb2vSYKFJSRXZUBbgTF07y4N/2k5Hl2lKg99wS3g=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=TbwLiRScfRj0hLGx+XgY9pKisM8cCZ1f9aNkchvqu+zkFxiVRMKl6ycgbGoGNXvCR
+	 Ypn/khbFpQjuaois5Gb/OMNdujaVsMpetVY+sZjfs5Ylm08sm3cLCI2nd/37lPq3c0
+	 yPU8Atp6te2MZI0CWfhHw6XdkAUrg232AbUn31hQ=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+	20231212093133eucas1p24dad27077c645000f6e7df73a31c73b0~gC6xNsHYk2201322013eucas1p2r;
+	Tue, 12 Dec 2023 09:31:33 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+	eusmges3new.samsung.com (EUCPMTA) with SMTP id 6C.E3.09552.57828756; Tue, 12
+	Dec 2023 09:31:33 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20231212093133eucas1p1c19ba5aa058ca1e159bfd070aec0f306~gC6wzHYyC0923209232eucas1p1o;
+	Tue, 12 Dec 2023 09:31:33 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20231212093133eusmtrp2cf5d936524a48067f2219bf248fa22ca~gC6wyGUFQ2501725017eusmtrp2c;
+	Tue, 12 Dec 2023 09:31:33 +0000 (GMT)
+X-AuditID: cbfec7f5-853ff70000002550-65-65782875f98f
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id 38.F1.09146.57828756; Tue, 12
+	Dec 2023 09:31:33 +0000 (GMT)
+Received: from localhost (unknown [106.120.51.111]) by eusmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20231212093133eusmtip142a909f67bd3e689f53855390da2c11c~gC6wl5hhl1171011710eusmtip1c;
+	Tue, 12 Dec 2023 09:31:33 +0000 (GMT)
+From: Lukasz Stelmach <l.stelmach@samsung.com>
+To: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: Olivia Mackall <olivia@selenic.com>,  Herbert Xu
+	<herbert@gondor.apana.org.au>,  Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>,  Alim Akhtar <alim.akhtar@samsung.com>,
+	linux-samsung-soc@vger.kernel.org,  linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,  kernel@pengutronix.de
+Subject: Re: [PATCH 03/12] hwrng: exynos - Convert to platform remove
+ callback returning void
+Date: Tue, 12 Dec 2023 10:31:32 +0100
+In-Reply-To: <817e91f7bb257745c0fb483037b83c1a6ba14e75.1702245873.git.u.kleine-koenig@pengutronix.de>
+	("Uwe =?utf-8?Q?Kleine-K=C3=B6nig=22's?= message of "Sun, 10 Dec 2023
+	23:12:18 +0100")
+Message-ID: <oypijdfs07937v.fsf%l.stelmach@samsung.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1154;
- i=neil.armstrong@linaro.org; h=from:subject:message-id;
- bh=BOUjaS/EmVt+3/Odcqx3EdTXwZy8c1+gLrnQRALTOxs=;
- b=owEBbQKS/ZANAwAKAXfc29rIyEnRAcsmYgBlOMOXdANPwSzrGljuoM1hjjOOdVulE+eo81QTVr/y
- j+OOf0iJAjMEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZTjDlwAKCRB33NvayMhJ0WqgEA
- CTcnEC2yItqtgysd1O56cU5W92ZUXW86INCYQjp3ThOJ3nLtWb5K2hvzXSBW4ubWFln70So8vEh5LF
- hgZZB3TdAnmNb7NPrSoaCd3U4VpKLEwZwq7VYqMjQFxcONA5s+N1vWw1EM72aml8JRYDAAeFzJJx1c
- vzszHpHFTDRiWP3co7c8NLlSU0WBYemhNCQ+ozyQ9wZU78pVI0Pp2KNE9F3c1D5Zf1Q4XOUJ6LOnq8
- 5DmD+pPCnhRKniKxuxPgQ79jJUKJcZvd91B0ICIfvRLke4Skaut7WcBhbN7VHhx+99OXB/rcTVZiS7
- qIBx+l62bWffXp+9lhX+DrOD+3kIRwUvNPQYEl+e+182m53WXwCCgtorWdGXEPISNDAT81evKq983o
- iLkycqxxu3vIPu+Tm2iRvIfSG1PSBrboziwCCZMMANDi8/GVXC2hei9yhSKvIm9YbnzIgYsQtEN6pO
- oF9oCXN/5FL4GOkLZumbu95Np5U1roLXe0796nVvUQJ8Wlb/dXoZ6N0cbx60XiOnGF+i0cjnlbMrKF
- ozKO9GjtX21GBKIo6rWy7X4lBU9GdyISFSFH8rDZp8akS6tUVLHaLzMG+gjd/euckYDPUzbEF5eGLw
- 3yV/L+me0mhqnA5imKcj2KN7BFleyf3XTg8u8ipK2TsjFr1uprZjispQgpuw==
-X-Developer-Key: i=neil.armstrong@linaro.org; a=openpgp; fpr=89EC3D058446217450F22848169AB7B1A4CFF8AE
-Precedence: bulk
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: MFm6lAxEwKdo7n0FGVAGyt2JICeAYwRF
-X-Proofpoint-ORIG-GUID: MFm6lAxEwKdo7n0FGVAGyt2JICeAYwRF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- impostorscore=0 clxscore=1011 phishscore=0 spamscore=0 mlxscore=0
- lowpriorityscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312120070
-Message-ID: <20231212085454.5H8unOB1f8PzWdpgrOckr6LgIhZL_LY3100xFEd-ZXo@z>
+Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
+	protocol="application/pgp-signature"
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrOKsWRmVeSWpSXmKPExsWy7djP87qlGhWpBt0HdSwezNvGZtH9SsZi
+	1dSdLBZ7X29lt9j0+Bqrxf17P5ksZpzfx2Rx/0wPo8XtiZMZHTg9th1Q9bhzbQ+bx+Yl9R79
+	fw08+rasYvToe7mB0ePzJrkA9igum5TUnMyy1CJ9uwSujCONHAV3xSrmvJvJ1sC4U7iLkZND
+	QsBE4tGMSaxdjFwcQgIrGCVudu5mgXC+MEqsXf6HGaRKSOAzo8T7q+IwHVNn34IqWs4osXvZ
+	dkYI5wWjxP/j19m7GDk42AT0JNaujQAxRQTcJHrnxoGUMAvsZJJovvqQHWSQsEC8xMX+54wg
+	NouAqsS3uS/BhnIKHGCUWNhyhwUkwStgLjHpx3GwK0QFLCWOb21ng4gLSpyc+QSshlkgV2Lm
+	+TdgR0gI9HNK3Fo9lR3iVBeJQ/MmMELYwhKvjm+BistI/N85nwmioZ1RounKQlYIZwKjxOeO
+	JiaIKmuJO+d+sUHYjhLHv58Ae01CgE/ixltBiM18EpO2TWeGCPNKdLQJQVSrSKzr38MCYUtJ
+	9L5aAXWDh8Svu1uZIaG1g1HixfIdrBMYFWYheWgWkodmAY1lFtCUWL9LHyKsLbFs4WtmCNtW
+	Yt269ywLGFlXMYqnlhbnpqcWG+ellusVJ+YWl+al6yXn525iBKav0/+Of93BuOLVR71DjEwc
+	jIcYVYCaH21YfYFRiiUvPy9VSYT35I7yVCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8qinyqUIC
+	6YklqdmpqQWpRTBZJg5OqQYmwxVrCq4pT0qT4F25mHVfY9VMd5up3dcjpJbOUfn8dsYz7qSj
+	fLPbdM0ndTB2ygQ38ewXM120/guvvdC91CmbLZjM9Sf3MnT7/5l30vvhmu/RBQaH724W9mQO
+	FyrTf9pQeiwxRar957PrxlLrNG6o1H98um5NQKj1xo1SKp5PXa4JfpK7yM3gICr2/Hfc00Vb
+	S27e7p7YfONYojW3hQ2nflz6mUWPbdvuvN928sq19HaJ/DQRd9v3v+asO2Lk5/58vY8jw9Nq
+	lw6Oy/5cjzzeRtwoucLmV96qKJddlWZ+cPbMuhfbzDlX6fpcK//RnyC2KSJT6bTo/gfb5nnX
+	Omf63oy7tN7RqGtXtHzTrEVKLMUZiYZazEXFiQAl2F0H2gMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrLIsWRmVeSWpSXmKPExsVy+t/xu7qlGhWpBttaBCwezNvGZtH9SsZi
+	1dSdLBZ7X29lt9j0+Bqrxf17P5ksZpzfx2Rx/0wPo8XtiZMZHTg9th1Q9bhzbQ+bx+Yl9R79
+	fw08+rasYvToe7mB0ePzJrkA9ig9m6L80pJUhYz84hJbpWhDCyM9Q0sLPSMTSz1DY/NYKyNT
+	JX07m5TUnMyy1CJ9uwS9jCONHAV3xSrmvJvJ1sC4U7iLkZNDQsBEYursWyxdjFwcQgJLGSVa
+	L29j7mLkAEpISaycmw5RIyzx51oXG0TNM0aJLfMvsIHUsAnoSaxdGwFiigi4SfTOjQMpYRbY
+	zSTx7dldZpBeYYF4iYv9zxlBbCGBFIlr1zawg9gsAqoS3+a+BNvLKXCAUeLSjA9gRbwC5hKT
+	fhwHaxYVsJQ4vrWdDSIuKHFy5hMWEJtZIFvi6+rnzBMYBWYhSc1CkpoFdBOzgKbE+l36EGFt
+	iWULXzND2LYS69a9Z1nAyLqKUSS1tDg3PbfYUK84Mbe4NC9dLzk/dxMjMO62Hfu5eQfjvFcf
+	9Q4xMnEwHmJUAep8tGH1BUYplrz8vFQlEd6TO8pThXhTEiurUovy44tKc1KLDzGaAv02kVlK
+	NDkfmBDySuINzQxMDU3MLA1MLc2MlcR5PQs6EoUE0hNLUrNTUwtSi2D6mDg4pRqY1vY8ezzf
+	mvnpjfO/eX/d7FSNmPZihZH7ao0Z3+TWzg+be1/9TWGhQ/g/JUmnPuEbVbNeHOt9I5u+tX7q
+	nNvMQlPcZJkd511t/T3X6Fwgh9mGlwsm7DI7ub+SR2TxDLF9a9n4lC1an2ed+ZpjOvH2wyJ+
+	LrWvrWFLfTybb9iwlclZ91n4F15c2q1XeTc78olxXNHaWJN4Nu0ZM34KJZrYvMhg3WKefCL0
+	mA2v4POSx9t3XE/1zmpTsxZaePHdXheLfGN/zuLl9n/NHja2R2sK/5v6Im5R1uGYY9t5unsm
+	9lif+Kq9VfN8g5pKz+5Fpgy8lhKK6ouDNs7mNDDh8bvQ49/GyBIbOOOf5Zxjb6YqsRRnJBpq
+	MRcVJwIA+w0MlFADAAA=
+X-CMS-MailID: 20231212093133eucas1p1c19ba5aa058ca1e159bfd070aec0f306
+X-Msg-Generator: CA
+X-RootMTR: 20231212093133eucas1p1c19ba5aa058ca1e159bfd070aec0f306
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20231212093133eucas1p1c19ba5aa058ca1e159bfd070aec0f306
+References: <817e91f7bb257745c0fb483037b83c1a6ba14e75.1702245873.git.u.kleine-koenig@pengutronix.de>
+	<CGME20231212093133eucas1p1c19ba5aa058ca1e159bfd070aec0f306@eucas1p1.samsung.com>
 
-From: Neil Armstrong <neil.armstrong@linaro.org>
+--=-=-=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Document the crypto engine on the SM8650 Platform.
+It was <2023-12-10 nie 23:12>, when Uwe Kleine-K=C3=B6nig wrote:
+> The .remove() callback for a platform driver returns an int which makes
+> many driver authors wrongly assume it's possible to do error handling by
+> returning an error code. However the value returned is ignored (apart
+> from emitting a warning) and this typically results in resource leaks.
+>
+> To improve here there is a quest to make the remove callback return
+> void. In the first step of this quest all drivers are converted to
+> .remove_new(), which already returns void. Eventually after all drivers
+> are converted, .remove_new() will be renamed to .remove().
+>
+> Trivially convert this driver from always returning zero in the remove
+> callback to the void returning variant.
+>
+> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
+> ---
+>  drivers/char/hw_random/exynos-trng.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
 
-Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-Acked-by: Rob Herring <robh@kernel.org>
----
-For convenience, a regularly refreshed linux-next based git tree containing
-all the SM8650 related work is available at:
-https://git.codelinaro.org/neil.armstrong/linux/-/tree/topic/sm85650/upstream/integ
----
- Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 1 +
- 1 file changed, 1 insertion(+)
+Acked-by: Lukasz Stelmach <l.stelmach@samsung.com>
 
+> diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_rando=
+m/exynos-trng.c
+> index 30207b7ac5f4..0ed5d22fe667 100644
+> --- a/drivers/char/hw_random/exynos-trng.c
+> +++ b/drivers/char/hw_random/exynos-trng.c
+> @@ -173,7 +173,7 @@ static int exynos_trng_probe(struct platform_device *=
+pdev)
+>  	return ret;
+>  }
+>=20=20
+> -static int exynos_trng_remove(struct platform_device *pdev)
+> +static void exynos_trng_remove(struct platform_device *pdev)
+>  {
+>  	struct exynos_trng_dev *trng =3D  platform_get_drvdata(pdev);
+>=20=20
+> @@ -181,8 +181,6 @@ static int exynos_trng_remove(struct platform_device =
+*pdev)
+>=20=20
+>  	pm_runtime_put_sync(&pdev->dev);
+>  	pm_runtime_disable(&pdev->dev);
+> -
+> -	return 0;
+>  }
+>=20=20
+>  static int exynos_trng_suspend(struct device *dev)
+> @@ -223,7 +221,7 @@ static struct platform_driver exynos_trng_driver =3D {
+>  		.of_match_table =3D exynos_trng_dt_match,
+>  	},
+>  	.probe =3D exynos_trng_probe,
+> -	.remove =3D exynos_trng_remove,
+> +	.remove_new =3D exynos_trng_remove,
+>  };
+>=20=20
+>  module_platform_driver(exynos_trng_driver);
 
----
-base-commit: fe1998aa935b44ef873193c0772c43bce74f17dc
-change-id: 20231016-topic-sm8650-upstream-bindings-qce-c6ae7eda5cba
+=2D-=20
+=C5=81ukasz Stelmach
+Samsung R&D Institute Poland
+Samsung Electronics
 
-Best regards,
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-index 8e665d910e6e..eeb8a956d7cb 100644
---- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-+++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-@@ -48,6 +48,7 @@ properties:
-               - qcom,sm8350-qce
-               - qcom,sm8450-qce
-               - qcom,sm8550-qce
-+              - qcom,sm8650-qce
-           - const: qcom,sm8150-qce
-           - const: qcom,qce
- 
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEXpuyqjq9kGEVr9UQsK4enJilgBAFAmV4KHQACgkQsK4enJil
+gBCRvQf+PyurfFZWbPslu37bFwG3yyfvKYGrFjJYjQl2baKl3uF9IRWnKIxklNqw
+FARwvOuCuSVyWJNRRAHrATFZ5wls96Pc0UU+BBExjIze+5babcF6yxAchQ/iaFj1
+gGOJzfEcLHXLZKGXOG5hYiaxf8rE4YAyu6ny1xXWkRSmE5+Q8foxCV5WFQm/M7nZ
+8bzOkGaIrpIjvFHqzAX5EWiysKqDkvH+3zZZofacSzu/mghR0dYhmwu2zzsz4S2i
+ZZ2WDOQh5rGzo9shSPlN95x7zSxIHv668dxki239m89AifAB2pdpaScoxXEGY2W2
+lvUkbzHnJnV2TZzEyDEcwejvkQy+RQ==
+=keMH
+-----END PGP SIGNATURE-----
+--=-=-=--
