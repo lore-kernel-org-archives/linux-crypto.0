@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TZxwekxb"
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 907BBD9
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2023 02:01:55 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40c2d50bfbfso26079635e9.0
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2023 02:01:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kb9Q4bAS"
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 832C7A6
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2023 02:03:19 -0800 (PST)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-40c0fc1cf3dso56854795e9.0
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2023 02:03:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702375314; x=1702980114; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1702375398; x=1702980198; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=15xgvmycXSmM1zVMhD/es2xFifWuzfNXWBt43uCGaPA=;
-        b=TZxwekxbFBv/UQueO4qMsCz1kRUuUNXA4irmLwZbLu+t3QoYWhszbPq7fDWbiwDuKV
-         dHRAU/8oPY07fK4Zird26l2A2Mc7V0eJ4s77KBquapdAG0yHaK66HJyU7MVOWGzVqdds
-         kqPOMSpazku3uL6JWm9ieIPPq1fY4rzlDOwzkc+4hp2cryOi6pc4NZrq+0vyUvfihyQJ
-         1mGESJfWXfvbZXSLynwTYlccZwmTHJ16dyRcryNMf5xAwIBHU5El31FBw2ko63bkxFEs
-         hIFhZsBBViVB8CK9o1kla5qyvPWsu5smbOiDpFDIO1yI58Ya8Wczln/oT0Oqh+kDv2V7
-         PVFg==
+        bh=8jwK3VIZKTtyh6l8Imn5ROjr3boxbaMYwliA7fT7XUg=;
+        b=Kb9Q4bASHhAtVZ3oJa7Bo95WSwW2OBpnYei/4/snZB77Vfgutx40FC72S3ptfEHENo
+         cOIdhnexPubItsY/82lgHIGP1j4zUjB/nMMrZv80RWA3vOIzo/CBFNOd+0Odcev6A5AI
+         LC/v0/W1JUm+Ho59c6B+ZrWStrLqJpRJAKeNdJRJzzAT+/mF5EMCc4HTOkMOPTGCKmkw
+         hfr2mcEm67mK81yuaZld58wTgXYELRpSTeLoa8qUzqY3BDXO5GxjOMqXv2dRtUMAxPQy
+         hrEazq5jO3ORA3O38lQFyHnMhU0jvw0IcGsBrXAjsnFa4mqOZx9w0DWusDhf4ZfSaPvD
+         O1XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702375314; x=1702980114;
+        d=1e100.net; s=20230601; t=1702375398; x=1702980198;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=15xgvmycXSmM1zVMhD/es2xFifWuzfNXWBt43uCGaPA=;
-        b=RBg1wz2hgAIyLr1eimPOp8f7/sTSUwSAl44v1XPL2/riUNzbzn0yEsJkkSHOrtxN5U
-         jkbk9wdQB2WzbrSaCRCRt4aJ42y18BaVJVZdlJjJNsEsYBWBtFui4Sem1E14fodEzJ3a
-         2sn7fQ6aWJYR33JgnDLX6viVYCrGXP4A8Wnu6veFTOmHJUlqqwWIxv3uFqjbxwbf/abh
-         ACgnp4Q8qp58p9RmF5ZJqpgeNQs+B5rGoL4HPGTsN996UEeMgcL8oCAsFkmLfY1fQWZ9
-         kIL2Y07lQNdZ0RjWBhOfvQPkle2zF7dJZMAFZrlkAGFCO+1dLaxBReO+MuuBp7sAM7DT
-         aiZg==
-X-Gm-Message-State: AOJu0Yzzp2nqjIefxaRo2lSjuNThkbVYc7CwRmrcsQqS1bBywfBaDdyO
-	Xy3mr2plNU3Nkse2AuKELXqmeA==
-X-Google-Smtp-Source: AGHT+IHaXwPvDh2brV8ZcZaQPLAUFNNZ6njsChR4JPz/nMyEgekcU5+UQglMoH08l6a88LqgdxYWLQ==
-X-Received: by 2002:a05:600c:518a:b0:40b:5e4a:2354 with SMTP id fa10-20020a05600c518a00b0040b5e4a2354mr3175914wmb.86.1702375313736;
-        Tue, 12 Dec 2023 02:01:53 -0800 (PST)
+        bh=8jwK3VIZKTtyh6l8Imn5ROjr3boxbaMYwliA7fT7XUg=;
+        b=OwiX3Ahy+XCR8o5g/Q0FTsIJW4wgaLPcnCRb2vWD/y+wteHTNKzfw6PWg+yGIP5hQD
+         C9QVyCoRRl2ukn7TbH/IFplc4zZAj01ysHPmgXBxLuTa/7NCI3d1T1T31narUC+nQ31Q
+         yEqIdZz19D+htyHFiIeojnx05mA2WUSLv+w0ucC0z6HijDAWDwY0Bpqo1X644Z/G8JeH
+         HrvoFzDDClweGHd2kCry8YiG1rinWt5bxZ1TQvC+eu2I+4rJ4bmYE6d/FDCNMZ3Z7xVJ
+         6apc1y3srVu1k4jT/J/uzTv/2zJt6Tsdi0MWvnGZ8EpMfNGFl1GWqs7eMzpMbbwbLrt4
+         +2zg==
+X-Gm-Message-State: AOJu0Yy6zHrg+7CrP0Ne+l9ZGTDAxiF89ETu8/Sa2/bjp2ePnjIVgv0r
+	IernC7wueeXzjMPji4crO73AdQ==
+X-Google-Smtp-Source: AGHT+IH8d9nFJN6D9XefxxLqX4ApJifPc5biF8y3mFhtEFY909GbyGfeXLox2gIAEFYD/NX8z85etw==
+X-Received: by 2002:a05:600c:458c:b0:40b:5e21:d355 with SMTP id r12-20020a05600c458c00b0040b5e21d355mr3028323wmo.94.1702375397938;
+        Tue, 12 Dec 2023 02:03:17 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.218.27])
-        by smtp.gmail.com with ESMTPSA id m24-20020a05600c3b1800b00405c33a9a12sm406183wms.0.2023.12.12.02.01.51
+        by smtp.gmail.com with ESMTPSA id m24-20020a05600c3b1800b00405c33a9a12sm406183wms.0.2023.12.12.02.03.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Dec 2023 02:01:53 -0800 (PST)
-Message-ID: <56800be1-ae05-42bc-81aa-77ea384911b5@linaro.org>
-Date: Tue, 12 Dec 2023 11:01:50 +0100
+        Tue, 12 Dec 2023 02:03:17 -0800 (PST)
+Message-ID: <5cfc4564-fd36-45a3-9293-9757ffbc7e96@linaro.org>
+Date: Tue, 12 Dec 2023 11:03:15 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,8 +47,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V1 1/2] dt-bindings: crypto: qcom-qce: document the SC7280
- crypto engine
+Subject: Re: [PATCH V1 2/2] arm64: dts: qcom: sc7280: add QCrypto nodes
 Content-Language: en-US
 To: Om Prakash Singh <quic_omprsing@quicinc.com>
 Cc: neil.armstrong@linaro.org, konrad.dybcio@linaro.org, agross@kernel.org,
@@ -59,7 +58,7 @@ Cc: neil.armstrong@linaro.org, konrad.dybcio@linaro.org, agross@kernel.org,
  marijn.suijten@somainline.org, robh+dt@kernel.org, vkoul@kernel.org,
  cros-qcom-dts-watchers@chromium.org
 References: <20231212085454.1238896-1-quic_omprsing@quicinc.com>
- <20231212085454.1238896-2-quic_omprsing@quicinc.com>
+ <20231212085454.1238896-3-quic_omprsing@quicinc.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -105,19 +104,60 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231212085454.1238896-2-quic_omprsing@quicinc.com>
+In-Reply-To: <20231212085454.1238896-3-quic_omprsing@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 12/12/2023 09:54, Om Prakash Singh wrote:
-> Document the crypto engine on the SM7280 Platform.
+> Add the QCE and Crypto BAM DMA nodes.
 > 
 > Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
 > ---
->  Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 1 +
->  1 file changed, 1 insertion(+)
+>  arch/arm64/boot/dts/qcom/sc7280.dtsi | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/sc7280.dtsi b/arch/arm64/boot/dts/qcom/sc7280.dtsi
+> index 66f1eb83cca7..7b705df21f4e 100644
+> --- a/arch/arm64/boot/dts/qcom/sc7280.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sc7280.dtsi
+> @@ -2272,6 +2272,28 @@ ipa: ipa@1e40000 {
+>  			status = "disabled";
+>  		};
+>  
+> +		cryptobam: dma-controller@1dc4000 {
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Are you sure you placed it in correct place? 1e4 looks higher than 1dc.
+
+> +			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
+> +			reg = <0x0 0x01dc4000 0x0 0x28000>;
+> +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+> +			#dma-cells = <1>;
+> +			qcom,ee = <0>;
+> +			qcom,controlled-remotely;
+
+These two properties go to the end (vendor properties are after generic
+ones).
+
+> +			iommus = <&apps_smmu 0x4E4 0x0011>,
+> +				 <&apps_smmu 0x4E6 0x0011>;
+
+Lowercase hex
+
+> +		};
+> +
+> +		crypto: crypto@1dfa000 {
+> +			compatible = "qcom,sc7280-qce", "qcom,sm8150-qce", "qcom,qce";
+> +			reg = <0x0 0x01dfa000 0x0 0x6000>;
+> +			dmas = <&cryptobam 4>, <&cryptobam 5>;
+> +			dma-names = "rx", "tx";
+> +			iommus = <&apps_smmu 0x4E4 0x0011>,
+> +				 <&apps_smmu 0x4E4 0x0011>;
+
+Lowercase hex
+
+> +			interconnects = <&aggre2_noc MASTER_CRYPTO 0 &mc_virt SLAVE_EBI1 0>;
+> +			interconnect-names = "memory";
+> +		};
 
 Best regards,
 Krzysztof
