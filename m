@@ -1,176 +1,144 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k8yk9r4u"
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47C6CB3;
-	Tue, 12 Dec 2023 06:03:18 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-a1f653e3c3dso585140166b.2;
-        Tue, 12 Dec 2023 06:03:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JMA4j4Yj"
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B799DB
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2023 07:02:19 -0800 (PST)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-a1c8512349dso761170966b.2
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2023 07:02:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702389797; x=1702994597; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uZijd03LXNPYjeHZjeC7Jq869Ey7f+8xrdH6Ffypg54=;
-        b=k8yk9r4uUufQsTcW5zt2CoXBMz3EjZuRFeoupN0Vx2JVhwiGPZE1SxbyDaKbvQryrX
-         nSOJEt6HJpNzQt4B7uvQA7eWIuhu8sktmV5CK0NJwSe+7tD6q39P4fNOXUcuJhPfBYqs
-         WryZEZ2oawM9LMh+INpuuIfjCkhmKobA9gZr0kzQfuwBLgRpd5xvFUL5q9vxZL9oi1jb
-         alHRuCuzMXi4YtV4FnpGwF61jAvO/6tOeYV8NxYwfmGHDWl6ObhFybLC9wu+qdTytSox
-         ODrE+yN9XnAxYLN2mZXW5riRDYRDXw7RwxakftrOybhDuOj0GYqJ4G9Bu0oEtwtjrSE+
-         Ji+g==
+        d=linaro.org; s=google; t=1702393337; x=1702998137; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0oq3UqUgz404bArUef1oQTnL/gxT+Fw1DLV1XoQdvNU=;
+        b=JMA4j4YjveZywlVx+pN8z+6i2SC5tUX4jHYL3NN7GNW5nJimVjoIBRmQzYmZkXvIB8
+         V0284zKPTHk7riiom5Pot8G+jpT1VqOTDTqFqEiiVDrSRAg359TirdlsOAxD2T4Ff6RC
+         PZ/V4x6W1yVWeKUOJRnASlzoA7BBOggXrrUxvqfrGnNC8cZEnH91E4SHRO5xmdJH2x4F
+         pVfRTzNlXQgOOHrkk1GE+ryE77rb3NdWcP65xmqnLjOuovnag06WcD0c6Li9kl/Vp5NN
+         25RkZqfNtDY0Ppmn7yqi1HV+63w+q4sGoU1+8cFfJFPSv1uDJ9mC17i9o01fJ7HJlBHe
+         9ASw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702389797; x=1702994597;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uZijd03LXNPYjeHZjeC7Jq869Ey7f+8xrdH6Ffypg54=;
-        b=G7+ttSaFhMfPmpQRCn2H8UtcriCTtQ4DrR0JpTUuJad2bmsRNiPW2EL15YfacFlLB5
-         7CJi1tJ802J/kXgzhLMzRw9Sm/N7YH2wPInUsQaSqCGWZPbFTgV36Cux9Wm5uogVcBl6
-         dNoTv3/Ky5+66UkIH1bRKoTTd4ovQyEHoQZC6TB56Ewyxl+w79763+ph8nS+mdsDJ2w7
-         q82yDzO60zzp+NrMH4g3uAVedwTkDoURiviyJ5N1Bk4irUqr9zXQN2M8+3eDbWirHwos
-         Ak4xYqX8GqcT+cJ59enMPa6BrL2Qzl23jYOZLgkVe+Gy/yRUtCAbtorM1X7sue5mPUaB
-         Jlng==
-X-Gm-Message-State: AOJu0YzCn7OzzeB3KwRkt4xVnCQl9rLd/C6j9rYlH3KNEJuXUGWfl3AP
-	TqS9nU3XCAJQvW1GYEwEg7+yCLWoRFsI/zPmhx0=
-X-Google-Smtp-Source: AGHT+IH632PKP0FkzO8rvfQFAe04NwMnCJLog8mBx7LAHu9FgvY4Xy5XVDAMTxm6ZDN+OMsG2rlYc1re9wNhFIJcZts=
-X-Received: by 2002:a17:906:1f4d:b0:a19:a1ba:bae7 with SMTP id
- d13-20020a1709061f4d00b00a19a1babae7mr1523005ejk.141.1702389796323; Tue, 12
- Dec 2023 06:03:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702393337; x=1702998137;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0oq3UqUgz404bArUef1oQTnL/gxT+Fw1DLV1XoQdvNU=;
+        b=t3p4pUvWYOwcwMK4jUbBzHoAD60Yf8Hww/w7rvtBqbYaubFvpWB+YilYQu52Mriq3Y
+         YSe17UPE4B98Uvjbjvk+LNOQqiGKZqIMFEH/3g+vOcEGZZ7sip/F2NiWGlrwbBA+TKoO
+         rSYVhytmuwbLKOw331PkH2sMeBLwq8jbTpjXjgPjaWluIQMZhYeMdPPxp0tU/Ki582DS
+         e/IfxQ9Zu2286C8C7RrlDShDZXedLwFbAfjIfo/JLFFH4qUku1QvhqO2sZL+7SH9tJWA
+         MWDonE8mV5dPcns0/TregEPn6cuc4pFlgzqKVQTTEjqNx8GZi2doAUkMPWEKuY5rDHwb
+         cgzg==
+X-Gm-Message-State: AOJu0YzZV3rotx8dS+q6r1o3f6RsUvzIPQSxaKpizzqAdj5KyHanU/7m
+	p7NPTt5qulpunXyNGLvzMxPv+A==
+X-Google-Smtp-Source: AGHT+IHzeYlqUUSRvzjj5LcGNfqD+8vGDnxTLM5/pN3olWK23lEeE7t8au8h3kJ3f6WLcP0MqIcR/g==
+X-Received: by 2002:a17:906:32d2:b0:a1a:57e2:2cc4 with SMTP id k18-20020a17090632d200b00a1a57e22cc4mr3193885ejk.52.1702393337502;
+        Tue, 12 Dec 2023 07:02:17 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.218.27])
+        by smtp.gmail.com with ESMTPSA id tl1-20020a170907c30100b00a1c8d243cf7sm6349748ejc.2.2023.12.12.07.02.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Dec 2023 07:02:16 -0800 (PST)
+Message-ID: <c848f874-3748-4d59-8e78-9ae044fb760a@linaro.org>
+Date: Tue, 12 Dec 2023 16:02:14 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZWnGV39HJr9uUB2/@gondor.apana.org.au> <tencent_B2D2C5864C49BDAEE0AEC1CC9627E3C6CF06@qq.com>
- <ZWpukgSDlA6UFR6e@gondor.apana.org.au> <ZWqCAsCUGN1cFIIT@gondor.apana.org.au>
-In-Reply-To: <ZWqCAsCUGN1cFIIT@gondor.apana.org.au>
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Date: Tue, 12 Dec 2023 19:33:04 +0530
-Message-ID: <CANc+2y6+jWNbveuBZGa-a7JoUiM++DtAYELoORTBXzt2TiEOrg@mail.gmail.com>
-Subject: Re: [PATCH] hwrng: core - Fix page fault dead lock on mmap-ed hwrng
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Edward Adam Davis <eadavis@qq.com>, davem@davemloft.net, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, olivia@selenic.com, 
-	syzbot+c52ab18308964d248092@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com, Ian Molton <ian.molton@collabora.co.uk>, 
-	Rusty Russell <rusty@rustcorp.com.au>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 2/2] arm64: dts: qcom: sc7280: add QCrypto nodes
+Content-Language: en-US
+To: Om Prakash Singh <quic_omprsing@quicinc.com>
+Cc: neil.armstrong@linaro.org, konrad.dybcio@linaro.org, agross@kernel.org,
+ andersson@kernel.org, conor+dt@kernel.org, davem@davemloft.net,
+ devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
+ krzysztof.kozlowski+dt@linaro.org, linux-arm-msm@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ marijn.suijten@somainline.org, robh+dt@kernel.org, vkoul@kernel.org
+References: <20231212133247.1366698-1-quic_omprsing@quicinc.com>
+ <20231212133247.1366698-3-quic_omprsing@quicinc.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20231212133247.1366698-3-quic_omprsing@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, 2 Dec 2023 at 08:05, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> There is a dead-lock in the hwrng device read path.  This triggers
-> when the user reads from /dev/hwrng into memory also mmap-ed from
-> /dev/hwrng.  The resulting page fault triggers a recursive read
-> which then dead-locks.
->
-> Fix this by using a stack buffer when calling copy_to_user.
->
-> Reported-by: Edward Adam Davis <eadavis@qq.com>
-> Reported-by: syzbot+c52ab18308964d248092@syzkaller.appspotmail.com
-> Fixes: 9996508b3353 ("hwrng: core - Replace u32 in driver API with byte array")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-> index 420f155d251f..a3bbdd6e60fc 100644
-> --- a/drivers/char/hw_random/core.c
-> +++ b/drivers/char/hw_random/core.c
-> @@ -23,10 +23,13 @@
->  #include <linux/sched.h>
->  #include <linux/sched/signal.h>
->  #include <linux/slab.h>
-> +#include <linux/string.h>
->  #include <linux/uaccess.h>
->
->  #define RNG_MODULE_NAME                "hw_random"
->
-> +#define RNG_BUFFER_SIZE (SMP_CACHE_BYTES < 32 ? 32 : SMP_CACHE_BYTES)
-> +
->  static struct hwrng *current_rng;
->  /* the current rng has been explicitly chosen by user via sysfs */
->  static int cur_rng_set_by_user;
-> @@ -58,7 +61,7 @@ static inline int rng_get_data(struct hwrng *rng, u8 *buffer, size_t size,
->
->  static size_t rng_buffer_size(void)
->  {
-> -       return SMP_CACHE_BYTES < 32 ? 32 : SMP_CACHE_BYTES;
-> +       return RNG_BUFFER_SIZE;
->  }
->
->  static void add_early_randomness(struct hwrng *rng)
-> @@ -209,6 +212,7 @@ static inline int rng_get_data(struct hwrng *rng, u8 *buffer, size_t size,
->  static ssize_t rng_dev_read(struct file *filp, char __user *buf,
->                             size_t size, loff_t *offp)
->  {
-> +       u8 buffer[RNG_BUFFER_SIZE];
->         ssize_t ret = 0;
->         int err = 0;
->         int bytes_read, len;
-> @@ -236,34 +240,37 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
->                         if (bytes_read < 0) {
->                                 err = bytes_read;
->                                 goto out_unlock_reading;
-> -                       }
-> -                       data_avail = bytes_read;
-> -               }
-> -
-> -               if (!data_avail) {
-> -                       if (filp->f_flags & O_NONBLOCK) {
-> +                       } else if (bytes_read == 0 &&
-> +                                  (filp->f_flags & O_NONBLOCK)) {
->                                 err = -EAGAIN;
->                                 goto out_unlock_reading;
->                         }
-> -               } else {
-> -                       len = data_avail;
-> +
-> +                       data_avail = bytes_read;
-> +               }
-> +
-> +               len = data_avail;
-> +               if (len) {
->                         if (len > size)
->                                 len = size;
->
->                         data_avail -= len;
->
-> -                       if (copy_to_user(buf + ret, rng_buffer + data_avail,
-> -                                                               len)) {
-> +                       memcpy(buffer, rng_buffer + data_avail, len);
-> +               }
-> +               mutex_unlock(&reading_mutex);
-> +               put_rng(rng);
-> +
-> +               if (len) {
-> +                       if (copy_to_user(buf + ret, buffer, len)) {
->                                 err = -EFAULT;
-> -                               goto out_unlock_reading;
-> +                               goto out;
->                         }
->
->                         size -= len;
->                         ret += len;
->                 }
->
-> -               mutex_unlock(&reading_mutex);
-> -               put_rng(rng);
->
->                 if (need_resched())
->                         schedule_timeout_interruptible(1);
-> @@ -274,6 +281,7 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
->                 }
->         }
->  out:
-> +       memzero_explicit(buffer, sizeof(buffer));
->         return ret ? : err;
->
->  out_unlock_reading:
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
+On 12/12/2023 14:32, Om Prakash Singh wrote:
+> Add the QCE and Crypto BAM DMA nodes.
+> 
+> Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+> ---
+> 
+> Changes in V2:
+>   - Update DT node sequence as per register ascending order
 
-Reviewed-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Hm, I don't see it...
 
-Regards,
-PrasannaKumar
+>   - Fix DT node properties as per convention
+> 
+>  arch/arm64/boot/dts/qcom/sc7280.dtsi | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/sc7280.dtsi b/arch/arm64/boot/dts/qcom/sc7280.dtsi
+> index 66f1eb83cca7..7b705df21f4e 100644
+> --- a/arch/arm64/boot/dts/qcom/sc7280.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sc7280.dtsi
+> @@ -2272,6 +2272,28 @@ ipa: ipa@1e40000 {
+>  			status = "disabled";
+>  		};
+>  
+> +		cryptobam: dma-controller@1dc4000 {
+
+It still looks like not correctly ordered by unit address against other
+nodes in the file.
+
+
+
+
+Best regards,
+Krzysztof
+
