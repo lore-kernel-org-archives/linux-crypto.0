@@ -1,56 +1,179 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="2FaSP8yJ"
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BEE9185
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2023 08:35:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=1t5R4lCpMqAC7TdLx4pToc8upY1ucjgCx1PSqABbd24=; b=2FaSP8yJcr+mw/3e7JeV7m+Q+4
-	+8yeaX2INi+dXFa+VKO+M9V0oK/Kmre08IhEMEWiW0vHiuC5dofwm6CqGIRe8mPcEqPXaU5Pbpf9g
-	KduMsve/Pi9fEY0SBLVsubTiP1rZ/dbNds28BrJodRWOsDkHjZlXdVjPlbdbxZSY6J/EwmlvowS32
-	2GLYLba4nxzuUAF1+2V139egllL4n+JuEl0tpY1/TgHuTB2zUbqvl3CVBIOFTE7Slkn6pPtevvUwu
-	D+nxLHe/SPOFLwmH4e5GFDc9xsSiuqNcAoKkhlm2U3+0KCjW9aMg3mwZWrBdoIeyf6Csg+pAECjCk
-	ZGOecMAA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rD5jM-00CEob-2q;
-	Tue, 12 Dec 2023 16:35:36 +0000
-Date: Tue, 12 Dec 2023 08:35:36 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Will Deacon <will@kernel.org>
-Cc: Ard Biesheuvel <ardb@kernel.org>, Ard Biesheuvel <ardb@google.com>,
-	linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
-	kernel-team@android.com, Mark Rutland <mark.rutland@arm.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Eric Biggers <ebiggers@google.com>,
-	Kees Cook <keescook@chromium.org>, Marc Zyngier <maz@kernel.org>,
-	Mark Brown <broonie@kernel.org>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 0/4] arm64: Run kernel mode NEON with preemption
- enabled
-Message-ID: <ZXiL2FhAWozC4HVu@infradead.org>
-References: <20231208113218.3001940-6-ardb@google.com>
- <170231871028.1857077.10318072500676133330.b4-ty@kernel.org>
- <CAMj1kXE=2H_Jqyuv_gDp6QS2g2Vzdgf=fngp=ZXEUBXKOYWnbQ@mail.gmail.com>
- <20231212105513.GA28416@willie-the-truck>
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="NdJgmgVe"
+Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F0FCA;
+	Tue, 12 Dec 2023 08:46:50 -0800 (PST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A109740E00C9;
+	Tue, 12 Dec 2023 16:46:47 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id qnttpbrXiaDF; Tue, 12 Dec 2023 16:46:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1702399604; bh=JgaP6s6ZQuPIIwAkFk4kUIsSkyeDb3qfZ2ZyjHtolEA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NdJgmgVeKvU8liYp3/47c6y/Ybc/cJYAHEezxdSbKUy6ElqCAo0iAf+oTOaEkIWft
+	 MORuUbw0LS6WxLJAP+oW178zvH39uVgrKeitaYSimp4ZniVoTFpm4tplzCCZWa+dCF
+	 nEK2W1q3AoHQk1XKuCwkU5XPtGmfItfQWKgJfwV/4mvbaY3yJbFF9BUGLyMI0CcHUc
+	 cBK3rk8wxsuFTR9FfXLr1jImBJhajECjn9BSjh0F/Z6DDxFNKOMil3DGEnt0kbP4wA
+	 Z7x5Hm31FpBcvuPU7I6ux5hmD8T1HOaDY5ZCc4T47RFgdcn99YAasSeHzjW4xrzMXo
+	 AtmJG6LEHjWmQVNT5Xf0dmtkdYdmNhMhjl4rJtYX6BcTREH+PiN/ikFmDN1Ggl7TPz
+	 ebN+Ni/9+86QlgNuLLfDJR6SF3ipr/QyNW+GOYvuhELllDxQrLvk0ofkoviLv5qs1f
+	 umIQ6gwYHIr4jTQkbitmZ9oDHSxatGyqh6fh++IljKplFsClYZ3bYiB9j9rKiL7+9z
+	 FrBmchtvqeczG949ntc5+H7NqfhaZz0vvt0Zu4abrbLmVrq81OmiSXtAI/vaaV2I5R
+	 sFyHV7PrUD+sDS+qKZS+F72iKoizGDLyCvxq0YKw0dCRZVMGGs+mRiQUv44yGVUcYA
+	 F6EulFumsy6QWxmrT/0qgJ4U=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3500E40E00CB;
+	Tue, 12 Dec 2023 16:46:04 +0000 (UTC)
+Date: Tue, 12 Dec 2023 17:45:57 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+	tony.luck@intel.com, marcorr@google.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 19/50] crypto: ccp: Add the SNP_PLATFORM_STATUS
+ command
+Message-ID: <20231212164557.GKZXiORUQjE8pCQBFk@fat_crate.local>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-20-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231212105513.GA28416@willie-the-truck>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20231016132819.1002933-20-michael.roth@amd.com>
 
-On Tue, Dec 12, 2023 at 10:55:13AM +0000, Will Deacon wrote:
-> As discussed off-list, the vague concern was if kernel_neon_begin() is
-> nested off the back of a user fault. The BUG_ON() should fire in that case,
-> so we're all good.
+On Mon, Oct 16, 2023 at 08:27:48AM -0500, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> The command can be used by the userspace to query the SNP platform status
 
-I think we should really document all these rules, and Samuel's series
-to add the portable FPU API would be the right place for it.  I'd also
-really love to see objtool support for enforcing the various rules
-where possible.
+s/by the userspace //
 
+> report. See the SEV-SNP spec for more details.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+
+Mike, this doesn't have your SOB at the end. The whole set should have
+it if you're sending it. Please go through the whole thing.
+
+> ---
+>  Documentation/virt/coco/sev-guest.rst | 27 ++++++++++++++++
+>  drivers/crypto/ccp/sev-dev.c          | 45 +++++++++++++++++++++++++++
+>  include/uapi/linux/psp-sev.h          |  1 +
+>  3 files changed, 73 insertions(+)
+> 
+> diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
+> index 68b0d2363af8..e828c5326936 100644
+> --- a/Documentation/virt/coco/sev-guest.rst
+> +++ b/Documentation/virt/coco/sev-guest.rst
+> @@ -67,6 +67,22 @@ counter (e.g. counter overflow), then -EIO will be returned.
+>                  };
+>          };
+>  
+> +The host ioctl should be called to /dev/sev device. The ioctl accepts commanda
+
+"... should be sent to the... "
+
+> +id and command input structure.
+> +
+> +::
+> +        struct sev_issue_cmd {
+> +                /* Command ID */
+> +                __u32 cmd;
+> +
+> +                /* Command request structure */
+> +                __u64 data;
+> +
+> +                /* firmware error code on failure (see psp-sev.h) */
+> +                __u32 error;
+> +        };
+> +
+> +
+>  2.1 SNP_GET_REPORT
+>  ------------------
+>  
+> @@ -124,6 +140,17 @@ be updated with the expected value.
+>  
+>  See GHCB specification for further detail on how to parse the certificate blob.
+>  
+> +2.4 SNP_PLATFORM_STATUS
+> +-----------------------
+> +:Technology: sev-snp
+> +:Type: hypervisor ioctl cmd
+> +:Parameters (in): struct sev_data_snp_platform_status
+> +:Returns (out): 0 on success, -negative on error
+> +
+> +The SNP_PLATFORM_STATUS command is used to query the SNP platform status. The
+> +status includes API major, minor version and more. See the SEV-SNP
+> +specification for further details.
+> +
+>  3. SEV-SNP CPUID Enforcement
+>  ============================
+>  
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index b574b0ef2b1f..679b8d6fc09a 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1772,6 +1772,48 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>  	return ret;
+>  }
+>  
+> +static int sev_ioctl_snp_platform_status(struct sev_issue_cmd *argp)
+
+sev_ioctl_do_snp_platform_status like the others.
+
+> +{
+> +	struct sev_device *sev = psp_master->sev_data;
+> +	struct sev_data_snp_addr buf;
+> +	struct page *status_page;
+> +	void *data;
+> +	int ret;
+> +
+> +	if (!sev->snp_initialized || !argp->data)
+> +		return -EINVAL;
+> +
+> +	status_page = alloc_page(GFP_KERNEL_ACCOUNT);
+> +	if (!status_page)
+> +		return -ENOMEM;
+> +
+> +	data = page_address(status_page);
+> +	if (rmp_mark_pages_firmware(__pa(data), 1, true)) {
+> +		__free_pages(status_page, 0);
+> +		return -EFAULT;
+
+		ret = -EFAULT;
+		goto cleanup;
+
+instead.
+
+...
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
