@@ -1,98 +1,56 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B056D28E6;
-	Tue, 12 Dec 2023 16:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGoV0FXb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60FC4C433CA;
-	Tue, 12 Dec 2023 16:35:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702398911;
-	bh=mMmJmC+q52Hml5ofl8CP4lRLUI3hn5sN9ppbWyRuzNQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EGoV0FXbAwukl1l0MwB7ef/rsDx1WCzrP4ggfOmlRwwdxSkUnuZh6YzYwzUSbHYE/
-	 BqAR5kZoq7vFg+i7G3qIVF5ytIOTXKgj/TAVssnIRm7pdCp8C1h2lgbggJiJSPvrBJ
-	 K4qvuJFQQhJ+Z2+u1XNuaSvXgx0c6zgJusk+foLwo1KqNoJgd4e8jCUa1DfJDni3xm
-	 wlu+HGThEnNQ0wai/MuSA9lkd+l4gJ05UHRHNmpYB0l7wr0T6tkJzHx1R6EW9NDOLG
-	 IA38nd1lLu4lAJ+DjyG8M0apsLG19cPwN5KE09/hY2pJnSvbvUiXkdCnmhAXUIKY4U
-	 tQizSL2wR2KLA==
-Date: Tue, 12 Dec 2023 16:35:07 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Jia Jie Ho <jiajie.ho@starfivetech.com>
-Cc: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] dt-bindings: rng: starfive: Add jh8100 compatible
- string
-Message-ID: <20231212-freely-familiar-f19c2e14c417@spud>
-References: <20231212032527.1250617-1-jiajie.ho@starfivetech.com>
- <20231212032527.1250617-2-jiajie.ho@starfivetech.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="2FaSP8yJ"
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BEE9185
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2023 08:35:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=1t5R4lCpMqAC7TdLx4pToc8upY1ucjgCx1PSqABbd24=; b=2FaSP8yJcr+mw/3e7JeV7m+Q+4
+	+8yeaX2INi+dXFa+VKO+M9V0oK/Kmre08IhEMEWiW0vHiuC5dofwm6CqGIRe8mPcEqPXaU5Pbpf9g
+	KduMsve/Pi9fEY0SBLVsubTiP1rZ/dbNds28BrJodRWOsDkHjZlXdVjPlbdbxZSY6J/EwmlvowS32
+	2GLYLba4nxzuUAF1+2V139egllL4n+JuEl0tpY1/TgHuTB2zUbqvl3CVBIOFTE7Slkn6pPtevvUwu
+	D+nxLHe/SPOFLwmH4e5GFDc9xsSiuqNcAoKkhlm2U3+0KCjW9aMg3mwZWrBdoIeyf6Csg+pAECjCk
+	ZGOecMAA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1rD5jM-00CEob-2q;
+	Tue, 12 Dec 2023 16:35:36 +0000
+Date: Tue, 12 Dec 2023 08:35:36 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Will Deacon <will@kernel.org>
+Cc: Ard Biesheuvel <ardb@kernel.org>, Ard Biesheuvel <ardb@google.com>,
+	linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
+	kernel-team@android.com, Mark Rutland <mark.rutland@arm.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Eric Biggers <ebiggers@google.com>,
+	Kees Cook <keescook@chromium.org>, Marc Zyngier <maz@kernel.org>,
+	Mark Brown <broonie@kernel.org>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v4 0/4] arm64: Run kernel mode NEON with preemption
+ enabled
+Message-ID: <ZXiL2FhAWozC4HVu@infradead.org>
+References: <20231208113218.3001940-6-ardb@google.com>
+ <170231871028.1857077.10318072500676133330.b4-ty@kernel.org>
+ <CAMj1kXE=2H_Jqyuv_gDp6QS2g2Vzdgf=fngp=ZXEUBXKOYWnbQ@mail.gmail.com>
+ <20231212105513.GA28416@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wKaAqqtx0HcURug5"
-Content-Disposition: inline
-In-Reply-To: <20231212032527.1250617-2-jiajie.ho@starfivetech.com>
-
-
---wKaAqqtx0HcURug5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231212105513.GA28416@willie-the-truck>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Dec 12, 2023 at 11:25:26AM +0800, Jia Jie Ho wrote:
-> Add compatible string for StarFive JH8100 trng.
->=20
-> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+On Tue, Dec 12, 2023 at 10:55:13AM +0000, Will Deacon wrote:
+> As discussed off-list, the vague concern was if kernel_neon_begin() is
+> nested off the back of a user fault. The BUG_ON() should fire in that case,
+> so we're all good.
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+I think we should really document all these rules, and Samuel's series
+to add the portable FPU API would be the right place for it.  I'd also
+really love to see objtool support for enforcing the various rules
+where possible.
 
-Cheers,
-Conor.
-
-> ---
->  .../devicetree/bindings/rng/starfive,jh7110-trng.yaml       | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.y=
-aml b/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
-> index 2b76ce25acc4..4639247e9e51 100644
-> --- a/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
-> +++ b/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
-> @@ -11,7 +11,11 @@ maintainers:
-> =20
->  properties:
->    compatible:
-> -    const: starfive,jh7110-trng
-> +    oneOf:
-> +      - items:
-> +          - const: starfive,jh8100-trng
-> +          - const: starfive,jh7110-trng
-> +      - const: starfive,jh7110-trng
-> =20
->    reg:
->      maxItems: 1
-> --=20
-> 2.34.1
->=20
-
---wKaAqqtx0HcURug5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXiLuwAKCRB4tDGHoIJi
-0uEMAP49L1RqAzELTRn4hY+Ff+rzCrdw6w5GIjrpiqAIxF4yyAEA3Aq4Vbym8J2L
-4Z/yc6Qm/2bLhA2ICyLVlC/hCPfDTQo=
-=0CMW
------END PGP SIGNATURE-----
-
---wKaAqqtx0HcURug5--
