@@ -1,423 +1,197 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F2A6829A;
-	Wed, 13 Dec 2023 19:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VMybQw20"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A929AC433C7;
-	Wed, 13 Dec 2023 19:53:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702497239;
-	bh=dcjUy2QND46YM2W9IosA0LzvC8ULdjGPyZnZLP6Ia3I=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=VMybQw20CoC5U8K+WyP5dgGTjp4Bl0IOQeA6Srubt/Kpgugo/8IwNYBD3Sigla1gj
-	 XaVzHYKbDNnpr5AHt1yeu70EHuOeQMW81wGzjmhy4INjCkG5mLpf6PD0+H89bPQV3B
-	 nPGmzsn84GT1eyIY3uNzKYgN0s13je2jVb5xNvXXoxi6Q2pxxFCCGO0fpNgREdOb3Y
-	 +3YcuOHHahFofUriI3VTMo1muq+Wvny0oUOapUfcQK1mucO3cwP/5yYciLvxjgbYnI
-	 EG+L9nx+wzwDn43j9Me34XpBY21CY4HzDz7v2aqAhb9qd4Hj+NQxY18ydU+owmXfk/
-	 5goU8DheuihiA==
-Message-ID: <52340f6e-e253-4eef-b395-2805aeac65a9@kernel.org>
-Date: Wed, 13 Dec 2023 20:53:52 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWKkpqyV"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D47FB9
+	for <linux-crypto@vger.kernel.org>; Wed, 13 Dec 2023 13:16:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702502178;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t3w6Xj8LYqILm8EKMqzQWJRNazs3Z4fz1iwltgUE9Bo=;
+	b=iWKkpqyVyrONFJAC1Xzi42wFw673HXlNGGzaCcuz+kbcqhfSpQEhnGf/8nxxOhj1RKNhkU
+	EDZYIjRcM4EWheXoxCI5+pkeiLOrLF3FKzze8FVpj6JpfUC6IOEGgZgkca5viy1K/M1uli
+	BwmkgBZvbw4zjnzaXUePOke8SwlU99Q=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-693-5sm7vwytNvOm-9xQQOi97g-1; Wed,
+ 13 Dec 2023 16:16:15 -0500
+X-MC-Unique: 5sm7vwytNvOm-9xQQOi97g-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C04001C0BB51;
+	Wed, 13 Dec 2023 21:16:13 +0000 (UTC)
+Received: from rh (unknown [10.64.138.3])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2144F492BC6;
+	Wed, 13 Dec 2023 21:16:13 +0000 (UTC)
+Received: from localhost ([::1] helo=rh)
+	by rh with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <dchinner@redhat.com>)
+	id 1rDWaQ-003rLL-1U;
+	Thu, 14 Dec 2023 08:16:10 +1100
+Date: Thu, 14 Dec 2023 08:16:07 +1100
+From: Dave Chinner <dchinner@redhat.com>
+To: Alexander Potapenko <glider@google.com>
+Cc: syzbot+a6d6b8fffa294705dbd8@syzkaller.appspotmail.com, hch@lst.de,
+	davem@davemloft.net, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com, linux-xfs@vger.kernel.org
+Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in __crc32c_le_base (3)
+Message-ID: <ZXofF2lXuIUvKi/c@rh>
+References: <000000000000f66a3005fa578223@google.com>
+ <20231213104950.1587730-1-glider@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/5] crypto: tegra: Add Tegra Security Engine driver
-Content-Language: en-US
-To: Akhil R <akhilrajeev@nvidia.com>, herbert@gondor.apana.org.au,
- davem@davemloft.net, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, thierry.reding@gmail.com,
- jonathanh@nvidia.com, linux-tegra@vger.kernel.org
-References: <20231213122030.11734-1-akhilrajeev@nvidia.com>
- <20231213122030.11734-4-akhilrajeev@nvidia.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20231213122030.11734-4-akhilrajeev@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231213104950.1587730-1-glider@google.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On 13/12/2023 13:20, Akhil R wrote:
-> Add support for Tegra Security Engine which can accelerates various
-> crypto algorithms. The Engine has two separate instances within for
-> AES and HASH algorithms respectively.
+[cc linux-xfs@vger.kernel.org because that's where all questions
+about XFS stuff should be directed, not to random individual
+developers. ]
+
+On Wed, Dec 13, 2023 at 11:49:50AM +0100, Alexander Potapenko wrote:
+> Hi Christoph, Dave,
 > 
-> The driver registers two crypto engines - one for AES and another for
-> HASH algorithms and these operate independently and both uses the host1x
-> bus. Additionally, it provides  hardware-assisted key protection for up
-> to 15 symmetric keys which it can use for the cipher operations.
+> The repro provided by Xingwei indeed works.
 > 
-> Signed-off-by: Akhil R <akhilrajeev@nvidia.com>
-> ---
+> I tried adding kmsan_check_memory(data, write_len) to xlog_write_iovec(), and
+> it reported an uninitialized hole inside the `data` buffer:
+> 
+> kmalloc-ed xlog buffer of size 512 : ffff88802fc26200
+> kmalloc-ed xlog buffer of size 368 : ffff88802fc24a00
+> kmalloc-ed xlog buffer of size 648 : ffff88802b631000
+> kmalloc-ed xlog buffer of size 648 : ffff88802b632800
+> kmalloc-ed xlog buffer of size 648 : ffff88802b631c00
 
-...
+Off the top of my head:
 
-> +
-> +int tegra_init_hash(struct tegra_se *se)
-> +{
-> +	struct ahash_engine_alg *alg;
-> +	int i, ret;
-> +
-> +	se->manifest = tegra_hash_kac_manifest;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(tegra_hash_algs); i++) {
-> +		tegra_hash_algs[i].se_dev = se;
-> +		alg = &tegra_hash_algs[i].alg.ahash;
-> +
-> +		ret = crypto_engine_register_ahash(alg);
-> +		if (ret) {
-> +			dev_err(se->dev, "failed to register %s\n",
-> +				alg->base.halg.base.cra_name);
-> +			goto sha_err;
-> +		}
-> +	}
-> +
-> +	dev_info(se->dev, "registered HASH algorithms\n");
+> xlog_write_iovec: copying 12 bytes from ffff888017ddbbd8 to ffff88802c300400
 
-Drop, not needed. Actually drop simple success messages. Drivers do not
-spam dmesg without need.
+Log start record in an ophdr.
 
-...
+> xlog_write_iovec: copying 28 bytes from ffff888017ddbbe4 to ffff88802c30040c
 
-> +
-> +int tegra_se_host1x_register(struct tegra_se *se)
-> +{
-> +	INIT_LIST_HEAD(&se->client.list);
-> +	se->client.dev = se->dev;
-> +	se->client.ops = &tegra_se_client_ops;
-> +	se->client.class = se->hw->host1x_class;
-> +	se->client.num_syncpts = 1;
-> +
-> +	host1x_client_register(&se->client);
-> +
-> +	return 0;
-> +}
-> +
-> +static int tegra_se_clk_init(struct tegra_se *se)
-> +{
-> +	int i, ret;
-> +
-> +	se->clk = devm_clk_get(se->dev, NULL);
-> +	if (IS_ERR(se->clk)) {
-> +		dev_err(se->dev, "failed to get clock\n");
+ophdr + checkpoint start header
 
-Why do you print failures multiple times? Once here, second in probe.
+> xlog_write_iovec: copying 68 bytes from ffff88802fc26274 to ffff88802c300428
 
-return dev_err_probe
+ophdr + inode log format header
 
-> +		return PTR_ERR(se->clk);
-> +	}
-> +
-> +	ret = clk_set_rate(se->clk, ULONG_MAX);
-> +	if (ret) {
-> +		dev_err(se->dev, "failed to set %d clock rate", i);
+> xlog_write_iovec: copying 188 bytes from ffff88802fc262bc to ffff88802c30046c
 
-Same comments
+ophdr + inode core in struct xfs_log_dinode format.
 
-> +		return ret;
-> +	}
-> +
-> +	ret = clk_prepare_enable(se->clk);
-> +	if (ret) {
-> +		dev_err(se->dev, "failed to enable clocks\n");
+> =====================================================
+> BUG: KMSAN: uninit-value in xlog_write_iovec fs/xfs/xfs_log.c:2227
+> BUG: KMSAN: uninit-value in xlog_write_full fs/xfs/xfs_log.c:2263
+> BUG: KMSAN: uninit-value in xlog_write+0x1fac/0x2600 fs/xfs/xfs_log.c:2532
+>  xlog_write_iovec fs/xfs/xfs_log.c:2227
+>  xlog_write_full fs/xfs/xfs_log.c:2263
+>  xlog_write+0x1fac/0x2600 fs/xfs/xfs_log.c:2532
+>  xlog_cil_write_chain fs/xfs/xfs_log_cil.c:918
+>  xlog_cil_push_work+0x30f2/0x44e0 fs/xfs/xfs_log_cil.c:1263
+>  process_one_work kernel/workqueue.c:2630
+>  process_scheduled_works+0x1188/0x1e30 kernel/workqueue.c:2703
+>  worker_thread+0xee5/0x14f0 kernel/workqueue.c:2784
+>  kthread+0x391/0x500 kernel/kthread.c:388
+>  ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+> 
+> Uninit was created at:
+>  slab_post_alloc_hook+0x101/0xac0 mm/slab.h:768
+>  slab_alloc_node mm/slub.c:3482
+>  __kmem_cache_alloc_node+0x612/0xae0 mm/slub.c:3521
+>  __do_kmalloc_node mm/slab_common.c:1006
+>  __kmalloc+0x11a/0x410 mm/slab_common.c:1020
+>  kmalloc ./include/linux/slab.h:604
+>  xlog_kvmalloc fs/xfs/xfs_log_priv.h:704
+>  xlog_cil_alloc_shadow_bufs fs/xfs/xfs_log_cil.c:343
+>  xlog_cil_commit+0x487/0x4dc0 fs/xfs/xfs_log_cil.c:1574
+>  __xfs_trans_commit+0x8df/0x1930 fs/xfs/xfs_trans.c:1017
+>  xfs_trans_commit+0x30/0x40 fs/xfs/xfs_trans.c:1061
+>  xfs_create+0x15af/0x2150 fs/xfs/xfs_inode.c:1076
+>  xfs_generic_create+0x4cd/0x1550 fs/xfs/xfs_iops.c:199
+>  xfs_vn_create+0x4a/0x60 fs/xfs/xfs_iops.c:275
+>  lookup_open fs/namei.c:3477
+>  open_last_lookups fs/namei.c:3546
+>  path_openat+0x29ac/0x6180 fs/namei.c:3776
+>  do_filp_open+0x24d/0x680 fs/namei.c:3809
+>  do_sys_openat2+0x1bc/0x330 fs/open.c:1440
+>  do_sys_open fs/open.c:1455
+>  __do_sys_openat fs/open.c:1471
+>  __se_sys_openat fs/open.c:1466
+>  __x64_sys_openat+0x253/0x330 fs/open.c:1466
+>  do_syscall_x64 arch/x86/entry/common.c:51
+>  do_syscall_64+0x4f/0x140 arch/x86/entry/common.c:82
+>  entry_SYSCALL_64_after_hwframe+0x63/0x6b arch/x86/entry/entry_64.S:120
+> 
+> Bytes 112-115 of 188 are uninitialized
+> Memory access of size 188 starts at ffff88802fc262bc
 
-Same comments
+so bytes 100-103 of the xfs_log_dinode, which is the di_crc field
+of the structure.
 
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void tegra_se_clk_deinit(struct tegra_se *se)
-> +{
-> +	clk_disable_unprepare(se->clk);
+<looks at code>
 
-Why aren't you using devm_clk_get_enabled? This looks like porting some
-old, out-of-tree vendor crappy driver :(
+Indeed, we *never* initialise that field, and we've never noticed
+because it doesn't get used in replay (it is recalculated after
+replay) so it's value is never checked and nothing has ever issued
+warnings about it in our testing.
 
-> +}
-> +
-> +static int tegra_se_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct tegra_se *se;
-> +	int ret;
-> +
-> +	se = devm_kzalloc(dev, sizeof(*se), GFP_KERNEL);
-> +	if (!se)
-> +		return -ENOMEM;
-> +
-> +	se->dev = dev;
-> +	se->owner = TEGRA_GPSE_ID;
-> +	se->hw = device_get_match_data(&pdev->dev);
-> +
-> +	se->base = devm_platform_ioremap_resource(pdev, 0);
-> +	if (IS_ERR(se->base))
-> +		return PTR_ERR(se->base);
-> +
-> +	dma_set_mask_and_coherent(dev, DMA_BIT_MASK(39));
-> +	platform_set_drvdata(pdev, se);
-> +
-> +	ret = tegra_se_clk_init(se);
-> +	if (ret) {
-> +		dev_err(dev, "failed to init clocks\n");
+We actually did all uninitialised structure leak testing back in
+2017 on the xfs_log_dinode and that, amongst other things, flagged
+the 4 bytes *before* the di_crc field as being uninitialised
+(di_next_unlinked). We fixed those issues and the uninit/leak
+warnings went away via this commit:
 
-Syntax is:
-return dev_err_probe
+commit 20413e37d71befd02b5846acdaf5e2564dd1c38e
+Author: Dave Chinner <dchinner@redhat.com>
+Date:   Mon Oct 9 11:37:22 2017 -0700
 
-> +		return ret;
-> +	}
-> +
-> +	if (!tegra_dev_iommu_get_stream_id(dev, &se->stream_id)) {
-> +		dev_err(dev, "failed to get IOMMU stream ID\n");
+    xfs: Don't log uninitialised fields in inode structures
+    
+    Prevent kmemcheck from throwing warnings about reading uninitialised
+    memory when formatting inodes into the incore log buffer. There are
+    several issues here - we don't always log all the fields in the
+    inode log format item, and we never log the inode the
+    di_next_unlinked field.
+    
+    In the case of the inode log format item, this is exacerbated
+    by the old xfs_inode_log_format structure padding issue. Hence make
+    the padded, 64 bit aligned version of the structure the one we always
+    use for formatting the log and get rid of the 64 bit variant. This
+    means we'll always log the 64-bit version and so recovery only needs
+    to convert from the unpadded 32 bit version from older 32 bit
+    kernels.
+    
+    Signed-Off-By: Dave Chinner <dchinner@redhat.com>
+    Tested-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+    Reviewed-by: Brian Foster <bfoster@redhat.com>
+    Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+    Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
 
-dev_err_probe
+The same tool that found those problems didn't report the 4 byte
+region of the di_crc as being uninitialised, and it's taken another
+6 years for some random, weird corner case for KMSAN to realise that
+every inode we log fails to initialise the di_crc field?
 
-> +		goto clk_deinit;
-> +	}
-> +
-> +	se_writel(se, se->stream_id, SE_STREAM_ID);
-> +
-> +	se->engine = crypto_engine_alloc_init(dev, 0);
-> +	if (!se->engine) {
-> +		dev_err(dev, "failed to init crypto engine\n");
+It's trivial to fix now that the kmsan tool has identified the
+issue, but I'm perplexed at how this has gone undetected for several
+years despite the fact that "mount <fs>; touch foo; unmount <fs>"
+should trigger an uninitialised memory read warning, without fail,
+every time it is run.
 
-Really? Test your code with coccinelle. Drop.
-
-> +		ret = -ENOMEM;
-> +		goto iommu_free;
-> +	}
-> +
-> +	ret = crypto_engine_start(se->engine);
-> +	if (ret) {
-> +		dev_err(dev, "failed to start crypto engine\n");
-
-dev_err_probe
-
-> +		goto engine_exit;
-> +	}
-> +
-> +	ret = tegra_se_host1x_register(se);
-> +	if (ret) {
-> +		dev_err(dev, "failed to init host1x params\n");
-
-dev_err_probe
-
-> +		goto engine_stop;
-> +	}
-> +
-> +	return 0;
-> +
-> +engine_stop:
-> +	crypto_engine_stop(se->engine);
-> +engine_exit:
-> +	crypto_engine_exit(se->engine);
-> +iommu_free:
-> +	iommu_fwspec_free(se->dev);
-> +clk_deinit:
-> +	tegra_se_clk_deinit(se);
-> +
-> +	return ret;
-> +}
-> +
-> +static int tegra_se_remove(struct platform_device *pdev)
-> +{
-> +	struct tegra_se *se = platform_get_drvdata(pdev);
-> +
-> +	crypto_engine_stop(se->engine);
-> +	crypto_engine_exit(se->engine);
-> +	iommu_fwspec_free(se->dev);
-> +	host1x_client_unregister(&se->client);
-> +	tegra_se_clk_deinit(se);
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct tegra_se_regs tegra234_aes1_regs = {
-> +	.config = SE_AES1_CFG,
-> +	.op = SE_AES1_OPERATION,
-> +	.last_blk = SE_AES1_LAST_BLOCK,
-> +	.linear_ctr = SE_AES1_LINEAR_CTR,
-> +	.aad_len = SE_AES1_AAD_LEN,
-> +	.cryp_msg_len = SE_AES1_CRYPTO_MSG_LEN,
-> +	.manifest = SE_AES1_KEYMANIFEST,
-> +	.key_addr = SE_AES1_KEY_ADDR,
-> +	.key_data = SE_AES1_KEY_DATA,
-> +	.key_dst = SE_AES1_KEY_DST,
-> +	.result = SE_AES1_CMAC_RESULT,
-> +};
-> +
-> +static const struct tegra_se_regs tegra234_hash_regs = {
-> +	.config = SE_SHA_CFG,
-> +	.op = SE_SHA_OPERATION,
-> +	.manifest = SE_SHA_KEYMANIFEST,
-> +	.key_addr = SE_SHA_KEY_ADDR,
-> +	.key_data = SE_SHA_KEY_DATA,
-> +	.key_dst = SE_SHA_KEY_DST,
-> +	.result = SE_SHA_HASH_RESULT,
-> +};
-> +
-> +static const struct tegra_se_hw tegra234_aes_hw = {
-> +	.regs = &tegra234_aes1_regs,
-> +	.kac_ver = 1,
-> +	.host1x_class = 0x3b,
-> +	.init_alg = tegra_init_aes,
-> +	.deinit_alg = tegra_deinit_aes,
-> +};
-> +
-> +static const struct tegra_se_hw tegra234_hash_hw = {
-> +	.regs = &tegra234_hash_regs,
-> +	.kac_ver = 1,
-> +	.host1x_class = 0x3d,
-> +	.init_alg = tegra_init_hash,
-> +	.deinit_alg = tegra_deinit_hash,
-> +};
-> +
-> +static const struct of_device_id tegra_se_of_match[] = {
-> +	{
-> +		.compatible = "nvidia,tegra234-se2-aes",
-> +		.data = &tegra234_aes_hw
-> +	}, {
-> +		.compatible = "nvidia,tegra234-se4-hash",
-> +		.data = &tegra234_hash_hw,
-> +	},
-> +	{ },
-> +};
-> +MODULE_DEVICE_TABLE(of, tegra_se_of_match);
-> +
-> +static struct platform_driver tegra_se_driver = {
-> +	.driver = {
-> +		.name	= "tegra-se",
-> +		.of_match_table = tegra_se_of_match,
-> +	},
-> +	.probe		= tegra_se_probe,
-> +	.remove		= tegra_se_remove,
-> +};
-> +
-> +static int tegra_se_host1x_probe(struct host1x_device *dev)
-> +{
-> +	return host1x_device_init(dev);
-> +}
-> +
-> +static int tegra_se_host1x_remove(struct host1x_device *dev)
-> +{
-> +	host1x_device_exit(dev);
-> +
-> +	return 0;
-> +}
-> +
-
-
-...
-
-> +		return -EINVAL;
-> +}
-> +
-> +/* Functions */
-> +int tegra_init_aead(struct tegra_se *se);
-
-I look for it and cannot find it... Drop.
-
-> +int tegra_init_aes(struct tegra_se *se);
-> +int tegra_init_hash(struct tegra_se *se);
-> +void tegra_deinit_aes(struct tegra_se *se);
-> +void tegra_deinit_hash(struct tegra_se *se);
-> +
-> +int tegra_key_submit(struct tegra_se *se, const u8 *key, u32 keylen, u32 alg, u32 *keyid);
-> +unsigned int tegra_key_get_idx(struct tegra_se *se, u32 keyid);
-> +void tegra_key_invalidate(struct tegra_se *se, u32 keyid, u32 alg);
-> +
-> +int tegra_se_host1x_register(struct tegra_se *se);
-> +int tegra_se_host1x_submit(struct tegra_se *se, u32 size);
-
-Everything looks bogus...
-
-> +
-> +static inline void se_writel(struct tegra_se *se, u32 val,
-> +			     unsigned int offset)
-> +{
-> +	writel_relaxed(val, se->base + offset);
-> +}
-> +
-> +static inline u32 se_readl(struct tegra_se *se, unsigned int offset)
-> +{
-> +	return readl_relaxed(se->base + offset);
-> +}
-
-Both wrappers are useless.
-
-> +
-> +/****
-> + *
-
-Use Linux coding style comments.
-
-> + * HOST1x OPCODES
-> + *
-> + ****/
-> +
-
-...
-
-> +
-> +static inline u32 host1x_opcode_nonincr(unsigned int offset, unsigned int count)
-> +{
-> +	return (2 << 28) | (offset << 16) | count;
-> +}
-> +
-> +static inline u32 host1x_uclass_incr_syncpt_cond_f(u32 v)
-> +{
-> +		return (v & 0xff) << 10;
-
-Fix indentation, in other places as well.
-
-
-Best regards,
-Krzysztof
+-Dave.
+-- 
+Dave Chinner
+dchinner@redhat.com
 
