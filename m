@@ -1,129 +1,113 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="EXaP/+Fb"
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 194CEB2;
-	Wed, 13 Dec 2023 10:54:17 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4F63840E00CB;
-	Wed, 13 Dec 2023 18:54:14 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id zcoG-nFJKqRJ; Wed, 13 Dec 2023 18:54:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1702493652; bh=e8bfGWqQN7jlEtFTw8d4r238b6Fxps9y+tq5Io28pc4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EXaP/+FbQNMwCok52oVms60raXIzpNrcn6C1msPBFP16C6xPhDXgtGL+GYz+x5E+0
-	 l6AOXSLgWbEaGwG8GAjkmDLoR6eqKJZO8cb+AMzilLSoMazjwWHgf9STXDsOKtEh76
-	 HimWjiZwf62VtXnzdU6Z/2/8dbeYqs2do8BuszSxR4mjBRbw126uAIGlVgPlK6iU7+
-	 E7qi+bgtiMQaDzPdAGwZBnQdfThGizgdwCDclUEBLi+PpyDwSfS9CvSoEGzAI04+lO
-	 bZ9pROCPQIoAawMIS+9dPulUiYLN0zmTUh1unxtB/iShJTI5wI6BUtf3v59xd6eVN7
-	 BY2lgPAGZl39yYzsNeHW6R2b650YUWykd0kkZdnMFPINLy8kiGqJpT7/FSii5eSHKC
-	 d4BnojkUm/Xy85qs4br4KoR1EYV7PqXCFjeKA4f6BlkAZRrGzFgg94AmPGgiQyELo3
-	 l4YkkdKX3BHrefOYp3eXpygrDFySXD9IoQIoGDUmWAoNTc3F3U3ojcKX9Cvt2C+cYO
-	 2f/o5KYscSu/daZcGnfboAa3C8DCDuyMQ8ert2AgryZ72eHmRB96dbAQx3IxJuzghS
-	 0f00YqTMHhOWdaR0Z3Qtel14h1zTzT7Lk8TA8LQJs3SYDbjxEqaRtsncV0HN4XMC94
-	 nLjoNX1NlmyFijuh9Sr5lavU=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 73AE840E0140;
-	Wed, 13 Dec 2023 18:53:30 +0000 (UTC)
-Date: Wed, 13 Dec 2023 19:53:25 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-	linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, seanjc@google.com, vkuznets@redhat.com,
-	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-	dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-	alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
-	nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
-	liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>,
-	Jarkko Sakkinen <jarkko@profian.com>
-Subject: Re: [PATCH v10 04/50] x86/cpufeatures: Add SEV-SNP CPU feature
-Message-ID: <20231213185325.GJZXn9pbqnjBGrQv4A@fat_crate.local>
-References: <20231016132819.1002933-5-michael.roth@amd.com>
- <0b2eb374-356c-46c6-9c4a-9512fbfece7a@redhat.com>
- <20231213131324.GDZXmt9LsMmJZyzCJw@fat_crate.local>
- <40915dc3-4083-4b9f-bc64-7542833566e1@redhat.com>
- <20231213133628.GEZXmzXFwA1p+crH/5@fat_crate.local>
- <9ac2311c-9ccc-4468-9b26-6cb0872e207f@redhat.com>
- <20231213134945.GFZXm2eTkd+IfdsjVE@fat_crate.local>
- <b4aab361-4494-4a4b-b180-d7df05fd3d5b@redhat.com>
- <20231213154107.GGZXnQkxEuw6dJfbc7@fat_crate.local>
- <e4b8326b-5b7b-4004-b0e1-b60e63bdcdd1@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0B368294;
+	Wed, 13 Dec 2023 19:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZsEo5Sp7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1AFFC433C7;
+	Wed, 13 Dec 2023 19:45:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702496757;
+	bh=LCOdYRs5R4tvsOXPbfJEsT4SC6tw2i2Req1AFV8+nfo=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=ZsEo5Sp798SnM5NQOL1Otg3q8xK5/VNNKc6gmnZL11jxHv9Zku6SkIc9o9L6ntGwo
+	 yt/pFaWkPX3eHh8e5cExq4+xlzR4Pou3PA2Iz/SgJP6cU3FaCGdpjOWzN7deDXh8Ea
+	 1N0c66FptMQeX24d87woIATBN8Jno7wf1Qoq0LTu7IVz32U6EzgMzSC+HzXvp2dSJw
+	 tgkG1x0DIwjJRKfoQ4oB1+kk05GCan6okgWr/ycvtLUfkaXb0bv92S8xYK7AYWxF1G
+	 VcEkBqdFjIjloxLe8EAJ1/SShz0Yg7KTbu/bl//YyoxyYxXGIxuwymQ8dJX8o9nf75
+	 7VCgPgnDSUgNg==
+Message-ID: <cffa9a73-802a-4453-826e-9870ee2e735d@kernel.org>
+Date: Wed, 13 Dec 2023 20:45:51 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e4b8326b-5b7b-4004-b0e1-b60e63bdcdd1@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] dt-bindings: crypto: Add Tegra SE DT binding doc
+Content-Language: en-US
+To: Akhil R <akhilrajeev@nvidia.com>, herbert@gondor.apana.org.au,
+ davem@davemloft.net, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thierry.reding@gmail.com,
+ jonathanh@nvidia.com, linux-tegra@vger.kernel.org
+References: <20231213122030.11734-1-akhilrajeev@nvidia.com>
+ <20231213122030.11734-2-akhilrajeev@nvidia.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
+ QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
+ gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
+ /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
+ iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
+ VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
+ 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
+ xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
+ eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
+ AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
+ MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
+ Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
+ ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
+ vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
+ oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
+ lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
+ t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
+ uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
+ 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
+ 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
+In-Reply-To: <20231213122030.11734-2-akhilrajeev@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Dec 13, 2023 at 06:35:35PM +0100, Paolo Bonzini wrote:
-> 1) patch 4 should have unconditionally cleared the feature (until the
-> initialization code comes around in patch 6); and it should have mentioned
-> in the commit message that we don't want X86_FEATURE_SEV_SNP to be set,
-> unless SNP can be enabled via MSR_AMD64_SYSCFG.
+On 13/12/2023 13:20, Akhil R wrote:
+> Add DT binding document for Tegra Security Engine.
+> The AES and HASH algorithms are handled independently by separate
+> engines within the Security Engine. These engines are registered
+> as two separate crypto engine drivers.
+> 
+> Signed-off-by: Akhil R <akhilrajeev@nvidia.com>
+> ---
 
-I guess.
+NAK, not tested.
 
-> 2) possibly, the commit message of patch 5 could have said something like
-> "at this point in the kernel SNP is never enabled".
+A nit, subject: drop second/last, redundant "binding doc". The
+"dt-bindings" prefix is already stating that these are bindings.
 
-Sure.
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC. It might happen, that command when run on an older
+kernel, gives you outdated entries. Therefore please be sure you base
+your patches on recent Linux kernel.
 
-> 3) Patch 23 should have been placed before the SNP initialization, because
-> as things stand the patches (mildly) break bisectability.
+You missed at least devicetree list (maybe more), so this won't be
+tested by automated tooling. Performing review on untested code might be
+a waste of time, thus I will skip this patch entirely till you follow
+the process allowing the patch to be tested.
 
-Ok, I still haven't reached that one.
+Please kindly resend and include all necessary To/Cc entries.
 
-> Understood now.  With the patch ordering and commit message edits I
-> suggested above, indeed I would not have picked up patch 4.
+Best regards,
+Krzysztof
 
-In the future, please simply refrain from picking up x86 patches if you
-haven't gotten an explicit ACK.
-
-We could have conflicting changes in tip, we could be reworking that
-part of the code and the thing the patch touches could be completely
-gone, and so on and so on...
-
-Also, we want to have a full picture of what goes in. Exactly the same
-as how you'd like to have a full picture of what goes into kvm and how
-we don't apply kvm patches unless there's some extraordinary
-circumstance or we have received an explicit ACK.
-  
-> But with your explanation, I would even say that "4/50 needs to go
-> together with the rest" *for correctness*, not just to mean something.
-
-Yes, but for ease of integration it would be easier if they go in two
-groups - kvm and x86 bits. Not: some x86 bits first, then kvm bits
-through your tree and then some more x86 bits. That would be
-a logistical nightmare.
-
-And even if you bisect and land at 4/50 and you disable AIBRS even
-without SNP being really enabled, that is not a big deal - you're only
-bisecting and not really using that kernel and it's not like it breaks
-builds so...
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
