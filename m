@@ -1,140 +1,91 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WUbAju55"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E6F810E
-	for <linux-crypto@vger.kernel.org>; Wed, 13 Dec 2023 05:31:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702474306;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=6ZKsZXAGZPzGdkl/Bds/E/0NRdRFaaRkoaeJez+DeeI=;
-	b=WUbAju55neVpt0AUOTcWy+B33D0HS3h81dzrBJx6jThjeH8kxtwDtwk1Yjoi9Yz+VMujdH
-	V+3/fMUGNIEy+NdO5AaOTU08wvRHZmjVHJ1wwqlqA7ii8qyP9zlCIU9zhEg2QdXy4OG1cy
-	ef5xsQlqCb/gapYNAr+sAwcyY0NqxKI=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-589-BBWj8wybMUaiaz6dix4XrQ-1; Wed, 13 Dec 2023 08:31:45 -0500
-X-MC-Unique: BBWj8wybMUaiaz6dix4XrQ-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a1d0767f0b3so371435466b.2
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Dec 2023 05:31:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702474304; x=1703079104;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6ZKsZXAGZPzGdkl/Bds/E/0NRdRFaaRkoaeJez+DeeI=;
-        b=a3IPP8cVynhKmdamxsbf9hRZXZm972uccUZUgnSLjxIoMjqq3zGeRUpS9lQ3tr9AYc
-         GTqfih1b0iL3xazmiJggRwUPl8pVVzcUKNCr4PNofnXKl3E+om6yXAgVkzaIebYWweQ8
-         SD+VFAfXkX9hz1w9+EJEu5CGlVNTeP+nvglIY+3D7V/1MZIv2CPyH/mZyHtQ26sewFNj
-         DRuEJH0/xwDEf3paHcKnhfABQZ6zfOYgqqJHOMUqhkixZ6F/subP0AZAHoqutR/fUGEi
-         6iHu7thsA9yApqVjbOYW+9sJ6UgnqyUsvxPuVwyLYMFj1qC+tT4zfDLYBKHYjPtIDtJN
-         mZZA==
-X-Gm-Message-State: AOJu0YxLm6luhnhnK+lO3ikTYLDFNyl+rZSJqQS7JIaRmeWMHFhfpFUN
-	a8zLG3kbZLh6AiYYHpdQMk9d8ytmGcK/jb/kxu+YmFIUY1xUVkm+hf1O4FdLWTywZ9rPHeCaDyz
-	nt6JXM9Ky/e8E1sN2b7y5i31g
-X-Received: by 2002:a17:906:2:b0:a23:482:ee74 with SMTP id 2-20020a170906000200b00a230482ee74mr251966eja.28.1702474303959;
-        Wed, 13 Dec 2023 05:31:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFPrwg34mR9QL3IK9lbbz36ejShRG3Tw1YL7unA2WVHwsE4ZIHQYfrs0+x2kBoMmIZzjvL3FA==
-X-Received: by 2002:a17:906:2:b0:a23:482:ee74 with SMTP id 2-20020a170906000200b00a230482ee74mr251933eja.28.1702474303726;
-        Wed, 13 Dec 2023 05:31:43 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id tg10-20020a1709078dca00b00a178b965899sm7819372ejc.100.2023.12.13.05.31.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 05:31:43 -0800 (PST)
-Message-ID: <f08334c6-24b4-4451-b1e1-3834b933f2fa@redhat.com>
-Date: Wed, 13 Dec 2023 14:31:37 +0100
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="k3ZzSSDZ"
+Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0981010C;
+	Wed, 13 Dec 2023 05:37:20 -0800 (PST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4A62C40E00CB;
+	Wed, 13 Dec 2023 13:37:17 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id p0U30yDLCYky; Wed, 13 Dec 2023 13:37:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1702474635; bh=YsH4/BEojnoqKhDSs/A5b/HEN4SIud9JxkU6bHGIETQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k3ZzSSDZFMpQnaGW9BcncZOs/yVlI6yaQuxN6E4vcYoNlELe7nKhzl5Ik0qVn3oCj
+	 j668Gcp+/P66Y/urrTJ/vDsLk9/u6n0FhhoHumDxwbG6N4kzmUxOYTDWxC6/YZ5kwB
+	 P2RvyUbZAsO9a2zbTdYt/KEi46RNH17BK36Co1IQx9rA+FmaoEAwEs1YRgnUvX6QOH
+	 nwmAuHRJ7f7lFi0bF1U52LiE2eaebb6Euoue6vucw+tjUql0v+bw4niwzaqnyJSzrm
+	 oPSXD2Sf5804v4D77oHC+2hj2afMmDhzZcmCBap/0qpDNXkWSeZXPEozTQT7i3DFmy
+	 NK1B3CIlO7Mur7agPdg7Cv5V5bYdtCkeOyVunRvDENHpzfqXPztmJASQTJko8b3MWs
+	 2pVgAX2EDaCFdMS2yokm6/WC4MaLq34kZHykWEN9B+aNOhe2bBQ68ROFc21zpCATjq
+	 Z6izNFCptB7hsGt5LHhLKuYrSpX3KSWtf/S1Ge7HqcvVBElo+FVS4SI2kbg7Ku6yS+
+	 +BGSHFFPGfNLsa6Izyhk8ONszw2sMQAzHgctgg1JqPdFFDJJ+zcEm37XpBVmK5W66f
+	 MRjOacIFonlsxm3SyICQvheBm5bJfg+y2x7srt0/+ep3HXHJ649sQOVzVCEUe35hmt
+	 p2C8L6CILEGJSIBky90kQ8fs=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8F45140E0030;
+	Wed, 13 Dec 2023 13:36:33 +0000 (UTC)
+Date: Wed, 13 Dec 2023 14:36:28 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, seanjc@google.com, vkuznets@redhat.com,
+	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+	dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+	alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
+	nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
+	liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>,
+	Jarkko Sakkinen <jarkko@profian.com>
+Subject: Re: [PATCH v10 04/50] x86/cpufeatures: Add SEV-SNP CPU feature
+Message-ID: <20231213133628.GEZXmzXFwA1p+crH/5@fat_crate.local>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-5-michael.roth@amd.com>
+ <0b2eb374-356c-46c6-9c4a-9512fbfece7a@redhat.com>
+ <20231213131324.GDZXmt9LsMmJZyzCJw@fat_crate.local>
+ <40915dc3-4083-4b9f-bc64-7542833566e1@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 23/50] KVM: SEV: Make AVIC backing, VMSA and VMCB
- memory allocation SNP safe
-Content-Language: en-US
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com,
- vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
- vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
- tony.luck@intel.com, marcorr@google.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
- pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
- Brijesh Singh <brijesh.singh@amd.com>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-24-michael.roth@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20231016132819.1002933-24-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <40915dc3-4083-4b9f-bc64-7542833566e1@redhat.com>
 
-On 10/16/23 15:27, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> Implement a workaround for an SNP erratum where the CPU will incorrectly
-> signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
-> RMP entry of a VMCB, VMSA or AVIC backing page.
-> 
-> When SEV-SNP is globally enabled, the CPU marks the VMCB, VMSA, and AVIC
-> backing pages as "in-use" via a reserved bit in the corresponding RMP
-> entry after a successful VMRUN. This is done for _all_ VMs, not just
-> SNP-Active VMs.
-> 
-> If the hypervisor accesses an in-use page through a writable
-> translation, the CPU will throw an RMP violation #PF. On early SNP
-> hardware, if an in-use page is 2mb aligned and software accesses any
-> part of the associated 2mb region with a hupage, the CPU will
-> incorrectly treat the entire 2mb region as in-use and signal a spurious
-> RMP violation #PF.
+On Wed, Dec 13, 2023 at 02:31:05PM +0100, Paolo Bonzini wrote:
+> Sure, I only queued it because you gave Acked-by for 05/50 and this is an
+> obvious dependency.  I would like to get things in as they are ready
+> (whenever it makes sense), so if you want to include those two in the x86
+> tree for 6.8, that would work for me.
 
-I don't understand if this can happen even if SEV-SNP is not in use, 
-just because it is supported on the host?  If so, should this be Cc'd to 
-stable?  (I can tweak the wording and submit it).
+It doesn't make sense to include them into 6.8 because the two alone are
+simply dead code in 6.8.
 
-Paolo
+The plan is to put the x86 patches first in the next submission, I'll
+pick them up for 6.9 and then give you an immutable branch to apply the
+KVM bits ontop. This way it all goes together.
 
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
