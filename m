@@ -1,51 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAbtQHOv"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B5E4D5
-	for <linux-crypto@vger.kernel.org>; Wed, 13 Dec 2023 09:35:46 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K77hnSQA"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41AFA100
+	for <linux-crypto@vger.kernel.org>; Wed, 13 Dec 2023 09:40:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702488945;
+	s=mimecast20190719; t=1702489256;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ZI5vco6PWgJtc3JoTVRWQROHjU+p2avOcErV9v922iw=;
-	b=KAbtQHOvL7VHny3fCsFUhi8bM+1UUN/pJHLFF3AH2Y/aQaN/H7X1oM/Y7m8qEWdxild3HW
-	zsBADTzc3T4y+CHQYEX7DJu3U2RSYLVN1VMKIrq9bQ14vY4bPfHtDLa0hGo3t7u2q/w3gm
-	Sdfj2cnXHAZc++te/rHQ3q6ezUtFI2k=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=5somQ2S3bpJ+yVpaee1GysURi5+Ex675PUxdDG+ZeIQ=;
+	b=K77hnSQANZKQkDC2j+kRNN7PRid2l7MdRvsrXlg+bpcwJia7y9axkWkb7uN+01bFzw1yhA
+	iP1cNUCiDh0p0eM9btZ6yBbMjhGKlCv7XjUyADrdSV+kXrwVoWIf9fI3fhooVXaIMmYUXB
+	BRkazJVrlYU/3neUi56kb0QNzuJpAqc=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-310-7jeBBPbrPcK23Y_GRhDulA-1; Wed, 13 Dec 2023 12:35:43 -0500
-X-MC-Unique: 7jeBBPbrPcK23Y_GRhDulA-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-50c1e669bf2so6440965e87.1
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Dec 2023 09:35:43 -0800 (PST)
+ us-mta-663-pPlYLDREM1uD7ehVopY8yw-1; Wed, 13 Dec 2023 12:40:54 -0500
+X-MC-Unique: pPlYLDREM1uD7ehVopY8yw-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-54cb8899c20so3350412a12.3
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Dec 2023 09:40:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702488942; x=1703093742;
+        d=1e100.net; s=20230601; t=1702489252; x=1703094052;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZI5vco6PWgJtc3JoTVRWQROHjU+p2avOcErV9v922iw=;
-        b=VtW1U4Wl7a4Ca4t9sg3d2765py6VTK3b4hUvsIEX0RUqf+SUS8Jecsn9ieiPEwSPuB
-         WsM7kL3k6glst5A9U2YJgf1iqfhyLIQ7rBRg0+4gs0iCQOHSC7TlcR899JK4ax6Z7SiR
-         dy/eawuzKuvCO3uhcNN0RK2kaZKRsqMYbZEGFAmVGYsS10AhCsQ83EuwbzWYNkbOy04t
-         0GJpywYRHq3UOXIDuyeZE3MfknVULHuvPrbojgBmSrtgzUolbiY+uqC02LxCcCQkuzs5
-         Cr6Ad0tcPeWbQczbUgVTzJQ16pMmcdQ3IRc330c/5xDFbrDfi+DOFssfoPTUNsJtRpgJ
-         yTHQ==
-X-Gm-Message-State: AOJu0Yw+0rAaKvPZPQxidXHQslZv3lPrLh4A+uF1xRkOL26N7AzlL7GC
-	EBKfAL/IsWgDRj3YWuqN04E732ESztU5O0gFNRh6breq3eNeYbvQtu4AeBip746n9i3x4m2GPt3
-	LxpJcIMJbBqOL9qmsUT8glxOa
-X-Received: by 2002:a05:6512:2385:b0:50b:f509:a2d3 with SMTP id c5-20020a056512238500b0050bf509a2d3mr5654287lfv.43.1702488942411;
-        Wed, 13 Dec 2023 09:35:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGfk8baDYcfEvOfdRyazgNm5STYlR8fJYNeGgxe6yeh3SUZzGnCwld8+CCbn45sJYfQ28B4Ew==
-X-Received: by 2002:a05:6512:2385:b0:50b:f509:a2d3 with SMTP id c5-20020a056512238500b0050bf509a2d3mr5654258lfv.43.1702488942051;
-        Wed, 13 Dec 2023 09:35:42 -0800 (PST)
+        bh=5somQ2S3bpJ+yVpaee1GysURi5+Ex675PUxdDG+ZeIQ=;
+        b=JX0mrSlaSruk49/yPKljSYmhH2G/xgiLCqDteI/GcdpoGpX5sgeH2AIiF6RDgBIa55
+         cTfnb4YxG3dxkbFCsZ7L28Xhyuzu64Pqgg4kFZFN0Zifbasxxbwj2xtqC+LVBKNdu+wt
+         +45oHjK6afCOoh53uaJQy/lI5bC1GNM2lvXUMwwPSMB1ApwWhxCvTG6D9trofOm4TwLn
+         pDzD24UhBY1Dd0XEKzgrKjpi+DNcrLaJswVi0WMfUpbvRylZ2dmjoRehFQ3aroOxQtxv
+         g62X7RIpJTz688wZiOZFbcnh75oncK8rfzPXkSBYQOdk2wmPMfp6jWlIbRN04BYZCxPK
+         56dg==
+X-Gm-Message-State: AOJu0Ywe2OMMR6remJXs4ZJ2fnHb259MG64xxvVgicemt0u72IUHyoHY
+	3Za3hjDiWgzpOOVAz0rL8QJRUSogXEzPxYle13ynzpRInQag9LkN233Wa4qhJeavw3l6swwhmBs
+	AAMQSqh9WT4vHbPYcP0z2bANc
+X-Received: by 2002:a50:d089:0:b0:552:27d2:a10d with SMTP id v9-20020a50d089000000b0055227d2a10dmr704234edd.12.1702489252473;
+        Wed, 13 Dec 2023 09:40:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEJkEAJ6CTdBfyQKvtHpMnagmfVq2yCVoMPjKxPagyIMlry/rmA+m2NFU3o+SUgvBr7eRY7SA==
+X-Received: by 2002:a50:d089:0:b0:552:27d2:a10d with SMTP id v9-20020a50d089000000b0055227d2a10dmr704204edd.12.1702489252175;
+        Wed, 13 Dec 2023 09:40:52 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id vs4-20020a170907a58400b00a22fb8901c4sm1312645ejc.12.2023.12.13.09.35.38
+        by smtp.googlemail.com with ESMTPSA id dc23-20020a056402311700b005525a9abf73sm171094edb.11.2023.12.13.09.40.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 09:35:41 -0800 (PST)
-Message-ID: <e4b8326b-5b7b-4004-b0e1-b60e63bdcdd1@redhat.com>
-Date: Wed, 13 Dec 2023 18:35:35 +0100
+        Wed, 13 Dec 2023 09:40:51 -0800 (PST)
+Message-ID: <13d72960-c7bc-4bc2-8404-931d3de04ecf@redhat.com>
+Date: Wed, 13 Dec 2023 18:40:47 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,33 +53,29 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 04/50] x86/cpufeatures: Add SEV-SNP CPU feature
+Subject: Re: [PATCH v10 03/50] KVM: SEV: Do not intercept accesses to
+ MSR_IA32_XSS for SEV-ES guests
 Content-Language: en-US
-To: Borislav Petkov <bp@alien8.de>, Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+To: Sean Christopherson <seanjc@google.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, linux-mm@kvack.org,
  linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
  tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
  vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
  dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
  peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
- kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
- marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
- zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>,
- Jarkko Sakkinen <jarkko@profian.com>
+ rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+ vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+ tony.luck@intel.com, marcorr@google.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+ Alexey Kardashevskiy <aik@amd.com>
 References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-5-michael.roth@amd.com>
- <0b2eb374-356c-46c6-9c4a-9512fbfece7a@redhat.com>
- <20231213131324.GDZXmt9LsMmJZyzCJw@fat_crate.local>
- <40915dc3-4083-4b9f-bc64-7542833566e1@redhat.com>
- <20231213133628.GEZXmzXFwA1p+crH/5@fat_crate.local>
- <9ac2311c-9ccc-4468-9b26-6cb0872e207f@redhat.com>
- <20231213134945.GFZXm2eTkd+IfdsjVE@fat_crate.local>
- <b4aab361-4494-4a4b-b180-d7df05fd3d5b@redhat.com>
- <20231213154107.GGZXnQkxEuw6dJfbc7@fat_crate.local>
+ <20231016132819.1002933-4-michael.roth@amd.com>
+ <e094dc8b-6758-4dd8-89a5-8aab05b2626b@redhat.com>
+ <ZXnqJMKD6lO6a0oq@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -116,48 +112,22 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20231213154107.GGZXnQkxEuw6dJfbc7@fat_crate.local>
+In-Reply-To: <ZXnqJMKD6lO6a0oq@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/13/23 16:41, Borislav Petkov wrote:
-> On Wed, Dec 13, 2023 at 03:18:17PM +0100, Paolo Bonzini wrote:
->> Surely we can agree that cpu_feature_enabled(X86_FEATURE_SEV_SNP) has nothing
->> to do with SEV-SNP host patches being present?
+On 12/13/23 18:30, Sean Christopherson wrote:
+>> For now, all we can do is document our wishes, with which userspace had
+>> better comply.  Please send a patch to QEMU that makes it obey.
+> Discussed this early today with Paolo at PUCK and pointed out that (a) the CPU
+> context switches the underlying state, (b) SVM doesn't allow intercepting*just*
+> XSAVES, and (c) SNP's AP creation can bypass XSS interception.
 > 
-> It does - we're sanitizing the meaning of a CPUID flag present in
-> /proc/cpuinfo, see here:
-> 
-> https://git.kernel.org/tip/79c603ee43b2674fba0257803bab265147821955
->
->> And that therefore retpolines are preferred even without any SEV-SNP
->> support in KVM?
-> 
-> No, automatic IBRS should be disabled when SNP is enabled. Not CPUID
-> present - enabled.
+> So while we all (all == KVM folks) agree that this is rather terrifying, e.g.
+> gives KVM zero option if there is a hardware issue, it's "fine" to let the guest
+> use XSAVES/XSS.
 
-Ok, so the root cause of the problem is commit message/patch ordering:
-
-1) patch 4 should have unconditionally cleared the feature (until the 
-initialization code comes around in patch 6); and it should have 
-mentioned in the commit message that we don't want X86_FEATURE_SEV_SNP 
-to be set, unless SNP can be enabled via MSR_AMD64_SYSCFG.
-
-2) possibly, the commit message of patch 5 could have said something 
-like "at this point in the kernel SNP is never enabled".
-
-3) Patch 23 should have been placed before the SNP initialization, 
-because as things stand the patches (mildly) break bisectability.
-
-> We clear that bit on a couple of occasions in the SNP
-> host patchset if we determine that SNP host support is not possible so
-> 4/50 needs to go together with the rest to mean something.
-
-Understood now.  With the patch ordering and commit message edits I 
-suggested above, indeed I would not have picked up patch 4.
-
-But with your explanation, I would even say that "4/50 needs to go 
-together with the rest" *for correctness*, not just to mean something.
+Indeed; looks like I've got to queue this for 6.7 after all.
 
 Paolo
 
