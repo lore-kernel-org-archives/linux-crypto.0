@@ -1,51 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ShWvZYHJ"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AC423275
-	for <linux-crypto@vger.kernel.org>; Wed, 13 Dec 2023 04:52:13 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EuoUGr9P"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4AB10A
+	for <linux-crypto@vger.kernel.org>; Wed, 13 Dec 2023 05:00:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702471932;
+	s=mimecast20190719; t=1702472406;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=bJEv3Wgqf4ketU6WFDuIdEXMdIFFad1fKIX/8Z1IzcQ=;
-	b=ShWvZYHJt5nbLQ8EQ4GMouNLTnK5Dv6hh7eeyxJQ1cQ7vZxfbu7O73sze4GUFKxxc5nJBO
-	a/dqYrB/IHzKqvagZt67WAdxRZtWmtXKhztShC98vQuz+7ITH6Q9iWOLnfRL6BKM3D1zUZ
-	HUC5wh0XxfzYOdQza1HLpeX4ZlGZAK0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=/HKVzQBbabQNbbp244Nm1fQjMKsvbXnOSOSucUClLDQ=;
+	b=EuoUGr9PXYjpT3FHixVfzyZWgIx0p/A26XTAzqnMHvtPVAAyGpf2rOLl8pzc/OH4nzzMNr
+	OqB9zFYOE3POQAoqxFhgvb4NOjw0X0wcw+1XwTr5i1aPHmCr16cGLQu8mt7BIn8WREgcmq
+	SJu4/kJpk14fw0SMhOKnxLO2NUvCPfo=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-439-Lkz0hosUMoCrWqdQ3Oep7g-1; Wed, 13 Dec 2023 07:52:11 -0500
-X-MC-Unique: Lkz0hosUMoCrWqdQ3Oep7g-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33641bbc49dso213086f8f.0
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Dec 2023 04:52:11 -0800 (PST)
+ us-mta-128-xZikh4hZOQKlRBgBN-n72Q-1; Wed, 13 Dec 2023 08:00:04 -0500
+X-MC-Unique: xZikh4hZOQKlRBgBN-n72Q-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40c2c568108so44778885e9.1
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Dec 2023 05:00:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702471930; x=1703076730;
+        d=1e100.net; s=20230601; t=1702472099; x=1703076899;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bJEv3Wgqf4ketU6WFDuIdEXMdIFFad1fKIX/8Z1IzcQ=;
-        b=FEPQ1irVOg6uSGNx/YhItLo2Sd+BccUO0fx/qEl1fmwa7EGi50w7QAnnhFujbehXtH
-         yN9pSO9u+lylTEJbHgzoYndP0tGlWYKjsjmbh/EAzBTnzS/bFoRC0oAF0YKiWX5c4bRw
-         8p5Uj5gN6+Q6QlQUeZZStda+aq7ybjg7+WFax1NgwqeRHb157HHQ5iFGfyXgj8yH97EQ
-         8Hwko6SF9SBg60T8CfFxK1LtEFEQaf2PI+SZUomjkUziWCTDn4s4kbMRHvb4bYG5jkwe
-         uvaJVtf40VXNkdUeFCDbTh7KVwY6GlS2Z1o1KOI275lC5W8vqFMpCq/Yj8pZIhyeXdZY
-         bHnA==
-X-Gm-Message-State: AOJu0YxPLe+FKKnqbpodxaOyuhhPqvXqUgy8t/gah3iTwGNwopYejxj6
-	rJpl81imxquUPci4U2KySTTKmcLg1ENS7R5fNsHJ41THAvcsNeNg4xJ/ccSMxQEBUtQPD2NFVtm
-	UEE0VzB2xHzPi6GmGJBayteXd
-X-Received: by 2002:adf:fd46:0:b0:336:975:1832 with SMTP id h6-20020adffd46000000b0033609751832mr4108916wrs.9.1702471930065;
-        Wed, 13 Dec 2023 04:52:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHsiuI3U3USlVbrEOowWazssqrIJRsCiZR7plKklR2Gi3O2ESNv8XGdBBceH98jEgWRta30fA==
-X-Received: by 2002:adf:fd46:0:b0:336:975:1832 with SMTP id h6-20020adffd46000000b0033609751832mr4108893wrs.9.1702471929744;
-        Wed, 13 Dec 2023 04:52:09 -0800 (PST)
+        bh=/HKVzQBbabQNbbp244Nm1fQjMKsvbXnOSOSucUClLDQ=;
+        b=cLwRW1t22KK0Sgjjep8ymkGR6Z8Vka0BClE0ZhgTF4BbQtJgLXBosANUuLLQgDK5HA
+         w8sHFP34veqzC80cSGPj1vdUTseETkC1PPQRKAA4qnUn8jjP0YLZM+z4GlFiwvY114WC
+         s5POayezFq7sMEjV6VN6Y8OrwOaU+bJ8u/QZ3T8/J3ySx94BVugdfU3KkfYE8zAW3gby
+         YHakM3DTQu1aqoeLzUA4JHud4CqNKRIIg1352HdsqUgReQAAd7iMZW27YC58gSCGIr7u
+         H0Cog6h1xoPoznHQTI1laD0Jw8mlGFzqPttIt2pk2eWco1njEseUUckGTnkykDtzf3Ue
+         kn7A==
+X-Gm-Message-State: AOJu0YxVLwe2d4qaQBzI1aqKe01nYHLmc5u9qXVjxlT75v2NYDYKJME+
+	r3QS7HqEWZPrEz73NGmlXRn88yZTiTFmw5OPTL1rFvjUo/Ox1BfjcExvcgLG538GeQhoNfvJ5zw
+	vId3KhVfZ5Ytgz3sTtk/Uopky
+X-Received: by 2002:a7b:c4d0:0:b0:40b:5e59:c57d with SMTP id g16-20020a7bc4d0000000b0040b5e59c57dmr4246939wmk.167.1702472099272;
+        Wed, 13 Dec 2023 04:54:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGQdiNlTSwr6VEc30+stkcWNjNy2tdKfNK5uWlFIpXTCn5UuzxjNo55fy45igptj58QEhafeg==
+X-Received: by 2002:a7b:c4d0:0:b0:40b:5e59:c57d with SMTP id g16-20020a7bc4d0000000b0040b5e59c57dmr4246915wmk.167.1702472098919;
+        Wed, 13 Dec 2023 04:54:58 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id h3-20020a5d4303000000b0033629538fa2sm4664964wrq.18.2023.12.13.04.52.07
+        by smtp.googlemail.com with ESMTPSA id f9-20020a05600c154900b0040c4be1af17sm8858371wmg.21.2023.12.13.04.54.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 04:52:09 -0800 (PST)
-Message-ID: <addcbff6-5db9-446a-a0a2-78f3be7f33db@redhat.com>
-Date: Wed, 13 Dec 2023 13:52:07 +0100
+        Wed, 13 Dec 2023 04:54:58 -0800 (PST)
+Message-ID: <cc97bfdf-ac46-4616-be68-d251304f81af@redhat.com>
+Date: Wed, 13 Dec 2023 13:54:55 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,8 +53,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 05/50] x86/speculation: Do not enable Automatic IBRS
- if SEV SNP is enabled
+Subject: Re: [PATCH v10 20/50] KVM: SEV: Select CONFIG_KVM_SW_PROTECTED_VM
+ when CONFIG_KVM_AMD_SEV=y
 Content-Language: en-US
 To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
 Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -69,10 +69,9 @@ Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  tony.luck@intel.com, marcorr@google.com,
  sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
  jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
- pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
- Kim Phillips <kim.phillips@amd.com>
+ pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com
 References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-6-michael.roth@amd.com>
+ <20231016132819.1002933-21-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -109,50 +108,19 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20231016132819.1002933-6-michael.roth@amd.com>
+In-Reply-To: <20231016132819.1002933-21-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 10/16/23 15:27, Michael Roth wrote:
-> From: Kim Phillips <kim.phillips@amd.com>
+> SEV-SNP relies on the restricted/protected memory support to run guests,
+> so make sure to enable that support with the
+> CONFIG_KVM_SW_PROTECTED_VM build option.
 > 
-> Without SEV-SNP, Automatic IBRS protects only the kernel. But when
-> SEV-SNP is enabled, the Automatic IBRS protection umbrella widens to all
-> host-side code, including userspace. This protection comes at a cost:
-> reduced userspace indirect branch performance.
-> 
-> To avoid this performance loss, don't use Automatic IBRS on SEV-SNP
-> hosts. Fall back to retpolines instead.
-> 
-> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
-> [mdr: squash in changes from review discussion]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Michael Roth<michael.roth@amd.com>
+> ---
 
-Queued, thanks.
+Why select KVM_SW_PROTECTED_VM and not KVM_GENERIC_PRIVATE_MEM?
 
 Paolo
-
-> ---
->   arch/x86/kernel/cpu/common.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-> index 382d4e6b848d..11fae89b799e 100644
-> --- a/arch/x86/kernel/cpu/common.c
-> +++ b/arch/x86/kernel/cpu/common.c
-> @@ -1357,8 +1357,13 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
->   	/*
->   	 * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Intel feature
->   	 * flag and protect from vendor-specific bugs via the whitelist.
-> +	 *
-> +	 * Don't use AutoIBRS when SNP is enabled because it degrades host
-> +	 * userspace indirect branch performance.
->   	 */
-> -	if ((ia32_cap & ARCH_CAP_IBRS_ALL) || cpu_has(c, X86_FEATURE_AUTOIBRS)) {
-> +	if ((ia32_cap & ARCH_CAP_IBRS_ALL) ||
-> +	    (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
-> +	     !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
->   		setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
->   		if (!cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB) &&
->   		    !(ia32_cap & ARCH_CAP_PBRSB_NO))
 
