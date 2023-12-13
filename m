@@ -1,24 +1,24 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0B368294;
-	Wed, 13 Dec 2023 19:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F2A6829A;
+	Wed, 13 Dec 2023 19:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZsEo5Sp7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1AFFC433C7;
-	Wed, 13 Dec 2023 19:45:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VMybQw20"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A929AC433C7;
+	Wed, 13 Dec 2023 19:53:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702496757;
-	bh=LCOdYRs5R4tvsOXPbfJEsT4SC6tw2i2Req1AFV8+nfo=;
+	s=k20201202; t=1702497239;
+	bh=dcjUy2QND46YM2W9IosA0LzvC8ULdjGPyZnZLP6Ia3I=;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=ZsEo5Sp798SnM5NQOL1Otg3q8xK5/VNNKc6gmnZL11jxHv9Zku6SkIc9o9L6ntGwo
-	 yt/pFaWkPX3eHh8e5cExq4+xlzR4Pou3PA2Iz/SgJP6cU3FaCGdpjOWzN7deDXh8Ea
-	 1N0c66FptMQeX24d87woIATBN8Jno7wf1Qoq0LTu7IVz32U6EzgMzSC+HzXvp2dSJw
-	 tgkG1x0DIwjJRKfoQ4oB1+kk05GCan6okgWr/ycvtLUfkaXb0bv92S8xYK7AYWxF1G
-	 VcEkBqdFjIjloxLe8EAJ1/SShz0Yg7KTbu/bl//YyoxyYxXGIxuwymQ8dJX8o9nf75
-	 7VCgPgnDSUgNg==
-Message-ID: <cffa9a73-802a-4453-826e-9870ee2e735d@kernel.org>
-Date: Wed, 13 Dec 2023 20:45:51 +0100
+	b=VMybQw20CoC5U8K+WyP5dgGTjp4Bl0IOQeA6Srubt/Kpgugo/8IwNYBD3Sigla1gj
+	 XaVzHYKbDNnpr5AHt1yeu70EHuOeQMW81wGzjmhy4INjCkG5mLpf6PD0+H89bPQV3B
+	 nPGmzsn84GT1eyIY3uNzKYgN0s13je2jVb5xNvXXoxi6Q2pxxFCCGO0fpNgREdOb3Y
+	 +3YcuOHHahFofUriI3VTMo1muq+Wvny0oUOapUfcQK1mucO3cwP/5yYciLvxjgbYnI
+	 EG+L9nx+wzwDn43j9Me34XpBY21CY4HzDz7v2aqAhb9qd4Hj+NQxY18ydU+owmXfk/
+	 5goU8DheuihiA==
+Message-ID: <52340f6e-e253-4eef-b395-2805aeac65a9@kernel.org>
+Date: Wed, 13 Dec 2023 20:53:52 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -26,14 +26,14 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] dt-bindings: crypto: Add Tegra SE DT binding doc
+Subject: Re: [PATCH 3/5] crypto: tegra: Add Tegra Security Engine driver
 Content-Language: en-US
 To: Akhil R <akhilrajeev@nvidia.com>, herbert@gondor.apana.org.au,
  davem@davemloft.net, linux-crypto@vger.kernel.org,
  linux-kernel@vger.kernel.org, thierry.reding@gmail.com,
  jonathanh@nvidia.com, linux-tegra@vger.kernel.org
 References: <20231213122030.11734-1-akhilrajeev@nvidia.com>
- <20231213122030.11734-2-akhilrajeev@nvidia.com>
+ <20231213122030.11734-4-akhilrajeev@nvidia.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -78,35 +78,345 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20231213122030.11734-2-akhilrajeev@nvidia.com>
+In-Reply-To: <20231213122030.11734-4-akhilrajeev@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 13/12/2023 13:20, Akhil R wrote:
-> Add DT binding document for Tegra Security Engine.
-> The AES and HASH algorithms are handled independently by separate
-> engines within the Security Engine. These engines are registered
-> as two separate crypto engine drivers.
+> Add support for Tegra Security Engine which can accelerates various
+> crypto algorithms. The Engine has two separate instances within for
+> AES and HASH algorithms respectively.
+> 
+> The driver registers two crypto engines - one for AES and another for
+> HASH algorithms and these operate independently and both uses the host1x
+> bus. Additionally, it provides  hardware-assisted key protection for up
+> to 15 symmetric keys which it can use for the cipher operations.
 > 
 > Signed-off-by: Akhil R <akhilrajeev@nvidia.com>
 > ---
 
-NAK, not tested.
+...
 
-A nit, subject: drop second/last, redundant "binding doc". The
-"dt-bindings" prefix is already stating that these are bindings.
+> +
+> +int tegra_init_hash(struct tegra_se *se)
+> +{
+> +	struct ahash_engine_alg *alg;
+> +	int i, ret;
+> +
+> +	se->manifest = tegra_hash_kac_manifest;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(tegra_hash_algs); i++) {
+> +		tegra_hash_algs[i].se_dev = se;
+> +		alg = &tegra_hash_algs[i].alg.ahash;
+> +
+> +		ret = crypto_engine_register_ahash(alg);
+> +		if (ret) {
+> +			dev_err(se->dev, "failed to register %s\n",
+> +				alg->base.halg.base.cra_name);
+> +			goto sha_err;
+> +		}
+> +	}
+> +
+> +	dev_info(se->dev, "registered HASH algorithms\n");
 
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC. It might happen, that command when run on an older
-kernel, gives you outdated entries. Therefore please be sure you base
-your patches on recent Linux kernel.
+Drop, not needed. Actually drop simple success messages. Drivers do not
+spam dmesg without need.
 
-You missed at least devicetree list (maybe more), so this won't be
-tested by automated tooling. Performing review on untested code might be
-a waste of time, thus I will skip this patch entirely till you follow
-the process allowing the patch to be tested.
+...
 
-Please kindly resend and include all necessary To/Cc entries.
+> +
+> +int tegra_se_host1x_register(struct tegra_se *se)
+> +{
+> +	INIT_LIST_HEAD(&se->client.list);
+> +	se->client.dev = se->dev;
+> +	se->client.ops = &tegra_se_client_ops;
+> +	se->client.class = se->hw->host1x_class;
+> +	se->client.num_syncpts = 1;
+> +
+> +	host1x_client_register(&se->client);
+> +
+> +	return 0;
+> +}
+> +
+> +static int tegra_se_clk_init(struct tegra_se *se)
+> +{
+> +	int i, ret;
+> +
+> +	se->clk = devm_clk_get(se->dev, NULL);
+> +	if (IS_ERR(se->clk)) {
+> +		dev_err(se->dev, "failed to get clock\n");
+
+Why do you print failures multiple times? Once here, second in probe.
+
+return dev_err_probe
+
+> +		return PTR_ERR(se->clk);
+> +	}
+> +
+> +	ret = clk_set_rate(se->clk, ULONG_MAX);
+> +	if (ret) {
+> +		dev_err(se->dev, "failed to set %d clock rate", i);
+
+Same comments
+
+> +		return ret;
+> +	}
+> +
+> +	ret = clk_prepare_enable(se->clk);
+> +	if (ret) {
+> +		dev_err(se->dev, "failed to enable clocks\n");
+
+Same comments
+
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void tegra_se_clk_deinit(struct tegra_se *se)
+> +{
+> +	clk_disable_unprepare(se->clk);
+
+Why aren't you using devm_clk_get_enabled? This looks like porting some
+old, out-of-tree vendor crappy driver :(
+
+> +}
+> +
+> +static int tegra_se_probe(struct platform_device *pdev)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct tegra_se *se;
+> +	int ret;
+> +
+> +	se = devm_kzalloc(dev, sizeof(*se), GFP_KERNEL);
+> +	if (!se)
+> +		return -ENOMEM;
+> +
+> +	se->dev = dev;
+> +	se->owner = TEGRA_GPSE_ID;
+> +	se->hw = device_get_match_data(&pdev->dev);
+> +
+> +	se->base = devm_platform_ioremap_resource(pdev, 0);
+> +	if (IS_ERR(se->base))
+> +		return PTR_ERR(se->base);
+> +
+> +	dma_set_mask_and_coherent(dev, DMA_BIT_MASK(39));
+> +	platform_set_drvdata(pdev, se);
+> +
+> +	ret = tegra_se_clk_init(se);
+> +	if (ret) {
+> +		dev_err(dev, "failed to init clocks\n");
+
+Syntax is:
+return dev_err_probe
+
+> +		return ret;
+> +	}
+> +
+> +	if (!tegra_dev_iommu_get_stream_id(dev, &se->stream_id)) {
+> +		dev_err(dev, "failed to get IOMMU stream ID\n");
+
+dev_err_probe
+
+> +		goto clk_deinit;
+> +	}
+> +
+> +	se_writel(se, se->stream_id, SE_STREAM_ID);
+> +
+> +	se->engine = crypto_engine_alloc_init(dev, 0);
+> +	if (!se->engine) {
+> +		dev_err(dev, "failed to init crypto engine\n");
+
+Really? Test your code with coccinelle. Drop.
+
+> +		ret = -ENOMEM;
+> +		goto iommu_free;
+> +	}
+> +
+> +	ret = crypto_engine_start(se->engine);
+> +	if (ret) {
+> +		dev_err(dev, "failed to start crypto engine\n");
+
+dev_err_probe
+
+> +		goto engine_exit;
+> +	}
+> +
+> +	ret = tegra_se_host1x_register(se);
+> +	if (ret) {
+> +		dev_err(dev, "failed to init host1x params\n");
+
+dev_err_probe
+
+> +		goto engine_stop;
+> +	}
+> +
+> +	return 0;
+> +
+> +engine_stop:
+> +	crypto_engine_stop(se->engine);
+> +engine_exit:
+> +	crypto_engine_exit(se->engine);
+> +iommu_free:
+> +	iommu_fwspec_free(se->dev);
+> +clk_deinit:
+> +	tegra_se_clk_deinit(se);
+> +
+> +	return ret;
+> +}
+> +
+> +static int tegra_se_remove(struct platform_device *pdev)
+> +{
+> +	struct tegra_se *se = platform_get_drvdata(pdev);
+> +
+> +	crypto_engine_stop(se->engine);
+> +	crypto_engine_exit(se->engine);
+> +	iommu_fwspec_free(se->dev);
+> +	host1x_client_unregister(&se->client);
+> +	tegra_se_clk_deinit(se);
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct tegra_se_regs tegra234_aes1_regs = {
+> +	.config = SE_AES1_CFG,
+> +	.op = SE_AES1_OPERATION,
+> +	.last_blk = SE_AES1_LAST_BLOCK,
+> +	.linear_ctr = SE_AES1_LINEAR_CTR,
+> +	.aad_len = SE_AES1_AAD_LEN,
+> +	.cryp_msg_len = SE_AES1_CRYPTO_MSG_LEN,
+> +	.manifest = SE_AES1_KEYMANIFEST,
+> +	.key_addr = SE_AES1_KEY_ADDR,
+> +	.key_data = SE_AES1_KEY_DATA,
+> +	.key_dst = SE_AES1_KEY_DST,
+> +	.result = SE_AES1_CMAC_RESULT,
+> +};
+> +
+> +static const struct tegra_se_regs tegra234_hash_regs = {
+> +	.config = SE_SHA_CFG,
+> +	.op = SE_SHA_OPERATION,
+> +	.manifest = SE_SHA_KEYMANIFEST,
+> +	.key_addr = SE_SHA_KEY_ADDR,
+> +	.key_data = SE_SHA_KEY_DATA,
+> +	.key_dst = SE_SHA_KEY_DST,
+> +	.result = SE_SHA_HASH_RESULT,
+> +};
+> +
+> +static const struct tegra_se_hw tegra234_aes_hw = {
+> +	.regs = &tegra234_aes1_regs,
+> +	.kac_ver = 1,
+> +	.host1x_class = 0x3b,
+> +	.init_alg = tegra_init_aes,
+> +	.deinit_alg = tegra_deinit_aes,
+> +};
+> +
+> +static const struct tegra_se_hw tegra234_hash_hw = {
+> +	.regs = &tegra234_hash_regs,
+> +	.kac_ver = 1,
+> +	.host1x_class = 0x3d,
+> +	.init_alg = tegra_init_hash,
+> +	.deinit_alg = tegra_deinit_hash,
+> +};
+> +
+> +static const struct of_device_id tegra_se_of_match[] = {
+> +	{
+> +		.compatible = "nvidia,tegra234-se2-aes",
+> +		.data = &tegra234_aes_hw
+> +	}, {
+> +		.compatible = "nvidia,tegra234-se4-hash",
+> +		.data = &tegra234_hash_hw,
+> +	},
+> +	{ },
+> +};
+> +MODULE_DEVICE_TABLE(of, tegra_se_of_match);
+> +
+> +static struct platform_driver tegra_se_driver = {
+> +	.driver = {
+> +		.name	= "tegra-se",
+> +		.of_match_table = tegra_se_of_match,
+> +	},
+> +	.probe		= tegra_se_probe,
+> +	.remove		= tegra_se_remove,
+> +};
+> +
+> +static int tegra_se_host1x_probe(struct host1x_device *dev)
+> +{
+> +	return host1x_device_init(dev);
+> +}
+> +
+> +static int tegra_se_host1x_remove(struct host1x_device *dev)
+> +{
+> +	host1x_device_exit(dev);
+> +
+> +	return 0;
+> +}
+> +
+
+
+...
+
+> +		return -EINVAL;
+> +}
+> +
+> +/* Functions */
+> +int tegra_init_aead(struct tegra_se *se);
+
+I look for it and cannot find it... Drop.
+
+> +int tegra_init_aes(struct tegra_se *se);
+> +int tegra_init_hash(struct tegra_se *se);
+> +void tegra_deinit_aes(struct tegra_se *se);
+> +void tegra_deinit_hash(struct tegra_se *se);
+> +
+> +int tegra_key_submit(struct tegra_se *se, const u8 *key, u32 keylen, u32 alg, u32 *keyid);
+> +unsigned int tegra_key_get_idx(struct tegra_se *se, u32 keyid);
+> +void tegra_key_invalidate(struct tegra_se *se, u32 keyid, u32 alg);
+> +
+> +int tegra_se_host1x_register(struct tegra_se *se);
+> +int tegra_se_host1x_submit(struct tegra_se *se, u32 size);
+
+Everything looks bogus...
+
+> +
+> +static inline void se_writel(struct tegra_se *se, u32 val,
+> +			     unsigned int offset)
+> +{
+> +	writel_relaxed(val, se->base + offset);
+> +}
+> +
+> +static inline u32 se_readl(struct tegra_se *se, unsigned int offset)
+> +{
+> +	return readl_relaxed(se->base + offset);
+> +}
+
+Both wrappers are useless.
+
+> +
+> +/****
+> + *
+
+Use Linux coding style comments.
+
+> + * HOST1x OPCODES
+> + *
+> + ****/
+> +
+
+...
+
+> +
+> +static inline u32 host1x_opcode_nonincr(unsigned int offset, unsigned int count)
+> +{
+> +	return (2 << 28) | (offset << 16) | count;
+> +}
+> +
+> +static inline u32 host1x_uclass_incr_syncpt_cond_f(u32 v)
+> +{
+> +		return (v & 0xff) << 10;
+
+Fix indentation, in other places as well.
+
 
 Best regards,
 Krzysztof
