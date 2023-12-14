@@ -1,87 +1,152 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zg93vykZ"
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8F3F10F
-	for <linux-crypto@vger.kernel.org>; Thu, 14 Dec 2023 06:55:41 -0800 (PST)
-Received: by mail-qv1-xf2f.google.com with SMTP id 6a1803df08f44-67ee17ab697so22464366d6.0
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Dec 2023 06:55:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702565741; x=1703170541; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bgs8beqFiekckw3WR8YiKzI+yNleMXeH4aOT2b+WN64=;
-        b=zg93vykZglFFbm2Z1nl173j4Lx+z4LgOTPy7DPNDDN/n3N7iLfexrr5ymdAmy29gIG
-         IdoPqtJuFNlFwZvOrofmuoYuh+yt/2V0U+IV8hc+9dFewlfFLd/XA/azu99ZdzJmGThU
-         +eCwbHDH8s2gfB+8rkXnKL1KPumXwy1nWtRFbeVhYU4GaHgXPZeA0/cUkxW24LQddiv8
-         snBpkuouOR1lZJNMQ96/QyPrwlrCeljqkDGEZhcJTfkQiiKHdeCDv/JG9yQopnnmnk7K
-         OfYVqmhuRcRwyX8LCBfKQhjbraNeaOIsMX7eX1C1cCnlAUmto1bqHgqcUKVkPQRFqGP3
-         tgeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702565741; x=1703170541;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bgs8beqFiekckw3WR8YiKzI+yNleMXeH4aOT2b+WN64=;
-        b=nRYRUqrUOxTOVB9ZadHsUSsC6fMN3Tg5F/9DE8906e9GshR1t1fTKuXwL7alvzBAIp
-         LO9RLEdKEWetNTpskkjEYdq5d9cWDC5a0W4egbIJI4Rd/gobKrIOxvVR0/tN9U0oZTkI
-         SHAXDIhejU3Q6KUnhgC3Z0mrYxE0ZxfFfTG0EOFlSEyyXMbDW/92w5jvoQ5IM82fwdYe
-         m734dKmG2yc5SK2gcvg11lAvCpb+2NXLxReEuDqGaY+ZriiOlwPQBwtgKMIPjbkHm4bF
-         nrRlE4I8CwTYy8TW5ZNArH4KBObUqcedTrzDzu97ozNEVqWLXYlMN/NNUZRJklkCoeZX
-         xRNA==
-X-Gm-Message-State: AOJu0YzZOQkC0TGYg2HbBbavVxmXNHxS5ElWAwW0Sa2aCtRcYGq5w2ft
-	AS+TlJ574qiwzBM2nLqTZLAjo6ltMMRGrfZlmDRClypRC7GdV8Kmy91MHQ==
-X-Google-Smtp-Source: AGHT+IEsLmHEUusvZQFiGgThJYCfYEu5uL9Ur9BmC1h3zHzuSXlUlQi5+C6Xa76eUg2ZzWa4mUxgAR4OBzeNO/8uOFA=
-X-Received: by 2002:a05:6214:16cc:b0:67e:ef8f:7978 with SMTP id
- d12-20020a05621416cc00b0067eef8f7978mr4056082qvz.30.1702565740942; Thu, 14
- Dec 2023 06:55:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eWQXK28E"
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5E67123;
+	Thu, 14 Dec 2023 10:09:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702577381; x=1734113381;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kQsTyReN6U5/B4j4CeAMns8RYLO2IGmgecq4Y3yTN6Q=;
+  b=eWQXK28E7cw+A0LqiVZ+2g607VPCrwTR8H7aAh+U3tu7+TpQ9SNOITtn
+   4qFX6axLpY11OeYjjYoOs9zhi3N2VlWDsQkM2O7Kg01tRIvRUu5NonR8q
+   iRgoY0dazhEHCXL5QLeimy8QmkBH9/UwjOtLZtSpnCM4SHmutivymVibn
+   Z+58/rJEo7qqhswecRcAo5v8KsXa8mdphVHgzwOMBhbcrMvUxrzBnLrtW
+   MvIYZsBieCAvVZRpZZU0gkcqFbMreXRSPTxsW2M01Af0K2seoYwaOJdKV
+   ZfDWFBmg5sdaFHDFTWRzcLo4SMSuJ/f5SXoDfahict2Q7EmKWwQX7XL9i
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="13852775"
+X-IronPort-AV: E=Sophos;i="6.04,276,1695711600"; 
+   d="scan'208";a="13852775"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 10:09:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="897825349"
+X-IronPort-AV: E=Sophos;i="6.04,276,1695711600"; 
+   d="scan'208";a="897825349"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga004.jf.intel.com with ESMTP; 14 Dec 2023 10:09:37 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rDq9A-000MSI-11;
+	Thu, 14 Dec 2023 18:09:27 +0000
+Date: Fri, 15 Dec 2023 02:08:31 +0800
+From: kernel test robot <lkp@intel.com>
+To: Akhil R <akhilrajeev@nvidia.com>, herbert@gondor.apana.org.au,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thierry.reding@gmail.com,
+	jonathanh@nvidia.com, linux-tegra@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Akhil R <akhilrajeev@nvidia.com>
+Subject: Re: [PATCH 3/5] crypto: tegra: Add Tegra Security Engine driver
+Message-ID: <202312150118.ydw2nowl-lkp@intel.com>
+References: <20231213122030.11734-4-akhilrajeev@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000f66a3005fa578223@google.com> <20231213104950.1587730-1-glider@google.com>
- <ZXofF2lXuIUvKi/c@rh> <ZXopGGh/YqNIdtMJ@dread.disaster.area>
-In-Reply-To: <ZXopGGh/YqNIdtMJ@dread.disaster.area>
-From: Alexander Potapenko <glider@google.com>
-Date: Thu, 14 Dec 2023 15:55:00 +0100
-Message-ID: <CAG_fn=UukAf5sPrwqQtmL7-_dyUs3neBpa75JAaeACUzXsHwOA@mail.gmail.com>
-Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in __crc32c_le_base (3)
-To: Dave Chinner <david@fromorbit.com>
-Cc: Dave Chinner <dchinner@redhat.com>, 
-	syzbot+a6d6b8fffa294705dbd8@syzkaller.appspotmail.com, hch@lst.de, 
-	davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, linux-xfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231213122030.11734-4-akhilrajeev@nvidia.com>
 
-On Wed, Dec 13, 2023 at 10:58=E2=80=AFPM 'Dave Chinner' via syzkaller-bugs
-<syzkaller-bugs@googlegroups.com> wrote:
->
-> On Thu, Dec 14, 2023 at 08:16:07AM +1100, Dave Chinner wrote:
-> > [cc linux-xfs@vger.kernel.org because that's where all questions
-> > about XFS stuff should be directed, not to random individual
-> > developers. ]
-> >
-> > On Wed, Dec 13, 2023 at 11:49:50AM +0100, Alexander Potapenko wrote:
-> > > Hi Christoph, Dave,
-> > >
-> > > The repro provided by Xingwei indeed works.
->
-> Can you please test the patch below?
+Hi Akhil,
 
-It fixed the problem for me, feel free to add:
+kernel test robot noticed the following build warnings:
 
-Tested-by: Alexander Potapenko <glider@google.com>
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on drm/drm-next arm64/for-next/core robh/for-next linus/master v6.7-rc5 next-20231214]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-As for the time needed to detect the bug, note that kmemcheck was
-never used together with syzkaller, so it couldn't have the chance to
-find it.
+url:    https://github.com/intel-lab-lkp/linux/commits/Akhil-R/dt-bindings-crypto-Add-Tegra-SE-DT-binding-doc/20231213-202407
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20231213122030.11734-4-akhilrajeev%40nvidia.com
+patch subject: [PATCH 3/5] crypto: tegra: Add Tegra Security Engine driver
+config: parisc-allmodconfig (https://download.01.org/0day-ci/archive/20231215/202312150118.ydw2nowl-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231215/202312150118.ydw2nowl-lkp@intel.com/reproduce)
 
-KMSAN found this bug in April
-(https://syzkaller.appspot.com/bug?extid=3Da6d6b8fffa294705dbd8), only
-half a year after we started mounting XFS images on syzbot.
-Right now it is among the top crashers, so fixing it might uncover
-more interesting bugs in xfs.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312150118.ydw2nowl-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from drivers/crypto/tegra/tegra-se-hash.c:22:
+   drivers/crypto/tegra/tegra-se-hash.c: In function 'tegra_sha_get_config':
+   drivers/crypto/tegra/tegra-se.h:55:57: error: implicit declaration of function 'FIELD_PREP' [-Werror=implicit-function-declaration]
+      55 | #define SE_SHA_CFG_ENC_ALG(x)                           FIELD_PREP(GENMASK(15, 12), x)
+         |                                                         ^~~~~~~~~~
+   drivers/crypto/tegra/tegra-se.h:59:57: note: in expansion of macro 'SE_SHA_CFG_ENC_ALG'
+      59 | #define SE_SHA_ENC_ALG_SHA                              SE_SHA_CFG_ENC_ALG(3)
+         |                                                         ^~~~~~~~~~~~~~~~~~
+   drivers/crypto/tegra/tegra-se-hash.c:53:24: note: in expansion of macro 'SE_SHA_ENC_ALG_SHA'
+      53 |                 cfg |= SE_SHA_ENC_ALG_SHA;
+         |                        ^~~~~~~~~~~~~~~~~~
+   drivers/crypto/tegra/tegra-se-hash.c: In function 'tegra_sha_init':
+>> drivers/crypto/tegra/tegra-se-hash.c:457:21: warning: variable 'algname' set but not used [-Wunused-but-set-variable]
+     457 |         const char *algname;
+         |                     ^~~~~~~
+   cc1: some warnings being treated as errors
+
+
+vim +/algname +457 drivers/crypto/tegra/tegra-se-hash.c
+
+   450	
+   451	static int tegra_sha_init(struct ahash_request *req)
+   452	{
+   453		struct tegra_sha_reqctx *rctx = ahash_request_ctx(req);
+   454		struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+   455		struct tegra_sha_ctx *ctx = crypto_ahash_ctx(tfm);
+   456		struct tegra_se *se = ctx->se;
+ > 457		const char *algname;
+   458	
+   459		if (ctx->fallback)
+   460			return tegra_sha_fallback_init(req);
+   461	
+   462		algname = crypto_tfm_alg_name(&tfm->base);
+   463	
+   464		rctx->total_len = 0;
+   465		rctx->datbuf.size = 0;
+   466		rctx->residue.size = 0;
+   467		rctx->key_id = ctx->key_id;
+   468		rctx->task = SHA_FIRST;
+   469		rctx->alg = ctx->alg;
+   470		rctx->blk_size = crypto_ahash_blocksize(tfm);
+   471		rctx->digest.size = crypto_ahash_digestsize(tfm);
+   472	
+   473		rctx->digest.buf = dma_alloc_coherent(se->dev, rctx->digest.size,
+   474						      &rctx->digest.addr, GFP_KERNEL);
+   475		if (!rctx->digest.buf)
+   476			goto digbuf_fail;
+   477	
+   478		rctx->residue.buf = dma_alloc_coherent(se->dev, rctx->blk_size,
+   479						       &rctx->residue.addr, GFP_KERNEL);
+   480		if (!rctx->residue.buf)
+   481			goto resbuf_fail;
+   482	
+   483		rctx->datbuf.buf = dma_alloc_coherent(se->dev, SE_SHA_BUFLEN,
+   484						      &rctx->datbuf.addr, GFP_KERNEL);
+   485		if (!rctx->datbuf.buf)
+   486			goto datbuf_fail;
+   487	
+   488		return 0;
+   489	
+   490	datbuf_fail:
+   491		dma_free_coherent(se->dev, rctx->blk_size, rctx->residue.buf,
+   492				  rctx->residue.addr);
+   493	resbuf_fail:
+   494		dma_free_coherent(se->dev, SE_SHA_BUFLEN, rctx->datbuf.buf,
+   495				  rctx->datbuf.addr);
+   496	digbuf_fail:
+   497		return -ENOMEM;
+   498	}
+   499	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
