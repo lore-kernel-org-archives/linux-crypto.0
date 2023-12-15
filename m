@@ -1,102 +1,124 @@
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B6A2C86C;
-	Fri, 15 Dec 2023 11:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95B33A8C0
+	for <linux-crypto@vger.kernel.org>; Fri, 15 Dec 2023 14:42:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="t3tBdg/M"
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BF9ZBLs018517;
-	Fri, 15 Dec 2023 12:19:09 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=selector1; bh=EXThrm7
-	r2Zne08IzRuM6iVKji7vFve1z4gpTqwOxd18=; b=t3tBdg/MiCqNpIB6GCXwL6f
-	qqDNiklz9eMqXuU9dl5VPKlFmYelJDismj312Je3vlnb0KEzNrswuJUUl37MMLdo
-	2Mqm43NdHvPSS+dzfWekfrr5RBdNMOs0RKigVLFWAvk0OSNLp2hHPUcyfCxmD2ay
-	unEEVAIM5Na4dXhl8J1XHJB1dAWt1vAVMKnHNNYjpXIUX1McwH1334eZszuouoeQ
-	wBfg5r5wZgSKW1ZHUyT81l5RrsBXpj16zGMQGHSrvmeIdhcsqOGqdewC7xPAa64A
-	zzFB1W50hQjGPoYiJRom3mmjKaW5cYC0TP9J4PtmpEZWMWqFpD4zOi9oIjVnRFg=
-	=
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3uyb2k9ec1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 12:19:08 +0100 (CET)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 9BED4100052;
-	Fri, 15 Dec 2023 12:19:04 +0100 (CET)
-Received: from Webmail-eu.st.com (shfdag1node3.st.com [10.75.129.71])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 618EE2138D7;
-	Fri, 15 Dec 2023 12:19:04 +0100 (CET)
-Received: from localhost (10.201.20.61) by SHFDAG1NODE3.st.com (10.75.129.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 15 Dec
- 2023 12:19:04 +0100
-From: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Dan Carpenter <error27@gmail.com>
-CC: <linux-crypto@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        Thomas Bourgoin <thomas.bourgoin@foss.st.com>,
-        kernel test robot
-	<lkp@intel.com>
-Subject: [PATCH] crypto: stm32/crc32 - fix parsing list of devices
-Date: Fri, 15 Dec 2023 12:17:24 +0100
-Message-ID: <20231215111724.864051-1-thomas.bourgoin@foss.st.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s3kuor0o"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-77f3159d822so45088485a.2
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Dec 2023 06:42:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702651350; x=1703256150; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aGMYxeknzC7gjgFIn010QvpivnBYXCaeK7U8Zp8Dqns=;
+        b=s3kuor0ortf4gI9VX9IlGJh5gT8HeElsb18TwHJRc2oQQ4mHRepVR2n+ODPkBAY+Nx
+         H8JFyVglnsbqlNlkZsHPn+T3gSB2oA10HGvQkkq7UPmA4udR75x5zVoblvovqUtE5S/2
+         pwxdn92vpW0faVF2dBJrCr6e7hPn3r3Q913YKforl0UlctOLHPb6zHKPqQOyHkNfp5/N
+         OWOKTiRpBIrYJzmGN4LZMi5OOZuBmoYWR7W8FN5kfU/PGYoeiA/Ha2o6IhgcuSE7RlWx
+         4XPdVQQfa7mMG9Cwr/syXEJMsYD40Ttp35nXtMrBJ0qZSIRZAgobTeARkd0JtFwPCPOJ
+         aMGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702651350; x=1703256150;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aGMYxeknzC7gjgFIn010QvpivnBYXCaeK7U8Zp8Dqns=;
+        b=ovEepGNtk9fiefCOhDLqbvoE44u0eS/a8HoTglXfOZLcgWGFlj2m4Pfjc80Ji1l+7Q
+         dLmQjoQfcwyhwncjtwg5j4+JR7OG4iGP5PIG876GtUUWWDxElo/VNUuzA03L9Aalds/a
+         HWs/xVSPp04o6oh7dDmPhpzxkiCf3tPWvENKZDitQpdyxaOckt6GygqOjBCDVCIRnYXN
+         GQ4CJi+t/2UqkjWerqBAkggCwtgOGSEimIrd5n+vVDM6l91FlJmec/k24+OvJeN8ZDoe
+         JRcRbw0uszz50a7tSrPnS4ZueJOz5L34Ar685ju/uny3Ds+qPacD9sx71kxysc04mnH0
+         Z3nA==
+X-Gm-Message-State: AOJu0YxwZXrkTzq8qy7aUViSBXwvmXa+WKZXnzHLfbNp8SaYx/sfhPHn
+	cPQ2E3PuobKrdtVRsvybVx4TCdvIPjlRhuY4MP7LeCpOtSu7tiK7z1lovQ==
+X-Google-Smtp-Source: AGHT+IFEP4GTH7PwOKt2GmIEi320wj42DmjXITQoebReQVa4qOl1P4PdTy3zrAT0HyjDjZcIXiRIU+gdyZRM37a8Siw=
+X-Received: by 2002:a05:6214:226d:b0:67f:f0d:1bda with SMTP id
+ gs13-20020a056214226d00b0067f0f0d1bdamr2911619qvb.110.1702651350277; Fri, 15
+ Dec 2023 06:42:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE3.st.com
- (10.75.129.71)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-15_06,2023-12-14_01,2023-05-22_02
+References: <000000000000f66a3005fa578223@google.com> <20231213104950.1587730-1-glider@google.com>
+ <ZXofF2lXuIUvKi/c@rh> <ZXopGGh/YqNIdtMJ@dread.disaster.area>
+ <CAG_fn=UukAf5sPrwqQtmL7-_dyUs3neBpa75JAaeACUzXsHwOA@mail.gmail.com> <ZXt2BklghFSmDbhg@dread.disaster.area>
+In-Reply-To: <ZXt2BklghFSmDbhg@dread.disaster.area>
+From: Alexander Potapenko <glider@google.com>
+Date: Fri, 15 Dec 2023 15:41:49 +0100
+Message-ID: <CAG_fn=VqSEyt+vwZ7viviiJtipPPYyzEhkuDjdnmRcW-UXZkYg@mail.gmail.com>
+Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in __crc32c_le_base (3)
+To: Dave Chinner <david@fromorbit.com>
+Cc: Dave Chinner <dchinner@redhat.com>, 
+	syzbot+a6d6b8fffa294705dbd8@syzkaller.appspotmail.com, hch@lst.de, 
+	davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, linux-xfs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-smatch warnings:
-drivers/crypto/stm32/stm32-crc32.c:108 stm32_crc_get_next_crc() warn:
-can 'crc' even be NULL?
+On Thu, Dec 14, 2023 at 10:39=E2=80=AFPM 'Dave Chinner' via syzkaller-bugs
+<syzkaller-bugs@googlegroups.com> wrote:
+>
+> On Thu, Dec 14, 2023 at 03:55:00PM +0100, Alexander Potapenko wrote:
+> > On Wed, Dec 13, 2023 at 10:58=E2=80=AFPM 'Dave Chinner' via syzkaller-b=
+ugs
+> > <syzkaller-bugs@googlegroups.com> wrote:
+> > >
+> > > On Thu, Dec 14, 2023 at 08:16:07AM +1100, Dave Chinner wrote:
+> > > > [cc linux-xfs@vger.kernel.org because that's where all questions
+> > > > about XFS stuff should be directed, not to random individual
+> > > > developers. ]
+> > > >
+> > > > On Wed, Dec 13, 2023 at 11:49:50AM +0100, Alexander Potapenko wrote=
+:
+> > > > > Hi Christoph, Dave,
+> > > > >
+> > > > > The repro provided by Xingwei indeed works.
+> > >
+> > > Can you please test the patch below?
+> >
+> > It fixed the problem for me, feel free to add:
+> >
+> > Tested-by: Alexander Potapenko <glider@google.com>
+>
+> Thanks.
+>
+> > As for the time needed to detect the bug, note that kmemcheck was
+> > never used together with syzkaller, so it couldn't have the chance to
+> > find it.
+> >
+> > KMSAN found this bug in April
+> > (https://syzkaller.appspot.com/bug?extid=3Da6d6b8fffa294705dbd8),
+>
+> KMSAN has been used for quite a long time with syzbot, however,
+> and it's supposed to find these problems, too. Yet it's only been
+> finding this for 6 months?
+>
+> > only
+> > half a year after we started mounting XFS images on syzbot.
+>
+> Really? Where did you get that from?  syzbot has been exercising XFS
+> filesystems since 2017 - the bug reports to the XFS list go back at
+> least that far.
 
-Use list_first_entry_or_null instead of list_first_entry to retrieve
-the first device registered.
-The function list_first_entry always return a non NULL pointer even if
-the list is empty. Hence checking if the pointer returned is NULL does
-not tell if the list is empty or not.
+You are right, syzbot used to mount XFS way before 2022.
+On the other hand, last fall there were some major changes to the way
+syz_mount_image() works, so I am attributing the newly detected bugs
+to those changes.
+Unfortunately we don't have much insight into reasons behind syzkaller
+being able to trigger one bug or another: once a bug is found for the
+first time, the likelihood to trigger it again increases, but finding
+it initially might be tricky.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/r/202311281111.ou2oUL2i-lkp@intel.com/
-Reported-by: Dan Carpenter <error27@gmail.com>
-Closes: https://lore.kernel.org/r/202311281111.ou2oUL2i-lkp@intel.com/
-Signed-off-by: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
----
- drivers/crypto/stm32/stm32-crc32.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/stm32/stm32-crc32.c b/drivers/crypto/stm32/stm32-crc32.c
-index b2d5c8921ab3..b0cf6d2fd352 100644
---- a/drivers/crypto/stm32/stm32-crc32.c
-+++ b/drivers/crypto/stm32/stm32-crc32.c
-@@ -104,7 +104,7 @@ static struct stm32_crc *stm32_crc_get_next_crc(void)
- 	struct stm32_crc *crc;
- 
- 	spin_lock_bh(&crc_list.lock);
--	crc = list_first_entry(&crc_list.dev_list, struct stm32_crc, list);
-+	crc = list_first_entry_or_null(&crc_list.dev_list, struct stm32_crc, list);
- 	if (crc)
- 		list_move_tail(&crc->list, &crc_list.dev_list);
- 	spin_unlock_bh(&crc_list.lock);
--- 
-2.25.1
-
+I don't understand much how trivial is the repro at
+https://gist.github.com/xrivendell7/c7bb6ddde87a892818ed1ce206a429c4,
+but overall we are not drilling deep enough into XFS.
+https://storage.googleapis.com/syzbot-assets/8547e3dd1cca/ci-upstream-kmsan=
+-gce-c7402612.html
+(ouch, 230Mb!) shows very limited coverage.
