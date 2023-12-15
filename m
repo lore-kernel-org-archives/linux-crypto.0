@@ -1,124 +1,114 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95B33A8C0
-	for <linux-crypto@vger.kernel.org>; Fri, 15 Dec 2023 14:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09ABE364C9
+	for <linux-crypto@vger.kernel.org>; Fri, 15 Dec 2023 15:26:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s3kuor0o"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-77f3159d822so45088485a.2
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Dec 2023 06:42:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702651350; x=1703256150; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aGMYxeknzC7gjgFIn010QvpivnBYXCaeK7U8Zp8Dqns=;
-        b=s3kuor0ortf4gI9VX9IlGJh5gT8HeElsb18TwHJRc2oQQ4mHRepVR2n+ODPkBAY+Nx
-         H8JFyVglnsbqlNlkZsHPn+T3gSB2oA10HGvQkkq7UPmA4udR75x5zVoblvovqUtE5S/2
-         pwxdn92vpW0faVF2dBJrCr6e7hPn3r3Q913YKforl0UlctOLHPb6zHKPqQOyHkNfp5/N
-         OWOKTiRpBIrYJzmGN4LZMi5OOZuBmoYWR7W8FN5kfU/PGYoeiA/Ha2o6IhgcuSE7RlWx
-         4XPdVQQfa7mMG9Cwr/syXEJMsYD40Ttp35nXtMrBJ0qZSIRZAgobTeARkd0JtFwPCPOJ
-         aMGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702651350; x=1703256150;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aGMYxeknzC7gjgFIn010QvpivnBYXCaeK7U8Zp8Dqns=;
-        b=ovEepGNtk9fiefCOhDLqbvoE44u0eS/a8HoTglXfOZLcgWGFlj2m4Pfjc80Ji1l+7Q
-         dLmQjoQfcwyhwncjtwg5j4+JR7OG4iGP5PIG876GtUUWWDxElo/VNUuzA03L9Aalds/a
-         HWs/xVSPp04o6oh7dDmPhpzxkiCf3tPWvENKZDitQpdyxaOckt6GygqOjBCDVCIRnYXN
-         GQ4CJi+t/2UqkjWerqBAkggCwtgOGSEimIrd5n+vVDM6l91FlJmec/k24+OvJeN8ZDoe
-         JRcRbw0uszz50a7tSrPnS4ZueJOz5L34Ar685ju/uny3Ds+qPacD9sx71kxysc04mnH0
-         Z3nA==
-X-Gm-Message-State: AOJu0YxwZXrkTzq8qy7aUViSBXwvmXa+WKZXnzHLfbNp8SaYx/sfhPHn
-	cPQ2E3PuobKrdtVRsvybVx4TCdvIPjlRhuY4MP7LeCpOtSu7tiK7z1lovQ==
-X-Google-Smtp-Source: AGHT+IFEP4GTH7PwOKt2GmIEi320wj42DmjXITQoebReQVa4qOl1P4PdTy3zrAT0HyjDjZcIXiRIU+gdyZRM37a8Siw=
-X-Received: by 2002:a05:6214:226d:b0:67f:f0d:1bda with SMTP id
- gs13-20020a056214226d00b0067f0f0d1bdamr2911619qvb.110.1702651350277; Fri, 15
- Dec 2023 06:42:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c7uMfNfX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702653964; x=1734189964;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6EsVvUu3K6OtZ/irpzF5FC3eLu2vIHVbzXi45aemFxw=;
+  b=c7uMfNfXgoru6jbXpEI2/g3pGMQgnrjgkFGYX60YLRYfqNnid9nLe5Mp
+   5j0956UKTWhYFC5SydJ2xS/qcvu/kBhBkv3wm+Y3tyEJFs9LiD6Tej8xh
+   5aIOLlgd72qoqTDa86RZvtpDhE2RbZwappoFzi9ecNVzjAJvgOh9mr4fM
+   nGrEl7U0muF5J3yL3sfmzVvGwwmagWvYTfFzxP3eb/L+mxpVrP9JDqW5N
+   kDIDuwIk5MP0S605SO26s09Y6vS4fCx6I8SF87EsG+bkfXZnTkTrPFEux
+   eSucvbY06PU1LGJSRi64jz5KYDnpPb3neVzAY73tGqFfuuU53jnrMrvbd
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="385706764"
+X-IronPort-AV: E=Sophos;i="6.04,279,1695711600"; 
+   d="scan'208";a="385706764"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 07:26:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,279,1695711600"; 
+   d="scan'208";a="22876699"
+Received: from r007s007_zp31l10c01.deacluster.intel.com (HELO fedora.deacluster.intel.com) ([10.219.171.169])
+  by orviesa001.jf.intel.com with ESMTP; 15 Dec 2023 07:26:05 -0800
+From: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Subject: [PATCH 0/5] crypto: qat - enable telemetry for QAT GEN 4
+Date: Fri, 15 Dec 2023 16:23:34 +0100
+Message-ID: <20231215152334.34524-1-lucas.segarra.fernandez@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000f66a3005fa578223@google.com> <20231213104950.1587730-1-glider@google.com>
- <ZXofF2lXuIUvKi/c@rh> <ZXopGGh/YqNIdtMJ@dread.disaster.area>
- <CAG_fn=UukAf5sPrwqQtmL7-_dyUs3neBpa75JAaeACUzXsHwOA@mail.gmail.com> <ZXt2BklghFSmDbhg@dread.disaster.area>
-In-Reply-To: <ZXt2BklghFSmDbhg@dread.disaster.area>
-From: Alexander Potapenko <glider@google.com>
-Date: Fri, 15 Dec 2023 15:41:49 +0100
-Message-ID: <CAG_fn=VqSEyt+vwZ7viviiJtipPPYyzEhkuDjdnmRcW-UXZkYg@mail.gmail.com>
-Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in __crc32c_le_base (3)
-To: Dave Chinner <david@fromorbit.com>
-Cc: Dave Chinner <dchinner@redhat.com>, 
-	syzbot+a6d6b8fffa294705dbd8@syzkaller.appspotmail.com, hch@lst.de, 
-	davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, linux-xfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 14, 2023 at 10:39=E2=80=AFPM 'Dave Chinner' via syzkaller-bugs
-<syzkaller-bugs@googlegroups.com> wrote:
->
-> On Thu, Dec 14, 2023 at 03:55:00PM +0100, Alexander Potapenko wrote:
-> > On Wed, Dec 13, 2023 at 10:58=E2=80=AFPM 'Dave Chinner' via syzkaller-b=
-ugs
-> > <syzkaller-bugs@googlegroups.com> wrote:
-> > >
-> > > On Thu, Dec 14, 2023 at 08:16:07AM +1100, Dave Chinner wrote:
-> > > > [cc linux-xfs@vger.kernel.org because that's where all questions
-> > > > about XFS stuff should be directed, not to random individual
-> > > > developers. ]
-> > > >
-> > > > On Wed, Dec 13, 2023 at 11:49:50AM +0100, Alexander Potapenko wrote=
-:
-> > > > > Hi Christoph, Dave,
-> > > > >
-> > > > > The repro provided by Xingwei indeed works.
-> > >
-> > > Can you please test the patch below?
-> >
-> > It fixed the problem for me, feel free to add:
-> >
-> > Tested-by: Alexander Potapenko <glider@google.com>
->
-> Thanks.
->
-> > As for the time needed to detect the bug, note that kmemcheck was
-> > never used together with syzkaller, so it couldn't have the chance to
-> > find it.
-> >
-> > KMSAN found this bug in April
-> > (https://syzkaller.appspot.com/bug?extid=3Da6d6b8fffa294705dbd8),
->
-> KMSAN has been used for quite a long time with syzbot, however,
-> and it's supposed to find these problems, too. Yet it's only been
-> finding this for 6 months?
->
-> > only
-> > half a year after we started mounting XFS images on syzbot.
->
-> Really? Where did you get that from?  syzbot has been exercising XFS
-> filesystems since 2017 - the bug reports to the XFS list go back at
-> least that far.
+Expose through debugfs telemetry data for QAT GEN4 devices.
 
-You are right, syzbot used to mount XFS way before 2022.
-On the other hand, last fall there were some major changes to the way
-syz_mount_image() works, so I am attributing the newly detected bugs
-to those changes.
-Unfortunately we don't have much insight into reasons behind syzkaller
-being able to trigger one bug or another: once a bug is found for the
-first time, the likelihood to trigger it again increases, but finding
-it initially might be tricky.
+This allows to gather metrics about the performance and the utilization
+of a QAT device and/or a group of ring pairs. In particular, statistics
+on (1) the utilization of the PCIe channel, (2) address translation and
+device TLB, when SVA is enabled and (3) the internal engines for crypto
+and data compression.
 
-I don't understand much how trivial is the repro at
-https://gist.github.com/xrivendell7/c7bb6ddde87a892818ed1ce206a429c4,
-but overall we are not drilling deep enough into XFS.
-https://storage.googleapis.com/syzbot-assets/8547e3dd1cca/ci-upstream-kmsan=
--gce-c7402612.html
-(ouch, 230Mb!) shows very limited coverage.
+The device periodically gathers telemetry data from hardware registers
+and writes it into a DMA memory region which is sampled by the driver.
+The driver then uses this data to compute basic metrics on the counters
+and exposes them through debugfs attributes in the folder
+/sys/kernel/debug/qat_<device>_<BDF>/telemetry.
+
+Here is a summary of the changes:
+ * Patch #1 adds an helper function to math.h to compute the average of
+   values within an array.
+ * Patch #2 includes a missing header in the file adf_accel_devices.h to
+   allow to use the macro GET_DEV().
+ * Patch #3 introduces device level telemetry and the associated documentation
+   in /Documentation/ABI.
+ * Patch #4 extends #3 by introducing ring pair level telemetry and
+   documentation about it.
+
+This set is based on earlier work done by Wojciech Ziemba.
+
+Lucas Segarra Fernandez (5):
+  math.h: Add avg_array()
+  crypto: qat - include pci.h for GET_DEV()
+  crypto: qat - add admin msgs for telemetry
+  crypto: qat - add support for device telemetry
+  crypto: qat - add support for ring pair level telemetry
+
+ .../ABI/testing/debugfs-driver-qat_telemetry  | 227 ++++++
+ .../intel/qat/qat_420xx/adf_420xx_hw_data.c   |   3 +
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |   3 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |   3 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |   6 +
+ .../crypto/intel/qat/qat_common/adf_admin.c   |  37 +
+ .../crypto/intel/qat/qat_common/adf_admin.h   |   4 +
+ .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   3 +
+ .../intel/qat/qat_common/adf_gen4_hw_data.h   |   1 +
+ .../crypto/intel/qat/qat_common/adf_gen4_tl.c | 153 +++++
+ .../crypto/intel/qat/qat_common/adf_gen4_tl.h | 158 +++++
+ .../crypto/intel/qat/qat_common/adf_init.c    |  12 +
+ .../intel/qat/qat_common/adf_telemetry.c      | 287 ++++++++
+ .../intel/qat/qat_common/adf_telemetry.h      |  99 +++
+ .../intel/qat/qat_common/adf_tl_debugfs.c     | 648 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_tl_debugfs.h     | 116 ++++
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |  10 +
+ include/linux/math.h                          |  33 +
+ 18 files changed, 1803 insertions(+)
+ create mode 100644 Documentation/ABI/testing/debugfs-driver-qat_telemetry
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_tl.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_tl.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_telemetry.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_telemetry.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_tl_debugfs.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_tl_debugfs.h
+
+
+base-commit: a7f74e2fbf7ab0a3b1cb4aff1deb3de3d5e1c381
+-- 
+2.41.0
+
