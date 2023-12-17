@@ -1,73 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E25A59B50;
-	Sun, 17 Dec 2023 17:22:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F3A4B122;
+	Sun, 17 Dec 2023 23:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rs/ToJlm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1C38C433D9;
-	Sun, 17 Dec 2023 17:22:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702833735;
-	bh=S08U/8QY4xKf/my78fGewT/X/Z7/h+dUEruTrZf2pe0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rs/ToJlmlfFhR2bM9eS2NGSd8esxnuFGDBXtkpv+k7OhoClI4Z0UrfvF9UhAjLT4n
-	 DdPYEuYlyz4AdIyfZkM2Yx7yz33lQoQ60jfXv/OY38pQHOxoKvASqgaPsXuolOVVjd
-	 5xDHJnoIvOGy/EVfAsC5Em3IeoAq1RjX2TmY1u3V88SzLgrItwOYJxaBuX8SiVpb2x
-	 vCGO3xekH6alYZ2A6gtX9T1VQ3ijxgl14HuiUv2L+dHj7ClrJOolsI4eIowYH5Lnfm
-	 /GKRTlo04sxTvkaOdZYmZXBB5Y3ItWORYploZLFNm03rWbjnCYL8NhtOPlqAXG7N4Y
-	 2yLw37+axnKpg==
-From: Bjorn Andersson <andersson@kernel.org>
-To: Om Prakash Singh <quic_omprsing@quicinc.com>
-Cc: neil.armstrong@linaro.org,
-	konrad.dybcio@linaro.org,
-	agross@kernel.org,
-	conor+dt@kernel.org,
-	davem@davemloft.net,
-	devicetree@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	krzysztof.kozlowski+dt@linaro.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	marijn.suijten@somainline.org,
-	robh+dt@kernel.org,
-	vkoul@kernel.org,
-	cros-qcom-dts-watchers@chromium.org
-Subject: Re: (subset) [PATCH V3 0/2] Add QCrypto support for SC7280
-Date: Sun, 17 Dec 2023 11:21:26 -0600
-Message-ID: <170283349430.66089.15994478058203053990.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231214103600.2613988-1-quic_omprsing@quicinc.com>
-References: <20231214103600.2613988-1-quic_omprsing@quicinc.com>
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="BKxmEd5U"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1702856871;
+	bh=Xd4o/leb3WIoJq7yzKGbJXYhThjRBM0bKQp6shqfr6s=;
+	h=Date:From:To:Cc:Subject:From;
+	b=BKxmEd5UqQk09NEwNo3vhgxYfjH829gpQLsQsbGIaIMVTJ0ccnWM8jyz+TKSjcvdR
+	 pWcoe0hcOksD795WHGSy4DKV7x0ITzc/HMnAnFJkEM4qXivWzZsUxFpuFn3S79oKdi
+	 /laBRT4CE5UIznwnSvWp6FDWSPrkmnhLOxBCApts2QMrunJWGr5y5Kv31r1bVTdTtI
+	 8dcjkbdKM6sdkuYFPWM7DhJ7kH3X8xkS2PZOnlZzIrEjjtntWoV/7zLxtcTqndrQWk
+	 UU58qFYx74MSZWnYm18/h2EwOPTSToD34elHSgNAnIpeug+jxMwmyX43soVrsUpOnA
+	 k0NBRy+/UoNjQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4StflV2Km3z4wd4;
+	Mon, 18 Dec 2023 10:47:50 +1100 (AEDT)
+Date: Mon, 18 Dec 2023 10:47:49 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto List <linux-crypto@vger.kernel.org>, Hans de Goede
+ <hdegoede@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Linux Kernel
+ Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Ma Jun <Jun.Ma2@amd.com>, Sumit Garg
+ <sumit.garg@linaro.org>, Tom Zanussi <tom.zanussi@linux.intel.com>
+Subject: linux-next: manual merge of the crypto tree with the jc_docs,
+ wireless-next trees
+Message-ID: <20231218104749.560969bf@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/vGo7X1kCjDbbb56miX44ihq";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
+--Sig_/vGo7X1kCjDbbb56miX44ihq
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 14 Dec 2023 16:05:58 +0530, Om Prakash Singh wrote:
-> Document SC7280 support for QCrypto driver and add QCE and Crypto BAM DMA nodes
-> 
-> Om Prakash Singh (2):
->   dt-bindings: crypto: qcom-qce: document the SC7280 crypto engine
->   arm64: dts: qcom: sc7280: add QCrypto nodes
-> 
-> .../devicetree/bindings/crypto/qcom-qce.yaml  |  1 +
->  arch/arm64/boot/dts/qcom/sc7280.dtsi          | 22 +++++++++++++++++++
->  2 files changed, 23 insertions(+)
-> 
-> [...]
+Hi all,
 
-Applied, thanks!
+Today's linux-next merge of the crypto tree got a conflict in:
 
-[2/2] arm64: dts: qcom: sc7280: add QCrypto nodes
-      commit: d488f903a8600203dc367985a0a7a742b530adc0
+  Documentation/driver-api/index.rst
 
-Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+between commits:
+
+  50709576d81b ("Documentation: Destage TEE subsystem documentation")
+  2128f3cca5a2 ("Documentation/driver-api: Add document about WBRF mechanis=
+m")
+
+from the jc_docs, wireless-next trees and commit:
+
+  8ccc257b29a1 ("crypto: iaa - Add IAA Compression Accelerator Documentatio=
+n")
+
+from the crypto tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc Documentation/driver-api/index.rst
+index e8e7ee506b13,8b95501cc208..000000000000
+--- a/Documentation/driver-api/index.rst
++++ b/Documentation/driver-api/index.rst
+@@@ -112,8 -115,7 +112,9 @@@ available subsections can be seen below
+     hte/index
+     wmi
+     dpll
+ +   tee
+ +   wbrf
++    crypto/index
+ =20
+  .. only::  subproject and html
+ =20
+
+--Sig_/vGo7X1kCjDbbb56miX44ihq
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmV/iKUACgkQAVBC80lX
+0Gz4kQf/VtDx149MrnIeJCUf28grp9VB4DFY9wo69h/8rkQFzQG3bEBJi5QZJyUW
+8iwmBokpY/744oqkGsrnkJW+vbNOCSDFTB7mqNUJTkAdkrKeh3Wi6B8Wgf1OcwKz
+/DMtbGPaFYCLOTJ8zVYgsXYvz0o0HfopBru/CWMtjZ1iWdeHWxyTYOYBYFuybwbC
+CDKQ2slGUyKrx5WHznPej7F82i3kbeiNbNdH319CI2dQsfBfYgzURPXHcWBTqsp9
+w1PiaSDeIQR8qWUXEWmiZh4GmpxyFaR3e0WzxPH1xU+1rpR25Skdf7sY49m7n4r7
+Jx7zExYIGVRv+nlkPplOuVH9d/5Kcw==
+=KSZa
+-----END PGP SIGNATURE-----
+
+--Sig_/vGo7X1kCjDbbb56miX44ihq--
