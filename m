@@ -1,80 +1,79 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DA57347A;
-	Mon, 18 Dec 2023 19:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65A8740B4;
+	Mon, 18 Dec 2023 20:47:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJZOCTDl"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a2340c803c6so225641966b.0;
-        Mon, 18 Dec 2023 11:56:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702929391; x=1703534191; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uSOucPhy8Uq24Amn7av5EziiKi3zQUdPVY+HVNazcmw=;
-        b=NJZOCTDl/o7CzK2E9auv4LDse1Ad12gXRf9weGmeJCfKdu2BjMPiODyzIFZ//pfXHm
-         C9i+xO1msJ4+nut8sVzIVEFSF7XrWydkr5BYIjWHxRPlfq5Nmpx9u4y88BuFcCR0SbPu
-         BuUYQwZVBZLF5AM97XtCvO/4ItgTxKC5yOhvt9ykcFZ5Oq9mDVVRHTPkLFypMlE4bMy0
-         tOoI9VJZf9Va1gtjypgrOMfWiLyCD1427GeSjCH5A7fdAfxOMqwE6S9dqNOM9r4+2Pfp
-         2foKed5XNjUlbY4mbvKQsaVRA8eRb2XFWnuyaVX7DiyXz+Tu9V/QUWss5Q/SonhTMMFR
-         YbWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702929391; x=1703534191;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uSOucPhy8Uq24Amn7av5EziiKi3zQUdPVY+HVNazcmw=;
-        b=eq9f7ISPga56/AkoIMW/i5yKPaYC0z6msH0wtdnvvtWYa2w8f9OQw3JkgUXm/TKOJU
-         2BT9N4cW07bMob/AKqFiFXKsLss265T5qblUZOF59w8PD1GTccm/zIB+iWnTa1WD2O5n
-         Jw4+lQoTPhfsjLTteEp77hdX8zD0dLugkTMLRRi9oi6zAvAULSTA4G5ePxG1y0lsH31R
-         v3Rxl3PGMVDgYciguo2Xnc8sZZ/CFqqCTtmR1TSlktbEisTjAfIpPXhuA5K1A9TqW2AL
-         zom7Cm29i9l8639DcK+4f36M6PjKWHkJ4gXWerAnQa93rDLmTT0VkwBVPzU++IUR2iBV
-         9RbA==
-X-Gm-Message-State: AOJu0YzEFGnKvHm7/xIoBcY2+SP8uRFGsS1KHBiJVvF43Gr6zrnk4gbC
-	8/nkrvlj+Ilfz+UxqrhUsw74xflYnYY=
-X-Google-Smtp-Source: AGHT+IE7TmqHMKHKgZX1NTAreBGHNdqmsN91K3ft/OadYBs8869eUaoyHQxBBrQWWA4Y9Z8CFr6cMg==
-X-Received: by 2002:a17:906:de:b0:a23:6708:cdd0 with SMTP id 30-20020a17090600de00b00a236708cdd0mr597284eji.88.1702929390578;
-        Mon, 18 Dec 2023 11:56:30 -0800 (PST)
-Received: from jernej-laptop.localnet (82-149-12-148.dynamic.telemach.net. [82.149.12.148])
-        by smtp.gmail.com with ESMTPSA id vt5-20020a170907a60500b00a1d38589c67sm14604413ejc.98.2023.12.18.11.56.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 11:56:30 -0800 (PST)
-From: Jernej =?utf-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
-To: linux-crypto@vger.kernel.org, ovidiu.panait@windriver.com
-Cc: linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
- davem@davemloft.net, Ovidiu Panait <ovidiu.panait@windriver.com>,
- Corentin Labbe <clabbe.montjoie@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
- Samuel Holland <samuel@sholland.org>, linux-arm-kernel@lists.infradead.org,
- linux-sunxi@lists.linux.dev
-Subject: Re: [PATCH 7/7] crypto: sun8i-ss - Use helper to set reqsize
-Date: Mon, 18 Dec 2023 20:56:29 +0100
-Message-ID: <4854975.GXAFRqVoOG@jernej-laptop>
-In-Reply-To: <20231218164649.2492465-7-ovidiu.panait@windriver.com>
-References:
- <20231218164649.2492465-1-ovidiu.panait@windriver.com>
- <20231218164649.2492465-7-ovidiu.panait@windriver.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FUR2z7/u"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702932440; x=1734468440;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xtwR1W3kmoc6IwExPrsk/qKdEPkgQCfat8S+OdCL8pE=;
+  b=FUR2z7/uzvL7rWOilKervWEOtrFNju51SPF+UUet8pd1fcbtwPVHCeuT
+   hpGQAd3kPg2hOlsBpZX2GdQ1WrJoifcKZSI5NR783DaTY+GwvWW79nuoX
+   pRtz42yxeTGf2armkywwRPELgLH8NL+uHrqX9Ti3Xrw52QAYb/kbEvMRs
+   wb0TJGmal0eEbe+AVxphY031Wxb1AU6Cjhsy5ltrpEV8vMyDjjQoaCmEf
+   W5hSf0ZCYbpr/L9m1vUN2x9pUMVANuXy3wv2B7G0qVVku0RWQHdvxdAUm
+   xWGRfctTA+m35UOd+nG7PZ2FcdgSGEQKL0Qj6rbUMQ1XLXfmbPtAMx8Xl
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10928"; a="462015868"
+X-IronPort-AV: E=Sophos;i="6.04,286,1695711600"; 
+   d="scan'208";a="462015868"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2023 12:47:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10928"; a="899101489"
+X-IronPort-AV: E=Sophos;i="6.04,286,1695711600"; 
+   d="scan'208";a="899101489"
+Received: from ssomasun-mobl1.amr.corp.intel.com (HELO tzanussi-mobl1.hsd1.il.comcast.net) ([10.212.116.107])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2023 12:47:18 -0800
+From: Tom Zanussi <tom.zanussi@linux.intel.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	fenghua.yu@intel.com
+Cc: dave.jiang@intel.com,
+	tony.luck@intel.com,
+	jacob.jun.pan@intel.com,
+	christophe.jaillet@wanadoo.fr,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org
+Subject: [PATCH 0/2] crypto: Intel Analytics Accelerator (IAA) updates
+Date: Mon, 18 Dec 2023 14:47:13 -0600
+Message-Id: <20231218204715.220299-1-tom.zanussi@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 
-Dne ponedeljek, 18. december 2023 ob 17:46:49 CET je ovidiu.panait@windriver.com napisal(a):
-> From: Ovidiu Panait <ovidiu.panait@windriver.com>
-> 
-> The value of reqsize must only be changed through the helper.
-> 
-> Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+Hi Herbert,
 
-Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+Here are a couple patches that didn't make it into the last version of
+the IAA crypto driver.
 
-Best regards,
-Jernej
+Tested using both shared and dedicated workqueues, with no problems
+seen.
 
+Thanks,
+
+Tom
+
+Tom Zanussi (2):
+  crypto: iaa - Change desc->priv to 0
+  crypto: iaa - Remove unneeded newline in update_max_adecomp_delay_ns()
+
+ drivers/crypto/intel/iaa/iaa_crypto_main.c  | 8 ++++----
+ drivers/crypto/intel/iaa/iaa_crypto_stats.c | 1 -
+ 2 files changed, 4 insertions(+), 5 deletions(-)
+
+-- 
+2.34.1
 
