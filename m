@@ -1,124 +1,302 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from wxsgout04.xfusion.com (wxsgout04.xfusion.com [36.139.87.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7E913FE9;
-	Mon, 18 Dec 2023 10:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="jyDBqdNM"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8D96440E0030;
-	Mon, 18 Dec 2023 10:24:46 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id VU4bhOjEhgIz; Mon, 18 Dec 2023 10:24:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1702895084; bh=+qd2C9CoTRT8YdE7RLTwVb7qNN/yqYEkDFQLfrBIgLE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jyDBqdNMXR+jZLcCyXJ4YR2GJc9LKFzUfKQU3+hzFPr2OQcmEZmCb/QfiQ9fGD0J9
-	 eQYwFxWWXMCvdmIB+F0qxZDDtmSCXC0qZbY41Wjb2pXH1THKaSUAfgZ58i5kPY7QSL
-	 WSWSVpxOHcPCd6xS9yGOuh+n+HxUm53a+/piNO0RL9Zjvu9V7zukW0vt81gfS74Dcx
-	 aA0wUPFu+W3LkrEt1Wkc3fLEPFALNemjO22dBaz2Q4T8BrzSeI3Sng4aozUlUX2EEu
-	 SaEz5M3ODAere1yfS09GTlW6/kVi5rIfYwk1LD7QVs7lPCFolNwcpGcIOB2HSzfaTV
-	 MItf1qGYtHgocHKjCn9euwhsyDZmnBVeKMziA0/hLgGbE9u1G/VD3PToB4mKfWlf4X
-	 xxtCVWvGGRgUqIkgt6yT/Ri7odTlfxrE3BL0M94Zk3Eykmmnkm+C+OnN/HG0Gv1sVR
-	 I9GjsRFtMrl3xUHXPjp2MZ9curGgNAmGbHh88r3Y9Ec13kZ6HaS+iBgpwvIhDmpiIo
-	 i5uFIBoZ/R/BFQVomO/iT/1hireFV74sUd2IBJb95rD/0LsCqfzRzG1Hdc0Bodjwff
-	 BEfsF00lawewiDqL8njMUlKG1PHYVIQ7lZulWHIFedIHeyLzkmsUsdx/uARXly9hqc
-	 hy9nZw4cu/qb4T4O6GAl8IY0=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E8A8140E00CB;
-	Mon, 18 Dec 2023 10:24:03 +0000 (UTC)
-Date: Mon, 18 Dec 2023 11:23:57 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, marcorr@google.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 22/50] KVM: SEV: Add GHCB handling for Hypervisor
- Feature Support requests
-Message-ID: <20231218102357.GPZYAdvfG5jNyajyu6@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-23-michael.roth@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BAB3A1B7;
+	Mon, 18 Dec 2023 13:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xfusion.com
+Received: from wuxshcsitd00600.xfusion.com (unknown [10.32.133.213])
+	by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4Sv0Zm32HmzB1CfX;
+	Mon, 18 Dec 2023 21:11:28 +0800 (CST)
+Received: from localhost (10.82.147.3) by wuxshcsitd00600.xfusion.com
+ (10.32.133.213) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Mon, 18 Dec
+ 2023 21:15:01 +0800
+Date: Mon, 18 Dec 2023 21:15:01 +0800
+From: WangJinchao <wangjinchao@xfusion.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, Tim Chen <tim.c.chen@linux.intel.com>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <stone.xulei@xfusion.com>, <wangjinchao@xfusion.com>
+Subject: [PATCH v2] crypto:tcrypt: add script tcrypt_speed_compare.py
+Message-ID: <202312182113+0800-wangjinchao@xfusion.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-23-michael.roth@amd.com>
+X-ClientProxiedBy: wuxshcsitd00602.xfusion.com (10.32.132.250) To
+ wuxshcsitd00600.xfusion.com (10.32.133.213)
 
-On Mon, Oct 16, 2023 at 08:27:51AM -0500, Michael Roth wrote:
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 4f895a7201ed..088b32657f46 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2568,6 +2568,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
->  	case SVM_VMGEXIT_AP_HLT_LOOP:
->  	case SVM_VMGEXIT_AP_JUMP_TABLE:
->  	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
-> +	case SVM_VMGEXIT_HV_FEATURES:
->  		break;
->  	default:
->  		reason = GHCB_ERR_INVALID_EVENT;
-> @@ -2828,6 +2829,13 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
->  				  GHCB_MSR_INFO_MASK,
->  				  GHCB_MSR_INFO_POS);
->  		break;
-> +	case GHCB_MSR_HV_FT_REQ: {
-				^^^
+Create a script for comparing tcrypt speed test logs.
+The script will systematically analyze differences item
+by item and provide a summary (average).
+This tool is useful for evaluating the stability of
+cryptographic module algorithms and assisting with
+performance optimization.
 
-No need to have a statement block here. Neither below.
+Please note that for such a comparison, stability depends
+on whether we allow frequency to float or pin the frequency.
 
+The script produces comparisons in two scenes:
 
-> +		set_ghcb_msr_bits(svm, GHCB_HV_FT_SUPPORTED,
-> +				  GHCB_MSR_HV_FT_MASK, GHCB_MSR_HV_FT_POS);
-> +		set_ghcb_msr_bits(svm, GHCB_MSR_HV_FT_RESP,
-> +				  GHCB_MSR_INFO_MASK, GHCB_MSR_INFO_POS);
-> +		break;
-> +	}
->  	case GHCB_MSR_TERM_REQ: {
->  		u64 reason_set, reason_code;
->  
-> @@ -2952,6 +2960,12 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->  		ret = 1;
->  		break;
->  	}
-> +	case SVM_VMGEXIT_HV_FEATURES: {
-				      ^^^^
+1. For operations in seconds
+================================================================================
+rfc4106(gcm(aes)) (pcrypt(rfc4106(gcm_base(ctr(aes-generic),ghash-generic))))
+                         encryption
+--------------------------------------------------------------------------------
+bit key | byte blocks | base ops    | new ops     | differ(%)
+160     | 16          | 66439       | 63063       | -5.08
+160     | 64          | 62220       | 57439       | -7.68
+...
+288     | 4096        | 15059       | 16278       | 8.09
+288     | 8192        | 9043        | 9526        | 5.34
+--------------------------------------------------------------------------------
+average differ(%s)    | total_differ(%)
+--------------------------------------------------------------------------------
+5.70                  | -4.49
+================================================================================
 
-> +		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_HV_FT_SUPPORTED);
-> +
-> +		ret = 1;
-> +		break;
-> +	}
->  	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
->  		vcpu_unimpl(vcpu,
->  			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+2. For avg cycles of operation
+================================================================================
+rfc4106(gcm(aes)) (pcrypt(rfc4106(gcm_base(ctr(aes-generic),ghash-generic))))
+                         encryption
+--------------------------------------------------------------------------------
+bit key | byte blocks | base cycles | new cycles  | differ(%)
+160     | 16          | 32500       | 35847       | 10.3
+160     | 64          | 33175       | 45808       | 38.08
+...
+288     | 4096        | 131369      | 132132      | 0.58
+288     | 8192        | 229503      | 234581      | 2.21
+--------------------------------------------------------------------------------
+average differ(%s)    | total_differ(%)
+--------------------------------------------------------------------------------
+8.41                  | -6.70
+================================================================================
 
+Signed-off-by: WangJinchao <wangjinchao@xfusion.com>
+---
+ MAINTAINERS                                 |   6 +
+ tools/crypto/tcrypt/tcrypt_speed_compare.py | 190 ++++++++++++++++++++
+ 2 files changed, 196 insertions(+)
+ create mode 100755 tools/crypto/tcrypt/tcrypt_speed_compare.py
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index bba17f97eda7..b9c8dd607bce 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -5524,6 +5524,12 @@ F:	include/crypto/
+ F:	include/linux/crypto*
+ F:	lib/crypto/
+ 
++CRYPTO SPEED TEST COMPARE
++M:	Wang Jinchao <wangjinchao@xfusion.com>
++L:	linux-crypto@vger.kernel.org
++S:	Maintained
++F:	tools/crypto/tcrypt/tcrypt_speed_compare.py
++
+ CRYPTOGRAPHIC RANDOM NUMBER GENERATOR
+ M:	Neil Horman <nhorman@tuxdriver.com>
+ L:	linux-crypto@vger.kernel.org
+diff --git a/tools/crypto/tcrypt/tcrypt_speed_compare.py b/tools/crypto/tcrypt/tcrypt_speed_compare.py
+new file mode 100755
+index 000000000000..f3f5783cdc06
+--- /dev/null
++++ b/tools/crypto/tcrypt/tcrypt_speed_compare.py
+@@ -0,0 +1,190 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++#
++# Copyright (C) xFusion Digital Technologies Co., Ltd., 2023
++#
++# Author: Wang Jinchao <wangjinchao@xfusion.com>
++#
++"""
++A tool for comparing tcrypt speed test logs.
++
++Please note that for such a comparison, stability depends
++on whether we allow frequency to float or pin the frequency.
++
++Both support tests for operations within one second and
++cycles of operation.
++For example, use it in the bash script below.
++
++```bash
++#!/bin/bash
++
++# log file prefix
++seq_num=0
++
++# When sec=0, it will perform cycle tests;
++# otherwise, it indicates the duration of a single test
++sec=0
++num_mb=8
++mode=211
++
++# base speed test
++lsmod | grep pcrypt && modprobe -r pcrypt
++dmesg -C
++modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
++modprobe tcrypt mode=${mode} sec=${sec} num_mb=${num_mb}
++dmesg > ${seq_num}_base_dmesg.log
++
++# new speed test
++lsmod | grep pcrypt && modprobe -r pcrypt
++dmesg -C
++modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
++modprobe tcrypt mode=${mode} sec=${sec} num_mb=${num_mb}
++dmesg > ${seq_num}_new_dmesg.log
++lsmod | grep pcrypt && modprobe -r pcrypt
++
++tools/crypto/tcrypt/tcrypt_speed_compare.py \
++    ${seq_num}_base_dmesg.log \
++    ${seq_num}_new_dmesg.log  \
++        >${seq_num}_compare.log
++grep 'average' -A2 -B0 --group-separator="" ${seq_num}_compare.log
++```
++"""
++
++import sys
++import re
++
++
++def parse_title(line):
++    pattern = r'tcrypt: testing speed of (.*?) (encryption|decryption)'
++    match = re.search(pattern, line)
++    if match:
++        alg = match.group(1)
++        op = match.group(2)
++        return alg, op
++    else:
++        return "", ""
++
++
++def parse_item(line):
++    pattern_operations = r'\((\d+) bit key, (\d+) byte blocks\): (\d+) operations'
++    pattern_cycles = r'\((\d+) bit key, (\d+) byte blocks\): 1 operation in (\d+) cycles'
++    match = re.search(pattern_operations, line)
++    if match:
++        res = {
++            "bit_key": int(match.group(1)),
++            "byte_blocks": int(match.group(2)),
++            "operations": int(match.group(3)),
++        }
++        return res
++
++    match = re.search(pattern_cycles, line)
++    if match:
++        res = {
++            "bit_key": int(match.group(1)),
++            "byte_blocks": int(match.group(2)),
++            "cycles": int(match.group(3)),
++        }
++        return res
++
++    return None
++
++
++def parse(filepath):
++    result = {}
++    alg, op = "", ""
++    with open(filepath, 'r') as file:
++        for line in file:
++            if not line:
++                continue
++            _alg, _op = parse_title(line)
++            if _alg:
++                alg, op = _alg, _op
++                if alg not in result:
++                    result[alg] = {}
++                if op not in result[alg]:
++                    result[alg][op] = []
++                continue
++            parsed_result = parse_item(line)
++            if parsed_result:
++                result[alg][op].append(parsed_result)
++    return result
++
++
++def merge(base, new):
++    merged = {}
++    for alg in base.keys():
++        merged[alg] = {}
++        for op in base[alg].keys():
++            if op not in merged[alg]:
++                merged[alg][op] = []
++            for index in range(len(base[alg][op])):
++                merged_item = {
++                    "bit_key": base[alg][op][index]["bit_key"],
++                    "byte_blocks": base[alg][op][index]["byte_blocks"],
++                }
++                if "operations" in base[alg][op][index].keys():
++                    merged_item["base_ops"] = base[alg][op][index]["operations"]
++                    merged_item["new_ops"] = new[alg][op][index]["operations"]
++                else:
++                    merged_item["base_cycles"] = base[alg][op][index]["cycles"]
++                    merged_item["new_cycles"] = new[alg][op][index]["cycles"]
++
++                merged[alg][op].append(merged_item)
++    return merged
++
++
++def format(merged):
++    for alg in merged.keys():
++        for op in merged[alg].keys():
++            base_sum = 0
++            new_sum = 0
++            differ_sum = 0
++            differ_cnt = 0
++            print()
++            hlen = 80
++            print("="*hlen)
++            print(f"{alg}")
++            print(f"{' '*(len(alg)//3) + op}")
++            print("-"*hlen)
++            key = ""
++            if "base_ops" in merged[alg][op][0]:
++                key = "ops"
++                print(f"bit key | byte blocks | base ops    | new ops     | differ(%)")
++            else:
++                key = "cycles"
++                print(f"bit key | byte blocks | base cycles | new cycles  | differ(%)")
++            for index in range(len(merged[alg][op])):
++                item = merged[alg][op][index]
++                base_cnt = item[f"base_{key}"]
++                new_cnt = item[f"new_{key}"]
++                base_sum += base_cnt
++                new_sum += new_cnt
++                differ = round((new_cnt - base_cnt)*100/base_cnt, 2)
++                differ_sum += differ
++                differ_cnt += 1
++                bit_key = item["bit_key"]
++                byte_blocks = item["byte_blocks"]
++                print(
++                    f"{bit_key:<7} | {byte_blocks:<11} | {base_cnt:<11} | {new_cnt:<11} | {differ:<8}")
++            average_speed_up = "{:.2f}".format(differ_sum/differ_cnt)
++            ops_total_speed_up = "{:.2f}".format(
++                (base_sum - new_sum) * 100 / base_sum)
++            print('-'*hlen)
++            print(f"average differ(%s)    | total_differ(%)")
++            print('-'*hlen)
++            print(f"{average_speed_up:<21} | {ops_total_speed_up:<10}")
++            print('='*hlen)
++
++
++def main(base_log, new_log):
++    base = parse(base_log)
++    new = parse(new_log)
++    merged = merge(base, new)
++    format(merged)
++
++
++if __name__ == "__main__":
++    if len(sys.argv) != 3:
++        print(f"usage: {sys.argv[0]} base_log new_log")
++        exit(-1)
++    main(sys.argv[1], sys.argv[2])
 -- 
-Regards/Gruss,
-    Boris.
+2.40.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
