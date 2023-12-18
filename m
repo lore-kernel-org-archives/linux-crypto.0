@@ -1,58 +1,112 @@
-Received: from mail.nsr.re.kr (unknown [210.104.33.65])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4540179EE;
-	Mon, 18 Dec 2023 07:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nsr.re.kr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nsr.re.kr
-Received: from 210.104.33.70 (nsr.re.kr)
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
-	by mail.nsr.re.kr with SMTP; Mon, 18 Dec 2023 16:33:09 +0900
-X-Sender: letrhee@nsr.re.kr
-Received: from 192.168.155.188 ([192.168.155.188])
-          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 291;
-          Mon, 18 Dec 2023 16:33:05 +0900 (KST)
-From: Dongsoo Lee <letrhee@nsr.re.kr>
-To: 'Herbert Xu' <herbert@gondor.apana.org.au>, 
-	"'David S. Miller'" <davem@davemloft.net>, 
-	'Jens Axboe' <axboe@kernel.dk>, 'Eric Biggers' <ebiggers@kernel.org>, 
-	"'Theodore Y. Ts'o'" <tytso@mit.edu>, 
-	'Jaegeuk Kim' <jaegeuk@kernel.org>, 
-	'Thomas Gleixner' <tglx@linutronix.de>, 
-	'Ingo Molnar' <mingo@redhat.com>, 'Borislav Petkov' <bp@alien8.de>, 
-	'Dave Hansen' <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"'H. Peter Anvin'" <hpa@zytor.com>, 
-	'Dongsoo Lee' <letrhee@nsr.re.kr>
-Cc: linux-crypto@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231205010329.21996-1-letrehee@nsr.re.kr>
-In-Reply-To: <20231205010329.21996-1-letrehee@nsr.re.kr>
-Subject: RE: [PATCH v6 0/5] crypto: LEA block cipher implementation
-Date: Mon, 18 Dec 2023 16:33:01 +0900
-Message-ID: <004701da3184$6e090560$4a1b1020$@nsr.re.kr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B56613ADC;
+	Mon, 18 Dec 2023 10:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="fxXH5ry6"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6872A40E00CB;
+	Mon, 18 Dec 2023 10:14:39 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 6gSLe3VmLbrr; Mon, 18 Dec 2023 10:14:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1702894476; bh=flSmrHICJg+bcSVL2Gg7M4juB6JLxKEwKyo/mAL/FNc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fxXH5ry6RnlJenPbiE6v3VXxmsrkTHM5Uupmu165JWWiAgHehbqsc4BccpJeJIvU8
+	 oXOGZQSlClpqYfk9UrVG5efKbQfGG5lplRVjyUkvs7/EnP/i4LidFQY8B8sXqRFGOf
+	 gSrXskQuCeEvDZw/RF0HGvuWPfYcBwYD0dxz2cGonJub0ZJoz9pL9YoG8xHPYeVjtW
+	 IaKfeyG5f01ZyhG0Cp7zXMkqHPwuxBtWVtatD0ID+/X+ENwTRoFPYzXmsEDBon+zSu
+	 qrdQDWTFEpqTEWvDlXNwLUMhtXlWTUfww0YrzpWJm5BX+D66wTTz9HW6ouIxdpWFN+
+	 GGxS5Keuc7leOliayFRH/y3lI/J5L+VLaqHA5qoVC14rNgEiU3Rs7dqlxnyve/h2Zp
+	 T9Yos25zGBBBjcERWxAjXWVE0fz86AxGoIY2/qJBS1qJ4+zmeaEgE2Rl7uoWw5oZht
+	 oIm33Tv8ybUANBaOyOpHbLe255QGVCCuE1hlKw25bG78+eVCamI9/21sWhJ/YpNPsj
+	 KfL+zMlrYgLiJNedm2V2L7fhzneY312Oa7Fs2L4M6nm2LMEHW2GP3UsTpPy7LDtoV3
+	 B2qaVZ7dNmD5lOAA+vlsn7ugICNiIo5NC/1e3svNnFoU2nS/4+jLd2rfnCoJbEzDjG
+	 uJP/vqTMNYhv3VA64TRIqrI8=
+Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3532640E0030;
+	Mon, 18 Dec 2023 10:13:57 +0000 (UTC)
+Date: Mon, 18 Dec 2023 11:13:50 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+	tony.luck@intel.com, marcorr@google.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com
+Subject: Re: [PATCH v10 20/50] KVM: SEV: Select CONFIG_KVM_SW_PROTECTED_VM
+ when CONFIG_KVM_AMD_SEV=y
+Message-ID: <20231218101350.GAZYAbXqYLXByk5Akw@fat_crate.local>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-21-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQKQdsWb5UD+xQlqqHr8cbxlcEv/nK9CGvZQ
-Content-Language: ko
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231016132819.1002933-21-michael.roth@amd.com>
 
-(Resend mail because of an error)
-Hello,
+On Mon, Oct 16, 2023 at 08:27:49AM -0500, Michael Roth wrote:
+> SEV-SNP relies on the restricted/protected memory support to run guests,
+> so make sure to enable that support with the
+> CONFIG_KVM_SW_PROTECTED_VM build option.
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/kvm/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 8452ed0228cb..71dc506aa3fb 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -126,6 +126,7 @@ config KVM_AMD_SEV
+>  	bool "AMD Secure Encrypted Virtualization (SEV) support"
+>  	depends on KVM_AMD && X86_64
+>  	depends on CRYPTO_DEV_SP_PSP && !(KVM_AMD=y && CRYPTO_DEV_CCP_DD=m)
+> +	select KVM_SW_PROTECTED_VM
+>  	help
+>  	  Provides support for launching Encrypted VMs (SEV) and Encrypted VMs
+>  	  with Encrypted State (SEV-ES) on AMD processors.
+> -- 
 
-I'm checking in on the status of the patch submitted to the Linux kernel =
-group. I understand the review process takes time, and we appreciate =
-your team's efforts.
+Kconfig doesn't like this one:
 
-While awaiting review, is there anything specific we can do to enhance =
-the patch's acceptance chances? Your guidance would be greatly =
-appreciated.
+WARNING: unmet direct dependencies detected for KVM_SW_PROTECTED_VM
+  Depends on [n]: VIRTUALIZATION [=y] && EXPERT [=n] && X86_64 [=y]
+  Selected by [m]:
+  - KVM_AMD_SEV [=y] && VIRTUALIZATION [=y] && KVM_AMD [=m] && X86_64 [=y] && CRYPTO_DEV_SP_PSP [=y] && (KVM_AMD [=m]!=y || CRYPTO_DEV_CCP_DD [=m]!=m)
 
-Thank you,
-Dongsoo Lee
+WARNING: unmet direct dependencies detected for KVM_SW_PROTECTED_VM
+  Depends on [n]: VIRTUALIZATION [=y] && EXPERT [=n] && X86_64 [=y]
+  Selected by [m]:
+  - KVM_AMD_SEV [=y] && VIRTUALIZATION [=y] && KVM_AMD [=m] && X86_64 [=y] && CRYPTO_DEV_SP_PSP [=y] && (KVM_AMD [=m]!=y || CRYPTO_DEV_CCP_DD [=m]!=m)
+
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
