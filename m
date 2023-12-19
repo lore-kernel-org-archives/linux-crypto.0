@@ -1,208 +1,340 @@
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2063.outbound.protection.outlook.com [40.107.100.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2343D0C2;
-	Tue, 19 Dec 2023 21:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175AF40BF5
+	for <linux-crypto@vger.kernel.org>; Tue, 19 Dec 2023 23:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BoNuw3Rw"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q7GRe3G8MQPSyK1Q2+UXrrtzl0UH7S9v4KqL4S0TLit9WCVe0P+2OPQMGWnZn9g/5xe8Ee3VZA4rPtaYMkCoHKWIAtJVZn5aZnXBLc325hgogY+lWlYcdfmP0e2dCcBg6eaY+PPmNGDL3mK8r7wPeZ8HhRL93bucHhlaSxhb4wa9r94fnMIjy3f4ankIju3dOrgLRnd+G4cuM/bczSJJUePcs7r/v6UcSRIl8aTR1UjRm7wBb1BDXRh6hOlglWzh9jmX0ZlUzKX/w1uv4RhetkNHJIvpHJzXVDizXMzKD2wEOpmtcbc1eYma9GtYss1NafoeeEjLzg9vz5l6+PKq+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=06d69L1CrHqIxaTmS38aZSzitC0So0NOlv1zMifyYxc=;
- b=I25/BA9MJsfXeOzfMTO5MdEXkC6iyMQnlruw3CrbkickLUAXxLiJAcPnWv330te3rqRtJiptef/u9qXsICW/o8n5sOUbWAJ6j+V287OzpwgIyPwmrDVW1ADhN5BK+mvjKzSmboSkTPA5jhn1ECgWhVOF86mkf6UExcRKCA4urHZqAZ4PnBb+l/++b1TdfeNMgdfpWDBTAsn/GRKs1+mPTQVhDI51oC0wBw1CFAIaQa5TpqdbvULZluEd7u8SEK5ODq2AU+cTQ8oQYFdDEmsvFsww8GF7jaxbOVCnkWsLONw8T4wCKvKZS2OW/7UP+ldzusp45SxfziROw9dCunopig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=06d69L1CrHqIxaTmS38aZSzitC0So0NOlv1zMifyYxc=;
- b=BoNuw3Rw/v1xSYYS7gpkwirFUt8KxAU5A7iL1nqfozt/0meFRI5JX0svCF9cdiTCokkofbgkOhcRU76U5Jl5pXdB0hTXWbivfh4xOPOKeRQPgZ9E2uTqkUr5ImgjFmL39ZOSMLZqLdDtiPPfkXquTrWs1JLtGcg3LV7QK6c2ZdU=
-Received: from CH2PR05CA0009.namprd05.prod.outlook.com (2603:10b6:610::22) by
- LV3PR12MB9165.namprd12.prod.outlook.com (2603:10b6:408:19f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.38; Tue, 19 Dec
- 2023 21:30:32 +0000
-Received: from SA2PEPF00001507.namprd04.prod.outlook.com
- (2603:10b6:610:0:cafe::c3) by CH2PR05CA0009.outlook.office365.com
- (2603:10b6:610::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.18 via Frontend
- Transport; Tue, 19 Dec 2023 21:30:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SA2PEPF00001507.mail.protection.outlook.com (10.167.242.39) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7113.14 via Frontend Transport; Tue, 19 Dec 2023 21:30:29 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Tue, 19 Dec
- 2023 15:30:28 -0600
-Date: Tue, 19 Dec 2023 10:20:26 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: Borislav Petkov <bp@alien8.de>
-CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
-	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
-	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
-	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
-	<vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-	<tony.luck@intel.com>, <marcorr@google.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 11/50] x86/sev: Add helper functions for RMPUPDATE
- and PSMASH instruction
-Message-ID: <20231219162026.mzicb22hbwjycpzg@amd.com>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-12-michael.roth@amd.com>
- <20231121162149.GFZVzZHQB1g2bdvJie@fat_crate.local>
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="MtreWpKm"
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6d9f879f784so3960140a34.2
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Dec 2023 15:34:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1703028843; x=1703633643; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=QJQt7cbCUi1tOuMx0ASymYCoclSLcgR/2qgTejmDPTU=;
+        b=MtreWpKmZ8jrOi+oP08vul+QoiiZiplTZ30lav2bTTchrxD7P0Cq6iSv5zLU15lywH
+         hwm+Qk9suMl1/23d45yuh2jbn/jNWz5sgv8JTv8q3puTqQvzOs3FMAt+yZXfVSp4Heyy
+         vviSKwPHyH5dAUgTFc16OcRQBW4wNqUDkkvdnZQSAS2t4nse/sZOiynRbd67rrM59Pgc
+         7dxiJaXT2HRwKz8+CFIZRFGMoNCS8kcLELwi4M+Oic+5l4Mh8F/3dXkxw7ai9BghxY6h
+         4JVE2NotcGQL97FK8D4bQkgBoPnGeSfWrUqR/7MZvTxj2NZNCXeFiCZe2oyAx38u0K6E
+         aqDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703028843; x=1703633643;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QJQt7cbCUi1tOuMx0ASymYCoclSLcgR/2qgTejmDPTU=;
+        b=dm9Q4KxSFCenvLHFWbBHBXlnNcXCgcwEBpo3Q+2W5vcEoEKcJOYiL4ABBYBFuq7XOe
+         vBCVLOh7K9CqdfeUUhwp0S6c5vxsFt0BdXmmPaYdgORYoH6Fpf9Sf+Vo+dlhR9AR2Cpy
+         918pnkEoe5R4E9UuE479i0o8/b0G4mp4TEkItTAzch4yWLEvamf9gXHPGYbjC1d6XY6q
+         sHoyqUNqS8emsazLGzsNYjdf4S/VdubZO6zCMxZROetvYI/0JcpUSDwc61Bfd4MbmD1E
+         0MG4PSoL6lFpJXJemzT4n+HeMdDSqY3KPlOullo3yFNB8scDtu3hLmPqrOdSo9EhrF5U
+         gCOw==
+X-Gm-Message-State: AOJu0YwaxbY7ulkScswFkUYWTVfh0U8o5tUUBv0/YIHIj3pUa8yFS+ME
+	b+wLVUeEtgxFBq7PE4mcJbgtYQ==
+X-Google-Smtp-Source: AGHT+IGUSBbzpL6dCwMmMDy4BA/oZq0bz76xCWnpQDCC4RjQFFWKr1IXur8/+3hkhIwIpSmVt3cMug==
+X-Received: by 2002:a05:6830:1084:b0:6d8:5323:2516 with SMTP id y4-20020a056830108400b006d853232516mr17340495oto.19.1703028842847;
+        Tue, 19 Dec 2023 15:34:02 -0800 (PST)
+Received: from dread.disaster.area (pa49-180-125-5.pa.nsw.optusnet.com.au. [49.180.125.5])
+        by smtp.gmail.com with ESMTPSA id q64-20020a634343000000b005cdb499acd0sm1929873pga.42.2023.12.19.15.34.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 15:34:01 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1rFjb4-00AdXV-0a;
+	Wed, 20 Dec 2023 10:33:58 +1100
+Date: Wed, 20 Dec 2023 10:33:58 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Alexander Potapenko <glider@google.com>
+Cc: Aleksandr Nogikh <nogikh@google.com>,
+	Dave Chinner <dchinner@redhat.com>,
+	syzbot+a6d6b8fffa294705dbd8@syzkaller.appspotmail.com, hch@lst.de,
+	davem@davemloft.net, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com, linux-xfs@vger.kernel.org
+Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in __crc32c_le_base (3)
+Message-ID: <ZYIoZuGKsVaOt2QI@dread.disaster.area>
+References: <20231213104950.1587730-1-glider@google.com>
+ <ZXofF2lXuIUvKi/c@rh>
+ <ZXopGGh/YqNIdtMJ@dread.disaster.area>
+ <CAG_fn=UukAf5sPrwqQtmL7-_dyUs3neBpa75JAaeACUzXsHwOA@mail.gmail.com>
+ <ZXt2BklghFSmDbhg@dread.disaster.area>
+ <CAG_fn=VqSEyt+vwZ7viviiJtipPPYyzEhkuDjdnmRcW-UXZkYg@mail.gmail.com>
+ <ZXzMU9DQ7JqeYwvb@dread.disaster.area>
+ <CANp29Y5XPoH3tdZ_ZEJK3oUZnFf5awQn1w3E95YJFJ-wPxQQ4g@mail.gmail.com>
+ <ZYGPZUerlEaCVRq8@dread.disaster.area>
+ <CAG_fn=XaT0pt0j-=BoOKFU9nh+R7NY3qgwtk5sTS3afDunnmwA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231121162149.GFZVzZHQB1g2bdvJie@fat_crate.local>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00001507:EE_|LV3PR12MB9165:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9566ee79-2ea1-4314-6780-08dc00d9b95b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	wdnBtnFz5dQcEiFh4uyCOjtN5ZK9tmGjkrYM1LKZcW/X6t7Yn5xHnZT+hF3EwiLMNK5u4fxlxEHb38MFkHVov55qF9uLrwXugYzyWlK149V/bP//ajSdBKdfYfkkxittkViE3BckygfWGgfYOTregBQOAnr9ozGy7FLGjU77RRMgv8j7qyWpOuNzC44LLAYeQapmF2oE9rmZ7mdwaXBjUTLIpWZf6w+2oLegHGF8YMNx4jvfLr8dzhyj735oAgLAd8ziMJGxIY6wF6l3WzJtr6kEwweyxedhPdzBdSNqXRoKG2MULPWESNmdo46SQyKDe3wbn/CgPODhBNJ9rlmasz5AjFqVr014ZjUvyv7s3gaXgnBqmUlnQhTk7k2DoD9vPez4AXE0TmlzO/Acor7veFp1xkfIqcuvNe/ilZAWkqBVSuZ+I3iYOYqUYyHm02taexSwmYEwecwzjYC5Lo2z6JPcStEURjqIAcEZxHnToOyte6Vkmxugeoi21cSB1FgaNTalOm0TOorFYL9ios4L/xPYmXF017Tr0KORnXpRgcDDIyNrG0gJunFn1h56eyBvA7wYiXGMvawzHzM83529pQIYFazH9JZl1qt7NbqG/ObFLYnh3emVegrdatyVD+rbqnESU//JoqL9DpPr3PnHei5xDiDA4t1fMPn0LddusbBdlLcVvDAZGsAiAHg3a0SKD2I19JylbkLVvgrjLWBMRPtGYB07/f/GtPVvWuKLfv+Z7gnEj3Cdc5VARDbYlqPYNIgkvHsDF2qDux6Yp89rDg==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(376002)(346002)(136003)(396003)(230922051799003)(82310400011)(64100799003)(186009)(1800799012)(451199024)(40470700004)(46966006)(36840700001)(8936002)(5660300002)(36860700001)(44832011)(47076005)(4326008)(8676002)(2906002)(83380400001)(6916009)(316002)(426003)(70586007)(40480700001)(70206006)(7406005)(7416002)(336012)(54906003)(41300700001)(82740400003)(40460700003)(81166007)(356005)(26005)(16526019)(1076003)(966005)(86362001)(2616005)(478600001)(36756003)(66899024)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Dec 2023 21:30:29.6352
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9566ee79-2ea1-4314-6780-08dc00d9b95b
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00001507.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9165
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAG_fn=XaT0pt0j-=BoOKFU9nh+R7NY3qgwtk5sTS3afDunnmwA@mail.gmail.com>
 
-On Tue, Nov 21, 2023 at 05:21:49PM +0100, Borislav Petkov wrote:
-> On Mon, Oct 16, 2023 at 08:27:40AM -0500, Michael Roth wrote:
-> > +static int rmpupdate(u64 pfn, struct rmp_state *val)
+On Tue, Dec 19, 2023 at 02:56:04PM +0100, Alexander Potapenko wrote:
+> On Tue, Dec 19, 2023 at 1:41 PM Dave Chinner <david@fromorbit.com> wrote:
+> >
+> > On Mon, Dec 18, 2023 at 11:22:40AM +0100, Aleksandr Nogikh wrote:
+> > > Hi Dave,
+> > >
+> > > > KMSAN has been used for quite a long time with syzbot, however,
+> > > > and it's supposed to find these problems, too. Yet it's only been
+> > > > finding this for 6 months?
+> > >
+> > > As Alex already mentioned, there were big fs fuzzing improvements in
+> > > 2022, and that's exactly when we started seeing "KMSAN: uninit-value
+> > > in __crc32c_le_base" (I've just checked crash history). Before that
+> > > moment the code was likely just not exercised on syzbot.
+> >
+> > Can you tell us what these "big fuzzing improvements" were? I mean,
+> > you're trying to fuzz our code and we've been working on rejecting
+> > fuzzing for the last 15 years, so if you're doing something novel it
+> > would help us work out how to defeat it quickly and effciently.
+> >
+> > > On Fri, Dec 15, 2023 at 10:59 PM 'Dave Chinner' via syzkaller-bugs
+> > > <syzkaller-bugs@googlegroups.com> wrote:
+> > > >
+> > > > On Fri, Dec 15, 2023 at 03:41:49PM +0100, Alexander Potapenko wrote:
+> > > > >
+> > > > > You are right, syzbot used to mount XFS way before 2022.
+> > > > > On the other hand, last fall there were some major changes to the way
+> > > > > syz_mount_image() works, so I am attributing the newly detected bugs
+> > > > > to those changes.
+> > > >
+> > > > Oh, so that's when syzbot first turned on XFS V5 format testing?
+> > > >
+> > > > Or was that done in April, when this issue was first reported?
+> > > >
+> > > > > Unfortunately we don't have much insight into reasons behind syzkaller
+> > > > > being able to trigger one bug or another: once a bug is found for the
+> > > > > first time, the likelihood to trigger it again increases, but finding
+> > > > > it initially might be tricky.
+> > > > >
+> > > > > I don't understand much how trivial is the repro at
+> > > > > https://gist.github.com/xrivendell7/c7bb6ddde87a892818ed1ce206a429c4,
+> > > >
+> > > > I just looked at it - all it does is create a new file. It's
+> > > > effectively "mount; touch", which is exactly what I said earlier
+> > > > in the thread should reproduce this issue every single time.
+> > > >
+> > > > > but overall we are not drilling deep enough into XFS.
+> > > > > https://storage.googleapis.com/syzbot-assets/8547e3dd1cca/ci-upstream-kmsan-gce-c7402612.html
+> > > > > (ouch, 230Mb!) shows very limited coverage.
+> > > >
+> > > > *sigh*
+> > > >
+> > > > Did you think to look at the coverage results to check why the
+> > > > numbers for XFS, ext4 and btrfs are all at 1%?
+> > >
+> > > Hmmm, thanks for pointing it out!
+> > >
+> > > Our ci-upstream-kmsan-gce instance is configured in such a way that
+> > > the fuzzer program is quite restricted in what it can do. Apparently,
+> > > it also lacks capabilities to do mounts, so we get almost no coverage
+> > > in fs/*/**. I'll check whether the lack of permissions to mount() was
+> > > intended.
+> > >
+> > > On the other hand, the ci-upstream-kmsan-gce-386 instance does not
+> > > have such restrictions at all and we do see fs/ coverage there:
+> > > https://storage.googleapis.com/syzbot-assets/609dc759f08b/ci-upstream-kmsan-gce-386-0e389834.html
+> > >
+> > > It's still quite low for fs/xfs, which is explainable -- we almost
+> > > immediately hit "KMSAN: uninit-value in __crc32c_le_base". For the
+> > > same reason, it's also somewhat lower than could be elsewhere as well
+> > > -- we spend too much time restarting VMs after crashes. Once the fix
+> > > patch reaches the fuzzed kernel tree, ci-upstream-kmsan-gce-386 should
+> > > be back to normal.
+> > >
+> > > If we want to see how deep syzbot can go into the fs/ code in general,
+> > > it's better to look at the KASAN instance coverage:
+> > > https://storage.googleapis.com/syzbot-assets/12b7d6ca74e6/ci-upstream-kasan-gce-root-0e389834.html
+> > >  (*)
+> > >
+> > > Here e.g. fs/ext4 is already 63% and fs/xfs is 16%.
+> >
+> > Actually, that XFS number is an excellent result. I don't think we
+> > can do much better than that.
+> >
+> > I know, that's not the response you expected.
+> >
+> > Everyone knows that higher coverage numbers are better because it
+> > means we've tested more code, right?
+> >
+> > Wrong.
+> >
+> > When it comes to fuzzing based attacks, the earlier the bad data is
+> > detected and rejected the better the result. We should see lower
+> > coverage of the code the better the detection and rejection
+> > algorithms get.  i.e. The detection code should be extensively
+> > covered, but the rest of the code should have very little coverage
+> > because of how quickly the filesystem reacts to fatal object
+> > corruption.
+> >
+> > And the evidence for this in the XFS coverage results?
+> >
+> > Take a look at fs/xfs/libxfs/xfs_inode_buf.c. Every single line of
+> > the disk inode format verifiers has been covered (i.e. every
+> > possible corruption case we can detect has been exercised).
+> >
+> > That's good.
+> >
+> > However, there is zero coverage of core formatting functions like
+> > xfs_inode_to_disk() that indicate no inodes have been successfully
+> > modified and written back to disk.
+> >
+> > That's *even better*.
+> >
+> > Think about that for a minute.
+> >
+> > The coverage data is telling us that we've read lots of corrupt
+> > inodes and rejected them, but the testing has made almost no
+> > successful inode modifications that have been written back to stable
+> > storage. That's because of widespread corruption in the images
+> > resulting in a fatal corruption being detected before modofications
+> > are being made or are being aborted before they are pushed back to
+> > the corrupt image.
+> >
+> > The same pattern appears for most other major on-disk subsystems.
+> > They either have not been exercised at all (e.g. extent btree code) or
+> > the only code in the subsystem that has significant coverage is the
+> > object lookup code and the format verifiers the lookup code runs.
+> >
+> > This is an excellent result because it proves that XFS is detecting
+> > the majority of corrupt structures in it's initial object
+> > search iteration paths. Corruption is not getting past the
+> > first read from disk and so no code other than the search/lookup
+> > code and the verifiers is getting run.
+> >
+> > Put simply: we are not letting corrupt structures get into code
+> > paths where they can be mis-interpretted and do damage.
+> >
+> > From my perspective as an experienced filesystem developer, this is
+> > exactly the sort of coverage pattern I would like to see from -all
+> > filesystems- when they are fed nothing but extensively corrupted
+> > filesystems the way syzbot does.
+> >
+> > The basic truth is that if filesystems are good at corruption
+> > detection and rejection, they should have very low code coverage
+> > numbers from syzbot testing.
+> >
+> > -Dave.
 > 
-> rmp_state *state
+> It is quite insightful that if we throw random garbage at a
+> well-written API then low coverage indicates that the checks are doing
+> their job.
 > 
-> so that it is clear what this is.
-> 
-> > +{
-> > +	unsigned long paddr = pfn << PAGE_SHIFT;
-> > +	int ret, level, npages;
-> > +	int attempts = 0;
-> > +
-> > +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> > +		return -ENXIO;
-> > +
-> > +	do {
-> > +		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
-> > +		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
-> > +			     : "=a"(ret)
-> > +			     : "a"(paddr), "c"((unsigned long)val)
-> 
-> Add an empty space between the " and the (
-> 
-> > +			     : "memory", "cc");
-> > +
-> > +		attempts++;
-> > +	} while (ret == RMPUPDATE_FAIL_OVERLAP);
-> 
-> What's the logic here? Loop as long as it says "overlap"?
-> 
-> How "transient" is that overlapping condition?
-> 
-> What's the upper limit of that loop?
-> 
-> This loop should check a generously chosen upper limit of attempts and
-> then break if that limit is reached.
+> But this is not how syzkaller works.
 
-We've raised similar questions to David Kaplan and discussed this to a
-fair degree.
+In general, that statement is true. But we're talking about the
+filesystem fuzzing that syzkaller does, and that's a completely
+different beast.
 
-The transient condition here is due to firmware locking the 2MB-aligned
-RMP entry for the range to handle atomic updates. There is no upper bound
-on retries or the amount of time spent, but it is always transient since
-multiple hypervisor implementations now depend on this and any deviation
-from this assurance would constitute a firmware regression.
+> Our goal is to produce as many well-formed inputs as possible to
+> exercise most of the code under test.
+> Then, a small step sideways from every well-formed input might trigger
+> a bug here or there.
+> It might as well be rejected early by the elaborate input checks (in
+> which case we won't be finding any new bugs), but anyway we should be
+> covering bigger parts of the code by just running valid inputs.
 
-A good torture test for this path is lots of 4K-only guests doing
-concurrent boot/shutdowns in a tight loop. With week-long runs the
-longest delay seen was on the order of 100ns, but there's no real 
-correlation between time spent and number of retries, sometimes
-100ns delays only involve 1 retry, sometimes much smaller time delays
-involve hundreds of retries, and it all depends on what firmware is
-doing, so there's no way to infer a safe retry limit based on that
-data.
+Yes, you're talking about the syscall exercising interface. That
+works just fine for finding issues when the input comes from only
+one direction - the syscall interface.
 
-All that said, there are unfortunately other conditions that can
-trigger non-transient RMPUPDATE_FAIL_OVERLAP failures, and these will
-result in an infinite loop. Those are the result of host misbehavior
-however, like trying to set up 2MB private RMP entries when there are
-already private 4K entries in the range. Ideally these would be separate
-error codes, but even if that were changed in firmware we'd still need
-code to support older firmwares that don't disambiguate so not sure this
-situation can be improved much.
+The issue is that filesystem testing has a second set of inputs that
+are being perturbed: the filesystem image being operated on by the
+syscalls.
 
-> 
-> > +	if (ret) {
-> > +		pr_err("RMPUPDATE failed after %d attempts, ret: %d, pfn: %llx, npages: %d, level: %d\n",
-> > +		       attempts, ret, pfn, npages, level);
-> 
-> You're dumping here uninitialized stack variables npages and level.
-> Looks like leftover from some prior version of this function.
+It's a simple fact that filesystem operations cannot be fully
+exercised if the filesystem image is corrupt. Corruption will be
+detected and the syscall operation will be aborted without having
+performed the desired operation.
 
-Yah, I'll clean this up. I think logging the attempts probably doesn't
-have much use anymore either.
+So while the goal might be to gain extensive subsystem code coverage
+from the syscall interface, this is being defeated by the additional
+peturbation of low level data objects (the corrupt filesystem)
+causing premature termination of the syscall explorations.
 
-> 
-> > +		sev_dump_rmpentry(pfn);
-> > +		dump_stack();
-> 
-> This is going to become real noisy on a huge machine with a lot of SNP
-> guests.
+> For certain subsystems with very limited APIs it is fairly easy to
+> generate all the possible valid inputs by simply combining syscalls.
+> In most cases we are still limited by the combinatorial explosion of
+> the search space though.
+> But if there are implicit dependencies that the fuzzer cannot deduce
+> from the descriptions, it will blindly flip bits in known inputs in
+> the hope to produce a new valid input - mostly in vain.
+> So seeing little coverage for a subsystem usually means that for some
+> reason we are just barely scratching the API surface.
 
-Since the transient case will eventually resolve to ret==0, we will only
-get here on a kernel oops sort of condition where a stack dump seems
-appropriate. rmpupdate() shouldn't error during normal operation, and if
-it ever does it will likely be a fatal situation where those stack dumps
-will be useful.
+Yes, random bit perturbation fuzzing is a really basic "million
+monkeys bashing on typewriters" discovery technique. But when I read
+the coverage results, there are very few syscall entry points into
+the filesystem, and they all end up in the metadata read verifiers
+that point to extensive corruption detection occuring.
 
-Thanks,
+> Compare this with fuzzing a C compiler.
+> Doing something like `head /dev/random > 1.c && gcc -c 1.c` in a loop
+> may eventually trigger interesting bugs in the compiler backend, but
+> most of the time the programs will be rejected by the lexer which is
+> smart enough to not accept garbage.
+> Is the lexer written correctly? Yes, as long as it does not crash on
+> these random inputs.
+> Does low coverage indicate that the whole compiler is written
+> correctly? Not necessarily. Tools like csmith will easily get past the
+> lexer checks by generating structurally valid programs that might be
+> broken from the semantic point of view.
 
-Mike
+This is exactly equivalent of syzkaller feeding corrupt filesystem
+images to the filesystems.
 
-> 
-> Thx.
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://people.kernel.org/tglx/notes-about-netiquette
-> 
+IOWs, syzkaller needs to stop using corrupt filesystem images if it
+wants to actually extensively cover filesystem internal
+functionality for filesystems with high rates of corruption
+rejection.
+
+> For some parts of the kernel syzkaller acts like csmith, because its
+> knowledge of the data layout is just enough to generate valid inputs.
+> For file systems, however, we might be lagging behind.
+
+I suspect the right word is "obsolete", not "lagging behind". That's
+what I'm trying to find out....
+
+> The last year changes in the fuzzer that we mentioned earlier improved
+> the initial seeding of file system images and added some basic
+> mutations, but there is still a lot to do.
+
+This really doesn't t tell us anything we didn't already know.
+
+What syzkaller -appears- to be doing with filesystems doesn't look
+much different to state of the art from 2005 where syscall
+operations were exercised against simulated disk failures and media
+corruptions instead of corrupted images. That quickly moved on to
+using image-based corruptions rather than simulated runtime failure
+because it was a lot simpler to implement and had much faster test
+cycles.
+
+e.g. Go look for "IRON File Systems" related papers from the
+University of Wisconsin where these techniques were first
+demonstrated. These were some of the foundational papers
+on filesystem error detection and handling that influenced the
+current XFS v5 format design and verifiation architecture.
+
+IOws, I'm trying to understand whether syzbot is actually doing
+something novel I've never seen before with it's filesystem images
+that might cause such coverage patterns. AFAICT syzkaller is not
+doing anything novel, but I can't be certain if the responses I get
+to requests for specific details are generalities devoid of any
+detail....
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
