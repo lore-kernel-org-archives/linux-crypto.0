@@ -1,227 +1,150 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2081.outbound.protection.outlook.com [40.107.93.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB23E1804D
-	for <linux-crypto@vger.kernel.org>; Tue, 19 Dec 2023 12:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643641A727;
+	Tue, 19 Dec 2023 12:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="bKVXCS4L"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so3387196a12.1
-        for <linux-crypto@vger.kernel.org>; Tue, 19 Dec 2023 04:41:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1702989673; x=1703594473; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jse3lCK79aXXY7rKkifQLf73K6m1hAauen4iGzJYwOo=;
-        b=bKVXCS4L0JWJesw9aXkA5G5G9azAxvKL11GFLNL0sVmvaWNiAK0bZMvykVrd1x0sMJ
-         cfmb1gSLbsyoHlOmStSZuHWWUf4BeBORrV0kwjbmeAiiDkhzG41AYd9mIcTX7KhU7AJ8
-         rXmtgKkR6ZkHtGIg4rjwY1sKYBEa1kJX6XZnESAxaSBLwRXw75qtQmqbDv4wMN3pILLK
-         Xewz2yMxt60EPuZgdI/G1tYJXnseM6SbYWEbpu2uKp3GncCLIlUYrtZTMM1ggqcfGv62
-         ElwGJm3S+sdpdXVWt6p1yE7/EiuNmnKul1onmfnGwsQLtNY9erUKj6AHZKG2bA35saa5
-         W4Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702989673; x=1703594473;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jse3lCK79aXXY7rKkifQLf73K6m1hAauen4iGzJYwOo=;
-        b=oJntnAnP8cFYmDXgOrk3/rskWj4DHb8jkWzBiaz3qKEPM5ND+L4y6mMX0TMrGLHiXm
-         R0GMSH1ZeMUy1qUlR94cOGilTdD8YhmJlEpmCAVB/ZKMZvBO/qcN3BQkVmH0phmPjHTO
-         lsRxmAWc3eRj6kCwiXWIearNhtxKQq3IrbRroKaBmBdsX/huCRd958YKfMVZj22bBLHZ
-         DXMXAcumTUcxHtC7OmgcFDnI3MqVgUI++DQbbBSEGJblWLIZPGvMjLNU+OGqcQBPY9Bz
-         UMJJqTwxT1vYgKR7Br20wiAesG55YjLWGcoGttvEYsBUXXCjCe+hQFLX/nWrNa6rN3cA
-         aG9Q==
-X-Gm-Message-State: AOJu0YxCO7QfbUNAuscvo4uDo9GaDp+O+pB2m1ASNqgPmxMPHAkKlEtX
-	Ioef61rikmnMqif4eLem9+TZSQ==
-X-Google-Smtp-Source: AGHT+IEPLCO86rZfqisZYKNGDry6iN+zDRCMVlxtQWLkdJrxo7qFtm5U61BClIDbvuTHod8s8r5Skw==
-X-Received: by 2002:a05:6a21:19c:b0:194:b60b:aa70 with SMTP id le28-20020a056a21019c00b00194b60baa70mr441841pzb.56.1702989673219;
-        Tue, 19 Dec 2023 04:41:13 -0800 (PST)
-Received: from dread.disaster.area (pa49-180-125-5.pa.nsw.optusnet.com.au. [49.180.125.5])
-        by smtp.gmail.com with ESMTPSA id b2-20020a17090a6e0200b0028ad2c3bd08sm1429356pjk.33.2023.12.19.04.41.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 04:41:12 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1rFZPJ-00AQml-1i;
-	Tue, 19 Dec 2023 23:41:09 +1100
-Date: Tue, 19 Dec 2023 23:41:09 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Aleksandr Nogikh <nogikh@google.com>
-Cc: Alexander Potapenko <glider@google.com>,
-	Dave Chinner <dchinner@redhat.com>,
-	syzbot+a6d6b8fffa294705dbd8@syzkaller.appspotmail.com, hch@lst.de,
-	davem@davemloft.net, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com, linux-xfs@vger.kernel.org
-Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in __crc32c_le_base (3)
-Message-ID: <ZYGPZUerlEaCVRq8@dread.disaster.area>
-References: <000000000000f66a3005fa578223@google.com>
- <20231213104950.1587730-1-glider@google.com>
- <ZXofF2lXuIUvKi/c@rh>
- <ZXopGGh/YqNIdtMJ@dread.disaster.area>
- <CAG_fn=UukAf5sPrwqQtmL7-_dyUs3neBpa75JAaeACUzXsHwOA@mail.gmail.com>
- <ZXt2BklghFSmDbhg@dread.disaster.area>
- <CAG_fn=VqSEyt+vwZ7viviiJtipPPYyzEhkuDjdnmRcW-UXZkYg@mail.gmail.com>
- <ZXzMU9DQ7JqeYwvb@dread.disaster.area>
- <CANp29Y5XPoH3tdZ_ZEJK3oUZnFf5awQn1w3E95YJFJ-wPxQQ4g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="d25JrXNx"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bVKjC0PQc4CTUD6qn3g5CDvg0OSE8VUr5xXHxn+iHvriga5EyUkDLmG2puf87j9/F9ilVgsmRsroVHe+ekU/L6v+E/xDcFqwMENzSb3NmqPpTLJzy2xH/xRz589Lmu2k2kpTtQi4NQGns/tGPsq06HGRwxqMhDBuNPc8+Hi5FYg8qyrzfsXvKPb1Jy+PvhvZjv4CXvpZuiv8VPyn79qcHFuoR/cngBxqinH7wnIjPoByi64AyYVitdeaBOEKadXQ5pTu7ePhFHShPbkwZeAIr0HwbUBQ6Lh1v14iP1ocb4QvCcRXgbFZsPrLzdsJTBTW4MFM+tFORd4cCNgiu+9b7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S0GPcQrknPxZPHPZqtdVTXBd6be4EA7eXWFwaujW65s=;
+ b=KIzQwsqkJkqg5nhix/TEYoQVc2Q5GYBGKfNF9ki7AiJxui4fdYuXXVv8bnEUgvMlf6RoI80aFlsplUyj1LRcG8it/o6JtI4Q4bmguCDCeMjNSg7FMkEqFjb1y+kjNa7fm8WUWWhRFO7utvs4eXClnxJUQxj+WgQ5wxzS0Oc8UZ730t2eLAesviENty6RNlduAtkEpcUiRUQOfqySymAkBtS1YS14q7GV7f/0wBV8KTt5zr7i5egtH+eCSiemQ5q4NOL7YoxwrgqGrzh6ni0e3wM/5V5Yngl1zvlMc+zKqhW49K909C7tjukMtv8McBznn2VYmLP6vPYcWkWyZi3TYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=gondor.apana.org.au
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S0GPcQrknPxZPHPZqtdVTXBd6be4EA7eXWFwaujW65s=;
+ b=d25JrXNxUuiGAUkFlfElDrSwoBjhKuFbF+tFsM7zHyfy40EHZC6+HTYEdbi2OvEj0WflB/6I+NV1//SUTmqbyD1eLLpJbKbhsy1y4J7I6PX/jCalaxDSKYgWTrbYPbuVXuJV/gCt0tYgotA98/R+sbFpc6HONTqzoCMYU3YkzH5RBsMh2Jyoi2dkpIBZc7iLsSsBcXcMj4XMUP14r7pROlGVBIGnTMG5bEIRl9hdIQ4MKj+ni+06UaCX7xh46w32GdMsRws0UAFQl6/YoJINd5tJk79/y4/yMn3oKsFUGISAwtmmk/HRESnqZIuD7lkPx08B91hZrxsJ/kCiKRn1jg==
+Received: from CYZPR11CA0002.namprd11.prod.outlook.com (2603:10b6:930:8d::8)
+ by SJ2PR12MB7963.namprd12.prod.outlook.com (2603:10b6:a03:4c1::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.37; Tue, 19 Dec
+ 2023 12:56:41 +0000
+Received: from CY4PEPF0000FCC1.namprd03.prod.outlook.com
+ (2603:10b6:930:8d:cafe::fd) by CYZPR11CA0002.outlook.office365.com
+ (2603:10b6:930:8d::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.18 via Frontend
+ Transport; Tue, 19 Dec 2023 12:56:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CY4PEPF0000FCC1.mail.protection.outlook.com (10.167.242.103) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7113.14 via Frontend Transport; Tue, 19 Dec 2023 12:56:39 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 19 Dec
+ 2023 04:56:37 -0800
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Tue, 19 Dec 2023 04:56:37 -0800
+Received: from BUILDSERVER-IO-L4T.nvidia.com (10.127.8.14) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.986.41 via Frontend
+ Transport; Tue, 19 Dec 2023 04:56:32 -0800
+From: Akhil R <akhilrajeev@nvidia.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+	<conor+dt@kernel.org>, <thierry.reding@gmail.com>, <jonathanh@nvidia.com>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <mperttunen@nvidia.com>,
+	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-tegra@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<krzk@kernel.org>
+CC: Akhil R <akhilrajeev@nvidia.com>
+Subject: [PATCH v2 0/5] Add Tegra Security Engine driver
+Date: Tue, 19 Dec 2023 18:26:09 +0530
+Message-ID: <20231219125614.33062-1-akhilrajeev@nvidia.com>
+X-Mailer: git-send-email 2.17.1
+X-NVConfidentiality: public
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANp29Y5XPoH3tdZ_ZEJK3oUZnFf5awQn1w3E95YJFJ-wPxQQ4g@mail.gmail.com>
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC1:EE_|SJ2PR12MB7963:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0848f709-3b5e-4d38-07f1-08dc0091f16b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	qdMP+FHWxnKmoxJVqJeJDt2vEeFti4fM7PmLnu30Ybe53UwSrX4FlfpEiqPsVef6UO+76loxR7fkJW6/c+9OTJm+Gxaard9FIzUv54ia7afI5y5Vk/IlXrraFddmWWO678jOTHmGSrbHeiHOAXf8H4MWPE0AarvQpyf0O8LLDZkSirf1qoe5909P7geuw5CjXFjaIYBpPGCYrbW9p6KLrLB6/lcF8y8OcLxAHfUXSwakLAtrMN1IJtWDTrucGG7WlNHDhRc8OYFgEVkotHQspHWQ4VqG9fhfKddqJGDK585S6GwHfIboetV9VxC64uY94vnq7DBD0H7PMVdxOD1bsb7eiuDOCw52q52HpTpYHOpx/d//RLoGT3DDOG+8cC8oIGpHR9+C0DUmyHNSPYvgtKuoyxrtmbVbZ6EKbBhaRHXeDtGyfyWMgqTq0Rp/0qeKDQK2NWwjCkb2095mwg7Q3ghXNnM3kkBGhgwHalQ2kvlgn0i7lqnWBcfTgE0tV1IgRxmyWVkRNF5qiePaOikMw7DUSEb0QA2Q82QPr1/7bwem+wVzPbkvwiQe48zBftLF/NBPir/52NPyj1Q4PeY3yaJRMwwPr5wOOE84C5WPj7L8a7fxp5y10etcw8gfyYQs4gGWX3p91QbPtoRir7Yxs/w7qt/pBbBMuHjQenY+w9qm0Dh3s5e/GRPLdV05gqAMv6w43N/WcRRqELCUUD0XOLbnv8X3+YN7O224jiKsfGtgqRStYNyUgR3lqHIC0hIZYrz6Uchl2U/quvJEky2uuCDn4VEr3lqS0scyXyW1CaowCRF0PDCb7QO40RLMVAdXwJ0O29AX2D79wtjuARZGLg==
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(346002)(136003)(396003)(230173577357003)(230273577357003)(230922051799003)(1800799012)(451199024)(82310400011)(186009)(64100799003)(46966006)(36840700001)(40470700004)(426003)(107886003)(7696005)(2616005)(1076003)(6666004)(26005)(15650500001)(478600001)(36860700001)(70206006)(2906002)(7416002)(5660300002)(83380400001)(47076005)(8936002)(4326008)(41300700001)(8676002)(110136005)(316002)(70586007)(356005)(7636003)(82740400003)(921008)(36756003)(86362001)(336012)(40480700001)(40460700003)(357404004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Dec 2023 12:56:39.9411
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0848f709-3b5e-4d38-07f1-08dc0091f16b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000FCC1.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7963
 
-On Mon, Dec 18, 2023 at 11:22:40AM +0100, Aleksandr Nogikh wrote:
-> Hi Dave,
-> 
-> > KMSAN has been used for quite a long time with syzbot, however,
-> > and it's supposed to find these problems, too. Yet it's only been
-> > finding this for 6 months?
-> 
-> As Alex already mentioned, there were big fs fuzzing improvements in
-> 2022, and that's exactly when we started seeing "KMSAN: uninit-value
-> in __crc32c_le_base" (I've just checked crash history). Before that
-> moment the code was likely just not exercised on syzbot.
+Add support for Tegra Security Engine which can accelerates various
+crypto algorithms. The Engine has two separate instances within for
+AES and HASH algorithms respectively.
 
-Can you tell us what these "big fuzzing improvements" were? I mean,
-you're trying to fuzz our code and we've been working on rejecting
-fuzzing for the last 15 years, so if you're doing something novel it
-would help us work out how to defeat it quickly and effciently.
+The driver registers two crypto engines - one for AES and another for
+HASH algorithms and these operate independently and both uses the host1x
+bus. Additionally, it provides  hardware-assisted key protection for up to
+15 symmetric keys which it can use for the cipher operations.
 
-> On Fri, Dec 15, 2023 at 10:59 PM 'Dave Chinner' via syzkaller-bugs
-> <syzkaller-bugs@googlegroups.com> wrote:
-> >
-> > On Fri, Dec 15, 2023 at 03:41:49PM +0100, Alexander Potapenko wrote:
-> > >
-> > > You are right, syzbot used to mount XFS way before 2022.
-> > > On the other hand, last fall there were some major changes to the way
-> > > syz_mount_image() works, so I am attributing the newly detected bugs
-> > > to those changes.
-> >
-> > Oh, so that's when syzbot first turned on XFS V5 format testing?
-> >
-> > Or was that done in April, when this issue was first reported?
-> >
-> > > Unfortunately we don't have much insight into reasons behind syzkaller
-> > > being able to trigger one bug or another: once a bug is found for the
-> > > first time, the likelihood to trigger it again increases, but finding
-> > > it initially might be tricky.
-> > >
-> > > I don't understand much how trivial is the repro at
-> > > https://gist.github.com/xrivendell7/c7bb6ddde87a892818ed1ce206a429c4,
-> >
-> > I just looked at it - all it does is create a new file. It's
-> > effectively "mount; touch", which is exactly what I said earlier
-> > in the thread should reproduce this issue every single time.
-> >
-> > > but overall we are not drilling deep enough into XFS.
-> > > https://storage.googleapis.com/syzbot-assets/8547e3dd1cca/ci-upstream-kmsan-gce-c7402612.html
-> > > (ouch, 230Mb!) shows very limited coverage.
-> >
-> > *sigh*
-> >
-> > Did you think to look at the coverage results to check why the
-> > numbers for XFS, ext4 and btrfs are all at 1%?
-> 
-> Hmmm, thanks for pointing it out!
-> 
-> Our ci-upstream-kmsan-gce instance is configured in such a way that
-> the fuzzer program is quite restricted in what it can do. Apparently,
-> it also lacks capabilities to do mounts, so we get almost no coverage
-> in fs/*/**. I'll check whether the lack of permissions to mount() was
-> intended.
-> 
-> On the other hand, the ci-upstream-kmsan-gce-386 instance does not
-> have such restrictions at all and we do see fs/ coverage there:
-> https://storage.googleapis.com/syzbot-assets/609dc759f08b/ci-upstream-kmsan-gce-386-0e389834.html
-> 
-> It's still quite low for fs/xfs, which is explainable -- we almost
-> immediately hit "KMSAN: uninit-value in __crc32c_le_base". For the
-> same reason, it's also somewhat lower than could be elsewhere as well
-> -- we spend too much time restarting VMs after crashes. Once the fix
-> patch reaches the fuzzed kernel tree, ci-upstream-kmsan-gce-386 should
-> be back to normal.
-> 
-> If we want to see how deep syzbot can go into the fs/ code in general,
-> it's better to look at the KASAN instance coverage:
-> https://storage.googleapis.com/syzbot-assets/12b7d6ca74e6/ci-upstream-kasan-gce-root-0e389834.html
->  (*)
-> 
-> Here e.g. fs/ext4 is already 63% and fs/xfs is 16%.
+v1->v2:
+* Update probe errors with 'dev_err_probe'.
+* Clean up function prototypes and redundant prints.
+* Remove readl/writel wrappers.
+* Fix test bot warnings.
 
-Actually, that XFS number is an excellent result. I don't think we
-can do much better than that.
+Akhil R (5):
+  dt-bindings: crypto: Add Tegra Security Engine
+  gpu: host1x: Add Tegra SE to SID table
+  crypto: tegra: Add Tegra Security Engine driver
+  arm64: defconfig: Enable Tegra Security Engine
+  arm64: tegra: Add Tegra Security Engine DT nodes
 
-I know, that's not the response you expected.
-
-Everyone knows that higher coverage numbers are better because it
-means we've tested more code, right?
-
-Wrong.
-
-When it comes to fuzzing based attacks, the earlier the bad data is
-detected and rejected the better the result. We should see lower
-coverage of the code the better the detection and rejection
-algorithms get.  i.e. The detection code should be extensively
-covered, but the rest of the code should have very little coverage
-because of how quickly the filesystem reacts to fatal object
-corruption.
-
-And the evidence for this in the XFS coverage results?
-
-Take a look at fs/xfs/libxfs/xfs_inode_buf.c. Every single line of
-the disk inode format verifiers has been covered (i.e. every
-possible corruption case we can detect has been exercised).
-
-That's good.
-
-However, there is zero coverage of core formatting functions like
-xfs_inode_to_disk() that indicate no inodes have been successfully
-modified and written back to disk.
-
-That's *even better*.
-
-Think about that for a minute.
-
-The coverage data is telling us that we've read lots of corrupt
-inodes and rejected them, but the testing has made almost no
-successful inode modifications that have been written back to stable
-storage. That's because of widespread corruption in the images
-resulting in a fatal corruption being detected before modofications
-are being made or are being aborted before they are pushed back to
-the corrupt image.
-
-The same pattern appears for most other major on-disk subsystems.
-They either have not been exercised at all (e.g. extent btree code) or
-the only code in the subsystem that has significant coverage is the
-object lookup code and the format verifiers the lookup code runs.
-
-This is an excellent result because it proves that XFS is detecting
-the majority of corrupt structures in it's initial object
-search iteration paths. Corruption is not getting past the
-first read from disk and so no code other than the search/lookup
-code and the verifiers is getting run.
-
-Put simply: we are not letting corrupt structures get into code
-paths where they can be mis-interpretted and do damage.
-
-From my perspective as an experienced filesystem developer, this is
-exactly the sort of coverage pattern I would like to see from -all
-filesystems- when they are fed nothing but extensively corrupted
-filesystems the way syzbot does.
-
-The basic truth is that if filesystems are good at corruption
-detection and rejection, they should have very low code coverage
-numbers from syzbot testing.
-
--Dave.
+ .../crypto/nvidia,tegra234-se-aes.yaml        |   53 +
+ .../crypto/nvidia,tegra234-se-hash.yaml       |   53 +
+ MAINTAINERS                                   |    5 +
+ arch/arm64/boot/dts/nvidia/tegra234.dtsi      |   16 +
+ arch/arm64/configs/defconfig                  |    1 +
+ drivers/crypto/Kconfig                        |    8 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/tegra/Makefile                 |    9 +
+ drivers/crypto/tegra/tegra-se-aes.c           | 1932 +++++++++++++++++
+ drivers/crypto/tegra/tegra-se-hash.c          | 1022 +++++++++
+ drivers/crypto/tegra/tegra-se-key.c           |  155 ++
+ drivers/crypto/tegra/tegra-se-main.c          |  439 ++++
+ drivers/crypto/tegra/tegra-se.h               |  569 +++++
+ drivers/gpu/host1x/dev.c                      |   24 +
+ 14 files changed, 4287 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-aes.yaml
+ create mode 100644 Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-hash.yaml
+ create mode 100644 drivers/crypto/tegra/Makefile
+ create mode 100644 drivers/crypto/tegra/tegra-se-aes.c
+ create mode 100644 drivers/crypto/tegra/tegra-se-hash.c
+ create mode 100644 drivers/crypto/tegra/tegra-se-key.c
+ create mode 100644 drivers/crypto/tegra/tegra-se-main.c
+ create mode 100644 drivers/crypto/tegra/tegra-se.h
 
 -- 
-Dave Chinner
-david@fromorbit.com
+2.17.1
+
