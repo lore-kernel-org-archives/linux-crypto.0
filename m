@@ -1,236 +1,136 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-205.mail.qq.com (out203-205-221-205.mail.qq.com [203.205.221.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27441405C6
-	for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2023 15:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B33F4184F;
+	Wed, 20 Dec 2023 16:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g4JXCcbp"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40c38e292c8so5713765e9.0
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2023 07:44:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703087090; x=1703691890; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YbcoKOLolHIGvbvQqAAbJtKlJU8NeEowJJnb4OdKCes=;
-        b=g4JXCcbpdSzUaYG+Vhfebov70KW7/ixm4jx/5B4xLX1Q/6LQMCk8ec3fcFCsVeMLrV
-         xQNJwcCluD33P5BqY76G8bv38yn8fGEtwYr0t+4vOY9hqIs3OfVeWqoAhCihyhfemqD1
-         SKrFinG7i0NXhpVJ+gXi0pSTLnEXmHKfO70m07a66daSaImzMTI09DDD6mVkV7l4Lobp
-         EtSIvHe4hqd77tjlsa7zzx+aja6l0sKMKz/9E5Znrb8Hibo2/zihOkIkm3te74IkrZLF
-         jjfyhtA/CNNSgB63zjxC4W3tW60dZEiF7mLGrrfSvVo3nFdsmH0MhjxfEyYMuo5ftBos
-         W6+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703087090; x=1703691890;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YbcoKOLolHIGvbvQqAAbJtKlJU8NeEowJJnb4OdKCes=;
-        b=ctAummGDGwUYFs/s4wbiqh8wMy0pNY5Oo/FciAoh5D7OlPCS+jAcuSa0iAyjq+quHF
-         wlkqkNKkWeW/Q4Rb2BkOycBpqOgMjhF1Mp7QbHlF/fBR48w6yGMazb61tgXsTOC5uUVj
-         Nkde41JY+1HU3TeudycKZNMPdIs+EQoC1wZAKbkCgbaRGXh8HNC40TmnOubvA7DdLI+Z
-         ey5JtZ/K0qCXoW9a2tR8B4OukkUmI5sEUBzcbK+RU56AFaSuFNJfSKP3i1V1mL3cVyqc
-         qqKKPEMlZa4f3U5C8OvVRt/jioV8XKwb32TEJNoRnuKURefuyuLQHDxnEgyo+eEYPZQ7
-         rDhw==
-X-Gm-Message-State: AOJu0YwqP8MFiI7ZRGkbuUO2pM6b05r/ZB6QGTDI2juDew5ygOEZnyPs
-	lg7E9tTkrcYVknpEmUTUIh9gFA==
-X-Google-Smtp-Source: AGHT+IGybtDZus8NVWxk0ZzUhIhIzn004ss2rYy0mAL4p2jcHBnbyAWqUsqODln0mIlbJ6WLs/2vNg==
-X-Received: by 2002:a05:600c:3145:b0:40c:6d85:99ff with SMTP id h5-20020a05600c314500b0040c6d8599ffmr1918882wmo.49.1703087090410;
-        Wed, 20 Dec 2023 07:44:50 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.218.27])
-        by smtp.gmail.com with ESMTPSA id p22-20020a05600c359600b0040d2524270asm42721wmq.8.2023.12.20.07.44.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Dec 2023 07:44:49 -0800 (PST)
-Message-ID: <fe87e220-560b-4d47-bc7f-cc7104d40921@linaro.org>
-Date: Wed, 20 Dec 2023 16:44:47 +0100
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="nhWyhg47"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1703088007; bh=g8YvPRZUntmP0IXEJjRd82n+bHsmgSr7jmdUnUCb5/E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=nhWyhg47K5trIv3W6tnxOID4QSwSS3RBE88WVqokE7C8EHiWAi7e6nTLPAopTv7dY
+	 ETDNztUcYKhpEdBrxTtbgpbeDjuP762fmagwgkp7oFL90S9k4OcK/AEYHxGlqc4/FR
+	 yu/uCKVqV9EKxRBuJ1wlbhXc5VT8PiO2xTS6m1IM=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.215])
+	by newxmesmtplogicsvrszb6-0.qq.com (NewEsmtp) with SMTP
+	id D7712EE5; Wed, 20 Dec 2023 23:53:55 +0800
+X-QQ-mid: xmsmtpt1703087635teeqh3v89
+Message-ID: <tencent_656D589558EA3EED8ACF3C79166F202E010A@qq.com>
+X-QQ-XMAILINFO: NkHKfw09D6j87+24TT5WJDwDVq9R2dk3vEOfbV0qyctP9ss1ZMwPstU9eR941/
+	 eq+dlV766aDFwmPR88WdvbP9XnuZ1jpmB9JcFugwr3K/vpsGnpCHZVTaECu0Hrfl8yV+ET5y7qwQ
+	 JOHIeU1G3T1hoeHOZSVHF847PNIZHJyJrmFH2/LbvzHrzsmn6rxn0WuXdQGkTHufEKTsvuNaFxyA
+	 RO1Ogitq6hPhebmyBfU/w/B+6PTFkLp+Oz+ufLDBcwXqE0SJ7rwE4ywYM7fTJ1j3nD9eA/Ott9X6
+	 TJcW2Y5/WorYCzgWkVZ/BqvAybY2iRVCF8R/U+UAydqrc9U7FGJLwPYdhUSMnR3PIkk86AWZUSei
+	 KFvRBNQ3PlYfsHHx5l0z/FGwjq8tP5rypBU2PYN7xU/e2oJHVtJk8xyGsrCI3FHSzmoGr+1O+sPM
+	 955narG5ZmL8FgonzFRVjGUjhDE16IlKHAB+GffsZjqEGK+Ulkozn7+olgot65KAbkOAvSNGedac
+	 A5uaEK72K1lL7Ye3h8syar2z3IKs7fTnY1Pd/wuhq+qoYXoeae1eZfjeJw7Qpv0q1Z+NXv6R2DC6
+	 XiP7ZiMjeLgupSvAszetwTOz6YD7fEY66b7zxqGp3qAUzYP11tpMd8DhBTpaPLSVpFFVB6pkBOTZ
+	 5loRSoLzHBSyrsaDsUTKtheUkYw0kaKELjvXGuqyn9UfI3KsXSlw2YWRV9fRcdi7OROipc77ovSK
+	 slTdFp1q8OLqzJxWTVGFdaWfj73Hp4eWtyPcZuVbHeHm+5CYrREusjdi4fZK9RZhVw/YN/GyW+Y5
+	 r/gjrW4mwgVVSN31WSsJ6HOW/gYTCY6VTPpe5pud1lW5/pC5MutsZRndkt9iUqwwVXXYdLx5lEaV
+	 m6ceCwM6R9kHW/wIQJ9I5TaZz1kZZG6RYLn/VqxcOKIAW8jo1/8xpwFMulF3QOKyQve9QciCshQO
+	 6+xYxxYdMkJ4AV9+XW+A==
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+8ffb0839a24e9c6bfa76@syzkaller.appspotmail.com
+Cc: davem@davemloft.net,
+	herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH next] crypto: fix oob Read in arc4_crypt
+Date: Wed, 20 Dec 2023 23:53:55 +0800
+X-OQ-MSGID: <20231220155354.3824368-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <000000000000d52e14060cc9c551@google.com>
+References: <000000000000d52e14060cc9c551@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/5] dt-bindings: crypto: Add Tegra Security Engine
-Content-Language: en-US
-To: Akhil R <akhilrajeev@nvidia.com>, herbert@gondor.apana.org.au,
- davem@davemloft.net, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, thierry.reding@gmail.com, jonathanh@nvidia.com,
- catalin.marinas@arm.com, will@kernel.org, mperttunen@nvidia.com,
- linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-tegra@vger.kernel.org, linux-kernel@vger.kernel.org, krzk@kernel.org
-References: <20231219125614.33062-1-akhilrajeev@nvidia.com>
- <20231219125614.33062-2-akhilrajeev@nvidia.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231219125614.33062-2-akhilrajeev@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 19/12/2023 13:56, Akhil R wrote:
-> Add DT binding document for Tegra Security Engine.
-> The AES and HASH algorithms are handled independently by separate
-> engines within the Security Engine. These engines are registered
-> as two separate crypto engine drivers.
-> 
-> Signed-off-by: Akhil R <akhilrajeev@nvidia.com>
-> ---
->  .../crypto/nvidia,tegra234-se-aes.yaml        | 53 +++++++++++++++++++
->  .../crypto/nvidia,tegra234-se-hash.yaml       | 53 +++++++++++++++++++
->  2 files changed, 106 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-aes.yaml
->  create mode 100644 Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-hash.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-aes.yaml b/Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-aes.yaml
-> new file mode 100644
-> index 000000000000..35c2e701bd42
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-aes.yaml
-> @@ -0,0 +1,53 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/crypto/nvidia,tegra234-se-aes.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: NVIDIA Tegra Security Engine for AES algorithms
-> +
-> +description: |
+The space allocated to areq is not sufficient to access the member __ctx of 
+struct skcipher_request, as the space occupied by struct arc4_ctx for reading 
+is 1032 bytes, while the requested memory size in skcipher_recvmsg() is:
+sizeof(struct af_alg_async_req) + crypto_skcipher_reqsize(tfm) = 736 bytes,
+which does not include the memory required for __ctx of struct skcipher_request.
 
-Do not need '|' unless you need to preserve formatting.
+Reported-by: syzbot+8ffb0839a24e9c6bfa76@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ crypto/algif_skcipher.c            | 10 +++++++---
+ crypto/skcipher.c                  |  1 -
+ include/crypto/internal/skcipher.h |  1 +
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
-> +  The Tegra Security Engine accelerates the following AES encryption/decryption
-> +  algorithms.
-
-s/./:/ and join lines? Wasn't that your intention here?
-
-> +  AES-ECB, AES-CBC, AES-OFB, AES-XTS, AES-CTR, AES-GCM, AES-CCM, AES-CMAC
-> +
-> +maintainers:
-> +  - Akhil R <akhilrajeev@nvidia.com>
-> +
-> +properties:
-> +  compatible:
-> +    const: nvidia,tegra234-se2-aes
-
-Why "se2"?
-
-Anyway, filename like compatible.
-
-
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    maxItems: 1
-> +
-> +  iommus:
-> +    maxItems: 1
-> +
-> +  dma-coherent: true
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +  - iommus
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +    #include <dt-bindings/memory/tegra234-mc.h>
-> +    #include <dt-bindings/clock/tegra234-clock.h>
-> +
-> +    crypto@15820000 {
-> +        compatible = "nvidia,tegra234-se2-aes";
-> +        reg = <0x15820000 0x10000>;
-> +        clocks = <&bpmp TEGRA234_CLK_SE>;
-> +        iommus = <&smmu TEGRA234_SID_SES_SE1>;
-> +        dma-coherent;
-> +    };
-> +...
-> diff --git a/Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-hash.yaml b/Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-hash.yaml
-> new file mode 100644
-> index 000000000000..e3848e9a53b5
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-hash.yaml
-> @@ -0,0 +1,53 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/crypto/nvidia,tegra234-se-hash.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: NVIDIA Tegra Security Engine for HASH algorithms
-> +
-> +description: |
-> +  The Tegra Security HASH Engine accelerates the following HASH functions.
-
-Similar comment
-
-> +  SHA1, SHA224, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512
-> +  HMAC(SHA224), HMAC(SHA256), HMAC(SHA384), HMAC(SHA512)
-> +
-
-> +maintainers:
-> +  - Akhil R <akhilrajeev@nvidia.com>
-> +
-> +properties:
-> +  compatible:
-> +    const: nvidia,tegra234-se4-hash
-
-What is se4?
-
-Anyway, filename like compatible.
-
-
-
-Best regards,
-Krzysztof
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 02cea2149504..b69d361b5515 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -33,6 +33,7 @@
+ #include <linux/module.h>
+ #include <linux/net.h>
+ #include <net/sock.h>
++#include <crypto/internal/skcipher.h>
+ 
+ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
+ 			    size_t size)
+@@ -102,11 +103,12 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	struct alg_sock *pask = alg_sk(psk);
+ 	struct af_alg_ctx *ctx = ask->private;
+ 	struct crypto_skcipher *tfm = pask->private;
++	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+ 	unsigned int bs = crypto_skcipher_chunksize(tfm);
+ 	struct af_alg_async_req *areq;
+ 	unsigned cflags = 0;
+ 	int err = 0;
+-	size_t len = 0;
++	size_t len = 0, aqlen;
+ 
+ 	if (!ctx->init || (ctx->more && ctx->used < bs)) {
+ 		err = af_alg_wait_for_data(sk, flags, bs);
+@@ -115,8 +117,10 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	}
+ 
+ 	/* Allocate cipher request for current operation. */
+-	areq = af_alg_alloc_areq(sk, sizeof(struct af_alg_async_req) +
+-				     crypto_skcipher_reqsize(tfm));
++	aqlen = sizeof(struct af_alg_async_req) + crypto_skcipher_reqsize(tfm);
++	if (alg->co.base.cra_type != &crypto_skcipher_type)
++		aqlen += 1032;
++	areq = af_alg_alloc_areq(sk, aqlen);
+ 	if (IS_ERR(areq))
+ 		return PTR_ERR(areq);
+ 
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index bc70e159d27d..0ae4a05a5aa7 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -44,7 +44,6 @@ struct skcipher_walk_buffer {
+ 	u8 buffer[];
+ };
+ 
+-static const struct crypto_type crypto_skcipher_type;
+ 
+ static int skcipher_walk_next(struct skcipher_walk *walk);
+ 
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index 7ae42afdcf3e..3c05872652f2 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -24,6 +24,7 @@
+ 
+ struct aead_request;
+ struct rtattr;
++static const struct crypto_type crypto_skcipher_type;
+ 
+ struct skcipher_instance {
+ 	void (*free)(struct skcipher_instance *inst);
+-- 
+2.43.0
 
