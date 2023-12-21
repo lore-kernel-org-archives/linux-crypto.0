@@ -1,41 +1,39 @@
-Received: from mx1.zhaoxin.com (MX1.ZHAOXIN.COM [210.0.225.12])
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD203B647
-	for <linux-crypto@vger.kernel.org>; Thu, 21 Dec 2023 06:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C7AB647
+	for <linux-crypto@vger.kernel.org>; Thu, 21 Dec 2023 06:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1703139686-086e237568044e0001-Xm9f1P
-Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx1.zhaoxin.com with ESMTP id kqWSCeADc2WC5adC (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Thu, 21 Dec 2023 14:21:26 +0800 (CST)
+X-ASG-Debug-ID: 1703139979-1eb14e740b040b0002-Xm9f1P
+Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx2.zhaoxin.com with ESMTP id c5eegCnApH9lyKf5 (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Thu, 21 Dec 2023 14:26:22 +0800 (CST)
 X-Barracuda-Envelope-From: LeoLiu-oc@zhaoxin.com
 X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
 Received: from ZXBJMBX03.zhaoxin.com (10.29.252.7) by ZXSHMBX3.zhaoxin.com
  (10.28.252.165) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 21 Dec
- 2023 14:21:26 +0800
+ 2023 14:26:19 +0800
 Received: from xin.lan (10.32.64.1) by ZXBJMBX03.zhaoxin.com (10.29.252.7)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 21 Dec
- 2023 14:21:24 +0800
+ 2023 14:26:03 +0800
 X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
 From: LeoLiu-oc <LeoLiu-oc@zhaoxin.com>
 X-Barracuda-RBL-Trusted-Forwarder: 10.29.252.7
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
-	<seanjc@google.com>, <kim.phillips@amd.com>, <pbonzini@redhat.com>,
-	<babu.moger@amd.com>, <jiaxi.chen@linux.intel.com>, <jmattson@google.com>,
-	<pawan.kumar.gupta@linux.intel.com>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
+To: <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
+	<jiajie.ho@starfivetech.com>, <conor.dooley@microchip.com>,
+	<martin@kaiser.cx>, <mmyangfl@gmail.com>, <jenny.zhang@starfivetech.com>,
+	<robh@kernel.org>, <l.stelmach@samsung.com>, <ardb@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
 CC: <CobeChen@zhaoxin.com>, <TonyWWang@zhaoxin.com>, <YunShen@zhaoxin.com>,
-	<Leoliu@zhaoxin.com>, LeoLiuoc <LeoLiu-oc@zhaoxin.com>
-Subject: [PATCH v4] crypto: x86/sm2 -add Zhaoxin SM2 algorithm implementation
-Date: Thu, 21 Dec 2023 14:21:23 +0800
-X-ASG-Orig-Subj: [PATCH v4] crypto: x86/sm2 -add Zhaoxin SM2 algorithm implementation
-Message-ID: <20231221062123.798957-1-LeoLiu-oc@zhaoxin.com>
+	<LeoLiu@zhaoxin.com>, LeoLiuoc <LeoLiu-oc@zhaoxin.com>
+Subject: [PATCH v3] hwrng: add Zhaoxin rng driver base on rep_xstore instruction
+Date: Thu, 21 Dec 2023 14:26:02 +0800
+X-ASG-Orig-Subj: [PATCH v3] hwrng: add Zhaoxin rng driver base on rep_xstore instruction
+Message-ID: <20231221062602.799432-1-LeoLiu-oc@zhaoxin.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231109094744.545887-1-LeoLiu-oc@zhaoxin.com>
-References: <20231109094744.545887-1-LeoLiu-oc@zhaoxin.com>
+In-Reply-To: <20231107070900.496827-1-LeoLiu-oc@zhaoxin.com>
+References: <20231107070900.496827-1-LeoLiu-oc@zhaoxin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,11 +45,11 @@ Content-Type: text/plain
 X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
  ZXBJMBX03.zhaoxin.com (10.29.252.7)
 X-Barracuda-Connect: ZXSHMBX3.zhaoxin.com[10.28.252.165]
-X-Barracuda-Start-Time: 1703139686
+X-Barracuda-Start-Time: 1703139981
 X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.35:4443/cgi-mod/mark.cgi
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
 X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 6989
+X-Barracuda-Scan-Msg-Size: 6401
 X-Barracuda-BRTS-Status: 1
 X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
 X-Barracuda-Spam-Score: -2.02
@@ -63,228 +61,206 @@ X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.118357
 
 From: LeoLiuoc <LeoLiu-oc@zhaoxin.com>
 
-Add support for SM2 (ShangMi 2) public key algorithm by Zhaoxin GMI
-Instruction. The purpose of this driver is to ensure that the application
-has both high performance and high security.
----
- arch/x86/crypto/Kconfig            |  10 ++
- arch/x86/crypto/Makefile           |   2 +
- arch/x86/crypto/sm2-zhaoxin-gmi.c  | 160 +++++++++++++++++++++++++++++
- arch/x86/include/asm/cpufeatures.h |   2 +
- 4 files changed, 174 insertions(+)
- create mode 100644 arch/x86/crypto/sm2-zhaoxin-gmi.c
+Add support for Zhaoxin hardware random number generator.
+This driver base on rep_xstore instruction and uses the same
+X86_FEATURE_XSTORE as via-rng driver. Therefore, modify the x86_cpu_id
+array in the via-rng driver, so that the corresponding driver can be
+correctly loader on respective platforms.
 
-diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
-index 9bbfd01cfa2f..b168596924e6 100644
---- a/arch/x86/crypto/Kconfig
-+++ b/arch/x86/crypto/Kconfig
-@@ -519,4 +519,14 @@ config CRYPTO_CRCT10DIF_PCLMUL
- 	  Architecture: x86_64 using:
- 	  - PCLMULQDQ (carry-less multiplication)
+v1 -> v2:
+1. Fix assembler code errors
+2. Remove redundant CPU model check codes
+
+v2 -> v3:
+1. Optimize code details based on the kernel style
+
+Signed-off-by: LeoLiuoc <LeoLiu-oc@zhaoxin.com>
+---
+ drivers/char/hw_random/Kconfig       | 12 ++++
+ drivers/char/hw_random/Makefile      |  1 +
+ drivers/char/hw_random/via-rng.c     | 10 +--
+ drivers/char/hw_random/zhaoxin-rng.c | 95 ++++++++++++++++++++++++++++
+ 4 files changed, 113 insertions(+), 5 deletions(-)
+ create mode 100644 drivers/char/hw_random/zhaoxin-rng.c
+
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 442c40efb200..3c1c4fa1203c 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -152,6 +152,18 @@ config HW_RANDOM_VIA
  
-+config CRYPTO_SM2_ZHAOXIN_GMI
-+	tristate "SM2 Cipher algorithm (Zhaoxin GMI Instruction)"
-+	depends on X86 && (CPU_SUP_CENTAUR || CPU_SUP_ZHAOXIN)
-+	select CRYPTO_AKCIPHER
+ 	  If unsure, say Y.
+ 
++config HW_RANDOM_ZHAOXIN
++	tristate "Zhaoxin HW Random Number Generator support"
++	depends on X86
 +	help
-+	  SM2 (ShangMi 2) public key algorithm by Zhaoxin GMI Instruction
++	  This driver provides kernel-side support for the Random Number
++	  Generator hardware found on Zhaoxin based motherboards.
 +
-+	  Published by State Encryption Management Bureau, China,
-+	  as specified by OSCCA GM/T 0003.1-2012 -- 0003.5-2012.
++	  To compile this driver as a module, choose M here: the
++	  module will be called zhaoxin-rng.
 +
- endmenu
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 9aa46093c91b..f1d64ff7b907 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -109,6 +109,8 @@ aria-aesni-avx2-x86_64-y := aria-aesni-avx2-asm_64.o aria_aesni_avx2_glue.o
- obj-$(CONFIG_CRYPTO_ARIA_GFNI_AVX512_X86_64) += aria-gfni-avx512-x86_64.o
- aria-gfni-avx512-x86_64-y := aria-gfni-avx512-asm_64.o aria_gfni_avx512_glue.o
++	  If unsure, say Y.
++
+ config HW_RANDOM_IXP4XX
+ 	tristate "Intel IXP4xx NPU HW Pseudo-Random Number Generator support"
+ 	depends on ARCH_IXP4XX || COMPILE_TEST
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index 32549a1186dc..ef5b3ae0794d 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -14,6 +14,7 @@ obj-$(CONFIG_HW_RANDOM_GEODE) += geode-rng.o
+ obj-$(CONFIG_HW_RANDOM_N2RNG) += n2-rng.o
+ n2-rng-y := n2-drv.o n2-asm.o
+ obj-$(CONFIG_HW_RANDOM_VIA) += via-rng.o
++obj-$(CONFIG_HW_RANDOM_ZHAOXIN) += zhaoxin-rng.o
+ obj-$(CONFIG_HW_RANDOM_EXYNOS) += exynos-trng.o
+ obj-$(CONFIG_HW_RANDOM_IXP4XX) += ixp4xx-rng.o
+ obj-$(CONFIG_HW_RANDOM_OMAP) += omap-rng.o
+diff --git a/drivers/char/hw_random/via-rng.c b/drivers/char/hw_random/via-rng.c
+index a9a0a3b09c8b..285505b4d620 100644
+--- a/drivers/char/hw_random/via-rng.c
++++ b/drivers/char/hw_random/via-rng.c
+@@ -35,7 +35,7 @@
+ #include <asm/cpufeature.h>
+ #include <asm/fpu/api.h>
  
-+obj-$(CONFIG_CRYPTO_SM2_ZHAOXIN_GMI) += sm2-zhaoxin-gmi.o
-+
- quiet_cmd_perlasm = PERLASM $@
-       cmd_perlasm = $(PERL) $< > $@
- $(obj)/%.S: $(src)/%.pl FORCE
-diff --git a/arch/x86/crypto/sm2-zhaoxin-gmi.c b/arch/x86/crypto/sm2-zhaoxin-gmi.c
+-
++static const struct x86_cpu_id via_rng_cpu_ids[];
+ 
+ 
+ enum {
+@@ -135,7 +135,7 @@ static int via_rng_init(struct hwrng *rng)
+ 	 * is always enabled if CPUID rng_en is set.  There is no
+ 	 * RNG configuration like it used to be the case in this
+ 	 * register */
+-	if (((c->x86 == 6) && (c->x86_model >= 0x0f))  || (c->x86 > 6)){
++	if ((c->x86 == 6) && (c->x86_model >= 0x0f)) {
+ 		if (!boot_cpu_has(X86_FEATURE_XSTORE_EN)) {
+ 			pr_err(PFX "can't enable hardware RNG "
+ 				"if XSTORE is not enabled\n");
+@@ -196,7 +196,7 @@ static int __init via_rng_mod_init(void)
+ {
+ 	int err;
+ 
+-	if (!boot_cpu_has(X86_FEATURE_XSTORE))
++	if (!x86_match_cpu(via_rng_cpu_ids))
+ 		return -ENODEV;
+ 
+ 	pr_info("VIA RNG detected\n");
+@@ -217,8 +217,8 @@ static void __exit via_rng_mod_exit(void)
+ }
+ module_exit(via_rng_mod_exit);
+ 
+-static struct x86_cpu_id __maybe_unused via_rng_cpu_id[] = {
+-	X86_MATCH_FEATURE(X86_FEATURE_XSTORE, NULL),
++static struct x86_cpu_id via_rng_cpu_id[] = {
++	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 6, X86_FEATURE_XSTORE, NULL),
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(x86cpu, via_rng_cpu_id);
+diff --git a/drivers/char/hw_random/zhaoxin-rng.c b/drivers/char/hw_random/zhaoxin-rng.c
 new file mode 100644
-index 000000000000..dbf2f701b832
+index 000000000000..3e5770df9948
 --- /dev/null
-+++ b/arch/x86/crypto/sm2-zhaoxin-gmi.c
-@@ -0,0 +1,160 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
++++ b/drivers/char/hw_random/zhaoxin-rng.c
+@@ -0,0 +1,95 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * SM2 asymmetric public-key algorithm
-+ * as specified by OSCCA GM/T 0003.1-2012 -- 0003.5-2012 SM2 and
-+ * described at https://tools.ietf.org/html/draft-shen-sm2-ecdsa-02
++ * RNG driver for Zhaoxin RNGs
 + *
-+ * Copyright (c) 2023 Shanghai Zhaoxin Semiconductor LTD.
-+ * Authors: YunShen <yunshen@zhaoxin.com>
++ * Copyright 2023 (c) Zhaoxin Semiconductor Co., Ltd
 + */
 +
-+#include <linux/module.h>
-+#include <linux/mpi.h>
-+#include <crypto/internal/akcipher.h>
-+#include <crypto/akcipher.h>
-+#include <crypto/sm2.h>
-+#include <asm/cpufeature.h>
-+#include <asm/processor.h>
 +#include <asm/cpu_device_id.h>
++#include <asm/fpu/api.h>
++#include <crypto/padlock.h>
++#include <linux/cpufeature.h>
++#include <linux/delay.h>
++#include <linux/hw_random.h>
++#include <linux/io.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
 +
-+#define SCRATCH_SIZE (4 * 2048)
-+
-+#define SM2_CWORD_VERIFY 0x8
-+#define SM2_VERIFY_PASS 1
-+
-+struct sm2_cipher_data {
-+	u8 pub_key[65]; /* public key */
++enum {
++	ZHAOXIN_RNG_CHUNK_8		= 0x00, /* 64 rand bits, 64 stored bits */
++	ZHAOXIN_RNG_CHUNK_4		= 0x01, /* 32 rand bits, 32 stored bits */
++	ZHAOXIN_RNG_CHUNK_2		= 0x02, /* 16 rand bits, 32 stored bits */
++	ZHAOXIN_RNG_CHUNK_1		= 0x03, /*  8 rand bits, 32 stored bits */
++	ZHAOXIN_RNG_MAX_SIZE	= (128 * 1024),
 +};
 +
-+/* Load supported features of the CPU to see if the SM2 is available. */
-+static int zhaoxin_gmi_available(void)
++static int zhaoxin_rng_init(struct hwrng *rng)
 +{
-+	if (!boot_cpu_has(X86_FEATURE_SM2_EN)) {
-+		pr_err("can't enable hardware SM2 if Zhaoxin GMI SM2 is not enabled\n");
++	if (!boot_cpu_has(X86_FEATURE_XSTORE_EN)) {
++		pr_err(PFX "can't enable hardware RNG if XSTORE is not enabled\n");
 +		return -ENODEV;
 +	}
-+	return 0;
-+}
-+
-+/* Zhaoxin sm2 verify function */
-+static inline size_t zhaoxin_gmi_sm2_verify(unsigned char *key, unsigned char *hash,
-+				unsigned char *sig, unsigned char *scratch)
-+{
-+	size_t result;
-+
-+	asm volatile(
-+		".byte 0xf2, 0x0f, 0xa6, 0xc0"
-+		: "=c"(result)
-+		: "a"(hash), "b"(key), "d"(SM2_CWORD_VERIFY), "S"(scratch), "D"(sig)
-+		: "memory");
-+
-+	return result;
-+}
-+
-+/* Zhaoxin sm2 verify function */
-+static int _zhaoxin_sm2_verify(struct sm2_cipher_data *ec, unsigned char *hash, unsigned char *sig)
-+{
-+	unsigned char *scratch = kzalloc(SCRATCH_SIZE, GFP_KERNEL);
-+	int ret = -EKEYREJECTED;
-+	size_t result;
-+
-+	result = zhaoxin_gmi_sm2_verify(ec->pub_key, hash, sig, scratch);
-+	if (result == SM2_VERIFY_PASS)
-+		ret = 0;
-+
-+	kfree(scratch);
-+
-+	return ret;
-+}
-+
-+static int zhaoxin_sm2_verify(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct sm2_cipher_data *ec = akcipher_tfm_ctx(tfm);
-+	unsigned char *buffer;
-+	unsigned int buf_len;
-+	int ret;
-+
-+	buf_len = req->src_len + req->dst_len;
-+	buffer = kmalloc(buf_len, GFP_KERNEL);
-+	if (!buffer)
-+		return -ENOMEM;
-+
-+	sg_pcopy_to_buffer(req->src, sg_nents_for_len(req->src, (u64)buf_len), buffer,
-+			(size_t)buf_len, 0);
-+	ret = _zhaoxin_sm2_verify(ec, buffer + req->src_len, buffer);
-+
-+	kfree(buffer);
-+
-+	return ret;
-+}
-+
-+static int zhaoxin_sm2_set_pub_key(struct crypto_akcipher *tfm, const void *key,
-+				unsigned int keylen)
-+{
-+	struct sm2_cipher_data *ec = akcipher_tfm_ctx(tfm);
-+
-+	memcpy(ec->pub_key, key, keylen);
 +
 +	return 0;
 +}
 +
-+static unsigned int zhaoxin_sm2_max_size(struct crypto_akcipher *tfm)
++static inline int rep_xstore(size_t size, size_t factor, void *result)
 +{
-+	/* Unlimited max size */
-+	return PAGE_SIZE;
++	asm(".byte 0xf3, 0x0f, 0xa7, 0xc0"
++		: "=m"(*(size_t *)result), "+c"(size), "+d"(factor), "+D"(result));
++
++	return 0;
 +}
 +
-+static int zhaoxin_sm2_init_tfm(struct crypto_akcipher *tfm)
++static int zhaoxin_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
 +{
-+	return zhaoxin_gmi_available();
++	if (max > ZHAOXIN_RNG_MAX_SIZE)
++		max = ZHAOXIN_RNG_MAX_SIZE;
++
++	rep_xstore(max, ZHAOXIN_RNG_CHUNK_1, data);
++
++	return max;
 +}
 +
-+static void zhaoxin_sm2_exit_tfm(struct crypto_akcipher *tfm)
-+{
-+	struct sm2_cipher_data *ec = akcipher_tfm_ctx(tfm);
-+
-+	memset(ec, 0, sizeof(*ec));
-+}
-+
-+static struct akcipher_alg zhaoxin_sm2 = {
-+	.verify = zhaoxin_sm2_verify,
-+	.set_pub_key = zhaoxin_sm2_set_pub_key,
-+	.max_size = zhaoxin_sm2_max_size,
-+	.init = zhaoxin_sm2_init_tfm,
-+	.exit = zhaoxin_sm2_exit_tfm,
-+	.base = {
-+		.cra_name = "sm2",
-+		.cra_driver_name = "zhaoxin-gmi-sm2",
-+		.cra_priority = 150,
-+		.cra_module = THIS_MODULE,
-+		.cra_ctxsize = sizeof(struct sm2_cipher_data),
-+	},
++static struct hwrng zhaoxin_rng = {
++	.name = "zhaoxin",
++	.init = zhaoxin_rng_init,
++	.read = zhaoxin_rng_read,
 +};
 +
-+static const struct x86_cpu_id zhaoxin_sm2_cpu_ids[] = {
-+	X86_MATCH_FEATURE(X86_FEATURE_SM2, NULL),
++static const struct x86_cpu_id zhaoxin_rng_cpu_ids[] = {
++	X86_MATCH_VENDOR_FAM_FEATURE(ZHAOXIN, 6, X86_FEATURE_XSTORE, NULL),
++	X86_MATCH_VENDOR_FAM_FEATURE(ZHAOXIN, 7, X86_FEATURE_XSTORE, NULL),
++	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 7, X86_FEATURE_XSTORE, NULL),
 +	{}
 +};
-+MODULE_DEVICE_TABLE(x86cpu, zhaoxin_sm2_cpu_ids);
++MODULE_DEVICE_TABLE(x86cpu, zhaoxin_rng_cpu_ids);
 +
-+static int __init zhaoxin_sm2_init(void)
++static int __init zhaoxin_rng_mod_init(void)
 +{
-+	if (!x86_match_cpu(zhaoxin_sm2_cpu_ids))
++	int err;
++
++	if (!x86_match_cpu(zhaoxin_rng_cpu_ids)) {
++		pr_err(PFX "The CPU isn't support XSTORE.\n");
 +		return -ENODEV;
++	}
 +
-+	return crypto_register_akcipher(&zhaoxin_sm2);
++	pr_info("Zhaoxin RNG detected\n");
++
++	err = hwrng_register(&zhaoxin_rng);
++	if (err)
++		pr_err(PFX "RNG registering failed (%d)\n", err);
++
++	return err;
 +}
++module_init(zhaoxin_rng_mod_init);
 +
-+static void __exit zhaoxin_sm2_exit(void)
++static void __exit zhaoxin_rng_mod_exit(void)
 +{
-+	crypto_unregister_akcipher(&zhaoxin_sm2);
++	hwrng_unregister(&zhaoxin_rng);
 +}
++module_exit(zhaoxin_rng_mod_exit);
 +
-+module_init(zhaoxin_sm2_init);
-+module_exit(zhaoxin_sm2_exit);
-+
++MODULE_DESCRIPTION("H/W RNG driver for Zhaoxin CPUs");
++MODULE_AUTHOR("YunShen@zhaoxin.com");
 +MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("YunShen <yunshen@zhaoxin.com>");
-+MODULE_DESCRIPTION("SM2 Zhaoxin GMI Algorithm");
-+MODULE_ALIAS_CRYPTO("zhaoxin-gmi-sm2");
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 4af140cf5719..07a78ec83bed 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -146,6 +146,8 @@
- #define X86_FEATURE_HYPERVISOR		( 4*32+31) /* Running on a hypervisor */
- 
- /* VIA/Cyrix/Centaur-defined CPU features, CPUID level 0xC0000001, word 5 */
-+#define X86_FEATURE_SM2			(5*32 + 0) /* SM2 ZhaoXin GMI present */
-+#define X86_FEATURE_SM2_EN			(5*32 + 1) /* SM2 ZhaoXin GMI enabled */
- #define X86_FEATURE_XSTORE		( 5*32+ 2) /* "rng" RNG present (xstore) */
- #define X86_FEATURE_XSTORE_EN		( 5*32+ 3) /* "rng_en" RNG enabled */
- #define X86_FEATURE_XCRYPT		( 5*32+ 6) /* "ace" on-CPU crypto (xcrypt) */
 -- 
 2.34.1
 
