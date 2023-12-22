@@ -1,23 +1,30 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30590611B;
-	Fri, 22 Dec 2023 04:36:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F3F8F40;
+	Fri, 22 Dec 2023 04:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rGXH8-00DhSU-Jr; Fri, 22 Dec 2023 12:36:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Dec 2023 12:36:53 +0800
-Date: Fri, 22 Dec 2023 12:36:53 +0800
+	id 1rGXLX-00DhXn-VZ; Fri, 22 Dec 2023 12:41:17 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Dec 2023 12:41:26 +0800
+Date: Fri, 22 Dec 2023 12:41:26 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Mimi Zohar <zohar@linux.ibm.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: lib/mpi - Fix unexpected pointer access
-Message-ID: <ZYUSZV8zHJMC444n@gondor.apana.org.au>
-References: <20231214030834.2665-1-tianjia.zhang@linux.alibaba.com>
+To: Om Prakash Singh <quic_omprsing@quicinc.com>
+Cc: neil.armstrong@linaro.org, konrad.dybcio@linaro.org, agross@kernel.org,
+	andersson@kernel.org, conor+dt@kernel.org, davem@davemloft.net,
+	devicetree@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, marijn.suijten@somainline.org,
+	robh+dt@kernel.org, vkoul@kernel.org,
+	cros-qcom-dts-watchers@chromium.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH V3 1/2] dt-bindings: crypto: qcom-qce: document the
+ SC7280 crypto engine
+Message-ID: <ZYUTdjxTd3380Xg4@gondor.apana.org.au>
+References: <20231214103600.2613988-1-quic_omprsing@quicinc.com>
+ <20231214103600.2613988-2-quic_omprsing@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -26,22 +33,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231214030834.2665-1-tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <20231214103600.2613988-2-quic_omprsing@quicinc.com>
 
-On Thu, Dec 14, 2023 at 11:08:34AM +0800, Tianjia Zhang wrote:
-> When the mpi_ec_ctx structure is initialized, some fields are not
-> cleared, causing a crash when referencing the field when the
-> structure was released. Initially, this issue was ignored because
-> memory for mpi_ec_ctx is allocated with the __GFP_ZERO flag.
-> For example, this error will be triggered when calculating the
-> Za value for SM2 separately.
+On Thu, Dec 14, 2023 at 04:05:59PM +0530, Om Prakash Singh wrote:
+> Document the crypto engine on the SM7280 Platform.
 > 
-> Fixes: d58bb7e55a8a ("lib/mpi: Introduce ec implementation to MPI library")
-> Cc: stable@vger.kernel.org # v6.5
-> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 > ---
->  lib/crypto/mpi/ec.c | 3 +++
->  1 file changed, 3 insertions(+)
+> Changes in V3:
+> 	No change in this patch
+> 
+> Changes in V2:
+> 	No change in this patch
+> 
+>  Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 1 +
+>  1 file changed, 1 insertion(+)
 
 Patch applied.  Thanks.
 -- 
