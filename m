@@ -1,25 +1,23 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463B717D3;
-	Fri, 22 Dec 2023 03:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC8017D3;
+	Fri, 22 Dec 2023 03:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rGWIB-00Dgpy-KJ; Fri, 22 Dec 2023 11:33:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Dec 2023 11:33:54 +0800
-Date: Fri, 22 Dec 2023 11:33:54 +0800
+	id 1rGWQi-00DgwM-Sq; Fri, 22 Dec 2023 11:42:33 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Dec 2023 11:42:43 +0800
+Date: Fri, 22 Dec 2023 11:42:43 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Gonglei <arei.gonglei@huawei.com>
-Cc: linux-crypto@vger.kernel.org, mst@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org, lixiao91@huawei.com,
-	wangyangxin <wangyangxin1@huawei.com>
-Subject: Re: [PATCH 2/2] crypto: virtio-crypto: Fix gcc check warnings
-Message-ID: <ZYUDop1Cv1ddrqQf@gondor.apana.org.au>
-References: <1702294936-61080-1-git-send-email-arei.gonglei@huawei.com>
- <1702294936-61080-3-git-send-email-arei.gonglei@huawei.com>
+To: Shigeru Yoshida <syoshida@redhat.com>
+Cc: davem@davemloft.net, dhowells@redhat.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: af_alg/hash: Fix uninit-value access in
+ af_alg_free_sg()
+Message-ID: <ZYUFs1MumRFf3mnv@gondor.apana.org.au>
+References: <20231211135949.689204-1-syoshida@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -28,37 +26,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1702294936-61080-3-git-send-email-arei.gonglei@huawei.com>
+In-Reply-To: <20231211135949.689204-1-syoshida@redhat.com>
 
-On Mon, Dec 11, 2023 at 07:42:16PM +0800, Gonglei wrote:
+On Mon, Dec 11, 2023 at 10:59:49PM +0900, Shigeru Yoshida wrote:
 >
->  static inline int virtio_crypto_get_current_node(void)
->  {
-> -	int cpu, node;
-> +	int node;
->  
-> -	cpu = get_cpu();
-> -	node = topology_physical_package_id(cpu);
-> +	node = topology_physical_package_id(get_cpu());
+> Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
 
-This looks like a bogus warning.  I think we should do something
-like this instead:
+I think it should actually be
 
-diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
-index ae81a7191c1c..0cb43986061b 100644
---- a/arch/x86/include/asm/processor.h
-+++ b/arch/x86/include/asm/processor.h
-@@ -191,7 +191,7 @@ DECLARE_PER_CPU_READ_MOSTLY(struct cpuinfo_x86, cpu_info);
- #define cpu_data(cpu)		per_cpu(cpu_info, cpu)
- #else
- #define cpu_info		boot_cpu_data
--#define cpu_data(cpu)		boot_cpu_data
-+#define cpu_data(cpu)		((void)cpu, boot_cpu_data)
- #endif
- 
- extern const struct seq_operations cpuinfo_op;
+	b6d972f6898308fbe7e693bf8d44ebfdb1cd2dc4
+	crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
 
-Please send this patch to the x86 people.
+Anyway, I think we should fix it by adding a new goto label that
+does not free the SG list:
+
+unlock_free:
+	af_alg_free_sg(&ctx->sgl);
+<--- Add new label here
+	hash_free_result(sk, ctx);
+	ctx->more = false;
+	goto unlock;
 
 Thanks,
 -- 
