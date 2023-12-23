@@ -1,36 +1,36 @@
 Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7BD12E5A
-	for <linux-crypto@vger.kernel.org>; Sat, 23 Dec 2023 18:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD8412E61
+	for <linux-crypto@vger.kernel.org>; Sat, 23 Dec 2023 18:10:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="jbJelIlt"
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BNIAheg016022;
-	Sat, 23 Dec 2023 10:10:43 -0800
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="cbNg+Ddy"
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BNHpBRD015681;
+	Sat, 23 Dec 2023 10:10:44 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
 	 h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:content-transfer-encoding:content-type:mime-version; s=
-	PPS06212021; bh=2/bBsHOnsse5CzDHR3+pI+UvwBS47SrmGuAP512pr+Q=; b=
-	jbJelIltKrDaspeAw6f75saDzoz5u4YbgJ7BUFRi0KaJP2lwi79igo+G4VTjL0Jc
-	Jm6isFPKnRQnaIlUfO8MdLIptD3d6OE1h5uljK7fZwqNLJeE3KHfml+wO77bILjS
-	E3dqoD3xYFFaqpVGmk67f/G4icJI+WsIlVia17hE1YhFvXfQniXdx9MffwzqiSlL
-	7Bg5dGXBt/vWbn8SiwE+lJ3NEd+9SNZwXaZwqSAoE7hiZX+/I+bbbSAD6OfkSb3w
-	taGpitztV3lcSXY5H/7p02mVK9w9PEBgl5gogs27EHk6Mqdd0VdqzijbFl2WbxhS
-	wj+EiTG2E5x7GDLaAhQ19A==
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2168.outbound.protection.outlook.com [104.47.57.168])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3v5yxm04cd-1
+	PPS06212021; bh=FXaS56t44zj/tkmmQKSjESH5fMIQsk5WTxpi0bi3nEI=; b=
+	cbNg+DdycC2pJ5UTm5DIDKEHsVKk+hbi0P4OIC+3R6SHZrcB6OT9y2dFh1NhtBwK
+	tQRy6P5CEkYQf3+sbMHSIrMx6e/63JsbfS5BfxioE9MawcQYRQRAL78CcYMwXzUx
+	mh5MId6boujIMOnwxQfXEP0t2ZOY8xEuHHiAZgQZrTLbH7uLQCOpLDGu5xC96ted
+	VU/ws6Cx/r0vNZeqKXI1J37k2//ZyIgwqLrn2FZdTxpRnFEKJ3XJsM9PSJqa+8XW
+	A+bO5EfzvH3yMTjv227L4asz2t+AL9VHBNawzv+loyM0/5FHlLDaJK01xfuDP3Fe
+	MK7qZ7yfSpYLaW7ctiHoBg==
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2169.outbound.protection.outlook.com [104.47.57.169])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3v5uq4g8cf-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 23 Dec 2023 10:10:43 -0800 (PST)
+	Sat, 23 Dec 2023 10:10:44 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WUmjFuiNUWVtHv+KpkLC3BknTRq1noKuidki0W/AQk7buRmkJ658yUlzXQ6weOtCq3rFsvjHRK7k2dRrX0BngL98c2NmeVxY5OR6swpnIRizYVvqX1Z7kwpg82ZQouy27FAPIm1RKT2QI8eUUcKFkUdVCtxbwOghTG2WcAftFCkHi5E3GlvCbSAOw9YoM1gSaW4611vY9Gi93djMliJcfpIlubJkxisxe0Rqz08Y+Z3d88qtSzEnnZBzad4h8e4V4hoOR7a9u/TTxpvq2hZyQ1NiTlk5E44Lx9RlvWBu2Tos4HwjoxjMXzbZFvC6LL+O52qyQDHTakp9QiOf0lZGNQ==
+ b=d5UMJXz41Y4gUihwH25IOyZYq+a+QoZwY7z/9CceKXTgGE+S8ztvVybmS9EoygzZgl9dvHaL3Veg4NyZUfQJUXhYCRzf4LZHo3HAqF709FI5KQ2tlKxswI2IHtTgVZFanMo20t+aBpvuvNtp0U/xcvs6BT3J49VUe5CzUj7ELiIl+mdr0iBa3eEiA1v0uDgz4by2L2GM+obAfc7rU1w4ID+Mp7jdIfIBWyhmeFzGVyBp3YDzh52P/FoILrmpEpJm68j6cTiBILxexOYZSMGrpUerP+AX5htZxjpoQJ23PWd3V3Dwa2CygMmXeCcNZCxlIOyd+Kb9Xe9a7rooJzi3XQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2/bBsHOnsse5CzDHR3+pI+UvwBS47SrmGuAP512pr+Q=;
- b=KuKpYyGniCW9ksmvS1UkJIYnHZTypqZRrNkI3FB8XgsSGHSg2U2Z1BIRXmbb6Shc0Y95OguGBXjdjMmjt5GcEiEYsSU/oeRBoXDnMb8v9h75WOPcDxU6xPWCaRNCU6ZJETZPR3bdB32CQQdTXZfy6bUTp2iC01Qta3MLSWbHFQ/3SUd5h3cXWEFsKZlE2xsVoHr82R5gMOzxluTi82Il+SjKG6J0DBAgkVL9CptyBqYxZgxKcAwaXyADQpGQiVV8P9Hs0vIo4kfyB46aKKz4ipX3il6MwzzfqVTcChYTBL6JPqAFV9UBH6/ThMRbT/w48A/i6lsL4Wz5i3DKQdYFaw==
+ bh=FXaS56t44zj/tkmmQKSjESH5fMIQsk5WTxpi0bi3nEI=;
+ b=EXoYk5XTik2UKwKCQXCe3pbcVzke+NMHOZsU5pxaB7BLJ2fxtDXqjZOX2jMWlwDE4q7hqeC5JKe45cCZ0xL2qqxuaPKGTeCo7QFFGSoreJ8NFRyv5+g7OTbYxgt1Y0bP6fqORmPV+R0Q/LJFtltIk1U7+BLQnP9uYHM1te6HoAlnFvOwYdz1yHCXOgdXj98A7I+hi7UAH8WMzlJgRhuz8K3nMTaXs6qPbtUR/qzRLJSgGVn4w/9iduJskapFKFvqjU8DGZRZEEdD3ic8LDXwfHTMk4XdG11MtvWuj/QVLn461AQC+syK6RcplCXpxBwEf+JU23AdDmizicnEVIUsyg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=windriver.com; dmarc=pass action=none
  header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
@@ -38,17 +38,17 @@ Received: from DM4PR11MB5327.namprd11.prod.outlook.com (2603:10b6:5:392::22)
  by SA0PR11MB4589.namprd11.prod.outlook.com (2603:10b6:806:9a::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.24; Sat, 23 Dec
- 2023 18:10:41 +0000
+ 2023 18:10:42 +0000
 Received: from DM4PR11MB5327.namprd11.prod.outlook.com
  ([fe80::7c2e:5b95:fdc2:30e]) by DM4PR11MB5327.namprd11.prod.outlook.com
  ([fe80::7c2e:5b95:fdc2:30e%3]) with mapi id 15.20.7113.023; Sat, 23 Dec 2023
- 18:10:41 +0000
+ 18:10:42 +0000
 From: ovidiu.panait@windriver.com
 To: linux-crypto@vger.kernel.org
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net, festevam@gmail.com
-Subject: [PATCH 05/14] crypto: sahara - fix processing hash requests with req->nbytes < sg->length
-Date: Sat, 23 Dec 2023 20:10:59 +0200
-Message-Id: <20231223181108.3819741-5-ovidiu.panait@windriver.com>
+Subject: [PATCH 06/14] crypto: sahara - do not resize req->src when doing hash operations
+Date: Sat, 23 Dec 2023 20:11:00 +0200
+Message-Id: <20231223181108.3819741-6-ovidiu.panait@windriver.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231223181108.3819741-1-ovidiu.panait@windriver.com>
 References: <20231223181108.3819741-1-ovidiu.panait@windriver.com>
@@ -65,109 +65,153 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DM4PR11MB5327:EE_|SA0PR11MB4589:EE_
-X-MS-Office365-Filtering-Correlation-Id: e07ffeab-a3d3-42c7-a863-08dc03e27947
+X-MS-Office365-Filtering-Correlation-Id: 2afd8916-fe44-4939-9f53-08dc03e27a20
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info: 
-	90Npe5ltpIG8kdH+/qJ8Hj8mTH6HvOq1E6ta4GIO16Aq5zGCxgmvJOKdfdXiOZ6RIw5gJk4SKy+463Kj7Op+2/T1HZHUS0tBl/B2F1zfER4YZ1PvpZ93M56JIEQQOlvTeimVPu16tjiBu64VAqB1+rQKMJ0sfhXBihiQjj/+7whXsKjlML752k3GH7xz4B0CJQ+gx2OAhnaga3MJVa1HQydtIcnIXnRv/iy3luWsmxofAH4nUwuY+RNUaZKCjJV6SNlldTnJAjkoEpZ+w9RWkSnJ2vjHqaZI5qMqj4aBcq/jljOYD9uX7o5Nnl4qpuh6om5PMfMiiL64ZBbgNZbIV8+Ie/PBqH0z85omwHtztT/YLriRG4Qgn1PifGTBBSJiIWbjD97xPB9UcwS3W2r/tkAAvIogsU/ZFV4kDu8QLTMdFV89VZEsDTLoSs2Za+SYQJt4WFKmL6dfwBuqiGMilcNr5vH348GzxBVkTQty2Idt0w6dI3g6LRN7CXadjVK02x9zmvWEK2m//u389EE7Z8fF0V4T8sOltAmo05ksjAvlR6a9SwSph2TB353FP28YXOEe6RFx0qo79azfssMzd/HvykUnsDctaOikXiY+Rt1LtsSMytfIwmrlPJ7FBSFL
+	rC1p3VLw1/g+FWRG1qMd65WcZSoEDkF/j00E2ecd3HI3nKgRLK/LPT0p2Ld+BkVRwRnc3LKhLMpjBBdLP86TerC3+TKDBWHCuhOQc/dlefk9HlekPVdaVEVqQRCYKSGsLpf4ONJDUQr8Ufak15M4EsGyXaPWuX5jrf+0dDBnhpDwJg2aWH0j0fPmh14lR60Esxh5w5wb21mDqRog4NVogwxI5koXnYKsVvzt2kXWmeV4q6cG29t/jA+zaJX87osS6qom8KpFtjskRV1UDYHYaoE4f60DGF2tvqoEflnoCIdT5X/VUAAlqu5KqDS43mgM8j1l1mqoN/7pqNjwctLOBhWAAiixfad3XAfOPe0EGnBwoON+0GdS2r0Zw4Y+zZqxUZBvRT8zz/DLWc4aL/OeKpQtm16XuOdR/XxqvxeC9VkK7hFx0rx8QjDGHEKw5wANYNd0hCUtpvjT/ykQtuN4boEXKJ5V7bQ3G00KHn560l62hioKBFddGoe6CLKG8TOV9jtKPE8eF1uFGCqlNqyDmakKgypunJkfnV1zuhSMeiFOTJZIH45DD5pDLzjz2dCen+Aa59WTnB/sCIrS8X6zlvZPIsVhEbZmlaqXGQEXcwpBnkhnE1hIf794gaBG41NS
 X-Forefront-Antispam-Report: 
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5327.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39850400004)(136003)(376002)(396003)(366004)(346002)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(41300700001)(38100700002)(2616005)(1076003)(26005)(83380400001)(36756003)(86362001)(38350700005)(6512007)(6506007)(52116002)(6916009)(316002)(6486002)(478600001)(6666004)(9686003)(66556008)(66476007)(66946007)(2906002)(4326008)(8936002)(8676002)(5660300002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?XWiCkAzaGNtn1krNpFeM61gWpsuGz3lPxEo/kJpBpqxeTn6GIuNZTDXLOBjg?=
- =?us-ascii?Q?zah+iedY/dndaGUXRX0Jw2v0enZnc0lLVyqKRYv9beRWKnRGd9rr9h0vhNBR?=
- =?us-ascii?Q?4UVEO/kN/YMmbv1m5ZeKdoDqI7xRyX66cmZVx04GQ/eLACm3bLvHeLoNi2qW?=
- =?us-ascii?Q?Tm/e2kANMVCbNnro9Ob9oPfJ0p4AjDqK2aBIxvbZ9M010rPmWHuB/O8k7qD/?=
- =?us-ascii?Q?NqNAhiDrN5ug+qcG3uHCU3sFvdG8QS6RaJ+DeZxRB888+4pCyjcRQV8k2t3W?=
- =?us-ascii?Q?Q70drkJTzLgZ07dfEBjQ/F3xcxxKxxonD46zPruAAjqTtkx34QDb1haRZb+l?=
- =?us-ascii?Q?cdl4gzWIrCbA8QCca2DjY3BnNvF5xhbU8cXJIAT0Kypb7cCIyM5dOFStY9Ah?=
- =?us-ascii?Q?tJKJ+xmxXVLzBpt1p243649+GsOsPzozxUUeWkDQP27TS5+r4wNqjEEtWvSE?=
- =?us-ascii?Q?q85bL1Jjn2UW9aRRCgxrXwaHpj4yWCZ2VFiZ9C82je0C5naGv5NBXi/YamcL?=
- =?us-ascii?Q?rR+31keDBQE5QWsCSimfHCy3s0B1v6sDTWdxCITSnTQHg4RkungME0wM5F8P?=
- =?us-ascii?Q?xqCQDAhrvwefD0RLzVAk1ni6VCgRSgYMt4TmqPKayb8WisTIBj4s/GYI2VW1?=
- =?us-ascii?Q?5apQekaf5auw6pWG3At4xGdvxkVPeUk5YdPrx3cLjlVrLKPi9dxUZmIs4PBN?=
- =?us-ascii?Q?f97MQXdryub+g75wrb/qj23mYFZaziTu7+p8z+bLEuA5Ul2K+LihgtkNe9pw?=
- =?us-ascii?Q?3qNPz+uXtBs38nXpkSOHKPEP2qrMGntODTje1l20iAFcvGqHJef1q/z8NzKl?=
- =?us-ascii?Q?NYZuirrSaQq7UlXp4vEdrpNMDoOJIqklQeWWZrp6SAYfscurNo/Z58k+z8ti?=
- =?us-ascii?Q?3lr6ZjwiKsju/BxMJs8ovgc3Fyvblt22tIypCemNvy5xZ9C8UpRJsWddOU3A?=
- =?us-ascii?Q?Xw0CG7/d2LSQGpZ0aKIdSo9ECtmq37Ntkdz0Npn5mLQaVlF5e6UcCX7HSQa4?=
- =?us-ascii?Q?6GKwFLNo79VNT242b3DQVISa757o+gjRmMgc5bXkjUUJUjZO/Sa1YzEsEGUD?=
- =?us-ascii?Q?GbQUL0+2xR5OxMOto01spJ33fx0bBmrPZ39ylUk2K5MVk7XkKFI7XkXG/nmT?=
- =?us-ascii?Q?lxdKOA1bjYruFFYUTBf4b3nZ4LnFJjT0pGkWNtF6dhiy1KwIr7g7u1VAPC4z?=
- =?us-ascii?Q?7+ZM4o1kNTjDTCcbfux88V1vrB/uGAC40Tlk2UGapLzB79bOlR5lME+2RhQH?=
- =?us-ascii?Q?1ce/mo1ElsnXfLHPK6yTA/tazfGqLQRjB9sbwss0H1sRvW7YEQpwYNxKIVtP?=
- =?us-ascii?Q?ylc2n2ciedSnST32aYgcqP2oafKrxgmnampd4DM/O5R9shexRVE5fBXdcHPL?=
- =?us-ascii?Q?pubK8pI6C9m9szDX3KcfpxvT+EsGEw0oXTzEHu0bcVyWnfpjYCW8jJBGgNe+?=
- =?us-ascii?Q?V1xYJi10Z4WpBXCE0f/1Sm8v35DSE9JKt+bFhFMi4u83nGj4eoDQD/KFNclO?=
- =?us-ascii?Q?5SUHvbKWGPNE4U+G3TC2EGOrXVTGReABAAC440r7LUFMVng1Eyz6nvh+Gqx6?=
- =?us-ascii?Q?TVh9DcU5mVC/U2SPT+SSMikVAOirm8we8y8F8Fg+NiNem3BdLWund6S246ur?=
- =?us-ascii?Q?qw=3D=3D?=
+	=?us-ascii?Q?4LeXAx8PEb1K+VbMp8poMabC/8P7nEqFlkxXXK2Wv4ArTRoizfnnWXubdXFM?=
+ =?us-ascii?Q?BwSU93PbJ/kDa3X3Vd7igRwPlluouhzNJOoNueDy51q+CZKcRQqAmlVdAykq?=
+ =?us-ascii?Q?BKNVsjaxmwBMuRFmSWjSxpEfQ8niIT1B2rEzE1VaUQCBSQgEEL0pljntsHm5?=
+ =?us-ascii?Q?lEb9/eofa6ZoxstmxoM/k1DicaKSvJKS9qWa2Duuby6M39HRR8a9YATHkUn/?=
+ =?us-ascii?Q?BnetBVRyM6CwgmM4rpMNK3FEM0seJGHjZE7QkopBiiaEhVKcDSW0MasHBkDX?=
+ =?us-ascii?Q?rdwxOgXYOnpylChgjzwpte1VdYjZdfHtBa9BZK8oyBLeX+pwJBGmmsF5MBoA?=
+ =?us-ascii?Q?Md4lzMowiOlpl75PNNRvmvMGvLNDP8lMQuHzZGJtD2PyA69r/N0ghruTXYgK?=
+ =?us-ascii?Q?TxmOQWjq5mvdLyJzSj7sGIv2ZOnTSwpg02Oydk5JrJenEylXmXkC4pUAXKLD?=
+ =?us-ascii?Q?HCUripI2vNGGGeVYUQVSt1FNxhcoxFCYf/+390jGAfHaekN4NEiyAwjDDJJY?=
+ =?us-ascii?Q?tEE3bN4uwxUMOs/fTLpNTS8vx3RFgybTJOV8QDKoI2Sx80AouwSo7vvB6vNX?=
+ =?us-ascii?Q?sdi2IOM+djvCgbVf3v244HjhgKWKeFgBelZ6yG9Iy6493KzHvsLMbVDegFcc?=
+ =?us-ascii?Q?bvabrMAz+ZFQMMfu510NcSaZIITbUVL4k/fr4jWfqYtTFETKw5CWiRXN0o34?=
+ =?us-ascii?Q?VQ82maTuU/o/r01AH6+G0tHU7UwcEqClTuMhE5x5B36wILDaOVwF+4N1gxlw?=
+ =?us-ascii?Q?c3UkfX9OX7DVNFGXrSesIro7iFqUFeGdyv0+Pj1LwfD8MshFim/KD4KxyNXq?=
+ =?us-ascii?Q?XdS/eTP7wic5ZTq8Kb8wAeC1Ozae1OGGupHtStR/ICb+oT2SS6HWS83ylUD8?=
+ =?us-ascii?Q?eueV8xPADjK33cvDtqHp9SDsZPYpgEBzKUV7Io7txFmwLH6hhZtEDxqERINX?=
+ =?us-ascii?Q?EE4JcDupeThv/lRXmcHD/yK4Sgon1os4oSQyzdAwv7JBq8iywUp4eJAIu9he?=
+ =?us-ascii?Q?GrgQ+yI0kwzAsCDOS6ypvYdcgxr/0SjpMp4khHI0nEwAvwopkzeRM0lkqZUV?=
+ =?us-ascii?Q?N/shnL2ID/9XJHXesJpIhzNt46l9arglNZgkoF56WDG8EUQ20IMZ7IOay3gD?=
+ =?us-ascii?Q?oIyJF+p35yGG/ehlhSdMV2YUdZDnVGHkeHHpLMKI0ZJU5NZXY1TVq2UGJ0AP?=
+ =?us-ascii?Q?NRjwod7Kj+V38AZ0tOHmcsldNHZVIIYTjV4cEJmgGEvK9gdn4A8RI/hcRSy1?=
+ =?us-ascii?Q?tF1NjenR4ptTz+mni748J2iIzjgsWOXtBlM1gP23ZddUsWp5BM5uTwADpl2i?=
+ =?us-ascii?Q?QC7G7xZVOST1rLdsV2Jjj15CkvWrfSx+fo/wZYzgQL7qK3p18DWItTVzrrak?=
+ =?us-ascii?Q?S7syWFWk4ZQp14ETLDorQyXGpMhqJzTo1Z5PLypaTOclOJz9AkcMQy9sYSWt?=
+ =?us-ascii?Q?bv+0sz+36Rhu2U6GqG4qgVClUoEDSfQdSkI/xH+yYjFwYGoly/H8SZ5abN9B?=
+ =?us-ascii?Q?hqhgZ/pVEUqRdr9fnXmfOLEw44kRrrJzUmuxefSOuEuDm2vtB0zbK8dws+Ad?=
+ =?us-ascii?Q?O4cV4o72fqAMLiH1ySrrikHH8Z9AMb7EB+LwdsnubSROetohSkpzVroOOxQq?=
+ =?us-ascii?Q?TA=3D=3D?=
 X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e07ffeab-a3d3-42c7-a863-08dc03e27947
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2afd8916-fe44-4939-9f53-08dc03e27a20
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5327.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Dec 2023 18:10:41.3281
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Dec 2023 18:10:42.7493
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VF9vMlb1RWL8meUJYAi5FvPefc3hmUsJE1YyNhk3KGb1xdZEoOssAVCswtGdrX7HXB4CABXnHUBiz+cyINx242E9QOPco9wKx1Rb4bsS5Y8=
+X-MS-Exchange-CrossTenant-UserPrincipalName: QQIblDUbmMxPvXBu/pi2aP5UolwP9Oe3i6xlDCskKZv9Bb6DM+7hasg1jU6kZS6YDFAs6IZJxszqWqgikXdvcNlYuESUyctrXCdkO6TPMbw=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4589
-X-Proofpoint-GUID: R0XWlfYx-YyCC6_5K0NhMUL6JZpDnXhB
-X-Proofpoint-ORIG-GUID: R0XWlfYx-YyCC6_5K0NhMUL6JZpDnXhB
+X-Proofpoint-GUID: eT7Cb6izEvHHoEQqZi7WPwDkBo7lZRX-
+X-Proofpoint-ORIG-GUID: eT7Cb6izEvHHoEQqZi7WPwDkBo7lZRX-
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-11-16_25,2023-11-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=920
- priorityscore=1501 mlxscore=0 bulkscore=0 impostorscore=0 adultscore=0
- clxscore=1015 phishscore=0 spamscore=0 suspectscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ impostorscore=0 spamscore=0 bulkscore=0 malwarescore=0 clxscore=1015
+ phishscore=0 lowpriorityscore=0 mlxlogscore=999 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2311290000 definitions=main-2312230144
 
 From: Ovidiu Panait <ovidiu.panait@windriver.com>
 
-It's not always the case that the entire sg entry needs to be processed.
-Currently, when nbytes is less than sg->length, "Descriptor length" errors
-are encountered.
+When testing sahara sha256 speed performance with tcrypt (mode=404) on
+imx53-qsrb board, multiple "Invalid numbers of src SG." errors are
+reported. This was traced to sahara_walk_and_recalc() resizing req->src
+and causing the subsequent dma_map_sg() call to fail.
 
-To fix this, take the actual request size into account when populating the
-hw links.
+Now that the previous commit fixed sahara_sha_hw_links_create() to take
+into account the actual request size, rather than relying on sg->length
+values, the resize operation is no longer necessary.
+
+Therefore, remove sahara_walk_and_recalc() and simplify associated logic.
 
 Fixes: 5a2bb93f5992 ("crypto: sahara - add support for SHA1/256")
 Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 ---
- drivers/crypto/sahara.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/crypto/sahara.c | 38 ++------------------------------------
+ 1 file changed, 2 insertions(+), 36 deletions(-)
 
 diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
-index d49659db6a48..321c11050457 100644
+index 321c11050457..f045591e8889 100644
 --- a/drivers/crypto/sahara.c
 +++ b/drivers/crypto/sahara.c
-@@ -774,6 +774,7 @@ static int sahara_sha_hw_links_create(struct sahara_dev *dev,
- 				       int start)
+@@ -884,24 +884,6 @@ static int sahara_sha_hw_context_descriptor_create(struct sahara_dev *dev,
+ 	return 0;
+ }
+ 
+-static int sahara_walk_and_recalc(struct scatterlist *sg, unsigned int nbytes)
+-{
+-	if (!sg || !sg->length)
+-		return nbytes;
+-
+-	while (nbytes && sg) {
+-		if (nbytes <= sg->length) {
+-			sg->length = nbytes;
+-			sg_mark_end(sg);
+-			break;
+-		}
+-		nbytes -= sg->length;
+-		sg = sg_next(sg);
+-	}
+-
+-	return nbytes;
+-}
+-
+ static int sahara_sha_prepare_request(struct ahash_request *req)
  {
- 	struct scatterlist *sg;
-+	unsigned int len;
- 	unsigned int i;
- 	int ret;
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+@@ -938,36 +920,20 @@ static int sahara_sha_prepare_request(struct ahash_request *req)
+ 					hash_later, 0);
+ 	}
  
-@@ -795,12 +796,14 @@ static int sahara_sha_hw_links_create(struct sahara_dev *dev,
- 	if (!ret)
- 		return -EFAULT;
+-	/* nbytes should now be multiple of blocksize */
+-	req->nbytes = req->nbytes - hash_later;
+-
+-	sahara_walk_and_recalc(req->src, req->nbytes);
+-
++	rctx->total = len - hash_later;
+ 	/* have data from previous operation and current */
+ 	if (rctx->buf_cnt && req->nbytes) {
+ 		sg_init_table(rctx->in_sg_chain, 2);
+ 		sg_set_buf(rctx->in_sg_chain, rctx->rembuf, rctx->buf_cnt);
+-
+ 		sg_chain(rctx->in_sg_chain, 2, req->src);
+-
+-		rctx->total = req->nbytes + rctx->buf_cnt;
+ 		rctx->in_sg = rctx->in_sg_chain;
+-
+-		req->src = rctx->in_sg_chain;
+ 	/* only data from previous operation */
+ 	} else if (rctx->buf_cnt) {
+-		if (req->src)
+-			rctx->in_sg = req->src;
+-		else
+-			rctx->in_sg = rctx->in_sg_chain;
+-		/* buf was copied into rembuf above */
++		rctx->in_sg = rctx->in_sg_chain;
+ 		sg_init_one(rctx->in_sg, rctx->rembuf, rctx->buf_cnt);
+-		rctx->total = rctx->buf_cnt;
+ 	/* no data from previous operation */
+ 	} else {
+ 		rctx->in_sg = req->src;
+-		rctx->total = req->nbytes;
+-		req->src = rctx->in_sg;
+ 	}
  
-+	len = rctx->total;
- 	for (i = start; i < dev->nb_in_sg + start; i++) {
--		dev->hw_link[i]->len = sg->length;
-+		dev->hw_link[i]->len = min(len, sg->length);
- 		dev->hw_link[i]->p = sg->dma_address;
- 		if (i == (dev->nb_in_sg + start - 1)) {
- 			dev->hw_link[i]->next = 0;
- 		} else {
-+			len -= min(len, sg->length);
- 			dev->hw_link[i]->next = dev->hw_phys_link[i + 1];
- 			sg = sg_next(sg);
- 		}
+ 	/* on next call, we only have the remaining data in the buffer */
 -- 
 2.34.1
 
