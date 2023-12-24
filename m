@@ -1,95 +1,141 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+Received: from mout.web.de (mout.web.de [212.227.15.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D674FBE8;
-	Sun, 24 Dec 2023 18:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C4CDDB3;
+	Sun, 24 Dec 2023 19:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XDlNubcP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703444099; x=1734980099;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=QkRfWSWR/XMDhOsYtyqhQDrgzSxc71smIy67/8QzOS4=;
-  b=XDlNubcPBAKkvsgn68yIY33Hf9fEEggOYSqaRZb8uvq7s+iKUlSfMR7T
-   tNpQ/bUqwns131836znNJW5y++RzO+mDALQQHbSlm66KpTtEcbhur6AR7
-   E8gdu7SFesAtN8Q3ISZ0OaTsrf9PLXaG8b0oEAezx2Aw6QE33nxBeLujB
-   4rbLpFRYEl0eUEn7YjDyY6f5PmkUoDw4ad0YjEVjaSG7cqMpYH98Jpem4
-   X7F0A/O1/ue/xHXabJVEVukJ6AcJk8pUc1Eod8Gm0UFMfFxV7s60YzodN
-   3XtTfwmfLHnDseiJ9evw4vTcllTNeCuNhmi9TyjkRL+ERsegBIRdYk2J/
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="427414104"
-X-IronPort-AV: E=Sophos;i="6.04,301,1695711600"; 
-   d="scan'208";a="427414104"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Dec 2023 10:54:58 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="848056972"
-X-IronPort-AV: E=Sophos;i="6.04,301,1695711600"; 
-   d="scan'208";a="848056972"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga004.fm.intel.com with ESMTP; 24 Dec 2023 10:54:56 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rHTcg-000CXN-1n;
-	Sun, 24 Dec 2023 18:54:51 +0000
-Date: Mon, 25 Dec 2023 02:54:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Edward Adam Davis <eadavis@qq.com>,
-	syzbot+8ffb0839a24e9c6bfa76@syzkaller.appspotmail.com
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net,
-	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH next] crypto: fix oob Read in arc4_crypt
-Message-ID: <202312250259.yyBgM27K-lkp@intel.com>
-References: <tencent_656D589558EA3EED8ACF3C79166F202E010A@qq.com>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="QoZIYXi9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1703447762; x=1704052562; i=markus.elfring@web.de;
+	bh=cm+fIZLlDlbOzuqZGb6TsofPaKLKFGH0UKkUeJ6PVQI=;
+	h=X-UI-Sender-Class:Date:To:From:Subject:Cc;
+	b=QoZIYXi9cZqtNGtvF4UCvUpoCNwOxR8e3FLbju/ydTYgpkVlGSLCy5MC8nVGT41d
+	 eResBJliME/ri5g5oXcpGtQd7eN/tTvbli+mycPuwFfAAEpCYPv8bFFpmcWBLUZ+A
+	 M1E4tfznDYRUXyX/fTG/K//nt3lCGAOz2gskuUMd+dPhYyRfMbOgIT5O8xlvrpe9j
+	 kj1gTCRZ1uGzPVOtzG7VUm8SuIOZuY32IdW8pcMq8q59rfsq76B94swfYIVlX4K4S
+	 0RObHdyPjK6Jfb4r07GwvwAVFrg3aDQw6uV3QIzkWhBmAhK8U6JXyFXDEdAkt+G82
+	 REFyZpZ7q9FVI2T+tw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1N7xeZ-1rDu1x2ZpT-014bII; Sun, 24
+ Dec 2023 20:56:02 +0100
+Message-ID: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
+Date: Sun, 24 Dec 2023 20:55:57 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_656D589558EA3EED8ACF3C79166F202E010A@qq.com>
+User-Agent: Mozilla Thunderbird
+To: virtualization@lists.linux.dev, linux-crypto@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Gonglei <arei.gonglei@huawei.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] crypto: virtio - Less function calls in
+ __virtio_crypto_akcipher_do_req() after error detection
+Cc: LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:js4ydb7183jogO2zNXAOsnmwRjTJkFts4230ojusF5s86M+AW5+
+ R5GJtNhXdNtM4tEDbq+iQg1RPiFfkUqzLSGBlTwOtVrdN81X0QdPgkZwQOUuzk5G6JgcA2/
+ a9bXWU4zIOkvteJDFZzgqHxnSoSM5vjhMP+WvH/mLObV2o2cMeoKp3S7dg2xNq5LAjTBtMO
+ gxGXiKX2GEOup1Ii5BzbA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:WbQ2yg1lmBc=;3P3aWHeDFAyqdOaqJJeKgIAbuWq
+ IaQuiX66fOG4HO1fbgWMKF56zCIYOlf1AD/+aEXdGYWKqhXFP09cN9kpPPdfEShTApKnr6BWB
+ OBGdTNc/CPS36kVuShgdvl6opR6/xO359mXEID+rkcOltIguEUYU2CITRnsfLCRZSQ0E//dKh
+ IXtHvmiBcN6iEiektNZQDOKynYCUCBBps2/cHdgz0qtl3KxEgKhbyrPRSZeQMFybO2F/5xFtt
+ p0y2gz506LIVL0Z+76Fyr/WQAUqwFVBvqylEhEJaWnhlg7tjc8JHXoLkfqazE8//fxucj0rzd
+ 9C2tARpcByUWLK1rMuufdESRp6PZi+WnZXuJb+hQiWvcnPtZ4tmVIRs5TnZi0tFfuC/euHMRo
+ NraWgvInU3jVsmCI//aiVaC8snV1L/ZY7i9A14A30bQoxtgao3NIR0ONSAqE95d04LblUro1d
+ hRzksKgd17O0eknBO6fIbO+He7glZ8dbMZQGmX7yrMKEZT6PRYtc2mLJP2LbHorzed4YXR+1d
+ IYpBsO7e65qV7dpR739Wo4SO+I14ReGMPJzC1dflQ/hmg8jwpUkiHkt/njIbGAKLKx/9wFgKS
+ EjSVQ5YZ1iVI39XMUnPUcNaog3hVm4xnsZLJR32H9Od9xyY6upJ5/eex2a6SCLGBq5pthhaJA
+ rKkFNI0hbwchKG59NklNFDR6FOBOESDr9TjazPDUTtrY1BxFQr9Mf6l6R9vZ+ckSZyyzp6aDA
+ JktyzBrAQlO6KNOQUYxLkUdPYWigCLlRRvz45mv+vYTHm4WsnRQPoYfX7wVRbOsdr4cwWlaJ5
+ SvB5fkElpx88XTzd8X0oPqsrZ81am9pzI4lThisgJXALB4sD1xBBYOCdfkPZpw5NlLSdmo8yI
+ MsvPcbhr2uh59j20gkLG3pcXm9dQ7ixm67c1pklP9d9ccELRpnpWxsmdEq7JPbQliKyiT9syi
+ 20AXhQ==
 
-Hi Edward,
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sun, 24 Dec 2023 20:42:19 +0100
 
-kernel test robot noticed the following build warnings:
+The kfree() function was called in up to two cases by the
+__virtio_crypto_akcipher_do_req() function during error handling
+even if the passed variable contained a null pointer.
+This issue was detected by using the Coccinelle software.
 
-[auto build test WARNING on next-20231222]
+* Adjust jump targets.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Edward-Adam-Davis/crypto-fix-oob-Read-in-arc4_crypt/20231222-172845
-base:   next-20231222
-patch link:    https://lore.kernel.org/r/tencent_656D589558EA3EED8ACF3C79166F202E010A%40qq.com
-patch subject: [PATCH next] crypto: fix oob Read in arc4_crypt
-config: i386-buildonly-randconfig-003-20231224 (https://download.01.org/0day-ci/archive/20231225/202312250259.yyBgM27K-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231225/202312250259.yyBgM27K-lkp@intel.com/reproduce)
+* Delete two initialisations which became unnecessary
+  with this refactoring.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312250259.yyBgM27K-lkp@intel.com/
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-All warnings (new ones prefixed by >>):
+diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers=
+/crypto/virtio/virtio_crypto_akcipher_algs.c
+index 2621ff8a9376..15dbe67f0d31 100644
+=2D-- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+@@ -224,11 +224,11 @@ static int __virtio_crypto_akcipher_do_req(struct vi=
+rtio_crypto_akcipher_request
+ 	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
+ 	struct virtio_crypto_op_data_req *req_data =3D vc_req->req_data;
+ 	struct scatterlist *sgs[4], outhdr_sg, inhdr_sg, srcdata_sg, dstdata_sg;
+-	void *src_buf =3D NULL, *dst_buf =3D NULL;
++	void *src_buf, *dst_buf =3D NULL;
+ 	unsigned int num_out =3D 0, num_in =3D 0;
+ 	int node =3D dev_to_node(&vcrypto->vdev->dev);
+ 	unsigned long flags;
+-	int ret =3D -ENOMEM;
++	int ret;
+ 	bool verify =3D vc_akcipher_req->opcode =3D=3D VIRTIO_CRYPTO_AKCIPHER_VE=
+RIFY;
+ 	unsigned int src_len =3D verify ? req->src_len + req->dst_len : req->src=
+_len;
 
-   In file included from drivers/crypto/padlock-aes.c:13:
->> include/crypto/internal/skcipher.h:27:33: warning: 'crypto_skcipher_type' defined but not used [-Wunused-const-variable=]
-      27 | static const struct crypto_type crypto_skcipher_type;
-         |                                 ^~~~~~~~~~~~~~~~~~~~
+@@ -239,7 +239,7 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
+io_crypto_akcipher_request
+ 	/* src data */
+ 	src_buf =3D kcalloc_node(src_len, 1, GFP_KERNEL, node);
+ 	if (!src_buf)
+-		goto err;
++		return -ENOMEM;
 
+ 	if (verify) {
+ 		/* for verify operation, both src and dst data work as OUT direction */
+@@ -254,7 +254,7 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
+io_crypto_akcipher_request
+ 		/* dst data */
+ 		dst_buf =3D kcalloc_node(req->dst_len, 1, GFP_KERNEL, node);
+ 		if (!dst_buf)
+-			goto err;
++			goto free_src;
 
-vim +/crypto_skcipher_type +27 include/crypto/internal/skcipher.h
+ 		sg_init_one(&dstdata_sg, dst_buf, req->dst_len);
+ 		sgs[num_out + num_in++] =3D &dstdata_sg;
+@@ -277,9 +277,9 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
+io_crypto_akcipher_request
+ 	return 0;
 
-    24	
-    25	struct aead_request;
-    26	struct rtattr;
-  > 27	static const struct crypto_type crypto_skcipher_type;
-    28	
+ err:
+-	kfree(src_buf);
+ 	kfree(dst_buf);
+-
++free_src;
++	kfree(src_buf);
+ 	return -ENOMEM;
+ }
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+=2D-
+2.43.0
+
