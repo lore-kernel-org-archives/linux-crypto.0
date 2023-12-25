@@ -1,136 +1,102 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2EEB54663;
-	Mon, 25 Dec 2023 12:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB92E524B8
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 14:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SlYoH19R"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40d53297996so15480505e9.2;
-        Mon, 25 Dec 2023 04:03:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703505824; x=1704110624; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aBQy6vgMSA/KrUei65+R4AvaCjiClzbb1i54FcWf2Kc=;
-        b=SlYoH19RPFcoW40OL0C/yA1XBhjXtyuKbesQqSI01ogjzW5J3z7tz1fRE1tnPTZsyX
-         5w+okKvztTf/AGMgtk77u4rVgD7/vLB7MyQoOUJusAwSf4DGwlgytbyO6/aLOb71E316
-         cqhs+IPRfTwtUt8QwQ5cjSwKzQlffz/4sbYbOauT80h08ex2iMIQJjjmemH/ZMg6/FRt
-         0ywBpxi/jkNMfcYXgXiqQ8cXb5IC0Yn0BDVZMFYHT86QrJUr2bODJklvBsESO/4cwFNs
-         8vKfdZDsd8ifuSdBdcchtEEq9OwlkJPzdrW+0xSxGa1pFog3nPqqNL+dB8GBn7NoE8gg
-         L9CA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FXJe0TZN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703513184;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sbPsD815Mv6jt+X0ZxPPC1XKV02PnoGH57lDKIhFvZQ=;
+	b=FXJe0TZNfOUojywWv1zC6cLyY+LVAGfkR9+t05w1nGX+Lvc/uqf4Q9Ve8m9UXpJrGCqJi9
+	UGaI+zLSlISxE17nmYpPQXGP+n1OMV0/fH1lcPe7Lzr4+ySW/S9STzJUP2NRjn7xHWhnYZ
+	Y6wJEQ1OMM1iCbMD5GhRy81exYcsBD4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-475-t2A5F94XOZufgOGm8jLSow-1; Mon, 25 Dec 2023 09:06:22 -0500
+X-MC-Unique: t2A5F94XOZufgOGm8jLSow-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40d55db5a06so9747505e9.1
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 06:06:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703505824; x=1704110624;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aBQy6vgMSA/KrUei65+R4AvaCjiClzbb1i54FcWf2Kc=;
-        b=on2qKIHRj55/tUsH8001zGybSxUayJTjTkuR54KOexEnPmSVtRLPz3r1o64SIerHmV
-         vjdJFH1xqB2IXXS/55xEi/dmhFkZeGNcG0W/8jl+B7b6KQwOlfIR9uFzw/GA4K9HsJxB
-         ocCwgxUCD1c1Pt9HRLRj202vVxFG7AF5PcI8glOw9jjS5bBQl10UYtoAx08/Foaj02pW
-         Gbo4X1astTawdOq2l12fwc6O++dGAq59YA4bbD8+EpMSifQDzOSxlcuQ8D/BVS0UENVH
-         yVYnVbuK5BbKblsj0nmeZy2sJdIij93HemIpp5l677kc0J4OckfIphlggEvtnWlW44rg
-         7Dfw==
-X-Gm-Message-State: AOJu0YyfNlUO5IUDx/x8Uw3zsRFOoK6a4NBzXUEBEwO1yoM7A3VLPCs2
-	Y/dOKO594P9daevN+yggx24=
-X-Google-Smtp-Source: AGHT+IFqYujQM7qzRs2hqVvPlvkA+1xWN0S8j43BWOm5G7302VwXXV0bEQzIw5oXkTC1ANPIxeyy+A==
-X-Received: by 2002:a05:600c:2203:b0:40d:33eb:d46a with SMTP id z3-20020a05600c220300b0040d33ebd46amr3045684wml.141.1703505823841;
-        Mon, 25 Dec 2023 04:03:43 -0800 (PST)
-Received: from david-ryuzu.fritz.box ([178.26.111.208])
-        by smtp.googlemail.com with ESMTPSA id 14-20020a05600c020e00b0040d23cea7bcsm6349456wmi.1.2023.12.25.04.03.42
+        d=1e100.net; s=20230601; t=1703513182; x=1704117982;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sbPsD815Mv6jt+X0ZxPPC1XKV02PnoGH57lDKIhFvZQ=;
+        b=YcPBwEJs7nKLBGR4qfk9YCfnKBCAXZRpLj5htcBxImQCC2JII+LJpRf+1JLR1Jhm90
+         oxzXK8SoH5/dhQF2lrZNbQQqbfzldgEQkWRcJiC2kzu26qHHDfGNqTZtrHbvN8XcqeNE
+         eATt0ieJ+CjOT1eLWAqPjMJqbU7NVEXNpWBvBUKJ7+xyVjAKvltSV3HEMPGqsIuMSXbp
+         XKXukoB1a+5KmyuEtXnbhPNsdYUHrgrmEjFLZop1ElmCvOiYj1mKaTnOnvgCU4B88tzd
+         lEfffY6fML+8ZeX184jsPNaEFKdGnFHrOMONYEOX/VXrYRxZcT1rxp02HoATQC5SC05A
+         ESuQ==
+X-Gm-Message-State: AOJu0Yx+V+gi77NnQ5BQeJpmOw3ip7oZrljkEug9ASdPxkCW7OmXWPVP
+	e2gvgJULZxQCI4rnCk536lhMHlLzQqndZbe4H+94+HJTVwFSWlzSGWSOKOcLm1kbL11e8qHhGiP
+	4Vw27eRdpyD5uNF31RP6gIswfFYkiNi+v
+X-Received: by 2002:a05:600c:3c97:b0:40c:2548:2e29 with SMTP id bg23-20020a05600c3c9700b0040c25482e29mr1894102wmb.334.1703513181849;
+        Mon, 25 Dec 2023 06:06:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEU9yN9B/S7kjrGkO269+hGYIEciicmdgOUUweSOTjBYpROCXhGDR4myECgkfJzm8/hWBY7oA==
+X-Received: by 2002:a05:600c:3c97:b0:40c:2548:2e29 with SMTP id bg23-20020a05600c3c9700b0040c25482e29mr1894095wmb.334.1703513181522;
+        Mon, 25 Dec 2023 06:06:21 -0800 (PST)
+Received: from redhat.com ([2a06:c701:73ef:4100:2cf6:9475:f85:181e])
+        by smtp.gmail.com with ESMTPSA id bd6-20020a05600c1f0600b0040d5335079dsm6956070wmb.47.2023.12.25.06.06.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Dec 2023 04:03:43 -0800 (PST)
-From: David Wronek <davidwronek@gmail.com>
-To: Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
+        Mon, 25 Dec 2023 06:06:20 -0800 (PST)
+Date: Mon, 25 Dec 2023 09:06:17 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Alexander Graf <graf@amazon.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Alim Akhtar <alim.akhtar@samsung.com>,
-	Avri Altman <avri.altman@wdc.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Joe Mason <buddyjojo06@outlook.com>,
-	hexdump0815@googlemail.com
-Cc: cros-qcom-dts-watchers@chromium.org,
-	linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-scsi@vger.kernel.org,
-	~postmarketos/upstreaming@lists.sr.ht,
-	phone-devel@vger.kernel.org,
-	David Wronek <davidwronek@gmail.com>
-Subject: [PATCH v3 8/8] arm64: dts: qcom: Add support for Xiaomi Redmi Note 9S
-Date: Mon, 25 Dec 2023 13:00:01 +0100
-Message-ID: <20231225120327.166160-9-davidwronek@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231225120327.166160-1-davidwronek@gmail.com>
-References: <20231225120327.166160-1-davidwronek@gmail.com>
+	Olivia Mackall <olivia@selenic.com>,
+	Petre Eftime <petre.eftime@gmail.com>,
+	Erdem Meydanlli <meydanli@amazon.nl>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH v7] misc: Add Nitro Secure Module driver
+Message-ID: <20231225090044-mutt-send-email-mst@kernel.org>
+References: <20231011213522.51781-1-graf@amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231011213522.51781-1-graf@amazon.com>
 
-From: Joe Mason <buddyjojo06@outlook.com>
+On Wed, Oct 11, 2023 at 09:35:22PM +0000, Alexander Graf wrote:
+> When running Linux inside a Nitro Enclave, the hypervisor provides a
+> special virtio device called "Nitro Security Module" (NSM). This device
+> has 3 main functions:
+> 
+>   1) Provide attestation reports
+>   2) Modify PCR state
+>   3) Provide entropy
+> 
+> This patch adds a driver for NSM that exposes a /dev/nsm device node which
+> user space can issue an ioctl on this device with raw NSM CBOR formatted
+> commands to request attestation documents, influence PCR states, read
+> entropy and enumerate status of the device. In addition, the driver
+> implements a hwrng backend.
+> 
+> Originally-by: Petre Eftime <petre.eftime@gmail.com>
+> Signed-off-by: Alexander Graf <graf@amazon.com>
 
-Add a device tree for the Xiaomi Redmi Note 9S (curtana) phone, based on
-sm7125-xiaomi-common.dtsi.
+Alex are you going to publish the spec patch for this device?  Important
+so we don't need to guess at behaviour when e.g.  making changes to
+virtio APIs.  Also, which tree do you want this to go through?
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
-Signed-off-by: Joe Mason <buddyjojo06@outlook.com>
-Signed-off-by: David Wronek <davidwronek@gmail.com>
----
- arch/arm64/boot/dts/qcom/Makefile                |  1 +
- .../boot/dts/qcom/sm7125-xiaomi-curtana.dts      | 16 ++++++++++++++++
- 2 files changed, 17 insertions(+)
- create mode 100644 arch/arm64/boot/dts/qcom/sm7125-xiaomi-curtana.dts
-
-diff --git a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefile
-index 39889d5f8e12..2e6984bbbb83 100644
---- a/arch/arm64/boot/dts/qcom/Makefile
-+++ b/arch/arm64/boot/dts/qcom/Makefile
-@@ -210,6 +210,7 @@ dtb-$(CONFIG_ARCH_QCOM)	+= sm6125-sony-xperia-seine-pdx201.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sm6125-xiaomi-laurel-sprout.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sm6350-sony-xperia-lena-pdx213.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sm6375-sony-xperia-murray-pdx225.dtb
-+dtb-$(CONFIG_ARCH_QCOM)	+= sm7125-xiaomi-curtana.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sm7125-xiaomi-joyeuse.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sm7225-fairphone-fp4.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sm8150-hdk.dtb
-diff --git a/arch/arm64/boot/dts/qcom/sm7125-xiaomi-curtana.dts b/arch/arm64/boot/dts/qcom/sm7125-xiaomi-curtana.dts
-new file mode 100644
-index 000000000000..12f517a8492c
---- /dev/null
-+++ b/arch/arm64/boot/dts/qcom/sm7125-xiaomi-curtana.dts
-@@ -0,0 +1,16 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2023, Joe Mason <buddyjojo06@outlook.com>
-+ */
-+
-+/dts-v1/;
-+
-+#include "sm7125-xiaomi-common.dtsi"
-+
-+/ {
-+	model = "Xiaomi Redmi Note 9S";
-+	compatible = "xiaomi,curtana", "qcom,sm7125";
-+
-+	/* required for bootloader to select correct board */
-+	qcom,board-id = <0x20022 1>;
-+};
 -- 
-2.43.0
+MST
 
