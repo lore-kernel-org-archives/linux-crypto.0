@@ -1,102 +1,97 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB92E524B8
-	for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 14:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9FE52F61;
+	Mon, 25 Dec 2023 16:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FXJe0TZN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703513184;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sbPsD815Mv6jt+X0ZxPPC1XKV02PnoGH57lDKIhFvZQ=;
-	b=FXJe0TZNfOUojywWv1zC6cLyY+LVAGfkR9+t05w1nGX+Lvc/uqf4Q9Ve8m9UXpJrGCqJi9
-	UGaI+zLSlISxE17nmYpPQXGP+n1OMV0/fH1lcPe7Lzr4+ySW/S9STzJUP2NRjn7xHWhnYZ
-	Y6wJEQ1OMM1iCbMD5GhRy81exYcsBD4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-475-t2A5F94XOZufgOGm8jLSow-1; Mon, 25 Dec 2023 09:06:22 -0500
-X-MC-Unique: t2A5F94XOZufgOGm8jLSow-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40d55db5a06so9747505e9.1
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 06:06:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703513182; x=1704117982;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sbPsD815Mv6jt+X0ZxPPC1XKV02PnoGH57lDKIhFvZQ=;
-        b=YcPBwEJs7nKLBGR4qfk9YCfnKBCAXZRpLj5htcBxImQCC2JII+LJpRf+1JLR1Jhm90
-         oxzXK8SoH5/dhQF2lrZNbQQqbfzldgEQkWRcJiC2kzu26qHHDfGNqTZtrHbvN8XcqeNE
-         eATt0ieJ+CjOT1eLWAqPjMJqbU7NVEXNpWBvBUKJ7+xyVjAKvltSV3HEMPGqsIuMSXbp
-         XKXukoB1a+5KmyuEtXnbhPNsdYUHrgrmEjFLZop1ElmCvOiYj1mKaTnOnvgCU4B88tzd
-         lEfffY6fML+8ZeX184jsPNaEFKdGnFHrOMONYEOX/VXrYRxZcT1rxp02HoATQC5SC05A
-         ESuQ==
-X-Gm-Message-State: AOJu0Yx+V+gi77NnQ5BQeJpmOw3ip7oZrljkEug9ASdPxkCW7OmXWPVP
-	e2gvgJULZxQCI4rnCk536lhMHlLzQqndZbe4H+94+HJTVwFSWlzSGWSOKOcLm1kbL11e8qHhGiP
-	4Vw27eRdpyD5uNF31RP6gIswfFYkiNi+v
-X-Received: by 2002:a05:600c:3c97:b0:40c:2548:2e29 with SMTP id bg23-20020a05600c3c9700b0040c25482e29mr1894102wmb.334.1703513181849;
-        Mon, 25 Dec 2023 06:06:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEU9yN9B/S7kjrGkO269+hGYIEciicmdgOUUweSOTjBYpROCXhGDR4myECgkfJzm8/hWBY7oA==
-X-Received: by 2002:a05:600c:3c97:b0:40c:2548:2e29 with SMTP id bg23-20020a05600c3c9700b0040c25482e29mr1894095wmb.334.1703513181522;
-        Mon, 25 Dec 2023 06:06:21 -0800 (PST)
-Received: from redhat.com ([2a06:c701:73ef:4100:2cf6:9475:f85:181e])
-        by smtp.gmail.com with ESMTPSA id bd6-20020a05600c1f0600b0040d5335079dsm6956070wmb.47.2023.12.25.06.06.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Dec 2023 06:06:20 -0800 (PST)
-Date: Mon, 25 Dec 2023 09:06:17 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Alexander Graf <graf@amazon.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Olivia Mackall <olivia@selenic.com>,
-	Petre Eftime <petre.eftime@gmail.com>,
-	Erdem Meydanlli <meydanli@amazon.nl>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH v7] misc: Add Nitro Secure Module driver
-Message-ID: <20231225090044-mutt-send-email-mst@kernel.org>
-References: <20231011213522.51781-1-graf@amazon.com>
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="go7oppXX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1703520462; x=1735056462;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=qHYtE5J76pY6+pfStg0q/+w1NticYUAenhuLViOG8j0=;
+  b=go7oppXXAXdpj6B2mMPhsQbOoB3Z1T6BliySbtS5bU36kPes+W/guVwF
+   gTfh2IJSwN4znx33KtlUtsG5Jzsam9OKZNTr027RL3FrHaul9xX3ckCQQ
+   HOVH3c9oipsiceHha9nROPoXgNoAw97/GyvnsgGwHafBdYwi8W8K+VXlg
+   U=;
+X-IronPort-AV: E=Sophos;i="6.04,303,1695686400"; 
+   d="scan'208";a="627635697"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 16:07:40 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com (Postfix) with ESMTPS id 92C198071B;
+	Mon, 25 Dec 2023 16:07:36 +0000 (UTC)
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:42133]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.144:2525] with esmtp (Farcaster)
+ id f49d12a5-aaa6-4630-a218-ea8017a839ed; Mon, 25 Dec 2023 16:07:35 +0000 (UTC)
+X-Farcaster-Flow-ID: f49d12a5-aaa6-4630-a218-ea8017a839ed
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 25 Dec 2023 16:07:35 +0000
+Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 25 Dec
+ 2023 16:07:32 +0000
+Message-ID: <363ca575-f01a-4d09-ae9d-b6249b3aedb3@amazon.com>
+Date: Mon, 25 Dec 2023 17:07:29 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231011213522.51781-1-graf@amazon.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7] misc: Add Nitro Secure Module driver
+Content-Language: en-US
+To: "Michael S. Tsirkin" <mst@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>, "Arnd
+ Bergmann" <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>, Olivia Mackall
+	<olivia@selenic.com>, Petre Eftime <petre.eftime@gmail.com>, Erdem Meydanlli
+	<meydanli@amazon.nl>, Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	David Woodhouse <dwmw@amazon.co.uk>, Jason Wang <jasowang@redhat.com>, "Xuan
+ Zhuo" <xuanzhuo@linux.alibaba.com>, Christophe JAILLET
+	<christophe.jaillet@wanadoo.fr>
+References: <20231011213522.51781-1-graf@amazon.com>
+ <20231225090044-mutt-send-email-mst@kernel.org>
+From: Alexander Graf <graf@amazon.com>
+In-Reply-To: <20231225090044-mutt-send-email-mst@kernel.org>
+X-ClientProxiedBy: EX19D032UWA004.ant.amazon.com (10.13.139.56) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 
-On Wed, Oct 11, 2023 at 09:35:22PM +0000, Alexander Graf wrote:
-> When running Linux inside a Nitro Enclave, the hypervisor provides a
-> special virtio device called "Nitro Security Module" (NSM). This device
-> has 3 main functions:
-> 
->   1) Provide attestation reports
->   2) Modify PCR state
->   3) Provide entropy
-> 
-> This patch adds a driver for NSM that exposes a /dev/nsm device node which
-> user space can issue an ioctl on this device with raw NSM CBOR formatted
-> commands to request attestation documents, influence PCR states, read
-> entropy and enumerate status of the device. In addition, the driver
-> implements a hwrng backend.
-> 
-> Originally-by: Petre Eftime <petre.eftime@gmail.com>
-> Signed-off-by: Alexander Graf <graf@amazon.com>
-
-Alex are you going to publish the spec patch for this device?  Important
-so we don't need to guess at behaviour when e.g.  making changes to
-virtio APIs.  Also, which tree do you want this to go through?
-
--- 
-MST
+SGV5IE1pY2hhZWwsCgpPbiAyNS4xMi4yMyAxNTowNiwgTWljaGFlbCBTLiBUc2lya2luIHdyb3Rl
+Ogo+IE9uIFdlZCwgT2N0IDExLCAyMDIzIGF0IDA5OjM1OjIyUE0gKzAwMDAsIEFsZXhhbmRlciBH
+cmFmIHdyb3RlOgo+PiBXaGVuIHJ1bm5pbmcgTGludXggaW5zaWRlIGEgTml0cm8gRW5jbGF2ZSwg
+dGhlIGh5cGVydmlzb3IgcHJvdmlkZXMgYQo+PiBzcGVjaWFsIHZpcnRpbyBkZXZpY2UgY2FsbGVk
+ICJOaXRybyBTZWN1cml0eSBNb2R1bGUiIChOU00pLiBUaGlzIGRldmljZQo+PiBoYXMgMyBtYWlu
+IGZ1bmN0aW9uczoKPj4KPj4gICAgMSkgUHJvdmlkZSBhdHRlc3RhdGlvbiByZXBvcnRzCj4+ICAg
+IDIpIE1vZGlmeSBQQ1Igc3RhdGUKPj4gICAgMykgUHJvdmlkZSBlbnRyb3B5Cj4+Cj4+IFRoaXMg
+cGF0Y2ggYWRkcyBhIGRyaXZlciBmb3IgTlNNIHRoYXQgZXhwb3NlcyBhIC9kZXYvbnNtIGRldmlj
+ZSBub2RlIHdoaWNoCj4+IHVzZXIgc3BhY2UgY2FuIGlzc3VlIGFuIGlvY3RsIG9uIHRoaXMgZGV2
+aWNlIHdpdGggcmF3IE5TTSBDQk9SIGZvcm1hdHRlZAo+PiBjb21tYW5kcyB0byByZXF1ZXN0IGF0
+dGVzdGF0aW9uIGRvY3VtZW50cywgaW5mbHVlbmNlIFBDUiBzdGF0ZXMsIHJlYWQKPj4gZW50cm9w
+eSBhbmQgZW51bWVyYXRlIHN0YXR1cyBvZiB0aGUgZGV2aWNlLiBJbiBhZGRpdGlvbiwgdGhlIGRy
+aXZlcgo+PiBpbXBsZW1lbnRzIGEgaHdybmcgYmFja2VuZC4KPj4KPj4gT3JpZ2luYWxseS1ieTog
+UGV0cmUgRWZ0aW1lIDxwZXRyZS5lZnRpbWVAZ21haWwuY29tPgo+PiBTaWduZWQtb2ZmLWJ5OiBB
+bGV4YW5kZXIgR3JhZiA8Z3JhZkBhbWF6b24uY29tPgo+IEFsZXggYXJlIHlvdSBnb2luZyB0byBw
+dWJsaXNoIHRoZSBzcGVjIHBhdGNoIGZvciB0aGlzIGRldmljZT8gIEltcG9ydGFudAo+IHNvIHdl
+IGRvbid0IG5lZWQgdG8gZ3Vlc3MgYXQgYmVoYXZpb3VyIHdoZW4gZS5nLiAgbWFraW5nIGNoYW5n
+ZXMgdG8KPiB2aXJ0aW8gQVBJcy4gIEFsc28sIHdoaWNoIHRyZWUgZG8geW91IHdhbnQgdGhpcyB0
+byBnbyB0aHJvdWdoPwoKClRoZSBzcGVjIHBhdGNoIGluY2x1ZGluZyBwaW5nIG1haWwgYXJlIHNp
+dHRpbmcgb24gdGhlIHZpcnRpby1jb21tZW50cyAKbWFpbGluZyBsaXN0IHNpbmNlIE9jdG9iZXIu
+IEkgaGF2ZW4ndCBzZWVuIGFueSByZXBseSB1bmZvcnR1bmF0ZWx5IDooCgpodHRwczovL2xvcmUu
+a2VybmVsLm9yZy92aXJ0aW8tY29tbWVudC8yMDIzMTAyNTIzNTM0NS4xNzc4OC0xLWdyYWZAYW1h
+em9uLmNvbS8KCkhhcHB5IHRvIHJlYWQgZmVlZGJhY2sgaWYgeW91IGhhdmUgYW55IDopLgoKVGhp
+cyBwYXRjaCBoZXJlIGlzIGFscmVhZHkgYXBwbGllZCBpbiBHcmVnJ3MgbWlzYyB0cmVlIHdoaWNo
+IEknbSBoYXBweSAKdG8gaGF2ZSBpdCB0cmlja2xlIHRvIExpbnVzIHRocm91Z2guCgoKQWxleAoK
+CgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgK
+MTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9u
+YXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50
+ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
 
