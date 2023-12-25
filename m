@@ -1,49 +1,77 @@
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC38EC5
-	for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 03:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066CB5102F;
+	Mon, 25 Dec 2023 12:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="KXRvNF4g"
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BP317fp027964;
-	Sun, 24 Dec 2023 19:05:15 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	PPS06212021; bh=wGzr1mVpSR696jjzLjWLxj5zxflwko0al1v648oQhkw=; b=
-	KXRvNF4gNaQyO8Ttqg7LQ1Q/nS9aTzGp9mfQacXHXK1g49Wa2y29e9CVAuD6FTIl
-	X9J1l0VX2nalw8mLvmhH/by6yCaYQiXREZjTa4muYDpy/KdAoWpFvHcD3HVKb9rX
-	k8Y/Frqz/ABr6Sv0Ox8uheOJWPwIwX5S8rbgHDJHtGnpgtIPgXzm7pFD1x2Q9E9e
-	Zf9ctp+V4gUmTYnY3HRIvWtf+O6D9WwH8BqmJ/sM2bv8Rf9qHuviC0YmT/+Kn3u0
-	ElwPi4ocdJABxN22kdND+xGoY7vClzwjdHkz7ytCMfpBx34M7sgpuuWM5vwLznTj
-	I4BdtZxGkiWyl/5seTOx8w==
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3v5yxm0ydn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Sun, 24 Dec 2023 19:05:15 -0800 (PST)
-Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 24 Dec 2023 19:05:18 -0800
-Received: from pek-lpd-ccm2.wrs.com (147.11.136.210) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Sun, 24 Dec 2023 19:05:15 -0800
-From: Kun Song <Kun.Song@windriver.com>
-To: <gaurav.jain@oss.nxp.com>
-CC: <Kun.Song@windriver.com>, <V.Sethi@nxp.com>, <aymen.sghaier@nxp.com>,
-        <davem@davemloft.net>, <filip.pudak@windriver.com>,
-        <heng.guo@windriver.com>, <herbert@gondor.apana.org.au>,
-        <horia.geanta@nxp.com>, <linux-crypto@vger.kernel.org>,
-        <meenakshi.aggarwal@nxp.com>
-Subject: RE: [PATCH v5.10.y] crypto: caam/jr - Fix possible caam_jr crash
-Date: Mon, 25 Dec 2023 11:05:10 +0800
-Message-ID: <20231225030510.929218-1-Kun.Song@windriver.com>
-X-Mailer: git-send-email 2.26.1
-In-Reply-To: <AM0PR04MB600494E7DA11E8853C57566EE794A@AM0PR04MB6004.eurprd04.prod.outlook.com>
-References: <AM0PR04MB600494E7DA11E8853C57566EE794A@AM0PR04MB6004.eurprd04.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jhdOYgJF"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40d4d9d9b77so20855325e9.2;
+        Mon, 25 Dec 2023 04:03:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703505815; x=1704110615; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=M9FH57aGkJw13IKFppWR0d0ExXBNDN8V4v9B+/Ni+Oo=;
+        b=jhdOYgJFul0zsAMk/6d2TXC2T85GIcPOBnpTOnMq/k4Bo/9q3mx4xxUSqF1R05ovXk
+         tA2+5W2HMdw9xjx3sqneqvl2eLai+WmLLtBAgSWdD2hH5QQriTPplFbyKQzDq0czwZel
+         2lCQVTGsP5dEi9AcXtVOvempYDiGRm/66Rdq62KAizcTVMRzvrTkf9imFTWdbVlBLFPj
+         yKDg/f8+lLCyF+fHkdvooJB98C2gWm6cxt+pzFhReUtHmJqY/oyMl1lhs19wL+FLvckC
+         fdpQ1ALd4w3B/yutQTElysEIB61JDGweLmfjXLnRrAjPnjhOEJDiu7FMwL8fvhEPPN1+
+         IBWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703505815; x=1704110615;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=M9FH57aGkJw13IKFppWR0d0ExXBNDN8V4v9B+/Ni+Oo=;
+        b=E3/iCgiZ6gLHrBWLxcF8HW/tyQpxMFcaKRYYUT5ObpRhUVV9GThOoBAhyEWvN7TD6V
+         i+D0Yp/dBx83nBfAD4gZeVZovCzHmRBig8D8BazS5FlCJEilk7pf0VHE7GgYvMnVxD4Y
+         bPzsM9KKoSM1Vt03bahkHosx6YCcwCVkFOipJRemHXcsFADm1jWImKr+u5YNoecw3yCI
+         5NamBHkWqsoWxz6pHyzWZYJH5cNVcPo6jXFkb0sOBdviCAEX1azOx0VJQBxG5Gj54/gS
+         tR+ZKj81koZU+7Lg72nXWcaWiORmp6w79P4ux5Z5gh7GmkDNJpO73EQoKpC2d0EsUjRn
+         JlFQ==
+X-Gm-Message-State: AOJu0YzM1Z2PbpWKYq43kSzNPllpl77n3DtAvBr1i7e9UzQwm0f+oNlp
+	FOyTP8HZqmnCN2Zv5A8nQgY=
+X-Google-Smtp-Source: AGHT+IG/Vs2hMcBk9dE1QNzxQyPaPfS892cgWA78VxcazBgLVeHJwXbFGn9Y6zC2d9xt6CMKPtcfRQ==
+X-Received: by 2002:a05:600c:1c2a:b0:40c:5971:6162 with SMTP id j42-20020a05600c1c2a00b0040c59716162mr4046285wms.81.1703505814885;
+        Mon, 25 Dec 2023 04:03:34 -0800 (PST)
+Received: from david-ryuzu.fritz.box ([178.26.111.208])
+        by smtp.googlemail.com with ESMTPSA id 14-20020a05600c020e00b0040d23cea7bcsm6349456wmi.1.2023.12.25.04.03.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Dec 2023 04:03:34 -0800 (PST)
+From: David Wronek <davidwronek@gmail.com>
+To: Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Joe Mason <buddyjojo06@outlook.com>,
+	hexdump0815@googlemail.com
+Cc: cros-qcom-dts-watchers@chromium.org,
+	linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-scsi@vger.kernel.org,
+	~postmarketos/upstreaming@lists.sr.ht,
+	phone-devel@vger.kernel.org,
+	David Wronek <davidwronek@gmail.com>
+Subject: [PATCH v3 0/8] Add UFS support for SC7180/SM7125
+Date: Mon, 25 Dec 2023 12:59:53 +0100
+Message-ID: <20231225120327.166160-1-davidwronek@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,30 +79,48 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: JRi0Ulzb7n648zD_CRB-seiF3n6nClAn
-X-Proofpoint-ORIG-GUID: JRi0Ulzb7n648zD_CRB-seiF3n6nClAn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-16_25,2023-11-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=486
- priorityscore=1501 mlxscore=0 bulkscore=0 impostorscore=0 adultscore=0
- clxscore=1011 phishscore=0 spamscore=0 suspectscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312250021
 
->Hi Kun
->
->Have you seen this issue in later kernel versions > 5.10 ?
->
->Regards
->Gaurav Jain
+This patchset introduces UFS support for SC7180 and SM7125, as well as
+support for the Xiaomi Redmi Note 9S.
 
-Hi, Gaurav
+Signed-off-by: David Wronek <davidwronek@gmail.com>
 
-This race issue can only be reproduced in the customer's complex environment.
-We were unable to reproduce it in our test enviroment, so we are not sure if the same issue can be reproduced on the latest kernel.
-But by reviewing the code, it should be present in later versions.
+---
+Changes in v3:
+ - Use SM7150 UFS PHY compatible as a fallback
+ - Fix dts style issues
+ - Add regulator-allow-set-load and allowed-modes to UFS regulators
 
-Thanks!
-BR/SK
+Changes in v2:
+ - Fix device tree binding for QMP PHY
+ - Separate ICE into its own node
+ - Fix style problems in sc7180.dtsi
+
+---
+David Wronek (7):
+  dt-bindings: crypto: ice: Document SC7180 inline crypto engine
+  dt-bindings: ufs: qcom: Add SC7180 compatible string
+  dt-bindings: phy: Add QMP UFS PHY compatible for SC7180
+  dt-bindings: arm: qcom: Add Xiaomi Redmi Note 9S
+  phy: qcom: qmp-ufs: Add SC7180 support
+  arm64: dts: qcom: sc7180: Add UFS nodes
+  arm64: dts: qcom: sm7125-xiaomi-common: Add UFS nodes
+
+Joe Mason (1):
+  arm64: dts: qcom: Add support for Xiaomi Redmi Note 9S
+
+ .../devicetree/bindings/arm/qcom.yaml         |  1 +
+ .../crypto/qcom,inline-crypto-engine.yaml     |  1 +
+ .../phy/qcom,sc8280xp-qmp-ufs-phy.yaml        |  2 +
+ .../devicetree/bindings/ufs/qcom,ufs.yaml     |  2 +
+ arch/arm64/boot/dts/qcom/Makefile             |  1 +
+ arch/arm64/boot/dts/qcom/sc7180.dtsi          | 70 +++++++++++++++++++
+ .../boot/dts/qcom/sm7125-xiaomi-common.dtsi   | 28 ++++++++
+ .../boot/dts/qcom/sm7125-xiaomi-curtana.dts   | 16 +++++
+ drivers/phy/qualcomm/phy-qcom-qmp-ufs.c       |  3 +
+ 9 files changed, 124 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/qcom/sm7125-xiaomi-curtana.dts
+
+-- 
+2.43.0
+
