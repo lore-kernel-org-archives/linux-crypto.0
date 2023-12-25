@@ -1,97 +1,141 @@
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9FE52F61;
-	Mon, 25 Dec 2023 16:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFEA1F18C
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 17:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="go7oppXX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1703520462; x=1735056462;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qHYtE5J76pY6+pfStg0q/+w1NticYUAenhuLViOG8j0=;
-  b=go7oppXXAXdpj6B2mMPhsQbOoB3Z1T6BliySbtS5bU36kPes+W/guVwF
-   gTfh2IJSwN4znx33KtlUtsG5Jzsam9OKZNTr027RL3FrHaul9xX3ckCQQ
-   HOVH3c9oipsiceHha9nROPoXgNoAw97/GyvnsgGwHafBdYwi8W8K+VXlg
-   U=;
-X-IronPort-AV: E=Sophos;i="6.04,303,1695686400"; 
-   d="scan'208";a="627635697"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 16:07:40 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
-	by email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com (Postfix) with ESMTPS id 92C198071B;
-	Mon, 25 Dec 2023 16:07:36 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:42133]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.144:2525] with esmtp (Farcaster)
- id f49d12a5-aaa6-4630-a218-ea8017a839ed; Mon, 25 Dec 2023 16:07:35 +0000 (UTC)
-X-Farcaster-Flow-ID: f49d12a5-aaa6-4630-a218-ea8017a839ed
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 25 Dec 2023 16:07:35 +0000
-Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 25 Dec
- 2023 16:07:32 +0000
-Message-ID: <363ca575-f01a-4d09-ae9d-b6249b3aedb3@amazon.com>
-Date: Mon, 25 Dec 2023 17:07:29 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1adtD7f"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703523742;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TZZm8uBDiMjjsh2k0v+Ijtz0bQpTltXijl66KHAtGuw=;
+	b=D1adtD7fAoJ5Yb5T4/sGUzauw4JhASbTU1KKB/ZUXUdQczt8+/c20+wgDwA0/o0KbhkZm9
+	jIpP/ne2ItISIPaluzm4J7SZOoGDUjIKfbTi1P+I/lLhrPgnSdh94vQcMOnVYqpRSKZ7Px
+	dKpB//E1AsqNVIZQ1XmDlnoHR2SXnts=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-215-fo9ByVEkPS64DslfFen1Ig-1; Mon, 25 Dec 2023 12:02:21 -0500
+X-MC-Unique: fo9ByVEkPS64DslfFen1Ig-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40d39bbe215so34821675e9.1
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 09:02:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703523740; x=1704128540;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TZZm8uBDiMjjsh2k0v+Ijtz0bQpTltXijl66KHAtGuw=;
+        b=LvRjwVFeb+TaxB3i6BpcAMEe3gCJ4fAj4y2K2fbyHqOoMVu8pm4JxY/jYXB7prCNek
+         IcRgKFy9P7JXVSpusTlQLFFRq+GnZ6OZSowQ6LQR1ZH7n5OrH/Uj1f/Oj5nZA9/Tizd3
+         9zsjVEt/P69NCbybAm41JWUCfbCC0fE/KfS6jRJTvqkaQBvcBEwPKg5bpDWja/GwXCpX
+         qml77EOt8QpSXdmuHABEGMlJ+U8DvydGmH9lYQiFxx+3lpTNK4zEVwn9zZTL+S31Y8BL
+         enP6bzCevQRKjLT7qVZenruCHik17cMPRxTOdrgK6R+nCAWwlpwOoBCb+KTr9cGir+RO
+         RPfA==
+X-Gm-Message-State: AOJu0Yzf1kCf3JCem8u9H9vqt8h+Iha6CXUGGbllt43fPE8oJxrff5Iq
+	3GM1UWY6plEaGwmK1+3ow0R8byoV+GSVeHKH7fcPzBdGZt4sahIayGNT7CWmqGA75NqPiLMhc2g
+	RqJzt2VprUU14yEYpvq/owDC9jKa72eIU
+X-Received: by 2002:a05:600c:354c:b0:40d:3aff:e067 with SMTP id i12-20020a05600c354c00b0040d3affe067mr3630429wmq.20.1703523740281;
+        Mon, 25 Dec 2023 09:02:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFI7/aHwtUm1PRRr4I1Ip9nypv342ACCr/ubj0f4dRys2i9jMSSS3I0aQfMD0TtZ7OlYEvzzg==
+X-Received: by 2002:a05:600c:354c:b0:40d:3aff:e067 with SMTP id i12-20020a05600c354c00b0040d3affe067mr3630410wmq.20.1703523739857;
+        Mon, 25 Dec 2023 09:02:19 -0800 (PST)
+Received: from redhat.com ([2a06:c701:73ef:4100:2cf6:9475:f85:181e])
+        by smtp.gmail.com with ESMTPSA id n9-20020a05600c4f8900b0040d56075463sm4512840wmq.44.2023.12.25.09.02.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Dec 2023 09:02:19 -0800 (PST)
+Date: Mon, 25 Dec 2023 12:02:16 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Alexander Graf <graf@amazon.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Olivia Mackall <olivia@selenic.com>,
+	Petre Eftime <petre.eftime@gmail.com>,
+	Erdem Meydanlli <meydanli@amazon.nl>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH v7] misc: Add Nitro Secure Module driver
+Message-ID: <20231225115827-mutt-send-email-mst@kernel.org>
+References: <20231011213522.51781-1-graf@amazon.com>
+ <20231225090044-mutt-send-email-mst@kernel.org>
+ <363ca575-f01a-4d09-ae9d-b6249b3aedb3@amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7] misc: Add Nitro Secure Module driver
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>, "Arnd
- Bergmann" <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>, Olivia Mackall
-	<olivia@selenic.com>, Petre Eftime <petre.eftime@gmail.com>, Erdem Meydanlli
-	<meydanli@amazon.nl>, Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	David Woodhouse <dwmw@amazon.co.uk>, Jason Wang <jasowang@redhat.com>, "Xuan
- Zhuo" <xuanzhuo@linux.alibaba.com>, Christophe JAILLET
-	<christophe.jaillet@wanadoo.fr>
-References: <20231011213522.51781-1-graf@amazon.com>
- <20231225090044-mutt-send-email-mst@kernel.org>
-From: Alexander Graf <graf@amazon.com>
-In-Reply-To: <20231225090044-mutt-send-email-mst@kernel.org>
-X-ClientProxiedBy: EX19D032UWA004.ant.amazon.com (10.13.139.56) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <363ca575-f01a-4d09-ae9d-b6249b3aedb3@amazon.com>
 
-SGV5IE1pY2hhZWwsCgpPbiAyNS4xMi4yMyAxNTowNiwgTWljaGFlbCBTLiBUc2lya2luIHdyb3Rl
-Ogo+IE9uIFdlZCwgT2N0IDExLCAyMDIzIGF0IDA5OjM1OjIyUE0gKzAwMDAsIEFsZXhhbmRlciBH
-cmFmIHdyb3RlOgo+PiBXaGVuIHJ1bm5pbmcgTGludXggaW5zaWRlIGEgTml0cm8gRW5jbGF2ZSwg
-dGhlIGh5cGVydmlzb3IgcHJvdmlkZXMgYQo+PiBzcGVjaWFsIHZpcnRpbyBkZXZpY2UgY2FsbGVk
-ICJOaXRybyBTZWN1cml0eSBNb2R1bGUiIChOU00pLiBUaGlzIGRldmljZQo+PiBoYXMgMyBtYWlu
-IGZ1bmN0aW9uczoKPj4KPj4gICAgMSkgUHJvdmlkZSBhdHRlc3RhdGlvbiByZXBvcnRzCj4+ICAg
-IDIpIE1vZGlmeSBQQ1Igc3RhdGUKPj4gICAgMykgUHJvdmlkZSBlbnRyb3B5Cj4+Cj4+IFRoaXMg
-cGF0Y2ggYWRkcyBhIGRyaXZlciBmb3IgTlNNIHRoYXQgZXhwb3NlcyBhIC9kZXYvbnNtIGRldmlj
-ZSBub2RlIHdoaWNoCj4+IHVzZXIgc3BhY2UgY2FuIGlzc3VlIGFuIGlvY3RsIG9uIHRoaXMgZGV2
-aWNlIHdpdGggcmF3IE5TTSBDQk9SIGZvcm1hdHRlZAo+PiBjb21tYW5kcyB0byByZXF1ZXN0IGF0
-dGVzdGF0aW9uIGRvY3VtZW50cywgaW5mbHVlbmNlIFBDUiBzdGF0ZXMsIHJlYWQKPj4gZW50cm9w
-eSBhbmQgZW51bWVyYXRlIHN0YXR1cyBvZiB0aGUgZGV2aWNlLiBJbiBhZGRpdGlvbiwgdGhlIGRy
-aXZlcgo+PiBpbXBsZW1lbnRzIGEgaHdybmcgYmFja2VuZC4KPj4KPj4gT3JpZ2luYWxseS1ieTog
-UGV0cmUgRWZ0aW1lIDxwZXRyZS5lZnRpbWVAZ21haWwuY29tPgo+PiBTaWduZWQtb2ZmLWJ5OiBB
-bGV4YW5kZXIgR3JhZiA8Z3JhZkBhbWF6b24uY29tPgo+IEFsZXggYXJlIHlvdSBnb2luZyB0byBw
-dWJsaXNoIHRoZSBzcGVjIHBhdGNoIGZvciB0aGlzIGRldmljZT8gIEltcG9ydGFudAo+IHNvIHdl
-IGRvbid0IG5lZWQgdG8gZ3Vlc3MgYXQgYmVoYXZpb3VyIHdoZW4gZS5nLiAgbWFraW5nIGNoYW5n
-ZXMgdG8KPiB2aXJ0aW8gQVBJcy4gIEFsc28sIHdoaWNoIHRyZWUgZG8geW91IHdhbnQgdGhpcyB0
-byBnbyB0aHJvdWdoPwoKClRoZSBzcGVjIHBhdGNoIGluY2x1ZGluZyBwaW5nIG1haWwgYXJlIHNp
-dHRpbmcgb24gdGhlIHZpcnRpby1jb21tZW50cyAKbWFpbGluZyBsaXN0IHNpbmNlIE9jdG9iZXIu
-IEkgaGF2ZW4ndCBzZWVuIGFueSByZXBseSB1bmZvcnR1bmF0ZWx5IDooCgpodHRwczovL2xvcmUu
-a2VybmVsLm9yZy92aXJ0aW8tY29tbWVudC8yMDIzMTAyNTIzNTM0NS4xNzc4OC0xLWdyYWZAYW1h
-em9uLmNvbS8KCkhhcHB5IHRvIHJlYWQgZmVlZGJhY2sgaWYgeW91IGhhdmUgYW55IDopLgoKVGhp
-cyBwYXRjaCBoZXJlIGlzIGFscmVhZHkgYXBwbGllZCBpbiBHcmVnJ3MgbWlzYyB0cmVlIHdoaWNo
-IEknbSBoYXBweSAKdG8gaGF2ZSBpdCB0cmlja2xlIHRvIExpbnVzIHRocm91Z2guCgoKQWxleAoK
-CgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgK
-MTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9u
-YXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50
-ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
+On Mon, Dec 25, 2023 at 05:07:29PM +0100, Alexander Graf wrote:
+> Hey Michael,
+> 
+> On 25.12.23 15:06, Michael S. Tsirkin wrote:
+> > On Wed, Oct 11, 2023 at 09:35:22PM +0000, Alexander Graf wrote:
+> > > When running Linux inside a Nitro Enclave, the hypervisor provides a
+> > > special virtio device called "Nitro Security Module" (NSM). This device
+> > > has 3 main functions:
+> > > 
+> > >    1) Provide attestation reports
+> > >    2) Modify PCR state
+> > >    3) Provide entropy
+> > > 
+> > > This patch adds a driver for NSM that exposes a /dev/nsm device node which
+> > > user space can issue an ioctl on this device with raw NSM CBOR formatted
+> > > commands to request attestation documents, influence PCR states, read
+> > > entropy and enumerate status of the device. In addition, the driver
+> > > implements a hwrng backend.
+> > > 
+> > > Originally-by: Petre Eftime <petre.eftime@gmail.com>
+> > > Signed-off-by: Alexander Graf <graf@amazon.com>
+> > Alex are you going to publish the spec patch for this device?  Important
+> > so we don't need to guess at behaviour when e.g.  making changes to
+> > virtio APIs.  Also, which tree do you want this to go through?
+> 
+> 
+> The spec patch including ping mail are sitting on the virtio-comments
+> mailing list since October. I haven't seen any reply unfortunately :(
+> 
+> https://lore.kernel.org/virtio-comment/20231025235345.17788-1-graf@amazon.com/
+> 
+> Happy to read feedback if you have any :).
+
+Oh I forgot.
+Now that I've read the driver, I actually have some :)
+I think there's an assumption that there's a request buffer
+and response buffer queued by the driver, and that
+the device always first consumes the request buffer
+followed by consuming the response buffer.
+If that is right then driver is ok but spec needs
+clarification, will note on virtio-comment.
+
+
+> This patch here is already applied in Greg's misc tree which I'm happy to
+> have it trickle to Linus through.
+> 
+> 
+> Alex
+> 
+> 
+> 
+> 
+> Amazon Development Center Germany GmbH
+> Krausenstr. 38
+> 10117 Berlin
+> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+> Sitz: Berlin
+> Ust-ID: DE 289 237 879
+> 
+> 
 
