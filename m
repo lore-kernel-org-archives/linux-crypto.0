@@ -1,141 +1,269 @@
-Received: from mout.web.de (mout.web.de [212.227.15.4])
+Received: from mx1.zhaoxin.com (MX1.ZHAOXIN.COM [210.0.225.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C4CDDB3;
-	Sun, 24 Dec 2023 19:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="QoZIYXi9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1703447762; x=1704052562; i=markus.elfring@web.de;
-	bh=cm+fIZLlDlbOzuqZGb6TsofPaKLKFGH0UKkUeJ6PVQI=;
-	h=X-UI-Sender-Class:Date:To:From:Subject:Cc;
-	b=QoZIYXi9cZqtNGtvF4UCvUpoCNwOxR8e3FLbju/ydTYgpkVlGSLCy5MC8nVGT41d
-	 eResBJliME/ri5g5oXcpGtQd7eN/tTvbli+mycPuwFfAAEpCYPv8bFFpmcWBLUZ+A
-	 M1E4tfznDYRUXyX/fTG/K//nt3lCGAOz2gskuUMd+dPhYyRfMbOgIT5O8xlvrpe9j
-	 kj1gTCRZ1uGzPVOtzG7VUm8SuIOZuY32IdW8pcMq8q59rfsq76B94swfYIVlX4K4S
-	 0RObHdyPjK6Jfb4r07GwvwAVFrg3aDQw6uV3QIzkWhBmAhK8U6JXyFXDEdAkt+G82
-	 REFyZpZ7q9FVI2T+tw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N7xeZ-1rDu1x2ZpT-014bII; Sun, 24
- Dec 2023 20:56:02 +0100
-Message-ID: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
-Date: Sun, 24 Dec 2023 20:55:57 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E976B4A16
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 02:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1703472813-086e230f2902760001-Xm9f1P
+Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx1.zhaoxin.com with ESMTP id zKtNCrgf4GqvBVNy (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Mon, 25 Dec 2023 10:53:33 +0800 (CST)
+X-Barracuda-Envelope-From: LeoLiu-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+Received: from ZXBJMBX03.zhaoxin.com (10.29.252.7) by ZXSHMBX3.zhaoxin.com
+ (10.28.252.165) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 25 Dec
+ 2023 10:53:32 +0800
+Received: from xin.lan (10.32.64.1) by ZXBJMBX03.zhaoxin.com (10.29.252.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 25 Dec
+ 2023 10:53:30 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+From: LeoLiu-oc <LeoLiu-oc@zhaoxin.com>
+X-Barracuda-RBL-Trusted-Forwarder: 10.29.252.7
+To: <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
+	<jiajie.ho@starfivetech.com>, <conor.dooley@microchip.com>,
+	<martin@kaiser.cx>, <mmyangfl@gmail.com>, <jenny.zhang@starfivetech.com>,
+	<robh@kernel.org>, <l.stelmach@samsung.com>, <ardb@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+CC: <CobeChen@zhaoxin.com>, <TonyWWang@zhaoxin.com>, <YunShen@zhaoxin.com>,
+	<LeoLiu@zhaoxin.com>, LeoLiuoc <LeoLiu-oc@zhaoxin.com>
+Subject: [PATCH v4] hwrng: add Zhaoxin rng driver base on rep_xstore instruction
+Date: Mon, 25 Dec 2023 10:53:30 +0800
+X-ASG-Orig-Subj: [PATCH v4] hwrng: add Zhaoxin rng driver base on rep_xstore instruction
+Message-ID: <20231225025330.809554-1-LeoLiu-oc@zhaoxin.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231107070900.496827-1-LeoLiu-oc@zhaoxin.com>
+References: <20231107070900.496827-1-LeoLiu-oc@zhaoxin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: virtualization@lists.linux.dev, linux-crypto@vger.kernel.org,
- kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Gonglei <arei.gonglei@huawei.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] crypto: virtio - Less function calls in
- __virtio_crypto_akcipher_do_req() after error detection
-Cc: LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:js4ydb7183jogO2zNXAOsnmwRjTJkFts4230ojusF5s86M+AW5+
- R5GJtNhXdNtM4tEDbq+iQg1RPiFfkUqzLSGBlTwOtVrdN81X0QdPgkZwQOUuzk5G6JgcA2/
- a9bXWU4zIOkvteJDFZzgqHxnSoSM5vjhMP+WvH/mLObV2o2cMeoKp3S7dg2xNq5LAjTBtMO
- gxGXiKX2GEOup1Ii5BzbA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:WbQ2yg1lmBc=;3P3aWHeDFAyqdOaqJJeKgIAbuWq
- IaQuiX66fOG4HO1fbgWMKF56zCIYOlf1AD/+aEXdGYWKqhXFP09cN9kpPPdfEShTApKnr6BWB
- OBGdTNc/CPS36kVuShgdvl6opR6/xO359mXEID+rkcOltIguEUYU2CITRnsfLCRZSQ0E//dKh
- IXtHvmiBcN6iEiektNZQDOKynYCUCBBps2/cHdgz0qtl3KxEgKhbyrPRSZeQMFybO2F/5xFtt
- p0y2gz506LIVL0Z+76Fyr/WQAUqwFVBvqylEhEJaWnhlg7tjc8JHXoLkfqazE8//fxucj0rzd
- 9C2tARpcByUWLK1rMuufdESRp6PZi+WnZXuJb+hQiWvcnPtZ4tmVIRs5TnZi0tFfuC/euHMRo
- NraWgvInU3jVsmCI//aiVaC8snV1L/ZY7i9A14A30bQoxtgao3NIR0ONSAqE95d04LblUro1d
- hRzksKgd17O0eknBO6fIbO+He7glZ8dbMZQGmX7yrMKEZT6PRYtc2mLJP2LbHorzed4YXR+1d
- IYpBsO7e65qV7dpR739Wo4SO+I14ReGMPJzC1dflQ/hmg8jwpUkiHkt/njIbGAKLKx/9wFgKS
- EjSVQ5YZ1iVI39XMUnPUcNaog3hVm4xnsZLJR32H9Od9xyY6upJ5/eex2a6SCLGBq5pthhaJA
- rKkFNI0hbwchKG59NklNFDR6FOBOESDr9TjazPDUTtrY1BxFQr9Mf6l6R9vZ+ckSZyyzp6aDA
- JktyzBrAQlO6KNOQUYxLkUdPYWigCLlRRvz45mv+vYTHm4WsnRQPoYfX7wVRbOsdr4cwWlaJ5
- SvB5fkElpx88XTzd8X0oPqsrZ81am9pzI4lThisgJXALB4sD1xBBYOCdfkPZpw5NlLSdmo8yI
- MsvPcbhr2uh59j20gkLG3pcXm9dQ7ixm67c1pklP9d9ccELRpnpWxsmdEq7JPbQliKyiT9syi
- 20AXhQ==
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
+ ZXBJMBX03.zhaoxin.com (10.29.252.7)
+X-Barracuda-Connect: ZXSHMBX3.zhaoxin.com[10.28.252.165]
+X-Barracuda-Start-Time: 1703472813
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.35:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 6442
+X-Barracuda-BRTS-Status: 0
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.118525
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sun, 24 Dec 2023 20:42:19 +0100
+From: LeoLiuoc <LeoLiu-oc@zhaoxin.com>
 
-The kfree() function was called in up to two cases by the
-__virtio_crypto_akcipher_do_req() function during error handling
-even if the passed variable contained a null pointer.
-This issue was detected by using the Coccinelle software.
+Add support for Zhaoxin hardware random number generator.
+This driver base on rep_xstore instruction and uses the same
+X86_FEATURE_XSTORE as via-rng driver. Therefore, modify the x86_cpu_id
+array in the via-rng driver, so that the corresponding driver can be
+correctly loader on respective platforms.
 
-* Adjust jump targets.
+v1 -> v2:
+1. Fix assembler code errors
+2. Remove redundant CPU model check codes
 
-* Delete two initialisations which became unnecessary
-  with this refactoring.
+v2 -> v3:
+1. Optimize code details based on the kernel style
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+v3 -> v4:
+1. Fix a typographical error
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers=
-/crypto/virtio/virtio_crypto_akcipher_algs.c
-index 2621ff8a9376..15dbe67f0d31 100644
-=2D-- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-@@ -224,11 +224,11 @@ static int __virtio_crypto_akcipher_do_req(struct vi=
-rtio_crypto_akcipher_request
- 	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
- 	struct virtio_crypto_op_data_req *req_data =3D vc_req->req_data;
- 	struct scatterlist *sgs[4], outhdr_sg, inhdr_sg, srcdata_sg, dstdata_sg;
--	void *src_buf =3D NULL, *dst_buf =3D NULL;
-+	void *src_buf, *dst_buf =3D NULL;
- 	unsigned int num_out =3D 0, num_in =3D 0;
- 	int node =3D dev_to_node(&vcrypto->vdev->dev);
- 	unsigned long flags;
--	int ret =3D -ENOMEM;
-+	int ret;
- 	bool verify =3D vc_akcipher_req->opcode =3D=3D VIRTIO_CRYPTO_AKCIPHER_VE=
-RIFY;
- 	unsigned int src_len =3D verify ? req->src_len + req->dst_len : req->src=
-_len;
+Signed-off-by: LeoLiuoc <LeoLiu-oc@zhaoxin.com>
+---
+ drivers/char/hw_random/Kconfig       | 12 ++++
+ drivers/char/hw_random/Makefile      |  1 +
+ drivers/char/hw_random/via-rng.c     | 10 +--
+ drivers/char/hw_random/zhaoxin-rng.c | 95 ++++++++++++++++++++++++++++
+ 4 files changed, 113 insertions(+), 5 deletions(-)
+ create mode 100644 drivers/char/hw_random/zhaoxin-rng.c
 
-@@ -239,7 +239,7 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
-io_crypto_akcipher_request
- 	/* src data */
- 	src_buf =3D kcalloc_node(src_len, 1, GFP_KERNEL, node);
- 	if (!src_buf)
--		goto err;
-+		return -ENOMEM;
-
- 	if (verify) {
- 		/* for verify operation, both src and dst data work as OUT direction */
-@@ -254,7 +254,7 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
-io_crypto_akcipher_request
- 		/* dst data */
- 		dst_buf =3D kcalloc_node(req->dst_len, 1, GFP_KERNEL, node);
- 		if (!dst_buf)
--			goto err;
-+			goto free_src;
-
- 		sg_init_one(&dstdata_sg, dst_buf, req->dst_len);
- 		sgs[num_out + num_in++] =3D &dstdata_sg;
-@@ -277,9 +277,9 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
-io_crypto_akcipher_request
- 	return 0;
-
- err:
--	kfree(src_buf);
- 	kfree(dst_buf);
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 442c40efb200..3c1c4fa1203c 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -152,6 +152,18 @@ config HW_RANDOM_VIA
+ 
+ 	  If unsure, say Y.
+ 
++config HW_RANDOM_ZHAOXIN
++	tristate "Zhaoxin HW Random Number Generator support"
++	depends on X86
++	help
++	  This driver provides kernel-side support for the Random Number
++	  Generator hardware found on Zhaoxin based motherboards.
++
++	  To compile this driver as a module, choose M here: the
++	  module will be called zhaoxin-rng.
++
++	  If unsure, say Y.
++
+ config HW_RANDOM_IXP4XX
+ 	tristate "Intel IXP4xx NPU HW Pseudo-Random Number Generator support"
+ 	depends on ARCH_IXP4XX || COMPILE_TEST
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index 32549a1186dc..ef5b3ae0794d 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -14,6 +14,7 @@ obj-$(CONFIG_HW_RANDOM_GEODE) += geode-rng.o
+ obj-$(CONFIG_HW_RANDOM_N2RNG) += n2-rng.o
+ n2-rng-y := n2-drv.o n2-asm.o
+ obj-$(CONFIG_HW_RANDOM_VIA) += via-rng.o
++obj-$(CONFIG_HW_RANDOM_ZHAOXIN) += zhaoxin-rng.o
+ obj-$(CONFIG_HW_RANDOM_EXYNOS) += exynos-trng.o
+ obj-$(CONFIG_HW_RANDOM_IXP4XX) += ixp4xx-rng.o
+ obj-$(CONFIG_HW_RANDOM_OMAP) += omap-rng.o
+diff --git a/drivers/char/hw_random/via-rng.c b/drivers/char/hw_random/via-rng.c
+index a9a0a3b09c8b..9f7da031adc4 100644
+--- a/drivers/char/hw_random/via-rng.c
++++ b/drivers/char/hw_random/via-rng.c
+@@ -35,7 +35,7 @@
+ #include <asm/cpufeature.h>
+ #include <asm/fpu/api.h>
+ 
 -
-+free_src;
-+	kfree(src_buf);
- 	return -ENOMEM;
++static const struct x86_cpu_id via_rng_cpu_id[];
+ 
+ 
+ enum {
+@@ -135,7 +135,7 @@ static int via_rng_init(struct hwrng *rng)
+ 	 * is always enabled if CPUID rng_en is set.  There is no
+ 	 * RNG configuration like it used to be the case in this
+ 	 * register */
+-	if (((c->x86 == 6) && (c->x86_model >= 0x0f))  || (c->x86 > 6)){
++	if ((c->x86 == 6) && (c->x86_model >= 0x0f)) {
+ 		if (!boot_cpu_has(X86_FEATURE_XSTORE_EN)) {
+ 			pr_err(PFX "can't enable hardware RNG "
+ 				"if XSTORE is not enabled\n");
+@@ -196,7 +196,7 @@ static int __init via_rng_mod_init(void)
+ {
+ 	int err;
+ 
+-	if (!boot_cpu_has(X86_FEATURE_XSTORE))
++	if (!x86_match_cpu(via_rng_cpu_id))
+ 		return -ENODEV;
+ 
+ 	pr_info("VIA RNG detected\n");
+@@ -217,8 +217,8 @@ static void __exit via_rng_mod_exit(void)
  }
-
-=2D-
-2.43.0
+ module_exit(via_rng_mod_exit);
+ 
+-static struct x86_cpu_id __maybe_unused via_rng_cpu_id[] = {
+-	X86_MATCH_FEATURE(X86_FEATURE_XSTORE, NULL),
++static struct x86_cpu_id via_rng_cpu_id[] = {
++	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 6, X86_FEATURE_XSTORE, NULL),
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(x86cpu, via_rng_cpu_id);
+diff --git a/drivers/char/hw_random/zhaoxin-rng.c b/drivers/char/hw_random/zhaoxin-rng.c
+new file mode 100644
+index 000000000000..3e5770df9948
+--- /dev/null
++++ b/drivers/char/hw_random/zhaoxin-rng.c
+@@ -0,0 +1,95 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * RNG driver for Zhaoxin RNGs
++ *
++ * Copyright 2023 (c) Zhaoxin Semiconductor Co., Ltd
++ */
++
++#include <asm/cpu_device_id.h>
++#include <asm/fpu/api.h>
++#include <crypto/padlock.h>
++#include <linux/cpufeature.h>
++#include <linux/delay.h>
++#include <linux/hw_random.h>
++#include <linux/io.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++
++enum {
++	ZHAOXIN_RNG_CHUNK_8		= 0x00, /* 64 rand bits, 64 stored bits */
++	ZHAOXIN_RNG_CHUNK_4		= 0x01, /* 32 rand bits, 32 stored bits */
++	ZHAOXIN_RNG_CHUNK_2		= 0x02, /* 16 rand bits, 32 stored bits */
++	ZHAOXIN_RNG_CHUNK_1		= 0x03, /*  8 rand bits, 32 stored bits */
++	ZHAOXIN_RNG_MAX_SIZE	= (128 * 1024),
++};
++
++static int zhaoxin_rng_init(struct hwrng *rng)
++{
++	if (!boot_cpu_has(X86_FEATURE_XSTORE_EN)) {
++		pr_err(PFX "can't enable hardware RNG if XSTORE is not enabled\n");
++		return -ENODEV;
++	}
++
++	return 0;
++}
++
++static inline int rep_xstore(size_t size, size_t factor, void *result)
++{
++	asm(".byte 0xf3, 0x0f, 0xa7, 0xc0"
++		: "=m"(*(size_t *)result), "+c"(size), "+d"(factor), "+D"(result));
++
++	return 0;
++}
++
++static int zhaoxin_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
++{
++	if (max > ZHAOXIN_RNG_MAX_SIZE)
++		max = ZHAOXIN_RNG_MAX_SIZE;
++
++	rep_xstore(max, ZHAOXIN_RNG_CHUNK_1, data);
++
++	return max;
++}
++
++static struct hwrng zhaoxin_rng = {
++	.name = "zhaoxin",
++	.init = zhaoxin_rng_init,
++	.read = zhaoxin_rng_read,
++};
++
++static const struct x86_cpu_id zhaoxin_rng_cpu_ids[] = {
++	X86_MATCH_VENDOR_FAM_FEATURE(ZHAOXIN, 6, X86_FEATURE_XSTORE, NULL),
++	X86_MATCH_VENDOR_FAM_FEATURE(ZHAOXIN, 7, X86_FEATURE_XSTORE, NULL),
++	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 7, X86_FEATURE_XSTORE, NULL),
++	{}
++};
++MODULE_DEVICE_TABLE(x86cpu, zhaoxin_rng_cpu_ids);
++
++static int __init zhaoxin_rng_mod_init(void)
++{
++	int err;
++
++	if (!x86_match_cpu(zhaoxin_rng_cpu_ids)) {
++		pr_err(PFX "The CPU isn't support XSTORE.\n");
++		return -ENODEV;
++	}
++
++	pr_info("Zhaoxin RNG detected\n");
++
++	err = hwrng_register(&zhaoxin_rng);
++	if (err)
++		pr_err(PFX "RNG registering failed (%d)\n", err);
++
++	return err;
++}
++module_init(zhaoxin_rng_mod_init);
++
++static void __exit zhaoxin_rng_mod_exit(void)
++{
++	hwrng_unregister(&zhaoxin_rng);
++}
++module_exit(zhaoxin_rng_mod_exit);
++
++MODULE_DESCRIPTION("H/W RNG driver for Zhaoxin CPUs");
++MODULE_AUTHOR("YunShen@zhaoxin.com");
++MODULE_LICENSE("GPL");
+-- 
+2.34.1
 
