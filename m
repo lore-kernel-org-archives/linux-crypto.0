@@ -1,141 +1,83 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFEA1F18C
-	for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 17:02:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCF61D697
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 18:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1adtD7f"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703523742;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TZZm8uBDiMjjsh2k0v+Ijtz0bQpTltXijl66KHAtGuw=;
-	b=D1adtD7fAoJ5Yb5T4/sGUzauw4JhASbTU1KKB/ZUXUdQczt8+/c20+wgDwA0/o0KbhkZm9
-	jIpP/ne2ItISIPaluzm4J7SZOoGDUjIKfbTi1P+I/lLhrPgnSdh94vQcMOnVYqpRSKZ7Px
-	dKpB//E1AsqNVIZQ1XmDlnoHR2SXnts=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-215-fo9ByVEkPS64DslfFen1Ig-1; Mon, 25 Dec 2023 12:02:21 -0500
-X-MC-Unique: fo9ByVEkPS64DslfFen1Ig-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40d39bbe215so34821675e9.1
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 09:02:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kKBA7FUQ"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-78154d86758so629585a.2
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Dec 2023 10:36:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1703529416; x=1704134216; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=rhuoQDM0PcQ1Hf0mmTK6WXCkbN9R/6E9/xIlxdvn19s=;
+        b=kKBA7FUQaPGX6KlbzlOyg4i2+nwrWRKTnygk7QexAStGWqQeG5nCrxxd5grru9MWTo
+         fObF5EJbNQVjmM3GIV8Vd5buSku+nl5lQJkFR2Xa3x4sYVkWKH8QcXTNbVbCfgpWiNbm
+         bfEUgAZwY6egp+LWdcA8TTp4AzD7q2BQpTus0F0OtUdJT5/bZyWTR9W6NdPx6tXunKzj
+         fmX1h/eVojq88H+fV2PuQHBVEPxCAGFqGaDoVN7L88MI4Q5rENyA9GYWPl+MfoGi/r7v
+         FM98UDKcVsparyCGWNxdUpXMsrv026vtcd1SCo1QpuQVKxsgc+zSWDD0Ay5lYCuu2fD8
+         MeIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703523740; x=1704128540;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TZZm8uBDiMjjsh2k0v+Ijtz0bQpTltXijl66KHAtGuw=;
-        b=LvRjwVFeb+TaxB3i6BpcAMEe3gCJ4fAj4y2K2fbyHqOoMVu8pm4JxY/jYXB7prCNek
-         IcRgKFy9P7JXVSpusTlQLFFRq+GnZ6OZSowQ6LQR1ZH7n5OrH/Uj1f/Oj5nZA9/Tizd3
-         9zsjVEt/P69NCbybAm41JWUCfbCC0fE/KfS6jRJTvqkaQBvcBEwPKg5bpDWja/GwXCpX
-         qml77EOt8QpSXdmuHABEGMlJ+U8DvydGmH9lYQiFxx+3lpTNK4zEVwn9zZTL+S31Y8BL
-         enP6bzCevQRKjLT7qVZenruCHik17cMPRxTOdrgK6R+nCAWwlpwOoBCb+KTr9cGir+RO
-         RPfA==
-X-Gm-Message-State: AOJu0Yzf1kCf3JCem8u9H9vqt8h+Iha6CXUGGbllt43fPE8oJxrff5Iq
-	3GM1UWY6plEaGwmK1+3ow0R8byoV+GSVeHKH7fcPzBdGZt4sahIayGNT7CWmqGA75NqPiLMhc2g
-	RqJzt2VprUU14yEYpvq/owDC9jKa72eIU
-X-Received: by 2002:a05:600c:354c:b0:40d:3aff:e067 with SMTP id i12-20020a05600c354c00b0040d3affe067mr3630429wmq.20.1703523740281;
-        Mon, 25 Dec 2023 09:02:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFI7/aHwtUm1PRRr4I1Ip9nypv342ACCr/ubj0f4dRys2i9jMSSS3I0aQfMD0TtZ7OlYEvzzg==
-X-Received: by 2002:a05:600c:354c:b0:40d:3aff:e067 with SMTP id i12-20020a05600c354c00b0040d3affe067mr3630410wmq.20.1703523739857;
-        Mon, 25 Dec 2023 09:02:19 -0800 (PST)
-Received: from redhat.com ([2a06:c701:73ef:4100:2cf6:9475:f85:181e])
-        by smtp.gmail.com with ESMTPSA id n9-20020a05600c4f8900b0040d56075463sm4512840wmq.44.2023.12.25.09.02.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Dec 2023 09:02:19 -0800 (PST)
-Date: Mon, 25 Dec 2023 12:02:16 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Alexander Graf <graf@amazon.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Olivia Mackall <olivia@selenic.com>,
-	Petre Eftime <petre.eftime@gmail.com>,
-	Erdem Meydanlli <meydanli@amazon.nl>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH v7] misc: Add Nitro Secure Module driver
-Message-ID: <20231225115827-mutt-send-email-mst@kernel.org>
-References: <20231011213522.51781-1-graf@amazon.com>
- <20231225090044-mutt-send-email-mst@kernel.org>
- <363ca575-f01a-4d09-ae9d-b6249b3aedb3@amazon.com>
+        d=1e100.net; s=20230601; t=1703529416; x=1704134216;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rhuoQDM0PcQ1Hf0mmTK6WXCkbN9R/6E9/xIlxdvn19s=;
+        b=SBDRNAcFtIjgRKuM8qYrQof/exV8mA8/EjCaKnxHIZGPNTkZaz7VfvNRnbABPl0vQw
+         SN30Je3sNoPUeEx/CrNXsaPUT/FnVeipdz/wjPHCHi87C7aGN4IMpZLwSpK0kr9w08Lw
+         wC38VIqcte63fld6vLVVH/FGrzHE6U9DxybNR6WUK1l8urHTUKdi04dVQrOjOuEL3zas
+         TTzSIhu9MYeuvBWBHEoQ3zcJTAlnjG6NtUDGLR3x+GtW4E6mXM+4cN/EIGfiMfn6TX1z
+         p0upA8eVJ20OfRr6rpGE+www0cUoexKjGIkFfMBvFwoZkpV2ArJxah9LorgmLW1qXWbi
+         ofLg==
+X-Gm-Message-State: AOJu0Yx8w/cznpH/cxxYuQKv6ARES6y3/JynuXolAgNpawllkx48UAL7
+	Ee/53D1xq3zQHcBxiUU7V2t4jJzVOIFLizo7bgq0xOJdrRhbQg==
+X-Google-Smtp-Source: AGHT+IE8CS08JUcDq3WI+3+8WI11iUmJs6u/1qSNRmsQnNIvWnx6Y9KlEVMPs7h/FyiJgfivx9Js3Ldg5moOhBHrYkY=
+X-Received: by 2002:ae9:c012:0:b0:77f:b722:50c4 with SMTP id
+ u18-20020ae9c012000000b0077fb72250c4mr7269847qkk.83.1703529415782; Mon, 25
+ Dec 2023 10:36:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <363ca575-f01a-4d09-ae9d-b6249b3aedb3@amazon.com>
+References: <20231225120327.166160-1-davidwronek@gmail.com> <20231225120327.166160-6-davidwronek@gmail.com>
+In-Reply-To: <20231225120327.166160-6-davidwronek@gmail.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Mon, 25 Dec 2023 20:36:44 +0200
+Message-ID: <CAA8EJpq1QiWwJ1dk9xtaY=0pXr0y-QfoibXyX4SZR=YbxjRBVg@mail.gmail.com>
+Subject: Re: [PATCH v3 5/8] phy: qcom: qmp-ufs: Add SC7180 support
+To: David Wronek <davidwronek@gmail.com>
+Cc: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
+	Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Alim Akhtar <alim.akhtar@samsung.com>, 
+	Avri Altman <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, 
+	Joe Mason <buddyjojo06@outlook.com>, hexdump0815@googlemail.com, 
+	cros-qcom-dts-watchers@chromium.org, linux-arm-msm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-scsi@vger.kernel.org, ~postmarketos/upstreaming@lists.sr.ht, 
+	phone-devel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Dec 25, 2023 at 05:07:29PM +0100, Alexander Graf wrote:
-> Hey Michael,
-> 
-> On 25.12.23 15:06, Michael S. Tsirkin wrote:
-> > On Wed, Oct 11, 2023 at 09:35:22PM +0000, Alexander Graf wrote:
-> > > When running Linux inside a Nitro Enclave, the hypervisor provides a
-> > > special virtio device called "Nitro Security Module" (NSM). This device
-> > > has 3 main functions:
-> > > 
-> > >    1) Provide attestation reports
-> > >    2) Modify PCR state
-> > >    3) Provide entropy
-> > > 
-> > > This patch adds a driver for NSM that exposes a /dev/nsm device node which
-> > > user space can issue an ioctl on this device with raw NSM CBOR formatted
-> > > commands to request attestation documents, influence PCR states, read
-> > > entropy and enumerate status of the device. In addition, the driver
-> > > implements a hwrng backend.
-> > > 
-> > > Originally-by: Petre Eftime <petre.eftime@gmail.com>
-> > > Signed-off-by: Alexander Graf <graf@amazon.com>
-> > Alex are you going to publish the spec patch for this device?  Important
-> > so we don't need to guess at behaviour when e.g.  making changes to
-> > virtio APIs.  Also, which tree do you want this to go through?
-> 
-> 
-> The spec patch including ping mail are sitting on the virtio-comments
-> mailing list since October. I haven't seen any reply unfortunately :(
-> 
-> https://lore.kernel.org/virtio-comment/20231025235345.17788-1-graf@amazon.com/
-> 
-> Happy to read feedback if you have any :).
+On Mon, 25 Dec 2023 at 14:05, David Wronek <davidwronek@gmail.com> wrote:
+>
+> The SC7180 UFS PHY is identical to the one found on SM7150. Add a
+> compatible for it.
+>
+> Signed-off-by: David Wronek <davidwronek@gmail.com>
+> ---
+>  drivers/phy/qualcomm/phy-qcom-qmp-ufs.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-Oh I forgot.
-Now that I've read the driver, I actually have some :)
-I think there's an assumption that there's a request buffer
-and response buffer queued by the driver, and that
-the device always first consumes the request buffer
-followed by consuming the response buffer.
-If that is right then driver is ok but spec needs
-clarification, will note on virtio-comment.
+Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 
-
-> This patch here is already applied in Greg's misc tree which I'm happy to
-> have it trickle to Linus through.
-> 
-> 
-> Alex
-> 
-> 
-> 
-> 
-> Amazon Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> Sitz: Berlin
-> Ust-ID: DE 289 237 879
-> 
-> 
-
+-- 
+With best wishes
+Dmitry
