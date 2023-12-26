@@ -1,150 +1,106 @@
-Received: from mout.web.de (mout.web.de [212.227.17.12])
+Received: from gauss.telenet-ops.be (gauss.telenet-ops.be [195.130.132.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0429E4E1A0;
-	Tue, 26 Dec 2023 10:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="qctTj9H1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1703585548; x=1704190348; i=markus.elfring@web.de;
-	bh=dPv4vm2V0dtNM9i6ea9tTX3+xLFfWPWmI5QeWJPTnZk=;
-	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
-	 In-Reply-To;
-	b=qctTj9H1YVuIc3m8+kAdWWGMz52a5nerjKipKUSb6X8ybQ8HqLI6Fm7K+JOA1q/j
-	 chiHL60LtJaQG8B58YOM4rEr9Xx+MEj4DQLXr80xtHmwVA+t2Lzh4Juxb/xXQLn/8
-	 JUBotIqKsiDzTLSsPto/n+/GwCINXYPM13DmwzXE3nBTKZ+uqlOqTu4ESJcHDKrKB
-	 o/oPJWLn42XMytEJk9QA5fSpUPH3u+Ga9weIjWDsGTDlmxjN/45/L3ayhy8ZxKW7l
-	 NbMKFMb2jaAQxa7Z6K9Os2ldxslTommCScCEiAI7p6J++Oe1zU6KUu5yMo0Y+dwts
-	 Ih+seoMJWTukJthKvw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MgzaR-1qmKZd2f09-00h0gW; Tue, 26
- Dec 2023 11:12:28 +0100
-Message-ID: <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
-Date: Tue, 26 Dec 2023 11:12:23 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C6C4E1C9
+	for <linux-crypto@vger.kernel.org>; Tue, 26 Dec 2023 11:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from andre.telenet-ops.be (andre.telenet-ops.be [IPv6:2a02:1800:120:4::f00:15])
+	by gauss.telenet-ops.be (Postfix) with ESMTPS id 4Szszj2Xbwz4x9VP
+	for <linux-crypto@vger.kernel.org>; Tue, 26 Dec 2023 12:31:29 +0100 (CET)
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed40:9b4b:afc4:afcc:abac])
+	by andre.telenet-ops.be with bizsmtp
+	id SzXL2B0092KswmB01zXLCU; Tue, 26 Dec 2023 12:31:22 +0100
+Received: from geert (helo=localhost)
+	by ramsan.of.borg with local-esmtp (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1rI5ea-00DRWR-Fl;
+	Tue, 26 Dec 2023 12:31:20 +0100
+Date: Tue, 26 Dec 2023 12:31:20 +0100 (CET)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Jie Wang <jie.wang@intel.com>
+cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, 
+    qat-linux@intel.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5/5] crypto: qat - add support for 420xx devices
+In-Reply-To: <20231215100147.1703641-6-jie.wang@intel.com>
+Message-ID: <c6662ee1-9c2a-49fb-917f-2a3586f636b4@linux-m68k.org>
+References: <20231215100147.1703641-1-jie.wang@intel.com> <20231215100147.1703641-6-jie.wang@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH v2] crypto: virtio - Less function calls in
- __virtio_crypto_akcipher_do_req() after error detection
-Content-Language: en-GB
-To: kernel test robot <lkp@intel.com>, virtualization@lists.linux.dev,
- linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Gonglei <arei.gonglei@huawei.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
- netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr
-References: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
- <202312260852.0ge5O8IL-lkp@intel.com>
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <202312260852.0ge5O8IL-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:YN0MO2vfA1atqF0nbfqn3SUIOjqrjmmzVaCGbVBzhr1uK75lo+t
- Z+XanIEq02qD07l7cGh0qCNmrpZhVE1z34Lyp8XzjJZz1NMCNGi0WvNA0YgL+CUCd3AkrUH
- u4m7w4Ne71OdUv3nbMx76OomPu4ThXd6ZHN3zMk7meKGBNwTcpJaMKYb1ZhMM9nhYIGQd72
- CDypDzv2I327qYKzDGLtg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:8nuqnBAmzpc=;fggNP23Hu6H5jAMVog3j6WuwsVy
- SNSPoYpjKMwrNPMQKvNUF2W2BCNiSMXM6+szPZlgk5czdie42gPPZHtJ7lVD+Ve9gzqracOJ/
- vJ5Nm0XtiPrhTYtne9KKJkgViiSJ9VRdwEOQg6qSSh0Mb6GF61My09Xu6t5blbdrTD8JCW+hi
- ZTyonCXTwrNSC5ybEZGjj1n1oSG7o6W0ZyXTEGYjlWq1Uw0g/0LYWTSyw0Ul4AyVOp9mf5bar
- LyyuaOfeY/6x8vmc4qN2V+wcRolHAdWvCkMblNmdfH5VNDTOO/6vgqOkQJ+4I+RmhODXe5aEk
- zcSDuO/zOLanNfFuqFZDqVUBziTSeoqXMdbMmvR+VbZse1YRLch5Kgaddv1kU57k/LvAdCeV/
- jITnam948vgtGL4CSq8sG+SNxwq7haNKwfXVlqMV0PvdcaZKULiS7OwcIu+JAjAExqHxn9VhC
- sQxEIQsHz0Vros/asQqPXaV9By64fZ4xZV9YTcYW9kYUMzFbACzWecX2MxryUt7VZdNL0hAKD
- h8b9hiub2b7uHr2lWE6sgLF0Lza1HRxLQE4P1gx/2/FK+TdMtwfi6fdlCUq0YAtkVAjhJ3Itc
- 7IQDzC6bKhG423ry4K5JJNPQrTieQVnchifFCJs9ji2RXXV7XAHJXJVTFsCMbvMSzqAYgrCjE
- ju2Lwc6iP4UF7ZT3PH1U5EkOjtkCUdjCEKcUxI9LG/RG9IQd4xrfJgOvxzxFRAa0hNFbco+mU
- 3K0PdeaQhY/3yQPOjtIfTCJAM0mn9o5LiJ/TwzfQnF6fBQgzwjZPllvg7PJdAgRahw1GDP0AU
- 4q0P9MY9OqRHgjCkBcqICAHF0Pb6L3gb166r70ry43nveXIZQuABdfP9ZVueBQ6dIV4gzclr9
- T3QMf/bkPp2VN9TN5sd/4dEflY8gfYX/vQqODRKtrK+Izhm70lJna8tRR0QH1TcGjBgoTUfi3
- VOtIf1J/PSAE+RJkUJCU2HoAB14=
+Content-Type: multipart/mixed; boundary="8323329-447575269-1703590280=:3203928"
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Tue, 26 Dec 2023 11:00:20 +0100
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-The kfree() function was called in up to two cases by the
-__virtio_crypto_akcipher_do_req() function during error handling
-even if the passed variable contained a null pointer.
-This issue was detected by using the Coccinelle software.
+--8323329-447575269-1703590280=:3203928
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-* Adjust jump targets.
+ 	Hi Jie,
 
-* Delete two initialisations which became unnecessary
-  with this refactoring.
+On Fri, 15 Dec 2023, Jie Wang wrote:
+> Add support for 420xx devices by including a new device driver that
+> supports such devices, updates to the firmware loader and capabilities.
+>
+> Compared to 4xxx devices, 420xx devices have more acceleration engines
+> (16 service engines and 1 admin) and support the wireless cipher
+> algorithms ZUC and Snow 3G.
+>
+> Signed-off-by: Jie Wang <jie.wang@intel.com>
+> Co-developed-by: Dong Xie <dong.xie@intel.com>
+> Signed-off-by: Dong Xie <dong.xie@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
+Thanks for your patch, which is now commit fcf60f4bcf54952c ("crypto:
+qat - add support for 420xx devices") in crypto/master
 
-v2:
-A typo was fixed for the delimiter of a label.
+> --- a/drivers/crypto/intel/qat/Kconfig
+> +++ b/drivers/crypto/intel/qat/Kconfig
+> @@ -59,6 +59,17 @@ config CRYPTO_DEV_QAT_4XXX
+> 	  To compile this as a module, choose M here: the module
+> 	  will be called qat_4xxx.
+>
+> +config CRYPTO_DEV_QAT_420XX
+> +	tristate "Support for Intel(R) QAT_420XX"
+> +	depends on PCI && (!CPU_BIG_ENDIAN || COMPILE_TEST)
 
- drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+These dependencies suggest that the QAT_420XX device can be present and
+used on any little-endian system that supports PCIe (arm64, MIPS,
+PowerPC, RISC-V, ...).
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers=
-/crypto/virtio/virtio_crypto_akcipher_algs.c
-index 2621ff8a9376..057da5bd8d30 100644
-=2D-- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-@@ -224,11 +224,11 @@ static int __virtio_crypto_akcipher_do_req(struct vi=
-rtio_crypto_akcipher_request
- 	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
- 	struct virtio_crypto_op_data_req *req_data =3D vc_req->req_data;
- 	struct scatterlist *sgs[4], outhdr_sg, inhdr_sg, srcdata_sg, dstdata_sg;
--	void *src_buf =3D NULL, *dst_buf =3D NULL;
-+	void *src_buf, *dst_buf =3D NULL;
- 	unsigned int num_out =3D 0, num_in =3D 0;
- 	int node =3D dev_to_node(&vcrypto->vdev->dev);
- 	unsigned long flags;
--	int ret =3D -ENOMEM;
-+	int ret;
- 	bool verify =3D vc_akcipher_req->opcode =3D=3D VIRTIO_CRYPTO_AKCIPHER_VE=
-RIFY;
- 	unsigned int src_len =3D verify ? req->src_len + req->dst_len : req->src=
-_len;
+However, [1] says QAT is only present on intel Atom® C5000, P5300, and
+P5700 processors, implying the dependency should rather be
 
-@@ -239,7 +239,7 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
-io_crypto_akcipher_request
- 	/* src data */
- 	src_buf =3D kcalloc_node(src_len, 1, GFP_KERNEL, node);
- 	if (!src_buf)
--		goto err;
-+		return -ENOMEM;
+     depends on PCI && (X86_64 || COMPILE_TEST)
 
- 	if (verify) {
- 		/* for verify operation, both src and dst data work as OUT direction */
-@@ -254,7 +254,7 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
-io_crypto_akcipher_request
- 		/* dst data */
- 		dst_buf =3D kcalloc_node(req->dst_len, 1, GFP_KERNEL, node);
- 		if (!dst_buf)
--			goto err;
-+			goto free_src;
+Which one is correct?
 
- 		sg_init_one(&dstdata_sg, dst_buf, req->dst_len);
- 		sgs[num_out + num_in++] =3D &dstdata_sg;
-@@ -277,9 +277,9 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
-io_crypto_akcipher_request
- 	return 0;
+[1] https://www.intel.com/content/www/us/en/architecture-and-technology/intel-quick-assist-technology-overview.html
 
- err:
--	kfree(src_buf);
- 	kfree(dst_buf);
--
-+free_src:
-+	kfree(src_buf);
- 	return -ENOMEM;
- }
+> +	select CRYPTO_DEV_QAT
+> +	help
+> +	  Support for Intel(R) QuickAssist Technology QAT_420xx
+> +	  for accelerating crypto and compression workloads.
+> +
+> +	  To compile this as a module, choose M here: the module
+> +	  will be called qat_420xx.
+> +
+> config CRYPTO_DEV_QAT_DH895xCCVF
+> 	tristate "Support for Intel(R) DH895xCC Virtual Function"
+> 	depends on PCI && (!CPU_BIG_ENDIAN || COMPILE_TEST)
 
-=2D-
-2.43.0
+Gr{oetje,eeting}s,
 
+ 						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+ 							    -- Linus Torvalds
+--8323329-447575269-1703590280=:3203928--
