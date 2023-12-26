@@ -1,84 +1,200 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F914E611;
-	Tue, 26 Dec 2023 12:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Szv4h5Tm1z1R6Hw;
-	Tue, 26 Dec 2023 20:20:52 +0800 (CST)
-Received: from kwepemi500024.china.huawei.com (unknown [7.221.188.100])
-	by mail.maildlp.com (Postfix) with ESMTPS id F10C21402DE;
-	Tue, 26 Dec 2023 20:22:11 +0800 (CST)
-Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
- kwepemi500024.china.huawei.com (7.221.188.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 26 Dec 2023 20:22:11 +0800
-Received: from dggpemm500006.china.huawei.com ([7.185.36.236]) by
- dggpemm500006.china.huawei.com ([7.185.36.236]) with mapi id 15.01.2507.035;
- Tue, 26 Dec 2023 20:22:11 +0800
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-To: Markus Elfring <Markus.Elfring@web.de>, kernel test robot <lkp@intel.com>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>, "David
- S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
-	"Xuan Zhuo" <xuanzhuo@linux.alibaba.com>
-CC: "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-	"oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, LKML
-	<linux-kernel@vger.kernel.org>, "cocci@inria.fr" <cocci@inria.fr>
-Subject: RE: [PATCH v2] crypto: virtio - Less function calls in
- __virtio_crypto_akcipher_do_req() after error detection
-Thread-Topic: [PATCH v2] crypto: virtio - Less function calls in
- __virtio_crypto_akcipher_do_req() after error detection
-Thread-Index: AQHaN+QUjZOxb6ORnEG4ZWEqtSGvn7C7fD+A
-Date: Tue, 26 Dec 2023 12:22:11 +0000
-Message-ID: <deb25ea00a57448d94496db1c46af693@huawei.com>
-References: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
- <202312260852.0ge5O8IL-lkp@intel.com>
- <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
-In-Reply-To: <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5B54EB2D
+	for <linux-crypto@vger.kernel.org>; Tue, 26 Dec 2023 15:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7ba74d90a71so680857539f.0
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Dec 2023 07:28:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703604499; x=1704209299;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7pAn0BFZph+5Rj0b0QLg8WiGaWGsuSYeAKIPJ2kKAdI=;
+        b=oiq8PvC/aZT0oC6zVC7zSLE79+LdV2wKroBaK+avcLLe7bWa/FwGiytz5HW+SPIhUS
+         nzWdJQjCLPUBe9zKzcI+LXIT1gFSASsdoQ/8ao4jrTNt/oyd/XaaWz4zioMWewjL90NY
+         EdOg/ed9phaHY8VaGhUA9PV58khwV4HVctkiOdiwRgum7nDaHzISvFA3uatUTswFfHmm
+         gRRoXWVxFXhBAqLUfJbNMND3/czyIZrEN43BwhukAgmK99vavOOoTYklW9F9Ip9Df/By
+         M2IreQe0krjkBHkCv6PrvNtBwHEkHc/AOeOvjBNm7VxZD1Wcow+7yaI0VzskybTB6g5J
+         72xQ==
+X-Gm-Message-State: AOJu0YzXVKnoCrmGa2vh+zXpktRBTiGPVsAlZRZe0ho2X2/QEkT7LAVw
+	ugYsynE/RUMV5g4P1HErR2rqjwQFLXam97GiIxFC0tgE4yg+
+X-Google-Smtp-Source: AGHT+IH4q7OAZUXBqXguzRyaZLmuPPxjcRofsCk0Zyz8LyN1S4PlW6j5tcIVnhsJBK9kYVIoclt3PWhtVI9E0xug5jbL5wJx//hn
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:154e:b0:35f:f683:f769 with SMTP id
+ j14-20020a056e02154e00b0035ff683f769mr682360ilu.5.1703604499709; Tue, 26 Dec
+ 2023 07:28:19 -0800 (PST)
+Date: Tue, 26 Dec 2023 07:28:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000b05cd060d6b5511@google.com>
+Subject: [syzbot] [crypto?] general protection fault in scatterwalk_copychunks (5)
+From: syzbot <syzbot+3eff5e51bf1db122a16e@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, chrisl@kernel.org, davem@davemloft.net, 
+	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nphamcs@gmail.com, 
+	syzkaller-bugs@googlegroups.com, yosryahmed@google.com, 
+	zhouchengming@bytedance.com
+Content-Type: text/plain; charset="UTF-8"
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFya3VzIEVsZnJpbmcg
-W21haWx0bzpNYXJrdXMuRWxmcmluZ0B3ZWIuZGVdDQo+IFNlbnQ6IFR1ZXNkYXksIERlY2VtYmVy
-IDI2LCAyMDIzIDY6MTIgUE0NCj4gVG86IGtlcm5lbCB0ZXN0IHJvYm90IDxsa3BAaW50ZWwuY29t
-PjsgdmlydHVhbGl6YXRpb25AbGlzdHMubGludXguZGV2Ow0KPiBsaW51eC1jcnlwdG9Admdlci5r
-ZXJuZWwub3JnOyBrZXJuZWwtamFuaXRvcnNAdmdlci5rZXJuZWwub3JnOyBEYXZpZCBTLiBNaWxs
-ZXINCj4gPGRhdmVtQGRhdmVtbG9mdC5uZXQ+OyBHb25nbGVpIChBcmVpKSA8YXJlaS5nb25nbGVp
-QGh1YXdlaS5jb20+OyBIZXJiZXJ0DQo+IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU+
-OyBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPjsNCj4gTWljaGFlbCBTLiBUc2lya2lu
-IDxtc3RAcmVkaGF0LmNvbT47IFh1YW4gWmh1bw0KPiA8eHVhbnpodW9AbGludXguYWxpYmFiYS5j
-b20+DQo+IENjOiBsbHZtQGxpc3RzLmxpbnV4LmRldjsgb2Uta2J1aWxkLWFsbEBsaXN0cy5saW51
-eC5kZXY7IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7DQo+IExLTUwgPGxpbnV4LWtlcm5lbEB2Z2Vy
-Lmtlcm5lbC5vcmc+OyBjb2NjaUBpbnJpYS5mcg0KPiBTdWJqZWN0OiBbUEFUQ0ggdjJdIGNyeXB0
-bzogdmlydGlvIC0gTGVzcyBmdW5jdGlvbiBjYWxscyBpbg0KPiBfX3ZpcnRpb19jcnlwdG9fYWtj
-aXBoZXJfZG9fcmVxKCkgYWZ0ZXIgZXJyb3IgZGV0ZWN0aW9uDQo+IA0KPiBGcm9tOiBNYXJrdXMg
-RWxmcmluZyA8ZWxmcmluZ0B1c2Vycy5zb3VyY2Vmb3JnZS5uZXQ+DQo+IERhdGU6IFR1ZSwgMjYg
-RGVjIDIwMjMgMTE6MDA6MjAgKzAxMDANCj4gDQo+IFRoZSBrZnJlZSgpIGZ1bmN0aW9uIHdhcyBj
-YWxsZWQgaW4gdXAgdG8gdHdvIGNhc2VzIGJ5IHRoZQ0KPiBfX3ZpcnRpb19jcnlwdG9fYWtjaXBo
-ZXJfZG9fcmVxKCkgZnVuY3Rpb24gZHVyaW5nIGVycm9yIGhhbmRsaW5nIGV2ZW4gaWYgdGhlDQo+
-IHBhc3NlZCB2YXJpYWJsZSBjb250YWluZWQgYSBudWxsIHBvaW50ZXIuDQo+IFRoaXMgaXNzdWUg
-d2FzIGRldGVjdGVkIGJ5IHVzaW5nIHRoZSBDb2NjaW5lbGxlIHNvZnR3YXJlLg0KPiANCj4gKiBB
-ZGp1c3QganVtcCB0YXJnZXRzLg0KPiANCj4gKiBEZWxldGUgdHdvIGluaXRpYWxpc2F0aW9ucyB3
-aGljaCBiZWNhbWUgdW5uZWNlc3NhcnkNCj4gICB3aXRoIHRoaXMgcmVmYWN0b3JpbmcuDQo+IA0K
-PiBTaWduZWQtb2ZmLWJ5OiBNYXJrdXMgRWxmcmluZyA8ZWxmcmluZ0B1c2Vycy5zb3VyY2Vmb3Jn
-ZS5uZXQ+DQo+IC0tLQ0KPiANCj4gdjI6DQo+IEEgdHlwbyB3YXMgZml4ZWQgZm9yIHRoZSBkZWxp
-bWl0ZXIgb2YgYSBsYWJlbC4NCj4gDQo+ICBkcml2ZXJzL2NyeXB0by92aXJ0aW8vdmlydGlvX2Ny
-eXB0b19ha2NpcGhlcl9hbGdzLmMgfCAxMiArKysrKystLS0tLS0NCj4gIDEgZmlsZSBjaGFuZ2Vk
-LCA2IGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pDQo+IA0KDQpSZXZpZXdlZC1ieTogR29u
-Z2xlaSA8YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+DQoNCg0KUmVnYXJkcywNCi1Hb25nbGVpDQo=
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    39676dfe5233 Add linux-next specific files for 20231222
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=172080a1e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f3761490b734dc96
+dashboard link: https://syzkaller.appspot.com/bug?extid=3eff5e51bf1db122a16e
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=178f6e26e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15c399e9e80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/360542c2ca67/disk-39676dfe.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/900dfb21ca8a/vmlinux-39676dfe.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c94a2a3ea0e0/bzImage-39676dfe.xz
+
+The issue was bisected to:
+
+commit 7bc134496bbbaacb0d4423b819da4eca850a839d
+Author: Chengming Zhou <zhouchengming@bytedance.com>
+Date:   Mon Dec 18 11:50:31 2023 +0000
+
+    mm/zswap: change dstmem size to one page
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15f60c36e80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=17f60c36e80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=13f60c36e80000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3eff5e51bf1db122a16e@syzkaller.appspotmail.com
+Fixes: 7bc134496bbb ("mm/zswap: change dstmem size to one page")
+
+general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+CPU: 0 PID: 5065 Comm: syz-executor140 Not tainted 6.7.0-rc6-next-20231222-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+RIP: 0010:scatterwalk_start include/crypto/scatterwalk.h:63 [inline]
+RIP: 0010:scatterwalk_pagedone include/crypto/scatterwalk.h:83 [inline]
+RIP: 0010:scatterwalk_pagedone include/crypto/scatterwalk.h:72 [inline]
+RIP: 0010:scatterwalk_copychunks+0x3e0/0x560 crypto/scatterwalk.c:50
+Code: f0 48 c1 e8 03 80 3c 08 00 0f 85 81 01 00 00 49 8d 44 24 08 4d 89 26 48 bf 00 00 00 00 00 fc ff df 48 89 44 24 10 48 c1 e8 03 <0f> b6 04 38 84 c0 74 08 3c 03 0f 8e 47 01 00 00 48 8b 44 24 08 41
+RSP: 0018:ffffc90003a8ecf0 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: 0000000000000000 RCX: dffffc0000000000
+RDX: ffff88802785d940 RSI: ffffffff8465df74 RDI: dffffc0000000000
+RBP: 0000000000001000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000002 R11: 82d8bd1b6060f805 R12: 0000000000000000
+R13: 0000000000000014 R14: ffffc90003a8ed88 R15: 0000000000001000
+FS:  00005555565c5380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000d5e538 CR3: 0000000079f3a000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ scatterwalk_map_and_copy+0x151/0x1d0 crypto/scatterwalk.c:67
+ scomp_acomp_comp_decomp+0x3a3/0x780 crypto/scompress.c:149
+ crypto_acomp_compress include/crypto/acompress.h:302 [inline]
+ zswap_store+0x98b/0x2430 mm/zswap.c:1666
+ swap_writepage+0x8e/0x220 mm/page_io.c:198
+ pageout+0x399/0x9e0 mm/vmscan.c:656
+ shrink_folio_list+0x2f47/0x3ea0 mm/vmscan.c:1319
+ reclaim_folio_list+0xe4/0x3a0 mm/vmscan.c:2104
+ reclaim_pages+0x483/0x6a0 mm/vmscan.c:2140
+ madvise_cold_or_pageout_pte_range+0x129e/0x1f70 mm/madvise.c:526
+ walk_pmd_range mm/pagewalk.c:143 [inline]
+ walk_pud_range mm/pagewalk.c:221 [inline]
+ walk_p4d_range mm/pagewalk.c:256 [inline]
+ walk_pgd_range+0xa48/0x1870 mm/pagewalk.c:293
+ __walk_page_range+0x630/0x770 mm/pagewalk.c:395
+ walk_page_range+0x626/0xa80 mm/pagewalk.c:521
+ madvise_pageout_page_range mm/madvise.c:585 [inline]
+ madvise_pageout+0x32c/0x820 mm/madvise.c:612
+ madvise_vma_behavior+0x1cc/0x1b50 mm/madvise.c:1031
+ madvise_walk_vmas+0x1cf/0x2c0 mm/madvise.c:1260
+ do_madvise+0x333/0x660 mm/madvise.c:1440
+ __do_sys_madvise mm/madvise.c:1453 [inline]
+ __se_sys_madvise mm/madvise.c:1451 [inline]
+ __x64_sys_madvise+0xa9/0x110 mm/madvise.c:1451
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x62/0x6a
+RIP: 0033:0x7f15a5e14b69
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffde7b4a5c8 EFLAGS: 00000246 ORIG_RAX: 000000000000001c
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f15a5e14b69
+RDX: 0000000000000015 RSI: 0000000000c00304 RDI: 0000000020000000
+RBP: 0000000000000000 R08: 00005555565c6610 R09: 00005555565c6610
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007ffde7b4a808 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:scatterwalk_start include/crypto/scatterwalk.h:63 [inline]
+RIP: 0010:scatterwalk_pagedone include/crypto/scatterwalk.h:83 [inline]
+RIP: 0010:scatterwalk_pagedone include/crypto/scatterwalk.h:72 [inline]
+RIP: 0010:scatterwalk_copychunks+0x3e0/0x560 crypto/scatterwalk.c:50
+Code: f0 48 c1 e8 03 80 3c 08 00 0f 85 81 01 00 00 49 8d 44 24 08 4d 89 26 48 bf 00 00 00 00 00 fc ff df 48 89 44 24 10 48 c1 e8 03 <0f> b6 04 38 84 c0 74 08 3c 03 0f 8e 47 01 00 00 48 8b 44 24 08 41
+RSP: 0018:ffffc90003a8ecf0 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: 0000000000000000 RCX: dffffc0000000000
+RDX: ffff88802785d940 RSI: ffffffff8465df74 RDI: dffffc0000000000
+RBP: 0000000000001000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000002 R11: 82d8bd1b6060f805 R12: 0000000000000000
+R13: 0000000000000014 R14: ffffc90003a8ed88 R15: 0000000000001000
+FS:  00005555565c5380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000d5e538 CR3: 0000000079f3a000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	f0 48 c1 e8 03       	lock shr $0x3,%rax
+   5:	80 3c 08 00          	cmpb   $0x0,(%rax,%rcx,1)
+   9:	0f 85 81 01 00 00    	jne    0x190
+   f:	49 8d 44 24 08       	lea    0x8(%r12),%rax
+  14:	4d 89 26             	mov    %r12,(%r14)
+  17:	48 bf 00 00 00 00 00 	movabs $0xdffffc0000000000,%rdi
+  1e:	fc ff df
+  21:	48 89 44 24 10       	mov    %rax,0x10(%rsp)
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	0f b6 04 38          	movzbl (%rax,%rdi,1),%eax <-- trapping instruction
+  2e:	84 c0                	test   %al,%al
+  30:	74 08                	je     0x3a
+  32:	3c 03                	cmp    $0x3,%al
+  34:	0f 8e 47 01 00 00    	jle    0x181
+  3a:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
+  3f:	41                   	rex.B
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
