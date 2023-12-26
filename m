@@ -1,121 +1,150 @@
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+Received: from mout.web.de (mout.web.de [212.227.17.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C964C625;
-	Tue, 26 Dec 2023 07:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0429E4E1A0;
+	Tue, 26 Dec 2023 10:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lOKfEY0k"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703576993; x=1735112993;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=U+wO1tAzMJBsNwBmiNDTSqAm2EQmTUDeXsbExsAPcjk=;
-  b=lOKfEY0kVGMBrC993az55Gmu1SFlDwGymoE9IH4VFgpxOaYAKo5135UY
-   /03u+3h2HwHTL1Rx6/WspGExCoT39R4j+otw18kJnY9tFCfYa7Qe6V7JR
-   q9/1WT2nNrD0RG/1IYZfQb77b4yq6OFVbosbTJjnKbLsoLjwFzDBLtuHO
-   rCr/ILPc1TCUmKTz9FWr0i8aEQYVS9rwxSfnWhuk6iijIMzVae1UYrdpS
-   2JgokdFsMlQzG0+2nUEZQ7a6R0qKpcmlIKJJQBYISHlkFa4OVbBPX0ZNN
-   DGIeCJ9n3U0f1t0FHwbcidC0IhIz6DdyKRIXkAaPiTZL7GVv/FRAPbZkX
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="400149436"
-X-IronPort-AV: E=Sophos;i="6.04,304,1695711600"; 
-   d="scan'208";a="400149436"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 23:49:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="921505174"
-X-IronPort-AV: E=Sophos;i="6.04,304,1695711600"; 
-   d="scan'208";a="921505174"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga001.fm.intel.com with ESMTP; 25 Dec 2023 23:49:46 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rI2C8-000EDF-0e;
-	Tue, 26 Dec 2023 07:49:44 +0000
-Date: Tue, 26 Dec 2023 15:49:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: LeoLiu-oc <LeoLiu-oc@zhaoxin.com>, olivia@selenic.com,
-	herbert@gondor.apana.org.au, jiajie.ho@starfivetech.com,
-	conor.dooley@microchip.com, martin@kaiser.cx, mmyangfl@gmail.com,
-	jenny.zhang@starfivetech.com, robh@kernel.org,
-	l.stelmach@samsung.com, ardb@kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, CobeChen@zhaoxin.com,
-	TonyWWang@zhaoxin.com, YunShen@zhaoxin.com, LeoLiu@zhaoxin.com,
-	LeoLiuoc <LeoLiu-oc@zhaoxin.com>
-Subject: Re: [PATCH v4] hwrng: add Zhaoxin rng driver base on rep_xstore
- instruction
-Message-ID: <202312261505.rDaQJwAq-lkp@intel.com>
-References: <20231225025330.809554-1-LeoLiu-oc@zhaoxin.com>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="qctTj9H1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1703585548; x=1704190348; i=markus.elfring@web.de;
+	bh=dPv4vm2V0dtNM9i6ea9tTX3+xLFfWPWmI5QeWJPTnZk=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=qctTj9H1YVuIc3m8+kAdWWGMz52a5nerjKipKUSb6X8ybQ8HqLI6Fm7K+JOA1q/j
+	 chiHL60LtJaQG8B58YOM4rEr9Xx+MEj4DQLXr80xtHmwVA+t2Lzh4Juxb/xXQLn/8
+	 JUBotIqKsiDzTLSsPto/n+/GwCINXYPM13DmwzXE3nBTKZ+uqlOqTu4ESJcHDKrKB
+	 o/oPJWLn42XMytEJk9QA5fSpUPH3u+Ga9weIjWDsGTDlmxjN/45/L3ayhy8ZxKW7l
+	 NbMKFMb2jaAQxa7Z6K9Os2ldxslTommCScCEiAI7p6J++Oe1zU6KUu5yMo0Y+dwts
+	 Ih+seoMJWTukJthKvw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MgzaR-1qmKZd2f09-00h0gW; Tue, 26
+ Dec 2023 11:12:28 +0100
+Message-ID: <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
+Date: Tue, 26 Dec 2023 11:12:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231225025330.809554-1-LeoLiu-oc@zhaoxin.com>
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH v2] crypto: virtio - Less function calls in
+ __virtio_crypto_akcipher_do_req() after error detection
+Content-Language: en-GB
+To: kernel test robot <lkp@intel.com>, virtualization@lists.linux.dev,
+ linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Gonglei <arei.gonglei@huawei.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+ netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr
+References: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
+ <202312260852.0ge5O8IL-lkp@intel.com>
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <202312260852.0ge5O8IL-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:YN0MO2vfA1atqF0nbfqn3SUIOjqrjmmzVaCGbVBzhr1uK75lo+t
+ Z+XanIEq02qD07l7cGh0qCNmrpZhVE1z34Lyp8XzjJZz1NMCNGi0WvNA0YgL+CUCd3AkrUH
+ u4m7w4Ne71OdUv3nbMx76OomPu4ThXd6ZHN3zMk7meKGBNwTcpJaMKYb1ZhMM9nhYIGQd72
+ CDypDzv2I327qYKzDGLtg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:8nuqnBAmzpc=;fggNP23Hu6H5jAMVog3j6WuwsVy
+ SNSPoYpjKMwrNPMQKvNUF2W2BCNiSMXM6+szPZlgk5czdie42gPPZHtJ7lVD+Ve9gzqracOJ/
+ vJ5Nm0XtiPrhTYtne9KKJkgViiSJ9VRdwEOQg6qSSh0Mb6GF61My09Xu6t5blbdrTD8JCW+hi
+ ZTyonCXTwrNSC5ybEZGjj1n1oSG7o6W0ZyXTEGYjlWq1Uw0g/0LYWTSyw0Ul4AyVOp9mf5bar
+ LyyuaOfeY/6x8vmc4qN2V+wcRolHAdWvCkMblNmdfH5VNDTOO/6vgqOkQJ+4I+RmhODXe5aEk
+ zcSDuO/zOLanNfFuqFZDqVUBziTSeoqXMdbMmvR+VbZse1YRLch5Kgaddv1kU57k/LvAdCeV/
+ jITnam948vgtGL4CSq8sG+SNxwq7haNKwfXVlqMV0PvdcaZKULiS7OwcIu+JAjAExqHxn9VhC
+ sQxEIQsHz0Vros/asQqPXaV9By64fZ4xZV9YTcYW9kYUMzFbACzWecX2MxryUt7VZdNL0hAKD
+ h8b9hiub2b7uHr2lWE6sgLF0Lza1HRxLQE4P1gx/2/FK+TdMtwfi6fdlCUq0YAtkVAjhJ3Itc
+ 7IQDzC6bKhG423ry4K5JJNPQrTieQVnchifFCJs9ji2RXXV7XAHJXJVTFsCMbvMSzqAYgrCjE
+ ju2Lwc6iP4UF7ZT3PH1U5EkOjtkCUdjCEKcUxI9LG/RG9IQd4xrfJgOvxzxFRAa0hNFbco+mU
+ 3K0PdeaQhY/3yQPOjtIfTCJAM0mn9o5LiJ/TwzfQnF6fBQgzwjZPllvg7PJdAgRahw1GDP0AU
+ 4q0P9MY9OqRHgjCkBcqICAHF0Pb6L3gb166r70ry43nveXIZQuABdfP9ZVueBQ6dIV4gzclr9
+ T3QMf/bkPp2VN9TN5sd/4dEflY8gfYX/vQqODRKtrK+Izhm70lJna8tRR0QH1TcGjBgoTUfi3
+ VOtIf1J/PSAE+RJkUJCU2HoAB14=
 
-Hi LeoLiu-oc,
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Tue, 26 Dec 2023 11:00:20 +0100
 
-kernel test robot noticed the following build errors:
+The kfree() function was called in up to two cases by the
+__virtio_crypto_akcipher_do_req() function during error handling
+even if the passed variable contained a null pointer.
+This issue was detected by using the Coccinelle software.
 
-[auto build test ERROR on char-misc/char-misc-testing]
-[also build test ERROR on char-misc/char-misc-next char-misc/char-misc-linus herbert-cryptodev-2.6/master linus/master v6.7-rc7 next-20231222]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+* Adjust jump targets.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/LeoLiu-oc/hwrng-add-Zhaoxin-rng-driver-base-on-rep_xstore-instruction/20231225-153520
-base:   char-misc/char-misc-testing
-patch link:    https://lore.kernel.org/r/20231225025330.809554-1-LeoLiu-oc%40zhaoxin.com
-patch subject: [PATCH v4] hwrng: add Zhaoxin rng driver base on rep_xstore instruction
-config: i386-randconfig-141-20231225 (https://download.01.org/0day-ci/archive/20231226/202312261505.rDaQJwAq-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231226/202312261505.rDaQJwAq-lkp@intel.com/reproduce)
+* Delete two initialisations which became unnecessary
+  with this refactoring.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312261505.rDaQJwAq-lkp@intel.com/
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
 
-All errors (new ones prefixed by >>):
+v2:
+A typo was fixed for the delimiter of a label.
 
->> drivers/char/hw_random/via-rng.c:220:26: error: redefinition of 'via_rng_cpu_id' with a different type: 'struct x86_cpu_id[]' vs 'const struct x86_cpu_id[]'
-   static struct x86_cpu_id via_rng_cpu_id[] = {
-                            ^
-   drivers/char/hw_random/via-rng.c:38:32: note: previous definition is here
-   static const struct x86_cpu_id via_rng_cpu_id[];
-                                  ^
->> drivers/char/hw_random/via-rng.c:224:1: error: definition of variable with array type needs an explicit size or an initializer
-   MODULE_DEVICE_TABLE(x86cpu, via_rng_cpu_id);
-   ^
-   include/linux/module.h:244:21: note: expanded from macro 'MODULE_DEVICE_TABLE'
-   extern typeof(name) __mod_##type##__##name##_device_table               \
-                       ^
-   <scratch space>:56:1: note: expanded from here
-   __mod_x86cpu__via_rng_cpu_id_device_table
-   ^
-   drivers/char/hw_random/via-rng.c:38:32: warning: tentative array definition assumed to have one element
-   static const struct x86_cpu_id via_rng_cpu_id[];
-                                  ^
-   1 warning and 2 errors generated.
+ drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers=
+/crypto/virtio/virtio_crypto_akcipher_algs.c
+index 2621ff8a9376..057da5bd8d30 100644
+=2D-- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+@@ -224,11 +224,11 @@ static int __virtio_crypto_akcipher_do_req(struct vi=
+rtio_crypto_akcipher_request
+ 	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
+ 	struct virtio_crypto_op_data_req *req_data =3D vc_req->req_data;
+ 	struct scatterlist *sgs[4], outhdr_sg, inhdr_sg, srcdata_sg, dstdata_sg;
+-	void *src_buf =3D NULL, *dst_buf =3D NULL;
++	void *src_buf, *dst_buf =3D NULL;
+ 	unsigned int num_out =3D 0, num_in =3D 0;
+ 	int node =3D dev_to_node(&vcrypto->vdev->dev);
+ 	unsigned long flags;
+-	int ret =3D -ENOMEM;
++	int ret;
+ 	bool verify =3D vc_akcipher_req->opcode =3D=3D VIRTIO_CRYPTO_AKCIPHER_VE=
+RIFY;
+ 	unsigned int src_len =3D verify ? req->src_len + req->dst_len : req->src=
+_len;
 
-vim +220 drivers/char/hw_random/via-rng.c
+@@ -239,7 +239,7 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
+io_crypto_akcipher_request
+ 	/* src data */
+ 	src_buf =3D kcalloc_node(src_len, 1, GFP_KERNEL, node);
+ 	if (!src_buf)
+-		goto err;
++		return -ENOMEM;
 
-   219	
- > 220	static struct x86_cpu_id via_rng_cpu_id[] = {
-   221		X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 6, X86_FEATURE_XSTORE, NULL),
-   222		{}
-   223	};
- > 224	MODULE_DEVICE_TABLE(x86cpu, via_rng_cpu_id);
-   225	
+ 	if (verify) {
+ 		/* for verify operation, both src and dst data work as OUT direction */
+@@ -254,7 +254,7 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
+io_crypto_akcipher_request
+ 		/* dst data */
+ 		dst_buf =3D kcalloc_node(req->dst_len, 1, GFP_KERNEL, node);
+ 		if (!dst_buf)
+-			goto err;
++			goto free_src;
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+ 		sg_init_one(&dstdata_sg, dst_buf, req->dst_len);
+ 		sgs[num_out + num_in++] =3D &dstdata_sg;
+@@ -277,9 +277,9 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
+io_crypto_akcipher_request
+ 	return 0;
+
+ err:
+-	kfree(src_buf);
+ 	kfree(dst_buf);
+-
++free_src:
++	kfree(src_buf);
+ 	return -ENOMEM;
+ }
+
+=2D-
+2.43.0
+
