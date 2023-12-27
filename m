@@ -1,44 +1,44 @@
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9093B5243;
-	Wed, 27 Dec 2023 07:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238705396;
+	Wed, 27 Dec 2023 07:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LhBwSG62"
-Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-4b6e1c5ec4cso732656e0c.3;
-        Tue, 26 Dec 2023 23:02:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vbj1AV3w"
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-4670adbd76aso190726137.1;
+        Tue, 26 Dec 2023 23:13:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703660522; x=1704265322; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703661217; x=1704266017; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZonpFW4K5Y0IYTZ34YC2yNUOUaHYW4NGLEuqLs8OBdc=;
-        b=LhBwSG62p/5ThHGFhOrYaJMHG9Yfb9PxE7yWauIE36U5nZTuoJvdF9qYbKODQjfMt6
-         nALd99PKEpSofQXuw4lxrOMQFmIxShBY+6pb0Db0fHBIOLIsekJPNv8deqoy0n3gAqx6
-         rqzCiYSoYY6I8yZL7HkaBJaEOvTMUd8A9MeZiBJWxPkkukyvgSiwnCkvgclB4SnGGRTs
-         w4XIawI2yR5+TxkrfiB+oofJQzwNcVzJmwxpjg7UBVMdDwsFPI4VXkbq2LB4KaU5n7yL
-         q2IYFQ0ChQAPRWay/jbnYD/Mc1JnkjWSnLv1ijDkWbTz2y+xR/L+LdqxM0mb7Vqljpdn
-         dkfQ==
+        bh=bI5XYag/xBEdGlLpq8ziFqLraW0qgoQHf4BpnqJgzqo=;
+        b=Vbj1AV3wNRQj6tuGwki3SvmfVOihRJcZOOPzxKj/jrOyhxDE2596bwZL343IzdsG2L
+         3NI0T7A4qIG6+D+k75Q/cnkEGDWpZDVAzm80TjJ8BEpVvkrwBgSYYUqdTJ1dQQ1eMhqD
+         6toaMAD+a+60OeQWvBev1mfPmW5+U8ZoiEJ4KSwJCeW5nuxNVj/dVHLVUscfvoqQKybN
+         NP7X2vtB44XkSVyjc4qfwsysWvIp2rAsbDznL4wRuHUa3UL+iXOP8y+v3WQmDpJNy6Ux
+         a1feIcapc8OaHXB699iuNEBN17Vx9Yr7gXkcf+X7EcsveeqRJAjA+RdqTQlwb0hYFOn/
+         bh0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703660522; x=1704265322;
+        d=1e100.net; s=20230601; t=1703661217; x=1704266017;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZonpFW4K5Y0IYTZ34YC2yNUOUaHYW4NGLEuqLs8OBdc=;
-        b=WRAxkOg87d06tBoVcIU32ZlZ9MFk13dA3AsMeW3h4/ErWiqfvBKkNti5SEAAlWPeCl
-         aBAObKVLdwHgBw0QBfHPskhi925n9chIPqkyvS83Vo+8n2XezkPDckSdZ5vs7V7eRy/4
-         Mz4fUB2SQXz4OSAEhHaOjop5DZDzsbINk3agrJ/Xp1HMe5bs1bneHAAGKyNZHZ8mCy5Y
-         R5OTA6zIhIZYHJqxBJAHq13mMiMztHP+XCi5EjKk1JLdU55WBBExTuv9Ekg/K1Fl7xjc
-         RgZu7M0iPE9U8F5rtt20tSjulNaFYLiCHSndND0j60q+TVIq6+bOUEiUI3r0/QWnLk1L
-         Vt5w==
-X-Gm-Message-State: AOJu0YwaKn4G7FoeX94BlkXppVbHzT/xYa+fj3CX1Rqc0ItGl4hB1R8Y
-	8v4j4L9meRvfRJw8L/exPiLj4SMfau8xUjVq8hQ=
-X-Google-Smtp-Source: AGHT+IEbjhm65h7L9Leku/YfOA/k/oFzTL8QjupHeo2SdYNyZH9jzeSQSxBSEPCCS0ymM9+AhIo4RepwJY3wSinKMbc=
-X-Received: by 2002:a05:6122:3105:b0:4b6:de44:dfd7 with SMTP id
- cg5-20020a056122310500b004b6de44dfd7mr2254613vkb.20.1703660522288; Tue, 26
- Dec 2023 23:02:02 -0800 (PST)
+        bh=bI5XYag/xBEdGlLpq8ziFqLraW0qgoQHf4BpnqJgzqo=;
+        b=ZUeJi0pbp5iFwX4I5gj/YO9hogwOeJksF+M0Lxul/LRPTIGVOkiLLpekE8+0fc66cx
+         FfmoodQSGIPL0OjDtMkvKdLRksbMh+ldq6hFS/d0wElQYfZ2j2zW0/DJG3UG8EWODqPC
+         wTB54/a8bQL4LJMmXOZTDrRUUwBNQZKTXrpEDlnYa3fj2xHKd73YTobEf+WAHOb53IRa
+         gcMMY3d8wmsFhxNdNT49r7Q4lbsFFeG4MLxWGTyiV7dVlpQ66FuXr+fA5L5uA5B25F2e
+         jxrDVUI2rPPrbc8hjUH5zdTvPVl8vRq8jMAu6iphEqFHOfvP2BnHF0LNvSkAWn8j7kUK
+         WRfQ==
+X-Gm-Message-State: AOJu0YyOUyxucBOWjumEYfqh384mmL9FsSu2HkAWGPeqaVyL+lCZMnz0
+	eHParEmCVWYQB/fpS26rkgcDTi0g5DJStyKHbIo=
+X-Google-Smtp-Source: AGHT+IEPW2kQ6zIFhF30iU6+cGNgtqStDkndxfsaDvTpMQWqSuhwj/wIuU5uiifUpoBleHwAeOOQZd7bSslyLl9pp38=
+X-Received: by 2002:a05:6102:3c84:b0:467:d0e:cc50 with SMTP id
+ c4-20020a0561023c8400b004670d0ecc50mr892661vsv.8.1703661216926; Tue, 26 Dec
+ 2023 23:13:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,8 +54,8 @@ References: <0000000000000b05cd060d6b5511@google.com> <CAKEwX=OmWYivf7dg_izW8pn5
  <5aff3bcf-ef36-45b3-8ac0-a4b19697419c@bytedance.com>
 In-Reply-To: <5aff3bcf-ef36-45b3-8ac0-a4b19697419c@bytedance.com>
 From: Barry Song <21cnbao@gmail.com>
-Date: Wed, 27 Dec 2023 20:01:50 +1300
-Message-ID: <CAGsJ_4xuuaPnQzkkQVaRyZL6ZdwkiQ_B7_c2baNaCKVg_O7ZQA@mail.gmail.com>
+Date: Wed, 27 Dec 2023 20:13:25 +1300
+Message-ID: <CAGsJ_4yJEr21-HijCL8tSXuosF3WtrmB0pTLGPLvhQ6DD22QzA@mail.gmail.com>
 Subject: Re: [syzbot] [crypto?] general protection fault in
  scatterwalk_copychunks (5)
 To: Chengming Zhou <zhouchengming@bytedance.com>
@@ -150,6 +150,11 @@ low data.
 > No, crypto_scomp_compress() writes to its own scomp_scratch->dst memory, =
 then copy
 > to our dstmem.
+
+Thanks, I got your point as you were using scomp. I used to depend on
+acomp, so that
+wasn't the case.
+
 >
 > >
 > > BTW, in many cases, hardware-accelerators drivers/crypto can do compres=
@@ -163,52 +168,12 @@ sion and
 >
 > But how do we know 2 pages is enough for any compression algorithm?
 >
-
-There is no guarrette 2 pages is enough.
-
-We can invent our own compression algorithm, in our algorithm, we can
-add a lot of metadata, for example, longer than 4KB when the source data
-is uncompress-able. then dst can be larger than 2 * PAGE_SIZE.  but this
-is not the case :-) This kind of algorithm may never succeed.
-
-For those in-tree algorithms, we have a WORST_COMPR_FACTOR. in
-ubifs, zram and zswap, we all use "2" as the worst comp factor.
-
-/*
- * Some compressors, like LZO, may end up with more data then the input buf=
-fer.
- * So UBIFS always allocates larger output buffer, to be sure the compresso=
-r
- * will not corrupt memory in case of worst case compression.
- */
-#define WORST_COMPR_FACTOR 2
-
-#ifdef CONFIG_FS_ENCRYPTION
-#define UBIFS_CIPHER_BLOCK_SIZE FSCRYPT_CONTENTS_ALIGNMENT
-#else
-#define UBIFS_CIPHER_BLOCK_SIZE 0
-#endif
-
-/*
- * How much memory is needed for a buffer where we compress a data node.
- */
-#define COMPRESSED_DATA_NODE_BUF_SZ \
-        (UBIFS_DATA_NODE_SZ + UBIFS_BLOCK_SIZE * WORST_COMPR_FACTOR)
-
-
-For years, we have never seen 2 pages that can be a problem. but 1
-page is definitely
-not enough, I remember I once saw many cases where accelerators' dmaengine
-can write more than 1 page.
-
 > Thanks.
 >
 > >
 > >>                 scatterwalk_map_and_copy(scratch->dst, req->dst, 0, re=
 q->dlen,
 > >>                                          1);
-> >
-> >
 
 Thanks
-Barry
+ Barry
