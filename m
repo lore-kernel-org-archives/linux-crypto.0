@@ -1,135 +1,270 @@
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991BD3C16
-	for <linux-crypto@vger.kernel.org>; Wed, 27 Dec 2023 03:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="hU2dmQ93"
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6dc02ab3cc9so236530a34.3
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Dec 2023 19:51:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1703649098; x=1704253898; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=reORFa1TwZDZzjEgWJpjbpsKpL4fAljPjBgD+hVKVJk=;
-        b=hU2dmQ93D3n7mAwObNfHNnvbE/HkzuW26DA4hFruXO4F+l4sztz1hiWV1YVaUwXSRT
-         a86AjqZsqxDnp0vHTxW6N3i6NmN4PCSlgO1eOp48C0urxd4wUHbdXPiZe2AByUF743LG
-         0RsoOxAFaRKjN0AVBSdfjV+l2o7kmVq71ec+h2oMaxZF+Rg01TW+USNi5aDSKsv6PwFY
-         8eOQag1AnxXyJFVQAHZxfik1eVhd0qsDNWZWZuRl7hAMvd4LJxw4nIleG1Y9aa2KkXoz
-         WOSnOc/bPaSeznjdIL1Lhv+MMcRl2Lv9utwQW/2BSHlXbA2ybD20hs7vWCczBNIH0F9l
-         lbhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703649098; x=1704253898;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=reORFa1TwZDZzjEgWJpjbpsKpL4fAljPjBgD+hVKVJk=;
-        b=nOIm3u1hK2NJH8Ee/3fnga0Wzoh8EV19ROg4KkhMu+InTJ24kQbssZ6BSxpE3253CU
-         na2xIlvInt+OrxY7PBDinSMaNnEqJCPICSH3jYkTD1x/9mnEsbUoaaji3Hn3PKpZSXUL
-         uCTlbrNRrtTkVf7EEpR51XhHMpxp36yPBen2Ux6iV8CXcf2qmqmlZGD7/vYFbAWG2ZeS
-         bxrYmKV4j+OPEjx+MuxVtsyiL//SbFx9JiSCXN043tu2YC6GBVt7LxbT4M5nmgmuMHR8
-         VMS7LBJ+TOPhsJy/YzS6Iv+Ni97mI2ncm6yGGxnjsGc3fi4uRfNc7vjUxESjyoxXe6mP
-         Vxgg==
-X-Gm-Message-State: AOJu0YzWAWDwSQRmNnLiabN8kPuVD+JzTBw7cYBrA2lJQoiexRkoZOeG
-	NDAhuZNpY979+MP9SlEkDB92NqFsZ3oSbQ==
-X-Google-Smtp-Source: AGHT+IHsOaVjT3F8LcJBDltNKHVmej/2YzvoPIbersq8N/MJhN80Uw+LY6nNoHDtNvYGn9+jHBdOcg==
-X-Received: by 2002:a05:6808:120e:b0:3ba:a85:42b2 with SMTP id a14-20020a056808120e00b003ba0a8542b2mr11245601oil.58.1703649098602;
-        Tue, 26 Dec 2023 19:51:38 -0800 (PST)
-Received: from [10.254.10.159] ([139.177.225.237])
-        by smtp.gmail.com with ESMTPSA id b15-20020aa78ecf000000b006d9a7a48bbesm6304822pfr.116.2023.12.26.19.51.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Dec 2023 19:51:38 -0800 (PST)
-Message-ID: <f27efd2e-ac65-4f6a-b1b5-c9fb0753d871@bytedance.com>
-Date: Wed, 27 Dec 2023 11:51:32 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DFA3C0D
+	for <linux-crypto@vger.kernel.org>; Wed, 27 Dec 2023 03:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1703649534-1eb14e0c7f05670001-Xm9f1P
+Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx2.zhaoxin.com with ESMTP id ol8BZVWtAkBcDxpH (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Wed, 27 Dec 2023 11:58:54 +0800 (CST)
+X-Barracuda-Envelope-From: LeoLiu-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+Received: from ZXBJMBX02.zhaoxin.com (10.29.252.6) by ZXSHMBX3.zhaoxin.com
+ (10.28.252.165) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 27 Dec
+ 2023 11:58:54 +0800
+Received: from xin.lan (10.32.64.1) by ZXBJMBX02.zhaoxin.com (10.29.252.6)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 27 Dec
+ 2023 11:58:51 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+From: LeoLiu-oc <LeoLiu-oc@zhaoxin.com>
+X-Barracuda-RBL-Trusted-Forwarder: 10.29.252.6
+To: <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
+	<jiajie.ho@starfivetech.com>, <conor.dooley@microchip.com>,
+	<martin@kaiser.cx>, <mmyangfl@gmail.com>, <jenny.zhang@starfivetech.com>,
+	<robh@kernel.org>, <l.stelmach@samsung.com>, <ardb@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+CC: <CobeChen@zhaoxin.com>, <TonyWWang@zhaoxin.com>, <YunShen@zhaoxin.com>,
+	<LeoLiu@zhaoxin.com>, LeoLiuoc <LeoLiu-oc@zhaoxin.com>
+Subject: [PATCH v5] hwrng: add Zhaoxin rng driver base on rep_xstore instruction
+Date: Wed, 27 Dec 2023 11:58:51 +0800
+X-ASG-Orig-Subj: [PATCH v5] hwrng: add Zhaoxin rng driver base on rep_xstore instruction
+Message-ID: <20231227035851.818569-1-LeoLiu-oc@zhaoxin.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231107070900.496827-1-LeoLiu-oc@zhaoxin.com>
+References: <20231107070900.496827-1-LeoLiu-oc@zhaoxin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [crypto?] general protection fault in
- scatterwalk_copychunks (5)
-Content-Language: en-US
-To: Nhat Pham <nphamcs@gmail.com>, Chris Li <chrisl@kernel.org>,
- 21cnbao@gmail.com
-Cc: syzbot <syzbot+3eff5e51bf1db122a16e@syzkaller.appspotmail.com>,
- akpm@linux-foundation.org, davem@davemloft.net, herbert@gondor.apana.org.au,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, yosryahmed@google.com
-References: <0000000000000b05cd060d6b5511@google.com>
- <CAKEwX=OmWYivf7dg_izW8pn5s5q15+nx-vRMsV47T_qG=dep_Q@mail.gmail.com>
- <CAF8kJuPLEXEXG+4esR6MbRa3iirTrJ7-w3YCorB9iD=gnQ+G3A@mail.gmail.com>
- <CAKEwX=PaFmreqmNrisatSN1=k2kRiYgDksgDze-t=GBD=0iJDg@mail.gmail.com>
- <CAF8kJuPF5ACu8o1P7GqEQRb6p8QShyTVNuzrrY557g+SsddzWA@mail.gmail.com>
- <CAKEwX=NHdr9=hUBiZhnLZyRPsp=JwN3Vkwud2XEn3=pNurYGpQ@mail.gmail.com>
-From: Chengming Zhou <zhouchengming@bytedance.com>
-In-Reply-To: <CAKEwX=NHdr9=hUBiZhnLZyRPsp=JwN3Vkwud2XEn3=pNurYGpQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
+ ZXBJMBX02.zhaoxin.com (10.29.252.6)
+X-Barracuda-Connect: ZXSHMBX3.zhaoxin.com[10.28.252.165]
+X-Barracuda-Start-Time: 1703649534
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 6453
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.118617
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-On 2023/12/27 08:23, Nhat Pham wrote:
-> On Tue, Dec 26, 2023 at 3:30 PM Chris Li <chrisl@kernel.org> wrote:
->>
->> Again, sorry I was looking at the decompression side rather than the
->> compression side. The compression side does not even offer a safe
->> version of the compression function.
->> That seems to be dangerous. It seems for now we should make the zswap
->> roll back to 2 page buffer until we have a safe way to do compression
->> without overwriting the output buffers.
-> 
-> Unfortunately, I think this is the way - at least until we rework the
-> crypto/compression API (if that's even possible?).
-> I still think the 2 page buffer is dumb, but it is what it is :(
+From: LeoLiuoc <LeoLiu-oc@zhaoxin.com>
 
-Hi,
+Add support for Zhaoxin hardware random number generator.
+This driver base on rep_xstore instruction and uses the same
+X86_FEATURE_XSTORE as via-rng driver. Therefore, modify the x86_cpu_id
+array in the via-rng driver, so that the corresponding driver can be
+correctly loader on respective platforms.
 
-I think it's a bug in `scomp_acomp_comp_decomp()`, which doesn't use
-the caller passed "src" and "dst" scatterlist. Instead, it uses its own
-per-cpu "scomp_scratch", which have 128KB src and dst.
+v1 -> v2:
+1. Fix assembler code errors
+2. Remove redundant CPU model check codes
 
-When compression done, it uses the output req->dlen to copy scomp_scratch->dst
-to our dstmem, which has only one page now, so this problem happened.
+v2 -> v3:
+1. Optimize code details based on the kernel style
 
-I still don't know why the alg->compress(src, slen, dst, &dlen) doesn't
-check the dlen? It seems an obvious bug, right?
+v3 -> v4:
+1. Fix a typographical error
 
-As for this problem in `scomp_acomp_comp_decomp()`, this patch below
-should fix it. I will set up a few tests to check later.
+v4 -> v5:
+1. Modified the definition and declaration of the x86_cpu_id table
 
-Thanks!
+Signed-off-by: LeoLiuoc <LeoLiu-oc@zhaoxin.com>
+---
+ drivers/char/hw_random/Kconfig       | 12 ++++
+ drivers/char/hw_random/Makefile      |  1 +
+ drivers/char/hw_random/via-rng.c     | 10 +--
+ drivers/char/hw_random/zhaoxin-rng.c | 93 ++++++++++++++++++++++++++++
+ 4 files changed, 111 insertions(+), 5 deletions(-)
+ create mode 100644 drivers/char/hw_random/zhaoxin-rng.c
 
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 442a82c9de7d..e654a120ae5a 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -117,6 +117,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
-        struct crypto_scomp *scomp = *tfm_ctx;
-        void **ctx = acomp_request_ctx(req);
-        struct scomp_scratch *scratch;
-+       unsigned int dlen;
-        int ret;
-
-        if (!req->src || !req->slen || req->slen > SCOMP_SCRATCH_SIZE)
-@@ -128,6 +129,8 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
-        if (!req->dlen || req->dlen > SCOMP_SCRATCH_SIZE)
-                req->dlen = SCOMP_SCRATCH_SIZE;
-
-+       dlen = req->dlen;
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 442c40efb200..3c1c4fa1203c 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -152,6 +152,18 @@ config HW_RANDOM_VIA
+ 
+ 	  If unsure, say Y.
+ 
++config HW_RANDOM_ZHAOXIN
++	tristate "Zhaoxin HW Random Number Generator support"
++	depends on X86
++	help
++	  This driver provides kernel-side support for the Random Number
++	  Generator hardware found on Zhaoxin based motherboards.
 +
-        scratch = raw_cpu_ptr(&scomp_scratch);
-        spin_lock(&scratch->lock);
++	  To compile this driver as a module, choose M here: the
++	  module will be called zhaoxin-rng.
++
++	  If unsure, say Y.
++
+ config HW_RANDOM_IXP4XX
+ 	tristate "Intel IXP4xx NPU HW Pseudo-Random Number Generator support"
+ 	depends on ARCH_IXP4XX || COMPILE_TEST
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index 32549a1186dc..ef5b3ae0794d 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -14,6 +14,7 @@ obj-$(CONFIG_HW_RANDOM_GEODE) += geode-rng.o
+ obj-$(CONFIG_HW_RANDOM_N2RNG) += n2-rng.o
+ n2-rng-y := n2-drv.o n2-asm.o
+ obj-$(CONFIG_HW_RANDOM_VIA) += via-rng.o
++obj-$(CONFIG_HW_RANDOM_ZHAOXIN) += zhaoxin-rng.o
+ obj-$(CONFIG_HW_RANDOM_EXYNOS) += exynos-trng.o
+ obj-$(CONFIG_HW_RANDOM_IXP4XX) += ixp4xx-rng.o
+ obj-$(CONFIG_HW_RANDOM_OMAP) += omap-rng.o
+diff --git a/drivers/char/hw_random/via-rng.c b/drivers/char/hw_random/via-rng.c
+index a9a0a3b09c8b..4288e1114fc9 100644
+--- a/drivers/char/hw_random/via-rng.c
++++ b/drivers/char/hw_random/via-rng.c
+@@ -35,7 +35,7 @@
+ #include <asm/cpufeature.h>
+ #include <asm/fpu/api.h>
+ 
+-
++static struct x86_cpu_id via_rng_cpu_id[];
+ 
+ 
+ enum {
+@@ -135,7 +135,7 @@ static int via_rng_init(struct hwrng *rng)
+ 	 * is always enabled if CPUID rng_en is set.  There is no
+ 	 * RNG configuration like it used to be the case in this
+ 	 * register */
+-	if (((c->x86 == 6) && (c->x86_model >= 0x0f))  || (c->x86 > 6)){
++	if ((c->x86 == 6) && (c->x86_model >= 0x0f)) {
+ 		if (!boot_cpu_has(X86_FEATURE_XSTORE_EN)) {
+ 			pr_err(PFX "can't enable hardware RNG "
+ 				"if XSTORE is not enabled\n");
+@@ -196,7 +196,7 @@ static int __init via_rng_mod_init(void)
+ {
+ 	int err;
+ 
+-	if (!boot_cpu_has(X86_FEATURE_XSTORE))
++	if (!x86_match_cpu(via_rng_cpu_id))
+ 		return -ENODEV;
+ 
+ 	pr_info("VIA RNG detected\n");
+@@ -217,8 +217,8 @@ static void __exit via_rng_mod_exit(void)
+ }
+ module_exit(via_rng_mod_exit);
+ 
+-static struct x86_cpu_id __maybe_unused via_rng_cpu_id[] = {
+-	X86_MATCH_FEATURE(X86_FEATURE_XSTORE, NULL),
++static struct x86_cpu_id via_rng_cpu_id[] = {
++	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 6, X86_FEATURE_XSTORE, NULL),
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(x86cpu, via_rng_cpu_id);
+diff --git a/drivers/char/hw_random/zhaoxin-rng.c b/drivers/char/hw_random/zhaoxin-rng.c
+new file mode 100644
+index 000000000000..5b4586c6dc8a
+--- /dev/null
++++ b/drivers/char/hw_random/zhaoxin-rng.c
+@@ -0,0 +1,93 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * RNG driver for Zhaoxin RNGs
++ *
++ * Copyright 2023 (c) Zhaoxin Semiconductor Co., Ltd
++ */
++
++#include <asm/cpu_device_id.h>
++#include <asm/fpu/api.h>
++#include <crypto/padlock.h>
++#include <linux/cpufeature.h>
++#include <linux/delay.h>
++#include <linux/hw_random.h>
++#include <linux/io.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++
++enum {
++	ZHAOXIN_RNG_CHUNK_8		= 0x00, /* 64 rand bits, 64 stored bits */
++	ZHAOXIN_RNG_CHUNK_4		= 0x01, /* 32 rand bits, 32 stored bits */
++	ZHAOXIN_RNG_CHUNK_2		= 0x02, /* 16 rand bits, 32 stored bits */
++	ZHAOXIN_RNG_CHUNK_1		= 0x03, /*  8 rand bits, 32 stored bits */
++	ZHAOXIN_RNG_MAX_SIZE	= (128 * 1024),
++};
++
++static int zhaoxin_rng_init(struct hwrng *rng)
++{
++	if (!boot_cpu_has(X86_FEATURE_XSTORE_EN)) {
++		pr_err(PFX "can't enable hardware RNG if XSTORE is not enabled\n");
++		return -ENODEV;
++	}
++
++	return 0;
++}
++
++static inline int rep_xstore(size_t size, size_t factor, void *result)
++{
++	asm(".byte 0xf3, 0x0f, 0xa7, 0xc0"
++		: "=m"(*(size_t *)result), "+c"(size), "+d"(factor), "+D"(result));
++
++	return 0;
++}
++
++static int zhaoxin_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
++{
++	if (max > ZHAOXIN_RNG_MAX_SIZE)
++		max = ZHAOXIN_RNG_MAX_SIZE;
++
++	rep_xstore(max, ZHAOXIN_RNG_CHUNK_1, data);
++
++	return max;
++}
++
++static struct hwrng zhaoxin_rng = {
++	.name = "zhaoxin",
++	.init = zhaoxin_rng_init,
++	.read = zhaoxin_rng_read,
++};
++
++static struct x86_cpu_id zhaoxin_rng_cpu_ids[] = {
++	X86_MATCH_VENDOR_FAM_FEATURE(ZHAOXIN, 6, X86_FEATURE_XSTORE, NULL),
++	X86_MATCH_VENDOR_FAM_FEATURE(ZHAOXIN, 7, X86_FEATURE_XSTORE, NULL),
++	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 7, X86_FEATURE_XSTORE, NULL),
++	{}
++};
++MODULE_DEVICE_TABLE(x86cpu, zhaoxin_rng_cpu_ids);
++
++static int __init zhaoxin_rng_mod_init(void)
++{
++	int err;
++
++	if (!x86_match_cpu(zhaoxin_rng_cpu_ids))
++		return -ENODEV;
++
++	pr_info("Zhaoxin RNG detected\n");
++
++	err = hwrng_register(&zhaoxin_rng);
++	if (err)
++		pr_err(PFX "RNG registering failed (%d)\n", err);
++
++	return err;
++}
++module_init(zhaoxin_rng_mod_init);
++
++static void __exit zhaoxin_rng_mod_exit(void)
++{
++	hwrng_unregister(&zhaoxin_rng);
++}
++module_exit(zhaoxin_rng_mod_exit);
++
++MODULE_DESCRIPTION("H/W RNG driver for Zhaoxin CPUs");
++MODULE_AUTHOR("YunShen@zhaoxin.com");
++MODULE_LICENSE("GPL");
+-- 
+2.34.1
 
-@@ -145,6 +148,9 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
-                                ret = -ENOMEM;
-                                goto out;
-                        }
-+               } else if (req->dlen > dlen) {
-+                       ret = -ENOMEM;
-+                       goto out;
-                }
-                scatterwalk_map_and_copy(scratch->dst, req->dst, 0, req->dlen,
-                                         1);
