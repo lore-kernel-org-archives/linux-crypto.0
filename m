@@ -1,106 +1,155 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0873C15
-	for <linux-crypto@vger.kernel.org>; Wed, 27 Dec 2023 04:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6E15228;
+	Wed, 27 Dec 2023 06:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bRWChaRh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703649831;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DYnbMfr6YIqES14uXvQ/ldz8qMPfpB6A/e3ZgdEIsFI=;
-	b=bRWChaRhCoxDK3a1bYkNAmsX5yBprNKwiOlzSYnV5u12Qf6jRCOBgcT5arL+l9e8CxjfP/
-	1c1GvAJlfsaoWopux1K01D+wHNeAhMPFJ13DuYvQNXltjGNoldwdRzYNvN0RgsJom5nmX0
-	27elFPnmalnq2omuC0y09nk4YAyQckY=
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
- [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-624--r1j-HCrPK-Slzb60ZQPPw-1; Tue, 26 Dec 2023 23:03:49 -0500
-X-MC-Unique: -r1j-HCrPK-Slzb60ZQPPw-1
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-20424523dc8so7826307fac.3
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Dec 2023 20:03:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H5rKazag"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-4b739b29686so1067343e0c.0;
+        Tue, 26 Dec 2023 22:25:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703658319; x=1704263119; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9ijI6BUCxQZE7tp2fvrWgnfg+vOELf49mKAjgd2qQ+w=;
+        b=H5rKazaglC125FK+ydM4gSTy6fZBhBhoMf70oUs7bdLUUW/XalNgAseUFw3He62PUL
+         nN4rjfjYk34GDvHMxtwYWSc3xmdaikAyTlsQFpAZIeTdb3r9iWN1EgShK+l9R48PXeKe
+         SSxcbKqUEGF2VMaTE5yQF0XIPD/7AwBzaZU7pwG1Btz2rHBAwbqf+yMAoBOlunkJbfZM
+         nTo29RuL6/1xvx2V2KNQdB8+SYsd9GC+fcR394ftPxrStARqjEpQmx9njdGeFmrXLmSa
+         PJGVfVkO9c67cjO+ydZipSOtYR6SONEIW28aeMCOmsn1Q4q8t8QzD5oOP+gJONaQt5Sp
+         DSTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703649829; x=1704254629;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DYnbMfr6YIqES14uXvQ/ldz8qMPfpB6A/e3ZgdEIsFI=;
-        b=ia4DPOEmgtkIvGPa1aeiEuu4i/z+GDBkqoyYbcn0bfjeEEzyjl8+2EEICq/Ylr/1jW
-         tq6+3ZNtbI/hhUD32fBMQSmypBisTUKD5e6qltEgWizktZq5bWSEkx2O6UzvS+z4tBCJ
-         pXLMVrvrOTBG+hiI386sG9ERhfYoaZm5tiZdJbEgokqcMMf7p1t5J05WnUUi+Xfc+4I2
-         GqXcM9NkWU3hgKmTkzA5/N5qlZRCo9HE0II+bJsSDagQQxT8nNOprgtOHfbiWlElVzlO
-         ih+OaF972tyG8Eu5YX6f4IK87xcCn6T5jVkB6CZpWooUG795zIihz3pf2/xKDOxG92kO
-         J2hQ==
-X-Gm-Message-State: AOJu0YyvMfkmMBC3dRpV4p9X0diEUsAxDgN+T5zgq3eEmggsrII+zXD4
-	8fUu2rEUJR5UT2U0AvZFTqELTK7CHECl6h0fcwBuhVslBvULZr15LHDsTz76VsyT3SOaxptidvP
-	1L8wmox3TCURtt05kWuVQSKwjMPj+7MpD
-X-Received: by 2002:a05:6870:15c2:b0:203:e8e:b384 with SMTP id k2-20020a05687015c200b002030e8eb384mr9426555oad.85.1703649828784;
-        Tue, 26 Dec 2023 20:03:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH/hVWKYtpZpePv2eJ0Sb9VQ6qgeZc7WsAMDw91Zve0Bn53uUZnV9VO8T1gC0+TBrNy1CxwjA==
-X-Received: by 2002:a05:6870:15c2:b0:203:e8e:b384 with SMTP id k2-20020a05687015c200b002030e8eb384mr9426544oad.85.1703649828536;
-        Tue, 26 Dec 2023 20:03:48 -0800 (PST)
-Received: from localhost ([240d:1a:c0d:9f00:ad0f:51ab:624e:a513])
-        by smtp.gmail.com with ESMTPSA id a18-20020aa78e92000000b006d9beb968c3sm3746568pfr.106.2023.12.26.20.03.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Dec 2023 20:03:48 -0800 (PST)
-Date: Wed, 27 Dec 2023 13:03:42 +0900 (JST)
-Message-Id: <20231227.130342.618032792909202594.syoshida@redhat.com>
-To: herbert@gondor.apana.org.au
-Cc: davem@davemloft.net, dhowells@redhat.com, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: af_alg/hash: Fix uninit-value access in
- af_alg_free_sg()
-From: Shigeru Yoshida <syoshida@redhat.com>
-In-Reply-To: <ZYUFs1MumRFf3mnv@gondor.apana.org.au>
-References: <20231211135949.689204-1-syoshida@redhat.com>
-	<ZYUFs1MumRFf3mnv@gondor.apana.org.au>
-X-Mailer: Mew version 6.9 on Emacs 29.1
+        d=1e100.net; s=20230601; t=1703658319; x=1704263119;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9ijI6BUCxQZE7tp2fvrWgnfg+vOELf49mKAjgd2qQ+w=;
+        b=NVMtAFUf9nZEQ71RiAqiWc7IR5X11O1HO/8uRme/yzlH84uEhTKxwPij2gBUrUOP56
+         8MtRn97OgghnJkpomZkYG8L46pY7MK7ENjTwSh2qFZIJVwhfoo4rQl0utF9pCkQQa7ee
+         GKZYBG8pd0W9z+BCW4Ovd13gACkC5R4gq+7ygS++ylV5WjGP2zEL9z8W64tAZKrEq409
+         KWGrihaZdIx+tod0EinRL+RQtNRm2/G/xXNjpcnh/I2N7+h5J5vlcWMBqSDxCAUzraj8
+         wDdrFJ3aXYBMHhikkvuNeejx7unicoAj0g2oTHDlpoe6SNi/2FVC4X2XMGt26a5RyGKR
+         nGwA==
+X-Gm-Message-State: AOJu0Yw+wj6kem5ArGbyrsT4VGknYD6w9Ho2l7SFIK6KFZ6leioOhFCo
+	ahoepzhMSx8gaPsGXHMXChJUtq/bEFvHGGSYlrc=
+X-Google-Smtp-Source: AGHT+IG3qXHc+1qk+98QNVBj1uzFLYyx/iostOAaxJsdhr/+mjJV0F3s0kaFzO4d0sa0rcn/ZnqmfDcKOWu9mc+Fyq4=
+X-Received: by 2002:a05:6122:3bc9:b0:4b6:cb66:778a with SMTP id
+ ft9-20020a0561223bc900b004b6cb66778amr6140167vkb.14.1703658319183; Tue, 26
+ Dec 2023 22:25:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <0000000000000b05cd060d6b5511@google.com> <CAKEwX=OmWYivf7dg_izW8pn5s5q15+nx-vRMsV47T_qG=dep_Q@mail.gmail.com>
+ <CAF8kJuPLEXEXG+4esR6MbRa3iirTrJ7-w3YCorB9iD=gnQ+G3A@mail.gmail.com>
+ <CAKEwX=PaFmreqmNrisatSN1=k2kRiYgDksgDze-t=GBD=0iJDg@mail.gmail.com>
+ <CAF8kJuPF5ACu8o1P7GqEQRb6p8QShyTVNuzrrY557g+SsddzWA@mail.gmail.com>
+ <CAKEwX=NHdr9=hUBiZhnLZyRPsp=JwN3Vkwud2XEn3=pNurYGpQ@mail.gmail.com> <f27efd2e-ac65-4f6a-b1b5-c9fb0753d871@bytedance.com>
+In-Reply-To: <f27efd2e-ac65-4f6a-b1b5-c9fb0753d871@bytedance.com>
+From: Barry Song <21cnbao@gmail.com>
+Date: Wed, 27 Dec 2023 19:25:07 +1300
+Message-ID: <CAGsJ_4x31mT8TXt4c7ejJoDW1yJhyNqDmJmLZrf2LxMt7Zwg2A@mail.gmail.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in
+ scatterwalk_copychunks (5)
+To: Chengming Zhou <zhouchengming@bytedance.com>
+Cc: Nhat Pham <nphamcs@gmail.com>, Chris Li <chrisl@kernel.org>, 
+	syzbot <syzbot+3eff5e51bf1db122a16e@syzkaller.appspotmail.com>, 
+	akpm@linux-foundation.org, davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, yosryahmed@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 22 Dec 2023 11:42:43 +0800, Herbert Xu wrote:
-> On Mon, Dec 11, 2023 at 10:59:49PM +0900, Shigeru Yoshida wrote:
->>
->> Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
-> 
-> I think it should actually be
-> 
-> 	b6d972f6898308fbe7e693bf8d44ebfdb1cd2dc4
-> 	crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
-> 
-> Anyway, I think we should fix it by adding a new goto label that
-> does not free the SG list:
-> 
-> unlock_free:
-> 	af_alg_free_sg(&ctx->sgl);
-> <--- Add new label here
-> 	hash_free_result(sk, ctx);
-> 	ctx->more = false;
-> 	goto unlock;
+On Wed, Dec 27, 2023 at 4:51=E2=80=AFPM Chengming Zhou
+<zhouchengming@bytedance.com> wrote:
+>
+> On 2023/12/27 08:23, Nhat Pham wrote:
+> > On Tue, Dec 26, 2023 at 3:30=E2=80=AFPM Chris Li <chrisl@kernel.org> wr=
+ote:
+> >>
+> >> Again, sorry I was looking at the decompression side rather than the
+> >> compression side. The compression side does not even offer a safe
+> >> version of the compression function.
+> >> That seems to be dangerous. It seems for now we should make the zswap
+> >> roll back to 2 page buffer until we have a safe way to do compression
+> >> without overwriting the output buffers.
+> >
+> > Unfortunately, I think this is the way - at least until we rework the
+> > crypto/compression API (if that's even possible?).
+> > I still think the 2 page buffer is dumb, but it is what it is :(
+>
+> Hi,
+>
+> I think it's a bug in `scomp_acomp_comp_decomp()`, which doesn't use
+> the caller passed "src" and "dst" scatterlist. Instead, it uses its own
+> per-cpu "scomp_scratch", which have 128KB src and dst.
+>
+> When compression done, it uses the output req->dlen to copy scomp_scratch=
+->dst
+> to our dstmem, which has only one page now, so this problem happened.
+>
+> I still don't know why the alg->compress(src, slen, dst, &dlen) doesn't
+> check the dlen? It seems an obvious bug, right?
+>
+> As for this problem in `scomp_acomp_comp_decomp()`, this patch below
+> should fix it. I will set up a few tests to check later.
+>
+> Thanks!
+>
+> diff --git a/crypto/scompress.c b/crypto/scompress.c
+> index 442a82c9de7d..e654a120ae5a 100644
+> --- a/crypto/scompress.c
+> +++ b/crypto/scompress.c
+> @@ -117,6 +117,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *=
+req, int dir)
+>         struct crypto_scomp *scomp =3D *tfm_ctx;
+>         void **ctx =3D acomp_request_ctx(req);
+>         struct scomp_scratch *scratch;
+> +       unsigned int dlen;
+>         int ret;
+>
+>         if (!req->src || !req->slen || req->slen > SCOMP_SCRATCH_SIZE)
+> @@ -128,6 +129,8 @@ static int scomp_acomp_comp_decomp(struct acomp_req *=
+req, int dir)
+>         if (!req->dlen || req->dlen > SCOMP_SCRATCH_SIZE)
+>                 req->dlen =3D SCOMP_SCRATCH_SIZE;
+>
+> +       dlen =3D req->dlen;
+> +
+>         scratch =3D raw_cpu_ptr(&scomp_scratch);
+>         spin_lock(&scratch->lock);
+>
+> @@ -145,6 +148,9 @@ static int scomp_acomp_comp_decomp(struct acomp_req *=
+req, int dir)
+>                                 ret =3D -ENOMEM;
+>                                 goto out;
+>                         }
+> +               } else if (req->dlen > dlen) {
+> +                       ret =3D -ENOMEM;
+> +                       goto out;
+>                 }
 
-Thanks for the feedback, and sorry for the late response.
+This can't fix the problem as crypto_scomp_compress() has written overflow =
+data.
 
-I'll check the code again, and send v2 patch.
+BTW, in many cases, hardware-accelerators drivers/crypto can do compression=
+ and
+decompression by off-loading CPU;
+we won't have a chance to let hardware check the dst buffer size. so
+giving the dst buffer
+with enough length to the hardware's dma engine is the right way. I
+mean, we shouldn't
+change dst from 2pages to 1page.
 
-Thanks,
-Shigeru
+>                 scatterwalk_map_and_copy(scratch->dst, req->dst, 0, req->=
+dlen,
+>                                          1);
 
-> 
-> Thanks,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> 
 
+Thanks
+Barry
