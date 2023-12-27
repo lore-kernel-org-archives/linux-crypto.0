@@ -1,117 +1,96 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E4B45946;
-	Wed, 27 Dec 2023 20:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB73748CF2;
+	Wed, 27 Dec 2023 23:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lrvdMeg6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703708933; x=1735244933;
-  h=message-id:subject:from:to:cc:date:
-   content-transfer-encoding:mime-version;
-  bh=LBP3V9OVBPjggE/TmVHcccYGhdeKMXq8wuA+Oj8KhSM=;
-  b=lrvdMeg6hJel9gW1qCCb4dTZzUjHVynqB9RtZ3HDpCPLw+77heW9mvKJ
-   S7KeIAJPmf+FxvlD/NTWiUZDpwGm0YS1x6XAgEuvjOtvDeo+2RSd8UpNO
-   P1AIeEKC/HibBPuCcH/UZ7IaMQT/DHndpiwSsTkEcHDApdg/o21bnCqyb
-   5yX17O65mrYyktZMqX9DezrLWF6/3K9liAJoIjuMwS6ZYNigesL2KfaDK
-   QCPcSGa+GT/FEY/Jt6DYx21Lsg/cKnijfvJnx3tYtCGBHyuFcqoG7NlI1
-   4/ciUPFFJgag7pfjGDcwjiZZzAmuPfCSxwdUHixOSXc3Hw2np7OyhLKqC
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="9872934"
-X-IronPort-AV: E=Sophos;i="6.04,310,1695711600"; 
-   d="scan'208";a="9872934"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2023 12:28:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="807241852"
-X-IronPort-AV: E=Sophos;i="6.04,310,1695711600"; 
-   d="scan'208";a="807241852"
-Received: from kkvillar-mobl.amr.corp.intel.com ([10.213.180.16])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2023 12:28:33 -0800
-Message-ID: <4bd63cf80a77a696b78d1f16f586ac6517320cd6.camel@linux.intel.com>
-Subject: [PATCH v2] crypto: iaa - Account for cpu-less numa nodes
-From: Tom Zanussi <tom.zanussi@linux.intel.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net, fenghua.yu@intel.com
-Cc: rex.zhang@intel.com, dave.jiang@intel.com, tony.luck@intel.com, 
-	rdunlap@infradead.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
-Date: Wed, 27 Dec 2023 14:28:32 -0600
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xi2Y0mLL"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7b7fb34265fso259793239f.3;
+        Wed, 27 Dec 2023 15:26:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703719605; x=1704324405; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wEMOjdbY0fY3N2JjHRStjCumCwdTvGjyUSjt06U4UHI=;
+        b=Xi2Y0mLLjy57YPGfnRRzinUCCm3gnrDEMqr6ChIC+WggsOrYm6loJsMcuhtYOPrRBx
+         QnkYMODAqTMzKFUYgntYfOrWTj7OAprhlbbFw4gRTboMp0TpUq4DFNHTvEGbWZ15zR0N
+         2MBgyzUNigJwSlbtTs0bbie/zWqG6QltI5IOMDWToxRzHyN1R+/YfXW+ZE8Hz/mUvgNu
+         cX7vSzz10TL2LSl5h6EmPDGONEuFGGVexrP3NclAjdNrBPHiITBRV6lsH77tdMoPD5BS
+         ilfChqN0rTHDrQvr0X8MPH6ArG4n+Kx+DMNZSgN55c8JgnAf2Rcor6CZWc3Zx19FNz8v
+         Zm6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703719605; x=1704324405;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wEMOjdbY0fY3N2JjHRStjCumCwdTvGjyUSjt06U4UHI=;
+        b=luMt+1AzHZ3yh41A/gpbNQwqQnUX9fDi6/zAcVoanGBgLY784pnhN/O0J7Zhq5l8EF
+         zdNMo/UK+4K5qSPmyPo/R743N00WnRiSRfBM7y0W7eNZmS8waOo6irmqJM31LOW8YgEf
+         TbyisDcQtinFiw42Y35aHz2JICVgJ2c/tK5bvQ2yCK1SQU6LSSwtD/EILNkXcgPSVjQA
+         AdE6ue1UJA80IuYNizMTLrhtX9k8nNwI7cjzZzK0HmfDLSvNtWgjJuPtC7yanOpnmjii
+         9ICa7hpM0rgvPIjCY6IJj86DUmJte2TzpukCVmhN34LjKf6LKKKtqQNwj5pEcPjBRoT8
+         AFDg==
+X-Gm-Message-State: AOJu0YzcXc3CHbwJssm50RVSNmBpY0EcxEwoS/vQc++hQ0Blvn/pREAc
+	HvoBznGRdyIXblih9ycgdfI/VfLts7ANBt4js2g=
+X-Google-Smtp-Source: AGHT+IFf/qwYN/xcEguZs0O55XvpYjto0J9S5LeglXBCb9SH5FUnzV9uStqIYLu+qOAa6TOJlpjqyxeMd7w/DdOXYEI=
+X-Received: by 2002:a05:6602:1512:b0:7b7:fc0c:63cd with SMTP id
+ g18-20020a056602151200b007b7fc0c63cdmr10728294iow.39.1703719604978; Wed, 27
+ Dec 2023 15:26:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <0000000000000b05cd060d6b5511@google.com> <CAKEwX=OmWYivf7dg_izW8pn5s5q15+nx-vRMsV47T_qG=dep_Q@mail.gmail.com>
+ <CAF8kJuPLEXEXG+4esR6MbRa3iirTrJ7-w3YCorB9iD=gnQ+G3A@mail.gmail.com>
+ <CAKEwX=PaFmreqmNrisatSN1=k2kRiYgDksgDze-t=GBD=0iJDg@mail.gmail.com>
+ <CAF8kJuPF5ACu8o1P7GqEQRb6p8QShyTVNuzrrY557g+SsddzWA@mail.gmail.com>
+ <CAKEwX=NHdr9=hUBiZhnLZyRPsp=JwN3Vkwud2XEn3=pNurYGpQ@mail.gmail.com>
+ <f27efd2e-ac65-4f6a-b1b5-c9fb0753d871@bytedance.com> <CAGsJ_4x31mT8TXt4c7ejJoDW1yJhyNqDmJmLZrf2LxMt7Zwg2A@mail.gmail.com>
+ <5aff3bcf-ef36-45b3-8ac0-a4b19697419c@bytedance.com> <CAGsJ_4xuuaPnQzkkQVaRyZL6ZdwkiQ_B7_c2baNaCKVg_O7ZQA@mail.gmail.com>
+ <e464c55e-d03a-4df9-abef-5ece182d7a2b@bytedance.com> <CAGsJ_4xknGt5Q6vTKHdnqvXi7fKMORwXywurdN09G2uOUJzCSg@mail.gmail.com>
+In-Reply-To: <CAGsJ_4xknGt5Q6vTKHdnqvXi7fKMORwXywurdN09G2uOUJzCSg@mail.gmail.com>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Wed, 27 Dec 2023 15:26:34 -0800
+Message-ID: <CAKEwX=PYK3hUzgm+qfs2sNU686RaE+_M3W4Zo_Q4mTMAgKaB2A@mail.gmail.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in
+ scatterwalk_copychunks (5)
+To: Barry Song <21cnbao@gmail.com>
+Cc: Chengming Zhou <zhouchengming@bytedance.com>, Chris Li <chrisl@kernel.org>, 
+	syzbot <syzbot+3eff5e51bf1db122a16e@syzkaller.appspotmail.com>, 
+	akpm@linux-foundation.org, davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, yosryahmed@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In some configurations e.g. systems with CXL, a numa node can have 0
-cpus and cpumask_nth() will return a cpu value that doesn't exist,
-which will result in an attempt to add an entry to the wq table at a
-bad index.
+On Wed, Dec 27, 2023 at 3:10=E2=80=AFAM Barry Song <21cnbao@gmail.com> wrot=
+e:
+>
+> On Wed, Dec 27, 2023 at 5:16=E2=80=AFPM Chengming Zhou
+> <zhouchengming@bytedance.com> wrote:
+> >
+> > Thanks for your explanation! Maybe it's best for us to return to 2 page=
+s
+> > if no other people's comments. And this really need more documentation =
+:-)
 
-To fix this, when iterating the cpus for a node, skip any node that
-doesn't have cpus.
+Fine by me. Hmm we're basically wasting one extra page per CPU (since
+these buffers are per-CPU), correct? That's not ideal, but not *too*
+bad for now I suppose...
 
-Also, as a precaution, add a warning and bail if cpumask_nth() returns
-a nonexistent cpu.
+>
+> I agree. we need some doc.
+>
+> besides, i actually think we can skip zswap frontend if
+> over-compression is really
+> happening.
 
-Reported-by: Zhang, Rex <rex.zhang@intel.com>
-Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
----
- v2: In iaa_crypto_init_module(), if nr_nodes is 0, print an error message =
-and return.
-
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/in=
-tel/iaa/iaa_crypto_main.c
-index 5093361b0107..4ebf1950568a 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -1017,12 +1017,17 @@ static void rebalance_wq_table(void)
- 		return;
- 	}
-=20
--	for_each_online_node(node) {
-+	for_each_node_with_cpus(node) {
- 		node_cpus =3D cpumask_of_node(node);
-=20
- 		for (cpu =3D 0; cpu < nr_cpus_per_node; cpu++) {
- 			int node_cpu =3D cpumask_nth(cpu, node_cpus);
-=20
-+			if (WARN_ON(node_cpu >=3D nr_cpu_ids)) {
-+				pr_debug("node_cpu %d doesn't exist!\n", node_cpu);
-+				return;
-+			}
-+
- 			if ((cpu % cpus_per_iaa) =3D=3D 0)
- 				iaa++;
-=20
-@@ -2095,9 +2100,15 @@ static struct idxd_device_driver iaa_crypto_driver =
-=3D {
- static int __init iaa_crypto_init_module(void)
- {
- 	int ret =3D 0;
-+	int node;
-=20
- 	nr_cpus =3D num_online_cpus();
--	nr_nodes =3D num_online_nodes();
-+	for_each_node_with_cpus(node)
-+		nr_nodes++;
-+	if (!nr_nodes) {
-+		pr_err("IAA couldn't find any nodes with cpus\n");
-+		return -ENODEV;
-+	}
- 	nr_cpus_per_node =3D nr_cpus / nr_nodes;
-=20
- 	if (crypto_has_comp("deflate-generic", 0, 0))
---=20
-2.34.1
-
-
+IIUC, zsmalloc already checked that - and most people are (or should
+be) using zsmalloc for zswap anyway. I wouldn't be opposed to adding
+an added layer of protection on the zswap side, but not super high
+priority I'd say.
