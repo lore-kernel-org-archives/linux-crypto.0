@@ -1,97 +1,124 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CB72D78C
-	for <linux-crypto@vger.kernel.org>; Wed, 27 Dec 2023 09:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1A444367;
+	Wed, 27 Dec 2023 11:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Fv1yKosl"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1703669738;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WEC4zcxwHKDFTEYmQ6GdpdDwW3vxNmvaojdQff3FHAk=;
-	b=Fv1yKoslVKu0i9egT0ibBU1nyc4CKUyHnyH+qi17lqjCS0jj0JYBrxMwvMLV7hvhNxbM/p
-	HpIykdOBZY0q/858UD8D0zRuJoUv2iUHGpuS7VKIxeliXcaOOblewxHuLdjcyAcsCbzghF
-	bKen7TGflyzTOf6YUpJLzfFIK0zaKew=
-From: chengming.zhou@linux.dev
-To: akpm@linux-foundation.org,
-	chrisl@kernel.org,
-	davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	nphamcs@gmail.com,
-	syzkaller-bugs@googlegroups.com,
-	yosryahmed@google.com,
-	21cnbao@gmail.com
-Cc: zhouchengming@bytedance.com,
-	syzbot+3eff5e51bf1db122a16e@syzkaller.appspotmail.com
-Subject: [PATCH v2] crypto: scompress - fix req->dst buffer overflow
-Date: Wed, 27 Dec 2023 09:35:23 +0000
-Message-Id: <20231227093523.2735484-1-chengming.zhou@linux.dev>
-In-Reply-To: <0000000000000b05cd060d6b5511@google.com>
-References: <0000000000000b05cd060d6b5511@google.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="izwMHxgy"
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3bb732e7d78so3944796b6e.0;
+        Wed, 27 Dec 2023 03:06:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703675171; x=1704279971; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EevuVU7B1VpO5whOxzp7/7YeGnwHG8aglB1XAt3LupU=;
+        b=izwMHxgyAHcRsrrwS4nmGZJV+BWlE6t1c99jaEhhuIko5r/vNc4R4p2wCyYkkY42O0
+         eo1pRigBKyZ/BRkzVI70IBGmYu+r4m9VIpEgYB76hJF2OQv8+iQgZRkv/LHBJ0wSzmCY
+         wAS5fX7t4I8gRoCKu1IRPpxXZhAQvLiWifnxXMnFkoTJPFRX7DjwwVel67MRf3eRDiZ+
+         zhnzRfW7Az1du9LWOuzLp+xHtyoRHKEpWL4MGPOxcBp85Bh7R6Fpuiov/R1gaWb3PJV4
+         rMCmOLCmafD9kALIiYMETEoWrFLzAFDnrn6D73N3v1UMma10Or117UATgZX10sdQcRGA
+         vbqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703675171; x=1704279971;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EevuVU7B1VpO5whOxzp7/7YeGnwHG8aglB1XAt3LupU=;
+        b=e7dMTTKNK0fn+hY/j5y8SUmSBYtE8Fit4h5e1IKdT7ML/iNYGbdcLOn0xdKW+2Xir1
+         d5CJt6F7Id6wNjt6yrnuf2CzLflZ+rjaQYb1FsRJ25tSINupDL2kWFYnkTwMQg+DJVJ3
+         AomRK8vdYMFhjITTfpjBcsAVCcZsHuJucBkXf3YTgoddZz/I9wxk3WmZhF7nEuAjgKIu
+         wwqvS84FH25coTAs2OyLvXZqed9bN+aKt0pUaK0ztCsKH5bxLnl8a1lIDFWtQEa3IDM1
+         RzGOU2ds+StgfnKFvDdX3M9J4BgDD/wLJtiZlCuNzQxrNvv3aDzaEdT/o3IXLODZ2GdI
+         IDgw==
+X-Gm-Message-State: AOJu0YwCJBv/i5kEZEmWrFMskrC6WWcLu5buWAseYwjRzJxXF2R/hjPV
+	GXH4dwyE56PFqD7eIXJiKIFjnk0kyClGhKQKjoE=
+X-Google-Smtp-Source: AGHT+IE7c6RgoZ0Rzso0lnnv2BvbhdfJLe/NdPlCqK22iQiH4myB+Nhp1ElUFDpaxlfq6LyBoERNAR4yV0lCKmpIwgA=
+X-Received: by 2002:a05:6808:3c93:b0:3bb:c935:3e0e with SMTP id
+ gs19-20020a0568083c9300b003bbc9353e0emr416570oib.73.1703675171409; Wed, 27
+ Dec 2023 03:06:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <0000000000000b05cd060d6b5511@google.com> <20231227093523.2735484-1-chengming.zhou@linux.dev>
+In-Reply-To: <20231227093523.2735484-1-chengming.zhou@linux.dev>
+From: Barry Song <21cnbao@gmail.com>
+Date: Wed, 27 Dec 2023 19:05:57 +0800
+Message-ID: <CAGsJ_4yDS+RMGf1DbCTfDzRTt83t7nugwNGiNWNO8tsZ75Th5Q@mail.gmail.com>
+Subject: Re: [PATCH v2] crypto: scompress - fix req->dst buffer overflow
+To: chengming.zhou@linux.dev
+Cc: akpm@linux-foundation.org, chrisl@kernel.org, davem@davemloft.net, 
+	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nphamcs@gmail.com, 
+	syzkaller-bugs@googlegroups.com, yosryahmed@google.com, 
+	zhouchengming@bytedance.com, 
+	syzbot+3eff5e51bf1db122a16e@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+On Wed, Dec 27, 2023 at 5:35=E2=80=AFPM <chengming.zhou@linux.dev> wrote:
+>
+> From: Chengming Zhou <zhouchengming@bytedance.com>
+>
+> The req->dst buffer size should be checked before copying from the
+> scomp_scratch->dst to avoid req->dst buffer overflow problem.
+>
+> Fixes: 1ab53a77b772 ("crypto: acomp - add driver-side scomp interface")
+> Reported-by: syzbot+3eff5e51bf1db122a16e@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/0000000000000b05cd060d6b5511@google.c=
+om/
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+> ---
+> v2:
+>  - change error code to ENOSPC.
 
-The req->dst buffer size should be checked before copying from the
-scomp_scratch->dst to avoid req->dst buffer overflow problem.
+Reviewed-by: Barry Song <v-songbaohua@oppo.com>
 
-Fixes: 1ab53a77b772 ("crypto: acomp - add driver-side scomp interface")
-Reported-by: syzbot+3eff5e51bf1db122a16e@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/0000000000000b05cd060d6b5511@google.com/
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
-v2:
- - change error code to ENOSPC.
----
- crypto/scompress.c | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 442a82c9de7d..b108a30a7600 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -117,6 +117,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 	struct crypto_scomp *scomp = *tfm_ctx;
- 	void **ctx = acomp_request_ctx(req);
- 	struct scomp_scratch *scratch;
-+	unsigned int dlen;
- 	int ret;
- 
- 	if (!req->src || !req->slen || req->slen > SCOMP_SCRATCH_SIZE)
-@@ -128,6 +129,8 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 	if (!req->dlen || req->dlen > SCOMP_SCRATCH_SIZE)
- 		req->dlen = SCOMP_SCRATCH_SIZE;
- 
-+	dlen = req->dlen;
-+
- 	scratch = raw_cpu_ptr(&scomp_scratch);
- 	spin_lock(&scratch->lock);
- 
-@@ -145,6 +148,9 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 				ret = -ENOMEM;
- 				goto out;
- 			}
-+		} else if (req->dlen > dlen) {
-+			ret = -ENOSPC;
-+			goto out;
- 		}
- 		scatterwalk_map_and_copy(scratch->dst, req->dst, 0, req->dlen,
- 					 1);
--- 
-2.40.1
-
+> ---
+>  crypto/scompress.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/crypto/scompress.c b/crypto/scompress.c
+> index 442a82c9de7d..b108a30a7600 100644
+> --- a/crypto/scompress.c
+> +++ b/crypto/scompress.c
+> @@ -117,6 +117,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *=
+req, int dir)
+>         struct crypto_scomp *scomp =3D *tfm_ctx;
+>         void **ctx =3D acomp_request_ctx(req);
+>         struct scomp_scratch *scratch;
+> +       unsigned int dlen;
+>         int ret;
+>
+>         if (!req->src || !req->slen || req->slen > SCOMP_SCRATCH_SIZE)
+> @@ -128,6 +129,8 @@ static int scomp_acomp_comp_decomp(struct acomp_req *=
+req, int dir)
+>         if (!req->dlen || req->dlen > SCOMP_SCRATCH_SIZE)
+>                 req->dlen =3D SCOMP_SCRATCH_SIZE;
+>
+> +       dlen =3D req->dlen;
+> +
+>         scratch =3D raw_cpu_ptr(&scomp_scratch);
+>         spin_lock(&scratch->lock);
+>
+> @@ -145,6 +148,9 @@ static int scomp_acomp_comp_decomp(struct acomp_req *=
+req, int dir)
+>                                 ret =3D -ENOMEM;
+>                                 goto out;
+>                         }
+> +               } else if (req->dlen > dlen) {
+> +                       ret =3D -ENOSPC;
+> +                       goto out;
+>                 }
+>                 scatterwalk_map_and_copy(scratch->dst, req->dst, 0, req->=
+dlen,
+>                                          1);
+> --
+> 2.40.1
+>
