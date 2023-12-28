@@ -1,143 +1,159 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFE06FA3
-	for <linux-crypto@vger.kernel.org>; Thu, 28 Dec 2023 10:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AFCC8DE
+	for <linux-crypto@vger.kernel.org>; Thu, 28 Dec 2023 14:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sCXuIXUH"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40d5bc68bb7so17828255e9.3
-        for <linux-crypto@vger.kernel.org>; Thu, 28 Dec 2023 02:29:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="dv8rhXUf"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a26f73732c5so296863166b.3
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Dec 2023 06:29:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703759381; x=1704364181; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z19/VdFEt1xtQwSgkxGkwB2KhGw+2oZZfLaJJcNz5Hk=;
-        b=sCXuIXUHb5AdixmjbMiL7gQNzsE2PWL3SefTQlTr5BIqkUhj3cw6F3bCO+qclnw3Fg
-         lWtjAINQ2O4GBeGkY6XYQqDwOQRjIZDkyoVk4taTiThXPKHzd+smt/piZWS3WHaV869q
-         390ItcV7x5cagk5cfKM0bGL0F6nvSnr5Pad3cHOLOvke8ITt8/yypASqKTiBvRIEvsaa
-         29RlraAwUt7Ui7CtMrbucbCUz5GQeFFkB18+VUx+VBhH3wBb1zVeL8JYsXTVNAUZ6Ch8
-         xkyXeZ0j76+iy0CJKkaQJb7RhwYD++ToLEz8IFaocjwnbsG7Dp/K2tGE5/d8NvSCiHTh
-         DOdA==
+        d=fairphone.com; s=fair; t=1703773797; x=1704378597; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IfOkw9nEcZxbA1rEGXnw7Xr3Fbv2QGCNa/sv3AZ14y4=;
+        b=dv8rhXUfeIIde9MZGjI6hLX+c81tekNQVvOna8wokRJYaskThEmkjZYVcF/8UpVNCA
+         WJvzBrDudVuXUJLvRRMGFNAs8WtmxyuyueFvSJhJ+dH9MnSewQju440m90hKwZZAa0om
+         EgT6qlyZDvDCdWti/BMZksKdrs6NyWCgFer1tHKrgEWph9k43KGI3aLlLZfAAfwFXLF8
+         U0azGfF+09/drjuMrS8jDXlqVMLvS8kAeywrbt/EGcJEWcGLD8zE0rJLTgyqAqUjK6Ww
+         Kuy+6x16nf1MtO3T0xaQvNIvZ2+6MXejx7NpdRdH260DejMtu4KIswRtwt6++COxddGn
+         rZ4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703759381; x=1704364181;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Z19/VdFEt1xtQwSgkxGkwB2KhGw+2oZZfLaJJcNz5Hk=;
-        b=ECMG1d++pt+znUIgu5KFHLeJYrOxyqVPJFZ518WQTRQH+XGZl11CVQhDSXUX+UyKRA
-         tCU8QaPFcjM/RMQoAGtJ+9JqEqfRXL1QZAVRe7+EjOvoknYR4cwo+4rb0M5DPSTF4T38
-         L8+MlYH0AXSj/zIroDfxVH5+VkfcR0rjHvDsp7Ofr8xCdgH6zoHEPtKSWWVvZLFEhjI/
-         wHwe8MN/YoVWc0i5nbOHK/KTf6Y089LU2yIawWljMfrk4lO0qT2zzK41ZS7IxTiUgBpF
-         Qp6wEo1vzSxJtYiC8GOEoCEh0+KLICu+2q4J1s/raSPyVnuRDow9Hb2tkZYHVFQF0wmz
-         TPBA==
-X-Gm-Message-State: AOJu0YwwOqlgmoP5XSjvQSdGS4S8vYVVtjD80WrFUIzcrsLMpyN9shWh
-	01mrBOmilLQZDnEUR6TmYEWJ38nevCrcTg==
-X-Google-Smtp-Source: AGHT+IHoZhvjjDTAWg3QxYfjUFZju28DcA5vl1IG7yFgTuayPhfKiZtk4ew/pfo6TUh1+zd8ssT58A==
-X-Received: by 2002:a05:600c:c0e:b0:40d:5dac:f1ce with SMTP id fm14-20020a05600c0c0e00b0040d5dacf1cemr1206238wmb.96.1703759380849;
-        Thu, 28 Dec 2023 02:29:40 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.218.27])
-        by smtp.gmail.com with ESMTPSA id ay14-20020a05600c1e0e00b0040c6ab53cd2sm27619659wmb.10.2023.12.28.02.29.39
+        d=1e100.net; s=20230601; t=1703773797; x=1704378597;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=IfOkw9nEcZxbA1rEGXnw7Xr3Fbv2QGCNa/sv3AZ14y4=;
+        b=j97I+oWu2emhVMQpU5DRMj/w4FA5Bhj+2EnpPfa7rOd9oemYQGrvrihkyRX6IdjARX
+         4cQUoZiIOloYmKS87+SWLVugYuDTiZK4wO4+OfsXiPytvT4ByeN18XB7B4srK/jePj0/
+         0wKdsc1DidzLU9MQ0He7dUQqX/Y1MItDhSoIWDs+YlVl1CkqO3Es7KlFhxuWwF459EMc
+         GKGVJVDkDRgoRAK29HDI39ECOzJYJrhJKs0W5LQaThvhuITlByT65W5OpUkFci8SgGOC
+         IRMwnt38EXeEs44WE4Z55F//kw9PoBrufSWKHf9cahA04/IimDKgO6dXuvaVuQXHAbSD
+         3MKQ==
+X-Gm-Message-State: AOJu0YxwK9Xyn5MzfzdHzdMsi+K6tYm6SESX4MWDtB0S36hNxIIhzI+t
+	O7grTsvCSdSZJzH1OXCmRBFSZikoDdOO9Q==
+X-Google-Smtp-Source: AGHT+IEwzibakp4+9ZXJZVidzN9ogA4Ep77wRAfVlvNC3XZ4Cuo92tm68q7JErfyuMvnMmslNephwA==
+X-Received: by 2002:a17:906:7810:b0:a12:78b5:3d81 with SMTP id u16-20020a170906781000b00a1278b53d81mr4527886ejm.1.1703773797149;
+        Thu, 28 Dec 2023 06:29:57 -0800 (PST)
+Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id r25-20020a170906281900b00a1f7c502736sm7523221ejc.164.2023.12.28.06.29.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Dec 2023 02:29:40 -0800 (PST)
-Message-ID: <662833e4-fd2a-481c-9d40-5e691d9a0cfa@linaro.org>
-Date: Thu, 28 Dec 2023 11:29:38 +0100
+        Thu, 28 Dec 2023 06:29:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/5] dt-bindings: crypto: Add Tegra Security Engine
-To: Akhil R <akhilrajeev@nvidia.com>,
- "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "robh+dt@kernel.org" <robh+dt@kernel.org>,
- "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "thierry.reding@gmail.com" <thierry.reding@gmail.com>,
- Jonathan Hunter <jonathanh@nvidia.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, Mikko Perttunen
- <mperttunen@nvidia.com>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "krzk@kernel.org" <krzk@kernel.org>
-References: <20231219125614.33062-1-akhilrajeev@nvidia.com>
- <20231219125614.33062-2-akhilrajeev@nvidia.com>
- <fe87e220-560b-4d47-bc7f-cc7104d40921@linaro.org>
- <SJ1PR12MB63397127C6E6D1289FA7E464C09EA@SJ1PR12MB6339.namprd12.prod.outlook.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <SJ1PR12MB63397127C6E6D1289FA7E464C09EA@SJ1PR12MB6339.namprd12.prod.outlook.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Thu, 28 Dec 2023 15:29:56 +0100
+Message-Id: <CY01EKQVWE36.B9X5TDXAREPF@fairphone.com>
+Cc: <neil.armstrong@linaro.org>, <konrad.dybcio@linaro.org>,
+ <agross@kernel.org>, <andersson@kernel.org>, <conor+dt@kernel.org>,
+ <davem@davemloft.net>, <devicetree@vger.kernel.org>,
+ <herbert@gondor.apana.org.au>, <krzysztof.kozlowski+dt@linaro.org>,
+ <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <marijn.suijten@somainline.org>,
+ <robh+dt@kernel.org>, <vkoul@kernel.org>,
+ <cros-qcom-dts-watchers@chromium.org>
+Subject: Re: [PATCH V3 2/2] arm64: dts: qcom: sc7280: add QCrypto nodes
+From: "Luca Weiss" <luca.weiss@fairphone.com>
+To: "Om Prakash Singh" <quic_omprsing@quicinc.com>
+X-Mailer: aerc 0.15.2
+References: <20231214103600.2613988-1-quic_omprsing@quicinc.com>
+ <20231214103600.2613988-3-quic_omprsing@quicinc.com>
+In-Reply-To: <20231214103600.2613988-3-quic_omprsing@quicinc.com>
 
-On 28/12/2023 10:33, Akhil R wrote:
->>> +properties:
->>> +  compatible:
->>> +    const: nvidia,tegra234-se4-hash
->>
->> What is se4?
->>
->> Anyway, filename like compatible.
-> Similar to the above, the hardware name is SE4.
-> 
-> nvidia,tegra234-se-aes and nvidia,tegra234-se-hash does look good to me. But I am a bit concerned
-> about the ABI breakage in case, we need a different compatible for the remaining instance.
+On Thu Dec 14, 2023 at 11:36 AM CET, Om Prakash Singh wrote:
+> Add the QCE and Crypto BAM DMA nodes.
+>
+> Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+> ---
+>
+> Changes in V3:
+>   - V2 patch was sent without actual modification. Resending the patch wi=
+th modified file.
+>
+> Changes in V2:
+>   - Update DT node sequence as per register ascending order.
+>   - Fix DT node properties as per convention.
+>
+>  arch/arm64/boot/dts/qcom/sc7280.dtsi | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+>
+> diff --git a/arch/arm64/boot/dts/qcom/sc7280.dtsi b/arch/arm64/boot/dts/q=
+com/sc7280.dtsi
+> index 66f1eb83cca7..b819724c1255 100644
+> --- a/arch/arm64/boot/dts/qcom/sc7280.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sc7280.dtsi
+> @@ -2233,6 +2233,28 @@ pcie1_phy: phy@1c0e000 {
+>  			status =3D "disabled";
+>  		};
+> =20
+> +		cryptobam: dma-controller@1dc4000 {
+> +			compatible =3D "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
+> +			reg =3D <0x0 0x01dc4000 0x0 0x28000>;
+> +			interrupts =3D <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+> +			#dma-cells =3D <1>;
+> +			iommus =3D <&apps_smmu 0x4e4 0x0011>,
+> +				 <&apps_smmu 0x4e6 0x0011>;
+> +			qcom,ee =3D <0>;
+> +			qcom,controlled-remotely;
+> +		};
 
-Isn't this a new device? What ABI breakage? What would be affected?
+Hi,
 
-Best regards,
-Krzysztof
+Unfortunately I seem to have boot failure / device crash with cryptobam
+enabled on my qcm6490-fairphone-fp5. Are you aware of any firmware
+differences that could cause this with QCM6490 LA firmware?
+
+Looking at downstream msm-5.4 dmesg I do see this BAM being used so it
+should generally be accessible from Linux.
+
+[    5.217214] qce 1de0000.qcedev: Adding to iommu group 18
+[    5.223741] QCE50: __qce_get_device_tree_data: CE operating frequency is=
+ not defined, setting to default 100MHZ
+[    5.234986] qce 1de0000.qcedev: QTI Crypto 5.6.0 device found @0x1de0000
+[    5.242981] sps_register_bam_device: sps:BAM 0x0000000001dc4000 is regis=
+tered
+[    5.251124] sps_bam_enable: sps:BAM 0x0000000001dc4000 (va:0x000000001db=
+63156) enabled: ver:0x27, number of pipes:16
+[    5.262783] QCE50: qce_sps_init:  QTI MSM CE-BAM at 0x0000000001dc4000 i=
+rq 9
+[    5.271820] qce 1de0000.qcedev:qcom_cedev_ns_cb: Adding to iommu group 1=
+9
+[    5.281083] qce 1de0000.qcedev:qcom_cedev_s_cb: Adding to iommu group 20
+[    5.289376] qcrypto 1de0000.qcrypto: Adding to iommu group 21
+[    5.296326] QCE50: __qce_get_device_tree_data: CE operating frequency is=
+ not defined, setting to default 100MHZ
+[    5.307675] qcrypto 1de0000.qcrypto: QTI Crypto 5.6.0 device found @0x1d=
+e0000
+[    5.315867] QCE50: qce_sps_init:  QTI MSM CE-BAM at 0x0000000001dc4000 i=
+rq 9
+
+Any idea?
+
+Regards
+Luca
+
+> +
+> +		crypto: crypto@1dfa000 {
+> +			compatible =3D "qcom,sc7280-qce", "qcom,sm8150-qce", "qcom,qce";
+> +			reg =3D <0x0 0x01dfa000 0x0 0x6000>;
+> +			dmas =3D <&cryptobam 4>, <&cryptobam 5>;
+> +			dma-names =3D "rx", "tx";
+> +			iommus =3D <&apps_smmu 0x4e4 0x0011>,
+> +				 <&apps_smmu 0x4e4 0x0011>;
+> +			interconnects =3D <&aggre2_noc MASTER_CRYPTO 0 &mc_virt SLAVE_EBI1 0>=
+;
+> +			interconnect-names =3D "memory";
+> +		};
+> +
+>  		ipa: ipa@1e40000 {
+>  			compatible =3D "qcom,sc7280-ipa";
+> =20
 
