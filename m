@@ -1,36 +1,37 @@
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2081.outbound.protection.outlook.com [40.107.244.81])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2042.outbound.protection.outlook.com [40.107.243.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE1414010;
-	Sat, 30 Dec 2023 16:24:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DF7B677;
+	Sat, 30 Dec 2023 16:24:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1tFjaEz7"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NnAClNgM"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Sf9Tk6ULlWlk3Rhb6j8mzNZle8WHZWP5YxE3fEt3pGB6HefEPfwHqyhr9qQtEJ62zzM8O85oV5z/Q17La/OcRkpAU2/lY+aPvK+uvy62gBHCZongRIufqOz53XVuESkWYSEHVBE1p98pHVhdkPZ7Pw18Yl5F8nm43NoB77avuh3s7UShTUytoOKQEjRYUR0Ug0TMeqLd2Zc4bRq+y1RyUDPx2HJdQ4z84NDeUsTvA3L//kkJEWYvCVvbabv+pgKQLEmIYE8EgEe6w7S7fW47SPAAVrtz5VeL5ZUtyUkRHd1WfQk/B98ZkrdO5xdIWGqTByHHA6VWo36VAGOTuu4h8w==
+ b=YPOf6fMAShQ2Fs8outixyzMxVlCvBH8YFf2EKJK5qPCDvw2Ad1Yj0ATxhuFKYUq/Iq6zwhibslcfIjdsQ9cqkuIpbt93xdAq8mlUyZBzYR7XSAOAox0ReGzV1w1QhEv15xlJFa2QUArwcDj/VgorWgi3QhfyAR7pv8PAJ0Hft2T003TdGB/gdQ6gIoyStDOFAoF8qgY9H+dz+wOoUXWaAkcyO8d38egp2g2Ryu8dJ0/CuRn5zOzx7k6Gmv2w0zZxnQFC2e6xGBOIHDwsxnt09IPu9HS/0UEqq6aopKr+iOdPaMbFOWPqVjkqqKeHXkiB/qJ3yijvQp/YuqwaVHRGBQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eVm2wPHZtBPaRL9pNsSxsS2/yrfr71lZByCaBifbzMQ=;
- b=JegwaF74VnT9RtZPiwgmrnxBf2ahzD8r5t5WZeph0odTP34mN0DzPWhIohLJvP87pQdKN2/+6N1Mf7rYOljf74EFfXAF9aKBGaGXfLfQ+wARxQYVCKtxcxThWLw0sCPuexVX5auT+hrghGybDCm+Nqx9CdEEGdfJAaH5EPKyRR0MB57U8PgEwqgbRWOp3a9hdrw4NREE4KjHw5EjCnk8yjyLko2Q26/ziI8SgFMG5lic5zH8fvG/0CUNp+2gfDsMOWDg4LGIJbDcGPXZLDvyw/ts0Y98QmGEg0yFjSoyfyWkBqNsD8uzYBI4427Odj9Pc4PsUWjCD6xvqmFTSHmtgQ==
+ bh=z35AkOsqk07RoliVu+UAgy3IR31M0OkEZ+CYlbdsl+c=;
+ b=NjYomt+urky1qad+S18t7tAeIdNL1O46FoNeVuvgP3rLgsb/upWuyZFvFscL5DVTGOVkvEJTT5IrhHUQ7A35OPS7ifDSwZxTxdaVwddUbqEzSv7yz56d2ZkxZP5RRTwouq2+K7YR14Gy1aripkpkbcBtQPbazrQaPHDymF14caz/zkZdm6uvDhNEC9pmOUOZb2+YQwTKBszy7bYQR/sHw1WbamLqsMwdcAF5vJy6d90s6O7Gi4LfjTABB/XRK4UQxs1zHXq8U78UOSom/mHCYkz850uxYb6N8/8D1KlZZLC6m6WYXyrsdLl9zZT+lStlHX0TCHqXUfNtJ2zNaSH/xA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eVm2wPHZtBPaRL9pNsSxsS2/yrfr71lZByCaBifbzMQ=;
- b=1tFjaEz7PbXFjJZfrcpUWfVtskBQKEwKU80uGZydKZYoIsm3d45U+UfkHseetY5wwdRw8rten+ucUZ7fGBBO7kReNVEm6a04MheIj5OPXVYZYRfdKUxMvp9f43AHavyClO/WWfHZbcKFwLaRnd9MYwHpUnEe/G7bFmuDuY94xvY=
-Received: from DS7PR03CA0114.namprd03.prod.outlook.com (2603:10b6:5:3b7::29)
- by DM8PR12MB5413.namprd12.prod.outlook.com (2603:10b6:8:3b::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7135.22; Sat, 30 Dec 2023 16:24:33 +0000
-Received: from DS1PEPF00017096.namprd05.prod.outlook.com
- (2603:10b6:5:3b7:cafe::ae) by DS7PR03CA0114.outlook.office365.com
- (2603:10b6:5:3b7::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.18 via Frontend
- Transport; Sat, 30 Dec 2023 16:24:33 +0000
+ bh=z35AkOsqk07RoliVu+UAgy3IR31M0OkEZ+CYlbdsl+c=;
+ b=NnAClNgM0qlpyGx/48hxkzUCWe0XM19WqScQAmyC3SPEfK6PfMm8CBxUo38nCYPMQsSSOIztxo9uXUbw9Qd2mRViCwxVtPeQIciSsSgpCjGzv31tyY9pbCgD+IQD/qHSKaA1rsqLXbwBtsNb6kJv5AnAqRJCqES9Q9grklYbWzE=
+Received: from DM6PR08CA0045.namprd08.prod.outlook.com (2603:10b6:5:1e0::19)
+ by MW3PR12MB4396.namprd12.prod.outlook.com (2603:10b6:303:59::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.22; Sat, 30 Dec
+ 2023 16:24:54 +0000
+Received: from DS1PEPF0001709B.namprd05.prod.outlook.com
+ (2603:10b6:5:1e0:cafe::e9) by DM6PR08CA0045.outlook.office365.com
+ (2603:10b6:5:1e0::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.21 via Frontend
+ Transport; Sat, 30 Dec 2023 16:24:54 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -38,307 +39,119 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF00017096.mail.protection.outlook.com (10.167.18.100) with Microsoft
+ DS1PEPF0001709B.mail.protection.outlook.com (10.167.18.105) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 16:24:33 +0000
+ 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 16:24:54 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Sat, 30 Dec
- 2023 10:24:32 -0600
+ 2023 10:24:53 -0600
+Date: Fri, 29 Dec 2023 15:40:30 -0600
 From: Michael Roth <michael.roth@amd.com>
-To: <x86@kernel.org>
+To: Borislav Petkov <bp@alien8.de>
 CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-	<thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-	<pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
-	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
-	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-	<tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
-	<ak@linux.intel.com>, <tony.luck@intel.com>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
+	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
+	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
+	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
+	<vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+	<tony.luck@intel.com>, <marcorr@google.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
 	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
-Subject: [PATCH v1 17/26] crypto: ccp: Handle non-volatile INIT_EX data when SNP is enabled
-Date: Sat, 30 Dec 2023 10:19:45 -0600
-Message-ID: <20231230161954.569267-18-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231230161954.569267-1-michael.roth@amd.com>
-References: <20231230161954.569267-1-michael.roth@amd.com>
+Subject: Re: [PATCH v10 20/50] KVM: SEV: Select CONFIG_KVM_SW_PROTECTED_VM
+ when CONFIG_KVM_AMD_SEV=y
+Message-ID: <20231229214030.wkijqtvpmmkwayfk@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-21-michael.roth@amd.com>
+ <20231218101350.GAZYAbXqYLXByk5Akw@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231218101350.GAZYAbXqYLXByk5Akw@fat_crate.local>
 X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017096:EE_|DM8PR12MB5413:EE_
-X-MS-Office365-Filtering-Correlation-Id: f252f1f5-5a1b-4691-88b4-08dc0953ce80
+X-MS-TrafficTypeDiagnostic: DS1PEPF0001709B:EE_|MW3PR12MB4396:EE_
+X-MS-Office365-Filtering-Correlation-Id: 779e08b7-acfc-46a4-93fb-08dc0953dafe
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	9Vc7I29ioAKe9UeMu7kSn4oDSIRYCWAMyrQRXiqRNP5s6yJLFTaycXONc/cwkB48GFB/iNSmwtf3n7cAgk+07MgBPVtWMEupqaedq/Zz5AByXvv06qoXayLlHsr87re0bDicHQcSXJWTuCwNB5s/tearPMrBVKdpeYM1tgR8Q8TIBM1OGtpQUzjdHJcntAdjiE+ydHH3N82BUPOLRLjwfs/IbpbhJ+pvgIegOVHG4mJre4anV9bBXchyja/kfvunL5wKbZ+kOuuAHHUbzZWkKe+074sIZBRSZHntbipHXiUQAz9hx9EZjDv6qO+jA92TwjNe6KlB+Ia2pLzS9+cJb6o2+WLaAtQjN90G4kvLTia+aY9pjqsMDECmcWfC8wTnNoNWfvYeBDmB+ZiRl66pnZxxYQQWGS1ABVtz6NVxrVHmlDMuKltIp4F/a2JGMs3/SDlXTH2bdYkFHMAwOUR8XI9pGyijgvugYSijpDHH9c0GpHJFs+IqzRMZPigpRrXKwDxrZ/2PoEYULGn9eElpRVxFS+zecUB25TXZDBCVGVt6BpBI0NzUMNs39jgo5TsIApxCby3lN3k5yg1UIribATzNa+oLnZxW08WMW1UKT/w3WkGjvT980mFc9f8wL+7bO/50YnEypVl8WK0ZFVm7e0GLVh5KtFPEppNwcy4djoY9FtR1vU6IbqUt4JVy/ro15zV4x+T2utDHg6RIJ5EJ3LY9VKosIi5/cDSHzywI9C0CAFa8RX4VxOCKwB+jk5GQHI9rYeJy52k20jjZ+o8RWA==
+	fFMzFyZJvQTnKEiGfjINvIW4+RRu96n8BgoOn6XOeBZ6FJ5yoIeJiFEu2XxImDN9lcSfVTAFCbh3VTMdtJvZpFFQouQEwF9R4sAjip2BjGYLYUDBauDFCoWLK7wYauB5vqN0bP/Zq8PrVgFvw821x3Y2iB2hQc9EPyJisu+E1PiFduY+Qgg/Pp2lW5zJvYdWNSZ5gF3wF5A0nNJKKlxIZRv+Wr+CGqo7oR1WmodNjN/iPMd9uBDe3I0D4HdLYKNLlNlp2m3dsYRvRWgbDJYtT1zt+2lTGxVDDsDe3ICuF/AMLeous9ejYUZCq+IRo94826a/nWVP/k7+AersK+X2UejROFb8eVdnINDySYk+KJnSRDreTxHyWmXSWKsF+CsODv4e/xBmgG19lcegzjMS/ojY9ZBetjC6eaf7eQbR1Ru5boP/Ln63DY6XAXvGtW7+NeId0wIaroa4T4/xEhQic3pX1rp1Zh6C4iSEL1KgAg4x/Ht7pLKOn3idLw+YoGRhjyqh5S8GIwnq/8LvDyfAeFn1+njVnXKsDLVrMAWbsT5FrPk9daX6bmbYdCr1kHqtdt4KdqbdU2FgHX/pN67yG0gvGERFoAcBK8ZF7TAPdDSc/BPIzIu1jiJMOW+WdzzpfpBIBGThoz5eBtEsTa0H4v3X37cgQ4fAHCDOQNE7JzikX54yyDPpdU/nOD9l5M6OpGi73/WZ9OXgpCcT2GbLqCVSacew0bal4LxWuO5c/mSaBnkMjNy0M80UoPc47TsqaC+qxVljbqxyaL8Ur+FwU12Vly9EaE0Y7sZMrfFPZRUG09SmN6hfMkfPNT4++5pz
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(136003)(39860400002)(376002)(230922051799003)(451199024)(1800799012)(64100799003)(82310400011)(186009)(40470700004)(46966006)(36840700001)(40480700001)(426003)(83380400001)(16526019)(1076003)(26005)(2616005)(40460700003)(336012)(478600001)(6666004)(47076005)(41300700001)(316002)(54906003)(70206006)(70586007)(6916009)(36756003)(44832011)(4326008)(8936002)(8676002)(36860700001)(356005)(81166007)(86362001)(82740400003)(2906002)(5660300002)(7416002)(7406005)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(346002)(376002)(396003)(230173577357003)(230273577357003)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(82310400011)(40470700004)(36840700001)(46966006)(40480700001)(40460700003)(426003)(336012)(2616005)(1076003)(16526019)(83380400001)(26005)(86362001)(81166007)(36756003)(356005)(82740400003)(47076005)(4326008)(44832011)(7406005)(5660300002)(7416002)(36860700001)(6666004)(54906003)(8936002)(70586007)(70206006)(8676002)(316002)(6916009)(3716004)(2906002)(41300700001)(966005)(478600001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 16:24:33.0452
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 16:24:54.0195
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f252f1f5-5a1b-4691-88b4-08dc0953ce80
+X-MS-Exchange-CrossTenant-Network-Message-Id: 779e08b7-acfc-46a4-93fb-08dc0953dafe
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017096.namprd05.prod.outlook.com
+	DS1PEPF0001709B.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5413
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4396
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+On Mon, Dec 18, 2023 at 11:13:50AM +0100, Borislav Petkov wrote:
+> On Mon, Oct 16, 2023 at 08:27:49AM -0500, Michael Roth wrote:
+> > SEV-SNP relies on the restricted/protected memory support to run guests,
+> > so make sure to enable that support with the
+> > CONFIG_KVM_SW_PROTECTED_VM build option.
+> > 
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > ---
+> >  arch/x86/kvm/Kconfig | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> > index 8452ed0228cb..71dc506aa3fb 100644
+> > --- a/arch/x86/kvm/Kconfig
+> > +++ b/arch/x86/kvm/Kconfig
+> > @@ -126,6 +126,7 @@ config KVM_AMD_SEV
+> >  	bool "AMD Secure Encrypted Virtualization (SEV) support"
+> >  	depends on KVM_AMD && X86_64
+> >  	depends on CRYPTO_DEV_SP_PSP && !(KVM_AMD=y && CRYPTO_DEV_CCP_DD=m)
+> > +	select KVM_SW_PROTECTED_VM
+> >  	help
+> >  	  Provides support for launching Encrypted VMs (SEV) and Encrypted VMs
+> >  	  with Encrypted State (SEV-ES) on AMD processors.
+> > -- 
+> 
+> Kconfig doesn't like this one:
+> 
+> WARNING: unmet direct dependencies detected for KVM_SW_PROTECTED_VM
+>   Depends on [n]: VIRTUALIZATION [=y] && EXPERT [=n] && X86_64 [=y]
+>   Selected by [m]:
+>   - KVM_AMD_SEV [=y] && VIRTUALIZATION [=y] && KVM_AMD [=m] && X86_64 [=y] && CRYPTO_DEV_SP_PSP [=y] && (KVM_AMD [=m]!=y || CRYPTO_DEV_CCP_DD [=m]!=m)
+> 
+> WARNING: unmet direct dependencies detected for KVM_SW_PROTECTED_VM
+>   Depends on [n]: VIRTUALIZATION [=y] && EXPERT [=n] && X86_64 [=y]
+>   Selected by [m]:
+>   - KVM_AMD_SEV [=y] && VIRTUALIZATION [=y] && KVM_AMD [=m] && X86_64 [=y] && CRYPTO_DEV_SP_PSP [=y] && (KVM_AMD [=m]!=y || CRYPTO_DEV_CCP_DD [=m]!=m)
 
-For SEV/SEV-ES, a buffer can be used to access non-volatile data so it
-can be initialized from a specified by the init_ex_path CCP module
-parameter instead of relying on the SPI bus for NV storage, and
-afterward the buffer can be read from to sync new data back to the file.
+I think this is because KVM_SW_PROTECTED_VM requires EXPERT, which has
+to be set explicitly. But I think Paolo is right that
+KVM_GENERIC_PRIVATE_MEM is more appropriate, which does not require
+EXPERT.
 
-When SNP is enabled, the pages comprising this buffer need to be set to
-firmware-owned in the RMP table before they can be accessed by firmware
-for subsequent updates to the initial contents.
+-Mike
 
-Implement that handling here.
-
-Setting these pages to firmware-owned will also result in them being
-removed from the kernel direct map, since generally the hypervisor does
-not access firmware-owned pages. However, in this exceptional case,
-the hypervisor does need to read the buffer to transfer updated contents
-back to the file at init_ex_path.
-
-Support this by using vmap() to create temporary mappings to the
-firmware-owned buffer whenever accesses are made, and rework the
-existing code to track the struct page corresponding to the start of the
-buffer rather than the virtual address that was previously provided via
-the direct map.
-
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-Co-developed-by: Michael Roth <michael.roth@amd.com>
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
- drivers/crypto/ccp/sev-dev.c | 104 ++++++++++++++++++++++++++---------
- 1 file changed, 79 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 307eb3e7c354..dfe7f7afc411 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -88,8 +88,9 @@ static size_t sev_es_tmr_size = SEV_TMR_SIZE;
-  *   allocator to allocate the memory, which will return aligned memory for the
-  *   specified allocation order.
-  */
--#define NV_LENGTH (32 * 1024)
--static void *sev_init_ex_buffer;
-+#define NV_LENGTH	(32 * 1024)
-+#define NV_PAGES	(NV_LENGTH >> PAGE_SHIFT)
-+static struct page *sev_init_ex_page;
- 
- /*
-  * SEV_DATA_RANGE_LIST:
-@@ -231,7 +232,7 @@ static int sev_read_init_ex_file(void)
- 
- 	lockdep_assert_held(&sev_cmd_mutex);
- 
--	if (!sev_init_ex_buffer)
-+	if (!sev_init_ex_page)
- 		return -EOPNOTSUPP;
- 
- 	fp = open_file_as_root(init_ex_path, O_RDONLY, 0);
-@@ -251,7 +252,7 @@ static int sev_read_init_ex_file(void)
- 		return ret;
- 	}
- 
--	nread = kernel_read(fp, sev_init_ex_buffer, NV_LENGTH, NULL);
-+	nread = kernel_read(fp, page_to_virt(sev_init_ex_page), NV_LENGTH, NULL);
- 	if (nread != NV_LENGTH) {
- 		dev_info(sev->dev,
- 			"SEV: could not read %u bytes to non volatile memory area, ret %ld\n",
-@@ -264,16 +265,44 @@ static int sev_read_init_ex_file(void)
- 	return 0;
- }
- 
-+/*
-+ * When SNP is enabled, the pages comprising the buffer used to populate
-+ * the file specified by the init_ex_path module parameter needs to be set
-+ * to firmware-owned, which removes the mapping from the kernel direct
-+ * mapping since generally the hypervisor does not access firmware-owned
-+ * pages. However, in this case the hypervisor does need to read the
-+ * buffer to transfer the contents to the file at init_ex_path, so this
-+ * function is used to create a temporary virtual mapping to be used for
-+ * this purpose.
-+ */
-+static void *vmap_sev_init_ex_buffer(void)
-+{
-+	struct page *pages[NV_PAGES];
-+	unsigned long base_pfn;
-+	int i;
-+
-+	if (WARN_ON_ONCE(!sev_init_ex_page))
-+		return NULL;
-+
-+	base_pfn = page_to_pfn(sev_init_ex_page);
-+
-+	for (i = 0; i < NV_PAGES; i++)
-+		pages[i] = pfn_to_page(base_pfn + i);
-+
-+	return vmap(pages, NV_PAGES, VM_MAP, PAGE_KERNEL_RO);
-+}
-+
- static int sev_write_init_ex_file(void)
- {
- 	struct sev_device *sev = psp_master->sev_data;
-+	void *sev_init_ex_buffer;
- 	struct file *fp;
- 	loff_t offset = 0;
- 	ssize_t nwrite;
- 
- 	lockdep_assert_held(&sev_cmd_mutex);
- 
--	if (!sev_init_ex_buffer)
-+	if (!sev_init_ex_page)
- 		return 0;
- 
- 	fp = open_file_as_root(init_ex_path, O_CREAT | O_WRONLY, 0600);
-@@ -286,6 +315,12 @@ static int sev_write_init_ex_file(void)
- 		return ret;
- 	}
- 
-+	sev_init_ex_buffer = vmap_sev_init_ex_buffer();
-+	if (!sev_init_ex_buffer) {
-+		dev_err(sev->dev, "SEV: failed to map non-volative memory area\n");
-+		return -EIO;
-+	}
-+
- 	nwrite = kernel_write(fp, sev_init_ex_buffer, NV_LENGTH, &offset);
- 	vfs_fsync(fp, 0);
- 	filp_close(fp, NULL);
-@@ -294,10 +329,12 @@ static int sev_write_init_ex_file(void)
- 		dev_err(sev->dev,
- 			"SEV: failed to write %u bytes to non volatile memory area, ret %ld\n",
- 			NV_LENGTH, nwrite);
-+		vunmap(sev_init_ex_buffer);
- 		return -EIO;
- 	}
- 
- 	dev_dbg(sev->dev, "SEV: write successful to NV file\n");
-+	vunmap(sev_init_ex_buffer);
- 
- 	return 0;
- }
-@@ -306,7 +343,7 @@ static int sev_write_init_ex_file_if_required(int cmd_id)
- {
- 	lockdep_assert_held(&sev_cmd_mutex);
- 
--	if (!sev_init_ex_buffer)
-+	if (!sev_init_ex_page)
- 		return 0;
- 
- 	/*
-@@ -599,7 +636,7 @@ static int __sev_init_ex_locked(int *error)
- 
- 	memset(&data, 0, sizeof(data));
- 	data.length = sizeof(data);
--	data.nv_address = __psp_pa(sev_init_ex_buffer);
-+	data.nv_address = sme_me_mask | PFN_PHYS(page_to_pfn(sev_init_ex_page));
- 	data.nv_len = NV_LENGTH;
- 
- 	if (sev_es_tmr) {
-@@ -618,7 +655,7 @@ static int __sev_init_ex_locked(int *error)
- 
- static inline int __sev_do_init_locked(int *psp_ret)
- {
--	if (sev_init_ex_buffer)
-+	if (sev_init_ex_page)
- 		return __sev_init_ex_locked(psp_ret);
- 	else
- 		return __sev_init_locked(psp_ret);
-@@ -787,10 +824,38 @@ static int __sev_platform_init_locked(int *error)
- 		}
- 	}
- 
--	if (sev_init_ex_buffer) {
-+	/*
-+	 * If an init_ex_path is provided allocate a buffer for the file and
-+	 * read in the contents. Additionally, if SNP is initialized, convert
-+	 * the buffer pages to firmware pages.
-+	 */
-+	if (init_ex_path && !sev_init_ex_page) {
-+		struct page *page;
-+
-+		page = alloc_pages(GFP_KERNEL, get_order(NV_LENGTH));
-+		if (!page) {
-+			dev_err(sev->dev, "SEV: INIT_EX NV memory allocation failed\n");
-+			return -ENOMEM;
-+		}
-+
-+		sev_init_ex_page = page;
-+
- 		rc = sev_read_init_ex_file();
- 		if (rc)
- 			return rc;
-+
-+		/* If SEV-SNP is initialized, transition to firmware page. */
-+		if (sev->snp_initialized) {
-+			unsigned long npages;
-+
-+			npages = 1UL << get_order(NV_LENGTH);
-+			if (rmp_mark_pages_firmware(PFN_PHYS(page_to_pfn(sev_init_ex_page)),
-+						    npages, false)) {
-+				dev_err(sev->dev,
-+					"SEV: INIT_EX NV memory page state change failed.\n");
-+				return -ENOMEM;
-+			}
-+		}
- 	}
- 
- 	rc = __sev_do_init_locked(&psp_ret);
-@@ -1689,10 +1754,11 @@ static void sev_firmware_shutdown(struct sev_device *sev)
- 		sev_es_tmr = NULL;
- 	}
- 
--	if (sev_init_ex_buffer) {
--		free_pages((unsigned long)sev_init_ex_buffer,
--			   get_order(NV_LENGTH));
--		sev_init_ex_buffer = NULL;
-+	if (sev_init_ex_page) {
-+		__snp_free_firmware_pages(sev_init_ex_page,
-+					  get_order(NV_LENGTH),
-+					  true);
-+		sev_init_ex_page = NULL;
- 	}
- 
- 	if (snp_range_list) {
-@@ -1745,18 +1811,6 @@ void sev_pci_init(void)
- 	if (sev_update_firmware(sev->dev) == 0)
- 		sev_get_api_version();
- 
--	/* If an init_ex_path is provided rely on INIT_EX for PSP initialization
--	 * instead of INIT.
--	 */
--	if (init_ex_path) {
--		sev_init_ex_buffer = sev_fw_alloc(NV_LENGTH);
--		if (!sev_init_ex_buffer) {
--			dev_err(sev->dev,
--				"SEV: INIT_EX NV memory allocation failed\n");
--			goto err;
--		}
--	}
--
- 	/* Initialize the platform */
- 	args.probe = true;
- 	rc = sev_platform_init(&args);
--- 
-2.25.1
-
+> 
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
+> 
