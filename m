@@ -1,151 +1,218 @@
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2071.outbound.protection.outlook.com [40.107.223.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f67.google.com (mail-ej1-f67.google.com [209.85.218.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFCCC23B8;
-	Fri, 29 Dec 2023 07:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC9D10A07
+	for <linux-crypto@vger.kernel.org>; Fri, 29 Dec 2023 09:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MyMvE/Qw"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JQoHAbfS2wWFH3j0/aeYs1f6AFBPsm4Mg1qVIAPrN2UIgCfBHbkQqpuTpiOsnJ+/rHmbJmecvBgPTjclx986E0Mb5CxhRNiqFKIY/4EXfZkBSbjlb+c6Ho8UhInBSWN9nDOvVSwzH0hXGAme8E2pwuvyc8CJdWHmyIc+lUxPPbHhqp6eiPzV7eW5If1iWmCWWZEphiMrDrcj5V9BOQQdBcHeXntJhLXr/ep2JvHFtY/p71UzgIrHFsiedwSo7Ho4aPFr+JgvR5Iz5WiRMXPMe8H8YRb3KJH78Py1zM1DdEKwuNp8eSssVwyu5bP8GVZWZIDwtiH0vcj812nSPR8xWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zBIUz8cFswFHWQWXdVvE6u8Paq1ZGIctxR4LcCydwQ8=;
- b=c3keGP55M+Dm06AcGaB/rfRiBrVHqHCDVlfG0D++0Ys3HaYJzcJTkJWhJ3azwe6IFVpziH3hHqX8AmcI/V2bCwa6/FQfOk1coboJyud4i97v0zry+u9CeWUhux8N6BqnCvTug2yyCpRJtJHJJf0mNBbx4CyRW9mtBK3GGxr2XYmjVj/8xMq7Sr9pQBmsStvFooeSaVkc51pGI1NtcsM6BIHxT2JpiNlwSoq9RrN+gwXvjpB115ar8AaBH6UK0VYJujb46S3e30rxlZ7VS5fKrZQuCQ43mzRRu//fGsR1wPpMX4gNVnonczdJCW547Wyc4KR5MDw+q6c6CyUeGuiNQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zBIUz8cFswFHWQWXdVvE6u8Paq1ZGIctxR4LcCydwQ8=;
- b=MyMvE/QwcMngf99C0HpImTxWw8WkRSfKHyUZJjAKewbjdIvwhTQM0Da0d4jknATYoarWn+aawkhg5Kwm8I/T+o+IrUDxfcezFNoS6MwOJAbc0SAY6N9ZrkYDVx2GRmfiYNhfCAVoZzCxZoH9wCtB1EzkzaaxJZDhOaWiRy2fc6omfXThpc3/V5txEFLgCsEXHUdSoYihG9+4j0oc81Th/yXA9cXaTN0RD1HYMJ9g5MP5+6/Xoy7dygW0LlUyrJ+WLptLrcWg4vMyHq0c7EhK0xGoCUtnmcFxd61tAgt1FnAPw9MquZ2wOrWLH2Xh2iuT1w9eswLhMoKStn0iw7+qHw==
-Received: from SJ1PR12MB6339.namprd12.prod.outlook.com (2603:10b6:a03:454::10)
- by DS7PR12MB5744.namprd12.prod.outlook.com (2603:10b6:8:73::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.29; Fri, 29 Dec
- 2023 07:11:32 +0000
-Received: from SJ1PR12MB6339.namprd12.prod.outlook.com
- ([fe80::d18b:57e8:ee01:bd48]) by SJ1PR12MB6339.namprd12.prod.outlook.com
- ([fe80::d18b:57e8:ee01:bd48%6]) with mapi id 15.20.7113.027; Fri, 29 Dec 2023
- 07:11:31 +0000
-From: Akhil R <akhilrajeev@nvidia.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>, "robh+dt@kernel.org"
-	<robh+dt@kernel.org>, "krzysztof.kozlowski+dt@linaro.org"
-	<krzysztof.kozlowski+dt@linaro.org>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, "thierry.reding@gmail.com" <thierry.reding@gmail.com>,
-	Jonathan Hunter <jonathanh@nvidia.com>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>, Mikko
- Perttunen <mperttunen@nvidia.com>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-tegra@vger.kernel.org"
-	<linux-tegra@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "krzk@kernel.org" <krzk@kernel.org>
-Subject: RE: [PATCH v2 1/5] dt-bindings: crypto: Add Tegra Security Engine
-Thread-Topic: [PATCH v2 1/5] dt-bindings: crypto: Add Tegra Security Engine
-Thread-Index: AQHaMnrYj4FV6eNlVUSo6pNY1YZjfLCyUfWAgAvyqLCAAEfxAIABUE+A
-Date: Fri, 29 Dec 2023 07:11:31 +0000
-Message-ID:
- <SJ1PR12MB6339008197C4E7F8FEA3C783C09DA@SJ1PR12MB6339.namprd12.prod.outlook.com>
-References: <20231219125614.33062-1-akhilrajeev@nvidia.com>
- <20231219125614.33062-2-akhilrajeev@nvidia.com>
- <fe87e220-560b-4d47-bc7f-cc7104d40921@linaro.org>
- <SJ1PR12MB63397127C6E6D1289FA7E464C09EA@SJ1PR12MB6339.namprd12.prod.outlook.com>
- <662833e4-fd2a-481c-9d40-5e691d9a0cfa@linaro.org>
-In-Reply-To: <662833e4-fd2a-481c-9d40-5e691d9a0cfa@linaro.org>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ1PR12MB6339:EE_|DS7PR12MB5744:EE_
-x-ms-office365-filtering-correlation-id: 50db0447-c8cf-45a2-e49c-08dc083d6266
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- XPR19tuuotLSTGqvpRBGHXDxv0ozRen7RkGNKgYJxEXxIrHjAX4w/pctoibeWOLMpF0AW5X4oXMrpzRuv6mnrF1eR0Hbd6WkoBDp9o/lskPTUAwvKvaXpvyridairz550JdhHu1YSA7GG+TkEhnSb1EH0Jz+LdUCLu9cGlhBGInmOytuuJUmBGRzk0lfLU4lBvBXmnvDMolZL4/3VcGtwtDyN8U1uWjOhV6y8F06WE0XvZuqGgKtDeCGwgc9SDNfkGwTSTkoqsuWSgZ8zvs8DKSn4fKcgLQftyWIq8M4G7C8MQAdJUTkn2a4dxXcojzYZytDFELf9DboQBZRMx3k3sap6FgU6OQAEK7p+oIdlvhsENPb8sX1w/D81ftuzB932OtXCqjAf/LBulADkoS9iGkrKcYde10STcKJVKExb2jaB6CIFZWzDPcaXheshpiG1s/kER7WT7HWvqlXPd8fhY1+VWihtIaJsSlOMBuvV6V8X2KTtvcI8K+AA6vLjbHR634D1GgJhkuzTayYuqQ7vE2L2IrmPJdimHz4KyAKlE1vCk2biVP2s3nTvvb7QMRRFlIqqeLAoOP3PHh4SLT8qRdqJjJ4MtBejD6qrYYcV3yZTZ3VFS/KLIe9qPDhL48H6rZLoFNCN3fO0E7ZS/R9lQ==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6339.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(136003)(346002)(366004)(39860400002)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(316002)(8676002)(110136005)(8936002)(478600001)(7696005)(33656002)(71200400001)(9686003)(6506007)(86362001)(53546011)(38070700009)(38100700002)(122000001)(41300700001)(66556008)(66476007)(66446008)(76116006)(66946007)(5660300002)(7416002)(921011)(2906002)(64756008)(55016003)(4744005)(52536014);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?V1dodlFVQ2RFRWFQSlZhNHg2SzJDd0VZdDNvU1pnRlJjKy83aEo0dXpidkNE?=
- =?utf-8?B?enhOaXhHbUhwSWNnTHBzZkYxbjlyWld1Q0NIVThGa0Y1VXJyVTdvRzJmam1y?=
- =?utf-8?B?UmdaTXc5QnVIOEhEZmFIVytIdXg1bWRVUWpQWUxHbVRmY3hOL0FkNlFQS1A1?=
- =?utf-8?B?LzYxMHR6MCtHWmlQcUU3ZU5UQWp6TE5RbEZqcEVvSnYvVHBTb0ZMbGhrV1NJ?=
- =?utf-8?B?djEyNm5Yd0tmR0thNFpEVmV4WFBTNk1OU0FURTNUc1VuZWxrTFpFNkhOVy81?=
- =?utf-8?B?dWlvbENSTEpOQ3p3bXMrdW1YVGRDSzdmTjRlK3ZPZ3JKYzBlN3R6T3A3THVH?=
- =?utf-8?B?T3dkUUUwQjc4Q25TaWpvYWNyUzJzck9yQXJsRXhXTnBtMm1DVXZIc3FiUlpt?=
- =?utf-8?B?TnZQdXNham4yaGZqYUhQZ1pQby9vMWZOd3RiSmwwcWxQUWRVMHkzNHAwcDNS?=
- =?utf-8?B?cExZdDU4VnYyMFBYQzdKWUR6UHBSR3JsZG5lVWhVc2JWUEdvcU9Ld3ZxK0NC?=
- =?utf-8?B?UzRnUWtrdG94OTU5aGpWM1dFUE0rQ0R4WU4wMHJTUWk2OUhaVnVubkNjVFRo?=
- =?utf-8?B?OWxUbDZEYXR4Mklxc1RVU1NkczlkM296TlNlNllwMnhYV0Rkek1KZUdZMVNt?=
- =?utf-8?B?eGNTaVdoYUJxNjc3Ulh3SVFHdlI5dUx3YU1NNTNCbncyZTc0ZkFRbGliSW91?=
- =?utf-8?B?a3dFVDBRTjJzVTVjTHZMMW5jN0toeWJSbG1UamN4ZEpSMXNUaTlEQnhzcGhh?=
- =?utf-8?B?Z2swcVRFN2RxOE1xRFA2M0RSOVZlbDlhdVlOc29rS1pIb1hreW05Z0lDemN2?=
- =?utf-8?B?ZUlXQWRMVy81RS9zd0lhdmQzVTJHM0s4dWtldlltSHpCbGRNQmRuU2l2Ylgw?=
- =?utf-8?B?STN2d3NPM244OWRGZ2hMSVRaL2kvR2RaaXM0ZjJ1OGpOV2FCY3N3OFdjMnU1?=
- =?utf-8?B?aDl2cW53SndxWSttUmUrR2RzNjc2VDIzbEdxUy9Pd05MdDVCcDVFRmhqQVdq?=
- =?utf-8?B?V2JoZVRpWDVzbUlCMC84cUhab2NUVDh0aHZGTC9VTmpVSWpjOHlFMGRCVUZt?=
- =?utf-8?B?Y1hTbks0bGNsUTVHOFozSGE4Q29KNlRMTW5TWDczaTFsbUMvQitzeXRlRjBT?=
- =?utf-8?B?ZnRZTXRhM3I1aHZkRzRJWExtSFBaU01VaUhkMVhNWXdTZmF2a2lzNmdEYWhK?=
- =?utf-8?B?L0NlVWhaNGJ6NGtGcG4wSHdLc2FSSG9NWWxyNnhOT01YcU44Q0ZKaDVEbXVF?=
- =?utf-8?B?Ym5IL3IrQmF1Vm96YThMbzNpWXVHeDVleENCd3NkMHdGZjZiRS9OL0Y3WUFw?=
- =?utf-8?B?c1dtaVFMTGtiS1Y4L2RJNW5XL0RPQWJESVZ3OUJwb3R2M2FNRjZEWVNqbUgx?=
- =?utf-8?B?aDRxZnp4UXlSZFpSeFVNSDMvT3p6K3RUNmVmWkRteWx5SUUzN2taMzlybndr?=
- =?utf-8?B?R0l2NkZJdmlqYWpzN1hUZDR0YndpVE5BNGQzQVZxcEVGVkNVYUtNMDJGS3Zs?=
- =?utf-8?B?bFZDZW0xUGQxWjF0SktCbm9XeGlPUXhLK0FJVnV0VWozbUVSQWxlTlg0MVhk?=
- =?utf-8?B?VzJlY3Y4U0xnb3JYUzJMUUI5eTdpR3Z6T1FFRFhJVHg3N2hRZmRZaGFEbDhE?=
- =?utf-8?B?VE5xVHh1cmlIRG1TQTFTa0JiYkgzYUJSSmREOXAxMHdSb2pJdGxwcEwvVi9W?=
- =?utf-8?B?ZXU1bkZ5dURFRUlpOXRaazFlajdFR1JOZUgzL0Y5RFJHZk1XVUhwNk1hbFYw?=
- =?utf-8?B?YlVMbWFsemJUUVZvMWgyQWVZZkdSeC9vam00WU1Oa1RGekdoWUdFOTBQVWVj?=
- =?utf-8?B?MExCbjBpNDh6bHp1RnJKM0ZpS3JRZFViNU1nd21WSUJhcFBxWmliWno0Q0o1?=
- =?utf-8?B?OHlMaFJMRmQwV3BBNnladkhXZUFLdWQrSTRLSHVvSUpVeUcyeDBZenlRaHZq?=
- =?utf-8?B?cjdHUzVBWG1GWVo1SXI4Ui9VWjJwTGdxUW9EZEM3V0hBRS80cnl1c2FZOHR1?=
- =?utf-8?B?by9SMm04WVI0NXFEVW5yVzNsQVMzVFF3SngyWGkwMXpMcURaa3NGSU9xWERo?=
- =?utf-8?B?QnR5bmhNcDBiajFKMXJJdUgvUUkyZ0ozMmxSQTRvamtjWnNrQWovMW9WQjNI?=
- =?utf-8?B?dlRFTWxkMCtGbUlNZEYyNFd4RW5jeEdabW9JcE9EQ2dqMHMxcXI3Z0lib3dR?=
- =?utf-8?Q?i1hlSdpp/9TX9qnggxKOym9UT9yglb3l2S1xYTRWO1gu?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="bfUwC1If"
+Received: by mail-ej1-f67.google.com with SMTP id a640c23a62f3a-a22f59c6ae6so802347366b.1
+        for <linux-crypto@vger.kernel.org>; Fri, 29 Dec 2023 01:00:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fairphone.com; s=fair; t=1703840456; x=1704445256; darn=vger.kernel.org;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4YFW2Iq8e4IPK1klqEUPGasZZ4lNFL4o1U6qQyaGioA=;
+        b=bfUwC1IfPl9BrSIPCEdLyPwGiW5Jasbb+GV7gUIqeJUIqNUIqHrX/BJOAuTO8ys/g3
+         YHaqN9v38oHo0s0y6lGZIZSNi5BJCdngr44CiCeWCuACEtX1MaQ2bgNS3xEJMBS5V8in
+         ixCUO652TGVBr63mMpUX6UOn+aZUTlzH6hU7FPa9HJPGhh3mLjmANw//rGDDaYEpAy00
+         Eq2j2iQRIsq8yqSbsTxBZGxwxVD/qYHC0v9e+kmrq++xRSNayDM05IGZWBebdbfPkSwk
+         tQagy/tRExtug1R1Jzt4QlPE4H4bPNYdLkb/LV0PH6683LmAyC83/63RQYT1teShK7+l
+         Sxug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703840456; x=1704445256;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4YFW2Iq8e4IPK1klqEUPGasZZ4lNFL4o1U6qQyaGioA=;
+        b=T9fW/FuiNsBl+x0cPwz/2YztWJTIO3582stwZNw/CAo6IRtQzsajdb83MfRIliyWnc
+         0nFOqMtLj6AHpQlrPmaeheQl0mVeegazVARB1S/UOklfmjUB6onpi1jrYVIp+l+axLcy
+         Be1rBF6v6dZi4CS7HfyEAvCNAdHJwobS5eTcoWV635/sjK/53McACMZ3MXbBGz/tLc8g
+         U6XgnSGaW+uYdUUQuX3lpE4u/Qa5I/929iZ6C7JtwW+hXbQPUGmzW4LLZ15Qv+7vMQJq
+         OIURvWljECkS8MosHgxesQPPdDykOtGih8IRilluuD1SnlnTFCZvM7ZtvEHZUEc8dX//
+         fOlg==
+X-Gm-Message-State: AOJu0Yx+YROmaCz0iIxO1GSHwRpgTOtr/h9aoL7LfT1BDBFPUa0XrO0I
+	Ry4cSQGGDcJHwVIH2EGqXfggRhp7uKU1Lg==
+X-Google-Smtp-Source: AGHT+IFsgyvxY2FIbSeZ4Rhwj26H1SnL4iCSe5/raWPACAtLD2F4iWeQeP0GVD7tgQnJsAiTpkU2iA==
+X-Received: by 2002:a17:906:6016:b0:a26:a0d9:10a7 with SMTP id o22-20020a170906601600b00a26a0d910a7mr2218391ejj.76.1703840455776;
+        Fri, 29 Dec 2023 01:00:55 -0800 (PST)
+Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id bz8-20020a1709070aa800b00a234b686f93sm8161508ejc.187.2023.12.29.01.00.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Dec 2023 01:00:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6339.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 50db0447-c8cf-45a2-e49c-08dc083d6266
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Dec 2023 07:11:31.6075
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: L59uMHTRWb82S7iJa7Cioon59vlmaLjZl7G5HgIqjv3ybj4jYjgvgK4uk/OnMdXvlzxUpUODkKYSF53XG57wEA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5744
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 29 Dec 2023 10:00:54 +0100
+Message-Id: <CY0P173KMGJY.25N4DSRYNK5A7@fairphone.com>
+To: "Luca Weiss" <luca.weiss@fairphone.com>, "Om Prakash Singh"
+ <quic_omprsing@quicinc.com>
+Cc: <neil.armstrong@linaro.org>, <konrad.dybcio@linaro.org>,
+ <agross@kernel.org>, <andersson@kernel.org>, <conor+dt@kernel.org>,
+ <davem@davemloft.net>, <devicetree@vger.kernel.org>,
+ <herbert@gondor.apana.org.au>, <krzysztof.kozlowski+dt@linaro.org>,
+ <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <marijn.suijten@somainline.org>,
+ <robh+dt@kernel.org>, <vkoul@kernel.org>,
+ <cros-qcom-dts-watchers@chromium.org>
+Subject: Re: [PATCH V3 2/2] arm64: dts: qcom: sc7280: add QCrypto nodes
+From: "Luca Weiss" <luca.weiss@fairphone.com>
+X-Mailer: aerc 0.15.2
+References: <20231214103600.2613988-1-quic_omprsing@quicinc.com>
+ <20231214103600.2613988-3-quic_omprsing@quicinc.com>
+ <CY01EKQVWE36.B9X5TDXAREPF@fairphone.com>
+In-Reply-To: <CY01EKQVWE36.B9X5TDXAREPF@fairphone.com>
 
-PiBPbiAyOC8xMi8yMDIzIDEwOjMzLCBBa2hpbCBSIHdyb3RlOg0KPiA+Pj4gK3Byb3BlcnRpZXM6
-DQo+ID4+PiArICBjb21wYXRpYmxlOg0KPiA+Pj4gKyAgICBjb25zdDogbnZpZGlhLHRlZ3JhMjM0
-LXNlNC1oYXNoDQo+ID4+DQo+ID4+IFdoYXQgaXMgc2U0Pw0KPiA+Pg0KPiA+PiBBbnl3YXksIGZp
-bGVuYW1lIGxpa2UgY29tcGF0aWJsZS4NCj4gPiBTaW1pbGFyIHRvIHRoZSBhYm92ZSwgdGhlIGhh
-cmR3YXJlIG5hbWUgaXMgU0U0Lg0KPiA+DQo+ID4gbnZpZGlhLHRlZ3JhMjM0LXNlLWFlcyBhbmQg
-bnZpZGlhLHRlZ3JhMjM0LXNlLWhhc2ggZG9lcyBsb29rIGdvb2QgdG8NCj4gPiBtZS4gQnV0IEkg
-YW0gYSBiaXQgY29uY2VybmVkIGFib3V0IHRoZSBBQkkgYnJlYWthZ2UgaW4gY2FzZSwgd2UgbmVl
-ZCBhDQo+IGRpZmZlcmVudCBjb21wYXRpYmxlIGZvciB0aGUgcmVtYWluaW5nIGluc3RhbmNlLg0K
-PiANCj4gSXNuJ3QgdGhpcyBhIG5ldyBkZXZpY2U/IFdoYXQgQUJJIGJyZWFrYWdlPyBXaGF0IHdv
-dWxkIGJlIGFmZmVjdGVkPw0KDQpJIG1lYW50IGEgc2NlbmFyaW8gd2hlcmUgd2UgbmVlZCB0byBz
-dXBwb3J0IFNFMSBpbnN0YW5jZSBhcyB3ZWxsLg0KDQpUaGVyZSBpcyBvbmUgbW9yZSBTRSBpbnN0
-YW5jZSBpbiBUZWdyYSwgd2hpY2ggaXMgdmVyeSBzaW1pbGFyIHRvIFNFMiBBRVMgRW5naW5lLg0K
-QnV0IHJpZ2h0IG5vdywgaXQgZG9lcyBub3QgaGF2ZSBhIGdvb2QgdXNlIGNhc2UgaW4gTGludXgu
-IE5vdyBpZiB3ZSBhZGQgDQpudmlkaWEsdGVncmEyMzQtc2UtYWVzIGFuZCBudmlkaWEsdGVncmEy
-MzQtc2UtaGFzaCwgd2hlbiBTRTEgbmVlZHMgdG8gYmUNCnN1cHBvcnRlZCwgSSBndWVzcyBpdCB3
-b3VsZCBiZSBjb25mdXNpbmcgdG8gZmluZCB0aGUgcmlnaHQgY29tcGF0aWJsZSBmb3IgaXQuDQoN
-ClJlZ2FyZHMsDQpBa2hpbA0K
+On Thu Dec 28, 2023 at 3:29 PM CET, Luca Weiss wrote:
+> On Thu Dec 14, 2023 at 11:36 AM CET, Om Prakash Singh wrote:
+> > Add the QCE and Crypto BAM DMA nodes.
+> >
+> > Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+> > ---
+> >
+> > Changes in V3:
+> >   - V2 patch was sent without actual modification. Resending the patch =
+with modified file.
+> >
+> > Changes in V2:
+> >   - Update DT node sequence as per register ascending order.
+> >   - Fix DT node properties as per convention.
+> >
+> >  arch/arm64/boot/dts/qcom/sc7280.dtsi | 22 ++++++++++++++++++++++
+> >  1 file changed, 22 insertions(+)
+> >
+> > diff --git a/arch/arm64/boot/dts/qcom/sc7280.dtsi b/arch/arm64/boot/dts=
+/qcom/sc7280.dtsi
+> > index 66f1eb83cca7..b819724c1255 100644
+> > --- a/arch/arm64/boot/dts/qcom/sc7280.dtsi
+> > +++ b/arch/arm64/boot/dts/qcom/sc7280.dtsi
+> > @@ -2233,6 +2233,28 @@ pcie1_phy: phy@1c0e000 {
+> >  			status =3D "disabled";
+> >  		};
+> > =20
+> > +		cryptobam: dma-controller@1dc4000 {
+> > +			compatible =3D "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
+> > +			reg =3D <0x0 0x01dc4000 0x0 0x28000>;
+> > +			interrupts =3D <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+> > +			#dma-cells =3D <1>;
+> > +			iommus =3D <&apps_smmu 0x4e4 0x0011>,
+> > +				 <&apps_smmu 0x4e6 0x0011>;
+> > +			qcom,ee =3D <0>;
+> > +			qcom,controlled-remotely;
+> > +		};
+>
+> Hi,
+>
+> Unfortunately I seem to have boot failure / device crash with cryptobam
+> enabled on my qcm6490-fairphone-fp5. Are you aware of any firmware
+> differences that could cause this with QCM6490 LA firmware?
+>
+> Looking at downstream msm-5.4 dmesg I do see this BAM being used so it
+> should generally be accessible from Linux.
+>
+> [    5.217214] qce 1de0000.qcedev: Adding to iommu group 18
+> [    5.223741] QCE50: __qce_get_device_tree_data: CE operating frequency =
+is not defined, setting to default 100MHZ
+> [    5.234986] qce 1de0000.qcedev: QTI Crypto 5.6.0 device found @0x1de00=
+00
+> [    5.242981] sps_register_bam_device: sps:BAM 0x0000000001dc4000 is reg=
+istered
+> [    5.251124] sps_bam_enable: sps:BAM 0x0000000001dc4000 (va:0x000000001=
+db63156) enabled: ver:0x27, number of pipes:16
+> [    5.262783] QCE50: qce_sps_init:  QTI MSM CE-BAM at 0x0000000001dc4000=
+ irq 9
+> [    5.271820] qce 1de0000.qcedev:qcom_cedev_ns_cb: Adding to iommu group=
+ 19
+> [    5.281083] qce 1de0000.qcedev:qcom_cedev_s_cb: Adding to iommu group =
+20
+> [    5.289376] qcrypto 1de0000.qcrypto: Adding to iommu group 21
+> [    5.296326] QCE50: __qce_get_device_tree_data: CE operating frequency =
+is not defined, setting to default 100MHZ
+> [    5.307675] qcrypto 1de0000.qcrypto: QTI Crypto 5.6.0 device found @0x=
+1de0000
+> [    5.315867] QCE50: qce_sps_init:  QTI MSM CE-BAM at 0x0000000001dc4000=
+ irq 9
+
+After some hints from Stephan Gerhold, it looks like when the bam driver
+tries to read the registers for getting num-ees and num-channels we
+need to have the interconnect up, otherwise the register read fails and
+resets the device into EDL mode.
+
+After applying the patch I've attached below the registers can be read
+successfully.
+
+The patch I've actually sent now[0] adds the values read from these
+registers as static properties so that during cryptobam probe we don't
+need to have the interconnect up because we don't read any registers.
+Stephan Gerhold mentioned off-list that this is an adequate solution
+because all the other times the cryptobam is used by the &crypto node
+the interconnect will be up.
+
+[0] https://lore.kernel.org/linux-arm-msm/20231229-sc7280-cryptobam-fixup-v=
+1-1-bd8f68589b80@fairphone.com/T/#u
+
+I imagine the cause why cryptobam & crypto are disabled in sm8350.dtsi
+is the same, so the solution there probably also is just hardcoding
+those properties and then using &crypto should work as expected.
+
+Regards
+Luca
+
+diff --git a/arch/arm64/boot/dts/qcom/sc7280.dtsi b/arch/arm64/boot/dts/qco=
+m/sc7280.dtsi
+index 83b5b76ba179..b2517631e884 100644
+--- a/arch/arm64/boot/dts/qcom/sc7280.dtsi
++++ b/arch/arm64/boot/dts/qcom/sc7280.dtsi
+@@ -2345,6 +2345,9 @@ cryptobam: dma-controller@1dc4000 {
+ 				 <&apps_smmu 0x4e6 0x0011>;
+ 			qcom,ee =3D <0>;
+ 			qcom,controlled-remotely;
++			interconnects =3D <&aggre2_noc MASTER_CRYPTO QCOM_ICC_TAG_ALWAYS
++					 &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>;
++			interconnect-names =3D "memory";
+ 		};
+=20
+ 		crypto: crypto@1dfa000 {
+diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
+index 5e7d332731e0..b2f85c6bcbea 100644
+--- a/drivers/dma/qcom/bam_dma.c
++++ b/drivers/dma/qcom/bam_dma.c
+@@ -40,6 +40,7 @@
+ #include <linux/circ_buf.h>
+ #include <linux/clk.h>
+ #include <linux/dmaengine.h>
++#include <linux/interconnect.h>
+ #include <linux/pm_runtime.h>
+=20
+ #include "../dmaengine.h"
+@@ -394,6 +395,7 @@ struct bam_device {
+ 	const struct reg_offset_data *layout;
+=20
+ 	struct clk *bamclk;
++	struct icc_path *mem_path;
+ 	int irq;
+=20
+ 	/* dma start transaction tasklet */
+@@ -1298,6 +1300,14 @@ static int bam_dma_probe(struct platform_device *pde=
+v)
+ 		return ret;
+ 	}
+=20
++	bdev->mem_path =3D devm_of_icc_get(bdev->dev, "memory");
++	if (IS_ERR(bdev->mem_path))
++		return PTR_ERR(bdev->mem_path);
++
++	ret =3D icc_set_bw(bdev->mem_path, 1, 1);
++	if (ret)
++		return ret;
++
+ 	ret =3D bam_init(bdev);
+ 	if (ret)
+ 		goto err_disable_clk;
