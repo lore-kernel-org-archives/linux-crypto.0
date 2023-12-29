@@ -1,37 +1,37 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2042.outbound.protection.outlook.com [40.107.93.42])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2060.outbound.protection.outlook.com [40.107.94.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956A315AC5;
-	Sat, 30 Dec 2023 16:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F68D2FF;
+	Sat, 30 Dec 2023 16:28:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="e+TUBCNy"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PQwXlIjE"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EqxBW5KRjNmIwx6folFiFWBt4jAyC1sAi9EH5nJJRFAJTYQV2DyRTplcWpkZRP9GqUvIaqlJbMBISax4wb89qfgnrM9RxYpU/rVI5jTvne1Lnp2+sS7rS4voDtALJTVXBp1S+oK0CIwmyXVMoIGgSSsNw8A5AXW7/nN87SwF0AlZf9MQJdi2lra9/JEoxSukXtjuHDUokHJAJpbXY/L4csJ4M56A8Z+v881dHGVHzqfqyHE660BooP9bz0iMXtSZtWFhKqYYDCS1d5z+1UUkzAEoHELPa5UXq32BR7qb3CBY6k0St8RwZvj8U2S0T/ZqkOBAWEV6mkEywIzMLDU22g==
+ b=CfO4WbdW6sdKH57RvpTjx7kTonwU9IbTo6k1jswQhigjdeZqzJfliV8eQinp+jVd8DVqEbEUkP6yiIY8k9KhohI9DMDJo546tMiO/S+PXqBXutJAmvrMtTvJRExUDHhVuufaQAB5YPfwA9kbE5FxkhJjAOeLX4nJ+n+LzI0tqHnaB+Z/BUbPkIuYwmcY/WR3HFvwdtxkAZTjCO1tnLXOfwlrox1wmE+gh8KjaFU5bE87z2IAYqcsjUS0+QDKZMVYw+sePo20hG3YtVzeOY1mSfBCQyQPZvvAz67rkLMbZzQASgP6UxEcNTkpCloJNQudA7Ln3BrW73EbkUJGnEtPtg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+HRK4QFVzuwysPEJ6g24TxyO83Z9D4pVegKGwtG3IRI=;
- b=lOhNXnXirKuRLFbHJhAUwyAnA6noJQDkznsqYDM1Rao366xsjjHFZlRa1HXtGjox60AueyQBivHVOYNKaFJryYsFb/jbDa0L8SyJet6xps7Sj17J5Tc+3QGU4IAvo6wJWlkZqbXacT53fb189EQspt+DInHQ6REq/oppXpZ1pulOWvBe5RucsiUYivLmDEOi1ZXTKdxAfnRpI+SCHk/nqLQ9m1SbqYtKFo7hY7e+W8EfNk3vdDwPrjaMQZqYIuZ8iQAcNwTDq4QNyLqG4sqreQ9x0oWc7utSdySH4/MmarzgzRxCAT7ARd7sijglDfr4IDhFtWdRCljnZOGGSgNX9g==
+ bh=+uWfdyNfgvPcp5KvXOi6ohVw02Oi+PezFcW7hS5yHyE=;
+ b=CcWWcCk1bp/O6+a9IuksqpClbZhqIxopI6m2GwUXIm//T9u/ucJ/ICOA8IeV402bUV46dXv8/6FENU2yZjHfspuAdbpPIJbtFshlNmumT0NT+ByHYWJyvq4h8f/NBfePZBkmCoDeJKZ2lzr3TGGhX4vp7ZxqZk/JvNd1/jiHQo/gnDnpDlchcFFbiHiKoyBXpjPkIT07/FjhgMtsCV9tGgDhGCC/vKay0ruZuoRRZb7Ox9Io2LqD2KV20CZIThiDf5slQm40FPWqTksKeVze0RwXpr2xCm6YCvclnRZ45Mg6NCDhsrWYTVuyDwvazXanYOzzl2Ovgvc+GB0/oK/hvg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+HRK4QFVzuwysPEJ6g24TxyO83Z9D4pVegKGwtG3IRI=;
- b=e+TUBCNy2ZLJ5EtEdUdnA0TYh3Ke+tns3orq+8SuFdWt5orNpY2I/Yhor4FcPRt8wz4lR7TahQn337CVDhB7kWAlTUvoVRu4Ax8dmmldl9OeAHBNNvheIMnpqybTLfJUapNPtDhtgYRvagVx6yGVBsQICuQDxc8LQquWWaT21HY=
-Received: from DS7PR03CA0216.namprd03.prod.outlook.com (2603:10b6:5:3ba::11)
- by IA0PR12MB8227.namprd12.prod.outlook.com (2603:10b6:208:406::15) with
+ bh=+uWfdyNfgvPcp5KvXOi6ohVw02Oi+PezFcW7hS5yHyE=;
+ b=PQwXlIjEP4gcpzI960LQnJ2oby/TStltqhhPs4imausGSyJc0xPxgQneWwvbRoIdIA8xgFjMxKS7FVLlEIouSUeJLDnhILT5E3Otg4Of9/nss1q0Gy/BtY2TKst8aj475rKkVFKcp3xNMkr0kFXF8dS+mkJuYh+kM7ExI3Gngb0=
+Received: from SJ0PR13CA0020.namprd13.prod.outlook.com (2603:10b6:a03:2c0::25)
+ by DM4PR12MB6302.namprd12.prod.outlook.com (2603:10b6:8:a4::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.23; Sat, 30 Dec
- 2023 16:28:01 +0000
-Received: from DS1PEPF00017096.namprd05.prod.outlook.com
- (2603:10b6:5:3ba:cafe::dd) by DS7PR03CA0216.outlook.office365.com
- (2603:10b6:5:3ba::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.22 via Frontend
- Transport; Sat, 30 Dec 2023 16:28:01 +0000
+ 2023 16:28:22 +0000
+Received: from DS1PEPF00017099.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c0:cafe::38) by SJ0PR13CA0020.outlook.office365.com
+ (2603:10b6:a03:2c0::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.7 via Frontend
+ Transport; Sat, 30 Dec 2023 16:28:22 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -39,166 +39,88 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF00017096.mail.protection.outlook.com (10.167.18.100) with Microsoft
+ DS1PEPF00017099.mail.protection.outlook.com (10.167.18.103) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 16:28:01 +0000
+ 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 16:28:21 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Sat, 30 Dec
- 2023 10:28:00 -0600
+ 2023 10:28:21 -0600
+Date: Fri, 29 Dec 2023 15:41:39 -0600
 From: Michael Roth <michael.roth@amd.com>
-To: <x86@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
 CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-	<thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-	<pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <seanjc@google.com>, <vkuznets@redhat.com>,
 	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
 	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
 	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-	<tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
-	<ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-	Brijesh Singh <brijesh.singh@amd.com>, Alexey Kardashevskiy <aik@amd.com>,
-	Dionna Glaze <dionnaglaze@google.com>
-Subject: [PATCH v1 26/26] crypto: ccp: Add the SNP_SET_CONFIG command
-Date: Sat, 30 Dec 2023 10:19:54 -0600
-Message-ID: <20231230161954.569267-27-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231230161954.569267-1-michael.roth@amd.com>
-References: <20231230161954.569267-1-michael.roth@amd.com>
+	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
+	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<marcorr@google.com>, <sathyanarayanan.kuppuswamy@linux.intel.com>,
+	<alpergun@google.com>, <jarkko@kernel.org>, <ashish.kalra@amd.com>,
+	<nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>, <liam.merwick@oracle.com>,
+	<zhi.a.wang@intel.com>
+Subject: Re: [PATCH v10 20/50] KVM: SEV: Select CONFIG_KVM_SW_PROTECTED_VM
+ when CONFIG_KVM_AMD_SEV=y
+Message-ID: <20231229214139.fctfgl5n2zjac2hb@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-21-michael.roth@amd.com>
+ <cc97bfdf-ac46-4616-be68-d251304f81af@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <cc97bfdf-ac46-4616-be68-d251304f81af@redhat.com>
 X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017096:EE_|IA0PR12MB8227:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1636d343-8966-4580-b80d-08dc09544a92
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017099:EE_|DM4PR12MB6302:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87801c02-df6d-442f-4309-08dc095456f1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	dPhh2KRSw37/HaErMzCmJTsnzeUXr0kvWj1EuT+B/5kelbTimLSQIEfsjS/G4mkDbRZnnc9Qq2sjSFBn5qgCMvlhxbthL+WQrgW513k10E8qjEXJYwJ+Y2IznFOhD+q4bvp7FclaENDXHJedDaizBS5n1ti6Obr0gc6oym9DXWAcglXvVZVRblHnXiLsTC9/wOCid5twPWvkduxKyuAr+16YobVAGObsBt1sdwWPAGnM+6Om3k/62+TKmNSvvRsg+tHZBenKtKCaQ+reTqz22JCXjhXsOWhDz9NJ55sly8r0g9phfCLSePCjoinjmuW+/rzhngA4D1AfUy8e+1dsDUIEKAszz/TAxo8FWIUblYmnQozA49MQN2Vne5ceh76qf62X519VKIg0XQJWxl9frZtBTcpJiKEJTYIfj3DHbX/kQ3rwUrFvJvBiHiFp9CKQrEVLjb01V0mEgujyUF0+iBTp2QDliwQ8J/PaEa5/yRBDUdfsQJS9GbphtvGmWKCiGoBVT0kIlT9bMrXCQ+ZmWNy5o5sZIJSFeNc+SvlPMl3mWaq/eS7bLMuzHDmyqLYElPpYUkCzWIP2gGud5s0SHZ73L3gra3UsnnoeXqwDrakFi++d72nvGBHt1ZXx55O+sjMpcLhkb5rqsUIpadAUKeaYLWCCxmIOWVFB3u/yQSjYfYl4/3uZnEhlyTJ/paJDyWzcDTLmwtmFJEvJ7VbiFYv340HYqbziNAi94XXdPYVIPdQ9qIUda9+QhfQyCVo9sjjojcFtXg/+o4Q6Bnf0Tg==
+	zsYkD9h3zQ7UAjP2OjAfFl7jXmkvRhBE7Cz6BO1Ijq303bv6CL0atloj+rG7gRrd7H/ku8je1C1dKP7fTfKAar/q327P4dxZPKa2Dfd5hZH3MnZOsgRj5ehxgEC1Mo+BQqrfMiIgbnWPuQ6HegXmwzISUBPDjL6BnnSIgt5FM/+zx9mHzTnE9gtULT3b0hniiYD8PEaHDieT/QnmWMqyUFE5ERhCpoflDBtUQvwgP3enSoYEkKaAduyKb2WqP6irExP5AcmD08Evn6kLBAt5XrIFI5hhsTQe2WVla0XvxAheG781dFP7oBj5B/7d/fIqtmDhuy48EXQdwmQ1mLRpXzbL85p41Qn9A4D/TDMJud2rfrfzMNyFEZR4H2muk55jId43zhGPTcw1qc6KdeBj3BWT1Q7wRcd+LDAo4k0ArfasMHg6K70uTDHih1ZvvPxQgGHVhnRdQ9s6wfzgATyokGmU31GmQi3DWb9iSXJM0ohte6eTzpX8sAQ7nQJyq8KLMQWYDBtlVZUNTHzDLYKtxaNPXDLlBJFfFNVATtVmdyHpAMfZwrU1qgCgyesJ8HCYM0fJotmv7bGGmuC5csK4muHpJLtuR7LnrtMpV8aswJo1sfeg7eQJFMFyauFO7Z6KtbLkewhBVE1WlpeRtSbnMITX3T3sPnM6aenlN21LYPXS7PKBpT9RNPF+pAPf+yIt3N9uHN/k7/Xs9NtMbvYSRz0WxCVP51wMpO1mO9PiHY0OwtpVmldbTudBKfghNutOY/32CBPpwDVjYYBFh66oow==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(39860400002)(376002)(136003)(230922051799003)(451199024)(1800799012)(186009)(82310400011)(64100799003)(36840700001)(40470700004)(46966006)(2906002)(7406005)(7416002)(5660300002)(41300700001)(82740400003)(478600001)(36860700001)(2616005)(40460700003)(16526019)(426003)(336012)(40480700001)(83380400001)(26005)(1076003)(6666004)(47076005)(8936002)(8676002)(36756003)(4326008)(44832011)(6916009)(356005)(70586007)(70206006)(81166007)(316002)(86362001)(54906003)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(39860400002)(396003)(136003)(230922051799003)(82310400011)(451199024)(186009)(1800799012)(64100799003)(46966006)(36840700001)(40470700004)(336012)(426003)(53546011)(1076003)(26005)(16526019)(2616005)(47076005)(36860700001)(5660300002)(44832011)(8936002)(4326008)(8676002)(41300700001)(7406005)(7416002)(4744005)(2906002)(478600001)(6666004)(316002)(6916009)(54906003)(70206006)(70586007)(36756003)(82740400003)(356005)(81166007)(86362001)(40480700001)(40460700003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 16:28:01.2018
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 16:28:21.9385
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1636d343-8966-4580-b80d-08dc09544a92
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87801c02-df6d-442f-4309-08dc095456f1
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017096.namprd05.prod.outlook.com
+	DS1PEPF00017099.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8227
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6302
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+On Wed, Dec 13, 2023 at 01:54:55PM +0100, Paolo Bonzini wrote:
+> On 10/16/23 15:27, Michael Roth wrote:
+> > SEV-SNP relies on the restricted/protected memory support to run guests,
+> > so make sure to enable that support with the
+> > CONFIG_KVM_SW_PROTECTED_VM build option.
+> > 
+> > Signed-off-by: Michael Roth<michael.roth@amd.com>
+> > ---
+> 
+> Why select KVM_SW_PROTECTED_VM and not KVM_GENERIC_PRIVATE_MEM?
 
-The SEV-SNP firmware provides the SNP_CONFIG command used to set various
-system-wide configuration values for SNP guests, such as the TCB version
-to be reported in guest attestation reports. Add an interface to set
-this via userspace.
+I'm not sure, maybe there were previous iterations where it made sense
+but KVM_GENERIC_PRIVATE_MEM definitely seems more appropriate now. I've
+changed it accordingly.
 
-Co-developed-by: Alexey Kardashevskiy <aik@amd.com>
-Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-Co-developed-by: Dionna Glaze <dionnaglaze@google.com>
-Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-[mdr: squash in doc patch from Dionna, drop extended request/certificate
- handling and simplify this to a simple wrapper around SNP_CONFIG fw
- cmd]
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
- Documentation/virt/coco/sev-guest.rst | 13 +++++++++++++
- drivers/crypto/ccp/sev-dev.c          | 20 ++++++++++++++++++++
- include/uapi/linux/psp-sev.h          |  1 +
- 3 files changed, 34 insertions(+)
+-Mike
 
-diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
-index 007ae828aa2a..4f696aacc866 100644
---- a/Documentation/virt/coco/sev-guest.rst
-+++ b/Documentation/virt/coco/sev-guest.rst
-@@ -162,6 +162,19 @@ SEV-SNP firmware SNP_COMMIT command. This prevents roll-back to a previously
- committed firmware version. This will also update the reported TCB to match
- that of the currently installed firmware.
- 
-+2.6 SNP_SET_CONFIG
-+------------------
-+:Technology: sev-snp
-+:Type: hypervisor ioctl cmd
-+:Parameters (in): struct sev_user_data_snp_config
-+:Returns (out): 0 on success, -negative on error
-+
-+The SNP_SET_CONFIG is used to set the system-wide configuration such as
-+reported TCB version in the attestation report. The command is similar to
-+SNP_CONFIG command defined in the SEV-SNP spec. The current values of the
-+firmware parameters affected by this command can be queried via
-+SNP_PLATFORM_STATUS.
-+
- 3. SEV-SNP CPUID Enforcement
- ============================
- 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 9c051a9b43e2..c5b26b3fe7ff 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -2018,6 +2018,23 @@ static int sev_ioctl_do_snp_commit(struct sev_issue_cmd *argp)
- 	return __sev_do_cmd_locked(SEV_CMD_SNP_COMMIT, &buf, &argp->error);
- }
- 
-+static int sev_ioctl_do_snp_set_config(struct sev_issue_cmd *argp, bool writable)
-+{
-+	struct sev_device *sev = psp_master->sev_data;
-+	struct sev_user_data_snp_config config;
-+
-+	if (!sev->snp_initialized || !argp->data)
-+		return -EINVAL;
-+
-+	if (!writable)
-+		return -EPERM;
-+
-+	if (copy_from_user(&config, (void __user *)argp->data, sizeof(config)))
-+		return -EFAULT;
-+
-+	return __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
-+}
-+
- static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- {
- 	void __user *argp = (void __user *)arg;
-@@ -2075,6 +2092,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- 	case SNP_COMMIT:
- 		ret = sev_ioctl_do_snp_commit(&input);
- 		break;
-+	case SNP_SET_CONFIG:
-+		ret = sev_ioctl_do_snp_set_config(&input, writable);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 		goto out;
-diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
-index 01aab4b340f4..f28d4fb5bc21 100644
---- a/include/uapi/linux/psp-sev.h
-+++ b/include/uapi/linux/psp-sev.h
-@@ -30,6 +30,7 @@ enum {
- 	SEV_GET_ID2,
- 	SNP_PLATFORM_STATUS,
- 	SNP_COMMIT,
-+	SNP_SET_CONFIG,
- 
- 	SEV_MAX,
- };
--- 
-2.25.1
-
+> 
+> Paolo
+> 
+> 
