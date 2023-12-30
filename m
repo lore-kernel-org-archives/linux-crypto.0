@@ -1,51 +1,50 @@
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2057.outbound.protection.outlook.com [40.107.102.57])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2065.outbound.protection.outlook.com [40.107.92.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E7414F6A;
-	Sat, 30 Dec 2023 17:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3AD14F89;
+	Sat, 30 Dec 2023 17:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DAsba546"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Vfs8TFwA"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fDTcXQ+2O7QDBv1i77UUuEYEc66y7VvCYmZxqmWQjYnwqSbvMZptHp3o782A6Rr/fhhYc0c2VDc7MNbjJP2cKufsvotl1aotyAj3cxyZ7unwGcNVRDPnI6jo5oSv9hUXJL/IgHfDTrdp44WG4KJzvmlBrPzbFAq4Xk6ZV3OCYNKo+Eu+u0F5lAALjZc9TACw+zV63Z1y1OCpKmuUTZX1ZtpKMFDoUdCgtRzIi4QYVGwlby0kEHjsptTo3F/ai0omz0BG2SxMFvJUY6KYb3J9NhVe44AS5yDVJw9jdHgkJrT4tmwQNTPoXeRmndeOBOTUu3c4iAf0FKzakZNwF86O7Q==
+ b=hmR7SNIieKu6JBk8zJ9kADYGl0G7f0fSYuCVBNGMeIWB4iS1EkaL1nY+rGhOT8wxsVUtIJ2HyxUbQtVFgTrQeBt2MZV8/DRKFqVl2quiKD9pIGgFm+Pop59F3pZIuQVNZNl51fPaHjah+wIJBXr7duxMHfz6Th3XzqURzlW8Y/Ly0f6sodH9KH3SMe03ip0LnQbIuh183d9CkxSFg3PSCxOm2rA9V0UrD0QM+hWximE5xkFBOAzO+hfkEDgaVnaAlg9hM1rcYzXgXTgOqZvpF2GP2SijBSM8haJxcQ5kGZbgk+1qVVxCHux7r1E5FW2cXtN11AVOrZe4ba7XYMndpg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Xi6JDzTfmVUpA1y8LRyTqKgiLlYzZFnL6ITEUbCEECc=;
- b=KWLom0F4lpyWg21uHrmGLOjSz7lDDLJcYTRIPGO5Jkv5baFAldccFFiPw1yiHE9V5FbAzODkgySGgegR/eaT4VJg6B5pBPa4RwshKC6usEBji/1C+wR7fEmkwtAbrHvmeLkOo8SCEWFS7VTETc5PPq7tqCvk76QOm1z7SgFFaUS3zcH8mXASxEOXruDma5on72vwlwwu/vowJTZVIUyeiwbvuGh/niDEqdWBshr0wZrSGVXMRfRuEMwXvChiXmKNB0pNqoIHO27slc2e0Dp+/PVkyzphMwEePe29mJuF7EP+NC0aRQzNO/uC0H0debZeMshBSe0rrdQnveoIEhVrAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
+ bh=HMquHRfJhztWwAGw0aEjpzQfmonSkbdg6a9RKxKNMiY=;
+ b=dbVeOajYY++Pzfc9g6eOg8zVkR6bs5vlbwb55Qy1zZzs45Mp7OVEXPPt3k8hPfu321a1ddt+zjWZ/bo1sXPImfmzeXJDD8m4VDZ1X9TvV33HRXOoYcicoMyuludLpxbrKPXejANgEOanA3ObWvoIXdWi4jNAeqXQJOxue4sSIYiKYcYxSfQcA2SH0Hi6rpSHvc77bRBB2MqbY8avJtPuuYs8vbqqzjoM81TcZMp13YWtx3Yb9FyLjfyU8UWpVzflRxpSIUUdOpKMjENtzi3a18xHnOGQIq3Z4Lrq1nf+WPpGfOD/rUePe32rM0HziVn/slyGB7m9aJ1C2yalz0G5AA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
+ is 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=temperror action=none header.from=amd.com; dkim=none (message not
+ signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Xi6JDzTfmVUpA1y8LRyTqKgiLlYzZFnL6ITEUbCEECc=;
- b=DAsba546ZsEnzmb/WMYPU5PyGXwpzSytZwvD67to0RMdpuBr9R4yA+DgZBZLJDlQY9l7h0KePtthU2x5yiqSS+e2e5WF/ggSZO9orEjq848xKnpsHtF+twycGEzHFJkrS2ulBjEH4v1GZ85j355sNeAFlrhrYqiqvcrcSxwW4Fo=
-Received: from MW4PR04CA0068.namprd04.prod.outlook.com (2603:10b6:303:6b::13)
- by MN0PR12MB6223.namprd12.prod.outlook.com (2603:10b6:208:3c1::12) with
+ bh=HMquHRfJhztWwAGw0aEjpzQfmonSkbdg6a9RKxKNMiY=;
+ b=Vfs8TFwArqDodrhXSrJKPAEymSSPDwm2oaWkmestuJLWA7pP8rcOu8LJoEcMcfW9bJjegzi13Fj3IzLnVYSBEzb0P4X/1bK0g2HEV2HgtyRv6YBIrDuXDGemO8TexXFKbPXEebDEiLBlihjV25bLxZSuQuwE32CfxXuZT1PD/Ac=
+Received: from SJ0PR13CA0147.namprd13.prod.outlook.com (2603:10b6:a03:2c6::32)
+ by SN7PR12MB7023.namprd12.prod.outlook.com (2603:10b6:806:260::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.22; Sat, 30 Dec
- 2023 17:32:42 +0000
-Received: from CO1PEPF000044F0.namprd05.prod.outlook.com
- (2603:10b6:303:6b:cafe::ea) by MW4PR04CA0068.outlook.office365.com
- (2603:10b6:303:6b::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.21 via Frontend
- Transport; Sat, 30 Dec 2023 17:32:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+ 2023 17:33:03 +0000
+Received: from CO1PEPF000044F2.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c6:cafe::e3) by SJ0PR13CA0147.outlook.office365.com
+ (2603:10b6:a03:2c6::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.7 via Frontend
+ Transport; Sat, 30 Dec 2023 17:33:03 +0000
+X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
+ 165.204.84.17) smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=temperror action=none header.from=amd.com;
+Received-SPF: TempError (protection.outlook.com: error in processing during
+ lookup of amd.com: DNS Timeout)
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000044F0.mail.protection.outlook.com (10.167.241.70) with Microsoft
+ CO1PEPF000044F2.mail.protection.outlook.com (10.167.241.72) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 17:32:41 +0000
+ 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 17:33:02 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Sat, 30 Dec
- 2023 11:32:40 -0600
+ 2023 11:33:01 -0600
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -61,11 +60,10 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-	Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH v11 02/35] mm: Introduce AS_INACCESSIBLE for encrypted/confidential memory
-Date: Sat, 30 Dec 2023 11:23:18 -0600
-Message-ID: <20231230172351.574091-3-michael.roth@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
+Subject: [PATCH v11 31/35] KVM: SEV: Avoid WBINVD for HVA-based MMU notifications for SNP
+Date: Sat, 30 Dec 2023 11:23:47 -0600
+Message-ID: <20231230172351.574091-32-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231230172351.574091-1-michael.roth@amd.com>
 References: <20231230172351.574091-1-michael.roth@amd.com>
@@ -81,75 +79,62 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F0:EE_|MN0PR12MB6223:EE_
-X-MS-Office365-Filtering-Correlation-Id: d07f1a2e-047c-45c8-2309-08dc095d5383
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F2:EE_|SN7PR12MB7023:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0b946496-a297-4964-53b6-08dc095d5fdd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	A6wr6M5+B73F4sbAdk5nB8wcN4EFYF6GThu8HAg9mqZKR1SbD16Ur+B5aJcMqXu/zPw8TgueSxb/elf5Nb57VuWvGMP+4rVWWC2j+id9TFxXo8xmn12lAlWL4bIZNnTJsxH/TmdVm0aJ4v9OTGulA6Yf4XR5VBgSweL4RLOtNC/9ZLojlIIdpd3kZK8DsFtiM/irZQE0gv9oagxO7GxvM6DHevWrjm1mZdLFYFepqPVt5BhR6dG9r1A1ulSsWiGZH7gfHFXaY6QI7pm0GgLwEgeu13dFzHIVudQhIck1HAp4mieQPHVjml9NhXXzpHoeXXuMLh6lxFCCUWSToSXio8Ks8ezkOsh5JJgsx+iF8dshI0cU1bWV1iPlGSHHe3LjcRY5/up7ah7hM/3syDN/akWEziBhR/pL4VXDAnWkPnXhHRshBKDFeD5l3W11BNea+qaMK/EaobB6T0vf+6mV7LtlvhT33MZm4qCxMCpWphSyXfHu3mhlbnAlc0K1zPVIA4rACZGVcnpy66YkE2dGaW7KAbkIt+fh3itmNdsrabdLxtZj5+gTRtXOgpa6EPwlDqQ2/X7od0xbchyWeBNHh0TkcEr7NOQNRtxVZAyJ7804gVoG2AS+jmKXV++8AN6Xf+NU+HFvC+wpCqUUvkdIdkp5PlKPK1ePPJofZ2yjjc/w4scGUHtikALYESk21tlzdW+nCw6cYd9fd2oxfd2G9or9p1tUmEd2I+p4iFxEM8XwuX9i3iemUnmLFfrGfSWWk0a1zlQT4iQBIfflqmxPfw==
+	uEUopIA+zJbIY2GCNfUFFoFgv805NV4/uVaDPWHvbUIqmjDmNrCzVxy5We4nxV5616O0BQT6GZn1j3o64VVbFDe6HsUiOqhv/egyRbQhJ+MgMI0W0xUPhZe0f2W7tPbmX8TdjAZ3jZkObO+EUbLmhE36FBqvPH3ljbUyMoQLZrVfw+lWWZGGtQaHn+Y+54tw+iliOKeqULiiHCh38Rgx1AexEeoX/17y7EACmgMFcchPcrlFuNBbA7yFUquHx+7ulvMKiAXADSTX1gbJPaqgEjWp4oSJjakc5qa+zEcoTqSydYUZo5nBeQ6VEn0bK2Vcw/wiQZb09xlwRWbZiBfUfvxU6TrjsH1lL/3RcGml0lQKjzNHqrY45sDpAGV7oQeYWxRLsVTsrNx18HykhQMuoWBlHlCU3xD/o1dl6SsW+MWY+3GF0IJPQbPSb3uGx80X4jwGTHNIchS/gwKAC46vm2Xv/N/EeBwNYR5fTS+jMRMNf+J5MEr9o24SCqk9G++e34PouTRBYXgvJCsVSu9Ex4pSXrnfyJqVR7+VgnRQJSgbT6h5Iu7Ms6Ps4RXywDb4Tc86Dr4s26vRmPMSGCsfqWNBn3B06o9spSzgNeIaLQrD3wQ5QnJWFdotLmdNndM3Z/jdgQYy7kSVwuk2m3wDSzFKHZh3TBhBDOAj1zugf7zxEkWmjqSVVpB4HI+dS/Zn/zjZHN2CfnzcnglwCsU85I/woBrTkVTRM4vYBjpLQZat+BnOTklkiE+YwExyOTG6VNB7yXnwWvKxTJaVZLg9CQ==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(346002)(396003)(39860400002)(376002)(230922051799003)(186009)(1800799012)(64100799003)(82310400011)(451199024)(40470700004)(46966006)(36840700001)(36860700001)(966005)(478600001)(40460700003)(41300700001)(82740400003)(44832011)(356005)(6916009)(36756003)(4326008)(86362001)(316002)(81166007)(54906003)(70206006)(70586007)(6666004)(47076005)(336012)(426003)(16526019)(26005)(1076003)(40480700001)(83380400001)(8936002)(8676002)(2616005)(2906002)(5660300002)(7416002)(7406005)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(396003)(376002)(346002)(230922051799003)(82310400011)(1800799012)(186009)(451199024)(64100799003)(46966006)(36840700001)(40470700004)(26005)(1076003)(54906003)(70586007)(70206006)(40460700003)(6916009)(40480700001)(2616005)(6666004)(83380400001)(63350400001)(63370400001)(4326008)(8676002)(8936002)(36756003)(316002)(336012)(426003)(478600001)(16526019)(44832011)(7416002)(7406005)(5660300002)(47076005)(86362001)(356005)(2906002)(81166007)(36860700001)(82740400003)(15650500001)(41300700001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 17:32:41.5760
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 17:33:02.3154
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d07f1a2e-047c-45c8-2309-08dc095d5383
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b946496-a297-4964-53b6-08dc095d5fdd
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F0.namprd05.prod.outlook.com
+	CO1PEPF000044F2.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6223
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7023
 
-filemap users like guest_memfd may use page cache pages to
-allocate/manage memory that is only intended to be accessed by guests
-via hardware protections like encryption. Writes to memory of this sort
-in common paths like truncation may cause unexpected behavior such
-writing garbage instead of zeros when attempting to zero pages, or
-worse, triggering hardware protections that are considered fatal as far
-as the kernel is concerned.
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Introduce a new address_space flag, AS_INACCESSIBLE, and use this
-initially to prevent zero'ing of pages during truncation, with the
-understanding that it is up to the owner of the mapping to handle this
-specially if needed.
+With SNP/guest_memfd, private/encrypted memory should not be mappable,
+and MMU notifications for HVA-mapped memory will only be relevant to
+unencrypted guest memory. Therefore, the rationale behind issuing a
+wbinvd_on_all_cpus() in sev_guest_memory_reclaimed() should not apply
+for SNP guests and can be ignored.
 
-Link: https://lore.kernel.org/lkml/ZR9LYhpxTaTk6PJX@google.com/
-Cc: Matthew Wilcox <willy@infradead.org>
-Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+[mdr: Add some clarifications in commit]
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- include/linux/pagemap.h | 1 +
- mm/truncate.c           | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ arch/x86/kvm/svm/sev.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index c2d90588c0bf..b56081a3512e 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -207,6 +207,7 @@ enum mapping_flags {
- 	AS_STABLE_WRITES,	/* must wait for writeback before modifying
- 				   folio contents */
- 	AS_UNMOVABLE,		/* The mapping cannot be moved, ever */
-+	AS_INACCESSIBLE,	/* Do not attempt direct R/W access to the mapping */
- };
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 5eb836b73131..2cc909cc18c1 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2858,7 +2858,14 @@ static void sev_flush_encrypted_page(struct kvm_vcpu *vcpu, void *va)
  
- /**
-diff --git a/mm/truncate.c b/mm/truncate.c
-index 725b150e47ac..c501338c7ebd 100644
---- a/mm/truncate.c
-+++ b/mm/truncate.c
-@@ -233,7 +233,8 @@ bool truncate_inode_partial_folio(struct folio *folio, loff_t start, loff_t end)
- 	 * doing a complex calculation here, and then doing the zeroing
- 	 * anyway if the page split fails.
- 	 */
--	folio_zero_range(folio, offset, length);
-+	if (!(folio->mapping->flags & AS_INACCESSIBLE))
-+		folio_zero_range(folio, offset, length);
+ void sev_guest_memory_reclaimed(struct kvm *kvm)
+ {
+-	if (!sev_guest(kvm))
++	/*
++	 * With SNP+gmem, private/encrypted memory should be
++	 * unreachable via the hva-based mmu notifiers. Additionally,
++	 * for shared->private translations, H/W coherency will ensure
++	 * first guest access to the page would clear out any existing
++	 * dirty copies of that cacheline.
++	 */
++	if (!sev_guest(kvm) || sev_snp_guest(kvm))
+ 		return;
  
- 	if (folio_has_private(folio))
- 		folio_invalidate(folio, offset, length);
+ 	wbinvd_on_all_cpus();
 -- 
 2.25.1
 
