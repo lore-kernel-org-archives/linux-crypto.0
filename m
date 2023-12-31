@@ -1,142 +1,204 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024D54415;
-	Sun, 31 Dec 2023 11:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B296120
+	for <linux-crypto@vger.kernel.org>; Sun, 31 Dec 2023 15:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="cl9kUDyW"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 49E0540E016E;
-	Sun, 31 Dec 2023 11:51:01 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 4eg0_SLg_kXx; Sun, 31 Dec 2023 11:50:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1704023458; bh=rshc7RO4qeTYeDFjVLydvwS1x2ZSFRCAo8/CN5Dns6c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cl9kUDyWnKHtQdd3kIozQ9uHF3eWNBAkA9wIgKNRIu7FMlBgTYVYC8j3eLDIc1+Bp
-	 hkCM/Nd7vdnc1b+zGVWwr43REhIvmABVHseMEcIDn96Gx7LzqRXuybrYhAPiUWP5sC
-	 Y+JS+4LXvxMsCuf0ZcgEBL4kezJ21Q5JQPftrjJ7263+bAT8WydTNUI14eWvOQUoa7
-	 MuR75H5YqKM/aJUMfhpWTNPKtLamIY3o/qMzhEYVBnetBqfMFoLFuqtAMdAJ7Qm4xF
-	 gDLIwz6WbJhe2mZ+JdJKrKDpUYNZzAotH/h/jJrAEbfNpKlINtQVMX6dLN+TaGh821
-	 L4OAMbOrvvamJrpu7L6HRKkgyktN3uVI9DQeiPnHvDo5oIXW2pxRfgkd2wu4og8eOw
-	 XbTSlD3s8+Qgux9YzBYAAuo5MGTkXznhDF6wrO0oI4fN3Cx42URjZxtEG4BYS26kcb
-	 FsESawR83FkYNekXbGrwE6ZyGKbm/n+82GK36oZAZLn5vwZcDFw6etAKx0K8ZpHzOi
-	 cwjrNNoC0yFFF7VaZjIcsogfnSxgwjbOlvBHIqhRXr0+Q9thC5IdKR3jqal48lWgWP
-	 awEOLCZO8cBJ62WGwyz1cZ4+0yOfOkwBMR8MWUkqUW1jPDOP0VpS/nWzvsh8Hh5/dM
-	 hi7IT3zlZSgFvThJFDwVQDTw=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BA2A040E00C7;
-	Sun, 31 Dec 2023 11:50:18 +0000 (UTC)
-Date: Sun, 31 Dec 2023 12:50:12 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>,
-	Jarkko Sakkinen <jarkko@profian.com>
-Subject: Re: [PATCH v1 01/26] x86/cpufeatures: Add SEV-SNP CPU feature
-Message-ID: <20231231115012.GAZZFVdHCWijp7yFls@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-2-michael.roth@amd.com>
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="kFuiS5cC"
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-35ff4ae98e7so26216815ab.1
+        for <linux-crypto@vger.kernel.org>; Sun, 31 Dec 2023 07:27:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1704036473; x=1704641273; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9j/PDsQCKNxJvXhPSwnRjZEPWOEDy7gzBo8k7L9PKtc=;
+        b=kFuiS5cCZCHgDecpy7HmOg6lPDfo3qFK7VIe2asrczaDt2YImG84woemSZ3loGy2u4
+         HTl2c8Lsc6ojC5sjCP9ha+LureOxEiLOGCTZz9vq96usJJqPOAP8EfFKuKfw2FpZ5Y85
+         kT4NSUQIs3nUSoFb0OPvcre01sqVViRYk+2UvvOSSf/Wy0LoeJCQU/LBNTUjaj1aVopZ
+         v2FL5LGJsgAhqHN8goEDD569AS25/vU3+B3buW0oSdsiHGbzSbAeniKmiEUcFtNUCXKn
+         hA1TH5vJHi740cCmIHJTjZdvsl/t17vrq5T6IdqJyeRLCvN7ZWNQdmW9091hWhtj0lCr
+         7VPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704036473; x=1704641273;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9j/PDsQCKNxJvXhPSwnRjZEPWOEDy7gzBo8k7L9PKtc=;
+        b=rqGs08rhiIJxZf2JTnWZOr+LxbIZhRlT3H7GZoUZeG8jRh+ONzJ238w0al9w3Et2tA
+         KpRmLBQ0YnwY8O+i/dg6NAb0de0QlSgGl7LQqlN2t8mjz/6FygGiUr39bscmuOY/1nqw
+         OfwRfYLoA0P7PTphHu8lKRVaobXYleqQBPG9PHGNsquxbFPnrYb0Rh7g8UMWbWuUXbK8
+         kP6o+mJ4LyiDbKarIroLyjq9JaB9bJ64ph54tzAtfT/r2gJ9jCVBynq3z4XZpVAyHCev
+         zkXMH2BswqM6DAyH/c+kgVHH+M1NAI1cvTjw4Ydvd2Dkj9qzphwh5mc2wj/skOcy6ZMW
+         g00A==
+X-Gm-Message-State: AOJu0YyHrJ3DB/2Zqfbv8rGcKORJ3Aevw5446EkV1ABGBPIvOaSb14kn
+	fK5KEwHh1xKtdz0nSQDXCswn8zPpffAsFw==
+X-Google-Smtp-Source: AGHT+IG8+YjoIiWGe/fJn9ezufjBAu+c+cQL9Jt2yHbbsR6y5VuXGEf72rzp1+nF0qsl5amU3ifDiA==
+X-Received: by 2002:a05:6e02:214b:b0:360:29f:b7a6 with SMTP id d11-20020a056e02214b00b00360029fb7a6mr14781805ilv.18.1704036473641;
+        Sun, 31 Dec 2023 07:27:53 -0800 (PST)
+Received: from localhost.localdomain ([49.216.222.63])
+        by smtp.gmail.com with ESMTPSA id n4-20020a170902e54400b001cc3c521affsm18624430plf.300.2023.12.31.07.27.50
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 31 Dec 2023 07:27:52 -0800 (PST)
+From: Jerry Shih <jerry.shih@sifive.com>
+To: paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	conor.dooley@microchip.com,
+	ebiggers@kernel.org,
+	ardb@kernel.org
+Cc: heiko@sntech.de,
+	phoebe.chen@sifive.com,
+	hongrong.hsu@sifive.com,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH v4 00/11] RISC-V: provide some accelerated cryptography implementations using vector extensions
+Date: Sun, 31 Dec 2023 23:27:32 +0800
+Message-Id: <20231231152743.6304-1-jerry.shih@sifive.com>
+X-Mailer: git-send-email 2.28.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231230161954.569267-2-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, Dec 30, 2023 at 10:19:29AM -0600, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> Add CPU feature detection for Secure Encrypted Virtualization with
-> Secure Nested Paging. This feature adds a strong memory integrity
-> protection to help prevent malicious hypervisor-based attacks like
-> data replay, memory re-mapping, and more.
-> 
-> Since enabling the SNP CPU feature imposes a number of additional
-> requirements on host initialization and handling legacy firmware APIs
-> for SEV/SEV-ES guests, only introduce the CPU feature bit so that the
-> relevant handling can be added, but leave it disabled via a
-> disabled-features mask.
-> 
-> Once all the necessary changes needed to maintain legacy SEV/SEV-ES
-> support are introduced in subsequent patches, the SNP feature bit will
-> be unmasked/enabled.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
-> Signed-off-by: Ashish Kalra <Ashish.Kalra@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h       | 1 +
->  arch/x86/include/asm/disabled-features.h | 4 +++-
->  arch/x86/kernel/cpu/amd.c                | 5 +++--
->  tools/arch/x86/include/asm/cpufeatures.h | 1 +
->  4 files changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 29cb275a219d..9492dcad560d 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -442,6 +442,7 @@
->  #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualization */
->  #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is supported */
->  #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
-> +#define X86_FEATURE_SEV_SNP		(19*32+ 4) /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
->  #define X86_FEATURE_V_TSC_AUX		(19*32+ 9) /* "" Virtual TSC_AUX */
->  #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
->  #define X86_FEATURE_DEBUG_SWAP		(19*32+14) /* AMD SEV-ES full debug state swap support */
-> diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
-> index 702d93fdd10e..a864a5b208fa 100644
-> --- a/arch/x86/include/asm/disabled-features.h
-> +++ b/arch/x86/include/asm/disabled-features.h
-> @@ -117,6 +117,8 @@
->  #define DISABLE_IBT	(1 << (X86_FEATURE_IBT & 31))
->  #endif
->  
-> +#define DISABLE_SEV_SNP		0
+This series provides cryptographic implementations using the vector crypto
+extensions[1] including:
+1. AES cipher
+2. AES with CBC/CTR/ECB/XTS block modes
+3. ChaCha20 stream cipher
+4. GHASH for GCM
+5. SHA-224/256 and SHA-384/512 hash
+6. SM3 hash
+7. SM4 cipher
 
-I think you want this here if SEV_SNP should be initially disabled:
+This patch set is based on Heiko Stuebner's work at:
+Link: https://lore.kernel.org/all/20230711153743.1970625-1-heiko@sntech.de/
 
-diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
-index a864a5b208fa..5b2fab8ad262 100644
---- a/arch/x86/include/asm/disabled-features.h
-+++ b/arch/x86/include/asm/disabled-features.h
-@@ -117,7 +117,7 @@
- #define DISABLE_IBT	(1 << (X86_FEATURE_IBT & 31))
- #endif
- 
--#define DISABLE_SEV_SNP		0
-+#define DISABLE_SEV_SNP	(1 << (X86_FEATURE_SEV_SNP & 31))
- 
- /*
-  * Make sure to add features to the correct mask
+The implementations reuse the perl-asm scripts from OpenSSL[2] with some
+changes adapting for the kernel crypto framework.
+The perl-asm scripts generate the RISC-V RVV 1.0 and the vector crypto 1.0
+instructions into `.S` files.
 
--- 
-Regards/Gruss,
-    Boris.
+All changes pass the kernel run-time crypto self tests and the extra tests
+with vector-crypto-enabled qemu.
+Link: https://lists.gnu.org/archive/html/qemu-devel/2023-11/msg00281.html
 
-https://people.kernel.org/tglx/notes-about-netiquette
+This series depend on:
+1. kernel riscv/for-next(6.7-rc1)
+Link: https://github.com/linux-riscv/linux-riscv/commit/f352a28cc2fb4ee8d08c6a6362c9a861fcc84236
+2. support kernel-mode vector
+Link: https://lore.kernel.org/all/20231229143627.22898-1-andy.chiu@sifive.com/
+
+Here is a branch on github applying with all dependent patches:
+Link: https://github.com/JerryShih/linux/tree/dev/jerrys/vector-crypto-upstream-v4
+
+And here is the previous v3 link:
+Link: https://lore.kernel.org/all/20231205092801.1335-1-jerry.shih@sifive.com/
+
+[1]
+Link: https://github.com/riscv/riscv-crypto/blob/56ed7952d13eb5bdff92e2b522404668952f416d/doc/vector/riscv-crypto-spec-vector.adoc
+[2]
+Link: https://github.com/openssl/openssl/pull/21923
+
+Updated patches (on current order): 4, 5, 6, 7, 8, 9, 10, 11
+New patch: 3
+Unchanged patch: 1, 2
+Deleted patch: 3, 5 in v3
+
+Changelog v4:
+ - Check the assembler capability for using the vector crypto asm
+   mnemonics.
+ - Use asm mnemonics for the instructions in vector crypto 1.0 extension.
+ - Revert the usage of simd skcipher interface for AES-CBC/CTR/ECB/XTS and
+   Chacha20.
+
+Changelog v3:
+ - Use asm mnemonics for the instructions in RVV 1.0 extension.
+ - Use `SYM_TYPED_FUNC_START` for indirect-call asm symbols.
+ - Update aes xts_crypt() implementation.
+ - Update crypto function names with the prefix/suffix of `riscv64` or the
+   specific extensions to avoid the collision with functions in `crypto/`
+   or `lib/crypto/`.
+
+Changelog v2:
+ - Do not turn on the RISC-V accelerated crypto kconfig options by
+   default.
+ - Assume RISC-V vector extension could support unaligned access in
+   kernel.
+ - Turn to use simd skcipher interface for AES-CBC/CTR/ECB/XTS and
+   Chacha20.
+ - Rename crypto file and driver names to make the most important
+   extension at first place.
+
+Heiko Stuebner (2):
+  RISC-V: add helper function to read the vector VLEN
+  RISC-V: hook new crypto subdir into build-system
+
+Jerry Shih (9):
+  RISC-V: add TOOLCHAIN_HAS_VECTOR_CRYPTO in kconfig
+  RISC-V: crypto: add Zvkned accelerated AES implementation
+  RISC-V: crypto: add accelerated AES-CBC/CTR/ECB/XTS implementations
+  RISC-V: crypto: add Zvkg accelerated GCM GHASH implementation
+  RISC-V: crypto: add Zvknha/b accelerated SHA224/256 implementations
+  RISC-V: crypto: add Zvknhb accelerated SHA384/512 implementations
+  RISC-V: crypto: add Zvksed accelerated SM4 implementation
+  RISC-V: crypto: add Zvksh accelerated SM3 implementation
+  RISC-V: crypto: add Zvkb accelerated ChaCha20 implementation
+
+ arch/riscv/Kbuild                             |    1 +
+ arch/riscv/Kconfig                            |    8 +
+ arch/riscv/crypto/Kconfig                     |  110 ++
+ arch/riscv/crypto/Makefile                    |   68 +
+ .../crypto/aes-riscv64-block-mode-glue.c      |  459 +++++++
+ arch/riscv/crypto/aes-riscv64-glue.c          |  137 ++
+ arch/riscv/crypto/aes-riscv64-glue.h          |   18 +
+ .../crypto/aes-riscv64-zvkned-zvbb-zvkg.pl    |  949 +++++++++++++
+ arch/riscv/crypto/aes-riscv64-zvkned-zvkb.pl  |  415 ++++++
+ arch/riscv/crypto/aes-riscv64-zvkned.pl       | 1199 +++++++++++++++++
+ arch/riscv/crypto/chacha-riscv64-glue.c       |  109 ++
+ arch/riscv/crypto/chacha-riscv64-zvkb.pl      |  321 +++++
+ arch/riscv/crypto/ghash-riscv64-glue.c        |  175 +++
+ arch/riscv/crypto/ghash-riscv64-zvkg.pl       |  100 ++
+ arch/riscv/crypto/sha256-riscv64-glue.c       |  145 ++
+ .../sha256-riscv64-zvknha_or_zvknhb-zvkb.pl   |  317 +++++
+ arch/riscv/crypto/sha512-riscv64-glue.c       |  139 ++
+ .../crypto/sha512-riscv64-zvknhb-zvkb.pl      |  265 ++++
+ arch/riscv/crypto/sm3-riscv64-glue.c          |  124 ++
+ arch/riscv/crypto/sm3-riscv64-zvksh.pl        |  227 ++++
+ arch/riscv/crypto/sm4-riscv64-glue.c          |  121 ++
+ arch/riscv/crypto/sm4-riscv64-zvksed.pl       |  268 ++++
+ arch/riscv/include/asm/vector.h               |   11 +
+ crypto/Kconfig                                |    3 +
+ 24 files changed, 5689 insertions(+)
+ create mode 100644 arch/riscv/crypto/Kconfig
+ create mode 100644 arch/riscv/crypto/Makefile
+ create mode 100644 arch/riscv/crypto/aes-riscv64-block-mode-glue.c
+ create mode 100644 arch/riscv/crypto/aes-riscv64-glue.c
+ create mode 100644 arch/riscv/crypto/aes-riscv64-glue.h
+ create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned-zvbb-zvkg.pl
+ create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned-zvkb.pl
+ create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned.pl
+ create mode 100644 arch/riscv/crypto/chacha-riscv64-glue.c
+ create mode 100644 arch/riscv/crypto/chacha-riscv64-zvkb.pl
+ create mode 100644 arch/riscv/crypto/ghash-riscv64-glue.c
+ create mode 100644 arch/riscv/crypto/ghash-riscv64-zvkg.pl
+ create mode 100644 arch/riscv/crypto/sha256-riscv64-glue.c
+ create mode 100644 arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvkb.pl
+ create mode 100644 arch/riscv/crypto/sha512-riscv64-glue.c
+ create mode 100644 arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.pl
+ create mode 100644 arch/riscv/crypto/sm3-riscv64-glue.c
+ create mode 100644 arch/riscv/crypto/sm3-riscv64-zvksh.pl
+ create mode 100644 arch/riscv/crypto/sm4-riscv64-glue.c
+ create mode 100644 arch/riscv/crypto/sm4-riscv64-zvksed.pl
+
+--
+2.28.0
+
