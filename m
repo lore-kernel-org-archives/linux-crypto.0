@@ -1,115 +1,188 @@
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B821F1799D;
-	Wed,  3 Jan 2024 02:58:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F0E171C8;
+	Wed,  3 Jan 2024 03:05:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mLvVffDe"
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6dbb7d80df8so6867728a34.1;
-        Tue, 02 Jan 2024 18:58:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YQwT/jk0"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6d9b51093a0so5715487b3a.0;
+        Tue, 02 Jan 2024 19:05:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704250709; x=1704855509; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/a2j1/lHth7zs05WU5aYt/LfzS3M/wGNylwLFfEgkQ0=;
-        b=mLvVffDeemap8bV5CQx9LsXW+V8ed5NeSVI2IIxJe1OP8p3jyprialiBEgf6blLGS3
-         tvo2NeUmsBec6Rk+HJqUSF3Pc/m4TSlClCa+FHeFbkQvZ8s5e9XDazozjlm2S9QuaqJJ
-         EJ/9KhWXzb+e23Zf/kUEZ5w5//Lw2zccWvDGV+K2khbrbLmYYPPGyml1RHu5LjxY/+Ql
-         jJBz1H6x9VkRsTP6BlxbYnlGYKSMS+D6pEr5lN+fZi/H5he5mB9AoH66zmP1JZXGmZHn
-         plIsPF909lPuEOABWAmaSNRBbuvu5k7JJNh5UTWGqb9LapAV52mRgYri5IKC49Du2Mzu
-         nUlA==
+        d=gmail.com; s=20230601; t=1704251135; x=1704855935; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=lTTGMdmW5tqRSqYab/aSD3OkEyygJdSXdIDYPelT2uo=;
+        b=YQwT/jk04DaSZ45bWr6Rqu3byEaVqSWz9W/3KYqkYRGZfUQESawhLR5qx3ZqZOVNdS
+         t+PzJH6nuxJvCqfd4Jp+yUbuqiSaGW5tbWScpZAL4jwpUtuOVbcpJxvYHQn0ehZt0isn
+         qYzwv1x2z9CJix/vzhVCm15cFsylKdelAAss8QENAvcSq5qa75AvgfbCyizjJQgNA6pr
+         EefMKxPwcsq3zKxnfy7XPy7hVD4Qfu4IuKHVIZY0b9Z2LfxgGvUV5BhKnX3ObZGHixJ6
+         e5BVG6RdITy2Lg0bdoCFjbH2jusPN1DUG4Kw+cJ3nBjOUYUgl1645iKVHeTzCP2n/x/B
+         gRoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704250709; x=1704855509;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/a2j1/lHth7zs05WU5aYt/LfzS3M/wGNylwLFfEgkQ0=;
-        b=a1czJlaWJSzzOmT/vqP1ozmnrPpRWEXyGQHq9nMWdi4r4S0RanlHGhu2kpkGFfF0t6
-         I7PJZZJXvhDv8tw32okUecehS72Ocsf2DRIX/Gk0n4Or7dnPOQyEithgnYt4acFprW1Z
-         23AR9Az3efGjdeezhtCGUM3G5XiUVbhdJM0+Ast5eDJUJZUz4Mh+yNilq6VcB81MTqrS
-         npu7w56OTW5ySdphyy+wYbUy7PMpVkbpkH23HZxx2uNCeIxQTpDYiZafPjRpbshUpu0F
-         eoA2EGQXxUrCzObie7uAkLJ6Vw8lqadpHX2eXwra2XFuM0SVLaDygr1cg2cHVpxsU5Rz
-         H83g==
-X-Gm-Message-State: AOJu0Yxm/KUi4zQ5ILrfAG0fRYCWj5iiIn9F3/IPh7YorGJh9wRo3I5q
-	gDKcApXGUuvk1i7BlYZ2vmY=
-X-Google-Smtp-Source: AGHT+IFpg8o2SLVkvafPjMs9qtDK8eJP522pJiWlxctRpEYR82N3yz/UoeW+DRyVcdlGAEybzkOYvw==
-X-Received: by 2002:a05:6830:3:b0:6db:fd12:8e9c with SMTP id c3-20020a056830000300b006dbfd128e9cmr9353263otp.5.1704250708788;
-        Tue, 02 Jan 2024 18:58:28 -0800 (PST)
-Received: from barry-desktop.hub ([2407:7000:8942:5500:a7d6:f37a:9130:cd96])
-        by smtp.gmail.com with ESMTPSA id d6-20020a63fd06000000b005cd8ada89e5sm21168572pgh.70.2024.01.02.18.58.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 18:58:28 -0800 (PST)
-From: Barry Song <21cnbao@gmail.com>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	akpm@linux-foundation.org,
-	chriscli@google.com,
-	chrisl@kernel.org,
-	ddstreet@ieee.org,
-	hannes@cmpxchg.org,
-	linux-mm@kvack.org,
-	nphamcs@gmail.com,
-	sjenning@redhat.com,
-	vitaly.wool@konsulko.com,
-	yosryahmed@google.com,
-	zhouchengming@bytedance.com
-Cc: linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 2/6] mm/zswap: reuse dstmem when decompress
-Date: Wed,  3 Jan 2024 15:57:59 +1300
-Message-Id: <20240103025759.523120-3-21cnbao@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240103025759.523120-1-21cnbao@gmail.com>
-References: <ZY1EnEefZsRTGYnP@gondor.apana.org.au>
- <20240103025759.523120-1-21cnbao@gmail.com>
+        d=1e100.net; s=20230601; t=1704251135; x=1704855935;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lTTGMdmW5tqRSqYab/aSD3OkEyygJdSXdIDYPelT2uo=;
+        b=hyTcRxzfsufIt7x8F9ssbjM/o4x6DKIkf0WoryWGyUFe0r4BnbFw+mVXkwGWgKJ9GL
+         vEk4yrNsv9S7Svj8B3x+c3VjX//j6fTV0VJtb8GKGvF86WeMZ0MCjAbtws9SUM3yyJ8x
+         sQaOoBDs3yy6faZyYntvkuFPlfslvpoUwRqC4+XFyAXMrU1DYcby01vbIvlfs27TUPm2
+         C0LfMp8SoPT3S/2G4ok1UxDWwUTspCjprXdgt+Ilf/mKQlOprA77uFajPmxFcOqP7IZU
+         a/PNZTd5Ns1TX0mah29EYnFzbPpC0zo6ToNGybofd+IYH2HjtUrq9SamYSTRvLiIiIB3
+         3s7Q==
+X-Gm-Message-State: AOJu0YzSK2u6nh74G3+wFFP9gRTIj1cAX6pyNe8m359PjW3JTx8mL3Zb
+	IFb5axKDcENSbnWY+3KXNlbfkhwaujIAM8F3/l4=
+X-Google-Smtp-Source: AGHT+IGoLzabXrh/YjSuINiNlgCjWf5zlqc4lZbhNqKIJKZdtjTN4WdrDMN7zuaExKLWvrWq+EUAIA88xg9DmxSqBEE=
+X-Received: by 2002:a05:6a00:1e02:b0:6d9:9fba:5bce with SMTP id
+ gx2-20020a056a001e0200b006d99fba5bcemr15768199pfb.9.1704251135213; Tue, 02
+ Jan 2024 19:05:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: xingwei lee <xrivendell7@gmail.com>
+Date: Wed, 3 Jan 2024 11:05:24 +0800
+Message-ID: <CABOYnLxaHBEaSRaEU+kDsHF8a=9AokO1ZUEVtpeT9ddL8giw3A@mail.gmail.com>
+Subject: Re: [PATCH] crypto: af_alg/hash: Fix uninit-value access in af_alg_free_sg()
+To: syoshida@redhat.com
+Cc: davem@davemloft.net, dhowells@redhat.com, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->>
->> for CPU-based alg, we have completed the compr/decompr within
->> crypto_acomp_decompress()
->> synchronously. they won't return EINPROGRESS, EBUSY.
->>
->> The problem is that crypto_acomp won't expose this information to its
->> users. if it does,
->> we can use this info, we will totally avoid the code of copying
->> zsmalloc's data to a tmp
->> buffer for the most majority users of zswap.
->>
->> But I am not sure if we can find a way to convince Herbert(+To)  :-)
+Hi,Shigeru and Herbert. Happy New Year anyway.
+I also found this bug and tried to reproduce it.
+My own syzkaller crashes titled "double-free in af_alg_free_sg=E2=80=9D or
+=E2=80=9CKASAN: use-after-free in af_alg_free_sg=E2=80=9D lead me to consid=
+er it maybe
+a security-related problem.
 
-> What would you like to expose? The async status of the underlying
-> algorithm?
+I reproduced it with repro.c and repro.txt and also bisection to this
+commit: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/comm=
+it/crypto/algif_hash.c?id=3Db6d972f6898308fbe7e693bf8d44ebfdb1cd2dc4
 
-Right. followed by a rfc patchset, please help take a look.
+=3D* repro.c =3D*
+// autogenerated by syzkaller (https://github.com/google/syzkaller)
 
-> 
-> We could certainly do that.  But I wonder if it might actually be
-> better for you to allocate a second sync-only algorithm for such
-> cases.  I'd like to see some real numbers.
+#define _GNU_SOURCE
 
-some hardware might want to use an accelerator to help offload CPU's
-work. their drivers are working in async mode, for example, hisilicon
-and intel.
+#include <endian.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-I don't have the exact number we can save by removing the redundant
-memcpy, nor do i have a proper hardware to test and get the number.
-As Chengming is actually working in zswap, i wonder if you can test
-my patches and post some data?
+uint64_t r[3] =3D {0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffff=
+ff};
 
-> 
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
+int main(void) {
+ syscall(__NR_mmap, /*addr=3D*/0x1ffff000ul, /*len=3D*/0x1000ul, /*prot=3D*=
+/0ul,
+         /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
+ syscall(__NR_mmap, /*addr=3D*/0x20000000ul, /*len=3D*/0x1000000ul, /*prot=
+=3D*/7ul,
+         /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
+ syscall(__NR_mmap, /*addr=3D*/0x21000000ul, /*len=3D*/0x1000ul, /*prot=3D*=
+/0ul,
+         /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
+ intptr_t res =3D 0;
+ res =3D syscall(__NR_socket, /*domain=3D*/0x26ul, /*type=3D*/5ul, /*proto=
+=3D*/0);
+ if (res !=3D -1) r[0] =3D res;
+ *(uint16_t*)0x20000040 =3D 0x26;
+ memcpy((void*)0x20000042, "hash\000\000\000\000\000\000\000\000\000\000", =
+14);
+ *(uint32_t*)0x20000050 =3D 0;
+ *(uint32_t*)0x20000054 =3D 0;
+ memcpy((void*)0x20000058,
+        "poly1305\000\000\000\000\000\000\000\000\000\000\000\000\000\000\0=
+00"
+        "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\0=
+00"
+        "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\0=
+00"
+        "\000\000\000\000\000\000\000",
+        64);
+ syscall(__NR_bind, /*fd=3D*/r[0], /*addr=3D*/0x20000040ul, /*addrlen=3D*/0=
+x58ul);
+ res =3D syscall(__NR_accept4, /*fd=3D*/r[0], /*peer=3D*/0ul, /*peerlen=3D*=
+/0ul,
+               /*flags=3D*/0ul);
+ if (res !=3D -1) r[1] =3D res;
+ *(uint64_t*)0x20000d80 =3D 0;
+ *(uint32_t*)0x20000d88 =3D 0;
+ *(uint64_t*)0x20000d90 =3D 0x20000d40;
+ *(uint64_t*)0x20000d40 =3D 0x20000d00;
+ *(uint16_t*)0x20000d00 =3D 0;
+ *(uint64_t*)0x20000d48 =3D 0x14;
+ *(uint64_t*)0x20000d98 =3D 1;
+ *(uint64_t*)0x20000da0 =3D 0;
+ *(uint64_t*)0x20000da8 =3D 0;
+ *(uint32_t*)0x20000db0 =3D 0;
+ syscall(__NR_sendmsg, /*fd=3D*/r[1], /*msg=3D*/0x20000d80ul, /*f=3D*/0x400=
+c000ul);
+ res =3D syscall(__NR_accept4, /*fd=3D*/r[1], /*peer=3D*/0ul, /*peerlen=3D*=
+/0ul,
+               /*flags=3D*/0ul);
+ if (res !=3D -1) r[2] =3D res;
+ *(uint64_t*)0x20000840 =3D 0;
+ *(uint32_t*)0x20000848 =3D 0;
+ *(uint64_t*)0x20000850 =3D 0;
+ *(uint64_t*)0x20000858 =3D 0;
+ *(uint64_t*)0x20000860 =3D 0;
+ *(uint64_t*)0x20000868 =3D 0;
+ *(uint32_t*)0x20000870 =3D 0x4000;
+ syscall(__NR_sendmsg, /*fd=3D*/r[2], /*msg=3D*/0x20000840ul, /*f=3D*/0x400=
+1ul);
+ return 0;
+}
 
-Thanks
-Barry
+=3D* repro.txt =3D*
+r0 =3D socket$alg(0x26, 0x5, 0x0)
+bind$alg(r0, &(0x7f0000000040)=3D{0x26, 'hash\x00', 0x0, 0x0,
+'poly1305\x00'}, 0x58)
+r1 =3D accept4(r0, 0x0, 0x0, 0x0)
+sendmsg$BATADV_CMD_SET_HARDIF(r1, &(0x7f0000000d80)=3D{0x0, 0x0,
+&(0x7f0000000d40)=3D{&(0x7f0000000d00)=3DANY=3D[@ANYBLOB, @ANYRES16=3D0x0,
+@ANYBLOB], 0x14}}, 0x400c000)
+r2 =3D accept4(r1, 0x0, 0x0, 0x0)
+sendmsg$alg(r2, &(0x7f0000000840)=3D{0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+0x4000}, 0x4001)
 
+After analysing the uninitialized of ctx->sgl, it may cause (without
+KMSAN in linux kernel)
+
+void af_alg_free_sg(struct af_alg_sgl *sgl)
+{
+  int i;
+
+  if (sgl->sgt.sgl) {
+    if (sgl->need_unpin)
+      for (i =3D 0; i < sgl->sgt.nents; i++)
+        unpin_user_page(sg_page(&sgl->sgt.sgl[i]));
+    if (sgl->sgt.sgl !=3D sgl->sgl)
+      kvfree(sgl->sgt.sgl);
+    sgl->sgt.sgl =3D NULL;
+  }
+}
+
+1. If sgl->sgt.sgl is 0x0, the poc triggers nothing
+2. If sgl->sgt.sgl is not null but like 0xbbbbbbbbbbbbbbbb,
+unpin_user_page will crash like =E2=80=9Cwild-memory access=E2=80=9D.
+3. If sgl->sgt.sgl happens to be a pointer whether it is being used or
+released, sgl->sgt.nents<0, kvfree can definitely cause uaf or double
+free and maybe lead to control flow hijacking.
+
+The incorrect logic of unlock_free label can really cause security issues.
+
+I hope the reproducer and analysis helps.
+
+Best regards.
+xingwei Lee
