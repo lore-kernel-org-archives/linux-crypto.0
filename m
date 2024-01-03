@@ -1,188 +1,103 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F0E171C8;
-	Wed,  3 Jan 2024 03:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBED16411
+	for <linux-crypto@vger.kernel.org>; Wed,  3 Jan 2024 04:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YQwT/jk0"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6d9b51093a0so5715487b3a.0;
-        Tue, 02 Jan 2024 19:05:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704251135; x=1704855935; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=lTTGMdmW5tqRSqYab/aSD3OkEyygJdSXdIDYPelT2uo=;
-        b=YQwT/jk04DaSZ45bWr6Rqu3byEaVqSWz9W/3KYqkYRGZfUQESawhLR5qx3ZqZOVNdS
-         t+PzJH6nuxJvCqfd4Jp+yUbuqiSaGW5tbWScpZAL4jwpUtuOVbcpJxvYHQn0ehZt0isn
-         qYzwv1x2z9CJix/vzhVCm15cFsylKdelAAss8QENAvcSq5qa75AvgfbCyizjJQgNA6pr
-         EefMKxPwcsq3zKxnfy7XPy7hVD4Qfu4IuKHVIZY0b9Z2LfxgGvUV5BhKnX3ObZGHixJ6
-         e5BVG6RdITy2Lg0bdoCFjbH2jusPN1DUG4Kw+cJ3nBjOUYUgl1645iKVHeTzCP2n/x/B
-         gRoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704251135; x=1704855935;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lTTGMdmW5tqRSqYab/aSD3OkEyygJdSXdIDYPelT2uo=;
-        b=hyTcRxzfsufIt7x8F9ssbjM/o4x6DKIkf0WoryWGyUFe0r4BnbFw+mVXkwGWgKJ9GL
-         vEk4yrNsv9S7Svj8B3x+c3VjX//j6fTV0VJtb8GKGvF86WeMZ0MCjAbtws9SUM3yyJ8x
-         sQaOoBDs3yy6faZyYntvkuFPlfslvpoUwRqC4+XFyAXMrU1DYcby01vbIvlfs27TUPm2
-         C0LfMp8SoPT3S/2G4ok1UxDWwUTspCjprXdgt+Ilf/mKQlOprA77uFajPmxFcOqP7IZU
-         a/PNZTd5Ns1TX0mah29EYnFzbPpC0zo6ToNGybofd+IYH2HjtUrq9SamYSTRvLiIiIB3
-         3s7Q==
-X-Gm-Message-State: AOJu0YzSK2u6nh74G3+wFFP9gRTIj1cAX6pyNe8m359PjW3JTx8mL3Zb
-	IFb5axKDcENSbnWY+3KXNlbfkhwaujIAM8F3/l4=
-X-Google-Smtp-Source: AGHT+IGoLzabXrh/YjSuINiNlgCjWf5zlqc4lZbhNqKIJKZdtjTN4WdrDMN7zuaExKLWvrWq+EUAIA88xg9DmxSqBEE=
-X-Received: by 2002:a05:6a00:1e02:b0:6d9:9fba:5bce with SMTP id
- gx2-20020a056a001e0200b006d99fba5bcemr15768199pfb.9.1704251135213; Tue, 02
- Jan 2024 19:05:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mLcMualv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704254935; x=1735790935;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gL8PNc7UX1Ihfr6zd2VLwkqFMWTEGULO2tEaZ4SoE8w=;
+  b=mLcMualvh7JMY1ckHuHjNXfMy6VcvwT14/l1QU6DxBfy/0xMTQmowptw
+   3Fle/FS+Idch+SdRv5maiFGaD2ydV0ntKVJ/70+6/YsNVB497H4bcy7+X
+   ftmREYPXqTv6uQ5b64BrLoFtEjJfG6fl/RfBN+8xFsyiRGZOxwaOzClmz
+   N+N03rrBv4bCNtqQ3YkzCBloa2QWCKv2NXD6ni5gntCox2icT8BbsFuJx
+   Fg9t1xlhuWVa8o6kEQw7qw5/x48B7Ecu+CcIdhQqhAeXO8bt8HKLN79c1
+   xd1XY6c6tUwPDzJHr1EvejLyStis+Gp4DrWeAsO/pcyiM4HirbsRTLVBo
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="3725450"
+X-IronPort-AV: E=Sophos;i="6.04,326,1695711600"; 
+   d="scan'208";a="3725450"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 20:08:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="1111241837"
+X-IronPort-AV: E=Sophos;i="6.04,326,1695711600"; 
+   d="scan'208";a="1111241837"
+Received: from myep-mobl1.png.intel.com ([10.107.5.97])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 20:08:50 -0800
+From: Mun Chun Yep <mun.chun.yep@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Mun Chun Yep <mun.chun.yep@intel.com>
+Subject: [PATCH 0/9] crypto: qat - improve recovery flows
+Date: Wed,  3 Jan 2024 12:07:13 +0800
+Message-Id: <20240103040722.14467-1-mun.chun.yep@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: xingwei lee <xrivendell7@gmail.com>
-Date: Wed, 3 Jan 2024 11:05:24 +0800
-Message-ID: <CABOYnLxaHBEaSRaEU+kDsHF8a=9AokO1ZUEVtpeT9ddL8giw3A@mail.gmail.com>
-Subject: Re: [PATCH] crypto: af_alg/hash: Fix uninit-value access in af_alg_free_sg()
-To: syoshida@redhat.com
-Cc: davem@davemloft.net, dhowells@redhat.com, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi,Shigeru and Herbert. Happy New Year anyway.
-I also found this bug and tried to reproduce it.
-My own syzkaller crashes titled "double-free in af_alg_free_sg=E2=80=9D or
-=E2=80=9CKASAN: use-after-free in af_alg_free_sg=E2=80=9D lead me to consid=
-er it maybe
-a security-related problem.
+This set improves the error recovery flows in the QAT drivers and
+adds a mechanism to test it through an heartbeat simulator.
 
-I reproduced it with repro.c and repro.txt and also bisection to this
-commit: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/comm=
-it/crypto/algif_hash.c?id=3Db6d972f6898308fbe7e693bf8d44ebfdb1cd2dc4
+When a QAT device reports either a fatal error, or an AER fatal error,
+or fails an heartbeat check, the PF driver sends an error notification to
+the VFs through PFVF comms and if `auto_reset` is enabled then
+the device goes through reset flows for error recovery.
+If SRIOV is enabled when an error is encountered, this is re-enabled after
+the reset cycle is done.
 
-=3D* repro.c =3D*
-// autogenerated by syzkaller (https://github.com/google/syzkaller)
+Damian Muszynski (2):
+  crypto: qat - add heartbeat error simulator
+  crypto: qat - add auto reset on error
 
-#define _GNU_SOURCE
+Furong Zhou (3):
+  crypto: qat - add fatal error notify method
+  crypto: qat - disable arbitration before reset
+  crypto: qat - limit heartbeat notifications
 
-#include <endian.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <unistd.h>
+Mun Chun Yep (4):
+  crypto: qat - update PFVF protocol for recovery
+  crypto: qat - re-enable sriov after pf reset
+  crypto: qat - add fatal error notification
+  crypto: qat - improve aer error reset handling
 
-uint64_t r[3] =3D {0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffff=
-ff};
+ Documentation/ABI/testing/debugfs-driver-qat  |  26 +++++
+ Documentation/ABI/testing/sysfs-driver-qat    |  20 ++++
+ drivers/crypto/intel/qat/Kconfig              |  15 +++
+ drivers/crypto/intel/qat/qat_common/Makefile  |   3 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |   2 +
+ drivers/crypto/intel/qat/qat_common/adf_aer.c | 107 +++++++++++++++++-
+ .../intel/qat/qat_common/adf_cfg_strings.h    |   1 +
+ .../intel/qat/qat_common/adf_common_drv.h     |  10 ++
+ .../intel/qat/qat_common/adf_heartbeat.c      |  20 +++-
+ .../intel/qat/qat_common/adf_heartbeat.h      |  21 ++++
+ .../qat/qat_common/adf_heartbeat_dbgfs.c      |  52 +++++++++
+ .../qat/qat_common/adf_heartbeat_inject.c     |  76 +++++++++++++
+ .../intel/qat/qat_common/adf_hw_arbiter.c     |  25 ++++
+ .../crypto/intel/qat/qat_common/adf_init.c    |  12 ++
+ drivers/crypto/intel/qat/qat_common/adf_isr.c |   7 +-
+ .../intel/qat/qat_common/adf_pfvf_msg.h       |   7 +-
+ .../intel/qat/qat_common/adf_pfvf_pf_msg.c    |  64 ++++++++++-
+ .../intel/qat/qat_common/adf_pfvf_pf_msg.h    |  21 ++++
+ .../intel/qat/qat_common/adf_pfvf_pf_proto.c  |   8 ++
+ .../intel/qat/qat_common/adf_pfvf_vf_proto.c  |   6 +
+ .../crypto/intel/qat/qat_common/adf_sriov.c   |  38 ++++++-
+ .../crypto/intel/qat/qat_common/adf_sysfs.c   |  37 ++++++
+ 22 files changed, 565 insertions(+), 13 deletions(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat_inject.c
 
-int main(void) {
- syscall(__NR_mmap, /*addr=3D*/0x1ffff000ul, /*len=3D*/0x1000ul, /*prot=3D*=
-/0ul,
-         /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
- syscall(__NR_mmap, /*addr=3D*/0x20000000ul, /*len=3D*/0x1000000ul, /*prot=
-=3D*/7ul,
-         /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
- syscall(__NR_mmap, /*addr=3D*/0x21000000ul, /*len=3D*/0x1000ul, /*prot=3D*=
-/0ul,
-         /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
- intptr_t res =3D 0;
- res =3D syscall(__NR_socket, /*domain=3D*/0x26ul, /*type=3D*/5ul, /*proto=
-=3D*/0);
- if (res !=3D -1) r[0] =3D res;
- *(uint16_t*)0x20000040 =3D 0x26;
- memcpy((void*)0x20000042, "hash\000\000\000\000\000\000\000\000\000\000", =
-14);
- *(uint32_t*)0x20000050 =3D 0;
- *(uint32_t*)0x20000054 =3D 0;
- memcpy((void*)0x20000058,
-        "poly1305\000\000\000\000\000\000\000\000\000\000\000\000\000\000\0=
-00"
-        "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\0=
-00"
-        "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\0=
-00"
-        "\000\000\000\000\000\000\000",
-        64);
- syscall(__NR_bind, /*fd=3D*/r[0], /*addr=3D*/0x20000040ul, /*addrlen=3D*/0=
-x58ul);
- res =3D syscall(__NR_accept4, /*fd=3D*/r[0], /*peer=3D*/0ul, /*peerlen=3D*=
-/0ul,
-               /*flags=3D*/0ul);
- if (res !=3D -1) r[1] =3D res;
- *(uint64_t*)0x20000d80 =3D 0;
- *(uint32_t*)0x20000d88 =3D 0;
- *(uint64_t*)0x20000d90 =3D 0x20000d40;
- *(uint64_t*)0x20000d40 =3D 0x20000d00;
- *(uint16_t*)0x20000d00 =3D 0;
- *(uint64_t*)0x20000d48 =3D 0x14;
- *(uint64_t*)0x20000d98 =3D 1;
- *(uint64_t*)0x20000da0 =3D 0;
- *(uint64_t*)0x20000da8 =3D 0;
- *(uint32_t*)0x20000db0 =3D 0;
- syscall(__NR_sendmsg, /*fd=3D*/r[1], /*msg=3D*/0x20000d80ul, /*f=3D*/0x400=
-c000ul);
- res =3D syscall(__NR_accept4, /*fd=3D*/r[1], /*peer=3D*/0ul, /*peerlen=3D*=
-/0ul,
-               /*flags=3D*/0ul);
- if (res !=3D -1) r[2] =3D res;
- *(uint64_t*)0x20000840 =3D 0;
- *(uint32_t*)0x20000848 =3D 0;
- *(uint64_t*)0x20000850 =3D 0;
- *(uint64_t*)0x20000858 =3D 0;
- *(uint64_t*)0x20000860 =3D 0;
- *(uint64_t*)0x20000868 =3D 0;
- *(uint32_t*)0x20000870 =3D 0x4000;
- syscall(__NR_sendmsg, /*fd=3D*/r[2], /*msg=3D*/0x20000840ul, /*f=3D*/0x400=
-1ul);
- return 0;
-}
+-- 
+2.34.1
 
-=3D* repro.txt =3D*
-r0 =3D socket$alg(0x26, 0x5, 0x0)
-bind$alg(r0, &(0x7f0000000040)=3D{0x26, 'hash\x00', 0x0, 0x0,
-'poly1305\x00'}, 0x58)
-r1 =3D accept4(r0, 0x0, 0x0, 0x0)
-sendmsg$BATADV_CMD_SET_HARDIF(r1, &(0x7f0000000d80)=3D{0x0, 0x0,
-&(0x7f0000000d40)=3D{&(0x7f0000000d00)=3DANY=3D[@ANYBLOB, @ANYRES16=3D0x0,
-@ANYBLOB], 0x14}}, 0x400c000)
-r2 =3D accept4(r1, 0x0, 0x0, 0x0)
-sendmsg$alg(r2, &(0x7f0000000840)=3D{0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-0x4000}, 0x4001)
-
-After analysing the uninitialized of ctx->sgl, it may cause (without
-KMSAN in linux kernel)
-
-void af_alg_free_sg(struct af_alg_sgl *sgl)
-{
-  int i;
-
-  if (sgl->sgt.sgl) {
-    if (sgl->need_unpin)
-      for (i =3D 0; i < sgl->sgt.nents; i++)
-        unpin_user_page(sg_page(&sgl->sgt.sgl[i]));
-    if (sgl->sgt.sgl !=3D sgl->sgl)
-      kvfree(sgl->sgt.sgl);
-    sgl->sgt.sgl =3D NULL;
-  }
-}
-
-1. If sgl->sgt.sgl is 0x0, the poc triggers nothing
-2. If sgl->sgt.sgl is not null but like 0xbbbbbbbbbbbbbbbb,
-unpin_user_page will crash like =E2=80=9Cwild-memory access=E2=80=9D.
-3. If sgl->sgt.sgl happens to be a pointer whether it is being used or
-released, sgl->sgt.nents<0, kvfree can definitely cause uaf or double
-free and maybe lead to control flow hijacking.
-
-The incorrect logic of unlock_free label can really cause security issues.
-
-I hope the reproducer and analysis helps.
-
-Best regards.
-xingwei Lee
