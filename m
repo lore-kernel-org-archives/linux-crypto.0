@@ -1,81 +1,88 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7FB1A73F
-	for <linux-crypto@vger.kernel.org>; Wed,  3 Jan 2024 15:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F821BDC3;
+	Wed,  3 Jan 2024 16:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VdJNU3a1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704296222;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EjWs1Ykrjur5OxV9fp8a8/YADEc50jIQs9yga6wA9hw=;
-	b=VdJNU3a1qYpPm6G2Mrwn1qpjPkOTlsojCSxGz9BRno3P55EIeOqMGELVkUs/d1fiJpf0ui
-	tHl/KIEIBCLLP5A+xBT7JQfVVJEmIFc7tfLUmKnk/2EPXlwdphKrYPnmwjuPvn8Lje+o3o
-	ZVkt0trAn3OIqrgAEBxf0GLEfC2voNc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-240-w1JaHDsAN4Sv8ShNidtqXw-1; Wed, 03 Jan 2024 10:37:01 -0500
-X-MC-Unique: w1JaHDsAN4Sv8ShNidtqXw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BA9BB88F2F1;
-	Wed,  3 Jan 2024 15:37:00 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4F8DCC15968;
-	Wed,  3 Jan 2024 15:36:52 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ZYUFs1MumRFf3mnv@gondor.apana.org.au>
-References: <ZYUFs1MumRFf3mnv@gondor.apana.org.au> <20231211135949.689204-1-syoshida@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dhowells@redhat.com, Shigeru Yoshida <syoshida@redhat.com>,
-    davem@davemloft.net, linux-crypto@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: af_alg/hash: Fix uninit-value access in af_alg_free_sg()
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dgtnolu1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28F45C433C7;
+	Wed,  3 Jan 2024 16:26:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704299174;
+	bh=4rFtZTk/CSyYTYOlTo0igxEY+Pn+iCcuCMqZdpDydfA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dgtnolu1WIZU8u9TNIazyOPm19CpnM1XlsbkNFKQkH8J0QKToEEfqrritT0jYywN4
+	 GTBc0Rclz4+tl+qH0gPvLMbVpJ8g72+YMmC2fQ2YcjSvMez2e1AyZWJsSJPMh4wx3s
+	 ny0jcXRCby8yyS59WQxbAXZnGqn1n/6AzYbt9iRqDq7S2WHCkTPn5x/2Ke7UpSKock
+	 UQpeffL/NvTlzISkfplQZk2Qr2lH/Fky0h6zu1b781LrXbx0xoCpNsRtX7RD7H78Aq
+	 /yBqjMD4kvHmmr6YpuBuMk9heTJGqi+CTY2k218GEcpK5sPcxMEqEHEVtnD0/aE/P9
+	 aHKUTLB89BsGw==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Damian Muszynski <damian.muszynski@intel.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Tom Zanussi <tom.zanussi@linux.intel.com>,
+	Jie Wang <jie.wang@intel.com>,
+	qat-linux@intel.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: qat - avoid memcpy() overflow warning
+Date: Wed,  3 Jan 2024 17:26:02 +0100
+Message-Id: <20240103162608.987145-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <386305.1704296211.1@warthog.procyon.org.uk>
-Date: Wed, 03 Jan 2024 15:36:51 +0000
-Message-ID: <386306.1704296211@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+Content-Transfer-Encoding: 8bit
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+From: Arnd Bergmann <arnd@arndb.de>
 
-> Anyway, I think we should fix it by adding a new goto label that
-> does not free the SG list:
-> 
-> unlock_free:
-> 	af_alg_free_sg(&ctx->sgl);
-> <--- Add new label here
-> 	hash_free_result(sk, ctx);
-> 	ctx->more = false;
-> 	goto unlock;
+The use of array_size() leads gcc to assume the memcpy() can have a larger
+limit than actually possible, which triggers a string fortification warning:
 
-Hmmm...  Is that going to get you a potential memory leak?
+In file included from include/linux/string.h:296,
+                 from include/linux/bitmap.h:12,
+                 from include/linux/cpumask.h:12,
+                 from include/linux/sched.h:16,
+                 from include/linux/delay.h:23,
+                 from include/linux/iopoll.h:12,
+                 from drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c:3:
+In function 'fortify_memcpy_chk',
+    inlined from 'adf_gen4_init_thd2arb_map' at drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c:401:3:
+include/linux/fortify-string.h:579:4: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
+  579 |    __write_overflow_field(p_size_field, size);
+      |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+include/linux/fortify-string.h:588:4: error: call to '__read_overflow2_field' declared with attribute warning: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Werror=attribute-warning]
+  588 |    __read_overflow2_field(q_size_field, size);
+      |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-ctx->sgl.sgt.sgl could (in theory) point to an allocated table.  I guess that
-would be cleaned up by af_alg_free_areq_sgls(), so there's probably no leak
-there.
+Add an explicit range check to avoid this.
 
-OTOH, af_alg_free_areq_sgls() is going to call af_alg_free_sg(), so maybe we
-want to initialise sgl->sgt.sgl to NULL as well.
+Fixes: 5da6a2d5353e ("crypto: qat - generate dynamically arbiter mappings")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Does it make sense just to clear *ctx entirely in hash_accept_parent_nokey()?
-
-David
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
+index 9985683056d5..f752653ccb47 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
+@@ -398,6 +398,9 @@ int adf_gen4_init_thd2arb_map(struct adf_accel_dev *accel_dev)
+ 			 ADF_GEN4_ADMIN_ACCELENGINES;
+ 
+ 	if (srv_id == SVC_DCC) {
++		if (ae_cnt > ICP_QAT_HW_AE_DELIMITER)
++			return -EINVAL;
++
+ 		memcpy(thd2arb_map, thrd_to_arb_map_dcc,
+ 		       array_size(sizeof(*thd2arb_map), ae_cnt));
+ 		return 0;
+-- 
+2.39.2
 
