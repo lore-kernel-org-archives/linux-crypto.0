@@ -1,153 +1,170 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE08217981;
-	Wed,  3 Jan 2024 05:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5253A14F72;
+	Wed,  3 Jan 2024 06:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="apGR11sO"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-5cdf76cde78so2598546a12.1;
-        Tue, 02 Jan 2024 21:31:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PX95XvT8"
+Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-466dfad4dc9so967028137.2;
+        Tue, 02 Jan 2024 22:53:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704259913; x=1704864713; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1704264817; x=1704869617; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w8EF56Awke+XwfA1XTbGHCbaLEHxvYXZLhOGAQUZsss=;
-        b=apGR11sOMq6u20+w6xkuQ4lKTed96tmES1x2XNEmRQ55c0FpTmqu14NWLHRaOUDh1d
-         aGN3gytnviMA4KQ7ABowX6zmcIFp6dpIy5lIfr+81pC30gVwziv1zX7xCBMA2QNZTEyU
-         GnjhW1BLDAhj+cspztEcMVGV1KHS+e5UBKhhpYCCJCe0uId2Nx/emsS1K87ytKzFnvoy
-         ayxQRuni0RKeVENPXo95cQj4sPkT2q/fDIO+AYzaAR6xcO6QP4dFwlUV9N8DTAoBJvbE
-         WWHdQ63Ntgn4ryBV0dQXHtX0HRhrdoBkaC90mvaOHd9qMhNTq2G3y7G08ukVzTXcY+Cn
-         imkQ==
+        bh=Y1njWoxtV/lkC315jnPVTEXguEXnsgC7ZST05muvICE=;
+        b=PX95XvT8NrQ+H1eGVIwAUajB3pMKktnhPgg/DdoOF8WYGax/3HZBj99CNScx301QLU
+         dbAnz3h1i3k9Tk0rXXfFCBd08jk59/v9ln/6H+U6EnE/nx7lwjxtwLinJLHsBWWCBJyd
+         +g3IQDRHTljYi6rCFzmi03/5XXRSKFKVhB1jHg+lVspbijqeLL6EBBMwb7ilo8nNP032
+         bMHk3lG0zwuZKLvNqKuVOnlNI7gVOlr7IfDMD3Tzvf8uFq4dCeDHoD+d9gz2jJndwGB7
+         lbH62PTaWoWnOHsm8lbJYjp8dG0t4L1ZJ/xkSEZikGWWPVJBnVmcd94SFeRczunbn9wR
+         hDRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704259913; x=1704864713;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1704264817; x=1704869617;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w8EF56Awke+XwfA1XTbGHCbaLEHxvYXZLhOGAQUZsss=;
-        b=CIsnuvIA09NqFIrWZI0YyRftmDMIJTUoCIHxwRj2BE1Cjtj674u698tC8hrF8L/O1U
-         RTsn0+Kke8P7XVSjquK0pm7PStJ9zreKurMXffcNdnEmvHr+uH5PlA5dnKdc63MXE1pG
-         J94O/3DUAsnVn86Oh7w4aJzRCXxw6Ks8yNfQVMg6ANWD0/NnQY+vyc2zpkpwNdEnwDeb
-         0rpdMyyMFDYvfflWGnCpI7bapaZ9qTGCEN0BsV30Bv6dqdsWc/ykA+pU7n5Xpew/ba9k
-         40Ie+4K1elzNUqWV/oswzeC6wFND1irk+TUQ2xNaMfzOzvM2CId1EXaQjuXQ5yiwHMQq
-         2tmw==
-X-Gm-Message-State: AOJu0YweV0QzqOd6L0Tbn9HeCFr0gIYcUnHmy9+l/IUxPiZIY3x82l9H
-	dHSvq6K5ROzm3Yl22/Q4dZI=
-X-Google-Smtp-Source: AGHT+IFCc/wIV6TxJsUS4zh9doG+Bj0rfKw5jQPtBPmClb1Odv3n75NqVqKfTtyxMLF8C2LcHTND4w==
-X-Received: by 2002:a05:6a20:7291:b0:197:5045:d299 with SMTP id o17-20020a056a20729100b001975045d299mr1568700pzk.76.1704259912854;
-        Tue, 02 Jan 2024 21:31:52 -0800 (PST)
-Received: from barry-desktop.hub ([2407:7000:8942:5500:a7d6:f37a:9130:cd96])
-        by smtp.gmail.com with ESMTPSA id 4-20020a631244000000b0050f85ef50d1sm21303808pgs.26.2024.01.02.21.31.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 21:31:52 -0800 (PST)
-From: Barry Song <21cnbao@gmail.com>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	zhouchengming@bytedance.com,
-	linux-crypto@vger.kernel.org
-Cc: akpm@linux-foundation.org,
-	chriscli@google.com,
-	chrisl@kernel.org,
-	ddstreet@ieee.org,
-	hannes@cmpxchg.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	nphamcs@gmail.com,
-	sjenning@redhat.com,
-	vitaly.wool@konsulko.com,
-	yosryahmed@google.com,
-	Barry Song <v-songbaohua@oppo.com>
-Subject: [PATCH RFC] crypto: scompress: remove memcpy if sg_nents is 1
-Date: Wed,  3 Jan 2024 18:31:34 +1300
-Message-Id: <20240103053134.564457-1-21cnbao@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <5aff3bcf-ef36-45b3-8ac0-a4b19697419c@bytedance.com>
-References: <5aff3bcf-ef36-45b3-8ac0-a4b19697419c@bytedance.com>
+        bh=Y1njWoxtV/lkC315jnPVTEXguEXnsgC7ZST05muvICE=;
+        b=QOXZjNwJNhGBquJVs4PU9AWCKMdkDVWjL5GIWWDBXbmKxSxnWcw5NaSqDD30o2C60r
+         9frSOVoLoeWcZ0i2UvzEs6Miq1hf7mVr2wONugeKPEnH2osOpP2+dAdK0lZvntVI0eif
+         y+BColFEQIjI+HxbpRacYmJ8KHd2JXLC0iq1gZw1iJ17UXLbxPGbsNGgXXm4qSnghFOo
+         /O12mbvXGHaey3d3eMa604wY9kO++DoHSN4FK1+hb1oJXpB80lhDaut6zytEO7GTMO7C
+         t4fzJUesLc6W2Hmm/PkT5KeC0ZQvtqk//Ic6P2YMjsin3ZhS/tttmckmj7D/CVf5ZwlC
+         j/GQ==
+X-Gm-Message-State: AOJu0YzO8KnqaWlEOPs5H0x7DAiOpKycto627+FUunl+8ikGftNjspeX
+	sImgrvOaPjUxhs1xUmkkcxgcjp/ChFG/Mo98FT08W2HljmcscQ==
+X-Google-Smtp-Source: AGHT+IFz64rayryxeZU2fI/ZaLRlnuH2UGtXPCmA7CnGofL05KoD28z9vIOSzi+45hO7rnPDqslzjl/wtk85KI5AnXI=
+X-Received: by 2002:a05:6102:4b14:b0:467:938:6be3 with SMTP id
+ ia20-20020a0561024b1400b0046709386be3mr5508219vsb.4.1704264817078; Tue, 02
+ Jan 2024 22:53:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <0000000000000b05cd060d6b5511@google.com> <CAKEwX=OmWYivf7dg_izW8pn5s5q15+nx-vRMsV47T_qG=dep_Q@mail.gmail.com>
+ <CAF8kJuPLEXEXG+4esR6MbRa3iirTrJ7-w3YCorB9iD=gnQ+G3A@mail.gmail.com>
+ <CAKEwX=PaFmreqmNrisatSN1=k2kRiYgDksgDze-t=GBD=0iJDg@mail.gmail.com>
+ <CAF8kJuPF5ACu8o1P7GqEQRb6p8QShyTVNuzrrY557g+SsddzWA@mail.gmail.com>
+ <CAKEwX=NHdr9=hUBiZhnLZyRPsp=JwN3Vkwud2XEn3=pNurYGpQ@mail.gmail.com>
+ <f27efd2e-ac65-4f6a-b1b5-c9fb0753d871@bytedance.com> <CAGsJ_4x31mT8TXt4c7ejJoDW1yJhyNqDmJmLZrf2LxMt7Zwg2A@mail.gmail.com>
+ <5aff3bcf-ef36-45b3-8ac0-a4b19697419c@bytedance.com>
+In-Reply-To: <5aff3bcf-ef36-45b3-8ac0-a4b19697419c@bytedance.com>
+From: Barry Song <21cnbao@gmail.com>
+Date: Wed, 3 Jan 2024 19:53:26 +1300
+Message-ID: <CAGsJ_4zkOM4CZ4HeqXxKWv95Y4w6Bh02bvXSDpUrS4jZQMLXRw@mail.gmail.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in
+ scatterwalk_copychunks (5)
+To: Chengming Zhou <zhouchengming@bytedance.com>
+Cc: Nhat Pham <nphamcs@gmail.com>, Chris Li <chrisl@kernel.org>, 
+	syzbot <syzbot+3eff5e51bf1db122a16e@syzkaller.appspotmail.com>, 
+	akpm@linux-foundation.org, davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, yosryahmed@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Barry Song <v-songbaohua@oppo.com>
+On Wed, Dec 27, 2023 at 7:38=E2=80=AFPM Chengming Zhou
+<zhouchengming@bytedance.com> wrote:
+>
+> On 2023/12/27 14:25, Barry Song wrote:
+> > On Wed, Dec 27, 2023 at 4:51=E2=80=AFPM Chengming Zhou
+> > <zhouchengming@bytedance.com> wrote:
+> >>
+> >> On 2023/12/27 08:23, Nhat Pham wrote:
+> >>> On Tue, Dec 26, 2023 at 3:30=E2=80=AFPM Chris Li <chrisl@kernel.org> =
+wrote:
+> >>>>
+> >>>> Again, sorry I was looking at the decompression side rather than the
+> >>>> compression side. The compression side does not even offer a safe
+> >>>> version of the compression function.
+> >>>> That seems to be dangerous. It seems for now we should make the zswa=
+p
+> >>>> roll back to 2 page buffer until we have a safe way to do compressio=
+n
+> >>>> without overwriting the output buffers.
+> >>>
+> >>> Unfortunately, I think this is the way - at least until we rework the
+> >>> crypto/compression API (if that's even possible?).
+> >>> I still think the 2 page buffer is dumb, but it is what it is :(
+> >>
+> >> Hi,
+> >>
+> >> I think it's a bug in `scomp_acomp_comp_decomp()`, which doesn't use
+> >> the caller passed "src" and "dst" scatterlist. Instead, it uses its ow=
+n
+> >> per-cpu "scomp_scratch", which have 128KB src and dst.
+> >>
+> >> When compression done, it uses the output req->dlen to copy scomp_scra=
+tch->dst
+> >> to our dstmem, which has only one page now, so this problem happened.
+> >>
+> >> I still don't know why the alg->compress(src, slen, dst, &dlen) doesn'=
+t
+> >> check the dlen? It seems an obvious bug, right?
+> >>
+> >> As for this problem in `scomp_acomp_comp_decomp()`, this patch below
+> >> should fix it. I will set up a few tests to check later.
+> >>
+> >> Thanks!
+> >>
+> >> diff --git a/crypto/scompress.c b/crypto/scompress.c
+> >> index 442a82c9de7d..e654a120ae5a 100644
+> >> --- a/crypto/scompress.c
+> >> +++ b/crypto/scompress.c
+> >> @@ -117,6 +117,7 @@ static int scomp_acomp_comp_decomp(struct acomp_re=
+q *req, int dir)
+> >>         struct crypto_scomp *scomp =3D *tfm_ctx;
+> >>         void **ctx =3D acomp_request_ctx(req);
+> >>         struct scomp_scratch *scratch;
+> >> +       unsigned int dlen;
+> >>         int ret;
+> >>
+> >>         if (!req->src || !req->slen || req->slen > SCOMP_SCRATCH_SIZE)
+> >> @@ -128,6 +129,8 @@ static int scomp_acomp_comp_decomp(struct acomp_re=
+q *req, int dir)
+> >>         if (!req->dlen || req->dlen > SCOMP_SCRATCH_SIZE)
+> >>                 req->dlen =3D SCOMP_SCRATCH_SIZE;
+> >>
+> >> +       dlen =3D req->dlen;
+> >> +
+> >>         scratch =3D raw_cpu_ptr(&scomp_scratch);
+> >>         spin_lock(&scratch->lock);
+> >>
+> >> @@ -145,6 +148,9 @@ static int scomp_acomp_comp_decomp(struct acomp_re=
+q *req, int dir)
+> >>                                 ret =3D -ENOMEM;
+> >>                                 goto out;
+> >>                         }
+> >> +               } else if (req->dlen > dlen) {
+> >> +                       ret =3D -ENOMEM;
+> >> +                       goto out;
+> >>                 }
+> >
+> > This can't fix the problem as crypto_scomp_compress() has written overf=
+low data.
+>
+> No, crypto_scomp_compress() writes to its own scomp_scratch->dst memory, =
+then copy
+> to our dstmem.
 
-while sg_nents is 1, which is always true for the current kernel
-as the only user - zswap is the case, we should be able to drop
-these two big memcpy.
+Hi Chengming,
+I still feel these two memcpys are too big and unnecessary, so i sent
+a RFC[1] to remove
+them as well as another one removing memcpy in zswap[2].
+but unfortunately I don't have real hardware to run and collect data,
+I wonder if you are
+interested in testing and collecting data as you are actively
+contributing to zswap.
 
-Signed-off-by: Barry Song <v-songbaohua@oppo.com>
----
- crypto/scompress.c | 35 ++++++++++++++++++++++++++++-------
- 1 file changed, 28 insertions(+), 7 deletions(-)
+[1] https://lore.kernel.org/linux-mm/20240103053134.564457-1-21cnbao@gmail.=
+com/
+[2]
+https://lore.kernel.org/linux-mm/20240103025759.523120-1-21cnbao@gmail.com/
+https://lore.kernel.org/linux-mm/20240103025759.523120-2-21cnbao@gmail.com/
 
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 442a82c9de7d..d1bb40ef83a2 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -117,6 +117,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 	struct crypto_scomp *scomp = *tfm_ctx;
- 	void **ctx = acomp_request_ctx(req);
- 	struct scomp_scratch *scratch;
-+	void *src, *dst;
- 	int ret;
- 
- 	if (!req->src || !req->slen || req->slen > SCOMP_SCRATCH_SIZE)
-@@ -131,13 +132,26 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 	scratch = raw_cpu_ptr(&scomp_scratch);
- 	spin_lock(&scratch->lock);
- 
--	scatterwalk_map_and_copy(scratch->src, req->src, 0, req->slen, 0);
-+	if (sg_nents(req->src) == 1) {
-+		src = kmap_local_page(sg_page(req->src)) + req->src->offset;
-+	} else {
-+		scatterwalk_map_and_copy(scratch->src, req->src, 0,
-+					 req->slen, 0);
-+		src = scratch->src;
-+	}
-+
-+	if (req->dst && sg_nents(req->dst) == 1) {
-+		dst = kmap_local_page(sg_page(req->dst)) + req->dst->offset;
-+	} else {
-+		dst = scratch->dst;
-+	}
-+
- 	if (dir)
--		ret = crypto_scomp_compress(scomp, scratch->src, req->slen,
--					    scratch->dst, &req->dlen, *ctx);
-+		ret = crypto_scomp_compress(scomp, src, req->slen,
-+					    dst, &req->dlen, *ctx);
- 	else
--		ret = crypto_scomp_decompress(scomp, scratch->src, req->slen,
--					      scratch->dst, &req->dlen, *ctx);
-+		ret = crypto_scomp_decompress(scomp, src, req->slen,
-+					      dst, &req->dlen, *ctx);
- 	if (!ret) {
- 		if (!req->dst) {
- 			req->dst = sgl_alloc(req->dlen, GFP_ATOMIC, NULL);
-@@ -146,10 +160,17 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 				goto out;
- 			}
- 		}
--		scatterwalk_map_and_copy(scratch->dst, req->dst, 0, req->dlen,
--					 1);
-+		if (dst == scratch->dst) {
-+			scatterwalk_map_and_copy(scratch->dst, req->dst, 0,
-+						 req->dlen, 1);
-+		}
- 	}
- out:
-+	if (src != scratch->src)
-+		kunmap_local(src);
-+	if (dst != scratch->dst)
-+		kunmap_local(dst);
-+
- 	spin_unlock(&scratch->lock);
- 	return ret;
- }
--- 
-2.34.1
-
+Thanks
+Barry
