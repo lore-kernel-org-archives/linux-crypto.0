@@ -1,57 +1,60 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26828185B;
-	Thu,  4 Jan 2024 02:03:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rLD4Q-00GebV-PX; Thu, 04 Jan 2024 10:02:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 04 Jan 2024 10:03:06 +0800
-Date: Thu, 4 Jan 2024 10:03:06 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: David Howells <dhowells@redhat.com>
-Cc: Shigeru Yoshida <syoshida@redhat.com>, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: af_alg/hash: Fix uninit-value access in
- af_alg_free_sg()
-Message-ID: <ZZYR2qcc2Fmaxqq0@gondor.apana.org.au>
-References: <ZYUFs1MumRFf3mnv@gondor.apana.org.au>
- <20231211135949.689204-1-syoshida@redhat.com>
- <386306.1704296211@warthog.procyon.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DE82032A;
+	Thu,  4 Jan 2024 07:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4T5Jph0ndDz29hsv;
+	Thu,  4 Jan 2024 15:57:32 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (unknown [7.193.23.191])
+	by mail.maildlp.com (Postfix) with ESMTPS id AEEB41A0173;
+	Thu,  4 Jan 2024 15:58:58 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 4 Jan 2024 15:58:58 +0800
+Subject: Re: [PATCH v2 0/4] some updates and cleanups for hisilicon/sec2.
+To: Qi Tao <taoqi10@huawei.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+References: <20231229064421.16981-1-taoqi10@huawei.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <ce0455d4-49c7-4838-a774-e7834aac5904@huawei.com>
+Date: Thu, 4 Jan 2024 15:58:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <386306.1704296211@warthog.procyon.org.uk>
+In-Reply-To: <20231229064421.16981-1-taoqi10@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
 
-On Wed, Jan 03, 2024 at 03:36:51PM +0000, David Howells wrote:
-> Hmmm...  Is that going to get you a potential memory leak?
+On 2023/12/29 14:44, Qi Tao wrote:
+> This seires patch mainly add some RAS registers to enhance the 
+> DFX positioning function and fix some cleanup issues.
 > 
-> ctx->sgl.sgt.sgl could (in theory) point to an allocated table.  I guess that
-> would be cleaned up by af_alg_free_areq_sgls(), so there's probably no leak
-> there.
+> Qi Tao (3):
+>   crypto: hisilicon/sec2 - updates the sec DFX function register
+>   crypto: hisilicon/sec2 - modify nested macro call
+>   crypto: hisilicon/sec2 - fix some cleanup issues
+> 
+> Wenkai Lin (1):
+>   crypto: hisilicon/sec - remove unused parameter
+> 
+>  drivers/crypto/hisilicon/sec2/sec_crypto.c | 33 ++++++++--------------
+>  drivers/crypto/hisilicon/sec2/sec_main.c   |  5 ++++
+>  2 files changed, 17 insertions(+), 21 deletions(-)
+> 
 
-The SG list is only setup in this function, and gets freed before
-we return.  There should be no SG list on entry.  It's only because
-you added the special case for a zero-length hash that we hit the
-bogus free.  So we should fix this by not freeing the SG list in
-the zero-length case, as it was never allocated.
+Reviewed-by: Longfang Liu <liulongfang@huawei.com>
 
-> OTOH, af_alg_free_areq_sgls() is going to call af_alg_free_sg(), so maybe we
-> want to initialise sgl->sgt.sgl to NULL as well.
-
-That has nothing to do with this.  This SG list is specific to
-algif_hash and has nothing to do with the shared SG list used
-by aead and skcipher.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks,
+Longfang.
