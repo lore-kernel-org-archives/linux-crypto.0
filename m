@@ -1,209 +1,135 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841D920B11
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Jan 2024 10:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5A820DE1;
+	Thu,  4 Jan 2024 10:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="YwVG3JKn"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d409bcb0e7so1792775ad.1
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Jan 2024 02:23:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1704363827; x=1704968627; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pzj3uOoh7PY5cR2xiJEt6lV6u8Aid8p6M7e8NclCE5I=;
-        b=YwVG3JKnHRc8p8CiyZR1KfoHtB1sx6i0vEnH4rCCfUJao2PMuxJymH+W8g/Hd18py8
-         2m9Ead/AIM9ZvIXTDAZWvgxh+0X9+bqR+4rqejKp0E96vJNBHIjRAWT+DcrRAiiWgd/t
-         De3wHSVVbD5PZvyP4UxfhpBYqDWwdIoMcGmrY/D8jWJdU2z7zHc7Ktg6pC+Vs9TdUiLE
-         bQRO6vWOTbWUUuacGYiz809b47+Alydft5q79s1D3POtMspnaDSoewIr8n+Hl32aSDbp
-         nQAPNi4BbDWtyrrTBUz4oYHXpes+l9YFKjrzG8UbLYIg/wNr1AZ6uGPK8FMDYgBztPPo
-         Ub4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704363827; x=1704968627;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pzj3uOoh7PY5cR2xiJEt6lV6u8Aid8p6M7e8NclCE5I=;
-        b=nxPWFT8BukPmcrS0d6RlNMOGDxQWZRTV+IxzIT6vBjh8rej8M/HGLnjiCZoqqwTI7u
-         XHt96BisrUE1UuciXgjrORAuu7pJZhS0g3lQe/bVhrVUCPAZIOWdDpC8c7GN7B4wM9PD
-         o5P7UKtrB0u6SgvQlJBkLVNNCYIEaFi+fd5van/L4smdab4woUXtiU9AoY9/mlZtE9Pc
-         c+rYhFF43yDVBSbIvAj6sY/z2I8L49NsNA3IT5a4ssumhK34yBRw3oG3OmrejEWb6qAt
-         Ozr8K/Wj8jdFxs4Oy/KEDr86XHQtvZhrQXeoH7lM+o8nvNKkawOtu96LZ6plXyuSv14l
-         lVFQ==
-X-Gm-Message-State: AOJu0YyhHPuF8xYoCdy9g6fpnUEKw/Pvamw7gs/n8qa0Wk6FtrZADlas
-	FxTIaTsALu9B+0S3xQfeGXFrPeCRokh73Q==
-X-Google-Smtp-Source: AGHT+IE+t/XnCgDoBmaNVOzJvr5a20jeY5tCq+x0APnt3WaHMTvvUZamnKncxOPcQZIME1UjYVniQw==
-X-Received: by 2002:a17:902:a3cc:b0:1d3:9287:a1a9 with SMTP id q12-20020a170902a3cc00b001d39287a1a9mr277038plb.57.1704363826793;
-        Thu, 04 Jan 2024 02:23:46 -0800 (PST)
-Received: from ?IPv6:2402:7500:5d5:7102:b5d6:a469:295a:6de5? ([2402:7500:5d5:7102:b5d6:a469:295a:6de5])
-        by smtp.gmail.com with ESMTPSA id h4-20020a170902f7c400b001bbb8d5166bsm25489720plw.123.2024.01.04.02.23.44
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 04 Jan 2024 02:23:46 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="V2d40fYB"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7C1B540E0202;
+	Thu,  4 Jan 2024 10:31:33 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id cpt72dB3zF74; Thu,  4 Jan 2024 10:31:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1704364291; bh=0rxushcfZyl8L0hy6S9Km4lGh2/dzw7ZO9lKAm8opZ8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V2d40fYBXLsjiwgw88xJEJal0iK5jhfOdiiW5CFmq7CsA30eB3UEH5tslaIptPYHx
+	 AiKsFb6HXIdUELKJTNpqrJ+OtNud5zqyBzQO12LOoH6NGEzs213S/tk5v/52ynLT+d
+	 BMUbP6o8Hi5BWVifZygd83cULDxVy73O2SgyQiBLTg/+hDTkamGbeymlReg9rcHoE2
+	 qb0hcW/GpP5dnDESmgo7cEDUG5p9xnZrGBlZk/BzCIXjhvzIKEkQmTdJsLz2hR9f5Y
+	 3e/8k6phnvZM8lA8qSM7zaOWOJp3eL9Tc+otbB0CH8PvK46AXOGxw1FN1ZCd2oaGD7
+	 indn2kf4LREaQl/JX+VTc0TLlwQNTp2WyLiBjla+Bw720a4k9qAZa9W7O5cQQKgwp7
+	 3HT2ReBRVycQg//veJFInytfO5HSRvVRcuJbA0MPCcLvSvs8oi9YMpQ4q1qn0bzL+5
+	 2UximNaMGXpHLlqLvXpeC2zshznqUwr9JofQc+LA8WBk+mL2P6pNm7ZxUHu8VyYs0d
+	 fc9TkDWvo4d7PMa4lnjQcWjHYn0Sf7srHrNS7OtjNQd21AGPYlE3GKV146o5opcokD
+	 0FvC5c4D1ZHKr5ycn1wFc1eWC9g48Qqj6QE89nWfm6ewVFLsyBNsoFSTzvr+7wDdPE
+	 uPUiPUyJWMXVD9UcdHdhHnFY=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D2A6C40E0177;
+	Thu,  4 Jan 2024 10:30:53 +0000 (UTC)
+Date: Thu, 4 Jan 2024 11:30:47 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com
+Subject: Re: [PATCH v1 03/26] iommu/amd: Don't rely on external callers to
+ enable IOMMU SNP support
+Message-ID: <20240104103047.GDZZaI11z9Htj3XS/P@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-4-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
-Subject: Re: [RFC PATCH 00/13] RISC-V crypto with reworked asm files
-From: Jerry Shih <jerry.shih@sifive.com>
-In-Reply-To: <20240103143557.GA773@quark.localdomain>
-Date: Thu, 4 Jan 2024 18:23:42 +0800
-Cc: Ard Biesheuvel <ardb@kernel.org>,
- linux-crypto@vger.kernel.org,
- linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org,
- Heiko Stuebner <heiko@sntech.de>,
- Phoebe Chen <phoebe.chen@sifive.com>,
- hongrong.hsu@sifive.com,
- Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>,
- Andy Chiu <andy.chiu@sifive.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <20EF7A6D-19AE-49C0-982F-8FE7733E375A@sifive.com>
-References: <20240102064743.220490-1-ebiggers@kernel.org>
- <CAMj1kXEAqxCZ_PNM9a=CyciSHUzDU_yqemKh51oncHyLbYUKtA@mail.gmail.com>
- <20240103143557.GA773@quark.localdomain>
-To: Eric Biggers <ebiggers@kernel.org>
-X-Mailer: Apple Mail (2.3445.9.7)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231230161954.569267-4-michael.roth@amd.com>
 
-On Jan 3, 2024, at 22:35, Eric Biggers <ebiggers@kernel.org> wrote:
-> On Wed, Jan 03, 2024 at 03:00:29PM +0100, Ard Biesheuvel wrote:
->> On Tue, 2 Jan 2024 at 07:50, Eric Biggers <ebiggers@kernel.org> =
-wrote:
->>>=20
->>> As discussed previously, the proposed use of the so-called perlasm =
-for
->>> the RISC-V crypto assembly files makes them difficult to read, and =
-these
->>> files have some other issues such extensively duplicating source =
-code
->>> for the different AES key lengths and for the unrolled hash =
-functions.
->>> There is/was a desire to share code with OpenSSL, but many of the =
-files
->>> have already diverged significantly; also, for most of the =
-algorithms
->>> the source code can be quite short anyway, due to the native support =
-for
->>> them in the RISC-V vector crypto extensions combined with the way =
-the
->>> RISC-V vector extension naturally scales to arbitrary vector =
-lengths.
->>>=20
->>> Since we're still waiting for prerequisite patches to be merged =
-anyway,
->>> we have a bit more time to get this cleaned up properly.  So I've =
-had a
->>> go at cleaning up the patchset to use standard .S files, with the =
-code
->>> duplication fixed.  I also made some tweaks to make the different
->>> algorithms consistent with each other and with what exists in the =
-kernel
+On Sat, Dec 30, 2023 at 10:19:31AM -0600, Michael Roth wrote:
+> +static void iommu_snp_enable(void)
+> +{
+> +#ifdef CONFIG_KVM_AMD_SEV
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return;
+> +	/*
+> +	 * The SNP support requires that IOMMU must be enabled, and is
+> +	 * not configured in the passthrough mode.
+> +	 */
+> +	if (no_iommu || iommu_default_passthrough()) {
+> +		pr_err("SNP: IOMMU is disabled or configured in passthrough mode, SNP cannot be supported.\n");
+> +		return;
+> +	}
+> +
+> +	amd_iommu_snp_en = check_feature(FEATURE_SNP);
+> +	if (!amd_iommu_snp_en) {
+> +		pr_err("SNP: IOMMU SNP feature is not enabled, SNP cannot be supported.\n");
+> +		return;
+> +	}
+> +
+> +	pr_info("IOMMU SNP support is enabled.\n");
+> +
+> +	/* Enforce IOMMU v1 pagetable when SNP is enabled. */
+> +	if (amd_iommu_pgtable != AMD_IOMMU_V1) {
+> +		pr_warn("Forcing use of AMD IOMMU v1 page table due to SNP.\n");
+> +		amd_iommu_pgtable = AMD_IOMMU_V1;
+> +	}
 
-Do you mean the xts gluing part only? Do we have the different =
-algorithms
-for the actual implementation in .S?=20
+Kernel code usually says simple "<bla> enabled" not "<bla> is enabled".
+Other than that, LGTM.
 
->>> already for other architectures, and tried to improve comments.
+---
 
-The improved comments are better. Thanks.
+diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
+index 1ed2ef22a0fb..2f1517acaba0 100644
+--- a/drivers/iommu/amd/init.c
++++ b/drivers/iommu/amd/init.c
+@@ -3231,17 +3231,17 @@ static void iommu_snp_enable(void)
+ 	 * not configured in the passthrough mode.
+ 	 */
+ 	if (no_iommu || iommu_default_passthrough()) {
+-		pr_err("SNP: IOMMU is disabled or configured in passthrough mode, SNP cannot be supported.\n");
++		pr_err("SNP: IOMMU disabled or configured in passthrough mode, SNP cannot be supported.\n");
+ 		return;
+ 	}
+ 
+ 	amd_iommu_snp_en = check_feature(FEATURE_SNP);
+ 	if (!amd_iommu_snp_en) {
+-		pr_err("SNP: IOMMU SNP feature is not enabled, SNP cannot be supported.\n");
++		pr_err("SNP: IOMMU SNP feature not enabled, SNP cannot be supported.\n");
+ 		return;
+ 	}
+ 
+-	pr_info("IOMMU SNP support is enabled.\n");
++	pr_info("IOMMU SNP support enabled.\n");
+ 
+ 	/* Enforce IOMMU v1 pagetable when SNP is enabled. */
+ 	if (amd_iommu_pgtable != AMD_IOMMU_V1) {
 
->>> The result is this series, which passes all tests and is about 2400
->>> lines shorter than the latest version with the perlasm
->>> =
-(https://lore.kernel.org/linux-crypto/20231231152743.6304-1-jerry.shih@sif=
-ive.com/).
 
-For the unrolled hash functions case(sha256/512), the .S implementation =
-uses
-macro instead. But I think the macro expanded code will be the same. Do =
-we
-care about the source code size instead of the final binary code size?
+-- 
+Regards/Gruss,
+    Boris.
 
-For the AES variants part, the .S uses branches inside the inner loop. =
-Does the
-branch inside the inner loop better than the bigger code size?
-
->>> All the same functionality and general optimizations are still =
-included,
->>> except for some minor optimizations in XTS that I dropped since it's =
-not
->>> clear they are worth the complexity.  (Note that almost all users of =
-XTS
->>> in the kernel only use it with block-aligned messages, so it's not =
-very
->>> important to optimize the ciphertext stealing case.)
-
-The aesni/neon are SIMD, so I think the rvv version could have the =
-different
-design. And I think my implementation is very similar to x86-xts except =
-the
-tail block numbers for ciphertext stealing case.
-The x86-xts-like implementation uses the fixed 2 block for the =
-ciphertext
-stealing case.
-
-+		int xts_blocks =3D DIV_ROUND_UP(req->cryptlen,
-+					      AES_BLOCK_SIZE) - 2;
-
->>> I'd appreciate people's thoughts on this series.  Jerry, I hope I'm =
-not
->>> stepping on your toes too much here, but I think there are some big
->>> improvements here.
->>>=20
->>=20
->> As I have indicated before, I fully agree with Eric here that =
-avoiding
->> perlasm is preferable: sharing code with OpenSSL is great if we can
->> simply adopt the exact same code (and track OpenSSL as its upstream)
->> but this never really worked that well for skciphers, due to API
->> differences. (The SHA transforms can be reused a bit more easily)
-
-In my opinion, I would prefer the perlasm with the usage of asm =
-mnemonics.
-I could see the expanded asm source from perlsm. I don't know how to =
-dump the
-expanded asm source when we use asm `.macro` directives. I use objdump =
-to
-see the final asm.
-And we could use function to modularize the asm implementations. The =
-macro
-might do the same things, but it's more clear for me for the argument =
-passing
-and more powerful string manipulation.
-And I could have scope for the register name binding. It's more clear to =
-me
-comparing with a long list of `#define xxx`.
-
-If the pure .S is still more preferable in kernel, let's do that.
-
--Jerry
-
->> I will also note that perlasm is not as useful for RISC-V as it is =
-for
->> other architectures: in OpenSSL, perlasm is also used to abstract
->> differences in calling conventions between, e.g., x86_64 on Linux vs
->> Windows, or to support building with outdated [proprietary]
->> toolchains.
->>=20
->> I do wonder if we could also use .req directives for register aliases
->> instead of CPP defines? It shouldn't matter for working code, but the
->> diagnostics tend to be a bit more useful if the aliases are visible =
-to
->> the assembler.
->=20
-> .req unfortunately isn't an option since it is specific to AArch64 and =
-ARM
-> assembly.  So we have to use #defines like x86 does.  Ultimately, the =
-effect is
-> about the same.
->=20
-> - Eric
-
+https://people.kernel.org/tglx/notes-about-netiquette
