@@ -1,138 +1,134 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC041DDC0
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Jan 2024 08:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEB21E501
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Jan 2024 08:47:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gp0tBZip"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704357462;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r4yMLTOTY18ZlQprKfKUPd3eMKBDwxlWLfpj9q5SGZk=;
-	b=Gp0tBZipDsTcG5z0rcLrdgwwZxK7F+/Vpdpe8aeWN/RlhYc/Ul3FAf+AAH1fUrSkeFmkjo
-	aj2nt4nNkn5eQUcqOFk6FSJfObVOMGM1Axjtm7k5grnlwK6UH0mSuJ6d9ekTLdOQQMjoio
-	Gu0k0eFu3WzmB3oZVWvtMd0hf8etITA=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-204-qycUCcWpMKq8cMdiFuLEOQ-1; Thu, 04 Jan 2024 03:37:40 -0500
-X-MC-Unique: qycUCcWpMKq8cMdiFuLEOQ-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-28cc1128ebfso283287a91.3
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Jan 2024 00:37:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ibV8KN5Z"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5cd5cdba609so213367a12.0
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Jan 2024 00:47:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1704358041; x=1704962841; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mgfsQLNdDzo7kWKLxPEqtg86d6gRnxnHrr+F4939nWk=;
+        b=ibV8KN5ZwQHCtG47ERLtCC2HtP4zF4RXNzxfeuMsco0zFe5lciO/s2phps8sRVaWlU
+         pRd7Ve6y/1nb+xtdrhdgFljePfYAwkKc1ZzA2BTOnVX+8irimWTqvrNCFpMoZOAC6cZa
+         +tOIbMG1jnhDL9BwTVAeXK5Ic+5I0Ad6mUIGQgAb1QncyYyjsiOZ4K3Id9bhbg26DLqI
+         q8WeaqsHfgEJ3F8R4NFXVGottY4RSL+HRxJnoQkTi3PmVOxVtV1Vkf33LMlrx8D3cRxU
+         metc8yvPmMj9S2tq70uHnoZGiaY+XVKlCHYT4yd10R77KMn40uxu/VgBB/nM0UycLgeZ
+         r6PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704357459; x=1704962259;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1704358041; x=1704962841;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=r4yMLTOTY18ZlQprKfKUPd3eMKBDwxlWLfpj9q5SGZk=;
-        b=px1CWpEb/fh7eT/cMwOknjEV2/HdKQNiFGqRv4PdbMETVER9w9e9hWgjoQGfbPQMBX
-         c61E/ygfpPLcYuS4qxSRSIg4cTJDaMaqnQuG0vsWdfy3DUJE4e6WaTO22RAq4gOitRwA
-         rQs/dwWXCpIP1tQT+L2tkaiP1D/3UPjrev+qPFiI97eBtQwVehGYueo+E3Sn1aZ6MG75
-         isAzs/NdIeDFXdW41wdT4EbrI0F3gXkj3aXeio92Tvs8AFEGq2HWwbA0cSpD4GzS4WLx
-         4w19qS6/0W4a13gCix50DiBEVKaefEyaiwCKJiV6B96Q9VAgnpFn+8SGWRk3pTucuGyQ
-         uJug==
-X-Gm-Message-State: AOJu0YwN31pT5ytRrf8BchTOePGn1H1YIxtHWO+rby+7pnDKhPH7Kvo8
-	EnAZA1AKRY2HENoV51WNrPtrMvNCyfnKu4XfRzkbJTeN7znY5vy+VW/kUGzKV5hWsPwrdGcRlj4
-	ikyjgQINPahHscbm7+ScCAdoyj+ulWdk0pGobxirCix0gP3Nu
-X-Received: by 2002:a17:90a:98d:b0:28b:dd93:a2ee with SMTP id 13-20020a17090a098d00b0028bdd93a2eemr258985pjo.95.1704357459672;
-        Thu, 04 Jan 2024 00:37:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGCdQEWGQrQ4xm5hLFsMfTv5mouiYJ9JNARw8RqplKfPW5owtuRQP+ob8vEBHzT3rV+OrS0pXTAbtJ6S2POjR0=
-X-Received: by 2002:a17:90a:98d:b0:28b:dd93:a2ee with SMTP id
- 13-20020a17090a098d00b0028bdd93a2eemr258980pjo.95.1704357459417; Thu, 04 Jan
- 2024 00:37:39 -0800 (PST)
+        bh=mgfsQLNdDzo7kWKLxPEqtg86d6gRnxnHrr+F4939nWk=;
+        b=UxaLbbU9s7I9nrei7bMqlcuJpsDfr3gEtOZcJ6sd7c30TCp4no9yXdC84Jl/sOhu60
+         9VwKVABzJEvFFHay6wkkHucoBXOFPujvxcp8BTrmWhS5Vo1d8s9aiFlJEEFo6hsOH0Ju
+         SHCCHeFW4c1G+K4CQVdBdaQbrZ5umeTnAvI7S8LGOn/1i3eAlHE7cUSQ2mWoWqwUwxd9
+         k0tN7oniXbRQojQGybFVjZFW9QShOQN7TNSKVRmsu0+Sda68cqRqz8RMmG2WKkckf9Qo
+         e6DrfeF7IIlcDiWGeuPhV5Zpp5gGNNaH5TbyJsbH+JYXe/FfPu4a0HvI76Rupzl9DxkN
+         RzcA==
+X-Gm-Message-State: AOJu0YzmA2khFPwDkeo6i7nDFeCc/sIY14VoRPIgCwwMRfeFsO6APOsD
+	vg67/3Dbk3Z2lThD6GeJRYgApBh+Bp9X+g==
+X-Google-Smtp-Source: AGHT+IG/sBRaenKqK4e/aSWU0CPcqduNWKUOpDd7nVy3analENwFGwddoXVDN4ch5A9tbYfXUAIt7w==
+X-Received: by 2002:a05:6a20:974b:b0:198:60af:20a5 with SMTP id hs11-20020a056a20974b00b0019860af20a5mr171949pzc.88.1704358040679;
+        Thu, 04 Jan 2024 00:47:20 -0800 (PST)
+Received: from ?IPv6:2402:7500:5d5:7102:b5d6:a469:295a:6de5? ([2402:7500:5d5:7102:b5d6:a469:295a:6de5])
+        by smtp.gmail.com with ESMTPSA id u3-20020a170902e5c300b001d3ee84ef0csm25107555plf.235.2024.01.04.00.47.17
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 04 Jan 2024 00:47:20 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <ZYT/beBEO7dAlVO2@gondor.apana.org.au> <AM0PR04MB6004FDAC2B2C0B4D41A92A89E794A@AM0PR04MB6004.eurprd04.prod.outlook.com>
- <CAFqZXNtb1hErawH30dN4vgGPD0tQv9Rd+9s26MBaT3boRYtPCA@mail.gmail.com> <AM0PR04MB6004F095D6800C4BC99E5C4FE760A@AM0PR04MB6004.eurprd04.prod.outlook.com>
-In-Reply-To: <AM0PR04MB6004F095D6800C4BC99E5C4FE760A@AM0PR04MB6004.eurprd04.prod.outlook.com>
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Date: Thu, 4 Jan 2024 09:37:28 +0100
-Message-ID: <CAFqZXNs-QzXFm+cLN62LrpPjb_R3DqJHgM_yjrOkzen8LEgS9A@mail.gmail.com>
-Subject: Re: [EXT] caam test failures with libkcapi
-To: Gaurav Jain <gaurav.jain@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Horia Geanta <horia.geanta@nxp.com>, 
-	Pankaj Gupta <pankaj.gupta@nxp.com>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Varun Sethi <V.Sethi@nxp.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
+Subject: Re: [RFC PATCH 07/13] crypto: riscv - add vector crypto accelerated
+ AES-{ECB,CBC,CTR,XTS}
+From: Jerry Shih <jerry.shih@sifive.com>
+In-Reply-To: <20240103145043.GB773@quark.localdomain>
+Date: Thu, 4 Jan 2024 16:47:16 +0800
+Cc: linux-crypto@vger.kernel.org,
+ linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org,
+ Ard Biesheuvel <ardb@kernel.org>,
+ Heiko Stuebner <heiko@sntech.de>,
+ Phoebe Chen <phoebe.chen@sifive.com>,
+ hongrong.hsu@sifive.com,
+ Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ Andy Chiu <andy.chiu@sifive.com>
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <905D43CF-B01A-49DE-9046-51A370B6F680@sifive.com>
+References: <20240102064743.220490-1-ebiggers@kernel.org>
+ <20240102064743.220490-8-ebiggers@kernel.org>
+ <20240103145043.GB773@quark.localdomain>
+To: Eric Biggers <ebiggers@kernel.org>
+X-Mailer: Apple Mail (2.3445.9.7)
 
-On Wed, Jan 3, 2024 at 12:50=E2=80=AFPM Gaurav Jain <gaurav.jain@nxp.com> w=
-rote:
->
->
->
-> > -----Original Message-----
-> > From: Ondrej Mosnacek <omosnace@redhat.com>
-> > Sent: Saturday, December 23, 2023 7:29 PM
-> > To: Gaurav Jain <gaurav.jain@nxp.com>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>; Horia Geanta
-> > <horia.geanta@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>; Linux
-> > Crypto Mailing List <linux-crypto@vger.kernel.org>
-> > Subject: Re: [EXT] caam test failures with libkcapi
-> >
-> > Caution: This is an external email. Please take care when clicking link=
-s or
-> > opening attachments. When in doubt, report the message using the 'Repor=
-t this
-> > email' button
-> >
-> >
-> > On Fri, Dec 22, 2023 at 11:50=E2=80=AFAM Gaurav Jain <gaurav.jain@nxp.c=
-om> wrote:
-[...]
-> > > Can you please share the logs for libkcapi test failures.
-> >
-> > A log from our kernel CI testing is available here (it is from CentOS S=
-tream 9, but
-> > it fails in the same way on the Fedora's 6.6.6-based
-> > kernel):
-> > https://s3.amaz/
-> > onaws.com%2Farr-cki-prod-trusted-artifacts%2Ftrusted-
-> > artifacts%2F1109180874%2Ftest_aarch64%2F5766414724%2Fartifacts%2Frun.d
-> > one.03%2Fjob.01%2Frecipes%2F15194733%2Ftasks%2F31%2Flogs%2Ftaskout.l
-> > og&data=3D05%7C02%7Cgaurav.jain%40nxp.com%7C3b52a83449bf4b3fffe208dc
-> > 03bf4b66%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C6383893673
-> > 38072709%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2l
-> > uMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3D9SCFiT
-> > 1nNsTZg4bh6n75CeicDC51Jw3wacQCaL7w4vQ%3D&reserved=3D0
->
-> In this log I cannot see CAAM failures. can you tell which CAAM tfm faile=
-d?
+On Jan 3, 2024, at 22:50, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Tue, Jan 02, 2024 at 12:47:33AM -0600, Eric Biggers wrote:
+>> diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
+>> index dca698c5cba3e..5dd91f34f0d52 100644
+>> --- a/arch/riscv/crypto/Makefile
+>> +++ b/arch/riscv/crypto/Makefile
+>> @@ -1,7 +1,10 @@
+>> # SPDX-License-Identifier: GPL-2.0-only
+>> #
+>> # linux/arch/riscv/crypto/Makefile
+>> #
+>>=20
+>> obj-$(CONFIG_CRYPTO_AES_RISCV64) +=3D aes-riscv64.o
+>> aes-riscv64-y :=3D aes-riscv64-glue.o aes-riscv64-zvkned.o
+>> +
+>> +obj-$(CONFIG_CRYPTO_AES_BLOCK_RISCV64) +=3D aes-block-riscv64.o
+>> +aes-block-riscv64-y :=3D aes-riscv64-block-mode-glue.o =
+aes-riscv64-zvkned-zvbb-zvkg.o aes-riscv64-zvkned-zvkb.o
+>=20
+> A bug I noticed (which is also present in Jerry's patchset) is that =
+some of the
+> code of the aes-block-riscv64 module is located in =
+aes-riscv64-zvkned.S, which
+> isn't built into that module but rather into aes-riscv64.  This causes =
+a build
+> error when both CONFIG_CRYPTO_AES_RISCV64 and =
+CONFIG_CRYPTO_AES_BLOCK_RISCV64
+> are set to 'm':
+>=20
+>    ERROR: modpost: "aes_cbc_decrypt_zvkned" =
+[arch/riscv/crypto/aes-block-riscv64.ko] undefined!
+>    ERROR: modpost: "aes_ecb_decrypt_zvkned" =
+[arch/riscv/crypto/aes-block-riscv64.ko] undefined!
+>    ERROR: modpost: "aes_cbc_encrypt_zvkned" =
+[arch/riscv/crypto/aes-block-riscv64.ko] undefined!
+>    ERROR: modpost: "aes_ecb_encrypt_zvkned" =
+[arch/riscv/crypto/aes-block-riscv64.ko] undefined!
+>=20
+> To fix this, I think we should just merge the two modules and kconfig =
+options
+> together so that there is one module that provides both the AES modes =
+and the
+> AES single-block cipher.  That's how x86's aesni-intel works, for =
+example.
+>=20
+> - Eric
 
-The test exercises the kernel crypto API via the AF_ALG interface. The
-failures basically detect that for certain inputs the crypto API
-returns different results than expected when the CAAM driver is used
-(the machine in question has the relevant hardware, so the caam_jr
-crypto drivers are registered for certain algorithms and they take
-priority).
+That's a bug in my patchset.
+I don't test with all options with `M` settings since I can't boot to =
+qemu with all `M` settings.
 
-For example, when you install libkcapi-tools and run:
+Could we move the cbc and ecb from `aes-riscv64-zvkned` to =
+`aes-block-riscv64` instead of merging
+these two modules?
+Thus, we could still enable the single aes block cipher without other =
+extensions(e.g. zvbb or zvkg).
 
-kcapi -x 2 -s  -e -c "gcm(aes)" -i 16c4b4bd1198f39f4ae817b7 \
-    -k 87c91a8b63f66934dd3703415b2538461fbfef55ce7a9ca9bb9425499f4cd1d6 \
-    -a "303bb57e4534b08a4d5f001a84b3052c9d0d58ee03eda5211a540950e819dc" \
-    -p "b05fbd403c2fa41a8cc702a7474ed9ba6c50fcc6c19732a7d300f1113862bc" -l =
-4
-
-...the caam_jr implementation results in
-b05fbd403c2fa41a8cc702a7474ed9ba6c50fcc6c19732a7d300f1113862bc6d2756d6,
-while the expected output is
-9bea5263e7b365d5a06cb3ccab0d43cb9a1ca967dfb7b1a6955b3c493018af6d2756d6.
-You can search the test log for "FAILED" to find the other failing
-commands (note that in some cases you need to escape the -c argument
-as it contains parentheses).
-
---
-Ondrej Mosnacek
-Senior Software Engineer, Linux Security - SELinux kernel
-Red Hat, Inc.
-
+-Jerry=
