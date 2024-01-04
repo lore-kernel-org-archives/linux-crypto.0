@@ -1,171 +1,136 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8465A1BDDE;
-	Wed,  3 Jan 2024 17:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AAE4C6D;
+	Thu,  4 Jan 2024 00:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BOLqHlGh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704301680; x=1735837680;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=70JQJlokyiaAyGaYrk9lvN1nK0nTFbNr3bb86hDu8YQ=;
-  b=BOLqHlGhS1r9yj7SW5HS4tzEi+6uKh9IEJprRp/TBvm/eH9NZV20qK2L
-   zzXre2/BmkEEW6XiuXex+vmhOahtzDcLeeA7JdVa7DxNOoQB3AhW9UZrC
-   +zDkrkmG6UWxZDKTjcgDiDEqRL1ebzuV2KfurTjLBMHL28vqM7jqJq+xF
-   X8kEieeI3qQTYskQv5EqDPpM217IQzOGTXscXXtrMfhunf+y1sP4+GpKS
-   QTi3uoOdvC9qusZCQGrsvucAUzJStcS4Wip1p+HuWyoqMGkX13gRCrtNy
-   J/D3SiwGwN6YudOHJF1AOXlXH4oAqIcFkUY0URt32YWIv+0bIN9XDpgkO
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="396765085"
-X-IronPort-AV: E=Sophos;i="6.04,328,1695711600"; 
-   d="scan'208";a="396765085"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 09:07:58 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="729835277"
-X-IronPort-AV: E=Sophos;i="6.04,328,1695711600"; 
-   d="scan'208";a="729835277"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Jan 2024 09:07:58 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 3 Jan 2024 09:07:58 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 3 Jan 2024 09:07:57 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 3 Jan 2024 09:07:57 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 3 Jan 2024 09:07:57 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TkYi87BKHKS9KEOTdHSQZnTUQOpdjW65krugxABV1s0ckRc/j8m7ITCwCAdVOcgOHPab4nGX9zAODm79ZzUjZYGLPPpDnqkjHWR/384CUObi5NTMs13VzRmMSFVmOajkYlmTLyYZL0EZkTBzxaQFxVWfZ1kTXwdwZXmY9Vm1VNa8R96D6enDT+0W5S6mPYaBTCYoeyXu7LYUr6nadCBdsqzMluunoy4xnVapoeeKmxsuR3mz4lW2eVrPzZKcDjFP6dmJj2HGbWMs7asgxw3tOZ3qdyPaWRm4xo7HC6Dgfxfovj0J6xtOBJXHMWvG5OrmKT/dxKooH3CKW7lqk6HLRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7J6nJQkqtmSngy0mjMZEvNq6UxNz4BjJSSTiU+OhQAQ=;
- b=jH83QGP1+1Sa7klwmVNAory+rOM3mBflxdAH2bYQn67U6BHOX7gI6GnDurNeszC1vvGbEoD8uPYYeQK6r6zqCYT+l1GPq3oM5L1QGN0ziQlWFqc/+Lz1l7bB9WI/lHBXqnjBqI1yJ58O4IfsbVoX/heGteyvDcDtTTY2ACv+p8PFs+RkOQDWf+NqGAVUx3WQlPWlAkFBY7JlHPs0rz5XExvQhD60VujBPglhHgJJiug14Egmgyv7edUY/Km9P1e4+BtEvi45MHykzxqQmRaVmxYnnu87qA6s0Xg7PUabIt7979ubLFWw0RW0rl6aiMxtFsFdmv48GcjZlgnH+VMEog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by MN6PR11MB8220.namprd11.prod.outlook.com (2603:10b6:208:478::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25; Wed, 3 Jan
- 2024 17:07:53 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::8de8:c1ad:7062:6afc]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::8de8:c1ad:7062:6afc%4]) with mapi id 15.20.7159.013; Wed, 3 Jan 2024
- 17:07:53 +0000
-Date: Wed, 3 Jan 2024 17:07:41 +0000
-From: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-To: Arnd Bergmann <arnd@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>, Damian Muszynski <damian.muszynski@intel.com>, "Arnd
- Bergmann" <arnd@arndb.de>, Tom Zanussi <tom.zanussi@linux.intel.com>, "Jie
- Wang" <jie.wang@intel.com>, <qat-linux@intel.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: qat - avoid memcpy() overflow warning
-Message-ID: <ZZWUXcHBwTJjiT/H@gcabiddu-mobl.ger.corp.intel.com>
-References: <20240103162608.987145-1-arnd@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240103162608.987145-1-arnd@kernel.org>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DU2PR04CA0251.eurprd04.prod.outlook.com
- (2603:10a6:10:28e::16) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TicdC0MZ"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7bb0ab8e79fso363120639f.1;
+        Wed, 03 Jan 2024 16:38:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704328732; x=1704933532; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LdFZ3Tk4i2v5Ki/jD5QceKjDKTifBKGWYuLRGbT2nQA=;
+        b=TicdC0MZJme9BGREP7ifiEfmHxf+AmgVq1fIyiliuBIGzyxz07o79bfG1P47uGTs5M
+         y9CCum7WB6mdvXcFmHmBVLq4NPqnjJguROFKGx9AYljYT5ecr5usG4ORI3rNFF23O6nL
+         us1307CkJ8n0Ci1DaEwZMzBUb7q2NlE0Qb1YnTW+gMqHOBtHuWEpk3MLgBISjVLpqyeE
+         uAhiBBAFvjQt9zkp0pYogSuF62IJ+EtXWxhqGAapt2Gd2+IbYNcim0HcGJwEJW3bwJTB
+         s2RwXzLLcLKePodzHImjomCtjT71sJozQOWA0PzB/WDXZ+pLK6BcR/F/NUBFDr6mAXwF
+         cyTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704328732; x=1704933532;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LdFZ3Tk4i2v5Ki/jD5QceKjDKTifBKGWYuLRGbT2nQA=;
+        b=Rmgb/FNCNvMVJEyv7CNI2vjLI4E+wuWEYdrJYZLCuZlOmQjKXCSGchOHm/i9WMxgNP
+         X43Fk5hgOc8IwtrnUx9zAuQpZcVW0T/gIOfSvj0bXllvoht8GBI/pgCU/e6StDk5N3Vp
+         mi09ghyIkjw4AYLFxwcOqSckr7JopgykCWAO/qZKxTSGPG28sjAmLhGyp2jzJDPPAr43
+         bdvX8QHG0X7ur9ZU2VE1kq83nPDjCagm52K/SPP+0UmkqmUpg5/oLx+DZ0TtCvFz3+oK
+         kmYdLTHBx+RiCKYPSuCvRKjeJ/nRInsirDqH/3jpJrsBo28qtUt4eZfkXcRacAd+DBgH
+         4aWg==
+X-Gm-Message-State: AOJu0YyzRf/BsTibHeWMoDAPNiY6WR8GfacXDkx7SEtkoR7CZuHUuKnj
+	1Fw/315QtmsudJaFMBSRHZE1cnL3CAzkepT4gfg=
+X-Google-Smtp-Source: AGHT+IF/4lBl1Vvdf7uTT3qi0hf/ACw1cp7fc1TK7LsZJKCrcz7Ep929X6o1Bq0+2vgJ6b/KNFs4rDmdocbi7z8oygE=
+X-Received: by 2002:a5d:9f0f:0:b0:7bb:bd06:d5f2 with SMTP id
+ q15-20020a5d9f0f000000b007bbbd06d5f2mr3391602iot.35.1704328732100; Wed, 03
+ Jan 2024 16:38:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|MN6PR11MB8220:EE_
-X-MS-Office365-Filtering-Correlation-Id: e50c40aa-6cc8-46fa-a79d-08dc0c7e8642
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: K3cd4n6y7U/PTq/Qmh1e7vmB31oLZrEh3duviw2y1cn4rn6rQ0RrobMooFvu1vuuyuo+HJMyCohARglR5ixw4FxRAmfJGciTGYGIU7NxonV6vzVC0xh1q2SLuUOBHcWoeyZVh1fH2qvlhY+D4Q66YrCwyAILPWNWzClXl1PxHCYL4jZQ5XsWfvRvYSLbiuWyoGIuQmhQQU3mNVR4FUtb33ob5S6iOoYPqiaox+PR72B4jwp3sjRxjQ7rwWiKUYu8jdlyZU77//Us/c9tPZl41im99tZg8EOI8qZ2F//LJ8s67GVVyp8Kq8djyTnewIluoVlrNiQ/hSetlIXktMLbsTlKWnuY5U3BtFub5SpHxKwI3RhGBNZPuY1bRd/N3fRAxjyBiFuxZ+nVAB9GLaO24c17EYCKCBXgHWFZHQ52KzFYoTldM3fG3dD6r/d5kd6pqY1ShN2SO314/DmwIUuBmsELFdbBu+zoNZlteTndQRkvuDk/Q9x7ll5AE0FkkPQuaRLHBmTNwJztcKfv6GWNo1rufdZYHqLUnaGFdjxdMiLvxnsi2QEnWaDIFyv1eeMYxGPgO9zrfCd/TrUipvlXtGac6pSs1m2BFRRz76BKBGgHL+gekL72i7c4PccJtJQ0
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(136003)(376002)(39860400002)(366004)(230273577357003)(230922051799003)(230173577357003)(186009)(64100799003)(1800799012)(451199024)(66476007)(6506007)(36916002)(6916009)(86362001)(66556008)(6512007)(6486002)(5660300002)(2906002)(82960400001)(38100700002)(41300700001)(66946007)(26005)(83380400001)(4326008)(6666004)(478600001)(54906003)(8676002)(316002)(8936002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gV91LtlBMC7701PJ5PZyP7h7qHA0STnxKzDD73jbAVJtO6Xr3rpliad/nu7e?=
- =?us-ascii?Q?nF0qJzbDBUU25zZpNg8JeEpN0SHXbQMWZWeUNEaWqbLMezWypQtTe8CGG6gU?=
- =?us-ascii?Q?2aDfGpGMsBnSdNIxA/029JhaNZTt+UaC1TpNK8lfdNdV3AYHRefA/0jDHIvx?=
- =?us-ascii?Q?srPxtSlD9oLyhu+rkIqH9xsADXv4ej96rlc/LUL17jl7Vhg8FG2l7R5myIgO?=
- =?us-ascii?Q?vT7YjkQfMUHddk0oYAQ6M1U6dQk/xfS9RqlmWwrI+clIlfcM3fFNwpFhY7J5?=
- =?us-ascii?Q?gUO2PaIktwp8h2W3sZJ+0gqn+heYhGlKUzGqv/EsCLUPk8I9U1k3676FDfy5?=
- =?us-ascii?Q?/uXw85TnLgSCF2j/NN0tDUYE+Iu68xRHKq+N2gXPUO25XXUQ69B7AKN6IRLp?=
- =?us-ascii?Q?ixQmOO4+A6zkuU+hSiDT4L4DpEuQpqkZJiAImsTfZLqXW7d1XEc5NwsbNBbK?=
- =?us-ascii?Q?sbNss8X/U7zbueOBAG/WwyvBXnL1G5QHzcOcnih1stH/6AnI3htn3z3CnxUK?=
- =?us-ascii?Q?LPoN9ZN3JA7MKZrEQydt6jhEVZEa+ph03aykmozcHgUfqqSXiwqSfxxc6Haf?=
- =?us-ascii?Q?Go2pwS3kAUOoZsFJVSzMJs8gT39lc7IjCeddFKy/0IM3CUFAVBNmLvgr6mDR?=
- =?us-ascii?Q?JyOfCtCg4hiSRcg3KUpkNcAafUJ05cB3aOfgAcJgTwEnDR7CEDOWCB47K+4O?=
- =?us-ascii?Q?o4p/4UAytJl611fUhQDt8l1FI5XErQaifnmCiji+pkXGXk82/vNcUsXWA9jI?=
- =?us-ascii?Q?9McUY52epGIxDs7ncsv5tzacc3gzg0KyY4YSCtDaS+pBTO/dXRLMqwdKzXPz?=
- =?us-ascii?Q?9vsMX3573lkO8vHNfMWgKBt8niBpvrgExic4sq4dHRfkidwY9Mex5X5P+6Uh?=
- =?us-ascii?Q?/w1i9I+Rr4Bykv9h/AJ3zJYnjgPpb+K3gzf5pDnOisLv8SmXDtGCAKjILAOX?=
- =?us-ascii?Q?FEvr8m9VPZFvFOOdVVWmKKC+7ZGnOFsPHyJOObwG1FAV7F2LjoVULor1cBy6?=
- =?us-ascii?Q?nQByoE8E94gZtYmnyzqLWuBXJo2rupiS9aYyVKqc4gYZ9Fg4XnIICEZoR+kw?=
- =?us-ascii?Q?eEX8KVntiUiZtJJGAtSMIXK45vk8PONA98GI3iWKh+3GBxhnnX2Izvi1UMl6?=
- =?us-ascii?Q?OoC9xhvdeQHn3oIbAxmQ+iWqtbssTHMVa0y2OSSIIf83z2v1jh1eQOjvpATX?=
- =?us-ascii?Q?Kxp3rGmz83KIMda0zPrVOH5on4UYupmjV+GtwLlSoZYuda2O8zTpQlErjfrI?=
- =?us-ascii?Q?7qtf2dcYzWuzji5ZPSopoBYsSYTQI+FUXgKBYCYP1kf3CrkeJAor2+01JeYm?=
- =?us-ascii?Q?nGD+ocwFpsrFHLS9/yTT408tlqELTc/yqeoyjOlF+yvYSifzz9h8FnzhE3uc?=
- =?us-ascii?Q?ZeryUSsKRxXjozzAjm/9rI/enBFQEGh4datxAvFkC0imzc01xs70Nfv9ryLk?=
- =?us-ascii?Q?yhcI99o1c7RFTr2ZOMfrgN2QgEzNbwvaOojNGI5rL8bFkNV3nzAGXt/EeKHn?=
- =?us-ascii?Q?UqsLsMzojxUOx/8kH8DrJxyTV+sK052Pk65rrnohMBZjaHM5WuJGedH852cO?=
- =?us-ascii?Q?EGMZ2nEVNT4iMOz4hYoWcyebnmz4CdrOxVUKTtiw0rOy45CrZMyc5e4sDPno?=
- =?us-ascii?Q?2w=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e50c40aa-6cc8-46fa-a79d-08dc0c7e8642
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2024 17:07:53.8890
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: voOJ6O/xfx3fbpWKT1CHio4WMMuXNMXWA4hQDKXbpqTMuIb46W4bBFWlAih7piNvthkncS8jfzU1EF1OfB9F4ZlTlEE77ifrmmS2z8lcJb0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8220
-X-OriginatorOrg: intel.com
+References: <20240103095006.608744-1-21cnbao@gmail.com> <20240103095006.608744-3-21cnbao@gmail.com>
+In-Reply-To: <20240103095006.608744-3-21cnbao@gmail.com>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Wed, 3 Jan 2024 16:38:41 -0800
+Message-ID: <CAKEwX=MDNuW72OS81mXgAKMdBnT2MCTGJtXx8cgMLh=J_Nv-ew@mail.gmail.com>
+Subject: Re: [PATCH 2/3] mm/zswap: remove the memcpy if acomp is not asynchronous
+To: Barry Song <21cnbao@gmail.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, 
+	akpm@linux-foundation.org, ddstreet@ieee.org, sjenning@redhat.com, 
+	vitaly.wool@konsulko.com, linux-crypto@vger.kernel.org, chriscli@google.com, 
+	chrisl@kernel.org, hannes@cmpxchg.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, yosryahmed@google.com, zhouchengming@bytedance.com, 
+	Barry Song <v-songbaohua@oppo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 03, 2024 at 05:26:02PM +0100, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> The use of array_size() leads gcc to assume the memcpy() can have a larger
-> limit than actually possible, which triggers a string fortification warning:
-> 
-> In file included from include/linux/string.h:296,
->                  from include/linux/bitmap.h:12,
->                  from include/linux/cpumask.h:12,
->                  from include/linux/sched.h:16,
->                  from include/linux/delay.h:23,
->                  from include/linux/iopoll.h:12,
->                  from drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c:3:
-> In function 'fortify_memcpy_chk',
->     inlined from 'adf_gen4_init_thd2arb_map' at drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c:401:3:
-> include/linux/fortify-string.h:579:4: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
->   579 |    __write_overflow_field(p_size_field, size);
->       |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> include/linux/fortify-string.h:588:4: error: call to '__read_overflow2_field' declared with attribute warning: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Werror=attribute-warning]
->   588 |    __read_overflow2_field(q_size_field, size);
->       |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> Add an explicit range check to avoid this.
-> 
-> Fixes: 5da6a2d5353e ("crypto: qat - generate dynamically arbiter mappings")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+On Wed, Jan 3, 2024 at 1:50=E2=80=AFAM Barry Song <21cnbao@gmail.com> wrote=
+:
+>
+> From: Barry Song <v-songbaohua@oppo.com>
+>
+> Most compressors are actually CPU-based and won't sleep during
+> compression and decompression. We should remove the redundant
+> memcpy for them.
+>
+> Signed-off-by: Barry Song <v-songbaohua@oppo.com>
+> Tested-by: Chengming Zhou <zhouchengming@bytedance.com>
+
+nit: it might help to include the test numbers in the changelog in
+this patch here too. Save a couple of clicks to dig out the original
+patch cover for the numbers :)
+
+> ---
+>  mm/zswap.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/mm/zswap.c b/mm/zswap.c
+> index ca25b676048e..36898614ebcc 100644
+> --- a/mm/zswap.c
+> +++ b/mm/zswap.c
+> @@ -168,6 +168,7 @@ struct crypto_acomp_ctx {
+>         struct crypto_wait wait;
+>         u8 *buffer;
+>         struct mutex mutex;
+> +       bool is_async; /* if acomp can sleep */
+
+nit: seems like this comment isn't necessary. is_async is pretty
+self-explanatory to me. But definitely not a show stopper tho :)
+
+>  };
+>
+>  /*
+> @@ -716,6 +717,7 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, s=
+truct hlist_node *node)
+>                 goto acomp_fail;
+>         }
+>         acomp_ctx->acomp =3D acomp;
+> +       acomp_ctx->is_async =3D acomp_is_async(acomp);
+>
+>         req =3D acomp_request_alloc(acomp_ctx->acomp);
+>         if (!req) {
+> @@ -1370,7 +1372,7 @@ static void __zswap_load(struct zswap_entry *entry,=
+ struct page *page)
+>         mutex_lock(&acomp_ctx->mutex);
+>
+>         src =3D zpool_map_handle(zpool, entry->handle, ZPOOL_MM_RO);
+> -       if (!zpool_can_sleep_mapped(zpool)) {
+> +       if (acomp_ctx->is_async && !zpool_can_sleep_mapped(zpool)) {
+>                 memcpy(acomp_ctx->buffer, src, entry->length);
+>                 src =3D acomp_ctx->buffer;
+>                 zpool_unmap_handle(zpool, entry->handle);
+> @@ -1384,7 +1386,7 @@ static void __zswap_load(struct zswap_entry *entry,=
+ struct page *page)
+>         BUG_ON(acomp_ctx->req->dlen !=3D PAGE_SIZE);
+>         mutex_unlock(&acomp_ctx->mutex);
+>
+> -       if (zpool_can_sleep_mapped(zpool))
+> +       if (!acomp_ctx->is_async || zpool_can_sleep_mapped(zpool))
+>                 zpool_unmap_handle(zpool, entry->handle);
+>  }
+>
+> --
+> 2.34.1
+>
+
+The zswap side looks good to me. I don't have expertise/authority to
+ack the crypto API change (but FWIW it LGTM too based on a cursory
+code read).
+Reviewed-by: Nhat Pham <nphamcs@gmail.com>
