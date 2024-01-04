@@ -1,136 +1,57 @@
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AAE4C6D;
-	Thu,  4 Jan 2024 00:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TicdC0MZ"
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7bb0ab8e79fso363120639f.1;
-        Wed, 03 Jan 2024 16:38:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704328732; x=1704933532; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LdFZ3Tk4i2v5Ki/jD5QceKjDKTifBKGWYuLRGbT2nQA=;
-        b=TicdC0MZJme9BGREP7ifiEfmHxf+AmgVq1fIyiliuBIGzyxz07o79bfG1P47uGTs5M
-         y9CCum7WB6mdvXcFmHmBVLq4NPqnjJguROFKGx9AYljYT5ecr5usG4ORI3rNFF23O6nL
-         us1307CkJ8n0Ci1DaEwZMzBUb7q2NlE0Qb1YnTW+gMqHOBtHuWEpk3MLgBISjVLpqyeE
-         uAhiBBAFvjQt9zkp0pYogSuF62IJ+EtXWxhqGAapt2Gd2+IbYNcim0HcGJwEJW3bwJTB
-         s2RwXzLLcLKePodzHImjomCtjT71sJozQOWA0PzB/WDXZ+pLK6BcR/F/NUBFDr6mAXwF
-         cyTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704328732; x=1704933532;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LdFZ3Tk4i2v5Ki/jD5QceKjDKTifBKGWYuLRGbT2nQA=;
-        b=Rmgb/FNCNvMVJEyv7CNI2vjLI4E+wuWEYdrJYZLCuZlOmQjKXCSGchOHm/i9WMxgNP
-         X43Fk5hgOc8IwtrnUx9zAuQpZcVW0T/gIOfSvj0bXllvoht8GBI/pgCU/e6StDk5N3Vp
-         mi09ghyIkjw4AYLFxwcOqSckr7JopgykCWAO/qZKxTSGPG28sjAmLhGyp2jzJDPPAr43
-         bdvX8QHG0X7ur9ZU2VE1kq83nPDjCagm52K/SPP+0UmkqmUpg5/oLx+DZ0TtCvFz3+oK
-         kmYdLTHBx+RiCKYPSuCvRKjeJ/nRInsirDqH/3jpJrsBo28qtUt4eZfkXcRacAd+DBgH
-         4aWg==
-X-Gm-Message-State: AOJu0YyzRf/BsTibHeWMoDAPNiY6WR8GfacXDkx7SEtkoR7CZuHUuKnj
-	1Fw/315QtmsudJaFMBSRHZE1cnL3CAzkepT4gfg=
-X-Google-Smtp-Source: AGHT+IF/4lBl1Vvdf7uTT3qi0hf/ACw1cp7fc1TK7LsZJKCrcz7Ep929X6o1Bq0+2vgJ6b/KNFs4rDmdocbi7z8oygE=
-X-Received: by 2002:a5d:9f0f:0:b0:7bb:bd06:d5f2 with SMTP id
- q15-20020a5d9f0f000000b007bbbd06d5f2mr3391602iot.35.1704328732100; Wed, 03
- Jan 2024 16:38:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26828185B;
+	Thu,  4 Jan 2024 02:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rLD4Q-00GebV-PX; Thu, 04 Jan 2024 10:02:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 04 Jan 2024 10:03:06 +0800
+Date: Thu, 4 Jan 2024 10:03:06 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: David Howells <dhowells@redhat.com>
+Cc: Shigeru Yoshida <syoshida@redhat.com>, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: af_alg/hash: Fix uninit-value access in
+ af_alg_free_sg()
+Message-ID: <ZZYR2qcc2Fmaxqq0@gondor.apana.org.au>
+References: <ZYUFs1MumRFf3mnv@gondor.apana.org.au>
+ <20231211135949.689204-1-syoshida@redhat.com>
+ <386306.1704296211@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103095006.608744-1-21cnbao@gmail.com> <20240103095006.608744-3-21cnbao@gmail.com>
-In-Reply-To: <20240103095006.608744-3-21cnbao@gmail.com>
-From: Nhat Pham <nphamcs@gmail.com>
-Date: Wed, 3 Jan 2024 16:38:41 -0800
-Message-ID: <CAKEwX=MDNuW72OS81mXgAKMdBnT2MCTGJtXx8cgMLh=J_Nv-ew@mail.gmail.com>
-Subject: Re: [PATCH 2/3] mm/zswap: remove the memcpy if acomp is not asynchronous
-To: Barry Song <21cnbao@gmail.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, 
-	akpm@linux-foundation.org, ddstreet@ieee.org, sjenning@redhat.com, 
-	vitaly.wool@konsulko.com, linux-crypto@vger.kernel.org, chriscli@google.com, 
-	chrisl@kernel.org, hannes@cmpxchg.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, yosryahmed@google.com, zhouchengming@bytedance.com, 
-	Barry Song <v-songbaohua@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <386306.1704296211@warthog.procyon.org.uk>
 
-On Wed, Jan 3, 2024 at 1:50=E2=80=AFAM Barry Song <21cnbao@gmail.com> wrote=
-:
->
-> From: Barry Song <v-songbaohua@oppo.com>
->
-> Most compressors are actually CPU-based and won't sleep during
-> compression and decompression. We should remove the redundant
-> memcpy for them.
->
-> Signed-off-by: Barry Song <v-songbaohua@oppo.com>
-> Tested-by: Chengming Zhou <zhouchengming@bytedance.com>
+On Wed, Jan 03, 2024 at 03:36:51PM +0000, David Howells wrote:
+> Hmmm...  Is that going to get you a potential memory leak?
+> 
+> ctx->sgl.sgt.sgl could (in theory) point to an allocated table.  I guess that
+> would be cleaned up by af_alg_free_areq_sgls(), so there's probably no leak
+> there.
 
-nit: it might help to include the test numbers in the changelog in
-this patch here too. Save a couple of clicks to dig out the original
-patch cover for the numbers :)
+The SG list is only setup in this function, and gets freed before
+we return.  There should be no SG list on entry.  It's only because
+you added the special case for a zero-length hash that we hit the
+bogus free.  So we should fix this by not freeing the SG list in
+the zero-length case, as it was never allocated.
 
-> ---
->  mm/zswap.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/mm/zswap.c b/mm/zswap.c
-> index ca25b676048e..36898614ebcc 100644
-> --- a/mm/zswap.c
-> +++ b/mm/zswap.c
-> @@ -168,6 +168,7 @@ struct crypto_acomp_ctx {
->         struct crypto_wait wait;
->         u8 *buffer;
->         struct mutex mutex;
-> +       bool is_async; /* if acomp can sleep */
+> OTOH, af_alg_free_areq_sgls() is going to call af_alg_free_sg(), so maybe we
+> want to initialise sgl->sgt.sgl to NULL as well.
 
-nit: seems like this comment isn't necessary. is_async is pretty
-self-explanatory to me. But definitely not a show stopper tho :)
+That has nothing to do with this.  This SG list is specific to
+algif_hash and has nothing to do with the shared SG list used
+by aead and skcipher.
 
->  };
->
->  /*
-> @@ -716,6 +717,7 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, s=
-truct hlist_node *node)
->                 goto acomp_fail;
->         }
->         acomp_ctx->acomp =3D acomp;
-> +       acomp_ctx->is_async =3D acomp_is_async(acomp);
->
->         req =3D acomp_request_alloc(acomp_ctx->acomp);
->         if (!req) {
-> @@ -1370,7 +1372,7 @@ static void __zswap_load(struct zswap_entry *entry,=
- struct page *page)
->         mutex_lock(&acomp_ctx->mutex);
->
->         src =3D zpool_map_handle(zpool, entry->handle, ZPOOL_MM_RO);
-> -       if (!zpool_can_sleep_mapped(zpool)) {
-> +       if (acomp_ctx->is_async && !zpool_can_sleep_mapped(zpool)) {
->                 memcpy(acomp_ctx->buffer, src, entry->length);
->                 src =3D acomp_ctx->buffer;
->                 zpool_unmap_handle(zpool, entry->handle);
-> @@ -1384,7 +1386,7 @@ static void __zswap_load(struct zswap_entry *entry,=
- struct page *page)
->         BUG_ON(acomp_ctx->req->dlen !=3D PAGE_SIZE);
->         mutex_unlock(&acomp_ctx->mutex);
->
-> -       if (zpool_can_sleep_mapped(zpool))
-> +       if (!acomp_ctx->is_async || zpool_can_sleep_mapped(zpool))
->                 zpool_unmap_handle(zpool, entry->handle);
->  }
->
-> --
-> 2.34.1
->
-
-The zswap side looks good to me. I don't have expertise/authority to
-ack the crypto API change (but FWIW it LGTM too based on a cursory
-code read).
-Reviewed-by: Nhat Pham <nphamcs@gmail.com>
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
