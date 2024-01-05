@@ -1,39 +1,39 @@
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C272D61C;
-	Fri,  5 Jan 2024 13:09:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05582D622;
+	Fri,  5 Jan 2024 13:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="QK0Go5m2"
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 405A3Bav024348;
-	Fri, 5 Jan 2024 14:07:02 +0100
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="1MykyLek"
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 405A5xIQ029634;
+	Fri, 5 Jan 2024 14:08:15 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
 	from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:content-type; s=
-	selector1; bh=smKl2bzJ797/uoq/KRDcSxVWqL6ZJIcSzKGdwZz9+N0=; b=QK
-	0Go5m2QK9hplBDlODrTYvQ01PE0C6i8zdynp49uEUnQGYqj9SQczrrkv4O8gToiY
-	zMGaO1WdtrJxt80zud7y38lRLvYyeS2eYLCOTUsNoKYI5x3tPid3AgomWfmHx40f
-	Bzmfto7zeOjmMqVLS1sDUDx9wz+kZHSUA5iksT3VL7WKxbIFPzQQ5OkREvF/t8yZ
-	RIeImw3hwXUNhC5EA+mndPFLW6mL9yVmiB0C4+f3OoTGySkjkoxDerkDtFbNlSOb
-	sYe2q7LRciMIYrFmjZgelJelZ964Xta3LfEgAFz67K1b3LXsUmAsMrRR4zNtpJYy
-	D+8oCCE1lR7nechuJxpA==
+	selector1; bh=pdoLzds6ybOz4DH26I8jBcXVv6K38hVXWpk0gC53suE=; b=1M
+	ykyLekQxVB8QeCibzGBFTU+wwbLAaFThGpcG3Uv7SVcH8MRj4Ho8gJ43sRxYxZPb
+	vPzYj/z5+v+6p7Ns9TMhn+bCIEAdHVMnHk7KLgRsD808/d2Z6dPnGhFJ9wjI/Dbx
+	XkC0qvX9W2hynl7CwPzDudaCEF0STykNcFY+7dHZjkl2d27a2JyCVrsF8yhzHtp1
+	pHOsRJBNCG4Q8mB2+SpGFAtZuvH8vTxCX1/Ha0eWpW8DZBNqWptIw47STH88jj7n
+	C3g3pqfRik7xFBA7gUNSGu7eJbwHrN5e7hsd6Ik5dvB75DEYq5mkVrIeN1WC/yx+
+	hKdTGOBgSBxB7Ck7wvzA==
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ve9h0j5ws-1
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ve9gfj62u-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Jan 2024 14:07:02 +0100 (CET)
+	Fri, 05 Jan 2024 14:08:15 +0100 (CET)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 0325410002A;
-	Fri,  5 Jan 2024 14:07:01 +0100 (CET)
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 8AE39100038;
+	Fri,  5 Jan 2024 14:08:14 +0100 (CET)
 Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id EA82E22A6C2;
-	Fri,  5 Jan 2024 14:07:00 +0100 (CET)
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 7EE2322A6C9;
+	Fri,  5 Jan 2024 14:08:14 +0100 (CET)
 Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 5 Jan
- 2024 14:07:00 +0100
+ 2024 14:08:14 +0100
 From: Gatien Chevallier <gatien.chevallier@foss.st.com>
 To: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
         <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
@@ -59,9 +59,9 @@ CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-usb@vger.kernel.org>,
         Gatien Chevallier
 	<gatien.chevallier@foss.st.com>
-Subject: [PATCH v9 09/13] bus: etzpc: introduce ETZPC firewall controller driver
-Date: Fri, 5 Jan 2024 14:04:00 +0100
-Message-ID: <20240105130404.301172-10-gatien.chevallier@foss.st.com>
+Subject: [PATCH v9 13/13] ARM: dts: stm32: put ETZPC as an access controller for STM32MP13x boards
+Date: Fri, 5 Jan 2024 14:04:04 +0100
+Message-ID: <20240105130404.301172-14-gatien.chevallier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240105130404.301172-1-gatien.chevallier@foss.st.com>
 References: <20240105130404.301172-1-gatien.chevallier@foss.st.com>
@@ -79,197 +79,270 @@ X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-01-05_06,2024-01-05_01,2023-05-22_02
 
-ETZPC is a peripheral and memory firewall controller that filter accesses
-based on Arm TrustZone secure state and Arm CPU privilege execution level.
-It handles MCU isolation as well.
+Reference ETZPC as an access-control-provider.
+
+For more information on which peripheral is securable or supports MCU
+isolation, please read the STM32MP13 reference manual
 
 Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 ---
 
-Changes in V2:
-	- Add controller name
-	- Driver is now a module_platform_driver
-	- Use error code returned by stm32_firewall_populate_bus()
-	- Fix license
+Patch not present in V6
 
- MAINTAINERS               |   1 +
- drivers/bus/Makefile      |   2 +-
- drivers/bus/stm32_etzpc.c | 141 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 143 insertions(+), 1 deletion(-)
- create mode 100644 drivers/bus/stm32_etzpc.c
+ arch/arm/boot/dts/st/stm32mp131.dtsi  | 26 ++++++++++++++++++++++++++
+ arch/arm/boot/dts/st/stm32mp133.dtsi  |  1 +
+ arch/arm/boot/dts/st/stm32mp13xc.dtsi |  1 +
+ arch/arm/boot/dts/st/stm32mp13xf.dtsi |  1 +
+ 4 files changed, 29 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 353b68fb3477..e02ca61f2505 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20442,6 +20442,7 @@ F:	drivers/media/i2c/st-mipid02.c
- ST STM32 FIREWALL
- M:	Gatien Chevallier <gatien.chevallier@foss.st.com>
- S:	Maintained
-+F:	drivers/bus/stm32_etzpc.c
- F:	drivers/bus/stm32_firewall.c
- F:	drivers/bus/stm32_rifsc.c
+diff --git a/arch/arm/boot/dts/st/stm32mp131.dtsi b/arch/arm/boot/dts/st/stm32mp131.dtsi
+index 6ba8e3fd43b0..74ceece168ce 100644
+--- a/arch/arm/boot/dts/st/stm32mp131.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp131.dtsi
+@@ -883,6 +883,7 @@ etzpc: bus@5c007000 {
+ 			reg = <0x5c007000 0x400>;
+ 			#address-cells = <1>;
+ 			#size-cells = <1>;
++			#access-controller-cells = <1>;
+ 			ranges;
  
-diff --git a/drivers/bus/Makefile b/drivers/bus/Makefile
-index e50d18e1d141..cddd4984d6af 100644
---- a/drivers/bus/Makefile
-+++ b/drivers/bus/Makefile
-@@ -26,7 +26,7 @@ obj-$(CONFIG_OMAP_INTERCONNECT)	+= omap_l3_smx.o omap_l3_noc.o
- obj-$(CONFIG_OMAP_OCP2SCP)	+= omap-ocp2scp.o
- obj-$(CONFIG_QCOM_EBI2)		+= qcom-ebi2.o
- obj-$(CONFIG_QCOM_SSC_BLOCK_BUS)	+= qcom-ssc-block-bus.o
--obj-$(CONFIG_STM32_FIREWALL)	+= stm32_firewall.o stm32_rifsc.o
-+obj-$(CONFIG_STM32_FIREWALL)	+= stm32_firewall.o stm32_rifsc.o stm32_etzpc.o
- obj-$(CONFIG_SUN50I_DE2_BUS)	+= sun50i-de2.o
- obj-$(CONFIG_SUNXI_RSB)		+= sunxi-rsb.o
- obj-$(CONFIG_OF)		+= simple-pm-bus.o
-diff --git a/drivers/bus/stm32_etzpc.c b/drivers/bus/stm32_etzpc.c
-new file mode 100644
-index 000000000000..7fc0f16960be
---- /dev/null
-+++ b/drivers/bus/stm32_etzpc.c
-@@ -0,0 +1,141 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
-+ */
-+
-+#include <linux/bitfield.h>
-+#include <linux/bits.h>
-+#include <linux/device.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/io.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
-+#include <linux/types.h>
-+
-+#include "stm32_firewall.h"
-+
-+/*
-+ * ETZPC registers
-+ */
-+#define ETZPC_DECPROT			0x10
-+#define ETZPC_HWCFGR			0x3F0
-+
-+/*
-+ * HWCFGR register
-+ */
-+#define ETZPC_HWCFGR_NUM_TZMA		GENMASK(7, 0)
-+#define ETZPC_HWCFGR_NUM_PER_SEC	GENMASK(15, 8)
-+#define ETZPC_HWCFGR_NUM_AHB_SEC	GENMASK(23, 16)
-+#define ETZPC_HWCFGR_CHUNKS1N4		GENMASK(31, 24)
-+
-+/*
-+ * ETZPC miscellaneous
-+ */
-+#define ETZPC_PROT_MASK			GENMASK(1, 0)
-+#define ETZPC_PROT_A7NS			0x3
-+#define ETZPC_DECPROT_SHIFT		1
-+
-+#define IDS_PER_DECPROT_REGS		16
-+
-+static int stm32_etzpc_grant_access(struct stm32_firewall_controller *ctrl, u32 firewall_id)
-+{
-+	u32 offset, reg_offset, sec_val;
-+
-+	if (firewall_id >= ctrl->max_entries) {
-+		dev_err(ctrl->dev, "Invalid sys bus ID %u", firewall_id);
-+		return -EINVAL;
-+	}
-+
-+	/* Check access configuration, 16 peripherals per register */
-+	reg_offset = ETZPC_DECPROT + 0x4 * (firewall_id / IDS_PER_DECPROT_REGS);
-+	offset = (firewall_id % IDS_PER_DECPROT_REGS) << ETZPC_DECPROT_SHIFT;
-+
-+	/* Verify peripheral is non-secure and attributed to cortex A7 */
-+	sec_val = (readl(ctrl->mmio + reg_offset) >> offset) & ETZPC_PROT_MASK;
-+	if (sec_val != ETZPC_PROT_A7NS) {
-+		dev_dbg(ctrl->dev, "Invalid bus configuration: reg_offset %#x, value %d\n",
-+			reg_offset, sec_val);
-+		return -EACCES;
-+	}
-+
-+	return 0;
-+}
-+
-+static void stm32_etzpc_release_access(struct stm32_firewall_controller *ctrl __maybe_unused,
-+				       u32 firewall_id __maybe_unused)
-+{
-+}
-+
-+static int stm32_etzpc_probe(struct platform_device *pdev)
-+{
-+	struct stm32_firewall_controller *etzpc_controller;
-+	struct device_node *np = pdev->dev.of_node;
-+	u32 nb_per, nb_master;
-+	struct resource *res;
-+	void __iomem *mmio;
-+	int rc;
-+
-+	etzpc_controller = devm_kzalloc(&pdev->dev, sizeof(*etzpc_controller), GFP_KERNEL);
-+	if (!etzpc_controller)
-+		return -ENOMEM;
-+
-+	mmio = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
-+	if (IS_ERR(mmio))
-+		return PTR_ERR(mmio);
-+
-+	etzpc_controller->dev = &pdev->dev;
-+	etzpc_controller->mmio = mmio;
-+	etzpc_controller->name = dev_driver_string(etzpc_controller->dev);
-+	etzpc_controller->type = STM32_PERIPHERAL_FIREWALL | STM32_MEMORY_FIREWALL;
-+	etzpc_controller->grant_access = stm32_etzpc_grant_access;
-+	etzpc_controller->release_access = stm32_etzpc_release_access;
-+
-+	/* Get number of etzpc entries*/
-+	nb_per = FIELD_GET(ETZPC_HWCFGR_NUM_PER_SEC,
-+			   readl(etzpc_controller->mmio + ETZPC_HWCFGR));
-+	nb_master = FIELD_GET(ETZPC_HWCFGR_NUM_AHB_SEC,
-+			      readl(etzpc_controller->mmio + ETZPC_HWCFGR));
-+	etzpc_controller->max_entries = nb_per + nb_master;
-+
-+	platform_set_drvdata(pdev, etzpc_controller);
-+
-+	rc = stm32_firewall_controller_register(etzpc_controller);
-+	if (rc) {
-+		dev_err(etzpc_controller->dev, "Couldn't register as a firewall controller: %d",
-+			rc);
-+		return rc;
-+	}
-+
-+	rc = stm32_firewall_populate_bus(etzpc_controller);
-+	if (rc) {
-+		dev_err(etzpc_controller->dev, "Couldn't populate ETZPC bus: %d",
-+			rc);
-+		return rc;
-+	}
-+
-+	/* Populate all allowed nodes */
-+	return of_platform_populate(np, NULL, NULL, &pdev->dev);
-+}
-+
-+static const struct of_device_id stm32_etzpc_of_match[] = {
-+	{ .compatible = "st,stm32-etzpc" },
-+	{}
-+};
-+MODULE_DEVICE_TABLE(of, stm32_etzpc_of_match);
-+
-+static struct platform_driver stm32_etzpc_driver = {
-+	.probe  = stm32_etzpc_probe,
-+	.driver = {
-+		.name = "stm32-etzpc",
-+		.of_match_table = stm32_etzpc_of_match,
-+	},
-+};
-+module_platform_driver(stm32_etzpc_driver);
-+
-+MODULE_AUTHOR("Gatien Chevallier <gatien.chevallier@foss.st.com>");
-+MODULE_DESCRIPTION("STMicroelectronics ETZPC driver");
-+MODULE_LICENSE("GPL");
+ 			adc_2: adc@48004000 {
+@@ -895,6 +896,7 @@ adc_2: adc@48004000 {
+ 				#interrupt-cells = <1>;
+ 				#address-cells = <1>;
+ 				#size-cells = <0>;
++				access-controllers = <&etzpc 33>;
+ 				status = "disabled";
+ 
+ 				adc2: adc@0 {
+@@ -942,6 +944,7 @@ usbotg_hs: usb@49000000 {
+ 				dr_mode = "otg";
+ 				otg-rev = <0x200>;
+ 				usb33d-supply = <&scmi_usb33>;
++				access-controllers = <&etzpc 34>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -955,6 +958,7 @@ usart1: serial@4c000000 {
+ 				dmas = <&dmamux1 41 0x400 0x5>,
+ 				<&dmamux1 42 0x400 0x1>;
+ 				dma-names = "rx", "tx";
++				access-controllers = <&etzpc 16>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -968,6 +972,7 @@ usart2: serial@4c001000 {
+ 				dmas = <&dmamux1 43 0x400 0x5>,
+ 				<&dmamux1 44 0x400 0x1>;
+ 				dma-names = "rx", "tx";
++				access-controllers = <&etzpc 17>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -979,6 +984,7 @@ i2s4: audio-controller@4c002000 {
+ 				dmas = <&dmamux1 83 0x400 0x01>,
+ 				<&dmamux1 84 0x400 0x01>;
+ 				dma-names = "rx", "tx";
++				access-controllers = <&etzpc 13>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -993,6 +999,7 @@ spi4: spi@4c002000 {
+ 				dmas = <&dmamux1 83 0x400 0x01>,
+ 				       <&dmamux1 84 0x400 0x01>;
+ 				dma-names = "rx", "tx";
++				access-controllers = <&etzpc 18>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -1007,6 +1014,7 @@ spi5: spi@4c003000 {
+ 				dmas = <&dmamux1 85 0x400 0x01>,
+ 				       <&dmamux1 86 0x400 0x01>;
+ 				dma-names = "rx", "tx";
++				access-controllers = <&etzpc 19>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -1025,6 +1033,7 @@ i2c3: i2c@4c004000 {
+ 				dma-names = "rx", "tx";
+ 				st,syscfg-fmp = <&syscfg 0x4 0x4>;
+ 				i2c-analog-filter;
++				access-controllers = <&etzpc 20>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -1043,6 +1052,7 @@ i2c4: i2c@4c005000 {
+ 				dma-names = "rx", "tx";
+ 				st,syscfg-fmp = <&syscfg 0x4 0x8>;
+ 				i2c-analog-filter;
++				access-controllers = <&etzpc 21>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -1061,6 +1071,7 @@ i2c5: i2c@4c006000 {
+ 				dma-names = "rx", "tx";
+ 				st,syscfg-fmp = <&syscfg 0x4 0x10>;
+ 				i2c-analog-filter;
++				access-controllers = <&etzpc 22>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -1073,6 +1084,7 @@ timers12: timer@4c007000 {
+ 				interrupt-names = "global";
+ 				clocks = <&rcc TIM12_K>;
+ 				clock-names = "int";
++				access-controllers = <&etzpc 23>;
+ 				status = "disabled";
+ 
+ 				pwm {
+@@ -1097,6 +1109,7 @@ timers13: timer@4c008000 {
+ 				interrupt-names = "global";
+ 				clocks = <&rcc TIM13_K>;
+ 				clock-names = "int";
++				access-controllers = <&etzpc 24>;
+ 				status = "disabled";
+ 
+ 				pwm {
+@@ -1121,6 +1134,7 @@ timers14: timer@4c009000 {
+ 				interrupt-names = "global";
+ 				clocks = <&rcc TIM14_K>;
+ 				clock-names = "int";
++				access-controllers = <&etzpc 25>;
+ 				status = "disabled";
+ 
+ 				pwm {
+@@ -1150,6 +1164,7 @@ timers15: timer@4c00a000 {
+ 				<&dmamux1 107 0x400 0x1>,
+ 				<&dmamux1 108 0x400 0x1>;
+ 				dma-names = "ch1", "up", "trig", "com";
++				access-controllers = <&etzpc 26>;
+ 				status = "disabled";
+ 
+ 				pwm {
+@@ -1177,6 +1192,7 @@ timers16: timer@4c00b000 {
+ 				dmas = <&dmamux1 109 0x400 0x1>,
+ 				<&dmamux1 110 0x400 0x1>;
+ 				dma-names = "ch1", "up";
++				access-controllers = <&etzpc 27>;
+ 				status = "disabled";
+ 
+ 				pwm {
+@@ -1204,6 +1220,7 @@ timers17: timer@4c00c000 {
+ 				dmas = <&dmamux1 111 0x400 0x1>,
+ 				       <&dmamux1 112 0x400 0x1>;
+ 				dma-names = "ch1", "up";
++				access-controllers = <&etzpc 28>;
+ 				status = "disabled";
+ 
+ 				pwm {
+@@ -1228,6 +1245,7 @@ lptimer2: timer@50021000 {
+ 				clocks = <&rcc LPTIM2_K>;
+ 				clock-names = "mux";
+ 				wakeup-source;
++				access-controllers = <&etzpc 1>;
+ 				status = "disabled";
+ 
+ 				pwm {
+@@ -1262,6 +1280,7 @@ lptimer3: timer@50022000 {
+ 				clocks = <&rcc LPTIM3_K>;
+ 				clock-names = "mux";
+ 				wakeup-source;
++				access-controllers = <&etzpc 2>;
+ 				status = "disabled";
+ 
+ 				pwm {
+@@ -1290,6 +1309,7 @@ hash: hash@54003000 {
+ 				resets = <&rcc HASH1_R>;
+ 				dmas = <&mdma 30 0x2 0x1000a02 0x0 0x0>;
+ 				dma-names = "in";
++				access-controllers = <&etzpc 41>;
+ 			};
+ 
+ 			rng: rng@54004000 {
+@@ -1297,6 +1317,7 @@ rng: rng@54004000 {
+ 				reg = <0x54004000 0x400>;
+ 				clocks = <&rcc RNG1_K>;
+ 				resets = <&rcc RNG1_R>;
++				access-controllers = <&etzpc 40>;
+ 			};
+ 
+ 			fmc: memory-controller@58002000 {
+@@ -1311,6 +1332,7 @@ fmc: memory-controller@58002000 {
+ 				#size-cells = <1>;
+ 				clocks = <&rcc FMC_K>;
+ 				resets = <&rcc FMC_R>;
++				access-controllers = <&etzpc 54>;
+ 				status = "disabled";
+ 
+ 				nand-controller@4,0 {
+@@ -1344,6 +1366,7 @@ qspi: spi@58003000 {
+ 				dma-names = "tx", "rx";
+ 				clocks = <&rcc QSPI_K>;
+ 				resets = <&rcc QSPI_R>;
++				access-controllers = <&etzpc 55>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -1358,6 +1381,7 @@ sdmmc1: mmc@58005000 {
+ 				cap-sd-highspeed;
+ 				cap-mmc-highspeed;
+ 				max-frequency = <130000000>;
++				access-controllers = <&etzpc 50>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -1372,6 +1396,7 @@ sdmmc2: mmc@58007000 {
+ 				cap-sd-highspeed;
+ 				cap-mmc-highspeed;
+ 				max-frequency = <130000000>;
++				access-controllers = <&etzpc 51>;
+ 				status = "disabled";
+ 			};
+ 
+@@ -1385,6 +1410,7 @@ usbphyc: usbphyc@5a006000 {
+ 				resets = <&rcc USBPHY_R>;
+ 				vdda1v1-supply = <&scmi_reg11>;
+ 				vdda1v8-supply = <&scmi_reg18>;
++				access-controllers = <&etzpc 5>;
+ 				status = "disabled";
+ 
+ 				usbphyc_port0: usb-phy@0 {
+diff --git a/arch/arm/boot/dts/st/stm32mp133.dtsi b/arch/arm/boot/dts/st/stm32mp133.dtsi
+index c4d3a520c14b..3e394c8e58b9 100644
+--- a/arch/arm/boot/dts/st/stm32mp133.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp133.dtsi
+@@ -47,6 +47,7 @@ adc_1: adc@48003000 {
+ 		#interrupt-cells = <1>;
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
++		access-controllers = <&etzpc 32>;
+ 		status = "disabled";
+ 
+ 		adc1: adc@0 {
+diff --git a/arch/arm/boot/dts/st/stm32mp13xc.dtsi b/arch/arm/boot/dts/st/stm32mp13xc.dtsi
+index b9fb071a1471..a8bd5fe6536c 100644
+--- a/arch/arm/boot/dts/st/stm32mp13xc.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp13xc.dtsi
+@@ -11,6 +11,7 @@ cryp: crypto@54002000 {
+ 		interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
+ 		clocks = <&rcc CRYP1>;
+ 		resets = <&rcc CRYP1_R>;
++		access-controllers = <&etzpc 42>;
+ 		status = "disabled";
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/st/stm32mp13xf.dtsi b/arch/arm/boot/dts/st/stm32mp13xf.dtsi
+index b9fb071a1471..a8bd5fe6536c 100644
+--- a/arch/arm/boot/dts/st/stm32mp13xf.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp13xf.dtsi
+@@ -11,6 +11,7 @@ cryp: crypto@54002000 {
+ 		interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
+ 		clocks = <&rcc CRYP1>;
+ 		resets = <&rcc CRYP1_R>;
++		access-controllers = <&etzpc 42>;
+ 		status = "disabled";
+ 	};
+ };
 -- 
 2.35.3
 
