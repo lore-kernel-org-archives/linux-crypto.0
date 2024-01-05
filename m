@@ -1,130 +1,100 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051F52E85C
-	for <linux-crypto@vger.kernel.org>; Fri,  5 Jan 2024 16:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92D4328A7;
+	Fri,  5 Jan 2024 16:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="U0SY9mNR"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a27cd5850d6so186400766b.1
-        for <linux-crypto@vger.kernel.org>; Fri, 05 Jan 2024 08:15:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1704471348; x=1705076148; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2EkrLPpfX68IA8d/5CPpZuMAmVCLu73Yzxl8t1E6w2M=;
-        b=U0SY9mNRzOHLg2oAJuki4XzHlnHxFPPVkogg4Bsg9gAjcixsZ7XWE9nydc3ZOuiHsT
-         Wl9VlAwNnK/OWl7qMZjd+yvuhS2ocl+0uMDZNcEUzlpXGhJqIXLqeyKlO2HHJFxH3Jvz
-         77AacKA9ADY95/ZLd/pWxo6ykcbUfYNIcs4aoRfNLXlQ6RLfYH0K6QSMP7GHRGac2F3R
-         zfL5LlJoZvzwwzSTDfsW9ZH5UPidQ1miL0/CKzbsLHItD4HBf6+ztuMFZBGpd2HaNXbG
-         ZFGykocPpCUUM4yo+esWqko0/GuA+BGj3SJpgSEbFWRtAXryW6aVv2bC3g/bQRDhfCcp
-         rnOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704471348; x=1705076148;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2EkrLPpfX68IA8d/5CPpZuMAmVCLu73Yzxl8t1E6w2M=;
-        b=P+Jyu+pZSVHgZ9ZrmoQF6IDTvf3fJgv4ey4zK0uFVOyClxFf2FXqShz8VwQPEpSuKY
-         fEbWg4Fq2NJy2JO+HQdDDmQisA5MUg3v1U0IN57aN8jFQlkFoPv7oiv+kqz443QDv8s5
-         IJKrXYaJkw4CeWMFqyLSiqZ7axLM0ypJf6/MS1+tviXq+0ZoKCQ76sjh6Om92qsfHNNB
-         6KMuLKc8Sct57ZB7GshJZxuRBUQvmC+xXHt5mrsyTjD+MqKuxOveKWVKzfxpbUxrPC2i
-         2WYFb5D2mWY9mgThZA8DoDnC7QywppvKS72x8ZXRnkq08hYXXtfEnXXAxUebVJ1ysbhD
-         6l1w==
-X-Gm-Message-State: AOJu0YxPOmq2m3hHqb1wlW/q30/ElcMPihAygENYrO392SBU6PSR66fD
-	ih0DFyfC63CS02asMJvosD8uwrcba0cGnw==
-X-Google-Smtp-Source: AGHT+IF0F4kBNIMfJY2WeUh31uZD8/I9CGX4aE/9HYT9YMdxaniTBXNbap7APj6H4vgi4j2E/4Gi1w==
-X-Received: by 2002:a17:906:261a:b0:a26:d20e:35a7 with SMTP id h26-20020a170906261a00b00a26d20e35a7mr1259647ejc.127.1704471348452;
-        Fri, 05 Jan 2024 08:15:48 -0800 (PST)
-Received: from otso.luca.vpn.lucaweiss.eu (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id ft33-20020a170907802100b00a26a5632d8fsm1031726ejc.13.2024.01.05.08.15.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 08:15:47 -0800 (PST)
-From: Luca Weiss <luca.weiss@fairphone.com>
-Date: Fri, 05 Jan 2024 17:15:44 +0100
-Subject: [PATCH 2/2] arm64: dts: qcom: sm6350: Add Crypto Engine
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="B5hW1EV9"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C73DD40E016C;
+	Fri,  5 Jan 2024 16:22:28 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 84HtEWuwaCZG; Fri,  5 Jan 2024 16:22:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1704471746; bh=j+eM5pN/ZJjguSTXrDo3g1D8mHy8zmaIa7AEsjD59Ss=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B5hW1EV9vq5JsAI+1K8hZ+f2YqJiyOSKPbVarcMMiw8kX2ro9XqQCODVg4iFe/8fD
+	 NbSSivZTtrQT8C7BxFa1r+3wg7vnBfocNEP25TIBX6PPQIUjouhNkLFt5qQDLDZQF3
+	 GcrStKGHX+9V3L+8K+veTdS3iX3KgBDOqKjRijz3eaZFMPKLWD5I3S/nUEc7FUtMua
+	 OxSJc7LIquZzRfl25m1BfXTbp/+b6CCNX49o01v4+//tf4vZavCs52zR6GK+KOBk1M
+	 CMmrYtfB9tmVTYO3ZQfTtEy4GGBumFGc9Ii8TlDcXSOyqbfvndPOB2owY7i6nBe5zb
+	 q61eALCQgj6osq0Ey2wjgA75scGAlI46jHRjhfi+3Eml/OR3RND0+0N3t9Koohpr97
+	 9b3/yw4hn53CarYV5+2qqXyM14tD7rKlN/IcrMjh55wgT6dN/lJSiUvaXL5B9NMbf+
+	 JE3TFAEv3LTJMUaOk4vn/2+DMTrWYpMrgHUwVnC5kLreh3vS5P+EnlK8X0YeFz7mfM
+	 MapqpvHY/m07UOKex0RizLW2ykAOU0jdTwauka14ssguCs8KKAs75iH6KxiIHAF2wV
+	 ggQIii0tmodflsN7YB/D/WWv8Ci3WR46LazY5XuNEajUAbiv/GEmC6XEodW4IEugwu
+	 vYB5DRcBjVXm4N99CMbdoLkc=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 08D6A40E00C5;
+	Fri,  5 Jan 2024 16:21:47 +0000 (UTC)
+Date: Fri, 5 Jan 2024 17:21:42 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+	pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
+	ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v1 04/26] x86/sev: Add the host SEV-SNP initialization
+ support
+Message-ID: <20240105162142.GEZZgslgQCQYI7twat@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-5-michael.roth@amd.com>
+ <f60c5fe0-9909-468d-8160-34d5bae39305@linux.microsoft.com>
+ <20240105160916.GDZZgprE8T6xbbHJ9E@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240105-sm6350-qce-v1-2-416e5c7319ac@fairphone.com>
-References: <20240105-sm6350-qce-v1-0-416e5c7319ac@fairphone.com>
-In-Reply-To: <20240105-sm6350-qce-v1-0-416e5c7319ac@fairphone.com>
-To: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konrad.dybcio@linaro.org>, 
- Thara Gopinath <thara.gopinath@gmail.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org, 
- linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Luca Weiss <luca.weiss@fairphone.com>
-X-Mailer: b4 0.12.4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240105160916.GDZZgprE8T6xbbHJ9E@fat_crate.local>
 
-Add crypto engine (CE) and CE BAM related nodes and definitions for this
-SoC.
+On Fri, Jan 05, 2024 at 05:09:16PM +0100, Borislav Petkov wrote:
+> On Thu, Jan 04, 2024 at 12:05:27PM +0100, Jeremi Piotrowski wrote:
+> > Is there a really good reason to perform the snp_probe_smptable_info() check at this
+> > point (instead of in snp_rmptable_init). snp_rmptable_init will also clear the cap
+> > on failure, and bsp_init_amd() runs too early to allow for the kernel to allocate the
+> > rmptable itself. I pointed out in the previous review that kernel allocation of rmptable
+> > is necessary in SNP-host capable VMs in Azure.
+> 
+> What does that even mean?
+> 
+> That function is doing some calculations after reading two MSRs. What
+> can possibly go wrong?!
 
-For reference:
+That could be one reason perhaps:
 
-  [    2.297419] qcrypto 1dfa000.crypto: Crypto device found, version 5.5.1
+"It needs to be called early enough to allow for AutoIBRS to not be disabled
+just because SNP is supported. By calling it where it is currently called, the
+SNP feature can be cleared if, even though supported, SNP can't be used,
+allowing AutoIBRS to be used as a more performant Spectre mitigation."
 
-Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
----
- arch/arm64/boot/dts/qcom/sm6350.dtsi | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/qcom/sm6350.dtsi b/arch/arm64/boot/dts/qcom/sm6350.dtsi
-index 8fd6f4d03490..516aadbb16bb 100644
---- a/arch/arm64/boot/dts/qcom/sm6350.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm6350.dtsi
-@@ -1212,6 +1212,37 @@ ufs_mem_phy_lanes: phy@1d87400 {
- 			};
- 		};
- 
-+		cryptobam: dma-controller@1dc4000 {
-+			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
-+			reg = <0 0x01dc4000 0 0x24000>;
-+			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-+			#dma-cells = <1>;
-+			qcom,ee = <0>;
-+			qcom,controlled-remotely;
-+			num-channels = <16>;
-+			qcom,num-ees = <4>;
-+			iommus = <&apps_smmu 0x432 0x0000>,
-+				 <&apps_smmu 0x438 0x0001>,
-+				 <&apps_smmu 0x43f 0x0000>,
-+				 <&apps_smmu 0x426 0x0011>,
-+				 <&apps_smmu 0x436 0x0011>;
-+		};
-+
-+		crypto: crypto@1dfa000 {
-+			compatible = "qcom,sm6350-qce", "qcom,sm8150-qce", "qcom,qce";
-+			reg = <0 0x01dfa000 0 0x6000>;
-+			dmas = <&cryptobam 4>, <&cryptobam 5>;
-+			dma-names = "rx", "tx";
-+			iommus = <&apps_smmu 0x432 0x0000>,
-+				 <&apps_smmu 0x438 0x0001>,
-+				 <&apps_smmu 0x43f 0x0000>,
-+				 <&apps_smmu 0x426 0x0011>,
-+				 <&apps_smmu 0x436 0x0011>;
-+			interconnects = <&aggre2_noc MASTER_CRYPTO_CORE_0 QCOM_ICC_TAG_ALWAYS
-+					 &clk_virt SLAVE_EBI_CH0 QCOM_ICC_TAG_ALWAYS>;
-+			interconnect-names = "memory";
-+		};
-+
- 		ipa: ipa@1e40000 {
- 			compatible = "qcom,sm6350-ipa";
- 
+https://lore.kernel.org/r/8ec38db1-5ccf-4684-bc0d-d48579ebf0d0@amd.com
 
 -- 
-2.43.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
