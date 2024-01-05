@@ -1,89 +1,94 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A412E823;
-	Fri,  5 Jan 2024 16:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AF42E846
+	for <linux-crypto@vger.kernel.org>; Fri,  5 Jan 2024 16:15:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="e8XnFhLY"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id ECF8C40E0196;
-	Fri,  5 Jan 2024 16:10:03 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id PCgHEbNop059; Fri,  5 Jan 2024 16:10:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1704471000; bh=hbXwqK0OxWvMXMXdG0rzK29hIKNQYHBM1ksrUbaSRh8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e8XnFhLYTn6wVrhB1oGHnnkiaLQNzGw27kCQ4orbXRtpPWQN15Ikeeb6dC9FMNT4V
-	 08nbNNLdbuVqBsBVhLz8851dcrm8x3p+EW8GeJZlvbVieJDeTUvKCndfl3vUZCCZOY
-	 VgENpIcUhA/q6LjhAknzz6vJYImadJXtK1CwOtySrs4Fqwrx3v3/r3LmYpre2akl2w
-	 3zpgn4xYZKZIL+9BghPvkYG6YRQc5ENXxIiK2TnxekY7MdkOtVz6vvhRL48aSxro/Z
-	 udKGIB0rzsmvT8y17GVwNigHycw2JCnHQMUNafy6TkuejfCkrrJTBzgnvpFavsmDG6
-	 prZ0tRSDWIOyk98VQ0cl1MjsQ7mjAwFKG+ckDcgRmr2CsFKHOqRBV29c84oNDuGPx1
-	 Wi42yvALu9FM4FCo5kSzTAz9kkS9EUCG71a4hFuZg02xr4RGRNUDXTVO0nKU9MRjwp
-	 CFWa3Yl/jANlvdO9Ifub/VFbSe2aWXSSHP12uQbsyHbf9Pl1RyDTStobt/vTQ0tVo4
-	 VHHoSzXuujKIcOJUG7vDL5EvoN0KDvfhNXQv7p8auEiMAwO2hYJBc4SFoCONRsjmSs
-	 m1R+FAUvbMPZ5Kw5EFfRb1+UnZT4xoBaSEAWhC0/GS3Z4skpS4mHLzoJxA6ygZpZQg
-	 MDWi7EbMfM4VPffbtRq7L0VM=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 445DA40E016C;
-	Fri,  5 Jan 2024 16:09:21 +0000 (UTC)
-Date: Fri, 5 Jan 2024 17:09:16 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
-	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
-	pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
-	ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v1 04/26] x86/sev: Add the host SEV-SNP initialization
- support
-Message-ID: <20240105160916.GDZZgprE8T6xbbHJ9E@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-5-michael.roth@amd.com>
- <f60c5fe0-9909-468d-8160-34d5bae39305@linux.microsoft.com>
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="0Qd0YOWt"
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-553ba2f0c8fso1924810a12.1
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Jan 2024 08:15:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fairphone.com; s=fair; t=1704471346; x=1705076146; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9XSaiyQmm79NWYYZKXvu1jjvp4q3CpLJczn8LJj/R3M=;
+        b=0Qd0YOWtUCwI3IwfBQhRUUV3z50CnbU4jorPRmyQ/t878DbzAz7r5qzuDiYIXfbob/
+         NVpdLMdVSJ1qRdKbknZERqagYDp3cKWCjwnbLaZmDFdvvWQZHE4WkGAkUOGrXz3VWKD6
+         gc3UpO70038BHxzMKPo93CZ3/CRuxfkgxEuuoQUVcRNiTK3uvCvUfSsTCpXQWI+G13xT
+         ZXsvc0KoiRFKba5ZJolHz4nYmYQ8oPuWL3ZTdcf94dBIZivqTJ6geGX3Eir8SwKS0T/i
+         Zdp8BnJP/ymBB8EQk5ozLLHQ/zcpMLQyn8y6SicvYR3hlM7pG3WrHUNpvmtL+XRdUSze
+         Oxcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704471346; x=1705076146;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9XSaiyQmm79NWYYZKXvu1jjvp4q3CpLJczn8LJj/R3M=;
+        b=o2NOw+ss0xyUNcksgnoPabVMbRvC231bl7MX/o6eBvKlbK+YtIrGB+vD1eLvFCnBGK
+         GzjuL2iYXxkVseOJ3eoyZVqjUWdvmkJWvjEm2u+9Fkhj2KQXZu7PSVcqtd4K2EO6ulrR
+         0raoacsqdptyExp1ASxhzOpmbF+GZm6fnp3EBH9UzWFZraPv7N6UNOubiZJxACNj+zrr
+         ERps+dKWDCKCLJKVTgixD7nsYzqVbPc2nDc1wg9YR4LDOsRUNjYoCKyPjxl1Pf8bYGtA
+         brgehQTVIhMJVCM7Ty1vVdBvNAXN0F9DPzet/S0tTz29c3Glww0ktODAyAXCAgjIKsVf
+         v2DA==
+X-Gm-Message-State: AOJu0YxgSiwogDFZUmvvjMKPRlTj77FhGLN2DZH1Ubw0PrK8EdoeQs+y
+	bPhBvXHRrF/IT4U3qE3PbIVh7M/qujtg+w==
+X-Google-Smtp-Source: AGHT+IFM6ysmp2Xr9DCU3Vuei4JMO0dEao78HnyRDX+jACWcpbdpi/2nDdNYBR7DbrmN5GkY4BhKSw==
+X-Received: by 2002:a17:906:7483:b0:a28:fc8a:5da5 with SMTP id e3-20020a170906748300b00a28fc8a5da5mr461903ejl.121.1704471346155;
+        Fri, 05 Jan 2024 08:15:46 -0800 (PST)
+Received: from otso.luca.vpn.lucaweiss.eu (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id ft33-20020a170907802100b00a26a5632d8fsm1031726ejc.13.2024.01.05.08.15.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jan 2024 08:15:45 -0800 (PST)
+From: Luca Weiss <luca.weiss@fairphone.com>
+Subject: [PATCH 0/2] Add Crypto Engine support for SM6350
+Date: Fri, 05 Jan 2024 17:15:42 +0100
+Message-Id: <20240105-sm6350-qce-v1-0-416e5c7319ac@fairphone.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f60c5fe0-9909-468d-8160-34d5bae39305@linux.microsoft.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAC4rmGUC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDQwNT3eJcM2NTA93C5FTdZDMjY+PEpKQ0U5M0JaCGgqLUtMwKsGHRsbW
+ 1AP+rrvZcAAAA
+To: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konrad.dybcio@linaro.org>, 
+ Thara Gopinath <thara.gopinath@gmail.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Luca Weiss <luca.weiss@fairphone.com>
+X-Mailer: b4 0.12.4
 
-On Thu, Jan 04, 2024 at 12:05:27PM +0100, Jeremi Piotrowski wrote:
-> Is there a really good reason to perform the snp_probe_smptable_info() check at this
-> point (instead of in snp_rmptable_init). snp_rmptable_init will also clear the cap
-> on failure, and bsp_init_amd() runs too early to allow for the kernel to allocate the
-> rmptable itself. I pointed out in the previous review that kernel allocation of rmptable
-> is necessary in SNP-host capable VMs in Azure.
+Add the compatible and nodes for the QCE found on SM6350 SoC.
 
-What does that even mean?
+Not completely sure how to fully test it but "kcapi-speed --all" shows
+no issues. Let me know if I can/should test this more.
 
-That function is doing some calculations after reading two MSRs. What
-can possibly go wrong?!
+Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+---
+Luca Weiss (2):
+      dt-bindings: qcom-qce: Add compatible for SM6350
+      arm64: dts: qcom: sm6350: Add Crypto Engine
 
+ .../devicetree/bindings/crypto/qcom-qce.yaml       |  1 +
+ arch/arm64/boot/dts/qcom/sm6350.dtsi               | 31 ++++++++++++++++++++++
+ 2 files changed, 32 insertions(+)
+---
+base-commit: 610a9b8f49fbcf1100716370d3b5f6f884a2835a
+change-id: 20240105-sm6350-qce-c6233abbf54f
+
+Best regards,
 -- 
-Regards/Gruss,
-    Boris.
+Luca Weiss <luca.weiss@fairphone.com>
 
-https://people.kernel.org/tglx/notes-about-netiquette
