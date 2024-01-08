@@ -1,69 +1,50 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56ED613FFA;
-	Mon,  8 Jan 2024 10:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3F24777F
+	for <linux-crypto@vger.kernel.org>; Mon,  8 Jan 2024 12:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eiEEANnR";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="IV8c+llT";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eiEEANnR";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="IV8c+llT"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 3202A1F799;
-	Mon,  8 Jan 2024 10:45:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1704710737; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DUrMQ588PontGGXfiGWoujWrvGIzdjiET4ISNVeyer4=;
-	b=eiEEANnRZeJbaI8CjaucatZH8wxLgTMD8Nk1SAQoE9nwmL1h2dUv1nlSVapgm4KTIOeJ2/
-	aMrE4dOrgd1/yC96csd/826bfs3cmng0vvAESMigZFOw1zkE56jOHBFH4mnYcyuOEsWu22
-	ZBeQB6XKFbe9p8uVFqSSaQ149yYvCzY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1704710737;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DUrMQ588PontGGXfiGWoujWrvGIzdjiET4ISNVeyer4=;
-	b=IV8c+llTYz1HJ2A4ILW2O+hnTA2OBYy29S6zX46BbRE/P0eK+LIIY/1uKRHvcMglTAu+a4
-	O3kM68xKIg9EAIAA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1704710737; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DUrMQ588PontGGXfiGWoujWrvGIzdjiET4ISNVeyer4=;
-	b=eiEEANnRZeJbaI8CjaucatZH8wxLgTMD8Nk1SAQoE9nwmL1h2dUv1nlSVapgm4KTIOeJ2/
-	aMrE4dOrgd1/yC96csd/826bfs3cmng0vvAESMigZFOw1zkE56jOHBFH4mnYcyuOEsWu22
-	ZBeQB6XKFbe9p8uVFqSSaQ149yYvCzY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1704710737;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DUrMQ588PontGGXfiGWoujWrvGIzdjiET4ISNVeyer4=;
-	b=IV8c+llTYz1HJ2A4ILW2O+hnTA2OBYy29S6zX46BbRE/P0eK+LIIY/1uKRHvcMglTAu+a4
-	O3kM68xKIg9EAIAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DC53B1392C;
-	Mon,  8 Jan 2024 10:45:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Ew51NVDSm2V1QgAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 08 Jan 2024 10:45:36 +0000
-Message-ID: <f221ad9d-6fc3-466b-bacf-23986b8655f5@suse.cz>
-Date: Mon, 8 Jan 2024 11:45:36 +0100
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eZqHEl/h"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-557a3ce8b72so1122925a12.1
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Jan 2024 04:40:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1704717625; x=1705322425; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=H32R+tMa1fM7nReMumPNtbL6GgMPNJ5zXeSLfAS8c1M=;
+        b=eZqHEl/hgmMw4+rbix+h2DNRdNaqydANI6WWQnUd6eL+K1DbY7AAX5iAdSpr+yV7d+
+         rmUI3Lto16fbjMGyxuP5yOoWuvGf+McK47atq9Rb3ybtgZGjDD7v1KFOZ1ErN/+VmICz
+         kH8JGAKWsK2yqtX4Fon4foPB+WZiAAMXP1SOg3TDba2KAiVSecnVb5PTdQaMkL+VXJ58
+         GO5JGYoIqfdl3uaO8kMIO2U3oTOhmNh1rBU3Uf7ZrpV0KIs9CH7hha99f+nKm/agXGLm
+         tz/+3bB18RORdylmLTWaFU0PQS2hymqhp1ApfH2IonFtecmiFMavg/vditmCac35MAKk
+         eCIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704717625; x=1705322425;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H32R+tMa1fM7nReMumPNtbL6GgMPNJ5zXeSLfAS8c1M=;
+        b=Ed4fmv43FMECPRq9xrpRXLBOEHEuPaTQ02x7zpsm8GbrOhxNnZrz/hHgWxG3aC7yVX
+         hEp2ZqywtyFju7kLteAZbQPVPca0Mrd78lh1py05JsQnOLehxzaEF5xq5C2who/2q7LR
+         LywbguaOW18p4J6oE/KSArcJS4MbXuKTE9pENvc9/mG9zcfEovdcwRBM3kUbEfA6fivl
+         dXbyxuiPQJUNHwYn0ZmQ7VyI72fK5w5ItvA3knEFPgAlmqwqNm/9iq6+Xo155fFNPkNA
+         i5vz6B+6QwBczWDjbm/Vx0tkFxcLwci9b18RZz5zc+f6wbQlrdUF6VBNOtMWbOQzHbbU
+         VFMg==
+X-Gm-Message-State: AOJu0YySc549/SZ5YW1KKeBwSuOHt/iI/8iJSHSC6mQrn3/O01/ELN5c
+	L9DsKC4O/o2FS/SpUH4Xq7GJGqmLzWOkGw==
+X-Google-Smtp-Source: AGHT+IH898cK1RhoFcQWVV9A7Y9eBRji8sMp9LSWyq80sKSXbnxTjPYGqPynIMsnf37N0Tflolu6Qw==
+X-Received: by 2002:a50:d68f:0:b0:557:bf64:81ae with SMTP id r15-20020a50d68f000000b00557bf6481aemr489412edi.34.1704717625554;
+        Mon, 08 Jan 2024 04:40:25 -0800 (PST)
+Received: from [192.168.199.125] (178235179081.dynamic-4-waw-k-1-3-0.vectranet.pl. [178.235.179.81])
+        by smtp.gmail.com with ESMTPSA id n19-20020aa7c453000000b005550844cd1dsm4250800edr.30.2024.01.08.04.40.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 04:40:25 -0800 (PST)
+Message-ID: <c3e82c7a-fc03-44c6-bf83-97dffaf22dba@linaro.org>
+Date: Mon, 8 Jan 2024 13:40:22 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -71,121 +52,68 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 15/26] x86/sev: Introduce snp leaked pages list
-To: Michael Roth <michael.roth@amd.com>, x86@kernel.org
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
- pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
- jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
- slp@redhat.com, pgonda@google.com, peterz@infradead.org,
- srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
- bp@alien8.de, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
- pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-16-michael.roth@amd.com>
+Subject: Re: [PATCH 0/2] Add Crypto Engine support for SM6350
+To: Luca Weiss <luca.weiss@fairphone.com>, Andy Gross <agross@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Thara Gopinath <thara.gopinath@gmail.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240105-sm6350-qce-v1-0-416e5c7319ac@fairphone.com>
 Content-Language: en-US
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20231230161954.569267-16-michael.roth@amd.com>
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
+ 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
+ izWDgYvmBE8=
+In-Reply-To: <20240105-sm6350-qce-v1-0-416e5c7319ac@fairphone.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spam-Level: 
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=eiEEANnR;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=IV8c+llT
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-1.51 / 50.00];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 TO_DN_SOME(0.00)[];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_TRACE(0.00)[suse.cz:+];
-	 MX_GOOD(-0.01)[];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_MATCH_FROM(0.00)[];
-	 BAYES_HAM(-0.01)[51.02%];
-	 ARC_NA(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 FROM_HAS_DN(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 RCPT_COUNT_TWELVE(0.00)[37];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 RCVD_TLS_ALL(0.00)[]
-X-Spam-Score: -1.51
-X-Rspamd-Queue-Id: 3202A1F799
-X-Spam-Flag: NO
 
-On 12/30/23 17:19, Michael Roth wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
+On 5.01.2024 17:15, Luca Weiss wrote:
+> Add the compatible and nodes for the QCE found on SM6350 SoC.
 > 
-> Pages are unsafe to be released back to the page-allocator, if they
-> have been transitioned to firmware/guest state and can't be reclaimed
-> or transitioned back to hypervisor/shared state. In this case add
-> them to an internal leaked pages list to ensure that they are not freed
-> or touched/accessed to cause fatal page faults.
-> 
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> [mdr: relocate to arch/x86/virt/svm/sev.c]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Not completely sure how to fully test it but "kcapi-speed --all" shows
+> no issues. Let me know if I can/should test this more.
 
-Hi, sorry I didn't respond in time to the last mail discussing previous
-version in
-https://lore.kernel.org/all/8c1fd8da-912a-a9ce-9547-107ba8a450fc@amd.com/
-due to upcoming holidays.
+I think I used `cryptsetup benchmark` with and without the ICE enabled
+a couple years back. IIRC the CPU should be faaar faster but also chug
+power while at it.
 
-I would rather avoid the approach of allocating container objects:
-- it's allocating memory when effectively losing memory, a dangerous thing
-- are all the callers and their context ok with GFP_KERNEL?
-- GFP_KERNEL_ACCOUNT seems wrong, why would we be charging this to the
-current process, it's probably not its fault the pages are leaked? Also the
-charging can fail?
-- given the benefit of having leaked pages on a list is basically just
-debugging (i.e. crash dump or drgn inspection) this seems too heavy
-
-I think it would be better and sufficient to use page->lru for order-0 and
-head pages, and simply skip tail pages (possibly with adjusted warning
-message for that case).
-
-Vlastimil
-
-<snip>
-
-> +
-> +void snp_leak_pages(u64 pfn, unsigned int npages)
-> +{
-> +	struct page *page = pfn_to_page(pfn);
-> +	struct leaked_page *leak;
-> +
-> +	pr_debug("%s: leaking PFN range 0x%llx-0x%llx\n", __func__, pfn, pfn + npages);
-> +
-> +	spin_lock(&snp_leaked_pages_list_lock);
-> +	while (npages--) {
-> +		leak = kzalloc(sizeof(*leak), GFP_KERNEL_ACCOUNT);
-> +		if (!leak)
-> +			goto unlock;
-
-Should we skip the dump_rmpentry() in such a case?
-
-> +		leak->page = page;
-> +		list_add_tail(&leak->list, &snp_leaked_pages_list);
-> +		dump_rmpentry(pfn);
-> +		snp_nr_leaked_pages++;
-> +		pfn++;
-> +		page++;
-> +	}
-> +unlock:
-> +	spin_unlock(&snp_leaked_pages_list_lock);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_leak_pages);
-
+Konrad
