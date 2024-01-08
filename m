@@ -1,98 +1,112 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37295465C;
-	Mon,  8 Jan 2024 17:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB95955C04
+	for <linux-crypto@vger.kernel.org>; Mon,  8 Jan 2024 20:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="U/ewXcsS"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8DA1C40E016C;
-	Mon,  8 Jan 2024 17:05:06 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id CuKpKJOv0sMx; Mon,  8 Jan 2024 17:05:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1704733504; bh=w1U9JuwWvaJMBjH60Qfm085eTdHCG+21c5u4mrqzaCs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U/ewXcsSUdD+9SivtyMgsN1CLap1vAi6dgi/nHSjCXg0jJhmbsOPxEmWonINyytCW
-	 yHusPDNEelLb2hSX/YpL86mKhzh6613QmFUDCKyPEVWa+yTwr3xKKYmHYETfOFioHM
-	 UG7wND5TN6SCBiUotmh/m0XPbPDaukfUGTkMy8jnkxzO4SwdfBDEUEnmkTpsGLZIOE
-	 sect88K4iyvL5/WYaCvR73nckuSijcOIQo4dmwfrAlizNGjOyn854a/fvz8K//UgzF
-	 WHkRisFKQ8H6k4WW77iRE/076LW8ZTb2CZJ5Tw71s6Ct6Jj8qJbypu83wz+y5t6xtn
-	 iyzJ67+JsiDecDvJpKCAYW9vOrCoSsUAmnPZCMwZX4Kz7rzgKj5fdwvD6fNyPGt4M0
-	 Wqatg1aOn4oh4LYWIf771GzU8hK1uihaj2XDIN6oLIWQ0iVNt5H/oTMPAW2d50+Jcb
-	 Gp2WStL5TwCP2vpCpWCHmCVAXXECM1pdxg5YQR7YlHrwAzoXgGYnr3TKUZKIclkwWQ
-	 /SVh/PhLwC3rsUUnMSUm+aBtUwi3A7GTVVTadwBTH/Qe3NuvHc677pP2x2yTeqLHPg
-	 pbBP0l6Y/iLEfyEE0WoSxhReJIxxwMk0lxvbvVJDa22IFMtfW8R1HhMLioru2Lyj6A
-	 Mxev4/iCkvm2ibZWTuP9drhI=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DC56840E01B0;
-	Mon,  8 Jan 2024 17:04:24 +0000 (UTC)
-Date: Mon, 8 Jan 2024 18:04:18 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
-	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
-	pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
-	ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v1 04/26] x86/sev: Add the host SEV-SNP initialization
- support
-Message-ID: <20240108170418.GDZZwrEiIaGuMpV0B0@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-5-michael.roth@amd.com>
- <f60c5fe0-9909-468d-8160-34d5bae39305@linux.microsoft.com>
- <20240105160916.GDZZgprE8T6xbbHJ9E@fat_crate.local>
- <20240105162142.GEZZgslgQCQYI7twat@fat_crate.local>
- <0c4aac73-10d8-4e47-b6a8-f0c180ba1900@linux.microsoft.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TlUOmPE5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704745038; x=1736281038;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=tyNbLF4NMRTU1x9UrvpK8DEiLClucYu5ZNQR7i87Ho0=;
+  b=TlUOmPE53KxS/MuvcycP4vJ7HT3cC6UuySeze8G5TbPlYh9qZ/i31QE0
+   +kk8RR46x0nGaQPdJsu3AhTVZiIo7IGUGqOIKPObWM3zps/7uT3BJqnjw
+   cnOTrz4II4vNvfw9uLyDmiwmcGJBTLFPySYosTWFg0nGWmIfteVNjpFHt
+   PP4m+xuTXSXGMpdfBUE0ccmR3k4PtwZGLgOjJTzxoeb9Zhmrk7deRFGMH
+   tvlBaW+/l33kOhGfLXxdj7UwwQX7Ov6+nJ/cN965Qi7wyvPBwIQF4gPv/
+   b3JDEm/Wq4aFdZxZTrA1irVYe8kV/466YAhUzgtx42B84NdrHBjY4mrpN
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="5360971"
+X-IronPort-AV: E=Sophos;i="6.04,180,1695711600"; 
+   d="scan'208";a="5360971"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 12:17:17 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="784967070"
+X-IronPort-AV: E=Sophos;i="6.04,180,1695711600"; 
+   d="scan'208";a="784967070"
+Received: from icubberl-mobl.amr.corp.intel.com ([10.213.165.94])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 12:17:17 -0800
+Message-ID: <b2e0bd974981291e16882686a2b9b1db3986abe4.camel@linux.intel.com>
+Subject: Re: [bug report] crypto: iaa - Add compression mode management
+ along with fixed mode
+From: Tom Zanussi <tom.zanussi@linux.intel.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: linux-crypto@vger.kernel.org
+Date: Mon, 08 Jan 2024 14:17:16 -0600
+In-Reply-To: <05696b53-c6ff-45e5-a3f1-d8f407a60050@moroto.mountain>
+References: <05696b53-c6ff-45e5-a3f1-d8f407a60050@moroto.mountain>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0c4aac73-10d8-4e47-b6a8-f0c180ba1900@linux.microsoft.com>
 
-On Mon, Jan 08, 2024 at 05:49:01PM +0100, Jeremi Piotrowski wrote:
-> What I wrote: "allow for the kernel to allocate the rmptable".
+SGkgRGFuLAoKT24gTW9uLCAyMDI0LTAxLTA4IGF0IDEyOjI2ICswMzAwLCBEYW4gQ2FycGVudGVy
+IHdyb3RlOgo+IEhlbGxvIFRvbSBaYW51c3NpLAo+IAo+IFRoZSBwYXRjaCBiMTkwNDQ3ZTBmYTM6
+ICJjcnlwdG86IGlhYSAtIEFkZCBjb21wcmVzc2lvbiBtb2RlCj4gbWFuYWdlbWVudCBhbG9uZyB3
+aXRoIGZpeGVkIG1vZGUiIGZyb20gRGVjIDUsIDIwMjMgKGxpbnV4LW5leHQpLAo+IGxlYWRzIHRv
+IHRoZSBmb2xsb3dpbmcgU21hdGNoIHN0YXRpYyBjaGVja2VyIHdhcm5pbmc6Cj4gCj4gwqDCoMKg
+wqDCoMKgwqDCoGRyaXZlcnMvY3J5cHRvL2ludGVsL2lhYS9pYWFfY3J5cHRvX21haW4uYzo1MzIK
+PiBpbml0X2RldmljZV9jb21wcmVzc2lvbl9tb2RlKCkKPiDCoMKgwqDCoMKgwqDCoMKgZXJyb3I6
+IG5vdCBhbGxvY2F0aW5nIGVub3VnaCBmb3IgPSAnZGV2aWNlX21vZGUtCj4gPmFlY3NfZGVjb21w
+X3RhYmxlJyA1MzUyIHZzIDE2MDAKPiAKPiBkcml2ZXJzL2NyeXB0by9pbnRlbC9pYWEvaWFhX2Ny
+eXB0b19tYWluLmMKPiDCoMKgwqAgNTEwIHN0YXRpYyBpbnQgaW5pdF9kZXZpY2VfY29tcHJlc3Np
+b25fbW9kZShzdHJ1Y3QgaWFhX2RldmljZQo+ICppYWFfZGV2aWNlLAo+IMKgwqDCoCA1MTHCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBzdHJ1Y3QKPiBpYWFfY29tcHJlc3Npb25fbW9kZSAqbW9kZSwK
+PiDCoMKgwqAgNTEywqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaW50IGlkeCwgc3RydWN0Cj4gaWR4
+ZF93cSAqd3EpCj4gwqDCoMKgIDUxMyB7Cj4gwqDCoMKgIDUxNMKgwqDCoMKgwqDCoMKgwqAgc2l6
+ZV90IHNpemUgPSBzaXplb2Yoc3RydWN0IGFlY3NfY29tcF90YWJsZV9yZWNvcmQpICsKPiBJQUFf
+QUVDU19BTElHTjsKPiDCoMKgwqAgNTE1wqDCoMKgwqDCoMKgwqDCoCBzdHJ1Y3QgZGV2aWNlICpk
+ZXYgPSAmaWFhX2RldmljZS0+aWR4ZC0+cGRldi0+ZGV2Owo+IMKgwqDCoCA1MTbCoMKgwqDCoMKg
+wqDCoMKgIHN0cnVjdCBpYWFfZGV2aWNlX2NvbXByZXNzaW9uX21vZGUgKmRldmljZV9tb2RlOwo+
+IMKgwqDCoCA1MTfCoMKgwqDCoMKgwqDCoMKgIGludCByZXQgPSAtRU5PTUVNOwo+IMKgwqDCoCA1
+MTggCj4gwqDCoMKgIDUxOcKgwqDCoMKgwqDCoMKgwqAgZGV2aWNlX21vZGUgPSBremFsbG9jKHNp
+emVvZigqZGV2aWNlX21vZGUpLAo+IEdGUF9LRVJORUwpOwo+IMKgwqDCoCA1MjDCoMKgwqDCoMKg
+wqDCoMKgIGlmICghZGV2aWNlX21vZGUpCj4gwqDCoMKgIDUyMcKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIHJldHVybiAtRU5PTUVNOwo+IMKgwqDCoCA1MjIgCj4gwqDCoMKgIDUyM8Kg
+wqDCoMKgwqDCoMKgwqAgZGV2aWNlX21vZGUtPm5hbWUgPSBrc3RyZHVwKG1vZGUtPm5hbWUsIEdG
+UF9LRVJORUwpOwo+IMKgwqDCoCA1MjTCoMKgwqDCoMKgwqDCoMKgIGlmICghZGV2aWNlX21vZGUt
+Pm5hbWUpCj4gwqDCoMKgIDUyNcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdvdG8g
+ZnJlZTsKPiDCoMKgwqAgNTI2IAo+IMKgwqDCoCA1MjfCoMKgwqDCoMKgwqDCoMKgIGRldmljZV9t
+b2RlLT5hZWNzX2NvbXBfdGFibGUgPQo+IGRtYV9hbGxvY19jb2hlcmVudChkZXYsIHNpemUsCj4g
+wqDCoMKgIDUyOMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgCj4gJmRldmljZV9tb2RlLT5hZWNzX2NvbXBfdGFibGVfZG1hX2FkZHIsIEdG
+UF9LRVJORUwpOwo+IMKgwqDCoCA1MjnCoMKgwqDCoMKgwqDCoMKgIGlmICghZGV2aWNlX21vZGUt
+PmFlY3NfY29tcF90YWJsZSkKPiDCoMKgwqAgNTMwwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgZ290byBmcmVlOwo+IMKgwqDCoCA1MzEgCj4gLS0+IDUzMsKgwqDCoMKgwqDCoMKgwqAg
+ZGV2aWNlX21vZGUtPmFlY3NfZGVjb21wX3RhYmxlID0KPiBkbWFfYWxsb2NfY29oZXJlbnQoZGV2
+LCBzaXplLAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBeXl5eXl4KPiBjb21wIGFuZCBkZWNvbXAgc2l6ZXMgYXJlIGRp
+ZmZlcmVudC7CoCBTbyB3ZSBzaG91bGQgYmUgYWxsb2NhdGluZwo+IGFlY3NfZGVjb21wX3RhYmxl
+X3JlY29yZCArIElBQV9BRUNTX0FMSUdOIGhlcmUgcHJvYmFibHkuCgpUaGFua3MgZm9yIHBvaW50
+aW5nIHRoaXMgb3V0LgoKVGhpcyBpcyBhY3R1YWxseSB1bnVzZWQgYnkgdGhlIGN1cnJlbnQgY29k
+ZSAtIGl0IHdhcyBwYXJ0IG9mIHRoZSBjYW5uZWQKbW9kZSB0aGF0IHdhcyByZW1vdmVkIGR1cmlu
+ZyByZXZpZXcuCgpJJ2xsIHN1Ym1pdCBhIHBhdGNoIHRvIHJlbW92ZSBpdCBjb21wbGV0ZWx5LCBh
+bmQgd2lsbCBmaXggaXQgaWYvd2hlbiB3ZQpyZXN1Ym1pdCBjYW5uZWQgbW9kZS4KClRoYW5rcywK
+ClRvbQoKPiAKPiDCoMKgwqAgNTMzwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgCj4gJmRldmljZV9tb2RlLT5hZWNzX2RlY29tcF90
+YWJsZV9kbWFfYWRkciwgR0ZQX0tFUk5FTCk7Cj4gwqDCoMKgIDUzNMKgwqDCoMKgwqDCoMKgwqAg
+aWYgKCFkZXZpY2VfbW9kZS0+YWVjc19kZWNvbXBfdGFibGUpCj4gwqDCoMKgIDUzNcKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdvdG8gZnJlZTsKPiDCoMKgwqAgNTM2IAo+IMKgwqDC
+oCA1MzfCoMKgwqDCoMKgwqDCoMKgIC8qIEFkZCBIdWZmbWFuIHRhYmxlIHRvIGFlY3MgKi8KPiDC
+oMKgwqAgNTM4wqDCoMKgwqDCoMKgwqDCoCBtZW1zZXQoZGV2aWNlX21vZGUtPmFlY3NfY29tcF90
+YWJsZSwgMCwKPiBzaXplb2YoKmRldmljZV9tb2RlLT5hZWNzX2NvbXBfdGFibGUpKTsKPiDCoMKg
+wqAgNTM5wqDCoMKgwqDCoMKgwqDCoCBtZW1jcHkoZGV2aWNlX21vZGUtPmFlY3NfY29tcF90YWJs
+ZS0+bGxfc3ltLCBtb2RlLQo+ID5sbF90YWJsZSwgbW9kZS0+bGxfdGFibGVfc2l6ZSk7Cj4gwqDC
+oMKgIDU0MMKgwqDCoMKgwqDCoMKgwqAgbWVtY3B5KGRldmljZV9tb2RlLT5hZWNzX2NvbXBfdGFi
+bGUtPmRfc3ltLCBtb2RlLQo+ID5kX3RhYmxlLCBtb2RlLT5kX3RhYmxlX3NpemUpOwo+IMKgwqDC
+oCA1NDEgCj4gCj4gcmVnYXJkcywKPiBkYW4gY2FycGVudGVyCgo=
 
-What?!
-
-"15.36.5 Hypervisor RMP Management
-
-...
-
-Because the RMP is initialized by the AMD-SP to prevent direct access to
-the RMP, the hypervisor must use the RMPUPDATE instruction to alter the
-entries of the RMP. RMPUPDATE allows the hypervisor to alter the
-Guest_Physical_Address, Assigned, Page_Size, Immutable, and ASID fields
-of an RMP entry."
-
-What you want is something that you should keep far and away from the
-upstream kernel.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
