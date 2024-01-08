@@ -1,107 +1,191 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647A81170A
-	for <linux-crypto@vger.kernel.org>; Mon,  8 Jan 2024 09:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56ED613FFA;
+	Mon,  8 Jan 2024 10:45:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vcnbPif6"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40e43e489e4so12930495e9.1
-        for <linux-crypto@vger.kernel.org>; Mon, 08 Jan 2024 01:26:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704706007; x=1705310807; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S2SS3mWBtdGH2dbT6gPsZGk8mJr7dIMPmHn982oUoew=;
-        b=vcnbPif6BTlvj/s5WlmvMJPvXsTqNsfN1HLaxsKcibbiNR9iOkY5YyVWQ/Di3p7go1
-         FO23N3Ry9tMVqZJD67JKr8B2tuKc33mpAae89wtWnxeEo4SquVQmbnyBHNqqCet9oeKM
-         UWWuJX1QrYuD/hdZ4McKmQk8THobjTee+8HnWr29DubarRD7YPmo7FHUh4S/CJ4SPrVy
-         1E+Xe0FPJUGVwPpeGKCbKaHNakwEico7Lm+hg7O+eYRJvWQK6NCD74leL4pt9iFV03kv
-         oRpK0N9R1L2TYwOff64PdHcbePqwOkb5OB5SUDkxTgic+uXrHlFP3hlYOG7D7UJ7blrz
-         B8nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704706007; x=1705310807;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S2SS3mWBtdGH2dbT6gPsZGk8mJr7dIMPmHn982oUoew=;
-        b=Eq2KN6AqokW67cJMjulKCdA3XOyQ19YmvtCEmOpqRy5tD/+nwUl/H9wk84LyXrJ7jl
-         TsFV+jQ5bj2cXwrXd0qFUCZAjKVrN2abGThsx2t2mSdeT2W9s8LiUUuwSdIQCxBayXe0
-         MH9RnqMQtCzXtZ3J1N3xXEE9ii4ckcAGdj/D4fDRo1dCTwtoxX6i6nPLXQD0q0MYzDSJ
-         T0JMe/2Bf4kN9WzKuyGeIkpizIUViw3ZFig1y3BgDHNyp3sl9P60WteKr1H9ckwpAfzp
-         n1QSy0g5AXUFH8RgtsrkyVhGaeb6jk4a618zoMv14mpblUnpTkMlq4rZqtfqv4hSpcGw
-         ixEw==
-X-Gm-Message-State: AOJu0Yz/JEUFMPEWmdkwzdK1IWTj/W7BU8TcVKuLFVGl72AjqxtdtToE
-	fVECJYbVIhqPiWodUhj1Dj90EnDowniiDQ==
-X-Google-Smtp-Source: AGHT+IFOYdkNYKGv/hwC043c5WWLbAui7ofghqK2cXAiRghCwI/k+ZWA3xcuObt1THg3dWxy0GG+Vw==
-X-Received: by 2002:a05:600c:19d2:b0:40e:3bba:8089 with SMTP id u18-20020a05600c19d200b0040e3bba8089mr1831556wmq.186.1704706007635;
-        Mon, 08 Jan 2024 01:26:47 -0800 (PST)
-Received: from localhost ([102.140.209.237])
-        by smtp.gmail.com with ESMTPSA id d1-20020adfa341000000b0033662fb321esm7310089wrb.33.2024.01.08.01.26.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 01:26:47 -0800 (PST)
-Date: Mon, 8 Jan 2024 12:26:42 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: tom.zanussi@linux.intel.com
-Cc: linux-crypto@vger.kernel.org
-Subject: [bug report] crypto: iaa - Add compression mode management along
- with fixed mode
-Message-ID: <05696b53-c6ff-45e5-a3f1-d8f407a60050@moroto.mountain>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eiEEANnR";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="IV8c+llT";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eiEEANnR";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="IV8c+llT"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 3202A1F799;
+	Mon,  8 Jan 2024 10:45:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1704710737; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DUrMQ588PontGGXfiGWoujWrvGIzdjiET4ISNVeyer4=;
+	b=eiEEANnRZeJbaI8CjaucatZH8wxLgTMD8Nk1SAQoE9nwmL1h2dUv1nlSVapgm4KTIOeJ2/
+	aMrE4dOrgd1/yC96csd/826bfs3cmng0vvAESMigZFOw1zkE56jOHBFH4mnYcyuOEsWu22
+	ZBeQB6XKFbe9p8uVFqSSaQ149yYvCzY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1704710737;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DUrMQ588PontGGXfiGWoujWrvGIzdjiET4ISNVeyer4=;
+	b=IV8c+llTYz1HJ2A4ILW2O+hnTA2OBYy29S6zX46BbRE/P0eK+LIIY/1uKRHvcMglTAu+a4
+	O3kM68xKIg9EAIAA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1704710737; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DUrMQ588PontGGXfiGWoujWrvGIzdjiET4ISNVeyer4=;
+	b=eiEEANnRZeJbaI8CjaucatZH8wxLgTMD8Nk1SAQoE9nwmL1h2dUv1nlSVapgm4KTIOeJ2/
+	aMrE4dOrgd1/yC96csd/826bfs3cmng0vvAESMigZFOw1zkE56jOHBFH4mnYcyuOEsWu22
+	ZBeQB6XKFbe9p8uVFqSSaQ149yYvCzY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1704710737;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DUrMQ588PontGGXfiGWoujWrvGIzdjiET4ISNVeyer4=;
+	b=IV8c+llTYz1HJ2A4ILW2O+hnTA2OBYy29S6zX46BbRE/P0eK+LIIY/1uKRHvcMglTAu+a4
+	O3kM68xKIg9EAIAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DC53B1392C;
+	Mon,  8 Jan 2024 10:45:36 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Ew51NVDSm2V1QgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 08 Jan 2024 10:45:36 +0000
+Message-ID: <f221ad9d-6fc3-466b-bacf-23986b8655f5@suse.cz>
+Date: Mon, 8 Jan 2024 11:45:36 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 15/26] x86/sev: Introduce snp leaked pages list
+To: Michael Roth <michael.roth@amd.com>, x86@kernel.org
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
+ bp@alien8.de, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-16-michael.roth@amd.com>
+Content-Language: en-US
+From: Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20231230161954.569267-16-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Level: 
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=eiEEANnR;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=IV8c+llT
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-1.51 / 50.00];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	 TO_DN_SOME(0.00)[];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_TRACE(0.00)[suse.cz:+];
+	 MX_GOOD(-0.01)[];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_MATCH_FROM(0.00)[];
+	 BAYES_HAM(-0.01)[51.02%];
+	 ARC_NA(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 FROM_HAS_DN(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 MIME_GOOD(-0.10)[text/plain];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 RCPT_COUNT_TWELVE(0.00)[37];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 RCVD_TLS_ALL(0.00)[]
+X-Spam-Score: -1.51
+X-Rspamd-Queue-Id: 3202A1F799
+X-Spam-Flag: NO
 
-Hello Tom Zanussi,
+On 12/30/23 17:19, Michael Roth wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> Pages are unsafe to be released back to the page-allocator, if they
+> have been transitioned to firmware/guest state and can't be reclaimed
+> or transitioned back to hypervisor/shared state. In this case add
+> them to an internal leaked pages list to ensure that they are not freed
+> or touched/accessed to cause fatal page faults.
+> 
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> [mdr: relocate to arch/x86/virt/svm/sev.c]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 
-The patch b190447e0fa3: "crypto: iaa - Add compression mode
-management along with fixed mode" from Dec 5, 2023 (linux-next),
-leads to the following Smatch static checker warning:
+Hi, sorry I didn't respond in time to the last mail discussing previous
+version in
+https://lore.kernel.org/all/8c1fd8da-912a-a9ce-9547-107ba8a450fc@amd.com/
+due to upcoming holidays.
 
-	drivers/crypto/intel/iaa/iaa_crypto_main.c:532 init_device_compression_mode()
-	error: not allocating enough for = 'device_mode->aecs_decomp_table' 5352 vs 1600
+I would rather avoid the approach of allocating container objects:
+- it's allocating memory when effectively losing memory, a dangerous thing
+- are all the callers and their context ok with GFP_KERNEL?
+- GFP_KERNEL_ACCOUNT seems wrong, why would we be charging this to the
+current process, it's probably not its fault the pages are leaked? Also the
+charging can fail?
+- given the benefit of having leaked pages on a list is basically just
+debugging (i.e. crash dump or drgn inspection) this seems too heavy
 
-drivers/crypto/intel/iaa/iaa_crypto_main.c
-    510 static int init_device_compression_mode(struct iaa_device *iaa_device,
-    511                                         struct iaa_compression_mode *mode,
-    512                                         int idx, struct idxd_wq *wq)
-    513 {
-    514         size_t size = sizeof(struct aecs_comp_table_record) + IAA_AECS_ALIGN;
-    515         struct device *dev = &iaa_device->idxd->pdev->dev;
-    516         struct iaa_device_compression_mode *device_mode;
-    517         int ret = -ENOMEM;
-    518 
-    519         device_mode = kzalloc(sizeof(*device_mode), GFP_KERNEL);
-    520         if (!device_mode)
-    521                 return -ENOMEM;
-    522 
-    523         device_mode->name = kstrdup(mode->name, GFP_KERNEL);
-    524         if (!device_mode->name)
-    525                 goto free;
-    526 
-    527         device_mode->aecs_comp_table = dma_alloc_coherent(dev, size,
-    528                                                           &device_mode->aecs_comp_table_dma_addr, GFP_KERNEL);
-    529         if (!device_mode->aecs_comp_table)
-    530                 goto free;
-    531 
---> 532         device_mode->aecs_decomp_table = dma_alloc_coherent(dev, size,
-                                  ^^^^^^
-comp and decomp sizes are different.  So we should be allocating
-aecs_decomp_table_record + IAA_AECS_ALIGN here probably.
+I think it would be better and sufficient to use page->lru for order-0 and
+head pages, and simply skip tail pages (possibly with adjusted warning
+message for that case).
 
-    533                                                             &device_mode->aecs_decomp_table_dma_addr, GFP_KERNEL);
-    534         if (!device_mode->aecs_decomp_table)
-    535                 goto free;
-    536 
-    537         /* Add Huffman table to aecs */
-    538         memset(device_mode->aecs_comp_table, 0, sizeof(*device_mode->aecs_comp_table));
-    539         memcpy(device_mode->aecs_comp_table->ll_sym, mode->ll_table, mode->ll_table_size);
-    540         memcpy(device_mode->aecs_comp_table->d_sym, mode->d_table, mode->d_table_size);
-    541 
+Vlastimil
 
-regards,
-dan carpenter
+<snip>
+
+> +
+> +void snp_leak_pages(u64 pfn, unsigned int npages)
+> +{
+> +	struct page *page = pfn_to_page(pfn);
+> +	struct leaked_page *leak;
+> +
+> +	pr_debug("%s: leaking PFN range 0x%llx-0x%llx\n", __func__, pfn, pfn + npages);
+> +
+> +	spin_lock(&snp_leaked_pages_list_lock);
+> +	while (npages--) {
+> +		leak = kzalloc(sizeof(*leak), GFP_KERNEL_ACCOUNT);
+> +		if (!leak)
+> +			goto unlock;
+
+Should we skip the dump_rmpentry() in such a case?
+
+> +		leak->page = page;
+> +		list_add_tail(&leak->list, &snp_leaked_pages_list);
+> +		dump_rmpentry(pfn);
+> +		snp_nr_leaked_pages++;
+> +		pfn++;
+> +		page++;
+> +	}
+> +unlock:
+> +	spin_unlock(&snp_leaked_pages_list_lock);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_leak_pages);
+
