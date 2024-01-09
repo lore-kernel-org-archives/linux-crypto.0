@@ -1,97 +1,157 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391153A1C2;
-	Tue,  9 Jan 2024 16:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aHgQfZLp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704817524; x=1736353524;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=pqvftV7jqXdOf/U1WVzf1rrU3Eu0865Q2QbvOkuWV+k=;
-  b=aHgQfZLp7SjKiOVe0Tmb6hSxRpQZT7O7+n/aLA0I1bw6vKk2O4vMQN41
-   WOMyD5yV1hcsWWVInnpZk+y7QDJZGnO+Ygn61zc52Pymea+0SgMidG7tT
-   vO8UEapvAms2bqhvYoj0gYYcvEZT4FfUgR/6dQ7pKHHaI1kifiLngi1XP
-   grXYPwV5x9q40+GF60Upr//Egm0410qbpSyj02LKgPyE2Gv9IFc58v3pc
-   S05vQZ28DUlRkx/V7Z3Y5bNoCzApk1c0xAsY3YCihZAQrphP7SXv694Ck
-   WhTge4Mhj3ER8Etd8t96Iyf4veXNI/AzKrek1U2NeBX4z3TSZWmoU+N0H
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="484427254"
-X-IronPort-AV: E=Sophos;i="6.04,183,1695711600"; 
-   d="scan'208";a="484427254"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 08:25:23 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,183,1695711600"; 
-   d="scan'208";a="16334102"
-Received: from rohitpra-mobl1.amr.corp.intel.com ([10.212.96.32])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 08:25:23 -0800
-Message-ID: <30948df0bebe6d37d722b4ca4ab5feba7b7c0895.camel@linux.intel.com>
-Subject: Re: [PATCH v1] crypto: iaa - Remove unnecessary
- debugfs_create_dir() error check in iaa_crypto_debugfs_init()
-From: Tom Zanussi <tom.zanussi@linux.intel.com>
-To: Minjie Du <duminjie@vivo.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-  "David S. Miller" <davem@davemloft.net>, "open list:INTEL IAA CRYPTO
- DRIVER" <linux-crypto@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>
-Cc: opensource.kernel@vivo.com
-Date: Tue, 09 Jan 2024 10:25:21 -0600
-In-Reply-To: <20240109021916.20960-1-duminjie@vivo.com>
-References: <20240109021916.20960-1-duminjie@vivo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B063C07B
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Jan 2024 18:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3604ae9e876so28373685ab.0
+        for <linux-crypto@vger.kernel.org>; Tue, 09 Jan 2024 10:20:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704824430; x=1705429230;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3afYaT69mpR33XvqXUKpkUgLg62032dTf6kloyJqf7Q=;
+        b=jL/9Rm5NgOxvzkff6RQ2APQzZgWXkilYdSMpWJ6gcuKSgZkce3absYR7raeoXGyAIb
+         rPIB/3jtHEV46RfoXfjYTeDOdbNEeSZ5df6liNETxA11880pGce76vc4rSkWuo3lA5ay
+         2CDOETSb1R2AwUTebCYo0uKSGEUNbB19jC/0Qmt8IeCdnHAEX6eNuMngotTkVd2oQgmB
+         6VsmD9hqMgckOkl5aCva2IZFSbrnlHanW8dLBHdd6FauNcSKcb0gkVfnAQjM/7FNzxvW
+         3bcW67RktNoVGACeBlKxGt2D9tX8nhqgKoYP3+5qQ33IXmigSmXrCbRH0mi23tlv3bkB
+         DN6A==
+X-Gm-Message-State: AOJu0YwimxituX+f8MPZtL+0MsJtqKMfPVCcLV8QeSEbAY28dG6BYIqw
+	xCcPwEMcZqAHo1k5o8Dh6duptJ+UDA//h4gxx6tUNH//G9Ri
+X-Google-Smtp-Source: AGHT+IErfY0+Jt+xXsA/4Rpjdd6+W/usaew9RH68Xf/lrjEp7D/0pOM0JtFs+mcRcZJEZAoQJ3/5VHCgQLQMTElvcN7TREW38Eev
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a92:c248:0:b0:35f:d5ea:8a86 with SMTP id
+ k8-20020a92c248000000b0035fd5ea8a86mr744195ilo.5.1704824430591; Tue, 09 Jan
+ 2024 10:20:30 -0800 (PST)
+Date: Tue, 09 Jan 2024 10:20:30 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000970711060e875e50@google.com>
+Subject: [syzbot] [crypto?] KMSAN: uninit-value in chksum_update
+From: syzbot <syzbot+9c0d9ba56264f1602420@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 2024-01-09 at 10:19 +0800, Minjie Du wrote:
-> This patch removes the debugfs_create_dir() error checking in
-> iaa_crypto_debugfs_init(). Because the debugfs_create_dir() is
-> developed
-> in a way that the caller can safely handle the errors that
-> occur during the creation of DebugFS nodes.
->=20
-> Signed-off-by: Minjie Du <duminjie@vivo.com>
+Hello,
 
-Acked-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+syzbot found the following issue on:
 
-Thanks Minjie,
+HEAD commit:    453f5db0619e Merge tag 'trace-v6.7-rc7' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=127054ade80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d4130d4bb32c48ef
+dashboard link: https://syzkaller.appspot.com/bug?extid=9c0d9ba56264f1602420
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-Tom
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/09f8d17b45e5/disk-453f5db0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/384c334e26ee/vmlinux-453f5db0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c93513aa17de/bzImage-453f5db0.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9c0d9ba56264f1602420@syzkaller.appspotmail.com
+
+EXT4-fs error (device loop4): __ext4_ext_dirty:202: inode #2: comm syz-executor.4: mark_inode_dirty error
+=====================================================
+BUG: KMSAN: uninit-value in chksum_update+0xae/0xd0 crypto/crc32c_generic.c:88
+ chksum_update+0xae/0xd0 crypto/crc32c_generic.c:88
+ crypto_shash_update+0x75/0xa0 crypto/shash.c:74
+ ext4_chksum fs/ext4/ext4.h:2474 [inline]
+ ext4_dirblock_csum fs/ext4/namei.c:382 [inline]
+ ext4_dirblock_csum_set fs/ext4/namei.c:430 [inline]
+ ext4_handle_dirty_dirblock+0x6d5/0x8d0 fs/ext4/namei.c:438
+ add_dirent_to_buf+0x885/0x9f0 fs/ext4/namei.c:2215
+ ext4_add_entry+0xcc2/0x1b30 fs/ext4/namei.c:2447
+ ext4_mkdir+0xaae/0x1510 fs/ext4/namei.c:3031
+ vfs_mkdir+0x49a/0x700 fs/namei.c:4106
+ do_mkdirat+0x529/0x800 fs/namei.c:4129
+ __do_sys_mkdir fs/namei.c:4149 [inline]
+ __se_sys_mkdir fs/namei.c:4147 [inline]
+ __x64_sys_mkdir+0xa1/0xe0 fs/namei.c:4147
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was stored to memory at:
+ ext4_chksum fs/ext4/ext4.h:2472 [inline]
+ ext4_dirblock_csum fs/ext4/namei.c:382 [inline]
+ ext4_dirblock_csum_set fs/ext4/namei.c:430 [inline]
+ ext4_handle_dirty_dirblock+0x7d5/0x8d0 fs/ext4/namei.c:438
+ add_dirent_to_buf+0x885/0x9f0 fs/ext4/namei.c:2215
+ ext4_add_entry+0xcc2/0x1b30 fs/ext4/namei.c:2447
+ ext4_mkdir+0xaae/0x1510 fs/ext4/namei.c:3031
+ vfs_mkdir+0x49a/0x700 fs/namei.c:4106
+ do_mkdirat+0x529/0x800 fs/namei.c:4129
+ __do_sys_mkdir fs/namei.c:4149 [inline]
+ __se_sys_mkdir fs/namei.c:4147 [inline]
+ __x64_sys_mkdir+0xa1/0xe0 fs/namei.c:4147
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was created at:
+ __alloc_pages+0x9a4/0xe00 mm/page_alloc.c:4591
+ alloc_pages_mpol+0x62b/0x9d0 mm/mempolicy.c:2133
+ alloc_pages+0x1be/0x1e0 mm/mempolicy.c:2204
+ alloc_slab_page mm/slub.c:1870 [inline]
+ allocate_slab mm/slub.c:2017 [inline]
+ new_slab+0x421/0x1570 mm/slub.c:2070
+ ___slab_alloc+0x13db/0x33d0 mm/slub.c:3223
+ __slab_alloc mm/slub.c:3322 [inline]
+ __slab_alloc_node mm/slub.c:3375 [inline]
+ slab_alloc_node mm/slub.c:3468 [inline]
+ slab_alloc mm/slub.c:3486 [inline]
+ __kmem_cache_alloc_lru mm/slub.c:3493 [inline]
+ kmem_cache_alloc_lru+0x552/0x970 mm/slub.c:3509
+ alloc_inode_sb include/linux/fs.h:2937 [inline]
+ ext4_alloc_inode+0x63/0x850 fs/ext4/super.c:1408
+ alloc_inode+0x83/0x440 fs/inode.c:261
+ new_inode_pseudo fs/inode.c:1006 [inline]
+ new_inode+0x38/0x420 fs/inode.c:1032
+ __ext4_new_inode+0x297/0x79b0 fs/ext4/ialloc.c:958
+ ext4_symlink+0x57e/0x1440 fs/ext4/namei.c:3398
+ vfs_symlink+0x1e6/0x3e0 fs/namei.c:4464
+ do_symlinkat+0x257/0x890 fs/namei.c:4490
+ __do_sys_symlinkat fs/namei.c:4506 [inline]
+ __se_sys_symlinkat fs/namei.c:4503 [inline]
+ __x64_sys_symlinkat+0xf8/0x160 fs/namei.c:4503
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+CPU: 0 PID: 5681 Comm: syz-executor.4 Not tainted 6.7.0-rc7-syzkaller-00049-g453f5db0619e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+=====================================================
 
 
-> ---
-> =C2=A0drivers/crypto/intel/iaa/iaa_crypto_stats.c | 2 --
-> =C2=A01 file changed, 2 deletions(-)
->=20
-> diff --git a/drivers/crypto/intel/iaa/iaa_crypto_stats.c
-> b/drivers/crypto/intel/iaa/iaa_crypto_stats.c
-> index 2e3b7b73af20..cbf87d0effe3 100644
-> --- a/drivers/crypto/intel/iaa/iaa_crypto_stats.c
-> +++ b/drivers/crypto/intel/iaa/iaa_crypto_stats.c
-> @@ -275,8 +275,6 @@ int __init iaa_crypto_debugfs_init(void)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0return -ENODEV;
-> =C2=A0
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iaa_crypto_debugfs_root =
-=3D debugfs_create_dir("iaa_crypto",
-> NULL);
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!iaa_crypto_debugfs_root)
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0return -ENOMEM;
-> =C2=A0
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0debugfs_create_u64("max_c=
-omp_delay_ns", 0644,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 iaa_crypto_debugfs_root,
-> &max_comp_delay_ns);
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
