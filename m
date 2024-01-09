@@ -1,87 +1,82 @@
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA1741A85;
-	Mon,  8 Jan 2024 23:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB4117F4;
+	Tue,  9 Jan 2024 02:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hpe.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ujp5thpA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704755248; x=1736291248;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=WLRAE5v+D1gq2v3TUdz+WwggrGJtRxNSxHcm83S2+Y4=;
-  b=Ujp5thpAe6uSkmiwfie9bsu3rbCtsGnuh+4lCvAWkp1ayQT1kJtkYdDh
-   h1ehQoNCnGR8/OgLSIHWOtJZtRLT+wjaO7N0XZ7v9+qJnuTH8pdLKO4Kp
-   a/cxM1ybubEpzAkR7XnogWfGXdEgwGJ44QnncRxzE6hgrnh14ON2vUcwJ
-   kGPH/JcnO8FyU/+BGp4mudZtC2gt4KZHx2I0p/sAJjljeqB6NjRENhmc6
-   xJVgEuvu0h0h6oSIToFd6afbFLNfreMctHZDFwNv4gDvZQURpSJqM9m1D
-   wkJY0031fWEauAIiKyopNHvbBXCpQXnlaoPQ4IQu/9BQUTVRFoWknEnL9
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="464423821"
-X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
-   d="scan'208";a="464423821"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 15:07:27 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="904959777"
-X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
-   d="scan'208";a="904959777"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Jan 2024 15:07:27 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 8 Jan 2024 15:07:27 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 8 Jan 2024 15:07:27 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="S53XnOwC"
+Received: from pps.filterd (m0134421.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 408NeQ6v018378;
+	Tue, 9 Jan 2024 02:10:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pps0720;
+ bh=pycfE4DdKZnEYflI1CIVfpSHZeYG9sAbqBcLrC0ZldY=;
+ b=S53XnOwCun86OFzYubF3/ojHsVl8boaWAJzW+f8S7CcTqXHW750ZlmiLoOopk3nyxejs
+ /TBDS9H1P5OFTs1mT492hgvOXA9QG0qh+S1VQLsJR9YGKkQQZbxoRJiz7gqejGTze71S
+ OB+uvJnGEQF3B2osEh9rgA6HqF/rCUShI4UHQoKlVGMTOt9KQJfcsly+xZrbBJsipBfN
+ F0zjaS/UjsCHXsPKK+Q3MHZPMt/8+iJt+JByH9pyDknTxUjFizNHs6xXVgh0LZLVFpY7
+ zyVbf2l4Vazdjl12wB8yDEEWrLKh4dy38KyIGU6akOCPPZ84cWIfNhTIi4pCOlYf367a 6g== 
+Received: from p1lg14881.it.hpe.com ([16.230.97.202])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3vgg8n7c5n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Jan 2024 02:10:24 +0000
+Received: from p1wg14926.americas.hpqcorp.net (unknown [10.119.18.115])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by p1lg14881.it.hpe.com (Postfix) with ESMTPS id 4CAE6805666;
+	Tue,  9 Jan 2024 02:10:23 +0000 (UTC)
+Received: from p1wg14925.americas.hpqcorp.net (10.119.18.114) by
+ p1wg14926.americas.hpqcorp.net (10.119.18.115) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 8 Jan 2024 15:07:27 -0800
+ 15.2.986.42; Mon, 8 Jan 2024 14:10:07 -1200
+Received: from p1wg14919.americas.hpqcorp.net (16.230.19.122) by
+ p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.42
+ via Frontend Transport; Mon, 8 Jan 2024 14:10:07 -1200
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (192.58.206.35)
+ by edge.it.hpe.com (16.230.19.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Mon, 8 Jan 2024 14:10:07 -1200
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V5FCWSc5/7ySCR7VWTLDsbfF0nVPMx1TiMGG2q9SeoyKX9aeAtevTmtIWcDeQBzBne6Vg8/HUr7tlzZGrzzBHx3QuSLjunyvTnDI/LQZjT5SYiSfLNeWOJwkvBF+XUiPNbCFSOBftThMhTLZbtYKuivuwcao3BPPljQ/JL1xIp+ek7FyWixdL+QQPXy9r+mJC0GacdEj0GEA9dLNtU14eWUhygnZCBQ4CBboY8b92Un+8ERgltdefDJQNAmGoqEZIPlAx9RYJdWXhjFLrRGSo90XUScihGFLPrWA+qaAxUgjxtJzjJNDpFOwogk6+m1J96YgRUU/lqtoPMHk42pAzw==
+ b=DmjPirI+8fmvsORoodm2JCmQy9sNqxwNifO3jAhmwShPz5o/V9EjDorcEt2owWIUso2TeWsB1/h6K0gnVsR0j2IKp1v4nCwycXmFgErWBZfKz2tUNPFV9CeLjQ2WxezBpR2f7F5DuW7I5cs4qND0DJ3EjpPQ4/dUxEmhrg62vjh00pJQaUT/SDSA7NJYoqEIOfvBwRu7dseZB1kELSAyn0C6986oURwDf/vGXQdj+EWaDOzSUpUCilIdrvDc8JK7KcgmbLcwY4UofLLaQXKyit+OE9n/cJxuKyRqHEe0/kVXMnxXv32W6+J33f7XswPmaqAiZVSHA/Ck3xq7aBIU4A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GhPDdUJ/I3KKFz5JjKpo+NIDnoIUHyEHQoB1zf0XyhM=;
- b=FM/zJ9n9TTVq95tW4pXZ1UFM+VM/Q0Ikf2YVI5x4OoNiKci68hlsXrfdU5cJYRt7IhPXXIFvppuyQ3JoVq2LhwwGIckKJS39ppC7OcsHmo5mShcPOjQDiJceWbCKsjnZ4hkQjr2fb3siGaT5VUnJhvMSoBueT6FM3tZYkvyTsxnidjl+XffQjZp8rr2UjBHZQgWEkOMu+3N06UH77P1VP0GTr9r5TLu5KM5SJYs2eg3OURygZXlm3Saby2f9is8KbzoSHCnRD5fiCfmY/lRpGAkMRFDjcdpVaG1xmsHNTO8xqNK2hlCHxhONDFcBfHAWrIXdJ/HkWyKxRnmrUMZP+g==
+ bh=pycfE4DdKZnEYflI1CIVfpSHZeYG9sAbqBcLrC0ZldY=;
+ b=VZWFbWVoMkqIXNRXYUf8r3a/+7Sup5Is7wd3YIeiZ7i0T2myp9EAbg6w8xk7xWjQfO4AcYjAlwgrWhBNKUGULP4kR6mpP/OkrLgnaYasOxRnnrSJQvLGSh2Qjodvw/SedlUzrAbZxi8D69VTfjznGUTJyu8PB2D1U7qp+fmVDB1bMe4Tst9pI2Ciupazm5rUBkBpK9PkWPyHbRIw9XoP9J88qTQ7nEmeOEs22yysyijGY842207vHcuX3x6oKl3sN9/nBiRe4qv6tGtNjeazPkdjieY2XPTJ3SPDlxZgJY8qb8RTqrZWuSO4Yem2jPOOYA5DTWqUDt8a9LWNQGCAdg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH7PR11MB5984.namprd11.prod.outlook.com (2603:10b6:510:1e3::15)
- by PH8PR11MB6878.namprd11.prod.outlook.com (2603:10b6:510:22a::7) with
+ smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
+ header.d=hpe.com; arc=none
+Received: from PH0PR84MB1480.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:173::21)
+ by CH3PR84MB3712.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:610:1cf::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Mon, 8 Jan
- 2024 23:07:24 +0000
-Received: from PH7PR11MB5984.namprd11.prod.outlook.com
- ([fe80::6f7b:337d:383c:7ad1]) by PH7PR11MB5984.namprd11.prod.outlook.com
- ([fe80::6f7b:337d:383c:7ad1%4]) with mapi id 15.20.7159.020; Mon, 8 Jan 2024
- 23:07:24 +0000
-Message-ID: <563b1dd6-8e91-4cb1-8981-5f18dc1d7130@intel.com>
-Date: Mon, 8 Jan 2024 16:07:20 -0700
-User-Agent: Betterbird (Linux)
-Subject: Re: [PATCH] crypto: iaa - Remove header table code
-To: Tom Zanussi <tom.zanussi@linux.intel.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <fenghua.yu@intel.com>
-CC: <dan.carpenter@linaro.org>, <tony.luck@intel.com>,
-	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<dmaengine@vger.kernel.org>
-References: <8bde35bf981a1e490114c6b50fc4755a64da55a5.camel@linux.intel.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Tue, 9 Jan
+ 2024 02:10:06 +0000
+Received: from PH0PR84MB1480.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::9138:7a8f:9a12:d1ea]) by PH0PR84MB1480.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::9138:7a8f:9a12:d1ea%4]) with mapi id 15.20.7159.020; Tue, 9 Jan 2024
+ 02:10:05 +0000
+Message-ID: <a77797fd-cbe4-42be-abd6-54cc815d360a@hpe.com>
+Date: Tue, 9 Jan 2024 10:10:00 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KEYS: include header for EINVAL definition
 Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <8bde35bf981a1e490114c6b50fc4755a64da55a5.camel@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Jarkko Sakkinen <jarkko@kernel.org>, <keyrings@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+References: <20240107132842.4024084-1-clayc@hpe.com>
+ <CY9E6M2BYETA.1VE73N3UHD4B9@suppilovahvero>
+From: Clay Chang <clayc@hpe.com>
+In-Reply-To: <CY9E6M2BYETA.1VE73N3UHD4B9@suppilovahvero>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0251.namprd03.prod.outlook.com
- (2603:10b6:a03:3a0::16) To PH7PR11MB5984.namprd11.prod.outlook.com
- (2603:10b6:510:1e3::15)
+X-ClientProxiedBy: TY2PR01CA0015.jpnprd01.prod.outlook.com
+ (2603:1096:404:a::27) To PH0PR84MB1480.NAMPRD84.PROD.OUTLOOK.COM
+ (2603:10b6:510:173::21)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -89,322 +84,105 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR11MB5984:EE_|PH8PR11MB6878:EE_
-X-MS-Office365-Filtering-Correlation-Id: 510b98c9-bc92-4fd9-8223-08dc109e932a
+X-MS-TrafficTypeDiagnostic: PH0PR84MB1480:EE_|CH3PR84MB3712:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9cb2d217-8ac8-427a-02f7-08dc10b81881
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KnSlA/J2ozajhbe8oW0VCLJuprYywRGRmu01aDL/YKB+6fBJ6QExAS/gJjiMyc9HJ78DCeQRaj5l4N1a7UuGV9C9ENJABziKp2iIUOpdZyR9PuOhYDYKB1nR/YcRI9sKmUVqZQeB2ehQL2Gz+jiyrVgG8cqXXvA7lJFIqiyvgM/J4ojF1DM/Rztb8oZ5eTtM+OMJEq0C6QT4oqapMREBwbWIbWnlmJXE1fs+wtFsTbJIRKm3FAWhiWaC2R6+8Z0MgKBzcHAJX9PhmsTXGN8Mp/GHt0n5XWtfSWVBToV4wocbVU0M481OGuBQBwSQsKr4oRnDpOtwCfsGIfoOG3z0zCTbEDj+gJFSuZEit0kQ7ZdBf94/DyqJmMerXgkmCxQkjvKvJ4DGELdz9za8JYW+mhoY1+1o+MzHIdaC2hpP/JwigXEC9VZtC+cK1ebQR7Hnoap9+6HWu7bs0bnZxLE8DgXzhTiJie9ZRFwCRyOhPAU9Ma2+jPuN7KOlmns8tFkfIZaPw1aX1nfpVJJjMvxwZZQWN+Lm2Gvm4nwlR1UISbvtzi8fM9+MhIjngwZIUtuZIZlsriVjdK2eT7bMXugoqU2/dFEdvRVxPdJlWuyBOBs=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB5984.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(366004)(39860400002)(136003)(346002)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(31686004)(66946007)(66556008)(66476007)(2906002)(5660300002)(44832011)(316002)(6666004)(8676002)(8936002)(41300700001)(6636002)(4326008)(478600001)(82960400001)(36756003)(86362001)(31696002)(38100700002)(966005)(2616005)(26005)(53546011)(6486002)(6506007)(83380400001)(6512007)(45980500001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: v7El0cs09JaFvQtsNjGycf2Om+9g+WoTd7AiIU47cptb+7jnp+bLwmG3JKKSs3gIGqWu91s3QWrGGbYQjY6iKxZUHhU+zDqxaPtxgXrQfq1jE2VpuaB3PVpN5Xzm3Ur4kvhEjB9/lHG2q5ApGNKUNvTpp4mhI0RUSUOuCmnqPoH1eP5KeJ1tkTuMT9V//5tUMw1mirNEsQh1O5wMKsKAXXogD4GAHK6OX6h36NpB/LcszD5GASmf9Oad7llHtvDP52CN7oJdzE2kKCnt5NyLhwX8djL4nG0kB6VHGYbUF9F0KRG8AUthYlBo30LLbA+b5aYBTA48lOOzEnJ8OTpNPwYBXAThjGeyWz7hAWbs8umNVpzERVImX/zAUf0zImrzBHxEKVmMMOHyIe56+OG4z8Hd7mu8OFW4tntgrNdNNRIyqVhH7Vl7/UgAWHEc6U9yxg1kJjzFc5h8qki5UDS8i9gzvnDj80qPnPacdhRBxO+S/gqjI1WhsKBHmb+ztrztpHIJqYlZfZKONKJRRlCyENpIK+GPucMMsqDTg5YhaNtUoYTNxXUQ4FB3NVJZ2MbLrGja63azsqO9AbwyqjR8aX7pCHtzp2MKUvahZBR+GRUpyOEinQiC/Je/TvUH9qWaOuaDUAP+6keJ6bmRaTbvJA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR84MB1480.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(376002)(366004)(39860400002)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(36756003)(5660300002)(38100700002)(6666004)(478600001)(31686004)(2906002)(4326008)(82960400001)(53546011)(2616005)(8676002)(8936002)(6506007)(316002)(6512007)(26005)(41300700001)(86362001)(31696002)(6486002)(83380400001)(66946007)(66476007)(66556008)(43740500002)(45980500001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eGFjdVJnRTRKUWNwYzZIN3JhdnJQbFYydTFOaWZzajVCdFNtLzdHbEtMbWQy?=
- =?utf-8?B?RGlxUkcyMksyTFRDZWc1N3U1K0dJdW9VUlEwSGNiUmlocWNCZnl6N2FoRURG?=
- =?utf-8?B?M0pRMWVMTnJqbDRueE51U3ZKcXAzRVZ4TnV2UzZiZi9SUG5yOU1reUdRREZ6?=
- =?utf-8?B?VERSTlpzMERQQ0F5YkppNzhnbnBoa3BXVktwRU40S3RGUlZIRmJ1Y0ZIdkNW?=
- =?utf-8?B?ZmxiZjVMYUVIRkhnRUl4ZTFnWnQ0YUg1NitMNDQ2MzBBNFltaWxMT2VtdUow?=
- =?utf-8?B?M1BNUC96VmRRYkN2Rm1pdnVnelV2WllNK0RnZTIxcnh3bWdNdVJVeXo0U2p4?=
- =?utf-8?B?Qlp5QU9kcDg4d1JDQ0tEdnNqZDI1dzM4QkpWYkZ1UlU5dEFvOUlCcU5VU3Zi?=
- =?utf-8?B?YkNNMU5Fa0xZb3NJdS81bnVFSmluN3FCaGRWRUdKVXVZRi9JRXNFZ1hRamVp?=
- =?utf-8?B?U2srWEVzQkJJcDl1cUJVZ01RTms1dTFkbmFwUitPV0ZtRGJrenFNS2psVlM4?=
- =?utf-8?B?WWl6SndXaW1WNGlHQXBnNG8yUlBHbGR4U0ZPSm5jYitUb0paWTZsazAyQytm?=
- =?utf-8?B?SzczWDVPdEd2dFZPOHY4M3FCcVYzTHEyNkN1S0ZSODlCWmFpZXVoUGRvVnpq?=
- =?utf-8?B?VzVPbmppeFpVVCtnZFNzSDh1cTNwdnk0bmprVXZJUmo0eS9aaDlnQnZvWlNr?=
- =?utf-8?B?d1BXdHplZ2RSM0JGM094d0JDcFlyL2NuazVCTzJGWjQra1UvQlRxS2JUT0E4?=
- =?utf-8?B?Mk5SZFB6bTRIVVV2M3JpdVQ4RHFCbHdhaU1jTmRDWkUxT2Q5UC8yWUxldHNX?=
- =?utf-8?B?UTYxdUdmQ2RLdnYzWFo2eUFBYm1ZRGh2MVc1K21kVFA0RFp4azFFMkt6U2NQ?=
- =?utf-8?B?SFVUUy9CZC9HNEQzN0hsSHJMRHh4WGx5MGNvYVY1dHgxSHJmdW9sTEs0aUt2?=
- =?utf-8?B?QjJGZFRJeHE1K3JhNm1WV2FOdUxhd0ZCSmUxd3dIWmZqRVNUd3R3VFBER0hD?=
- =?utf-8?B?V21Cd1lLeGpYQXlqRURwNUlidjF2SkxOQW0wVjVUUVNsVk1aUzI3QW9PZFBH?=
- =?utf-8?B?WFUzam1XOVJiOGxreDdBN2tlV2x3UXNENTc3TXRNYXRQdUh2dzB1TnJZUnZr?=
- =?utf-8?B?aW1JaTdkOTIvWGc3VkdaRWpxY2o4d0VYNXFjK0tacXU2OW5kMzFWUUU3YUY1?=
- =?utf-8?B?YUhYd3c3T2JRTm52SkdNYVpCWDU4bGhyam5GT2gxbVdRL2xIUE5OWkVRRlBT?=
- =?utf-8?B?aW9kQk5wWG8vOHVXUnJMRU1pdHJwcWRwd2dmSGN5MHZoa0Q1ODl2aE1HMHAy?=
- =?utf-8?B?Z2xQZnpOWG9RY3V4aysvR1JjUGNZSkNDTnlCQW1oYklrOXU5KzlWQVFPTjBt?=
- =?utf-8?B?cnNzWHd3UmpBd2ZYOCtPUkxhb252RFNMQTlQK2wxNmFXc3ZhZDV5bE81WGda?=
- =?utf-8?B?a3ZCLzVnYXZETmZUNS9ESll3MzFJaC9zQytGQ3hEZmN4Rk1qdWg1ZmpuU3pV?=
- =?utf-8?B?bEtBS0IxZkp0K0xrcmplY1FoVlZVME5XZzhNK25jUm16S1drMnFEM1oyOTFO?=
- =?utf-8?B?SUNMQ3RJWlVBZ2JWa3FYaWROeEt4OEJIRVFXZm43dTNpWVJJb25VRGRxM0FY?=
- =?utf-8?B?Szk1Nlk2OWNQVWw0dzEvK1g4UGVEK2d2UTFFWEZZN1lscStkVHFEVnRPSlBM?=
- =?utf-8?B?b21TY29qb2lHN0Z1S25IMVRDTDQ3TDBsYjVrNnhjY2RvdllzSWtMQ3IzQjlz?=
- =?utf-8?B?Z0dEaEdGMVVEWnFvOWg2YXgvNnJDYTFMbGxmWGtnbFpVenNwL285VUhLZm1H?=
- =?utf-8?B?UlRwS1h1amdnb3Z4SkdJWXd0Q0JUV3VkL1llb0dpbTdjNmhJazgrRjhISTBB?=
- =?utf-8?B?MUdoRlY5YlR1d3QvclRvWXpNV0Z0RjFEVWFpWDdkcFV5S3A0OVNzbVN3Zi9W?=
- =?utf-8?B?UE9tWXBSbmVoY2cvdHJMVXZJbVA1ZTE3RUlRdWo1SjNzN1F6eG1YYStqZ3Zj?=
- =?utf-8?B?TTBoWlJOOHQ4eUJnZU8wYUVVQVJTT2pKSnBzaHBFVURVM01UVWNsdU43Mlhs?=
- =?utf-8?B?MkdwaGlmS0s5QXY3QTl6cC9tL3ZqdzJIRmVvY0dNWU5HMElEdHlMODAxam9a?=
- =?utf-8?Q?xNMamMtDksL9zdI8p3k8xIbzG?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 510b98c9-bc92-4fd9-8223-08dc109e932a
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB5984.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a1FaVzRyMDkydGEzSEpaOHNuYUplVFFWL3lMWUcwNlJnRm5EY25hNS9DajdT?=
+ =?utf-8?B?a25tb282NDJkdjN2b3ppU1hsRDJzN1hQRVQyVXFweEljOGRoWE5haktjaTQ5?=
+ =?utf-8?B?VmJzeWJiMzFEd283SGxZVkxhWSswZUZsT1ZUMHN6YzFqQmtSQ25vY1R5M1FO?=
+ =?utf-8?B?ZC9iS09Ock56RXFkTmQwMUJUZU1OdUZyazhXc3g3WWFEYlNlTEcxMkRGbXd5?=
+ =?utf-8?B?TjhTVjhhakxtRFkvOHBybFVVUUpTNWZjTUVOVHJySzIzRWQ4UE03VnVNa0xM?=
+ =?utf-8?B?NXpSd251L1VvWVV6WE5UcjM4WXFOY3k1SXdTTTdZL1hjZVZ1SjJXR0pwSGNJ?=
+ =?utf-8?B?R2pmNVBuTjE5SmxyVU5kY1IzY0tybUw4Y3YzbkM4SWQrMWY2bGZXRGRlSFhT?=
+ =?utf-8?B?VzF0QjZTTzVZd0V6TTQ0Vk5va3owR0REK25iOFJObGtzcEZtRkhJS09aUHRK?=
+ =?utf-8?B?NkFCNGE2ZE82WHZOeXhueFRnbDgyV3VpeDF5Y05weDE1aUJ3ekYrSXRJZklF?=
+ =?utf-8?B?cnkreWdTUzR3NnkvNFpBV2Iwakg5bUxNSU9HRFhYWll3OUVUUEJKK3JJWUlB?=
+ =?utf-8?B?NFRhY0ZkaWQ3ckp0a25BT1k1SE1VMy9UaWpkWXdZaHJMVjIvL2g1d1dDT1RV?=
+ =?utf-8?B?K2p6Mm5HNm8rQndxUDdtTWFUbjhPdlJxZEtlai9WdzhjdEltcnlmNllPWG9J?=
+ =?utf-8?B?R0pDeTk1cytEQWJzSFRFSTZUdEVkU0hGaFcyZkowT1RZNGoyR3V4WTRYMzZK?=
+ =?utf-8?B?Umt5OGM2YzRIcDJzOXUyaFAvNi84bDFEU2EwcFMwdnk2UW12bTFKNDNhTk9Z?=
+ =?utf-8?B?eUMwQXFIbk1HUkRtQ08vK1Y3aGlCWXNiN1Z5VFBIaElsM1BvcnNQdUhlZXdB?=
+ =?utf-8?B?TDBKNDhPeFo3ajFkMmUySnNFRzR1NmZVQ3I4Y29iMTlpL0ZCRENXOTduejlx?=
+ =?utf-8?B?VUdWN1BTVmIzWWhxSmtqbVRTcGZvemxpVjVQSVVzY3lBNDFtMUpndkVpRkR6?=
+ =?utf-8?B?b0xtaHZZQ04zdkxQNWlLZ2ZNazZZb1M3dGxDdzgvVTJ3S0FYSjFpYTUrMito?=
+ =?utf-8?B?Qm5jYytNZG9jajBlWkw1UTJLYUxyQmpMRGJnR0VhUVA4dTFSNDh4bXVJMWtq?=
+ =?utf-8?B?WDZsNlhxakx6NmFzQmxRRzdVQnhyU1RNNElzSmZLT3h2VzFnL0NiUFZDbmNX?=
+ =?utf-8?B?ZjhrOVN2elZNcWpUYUpydWphL3FnTXRGRXpoNEFzc3dvdDFvcWdYZTNlY2FY?=
+ =?utf-8?B?TXE4dmF3dHpWcEZtbVliV1RrTjYrQUZwckdaMmc4dFVlQm9ZaVIvYkZtb09p?=
+ =?utf-8?B?b0lCVTQrbWFIRjlmZ2M1WEpWYWxUR2hYZGl6TXpzcTRzS2VHNkFDWHhObjcx?=
+ =?utf-8?B?OHh2MlJWM0NNN1R1RXZIeFlMT29VUjJMS2VOeSttbUpWdlQ5U0w1b0V5RmlM?=
+ =?utf-8?B?aHVFcTg1L3VOTUJ5SkJwclA4aW5wdzBmZFdWaVAzSTZ5ZkxYRDdZKzExSEJp?=
+ =?utf-8?B?b3lsczJtTEd2OTdxUHB1R2NlT3hqM01CWFJia2R6L1BrTXJTNnRPZzh4SVJ3?=
+ =?utf-8?B?YlR1cTFveHViRmYwRUYrV3JPaFJNV05WUk1SdC9TczFmbzZ0elBNN2J4dkFJ?=
+ =?utf-8?B?L2NrcHRNTUpDSUNZaEo1TmZyRWZrWlpEbDlMS3Z2VkdFS3BHbUpNMjlDbUFC?=
+ =?utf-8?B?VjJqRTRad1g1UkNqUFlNK3ZrZFdBQ2pVSmlZaDhVNjgzTGpQRmduWnIzcVho?=
+ =?utf-8?B?c2NOT0x0TDJqRHhyNThuRUpkdkNOSDRMNU5oQ0ZjV09aQXFDdm5PeitPa3Z3?=
+ =?utf-8?B?NGl6T1NyNjhYYm8rV3JHLzRHQmZFVFRqcCtHSTZWQ1NBKzlqUk05Vm5NYTE4?=
+ =?utf-8?B?R2JHeUlZYmZSWnBvVUljMmFNQlJxU2g0cmNialBkSy9VSHhLVGdmeFN3VUVM?=
+ =?utf-8?B?WEU2NXdENkdxMzZMamZ4dW96d1ZDRExTUmZVWWdiN1FTZFQzU2ZoZEwvNWxJ?=
+ =?utf-8?B?OFphTEg0VGFkdnYyRWlvRkpvV3N2Y1N3V0FHQm00aHpkOXpJS1pGNWkrd2FL?=
+ =?utf-8?B?NUZ1Slo0dHREdHJKMndZOXJDd0NlVHdUSjdiYnJRT2VKYjlBejRqaTF0TW9s?=
+ =?utf-8?Q?UUys=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9cb2d217-8ac8-427a-02f7-08dc10b81881
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR84MB1480.NAMPRD84.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 23:07:24.2782
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2024 02:10:05.3726
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 105b2061-b669-4b31-92ac-24d304d195dc
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sXyWX/8+nOVdDYk3wT/0Z20RICOXCPWm/QgEfAyQkgzR3nWrD3KWje0zrnIuc4JcggchFsUTGCPuaVg5wpNSyQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6878
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: jplne57d9x57obhUJWip4qvVclgyOO066FYOCuAAEtRylLRlM0dyxsDMNqZu/0Nh
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR84MB3712
+X-OriginatorOrg: hpe.com
+X-Proofpoint-GUID: VHUIASe0X4O1Vu0QlI707Cz7MqQjB12w
+X-Proofpoint-ORIG-GUID: VHUIASe0X4O1Vu0QlI707Cz7MqQjB12w
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-08_11,2024-01-08_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=713
+ mlxscore=0 adultscore=0 lowpriorityscore=0 phishscore=0 impostorscore=0
+ spamscore=0 malwarescore=0 suspectscore=0 priorityscore=1501 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2401090010
 
+Hi Jarkko,
 
+The issue was found when crypto/public_key.h was included, but CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE was not enabled. If CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE was not enabled, the public_key_verify_signature simply returned -EINVAL, which was not declared without linux/errno.h being included.
 
-On 1/8/24 15:53, Tom Zanussi wrote:
-> The header table and related code is currently unused - it was
-> included and used for canned mode, but canned mode has been removed,
-> so this code can be safely removed as well.
+Thanks,
+Clay
+
+On 2024/1/8 10:24 PM, Jarkko Sakkinen wrote:
+> On Sun Jan 7, 2024 at 3:28 PM EET,  wrote:
+>> From: Clay Chang <clayc@hpe.com>
+>>
+>> This patch includes linux/errno.h to address the issue of 'EINVAL' being
+>> undeclared.
+>>
+>> Signed-off-by: Clay Chang <clayc@hpe.com>
+>> ---
+>>  include/crypto/public_key.h | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+>> index 462f8a34cdf8..b7f308977c84 100644
+>> --- a/include/crypto/public_key.h
+>> +++ b/include/crypto/public_key.h
+>> @@ -10,6 +10,7 @@
+>>  #ifndef _LINUX_PUBLIC_KEY_H
+>>  #define _LINUX_PUBLIC_KEY_H
+>>  
+>> +#include <linux/errno.h>
+>>  #include <linux/keyctl.h>
+>>  #include <linux/oid_registry.h>
+>>  
 > 
-> This indirectly fixes a bug reported by Dan Carpenter.
+> Please provide evidence that issue exist (applies for any possible kernel issue).
 > 
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Closes: https://lore.kernel.org/linux-crypto/b2e0bd974981291e16882686a2b9b1db3986abe4.camel@linux.intel.com/T/#m4403253d6a4347a925fab4fc1cdb4ef7c095fb86
-> Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
-
-Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-
-> ---
->  drivers/crypto/intel/iaa/iaa_crypto.h         |  25 ----
->  .../crypto/intel/iaa/iaa_crypto_comp_fixed.c  |   1 -
->  drivers/crypto/intel/iaa/iaa_crypto_main.c    | 108 +-----------------
->  3 files changed, 3 insertions(+), 131 deletions(-)
-> 
-> diff --git a/drivers/crypto/intel/iaa/iaa_crypto.h b/drivers/crypto/intel/iaa/iaa_crypto.h
-> index 014420f7beb0..2524091a5f70 100644
-> --- a/drivers/crypto/intel/iaa/iaa_crypto.h
-> +++ b/drivers/crypto/intel/iaa/iaa_crypto.h
-> @@ -59,10 +59,8 @@ struct iaa_device_compression_mode {
->  	const char			*name;
->  
->  	struct aecs_comp_table_record	*aecs_comp_table;
-> -	struct aecs_decomp_table_record	*aecs_decomp_table;
->  
->  	dma_addr_t			aecs_comp_table_dma_addr;
-> -	dma_addr_t			aecs_decomp_table_dma_addr;
->  };
->  
->  /* Representation of IAA device with wqs, populated by probe */
-> @@ -107,23 +105,6 @@ struct aecs_comp_table_record {
->  	u32 reserved_padding[2];
->  } __packed;
->  
-> -/* AECS for decompress */
-> -struct aecs_decomp_table_record {
-> -	u32 crc;
-> -	u32 xor_checksum;
-> -	u32 low_filter_param;
-> -	u32 high_filter_param;
-> -	u32 output_mod_idx;
-> -	u32 drop_init_decomp_out_bytes;
-> -	u32 reserved[36];
-> -	u32 output_accum_data[2];
-> -	u32 out_bits_valid;
-> -	u32 bit_off_indexing;
-> -	u32 input_accum_data[64];
-> -	u8  size_qw[32];
-> -	u32 decomp_state[1220];
-> -} __packed;
-> -
->  int iaa_aecs_init_fixed(void);
->  void iaa_aecs_cleanup_fixed(void);
->  
-> @@ -136,9 +117,6 @@ struct iaa_compression_mode {
->  	int			ll_table_size;
->  	u32			*d_table;
->  	int			d_table_size;
-> -	u32			*header_table;
-> -	int			header_table_size;
-> -	u16			gen_decomp_table_flags;
->  	iaa_dev_comp_init_fn_t	init;
->  	iaa_dev_comp_free_fn_t	free;
->  };
-> @@ -148,9 +126,6 @@ int add_iaa_compression_mode(const char *name,
->  			     int ll_table_size,
->  			     const u32 *d_table,
->  			     int d_table_size,
-> -			     const u8 *header_table,
-> -			     int header_table_size,
-> -			     u16 gen_decomp_table_flags,
->  			     iaa_dev_comp_init_fn_t init,
->  			     iaa_dev_comp_free_fn_t free);
->  
-> diff --git a/drivers/crypto/intel/iaa/iaa_crypto_comp_fixed.c b/drivers/crypto/intel/iaa/iaa_crypto_comp_fixed.c
-> index 45cf5d74f0fb..19d9a333ac49 100644
-> --- a/drivers/crypto/intel/iaa/iaa_crypto_comp_fixed.c
-> +++ b/drivers/crypto/intel/iaa/iaa_crypto_comp_fixed.c
-> @@ -78,7 +78,6 @@ int iaa_aecs_init_fixed(void)
->  				       sizeof(fixed_ll_sym),
->  				       fixed_d_sym,
->  				       sizeof(fixed_d_sym),
-> -				       NULL, 0, 0,
->  				       init_fixed_mode, NULL);
->  	if (!ret)
->  		pr_debug("IAA fixed compression mode initialized\n");
-> diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> index dfd3baf0a8d8..39a5fc905c4d 100644
-> --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> @@ -258,16 +258,14 @@ static void free_iaa_compression_mode(struct iaa_compression_mode *mode)
->  	kfree(mode->name);
->  	kfree(mode->ll_table);
->  	kfree(mode->d_table);
-> -	kfree(mode->header_table);
->  
->  	kfree(mode);
->  }
->  
->  /*
-> - * IAA Compression modes are defined by an ll_table, a d_table, and an
-> - * optional header_table.  These tables are typically generated and
-> - * captured using statistics collected from running actual
-> - * compress/decompress workloads.
-> + * IAA Compression modes are defined by an ll_table and a d_table.
-> + * These tables are typically generated and captured using statistics
-> + * collected from running actual compress/decompress workloads.
->   *
->   * A module or other kernel code can add and remove compression modes
->   * with a given name using the exported @add_iaa_compression_mode()
-> @@ -315,9 +313,6 @@ EXPORT_SYMBOL_GPL(remove_iaa_compression_mode);
->   * @ll_table_size: The ll table size in bytes
->   * @d_table: The d table
->   * @d_table_size: The d table size in bytes
-> - * @header_table: Optional header table
-> - * @header_table_size: Optional header table size in bytes
-> - * @gen_decomp_table_flags: Otional flags used to generate the decomp table
->   * @init: Optional callback function to init the compression mode data
->   * @free: Optional callback function to free the compression mode data
->   *
-> @@ -330,9 +325,6 @@ int add_iaa_compression_mode(const char *name,
->  			     int ll_table_size,
->  			     const u32 *d_table,
->  			     int d_table_size,
-> -			     const u8 *header_table,
-> -			     int header_table_size,
-> -			     u16 gen_decomp_table_flags,
->  			     iaa_dev_comp_init_fn_t init,
->  			     iaa_dev_comp_free_fn_t free)
->  {
-> @@ -370,16 +362,6 @@ int add_iaa_compression_mode(const char *name,
->  		mode->d_table_size = d_table_size;
->  	}
->  
-> -	if (header_table) {
-> -		mode->header_table = kzalloc(header_table_size, GFP_KERNEL);
-> -		if (!mode->header_table)
-> -			goto free;
-> -		memcpy(mode->header_table, header_table, header_table_size);
-> -		mode->header_table_size = header_table_size;
-> -	}
-> -
-> -	mode->gen_decomp_table_flags = gen_decomp_table_flags;
-> -
->  	mode->init = init;
->  	mode->free = free;
->  
-> @@ -420,10 +402,6 @@ static void free_device_compression_mode(struct iaa_device *iaa_device,
->  	if (device_mode->aecs_comp_table)
->  		dma_free_coherent(dev, size, device_mode->aecs_comp_table,
->  				  device_mode->aecs_comp_table_dma_addr);
-> -	if (device_mode->aecs_decomp_table)
-> -		dma_free_coherent(dev, size, device_mode->aecs_decomp_table,
-> -				  device_mode->aecs_decomp_table_dma_addr);
-> -
->  	kfree(device_mode);
->  }
->  
-> @@ -440,73 +418,6 @@ static int check_completion(struct device *dev,
->  			    bool compress,
->  			    bool only_once);
->  
-> -static int decompress_header(struct iaa_device_compression_mode *device_mode,
-> -			     struct iaa_compression_mode *mode,
-> -			     struct idxd_wq *wq)
-> -{
-> -	dma_addr_t src_addr, src2_addr;
-> -	struct idxd_desc *idxd_desc;
-> -	struct iax_hw_desc *desc;
-> -	struct device *dev;
-> -	int ret = 0;
-> -
-> -	idxd_desc = idxd_alloc_desc(wq, IDXD_OP_BLOCK);
-> -	if (IS_ERR(idxd_desc))
-> -		return PTR_ERR(idxd_desc);
-> -
-> -	desc = idxd_desc->iax_hw;
-> -
-> -	dev = &wq->idxd->pdev->dev;
-> -
-> -	src_addr = dma_map_single(dev, (void *)mode->header_table,
-> -				  mode->header_table_size, DMA_TO_DEVICE);
-> -	dev_dbg(dev, "%s: mode->name %s, src_addr %llx, dev %p, src %p, slen %d\n",
-> -		__func__, mode->name, src_addr,	dev,
-> -		mode->header_table, mode->header_table_size);
-> -	if (unlikely(dma_mapping_error(dev, src_addr))) {
-> -		dev_dbg(dev, "dma_map_single err, exiting\n");
-> -		ret = -ENOMEM;
-> -		return ret;
-> -	}
-> -
-> -	desc->flags = IAX_AECS_GEN_FLAG;
-> -	desc->opcode = IAX_OPCODE_DECOMPRESS;
-> -
-> -	desc->src1_addr = (u64)src_addr;
-> -	desc->src1_size = mode->header_table_size;
-> -
-> -	src2_addr = device_mode->aecs_decomp_table_dma_addr;
-> -	desc->src2_addr = (u64)src2_addr;
-> -	desc->src2_size = 1088;
-> -	dev_dbg(dev, "%s: mode->name %s, src2_addr %llx, dev %p, src2_size %d\n",
-> -		__func__, mode->name, desc->src2_addr, dev, desc->src2_size);
-> -	desc->max_dst_size = 0; // suppressed output
-> -
-> -	desc->decompr_flags = mode->gen_decomp_table_flags;
-> -
-> -	desc->priv = 0;
-> -
-> -	desc->completion_addr = idxd_desc->compl_dma;
-> -
-> -	ret = idxd_submit_desc(wq, idxd_desc);
-> -	if (ret) {
-> -		pr_err("%s: submit_desc failed ret=0x%x\n", __func__, ret);
-> -		goto out;
-> -	}
-> -
-> -	ret = check_completion(dev, idxd_desc->iax_completion, false, false);
-> -	if (ret)
-> -		dev_dbg(dev, "%s: mode->name %s check_completion failed ret=%d\n",
-> -			__func__, mode->name, ret);
-> -	else
-> -		dev_dbg(dev, "%s: mode->name %s succeeded\n", __func__,
-> -			mode->name);
-> -out:
-> -	dma_unmap_single(dev, src_addr, 1088, DMA_TO_DEVICE);
-> -
-> -	return ret;
-> -}
-> -
->  static int init_device_compression_mode(struct iaa_device *iaa_device,
->  					struct iaa_compression_mode *mode,
->  					int idx, struct idxd_wq *wq)
-> @@ -529,24 +440,11 @@ static int init_device_compression_mode(struct iaa_device *iaa_device,
->  	if (!device_mode->aecs_comp_table)
->  		goto free;
->  
-> -	device_mode->aecs_decomp_table = dma_alloc_coherent(dev, size,
-> -							    &device_mode->aecs_decomp_table_dma_addr, GFP_KERNEL);
-> -	if (!device_mode->aecs_decomp_table)
-> -		goto free;
-> -
->  	/* Add Huffman table to aecs */
->  	memset(device_mode->aecs_comp_table, 0, sizeof(*device_mode->aecs_comp_table));
->  	memcpy(device_mode->aecs_comp_table->ll_sym, mode->ll_table, mode->ll_table_size);
->  	memcpy(device_mode->aecs_comp_table->d_sym, mode->d_table, mode->d_table_size);
->  
-> -	if (mode->header_table) {
-> -		ret = decompress_header(device_mode, mode, wq);
-> -		if (ret) {
-> -			pr_debug("iaa header decompression failed: ret=%d\n", ret);
-> -			goto free;
-> -		}
-> -	}
-> -
->  	if (mode->init) {
->  		ret = mode->init(device_mode);
->  		if (ret)
+> BR, Jarkko
