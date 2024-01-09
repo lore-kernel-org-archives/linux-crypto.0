@@ -1,113 +1,152 @@
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2085.outbound.protection.outlook.com [40.107.243.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EBB1259D;
-	Tue,  9 Jan 2024 03:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59035328D8;
+	Tue,  9 Jan 2024 09:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UudJMDjh"
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-7cdef012c0eso689578241.2;
-        Mon, 08 Jan 2024 19:38:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704771538; x=1705376338; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QKRSbrKS67RNdW5xwmhX/Uca0R/IdmheRC0aGIx8H7k=;
-        b=UudJMDjhz+TqGReuU6W9dzmT9E0AQw6t6IdLnkIhD7w4FMB9jhdUBObQNWQCyBlflv
-         XZjga2unC2xV7sD0E+LRYOWU4p/fXBiWEBGDzmDWkUMmU2UIJqM/wAEWxo7FST9I4oCm
-         eOQ1ACR1CFkTaL+zRigUzLU6QQN1jrulBx2h6Qh/p4TbavnWWTI8AGEco30eS1Q4jcE7
-         Q9OQMYbAuKelJMn0tKW/7x00JZanWWKxLHdwpsgkbHPuvvoc8kNEc1rQ2Kb7HtJ94bUA
-         1xm2T5vbGRVeRLobqklOddLLbn7D6Yxg1VNu9n44Me18omcs6l3EqiImb0Q4lnhqH4hE
-         zVvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704771538; x=1705376338;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QKRSbrKS67RNdW5xwmhX/Uca0R/IdmheRC0aGIx8H7k=;
-        b=Rw2NOTdVy6Oycs9WbFavREQVZeaTkGbnZc3UQSyvNwf5NoUxrhE+24yrF9MBfdCHdL
-         yNW8E8cgISWJHqTUII63EmDO68w2b2s897b9o3MpfyLkTj20rAW7F0p9nTjgs0b+9hpi
-         sr00EmpbOwTKwL6uiXmULM/Q0p1Jqc9/t5mg/1V4mhHzWNV0kc2hwL1VADCwoajVRp8K
-         WROBM1MsjfBw4iHri6W/2/8NPUssJlkqdGeN+/is87S7Jun20kYj0gt/YYE5AfVXbpVH
-         QoJZApLyy9geGXE3GXEbVbJFjDMSK+YpvxYZIP2Qb4i6WpABdiXt/8w6MsvHuTP7AwrF
-         WIfg==
-X-Gm-Message-State: AOJu0YzVOqErw5XODAn4kqc2UCmUfo0e2Sj3lvuIfUo2Emzw+6TQQ2XM
-	KNMzoJRvkXrh07+WYT5fOnrXrV09sJLwQisOGSU=
-X-Google-Smtp-Source: AGHT+IH79Oshez2nIujyNrM/TrmLpogKjgIG7d+6qcN40iC37fKrEcCZqcR6H3d2Kw8+DHLOHynmOHX7tGAn3zBbrYc=
-X-Received: by 2002:a67:e715:0:b0:467:b016:61c5 with SMTP id
- hw21-20020a67e715000000b00467b01661c5mr3360285vsb.6.1704771538189; Mon, 08
- Jan 2024 19:38:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Hxe0lPzN"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kAsZe/+H9BhX2t1sodn1VsxaEQyWdKCXPU7Zm3YT99+U0puQRN2VjCerLvXbFX/LWgAlxy3aX8Snqk4meCsokvSiHraeQWPo8d0qB4QNO5m5y93daaV3/Vg7Hn+Cf7RqYXBY8I3gGiy+GtxsUHsx2VyCIRJvNX4gLRsx5qlXT8TaVv1pY14vRnGQ/qktCjicyDnsIJrI1orYyJVPvvrONKiG8Slacm95nlGoePrPjCaXA6Dnt74t4sxguvEvtrf4Ps46P4iM6EcKVO35jREie+LXhZlAbFWp66Z52/FLt1TQahcigoNXgl+r6t9P8Rr7WH66TMXsY2aOg8GrCygFsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3AFCufjJgoaIB5hTdZfKf7cbacIO+bgSE/0YRh3pwwY=;
+ b=cWgtlieHDjSGZqnOk1Z+Htu0P2rm+2NBCxANUyRfzhrLPGawt9VS6fSz82ihGWQJccARYrPrelBiRZQZN3036jJXr72xpe88dFQbKBXqReYI77rhmX+nD2PyPXUlZu4Iy/FS9aF2rVRcw9m3c6tMMXU9Wtn/wnzpkCBd/R4G6tKc54Ee/EKRe0xR1HBquP9zVtNdOWuUMypYfruyackbJ6JcmiD1pIWb1YRtjC7dNcLf/diqmc8tBolTIrGnOdeCYybUNExts/OrVMqd7IVL2g4Ccw285V4UsWSB3qD7NYBgu6izhuG3/M9Gm2KcSdxWUzHpbEkEidx34k6hZDw9/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=gondor.apana.org.au
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3AFCufjJgoaIB5hTdZfKf7cbacIO+bgSE/0YRh3pwwY=;
+ b=Hxe0lPzNEW9AUwNl7hhWjuiKQLkF+DsDLljY6ABID0/Sfsvc5cS7QVnklGaujJHm94wugP25foI6llKGxb24A3xi1lWo4u3Cmzk2MgAnyKK/9lwiRN3WNwWCMUWMW3TLKv2MW6VpnMpfvv8ZhjlsPuRuDc9B/ijlWNfERSnao8seHXn+VncU2vfBJlMXZaikz9qzUk4gGqQhIc2TG/clUQMnUJf87ib6Rc0qnXr+MNk7C1qlix9Ndn4B6hose04KG4hkyhL4BDtIuz9WcDK/5FXviByVOuKnwU1mUanDkAm4UrKH2/X4Lc6jH9MDnrgTXTyyjdSsLy/3NKa8IVmlew==
+Received: from BL1PR13CA0229.namprd13.prod.outlook.com (2603:10b6:208:2bf::24)
+ by DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7159.23; Tue, 9 Jan 2024 09:17:40 +0000
+Received: from MN1PEPF0000ECD7.namprd02.prod.outlook.com
+ (2603:10b6:208:2bf:cafe::6a) by BL1PR13CA0229.outlook.office365.com
+ (2603:10b6:208:2bf::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.17 via Frontend
+ Transport; Tue, 9 Jan 2024 09:17:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ MN1PEPF0000ECD7.mail.protection.outlook.com (10.167.242.136) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7181.14 via Frontend Transport; Tue, 9 Jan 2024 09:17:38 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 9 Jan 2024
+ 01:17:23 -0800
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 9 Jan 2024
+ 01:17:22 -0800
+Received: from BUILDSERVER-IO-L4T.nvidia.com (10.127.8.14) by mail.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server id 15.2.986.41 via Frontend
+ Transport; Tue, 9 Jan 2024 01:17:18 -0800
+From: Akhil R <akhilrajeev@nvidia.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+	<conor+dt@kernel.org>, <thierry.reding@gmail.com>, <jonathanh@nvidia.com>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <mperttunen@nvidia.com>,
+	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-tegra@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<krzk@kernel.org>
+CC: Akhil R <akhilrajeev@nvidia.com>
+Subject: [PATCH v3 0/5] Add Tegra Security Engine driver
+Date: Tue, 9 Jan 2024 14:47:03 +0530
+Message-ID: <20240109091708.66977-1-akhilrajeev@nvidia.com>
+X-Mailer: git-send-email 2.17.1
+X-NVConfidentiality: public
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103095006.608744-1-21cnbao@gmail.com> <20240103095006.608744-2-21cnbao@gmail.com>
- <CAJD7tkbB2Tni-xo5orxw-uDHzAcKocc7WeV2536LLbE=PC8=QA@mail.gmail.com>
-In-Reply-To: <CAJD7tkbB2Tni-xo5orxw-uDHzAcKocc7WeV2536LLbE=PC8=QA@mail.gmail.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Tue, 9 Jan 2024 11:38:46 +0800
-Message-ID: <CAGsJ_4yk=yrpBWvYukoDbq8288yqLLyox4ozg82GiUyaU+ntWQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] crypto: introduce acomp_is_async to expose if a acomp
- has a scomp backend
-To: Yosry Ahmed <yosryahmed@google.com>, herbert@gondor.apana.org.au
-Cc: davem@davemloft.net, akpm@linux-foundation.org, ddstreet@ieee.org, 
-	sjenning@redhat.com, vitaly.wool@konsulko.com, linux-crypto@vger.kernel.org, 
-	chriscli@google.com, chrisl@kernel.org, hannes@cmpxchg.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, nphamcs@gmail.com, 
-	zhouchengming@bytedance.com, Barry Song <v-songbaohua@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD7:EE_|DM8PR12MB5445:EE_
+X-MS-Office365-Filtering-Correlation-Id: ad771891-27c1-4dbb-6af6-08dc10f3d37a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	WNcJOW3y3WViGD0h0SQsd8PBU5KtQ7+utftWCI5CRbzrzf/RPK1ktVi7NLWYeSCjGGSnTdeywPNjtCjeMGuI+bQcJVJZzITvW9vfe9/Ngtuby1trgw1fkhoe9KMAVnLyL/Lbdi2iqe43ucakG0QUHAZi5yFIdIH/bh2bbvHP0W6Jb+vinvGISYKjvhkTy8vBSeCEdnSTj7POWoukDz0QGC2cVxop7xjD7JeBQM+XFGPkumqD6Ky7HXQjYDGXW5HZgi1WAzKhLkO5fs/BxE3Wgtd7vo+glyKj1zhquqNhH/1hUcniyj4DCx5a5o9BNTfT7EbvMaSHYWT8AWiHlDIL7lhltupnn0LUb6bpzg+hkjqIeUD47dDTTlSWfxVhx8sydFzCgjeYa8DR+ArpdXqlkObcwdlwkbQ5rJPkctQ17rKd22hsdE2/0naRaCyJQJ8CUjzhZUeR6tcm8eIyW/jJ90Qew9Gv8BqRhcFaU45wyQsNKnEGkTZCpkPuNwgofzZiCXP9AdBHi8SE+kNlUx3IA/jgLE2AedyZTK2gR4WawOh5L6zXt7mzE7qHxiJLZT4WGS9rK2+lkJDJtrwHyS68uTgHsf6yxq8ucMhbPjKufgi7QMnfS2fuiszrjChUS3Xoyqs0BGWqs1PBVeNcoxtuyjMwWtXQHISXWabVChaZqGt+r513yS0aDuUj46di3jmjK1iVK52e8oOayFwVKHv/nIiklInpjjhNhT8BECmWtyh4i8JN5Zi86VVQWDXqqS4TTmXaGyiFWknF6vupVVmBlloPPJMP84bus1JEbKhUpMDbWxqwu7o8+InwnT5+yJB9gcjPO/pOdKe+iFl+aN+WgQ==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(346002)(39860400002)(376002)(396003)(230173577357003)(230273577357003)(230922051799003)(1800799012)(451199024)(186009)(82310400011)(64100799003)(40470700004)(36840700001)(46966006)(41300700001)(426003)(7696005)(1076003)(47076005)(83380400001)(336012)(921011)(40480700001)(6666004)(40460700003)(7636003)(2906002)(70586007)(70206006)(82740400003)(478600001)(107886003)(2616005)(26005)(36860700001)(356005)(86362001)(110136005)(316002)(15650500001)(36756003)(5660300002)(7416002)(4326008)(8676002)(8936002)(357404004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2024 09:17:38.8693
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad771891-27c1-4dbb-6af6-08dc10f3d37a
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECD7.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5445
 
-On Tue, Jan 9, 2024 at 6:36=E2=80=AFAM Yosry Ahmed <yosryahmed@google.com> =
-wrote:
->
-> On Wed, Jan 3, 2024 at 1:50=E2=80=AFAM Barry Song <21cnbao@gmail.com> wro=
-te:
-> >
-> > From: Barry Song <v-songbaohua@oppo.com>
-> >
-> > Almost all CPU-based compressors/decompressors are actually synchronous
-> > though they support acomp APIs. While some hardware has hardware-based
-> > accelerators to offload CPU's work such as hisilicon and intel/qat/,
-> > their drivers are working in async mode.
-> > Letting acomp's users know exactly if the acomp is really async will
-> > help users know if the compression and decompression procedure can
-> > sleep.
-> >
-> > Signed-off-by: Barry Song <v-songbaohua@oppo.com>
-> > Tested-by: Chengming Zhou <zhouchengming@bytedance.com>
-> > ---
-> >  crypto/acompress.c         | 8 ++++++++
-> >  include/crypto/acompress.h | 9 +++++++++
-> >  2 files changed, 17 insertions(+)
-> >
-> > diff --git a/crypto/acompress.c b/crypto/acompress.c
-> > index 1c682810a484..99118e879a4a 100644
-> > --- a/crypto/acompress.c
-> > +++ b/crypto/acompress.c
-> > @@ -152,6 +152,14 @@ struct crypto_acomp *crypto_alloc_acomp_node(const=
- char *alg_name, u32 type,
-> >  }
-> >  EXPORT_SYMBOL_GPL(crypto_alloc_acomp_node);
-> >
-> > +bool acomp_is_async(struct crypto_acomp *acomp)
->
-> Is synchronous semantically the same as sleepable? IIUC synchronous
-> code may still sleep, at least generally. The purpose of this change
-> is to know whether we will sleep or not in the zswap code, so I
-> suggest the code should be explicit about sleep-ability instead (e.g.
-> acomp_is_sleepable or acomp_may_sleep).
+Add support for Tegra Security Engine which can accelerates various
+crypto algorithms. The Engine has two separate instances within for
+AES and HASH algorithms respectively.
 
-Thanks, Tosry. sounds reasonable.
+The driver registers two crypto engines - one for AES and another for
+HASH algorithms and these operate independently and both uses the host1x
+bus. Additionally, it provides  hardware-assisted key protection for up to
+15 symmetric keys which it can use for the cipher operations.
 
-I'd like to ask for Herbert's comment, do we have a better way to know
-if an acomp can sleep other than checking the below?
+v2->v3:
+* Update compatible in driver and device trees.
+* Remove extra new lines and symbols in binding doc.
+v1->v2:
+* Update probe errors with 'dev_err_probe'.
+* Clean up function prototypes and redundant prints.
+* Remove readl/writel wrappers.
+* Fix test bot warnings.
 
-return tfm->__crt_alg->cra_type =3D=3D &crypto_acomp_type;
+Akhil R (5):
+  dt-bindings: crypto: Add Tegra Security Engine
+  gpu: host1x: Add Tegra SE to SID table
+  crypto: tegra: Add Tegra Security Engine driver
+  arm64: defconfig: Enable Tegra Security Engine
+  arm64: tegra: Add Tegra Security Engine DT nodes
 
-Thanks
-Barry
+ .../crypto/nvidia,tegra234-se-aes.yaml        |   53 +
+ .../crypto/nvidia,tegra234-se-hash.yaml       |   53 +
+ MAINTAINERS                                   |    5 +
+ arch/arm64/boot/dts/nvidia/tegra234.dtsi      |   16 +
+ arch/arm64/configs/defconfig                  |    1 +
+ drivers/crypto/Kconfig                        |    8 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/tegra/Makefile                 |    9 +
+ drivers/crypto/tegra/tegra-se-aes.c           | 1932 +++++++++++++++++
+ drivers/crypto/tegra/tegra-se-hash.c          | 1022 +++++++++
+ drivers/crypto/tegra/tegra-se-key.c           |  155 ++
+ drivers/crypto/tegra/tegra-se-main.c          |  439 ++++
+ drivers/crypto/tegra/tegra-se.h               |  569 +++++
+ drivers/gpu/host1x/dev.c                      |   24 +
+ 14 files changed, 4287 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-aes.yaml
+ create mode 100644 Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-hash.yaml
+ create mode 100644 drivers/crypto/tegra/Makefile
+ create mode 100644 drivers/crypto/tegra/tegra-se-aes.c
+ create mode 100644 drivers/crypto/tegra/tegra-se-hash.c
+ create mode 100644 drivers/crypto/tegra/tegra-se-key.c
+ create mode 100644 drivers/crypto/tegra/tegra-se-main.c
+ create mode 100644 drivers/crypto/tegra/tegra-se.h
+
+-- 
+2.17.1
+
