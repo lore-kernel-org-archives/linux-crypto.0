@@ -1,94 +1,109 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCCAC36B15
-	for <linux-crypto@vger.kernel.org>; Tue,  9 Jan 2024 11:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8952938DD8;
+	Tue,  9 Jan 2024 11:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="jRE56T1L"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-55719cdc0e1so3185938a12.1
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Jan 2024 03:27:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1704799675; x=1705404475; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oKel/uL1tajPej7Kr+Y3gD2pm0Q/5wlP7q9l4+pRLR8=;
-        b=jRE56T1LeQJAkA6mhHCrJJdZN4io3r5Q1w3lsA3Q5ln52EOtCaCvigxk9b1bKXV0Uc
-         l02SqWOBEwm2aDRxLaY9990nhiSA5bCCcG82N5iXrasCHFLvI//xbMgDEnSApTFTwaIz
-         MSl0tgwuDXnJQAxEyB5RBX4efzT5xCnxG+Eq5WBttWGmroJWSwIZBIRj7t2TRe0e0ToY
-         Qpf93VqfghWjBWrSvIfCg6iHEtX9UAjbvMz4htxGj8R9rgG+Sj0OWoQT1E2nnwbujJxN
-         hFnH3jAgeYx3+0Tlt26MUmgT40Lr3b2vukLkIF832pMOPF7wvUB2JSeGSCXx++3SEnj/
-         0xgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704799675; x=1705404475;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oKel/uL1tajPej7Kr+Y3gD2pm0Q/5wlP7q9l4+pRLR8=;
-        b=PbHhTyLY/6EA068aYFeB5KhXkO96Z2ux9tTrKEhMRjV3UVs8egbVmJG/u2f19dWoNb
-         jBYZ394xcAhD+7MCaNz0xVlEnOFYrGXdPvjEz9jCvQQCGMtmZpHfM3g4P0AtdI9njOBJ
-         JlaQGZPRthemwyMZdtmsqIjw3eCB0jvVMnOMlwH4rkZhNwEaOx4qEVWvVwo63Dyn8MJr
-         rc9ZsqJY4cGyVI6IrjemdH/yN3kb79w/lP9Rgh4e3sLmy8HWUr6wmtiVzmAXQQX588gY
-         2nWJOJSi2CLV0KFRQCBgx465AI9p5yz1F7TyOwue1nNPP09cKWWPWDlwEtqJwYqaPZ3p
-         9hkA==
-X-Gm-Message-State: AOJu0YxLDP1/ja7RasJv9QJQXUoOpHHb/9rOFIGfntjIEGvhukPio4Jg
-	v/ZYvnDRaGlcJFO+nIndmmG5FYVZM9LVGA==
-X-Google-Smtp-Source: AGHT+IFLDOEYrnaFAb1pvyYayLgZLIaQwOsuzV7aIZuufvzjoaHL+sD2wiqnSgjHvZSMG2kvOL3hGg==
-X-Received: by 2002:a50:bb2f:0:b0:557:188b:eccb with SMTP id y44-20020a50bb2f000000b00557188beccbmr2752722ede.84.1704799675115;
-        Tue, 09 Jan 2024 03:27:55 -0800 (PST)
-Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id b6-20020a0564021f0600b0055678085e27sm847587edb.20.2024.01.09.03.27.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jan 2024 03:27:54 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="leEnvgxm"
+Received: from [192.168.1.210] (181-28-144-85.ftth.glasoperator.nl [85.144.28.181])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 5DA60209AF69;
+	Tue,  9 Jan 2024 03:56:19 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5DA60209AF69
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1704801386;
+	bh=qTrKm5gfDaGVKWMebrVJloyB8rgSl281DiQxs9lsdz4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=leEnvgxmqMyQcS71Cg/lDkkVYOlAo1MdVzP4smUzAvnnaHz4jrz2ndUmu4HVjlYiQ
+	 pQ9ufr8kiXyrTyy7o8s4h6REGjMhslEU9OG1i/Gy8bxqDNExlO0wS6czjMnGF8TyoQ
+	 P4TKIMEclkSk/uRWSxMfgue1qpFPR6T4Eu81gM/Y=
+Message-ID: <b5b57b60-1573-44f4-8161-e2249eb6f9b6@linux.microsoft.com>
+Date: Tue, 9 Jan 2024 12:56:17 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 04/26] x86/sev: Add the host SEV-SNP initialization
+ support
+Content-Language: en-US
+To: Borislav Petkov <bp@alien8.de>
+Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
+ vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+ tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+ alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
+ nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
+ zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-5-michael.roth@amd.com>
+ <f60c5fe0-9909-468d-8160-34d5bae39305@linux.microsoft.com>
+ <20240105160916.GDZZgprE8T6xbbHJ9E@fat_crate.local>
+ <20240105162142.GEZZgslgQCQYI7twat@fat_crate.local>
+ <0c4aac73-10d8-4e47-b6a8-f0c180ba1900@linux.microsoft.com>
+ <20240108170418.GDZZwrEiIaGuMpV0B0@fat_crate.local>
+From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+In-Reply-To: <20240108170418.GDZZwrEiIaGuMpV0B0@fat_crate.local>
 Content-Type: text/plain; charset=UTF-8
-Date: Tue, 09 Jan 2024 12:27:54 +0100
-Message-Id: <CYA51QMVFQZF.3NEPC3R2QY2VM@fairphone.com>
-From: "Luca Weiss" <luca.weiss@fairphone.com>
-To: "Konrad Dybcio" <konrad.dybcio@linaro.org>, "Andy Gross"
- <agross@kernel.org>, "Bjorn Andersson" <andersson@kernel.org>, "Thara
- Gopinath" <thara.gopinath@gmail.com>, "Herbert Xu"
- <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
- "Rob Herring" <robh+dt@kernel.org>, "Krzysztof Kozlowski"
- <krzysztof.kozlowski+dt@linaro.org>, "Conor Dooley" <conor+dt@kernel.org>,
- "Bhupesh Sharma" <bhupesh.sharma@linaro.org>
-Cc: <~postmarketos/upstreaming@lists.sr.ht>, <phone-devel@vger.kernel.org>,
- <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 0/2] Add Crypto Engine support for SM6350
-X-Mailer: aerc 0.15.2
-References: <20240105-sm6350-qce-v1-0-416e5c7319ac@fairphone.com>
- <c3e82c7a-fc03-44c6-bf83-97dffaf22dba@linaro.org>
-In-Reply-To: <c3e82c7a-fc03-44c6-bf83-97dffaf22dba@linaro.org>
+Content-Transfer-Encoding: 7bit
 
-On Mon Jan 8, 2024 at 1:40 PM CET, Konrad Dybcio wrote:
-> On 5.01.2024 17:15, Luca Weiss wrote:
-> > Add the compatible and nodes for the QCE found on SM6350 SoC.
-> >=20
-> > Not completely sure how to fully test it but "kcapi-speed --all" shows
-> > no issues. Let me know if I can/should test this more.
+On 08/01/2024 18:04, Borislav Petkov wrote:
+> On Mon, Jan 08, 2024 at 05:49:01PM +0100, Jeremi Piotrowski wrote:
+>> What I wrote: "allow for the kernel to allocate the rmptable".
+> 
+> What?!
+> 
+> "15.36.5 Hypervisor RMP Management
+> 
+> ...
+> 
+> Because the RMP is initialized by the AMD-SP to prevent direct access to
+> the RMP, the hypervisor must use the RMPUPDATE instruction to alter the
+> entries of the RMP. RMPUPDATE allows the hypervisor to alter the
+> Guest_Physical_Address, Assigned, Page_Size, Immutable, and ASID fields
+> of an RMP entry."
+>> What you want is something that you should keep far and away from the
+> upstream kernel.
 >
-> I think I used `cryptsetup benchmark` with and without the ICE enabled
-> a couple years back. IIRC the CPU should be faaar faster but also chug
-> power while at it.
 
-Are you sure you mean QCE here (which this patch is about) and not ICE?
+Can we please not assume I am acting in bad faith. I am explicitly trying to
+integrate nicely with AMD's KVM SNP host patches to cover an additional usecase
+and get something upstreamable.
 
-I'm not aware of them working together somehow but I wouldn't be
-surprised if there's something since I don't know much of this area at
-all.
+Let's separate RMP allocation from who (and how) maintains the entries.
 
-Regards
-Luca
+"""
+15.36.4 Initializing the RMP
+...
+Software must program RMP_BASE and RMP_END identically for each core in the
+system and before enabling SEV-SNP globally.
+"""
 
->
-> Konrad
+KVM expects UEFI to do this, Hyper-V does the allocation itself (on bare-metal).
+Both are valid. Afaik it is the SNP_INIT command that hands over control of the
+RMP from software to AMD-SP.
 
+When it comes to "who and how maintains the rmp" - that is of course the AMD-SP
+and hypervisor issues RMPUPDATE instructions. The paragraph you cite talks about
+the physical RMP and AMD-SP - not virtualized SNP (aka "SNP-host VM"/nested SNP).
+AMD specified an MSR-based RMPUPDATE for us for that usecase (15.36.19 SEV-SNP
+Instruction Virtualization). The RMP inside the SNP-host VM is not related to
+the physical RMP and is an entirely software based construct.
+
+The RMP in nested SNP is only used for kernel bookkeeping and so its allocation
+is optional. KVM could do without reading the RMP directly altogether (by tracking
+the assigned bit somewhere) but that would be a design change and I'd rather see
+the KVM SNP host patches merged in their current shape. Which is why the patch
+I linked allocates a (shadow) RMP from the kernel.
+
+I would very much appreciate if we would not prevent that usecase from working -
+that's why I've been reviewing and testing multiple revisions of these patches
+and providing feedback all along.
