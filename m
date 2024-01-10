@@ -1,87 +1,56 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36924CB20;
-	Wed, 10 Jan 2024 15:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8134E1D2;
+	Wed, 10 Jan 2024 19:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="DvO7RhNe"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0290C40E016C;
-	Wed, 10 Jan 2024 15:56:11 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id jhy-WvyI-ZKl; Wed, 10 Jan 2024 15:56:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1704902168; bh=9AXlWCYHyGlZWoMBjnEdXnJNXAAZdOZ1mMO8CIYljuM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DvO7RhNeuoKySKUfs6PH0zwrctKvn30zN4ZJDSb4SJEyCcf/+ZUAT51AnHdipMAh7
-	 rm0RrWrys+aUa/IzTcaKG3XQZypPVKlUvek2MEpQmkr+NuF5q9tRLpICGdc0/QWziU
-	 MwU/PkCLVGULD/bD5kg83YuJkvlWJO6QsaEenRoEObBox8gQVQvOU+FYNLztanY1Yq
-	 Rg6EiSfJWGaWHw6zbN51AyuRDr+Gta1viaxdbG/MHFJN8DQlIaS0GDhyhpuBGYXiZd
-	 QXHYO3b1r66t6qXOhXGV1ZPN+Ftm4y7/vGYv1NcEhVaqZtGue97HlNS0yT53vMp/+/
-	 o7gi4l2nlH6zVoGaNly8UNIs8TfMAcJxu/jPx6VwPlFgpkLdPWqcg2r1CCH+l9I1vn
-	 IUn3st1d8C838EjqjP+1VkwM0KrZDrQw2voJaJIKrvOM15E1+WhXiIbZBgaHOPcc90
-	 FXp61xtJLgEtlnKTodZAGCn+aXb9dm7jz+fiSKkzJlKzi7V+fiUMnpIsARIk/0FffF
-	 xdLIK8mYSVKwdgB00rWb/VTCt9noXUDjeGEYMbMPWGTF19zJxZNDhLwTBK8Px0bF8u
-	 CXpBdrtdMuIoGpqfvJx9e+EmE4Yrut8ZwqkQGOad2y15r9Q0D4m1gM7uN3plRwBes3
-	 XjO8/dwgOZn6I30W6HVlZEXA=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 73DF440E01A9;
-	Wed, 10 Jan 2024 15:55:30 +0000 (UTC)
-Date: Wed, 10 Jan 2024 16:55:23 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
-	hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com,
-	seanjc@google.com, vkuznets@redhat.com, jmattson@google.com,
-	luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-	pgonda@google.com, peterz@infradead.org,
-	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
-	ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v1 07/26] x86/fault: Add helper for dumping RMP entries
-Message-ID: <20240110155523.GEZZ696yxCY-oOvygR@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-8-michael.roth@amd.com>
- <20240110111344.GBZZ576DpwHHs997Zl@fat_crate.local>
- <625926f9-6c45-4242-ac62-8f36abfcb099@amd.com>
- <20240110152745.GDZZ63cekYEDqdajjO@fat_crate.local>
- <9e3a6d33-cc04-46cb-b97d-e903a263800f@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NngQGyCX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1016BC43390;
+	Wed, 10 Jan 2024 19:54:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704916467;
+	bh=G/7hgYXNJihtqEGK7wf7YlXvXrRVOT9oUMyOaFQcpCk=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=NngQGyCX1jxlJKb0CtcVKw89DboFowUBRbga16rY/xFOUOQfyO5ngYWMXi1PTH9zL
+	 c0gHz89Ug8rvZrOqDUdhGS6oGvI8cqAzV4Cd5xFKKg70iaoKnVORlBGevOo320hY0I
+	 v3JWOjyqB2uh97VZsJ0VwfhrIuO5NWcfjlJKUt8ah0F0OXVOnwtlAX4FiSmRpOF2vh
+	 XTTNaWLHtJ+GuhHeG++EaZOYYzDsaVydM6ZCeuCTLJXsaLnRHkI13p8Ye+rcdU0e1S
+	 S1NrPOuzy3kIpjhj4YRGfv0OOn1AzJOmpw+KFp6SLeUZiKiGNWvVFQ/455x3h22O2w
+	 daV8wkd6Irt3Q==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9e3a6d33-cc04-46cb-b97d-e903a263800f@amd.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 10 Jan 2024 21:54:23 +0200
+Message-Id: <CYBAG2X330P5.2SIIYCQ1GN44G@suppilovahvero>
+Subject: Re: [PATCH] KEYS: include header for EINVAL definition
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Clay Chang" <clayc@hpe.com>, <keyrings@vger.kernel.org>,
+ <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Cc: <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
+ <davem@davemloft.net>
+X-Mailer: aerc 0.15.2
+References: <20240107132842.4024084-1-clayc@hpe.com>
+ <CY9E6M2BYETA.1VE73N3UHD4B9@suppilovahvero>
+ <a77797fd-cbe4-42be-abd6-54cc815d360a@hpe.com>
+In-Reply-To: <a77797fd-cbe4-42be-abd6-54cc815d360a@hpe.com>
 
-On Wed, Jan 10, 2024 at 09:51:04AM -0600, Tom Lendacky wrote:
-> I'm only suggesting getting rid of the else that prints "..." when the entry
-> is all zeroes. Printing the non-zero entries would still occur.
+On Tue Jan 9, 2024 at 4:10 AM EET, Clay Chang wrote:
+> Hi Jarkko,
+>
+> The issue was found when crypto/public_key.h was included, but
+> CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE was not enabled. If
+> CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE was not enabled, the
+> public_key_verify_signature simply returned -EINVAL, which was not
+> declared without linux/errno.h being included.
+>
+> Thanks,
+> Clay
 
-Sure, one should be able to to infer that the missing entries are null.
+Do you have .config to verify this?
 
-:-)
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+BR, Jarkko
