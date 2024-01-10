@@ -1,92 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20F4495CC;
-	Wed, 10 Jan 2024 13:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698354BA85
+	for <linux-crypto@vger.kernel.org>; Wed, 10 Jan 2024 14:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V1jPPPfb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14496C433C7;
-	Wed, 10 Jan 2024 13:48:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704894507;
-	bh=Mpj9MmpWsZ0QXa3z+JG9y8iO9570kyRUme6G8UyY3ns=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V1jPPPfbtZjWicjR/pXvV3fvfEd+WTpUYKesK1ver/unl0yUXsY4TkjQIutQjBRsP
-	 rP/Oz0q/0h14UEjOgFaxFG624+eWlJ/AO+ivv3TYC1sZnL+hL4/+Alo/46tP000hXg
-	 zplNZ64lLrfkj8J9hOzdzzP2smKm7MeEZ/IYISeNp94tvvX509RdtM1WHeyhjMm5jx
-	 6PVp6J9lR2f0adpYnosG4kNDW+C6yKAzSmFoUpH39oONuTUSb402zXo2PYbzqdDyDw
-	 8BKfIvBQaR2VfeSzJy9k28uur98lcaUtFQRjhOYk1Xziu9Q+q1jecwOjEuD67FrH9y
-	 AnuUlci6GEj1Q==
-Date: Wed, 10 Jan 2024 13:48:20 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: akpm@linux-foundation.org, llvm@lists.linux.dev,
-	patches@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-trace-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-efi@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
-	linux-arch@vger.kernel.org, kasan-dev@googlegroups.com,
-	linux-mm@kvack.org, bridge@lists.linux.dev, netdev@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 2/3] arch and include: Update LLVM Phabricator links
-Message-ID: <20240110-apostle-trident-533d4c2c9c97@spud>
-References: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
- <20240109-update-llvm-links-v1-2-eb09b59db071@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YRqAitOm"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1d455b34723so39282095ad.0
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Jan 2024 06:59:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704898798; x=1705503598; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jQgwaFhg2BKv9e1KoNKcmXpgVYtZET9cMV48SEG0pPU=;
+        b=YRqAitOm5gumBrFgSLai4ponlmBBw6BKjFm3Z6tU5tFzOvbrG5T3GgqztmunDZUxvD
+         h+XP1+AruxU5dtviaLIS7fSxjTqOmXpHhwQTLY2zAXmD9YnSUnmFMX931gjUrRbfWOkv
+         7pUMeM1rCs6RQf0KgyOi7ihga0yB/mAs4cNnze3nq2R1fHzyfsTtawinpREtZ1dN0fNJ
+         5azrmjfK5AvS1K6SjMETx0oa/dvTT0gE8EQon+KQNgo3X9Udjj82Tayf+qWnJPgrfR+/
+         tSlmizaajvR6GBC8gcJh2JVVK3HLbHWeaPEXE9GHH6LLLl5jdTX4Ko+b4TbJq5I+gu8z
+         TOfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704898798; x=1705503598;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jQgwaFhg2BKv9e1KoNKcmXpgVYtZET9cMV48SEG0pPU=;
+        b=wvNW7/+ilRvFJOg6sVYNyPwGpowdD9nijAaM0IJ5ZZ21uWteXheHfFK7iDeY0Zj20D
+         9Fbr+y873e3ZqzTpsR2vWZXayvckGfbd/q/UlemtnQqUiU4v+NU4vNeaDts2ALMIHgVY
+         6Iiy5wxgrW5ZHHyA7XEYiA4VYYKTVL1Qh/k5LRrIHHyWn1x5JNwduGQLuKjAaEEpxwGr
+         ZAiEl/d8ReISOvE92xOZ+ZpYG5y8V9Dkj6PGUdOpMU/OQpYlpt5aD2/fszQXfzGxg11u
+         Bikv5SoWOrLyv4lLVNdMdccha3KIFuxfQ7yd7PpA0wB6fAA3E4R7SRQ0IB0rtNFXs2Wq
+         /Fsw==
+X-Gm-Message-State: AOJu0Yz6xPpF6IcMqLjNh7f/dNgBNRKXf0ZD6Y8NvZM658Wokp3ibAUI
+	aHwg55k9U2WQyNwAaeiO0j8UUSK0ALfl7O/Ugw==
+X-Google-Smtp-Source: AGHT+IEFhpLTQv5FIWQpxWjgo1MFihEctBgRDmmwpll2k+f+nuyvSydHAURFUngl8/4pjVhHXFBidN6ogTw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:cec1:b0:1d4:a996:fc96 with SMTP id
+ d1-20020a170902cec100b001d4a996fc96mr6121plg.11.1704898797659; Wed, 10 Jan
+ 2024 06:59:57 -0800 (PST)
+Date: Wed, 10 Jan 2024 06:59:56 -0800
+In-Reply-To: <20231230161954.569267-21-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="p6SYI+U6gP5vpK1M"
-Content-Disposition: inline
-In-Reply-To: <20240109-update-llvm-links-v1-2-eb09b59db071@kernel.org>
+Mime-Version: 1.0
+References: <20231230161954.569267-1-michael.roth@amd.com> <20231230161954.569267-21-michael.roth@amd.com>
+Message-ID: <ZZ6w7A8SYz3_VT3u@google.com>
+Subject: Re: [PATCH v1 20/26] crypto: ccp: Add debug support for decrypting pages
+From: Sean Christopherson <seanjc@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+	pbonzini@redhat.com, vkuznets@redhat.com, jmattson@google.com, 
+	luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com, 
+	pgonda@google.com, peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, 
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com, 
+	Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
+On Sat, Dec 30, 2023, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> Add support to decrypt guest encrypted memory. These API interfaces can
+> be used for example to dump VMCBs on SNP guest exit.
 
---p6SYI+U6gP5vpK1M
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Jan 09, 2024 at 03:16:30PM -0700, Nathan Chancellor wrote:
-> reviews.llvm.org was LLVM's Phabricator instances for code review. It
-> has been abandoned in favor of GitHub pull requests. While the majority
-> of links in the kernel sources still work because of the work Fangrui
-> has done turning the dynamic Phabricator instance into a static archive,
-> there are some issues with that work, so preemptively convert all the
-> links in the kernel sources to point to the commit on GitHub.
->=20
-> Most of the commits have the corresponding differential review link in
-> the commit message itself so there should not be any loss of fidelity in
-> the relevant information.
->=20
-> Link: https://discourse.llvm.org/t/update-on-github-pull-requests/71540/1=
-72
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> ---
-
->  arch/riscv/Kconfig              | 2 +-
->  arch/riscv/include/asm/ftrace.h | 2 +-
-
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-
-Cheers,
-Conor.
-
---p6SYI+U6gP5vpK1M
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZZ6gJAAKCRB4tDGHoIJi
-0mIlAQCj5ZP6QEhEswWYjX38obn/p3pF8mt+Ve+vlBnVEhAW8QD8ClRvKxDiajR5
-Zp8ES/FLDyH/QJ5QjGuYLP5PATLeFAY=
-=SqXc
------END PGP SIGNATURE-----
-
---p6SYI+U6gP5vpK1M--
+By who?  Nothing in this series, or the KVM series, ever invokes
+snp_guest_dbg_decrypt_page().
