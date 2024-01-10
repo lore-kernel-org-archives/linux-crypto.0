@@ -1,71 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D909D4F5EF;
-	Wed, 10 Jan 2024 20:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5276C2AE87;
+	Wed, 10 Jan 2024 20:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZvkunF8I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01087C433F1;
-	Wed, 10 Jan 2024 20:18:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704917926;
-	bh=fgRgZuoAXQ+AEZV1jM9xn99Om5QJ8jDoPAfUebkzG1k=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=ZvkunF8I+PbytQ3aauQZUhtA04lAEOU1IIG/RzeLPK401UDcocZUiX7tCvNZkhUk4
-	 J8a7G8Iysz62mTv6dS7JxkxqOpnkVy0/tWgEyKHX0ldkP1s5h1dIXmuIQPkQhKovTm
-	 Cub4+DO8mPJAz+POJlzwqzGt+XtknBta4GkxUMyo0//jfrITtgslfxtCKBzyk9B0qx
-	 raZ45Hlaa0llbA+sg7uaPslIrVCLG2bYGGGl4PlWYiRlAyGoNI0zCZ+6ZGhY9M/AMT
-	 /ni0sJFRI03TITR1JWZJnCtipD43lilhybATuWTUCrc8Q7YIMfY2l/lWVu4GyNF9xT
-	 JNdHq6vFCh6cg==
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="Ev5cfX5o"
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id ACE85120019;
+	Wed, 10 Jan 2024 23:12:26 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru ACE85120019
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1704917546;
+	bh=ZsEVEKBfXgYOp70GvXu8cfrdsdoWzBIzHkZd6g+E03o=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=Ev5cfX5oNuTHckqSCunuiKGIBPdCYP/9L50pG8Ndo27B+Jp3jBlgXK3l04/aFM1fd
+	 2qxsJLPw0ZjOtyQb8JQkYNqnhUs4KAYwNpa80uWPKo9uJteEKNHRdDDevuXboqCdkR
+	 JGoDxOkkfQQiN8oiId9KTXHhYqoEVAdGHbAivFxWtpTJ9Ndyy0P8qrq1xG+qorlz+h
+	 JnG5bJOgr7+8tpdMTwpWufuk7LUd30Aiowu8eY4sJXt+zWLc+ubsIzAFPBhcVOL+1B
+	 gF8CFz75Xp88z/PNYu5xcyx19SWHn+vXvgRDTxQb/UCv/nhxEqjPqH1Da7H9/CoOFA
+	 geeJw/fZMiwfA==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Wed, 10 Jan 2024 23:12:26 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 10 Jan 2024 23:12:26 +0300
+From: Alexey Romanov <avromanov@salutedevices.com>
+To: <narmstrong@baylibre.com>, <neil.armstrong@linaro.org>,
+	<clabbe@baylibre.com>, <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+	<conor+dt@kernel.org>, <khilman@baylibre.com>, <jbrunet@baylibre.com>,
+	<artin.blumenstingl@googlemail.com>
+CC: <linux-crypto@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kernel@salutedevices.com>, Alexey
+ Romanov <avromanov@salutedevices.com>, Jan Dakinevich
+	<yvdakinevich@salutedevices.com>
+Subject: [PATCH v1 02/24] drivers: crypto: meson: make CLK controller optional
+Date: Wed, 10 Jan 2024 23:11:18 +0300
+Message-ID: <20240110201216.18016-3-avromanov@salutedevices.com>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20240110201216.18016-1-avromanov@salutedevices.com>
+References: <20240110201216.18016-1-avromanov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 10 Jan 2024 22:18:37 +0200
-Message-Id: <CYBAYMHESW3Z.1EVW4Q0W0FHEC@suppilovahvero>
-Cc: <x86@kernel.org>, <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
- <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
- <jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
- <ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
- <vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
- <dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
- <peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
- <rientjes@google.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
- <kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
- <sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
- <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>,
- <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>, "Brijesh Singh"
- <brijesh.singh@amd.com>
-Subject: Re: [PATCH v1 07/26] x86/fault: Add helper for dumping RMP entries
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Borislav Petkov" <bp@alien8.de>, "Michael Roth" <michael.roth@amd.com>
-X-Mailer: aerc 0.15.2
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-8-michael.roth@amd.com>
- <20240110095912.GAZZ5qcFXYgvPrCdRI@fat_crate.local>
-In-Reply-To: <20240110095912.GAZZ5qcFXYgvPrCdRI@fat_crate.local>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 182544 [Jan 10 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.3
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/01/10 17:01:00 #23071477
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Wed Jan 10, 2024 at 11:59 AM EET, Borislav Petkov wrote:
-> On Sat, Dec 30, 2023 at 10:19:35AM -0600, Michael Roth wrote:
-> > +void snp_dump_hva_rmpentry(unsigned long hva)
-> > +{
-> > +	unsigned int level;
-> > +	pgd_t *pgd;
-> > +	pte_t *pte;
-> > +
-> > +	pgd =3D __va(read_cr3_pa());
-> > +	pgd +=3D pgd_index(hva);
-> > +	pte =3D lookup_address_in_pgd(pgd, hva, &level);
-> > +
-> > +	if (!pte) {
-> > +		pr_info("Can't dump RMP entry for HVA %lx: no PTE/PFN found\n", hva)=
-;
-                ~~~~~~~
-		is this correct log level?
+Not all Amlogic SoC's uses CLK controller.
 
-BR, Jarkko
+Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
+Signed-off-by: Jan Dakinevich <yvdakinevich@salutedevices.com>
+---
+ drivers/crypto/amlogic/amlogic-gxl-core.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
+index a5df061f9890..e5f504fb477e 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-core.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+@@ -248,16 +248,10 @@ static int meson_crypto_probe(struct platform_device *pdev)
+ 		dev_err(&pdev->dev, "Cannot request MMIO err=%d\n", err);
+ 		return err;
+ 	}
+-	mc->busclk = devm_clk_get(&pdev->dev, "blkmv");
++	mc->busclk = devm_clk_get_optional_enabled(&pdev->dev, "blkmv");
+ 	if (IS_ERR(mc->busclk)) {
+ 		err = PTR_ERR(mc->busclk);
+-		dev_err(&pdev->dev, "Cannot get core clock err=%d\n", err);
+-		return err;
+-	}
+-
+-	err = clk_prepare_enable(mc->busclk);
+-	if (err != 0) {
+-		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
++		dev_err(&pdev->dev, "Cannot get and enable core clock err=%d\n", err);
+ 		return err;
+ 	}
+ 
+@@ -279,7 +273,6 @@ static int meson_crypto_probe(struct platform_device *pdev)
+ 	meson_unregister_algs(mc);
+ error_flow:
+ 	meson_free_chanlist(mc, mc->flow_cnt - 1);
+-	clk_disable_unprepare(mc->busclk);
+ 	return err;
+ }
+ 
+@@ -295,7 +288,6 @@ static int meson_crypto_remove(struct platform_device *pdev)
+ 
+ 	meson_free_chanlist(mc, mc->flow_cnt - 1);
+ 
+-	clk_disable_unprepare(mc->busclk);
+ 	return 0;
+ }
+ 
+-- 
+2.30.1
+
