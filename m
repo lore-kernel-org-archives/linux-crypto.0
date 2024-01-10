@@ -1,82 +1,92 @@
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDBA47F46
-	for <linux-crypto@vger.kernel.org>; Wed, 10 Jan 2024 11:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20F4495CC;
+	Wed, 10 Jan 2024 13:48:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="AGjdw4Cr"
-Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40ABKm27007253;
-	Wed, 10 Jan 2024 11:56:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	PPS06212021; bh=3Hfk2OA0HnzqSdXlKJzUHrmrs+orUbJxUGPBHwQyjKI=; b=
-	AGjdw4CrTrof7bU+zjHOC5c+qa5fEUmBd3r+2PP5acnKx9aoZsYrQPngwnCbSmYF
-	/jBGvJO7FABohCGA5DfSCA4HKcwO73B2Uvo6jZi6Jd17ConCoJj6oODbDe7Mlq1h
-	bAZczC6TSvMKdC6QjO5f4cFGAPNBIsQp8KRrSMsxTSgqTgaJVrylC2PwFCNR5BFl
-	fDn1Zv8IgLgYo9f/Bs5kZQtT0I1dJ/O3TShe08qxgUNwVo/djAKeCySGTtlhfXfq
-	XthmtBkoK922Syp1FXvBk6gcauNyrnjA2G/ktTtq4V6eXPTFCgTRfz/QNgENJbOJ
-	H7R/Ic0H4GRq6KSHQWDTIQ==
-Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3vewu5cgj3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 10 Jan 2024 11:56:58 +0000 (GMT)
-Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 10 Jan 2024 03:57:28 -0800
-Received: from pek-lpd-ccm2.wrs.com (147.11.136.210) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 10 Jan 2024 03:57:25 -0800
-From: Kun Song <Kun.Song@windriver.com>
-To: <gaurav.jain@nxp.com>
-CC: <Kun.Song@windriver.com>, <V.Sethi@nxp.com>, <aymen.sghaier@nxp.com>,
-        <davem@davemloft.net>, <filip.pudak@windriver.com>,
-        <heng.guo@windriver.com>, <herbert@gondor.apana.org.au>,
-        <horia.geanta@nxp.com>, <linux-crypto@vger.kernel.org>,
-        <meenakshi.aggarwal@nxp.com>, <richard.danter@windriver.com>
-Subject: RE: [PATCH v5.10.y] crypto: caam/jr - Fix possible caam_jr crash
-Date: Wed, 10 Jan 2024 19:56:53 +0800
-Message-ID: <20240110115653.3170977-1-Kun.Song@windriver.com>
-X-Mailer: git-send-email 2.26.1
-In-Reply-To: <AM0PR04MB600455078CE01BE8246117B7E7692@AM0PR04MB6004.eurprd04.prod.outlook.com>
-References: <AM0PR04MB600455078CE01BE8246117B7E7692@AM0PR04MB6004.eurprd04.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V1jPPPfb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14496C433C7;
+	Wed, 10 Jan 2024 13:48:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704894507;
+	bh=Mpj9MmpWsZ0QXa3z+JG9y8iO9570kyRUme6G8UyY3ns=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V1jPPPfbtZjWicjR/pXvV3fvfEd+WTpUYKesK1ver/unl0yUXsY4TkjQIutQjBRsP
+	 rP/Oz0q/0h14UEjOgFaxFG624+eWlJ/AO+ivv3TYC1sZnL+hL4/+Alo/46tP000hXg
+	 zplNZ64lLrfkj8J9hOzdzzP2smKm7MeEZ/IYISeNp94tvvX509RdtM1WHeyhjMm5jx
+	 6PVp6J9lR2f0adpYnosG4kNDW+C6yKAzSmFoUpH39oONuTUSb402zXo2PYbzqdDyDw
+	 8BKfIvBQaR2VfeSzJy9k28uur98lcaUtFQRjhOYk1Xziu9Q+q1jecwOjEuD67FrH9y
+	 AnuUlci6GEj1Q==
+Date: Wed, 10 Jan 2024 13:48:20 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: akpm@linux-foundation.org, llvm@lists.linux.dev,
+	patches@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-trace-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-efi@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linux-arch@vger.kernel.org, kasan-dev@googlegroups.com,
+	linux-mm@kvack.org, bridge@lists.linux.dev, netdev@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 2/3] arch and include: Update LLVM Phabricator links
+Message-ID: <20240110-apostle-trident-533d4c2c9c97@spud>
+References: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
+ <20240109-update-llvm-links-v1-2-eb09b59db071@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 6ttKKB4f2FGyQlMosDqP1AIgMPHA9PGo
-X-Proofpoint-ORIG-GUID: 6ttKKB4f2FGyQlMosDqP1AIgMPHA9PGo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-16_25,2023-11-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=603
- priorityscore=1501 impostorscore=0 malwarescore=0 mlxscore=0 clxscore=1015
- lowpriorityscore=0 phishscore=0 suspectscore=0 spamscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
- definitions=main-2401100098
-
->https://github.com/torvalds/linux/commit/06e39357c36b0d3cc2779d08ed04cb389eaa22ba - drivers: crypto: caam/jr - Allow quiesce when quiesced
->apply this one as well.
-
-Hi, Gaurav
-
-Our version has backport this commiti(06e39357c36b0d3cc2779d08ed04cb389eaa22ba), but the problem still exists.
-
-When crash occurs, the log will output
-
-<3>caam_jr 8030000.jr: Device is busy
-<3>caam_jr 8020000.jr: Device is busy
-<3>caam_jr 8010000.jr: Device is busy
-<3>caam_jr 8010000.jr: job ring error: irqstate: 00000103
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="p6SYI+U6gP5vpK1M"
+Content-Disposition: inline
+In-Reply-To: <20240109-update-llvm-links-v1-2-eb09b59db071@kernel.org>
 
 
-Thanks!
-BR/SK
+--p6SYI+U6gP5vpK1M
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Jan 09, 2024 at 03:16:30PM -0700, Nathan Chancellor wrote:
+> reviews.llvm.org was LLVM's Phabricator instances for code review. It
+> has been abandoned in favor of GitHub pull requests. While the majority
+> of links in the kernel sources still work because of the work Fangrui
+> has done turning the dynamic Phabricator instance into a static archive,
+> there are some issues with that work, so preemptively convert all the
+> links in the kernel sources to point to the commit on GitHub.
+>=20
+> Most of the commits have the corresponding differential review link in
+> the commit message itself so there should not be any loss of fidelity in
+> the relevant information.
+>=20
+> Link: https://discourse.llvm.org/t/update-on-github-pull-requests/71540/1=
+72
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
+
+>  arch/riscv/Kconfig              | 2 +-
+>  arch/riscv/include/asm/ftrace.h | 2 +-
+
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+
+Cheers,
+Conor.
+
+--p6SYI+U6gP5vpK1M
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZZ6gJAAKCRB4tDGHoIJi
+0mIlAQCj5ZP6QEhEswWYjX38obn/p3pF8mt+Ve+vlBnVEhAW8QD8ClRvKxDiajR5
+Zp8ES/FLDyH/QJ5QjGuYLP5PATLeFAY=
+=SqXc
+-----END PGP SIGNATURE-----
+
+--p6SYI+U6gP5vpK1M--
