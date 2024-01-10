@@ -1,163 +1,73 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D87D3F8CE
-	for <linux-crypto@vger.kernel.org>; Tue,  9 Jan 2024 23:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F751370
+	for <linux-crypto@vger.kernel.org>; Wed, 10 Jan 2024 01:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2X/fCjnp"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3606f507efeso17177045ab.3
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Jan 2024 15:42:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704843764; x=1705448564; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QIcPXVK1fYFTemMdjpiQGc+AOvdzW3M34c5/yKhDtd4=;
-        b=2X/fCjnpWleyUM89aPH0FD6rDIWGbLtUc2Mv15EvJVL5FPT0TO2L7pFdzX4GOsfqP4
-         rS18DElgEhNV9dk7NrG1b9UIO6YNdjbBNVjYcjCkpFHGhTqTnjfDzIUMBSq1AVUHRP0f
-         yOb4rReEGaiwkslthXZHh9oquvcRXfjeTNELlvIK+JsvTLj0Nmh9AbLPY30wyHZjGfXH
-         RbuDC/2hgS6QASD09oWCvr+nTnUu6tof+TYCbfEndNUAR79cj7rPD0zkS+g3if8uX55X
-         +95LXNWegkGPPnzW6K9c+/dhd0EmumJtnhedDaR42BlVkOS7Vpj8vlRzq7u+TiyiV6xe
-         +QDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704843764; x=1705448564;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QIcPXVK1fYFTemMdjpiQGc+AOvdzW3M34c5/yKhDtd4=;
-        b=SFaKScMk0gldOu+aa2GjaknQhKNLnZrutiYndlvUSJnPNog8h06kxNJCo6tyE05SVo
-         HrOL/uP5jXn/NNLM1hHx3rP4ogSQC9Wt6DEf9tlGEPdk6B/QjL+zpt2xMLnRWmL3OGfd
-         wagVjeXCfJjNe+XOYc9rQHIo8z05VIfmxVdczkAq61izVbq9qMXZxM4UaBJuGZ9tmR6s
-         +bxh4ldnWnDbJxVxGHogqpVY+QJcImPz1ThQXpzGJEUrUz/nuXQsMF+iBv5hi8ww90K+
-         1i2JgPXVXojlsR/hODZgjs1n9qg0DWJZ2rzQSY1yGTG1Hk42UKRj3k1/qRTvK3xguu/p
-         6YOA==
-X-Gm-Message-State: AOJu0YyiMbWX6gWHjzxx5P9oJlJgFzNojd1VTh5pNwHDHg3ISR6GvCRa
-	gd5Tmw+Kt54zh+Def44+RWZQzqIOpwkU
-X-Google-Smtp-Source: AGHT+IFcCSzwyXxCeIeRPodhTFSjdMhuIXovQrmFwVT7Gt7z1oM7wbSewwsMzzo7BrlWgSVFYS5jcw==
-X-Received: by 2002:a05:6e02:3208:b0:360:5cd9:a73e with SMTP id cd8-20020a056e02320800b003605cd9a73emr300419ilb.6.1704843764645;
-        Tue, 09 Jan 2024 15:42:44 -0800 (PST)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id em17-20020a0566384db100b0046ceccc798asm954664jab.6.2024.01.09.15.42.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jan 2024 15:42:44 -0800 (PST)
-Date: Tue, 9 Jan 2024 23:42:41 +0000
-From: Justin Stitt <justinstitt@google.com>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: kernel test robot <lkp@intel.com>, virtualization@lists.linux.dev,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Gonglei <arei.gonglei@huawei.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, llvm@lists.linux.dev,
-	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr
-Subject: Re: [PATCH v2] crypto: virtio - Less function calls in
- __virtio_crypto_akcipher_do_req() after error detection
-Message-ID: <20240109234241.4q3ueqdjz5o54oan@google.com>
-References: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
- <202312260852.0ge5O8IL-lkp@intel.com>
- <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="IWiI9f51"
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40A0pONX006008;
+	Tue, 9 Jan 2024 17:39:24 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding:content-type; s=
+	PPS06212021; bh=M+MYSGdfU78gcphe0xPfVxEluN9XQy2CP3XZ8A9L2rA=; b=
+	IWiI9f51OBjsNo1MlvtEVirqE7uk8Qeocj2zvJwS/hBcmQP441GZsaO6zWjh44z0
+	cRpTmJgjXcOJQq1pU46yCnhs9/glQIUKuNXNPEhuMR5Do/kAh74IxGbXQgvk8Lbm
+	tRhD0ncZOVHrLSNKK0PojR66ALI98ZS79+VxUSjc5idqT1yWgEI0kFK6JohmIb/T
+	AYYSe7etQ+k+pVC4B93ZT0PrOMsecspQsBGSW+trGPrZa5Y/R0bSOYsPDsXkJd8z
+	PfKyCcM1GJtG9/XEhkblhGzDgj34zeyLmbh8JVPlldwBtSG3Y+Uep4r15Oh8ZdB5
+	iJcAvWYC0A+hsHNxZSQFCw==
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3vf78mbmqx-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 09 Jan 2024 17:39:24 -0800 (PST)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 9 Jan 2024 17:39:41 -0800
+Received: from pek-lpd-ccm2.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Tue, 9 Jan 2024 17:39:38 -0800
+From: Kun Song <Kun.Song@windriver.com>
+To: <gaurav.jain@oss.nxp.com>
+CC: <Kun.Song@windriver.com>, <V.Sethi@nxp.com>, <aymen.sghaier@nxp.com>,
+        <davem@davemloft.net>, <filip.pudak@windriver.com>,
+        <heng.guo@windriver.com>, <herbert@gondor.apana.org.au>,
+        <horia.geanta@nxp.com>, <linux-crypto@vger.kernel.org>,
+        <meenakshi.aggarwal@nxp.com>
+Subject: [REMINDER] Re: [PATCH v5.10.y] crypto: caam/jr - Fix possible caam_jr crash 
+Date: Wed, 10 Jan 2024 09:39:05 +0800
+Message-ID: <20240110013905.2241490-1-Kun.Song@windriver.com>
+X-Mailer: git-send-email 2.26.1
+In-Reply-To: <AM0PR04MB600494E7DA11E8853C57566EE794A@AM0PR04MB6004.eurprd04.prod.outlook.com>
+References: <AM0PR04MB600494E7DA11E8853C57566EE794A@AM0PR04MB6004.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: taX2H7RPLlAUOntiN2fH1vy0my-xmWAv
+X-Proofpoint-ORIG-GUID: taX2H7RPLlAUOntiN2fH1vy0my-xmWAv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-16_25,2023-11-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 phishscore=0 lowpriorityscore=0 spamscore=0 mlxscore=0
+ mlxlogscore=750 suspectscore=0 malwarescore=0 bulkscore=0 clxscore=1015
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2401100012
 
-Hi,
+Hello Gaurav,
 
-On Tue, Dec 26, 2023 at 11:12:23AM +0100, Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Tue, 26 Dec 2023 11:00:20 +0100
->
-> The kfree() function was called in up to two cases by the
-> __virtio_crypto_akcipher_do_req() function during error handling
-> even if the passed variable contained a null pointer.
-> This issue was detected by using the Coccinelle software.
+  I hope you receive this email. I'm following up on a patch I submitted a few weeks ago. There doesn't seem to be any response yet and I want to make sure it gets pushed forward.
 
-If the script is short and simple would you mind, in the future,
-including it below the fold -- this may help others do similar work down
-the line -- Or you could also link to a git-managed version like what
-Kees has been doing with his __counted_by patches [1].
+  I know you're busy and thank you for taking the time to focus on this.If you have any concerns or feedback please let me know and I'll be happy to address it.
 
->
-> * Adjust jump targets.
->
-> * Delete two initialisations which became unnecessary
->   with this refactoring.
->
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-> ---
-
-Nonetheless,
-
-Reviewed-by: Justin Stitt <justinstitt@google.com>
->
-> v2:
-> A typo was fixed for the delimiter of a label.
->
->  drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-> index 2621ff8a9376..057da5bd8d30 100644
-> --- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-> +++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-> @@ -224,11 +224,11 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
->  	struct virtio_crypto *vcrypto = ctx->vcrypto;
->  	struct virtio_crypto_op_data_req *req_data = vc_req->req_data;
->  	struct scatterlist *sgs[4], outhdr_sg, inhdr_sg, srcdata_sg, dstdata_sg;
-> -	void *src_buf = NULL, *dst_buf = NULL;
-> +	void *src_buf, *dst_buf = NULL;
->  	unsigned int num_out = 0, num_in = 0;
->  	int node = dev_to_node(&vcrypto->vdev->dev);
->  	unsigned long flags;
-> -	int ret = -ENOMEM;
-> +	int ret;
->  	bool verify = vc_akcipher_req->opcode == VIRTIO_CRYPTO_AKCIPHER_VERIFY;
->  	unsigned int src_len = verify ? req->src_len + req->dst_len : req->src_len;
->
-> @@ -239,7 +239,7 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
->  	/* src data */
->  	src_buf = kcalloc_node(src_len, 1, GFP_KERNEL, node);
->  	if (!src_buf)
-> -		goto err;
-> +		return -ENOMEM;
->
->  	if (verify) {
->  		/* for verify operation, both src and dst data work as OUT direction */
-> @@ -254,7 +254,7 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
->  		/* dst data */
->  		dst_buf = kcalloc_node(req->dst_len, 1, GFP_KERNEL, node);
->  		if (!dst_buf)
-> -			goto err;
-> +			goto free_src;
->
->  		sg_init_one(&dstdata_sg, dst_buf, req->dst_len);
->  		sgs[num_out + num_in++] = &dstdata_sg;
-> @@ -277,9 +277,9 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
->  	return 0;
->
->  err:
-> -	kfree(src_buf);
->  	kfree(dst_buf);
-> -
-> +free_src:
-> +	kfree(src_buf);
->  	return -ENOMEM;
->  }
->
-> --
-> 2.43.0
->
-
-[1]: https://lore.kernel.org/all/20230922175023.work.239-kees@kernel.org/
-
-Thanks
-Justin
+Best regards,
+SK 
