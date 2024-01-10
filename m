@@ -1,219 +1,82 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138B346BB1;
-	Wed, 10 Jan 2024 11:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDBA47F46
+	for <linux-crypto@vger.kernel.org>; Wed, 10 Jan 2024 11:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="DRISGyRR"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 2B03040E01A9;
-	Wed, 10 Jan 2024 11:14:30 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id rk1GXipRnNvY; Wed, 10 Jan 2024 11:14:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1704885267; bh=fwWP59DQZ/MSSlZK6nSA8WJmcHMonAP5bkUAu0nzMfE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DRISGyRRH2Yb8ljr7qzKxmjDv5PDR//i1JNCPji2bZmoSqvXC2CEFgz/un4zlwdOd
-	 1gE3QpuxPCOS/AO49UojJngUhe+gslvuDort5mT6YKdB6PxdpW6SSQ6zI36SoQuZR2
-	 j+RNLNTXzjvJQgrviDjXNmGcHbG5Mhmfs3WnhbYXRMEeLIMF9EE/Sfiam/v3lfpkqD
-	 jmyhL1yhBFmtW21wCivpy1KA++k78OC13Jex3T8KKx2xdYeruw7kBahsHOSGi83Nc6
-	 zsmsThRTTmzDRmCRXhyv4Wh7snbFm9Jn0fzha+wd4J2CxbS65LeqhPk/ZyYjL29/bo
-	 uzu+pKOPJQzyhB3gyH2U0vw/1s2cnfvdj8f4glLTntMjkAbIhBlBYRxUu+5LM16j5D
-	 U55MFzVMl22H06LDmtwxnqgrBxOzam7Rf4F2Fu/NM/qSWgrU3fe+/dUsfjXHbxCZ5G
-	 e7qT409qJNtDLgXCJ76zb6Vl1icGQQwZPxoS/Wdei8VQcHsSvz5xp6cU2JEctfs62k
-	 7S7u9Tu+1rKxVl8sIi+n7DFgdXO+dkjJJ2aOKwBMXd4jKb0z/ex7gzelEMo/Qew5t7
-	 pM9QC4FIj9hngIZR138Qa4DFSWnFwdYzXo60YT4dvPw5Je2/cOL9wzPkTcg6JofhE0
-	 8CJKjCNIb4GEyJfUyPXLgMxs=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 67EAF40E01F9;
-	Wed, 10 Jan 2024 11:13:49 +0000 (UTC)
-Date: Wed, 10 Jan 2024 12:13:44 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v1 07/26] x86/fault: Add helper for dumping RMP entries
-Message-ID: <20240110111344.GBZZ576DpwHHs997Zl@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-8-michael.roth@amd.com>
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="AGjdw4Cr"
+Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40ABKm27007253;
+	Wed, 10 Jan 2024 11:56:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding:content-type; s=
+	PPS06212021; bh=3Hfk2OA0HnzqSdXlKJzUHrmrs+orUbJxUGPBHwQyjKI=; b=
+	AGjdw4CrTrof7bU+zjHOC5c+qa5fEUmBd3r+2PP5acnKx9aoZsYrQPngwnCbSmYF
+	/jBGvJO7FABohCGA5DfSCA4HKcwO73B2Uvo6jZi6Jd17ConCoJj6oODbDe7Mlq1h
+	bAZczC6TSvMKdC6QjO5f4cFGAPNBIsQp8KRrSMsxTSgqTgaJVrylC2PwFCNR5BFl
+	fDn1Zv8IgLgYo9f/Bs5kZQtT0I1dJ/O3TShe08qxgUNwVo/djAKeCySGTtlhfXfq
+	XthmtBkoK922Syp1FXvBk6gcauNyrnjA2G/ktTtq4V6eXPTFCgTRfz/QNgENJbOJ
+	H7R/Ic0H4GRq6KSHQWDTIQ==
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3vewu5cgj3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 10 Jan 2024 11:56:58 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 10 Jan 2024 03:57:28 -0800
+Received: from pek-lpd-ccm2.wrs.com (147.11.136.210) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 10 Jan 2024 03:57:25 -0800
+From: Kun Song <Kun.Song@windriver.com>
+To: <gaurav.jain@nxp.com>
+CC: <Kun.Song@windriver.com>, <V.Sethi@nxp.com>, <aymen.sghaier@nxp.com>,
+        <davem@davemloft.net>, <filip.pudak@windriver.com>,
+        <heng.guo@windriver.com>, <herbert@gondor.apana.org.au>,
+        <horia.geanta@nxp.com>, <linux-crypto@vger.kernel.org>,
+        <meenakshi.aggarwal@nxp.com>, <richard.danter@windriver.com>
+Subject: RE: [PATCH v5.10.y] crypto: caam/jr - Fix possible caam_jr crash
+Date: Wed, 10 Jan 2024 19:56:53 +0800
+Message-ID: <20240110115653.3170977-1-Kun.Song@windriver.com>
+X-Mailer: git-send-email 2.26.1
+In-Reply-To: <AM0PR04MB600455078CE01BE8246117B7E7692@AM0PR04MB6004.eurprd04.prod.outlook.com>
+References: <AM0PR04MB600455078CE01BE8246117B7E7692@AM0PR04MB6004.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231230161954.569267-8-michael.roth@amd.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: 6ttKKB4f2FGyQlMosDqP1AIgMPHA9PGo
+X-Proofpoint-ORIG-GUID: 6ttKKB4f2FGyQlMosDqP1AIgMPHA9PGo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-16_25,2023-11-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=603
+ priorityscore=1501 impostorscore=0 malwarescore=0 mlxscore=0 clxscore=1015
+ lowpriorityscore=0 phishscore=0 suspectscore=0 spamscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
+ definitions=main-2401100098
 
-On Sat, Dec 30, 2023 at 10:19:35AM -0600, Michael Roth wrote:
-> +	while (pfn_current < pfn_end) {
-> +		e = __snp_lookup_rmpentry(pfn_current, &level);
-> +		if (IS_ERR(e)) {
-> +			pfn_current++;
-> +			continue;
-> +		}
-> +
-> +		e_data = (u64 *)e;
-> +		if (e_data[0] || e_data[1]) {
-> +			pr_info("No assigned RMP entry for PFN 0x%llx, but the 2MB region contains populated RMP entries, e.g.: PFN 0x%llx: [high=0x%016llx low=0x%016llx]\n",
-> +				pfn, pfn_current, e_data[1], e_data[0]);
-> +			return;
-> +		}
-> +		pfn_current++;
-> +	}
-> +
-> +	pr_info("No populated RMP entries in the 2MB region containing PFN 0x%llx\n",
-> +		pfn);
-> +}
+>https://github.com/torvalds/linux/commit/06e39357c36b0d3cc2779d08ed04cb389eaa22ba - drivers: crypto: caam/jr - Allow quiesce when quiesced
+>apply this one as well.
 
-Ok, I went and reworked this, see below.
+Hi, Gaurav
 
-Yes, I think it is important - at least in the beginning - to dump the
-whole 2M PFN region for debugging purposes. If that output starts
-becoming too unwieldy and overflowing terminals or log files, we'd
-shorten it or put it behind a debug option or so.
+Our version has backport this commiti(06e39357c36b0d3cc2779d08ed04cb389eaa22ba), but the problem still exists.
 
-Thx.
+When crash occurs, the log will output
 
----
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index a8cf33b7da71..259a1dd655a7 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -35,16 +35,21 @@
-  * Family 19h Model 01h, Rev B1 processor.
-  */
- struct rmpentry {
--	u64	assigned	: 1,
--		pagesize	: 1,
--		immutable	: 1,
--		rsvd1		: 9,
--		gpa		: 39,
--		asid		: 10,
--		vmsa		: 1,
--		validated	: 1,
--		rsvd2		: 1;
--	u64 rsvd3;
-+	union {
-+		struct {
-+			u64	assigned	: 1,
-+				pagesize	: 1,
-+				immutable	: 1,
-+				rsvd1		: 9,
-+				gpa		: 39,
-+				asid		: 10,
-+				vmsa		: 1,
-+				validated	: 1,
-+				rsvd2		: 1;
-+		};
-+		u64 lo;
-+	};
-+	u64 hi;
- } __packed;
- 
- /*
-@@ -272,22 +277,20 @@ EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
-  */
- static void dump_rmpentry(u64 pfn)
- {
--	u64 pfn_current, pfn_end;
-+	u64 pfn_i, pfn_end;
- 	struct rmpentry *e;
--	u64 *e_data;
- 	int level;
- 
- 	e = __snp_lookup_rmpentry(pfn, &level);
- 	if (IS_ERR(e)) {
--		pr_info("Failed to read RMP entry for PFN 0x%llx, error %ld\n",
--			pfn, PTR_ERR(e));
-+		pr_err("Error %ld reading RMP entry for PFN 0x%llx\n",
-+			PTR_ERR(e), pfn);
- 		return;
- 	}
- 
--	e_data = (u64 *)e;
- 	if (e->assigned) {
--		pr_info("RMP entry for PFN 0x%llx: [high=0x%016llx low=0x%016llx]\n",
--			pfn, e_data[1], e_data[0]);
-+		pr_info("PFN 0x%llx, RMP entry: [0x%016llx - 0x%016llx]\n",
-+			pfn, e->lo, e->hi);
- 		return;
- 	}
- 
-@@ -299,27 +302,28 @@ static void dump_rmpentry(u64 pfn)
- 	 * certain situations, such as when the PFN is being accessed via a 2MB
- 	 * mapping in the host page table.
- 	 */
--	pfn_current = ALIGN(pfn, PTRS_PER_PMD);
--	pfn_end = pfn_current + PTRS_PER_PMD;
-+	pfn_i = ALIGN(pfn, PTRS_PER_PMD);
-+	pfn_end = pfn_i + PTRS_PER_PMD;
- 
--	while (pfn_current < pfn_end) {
--		e = __snp_lookup_rmpentry(pfn_current, &level);
-+	pr_info("PFN 0x%llx unassigned, dumping the whole 2M PFN region: [0x%llx - 0x%llx]\n",
-+		pfn, pfn_i, pfn_end);
-+
-+	while (pfn_i < pfn_end) {
-+		e = __snp_lookup_rmpentry(pfn_i, &level);
- 		if (IS_ERR(e)) {
--			pfn_current++;
-+			pr_err("Error %ld reading RMP entry for PFN 0x%llx\n",
-+				PTR_ERR(e), pfn_i);
-+			pfn_i++;
- 			continue;
- 		}
- 
--		e_data = (u64 *)e;
--		if (e_data[0] || e_data[1]) {
--			pr_info("No assigned RMP entry for PFN 0x%llx, but the 2MB region contains populated RMP entries, e.g.: PFN 0x%llx: [high=0x%016llx low=0x%016llx]\n",
--				pfn, pfn_current, e_data[1], e_data[0]);
--			return;
--		}
--		pfn_current++;
--	}
-+		if (e->lo || e->hi)
-+			pr_info("PFN: 0x%llx, [0x%016llx - 0x%016llx]\n", pfn_i, e->lo, e->hi);
-+		else
-+			pr_info("PFN: 0x%llx ...\n", pfn_i);
- 
--	pr_info("No populated RMP entries in the 2MB region containing PFN 0x%llx\n",
--		pfn);
-+		pfn_i++;
-+	}
- }
- 
- void snp_dump_hva_rmpentry(unsigned long hva)
-@@ -339,4 +343,3 @@ void snp_dump_hva_rmpentry(unsigned long hva)
- 
- 	dump_rmpentry(pte_pfn(*pte));
- }
--EXPORT_SYMBOL_GPL(snp_dump_hva_rmpentry);
+<3>caam_jr 8030000.jr: Device is busy
+<3>caam_jr 8020000.jr: Device is busy
+<3>caam_jr 8010000.jr: Device is busy
+<3>caam_jr 8010000.jr: job ring error: irqstate: 00000103
 
--- 
-Regards/Gruss,
-    Boris.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks!
+BR/SK
