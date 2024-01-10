@@ -1,76 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0250D4F890;
-	Wed, 10 Jan 2024 21:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BF84F21D;
+	Wed, 10 Jan 2024 22:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WV/+YMoO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C01ECC43390;
-	Wed, 10 Jan 2024 21:25:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704921934;
-	bh=Ax58DmDjPNW74NGwRvhHHGsYqpwIGIZxv4FkZoGcxV4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=WV/+YMoOvCEyWpaRpYZfa87kc6mbQ0JnVBbDnIG5yf/huJPTEyQwx8cXxan8KxinN
-	 6sNBXfQFoVBxzqwDGumSVysnHcLmYq9nvcNjV5hKJ7VVI/muQ0GlHvgx+x3+niVmq9
-	 RuxS7Zd6MOXiXUhr0aTG2YCs+G4j0caWW01HTd+aL1Hy5Lw/lJ9cj/lZOsySBKvQWB
-	 er+OO8VqSbL3cviSAhyf8p2dZWVLVPhS4OLTE6iChmLPRf4MhEPa0XRlj+JhQFQ55u
-	 m/xZtqRUdeC3VwXCXxl9xZQ9TjdHsXZYksEUz4gTQpIoWVCmyU/4A+oymlcDeOrDbP
-	 DQq9jAA3AdwNQ==
-Received: (nullmailer pid 2648568 invoked by uid 1000);
-	Wed, 10 Jan 2024 21:25:28 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="T7tPVLGj"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id E2EB740E01F9;
+	Wed, 10 Jan 2024 22:15:02 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id nyXwZKqd1a34; Wed, 10 Jan 2024 22:15:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1704924900; bh=qzYKfx3de59+vgu9hb7XP534ekilIGghNG65JX231Xw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=T7tPVLGjEkG/q/m/oH7mkFdDSm4g2QnCZlUFWhO4EGnjXvMod93Xmw38Bn6Qb02r8
+	 nVFfOtjpQQjaePLyFHocD24AWkK+eKheKufHm6jIuZsdberpp7cjLKTTTL4Sjip/lF
+	 Sxjy//bcTKZlT06vTRplCHHl8DqCr+tPTSlSQC0WQqDmdH0Hge0WZKgYQj2tMBe/Rx
+	 Xr91oVHJxIbJ0ZwzFk4MlIv7acdNiks925JUCne17jxQPHPY4amCgxM59vOSaZgezg
+	 YVUqIxNGgpKG0Fsr+hv2s33cd3ENnb7hSAX0Qvx065ZjUprPxuH7YkWvagW5+DR5Ot
+	 Kemo2oqFTqg6S4xoCIC3E3WweV6jc1c4lXvDZq2yciB5bqbXCghRbMmNeFPYcVgbar
+	 vnkdWwdyOwC4GbhSLTHRzi0hOajTdSUSGK/B5RLAW8Zt5ACALLmT4+pEaqb406hbZs
+	 iOl9T/u3ucRUZKWJJAc6B9oVbP29ud3il+OUf2RAvWYjNOHSppvfdr8eQ1XADoPpoi
+	 yD8LSFO8WizFfqBxIv4qNn47XIKqyWwIcQRafgo7sjlVZhQrKeWYPMrmMReiNz5g/6
+	 pnB79G3kp/jjse4W92qGlxhmpVRliPceQSyedFqsoc4HfF/fnlUSNqjajDUxgDdX+8
+	 y3b1JVQnou1C5kImEixUgwGk=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 72F3A40E0196;
+	Wed, 10 Jan 2024 22:14:22 +0000 (UTC)
+Date: Wed, 10 Jan 2024 23:14:21 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Jarkko Sakkinen <jarkko@kernel.org>,
+	Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	ashish.kalra@amd.com, nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
+	liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v1 07/26] x86/fault: Add helper for dumping RMP entries
+Message-ID: <20240110221421.GGZZ8WvTGdNrWkUkfv@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-8-michael.roth@amd.com>
+ <20240110095912.GAZZ5qcFXYgvPrCdRI@fat_crate.local>
+ <CYBAYMHESW3Z.1EVW4Q0W0FHEC@suppilovahvero>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Alexey Romanov <avromanov@salutedevices.com>
-Cc: kernel@salutedevices.com, herbert@gondor.apana.org.au, davem@davemloft.net, neil.armstrong@linaro.org, linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, khilman@baylibre.com, robh+dt@kernel.org, linux-amlogic@lists.infradead.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, narmstrong@baylibre.com, clabbe@baylibre.com, jbrunet@baylibre.com, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, artin.blumenstingl@googlemail.com
-In-Reply-To: <20240110201216.18016-17-avromanov@salutedevices.com>
-References: <20240110201216.18016-1-avromanov@salutedevices.com>
- <20240110201216.18016-17-avromanov@salutedevices.com>
-Message-Id: <170492192887.2648505.6187306596898979418.robh@kernel.org>
-Subject: Re: [PATCH v1 16/24] dt-bindings: crypto: meson: add new
- compatibles
-Date: Wed, 10 Jan 2024 15:25:28 -0600
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CYBAYMHESW3Z.1EVW4Q0W0FHEC@suppilovahvero>
 
+On Wed, Jan 10, 2024 at 10:18:37PM +0200, Jarkko Sakkinen wrote:
+> > > +	if (!pte) {
+> > > +		pr_info("Can't dump RMP entry for HVA %lx: no PTE/PFN found\n", hva);
+>                 ~~~~~~~
+> 		is this correct log level?
 
-On Wed, 10 Jan 2024 23:11:32 +0300, Alexey Romanov wrote:
-> Now we can use crypto driver at G12A/G12B/S4/A1/SM1/AXG.
-> 
-> Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
-> ---
->  .../devicetree/bindings/crypto/amlogic,gxl-crypto.yaml          | 2 ++
->  1 file changed, 2 insertions(+)
-> 
+No, and I caught a couple of those already but missed this one, thanks.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Mike, please make sure all your error prints are pr_err.
 
-yamllint warnings/errors:
+Thx.
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.example.dtb: crypto-engine@c883e000: compatible: ['amlogic,gxl-crypto'] is too short
-	from schema $id: http://devicetree.org/schemas/crypto/amlogic,gxl-crypto.yaml#
+-- 
+Regards/Gruss,
+    Boris.
 
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240110201216.18016-17-avromanov@salutedevices.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+https://people.kernel.org/tglx/notes-about-netiquette
