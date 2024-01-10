@@ -1,226 +1,199 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2044.outbound.protection.outlook.com [40.107.8.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E243A8C6;
-	Wed, 10 Jan 2024 08:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B171113
+	for <linux-crypto@vger.kernel.org>; Wed, 10 Jan 2024 09:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qjBrksVJ";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="RY4cswgs";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qjBrksVJ";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="RY4cswgs"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1F65B21E17;
-	Wed, 10 Jan 2024 08:59:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1704877184; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0GtM+U/m1/8CwPcl+4EBtNE2sj1pzKEolTyiwmoL/Us=;
-	b=qjBrksVJ7ayqtT+hHMQ3E32pBal7nh9Y3++2UcNMq4F1aQ3R606xDvDXyS+8yjW8lBsHyI
-	zAW5/0Mpb1ig+YsUu+Cz467VrCMZ8P/EL0QCo9fUb6+aYrPjF4yCSvFvSD3XKPexpTJLzA
-	+575X+EQKkKnU9eakb6GIjaE4bFTFB4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1704877184;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0GtM+U/m1/8CwPcl+4EBtNE2sj1pzKEolTyiwmoL/Us=;
-	b=RY4cswgsDRFXGOkmPW9cy8ROFg9IKH3nV+B1DI5nTja1CXyN+Fuu1V6t+BKZ6incmHbQow
-	/wczs5i4KHO89nBA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1704877184; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0GtM+U/m1/8CwPcl+4EBtNE2sj1pzKEolTyiwmoL/Us=;
-	b=qjBrksVJ7ayqtT+hHMQ3E32pBal7nh9Y3++2UcNMq4F1aQ3R606xDvDXyS+8yjW8lBsHyI
-	zAW5/0Mpb1ig+YsUu+Cz467VrCMZ8P/EL0QCo9fUb6+aYrPjF4yCSvFvSD3XKPexpTJLzA
-	+575X+EQKkKnU9eakb6GIjaE4bFTFB4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1704877184;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0GtM+U/m1/8CwPcl+4EBtNE2sj1pzKEolTyiwmoL/Us=;
-	b=RY4cswgsDRFXGOkmPW9cy8ROFg9IKH3nV+B1DI5nTja1CXyN+Fuu1V6t+BKZ6incmHbQow
-	/wczs5i4KHO89nBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CCB0E13786;
-	Wed, 10 Jan 2024 08:59:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id MHKKMX9cnmVXewAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Wed, 10 Jan 2024 08:59:43 +0000
-Message-ID: <7234513d-45c9-4bda-a537-4278387cedc4@suse.cz>
-Date: Wed, 10 Jan 2024 09:59:43 +0100
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="J4BvfvVX"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e5wNBq8kMZwdvGNWITU1JWKXsClzTZ1xst9swXUU2zxiiD8+RJW4nDhy+TpWbHzQEGXOxSMcTswx2TYFeMEm3eCO+XfdZY6ZNOqjvnabb3aERYhUedw104oubmJPznjMMZkaOTSAaeYRsOIhxhICz0Eq9qyTKuHooZHVD5t4pJBgpXwNR73kSkFrx0lQn/Fb81LOTjZz43qEVNYcg/MhP7t4VuPj6v2WJ5PZi5NFmcox0UahuniWUiyIbHmQrnLQzgm5WXlXM1M4Rqgl+34cXZN+RFZ262j0WebQiwbHof1NN7qVgrwrywfPHU52y/wLvTALJu7+4D5KP9jNm6dOIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wvofmwuLsJ4AFkNzEz66EX8hdhNGiIOulJbvEKeaGzU=;
+ b=bvjB3KsjFh4qPwkeKIUqUqCyw029gBVE5W4wH+RjivFw9z2kNstxkEv3ahaSgiOt4tR3vHgzU2AlAyKo4dtwMEfOFCsFPGRLogpjcWt4k5dhZoldNf2vMHT8591pEVDxgdkqJq9lPkSAPyt2b9z9D2UWAG3qnN8w8nBloiGQXeyNcZTzE/KVyasfAUyeryJGzgB8/d5oeGD0EjbSpOIgdvOV/iqRnvrinNdLk9/7oiyqCVdxRYwPGZ0HS6tOyErw9pIOTQTSwd6p/tvtL7NeZ7RcoHWAgBrI+UzpAPkvyKwi5e4nEYZXmvORnoVJ/v5upXsihQRV0pVm9WLVAbH6IQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wvofmwuLsJ4AFkNzEz66EX8hdhNGiIOulJbvEKeaGzU=;
+ b=J4BvfvVXOnPgQcnVPorAex5tt96l7zfwyAi0P1jJteFGDqByl/ZSpl+tx1Hi930y1gLmizHOm0zrAC2gOaOJWiB4u3BPnC27lfqH+4BzEImF+DADM8JBqVWStxYW9q5u0Rew9wEBMbLt0l7HFn1aKgDrdnebh/DQANoyvn88xTs=
+Received: from AM0PR04MB6004.eurprd04.prod.outlook.com (2603:10a6:208:11a::11)
+ by AM8PR04MB7218.eurprd04.prod.outlook.com (2603:10a6:20b:1d9::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.17; Wed, 10 Jan
+ 2024 09:14:16 +0000
+Received: from AM0PR04MB6004.eurprd04.prod.outlook.com
+ ([fe80::72db:548e:8011:b12f]) by AM0PR04MB6004.eurprd04.prod.outlook.com
+ ([fe80::72db:548e:8011:b12f%4]) with mapi id 15.20.7181.015; Wed, 10 Jan 2024
+ 09:14:16 +0000
+From: Gaurav Jain <gaurav.jain@nxp.com>
+To: Kun Song <Kun.Song@windriver.com>
+CC: Varun Sethi <V.Sethi@nxp.com>, Aymen Sghaier <aymen.sghaier@nxp.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "filip.pudak@windriver.com"
+	<filip.pudak@windriver.com>, "heng.guo@windriver.com"
+	<heng.guo@windriver.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, Horia Geanta <horia.geanta@nxp.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Meenakshi
+ Aggarwal <meenakshi.aggarwal@nxp.com>, "richard.danter@windriver.com"
+	<richard.danter@windriver.com>
+Subject: RE: [EXT] RE: [PATCH v5.10.y] crypto: caam/jr - Fix possible caam_jr
+ crash
+Thread-Topic: [EXT] RE: [PATCH v5.10.y] crypto: caam/jr - Fix possible caam_jr
+ crash
+Thread-Index: AQHaQ56ceWii/sYVC0amEMLId/XZerDSu5zA
+Date: Wed, 10 Jan 2024 09:14:16 +0000
+Message-ID:
+ <AM0PR04MB600455078CE01BE8246117B7E7692@AM0PR04MB6004.eurprd04.prod.outlook.com>
+References:
+ <AM0PR04MB6004B82755A53A216D2EFA13E7692@AM0PR04MB6004.eurprd04.prod.outlook.com>
+ <20240110082532.2858045-1-Kun.Song@windriver.com>
+In-Reply-To: <20240110082532.2858045-1-Kun.Song@windriver.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM0PR04MB6004:EE_|AM8PR04MB7218:EE_
+x-ms-office365-filtering-correlation-id: 2793b802-64bd-4f70-293b-08dc11bc8519
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ cCdOJaCBdu6m8mA39r844G1u3mpxOERPQC0dc9ltzd68Z5n4rQC3LZVn1YY2UrjWlYLxT98XWj9xWztPr25Zmsx774ETUhEEHlH2Axy4Y01RciXy+YGToi634Mo0bYoHy/q5l6sfxfsGw/la+IvBclztNGQtl+0mLU4dxhLPcvio8v3VrxDsgI1DqQdiCi5w409sGubLGesikic8mbeM1zfZBFXl75PkG5pNvdhCouhp7iFPiC0/p5ZMgJkgUnVXeKyXgQlRd8rjv9J+8O1M+qsWZseIZ368GqoI1vZx/liHT3vA4+zZ/im8fZrrg9VxeG5B/jHP4opaHx6TmOcE/omuhrhxfl/Kbk1P4e3A83kYXNDoRJmU2lqG8TNXj5b/sdVJHV2IONv331EsYk/8JRCEzWVfh9+hJwsf8rp0ziRCUQHWHULSZA9N8dUIcWyrmULtcDdSpyR+DlGx5+du/N7k3PKX4CbYxkPWEPUddFi+/XsB+vdpP5fHUb/XhjCJCXzM3+zLIdEdfV9MT6E4Krvj96IWJGOuQvnCr9cjXUoFq4aMgGVnhOCAtH/qgz6RqsOSD1bQEsshmXbLo8KfvXbXMpIrMN/mq+jdGhvIFJuMn9T5x3JvOLl097v0Rf2o18i3pxakaZ16wdaKbAnkeA==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6004.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(39860400002)(396003)(136003)(346002)(230173577357003)(230273577357003)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(86362001)(26005)(71200400001)(478600001)(6506007)(7696005)(9686003)(55236004)(53546011)(966005)(83380400001)(5660300002)(44832011)(4326008)(2906002)(41300700001)(76116006)(8676002)(8936002)(52536014)(6916009)(64756008)(66556008)(66946007)(66446008)(66476007)(54906003)(316002)(33656002)(38100700002)(122000001)(38070700009)(55016003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?C/PdtL53Sd+oqfnsBXDCMZURT9NI7wfeoJ5v/HVhgQbzdvE+BR4jJyTJodRx?=
+ =?us-ascii?Q?foO9WYQQHMZ9micZwsUpxEZXHmfsVHbHETO7uALTbYUtqLWrYRjEFPm7K4c2?=
+ =?us-ascii?Q?TU3mgRB7YWxPBqbPAPENd6kjPQKZz9L2ubb8nj/PZngS99YntB131Tm7A2gp?=
+ =?us-ascii?Q?xeX/DVYD0Xn0Cld4x//aaOd9I9QMLbgSPV7YaU/lAgtV//fDnSLSqZVTa/it?=
+ =?us-ascii?Q?SDqCjn7kvd9oDJYqGRIahmr0bumpGQ+5oGXb1k28uG07lx/NaUqGWDIolP/l?=
+ =?us-ascii?Q?3Dq7z3qaBB9O1CUR3gNrry+wCCrGB2gszXi3FHgG1ghAtsnmWY6OuVCztnjV?=
+ =?us-ascii?Q?506fS4X6K5PlsRoyH0FLPJKHzzujn0IvNqhzM1QI7yAl1ETDfoPn809Oo3aA?=
+ =?us-ascii?Q?WE5O/Jit0zVQtzzLYwQLvP1X4RmnwZkNeB9OX+uAq03HN9msVkrTXG647xre?=
+ =?us-ascii?Q?7qYQ2dUc0q5LAgBazyFigjh4J3mpzd050AdejiofIBE3xhWRisnsIPPzHJeN?=
+ =?us-ascii?Q?12keBPHL+0Io85DctatNb+AUgcCiWRbyyJ+sUIqo9RYFgt58GHkvlfRE2PS/?=
+ =?us-ascii?Q?IC2BaJD/+1lyQ8BtEuZOje65HYtbqnL51gbrhDrH78DNUOa6vJ8JLHqgBBjJ?=
+ =?us-ascii?Q?k8Q3tn8G5/S17jeQCJnKZIIQ0nqMHVNf+YQNYDUKXe8coW793ojO6XNrZdUq?=
+ =?us-ascii?Q?R4TK4w5WErdppFdVqyX2Mu9L7DzZB6wbLK95O7oQbOp2h4wI84WBYRJfa28s?=
+ =?us-ascii?Q?OhFHgCFZUcCDveSPldfDe96XM7BPs3/c/XqhURTEQzAln90lg1G2a3KB45X0?=
+ =?us-ascii?Q?wYRggNwu/7/bx57IJEQFaQV5U8G5sSmlezXPY4AjzC8ci4LUmXR1OWNMMpkp?=
+ =?us-ascii?Q?JQE62169vdTvFYO9uL72lXbQgFdbf7jlBOet9K2JqRcToHr57yde/oV+Flxy?=
+ =?us-ascii?Q?+v9sORtbS8VywJFeZBNoM0T7pm5apNIW3mD/UY9rscPpYnl3ZEInYcLdTgOE?=
+ =?us-ascii?Q?fCEJeNzFGfZ3RT1El4IpQ4tjZO6LERCSNe/XLXLD67oO9tsuKn4fNC7SBf2K?=
+ =?us-ascii?Q?pLmI1H8HIgXg1Xpef4ebB3IBLPGfHOMzT2scWMmDQh1pfL4i8crXpesN0YSx?=
+ =?us-ascii?Q?UWZnD8+u4zR0z5RTVHNiLtAOvyAOrIsJYw1hbml8qOfF/Fkb23x3npYTw+jl?=
+ =?us-ascii?Q?bmSj2Mwa3GvcQBdTFc2sxR/OFDNfJtZMzz1/SW67S345JoxrSVHYVm+9vw/9?=
+ =?us-ascii?Q?RFUei2ocNo1fnp1PP0e+BcoarFN8mlhPpBSIFBJaV6iocEmQpkIrC2dDIoRG?=
+ =?us-ascii?Q?44CJfpEKWeDk94fNCnv4m80wYEAbd++TnQaYHskB0V2KbZP3dkwKW7l7FPUM?=
+ =?us-ascii?Q?TAgIJnbMDloYkdfQfb0cgeG5MzJWwQ/RABbyJ5EAgAxL/h25xo1tdmqTBbic?=
+ =?us-ascii?Q?Ke5hpbifyB7Tdb18GK6d/+S7OdAf5wIIUnMqzISUyCb8UOUH5ESd6lnpabGI?=
+ =?us-ascii?Q?qNQYNc0MOo9Yu8HmLl8SvTBizHlTumRKI/rSMUMuY7+g8jCk0Coh3PJNKOZx?=
+ =?us-ascii?Q?A3uXQBkAlFr4KRlo/A6MmyNfjDdch5/w3L+kkA6+?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 15/26] x86/sev: Introduce snp leaked pages list
-To: "Kalra, Ashish" <ashish.kalra@amd.com>,
- Michael Roth <michael.roth@amd.com>, x86@kernel.org
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
- pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
- jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
- slp@redhat.com, pgonda@google.com, peterz@infradead.org,
- srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
- bp@alien8.de, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
- liam.merwick@oracle.com, zhi.a.wang@intel.com
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-16-michael.roth@amd.com>
- <f221ad9d-6fc3-466b-bacf-23986b8655f5@suse.cz>
- <5cdd2093-b007-404d-96a8-89b3aa6e6e4b@amd.com>
-Content-Language: en-US
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <5cdd2093-b007-404d-96a8-89b3aa6e6e4b@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 1F65B21E17
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=qjBrksVJ;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=RY4cswgs
-X-Spam-Score: -4.50
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-4.50 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 R_RATELIMIT(0.00)[to_ip_from(RLisu716frudqkg98kczdd9eac)];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.cz:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_TWELVE(0.00)[37];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6004.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2793b802-64bd-4f70-293b-08dc11bc8519
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jan 2024 09:14:16.4090
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: VrzGh/UEqwmVEbs4dXi4FjsL4SGaq91ggxAqKRYb+uCzUWjBBMY9P7sDH7J2JiWDBNGZmdXpdyr4AYTcT/VPHg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7218
 
-On 1/9/24 23:19, Kalra, Ashish wrote:
-> Hello Vlastimil,
-> 
-> On 1/8/2024 4:45 AM, Vlastimil Babka wrote:
->> On 12/30/23 17:19, Michael Roth wrote:
->>> From: Ashish Kalra <ashish.kalra@amd.com>
->>>
->>> Pages are unsafe to be released back to the page-allocator, if they
->>> have been transitioned to firmware/guest state and can't be reclaimed
->>> or transitioned back to hypervisor/shared state. In this case add
->>> them to an internal leaked pages list to ensure that they are not freed
->>> or touched/accessed to cause fatal page faults.
->>>
->>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->>> [mdr: relocate to arch/x86/virt/svm/sev.c]
->>> Signed-off-by: Michael Roth <michael.roth@amd.com>
->> Hi, sorry I didn't respond in time to the last mail discussing previous
->> version in
->> https://lore.kernel.org/all/8c1fd8da-912a-a9ce-9547-107ba8a450fc@amd.com/
->> due to upcoming holidays.
->>
->> I would rather avoid the approach of allocating container objects:
->> - it's allocating memory when effectively losing memory, a dangerous thing
->> - are all the callers and their context ok with GFP_KERNEL?
->> - GFP_KERNEL_ACCOUNT seems wrong, why would we be charging this to the
->> current process, it's probably not its fault the pages are leaked? Also the
->> charging can fail?
->> - given the benefit of having leaked pages on a list is basically just
->> debugging (i.e. crash dump or drgn inspection) this seems too heavy
->>
->> I think it would be better and sufficient to use page->lru for order-0 and
->> head pages, and simply skip tail pages (possibly with adjusted warning
->> message for that case).
->>
->> Vlastimil
->>
->> <snip
-> 
-> Considering the above thoughts, this is updated version of 
-> snp_leak_pages(), looking forward to any review comments/feedback you 
-> have on the same:
-> 
-> void snp_leak_pages(u64 pfn, unsigned int npages)
-> {
->          struct page *page = pfn_to_page(pfn);
-> 
->          pr_debug("%s: leaking PFN range 0x%llx-0x%llx\n", __func__, 
-> pfn, pfn + npages);
-> 
->          spin_lock(&snp_leaked_pages_list_lock);
->          while (npages--) {
->                  /*
->                   * Reuse the page's buddy list for chaining into the leaked
->                   * pages list. This page should not be on a free list 
-> currently
->                   * and is also unsafe to be added to a free list.
->                   */
->                  if ((likely(!PageCompound(page))) || (PageCompound(page) &&
->                      !PageTail(page) && compound_head(page) == page))
 
-This is unnecessarily paranoid wrt that compound_head(page) test, but OTOH
-doesn't handle the weird case when we're leaking less than whole compound
-page (if that can even happen). So I'd suggest:
+> -----Original Message-----
+> From: Kun Song <Kun.Song@windriver.com>
+> Sent: Wednesday, January 10, 2024 1:56 PM
+> To: Gaurav Jain <gaurav.jain@nxp.com>
+> Cc: Kun.Song@windriver.com; Varun Sethi <V.Sethi@nxp.com>; Aymen Sghaier
+> <aymen.sghaier@nxp.com>; davem@davemloft.net; filip.pudak@windriver.com;
+> heng.guo@windriver.com; herbert@gondor.apana.org.au; Horia Geanta
+> <horia.geanta@nxp.com>; linux-crypto@vger.kernel.org; Meenakshi Aggarwal
+> <meenakshi.aggarwal@nxp.com>; richard.danter@windriver.com
+> Subject: [EXT] RE: [PATCH v5.10.y] crypto: caam/jr - Fix possible caam_jr=
+ crash
+>=20
+> Caution: This is an external email. Please take care when clicking links =
+or
+> opening attachments. When in doubt, report the message using the 'Report =
+this
+> email' button
+>=20
+>=20
+> >Hello SK
+> >
+> >I am submitting and replying patches using gaurav.jain@nxp.com
+> >
+> >In Later kernel versions we have provided fixes related to job ring flus=
+h and
+> there are other changes as well.
+> >It would be better to add these changes on top of 5.10 tree as we also r=
+un
+> multiple tests and not observed this issue.
+> >
+> >Regards
+> >Gaurav Jain
+>=20
+> Hi, Gaurav
+>=20
+> Can you identify which commits?
+> Our version has added some related commits based on 5.10
+> -------------------------------------------------
+> 04ff8e37a2df crypto: caam/jr - add .shutdown hook
+> f7ea4a6a6511 LF-3093-1 crypto: caam/jr - fix caam-keygen exit / clean-up
+> c41daf27fa44 LF-3079 crypto: caam/jr - fix shared IRQ line handling
+> 1f12127de72a MLK-24912-2 crypto: caam - fix RNG vs. hwrng kthread race
+> 04e3a61f9bb5 MLK-24912-1 crypto: caam/jr - update jr_list during
+> suspend/resume f48d9e23262e MLK-24420-3 crypto: caam - add ioctl calls fo=
+r
+> black keys and blobs generation
+> 5c98742fbf60 MLK-24420-2 crypto: caam - add support for black keys and bl=
+obs
+> -------------------------------------------------
 
-while (npages) {
 
-  if ((likely(!PageCompound(page))) || (PageHead(page) && compound_nr(page)
-<= npages))
-	list_add_tail(&page->buddy_list, ...)
-  }
+https://github.com/torvalds/linux/commit/06e39357c36b0d3cc2779d08ed04cb389e=
+aa22ba - drivers: crypto: caam/jr - Allow quiesce when quiesced
+apply this one as well.
 
-  ... (no change from yours)
+>=20
+> But We have no way to port this commit because its architecture has chang=
+ed
+> too much.
+> commit 304a2efe9d55875c6805f3c2957bc39ceebbc5c0
+> crypto: caam/jr - Convert to platform remove callback returning void
 
-  npages--;
-}
+Ok. I think this can be skipped.
 
-(or an equivalent for()) perhaps
+>=20
+>=20
+> On your test enviroment, modify function caam_jr_remove Test scenarios1:
+> if &jrpriv->tfm_count is not zero,whether will crash?
+>=20
+> +atomic_inc(&jrpriv->tfm_count);
+> if (atomic_read(&jrpriv->tfm_count)) {
 
->                          /*
->                           * Skip inserting tail pages of compound page as
->                           * page->buddy_list of tail pages is not usable.
->                           */
->                          list_add_tail(&page->buddy_list, 
-> &snp_leaked_pages_list);
->                  sev_dump_rmpentry(pfn);
->                  snp_nr_leaked_pages++;
->                  pfn++;
->                  page++;
->          }
->          spin_unlock(&snp_leaked_pages_list_lock);
-> }
-> 
-> Thanks, Ashish
-> 
+This way jobring flush operation will not be triggered and reusing jobring =
+result in error.
 
+>=20
+>=20
+> Thanks!
+> BR/SK
