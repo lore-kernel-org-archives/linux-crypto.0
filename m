@@ -1,51 +1,51 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281BDE545
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 08:19:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A8914F65
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 08:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Acs4L3C0"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3366ddd1eddso4461762f8f.0
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 00:19:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZS1OmduY"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ccae380df2so54426331fa.1
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 00:20:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704961153; x=1705565953; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704961255; x=1705566055; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+4qHeI/z66hlwEDi1tGbM9yP5c2kAe5foIFfSXCRpNE=;
-        b=Acs4L3C0LJCQLHKxWGFp+PX345K3pSmxATroorgT2qmm79NFUkUSS/TFbE2EwkhkNz
-         t9wkPUTBQJOLNKDK+CNRJ5E88Q7d7GtW8G45tWjj7oyUXH9bVzNEaHdswJmRfooq/V2v
-         Ok48a9YU/eLPVYP31FpdQs/9T7hS+iUZPMyYeIdO3RIpkvL9VITgNErhLNn/9nddGltR
-         B5zkNCsRZWadK8sNy2NpQLkZBYPEXiORnUCGnVCtC89yX4UdB46RgG6chX+CYT+X1IWr
-         3km14UcpQjtxej9NMtoKUsSUvb2vn+QX7rIb0l3MqKm85dWJq1IzXtwgEvmJdWrTA98b
-         byFw==
+        bh=d8H8nLABIrRnbxfnMrbAUP0DbCSuPWhYrIfqcQ3RIvA=;
+        b=ZS1OmduYEkt0hjV0F4lF/uVpcmcUH5Viug7Zo3DZ/z/QruqatBbUn+3iLwXdIy2U4c
+         LFK5RukWXRzIlMzZRG+o+Ry2/GY960VKJTPeb/ED/0+UrsJhsfA09ala2yhrxgZcZ/rY
+         whEsOp/Fuxflfggl/EC3ky2veC6JB2RlFMjmCq3apMOfPso0nMEdgK9MPcjUPDk9Xgt3
+         QCMOC8dlyQNuH8H5xhRchROJ/9eliOpf0Hx2w5uqLW2yf8kWA67HyftZRg2Ve2AwAHwT
+         rEUTI+ohR5Zkvsevh4BklP5r8Ztm/80bO1uzE7u+7YPgkZwiSV9lQrlh1DGE34ubltU9
+         ISRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704961153; x=1705565953;
+        d=1e100.net; s=20230601; t=1704961255; x=1705566055;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=+4qHeI/z66hlwEDi1tGbM9yP5c2kAe5foIFfSXCRpNE=;
-        b=ofzczRHDfytc/PZxWKhg6jWfZJncY2YP/dc708ZWLLD3CSVwIGeywDu3IO0RV+U7aq
-         5VBRyEh3TPfGTM0XCs1n4LxnK/SAaWewHl6HgBEgqSTOEsT0kfteAoTbQljyLBp55+dZ
-         mGXWGdZYsfi8kGQf0MPekr8rxJS/j9SgHA7VLS+BHX9DXGNzO/3tzy7gm1oF597a0xef
-         SEVJDo5OGwFM7uz07n8kbJFZgv6TaGCdTEafUOP0+ItmtXJoXS/jJnxQcP9UF6E3LFNP
-         Wcykt+kty9eYK5ZPkZnei+LX2sjOdPZdHz6M/Q2u63VoGYzVLVtsOKWZmVRij9w8xr8g
-         zBwA==
-X-Gm-Message-State: AOJu0Yyt8ydYq8lI0jPbY1q37sipZRIiWeC5SCRFDlBa6e2PVibjDBja
-	4JIgU922JOFYz6LE61t/Nmd2qH6KF1LDnQ==
-X-Google-Smtp-Source: AGHT+IG1MXGBZm+5oHqUHBJdJ1Gjre9hhkiIT+3tfrKpHjQyQgK7AuNU3ufYjUEJBIcpbc9DMxgMRg==
-X-Received: by 2002:adf:ed4e:0:b0:336:4bbc:72e4 with SMTP id u14-20020adfed4e000000b003364bbc72e4mr189239wro.81.1704961153283;
-        Thu, 11 Jan 2024 00:19:13 -0800 (PST)
+        bh=d8H8nLABIrRnbxfnMrbAUP0DbCSuPWhYrIfqcQ3RIvA=;
+        b=TmFFW6fBiSGEjvwyHU5jSdlOIz/34TpVi+S1U0q48DGxVpanW4+aSn+eOOFIWfCr2m
+         Ul5UaXi8TnIg96YmX0u0FSxtcRo687nldM7d2G7H3ctnCDJgPNPqTfIfTI4EOjDBth/1
+         L3AdMdrK6TRkqGgKyqKu1Ch/l+odpRjhFk/40EFCXxnpFjzOe5mnKUTlH6ivl8K6RPzG
+         wgBdMQvDAwOKqz61uVAL1qva7lHcOl7T4uG18bza2VlL5dyPRExzfclTmvBUdsLw2bBW
+         zPUAHh2Wwz6DizhtGkxQPf2xRMc5YCZBhEgqVgycwDNeEeeswijYJBYWRMWxhGv8XPeL
+         y6nQ==
+X-Gm-Message-State: AOJu0YxMFE0JyuVps5+8Cgm4qqGKmoAaEukVHqTtYxMwT3yTCw4AXi29
+	wEAoBOesr6HCgm+RKRcXENFcxv4ENWtf1g==
+X-Google-Smtp-Source: AGHT+IHFIdzzA8pDHnJscKixDdClY522jcwFHATS2Aupj39MBfjX5t+c8qexSW8CJXjpE5qrRmvjLw==
+X-Received: by 2002:a2e:9209:0:b0:2cc:daca:2e81 with SMTP id k9-20020a2e9209000000b002ccdaca2e81mr138241ljg.15.1704961255185;
+        Thu, 11 Jan 2024 00:20:55 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:982:cbb0:a5aa:e466:ae57:5a26? ([2a01:e0a:982:cbb0:a5aa:e466:ae57:5a26])
-        by smtp.gmail.com with ESMTPSA id x18-20020adfffd2000000b003377680c55bsm555821wrs.16.2024.01.11.00.19.12
+        by smtp.gmail.com with ESMTPSA id j27-20020adfb31b000000b00336e32338f3sm550474wrd.70.2024.01.11.00.20.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jan 2024 00:19:12 -0800 (PST)
-Message-ID: <b2caf65d-4bc8-4e16-b4db-b24006e3dce6@linaro.org>
-Date: Thu, 11 Jan 2024 09:19:11 +0100
+        Thu, 11 Jan 2024 00:20:54 -0800 (PST)
+Message-ID: <8bc3b9e3-3623-41fa-a269-c0f439aee1b5@linaro.org>
+Date: Thu, 11 Jan 2024 09:20:53 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,8 +55,8 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: neil.armstrong@linaro.org
 Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH v1 00/24] Support more Amlogic SoC families in crypto
- driver
+Subject: Re: [PATCH v1 02/24] drivers: crypto: meson: make CLK controller
+ optional
 Content-Language: en-US, fr
 To: Alexey Romanov <avromanov@salutedevices.com>, narmstrong@baylibre.com,
  clabbe@baylibre.com, herbert@gondor.apana.org.au, davem@davemloft.net,
@@ -64,8 +64,10 @@ To: Alexey Romanov <avromanov@salutedevices.com>, narmstrong@baylibre.com,
  khilman@baylibre.com, jbrunet@baylibre.com, artin.blumenstingl@googlemail.com
 Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
  linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
+ linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com,
+ Jan Dakinevich <yvdakinevich@salutedevices.com>
 References: <20240110201216.18016-1-avromanov@salutedevices.com>
+ <20240110201216.18016-3-avromanov@salutedevices.com>
 Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
  GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
@@ -91,77 +93,61 @@ Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
  QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
 Organization: Linaro Developer Services
-In-Reply-To: <20240110201216.18016-1-avromanov@salutedevices.com>
+In-Reply-To: <20240110201216.18016-3-avromanov@salutedevices.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi !
-
 On 10/01/2024 21:11, Alexey Romanov wrote:
-> Hello!
-> 
-> This patchset expand the funcionality of the Amlogic
-> crypto driver by adding support for more SoC families:
-> AXG, G12A, G12B, SM1, A1, S4.
-> 
-> Also specify and enable crypto node in device tree
-> for reference Amlogic devices.
-> 
-> Tested on AXG, G12A/B, SM1, A1 and S4 devices via
-> custom tests and trcypt module.
+> Not all Amlogic SoC's uses CLK controller.
 
-Thanks a lot for the patchset, it's very welcome!
+In this case you must make clocks not required for the new platforms in the bindings.
 
-Could you provide some procedure used to test and test dumps for all the platforms, like `cryptsetup benchmark` or a summary of tcrypt tests output ?
-
-Thanks,
 Neil
 
 > 
-> Alexey Romanov (17):
->    drivers: crypto: meson: don't hardcode IRQ count
->    drivers: crypto: meson: make CLK controller optional
->    drviers: crypto: meson: add platform data
->    drivers: crypto: meson: add MMIO helpers
->    drivers: crypto: meson: move get_engine_number()
->    drivers: crypto: meson: use fallback for 192-bit keys
->    drivers: crypto: meson: add support for G12-series
->    drivers: crypto: meson: add support for AXG-series
->    dt-bindings: crypto: meson: add new compatibles
->    arch: arm64: dts: meson: a1: add crypto node
->    arch: arm64: dts: meson: s4: add crypto node
->    arch: arm64: dts: meson: g12: add crypto node
->    arch: arm64: dts: meson: axg: add crypto node
->    arch: arm64: dts: meson: s4-s805x2-aq222: enable crypto node
->    arch: arm64: dts: meson: a1-ad401: enable crypto node
->    arch: arm64: dts: meson: axg-s400: enable crypto node
->    arch: arm64: dts: meson: g12a-u200: enable crypto node
+> Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
+> Signed-off-by: Jan Dakinevich <yvdakinevich@salutedevices.com>
+> ---
+>   drivers/crypto/amlogic/amlogic-gxl-core.c | 12 ++----------
+>   1 file changed, 2 insertions(+), 10 deletions(-)
 > 
-> Jan Dakinevich (7):
->    drivers: crypto: meson: drop status field from meson_flow
->    drivers: crypto: meson: move algs definition and cipher API to
->      cipher.c
->    drivers: crypto: meson: cleanup defines
->    drivers: crypto: meson: process more than MAXDESCS descriptors
->    drivers: crypto: meson: avoid kzalloc in engine thread
->    drivers: crypto: meson: introduce hasher
->    drivers: crypto: meson: add support for AES-CTR
-> 
->   .../bindings/crypto/amlogic,gxl-crypto.yaml   |   2 +
->   .../arm64/boot/dts/amlogic/meson-a1-ad401.dts |   4 +
->   arch/arm64/boot/dts/amlogic/meson-a1.dtsi     |   8 +
->   .../arm64/boot/dts/amlogic/meson-axg-s400.dts |   4 +
->   arch/arm64/boot/dts/amlogic/meson-axg.dtsi    |   7 +
->   .../boot/dts/amlogic/meson-g12-common.dtsi    |   7 +
->   .../boot/dts/amlogic/meson-g12a-u200.dts      |   4 +
->   .../dts/amlogic/meson-s4-s805x2-aq222.dts     |   4 +
->   arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |   7 +
->   drivers/crypto/amlogic/Makefile               |   2 +-
->   drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 591 ++++++++++++------
->   drivers/crypto/amlogic/amlogic-gxl-core.c     | 260 ++++----
->   drivers/crypto/amlogic/amlogic-gxl-hasher.c   | 448 +++++++++++++
->   drivers/crypto/amlogic/amlogic-gxl.h          | 116 +++-
->   14 files changed, 1135 insertions(+), 329 deletions(-)
->   create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
-> 
+> diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
+> index a5df061f9890..e5f504fb477e 100644
+> --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
+> +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+> @@ -248,16 +248,10 @@ static int meson_crypto_probe(struct platform_device *pdev)
+>   		dev_err(&pdev->dev, "Cannot request MMIO err=%d\n", err);
+>   		return err;
+>   	}
+> -	mc->busclk = devm_clk_get(&pdev->dev, "blkmv");
+> +	mc->busclk = devm_clk_get_optional_enabled(&pdev->dev, "blkmv");
+>   	if (IS_ERR(mc->busclk)) {
+>   		err = PTR_ERR(mc->busclk);
+> -		dev_err(&pdev->dev, "Cannot get core clock err=%d\n", err);
+> -		return err;
+> -	}
+> -
+> -	err = clk_prepare_enable(mc->busclk);
+> -	if (err != 0) {
+> -		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
+> +		dev_err(&pdev->dev, "Cannot get and enable core clock err=%d\n", err);
+>   		return err;
+>   	}
+>   
+> @@ -279,7 +273,6 @@ static int meson_crypto_probe(struct platform_device *pdev)
+>   	meson_unregister_algs(mc);
+>   error_flow:
+>   	meson_free_chanlist(mc, mc->flow_cnt - 1);
+> -	clk_disable_unprepare(mc->busclk);
+>   	return err;
+>   }
+>   
+> @@ -295,7 +288,6 @@ static int meson_crypto_remove(struct platform_device *pdev)
+>   
+>   	meson_free_chanlist(mc, mc->flow_cnt - 1);
+>   
+> -	clk_disable_unprepare(mc->busclk);
+>   	return 0;
+>   }
+>   
 
