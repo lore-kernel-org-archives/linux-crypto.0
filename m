@@ -1,51 +1,51 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6308EAC5
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 08:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281BDE545
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 08:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FmTCRzPy"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40e5afc18f5so8621375e9.3
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 00:16:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Acs4L3C0"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3366ddd1eddso4461762f8f.0
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 00:19:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704960962; x=1705565762; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704961153; x=1705565953; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ucZYjQafMIKHoLE/R0AnbQMYTAjIxNebYPWwbqvXZWA=;
-        b=FmTCRzPy44n6ROdW4WY8EvwDwrmrzFeOt3B2Pt6QcddPjY2mxTFYuR8B5RQ310t+vH
-         43D95wA0ytFQ8UjyR9vIceJqM2KW2asaaBesFLsELTFqb7DNPNFXqraY5Ql6T/0SniBU
-         J83dkePVATvUD0fsE386p6eWLpUOdTebTjN6d8uz60MoU9wkp7RPvtQJ0HO4XSjXQbi4
-         zY081izGcXNOW1rawUscc3J6MDjsEXLVDI+zcb+cQfQgSlpH94Fz8QIDcp9QGGzPZ+2f
-         w7oHX0eu1xJI3DehReXp79qw0rOlxuN+b+dN4xu5gmli1K5leJZ0Kc7xDl7GtZ1lQojH
-         wb/w==
+        bh=+4qHeI/z66hlwEDi1tGbM9yP5c2kAe5foIFfSXCRpNE=;
+        b=Acs4L3C0LJCQLHKxWGFp+PX345K3pSmxATroorgT2qmm79NFUkUSS/TFbE2EwkhkNz
+         t9wkPUTBQJOLNKDK+CNRJ5E88Q7d7GtW8G45tWjj7oyUXH9bVzNEaHdswJmRfooq/V2v
+         Ok48a9YU/eLPVYP31FpdQs/9T7hS+iUZPMyYeIdO3RIpkvL9VITgNErhLNn/9nddGltR
+         B5zkNCsRZWadK8sNy2NpQLkZBYPEXiORnUCGnVCtC89yX4UdB46RgG6chX+CYT+X1IWr
+         3km14UcpQjtxej9NMtoKUsSUvb2vn+QX7rIb0l3MqKm85dWJq1IzXtwgEvmJdWrTA98b
+         byFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704960962; x=1705565762;
+        d=1e100.net; s=20230601; t=1704961153; x=1705565953;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=ucZYjQafMIKHoLE/R0AnbQMYTAjIxNebYPWwbqvXZWA=;
-        b=lq2BjBuH7l3GCrUESRp4ya6zC9HCfmcKg7WBET5TgGXah2dkkmMhedjkz7aOrlRFje
-         HR/Rtb0EpFoQbc4+t2Vp3zlrfR/lCOioaJXlnNI/yx+zY0xgPPwJv8yAoq5+5Hs+Rmwe
-         3/dA5Ev7EKWnKzMEjrc9P7Gh8CCPBpo//tHhLWmx5zcDbRiE8B6zKpaJMpvDKg6TfqlP
-         RURNpSGKeISUKENGV5zHeFgPZd7ChZQvaQ7UDlYHWPSjbx24oiCKS3oxmvkaG42nsT8Y
-         Da0J8gwKRePGCg2o8/DZSilUrvRNuX77HEMXtQ95L925/VALjh/KFuEQEyxgui+k8V3i
-         WbQA==
-X-Gm-Message-State: AOJu0Yw3bftGgh8qAmlKjX4qNJX51JPVZd0e37k7rWO5Y05HQ3VU8RKG
-	zVCLV97WxumWuLYY+ew1TwBtdJgebjPr7A==
-X-Google-Smtp-Source: AGHT+IH87WgS1yK9VKo2iOZzHy0Ibve5OOd1/gKkKchhicjR8afbKzVMmi3wCXF9AUr8mS7ZTrYrTw==
-X-Received: by 2002:a05:600c:5199:b0:40e:61ff:1d52 with SMTP id fa25-20020a05600c519900b0040e61ff1d52mr16310wmb.128.1704960962098;
-        Thu, 11 Jan 2024 00:16:02 -0800 (PST)
+        bh=+4qHeI/z66hlwEDi1tGbM9yP5c2kAe5foIFfSXCRpNE=;
+        b=ofzczRHDfytc/PZxWKhg6jWfZJncY2YP/dc708ZWLLD3CSVwIGeywDu3IO0RV+U7aq
+         5VBRyEh3TPfGTM0XCs1n4LxnK/SAaWewHl6HgBEgqSTOEsT0kfteAoTbQljyLBp55+dZ
+         mGXWGdZYsfi8kGQf0MPekr8rxJS/j9SgHA7VLS+BHX9DXGNzO/3tzy7gm1oF597a0xef
+         SEVJDo5OGwFM7uz07n8kbJFZgv6TaGCdTEafUOP0+ItmtXJoXS/jJnxQcP9UF6E3LFNP
+         Wcykt+kty9eYK5ZPkZnei+LX2sjOdPZdHz6M/Q2u63VoGYzVLVtsOKWZmVRij9w8xr8g
+         zBwA==
+X-Gm-Message-State: AOJu0Yyt8ydYq8lI0jPbY1q37sipZRIiWeC5SCRFDlBa6e2PVibjDBja
+	4JIgU922JOFYz6LE61t/Nmd2qH6KF1LDnQ==
+X-Google-Smtp-Source: AGHT+IG1MXGBZm+5oHqUHBJdJ1Gjre9hhkiIT+3tfrKpHjQyQgK7AuNU3ufYjUEJBIcpbc9DMxgMRg==
+X-Received: by 2002:adf:ed4e:0:b0:336:4bbc:72e4 with SMTP id u14-20020adfed4e000000b003364bbc72e4mr189239wro.81.1704961153283;
+        Thu, 11 Jan 2024 00:19:13 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:982:cbb0:a5aa:e466:ae57:5a26? ([2a01:e0a:982:cbb0:a5aa:e466:ae57:5a26])
-        by smtp.gmail.com with ESMTPSA id o21-20020a05600c4fd500b0040e34ca648bsm955660wmq.0.2024.01.11.00.16.01
+        by smtp.gmail.com with ESMTPSA id x18-20020adfffd2000000b003377680c55bsm555821wrs.16.2024.01.11.00.19.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jan 2024 00:16:01 -0800 (PST)
-Message-ID: <2fcf851c-a39a-4471-a705-6bfe9f4b975e@linaro.org>
-Date: Thu, 11 Jan 2024 09:16:01 +0100
+        Thu, 11 Jan 2024 00:19:12 -0800 (PST)
+Message-ID: <b2caf65d-4bc8-4e16-b4db-b24006e3dce6@linaro.org>
+Date: Thu, 11 Jan 2024 09:19:11 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,7 +55,8 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: neil.armstrong@linaro.org
 Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH v1 17/24] arch: arm64: dts: meson: a1: add crypto node
+Subject: Re: [PATCH v1 00/24] Support more Amlogic SoC families in crypto
+ driver
 Content-Language: en-US, fr
 To: Alexey Romanov <avromanov@salutedevices.com>, narmstrong@baylibre.com,
  clabbe@baylibre.com, herbert@gondor.apana.org.au, davem@davemloft.net,
@@ -65,7 +66,6 @@ Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
  linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
 References: <20240110201216.18016-1-avromanov@salutedevices.com>
- <20240110201216.18016-18-avromanov@salutedevices.com>
 Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
  GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
@@ -91,44 +91,77 @@ Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
  QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
 Organization: Linaro Developer Services
-In-Reply-To: <20240110201216.18016-18-avromanov@salutedevices.com>
+In-Reply-To: <20240110201216.18016-1-avromanov@salutedevices.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+Hi !
+
 On 10/01/2024 21:11, Alexey Romanov wrote:
-> This patch adds a crypto node declaration. With the
-> Amlogic crypto driver we can use HW implementation
-> of SHA1/224/256 and AES algo.
+> Hello!
 > 
-> Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
-> ---
->   arch/arm64/boot/dts/amlogic/meson-a1.dtsi | 8 ++++++++
->   1 file changed, 8 insertions(+)
+> This patchset expand the funcionality of the Amlogic
+> crypto driver by adding support for more SoC families:
+> AXG, G12A, G12B, SM1, A1, S4.
 > 
-> diff --git a/arch/arm64/boot/dts/amlogic/meson-a1.dtsi b/arch/arm64/boot/dts/amlogic/meson-a1.dtsi
-> index cf150f568335..879e0ce0b2ea 100644
-> --- a/arch/arm64/boot/dts/amlogic/meson-a1.dtsi
-> +++ b/arch/arm64/boot/dts/amlogic/meson-a1.dtsi
-> @@ -653,6 +653,14 @@ sd_emmc: sd@10000 {
->   				power-domains = <&pwrc PWRC_SD_EMMC_ID>;
->   				status = "disabled";
->   			};
-> +
-> +			crypto: crypto@6000 {
-> +				compatible = "amlogic,g12a-crypto";
-> +				reg = <0x0 0x6000 0x0 0x48>;
-> +				interrupts = <GIC_SPI 120 IRQ_TYPE_EDGE_RISING>;
-> +				power-domains = <&pwrc PWRC_DMA_ID>;
-> +				status = "disabled";
+> Also specify and enable crypto node in device tree
+> for reference Amlogic devices.
+> 
+> Tested on AXG, G12A/B, SM1, A1 and S4 devices via
+> custom tests and trcypt module.
 
-Why disabled ? Usually we always leave the embedded HW enabled by default.
+Thanks a lot for the patchset, it's very welcome!
 
-The comment is valid for the other dtsi changes,
+Could you provide some procedure used to test and test dumps for all the platforms, like `cryptsetup benchmark` or a summary of tcrypt tests output ?
 
+Thanks,
 Neil
 
-> +			};
->   		};
->   
->   		usb: usb@fe004400 {
+> 
+> Alexey Romanov (17):
+>    drivers: crypto: meson: don't hardcode IRQ count
+>    drivers: crypto: meson: make CLK controller optional
+>    drviers: crypto: meson: add platform data
+>    drivers: crypto: meson: add MMIO helpers
+>    drivers: crypto: meson: move get_engine_number()
+>    drivers: crypto: meson: use fallback for 192-bit keys
+>    drivers: crypto: meson: add support for G12-series
+>    drivers: crypto: meson: add support for AXG-series
+>    dt-bindings: crypto: meson: add new compatibles
+>    arch: arm64: dts: meson: a1: add crypto node
+>    arch: arm64: dts: meson: s4: add crypto node
+>    arch: arm64: dts: meson: g12: add crypto node
+>    arch: arm64: dts: meson: axg: add crypto node
+>    arch: arm64: dts: meson: s4-s805x2-aq222: enable crypto node
+>    arch: arm64: dts: meson: a1-ad401: enable crypto node
+>    arch: arm64: dts: meson: axg-s400: enable crypto node
+>    arch: arm64: dts: meson: g12a-u200: enable crypto node
+> 
+> Jan Dakinevich (7):
+>    drivers: crypto: meson: drop status field from meson_flow
+>    drivers: crypto: meson: move algs definition and cipher API to
+>      cipher.c
+>    drivers: crypto: meson: cleanup defines
+>    drivers: crypto: meson: process more than MAXDESCS descriptors
+>    drivers: crypto: meson: avoid kzalloc in engine thread
+>    drivers: crypto: meson: introduce hasher
+>    drivers: crypto: meson: add support for AES-CTR
+> 
+>   .../bindings/crypto/amlogic,gxl-crypto.yaml   |   2 +
+>   .../arm64/boot/dts/amlogic/meson-a1-ad401.dts |   4 +
+>   arch/arm64/boot/dts/amlogic/meson-a1.dtsi     |   8 +
+>   .../arm64/boot/dts/amlogic/meson-axg-s400.dts |   4 +
+>   arch/arm64/boot/dts/amlogic/meson-axg.dtsi    |   7 +
+>   .../boot/dts/amlogic/meson-g12-common.dtsi    |   7 +
+>   .../boot/dts/amlogic/meson-g12a-u200.dts      |   4 +
+>   .../dts/amlogic/meson-s4-s805x2-aq222.dts     |   4 +
+>   arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |   7 +
+>   drivers/crypto/amlogic/Makefile               |   2 +-
+>   drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 591 ++++++++++++------
+>   drivers/crypto/amlogic/amlogic-gxl-core.c     | 260 ++++----
+>   drivers/crypto/amlogic/amlogic-gxl-hasher.c   | 448 +++++++++++++
+>   drivers/crypto/amlogic/amlogic-gxl.h          | 116 +++-
+>   14 files changed, 1135 insertions(+), 329 deletions(-)
+>   create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
+> 
 
