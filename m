@@ -1,50 +1,50 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6425E10962
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 09:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2582014A98
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 09:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i9rUgT1Z"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a2c29418ad5so98604566b.0
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 01:29:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xhbOqDX1"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a28d61ba65eso576576366b.3
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 01:31:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704965397; x=1705570197; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zI8aOKoY1J1LzQGBJCecKcYIvB4FJqN1IGqRzkcldyQ=;
-        b=i9rUgT1ZEzcGgBtvzCddhCA61kOfq5KEeaXh68BGqZtpTCAxM5/65iNYXgoHSmMLPm
-         nxNTcZxBX+Ctx1thUv3gDNnpZxtqJBu+a0iVymZyPYLgUNH4j4YQwz8UmAr/uHdJtm5V
-         9HMaUgQGflQPc+uNuG2cBG4PMoxu5yshzXgi0JUL+72oxelikabHBmn3qrMvDIZWKjT1
-         xp4suj488nlwwHVDi8po3lwVD7WJQV3/XJRmmuIctjmUm/+NuvmYNXKWh4NlFJo/fZ/G
-         ZSi5dpk2mEYgwDjqcySE3e1sYjgS/2vDiMFlRPuNmcPwU7eX3L+Q+AH3vjzaNIVJLC5w
-         4pSw==
+        d=linaro.org; s=google; t=1704965474; x=1705570274; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
+         :from:content-language:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Eor6lImS7ySePlUmbye/lNdlPbDxWcSpzNk/0V1lmvk=;
+        b=xhbOqDX1gcf+xuQdqaFkzKm3nkB6C5TFHK7Ffkt9MTSEAxytdHiJK4/a2WY1mKTCcC
+         vDfNt8+9bM72vSOb+pZx3Gu/RsHJljwMqaWYYaGL4OXk/BpK83loZ8keX8QJxdr8rXWF
+         AWMO3CUSPMpRIvW3wi4EIkhJp8BtiaHCrzuplK26kCnlBj9eXNVc/qIWPk0vnWIIpiFu
+         vTOm84cPWDy0RTWLwD1e6QS6dEivAhc8PxiGMa16sSrdsokCgHsiIkHuvSoHwgB9DmRR
+         lD+BU7mFTF2uKfrwTSJj2q5CNFw6tw4TMQgDgyNYfRgDd2O0u+/itA5A7fXwAnrjBkSv
+         avzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704965397; x=1705570197;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zI8aOKoY1J1LzQGBJCecKcYIvB4FJqN1IGqRzkcldyQ=;
-        b=UWFaQQ2QutV7TBNgPyq/VZhqENBDqHrLr8Ozi1L1zZUwl0qcvy9RZyqD1UwYg9Y8wi
-         DExeLTp7fQ+dSYxoj2kDBKUgLHgUiQ9MlzyIsn6UbhqNx8deUPzAoz8wmrZBCYRZ28pb
-         WsSc4zNwJPdx05p9FrEVVDUH3SLHZifjHnKE7SKWI2zcGaM6bQw4adMUC/af9wEfAw49
-         DrEu8dpQRaQ1nIKgiiICFbHHrbAFGzLOCI0UUcAgtZTgxvz6Q8ECZvspemwEA5go0kSD
-         Y75LgO+5kTO9pHx5G3f+6p3SAVBEr77hWdapGLJ4VaMuj9+sJNYzvkZxqACMdK4WymUw
-         bryg==
-X-Gm-Message-State: AOJu0YwTYFP4+jI1vOTrW7bEqKQuaOaO61KIvCBW3e8PRzM5E7Hnntrq
-	hKWWsO3YQd1jI/nMZvF5ZcWNeh/pyOoFYA==
-X-Google-Smtp-Source: AGHT+IFmJvC4h8dnnPMKN5HoXLRJV8fo6ByPAMiPWXQlUHuh1MZAApTAIIIoZ7IAwmgZNLXXFThv7A==
-X-Received: by 2002:a17:907:9346:b0:a29:335f:4248 with SMTP id bv6-20020a170907934600b00a29335f4248mr481321ejc.45.1704965397637;
-        Thu, 11 Jan 2024 01:29:57 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704965474; x=1705570274;
+        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
+         :from:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Eor6lImS7ySePlUmbye/lNdlPbDxWcSpzNk/0V1lmvk=;
+        b=hbiyimbKyyBviN/k8eYNUtTkkiaTBHUedigNXzRW8YJLynbr98M2Oa66T4U9ES3S8c
+         TMJGRSMyeyP4ZXDfQiYDvdhn+d/x7UW7eIjR7c+4NGaXBlaCy2BQtjPQo8fgH8aMdD0x
+         WWEgPle/snkCCZCmr8DKg2LAsIg+tebkGqpte5NzsVKEjj+o8UaXr8qmbgybBdpyRY2p
+         hM5FsMyA4eeXlG02Asj7g+yHKvvzBimB///MfK07l6le10a/DguezGqoX0fUwAkEllIm
+         SaO8rU/cbq+NhlrlvsskZ9YnHjucB/eS1WFWIlqW1CXDScAk5V2wXQ0qF7RqCacyRZFO
+         Teww==
+X-Gm-Message-State: AOJu0YzpdJQgnuNUncUqgyFm8d/8RKDoZLVdLdbfvKliPTFU/0xRQKag
+	YLeyBXcf7hl0SnYkbegf3xWBEHwBfk35nw==
+X-Google-Smtp-Source: AGHT+IGD9nTnB2PCUwRoN7P9hfHTaak6Rf6N5a7I+i6QTcDjkE0MZWvuwl97F/xmIbbqjFd1l3G8BA==
+X-Received: by 2002:a17:906:2459:b0:a2b:643:322 with SMTP id a25-20020a170906245900b00a2b06430322mr243390ejb.138.1704965474275;
+        Thu, 11 Jan 2024 01:31:14 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.223.112])
-        by smtp.gmail.com with ESMTPSA id b4-20020a170906150400b00a2a37f63216sm353336ejd.171.2024.01.11.01.29.54
+        by smtp.gmail.com with ESMTPSA id b4-20020a170906150400b00a2a37f63216sm353336ejd.171.2024.01.11.01.31.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jan 2024 01:29:56 -0800 (PST)
-Message-ID: <910736a3-069f-430c-ba6c-221777ddcda2@linaro.org>
-Date: Thu, 11 Jan 2024 10:29:53 +0100
+        Thu, 11 Jan 2024 01:31:13 -0800 (PST)
+Message-ID: <039a4223-3412-415e-a5e6-c5dca53c96e1@linaro.org>
+Date: Thu, 11 Jan 2024 10:31:11 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,6 +54,8 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v1 00/24] Support more Amlogic SoC families in crypto
  driver
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 To: Alexey Romanov <avromanov@salutedevices.com>,
  Corentin Labbe <clabbe.montjoie@gmail.com>
 Cc: "narmstrong@baylibre.com" <narmstrong@baylibre.com>,
@@ -75,8 +77,7 @@ Cc: "narmstrong@baylibre.com" <narmstrong@baylibre.com>,
  <linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
 References: <20240110201216.18016-1-avromanov@salutedevices.com>
  <ZZ8HP7dJgVaZLMw5@Red> <20240111091840.7fe4lqx225rdlwly@cab-wsm-0029881>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+ <910736a3-069f-430c-ba6c-221777ddcda2@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
  cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
@@ -121,37 +122,41 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240111091840.7fe4lqx225rdlwly@cab-wsm-0029881>
+In-Reply-To: <910736a3-069f-430c-ba6c-221777ddcda2@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/01/2024 10:18, Alexey Romanov wrote:
-> Hello!
-> 
-> On Wed, Jan 10, 2024 at 10:08:15PM +0100, Corentin Labbe wrote:
->> Le Wed, Jan 10, 2024 at 11:11:16PM +0300, Alexey Romanov a 'ecrit :
->>> Hello!
->>>
->>> This patchset expand the funcionality of the Amlogic
->>> crypto driver by adding support for more SoC families: 
->>> AXG, G12A, G12B, SM1, A1, S4.
->>>
->>> Also specify and enable crypto node in device tree
->>> for reference Amlogic devices.
->>>
->>> Tested on AXG, G12A/B, SM1, A1 and S4 devices via
->>> custom tests and trcypt module.
+On 11/01/2024 10:29, Krzysztof Kozlowski wrote:
+> On 11/01/2024 10:18, Alexey Romanov wrote:
+>> Hello!
 >>
->> Hello
+>> On Wed, Jan 10, 2024 at 10:08:15PM +0100, Corentin Labbe wrote:
+>>> Le Wed, Jan 10, 2024 at 11:11:16PM +0300, Alexey Romanov a 'ecrit :
+>>>> Hello!
+>>>>
+>>>> This patchset expand the funcionality of the Amlogic
+>>>> crypto driver by adding support for more SoC families: 
+>>>> AXG, G12A, G12B, SM1, A1, S4.
+>>>>
+>>>> Also specify and enable crypto node in device tree
+>>>> for reference Amlogic devices.
+>>>>
+>>>> Tested on AXG, G12A/B, SM1, A1 and S4 devices via
+>>>> custom tests and trcypt module.
+>>>
+>>> Hello
+>>>
+>>> Thanks for your patch series.
+>>> Unfortunatly, I fail to apply it for testing on top of linux-next.
+>>> On top of which tree did you have tested ?
 >>
->> Thanks for your patch series.
->> Unfortunatly, I fail to apply it for testing on top of linux-next.
->> On top of which tree did you have tested ?
+>> We use 6.5-rc3.
 > 
-> We use 6.5-rc3.
+> Don't develop on old trees... I mean, internally you can do whatever you
+> wish, but don't work upstream on such trees.
 
-Don't develop on old trees... I mean, internally you can do whatever you
-wish, but don't work upstream on such trees.
+Number of email bounces also prove the point: you did not Cc right
+people due to work on some ancient files.
 
 Best regards,
 Krzysztof
