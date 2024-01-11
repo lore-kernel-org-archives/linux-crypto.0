@@ -1,71 +1,97 @@
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2914EB28;
-	Thu, 11 Jan 2024 16:35:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFFE0487AC
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 16:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="M+1hxecl"
-Received: from localhost (unknown [IPv6:2601:280:5e00:7e19::646])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bcieYNXp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704991338;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=VqrInYkNLx1NtjOqgVxpVM91IYukVc31dOGwzdzlGfI=;
+	b=bcieYNXpRqMoVNkm5HaKE8DRiwDcnBbtKQmpOY/4l52X36j3lpwsLwGUK1K9MKDAW7tpTk
+	8cfbv1g58trjOLTM4/bLPknjsIkWkY3icH3yH6l6YlIn78ihO80hL58P1b2LhZlLyt7fZR
+	QgX8CaXfIEsS4DZsBQls5sMwQ0GW/Xc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-522-UpLrGVGfMfWuXurDF-TKjw-1; Thu, 11 Jan 2024 11:42:13 -0500
+X-MC-Unique: UpLrGVGfMfWuXurDF-TKjw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 5DDDF5CC;
-	Thu, 11 Jan 2024 16:35:32 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 5DDDF5CC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1704990932; bh=lxbMwgaCj5UW1Y/FCB9H2dwcciiTULw8Q9ix+lEkNWU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=M+1hxecl7+TX+LPT0Z9uLpMngKCfvyA9Vek4D0wR8CNCZwKf0IDHq/oucYrB1HVON
-	 xia15KL6dbRzy6szG3nr6Lb2oM1/e+1DMxcaC/ctnEgE/voj1Lw0KY9rhLa0zLACBA
-	 zPmBjs6twVEWbAOX5kV5r9/BcgapR7KM9BWxmefo0Bf6qOZbDtDqYsXIOSMlBHRmGr
-	 /FgmTsDGgFMrRnKoVgzZ7fGxI45BfPrHwCeRoM1oIUdruCQaCyJxpInEyjd1gvdXyi
-	 0q/BtjdRGhrGe9J6Jn3ZQKYWhLbEJPmqPGL3JwvCz31SAF7rj0XQACxitiyummi5e/
-	 CQcCEuRoc+7LA==
-From: Jonathan Corbet <corbet@lwn.net>
-To: Baruch Siach <baruch@tkos.co.il>, Olivia Mackall <olivia@selenic.com>,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org, Baruch Siach
- <baruch@tkos.co.il>
-Subject: Re: [PATCH] docs: admin-guide: hw_random: update rng-tools website
-In-Reply-To: <ef52ace5008fa934084442149f64f5f9ddbba465.1704720105.git.baruch@tkos.co.il>
-References: <ef52ace5008fa934084442149f64f5f9ddbba465.1704720105.git.baruch@tkos.co.il>
-Date: Thu, 11 Jan 2024 09:35:31 -0700
-Message-ID: <8734v3n7zg.fsf@meer.lwn.net>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EF910882321;
+	Thu, 11 Jan 2024 16:42:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E5C7A2166B31;
+	Thu, 11 Jan 2024 16:42:08 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+    Chuck Lever III <chuck.lever@oracle.com>
+cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+    linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Rebuilding at least part of my krb5 crypto lib on crypto-aead
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2131431.1704991328.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 11 Jan 2024 16:42:08 +0000
+Message-ID: <2131432.1704991328@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-Baruch Siach <baruch@tkos.co.il> writes:
+Hi Herbert, Chuck,
 
-> rng-tools upstream moved to github. New upstream does not appear to
-> consider itself official website for hw_random. Drop that part.
->
-> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
-> ---
->  Documentation/admin-guide/hw_random.rst | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/Documentation/admin-guide/hw_random.rst b/Documentation/admin-guide/hw_random.rst
-> index d494601717f1..bfc39f1cf470 100644
-> --- a/Documentation/admin-guide/hw_random.rst
-> +++ b/Documentation/admin-guide/hw_random.rst
-> @@ -14,10 +14,9 @@ into that core.
->  
->  To make the most effective use of these mechanisms, you
->  should download the support software as well.  Download the
-> -latest version of the "rng-tools" package from the
-> -hw_random driver's official Web site:
-> +latest version of the "rng-tools" package from:
->  
-> -	http://sourceforge.net/projects/gkernel/
-> +	https://github.com/nhorman/rng-tools
->  
+I've been thinking more on how I might go about rebuilding at least part o=
+f my
+krb5 crypto library on top of the AEAD template.
 
-Applied, thanks.
+I don't think it makes sense to try and put the entirety of it in there.
+There are functions that completely don't fit (such as key generation) and=
+ the
+catalogue of Kerberos type values and associated parameters.
 
-jon
+Also, I'm not sure it makes sense to try and squeeze the Integrity-type
+operations get_mic and verify_mic as AEAD.  get_mic might work as AEAD, bu=
+t
+all a wrapper would add is to emplace the checksum into ciphertext buffer.
+The actual checksumming is handled by a SHASH algorithm perfectly well.
+verify_mic doesn't really make sense as it has no output other than "yes/n=
+o" -
+and so is also handled fine by a SHASH algorithm.
+
+Where it does make sense is at the core of the encrypt/decrypt ops where I
+have four compound ops to choose from:
+
+	- encrypt-then-hash
+	- hash-then-decrypt
+	- hash-then-encrypt
+	- decrypt-then-hash
+
+These can conceivably be hardware optimised to do both parts of the op
+simultaneously.  I *think* I've seen a suggestion that x86_64 AVX has
+sufficient registers available to do both AES and SHA simultaneously, say.
+
+The question I then have is this: How do I parameterise the crypto algorit=
+hm
+inside AEAD?  Can I do something like:
+
+	cipher =3D crypto_alloc_sync_aead("enc-then-hash(cts(cbc(camellia)),cmac(=
+camellia))");
+
+David
+
