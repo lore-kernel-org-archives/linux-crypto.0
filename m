@@ -1,51 +1,51 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3840FDF61
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 08:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6308EAC5
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 08:16:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BNwPN68k"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40e5c317b34so6631945e9.2
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 00:15:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FmTCRzPy"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40e5afc18f5so8621375e9.3
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 00:16:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704960923; x=1705565723; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704960962; x=1705565762; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lhNg/hT61OVz92mVen6SG0PHl8H7M3f4I/Xw2MdU3wk=;
-        b=BNwPN68kFDyle69ePV2N5X7wlMK2CyQG1CNAAQpPPvbDVIXOtFnIwjspYyL2D9Gjcn
-         uJqKTrp1WQMDnfZeGW1gtHqMerucZa9etZ73yOSp1hSvfLE9ORdj0XTplIUZcPosq4VW
-         0pw8JF18ihSXtRaqXqPRaddwk7qlhoGat/6jDABv8VzGu32eafNwKG/tL5QUps2B/g2o
-         acvZIo1iN3v5dn4wg4Yb/m29Rq9nUTj49zyJlXxcu4Prr/xq5mbYqMKBp37isZ3YvVrR
-         6hkJtUqvXpTyDonBX5BYkYBOlcMYyG5KS2ONDMWgkEt8k+VcWAocDNh+Q5pc7dkMYoks
-         YPKQ==
+        bh=ucZYjQafMIKHoLE/R0AnbQMYTAjIxNebYPWwbqvXZWA=;
+        b=FmTCRzPy44n6ROdW4WY8EvwDwrmrzFeOt3B2Pt6QcddPjY2mxTFYuR8B5RQ310t+vH
+         43D95wA0ytFQ8UjyR9vIceJqM2KW2asaaBesFLsELTFqb7DNPNFXqraY5Ql6T/0SniBU
+         J83dkePVATvUD0fsE386p6eWLpUOdTebTjN6d8uz60MoU9wkp7RPvtQJ0HO4XSjXQbi4
+         zY081izGcXNOW1rawUscc3J6MDjsEXLVDI+zcb+cQfQgSlpH94Fz8QIDcp9QGGzPZ+2f
+         w7oHX0eu1xJI3DehReXp79qw0rOlxuN+b+dN4xu5gmli1K5leJZ0Kc7xDl7GtZ1lQojH
+         wb/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704960923; x=1705565723;
+        d=1e100.net; s=20230601; t=1704960962; x=1705565762;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=lhNg/hT61OVz92mVen6SG0PHl8H7M3f4I/Xw2MdU3wk=;
-        b=bn8XO2MYgjr1Fo7VvnllWQHpCpmkBddW7AZwARGbTcU5VNoqQiH+rW04cihobySLeb
-         aQW3ud0mIxUgGaEunbsYUxK3avFe1BtfATX5C9G5HP1NsVWDaQHJT07YlDBVvmCP9nkw
-         AQByVkHjZ6sUlY7FlTlxFPPXqtZtTiVwzDiI5TwM2VucwsA0BAM7/o0/+xHel/4bRtu2
-         YkpAzLOjtROdBGwyMReQ6AjXuR9ZSqzvCPadHT2uxKf7MpyLmujVu0LyC8QO4MErR57R
-         GB1rPotGCovQGkS0WbmcjBQjd3waGeFlGo9AI6SXyW0kTWIquuChCs6Wi8GXqhwXiMPu
-         1ppg==
-X-Gm-Message-State: AOJu0YzXQDZ42VAz7EAu5lmPyh6hTxqJJvC2A6JDVlN7RQWjbs5x9j/K
-	khxenNgGgQ2S8sK+bORY654Yri8H7uFsmg==
-X-Google-Smtp-Source: AGHT+IF/f7owkasdyC/MXgmBm/N1vKiUhNkP2gxMz9Hc0+6VjlV1rdgRGysxvD1ZUx8/gqCrux8hLQ==
-X-Received: by 2002:a05:600c:1547:b0:40e:40b3:99e9 with SMTP id f7-20020a05600c154700b0040e40b399e9mr149158wmg.108.1704960923479;
-        Thu, 11 Jan 2024 00:15:23 -0800 (PST)
+        bh=ucZYjQafMIKHoLE/R0AnbQMYTAjIxNebYPWwbqvXZWA=;
+        b=lq2BjBuH7l3GCrUESRp4ya6zC9HCfmcKg7WBET5TgGXah2dkkmMhedjkz7aOrlRFje
+         HR/Rtb0EpFoQbc4+t2Vp3zlrfR/lCOioaJXlnNI/yx+zY0xgPPwJv8yAoq5+5Hs+Rmwe
+         3/dA5Ev7EKWnKzMEjrc9P7Gh8CCPBpo//tHhLWmx5zcDbRiE8B6zKpaJMpvDKg6TfqlP
+         RURNpSGKeISUKENGV5zHeFgPZd7ChZQvaQ7UDlYHWPSjbx24oiCKS3oxmvkaG42nsT8Y
+         Da0J8gwKRePGCg2o8/DZSilUrvRNuX77HEMXtQ95L925/VALjh/KFuEQEyxgui+k8V3i
+         WbQA==
+X-Gm-Message-State: AOJu0Yw3bftGgh8qAmlKjX4qNJX51JPVZd0e37k7rWO5Y05HQ3VU8RKG
+	zVCLV97WxumWuLYY+ew1TwBtdJgebjPr7A==
+X-Google-Smtp-Source: AGHT+IH87WgS1yK9VKo2iOZzHy0Ibve5OOd1/gKkKchhicjR8afbKzVMmi3wCXF9AUr8mS7ZTrYrTw==
+X-Received: by 2002:a05:600c:5199:b0:40e:61ff:1d52 with SMTP id fa25-20020a05600c519900b0040e61ff1d52mr16310wmb.128.1704960962098;
+        Thu, 11 Jan 2024 00:16:02 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:982:cbb0:a5aa:e466:ae57:5a26? ([2a01:e0a:982:cbb0:a5aa:e466:ae57:5a26])
-        by smtp.gmail.com with ESMTPSA id o21-20020a05600c4fd500b0040e34ca648bsm955660wmq.0.2024.01.11.00.15.22
+        by smtp.gmail.com with ESMTPSA id o21-20020a05600c4fd500b0040e34ca648bsm955660wmq.0.2024.01.11.00.16.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jan 2024 00:15:22 -0800 (PST)
-Message-ID: <60cfb114-aa36-4588-91a5-7353791cb0ae@linaro.org>
-Date: Thu, 11 Jan 2024 09:15:21 +0100
+        Thu, 11 Jan 2024 00:16:01 -0800 (PST)
+Message-ID: <2fcf851c-a39a-4471-a705-6bfe9f4b975e@linaro.org>
+Date: Thu, 11 Jan 2024 09:16:01 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,7 +55,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: neil.armstrong@linaro.org
 Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH v1 16/24] dt-bindings: crypto: meson: add new compatibles
+Subject: Re: [PATCH v1 17/24] arch: arm64: dts: meson: a1: add crypto node
 Content-Language: en-US, fr
 To: Alexey Romanov <avromanov@salutedevices.com>, narmstrong@baylibre.com,
  clabbe@baylibre.com, herbert@gondor.apana.org.au, davem@davemloft.net,
@@ -65,7 +65,7 @@ Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
  linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
 References: <20240110201216.18016-1-avromanov@salutedevices.com>
- <20240110201216.18016-17-avromanov@salutedevices.com>
+ <20240110201216.18016-18-avromanov@salutedevices.com>
 Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
  GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
@@ -91,38 +91,44 @@ Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
  QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
 Organization: Linaro Developer Services
-In-Reply-To: <20240110201216.18016-17-avromanov@salutedevices.com>
+In-Reply-To: <20240110201216.18016-18-avromanov@salutedevices.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi,
-
 On 10/01/2024 21:11, Alexey Romanov wrote:
-> Now we can use crypto driver at G12A/G12B/S4/A1/SM1/AXG.
+> This patch adds a crypto node declaration. With the
+> Amlogic crypto driver we can use HW implementation
+> of SHA1/224/256 and AES algo.
 > 
 > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
 > ---
->   .../devicetree/bindings/crypto/amlogic,gxl-crypto.yaml          | 2 ++
->   1 file changed, 2 insertions(+)
+>   arch/arm64/boot/dts/amlogic/meson-a1.dtsi | 8 ++++++++
+>   1 file changed, 8 insertions(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> index 948e11ebe4ee..317003505510 100644
-> --- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> @@ -13,6 +13,8 @@ properties:
->     compatible:
->       items:
->         - const: amlogic,gxl-crypto
-> +      - const: amlogic,g12a-crypto
-> +      - const: amlogic,axg-crypto
+> diff --git a/arch/arm64/boot/dts/amlogic/meson-a1.dtsi b/arch/arm64/boot/dts/amlogic/meson-a1.dtsi
+> index cf150f568335..879e0ce0b2ea 100644
+> --- a/arch/arm64/boot/dts/amlogic/meson-a1.dtsi
+> +++ b/arch/arm64/boot/dts/amlogic/meson-a1.dtsi
+> @@ -653,6 +653,14 @@ sd_emmc: sd@10000 {
+>   				power-domains = <&pwrc PWRC_SD_EMMC_ID>;
+>   				status = "disabled";
+>   			};
+> +
+> +			crypto: crypto@6000 {
+> +				compatible = "amlogic,g12a-crypto";
+> +				reg = <0x0 0x6000 0x0 0x48>;
+> +				interrupts = <GIC_SPI 120 IRQ_TYPE_EDGE_RISING>;
+> +				power-domains = <&pwrc PWRC_DMA_ID>;
+> +				status = "disabled";
 
-Please add amlogic,s4-crypto and amlogic,a1-crypto using amlogic,g12a-crypto as fallback,
-it's a requirement for dt bindings to have per-soc compatibles now.
+Why disabled ? Usually we always leave the embedded HW enabled by default.
 
-Thanks,
+The comment is valid for the other dtsi changes,
+
 Neil
 
+> +			};
+>   		};
 >   
->     reg:
->       maxItems: 1
+>   		usb: usb@fe004400 {
 
