@@ -1,121 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCF650250
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 16:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2914EB28;
+	Thu, 11 Jan 2024 16:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwQH2zgD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE52C43390
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 16:35:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704990915;
-	bh=pYZFzDQ/TWAhv59QB61LzALmMor3mbcIpv5DzqPls6s=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=dwQH2zgDTp2iU/C/sQfxuFE8Wl9PsY+/86TzHlbSjtgNHG+x2pe+A/s92EEBfxhaR
-	 XuYoVLdCb6PY5YCNnIk5eR7v+A736n2Slmxdy7uynWoWTzSSXkYjlckmjerlXNPXh9
-	 ethkCXU311LOB7b+F3iaICYMXQ9bQOFrAWudIsCIHLtYVnCeWdwPoO0mmMeaW31W70
-	 arRGx2ab/eZVjnDElb8+cQkpbHoWWRGw15OsbHCQLrSI3R7MxPXs1SLqOljqKKNdif
-	 K/wonqm0FJwmEyPynmBF0ZURamnHjF/ISJ7bz0Q/eoXyLY52GBCvPD4yQbEggCfWaT
-	 jaDr8ZLeEikbA==
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-50eaa8b447bso6084167e87.1
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 08:35:15 -0800 (PST)
-X-Gm-Message-State: AOJu0YwJ0A8X7vr7AFxLqScpkSYwECeeb6p3/c27JuGD1odIToBHKnnY
-	fZGowG/aRcSuscLFh2tLuBP/XCPrTyWZZsJFyzE=
-X-Google-Smtp-Source: AGHT+IGd0R4a7VgUlGB7OkfS4bXdlkmaUKHgsFZ+H3HqmZqj5ddwPoYBOgdjfcgKwMRY/E/ZB3clD/5JsdwVZMlIimw=
-X-Received: by 2002:a05:6512:3e27:b0:50e:7bba:8567 with SMTP id
- i39-20020a0565123e2700b0050e7bba8567mr528644lfv.233.1704990913847; Thu, 11
- Jan 2024 08:35:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="M+1hxecl"
+Received: from localhost (unknown [IPv6:2601:280:5e00:7e19::646])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 5DDDF5CC;
+	Thu, 11 Jan 2024 16:35:32 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 5DDDF5CC
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1704990932; bh=lxbMwgaCj5UW1Y/FCB9H2dwcciiTULw8Q9ix+lEkNWU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=M+1hxecl7+TX+LPT0Z9uLpMngKCfvyA9Vek4D0wR8CNCZwKf0IDHq/oucYrB1HVON
+	 xia15KL6dbRzy6szG3nr6Lb2oM1/e+1DMxcaC/ctnEgE/voj1Lw0KY9rhLa0zLACBA
+	 zPmBjs6twVEWbAOX5kV5r9/BcgapR7KM9BWxmefo0Bf6qOZbDtDqYsXIOSMlBHRmGr
+	 /FgmTsDGgFMrRnKoVgzZ7fGxI45BfPrHwCeRoM1oIUdruCQaCyJxpInEyjd1gvdXyi
+	 0q/BtjdRGhrGe9J6Jn3ZQKYWhLbEJPmqPGL3JwvCz31SAF7rj0XQACxitiyummi5e/
+	 CQcCEuRoc+7LA==
+From: Jonathan Corbet <corbet@lwn.net>
+To: Baruch Siach <baruch@tkos.co.il>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org, Baruch Siach
+ <baruch@tkos.co.il>
+Subject: Re: [PATCH] docs: admin-guide: hw_random: update rng-tools website
+In-Reply-To: <ef52ace5008fa934084442149f64f5f9ddbba465.1704720105.git.baruch@tkos.co.il>
+References: <ef52ace5008fa934084442149f64f5f9ddbba465.1704720105.git.baruch@tkos.co.il>
+Date: Thu, 11 Jan 2024 09:35:31 -0700
+Message-ID: <8734v3n7zg.fsf@meer.lwn.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240111123302.589910-10-ardb+git@google.com> <20240111123302.589910-14-ardb+git@google.com>
-In-Reply-To: <20240111123302.589910-14-ardb+git@google.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 11 Jan 2024 17:35:02 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXHBNe-CaFpWAxeWCw74vG8vwne-VOV6R4O+B=b7pcxiFQ@mail.gmail.com>
-Message-ID: <CAMj1kXHBNe-CaFpWAxeWCw74vG8vwne-VOV6R4O+B=b7pcxiFQ@mail.gmail.com>
-Subject: Re: [PATCH 4/8] crypto: arm64/aes-ccm - Replace bytewise tail
- handling with NEON permute
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-crypto@vger.kernel.org, ebiggers@kernel.org, 
-	herbert@gondor.apana.org.au
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-On Thu, 11 Jan 2024 at 13:33, Ard Biesheuvel <ardb+git@google.com> wrote:
+Baruch Siach <baruch@tkos.co.il> writes:
+
+> rng-tools upstream moved to github. New upstream does not appear to
+> consider itself official website for hw_random. Drop that part.
 >
-> From: Ard Biesheuvel <ardb@kernel.org>
->
-> Implement the CCM tail handling using a single sequence that uses
-> permute vectors and overlapping loads and stores, rather than going over
-> the tail byte by byte in a loop, and using scalar operations. This is
-> more efficient, even though the measured speedup is only around 1-2% on
-> the CPUs I have tried.
->
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
 > ---
->  arch/arm64/crypto/aes-ce-ccm-core.S | 59 +++++++++++++-------
->  arch/arm64/crypto/aes-ce-ccm-glue.c | 20 +++----
->  2 files changed, 48 insertions(+), 31 deletions(-)
+>  Documentation/admin-guide/hw_random.rst | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 >
-...
+> diff --git a/Documentation/admin-guide/hw_random.rst b/Documentation/admin-guide/hw_random.rst
+> index d494601717f1..bfc39f1cf470 100644
+> --- a/Documentation/admin-guide/hw_random.rst
+> +++ b/Documentation/admin-guide/hw_random.rst
+> @@ -14,10 +14,9 @@ into that core.
+>  
+>  To make the most effective use of these mechanisms, you
+>  should download the support software as well.  Download the
+> -latest version of the "rng-tools" package from the
+> -hw_random driver's official Web site:
+> +latest version of the "rng-tools" package from:
+>  
+> -	http://sourceforge.net/projects/gkernel/
+> +	https://github.com/nhorman/rng-tools
+>  
 
-The hunks below don't belong here: they were supposed to be squashed
-into the previous patch.
+Applied, thanks.
 
-I will fix that up for the next revision.
-
-
-> diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
-> index 2f4e6a318fcd..4710e59075f5 100644
-> --- a/arch/arm64/crypto/aes-ce-ccm-glue.c
-> +++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
-> @@ -181,16 +181,16 @@ static int ccm_encrypt(struct aead_request *req)
->                 if (walk.nbytes == walk.total)
->                         tail = 0;
->
-> -               if (unlikely(walk.total < AES_BLOCK_SIZE))
-> -                       src = dst = memcpy(buf + sizeof(buf) - walk.total,
-> -                                          src, walk.total);
-> +               if (unlikely(walk.nbytes < AES_BLOCK_SIZE))
-> +                       src = dst = memcpy(&buf[sizeof(buf) - walk.nbytes],
-> +                                          src, walk.nbytes);
->
->                 ce_aes_ccm_encrypt(dst, src, walk.nbytes - tail,
->                                    ctx->key_enc, num_rounds(ctx),
->                                    mac, walk.iv);
->
-> -               if (unlikely(walk.total < AES_BLOCK_SIZE))
-> -                       memcpy(walk.dst.virt.addr, dst, walk.total);
-> +               if (unlikely(walk.nbytes < AES_BLOCK_SIZE))
-> +                       memcpy(walk.dst.virt.addr, dst, walk.nbytes);
->
->                 if (walk.nbytes == walk.total)
->                         ce_aes_ccm_final(mac, orig_iv, ctx->key_enc, num_rounds(ctx));
-> @@ -248,16 +248,16 @@ static int ccm_decrypt(struct aead_request *req)
->                 if (walk.nbytes == walk.total)
->                         tail = 0;
->
-> -               if (unlikely(walk.total < AES_BLOCK_SIZE))
-> -                       src = dst = memcpy(buf + sizeof(buf) - walk.total,
-> -                                          src, walk.total);
-> +               if (unlikely(walk.nbytes < AES_BLOCK_SIZE))
-> +                       src = dst = memcpy(&buf[sizeof(buf) - walk.nbytes],
-> +                                          src, walk.nbytes);
->
->                 ce_aes_ccm_decrypt(dst, src, walk.nbytes - tail,
->                                    ctx->key_enc, num_rounds(ctx),
->                                    mac, walk.iv);
->
-> -               if (unlikely(walk.total < AES_BLOCK_SIZE))
-> -                       memcpy(walk.dst.virt.addr, dst, walk.total);
-> +               if (unlikely(walk.nbytes < AES_BLOCK_SIZE))
-> +                       memcpy(walk.dst.virt.addr, dst, walk.nbytes);
->
->                 if (walk.nbytes == walk.total)
->                         ce_aes_ccm_final(mac, orig_iv, ctx->key_enc, num_rounds(ctx));
-> --
-> 2.43.0.275.g3460e3d667-goog
->
+jon
