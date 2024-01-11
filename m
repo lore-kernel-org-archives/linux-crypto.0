@@ -1,163 +1,179 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2582014A98
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 09:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6AD15AE4;
+	Thu, 11 Jan 2024 09:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xhbOqDX1"
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a28d61ba65eso576576366b.3
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 01:31:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704965474; x=1705570274; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Eor6lImS7ySePlUmbye/lNdlPbDxWcSpzNk/0V1lmvk=;
-        b=xhbOqDX1gcf+xuQdqaFkzKm3nkB6C5TFHK7Ffkt9MTSEAxytdHiJK4/a2WY1mKTCcC
-         vDfNt8+9bM72vSOb+pZx3Gu/RsHJljwMqaWYYaGL4OXk/BpK83loZ8keX8QJxdr8rXWF
-         AWMO3CUSPMpRIvW3wi4EIkhJp8BtiaHCrzuplK26kCnlBj9eXNVc/qIWPk0vnWIIpiFu
-         vTOm84cPWDy0RTWLwD1e6QS6dEivAhc8PxiGMa16sSrdsokCgHsiIkHuvSoHwgB9DmRR
-         lD+BU7mFTF2uKfrwTSJj2q5CNFw6tw4TMQgDgyNYfRgDd2O0u+/itA5A7fXwAnrjBkSv
-         avzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704965474; x=1705570274;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Eor6lImS7ySePlUmbye/lNdlPbDxWcSpzNk/0V1lmvk=;
-        b=hbiyimbKyyBviN/k8eYNUtTkkiaTBHUedigNXzRW8YJLynbr98M2Oa66T4U9ES3S8c
-         TMJGRSMyeyP4ZXDfQiYDvdhn+d/x7UW7eIjR7c+4NGaXBlaCy2BQtjPQo8fgH8aMdD0x
-         WWEgPle/snkCCZCmr8DKg2LAsIg+tebkGqpte5NzsVKEjj+o8UaXr8qmbgybBdpyRY2p
-         hM5FsMyA4eeXlG02Asj7g+yHKvvzBimB///MfK07l6le10a/DguezGqoX0fUwAkEllIm
-         SaO8rU/cbq+NhlrlvsskZ9YnHjucB/eS1WFWIlqW1CXDScAk5V2wXQ0qF7RqCacyRZFO
-         Teww==
-X-Gm-Message-State: AOJu0YzpdJQgnuNUncUqgyFm8d/8RKDoZLVdLdbfvKliPTFU/0xRQKag
-	YLeyBXcf7hl0SnYkbegf3xWBEHwBfk35nw==
-X-Google-Smtp-Source: AGHT+IGD9nTnB2PCUwRoN7P9hfHTaak6Rf6N5a7I+i6QTcDjkE0MZWvuwl97F/xmIbbqjFd1l3G8BA==
-X-Received: by 2002:a17:906:2459:b0:a2b:643:322 with SMTP id a25-20020a170906245900b00a2b06430322mr243390ejb.138.1704965474275;
-        Thu, 11 Jan 2024 01:31:14 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.223.112])
-        by smtp.gmail.com with ESMTPSA id b4-20020a170906150400b00a2a37f63216sm353336ejd.171.2024.01.11.01.31.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jan 2024 01:31:13 -0800 (PST)
-Message-ID: <039a4223-3412-415e-a5e6-c5dca53c96e1@linaro.org>
-Date: Thu, 11 Jan 2024 10:31:11 +0100
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="hv+QwaFh"
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 6FCAB12001A;
+	Thu, 11 Jan 2024 12:33:44 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 6FCAB12001A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1704965624;
+	bh=g2h5bYKkZTz9VczCxo+jetZF5Hf3q3K6NtzYos+6www=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version:From;
+	b=hv+QwaFhRIfcXBnzqCt86ytpeqAe3IB3Zih7TDeTVwsDXnJ5lvTAUWu1RMrysK102
+	 EvpbRu63DmoC7FyMEdhATPCbKCejw8uBEnr/+8aqgyTFG93TyZn4cbXSl+dEvJIPOM
+	 UsZwjGAOV/8lheFvK7phAmZgQWKVL0FWHX7ymy7HRZkuARDEMLNeDomBukU4wfbx+p
+	 J1RgwKkE66nM3NNoiO2PNlCXXE3lIQIYmjnBrbJ01FaxO6KawPVF5/pnGkg2h0hIl4
+	 m11Mh3WUSM2dcPpqc+LhjKEe2o8h41dDdW1IUywxPE54GR8xflW+A76XrqrdtPSY4O
+	 PUYF4a0PQQlPQ==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Thu, 11 Jan 2024 12:33:44 +0300 (MSK)
+Received: from p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 11 Jan 2024 12:33:43 +0300
+Received: from p-i-exch-sc-m01.sberdevices.ru ([fe80::e8ee:cc43:7c6f:7ce0]) by
+ p-i-exch-sc-m01.sberdevices.ru ([fe80::e8ee:cc43:7c6f:7ce0%7]) with mapi id
+ 15.02.1118.040; Thu, 11 Jan 2024 12:33:43 +0300
+From: Alexey Romanov <avromanov@salutedevices.com>
+To: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>
+CC: "narmstrong@baylibre.com" <narmstrong@baylibre.com>, "clabbe@baylibre.com"
+	<clabbe@baylibre.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "khilman@baylibre.com"
+	<khilman@baylibre.com>, "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
+	"artin.blumenstingl@googlemail.com" <artin.blumenstingl@googlemail.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
+Subject: Re: [PATCH v1 00/24] Support more Amlogic SoC families in crypto
+ driver
+Thread-Topic: [PATCH v1 00/24] Support more Amlogic SoC families in crypto
+ driver
+Thread-Index: AQHaRAFT58y12An6Uk+iikjI6uDH27DUE2iAgAAUzQA=
+Date: Thu, 11 Jan 2024 09:33:43 +0000
+Message-ID: <20240111093338.la4rdg5jxkpc7hz3@cab-wsm-0029881>
+References: <20240110201216.18016-1-avromanov@salutedevices.com>
+ <b2caf65d-4bc8-4e16-b4db-b24006e3dce6@linaro.org>
+In-Reply-To: <b2caf65d-4bc8-4e16-b4db-b24006e3dce6@linaro.org>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <526DB4079F018E41B016430D6453B89C@sberdevices.ru>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 00/24] Support more Amlogic SoC families in crypto
- driver
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Alexey Romanov <avromanov@salutedevices.com>,
- Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc: "narmstrong@baylibre.com" <narmstrong@baylibre.com>,
- "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
- "clabbe@baylibre.com" <clabbe@baylibre.com>,
- "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "robh+dt@kernel.org" <robh+dt@kernel.org>,
- "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "khilman@baylibre.com" <khilman@baylibre.com>,
- "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
- "artin.blumenstingl@googlemail.com" <artin.blumenstingl@googlemail.com>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
-References: <20240110201216.18016-1-avromanov@salutedevices.com>
- <ZZ8HP7dJgVaZLMw5@Red> <20240111091840.7fe4lqx225rdlwly@cab-wsm-0029881>
- <910736a3-069f-430c-ba6c-221777ddcda2@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <910736a3-069f-430c-ba6c-221777ddcda2@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 182551 [Jan 11 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.3
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_uf_ne_domains}, {Track_E25351}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;gist.github.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/01/11 08:51:00
+X-KSMG-LinksScanning: Clean, bases: 2024/01/11 08:52:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/01/11 07:45:00 #23086920
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On 11/01/2024 10:29, Krzysztof Kozlowski wrote:
-> On 11/01/2024 10:18, Alexey Romanov wrote:
->> Hello!
->>
->> On Wed, Jan 10, 2024 at 10:08:15PM +0100, Corentin Labbe wrote:
->>> Le Wed, Jan 10, 2024 at 11:11:16PM +0300, Alexey Romanov a 'ecrit :
->>>> Hello!
->>>>
->>>> This patchset expand the funcionality of the Amlogic
->>>> crypto driver by adding support for more SoC families: 
->>>> AXG, G12A, G12B, SM1, A1, S4.
->>>>
->>>> Also specify and enable crypto node in device tree
->>>> for reference Amlogic devices.
->>>>
->>>> Tested on AXG, G12A/B, SM1, A1 and S4 devices via
->>>> custom tests and trcypt module.
->>>
->>> Hello
->>>
->>> Thanks for your patch series.
->>> Unfortunatly, I fail to apply it for testing on top of linux-next.
->>> On top of which tree did you have tested ?
->>
->> We use 6.5-rc3.
-> 
-> Don't develop on old trees... I mean, internally you can do whatever you
-> wish, but don't work upstream on such trees.
 
-Number of email bounces also prove the point: you did not Cc right
-people due to work on some ancient files.
+Hi Neil,
 
-Best regards,
-Krzysztof
+On Thu, Jan 11, 2024 at 09:19:11AM +0100, neil.armstrong@linaro.org wrote:
+> Hi !
+>=20
+> On 10/01/2024 21:11, Alexey Romanov wrote:
+> > Hello!
+> >=20
+> > This patchset expand the funcionality of the Amlogic
+> > crypto driver by adding support for more SoC families:
+> > AXG, G12A, G12B, SM1, A1, S4.
+> >=20
+> > Also specify and enable crypto node in device tree
+> > for reference Amlogic devices.
+> >=20
+> > Tested on AXG, G12A/B, SM1, A1 and S4 devices via
+> > custom tests and trcypt module.
+>=20
+> Thanks a lot for the patchset, it's very welcome!
+>=20
+> Could you provide some procedure used to test and test dumps for all the =
+platforms, like `cryptsetup benchmark` or a summary of tcrypt tests output =
+?
 
+We use the following kernel module:
+
+https://gist.github.com/mRrvz/8d9277d57abb4d21568725785ec9e939
+
+and don't forget to define reserved memory region in device tree.
+
+>=20
+> Thanks,
+> Neil
+>=20
+> >=20
+> > Alexey Romanov (17):
+> >    drivers: crypto: meson: don't hardcode IRQ count
+> >    drivers: crypto: meson: make CLK controller optional
+> >    drviers: crypto: meson: add platform data
+> >    drivers: crypto: meson: add MMIO helpers
+> >    drivers: crypto: meson: move get_engine_number()
+> >    drivers: crypto: meson: use fallback for 192-bit keys
+> >    drivers: crypto: meson: add support for G12-series
+> >    drivers: crypto: meson: add support for AXG-series
+> >    dt-bindings: crypto: meson: add new compatibles
+> >    arch: arm64: dts: meson: a1: add crypto node
+> >    arch: arm64: dts: meson: s4: add crypto node
+> >    arch: arm64: dts: meson: g12: add crypto node
+> >    arch: arm64: dts: meson: axg: add crypto node
+> >    arch: arm64: dts: meson: s4-s805x2-aq222: enable crypto node
+> >    arch: arm64: dts: meson: a1-ad401: enable crypto node
+> >    arch: arm64: dts: meson: axg-s400: enable crypto node
+> >    arch: arm64: dts: meson: g12a-u200: enable crypto node
+> >=20
+> > Jan Dakinevich (7):
+> >    drivers: crypto: meson: drop status field from meson_flow
+> >    drivers: crypto: meson: move algs definition and cipher API to
+> >      cipher.c
+> >    drivers: crypto: meson: cleanup defines
+> >    drivers: crypto: meson: process more than MAXDESCS descriptors
+> >    drivers: crypto: meson: avoid kzalloc in engine thread
+> >    drivers: crypto: meson: introduce hasher
+> >    drivers: crypto: meson: add support for AES-CTR
+> >=20
+> >   .../bindings/crypto/amlogic,gxl-crypto.yaml   |   2 +
+> >   .../arm64/boot/dts/amlogic/meson-a1-ad401.dts |   4 +
+> >   arch/arm64/boot/dts/amlogic/meson-a1.dtsi     |   8 +
+> >   .../arm64/boot/dts/amlogic/meson-axg-s400.dts |   4 +
+> >   arch/arm64/boot/dts/amlogic/meson-axg.dtsi    |   7 +
+> >   .../boot/dts/amlogic/meson-g12-common.dtsi    |   7 +
+> >   .../boot/dts/amlogic/meson-g12a-u200.dts      |   4 +
+> >   .../dts/amlogic/meson-s4-s805x2-aq222.dts     |   4 +
+> >   arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |   7 +
+> >   drivers/crypto/amlogic/Makefile               |   2 +-
+> >   drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 591 ++++++++++++-----=
+-
+> >   drivers/crypto/amlogic/amlogic-gxl-core.c     | 260 ++++----
+> >   drivers/crypto/amlogic/amlogic-gxl-hasher.c   | 448 +++++++++++++
+> >   drivers/crypto/amlogic/amlogic-gxl.h          | 116 +++-
+> >   14 files changed, 1135 insertions(+), 329 deletions(-)
+> >   create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
+> >=20
+>=20
+
+--=20
+Thank you,
+Alexey=
