@@ -1,45 +1,45 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A154115AC2
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 12:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6949915AC2
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 12:33:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sM+3e7an"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbdb69bc114so7191588276.0
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 04:33:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qEUZLuMD"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-336b8da86eeso3309427f8f.0
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Jan 2024 04:33:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704976412; x=1705581212; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1704976414; x=1705581214; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QHDclY05fjEWHWVFdqEeEWldPY0XAnoENh1KcMswByg=;
-        b=sM+3e7an8st+nPA96L0jxlU6mILtzay/ZH3amyfPAFWh43pN6QYzL+dgNkXvkIcY9n
-         UeDjItnZe5jktP2Yaw+02Gnk006sJ7i95154jta7U03cuXTAvz1bI08PVOkkw2CTqJD0
-         D/iJG+qXRekqYlZFaGHcqY6wnlTxpCF99hq45TwXEB1GC5l2v6Z7ui30Rw9HGNgH82b4
-         ppy4DTpYEf5DVWmbjACOem9vU6LflNRA5oNxL1qcbrhPw+ufKP66zU8iHqui/p8mMX21
-         urqrbMlc5ZA1+Oaincip1joRFnYW1YaMTiHg+Hl4bhoeDUfTo+1zns3TOYkw5l8Pp9jt
-         CVYw==
+        bh=V7NqHvpVwYIckzJz3vTZ8qk1DnUwBae1Z/b9b550F34=;
+        b=qEUZLuMDZStxy4VsKWA/DIn7XpnVNYaY+mvirx1Bh/sMJTccW5af/OcY2ZEcqY3fQS
+         wY303th/G8o9aN849gqtfBvg7b6Gv/I1NSUCQx3WMBXevf/bglCrowvr2mkma5kYor2r
+         CBdYsAbt5GTrZJuQYaLWldqLHJZG9X6rZooQtWmsCg2as0h5suh+EADxG3im+ajjU2l9
+         V2Z4FND46FG79LoTgypO3uWSUTAkDMLco1CWjBJIzPYW5oIyOqhtyGz3yb5GeQoOWqQr
+         M2KJyMTR8cyVEWDY1BOI8RB2rrF9k4GdDkZd6G1IslhNjfAXlrAP3e9TOg4SOmhUzJYm
+         HKhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704976412; x=1705581212;
+        d=1e100.net; s=20230601; t=1704976414; x=1705581214;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QHDclY05fjEWHWVFdqEeEWldPY0XAnoENh1KcMswByg=;
-        b=oI+jx/BM71e139N6kApKOAHptkrRQT94iBwlyV8ufVtliyGNg5bY0sgibUaISaUo+V
-         An451LIgJ3XOXxhR8pLLB5/j60oLovNhlxOWeHL+ATkNHNil4/G7eI9GP44n4pGvCo9T
-         dtX7N1IwlotMnmUt2kgnqDX7skrkjq/CU8TkBKCEI0kOJNX5qpEctk01kGCMcPCeibT+
-         RiaUplzYGxqRklWZQM7z53xwzDfEsPt7K5Qly+TIRRtz3IzdDVKqlBzNsdoOfM29YpZ8
-         OeJhcn2EPcMNTZ2+Y4MfsPzNNv+Pg42Pkvch/38fkATYBXlOceoVqkqwtAQkGGOXQQfT
-         hipg==
-X-Gm-Message-State: AOJu0YzWjFhhg6xqJIHrusi3ZQUsvr08XTDSE0FM2ZN8ID1Ta4s67Gqy
-	JNRrK8CHPOpx4ynvL5zGBNxK4P7nWFw5cDHqqtiCevctA4ZCTMHSQ7A1gXHLLWFs7f0LnWqLv06
-	9yjwlEKhb7+IsFuXy+aPx+5UBKK6kVHqVsj7+4FetJnsDQJHRz8VN58lLn9VAmeGU+K23Hsk=
-X-Google-Smtp-Source: AGHT+IFUEAx5y8BVxQp1jrTICbSiLjwdyWaDzrAPpVT11wT+s5zJ2GtGVHd4GtOEX8p7B835X/U9W0ZY
+        bh=V7NqHvpVwYIckzJz3vTZ8qk1DnUwBae1Z/b9b550F34=;
+        b=R7xwmKon34mKd/NxLuQklgKVGFoMZojV2CuScgyiHhq32HZSudI/nUAM0KfzEcH7pQ
+         8b3gkdAT9rsEkaVRID+VORtSzm0HOkHZ+9pNiZST+YsT5/GsJhXsifMgeVmiiKN5X+ZK
+         ehu/3W2G5iIzRvvQ49nN9DaxyMHv5dTT8ouIyNVtxjR1vsHZfm0+HzmjiUYlD99BSbo7
+         rUhraJelfQCunob2Wpp5lNrPPUNOwCSruDbMTABrNS7N4E+vcDdYj8/0jP+Wp6kok989
+         b9cppHmdRBoz++xUFHsTGReNzalK9Gw0ryuVx+HcqVYPgiNGQTRA2lumHf9GbG4Z/qiQ
+         vNfA==
+X-Gm-Message-State: AOJu0YxwyDPXxrjGIFHrT6Sdrj5105aCkmgmbcrxVACgVEgXqKyRIWoe
+	XdVuH6brD/kVtE49kJIHiBbyePtcP8VQ71E2fGOiaoYak5E7FQ8sr2SuQ8+SefhvuqD5HoxMaYA
+	No5Vs5zMkgsvGc3t+3db8uNMAZRhRN6oRZ823wWFh+FNG+k1Xqpp52r/7j3jGZn8c2nn3W8M=
+X-Google-Smtp-Source: AGHT+IG1OE+vDmEsbe2sQorhqr94K4Y2eP/iuYTMTFAHNPq0MDGTHEk7shg3n4Q2qAwc65fyp0Se8LIf
 X-Received: from palermo.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:118a])
- (user=ardb job=sendgmr) by 2002:a05:6902:2843:b0:dbe:a220:68f9 with SMTP id
- ee3-20020a056902284300b00dbea22068f9mr475521ybb.0.1704976412450; Thu, 11 Jan
- 2024 04:33:32 -0800 (PST)
-Date: Thu, 11 Jan 2024 13:33:07 +0100
+ (user=ardb job=sendgmr) by 2002:a05:6000:1c1c:b0:337:77fc:e84f with SMTP id
+ ba28-20020a0560001c1c00b0033777fce84fmr11442wrb.9.1704976414596; Thu, 11 Jan
+ 2024 04:33:34 -0800 (PST)
+Date: Thu, 11 Jan 2024 13:33:08 +0100
 In-Reply-To: <20240111123302.589910-10-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -49,15 +49,14 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240111123302.589910-10-ardb+git@google.com>
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5865; i=ardb@kernel.org;
- h=from:subject; bh=tZlQQtnd9aDoIsH9u1ZAwbpmkDhKIfhCzBwvMQih1VI=;
- b=owGbwMvMwCFmkMcZplerG8N4Wi2JIXX+A6aLR29cVglR8/L4uHh65ptaqTlFJnuz915gjy5Nm
- 6WuJvS3o5SFQYyDQVZMkUVg9t93O09PlKp1niULM4eVCWQIAxenAEyEXZ7hr7DOohXHX8h+XXc7
- UUJiU7LlpccnGDol5sVdlZypv3imgBgjw5GgBUJJ25/PmHV+2eY7mzYeT3zgvPagcYBVj8ad4/N 81nADAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6993; i=ardb@kernel.org;
+ h=from:subject; bh=yle/H4ZDasJ7xiFxa7Y8LY3dYulmTCAxQvljqoR89sw=;
+ b=owGbwMvMwCFmkMcZplerG8N4Wi2JIXX+A+Yg09Ware4npj29VlzwjHOloJ6s4mSprKfhm1ye+
+ wRsXx7aUcrCIMbBICumyCIw+++7nacnStU6z5KFmcPKBDKEgYtTACbyX4uR4Tiv54f8aImk8HaO
+ Ez1z0w5rH7FxZHkTEWsSaKQwceleX0aGBpPrNim+Nsl9jTEfJDSLapsq0zIO/+dtYjt2is2hlJ8 BAA==
 X-Mailer: git-send-email 2.43.0.275.g3460e3d667-goog
-Message-ID: <20240111123302.589910-14-ardb+git@google.com>
-Subject: [PATCH 4/8] crypto: arm64/aes-ccm - Replace bytewise tail handling
- with NEON permute
+Message-ID: <20240111123302.589910-15-ardb+git@google.com>
+Subject: [PATCH 5/8] crypto: arm64/aes-ccm - Reuse existing MAC update for AAD input
 From: Ard Biesheuvel <ardb+git@google.com>
 To: linux-crypto@vger.kernel.org
 Cc: ebiggers@kernel.org, herbert@gondor.apana.org.au, 
@@ -66,161 +65,228 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Ard Biesheuvel <ardb@kernel.org>
 
-Implement the CCM tail handling using a single sequence that uses
-permute vectors and overlapping loads and stores, rather than going over
-the tail byte by byte in a loop, and using scalar operations. This is
-more efficient, even though the measured speedup is only around 1-2% on
-the CPUs I have tried.
+CCM combines the counter (CTR) encryption mode with a MAC based on the
+same block cipher. This MAC construction is a bit clunky: it invokes the
+block cipher in a way that cannot be parallelized, resulting in poor CPU
+pipeline efficiency.
+
+The arm64 CCM code mitigates this by interleaving the encryption and MAC
+at the AES round level, resulting in a substantial speedup. But this
+approach does not apply to the additional authenticated data (AAD) which
+is not encrypted.
+
+This means the special asm routine dealing with the AAD is not any
+better than the MAC update routine used by the arm64 AES block
+encryption driver, so let's reuse that, and drop the special AES-CCM
+version.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/arm64/crypto/aes-ce-ccm-core.S | 59 +++++++++++++-------
- arch/arm64/crypto/aes-ce-ccm-glue.c | 20 +++----
- 2 files changed, 48 insertions(+), 31 deletions(-)
+ arch/arm64/crypto/Kconfig           |  1 +
+ arch/arm64/crypto/aes-ce-ccm-core.S | 71 --------------------
+ arch/arm64/crypto/aes-ce-ccm-glue.c | 49 +++++++++++---
+ arch/arm64/crypto/aes-glue.c        |  1 +
+ 4 files changed, 43 insertions(+), 79 deletions(-)
 
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index eb7b423ba463..e7d9bd8e4709 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -268,6 +268,7 @@ config CRYPTO_AES_ARM64_CE_CCM
+ 	depends on ARM64 && KERNEL_MODE_NEON
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_AES_ARM64_CE
++	select CRYPTO_AES_ARM64_CE_BLK
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_LIB_AES
+ 	help
 diff --git a/arch/arm64/crypto/aes-ce-ccm-core.S b/arch/arm64/crypto/aes-ce-ccm-core.S
-index b03f7f71f893..b21a9b759ab2 100644
+index b21a9b759ab2..0132872bd780 100644
 --- a/arch/arm64/crypto/aes-ce-ccm-core.S
 +++ b/arch/arm64/crypto/aes-ce-ccm-core.S
-@@ -1,8 +1,11 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
- /*
-- * aesce-ccm-core.S - AES-CCM transform for ARMv8 with Crypto Extensions
-+ * aes-ce-ccm-core.S - AES-CCM transform for ARMv8 with Crypto Extensions
-  *
-- * Copyright (C) 2013 - 2017 Linaro Ltd <ard.biesheuvel@linaro.org>
-+ * Copyright (C) 2013 - 2017 Linaro Ltd.
-+ * Copyright (C) 2024 Google LLC
-+ *
-+ * Author: Ard Biesheuvel <ardb@kernel.org>
-  */
+@@ -14,77 +14,6 @@
+ 	.text
+ 	.arch	armv8-a+crypto
  
- #include <linux/linkage.h>
-@@ -168,13 +171,13 @@ CPU_LE(	rev	x8, x8			)	/* keep swabbed ctr in reg */
- 	ld1	{v2.16b}, [x1], #16		/* load next input block */
- 	.if	\enc == 1
- 	eor	v2.16b, v2.16b, v5.16b		/* final round enc+mac */
--	eor	v1.16b, v1.16b, v2.16b		/* xor with crypted ctr */
-+	eor	v6.16b, v1.16b, v2.16b		/* xor with crypted ctr */
- 	.else
- 	eor	v2.16b, v2.16b, v1.16b		/* xor with crypted ctr */
--	eor	v1.16b, v2.16b, v5.16b		/* final round enc */
-+	eor	v6.16b, v2.16b, v5.16b		/* final round enc */
- 	.endif
- 	eor	v0.16b, v0.16b, v2.16b		/* xor mac with pt ^ rk[last] */
--	st1	{v1.16b}, [x0], #16		/* write output block */
-+	st1	{v6.16b}, [x0], #16		/* write output block */
- 	bne	0b
- CPU_LE(	rev	x8, x8			)
- 	st1	{v0.16b}, [x5]			/* store mac */
-@@ -183,25 +186,31 @@ CPU_LE(	rev	x8, x8			)
- 
- 6:	eor	v0.16b, v0.16b, v5.16b		/* final round mac */
- 	eor	v1.16b, v1.16b, v5.16b		/* final round enc */
--	st1	{v0.16b}, [x5]			/* store mac */
--	add	w2, w2, #16			/* process partial tail block */
--7:	ldrb	w9, [x1], #1			/* get 1 byte of input */
--	umov	w6, v1.b[0]			/* get top crypted ctr byte */
--	umov	w7, v0.b[0]			/* get top mac byte */
-+
-+	add	x1, x1, w2, sxtw		/* rewind the input pointer (w2 < 0) */
-+	add	x0, x0, w2, sxtw		/* rewind the output pointer */
-+
-+	adr_l	x8, .Lpermute			/* load permute vectors */
-+	add	x9, x8, w2, sxtw
-+	sub	x8, x8, w2, sxtw
-+	ld1	{v7.16b-v8.16b}, [x9]
-+	ld1	{v9.16b}, [x8]
-+
-+	ld1	{v2.16b}, [x1]			/* load a full block of input */
-+	tbl	v1.16b, {v1.16b}, v7.16b	/* move keystream to end of register */
- 	.if	\enc == 1
--	eor	w7, w7, w9
--	eor	w9, w9, w6
-+	tbl	v7.16b, {v2.16b}, v9.16b	/* copy plaintext to start of v7 */
-+	eor	v2.16b, v2.16b, v1.16b		/* encrypt partial input block */
- 	.else
--	eor	w9, w9, w6
--	eor	w7, w7, w9
-+	eor	v2.16b, v2.16b, v1.16b		/* decrypt partial input block */
-+	tbl	v7.16b, {v2.16b}, v9.16b	/* copy plaintext to start of v7 */
- 	.endif
--	strb	w9, [x0], #1			/* store out byte */
--	strb	w7, [x5], #1			/* store mac byte */
+-	/*
+-	 * u32 ce_aes_ccm_auth_data(u8 mac[], u8 const in[], u32 abytes,
+-	 *			    u32 macp, u8 const rk[], u32 rounds);
+-	 */
+-SYM_FUNC_START(ce_aes_ccm_auth_data)
+-	ld1	{v0.16b}, [x0]			/* load mac */
+-	cbz	w3, 1f
+-	sub	w3, w3, #16
+-	eor	v1.16b, v1.16b, v1.16b
+-0:	ldrb	w7, [x1], #1			/* get 1 byte of input */
 -	subs	w2, w2, #1
--	beq	5b
--	ext	v0.16b, v0.16b, v0.16b, #1	/* shift out mac byte */
--	ext	v1.16b, v1.16b, v1.16b, #1	/* shift out ctr byte */
+-	add	w3, w3, #1
+-	ins	v1.b[0], w7
+-	ext	v1.16b, v1.16b, v1.16b, #1	/* rotate in the input bytes */
+-	beq	8f				/* out of input? */
+-	cbnz	w3, 0b
+-	eor	v0.16b, v0.16b, v1.16b
+-1:	ld1	{v3.4s}, [x4]			/* load first round key */
+-	prfm	pldl1strm, [x1]
+-	cmp	w5, #12				/* which key size? */
+-	add	x6, x4, #16
+-	sub	w7, w5, #2			/* modified # of rounds */
+-	bmi	2f
+-	bne	5f
+-	mov	v5.16b, v3.16b
+-	b	4f
+-2:	mov	v4.16b, v3.16b
+-	ld1	{v5.4s}, [x6], #16		/* load 2nd round key */
+-3:	aese	v0.16b, v4.16b
+-	aesmc	v0.16b, v0.16b
+-4:	ld1	{v3.4s}, [x6], #16		/* load next round key */
+-	aese	v0.16b, v5.16b
+-	aesmc	v0.16b, v0.16b
+-5:	ld1	{v4.4s}, [x6], #16		/* load next round key */
+-	subs	w7, w7, #3
+-	aese	v0.16b, v3.16b
+-	aesmc	v0.16b, v0.16b
+-	ld1	{v5.4s}, [x6], #16		/* load next round key */
+-	bpl	3b
+-	aese	v0.16b, v4.16b
+-	subs	w2, w2, #16			/* last data? */
+-	eor	v0.16b, v0.16b, v5.16b		/* final round */
+-	bmi	6f
+-	ld1	{v1.16b}, [x1], #16		/* load next input block */
+-	eor	v0.16b, v0.16b, v1.16b		/* xor with mac */
+-	bne	1b
+-6:	st1	{v0.16b}, [x0]			/* store mac */
+-	beq	10f
+-	adds	w2, w2, #16
+-	beq	10f
+-	mov	w3, w2
+-7:	ldrb	w7, [x1], #1
+-	umov	w6, v0.b[0]
+-	eor	w6, w6, w7
+-	strb	w6, [x0], #1
+-	subs	w2, w2, #1
+-	beq	10f
+-	ext	v0.16b, v0.16b, v0.16b, #1	/* rotate out the mac bytes */
 -	b	7b
-+	eor	v0.16b, v0.16b, v7.16b		/* fold plaintext into mac */
-+	tbx	v2.16b, {v6.16b}, v8.16b	/* insert output from previous iteration */
-+
-+	st1	{v0.16b}, [x5]			/* store mac */
-+	st1	{v2.16b}, [x0]			/* store output block */
-+	ret
- 	.endm
- 
+-8:	cbz	w3, 91f
+-	mov	w7, w3
+-	add	w3, w3, #16
+-9:	ext	v1.16b, v1.16b, v1.16b, #1
+-	adds	w7, w7, #1
+-	bne	9b
+-91:	eor	v0.16b, v0.16b, v1.16b
+-	st1	{v0.16b}, [x0]
+-10:	mov	w0, w3
+-	ret
+-SYM_FUNC_END(ce_aes_ccm_auth_data)
+-
  	/*
-@@ -219,3 +228,11 @@ SYM_FUNC_END(ce_aes_ccm_encrypt)
- SYM_FUNC_START(ce_aes_ccm_decrypt)
- 	aes_ccm_do_crypt	0
- SYM_FUNC_END(ce_aes_ccm_decrypt)
-+
-+	.section ".rodata", "a"
-+	.align	6
-+	.fill	15, 1, 0xff
-+.Lpermute:
-+	.byte	0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7
-+	.byte	0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf
-+	.fill	15, 1, 0xff
+ 	 * void ce_aes_ccm_final(u8 mac[], u8 const ctr[], u8 const rk[],
+ 	 * 			 u32 rounds);
 diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
-index 2f4e6a318fcd..4710e59075f5 100644
+index 4710e59075f5..ed3d79e05112 100644
 --- a/arch/arm64/crypto/aes-ce-ccm-glue.c
 +++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
-@@ -181,16 +181,16 @@ static int ccm_encrypt(struct aead_request *req)
- 		if (walk.nbytes == walk.total)
- 			tail = 0;
+@@ -18,6 +18,8 @@
  
--		if (unlikely(walk.total < AES_BLOCK_SIZE))
--			src = dst = memcpy(buf + sizeof(buf) - walk.total,
--					   src, walk.total);
-+		if (unlikely(walk.nbytes < AES_BLOCK_SIZE))
-+			src = dst = memcpy(&buf[sizeof(buf) - walk.nbytes],
-+					   src, walk.nbytes);
+ #include "aes-ce-setkey.h"
  
- 		ce_aes_ccm_encrypt(dst, src, walk.nbytes - tail,
- 				   ctx->key_enc, num_rounds(ctx),
- 				   mac, walk.iv);
++MODULE_IMPORT_NS(CRYPTO_INTERNAL);
++
+ static int num_rounds(struct crypto_aes_ctx *ctx)
+ {
+ 	/*
+@@ -30,8 +32,9 @@ static int num_rounds(struct crypto_aes_ctx *ctx)
+ 	return 6 + ctx->key_length / 4;
+ }
  
--		if (unlikely(walk.total < AES_BLOCK_SIZE))
--			memcpy(walk.dst.virt.addr, dst, walk.total);
-+		if (unlikely(walk.nbytes < AES_BLOCK_SIZE))
-+			memcpy(walk.dst.virt.addr, dst, walk.nbytes);
+-asmlinkage u32 ce_aes_ccm_auth_data(u8 mac[], u8 const in[], u32 abytes,
+-				    u32 macp, u32 const rk[], u32 rounds);
++asmlinkage u32 ce_aes_mac_update(u8 const in[], u32 const rk[], int rounds,
++				 int blocks, u8 dg[], int enc_before,
++				 int enc_after);
  
- 		if (walk.nbytes == walk.total)
- 			ce_aes_ccm_final(mac, orig_iv, ctx->key_enc, num_rounds(ctx));
-@@ -248,16 +248,16 @@ static int ccm_decrypt(struct aead_request *req)
- 		if (walk.nbytes == walk.total)
- 			tail = 0;
+ asmlinkage void ce_aes_ccm_encrypt(u8 out[], u8 const in[], u32 cbytes,
+ 				   u32 const rk[], u32 rounds, u8 mac[],
+@@ -97,6 +100,41 @@ static int ccm_init_mac(struct aead_request *req, u8 maciv[], u32 msglen)
+ 	return 0;
+ }
  
--		if (unlikely(walk.total < AES_BLOCK_SIZE))
--			src = dst = memcpy(buf + sizeof(buf) - walk.total,
--					   src, walk.total);
-+		if (unlikely(walk.nbytes < AES_BLOCK_SIZE))
-+			src = dst = memcpy(&buf[sizeof(buf) - walk.nbytes],
-+					   src, walk.nbytes);
++static u32 ce_aes_ccm_auth_data(u8 mac[], u8 const in[], u32 abytes,
++				u32 macp, u32 const rk[], u32 rounds)
++{
++	int enc_after = (macp + abytes) % AES_BLOCK_SIZE;
++
++	do {
++		u32 blocks = abytes / AES_BLOCK_SIZE;
++
++		if (macp == AES_BLOCK_SIZE || (!macp && blocks > 0)) {
++			u32 rem = ce_aes_mac_update(in, rk, rounds, blocks, mac,
++						    macp, enc_after);
++			u32 adv = (blocks - rem) * AES_BLOCK_SIZE;
++
++			macp = enc_after ? 0 : AES_BLOCK_SIZE;
++			in += adv;
++			abytes -= adv;
++
++			if (unlikely(rem)) {
++				kernel_neon_end();
++				kernel_neon_begin();
++				macp = 0;
++			}
++		} else {
++			u32 l = min(AES_BLOCK_SIZE - macp, abytes);
++
++			crypto_xor(&mac[macp], in, l);
++			in += l;
++			macp += l;
++			abytes -= l;
++		}
++	} while (abytes > 0);
++
++	return macp;
++}
++
+ static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[])
+ {
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+@@ -104,7 +142,7 @@ static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[])
+ 	struct __packed { __be16 l; __be32 h; u16 len; } ltag;
+ 	struct scatter_walk walk;
+ 	u32 len = req->assoclen;
+-	u32 macp = 0;
++	u32 macp = AES_BLOCK_SIZE;
  
- 		ce_aes_ccm_decrypt(dst, src, walk.nbytes - tail,
- 				   ctx->key_enc, num_rounds(ctx),
- 				   mac, walk.iv);
+ 	/* prepend the AAD with a length tag */
+ 	if (len < 0xff00) {
+@@ -128,16 +166,11 @@ static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[])
+ 			scatterwalk_start(&walk, sg_next(walk.sg));
+ 			n = scatterwalk_clamp(&walk, len);
+ 		}
+-		n = min_t(u32, n, SZ_4K); /* yield NEON at least every 4k */
+ 		p = scatterwalk_map(&walk);
  
--		if (unlikely(walk.total < AES_BLOCK_SIZE))
--			memcpy(walk.dst.virt.addr, dst, walk.total);
-+		if (unlikely(walk.nbytes < AES_BLOCK_SIZE))
-+			memcpy(walk.dst.virt.addr, dst, walk.nbytes);
+ 		macp = ce_aes_ccm_auth_data(mac, p, n, macp, ctx->key_enc,
+ 					    num_rounds(ctx));
  
- 		if (walk.nbytes == walk.total)
- 			ce_aes_ccm_final(mac, orig_iv, ctx->key_enc, num_rounds(ctx));
+-		if (len / SZ_4K > (len - n) / SZ_4K) {
+-			kernel_neon_end();
+-			kernel_neon_begin();
+-		}
+ 		len -= n;
+ 
+ 		scatterwalk_unmap(p);
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index 162787c7aa86..a147e847a5a1 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -1048,6 +1048,7 @@ static int __init aes_init(void)
+ 
+ #ifdef USE_V8_CRYPTO_EXTENSIONS
+ module_cpu_feature_match(AES, aes_init);
++EXPORT_SYMBOL_NS(ce_aes_mac_update, CRYPTO_INTERNAL);
+ #else
+ module_init(aes_init);
+ EXPORT_SYMBOL(neon_aes_ecb_encrypt);
 -- 
 2.43.0.275.g3460e3d667-goog
 
