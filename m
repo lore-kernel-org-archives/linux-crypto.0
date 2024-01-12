@@ -1,27 +1,27 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3360B42057;
-	Fri, 12 Jan 2024 10:26:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EE55EE81;
+	Fri, 12 Jan 2024 10:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TBHj30Mfqz29dNY;
-	Fri, 12 Jan 2024 18:24:55 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TBHjz0hqSzsVqh;
+	Fri, 12 Jan 2024 18:25:43 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (unknown [7.193.23.164])
-	by mail.maildlp.com (Postfix) with ESMTPS id BB9B41A0172;
-	Fri, 12 Jan 2024 18:26:28 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 36D6A14011A;
+	Fri, 12 Jan 2024 18:26:30 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 12 Jan 2024 18:26:28 +0800
+ 15.1.2507.35; Fri, 12 Jan 2024 18:26:29 +0800
 From: Weili Qian <qianweili@huawei.com>
 To: <herbert@gondor.apana.org.au>
 CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<liulongfang@huawei.com>, Weili Qian <qianweili@huawei.com>
-Subject: [PATCH 1/2] crypto: hisilicon/qm - support get device state
-Date: Fri, 12 Jan 2024 18:25:45 +0800
-Message-ID: <20240112102546.2213-2-qianweili@huawei.com>
+Subject: [PATCH 2/2] crypto: hisilicon/qm - dump important registers values before resetting
+Date: Fri, 12 Jan 2024 18:25:46 +0800
+Message-ID: <20240112102546.2213-3-qianweili@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20240112102546.2213-1-qianweili@huawei.com>
 References: <20240112102546.2213-1-qianweili@huawei.com>
@@ -36,126 +36,49 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemm600009.china.huawei.com (7.193.23.164)
 
-Support get device current state. The value 0 indicates that
-the device is busy, and the value 1 indicates that the
-device is idle. When the device is in suspended, 1 is returned.
+Read the values of some device registers before the device
+is reset, these values help analyze the cause of the device exception.
 
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- Documentation/ABI/testing/debugfs-hisi-hpre |  7 +++++
- Documentation/ABI/testing/debugfs-hisi-sec  |  7 +++++
- Documentation/ABI/testing/debugfs-hisi-zip  |  7 +++++
- drivers/crypto/hisilicon/debugfs.c          | 29 +++++++++++++++++++++
- 4 files changed, 50 insertions(+)
+ drivers/crypto/hisilicon/debugfs.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/Documentation/ABI/testing/debugfs-hisi-hpre b/Documentation/ABI/testing/debugfs-hisi-hpre
-index 8e8de49c5cc6..6ed9258605c7 100644
---- a/Documentation/ABI/testing/debugfs-hisi-hpre
-+++ b/Documentation/ABI/testing/debugfs-hisi-hpre
-@@ -111,6 +111,13 @@ Description:	QM debug registers(regs) read hardware register value. This
- 		node is used to show the change of the qm register values. This
- 		node can be help users to check the change of register values.
- 
-+What:		/sys/kernel/debug/hisi_hpre/<bdf>/qm/qm_state
-+Date:		Jan 2024
-+Contact:	linux-crypto@vger.kernel.org
-+Description:	Dump the state of the device.
-+		0: busy, 1: idle.
-+		Only available for PF, and take no other effect on HPRE.
-+
- What:		/sys/kernel/debug/hisi_hpre/<bdf>/hpre_dfx/diff_regs
- Date:		Mar 2022
- Contact:	linux-crypto@vger.kernel.org
-diff --git a/Documentation/ABI/testing/debugfs-hisi-sec b/Documentation/ABI/testing/debugfs-hisi-sec
-index deeefe2c735e..403f5de96318 100644
---- a/Documentation/ABI/testing/debugfs-hisi-sec
-+++ b/Documentation/ABI/testing/debugfs-hisi-sec
-@@ -91,6 +91,13 @@ Description:	QM debug registers(regs) read hardware register value. This
- 		node is used to show the change of the qm register values. This
- 		node can be help users to check the change of register values.
- 
-+What:		/sys/kernel/debug/hisi_sec2/<bdf>/qm/qm_state
-+Date:		Jan 2024
-+Contact:	linux-crypto@vger.kernel.org
-+Description:	Dump the state of the device.
-+		0: busy, 1: idle.
-+		Only available for PF, and take no other effect on SEC.
-+
- What:		/sys/kernel/debug/hisi_sec2/<bdf>/sec_dfx/diff_regs
- Date:		Mar 2022
- Contact:	linux-crypto@vger.kernel.org
-diff --git a/Documentation/ABI/testing/debugfs-hisi-zip b/Documentation/ABI/testing/debugfs-hisi-zip
-index 593714afaed2..2394e6a3cfe2 100644
---- a/Documentation/ABI/testing/debugfs-hisi-zip
-+++ b/Documentation/ABI/testing/debugfs-hisi-zip
-@@ -104,6 +104,13 @@ Description:	QM debug registers(regs) read hardware register value. This
- 		node is used to show the change of the qm registers value. This
- 		node can be help users to check the change of register values.
- 
-+What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/qm_state
-+Date:		Jan 2024
-+Contact:	linux-crypto@vger.kernel.org
-+Description:	Dump the state of the device.
-+		0: busy, 1: idle.
-+		Only available for PF, and take no other effect on ZIP.
-+
- What:		/sys/kernel/debug/hisi_zip/<bdf>/zip_dfx/diff_regs
- Date:		Mar 2022
- Contact:	linux-crypto@vger.kernel.org
 diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
-index 80ed4b2d209c..615c8e18d8b0 100644
+index 615c8e18d8b0..06e67eda409f 100644
 --- a/drivers/crypto/hisilicon/debugfs.c
 +++ b/drivers/crypto/hisilicon/debugfs.c
-@@ -24,6 +24,8 @@
- #define QM_DFX_QN_SHIFT			16
- #define QM_DFX_CNT_CLR_CE		0x100118
- #define QM_DBG_WRITE_LEN		1024
-+#define QM_IN_IDLE_ST_REG		0x1040e4
-+#define QM_IN_IDLE_STATE		0x1
+@@ -83,6 +83,30 @@ static const struct debugfs_reg32 qm_dfx_regs[] = {
+ 	{"QM_DFX_FF_ST5                 ",  0x1040dc},
+ 	{"QM_DFX_FF_ST6                 ",  0x1040e0},
+ 	{"QM_IN_IDLE_ST                 ",  0x1040e4},
++	{"QM_CACHE_CTL                  ",  0x100050},
++	{"QM_TIMEOUT_CFG                ",  0x100070},
++	{"QM_DB_TIMEOUT_CFG             ",  0x100074},
++	{"QM_FLR_PENDING_TIME_CFG       ",  0x100078},
++	{"QM_ARUSR_MCFG1                ",  0x100088},
++	{"QM_AWUSR_MCFG1                ",  0x100098},
++	{"QM_AXI_M_CFG_ENABLE           ",  0x1000B0},
++	{"QM_RAS_CE_THRESHOLD           ",  0x1000F8},
++	{"QM_AXI_TIMEOUT_CTRL           ",  0x100120},
++	{"QM_AXI_TIMEOUT_STATUS         ",  0x100124},
++	{"QM_CQE_AGGR_TIMEOUT_CTRL      ",  0x100144},
++	{"ACC_RAS_MSI_INT_SEL           ",  0x1040fc},
++	{"QM_CQE_OUT                    ",  0x104100},
++	{"QM_EQE_OUT                    ",  0x104104},
++	{"QM_AEQE_OUT                   ",  0x104108},
++	{"QM_DB_INFO0                   ",  0x104180},
++	{"QM_DB_INFO1                   ",  0x104184},
++	{"QM_AM_CTRL_GLOBAL             ",  0x300000},
++	{"QM_AM_CURR_PORT_STS           ",  0x300100},
++	{"QM_AM_CURR_TRANS_RETURN       ",  0x300150},
++	{"QM_AM_CURR_RD_MAX_TXID        ",  0x300154},
++	{"QM_AM_CURR_WR_MAX_TXID        ",  0x300158},
++	{"QM_AM_ALARM_RRESP             ",  0x300180},
++	{"QM_AM_ALARM_BRESP             ",  0x300184},
+ };
  
- static const char * const qm_debug_file_name[] = {
- 	[CURRENT_QM]   = "current_qm",
-@@ -1001,6 +1003,30 @@ static int qm_diff_regs_show(struct seq_file *s, void *unused)
- }
- DEFINE_SHOW_ATTRIBUTE(qm_diff_regs);
- 
-+static int qm_state_show(struct seq_file *s, void *unused)
-+{
-+	struct hisi_qm *qm = s->private;
-+	u32 val;
-+	int ret;
-+
-+	/* If device is in suspended, directly return the idle state. */
-+	ret = hisi_qm_get_dfx_access(qm);
-+	if (!ret) {
-+		val = readl(qm->io_base + QM_IN_IDLE_ST_REG);
-+		hisi_qm_put_dfx_access(qm);
-+	} else if (ret == -EAGAIN) {
-+		val = QM_IN_IDLE_STATE;
-+	} else {
-+		return ret;
-+	}
-+
-+	seq_printf(s, "%u\n", val);
-+
-+	return 0;
-+}
-+
-+DEFINE_SHOW_ATTRIBUTE(qm_state);
-+
- static ssize_t qm_status_read(struct file *filp, char __user *buffer,
- 			      size_t count, loff_t *pos)
- {
-@@ -1072,6 +1098,9 @@ void hisi_qm_debug_init(struct hisi_qm *qm)
- 
- 	/* only show this in PF */
- 	if (qm->fun_type == QM_HW_PF) {
-+		debugfs_create_file("qm_state", 0444, qm->debug.qm_d,
-+					qm, &qm_state_fops);
-+
- 		qm_create_debugfs_file(qm, qm->debug.debug_root, CURRENT_QM);
- 		for (i = CURRENT_Q; i < DEBUG_FILE_NUM; i++)
- 			qm_create_debugfs_file(qm, qm->debug.qm_d, i);
+ static const struct debugfs_reg32 qm_vf_dfx_regs[] = {
 -- 
 2.33.0
 
