@@ -1,83 +1,136 @@
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEDD6BB22
-	for <linux-crypto@vger.kernel.org>; Fri, 12 Jan 2024 13:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-107-MotGPF6GOuKC6jFoeEgFUA-1; Fri, 12 Jan 2024 13:00:14 +0000
-X-MC-Unique: MotGPF6GOuKC6jFoeEgFUA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 12 Jan
- 2024 12:59:56 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Fri, 12 Jan 2024 12:59:56 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Dongsoo Lee' <letrhee@nsr.re.kr>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, "Jens
- Axboe" <axboe@kernel.dk>, Eric Biggers <ebiggers@kernel.org>, "Theodore Y.
- Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Thomas Gleixner
-	<tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
-	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org"
-	<x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
-CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v6 RESEND 5/5] crypto: LEA block cipher x86_64
- optimization
-Thread-Topic: [PATCH v6 RESEND 5/5] crypto: LEA block cipher x86_64
- optimization
-Thread-Index: AQHaRP97Qv3M1SIfYkW1atonfzlDU7DWJB2Q
-Date: Fri, 12 Jan 2024 12:59:56 +0000
-Message-ID: <cbd8de6ff70849a98faf2fd25b065a94@AcuMS.aculab.com>
-References: <20240112022859.2384-1-letrhee@nsr.re.kr>
- <20240112022859.2384-6-letrhee@nsr.re.kr>
-In-Reply-To: <20240112022859.2384-6-letrhee@nsr.re.kr>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C926DD16;
+	Fri, 12 Jan 2024 14:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Uq/rcauV"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 2195A40E01BB;
+	Fri, 12 Jan 2024 14:50:19 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id j0ZiORjLOv0g; Fri, 12 Jan 2024 14:50:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1705071016; bh=nqVhozkdasMvoNMNWSSH6FJXsbVj0/v6l5vQpljdmiQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Uq/rcauVAF/rPaiz6zG4iwcyP/DJrKvon5cm7DsCpvv4EfqvJbpDlNpRuNhfhu72L
+	 n8IrDjE75/gjytSFQmBDYV+RfXzJ5yPbmWYErAT4jGQHPgp9fTYohyoE/hw6Ic509I
+	 EoKI50jTnVkmhyJb73dkILrUIECLcmIj8qFIsZS0LSzioXwtpKYMdTyVeCzOp+jTAu
+	 eswxAZ6hDFO/fdZBLGyMWGSbn+hdpFC72aRyo2dLJaHPSGHiWrawt6r1nl/QpSOZEq
+	 po0eksPZQ3C5njl94LFXpntvJxTOSx/1TpV4ZHecnzsEvRgDodYPzfu7vznZi1knt5
+	 e11dAhUw4NtAGRdUsBK5wIs9HFPwAc/bayH04wPymSCxGKgNBMX68hI2nTmcfQxdZR
+	 jDqwIBJKuiBIEEETVzTvKfLT0bN3FMAiRnQzvHxvGalGKUbxX7bh+8lg5Whx5MSOC1
+	 W+/5lMfe87IhbXpJFI+X4WIUjnVT2dUA4imi3IR/AKWcErPvsHeAgxmv5vgUdlf9bm
+	 FZyjY+aOH8hxRoWUWFCEsBQ2BGhEHTxa4HjzR8ymv8uO60uwA/S85/BgcTGfBenv1Y
+	 48POGnd7/NvuF/kg3fM8WUIzdT/x9J+Hj9IhZc2TjQezZuldVKsalPi3428QxA45E0
+	 sVyGs7NksRVilK6HjRwuPKo4=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 441A340E016C;
+	Fri, 12 Jan 2024 14:49:38 +0000 (UTC)
+Date: Fri, 12 Jan 2024 15:49:31 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v1 10/26] x86/sev: Add helper functions for RMPUPDATE and
+ PSMASH instruction
+Message-ID: <20240112144931.GCZaFRewg1ft-oS_rY@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-11-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231230161954.569267-11-michael.roth@amd.com>
 
-From: Dongsoo Lee
-> Sent: 12 January 2024 02:29
->=20
-> For the x86_64 environment, we use AVX-512F/AVX2/SSE2 instructions.
-> Since LEA uses 128-bit blocks of four 32-bit integers, for optimization,
-> SSE2 encrypts 4 blocks, AVX2 encrypts 4/8 blocks, and AVX-512F encrypts
-> 4/8/16 blocks at a time.
->=20
-> Our submission provides a optimized implementation of ECB, CBC
-> decryption, CTR, and XTS cipher operation modes on x86_64 CPUs
-> supporting.
+On Sat, Dec 30, 2023 at 10:19:38AM -0600, Michael Roth wrote:
+> +static int rmpupdate(u64 pfn, struct rmp_state *state)
+> +{
+> +	unsigned long paddr = pfn << PAGE_SHIFT;
+> +	int ret;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return -ENODEV;
+> +
 
-Given you say in 0/0:
+Let's document this deal here and leave the door open for potential
+future improvements:
 
-The LEA algorithm is a lightweight block cipher that processes data blocks =
-of 128-bits and has three different key lengths, each with a different numb=
-er of rounds:
+---
 
-Just how big is it ?
-Doesn't look 'lightweight' to me.
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index c9156ce47c77..1fbf9843c163 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -374,6 +374,21 @@ static int rmpupdate(u64 pfn, struct rmp_state *state)
+ 	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+ 		return -ENODEV;
+ 
++	/*
++	 * It is expected that those operations are seldom enough so
++	 * that no mutual exclusion of updaters is needed and thus the
++	 * overlap error condition below should happen very seldomly and
++	 * would get resolved relatively quickly by the firmware.
++	 *
++	 * If not, one could consider introducing a mutex or so here to
++	 * sync concurrent RMP updates and thus diminish the amount of
++	 * cases where firmware needs to lock 2M ranges to protect
++	 * against concurrent updates.
++	 *
++	 * The optimal solution would be range locking to avoid locking
++	 * disjoint regions unnecessarily but there's no support for
++	 * that yet.
++	 */
+ 	do {
+ 		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
+ 		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
 
-=09David
+> +	do {
+> +		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
+> +		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
+> +			     : "=a" (ret)
+> +			     : "a" (paddr), "c" ((unsigned long)state)
+> +			     : "memory", "cc");
+> +	} while (ret == RMPUPDATE_FAIL_OVERLAP);
+> +
+> +	if (ret) {
+> +		pr_err("RMPUPDATE failed for PFN %llx, ret: %d\n", pfn, ret);
+> +		dump_rmpentry(pfn);
+> +		dump_stack();
+> +		return -EFAULT;
+> +	}
+> +
+> +	return 0;
+> +}
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
