@@ -1,84 +1,83 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EE55EE81;
-	Fri, 12 Jan 2024 10:26:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TBHjz0hqSzsVqh;
-	Fri, 12 Jan 2024 18:25:43 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (unknown [7.193.23.164])
-	by mail.maildlp.com (Postfix) with ESMTPS id 36D6A14011A;
-	Fri, 12 Jan 2024 18:26:30 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 12 Jan 2024 18:26:29 +0800
-From: Weili Qian <qianweili@huawei.com>
-To: <herbert@gondor.apana.org.au>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<liulongfang@huawei.com>, Weili Qian <qianweili@huawei.com>
-Subject: [PATCH 2/2] crypto: hisilicon/qm - dump important registers values before resetting
-Date: Fri, 12 Jan 2024 18:25:46 +0800
-Message-ID: <20240112102546.2213-3-qianweili@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240112102546.2213-1-qianweili@huawei.com>
-References: <20240112102546.2213-1-qianweili@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEDD6BB22
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Jan 2024 13:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-107-MotGPF6GOuKC6jFoeEgFUA-1; Fri, 12 Jan 2024 13:00:14 +0000
+X-MC-Unique: MotGPF6GOuKC6jFoeEgFUA-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 12 Jan
+ 2024 12:59:56 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 12 Jan 2024 12:59:56 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Dongsoo Lee' <letrhee@nsr.re.kr>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, "Jens
+ Axboe" <axboe@kernel.dk>, Eric Biggers <ebiggers@kernel.org>, "Theodore Y.
+ Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Thomas Gleixner
+	<tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org"
+	<x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v6 RESEND 5/5] crypto: LEA block cipher x86_64
+ optimization
+Thread-Topic: [PATCH v6 RESEND 5/5] crypto: LEA block cipher x86_64
+ optimization
+Thread-Index: AQHaRP97Qv3M1SIfYkW1atonfzlDU7DWJB2Q
+Date: Fri, 12 Jan 2024 12:59:56 +0000
+Message-ID: <cbd8de6ff70849a98faf2fd25b065a94@AcuMS.aculab.com>
+References: <20240112022859.2384-1-letrhee@nsr.re.kr>
+ <20240112022859.2384-6-letrhee@nsr.re.kr>
+In-Reply-To: <20240112022859.2384-6-letrhee@nsr.re.kr>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Read the values of some device registers before the device
-is reset, these values help analyze the cause of the device exception.
+From: Dongsoo Lee
+> Sent: 12 January 2024 02:29
+>=20
+> For the x86_64 environment, we use AVX-512F/AVX2/SSE2 instructions.
+> Since LEA uses 128-bit blocks of four 32-bit integers, for optimization,
+> SSE2 encrypts 4 blocks, AVX2 encrypts 4/8 blocks, and AVX-512F encrypts
+> 4/8/16 blocks at a time.
+>=20
+> Our submission provides a optimized implementation of ECB, CBC
+> decryption, CTR, and XTS cipher operation modes on x86_64 CPUs
+> supporting.
 
-Signed-off-by: Weili Qian <qianweili@huawei.com>
----
- drivers/crypto/hisilicon/debugfs.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+Given you say in 0/0:
 
-diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
-index 615c8e18d8b0..06e67eda409f 100644
---- a/drivers/crypto/hisilicon/debugfs.c
-+++ b/drivers/crypto/hisilicon/debugfs.c
-@@ -83,6 +83,30 @@ static const struct debugfs_reg32 qm_dfx_regs[] = {
- 	{"QM_DFX_FF_ST5                 ",  0x1040dc},
- 	{"QM_DFX_FF_ST6                 ",  0x1040e0},
- 	{"QM_IN_IDLE_ST                 ",  0x1040e4},
-+	{"QM_CACHE_CTL                  ",  0x100050},
-+	{"QM_TIMEOUT_CFG                ",  0x100070},
-+	{"QM_DB_TIMEOUT_CFG             ",  0x100074},
-+	{"QM_FLR_PENDING_TIME_CFG       ",  0x100078},
-+	{"QM_ARUSR_MCFG1                ",  0x100088},
-+	{"QM_AWUSR_MCFG1                ",  0x100098},
-+	{"QM_AXI_M_CFG_ENABLE           ",  0x1000B0},
-+	{"QM_RAS_CE_THRESHOLD           ",  0x1000F8},
-+	{"QM_AXI_TIMEOUT_CTRL           ",  0x100120},
-+	{"QM_AXI_TIMEOUT_STATUS         ",  0x100124},
-+	{"QM_CQE_AGGR_TIMEOUT_CTRL      ",  0x100144},
-+	{"ACC_RAS_MSI_INT_SEL           ",  0x1040fc},
-+	{"QM_CQE_OUT                    ",  0x104100},
-+	{"QM_EQE_OUT                    ",  0x104104},
-+	{"QM_AEQE_OUT                   ",  0x104108},
-+	{"QM_DB_INFO0                   ",  0x104180},
-+	{"QM_DB_INFO1                   ",  0x104184},
-+	{"QM_AM_CTRL_GLOBAL             ",  0x300000},
-+	{"QM_AM_CURR_PORT_STS           ",  0x300100},
-+	{"QM_AM_CURR_TRANS_RETURN       ",  0x300150},
-+	{"QM_AM_CURR_RD_MAX_TXID        ",  0x300154},
-+	{"QM_AM_CURR_WR_MAX_TXID        ",  0x300158},
-+	{"QM_AM_ALARM_RRESP             ",  0x300180},
-+	{"QM_AM_ALARM_BRESP             ",  0x300184},
- };
- 
- static const struct debugfs_reg32 qm_vf_dfx_regs[] = {
--- 
-2.33.0
+The LEA algorithm is a lightweight block cipher that processes data blocks =
+of 128-bits and has three different key lengths, each with a different numb=
+er of rounds:
+
+Just how big is it ?
+Doesn't look 'lightweight' to me.
+
+=09David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
