@@ -1,99 +1,62 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E41FBEA;
-	Sat, 13 Jan 2024 04:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C316AB9;
+	Sat, 13 Jan 2024 20:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F/605MET"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705121670; x=1736657670;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WL/QqSd1Bk1dMQtp6aDp3jGsFXAHfb+taVAOlJrMvNc=;
-  b=F/605METF9ZVAln3e8OBqFiocfDKLZZbp7AymsfXutzNmvjTo1/oANHr
-   b21SdWYmFiO7l9EDhIF864Z10UgmbobQuC7C9S6UIDC+Enl1zl95cOpUX
-   4Cc/QaqTNFs5IGcBNojLPctiSBSstcxi+pEjIihXdMtuo3jTso92Mp1Jl
-   7wSaae+B/2OXYtslYg2g/zFc3ZhLs7mK2rfxB3TvpynsMrPZIjGotFwPT
-   Yke490Fj0bi4fN2hxsz3xkp4blcnL6yhuv7mKkpNjQTcE4rNQNViho9kK
-   09DZlOJRWbEpm/WzOJ8msn9fHaZtqAhdQJuDzsivTtcqSh+I+SctxeKlt
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10951"; a="12715720"
-X-IronPort-AV: E=Sophos;i="6.04,191,1695711600"; 
-   d="scan'208";a="12715720"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2024 20:54:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10951"; a="786570253"
-X-IronPort-AV: E=Sophos;i="6.04,191,1695711600"; 
-   d="scan'208";a="786570253"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga007.fm.intel.com with ESMTP; 12 Jan 2024 20:54:24 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rOW2I-000A6u-22;
-	Sat, 13 Jan 2024 04:54:22 +0000
-Date: Sat, 13 Jan 2024 12:53:50 +0800
-From: kernel test robot <lkp@intel.com>
-To: Akhil R <akhilrajeev@nvidia.com>, herbert@gondor.apana.org.au,
-	davem@davemloft.net, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	thierry.reding@gmail.com, jonathanh@nvidia.com,
-	catalin.marinas@arm.com, will@kernel.org, mperttunen@nvidia.com,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-tegra@vger.kernel.org, linux-kernel@vger.kernel.org,
-	krzk@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Akhil R <akhilrajeev@nvidia.com>
-Subject: Re: [PATCH v3 3/5] crypto: tegra: Add Tegra Security Engine driver
-Message-ID: <202401131257.8RjvB7OG-lkp@intel.com>
-References: <20240109091708.66977-4-akhilrajeev@nvidia.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="elFGA7OA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 575F4C433F1;
+	Sat, 13 Jan 2024 20:46:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705178820;
+	bh=iwEVATHQ8eeDbVh0zZOeyRTJ7va9/daHx97fvBWGCnc=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=elFGA7OAAVDu5Vtl+1rE9koMNONVqQziudmT364fAVLfwluPsG963158mubxJMrfI
+	 OkZvV7rgV3+7U0C8wB+Vb5kPKoZKLDUCx/oIZT2y90SpyYyM9TRjupAqVUFdE8/6D0
+	 YNgX0OPsdD/wL5RSkPZ1T48vyt3L7edkolfwLwBlXpZPvbsBW1hmD1/ttRHCL0l8ow
+	 1cawMy0CyaoMsD9Y2MN/VEEREJAfxbQk5EaZ3UiKp9VOhYKrI9VBv3OI1sjJMZDnYh
+	 0w+yOrYIt3pi4DBp5UAiCJe3UCq1yDOAqWrXeOmaBQ/jzXfYrks29Br/fBXrU5Ipeh
+	 AIvh8rn7afNtg==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240109091708.66977-4-akhilrajeev@nvidia.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 13 Jan 2024 22:46:57 +0200
+Message-Id: <CYDVFYGDLJFC.1IAQAPLY6VRWX@kernel.org>
+Cc: <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
+ <davem@davemloft.net>
+Subject: Re: [PATCH] KEYS: include header for EINVAL definition
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Clay Chang" <clayc@hpe.com>, <keyrings@vger.kernel.org>,
+ <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+X-Mailer: aerc 0.16.0
+References: <20240107132842.4024084-1-clayc@hpe.com>
+ <CY9E6M2BYETA.1VE73N3UHD4B9@suppilovahvero>
+ <a77797fd-cbe4-42be-abd6-54cc815d360a@hpe.com>
+ <CYBAG2X330P5.2SIIYCQ1GN44G@suppilovahvero>
+ <a8ad036a-7d65-4dbe-8c87-f569e54d7a57@hpe.com>
+In-Reply-To: <a8ad036a-7d65-4dbe-8c87-f569e54d7a57@hpe.com>
 
-Hi Akhil,
+On Fri Jan 12, 2024 at 7:59 AM EET, Clay Chang wrote:
+> Hi Jarkko,
+>
+> Yes, I have. I am working on an OpenBMC project and the kernel .config wa=
+s generated by merging several config fragments. In one experiment where th=
+e CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE was not presented, I got a EINVAL un=
+declared compilation error.
+>
+> Do you want me to show the full .config here?
 
-kernel test robot noticed the following build warnings:
+Well the problem with the patch is that it does not *prove*
+that there is issue.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master tegra/for-next linus/master v6.7 next-20240112]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+So you evidence in the commit message that there is bug in
+the first place and which config options cause it. And it
+it must be testable with latest mainline (not by downstream
+project).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Akhil-R/dt-bindings-crypto-Add-Tegra-Security-Engine/20240109-172454
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20240109091708.66977-4-akhilrajeev%40nvidia.com
-patch subject: [PATCH v3 3/5] crypto: tegra: Add Tegra Security Engine driver
-config: powerpc64-randconfig-r123-20240112 (https://download.01.org/0day-ci/archive/20240113/202401131257.8RjvB7OG-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce: (https://download.01.org/0day-ci/archive/20240113/202401131257.8RjvB7OG-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401131257.8RjvB7OG-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/crypto/tegra/tegra-se-key.c:20:1: sparse: sparse: symbol 'kslt_lock' was not declared. Should it be static?
-   drivers/crypto/tegra/tegra-se-key.c: note: in included file (through include/linux/mmzone.h, include/linux/gfp.h, include/linux/umh.h, include/linux/kmod.h, ...):
-   include/linux/page-flags.h:242:46: sparse: sparse: self-comparison always evaluates to false
-
-vim +/kslt_lock +20 drivers/crypto/tegra/tegra-se-key.c
-
-    18	
-    19	/* Mutex lock to guard keyslots */
-  > 20	DEFINE_MUTEX(kslt_lock);
-    21	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+BR, Jarkko
