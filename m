@@ -1,101 +1,100 @@
-Received: from mail.nsr.re.kr (unknown [210.104.33.65])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2695A522B;
-	Mon, 15 Jan 2024 05:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nsr.re.kr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nsr.re.kr
-Received: from 210.104.33.70 (nsr.re.kr)
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
-	by mail.nsr.re.kr with SMTP; Mon, 15 Jan 2024 14:17:49 +0900
-X-Sender: letrhee@nsr.re.kr
-Received: from 192.168.155.188 ([192.168.155.188])
-          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 499;
-          Mon, 15 Jan 2024 14:17:43 +0900 (KST)
-From: Dongsoo Lee <letrhee@nsr.re.kr>
-To: 'David Laight' <David.Laight@ACULAB.COM>, 
-	'Herbert Xu' <herbert@gondor.apana.org.au>, 
-	"'David S. Miller'" <davem@davemloft.net>, 
-	'Jens Axboe' <axboe@kernel.dk>, 'Eric Biggers' <ebiggers@kernel.org>, 
-	"'Theodore Y. Ts'o'" <tytso@mit.edu>, 
-	'Jaegeuk Kim' <jaegeuk@kernel.org>, 
-	'Thomas Gleixner' <tglx@linutronix.de>, 
-	'Ingo Molnar' <mingo@redhat.com>, 'Borislav Petkov' <bp@alien8.de>, 
-	'Dave Hansen' <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"'H. Peter Anvin'" <hpa@zytor.com>
-Cc: linux-crypto@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240112022859.2384-1-letrhee@nsr.re.kr> <20240112022859.2384-6-letrhee@nsr.re.kr> <cbd8de6ff70849a98faf2fd25b065a94@AcuMS.aculab.com>
-In-Reply-To: <cbd8de6ff70849a98faf2fd25b065a94@AcuMS.aculab.com>
-Subject: RE: [PATCH v6 RESEND 5/5] crypto: LEA block cipher x86_64 optimization
-Date: Mon, 15 Jan 2024 14:17:43 +0900
-Message-ID: <000e01da4772$2b2c5360$8184fa20$@nsr.re.kr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E584428;
+	Mon, 15 Jan 2024 09:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="SAOPBhxw"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id AD92740E01B0;
+	Mon, 15 Jan 2024 09:02:12 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id SUKdvpsWbZhK; Mon, 15 Jan 2024 09:02:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1705309330; bh=StldW18DJW9RHvhpFLIMw8/y8Xdlf7u+BI435bxm9gE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SAOPBhxwbXpACDVHP9Vgo+tBOgk6enmMbPub2YjCJOSM2Toof/rV7Tf6Q7KI0mS1g
+	 ZEBocmEh81odQ2fQbDeCt9YY3bAHX7XPTnpw7Un7NF9qjc3oa1yXKaibzSuoQDj/x3
+	 evyCIOERFXEiSoe5cyAhmDl1c1pRyM8HLcaLyzQMdOF72dHMjbbRjLv0doHYVPOaCh
+	 hlygnPuXr/lh3jKPd04u9kqpmeR2RvvB11xD0OZbMX98qSlIrtzWdjd/EJwIPPXF/e
+	 3B4uJK5neFbWsFBfVhuCn823FkTrBaGCd/C4SUl+MIBS8hD67NvSqMRUxA5BhQzE5Z
+	 olACYu2A9zCwGqxAR/dxdJtbefC0pED2yvzcvoMizdVumW2bIrH2gaqeVecKt5LeEE
+	 kvQxK5TJeeXq+Xc+DaFxh0DsavN4p3n6NNrZ2GYRoMMaOelAuNsYdoTKSLlPViMhxn
+	 so7gePgLsENHGpjy+x/C1Wi41H+Rl5T+SVHS7jKFXTVmIhciNEDlSkcfMY61sFbJI/
+	 o7VSoCVXWZv8qrKkhvxKf8e3Yh2FnNPraaEj7B872YIPUs96dShqtLXjHEgZWG9QqR
+	 6jgVxJglFNO/ETzSN4Oz4a+qpYt6yB52z6q81wpRVsI+ElPGIVMbmNf/lhjYS9V2T+
+	 oygAXEbBHHh/kshvJixLCzlI=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 008B940E01A9;
+	Mon, 15 Jan 2024 09:01:31 +0000 (UTC)
+Date: Mon, 15 Jan 2024 10:01:26 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
+ when adding them to the RMP table
+Message-ID: <20240115090126.GEZaT0ZnSPIPsnUiyt@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-12-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: ko
-Thread-Index: AQMGEr+nvC0x82l43QjPVTp1bc6i9wFH8CyOAqmBDhmuYzLfEA==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231230161954.569267-12-michael.roth@amd.com>
 
-On  Fri, 12 Jan 2024 12:59:56 +0000, David Laight =
-<David.Laight@ACULAB.COM> wrote:
-> From: Dongsoo Lee
->> Sent: 12 January 2024 02:29
->>
->> For the x86_64 environment, we use AVX-512F/AVX2/SSE2 instructions.
->> Since LEA uses 128-bit blocks of four 32-bit integers, for =
-optimization,
->> SSE2 encrypts 4 blocks, AVX2 encrypts 4/8 blocks, and AVX-512F =
-encrypts
->> 4/8/16 blocks at a time.
->>
->> Our submission provides a optimized implementation of ECB, CBC
->> decryption, CTR, and XTS cipher operation modes on x86_64 CPUs
->> supporting.
->=20
-> Given you say in 0/0:
->=20
-> The LEA algorithm is a lightweight block cipher that processes data =
-blocks of 128-bits and has three different key lengths, each with a =
-different number of rounds:
->=20
-> Just how big is it ?
-> Doesn't look 'lightweight' to me.
->=20
-> 	David
->=20
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, =
-MK1 1PT, UK
-> Registration No: 1397386 (Wales)
->=20
+On Sat, Dec 30, 2023 at 10:19:39AM -0600, Michael Roth wrote:
+> +	/*
+> +	 * If the kernel uses a 2MB directmap mapping to write to an address,
+> +	 * and that 2MB range happens to contain a 4KB page that set to private
+> +	 * in the RMP table, an RMP #PF will trigger and cause a host crash.
 
-Firstly, it's worth mentioning that LEA is an encryption algorithm =
-designed to ensure 128-bit security.
+Also:
 
-The LEA cipher provides a balance between code size and required memory, =
-allowing for trade-offs with performance. The implementation of LEA that =
-we have submitted is oriented towards achieving optimal performance.
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index 7d294d1a620b..2ad83e7fb2da 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -415,8 +415,9 @@ static int rmpupdate(u64 pfn, struct rmp_state *state)
+ 
+ 	/*
+ 	 * If the kernel uses a 2MB directmap mapping to write to an address,
+-	 * and that 2MB range happens to contain a 4KB page that set to private
+-	 * in the RMP table, an RMP #PF will trigger and cause a host crash.
++	 * and that 2MB range happens to contain a 4KB page that has been set
++	 * to private in the RMP table, an RMP #PF will trigger and cause a
++	 * host crash.
+ 	 *
+ 	 * Prevent this by removing pages from the directmap prior to setting
+ 	 * them as private in the RMP table.
 
-While it's difficult to compare to the most recent implementations of =
-cryptographic algorithms because the test is out of date, you can see =
-the results of a previous FELICS test [1] that implemented LEA for a =
-smaller code size.
+-- 
+Regards/Gruss,
+    Boris.
 
-For example, a detailed example of skipping the key schedule to reduce =
-memory usage and minimize code size can be found in [2].
-
-Thank you for your interest.
-
-    Dongsoo Lee
-
-[1] https://www.cryptolux.org/index.php/FELICS#Results
-[2] =
-https://github.com/cryptolu/FELICS/blob/master/block_ciphers/source/ciphe=
-rs/LEA_128_128_v03/source/encrypt.c
+https://people.kernel.org/tglx/notes-about-netiquette
