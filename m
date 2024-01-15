@@ -1,153 +1,127 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66885F4E4;
-	Mon, 15 Jan 2024 09:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04EF9F9D3;
+	Mon, 15 Jan 2024 09:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="DwSRoxEo";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kA3Crk0x";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="DwSRoxEo";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kA3Crk0x"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="kZq7oIgp"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 367D240E016C;
+	Mon, 15 Jan 2024 09:41:59 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id gbcYK8KndIZR; Mon, 15 Jan 2024 09:41:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1705311716; bh=XBIKxlNsZUJPRPkrxlOi1GzgwTad37xoV2mYozz4U4g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kZq7oIgpoPYNJEFRmQ9JE48d2cPjKOwShniYdb8svdbjNuXaCXgkI4vm7t9jN3tk3
+	 0SyquZx6f4o+581UG8SQEF/a5JXBrhlewfKVgs0DWSPD7Xhu3x7KPorhxYHOrW/ZkW
+	 /WkS4JM23S0qQa6J6k/PMJ9/UFQC3c3EAtxAAudXnxy2OfmMr6GryU5ieNcRB0VUqF
+	 Kk56gR6BWxDGFlGlKPXEkv3AS1x2RjKgRjF4rN71FCEKHAR7JQV8a9ePmr0epXg4nr
+	 +K8OUef+fdVPdl9dDUwxnKAIEtAaEqwy5hTxtLcpu+fZI3TyrfY91wAV77MqGaQJX+
+	 I9TV8Vr7MDR6A+XR2gzKocxtwZwUaUPYPtI71n52jydUwNRUFbuLfcJmGPHLs6vmCc
+	 GT15I5hrWJ5oS44BqXuvuQz7Gn+RxvthADl5Xqp7KraalD4OGnhM3sIkHtrlPoA+SP
+	 ElIlzTj3x2wO4UdsT9YEgQcRKXep+r2BCZohCYiRrppaZJ8uagtla5VglupvrYmOSB
+	 Uz8ExwhjAP5m15h1O0Q7sQH1RYxDEBqFCXtAiJLE2g5DCXhPEhpyNgmdJIGvMFTeRG
+	 6p+xjuV3jBjkoXBYS7fHf89rG4lL2UmaOvBIU5i6yOHaa7F3eHhKV/VzYkAGlTfiYe
+	 I7Bqk/56DF97nG5LMUix8SaU=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 989B722150;
-	Mon, 15 Jan 2024 09:23:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1705310598; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cAvAmgb/jPWg9AlkaccrOmdOwRCSsdippzeZcx291nI=;
-	b=DwSRoxEoiZW4TfXc4fF+UH6GBBSvPVkAmEhT07+0QAIj26qFIMksxaCur1+5JSJLMCy7B9
-	v/+ZtmjzRhoLXPTBMYfF7KkuOR4oUwo4FvTnzlWfoZYjRVF/+xJDTtAu0wCtGtMrm6GudZ
-	TGjumFbt6AdFGn0Zl8gyqMwqvWBBzVo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1705310598;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cAvAmgb/jPWg9AlkaccrOmdOwRCSsdippzeZcx291nI=;
-	b=kA3Crk0xZEfgJb4J6mqAN5ZS7yw5zCilj6ACcSSlpobTV6Exuk6q44u8bK9neKpLGTIakg
-	UM2XD+NvPvgehlAg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1705310598; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cAvAmgb/jPWg9AlkaccrOmdOwRCSsdippzeZcx291nI=;
-	b=DwSRoxEoiZW4TfXc4fF+UH6GBBSvPVkAmEhT07+0QAIj26qFIMksxaCur1+5JSJLMCy7B9
-	v/+ZtmjzRhoLXPTBMYfF7KkuOR4oUwo4FvTnzlWfoZYjRVF/+xJDTtAu0wCtGtMrm6GudZ
-	TGjumFbt6AdFGn0Zl8gyqMwqvWBBzVo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1705310598;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cAvAmgb/jPWg9AlkaccrOmdOwRCSsdippzeZcx291nI=;
-	b=kA3Crk0xZEfgJb4J6mqAN5ZS7yw5zCilj6ACcSSlpobTV6Exuk6q44u8bK9neKpLGTIakg
-	UM2XD+NvPvgehlAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4DD7713712;
-	Mon, 15 Jan 2024 09:23:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id OHGxEob5pGXdEwAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 15 Jan 2024 09:23:18 +0000
-Message-ID: <91f54c39-a8f4-4186-9a5b-83dcbc5c929c@suse.cz>
-Date: Mon, 15 Jan 2024 10:23:18 +0100
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AC6A940E01A9;
+	Mon, 15 Jan 2024 09:41:19 +0000 (UTC)
+Date: Mon, 15 Jan 2024 10:41:12 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com,
+	"liam.merwick@oracle.com Brijesh Singh" <brijesh.singh@amd.com>
+Subject: Re: [PATCH v1 12/26] crypto: ccp: Define the SEV-SNP commands
+Message-ID: <20240115094103.GFZaT9r4zX8V_ax8lv@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-13-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
- when adding them to the RMP table
-Content-Language: en-US
-To: Dave Hansen <dave.hansen@intel.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, Borislav Petkov <bp@alien8.de>
-Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, hpa@zytor.com,
- ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
- vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, tobin@ibm.com, kirill@shutemov.name,
- ak@linux.intel.com, tony.luck@intel.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
- pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
- Brijesh Singh <brijesh.singh@amd.com>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-12-michael.roth@amd.com>
- <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
- <20240112200751.GHZaGcF0-OZVJiIB7y@fat_crate.local>
- <63297d29-bb24-ac5e-0b47-35e22bb1a2f8@amd.com>
- <336b55f9-c7e6-4ec9-806b-cb3659dbfdc3@intel.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <336b55f9-c7e6-4ec9-806b-cb3659dbfdc3@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=DwSRoxEo;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=kA3Crk0x
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 BAYES_HAM(-0.00)[34.26%];
-	 MIME_GOOD(-0.10)[text/plain];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 RCVD_DKIM_ARC_DNSWL_HI(-1.00)[];
-	 R_RATELIMIT(0.00)[to_ip_from(RLisu716frudqkg98kczdd9eac)];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.cz:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_TWELVE(0.00)[39];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_IN_DNSWL_HI(-1.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 989B722150
-X-Spam-Level: 
-X-Spam-Score: -2.30
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231230161954.569267-13-michael.roth@amd.com>
 
-On 1/12/24 21:37, Dave Hansen wrote:
-> On 1/12/24 12:28, Tom Lendacky wrote:
->> I thought there was also a desire to remove the direct map for any pages
->> assigned to a guest as private, not just the case that the comment says.
->> So updating the comment would probably the best action.
+On Sat, Dec 30, 2023 at 10:19:40AM -0600, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> I'm not sure who desires that.
+> AMD introduced the next generation of SEV called SEV-SNP (Secure Nested
+> Paging). SEV-SNP builds upon existing SEV and SEV-ES functionality
+> while adding new hardware security protection.
 > 
-> It's sloooooooow to remove things from the direct map.  There's almost
-> certainly a frequency cutoff where running the whole direct mapping as
-> 4k is better than the cost of mapping/unmapping.
+> Define the commands and structures used to communicate with the AMD-SP
+> when creating and managing the SEV-SNP guests. The SEV-SNP firmware spec
+> is available at developer.amd.com/sev.
 > 
-> Actually, where _is_ the TLB flushing here?
+> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> [mdr: update SNP command list and SNP status struct based on current
+>       spec, use C99 flexible arrays, fix kernel-doc issues]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  drivers/crypto/ccp/sev-dev.c |  16 +++
+>  include/linux/psp-sev.h      | 264 +++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/psp-sev.h |  56 ++++++++
+>  3 files changed, 336 insertions(+)
 
-Hm yeah it seems to be using the _noflush version? Maybe the RMP issues this
-avoids are only triggered with actual page tables and a stray outdated TLB
-hit doesn't trigger it? Needs documenting though if that's the case.
+More ignored feedback:
+
+https://lore.kernel.org/r/20231124143630.GKZWC07hjqxkf60ni4@fat_crate.local
+
+Lemme send it to you as a diff then - it'll work then perhaps.
+
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 983d314b5ff5..1a76b5297f03 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -104,7 +104,7 @@ enum sev_cmd {
+ 	SEV_CMD_SNP_PAGE_RECLAIM	= 0x0C7,
+ 	SEV_CMD_SNP_PAGE_UNSMASH	= 0x0C8,
+ 	SEV_CMD_SNP_CONFIG		= 0x0C9,
+-	SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX	= 0x0CA,
++	SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX = 0x0CA,
+ 	SEV_CMD_SNP_COMMIT		= 0x0CB,
+ 	SEV_CMD_SNP_VLEK_LOAD		= 0x0CD,
+ 
+@@ -624,7 +624,8 @@ enum {
+  * @gctx_paddr: system physical address of guest context page
+  * @page_size: page size 0 indicates 4K and 1 indicates 2MB page
+  * @page_type: encoded page type
+- * @imi_page: indicates that this page is part of the IMI of the guest
++ * @imi_page: indicates that this page is part of the IMI (Incoming
++ * Migration Image) of the guest
+  * @rsvd: reserved
+  * @rsvd2: reserved
+  * @address: system physical address of destination page to encrypt
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
