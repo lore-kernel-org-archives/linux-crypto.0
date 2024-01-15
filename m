@@ -1,63 +1,68 @@
 Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E584428;
-	Mon, 15 Jan 2024 09:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A7BC2D2;
+	Mon, 15 Jan 2024 09:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="SAOPBhxw"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="ZkNaz/iK"
 Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id AD92740E01B0;
-	Mon, 15 Jan 2024 09:02:12 +0000 (UTC)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 9238240E01A9;
+	Mon, 15 Jan 2024 09:07:22 +0000 (UTC)
 X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
 Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
 	header.d=alien8.de
 Received: from mail.alien8.de ([127.0.0.1])
 	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id SUKdvpsWbZhK; Mon, 15 Jan 2024 09:02:10 +0000 (UTC)
+	with ESMTP id 4xtKFCvfzKuy; Mon, 15 Jan 2024 09:07:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1705309330; bh=StldW18DJW9RHvhpFLIMw8/y8Xdlf7u+BI435bxm9gE=;
+	t=1705309639; bh=fdg/Qndr0DWBNTkgQOVl8J+shnlTJdeLN2SZCkKmRQY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SAOPBhxwbXpACDVHP9Vgo+tBOgk6enmMbPub2YjCJOSM2Toof/rV7Tf6Q7KI0mS1g
-	 ZEBocmEh81odQ2fQbDeCt9YY3bAHX7XPTnpw7Un7NF9qjc3oa1yXKaibzSuoQDj/x3
-	 evyCIOERFXEiSoe5cyAhmDl1c1pRyM8HLcaLyzQMdOF72dHMjbbRjLv0doHYVPOaCh
-	 hlygnPuXr/lh3jKPd04u9kqpmeR2RvvB11xD0OZbMX98qSlIrtzWdjd/EJwIPPXF/e
-	 3B4uJK5neFbWsFBfVhuCn823FkTrBaGCd/C4SUl+MIBS8hD67NvSqMRUxA5BhQzE5Z
-	 olACYu2A9zCwGqxAR/dxdJtbefC0pED2yvzcvoMizdVumW2bIrH2gaqeVecKt5LeEE
-	 kvQxK5TJeeXq+Xc+DaFxh0DsavN4p3n6NNrZ2GYRoMMaOelAuNsYdoTKSLlPViMhxn
-	 so7gePgLsENHGpjy+x/C1Wi41H+Rl5T+SVHS7jKFXTVmIhciNEDlSkcfMY61sFbJI/
-	 o7VSoCVXWZv8qrKkhvxKf8e3Yh2FnNPraaEj7B872YIPUs96dShqtLXjHEgZWG9QqR
-	 6jgVxJglFNO/ETzSN4Oz4a+qpYt6yB52z6q81wpRVsI+ElPGIVMbmNf/lhjYS9V2T+
-	 oygAXEbBHHh/kshvJixLCzlI=
+	b=ZkNaz/iKc3LzjTMyl6FnAiSlV+JZM1UpTOX9qLr8pnYEKoXUT9jNAtvvmQ8pU0p6m
+	 +fYgLGKa+NNt52aDxT3FpVtS7PdZmIN2D80G8SNHTsur2lzAr9RxEVRbPf6TVbVJqg
+	 0OwMIGnWbY/YpFkgkdd2AgwDqcuc1ok33QTw6PNjtU2wtGxK0WfVqX9ipSXjt25gXe
+	 +dJPbtsuhvtfPISu0HiFaBDwQPXcW1bgGFX851UQQ/tfaV05wYYFOrnKy1Bwvl6WpL
+	 js+6kZTo4WwJfudgNjOUwobT/R51fBqnsVeQfwp9rByapzDXXmQCtuTLkfmLgrQnzo
+	 mCFKfrxrLmq2Z9s4w13d+ebgoK3PriI6UcnJAWGPrdbnoWBPB9ojjR7LmmyoMqSQM7
+	 woKce8ot8gcs1H3Br3HLrT7GD+QpKD3RqWHYhyYjpxmZMg3TtHA+lHD+cdRiWxop/r
+	 NJy9jak8MYl+VK11r8GNDN3IJe7Xe/nyo4sH0lFeP5FFWIev2qm5caSfykhOcspSbi
+	 LGwGMPgfy9HbTFJABSlxrxEqtUzDembSgLL4wMMy9w4doK5sYupWifRHZ70nABRpgq
+	 5nF4zTphmDGv45tYTfXv2gYEibHZQZ8i+vIJ6/ONEFrnq995zzrgNZjmhBPmF9K2IF
+	 j8KFtKvdHtbTsDvqHcn/GVZo=
 Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 008B940E01A9;
-	Mon, 15 Jan 2024 09:01:31 +0000 (UTC)
-Date: Mon, 15 Jan 2024 10:01:26 +0100
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id ED04740E016C;
+	Mon, 15 Jan 2024 09:06:39 +0000 (UTC)
+Date: Mon, 15 Jan 2024 10:06:39 +0100
 From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Dave Hansen <dave.hansen@intel.com>,
+	Michael Roth <michael.roth@amd.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+	pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+	tobin@ibm.com, kirill@shutemov.name, ak@linux.intel.com,
+	tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+	alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
+	nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
+	liam.merwick@oracle.com, zhi.a.wang@intel.com,
 	Brijesh Singh <brijesh.singh@amd.com>
 Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
  when adding them to the RMP table
-Message-ID: <20240115090126.GEZaT0ZnSPIPsnUiyt@fat_crate.local>
+Message-ID: <20240115090639.GAZaT1nx4C4xJuF8IA@fat_crate.local>
 References: <20231230161954.569267-1-michael.roth@amd.com>
  <20231230161954.569267-12-michael.roth@amd.com>
+ <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
+ <20240112200751.GHZaGcF0-OZVJiIB7y@fat_crate.local>
+ <f0f44280-799a-4bf8-bf88-d423a2bd41ec@suse.cz>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -66,32 +71,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231230161954.569267-12-michael.roth@amd.com>
+In-Reply-To: <f0f44280-799a-4bf8-bf88-d423a2bd41ec@suse.cz>
 
-On Sat, Dec 30, 2023 at 10:19:39AM -0600, Michael Roth wrote:
-> +	/*
-> +	 * If the kernel uses a 2MB directmap mapping to write to an address,
-> +	 * and that 2MB range happens to contain a 4KB page that set to private
-> +	 * in the RMP table, an RMP #PF will trigger and cause a host crash.
+On Fri, Jan 12, 2024 at 09:27:45PM +0100, Vlastimil Babka wrote:
+> Yeah and last LSF/MM we concluded that it's not as a big disadvantage as we
+> previously thought https://lwn.net/Articles/931406/
 
-Also:
+How nice, thanks for that!
 
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 7d294d1a620b..2ad83e7fb2da 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -415,8 +415,9 @@ static int rmpupdate(u64 pfn, struct rmp_state *state)
- 
- 	/*
- 	 * If the kernel uses a 2MB directmap mapping to write to an address,
--	 * and that 2MB range happens to contain a 4KB page that set to private
--	 * in the RMP table, an RMP #PF will trigger and cause a host crash.
-+	 * and that 2MB range happens to contain a 4KB page that has been set
-+	 * to private in the RMP table, an RMP #PF will trigger and cause a
-+	 * host crash.
- 	 *
- 	 * Prevent this by removing pages from the directmap prior to setting
- 	 * them as private in the RMP table.
+Do you have some refs to Mike's tests so that we could run them here too
+with SNP guests to see how big - if any - the fragmentation has.
+
+Thx.
 
 -- 
 Regards/Gruss,
