@@ -1,127 +1,101 @@
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.nsr.re.kr (unknown [210.104.33.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B925398
-	for <linux-crypto@vger.kernel.org>; Sun, 14 Jan 2024 10:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7bf0305ded5so151806739f.1
-        for <linux-crypto@vger.kernel.org>; Sun, 14 Jan 2024 02:15:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705227321; x=1705832121;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fkWasQ++Mab08/ryMTBCXw8J551aaZAW6Ugwqeze+mE=;
-        b=Oh5trSdBfHz2yln9g9mpifLTWVT0WrS8LaKAXXepQGJXb7aWWUzQtIpLXEJWU4u2fB
-         xEH3G1uBh48v7q+yh2TKWSYYYLNsDhbIzle8fPk5aOEafD7yGcCS/ouS7gv8nCfSq0aQ
-         +kSLKJ3oViiMrh87yel1pda6RqOFDKo0CRQm/6i5eDb+9bWvVpSulWrcm2tWEzRnUu+6
-         oKBjJJmIRpYSX/EE+sgMmUbFhoh2IgJqcoQjOuUhf1u0m/0orA11CtrEQ0w6ph70WlHq
-         iKFhLa2eiUdNvf9C/UU1+6PZA33XRqhnv66RSOlPAofVvo1g6Gz+xir92UBzYqWswXcl
-         17ug==
-X-Gm-Message-State: AOJu0YzuJ6oWvi3W+juQ5hYnD3zWYGeI1vmT3ZAs1wF3yLjzM4VbiJlE
-	DrVGkqrCf/qtK+NxXWt8aoUiKSXe9GB4kldLdD0lCfDFQ/Eq
-X-Google-Smtp-Source: AGHT+IFL3P/KyfWtk5t5RX3ilVyXWysXx3wABkTaGwg1bbPpg42WzdALJw+f3WiLAcjjMqiY3T02mBydxhaps7RInAGCKt1utSro
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2695A522B;
+	Mon, 15 Jan 2024 05:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nsr.re.kr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nsr.re.kr
+Received: from 210.104.33.70 (nsr.re.kr)
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
+	by mail.nsr.re.kr with SMTP; Mon, 15 Jan 2024 14:17:49 +0900
+X-Sender: letrhee@nsr.re.kr
+Received: from 192.168.155.188 ([192.168.155.188])
+          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 499;
+          Mon, 15 Jan 2024 14:17:43 +0900 (KST)
+From: Dongsoo Lee <letrhee@nsr.re.kr>
+To: 'David Laight' <David.Laight@ACULAB.COM>, 
+	'Herbert Xu' <herbert@gondor.apana.org.au>, 
+	"'David S. Miller'" <davem@davemloft.net>, 
+	'Jens Axboe' <axboe@kernel.dk>, 'Eric Biggers' <ebiggers@kernel.org>, 
+	"'Theodore Y. Ts'o'" <tytso@mit.edu>, 
+	'Jaegeuk Kim' <jaegeuk@kernel.org>, 
+	'Thomas Gleixner' <tglx@linutronix.de>, 
+	'Ingo Molnar' <mingo@redhat.com>, 'Borislav Petkov' <bp@alien8.de>, 
+	'Dave Hansen' <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"'H. Peter Anvin'" <hpa@zytor.com>
+Cc: linux-crypto@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240112022859.2384-1-letrhee@nsr.re.kr> <20240112022859.2384-6-letrhee@nsr.re.kr> <cbd8de6ff70849a98faf2fd25b065a94@AcuMS.aculab.com>
+In-Reply-To: <cbd8de6ff70849a98faf2fd25b065a94@AcuMS.aculab.com>
+Subject: RE: [PATCH v6 RESEND 5/5] crypto: LEA block cipher x86_64 optimization
+Date: Mon, 15 Jan 2024 14:17:43 +0900
+Message-ID: <000e01da4772$2b2c5360$8184fa20$@nsr.re.kr>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:3726:b0:46e:6732:7cf0 with SMTP id
- k38-20020a056638372600b0046e67327cf0mr119010jav.2.1705227321086; Sun, 14 Jan
- 2024 02:15:21 -0800 (PST)
-Date: Sun, 14 Jan 2024 02:15:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bc186d060ee52c29@google.com>
-Subject: [syzbot] [crypto?] KMSAN: uninit-value in af_alg_free_sg (2)
-From: syzbot <syzbot+3266db0c26d1fbbe3abb@syzkaller.appspotmail.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: ko
+Thread-Index: AQMGEr+nvC0x82l43QjPVTp1bc6i9wFH8CyOAqmBDhmuYzLfEA==
 
-Hello,
+On  Fri, 12 Jan 2024 12:59:56 +0000, David Laight =
+<David.Laight@ACULAB.COM> wrote:
+> From: Dongsoo Lee
+>> Sent: 12 January 2024 02:29
+>>
+>> For the x86_64 environment, we use AVX-512F/AVX2/SSE2 instructions.
+>> Since LEA uses 128-bit blocks of four 32-bit integers, for =
+optimization,
+>> SSE2 encrypts 4 blocks, AVX2 encrypts 4/8 blocks, and AVX-512F =
+encrypts
+>> 4/8/16 blocks at a time.
+>>
+>> Our submission provides a optimized implementation of ECB, CBC
+>> decryption, CTR, and XTS cipher operation modes on x86_64 CPUs
+>> supporting.
+>=20
+> Given you say in 0/0:
+>=20
+> The LEA algorithm is a lightweight block cipher that processes data =
+blocks of 128-bits and has three different key lengths, each with a =
+different number of rounds:
+>=20
+> Just how big is it ?
+> Doesn't look 'lightweight' to me.
+>=20
+> 	David
+>=20
+> -
+> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, =
+MK1 1PT, UK
+> Registration No: 1397386 (Wales)
+>=20
 
-syzbot found the following issue on:
+Firstly, it's worth mentioning that LEA is an encryption algorithm =
+designed to ensure 128-bit security.
 
-HEAD commit:    0dd3ee311255 Linux 6.7
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=169326ade80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=373206b1ae2fe3d4
-dashboard link: https://syzkaller.appspot.com/bug?extid=3266db0c26d1fbbe3abb
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+The LEA cipher provides a balance between code size and required memory, =
+allowing for trade-offs with performance. The implementation of LEA that =
+we have submitted is oriented towards achieving optimal performance.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+While it's difficult to compare to the most recent implementations of =
+cryptographic algorithms because the test is out of date, you can see =
+the results of a previous FELICS test [1] that implemented LEA for a =
+smaller code size.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/983c6822f4f0/disk-0dd3ee31.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f7ac98ec5a78/vmlinux-0dd3ee31.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f568a85da78f/bzImage-0dd3ee31.xz
+For example, a detailed example of skipping the key schedule to reduce =
+memory usage and minimize code size can be found in [2].
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3266db0c26d1fbbe3abb@syzkaller.appspotmail.com
+Thank you for your interest.
 
-=====================================================
-BUG: KMSAN: uninit-value in af_alg_free_sg+0x1a7/0x270 crypto/af_alg.c:547
- af_alg_free_sg+0x1a7/0x270 crypto/af_alg.c:547
- hash_sendmsg+0x1938/0x1c30 crypto/algif_hash.c:172
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2586
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2640
- __sys_sendmmsg+0x3c4/0x950 net/socket.c:2726
- __do_sys_sendmmsg net/socket.c:2755 [inline]
- __se_sys_sendmmsg net/socket.c:2752 [inline]
- __x64_sys_sendmmsg+0xbc/0x120 net/socket.c:2752
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+    Dongsoo Lee
 
-Uninit was created at:
- slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
- slab_alloc_node mm/slub.c:3478 [inline]
- __kmem_cache_alloc_node+0x5c9/0x970 mm/slub.c:3517
- __do_kmalloc_node mm/slab_common.c:1006 [inline]
- __kmalloc+0x121/0x3c0 mm/slab_common.c:1020
- kmalloc include/linux/slab.h:604 [inline]
- sock_kmalloc+0x128/0x1c0 net/core/sock.c:2688
- hash_accept_parent_nokey crypto/algif_hash.c:418 [inline]
- hash_accept_parent+0xbf/0x430 crypto/algif_hash.c:445
- af_alg_accept+0x1fc/0x810 crypto/af_alg.c:439
- hash_accept+0x340/0x790 crypto/algif_hash.c:254
- do_accept+0x606/0xa80 net/socket.c:1929
- __sys_accept4_file net/socket.c:1969 [inline]
- __sys_accept4+0x18e/0x360 net/socket.c:1999
- __do_sys_accept4 net/socket.c:2010 [inline]
- __se_sys_accept4 net/socket.c:2007 [inline]
- __x64_sys_accept4+0xb8/0x120 net/socket.c:2007
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-CPU: 1 PID: 6735 Comm: syz-executor.4 Not tainted 6.7.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+[1] https://www.cryptolux.org/index.php/FELICS#Results
+[2] =
+https://github.com/cryptolu/FELICS/blob/master/block_ciphers/source/ciphe=
+rs/LEA_128_128_v03/source/encrypt.c
