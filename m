@@ -1,42 +1,42 @@
 Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04EF9F9D3;
-	Mon, 15 Jan 2024 09:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB8D2208A;
+	Mon, 15 Jan 2024 11:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="kZq7oIgp"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="c9ibmYOW"
 Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 367D240E016C;
-	Mon, 15 Jan 2024 09:41:59 +0000 (UTC)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C7BEE40E016C;
+	Mon, 15 Jan 2024 11:20:23 +0000 (UTC)
 X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
 Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
 	header.d=alien8.de
 Received: from mail.alien8.de ([127.0.0.1])
 	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id gbcYK8KndIZR; Mon, 15 Jan 2024 09:41:57 +0000 (UTC)
+	with ESMTP id 1FAqnwMpb_Zd; Mon, 15 Jan 2024 11:20:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1705311716; bh=XBIKxlNsZUJPRPkrxlOi1GzgwTad37xoV2mYozz4U4g=;
+	t=1705317621; bh=nCwtoIhn1fv1DIHX6b7LJt+v8CCENhFJbxBqG4Uf3iw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kZq7oIgpoPYNJEFRmQ9JE48d2cPjKOwShniYdb8svdbjNuXaCXgkI4vm7t9jN3tk3
-	 0SyquZx6f4o+581UG8SQEF/a5JXBrhlewfKVgs0DWSPD7Xhu3x7KPorhxYHOrW/ZkW
-	 /WkS4JM23S0qQa6J6k/PMJ9/UFQC3c3EAtxAAudXnxy2OfmMr6GryU5ieNcRB0VUqF
-	 Kk56gR6BWxDGFlGlKPXEkv3AS1x2RjKgRjF4rN71FCEKHAR7JQV8a9ePmr0epXg4nr
-	 +K8OUef+fdVPdl9dDUwxnKAIEtAaEqwy5hTxtLcpu+fZI3TyrfY91wAV77MqGaQJX+
-	 I9TV8Vr7MDR6A+XR2gzKocxtwZwUaUPYPtI71n52jydUwNRUFbuLfcJmGPHLs6vmCc
-	 GT15I5hrWJ5oS44BqXuvuQz7Gn+RxvthADl5Xqp7KraalD4OGnhM3sIkHtrlPoA+SP
-	 ElIlzTj3x2wO4UdsT9YEgQcRKXep+r2BCZohCYiRrppaZJ8uagtla5VglupvrYmOSB
-	 Uz8ExwhjAP5m15h1O0Q7sQH1RYxDEBqFCXtAiJLE2g5DCXhPEhpyNgmdJIGvMFTeRG
-	 6p+xjuV3jBjkoXBYS7fHf89rG4lL2UmaOvBIU5i6yOHaa7F3eHhKV/VzYkAGlTfiYe
-	 I7Bqk/56DF97nG5LMUix8SaU=
+	b=c9ibmYOWC60KK4KJuKNxRjp9cTDl/t4NGMCh/hIKwI8C8n85ZPub0L2koL6V6bEcL
+	 DnLO99QtKwXchL36UkyaqZXBS5DH7fP3jHL9Q/Ctm4+fh8YQ/Zi44hPI/hQd/pdAI4
+	 hF/dZoekSuQo4hLubKrITPpOBld2No3hKm8/53/0LY+40mMrigZM8I3pfNjZm2DoIk
+	 UROnl9HdofZnPLJ6LMgGqBqaDafsnEMfGqPyc1AfVYJRxj4jSf2YNhaeWiCk9E/3A2
+	 a3kH6iByD969PW9vbwfK+YiMd0D9SY1TtpWky0g3RTJAF0hq+BELR+pCArKET/9zsi
+	 qWGNTjOJNmElWJ+LYDgjQXdiTHPiLtkxN0MZLSX8sXLtARN3Gs1imoyDUCgjd7VCZC
+	 J9vT3kwHNvW4Kf8TVcvfdGoJS6jNtP7zMsdEveUfXAGsMoXMdd0HGdiWKiEuoKaYNA
+	 EPtLG2zJlKmm50rZEOmCQzZpToDW7Nw49E+B7wCUUoN+R/Zp/A/UYJ71G3L+X51uGD
+	 46T9n5gOcZdmqK0u48Y8hXTy3YOBjU897Pw0gioBU1PMLttNUhCbrT7GUSTA/Bnr02
+	 Mj7zI4H0tzj0gA4NTS5FNbwPFc3ylTElAZVRO6fzZXitlK8u8u1qXnQK/5HSONYAJJ
+	 l7i/ggtKLhd5cb4XvcaoXjgQ=
 Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AC6A940E01A9;
-	Mon, 15 Jan 2024 09:41:19 +0000 (UTC)
-Date: Mon, 15 Jan 2024 10:41:12 +0100
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1B87140E00C5;
+	Mon, 15 Jan 2024 11:19:44 +0000 (UTC)
+Date: Mon, 15 Jan 2024 12:19:37 +0100
 From: Borislav Petkov <bp@alien8.de>
 To: Michael Roth <michael.roth@amd.com>
 Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
@@ -52,11 +52,13 @@ Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
 	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
 	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
 	pankaj.gupta@amd.com,
-	"liam.merwick@oracle.com Brijesh Singh" <brijesh.singh@amd.com>
-Subject: Re: [PATCH v1 12/26] crypto: ccp: Define the SEV-SNP commands
-Message-ID: <20240115094103.GFZaT9r4zX8V_ax8lv@fat_crate.local>
+	"liam.merwick@oracle.com Brijesh Singh" <brijesh.singh@amd.com>,
+	Jarkko Sakkinen <jarkko@profian.com>
+Subject: Re: [PATCH v1 13/26] crypto: ccp: Add support to initialize the
+ AMD-SP for SEV-SNP
+Message-ID: <20240115111930.GGZaUUwpmmZqxVcBEu@fat_crate.local>
 References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-13-michael.roth@amd.com>
+ <20231230161954.569267-14-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -65,60 +67,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231230161954.569267-13-michael.roth@amd.com>
+In-Reply-To: <20231230161954.569267-14-michael.roth@amd.com>
 
-On Sat, Dec 30, 2023 at 10:19:40AM -0600, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> AMD introduced the next generation of SEV called SEV-SNP (Secure Nested
-> Paging). SEV-SNP builds upon existing SEV and SEV-ES functionality
-> while adding new hardware security protection.
-> 
-> Define the commands and structures used to communicate with the AMD-SP
-> when creating and managing the SEV-SNP guests. The SEV-SNP firmware spec
-> is available at developer.amd.com/sev.
-> 
-> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> [mdr: update SNP command list and SNP status struct based on current
->       spec, use C99 flexible arrays, fix kernel-doc issues]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  drivers/crypto/ccp/sev-dev.c |  16 +++
->  include/linux/psp-sev.h      | 264 +++++++++++++++++++++++++++++++++++
->  include/uapi/linux/psp-sev.h |  56 ++++++++
->  3 files changed, 336 insertions(+)
+On Sat, Dec 30, 2023 at 10:19:41AM -0600, Michael Roth wrote:
+> +	/*
+> +	 * The following sequence must be issued before launching the
+> +	 * first SNP guest to ensure all dirty cache lines are flushed,
+> +	 * including from updates to the RMP table itself via RMPUPDATE
+> +	 * instructions:
+> +	 *
+> +	 * - WBINDV on all running CPUs
+> +	 * - SEV_CMD_SNP_INIT[_EX] firmware command
+> +	 * - WBINDV on all running CPUs
+> +	 * - SEV_CMD_SNP_DF_FLUSH firmware command
+> +	 */
 
-More ignored feedback:
+Typos:
 
-https://lore.kernel.org/r/20231124143630.GKZWC07hjqxkf60ni4@fat_crate.local
-
-Lemme send it to you as a diff then - it'll work then perhaps.
-
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 983d314b5ff5..1a76b5297f03 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -104,7 +104,7 @@ enum sev_cmd {
- 	SEV_CMD_SNP_PAGE_RECLAIM	= 0x0C7,
- 	SEV_CMD_SNP_PAGE_UNSMASH	= 0x0C8,
- 	SEV_CMD_SNP_CONFIG		= 0x0C9,
--	SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX	= 0x0CA,
-+	SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX = 0x0CA,
- 	SEV_CMD_SNP_COMMIT		= 0x0CB,
- 	SEV_CMD_SNP_VLEK_LOAD		= 0x0CD,
- 
-@@ -624,7 +624,8 @@ enum {
-  * @gctx_paddr: system physical address of guest context page
-  * @page_size: page size 0 indicates 4K and 1 indicates 2MB page
-  * @page_type: encoded page type
-- * @imi_page: indicates that this page is part of the IMI of the guest
-+ * @imi_page: indicates that this page is part of the IMI (Incoming
-+ * Migration Image) of the guest
-  * @rsvd: reserved
-  * @rsvd2: reserved
-  * @address: system physical address of destination page to encrypt
+---
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 85634d4f8cfe..ce0c56006900 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -604,9 +604,9 @@ static int __sev_snp_init_locked(int *error)
+ 	 * including from updates to the RMP table itself via RMPUPDATE
+ 	 * instructions:
+ 	 *
+-	 * - WBINDV on all running CPUs
++	 * - WBINVD on all running CPUs
+ 	 * - SEV_CMD_SNP_INIT[_EX] firmware command
+-	 * - WBINDV on all running CPUs
++	 * - WBINVD on all running CPUs
+ 	 * - SEV_CMD_SNP_DF_FLUSH firmware command
+ 	 */
+ 	wbinvd_on_all_cpus();
 
 -- 
 Regards/Gruss,
