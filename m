@@ -1,184 +1,79 @@
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2044.outbound.protection.outlook.com [40.107.247.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FAD17568;
-	Tue, 16 Jan 2024 09:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A761F134AD;
+	Tue, 16 Jan 2024 10:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="hYHjRm2P"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=idwpVFIVHHevVDAkON7kWMdLE3Kt4thxSHx+avu20BmwCtWia+3P42FGpykFyXvGpWzTz9vRwgRJ4uOvDkR6whTBbBfGVZsqjKidaep5PMv1LRfwCilD9XleY9iQGxWHkFTXsjW4Smbf3i6wj9lBFnfo7MD928igsuGyAVnNljRIWLQzCmChD/tZ0MTJ3Tf5Few537ehySffYCYQY1Z3aStwRJymuDSdHVGTMurZUKvA4Yd+/izG/N62X/pRJBrzTTfjWXTlJWWNkA5XdILx+aVoas85ngo3Z9mLPHzCc2pngeraaS9Ki+Bdctm51SzR0gz+foWTGnHEicb8Ruux5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rX8AaQvvOhugl3Pdapny5eOmLB3UeQcOLYFGys1ZFDk=;
- b=QYIDqBIpeRpc/eJsOderBS0s1vZ1o9IAmMtXUy5KB/OwFpHbxqILydEHEEE+gj1FTfVJsKJ+Y73pJWvrjrTtHbQrIUPOn9uLf9CW1/S+9qXl+cO9SkG1AOc9Y18OULlfZDYuOAzvWSO4a8lR/WOQ66oNxzvzQBRhsghPGdWjwB016o1x3kLHqumaP0AZahtx2uFw10HGE6dB45xyBBVTsi/D+TEzQE/bWu8dCl141Uz6BCyP4E6nUBtKd3tqwXKkC7zfR+b3BAm20UnFInQDy8qjPZb3/BGuzYoFziSU6/e1i9xNS7V4h8AOOX5qFiri1hoLws+F966bgUZZ+Dkqbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rX8AaQvvOhugl3Pdapny5eOmLB3UeQcOLYFGys1ZFDk=;
- b=hYHjRm2PKaWJiZvaTR4/pjy41F75wNwfTWGRmXkgJ5ICOI5DPJLN6pE776VmaLgWrBnWKCfpkdfzl8U1emlQZhHEHMzKlZ84mHbmltfqsQfaXn83INXczxViLHK52SV2OJeSTCUaxP4txmCepjHru+9pP38Y4yEp4rf3LS0CYjg=
-Received: from DB6PR04MB3190.eurprd04.prod.outlook.com (2603:10a6:6:5::31) by
- AS8PR04MB8931.eurprd04.prod.outlook.com (2603:10a6:20b:42e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.28; Tue, 16 Jan
- 2024 09:59:29 +0000
-Received: from DB6PR04MB3190.eurprd04.prod.outlook.com
- ([fe80::530c:5815:14e4:2c7c]) by DB6PR04MB3190.eurprd04.prod.outlook.com
- ([fe80::530c:5815:14e4:2c7c%5]) with mapi id 15.20.7181.018; Tue, 16 Jan 2024
- 09:59:29 +0000
-From: Kshitiz Varshney <kshitiz.varshney@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
-	dl-linux-imx <linux-imx@nxp.com>, Pengutronix Kernel Team
-	<kernel@pengutronix.de>, Varun Sethi <V.Sethi@nxp.com>, Gaurav Jain
-	<gaurav.jain@nxp.com>, Pankaj Gupta <pankaj.gupta@nxp.com>, Sahil Malhotra
-	<sahil.malhotra@nxp.com>, Vabhav Sharma <vabhav.sharma@nxp.com>, Meenakshi
- Aggarwal <meenakshi.aggarwal@nxp.com>, Rahul Kumar Yadav
-	<rahulkumar.yadav@nxp.com>, Nikhil Singla <nikhil.singla@nxp.com>
-CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v1] imx_v6_v7_defconfig: Enable sm3, sm4, polyval, xctr
- cipher test support
-Thread-Topic: [PATCH v1] imx_v6_v7_defconfig: Enable sm3, sm4, polyval, xctr
- cipher test support
-Thread-Index: AQHaMzkv0uKPr9fQ6U+/vbkIUpb10rDcXong
-Date: Tue, 16 Jan 2024 09:59:29 +0000
-Message-ID:
- <DB6PR04MB319097FF0EB342BA7B17E4D78F732@DB6PR04MB3190.eurprd04.prod.outlook.com>
-References: <20231220113857.1127598-1-kshitiz.varshney@nxp.com>
-In-Reply-To: <20231220113857.1127598-1-kshitiz.varshney@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DB6PR04MB3190:EE_|AS8PR04MB8931:EE_
-x-ms-office365-filtering-correlation-id: e4fd5579-1377-4980-039a-08dc1679d4bb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- EiiL8s8cicx90vwZOkBRITxeum+YW3FqCXfw4Q8ZuTb7Nmb/6UUUwC2ZuOgc2A3nO/QWP+Ao1dWcPXzz5WkL2WASs3n+5i3pnOTRMl1Wxsz4w6KQTB2SZloWX9uFCgwo5n1iMOFQnoYwaMZ9eRjhEOMsf6bzudXdpOYibFXAqyRdIK8/G+WKrbjwfCIHtdlIxzgXr5Kmpm61teFCYq6ntU80UG+pW68Spjltu1YWFW9ebLvEjGzTs4IEdPShbEVLhNEX92abIBC1x0QTcWdtv1xLCeQT/WP/2+T0DkdORTruVGwZXsMjYWyWKLba6Y7EP0pYKp4el/GRKH7ClIaUtcx75IXKERG0kYtnMxOfzPo/UqnQnrBoptV4H8ZkaG9SVOcV4LCv4yUj8kwSieG97baKsEGVaB1ekXWJk+i2hHMlIGdSEeN36disbhfUPcWdWHAxhAi28oVcXmmQvGTMvCXmOPwdH7Xsl+AkkiqUI3tP+ncnvSOX10DiA5Dj3Wdhqj+krnNUGoL4UvJOTxVHoDVROzqRrMsAZ9yR+jSO65Y1m/j/A5Z5z4xKLS3CladBYvw89ElHUuCOdFYtgKzMVoXSg3TIPVoe5pholMNDTNUsAWUGwSj8dgjqXJFE+SnsK+oN62SBW1okcGqYHVEE1A==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB6PR04MB3190.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(366004)(136003)(39860400002)(346002)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(122000001)(2906002)(41300700001)(33656002)(86362001)(38100700002)(53546011)(7696005)(54906003)(6506007)(64756008)(66446008)(66946007)(6636002)(66556008)(8676002)(55236004)(66476007)(316002)(9686003)(8936002)(71200400001)(478600001)(83380400001)(5660300002)(52536014)(4326008)(44832011)(26005)(76116006)(110136005)(38070700009)(921011)(55016003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?0okKNruLc/zhgY/uBV6YhLk+VFVpl7q6TFJJEBNXqZ32TAE73VQYtDbSWgFu?=
- =?us-ascii?Q?xh4mB+K+KlsfE99Uq+JH11z3QuRW4nS9VaikYFx0gW1G/NtFkxOFIxlcYYyv?=
- =?us-ascii?Q?niBuuc/QygJagVaKE+nc4Q63YB4VIKNiLqj9+5bMpvjtaSqP4mnI0lVtDjnG?=
- =?us-ascii?Q?tyaEMBhfUavWSCSSUP98jGRv4UCbBcJxCvdC1DmXfZNG5Lryos9bolEx1rrg?=
- =?us-ascii?Q?0L2QkJ9lBnzix7jFCsZJxznJoyxYr8XQnfMQ4Gj8tjPSDGoE4G/Xahxcuc6m?=
- =?us-ascii?Q?aiOZzQYCC2v2wtZEQ1YbK07bR5PTK68YBAifq8KL02iWGoxa6DnpCPZpGfPv?=
- =?us-ascii?Q?veRHvIxrMr9QjjLSOTqGTmnkgjCXXGS4vIVSZKQBS/cFoTUdPl5mcmef9Gw0?=
- =?us-ascii?Q?TjW5b3Qb4iZRmvk9odUEVjUqSv4zVW8zGtsMrnw+XNNB5UKwPX9GWYCA/KQo?=
- =?us-ascii?Q?8t2Wo9f4qSPdjIDlUCqV26GzXC7wEuuCeG8g0pAjkVz76z3x4RpCrwHQwvGZ?=
- =?us-ascii?Q?PjVsNWlFDR+r1NKXNueWwthwrBTvbXWRbznxBfGOtBabojIYA6c5tIkc822M?=
- =?us-ascii?Q?a94xML755/9X7kVkROkwD30kTNI/yrNgA2J1WlXr/HlaIXQ02f02pn/Hf6KR?=
- =?us-ascii?Q?OYZAaLC0c1J2VBX4l9xQMO6+6LNmPyONPqEHKj/Ud24avFMDsLWOmeK6d8WS?=
- =?us-ascii?Q?0AbVnrpV7EdP/e1aG9hxL6PAWy0eNNnfOmzWDSrJECOCh5eK9FUb9hEBEnLA?=
- =?us-ascii?Q?Z+J6KkPF5fP+KnrXl4KW31YajQEeNIqmu+AlscdPQQyQGlpJON0HC8q+VZlO?=
- =?us-ascii?Q?aTt8M/q9glASorGceKKBpq6jtlvXjCCA8tEugNAgefHt/A+V9oqeFb1xEntP?=
- =?us-ascii?Q?sTPHzB6onc4eflcatM5CLEt8avycZaBd/6nmoidGoDl0BkSyFvH3TZNPWfQV?=
- =?us-ascii?Q?YMOD3MrTF4UX9yT/8Y2wiQpu+0ydHwFOY2WQSEoOuLr2aPk8Qt6RVg66stXg?=
- =?us-ascii?Q?55ylBnqAZZAfO5mibWqjZT7JTSbOREy0iDe9s47X1Usxsq4P5YB4vA2vZtml?=
- =?us-ascii?Q?i2Tko9D/SwZO7mjXk+w8VqQfQnwoQU+zueE9ws6LipJIAAbCV31tKUeAS/E5?=
- =?us-ascii?Q?P/pWLsc0Enrb+37pEAhjMr860q1FuxgGWJWkLuKmxl3EjyfOtAk+2aL3O/JA?=
- =?us-ascii?Q?NiO+pR2L+d6VEzfQhvrLRq6Zak9qIgBTcmiI7q2bI/Y7TaHD539tNXgc6lnQ?=
- =?us-ascii?Q?eh0Zahf684BcMN/tH2qdbiwgd0N6oOs3FZWWZvlZeXpO9ypYYgStlT6rKUnk?=
- =?us-ascii?Q?IXWlElOnG7cVBYID+gowDP1/t4Pf8I0aJkve6lCmlH40v6K3BRPVEbH2hpyl?=
- =?us-ascii?Q?InBgZUY2qUfHof3uaq4+c2pq9p78aokwI+Up9G+fhQSmIIq7WBbA67eB3GXr?=
- =?us-ascii?Q?eQ/LfPhj6fva4fIFMzlQAmzx2ngIlF+vJL8SAVANTd6NIacV+x12rfQswRel?=
- =?us-ascii?Q?3qTYx/xlT25h2Cl1ByjI3PcQnfySQ6xni2LxcicxzXQVQD5kFWms6SJ6uPIm?=
- =?us-ascii?Q?75skHbPYu5sI4y2boMlPiO3tazylpvvHVAC0McPk?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CzVsly4o"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-58962bf3f89so1288487a12.0;
+        Tue, 16 Jan 2024 02:05:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705399522; x=1706004322; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gK8XCEg8PjR2WLHbcaqzG/kF7LkZPky9tvtMV+e2/74=;
+        b=CzVsly4oUmeIH97x0vN0gN7yuz6IePvhLtpCPjjik/jjJY1ntRiBe3bBCvqTjHmcPg
+         DFsJTtULoYgxiC16BDeVUvQGRbM9yWoaOUtUsqkwQ5IpBzoFn5TWVYSV15/yUEyadZBz
+         AHf2UJJt0XOn+ViNn7RWTA/7PKRErIejpw+ejUPuc29bpx5LqCjqjGuDrPUvWizEb/xJ
+         ZRaqe6uRORfSB3mZBQH6ixUKmfl1HtjmFbQ4kisxqpQ9G6T6++F08Awjz9/WmqOcfj+W
+         KdFNMSlzckT8XVJBnDka4jgOy4Dg1gUwiDopLRBrFHFY/mF+q+kA9LlkiW0iDxzgMQ9q
+         YS1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705399522; x=1706004322;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gK8XCEg8PjR2WLHbcaqzG/kF7LkZPky9tvtMV+e2/74=;
+        b=VoWiIE/xrs4bm9EnrE5yb1kepHcFHktIT4Q0dC4Si4rrS2J7f0x8zbIuyjGCRL8dmg
+         bcm4oD8mONFYSEjKfaYFL2fAXRqQm8yt//9USMIoVCg3jDPUrdLMO2YYvsy63olFwzZt
+         9tgUsoRIZsC22NQVgbU4x3e8CHTdTHMaLCway2T0MT+gEDA0zwj3doePYxqDSvO5ARG5
+         sogWKDSn4D3+liYzHm4SsITGNqjJUri5wqucMLIqgXSR9tzvtQtVlzbim8BXWX185oVZ
+         n14NdALoKQ0rZ7GrIfXthT1ftH5ei2/hZ2MoTJs6M06DGAejJlEZwjjRKgAQRo9C194t
+         6pkA==
+X-Gm-Message-State: AOJu0YzVhGJ3LYVgMfbqiGGZcrEo8hWgHe+liSi7ouVlXmVLuhi87C9O
+	pVWSmLRqKsIJ+RRxZzQmPM0qa/Hh4hFqwEDLmI8=
+X-Google-Smtp-Source: AGHT+IF4ymp/p+7TFDADsct4+54sD0EvnPWvTuV4cyjWSS1OOSbO+LWGXaNZt2L3QMpJzn6B7PlQnCGq3B5zvpZFzOc=
+X-Received: by 2002:a05:6a21:6da2:b0:19a:49c8:b9e6 with SMTP id
+ wl34-20020a056a216da200b0019a49c8b9e6mr14684200pzb.0.1705399522040; Tue, 16
+ Jan 2024 02:05:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DB6PR04MB3190.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4fd5579-1377-4980-039a-08dc1679d4bb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2024 09:59:29.5601
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hYQQ1iNwR/XSkxl/u3SD6b2tLx4Sf2rRMMOkgsdf8VKZ3bL5IdDkar/645Oe3M9h/uO5Tahk/ZePdWeBQgOeTYXvKjuBO6DAzYInaDb8c2A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8931
+References: <20231220113857.1127598-1-kshitiz.varshney@nxp.com> <DB6PR04MB319097FF0EB342BA7B17E4D78F732@DB6PR04MB3190.eurprd04.prod.outlook.com>
+In-Reply-To: <DB6PR04MB319097FF0EB342BA7B17E4D78F732@DB6PR04MB3190.eurprd04.prod.outlook.com>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Tue, 16 Jan 2024 07:05:10 -0300
+Message-ID: <CAOMZO5DYT6Ea7nSKe8pPdWH4gS=d39mPRSw6=yCaPXS=XW674w@mail.gmail.com>
+Subject: Re: [PATCH v1] imx_v6_v7_defconfig: Enable sm3, sm4, polyval, xctr
+ cipher test support
+To: Kshitiz Varshney <kshitiz.varshney@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Shawn Guo <shawnguo@kernel.org>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, dl-linux-imx <linux-imx@nxp.com>, 
+	Pengutronix Kernel Team <kernel@pengutronix.de>, Varun Sethi <V.Sethi@nxp.com>, 
+	Gaurav Jain <gaurav.jain@nxp.com>, Pankaj Gupta <pankaj.gupta@nxp.com>, 
+	Sahil Malhotra <sahil.malhotra@nxp.com>, Vabhav Sharma <vabhav.sharma@nxp.com>, 
+	Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>, Rahul Kumar Yadav <rahulkumar.yadav@nxp.com>, 
+	Nikhil Singla <nikhil.singla@nxp.com>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Herbert,
+On Tue, Jan 16, 2024 at 6:59=E2=80=AFAM Kshitiz Varshney
+<kshitiz.varshney@nxp.com> wrote:
+>
+> Hi Herbert,
+>
+> Gentle Reminder.
+> Please help to merge the patch.
 
-Gentle Reminder.
-Please help to merge the patch.
+This patch goes to Shawn's tree, not Herbert's.
 
-Regards,
-Kshitiz
-
-> -----Original Message-----
-> From: Kshitiz Varshney <kshitiz.varshney@nxp.com>
-> Sent: Wednesday, December 20, 2023 5:09 PM
-> To: Herbert Xu <herbert@gondor.apana.org.au>; Shawn Guo
-> <shawnguo@kernel.org>; Sascha Hauer <s.hauer@pengutronix.de>; Fabio
-> Estevam <festevam@gmail.com>; dl-linux-imx <linux-imx@nxp.com>;
-> Pengutronix Kernel Team <kernel@pengutronix.de>; Varun Sethi
-> <V.Sethi@nxp.com>; Gaurav Jain <gaurav.jain@nxp.com>; Pankaj Gupta
-> <pankaj.gupta@nxp.com>; Sahil Malhotra <sahil.malhotra@nxp.com>;
-> Vabhav Sharma <vabhav.sharma@nxp.com>; Meenakshi Aggarwal
-> <meenakshi.aggarwal@nxp.com>; Rahul Kumar Yadav
-> <rahulkumar.yadav@nxp.com>; Nikhil Singla <nikhil.singla@nxp.com>
-> Cc: linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Kshitiz
-> Varshney <kshitiz.varshney@nxp.com>
-> Subject: [PATCH v1] imx_v6_v7_defconfig: Enable sm3, sm4, polyval, xctr
-> cipher test support
->=20
->     Enable config for sm3, sm4, polyval, xctr cipher test as built in mod=
-ule.
->=20
->     Issue:-
->     Multiple crypto tests like sm3, sm4 xctr and polyval failing.
->=20
->     skcipher: failed to allocate transform for xctr(aes): -2
->     alg: self-tests for xctr(aes) using xctr(aes) failed (rc=3D-2)
->     alg: self-tests for sm3 using sm3 failed (rc=3D-2)
->     tcrypt: failed to load transform for sm3: -2
->     alg: hash: failed to allocate transform for polyval: -2
->     alg: self-tests for polyval using polyval failed (rc=3D-2)
->=20
->     Resolution:-
->     Enabling CONFIG_CRYPTO_SM3_GENERIC,
-> CONFIG_CRYPTO_SM4_GENERIC,
->     CONFIG_CRYPTO_HCTR2, CONFIG_CRYPTO_ARIA as module enables
-> support of
->     sm3, sm4, aria, polyval & xctr.
->=20
->     Signed-off-by: Kshitiz Varshney <kshitiz.varshney@nxp.com>
-> ---
->  arch/arm/configs/imx_v6_v7_defconfig | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/arch/arm/configs/imx_v6_v7_defconfig
-> b/arch/arm/configs/imx_v6_v7_defconfig
-> index 0a90583f9f01..627f57da9d5b 100644
-> --- a/arch/arm/configs/imx_v6_v7_defconfig
-> +++ b/arch/arm/configs/imx_v6_v7_defconfig
-> @@ -484,3 +484,7 @@ CONFIG_DEBUG_FS=3Dy
->  # CONFIG_SLUB_DEBUG is not set
->  # CONFIG_SCHED_DEBUG is not set
->  # CONFIG_FTRACE is not set
-> +CONFIG_CRYPTO_HCTR2=3Dm
-> +CONFIG_CRYPTO_SM3_GENERIC=3Dm
-> +CONFIG_CRYPTO_SM4_GENERIC=3Dm
-> +CONFIG_CRYPTO_ARIA=3Dm
-> --
-> 2.25.1
-
+We are currently in the merge window, so this change will likely be
+applied after 6.8-rc1 is out.
