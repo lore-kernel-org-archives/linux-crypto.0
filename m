@@ -1,22 +1,22 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1064439D;
-	Tue, 16 Jan 2024 00:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A053A58208;
+	Tue, 16 Jan 2024 00:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QpYeTS6y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF572C433B1;
-	Tue, 16 Jan 2024 00:26:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lhvByUeK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92B80C433C7;
+	Tue, 16 Jan 2024 00:27:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705364790;
+	s=k20201202; t=1705364831;
 	bh=cgcRAiYk9vNMeMeB7RPaExiqCoReMDxjFFMz4hwr2P0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QpYeTS6yTWbq/iC8kAhwFsHsl85bjesOTa0D2Myq5xSk3hxgvyXyVKl85jW1oW64p
-	 HBzJfE7oGQzwSSmPFg8cByOPcHFolGquKhYeqX2UJ6+2r6uN5p2aiVVoc1mE9eGlQ1
-	 AMRH4FhTwXIBfYgYuhWSsjpEWhhGH5TBGNvSwhZ++0BWBzaHwgv85TVZVQR+VPXySf
-	 brb9aBDs4kmqAgJnlWFLrDWa4gQL0m70sZKhzarpj2oFZ1bgZLWi3VDzqE/2227vAW
-	 jJZw/LqEuPDtDQsOrGUmhihi9Xj7PTPaoS6g2ZQdRT8S27L/b9HHXBN5nULex2518Q
-	 Zc/ltcZckXrbA==
+	b=lhvByUeKsIK5qQIQgsGkDqiZBVl8jfsxou/nFG21twnDzzemX1+k6YTt3PXadkGhf
+	 2EDpxMWY1eQ9+XsNKi4zoeJOmB/OAFSkn6GLVhS3xmu14lt+6mYH5Ax/yPkWNVkprQ
+	 mRdMIbDOubpO/gBxxEo7xLoH9jfjhxnQEm9NKfDAMvuPiTX1m+noysSzdelUCK/HLS
+	 Oj4g/H9GIvXrNBU8o7aMkljfQpmo0HKukOnRaSdeqqcXRFlW0o2SqLaCneeeCp7geh
+	 +4v2ncfEc3AkDd04QLZ6wKCVpY7+z1McOfVI7B294VPOS15Ites4oZf9mumbzHT0SJ
+	 9/unken7up/ew==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -28,17 +28,17 @@ Cc: Thomas Bourgoin <thomas.bourgoin@foss.st.com>,
 	davem@davemloft.net,
 	mcoquelin.stm32@gmail.com,
 	alexandre.torgue@foss.st.com,
-	u.kleine-koenig@pengutronix.de,
 	ebiggers@google.com,
+	u.kleine-koenig@pengutronix.de,
 	linux-crypto@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.15 09/13] crypto: stm32/crc32 - fix parsing list of devices
-Date: Mon, 15 Jan 2024 19:25:45 -0500
-Message-ID: <20240116002603.215942-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 08/12] crypto: stm32/crc32 - fix parsing list of devices
+Date: Mon, 15 Jan 2024 19:26:33 -0500
+Message-ID: <20240116002649.216260-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240116002603.215942-1-sashal@kernel.org>
-References: <20240116002603.215942-1-sashal@kernel.org>
+In-Reply-To: <20240116002649.216260-1-sashal@kernel.org>
+References: <20240116002649.216260-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,7 +47,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.147
+X-stable-base: Linux 5.10.208
 Content-Transfer-Encoding: 8bit
 
 From: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
