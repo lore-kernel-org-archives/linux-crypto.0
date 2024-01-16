@@ -1,40 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621EA1B968;
-	Tue, 16 Jan 2024 00:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CA71BDCE;
+	Tue, 16 Jan 2024 00:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k85Qk/Wd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B471C433F1;
-	Tue, 16 Jan 2024 00:23:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hL9eZ5PL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFC84C433C7;
+	Tue, 16 Jan 2024 00:23:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705364620;
-	bh=uWnWtrqieC9Vvspv3brBuB+s8l8BstgLh0mqhN/S4Us=;
+	s=k20201202; t=1705364625;
+	bh=K4xgG6Zt6TW6EJG0eRUViQAzIY/jyHuCmxXtXWtqEng=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=k85Qk/WdeCAtfMQur0RkpPaLM9Psx53Oyk1yfyLyhLAn+479LzAmnxTdWdOEFrXGb
-	 uEnTYd2ieVudDubQcvxy2+ruxbc/qtF3v1fE2S5AzDfGwAV9mH5iDLfBV+fP0ND1FX
-	 JoLPCQ3Z8acJVzn1jrOOLQLZauqrrOkeKpgg84YLNztdcC0mE4sSK0ZExRKIwvGREL
-	 b6gbyd7JBDmMPXESLjP2FfuKABMNprnyNVSFFcmsToK9puNV4zXYqINifeEDhxyDQJ
-	 EW8YUqgdnHclXZBk/p/r2GBX0m9+f6IviwMYGvyYVIQYmngo4D7zGTkks5JP+UaMVR
-	 OqKKdMbnHxZkg==
+	b=hL9eZ5PLPijE7Qm3JfMhxQuAH8pL+6JOHT29+CzgGLSlpSNzMeS1bj3CPTn9PEVFX
+	 GVal0UkQTheWrE1CRCDslZUj1YoT6LS5Fha0WNfr0pA15Ibb5d4vbc+N7pAsYdp5HS
+	 PkswocltFGLIefhdSK1HeGmfFbMlT85TH68vWLGWzhU1+HL9RnMlZOH9S3Wj+EdW+b
+	 XcYIKFuNEx5AwxlhPP2yPU/r93D05RHhn5PQJaHEwKNWY/MePe7+A80cJdErGFhgyc
+	 0++vZLl5jHSPTtdrayWR3IJAEPOHL2DjlcPjbotpJ94h2zZu2MZmrybYQYulfuaKOP
+	 w0dEPTv4PAzwA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Bharat Bhushan <bbhushan2@marvell.com>,
+Cc: Thomas Bourgoin <thomas.bourgoin@foss.st.com>,
+	kernel test robot <lkp@intel.com>,
+	Dan Carpenter <error27@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Sasha Levin <sashal@kernel.org>,
-	bbrezillon@kernel.org,
-	arno@natisbad.org,
-	schalla@marvell.com,
 	davem@davemloft.net,
-	ndabilpuram@marvell.com,
-	alobakin@pm.me,
-	masahiroy@kernel.org,
-	tj@kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 12/19] crypto: octeontx2 - Fix cptvf driver cleanup
-Date: Mon, 15 Jan 2024 19:22:48 -0500
-Message-ID: <20240116002311.214705-12-sashal@kernel.org>
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	ebiggers@google.com,
+	u.kleine-koenig@pengutronix.de,
+	linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 6.7 14/19] crypto: stm32/crc32 - fix parsing list of devices
+Date: Mon, 15 Jan 2024 19:22:50 -0500
+Message-ID: <20240116002311.214705-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116002311.214705-1-sashal@kernel.org>
 References: <20240116002311.214705-1-sashal@kernel.org>
@@ -49,69 +50,44 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.7
 Content-Transfer-Encoding: 8bit
 
-From: Bharat Bhushan <bbhushan2@marvell.com>
+From: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
 
-[ Upstream commit c480a421a4faf693c38e60b0fe6e554c9a3fee02 ]
+[ Upstream commit 0eaef675b94c746900dcea7f6c41b9a103ed5d53 ]
 
-This patch fixes following cleanup issues:
- - Missing instruction queue free on cleanup. This
-   will lead to memory leak.
- - lfs->lfs_num is set to zero before cleanup, which
-   will lead to improper cleanup.
+smatch warnings:
+drivers/crypto/stm32/stm32-crc32.c:108 stm32_crc_get_next_crc() warn:
+can 'crc' even be NULL?
 
-Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+Use list_first_entry_or_null instead of list_first_entry to retrieve
+the first device registered.
+The function list_first_entry always return a non NULL pointer even if
+the list is empty. Hence checking if the pointer returned is NULL does
+not tell if the list is empty or not.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/r/202311281111.ou2oUL2i-lkp@intel.com/
+Reported-by: Dan Carpenter <error27@gmail.com>
+Closes: https://lore.kernel.org/r/202311281111.ou2oUL2i-lkp@intel.com/
+Signed-off-by: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/marvell/octeontx2/otx2_cptlf.c      | 6 ++++--
- drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c | 3 +++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ drivers/crypto/stm32/stm32-crc32.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-index 6edd27ff8c4e..e4bd3f030cec 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-@@ -419,8 +419,8 @@ int otx2_cptlf_init(struct otx2_cptlfs_info *lfs, u8 eng_grp_mask, int pri,
- 	return 0;
+diff --git a/drivers/crypto/stm32/stm32-crc32.c b/drivers/crypto/stm32/stm32-crc32.c
+index b2d5c8921ab3..b0cf6d2fd352 100644
+--- a/drivers/crypto/stm32/stm32-crc32.c
++++ b/drivers/crypto/stm32/stm32-crc32.c
+@@ -104,7 +104,7 @@ static struct stm32_crc *stm32_crc_get_next_crc(void)
+ 	struct stm32_crc *crc;
  
- free_iq:
--	otx2_cpt_free_instruction_queues(lfs);
- 	cptlf_hw_cleanup(lfs);
-+	otx2_cpt_free_instruction_queues(lfs);
- detach_rsrcs:
- 	otx2_cpt_detach_rsrcs_msg(lfs);
- clear_lfs_num:
-@@ -431,11 +431,13 @@ EXPORT_SYMBOL_NS_GPL(otx2_cptlf_init, CRYPTO_DEV_OCTEONTX2_CPT);
- 
- void otx2_cptlf_shutdown(struct otx2_cptlfs_info *lfs)
- {
--	lfs->lfs_num = 0;
- 	/* Cleanup LFs hardware side */
- 	cptlf_hw_cleanup(lfs);
-+	/* Free instruction queues */
-+	otx2_cpt_free_instruction_queues(lfs);
- 	/* Send request to detach LFs */
- 	otx2_cpt_detach_rsrcs_msg(lfs);
-+	lfs->lfs_num = 0;
- }
- EXPORT_SYMBOL_NS_GPL(otx2_cptlf_shutdown, CRYPTO_DEV_OCTEONTX2_CPT);
- 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-index bac729c885f9..215a1b17b6ce 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-@@ -249,8 +249,11 @@ static void cptvf_lf_shutdown(struct otx2_cptlfs_info *lfs)
- 	otx2_cptlf_unregister_interrupts(lfs);
- 	/* Cleanup LFs software side */
- 	lf_sw_cleanup(lfs);
-+	/* Free instruction queues */
-+	otx2_cpt_free_instruction_queues(lfs);
- 	/* Send request to detach LFs */
- 	otx2_cpt_detach_rsrcs_msg(lfs);
-+	lfs->lfs_num = 0;
- }
- 
- static int cptvf_lf_init(struct otx2_cptvf_dev *cptvf)
+ 	spin_lock_bh(&crc_list.lock);
+-	crc = list_first_entry(&crc_list.dev_list, struct stm32_crc, list);
++	crc = list_first_entry_or_null(&crc_list.dev_list, struct stm32_crc, list);
+ 	if (crc)
+ 		list_move_tail(&crc->list, &crc_list.dev_list);
+ 	spin_unlock_bh(&crc_list.lock);
 -- 
 2.43.0
 
