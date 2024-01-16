@@ -1,89 +1,107 @@
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
+Received: from mail.kapsi.fi (mail.kapsi.fi [91.232.154.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7018610A13
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Jan 2024 06:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1705386951-1eb14e0c7f1eda0001-Xm9f1P
-Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx2.zhaoxin.com with ESMTP id 6inuI1kU4kvmppjM (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Tue, 16 Jan 2024 14:35:51 +0800 (CST)
-X-Barracuda-Envelope-From: TonyWWang-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
-Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHMBX3.zhaoxin.com
- (10.28.252.165) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 16 Jan
- 2024 14:35:51 +0800
-Received: from localhost.localdomain (10.32.65.162) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 16 Jan
- 2024 14:35:48 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
-From: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.29.252.163
-To: <675146817@qq.com>, <story_19872006@126.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
-	<seanjc@google.com>, <kim.phillips@amd.com>,
-	<kirill.shutemov@linux.intel.com>, <jmattson@google.com>,
-	<babu.moger@amd.com>, <kai.huang@intel.com>, <TonyWWang-oc@zhaoxin.com>,
-	<acme@redhat.com>, <aik@amd.com>, <namhyung@kernel.org>
-CC: <CobeChen@zhaoxin.com>, <TimGuo@zhaoxin.com>, <LeoLiu-oc@zhaoxin.com>,
-	<GeorgeXue@zhaoxin.com>
-Subject: [PATCH 1/3] crypto: padlock-sha: Matches CPU with Family with 6 explicitly
-Date: Tue, 16 Jan 2024 14:35:47 +0800
-X-ASG-Orig-Subj: [PATCH 1/3] crypto: padlock-sha: Matches CPU with Family with 6 explicitly
-Message-ID: <20240116063549.3016-2-TonyWWang-oc@zhaoxin.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240116063549.3016-1-TonyWWang-oc@zhaoxin.com>
-References: <20240116063549.3016-1-TonyWWang-oc@zhaoxin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA50110A05;
+	Tue, 16 Jan 2024 06:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kapsi.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kapsi.fi
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kapsi.fi header.i=@kapsi.fi header.b="EWb1mvNP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=kapsi.fi;
+	s=20161220; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	To:Subject:From:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=l9cbtoVxmahu43eSHexnSSM/C+AFOi8SW69yat4JZ0A=; b=EWb1mvNPtJnN6SSi52fNO/z6wg
+	wbhDrovcJ/US7uMMt3iw6ibEiLzJEgT6aJ10GwT7gae7oM84PF7RZcrJthI7NZIQaDQQ4ryYGLESs
+	idq9FSTqiNIL/N+ZGX/A2LK0e1pxSKxb4amtoubTbfTVC5MQBuV4LEZdL3IKMtha/Q4xyME1tR4WC
+	GeeMoxppEqJm6xYUjUKYg2iE/ZrlgdnpSHteFEUgTqaFwrVw8QoczfS8ItSv579rlps7A/pi1sH2H
+	CzDvslR+repTDMWObh+jKvWrqKeK85YMxChoGOhlzMLUBtA8hXQy8AtGxjB7VxP644Ihd5tphh5Uj
+	K4Cwnzlg==;
+Received: from [39.110.237.146] (helo=[10.19.62.31])
+	by mail.kapsi.fi with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <cyndis@kapsi.fi>)
+	id 1rPd44-006n2A-2f;
+	Tue, 16 Jan 2024 08:36:49 +0200
+Message-ID: <84be2248-9789-4b32-8f89-296c0f195835@kapsi.fi>
+Date: Tue, 16 Jan 2024 15:36:38 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
-X-Barracuda-Connect: ZXSHMBX3.zhaoxin.com[10.28.252.165]
-X-Barracuda-Start-Time: 1705386951
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 786
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.119492
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+User-Agent: Mozilla Thunderbird
+From: Mikko Perttunen <cyndis@kapsi.fi>
+Subject: Re: [PATCH v3 2/5] gpu: host1x: Add Tegra SE to SID table
+To: Akhil R <akhilrajeev@nvidia.com>, herbert@gondor.apana.org.au,
+ davem@davemloft.net, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, thierry.reding@gmail.com, jonathanh@nvidia.com,
+ catalin.marinas@arm.com, will@kernel.org, mperttunen@nvidia.com,
+ linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-tegra@vger.kernel.org, linux-kernel@vger.kernel.org, krzk@kernel.org
+References: <20240109091708.66977-1-akhilrajeev@nvidia.com>
+ <20240109091708.66977-3-akhilrajeev@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <20240109091708.66977-3-akhilrajeev@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 39.110.237.146
+X-SA-Exim-Mail-From: cyndis@kapsi.fi
+X-SA-Exim-Scanned: No (on mail.kapsi.fi); SAEximRunCond expanded to false
 
-Updates the supporting qualification for packlock-sha driver, making
-it support CPUs whose vendor ID is Centaur and Famliy is 6.
+On 1/9/24 18:17, Akhil R wrote:
+> Add Tegra Security Engine details to the SID table in host1x driver.
+> These will be referred when registering the SE as host1x device.
 
-Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
----
- drivers/crypto/padlock-sha.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Technically, these entries are required to be in place any time we want 
+to configure SE's stream ID. Register writes to stream ID registers fail 
+otherwise.
 
-diff --git a/drivers/crypto/padlock-sha.c b/drivers/crypto/padlock-sha.c
-index 6865c7f1fc1a..2e82c5e77f7a 100644
---- a/drivers/crypto/padlock-sha.c
-+++ b/drivers/crypto/padlock-sha.c
-@@ -491,7 +491,7 @@ static struct shash_alg sha256_alg_nano = {
- };
- 
- static const struct x86_cpu_id padlock_sha_ids[] = {
--	X86_MATCH_FEATURE(X86_FEATURE_PHE, NULL),
-+	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 6, X86_FEATURE_PHE, NULL),
- 	{}
- };
- MODULE_DEVICE_TABLE(x86cpu, padlock_sha_ids);
--- 
-2.25.1
+> 
+> Signed-off-by: Akhil R <akhilrajeev@nvidia.com>
+> ---
+>   drivers/gpu/host1x/dev.c | 24 ++++++++++++++++++++++++
+>   1 file changed, 24 insertions(+)
+> 
+> diff --git a/drivers/gpu/host1x/dev.c b/drivers/gpu/host1x/dev.c
+> index 42fd504abbcd..b564c7042235 100644
+> --- a/drivers/gpu/host1x/dev.c
+> +++ b/drivers/gpu/host1x/dev.c
+> @@ -214,6 +214,30 @@ static const struct host1x_info host1x07_info = {
+>    * and firmware stream ID in the MMIO path table.
+>    */
+>   static const struct host1x_sid_entry tegra234_sid_table[] = {
+> +	{
+> +		/* SE2 MMIO */
+> +		.base = 0x1658,
+> +		.offset = 0x90,
+> +		.limit = 0x90
+> +	},
+> +	{
+> +		/* SE4 MMIO */
+> +		.base = 0x1660,
+> +		.offset = 0x90,
+> +		.limit = 0x90
+> +	},
+> +	{
+> +		/* SE2 channel */
+> +		.base = 0x1738,
+> +		.offset = 0x90,
+> +		.limit = 0x90
+> +	},
+> +	{
+> +		/* SE4 channel */
+> +		.base = 0x1740,
+> +		.offset = 0x90,
+> +		.limit = 0x90
+> +	},
+>   	{
+>   		/* VIC channel */
+>   		.base = 0x17b8,
 
+With the commit message slightly adjusted,
+
+Acked-by: Mikko Perttunen <mperttunen@nvidia.com>
