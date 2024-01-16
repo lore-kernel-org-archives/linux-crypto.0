@@ -1,72 +1,73 @@
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2051.outbound.protection.outlook.com [40.107.223.51])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A311CA80;
-	Tue, 16 Jan 2024 16:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F8E1CF80;
+	Tue, 16 Jan 2024 18:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705429384; cv=none; b=LDkZelu93ZkOr3yvzeuy7LkbqaEMPY3YkAo97Mbhk/DQ4KCK/+2Vqp5vYVukqP4oPfE0bd/+J6NIPW/NlHZald5YQ1SJVXVBiaYBrV9JpaSOtgoyaxWoVkRjAco9I+Gvo00ws9HDSFnmoMvCW2FnGG1d7e7xByfoYcWQ1wXf5nQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705429384; c=relaxed/simple;
+	bh=vOgqF5Zcc8Ylq6RHqZfJs1o320FusJ0JBsfhr/+0YmU=;
+	h=Received:X-Virus-Scanned:Received:DKIM-Signature:Received:Date:
+	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=HmPA4ohNw6qHuvujiuWZB4FSGo+W9ae8HDb0VSEfx4n9bRn9GVq59c03u6z1sBoa0IXZn0M8e4zrotK8Kf85EkqQIrWnD1+xW0514YPcXvI+pw3d5B2vAmUo08rtwNrpThfG7ylBNm6itLmX7XtU24ewoML9xEz5kRfig6EbPtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=iT/Igi1V; arc=none smtp.client-ip=65.109.113.108
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="09uBgXnu"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W26ph9xzOjwGJXAC67YIZwb+epj/+FPMFi98WtjrMBsu9WIaCXkvMJNLsk6JWEjJ5amQxYaRQSssbgKsEOau9UNMaQeSXVKNuqbey1UR2UyjzR2P5iTXwSgc+JZArVbuQEyLHPyeJs5FVRUn8cU3Do22zH35vqMvNH75bBQaMAaip4QBpuustMvIyPgLKan8SS/jzuCW8qGktLBFaW88P9MtrggitolezpNloge43fhFwvtDXu6n9kau8Rtpr2+NTKUHl6XV0uhZIQIfweLsHkzb4AjkG3GXf+MlIt7ydFsjlIllqEupUyyDMIsHl6Usq6tCULp6Yl8DCW8FdzUtKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YOxuYkMnskfLXsQJUZTf6Lccs54q6PW1/+t64c/Ea98=;
- b=iP1yj4+y0llOWsVujrvzM1OqcrGBI0fvUK9bU2BWM1iON9NOVnsmG7mjTQWoazcmS0nwO3Ty2sFqiEOE8ve5qKA0BuEaZ5AjaBJkq4oTD1PuRCVV4BEjZOi0XjKSdL83Rl+fkF3ZGknfwnbU7zSrzPl/ZOV3o2xYYep6th862U4YhV/lCAHvl5foOhBsEHpbEIj3K863UdS0baVe2gPRDQaJsTuD17Wf24NwSCC2BtUQ0ER0LZakJbVfKPPlbzf1qh+IVhAapEZIE+hR8Q6ci+I41QXgYgIVSP3MzsoaUIWSvBHQ8gEUK5j9aPqCxHbkDg16AYkSJ4jkgWc4bZp9NA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YOxuYkMnskfLXsQJUZTf6Lccs54q6PW1/+t64c/Ea98=;
- b=09uBgXnukGNdXNTNro32x5rE7Hmd0HkElAmldyPDs6+0jgRuAp6uwNr7RIpEshBr4jU+YvF9/ag6TFbyrwJmUkTDyVvAzDg7N/eIA45oZQYGu+6feX5FCUyEi8BlzC/Q74dBfMMczOzQkdT6JrMduEHswp5GnOmtG453tucNqRU=
-Received: from DM6PR03CA0057.namprd03.prod.outlook.com (2603:10b6:5:100::34)
- by DM4PR12MB6496.namprd12.prod.outlook.com (2603:10b6:8:bd::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.23; Tue, 16 Jan
- 2024 16:51:44 +0000
-Received: from DS1PEPF00017096.namprd05.prod.outlook.com
- (2603:10b6:5:100:cafe::59) by DM6PR03CA0057.outlook.office365.com
- (2603:10b6:5:100::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.26 via Frontend
- Transport; Tue, 16 Jan 2024 16:51:44 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF00017096.mail.protection.outlook.com (10.167.18.100) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7202.16 via Frontend Transport; Tue, 16 Jan 2024 16:51:44 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Tue, 16 Jan
- 2024 10:51:43 -0600
-Date: Tue, 16 Jan 2024 10:50:25 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: Dave Hansen <dave.hansen@intel.com>
-CC: Tom Lendacky <thomas.lendacky@amd.com>, Borislav Petkov <bp@alien8.de>,
-	<x86@kernel.org>, <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-	<linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
-	<seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
-	<luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-	<pgonda@google.com>, <peterz@infradead.org>,
-	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-	<tobin@ibm.com>, <vbabka@suse.cz>, <kirill@shutemov.name>,
-	<ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-	Brijesh Singh <brijesh.singh@amd.com>, <rppt@kernel.org>
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="iT/Igi1V"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0579F40E01B2;
+	Tue, 16 Jan 2024 18:22:58 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 3FYGSk50diAZ; Tue, 16 Jan 2024 18:22:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1705429375; bh=UZ6G+J6ye64gzMjmC6lSx1WhjVghiKPeCR0bIv9HV54=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iT/Igi1VvZ6a4grjasUBsQ3NdbxVO1LZMf2kXl82VNfinMdUS0Ec9PcrPGaD1XYXR
+	 YdA48WrCcriSh2e1xb52ISkIy8H1Rrm524EZxg9aoINEgy9OXUaWhXGJa1lV94hImP
+	 YaODpfGf/w+A/eInOmc3DpCH5vcKshzQ9Mg3VBfLUNHhIWpa8jsF9ZzU5wtjD6WPhn
+	 DAIloOlghiaeyvEcwwen2OpIDhV0kjqSYj1GWUQm+vN63O24M4KXlaRkaruNlOwWGo
+	 h6tUDG57RTqsPMq+wIcj6Z+Z9NZ0DRB624YhMEin4N8pz2z7AbqUUiuXPHv878xWwL
+	 xULI9qMNlhWlYjI0zUTMS4dOnss7cKROp32wMTohATsxLHoXcYZR7FvUImvS6ECkrh
+	 CHT7ArPtEgM1vD2isJU2OhQk9QnEo9ikZJUhZDBpg2E9bK66pHThR7OpdEhIrDCpy6
+	 GthkzXZNIYojH/h4s6yJMI6OwM4NHagRA0EuKgVwLbu2rXVZIybUYjMnw3NLd+1bXM
+	 Ujlxrws7Vk6QaiuBPnZ8+jgrI1UrwQm2aN9MZWjwjp8Zd9ZnOKPKTi/CovQK0x5Wu/
+	 AuGWt9P+gEXnoQ0GUpRPlDUDUkghNjB1kzTfdx1ZoDopAUpzAca3zMaweDB0gIZUZr
+	 sFqXK/o7GqQGyHT5mb3FRkRU=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EA5AD40E01A9;
+	Tue, 16 Jan 2024 18:22:15 +0000 (UTC)
+Date: Tue, 16 Jan 2024 19:22:10 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: Dave Hansen <dave.hansen@intel.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+	hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com,
+	seanjc@google.com, vkuznets@redhat.com, jmattson@google.com,
+	luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+	pgonda@google.com, peterz@infradead.org,
+	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
+	ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com,
+	Brijesh Singh <brijesh.singh@amd.com>, rppt@kernel.org
 Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
  when adding them to the RMP table
-Message-ID: <20240116165025.g4iouboabyxkn5nd@amd.com>
+Message-ID: <20240116182158.GHZabJRqUMAEidcee1@fat_crate.local>
 References: <20231230161954.569267-1-michael.roth@amd.com>
  <20231230161954.569267-12-michael.roth@amd.com>
  <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
@@ -80,71 +81,11 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 In-Reply-To: <20240116161909.msbdwiyux7wsxw2i@amd.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017096:EE_|DM4PR12MB6496:EE_
-X-MS-Office365-Filtering-Correlation-Id: 65bcccdc-9391-48d8-bdbe-08dc16b36c0d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	sRoWkZNIlP1GEDEGgrKB+PXthqJflfoep0oNkZhWyF4Ss3R2dhPNuwxLTtIRp2UyP3nxEHkTS5jDxk76OkedhxI++8pbAV3QNVhrmp8LeAQiRnP7TeNSCa7wJqb67SPDev61XTKzKqPoScnGVEYVzFOsmPQjyFFxG6A0m8YLxP8P1uDPAqs6ddx4Xe78ix+g2z+WgyuF3CAjmIuFunEqDctVGfIKZTfltM4N0sOyyy/Rylr6AwezQWIHhNlrPmyepQgdKPwCh0k4ONYKLeB9uN2WcUts15fEPtXNfXxIBOoVbXzM8FqGDxemInexoxKdb8kk/OEbUPFg4kmFGI80489NHci8qv5t+Mk7ikvy0xl9X/mzaI2P+KSxdzHdBDWJ0zA8dwGsndTk1cUh9B88/nrOtCQqaE2xtGNIhn5KlCKZojJhPSGjm1ohKhRSyv6YiG3rWE3vA0F64AZ57UonCs4CagTvSO0CTRGE9+6SPKSl0urzERfeqZKAqJOjiapYKwz44pIxub5PdMkNzRRrmBLO+BoP/ubbOjwMppxsz86s0ZNPhi7iafAE4FQShffleuskq0ER57hfJcG3g/xSscxcG48s0ievDm0o8FzHKufKjXHg0ci0I4GxWliWedTnU9pa63nBHio8Lo9UAwtZv1QT+VlFBk60P9LKCjX0u++f5DjIg/Q608ITVplLDSD9f9LFeUXNGICI0KVF1Fu2NQUc4tW4qwo6fiEkArW3sj4t+DdqJA+ZRkLMIY0juq7ob29agqND+BVCTvuu0x6VJg==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(346002)(396003)(39860400002)(376002)(230922051799003)(451199024)(64100799003)(186009)(82310400011)(1800799012)(36840700001)(40470700004)(46966006)(36860700001)(40480700001)(356005)(82740400003)(40460700003)(86362001)(26005)(16526019)(1076003)(426003)(2616005)(83380400001)(36756003)(6666004)(47076005)(81166007)(336012)(70206006)(70586007)(316002)(54906003)(6916009)(44832011)(7416002)(7406005)(2906002)(4326008)(5660300002)(8676002)(8936002)(478600001)(41300700001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2024 16:51:44.6783
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 65bcccdc-9391-48d8-bdbe-08dc16b36c0d
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017096.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6496
 
 On Tue, Jan 16, 2024 at 10:19:09AM -0600, Michael Roth wrote:
-> I did some performance tests which do seem to indicate that
-> pre-splitting the directmap to 4K can be substantially improve certain
-> SNP guest workloads. This test involves running a single 1TB SNP guest
-> with 128 vCPUs running "stress --vm 128 --vm-bytes 5G --vm-keep" to
-> rapidly fault in all of its memory via lazy acceptance, and then
-> measuring the rate that gmem pages are being allocated on the host by
-> monitoring "FileHugePages" from /proc/meminfo to get some rough gauge
-> of how quickly a guest can fault in it's initial working set prior to
-> reaching steady state. The data is a bit noisy but seems to indicate
-> significant improvement by taking the directmap updates out of the
-> lazy acceptance path, and I would only expect that to become more
-> significant as you scale up the number of guests / vCPUs.
-> 
->   # Average fault-in rate across 3 runs, measured in GB/s
->                     unpinned | pinned to NUMA node 0
->   DirectMap4K           12.9 | 12.1
->              stddev      2.2 |  1.3
->   DirectMap2M+split      8.0 |  8.9
->              stddev      1.3 |  0.8
-> 
-> The downside of course is potential impact for non-SNP workloads
-> resulting from splitting the directmap. Mike Rapoport's numbers make
-> me feel a little better about it, but I don't think they apply directly
-> to the notion of splitting the entire directmap. It's Even he LWN article
-> summarizes:
-> 
->   "The conclusion from all of this, Rapoport continued, was that
->   direct-map fragmentation just does not matter — for data access, at
->   least. Using huge-page mappings does still appear to make a difference
->   for memory containing the kernel code, so allocator changes should
->   focus on code allocations — improving the layout of allocations for
->   loadable modules, for example, or allowing vmalloc() to allocate huge
->   pages for code. But, for kernel-data allocations, direct-map
->   fragmentation simply appears to not be worth worrying about."
-> 
 > So at the very least, if we went down this path, we would be worth
 > investigating the following areas in addition to general perf testing:
 > 
@@ -156,17 +97,31 @@ On Tue, Jan 16, 2024 at 10:19:09AM -0600, Michael Roth wrote:
 >      worthwhile, but that itself has been noted as a concern for users
 >      so it would be nice to not make things even worse).
 
-There's another potential area of investigation I forgot to mention that
-doesn't involve pre-splitting the directmap. It makes use of the fact
-that the kernel should never be accessing a 2MB mapping that overlaps with
-private guest memory if the backing PFN for the guest memory is a 2MB page.
-Since there's no chance for overlap (well, maybe via a 1GB directmap entry,
-but not as dramatic a change to force those to 2M), there's no need to
-actually split the directmap entry in these cases since they won't
-result in unexpected RMP faults.
+So the gist of this whole explanation why we end up doing what we end up
+doing eventually should be in the commit message so that it is clear
+*why* we did it. 
 
-So if pre-splitting the directmap ends up having too many downsides, then
-there may still some potential for optimizing the current approach to a
-fair degree.
+> After further discussion I think we'd concluded it wasn't necessary. Maybe
+> that's worth revisiting though. If it is necessary, then that would be
+> another reason to just pre-split the directmap because the above-mentioned
+> lazy acceptance workload/bottleneck would likely get substantially worse.
 
--Mike
+The reason for that should also be in the commit message.
+
+And to answer:
+
+https://lore.kernel.org/linux-mm/20221219150026.bltiyk72pmdc2ic3@amd.com/
+
+yes, you should add a @npages variant.
+
+See if you could use/extend this, for example:
+
+https://lore.kernel.org/r/20240116022008.1023398-3-mhklinux@outlook.com
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
