@@ -1,36 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E311D55C;
-	Tue, 16 Jan 2024 00:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981E82CCD2;
+	Tue, 16 Jan 2024 00:24:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pc1vAcSK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFDB2C433F1;
-	Tue, 16 Jan 2024 00:24:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MfeePsLX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59077C433F1;
+	Tue, 16 Jan 2024 00:24:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705364673;
-	bh=My/GFt1IQOVLc+gYzB6g6/sg0L7W9/aHk/58FNKbkTQ=;
+	s=k20201202; t=1705364678;
+	bh=Xu5aDG6VKhjO7Qw88dpdP3PSA2esceo3TBRKh5OeS8s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Pc1vAcSK3uuSU9L413MPd6ohMMRLL7hQCDJLItkUoffxTY0NXAl2uEVkcTsEw07Mc
-	 U3KiIuNZiPKFwaJS988IomDK2jEvX4LyPLqOYDrAUBG/2YfsNvTNB7cxrgynAFTU+X
-	 cRf4X6kQmlHTY1DTxyoeA2sjKCMupy4cSLCkhnS95r9c/1KcPxvnN8AXJ11WZFcmp9
-	 0pNjeQcym9wsrwyvH8gkFDGv7VkRVOWWLAbEO2pD5JBMyTpbZopDYZcb0GgJwldeeH
-	 8y5O+mY94ZY0pPyUU6C/VhJvIaZ9L5bnCKZw9HqPx5+KhOmZK8B7nTXha59QjAvxjO
-	 iH/lxrX4t8kIQ==
+	b=MfeePsLXILXMoH6tF8CXdXREd0zrBeutzTwZrE7SZJoJ67j4GHDVvE6leA0l6/x/w
+	 55W0CFSp897+7HogDYyDuaKYQmj6+qzqnSlebPAMOcrluOwE8oV/75K+iuGpDDIFM2
+	 RA93esGJ734iPkcukFzQpQDzk61YO0KbCmCwmVtcHR3uKDgs5YApnqSXGc3Z34E3pA
+	 P54JAMAEoF0DwA9ewU1BdnsxQqn7xWZg6NCZnffi+JKA7Doj3MKuie4BdxGMy3Kq0T
+	 7A/QFq/ci9c2J54z+mVAV1k0KYbf6rqFRGDwlkDjNkgdIkts8zHn8Wukgh9Hsugiso
+	 U777iDmFED2bA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
+Cc: Jia Jie Ho <jiajie.ho@starfivetech.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Sasha Levin <sashal@kernel.org>,
+	william.qiu@starfivetech.com,
 	davem@davemloft.net,
-	mpe@ellerman.id.au,
-	linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 6.6 08/19] crypto: p10-aes-gcm - Avoid -Wstringop-overflow warnings
-Date: Mon, 15 Jan 2024 19:23:43 -0500
-Message-ID: <20240116002413.215163-8-sashal@kernel.org>
+	linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 11/19] crypto: starfive - Fix dev_err_probe return error
+Date: Mon, 15 Jan 2024 19:23:46 -0500
+Message-ID: <20240116002413.215163-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116002413.215163-1-sashal@kernel.org>
 References: <20240116002413.215163-1-sashal@kernel.org>
@@ -45,56 +43,33 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.12
 Content-Transfer-Encoding: 8bit
 
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+From: Jia Jie Ho <jiajie.ho@starfivetech.com>
 
-[ Upstream commit aaa03fdb56c781db4a4831dd5d6ec8817918c726 ]
+[ Upstream commit 8517c34e87025b3f74f3c07813d493828f369598 ]
 
-The compiler doesn't know that `32` is an offset into the Hash table:
+Current dev_err_probe will return 0 instead of proper error code if
+driver failed to get irq number. Fix the return code.
 
- 56 struct Hash_ctx {
- 57         u8 H[16];       /* subkey */
- 58         u8 Htable[256]; /* Xi, Hash table(offset 32) */
- 59 };
-
-So, it legitimately complains about a potential out-of-bounds issue
-if `256 bytes` are accessed in `htable` (this implies going
-`32 bytes` beyond the boundaries of `Htable`):
-
-arch/powerpc/crypto/aes-gcm-p10-glue.c: In function 'gcmp10_init':
-arch/powerpc/crypto/aes-gcm-p10-glue.c:120:9: error: 'gcm_init_htable' accessing 256 bytes in a region of size 224 [-Werror=stringop-overflow=]
-  120 |         gcm_init_htable(hash->Htable+32, hash->H);
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-arch/powerpc/crypto/aes-gcm-p10-glue.c:120:9: note: referencing argument 1 of type 'unsigned char[256]'
-arch/powerpc/crypto/aes-gcm-p10-glue.c:120:9: note: referencing argument 2 of type 'unsigned char[16]'
-arch/powerpc/crypto/aes-gcm-p10-glue.c:40:17: note: in a call to function 'gcm_init_htable'
-   40 | asmlinkage void gcm_init_htable(unsigned char htable[256], unsigned char Xi[16]);
-      |                 ^~~~~~~~~~~~~~~
-
-Address this by avoiding specifying the size of `htable` in the function
-prototype; and just for consistency, do the same for parameter `Xi`.
-
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Closes: https://lore.kernel.org/linux-next/20231121131903.68a37932@canb.auug.org.au/
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/powerpc/crypto/aes-gcm-p10-glue.c | 2 +-
+ drivers/crypto/starfive/jh7110-cryp.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/crypto/aes-gcm-p10-glue.c b/arch/powerpc/crypto/aes-gcm-p10-glue.c
-index 4b6e899895e7..f62ee54076c0 100644
---- a/arch/powerpc/crypto/aes-gcm-p10-glue.c
-+++ b/arch/powerpc/crypto/aes-gcm-p10-glue.c
-@@ -37,7 +37,7 @@ asmlinkage void aes_p10_gcm_encrypt(u8 *in, u8 *out, size_t len,
- 				    void *rkey, u8 *iv, void *Xi);
- asmlinkage void aes_p10_gcm_decrypt(u8 *in, u8 *out, size_t len,
- 				    void *rkey, u8 *iv, void *Xi);
--asmlinkage void gcm_init_htable(unsigned char htable[256], unsigned char Xi[16]);
-+asmlinkage void gcm_init_htable(unsigned char htable[], unsigned char Xi[]);
- asmlinkage void gcm_ghash_p10(unsigned char *Xi, unsigned char *Htable,
- 		unsigned char *aad, unsigned int alen);
+diff --git a/drivers/crypto/starfive/jh7110-cryp.c b/drivers/crypto/starfive/jh7110-cryp.c
+index 08e974e0dd12..f6601f9d3aff 100644
+--- a/drivers/crypto/starfive/jh7110-cryp.c
++++ b/drivers/crypto/starfive/jh7110-cryp.c
+@@ -168,7 +168,7 @@ static int starfive_cryp_probe(struct platform_device *pdev)
+ 	ret = devm_request_irq(&pdev->dev, irq, starfive_cryp_irq, 0, pdev->name,
+ 			       (void *)cryp);
+ 	if (ret)
+-		return dev_err_probe(&pdev->dev, irq,
++		return dev_err_probe(&pdev->dev, ret,
+ 				     "Failed to register interrupt handler\n");
  
+ 	clk_prepare_enable(cryp->hclk);
 -- 
 2.43.0
 
