@@ -1,119 +1,115 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A4E37152;
-	Sun, 21 Jan 2024 12:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06D1376E4;
+	Sun, 21 Jan 2024 15:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705840909; cv=none; b=LIdXv5f2qb3iHPMaBWQeCWRwCtpla0ddfD64HI/djzILhLk+5OpYrlK0bwDO7jNxwq8ZwtUcw9tA/Fp9ZC/LNqP0Ptc/kaaytWU5DArhlQLy4TwaqGPrSL7tcyjGAH1IXpiQFKQ8jtTjDsJ5zqWl14TD4nNLPllqozHrWOeFCgs=
+	t=1705851334; cv=none; b=TtFIS5ImxPBdaF5IreMasKGDGA5u/L7gJgj8iKcLDEDhBo3AbKV/45RkavuUXFLWGsNomnjISmvcBL1GItN4rRVAZ1bnlzfUCOSJP6N14B6JihHY9Hk3NknyMB9YaWfVRIpeMNz8EmMxksByW3masmbceUZIGhMkjr0JLofU0R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705840909; c=relaxed/simple;
-	bh=b8kssEXUcXyp+9yNySq1ZhZ7sO+9Z0J8oTphLVHUrSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bwkeuV/KyvymrBKUTf28Yu06BHC+jmED+oVuwx/OZPLPjWfpN7b4fxx9d44h4DP8ZJ36x0toh+5+71+j+u+9qv1A4Q0jFV1l4UJW5kNeZbuex6xosNaFMCHs1dxy6rGeBkhIgxcuGyJtZsspXkQeMIaFIU1BQpJGSse6oScfN9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=RZTMuyMX; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1705851334; c=relaxed/simple;
+	bh=brNXGMrVlHQm0RTaVV57rRuousVunDuYR0RflipHqy8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=s1J5kcJlFts0kWHmkpTlvyiXGJUigOuN/zvWyz9RVaTFJLFuj8XDLRrqXBJw3aab+vVOy26MDJSCySKSO+ntVhTPfGwc/TqjHwX/tW9hWgbew77BvLxwxGKD28/8tZa25DkR81eGVtKhgL6kRxeFwKpqNCSYj0hMDrazPaiviHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com; spf=pass smtp.mailfrom=gmx.com; dkim=pass (2048-bit key) header.d=gmx.com header.i=erick.archer@gmx.com header.b=KmuHJdlQ; arc=none smtp.client-ip=212.227.17.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="RZTMuyMX"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3174D40E0177;
-	Sun, 21 Jan 2024 12:41:45 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id n2xllazxIvv4; Sun, 21 Jan 2024 12:41:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1705840903; bh=DdanBUUkzmEiL4WSI9ML5YIGh668EwCLp/CMKO1Dfnc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RZTMuyMX3VgHk63OanWHbKzjFKwZiqdXLYCiVXJhzB9i3WpVpKJ+3d6zftj9gSVIu
-	 77xLCZ1tjQvsjiwNzqySdXhaV3DVPeAkW7s2edCI3z2wUsyhmbWQwv1qUyLv/3eZu6
-	 K20T0sIVPQp9u2CcqztXJnr+dDoELbMEVVCpUvp9pTO1erBkf/id+HlwoiDMl68k6F
-	 LHrQLs5kOa/9KSQF946VvtBl6Lo8Jr7Q9eeLd/MPMLaZZn7koA4cQJkBQkXpaElTSz
-	 pnl7ekltsypo7YyGIefJlpkGg8cGkK78qVbdj03pRewqW9RFwHk4iBph9+nKBJpWE8
-	 wB5MdGS/taoN5YeyhbdJGTQBNoSqkmcYbWdRB4dQi0PQQI1SteJOAcDTb4fTzu99dc
-	 z18R/pNaxbGy4q7gV2dWtMN7Q+6lYimR58vxr3O5ZgPQMsfkTNNbzI+E8y1fI5bKDE
-	 W1wasiStWVkB+t3kGq6tmnX6TcFmaFZ8sQbvGS6w6fr5k0anDm+Ddvhl9Z1B4dbrA6
-	 G9lkDN+ZCwy+lEoJxh8xDRQDTwPqENL0bomUjFV975KK2npNCLfKK6U8JUZKTmwPq5
-	 uUmzyeDDN/p0tR1uyS3ajxEg/gVjrbvq4hiUKq8D8b2m8guGhuodYpWBp0qnba2W5M
-	 LwAkg6N092PjLvUSz+CFsiho=
-Received: from zn.tnic (pd953099d.dip0.t-ipconnect.de [217.83.9.157])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9771940E016C;
-	Sun, 21 Jan 2024 12:41:03 +0000 (UTC)
-Date: Sun, 21 Jan 2024 13:41:02 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com,
-	Brijesh Singh <brijesh.singh@amd.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Dionna Glaze <dionnaglaze@google.com>
-Subject: Re: [PATCH v1 26/26] crypto: ccp: Add the SNP_SET_CONFIG command
-Message-ID: <20240121124102.GPZa0Q3oBHLG0fH_yn@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-27-michael.roth@amd.com>
+	dkim=pass (2048-bit key) header.d=gmx.com header.i=erick.archer@gmx.com header.b="KmuHJdlQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.com;
+	s=s31663417; t=1705851264; x=1706456064; i=erick.archer@gmx.com;
+	bh=brNXGMrVlHQm0RTaVV57rRuousVunDuYR0RflipHqy8=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+	b=KmuHJdlQlra8yhaAZyRVaOdPR3Ngby1Ed8ytpQ5Bq8rhobq78LiTS9ylXCMReZ3C
+	 VTfK2XjAxxNXCSejEJ4S5ZOIn6BoPueQj982qXij68RaTc1wQLUWVOYeBV1HSofPF
+	 iFH+REEXdNBDADA1BHw6JGCCkXCBTJanTTCGTODKBqOUG3h2MmadKr06kldID1gXN
+	 11g9g5r4zmKsUB6DgcSbTQC8tfll1Pqd4CJ8sogALz62VqosyFkoUTMbg9nuQ4EGo
+	 kJ4gLDi0p5iISesO5zgSq0hZiRCCK5GmdxvLWdkO6qSPm9r2CCMnDS+ExofpE9AAk
+	 VRG8eR0YtYCk8J/T6g==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from localhost.localdomain ([79.157.194.183]) by mail.gmx.net
+ (mrgmx105 [212.227.17.174]) with ESMTPSA (Nemesis) id
+ 1MPogF-1rnu2e2t6J-00MxT2; Sun, 21 Jan 2024 16:34:23 +0100
+From: Erick Archer <erick.archer@gmx.com>
+To: Corentin Labbe <clabbe.montjoie@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Erick Archer <erick.archer@gmx.com>,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH] crypto: sun8i-ce - Use kcalloc() instead of kzalloc()
+Date: Sun, 21 Jan 2024 16:34:07 +0100
+Message-Id: <20240121153407.8348-1-erick.archer@gmx.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231230161954.569267-27-michael.roth@amd.com>
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:AxmzJ/LffrzzgeFylniD23yWMgGbXKe9NvmRSO8/IaOF4X9WL+d
+ /DWmNgnnIDNPKn+4YvnUGRfa05XZMxDTtrOLTZgJjgupSydDlEqj1LHneFwYJcShATqBTrX
+ AivO8CM9036cwP7d1/gHCHZkAka+MjAVDEsABxE9P+/Vti5yfy01GSpBSFmD6HviAWOqLCY
+ atPFM8X8JYu1RHSQkLkcA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:ulWb1d2L0TE=;hYsmrUzpdwDFSW+AMoveAoIAKmi
+ hoOwXEc5Iyju+CMavqgtB57Li72O4ujobrkofQU/21lrm+3ecyxP3PAoCsUV9X1isK0whSuk2
+ 1ZnfQjLB666SFEO8aKfLunD9L139jR+d1Mf/RvvjIrkaBHpvrlgB47r1GrzBv2yN5HntIvWVz
+ ArdE3vfwOcNn4cznxYKjm1BtZalPRQ3+5m6l/OGYyogrOc7lf/9iLRfLmcsVSoKtMepyBV/g1
+ xeo+wrvKzrc4SGIIExIypk8kYqKBRPO1wLwJ/GnSmHHN+ln+Arev+U29vSVd6fO8MJBXnjlXp
+ ztjmBU4XS7Xjhm0Sa1p2FHMRtCu7hRIR1xOOl0mT2VTnpcIg3bP4CAYqPT5XSKuzCirc82Kqn
+ V796rmPSpugtqJUHQgIol56B2pxIgECyK8oTfSgHk1IRUtEJIupVGtbt9FWHTbMQcxRYzow85
+ qIPBK03qa0Oxkxtcvoy3SG1ZmCsrtSz/bs/mUL6/pE7osNX2SaNKmC9czDCLK3SttRVrHOAha
+ r6lCYBTLqsEwabEimIrHud/aqloiazTBwcXYzvtIpZWKObubkJwIy83KCEiuaIqEC4kOuDxHt
+ +E3t+JWmPuz4fyUi1gv1jrUCqrq85OKrzwnwdTnNMcsug29YlwhB43+zf2X5XNVglcRBAtrE1
+ XpUAgvDnVV4giGynv8zMI8QEKvpllBPbhPBRY83aG/zQ7zcsVdpitd1JXYFVaMbKp4enNJa/S
+ dyYzYPa/eWYQmHF7NtDhEylxY9E3kiJkf2Is84qFzvaIwJBB5KzTxopTzgW+0BRHjWTroCSYg
+ SQlxXAVIBy9H5PMuyhIOjkGJoYHLeRx4royhzG1wI/EYiTDeoTgcYrTrM5tzSQsJ7BSYphMXV
+ PlcKjj7I/2bo/HCTxkOCF5cKbPxC8QBI2OaMoEUn3Sz1/3y7WEJBAkjXuHG5MJeljVpWhmQf6
+ 6cXOOEgbvK5OW548Mp0d0hwQkCI=
 
-On Sat, Dec 30, 2023 at 10:19:54AM -0600, Michael Roth wrote:
-> +The SNP_SET_CONFIG is used to set the system-wide configuration such as
-> +reported TCB version in the attestation report. The command is similar to
-> +SNP_CONFIG command defined in the SEV-SNP spec. The current values of the
-> +firmware parameters affected by this command can be queried via
-> +SNP_PLATFORM_STATUS.
+As noted in the "Deprecated Interfaces, Language Features, Attributes,
+and Conventions" documentation [1], size calculations (especially
+multiplication) should not be performed in memory allocator (or similar)
+function arguments due to the risk of them overflowing. This could lead
+to values wrapping around and a smaller allocation being made than the
+caller was expecting. Using those allocations could lead to linear
+overflows of heap memory and other misbehaviors.
 
-diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
-index 4f696aacc866..14c9de997b7d 100644
---- a/Documentation/virt/coco/sev-guest.rst
-+++ b/Documentation/virt/coco/sev-guest.rst
-@@ -169,10 +169,10 @@ that of the currently installed firmware.
- :Parameters (in): struct sev_user_data_snp_config
- :Returns (out): 0 on success, -negative on error
- 
--The SNP_SET_CONFIG is used to set the system-wide configuration such as
--reported TCB version in the attestation report. The command is similar to
--SNP_CONFIG command defined in the SEV-SNP spec. The current values of the
--firmware parameters affected by this command can be queried via
-+SNP_SET_CONFIG is used to set the system-wide configuration such as
-+reported TCB version in the attestation report. The command is similar
-+to SNP_CONFIG command defined in the SEV-SNP spec. The current values of
-+the firmware parameters affected by this command can be queried via
- SNP_PLATFORM_STATUS.
- 
- 3. SEV-SNP CPUID Enforcement
+So, use the purpose specific kcalloc() function instead of the argument
+size * count in the kzalloc() function.
 
----
+Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-co=
+ded-arithmetic-in-allocator-arguments [1]
+Link: https://github.com/KSPP/linux/issues/162
+Signed-off-by: Erick Archer <erick.archer@gmx.com>
+=2D--
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ok, you're all reviewed. Please send a new revision with *all* feedback
-addressed so that I can queue it.
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/c=
+rypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+index d358334e5981..ee2a28c906ed 100644
+=2D-- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+@@ -362,7 +362,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, vo=
+id *breq)
+ 		digestsize =3D SHA512_DIGEST_SIZE;
 
-Thx.
+ 	/* the padding could be up to two block. */
+-	buf =3D kzalloc(bs * 2, GFP_KERNEL | GFP_DMA);
++	buf =3D kcalloc(2, bs, GFP_KERNEL | GFP_DMA);
+ 	if (!buf) {
+ 		err =3D -ENOMEM;
+ 		goto theend;
+=2D-
+2.25.1
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
