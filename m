@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E1537E;
-	Mon, 22 Jan 2024 00:22:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA75A2A;
+	Mon, 22 Jan 2024 00:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705882979; cv=none; b=eE4bCHO+bY/+CXG3u4X2Pta23ENtDKufKpCUHfItVeeXgCL5dkKEhfL5TCWvSDAXzCgeR/qKAxJmB+50u6c4CXtnui9/uKfePURcnWW3f00mt0zfj/EidWLRGV6Q6FLTJVOHbRf8WYQW7YC3iCK2Soce10direMMN6WPwmoJgZ8=
+	t=1705882979; cv=none; b=XhSvMvvLrC8Jd4LNc+DErlN5/X3yYeGUja2Qx5IHiDTIuWV0H7lmSUewZ1gn+b85NzaGlB4DyWSf5hyjGJleUPDtY/3nfnc6IB6TOqko0YwUj75sj5taJc07BpQEYpwxMbZ6VyU6+E76bEKUQ82rIW0hRNhgnMaqiH6va/pLC2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705882979; c=relaxed/simple;
-	bh=cu/x3ItAEqexfto4Q62/HSpF8UbXNvIBvj4vMpklLig=;
+	bh=TfofIEIKQZPK62dMUzgvPsR4BgvnYH75rA2YkgLkUvQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Hilg/JWPBMQ4TDShslQ5k7jbAIYa2GGO9ko8YWJu3wHvpOHL8Cjvg9sKYLL4xhSoVmOUWWcOtUt6lmnJaAd3FRpP7zuCJbzXCWDKwjDcUB7y7oPKlXStKVMSI2Tt5MbdteFH6IYY7y7alYXxwzSyM/tsScbvh86uBCNe4iEqSZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pHW/j+hV; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=jQKbO4LRaW7p06NSPmtPek+0Ku6ChON1v2Qoz4pyPJrZhN5K6qfoyj39BQfkzqFVLaJVZ2QXOSs8Rn5d3gCahMjMw6udTWDpJWUcNmknUDxlkq4/AJZm5SDXS/4CdPzlEQTqiGrHuFTk1nNlZNILhkU2j8bEh9ZQhlIy9b7eD/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oXmmw0pF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pHW/j+hV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB036C43390;
-	Mon, 22 Jan 2024 00:22:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oXmmw0pF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14B7AC43330;
+	Mon, 22 Jan 2024 00:22:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705882978;
-	bh=cu/x3ItAEqexfto4Q62/HSpF8UbXNvIBvj4vMpklLig=;
+	s=k20201202; t=1705882979;
+	bh=TfofIEIKQZPK62dMUzgvPsR4BgvnYH75rA2YkgLkUvQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pHW/j+hVYcQ07mUuVmoaaAsGPm/61eCDdoJM0ufsYRwR6PrpSPg84A+/4jl51OZqh
-	 gRJqHPELv2mQnKLWkuFWnmN6bOuwlKBmo1kkltWLEMQiZiPjAKFOdrKl4xdlX2EfZf
-	 MFIuQ/hgBkYKXEw4jZWDBPoLXota/bOJ7wWH+VHTnNr0myYVIsGWL+dLXfLSG7ByEZ
-	 1BvesMZ2YNLNAY8HD4twt8KK1b+kp7/ituTaaXKMTwHXvZAWuFnNZpnQ8pFjZEo8cg
-	 5W2ZkYpsq0PQFU3itAG689+XqQbphjP4Fji+0DZ+zAUPDz9JKqxZOdTSz6bQEq3q68
-	 HayS0AbAwrKxg==
+	b=oXmmw0pFKie1iTNEGrk1apBcAwNl0xXWYevupFo5OY/FbDJ0gEe1eAwyHLzA7rYHQ
+	 VakSJ8WYLUyqbNKoG43mlsAbgUEmIi+4L7MOfvsXzbw+goo9lUw9srnKTF3WWZxAcx
+	 5Kyk99bwbmRl0u1P9xi/Ckm6NM+xWGQ9wtW1LiUTcljq2RWn1wE0siEwMuLGMSZ+AB
+	 uo/A4Mrgrlw8bHIKJEHwlxCGbeCTMJGN+crODJ/aydsCP2MQ3zIsOOLdjwJwr3iXG/
+	 pf01EyzlGraH+P21AEXDaXGIhX99/gvlUl76GOOYaFAnYzf2O/awfYJ/4utJVT9X4Q
+	 K/yt9e5HaL7hA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	linux-riscv@lists.infradead.org
@@ -41,9 +41,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Phoebe Chen <phoebe.chen@sifive.com>,
 	hongrong.hsu@sifive.com,
 	Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: [PATCH v3 01/10] RISC-V: add helper function to read the vector VLEN
-Date: Sun, 21 Jan 2024 16:19:12 -0800
-Message-ID: <20240122002024.27477-2-ebiggers@kernel.org>
+Subject: [PATCH v3 03/10] RISC-V: hook new crypto subdir into build-system
+Date: Sun, 21 Jan 2024 16:19:14 -0800
+Message-ID: <20240122002024.27477-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240122002024.27477-1-ebiggers@kernel.org>
 References: <20240122002024.27477-1-ebiggers@kernel.org>
@@ -57,52 +57,85 @@ Content-Transfer-Encoding: 8bit
 
 From: Heiko Stuebner <heiko.stuebner@vrull.eu>
 
-VLEN describes the length of each vector register and some instructions
-need specific minimal VLENs to work correctly.
-
-The vector code already includes a variable riscv_v_vsize that contains
-the value of "32 vector registers with vlenb length" that gets filled
-during boot. vlenb is the value contained in the CSR_VLENB register and
-the value represents "VLEN / 8".
-
-So add riscv_vector_vlen() to return the actual VLEN value for in-kernel
-users when they need to check the available VLEN.
+Create a crypto subdirectory for added accelerated cryptography routines
+and hook it into the riscv Kbuild and the main crypto Kconfig.
 
 Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 Reviewed-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Jerry Shih <jerry.shih@sifive.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/riscv/include/asm/vector.h | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ arch/riscv/Kbuild          | 1 +
+ arch/riscv/crypto/Kconfig  | 5 +++++
+ arch/riscv/crypto/Makefile | 1 +
+ crypto/Kconfig             | 3 +++
+ 4 files changed, 10 insertions(+)
+ create mode 100644 arch/riscv/crypto/Kconfig
+ create mode 100644 arch/riscv/crypto/Makefile
 
-diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/vector.h
-index 0cd6f0a027d1f..731dcd0ed4de9 100644
---- a/arch/riscv/include/asm/vector.h
-+++ b/arch/riscv/include/asm/vector.h
-@@ -277,11 +277,22 @@ static inline bool riscv_v_vstate_ctrl_user_allowed(void) { return false; }
- #define riscv_v_vstate_restore(vstate, regs)	do {} while (0)
- #define __switch_to_vector(__prev, __next)	do {} while (0)
- #define riscv_v_vstate_off(regs)		do {} while (0)
- #define riscv_v_vstate_on(regs)			do {} while (0)
- #define riscv_v_thread_free(tsk)		do {} while (0)
- #define  riscv_v_setup_ctx_cache()		do {} while (0)
- #define riscv_v_thread_alloc(tsk)		do {} while (0)
+diff --git a/arch/riscv/Kbuild b/arch/riscv/Kbuild
+index d25ad1c19f881..2c585f7a0b6ef 100644
+--- a/arch/riscv/Kbuild
++++ b/arch/riscv/Kbuild
+@@ -1,11 +1,12 @@
+ # SPDX-License-Identifier: GPL-2.0-only
  
- #endif /* CONFIG_RISCV_ISA_V */
+ obj-y += kernel/ mm/ net/
+ obj-$(CONFIG_BUILTIN_DTB) += boot/dts/
++obj-$(CONFIG_CRYPTO) += crypto/
+ obj-y += errata/
+ obj-$(CONFIG_KVM) += kvm/
  
-+/*
-+ * Return the implementation's vlen value.
-+ *
-+ * riscv_v_vsize contains the value of "32 vector registers with vlenb length"
-+ * so rebuild the vlen value in bits from it.
-+ */
-+static inline int riscv_vector_vlen(void)
-+{
-+	return riscv_v_vsize / 32 * 8;
-+}
+ obj-$(CONFIG_ARCH_SUPPORTS_KEXEC_PURGATORY) += purgatory/
+ 
+ # for cleaning
+ subdir- += boot
+diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
+new file mode 100644
+index 0000000000000..10d60edc0110a
+--- /dev/null
++++ b/arch/riscv/crypto/Kconfig
+@@ -0,0 +1,5 @@
++# SPDX-License-Identifier: GPL-2.0
 +
- #endif /* ! __ASM_RISCV_VECTOR_H */
++menu "Accelerated Cryptographic Algorithms for CPU (riscv)"
++
++endmenu
+diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
+new file mode 100644
+index 0000000000000..a4e40e534e6a8
+--- /dev/null
++++ b/arch/riscv/crypto/Makefile
+@@ -0,0 +1 @@
++# SPDX-License-Identifier: GPL-2.0-only
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 7d156c75f15f2..00e4aa16bf2bf 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1489,20 +1489,23 @@ source "arch/arm64/crypto/Kconfig"
+ endif
+ if LOONGARCH
+ source "arch/loongarch/crypto/Kconfig"
+ endif
+ if MIPS
+ source "arch/mips/crypto/Kconfig"
+ endif
+ if PPC
+ source "arch/powerpc/crypto/Kconfig"
+ endif
++if RISCV
++source "arch/riscv/crypto/Kconfig"
++endif
+ if S390
+ source "arch/s390/crypto/Kconfig"
+ endif
+ if SPARC
+ source "arch/sparc/crypto/Kconfig"
+ endif
+ if X86
+ source "arch/x86/crypto/Kconfig"
+ endif
+ endif
 -- 
 2.43.0
 
