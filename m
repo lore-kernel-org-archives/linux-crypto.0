@@ -1,101 +1,97 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3C4811E4;
-	Tue, 23 Jan 2024 17:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4318D811EF;
+	Tue, 23 Jan 2024 17:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706031912; cv=none; b=TG4H/sMevIbta3Vz0uBaZG8OOyQzPYOeHp7KLAox05vCDZZUNdRG6S6F22ziKDBG7+b98C9X4YY2f8H/xSVv4kQcE6ok7fPe+NM7NcxEhSRmkJUxTike7BUxo+aAYDRjelQ2q+x68EeNHMLKHZIMG1zvPgm5H2MN+kBBlvvy6so=
+	t=1706032230; cv=none; b=iz3i0Wwijyflc3yjZAe0nL6NohPet2StYWOke9HukTsN1eKvwBuK9+47Mut/4DriwiAWe379R2vgnSF6W20nPDW9xEb8f+09xuy+yPokM4M/kaLhTAB4twmzm1ehd4MF4BBkSBnJOIk+O1QStbyxJceuBhrqr2ChnkB+S9EzDrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706031912; c=relaxed/simple;
-	bh=hiYpf5YTmy2SgRtEVXbmJOPkhwnjcJIUaFmiSYESsd0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TxXAh1hIqyNZyECEPjSjszGYsgU1Kh3OSCFsEB6ea6tBiQSnLS6RsMKRSvAmhJh2AFe3M5GhghQsGO3eq5J1v3anBwd3oruv68BaDGJSa6fU8Hzu1JBLaNhYPQ1KXIhYu8zg4BMTyd7ncWpu5cWRLionRt0DI+2ipFOptcAuu7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E6fNOKV8; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1706032230; c=relaxed/simple;
+	bh=Fg0kjr4p02yeL0dd3zpR20S3rY7QojmBvz5b3eZjGMY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=t/7X9rPUn6/iVl8xleW6DJQ+hECArk7h3xkZ5hR9RSFYri9UlK9ey//CgkMCi6FLRD9xBqeb+RXBxKIK7qrb3ispd7KqacF1A9UkRx3tmg6cTmvkXxzL+QysyLRi7MraPLLAODRJOQk9upWDnCq0Gj5Wcj8qCsjKO712sXl6O6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=txpf10q3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E6fNOKV8"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40e775695c6so45190635e9.3;
-        Tue, 23 Jan 2024 09:45:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706031909; x=1706636709; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W4oyBrQ4+qtvNHd22bRaiLV27J7OcLKPIojk24G7ULU=;
-        b=E6fNOKV8eltoEw0cXzEo7w9kUircsqvGkdr52sS9pUBS0BCHqnT78i57GBLojr+wW9
-         U8Rp2yq+2u1vOMx5LywwxbC6hAYtKZKbPsCyc6RuQqxZ4S5kluSdzzsYdvjJ+NUTauGF
-         K/Z33B4EXqmOkQUGJ8YMU/EUGPvVir3MH7nok9YKx4RsWC2YnN/QfFe6+cz8pvNahi/H
-         iHj1jHXQh2hzb8Bo2+Dy/NQaDKdWgsyXyteJVrfg1ZP7cI2eysBaxRXHwcP0xaPTJfLI
-         pQ1V7e00gba7gbPkIQQdEhO1R+bS533KzZLCALd1KFDn4QCpsNypBr63y1SxuYLpvZW+
-         tj9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706031909; x=1706636709;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W4oyBrQ4+qtvNHd22bRaiLV27J7OcLKPIojk24G7ULU=;
-        b=FwkmQ/8yWeUipg9YP6Nd16O/IAQsIcanQvggCHlYzg+nE9NB2yP6iydas0CyrqNNHY
-         pjEJVKIMbfbjjVc4xV7dppJEEJEj7gYgA3lvc/X0sbKzvX2r5DppnzDL/sw8s9Zxj0+S
-         2ndiq1QK9fWLqVmkosD/B/c591uaAJGA+UwnL90rUoKkI8Fjk3fxPUysaRgaAwaOW9ST
-         H7z89Ch10wg38wiATNpz9agbY/cxoN8GECUvDE9wfC1VTKvl6pjqbGhKWzfygpHqWW0Y
-         KzJjiTNNXnz8rdfFvdqFe0ZvrPQ8OZ1IS9Goxp2fscm9h+VN3UJnLnCB++SsDqXxarv5
-         QGog==
-X-Gm-Message-State: AOJu0YyjsG2UU99JxpX6orgLaQegjHQAm/DhYk/9rjfy0AEl2twrseDY
-	B4N0vGmt0M+CQE3JGN8lhHvrh1dtJTHUT6QbHqv4BkSLO9S8qA8m
-X-Google-Smtp-Source: AGHT+IFvQq2aPOGlvF4JOsf/hb7L41ATp/rSHCn3ZpEvu3AEHPAoSdqMSCs8os0KHLA0EEadsR8H9A==
-X-Received: by 2002:adf:e84c:0:b0:337:cdc1:daff with SMTP id d12-20020adfe84c000000b00337cdc1daffmr3997048wrn.71.1706031908892;
-        Tue, 23 Jan 2024 09:45:08 -0800 (PST)
-Received: from jernej-laptop.localnet (86-58-14-70.dynamic.telemach.net. [86.58.14.70])
-        by smtp.gmail.com with ESMTPSA id x8-20020adfdd88000000b003392ae3aee8sm9009835wrl.97.2024.01.23.09.45.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 09:45:08 -0800 (PST)
-From: Jernej =?utf-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Chen-Yu Tsai <wens@csie.org>,
- Samuel Holland <samuel@sholland.org>, Jonathan Corbet <corbet@lwn.net>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Erick Archer <erick.archer@gmx.com>
-Cc: Erick Archer <erick.archer@gmx.com>, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] crypto: sun8i-ce - Use kcalloc() instead of kzalloc()
-Date: Tue, 23 Jan 2024 18:45:07 +0100
-Message-ID: <1876185.tdWV9SEqCh@jernej-laptop>
-In-Reply-To: <20240121153407.8348-1-erick.archer@gmx.com>
-References: <20240121153407.8348-1-erick.archer@gmx.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="txpf10q3"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EBB36C433C7;
+	Tue, 23 Jan 2024 17:50:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706032230;
+	bh=Fg0kjr4p02yeL0dd3zpR20S3rY7QojmBvz5b3eZjGMY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=txpf10q3NNT5p/ZbgP37oRGugwd240cA5vlkhPPYdaRJzCLdrHhvFpUFCPEMJvdAD
+	 xHdEDErc2MfD1gyre6Yn+ca6xxFLR7yr+85zx0RdnnL1BCGGswRkJAsvES7qddTc1d
+	 jXwQsyD0oj1QSTgwEO6jGiRAiOhSdWqr5z9gsN/UngCkaXRVzgkj/LJaQuHuds8K8n
+	 iMR4tJaYy4qu9h+/Y9z2w6Gk+HhYN1ICqFGRoUhk8bLLes+8SCbMZLCV39Zd4Ndqs6
+	 83fxqyG93y/qRDVzoRnByqO4vwlsEz+ZMRxeV8YOyxJO6VIvepdfJuTlcVfjkUmvu7
+	 K32Es2dZEBglQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D1D0CDFF762;
+	Tue, 23 Jan 2024 17:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 00/10] RISC-V crypto with reworked asm files
+From: patchwork-bot+linux-riscv@kernel.org
+Message-Id: 
+ <170603222985.30461.5962076100762100573.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Jan 2024 17:50:29 +0000
+References: <20240122002024.27477-1-ebiggers@kernel.org>
+In-Reply-To: <20240122002024.27477-1-ebiggers@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-riscv@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, aou@eecs.berkeley.edu, andy.chiu@sifive.com,
+ ardb@kernel.org, christoph.muellner@vrull.eu, heiko@sntech.de,
+ jerry.shih@sifive.com, palmer@dabbelt.com, paul.walmsley@sifive.com,
+ phoebe.chen@sifive.com, hongrong.hsu@sifive.com
 
-Dne nedelja, 21. januar 2024 ob 16:34:07 CET je Erick Archer napisal(a):
-> As noted in the "Deprecated Interfaces, Language Features, Attributes,
-> and Conventions" documentation [1], size calculations (especially
-> multiplication) should not be performed in memory allocator (or similar)
-> function arguments due to the risk of them overflowing. This could lead
-> to values wrapping around and a smaller allocation being made than the
-> caller was expecting. Using those allocations could lead to linear
-> overflows of heap memory and other misbehaviors.
+Hello:
+
+This series was applied to riscv/linux.git (for-next)
+by Palmer Dabbelt <palmer@rivosinc.com>:
+
+On Sun, 21 Jan 2024 16:19:11 -0800 you wrote:
+> This patchset, which applies to v6.8-rc1, adds cryptographic algorithm
+> implementations accelerated using the RISC-V vector crypto extensions
+> (https://github.com/riscv/riscv-crypto/releases/download/v1.0.0/riscv-crypto-spec-vector.pdf)
+> and RISC-V vector extension
+> (https://github.com/riscv/riscv-v-spec/releases/download/v1.0/riscv-v-spec-1.0.pdf).
+> The following algorithms are included: AES in ECB, CBC, CTR, and XTS modes;
+> ChaCha20; GHASH; SHA-2; SM3; and SM4.
 > 
-> So, use the purpose specific kcalloc() function instead of the argument
-> size * count in the kzalloc() function.
-> 
-> Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [1]
-> Link: https://github.com/KSPP/linux/issues/162
-> Signed-off-by: Erick Archer <erick.archer@gmx.com>
+> [...]
 
-Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+Here is the summary with links:
+  - [v3,01/10] RISC-V: add helper function to read the vector VLEN
+    (no matching commit)
+  - [v3,02/10] RISC-V: add TOOLCHAIN_HAS_VECTOR_CRYPTO
+    https://git.kernel.org/riscv/c/34ca4ec628de
+  - [v3,03/10] RISC-V: hook new crypto subdir into build-system
+    https://git.kernel.org/riscv/c/178f3856436c
+  - [v3,04/10] crypto: riscv - add vector crypto accelerated AES-{ECB,CBC,CTR,XTS}
+    https://git.kernel.org/riscv/c/eb24af5d7a05
+  - [v3,05/10] crypto: riscv - add vector crypto accelerated ChaCha20
+    https://git.kernel.org/riscv/c/bb54668837a0
+  - [v3,06/10] crypto: riscv - add vector crypto accelerated GHASH
+    https://git.kernel.org/riscv/c/600a3853dfa0
+  - [v3,07/10] crypto: riscv - add vector crypto accelerated SHA-{256,224}
+    https://git.kernel.org/riscv/c/8c8e40470ffe
+  - [v3,08/10] crypto: riscv - add vector crypto accelerated SHA-{512,384}
+    https://git.kernel.org/riscv/c/b3415925a08b
+  - [v3,09/10] crypto: riscv - add vector crypto accelerated SM3
+    https://git.kernel.org/riscv/c/563a5255afa2
+  - [v3,10/10] crypto: riscv - add vector crypto accelerated SM4
+    https://git.kernel.org/riscv/c/b8d06352bbf3
 
-Best regards,
-Jernej
-
-
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
