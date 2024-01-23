@@ -1,199 +1,222 @@
-Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430415F858;
-	Tue, 23 Jan 2024 14:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBD85FDD7
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Jan 2024 15:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706019701; cv=none; b=OPJs9xME0cXRUlLLAhRFb+ARqA8Ewxpwat3jdiyIxavfu6qb2VoqovQZDpqg0syoqvvbb6gcrtpbm7L7w5wRrDeniihanq0vM0fsRmLlnDVKKJZyIsJgp69yzQi7NRVVC0l4+YSpMze1FzkqecV3LOxQDhvX+tkoH0kXemp5374=
+	t=1706022417; cv=none; b=gxb2DkpxU39JtnjEARiS7LfBTZ9pppN4wrxyaWxHPbvUwUuQEYCVEiCZKV3p8IyVZPwQpGt7QScmf6kskLS//OB7NmPoWbDSZmoBhYB+WwYV7VDs/0XFSQDCRq5szca+uriGZjIAYh0buR3h3wJqafhb/Sp9HtA2HUCwkG/vhVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706019701; c=relaxed/simple;
-	bh=BWxFJ6f+lO7oLYsKbxzaJnDar3I13n2vm78DWeqz9IY=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=FGurJrD2FVc2LQPBukY/6oCCxfahRa/wu+ND5YE51PM39x/do822ysbdaIDpyaGZGCKCeQY2LlsLiAVZRqBJ4lFUV4SztbjbbyH2wBGyOqY26m6eoT3Lbm+PcLHTpVHLpjld4AZk/jh6iqfMOYDuouGM6byvOX+40+fXGMYrJLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=PKayuLNr; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iaeyMu9I; arc=none smtp.client-ip=64.147.123.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1706022417; c=relaxed/simple;
+	bh=NTmyNsrucXKY9cw+aWmnWoco1HoM9ZMyvI4AhLzmiek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sYeLIEFbHjZTP/Xoxp4HJx8jgVmCl3G0fyrAd6npcViMGuaT6xLCA4pwt2k3Mz4y66ORKVhZsdwsh5M3aSX6CXCoXpLFLWCU/ZbycFUGvAapcvwrY/lfkSGXj0jBzCOCYnACA11/AV3NUZxEIFWoh0wB19kmcj9szfPgjpwwSoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vrull.eu; spf=pass smtp.mailfrom=vrull.eu; dkim=pass (2048-bit key) header.d=vrull.eu header.i=@vrull.eu header.b=PG84TjTS; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vrull.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vrull.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="PKayuLNr";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iaeyMu9I"
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.west.internal (Postfix) with ESMTP id F2C013200A04;
-	Tue, 23 Jan 2024 09:21:36 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Tue, 23 Jan 2024 09:21:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1706019696;
-	 x=1706106096; bh=Wb2LadyDq3EncKOixdkKXF1xf+5ToI114DbbSpnU1nY=; b=
-	PKayuLNrs/RNOnY9Pm3PTRTDtc1BuvHxlCD7DuFwY3X2d3w/3n1RTZ9LkQQmom3/
-	w6idujhcC4sf3BbCM5+B3rKAeN6o49DZxzKkXiUHhjhwBc48BWX6QQG9FBbGrESz
-	dY9isiD4klmX7hDZxIpR0XAo9bx2f3HmXbcXHrgnWu377wYBVGHNDJeydLYODUm3
-	R2v4IQChjpBjq1THZkrhojBT62tPQZhhhJX7vhM3GS1LAQ5MUjk8AsVhFsBFrQgH
-	doe9VBd2+6WHeaR4G96Yes5cYzvayqaI2fWvhDYf/ZZHo1Zb7cz6wduRTcnHpKrW
-	6kE0Ci1RccWeYTA5fc/t/A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1706019696; x=
-	1706106096; bh=Wb2LadyDq3EncKOixdkKXF1xf+5ToI114DbbSpnU1nY=; b=i
-	aeyMu9IQJm8viLVFcRG2+AfApl0inhRKl32d9bxe+ynOLxLBL2s/6xnBdR+sart7
-	wAZAjiA4uL/DTaIWBboS2/YhhyDMgMYyxOQ4f604bM7uJzQt+e/9izTFd+xJifVo
-	xQ50WHbYZD/V2ZAwYra6Pek4hm9CLQF0AsKq4BVdceSEFeVHgMY+a42IjHl2qdAC
-	3tidNdDH6brWPgcA3qtQ97S9I8mHpThso03DUhwzCMsTMvIaulq1IZgWkWvjI17h
-	qB/abhBsPAnPQnf0Ws70h0wwPbXzEqjR98NOYls5N0AIzgYtr4Y02V+Cwfh6GpX1
-	RL81i2NKrtG69Wlsq/MXA==
-X-ME-Sender: <xms:b8uvZZutZyYhjvm11xsbDHd-yctTohxrZ96EclPn7v7Uk295CAYxIA>
-    <xme:b8uvZSdJ-DzXvh4tLWbWKsloyBAkMqIGhWu0zDscTRdh84QtuWV6_vntH6OGKUGWc
-    o9tQr6gGnuPR811080>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdekkedgieduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpefgkeeuleegieeghfduudeltdekfeffjeeuleehleefudettddtgfevueef
-    feeigeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:b8uvZcyHxEDFbucCwS_wdJTB7xZCjv4VpoI1kQNX4uuVdNYjj6sBQw>
-    <xmx:b8uvZQOGooI-lZsO5yozfuK-_cjQpfLDCPfU0iE3UrR2Mn2j9dL4qQ>
-    <xmx:b8uvZZ-FoQRRZFNwPBfm4zrKoG5PrhcOqTLtRYQnZkkS4F1E545I9g>
-    <xmx:cMuvZdVu3pmkvuhw0wgTNHs20QG_zyCJ2SI5aNTi4b7I7-93_VGCkA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id C023DB6008D; Tue, 23 Jan 2024 09:21:35 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-119-ga8b98d1bd8-fm-20240108.001-ga8b98d1b
+	dkim=pass (2048-bit key) header.d=vrull.eu header.i=@vrull.eu header.b="PG84TjTS"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d5f252411aso24009065ad.2
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Jan 2024 07:06:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vrull.eu; s=google; t=1706022415; x=1706627215; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1tjKV2GUrSP7LFhHsJ97x90ExpcYsvB+JBmXfLVyyFI=;
+        b=PG84TjTSJg3ERaFtnJ8DCLDWqDoNrpdTVJJTYtXnKuIvx/PGVyxp6si+0fZCI0L1/s
+         fMMYIsoWUhRyT8XJGj1r1HCk5oJRK9d19pumhm7P2iL+wv7/kpMKh8LjG9HGZMjyEjSN
+         cCYIk+RSYJdysHL1Y2dMM574md4/owg5BOyuf1fnsTSKUhuqoK5LW9RHy3CzGfsncWkF
+         Twwwx1uyBFUVcz09Scz2ZlHm941nN6IbMAKP1WRrdKfWtxc47vGqUfgZJmpqxEu+pv8b
+         4yYWyNp+jApMhZ6knfnADk1WSl2v2IfvpiIi0KLZCT76T859x1gyW+56n7r/iFIMKTVo
+         SdSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706022415; x=1706627215;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1tjKV2GUrSP7LFhHsJ97x90ExpcYsvB+JBmXfLVyyFI=;
+        b=ROxbyeg5oloNa7/rbXrHWlBCy0yuMxIE6zzckXY74woKXDOq9Ts2YmZjYU63TZEDdK
+         C6W5jzwo1A4NTXYiu1SAmMKJQhpcwcsYuaCXI0iaivZnjcMsvrRU2y6qh5PPWEh5BSxN
+         DKjTMvHcLTHiMhd9bf6MA5GoKt0P45xahwyj0YrvB+FyARdRm64fRVhd/dtT/WwJK1FH
+         0x7+q7SMs9BPuPfjUsdbaqFJT6sMPJ2UtVQrH/AmEL7QK/4lrmag8yKclaa+bSfTzoB5
+         XkLvNyqi1U3dY4RyJukRKZD6ysQ4GUgso6xCm1T0v9KMIY+fpPRX8WOpCYrCWi1cR1Iw
+         5rsg==
+X-Gm-Message-State: AOJu0YxLXbxxwvg8yosCZf5p2nKORnXY7CVLkrK19B+s0ipwoCnJx73s
+	x9LC4SilgNKRenOAw+ncpcfloYdR2c5gs2sGoUqlyCbGIaAWlGTX5wJ3sYC9AXKvcl3lb6BZga3
+	z2mf4+Sc45QMsenOrtqC9hVgSrYR+ONqk9rqRHw==
+X-Google-Smtp-Source: AGHT+IHDBHd0oeNga+xE+kyZKxq8j0hI4802+QZ38jIKhXZ5obf2QepzH8/p7HOdtFVFwKsQoAwztEPl6+jRnYSDxvs=
+X-Received: by 2002:a17:90b:606:b0:28f:f849:7c8c with SMTP id
+ gb6-20020a17090b060600b0028ff8497c8cmr2681037pjb.34.1706022414987; Tue, 23
+ Jan 2024 07:06:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <0229fa60-2d87-4b1c-b9f0-6f04c6e4dbdd@app.fastmail.com>
-In-Reply-To: <d03e90ca-8485-4d1b-5ec1-c3398e0e8da@linux-m68k.org>
-References: 
- <CAHk-=wiB4iHTtfZKiy5pC24uOjun4fbj4kSX0=ZnGsOXadMf6g@mail.gmail.com>
- <20240123111235.3097079-1-geert@linux-m68k.org>
- <d03e90ca-8485-4d1b-5ec1-c3398e0e8da@linux-m68k.org>
-Date: Tue, 23 Jan 2024 15:21:14 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Geert Uytterhoeven" <geert@linux-m68k.org>, linux-kernel@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org, linux-sh@vger.kernel.org,
- sparclinux@vger.kernel.org, intel-xe@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, linux-mtd@lists.infradead.org,
- mpi3mr-linuxdrv.pdl@broadcom.com, linux-scsi@vger.kernel.org,
- "Chris Zankel" <chris@zankel.net>, "Max Filippov" <jcmvbkbc@gmail.com>,
- linux-hardening@vger.kernel.org, qat-linux@intel.com,
- linux-crypto@vger.kernel.org,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- Netdev <netdev@vger.kernel.org>
-Subject: Re: Build regressions/improvements in v6.8-rc1
-Content-Type: text/plain;charset=utf-8
+References: <20240122002024.27477-1-ebiggers@kernel.org>
+In-Reply-To: <20240122002024.27477-1-ebiggers@kernel.org>
+From: =?UTF-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>
+Date: Tue, 23 Jan 2024 16:06:43 +0100
+Message-ID: <CAEg0e7j6x6Fj4CmAGz2qzumVeL4mMK1D3VUT5CaQYTebsyPThg@mail.gmail.com>
+Subject: Re: [PATCH v3 00/10] RISC-V crypto with reworked asm files
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>, 
+	Andy Chiu <andy.chiu@sifive.com>, Ard Biesheuvel <ardb@kernel.org>, Heiko Stuebner <heiko@sntech.de>, 
+	Jerry Shih <jerry.shih@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Phoebe Chen <phoebe.chen@sifive.com>, 
+	hongrong.hsu@sifive.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 23, 2024, at 12:45, Geert Uytterhoeven wrote:
-
->> 68 error regressions:
+On Mon, Jan 22, 2024 at 1:23=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
+wrote:
 >
->>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous=
- prototype for 'memcons_getc' [-Werror=3Dmissing-prototypes]:  =3D> 80:5
->>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous=
- prototype for 'memcons_getc_poll' [-Werror=3Dmissing-prototypes]:  =3D>=
- 57:5
->>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous=
- prototype for 'memcons_putc' [-Werror=3Dmissing-prototypes]:  =3D> 44:6
+> This patchset, which applies to v6.8-rc1, adds cryptographic algorithm
+> implementations accelerated using the RISC-V vector crypto extensions
+> (https://github.com/riscv/riscv-crypto/releases/download/v1.0.0/riscv-cry=
+pto-spec-vector.pdf)
+> and RISC-V vector extension
+> (https://github.com/riscv/riscv-v-spec/releases/download/v1.0/riscv-v-spe=
+c-1.0.pdf).
+> The following algorithms are included: AES in ECB, CBC, CTR, and XTS mode=
+s;
+> ChaCha20; GHASH; SHA-2; SM3; and SM4.
 >
-> powerpc-gcc{5,12,13}/ppc64_book3e_allmodconfig
-
-I now sent patches for powerpc booke warnings
-
->>  + /kisskb/src/arch/sh/kernel/cpu/init.c: error: no previous prototyp=
-e for 'l2_cache_init' [-Werror=3Dmissing-prototypes]:  =3D> 99:29
+> In general, the assembly code requires a 64-bit RISC-V CPU with VLEN >=3D=
+ 128,
+> little endian byte order, and vector unaligned access support.  The ECB, =
+CTR,
+> XTS, and ChaCha20 code is designed to naturally scale up to larger VLEN v=
+alues.
+> Building the assembly code requires tip-of-tree binutils (future 2.42) or
+> tip-of-tree clang (future 18.x).  All algorithms pass testing in QEMU, us=
+ing
+> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=3Dy.  Much of the assembly code is deri=
+ved from
+> OpenSSL code that was added by https://github.com/openssl/openssl/pull/21=
+923.
+> It's been cleaned up for integration with the kernel, e.g. reducing code
+> duplication, eliminating use of .inst and perlasm, and fixing a few bugs.
 >
-> sh4-gcc1[123]/se7{619,750}_defconfig
-> sh4-gcc1[123]/sh-{all{mod,no,yes},def}config
-> sh4-gcc11/sh-allnoconfig
-
-I assume the sh maintainers will eventually get to that
-
->>  + /kisskb/src/arch/sparc/include/asm/floppy_64.h: error: no previous=
- prototype for 'sparc_floppy_irq' [-Werror=3Dmissing-prototypes]:  =3D> =
-200:13
->>  + /kisskb/src/arch/sparc/include/asm/floppy_64.h: error: no previous=
- prototype for 'sun_pci_fd_dma_callback' [-Werror=3Dmissing-prototypes]:=
-  =3D> 437:6
+> This patchset incorporates the work of multiple people, including Jerry S=
+hih,
+> Heiko Stuebner, Christoph M=C3=BCllner, Phoebe Chen, Charalampos Mitrodim=
+as, and
+> myself.  This patchset went through several versions from Heiko (last ver=
+sion
+> https://lore.kernel.org/linux-crypto/20230711153743.1970625-1-heiko@sntec=
+h.de),
+> then several versions from Jerry (last version:
+> https://lore.kernel.org/linux-crypto/20231231152743.6304-1-jerry.shih@sif=
+ive.com),
+> then finally several versions from me.  Thanks to everyone who has contri=
+buted
+> to this patchset or its prerequisites.  Since v6.8-rc1, all prerequisite =
+kernel
+> patches are upstream.  I think this is now ready, and I'd like for it to =
+be
+> applied for 6.9, either to the crypto or riscv tree (at maintainers' choi=
+ce).
 >
-> sparc64-gcc{5,11,12,13}/sparc64-allmodconfig
+> Below is the changelog for my versions of the patchset.  For the changelo=
+g of
+> the older versions, see the above links.
 
-Andrew Morton did a patch for the sparc warnings, and Andreas Larsson
-is joining as a maintainer, so hopefully he can pick that up soon.
-> sparc64-gcc{5,1[123]}/sparc64-allmodconfig
+For all patches of this series:
+Reviewed-by: Christoph M=C3=BCllner <christoph.muellner@vrull.eu>
+
+Eric, thank you for working on this!
+
 >
->>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous p=
-rototype for '__vdso_clock_gettime' [-Werror=3Dmissing-prototypes]:  =3D=
-> 254:1
->>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous p=
-rototype for '__vdso_clock_gettime_stick' [-Werror=3Dmissing-prototypes]=
-:  =3D> 282:1
->>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous p=
-rototype=20
-
-There are prototypes in include/vdso/gettime.h that should be
-used here, but unfortunately the sparc implementation does
-not match the prototypes because sparc is missing the gettime64
-support.
-
-> sparc64-gcc{5,12,13}/sparc64-{allno,def}config
-> sparc64-gcc11/sparc64-{all{mod,no},def}config
+> Changed in v3:
+>   - Fixed a bug in the AES-XTS implementation where it assumed the CPU
+>     always set vl to the maximum possible value.  This was okay for
+>     QEMU, but the vector spec allows CPUs to have different behavior.
+>   - Increased the LMUL for AES-ECB to 8, as the registers are available.
+>   - Fixed some license text that I had mistakenly changed when doing a
+>     find-and-replace of code.
+>   - Addressed a checkpatch warning by not including filename in file.
+>   - Rename some labels.
+>   - Constify a variable.
 >
->>  + /kisskb/src/arch/x86/um/shared/sysdep/kernel-offsets.h: error: no =
-previous prototype for =E2=80=98foo=E2=80=99 [-Werror=3Dmissing-prototyp=
-es]:  =3D> 9:6
+> Changed in v2:
+>   - Merged the AES modules together to prevent a build error.
+>   - Only unregister AES algorithms that were registered.
+>   - Corrected walksize properties to match the LMUL used by asm code.
+>   - Simplified the CTR and XTS glue code slightly.
+>   - Minor cleanups.
 >
-> um-x86_64-gcc12/um-{all{mod,yes},def}config
-
-I made a patch for arch/um yesterday.
-
-> sparc64-gcc1[12]/sparc64-allmodconfig
+> Changed in v1:
+>   - Refer to my cover letter
+>     https://lore.kernel.org/linux-crypto/20240102064743.220490-1-ebiggers=
+@kernel.org/
 >
->>  + /kisskb/src/drivers/scsi/mpi3mr/mpi3mr_transport.c: error: the fra=
-me size of 1680 bytes is larger than 1536 bytes [-Werror=3Dframe-larger-=
-than=3D]:  =3D> 1818:1
-
-I sent a patch in November when the regression started, missed
-the reply about needing another change
-https://lore.kernel.org/all/CAFdVvOxH4UQjww4124E2ttuTgknzkHoPxVSFOQgLfoV=
-_dkANwQ@mail.gmail.com/
-
->>  + {standard input}: Error: displacement to undefined symbol .L105 ov=
-erflows 8-bit field :  =3D> 590, 593
->>  + {standard input}: Error: displacement to undefined symbol .L135 ov=
-erflows 8-bit field :  =3D> 603
->>  + {standard input}: Error: displacement to undefined symbol .L140 ov=
-erflows 8-bit field :  =3D> 606
->>  + {standard input}: Error: displacement to undefined symbol .L76 ove=
-rflows 12-bit field:  =3D> 591, 594
->>  + {standard input}: Error: displacement to undefined symbol .L77 ove=
-rflows 8-bit field : 607 =3D> 607, 582, 585
->>  + {standard input}: Error: displacement to undefined symbol .L97 ove=
-rflows 12-bit field:  =3D> 607
->>  + {standard input}: Error: pcrel too far: 604, 590, 577, 593, 572, 5=
-69, 598, 599, 596, 610 =3D> 610, 574, 599, 569, 598, 596, 601, 590, 604,=
- 595, 572, 577, 593
+> Eric Biggers (1):
+>   RISC-V: add TOOLCHAIN_HAS_VECTOR_CRYPTO
 >
-> SH ICE crickets
-
-Linus did a patch for the syscall, and I sent another one for
-arch/sh to prevent this from happening again:
-
-https://lore.kernel.org/all/CAHk-=3Dwjh6Cypo8WC-McXgSzCaou3UXccxB+7PVeSu=
-GR8AjCphg@mail.gmail.com/
-https://lore.kernel.org/all/07d8877b-d933-46f4-8ca4-c10ed602f37e@app.fas=
-tmail.com/
-
-Resent mine now.
-
-      Arnd
+> Heiko Stuebner (2):
+>   RISC-V: add helper function to read the vector VLEN
+>   RISC-V: hook new crypto subdir into build-system
+>
+> Jerry Shih (7):
+>   crypto: riscv - add vector crypto accelerated AES-{ECB,CBC,CTR,XTS}
+>   crypto: riscv - add vector crypto accelerated ChaCha20
+>   crypto: riscv - add vector crypto accelerated GHASH
+>   crypto: riscv - add vector crypto accelerated SHA-{256,224}
+>   crypto: riscv - add vector crypto accelerated SHA-{512,384}
+>   crypto: riscv - add vector crypto accelerated SM3
+>   crypto: riscv - add vector crypto accelerated SM4
+>
+>  arch/riscv/Kbuild                             |   1 +
+>  arch/riscv/Kconfig                            |   7 +
+>  arch/riscv/crypto/Kconfig                     |  93 +++
+>  arch/riscv/crypto/Makefile                    |  23 +
+>  arch/riscv/crypto/aes-macros.S                | 156 +++++
+>  arch/riscv/crypto/aes-riscv64-glue.c          | 550 ++++++++++++++++++
+>  .../crypto/aes-riscv64-zvkned-zvbb-zvkg.S     | 312 ++++++++++
+>  arch/riscv/crypto/aes-riscv64-zvkned-zvkb.S   | 146 +++++
+>  arch/riscv/crypto/aes-riscv64-zvkned.S        | 180 ++++++
+>  arch/riscv/crypto/chacha-riscv64-glue.c       | 101 ++++
+>  arch/riscv/crypto/chacha-riscv64-zvkb.S       | 294 ++++++++++
+>  arch/riscv/crypto/ghash-riscv64-glue.c        | 168 ++++++
+>  arch/riscv/crypto/ghash-riscv64-zvkg.S        |  72 +++
+>  arch/riscv/crypto/sha256-riscv64-glue.c       | 137 +++++
+>  .../sha256-riscv64-zvknha_or_zvknhb-zvkb.S    | 225 +++++++
+>  arch/riscv/crypto/sha512-riscv64-glue.c       | 133 +++++
+>  .../riscv/crypto/sha512-riscv64-zvknhb-zvkb.S | 203 +++++++
+>  arch/riscv/crypto/sm3-riscv64-glue.c          | 112 ++++
+>  arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.S    | 123 ++++
+>  arch/riscv/crypto/sm4-riscv64-glue.c          | 107 ++++
+>  arch/riscv/crypto/sm4-riscv64-zvksed-zvkb.S   | 117 ++++
+>  arch/riscv/include/asm/vector.h               |  11 +
+>  crypto/Kconfig                                |   3 +
+>  23 files changed, 3274 insertions(+)
+>  create mode 100644 arch/riscv/crypto/Kconfig
+>  create mode 100644 arch/riscv/crypto/Makefile
+>  create mode 100644 arch/riscv/crypto/aes-macros.S
+>  create mode 100644 arch/riscv/crypto/aes-riscv64-glue.c
+>  create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned-zvbb-zvkg.S
+>  create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned-zvkb.S
+>  create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned.S
+>  create mode 100644 arch/riscv/crypto/chacha-riscv64-glue.c
+>  create mode 100644 arch/riscv/crypto/chacha-riscv64-zvkb.S
+>  create mode 100644 arch/riscv/crypto/ghash-riscv64-glue.c
+>  create mode 100644 arch/riscv/crypto/ghash-riscv64-zvkg.S
+>  create mode 100644 arch/riscv/crypto/sha256-riscv64-glue.c
+>  create mode 100644 arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvk=
+b.S
+>  create mode 100644 arch/riscv/crypto/sha512-riscv64-glue.c
+>  create mode 100644 arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.S
+>  create mode 100644 arch/riscv/crypto/sm3-riscv64-glue.c
+>  create mode 100644 arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.S
+>  create mode 100644 arch/riscv/crypto/sm4-riscv64-glue.c
+>  create mode 100644 arch/riscv/crypto/sm4-riscv64-zvksed-zvkb.S
+>
+>
+> base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
+> --
+> 2.43.0
+>
