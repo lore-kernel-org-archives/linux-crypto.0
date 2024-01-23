@@ -1,130 +1,248 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from gauss.telenet-ops.be (gauss.telenet-ops.be [195.130.132.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864A45D727;
-	Tue, 23 Jan 2024 09:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BF55D753
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Jan 2024 11:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706003106; cv=none; b=incVdL6SyVOzaCgJDUCx5Mg6aJnqaC1XBMu+0EWE60U3LlBQxEjwnHNwMs7QBaMA2iBg8v45OXYDbbzjKBWuzA3S8KIU6QlrNujL144uDvwCdxM11K5GgerXAbqHPbisx3ge6FwcPgS2FrCddODTXC313DNLHEqu5n74H5yjwWE=
+	t=1706010348; cv=none; b=lKZX/xFSTNsimqLDZUlhmyQ0iiN8Li8uy2HnQupKRlC8e/AQ49i2De5lJivI9DYntVEqWPFmZunfDXdBO59vGUFueYo7LzKreZGTlcBLZ0n7Wt1Ee0L0KMC9q9tArm4AL/AeRjXGAzvvTad0QVQoNxrnEP75Kl4lybZteRelejw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706003106; c=relaxed/simple;
-	bh=pymzY/3H3JwV2zvE9dnuZ+MtpGTlYgDuqgn9PZfrCkI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fg4G4c9N5tK3OFPbC2lkG6qa3Uj+4xatdWe26gD65xek1Bo8BhkfeCZkrZwhz/k1rP4aEp/PKI/4PHTnOBgt9sDwACNfLbzv14+xSofARn9FROI7PkPzTNA0MVnuWIXsYwoutCY1S753kff10xTtyPnYa5rPa5z6EdakKzIlI5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=hxwNynJb; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="hxwNynJb"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7D7C040E01BB;
-	Tue, 23 Jan 2024 09:45:00 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 50w5MlWy-wd7; Tue, 23 Jan 2024 09:44:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1706003097; bh=GkrBxaeL2aLlMplkTSKVP94a03nzHfhpk7LQpBp9/7k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hxwNynJbGDduwLhbt4g4J7ymAcJHM+Xol23ZxPF4xrH/6X9JLuOLJMWEeOYiFtDmk
-	 uxiINz75Rp2vkRqFEvxLv71BucXmNgjdRQ4nhGo2rH6oDuLQ2B1NPaS1YB0cg/3cO6
-	 eT39INMB7cu1Y5Q3OR1PkmYuGTH/TglaeJpx2PdatETiQzzFCbLjzQ9YSia5WQMzVL
-	 6UDWcS5RBHDSe6hGicTCTCK8qEujnJiTa9vkMbq4m+DLaIPk5F772MNYDI30z0h4GB
-	 LhiPvUvZS6+YO7IexEpzHOqgt1L/CaSlJ7b8pTqEJkQZW+bgkT6dJND/OLK38s12Ro
-	 wDuwq7do0I4/Pow2LuhJjMApbhdd8MaTNMOIVibAqkZvGgL11tgnd5krf/HpIWFWdU
-	 0kAt6721pkSLBL6WMNnPTNPTVuxaYghjQcevor1j6C2sCIY7L647yZCBhI/BvtF/lB
-	 h8kyUYGcHIPzpCVv67IulAwR3RI6FjNaznAgzBZUDL54RG/QdGofPc/joibedooUEk
-	 Y7DT1umvJkwwt4gIpX2QVwWxbY3NpmcCIJelzttQ1IFlfLkPbuVAK2XtFB47XzSOZ6
-	 LLC4ki2bI6pVe+I687BjIQGek2p15B6sR0cnvT/YpfQrawQfSIOW2Ix63Uug1kt11k
-	 wfVynrHAvlPN8MXOqht7prNo=
-Received: from zn.tnic (pd953099d.dip0.t-ipconnect.de [217.83.9.157])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2949D40E01B4;
-	Tue, 23 Jan 2024 09:44:34 +0000 (UTC)
-Date: Tue, 23 Jan 2024 10:44:27 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-	kim.phillips@amd.com, kirill.shutemov@linux.intel.com,
-	jmattson@google.com, babu.moger@amd.com, kai.huang@intel.com,
-	acme@redhat.com, aik@amd.com, namhyung@kernel.org,
-	CobeChen@zhaoxin.com, TimGuo@zhaoxin.com, LeoLiu-oc@zhaoxin.com,
-	GeorgeXue@zhaoxin.com
-Subject: Re: [PATCH v2 2/3] x86/cpufeatures: Add CPU feature flags for
- Zhaoxin Hash Engine
-Message-ID: <20240123094427.GAZa-Ke5d2Kwyk2nSU@fat_crate.local>
-References: <20240123022852.2475-1-TonyWWang-oc@zhaoxin.com>
- <20240123022852.2475-3-TonyWWang-oc@zhaoxin.com>
+	s=arc-20240116; t=1706010348; c=relaxed/simple;
+	bh=8OD6O78KilYfiS1XJAOMNox5aCxYPYDXopHTRlKehPA=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=BOLMiLXJ0eeS/1IXw7L7K4gv5mw1BmEYyNDc0eRveJjfUXCtXvyJvF80ViyanZ3QljenCCBq4QejPbDGggp8tyryT7+H+QPqzpg6hWAKH96g44RT6fIoyIcOQE/nkF1Bqt6ZcX21UcDQBDnHc3COQPAK7gBO75JHtXKjWK9kGhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.132.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from andre.telenet-ops.be (andre.telenet-ops.be [IPv6:2a02:1800:120:4::f00:15])
+	by gauss.telenet-ops.be (Postfix) with ESMTPS id 4TK4zD3p5lz4x1cT
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Jan 2024 12:45:44 +0100 (CET)
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed40:8ec8:24bf:c2ed:213e])
+	by andre.telenet-ops.be with bizsmtp
+	id eBlV2B0032E7G5801BlVKu; Tue, 23 Jan 2024 12:45:37 +0100
+Received: from geert (helo=localhost)
+	by ramsan.of.borg with local-esmtp (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1rSFDd-00GLOZ-05;
+	Tue, 23 Jan 2024 12:45:29 +0100
+Date: Tue, 23 Jan 2024 12:45:28 +0100 (CET)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: linux-kernel@vger.kernel.org
+cc: linuxppc-dev@lists.ozlabs.org, linux-sh@vger.kernel.org, 
+    sparclinux@vger.kernel.org, intel-xe@lists.freedesktop.org, 
+    dri-devel@lists.freedesktop.org, linux-mtd@lists.infradead.org, 
+    mpi3mr-linuxdrv.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
+    Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>, 
+    linux-hardening@vger.kernel.org, qat-linux@intel.com, 
+    linux-crypto@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
+    netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: Build regressions/improvements in v6.8-rc1
+In-Reply-To: <20240123111235.3097079-1-geert@linux-m68k.org>
+Message-ID: <d03e90ca-8485-4d1b-5ec1-c3398e0e8da@linux-m68k.org>
+References: <CAHk-=wiB4iHTtfZKiy5pC24uOjun4fbj4kSX0=ZnGsOXadMf6g@mail.gmail.com> <20240123111235.3097079-1-geert@linux-m68k.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240123022852.2475-3-TonyWWang-oc@zhaoxin.com>
+Content-Type: multipart/mixed; boundary="8323329-792708632-1706010328=:3895412"
 
-On Tue, Jan 23, 2024 at 10:28:51AM +0800, Tony W Wang-oc wrote:
-> Zhaoxin CPUs have implemented the SHA(Secure Hash Algorithm) as its
-> instrucions.
-> Add two CPU feature flags indicated by CPUID.(EAX=C0000001,ECX=0):EDX
-> bit 25/26 which will be used by Zhaoxin SHA driver.
-> 
-> Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h       | 4 +++-
->  tools/arch/x86/include/asm/cpufeatures.h | 4 +++-
->  2 files changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 29cb275a219d..28b0e62dbdf5 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -145,7 +145,7 @@
->  #define X86_FEATURE_RDRAND		( 4*32+30) /* RDRAND instruction */
->  #define X86_FEATURE_HYPERVISOR		( 4*32+31) /* Running on a hypervisor */
->  
-> -/* VIA/Cyrix/Centaur-defined CPU features, CPUID level 0xC0000001, word 5 */
-> +/* VIA/Cyrix/Centaur/Zhaoxin-defined CPU features, CPUID level 0xC0000001, word 5 */
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Does that mean that all those companies agree on the contents of this
-CPUID leaf?
+--8323329-792708632-1706010328=:3895412
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
->  #define X86_FEATURE_XSTORE		( 5*32+ 2) /* "rng" RNG present (xstore) */
->  #define X86_FEATURE_XSTORE_EN		( 5*32+ 3) /* "rng_en" RNG enabled */
->  #define X86_FEATURE_XCRYPT		( 5*32+ 6) /* "ace" on-CPU crypto (xcrypt) */
-> @@ -156,6 +156,8 @@
->  #define X86_FEATURE_PHE_EN		( 5*32+11) /* PHE enabled */
->  #define X86_FEATURE_PMM			( 5*32+12) /* PadLock Montgomery Multiplier */
->  #define X86_FEATURE_PMM_EN		( 5*32+13) /* PMM enabled */
-> +#define X86_FEATURE_PHE2		( 5*32+25) /* "phe2" Zhaoxin Hash Engine */
-> +#define X86_FEATURE_PHE2_EN		( 5*32+26) /* "phe2_en" PHE2 enabled */
-						      ^^^^^^^^^
+On Tue, 23 Jan 2024, Geert Uytterhoeven wrote:
+> Below is the list of build error/warning regressions/improvements in
+> v6.8-rc1[1] compared to v6.7[2].
+>
+> Summarized:
+>  - build errors: +68/-18
+>  - build warnings: +129/-1487
+>
+> Happy fixing! ;-)
+>
+> Thanks to the linux-next team for providing the build service.
+>
+> [1] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/6613476e225e090cc9aad49be7fa504e290dd33d/ (all 239 configs)
+> [2] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/0dd3ee31125508cd67f7e7172247f05b7fd1753a/ (all 239 configs)
+>
+>
+> *** ERRORS ***
+>
+> 68 error regressions:
 
-From: Documentation/arch/x86/cpuinfo.rst
+>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous prototype for 'memcons_getc' [-Werror=missing-prototypes]:  => 80:5
+>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous prototype for 'memcons_getc_poll' [-Werror=missing-prototypes]:  => 57:5
+>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous prototype for 'memcons_putc' [-Werror=missing-prototypes]:  => 44:6
 
-"a: Feature flags can be derived from the contents of CPUID leaves.
-------------------------------------------------------------------
-These feature definitions are organized mirroring the layout of CPUID
-leaves and grouped in words with offsets as mapped in enum cpuid_leafs
-in cpufeatures.h (see arch/x86/include/asm/cpufeatures.h for details).
-If a feature is defined with a X86_FEATURE_<name> definition in
-cpufeatures.h, and if it is detected at run time, the flags will be
-displayed accordingly in /proc/cpuinfo. For example, the flag "avx2"
-comes from X86_FEATURE_AVX2 in cpufeatures.h."
+powerpc-gcc{5,12,13}/ppc64_book3e_allmodconfig
 
-Is your grep broken?
+>  + /kisskb/src/arch/sh/kernel/cpu/init.c: error: no previous prototype for 'l2_cache_init' [-Werror=missing-prototypes]:  => 99:29
 
--- 
-Regards/Gruss,
-    Boris.
+sh4-gcc1[123]/se7{619,750}_defconfig
+sh4-gcc1[123]/sh-{all{mod,no,yes},def}config
+sh4-gcc11/sh-allnoconfig
 
-https://people.kernel.org/tglx/notes-about-netiquette
+>  + /kisskb/src/arch/sh/math-emu/math.c: error: no previous prototype for 'do_fpu_inst' [-Werror=missing-prototypes]:  => 492:5
+
+sh4-gcc1[123]/sh-all{mod,yes}config
+
+>  + /kisskb/src/arch/sh/mm/cache-sh2.c: error: no previous prototype for 'sh2_cache_init' [-Werror=missing-prototypes]:  => 85:13
+
+sh4-gcc1[123]/se7619_defconfig
+sh4-gcc1[123]/sh-all{mod,yes}config
+
+>  + /kisskb/src/arch/sh/mm/nommu.c: error: no previous prototype for 'kmap_coherent' [-Werror=missing-prototypes]:  => 80:7
+>  + /kisskb/src/arch/sh/mm/nommu.c: error: no previous prototype for 'kmap_coherent_init' [-Werror=missing-prototypes]:  => 76:13
+>  + /kisskb/src/arch/sh/mm/nommu.c: error: no previous prototype for 'kunmap_coherent' [-Werror=missing-prototypes]:  => 86:6
+
+sh4-gcc1[123]/se7619_defconfig
+sh4-gcc1[123]/sh-allnoconfig
+sh4-gcc12/sh-allyesconfig
+
+>  + /kisskb/src/arch/sparc/include/asm/floppy_64.h: error: no previous prototype for 'sparc_floppy_irq' [-Werror=missing-prototypes]:  => 200:13
+>  + /kisskb/src/arch/sparc/include/asm/floppy_64.h: error: no previous prototype for 'sun_pci_fd_dma_callback' [-Werror=missing-prototypes]:  => 437:6
+
+sparc64-gcc{5,11,12,13}/sparc64-allmodconfig
+
+>  + /kisskb/src/arch/sparc/kernel/traps_64.c: error: no previous prototype for 'do_mcd_err' [-Werror=missing-prototypes]:  => 2035:6
+>  + /kisskb/src/arch/sparc/kernel/traps_64.c: error: no previous prototype for 'is_no_fault_exception' [-Werror=missing-prototypes]:  => 253:6
+>  + /kisskb/src/arch/sparc/kernel/traps_64.c: error: no previous prototype for 'sun4v_nonresum_error_user_handled' [-Werror=missing-prototypes]:  => 2153:6
+>  + /kisskb/src/arch/sparc/prom/misc_64.c: error: no previous prototype for 'prom_get_mmu_ihandle' [-Werror=missing-prototypes]:  => 165:5
+>  + /kisskb/src/arch/sparc/prom/p1275.c: error: no previous prototype for 'prom_cif_init' [-Werror=missing-prototypes]:  => 52:6
+>  + /kisskb/src/kernel/dma.c: error: no previous prototype for 'free_dma' [-Werror=missing-prototypes]:  => 88:6
+>  + /kisskb/src/kernel/dma.c: error: no previous prototype for 'request_dma' [-Werror=missing-prototypes]:  => 70:5
+
+sparc64-gcc{5,1[123]}/sparc64-{all{mod,no},def}config
+
+>  + /kisskb/src/arch/sparc/lib/cmpdi2.c: error: no previous prototype for '__cmpdi2' [-Werror=missing-prototypes]:  => 6:11
+
+sparc64-gcc{5,1[123]}/sparc-{all{mod,no},def}config
+
+>  + /kisskb/src/arch/sparc/mm/init_64.c: error: no previous prototype for 'vmemmap_free' [-Werror=missing-prototypes]:  => 2644:6
+
+sparc64-gcc{5,1[123]}/sparc64-{allmod,def}config
+
+>  + /kisskb/src/arch/sparc/power/hibernate.c: error: no previous prototype for 'pfn_is_nosave' [-Werror=missing-prototypes]:  => 22:5
+>  + /kisskb/src/arch/sparc/power/hibernate.c: error: no previous prototype for 'restore_processor_state' [-Werror=missing-prototypes]:  => 35:6
+>  + /kisskb/src/arch/sparc/power/hibernate.c: error: no previous prototype for 'save_processor_state' [-Werror=missing-prototypes]:  => 30:6
+>  + /kisskb/src/drivers/gpu/drm/xe/xe_lrc.c: error: "CTX_VALID" redefined [-Werror]:  => 24, 24:0
+>  + /kisskb/src/drivers/mtd/maps/sun_uflash.c: error: no previous prototype for 'uflash_devinit' [-Werror=missing-prototypes]:  => 50:5
+
+sparc64-gcc{5,1[123]}/sparc64-allmodconfig
+
+>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous prototype for '__vdso_clock_gettime' [-Werror=missing-prototypes]:  => 254:1
+>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous prototype for '__vdso_clock_gettime_stick' [-Werror=missing-prototypes]:  => 282:1
+>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous prototype for '__vdso_gettimeofday' [-Werror=missing-prototypes]:  => 307:1
+>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous prototype for '__vdso_gettimeofday_stick' [-Werror=missing-prototypes]:  => 343:1
+>  + /kisskb/src/arch/sparc/vdso/vdso32/../vclock_gettime.c: error: no previous prototype for '__vdso_clock_gettime' [-Werror=missing-prototypes]:  => 254:1
+>  + /kisskb/src/arch/sparc/vdso/vdso32/../vclock_gettime.c: error: no previous prototype for '__vdso_clock_gettime_stick' [-Werror=missing-prototypes]:  => 282:1
+>  + /kisskb/src/arch/sparc/vdso/vdso32/../vclock_gettime.c: error: no previous prototype for '__vdso_gettimeofday' [-Werror=missing-prototypes]:  => 307:1
+>  + /kisskb/src/arch/sparc/vdso/vdso32/../vclock_gettime.c: error: no previous prototype for '__vdso_gettimeofday_stick' [-Werror=missing-prototypes]:  => 343:1
+>  + /kisskb/src/arch/sparc/vdso/vma.c: error: no previous prototype for 'init_vdso_image' [-Werror=missing-prototypes]:  => 246:12
+
+sparc64-gcc{5,12,13}/sparc64-{allno,def}config
+sparc64-gcc11/sparc64-{all{mod,no},def}config
+
+>  + /kisskb/src/arch/x86/um/shared/sysdep/kernel-offsets.h: error: no previous prototype for ‘foo’ [-Werror=missing-prototypes]:  => 9:6
+
+um-x86_64-gcc12/um-{all{mod,yes},def}config
+
+>  + /kisskb/src/drivers/sbus/char/bbc_envctrl.c: error: no previous prototype for 'bbc_envctrl_cleanup' [-Werror=missing-prototypes]:  => 594:6
+>  + /kisskb/src/drivers/sbus/char/bbc_envctrl.c: error: no previous prototype for 'bbc_envctrl_init' [-Werror=missing-prototypes]:  => 566:5
+
+sparc64-gcc1[12]/sparc64-allmodconfig
+
+>  + /kisskb/src/drivers/scsi/mpi3mr/mpi3mr_transport.c: error: the frame size of 1680 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]:  => 1818:1
+
+xtensa-gcc11/xtensa-allmodconfig
+
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_1044' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_1064' declared with attribute error: FIELD_PREP: mask is not constant:  => 435:38
+
+in drivers/net/ethernet/intel/ice/ice_base.c
+
+powerpc-gcc5/ppc32_allmodconfig
+
+
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_1083' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_1136' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_923' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+
+in drivers/net/ethernet/intel/ice/ice_nvm.c
+
+aarcharm64-gcc5/arm64-allmodconfig
+powerpc-gcc5/ppc32_allmodconfig
+powerpc-gcc5/powerpc-allmodconfig
+powerpc-gcc5/ppc64le_allmodconfig
+
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_1094' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_1147' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_934' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+
+in drivers/net/ethernet/intel/ice/ice_common.c
+
+arm64-gcc5/arm64-allmodconfig
+powerpc-gcc5/ppc32_allmodconfig
+
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_453' declared with attribute error: FIELD_PREP: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_485' declared with attribute error: FIELD_PREP: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_544' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_565' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_614' declared with attribute error: FIELD_PREP: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_646' declared with attribute error: FIELD_PREP: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_656' declared with attribute error: FIELD_PREP: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_688' declared with attribute error: FIELD_PREP: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_705' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_747' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+
+in drivers/gpu/drm/xe/xe_guc_ct.c
+arm64-gcc5/arm64-allmodconfig
+powerpc-gcc5/ppc64_book3e_allmodconfig
+powerpc-gcc5/powerpc-allmodconfig
+
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_693' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_704' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+>  + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_748' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+
+in drivers/net/ethernet/intel/i40e/i40e_dcb.c
+
+powerpc-gcc5/powerpc-allmodconfig
+powerpc-gcc5/ppc32_allmodconfig
+powerpc-gcc5/ppc64_book3e_allmodconfig
+
+
+arm64-gcc5/arm64-allmodconfig
+powerpc-gcc5/powerpc-all{mod,yes}config
+powerpc-gcc5/ppc{32,64le,64_book3e}_allmodconfig
+
+>  + /kisskb/src/include/linux/fortify-string.h: error: call to '__read_overflow2_field' declared with attribute warning: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Werror]:  => 537:4
+>  + /kisskb/src/include/linux/fortify-string.h: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror]:  => 528:4
+
+mips-gcc8/mips-allmodconfig
+
+>  + {standard input}: Error: displacement to undefined symbol .L105 overflows 8-bit field :  => 590, 593
+>  + {standard input}: Error: displacement to undefined symbol .L135 overflows 8-bit field :  => 603
+>  + {standard input}: Error: displacement to undefined symbol .L140 overflows 8-bit field :  => 606
+>  + {standard input}: Error: displacement to undefined symbol .L76 overflows 12-bit field:  => 591, 594
+>  + {standard input}: Error: displacement to undefined symbol .L77 overflows 8-bit field : 607 => 607, 582, 585
+>  + {standard input}: Error: displacement to undefined symbol .L97 overflows 12-bit field:  => 607
+>  + {standard input}: Error: pcrel too far: 604, 590, 577, 593, 572, 569, 598, 599, 596, 610 => 610, 574, 599, 569, 598, 596, 601, 590, 604, 595, 572, 577, 593
+
+SH ICE crickets
+
+Gr{oetje,eeting}s,
+
+ 						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+ 							    -- Linus Torvalds
+--8323329-792708632-1706010328=:3895412--
