@@ -1,197 +1,139 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138CA65BAC
-	for <linux-crypto@vger.kernel.org>; Tue, 23 Jan 2024 01:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0874E29424
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Jan 2024 02:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.110.167.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705975101; cv=none; b=TldTbSLnbiQ27H5REnUKLy0ZfwAojAh7O4lUxA6FWiWF65/rpBKTLxOnLG2iE3dUhj6MEwPLlbUWcWgYu2rC6uFgJwX6tWuDj30KOw4JAiqqPH0SXSZpUHlTjtwJ3m1B0B5bJ8p5RkCi4Mye2bCtT8kvlzfjmOXgSEAMJxR4Gv8=
+	t=1705976947; cv=none; b=YEG1nkE5+sMvjC47Adz3hCBVexBa/33wbCrcCOEmHnNmvsNxHiYyxGgkvgVc9kMTaQoK7WRinVf1NDT0pplrHyJwGgB1EooiVBdgz9+NtMS2n3ufxXIH1gMwZLwwTHTfbIAd9dXLVOcUr/HRFqkTxACgoah6t6KG1r3dcCcqyig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705975101; c=relaxed/simple;
-	bh=C0cmY3Yc126hc3Jzzmo/IPOo+CewaLsKcA1hSSoU9oc=;
-	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
-	 Content-Type; b=YXQaPfDNMmEOHnWqdOVDCJYgzWn3YFZWY/y7TU6tXtr4uKAbXhZPgQ+J9gUQRJrTyRZBAS2Kb4rcPR/DSgP2dAUjHccRIZWa5X94mVdjwToQ3WR83fb1bplQzPjFt2JxRbqZQzyjHFEuWFQCgGywLhPDYa7ahLo5JSppsrM4xSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=2JOi9WUH; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="2JOi9WUH"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d7431e702dso11056945ad.1
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Jan 2024 17:58:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1705975098; x=1706579898; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xl1bS9xx12/4+TlYvqy1BacmMJQkNZFYVSIgYjkxeXA=;
-        b=2JOi9WUHZey91jPG/eqkEKD87lUZXBsg5GyTTKnQrSxkMGsWcPjTHghbaLaSM6CG3m
-         IpVRwHzc895eydG2Z1UX+yHwScZ+qU3nEQuu7SClxotSIqI0EmGYRddtHybS+qNXCq3P
-         5zaW65u9aVDNsz+Tz6q1sjr76L4kZTKdcqbe7khBZLUfnw7sEbNUDsDPp9D0QLGG0h9U
-         kqNWZrr2eOzBClCVK7BejyRkHYjBT5aj5ODxdHR+XzKqcvit2h7/wKVZ+tWqeU+ymhGE
-         MwVd0J1zPhHj4hDShCWhVv5Jmy3nugagIkph4up1mdHfd7pccD4sTzHTDF4jWm3Svq9A
-         o5bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705975098; x=1706579898;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xl1bS9xx12/4+TlYvqy1BacmMJQkNZFYVSIgYjkxeXA=;
-        b=JqVcx+rRK17UD7CIhKuPkihGcaZmB5CrMrhkxCSr8foi96ZRe193RJhWBbczdRUrk1
-         aNvAtP1FgKWHZlfrzJNm9pISD6VvNfhbTRnF0Dnggex/fbj9+TVg88xvG6OAAjmUfGiy
-         Uh8L3ggTEXXBdGtHcXeOKiKqcIFquArYc/7kTqscXQ/p0f5L1XP/MSFX7iqzO1uwoSkw
-         9rRy9N3RLlpC6Vc9rWQ37seYUmUf/CERB5UCf0+WNTUaznpQEE8VdJfy+gfsr3LnmbxP
-         PyVh6tS4KUQjMwY1Gurx22cl/6mZKLk7yVrkADILQm5tX1p5gVqUltARP9XItYvqeciZ
-         yRxw==
-X-Gm-Message-State: AOJu0YwK7AsD5Ek0jk4ESfPvWerkIJonvbYN/w0SitLNzC4nKLCMZ/jX
-	BM7XZWB8gPOo3ec9axQli44Zs3FL+Gr/bbVKOOjZPQ7eEeD1nZBoLrTiH2SwEMlmxifooZTOQUP
-	a
-X-Google-Smtp-Source: AGHT+IGfPm27pCdlWIEdcPx9mb5M1+rrIWMsXK6AMdbrIt8teRpxerMx5/kPe/+y5EpMdTUT160Btw==
-X-Received: by 2002:a17:902:ef93:b0:1d7:131a:1f05 with SMTP id iz19-20020a170902ef9300b001d7131a1f05mr2047709plb.23.1705975097784;
-        Mon, 22 Jan 2024 17:58:17 -0800 (PST)
-Received: from localhost ([192.184.165.199])
-        by smtp.gmail.com with ESMTPSA id d5-20020a170902ef0500b001d7244c8ee0sm5634529plx.117.2024.01.22.17.58.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 17:58:17 -0800 (PST)
-Date: Mon, 22 Jan 2024 17:58:17 -0800 (PST)
-X-Google-Original-Date: Mon, 22 Jan 2024 17:58:10 PST (-0800)
-Subject:     Re: [PATCH v3 00/10] RISC-V crypto with reworked asm files
-In-Reply-To: <20240122002024.27477-1-ebiggers@kernel.org>
-CC: linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org,
-  linux-kernel@vger.kernel.org, aou@eecs.berkeley.edu, andy.chiu@sifive.com, Ard Biesheuvel <ardb@kernel.org>,
-  christoph.muellner@vrull.eu, heiko@sntech.de, jerry.shih@sifive.com,
-  Paul Walmsley <paul.walmsley@sifive.com>, phoebe.chen@sifive.com, hongrong.hsu@sifive.com
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: ebiggers@kernel.org
-Message-ID: <mhng-4b573769-2306-43f9-8c7a-c7a1bc461502@palmer-ri-x1c9>
+	s=arc-20240116; t=1705976947; c=relaxed/simple;
+	bh=TYytRoBRPO460xz7ymBTlU+vkWrppd7xtwrj5lYa8s8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=txGuhWF6BSzdIk4Tq03JfNWC3jkxcrdD3+ICXl4wJRE+Tt5uVtCEtBNcRMMeXGE32bMkNMUG9ALC3hZYoAD0TddVz30Sv1CD1yYoQ9Y6U6e+IUFYDpT9539kXt1tgBexchFkBiNr8vEbfOH357a5LhICChuY2gKvRuTjQauu+To=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=203.110.167.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1705976935-1eb14e0c7f272d0001-Xm9f1P
+Received: from ZXSHMBX2.zhaoxin.com (ZXSHMBX2.zhaoxin.com [10.28.252.164]) by mx2.zhaoxin.com with ESMTP id zsstOb7ku2RIE6lw (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Tue, 23 Jan 2024 10:28:55 +0800 (CST)
+X-Barracuda-Envelope-From: TonyWWang-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHMBX2.zhaoxin.com
+ (10.28.252.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 23 Jan
+ 2024 10:28:54 +0800
+Received: from localhost.localdomain (10.32.65.162) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 23 Jan
+ 2024 10:28:52 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
+From: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+X-Barracuda-RBL-Trusted-Forwarder: 10.29.252.163
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+	<seanjc@google.com>, <kim.phillips@amd.com>,
+	<kirill.shutemov@linux.intel.com>, <jmattson@google.com>,
+	<babu.moger@amd.com>, <kai.huang@intel.com>, <TonyWWang-oc@zhaoxin.com>,
+	<acme@redhat.com>, <aik@amd.com>, <namhyung@kernel.org>
+CC: <CobeChen@zhaoxin.com>, <TimGuo@zhaoxin.com>, <LeoLiu-oc@zhaoxin.com>,
+	<GeorgeXue@zhaoxin.com>
+Subject: [PATCH v2 0/3] Add Zhaoxin hardware engine driver support for SHA
+Date: Tue, 23 Jan 2024 10:28:49 +0800
+X-ASG-Orig-Subj: [PATCH v2 0/3] Add Zhaoxin hardware engine driver support for SHA
+Message-ID: <20240123022852.2475-1-TonyWWang-oc@zhaoxin.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
+X-Barracuda-Connect: ZXSHMBX2.zhaoxin.com[10.28.252.164]
+X-Barracuda-Start-Time: 1705976935
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 3585
+X-Barracuda-BRTS-Status: 0
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.119809
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-On Sun, 21 Jan 2024 16:19:11 PST (-0800), ebiggers@kernel.org wrote:
-> This patchset, which applies to v6.8-rc1, adds cryptographic algorithm
-> implementations accelerated using the RISC-V vector crypto extensions
-> (https://github.com/riscv/riscv-crypto/releases/download/v1.0.0/riscv-crypto-spec-vector.pdf)
-> and RISC-V vector extension
-> (https://github.com/riscv/riscv-v-spec/releases/download/v1.0/riscv-v-spec-1.0.pdf).
-> The following algorithms are included: AES in ECB, CBC, CTR, and XTS modes;
-> ChaCha20; GHASH; SHA-2; SM3; and SM4.
->
-> In general, the assembly code requires a 64-bit RISC-V CPU with VLEN >= 128,
-> little endian byte order, and vector unaligned access support.  The ECB, CTR,
-> XTS, and ChaCha20 code is designed to naturally scale up to larger VLEN values.
-> Building the assembly code requires tip-of-tree binutils (future 2.42) or
-> tip-of-tree clang (future 18.x).  All algorithms pass testing in QEMU, using
-> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y.  Much of the assembly code is derived from
-> OpenSSL code that was added by https://github.com/openssl/openssl/pull/21923.
-> It's been cleaned up for integration with the kernel, e.g. reducing code
-> duplication, eliminating use of .inst and perlasm, and fixing a few bugs.
->
-> This patchset incorporates the work of multiple people, including Jerry Shih,
-> Heiko Stuebner, Christoph Müllner, Phoebe Chen, Charalampos Mitrodimas, and
-> myself.  This patchset went through several versions from Heiko (last version
-> https://lore.kernel.org/linux-crypto/20230711153743.1970625-1-heiko@sntech.de),
-> then several versions from Jerry (last version:
-> https://lore.kernel.org/linux-crypto/20231231152743.6304-1-jerry.shih@sifive.com),
-> then finally several versions from me.  Thanks to everyone who has contributed
-> to this patchset or its prerequisites.  Since v6.8-rc1, all prerequisite kernel
-> patches are upstream.  I think this is now ready, and I'd like for it to be
-> applied for 6.9, either to the crypto or riscv tree (at maintainers' choice).
+Zhaoxin CPUs have implemented the SHA(Secure Hash Algorithm) as its CPU
+instructions, including SHA1, SHA256, SHA384 and SHA512, which conform
+to the Secure Hash Algorithms specified by FIPS 180-3.
 
-I'm OK taking this through the RISC-V tree if folks want, I've gone and 
-queued it up for my tester.  Just LMK if it should go somewhere else, 
-otherwise it'll end up on for-next in a day or so (I'm trying to get LTO 
-builds added right now, so it might take a bit).
+With the help of implementation of SHA in hardware instead of software,
+can develop applications with higher performance, more security and more
+flexibility.
 
->
-> Below is the changelog for my versions of the patchset.  For the changelog of
-> the older versions, see the above links.
->
-> Changed in v3:
->   - Fixed a bug in the AES-XTS implementation where it assumed the CPU
->     always set vl to the maximum possible value.  This was okay for
->     QEMU, but the vector spec allows CPUs to have different behavior.
->   - Increased the LMUL for AES-ECB to 8, as the registers are available.
->   - Fixed some license text that I had mistakenly changed when doing a
->     find-and-replace of code.
->   - Addressed a checkpatch warning by not including filename in file.
->   - Rename some labels.
->   - Constify a variable.
->
-> Changed in v2:
->   - Merged the AES modules together to prevent a build error.
->   - Only unregister AES algorithms that were registered.
->   - Corrected walksize properties to match the LMUL used by asm code.
->   - Simplified the CTR and XTS glue code slightly.
->   - Minor cleanups.
->
-> Changed in v1:
->   - Refer to my cover letter
->     https://lore.kernel.org/linux-crypto/20240102064743.220490-1-ebiggers@kernel.org/
->
-> Eric Biggers (1):
->   RISC-V: add TOOLCHAIN_HAS_VECTOR_CRYPTO
->
-> Heiko Stuebner (2):
->   RISC-V: add helper function to read the vector VLEN
->   RISC-V: hook new crypto subdir into build-system
->
-> Jerry Shih (7):
->   crypto: riscv - add vector crypto accelerated AES-{ECB,CBC,CTR,XTS}
->   crypto: riscv - add vector crypto accelerated ChaCha20
->   crypto: riscv - add vector crypto accelerated GHASH
->   crypto: riscv - add vector crypto accelerated SHA-{256,224}
->   crypto: riscv - add vector crypto accelerated SHA-{512,384}
->   crypto: riscv - add vector crypto accelerated SM3
->   crypto: riscv - add vector crypto accelerated SM4
->
->  arch/riscv/Kbuild                             |   1 +
->  arch/riscv/Kconfig                            |   7 +
->  arch/riscv/crypto/Kconfig                     |  93 +++
->  arch/riscv/crypto/Makefile                    |  23 +
->  arch/riscv/crypto/aes-macros.S                | 156 +++++
->  arch/riscv/crypto/aes-riscv64-glue.c          | 550 ++++++++++++++++++
->  .../crypto/aes-riscv64-zvkned-zvbb-zvkg.S     | 312 ++++++++++
->  arch/riscv/crypto/aes-riscv64-zvkned-zvkb.S   | 146 +++++
->  arch/riscv/crypto/aes-riscv64-zvkned.S        | 180 ++++++
->  arch/riscv/crypto/chacha-riscv64-glue.c       | 101 ++++
->  arch/riscv/crypto/chacha-riscv64-zvkb.S       | 294 ++++++++++
->  arch/riscv/crypto/ghash-riscv64-glue.c        | 168 ++++++
->  arch/riscv/crypto/ghash-riscv64-zvkg.S        |  72 +++
->  arch/riscv/crypto/sha256-riscv64-glue.c       | 137 +++++
->  .../sha256-riscv64-zvknha_or_zvknhb-zvkb.S    | 225 +++++++
->  arch/riscv/crypto/sha512-riscv64-glue.c       | 133 +++++
->  .../riscv/crypto/sha512-riscv64-zvknhb-zvkb.S | 203 +++++++
->  arch/riscv/crypto/sm3-riscv64-glue.c          | 112 ++++
->  arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.S    | 123 ++++
->  arch/riscv/crypto/sm4-riscv64-glue.c          | 107 ++++
->  arch/riscv/crypto/sm4-riscv64-zvksed-zvkb.S   | 117 ++++
->  arch/riscv/include/asm/vector.h               |  11 +
->  crypto/Kconfig                                |   3 +
->  23 files changed, 3274 insertions(+)
->  create mode 100644 arch/riscv/crypto/Kconfig
->  create mode 100644 arch/riscv/crypto/Makefile
->  create mode 100644 arch/riscv/crypto/aes-macros.S
->  create mode 100644 arch/riscv/crypto/aes-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned-zvbb-zvkg.S
->  create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned-zvkb.S
->  create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned.S
->  create mode 100644 arch/riscv/crypto/chacha-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/chacha-riscv64-zvkb.S
->  create mode 100644 arch/riscv/crypto/ghash-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/ghash-riscv64-zvkg.S
->  create mode 100644 arch/riscv/crypto/sha256-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvkb.S
->  create mode 100644 arch/riscv/crypto/sha512-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.S
->  create mode 100644 arch/riscv/crypto/sm3-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.S
->  create mode 100644 arch/riscv/crypto/sm4-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/sm4-riscv64-zvksed-zvkb.S
->
->
-> base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
+Below table gives a summary of test using the driver tcrypt with different
+crypt algorithm drivers on Zhaoxin KH-40000 platform:
+---------------------------------------------------------------------------
+tcrypt     driver   16*    64      256     1024    2048    4096    8192
+---------------------------------------------------------------------------
+           zhaoxin** 442.80 1309.21 3257.53 5221.56 5813.45 6136.39 6264.50***
+403:SHA1   generic** 341.44 813.27  1458.98 1818.03 1896.60 1940.71 1939.06
+           ratio    1.30   1.61    2.23    2.87    3.07    3.16    3.23
+---------------------------------------------------------------------------
+           zhaoxin  451.70 1313.65 2958.71 4658.55 5109.16 5359.08 5459.13
+404:SHA256 generic  202.62 463.55  845.01  1070.50 1117.51 1144.79 1155.68
+           ratio    2.23   2.83    3.50    4.35    4.57    4.68    4.72
+---------------------------------------------------------------------------
+           zhaoxin  350.90 1406.42 3166.16 5736.39 6627.77 7182.01 7429.18
+405:SHA384 generic  161.76 654.88  979.06  1350.56 1423.08 1496.57 1513.12
+           ratio    2.17   2.15    3.23    4.25    4.66    4.80    4.91
+---------------------------------------------------------------------------
+           zhaoxin  334.49 1394.71 3159.93 5728.86 6625.33 7169.23 7407.80
+406:SHA512 generic  161.80 653.84  979.42  1351.41 1444.14 1495.35 1518.43
+           ratio    2.07   2.13    3.23    4.24    4.59    4.79    4.88
+---------------------------------------------------------------------------
+*: The length of each data block to be processed by one complete SHA
+   sequence, namely one INIT, multi UPDATEs and one FINAL.
+**: Crypt algorithm driver used by tcrypt, "zhaoxin" represents zhaoxin-sha
+   while "generic" represents the generic software SHA driver.
+***: The speed of each crypt algorithm driver processing different length
+   of data blocks, unit is Mb/s.
+
+The ratio in the table implies the performance of SHA implemented by
+zhaoxin-sha driver is much higher than the ones implemented by the generic
+software driver of sha1/sha256/sha384/sha512.
+
+In order to support Zhaoxin-sha driver, make padlock-sha driver matches
+the CENTAUR CPUs with Family == 6 and add two Zhaoxin Hash Engine
+cpufeatures.
+
+---
+v2:
+- Make Zhaoxin SHA depends on X86 && !UML
+- Update MAINTAINERS for Zhaoxin SHA
+
+Tony W Wang-oc (3):
+  crypto: padlock-sha: Matches CPU with Family with 6 explicitly
+  x86/cpufeatures: Add CPU feature flags for Zhaoxin Hash Engine
+  crypto: Zhaoxin: Hardware Engine Driver for SHA1/256/384/512
+
+ MAINTAINERS                              |   6 +
+ arch/x86/include/asm/cpufeatures.h       |   4 +-
+ drivers/crypto/Kconfig                   |  16 +
+ drivers/crypto/Makefile                  |   1 +
+ drivers/crypto/padlock-sha.c             |   2 +-
+ drivers/crypto/zhaoxin-sha.c             | 500 +++++++++++++++++++++++
+ drivers/crypto/zhaoxin-sha.h             |  17 +
+ tools/arch/x86/include/asm/cpufeatures.h |   4 +-
+ 8 files changed, 547 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/crypto/zhaoxin-sha.c
+ create mode 100644 drivers/crypto/zhaoxin-sha.h
+
+-- 
+2.25.1
+
