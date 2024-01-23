@@ -1,115 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B7A10F1;
-	Tue, 23 Jan 2024 03:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864A45D727;
+	Tue, 23 Jan 2024 09:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705980584; cv=none; b=KD7Fnge+T9POJvAV8qAKe6sx92HBtT8JmbeIorRg4KP7mBmGdiTT+JCIrJqT4MRxC2GiGlCqCW1H3DBGErzk2orKr3LaLYGalpQk+kJPDFgMT3nwDOd/CwbU96FlZoFLNXs6I2urnXRju2kOHr2SLaov3F9i/MeN71pfR+2WhL0=
+	t=1706003106; cv=none; b=incVdL6SyVOzaCgJDUCx5Mg6aJnqaC1XBMu+0EWE60U3LlBQxEjwnHNwMs7QBaMA2iBg8v45OXYDbbzjKBWuzA3S8KIU6QlrNujL144uDvwCdxM11K5GgerXAbqHPbisx3ge6FwcPgS2FrCddODTXC313DNLHEqu5n74H5yjwWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705980584; c=relaxed/simple;
-	bh=U1v5qrYKbV+f+R8OtytsdZNiZAtmV31IrDUJJyID3bk=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=Q0YmV5gDg3VwcxQlxqdemhPnPEavoW7fR8gLM5xm078rlHPS7xP/tmnOZocVehg/pCwyaxkUZrpZEsLhM65GL54MzofCKmiwjqND1gVjiXb+0xdY2pL+vuEDBDSTEJFvGwDty4Jq17wiysMICq8W5OQ5Bw/45aDnVB/Ik/pHEGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wng2Ly9p; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706003106; c=relaxed/simple;
+	bh=pymzY/3H3JwV2zvE9dnuZ+MtpGTlYgDuqgn9PZfrCkI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fg4G4c9N5tK3OFPbC2lkG6qa3Uj+4xatdWe26gD65xek1Bo8BhkfeCZkrZwhz/k1rP4aEp/PKI/4PHTnOBgt9sDwACNfLbzv14+xSofARn9FROI7PkPzTNA0MVnuWIXsYwoutCY1S753kff10xTtyPnYa5rPa5z6EdakKzIlI5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=hxwNynJb; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wng2Ly9p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A2CEC433C7;
-	Tue, 23 Jan 2024 03:29:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705980583;
-	bh=U1v5qrYKbV+f+R8OtytsdZNiZAtmV31IrDUJJyID3bk=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=Wng2Ly9p0gJUrUy0fOD4sFGGZ3A/c+t4sAUY6sRcNyedhhhAQEuGsBs991gjlQhWi
-	 L9W34O7F9D6wLVxhLculzkedvobKw3ENzJv1JQTt2VBpihomaaGQWcWBbsYybwdIJF
-	 ig5KyQrCJqCLjUKrpQep0GrdUC5rmFXzYY056mFzRum+NFP1zAAHW6lCBRRBozSmzS
-	 IKrxbZ/KFH/jeSI4AjmRfZwnEkxStHujgD3WpURC8HreGp2IRC4gaNEfbGxo/7AosX
-	 j93RdCdt5BGaL7DtelBesGtRUoWStsloAYet8odRBsaEEjZhqLKLRgsDIy8/b6GhYk
-	 f7F7CMQMRIVtw==
-Date: Mon, 22 Jan 2024 19:29:42 -0800
-From: Kees Cook <kees@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>, Kees Cook <keescook@chromium.org>
-CC: linux-hardening@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- Aditya Srivastava <yashsri421@gmail.com>,
- Randy Dunlap <rdunlap@infradead.org>, linux-crypto@vger.kernel.org,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 46/82] crypto: Refactor intentional wrap-around test
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20240123030745.GA1097@sol.localdomain>
-References: <20240122235208.work.748-kees@kernel.org> <20240123002814.1396804-46-keescook@chromium.org> <20240123030745.GA1097@sol.localdomain>
-Message-ID: <C9D472CD-13E1-460B-B8FF-3DD9447804B3@kernel.org>
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="hxwNynJb"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7D7C040E01BB;
+	Tue, 23 Jan 2024 09:45:00 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 50w5MlWy-wd7; Tue, 23 Jan 2024 09:44:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1706003097; bh=GkrBxaeL2aLlMplkTSKVP94a03nzHfhpk7LQpBp9/7k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hxwNynJbGDduwLhbt4g4J7ymAcJHM+Xol23ZxPF4xrH/6X9JLuOLJMWEeOYiFtDmk
+	 uxiINz75Rp2vkRqFEvxLv71BucXmNgjdRQ4nhGo2rH6oDuLQ2B1NPaS1YB0cg/3cO6
+	 eT39INMB7cu1Y5Q3OR1PkmYuGTH/TglaeJpx2PdatETiQzzFCbLjzQ9YSia5WQMzVL
+	 6UDWcS5RBHDSe6hGicTCTCK8qEujnJiTa9vkMbq4m+DLaIPk5F772MNYDI30z0h4GB
+	 LhiPvUvZS6+YO7IexEpzHOqgt1L/CaSlJ7b8pTqEJkQZW+bgkT6dJND/OLK38s12Ro
+	 wDuwq7do0I4/Pow2LuhJjMApbhdd8MaTNMOIVibAqkZvGgL11tgnd5krf/HpIWFWdU
+	 0kAt6721pkSLBL6WMNnPTNPTVuxaYghjQcevor1j6C2sCIY7L647yZCBhI/BvtF/lB
+	 h8kyUYGcHIPzpCVv67IulAwR3RI6FjNaznAgzBZUDL54RG/QdGofPc/joibedooUEk
+	 Y7DT1umvJkwwt4gIpX2QVwWxbY3NpmcCIJelzttQ1IFlfLkPbuVAK2XtFB47XzSOZ6
+	 LLC4ki2bI6pVe+I687BjIQGek2p15B6sR0cnvT/YpfQrawQfSIOW2Ix63Uug1kt11k
+	 wfVynrHAvlPN8MXOqht7prNo=
+Received: from zn.tnic (pd953099d.dip0.t-ipconnect.de [217.83.9.157])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2949D40E01B4;
+	Tue, 23 Jan 2024 09:44:34 +0000 (UTC)
+Date: Tue, 23 Jan 2024 10:44:27 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	kim.phillips@amd.com, kirill.shutemov@linux.intel.com,
+	jmattson@google.com, babu.moger@amd.com, kai.huang@intel.com,
+	acme@redhat.com, aik@amd.com, namhyung@kernel.org,
+	CobeChen@zhaoxin.com, TimGuo@zhaoxin.com, LeoLiu-oc@zhaoxin.com,
+	GeorgeXue@zhaoxin.com
+Subject: Re: [PATCH v2 2/3] x86/cpufeatures: Add CPU feature flags for
+ Zhaoxin Hash Engine
+Message-ID: <20240123094427.GAZa-Ke5d2Kwyk2nSU@fat_crate.local>
+References: <20240123022852.2475-1-TonyWWang-oc@zhaoxin.com>
+ <20240123022852.2475-3-TonyWWang-oc@zhaoxin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240123022852.2475-3-TonyWWang-oc@zhaoxin.com>
 
+On Tue, Jan 23, 2024 at 10:28:51AM +0800, Tony W Wang-oc wrote:
+> Zhaoxin CPUs have implemented the SHA(Secure Hash Algorithm) as its
+> instrucions.
+> Add two CPU feature flags indicated by CPUID.(EAX=C0000001,ECX=0):EDX
+> bit 25/26 which will be used by Zhaoxin SHA driver.
+> 
+> Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+> ---
+>  arch/x86/include/asm/cpufeatures.h       | 4 +++-
+>  tools/arch/x86/include/asm/cpufeatures.h | 4 +++-
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index 29cb275a219d..28b0e62dbdf5 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -145,7 +145,7 @@
+>  #define X86_FEATURE_RDRAND		( 4*32+30) /* RDRAND instruction */
+>  #define X86_FEATURE_HYPERVISOR		( 4*32+31) /* Running on a hypervisor */
+>  
+> -/* VIA/Cyrix/Centaur-defined CPU features, CPUID level 0xC0000001, word 5 */
+> +/* VIA/Cyrix/Centaur/Zhaoxin-defined CPU features, CPUID level 0xC0000001, word 5 */
 
+Does that mean that all those companies agree on the contents of this
+CPUID leaf?
 
-On January 22, 2024 7:07:45 PM PST, Eric Biggers <ebiggers@kernel=2Eorg> w=
-rote:
->Just to double check, you really intend to forbid *unsigned* integer wrap=
-around?
->This patch's commit message focuses on signed, and barely mentions unsign=
-ed=2E
->The actual code changes in this patch only deals with unsigned=2E
+>  #define X86_FEATURE_XSTORE		( 5*32+ 2) /* "rng" RNG present (xstore) */
+>  #define X86_FEATURE_XSTORE_EN		( 5*32+ 3) /* "rng_en" RNG enabled */
+>  #define X86_FEATURE_XCRYPT		( 5*32+ 6) /* "ace" on-CPU crypto (xcrypt) */
+> @@ -156,6 +156,8 @@
+>  #define X86_FEATURE_PHE_EN		( 5*32+11) /* PHE enabled */
+>  #define X86_FEATURE_PMM			( 5*32+12) /* PadLock Montgomery Multiplier */
+>  #define X86_FEATURE_PMM_EN		( 5*32+13) /* PMM enabled */
+> +#define X86_FEATURE_PHE2		( 5*32+25) /* "phe2" Zhaoxin Hash Engine */
+> +#define X86_FEATURE_PHE2_EN		( 5*32+26) /* "phe2_en" PHE2 enabled */
+						      ^^^^^^^^^
 
-I don't mean to forbid wrap-around; we just need to annotate it=2E I can s=
-ee how this commit log didn't do a great job explaining this=2E I hope the =
-cover letter is more sensible:
-https://lore=2Ekernel=2Eorg/linux-hardening/20240122235208=2Ework=2E748-ke=
-es@kernel=2Eorg/
+From: Documentation/arch/x86/cpuinfo.rst
 
->Also, what's the motivation for addressing the 'x + y < x' case but not o=
-ther
->cases in the same file?
+"a: Feature flags can be derived from the contents of CPUID leaves.
+------------------------------------------------------------------
+These feature definitions are organized mirroring the layout of CPUID
+leaves and grouped in words with offsets as mapped in enum cpuid_leafs
+in cpufeatures.h (see arch/x86/include/asm/cpufeatures.h for details).
+If a feature is defined with a X86_FEATURE_<name> definition in
+cpufeatures.h, and if it is detected at run time, the flags will be
+displayed accordingly in /proc/cpuinfo. For example, the flag "avx2"
+comes from X86_FEATURE_AVX2 in cpufeatures.h."
 
-It's a code pattern we could find easily=2E It's working from the instance=
-s found via Coccinelle earlier in the series:
-https://lore=2Ekernel=2Eorg/linux-hardening/20240123002814=2E1396804-5-kee=
-scook@chromium=2Eorg/
+Is your grep broken?
 
-> For example, the le128_add() function which this patch
->modifies has two other intentional wraparounds, which this patch doesn't =
-touch=2E
+-- 
+Regards/Gruss,
+    Boris.
 
-For dedicated wrapping functions we can mark them with __unsigned_wrap:
-https://lore=2Ekernel=2Eorg/linux-hardening/20240123002814=2E1396804-6-kee=
-scook@chromium=2Eorg/
-
->Also, the le128_sub() function just below le128_add() is very similar but=
- does
->wraparound in the other direction=2E  That's 6 cases in 20 lines of code,=
- but this
->patch only addresses 1=2E  And of course, lots of other crypto code relie=
-s on
->unsigned wraparounds too, which this patch overlooks=2E =20
-
-Right -- finding these kinds of things is where a lot of time will be spen=
-t in the future, I suspect=2E :)
-
-> So I'm a bit confused
->about the point of this patch=2E  If we really wanted to explicitly annot=
-ate all
->the intentional wraparounds in a particular piece of code, so that the co=
-de can
->be run with the corresponding sanitizer enabled, wouldn't it be necessary=
- to
->actually test the code with that sanitizer enabled to find all the cases?
-
-Yes, but there's a lot of code to test -- I'm trying to get the first step=
-s done=2E And then once the sanitizers are in good shape, the fuzzers can g=
-rind=2E (I'm trying to add some parallelism to this project; this code patt=
-ern was known so I figured we could address it now=2E)
-
--Kees
-
---=20
-Kees Cook
+https://people.kernel.org/tglx/notes-about-netiquette
