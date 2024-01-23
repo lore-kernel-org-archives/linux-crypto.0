@@ -1,222 +1,125 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBD85FDD7
-	for <linux-crypto@vger.kernel.org>; Tue, 23 Jan 2024 15:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5EC63409;
+	Tue, 23 Jan 2024 15:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706022417; cv=none; b=gxb2DkpxU39JtnjEARiS7LfBTZ9pppN4wrxyaWxHPbvUwUuQEYCVEiCZKV3p8IyVZPwQpGt7QScmf6kskLS//OB7NmPoWbDSZmoBhYB+WwYV7VDs/0XFSQDCRq5szca+uriGZjIAYh0buR3h3wJqafhb/Sp9HtA2HUCwkG/vhVw=
+	t=1706024571; cv=none; b=WbnlW/Y5payC4rycEykWDCGuZZUF+jgrEHpfLxyGIXliGF+zWKuRdMO+pEOcCc2IDORe89Ff+jXeAFnO5228G2OfEDcIeQBs0BGqRt0GMqNVg9kn1uNGXdiR8ICAEHSGxtL7yvCpN3Yz4rk0hw9qOAnOz2MKytFi0I4ajQkjmJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706022417; c=relaxed/simple;
-	bh=NTmyNsrucXKY9cw+aWmnWoco1HoM9ZMyvI4AhLzmiek=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sYeLIEFbHjZTP/Xoxp4HJx8jgVmCl3G0fyrAd6npcViMGuaT6xLCA4pwt2k3Mz4y66ORKVhZsdwsh5M3aSX6CXCoXpLFLWCU/ZbycFUGvAapcvwrY/lfkSGXj0jBzCOCYnACA11/AV3NUZxEIFWoh0wB19kmcj9szfPgjpwwSoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vrull.eu; spf=pass smtp.mailfrom=vrull.eu; dkim=pass (2048-bit key) header.d=vrull.eu header.i=@vrull.eu header.b=PG84TjTS; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vrull.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vrull.eu
+	s=arc-20240116; t=1706024571; c=relaxed/simple;
+	bh=8JD68csNl8Tb1siGMnm1l/EwSi4Lo8eyYQU7w9FZPho=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=AWpXTQQI8uPGhOt4G9h+Wv2bPbOXx8OAVDigOER5NmcXzhAGVfU7vL3yQqnY2P0ivNxEr1GdpZT+fo8BGDAITV6+25N/VIkXafNdmYISRxQN90bxrzP0pi1hRZcCPGddjP5VrOV8x9DoB5Q/cVNvuGixlMuQ2rh164/H8IHQ7DI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=SXcZchmN; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vrull.eu header.i=@vrull.eu header.b="PG84TjTS"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d5f252411aso24009065ad.2
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Jan 2024 07:06:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vrull.eu; s=google; t=1706022415; x=1706627215; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1tjKV2GUrSP7LFhHsJ97x90ExpcYsvB+JBmXfLVyyFI=;
-        b=PG84TjTSJg3ERaFtnJ8DCLDWqDoNrpdTVJJTYtXnKuIvx/PGVyxp6si+0fZCI0L1/s
-         fMMYIsoWUhRyT8XJGj1r1HCk5oJRK9d19pumhm7P2iL+wv7/kpMKh8LjG9HGZMjyEjSN
-         cCYIk+RSYJdysHL1Y2dMM574md4/owg5BOyuf1fnsTSKUhuqoK5LW9RHy3CzGfsncWkF
-         Twwwx1uyBFUVcz09Scz2ZlHm941nN6IbMAKP1WRrdKfWtxc47vGqUfgZJmpqxEu+pv8b
-         4yYWyNp+jApMhZ6knfnADk1WSl2v2IfvpiIi0KLZCT76T859x1gyW+56n7r/iFIMKTVo
-         SdSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706022415; x=1706627215;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1tjKV2GUrSP7LFhHsJ97x90ExpcYsvB+JBmXfLVyyFI=;
-        b=ROxbyeg5oloNa7/rbXrHWlBCy0yuMxIE6zzckXY74woKXDOq9Ts2YmZjYU63TZEDdK
-         C6W5jzwo1A4NTXYiu1SAmMKJQhpcwcsYuaCXI0iaivZnjcMsvrRU2y6qh5PPWEh5BSxN
-         DKjTMvHcLTHiMhd9bf6MA5GoKt0P45xahwyj0YrvB+FyARdRm64fRVhd/dtT/WwJK1FH
-         0x7+q7SMs9BPuPfjUsdbaqFJT6sMPJ2UtVQrH/AmEL7QK/4lrmag8yKclaa+bSfTzoB5
-         XkLvNyqi1U3dY4RyJukRKZD6ysQ4GUgso6xCm1T0v9KMIY+fpPRX8WOpCYrCWi1cR1Iw
-         5rsg==
-X-Gm-Message-State: AOJu0YxLXbxxwvg8yosCZf5p2nKORnXY7CVLkrK19B+s0ipwoCnJx73s
-	x9LC4SilgNKRenOAw+ncpcfloYdR2c5gs2sGoUqlyCbGIaAWlGTX5wJ3sYC9AXKvcl3lb6BZga3
-	z2mf4+Sc45QMsenOrtqC9hVgSrYR+ONqk9rqRHw==
-X-Google-Smtp-Source: AGHT+IHDBHd0oeNga+xE+kyZKxq8j0hI4802+QZ38jIKhXZ5obf2QepzH8/p7HOdtFVFwKsQoAwztEPl6+jRnYSDxvs=
-X-Received: by 2002:a17:90b:606:b0:28f:f849:7c8c with SMTP id
- gb6-20020a17090b060600b0028ff8497c8cmr2681037pjb.34.1706022414987; Tue, 23
- Jan 2024 07:06:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="SXcZchmN"
+Received: from [127.0.0.1] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.17.2/8.17.1) with ESMTPSA id 40NFg2FF3157103
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 23 Jan 2024 07:42:03 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 40NFg2FF3157103
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2024011201; t=1706024527;
+	bh=T/4H9mi6BG7HwRXIFLHvGD5C/Xts5jU0ou5CYzc/EcQ=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=SXcZchmNHbVfHs9BLoI3l3CM+batgETuTpKUiOTl+uwFhDrLvTC2tKq2XkBu2SLSA
+	 6P+JasaFRWEji1jOY4REZ4TAdKt/vGsCuCjjo43j7hTnuCvicsPiHSfJCHEYv2n1oR
+	 wEkEf5JMaXMNgX02f3OKJq6qAf44nc8smZi+DyqFPVflBdNGKaLcL4mAIUWZsR0Kx/
+	 7Ul+uOskJRZT0QMlURpf1jcMkIdMSz3vVVXCIG6TKJnj8b/QG/FVqDSuWNGSG/qNC2
+	 q+bzMgxxBeA7Bdg+Z5tVznsHg+Lk/+2GvyVlPiQQZ3gd4/aZppwE+Uj6b7mmDlIssc
+	 s+Xpmbe9WguEg==
+Date: Tue, 23 Jan 2024 07:42:00 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Borislav Petkov <bp@alien8.de>, Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+CC: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+        x86@kernel.org, seanjc@google.com, kim.phillips@amd.com,
+        kirill.shutemov@linux.intel.com, jmattson@google.com,
+        babu.moger@amd.com, kai.huang@intel.com, acme@redhat.com, aik@amd.com,
+        namhyung@kernel.org, CobeChen@zhaoxin.com, TimGuo@zhaoxin.com,
+        LeoLiu-oc@zhaoxin.com, GeorgeXue@zhaoxin.com
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_2/3=5D_x86/cpufeatures=3A_Add_?= =?US-ASCII?Q?CPU_feature_flags_for_Zhaoxin_Hash_Engine?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20240123094427.GAZa-Ke5d2Kwyk2nSU@fat_crate.local>
+References: <20240123022852.2475-1-TonyWWang-oc@zhaoxin.com> <20240123022852.2475-3-TonyWWang-oc@zhaoxin.com> <20240123094427.GAZa-Ke5d2Kwyk2nSU@fat_crate.local>
+Message-ID: <AADBA4D3-3D36-4AB6-B0D1-510DD5347430@zytor.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122002024.27477-1-ebiggers@kernel.org>
-In-Reply-To: <20240122002024.27477-1-ebiggers@kernel.org>
-From: =?UTF-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>
-Date: Tue, 23 Jan 2024 16:06:43 +0100
-Message-ID: <CAEg0e7j6x6Fj4CmAGz2qzumVeL4mMK1D3VUT5CaQYTebsyPThg@mail.gmail.com>
-Subject: Re: [PATCH v3 00/10] RISC-V crypto with reworked asm files
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>, 
-	Andy Chiu <andy.chiu@sifive.com>, Ard Biesheuvel <ardb@kernel.org>, Heiko Stuebner <heiko@sntech.de>, 
-	Jerry Shih <jerry.shih@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Phoebe Chen <phoebe.chen@sifive.com>, 
-	hongrong.hsu@sifive.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 22, 2024 at 1:23=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
-wrote:
+On January 23, 2024 1:44:27 AM PST, Borislav Petkov <bp@alien8=2Ede> wrote:
+>On Tue, Jan 23, 2024 at 10:28:51AM +0800, Tony W Wang-oc wrote:
+>> Zhaoxin CPUs have implemented the SHA(Secure Hash Algorithm) as its
+>> instrucions=2E
+>> Add two CPU feature flags indicated by CPUID=2E(EAX=3DC0000001,ECX=3D0)=
+:EDX
+>> bit 25/26 which will be used by Zhaoxin SHA driver=2E
+>>=20
+>> Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin=2Ecom>
+>> ---
+>>  arch/x86/include/asm/cpufeatures=2Eh       | 4 +++-
+>>  tools/arch/x86/include/asm/cpufeatures=2Eh | 4 +++-
+>>  2 files changed, 6 insertions(+), 2 deletions(-)
+>>=20
+>> diff --git a/arch/x86/include/asm/cpufeatures=2Eh b/arch/x86/include/as=
+m/cpufeatures=2Eh
+>> index 29cb275a219d=2E=2E28b0e62dbdf5 100644
+>> --- a/arch/x86/include/asm/cpufeatures=2Eh
+>> +++ b/arch/x86/include/asm/cpufeatures=2Eh
+>> @@ -145,7 +145,7 @@
+>>  #define X86_FEATURE_RDRAND		( 4*32+30) /* RDRAND instruction */
+>>  #define X86_FEATURE_HYPERVISOR		( 4*32+31) /* Running on a hypervisor =
+*/
+>> =20
+>> -/* VIA/Cyrix/Centaur-defined CPU features, CPUID level 0xC0000001, wor=
+d 5 */
+>> +/* VIA/Cyrix/Centaur/Zhaoxin-defined CPU features, CPUID level 0xC0000=
+001, word 5 */
 >
-> This patchset, which applies to v6.8-rc1, adds cryptographic algorithm
-> implementations accelerated using the RISC-V vector crypto extensions
-> (https://github.com/riscv/riscv-crypto/releases/download/v1.0.0/riscv-cry=
-pto-spec-vector.pdf)
-> and RISC-V vector extension
-> (https://github.com/riscv/riscv-v-spec/releases/download/v1.0/riscv-v-spe=
-c-1.0.pdf).
-> The following algorithms are included: AES in ECB, CBC, CTR, and XTS mode=
-s;
-> ChaCha20; GHASH; SHA-2; SM3; and SM4.
+>Does that mean that all those companies agree on the contents of this
+>CPUID leaf?
 >
-> In general, the assembly code requires a 64-bit RISC-V CPU with VLEN >=3D=
- 128,
-> little endian byte order, and vector unaligned access support.  The ECB, =
-CTR,
-> XTS, and ChaCha20 code is designed to naturally scale up to larger VLEN v=
-alues.
-> Building the assembly code requires tip-of-tree binutils (future 2.42) or
-> tip-of-tree clang (future 18.x).  All algorithms pass testing in QEMU, us=
-ing
-> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=3Dy.  Much of the assembly code is deri=
-ved from
-> OpenSSL code that was added by https://github.com/openssl/openssl/pull/21=
-923.
-> It's been cleaned up for integration with the kernel, e.g. reducing code
-> duplication, eliminating use of .inst and perlasm, and fixing a few bugs.
+>>  #define X86_FEATURE_XSTORE		( 5*32+ 2) /* "rng" RNG present (xstore) *=
+/
+>>  #define X86_FEATURE_XSTORE_EN		( 5*32+ 3) /* "rng_en" RNG enabled */
+>>  #define X86_FEATURE_XCRYPT		( 5*32+ 6) /* "ace" on-CPU crypto (xcrypt)=
+ */
+>> @@ -156,6 +156,8 @@
+>>  #define X86_FEATURE_PHE_EN		( 5*32+11) /* PHE enabled */
+>>  #define X86_FEATURE_PMM			( 5*32+12) /* PadLock Montgomery Multiplier =
+*/
+>>  #define X86_FEATURE_PMM_EN		( 5*32+13) /* PMM enabled */
+>> +#define X86_FEATURE_PHE2		( 5*32+25) /* "phe2" Zhaoxin Hash Engine */
+>> +#define X86_FEATURE_PHE2_EN		( 5*32+26) /* "phe2_en" PHE2 enabled */
+>						      ^^^^^^^^^
 >
-> This patchset incorporates the work of multiple people, including Jerry S=
-hih,
-> Heiko Stuebner, Christoph M=C3=BCllner, Phoebe Chen, Charalampos Mitrodim=
-as, and
-> myself.  This patchset went through several versions from Heiko (last ver=
-sion
-> https://lore.kernel.org/linux-crypto/20230711153743.1970625-1-heiko@sntec=
-h.de),
-> then several versions from Jerry (last version:
-> https://lore.kernel.org/linux-crypto/20231231152743.6304-1-jerry.shih@sif=
-ive.com),
-> then finally several versions from me.  Thanks to everyone who has contri=
-buted
-> to this patchset or its prerequisites.  Since v6.8-rc1, all prerequisite =
-kernel
-> patches are upstream.  I think this is now ready, and I'd like for it to =
-be
-> applied for 6.9, either to the crypto or riscv tree (at maintainers' choi=
-ce).
+>From: Documentation/arch/x86/cpuinfo=2Erst
 >
-> Below is the changelog for my versions of the patchset.  For the changelo=
-g of
-> the older versions, see the above links.
+>"a: Feature flags can be derived from the contents of CPUID leaves=2E
+>------------------------------------------------------------------
+>These feature definitions are organized mirroring the layout of CPUID
+>leaves and grouped in words with offsets as mapped in enum cpuid_leafs
+>in cpufeatures=2Eh (see arch/x86/include/asm/cpufeatures=2Eh for details)=
+=2E
+>If a feature is defined with a X86_FEATURE_<name> definition in
+>cpufeatures=2Eh, and if it is detected at run time, the flags will be
+>displayed accordingly in /proc/cpuinfo=2E For example, the flag "avx2"
+>comes from X86_FEATURE_AVX2 in cpufeatures=2Eh=2E"
+>
+>Is your grep broken?
+>
 
-For all patches of this series:
-Reviewed-by: Christoph M=C3=BCllner <christoph.muellner@vrull.eu>
-
-Eric, thank you for working on this!
-
->
-> Changed in v3:
->   - Fixed a bug in the AES-XTS implementation where it assumed the CPU
->     always set vl to the maximum possible value.  This was okay for
->     QEMU, but the vector spec allows CPUs to have different behavior.
->   - Increased the LMUL for AES-ECB to 8, as the registers are available.
->   - Fixed some license text that I had mistakenly changed when doing a
->     find-and-replace of code.
->   - Addressed a checkpatch warning by not including filename in file.
->   - Rename some labels.
->   - Constify a variable.
->
-> Changed in v2:
->   - Merged the AES modules together to prevent a build error.
->   - Only unregister AES algorithms that were registered.
->   - Corrected walksize properties to match the LMUL used by asm code.
->   - Simplified the CTR and XTS glue code slightly.
->   - Minor cleanups.
->
-> Changed in v1:
->   - Refer to my cover letter
->     https://lore.kernel.org/linux-crypto/20240102064743.220490-1-ebiggers=
-@kernel.org/
->
-> Eric Biggers (1):
->   RISC-V: add TOOLCHAIN_HAS_VECTOR_CRYPTO
->
-> Heiko Stuebner (2):
->   RISC-V: add helper function to read the vector VLEN
->   RISC-V: hook new crypto subdir into build-system
->
-> Jerry Shih (7):
->   crypto: riscv - add vector crypto accelerated AES-{ECB,CBC,CTR,XTS}
->   crypto: riscv - add vector crypto accelerated ChaCha20
->   crypto: riscv - add vector crypto accelerated GHASH
->   crypto: riscv - add vector crypto accelerated SHA-{256,224}
->   crypto: riscv - add vector crypto accelerated SHA-{512,384}
->   crypto: riscv - add vector crypto accelerated SM3
->   crypto: riscv - add vector crypto accelerated SM4
->
->  arch/riscv/Kbuild                             |   1 +
->  arch/riscv/Kconfig                            |   7 +
->  arch/riscv/crypto/Kconfig                     |  93 +++
->  arch/riscv/crypto/Makefile                    |  23 +
->  arch/riscv/crypto/aes-macros.S                | 156 +++++
->  arch/riscv/crypto/aes-riscv64-glue.c          | 550 ++++++++++++++++++
->  .../crypto/aes-riscv64-zvkned-zvbb-zvkg.S     | 312 ++++++++++
->  arch/riscv/crypto/aes-riscv64-zvkned-zvkb.S   | 146 +++++
->  arch/riscv/crypto/aes-riscv64-zvkned.S        | 180 ++++++
->  arch/riscv/crypto/chacha-riscv64-glue.c       | 101 ++++
->  arch/riscv/crypto/chacha-riscv64-zvkb.S       | 294 ++++++++++
->  arch/riscv/crypto/ghash-riscv64-glue.c        | 168 ++++++
->  arch/riscv/crypto/ghash-riscv64-zvkg.S        |  72 +++
->  arch/riscv/crypto/sha256-riscv64-glue.c       | 137 +++++
->  .../sha256-riscv64-zvknha_or_zvknhb-zvkb.S    | 225 +++++++
->  arch/riscv/crypto/sha512-riscv64-glue.c       | 133 +++++
->  .../riscv/crypto/sha512-riscv64-zvknhb-zvkb.S | 203 +++++++
->  arch/riscv/crypto/sm3-riscv64-glue.c          | 112 ++++
->  arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.S    | 123 ++++
->  arch/riscv/crypto/sm4-riscv64-glue.c          | 107 ++++
->  arch/riscv/crypto/sm4-riscv64-zvksed-zvkb.S   | 117 ++++
->  arch/riscv/include/asm/vector.h               |  11 +
->  crypto/Kconfig                                |   3 +
->  23 files changed, 3274 insertions(+)
->  create mode 100644 arch/riscv/crypto/Kconfig
->  create mode 100644 arch/riscv/crypto/Makefile
->  create mode 100644 arch/riscv/crypto/aes-macros.S
->  create mode 100644 arch/riscv/crypto/aes-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned-zvbb-zvkg.S
->  create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned-zvkb.S
->  create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned.S
->  create mode 100644 arch/riscv/crypto/chacha-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/chacha-riscv64-zvkb.S
->  create mode 100644 arch/riscv/crypto/ghash-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/ghash-riscv64-zvkg.S
->  create mode 100644 arch/riscv/crypto/sha256-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/sha256-riscv64-zvknha_or_zvknhb-zvk=
-b.S
->  create mode 100644 arch/riscv/crypto/sha512-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/sha512-riscv64-zvknhb-zvkb.S
->  create mode 100644 arch/riscv/crypto/sm3-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/sm3-riscv64-zvksh-zvkb.S
->  create mode 100644 arch/riscv/crypto/sm4-riscv64-glue.c
->  create mode 100644 arch/riscv/crypto/sm4-riscv64-zvksed-zvkb.S
->
->
-> base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
-> --
-> 2.43.0
->
+Well, Centaur bought Cyrix, and then VIA bought Centaur=2E I think Zhaoxin=
+ is a joint venture between VIA and the City of Shanghai, or something like=
+ that?
