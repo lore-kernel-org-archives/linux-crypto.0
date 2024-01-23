@@ -1,44 +1,44 @@
 Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892D686AD7;
-	Tue, 23 Jan 2024 16:58:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651DC1272A2;
+	Tue, 23 Jan 2024 16:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706029139; cv=none; b=OW7MmWr7nuhwiR9onkjEn1wKJmZf8GLL3/NA/pglUcwvOq3QXrn68yU4S2P8oFYWMQ8bzBk7+pzP+wNjNxJCGptIS4IPz+nmP70uyXuurU3MH8L+ySO1jWfBYNJG1PNtgpT+FMelaKydNrcA/rtECRG/2plaP8FdzoQpmHeE078=
+	t=1706029140; cv=none; b=WYpunQEBV99shu0FzBnSlprZUaWqV8txQrcUdq5RxYqQKHDk9UfYDuDks6VRISSat2MlHloRWzFsryD5Y+hN41gtnxsJRqx5PD6gCgjziA3ucNH3eoMgx1ap+YuzQlwwI5JN1lvtTddDhAmJUycc2V+UwsmLyrASuRJX2pgKoWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706029139; c=relaxed/simple;
-	bh=I/OA1xdZqYmydQEXjMunKUa+5azQtbBZdB4cJ/B/q+Q=;
+	s=arc-20240116; t=1706029140; c=relaxed/simple;
+	bh=+k+CqjdzL6viuspWVQ+kwC7SascU8xohzdz/tiDX4mk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T3vzlXl4VL7ACaeLRUcrba02O0RBHzZgE7ZrxZkQAEyejMrWMJYEMBfOLR8lk2NGC3qOOyokvgrHdebXqMunkUhf7gLDW5/RpK2jrVyqDNym8O42yQnDZNay/FIUuYCBf4RYI+wPrRoYZgNjj/qbcTMYA56Z0lfz3J1H5MMbu3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=ZrYCBIdd; arc=none smtp.client-ip=37.18.73.165
+	 MIME-Version:Content-Type; b=YCExcq3cBK9OaE4DJXVW16wxs5sf0Oe5bEeEqpydcL8mLcOQNBRJwD2iiQOQujRsGzu3fFqDA07gU3kcSNgCq8aP2meIJGjCq+TgLigO4CO6/bCETrmUJuTwHWMqYqASS9UfOo6dRg6i2hPyQ8j56+FZrTJwcaOe5d/PxOmxyj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=HNTZQUMD; arc=none smtp.client-ip=37.18.73.165
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="ZrYCBIdd"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="HNTZQUMD"
 Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 18C0F100015;
-	Tue, 23 Jan 2024 19:58:55 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 18C0F100015
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 8059D100016;
+	Tue, 23 Jan 2024 19:58:56 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 8059D100016
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1706029135;
-	bh=aRWkZZe66hW5kxCXdPYRNigJUlN+4koWostk3jDjVfQ=;
+	s=mail; t=1706029136;
+	bh=iW5IK13q7Fpx4RVMpi6/elOGgqMmBDDw148VRPue5Io=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=ZrYCBIddPx1iq+sxCpkgh1h+3X9NF+LlzHkMobdxEi8TzOyZlaDHE0YssXeHE8qfK
-	 quxTk0o1x79I6pECqbhpN3NUQ4mjugEVBx1DnR56RzbSgP2nAQPwupXfUZ+AsPU8uG
-	 n7Qp4ndW9kGJPDlYyrXKxqMpU/hWmbbknOrGg/WU1Aj/oumVBoDYjxbDEwLXnw/eLm
-	 sJHsf+UrVPFsSlqZgl9M8mAP5NckG5Z8mU4L5IK0BJvVK/YJgEyWK9N1mnWKyC2jVC
-	 Au4snff+lHfa8RomFqFwev36c7ejfzCDSIh0MpoxF7s6K8ElRq6a5DV2sRzUnbvZTr
-	 68yz6NfcNJ1xA==
+	b=HNTZQUMDPVQ59dRgfC7t5Ps8WzSwrVY8YVumaUKG+FUV7/9VThw3sj5FoJtqwHKJk
+	 qilrqyIWN8K2jknJes2gPIGR7jQrn0JDlscroFsVeX/9m8s3fmlkeXyFpIwyDgx2CG
+	 /RU0YyxNekSKmrbJFK4UYKnHEK7riPgfUZ/ZCLWoMD/CXFBqCuOxKZTyCBg7XBYE6P
+	 iz2xgO9y2V6ydbTxqrXj79nFQb6IDmQu0vUddn3omSKMT2jNkJJrGETAww3OUPQJ+u
+	 uxNxaauP3CUv1p9oVq34lxveytaeSDtelW3/JIf2zv1JTg0KR/ufFtH1eGDGtEHmz9
+	 I1WCJd6nKRzww==
 Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
 	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue, 23 Jan 2024 19:58:54 +0300 (MSK)
+	Tue, 23 Jan 2024 19:58:56 +0300 (MSK)
 Received: from user-A520M-DS3H.sberdevices.ru (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 23 Jan 2024 19:58:54 +0300
+ 15.2.1118.40; Tue, 23 Jan 2024 19:58:55 +0300
 From: Alexey Romanov <avromanov@salutedevices.com>
 To: <neil.armstrong@linaro.org>, <clabbe@baylibre.com>,
 	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh+dt@kernel.org>,
@@ -49,9 +49,9 @@ CC: <linux-crypto@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
 	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <kernel@salutedevices.com>, Alexey
  Romanov <avromanov@salutedevices.com>
-Subject: [PATCH v2 16/20] dt-bindings: crypto: meson: add new compatibles
-Date: Tue, 23 Jan 2024 19:58:27 +0300
-Message-ID: <20240123165831.970023-17-avromanov@salutedevices.com>
+Subject: [PATCH v2 18/20] arch: arm64: dts: meson: s4: add crypto node
+Date: Tue, 23 Jan 2024 19:58:29 +0300
+Message-ID: <20240123165831.970023-19-avromanov@salutedevices.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240123165831.970023-1-avromanov@salutedevices.com>
 References: <20240123165831.970023-1-avromanov@salutedevices.com>
@@ -82,62 +82,32 @@ X-KSMG-LinksScanning: Clean
 X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/01/23 13:53:00 #23383939
 X-KSMG-AntiVirus-Status: Clean, skipped
 
-Now we can use crypto driver at G12A/G12B/S4/A1/SM1/AXG.
+This patch adds a crypto node declaration for Amlogic S4-series.
+With the Amlogic crypto driver we can use HW implementation
+of SHA1/224/256 and AES algo.
 
 Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
 ---
- .../bindings/crypto/amlogic,gxl-crypto.yaml   | 31 ++++++++++++++++---
- 1 file changed, 27 insertions(+), 4 deletions(-)
+ arch/arm64/boot/dts/amlogic/meson-s4.dtsi | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-index 948e11ebe4ee..a7145b126a06 100644
---- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-+++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-@@ -11,8 +11,15 @@ maintainers:
+diff --git a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
+index ce90b35686a2..c30db720cd01 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
+@@ -339,6 +339,12 @@ mux {
  
- properties:
-   compatible:
--    items:
--      - const: amlogic,gxl-crypto
-+    oneOf:
-+      - items:
-+          - enum:
-+              - amlogic,g12a-crypto
-+              - amlogic,s4-crypto
-+              - amlogic,a1-crypto
-+      - items:
-+          - const: amlogic,gxl-crypto
-+          - const: amlogic,axg-crypto
+ 			};
  
-   reg:
-     maxItems: 1
-@@ -32,8 +39,24 @@ required:
-   - compatible
-   - reg
-   - interrupts
--  - clocks
--  - clock-names
++			crypto: crypto@440400 {
++				compatible = "amlogic,s4-crypto";
++				reg = <0x0 0x440400 0x0 0x48>;
++				interrupts = <GIC_SPI 24 IRQ_TYPE_EDGE_RISING>;
++			};
 +
-+if:
-+  properties:
-+    compatible:
-+      contains:
-+        enum:
-+          - amlogic,gxl-crypto
-+then:
-+  required:
-+    - clocks
-+    - clock-names
-+  properties:
-+    interrupts:
-+      maxItems: 2
-+else:
-+  properties:
-+    interrupts:
-+      maxItems: 1
- 
- additionalProperties: false
- 
+ 			gpio_intc: interrupt-controller@4080 {
+ 				compatible = "amlogic,meson-s4-gpio-intc",
+ 					     "amlogic,meson-gpio-intc";
 -- 
 2.34.1
 
