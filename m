@@ -1,149 +1,184 @@
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2047.outbound.protection.outlook.com [40.107.92.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A4017BC2;
-	Wed, 24 Jan 2024 08:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706085664; cv=fail; b=I7E3bj8W/4GoAv017TySaTxBtsht+basSYd6j4/es0LWTxx7HJBp5FMNdY1o8H2GSZ/Zxdw8CMEafWRe3EFKGNaqNhuiEcV7FTkKyM7ABeADJEDBpPR22N9VLPt6AR5sdu2Hh1+adhOXqTujvlM1Jn6OjsxhP/pKr6UvSIsI+5I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706085664; c=relaxed/simple;
-	bh=JSavUQwauQ5NugGLC8OHoM1toSWzyiW15+qS8DK9VTI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sMNwyZGiWVgle1abBzPS2tfDOl7kylaTYWq3bLUBL+bH2bWikiZZxewdSCFeP1In8/TY8Mv2oNbLzUGF8g7u3asXUoRGUG0tB86ASN1VoqkixmEFFJLXFOWy+JsvJtbq7JCW8ZVZdLT0aMMI8ErWkawqMAdyqNJe+kPLsuE5sbU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RPkqBPCK; arc=fail smtp.client-ip=40.107.92.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B9117BBA
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2024 09:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706087626; cv=none; b=rQmjiQ1T4qSAufHcwPsbFf2lIpwDPQDgv5h7BkVQ4m2ldI0gXEeXtT5Erp7ds0sEOSxDo9PUnyALQaFpKLtw9KvOVBkCG9wqrEb7A900wnd+n7D/XbcaAhaQgvgG2o5UGpTmcm0x53Xy/R41+LmSoC15/ZiWnX7gODjANRv0a6I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706087626; c=relaxed/simple;
+	bh=uxEEQtkZ4BRVlpQbFUGBbFwTBUmJAeCEsEOm8tdKsXA=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=cRmG2flSZa6we07NMQk7BYuYXJWFKl/CMLC8aoFk3GACEVIbHJFeX2p/9Im9RiCHI1HD3w30OG6xFCNiJFdKN3MDerA8fIjx/TK85LkEBKNqvIJZFO+F17A5PqXFx5FOJixAzFKGQVP/yxatbAZlgN7ukjckREk6Pm3X7hkNC7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=uiax9v3Q; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RPkqBPCK"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QhQRKWi6H1f5FNsjWA0rvWthheeFGINkDQ3DaqM5utrOSH2NqAWr9kQjF3iouWTIlILGickXcipf1nfUCuu932G16Gjo7LirS3wbygqFr/c3N3cLSj8v7IeX89yyBivuWD2+sM/3pN5t+vd3QjeWKpFXvX5SG+SBpUHdY5rhmKX6IFVKWCXrZ4BnbpKg6fPuE3JdBjFzMmRjjkpSWlhnl84HEBSRALFc4Uj0iCTrryITNnJ2cf11pnNTMizg4hVPa+rh8mR/4HnhmN1ODx5cVi+1IKt9pP3PQipLfAqUh4m0g/QC4/SDGWL0RtTCkewpCOyS8epDr7d4IFxKunpd5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JtakwJF2Bp/VGmlWNt/aPHSW8I2UW+8++6zg+6yNoeU=;
- b=MekRGeiZzp15rZeHPqUIbfxv72CY68k6Jk3Dy3hIgQJMYajgxGgqkNALU4I/gCg0I7EycWTBHHEYhT5VGW35PTMXFMBDhnvINmE/CO5WV+IQ3SaqQ/5L4ZOOzB2/U0L+b8bUtUTI03z04EeKkCPVfLkQnfG9K86sbUW8fO5V8PuuF2dUmSRGWkoJBZw3ZZOiNGKNiJNn1Nr8ZcvBL8PGN6m0Xje84ubzDlHtqXqcABB0BuyKKo58H+6spLTUJXv+Vdg+3Iame8sXLLKLNxs1trXXNzEVKhJvtrzXBD79iZtXQm7mcrLHXwrjF7OC47OC2QonAYp09lzqG1G0JUIYbA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=gondor.apana.org.au
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JtakwJF2Bp/VGmlWNt/aPHSW8I2UW+8++6zg+6yNoeU=;
- b=RPkqBPCK+FPzTNrmOKyd9fBs/qk95S9Dq/3wdgby9U4q+8+/8HqajpDc3ghNWXjaLcTExw9xIOqJ78yPWKLjR/EIKLl9Ek3erZR2+mLPYudo/K/3Ti27fQXtmRsZqbPDa9ndk3VUweICsjRyxxxWvNGdvwLW2pNIjI+p7NZ8uxGS4ZeT6wZowHtl0JZntmdJvEUGv/G9VSLF/wky5FdTdZ4HgYqHlTkAfMr0UtVYaIxRjcvBI6NJuFwLl75gdC6r5taIR72jovDw3i9zeWyPRtOXEmRmXt9c/8Ryyw9w6pSDy2kDbHIcznNuG0sb+/POp/oJtpmkTXSXxWMl46CyZw==
-Received: from SA9PR13CA0051.namprd13.prod.outlook.com (2603:10b6:806:22::26)
- by MW6PR12MB8951.namprd12.prod.outlook.com (2603:10b6:303:244::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.34; Wed, 24 Jan
- 2024 08:40:59 +0000
-Received: from SN1PEPF0002636E.namprd02.prod.outlook.com
- (2603:10b6:806:22:cafe::e2) by SA9PR13CA0051.outlook.office365.com
- (2603:10b6:806:22::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22 via Frontend
- Transport; Wed, 24 Jan 2024 08:40:59 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF0002636E.mail.protection.outlook.com (10.167.241.139) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7202.16 via Frontend Transport; Wed, 24 Jan 2024 08:40:58 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 24 Jan
- 2024 00:40:39 -0800
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 24 Jan
- 2024 00:40:39 -0800
-Received: from BUILDSERVER-IO-L4T.nvidia.com (10.127.8.14) by mail.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server id 15.2.986.41 via Frontend
- Transport; Wed, 24 Jan 2024 00:40:35 -0800
-From: Akhil R <akhilrajeev@nvidia.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-	<conor+dt@kernel.org>, <thierry.reding@gmail.com>, <jonathanh@nvidia.com>,
-	<catalin.marinas@arm.com>, <will@kernel.org>, <mperttunen@nvidia.com>,
-	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-tegra@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<krzk@kernel.org>
-CC: Akhil R <akhilrajeev@nvidia.com>
-Subject: [PATCH v4 5/5] arm64: tegra: Add Tegra Security Engine DT nodes
-Date: Wed, 24 Jan 2024 14:08:46 +0530
-Message-ID: <20240124083846.46487-6-akhilrajeev@nvidia.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20240124083846.46487-1-akhilrajeev@nvidia.com>
-References: <20240124083846.46487-1-akhilrajeev@nvidia.com>
-X-NVConfidentiality: public
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uiax9v3Q"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-339208f5105so4500411f8f.1
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2024 01:13:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706087621; x=1706692421; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fGaFNTm0rKDhMzJZfCGf3yauwaFWWjKUfBj6ngaz/vY=;
+        b=uiax9v3QUpxGCcCFHqNJxdBmDJSULnueiqMFYSOH24446QwFTppg8AE20dzNQ2cojv
+         AgJBHNIdJhzIbh677ZWyW8Q3F/ZJvWDO0HN3+mYla+ouQFl3KhwsfVvBYCRYBFtUHMFM
+         hUWX0vyE7EE5u0UYiRaOg9Gyk4WdGx9iLLc/bv5VyoRcNns1ZuQW0ielL0QpfGzx/ZzB
+         mw2HvfqwPkewXHhEh9qKHvCisADbA+0nJizS3IrhTN3iKsB6m7OaFlzghQZk0ofXriBL
+         fctHl5VFrz4NDFjngRDwKcyodssj9rxUlViLs8Funf4cZ/O2aX1/9IgXuZAkMJtwG6rw
+         8ooA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706087621; x=1706692421;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fGaFNTm0rKDhMzJZfCGf3yauwaFWWjKUfBj6ngaz/vY=;
+        b=t+p+X4SRpDfFV1L0PYDuUdH6DH0ix/A3llLjGygXILW9fVJ4ipuzanNJ6UYk6w8SII
+         ETlslsOYX1aq4lHqbbgU37CZoIHfOIkn95DV0/+vQUMAN13AFmS8T6x+g3v05kbgamkd
+         4vZLPP1OYuzcCqwpgAsnSDBrpJzC0nbXRD/aBNMo4K75BVPBnIaDiED9zgQe4lJo2iAz
+         B+PNUG5C5Qf5QoasN5W00vn4P35vT+zU6Ihj2fJvMjW9vdtLNz3hbJ4CmqGaShChK3nI
+         aqz/ZYWymuoCK/TJcJjGUnzirDUP3QkXllFCYj2BPuFVr47Pdra6DhLTpr9eeCS7qIOD
+         XkPg==
+X-Gm-Message-State: AOJu0YzBHB7rZyr70CFGHzERKGVs6RLxgKqosj1xmtMh4G8rXN/x++bG
+	pg3A9us1cvLljiuOSo3FJ7u0S5Xz80X7tYjGc2z+/Oj3qoeMyXw21ej9V633/Ag=
+X-Google-Smtp-Source: AGHT+IGb3UlcnEsZFUqNVOVjeSwNjuzYXVL9pU/Vo6NgRusnbHMDF8VTnpV/xhK9NafXCoXsbiaQeQ==
+X-Received: by 2002:a5d:49c7:0:b0:337:c829:9838 with SMTP id t7-20020a5d49c7000000b00337c8299838mr207429wrs.69.1706087621095;
+        Wed, 24 Jan 2024 01:13:41 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:982:cbb0:fd4f:fd82:e4fb:1654? ([2a01:e0a:982:cbb0:fd4f:fd82:e4fb:1654])
+        by smtp.gmail.com with ESMTPSA id b1-20020a5d6341000000b0033930b9a2b1sm8329301wrw.26.2024.01.24.01.13.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jan 2024 01:13:40 -0800 (PST)
+Message-ID: <5f54f139-7710-4276-b31c-3b6cfa319f16@linaro.org>
+Date: Wed, 24 Jan 2024 10:13:38 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002636E:EE_|MW6PR12MB8951:EE_
-X-MS-Office365-Filtering-Correlation-Id: aa60866d-43d8-410c-c29b-08dc1cb8300f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	SheipnI6bs4rUDiEOS3ksZPuiw1LTJ8mP8Pbjgm3Now9KSazPEqdLUicGdcYwbcWQw9LRV7Kmukx9kIpGQRnYNUDUWWpn0R2xpt0xP5o0WWf286xIGXJfpGIMXHIirdP3oKMKCbl5EQlo5IZrqb4Jg9+U1ntqV74qEeB+sDyPLSn9PfMMH2wLUEnRdMZkiRT8MbnyFZU857V/3WgtY/ip4IEr2pLhwgqXV08e6ovScvjAbxwhvoQHQVF3PUD9oRxVYsv+JZXV0MyQ3hoWeBsqh6BtBvCmo+DeW7nfQd3myjPYV0BgL7ZSsMQMhK2Gy65smwnytGwSo8fJFSI51gKmCpa33/Olnyko7U07/Zj48z2eWYPudWWkmPyr6E4O1wNFX1AbBYOFWhfrs8r5ugS5aI26d3PYa70ag6wUhIDoCoeffMHgQMp+a0v2gsTh+sLj7ETBCELM5D/wSP8zCulKCkHfN1hYwBcTmwwNJbotHVcTmcGXfYO43lxcTT2h2Ts50LuoxlsS/ErsboSP7MKrQLNOW1k9mYOz4RdN8Q//KIOjp+KZtbyDuVO06GV1KTPgtTNX6P+v5HnY7ucZkP/cGNS0VF9iYq0mf3DQl0lya4ztCV2O34xmbtGlVeC5KGFHdjGvVShQyAQdWa9pC4Dmu+PJgbjIQjvgjZpwxJjueXU6L4cK0p8RdwtIWYguiQZ9/X1zoRPmZdK1f2OSW6v1G6XDB8q1raARR/EglRzdqd0aVOItpjPYjMz5n0Zj/Sg
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(346002)(396003)(136003)(376002)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(82310400011)(36840700001)(40470700004)(46966006)(36860700001)(83380400001)(47076005)(2616005)(107886003)(1076003)(26005)(336012)(426003)(7636003)(82740400003)(8936002)(5660300002)(2906002)(41300700001)(7696005)(6666004)(70586007)(8676002)(110136005)(7416002)(70206006)(316002)(4326008)(356005)(478600001)(86362001)(36756003)(921011)(4744005)(40480700001)(40460700003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2024 08:40:58.4417
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa60866d-43d8-410c-c29b-08dc1cb8300f
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002636E.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8951
+User-Agent: Mozilla Thunderbird
+From: neil.armstrong@linaro.org
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH v2 00/20] Support more Amlogic SoC families in crypto
+ driver
+Content-Language: en-US, fr
+To: Alexey Romanov <avromanov@salutedevices.com>, clabbe@baylibre.com,
+ herbert@gondor.apana.org.au, davem@davemloft.net, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ khilman@baylibre.com, jbrunet@baylibre.com,
+ martin.blumenstingl@googlemail.com
+Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
+References: <20240123165831.970023-1-avromanov@salutedevices.com>
+Autocrypt: addr=neil.armstrong@linaro.org; keydata=
+ xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
+ GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
+ BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
+ qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
+ 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
+ AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
+ OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
+ Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
+ YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
+ GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
+ UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
+ GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
+ yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
+ QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
+ SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
+ 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
+ Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
+ oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
+ M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
+ 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
+ KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
+ 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
+ QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
+Organization: Linaro Developer Services
+In-Reply-To: <20240123165831.970023-1-avromanov@salutedevices.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add device tree nodes for Tegra AES and HASH engines.
+Hi,
 
-Signed-off-by: Akhil R <akhilrajeev@nvidia.com>
----
- arch/arm64/boot/dts/nvidia/tegra234.dtsi | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+On 23/01/2024 17:58, Alexey Romanov wrote:
+> Hello!
+> 
+> This patchset expand the funcionality of the Amlogic
+> crypto driver by adding support for more SoC families:
+> AXG, G12A, G12B, SM1, A1, S4.
+> 
+> Also specify and enable crypto node in device tree
+> for reference Amlogic devices.
+> 
+> Tested on AXG, G12A/B, SM1, A1 and S4 devices via
+> custom tests and trcypt module.
 
-diff --git a/arch/arm64/boot/dts/nvidia/tegra234.dtsi b/arch/arm64/boot/dts/nvidia/tegra234.dtsi
-index 3f16595d099c..8a6eae4b4365 100644
---- a/arch/arm64/boot/dts/nvidia/tegra234.dtsi
-+++ b/arch/arm64/boot/dts/nvidia/tegra234.dtsi
-@@ -2304,6 +2304,22 @@
- 				 */
- 				status = "disabled";
- 			};
-+
-+			crypto@15820000 {
-+				compatible = "nvidia,tegra234-se-aes";
-+				reg = <0x00 0x15820000 0x00 0x10000>;
-+				clocks = <&bpmp TEGRA234_CLK_SE>;
-+				iommus = <&smmu_niso1 TEGRA234_SID_SES_SE1>;
-+				dma-coherent;
-+			};
-+
-+			crypto@15840000 {
-+				compatible = "nvidia,tegra234-se-hash";
-+				reg = <0x00 0x15840000 0x00 0x10000>;
-+				clocks = <&bpmp TEGRA234_CLK_SE>;
-+				iommus = <&smmu_niso1 TEGRA234_SID_SES_SE1>;
-+				dma-coherent;
-+			};
- 		};
- 
- 		pcie@140a0000 {
--- 
-2.17.1
+Please describe which tests you ran for next version.
+
+Neil
+
+> 
+> ---
+> 
+> Changes V1 -> V2:
+> 
+> - Rebased over linux-next.
+> - Adjusted device tree bindings description.
+> - A1 and S4 dts use their own compatible, which is a G12 fallback.
+
+This is not what I meant by fallback, I was meaning having:
+compatible = "amlogic,a1-crypto", "amlogic,g12a-crypto";
+
+and them only add "amlogic,g12a-crypto" in the driver.
+
+Same for S4.
+
+Neil
+
+> 
+> V1: https://lore.kernel.org/all/20240110201216.18016-1-avromanov@salutedevices.com/
+> 
+> Alexey Romanov (20):
+>    drivers: crypto: meson: don't hardcode IRQ count
+>    drivers: crypto: meson: make CLK controller optional
+>    drviers: crypto: meson: add platform data
+>    drivers: crypto: meson: add MMIO helpers
+>    drivers: crypto: meson: move get_engine_number()
+>    drivers: crypto: meson: drop status field from meson_flow
+>    drivers: crypto: meson: move algs definition and cipher API to
+>      cipher.c
+>    drivers: crypto: meson: cleanup defines
+>    drivers: crypto: meson: process more than MAXDESCS descriptors
+>    drivers: crypto: meson: avoid kzalloc in engine thread
+>    drivers: crypto: meson: introduce hasher
+>    drivers: crypto: meson: add support for AES-CTR
+>    drivers: crypto: meson: use fallback for 192-bit keys
+>    drivers: crypto: meson: add support for G12-series
+>    drivers: crypto: meson: add support for AXG-series
+>    dt-bindings: crypto: meson: add new compatibles
+>    arch: arm64: dts: meson: a1: add crypto node
+>    arch: arm64: dts: meson: s4: add crypto node
+>    arch: arm64: dts: meson: g12: add crypto node
+>    arch: arm64: dts: meson: axg: add crypto node
+> 
+>   .../bindings/crypto/amlogic,gxl-crypto.yaml   |  31 +-
+>   arch/arm64/boot/dts/amlogic/meson-a1.dtsi     |   7 +
+>   arch/arm64/boot/dts/amlogic/meson-axg.dtsi    |   6 +
+>   .../boot/dts/amlogic/meson-g12-common.dtsi    |   6 +
+>   arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |   6 +
+>   drivers/crypto/amlogic/Makefile               |   2 +-
+>   drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 602 ++++++++++++------
+>   drivers/crypto/amlogic/amlogic-gxl-core.c     | 281 ++++----
+>   drivers/crypto/amlogic/amlogic-gxl-hasher.c   | 452 +++++++++++++
+>   drivers/crypto/amlogic/amlogic-gxl.h          | 115 +++-
+>   10 files changed, 1165 insertions(+), 343 deletions(-)
+>   create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
+> 
 
