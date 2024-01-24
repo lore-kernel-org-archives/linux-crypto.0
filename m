@@ -1,180 +1,140 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CBF16429;
-	Wed, 24 Jan 2024 07:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C149217738
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2024 08:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706081453; cv=none; b=IRxKkPTGY15lrPOQxIzrHCOFwPOhmbo9qyWecY9ItDVx4ffsdIviA+DG+EoZC7A+MxHaVZDmHRSrRlXjFh9MuKABmalIM053TAY/XEtzImlPnJb76Gx8E5qbyHAuz+U2lQb2evja2jU1DiJe9lX3jj8V90iuVb+tk8XdpHo7qUk=
+	t=1706085511; cv=none; b=cETRDUwnGJQ2nA0oWMr7aRHcr6w3MhaP3YWiKpRGZHZSMQOYRRse7ysEudd0D87raChEodst3AH/MWuvELDAt3++KbdYZMDYqEkgMOOn44UT927iZuUdxUpNEvG3OwJ+ntSEOPYkWiKN2f6OnqxS2AqnLeX/dsh3AYg2B+2BuqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706081453; c=relaxed/simple;
-	bh=zcuTBnSpR8a5t/QEYSRtGuCgQG6oo8zB7awoq0F0Efg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=leE8y0X0X3wr2tF1wk31WsvKa10oR4i4VJg1whtgrpNMmdVf4lbx2o7HH74ULF8tnh6TwSxsagrh6nQMFZPkb1Ff5WzY4AH+1wOjcgikZ9NsF7n52nYBnOdHtoccutLDkz+u+oY1WCkcTQNZ1GSD18fK8aeoakHo5bTizjJyGtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hg+uUpCP; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1706085511; c=relaxed/simple;
+	bh=jlz6yDARmYRfIwcJEftzYZRs+rGjhCsFQhkX+BsxAu4=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=ACJoJf1//7/pRuHO5SDO9wkbPuaZCD5z3q5JbzfDpFZnVHlihv3UgYoEuWUunmVD2bH/n9Xvo73v2O3bDGDMe2hzBm3fQ27jFOhKUQNUY9z0311hoSOLU6DIcZmJL6TjUnGazxXc7UZ+exZVaF9ZwWIN40BOzfibVc3ZOIOfZCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=krn/OveB; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hg+uUpCP"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40e80046264so64802155e9.0;
-        Tue, 23 Jan 2024 23:30:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="krn/OveB"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3394ca0c874so429460f8f.2
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2024 00:38:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706081450; x=1706686250; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3q1o6aAekTHAGtHaTxP4kjBlXWWUej4AyBNrNnh309M=;
-        b=Hg+uUpCPOF+2+QtvsauJnKFCxRX56WPMIrLJX4oo7wUbRJemdGUrSJqK/ReDAUZGjI
-         QsFEQaY+WkP8zVW35MuTxlPeEqs9efzy3SsEjJsW0FDNp9AQbneRF5pAeP8V1TQ0hyNo
-         CxVhvszF4JkzwGUWa0uDZeegx1f/rErq/2mCvuQWvdN509IdP1+MhQXtcN6KKQQybRJY
-         aJu/Gkgo2h8dK7p6M21DiDF5dUY7GrBSXKIG/r6YRIpFtWXq6pNQUoiuvDwKA6knkaS8
-         CSvkKQHJ9SpdkenYuVwC/khNMCvw4sHJRKUHEkPNn3PYm5huDhHHjO8G9YMGu4ytDlCx
-         St3Q==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1706085507; x=1706690307; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=h1FUWfiTuw8iaOnUVAaUBuSlg9Mxe6vb31eu30jmGPc=;
+        b=krn/OveBgwleslyeOJOyOKtmVAp4dAQsEM5wZawFiBK5IPvQW57QAd+7dcwE96kJKN
+         HbOsxi8SWTGY+61VE2s3PeteyevJKeyupkzERqr8sCHIJNQB39zTM7tySOXKbMp6lY5W
+         4bZo3t5Z1axLrnTzVc13n9QDvS38kdwig3gO5r/qPcdbSxLRl/lBc6z2Fk2Pf3wB9tzG
+         Y4glRu6mVW1cVa0Gg42LctbGJ57p/JGP82FH6h6aSPSeQzoD5DR0lIts2BOgOS+IvGOf
+         7wzbXaxc+S7GF4eeDdLM2nrtK1xWz9hEiKZRWb5HIj3it7rpQMO0zSf0B655TkJOMErr
+         SmDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706081450; x=1706686250;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3q1o6aAekTHAGtHaTxP4kjBlXWWUej4AyBNrNnh309M=;
-        b=BuA1girzLuB6rIvBPmhNqgGVxf2KnWs6Eni2udCYNuoQGJ9NkF8o6ZCl9nLWtXkkhC
-         X2VDKb+0OFgHCBYxZ8mwJ1Zec2PgY5L0H3qTNIOP08oaOlhT4bE8OgRXD6dRTVAbH7GR
-         mijskF/Gnip0/jpMvqOKj4GulCCbquoEa63zwopIFtMoKdilBrkjDyzfwYhVrFWAAY9n
-         4iv9o7vB/ZJClP/VVhHLwHCKs4+hOXJToV4UoF7LuZNuogz15dqNv+w9ZN43XpPMUpFI
-         l4g71fsADbYR1pAx55EF5EAu6wzLZKSTO5+QyWDe8fnBWocRO7B36XTQDt7eCzhppxba
-         32wQ==
-X-Gm-Message-State: AOJu0YyfAwSZbgR7EbBOCw4WJbJwxxAOEaS4znfkw5kUg9Az7jNV+VX+
-	pbYohlcbOJgDwdVZ9oe1csCZfyuhrD28K9nasneA2PEUUPkU9IGk
-X-Google-Smtp-Source: AGHT+IFgs85NIjlXfM9SBtUmGybQ1WPXBV4OIlQceBFmgtfQOL0aW4ydBfYNlu7dBZ7BJKo1rSz6Hw==
-X-Received: by 2002:a05:600c:4514:b0:40e:4a58:2a85 with SMTP id t20-20020a05600c451400b0040e4a582a85mr853492wmo.99.1706081450216;
-        Tue, 23 Jan 2024 23:30:50 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id ek15-20020a05600c3ecf00b0040e8e358f82sm21572528wmb.19.2024.01.23.23.30.49
+        d=1e100.net; s=20230601; t=1706085507; x=1706690307;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h1FUWfiTuw8iaOnUVAaUBuSlg9Mxe6vb31eu30jmGPc=;
+        b=MDvopCeO4Uanw40S+0XKEMGF5cE0eno3cBZn7nbKTcPITXTb4kyD+lYRyn3j7waoE7
+         PpYrZu2KIO8NKcPisLZycHUWJ9kzudOCR5VV/gPhGepUE3l5REU1lz64Nu/TLO2ixFGm
+         ofzd0u8IRxtXH53vtPchS1TDxBG6P8m769tI0H0JhjTc8PvEgtL6lfh4kRJyYr5emgFH
+         3fz8m8V0E15xLpbKf6U5r9WOfJh76vsIXdk01jrSH7KrsR4FA9gGFQeY5Md8XN1YB6Fb
+         2pPEo1kNasauyuvwBE4HU9/7+/Lxp5sb2AUTLGtNOI6+88tNsX3itbyZxN/sz6oGoHkW
+         H/BA==
+X-Gm-Message-State: AOJu0Yw0i5kY/sIssHyIFmkcMfIXIrQeoA/4+CgYsfziVavQLRgQUU63
+	s172K3Cc6zmpQLQ1vrERoRy6SZwu0wiDGH4Kda8p1+Em0dqF1PX1TA5+roYPX3c=
+X-Google-Smtp-Source: AGHT+IHWDnX0w1SzsoI8DA0xPySEzo5xJtqS7XZt2YHYZTHRfUc5D0hbaLhIUuqtBbzsb1EykQ2hjw==
+X-Received: by 2002:a5d:6d52:0:b0:337:bcec:d45e with SMTP id k18-20020a5d6d52000000b00337bcecd45emr300741wri.35.1706085507028;
+        Wed, 24 Jan 2024 00:38:27 -0800 (PST)
+Received: from localhost ([2a01:e0a:3c5:5fb1:d8b6:17b6:386f:c67b])
+        by smtp.gmail.com with ESMTPSA id df10-20020a5d5b8a000000b0033947d7651asm2936415wrb.5.2024.01.24.00.38.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 23:30:50 -0800 (PST)
-Date: Wed, 24 Jan 2024 08:30:48 +0100
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
+        Wed, 24 Jan 2024 00:38:26 -0800 (PST)
+References: <20240123165831.970023-1-avromanov@salutedevices.com>
+ <20240123165831.970023-3-avromanov@salutedevices.com>
+User-agent: mu4e 1.10.8; emacs 29.1
+From: Jerome Brunet <jbrunet@baylibre.com>
 To: Alexey Romanov <avromanov@salutedevices.com>
 Cc: neil.armstrong@linaro.org, clabbe@baylibre.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, khilman@baylibre.com, jbrunet@baylibre.com,
-	martin.blumenstingl@googlemail.com, linux-crypto@vger.kernel.org,
-	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kernel@salutedevices.com
-Subject: Re: [PATCH v2 03/20] drviers: crypto: meson: add platform data
-Message-ID: <ZbC8qLXogjxJD8LD@Red>
-References: <20240123165831.970023-1-avromanov@salutedevices.com>
- <20240123165831.970023-4-avromanov@salutedevices.com>
+ herbert@gondor.apana.org.au, davem@davemloft.net, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ khilman@baylibre.com, jbrunet@baylibre.com,
+ martin.blumenstingl@googlemail.com, linux-crypto@vger.kernel.org,
+ linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel@salutedevices.com
+Subject: Re: [PATCH v2 02/20] drivers: crypto: meson: make CLK controller
+ optional
+Date: Wed, 24 Jan 2024 09:28:00 +0100
+In-reply-to: <20240123165831.970023-3-avromanov@salutedevices.com>
+Message-ID: <1j34unxh1a.fsf@starbuckisacylon.baylibre.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240123165831.970023-4-avromanov@salutedevices.com>
+Content-Type: text/plain
 
-Le Tue, Jan 23, 2024 at 07:58:14PM +0300, Alexey Romanov a écrit :
-> To support other Amlogic SoC's we have to
-> use platform data: descriptors and status registers
-> offsets are individual for each SoC series.
-> 
+
+On Tue 23 Jan 2024 at 19:58, Alexey Romanov <avromanov@salutedevices.com> wrote:
+
+> Not all Amlogic SoC's uses CLK controller.
+
+That's fairly short description and very likely to be wrong.
+
+Of all the SoCs I have seen mentionned in the bindings, they all have clock
+"controllers"
+
+I'd assume you meant "this crypto ip does not take a clock input on some
+SoCs", correct ?
+
+If that is what you mean, giving the list of the SoCs which - according
+to you - do or don't take a clock ip input would be helpful.
+
+>
 > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
 > ---
->  drivers/crypto/amlogic/amlogic-gxl-cipher.c |  2 +-
->  drivers/crypto/amlogic/amlogic-gxl-core.c   | 31 +++++++++++++++------
->  drivers/crypto/amlogic/amlogic-gxl.h        | 11 ++++++++
->  3 files changed, 35 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-> index b19032f92415..7eff3ae7356f 100644
-> --- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-> +++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-> @@ -225,7 +225,7 @@ static int meson_cipher(struct skcipher_request *areq)
->  
->  	reinit_completion(&mc->chanlist[flow].complete);
->  	mc->chanlist[flow].status = 0;
-> -	writel(mc->chanlist[flow].t_phy | 2, mc->base + (flow << 2));
-> +	writel(mc->chanlist[flow].t_phy | 2, mc->base + ((mc->pdata->descs_reg + flow) << 2));
->  	wait_for_completion_interruptible_timeout(&mc->chanlist[flow].complete,
->  						  msecs_to_jiffies(500));
->  	if (mc->chanlist[flow].status == 0) {
+>  drivers/crypto/amlogic/amlogic-gxl-core.c | 11 ++---------
+>  1 file changed, 2 insertions(+), 9 deletions(-)
+>
 > diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> index a58644be76e9..2be381e157c4 100644
+> index 35ec64df5b3a..a58644be76e9 100644
 > --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
 > +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> @@ -18,6 +18,7 @@
->  #include <linux/kernel.h>
->  #include <linux/module.h>
->  #include <linux/of.h>
-> +#include <linux/of_device.h>
->  #include <linux/platform_device.h>
->  
->  #include "amlogic-gxl.h"
-> @@ -30,9 +31,10 @@ static irqreturn_t meson_irq_handler(int irq, void *data)
->  
->  	for (flow = 0; flow < mc->flow_cnt; flow++) {
->  		if (mc->chanlist[flow].irq == irq) {
-> -			p = readl(mc->base + ((0x04 + flow) << 2));
-> +			p = readl(mc->base + ((mc->pdata->status_reg + flow) << 2));
->  			if (p) {
-> -				writel_relaxed(0xF, mc->base + ((0x4 + flow) << 2));
-> +				writel_relaxed(0xF, mc->base +
-> +					      ((mc->pdata->status_reg + flow) << 2));
->  				mc->chanlist[flow].status = 1;
->  				complete(&mc->chanlist[flow].complete);
->  				return IRQ_HANDLED;
-> @@ -245,15 +247,34 @@ static void meson_unregister_algs(struct meson_dev *mc)
+> @@ -263,16 +263,10 @@ static int meson_crypto_probe(struct platform_device *pdev)
+>  		dev_err(&pdev->dev, "Cannot request MMIO err=%d\n", err);
+>  		return err;
 >  	}
+> -	mc->busclk = devm_clk_get(&pdev->dev, "blkmv");
+> +	mc->busclk = devm_clk_get_optional_enabled(&pdev->dev, "blkmv");
+
+Assuming some SoC actually don't have an input clock (I'm not
+convinced), the clock still ain't optional for the ones which do.
+
+Use the compatible to properly claim the ressource (or not) 
+
+>  	if (IS_ERR(mc->busclk)) {
+>  		err = PTR_ERR(mc->busclk);
+> -		dev_err(&pdev->dev, "Cannot get core clock err=%d\n", err);
+> -		return err;
+> -	}
+> -
+> -	err = clk_prepare_enable(mc->busclk);
+> -	if (err != 0) {
+> -		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
+> +		dev_err(&pdev->dev, "Cannot get and enable core clock err=%d\n", err);
+>  		return err;
+>  	}
+>  
+> @@ -300,7 +294,6 @@ static int meson_crypto_probe(struct platform_device *pdev)
+>  	meson_unregister_algs(mc);
+>  error_flow:
+>  	meson_free_chanlist(mc, mc->flow_cnt - 1);
+> -	clk_disable_unprepare(mc->busclk);
+>  	return err;
 >  }
->  
-> +static const struct meson_pdata meson_gxl_pdata = {
-> +	.descs_reg = 0x0,
-> +	.status_reg = 0x4,
-> +};
-> +
-> +static const struct of_device_id meson_crypto_of_match_table[] = {
-> +	{
-> +		.compatible = "amlogic,gxl-crypto",
-> +		.data = &meson_gxl_pdata,
-> +	},
-> +	{},
-> +};
-> +
->  static int meson_crypto_probe(struct platform_device *pdev)
->  {
-> +	const struct of_device_id *match;
->  	struct meson_dev *mc;
->  	int err;
->  
-> +	match = of_match_device(meson_crypto_of_match_table, &pdev->dev);
-> +	if (!match)
-> +		return -EINVAL;
-> +
->  	mc = devm_kzalloc(&pdev->dev, sizeof(*mc), GFP_KERNEL);
->  	if (!mc)
->  		return -ENOMEM;
->  
-> +	mc->pdata = match->data;
->  	mc->dev = &pdev->dev;
->  	platform_set_drvdata(pdev, mc);
->  
-> @@ -312,12 +333,6 @@ static void meson_crypto_remove(struct platform_device *pdev)
->  	clk_disable_unprepare(mc->busclk);
->  }
->  
-> -static const struct of_device_id meson_crypto_of_match_table[] = {
-> -	{ .compatible = "amlogic,gxl-crypto", },
-> -	{}
-> -};
-> -MODULE_DEVICE_TABLE(of, meson_crypto_of_match_table);
 
-Hello
 
-This patch breaks bisection, since it removes MODULE_DEVICE_TABLE.
-After applying patchs 1,2,3 the driver does not load anymore on lepotato board.
-
-Regards
+-- 
+Jerome
