@@ -1,187 +1,55 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE80B6FA7
-	for <linux-crypto@vger.kernel.org>; Thu, 25 Jan 2024 01:26:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3E31CA8B;
+	Thu, 25 Jan 2024 09:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706145995; cv=none; b=RT+0eU0dyWeB6/POBeerMDENVMeTxsNmCjRn58Ey7naawbGhayAn7K70MHlfwa2HdlKojm3T2JtzOQv+YmI13UWdFFTfgVGO5Z7JQaAoKaxBhp7TYirltlLfYq0RW9CFkhh/NclcA+0ncdctiTksiKtF3tg3xUPAEYduu2cDtUI=
+	t=1706175437; cv=none; b=kp/ysHLP7f6fDHjFQJvRFOoIv8KNyBgKGZDywrYfjUqClCBKk6NXd9g1uOk3XzVtMqzR6VmNFqVgbpFuSg+oUkckF6W++Onn4Fqk5nBKu1gcBqIaSP6E3WaiRqZhKm1N8f6vm3v/c4Yk7KwQ2vgKMxxEwSMhrgXk4QJmPfM8CBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706145995; c=relaxed/simple;
-	bh=/bG04frI+8AEtX1UkmXUckcVaY83ebVSVcY77KIMgF0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Jx9Ye8sL6u+2BOpzoai5Kjf4lANdAB0BqS51Ls8ax+1uILdfV0Eg8Ij01s0dpCemlRGD+eGHQh+KbIEU+sFUhZZ6wXQJj+uRwQoFzwgb/KVr9lvUw0EtJPI57dCoIgLKqv0ZtpRvyLp6Nu7PeiCJ4Dbdw5bNh0wx9IbRM1B9DFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Yzh7DPss; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Yzh7DPss"
-Message-ID: <ca2ca170-b76c-4fc3-aa44-cae4a1e25aa4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706145991;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ALoEZM9RVE/tOlWK9AF2LXEypS3Bld3Rxux5elBLvf8=;
-	b=Yzh7DPss9iVKI7RV511dKJG2UWex+qR0YNUkFdNKTW6lvW9w+8xGoCD3U7bRfq+3aklkgl
-	VQRDF4Hl/dgEekNxkIbCM5CM41FImyn14RD/mHrrcFOgsESJ58Wa+KJYjNY7rzAvOTtQXX
-	SIIPQT1meee/i7A/TlSCgOqebv7N63g=
-Date: Wed, 24 Jan 2024 17:26:24 -0800
+	s=arc-20240116; t=1706175437; c=relaxed/simple;
+	bh=pANF+oLZHBkHSuW3uOERdFLcUTwaM+ZLvBfpRyEnK4k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kgVD6kq3DWi0j1bgEkQvOdosl8yxcT5twcWIqpVflxaJvXEzhINkzMMtOgZUWMnlmBEJXMUhkZ6fMclShZQoDAltWDORl8saiujFwh9Od1E0C0vciGFSaCYTGJMy7Q+aXdSgds0cTufnJXq6mhZXz2uWeazbRXHNRyakXxhPA44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rSwAQ-005sJt-Kl; Thu, 25 Jan 2024 17:37:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 25 Jan 2024 17:37:15 +0800
+Date: Thu, 25 Jan 2024 17:37:15 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Qi Tao <taoqi10@huawei.com>
+Cc: davem@davemloft.net, liulongfang@huawei.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 3/4] crypto: hisilicon/sec2 - fix some cleanup issues
+Message-ID: <ZbIry8M6yFUAr5oL@gondor.apana.org.au>
+References: <20231229064421.16981-1-taoqi10@huawei.com>
+ <20231229064421.16981-4-taoqi10@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v8 3/3] selftests: bpf: crypto skcipher algo
- selftests
-Content-Language: en-US
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
- bpf@vger.kernel.org, Victor Stewart <v@nametag.social>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jakub Kicinski
- <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Herbert Xu <herbert@gondor.apana.org.au>
-References: <20240115220803.1973440-1-vadfed@meta.com>
- <20240115220803.1973440-3-vadfed@meta.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240115220803.1973440-3-vadfed@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231229064421.16981-4-taoqi10@huawei.com>
 
-On 1/15/24 2:08 PM, Vadim Fedorenko wrote:
-> +static void deinit_afalg(void)
-> +{
-> +	if (tfmfd)
+On Fri, Dec 29, 2023 at 02:44:20PM +0800, Qi Tao wrote:
+>
+> @@ -1371,7 +1371,7 @@ static int sec_skcipher_bd_fill_v3(struct sec_ctx *ctx, struct sec_req *req)
+>  	sec_sqe3->bd_param = cpu_to_le32(bd_param);
+>  
+>  	sec_sqe3->c_len_ivin |= cpu_to_le32(c_req->c_len);
+> -	sec_sqe3->tag = cpu_to_le64(req);
+> +	sec_sqe3->tag = cpu_to_le64((unsigned long)(uintptr_t)req);
 
-The test should be (tfmfd != -1) ?
+Please explain why you're casting twice.
 
-> +		close(tfmfd);
-> +	if (opfd)
-
-Same here.
-
-> +		close(opfd);
-> +}
-
-[ ... ]
-
-> +SEC("?fentry.s/bpf_fentry_test1")
-> +__failure __msg("Unreleased reference")
-
-The error message is not checked. Take a look at how other tests use RUN_TESTS.
-
-> +int BPF_PROG(crypto_acquire)
-> +{
-> +	struct bpf_crypto_ctx *cctx;
-> +	struct bpf_dynptr key = {};
-> +	int err = 0;
-> +
-> +	status = 0;
-> +
-> +	bpf_dynptr_from_mem(crypto_key, sizeof(crypto_key), 0, &key);
-> +	cctx = bpf_crypto_ctx_create("skcipher", "ecb(aes)", &key, 0, &err);
-> +
-> +	if (!cctx) {
-> +		status = err;
-> +		return 0;
-> +	}
-> +
-> +	cctx = bpf_crypto_ctx_acquire(cctx);
-> +	if (!cctx)
-> +		return -EINVAL;
-> +
-> +	bpf_crypto_ctx_release(cctx);
-> +
-> +	return 0;
-> +}
-> +
-> +SEC("tc")
-> +int decrypt_sanity(struct __sk_buff *skb)
-> +{
-> +	struct __crypto_ctx_value *v;
-> +	struct bpf_crypto_ctx *ctx;
-> +	struct bpf_dynptr psrc, pdst, iv;
-> +	int err;
-> +
-> +	err = skb_dynptr_validate(skb, &psrc);
-> +	if (err < 0) {
-> +		status = err;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	v = crypto_ctx_value_lookup();
-> +	if (!v) {
-> +		status = -ENOENT;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	ctx = v->ctx;
-> +	if (!ctx) {
-> +		status = -ENOENT;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
-> +	/* iv dynptr has to be initialized with 0 size, but proper memory region
-> +	 * has to be provided anyway
-> +	 */
-> +	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-
-It would be nice to allow passing NULL as an optional "iv" arg. It could be a 
-future improvement.
-
-Overall lgtm. Please add a cover letter in v4 and also the benchmark test that 
-was brought up a while back.
-
-> +
-> +	status = bpf_crypto_decrypt(ctx, &psrc, &pdst, &iv);
-> +
-> +	return TC_ACT_SHOT;
-> +}
-> +
-> +SEC("tc")
-> +int encrypt_sanity(struct __sk_buff *skb)
-> +{
-> +	struct __crypto_ctx_value *v;
-> +	struct bpf_crypto_ctx *ctx;
-> +	struct bpf_dynptr psrc, pdst, iv;
-> +	int err;
-> +
-> +	status = 0;
-> +
-> +	err = skb_dynptr_validate(skb, &psrc);
-> +	if (err < 0) {
-> +		status = err;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	v = crypto_ctx_value_lookup();
-> +	if (!v) {
-> +		status = -ENOENT;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	ctx = v->ctx;
-> +	if (!ctx) {
-> +		status = -ENOENT;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
-> +	/* iv dynptr has to be initialized with 0 size, but proper memory region
-> +	 * has to be provided anyway
-> +	 */
-> +	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-> +
-> +	status = bpf_crypto_encrypt(ctx, &psrc, &pdst, &iv);
-> +
-> +	return TC_ACT_SHOT;
-> +}
-> +
-> +char __license[] SEC("license") = "GPL";
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
