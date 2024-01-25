@@ -1,32 +1,37 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3E31CA8B;
-	Thu, 25 Jan 2024 09:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7402D1C687;
+	Thu, 25 Jan 2024 09:41:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706175437; cv=none; b=kp/ysHLP7f6fDHjFQJvRFOoIv8KNyBgKGZDywrYfjUqClCBKk6NXd9g1uOk3XzVtMqzR6VmNFqVgbpFuSg+oUkckF6W++Onn4Fqk5nBKu1gcBqIaSP6E3WaiRqZhKm1N8f6vm3v/c4Yk7KwQ2vgKMxxEwSMhrgXk4QJmPfM8CBw=
+	t=1706175694; cv=none; b=kPvEctm6H5jajlaG0msDcFHmaN5ffNrlZkkin/sShcJubElAYPEM5AIvkCoK3ykSG1VAjU8QxWakC7xZoC+0MYE+nWSGc0qM0T+/V/WTUouT/Ya1SZjR7ryL8EI1cIWnaMRTXBCTGbeLH5cwmzZQZWNuUra/2GCa37lQLNHRS8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706175437; c=relaxed/simple;
-	bh=pANF+oLZHBkHSuW3uOERdFLcUTwaM+ZLvBfpRyEnK4k=;
+	s=arc-20240116; t=1706175694; c=relaxed/simple;
+	bh=a1uRqjaQU/0jst93xo19fk3EChLuryXiTmd5Hs2DoLM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kgVD6kq3DWi0j1bgEkQvOdosl8yxcT5twcWIqpVflxaJvXEzhINkzMMtOgZUWMnlmBEJXMUhkZ6fMclShZQoDAltWDORl8saiujFwh9Od1E0C0vciGFSaCYTGJMy7Q+aXdSgds0cTufnJXq6mhZXz2uWeazbRXHNRyakXxhPA44=
+	 Content-Type:Content-Disposition:In-Reply-To; b=OLAR7rYeRBvexSsXvqbckJnAGld1ERkIXm1v8VF/rfvlSNnbSEQ9rxLvny2dJFdku9n1YSy0v+tk6gLol2MQruoj4m8VzMT8C/E5AezDcQgplV6OSF4lSllmGEWsrULtg6y5OTi8wXxUTF+SLEHrcoLuxbVsenZVmOWUBRL6N+0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rSwAQ-005sJt-Kl; Thu, 25 Jan 2024 17:37:03 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 25 Jan 2024 17:37:15 +0800
-Date: Thu, 25 Jan 2024 17:37:15 +0800
+	id 1rSwEG-005sPE-AZ; Thu, 25 Jan 2024 17:41:01 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 25 Jan 2024 17:41:12 +0800
+Date: Thu, 25 Jan 2024 17:41:12 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Qi Tao <taoqi10@huawei.com>
-Cc: davem@davemloft.net, liulongfang@huawei.com,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 3/4] crypto: hisilicon/sec2 - fix some cleanup issues
-Message-ID: <ZbIry8M6yFUAr5oL@gondor.apana.org.au>
-References: <20231229064421.16981-1-taoqi10@huawei.com>
- <20231229064421.16981-4-taoqi10@huawei.com>
+To: Barry Song <21cnbao@gmail.com>
+Cc: davem@davemloft.net, akpm@linux-foundation.org, chriscli@google.com,
+	chrisl@kernel.org, ddstreet@ieee.org, hannes@cmpxchg.org,
+	linux-mm@kvack.org, nphamcs@gmail.com, sjenning@redhat.com,
+	vitaly.wool@konsulko.com, yosryahmed@google.com,
+	zhouchengming@bytedance.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v4 2/6] mm/zswap: reuse dstmem when decompress
+Message-ID: <ZbIsuN+bpHNX7CnL@gondor.apana.org.au>
+References: <ZY1EnEefZsRTGYnP@gondor.apana.org.au>
+ <20240103025759.523120-1-21cnbao@gmail.com>
+ <20240103025759.523120-3-21cnbao@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,18 +40,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231229064421.16981-4-taoqi10@huawei.com>
+In-Reply-To: <20240103025759.523120-3-21cnbao@gmail.com>
 
-On Fri, Dec 29, 2023 at 02:44:20PM +0800, Qi Tao wrote:
+On Wed, Jan 03, 2024 at 03:57:59PM +1300, Barry Song wrote:
 >
-> @@ -1371,7 +1371,7 @@ static int sec_skcipher_bd_fill_v3(struct sec_ctx *ctx, struct sec_req *req)
->  	sec_sqe3->bd_param = cpu_to_le32(bd_param);
->  
->  	sec_sqe3->c_len_ivin |= cpu_to_le32(c_req->c_len);
-> -	sec_sqe3->tag = cpu_to_le64(req);
-> +	sec_sqe3->tag = cpu_to_le64((unsigned long)(uintptr_t)req);
+> > We could certainly do that.  But I wonder if it might actually be
+> > better for you to allocate a second sync-only algorithm for such
+> > cases.  I'd like to see some real numbers.
+> 
+> some hardware might want to use an accelerator to help offload CPU's
+> work. their drivers are working in async mode, for example, hisilicon
+> and intel.
+> 
+> I don't have the exact number we can save by removing the redundant
+> memcpy, nor do i have a proper hardware to test and get the number.
+> As Chengming is actually working in zswap, i wonder if you can test
+> my patches and post some data?
 
-Please explain why you're casting twice.
+I don't have the hardware to test this.  Since you're proposing
+the change, please test it to ensure that we're not adding cruft
+to the API that's actually detrimental to performance.
 
 Thanks,
 -- 
