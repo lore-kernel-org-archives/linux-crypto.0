@@ -1,36 +1,39 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9A4286A6
-	for <linux-crypto@vger.kernel.org>; Thu, 25 Jan 2024 09:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CCE1CD02;
+	Thu, 25 Jan 2024 09:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706175770; cv=none; b=Vex9DegYHf1Lxz7sLOCf64jVW2iAQ54RC95gvpVyZfDqdqfp7ruYYfEWLW8aHgUpDJPp+f9rIx2+PMDSnuHbNmazn1c5miInQNEF7gto7tsaifJR+UGXPZAxk5Yslan9JZUHxiEGbwoj41ghydNtAnZ+6TxCzAn+u3yqwwFAsAs=
+	t=1706176334; cv=none; b=t4G0eCK/5QtEKQ1pCDq7iHLytkQmeXXp7eB2VEVbcpz4Ru8joH3oah2HHSENrC3VxVvPL4c8qC7ADCP/Ew2JpBOHYvEUDOivM1Jrz1FxAvE9KN8Hv7CrH2Q3NBJQwF3po/f+B7b6+MmpVVVMUBcbvRhMtBASOayaDxaK0/0OYHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706175770; c=relaxed/simple;
-	bh=Cn18gzXDm9G/ulEdtJDQQ95A/BUjsvQMzPG1fPA1Vos=;
+	s=arc-20240116; t=1706176334; c=relaxed/simple;
+	bh=StG+/eVbGK2/dVKyODarUOD8vIXXM+MXKHc4ky+fXlY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IV3EFXQBnwuQKgSgyXTEkJ8OQkEgAEGFyA8T4TILmX2/jTBXiuz4IRKcbVp8HcubqTcZF+S4tpOK08KCwUlH9zgbngx5zzwYRRuDqaQOLutVDKylPSPJjOMY69gZYUeiynuZu70tnRSwDu3mFOpEN1HQL+WeMMoe9+n2/nFtReE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=PQh1rxRr1+6Ofv1SSeDZY4KWdRxI4pFGfpv/ncEX+MGF1tENok071lOJYNINzIr7NEvuZ0R6W1jqnhltCLyuM3G+qG1Y/kNjSlUeaJ9H7jiO2E8OMa4yAjjixvQaRD1qVZEmVxzTyd2ZIWHHbIaAVDBaqWuyyexij3If5lN5v+A=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rSwFv-005sUW-31; Thu, 25 Jan 2024 17:42:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 25 Jan 2024 17:42:55 +0800
-Date: Thu, 25 Jan 2024 17:42:55 +0800
+	id 1rSvxo-005s2C-0g; Thu, 25 Jan 2024 17:24:01 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 25 Jan 2024 17:24:12 +0800
+Date: Thu, 25 Jan 2024 17:24:12 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Mun Chun Yep <mun.chun.yep@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Damian Muszynski <damian.muszynski@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
-	Ahsan Atta <ahsan.atta@intel.com>,
-	Markas Rapoportas <markas.rapoportas@intel.com>
-Subject: Re: [PATCH 1/9] crypto: qat - add heartbeat error simulator
-Message-ID: <ZbItH1hIRLMmsKwU@gondor.apana.org.au>
-References: <20240103040722.14467-1-mun.chun.yep@intel.com>
- <20240103040722.14467-2-mun.chun.yep@intel.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Vadim Fedorenko <vadfed@meta.com>, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org,
+	Victor Stewart <v@nametag.social>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>
+Subject: Re: [PATCH bpf-next v8 2/3] bpf: crypto: add skcipher to bpf crypto
+Message-ID: <ZbIovBWdpDrwFw0V@gondor.apana.org.au>
+References: <20240115220803.1973440-1-vadfed@meta.com>
+ <20240115220803.1973440-2-vadfed@meta.com>
+ <dc3f48ee-2742-4c59-96a1-a06ffa1d7712@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -39,17 +42,37 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240103040722.14467-2-mun.chun.yep@intel.com>
+In-Reply-To: <dc3f48ee-2742-4c59-96a1-a06ffa1d7712@linux.dev>
 
-On Wed, Jan 03, 2024 at 12:07:14PM +0800, Mun Chun Yep wrote:
->
-> +config CRYPTO_DEV_QAT_ERROR_INJECTION
-> +	bool "Support for Intel(R) QAT Devices Heartbeat Error Injection"
-> +	default n
+On Wed, Jan 24, 2024 at 05:14:56PM -0800, Martin KaFai Lau wrote:
+> On 1/15/24 2:08 PM, Vadim Fedorenko wrote:
+> > Implement skcipher crypto in BPF crypto framework.
+> > 
+> > Signed-off-by: Vadim Fedorenko<vadfed@meta.com>
+> > ---
+> > v7 -> v8:
+> > - Move bpf_crypto_skcipher.c to crypto and make it part of
+> >    skcipher module. This way looks more natural and makes bpf crypto
+> >    proper modular. MAINTAINERS files is adjusted to make bpf part
+> >    belong to BPF maintainers.
+> > v6 - v7:
+> > - style issues
+> > v6:
+> > - introduce new file
+> > ---
+> >   MAINTAINERS                  |  8 ++++
+> >   crypto/Makefile              |  3 ++
+> >   crypto/bpf_crypto_skcipher.c | 82 ++++++++++++++++++++++++++++++++++++
+> 
+> The changes are mostly isolated to the new bpf_crypto_skcipher.c file
+> addition to the crypto/ but still will be helpful to get an Ack from the
+> crypto maintainers (Herbert?).
 
-This is redundant as n is the default.
+Looks good to me.
 
-Cheers,
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
