@@ -1,31 +1,31 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8B158AD6
-	for <linux-crypto@vger.kernel.org>; Fri, 26 Jan 2024 09:05:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE025FB84;
+	Fri, 26 Jan 2024 09:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706259910; cv=none; b=hha8lqZ0XY6/KKO6QYSRA/IsExDmYZXQ1lHdvUt/E5lyeyc856n3gSF5rH+FD4fViH4+is8fCu1jg6WxnhwV4bxSF2KAOba2Ir3PSLIzwQM0GepdTNPTL84rxdUnw86A7BjyXj4fSGnUiV8Q/xLdf2meC/7BbM4JfZZveOZatVs=
+	t=1706259926; cv=none; b=jhm13Fg72ld1nBZRQhXcyitG2vYxhfVSxaD4/YIh/CezyxiVUJ/o8FUPG7N+8jm9INyAXNL9n8O4SsAub2dQ17aD+yR3ic+uYftIqt/0X+O7Xzgn5uljPcJER6owKwcDm2lWtbrBpyxDhH/Hgv8EqY9M0gTvTAs96ER0MMZganI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706259910; c=relaxed/simple;
-	bh=uwb6oz79eDENEy+0SQNheTm4YArttrkyh84CBGd8Sok=;
+	s=arc-20240116; t=1706259926; c=relaxed/simple;
+	bh=9fFOopVdKAjV1by1QMH5ucZbA1hAWe+Zz5PTAY9LHIo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xgikpudc8SuzNhkHh1F54czyNHfK63opCxzxgTnGDrkSWvQ/IR5Wr+2omrXFg++MRb1TNcGNxFATQ92glUTshSPws+td+X4O8uHKMJ/W9cbBsA8W8is/0c9K72tmlQfWLswBbAD4kM+m+c1pFuCqoJCZDt00dA6ELagaElwSmuI=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q1VYkabOOI+pvDhSAG5zo7Hgtx6qHu3Ung5oLgy/nda6Ptk+TxQ/502Uss3mPZ5n11oqjCX8DNCRT+v6HSEUZrxoBDmlZc+tVMhovXfXIbkCgBltoAtH7VJjQx6TILGPpcJK33No5kLPervnxWpEd96zMymIlNKJhhOu5+HX28E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rTI90-006Erc-Ll; Fri, 26 Jan 2024 17:05:03 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jan 2024 17:05:15 +0800
-Date: Fri, 26 Jan 2024 17:05:15 +0800
+	id 1rTI9G-006Es7-Vz; Fri, 26 Jan 2024 17:05:20 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jan 2024 17:05:31 +0800
+Date: Fri, 26 Jan 2024 17:05:31 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-crypto@vger.kernel.org, ebiggers@kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v2 0/8] crypto: Clean up arm64 AES-CCM code
-Message-ID: <ZbN1y/oViQpoxyR4@gondor.apana.org.au>
-References: <20240118170628.3049797-10-ardb+git@google.com>
+To: Wenkai Lin <linwenkai6@hisilicon.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	liulongfang@huawei.com, fanghao11@huawei.com, acc@openeuler.org
+Subject: Re: [PATCH] crypto: hisilicon - Fix smp_processor_id() warnings
+Message-ID: <ZbN128cDR4qisFha@gondor.apana.org.au>
+References: <20240119081107.5306-1-linwenkai6@hisilicon.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -34,57 +34,52 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240118170628.3049797-10-ardb+git@google.com>
+In-Reply-To: <20240119081107.5306-1-linwenkai6@hisilicon.com>
 
-On Thu, Jan 18, 2024 at 06:06:29PM +0100, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ardb@kernel.org>
+On Fri, Jan 19, 2024 at 04:11:07PM +0800, Wenkai Lin wrote:
+> Switch to raw_smp_processor_id() to prevent a number of
+> warnings from kernel debugging. We do not care about
+> preemption here, as the CPU number is only used as a
+> poor mans load balancing or device selection. If preemption
+> happens during an encrypt/decrypt operation a small performance
+> hit will occur but everything will continue to work, so just
+> ignore it. This commit is similar to e7a9b05ca4
+> ("crypto: cavium - Fix smp_processor_id() warnings").
 > 
-> The AES-CCM driver was written 10+ years ago, based on the very first
-> kernel mode NEON API for arm64, which eagerly preserved/restored the
-> NEON registers on each call to kernel_neon_begin() resp.
-> kernel_neon_end().
+> [ 7538.874350] BUG: using smp_processor_id() in preemptible [00000000] code: af_alg06/8438
+> [ 7538.874368] caller is debug_smp_processor_id+0x1c/0x28
+> [ 7538.874373] CPU: 50 PID: 8438 Comm: af_alg06 Kdump: loaded Not tainted 5.10.0.pc+ #18
+> [ 7538.874377] Call trace:
+> [ 7538.874387]  dump_backtrace+0x0/0x210
+> [ 7538.874389]  show_stack+0x2c/0x38
+> [ 7538.874392]  dump_stack+0x110/0x164
+> [ 7538.874394]  check_preemption_disabled+0xf4/0x108
+> [ 7538.874396]  debug_smp_processor_id+0x1c/0x28
+> [ 7538.874406]  sec_create_qps+0x24/0xe8 [hisi_sec2]
+> [ 7538.874408]  sec_ctx_base_init+0x20/0x4d8 [hisi_sec2]
+> [ 7538.874411]  sec_aead_ctx_init+0x68/0x180 [hisi_sec2]
+> [ 7538.874413]  sec_aead_sha256_ctx_init+0x28/0x38 [hisi_sec2]
+> [ 7538.874421]  crypto_aead_init_tfm+0x54/0x68
+> [ 7538.874423]  crypto_create_tfm_node+0x6c/0x110
+> [ 7538.874424]  crypto_alloc_tfm_node+0x74/0x288
+> [ 7538.874426]  crypto_alloc_aead+0x40/0x50
+> [ 7538.874431]  aead_bind+0x50/0xd0
+> [ 7538.874433]  alg_bind+0x94/0x148
+> [ 7538.874439]  __sys_bind+0x98/0x118
+> [ 7538.874441]  __arm64_sys_bind+0x28/0x38
+> [ 7538.874445]  do_el0_svc+0x88/0x258
+> [ 7538.874447]  el0_svc+0x1c/0x28
+> [ 7538.874449]  el0_sync_handler+0x8c/0xb8
+> [ 7538.874452]  el0_sync+0x148/0x180
 > 
-> For this reason, the asm helpers were constructed in a way that used
-> only 6 NEON registers, as the kernel mode NEON API at the time
-> implemented an optimization where kernel_neon_begin() took an int
-> denoting the number of NEON registers to preserve/restore. Given that no
-> actual hardware existed at the time (except perhaps for APM Xgene1 which
-> did not implement the crypto instructions), all of this was based on
-> premature assumptions.
-> 
-> These days, the NEON API is a bit more sophisticated, and does not
-> bother to preserve/restore anything unless it is needed (e.g., when
-> context switching or returning to user space). It also no longer
-> disables preemption. Finally, we've developed some code patterns in the
-> mean time to deal with tail blocks more cleanly and efficiently.
-> 
-> So let's bring the CCM driver up to date with all of this.
-> 
-> Changes since v1:
-> - keep primary en/decryption paths separate
-> - fix rebase error in v1
-> 
-> Ard Biesheuvel (8):
->   crypto: arm64/aes-ccm - Revert "Rewrite skcipher walker loop"
->   crypto: arm64/aes-ccm - Keep NEON enabled during skcipher walk
->   crypto: arm64/aes-ccm - Pass short inputs via stack buffer
->   crypto: arm64/aes-ccm - Replace bytewise tail handling with NEON
->     permute
->   crypto: arm64/aes-ccm - Reuse existing MAC update for AAD input
->   crypto: arm64/aes-ccm - Cache round keys and unroll AES loops
->   crypto: arm64/aes-ccm - Merge encrypt and decrypt tail handling
->   crypto: arm64/aes-ccm - Merge finalization into en/decrypt asm helpers
-> 
->  arch/arm64/crypto/Kconfig           |   1 +
->  arch/arm64/crypto/aes-ce-ccm-core.S | 265 +++++++-------------
->  arch/arm64/crypto/aes-ce-ccm-glue.c | 154 ++++++++----
->  arch/arm64/crypto/aes-glue.c        |   1 +
->  4 files changed, 200 insertions(+), 221 deletions(-)
-> 
-> -- 
-> 2.43.0.381.gb435a96ce8-goog
+> Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
+> ---
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 2 +-
+>  drivers/crypto/hisilicon/sec2/sec_main.c  | 2 +-
+>  drivers/crypto/hisilicon/zip/zip_main.c   | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
