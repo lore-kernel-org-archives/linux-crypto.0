@@ -1,39 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5C860B90;
-	Fri, 26 Jan 2024 09:06:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75495612D3;
+	Fri, 26 Jan 2024 09:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706260008; cv=none; b=nCJFaBYTpAiLqsiKsk5rjoLI0d92wMhbx7Q+EWG9WZ7GarBSWgmWZMfSK7ehyos2sBMPppcNavSI9Aze6yLT0ss7fiITDIB1DfkwLqncaQce3MnjuSMyz1BQVFeZibnpZTBcvXN2DIFvvK66N4AJQd4Ay7UFozu2wylcZ5nEiG8=
+	t=1706260170; cv=none; b=gKBPSULut4QoE1dnZd8vF5SRCE3KKOP90m+Nuyf32nHmysiFK09fH8YJkOv0tVf/ibuVwtybE8Qy5VdsklMsXv0fYxiW8Jg/LQzdyrHJIvUU8xBAhRcSQSafKudrKZZ32J/46MydwvxZvzdEQrYnb06oZrkQjC/M0daL6vRUIyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706260008; c=relaxed/simple;
-	bh=FmZ7L70FxZzdqagdRT1MctQ8VKv5y9VO6LoUIfjlsTQ=;
+	s=arc-20240116; t=1706260170; c=relaxed/simple;
+	bh=F1hz7KCSVbFLfrCBmACnmf9Nqw8PEapG5/S7HX7OJtE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pT8I4HVCc8fBIywDamug1+mM3G5z8OfnRizdbNOx2FX0ydsh5RPxHpqBNY25FyF1y1r527gzwHmq5oQEaKW6j2MKF9crICKrkXNdUv4e3pxW6wnkdsQlLBLkWO6S/nxV9J0m+wSI+ocupGaQ3h0fKp2i1oGi5KPXJX1VhXg5dNw=
+	 Content-Type:Content-Disposition:In-Reply-To; b=AVg29gsCmuRopBi5RCbQGQ/sbGZ5Tl8+4yz1eQFO0gLs/SkEJu43ymCMMTUM43VcCvEznOaVg4faHUpGnjE0vch5O9MDLHZvZIXU2BNWLKi9XZviHTkPiF//mvFJxX8zBfPwpBDRU2yvd+FBXJjH6xO6wEng4PpjYFUMpSpd8m4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rTIAG-006Eu5-Mh; Fri, 26 Jan 2024 17:06:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jan 2024 17:06:33 +0800
-Date: Fri, 26 Jan 2024 17:06:33 +0800
+	id 1rTID0-006Ez2-Vh; Fri, 26 Jan 2024 17:09:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jan 2024 17:09:23 +0800
+Date: Fri, 26 Jan 2024 17:09:23 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Erick Archer <erick.archer@gmx.com>
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>,
+To: David Wronek <davidwronek@gmail.com>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] crypto: sun8i-ce - Use kcalloc() instead of kzalloc()
-Message-ID: <ZbN2GfKU18pVEprw@gondor.apana.org.au>
-References: <20240121153407.8348-1-erick.archer@gmx.com>
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Andy Gross <agross@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	cros-qcom-dts-watchers@chromium.org, linux-arm-msm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	~postmarketos/upstreaming@lists.sr.ht,
+	Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v4 1/8] dt-bindings: crypto: ice: Document SC7180 inline
+ crypto engine
+Message-ID: <ZbN2wwvM8D4yldjS@gondor.apana.org.au>
+References: <20240121-sm7125-upstream-v4-0-f7d1212c8ebb@gmail.com>
+ <20240121-sm7125-upstream-v4-1-f7d1212c8ebb@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,26 +52,17 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240121153407.8348-1-erick.archer@gmx.com>
+In-Reply-To: <20240121-sm7125-upstream-v4-1-f7d1212c8ebb@gmail.com>
 
-On Sun, Jan 21, 2024 at 04:34:07PM +0100, Erick Archer wrote:
-> As noted in the "Deprecated Interfaces, Language Features, Attributes,
-> and Conventions" documentation [1], size calculations (especially
-> multiplication) should not be performed in memory allocator (or similar)
-> function arguments due to the risk of them overflowing. This could lead
-> to values wrapping around and a smaller allocation being made than the
-> caller was expecting. Using those allocations could lead to linear
-> overflows of heap memory and other misbehaviors.
+On Sun, Jan 21, 2024 at 05:57:41PM +0100, David Wronek wrote:
+> Document the compatible used for the inline crypto engine found on
+> SC7180.
 > 
-> So, use the purpose specific kcalloc() function instead of the argument
-> size * count in the kzalloc() function.
-> 
-> Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [1]
-> Link: https://github.com/KSPP/linux/issues/162
-> Signed-off-by: Erick Archer <erick.archer@gmx.com>
+> Acked-by: Rob Herring <robh@kernel.org>
+> Signed-off-by: David Wronek <davidwronek@gmail.com>
 > ---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml | 1 +
+>  1 file changed, 1 insertion(+)
 
 Patch applied.  Thanks.
 -- 
