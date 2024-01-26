@@ -1,33 +1,35 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A0A51C26;
-	Fri, 26 Jan 2024 09:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E5255793;
+	Fri, 26 Jan 2024 09:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706259612; cv=none; b=B/TBkjI6zsW2r+WMc5TSpPJFZILkdN5z/K1cSznLYhXZ6iJX8SWjXbi/VHCR+XK1uqFhQ8g3RJIRE6V7mHOFEXUs4QkkktN83wqxRKB0Xn1WUqkWGqQhbAiVNSOK765mdjCi4+veS0mQK3yiXRqrvIBxndJ0t6TGa0ujGI7xisk=
+	t=1706259659; cv=none; b=rHWZKnuMZdOW3IBHgKTC0dsY2QVf0Ul5mlH9IEcsWMNoe8jEFgdzLxDBb44ec/R8NJCGMH/aM9UzqX3BdARYDDdwcNFpZTHqF3yIH98PAeHRmj7ubxmbQCRuTRCB9aPKDP1fyiVEMLNFHbrAnTzYOEK2iAlgEbKxjGhxgS3knmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706259612; c=relaxed/simple;
-	bh=kOkPe13PZ9nRiXrBdZLTfIKaB5agjBUgj++JJpMbqb0=;
+	s=arc-20240116; t=1706259659; c=relaxed/simple;
+	bh=KNc39Sy1zvoDM7Q0A2A6CjK0GfV3vdUIPYp7FnGGmmo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D1E8W/Nw7TgcQ2Crps84XiuTMF6NP2UfVeT+hUoA68JWZeUunPFl0PsaJLubA7FGptFbrEK/L4n5cDe+1dNJcjQU7AJU6HdQJg2u6abx4/rgJq5dTuJQ8PsgVyckP9mY7/o2bC/nrBe2HHKHr7n5ceQV1n1/5IVwE2pvZAe7FQU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=moyQ5+qKJxicPDN8kzPyZrs1qrEcrfN632XpVhtqijJhkGS/QreUDJTJFKWyjRa9s3Sk+W9LtQd40tDfCy2a41y5ghiUL1KBD41LhUnd0PAoGVWiNeS+5OMeyQOUC0dLNP8X6/EsfFXczwe3hfn08Lu3VDx3KvQVsoIo9jM0abk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rTI49-006EdX-8S; Fri, 26 Jan 2024 17:00:02 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jan 2024 17:00:13 +0800
-Date: Fri, 26 Jan 2024 17:00:13 +0800
+	id 1rTI4v-006Eez-2t; Fri, 26 Jan 2024 17:00:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jan 2024 17:01:01 +0800
+Date: Fri, 26 Jan 2024 17:01:01 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Tom Zanussi <tom.zanussi@linux.intel.com>
-Cc: davem@davemloft.net, fenghua.yu@intel.com, dan.carpenter@linaro.org,
-	dave.jiang@intel.com, tony.luck@intel.com,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org
-Subject: Re: [PATCH] crypto: iaa - Remove header table code
-Message-ID: <ZbN0nS0krktSqB51@gondor.apana.org.au>
-References: <8bde35bf981a1e490114c6b50fc4755a64da55a5.camel@linux.intel.com>
+To: Minjie Du <duminjie@vivo.com>
+Cc: Tom Zanussi <tom.zanussi@linux.intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"open list:INTEL IAA CRYPTO DRIVER" <linux-crypto@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	opensource.kernel@vivo.com
+Subject: Re: [PATCH v1] crypto: iaa - Remove unnecessary debugfs_create_dir()
+ error check in iaa_crypto_debugfs_init()
+Message-ID: <ZbN0zQwTzhBmD0W/@gondor.apana.org.au>
+References: <20240109021916.20960-1-duminjie@vivo.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -36,23 +38,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8bde35bf981a1e490114c6b50fc4755a64da55a5.camel@linux.intel.com>
+In-Reply-To: <20240109021916.20960-1-duminjie@vivo.com>
 
-On Mon, Jan 08, 2024 at 04:53:48PM -0600, Tom Zanussi wrote:
-> The header table and related code is currently unused - it was
-> included and used for canned mode, but canned mode has been removed,
-> so this code can be safely removed as well.
+On Tue, Jan 09, 2024 at 10:19:14AM +0800, Minjie Du wrote:
+> This patch removes the debugfs_create_dir() error checking in
+> iaa_crypto_debugfs_init(). Because the debugfs_create_dir() is developed
+> in a way that the caller can safely handle the errors that
+> occur during the creation of DebugFS nodes.
 > 
-> This indirectly fixes a bug reported by Dan Carpenter.
-> 
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Closes: https://lore.kernel.org/linux-crypto/b2e0bd974981291e16882686a2b9b1db3986abe4.camel@linux.intel.com/T/#m4403253d6a4347a925fab4fc1cdb4ef7c095fb86
-> Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+> Signed-off-by: Minjie Du <duminjie@vivo.com>
 > ---
->  drivers/crypto/intel/iaa/iaa_crypto.h         |  25 ----
->  .../crypto/intel/iaa/iaa_crypto_comp_fixed.c  |   1 -
->  drivers/crypto/intel/iaa/iaa_crypto_main.c    | 108 +-----------------
->  3 files changed, 3 insertions(+), 131 deletions(-)
+>  drivers/crypto/intel/iaa/iaa_crypto_stats.c | 2 --
+>  1 file changed, 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
