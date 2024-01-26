@@ -1,54 +1,68 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2331BF31
-	for <linux-crypto@vger.kernel.org>; Fri, 26 Jan 2024 08:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA991BC4C;
+	Fri, 26 Jan 2024 08:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706257749; cv=none; b=iYdJjzxd5d3gMGkV7CHlsPCRm1AI+ZxMIVn1xnYWF8pINZtLBcGJIZt/nOq4KP36LSqlJ3oCVY0iuCuC+TTs59QvkreyyD2W8NqRmiv/qA4Sydpm1ZsaziqeBz44Pqip2wa/0vhIcYjb3mf7y212E36RO2tJic8mgrFbC5FjZxU=
+	t=1706258445; cv=none; b=uLBmEZ0NiAdr6zQ8s6I4B9Attx+0TKWcdz36xMt91FUVljvru5YhqNqIz/T3evwH1romXphpjemDdUuPNjUuRAk6gzTDlRgz1RUgR7xEvhvxHCzOME1hgc0WveJ/34j12Jdju5z7tWP75nvveL7Y/jM3LcW4fQXNf8xK4WOrMeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706257749; c=relaxed/simple;
-	bh=0pazT6/+PhaI5hwbDlQ0W/arHusjdRVzz573NNFeBIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rsq3xxj5MsinFdnbW2JWPafGItbpGUMdycm5yWRV8GrUSBbcdXZNHIzWzcAR7y7lNMAxVICdeQanvZsuZvrNIAEZm19NuCibC7NHPtMYEoQy9ngU5PS6qbVhIZKqq8H2oBG5zQo5RwTj6KrHNO3dzZW68uDLbya5sjjy4juGuzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rTHa7-006E2p-Jc; Fri, 26 Jan 2024 16:29:00 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jan 2024 16:29:12 +0800
-Date: Fri, 26 Jan 2024 16:29:12 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Joachim Vandersmissen <git@jvdsn.com>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: rsa - restrict plaintext/ciphertext values more
- in FIPS mode
-Message-ID: <ZbNtWAXCz5LLaIeZ@gondor.apana.org.au>
-References: <20240121194901.344206-1-git@jvdsn.com>
- <ZbNKHGDiGOyIB5+S@gondor.apana.org.au>
- <b2dc028f-54e5-4992-8f8b-32cbfd072f73@jvdsn.com>
+	s=arc-20240116; t=1706258445; c=relaxed/simple;
+	bh=kb9C7u8yTsWsUe5kmCLWQKW96P4fUbGNHwszHARhCe0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Xo0vcsQ8UjQuQOw8V1iMKUtBiw2uDYdw3VyzkIQCzLFRfnoCzegWmaIWtw2twoi6vaU9YmlOd8wvWDIZeLZhF6BCqATQkAP/d/8isE/voUtfPS85HQAI2YGT41bm2emDwSYfPd2EuQgJBvR8UngDkRW7O4/tni4Iza8KxuIqZeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4TLrjD6VGwzNlYX;
+	Fri, 26 Jan 2024 16:39:44 +0800 (CST)
+Received: from dggpeml500001.china.huawei.com (unknown [7.185.36.227])
+	by mail.maildlp.com (Postfix) with ESMTPS id CCC5818001C;
+	Fri, 26 Jan 2024 16:40:39 +0800 (CST)
+Received: from [10.67.121.42] (10.67.121.42) by dggpeml500001.china.huawei.com
+ (7.185.36.227) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 26 Jan
+ 2024 16:40:39 +0800
+Message-ID: <273d30b3-edba-4f4c-8138-fe83dbfd83aa@huawei.com>
+Date: Fri, 26 Jan 2024 16:40:39 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b2dc028f-54e5-4992-8f8b-32cbfd072f73@jvdsn.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/4] crypto: hisilicon/sec2 - fix some cleanup issues
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: <davem@davemloft.net>, <liulongfang@huawei.com>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+References: <20231229064421.16981-1-taoqi10@huawei.com>
+ <20231229064421.16981-4-taoqi10@huawei.com>
+ <ZbIry8M6yFUAr5oL@gondor.apana.org.au>
+From: taoqi <taoqi10@huawei.com>
+In-Reply-To: <ZbIry8M6yFUAr5oL@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500001.china.huawei.com (7.185.36.227)
 
-On Fri, Jan 26, 2024 at 12:13:00AM -0600, Joachim Vandersmissen wrote:
->
-> Yes, mathematically speaking the values 1 and n - 1 aren't suitable for RSA
-> (they will always be fixed points). I simply didn't want to introduce a
-> breaking change. If you think a breaking change is acceptable, I can update
-> the patch to replace the RFC3447 check with the stricter check.
+On 2024/1/25 17:37, Herbert Xu wrote:
+> On Fri, Dec 29, 2023 at 02:44:20PM +0800, Qi Tao wrote:
+>>
+>> @@ -1371,7 +1371,7 @@ static int sec_skcipher_bd_fill_v3(struct sec_ctx *ctx, struct sec_req *req)
+>>   	sec_sqe3->bd_param = cpu_to_le32(bd_param);
+>>   
+>>   	sec_sqe3->c_len_ivin |= cpu_to_le32(c_req->c_len);
+>> -	sec_sqe3->tag = cpu_to_le64(req);
+>> +	sec_sqe3->tag = cpu_to_le64((unsigned long)(uintptr_t)req);
+> 
+> Please explain why you're casting twice.
+> 
+> Thanks,
 
-Please do.  We can always change it later if someone complains.
+I'm sorry. I made a mistake here. unsigned long and uintptr_t are the 
+same data type in linux kernel. The type cast is invalidly repeated 
+here. Can I just keep (unsigned long) one cast?
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
