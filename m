@@ -1,34 +1,40 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A991200BE;
-	Fri, 26 Jan 2024 08:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639592263C;
+	Fri, 26 Jan 2024 08:55:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706259268; cv=none; b=AlFkosiYtO9cCf72rdtf5nsYwELL46qm7inZmv8Bpuh4bCPEd+JSerR1nnHwiIsqEDEDEBsX6PS/D/MsIJehiwTP2/i4URhnN/P+/PxPtyQihWcHaapIeF0WD5sz7yH3LEDOwWtQJY5pCZ7StrcqnUMx4TdMAXKVYPdN0cazLuA=
+	t=1706259341; cv=none; b=HWYW6Z+5ozEzh2gOcXlDWjxjVjU7K93XCGfPylDsui5Pd9O6TYBbos8r1JAAwXQB9ptRC/oXM6IV5q0GGP1vWcQ6FVjpvRc+cHIXmV8y5R6p4UDX+3lhXO39DSxKdScbGnzGjfuxz8rsL9u2ZHgyCwx6J/0LGoYeRruMdR5UnZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706259268; c=relaxed/simple;
-	bh=m2v8yGscxTccKKQmICA2Ug+JNmQcZxXV7SctgFuruso=;
+	s=arc-20240116; t=1706259341; c=relaxed/simple;
+	bh=YWuyFj1LWoUEo8gZuJhqmKZRCyglpZ4AVYuFv8OugUI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gz2rfgf2ze6db7R+dZ06PkU4zMGUJTZtglRFG6mzIGNh8YHGMh1hGJyZQvPhVHF5VcvhApqpv7BpDWobH3jg9k2CTvK9iSO92qBxFEUP3Ds9gMzSFildCgY7kGaMGKB3r9m9HEPyyJpo3nqzvoWjy+677q1pX/XsIPm3DDGYYMI=
+	 Content-Type:Content-Disposition:In-Reply-To; b=NTvnk74zF0yT3Q59xjW7DIv45RrDqFiJNLfuX1E7THS7JV8c/fa6eJNFIniGlEmBYfF0zlq0uva+uUbW1gQAE2vTvh1n14KdcmJRbN4mSGAvMc/eFWssyi2k6qPAFxJN61lDnIFeqrpyHNKK0EsrcQfc+9c5OYWMAdhXswwPc5k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rTHyW-006ESD-Fn; Fri, 26 Jan 2024 16:54:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jan 2024 16:54:25 +0800
-Date: Fri, 26 Jan 2024 16:54:25 +0800
+	id 1rTHzV-006ETz-47; Fri, 26 Jan 2024 16:55:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jan 2024 16:55:25 +0800
+Date: Fri, 26 Jan 2024 16:55:25 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: taoqi <taoqi10@huawei.com>
-Cc: davem@davemloft.net, liulongfang@huawei.com,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 3/4] crypto: hisilicon/sec2 - fix some cleanup issues
-Message-ID: <ZbNzQQhlL6HYzqji@gondor.apana.org.au>
-References: <20231229064421.16981-1-taoqi10@huawei.com>
- <20231229064421.16981-4-taoqi10@huawei.com>
- <ZbIry8M6yFUAr5oL@gondor.apana.org.au>
- <273d30b3-edba-4f4c-8138-fe83dbfd83aa@huawei.com>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: kernel test robot <lkp@intel.com>, virtualization@lists.linux.dev,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Gonglei <arei.gonglei@huawei.com>, Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, llvm@lists.linux.dev,
+	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr
+Subject: Re: [PATCH v2] crypto: virtio - Less function calls in
+ __virtio_crypto_akcipher_do_req() after error detection
+Message-ID: <ZbNzfR5wzrKarP4h@gondor.apana.org.au>
+References: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
+ <202312260852.0ge5O8IL-lkp@intel.com>
+ <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -37,17 +43,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <273d30b3-edba-4f4c-8138-fe83dbfd83aa@huawei.com>
+In-Reply-To: <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
 
-On Fri, Jan 26, 2024 at 04:40:39PM +0800, taoqi wrote:
->
-> I'm sorry. I made a mistake here. unsigned long and uintptr_t are the same
-> data type in linux kernel. The type cast is invalidly repeated here. Can I
-> just keep (unsigned long) one cast?
+On Tue, Dec 26, 2023 at 11:12:23AM +0100, Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Tue, 26 Dec 2023 11:00:20 +0100
+> 
+> The kfree() function was called in up to two cases by the
+> __virtio_crypto_akcipher_do_req() function during error handling
+> even if the passed variable contained a null pointer.
+> This issue was detected by using the Coccinelle software.
+> 
+> * Adjust jump targets.
+> 
+> * Delete two initialisations which became unnecessary
+>   with this refactoring.
+> 
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> ---
+> 
+> v2:
+> A typo was fixed for the delimiter of a label.
+> 
+>  drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 
-Yes that makes sense.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
