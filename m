@@ -1,40 +1,34 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639592263C;
-	Fri, 26 Jan 2024 08:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB4314F522;
+	Fri, 26 Jan 2024 08:58:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706259341; cv=none; b=HWYW6Z+5ozEzh2gOcXlDWjxjVjU7K93XCGfPylDsui5Pd9O6TYBbos8r1JAAwXQB9ptRC/oXM6IV5q0GGP1vWcQ6FVjpvRc+cHIXmV8y5R6p4UDX+3lhXO39DSxKdScbGnzGjfuxz8rsL9u2ZHgyCwx6J/0LGoYeRruMdR5UnZ0=
+	t=1706259520; cv=none; b=SslTdIbquBOz6miXEnKCyeAtPg3v3MUxlWBXkRByPCsOcZY89DyhR7dDRIkzqe1iiUldPuytOlI5NdatuaSNeSdxefWU4h9rXHQ5FoDmdtmwpoXYly0aCoipy17MvYRwOUND+Jn0zXss/U06CkyZQt5DojQ89yh8cr0uwtEhEkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706259341; c=relaxed/simple;
-	bh=YWuyFj1LWoUEo8gZuJhqmKZRCyglpZ4AVYuFv8OugUI=;
+	s=arc-20240116; t=1706259520; c=relaxed/simple;
+	bh=wot1yPJV87tUkM8CsZ2oaB+0f3xAXpRMa/ZMlXNaja8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NTvnk74zF0yT3Q59xjW7DIv45RrDqFiJNLfuX1E7THS7JV8c/fa6eJNFIniGlEmBYfF0zlq0uva+uUbW1gQAE2vTvh1n14KdcmJRbN4mSGAvMc/eFWssyi2k6qPAFxJN61lDnIFeqrpyHNKK0EsrcQfc+9c5OYWMAdhXswwPc5k=
+	 Content-Type:Content-Disposition:In-Reply-To; b=efu3cpjveEOX4Xq9sY8vsqidY2lCRpiD2wZat98+cjp9ackNbpY80XIhy61N1jqy7q/zd1N8I1Np2OidEgs2hSNhrrC3FxmitGy2XnaxeuaSeacdKa46QcOUtzKUMPD/qdoJPzC/XEMkbhpZx1pB+nY0kSUnmyMmXaLsqZ3xNLE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rTHzV-006ETz-47; Fri, 26 Jan 2024 16:55:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jan 2024 16:55:25 +0800
-Date: Fri, 26 Jan 2024 16:55:25 +0800
+	id 1rTI2L-006EZR-QN; Fri, 26 Jan 2024 16:58:10 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jan 2024 16:58:22 +0800
+Date: Fri, 26 Jan 2024 16:58:22 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: kernel test robot <lkp@intel.com>, virtualization@lists.linux.dev,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Gonglei <arei.gonglei@huawei.com>, Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, llvm@lists.linux.dev,
-	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr
-Subject: Re: [PATCH v2] crypto: virtio - Less function calls in
- __virtio_crypto_akcipher_do_req() after error detection
-Message-ID: <ZbNzfR5wzrKarP4h@gondor.apana.org.au>
-References: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
- <202312260852.0ge5O8IL-lkp@intel.com>
- <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
+To: Danny Tsen <dtsen@linux.ibm.com>
+Cc: linux-crypto@vger.kernel.org, leitao@debian.org, nayna@linux.ibm.com,
+	appro@cryptogams.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
+	ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
+Subject: Re: [PATCH] crypto:vmx: Move ppc vmx diirectory to
+ arch/powerpc/crypto.
+Message-ID: <ZbN0LufXZ6YZmn3E@gondor.apana.org.au>
+References: <20240102205856.370103-1-dtsen@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,30 +37,63 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
+In-Reply-To: <20240102205856.370103-1-dtsen@linux.ibm.com>
 
-On Tue, Dec 26, 2023 at 11:12:23AM +0100, Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Tue, 26 Dec 2023 11:00:20 +0100
+On Tue, Jan 02, 2024 at 03:58:56PM -0500, Danny Tsen wrote:
+> Relocate all crypto files in vmx driver to arch/powerpc/crypto directory
+> and remove vmx directory.
 > 
-> The kfree() function was called in up to two cases by the
-> __virtio_crypto_akcipher_do_req() function during error handling
-> even if the passed variable contained a null pointer.
-> This issue was detected by using the Coccinelle software.
+> drivers/crypto/vmx/aes.c rename to arch/powerpc/crypto/aes.c
+> drivers/crypto/vmx/aes_cbc.c rename to arch/powerpc/crypto/aes_cbc.c
+> drivers/crypto/vmx/aes_ctr.c rename to arch/powerpc/crypto/aes_ctr.c
+> drivers/crypto/vmx/aes_xts.c rename to arch/powerpc/crypto/aes_xts.c
+> drivers/crypto/vmx/aesp8-ppc.h rename to arch/powerpc/crypto/aesp8-ppc.h
+> drivers/crypto/vmx/aesp8-ppc.pl rename to arch/powerpc/crypto/aesp8-ppc.pl
+> drivers/crypto/vmx/ghash.c rename to arch/powerpc/crypto/ghash.c
+> drivers/crypto/vmx/ghashp8-ppc.pl rename to arch/powerpc/crypto/ghashp8-ppc.pl
+> drivers/crypto/vmx/vmx.c rename to arch/powerpc/crypto/vmx.c
 > 
-> * Adjust jump targets.
+> deleted files:
+> drivers/crypto/vmx/Makefile
+> drivers/crypto/vmx/Kconfig
+> drivers/crypto/vmx/ppc-xlate.pl
 > 
-> * Delete two initialisations which became unnecessary
->   with this refactoring.
+> This patch has been tested has passed the selftest.  The patch is also tested with
+> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled.
 > 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
 > ---
-> 
-> v2:
-> A typo was fixed for the delimiter of a label.
-> 
->  drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+>  arch/powerpc/crypto/Kconfig                   |  20 ++
+>  arch/powerpc/crypto/Makefile                  |  20 +-
+>  .../crypto/vmx => arch/powerpc/crypto}/aes.c  |   0
+>  .../vmx => arch/powerpc/crypto}/aes_cbc.c     |   0
+>  .../vmx => arch/powerpc/crypto}/aes_ctr.c     |   0
+>  .../vmx => arch/powerpc/crypto}/aes_xts.c     |   0
+>  .../vmx => arch/powerpc/crypto}/aesp8-ppc.h   |   0
+>  .../vmx => arch/powerpc/crypto}/aesp8-ppc.pl  |   0
+>  .../vmx => arch/powerpc/crypto}/ghash.c       |   0
+>  .../powerpc/crypto}/ghashp8-ppc.pl            |   0
+>  .../crypto/vmx => arch/powerpc/crypto}/vmx.c  |   0
+>  drivers/crypto/Kconfig                        |  14 +-
+>  drivers/crypto/Makefile                       |   2 +-
+>  drivers/crypto/vmx/.gitignore                 |   3 -
+>  drivers/crypto/vmx/Kconfig                    |  14 --
+>  drivers/crypto/vmx/Makefile                   |  23 --
+>  drivers/crypto/vmx/ppc-xlate.pl               | 231 ------------------
+>  17 files changed, 46 insertions(+), 281 deletions(-)
+>  rename {drivers/crypto/vmx => arch/powerpc/crypto}/aes.c (100%)
+>  rename {drivers/crypto/vmx => arch/powerpc/crypto}/aes_cbc.c (100%)
+>  rename {drivers/crypto/vmx => arch/powerpc/crypto}/aes_ctr.c (100%)
+>  rename {drivers/crypto/vmx => arch/powerpc/crypto}/aes_xts.c (100%)
+>  rename {drivers/crypto/vmx => arch/powerpc/crypto}/aesp8-ppc.h (100%)
+>  rename {drivers/crypto/vmx => arch/powerpc/crypto}/aesp8-ppc.pl (100%)
+>  rename {drivers/crypto/vmx => arch/powerpc/crypto}/ghash.c (100%)
+>  rename {drivers/crypto/vmx => arch/powerpc/crypto}/ghashp8-ppc.pl (100%)
+>  rename {drivers/crypto/vmx => arch/powerpc/crypto}/vmx.c (100%)
+>  delete mode 100644 drivers/crypto/vmx/.gitignore
+>  delete mode 100644 drivers/crypto/vmx/Kconfig
+>  delete mode 100644 drivers/crypto/vmx/Makefile
+>  delete mode 100644 drivers/crypto/vmx/ppc-xlate.pl
 
 Patch applied.  Thanks.
 -- 
