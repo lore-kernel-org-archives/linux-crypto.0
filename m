@@ -1,159 +1,125 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0FD208A3
-	for <linux-crypto@vger.kernel.org>; Fri, 26 Jan 2024 17:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791FF1DDFC;
+	Fri, 26 Jan 2024 18:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706290728; cv=none; b=DR3EEz+JpCQ4bIONh7XPlOIfNGbEvzdXdJDHSM+AZFN9E+IhMIRlawQpG4o1yB6Zn94DiYSx+w6kISA1FkE1jux01zMcVw2w5ci6w9IgGjWBw9I7pMqfaGJg7wc13aTnrN+xIc5ZL5XRZxK+bnFpiPYJhIlz7WuryLuoQErDyLo=
+	t=1706294673; cv=none; b=qZfR5f9PVsjsihMp6Ov/gZgFJDT1e1qXjWAB6h+P3xjHuH0ut8EPm7GdU0R70u3oz9jGTg1q+pnEH3sheA2UFoENbR2GVMRo6Yn9AGCjxAb2bgWD0X4WRsgUr4SbKLPjCjFPDCEHVXmQsKzD+JOspCghSepaZSOng8k/fQP83nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706290728; c=relaxed/simple;
-	bh=ofuQOEbQQFzE0GCfYJoMi9Q3uD0EeA4A29bglOPy/LA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T26MT+enFNfWAJMEkx1ZLe4k/YRDS5KA3q0Fhpfd8aR9c4O+felpLLYdwCPEn7fOW1zdj3tuUclUI6irSMyH8PogtY1gsaELQq3JiqkAOdH7gFryxlt8YsUiHijg0+x+w4VZFxv9FPsleCb/3VeW7WPlXvNkhyuMQuPTcqvKslE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f1+j2jRx; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1706294673; c=relaxed/simple;
+	bh=nf/POY29CG3Y+BqXT0M1LE29Qv40vbKTyyGYz43XKHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fTqiWFPgDEIQIOFIcwn/h4s9ns9HfyZXOmfUQ//Z9OUptYZraRfBMfjgFp7POOEoV7hdar63JIPvztMLUMOBJSA5kIH79V0YcORWjontguAUtI09oMO2FnPu8Rs+0tA0Y1uz12XAGpFotfTUuCnohqGlmghBtpT+hSSYafEL4x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=dZ7IOSuV; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f1+j2jRx"
-Message-ID: <d15e44d8-941a-4da6-ae8a-c4e031623e0f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706290723;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hrNyYEKOGi6GDPwxj18KT3Z3avOcsu6ZH6V/ZzqbE58=;
-	b=f1+j2jRxHnceOOU3X1qIJXeHPH/lliU0My8D+iJacSp615kLkXvFZoouPy+6aEwjSzpE36
-	xUsCDywGERV9zVuMMfcKS9V4swaD6V24uAfHekt4L6/B299PzoKs718N7UOOMYmoWF68ap
-	pvhp8ZGZon06J23aL3HWECXI7Q3iPU0=
-Date: Fri, 26 Jan 2024 17:38:36 +0000
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="dZ7IOSuV"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5BA7F40E01A9;
+	Fri, 26 Jan 2024 18:44:27 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id pobZP-BeJfAp; Fri, 26 Jan 2024 18:44:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1706294665; bh=duwCYa0fwFKf6HI10qA1Z2xg/PK3N1HXBTl9zUoAe5Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dZ7IOSuVpOKnAq6iSSA/5BPQOosteryR4BL/dDYOzqOz7mbKP7XKS6DYNmYUuR7zQ
+	 ucDQCB+3oYkx5yez0vnxL08sdZIHI9XeqjTUjLhjeHjRH7KTfwFIhsp5Upqd2fz4iG
+	 IN6ieFmKw228wvOseFZAsBm4kuZ71QDY8XcRQrU3wwPB4gA/y0d1umlumNSy6PlR/6
+	 lFGPR1q0bFT80L8ZguOxanmGs9TLwgCOjQ+szOZi1iLGLfwkzYu13S2M9ozFFTiItu
+	 7aI1enA/as9CDGUCSqQLNtBO4im+L9sC7Wa2DDCtzOndx7PlKaP7XsYLJMYIwich8A
+	 HX2OWGwk+ZT1kNCsTNBihyxgyFzxn/h2k06fdbe5unNqSE+LfH7Oss/wbqBFz6pnQW
+	 I0VK/FW7wQAMQ89hI2Bm3AHl45qD6NlDpKSr4dfgRIOQZgENQYbIUtrQlTyZK/ccNF
+	 lFtJ68KKeAM5oX+Lokm9bWJvRMAaoTS7IHcX0AB7Dtg2x14FNrH9oNNX6vvQJo4BIb
+	 YS+H0YBgJqjXVhNmVsCkdnJQ6EDEx9ledNnVioJksK+fIyC+nlYnDb2XKLoC775Pcn
+	 KKFax279Nwwcmuvkq/sobr8XRY8Fuv8Su6Lo4xnRYi/aYYKe/ZlP29oc3397HujdT9
+	 w/8zEkJUX+JWvm6vs5bQrgZs=
+Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 853E840E00C5;
+	Fri, 26 Jan 2024 18:43:48 +0000 (UTC)
+Date: Fri, 26 Jan 2024 19:43:40 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com
+Subject: Re: [PATCH v2 11/25] x86/sev: Adjust directmap to avoid inadvertant
+ RMP faults
+Message-ID: <20240126184340.GEZbP9XA13X91-eybA@fat_crate.local>
+References: <20240126041126.1927228-1-michael.roth@amd.com>
+ <20240126041126.1927228-12-michael.roth@amd.com>
+ <20240126153451.GDZbPRG3KxaQik-0aY@fat_crate.local>
+ <20240126170415.f7r4nvsrzgpzcrzv@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v8 1/3] bpf: make common crypto API for TC/XDP
- programs
-Content-Language: en-US
-To: Martin KaFai Lau <martin.lau@linux.dev>, Vadim Fedorenko <vadfed@meta.com>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
- bpf@vger.kernel.org, Victor Stewart <v@nametag.social>,
- Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Herbert Xu <herbert@gondor.apana.org.au>
-References: <20240115220803.1973440-1-vadfed@meta.com>
- <3d2d5f4e-c554-4648-bcec-839d83585123@linux.dev>
- <a682b902-37a2-4d43-8f39-56ca213f6663@linux.dev>
- <cec469f4-2fd0-479a-8919-0d5578687fb2@linux.dev>
- <f70e2d1e-b17d-44c2-9077-51afa9f4f05e@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <f70e2d1e-b17d-44c2-9077-51afa9f4f05e@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240126170415.f7r4nvsrzgpzcrzv@amd.com>
 
-On 26/01/2024 10:30, Vadim Fedorenko wrote:
-> On 25/01/2024 22:34, Martin KaFai Lau wrote:
->> On 1/25/24 3:19 AM, Vadim Fedorenko wrote:
->>> On 25/01/2024 01:10, Martin KaFai Lau wrote:
->>>> On 1/15/24 2:08 PM, Vadim Fedorenko wrote:
->>>>> +static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
->>>>> +                const struct bpf_dynptr_kern *src,
->>>>> +                struct bpf_dynptr_kern *dst,
->>>>> +                const struct bpf_dynptr_kern *siv,
->>>>> +                bool decrypt)
->>>>> +{
->>>>> +    u32 src_len, dst_len, siv_len;
->>>>> +    const u8 *psrc;
->>>>> +    u8 *pdst, *piv;
->>>>> +    int err;
->>>>> +
->>>>> +    if (ctx->type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY)
->>>>
->>>> nit. Does the indirect call get_flags() return different values?
->>>> Should it be rejected earlier, e.g. in bpf_crypto_ctx_create()?
->>>
->>> Well, that is the common pattern in crypto subsys to check flags.
->>> But after looking at it second time, I think I have to refactor this
->>> part. CRYPTO_TFM_NEED_KEY is set during tfm creation if algo requires
->>> the key. And it's freed when the key setup is successful. As there is no
->>> way bpf programs can modify tfm directly we can move this check to
->>> bpf_crypto_ctx_create() to key setup part and avoid indirect call in 
->>> this place.
->>>>
->>>>> +        return -EINVAL;
->>>>> +
->>>>> +    if (__bpf_dynptr_is_rdonly(dst))
->>>>> +        return -EINVAL;
->>>>> +
->>>>> +    siv_len = __bpf_dynptr_size(siv);
->>>>> +    src_len = __bpf_dynptr_size(src);
->>>>> +    dst_len = __bpf_dynptr_size(dst);
->>>>> +    if (!src_len || !dst_len)
->>>>> +        return -EINVAL;
->>>>> +
->>>>> +    if (siv_len != (ctx->type->ivsize(ctx->tfm) + 
->>>>> ctx->type->statesize(ctx->tfm)))
->>>>
->>>> Same here, two indirect calls per en/decrypt kfunc call. Does the 
->>>> return value change?
->>>
->>> I have to check the size of IV provided by the caller, and then to avoid
->>> indirect calls I have to store these values somewhere in ctx. It gives a
->>> direct access to these values to bpf programs, which can potentially
->>> abuse them. Not sure if it's good to open such opportunity.
->>
->> I don't think it makes any difference considering tfm has already been 
->> accessible in ctx->tfm.
-> 
-> Fair. I'll do it then.
-> 
->> A noob question, what secret is in the siv len?
-> 
-> No secrets in the values themself. The problem I see is that user (bpf
-> program) can adjust them to avoid proper validation and then pass
-> smaller buffer and trigger read/write out-of-bounds.
+On Fri, Jan 26, 2024 at 11:04:15AM -0600, Michael Roth wrote:
+> vaddr comes from pfn_to_kaddr(pfn), i.e. __va(paddr), so it will
+> necessarily be a direct-mapped address above __PAGE_OFFSET.
 
-I've done more tests, and looks like verifier will block programs that
-are trying to write directly to the struct. In this case no abuse is
-possible and it's safe to export the value into ctx and avoid indirect
-calls.
+Ah, true.
 
-> 
->> btw, unrelated, based on the selftest in patch 3, is it supporting any 
->> siv_len > 0 for now?
-> 
-> Well, it should. I see no reasons not to support it. But to test it
-> properly another cipher should be used. I'll think about extending tests
-> 
->>
->>>
->>>>
->>>>> +        return -EINVAL;
->>>>> +
->>>>> +    psrc = __bpf_dynptr_data(src, src_len);
->>>>> +    if (!psrc)
->>>>> +        return -EINVAL;
->>>>> +    pdst = __bpf_dynptr_data_rw(dst, dst_len);
->>>>> +    if (!pdst)
->>>>> +        return -EINVAL;
->>>>> +
->>>>> +    piv = siv_len ? __bpf_dynptr_data_rw(siv, siv_len) : NULL;
->>>>> +    if (siv_len && !piv)
->>>>> +        return -EINVAL;
->>>>> +
->>>>> +    err = decrypt ? ctx->type->decrypt(ctx->tfm, psrc, pdst, 
->>>>> src_len, piv)
->>>>> +              : ctx->type->encrypt(ctx->tfm, psrc, pdst, src_len, 
->>>>> piv);
->>>>> +
->>>>> +    return err;
->>>>> +}
->>>>
->>>
->>
-> 
+> For upper-end, a pfn_valid(pfn) check might suffice, since only a valid
+> PFN would have a possibly-valid mapping wthin the directmap range.
 
+Looking at it, yap, that could be a sensible thing to check.
+
+> These are PFNs that are owned/allocated-to the caller. Due to the nature
+> of the directmap it's possible non-owners would write to a mapping that
+> overlaps, but vmalloc()/etc. would not create mappings for any pages that
+> were not specifically part of an allocation that belongs to the caller,
+> so I don't see where there's any chance for an overlap there. And the caller
+> of these functions would not be adjusting directmap for PFNs that might be
+> mapped into other kernel address ranges like kernel-text/etc unless the
+> caller was specifically making SNP-aware adjustments to those ranges, in
+> which case it would be responsible for making those other adjustments,
+> or implementing the necessary helpers/etc.
+
+Why does any of that matter?
+
+If you can make this helper as generic as possible now, why don't you?
+
+> I'm not aware of such cases in the current code, and I don't think it makes
+> sense to attempt to try to handle them here generically until such a case
+> arises, since it will likely involve more specific requirements than what
+> we can anticipate from a theoretical/generic standpoint.
+
+Then that's a different story. If it will likely involve more specific
+handling, then that function should deal with pfns for which it can DTRT
+and for others warn loudly so that the code gets fixed in time.
+
+IOW, then it should check for the upper pfn of the direct map here and
+we have two, depending on the page sizes used...
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
