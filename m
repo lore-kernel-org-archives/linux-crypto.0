@@ -1,35 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF95812E6F
-	for <linux-crypto@vger.kernel.org>; Sat, 27 Jan 2024 07:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5FA7F;
+	Sat, 27 Jan 2024 09:01:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706341824; cv=none; b=mJU4dyLEh9b9rX0J8FVERaQRpV0mGWsb5PB/Kniu6UU6p01cDwdb5IxH0528RdRFPz53gWKEC73HEKvfQdqRllPtx1ZhuoAF5SBaNhaxoTkcolM85wzXdjnxJP/AzTUCWzdVLpIuKZ0U2KsIkIuMTnbhLRxe+o7+YhEdDppANqw=
+	t=1706346084; cv=none; b=d0hwB7fXPiWNHCVRpklKI3/tICWf+EdBopwaNkYg4DMH9SSbTwgOjEecP02zY++Gn5c1WtMFtWW6WV0OKRGGGf8S92PAedxyDb6ki0obBx/2xL0f/GvpySybYuIGlheG0O505TqslwY4Fbnilz0PYZSyaW9VtQC8Y64/QOrwvH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706341824; c=relaxed/simple;
-	bh=ChJuRuerzeHs0UIpjC6hn9f2X1DSVAMhnBEcG6upaMM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Mn4Ppd1rAXwEWnewhKGSqgeXdI/VKKgqBl3wI4NpkXPzTJ/wgo8J1m6fIPaW7Nq/dP6lb1KmbdRw2v8HocLGinKwnfWRgtvZUmpYsI2/xtaSAeFfrOHPqswtEhgIQPHoGIckH6iElP/RonYX/iY7jSyVqCKK6hOJKjXhqDG/l0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ULuGNuhc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706346084; c=relaxed/simple;
+	bh=hpNFNF09+4R9C/NT6J2wtQJfi2pvjGg8peeFOWYXxjU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EGMxw4f1VmpcWHIlBTijqgYuQkQW8mp1cudzArBhm6gijuv6Rma5u6Pl3AqNN/C/g7aBa5AaoDDA/GbmOuwKxysEZTyKPgsP1BAnQ4P/cIBANQnomGG7S4N4y7Vr75Q5IxqbxSEvRJuLPdS6aqDALQTSem8YMkhA3/+nnCPP72o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H68dCSkY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ULuGNuhc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CB6DC433F1
-	for <linux-crypto@vger.kernel.org>; Sat, 27 Jan 2024 07:50:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H68dCSkY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37BCAC433F1;
+	Sat, 27 Jan 2024 09:01:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706341823;
-	bh=ChJuRuerzeHs0UIpjC6hn9f2X1DSVAMhnBEcG6upaMM=;
-	h=From:To:Subject:Date:From;
-	b=ULuGNuhcF0PU00PhkI5EYmQy+MYgkAfo9TeeRPqr6R9O8T6qCepXLCLCEt5o8Mpn/
-	 IBv2S0oZoD8Fb8mLl+vUZwwOVVRw6HpEp+m6MIbnSi1W4BuC9pE7/EyKjNXX6aArQB
-	 YosRHHfh6ttTptUod/VpvDVI9WV/8pdkTTuueMr3v9ky3kxO8jXhXVy18gvujEMagT
-	 osFPzBV+05AfRCqCjYNchV4FsWiADGe/urRiMUjerc8rCdlHAx2mKqyK0MSksz5d+W
-	 PFFIR9HdFPvoZhd0O2fSnIOWpwz0mj451r/T7wbXf2YBY5rsaiAIKaJBoYLCb7KSV6
-	 RasoKkapeD8zA==
+	s=k20201202; t=1706346083;
+	bh=hpNFNF09+4R9C/NT6J2wtQJfi2pvjGg8peeFOWYXxjU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=H68dCSkYteFymi0Fxr4ZLnTtDfhc3iBgtp7a90RfidyQYu69r1r6CihH13IS38xKA
+	 7Y6lvWBv2gcFEyLZ7+znoLsJ18B01ysbSi7TqxpUNXJDjWLhRejbBDgMlFauFXh4ho
+	 PgX1lKteFbkEBIRK/boTZP8jxy8/KPzdwQ8qfbuK5SkmfjbayN6IDNPQrhOI0VvkMJ
+	 NGevEz43xgBNX1hKceUzic8Bw2t3RuDqq3ZNOQxH75u0u5SfE8UY/gIOE4ozUeGeuB
+	 LszLbDcljUQ2hOZ4ZAmeCkoYlvD5m4F4pw116jSOeoKtfeSDfZIdObP++x9JedU1FS
+	 k2tgGoKo1zjrQ==
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: ahash - unexport crypto_hash_alg_has_setkey()
-Date: Fri, 26 Jan 2024 23:49:27 -0800
-Message-ID: <20240127074927.74282-1-ebiggers@kernel.org>
+To: linux-riscv@lists.infradead.org
+Cc: linux-crypto@vger.kernel.org,
+	llvm@lists.linux.dev,
+	Brandon Wu <brandon.wu@sifive.com>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH] RISC-V: fix check for zvkb with tip-of-tree clang
+Date: Sat, 27 Jan 2024 01:00:54 -0800
+Message-ID: <20240127090055.124336-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -41,103 +45,45 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Since crypto_hash_alg_has_setkey() is only called from ahash.c itself,
-make it a static function.
+LLVM commit 8e01042da9d3 ("[RISCV] Add missing dependency check for Zvkb
+(#79467)") broke the check used by the TOOLCHAIN_HAS_VECTOR_CRYPTO
+kconfig symbol because it made zvkb start depending on v or zve*.  Fix
+this by specifying both v and zvkb when checking for support for zvkb.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/ahash.c                 | 21 ++++++++++-----------
- include/crypto/internal/hash.h |  2 --
- 2 files changed, 10 insertions(+), 13 deletions(-)
+ arch/riscv/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 80c3e5354711e..0ac83f7f701df 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -611,20 +611,30 @@ struct crypto_ahash *crypto_alloc_ahash(const char *alg_name, u32 type,
- 	return crypto_alloc_tfm(alg_name, &crypto_ahash_type, type, mask);
- }
- EXPORT_SYMBOL_GPL(crypto_alloc_ahash);
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index b49016bb5077b..912fff31492b9 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -581,21 +581,21 @@ config TOOLCHAIN_HAS_ZBB
+ 	default y
+ 	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64ima_zbb)
+ 	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_zbb)
+ 	depends on LLD_VERSION >= 150000 || LD_VERSION >= 23900
+ 	depends on AS_HAS_OPTION_ARCH
  
- int crypto_has_ahash(const char *alg_name, u32 type, u32 mask)
- {
- 	return crypto_type_has_alg(alg_name, &crypto_ahash_type, type, mask);
- }
- EXPORT_SYMBOL_GPL(crypto_has_ahash);
+ # This symbol indicates that the toolchain supports all v1.0 vector crypto
+ # extensions, including Zvk*, Zvbb, and Zvbc.  LLVM added all of these at once.
+ # binutils added all except Zvkb, then added Zvkb.  So we just check for Zvkb.
+ config TOOLCHAIN_HAS_VECTOR_CRYPTO
+-	def_bool $(as-instr, .option arch$(comma) +zvkb)
++	def_bool $(as-instr, .option arch$(comma) +v$(comma) +zvkb)
+ 	depends on AS_HAS_OPTION_ARCH
  
-+static bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg)
-+{
-+	struct crypto_alg *alg = &halg->base;
-+
-+	if (alg->cra_type == &crypto_shash_type)
-+		return crypto_shash_alg_has_setkey(__crypto_shash_alg(alg));
-+
-+	return __crypto_ahash_alg(alg)->setkey != ahash_nosetkey;
-+}
-+
- struct crypto_ahash *crypto_clone_ahash(struct crypto_ahash *hash)
- {
- 	struct hash_alg_common *halg = crypto_hash_alg_common(hash);
- 	struct crypto_tfm *tfm = crypto_ahash_tfm(hash);
- 	struct crypto_ahash *nhash;
- 	struct ahash_alg *alg;
- 	int err;
- 
- 	if (!crypto_hash_alg_has_setkey(halg)) {
- 		tfm = crypto_tfm_get(tfm);
-@@ -753,23 +763,12 @@ int ahash_register_instance(struct crypto_template *tmpl,
- 		return -EINVAL;
- 
- 	err = ahash_prepare_alg(&inst->alg);
- 	if (err)
- 		return err;
- 
- 	return crypto_register_instance(tmpl, ahash_crypto_instance(inst));
- }
- EXPORT_SYMBOL_GPL(ahash_register_instance);
- 
--bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg)
--{
--	struct crypto_alg *alg = &halg->base;
--
--	if (alg->cra_type == &crypto_shash_type)
--		return crypto_shash_alg_has_setkey(__crypto_shash_alg(alg));
--
--	return __crypto_ahash_alg(alg)->setkey != ahash_nosetkey;
--}
--EXPORT_SYMBOL_GPL(crypto_hash_alg_has_setkey);
--
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Asynchronous cryptographic hash type");
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index 59c707e4dea46..58967593b6b4d 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -80,22 +80,20 @@ static inline bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
- {
- 	return alg->setkey != shash_no_setkey;
- }
- 
- static inline bool crypto_shash_alg_needs_key(struct shash_alg *alg)
- {
- 	return crypto_shash_alg_has_setkey(alg) &&
- 		!(alg->base.cra_flags & CRYPTO_ALG_OPTIONAL_KEY);
- }
- 
--bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg);
--
- int crypto_grab_ahash(struct crypto_ahash_spawn *spawn,
- 		      struct crypto_instance *inst,
- 		      const char *name, u32 type, u32 mask);
- 
- static inline void crypto_drop_ahash(struct crypto_ahash_spawn *spawn)
- {
- 	crypto_drop_spawn(&spawn->base);
- }
- 
- static inline struct hash_alg_common *crypto_spawn_ahash_alg(
+ config RISCV_ISA_ZBB
+ 	bool "Zbb extension support for bit manipulation instructions"
+ 	depends on TOOLCHAIN_HAS_ZBB
+ 	depends on MMU
+ 	depends on RISCV_ALTERNATIVE
+ 	default y
+ 	help
+ 	   Adds support to dynamically detect the presence of the ZBB
 
-base-commit: 4d314d27130b674a3687135fe94f44a40f107f76
+base-commit: cb4ede926134a65bc3bf90ed58dace8451d7e759
 -- 
 2.43.0
 
