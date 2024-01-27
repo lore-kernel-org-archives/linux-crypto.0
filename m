@@ -1,113 +1,183 @@
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2078.outbound.protection.outlook.com [40.107.94.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920B22563F;
-	Sat, 27 Jan 2024 14:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706366524; cv=none; b=pTU7GJV4oRZbsOOwVd+7nIwM5nI4E1Y7dnKDvM7PHFHDLHh3U5XISY086/uaGXAMuWBwCh3E+oPv5Q/pIDE+Jtznyt5hRjNnj1MOpMiRQDPrxy1KimeriSz9blATf0DwydXRH+fer5FtQDc8sWs4zOCijKzKq/hUI1FBpUl/WgM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706366524; c=relaxed/simple;
-	bh=HfL90naAADy81JPcs0YM+zkTGDajDG/W+LK5c+48bpw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bFkVyUfQ5iOeSlQHVjrPpdd1JP4Mm+HTvm+lHK5cgVKB66KlmyJ3tMvdGzhC+MgaCpWtGyCXIAvf/VTf4C1noGocmtezM1rYLy4YXIqu3gvRCCVLMvcLNWJxmYRFtwrcrHiHBGpuSDK75HPsqyYj9PTpm/rEAXddplbpW8UjeQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DNBTqiRI; arc=none smtp.client-ip=209.85.222.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA8928DD3;
+	Sat, 27 Jan 2024 15:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706370328; cv=fail; b=m5HVZtZdzoFCCGLVXTjFcm3NdKjUScLNEv/9Skng+d4ra4kLXaTA4pvaavBw5EdempdfZ9IJ4lFsKm/mIQcB7PfmRoC6RLfXC4+rVA7O4K0H4Opg9zxxcfnLRTr7xjfXa73a3QOJB9JvzkSpoDnMnPN1op6mKeDXhn4nTIZlSe8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706370328; c=relaxed/simple;
+	bh=cpJdl/KLyH4nt4a3/9uzX9y+G1ZjU5cLci8ZQSoUlo0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gKXwRM6Ws8XJhFztt1eWVKYVNVZOLHAVcZbFwV+51FN3UlYxuL3JAZewsAh7szo+ZGsiVp1G3AyVJ3CheCYZ5nPiIA1S9nWC6tEnux1G4l6QaNMlu9qIIvurvQV8jLmjp6+GZeA2AbPZZVd7NNxzxJRoNiE3lE3a/ParrisYX9w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=VM0q+w5H; arc=fail smtp.client-ip=40.107.94.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DNBTqiRI"
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-7cedcea89a0so592182241.1;
-        Sat, 27 Jan 2024 06:42:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706366521; x=1706971321; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=796hVN76xRHFliSsyjmiY1NL2iC0ZjTvhLKEWPuIZ2Q=;
-        b=DNBTqiRILKXMWe+XK2xbV09dnc7VyshHhGMkUiexrsAfU8ZuJG5099hwT0V1HzmtDH
-         QxX2YAy2FHcNF9gm7pYHlkHGZUT1iSDS2Ojyiy4KsITMvWFMOjKgHUli1ZD5qtv9jB/2
-         ps1i4LcXjwCIEarvThfyuXgHNHZqd1JaVPETDJhWNa0ANEaKei6vB8n0bi0QFQIP8sNR
-         Mij6l9+ab9VbNSZ5M4PD6wI+yNg06w3OQo5KrZKgL+V3vEf/cpR/jAgdtG2bZF4wt36V
-         0X5R3KQD0VKNjY1bgkj3nZXP2KQrEU1piIYNSo8AEtJEcFj0N6DFJvT19Qbn/PENJhYX
-         eDgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706366521; x=1706971321;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=796hVN76xRHFliSsyjmiY1NL2iC0ZjTvhLKEWPuIZ2Q=;
-        b=dZpXQgqCaXZG94/FK0SonGqvBIYLQL3JEoknhz63REUIaoajZ8tqbkmx1qT+CsHZoU
-         22ERZWBsLG7yTNThUZ6abNlBJxE0ciAtDeWuB2Cu+o2DseZMS/9MLme274Rg1GnYl2+X
-         yCnBuzNXCYS9xEBskKuTo3cHcPSTQOB6tg51xT1xnGw2rVfmXJGZ1anQemam2uL+yHnu
-         t9vqDkJ1u+4yaeede1kPQSJ5hUta2SyVq5EzEu+Tq6eCM+h7Fmjd3r520FHm3SPxYLRw
-         UEkxo9bHYNYdnpv8B/8uDA3aZBY3+JIsZowc9r+KE72BVJhNFgBDFHiYgMuhJJxfMmqU
-         l3cA==
-X-Gm-Message-State: AOJu0YynTvW5Q8lPK2LV6TI2bahQ9NPbypapbSxhjNLjxX1I5l/R1LpA
-	ZASd6UMn8MXFeokMqBjEPkkxjRbK+XgzSZx1j1Oh9MJzPG/LMm6QQ2CjNnP+eDEW9jxb9mWCGtv
-	vZZgPyTgQhKF9awAYaiVqgKxJOTA=
-X-Google-Smtp-Source: AGHT+IEB+ia/+5CqOs/g5/EYRaYUXNHhUMKokIZjZOjq8CyacCxUf3T3x6Q2xKgPwAYYecgl7t5Ft6+APw+3Sa88kEs=
-X-Received: by 2002:a05:6102:37c:b0:469:a26c:cd40 with SMTP id
- f28-20020a056102037c00b00469a26ccd40mr550545vsa.71.1706366521356; Sat, 27 Jan
- 2024 06:42:01 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="VM0q+w5H"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YI7Shyar2bN32WpDzsK313uAHkaQ6IM+JPitk98C1SwpCZPaR6WW+YMPeHokxbbieVqIAua5vY0bC1d42YLVq0mGSesAacISioGlFCjDrdBGY4kiks/0E7T9AoFjQGwxK0OLjn35GY7olcHScZnC423rHe7lSic38fPutJbIUlcq3rK4HXENEQ2cY7qfwcEfIvD1lOymLnmpQQaax7y2L3EeTYx0MMl5SAZcUZZAcNtCOYaaPazZ70U7fc/HtqOhFil+AxBxCUEF7lfiZ3gzTjazg/qYARlp49DJvf/R/791ec8a0+2CVwe68Q2y/kaNVaq0evY1zkFWQFw2h1g3BA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eIgWZRkoHR8/peI0RlxwsM2rSt1Umjo3Dmebk+MIZtI=;
+ b=FRJgvbb6uGaGlI86PHFyyLfhzdxj0vYgt1B93IRYYwzVjNpNFrbcMCoKX2L51leFPkNuduob/aOtCaV/dbw6XNWNvJYkdKOWIA5LvtsF9Lc97fnUwGpZa7bx8mMkyUrCKaRbn9NLKywJc2t5m7SvLHYHlPXGPMKIwTNBjY5OLOkXFBA+0bBXjNaVk8sGisBjISRbrkSJRXO+RXAS98dFHcVo8T0CAOF11x4KVTi963r1DNtDm6QPMTErxTduvBZUlWiNLR/bd/LVsXYDhoC8rHjF70K7UjaOdw1EiMnEJ7Io9k+RdF34LBzx02lKvJvZivhnGpAo1zm0YUFh9Y/2Ew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eIgWZRkoHR8/peI0RlxwsM2rSt1Umjo3Dmebk+MIZtI=;
+ b=VM0q+w5HG9BR0v2QTQxSOWGWMiOegojSJdyPszSKVnSYfYTrgZYsTMSnfnK1QP2l5/IpZQGNsHRHYDGLXDbd/D3vhb/nFZTyKp4zDs6reSsiBXnxiFnnbsxKO3El912vgk0Pwo3dHNDoBlO8NOdfB6HFKk1K/5DTRoRVhZqzLAA=
+Received: from BL0PR02CA0107.namprd02.prod.outlook.com (2603:10b6:208:51::48)
+ by BY5PR12MB4258.namprd12.prod.outlook.com (2603:10b6:a03:20d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.31; Sat, 27 Jan
+ 2024 15:45:21 +0000
+Received: from BL6PEPF0001AB55.namprd02.prod.outlook.com
+ (2603:10b6:208:51:cafe::8b) by BL0PR02CA0107.outlook.office365.com
+ (2603:10b6:208:51::48) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.30 via Frontend
+ Transport; Sat, 27 Jan 2024 15:45:20 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL6PEPF0001AB55.mail.protection.outlook.com (10.167.241.7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7181.14 via Frontend Transport; Sat, 27 Jan 2024 15:45:20 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Sat, 27 Jan
+ 2024 09:45:19 -0600
+Date: Sat, 27 Jan 2024 09:45:06 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Borislav Petkov <bp@alien8.de>
+CC: <x86@kernel.org>, <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+	<linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
+	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
+	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
+	<rientjes@google.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
+	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
+Subject: Re: [PATCH v2 11/25] x86/sev: Adjust directmap to avoid inadvertant
+ RMP faults
+Message-ID: <20240127154506.v3wdio25zs6i2lc3@amd.com>
+References: <20240126041126.1927228-1-michael.roth@amd.com>
+ <20240126041126.1927228-12-michael.roth@amd.com>
+ <20240126153451.GDZbPRG3KxaQik-0aY@fat_crate.local>
+ <20240126170415.f7r4nvsrzgpzcrzv@amd.com>
+ <20240126184340.GEZbP9XA13X91-eybA@fat_crate.local>
+ <20240126235420.mu644waj2eyoxqx6@amd.com>
+ <20240127114207.GBZbTsDyC3hFq8pQ3D@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZY1EnEefZsRTGYnP@gondor.apana.org.au> <20240103025759.523120-1-21cnbao@gmail.com>
- <20240103025759.523120-3-21cnbao@gmail.com> <ZbIsuN+bpHNX7CnL@gondor.apana.org.au>
-In-Reply-To: <ZbIsuN+bpHNX7CnL@gondor.apana.org.au>
-From: Barry Song <21cnbao@gmail.com>
-Date: Sat, 27 Jan 2024 22:41:49 +0800
-Message-ID: <CAGsJ_4xcvYC_q-H+VrKwU-bOGm88Y+8LftgRXnuYvMm26OOf8Q@mail.gmail.com>
-Subject: Re: [PATCH v4 2/6] mm/zswap: reuse dstmem when decompress
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: davem@davemloft.net, akpm@linux-foundation.org, chriscli@google.com, 
-	chrisl@kernel.org, ddstreet@ieee.org, hannes@cmpxchg.org, linux-mm@kvack.org, 
-	nphamcs@gmail.com, sjenning@redhat.com, vitaly.wool@konsulko.com, 
-	yosryahmed@google.com, zhouchengming@bytedance.com, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240127114207.GBZbTsDyC3hFq8pQ3D@fat_crate.local>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB55:EE_|BY5PR12MB4258:EE_
+X-MS-Office365-Filtering-Correlation-Id: 11b8c8e4-a730-4017-64e4-08dc1f4ef7a8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	T0uix9xMryNqjhgdI4rJ7He12MGm+7IlakDuSdpDu04OLYaLmBJSVIYMknC5gGl0IqHyOy6o5pkfwUb2Z/g4oivTZZOlLFlOOE3EPRxp0x3/VSPdZGzcvTxH8Qtj6u7giYSMwn7l2qwyHuzCjGHD3XZ7eJNBOU9yVgUk36MwlaBJd23LK4dJUGCbq8AKMTgxqSXfHxrbcC0edKlbO7hv6MZxD+InyVstTluWmvL0AK3vA0JHPeActObYayg00muhuqUIhcaIXvA9NRnvtEk5QKlVRIUYioc72ZYMtlzazdqdBGC6azfTFg4Axx1G7JBXSEmWI1RYCBl8RG5hnHHunI/TaGojHRmv3do0i6NHpPw4n66G0ug3zSnHkeKC5+spG5haSv7RtKqBMVkmLnyi410VSllcH1BSDDz6PEtGdA+4RLlaVy5Vud9NSuxTr0lrT9GiIAQznciz4lybk8kgbzAiZy1UtkhkKcuGfstg2HzmHqsh5FbOUez7Yhu6JFqg2sfXionKPaLXZCDxdDe2fecD75PRQRQpT97RsjIT3mR7ekskObliTc5DLWtx0o2umI2Vqp5v5tM65GbeTfdmumfPVP8Dyn+edGWVABBX8sQYlVVQgWf4tOkCN8MrQOS+t1FCfRSjowTL9ifes8/+9xqG8tNaKkmwq29Wx3sjdJ50zN3/X0QF/7L9KEa7fza+Yh5FjIt+R141kx9a0SAL5bL6BFQO3UgyFoUbNVYql91Ucsn6bPMinxepCkfjXwl1fbayeP/uhvz7JakBMjvH3w==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(136003)(346002)(39850400004)(230922051799003)(451199024)(82310400011)(186009)(1800799012)(64100799003)(36840700001)(46966006)(40470700004)(36860700001)(83380400001)(36756003)(47076005)(54906003)(6916009)(316002)(70586007)(70206006)(8936002)(8676002)(86362001)(966005)(478600001)(6666004)(4326008)(26005)(16526019)(2906002)(1076003)(336012)(426003)(44832011)(7416002)(7406005)(2616005)(5660300002)(41300700001)(356005)(40480700001)(40460700003)(81166007)(82740400003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2024 15:45:20.2061
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11b8c8e4-a730-4017-64e4-08dc1f4ef7a8
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB55.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4258
 
-On Thu, Jan 25, 2024 at 5:41=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> On Wed, Jan 03, 2024 at 03:57:59PM +1300, Barry Song wrote:
-> >
-> > > We could certainly do that.  But I wonder if it might actually be
-> > > better for you to allocate a second sync-only algorithm for such
-> > > cases.  I'd like to see some real numbers.
-> >
-> > some hardware might want to use an accelerator to help offload CPU's
-> > work. their drivers are working in async mode, for example, hisilicon
-> > and intel.
-> >
-> > I don't have the exact number we can save by removing the redundant
-> > memcpy, nor do i have a proper hardware to test and get the number.
-> > As Chengming is actually working in zswap, i wonder if you can test
-> > my patches and post some data?
->
-> I don't have the hardware to test this.  Since you're proposing
-> the change, please test it to ensure that we're not adding cruft
-> to the API that's actually detrimental to performance.
+On Sat, Jan 27, 2024 at 12:42:07PM +0100, Borislav Petkov wrote:
+> On Fri, Jan 26, 2024 at 05:54:20PM -0600, Michael Roth wrote:
+> > Is something like this close to what you're thinking? I've re-tested with
+> > SNP guests and it seems to work as expected.
+> > 
+> > diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+> > index 846e9e53dff0..c09497487c08 100644
+> > --- a/arch/x86/virt/svm/sev.c
+> > +++ b/arch/x86/virt/svm/sev.c
+> > @@ -421,7 +421,12 @@ static int adjust_direct_map(u64 pfn, int rmp_level)
+> >         if (WARN_ON_ONCE(rmp_level > PG_LEVEL_2M))
+> >                 return -EINVAL;
+> > 
+> > -       if (WARN_ON_ONCE(rmp_level == PG_LEVEL_2M && !IS_ALIGNED(pfn, PTRS_PER_PMD)))
+> > +       if (!pfn_valid(pfn))
+> 
+> _text at VA 0xffffffff81000000 is also a valid pfn so no, this is not
+> enough.
 
-Understood.
-sorry for the grammatical errors, i was actually asking for
-chengming's help for testing as
-he had hardware and was actively working on optimizing  zswap.
-and he has already tested and sent the performance data which I quoted
-in the formal
-patchset.
+directmap maps all physical memory accessible by kernel, including text
+pages, so those are valid PFNs as far as this function is concerned. We
+can't generally guard against the caller passing in any random PFN that
+might also be mapped into additional address ranges, similarly to how
+we can't guard against something doing a write to some random PFN
+__va(0x1234) and scribbling over memory that it doesn't own, or just
+unmapping the entire directmap range and blowing up the kernel.
 
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+The expectation is that the caller is aware of what PFNs it is passing in,
+whether those PFNs have additional mappings, and if those mappings are of
+concern, implement the necessary handlers if new use-cases are ever
+introducted, like the adjust_kernel_text_mapping() example I mentioned
+earlier. 
 
+> 
+> Either this function should not have "direct map" in the name as it
+> converts *any* valid pfn not just the direct map ones or it should check
+> whether the pfn belongs to the direct map range.
 
-Thanks
-Barry
+This function only splits mappings in the 0xffff888000000000 directmap
+range. It would be inaccurate to name it in such a way that suggests
+that it does anything else. If a use-case ever arises for splitting
+_text mappings at 0xffffffff81000000, or any other ranges, those too
+would best served by dedicated helpers adjust_kernel_text_mapping()
+that *actually* modify mappings for those virtual ranges, and implement
+bounds-checking appropriate for those physical/virtual ranges. The
+directmap range maps all kernel-accessible physical memory, so it's
+appropriate that our bounds-checking for the purpose of
+adjust_direct_map() is all kernel-accessible physical memory. If that
+includes PFNs mapped to other virtual ranges as well, the caller needs
+to consider that and implement additional helpers as necessary, but
+they'd likely *still* need to call adjust_direct_map() to adjust the
+directmap range in addition to those other ranges, so even if were
+possible to do so reliably, we shouldn't try to selectively reject any
+PFN ranges beyond what mm.rst suggests is valid for 0xffff888000000000.
+
+-Mike
+
+> 
+> Thx.
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
+> 
