@@ -1,75 +1,151 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F84633D1;
-	Sat, 27 Jan 2024 00:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057C811CAF;
+	Sat, 27 Jan 2024 06:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706313801; cv=none; b=lXqsYP9EI4Ttwpta5cTT2ZfXfitpvzNZYDyoOYiPlHCL2hj7dH6FGgcWRRHAs9QNkusg9CHkHih3sdUe+xKV729Y9E8EvbBZtLFpQDH2ojfBZqrnY/p8URvCxZ5wf3ZEWaDhguySM1I3sno05QyztzOvw92n8AApud999jZ6FKE=
+	t=1706335978; cv=none; b=GlX6Gu3OnbEslqdpiMwI78TG0mLA6Xi3boi0Rb2bdreThaQPnfpJ0TqQH0KaC+2oZXGjPYmNslNKqzZpkp2DtlhqC+hoIA154NEK89z07lC1RH/XhWQm/H84ZRVikEF7MBVIfcFTRVNy1HInNGiBHV890Sz3sJMQBkkc00Swnfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706313801; c=relaxed/simple;
-	bh=yXzHV+To+Bf35AcBbLv/hgMCRQ8f9/i5+DnGHKeqink=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GgphklnfQqWVI7060gwLb3GNGi6zbA2mCG+bpwovjZr78o6zzqNfWXzz9ka+HN4wB3Y+hYc3tYn7Pf0a8C+MZ/ecRxYigNcr86zFqmIEW1RL/FUIh//4jMS3MaOgQE3CUD0ZWwefKVN+g5lbOYqUSEDvSvQYdoE5sTMw/qE3524=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QO3GLItS; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QO3GLItS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55ADEC433C7;
-	Sat, 27 Jan 2024 00:03:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706313801;
-	bh=yXzHV+To+Bf35AcBbLv/hgMCRQ8f9/i5+DnGHKeqink=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QO3GLItS8D9pjuHnVAH0T9crdlP/3wzsDJKrClqNlJuPSVk4pmR9GMdk6f4KP6b3r
-	 CjNxlg+lqg0PgY7unlhP03t7DRa5bj2IPE9oF18bU9Y+0EeYZIs5fnMiwyfgvKbwLg
-	 mw23j3qTjHPItBJ9ztwBMaIzKjEvB8fHXq5mLlkl8eyHHqD0LRsbWXq/j9F88j2SkR
-	 Uw4qrU+O04PHzfFqMtyMJhmHs/vsdGedyjAuO/g4MJfuLhns4q7BnsOJaSk4jwx3Rf
-	 vV1seWz5FaqkswJjBpNJoT3hQPW7UvzVUlZoR+dHfU0sBt+wAQDJCvokYx5m7t6Dkd
-	 5pjzDOYa7713A==
-Date: Fri, 26 Jan 2024 17:03:18 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org,
-	patches@lists.linux.dev, linux-kernel@vger.kernel.org,
-	torvalds@linux-foundation.org, llvm@lists.linux.dev,
-	keescook@chromium.org, arei.gonglei@huawei.com, mst@redhat.com,
-	jasowang@redhat.com, virtualization@lists.linux.dev,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 5.10 000/286] 5.10.209-rc1 review
-Message-ID: <20240127000318.GA1561706@dev-arch.thelio-3990X>
-References: <20240122235732.009174833@linuxfoundation.org>
- <6b563537-b62f-428e-96d1-2a228da99077@roeck-us.net>
- <2024012636-clubbed-radial-1997@gregkh>
- <2f342268-8517-4c06-8785-96a588d20c63@roeck-us.net>
- <20240126203436.GA913905@dev-arch.thelio-3990X>
- <0a194a79-e3a3-45e7-be98-83abd3e1cb7e@roeck-us.net>
- <20240126223554.GA1320833@dev-arch.thelio-3990X>
- <bef7737e-4b8e-4a89-b538-cd8e75874fd2@roeck-us.net>
+	s=arc-20240116; t=1706335978; c=relaxed/simple;
+	bh=zsLMbN4rrmf2e1uZ1jmijWWUMOO1EeeZT0PwSCoPyqQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DdHj64QL7ZTjn4gt7fzPmjRJuKF7khekNKi2ydePhM3kZGKgnU1yaifWRwRqQ/fA6iwykgq3/U/ga9agOHIIyq0tfd0wYCfUVoJWV2s2Ajzwq7ioSlFHl8wIM9IQbXlg8201X+bihnIJFK+cAsw9p9Cw0FiNjX0qAspIUCr6W30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4TMPN04dBfz18MK6;
+	Sat, 27 Jan 2024 14:11:44 +0800 (CST)
+Received: from dggpemd200003.china.huawei.com (unknown [7.185.36.122])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0055818006D;
+	Sat, 27 Jan 2024 14:12:51 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.2) by
+ dggpemd200003.china.huawei.com (7.185.36.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.28; Sat, 27 Jan 2024 14:12:50 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<shenyang39@huawei.com>
+Subject: [PATCH] crypto: hisilicon/zip - Modify some data type and code cleanup
+Date: Sat, 27 Jan 2024 14:08:50 +0800
+Message-ID: <20240127060850.183186-1-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bef7737e-4b8e-4a89-b538-cd8e75874fd2@roeck-us.net>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemd200003.china.huawei.com (7.185.36.122)
 
-On Fri, Jan 26, 2024 at 03:55:02PM -0800, Guenter Roeck wrote:
-> Anyway, how did you find that ? Is there a magic trick to find the
-> actual code causing the warning ? I am asking because we had seen
-> similar warnings before, and it would help to know how to find the
-> problematic code.
+From: Yang Shen <shenyang39@huawei.com>
 
-The easiest way I have found is figuring out what primitive is causing
-the warning (memset, memcpy) then just commenting out the uses in the
-particular file until the warning goes away. Sometimes it is quick like
-in this case since there were only two instances of memcpy() in that
-file but other cases it can definitely take time. There could be
-potential issues with that approach if the problematic use is in a
-header, at which point you could generate a preprocessed ('.i') file and
-see where fortify_memcpy_chk() or fortify_memset_chk() come from in that
-file.
+Improve some inappropriate variable types to make variable expression more
+accurate.
 
-Cheers,
-Nathan
+Signed-off-by: Yang Shen <shenyang39@huawei.com>
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+---
+ drivers/crypto/hisilicon/zip/zip_main.c | 29 +++++++++++--------------
+ 1 file changed, 13 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 479ba8a1d6b5..b3e2b58ba7d7 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -809,21 +809,20 @@ DEFINE_SHOW_ATTRIBUTE(hisi_zip_regs);
+ 
+ static int hisi_zip_core_debug_init(struct hisi_qm *qm)
+ {
+-	u32 zip_core_num, zip_comp_core_num;
++	u32 zip_core_num, zip_comp_core_num, i;
+ 	struct device *dev = &qm->pdev->dev;
+ 	struct debugfs_regset32 *regset;
+ 	struct dentry *tmp_d;
+ 	char buf[HZIP_BUF_SIZE];
+-	int i;
+ 
+ 	zip_core_num = qm->cap_tables.dev_cap_table[ZIP_CORE_NUM_CAP_IDX].cap_val;
+ 	zip_comp_core_num = qm->cap_tables.dev_cap_table[ZIP_CLUSTER_COMP_NUM_CAP_IDX].cap_val;
+ 
+ 	for (i = 0; i < zip_core_num; i++) {
+ 		if (i < zip_comp_core_num)
+-			scnprintf(buf, sizeof(buf), "comp_core%d", i);
++			scnprintf(buf, sizeof(buf), "comp_core%u", i);
+ 		else
+-			scnprintf(buf, sizeof(buf), "decomp_core%d",
++			scnprintf(buf, sizeof(buf), "decomp_core%u",
+ 				  i - zip_comp_core_num);
+ 
+ 		regset = devm_kzalloc(dev, sizeof(*regset), GFP_KERNEL);
+@@ -850,7 +849,7 @@ static void hisi_zip_dfx_debug_init(struct hisi_qm *qm)
+ 	struct hisi_zip_dfx *dfx = &zip->dfx;
+ 	struct dentry *tmp_dir;
+ 	void *data;
+-	int i;
++	size_t i;
+ 
+ 	tmp_dir = debugfs_create_dir("zip_dfx", qm->debug.debug_root);
+ 	for (i = 0; i < ARRAY_SIZE(zip_dfx_files); i++) {
+@@ -923,7 +922,7 @@ static int hisi_zip_debugfs_init(struct hisi_qm *qm)
+ /* hisi_zip_debug_regs_clear() - clear the zip debug regs */
+ static void hisi_zip_debug_regs_clear(struct hisi_qm *qm)
+ {
+-	int i, j;
++	size_t i, j;
+ 
+ 	/* enable register read_clear bit */
+ 	writel(HZIP_RD_CNT_CLR_CE_EN, qm->io_base + HZIP_SOFT_CTRL_CNT_CLR_CE);
+@@ -952,12 +951,11 @@ static void hisi_zip_debugfs_exit(struct hisi_qm *qm)
+ 
+ static int hisi_zip_show_last_regs_init(struct hisi_qm *qm)
+ {
+-	int core_dfx_regs_num =  ARRAY_SIZE(hzip_dump_dfx_regs);
+-	int com_dfx_regs_num = ARRAY_SIZE(hzip_com_dfx_regs);
++	u32 core_dfx_regs_num =  ARRAY_SIZE(hzip_dump_dfx_regs);
++	u32 com_dfx_regs_num = ARRAY_SIZE(hzip_com_dfx_regs);
+ 	struct qm_debug *debug = &qm->debug;
++	u32 zip_core_num, i, j, idx;
+ 	void __iomem *io_base;
+-	u32 zip_core_num;
+-	int i, j, idx;
+ 
+ 	zip_core_num = qm->cap_tables.dev_cap_table[ZIP_CORE_NUM_CAP_IDX].cap_val;
+ 
+@@ -996,14 +994,13 @@ static void hisi_zip_show_last_regs_uninit(struct hisi_qm *qm)
+ 
+ static void hisi_zip_show_last_dfx_regs(struct hisi_qm *qm)
+ {
+-	int core_dfx_regs_num =  ARRAY_SIZE(hzip_dump_dfx_regs);
+-	int com_dfx_regs_num = ARRAY_SIZE(hzip_com_dfx_regs);
++	u32 core_dfx_regs_num =  ARRAY_SIZE(hzip_dump_dfx_regs);
++	u32 com_dfx_regs_num = ARRAY_SIZE(hzip_com_dfx_regs);
+ 	u32 zip_core_num, zip_comp_core_num;
+ 	struct qm_debug *debug = &qm->debug;
+ 	char buf[HZIP_BUF_SIZE];
+ 	void __iomem *base;
+-	int i, j, idx;
+-	u32 val;
++	u32 i, j, idx, val;
+ 
+ 	if (qm->fun_type == QM_HW_VF || !debug->last_words)
+ 		return;
+@@ -1020,9 +1017,9 @@ static void hisi_zip_show_last_dfx_regs(struct hisi_qm *qm)
+ 
+ 	for (i = 0; i < zip_core_num; i++) {
+ 		if (i < zip_comp_core_num)
+-			scnprintf(buf, sizeof(buf), "Comp_core-%d", i);
++			scnprintf(buf, sizeof(buf), "Comp_core-%u", i);
+ 		else
+-			scnprintf(buf, sizeof(buf), "Decomp_core-%d",
++			scnprintf(buf, sizeof(buf), "Decomp_core-%u",
+ 				  i - zip_comp_core_num);
+ 		base = qm->io_base + core_offsets[i];
+ 
+-- 
+2.30.0
+
