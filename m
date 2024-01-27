@@ -1,36 +1,36 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057C811CAF;
-	Sat, 27 Jan 2024 06:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF95812E6F
+	for <linux-crypto@vger.kernel.org>; Sat, 27 Jan 2024 07:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706335978; cv=none; b=GlX6Gu3OnbEslqdpiMwI78TG0mLA6Xi3boi0Rb2bdreThaQPnfpJ0TqQH0KaC+2oZXGjPYmNslNKqzZpkp2DtlhqC+hoIA154NEK89z07lC1RH/XhWQm/H84ZRVikEF7MBVIfcFTRVNy1HInNGiBHV890Sz3sJMQBkkc00Swnfo=
+	t=1706341824; cv=none; b=mJU4dyLEh9b9rX0J8FVERaQRpV0mGWsb5PB/Kniu6UU6p01cDwdb5IxH0528RdRFPz53gWKEC73HEKvfQdqRllPtx1ZhuoAF5SBaNhaxoTkcolM85wzXdjnxJP/AzTUCWzdVLpIuKZ0U2KsIkIuMTnbhLRxe+o7+YhEdDppANqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706335978; c=relaxed/simple;
-	bh=zsLMbN4rrmf2e1uZ1jmijWWUMOO1EeeZT0PwSCoPyqQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DdHj64QL7ZTjn4gt7fzPmjRJuKF7khekNKi2ydePhM3kZGKgnU1yaifWRwRqQ/fA6iwykgq3/U/ga9agOHIIyq0tfd0wYCfUVoJWV2s2Ajzwq7ioSlFHl8wIM9IQbXlg8201X+bihnIJFK+cAsw9p9Cw0FiNjX0qAspIUCr6W30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4TMPN04dBfz18MK6;
-	Sat, 27 Jan 2024 14:11:44 +0800 (CST)
-Received: from dggpemd200003.china.huawei.com (unknown [7.185.36.122])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0055818006D;
-	Sat, 27 Jan 2024 14:12:51 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- dggpemd200003.china.huawei.com (7.185.36.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1258.28; Sat, 27 Jan 2024 14:12:50 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<shenyang39@huawei.com>
-Subject: [PATCH] crypto: hisilicon/zip - Modify some data type and code cleanup
-Date: Sat, 27 Jan 2024 14:08:50 +0800
-Message-ID: <20240127060850.183186-1-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.30.0
+	s=arc-20240116; t=1706341824; c=relaxed/simple;
+	bh=ChJuRuerzeHs0UIpjC6hn9f2X1DSVAMhnBEcG6upaMM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Mn4Ppd1rAXwEWnewhKGSqgeXdI/VKKgqBl3wI4NpkXPzTJ/wgo8J1m6fIPaW7Nq/dP6lb1KmbdRw2v8HocLGinKwnfWRgtvZUmpYsI2/xtaSAeFfrOHPqswtEhgIQPHoGIckH6iElP/RonYX/iY7jSyVqCKK6hOJKjXhqDG/l0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ULuGNuhc; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ULuGNuhc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CB6DC433F1
+	for <linux-crypto@vger.kernel.org>; Sat, 27 Jan 2024 07:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706341823;
+	bh=ChJuRuerzeHs0UIpjC6hn9f2X1DSVAMhnBEcG6upaMM=;
+	h=From:To:Subject:Date:From;
+	b=ULuGNuhcF0PU00PhkI5EYmQy+MYgkAfo9TeeRPqr6R9O8T6qCepXLCLCEt5o8Mpn/
+	 IBv2S0oZoD8Fb8mLl+vUZwwOVVRw6HpEp+m6MIbnSi1W4BuC9pE7/EyKjNXX6aArQB
+	 YosRHHfh6ttTptUod/VpvDVI9WV/8pdkTTuueMr3v9ky3kxO8jXhXVy18gvujEMagT
+	 osFPzBV+05AfRCqCjYNchV4FsWiADGe/urRiMUjerc8rCdlHAx2mKqyK0MSksz5d+W
+	 PFFIR9HdFPvoZhd0O2fSnIOWpwz0mj451r/T7wbXf2YBY5rsaiAIKaJBoYLCb7KSV6
+	 RasoKkapeD8zA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: ahash - unexport crypto_hash_alg_has_setkey()
+Date: Fri, 26 Jan 2024 23:49:27 -0800
+Message-ID: <20240127074927.74282-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -38,114 +38,106 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemd200003.china.huawei.com (7.185.36.122)
 
-From: Yang Shen <shenyang39@huawei.com>
+From: Eric Biggers <ebiggers@google.com>
 
-Improve some inappropriate variable types to make variable expression more
-accurate.
+Since crypto_hash_alg_has_setkey() is only called from ahash.c itself,
+make it a static function.
 
-Signed-off-by: Yang Shen <shenyang39@huawei.com>
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/hisilicon/zip/zip_main.c | 29 +++++++++++--------------
- 1 file changed, 13 insertions(+), 16 deletions(-)
+ crypto/ahash.c                 | 21 ++++++++++-----------
+ include/crypto/internal/hash.h |  2 --
+ 2 files changed, 10 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 479ba8a1d6b5..b3e2b58ba7d7 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -809,21 +809,20 @@ DEFINE_SHOW_ATTRIBUTE(hisi_zip_regs);
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 80c3e5354711e..0ac83f7f701df 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -611,20 +611,30 @@ struct crypto_ahash *crypto_alloc_ahash(const char *alg_name, u32 type,
+ 	return crypto_alloc_tfm(alg_name, &crypto_ahash_type, type, mask);
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_ahash);
  
- static int hisi_zip_core_debug_init(struct hisi_qm *qm)
+ int crypto_has_ahash(const char *alg_name, u32 type, u32 mask)
  {
--	u32 zip_core_num, zip_comp_core_num;
-+	u32 zip_core_num, zip_comp_core_num, i;
- 	struct device *dev = &qm->pdev->dev;
- 	struct debugfs_regset32 *regset;
- 	struct dentry *tmp_d;
- 	char buf[HZIP_BUF_SIZE];
--	int i;
+ 	return crypto_type_has_alg(alg_name, &crypto_ahash_type, type, mask);
+ }
+ EXPORT_SYMBOL_GPL(crypto_has_ahash);
  
- 	zip_core_num = qm->cap_tables.dev_cap_table[ZIP_CORE_NUM_CAP_IDX].cap_val;
- 	zip_comp_core_num = qm->cap_tables.dev_cap_table[ZIP_CLUSTER_COMP_NUM_CAP_IDX].cap_val;
- 
- 	for (i = 0; i < zip_core_num; i++) {
- 		if (i < zip_comp_core_num)
--			scnprintf(buf, sizeof(buf), "comp_core%d", i);
-+			scnprintf(buf, sizeof(buf), "comp_core%u", i);
- 		else
--			scnprintf(buf, sizeof(buf), "decomp_core%d",
-+			scnprintf(buf, sizeof(buf), "decomp_core%u",
- 				  i - zip_comp_core_num);
- 
- 		regset = devm_kzalloc(dev, sizeof(*regset), GFP_KERNEL);
-@@ -850,7 +849,7 @@ static void hisi_zip_dfx_debug_init(struct hisi_qm *qm)
- 	struct hisi_zip_dfx *dfx = &zip->dfx;
- 	struct dentry *tmp_dir;
- 	void *data;
--	int i;
-+	size_t i;
- 
- 	tmp_dir = debugfs_create_dir("zip_dfx", qm->debug.debug_root);
- 	for (i = 0; i < ARRAY_SIZE(zip_dfx_files); i++) {
-@@ -923,7 +922,7 @@ static int hisi_zip_debugfs_init(struct hisi_qm *qm)
- /* hisi_zip_debug_regs_clear() - clear the zip debug regs */
- static void hisi_zip_debug_regs_clear(struct hisi_qm *qm)
++static bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg)
++{
++	struct crypto_alg *alg = &halg->base;
++
++	if (alg->cra_type == &crypto_shash_type)
++		return crypto_shash_alg_has_setkey(__crypto_shash_alg(alg));
++
++	return __crypto_ahash_alg(alg)->setkey != ahash_nosetkey;
++}
++
+ struct crypto_ahash *crypto_clone_ahash(struct crypto_ahash *hash)
  {
--	int i, j;
-+	size_t i, j;
+ 	struct hash_alg_common *halg = crypto_hash_alg_common(hash);
+ 	struct crypto_tfm *tfm = crypto_ahash_tfm(hash);
+ 	struct crypto_ahash *nhash;
+ 	struct ahash_alg *alg;
+ 	int err;
  
- 	/* enable register read_clear bit */
- 	writel(HZIP_RD_CNT_CLR_CE_EN, qm->io_base + HZIP_SOFT_CTRL_CNT_CLR_CE);
-@@ -952,12 +951,11 @@ static void hisi_zip_debugfs_exit(struct hisi_qm *qm)
+ 	if (!crypto_hash_alg_has_setkey(halg)) {
+ 		tfm = crypto_tfm_get(tfm);
+@@ -753,23 +763,12 @@ int ahash_register_instance(struct crypto_template *tmpl,
+ 		return -EINVAL;
  
- static int hisi_zip_show_last_regs_init(struct hisi_qm *qm)
+ 	err = ahash_prepare_alg(&inst->alg);
+ 	if (err)
+ 		return err;
+ 
+ 	return crypto_register_instance(tmpl, ahash_crypto_instance(inst));
+ }
+ EXPORT_SYMBOL_GPL(ahash_register_instance);
+ 
+-bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg)
+-{
+-	struct crypto_alg *alg = &halg->base;
+-
+-	if (alg->cra_type == &crypto_shash_type)
+-		return crypto_shash_alg_has_setkey(__crypto_shash_alg(alg));
+-
+-	return __crypto_ahash_alg(alg)->setkey != ahash_nosetkey;
+-}
+-EXPORT_SYMBOL_GPL(crypto_hash_alg_has_setkey);
+-
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Asynchronous cryptographic hash type");
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 59c707e4dea46..58967593b6b4d 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -80,22 +80,20 @@ static inline bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
  {
--	int core_dfx_regs_num =  ARRAY_SIZE(hzip_dump_dfx_regs);
--	int com_dfx_regs_num = ARRAY_SIZE(hzip_com_dfx_regs);
-+	u32 core_dfx_regs_num =  ARRAY_SIZE(hzip_dump_dfx_regs);
-+	u32 com_dfx_regs_num = ARRAY_SIZE(hzip_com_dfx_regs);
- 	struct qm_debug *debug = &qm->debug;
-+	u32 zip_core_num, i, j, idx;
- 	void __iomem *io_base;
--	u32 zip_core_num;
--	int i, j, idx;
+ 	return alg->setkey != shash_no_setkey;
+ }
  
- 	zip_core_num = qm->cap_tables.dev_cap_table[ZIP_CORE_NUM_CAP_IDX].cap_val;
- 
-@@ -996,14 +994,13 @@ static void hisi_zip_show_last_regs_uninit(struct hisi_qm *qm)
- 
- static void hisi_zip_show_last_dfx_regs(struct hisi_qm *qm)
+ static inline bool crypto_shash_alg_needs_key(struct shash_alg *alg)
  {
--	int core_dfx_regs_num =  ARRAY_SIZE(hzip_dump_dfx_regs);
--	int com_dfx_regs_num = ARRAY_SIZE(hzip_com_dfx_regs);
-+	u32 core_dfx_regs_num =  ARRAY_SIZE(hzip_dump_dfx_regs);
-+	u32 com_dfx_regs_num = ARRAY_SIZE(hzip_com_dfx_regs);
- 	u32 zip_core_num, zip_comp_core_num;
- 	struct qm_debug *debug = &qm->debug;
- 	char buf[HZIP_BUF_SIZE];
- 	void __iomem *base;
--	int i, j, idx;
--	u32 val;
-+	u32 i, j, idx, val;
+ 	return crypto_shash_alg_has_setkey(alg) &&
+ 		!(alg->base.cra_flags & CRYPTO_ALG_OPTIONAL_KEY);
+ }
  
- 	if (qm->fun_type == QM_HW_VF || !debug->last_words)
- 		return;
-@@ -1020,9 +1017,9 @@ static void hisi_zip_show_last_dfx_regs(struct hisi_qm *qm)
+-bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg);
+-
+ int crypto_grab_ahash(struct crypto_ahash_spawn *spawn,
+ 		      struct crypto_instance *inst,
+ 		      const char *name, u32 type, u32 mask);
  
- 	for (i = 0; i < zip_core_num; i++) {
- 		if (i < zip_comp_core_num)
--			scnprintf(buf, sizeof(buf), "Comp_core-%d", i);
-+			scnprintf(buf, sizeof(buf), "Comp_core-%u", i);
- 		else
--			scnprintf(buf, sizeof(buf), "Decomp_core-%d",
-+			scnprintf(buf, sizeof(buf), "Decomp_core-%u",
- 				  i - zip_comp_core_num);
- 		base = qm->io_base + core_offsets[i];
+ static inline void crypto_drop_ahash(struct crypto_ahash_spawn *spawn)
+ {
+ 	crypto_drop_spawn(&spawn->base);
+ }
  
+ static inline struct hash_alg_common *crypto_spawn_ahash_alg(
+
+base-commit: 4d314d27130b674a3687135fe94f44a40f107f76
 -- 
-2.30.0
+2.43.0
 
