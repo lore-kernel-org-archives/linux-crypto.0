@@ -1,89 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5FA7F;
-	Sat, 27 Jan 2024 09:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514281E869;
+	Sat, 27 Jan 2024 11:42:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706346084; cv=none; b=d0hwB7fXPiWNHCVRpklKI3/tICWf+EdBopwaNkYg4DMH9SSbTwgOjEecP02zY++Gn5c1WtMFtWW6WV0OKRGGGf8S92PAedxyDb6ki0obBx/2xL0f/GvpySybYuIGlheG0O505TqslwY4Fbnilz0PYZSyaW9VtQC8Y64/QOrwvH4=
+	t=1706355776; cv=none; b=m4CoccuxWjVdLMxYfnsDDPUS0uUGa1QUeIbits8BRvLzRJ0+mjmwMnkR2cUZ1n9tlzxQyVPLS1xG0/p9U6CzAdCoHnTBMnBja7zl0aF7+s8p+tJ/bSum4DvteQAlNI9uSVVA/btKWzWgm42khLxV4q34xFaI4Q48mrtgDwnYCz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706346084; c=relaxed/simple;
-	bh=hpNFNF09+4R9C/NT6J2wtQJfi2pvjGg8peeFOWYXxjU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EGMxw4f1VmpcWHIlBTijqgYuQkQW8mp1cudzArBhm6gijuv6Rma5u6Pl3AqNN/C/g7aBa5AaoDDA/GbmOuwKxysEZTyKPgsP1BAnQ4P/cIBANQnomGG7S4N4y7Vr75Q5IxqbxSEvRJuLPdS6aqDALQTSem8YMkhA3/+nnCPP72o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H68dCSkY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706355776; c=relaxed/simple;
+	bh=nAOcTFP3pwvvDUbQsgTedOGhxngX6Aj/2e6lzNcC4KI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZF4ed+98TDlcxjkWGRzP7FySZe2CdD2z7wlvQj/7+DdrU1iodYtvjXZNSIvQRB9LsLwewVThAO0+m4pzoEZ9ILjH3fnRnYFQcA433UnNmCUe76Gs6YWqWyiLnM7XF+/bpUEOrtwc48bwV9RD3nzu6wyLA39E2emgVoekbN/4cN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=eC4rs6Wd; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H68dCSkY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37BCAC433F1;
-	Sat, 27 Jan 2024 09:01:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706346083;
-	bh=hpNFNF09+4R9C/NT6J2wtQJfi2pvjGg8peeFOWYXxjU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=H68dCSkYteFymi0Fxr4ZLnTtDfhc3iBgtp7a90RfidyQYu69r1r6CihH13IS38xKA
-	 7Y6lvWBv2gcFEyLZ7+znoLsJ18B01ysbSi7TqxpUNXJDjWLhRejbBDgMlFauFXh4ho
-	 PgX1lKteFbkEBIRK/boTZP8jxy8/KPzdwQ8qfbuK5SkmfjbayN6IDNPQrhOI0VvkMJ
-	 NGevEz43xgBNX1hKceUzic8Bw2t3RuDqq3ZNOQxH75u0u5SfE8UY/gIOE4ozUeGeuB
-	 LszLbDcljUQ2hOZ4ZAmeCkoYlvD5m4F4pw116jSOeoKtfeSDfZIdObP++x9JedU1FS
-	 k2tgGoKo1zjrQ==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-riscv@lists.infradead.org
-Cc: linux-crypto@vger.kernel.org,
-	llvm@lists.linux.dev,
-	Brandon Wu <brandon.wu@sifive.com>,
-	Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH] RISC-V: fix check for zvkb with tip-of-tree clang
-Date: Sat, 27 Jan 2024 01:00:54 -0800
-Message-ID: <20240127090055.124336-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="eC4rs6Wd"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4F3AA40E0196;
+	Sat, 27 Jan 2024 11:42:51 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id CIObjHhXZrUT; Sat, 27 Jan 2024 11:42:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1706355768; bh=Z+24pU73zrvlVW/zZsFzlGVxb2gSvEeHL9ZKSaOfvm8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eC4rs6WdjoEAKl2hlM4DT8Ngyn7hIzO1XtLqEGVdcosggtPTaawBo0zgWCPYL0fp0
+	 tXHcSXmV9rsQa1LznoqFpESHm5PRtL6p7P9t91N+pCjdpT1nUmTFRfqvLzPi4yPncD
+	 AbFcv6pi0dgWN3pzy7KBBMK5uYvXEf1+cCbxD3wogXe/gdKmqYtCs1R723GFv2uqTF
+	 r9qdDIguH8bY6RrAQRDKIbyGKezDOrtTmgibvnjyMAPZ/mcYg+iNHpb6Qbq+lpoYaG
+	 h/H3Xzhi5LwTQxppVDMluSTI+kUEINJjQkBkOVUlhk/xseeqzpv8bH0wc7bp0u2Sbc
+	 bPelKuYVSeN74fAIy+GORMmBwW3Q0wjtRqCjXPfImX6pM3GEF6+1w8uetPJmV2MDsf
+	 gmF1XSHCxkf1VTEMBYkknctBJfZrPSlBy5xIfAzqUf83N3nAJlCBEZg0vtyhS/2XwG
+	 Mx6ApzoIcVSR17zE4NkrPPRoHVJ1e46DR3F24AYYrzcEQo2JQvwE3NNP3BXz/wY4Eh
+	 f+j7/Rox/xWnB99wp6N7L8V+buOHpbNVVEAC2hNWsfizH9XIRtc1rFJXd6yXzU2VqM
+	 9bGD1cD5mLnomB2H9Xxv5PJslPh068zLfH20RKayB50XALaa6PGfV1mhv1/y6bhKqu
+	 pKzTDG5kVuhAuqJOMmtPjZy0=
+Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7310540E016C;
+	Sat, 27 Jan 2024 11:42:12 +0000 (UTC)
+Date: Sat, 27 Jan 2024 12:42:07 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com
+Subject: Re: [PATCH v2 11/25] x86/sev: Adjust directmap to avoid inadvertant
+ RMP faults
+Message-ID: <20240127114207.GBZbTsDyC3hFq8pQ3D@fat_crate.local>
+References: <20240126041126.1927228-1-michael.roth@amd.com>
+ <20240126041126.1927228-12-michael.roth@amd.com>
+ <20240126153451.GDZbPRG3KxaQik-0aY@fat_crate.local>
+ <20240126170415.f7r4nvsrzgpzcrzv@amd.com>
+ <20240126184340.GEZbP9XA13X91-eybA@fat_crate.local>
+ <20240126235420.mu644waj2eyoxqx6@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240126235420.mu644waj2eyoxqx6@amd.com>
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, Jan 26, 2024 at 05:54:20PM -0600, Michael Roth wrote:
+> Is something like this close to what you're thinking? I've re-tested with
+> SNP guests and it seems to work as expected.
+> 
+> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+> index 846e9e53dff0..c09497487c08 100644
+> --- a/arch/x86/virt/svm/sev.c
+> +++ b/arch/x86/virt/svm/sev.c
+> @@ -421,7 +421,12 @@ static int adjust_direct_map(u64 pfn, int rmp_level)
+>         if (WARN_ON_ONCE(rmp_level > PG_LEVEL_2M))
+>                 return -EINVAL;
+> 
+> -       if (WARN_ON_ONCE(rmp_level == PG_LEVEL_2M && !IS_ALIGNED(pfn, PTRS_PER_PMD)))
+> +       if (!pfn_valid(pfn))
 
-LLVM commit 8e01042da9d3 ("[RISCV] Add missing dependency check for Zvkb
-(#79467)") broke the check used by the TOOLCHAIN_HAS_VECTOR_CRYPTO
-kconfig symbol because it made zvkb start depending on v or zve*.  Fix
-this by specifying both v and zvkb when checking for support for zvkb.
+_text at VA 0xffffffff81000000 is also a valid pfn so no, this is not
+enough.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/riscv/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Either this function should not have "direct map" in the name as it
+converts *any* valid pfn not just the direct map ones or it should check
+whether the pfn belongs to the direct map range.
 
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index b49016bb5077b..912fff31492b9 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -581,21 +581,21 @@ config TOOLCHAIN_HAS_ZBB
- 	default y
- 	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64ima_zbb)
- 	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_zbb)
- 	depends on LLD_VERSION >= 150000 || LD_VERSION >= 23900
- 	depends on AS_HAS_OPTION_ARCH
- 
- # This symbol indicates that the toolchain supports all v1.0 vector crypto
- # extensions, including Zvk*, Zvbb, and Zvbc.  LLVM added all of these at once.
- # binutils added all except Zvkb, then added Zvkb.  So we just check for Zvkb.
- config TOOLCHAIN_HAS_VECTOR_CRYPTO
--	def_bool $(as-instr, .option arch$(comma) +zvkb)
-+	def_bool $(as-instr, .option arch$(comma) +v$(comma) +zvkb)
- 	depends on AS_HAS_OPTION_ARCH
- 
- config RISCV_ISA_ZBB
- 	bool "Zbb extension support for bit manipulation instructions"
- 	depends on TOOLCHAIN_HAS_ZBB
- 	depends on MMU
- 	depends on RISCV_ALTERNATIVE
- 	default y
- 	help
- 	   Adds support to dynamically detect the presence of the ZBB
+Thx.
 
-base-commit: cb4ede926134a65bc3bf90ed58dace8451d7e759
 -- 
-2.43.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
