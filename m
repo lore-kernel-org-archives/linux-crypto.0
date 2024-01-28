@@ -1,200 +1,283 @@
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF40802;
-	Sun, 28 Jan 2024 04:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.166.238
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706416216; cv=fail; b=Ypx24Y14v1ijeTQ04GfYWfWVCv9J3Po5eyv2gjICOS6WgPkUUcDCp71jPs59tWNHlldyt9OcTl1G3FUnioTTilDE87OjYViitQNdJ6y9l2DfqV6aL9WrxiiHWrs1WUKFUomqtKmUOS2317+sNnKukl4lbuFoGIc0wKhx/yggXIc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706416216; c=relaxed/simple;
-	bh=CMcx+HyDVx6kOCk4/RwVQRb9BKeNA0hm25MfZulnFNw=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=kFPyXuKxkaSxv90rgNEtjbEAalgGRGTh6zEWCIoHjTIKDiitZ0+AMJu3Sy65d8uEMFGhpzg4wCCl15zsf/7UThJC/O9bqrbd2zxX521q4eilLiOpgSUk/nepjNzhqRvUh0OYvko5yKrIGhVHFf4TiN+kyj7LTwdMXl4uplLANO4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=MsZ1r1AM; arc=fail smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31771EB22
+	for <linux-crypto@vger.kernel.org>; Sun, 28 Jan 2024 11:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706440392; cv=none; b=NLLWAN7L9BODS/39P7C+BpBy72egEolziu9UgByjxHd/Bo9Oq/7kLDAOvtNQNrsRepq6tkyzLO2LYa4vYZUWMy4hwikfsGr4G3g0dV2uvrWmS5og70O51dbpBI17MLGyR6BHt5+2aoqY1LQrepHB8ZfHvqw1ioMXWZLduh/HxyA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706440392; c=relaxed/simple;
+	bh=YjsxHOt4tWyCdJTuimtgU/jG1rOZovQCMQl3k6T1wpw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A5w1Ico5Bvf4Ly1zUdfzlZBK4/SDPakwxIr69Ln9b8gNnn7KVa8Ut5OGfyO8yYLihxCPjql6vVEcop+DJye9BE6fl/uaoU+2zzJa5zft4/qN2sWp+VOQsnrpfp+VzfQau9Me32+EW8eu2LE6IuD+aw8KUvlHnDTRd6RAD+PU6zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R0bOUokI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="MsZ1r1AM"
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40S4TiNg013077;
-	Sat, 27 Jan 2024 20:29:44 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=from:to:cc:subject:date:message-id:content-transfer-encoding
-	:content-type:mime-version; s=PPS06212021; bh=solEeJm6YKb3PqyZGK
-	iMtT+oQhfT85NJMFCceBi78l0=; b=MsZ1r1AM+3wotyO0Y74lam7QCNJ0O5Vvdt
-	SezVkA6A7yt9YWCEpnOwIePLnlEdssExgdS9IZ0jUVGVJ5BSe90mboUcnGaECVyP
-	JpRe+qMoi2xquc8OiI/qXodeHBJAEBykjhImOGETK003LfXeuEP3QgjVOGYyX2qq
-	r3+ffFmt218v0QsosiQYzEd8PZJRar220jupuiZTKXKGvdhhxxrpukTIyOaUJxfX
-	3d5l1W3DI2w4x2bKAN68lufQ3GQwPjmRDm3t3BhzJQNuQreHKSOlMlKDfuL6r5ey
-	+20+66Tf5hRbD8I8Fc3ELbPhBiku4y/bQfBY4kDtN3U4Uc+B2vKg==
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2041.outbound.protection.outlook.com [104.47.56.41])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3vw27kre4r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 27 Jan 2024 20:29:44 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oH2Gg5LrmCz3wJRnR3yHjG/1sQ+dbVi2HJz8/P97L6713xKS1+cFSD6QCTmoPmrSG9jTLMNwqEQpLLms3nF5puAkuk98SQntGUqmyIhwWsi6+EaVM9SpimaLlVnoIP1+tVBxJ1xTjLP9AIoBfLTlpMIgiDWVcpII4N6D27jq5WBbkwUR4gpKzdbGObWcU8J9J+o+jlRs7HhOwhmHODKett2OeujeLDeD5OkYD2gZ8bu1C22B63e3S+KLsUfS2OHTh/iQUIKbAZ8w6u9/4FdnV/WOgE/D5DhCWG2jAjgR6XRP8PH9jg0JCA2s0dn3WJRvOZIGetUv487/IKVrG1tZgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=solEeJm6YKb3PqyZGKiMtT+oQhfT85NJMFCceBi78l0=;
- b=KpYevn8Tn/MGr5XhJBamSi0CpbMRsa3fHicwjjHVZf6jw+wEyfauis4nppZ0nFQ6aMMmc/TKass0xfm7nxR2Lewe2nd++yIzFO97NPqBkd5sD5vFXFcpVgFhgHjQVh8nuwZ0S2+YL+gM1WdFQu1Jyu8zzTmNo2DBVdq6HdvhsoahNC57Gk76vlLdU9+8U4a3Xf1dHhhBWovOUpSNqWd+p+AMpF9dYzsoGLr2BylhEYgtUhPPdsksu2Ali8HH6Hb3s6cqfHqc0vxj8xYpmyVuO2hb9fI8qnF0uONd06LDzOdKHcyHyrAVo/wlxz8OOaHGY3kgHSKGwEOveIi9qBSaMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-Received: from IA0PR11MB7402.namprd11.prod.outlook.com (2603:10b6:208:432::21)
- by SJ2PR11MB7672.namprd11.prod.outlook.com (2603:10b6:a03:4cd::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.31; Sun, 28 Jan
- 2024 04:29:38 +0000
-Received: from IA0PR11MB7402.namprd11.prod.outlook.com
- ([fe80::740d:39ba:9695:b0a5]) by IA0PR11MB7402.namprd11.prod.outlook.com
- ([fe80::740d:39ba:9695:b0a5%4]) with mapi id 15.20.7228.029; Sun, 28 Jan 2024
- 04:29:37 +0000
-From: quanyang.wang@windriver.com
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Michal Simek <michal.simek@amd.com>
-Cc: Rob Herring <robh@kernel.org>,
-        =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        Quanyang Wang <quanyang.wang@windriver.com>
-Subject: [PATCH] crypto: xilinx: call finalize with bh disabled
-Date: Sun, 28 Jan 2024 12:29:06 +0800
-Message-Id: <20240128042906.557038-1-quanyang.wang@windriver.com>
-X-Mailer: git-send-email 2.36.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2PR02CA0005.apcprd02.prod.outlook.com
- (2603:1096:4:194::6) To IA0PR11MB7402.namprd11.prod.outlook.com
- (2603:10b6:208:432::21)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R0bOUokI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706440389;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CSNy3hGfgBOZXh5HJ7aSuvkcMf5sEzqK7aR6BtJy+rs=;
+	b=R0bOUokI+b/gqhgVRwHEETgOuIb4DUazsCGWFy1s+tIq0N6E0s4nOIobXvp3c2r/Jg/W9E
+	EFQKd0Y5GwY8jkn5jloIARoVW8LtMPou6EzMv139jxp0S4s4/YHJIpLqtCOEg3Ncn3+wyd
+	FV5SuuFPYc/gNCrRErWObiBPdqStEiE=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-20-FBsJKR4oMJmqU8KDZw4iOw-1; Sun, 28 Jan 2024 06:13:07 -0500
+X-MC-Unique: FBsJKR4oMJmqU8KDZw4iOw-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-54554ea191bso823192a12.2
+        for <linux-crypto@vger.kernel.org>; Sun, 28 Jan 2024 03:13:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706440386; x=1707045186;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CSNy3hGfgBOZXh5HJ7aSuvkcMf5sEzqK7aR6BtJy+rs=;
+        b=Nwpr8HEO+E9TYeiCiwxVFFpDt92SMOpG2GHOtK/2zbwhy1TPrvYb4p/YalpqJ1BvsN
+         9PwJT0djCSZdvfB+ygm5+Ifws851xHjFWl5hCUGHUeJoURnioqcv2p1uLbR42JwSjPPO
+         Y5XoS01PwICOKTjscO/6dEjqHGa9oHrYqHmrZfd+kfI/SJ21o3PDiwV55Fh5KBbsVzxq
+         ANatyvJ6GvpR59A6PEWPwAzezYe731st2w9S7zxtV0Rw3akUUUTVM0zGG+0Rk4nZIVwJ
+         3TVztV+sP4Pgmfy8n2U6d95mRkTdr1AvV7LW2L9JAQFFh1kPjzOXvJ3ZXRCg6g9H7vd+
+         nt/w==
+X-Gm-Message-State: AOJu0YzEgSOxX/f9rueFTTPoFvx3Ti+tBtJGcSvIO9RNnG+IlL/RVfp/
+	QKIdG144RgiTV2tBacVakfkEk7duEDHYhOgc8bl2tPWjwCTOE+mgDEGdU0NSp/HwMD8AjyXdq5b
+	mjNNk9XJ6WBSvmWkkQeImQOBfMon40lOTGXpYI1wJCEh951V+wC0hkaUQlhRYuQ==
+X-Received: by 2002:a05:6402:35c4:b0:559:3583:bb6d with SMTP id z4-20020a05640235c400b005593583bb6dmr2513819edc.32.1706440386132;
+        Sun, 28 Jan 2024 03:13:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHO4+zS2ikKQXpXzKl7d9R8QWe1EjS5JACKDAyMhVe/Pnh4ZYWUTbIpgJtOc0lzL8TXZByeUw==
+X-Received: by 2002:a05:6402:35c4:b0:559:3583:bb6d with SMTP id z4-20020a05640235c400b005593583bb6dmr2513797edc.32.1706440385706;
+        Sun, 28 Jan 2024 03:13:05 -0800 (PST)
+Received: from redhat.com ([2a02:14f:17b:70ae:658f:adde:5091:c5dd])
+        by smtp.gmail.com with ESMTPSA id x6-20020a056402414600b0055d36e6f1a7sm2393638eda.82.2024.01.28.03.13.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Jan 2024 03:13:04 -0800 (PST)
+Date: Sun, 28 Jan 2024 06:13:00 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Nathan Chancellor <nathan@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	stable@vger.kernel.org, patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
+	llvm@lists.linux.dev, keescook@chromium.org,
+	arei.gonglei@huawei.com, jasowang@redhat.com,
+	virtualization@lists.linux.dev, linux-crypto@vger.kernel.org,
+	Wei Yongjun <weiyongjun1@huawei.com>
+Subject: Re: [PATCH 5.10 000/286] 5.10.209-rc1 review
+Message-ID: <20240128055533-mutt-send-email-mst@kernel.org>
+References: <20240122235732.009174833@linuxfoundation.org>
+ <6b563537-b62f-428e-96d1-2a228da99077@roeck-us.net>
+ <2024012636-clubbed-radial-1997@gregkh>
+ <2f342268-8517-4c06-8785-96a588d20c63@roeck-us.net>
+ <20240126203436.GA913905@dev-arch.thelio-3990X>
+ <0a194a79-e3a3-45e7-be98-83abd3e1cb7e@roeck-us.net>
+ <20240126223554.GA1320833@dev-arch.thelio-3990X>
+ <bef7737e-4b8e-4a89-b538-cd8e75874fd2@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PR11MB7402:EE_|SJ2PR11MB7672:EE_
-X-MS-Office365-Filtering-Correlation-Id: f9f4000e-ea82-4c70-5a63-08dc1fb9bc72
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	s+tEcCVHEvDc30AQrKjji6zwq1gC+CeZpYHNoGxlKcpOLzeHyF2lgYRaiTlqVpZbflXHlLJQKegNuAASeR7xGUcG7EO7Xh4+rXdPa0EHb97c/LRQpU75RGXvLl3C+ZKiqB2fjmpOjG/MGgypOsTzUO7UsJSSHuXu1mHZhK3duvMxXE9nHMhe6d2bwmIO1ZtYoRv5Mdx3TGOqQScz2eXVt3yVWLCcICx4PznEumclBnXT2pTlp6y4JdxS4krFYdzPdq5Vt6k/ZpfYgf5zUWIHVUrZJ0P/FgICi3ToiBbExyjW/wn7u2JPqdqE8nzYoRjQRsHijENf5E1lvYQAbIUW2bbxqQsxGQe7qrSI1z8g/crxEs55fbpd2SQxCWJi0u/sSmvABeEEg89QNdg0wuZtIj1/gp5ZACjskZLHGjqxVnBnDnb4wVfGeC8we7FWzemZYZmgCbfBhhbATc4FvjYtuQGlHnc42o00/7p+7kYemZBcWbqAoL7YJs8iRyllTJjgDORYnhbGIHd0jiiPx0ivEFQRaSkWxRwHkeyKHy8ZquPKWBTxQbqSjxifWT4k36/TVJIXwAcGs0CBty1ut8JKYhqX0RVkY9RnH0Z+74vNss4OintOtPfAkaE3V2g9sGmDXycBpgcNECuf3Vj2HdvfVPFka1iQhVsOFAoqKyf4qGE=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR11MB7402.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(366004)(376002)(396003)(39850400004)(230173577357003)(230922051799003)(230273577357003)(1800799012)(64100799003)(186009)(451199024)(8936002)(8676002)(4326008)(2906002)(5660300002)(86362001)(110136005)(66946007)(66556008)(66476007)(54906003)(316002)(38350700005)(36756003)(38100700002)(6506007)(52116002)(9686003)(6512007)(478600001)(6486002)(45080400002)(6666004)(83380400001)(26005)(1076003)(107886003)(2616005)(41300700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?k9NckFh1cgPGSHvV5D5tUusEyorowe3ThL1s1Ia/gLOhCLZnWbEXdia8geDK?=
- =?us-ascii?Q?xGAvLcJx0UNy29Rug19rEShqg3s5DLKxo58mROUVnqxA7bnx2XUpjSQcFN3m?=
- =?us-ascii?Q?TO7wT8P4MqJkYwyhM5DuIXsF13P1fsRYGcoyy1KR94TkfOP8Dc5rN/IljE+1?=
- =?us-ascii?Q?un1UFaUTyWP+wSukT08+LpwsN5WsAG1WT/DwSfHSchD8Z/gwwMdEtaRnSDFx?=
- =?us-ascii?Q?Jn0v9SoDN+R+crdwP3px9M/5XRs9GI90H3IDR3bTDxx2M/8BRxrxECu+lbEo?=
- =?us-ascii?Q?wbnR/0mOHRmGQX/I7GJTnwNTPUsxLyhT6XUN0rF55rlmw4+9UECl0am9SPL1?=
- =?us-ascii?Q?AVfs5Aen3nzFwCyO+YN1evvB4YroidgLufFSkULdf7T8Wuw4yrPa8NYDt/pa?=
- =?us-ascii?Q?gFybRvSunc20fs7Orq2sVCBaF8S5Ptm+gr0yVN/S7n4doHVhzNil53KQ7Y0D?=
- =?us-ascii?Q?CcuKbuAAMHta0kjEDLOT0MvcY1PV03Y5hr8A7GgRwAdHk2Kp+rlgjG3WmGJi?=
- =?us-ascii?Q?MsPpE6CHNgBfHq5lJzgQlTju3DYU1JCs4qMKxuzrHUeLJKc4B/QgM7Rd0xml?=
- =?us-ascii?Q?jm8zIC1c0X9w6ZBh8kggY8P8M5ylYaHyRWvL/Wv7vOTHvs+P1ikEcyswLg7z?=
- =?us-ascii?Q?PkyKGF2/QVDJxXS4o0JvuLeaKbnFS+bBb9UCmLJCS2dPKuy0iDP7f0iYwug7?=
- =?us-ascii?Q?sxMOnAPhT+vzJImQfDs6M5ZX0OWUtsdl2937oyt5M0NKoFIVBYLUJuYTpaoX?=
- =?us-ascii?Q?Q/7O65Ik8DUoegI0QhHjIDL7K4Tutegr+/xc+WozeI5pVXKLJbVN6Kk+7ol+?=
- =?us-ascii?Q?oyRrrsdHM4AEw8XQEMEbPXQqy5lNoA97UkFgRTnxWkETOl4VvGMOGwobiiOL?=
- =?us-ascii?Q?p4mekRBCfau8NZ80kBZsx7ccV+uq/RBrybF2T2ThVmxhuAOdms4e0ldlh2CZ?=
- =?us-ascii?Q?6hXUzeWxmjhZF0LYlfjIHFighg24ClanKMwwtCVa/wZYAbeX+54RaVvepQiM?=
- =?us-ascii?Q?gEQ2VRP0isFVTwvp0q/22+G8gvc8HYqlESpN94XhO+yhH5RpxyW++e7aLago?=
- =?us-ascii?Q?VY5jY7NNp8HR/ITvwX+4YEvWH/5OxuGNtsPZ75MbpjQqZM4HHfW2sqsAG3CL?=
- =?us-ascii?Q?rBItIwkw5q8jqK5ctAJDyi7fFgeT27qUJufk6JbJQVKGp1myStLLDQZekjEf?=
- =?us-ascii?Q?iCOnB7hzE50M2Zv5/I9HTXn7Arc8waMzbOMz4/2zdiuO7DdLnz5yaYpOBTCx?=
- =?us-ascii?Q?626ZUKyhBewZRfjGE9Io+A6SQXMlpyO7gYuJt6SsHRBSpFa/PoumjDCbaDWZ?=
- =?us-ascii?Q?fbm547KnQqSB4Y6hLPFx1io8aRa3fIoWhTZpU8Pv9GOTazcd5hknQ8B2hk46?=
- =?us-ascii?Q?u7VM0Op6dt65twoZxMAPZypFN0UtvoGUHcQyN4H6b2gYxr6Hp8ufZTQ3Zacd?=
- =?us-ascii?Q?ajzsWLQUfDZPwZxVuTZ3joIOgez912rfAQGlZDCcLd2NdOdLc/et9Lru12D3?=
- =?us-ascii?Q?6eamDGNV0ELs1RjilIf/5Pe4RLMlDgAO6ZFEQ64FL/y25M497Kccyzd08c6a?=
- =?us-ascii?Q?Fk3MciVTZ5DaMZEU3Vq2tSn+EO3BuHxu1VhkcgLXTpiu5Zg3D5s04MkYB2UG?=
- =?us-ascii?Q?Rg=3D=3D?=
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9f4000e-ea82-4c70-5a63-08dc1fb9bc72
-X-MS-Exchange-CrossTenant-AuthSource: IA0PR11MB7402.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2024 04:29:37.2460
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jQ9KmIw9jwRpmGh9j6gzzpEjNSGGy5clCABovDpDG6oR1km9upjT0kSByuk4+OZ0c7lfyVLiDES0vquUo56jdb4ZlptI3vid9zBlJHpEdKo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7672
-X-Proofpoint-GUID: qUXDgUUcDhpDsU4Tr7DHnzULifxRPUoD
-X-Proofpoint-ORIG-GUID: qUXDgUUcDhpDsU4Tr7DHnzULifxRPUoD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-25_14,2024-01-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 adultscore=0 mlxlogscore=705 mlxscore=0 bulkscore=0
- clxscore=1011 priorityscore=1501 phishscore=0 spamscore=0 impostorscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401190000 definitions=main-2401280030
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bef7737e-4b8e-4a89-b538-cd8e75874fd2@roeck-us.net>
 
-From: Quanyang Wang <quanyang.wang@windriver.com>
+On Fri, Jan 26, 2024 at 03:55:02PM -0800, Guenter Roeck wrote:
+> On 1/26/24 14:35, Nathan Chancellor wrote:
+> > (slimming up the CC list, I don't think this is too relevant to the
+> > wider stable community)
+> > 
+> > On Fri, Jan 26, 2024 at 01:01:15PM -0800, Guenter Roeck wrote:
+> > > On 1/26/24 12:34, Nathan Chancellor wrote:
+> > > > On Fri, Jan 26, 2024 at 10:17:23AM -0800, Guenter Roeck wrote:
+> > > > > On 1/26/24 09:51, Greg Kroah-Hartman wrote:
+> > > > > > On Fri, Jan 26, 2024 at 08:46:42AM -0800, Guenter Roeck wrote:
+> > > > > > > On 1/22/24 15:55, Greg Kroah-Hartman wrote:
+> > > > > > > > This is the start of the stable review cycle for the 5.10.209 release.
+> > > > > > > > There are 286 patches in this series, all will be posted as a response
+> > > > > > > > to this one.  If anyone has any issues with these being applied, please
+> > > > > > > > let me know.
+> > > > > > > > 
+> > > > > > > > Responses should be made by Wed, 24 Jan 2024 23:56:49 +0000.
+> > > > > > > > Anything received after that time might be too late.
+> > > > > > > > 
+> > > > > > > [ ... ]
+> > > > > > > 
+> > > > > > > > zhenwei pi <pizhenwei@bytedance.com>
+> > > > > > > >         virtio-crypto: implement RSA algorithm
+> > > > > > > > 
+> > > > > > > 
+> > > > > > > Curious: Why was this (and its subsequent fixes) backported to v5.10.y ?
+> > > > > > > It is quite beyond a bug fix. Also, unless I am really missing something,
+> > > > > > > the series (or at least this patch) was not applied to v5.15.y, so we now
+> > > > > > > have functionality in v5.10.y which is not in v5.15.y.
+> > > > > > 
+> > > > > > See the commit text, it was a dependency of a later fix and documented
+> > > > > > as such.
+> > > > > > 
+> > > > > > Having it in 5.10 and not 5.15 is a bit odd, I agree, so patches are
+> > > > > > gladly accepted :)
+> > > > > > 
+> > > > > 
+> > > > > We reverted the entire series from the merge because it results in a build
+> > > > > failure for us.
+> > > > > 
+> > > > > In file included from /home/groeck/src/linux-chromeos/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c:10:
+> > > > > In file included from /home/groeck/src/linux-chromeos/include/linux/mpi.h:21:
+> > > > > In file included from /home/groeck/src/linux-chromeos/include/linux/scatterlist.h:5:
+> > > > > In file included from /home/groeck/src/linux-chromeos/include/linux/string.h:293:
+> > > > > /home/groeck/src/linux-chromeos/include/linux/fortify-string.h:512:4: error: call to __read_overflow2_field declared with 'warning' attribute: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
+> > > > >                           __read_overflow2_field(q_size_field, size);
+> > > > 
+> > > > For what it's worth, this is likely self inflicted for chromeos-5.10,
+> > > > which carries a revert of commit eaafc590053b ("fortify: Explicitly
+> > > > disable Clang support") as commit c19861d34c003 ("CHROMIUM: Revert
+> > > > "fortify: Explicitly disable Clang support""). I don't see the series
+> > > > that added proper support for clang to fortify in 5.18 that ended with
+> > > > commit 281d0c962752 ("fortify: Add Clang support") in that ChromeOS
+> > > > branch, so this seems somewhat expected.
+> > > > 
+> > > 
+> > > That explains that ;-). I don't mind if the patches stay in v5.10.y,
+> > > we have them reverted anyway.
+> > > 
+> > > The revert was a pure process issue, as you may see when looking into
+> > > commit c19861d34c003, so, yes, I agree that it is self-inflicted damage.
+> > > Still, that doesn't explain why the problem exists in 5.18+.
+> > > 
+> > > > > I also see that upstream (starting with 6.1) when trying to build it with clang,
+> > > > > so I guess it is one of those bug-for-bug compatibility things. I really have
+> > > > > no idea what causes it, or why we don't see the problem when building
+> > > > > chromeos-6.1 or chromeos-6.6, but (so far) only with chromeos-5.10 after
+> > > > > merging 5.10.209 into it. Making things worse, the problem isn't _always_
+> > > > > seen. Sometimes I can compile the file in 6.1.y without error, sometimes not.
+> > > > > I have no idea what triggers the problem.
+> > > > 
+> > > > Have a .config that reproduces it on upstream? I have not personally
+> > > > seen this warning in my build matrix nor has our continuous-integration
+> > > > matrix (I don't see it in the warning output at the bottom but that
+> > > > could have missed something for some reason) in 6.1:
+> > > > 
+> > > 
+> > > The following command sequence reproduces the problem for me with all stable
+> > > branches starting with 5.18.y (plus mainline).
+> > > 
+> > > rm -rf /tmp/crypto-build
+> > > mkdir /tmp/crypto-build
+> > > make -j CC=clang-15 mrproper >/dev/null 2>&1
+> > > make -j O=/tmp/crypto-build CC=clang-15 allmodconfig >/dev/null 2>&1
+> > > make -j O=/tmp/crypto-build W=1 CC=clang-15 drivers/crypto/virtio/virtio_crypto_akcipher_algs.o
+> > > 
+> > > I tried clang versions 14, 15, and 16. This is with my home system running
+> > > Ubuntu 22.04, no ChromeOS or Google specifics/internals involved. For clang-15,
+> > > the version is
+> > > 
+> > > Ubuntu clang version 15.0.7
+> > > Target: x86_64-pc-linux-gnu
+> > > Thread model: posix
+> > > InstalledDir: /usr/bin
+> > 
+> > Okay interesting, this warning is hidden behind W=1, which our CI does
+> > not test with. Looks like it has been that way since the introduction of
+> > these checks in f68f2ff91512 ("fortify: Detect struct member overflows
+> > in memcpy() at compile-time").
+> > 
+> 
+> Interestingly the warning is seen in chromeos-5.10, without this patch,
+> and without W=1. I guess that must have to do with the revert which is
+> finally biting us.
+> 
+> > I think this is a legitimate warning though. It is complaining about the
+> > second memcpy() in virtio_crypto_alg_akcipher_init_session():
+> > 
+> >    memcpy(&ctrl->u, para, sizeof(ctrl->u));
+> > 
+> > where ctrl is:
+> > 
+> >    struct virtio_crypto_op_ctrl_req {
+> >            struct virtio_crypto_ctrl_header header;         /*     0    16 */
+> >            union {
+> >                    struct virtio_crypto_sym_create_session_req sym_create_session; /*    16    56 */
+> >                    struct virtio_crypto_hash_create_session_req hash_create_session; /*    16    56 */
+> >                    struct virtio_crypto_mac_create_session_req mac_create_session; /*    16    56 */
+> >                    struct virtio_crypto_aead_create_session_req aead_create_session; /*    16    56 */
+> >                    struct virtio_crypto_akcipher_create_session_req akcipher_create_session; /*    16    56 */
+> >                    struct virtio_crypto_destroy_session_req destroy_session; /*    16    56 */
+> >                    __u8               padding[56];          /*    16    56 */
+> >            } u;                                             /*    16    56 */
+> >            union {
+> >                    struct virtio_crypto_sym_create_session_req sym_create_session; /*     0    56 */
+> >                    struct virtio_crypto_hash_create_session_req hash_create_session; /*     0    56 */
+> >                    struct virtio_crypto_mac_create_session_req mac_create_session; /*     0    56 */
+> >                    struct virtio_crypto_aead_create_session_req aead_create_session; /*     0    56 */
+> >                    struct virtio_crypto_akcipher_create_session_req akcipher_create_session; /*     0    56 */
+> >                    struct virtio_crypto_destroy_session_req destroy_session; /*     0    56 */
+> >                    __u8                       padding[56];          /*     0    56 */
+> >            };
+> > 
+> > 
+> >            /* size: 72, cachelines: 2, members: 2 */
+> >            /* last cacheline: 8 bytes */
+> >    };
+> > 
+> > (so size and p_size_field should be 56) and the type of the para
+> > parameter in virtio_crypto_alg_akcipher_init_session() is 'void *' but
+> > the para passed by reference to
+> > virtio_crypto_alg_akcipher_init_session() in virtio_crypto_rsa_set_key()
+> > has a type of 'struct virtio_crypto_akcipher_session_para':
+> > 
+> >    struct virtio_crypto_akcipher_session_para {
+> >            __le32                     algo;                 /*     0     4 */
+> >            __le32                     keytype;              /*     4     4 */
+> >            __le32                     keylen;               /*     8     4 */
+> >            union {
+> >                    struct virtio_crypto_rsa_session_para rsa; /*    12     8 */
+> >                    struct virtio_crypto_ecdsa_session_para ecdsa; /*    12     8 */
+> >            } u;                                             /*    12     8 */
+> >            union {
+> >                    struct virtio_crypto_rsa_session_para rsa;       /*     0     8 */
+> >                    struct virtio_crypto_ecdsa_session_para ecdsa;   /*     0     8 */
+> >            };
+> > 
+> > 
+> >            /* size: 20, cachelines: 1, members: 4 */
+> >            /* last cacheline: 20 bytes */
+> >    };
+> > 
+> > (so q_size_field would be 20 if clang were able to do inlining to see
+> > through the 'void *'...?), which would result in the
+> > 
+> >    __compiletime_lessthan(q_size_field, size)
+> > 
+> > check succeeding and triggering the warning because 20 < 56, so it does
+> > seem like there is an overread of the source buffer here? Adding the
+> 
+> Looks like it; I think either the passed 'para' should be of type
+> virtio_crypto_akcipher_create_session_req() or it should only copy
+> sizeof(struct virtio_crypto_akcipher_session_para) bytes.
+> 
+> Anyway, how did you find that ? Is there a magic trick to find the
+> actual code causing the warning ? I am asking because we had seen
+> similar warnings before, and it would help to know how to find the
+> problematic code.
+> 
+> Thanks,
+> Guenter
+> 
+> > maintainers of the driver and subsystem in question.
+> > 
+> > Cheers,
+> > Nathan
 
-When calling crypto_finalize_request, BH should be disabled to avoid
-triggering the following calltrace:
 
-    ------------[ cut here ]------------
-    WARNING: CPU: 2 PID: 74 at crypto/crypto_engine.c:58 crypto_finalize_request+0xa0/0x118
-    Modules linked in: cryptodev(O)
-    CPU: 2 PID: 74 Comm: firmware:zynqmp Tainted: G           O       6.8.0-rc1-yocto-standard #323
-    Hardware name: ZynqMP ZCU102 Rev1.0 (DT)
-    pstate: 40000005 (nZcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-    pc : crypto_finalize_request+0xa0/0x118
-    lr : crypto_finalize_request+0x104/0x118
-    sp : ffffffc085353ce0
-    x29: ffffffc085353ce0 x28: 0000000000000000 x27: ffffff8808ea8688
-    x26: ffffffc081715038 x25: 0000000000000000 x24: ffffff880100db00
-    x23: ffffff880100da80 x22: 0000000000000000 x21: 0000000000000000
-    x20: ffffff8805b14000 x19: ffffff880100da80 x18: 0000000000010450
-    x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
-    x14: 0000000000000003 x13: 0000000000000000 x12: ffffff880100dad0
-    x11: 0000000000000000 x10: ffffffc0832dcd08 x9 : ffffffc0812416d8
-    x8 : 00000000000001f4 x7 : ffffffc0830d2830 x6 : 0000000000000001
-    x5 : ffffffc082091000 x4 : ffffffc082091658 x3 : 0000000000000000
-    x2 : ffffffc7f9653000 x1 : 0000000000000000 x0 : ffffff8802d20000
-    Call trace:
-     crypto_finalize_request+0xa0/0x118
-     crypto_finalize_aead_request+0x18/0x30
-     zynqmp_handle_aes_req+0xcc/0x388
-     crypto_pump_work+0x168/0x2d8
-     kthread_worker_fn+0xfc/0x3a0
-     kthread+0x118/0x138
-     ret_from_fork+0x10/0x20
-    irq event stamp: 40
-    hardirqs last  enabled at (39): [<ffffffc0812416f8>] _raw_spin_unlock_irqrestore+0x70/0xb0
-    hardirqs last disabled at (40): [<ffffffc08122d208>] el1_dbg+0x28/0x90
-    softirqs last  enabled at (36): [<ffffffc080017dec>] kernel_neon_begin+0x8c/0xf0
-    softirqs last disabled at (34): [<ffffffc080017dc0>] kernel_neon_begin+0x60/0xf0
-    ---[ end trace 0000000000000000 ]---
+CC patch contributor before I revert the whole thing.
 
-Signed-off-by: Quanyang Wang <quanyang.wang@windriver.com>
----
- drivers/crypto/xilinx/zynqmp-aes-gcm.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/crypto/xilinx/zynqmp-aes-gcm.c b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-index 3c205324b22b6..e614057188409 100644
---- a/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-+++ b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-@@ -231,7 +231,10 @@ static int zynqmp_handle_aes_req(struct crypto_engine *engine,
- 		err = zynqmp_aes_aead_cipher(areq);
- 	}
- 
-+	local_bh_disable();
- 	crypto_finalize_aead_request(engine, areq, err);
-+	local_bh_enable();
-+
- 	return 0;
- }
- 
 -- 
-2.36.1
+MST
 
