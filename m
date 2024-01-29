@@ -1,200 +1,99 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0324612DA
-	for <linux-crypto@vger.kernel.org>; Mon, 29 Jan 2024 12:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535056166D;
+	Mon, 29 Jan 2024 12:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706532933; cv=none; b=V/ERejKGx70BlWpmjc/TgVlJLLfo6SWonK40U/djd8J6tY/1ylOYzqMTPgO4SPWfDW6IbrVSknZYiCih0O29S1hxxsYkf9HZ5mYAPl3QcmcVkI9RyJ7QrzLBk5TN607YB0QvRBPD2u4Ub1IAaN7psgDc8zmXc1UD6ts2gdKKuRU=
+	t=1706533056; cv=none; b=RdsvLInHso8YEbSLS4CLY1hViypu9O4ZuhbcPzOsMeR8+iEqkbdgNXh0X46lgtsVag3eSE5LDkMStFi/lDkSQargzAppTRZx4O8enmbArp50PLe36fEWmEiLuoLrVY/EORSjK/YXAtyaLBnaFoHodLGRiebho33FpjVYCZ/69/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706532933; c=relaxed/simple;
-	bh=gCNLN32onkfofc2XLJ63iawEcWMbF9XLfRMNpJZnSL8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KAn2cpGLHBomPR02bLYPNZKrkT3oRIWCRG3XL3ygmxHSSqM5qeU+ErzF/esyiVjbUw+WbqZ1B0hCEGjegQdeU/qlJmVPJT909PQAVdASHvGJX8WYo+xo8Aj6oc6dRuc8h/LPgnxlDqY6h7r6MOFXKm7k7JBu/8UI0/fFq/OM15A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-363779f3989so8994585ab.3
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Jan 2024 04:55:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706532930; x=1707137730;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1706533056; c=relaxed/simple;
+	bh=uQ/Xzy1t1vgnWJ/4O5irvMHl8vFPdVlozjit+qHy3vw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=nFBZI1hoL6Q3C6fmASR3ApmctQ438UsrqBj/Diz1yvmGLqOg7+qKTXBuyT/IaLrZbDPgt4ZmEIbrRF6y5n7pRRXgWCmsROQ0mxE9aGrEX+VSG3Mt1uIQLuj03IiTGwuaYxahY05S2aM5Cnw0dtyIvX9XXo14KDjfs2KwPcIl3Cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AQ8jbGBV; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AQ8jbGBV"
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-6001449a2beso17037007b3.3;
+        Mon, 29 Jan 2024 04:57:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706533050; x=1707137850; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=UrnXr+h10ghLDpUHiMKmC913INgZavjkvo1GZXmFYWk=;
-        b=AxXADxVGPp4Gm28MtJqaIqG18LdRWdy9fVxCXHakuUxi1FfaaZV/ktH7dTqKGddEUm
-         W2U8PIrnAPLGd75DRkNXKUi8odf9kA3gg9xj4xGQovMP8+MamB18r5gMPdQCrx1nciGg
-         brKAW65g8qBok2qUnKacgMxDQTmzw6raIKYwU7hPOBjNjlHc6cdh/+R5rgRtIL/efP8r
-         zoILEiDYeAMcfA/Dn5ue2RapYA6akrB+pOgNEezmsl8k2oxNUhUPCmj0KZK9TVtvaC/H
-         +9nLRva3cvzKZiRMovp7MiNoZXXnoVZ/tb1Bvlq7zXnV0apJ6T48OjQESANFMgBonF/b
-         stdg==
-X-Gm-Message-State: AOJu0YzoVCJ+8HCPV31FIRXq1scYwQqccMcIpXJRbBQ0tX1RAsYJGN9V
-	P0uRB/Ia7XIFC+qa8/yKpXXzjOIfOur/WSESYb9Rlx38cj7aU8xYbOU7923uuF1h/lBgRVg9/r3
-	LOXha+TAi912NtpoTJrgaEU9tRY9qOzjYWytwNQ9atrzVDeGA1skyIzg=
-X-Google-Smtp-Source: AGHT+IGPlSzYOPzrKRbtnmW7WFNiwQKydE+NeSOBAz2/BDx3RJAYPJA+6muxCx6BYlUnVioEoU0kLBrzwWVFVTCWkJ1LVxq5FbUI
+        bh=Q7MRtgQq1559VqTtq0fV0eOYg6mrlq7EbBFuJ58DRMI=;
+        b=AQ8jbGBVOFd6xGwO0CItRemwVgIIWS0L8O0IVV/eR7Ic1oMicAUU/HgFHfAVX7zuDd
+         6Kxfc8C28ZtOHC35cHmKwUBXmPkE4onDQTPGEXYrXwwsqj/9zBkkQ1G5+knLDGqlWeky
+         sAPVkDEGajz+D5h1dDV3sHHlgSTlV60yhHxwjLMNdgd3+1kVIToCPEuYnvRQ7+pWoOa5
+         x2r4gi0bgOQQdhQaCO8xCYfgbdsgmN/RqDOefGsmLPsZVMe8Wt0B+tBeiMcNZ0CdSLeP
+         ET/x7aUnZvfeA5jhAlj1O2chu9KGSeTKBZFqXzemTa/PWD0zGjgZLbVJA2PU9Wp3b2yN
+         8XWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706533050; x=1707137850;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q7MRtgQq1559VqTtq0fV0eOYg6mrlq7EbBFuJ58DRMI=;
+        b=KM00yC+n8uI0pM+7FACzj+ERLjmqW9niV8a0NBRS53F29feicOtB0HJJU6HsTOkZ/5
+         xVKeLdyyj3/VjanGBhbSGvEo2eHevZ+lLrlQA97CmQcmuoxdDYeqsvM5Pl3KppyxWrav
+         Wcd5hUV+U9BkOEclEzHaPia/50iusJF5bkcSV2ydEDvBE+LizbezKPJVVnkh9ojs1iej
+         PfmQ6LXfh1iPa4VHtcQAJB8x/ZJhNfQUOd9oB71UoR2e0+uVuu3xu716gtEOfn1/44Zp
+         dSDsTNryu9Ii/sgW6JQDPAsDUWL2cFCd1o3fJ+QuLUrdzGjBAp0mm+SmauwbQugd+Nj1
+         /HCw==
+X-Gm-Message-State: AOJu0YzsVBCSTeVKuiC2xZHb3PKO+yBTuYi01vYTDdJDt+SEiV9TaFJP
+	M0HUeyjj3kpSAgIi6Jv+PQKaEWnmP8YKs0ccfsgXrnJDDowkDXg=
+X-Google-Smtp-Source: AGHT+IEEzC5ixYHXvoggCQs5qrvbv9IqQr5jYpj6wOIk6jV/fBwm69ksRVsje5mHZpNEaplLRhBK2Q==
+X-Received: by 2002:a0d:d793:0:b0:602:ac0e:697f with SMTP id z141-20020a0dd793000000b00602ac0e697fmr3722989ywd.51.1706533050102;
+        Mon, 29 Jan 2024 04:57:30 -0800 (PST)
+Received: from localhost ([207.181.197.26])
+        by smtp.gmail.com with ESMTPSA id v7-20020a05620a0f0700b00783b6da58a9sm3077939qkl.39.2024.01.29.04.57.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jan 2024 04:57:29 -0800 (PST)
+Date: Mon, 29 Jan 2024 06:57:28 -0600
+From: Lenko Donchev <lenko.donchev@gmail.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: [PATCH] crypto: qat - use kcalloc() instead of kzalloc()
+Message-ID: <ZbeguDTmVrP9SnDr@nixos>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c562:0:b0:35f:f01e:bb18 with SMTP id
- b2-20020a92c562000000b0035ff01ebb18mr594758ilj.6.1706532930067; Mon, 29 Jan
- 2024 04:55:30 -0800 (PST)
-Date: Mon, 29 Jan 2024 04:55:30 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000018273706101529cf@google.com>
-Subject: [syzbot] [crypto?] BUG: unable to handle kernel NULL pointer
- dereference in crypto_arc4_crypt
-From: syzbot <syzbot+050eeedd6c285d8c42f2@syzkaller.appspotmail.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hello,
+We are trying to get rid of all multiplications from allocation
+functions to prevent integer overflows[1]. Here the multiplication is
+obviously safe, but using kcalloc() is more appropriate and improves
+readability. This patch has no effect on runtime behavior.
 
-syzbot found the following issue on:
+Link: https://github.com/KSPP/linux/issues/162 [1]
+Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [2]
 
-HEAD commit:    3a5879d495b2 Merge tag 'ata-6.8-rc2' of git://git.kernel.o..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1683b6bbe80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bc36d99546fe9035
-dashboard link: https://syzkaller.appspot.com/bug?extid=050eeedd6c285d8c42f2
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15178ea0180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=107f8eefe80000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6f5df0cd5c86/disk-3a5879d4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/284ff9c3970b/vmlinux-3a5879d4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b75c80c77fad/bzImage-3a5879d4.xz
-
-The issue was bisected to:
-
-commit 47309ea1359115125d9cab17a279c8df72b47235
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Tue Nov 28 06:52:57 2023 +0000
-
-    crypto: arc4 - Add internal state
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1325e5a0180000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=10a5e5a0180000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1725e5a0180000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+050eeedd6c285d8c42f2@syzkaller.appspotmail.com
-Fixes: 47309ea13591 ("crypto: arc4 - Add internal state")
-
-"syz-executor299" (5065) uses obsolete ecb(arc4) skcipher
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-#PF: supervisor write access in kernel mode
-#PF: error_code(0x0002) - not-present page
-PGD 78051067 P4D 78051067 PUD 7e3d7067 PMD 0 
-Oops: 0002 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 5065 Comm: syz-executor299 Not tainted 6.8.0-rc1-syzkaller-00311-g3a5879d495b2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:memcpy_orig+0x31/0x120 arch/x86/lib/memcpy_64.S:71
-Code: 48 83 fa 20 0f 82 86 00 00 00 40 38 fe 7c 35 48 83 ea 20 48 83 ea 20 4c 8b 06 4c 8b 4e 08 4c 8b 56 10 4c 8b 5e 18 48 8d 76 20 <4c> 89 07 4c 89 4f 08 4c 89 57 10 4c 89 5f 18 48 8d 7f 20 73 d4 83
-RSP: 0018:ffffc90003a378c0 EFLAGS: 00010202
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff84401c81
-RDX: 00000000000003c8 RSI: ffff888019ee1040 RDI: 0000000000000000
-RBP: ffff888019ee1000 R08: 0000000400000003 R09: 0000002200000071
-R10: 0000000800000016 R11: 0000001700000083 R12: 0000000000000000
-R13: ffff88807f225da0 R14: ffff88807929e000 R15: 0000000000000001
-FS:  00005555570b8380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000007c30c000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- crypto_arc4_crypt+0x4b/0x70 crypto/arc4.c:33
- crypto_lskcipher_crypt crypto/lskcipher.c:160 [inline]
- crypto_lskcipher_decrypt+0xd4/0x130 crypto/lskcipher.c:194
- crypto_cbc_decrypt_segment crypto/cbc.c:80 [inline]
- crypto_cbc_decrypt+0x14f/0x330 crypto/cbc.c:133
- crypto_lskcipher_crypt_sg+0x28c/0x460 crypto/lskcipher.c:229
- crypto_skcipher_decrypt+0xda/0x160 crypto/skcipher.c:693
- _skcipher_recvmsg crypto/algif_skcipher.c:199 [inline]
- skcipher_recvmsg+0xc2b/0x1040 crypto/algif_skcipher.c:221
- sock_recvmsg_nosec net/socket.c:1046 [inline]
- sock_recvmsg+0xe2/0x170 net/socket.c:1068
- __sys_recvfrom+0x1ab/0x2e0 net/socket.c:2242
- __do_sys_recvfrom net/socket.c:2260 [inline]
- __se_sys_recvfrom net/socket.c:2256 [inline]
- __x64_sys_recvfrom+0xe0/0x1b0 net/socket.c:2256
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f23399079b9
-Code: ff e8 cb 01 00 00 66 2e 0f 1f 84 00 00 00 00 00 90 80 3d f1 56 07 00 00 41 89 ca 74 1c 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 67 c3 66 0f 1f 44 00 00 55 48 83 ec 20 48 89
-RSP: 002b:00007ffe68b37d28 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
-RAX: ffffffffffffffda RBX: 00007ffe68b37db4 RCX: 00007f23399079b9
-RDX: 0000000000001000 RSI: 00007ffe68b37da0 RDI: 0000000000000004
-RBP: 0000000000000004 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffe68b37da0
-R13: 00007ffe68b38f88 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-Modules linked in:
-CR2: 0000000000000000
----[ end trace 0000000000000000 ]---
-RIP: 0010:memcpy_orig+0x31/0x120 arch/x86/lib/memcpy_64.S:71
-Code: 48 83 fa 20 0f 82 86 00 00 00 40 38 fe 7c 35 48 83 ea 20 48 83 ea 20 4c 8b 06 4c 8b 4e 08 4c 8b 56 10 4c 8b 5e 18 48 8d 76 20 <4c> 89 07 4c 89 4f 08 4c 89 57 10 4c 89 5f 18 48 8d 7f 20 73 d4 83
-RSP: 0018:ffffc90003a378c0 EFLAGS: 00010202
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff84401c81
-RDX: 00000000000003c8 RSI: ffff888019ee1040 RDI: 0000000000000000
-RBP: ffff888019ee1000 R08: 0000000400000003 R09: 0000002200000071
-R10: 0000000800000016 R11: 0000001700000083 R12: 0000000000000000
-R13: ffff88807f225da0 R14: ffff88807929e000 R15: 0000000000000001
-FS:  00005555570b8380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000007c30c000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	48 83 fa 20          	cmp    $0x20,%rdx
-   4:	0f 82 86 00 00 00    	jb     0x90
-   a:	40 38 fe             	cmp    %dil,%sil
-   d:	7c 35                	jl     0x44
-   f:	48 83 ea 20          	sub    $0x20,%rdx
-  13:	48 83 ea 20          	sub    $0x20,%rdx
-  17:	4c 8b 06             	mov    (%rsi),%r8
-  1a:	4c 8b 4e 08          	mov    0x8(%rsi),%r9
-  1e:	4c 8b 56 10          	mov    0x10(%rsi),%r10
-  22:	4c 8b 5e 18          	mov    0x18(%rsi),%r11
-  26:	48 8d 76 20          	lea    0x20(%rsi),%rsi
-* 2a:	4c 89 07             	mov    %r8,(%rdi) <-- trapping instruction
-  2d:	4c 89 4f 08          	mov    %r9,0x8(%rdi)
-  31:	4c 89 57 10          	mov    %r10,0x10(%rdi)
-  35:	4c 89 5f 18          	mov    %r11,0x18(%rdi)
-  39:	48 8d 7f 20          	lea    0x20(%rdi),%rdi
-  3d:	73 d4                	jae    0x13
-  3f:	83                   	.byte 0x83
-
-
+Signed-off-by: Lenko Donchev <lenko.donchev@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/crypto/intel/qat/qat_common/adf_isr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_isr.c b/drivers/crypto/intel/qat/qat_common/adf_isr.c
+index 3557a0d6dea2..a13d9885d60f 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_isr.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_isr.c
+@@ -272,7 +272,7 @@ static int adf_isr_alloc_msix_vectors_data(struct adf_accel_dev *accel_dev)
+ 	if (!accel_dev->pf.vf_info)
+ 		msix_num_entries += hw_data->num_banks;
+ 
+-	irqs = kzalloc_node(msix_num_entries * sizeof(*irqs),
++	irqs = kcalloc_node(msix_num_entries, sizeof(*irqs),
+ 			    GFP_KERNEL, dev_to_node(&GET_DEV(accel_dev)));
+ 	if (!irqs)
+ 		return -ENOMEM;
+-- 
+2.43.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
