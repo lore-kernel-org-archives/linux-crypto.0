@@ -1,68 +1,69 @@
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17593F9CE;
-	Mon, 29 Jan 2024 18:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B091335B5;
+	Mon, 29 Jan 2024 19:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706551305; cv=fail; b=SIReF4lUMj4hTuKBFvf0wHTHzdYKLesSL5pspAsMoPAWg7E9RIoDc9+N2+uIXyuCd1B6OFsVbwhCORU0hiVAG85t9PkhMo5dH7Tj4Zl6RmzdDDYR87na60tAvT3sOgNI26v8L0G2/8QK96eARG5ohvsOAog/HRXyd0gWo8X/XGU=
+	t=1706555982; cv=fail; b=ApMtt+5YFFyRDxJ2KwY7aghJsOl8e9e5Vd/g8SQtjbLYbWfNhUXRCTDeGlzBbEGUBSznPvShIwVxCpDb0XLpCTZnt2SFRBlmP/2G3nMMS06u67Wm6jOnlk01h45XKVH3INCOBWA96kWF9VqeLZkn+YdPtg2NDdaBRqlzl4DsR2I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706551305; c=relaxed/simple;
-	bh=Hjt3LYEHjegOxtyOAWgjtLOEdZzXMbiVThzmbYMnHlw=;
+	s=arc-20240116; t=1706555982; c=relaxed/simple;
+	bh=8k1znlmpbPmFlDj4IuGf79ZAoZJaeo4julaQj7dZLOM=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=fKv/fxKkdUawi8zggK8fMHlPfJPU54f9yGAoMWnRubSo/EQx3sOTwpzcRzkaW4Y6U/j4Nfld3C19//t2OxnNhJekoX6PNqgiNxEHeeN0/2DBzUNSj8YGZduEPQgt7+hHNSzBTGP8aDnrQaXKouqZyr8XBq5RM2LoBmkPV/SyoyY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=G844qknY; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=e4dVcBI5; arc=fail smtp.client-ip=205.220.177.32
+	 Content-Type:MIME-Version; b=Ng9z0/vQAVnV4dCLwfyZMkgIcXINzwYZGiHQf2vkkdzpBRNwOiLy5jMjh7QhbmPJHJ1/m2W9rZ21jw6QRhEg25EB0LH0xklW7zxX+3IHJx914xsqur10bSlMqnvuDg0dN4rp/85eVBjaSAdjvNxzPClgN6UB/3H6diYsrSAVj3U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=MU5Bk1ek; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=t2fG2H4v; arc=fail smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="G844qknY";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="e4dVcBI5"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="MU5Bk1ek";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="t2fG2H4v"
 Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40TGmrlL028135;
-	Mon, 29 Jan 2024 18:00:40 GMT
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40TGmqhI028114;
+	Mon, 29 Jan 2024 19:18:59 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : references : in-reply-to : content-type :
  content-id : content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=C2dhaBGOFz/SXVyv+0kOxPr7iTYjmlQD2Dzg0h0CyDc=;
- b=G844qknYAnL6Zpqs5qC5ce2SHAGu9EM1+RfgrWQ8m5ANorKxooF2tyj+nGfUk4KeMUp4
- ZLec8LspvIv0lgqCa9rAX6AXmJobbXq421xu+tACdd2MH/OfjUm3jWnHZG4XCw4AYYpk
- FElDR7RCmgd9y9LRTVoQOLhh0KtVrYwpuu4mA9RBJFAR01Ao8tdJF8MR70zXMnl6pugv
- BvGXybRJWrBINWh/QuMn2FdYrNTxPUQmOsCSN8SjFDpsvv4Fk03BXBN4rXpUtmRiQ8/t
- tv7d8o9YGt3yERE1CqgZgyoruAJ+tba9xNFu+Yv7bekhHB5hmTdlyMR3Y9GN+3Wr6dpo 9w== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vvr8ecjd2-1
+ bh=4klArVRSWnxHFFwcWhbh4Z3gWLdUefRdr5NBdSxUaxQ=;
+ b=MU5Bk1eke0EAzEo6nYH3+zrHXpM7i/P4j6oNisw2/gPwmh6fcUXqx0S7d0Sb0okxa4jU
+ fi1m53s/tK+mm5E/kcOtrt5Wut0DTVmJTSTCZDiRfrAn30AgC5y+O3HElOLuxHP/46Af
+ 9gIrdi/l2iQnynzBnBi5EnGsZUCCWZhExxPQ2iKy3HGwh5lf09qesULla144UhzgBUba
+ 6MYpClPQIVdYB1bwSaXVgwMf37GpS5ME4t+CUqRhT/N3sXspVL2QbzeXflKEVN0Uvz4C
+ gNLtWDI3YyY8ua6lKue5XPZNksiFXzjMke5nB+SK0zA1aGHqJMO0dy5wKyHeE0lDxZk9 cg== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vvr8ecqhv-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 29 Jan 2024 18:00:40 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 40THvK4u008435;
-	Mon, 29 Jan 2024 18:00:39 GMT
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2041.outbound.protection.outlook.com [104.47.73.41])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3vvr9cg6cc-1
+	Mon, 29 Jan 2024 19:18:59 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 40TJBhfU014554;
+	Mon, 29 Jan 2024 19:18:58 GMT
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2168.outbound.protection.outlook.com [104.47.57.168])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3vvr962y0w-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 29 Jan 2024 18:00:39 +0000
+	Mon, 29 Jan 2024 19:18:58 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G9hCPunUiRafLZplcWMgDeOmQp7LJRS0RM6IjcT633j03q7xbifQPj5REKIdId7lXSDaQbWhHvOs7AUyawzFxyAbPTmKgk6bQbEeQM8elIAjSrDdwUWLBGKeBefX0m95ZkkzAYxePvndXt80CpCcNyitlTHYg5R59OylREn0VicTnWiknbEmbOUS5sftR+uL+DPm6ECVRGmuFGr+p1+45jUKa+shnt0ofI6Uwtl9DbWDuU8d7oup5s3SEDNEYPmrJVjp0xc/yIZN7m/J7h6l1zBEK1R1vbEXB00fdkX3+ihDWKT0HHcpSpUxOSK6edIib886uI2pmNFZRlfmqqK+vQ==
+ b=QWHNknDcKwzVMGBlT/VvWZqQleRB6VbQNNhaVvzlA/j6DQ7pMp6PVZ6QZbfWToLaUlB1ldkZSaIAcSzcxF1kx6ewfshSMzyk2tFjWU4PY/f3O1TheH4BbBEdfYftBbblCFFNqj4rLBT4zj+gvszTZVgTVLV0mylis9/THLgMydOUT3laZGdT4MUP+bHbrG1A/htF8gLzvJvX8S3PEPV/UA5RP/LCg/SHes1Tnd3Tmo2MDjwTI00qZtrCx2wi2sBTz+IPQE+diJUuO+kOySNA4s7YuWcfSNpVB6JGnInF+ZdTCk2+OxpqpgYkOqxPmv6W5P+2UMZ7BRdDSWzPtTLXkA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C2dhaBGOFz/SXVyv+0kOxPr7iTYjmlQD2Dzg0h0CyDc=;
- b=TUsJU+7vCTEjMC8YOfIixi0sWajb8I93zCmgDqs/NkDk9G7R9kfCj2CBcX3Cz5FT0lMfCPj+i4DR/ygw7KO+BXI75V8puETdsbxbtpyPjXXFPXvbYkK5yeqYpd7OfkfsSf/ApjqP9ZqRzbFfzKaP2N5kYgI0NejmFi2EWWdatn4Be2TJrn+hlOhESvzNY89x6m9p43uAt8FKjtvEcMEPdT70UWq5bv7GTU4bqsIUQgcEmRe0n+NdDyrHb7WjJPVacUqk9H/E2l6UxINMBXBdN2sNkSickrgkkyTRfmN0Colbm9jfDPpa1ZDRUUDFO8oNF1IHFcfx63vR+DLhPHnDfg==
+ bh=4klArVRSWnxHFFwcWhbh4Z3gWLdUefRdr5NBdSxUaxQ=;
+ b=m0s8vdHYPnUbHdXWs5gfjRRV6Xr9Q3l45B8/0DwcBcpBIGMS0qdAx31bj+sVj57FGwil9RkCH3i3Hr08VfstpSyHZleReD1Fk5DzvGdjsbsL8CQ8IP9Iek+Lpi01iAnWpXHr/xYKHax12KYmqofxOMVEFIsRKTG0l3UB2nAUBWOASoULea/5oukuESzrbNNg5J8Vz3gSJm0zUtg37K9aIfDMGExWxZNqJHt9mT8clYqHtethj7IM/9BfW6j6MSpFNT06SslO9eSqym3iQyNBv+RICdH92X5dpU4k7lh7DqXmSlxbnV1JuG5sHlnBHMJuFNnp68g+gCZxf+IKSfsXHQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C2dhaBGOFz/SXVyv+0kOxPr7iTYjmlQD2Dzg0h0CyDc=;
- b=e4dVcBI5jra/bOzY2cTuS77OzNY7RpKv09kFBXiFf8Dw/rOA2RUSFj4irso5tWnP/rqv3oq+h14yQRLC5tAWizU1vzbmS2K8YKqQ2C3mb0oIzAFpF9besK37VDhBbg9WGyikC/s/U34W/E61w/3pap0qIH2kRal3J/+4IyFluxU=
+ bh=4klArVRSWnxHFFwcWhbh4Z3gWLdUefRdr5NBdSxUaxQ=;
+ b=t2fG2H4vadPR+dcdl0M42+h/ftwX/4Z4fEO1rHRKJIegl+N7evzmG7Zluee7uxYhOGeS6I54rObXz/Pa1S4jRSD9SKjyGBKoaCEw1E9weDDKraR7zyS0Evbd/3CzWJpt7wMnPNEHDwt3vCjX8+HNZrpU7nlvpNgXm9g5/HLnyGI=
 Received: from BN0PR10MB5030.namprd10.prod.outlook.com (2603:10b6:408:12a::18)
- by DM3PR10MB7928.namprd10.prod.outlook.com (2603:10b6:0:44::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7228.32; Mon, 29 Jan 2024 18:00:36 +0000
+ by SJ1PR10MB5906.namprd10.prod.outlook.com (2603:10b6:a03:48b::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.31; Mon, 29 Jan
+ 2024 19:18:54 +0000
 Received: from BN0PR10MB5030.namprd10.prod.outlook.com
  ([fe80::c6e9:8c36:bfbe:9ebf]) by BN0PR10MB5030.namprd10.prod.outlook.com
  ([fe80::c6e9:8c36:bfbe:9ebf%7]) with mapi id 15.20.7228.029; Mon, 29 Jan 2024
- 18:00:36 +0000
+ 19:18:54 +0000
 From: Liam Merwick <liam.merwick@oracle.com>
 To: Michael Roth <michael.roth@amd.com>, "x86@kernel.org" <x86@kernel.org>
 CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
@@ -108,68 +109,68 @@ CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
 	<nikunj.dadhania@amd.com>,
         "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
+        Alexey Kardashevskiy <aik@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
         Liam Merwick <liam.merwick@oracle.com>
-Subject: Re: [PATCH v2 10/25] x86/sev: Add helper functions for RMPUPDATE and
- PSMASH instruction
-Thread-Topic: [PATCH v2 10/25] x86/sev: Add helper functions for RMPUPDATE and
- PSMASH instruction
-Thread-Index: AQHaUBHag0GCwZsLtkOjW0igYQCdjLDxGcyA
-Date: Mon, 29 Jan 2024 18:00:36 +0000
-Message-ID: <23cb85b1-4072-45a4-b7dd-9afd6ad20126@oracle.com>
+Subject: Re: [PATCH v2 25/25] crypto: ccp: Add the SNP_SET_CONFIG command
+Thread-Topic: [PATCH v2 25/25] crypto: ccp: Add the SNP_SET_CONFIG command
+Thread-Index: AQHaUBKyZC5KowvA3UScRWyCZr8I57DxLGIA
+Date: Mon, 29 Jan 2024 19:18:54 +0000
+Message-ID: <57750667-92a2-4510-99fa-af7df8d887fc@oracle.com>
 References: <20240126041126.1927228-1-michael.roth@amd.com>
- <20240126041126.1927228-11-michael.roth@amd.com>
-In-Reply-To: <20240126041126.1927228-11-michael.roth@amd.com>
+ <20240126041126.1927228-26-michael.roth@amd.com>
+In-Reply-To: <20240126041126.1927228-26-michael.roth@amd.com>
 Accept-Language: en-IE, en-US
 Content-Language: en-IE
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 msip_labels: 
-x-ms-exchange-imapappendstamp: BN0PR10MB5206.namprd10.prod.outlook.com
+x-ms-exchange-imapappendstamp: LV8PR10MB7798.namprd10.prod.outlook.com
  (15.20.7202.013)
 user-agent: Mozilla Thunderbird
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN0PR10MB5030:EE_|DM3PR10MB7928:EE_
-x-ms-office365-filtering-correlation-id: 66731092-163a-4fdb-5c6e-08dc20f431ef
+x-ms-traffictypediagnostic: BN0PR10MB5030:EE_|SJ1PR10MB5906:EE_
+x-ms-office365-filtering-correlation-id: a8af5ded-9685-438c-1edd-08dc20ff2264
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
 x-microsoft-antispam-message-info: 
- Q+/mFxoc9OB8dAY+0j0OyWEMDN5YqFrE8Ec8rmY93cOb7O9SIWUqbttik44+99EkagplTUOlizNnobKp6Hwe7Iz78h9yYCxML64mmsS0xonn97CGN3aWxswggHITCSqpyC4tlPgcSs953nsX3U6XtMBG58A1eUKPd1a+LNOiqBVf822OQfjY/4tKH4e0r7a0Bt15t+b4Bs2XZK2I/lJcrF44FKuZAKjlWEwnfakL3DWF4aTxDZPApXLP3VKijVRbV3oJsYHNOrV1CsrIEd0Kslwmc3Qp2+/SgLj7zy72buQVck4jgXooCFDBCLBBmF2SJeQFPuhhKrifJfmsZsqoPbxEBEKnRMF+yXztxTID4ZxaGQfclAIMvQuFuK/wTx37eSV6WQZXxdjLxC1Rg09OYNuRBStxFVP42FOL4foYqUrNzalGX6mMwP0PWS+UuoD5dty/WtcK7auP9t7bmq5zl4aVrrSA1cFLca57j/6fx+J9LN++IRSxNrgNi1kjK2Qtw94l5ae9+4EEnrT1QGIQV47leXTtDM73qEJW7uiU4UCtPdSF1uAHZ8ln7wPg2T91OOMAR2RcP6G6K3UtE07vkGywH/gO01QxLEva2ZyI7IL9nB+BiBoBBHaGM+uuJu9OobXk6X08WFoJJ7PFsZ9CV7gSVxaG7qSNsczPtqhljWwBjQy4YfLT4nr+aoVB1QBb
+ Q6hj0UiUGxrUZ5BXfdA/4VHbYw2f4nu9xEsDc67wjl0bs1Vu46WisdPXMK+gCTbgQsHebwgvfno00NkC/07691k65XTrEUthr/B1B3YfN9k1Y0LVnLtVmqaWFeWCIEYHiLbMsHhtW9e8E7CrltjXsH8tcdXP1mFftxQ1vrUz0fZXPepi5Kp7+jhOo8fB8hg4GExDpAEtJ/6Np3mlbzKuPa65Hmj7/O5rSkPmVAzafhCIO/3oVlkRoxM9jXexVvAHFzQmOOqKSuaxnTrISrIcAc4f24Mgek8K5WIqjdcbkAr1JepuHjnfT1NtdfjyvfJLV3VHM5swUWCdtncN9ADGm5nr31xEEBMsNzAZgL+f442KU9B9jRmBCjtM+WH26p9/XSSgxo3Z9mcd137dbp/Qzr7dA9ayvVqbTmqkacDAb5hCH8jDlQvpfhR1eh3DG2+TFreAvbuS0uNNW45eZ9Txh1jPancTJDdrb0LGiA12C6iw4OTDlKsm+haUsgWuzCk2SjEuEH11I+YKocW9ZyfJVnp2uw3KWyqmXkEq7Q4/txtAZ4NXgzulWS4vwFzGSFi44lwYvihfrRF64QulcqjvewrQhWn+TTTXmAvwavGXyyu8c5kjlyJclCGq5HhMHbmyMVcnG0d1O1+OR1TqMegoqKdwpt+1pODdsNaV5a9tZcA=
 x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5030.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(39860400002)(346002)(376002)(366004)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(31686004)(83380400001)(31696002)(86362001)(36756003)(38070700009)(122000001)(38100700002)(107886003)(2616005)(7416002)(6512007)(66556008)(66446008)(53546011)(6506007)(2906002)(6486002)(8676002)(478600001)(7406005)(110136005)(76116006)(316002)(71200400001)(64756008)(66946007)(54906003)(41300700001)(66476007)(91956017)(4326008)(8936002)(5660300002)(44832011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5030.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(346002)(376002)(396003)(39860400002)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(31686004)(83380400001)(6512007)(6506007)(53546011)(36756003)(31696002)(86362001)(38070700009)(44832011)(8676002)(8936002)(41300700001)(4326008)(5660300002)(66946007)(122000001)(478600001)(107886003)(38100700002)(316002)(110136005)(66476007)(91956017)(64756008)(76116006)(54906003)(66446008)(66556008)(7406005)(7416002)(6486002)(966005)(2616005)(71200400001)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0: 
- =?iso-8859-1?Q?nJE/dU5LGl7lMhfqoFvhB/DBhbWwUm03XW+YIcbn2XWJsvcrJzbReS0Z2c?=
- =?iso-8859-1?Q?M4yQY7B8aVkycs2DvBiQo4vMaqIlmOuLCB6YT0qtYIF2m0+8szmm57hAZq?=
- =?iso-8859-1?Q?AASt6PpbWjP9IZY4yoLDJeHnqCkaQZH+mWC9OKpafPBbrW/BkejS5LytFK?=
- =?iso-8859-1?Q?jV98IKfwykEIdVvB7L8XNom6G+O9EemlKHHV7w1fm0F4Ud/QlPpErnA1wl?=
- =?iso-8859-1?Q?UOJxgQuUPRDqFU1ykkgkWwI3AsWuEqCXHZzMxI7eKYSEAdw+HBfQVyCX/z?=
- =?iso-8859-1?Q?fLjHPidpd87GvjXpgcrXYiEqITLaBOiB3EpnZVgDXmyCreQn7HEOvGdPPb?=
- =?iso-8859-1?Q?7lyfgBTlgkQ8RsrPCUlDEXW7vJsTAV/kFkJNDQVkXDmc4XDoFwpuhREWbu?=
- =?iso-8859-1?Q?4Ux9BCdeJ+/fZ8LyfupErPSjU5mocR5vozAB8f+ATF3UTDQ3gZJNVSx+A0?=
- =?iso-8859-1?Q?0Qaa6AiXcRcK6BOQKaZELgLh03Zzku2OT96ThmES8Tlv/XJAjVhpibFsv8?=
- =?iso-8859-1?Q?cbYku3rqRivXIHEFNoLibBozzgPf+uMoyjsOIlv/MrknNFoJLNvykII3Te?=
- =?iso-8859-1?Q?YXb4FJF39QEt3WEhtDGnV8/4hxNQcbviB20AvKmoirSU7M5h4IVgKnaxV0?=
- =?iso-8859-1?Q?DeJRMPO+EXISBppCWRxHg0xE3/8XJ9Ig/uQamae70kIN7sB7Vk3Hmv93KN?=
- =?iso-8859-1?Q?XuTyOlHlx1+n06wr5mXyBbYMZ5PUzdKkRueU3S1o3BFvCIXLKACJusIw1v?=
- =?iso-8859-1?Q?YaZkBZfBni1E5tknTYFY1A8pC5u5odmaPJnQ6k6omBm+58/YsQEjEtkY0g?=
- =?iso-8859-1?Q?oxNZHfvPP4OgIcb0LOA/TK79UwlcHwaULMZcl20u8/rPt7wzCb+R22SbVE?=
- =?iso-8859-1?Q?4Es22GiIX39da2vUoL4I+Fv7tJatLHkW26RD3EC/paSmVTcMXzBBBUq+z8?=
- =?iso-8859-1?Q?eGxp+2KqEcaxBkYu1UtY7+zmcq2iiSD0ieSsMkoSu4bXJFqQxjJXf0KzBu?=
- =?iso-8859-1?Q?oKdMv+h6yRpdOEF/nC4aVMZ8Ni9rf/Luw62KX9QNST5wJOeGBfWhT/aQ4T?=
- =?iso-8859-1?Q?bNfa4qRbW4xamP1+eQP/l7ki8Sm76Q6vYAGXp1ImbBEz6j7MxBHxqHsQ9o?=
- =?iso-8859-1?Q?x3Ok7nPC5mo5/RkgyefTVID5GnQD0hOc+fuDuIz7UmsDvrmVex4SRgqWEJ?=
- =?iso-8859-1?Q?YMj9ThSeB4Wtj8+q6QdiXGQmxEha7ZVEr59t6T+gr3MV/wLC9Yc6nf+lBh?=
- =?iso-8859-1?Q?t06lNhKxxVBAVgqlonvpUiXtBg1Ict0u/2ex+yHo1hF73TGKgB74mD20Do?=
- =?iso-8859-1?Q?SJclqGsvehOkyLy6HBDek9aVSbVx/QtwGAxGkC+pMjZaRg/tK5J80nQzr2?=
- =?iso-8859-1?Q?O7mGUkpA9kUjswzVPh5Y9gnAPzDOSjGzwWOw0iREPz4ozr+41QYsjo7Rqn?=
- =?iso-8859-1?Q?QCKkg15aXX3rZveYMCpkyU79WAL4cdsO3fU6bpVZ40YJEQfC2BVm/mhtdk?=
- =?iso-8859-1?Q?5Q7Uj0CIahRoWhAHJlgHKNwMAxYf1WPD1O2sbaaTtBOCNGapiOjGcoXRnv?=
- =?iso-8859-1?Q?NEYbT/43Gt3XY4BxWK21DgNiQEn6g0jn7WESSBBbfp3VTNK+SVFWqX4tw8?=
- =?iso-8859-1?Q?vXxCEkyXuPgSbC5Y/hichcKio+hwZZDavcjKE1zdi/URFXuC52Mg65zw?=
+ =?iso-8859-1?Q?0oFnrxk/7vWSzkqczG/+35oqfU8dFhgWK0lDEdxm1etkgcZSlOCZKq3eSR?=
+ =?iso-8859-1?Q?0wT4oW6uETKQLsdPQyVJuTHSKD9w6t3LOw3Ow+ME7t4vnCT6gMjOcmkpq5?=
+ =?iso-8859-1?Q?QqW1EACNcbGCTAAlN7r7Hl9n1vM7L7ekfLf8PW+8QBjKdmfi1VvnHiaWz4?=
+ =?iso-8859-1?Q?DUxTT1gc45TjSPyf3m72/q1vcQo+0s490pWfeq3h/lbRKno9NvFYe5zpIw?=
+ =?iso-8859-1?Q?Wav3jVRCXD4KMP3D5gbJKjCVg3P4ME7T98tS++T2lMN4pOS8RXaabJVKI7?=
+ =?iso-8859-1?Q?XB9+yjNrRhZ90wQOdkij2/IXVa1LG7Rv+0CXFL5pnmnLj9+CPtcg9+dxZ2?=
+ =?iso-8859-1?Q?M6rOMIZDpoMHamQXbSQ9e/8YbxO0/8NXBcfiSMq7taL0KYJsfAkAA5Isel?=
+ =?iso-8859-1?Q?4XMIO6vDh3ZfUnpn/jEbhVcNmmdsAmDJmzxMQ3/6Rwee+HN6zGZIx4bFkd?=
+ =?iso-8859-1?Q?GeH3T+JeYhfOvJibdgnQ6xOX+abnqK+JqayXbLXB+51Wimqvi5vQp4qBhR?=
+ =?iso-8859-1?Q?lt+jeqzhDTtKDbxl7NFUN18Sj/rp8ibZ5l1ldZOvJSRNlF+NB+3WDEhdE4?=
+ =?iso-8859-1?Q?dO7qq/YX05gzhVePB2yr40gyJzMJjIn5qDczmMomCxPmrF/xIgL4tscPfo?=
+ =?iso-8859-1?Q?psdptYl4Nmk+8torbdnigHGivZ4T1rmoe3AGxw2m+8nUPlcWesvDVInjbc?=
+ =?iso-8859-1?Q?r/j3Z+3PyLPcR34I9iX4p/XTZh41JYFvtgJwuPhj/T08QrER7akeo2zC59?=
+ =?iso-8859-1?Q?fW+q8LyOMryfoNOmc9pe1Ppqmi5JQBWSd0G10U0haqDnDEZ20Z80bnNx/9?=
+ =?iso-8859-1?Q?IR48ZWOghzhig5k7eKjVUlICS0cMrykycQ0eJxpiWZ+IsiBM61aE3YPm5K?=
+ =?iso-8859-1?Q?xm5vhssBDqay7XzuYdHbxTt3D6oHekjPbAwCWph7WiXWJKXEqnCAuQ+f6t?=
+ =?iso-8859-1?Q?q29TN5tQgXu1ylO+8AATMRXrABBwU8Hf8bJHVyfco8FTT447uAoGw9D0DZ?=
+ =?iso-8859-1?Q?bvVjdJtfWFvg1q9QX84HSk/ekr1sznZBDaWJrYfe8galaK/jOgLBfdArDp?=
+ =?iso-8859-1?Q?jLHql+NzTAWy32s074NQhmvQ3dY+clkPH/QpbjdxnsVank7OpmaJxNLRuM?=
+ =?iso-8859-1?Q?I0xiLCb3CF7rb5KB/rY3TSooRkaZvglooIbCIa0pt4q1VXiiR41RK/WzkG?=
+ =?iso-8859-1?Q?xT0j+x7pTFCL2N0sED/8SBOjmsQU3YgToIuWogm9ppyRajHLYKSgNiRliR?=
+ =?iso-8859-1?Q?GPK24DLcLXH5CvxZPoXeoLa3049x0p5qIDomimiWbpCLyhnwR9pG1uYv4X?=
+ =?iso-8859-1?Q?jkEEnV//FIC2ogs+D1Ctq12rxQ9uwDm3LYz86HJB9v0qx+GrFWS/Pzgqhw?=
+ =?iso-8859-1?Q?HQFgPdQNS3W5N4cP+VrAA24IOlLWa89F4PLwbY0D9ANEBAAmG55Lgq+Y2v?=
+ =?iso-8859-1?Q?Vgy8AqO8tUAIZ5Kk52AuyED5wNGNUuN1cvPYAu+taoxX3sZ0YGE3wWfovp?=
+ =?iso-8859-1?Q?RsDnFagKhHVeUI85sYCHYM/fvC2JP7IqKk8ivKcpLTtvb0YahPFoi/lCHQ?=
+ =?iso-8859-1?Q?m0Ndq+REQXBkRZmgbEw5VoUZaBi6HTSUvjlfps6Jh7gejZ3ENVrFvPbCAH?=
+ =?iso-8859-1?Q?ecDL3UjUm7GTgMtD6R/wR5qgwyyEgBZnJuSvjrsFCe6eowf3nqZYWoUw?=
  =?iso-8859-1?Q?=3D=3D?=
 Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <A3BFF8B56B5AFF43B6FCA971C138018B@oracle.onmicrosoft.com>
+Content-ID: <8BEAF16A8035854CA69422599EFAD49C@oracle.onmicrosoft.com>
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -179,231 +180,148 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	5QNIivDAka8EhwJyuXIMW6YYgh0fabQx3nzCNoTPKj0brFIR6nA4V7hOnfq8g6YY9hmiRPhZuZvDmNi9yQ3QyylCAVioNWFZY0XOkfU9SiTjDRmWyDcMt+YVSMp7RsEqM9BYnFD9f37kszZFeC2Flte8izYsTIRDaejUAByNQ1Bn8RTuISA37WaHOSLWtv+Tw0LJLTdCBeC0cxQqy9mj957oXir8rFnA0/gnxnhLr7dZUZ06qnBbN8aFvuD0prAyUfDikMWhUyNnKGWRbBREHF45fi4XSTkCtVaE04Xhen+6qnYS/Mk5asTTgLk5bEIvzJmDGY2+/YR1evzYn53ib6EhgNrfNxyk0RIpjrws6TJTU/m6EWHkMMoXZMUA5/MX7VR9YD5KnVQes+ueVUe7sNJy9cGy7SoMBg0qNKja8ppuPqmyaQ3nhhLYH2/e0+qRbkubKfvlkXpwM9oeMCxnpaP49BDy/xpHGFvSMa81iMKpeeWJEgk8xAId12K41WtlQAFCVmHBiug2jmOCZTmSylomgeVVsuUoMOVLoY0eeNQthbmrDHg+V1nPG3oKCZ6tsjt95vAGCs70/G2vTRJeGBjyULKDueDwTJX5QbJZFdg=
+	MpuRuevEABQQr0Ot7mHgMq533RSLR3MI1EtkqnbLE918BhCO11CJQRBwlFOE4z7nw2ioG1/oNEeT3RzXisDsd91AbmxImibFYBFDEy5xI9cwcwGrSQEtQq14Qnhu4jtdOgAhSR1Cpgy49J9cUePhPQMb2/lvPNGuGlJKdr/a1DSOyEgOsESQIg42EhqpHXxUbE98yPDyqi2ASqP0n/SF6XAlnbD0qNqtNAm+kMIqUqY/cKiPSm7DkMqUQm6zPQngRS1Yg7WB4xDYtGuWRgsx/AULHNd+Hw2KmJPMZYefFXiYVLT5emUciKnPOSP6qaxbbWygIRqzcG/B03vUcy2H1xRCLxbYFVHKUUK3HFu+6i9XomFNZsRQiwelNCqvw5DMVGFEer+IZOKZeSIfGeXCeGQ6yDrfwhGdJdOFXhmdljX06cUdAMs5bjMQc1dDgHGum9doX7mXOcXLD+2H7a+BDtWN4nuzA/erbbW7VQwvHUB7bfsffoZQdXCyF12abx/Tui2RfWh6L1WwH+RxYvHWvRMPejr7fp4c2V+A45A6IqLV09QlNxrnZ+KGDfRB8/u/0lBXJj/z29gyL3YZLnpJOhOFJFud7UMjWzgITPanR44=
 X-OriginatorOrg: oracle.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5030.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66731092-163a-4fdb-5c6e-08dc20f431ef
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2024 18:00:36.1286
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8af5ded-9685-438c-1edd-08dc20ff2264
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2024 19:18:54.5224
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +74p6EolD3o7d2n836g6d3CyzbEqdSRoShuKa9LwxHA+bNCL5gsgu0dnxsDKuKVFO/YFzdmE057kYA47CfWoTQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR10MB7928
+X-MS-Exchange-CrossTenant-userprincipalname: mRfUWjZJvzHfaFhDkohydJ+cGVj9EacAt4iYrgK1FC1s4o/clihn2Cq1G55+QOCyK/O6j0wKMjJhee+xrZ1uPg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR10MB5906
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-29_11,2024-01-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 malwarescore=0
- spamscore=0 mlxlogscore=999 adultscore=0 bulkscore=0 suspectscore=0
+ definitions=2024-01-29_12,2024-01-29_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 malwarescore=0
+ suspectscore=0 phishscore=0 mlxscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2401290133
-X-Proofpoint-ORIG-GUID: wDS-nM4k0bNnF65DXhlMWMkvBbaJxYB7
-X-Proofpoint-GUID: wDS-nM4k0bNnF65DXhlMWMkvBbaJxYB7
+ definitions=main-2401290143
+X-Proofpoint-ORIG-GUID: yo53NunuBvoou0fr3yny2mkHf_OqIGtM
+X-Proofpoint-GUID: yo53NunuBvoou0fr3yny2mkHf_OqIGtM
 
 On 26/01/2024 04:11, Michael Roth wrote:=0A=
 > From: Brijesh Singh <brijesh.singh@amd.com>=0A=
 > =0A=
-> The RMPUPDATE instruction updates the access restrictions for a page via=
+> The SEV-SNP firmware provides the SNP_CONFIG command used to set various=
 =0A=
-> its corresponding entry in the RMP Table. The hypervisor will use the=0A=
-> instruction to enforce various access restrictions on pages used for=0A=
-> confidential guests and other specialized functionality. See APM3 for=0A=
-> details on the instruction operations.=0A=
-> =0A=
-> The PSMASH instruction expands a 2MB RMP entry in the RMP table into a=0A=
-> corresponding set of contiguous 4KB RMP entries while retaining the=0A=
-> state of the validated bit from the original 2MB RMP entry. The=0A=
-> hypervisor will use this instruction in cases where it needs to re-map a=
-=0A=
-> page as 4K rather than 2MB in a guest's nested page table.=0A=
-> =0A=
-> Add helpers to make use of these instructions.=0A=
+> system-wide configuration values for SNP guests, such as the reported=0A=
+> TCB version used when signing guest attestation reports. Add an=0A=
+> interface to set this via userspace.=0A=
 > =0A=
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>=0A=
+> Co-developed-by: Alexey Kardashevskiy <aik@amd.com>=0A=
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>=0A=
+> Co-developed-by: Dionna Glaze <dionnaglaze@google.com>=0A=
+> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>=0A=
 > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>=0A=
-> [mdr: add RMPUPDATE retry logic for transient FAIL_OVERLAP errors]=0A=
+> [mdr: squash in doc patch from Dionna, drop extended request/certificate=
+=0A=
+>   handling and simplify this to a simple wrapper around SNP_CONFIG fw=0A=
+>   cmd]=0A=
 > Signed-off-by: Michael Roth <michael.roth@amd.com>=0A=
 > ---=0A=
->   arch/x86/include/asm/sev.h | 23 ++++++++++=0A=
->   arch/x86/virt/svm/sev.c    | 92 ++++++++++++++++++++++++++++++++++++++=
-=0A=
->   2 files changed, 115 insertions(+)=0A=
+>   Documentation/virt/coco/sev-guest.rst | 13 +++++++++++++=0A=
+>   drivers/crypto/ccp/sev-dev.c          | 20 ++++++++++++++++++++=0A=
+>   include/uapi/linux/psp-sev.h          |  1 +=0A=
+>   3 files changed, 34 insertions(+)=0A=
 > =0A=
-> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h=0A=
-> index 2c53e3de0b71..d3ccb7a0c7e9 100644=0A=
-> --- a/arch/x86/include/asm/sev.h=0A=
-> +++ b/arch/x86/include/asm/sev.h=0A=
-> @@ -87,10 +87,23 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs)=
-;=0A=
->   /* Software defined (when rFlags.CF =3D 1) */=0A=
->   #define PVALIDATE_FAIL_NOUPDATE		255=0A=
+> diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/c=
+oco/sev-guest.rst=0A=
+> index 007ae828aa2a..14c9de997b7d 100644=0A=
+> --- a/Documentation/virt/coco/sev-guest.rst=0A=
+> +++ b/Documentation/virt/coco/sev-guest.rst=0A=
+> @@ -162,6 +162,19 @@ SEV-SNP firmware SNP_COMMIT command. This prevents r=
+oll-back to a previously=0A=
+>   committed firmware version. This will also update the reported TCB to m=
+atch=0A=
+>   that of the currently installed firmware.=0A=
 >   =0A=
-> +/* RMUPDATE detected 4K page and 2MB page overlap. */=0A=
-> +#define RMPUPDATE_FAIL_OVERLAP		4=0A=
+> +2.6 SNP_SET_CONFIG=0A=
+> +------------------=0A=
+> +:Technology: sev-snp=0A=
+> +:Type: hypervisor ioctl cmd=0A=
+> +:Parameters (in): struct sev_user_data_snp_config=0A=
+> +:Returns (out): 0 on success, -negative on error=0A=
 > +=0A=
->   /* RMP page size */=0A=
->   #define RMP_PG_SIZE_4K			0=0A=
->   #define RMP_PG_SIZE_2M			1=0A=
->   #define RMP_TO_PG_LEVEL(level)		(((level) =3D=3D RMP_PG_SIZE_4K) ? PG_L=
-EVEL_4K : PG_LEVEL_2M)=0A=
-> +#define PG_LEVEL_TO_RMP(level)		(((level) =3D=3D PG_LEVEL_4K) ? RMP_PG_S=
-IZE_4K : RMP_PG_SIZE_2M)=0A=
-> +=0A=
-> +struct rmp_state {=0A=
-> +	u64 gpa;=0A=
-> +	u8 assigned;=0A=
-> +	u8 pagesize;=0A=
-> +	u8 immutable;=0A=
-> +	u8 rsvd;=0A=
-> +	u32 asid;=0A=
-> +} __packed;=0A=
->   =0A=
->   #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)=0A=
->   =0A=
-> @@ -248,10 +261,20 @@ static inline u64 sev_get_status(void) { return 0; =
-}=0A=
->   bool snp_probe_rmptable_info(void);=0A=
->   int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level);=0A=
->   void snp_dump_hva_rmpentry(unsigned long address);=0A=
-> +int psmash(u64 pfn);=0A=
-> +int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bo=
-ol immutable);=0A=
-> +int rmp_make_shared(u64 pfn, enum pg_level level);=0A=
->   #else=0A=
->   static inline bool snp_probe_rmptable_info(void) { return false; }=0A=
->   static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *lev=
-el) { return -ENODEV; }=0A=
->   static inline void snp_dump_hva_rmpentry(unsigned long address) {}=0A=
-> +static inline int psmash(u64 pfn) { return -ENODEV; }=0A=
-> +static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level=
-, int asid,=0A=
-> +				   bool immutable)=0A=
-> +{=0A=
-> +	return -ENODEV;=0A=
-> +}=0A=
-> +static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return=
- -ENODEV; }=0A=
->   #endif=0A=
->   =0A=
->   #endif=0A=
-> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c=0A=
-> index c74266e039b2..16b3d8139649 100644=0A=
-> --- a/arch/x86/virt/svm/sev.c=0A=
-> +++ b/arch/x86/virt/svm/sev.c=0A=
-> @@ -342,3 +342,95 @@ void snp_dump_hva_rmpentry(unsigned long hva)=0A=
->   	paddr =3D PFN_PHYS(pte_pfn(*pte)) | (hva & ~page_level_mask(level));=
+> +SNP_SET_CONFIG is used to set the system-wide configuration such as=0A=
+> +reported TCB version in the attestation report. The command is similar=
 =0A=
->   	dump_rmpentry(PHYS_PFN(paddr));=0A=
+> +to SNP_CONFIG command defined in the SEV-SNP spec. The current values of=
+=0A=
+> +the firmware parameters affected by this command can be queried via=0A=
+> +SNP_PLATFORM_STATUS.=0A=
+> +=0A=
+>   3. SEV-SNP CPUID Enforcement=0A=
+>   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=0A=
+>   =0A=
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c=
+=0A=
+> index 73ace4064e5a..398ae932aa0b 100644=0A=
+> --- a/drivers/crypto/ccp/sev-dev.c=0A=
+> +++ b/drivers/crypto/ccp/sev-dev.c=0A=
+> @@ -1982,6 +1982,23 @@ static int sev_ioctl_do_snp_commit(struct sev_issu=
+e_cmd *argp)=0A=
+>   	return __sev_do_cmd_locked(SEV_CMD_SNP_COMMIT, &buf, &argp->error);=0A=
 >   }=0A=
-> +=0A=
-> +/*=0A=
-> + * PSMASH a 2MB aligned page into 4K pages in the RMP table while preser=
-ving the=0A=
-> + * Validated bit.=0A=
-> + */=0A=
-> +int psmash(u64 pfn)=0A=
+>   =0A=
+> +static int sev_ioctl_do_snp_set_config(struct sev_issue_cmd *argp, bool =
+writable)=0A=
 > +{=0A=
-> +	unsigned long paddr =3D pfn << PAGE_SHIFT;=0A=
-> +	int ret;=0A=
-> +=0A=
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))=0A=
-> +		return -ENODEV;=0A=
-> +=0A=
-> +	if (!pfn_valid(pfn))=0A=
-> +		return -EINVAL;=0A=
-> +=0A=
-> +	/* Binutils version 2.36 supports the PSMASH mnemonic. */=0A=
-> +	asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"=0A=
-> +		      : "=3Da" (ret)=0A=
-> +		      : "a" (paddr)=0A=
-> +		      : "memory", "cc");=0A=
-> +=0A=
-> +	return ret;=0A=
-> +}=0A=
-> +EXPORT_SYMBOL_GPL(psmash);=0A=
-> +=0A=
-> +/*=0A=
-> + * It is expected that those operations are seldom enough so that no mut=
-ual=0A=
-> + * exclusion of updaters is needed and thus the overlap error condition =
-below=0A=
-> + * should happen very seldomly and would get resolved relatively quickly=
- by=0A=
-> + * the firmware.=0A=
-> + *=0A=
-> + * If not, one could consider introducing a mutex or so here to sync con=
-current=0A=
-> + * RMP updates and thus diminish the amount of cases where firmware need=
-s to=0A=
-> + * lock 2M ranges to protect against concurrent updates.=0A=
-> + *=0A=
-> + * The optimal solution would be range locking to avoid locking disjoint=
+> +	struct sev_device *sev =3D psp_master->sev_data;=0A=
 =0A=
-> + * regions unnecessarily but there's no support for that yet.=0A=
-> + */=0A=
-> +static int rmpupdate(u64 pfn, struct rmp_state *state)=0A=
-> +{=0A=
-> +	unsigned long paddr =3D pfn << PAGE_SHIFT;=0A=
-> +	int ret;=0A=
-> +=0A=
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))=0A=
-> +		return -ENODEV;=0A=
-> +=0A=
-> +	do {=0A=
-> +		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */=0A=
-> +		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"=0A=
-> +			     : "=3Da" (ret)=0A=
-> +			     : "a" (paddr), "c" ((unsigned long)state)=0A=
-> +			     : "memory", "cc");=0A=
-> +	} while (ret =3D=3D RMPUPDATE_FAIL_OVERLAP);=0A=
-> +=0A=
-> +	if (ret) {=0A=
-> +		pr_err("RMPUPDATE failed for PFN %llx, ret: %d\n", pfn, ret);=0A=
-> +		dump_rmpentry(pfn);=0A=
-> +		dump_stack();=0A=
-> +		return -EFAULT;=0A=
-> +	}=0A=
-> +=0A=
-> +	return 0;=0A=
-> +}=0A=
-> +=0A=
-> +/* Transition a page to guest-owned/private state in the RMP table. */=
-=0A=
-> +int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bo=
-ol immutable)=0A=
+Should this check that psp_master is not NULL? Like the fix for=0A=
+https://lore.kernel.org/all/20240125231253.3122579-1-kim.phillips@amd.com/=
 =0A=
 =0A=
-asid is typically a u32 (or at least unsigned) - is it better to avoid =0A=
-potential conversion issues with an 'int'?=0A=
-=0A=
-Otherwise=0A=
+Otherwise,=0A=
 Reviewed-by: Liam Merwick <liam.merwick@oracle.com>=0A=
 =0A=
+> +	struct sev_user_data_snp_config config;=0A=
+> +=0A=
+> +	if (!sev->snp_initialized || !argp->data)=0A=
+> +		return -EINVAL;=0A=
+> +=0A=
+> +	if (!writable)=0A=
+> +		return -EPERM;=0A=
+> +=0A=
+> +	if (copy_from_user(&config, (void __user *)argp->data, sizeof(config)))=
 =0A=
-> +{=0A=
-> +	struct rmp_state state;=0A=
+> +		return -EFAULT;=0A=
 > +=0A=
-> +	memset(&state, 0, sizeof(state));=0A=
-> +	state.assigned =3D 1;=0A=
-> +	state.asid =3D asid > +	state.immutable =3D immutable;=0A=
-> +	state.gpa =3D gpa;=0A=
-> +	state.pagesize =3D PG_LEVEL_TO_RMP(level);=0A=
-> +=0A=
-> +	return rmpupdate(pfn, &state);=0A=
+> +	return __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);=
+=0A=
 > +}=0A=
-> +EXPORT_SYMBOL_GPL(rmp_make_private);=0A=
 > +=0A=
-> +/* Transition a page to hypervisor-owned/shared state in the RMP table. =
-*/=0A=
-> +int rmp_make_shared(u64 pfn, enum pg_level level)=0A=
-> +{=0A=
-> +	struct rmp_state state;=0A=
-> +=0A=
-> +	memset(&state, 0, sizeof(state));=0A=
-> +	state.pagesize =3D PG_LEVEL_TO_RMP(level);=0A=
-> +=0A=
-> +	return rmpupdate(pfn, &state);=0A=
-> +}=0A=
-> +EXPORT_SYMBOL_GPL(rmp_make_shared);=0A=
+>   static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned l=
+ong arg)=0A=
+>   {=0A=
+>   	void __user *argp =3D (void __user *)arg;=0A=
+> @@ -2039,6 +2056,9 @@ static long sev_ioctl(struct file *file, unsigned i=
+nt ioctl, unsigned long arg)=0A=
+>   	case SNP_COMMIT:=0A=
+>   		ret =3D sev_ioctl_do_snp_commit(&input);=0A=
+>   		break;=0A=
+> +	case SNP_SET_CONFIG:=0A=
+> +		ret =3D sev_ioctl_do_snp_set_config(&input, writable);=0A=
+> +		break;=0A=
+>   	default:=0A=
+>   		ret =3D -EINVAL;=0A=
+>   		goto out;=0A=
+> diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h=
+=0A=
+> index 35c207664e95..b7a2c2ee35b7 100644=0A=
+> --- a/include/uapi/linux/psp-sev.h=0A=
+> +++ b/include/uapi/linux/psp-sev.h=0A=
+> @@ -30,6 +30,7 @@ enum {=0A=
+>   	SEV_GET_ID2,=0A=
+>   	SNP_PLATFORM_STATUS,=0A=
+>   	SNP_COMMIT,=0A=
+> +	SNP_SET_CONFIG,=0A=
+>   =0A=
+>   	SEV_MAX,=0A=
+>   };=0A=
 =0A=
