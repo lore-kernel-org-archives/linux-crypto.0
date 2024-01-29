@@ -1,260 +1,200 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D205FEFE;
-	Mon, 29 Jan 2024 12:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0324612DA
+	for <linux-crypto@vger.kernel.org>; Mon, 29 Jan 2024 12:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706529619; cv=none; b=lCm9GzXIxJ1K8T8sVMs9oF2hpf1m5qM3YFRxkfwJqIK7m8QsK5RODhjp/H2Fs/ekTddDhxv7tIX2vPFeDR7SNwfnjnyWBoRbsbibVAB54xsIxj8KED0y0YF4sGw8/KmiAx7zTxODlQehT/KqL7brQ2GNowcfDuZTuslQFD9draA=
+	t=1706532933; cv=none; b=V/ERejKGx70BlWpmjc/TgVlJLLfo6SWonK40U/djd8J6tY/1ylOYzqMTPgO4SPWfDW6IbrVSknZYiCih0O29S1hxxsYkf9HZ5mYAPl3QcmcVkI9RyJ7QrzLBk5TN607YB0QvRBPD2u4Ub1IAaN7psgDc8zmXc1UD6ts2gdKKuRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706529619; c=relaxed/simple;
-	bh=mhGFf7MGTE5UAJykdouzYWhk4A4r1a2TZMx7bqBDAL8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HyB9MY4A/d0a8Cl2u0PL0f7tMkOwEm1i8+YhU5co8RjYv5maScoR9AqSDpWIRvOVlPy8hYSA1rG0S07DGmfYiOMiSkun0xHp+b5U63Ficd8ZaJZbX3oYoAXR5U+bmEWP7MSSsHg6yQpE6d+iJaV0pGUqM2Kc5yQxNZSEce8fmOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=IBierxaI; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="IBierxaI"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A8E7B40E0196;
-	Mon, 29 Jan 2024 12:00:12 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id O1PSSIUvSr7N; Mon, 29 Jan 2024 12:00:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1706529610; bh=/7xdwftFvU+K+fkB5/ftiK4NLEcLXN8V2ZAOrBtCZIE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IBierxaIyAM4wVGGVRMEVa0DhSTk88Xh5/OsGgzc4yP+6lvF1kUD9VZKGAew+NHBk
-	 Q7kGzqLvTMr/cz9aNoicn2tPBb271lGceu6yMC3cXAwExtfCV7kF8VqTitg6j/sG6v
-	 oLJcAizi3PnbrH56dycJABb3hEU14dL5U02Li4+7Nc7eclV5FfDPpbMRXOokEF4WMh
-	 aA8YVFXNFx2WroM0cNQGlOH+9xU6gPwFBySl7FoIsVYslCfQg51BMFrYVyYuwrunM9
-	 +ftHYOc1z+qpU3qAsIUI5scOBlpibpkNiiuOIL6kF7C0BAFkXmuKf5sNowzEfPP7A7
-	 V/frA2kDd09a9fkvf18ND5bZ0UT0bvklhvTo6r0kID8oikyiKGNFFgW9v8lQeor+AC
-	 0N89Ed4xoAnVVZKSfKOZTMFcGRAV2+YeStzr2kEdj4BprulWSHFugZ2dUQNv8ALRRP
-	 0h7Cy0WCjKz3yqdnObG/x8fN6OVW5EPRjtH/oyymOa2RKAL8I6DksXWuR5Mc4igIAG
-	 OV8POWpWzWX1g04MaabkYiJfBVCA8egDSArYfvEXl2bIjTNdiKpu59WvZA7MFZ4qyH
-	 yHIbgrkCVe7vMaOO4/FnbijEXMg6/T+tQMWhqY0DwOGiMrVLaZqjh16+IrNNXnDYjk
-	 kStk+XZ13tqUQvqFgyhus5/0=
-Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AB5CF40E01B3;
-	Mon, 29 Jan 2024 11:59:33 +0000 (UTC)
-Date: Mon, 29 Jan 2024 12:59:28 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com
-Subject: Re: [PATCH v2 11/25] x86/sev: Adjust directmap to avoid inadvertant
- RMP faults
-Message-ID: <20240129115928.GBZbeTIJUYivEMSonh@fat_crate.local>
-References: <20240126041126.1927228-1-michael.roth@amd.com>
- <20240126041126.1927228-12-michael.roth@amd.com>
- <20240126153451.GDZbPRG3KxaQik-0aY@fat_crate.local>
- <20240126170415.f7r4nvsrzgpzcrzv@amd.com>
- <20240126184340.GEZbP9XA13X91-eybA@fat_crate.local>
- <20240126235420.mu644waj2eyoxqx6@amd.com>
- <20240127114207.GBZbTsDyC3hFq8pQ3D@fat_crate.local>
- <20240127154506.v3wdio25zs6i2lc3@amd.com>
- <20240127160249.GDZbUpKW_cqRzdYn7Z@fat_crate.local>
+	s=arc-20240116; t=1706532933; c=relaxed/simple;
+	bh=gCNLN32onkfofc2XLJ63iawEcWMbF9XLfRMNpJZnSL8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KAn2cpGLHBomPR02bLYPNZKrkT3oRIWCRG3XL3ygmxHSSqM5qeU+ErzF/esyiVjbUw+WbqZ1B0hCEGjegQdeU/qlJmVPJT909PQAVdASHvGJX8WYo+xo8Aj6oc6dRuc8h/LPgnxlDqY6h7r6MOFXKm7k7JBu/8UI0/fFq/OM15A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-363779f3989so8994585ab.3
+        for <linux-crypto@vger.kernel.org>; Mon, 29 Jan 2024 04:55:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706532930; x=1707137730;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UrnXr+h10ghLDpUHiMKmC913INgZavjkvo1GZXmFYWk=;
+        b=AxXADxVGPp4Gm28MtJqaIqG18LdRWdy9fVxCXHakuUxi1FfaaZV/ktH7dTqKGddEUm
+         W2U8PIrnAPLGd75DRkNXKUi8odf9kA3gg9xj4xGQovMP8+MamB18r5gMPdQCrx1nciGg
+         brKAW65g8qBok2qUnKacgMxDQTmzw6raIKYwU7hPOBjNjlHc6cdh/+R5rgRtIL/efP8r
+         zoILEiDYeAMcfA/Dn5ue2RapYA6akrB+pOgNEezmsl8k2oxNUhUPCmj0KZK9TVtvaC/H
+         +9nLRva3cvzKZiRMovp7MiNoZXXnoVZ/tb1Bvlq7zXnV0apJ6T48OjQESANFMgBonF/b
+         stdg==
+X-Gm-Message-State: AOJu0YzoVCJ+8HCPV31FIRXq1scYwQqccMcIpXJRbBQ0tX1RAsYJGN9V
+	P0uRB/Ia7XIFC+qa8/yKpXXzjOIfOur/WSESYb9Rlx38cj7aU8xYbOU7923uuF1h/lBgRVg9/r3
+	LOXha+TAi912NtpoTJrgaEU9tRY9qOzjYWytwNQ9atrzVDeGA1skyIzg=
+X-Google-Smtp-Source: AGHT+IGPlSzYOPzrKRbtnmW7WFNiwQKydE+NeSOBAz2/BDx3RJAYPJA+6muxCx6BYlUnVioEoU0kLBrzwWVFVTCWkJ1LVxq5FbUI
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240127160249.GDZbUpKW_cqRzdYn7Z@fat_crate.local>
+X-Received: by 2002:a92:c562:0:b0:35f:f01e:bb18 with SMTP id
+ b2-20020a92c562000000b0035ff01ebb18mr594758ilj.6.1706532930067; Mon, 29 Jan
+ 2024 04:55:30 -0800 (PST)
+Date: Mon, 29 Jan 2024 04:55:30 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000018273706101529cf@google.com>
+Subject: [syzbot] [crypto?] BUG: unable to handle kernel NULL pointer
+ dereference in crypto_arc4_crypt
+From: syzbot <syzbot+050eeedd6c285d8c42f2@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Jan 27, 2024 at 05:02:49PM +0100, Borislav Petkov wrote:
-> This function takes any PFN it gets passed in as it is. I don't care
-> who its users are now or in the future and whether they pay attention
-> what they pass into - it needs to be properly defined.
+Hello,
 
-Ok, we solved it offlist, here's the final version I have. It has
-a comment explaining what I was asking.
+syzbot found the following issue on:
+
+HEAD commit:    3a5879d495b2 Merge tag 'ata-6.8-rc2' of git://git.kernel.o..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1683b6bbe80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bc36d99546fe9035
+dashboard link: https://syzkaller.appspot.com/bug?extid=050eeedd6c285d8c42f2
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15178ea0180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=107f8eefe80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6f5df0cd5c86/disk-3a5879d4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/284ff9c3970b/vmlinux-3a5879d4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b75c80c77fad/bzImage-3a5879d4.xz
+
+The issue was bisected to:
+
+commit 47309ea1359115125d9cab17a279c8df72b47235
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Tue Nov 28 06:52:57 2023 +0000
+
+    crypto: arc4 - Add internal state
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1325e5a0180000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=10a5e5a0180000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1725e5a0180000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+050eeedd6c285d8c42f2@syzkaller.appspotmail.com
+Fixes: 47309ea13591 ("crypto: arc4 - Add internal state")
+
+"syz-executor299" (5065) uses obsolete ecb(arc4) skcipher
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+#PF: supervisor write access in kernel mode
+#PF: error_code(0x0002) - not-present page
+PGD 78051067 P4D 78051067 PUD 7e3d7067 PMD 0 
+Oops: 0002 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 5065 Comm: syz-executor299 Not tainted 6.8.0-rc1-syzkaller-00311-g3a5879d495b2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+RIP: 0010:memcpy_orig+0x31/0x120 arch/x86/lib/memcpy_64.S:71
+Code: 48 83 fa 20 0f 82 86 00 00 00 40 38 fe 7c 35 48 83 ea 20 48 83 ea 20 4c 8b 06 4c 8b 4e 08 4c 8b 56 10 4c 8b 5e 18 48 8d 76 20 <4c> 89 07 4c 89 4f 08 4c 89 57 10 4c 89 5f 18 48 8d 7f 20 73 d4 83
+RSP: 0018:ffffc90003a378c0 EFLAGS: 00010202
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff84401c81
+RDX: 00000000000003c8 RSI: ffff888019ee1040 RDI: 0000000000000000
+RBP: ffff888019ee1000 R08: 0000000400000003 R09: 0000002200000071
+R10: 0000000800000016 R11: 0000001700000083 R12: 0000000000000000
+R13: ffff88807f225da0 R14: ffff88807929e000 R15: 0000000000000001
+FS:  00005555570b8380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000007c30c000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ crypto_arc4_crypt+0x4b/0x70 crypto/arc4.c:33
+ crypto_lskcipher_crypt crypto/lskcipher.c:160 [inline]
+ crypto_lskcipher_decrypt+0xd4/0x130 crypto/lskcipher.c:194
+ crypto_cbc_decrypt_segment crypto/cbc.c:80 [inline]
+ crypto_cbc_decrypt+0x14f/0x330 crypto/cbc.c:133
+ crypto_lskcipher_crypt_sg+0x28c/0x460 crypto/lskcipher.c:229
+ crypto_skcipher_decrypt+0xda/0x160 crypto/skcipher.c:693
+ _skcipher_recvmsg crypto/algif_skcipher.c:199 [inline]
+ skcipher_recvmsg+0xc2b/0x1040 crypto/algif_skcipher.c:221
+ sock_recvmsg_nosec net/socket.c:1046 [inline]
+ sock_recvmsg+0xe2/0x170 net/socket.c:1068
+ __sys_recvfrom+0x1ab/0x2e0 net/socket.c:2242
+ __do_sys_recvfrom net/socket.c:2260 [inline]
+ __se_sys_recvfrom net/socket.c:2256 [inline]
+ __x64_sys_recvfrom+0xe0/0x1b0 net/socket.c:2256
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7f23399079b9
+Code: ff e8 cb 01 00 00 66 2e 0f 1f 84 00 00 00 00 00 90 80 3d f1 56 07 00 00 41 89 ca 74 1c 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 67 c3 66 0f 1f 44 00 00 55 48 83 ec 20 48 89
+RSP: 002b:00007ffe68b37d28 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
+RAX: ffffffffffffffda RBX: 00007ffe68b37db4 RCX: 00007f23399079b9
+RDX: 0000000000001000 RSI: 00007ffe68b37da0 RDI: 0000000000000004
+RBP: 0000000000000004 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffe68b37da0
+R13: 00007ffe68b38f88 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+Modules linked in:
+CR2: 0000000000000000
+---[ end trace 0000000000000000 ]---
+RIP: 0010:memcpy_orig+0x31/0x120 arch/x86/lib/memcpy_64.S:71
+Code: 48 83 fa 20 0f 82 86 00 00 00 40 38 fe 7c 35 48 83 ea 20 48 83 ea 20 4c 8b 06 4c 8b 4e 08 4c 8b 56 10 4c 8b 5e 18 48 8d 76 20 <4c> 89 07 4c 89 4f 08 4c 89 57 10 4c 89 5f 18 48 8d 7f 20 73 d4 83
+RSP: 0018:ffffc90003a378c0 EFLAGS: 00010202
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff84401c81
+RDX: 00000000000003c8 RSI: ffff888019ee1040 RDI: 0000000000000000
+RBP: ffff888019ee1000 R08: 0000000400000003 R09: 0000002200000071
+R10: 0000000800000016 R11: 0000001700000083 R12: 0000000000000000
+R13: ffff88807f225da0 R14: ffff88807929e000 R15: 0000000000000001
+FS:  00005555570b8380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000007c30c000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	48 83 fa 20          	cmp    $0x20,%rdx
+   4:	0f 82 86 00 00 00    	jb     0x90
+   a:	40 38 fe             	cmp    %dil,%sil
+   d:	7c 35                	jl     0x44
+   f:	48 83 ea 20          	sub    $0x20,%rdx
+  13:	48 83 ea 20          	sub    $0x20,%rdx
+  17:	4c 8b 06             	mov    (%rsi),%r8
+  1a:	4c 8b 4e 08          	mov    0x8(%rsi),%r9
+  1e:	4c 8b 56 10          	mov    0x10(%rsi),%r10
+  22:	4c 8b 5e 18          	mov    0x18(%rsi),%r11
+  26:	48 8d 76 20          	lea    0x20(%rsi),%rsi
+* 2a:	4c 89 07             	mov    %r8,(%rdi) <-- trapping instruction
+  2d:	4c 89 4f 08          	mov    %r9,0x8(%rdi)
+  31:	4c 89 57 10          	mov    %r10,0x10(%rdi)
+  35:	4c 89 5f 18          	mov    %r11,0x18(%rdi)
+  39:	48 8d 7f 20          	lea    0x20(%rdi),%rdi
+  3d:	73 d4                	jae    0x13
+  3f:	83                   	.byte 0x83
+
 
 ---
-From: Michael Roth <michael.roth@amd.com>
-Date: Thu, 25 Jan 2024 22:11:11 -0600
-Subject: [PATCH] x86/sev: Adjust the directmap to avoid inadvertent RMP faults
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-If the kernel uses a 2MB or larger directmap mapping to write to an
-address, and that mapping contains any 4KB pages that are set to private
-in the RMP table, an RMP #PF will trigger and cause a host crash.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-SNP-aware code that owns the private PFNs will never attempt such
-a write, but other kernel tasks writing to other PFNs in the range may
-trigger these checks inadvertently due to writing to those other PFNs
-via a large directmap mapping that happens to also map a private PFN.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Prevent this by splitting any 2MB+ mappings that might end up containing
-a mix of private/shared PFNs as a result of a subsequent RMPUPDATE for
-the PFN/rmp_level passed in.
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
-Another way to handle this would be to limit the directmap to 4K
-mappings in the case of hosts that support SNP, but there is potential
-risk for performance regressions of certain host workloads.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-Handling it as-needed results in the directmap being slowly split over
-time, which lessens the risk of a performance regression since the more
-the directmap gets split as a result of running SNP guests, the more
-likely the host is being used primarily to run SNP guests, where
-a mostly-split directmap is actually beneficial since there is less
-chance of TLB flushing and cpa_lock contention being needed to perform
-these splits.
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-Cases where a host knows in advance it wants to primarily run SNP guests
-and wishes to pre-split the directmap can be handled by adding
-a tuneable in the future, but preliminary testing has shown this to not
-provide a signficant benefit in the common case of guests that are
-backed primarily by 2MB THPs, so it does not seem to be warranted
-currently and can be added later if a need arises in the future.
-
-Signed-off-by: Michael Roth <michael.roth@amd.com>
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
-Link: https://lore.kernel.org/r/20240126041126.1927228-12-michael.roth@amd.com
----
- arch/x86/virt/svm/sev.c | 86 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 84 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index c0b4c2306e8d..8da9c5330ff0 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -368,6 +368,82 @@ int psmash(u64 pfn)
- }
- EXPORT_SYMBOL_GPL(psmash);
- 
-+/*
-+ * If the kernel uses a 2MB or larger directmap mapping to write to an address,
-+ * and that mapping contains any 4KB pages that are set to private in the RMP
-+ * table, an RMP #PF will trigger and cause a host crash. Hypervisor code that
-+ * owns the PFNs being transitioned will never attempt such a write, but other
-+ * kernel tasks writing to other PFNs in the range may trigger these checks
-+ * inadvertently due a large directmap mapping that happens to overlap such a
-+ * PFN.
-+ *
-+ * Prevent this by splitting any 2MB+ mappings that might end up containing a
-+ * mix of private/shared PFNs as a result of a subsequent RMPUPDATE for the
-+ * PFN/rmp_level passed in.
-+ *
-+ * Note that there is no attempt here to scan all the RMP entries for the 2MB
-+ * physical range, since it would only be worthwhile in determining if a
-+ * subsequent RMPUPDATE for a 4KB PFN would result in all the entries being of
-+ * the same shared/private state, thus avoiding the need to split the mapping.
-+ * But that would mean the entries are currently in a mixed state, and so the
-+ * mapping would have already been split as a result of prior transitions.
-+ * And since the 4K split is only done if the mapping is 2MB+, and there isn't
-+ * currently a mechanism in place to restore 2MB+ mappings, such a check would
-+ * not provide any usable benefit.
-+ *
-+ * More specifics on how these checks are carried out can be found in APM
-+ * Volume 2, "RMP and VMPL Access Checks".
-+ */
-+static int adjust_direct_map(u64 pfn, int rmp_level)
-+{
-+	unsigned long vaddr;
-+	unsigned int level;
-+	int npages, ret;
-+	pte_t *pte;
-+
-+	/*
-+	 * pfn_to_kaddr() will return a vaddr only within the direct
-+	 * map range.
-+	 */
-+	vaddr = (unsigned long)pfn_to_kaddr(pfn);
-+
-+	/* Only 4KB/2MB RMP entries are supported by current hardware. */
-+	if (WARN_ON_ONCE(rmp_level > PG_LEVEL_2M))
-+		return -EINVAL;
-+
-+       if (!pfn_valid(pfn))
-+               return -EINVAL;
-+
-+       if (rmp_level == PG_LEVEL_2M &&
-+           (!IS_ALIGNED(pfn, PTRS_PER_PMD) ||
-+            !pfn_valid(pfn + PTRS_PER_PMD - 1)))
-+		return -EINVAL;
-+
-+	/*
-+	 * If an entire 2MB physical range is being transitioned, then there is
-+	 * no risk of RMP #PFs due to write accesses from overlapping mappings,
-+	 * since even accesses from 1GB mappings will be treated as 2MB accesses
-+	 * as far as RMP table checks are concerned.
-+	 */
-+	if (rmp_level == PG_LEVEL_2M)
-+		return 0;
-+
-+	pte = lookup_address(vaddr, &level);
-+	if (!pte || pte_none(*pte))
-+		return 0;
-+
-+	if (level == PG_LEVEL_4K)
-+		return 0;
-+
-+	npages = page_level_size(rmp_level) / PAGE_SIZE;
-+	ret = set_memory_4k(vaddr, npages);
-+	if (ret)
-+		pr_warn("Failed to split direct map for PFN 0x%llx, ret: %d\n",
-+			pfn, ret);
-+
-+	return ret;
-+}
-+
- /*
-  * It is expected that those operations are seldom enough so that no mutual
-  * exclusion of updaters is needed and thus the overlap error condition below
-@@ -384,11 +460,16 @@ EXPORT_SYMBOL_GPL(psmash);
- static int rmpupdate(u64 pfn, struct rmp_state *state)
- {
- 	unsigned long paddr = pfn << PAGE_SHIFT;
--	int ret;
-+	int ret, level;
- 
- 	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
- 		return -ENODEV;
- 
-+	level = RMP_TO_PG_LEVEL(state->pagesize);
-+
-+	if (adjust_direct_map(pfn, level))
-+		return -EFAULT;
-+
- 	do {
- 		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
- 		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
-@@ -398,7 +479,8 @@ static int rmpupdate(u64 pfn, struct rmp_state *state)
- 	} while (ret == RMPUPDATE_FAIL_OVERLAP);
- 
- 	if (ret) {
--		pr_err("RMPUPDATE failed for PFN %llx, ret: %d\n", pfn, ret);
-+		pr_err("RMPUPDATE failed for PFN %llx, pg_level: %d, ret: %d\n",
-+		       pfn, level, ret);
- 		dump_rmpentry(pfn);
- 		dump_stack();
- 		return -EFAULT;
--- 
-2.43.0
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+If you want to undo deduplication, reply with:
+#syz undup
