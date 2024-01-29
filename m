@@ -1,99 +1,119 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535056166D;
-	Mon, 29 Jan 2024 12:57:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552596280D;
+	Mon, 29 Jan 2024 13:17:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706533056; cv=none; b=RdsvLInHso8YEbSLS4CLY1hViypu9O4ZuhbcPzOsMeR8+iEqkbdgNXh0X46lgtsVag3eSE5LDkMStFi/lDkSQargzAppTRZx4O8enmbArp50PLe36fEWmEiLuoLrVY/EORSjK/YXAtyaLBnaFoHodLGRiebho33FpjVYCZ/69/w=
+	t=1706534256; cv=none; b=ePpd1QAP8dVSvNXfYn6P944lwPML3OpwxWilYEg9J96NP5lpy7EjjKQashNSLX6m/3FPhC1fjcDuqDfa++FzMgnm/o2m0yyXdtmYB4TzV5C26j0CyIobKIysxxQu7j6aAw3X+HFlyU7Baa5VKGJ6oQSiMvV9fUZgcqnP+/zQAaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706533056; c=relaxed/simple;
-	bh=uQ/Xzy1t1vgnWJ/4O5irvMHl8vFPdVlozjit+qHy3vw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=nFBZI1hoL6Q3C6fmASR3ApmctQ438UsrqBj/Diz1yvmGLqOg7+qKTXBuyT/IaLrZbDPgt4ZmEIbrRF6y5n7pRRXgWCmsROQ0mxE9aGrEX+VSG3Mt1uIQLuj03IiTGwuaYxahY05S2aM5Cnw0dtyIvX9XXo14KDjfs2KwPcIl3Cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AQ8jbGBV; arc=none smtp.client-ip=209.85.128.171
+	s=arc-20240116; t=1706534256; c=relaxed/simple;
+	bh=6QTPt33T5rQKL/6Gt/bIWU0jYiWt8sqi5iCPonlXgec=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=tqFDqnfr9HxRWFQMsSbvwcr5F3X0BcdoGWs8DrW386y+rVOMxg/A8bXiwaYJ38jbf2hm/6m7XypAKegYrW78mX9YaCAwAhjOVwydhu8xdRA3wQK0FmhODYB3eJze0M24Px1+W85Ln9w3OncdoIN8IMCd+KIchf1gUxg2V4SHlHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PgaFvKX3; arc=none smtp.client-ip=209.85.218.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AQ8jbGBV"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-6001449a2beso17037007b3.3;
-        Mon, 29 Jan 2024 04:57:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PgaFvKX3"
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a349ed467d9so286164666b.1;
+        Mon, 29 Jan 2024 05:17:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706533050; x=1707137850; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q7MRtgQq1559VqTtq0fV0eOYg6mrlq7EbBFuJ58DRMI=;
-        b=AQ8jbGBVOFd6xGwO0CItRemwVgIIWS0L8O0IVV/eR7Ic1oMicAUU/HgFHfAVX7zuDd
-         6Kxfc8C28ZtOHC35cHmKwUBXmPkE4onDQTPGEXYrXwwsqj/9zBkkQ1G5+knLDGqlWeky
-         sAPVkDEGajz+D5h1dDV3sHHlgSTlV60yhHxwjLMNdgd3+1kVIToCPEuYnvRQ7+pWoOa5
-         x2r4gi0bgOQQdhQaCO8xCYfgbdsgmN/RqDOefGsmLPsZVMe8Wt0B+tBeiMcNZ0CdSLeP
-         ET/x7aUnZvfeA5jhAlj1O2chu9KGSeTKBZFqXzemTa/PWD0zGjgZLbVJA2PU9Wp3b2yN
-         8XWA==
+        d=gmail.com; s=20230601; t=1706534252; x=1707139052; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tMwNqcZZgOVXT/J1FjC+xI4RABs1qjk7vHn8GPhDdCA=;
+        b=PgaFvKX3hLtNIRwS3CD1g+ugBX57+JA3YHbRQ9n6tneYEWhJ3uoU6T4hzxhG/qtp0h
+         Ct64xKsJrffFcJyMxcDuXe++aYwxmYeZkwg6bm+9OmXBR8jwM3everq/e2LnCx13r87m
+         Z6mxBBBtWWl7Gs+a12ilJ9M522NinOaDo5i2FfgjW0/ZNB6yj6UWy/RaA/42By1tmrKB
+         F9oHvCyLYwUO5usWCD2kaWYsd3GQXOmUpsHnKwy7ZMa2bPIFiewRCQ/3/2AAbZnhDFv4
+         HsvTK1GiyGaw7ZnhvYHmpt7GfEVNdDgSKCgJcmmKVrXmSRAGE+VM33DjyLnMcO5XHwFy
+         uoMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706533050; x=1707137850;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q7MRtgQq1559VqTtq0fV0eOYg6mrlq7EbBFuJ58DRMI=;
-        b=KM00yC+n8uI0pM+7FACzj+ERLjmqW9niV8a0NBRS53F29feicOtB0HJJU6HsTOkZ/5
-         xVKeLdyyj3/VjanGBhbSGvEo2eHevZ+lLrlQA97CmQcmuoxdDYeqsvM5Pl3KppyxWrav
-         Wcd5hUV+U9BkOEclEzHaPia/50iusJF5bkcSV2ydEDvBE+LizbezKPJVVnkh9ojs1iej
-         PfmQ6LXfh1iPa4VHtcQAJB8x/ZJhNfQUOd9oB71UoR2e0+uVuu3xu716gtEOfn1/44Zp
-         dSDsTNryu9Ii/sgW6JQDPAsDUWL2cFCd1o3fJ+QuLUrdzGjBAp0mm+SmauwbQugd+Nj1
-         /HCw==
-X-Gm-Message-State: AOJu0YzsVBCSTeVKuiC2xZHb3PKO+yBTuYi01vYTDdJDt+SEiV9TaFJP
-	M0HUeyjj3kpSAgIi6Jv+PQKaEWnmP8YKs0ccfsgXrnJDDowkDXg=
-X-Google-Smtp-Source: AGHT+IEEzC5ixYHXvoggCQs5qrvbv9IqQr5jYpj6wOIk6jV/fBwm69ksRVsje5mHZpNEaplLRhBK2Q==
-X-Received: by 2002:a0d:d793:0:b0:602:ac0e:697f with SMTP id z141-20020a0dd793000000b00602ac0e697fmr3722989ywd.51.1706533050102;
-        Mon, 29 Jan 2024 04:57:30 -0800 (PST)
-Received: from localhost ([207.181.197.26])
-        by smtp.gmail.com with ESMTPSA id v7-20020a05620a0f0700b00783b6da58a9sm3077939qkl.39.2024.01.29.04.57.28
+        d=1e100.net; s=20230601; t=1706534252; x=1707139052;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tMwNqcZZgOVXT/J1FjC+xI4RABs1qjk7vHn8GPhDdCA=;
+        b=RRYpqnIjGEtw2KISnxaoPCV2y34gE+oGG+jNHDGieuIfMbq3iMq3v5AlOSDlTJ6i12
+         hh64Eh/lmXBFlFDrp8T8dTyNbMnjgqj3Lbtp/mn7zEqfq4EvgzdCSQfxLI6gJQ6gC4gk
+         +j8iNPbcwNihVAWeIydVeca8Ee3ntZj9+BMEjWlQeDKC3dcq+mHZAn+RubNKIaIDvrnO
+         eYLc5Q5Sf2fzKdGUFQQCZxPywabZug6NS6+K1g1IW7WsKIYzIl1XRacx2/4LR3Una13r
+         LmyMo5uXoQEJVLOZ8r8IkSgvK06SWAKkgkOEFeucpDrKalTelsub5DGW1ZAEyORxdDJS
+         zQVw==
+X-Gm-Message-State: AOJu0Yw4SnnPm32ru6DB+TRfh5Exje0re0294+BGmHdF+USzCAQysQqI
+	qMCU8H8tyLuvK6cDMqlyEB13g0vI4f5/9yEeczlZzJLFiX0KNDOB
+X-Google-Smtp-Source: AGHT+IF56lsLVSwWT0MpkDQTXGgYqHeVKKkqZNQrGyXnP0BOY5XivLNVLZnraDMCsPBFwK/blGmZfg==
+X-Received: by 2002:a17:906:2e94:b0:a35:fdf9:e6fc with SMTP id o20-20020a1709062e9400b00a35fdf9e6fcmr55005eji.18.1706534252237;
+        Mon, 29 Jan 2024 05:17:32 -0800 (PST)
+Received: from felia.fritz.box ([2a02:810d:7e40:14b0:fddc:9ce:9e0f:3ad3])
+        by smtp.gmail.com with ESMTPSA id q15-20020a17090622cf00b00a359afad88dsm1590449eja.10.2024.01.29.05.17.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 04:57:29 -0800 (PST)
-Date: Mon, 29 Jan 2024 06:57:28 -0600
-From: Lenko Donchev <lenko.donchev@gmail.com>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Mon, 29 Jan 2024 05:17:31 -0800 (PST)
+From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To: Danny Tsen <dtsen@linux.ibm.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: [PATCH] crypto: qat - use kcalloc() instead of kzalloc()
-Message-ID: <ZbeguDTmVrP9SnDr@nixos>
+	linux-crypto@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] MAINTAINERS: adjust file entries after crypto vmx file movement
+Date: Mon, 29 Jan 2024 14:17:29 +0100
+Message-Id: <20240129131729.4311-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-We are trying to get rid of all multiplications from allocation
-functions to prevent integer overflows[1]. Here the multiplication is
-obviously safe, but using kcalloc() is more appropriate and improves
-readability. This patch has no effect on runtime behavior.
+Commit 109303336a0c ("crypto: vmx - Move to arch/powerpc/crypto") moves the
+crypto vmx files to arch/powerpc, but misses to adjust the file entries for
+IBM Power VMX Cryptographic instructions and LINUX FOR POWERPC.
 
-Link: https://github.com/KSPP/linux/issues/162 [1]
-Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [2]
+Hence, ./scripts/get_maintainer.pl --self-test=patterns complains about
+broken references.
 
-Signed-off-by: Lenko Donchev <lenko.donchev@gmail.com>
+Adjust these file entries accordingly.
+
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
 ---
- drivers/crypto/intel/qat/qat_common/adf_isr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Danny, please ack.
+Herbert, please pick this minor clean-up patch on your -next tree.
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_isr.c b/drivers/crypto/intel/qat/qat_common/adf_isr.c
-index 3557a0d6dea2..a13d9885d60f 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_isr.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_isr.c
-@@ -272,7 +272,7 @@ static int adf_isr_alloc_msix_vectors_data(struct adf_accel_dev *accel_dev)
- 	if (!accel_dev->pf.vf_info)
- 		msix_num_entries += hw_data->num_banks;
+ MAINTAINERS | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2fb944964be5..15bc79e80e28 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10307,12 +10307,12 @@ M:	Nayna Jain <nayna@linux.ibm.com>
+ M:	Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Supported
+-F:	drivers/crypto/vmx/Kconfig
+-F:	drivers/crypto/vmx/Makefile
+-F:	drivers/crypto/vmx/aes*
+-F:	drivers/crypto/vmx/ghash*
+-F:	drivers/crypto/vmx/ppc-xlate.pl
+-F:	drivers/crypto/vmx/vmx.c
++F:	arch/powerpc/crypto/Kconfig
++F:	arch/powerpc/crypto/Makefile
++F:	arch/powerpc/crypto/aes*
++F:	arch/powerpc/crypto/ghash*
++F:	arch/powerpc/crypto/ppc-xlate.pl
++F:	arch/powerpc/crypto/vmx.c
  
--	irqs = kzalloc_node(msix_num_entries * sizeof(*irqs),
-+	irqs = kcalloc_node(msix_num_entries, sizeof(*irqs),
- 			    GFP_KERNEL, dev_to_node(&GET_DEV(accel_dev)));
- 	if (!irqs)
- 		return -ENOMEM;
+ IBM ServeRAID RAID DRIVER
+ S:	Orphan
+@@ -12397,7 +12397,6 @@ F:	drivers/*/*/*pasemi*
+ F:	drivers/*/*pasemi*
+ F:	drivers/char/tpm/tpm_ibmvtpm*
+ F:	drivers/crypto/nx/
+-F:	drivers/crypto/vmx/
+ F:	drivers/i2c/busses/i2c-opal.c
+ F:	drivers/net/ethernet/ibm/ibmveth.*
+ F:	drivers/net/ethernet/ibm/ibmvnic.*
 -- 
-2.43.0
+2.17.1
 
