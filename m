@@ -1,356 +1,163 @@
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D36EECC;
-	Mon, 29 Jan 2024 02:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1683F52F6C
+	for <linux-crypto@vger.kernel.org>; Mon, 29 Jan 2024 08:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706496048; cv=none; b=thPpd/1IvJow4adthQ+uHzeMPKIltKjlOwjZf4m5HVU+CFKUaYZIWxk6VGGxeu9JWcTF2w+LPoRQivfA9WbRis9mBdoQVQm7HSpXaDvX3HUkEFIIEP6HBH/HimUqB7BP0DiFh2Z8mdhoZgVuPZAokqOlk8HqAVriFoeVU8Bdrj4=
+	t=1706516128; cv=none; b=LvyWMqUost+6klVUK1qNkgXX1oDr3uQdqBNtlgXg6ti9Hnl1k655Bbn/rltgArdd1gfiQQPySYCvSK5TF6lmrAWIXskFCJA2C2FK9SESrYXVXTXO4Fcf9mM8dVVEVGDX7zaOms7WB2hIdXq6N4EEHWVTjkY8Cfbd5Q6/yeR9wDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706496048; c=relaxed/simple;
-	bh=0XTTNKeyYBe8CdKNb80jwsYBz9OgESHFt9xvUdWSxuY=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=BlaLGOdLd1JWXsXyt3VZsg3oAA6xCsWb/GModak5FijV2B8UbAZAMwtcDCJYGPM7CxynyPRSYS8qLIROc0595zer/Uto+p1KbbCca8ZxMoZv9hL+1QL5at54k0T0Z5zdx5DxHzwqB4jDP4nVN3weM9MecwqDa4OLkcsbsXW+tIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TNXVK1LDYz1FJjB;
-	Mon, 29 Jan 2024 10:36:09 +0800 (CST)
-Received: from kwepemm600005.china.huawei.com (unknown [7.193.23.191])
-	by mail.maildlp.com (Postfix) with ESMTPS id B55901400DD;
-	Mon, 29 Jan 2024 10:40:35 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 29 Jan 2024 10:40:35 +0800
-Subject: Re: [PATCH 2/3] crypto: hisilicon/qm - obtain stop queue status
-To: Weili Qian <qianweili@huawei.com>, <herbert@gondor.apana.org.au>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240127131530.64617-1-qianweili@huawei.com>
- <20240127131530.64617-3-qianweili@huawei.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <3d2359ad-e3c3-5e77-ae77-c824b1ef9f9a@huawei.com>
-Date: Mon, 29 Jan 2024 10:40:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1706516128; c=relaxed/simple;
+	bh=bTMdAmM70iD8Skp4adPt1e6R4xGZ8keLZAYelVo6dXA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nM1owpy6OaBZv1r0/r2dBy7wp072QGOGzSJxnti/lMS9WcvWBTu74pX9DqPxWGBWbs3/rWs27ziJKXfetBx+5FXljby8irNnVXvn8QIx97lXxlyxbMvU7vITY9NtW9eCGhGUvMz8Stki3RIYlf6i6s+wCBy+6EutOI/qt9dWpoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=h8LAfgQv; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h8LAfgQv"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55f03ede12cso580153a12.0
+        for <linux-crypto@vger.kernel.org>; Mon, 29 Jan 2024 00:15:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706516123; x=1707120923; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CZ37FTpWtxd+apLpbc3f/ZbNZv8NUkS8211DEAp7JYE=;
+        b=h8LAfgQvUC2rdUGfj1sBsgVZPAsuydP1MFnDvPdTACh8beSh/Al2Ky6BWAE/HZEOYc
+         Gya4QhMjXVSuVz+kCxOkrEvt5uEaDTmesMnvuvC9FUcKHYX4plkt35RwwF9FxMx2YjoN
+         76W5c6pFav6JyCIoP9/Pz5KjPBPgCvoxhmbfR79Cm0AX/X4IEC7dJwm79A+UunF3BXM+
+         zy6pB17k7jEqlqi30vx1E3YJGgPDjn9D4Zd0CNhjM9+Cmi6BNQW45xsyAWSK4UACwJYR
+         iVIvyq1QsSbTe0I2tvcR4zobHKBDJkM81FkgK4AmfYI6yh5jZS/oOJXsiG8va2ReWh2g
+         HX0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706516123; x=1707120923;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CZ37FTpWtxd+apLpbc3f/ZbNZv8NUkS8211DEAp7JYE=;
+        b=JQtiv2Ukb5NAr29+DSM7CcxAX6gHX2zysJT6Fxh9vlctdQaA/sJ0RQlyity50SAs8K
+         Xc7XVQfBFVj2CM8LnXKia7Bqax0Q/IJ6RWaolLTW8pwVvoDZnIR+acuFOZLTflmS0F7J
+         uOMuwms7ip9zbKIFuGUt0/u0/cOaO5fMT9nQSV4dkDYFQpKGWzwg2Knv39lAI6R0DhJu
+         iyEUv8BPyjRGvbtUWD35tKXsLX8E7x4vhfst08muuIARn3GWI+f2RPuYTByhzX+WM20d
+         46bnN6wlL4YYxxhH06+ywnTOPD/vxUVtkTDSZnkF9SZX4l+ULNgzzn6GrbfElyVam4Lz
+         q9gA==
+X-Gm-Message-State: AOJu0YzdW2zVVawiirBt6WkfiLnFBCZY4iTdF0nlt8o+ZLD9jqk3iToU
+	YNWrZLdOkBdEgbk1FRGWglPwcZVpX/+/vnSxHOmFxp31SXK1/pz0VlbvJqUPY0Q=
+X-Google-Smtp-Source: AGHT+IGq6hM25x7JO+csRoGfY9SrHjUj9tVt/PgVdiJnW4tND8ArgaPwpwQ0gpAxBtDpMJDT0pPnGg==
+X-Received: by 2002:a05:6402:35c4:b0:55d:20f2:11c9 with SMTP id z4-20020a05640235c400b0055d20f211c9mr3598720edc.25.1706516123326;
+        Mon, 29 Jan 2024 00:15:23 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.62])
+        by smtp.gmail.com with ESMTPSA id g15-20020a056402090f00b0055e230fe75esm2743763edz.91.2024.01.29.00.15.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Jan 2024 00:15:22 -0800 (PST)
+Message-ID: <cc28fc0e-0ef0-4194-ab1e-fcd98a7be903@linaro.org>
+Date: Mon, 29 Jan 2024 09:15:20 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240127131530.64617-3-qianweili@huawei.com>
-Content-Type: text/plain; charset="gbk"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 14/15] arm64: dts: qcom: sm8650: add hwkm support to
+ ufs ice
+Content-Language: en-US
+To: Gaurav Kashyap <quic_gaurkash@quicinc.com>,
+ linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org,
+ andersson@kernel.org, ebiggers@google.com, neil.armstrong@linaro.org,
+ srinivas.kandagatla@linaro.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, robh+dt@kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
+ kernel@quicinc.com, linux-crypto@vger.kernel.org,
+ devicetree@vger.kernel.org, quic_omprsing@quicinc.com,
+ quic_nguyenb@quicinc.com, bartosz.golaszewski@linaro.org,
+ konrad.dybcio@linaro.org, ulf.hansson@linaro.org, jejb@linux.ibm.com,
+ martin.petersen@oracle.com, mani@kernel.org, davem@davemloft.net,
+ herbert@gondor.apana.org.au
+References: <20240127232436.2632187-1-quic_gaurkash@quicinc.com>
+ <20240127232436.2632187-15-quic_gaurkash@quicinc.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240127232436.2632187-15-quic_gaurkash@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600005.china.huawei.com (7.193.23.191)
 
-On 2024/1/27 21:15, Weili Qian wrote:
-> The debugfs files 'dev_state' and 'dev_timeout' are added.
-> Users can query the current queue stop status through these two
-> files. And set the waiting timeout when the queue is released.
+On 28/01/2024 00:14, Gaurav Kashyap wrote:
+> The Inline Crypto Engine (ICE) for UFS/EMMC supports the
+> Hardware Key Manager (HWKM) to securely manage storage
+> keys. Enable using this hardware on sm8650.
 > 
-> dev_state: if dev_timeout is set, dev_state indicates the status
-> of stopping the queue. 0 indicates that the queue is stopped
-> successfully. Other values indicate that the queue stops fail.
-> if dev_timeout is not set, the value of dev_state is 0;
+> This requires two changes:
+> 1. Register size increase: HWKM is an additional piece of hardware
+>    sitting alongside ICE, and extends the old ICE's register space.
+> 2. Explicitly tell the ICE driver to use HWKM with ICE so that
+>    wrapped keys are used in sm8650.
 > 
-> dev_timeout: If the queue fails to stop, the queue is released
-> after waiting dev_timeout * 20ms.
-> 
-> Signed-off-by: Weili Qian <qianweili@huawei.com>
+> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+> Reviewed-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+> Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
 > ---
->  Documentation/ABI/testing/debugfs-hisi-hpre | 15 ++++
->  Documentation/ABI/testing/debugfs-hisi-sec  | 15 ++++
->  Documentation/ABI/testing/debugfs-hisi-zip  | 15 ++++
->  drivers/crypto/hisilicon/debugfs.c          |  5 ++
->  drivers/crypto/hisilicon/qm.c               | 97 +++++++++++++++------
->  include/linux/hisi_acc_qm.h                 | 14 +++
->  6 files changed, 135 insertions(+), 26 deletions(-)
+>  arch/arm64/boot/dts/qcom/sm8650.dtsi | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/Documentation/ABI/testing/debugfs-hisi-hpre b/Documentation/ABI/testing/debugfs-hisi-hpre
-> index 6ed9258605c7..e6394a2fb371 100644
-> --- a/Documentation/ABI/testing/debugfs-hisi-hpre
-> +++ b/Documentation/ABI/testing/debugfs-hisi-hpre
-> @@ -118,6 +118,21 @@ Description:	Dump the state of the device.
->  		0: busy, 1: idle.
->  		Only available for PF, and take no other effect on HPRE.
->  
-> +What:		/sys/kernel/debug/hisi_hpre/<bdf>/qm/dev_timeout
-> +Date:		Jan 2024
-> +Contact:	linux-crypto@vger.kernel.org
-> +Description:	Set the wait time when stop queue fails. Available for both PF
-> +		and VF, and take no other effect on HPRE.
-> +		0: not wait(default), others value: wait dev_timeout * 20 microsecond.
-> +
-> +What:		/sys/kernel/debug/hisi_hpre/<bdf>/qm/dev_state
-> +Date:		Jan 2024
-> +Contact:	linux-crypto@vger.kernel.org
-> +Description:	Dump the stop queue status of the QM. The default value is 0,
-> +		if dev_timeout is set, when stop queue fails, the dev_state
-> +		will return non-zero value. Available for both PF and VF,
-> +		and take no other effect on HPRE.
-> +
->  What:		/sys/kernel/debug/hisi_hpre/<bdf>/hpre_dfx/diff_regs
->  Date:		Mar 2022
->  Contact:	linux-crypto@vger.kernel.org
-> diff --git a/Documentation/ABI/testing/debugfs-hisi-sec b/Documentation/ABI/testing/debugfs-hisi-sec
-> index 403f5de96318..2b5db193b5e6 100644
-> --- a/Documentation/ABI/testing/debugfs-hisi-sec
-> +++ b/Documentation/ABI/testing/debugfs-hisi-sec
-> @@ -98,6 +98,21 @@ Description:	Dump the state of the device.
->  		0: busy, 1: idle.
->  		Only available for PF, and take no other effect on SEC.
->  
-> +What:		/sys/kernel/debug/hisi_sec2/<bdf>/qm/dev_timeout
-> +Date:		Jan 2024
-> +Contact:	linux-crypto@vger.kernel.org
-> +Description:	Set the wait time when stop queue fails. Available for both PF
-> +		and VF, and take no other effect on SEC.
-> +		0: not wait(default), others value: wait dev_timeout * 20 microsecond.
-> +
-> +What:		/sys/kernel/debug/hisi_sec2/<bdf>/qm/dev_state
-> +Date:		Jan 2024
-> +Contact:	linux-crypto@vger.kernel.org
-> +Description:	Dump the stop queue status of the QM. The default value is 0,
-> +		if dev_timeout is set, when stop queue fails, the dev_state
-> +		will return non-zero value. Available for both PF and VF,
-> +		and take no other effect on SEC.
-> +
->  What:		/sys/kernel/debug/hisi_sec2/<bdf>/sec_dfx/diff_regs
->  Date:		Mar 2022
->  Contact:	linux-crypto@vger.kernel.org
-> diff --git a/Documentation/ABI/testing/debugfs-hisi-zip b/Documentation/ABI/testing/debugfs-hisi-zip
-> index 2394e6a3cfe2..260c514e0e9e 100644
-> --- a/Documentation/ABI/testing/debugfs-hisi-zip
-> +++ b/Documentation/ABI/testing/debugfs-hisi-zip
-> @@ -111,6 +111,21 @@ Description:	Dump the state of the device.
->  		0: busy, 1: idle.
->  		Only available for PF, and take no other effect on ZIP.
->  
-> +What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/dev_timeout
-> +Date:		Jan 2024
-> +Contact:	linux-crypto@vger.kernel.org
-> +Description:	Set the wait time when stop queue fails. Available for both PF
-> +		and VF, and take no other effect on ZIP.
-> +		0: not wait(default), others value: wait dev_timeout * 20 microsecond.
-> +
-> +What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/dev_state
-> +Date:		Jan 2024
-> +Contact:	linux-crypto@vger.kernel.org
-> +Description:	Dump the stop queue status of the QM. The default value is 0,
-> +		if dev_timeout is set, when stop queue fails, the dev_state
-> +		will return non-zero value. Available for both PF and VF,
-> +		and take no other effect on ZIP.
-> +
->  What:		/sys/kernel/debug/hisi_zip/<bdf>/zip_dfx/diff_regs
->  Date:		Mar 2022
->  Contact:	linux-crypto@vger.kernel.org
-> diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
-> index 06e67eda409f..cd67fa348ca7 100644
-> --- a/drivers/crypto/hisilicon/debugfs.c
-> +++ b/drivers/crypto/hisilicon/debugfs.c
-> @@ -1112,6 +1112,7 @@ DEFINE_DEBUGFS_ATTRIBUTE(qm_atomic64_ops, qm_debugfs_atomic64_get,
->  void hisi_qm_debug_init(struct hisi_qm *qm)
->  {
->  	struct dfx_diff_registers *qm_regs = qm->debug.qm_diff_regs;
-> +	struct qm_dev_dfx *dev_dfx = &qm->debug.dev_dfx;
->  	struct qm_dfx *dfx = &qm->debug.dfx;
->  	struct dentry *qm_d;
->  	void *data;
-> @@ -1140,6 +1141,10 @@ void hisi_qm_debug_init(struct hisi_qm *qm)
->  
->  	debugfs_create_file("status", 0444, qm->debug.qm_d, qm,
->  			&qm_status_fops);
-> +
-> +	debugfs_create_u32("dev_state", 0444, qm->debug.qm_d, &dev_dfx->dev_state);
-> +	debugfs_create_u32("dev_timeout", 0644, qm->debug.qm_d, &dev_dfx->dev_timeout);
-> +
->  	for (i = 0; i < ARRAY_SIZE(qm_dfx_files); i++) {
->  		data = (atomic64_t *)((uintptr_t)dfx + qm_dfx_files[i].offset);
->  		debugfs_create_file(qm_dfx_files[i].name,
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index 3b015482b4e6..75d0b2ea117e 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -2037,43 +2037,25 @@ static void qp_stop_fail_cb(struct hisi_qp *qp)
->  	}
->  }
->  
-> -/**
-> - * qm_drain_qp() - Drain a qp.
-> - * @qp: The qp we want to drain.
-> - *
-> - * Determine whether the queue is cleared by judging the tail pointers of
-> - * sq and cq.
-> - */
-> -static int qm_drain_qp(struct hisi_qp *qp)
-> +static int qm_wait_qp_empty(struct hisi_qm *qm, u32 *state, u32 qp_id)
->  {
-> -	struct hisi_qm *qm = qp->qm;
->  	struct device *dev = &qm->pdev->dev;
->  	struct qm_sqc sqc;
->  	struct qm_cqc cqc;
->  	int ret, i = 0;
->  
-> -	/* No need to judge if master OOO is blocked. */
-> -	if (qm_check_dev_error(qm))
-> -		return 0;
-> -
-> -	/* Kunpeng930 supports drain qp by device */
-> -	if (test_bit(QM_SUPPORT_STOP_QP, &qm->caps)) {
-> -		ret = qm_stop_qp(qp);
-> -		if (ret)
-> -			dev_err(dev, "Failed to stop qp(%u)!\n", qp->qp_id);
-> -		return ret;
-> -	}
-> -
->  	while (++i) {
-> -		ret = qm_set_and_get_xqc(qm, QM_MB_CMD_SQC, &sqc, qp->qp_id, 1);
-> +		ret = qm_set_and_get_xqc(qm, QM_MB_CMD_SQC, &sqc, qp_id, 1);
->  		if (ret) {
->  			dev_err_ratelimited(dev, "Failed to dump sqc!\n");
-> +			*state = DUMP_SQC_FAIL;
->  			return ret;
->  		}
->  
-> -		ret = qm_set_and_get_xqc(qm, QM_MB_CMD_CQC, &cqc, qp->qp_id, 1);
-> +		ret = qm_set_and_get_xqc(qm, QM_MB_CMD_CQC, &cqc, qp_id, 1);
->  		if (ret) {
->  			dev_err_ratelimited(dev, "Failed to dump cqc!\n");
-> +			*state = DUMP_CQC_FAIL;
->  			return ret;
->  		}
->  
-> @@ -2082,8 +2064,9 @@ static int qm_drain_qp(struct hisi_qp *qp)
->  			break;
->  
->  		if (i == MAX_WAIT_COUNTS) {
-> -			dev_err(dev, "Fail to empty queue %u!\n", qp->qp_id);
-> -			return -EBUSY;
-> +			dev_err(dev, "Fail to empty queue %u!\n", qp_id);
-> +			*state = STOP_QUEUE_FAIL;
-> +			return -ETIMEDOUT;
->  		}
->  
->  		usleep_range(WAIT_PERIOD_US_MIN, WAIT_PERIOD_US_MAX);
-> @@ -2092,6 +2075,49 @@ static int qm_drain_qp(struct hisi_qp *qp)
->  	return 0;
->  }
->  
-> +/**
-> + * qm_drain_qp() - Drain a qp.
-> + * @qp: The qp we want to drain.
-> + *
-> + * If the device does not support stopping queue by sending mailbox,
-> + * determine whether the queue is cleared by judging the tail pointers of
-> + * sq and cq.
-> + */
-> +static int qm_drain_qp(struct hisi_qp *qp)
-> +{
-> +	struct hisi_qm *qm = qp->qm;
-> +	struct hisi_qm *pf_qm = pci_get_drvdata(pci_physfn(qm->pdev));
-> +	u32 state = 0;
-> +	int ret;
-> +
-> +	/* No need to judge if master OOO is blocked. */
-> +	if (qm_check_dev_error(pf_qm))
-> +		return 0;
-> +
-> +	/* HW V3 supports drain qp by device */
-> +	if (test_bit(QM_SUPPORT_STOP_QP, &qm->caps)) {
-> +		ret = qm_stop_qp(qp);
-> +		if (ret) {
-> +			dev_err(&qm->pdev->dev, "Failed to stop qp!\n");
-> +			state = STOP_QUEUE_FAIL;
-> +			goto set_dev_state;
-> +		}
-> +		return ret;
-> +	}
-> +
-> +	ret = qm_wait_qp_empty(qm, &state, qp->qp_id);
-> +	if (ret)
-> +		goto set_dev_state;
-> +
-> +	return 0;
-> +
-> +set_dev_state:
-> +	if (qm->debug.dev_dfx.dev_timeout)
-> +		qm->debug.dev_dfx.dev_state = state;
-> +
-> +	return ret;
-> +}
-> +
->  static int qm_stop_qp_nolock(struct hisi_qp *qp)
->  {
->  	struct hisi_qm *qm = qp->qm;
-> @@ -2319,7 +2345,26 @@ static int hisi_qm_uacce_start_queue(struct uacce_queue *q)
->  
->  static void hisi_qm_uacce_stop_queue(struct uacce_queue *q)
->  {
-> -	hisi_qm_stop_qp(q->priv);
-> +	struct hisi_qp *qp = q->priv;
-> +	struct hisi_qm *qm = qp->qm;
-> +	struct qm_dev_dfx *dev_dfx = &qm->debug.dev_dfx;
-> +	u32 i = 0;
-> +
-> +	hisi_qm_stop_qp(qp);
-> +
-> +	if (!dev_dfx->dev_timeout || !dev_dfx->dev_state)
-> +		return;
-> +
-> +	while (++i) {
-> +		if (!i || i > dev_dfx->dev_timeout) {
+> diff --git a/arch/arm64/boot/dts/qcom/sm8650.dtsi b/arch/arm64/boot/dts/qcom/sm8650.dtsi
+> index 2df77123a8c7..c27daf576af5 100644
+> --- a/arch/arm64/boot/dts/qcom/sm8650.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sm8650.dtsi
+> @@ -2524,7 +2524,8 @@ &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>,
+>  		ice: crypto@1d88000 {
+>  			compatible = "qcom,sm8650-inline-crypto-engine",
+>  				     "qcom,inline-crypto-engine";
+> -			reg = <0 0x01d88000 0 0x8000>;
+> +			reg = <0 0x01d88000 0 0x10000>;
+> +			qcom,ice-use-hwkm;
 
+Vendor properties go to the end. Please consult DTS coding style.
 
-The "!i" judgment here is redundant. What needs to be considered is the situation
-if i is equal to dev_timeout and both are UINT_MAX.
+Best regards,
+Krzysztof
 
-Thanks,
-Longfang.
-
-> +			dev_err(&qm->pdev->dev, "Stop q %u timeout, state %u\n",
-> +			       qp->qp_id, dev_dfx->dev_state);
-> +			dev_dfx->dev_state = FINISH_WAIT;
-> +			break;
-> +		}
-> +
-> +		msleep(WAIT_PERIOD);
-> +	}
->  }
->  
->  static int hisi_qm_is_q_updated(struct uacce_queue *q)
-> diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-> index 720f10874a66..ec5a70ade511 100644
-> --- a/include/linux/hisi_acc_qm.h
-> +++ b/include/linux/hisi_acc_qm.h
-> @@ -158,6 +158,19 @@ enum qm_cap_bits {
->  	QM_SUPPORT_RPM,
->  };
->  
-> +enum qm_dev_fail_state {
-> +	STOP_QUEUE_FAIL = 1,
-> +	ALLOC_CTX_FAIL,
-> +	DUMP_SQC_FAIL,
-> +	DUMP_CQC_FAIL,
-> +	FINISH_WAIT,
-> +};
-> +
-> +struct qm_dev_dfx {
-> +	u32 dev_state;
-> +	u32 dev_timeout;
-> +};
-> +
->  struct qm_dev_alg {
->  	u64 alg_msk;
->  	const char *alg;
-> @@ -191,6 +204,7 @@ struct qm_debug {
->  	struct dentry *debug_root;
->  	struct dentry *qm_d;
->  	struct debugfs_file files[DEBUG_FILE_NUM];
-> +	struct qm_dev_dfx dev_dfx;
->  	unsigned int *qm_last_words;
->  	/* ACC engines recoreding last regs */
->  	unsigned int *last_words;
-> 
