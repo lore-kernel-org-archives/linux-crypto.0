@@ -1,189 +1,127 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51862155A2A;
-	Mon, 29 Jan 2024 15:26:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7856154BF0;
+	Mon, 29 Jan 2024 15:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706541974; cv=none; b=mamgvph2yGTGPDdwOguUn75MZTGSxXoShjZkSiKpqM2G7boaAySuH0iq7ADwmHvl+jP/DNeBryFKLZBxZyvCkFpVt8UL64wVspLBFSqFmpg+kvAi7KVmHOKlhYm/x/+eTNcg6Hryat95qihBU4DzMEkutObRqjV3V+WQEfM65Sk=
+	t=1706543371; cv=none; b=nD9XekQJKzXee6h2GKC+s73F+lamqBRaGl07ClQNdGgNVFZn6OW6FBKwF8f2okrPKiQCpqiokLlz/gNFpX+uzy59K/U4io5+ghjpJztw6PXDXqVbsQG8NNzBoPUxALs1hPfPNyK3yQiM1ch2qK5lMnc4BAZ87TDD+KKZxCuW4Qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706541974; c=relaxed/simple;
-	bh=2krepP86f5+8aMs2Z47cms8u797SS21OCKmTKGRnVBM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hNHNNoQjoP6GBuOO4HBOBooR+4GXNAH37MuV5yuqZCDTLvAGro9Ky2Mlwg80L4tyVa5a9o9cdX5aLHcBSv8FKnXTJfsVraW+RI/JVcYrJBiY+YA+vaZoV0IbpqkoE6OkX5swC/s2bB5JR8frhjvNJuOP3Wzr4OITnQ0VrvLjxfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=IqJ9FeBb; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=buBCJSoE; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=wra20jGo; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=QGF3yu+y; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1706543371; c=relaxed/simple;
+	bh=e0ESeQsRk5SoTUCa6RZLB/A935snlZkD/TqcBFtYBfs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V8Me1dzPMBpTon86D59mb8XwSTTfhllcIpkhDPZu+X9hq30N17I7RhJsaCvIA79LWhiiWeYFQCsvIMkzAK7f7joXMNl2CmjVB3KWPAgQc6bWesARplhM5U6p1684oMRC9608WNgHa/zuy6xrIeil4SsuoVwDGBD+oi0M6NZWG+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=klRqlMJk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="IqJ9FeBb";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="buBCJSoE";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="wra20jGo";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="QGF3yu+y"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B26A01F7EF;
-	Mon, 29 Jan 2024 15:26:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1706541963; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jh9pQCHiNrOIgT4Qx0ZOIp8ky/ddjw+KrmlzKD3GTFA=;
-	b=IqJ9FeBbPT86udoxla6bPHyxwjxJzWqX7LKUgjJK80R5KnYwWbAAOHeWSivRHKTim9jS4C
-	AGd8isc43iGspBrV087KRzqkHx8cDtcjOGfxumSF+UmpfzhTsaGPVyd4WF8uG3cjFqYFIq
-	LvI6iAgggiWgMe7TcwdX8ZurFxm3emA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1706541963;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jh9pQCHiNrOIgT4Qx0ZOIp8ky/ddjw+KrmlzKD3GTFA=;
-	b=buBCJSoENZMrlJF3gAtTCcP9YbSkzSTmYZPOMOHmNSfSKzKJyT1yHabOIKQWMQHSFjiKmM
-	VXdS65hxh/BSTgDw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1706541961; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jh9pQCHiNrOIgT4Qx0ZOIp8ky/ddjw+KrmlzKD3GTFA=;
-	b=wra20jGo4/gxClPMQNEDxg3qKNEOScanFSiG/ETsrUypOo2JjVxnSwInEkTN/6LLJK8vVk
-	lr0dEOzA4BY/h9s6rmQy5uO24sZFxM4CfUUU/8H/5uZXweZKJ7QtHpxtCVrjufuWVnL4al
-	7ChaBUZLjJahSiWbJ1BTuv9XGk79JKw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1706541961;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jh9pQCHiNrOIgT4Qx0ZOIp8ky/ddjw+KrmlzKD3GTFA=;
-	b=QGF3yu+yO4l0N6y9I54yuTV433cHTbnUtte7rHsiobjlibNuPusNpVGfX31J18kGHt/OrC
-	c9YEFnT6c3ldgqDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6548013647;
-	Mon, 29 Jan 2024 15:26:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id dcSQF4nDt2U4RAAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 29 Jan 2024 15:26:01 +0000
-Message-ID: <2068cfca-b99b-4cf0-addc-43376c2681cb@suse.cz>
-Date: Mon, 29 Jan 2024 16:26:01 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="klRqlMJk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED4B4C433F1;
+	Mon, 29 Jan 2024 15:49:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706543371;
+	bh=e0ESeQsRk5SoTUCa6RZLB/A935snlZkD/TqcBFtYBfs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=klRqlMJkd+WDOpLV4juXYlgk8v3HtObx4BTF0uw+i6uMJ2Ukbl/AnHkgvlzC3Fbeh
+	 6/k0AZzH8diBnwhlxKgNtvAV1pnyzv4YX5C8n2D8jRsHUGxqz7zRFU0SuVB3wnLab9
+	 IFHbOYbi4/huqwPcpPd4nWnzstOvOF0xQQnUjlNgiLC8Q+qxfpU59I8TnfR3mIHCz/
+	 pNpoXRsCLig/7qtUkzPbEMZkSD6AWncpltomFPmywI3UZeEQzN6/7AK8D8wYxWoOiP
+	 XEmSj7BUmVDzGjaXikIqMFY1lMv/0F6lECM2o63uF4fnm05hwo4nrnQJUzJVN91/hn
+	 c3++kX5OZ/raQ==
+Date: Mon, 29 Jan 2024 15:49:27 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-riscv@lists.infradead.org, linux-crypto@vger.kernel.org,
+	llvm@lists.linux.dev, Brandon Wu <brandon.wu@sifive.com>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: Re: [PATCH] RISC-V: fix check for zvkb with tip-of-tree clang
+Message-ID: <20240129-always-nurture-f5fe831b8bb2@spud>
+References: <20240127090055.124336-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 11/25] x86/sev: Adjust directmap to avoid inadvertant
- RMP faults
-Content-Language: en-US
-To: Borislav Petkov <bp@alien8.de>, Michael Roth <michael.roth@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
- linux-mm@kvack.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
- jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
- pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
- jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
- slp@redhat.com, pgonda@google.com, peterz@infradead.org,
- srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
- kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
- pankaj.gupta@amd.com, liam.merwick@oracle.com
-References: <20240126041126.1927228-1-michael.roth@amd.com>
- <20240126041126.1927228-12-michael.roth@amd.com>
- <20240126153451.GDZbPRG3KxaQik-0aY@fat_crate.local>
- <20240126170415.f7r4nvsrzgpzcrzv@amd.com>
- <20240126184340.GEZbP9XA13X91-eybA@fat_crate.local>
- <20240126235420.mu644waj2eyoxqx6@amd.com>
- <20240127114207.GBZbTsDyC3hFq8pQ3D@fat_crate.local>
- <20240127154506.v3wdio25zs6i2lc3@amd.com>
- <20240127160249.GDZbUpKW_cqRzdYn7Z@fat_crate.local>
- <20240129115928.GBZbeTIJUYivEMSonh@fat_crate.local>
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20240129115928.GBZbeTIJUYivEMSonh@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spamd-Result: default: False [-3.09 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%];
-	 MIME_GOOD(-0.10)[text/plain];
-	 R_RATELIMIT(0.00)[to_ip_from(RL81e5qggtdx371s8ik49ru6xr)];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 RCPT_COUNT_TWELVE(0.00)[36];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -3.09
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="EL2F3hYGXg3SLtEB"
+Content-Disposition: inline
+In-Reply-To: <20240127090055.124336-1-ebiggers@kernel.org>
 
-On 1/29/24 12:59, Borislav Petkov wrote:
-> On Sat, Jan 27, 2024 at 05:02:49PM +0100, Borislav Petkov wrote:
->> This function takes any PFN it gets passed in as it is. I don't care
->> who its users are now or in the future and whether they pay attention
->> what they pass into - it needs to be properly defined.
-> 
-> Ok, we solved it offlist, here's the final version I have. It has
-> a comment explaining what I was asking.
-> 
+
+--EL2F3hYGXg3SLtEB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, Jan 27, 2024 at 01:00:54AM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+>=20
+> LLVM commit 8e01042da9d3 ("[RISCV] Add missing dependency check for Zvkb
+> (#79467)") broke the check used by the TOOLCHAIN_HAS_VECTOR_CRYPTO
+> kconfig symbol because it made zvkb start depending on v or zve*.  Fix
+> this by specifying both v and zvkb when checking for support for zvkb.
+
+Seems like a reasonable change on the part of LLVM.
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+
+Cheers,
+Conor.
+
+>=20
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
-> From: Michael Roth <michael.roth@amd.com>
-> Date: Thu, 25 Jan 2024 22:11:11 -0600
-> Subject: [PATCH] x86/sev: Adjust the directmap to avoid inadvertent RMP faults
-> 
-> If the kernel uses a 2MB or larger directmap mapping to write to an
-> address, and that mapping contains any 4KB pages that are set to private
-> in the RMP table, an RMP #PF will trigger and cause a host crash.
-> 
-> SNP-aware code that owns the private PFNs will never attempt such
-> a write, but other kernel tasks writing to other PFNs in the range may
-> trigger these checks inadvertently due to writing to those other PFNs
-> via a large directmap mapping that happens to also map a private PFN.
-> 
-> Prevent this by splitting any 2MB+ mappings that might end up containing
-> a mix of private/shared PFNs as a result of a subsequent RMPUPDATE for
-> the PFN/rmp_level passed in.
-> 
-> Another way to handle this would be to limit the directmap to 4K
-> mappings in the case of hosts that support SNP, but there is potential
-> risk for performance regressions of certain host workloads.
-> 
-> Handling it as-needed results in the directmap being slowly split over
-> time, which lessens the risk of a performance regression since the more
-> the directmap gets split as a result of running SNP guests, the more
-> likely the host is being used primarily to run SNP guests, where
-> a mostly-split directmap is actually beneficial since there is less
-> chance of TLB flushing and cpa_lock contention being needed to perform
-> these splits.
-> 
-> Cases where a host knows in advance it wants to primarily run SNP guests
-> and wishes to pre-split the directmap can be handled by adding
-> a tuneable in the future, but preliminary testing has shown this to not
-> provide a signficant benefit in the common case of guests that are
-> backed primarily by 2MB THPs, so it does not seem to be warranted
-> currently and can be added later if a need arises in the future.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
-> Link: https://lore.kernel.org/r/20240126041126.1927228-12-michael.roth@amd.com
+>  arch/riscv/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index b49016bb5077b..912fff31492b9 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -581,21 +581,21 @@ config TOOLCHAIN_HAS_ZBB
+>  	default y
+>  	depends on !64BIT || $(cc-option,-mabi=3Dlp64 -march=3Drv64ima_zbb)
+>  	depends on !32BIT || $(cc-option,-mabi=3Dilp32 -march=3Drv32ima_zbb)
+>  	depends on LLD_VERSION >=3D 150000 || LD_VERSION >=3D 23900
+>  	depends on AS_HAS_OPTION_ARCH
+> =20
+>  # This symbol indicates that the toolchain supports all v1.0 vector cryp=
+to
+>  # extensions, including Zvk*, Zvbb, and Zvbc.  LLVM added all of these a=
+t once.
+>  # binutils added all except Zvkb, then added Zvkb.  So we just check for=
+ Zvkb.
+>  config TOOLCHAIN_HAS_VECTOR_CRYPTO
+> -	def_bool $(as-instr, .option arch$(comma) +zvkb)
+> +	def_bool $(as-instr, .option arch$(comma) +v$(comma) +zvkb)
+>  	depends on AS_HAS_OPTION_ARCH
+> =20
+>  config RISCV_ISA_ZBB
+>  	bool "Zbb extension support for bit manipulation instructions"
+>  	depends on TOOLCHAIN_HAS_ZBB
+>  	depends on MMU
+>  	depends on RISCV_ALTERNATIVE
+>  	default y
+>  	help
+>  	   Adds support to dynamically detect the presence of the ZBB
+>=20
+> base-commit: cb4ede926134a65bc3bf90ed58dace8451d7e759
+> --=20
+> 2.43.0
+>=20
+>=20
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
+--EL2F3hYGXg3SLtEB
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks!
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZbfJBwAKCRB4tDGHoIJi
+0gPKAP4wBaV9cReJkJDl06WUVEYJxyYVr3Il1OGMyQgDVaCHKAD+L7LWWskK+HJW
+fTp58Q6g61eD/wtV2oyASlZrEQ8f2g4=
+=khU5
+-----END PGP SIGNATURE-----
+
+--EL2F3hYGXg3SLtEB--
