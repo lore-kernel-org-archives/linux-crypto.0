@@ -1,117 +1,102 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A456D66B24
-	for <linux-crypto@vger.kernel.org>; Tue, 30 Jan 2024 11:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3846D1BC;
+	Tue, 30 Jan 2024 16:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706614078; cv=none; b=jDHSMSlOzD6eYQzKBmPsjWs6kB+LqCcbu21RPY1Sq2bDXk+M7IAWg5ujONi/TeSlPaQooN2OTUwVUbBsmaJ+wJYXFIPwNaxkNcxsrxJaQrkKSyIYvRnHhnnAgOOPjoh9wBtnikETbA3VZ4wBWI93V8nMn7o6cU5LvL+fjCn/HPs=
+	t=1706631646; cv=none; b=SYdEGsQWvLEMPBVVz3kAASkk2cRQ3zGYYLm9SoE0/SJz+XQ20ypUl1ka9nhDfJmOC8Jev0d3Apv1TV2EMqlaWC1KD9jKmwRkfQo6YtymHplTp2xvdBeTwiMtZVfIdTAFLbaLFNjefIF/0x8wlcWNUJJ6yTWjJ8HGlT2jDuXY46A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706614078; c=relaxed/simple;
-	bh=VJ3WxFyUH1QX/R2FezaIZrc9SHd0VxU+WMrUCCCzWbA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Miy1b7Ehw9OeqMWfa9IIpLpa1TDboLyfFLnZ4GSuhFWYlpX6n5BUMNICH8Q9/WRNuHeXG+XX8KiW27fPLaj9IuFQg82z1OGWhdeAqF7h2fSTEDtke9EjiVtf6be7CliL8BchV+G6WK6pVN8zPUnfY1gqjqQO+tm0duLDfFranfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Zhe7aujY; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+	s=arc-20240116; t=1706631646; c=relaxed/simple;
+	bh=9dqoKUzfPnS0ouqZmUsutY8WSQ36Ew7hhDXp38tOQgU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZA1pjiAPRHvBz5D+h+LcMH4TgQwh1jJPBqDfjguu2c/5oj3FrqAq3wYk4C9Up0v5XerpUict1LfR3zVUNOP0Df4xHSa56FcRhS7ufOlGoQawG2TGHloagjHpTC8/iZaRxINKw9nDR+lUkQBFfR9XyirP6CKFd9yznLCnOLC2d98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=RFQwU6NC; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Zhe7aujY"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d8cea8bb3bso10126795ad.2
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Jan 2024 03:27:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1706614076; x=1707218876; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NFz/ioS5pMtmsywy9UOLGQH2uroA4Qw/qVk4L7fINX0=;
-        b=Zhe7aujYvlLHVtXJZ3kv02iCcmFKPV5YO9MbmC0Mk12po2UQlDHCIGXR+EjbhYwQLU
-         Wa6IatPOH2E73/nhTv8SCStzr8X58TvEgcnKDd9kOn4uVIIDtbH8NTdtR9Jg1WSEOhMh
-         rmJZuCyJ+qS9UDHBu/miZ/kDCu1+7+xbK8PwDsK5RqzJi1Jgb+ObXi8T9KnpdSewo0Uq
-         4eFeSd348K4Q3lRNCH9aQmZLwREmG6G534N/sQNvbyf7LgXMHkw/uhhHuKLErvmre5yg
-         /5WvLUMAgIZUhLxgmOf1gHazivLfcDnCp6wXI51bKvcgPiG8ons+6yNYHmK6VbAMQ7JL
-         bQqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706614076; x=1707218876;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NFz/ioS5pMtmsywy9UOLGQH2uroA4Qw/qVk4L7fINX0=;
-        b=VxMt3aVFceNMCsBj2Rh3r1dLfmDeszr8vPax3Lsy643Ie+f2csNCYEuJZawFBBvAI/
-         ei0rFIs/WFk75trY/OH84S+SD45JSqv9dGFH24eq3KhfmB5gajKxh66CcIxAmFa0ioSx
-         3KnppzsSxf8jYhYfZ9N9NE/aTNuM1q2fNIs3svJxCj1rVUUfkrqpK9GFaPvyRYu/dY6P
-         rfOzuSy4BHSs6Y8ZH98hfD+W3cE6+8HkjC3epFW+MGq+65yvb5ZTkxMb8fOkQx8gTpao
-         VP5GqNmxVHDZFdbZNFmtsgL2a7T7mDg0y6mFLgmCoR39cC09bTu1LaRLAXdA0ZLQASjX
-         /Zjw==
-X-Gm-Message-State: AOJu0Ywlu66qP/WRFDaXJC8jWJ13hB0RJLy1ivZLBEleMM+Zm3EkDxjU
-	ovwUeHglO5nZ3gwOAXkHGTaH4vExrbxdyVTvR1SWZ9Tow3G6bRD03Co04ffYjrQ=
-X-Google-Smtp-Source: AGHT+IFxYQYsZlp0TH8j7NTAhzYbg+/UE/MPq1RYMFL1zOTZBo9xa9ES0Z1wEP85nypj79LLuQ20dw==
-X-Received: by 2002:a17:903:2692:b0:1d4:4e13:6b59 with SMTP id jf18-20020a170903269200b001d44e136b59mr4044993plb.45.1706614075892;
-        Tue, 30 Jan 2024 03:27:55 -0800 (PST)
-Received: from always-x1.bytedance.net ([139.177.225.226])
-        by smtp.gmail.com with ESMTPSA id jz6-20020a170903430600b001d74502d261sm7002041plb.115.2024.01.30.03.27.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 03:27:55 -0800 (PST)
-From: zhenwei pi <pizhenwei@bytedance.com>
-To: arei.gonglei@huawei.com,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	herbert@gondor.apana.org.au
-Cc: xuanzhuo@linux.alibaba.com,
-	virtualization@lists.linux.dev,
-	nathan@kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	davem@davemloft.net,
-	zhenwei pi <pizhenwei@bytedance.com>
-Subject: [PATCH] crypto: virtio/akcipher - Fix stack overflow on memcpy
-Date: Tue, 30 Jan 2024 19:27:40 +0800
-Message-Id: <20240130112740.882183-1-pizhenwei@bytedance.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="RFQwU6NC"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 161F040E01B3;
+	Tue, 30 Jan 2024 16:20:41 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 7yVcVDOXyjWb; Tue, 30 Jan 2024 16:20:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1706631639; bh=alWf9PlcGUIY347NLIw+uw/YZFl5yuvijufcFHJXHac=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RFQwU6NCK40raUA31PWhXPZKfjdfhCWWZXv8repbMJaj2d3tzBIwSyhuY0zVFuL/t
+	 nGJHjh6F7ujehycrE+kCrMDQZbCn6ouDqp23GJ73Fe4jnIX5WaGDIQQFF/qUtf/Ujt
+	 /nknHKZZogm7FogSq7ryuDZobR5h0c7ThyoD7NY9hhxHGvpjhDbEKpk8pPCyPPguQL
+	 dIdj3AzixiVWYkSS78kQTyZ0yFwnUF5RCxkLDV8R8X88vHhSXKgLLF1ksUq8pnIGKv
+	 2fLvgnufs9u8Ml0SxAJughMKYrDg13dD+ul8HQPKYgJvWhL7j+BAW0DSrfUwG1XVY7
+	 /By15uTzDxBIdER5lNvw1JI0VM9rMiPJeT7rt2TWOOD7K8H3ZScAj+wzJTCs1wVW5j
+	 LvnDz5D4NIMP7QMiItg4PTaMZZLKAjVSpDES8TEw/8h7+7k3xyGQCQPYYcSeAYYh79
+	 VbAFiHvz0xEHOt1rmkwfNS/TqeT0R1fjx7XRHgoL6l4SbRbWj0DJY6kr1iuelg/9Xn
+	 /nCrkyaNKsNK3+BXCCFQWjRCcVWbPEV6YUZxfgY9IXU3hb9lZY6rBroNNLIcA9CXq5
+	 Sotj8mLiXilxw9pP/mTw6O34JotnPspFg0YTCAVMGQ147AKOYj5YSRCf95TC47qAFT
+	 tFPrc8bdrPIOARXme6y93Rgc=
+Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B083840E00C5;
+	Tue, 30 Jan 2024 16:20:00 +0000 (UTC)
+Date: Tue, 30 Jan 2024 17:19:55 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com
+Subject: Re: [PATCH v2 00/25] Add AMD Secure Nested Paging (SEV-SNP)
+ Initialization Support
+Message-ID: <20240130161955.GFZbkhq2RDUrW5-NvV@fat_crate.local>
+References: <20240126041126.1927228-1-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240126041126.1927228-1-michael.roth@amd.com>
 
-sizeof(struct virtio_crypto_akcipher_session_para) is less than
-sizeof(struct virtio_crypto_op_ctrl_req::u), copying more bytes from
-stack variable leads stack overflow. Clang reports this issue by
-commands:
-make -j CC=clang-14 mrproper >/dev/null 2>&1
-make -j O=/tmp/crypto-build CC=clang-14 allmodconfig >/dev/null 2>&1
-make -j O=/tmp/crypto-build W=1 CC=clang-14 drivers/crypto/virtio/
-  virtio_crypto_akcipher_algs.o
+On Thu, Jan 25, 2024 at 10:11:00PM -0600, Michael Roth wrote:
+> This patchset is also available at:
+> 
+>   https://github.com/amdese/linux/commits/snp-host-init-v2
+> 
+> and is based on top of linux-next tag next-20240125
 
-Fixes: 59ca6c93387d ("virtio-crypto: implement RSA algorithm")
-Link: https://lore.kernel.org/all/0a194a79-e3a3-45e7-be98-83abd3e1cb7e@roeck-us.net/
-Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
----
- drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Ok, I've queued this now after some testing.
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-index 2621ff8a9376..de53eddf6796 100644
---- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-@@ -104,7 +104,8 @@ static void virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
- }
- 
- static int virtio_crypto_alg_akcipher_init_session(struct virtio_crypto_akcipher_ctx *ctx,
--		struct virtio_crypto_ctrl_header *header, void *para,
-+		struct virtio_crypto_ctrl_header *header,
-+		struct virtio_crypto_akcipher_session_para *para,
- 		const uint8_t *key, unsigned int keylen)
- {
- 	struct scatterlist outhdr_sg, key_sg, inhdr_sg, *sgs[3];
-@@ -128,7 +129,7 @@ static int virtio_crypto_alg_akcipher_init_session(struct virtio_crypto_akcipher
- 
- 	ctrl = &vc_ctrl_req->ctrl;
- 	memcpy(&ctrl->header, header, sizeof(ctrl->header));
--	memcpy(&ctrl->u, para, sizeof(ctrl->u));
-+	memcpy(&ctrl->u.akcipher_create_session.para, para, sizeof(*para));
- 	input = &vc_ctrl_req->input;
- 	input->status = cpu_to_le32(VIRTIO_CRYPTO_ERR);
- 
+As of now
+
+https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/log/?h=x86/sev
+
+is frozen and fixes should come ontop so that Paolo/Sean can use that
+branch to base the remaining SNP host stuff ontop.
+
+Thx.
+
 -- 
-2.34.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
