@@ -1,137 +1,102 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503A4129A8D;
-	Wed, 31 Jan 2024 15:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210233715E;
+	Wed, 31 Jan 2024 19:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706715220; cv=none; b=iU84XWBafNkIHj1U3DTU2lFs78AXN2UnE/RwYeTJ1bNvTNk5B0ea/2cQ0Ewq1XOCqUqa5xjzcWd7zqDi+tQ679dAiDroJWC3xB0tiQNVEe2KBVBJaqC/XrwiSCmzY86lCr04CISgnIkSBDABgSDlqPtwBtwSmWtwFh3VQODhVi4=
+	t=1706728214; cv=none; b=TvlH+fsSQDcg08Hb/fUDjcLMN0AxEN7UeB8MZnuXXv1GGzTm7IbSJzyTnFGvxfTZAiB9d51Ntvzdo0utEq6YIgxMvAob4hgSWUuxAUzkEgat1EUIo3PVDV7povMB8o3oU6R88B6ERaXgfoPExeEymA/TjIbLbPspxt8b10bzzZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706715220; c=relaxed/simple;
-	bh=0zgyG70uKARMg4PuX4dIuRgtDZijkpkac6Koi4sltqY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EXdVWQq0I2i8YFhZmIg2e0ZJmqFfkJyflyCPGasKSwJet/hn0ATxbXreiooI/Bf0o4x9Ks5GRrIutREAZL99fO3BkqM0w3ojH0hEN/Zkv/lHgz01Ivgb1RbRs5mZyicq3ahh4bmqIbndLj70ZtVqL/Rm9PEKmsRhAOD1a4ruS6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a3t5VOXj; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1706728214; c=relaxed/simple;
+	bh=YuGBlaaDD6uC/KXsWtFTjEBqEGYGFxartz53V+KSBQU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aOfo0pcl0fbKhtoCRdH8e+HZCURH6LMIz/VwJkm5myrVnI2sT+shwNYO0JIL7EhvRzcA8u5FtMEjd1CHchtc52lr7zvteooki0qjKpqbvv9MI1VkQbqTafRb/XsEq1EewXRoBLECkSEi6Wllwb4Y5tDT02vyjx6vwbHc1yFcj28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WZN8QliN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a3t5VOXj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706715220; x=1738251220;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=0zgyG70uKARMg4PuX4dIuRgtDZijkpkac6Koi4sltqY=;
-  b=a3t5VOXjtmlOBldLdbdQYOvcuzCCvE/juhJqq3WInS8h5KqHmFVGhtkk
-   J9F+e3AcKK/TQx4/Df9ax76yLYKuGB+yppnSOB1quC93uIKVFWntuFQHU
-   JAQ1ojndavkKrnbpBVNKPhXjqUSUkK3QAbztMCABnmgy8uw2TuEjS3VjQ
-   YImlqKa6r9GjD0RW5iicakSG0Ns/U+qgUABBsqQd8P+V7JC7FdiooMBh/
-   D2SC5/Cmd1M3cJbWqoXfaKXkZwFnqBKMjjQjDtlU09PL3yH+m0QEvw7CT
-   Kdm5hp3uqh+68INoyeDJrEXyDiF+jMw2xxI0VWcvJZXsAB6Tw+KMDnKS+
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="10384267"
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="10384267"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 07:33:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="788611249"
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="788611249"
-Received: from dspeerx-mobl.amr.corp.intel.com (HELO [10.212.131.185]) ([10.212.131.185])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 07:33:37 -0800
-Message-ID: <85dd3df3-9c0e-45e2-af8d-50dbc0cf40c8@intel.com>
-Date: Wed, 31 Jan 2024 07:33:36 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WZN8QliN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE521C433F1;
+	Wed, 31 Jan 2024 19:10:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706728213;
+	bh=YuGBlaaDD6uC/KXsWtFTjEBqEGYGFxartz53V+KSBQU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WZN8QliNA2knu33YvywVNAsuKerSk0V11V6U2pfWg1KSPUQq0x3NY8psX+IU6uQw2
+	 7uHgK95gmRPhnEgKK1DymD2ss8Su/LxCV98VMotPQz8LtS1/VjIthbdFRbuqShAH3z
+	 ZeoiXhxlmeB8NU4KKrCqmeUO5kO+cCe476SZ6Ux29lc9M9Nzx7ob1/q3bzVfoh3X5F
+	 Bt5smSIC7nCg13w+SRXqRa7MxZoTUwTlOIDuNSSz7n9cB6IKWlTRw/oPcjVw1n6MuF
+	 MxHR6UMVHG1JP273RiNj/Gvoyo1fH76JluEr+4e2WsBufIaUdYC4Qv1Rhu2HwMsE5O
+	 grkcvAk+7yk2A==
+Date: Wed, 31 Jan 2024 12:10:11 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: zhenwei pi <pizhenwei@bytedance.com>
+Cc: arei.gonglei@huawei.com, mst@redhat.com, jasowang@redhat.com,
+	herbert@gondor.apana.org.au, xuanzhuo@linux.alibaba.com,
+	virtualization@lists.linux.dev, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davem@davemloft.net
+Subject: Re: [PATCH] crypto: virtio/akcipher - Fix stack overflow on memcpy
+Message-ID: <20240131191011.GA679548@dev-arch.thelio-3990X>
+References: <20240130112740.882183-1-pizhenwei@bytedance.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] crypto: padlock-sha: Matches CPU with Family with
- 6 explicitly
-Content-Language: en-US
-To: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>, herbert@gondor.apana.org.au,
- davem@davemloft.net, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, kim.phillips@amd.com, kirill.shutemov@linux.intel.com,
- jmattson@google.com, babu.moger@amd.com, kai.huang@intel.com,
- acme@redhat.com, aik@amd.com, namhyung@kernel.org
-Cc: CobeChen@zhaoxin.com, TimGuo@zhaoxin.com, LeoLiu-oc@zhaoxin.com,
- GeorgeXue@zhaoxin.com
-References: <20240123022852.2475-1-TonyWWang-oc@zhaoxin.com>
- <20240123022852.2475-2-TonyWWang-oc@zhaoxin.com>
- <54d4fe7f-2e36-4bb3-8b51-4a68510010d5@intel.com>
- <40e74749-fa9d-4089-ae23-e9aefdd3549f@zhaoxin.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <40e74749-fa9d-4089-ae23-e9aefdd3549f@zhaoxin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240130112740.882183-1-pizhenwei@bytedance.com>
 
-On 1/31/24 01:45, Tony W Wang-oc wrote:
->>>   static const struct x86_cpu_id padlock_sha_ids[] = {
->>> -     X86_MATCH_FEATURE(X86_FEATURE_PHE, NULL),
->>> +     X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 6, X86_FEATURE_PHE, NULL),
->>>        {}
->>>   };
->> Logically, this is saying that there are non-CENTAUR or non-family-6
->> CPUs that set X86_FEATURE_PHE, but don't support X86_FEATURE_PHE.  Is
->> that the case?
+On Tue, Jan 30, 2024 at 07:27:40PM +0800, zhenwei pi wrote:
+> sizeof(struct virtio_crypto_akcipher_session_para) is less than
+> sizeof(struct virtio_crypto_op_ctrl_req::u), copying more bytes from
+> stack variable leads stack overflow. Clang reports this issue by
+> commands:
+> make -j CC=clang-14 mrproper >/dev/null 2>&1
+> make -j O=/tmp/crypto-build CC=clang-14 allmodconfig >/dev/null 2>&1
+> make -j O=/tmp/crypto-build W=1 CC=clang-14 drivers/crypto/virtio/
+>   virtio_crypto_akcipher_algs.o
 > 
-> Not exactly.
-> 
-> Zhaoxin CPU supports X86_FEATURE_PHE and X86_FEATURE_PHE2.
-> 
-> We expect the Zhaoxin CPU to use the zhaoxin_sha driver introduced in
-> the third patch of this patch set.
-> 
-> Without this patch Zhaoxin CPU will also match the padlock-sha driver too.
+> Fixes: 59ca6c93387d ("virtio-crypto: implement RSA algorithm")
+> Link: https://lore.kernel.org/all/0a194a79-e3a3-45e7-be98-83abd3e1cb7e@roeck-us.net/
+> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
 
-I honestly have no idea what this is saying.
+I can confirm this resolves the warning for me as well.
 
-Could you try again, please?
+Tested-by: Nathan Chancellor <nathan@kernel.org> # build
+
+I suspect Guenter should have a formal Reported-by tag. Should this be
+CC'd for stable@ as well?
+
+Cheers,
+Nathan
+
+> ---
+>  drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> index 2621ff8a9376..de53eddf6796 100644
+> --- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> +++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> @@ -104,7 +104,8 @@ static void virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
+>  }
+>  
+>  static int virtio_crypto_alg_akcipher_init_session(struct virtio_crypto_akcipher_ctx *ctx,
+> -		struct virtio_crypto_ctrl_header *header, void *para,
+> +		struct virtio_crypto_ctrl_header *header,
+> +		struct virtio_crypto_akcipher_session_para *para,
+>  		const uint8_t *key, unsigned int keylen)
+>  {
+>  	struct scatterlist outhdr_sg, key_sg, inhdr_sg, *sgs[3];
+> @@ -128,7 +129,7 @@ static int virtio_crypto_alg_akcipher_init_session(struct virtio_crypto_akcipher
+>  
+>  	ctrl = &vc_ctrl_req->ctrl;
+>  	memcpy(&ctrl->header, header, sizeof(ctrl->header));
+> -	memcpy(&ctrl->u, para, sizeof(ctrl->u));
+> +	memcpy(&ctrl->u.akcipher_create_session.para, para, sizeof(*para));
+>  	input = &vc_ctrl_req->input;
+>  	input->status = cpu_to_le32(VIRTIO_CRYPTO_ERR);
+>  
+> -- 
+> 2.34.1
+> 
