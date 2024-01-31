@@ -1,134 +1,148 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.zhaoxin.com (MX1.ZHAOXIN.COM [210.0.225.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AF24C98
-	for <linux-crypto@vger.kernel.org>; Wed, 31 Jan 2024 01:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C71F69956
+	for <linux-crypto@vger.kernel.org>; Wed, 31 Jan 2024 09:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.0.225.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706663584; cv=none; b=SwuTJnxIUpjByqe+KBIFuav90N83dIQALJVXhWbWn4O9303Hjh7BBVU0MsjLfw1FDWIwOkH3680moD9WMWxV3K3H/iDjiiir0Oa2Ivnan/xbADG/1iXJ/ixG+07mTY3i8wNe3SsTxYylzHlFCC+4XbBiQ6ZyarWpx61vAgKMb9U=
+	t=1706692255; cv=none; b=iSZ442yQj9w1epGMOfnbKoamvNZ+elZiKz2ff8uvmnTE3WRUO5UkjZGC3268M3LC3huRAGJQ5i8Tus8URYvb2DmPzXqdTXn0ohBoFxNdvJ505oKqrQsp6U5i3Xlj2ucSjTO4orOo9KaPQB0E8gpQbwBKuo8qYtdjUqvsCkQXRMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706663584; c=relaxed/simple;
-	bh=WnaiMYjG3HYrBPVosKeochjRi58QHb85b9Uafy87v5A=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XwQGKRk8sjpE1P6np5WqkLqmgf5IxU4kIUkQ1m/erTPQrd0/EWB9SPYhH6KYidX2KihHyPlrmK8F8hj+z9mKnZzAsHG94IQtezegteoeDPLArv3weDAUAaUjw9YMEHC1A2Xv4JKlbXStwRHb07UUFvdeKYeBbX1ZIgi5eUslv2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w9IQLSNZ; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w9IQLSNZ"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d72c4b8165so25198185ad.3
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Jan 2024 17:13:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706663582; x=1707268382; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/GoosJvXV4tQVgQnoX094ue9LgaeDV/puMZ+zgV5v8A=;
-        b=w9IQLSNZ4uiLohicHi+6G4ZMJRs0oUrtBRqKLSOvirKyQrWa1O/qJwki5kVmpdZUx3
-         IpKJ4/Q6lzxOqvq+nzIOc64XbTDVm5OnVcguzGFi4NlitC2y4KwWXcGKJZHfHjeWTbpc
-         Nqc5QsHw1b4PeF0Jqt2N5f0pgo9UHiHsbXI6wiwqGaevp5KffFT1lNyFTEchXuLFnmwy
-         8aeYQITF4QJdmpaKl8yABpwEesen6QirhP2R5sWTUkaY7VuuYZpwS4VR8k2F/w6BascW
-         TIj9TXanfw+TjmKBdug0CmE/Jm2wfYbveeQ59wYGdBLLdJZWqwhMyrLj+atS2x+AgBwu
-         5s7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706663582; x=1707268382;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/GoosJvXV4tQVgQnoX094ue9LgaeDV/puMZ+zgV5v8A=;
-        b=ClfFSbPgyzqc/0weBueGPjvSGTz5kjf3pZHp1wehZW8/mcMmbSdKmlT9QSJosL8F4S
-         I7mjUFdR7MbvYauQ0S9NKzB1wgYZf/1d/hv4PUNtHQ2Ht9LS5MiD05NLG/R0f7T3eCYE
-         1GxYSnXyhxJpIWzmSUMIXU7vSo0yxiz4QsFeTdU7jXPomCQnmSWYu5DQLVj1uF1HOLub
-         DUjS8+kGbOuPLoBpbBpmkNxRzgRMJfi/VW+hqYuJWJXngCTNoblpG5IFaEwe1gEY9DLH
-         iE1Ib5JcGllblRctYlFpxHyTkQKct0ny8KsNc0ji6BWucN851EuZ474IKwiE1alCoLyd
-         VT8A==
-X-Gm-Message-State: AOJu0YzAam9T1oUtyHbVnCXZ8JDBlPdKGXFjk29nO+PRYLD030E9uh5Z
-	3Uf7DubWebVPDBSIG32s9T1FABuc/nAUJ3ZWBbzo8V4w7+ixQIMfZGegn9Td9jQzZSjoAL7z2ee
-	G4g==
-X-Google-Smtp-Source: AGHT+IHXA4t0uhZ7tzthJIqQkUlU7edO5hP5ya6T+NaNmVk8RFxp+26SnKPKNqGEdvTVdg4s3sxwKV4qvvQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d212:b0:1d9:1e1:76ca with SMTP id
- t18-20020a170902d21200b001d901e176camr715ply.10.1706663582547; Tue, 30 Jan
- 2024 17:13:02 -0800 (PST)
-Date: Tue, 30 Jan 2024 17:13:00 -0800
-In-Reply-To: <20231016115028.996656-9-michael.roth@amd.com>
+	s=arc-20240116; t=1706692255; c=relaxed/simple;
+	bh=tZ2Kkk4OTFSJm493uk6H8hT3BpCU0VrAwNM5XClLaCQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=jhs1pGxIOrf2ESjBeyvFV3Eh+GG9StGPnK6gQe02SJafTcHqnjgM4LLo/5V1hc5Ba+4ymj7DyfgIy/PViMdAdlGWYhQ7PA28mgw5SO9ECnSjNL6VMqnn8C0BtlhywgWUh74mG5jNSW1zZq54K6Nhs/UEXP85wk/gKoAW397J26U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=210.0.225.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1706691568-086e230f2933e90001-Xm9f1P
+Received: from ZXSHMBX3.zhaoxin.com (ZXSHMBX3.zhaoxin.com [10.28.252.165]) by mx1.zhaoxin.com with ESMTP id CpJE2AnaHniHCIlk (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Wed, 31 Jan 2024 16:59:28 +0800 (CST)
+X-Barracuda-Envelope-From: TonyWWang-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHMBX3.zhaoxin.com
+ (10.28.252.165) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 31 Jan
+ 2024 16:59:28 +0800
+Received: from [10.32.57.248] (10.32.57.248) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 31 Jan
+ 2024 16:59:25 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.165
+Message-ID: <4ef18ceb-68ae-4e09-a04a-b268c7442c52@zhaoxin.com>
+X-Barracuda-RBL-Trusted-Forwarder: 10.32.57.248
+Date: Wed, 31 Jan 2024 16:59:24 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231016115028.996656-1-michael.roth@amd.com> <20231016115028.996656-9-michael.roth@amd.com>
-Message-ID: <ZbmenP05fo8hZU8N@google.com>
-Subject: Re: [PATCH RFC gmem v1 8/8] KVM: x86: Determine shared/private faults
- based on vm_type
-From: Sean Christopherson <seanjc@google.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com, isaku.yamahata@intel.com, 
-	ackerleytng@google.com, vbabka@suse.cz, ashish.kalra@amd.com, 
-	nikunj.dadhania@amd.com, jroedel@suse.de, pankaj.gupta@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/3] x86/cpufeatures: Add CPU feature flags for Zhaoxin
+ Hash Engine
+Content-Language: en-US
+X-ASG-Orig-Subj: Re: [PATCH v2 2/3] x86/cpufeatures: Add CPU feature flags for Zhaoxin
+ Hash Engine
+To: "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<tglx@linutronix.de>, <mingo@redhat.com>, <dave.hansen@linux.intel.com>,
+	<x86@kernel.org>, <seanjc@google.com>, <kim.phillips@amd.com>,
+	<kirill.shutemov@linux.intel.com>, <jmattson@google.com>,
+	<babu.moger@amd.com>, <kai.huang@intel.com>, <acme@redhat.com>,
+	<aik@amd.com>, <namhyung@kernel.org>, <CobeChen@zhaoxin.com>,
+	<TimGuo@zhaoxin.com>, <LeoLiu-oc@zhaoxin.com>, <GeorgeXue@zhaoxin.com>
+References: <20240123022852.2475-1-TonyWWang-oc@zhaoxin.com>
+ <20240123022852.2475-3-TonyWWang-oc@zhaoxin.com>
+ <20240123094427.GAZa-Ke5d2Kwyk2nSU@fat_crate.local>
+ <AADBA4D3-3D36-4AB6-B0D1-510DD5347430@zytor.com>
+From: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+In-Reply-To: <AADBA4D3-3D36-4AB6-B0D1-510DD5347430@zytor.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
+X-Barracuda-Connect: ZXSHMBX3.zhaoxin.com[10.28.252.165]
+X-Barracuda-Start-Time: 1706691568
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.35:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 3419
+X-Barracuda-BRTS-Status: 0
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.120182
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-On Mon, Oct 16, 2023, Michael Roth wrote:
-> For KVM_X86_SNP_VM, only the PFERR_GUEST_ENC_MASK flag is needed to
-> determine with an #NPF is due to a private/shared access by the guest.
-> Implement that handling here. Also add handling needed to deal with
-> SNP guests which in some cases will make MMIO accesses with the
-> encryption bit.
 
-...
+On 2024/1/23 23:42, H. Peter Anvin wrote:
+>
+> [这封邮件来自外部发件人 谨防风险]
+>
+> On January 23, 2024 1:44:27 AM PST, Borislav Petkov <bp@alien8.de> wrote:
+>> On Tue, Jan 23, 2024 at 10:28:51AM +0800, Tony W Wang-oc wrote:
+>>> Zhaoxin CPUs have implemented the SHA(Secure Hash Algorithm) as its
+>>> instrucions.
+>>> Add two CPU feature flags indicated by CPUID.(EAX=C0000001,ECX=0):EDX
+>>> bit 25/26 which will be used by Zhaoxin SHA driver.
+>>>
+>>> Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+>>> ---
+>>>   arch/x86/include/asm/cpufeatures.h       | 4 +++-
+>>>   tools/arch/x86/include/asm/cpufeatures.h | 4 +++-
+>>>   2 files changed, 6 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+>>> index 29cb275a219d..28b0e62dbdf5 100644
+>>> --- a/arch/x86/include/asm/cpufeatures.h
+>>> +++ b/arch/x86/include/asm/cpufeatures.h
+>>> @@ -145,7 +145,7 @@
+>>>   #define X86_FEATURE_RDRAND          ( 4*32+30) /* RDRAND instruction */
+>>>   #define X86_FEATURE_HYPERVISOR              ( 4*32+31) /* Running on a hypervisor */
+>>>
+>>> -/* VIA/Cyrix/Centaur-defined CPU features, CPUID level 0xC0000001, word 5 */
+>>> +/* VIA/Cyrix/Centaur/Zhaoxin-defined CPU features, CPUID level 0xC0000001, word 5 */
+>> Does that mean that all those companies agree on the contents of this
+>> CPUID leaf?
+>>
+>>>   #define X86_FEATURE_XSTORE          ( 5*32+ 2) /* "rng" RNG present (xstore) */
+>>>   #define X86_FEATURE_XSTORE_EN               ( 5*32+ 3) /* "rng_en" RNG enabled */
+>>>   #define X86_FEATURE_XCRYPT          ( 5*32+ 6) /* "ace" on-CPU crypto (xcrypt) */
+>>> @@ -156,6 +156,8 @@
+>>>   #define X86_FEATURE_PHE_EN          ( 5*32+11) /* PHE enabled */
+>>>   #define X86_FEATURE_PMM                     ( 5*32+12) /* PadLock Montgomery Multiplier */
+>>>   #define X86_FEATURE_PMM_EN          ( 5*32+13) /* PMM enabled */
+>>> +#define X86_FEATURE_PHE2            ( 5*32+25) /* "phe2" Zhaoxin Hash Engine */
+>>> +#define X86_FEATURE_PHE2_EN         ( 5*32+26) /* "phe2_en" PHE2 enabled */
+>>                                                      ^^^^^^^^^
+>>
+>> From: Documentation/arch/x86/cpuinfo.rst
+>>
+>> "a: Feature flags can be derived from the contents of CPUID leaves.
+>> ------------------------------------------------------------------
+>> These feature definitions are organized mirroring the layout of CPUID
+>> leaves and grouped in words with offsets as mapped in enum cpuid_leafs
+>> in cpufeatures.h (see arch/x86/include/asm/cpufeatures.h for details).
+>> If a feature is defined with a X86_FEATURE_<name> definition in
+>> cpufeatures.h, and if it is detected at run time, the flags will be
+>> displayed accordingly in /proc/cpuinfo. For example, the flag "avx2"
+>> comes from X86_FEATURE_AVX2 in cpufeatures.h."
+>>
+>> Is your grep broken?
+>>
+> Well, Centaur bought Cyrix, and then VIA bought Centaur. I think Zhaoxin is a joint venture between VIA and the City of Shanghai, or something like that?
 
-> @@ -4356,12 +4357,19 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  			return RET_PF_EMULATE;
->  	}
->  
-> -	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-> +	/*
-> +	 * In some cases SNP guests will make MMIO accesses with the encryption
-> +	 * bit set. Handle these via the normal MMIO fault path.
-> +	 */
-> +	if (!slot && private_fault && kvm_is_vm_type(vcpu->kvm, KVM_X86_SNP_VM))
-> +		private_fault = false;
+Yes, Zhaoxin is a joint venture including VIA and Shanghai Alliance 
+Investment Ltd.
 
-Why?  This is inarguably a guest bug.
+VIA has not designed new CPU products for a long time, nor maintained 
+the previous products.
 
-> +	if (private_fault != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
->  		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
->  		return -EFAULT;
->  	}
->  
-> -	if (fault->is_private)
-> +	if (private_fault)
->  		return kvm_faultin_pfn_private(vcpu, fault);
->  
->  	async = false;
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index 759c8b718201..e5b973051ad9 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -251,6 +251,24 @@ struct kvm_page_fault {
->  
->  int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
->  
-> +static bool kvm_mmu_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 err)
-> +{
-> +	bool private_fault = false;
-> +
-> +	if (kvm_is_vm_type(kvm, KVM_X86_SNP_VM)) {
-> +		private_fault = !!(err & PFERR_GUEST_ENC_MASK);
-> +	} else if (kvm_is_vm_type(kvm, KVM_X86_SW_PROTECTED_VM)) {
-> +		/*
-> +		 * This handling is for gmem self-tests and guests that treat
-> +		 * userspace as the authority on whether a fault should be
-> +		 * private or not.
-> +		 */
-> +		private_fault = kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
-> +	}
+Zhaoxin is currently designing and releasing new CPU products, and VIA 
+understands and agrees that Zhaoxin uses the contents of this CPUID leaf.
 
-This can be more simply:
+Sorry for late!
 
-	if (kvm_is_vm_type(kvm, KVM_X86_SNP_VM))
-		return !!(err & PFERR_GUEST_ENC_MASK);
 
-	if (kvm_is_vm_type(kvm, KVM_X86_SW_PROTECTED_VM))
-		return kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
