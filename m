@@ -1,31 +1,35 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD56EACC;
-	Thu,  1 Feb 2024 01:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A2F39FCC
+	for <linux-crypto@vger.kernel.org>; Thu,  1 Feb 2024 02:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.110.167.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706752733; cv=none; b=c5OwqIx6MhlWyVdnCuHVPRFcOOf3i+arUTCNUQzaUTDjLY+MIObIka3fp2fVReg1+OnJgczzz8PaRsc9F7X+nBf8ujVVwwKrqDRdYZQ+YAI40CyThyFXtJsIfue3nB7ZQrm1/WoClhdiAdSRpsGNA0oVEcyaBg/FCYc5xoFl1PE=
+	t=1706755067; cv=none; b=gwXJzcr6GzKan5p7Xf4p2m7fwPcR+0T+Ol1ABRbVk1Q4awTjnVzQX7bOUIx7k8bLJ1AukzXhnQ39+iHpOuN9vDy6svBWJYTopDbjzRgIDgo0CsIKtO/MaRARabrl4tUgM+hBXxFyB9/eB/XcQp9m+tcfV/CiSBXEkZ/nboFL8/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706752733; c=relaxed/simple;
-	bh=Xor6owu58Ln6T3Af5RESZax2j6h4UOSBR2UkbAZpWec=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=YdYyftGt9Hyv1IPUsDVrjdDZsYqE3IDB+4CguNW64LukF1xSLgH6WwYOxgGxiF9WRiw9MRd700UP1WOXQCbLHx4fMaPpAaKwckXMLBz5zXsFZI12eZ0c8BHmyF/X9EfvSll8OAHLTbAmhbvqaKUmrF7+j816YTGHHdFQsa3dnig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TQMTh6yvDz29kq5;
-	Thu,  1 Feb 2024 09:56:56 +0800 (CST)
-Received: from dggpeml500001.china.huawei.com (unknown [7.185.36.227])
-	by mail.maildlp.com (Postfix) with ESMTPS id F36961400D4;
-	Thu,  1 Feb 2024 09:58:47 +0800 (CST)
-Received: from [10.67.121.42] (10.67.121.42) by dggpeml500001.china.huawei.com
- (7.185.36.227) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 1 Feb
- 2024 09:58:47 +0800
-Message-ID: <667a313b-beae-4340-9173-82363c8e9aa8@huawei.com>
-Date: Thu, 1 Feb 2024 09:58:47 +0800
+	s=arc-20240116; t=1706755067; c=relaxed/simple;
+	bh=v9KFJ0/t9phT/0qcrC94uWpVsSJNz28sqabEjQ2Ec10=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=bmVVj6h8DJZrblOSB0xd/2IfpcLUE38eQFxQd99bRbFeGSqaIs5rwkdVuo6jz9N601X224aL+QUxdjn6kVHCtw7yKWLb9L6sISs+mzSCz3Gw7Q38lSl/zzCEFRhfnU9nyCKTjMPqbgs40gnS1rRDNKhHE2mV9sMnsMjTfupqLLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=203.110.167.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1706755060-1eb14e0c7e333b0001-Xm9f1P
+Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx2.zhaoxin.com with ESMTP id vybHdzObSTfvd8JI (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Thu, 01 Feb 2024 10:37:40 +0800 (CST)
+X-Barracuda-Envelope-From: TonyWWang-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHMBX1.zhaoxin.com
+ (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 1 Feb
+ 2024 10:37:40 +0800
+Received: from [10.32.57.248] (10.32.57.248) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 1 Feb
+ 2024 10:37:37 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
+Message-ID: <858b8c95-a0b7-4085-9ae4-824bec4d3c67@zhaoxin.com>
+X-Barracuda-RBL-Trusted-Forwarder: 10.32.57.248
+Date: Thu, 1 Feb 2024 10:37:36 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -33,43 +37,82 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/4] some updates and cleanups for hisilicon/sec2.
-From: taoqi <taoqi10@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<liulongfang@huawei.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-References: <20240126093828.14131-1-taoqi10@huawei.com>
-In-Reply-To: <20240126093828.14131-1-taoqi10@huawei.com>
+Subject: Re: [PATCH v2 1/3] crypto: padlock-sha: Matches CPU with Family with
+ 6 explicitly
+Content-Language: en-US
+X-ASG-Orig-Subj: Re: [PATCH v2 1/3] crypto: padlock-sha: Matches CPU with Family with
+ 6 explicitly
+To: Dave Hansen <dave.hansen@intel.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+	<hpa@zytor.com>, <seanjc@google.com>, <kim.phillips@amd.com>,
+	<kirill.shutemov@linux.intel.com>, <jmattson@google.com>,
+	<babu.moger@amd.com>, <kai.huang@intel.com>, <acme@redhat.com>,
+	<aik@amd.com>, <namhyung@kernel.org>
+CC: <CobeChen@zhaoxin.com>, <TimGuo@zhaoxin.com>, <LeoLiu-oc@zhaoxin.com>,
+	<GeorgeXue@zhaoxin.com>
+References: <20240123022852.2475-1-TonyWWang-oc@zhaoxin.com>
+ <20240123022852.2475-2-TonyWWang-oc@zhaoxin.com>
+ <54d4fe7f-2e36-4bb3-8b51-4a68510010d5@intel.com>
+ <40e74749-fa9d-4089-ae23-e9aefdd3549f@zhaoxin.com>
+ <85dd3df3-9c0e-45e2-af8d-50dbc0cf40c8@intel.com>
+From: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+In-Reply-To: <85dd3df3-9c0e-45e2-af8d-50dbc0cf40c8@intel.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500001.china.huawei.com (7.185.36.227)
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
+X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
+X-Barracuda-Start-Time: 1706755060
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 1244
+X-Barracuda-BRTS-Status: 0
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.120217
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-On 2024/1/26 17:38, Qi Tao wrote:
-> This seires patch mainly add some RAS registers to enhance the
-> DFX positioning function and fix some cleanup issues.
-> 
-> [PATCH v1 3/4] -> [PATCH v2 3/4]
-> 	sec_sqe3->c_len_ivin |= cpu_to_le32(c_req->c_len);
-> -	sec_sqe3->tag = cpu_to_le64((unsigned long)(uintptr_t)req);
-> +	sec_sqe3->tag = cpu_to_le64((unsigned long)req);
-> 
-> Other patches are not modified.
-> 
-> Qi Tao (3):
->    crypto: hisilicon/sec2 - updates the sec DFX function register
->    crypto: hisilicon/sec2 - modify nested macro call
->    crypto: hisilicon/sec2 - fix some cleanup issues
-> 
-> Wenkai Lin (1):
->    crypto: hisilicon/sec - remove unused parameter
-> 
->    drivers/crypto/hisilicon/sec2/sec_crypto.c | 33 ++++++++--------------
->    drivers/crypto/hisilicon/sec2/sec_main.c   |  5 ++++
->    2 files changed, 17 insertions(+), 21 deletions(-)
-> 
 
-The email is sent repeatedly. Please ignore other duplicate patches.
+On 2024/1/31 23:33, Dave Hansen wrote:
+>
+> [这封邮件来自外部发件人 谨防风险]
+>
+> On 1/31/24 01:45, Tony W Wang-oc wrote:
+>>>>    static const struct x86_cpu_id padlock_sha_ids[] = {
+>>>> -     X86_MATCH_FEATURE(X86_FEATURE_PHE, NULL),
+>>>> +     X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 6, X86_FEATURE_PHE, NULL),
+>>>>         {}
+>>>>    };
+>>> Logically, this is saying that there are non-CENTAUR or non-family-6
+>>> CPUs that set X86_FEATURE_PHE, but don't support X86_FEATURE_PHE.  Is
+>>> that the case?
+>> Not exactly.
+>>
+>> Zhaoxin CPU supports X86_FEATURE_PHE and X86_FEATURE_PHE2.
+>>
+>> We expect the Zhaoxin CPU to use the zhaoxin_sha driver introduced in
+>> the third patch of this patch set.
+>>
+>> Without this patch Zhaoxin CPU will also match the padlock-sha driver too.
+> I honestly have no idea what this is saying.
+>
+> Could you try again, please?
 
-Thanks
-taoqi
+
+Sorry. It should be said that there are non-CENTAUR or non-family-6 CPUs 
+that set X86_FEATURE_PHE,
+
+and also set the new X86_FEATURE_PHE2.  For these CPUs, we expect to use 
+a new driver that supports
+
+both X86_FEATURE_PHE and X86_FEATURE_PHE2.
+
+So we make the driver padlock-sha to matches CENTAUR Family-6 CPU 
+explicitly.
+
