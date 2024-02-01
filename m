@@ -1,59 +1,47 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62ED9626CD
-	for <linux-crypto@vger.kernel.org>; Thu,  1 Feb 2024 16:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1187E0E8;
+	Thu,  1 Feb 2024 16:42:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706803890; cv=none; b=Ztxn4vS+cZEvkpItBX840PaYNJN1wknMbzVkgTzt/OscI2aatEbzmCQAoGfsKo5XFH4Wqh5iW6d1dCpXtOwWn4qnQfcd1L9x6GoozMqHzBIWCpatTfGPoU2EUdtrK+nhBOf8ZRfUpL7l+DmOQ5gh0IbiHCwvVHeE107m8NZmU+4=
+	t=1706805745; cv=none; b=UUJkckBsQXSy/fa13R94A8UZgq2QyxYb+7BBFCJeqSOvny3bfRFl/kjh+pSOOTchaBWWrAG6x2/Cs1d+0fwTg2fnZdjjkQ7zzgEQ1H2tG2Vp3NeFQSWw8r4oxCLPn4CBgjqjPB3Eo0b168U/KIHK6WuuRYEuHIkI2oulqkNycvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706803890; c=relaxed/simple;
-	bh=apJLdzMZKNqZkxhr/A8+CNCpsUOL9GHK5UhU9ZsNJTk=;
+	s=arc-20240116; t=1706805745; c=relaxed/simple;
+	bh=OqwpFTlAvnJTl/ArcCIdV9POC6pM6Rx9XEdFbU2OLlg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JLBGcW91o07JmR9gnpquaon61kVQNQSj5I4UiwlAGAHRwwpD3TtyNX8dnrpbb7PFsBHcmzofskVjvBTpiGROgyJckFWoOOmkVbsR3AtsblsibSK0NGuy9BJGK8liuAzmlXt3myyZo0QCdHsS04WOHtfO9GygJW8T/15jI3OFfLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gf9N5JmE; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 In-Reply-To:Content-Type; b=EStiY/nhUZ3kgkiANmvV8Je78BYj+tvKkA9rFcpzMyH42n2yOB3Rxbjf2skvjCawZvEkOOC+qAlku6T1Qiv+yxWQXmEgHeOhtS9EqfC8gD1LR6WwiP87jl5LlApx6svHj+/RuEl4HJeWygXrX963MULI//9+3dcvR0O/sWTp/xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cdzxkh+i; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gf9N5JmE"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a354408e6bfso382149166b.1
-        for <linux-crypto@vger.kernel.org>; Thu, 01 Feb 2024 08:11:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706803885; x=1707408685; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8pjHDOWqTPfZAnEZAI0E4Dw26mHdRawBX0HOJq1N4u8=;
-        b=gf9N5JmE4Cg19vElele8rOlai+vTyHCI1HvQuAOq2r4ekDwPWxOyVBsskf/ud04Z9o
-         wkrhmXBhFjPDyhAW0mXXh1GLEMXzJr6AgMaE1UWJH5jbH1W9Msn69cvC3BbQTiQZAJhJ
-         rtpj+nZ3gYzFJXGoV9ltvJ2Hp2YeMu+Lv4jnolOgjQgpg8LlR/hwQFnGHWDmgPrCrpTT
-         pxeSMSJzY4tsnSoSsWY1CuvnFmFy9AH29QNSAMKumvdfrM/Wj7YhY0Fbwk+GlLKDbeKI
-         p1p3wLuZi8BSI3vTtE+xt8ic1xH69QMGFl/w6H4arFrLyTdPb+4TkOyWCxZro7LuxYbM
-         GeCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706803885; x=1707408685;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8pjHDOWqTPfZAnEZAI0E4Dw26mHdRawBX0HOJq1N4u8=;
-        b=hDz4AqFHrNgB3BOU6jK2OarZAoF0w5SQ3IydtpUrlUg+4MqVr4zYaf9tHlLSqyhnQb
-         uZfid9Skir4OWIDZnTP0nb/9ujRP/z19d34OalpGXMc2SKS4BaUs61V4kGzm4XzWkCYm
-         p3XpZv7Wrw6Vmobmz/6x9Azctpng/xswtJF+oxro3e/qL/oFJzmgHyHx1DZG+FYur6nz
-         rEBpI/U8joZyt6D0ARiRGmRICwCzR/caonrLmA7tKmTOV+xjDpeGZTpwV2y0CKZzTkUe
-         vzS96857AS4WIUlU/c8gw9oV6ZEafYsfmKmbz0zTOH61nsMKDOb/1JqoOwoltT9X/4Tj
-         mW0g==
-X-Gm-Message-State: AOJu0Yxxwjka930xyvqk3EzCPYaWts6s01nTHms6XJLK4Ap9iJ8BDYv1
-	l3w75tKq12YmtJm+r37G4J4qJK4HiIBU/Vpzqg021OymBR5uzN0BezkscLwRAoI=
-X-Google-Smtp-Source: AGHT+IEuxOZ2oi/31tSTIMkkw25aN7dth0mVptYES/tdHDb9mAGvYyXsbecw2G/Xeve7QNqJa1stlg==
-X-Received: by 2002:a17:906:bf47:b0:a36:c3e3:9161 with SMTP id ps7-20020a170906bf4700b00a36c3e39161mr1985471ejb.2.1706803885632;
-        Thu, 01 Feb 2024 08:11:25 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCU/oxTWPCj5ijULfiynzTYVPiC/wr+Vzjr8rOv48rN16ZEY/9jMKGTf0kHr2muV7oKatpzSPKY5jUlC3zJoBGpF203jONzgtAZ1kjk1kwjLdSUT9/3HVfSOg/1AdJNvbLy5JrQe5ck3RxMLfZ29iEus+a42w3s+zwmQ4bYVuU4+TWLP343L120JeB9kB1arU5Sn7F4Y2jQsPXIyHF4wmcKchFwNj3AGSOXlpok9RbF7Pq7GINIifkNxamgEC3q3Llrocl0KyUKi84M6zaLjA8OCBEEuE7TMt6IsDMaIWvC16aiVhFsgNKwSQEiymKoi6yhn0NsCHM467dCtMSB5cCCEiOdrRPeT16RKZ9NEReEZF2JP53omadRzWjSeABfLyDht/4tbnYjh0jkfLHnk065+vGwYaQQdnrD6uY2UdJQ/OEPrs+qQBEJoQ278h9YKPMM6KYuUSS+P0/79uDwOESGASpyqV2s3yUayAAWhPdkHeuPSDp1FNPfd48gTgExO4dlWW+vVaE4SdaHoSCEqibNSZlUJPhiIe5K8Mf7yHR1Z+0xbuI6Y14akzpAWFVaFBWGRB6NzBdWK3imdrYXVfsqEGKfix4/wJw/bopl+admnZ8gc1fZ5dTrGFt2gkLYHDj6tDF8/ite+8YnEduzPFswC4qGYZgp2w8BpgeRDtblyOTdTptKb2O+/FQCQtGWp4H0AZBNRoeC8ylLr/qPGb7dQjcehNmOnc+Y8+GpciSDHQwxuB4uNZOKP7qaQ9bp2NNXImSGwdOL93ZbBL2fmF6hzPCc5eZ+ejLQ0FxFolVj0mqhAGaU=
-Received: from [192.168.159.104] (178235179129.dynamic-4-waw-k-1-3-0.vectranet.pl. [178.235.179.129])
-        by smtp.gmail.com with ESMTPSA id w15-20020a17090652cf00b00a2e81e4876dsm7299086ejn.44.2024.02.01.08.11.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Feb 2024 08:11:25 -0800 (PST)
-Message-ID: <b06b3b13-3d61-4bf6-bc06-80ca1a189a4f@linaro.org>
-Date: Thu, 1 Feb 2024 17:11:22 +0100
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cdzxkh+i"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706805743; x=1738341743;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=OqwpFTlAvnJTl/ArcCIdV9POC6pM6Rx9XEdFbU2OLlg=;
+  b=Cdzxkh+in6FTr3lPQKt1GkI6kIbcT5eFE0wO2auTb4/VwlMuBF+qhPZx
+   mrT+4z7r3KtWVcKbieABtzEBKfmgLBwe3HDC9UHhjxdpUhpIvbiJKyjaF
+   f1EPZ9SFiLnqTF7OAe1RmcNsDfqvJEonQOzDlnwq18RchTy1FMqkgj43O
+   zkuXQlFAqSb1HPLd+vUcfUqrjaMIEfAxS7rLGwiaMWwohjvni0/PstVHk
+   ZnhrZahbuKWmnlln1SVQYzB/wg40zxO5oAGzZDGYVay6OnJCBwtEr6xLP
+   zKJ7Ca6DFEUrwXf220M+hNX1kluT/Ami/v80E1JX2AAMT/0Hn7340v98M
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="10688781"
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="10688781"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 08:42:22 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="738480102"
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="738480102"
+Received: from arbartma-mobl.amr.corp.intel.com (HELO [10.212.155.10]) ([10.212.155.10])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 08:42:21 -0800
+Message-ID: <127a9b07-214c-45b7-90fb-46d4303fee62@intel.com>
+Date: Thu, 1 Feb 2024 08:42:21 -0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,153 +49,86 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 02/15] qcom_scm: scm call for deriving a software
- secret
+Subject: Re: [PATCH v2 1/3] crypto: padlock-sha: Matches CPU with Family with
+ 6 explicitly
 Content-Language: en-US
-To: Gaurav Kashyap <quic_gaurkash@quicinc.com>,
- linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org,
- andersson@kernel.org, ebiggers@google.com, neil.armstrong@linaro.org,
- srinivas.kandagatla@linaro.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, robh+dt@kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
- kernel@quicinc.com, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, quic_omprsing@quicinc.com,
- quic_nguyenb@quicinc.com, bartosz.golaszewski@linaro.org,
- ulf.hansson@linaro.org, jejb@linux.ibm.com, martin.petersen@oracle.com,
- mani@kernel.org, davem@davemloft.net, herbert@gondor.apana.org.au
-References: <20240127232436.2632187-1-quic_gaurkash@quicinc.com>
- <20240127232436.2632187-3-quic_gaurkash@quicinc.com>
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
- 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
- izWDgYvmBE8=
-In-Reply-To: <20240127232436.2632187-3-quic_gaurkash@quicinc.com>
+To: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>, herbert@gondor.apana.org.au,
+ davem@davemloft.net, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, kim.phillips@amd.com, kirill.shutemov@linux.intel.com,
+ jmattson@google.com, babu.moger@amd.com, kai.huang@intel.com,
+ acme@redhat.com, aik@amd.com, namhyung@kernel.org
+Cc: CobeChen@zhaoxin.com, TimGuo@zhaoxin.com, LeoLiu-oc@zhaoxin.com,
+ GeorgeXue@zhaoxin.com
+References: <20240123022852.2475-1-TonyWWang-oc@zhaoxin.com>
+ <20240123022852.2475-2-TonyWWang-oc@zhaoxin.com>
+ <54d4fe7f-2e36-4bb3-8b51-4a68510010d5@intel.com>
+ <40e74749-fa9d-4089-ae23-e9aefdd3549f@zhaoxin.com>
+ <85dd3df3-9c0e-45e2-af8d-50dbc0cf40c8@intel.com>
+ <858b8c95-a0b7-4085-9ae4-824bec4d3c67@zhaoxin.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <858b8c95-a0b7-4085-9ae4-824bec4d3c67@zhaoxin.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 28.01.2024 00:14, Gaurav Kashyap wrote:
-> Inline storage encryption may require deriving a software
-> secret from storage keys added to the kernel.
+On 1/31/24 18:37, Tony W Wang-oc wrote:
+> Sorry. It should be said that there are non-CENTAUR or non-family-6 CPUs
+> that set X86_FEATURE_PHE,
 > 
-> For non-wrapped keys, this can be directly done in the kernel as
-> keys are in the clear.
+> and also set the new X86_FEATURE_PHE2.  For these CPUs, we expect to use
+> a new driver that supports
 > 
-> However, hardware wrapped keys can only be unwrapped by the wrapping
-> entity. In case of Qualcomm's wrapped key solution, this is done by
-> the Hardware Key Manager (HWKM) from Trustzone.
-> Hence, adding a new SCM call which in the end provides a hook
-> to the software secret crypto profile API provided by the block
-> layer.
+> both X86_FEATURE_PHE and X86_FEATURE_PHE2.
 > 
-> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
->  drivers/firmware/qcom/qcom_scm.c       | 65 ++++++++++++++++++++++++++
->  drivers/firmware/qcom/qcom_scm.h       |  1 +
->  include/linux/firmware/qcom/qcom_scm.h |  2 +
->  3 files changed, 68 insertions(+)
-> 
-> diff --git a/drivers/firmware/qcom/qcom_scm.c b/drivers/firmware/qcom/qcom_scm.c
-> index 7e17fd662bda..4882f8a36453 100644
-> --- a/drivers/firmware/qcom/qcom_scm.c
-> +++ b/drivers/firmware/qcom/qcom_scm.c
-> @@ -1220,6 +1220,71 @@ int qcom_scm_ice_set_key(u32 index, const u8 *key, u32 key_size,
->  }
->  EXPORT_SYMBOL_GPL(qcom_scm_ice_set_key);
->  
-> +/**
-> + * qcom_scm_derive_sw_secret() - Derive software secret from wrapped key
-> + * @wkey: the hardware wrapped key inaccessible to software
-> + * @wkey_size: size of the wrapped key
-> + * @sw_secret: the secret to be derived which is exactly the secret size
-> + * @sw_secret_size: size of the sw_secret
-> + *
-> + * Derive a software secret from a hardware wrapped key for software crypto
-> + * operations.
-> + * For wrapped keys, the key needs to be unwrapped, in order to derive a
-> + * software secret, which can be done in the hardware from a secure execution
-> + * environment.
-> + *
-> + * For more information on sw secret, please refer to "Hardware-wrapped keys"
-> + * section of Documentation/block/inline-encryption.rst.
-> + *
-> + * Return: 0 on success; -errno on failure.
-> + */
-> +int qcom_scm_derive_sw_secret(const u8 *wkey, size_t wkey_size,
-> +			      u8 *sw_secret, size_t sw_secret_size)
-> +{
-> +	struct qcom_scm_desc desc = {
-> +		.svc = QCOM_SCM_SVC_ES,
-> +		.cmd =  QCOM_SCM_ES_DERIVE_SW_SECRET,
-> +		.arginfo = QCOM_SCM_ARGS(4, QCOM_SCM_RW,
-> +					 QCOM_SCM_VAL, QCOM_SCM_RW,
-> +					 QCOM_SCM_VAL),
-> +		.args[1] = wkey_size,
-> +		.args[3] = sw_secret_size,
-> +		.owner = ARM_SMCCC_OWNER_SIP,
-> +	};
-> +
-> +	void *secret_buf;
-> +	void *wkey_buf;
-> +	int ret;
-> +
-> +	wkey_buf = qcom_tzmem_alloc(__scm->mempool, wkey_size, GFP_KERNEL);
-> +	if (!wkey_buf)
-> +		return -ENOMEM;
-> +
-> +	secret_buf = qcom_tzmem_alloc(__scm->mempool, sw_secret_size, GFP_KERNEL);
-> +	if (!secret_buf) {
-> +		ret = -ENOMEM;
-> +		goto err_free_wrapped;
-> +	}
-> +
-> +	memcpy(wkey_buf, wkey, wkey_size);
-> +	desc.args[0] = qcom_tzmem_to_phys(wkey_buf);
-> +	desc.args[2] = qcom_tzmem_to_phys(secret_buf);
-> +
-> +	ret = qcom_scm_call(__scm->dev, &desc, NULL);
-> +	if (!ret)
-> +		memcpy(sw_secret, secret_buf, sw_secret_size);
-> +
-> +	memzero_explicit(secret_buf, sw_secret_size);
-> +	qcom_tzmem_free(secret_buf);
-> +
-> +err_free_wrapped:
-> +	memzero_explicit(wkey_buf, wkey_size);
-> +	qcom_tzmem_free(wkey_buf);
-__free(qcom_tzmem) attribute instead?
+> So we make the driver padlock-sha to matches CENTAUR Family-6 CPU
+> explicitly.
 
-Konrad
-
+Could you please take a look at how this is done for the existing crypto
+algorithms?  This doesn't seem horribly new.  We have AVX-512-based
+algorithms that somehow work on systems that also have AVX and AVX2
+support.  Yet, there are no other vendor or family matches in the
+x86_cpu_id arrays for them.  Why?
