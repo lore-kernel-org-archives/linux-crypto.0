@@ -1,39 +1,33 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55285FB8B;
-	Thu,  1 Feb 2024 05:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B89A612EA;
+	Thu,  1 Feb 2024 05:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706766050; cv=none; b=s4hDyENTtqYDuQm0rigAl7/p3kUyQCNOnP2LzlNLvXgS7DtHAguWQzVLLocfOfeYfYVwFZAViaXsfrgfMi9rpRZ0tmXzF1JfgTrA1XSBjigFJO/AdBMYGFW1jo+q138tLGRKqzxnXwsM/iMyFGkUgHD9bYfQ/Qe4n55LubGEgqY=
+	t=1706766548; cv=none; b=l1x230ku1eUCy5dsZyD6Q8+6tNzYjAq4jrSIgCx3e0Fbm8HNwry2eDh9I9+GDuC6X1rVeFFxniFJtR1OKUMk5/AEzpjm1fhq2sun1azV1jAqd8P7vx5AWHBVvMJ15OjoHv6nVrEC5tJq5otZEY23pvbbJoJZvPHEDttH4pd1Lsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706766050; c=relaxed/simple;
-	bh=UEUfiP9mMy88eoTLAvjGfWU3BPt9BNiZ4XiYnzinCUk=;
+	s=arc-20240116; t=1706766548; c=relaxed/simple;
+	bh=g+miW4xaziDnTHMMQnZVcFcFV04N5hZMmlNvrm0fOdQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VxCoInb8Y4oYCh/7NxXG4ZFf4TSxrZolpZiuQYGjkQ+Tp/LLEGn6Xm8XpQfdZIi5RFo9v8j8oRwMbSKIP9yOlJHsPEUivo+RYPmYAtux7FoSYGiPQ4lwlHH/nny6mTwssmDYhXrQVAPvW5YcS7mJg9KbfkTH4Zh4hVZFhwqTkmg=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y+WBvjDxzljsInXn1WmsNSYnXteJ7ZVEmGi9Guh0AqrvR5DRE34Llqc8iaxhCVxJTbg+lfG7T/Oq8vWlSwlFWp9j72b4/YkXze6QO2EbC6p9aVPcMhsobYrIk/EzhF2wS0qsdoL6d780LvmIvj0RVLckLl1IaS5FZ+miov/5DCw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rVPoQ-008UOM-Al; Thu, 01 Feb 2024 13:40:35 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 01 Feb 2024 13:40:47 +0800
-Date: Thu, 1 Feb 2024 13:40:47 +0800
+	id 1rVPwV-008UXG-RV; Thu, 01 Feb 2024 13:48:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 01 Feb 2024 13:49:09 +0800
+Date: Thu, 1 Feb 2024 13:49:09 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: JiaJie Ho <jiajie.ho@starfivetech.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 4/5] crypto: starfive: Add sm3 support for JH8100
-Message-ID: <Zbsu39gZn2cGrnew@gondor.apana.org.au>
-References: <20240116090135.75737-1-jiajie.ho@starfivetech.com>
- <20240116090135.75737-5-jiajie.ho@starfivetech.com>
- <ZbNCKrTLXmPcsrSH@gondor.apana.org.au>
- <BJSPR01MB0659C3FE1262DF8CC7F7DA468A43A@BJSPR01MB0659.CHNPR01.prod.partner.outlook.cn>
+To: xingwei lee <xrivendell7@gmail.com>
+Cc: syzbot+3266db0c26d1fbbe3abb@syzkaller.appspotmail.com,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Subject: [PATCH] crypto: algif_hash - Remove bogus SGL free on zero-length
+ error path
+Message-ID: <Zbsw1WDUg8mJ5s9e@gondor.apana.org.au>
+References: <CABOYnLx_8_TpFHS-nkrvF5dG_Ev6tgMi1dj_+4sSydM1wmD1XA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,17 +36,59 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BJSPR01MB0659C3FE1262DF8CC7F7DA468A43A@BJSPR01MB0659.CHNPR01.prod.partner.outlook.cn>
+In-Reply-To: <CABOYnLx_8_TpFHS-nkrvF5dG_Ev6tgMi1dj_+4sSydM1wmD1XA@mail.gmail.com>
 
-On Thu, Feb 01, 2024 at 03:01:59AM +0000, JiaJie Ho wrote:
->
-> I am using ifdef so unused codes wouldn't be compiled into the driver for unsupported variant.
-> Is the compiled driver size a concern for such cases? 
+On Fri, Jan 26, 2024 at 09:11:39PM +0800, xingwei lee wrote:
+> This bug is the same bug that is mentioned in
+> https://lore.kernel.org/all/20231211135949.689204-1-syoshida@redhat.com/.
+> And I also reproduced it with repro.c in
+> https://lore.kernel.org/all/CABOYnLxaHBEaSRaEU+kDsHF8a=9AokO1ZUEVtpeT9ddL8giw3A@mail.gmail.com/
+> also see in https://gist.github.com/xrivendell7/b10745f297bd2d12a2e48155920996d2
+> and also a simple root cause analysis.
 
-The compiler should be eliminating unused code for you.  Is this
-not the case?
+Thanks for the reminder.  I was waiting for an updated patch but
+I'll apply the following instead:
 
-Cheers,
+---8<---
+When a zero-length message is hashed by algif_hash, and an error
+is triggered, it tries to free an SG list that was never allocated
+in the first place.  Fix this by not freeing the SG list on the
+zero-length error path.
+
+Reported-by: Shigeru Yoshida <syoshida@redhat.com>
+Reported-by: xingwei lee <xrivendell7@gmail.com>
+Fixes: b6d972f68983 ("crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index 82c44d4899b9..e24c829d7a01 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -91,13 +91,13 @@ static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		if (!(msg->msg_flags & MSG_MORE)) {
+ 			err = hash_alloc_result(sk, ctx);
+ 			if (err)
+-				goto unlock_free;
++				goto unlock_free_result;
+ 			ahash_request_set_crypt(&ctx->req, NULL,
+ 						ctx->result, 0);
+ 			err = crypto_wait_req(crypto_ahash_final(&ctx->req),
+ 					      &ctx->wait);
+ 			if (err)
+-				goto unlock_free;
++				goto unlock_free_result;
+ 		}
+ 		goto done_more;
+ 	}
+@@ -170,6 +170,7 @@ static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
+ 
+ unlock_free:
+ 	af_alg_free_sg(&ctx->sgl);
++unlock_free_result:
+ 	hash_free_result(sk, ctx);
+ 	ctx->more = false;
+ 	goto unlock;
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
