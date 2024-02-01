@@ -1,118 +1,82 @@
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A2F39FCC
-	for <linux-crypto@vger.kernel.org>; Thu,  1 Feb 2024 02:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.110.167.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26ED929403;
+	Thu,  1 Feb 2024 05:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706755067; cv=none; b=gwXJzcr6GzKan5p7Xf4p2m7fwPcR+0T+Ol1ABRbVk1Q4awTjnVzQX7bOUIx7k8bLJ1AukzXhnQ39+iHpOuN9vDy6svBWJYTopDbjzRgIDgo0CsIKtO/MaRARabrl4tUgM+hBXxFyB9/eB/XcQp9m+tcfV/CiSBXEkZ/nboFL8/A=
+	t=1706765581; cv=none; b=C8bKCZtOumXWQZy7HwNykHCUhpwwJO1Y5sO+nY9ttq2xQyn5BhBGV37KOPjBeWEHui5GyGusopSPOa9xP2YjmwPK4JOg7EWX3rOMVxGjhJWcb88/n0tAwRwMhLkRsFzXzGK7jHjorGYdvDsRXcKYl5aHBa/OBNVerNu1gSwFu8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706755067; c=relaxed/simple;
-	bh=v9KFJ0/t9phT/0qcrC94uWpVsSJNz28sqabEjQ2Ec10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=bmVVj6h8DJZrblOSB0xd/2IfpcLUE38eQFxQd99bRbFeGSqaIs5rwkdVuo6jz9N601X224aL+QUxdjn6kVHCtw7yKWLb9L6sISs+mzSCz3Gw7Q38lSl/zzCEFRhfnU9nyCKTjMPqbgs40gnS1rRDNKhHE2mV9sMnsMjTfupqLLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=203.110.167.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1706755060-1eb14e0c7e333b0001-Xm9f1P
-Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx2.zhaoxin.com with ESMTP id vybHdzObSTfvd8JI (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Thu, 01 Feb 2024 10:37:40 +0800 (CST)
-X-Barracuda-Envelope-From: TonyWWang-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHMBX1.zhaoxin.com
- (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 1 Feb
- 2024 10:37:40 +0800
-Received: from [10.32.57.248] (10.32.57.248) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 1 Feb
- 2024 10:37:37 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-Message-ID: <858b8c95-a0b7-4085-9ae4-824bec4d3c67@zhaoxin.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.32.57.248
-Date: Thu, 1 Feb 2024 10:37:36 +0800
+	s=arc-20240116; t=1706765581; c=relaxed/simple;
+	bh=NWi1hpkvHCFH0KErOmhqssdjDvssGBxw/+ZCVEXNFdM=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YfBPYhr2T5MXuVNpfYPm5H0kCdfmwJUV4/avhOJSZG1FNgXMuUrXIUDBrpaIuCNxRHCHr+PDXhxZycJsEjQ9M6szAe74Cx/Pk2L7Eu9JZdxUmeKoSKkzcAPuFMO2DlUIcHzHHVj7aIu90rQ+TfA8RGhUfZ7TZ65qXGL3IXZuEBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rVPgm-008UIj-9O; Thu, 01 Feb 2024 13:32:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 01 Feb 2024 13:32:53 +0800
+Date: Thu, 1 Feb 2024 13:32:53 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.8
+Message-ID: <ZbstBewmaIfrFocE@gondor.apana.org.au>
+References: <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
+ <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+ <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
+ <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+ <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
+ <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
+ <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+ <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] crypto: padlock-sha: Matches CPU with Family with
- 6 explicitly
-Content-Language: en-US
-X-ASG-Orig-Subj: Re: [PATCH v2 1/3] crypto: padlock-sha: Matches CPU with Family with
- 6 explicitly
-To: Dave Hansen <dave.hansen@intel.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-	<hpa@zytor.com>, <seanjc@google.com>, <kim.phillips@amd.com>,
-	<kirill.shutemov@linux.intel.com>, <jmattson@google.com>,
-	<babu.moger@amd.com>, <kai.huang@intel.com>, <acme@redhat.com>,
-	<aik@amd.com>, <namhyung@kernel.org>
-CC: <CobeChen@zhaoxin.com>, <TimGuo@zhaoxin.com>, <LeoLiu-oc@zhaoxin.com>,
-	<GeorgeXue@zhaoxin.com>
-References: <20240123022852.2475-1-TonyWWang-oc@zhaoxin.com>
- <20240123022852.2475-2-TonyWWang-oc@zhaoxin.com>
- <54d4fe7f-2e36-4bb3-8b51-4a68510010d5@intel.com>
- <40e74749-fa9d-4089-ae23-e9aefdd3549f@zhaoxin.com>
- <85dd3df3-9c0e-45e2-af8d-50dbc0cf40c8@intel.com>
-From: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
-In-Reply-To: <85dd3df3-9c0e-45e2-af8d-50dbc0cf40c8@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
-X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
-X-Barracuda-Start-Time: 1706755060
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 1244
-X-Barracuda-BRTS-Status: 0
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.120217
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
 
+Hi Linus:
 
-On 2024/1/31 23:33, Dave Hansen wrote:
->
-> [这封邮件来自外部发件人 谨防风险]
->
-> On 1/31/24 01:45, Tony W Wang-oc wrote:
->>>>    static const struct x86_cpu_id padlock_sha_ids[] = {
->>>> -     X86_MATCH_FEATURE(X86_FEATURE_PHE, NULL),
->>>> +     X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 6, X86_FEATURE_PHE, NULL),
->>>>         {}
->>>>    };
->>> Logically, this is saying that there are non-CENTAUR or non-family-6
->>> CPUs that set X86_FEATURE_PHE, but don't support X86_FEATURE_PHE.  Is
->>> that the case?
->> Not exactly.
->>
->> Zhaoxin CPU supports X86_FEATURE_PHE and X86_FEATURE_PHE2.
->>
->> We expect the Zhaoxin CPU to use the zhaoxin_sha driver introduced in
->> the third patch of this patch set.
->>
->> Without this patch Zhaoxin CPU will also match the padlock-sha driver too.
-> I honestly have no idea what this is saying.
->
-> Could you try again, please?
+The following changes since commit 6613476e225e090cc9aad49be7fa504e290dd33d:
 
+  Linux 6.8-rc1 (2024-01-21 14:11:32 -0800)
 
-Sorry. It should be said that there are non-CENTAUR or non-family-6 CPUs 
-that set X86_FEATURE_PHE,
+are available in the Git repository at:
 
-and also set the new X86_FEATURE_PHE2.  For these CPUs, we expect to use 
-a new driver that supports
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.8-p2 
 
-both X86_FEATURE_PHE and X86_FEATURE_PHE2.
+for you to fetch changes up to c5a2f74db71a849f3a60bc153d684d6d28a0c665:
 
-So we make the driver padlock-sha to matches CENTAUR Family-6 CPU 
-explicitly.
+  crypto: caam - fix asynchronous hash (2024-01-26 16:35:55 +0800)
 
+----------------------------------------------------------------
+This push fixes regressions in caam and qat.
+----------------------------------------------------------------
+
+Damian Muszynski (1):
+      crypto: qat - fix arbiter mapping generation algorithm for QAT 402xx
+
+Gaurav Jain (1):
+      crypto: caam - fix asynchronous hash
+
+ drivers/crypto/caam/caamalg_qi2.c                    | 7 +++++--
+ drivers/crypto/caam/caamhash.c                       | 7 +++++--
+ drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c | 1 +
+ 3 files changed, 11 insertions(+), 4 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
