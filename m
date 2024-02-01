@@ -1,220 +1,72 @@
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B261160899;
-	Thu,  1 Feb 2024 17:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14B512FB2A;
+	Thu,  1 Feb 2024 18:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706807650; cv=none; b=K1R0rUzUHfZYrgPpJCOZi/33f1d8ttjdpMlKfwhqe0t829xtrqkwMX6I3vsrKpA57STfu9naFyE1bPDAx7IMauQbBAsLRKmBjfZ44xlMoLQhrZex2XHYFLLYGI5q1LipHIsCBF5xp4vZdkRgmPBbldohrYz+xmp3tIDBgzlSW6U=
+	t=1706811792; cv=none; b=dvtAipUrPtw5UyRNek7rl1005DTcX6ltJH5RCLBKjt6SKTubPiX7ciKx+UBJ1SRHfjGnczhP0lAK10PzfyXrD1KXF60QvP7pEMo6d5Op9bQM9dflyKQ6ruyzGrxb9Ybn8krJN0Am8DgwRfhoKTvqdKpE0R/s7q0AyHWrjMreuag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706807650; c=relaxed/simple;
-	bh=+lIVjqeyffI/zgaJ7BuVC114MXPVDQGJwzdFEPzYLWs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=PbU4x9rW/7xHpswBJhHnG6sp+7otY8fYVsWiltIH/gNzoW+ow2/0oO2TTQgNLYZ22FszLFw9YZ/fakYVjTRme8HSLAr/uLos1gcSlb48lqEGZ1k4rKIeaxpWsvxs3/1jmeCBBkVguSOxrBdDmbQg08aW9Aw7rngbpB5nyBCRuOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=qJ1SNigq; arc=none smtp.client-ip=45.89.224.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	s=arc-20240116; t=1706811792; c=relaxed/simple;
+	bh=yq+Z4M7zlzPMJLWLN9zuh/eHfYQwP+DCdiLxy1yA5MI=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=qSwqESwLSzMmnvT9FgYg1fbHevRoXqN7ZZDUh/9w/NiH6+dNgDZVA+RidGLozq0GeYHCrmkLEVNBIBjIvgsjrl+rOmKFHdowV7uYF/VIG+hG0kggYf3RBQgnuLE56mav5Z3CETXnQpmPKboRI4m4Fov5O6iTMA/4o4O/4HroUo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CVVBQb7a; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="qJ1SNigq"
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 6B283120006;
-	Thu,  1 Feb 2024 20:13:57 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 6B283120006
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1706807637;
-	bh=mPZuNvTkk/N4kF/J6YO7atqu/SZxpPBkvHjvXTITUwk=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version:From;
-	b=qJ1SNigqY3gzQ3z/ccnM7nODjl9MI3bUgeQizfpEsOHM1lLX13CLHDP5hiSBDOwWb
-	 7lbf9eylMBXQzqnCGEogmLszsYIuZZ7ECl2L05ZhkH/L/DtdbdCUfYvvxZQu3WQg7O
-	 4pnAr7QaprBCClo0ewrE8J6zrQO65lpbx/P7EpxK7Qjhr+5Yu6p/aJoOPTHW0DRe/m
-	 4BsKgLlCNAdc8z6Ca+eLxGl5WW7QdsO2dOgFssQdmjiQ5qC3SDH5VLkvDWDV2B7ICZ
-	 1WwQqHe1PU4bzGpd5m1wBlSYTM+dgyOJXPg1mwD+Z2k8VHDJygpfI/74UhKd83+Dgg
-	 oAe/UVqnHeI2A==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu,  1 Feb 2024 20:13:57 +0300 (MSK)
-Received: from p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) by
- p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 1 Feb 2024 20:13:56 +0300
-Received: from p-i-exch-sc-m01.sberdevices.ru ([fe80::25de:2e74:8821:eb9a]) by
- p-i-exch-sc-m01.sberdevices.ru ([fe80::25de:2e74:8821:eb9a%7]) with mapi id
- 15.02.1118.040; Thu, 1 Feb 2024 20:13:56 +0300
-From: Alexey Romanov <avromanov@salutedevices.com>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-CC: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "khilman@baylibre.com"
-	<khilman@baylibre.com>, "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
-	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
-Subject: Re: [PATCH v2 03/20] drviers: crypto: meson: add platform data
-Thread-Topic: [PATCH v2 03/20] drviers: crypto: meson: add platform data
-Thread-Index: AQHaTh1s2/zZexXjGk+hgEk0Ax0wPrDoX/oAgA01jwA=
-Date: Thu, 1 Feb 2024 17:13:56 +0000
-Message-ID: <20240201171352.ut5xhw3u2b77v33d@cab-wsm-0029881>
-References: <20240123165831.970023-1-avromanov@salutedevices.com>
- <20240123165831.970023-4-avromanov@salutedevices.com> <ZbC8qLXogjxJD8LD@Red>
-In-Reply-To: <ZbC8qLXogjxJD8LD@Red>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <E74E91B6684D234DA5CB2A0551E4FAC0@sberdevices.ru>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CVVBQb7a"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7668EC433C7;
+	Thu,  1 Feb 2024 18:23:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706811792;
+	bh=yq+Z4M7zlzPMJLWLN9zuh/eHfYQwP+DCdiLxy1yA5MI=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=CVVBQb7alxOrVgqjNfPoyvE2ZNeGf8Ozr4y7QfHOkFdcX40XfE589hxrKZKOHBIGV
+	 renqucEft1x+uVVuAIlHE50gFbXZyskzejLiZykSwBXEAKPfnY1KjMdH0aK9+NflJ8
+	 yiaeOr+9YsD5P73QM7AwMH283e5k3de+SJH6bNNqTNiPmTJpySEgZrYUAEyZKueP42
+	 uWrhtzSwjNDZvaa6IheZHTLzL1tALOarJ199dnpoqRb9ag+tltC37qlSBZCAGMRNfg
+	 FTQkqy501KWaGuXl1ZDCjdHuTgPJrYas1bvVEHSNPHDkg4L6CqiVOfUUvoi15eYKWh
+	 fgfNKP2mPshgA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 60AD0C0C40E;
+	Thu,  1 Feb 2024 18:23:12 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.8
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <ZbstBewmaIfrFocE@gondor.apana.org.au>
+References: <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
+ <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+ <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
+ <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+ <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
+ <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
+ <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+ <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au> <ZbstBewmaIfrFocE@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <ZbstBewmaIfrFocE@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.8-p2
+X-PR-Tracked-Commit-Id: c5a2f74db71a849f3a60bc153d684d6d28a0c665
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8a2514c0c61f7d4587071b96b4be7481350b5bc9
+Message-Id: <170681179239.954.11799166338832524461.pr-tracker-bot@kernel.org>
+Date: Thu, 01 Feb 2024 18:23:12 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 183130 [Feb 01 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.3
-X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Track_E25351}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/02/01 13:26:00 #23335101
-X-KSMG-AntiVirus-Status: Clean, skipped
 
-Hello,
+The pull request you sent on Thu, 1 Feb 2024 13:32:53 +0800:
 
-On Wed, Jan 24, 2024 at 08:30:48AM +0100, Corentin Labbe wrote:
-> Le Tue, Jan 23, 2024 at 07:58:14PM +0300, Alexey Romanov a 'ecrit :
-> > To support other Amlogic SoC's we have to
-> > use platform data: descriptors and status registers
-> > offsets are individual for each SoC series.
-> >=20
-> > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
-> > ---
-> >  drivers/crypto/amlogic/amlogic-gxl-cipher.c |  2 +-
-> >  drivers/crypto/amlogic/amlogic-gxl-core.c   | 31 +++++++++++++++------
-> >  drivers/crypto/amlogic/amlogic-gxl.h        | 11 ++++++++
-> >  3 files changed, 35 insertions(+), 9 deletions(-)
-> >=20
-> > diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/cryp=
-to/amlogic/amlogic-gxl-cipher.c
-> > index b19032f92415..7eff3ae7356f 100644
-> > --- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-> > +++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-> > @@ -225,7 +225,7 @@ static int meson_cipher(struct skcipher_request *ar=
-eq)
-> > =20
-> >  	reinit_completion(&mc->chanlist[flow].complete);
-> >  	mc->chanlist[flow].status =3D 0;
-> > -	writel(mc->chanlist[flow].t_phy | 2, mc->base + (flow << 2));
-> > +	writel(mc->chanlist[flow].t_phy | 2, mc->base + ((mc->pdata->descs_re=
-g + flow) << 2));
-> >  	wait_for_completion_interruptible_timeout(&mc->chanlist[flow].complet=
-e,
-> >  						  msecs_to_jiffies(500));
-> >  	if (mc->chanlist[flow].status =3D=3D 0) {
-> > diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto=
-/amlogic/amlogic-gxl-core.c
-> > index a58644be76e9..2be381e157c4 100644
-> > --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-> > +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> > @@ -18,6 +18,7 @@
-> >  #include <linux/kernel.h>
-> >  #include <linux/module.h>
-> >  #include <linux/of.h>
-> > +#include <linux/of_device.h>
-> >  #include <linux/platform_device.h>
-> > =20
-> >  #include "amlogic-gxl.h"
-> > @@ -30,9 +31,10 @@ static irqreturn_t meson_irq_handler(int irq, void *=
-data)
-> > =20
-> >  	for (flow =3D 0; flow < mc->flow_cnt; flow++) {
-> >  		if (mc->chanlist[flow].irq =3D=3D irq) {
-> > -			p =3D readl(mc->base + ((0x04 + flow) << 2));
-> > +			p =3D readl(mc->base + ((mc->pdata->status_reg + flow) << 2));
-> >  			if (p) {
-> > -				writel_relaxed(0xF, mc->base + ((0x4 + flow) << 2));
-> > +				writel_relaxed(0xF, mc->base +
-> > +					      ((mc->pdata->status_reg + flow) << 2));
-> >  				mc->chanlist[flow].status =3D 1;
-> >  				complete(&mc->chanlist[flow].complete);
-> >  				return IRQ_HANDLED;
-> > @@ -245,15 +247,34 @@ static void meson_unregister_algs(struct meson_de=
-v *mc)
-> >  	}
-> >  }
-> > =20
-> > +static const struct meson_pdata meson_gxl_pdata =3D {
-> > +	.descs_reg =3D 0x0,
-> > +	.status_reg =3D 0x4,
-> > +};
-> > +
-> > +static const struct of_device_id meson_crypto_of_match_table[] =3D {
-> > +	{
-> > +		.compatible =3D "amlogic,gxl-crypto",
-> > +		.data =3D &meson_gxl_pdata,
-> > +	},
-> > +	{},
-> > +};
-> > +
-> >  static int meson_crypto_probe(struct platform_device *pdev)
-> >  {
-> > +	const struct of_device_id *match;
-> >  	struct meson_dev *mc;
-> >  	int err;
-> > =20
-> > +	match =3D of_match_device(meson_crypto_of_match_table, &pdev->dev);
-> > +	if (!match)
-> > +		return -EINVAL;
-> > +
-> >  	mc =3D devm_kzalloc(&pdev->dev, sizeof(*mc), GFP_KERNEL);
-> >  	if (!mc)
-> >  		return -ENOMEM;
-> > =20
-> > +	mc->pdata =3D match->data;
-> >  	mc->dev =3D &pdev->dev;
-> >  	platform_set_drvdata(pdev, mc);
-> > =20
-> > @@ -312,12 +333,6 @@ static void meson_crypto_remove(struct platform_de=
-vice *pdev)
-> >  	clk_disable_unprepare(mc->busclk);
-> >  }
-> > =20
-> > -static const struct of_device_id meson_crypto_of_match_table[] =3D {
-> > -	{ .compatible =3D "amlogic,gxl-crypto", },
-> > -	{}
-> > -};
-> > -MODULE_DEVICE_TABLE(of, meson_crypto_of_match_table);
->=20
-> Hello
->=20
-> This patch breaks bisection, since it removes MODULE_DEVICE_TABLE.
-> After applying patchs 1,2,3 the driver does not load anymore on lepotato =
-board.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.8-p2
 
-Please, give more information.=20
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8a2514c0c61f7d4587071b96b4be7481350b5bc9
 
-I applied the first 3 patches and the driver probes correctly.
+Thank you!
 
->=20
-> Regards
-
---=20
-Thank you,
-Alexey=
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
