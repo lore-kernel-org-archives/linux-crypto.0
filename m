@@ -1,53 +1,54 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EFA46B91
-	for <linux-crypto@vger.kernel.org>; Fri,  2 Feb 2024 13:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB281474A0;
+	Fri,  2 Feb 2024 16:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706881507; cv=none; b=PTZ7Pg9lBiBkhplRsj7/BUNh4vlki2gvdcclNjvWQQUrTlBf8gOAdA2th4VRIJekhVKADriwclIg1vh4ySfgHw6BqtIVm/+9oU0nDV/5x9spDjKNuMM5eU8otyFfcoDlQqmErSCLjRtzKrsrZfkdOEr6n4IZrv8079m9wMaa628=
+	t=1706890142; cv=none; b=smyy5SyUPmls1IIplr5ikKksAZ0scmx7pc1CJ4sr2VjoODOc1UCOs4oRsdE997MPu921b6gcXBRoPfCtdD28v2fSLaKBg1lZSbPOG0jtsKAD4k/8T11MpxvQTbFvrJz5moTQr8YBdAojHQMMjOEtpniGxo5jftMXIGDzU/HXDEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706881507; c=relaxed/simple;
-	bh=PKzcI1q48e2Z9AZgmA1h8iLqG3H0FbHpPV+nCkPjFVo=;
+	s=arc-20240116; t=1706890142; c=relaxed/simple;
+	bh=ObobwIusGY63NE/2MOWR+NbMWvgKu/d9ZjBL9g2lKRM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oAgy3YWjCIq2CYnqCPPByJ8TUKSr3xAtiIlBOTrIjug3S9UvuLVOUqYRgydtnpa9qqCy5EnXv62JedFUZ9LEcV6mM91PB6pnvVJ46H3pEeJxmmRX/cgCMC2C3ydZw8HfeuOVXa3N+yiWB734PczKrO9d5vYohsADDfjbiAremC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ciLtjmQe; arc=none smtp.client-ip=209.85.221.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=EOpYeOqPh6GQVZ3zgCPgFQwWaqB5Rtj39VqE78tyv4nsq9z8fJ6KfGPuezpDdCB/Pmy8LKKhcBoeK6kYFiFn0NgobP9njxaa+xcfaQIMnYx0d+SXbJCYR/11ACLJ2NY/dwkeuJjzExu3FQXK9y7u/HSU0Jycx7HFl9nJHV80lRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P4aG5jaD; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ciLtjmQe"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-4bd45397c17so758371e0c.2
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Feb 2024 05:45:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4aG5jaD"
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6041779e75eso24009227b3.3;
+        Fri, 02 Feb 2024 08:09:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706881504; x=1707486304; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IIzUaTAWY721VAmsfjicI7pRblrKzWu2/3eiQAJEETw=;
-        b=ciLtjmQe/0vRcQ3JQLVTYPqCoOMXdITAKbYTfWsB+fpRqSM8y404m8HozoFm5QYZsL
-         hFVfXSOloLdjHecWKFMM8jdutG0nvWpKrQtzxZo7VpdpsY5FH7fHh9BR6g0EGI8yTVqL
-         X2XFDObPrxafA/1Sb4+6fkZuqIpPeMelkv2aWExfqoPn7KK9tQZeXG9t/AtPel9FGaH7
-         3D6N/jyiXnluyTCTST9wICuZosRMjt6x7r2WaOnXojP+XdYv5tffqk+WBcrAJVqpgHB0
-         mPBL6rpGZIAnxdCjkOS5UtTwYUk7va1agy48bAvxlJJIq+FtWNph+TEW7FIGMQjeVOYY
-         27KA==
+        d=gmail.com; s=20230601; t=1706890139; x=1707494939; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ObobwIusGY63NE/2MOWR+NbMWvgKu/d9ZjBL9g2lKRM=;
+        b=P4aG5jaDyDYRpT+eVdAhqKTboEYgxtCcSFqFddMsR/tA4OfDmGLY5vqhusq0s5DLC9
+         Cg+jgJKUN25AAgBN9xRQp7uvSQiPR4dj1RGfaxL5Qybhh9g9+VEHl8E/9ZijgqZ60wF5
+         I+kWnwOqW9S3X62MeKqXQgJkY25bnnDCTfPUAYT0W/JFkZ1RDLUuq2UZWGtLckdZIT9a
+         gwB+ps0VwjoclkuWq6lGjjH0ghpUsNG9EGQ8YPFVIfk89OzuX1QnFWcUJkHYCVE6+RGU
+         FmdUggw8Ygjmdij6T/amKgnTpH+uoBGKKw2Usx05xbOhEgXHgG1kJZuojuNKtI86i7mU
+         1W3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706881504; x=1707486304;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IIzUaTAWY721VAmsfjicI7pRblrKzWu2/3eiQAJEETw=;
-        b=qYSoQSXhm1FVMIUd16cjoi53U4BIgn2IxgsHACJ9V3+XOJOZjYRbDpwspcSyO2lt7q
-         oHuInpN8M8qNAe+28V9JKO/LzO4IjuZzAQZkxXYM3Ovzw4OeeJkNPoDIprvtlJrHnh9U
-         y1l4OnjR8xMHYBPSBL7ixApxo9VUW3uWT8TppX3pxicaqsUAHXJx4IjsSn6LGuHkfgCy
-         S5rus7z9VyIuH1EfbiAQ2GTjuujDSRiXh8TPhmHXyLBviX15A8OTUKmjaz2tZkIHRl2j
-         l52LPp1UqUt9wx0VP3GX8gLLGKzceWli8ImmxT043cCh4fmnAAc3lpeUrA/AI50PxINz
-         Gdlg==
-X-Gm-Message-State: AOJu0Yw5K6WXgkKTNf/LGZ/rM/CGnTvdYW6TlLDDGYzmYa4Uyoo5wefu
-	E/C5CKXFKwMedv5OEiku4wqsSplCmE/WRk14DPed1X8smY5PEETm4oCqR+cOS29Btwyfxs2xD2Y
-	steULfYi8TSxJdaijoVGzmZDeBAwLCh75w7+S
-X-Google-Smtp-Source: AGHT+IHcugcAY0onJJ9YbOTRMsO8AuL33RLMvypF1xfaELG25ml3lxK0pklBkcHRLPdq/bsUZds6rXkq0SmKDaybI0c=
-X-Received: by 2002:a1f:f4c9:0:b0:4b6:bdba:8460 with SMTP id
- s192-20020a1ff4c9000000b004b6bdba8460mr1847799vkh.9.1706881503872; Fri, 02
- Feb 2024 05:45:03 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706890139; x=1707494939;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ObobwIusGY63NE/2MOWR+NbMWvgKu/d9ZjBL9g2lKRM=;
+        b=qbD9G/Gt6DkkCUln5hyv8yKoKL++fXlOOf/djTNWE6YBWO+myS2Go1VoSLWhmC0Xm4
+         ZQbHxHm7mKk0E58FGrfPpkPJaaCj1z2FzxClNFc2G0uFhI6fy011GE1nXmCrQO0i0ONr
+         3TSCKjtQmX69r9GxQ/kvFkhUSvVPGXxhWlrK9Otyg/JMefzdy/yssnvYEAeb5R3QpOQz
+         L2oCBsmylfFtzA5hkv7iOMcEFqUpodvUCuHwMUzCWWTL9jVlRLXGF62R5aUlzK3BEoEY
+         JMucZ2SD73t43dhC0sgmC5j1dPZ2i9cfq6mevdCG6VIfs6ujIJWSyo/IXq61bLTbmY9W
+         T5OA==
+X-Gm-Message-State: AOJu0Yw7nq4Lbg++wqBtxDKPgsQDyU6QGLU+7LmL7WEiiyKK2ehtIMjj
+	Ibd4NOKJCXWOcNbkyVaKw4y5bAhEmlToN/2eeSkO3K/zAKKZvgSEsXWmvDFfBbOT6Lk6EFFmU1A
+	1ggu1a3P23H/fYtclu/VkU+8YtRc=
+X-Google-Smtp-Source: AGHT+IGMWWJJIsEQaIGhd3HotQ+QkJuC6kkshmtHK3UG+EVQsNgMHpDuOqo3DccHZuJCzl1gJq/ilLs/vZ/Z4MzkmfU=
+X-Received: by 2002:a81:441c:0:b0:5e8:92f9:46e8 with SMTP id
+ r28-20020a81441c000000b005e892f946e8mr2730296ywa.30.1706890139331; Fri, 02
+ Feb 2024 08:08:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,122 +58,43 @@ MIME-Version: 1.0
 References: <20240202101311.it.893-kees@kernel.org> <20240202101642.156588-2-keescook@chromium.org>
  <CANpmjNPPbTNPJfM5MNE6tW-jCse+u_RB8bqGLT3cTxgCsL+x-A@mail.gmail.com> <202402020405.7E0B5B3784@keescook>
 In-Reply-To: <202402020405.7E0B5B3784@keescook>
-From: Marco Elver <elver@google.com>
-Date: Fri, 2 Feb 2024 14:44:25 +0100
-Message-ID: <CANpmjNO-4A4LMK8kbWiiODB-vOZqc5gZndWtnYDc5RCGDBcoSQ@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 2 Feb 2024 17:08:48 +0100
+Message-ID: <CANiq72ku9wsHtnPAh5G71Y_pbsftrPPyV5wmDCcZRM+WB6KVjA@mail.gmail.com>
 Subject: Re: [PATCH v2 2/6] ubsan: Reintroduce signed and unsigned overflow sanitizers
 To: Kees Cook <keescook@chromium.org>
-Cc: linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Hao Luo <haoluo@google.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	Fangrui Song <maskray@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Bill Wendling <morbo@google.com>, 
-	Andrey Konovalov <andreyknvl@gmail.com>, Jonathan Corbet <corbet@lwn.net>, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	llvm@lists.linux.dev, linux-doc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, kasan-dev@googlegroups.com, 
-	linux-acpi@vger.kernel.org
+Cc: Marco Elver <elver@google.com>, linux-hardening@vger.kernel.org, 
+	Justin Stitt <justinstitt@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Hao Luo <haoluo@google.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Fangrui Song <maskray@google.com>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
+	Bill Wendling <morbo@google.com>, Andrey Konovalov <andreyknvl@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev, linux-doc@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	kasan-dev@googlegroups.com, linux-acpi@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2 Feb 2024 at 13:17, Kees Cook <keescook@chromium.org> wrote:
->
-> On Fri, Feb 02, 2024 at 12:01:55PM +0100, Marco Elver wrote:
-> > On Fri, 2 Feb 2024 at 11:16, Kees Cook <keescook@chromium.org> wrote:
-> > > [...]
-> > > +config UBSAN_UNSIGNED_WRAP
-> > > +       bool "Perform checking for unsigned arithmetic wrap-around"
-> > > +       depends on $(cc-option,-fsanitize=unsigned-integer-overflow)
-> > > +       depends on !X86_32 # avoid excessive stack usage on x86-32/clang
-> > > +       depends on !COMPILE_TEST
-> > > +       help
-> > > +         This option enables -fsanitize=unsigned-integer-overflow which checks
-> > > +         for wrap-around of any arithmetic operations with unsigned integers. This
-> > > +         currently causes x86 to fail to boot.
-> >
-> > My hypothesis is that these options will quickly be enabled by various
-> > test and fuzzing setups, to the detriment of kernel developers. While
-> > the commit message states that these are for experimentation, I do not
-> > think it is at all clear from the Kconfig options.
->
-> I can certainly rephrase it more strongly. I would hope that anyone
-> enabling the unsigned sanitizer would quickly realize how extremely
-> noisy it is.
->
-> > Unsigned integer wrap-around is relatively common (it is _not_ UB
-> > after all). While I can appreciate that in some cases wrap around is a
-> > genuine semantic bug, and that's what we want to find with these
-> > changes, ultimately marking all semantically valid wrap arounds to
-> > catch the unmarked ones. Given these patterns are so common, and C
-> > programmers are used to them, it will take a lot of effort to mark all
-> > the intentional cases. But I fear that even if we get to that place,
-> > _unmarked_  but semantically valid unsigned wrap around will keep
-> > popping up again and again.
->
-> I agree -- it's going to be quite a challenge. My short-term goal is to
-> see how far the sanitizer itself can get with identifying intentional
-> uses. For example, I found two more extremely common code patterns that
-> trip it now:
->
->         unsigned int i = ...;
->         ...
->         while (i--) { ... }
->
-> This trips the sanitizer at loop exit. :P It seems like churn to
-> refactor all of these into "for (; i; i--)". The compiler should be able
-> to identify this by looking for later uses of "i", etc.
->
-> The other is negative constants: -1UL, -3ULL, etc. These are all over
-> the place and very very obviously intentional and should be ignored by
-> the compiler.
-
-Yeah, banning technically valid code like this is going to be a very hard sell.
-
-> > What is the long-term vision to minimize the additional churn this may
-> > introduce?
->
-> My hope is that we can evolve the coverage over time. Solving it all at
-> once won't be possible, but I think we can get pretty far with the
-> signed overflow sanitizer, which runs relatively cleanly already.
->
-> If we can't make meaningful progress in unsigned annotations, I think
-> we'll have to work on gaining type-based operator overloading so we can
-> grow type-aware arithmetic. That will serve as a much cleaner
-> annotation. E.g. introduce jiffie_t, which wraps.
->
-> > I think the problem reminds me a little of the data race problem,
-> > although I suspect unsigned integer wraparound is much more common
-> > than data races (which unlike unsigned wrap around is actually UB) -
-> > so chasing all intentional unsigned integer wrap arounds and marking
-> > will take even more effort than marking all intentional data races
-> > (which we're still slowly, but steadily, making progress towards).
-> >
-> > At the very least, these options should 'depends on EXPERT' or even
-> > 'depends on BROKEN' while the story is still being worked out.
+On Fri, Feb 2, 2024 at 1:17=E2=80=AFPM Kees Cook <keescook@chromium.org> wr=
+ote:
 >
 > Perhaps I should hold off on bringing the unsigned sanitizer back? I was
 > hoping to work in parallel with the signed sanitizer, but maybe this
 > isn't the right approach?
 
-I leave that to you - to me any of these options would be ok:
+If you can do anything to keep it in-tree, I think it would be nice so
+that others can easily use it to test the tooling and to start to
+clean up cases. A per-subsystem opt-in like Marco says could be a way,
+and you could perhaps do one very small subsystem or similar to see
+how it would look like.
 
-1. Remove completely for now.
+Something that could also help would be to split the cases even
+further (say, only overflows and not underflows), but is that a
+possibility with the current tooling?
 
-2. Make it 'depends on BROKEN' (because I think even 'depends on
-EXPERT' won't help avoid the inevitable spam from test robots).
+Thanks for working on this, Kees!
 
-3. Make it a purely opt-in sanitizer: rather than having subsystems
-opt out with UBSAN_WRAP_UNSIGNED:=n, do the opposite and say that for
-subsystems that want to opt in, they have to specify
-UBSAN_WRAP_UNSIGNED:=y to explicitly opt in.
-
-I can see there being value in explicitly marking semantically
-intended unsigned integer wrap, and catch unintended cases, so option
-#3 seems appealing. At least that way, if a maintainer chooses to opt
-in, they are committed to sorting out their code. Hypothetically, if I
-was the maintainer of some smaller subsystem and have had wrap around
-bugs in the past, I would certainly consider opting in. It feels a lot
-nicer than having it forced upon me.
-
-Thanks,
--- Marco
+Cheers,
+Miguel
