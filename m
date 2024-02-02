@@ -1,138 +1,214 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E32F7A73B
-	for <linux-crypto@vger.kernel.org>; Fri,  2 Feb 2024 10:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C62B79DB2
+	for <linux-crypto@vger.kernel.org>; Fri,  2 Feb 2024 11:02:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706871325; cv=none; b=qgxJ7T2zVr/v7FOAHUnDCHBeAT7VekNvhlOerIzYTa0ATBXVNXvL84e64UFKRFQ12oeKaTM/1wMg2rywJda9dCOzT26QtRdBmrdODkJgonzLStQVZhykcUeCKh8yMlMZzhbfdPYoacDtfM09VmZyRy4quNKwwLuOXSTQrRSROB0=
+	t=1706871757; cv=none; b=AnBOA2Hmu0e4aBf+6wmxQa6ppTZnD84RZPwPzP4s9XJ1xIpLydAxIZxThrveuzh3fVGL0JAflr2C5bbuPOsln8h3+qMNdwOseJaKzf31N5lZEn5Qr0Sesz/Nya3YroKFCf0co6h+kiuY3CnfgvCmJHzPHg4rJoApIJmVbq64Ucs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706871325; c=relaxed/simple;
-	bh=iK5Dg+kPYmmsKf18NNwrJk+3HijZcLRbaN0Q5bzl8yE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FKA17EqMlXlolKZ09Q6qwaxvNGT2bJ+JWYJ+xn/LBlu0MYxVtHGTsRYaymEDYsfYxOszVxFNCfVegNCVxowC+bk7xmiw2at+tFN7JLjygEco9UpqSSu0N6yMlXERqAXAq2l+K7vAKRxyrF8yMZ7F+pGVNGQPUhveSeT8Z3AF7Ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hULeksqM; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1706871757; c=relaxed/simple;
+	bh=D74xUy1ymoMyy6G89fvtRm0D45tUlhGfHmdtylAdP74=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kwIeo4y/6Iu6wag5/MggeUTNFrZyJhpaHxgzmN6uBKnY/IAtdsZW/hCithNCZdVRDpeFozrg7rhPLVximcjFAQCxCLvtbOVyQqcx5wM7u4kW4ptYNeqjgfyEUDvWzvF3Ex7om8pWjC/VI9qsMP0cHsuNNJK8uT/I+fMbxZps5mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mRLrVqNU; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hULeksqM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706871324; x=1738407324;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=iK5Dg+kPYmmsKf18NNwrJk+3HijZcLRbaN0Q5bzl8yE=;
-  b=hULeksqMGaNkEhPJpEeBVHsQd6Q2bcLkDi7qdxOHenIAajES6xfN6hRx
-   X6DQY8hxMX93twv5sk0eBZJF0NNLwRI4g4rwCVWYK/x2UWUhHmwGr6OJN
-   1VPlh3Q8OE5EeJJWig5kx9Ajw7eldVLsJ6mlViSgy8a50SagH/99/45+8
-   I9IZa3CPXAyxOsp+PD1rBNccrWVW8Z+kdnkiprz9IAEzG5ZiguZuC0NZ0
-   Siyrv8uoYtMjt+FGEc6hscSwFNmxdMv/TaqqiDYadkzsvRndkRgsyDENw
-   dIbiNyJlnSbWCKag/9lkxyhMHZabARKHdr6sGzZo+WxnigIZBwMaWkdLL
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="10787396"
-X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
-   d="scan'208";a="10787396"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 02:55:24 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
-   d="scan'208";a="53658"
-Received: from myep-mobl1.png.intel.com ([10.107.10.166])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 02:55:22 -0800
-From: Mun Chun Yep <mun.chun.yep@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Mun Chun Yep <mun.chun.yep@intel.com>,
-	Ahsan Atta <ahsan.atta@intel.com>,
-	Markas Rapoportas <markas.rapoportas@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v2 9/9] crypto: qat - improve aer error reset handling
-Date: Fri,  2 Feb 2024 18:53:24 +0800
-Message-Id: <20240202105324.50391-10-mun.chun.yep@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240202105324.50391-1-mun.chun.yep@intel.com>
-References: <20240202105324.50391-1-mun.chun.yep@intel.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mRLrVqNU"
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3be6df6bc9bso1252060b6e.0
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Feb 2024 03:02:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706871754; x=1707476554; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=AKvTOkMfs92gzE0M+TFiSJEhkCKRpJTzmpH7agAwUHE=;
+        b=mRLrVqNUC0+K74GLOl3vqaKFfnZylYJ9FexXfOF7UWpR79qSkQVkNE7M3Dd3TeVLhb
+         PhrYT0Eam/JvsohsUplCZo2sC80k7JA38WiRwJR/Tiyzu/netZn4T1zXO+n3szutFE73
+         AYobjBPAq6heSsJap54Cc/4cOZ8dsmtVBSb6YNXMp+K+Jr4A2Z1ZH9RdF9OcyE2iAv6G
+         Nvgx8OhKbCbIVM0OPBdwcEm0cU9+gsvREElE+bIRwnrDrW9OsJ3y2hB0935KlI0qV1vb
+         EmXVwTpkOERbd8aEchG0ttIRworAU5vnn5ah8i+faa84zzD9AT9VD008Sx+sdyvHnbPE
+         OCtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706871754; x=1707476554;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AKvTOkMfs92gzE0M+TFiSJEhkCKRpJTzmpH7agAwUHE=;
+        b=B6Y7FVQSIEU/XJne9yZ5O1czpguCrghylmzJnZVpWSxR5ill3CV3IF7PMkfcjHB0On
+         5T3InqBgb1wb6YW8W4Qd+lx54CPEcp471Tdyq6REDS/VxOZUUHEjdmQt6ko9jtjQ1r5p
+         48ZSrwhe/r/xHy/kmdcUUugDwiau53HvH/e5i+D+LUlnlZ6ybg5hF8gizEQE+jJAn2/F
+         WoFZgcPUt13l7CsPB98mBN79N0TGx7U9KAP8yL91NEq73pnAqW8TcuU7S1/tR58hM+0W
+         Poml6EZ28HDwsFcYPZ4SWECXle3AqxqIR8z85b0oQToTWwhTBQc9qcfFazPi01R1lDrm
+         x8Sw==
+X-Gm-Message-State: AOJu0YwA6QI5O/PVCVmdKJfyKBWiZZcuzrDR46O9o1hgr0Xo48/w7+9n
+	O6v0ScmWHv4k3/d2eosVXfTo/08dXAx/jmva4qjdguO/PqrLdRyAaceZtwEmtXln0LyTBg4prYj
+	d7NyzaAA3b8x2zoQusk3X1yJoiz9cqbOgLiqC
+X-Google-Smtp-Source: AGHT+IFRpqtiZKVAmnfyGxbOhfn+Xv95kz9Cj0dh1dh0pmbX0ph2z2DTZnuR3soBcYzNT173zBRShjkf603kulKsELQ=
+X-Received: by 2002:a05:6808:10c3:b0:3bf:80de:9831 with SMTP id
+ s3-20020a05680810c300b003bf80de9831mr1988318ois.10.1706871754161; Fri, 02 Feb
+ 2024 03:02:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240202101311.it.893-kees@kernel.org> <20240202101642.156588-2-keescook@chromium.org>
+In-Reply-To: <20240202101642.156588-2-keescook@chromium.org>
+From: Marco Elver <elver@google.com>
+Date: Fri, 2 Feb 2024 12:01:55 +0100
+Message-ID: <CANpmjNPPbTNPJfM5MNE6tW-jCse+u_RB8bqGLT3cTxgCsL+x-A@mail.gmail.com>
+Subject: Re: [PATCH v2 2/6] ubsan: Reintroduce signed and unsigned overflow sanitizers
+To: Kees Cook <keescook@chromium.org>
+Cc: linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Hao Luo <haoluo@google.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	Fangrui Song <maskray@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, Bill Wendling <morbo@google.com>, 
+	Andrey Konovalov <andreyknvl@gmail.com>, Jonathan Corbet <corbet@lwn.net>, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	llvm@lists.linux.dev, linux-doc@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, kasan-dev@googlegroups.com, 
+	linux-acpi@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Rework the AER reset and recovery flow to take into account root port
-integrated devices that gets reset between the error detected and the
-slot reset callbacks.
+On Fri, 2 Feb 2024 at 11:16, Kees Cook <keescook@chromium.org> wrote:
+>
+> Effectively revert commit 6aaa31aeb9cf ("ubsan: remove overflow
+> checks"), to allow the kernel to be built with the "overflow"
+> sanitizers again. This gives developers a chance to experiment[1][2][3]
+> with the instrumentation again, while compilers adjust their sanitizers
+> to deal with the impact of -fno-strict-oveflow (i.e. moving from
+> "overflow" checking to "wrap-around" checking).
+>
+> Notably, the naming of the options is adjusted to use the name "WRAP"
+> instead of "OVERFLOW". In the strictest sense, arithmetic "overflow"
+> happens when a result exceeds the storage of the type, and is considered
+> by the C standard and compilers to be undefined behavior for signed
+> and pointer types (without -fno-strict-overflow). Unsigned arithmetic
+> overflow is defined as always wrapping around.
+>
+> Because the kernel is built with -fno-strict-overflow, signed and pointer
+> arithmetic is defined to always wrap around instead of "overflowing"
+> (which could either be elided due to being undefined behavior or would
+> wrap around, which led to very weird bugs in the kernel).
+>
+> So, the config options are added back as CONFIG_UBSAN_SIGNED_WRAP and
+> CONFIG_UBSAN_UNSIGNED_WRAP. Since the kernel has several places that
+> explicitly depend on wrap-around behavior (e.g. counters, atomics, crypto,
+> etc), also introduce the __signed_wrap and __unsigned_wrap function
+> attributes for annotating functions where wrapping is expected and should
+> not be instrumented. This will allow us to distinguish in the kernel
+> between intentional and unintentional cases of arithmetic wrap-around.
+>
+> Additionally keep these disabled under CONFIG_COMPILE_TEST for now.
+>
+> Link: https://github.com/KSPP/linux/issues/26 [1]
+> Link: https://github.com/KSPP/linux/issues/27 [2]
+> Link: https://github.com/KSPP/linux/issues/344 [3]
+> Cc: Justin Stitt <justinstitt@google.com>
+> Cc: Miguel Ojeda <ojeda@kernel.org>
+> Cc: Nathan Chancellor <nathan@kernel.org>
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Marco Elver <elver@google.com>
+> Cc: Hao Luo <haoluo@google.com>
+> Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  include/linux/compiler_types.h | 14 ++++++-
+>  lib/Kconfig.ubsan              | 19 ++++++++++
+>  lib/test_ubsan.c               | 49 ++++++++++++++++++++++++
+>  lib/ubsan.c                    | 68 ++++++++++++++++++++++++++++++++++
+>  lib/ubsan.h                    |  4 ++
+>  scripts/Makefile.ubsan         |  2 +
+>  6 files changed, 155 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+> index 6f1ca49306d2..e585614f3152 100644
+> --- a/include/linux/compiler_types.h
+> +++ b/include/linux/compiler_types.h
+> @@ -282,11 +282,23 @@ struct ftrace_likely_data {
+>  #define __no_sanitize_or_inline __always_inline
+>  #endif
+>
+> +/* Allow wrapping arithmetic within an annotated function. */
+> +#ifdef CONFIG_UBSAN_SIGNED_WRAP
+> +# define __signed_wrap __attribute__((no_sanitize("signed-integer-overflow")))
+> +#else
+> +# define __signed_wrap
+> +#endif
+> +#ifdef CONFIG_UBSAN_UNSIGNED_WRAP
+> +# define __unsigned_wrap __attribute__((no_sanitize("unsigned-integer-overflow")))
+> +#else
+> +# define __unsigned_wrap
+> +#endif
+> +
+>  /* Section for code which can't be instrumented at all */
+>  #define __noinstr_section(section)                                     \
+>         noinline notrace __attribute((__section__(section)))            \
+>         __no_kcsan __no_sanitize_address __no_profile __no_sanitize_coverage \
+> -       __no_sanitize_memory
+> +       __no_sanitize_memory __signed_wrap __unsigned_wrap
+>
+>  #define noinstr __noinstr_section(".noinstr.text")
+>
+> diff --git a/lib/Kconfig.ubsan b/lib/Kconfig.ubsan
+> index 59e21bfec188..a7003e5bd2a1 100644
+> --- a/lib/Kconfig.ubsan
+> +++ b/lib/Kconfig.ubsan
+> @@ -116,6 +116,25 @@ config UBSAN_UNREACHABLE
+>           This option enables -fsanitize=unreachable which checks for control
+>           flow reaching an expected-to-be-unreachable position.
+>
+> +config UBSAN_SIGNED_WRAP
+> +       bool "Perform checking for signed arithmetic wrap-around"
+> +       default UBSAN
+> +       depends on !COMPILE_TEST
+> +       depends on $(cc-option,-fsanitize=signed-integer-overflow)
+> +       help
+> +         This option enables -fsanitize=signed-integer-overflow which checks
+> +         for wrap-around of any arithmetic operations with signed integers.
+> +
+> +config UBSAN_UNSIGNED_WRAP
+> +       bool "Perform checking for unsigned arithmetic wrap-around"
+> +       depends on $(cc-option,-fsanitize=unsigned-integer-overflow)
+> +       depends on !X86_32 # avoid excessive stack usage on x86-32/clang
+> +       depends on !COMPILE_TEST
+> +       help
+> +         This option enables -fsanitize=unsigned-integer-overflow which checks
+> +         for wrap-around of any arithmetic operations with unsigned integers. This
+> +         currently causes x86 to fail to boot.
 
-In adf_error_detected() the devices is gracefully shut down. The worker
-threads are disabled, the error conditions are notified to listeners and
-through PFVF comms and finally the device is reset as part of
-adf_dev_down().
+My hypothesis is that these options will quickly be enabled by various
+test and fuzzing setups, to the detriment of kernel developers. While
+the commit message states that these are for experimentation, I do not
+think it is at all clear from the Kconfig options.
 
-In adf_slot_reset(), the device is brought up again. If SRIOV VFs were
-enabled before reset, these are re-enabled and VFs are notified of
-restarting through PFVF comms.
+Unsigned integer wrap-around is relatively common (it is _not_ UB
+after all). While I can appreciate that in some cases wrap around is a
+genuine semantic bug, and that's what we want to find with these
+changes, ultimately marking all semantically valid wrap arounds to
+catch the unmarked ones. Given these patterns are so common, and C
+programmers are used to them, it will take a lot of effort to mark all
+the intentional cases. But I fear that even if we get to that place,
+_unmarked_  but semantically valid unsigned wrap around will keep
+popping up again and again.
 
-Signed-off-by: Mun Chun Yep <mun.chun.yep@intel.com>
-Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
-Reviewed-by: Markas Rapoportas <markas.rapoportas@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/intel/qat/qat_common/adf_aer.c | 26 ++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+What is the long-term vision to minimize the additional churn this may
+introduce?
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-index b3d4b6b99c65..3597e7605a14 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-@@ -33,6 +33,19 @@ static pci_ers_result_t adf_error_detected(struct pci_dev *pdev,
- 		return PCI_ERS_RESULT_DISCONNECT;
- 	}
- 
-+	set_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
-+	if (accel_dev->hw_device->exit_arb) {
-+		dev_dbg(&pdev->dev, "Disabling arbitration\n");
-+		accel_dev->hw_device->exit_arb(accel_dev);
-+	}
-+	adf_error_notifier(accel_dev);
-+	adf_pf2vf_notify_fatal_error(accel_dev);
-+	adf_dev_restarting_notify(accel_dev);
-+	adf_pf2vf_notify_restarting(accel_dev);
-+	adf_pf2vf_wait_for_restarting_complete(accel_dev);
-+	pci_clear_master(pdev);
-+	adf_dev_down(accel_dev, false);
-+
- 	return PCI_ERS_RESULT_NEED_RESET;
- }
- 
-@@ -180,14 +193,25 @@ static int adf_dev_aer_schedule_reset(struct adf_accel_dev *accel_dev,
- static pci_ers_result_t adf_slot_reset(struct pci_dev *pdev)
- {
- 	struct adf_accel_dev *accel_dev = adf_devmgr_pci_to_accel_dev(pdev);
-+	int res = 0;
- 
- 	if (!accel_dev) {
- 		pr_err("QAT: Can't find acceleration device\n");
- 		return PCI_ERS_RESULT_DISCONNECT;
- 	}
--	if (adf_dev_aer_schedule_reset(accel_dev, ADF_DEV_RESET_SYNC))
-+
-+	if (!pdev->is_busmaster)
-+		pci_set_master(pdev);
-+	pci_restore_state(pdev);
-+	pci_save_state(pdev);
-+	res = adf_dev_up(accel_dev, false);
-+	if (res && res != -EALREADY)
- 		return PCI_ERS_RESULT_DISCONNECT;
- 
-+	adf_reenable_sriov(accel_dev);
-+	adf_pf2vf_notify_restarted(accel_dev);
-+	adf_dev_restarted_notify(accel_dev);
-+	clear_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
- 	return PCI_ERS_RESULT_RECOVERED;
- }
- 
--- 
-2.34.1
+I think the problem reminds me a little of the data race problem,
+although I suspect unsigned integer wraparound is much more common
+than data races (which unlike unsigned wrap around is actually UB) -
+so chasing all intentional unsigned integer wrap arounds and marking
+will take even more effort than marking all intentional data races
+(which we're still slowly, but steadily, making progress towards).
 
+At the very least, these options should 'depends on EXPERT' or even
+'depends on BROKEN' while the story is still being worked out.
+
+Thanks,
+-- Marco
