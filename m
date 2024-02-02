@@ -1,31 +1,29 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A1A79DCE;
-	Fri,  2 Feb 2024 10:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E719679930
+	for <linux-crypto@vger.kernel.org>; Fri,  2 Feb 2024 10:12:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706868702; cv=none; b=q4Wo8HEEeaD3j5gCiikSMhP0XHtZ4gz25DEL6iGXHR4VYmVJHNnOh8m6BhRPHxHvN3WXJWTVQWqXYxFebxEreQD20FCLmhtOtP9MONeu01X/wHshRMsUUPG7l3XlECCqrDycZROnoLwikJVtPFKxBH25ZM8LsKXKS1jHX8h+9yE=
+	t=1706868733; cv=none; b=OSvPVIErPUzE//TWA69OXXH+NsRF1s9F6HMPnDIcuZXYIxx1zLS6f1LeSsNhf/P7lB2Cuj0Zxx9rx7aLQ2HtP1MZws+JWa269pZfpOBziOTOQhUHJ/CLu8SRF83AUXeXKx5Y33UyUcv59Im42eCwS+RPgr9cwgZMUo4MXmFYIyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706868702; c=relaxed/simple;
-	bh=C7uLKFP3Y5+66Alum0hktoFqE9J4pbgBVFFvwulqzFg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GFCIOEQ9qlWZl8xkB4YJqw3GGcfbK0LCwouF7dLMilulgfEZFOP76rCp8ZS0AFwwtlZeP9JXrpr1GVAYdkSmz5PZWB4rk6uYAQ+/bmDnfNEMfMD+AiDA13l1WTFbe+IpHaI8ffCp3+ja0PhgS9KdCyf9wkXA8T0/hgGRyLT9iwk=
+	s=arc-20240116; t=1706868733; c=relaxed/simple;
+	bh=n1395KoXyjuOkrRPuFdHLsyxIiAaOAQkXxlqJTKLZgs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=HVNrxWD3G6wcdM25vO24cqNtT1tlpNmLBRpJdO4ESamysAzNZJI94/cH1G4fUSyC28rHjhGp0TG8aWvM34+U9RkqxBWOK6RYBDF1haniCUWlZZg547LFtc/0wyWnhh+wLgY2TdI5DCbzLDz07DgwsRfYoaAQOOx1lvdL+ojbDBo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rVqWB-0092tc-2S; Fri, 02 Feb 2024 18:11:32 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Feb 2024 18:11:44 +0800
-Date: Fri, 2 Feb 2024 18:11:44 +0800
+	id 1rVqWj-0092ut-UD; Fri, 02 Feb 2024 18:12:06 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Feb 2024 18:12:19 +0800
+Date: Fri, 2 Feb 2024 18:12:19 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Qi Tao <taoqi10@huawei.com>
-Cc: davem@davemloft.net, liulongfang@huawei.com,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] some updates and cleanups for hisilicon/sec2.
-Message-ID: <Zby/4CjHCbF2VyDo@gondor.apana.org.au>
-References: <20240126093828.14131-1-taoqi10@huawei.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: ahash - unexport crypto_hash_alg_has_setkey()
+Message-ID: <ZbzAA3Zf9dl2xxLN@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -34,35 +32,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240126093828.14131-1-taoqi10@huawei.com>
+In-Reply-To: <20240127074927.74282-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 
-On Fri, Jan 26, 2024 at 05:38:24PM +0800, Qi Tao wrote:
-> This seires patch mainly add some RAS registers to enhance the 
-> DFX positioning function and fix some cleanup issues.
+Eric Biggers <ebiggers@kernel.org> wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> [PATCH v1 3/4] -> [PATCH v2 3/4]
-> 	sec_sqe3->c_len_ivin |= cpu_to_le32(c_req->c_len);
-> -	sec_sqe3->tag = cpu_to_le64((unsigned long)(uintptr_t)req);
-> +	sec_sqe3->tag = cpu_to_le64((unsigned long)req);
+> Since crypto_hash_alg_has_setkey() is only called from ahash.c itself,
+> make it a static function.
 > 
-> Other patches are not modified.
-> 
-> Qi Tao (3):
->   crypto: hisilicon/sec2 - updates the sec DFX function register
->   crypto: hisilicon/sec2 - modify nested macro call
->   crypto: hisilicon/sec2 - fix some cleanup issues
-> 
-> Wenkai Lin (1):
->   crypto: hisilicon/sec - remove unused parameter
-> 
->   drivers/crypto/hisilicon/sec2/sec_crypto.c | 33 ++++++++--------------
->   drivers/crypto/hisilicon/sec2/sec_main.c   |  5 ++++
->   2 files changed, 17 insertions(+), 21 deletions(-)
-> 
-> -- 
-> 2.33.0
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+> crypto/ahash.c                 | 21 ++++++++++-----------
+> include/crypto/internal/hash.h |  2 --
+> 2 files changed, 10 insertions(+), 13 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
