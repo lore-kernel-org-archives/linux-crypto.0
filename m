@@ -1,134 +1,128 @@
-Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DB34EB25
-	for <linux-crypto@vger.kernel.org>; Sat,  3 Feb 2024 07:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1CD755E70;
+	Sat,  3 Feb 2024 14:21:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706945379; cv=none; b=UzoiOeT8QGbkHNUHynmZU9SGhsx/q0MQJB75ics6C+D+He8VwyoKcW+tmLKpM0gbbuauFNaVtJtYcNRMeklpPcNsPn8FloLCaNqfWhtg8vH6vwGe0e1CXkX58NEuzTmlysMXmr7Fy9w5ag2aIpm8bUCNquuBNuPn+L9S/+52JNw=
+	t=1706970120; cv=none; b=PRmb/Y34vBMUTNzqD+6Mx6y7wWCo1rrgiAhkDNfQYLJjuHlkGbVGes/zCpGI6LcuMBRQO2epi7mZjcdA9NJncu1CQG9zT5JhhPkM2X3fHs0h+Vi0vv+IVigxV172TbIngR3fip2+m8rMZn9IWOzCMOmxrKpma1wfQzzDm2r7uVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706945379; c=relaxed/simple;
-	bh=PTOpCCEM3IxbhvuSFFypmEAY+7vzYF1umsDvuUrgiXI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rF5Hc+WcyM/U7B2AMwqZ1MHP+isc3nBRDE2lLmuSjh5HEbdzv3F+6tLIjrWIDVDKJmzqJ3fhwFDO0wyDw3eHVxh52qI2+KQp8v3GSGoO5t4EaaF13+MVDctPozkz03qDeUrhCuOL+uTui7Ccgk1wD0qPM6M0bxOp31vWgz7+2g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=O9Ki0kuH; arc=none smtp.client-ip=129.153.194.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
+	s=arc-20240116; t=1706970120; c=relaxed/simple;
+	bh=zYrf0P/Z30JJi7prvKKRaAdhW6IPCVPSFetbZi93Bt8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hET0LXyyfWzcYWWNX0t28qAf/swb0cu4VW6P5F7sZbvFEbmROUaZtgnza42mejP3ygSkK7nJyoRxhn4JGgoFHth8r3TYbg1UGnPCdpwLRfDNMS9xYr18mBgivUEx8AlIX6/ukISWOica0JNW2/AkxDjdmdjyx/NrxnCzkE88SiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mdM4/+k4; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="O9Ki0kuH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
-	t=1706944814; bh=PTOpCCEM3IxbhvuSFFypmEAY+7vzYF1umsDvuUrgiXI=;
-	h=From:To:Cc:Subject:Date;
-	b=O9Ki0kuHyXgz6hB8GZG2xrVRL5oWLrqyVfO171cWUMsxxrB6I/OV4T1My0XFwZ0P+
-	 J5WZu8f8zTeL4rUWAHf7U1nNJNEmA4ROLjWlORjKhQjfN5gTrOyVJa9gU/II/bY4at
-	 Juv14sn6g31bgNvikWLl9HlQNhtraNaUh+ltk2f3i05S6jEmwdMgW7VsF6SSd+ANLb
-	 hLpnp4PYC19WzFyvjAsp9U7EO7Xou9MYbzcgUJL/yrrvVMUWQh2qCr3aHyQgnPZ5PF
-	 JnLRQJ6Whzrr7J5VtDYB8dGF3s66NTNPVlianCNKYsN0O0Ual163IEFFA0G1vHhwc8
-	 LukaM9EAPy5fQ==
-From: Joachim Vandersmissen <git@jvdsn.com>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Joachim Vandersmissen <git@jvdsn.com>
-Subject: [PATCH v2] crypto: rsa - restrict plaintext/ciphertext values more
-Date: Sat,  3 Feb 2024 01:19:59 -0600
-Message-ID: <20240203071959.239363-1-git@jvdsn.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mdM4/+k4"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-29631796acdso1327949a91.3;
+        Sat, 03 Feb 2024 06:21:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706970118; x=1707574918; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ToEVaWIZ0fuUtYtDuSCMzcdantFPoh+MRoifqahhM0A=;
+        b=mdM4/+k4aIBdegQ1Rigz3vbhjgH82MkxL1YVIKhf4VhWmEUaMb5qj8pzW7RsnYveYZ
+         pxHRT07kGaETnX9aJoIaEz+1zZKFHRj9QQi2Z0/dObskFtZMpeGMgX02sGQQRtUiosu+
+         TSYDT/nSzhq5GQehIYePmwddDDugDNNlgjwptz8DJDDfKBT3Bg0uaFR0kqiBHfVCSNzF
+         90pzWMjDv4CSHH5CsqNsY8XoH1gWZUIg97cT5mqWWOJ581eh3dZPi7UQk8mhPIMTuw42
+         T9By5yGNlV3EqIZA+A5R2jfhYOXwupullNfRyRagjEaXl7+LmPLnJmwJf03gNEfF9vxq
+         XqWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706970118; x=1707574918;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ToEVaWIZ0fuUtYtDuSCMzcdantFPoh+MRoifqahhM0A=;
+        b=wCHXQSuSUGbaJucA34GT2AE6MU6jLKx7mevidDenZMA6a0R7o1PWtjC/JT6j7+PvP+
+         VDzST3sEiQvjsJe6NqbRiXYgDfgV1rq3jrAwTcDlbeu5rBlrLEz/TBQlX+FfeoIOrPLI
+         DXYIxR5e0tRVYMPwkt1dddudP65823Te93iPgPySJ1HOq7s4QVar5+XRkhLM/dhNE9N+
+         ZsCXh3+yEGbnqrCclXylEXtySqs3r0GxBSv/07PPcqvax6hFrGF+miaDBhISfU42LYUW
+         TofQvUM0a9GnbT4TY3oJWojY9WM85znQyhkTeRDFoTOifFQxf8wQO7EDLdnLKwLb0xup
+         HUtQ==
+X-Gm-Message-State: AOJu0YwhalOWL81fCv8+93OUzC+U+renVQdbORxXuG6drq92LpIklhhv
+	CmyLZch1Xp2vFI3kiMc6G/62z1vQG9kSe2c/0KjvY+LkV6LyHhQE
+X-Google-Smtp-Source: AGHT+IH50Mulf3HD1zogOIaD4lEQL8c0b5BOoc10ZI605VLBz8YU65Vl1bg+qoF4yaKAtuIHIgYs3A==
+X-Received: by 2002:a17:90a:43a3:b0:296:42ef:b3ce with SMTP id r32-20020a17090a43a300b0029642efb3cemr4449584pjg.28.1706970117959;
+        Sat, 03 Feb 2024 06:21:57 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVpaILoBXRe6n7KCMUKDi5wsE0061FmwuOKEl8f0m4PFkkASp+8IAn4QcDehTnaYDfSvK9U0/Nr3cWoqLOaIOKxog/ZYNHoR249Y7XPrrB+GhfZPoZ97ZQEp73eKs/qdACjNCaaBsffOX9R9E4zJR9hlPmURm05MqQH90FTKMJTsnlR1BxVySBOzZ9Yuu1sjVhu6ar/Va3/xzq8d7E8XweZkqVV3IPoaFCNVG3NDEPtEkY30Hk2XctNfiTjr8APzpV0LS8QJ11EJxYFiJPO7qtZn+2c7C4H1pOiv9QMwJtAhBZ/eK/k3cWLP4G3nXDJex7/nMRhEPTrW5p6avAKfimXQWHp7hIA9007jrSNKyVYlemClkr9QFeH0NAnm53SaOyETX/NSEerURmce1ChPW0ZAwkBJ/QYNDVg2Ur/P2c7sj+p8eYKRBsKQsittfnYmX6oc1j+TyDaUBfOwJ5c+jxvvJBTx043Wqr7WUOunVfhlDBQ9JEmnx/hXMlofYehnW75JRwo4sn4faylL7/2
+Received: from dragon (45.78.63.125.16clouds.com. [45.78.63.125])
+        by smtp.gmail.com with ESMTPSA id lh4-20020a170903290400b001d8ecf5ff6csm3340292plb.147.2024.02.03.06.21.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Feb 2024 06:21:57 -0800 (PST)
+Date: Sat, 3 Feb 2024 22:21:49 +0800
+From: Shawn Guo <shawn.gsc@gmail.com>
+To: Kshitiz Varshney <kshitiz.varshney@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Varun Sethi <V.Sethi@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Sahil Malhotra <sahil.malhotra@nxp.com>,
+	Vabhav Sharma <vabhav.sharma@nxp.com>,
+	Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+	Rahul Kumar Yadav <rahulkumar.yadav@nxp.com>,
+	Nikhil Singla <nikhil.singla@nxp.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] imx_v6_v7_defconfig: Enable sm3, sm4, polyval, xctr
+ cipher test support
+Message-ID: <20240203142149.GI463595@dragon>
+References: <20231220113857.1127598-1-kshitiz.varshney@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231220113857.1127598-1-kshitiz.varshney@nxp.com>
 
-Hi Herbert,
+On Wed, Dec 20, 2023 at 12:38:57PM +0100, Kshitiz Varshney wrote:
+>     Enable config for sm3, sm4, polyval, xctr cipher test as built in module.
+> 
+>     Issue:-
+>     Multiple crypto tests like sm3, sm4 xctr and polyval failing.
+> 
+>     skcipher: failed to allocate transform for xctr(aes): -2
+>     alg: self-tests for xctr(aes) using xctr(aes) failed (rc=-2)
+>     alg: self-tests for sm3 using sm3 failed (rc=-2)
+>     tcrypt: failed to load transform for sm3: -2
+>     alg: hash: failed to allocate transform for polyval: -2
+>     alg: self-tests for polyval using polyval failed (rc=-2)
+> 
+>     Resolution:-
+>     Enabling CONFIG_CRYPTO_SM3_GENERIC, CONFIG_CRYPTO_SM4_GENERIC,
+>     CONFIG_CRYPTO_HCTR2, CONFIG_CRYPTO_ARIA as module enables support of
+>     sm3, sm4, aria, polyval & xctr.
+> 
+>     Signed-off-by: Kshitiz Varshney <kshitiz.varshney@nxp.com>
 
-As requested, I replaced the existing check with the new SP 800-56Br2
-check. I verified that the restriction is now applied in both FIPS and
-non-FIPS mode. I tried to make it clear in the comments why the code is
-now deviating from RFC3447.
+The commit log and Signed-off-by lines shouldn't have leading
+spaces/indent.
 
----8<---
+> ---
+>  arch/arm/configs/imx_v6_v7_defconfig | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/arm/configs/imx_v6_v7_defconfig b/arch/arm/configs/imx_v6_v7_defconfig
+> index 0a90583f9f01..627f57da9d5b 100644
+> --- a/arch/arm/configs/imx_v6_v7_defconfig
+> +++ b/arch/arm/configs/imx_v6_v7_defconfig
+> @@ -484,3 +484,7 @@ CONFIG_DEBUG_FS=y
+>  # CONFIG_SLUB_DEBUG is not set
+>  # CONFIG_SCHED_DEBUG is not set
+>  # CONFIG_FTRACE is not set
+> +CONFIG_CRYPTO_HCTR2=m
+> +CONFIG_CRYPTO_SM3_GENERIC=m
+> +CONFIG_CRYPTO_SM4_GENERIC=m
+> +CONFIG_CRYPTO_ARIA=m
 
-SP 800-56Br2, Section 7.1.1 [1] specifies that:
-1. If m does not satisfy 1 < m < (n – 1), output an indication that m is
-out of range, and exit without further processing.
+Instead of adding lines at the end of file, please use help from
+'make savedefconfig' to get them appear at the correct places.
 
-Similarly, Section 7.1.2 of the same standard specifies that:
-1. If the ciphertext c does not satisfy 1 < c < (n – 1), output an
-indication that the ciphertext is out of range, and exit without further
-processing.
-
-This range is slightly more conservative than RFC3447, as it also
-excludes RSA fixed points 0, 1, and n - 1.
-
-[1] https://doi.org/10.6028/NIST.SP.800-56Br2
-
-Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
----
- crypto/rsa.c | 36 ++++++++++++++++++++++++++++++++----
- 1 file changed, 32 insertions(+), 4 deletions(-)
-
-diff --git a/crypto/rsa.c b/crypto/rsa.c
-index b9cd11fb7d36..d9be9e86097e 100644
---- a/crypto/rsa.c
-+++ b/crypto/rsa.c
-@@ -24,14 +24,38 @@ struct rsa_mpi_key {
- 	MPI qinv;
- };
- 
-+static int rsa_check_payload(MPI x, MPI n)
-+{
-+	MPI n1;
-+
-+	if (mpi_cmp_ui(x, 1) <= 0)
-+		return -EINVAL;
-+
-+	n1 = mpi_alloc(0);
-+	if (!n1)
-+		return -ENOMEM;
-+
-+	if (mpi_sub_ui(n1, n, 1) || mpi_cmp(x, n1) >= 0) {
-+		mpi_free(n1);
-+		return -EINVAL;
-+	}
-+
-+	mpi_free(n1);
-+	return 0;
-+}
-+
- /*
-  * RSAEP function [RFC3447 sec 5.1.1]
-  * c = m^e mod n;
-  */
- static int _rsa_enc(const struct rsa_mpi_key *key, MPI c, MPI m)
- {
--	/* (1) Validate 0 <= m < n */
--	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->n) >= 0)
-+	/*
-+	 * Even though (1) in RFC3447 only requires 0 <= m <= n - 1, we are
-+	 * slightly more conservative and require 1 < m < n - 1. This is in line
-+	 * with SP 800-56Br2, Section 7.1.1.
-+	 */
-+	if (rsa_check_payload(m, key->n))
- 		return -EINVAL;
- 
- 	/* (2) c = m^e mod n */
-@@ -50,8 +74,12 @@ static int _rsa_dec_crt(const struct rsa_mpi_key *key, MPI m_or_m1_or_h, MPI c)
- 	MPI m2, m12_or_qh;
- 	int ret = -ENOMEM;
- 
--	/* (1) Validate 0 <= c < n */
--	if (mpi_cmp_ui(c, 0) < 0 || mpi_cmp(c, key->n) >= 0)
-+	/*
-+	 * Even though (1) in RFC3447 only requires 0 <= c <= n - 1, we are
-+	 * slightly more conservative and require 1 < c < n - 1. This is in line
-+	 * with SP 800-56Br2, Section 7.1.2.
-+	 */
-+	if (rsa_check_payload(c, key->n))
- 		return -EINVAL;
- 
- 	m2 = mpi_alloc(0);
--- 
-2.43.0
-
+Shawn
