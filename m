@@ -1,159 +1,140 @@
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2D824215;
-	Sun,  4 Feb 2024 17:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83352249EE;
+	Sun,  4 Feb 2024 18:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707067521; cv=none; b=GM1kqxvichtTG0GoZZ4cNM7S4FUxVaBp41QrXgstMIbRoG7MbskpnEscNjV1MIHKpGkEt9rg1JHpPj2j2uRdmOOOtrCy7kmClVs2mEs7vRim/4Ol0oT7RUtri1tEoeWhKW7tw+hFo1ztumsfvgMLfHWwf4j1C1poJWXBEQ/PzcU=
+	t=1707071563; cv=none; b=ZuPt7597U8ny3KZPHT+jdJWKuJXPr39yW101VI5T2Pcc5antz/IZ5YaUvmq9lNT+8Di3kY8sVrivEe/kQyGdBpXnawfU5Myt41nX339nVlJASgL+rPQA0ha7cJpAtUBexLX4ZxQWwqfGKl/wwr0TOmmb3apnKEvRzmXWNovsOEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707067521; c=relaxed/simple;
-	bh=o6XgZklQg99ao472cPaHWFZkdLc8gXrmjSvTwRxHuxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TN1avc3WT/XHGYEkLHNFOWH4ajWnHA1mlu09SaaoYq3nTErMNinLTVO++B90QFMD5Hq/AoVYu1VgnV2DW1mmEXMPe97840OoD1kF3sWZ2ySKwLTJSptf57J7FWI6quGfO5rjUEOQckHsywGb/SAd0UNS3rrJquwSyaI7tcUyxOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 5E0872800B3C2;
-	Sun,  4 Feb 2024 18:25:10 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 463422F90E5; Sun,  4 Feb 2024 18:25:10 +0100 (CET)
-Date: Sun, 4 Feb 2024 18:25:10 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: Bjorn Helgaas <helgaas@kernel.org>, David Howells <dhowells@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-	linuxarm@huawei.com, David Box <david.e.box@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, "Li, Ming" <ming4.li@intel.com>,
-	Zhi Wang <zhi.a.wang@intel.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 07/12] spdm: Introduce library to authenticate devices
-Message-ID: <20240204172510.GA19805@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
- <89a83f42ae3c411f46efd968007e9b2afd839e74.1695921657.git.lukas@wunner.de>
- <20231003153937.000034ca@Huawei.com>
+	s=arc-20240116; t=1707071563; c=relaxed/simple;
+	bh=0+rTMhidwrziDNcAPA5ZtRDC2hGitSVJlE07G60n9N8=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qShD9XtWUVITc3Il4N4SCr4bbsKq/dV3vHZoR+rVTtkKBgJDoFXEQd3a7/Z/AbHpc1v5N3NaCm+UhYJmyt4YmxlmWMBZpOE7cCUhuM2zYuXoJnbnHryAxyptC4C1Zyrp5w/RHgZEVz1NLfhlH2+2qBlyBrXjbuc9Sg/ew2hGP+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=NEtxkGF0; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="NEtxkGF0"
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 414IW9Ft020319;
+	Sun, 4 Feb 2024 12:32:09 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1707071529;
+	bh=s2TWXxbk1O39WIKgnGYQbW++dB7WqbpabTQYcEP9Epg=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date;
+	b=NEtxkGF0LK9XaN9HqFJjU9aFr3taztUE4uxi+uN7w/z6xRWBwV/f5C1nBHVQUOsNW
+	 l2APL7p+wukyZK+oneR50K5qf3nPn8zPfiJ1y1sbJjJZiOI4epbkRk6XcpzUsAxHoS
+	 dquzwtolCOfUc11IG0xiylFmsBeN9TaCsknOPWVc=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 414IW9NI020112
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Sun, 4 Feb 2024 12:32:09 -0600
+Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 4
+ Feb 2024 12:32:09 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE111.ent.ti.com
+ (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Sun, 4 Feb 2024 12:32:09 -0600
+Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 414IW86i038451;
+	Sun, 4 Feb 2024 12:32:08 -0600
+From: Kamlesh Gurudasani <kamlesh@ti.com>
+To: Gaurav Kashyap <quic_gaurkash@quicinc.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <andersson@kernel.org>, <ebiggers@google.com>,
+        <neil.armstrong@linaro.org>, <srinivas.kandagatla@linaro.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <robh+dt@kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <kernel@quicinc.com>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <quic_omprsing@quicinc.com>,
+        <quic_nguyenb@quicinc.com>, <bartosz.golaszewski@linaro.org>,
+        <konrad.dybcio@linaro.org>, <ulf.hansson@linaro.org>,
+        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>, <mani@kernel.org>,
+        <davem@davemloft.net>, <herbert@gondor.apana.org.au>,
+        Gaurav Kashyap <quic_gaurkash@quicinc.com>
+Subject: Re: [EXTERNAL] [PATCH v4 04/15] soc: qcom: ice: add hwkm support in
+ ice
+In-Reply-To: <20240127232436.2632187-5-quic_gaurkash@quicinc.com>
+References: <20240127232436.2632187-1-quic_gaurkash@quicinc.com>
+ <20240127232436.2632187-5-quic_gaurkash@quicinc.com>
+Date: Mon, 5 Feb 2024 00:02:07 +0530
+Message-ID: <87jznkytaw.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231003153937.000034ca@Huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Tue, Oct 03, 2023 at 03:39:37PM +0100, Jonathan Cameron wrote:
-> On Thu, 28 Sep 2023 19:32:37 +0200 Lukas Wunner <lukas@wunner.de> wrote:
-> > +/**
-> > + * spdm_challenge_rsp_sz() - Calculate CHALLENGE_AUTH response size
-> > + *
-> > + * @spdm_state: SPDM session state
-> > + * @rsp: CHALLENGE_AUTH response (optional)
-> > + *
-> > + * A CHALLENGE_AUTH response contains multiple variable-length fields
-> > + * as well as optional fields.  This helper eases calculating its size.
-> > + *
-> > + * If @rsp is %NULL, assume the maximum OpaqueDataLength of 1024 bytes
-> > + * (SPDM 1.0.0 table 21).  Otherwise read OpaqueDataLength from @rsp.
-> > + * OpaqueDataLength can only be > 0 for SPDM 1.0 and 1.1, as they lack
-> > + * the OtherParamsSupport field in the NEGOTIATE_ALGORITHMS request.
-> > + * For SPDM 1.2+, we do not offer any Opaque Data Formats in that field,
-> > + * which forces OpaqueDataLength to 0 (SPDM 1.2.0 margin no 261).
-> > + */
-> > +static size_t spdm_challenge_rsp_sz(struct spdm_state *spdm_state,
-> > +				    struct spdm_challenge_rsp *rsp)
-> > +{
-> > +	size_t  size  = sizeof(*rsp)		/* Header */
-> 
-> Double spaces look a bit strange...
-> 
-> > +		      + spdm_state->h		/* CertChainHash */
-> > +		      + 32;			/* Nonce */
-> > +
-> > +	if (rsp)
-> > +		/* May be unaligned if hash algorithm has unusual length. */
-> > +		size += get_unaligned_le16((u8 *)rsp + size);
-> > +	else
-> > +		size += SPDM_MAX_OPAQUE_DATA;	/* OpaqueData */
-> > +
-> > +	size += 2;				/* OpaqueDataLength */
-> > +
-> > +	if (spdm_state->version >= 0x13)
-> > +		size += 8;			/* RequesterContext */
-> > +
-> > +	return  size  + spdm_state->s;		/* Signature */
-> 
-> Double space here as well looks odd to me.
+Gaurav Kashyap <quic_gaurkash@quicinc.com> writes:
 
-This was criticized by Ilpo as well, but the double spaces are
-intentional to vertically align "size" on each line for neatness.
+...
 
-How strongly do you guys feel about it? ;)
+> +	/*
+> +	 * When ICE is in standard (hwkm) mode, it supports HW wrapped
+> +	 * keys, and when it is in legacy mode, it only supports standard
+> +	 * (non HW wrapped) keys.
+> +	 *
+> +	 * Put ICE in standard mode, ICE defaults to legacy mode.
+> +	 * Legacy mode - ICE HWKM slave not supported.
+> +	 * Standard mode - ICE HWKM slave supported.
+> +	 *
+> +	 * Depending on the version of HWKM, it is controlled by different
+> +	 * registers in ICE.
+> +	 */
+> +	if (ice->hwkm_version >= 2) {
+> +		val = qcom_ice_readl(ice, QCOM_ICE_REG_CONTROL);
+> +		val = val & 0xFFFFFFFE;
+From the code I understand that the last bit is used for setting the
+mode.
 
+Was wondering if it would make more sense to use ~BIT(0) or GENMASK
+to generate this value and #define this value to express the work it
+does.
 
-> > +int spdm_authenticate(struct spdm_state *spdm_state)
-> > +{
-> > +	size_t transcript_sz;
-> > +	void *transcript;
-> > +	int rc = -ENOMEM;
-> > +	u8 slot;
-> > +
-> > +	mutex_lock(&spdm_state->lock);
-> > +	spdm_reset(spdm_state);
-[...]
-> > +	rc = spdm_challenge(spdm_state, slot);
-> > +
-> > +unlock:
-> > +	if (rc)
-> > +		spdm_reset(spdm_state);
-> 
-> I'd expect reset to also clear authenticated. Seems odd to do it separately
-> and relies on reset only being called here. If that were the case and you
-> were handling locking and freeing using cleanup.h magic, then
-> 
-> 	rc = spdm_challenge(spdm_state);
-> 	if (rc)
-> 		goto reset;
-> 	return 0;
-> 
-> reset:
-> 	spdm_reset(spdm_state);
+In this case, something like #define xx_SET_MODE_MASK (~BIT(0)) or use GENMASK
 
-Unfortunately clearing "authenticated" in spdm_reset() is not an
-option:
+This would make it easier for a person who is taking a look at the code
+for first time. This is just my perspective.
 
-Note that spdm_reset() is also called at the top of spdm_authenticate().
+If you do agree, you can change them at multiple places accross this
+patch, wherever magic numbers are used for val and masking the value.
 
-If the device was previously successfully authenticated and is now
-re-authenticated successfully, clearing "authenticated" in spdm_reset()
-would cause the flag to be briefly set to false, which may irritate
-user space inspecting the sysfs attribute at just the wrong moment.
+Regards,
+Kamlesh
 
-If the device was previously successfully authenticated and is
-re-authenticated successfully, I want the "authenticated" attribute
-to show "true" without any gaps.  Hence it's only cleared at the end
-of spdm_authenticate() if there was an error.
+> +		qcom_ice_writel(ice, val, QCOM_ICE_REG_CONTROL);
+> +	} else {
+> +		qcom_ice_writel(ice, 0x7, HWKM_OFFSET(QCOM_ICE_REG_HWKM_TZ_KM_CTL));
+> +	}
+> +}
+> +
+> +static void qcom_ice_hwkm_init(struct qcom_ice *ice)
+> +{
+> +	/* Disable CRC checks. This HWKM feature is not used. */
+> +	qcom_ice_writel(ice, 0x6,
+> +			HWKM_OFFSET(QCOM_ICE_REG_HWKM_TZ_KM_CTL));
+> +
+> +	/*
+> +	 * Give register bank of the HWKM slave access to read and modify
+> +	 * the keyslots in ICE HWKM slave. Without this, trustzone will not
+> +	 * be able to program keys into ICE.
+> +	 */
+> +	qcom_ice_writel(ice, 0xFFFFFFFF, HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_0));
+> +	qcom_ice_writel(ice, 0xFFFFFFFF, HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_1));
+> +	qcom_ice_writel(ice, 0xFFFFFFFF, HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_2));
+> +	qcom_ice_writel(ice, 0xFFFFFFFF, HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_3));
+> +	qcom_ice_writel(ice, 0xFFFFFFFF, HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_4));
+> +
+> +	/* Clear HWKM response FIFO before doing anything */
+> +	qcom_ice_writel(ice, 0x8, HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BANKN_IRQ_STATUS));
+> +	ice->hwkm_init_complete = true;
+> +}
 
-I agree with all your other review feedback and have amended the
-patch accordingly.  Thanks a lot!
-
-Lukas
+...
