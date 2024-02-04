@@ -1,104 +1,159 @@
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C567214A94;
-	Sun,  4 Feb 2024 07:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2D824215;
+	Sun,  4 Feb 2024 17:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707033003; cv=none; b=lo0uQ8UJKw/+VIziT4Bn2b+hY7ajqHICe2SjhNNof7IFhEhC66EeaUCSvfuCWN3tBlNGKv/OWweFf2KDFMSoZ0TTkpEmSFrdnUVC3LrqruREAJTu9xOOCAfNOaDpKzN5oVARNecOD+9e4ltogLZYVF/LRI87UH61GEPPrZc2poI=
+	t=1707067521; cv=none; b=GM1kqxvichtTG0GoZZ4cNM7S4FUxVaBp41QrXgstMIbRoG7MbskpnEscNjV1MIHKpGkEt9rg1JHpPj2j2uRdmOOOtrCy7kmClVs2mEs7vRim/4Ol0oT7RUtri1tEoeWhKW7tw+hFo1ztumsfvgMLfHWwf4j1C1poJWXBEQ/PzcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707033003; c=relaxed/simple;
-	bh=8rYxczI/5Lo4DDBMNGT7Xezq3tFx3qZcjoXISzbgu8o=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EujY80wRTVHeBzWphuk8yr2PiR4FrHGB5lqcy3ww5m8srZ1q7YH++mNxx7S3mPpMFSYtpIau/BabK22fOqDQU1VYl5QeyGlz9N1/hvtWmQDVK05gv0IfAjbOUczNgCIkoVC2lU/ofNFfXanSuIiW0PhkOWIU5db1nHZO1JQn8XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=HnTtvqz+; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="HnTtvqz+"
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4147nZVA040695;
-	Sun, 4 Feb 2024 01:49:35 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1707032975;
-	bh=A14BCls41fwfyoOZpPImx9gM6CsoQWADM/eYvGfz9Sg=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date;
-	b=HnTtvqz+bj/maXJMRIFvmTvcnjEgG7IUIaeB9KK+Ei6OlNfkUkTvlpuVwxmar3cBM
-	 cGw8kVsdvDZXnSa2+/VkLNOML3E9cVn+EVg5R03mdJE5hQPyi4mWwMq+TzbQ939VJ8
-	 qpbx+8sA3WQ/9M2bYTOMCuSQ0vJWroZWlusiR2qM=
-Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4147nZ5A053108
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sun, 4 Feb 2024 01:49:35 -0600
-Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 4
- Feb 2024 01:49:35 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE111.ent.ti.com
- (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 4 Feb 2024 01:49:35 -0600
-Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4147nY0O050380;
-	Sun, 4 Feb 2024 01:49:35 -0600
-From: Kamlesh Gurudasani <kamlesh@ti.com>
-To: Xin Zeng <xin.zeng@intel.com>, <herbert@gondor.apana.org.au>,
-        <alex.williamson@redhat.com>, <jgg@nvidia.com>, <yishaih@nvidia.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>
-CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <qat-linux@intel.com>, Siming Wan <siming.wan@intel.com>,
-        Xin Zeng
-	<xin.zeng@intel.com>
-Subject: Re: [EXTERNAL] [PATCH 07/10] crypto: qat - add bank save and
- restore flows
-In-Reply-To: <20240201153337.4033490-8-xin.zeng@intel.com>
-References: <20240201153337.4033490-1-xin.zeng@intel.com>
- <20240201153337.4033490-8-xin.zeng@intel.com>
-Date: Sun, 4 Feb 2024 13:19:34 +0530
-Message-ID: <87o7cwzn1t.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+	s=arc-20240116; t=1707067521; c=relaxed/simple;
+	bh=o6XgZklQg99ao472cPaHWFZkdLc8gXrmjSvTwRxHuxo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TN1avc3WT/XHGYEkLHNFOWH4ajWnHA1mlu09SaaoYq3nTErMNinLTVO++B90QFMD5Hq/AoVYu1VgnV2DW1mmEXMPe97840OoD1kF3sWZ2ySKwLTJSptf57J7FWI6quGfO5rjUEOQckHsywGb/SAd0UNS3rrJquwSyaI7tcUyxOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 5E0872800B3C2;
+	Sun,  4 Feb 2024 18:25:10 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 463422F90E5; Sun,  4 Feb 2024 18:25:10 +0100 (CET)
+Date: Sun, 4 Feb 2024 18:25:10 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, David Howells <dhowells@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+	linuxarm@huawei.com, David Box <david.e.box@intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>, "Li, Ming" <ming4.li@intel.com>,
+	Zhi Wang <zhi.a.wang@intel.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 07/12] spdm: Introduce library to authenticate devices
+Message-ID: <20240204172510.GA19805@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+ <89a83f42ae3c411f46efd968007e9b2afd839e74.1695921657.git.lukas@wunner.de>
+ <20231003153937.000034ca@Huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231003153937.000034ca@Huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Xin Zeng <xin.zeng@intel.com> writes:
+On Tue, Oct 03, 2023 at 03:39:37PM +0100, Jonathan Cameron wrote:
+> On Thu, 28 Sep 2023 19:32:37 +0200 Lukas Wunner <lukas@wunner.de> wrote:
+> > +/**
+> > + * spdm_challenge_rsp_sz() - Calculate CHALLENGE_AUTH response size
+> > + *
+> > + * @spdm_state: SPDM session state
+> > + * @rsp: CHALLENGE_AUTH response (optional)
+> > + *
+> > + * A CHALLENGE_AUTH response contains multiple variable-length fields
+> > + * as well as optional fields.  This helper eases calculating its size.
+> > + *
+> > + * If @rsp is %NULL, assume the maximum OpaqueDataLength of 1024 bytes
+> > + * (SPDM 1.0.0 table 21).  Otherwise read OpaqueDataLength from @rsp.
+> > + * OpaqueDataLength can only be > 0 for SPDM 1.0 and 1.1, as they lack
+> > + * the OtherParamsSupport field in the NEGOTIATE_ALGORITHMS request.
+> > + * For SPDM 1.2+, we do not offer any Opaque Data Formats in that field,
+> > + * which forces OpaqueDataLength to 0 (SPDM 1.2.0 margin no 261).
+> > + */
+> > +static size_t spdm_challenge_rsp_sz(struct spdm_state *spdm_state,
+> > +				    struct spdm_challenge_rsp *rsp)
+> > +{
+> > +	size_t  size  = sizeof(*rsp)		/* Header */
+> 
+> Double spaces look a bit strange...
+> 
+> > +		      + spdm_state->h		/* CertChainHash */
+> > +		      + 32;			/* Nonce */
+> > +
+> > +	if (rsp)
+> > +		/* May be unaligned if hash algorithm has unusual length. */
+> > +		size += get_unaligned_le16((u8 *)rsp + size);
+> > +	else
+> > +		size += SPDM_MAX_OPAQUE_DATA;	/* OpaqueData */
+> > +
+> > +	size += 2;				/* OpaqueDataLength */
+> > +
+> > +	if (spdm_state->version >= 0x13)
+> > +		size += 8;			/* RequesterContext */
+> > +
+> > +	return  size  + spdm_state->s;		/* Signature */
+> 
+> Double space here as well looks odd to me.
 
-> This message was sent from outside of Texas Instruments. 
-> Do not click links or open attachments unless you recognize the source of this email and know the content is safe. 
->  
-> From: Siming Wan <siming.wan@intel.com>
->
-> Add logic to save, restore, quiesce and drain a ring bank for QAT GEN4
-> devices.
-> This allows to save and restore the state of a Virtual Function (VF) and
-> will be used to implement VM live migration.
->
-> Signed-off-by: Siming Wan <siming.wan@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Xin Zeng <xin.zeng@intel.com>
-> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-...
-> +#define CHECK_STAT(op, expect_val, name, args...) \
-> +({ \
-> +	u32 __expect_val = (expect_val); \
-> +	u32 actual_val = op(args); \
-> +	if (__expect_val != actual_val) \
-> +		pr_err("QAT: Fail to restore %s register. Expected 0x%x, but actual is 0x%x\n", \
-> +			name, __expect_val, actual_val); \
-> +	(__expect_val == actual_val) ? 0 : -EINVAL; \
-I was wondering if this can be done like following, saves repeat comparison.
+This was criticized by Ilpo as well, but the double spaces are
+intentional to vertically align "size" on each line for neatness.
 
-(__expect_val == actual_val) ? 0 : (pr_err("QAT: Fail to restore %s \
-                                          register. Expected 0x%x, \
-                                          but actual is 0x%x\n", \
-                 			  name, __expect_val, \
-                                          actual_val), -EINVAL); \
-Regards,
-Kamlesh
+How strongly do you guys feel about it? ;)
 
-> +})
-...
+
+> > +int spdm_authenticate(struct spdm_state *spdm_state)
+> > +{
+> > +	size_t transcript_sz;
+> > +	void *transcript;
+> > +	int rc = -ENOMEM;
+> > +	u8 slot;
+> > +
+> > +	mutex_lock(&spdm_state->lock);
+> > +	spdm_reset(spdm_state);
+[...]
+> > +	rc = spdm_challenge(spdm_state, slot);
+> > +
+> > +unlock:
+> > +	if (rc)
+> > +		spdm_reset(spdm_state);
+> 
+> I'd expect reset to also clear authenticated. Seems odd to do it separately
+> and relies on reset only being called here. If that were the case and you
+> were handling locking and freeing using cleanup.h magic, then
+> 
+> 	rc = spdm_challenge(spdm_state);
+> 	if (rc)
+> 		goto reset;
+> 	return 0;
+> 
+> reset:
+> 	spdm_reset(spdm_state);
+
+Unfortunately clearing "authenticated" in spdm_reset() is not an
+option:
+
+Note that spdm_reset() is also called at the top of spdm_authenticate().
+
+If the device was previously successfully authenticated and is now
+re-authenticated successfully, clearing "authenticated" in spdm_reset()
+would cause the flag to be briefly set to false, which may irritate
+user space inspecting the sysfs attribute at just the wrong moment.
+
+If the device was previously successfully authenticated and is
+re-authenticated successfully, I want the "authenticated" attribute
+to show "true" without any gaps.  Hence it's only cleared at the end
+of spdm_authenticate() if there was an error.
+
+I agree with all your other review feedback and have amended the
+patch accordingly.  Thanks a lot!
+
+Lukas
