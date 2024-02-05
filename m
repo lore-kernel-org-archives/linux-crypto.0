@@ -1,132 +1,86 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5242E3FD;
-	Mon,  5 Feb 2024 19:00:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A83C45C1C;
+	Mon,  5 Feb 2024 20:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707159608; cv=none; b=gkiUSySgPeHw3YbSZXc1tPiY8yTqSGg9Q4aY4L5/ZLSbElLx4Igrqrm3kkrW/yQ7mUBNzfyy4qa9G6PZBnWKQiqOT+74fnLMnhlTK32ESguNnfhwbKHRz0xUrWBDZMSpCRSe8MPE1xLNRuyGWMgfC5BbSrhOBq/7lGMeCM2Z6Nk=
+	t=1707164363; cv=none; b=pdNU5VXDhjOS9kdVQrIagg0QAgBptnS8BPQyebGkMWd453pAUhoMskC42MVyMLFHOyhDx5wPDuN81RgyJ/QSW3AdDRGfDHqqjZ92OW3lFAk92wuVtm127+IQgT8xP5DRLnY2xf4NdNkk8yz9CdfZwlrM1tU/gpJVXMCtYcbkSnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707159608; c=relaxed/simple;
-	bh=HNYrnp9WLIKqhOXfadNXBc7gufyxT44WSMQVNI9swv8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Mc/8t45TwHEqS2kB8uy7ulOBC+z2ix4IzpNcHlAVxYa917QhmuE8Wq1MHswYY8BR2HGzgutkn72hY1lrowsw82w/PY43T/pZ/IbbA64hLsEpkcXSn5EIBw9L/hMMmhj6VXql5Of8tqwFvCTWO3yFVAQf5erHprV8IJxmQvghGpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=MOmpDQLK; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1707164363; c=relaxed/simple;
+	bh=liupdPp9PpabKJrwTtmOwXRlraS5xdM8nIKa3B+TSt8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OdWpgGkjmCWKH3cMSKQD13VUUkwjtsfCtirBbgJpfoZvsUVIGoDf/sm63nQmKdsMEBUT6lwlg9QbJPe84VsXYhcD1psqNDqOoDDOtDnaYHj7n/BdtRRj5idnfp4OoVbOVPiZwZ+y4CCgCL1bag771OoGcA6FZfTEfrSVi4yHSn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q2jTGySi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="MOmpDQLK"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 415EwfiI003365;
-	Mon, 5 Feb 2024 18:59:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=LBmqhbGx6f84e6T5h03SQhOocsnVabU6PUYhi2PETL4=; b=MO
-	mpDQLKDvDWAwLBja6peMLUL7JSoH8y+pS96NAt2lbWYQgl+mYZUtj0BMHfUz8fpV
-	CYBt/AIwi3qRlj+cxxvS+MeGsH+Fq4Lrhxrmv+ZBVjKmcPQ0BCPq/dmEWDLDcEMO
-	frA5Zi2nY2jZD0abNi10MQSSxSThTkZivAc4l4EyHvJvppqOAzq6wU/EeOo5ThcC
-	xsYI8z0rhJV/yEVxdXUXUhQqmAt87KoDj6zk9UjF2gNelJ3+kM9ndSUlFQQtMU2V
-	TqGBWxncVohJCQsVf267e0D4B0yRpkdXfyUzsXz3D6B5BFCj1TtFzHLnVcSf6Qb6
-	GchIhTiGvLrr6sHnTEsw==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w31wnrjp0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Feb 2024 18:59:54 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 415IxrEW017665
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 5 Feb 2024 18:59:53 GMT
-Received: from [10.216.24.76] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 5 Feb
- 2024 10:59:42 -0800
-Message-ID: <ddb49c10-4463-4a8f-b44e-c10d5220d8a5@quicinc.com>
-Date: Tue, 6 Feb 2024 00:29:38 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q2jTGySi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62284C433C7;
+	Mon,  5 Feb 2024 20:19:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707164362;
+	bh=liupdPp9PpabKJrwTtmOwXRlraS5xdM8nIKa3B+TSt8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q2jTGySiO+5tIbSGAGnj+X1dKVpqXJNRIGBy8IhCrKXvRj/51qGS1fEjrdUDRJHgP
+	 wlFuaLb7MAONOYgH8pidL8Sh6FCt+Bw0W5EIfa5RGq8RI5iLl+zQV9DHk0dYIHbH7n
+	 pR2UUwJGbmtAOcBd2IrhnA8jb8OQF1sjVu2pw7nxOK0Lau2h0bPRwXZPjhOyb01irH
+	 8xnbO0g3tonhFSyWySir8p6Z+lbqJsRb+soSn+TeUOqQNN6cBG/a/9KmnLaLbdEkQD
+	 XXgrDSJfw4IudhIdwiXRE6YzXQHQpDD6fjm+sDe6LUya6OT9WjwERHppLkzi3Y5LGx
+	 AhaXjZDXJvsYw==
+Date: Mon, 5 Feb 2024 12:19:20 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Kshitiz Varshney <kshitiz.varshney@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	dl-linux-imx <linux-imx@nxp.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Varun Sethi <V.Sethi@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Sahil Malhotra <sahil.malhotra@nxp.com>,
+	Vabhav Sharma <vabhav.sharma@nxp.com>,
+	Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+	Rahul Kumar Yadav <rahulkumar.yadav@nxp.com>,
+	Nikhil Singla <nikhil.singla@nxp.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] Enable config for sm3, sm4, polyval, xctr cipher test
+ as built in module.
+Message-ID: <20240205201920.GA2220@sol.localdomain>
+References: <20240205112933.3084766-1-kshitiz.varshney@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 10/15] ufs: host: wrapped keys support in ufs qcom
-Content-Language: en-US
-To: Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <andersson@kernel.org>, <ebiggers@google.com>,
-        <neil.armstrong@linaro.org>, <srinivas.kandagatla@linaro.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <robh+dt@kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <kernel@quicinc.com>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <quic_nguyenb@quicinc.com>,
-        <bartosz.golaszewski@linaro.org>, <konrad.dybcio@linaro.org>,
-        <ulf.hansson@linaro.org>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <mani@kernel.org>, <davem@davemloft.net>,
-        <herbert@gondor.apana.org.au>
-References: <20240127232436.2632187-1-quic_gaurkash@quicinc.com>
- <20240127232436.2632187-11-quic_gaurkash@quicinc.com>
-From: Om Prakash Singh <quic_omprsing@quicinc.com>
-In-Reply-To: <20240127232436.2632187-11-quic_gaurkash@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: SHzNTd1x01RGFKe2FX5ORZBspHnLzBtT
-X-Proofpoint-GUID: SHzNTd1x01RGFKe2FX5ORZBspHnLzBtT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-05_13,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 phishscore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0
- impostorscore=0 bulkscore=0 clxscore=1015 malwarescore=0 suspectscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401310000 definitions=main-2402050141
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240205112933.3084766-1-kshitiz.varshney@nxp.com>
 
+On Mon, Feb 05, 2024 at 12:29:33PM +0100, Kshitiz Varshney wrote:
+> Issue:-
+> Multiple crypto tests like sm3, sm4 xctr and polyval failing.
+> 
+> skcipher: failed to allocate transform for xctr(aes): -2
+> alg: self-tests for xctr(aes) using xctr(aes) failed (rc=-2)
+> alg: self-tests for sm3 using sm3 failed (rc=-2)
+> tcrypt: failed to load transform for sm3: -2
+> alg: hash: failed to allocate transform for polyval: -2
+> alg: self-tests for polyval using polyval failed (rc=-2)
+> 
+> Resolution:-
+> Enabling CONFIG_CRYPTO_SM3_GENERIC, CONFIG_CRYPTO_SM4_GENERIC,
+> CONFIG_CRYPTO_HCTR2, CONFIG_CRYPTO_ARIA as module enables support of
+> sm3, sm4, aria, polyval & xctr.
+> 
+> Signed-off-by: Kshitiz Varshney <kshitiz.varshney@nxp.com>
 
+This looks like an issue in tcrypt.  When algorithms are unavailable it should
+consider the corresponding test cases to be skipped, not failed.
 
-On 1/28/2024 4:44 AM, Gaurav Kashyap wrote:
-> Use the wrapped keys quirk when hwkm is supported/used.
-> Whether to use HWKM or not would be decided during an ICE
-> probe, and based on this information, UFS can decide to use
-> wrapped keys or standard keys.
-> 
-> Also, propagate the appropriate key size to the ICE driver
-> when wrapped keys are used.
-> 
-> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
-Reviewed-by: Om Prakash Singh <quic_omprsing@quicinc.com>
->   drivers/ufs/host/ufs-qcom.c | 8 +++++++-
->   1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/ufs/host/ufs-qcom.c b/drivers/ufs/host/ufs-qcom.c
-> index acf352594362..5c9ba06438a9 100644
-> --- a/drivers/ufs/host/ufs-qcom.c
-> +++ b/drivers/ufs/host/ufs-qcom.c
-> @@ -123,6 +123,8 @@ static int ufs_qcom_ice_init(struct ufs_qcom_host *host)
->   
->   	host->ice = ice;
->   	hba->caps |= UFSHCD_CAP_CRYPTO;
-> +	if (qcom_ice_hwkm_supported(host->ice))
-> +		hba->quirks |= UFSHCD_QUIRK_USES_WRAPPED_CRYPTO_KEYS;
->   
->   	return 0;
->   }
-> @@ -160,7 +162,11 @@ static int ufs_qcom_ice_program_key(struct ufs_hba *hba,
->   	    cap.key_size != UFS_CRYPTO_KEY_SIZE_256)
->   		return -EOPNOTSUPP;
->   
-> -	ice_key_size = QCOM_ICE_CRYPTO_KEY_SIZE_256;
-> +	if (bkey->crypto_cfg.key_type == BLK_CRYPTO_KEY_TYPE_HW_WRAPPED)
-> +		ice_key_size = QCOM_ICE_CRYPTO_KEY_SIZE_WRAPPED;
-> +	else
-> +		ice_key_size = QCOM_ICE_CRYPTO_KEY_SIZE_256;
-> +
->   	if (config_enable)
->   		return qcom_ice_program_key(host->ice,
->   					    QCOM_ICE_CRYPTO_ALG_AES_XTS,
+>  arch/arm/configs/imx_v6_v7_defconfig | 4 ++++
+
+There should be no need to enable every crypto algorithm in every defconfig
+file.  Can you consider fixing the underlying issue instead of doing that?
+
+- Eric
