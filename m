@@ -1,172 +1,50 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37CB168D9;
-	Mon,  5 Feb 2024 10:07:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469691759C
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Feb 2024 10:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707127679; cv=none; b=aI/jCq6PKunj/bSeJq7XxqoDLtJPwDo8ry4i+00hayWrW+W5b1F0NhuldU7AE/dK0GRhtk0bNgeNu/9q0ZlPUZcd123cNCjLRGxaD0P8zl1XOcBPZBJ4P9c/xzGSXil8PVjxY/n2BEGGXzTnOIHWTcQPY1mNuG8UeNUttkxhlT0=
+	t=1707130636; cv=none; b=aRHNTzpYGIgx2jWfSp0rjCfKgPy6vl2Od2Hd0FFX+vPNFsV8lsK0moX+AEstE7/BUDLIVx03fnAj4oOwTtIGSWGIjc+mcjHanX5rGA4Ct9N02DBxHFz13BQtREF4mG4g1q5oUp0NgCgNKhrS/4+medAmd1zWyb76SZj1FKn7p18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707127679; c=relaxed/simple;
-	bh=iBaUmXBlN0VxxLhGqD9SvUefjOy+3CbgHgnuPzCue3A=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FxqXdmmtIAicsRKyp9mODHykKfiu6kIQfQow/pK6ddGWPfp2kPpZHzueGHtzDS0lPMILClToBaDDJOEvV0heuhZqZlP+JXY5jwfMxyYXEfxs4hK6QU/gWCWqLAW1Zdw/KsQDtYy8GXSFsZV3QCrRmPxwDkbxrtDHgySs3pwNJqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4TT26g0TNXz6GBd5;
-	Mon,  5 Feb 2024 18:04:43 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id BFC8314185F;
-	Mon,  5 Feb 2024 18:07:54 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 5 Feb
- 2024 10:07:54 +0000
-Date: Mon, 5 Feb 2024 10:07:53 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Lukas Wunner <lukas@wunner.de>
-CC: Ilpo =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, "Bjorn
- Helgaas" <helgaas@kernel.org>, David Howells <dhowells@redhat.com>, "David
- Woodhouse" <dwmw2@infradead.org>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, Alex Williamson
-	<alex.williamson@redhat.com>, <linux-pci@vger.kernel.org>,
-	<linux-cxl@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-	<keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linuxarm@huawei.com>, David Box
-	<david.e.box@intel.com>, Dan Williams <dan.j.williams@intel.com>, "Dave
- Jiang" <dave.jiang@intel.com>, "Li, Ming" <ming4.li@intel.com>, Zhi Wang
-	<zhi.a.wang@intel.com>, Alistair Francis <alistair.francis@wdc.com>, Wilfred
- Mallawa <wilfred.mallawa@wdc.com>, Alexey Kardashevskiy <aik@amd.com>, Tom
- Lendacky <thomas.lendacky@amd.com>, "Sean Christopherson"
-	<seanjc@google.com>, Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 07/12] spdm: Introduce library to authenticate devices
-Message-ID: <20240205100753.0000798b@Huawei.com>
-In-Reply-To: <20240204172510.GA19805@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
-	<89a83f42ae3c411f46efd968007e9b2afd839e74.1695921657.git.lukas@wunner.de>
-	<20231003153937.000034ca@Huawei.com>
-	<20240204172510.GA19805@wunner.de>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1707130636; c=relaxed/simple;
+	bh=A/JBG60iUAYOsvqnBHyDFd8jT2G/vKHakLPI6CqNzuo=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=II+iBh/mFPz0IL7pNYGrn0XNmrJ3x+mJPa2JmjezgiZ/yA9su/oEmJ0tHNJZrfJ0BX3iJfrcm/jM+0zGOkxcThdMO7TF9+2xXD0Efsf4zp8lGzaqcWJOgnXfywlrLxYkomqrBVOovm3lDuRba+Jnf+hHe8/hissdrESp5jjh73c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rWwes-00A1zk-9N; Mon, 05 Feb 2024 18:57:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 05 Feb 2024 18:57:15 +0800
+Date: Mon, 5 Feb 2024 18:57:15 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org
+Subject: Failed self-test on ffdhe6144(qat-dh)
+Message-ID: <ZcC/C/kpcKaoVPp4@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Sun, 4 Feb 2024 18:25:10 +0100
-Lukas Wunner <lukas@wunner.de> wrote:
+Hi:
 
-> On Tue, Oct 03, 2023 at 03:39:37PM +0100, Jonathan Cameron wrote:
-> > On Thu, 28 Sep 2023 19:32:37 +0200 Lukas Wunner <lukas@wunner.de> wrote:  
-> > > +/**
-> > > + * spdm_challenge_rsp_sz() - Calculate CHALLENGE_AUTH response size
-> > > + *
-> > > + * @spdm_state: SPDM session state
-> > > + * @rsp: CHALLENGE_AUTH response (optional)
-> > > + *
-> > > + * A CHALLENGE_AUTH response contains multiple variable-length fields
-> > > + * as well as optional fields.  This helper eases calculating its size.
-> > > + *
-> > > + * If @rsp is %NULL, assume the maximum OpaqueDataLength of 1024 bytes
-> > > + * (SPDM 1.0.0 table 21).  Otherwise read OpaqueDataLength from @rsp.
-> > > + * OpaqueDataLength can only be > 0 for SPDM 1.0 and 1.1, as they lack
-> > > + * the OtherParamsSupport field in the NEGOTIATE_ALGORITHMS request.
-> > > + * For SPDM 1.2+, we do not offer any Opaque Data Formats in that field,
-> > > + * which forces OpaqueDataLength to 0 (SPDM 1.2.0 margin no 261).
-> > > + */
-> > > +static size_t spdm_challenge_rsp_sz(struct spdm_state *spdm_state,
-> > > +				    struct spdm_challenge_rsp *rsp)
-> > > +{
-> > > +	size_t  size  = sizeof(*rsp)		/* Header */  
-> > 
-> > Double spaces look a bit strange...
-> >   
-> > > +		      + spdm_state->h		/* CertChainHash */
-> > > +		      + 32;			/* Nonce */
-> > > +
-> > > +	if (rsp)
-> > > +		/* May be unaligned if hash algorithm has unusual length. */
-> > > +		size += get_unaligned_le16((u8 *)rsp + size);
-> > > +	else
-> > > +		size += SPDM_MAX_OPAQUE_DATA;	/* OpaqueData */
-> > > +
-> > > +	size += 2;				/* OpaqueDataLength */
-> > > +
-> > > +	if (spdm_state->version >= 0x13)
-> > > +		size += 8;			/* RequesterContext */
-> > > +
-> > > +	return  size  + spdm_state->s;		/* Signature */  
-> > 
-> > Double space here as well looks odd to me.  
-> 
-> This was criticized by Ilpo as well, but the double spaces are
-> intentional to vertically align "size" on each line for neatness.
-> 
-> How strongly do you guys feel about it? ;)
+I received a report that ffdhe6144(dh-qat) fails its self-test:
 
-I suspect we'll see 'fixes' for this creating noise for maintainers.
-So whilst I don't feel that strongly about it I'm not sure the alignment
-really helps much with readability either.
- 
-> 
-> 
-> > > +int spdm_authenticate(struct spdm_state *spdm_state)
-> > > +{
-> > > +	size_t transcript_sz;
-> > > +	void *transcript;
-> > > +	int rc = -ENOMEM;
-> > > +	u8 slot;
-> > > +
-> > > +	mutex_lock(&spdm_state->lock);
-> > > +	spdm_reset(spdm_state);  
-> [...]
-> > > +	rc = spdm_challenge(spdm_state, slot);
-> > > +
-> > > +unlock:
-> > > +	if (rc)
-> > > +		spdm_reset(spdm_state);  
-> > 
-> > I'd expect reset to also clear authenticated. Seems odd to do it separately
-> > and relies on reset only being called here. If that were the case and you
-> > were handling locking and freeing using cleanup.h magic, then
-> > 
-> > 	rc = spdm_challenge(spdm_state);
-> > 	if (rc)
-> > 		goto reset;
-> > 	return 0;
-> > 
-> > reset:
-> > 	spdm_reset(spdm_state);  
-> 
-> Unfortunately clearing "authenticated" in spdm_reset() is not an
-> option:
-> 
-> Note that spdm_reset() is also called at the top of spdm_authenticate().
-> 
-> If the device was previously successfully authenticated and is now
-> re-authenticated successfully, clearing "authenticated" in spdm_reset()
-> would cause the flag to be briefly set to false, which may irritate
-> user space inspecting the sysfs attribute at just the wrong moment.
+alg: ffdhe6144(dh): test failed on vector 1, err=-22
+alg: self-tests for ffdhe6144(qat-dh) (ffdhe6144(dh)) failed (rc=-22)
 
-That makes sense. Thanks.
+Could you please take a look at this and see if it's
+reproducible for you?
 
-> 
-> If the device was previously successfully authenticated and is
-> re-authenticated successfully, I want the "authenticated" attribute
-> to show "true" without any gaps.  Hence it's only cleared at the end
-> of spdm_authenticate() if there was an error.
-> 
-> I agree with all your other review feedback and have amended the
-> patch accordingly.  Thanks a lot!
-> 
-> Lukas
-> 
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
