@@ -1,106 +1,153 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2C92E416;
-	Mon,  5 Feb 2024 15:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CDC532C8C;
+	Mon,  5 Feb 2024 15:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707147981; cv=none; b=aBnoa85ipNRiw56m/+XDVhPaPDfwIl0FlpSNG+FyecbI7rtES2u1n4Gcde3nMI7CePCd0lguWXahFPv/bhcbDhOPukMP8N/yfyCj51E8ecDZuJ7wVfp8Kw9MbQr4jfMqPb7wtVbYu+2QITunyuxKx7DFELPlMi2Vuuay7Vi2kmk=
+	t=1707148542; cv=none; b=Soc0sU6EDmU5uN2K6SazmGeuntyxcVsAewSpdSGVyLFrFWnIbNlYr/f+Tj0uWwP+9KujY/inTHxBHuxExF3SxfuDCKfNaAaVaT8/U2rG5E/f6DlbnCFDSaHkhj2/gFDQqbnIWz3vmEnNxpbpHHpYZIloHCn4ibxP/cZTdG2RFcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707147981; c=relaxed/simple;
-	bh=99DLMoiQw9UdibYsb7nW4kjtVppg2enuDKrfn5xnVBo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K5XrCojhOyBsHcfOTRZ9M4noEFF2anA4/zWpQPd880C+Qge4EUscyUY3FScBbkeAlPhMu5V79gS5CgfztwcdqCxv0hhp42IHf/Moc6JT7LhVuFQ+ucsUmwmxg7ABX5TxQapqPmVEeXKGKiG5PDNzXC6rqVwScF1lYrd/QTlDkDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=OOCwvCd5 reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1707148542; c=relaxed/simple;
+	bh=H4oRgV/jEie/v77cuvbTK14qC3liSqOPe1rAe25bwNA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QXf0ZwBbdy/ZZmhPhV95oOAojVunPYNsdTOMYWyxJm2ZSUFkQcjyL/mMJea5Abdw0FwhmuTykpLRL7BrSUso/M3urgxxX7KeYIDREJtiPqHWw7eIDObe6Nvx/NL6JCTTFnmtIqupJzvRthSPGEKdG0L6mQsRQrwZqHHBJsGPMJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=YD82x4dZ; arc=none smtp.client-ip=37.18.73.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="OOCwvCd5"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3DC5940E023B;
-	Mon,  5 Feb 2024 15:46:15 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
-	reason="fail (body has been altered)" header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id vjXImscZRHXO; Mon,  5 Feb 2024 15:46:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1707147972; bh=wbm3Vi14SEHcJedVBXKYDq7ca7nh/UFMqRcdkimkw/E=;
-	h=From:To:Cc:Subject:Date:From;
-	b=OOCwvCd5/pLan3qvX+REeAAkY0+icWbWTYpNGlSt7Fr4ugiRQm2mHi1fI4867IU8m
-	 SZUQ8Zb2ZJ1eEoyh7Rd5qExLze2GAViBfTc6e75cXvzo1rtDNuL4R7tMkPWOdhYKy0
-	 UexLSiEOvw9/8PfrZBf5gtz0QvndmcZwmh8M2C3UhNISgMzLy14edLYbnfMux1HlFc
-	 3K9Jqz2mmYAtw7eV419OJOrH42CrHfrlCBgdk7qKKN90ZMn8xt3rCyofg5+C8VoWe0
-	 Z8+0tZHhDDOURvqCqMxQ+Q+KFcrivqDuleR+wZeQWX6xc6w4oMxwCabTwKir5qUJAA
-	 o76ILQ/lUENzce4AyygZQfIDC5a8LRLikIoBmVYZlie+EXM/+IKhI4g2titKHjmWPx
-	 vpeE2bK80HbifGq+wjhe4sor+f+DhbywzYclEpqVSs5IHNODDCV1D7FP8zSs3yr7CE
-	 tM29DcXBkIzcFOcNf9+M/S0TzeeSBWeKiKSuzSGJ99q26/nEFZHX1ftFi6DtL/JO4P
-	 sHpfQn2X094jQwxTXAZLEoXfICYAfFbsob5tkTJBDWldYVuMD29XHFXuZwQEGJeJAT
-	 bHGeXyB9MTnvsS2HGxVTxkZuqjpRc0qkdBPzRyi4XJaBSlHnwcKgEnL3kBNP9wqomT
-	 fHGJ5EaHm9EFwuJKpaYgNHpE=
-Received: from zn.tnic (pd953021b.dip0.t-ipconnect.de [217.83.2.27])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="YD82x4dZ"
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 92CA210000D;
+	Mon,  5 Feb 2024 18:55:34 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 92CA210000D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1707148534;
+	bh=WukR0BEdUiJljBEquye27ZsOeD9lCcogq+wY4cXLaGs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=YD82x4dZDSufRR2KwQjmJ6ULUyOujM2Yrk8mjuB+kdZWu/ZV9jcc/ubWaR9AhdM2z
+	 YAr6unQlgzCAysmjK3Cv5dzibjaY8XwliylOO2pSyJ9HBjhqSkCTq1U2xx1c684ysM
+	 EMD68XNRWdPKGmQYml4nfjfgCXgybI3KTU+G6ivLkbyfPbbSeeOcyvkKBNtkAE546F
+	 0z48jglMlCFICe2wZN8QzgsGyfeExtqnTIVFrKk2c/rGVk8JkvDCwUQ5mZ1wbfxI27
+	 1m8CYKI0VfWuIP6CuKBfyRv5pRdqD5w7gtg+fBUGMEJsGXTc3qu/ojm65x1LAmtct8
+	 GU5UqEei2xrNQ==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6C55B40E01A9;
-	Mon,  5 Feb 2024 15:46:08 +0000 (UTC)
-From: Borislav Petkov <bp@alien8.de>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: John Allen <john.allen@amd.com>,
-	linux-crypto@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: ccp - State in dmesg that TSME is enabled
-Date: Mon,  5 Feb 2024 16:46:01 +0100
-Message-ID: <20240205154602.21411-1-bp@alien8.de>
-X-Mailer: git-send-email 2.43.0
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Mon,  5 Feb 2024 18:55:34 +0300 (MSK)
+Received: from user-A520M-DS3H.sberdevices.ru (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 5 Feb 2024 18:55:32 +0300
+From: Alexey Romanov <avromanov@salutedevices.com>
+To: <neil.armstrong@linaro.org>, <clabbe@baylibre.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<khilman@baylibre.com>, <jbrunet@baylibre.com>,
+	<martin.blumenstingl@googlemail.com>
+CC: <linux-crypto@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kernel@salutedevices.com>, Alexey
+ Romanov <avromanov@salutedevices.com>
+Subject: [PATCH v3 00/20] Support more Amlogic SoC families in crypto driver 
+Date: Mon, 5 Feb 2024 18:55:01 +0300
+Message-ID: <20240205155521.1795552-1-avromanov@salutedevices.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 183204 [Feb 05 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.3
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;smtp.sberdevices.ru:7.1.1,5.0.1;lore.kernel.org:7.1.1;gist.github.com:7.1.1;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/02/05 14:21:00
+X-KSMG-LinksScanning: Clean, bases: 2024/02/05 14:21:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/02/05 10:19:00 #23362212
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-From: "Borislav Petkov (AMD)" <bp@alien8.de>
+Hello!
 
-In the case when only TSME is enabled, it is useful to state that fact
-too, so that users are aware that memory encryption is still enabled
-even when the corresponding software variant of memory encryption is not
-enabled.
+This patchset expand the funcionality of the Amlogic
+crypto driver by adding support for more SoC families:
+AXG, G12A, G12B, SM1, A1, S4.
 
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+Also specify and enable crypto node in device tree
+for reference Amlogic devices.
+
+Tested on AXG, G12A/B, SM1, A1 and S4 devices via
+custom tests [1] and tcrypt module.
+
 ---
- drivers/crypto/ccp/psp-dev.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 124a2e0c8999..56bf832c2947 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -156,11 +156,14 @@ static unsigned int psp_get_capability(struct psp_d=
-evice *psp)
- 	}
- 	psp->capability =3D val;
-=20
--	/* Detect if TSME and SME are both enabled */
-+	/* Detect TSME and/or SME status */
- 	if (PSP_CAPABILITY(psp, PSP_SECURITY_REPORTING) &&
--	    psp->capability & (PSP_SECURITY_TSME_STATUS << PSP_CAPABILITY_PSP_S=
-ECURITY_OFFSET) &&
--	    cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
--		dev_notice(psp->dev, "psp: Both TSME and SME are active, SME is unnece=
-ssary when TSME is active.\n");
-+	    psp->capability & (PSP_SECURITY_TSME_STATUS << PSP_CAPABILITY_PSP_S=
-ECURITY_OFFSET)) {
-+		if (cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
-+			dev_notice(psp->dev, "psp: Both TSME and SME are active, SME is unnec=
-essary when TSME is active.\n");
-+		else
-+			dev_notice(psp->dev, "psp: TSME enabled\n");
-+	}
-=20
- 	return 0;
- }
---=20
-2.43.0
+Changes V1 -> V2 [2]:
+
+- Rebased over linux-next.
+- Adjusted device tree bindings description.
+- A1 and S4 dts use their own compatible, which is a G12 fallback.
+
+Changes V2 -> V3 [3]:
+
+- Fix errors in dt-bindings and device tree.
+- Add new field in platform data, which determines
+whether clock controller should be used for crypto IP.
+- Place back MODULE_DEVICE_TABLE.
+- Correct commit messages.
+
+Links:
+  - [1] https://gist.github.com/mRrvz/3fb8943a7487ab7b943ec140706995e7
+  - [2] https://lore.kernel.org/all/20240110201216.18016-1-avromanov@salutedevices.com/
+  - [3] https://lore.kernel.org/all/20240123165831.970023-1-avromanov@salutedevices.com/
+
+Alexey Romanov (20):
+  drivers: crypto: meson: don't hardcode IRQ count
+  drviers: crypto: meson: add platform data
+  drivers: crypto: meson: make CLK controller optional
+  drivers: crypto: meson: add MMIO helpers
+  drivers: crypto: meson: move get_engine_number()
+  drivers: crypto: meson: drop status field from meson_flow
+  drivers: crypto: meson: move algs definition and cipher API to
+    cipher.c
+  drivers: crypto: meson: cleanup defines
+  drivers: crypto: meson: process more than MAXDESCS descriptors
+  drivers: crypto: meson: avoid kzalloc in engine thread
+  drivers: crypto: meson: introduce hasher
+  drivers: crypto: meson: add support for AES-CTR
+  drivers: crypto: meson: use fallback for 192-bit keys
+  drivers: crypto: meson: add support for G12-series
+  drivers: crypto: meson: add support for AXG-series
+  dt-bindings: crypto: meson: support new SoC's
+  arch: arm64: dts: meson: a1: add crypto node
+  arch: arm64: dts: meson: s4: add crypto node
+  arch: arm64: dts: meson: g12: add crypto node
+  arch: arm64: dts: meson: axg: add crypto node
+
+ .../bindings/crypto/amlogic,gxl-crypto.yaml   |  44 +-
+ arch/arm64/boot/dts/amlogic/meson-a1.dtsi     |   7 +
+ arch/arm64/boot/dts/amlogic/meson-axg.dtsi    |   6 +
+ .../boot/dts/amlogic/meson-g12-common.dtsi    |   6 +
+ arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |   6 +
+ drivers/crypto/amlogic/Makefile               |   2 +-
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 602 ++++++++++++------
+ drivers/crypto/amlogic/amlogic-gxl-core.c     | 290 +++++----
+ drivers/crypto/amlogic/amlogic-gxl-hasher.c   | 452 +++++++++++++
+ drivers/crypto/amlogic/amlogic-gxl.h          | 117 +++-
+ 10 files changed, 1183 insertions(+), 349 deletions(-)
+ create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
+
+-- 
+2.34.1
 
