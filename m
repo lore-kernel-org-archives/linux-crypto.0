@@ -1,148 +1,93 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D047D12EBEB
-	for <linux-crypto@vger.kernel.org>; Tue,  6 Feb 2024 11:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E6B12CDA2
+	for <linux-crypto@vger.kernel.org>; Tue,  6 Feb 2024 12:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707220790; cv=none; b=MQNssqhrdkweJjGLRbKi5bjOJV6ObIo5s6VeeSOolHI6yEhdvO8YOThyX2b5JcC9H1eQRvF5Q/c5MggjDnQ5DRQEpNaeXVWt8wzH5CN68w99Yq3ukJeO7sbknatmSvENDrpidmAoTGhvbwygYYcrf1KD00mDKqw0vblUidovYt0=
+	t=1707221411; cv=none; b=CLD95XfM45czGmej4O7KTbZxc54Mt9I+weKDaFRAmBwMdy2CcVwh3j4CUiw1jp7Z/Ek09t4pTZoU44GyaX6g2wJBjrx9LJIQusYChU59c1Ga5sEoabfQg4GWzVo3453PZPzaVjAm6v/tlVl3T8q54Lq/ZrPeWv2RNW+ss6QLYKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707220790; c=relaxed/simple;
-	bh=EtsT4PQhPQG5JWztb0+mi4R2d7ka72NiRj+QIgwDG5g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nmL5Kr3YNFxW6fN/pOhILLcI6nAwRPLmdZXdC47Vy5GCNQnJBvkMe1SqZpzKjw+kjjxdGgXWyxirhsV/OPUdQmShG2/0LvX7ZF9fWBWLKsKT/vc7qyKQTH13p3+Fn6mG8hnRWBcKPTo/w55wYSqg75eF7Y0XVF9MRtmDctjDj18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GtTxLIMz; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1707221411; c=relaxed/simple;
+	bh=i4UWx+KB6k5rhBfd9xHyOK3WXVN5exrluwojnhLg4ag=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=EA4n2ZnPAmp2FSV/LDHeMFcV1BVqVUv+uwfxNMMuCLQbPDIzFPl2vpNPswprgq4MkxTvgjaLH96lzlWeL0mEb3tf8vc9BXo8Vg5ZEXf47D8//eaXXJe/73Hi3RuLMmtnEcFAzlBNqbG+HgmPPoQOE39M926iMPSO+tp3ISkVb64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cH3PW+gW; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GtTxLIMz"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-60412f65124so50730677b3.3
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Feb 2024 03:59:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cH3PW+gW"
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3bba0ac2e88so284177b6e.0
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Feb 2024 04:10:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707220787; x=1707825587; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=CNhycZjEYpR/VohePuZrM34Prmw23zgM6uVQKrTP5kw=;
-        b=GtTxLIMzLdlaDjq/Bw5H46F0QD6Zysg6LeAx7+TINdOecjHhufuiBCKu3WYEAEL1tS
-         nbkE8nZT83JydFmCmwha0ZT3mKKDxDs2fYVBjlaHbbomFJc/QPbZjoKMd5Zra4gl72+K
-         +sTlNTtcj9sHUnkMFgwXqw+zaPRrx6/nSWpp54I5LwKF3pbvnAIXEeWfdIusrOX/777U
-         8WnOa1J0b3dZO4NhnqUbdaIwRPNEHsVpM6CEtfXrlI9zizyxVOxIriBnS4irdjrIpPc2
-         bpgaqOy+ZSO7+KY2pHW0112AITamvma9DRzckOjtpq1Ig3BxB/ywNJWx/1AkeXNu1HDH
-         qEqQ==
+        d=gmail.com; s=20230601; t=1707221409; x=1707826209; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/KaQhFrp/zmRzqbdPjMI4mPbsvxaF4/4MawXckaGjzU=;
+        b=cH3PW+gWcM39eFwfAhhUFsaY3BGHw/SEYGZmXSGl2MZW+l8jxcsRec+iaMOFyt0hz5
+         L0R0NE/ZegT3tFo6GrkigXCccH1othnea900QdIEZX1zOkthmwMbh+HCsN/MRIWHY9Qb
+         8GbSIWIAeZgQQyYXbcBGL0W5KTwz6+Lgvtpx6yGyfQLGdTfoi+jdsF16t0fmrT93yIqT
+         Rhzsq3VIJ5JpGgU0i25ZaILUAaFDK3sMCdQYtuuziZl8ojj21ag3JTp3Wjm6KnvGyQSH
+         NlZX6emfwDhI3YuwOWMUqsrQMGywxB6iGnURkViEcWuyK3JAzmUIsu3osGB9ac9dRwVS
+         a/yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707220787; x=1707825587;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CNhycZjEYpR/VohePuZrM34Prmw23zgM6uVQKrTP5kw=;
-        b=YtmAEpEVRk9UYTN1y0xe82UsbCdz5dCF/MkliDlWcUOu/NNIw0HLFdu7nv+3xdAxkZ
-         daGOwslR27WePYqgfduIPjzraUp/0KHbub+gNCaxYJZQZX1cj3hNKqLj7WyaOmey2G/U
-         mMFmY3fJ5yuvM0zOvy66BfR0VdemQqNLowqEFkfTJE8hW/QXZ+CD0pQ7PaiGDZ8Y57Af
-         sOkcLJOrlCn0GZMWsETPbSXzBW57NFVvCCDq4JvA3SZnHTvvIA+Dm/UUfockzBdhB4pj
-         zvAyFaUeJfaF0sOpdYmpfIuRamvh80TKsxr/MBfVy383Gi8VXgb6zTJw2SUlMs9RCglE
-         DRqw==
-X-Gm-Message-State: AOJu0Yy4Uaq7NwK355y3hcEv8oZZSkfrD1dLIe+udP722Rd6hzk//Dn1
-	gK9m+xvIh3c6NvYezYQp01F9ZtHwzAmnxuqtuvKezL5A1GmBvDNuhlbPOelMgAXPOcG+fBLefPo
-	Yy+MaZTlWSlysgzzUyA6YQRtIZJBYuO03kfv+RQ==
-X-Google-Smtp-Source: AGHT+IGp4zSfVN0bhdWn/BNXPVm1N0DQtGd+SBJSrjS/zOeOsHkJO47hbNHRq2jlyZogmxAAIrtYFkDNTHHiPQLWpKw=
-X-Received: by 2002:a81:b3c7:0:b0:603:bc00:b469 with SMTP id
- r190-20020a81b3c7000000b00603bc00b469mr1635531ywh.11.1707220786825; Tue, 06
- Feb 2024 03:59:46 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707221409; x=1707826209;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/KaQhFrp/zmRzqbdPjMI4mPbsvxaF4/4MawXckaGjzU=;
+        b=A7IDVUhSRIJ08pBZ4Yqdnbs/pjM50oiTMQlkMD7MbT2mNIFZpUuBH3rLnI+8NkA7Wy
+         CbVSTdWhIDzaaT4jXrVG5BAem4fSkMi/3XKrpCm+nV3b2MICHqUyYdfOmEDlI6yrxsLw
+         67/MyMJ6olqY0VH4feKI7zJiPHjHw0IPz5N+TAeSlW0d5h++Tuejzuw9JW2kPHM0alNN
+         4oYV3Ho8Dym9bFkTA6tz694e8Y4LX3i/ZPCz2N+QmfgReozbOZHaAP5K4+U/fJEO3QO9
+         G3LKNzlQWjsxJYe4X1hiXchv1V3h2+EALhY2vqaAAC7r6l4DAwNLwjnF437myQpOY51c
+         FAyA==
+X-Gm-Message-State: AOJu0YxtXTOJJI7yBVAe+V0aoqyTXaM7D/AqPtEBfvBOSCynlHBbzxOP
+	mJOqmRBfUcGzqb4ibIuYnET5gpdw2XpV1XgrGbOdzhu5W5ssBDMTlzxMrTyWkY5gQEDs+4zCBBP
+	ui4wXbDMRncnWmHDeZzJWa0ERboLqaWci7A==
+X-Google-Smtp-Source: AGHT+IEkGDgkXq6vKCpEkng0hu2wELk4EAnD4yBM6NBeAP1m/fdEF3zCFVBfnlrzLM53Hp6zpaoGnL4yGDs2wAbPDE8=
+X-Received: by 2002:a05:6808:bcc:b0:3bd:a00e:edf8 with SMTP id
+ o12-20020a0568080bcc00b003bda00eedf8mr1221532oik.8.1707221409146; Tue, 06 Feb
+ 2024 04:10:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240127232436.2632187-1-quic_gaurkash@quicinc.com> <20240127232436.2632187-4-quic_gaurkash@quicinc.com>
-In-Reply-To: <20240127232436.2632187-4-quic_gaurkash@quicinc.com>
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Date: Tue, 6 Feb 2024 12:59:36 +0100
-Message-ID: <CACMJSetM_JQ+1bTEszc4EtaUwb2iKkbg3WFWVTsXa14KD_VKCA@mail.gmail.com>
-Subject: Re: [PATCH v4 03/15] qcom_scm: scm call for create, prepare and
- import keys
-To: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	andersson@kernel.org, ebiggers@google.com, neil.armstrong@linaro.org, 
-	srinivas.kandagatla@linaro.org, krzysztof.kozlowski+dt@linaro.org, 
-	conor+dt@kernel.org, robh+dt@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, kernel@quicinc.com, linux-crypto@vger.kernel.org, 
-	devicetree@vger.kernel.org, quic_omprsing@quicinc.com, 
-	quic_nguyenb@quicinc.com, konrad.dybcio@linaro.org, ulf.hansson@linaro.org, 
-	jejb@linux.ibm.com, martin.petersen@oracle.com, mani@kernel.org, 
-	davem@davemloft.net, herbert@gondor.apana.org.au
+From: "Jayalakshmi Manunath Bhat ," <bhat.jayalakshmi@gmail.com>
+Date: Tue, 6 Feb 2024 17:38:40 +0530
+Message-ID: <CALq8Rv+w+E=KZrOXJirtS7jzUWEeL++7k0W+RXe5yKAK7OpfHQ@mail.gmail.com>
+Subject: Sub: USGV6 test v6LC.2.2.23- Processing Router Advertisement failure
+ on version 5.10
+To: linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Sun, 28 Jan 2024 at 00:26, Gaurav Kashyap <quic_gaurkash@quicinc.com> wrote:
->
-> Storage encryption has two IOCTLs for creating, importing
-> and preparing keys for encryption. For wrapped keys, these
-> IOCTLs need to interface with Qualcomm's Trustzone, which
-> require these SCM calls.
->
-> generate_key: This is used to generate and return a longterm
->               wrapped key. Trustzone achieves this by generating
->               a key and then wrapping it using hwkm, returning
->               a wrapped keyblob.
-> import_key:   The functionality is similar to generate, but here,
->               a raw key is imported into hwkm and a longterm wrapped
->               keyblob is returned.
-> prepare_key:  The longterm wrapped key from import or generate
->               is made further secure by rewrapping it with a per-boot
->               ephemeral wrapped key before installing it to the linux
->               kernel for programming to ICE.
->
-> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
->  drivers/firmware/qcom/qcom_scm.c       | 182 +++++++++++++++++++++++++
->  drivers/firmware/qcom/qcom_scm.h       |   3 +
->  include/linux/firmware/qcom/qcom_scm.h |   5 +
->  3 files changed, 190 insertions(+)
->
-> diff --git a/drivers/firmware/qcom/qcom_scm.c b/drivers/firmware/qcom/qcom_scm.c
-> index 4882f8a36453..20dbab765c8e 100644
-> --- a/drivers/firmware/qcom/qcom_scm.c
-> +++ b/drivers/firmware/qcom/qcom_scm.c
-> @@ -1285,6 +1285,188 @@ int qcom_scm_derive_sw_secret(const u8 *wkey, size_t wkey_size,
->  }
->  EXPORT_SYMBOL_GPL(qcom_scm_derive_sw_secret);
->
-> +/**
-> + * qcom_scm_generate_ice_key() - Generate a wrapped key for encryption.
-> + * @lt_key: the wrapped key returned after key generation
-> + * @lt_key_size: size of the wrapped key to be returned.
-> + *
-> + * Qualcomm wrapped keys need to be generated in a trusted environment.
-> + * A generate key IOCTL call is used to achieve this. These are longterm
-> + * in nature as they need to be generated and wrapped only once per
-> + * requirement.
-> + *
-> + * Adds support for the create key IOCTL to interface
-> + * with the secure environment to generate and return a wrapped key..
-> + *
-> + * Return: longterm key size on success; -errno on failure.
-> + */
-> +int qcom_scm_generate_ice_key(u8 *lt_key, size_t lt_key_size)
-> +{
-> +       struct qcom_scm_desc desc = {
-> +               .svc = QCOM_SCM_SVC_ES,
-> +               .cmd =  QCOM_SCM_ES_GENERATE_ICE_KEY,
-> +               .arginfo = QCOM_SCM_ARGS(2, QCOM_SCM_RW, QCOM_SCM_VAL),
-> +               .args[1] = lt_key_size,
-> +               .owner = ARM_SMCCC_OWNER_SIP,
-> +       };
-> +
-> +       void *lt_key_buf;
-> +       int ret;
-> +
-> +       lt_key_buf = qcom_tzmem_alloc(__scm->mempool, lt_key_size, GFP_KERNEL);
+Hi All,
 
-Please use __free(qcom_tzmem) everywhere in this series. You can take
-a look at the calls I converted in the series adding this allocator.
-It's really useful - especially if the buffer is surely freed within
-the same scope.
+We are executing IPv6 Ready Core Protocols Test Specification for
+Linux kernel 5.10.201 for USGv6 certification.
+Under Test v6LC.2.2.23: Processing Router Advertisement with Route
+Information Option (Host Only) , there are multiple tests from A to J
+category. We are facing issues with test category F which is described
+below.
 
-Bart
+Part F: PRF change in Route Information Option.
 
-[snip]
+ Here is what is happening:
+Router Advertisement sent from router A with PRF low.
+Router Advertisement sent from router B with PRF medium.
+Echo Request.
+Echo Reply expected to be directed to router B. However, reply is sent
+to router A
+Router Advertisement sent from router A with PRF high.
+Echo Request.
+Echo Reply expected to be directed to router A. However,  reply is
+sent to router B
+
+We tried introducing delay in the test case between each request to
+allow processing to complete. This did not help.
+Has anyone observed this behavior? Is there a patch for this issue ?
+Please suggest how to go about finding a solution for this failure.
+If I need to post this to other linux network users forums as well,
+please let me know.
+
+Regards,
+Jayalakshmi
