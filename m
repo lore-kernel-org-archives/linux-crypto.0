@@ -1,132 +1,72 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDBC1CF8B
-	for <linux-crypto@vger.kernel.org>; Tue,  6 Feb 2024 23:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D94A8BEE;
+	Wed,  7 Feb 2024 00:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707263522; cv=none; b=D/fG0E9WBfjBj0a2cBtpVyVjLgAYEQByr4Hbsm4f8TnXKfbf6CvJHynw1Ymv5YtFdodLX1ZOv3gX9pHNIx6HDyxSY9eq2brK+aAhN9oxRNXB+YXqml+XFk0GflCbagTTxCbd8VA2f7OJKHTUZvawAs2TuntCFwyqmwuHrsKMg4g=
+	t=1707266846; cv=none; b=ZSrz6DYHRz/7HAF71IXARsnYz4gmY6ouCJk+69NY7PjxJYd/FDNhRgzgRwvgUUk9gBGD4Tu59DoecMtgKp7GhiTtMwMgA4WT/cu2o7DHlmByO9U2agqPMiQkmMfrR2jgdeLbi0yMWzm6sBxC432O1ZgPguAHdo4iJgmlA14QZMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707263522; c=relaxed/simple;
-	bh=ve66283HQWjoTIfCCyXOJ53dpz5pgvyRfthFOrG2wSQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TnKeG201wNjVis+DCYz7Wrh39Wt+6IryteA3p44M76Z8SwbqaysBdHNAQhsjoc650lelhAjNBGapBk2HGerAq6kcisXsAFAGgFWB2vAU0n32Lfl4MN4TNGXr+PVl9gwk9tRiu2Z9ERp2YIkPwyCUrokmkYPP/34cn706fAEPCYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fels2s3I; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1707266846; c=relaxed/simple;
+	bh=iqHxgOHuYFmk9YND73eU0cO+vCD/4trx3LeVLF6gEa0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hQptI/RFkt8HvpVIdpv3n7rwFvNcCiiW8k0GgrNIhAhmpY/2tbOQfFOlFOGHst7p0ZlhWKiF+PvxMkGch5wbmgRWgh01L+sU+rhB0HhI+0y6QUtzdTJXroiweWxqg00ujJsaMhZ3VHbVZbkVznOEzkzdMsEGCKWFYak0/bpi6yU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IgWpcCRL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fels2s3I"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707263519;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QlaMHMv+OFsz29LUU+CREUFzhlwBZ5CupOOm81GfonI=;
-	b=fels2s3IuSxeSTU0T1hhpedDNZri0VY5q4h8xVz36HJgxtjdNUWCw5/tp6GvyaYiEe4+AY
-	BjYVVSEgV16IjWuescU2tlfpHz9qrAhwtCYmz+rMMkPr0JLNE3eQstlzVX16jruBBIgD3R
-	BqOHb00jFRULkYfrz4tx9+MO8unakes=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-204-4xGAveEmPaS4wtCM3OvurA-1; Tue, 06 Feb 2024 18:51:58 -0500
-X-MC-Unique: 4xGAveEmPaS4wtCM3OvurA-1
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-46d26e4118dso4906137.0
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Feb 2024 15:51:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707263518; x=1707868318;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QlaMHMv+OFsz29LUU+CREUFzhlwBZ5CupOOm81GfonI=;
-        b=LQ1oFHz87XyAX7TtS1rD/sL/YZ7QfzLRWI6irfJltJLIPRYGz2mx2dRqfHgw+YoYsr
-         v5Oj0q8aKF73I/JOI6Ua6P5mLrasbgXgkNy5mPnW11VkD2UvqQMSjgSxdWNdFfP/4afo
-         OU/Qy7/EyUqYcR/TCJqQq/cV9JRaKj+PqBgSn7BiDp2Swzm5nZ359AKEdK12AHFXzwZh
-         24Rp+yKllxzRdX9uXVck5MDHAk4AXiFTNlSKqNZSEHy5v5JAPrLSxIC53wAsaXBSgdQl
-         yGMCmrS3GDzNAKDGNpEQlZbxXdK4FKaI1eelheSJ8yVngvfZdqSwo9q3U7vr+ZS00Vnh
-         3MSg==
-X-Gm-Message-State: AOJu0YzMjnCfJhht7jtpR7q9CRwK/FieIBWvvbpYfk+B7xfZoi7EzDJu
-	yFI6BnVSC1bkdaQC/IRb8EI+HjPZmSH9krTnR2RD+K3HCVgRumbDHqMZ6XQG3rgKJvwuSinv2ve
-	Zj/4JkK/CQIDkVSebg+bIBXZGpG8lr2Cyhvu7R6xVC5t0WEu1SothcOMLCiIERqWp2txxTCw2Eq
-	AceyDhqw33o/NYoBKQdopZpxX+Ln1BwBZ8UZdb
-X-Received: by 2002:a05:6102:cf:b0:46c:fd63:bde1 with SMTP id u15-20020a05610200cf00b0046cfd63bde1mr1286412vsp.19.1707263518113;
-        Tue, 06 Feb 2024 15:51:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF70k2IB6sfXGMG5DxBsPeJSyX4Z7lyvMyz2eIY0biSnZnIU+nH0ONxsk7eIwQOzejVn484uJrg8s77iTZynRo=
-X-Received: by 2002:a05:6102:cf:b0:46c:fd63:bde1 with SMTP id
- u15-20020a05610200cf00b0046cfd63bde1mr1286379vsp.19.1707263517863; Tue, 06
- Feb 2024 15:51:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IgWpcCRL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DAB3C433F1;
+	Wed,  7 Feb 2024 00:47:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707266845;
+	bh=iqHxgOHuYFmk9YND73eU0cO+vCD/4trx3LeVLF6gEa0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IgWpcCRLQhkVQtpOkfg/qGEI4J2qtrzW0bdMNunzjROZxeOQ/OD3+soNK+E6gYd6V
+	 NU+KW9AHJGg1GSKDukeeoGxEHzefuUZ7ejTpVSPSkucR9/05xrfbrXlsDHXG4xbYCx
+	 ZVW8RelbRk88iiGisT8knwuJi4RAOLMpTnABx8vG5xP/o3Hh5ww+zoz6QcvPTFSkuo
+	 CGnhSXiEgbdTNom7SBTZN2W2ro54td1SSjbBsLgxOZ0V9cdPi0mMds+dC4FnoB85eu
+	 uY6S39REIprg28NgBMrfSbGz5GO/aCy4affm1JBCUHGgrXAGRy4DJ8tfTrOfAaeT9X
+	 wKpaEKwOcKN/A==
+Date: Tue, 6 Feb 2024 16:47:23 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev
+Subject: Re: A question about modifying the buffer under authenticated
+ encryption
+Message-ID: <20240207004723.GA35324@sol.localdomain>
+References: <f22dae2c-9cac-a63-fff-3b0b7305be6@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231230172351.574091-1-michael.roth@amd.com> <20231230172351.574091-16-michael.roth@amd.com>
-In-Reply-To: <20231230172351.574091-16-michael.roth@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 7 Feb 2024 00:51:46 +0100
-Message-ID: <CABgObfYDeUWMT03=yjvKG5J2GHYc9M7+A4+oY22gpqMCk1eQBg@mail.gmail.com>
-Subject: Re: [PATCH v11 15/35] KVM: SEV: Add KVM_SNP_INIT command
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
-	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com, 
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com, 
-	Brijesh Singh <brijesh.singh@amd.com>, Pavan Kumar Paluri <papaluri@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f22dae2c-9cac-a63-fff-3b0b7305be6@redhat.com>
 
-On Sat, Dec 30, 2023 at 6:26=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
- wrote:
->
-> From: Brijesh Singh <brijesh.singh@amd.com>
->
-> The KVM_SNP_INIT command is used by the hypervisor to initialize the
-> SEV-SNP platform context. In a typical workflow, this command should be
-> the first command issued. When creating SEV-SNP guest, the VMM must use
-> this command instead of the KVM_SEV_INIT or KVM_SEV_ES_INIT.
->
-> The flags value must be zero, it will be extended in future SNP support
-> to communicate the optional features (such as restricted INT injection
-> etc).
+On Tue, Feb 06, 2024 at 10:46:59PM +0100, Mikulas Patocka wrote:
+> Hi
+> 
+> I'm trying to fix some problems in dm-crypt that it may report 
+> authentication failures when the user reads data with O_DIRECT and 
+> modifies the read buffer while it is being read.
+> 
+> I'd like to ask you:
+> 
+> 1. If the authenticated encryption encrypts a message, reading from 
+>    buffer1 and writing to buffer2 - and buffer1 changes while reading from 
+>    it - is it possible that it generates invalid authentication tag?
+> 
+> 2. If the authenticated encryption decrypts a message, reading from 
+>    buffer1 and writing to buffer2 - and buffer2 changes while writing to 
+>    it - is is possible that it reports authentication tag mismatch?
+> 
 
-We have a (preexisting) problem in that KVM_SEV_INIT and
-KVM_SEV_ES_INIT are not flexible enough. debug_swap has broken
-measurements of the VMSA because it changed the contents of the VMSA
-under userspace's feet, therefore VMSA features need to be passed into
-the API somehow. It's preexisting but we need to fix it before the new
-KVM_SNP_INIT API makes it worse.
+Yes, both scenarios are possible.  But it depends on the AEAD algorithm and how
+it happens to be implemented, and on whether the data overlaps or not.
 
-I have started prototyping a change to move SEV-ES/SEV-SNP to
-KVM_CREATE_VM, and introduce a single KVM_SEV_INIT_VM operation that
-can be used for the PSP initialization.
+This is very much a "don't do that" sort of thing.
 
-> +The flags bitmap is defined as::
-> +
-> +   /* enable the restricted injection */
-> +   #define KVM_SEV_SNP_RESTRICTED_INJET   (1<<0)
-> +
-> +   /* enable the restricted injection timer */
-> +   #define KVM_SEV_SNP_RESTRICTED_TIMER_INJET   (1<<1)
-
-These are not yet supported, so they might as well not be documented.
-If you want to document them, you need to provide an API to query
-SEV_SNP_SUPPORTED_FLAGS. Let's do that later.
-
-> +       if (params.flags & ~SEV_SNP_SUPPORTED_FLAGS)
-> +               ret =3D -EOPNOTSUPP;
-> +
-> +       params.flags =3D SEV_SNP_SUPPORTED_FLAGS;
-
-This assignment is not necessary.
-
-Paolo
-
+- Eric
