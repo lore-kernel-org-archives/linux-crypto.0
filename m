@@ -1,72 +1,179 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D94A8BEE;
-	Wed,  7 Feb 2024 00:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B7410979
+	for <linux-crypto@vger.kernel.org>; Wed,  7 Feb 2024 02:43:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707266846; cv=none; b=ZSrz6DYHRz/7HAF71IXARsnYz4gmY6ouCJk+69NY7PjxJYd/FDNhRgzgRwvgUUk9gBGD4Tu59DoecMtgKp7GhiTtMwMgA4WT/cu2o7DHlmByO9U2agqPMiQkmMfrR2jgdeLbi0yMWzm6sBxC432O1ZgPguAHdo4iJgmlA14QZMk=
+	t=1707273822; cv=none; b=n/gp2wxCTvBKhR0/PEFJR2XPx9ngEESszArOLLCKnInWBaRbkloJnOfbJN/jlAAjL6cRJ1sqQkTTwFeF7FMSzymZ49EHQVU3mx1elrkQtdzmWqafwTcSlrHfzTFzEwPYj265hHSMN31MQJWHCPEyYIWrvblCdp658Zneq2NIDDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707266846; c=relaxed/simple;
-	bh=iqHxgOHuYFmk9YND73eU0cO+vCD/4trx3LeVLF6gEa0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hQptI/RFkt8HvpVIdpv3n7rwFvNcCiiW8k0GgrNIhAhmpY/2tbOQfFOlFOGHst7p0ZlhWKiF+PvxMkGch5wbmgRWgh01L+sU+rhB0HhI+0y6QUtzdTJXroiweWxqg00ujJsaMhZ3VHbVZbkVznOEzkzdMsEGCKWFYak0/bpi6yU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IgWpcCRL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707273822; c=relaxed/simple;
+	bh=yAc2qDg86yKSHh+BWfG2RTtPpu6Cksg1ErI8pCgZ7jE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Qsz5mdFEdNH7pUxh53+O4HeUfN2TrZeefGe8BWvWtaTzbIXjNa/FeJL7YZpqIE0p5VBVCcQ0mQluE9fl9KVxSqFSG09/7b0hArFxv5SuFQ7cvPbB0+Dkc9KiJtH2Dju8WxtfvYm/ZHovHk2F5R1JU3Ionoskpi5EA42tqsIbDao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=grFK2SFK; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IgWpcCRL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DAB3C433F1;
-	Wed,  7 Feb 2024 00:47:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707266845;
-	bh=iqHxgOHuYFmk9YND73eU0cO+vCD/4trx3LeVLF6gEa0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IgWpcCRLQhkVQtpOkfg/qGEI4J2qtrzW0bdMNunzjROZxeOQ/OD3+soNK+E6gYd6V
-	 NU+KW9AHJGg1GSKDukeeoGxEHzefuUZ7ejTpVSPSkucR9/05xrfbrXlsDHXG4xbYCx
-	 ZVW8RelbRk88iiGisT8knwuJi4RAOLMpTnABx8vG5xP/o3Hh5ww+zoz6QcvPTFSkuo
-	 CGnhSXiEgbdTNom7SBTZN2W2ro54td1SSjbBsLgxOZ0V9cdPi0mMds+dC4FnoB85eu
-	 uY6S39REIprg28NgBMrfSbGz5GO/aCy4affm1JBCUHGgrXAGRy4DJ8tfTrOfAaeT9X
-	 wKpaEKwOcKN/A==
-Date: Tue, 6 Feb 2024 16:47:23 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev
-Subject: Re: A question about modifying the buffer under authenticated
- encryption
-Message-ID: <20240207004723.GA35324@sol.localdomain>
-References: <f22dae2c-9cac-a63-fff-3b0b7305be6@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="grFK2SFK"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-604832bcbd0so3486827b3.0
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Feb 2024 18:43:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707273820; x=1707878620; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g7guOO3K6cZeccVPYodTSSR3CLbTuFzc0JepOhwBqf8=;
+        b=grFK2SFKZqLTXSDLVLI4bcvE0N08jdaLe1SI3FOpqQ0ljetYoTLDld5EdWLBmT/LbW
+         0eINMxXXSg3F9w4BlsaXm7IRfS6/gBFePOjaGmLOOBk8K2dgvImHNZoihGK05rhzS9EM
+         sd2OSZ6Fwd372IpKtvHh44VzMFVSoIqQuLQKtLJ+4oHPMwBnmPAU2x8m49+RFnt3lMb8
+         QibJ+olqqhcCADpriEKFktx1v0WeIG7zqS7K0juyRfpMBGPWadCBeuB/b2QlrQRFTBUU
+         V/d1UhftHn1nmFNSyhSn7AQbvrW3HF+5wmzWYsyPhg3QmSSeBRM2nHzZ2byyjFMNfceA
+         Ccqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707273820; x=1707878620;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=g7guOO3K6cZeccVPYodTSSR3CLbTuFzc0JepOhwBqf8=;
+        b=IPILqseYsIc5IwhHoGNZYpAP14/3MdhaF8sylPn73yh5pbXejPeDBqZgfI+3XaCyBL
+         ym22z/bfyfHA7zrLuF78fQqWunLJp96mPw1NPSgwwtYLxMW+2Tv7nM1J2TmsmSymc3R4
+         ZSNi7hnX5IUe6CG0vcNwHIdVn3lUQz6Hf4V7QFvk808U2M2N9BdJpcUSEHtBGO2YVX0g
+         3jA48v77OLd75XYrDhTXnMsyU62yZgOJgsjdMHRh8wovf3OnYdcfZxT1XoR3a3OdtCW9
+         R/PNddoRb2FtA9qSjBvTkFjZxDYxUOI0aBRJmVCySO3ZuzgWwmr+MSGijG+/Oc9MifYM
+         I5tw==
+X-Gm-Message-State: AOJu0YxyEhELGqbhwmShvB8UFkNvcXGYlOJPDvaG39yXFzrJx9a03Q81
+	t87Q7FcWLmABxuVfaZLhVUxaVtw3dfBV5DHiTweRhUKXfQ7DdIBXLv215ooH5BUB/bu9bnDp0nP
+	V3w==
+X-Google-Smtp-Source: AGHT+IHFKn95FP8tDKGyeHSLkuyZnMtdrnlqEFcDN45UncE4QphOeyXOIkcKI10ZFatjnFxEnz3hwTc5JAw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2485:b0:dc2:550b:a4f4 with SMTP id
+ ds5-20020a056902248500b00dc2550ba4f4mr906756ybb.1.1707273820039; Tue, 06 Feb
+ 2024 18:43:40 -0800 (PST)
+Date: Tue, 6 Feb 2024 18:43:38 -0800
+In-Reply-To: <CABgObfa_PbxXdj9v7=2ZXfqQ_tJgdQTrO9NHKOQ691TSKQDY2A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f22dae2c-9cac-a63-fff-3b0b7305be6@redhat.com>
+Mime-Version: 1.0
+References: <20231230172351.574091-1-michael.roth@amd.com> <20231230172351.574091-19-michael.roth@amd.com>
+ <ZZ67oJwzAsSvui5U@google.com> <20240116041457.wver7acnwthjaflr@amd.com>
+ <Zb1yv67h6gkYqqv9@google.com> <CABgObfa_PbxXdj9v7=2ZXfqQ_tJgdQTrO9NHKOQ691TSKQDY2A@mail.gmail.com>
+Message-ID: <ZcLuGxZ-w4fPmFxd@google.com>
+Subject: Re: [PATCH v11 18/35] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com, 
+	Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 06, 2024 at 10:46:59PM +0100, Mikulas Patocka wrote:
-> Hi
-> 
-> I'm trying to fix some problems in dm-crypt that it may report 
-> authentication failures when the user reads data with O_DIRECT and 
-> modifies the read buffer while it is being read.
-> 
-> I'd like to ask you:
-> 
-> 1. If the authenticated encryption encrypts a message, reading from 
->    buffer1 and writing to buffer2 - and buffer1 changes while reading from 
->    it - is it possible that it generates invalid authentication tag?
-> 
-> 2. If the authenticated encryption decrypts a message, reading from 
->    buffer1 and writing to buffer2 - and buffer2 changes while writing to 
->    it - is is possible that it reports authentication tag mismatch?
-> 
+On Wed, Feb 07, 2024, Paolo Bonzini wrote:
+> On Fri, Feb 2, 2024 at 11:55=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > > It doesn't really matter if the attributes are set before or after
+> > > KVM_SNP_LAUNCH_UPDATE, only that by the time the guest actually launc=
+hes
+> > > they pages get set to private so they get faulted in from gmem. We co=
+uld
+> > > document our expectations and enforce them here if that's preferable
+> > > however. Maybe requiring KVM_SET_MEMORY_ATTRIBUTES(private) in advanc=
+e
+> > > would make it easier to enforce that userspace does the right thing.
+> > > I'll see how that looks if there are no objections.
+> >
+> > Userspace owns whether a page is PRIVATE or SHARED, full stop.  If KVM =
+can't
+> > honor that, then we need to come up with better uAPI.
+>=20
+> Can you explain more verbosely what you mean?
 
-Yes, both scenarios are possible.  But it depends on the AEAD algorithm and how
-it happens to be implemented, and on whether the data overlaps or not.
+As proposed, snp_launch_update_gfn_handler() doesn't verify the state of th=
+e
+gfns' attributes.  But that's a minor problem and probably not a sticking p=
+oint.
 
-This is very much a "don't do that" sort of thing.
+My overarching complaint is that the code is to be wildly unsafe, or at the=
+ very
+least brittle.  Without guest_memfd's knowledge, and without holding any lo=
+cks
+beyond kvm->lock, it=20
 
-- Eric
+ 1) checks if a pfn is shared in the RMP
+ 2) copies data to the page
+ 3) converts the page to private in the RMP
+ 4) does PSP stuff
+ 5) on failure, converts the page back to shared in RMP
+ 6) conditionally on failure, writes to the page via a gfn
+
+I'm not at all confident that 1-4 isn't riddled with TOCTOU bugs, and that'=
+s
+before KVM gains support for intrahost migration, i.e. before KVM allows mu=
+ltiple
+VM instances to bind to a single guest_memfd.
+
+But I _think_ we mostly sorted this out at PUCK.  IIRC, the plan is to have=
+ guest_memfd
+provide (kernel) APIs to allow arch/vendor code to initialize a guest_memfd=
+ range.
+That will give guest_memfd complete control over the state of a given page,=
+ will
+allow guest_memfd to take the appropriate locks, and if we're lucky, will b=
+e reusable
+by other CoCo flavors beyond SNP.
+
+> > > > > +                  * When invalid CPUID function entries are dete=
+cted, the firmware
+> > > > > +                  * corrects these entries for debugging purpose=
+ and leaves the
+> > > > > +                  * page unencrypted so it can be provided users=
+ for debugging
+> > > > > +                  * and error-reporting.
+> > > >
+> > > > Why?  IIUC, this is basically backdooring reads/writes into guest_m=
+emfd to avoid
+> > > > having to add proper mmap() support.
+> >
+> > Yes, I am specifically complaining about writing guest memory on failur=
+e, which is
+> > all kinds of weird.
+>=20
+> It is weird but I am not sure if you are complaining about firmware
+> behavior or something else.
+
+This proposed KVM code:
+
++                               host_rmp_make_shared(pfns[i], PG_LEVEL_4K, =
+true);
++
++                               ret =3D kvm_write_guest_page(kvm, gfn, kvad=
+dr, 0, PAGE_SIZE);
++                               if (ret)
++                                       pr_err("Failed to write CPUID page =
+back to userspace, ret: 0x%x\n",
++                                              ret);
+
+
+I have no objection to propagating error/debug information back to userspac=
+e,
+but it needs to be routed through the source page (or I suppose some dedica=
+ted
+error page, but that seems like overkill).  Shoving the error information i=
+nto
+guest memory is gross.
+
+But this should naturally go away when the requirement that the source be
+covered by the same memslot also goes away.
