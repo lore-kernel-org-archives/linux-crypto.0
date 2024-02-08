@@ -1,132 +1,106 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7BF6BB3D;
-	Thu,  8 Feb 2024 09:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BB86A8B7;
+	Thu,  8 Feb 2024 09:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707384814; cv=none; b=lRYhWDv1u0NYZniUGGnuWqZcmKHtxVYS345FrJTQ19CwTCfo+gVCEIK2jJUy85/Ront3x0jr63+r7Wug3+fLCIOvh1kPYenr1UFtqaf8vaVCvb/W8a6KnSPy1SRf0kS9K2hLMPoIQ2/Z1LcRdh6S0Q+C8YETmYy1Z93h7PQckuE=
+	t=1707385649; cv=none; b=JS3wp/4lA3kz4f/ptkKOZwW8qSMBbVNrISWGrQhfvlVxRBNqQSET4zqjtQ31rDwSgDx84qFatbmo4h0E4l1GSU7UIxgj4M8t2wq6Jsj0wbYOT+qi658gyYM9nhtwSuWSKpojAWCVk/HaOccAx4inUz7OtRoFR4FZZKsnu52Eil8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707384814; c=relaxed/simple;
-	bh=lhwPUoYyro9oaMp2bVStAN7YAQl8rqdb9WH7FoKshb8=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=WCTwrIR4e/J1OpI8+PboEb6VLDy/GpxYj2La5EAmxhUT83+TiM/yBpYDdkNpWssDm+Htwz4uNgaVfvf8ixTPLIxj8KZBj4N/raQxcxCLWMn8+9lpQYAv0iDJH0UJ5xjIxl3TxT5V8J3Gx6QnyTb5ish85EmKSagtSaGp3iiUlUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YQ8tcAwC; arc=none smtp.client-ip=209.85.208.48
+	s=arc-20240116; t=1707385649; c=relaxed/simple;
+	bh=NJzTYxPGog+LHw69EzTQgjJrKi3/8IWhSZCZ12TQeTc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Fiued0Fezm1Lv3Spk1tpH6nmsmtNdboVsXfzqqVDUgbUOvXuJwGfy6Od9x6aeI7vl6TMnnJdOi6mwHj27HJKIM6aWAq1cd99EQ68Bf/aEumA9sngl/WBUuepCWNxvoLsrYVs/MksrDNPVWuUF6Rk9fy7g2UsocN1kr2qEQVKg7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ievev3SY; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YQ8tcAwC"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5600d950442so1836317a12.1;
-        Thu, 08 Feb 2024 01:33:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ievev3SY"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a388c5542e9so126905266b.1;
+        Thu, 08 Feb 2024 01:47:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707384811; x=1707989611; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1707385645; x=1707990445; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ClZxZfA/V4+BWFkj7VuhiD7elrfOXLoTCprCHq1vgfU=;
-        b=YQ8tcAwClVvjy+k2Q+WJX85DK4XdAaZtvkGLnC+BiphLi8q9RW73aLrIfno6MombQ/
-         tEpwQ5RZrbLjaa6wy/SzpsfZwdVmCPIssGuWC7Bwmw8Bh6iUSbJ/D0sa/CHEFM+92/jI
-         9qgnQST6J4UB63qmdf+hv75ZrtP85Pj5EhjQlaTU2ieGHcYaoyLEKrBTwXu0tJoQ36Yj
-         pIFCqOXmvJZKbcJvUQH1rqtlPEPv+LWyc10TFfdM7pqJ6qHXn9LS6l/RNf8ZJLUfdI8q
-         w0vpuhICBMvIaNnDQlFITEDxUYIbeJ3B69iKdS0NZzCsVHN2YxExEbZAc47j1Umf/9dB
-         4IAQ==
+        bh=DH3hgklJ1R75I/VpBMJ+510hVZo1X3MvgC5DTxJlxAI=;
+        b=Ievev3SYGISIljGc9L95TWHsm4aaHm2deDlQ3h7XDI3nqfV5MSR1qAZwuwI7fsgEh8
+         7UIDyiMMFJ7dV2JgYth2L3ctguRZ2ei2S1DkIsFxAMGTs3ZVq9gS81Gr0gCjJfuKYc8K
+         ROBIiryRFIsxAzRGZG8LhBd8WOkrPtYqKekD1rr0EE8Agv7x4fQhPkBu2s2UX60x+umo
+         DcUFt8kBR/5Mgbgqa223bR0nS0dmyGhxmAt2SY+x22jj/Vv7Vxz2aKVB4tX8vmUUwm55
+         krXuk5c4ka4T+D5OoIwmfMJwn+5Ns9XCUdixoINCrW6p/ae4b6i+oUM3G7rzO4o4+nsI
+         JgEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707384811; x=1707989611;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1707385645; x=1707990445;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ClZxZfA/V4+BWFkj7VuhiD7elrfOXLoTCprCHq1vgfU=;
-        b=P+kGpQi2cctzGuTBHJRtBHwgti/3kxp7qybeLs09QRIzR9GWPS6SIVv/VLK4dyNYW7
-         43xcjfhlsYO0LV97AbzGrb1TqJbUsoY1xbif5knE5isb1Ct5eYhfsBMCs9+DdLPjwrlt
-         CabJt86y/2puXau9rgvp5Wh8ag8g1IbzfWnhuS6aIlja9RP/UBrtd8v0onwJV92pyAMH
-         9LdABit6aUfXgA8mpyMKFqMMnoOwXWXaPKA5yfjKkoLiTrXiN6q10Fu7JlFbZmsuERQV
-         C8jCHMceZrb/+qcLNUzVeAnOyyKS5YrYLGXborMBXoA/7ri5+UR7QDOD5nyoAR0cRp3L
-         DH5g==
-X-Gm-Message-State: AOJu0YwdyaPfqxH+FeHcrxa1dub54Qk6xJwf2/hvQmSFIMQISfsJAmT7
-	hXAN6nc4gQRXADKxF1lSnFgbFpWttlKv20d3rmiF1yKECPWFJ9eQ
-X-Google-Smtp-Source: AGHT+IEZDOgle6xEeOkEl/5TlUMHh/sDQAV3pdX3MQSmWUeItHW9uH8U0Gszb+dGZ3njJ8RK0BuGYQ==
-X-Received: by 2002:aa7:d95a:0:b0:561:1484:8cc5 with SMTP id l26-20020aa7d95a000000b0056114848cc5mr534673eds.39.1707384811049;
-        Thu, 08 Feb 2024 01:33:31 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWdxX+Z5XfKi+0hB9EUdd/yz/n0ff5bWnTmPCM6KditwXe7kyb9xF7fGlJmcG7Qutlb6Zwco9744h+P0R8Mh3V5IizY3BIrOoHEtGdMCAxw3iNiFEJ6ZE0Ircd68BY0c0RPoaEQ5u0hDZPGt8BBJrNNcxPmMYtPEnvrJgXSBTCJbaLJ9NC74eviKltzeqexGBn/S36ZNGaeOxF8FUNB9tCQQx9o8Lhh/k7AB+Q1wXbeFm5VCM/Ac5Ii8CyDqo+b3A==
-Received: from felia.fritz.box ([2a02:810d:7e40:14b0:f81c:5b24:d269:24d])
-        by smtp.gmail.com with ESMTPSA id dk5-20020a0564021d8500b0055c97f940fcsm628306edb.81.2024.02.08.01.33.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 01:33:30 -0800 (PST)
-From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-To: Danny Tsen <dtsen@linux.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH v2] MAINTAINERS: adjust file entries after crypto vmx file movement
-Date: Thu,  8 Feb 2024 10:33:27 +0100
-Message-Id: <20240208093327.23926-1-lukas.bulwahn@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        bh=DH3hgklJ1R75I/VpBMJ+510hVZo1X3MvgC5DTxJlxAI=;
+        b=STIoDIFSdtk68k6fvAAWHer+0h1o7MR7ZsrsETDXSkOLymZbWb5yUUcebsnZJrw8IS
+         PFJsckJJhGuPrdMC9vA8NsI5gJsg7w60CFnzDZHQzNubck5WD3aPpBkWwLSBAAA3/LX2
+         4dxUC/LKtMkC/s1FhE+ki0PCazcIKz/D5SGulw+9AfjX+Vwdw45VVoqTzncY1Nfry9D2
+         zeqcch7KWrQTMvTeX6i0yafnRtqLXEBRSdGwrDvv/a/Pe0OEjrDV/O9aYShDDgRVOTRz
+         T1Ib2cCWxv9rgLypMQ3ALBGSuKClEPuN4OVsqfF6qjMK3xOHFQpG+i//J3lURH+urzVx
+         quPw==
+X-Gm-Message-State: AOJu0Yzbwm3tc2GReCzTFoKW9c6BwIHNHahjXZ6qoXw4KskrFhxw4Clo
+	sJtaGIhzpu9x1VdcJYDCB79d/FCKodCbATL3ieHW2XKKA6FtmXRcAwRhzR+nfInppG0OksTh/S1
+	24TotKsFKUf/GZjJvnKafko21j9BaQ0HPe3s=
+X-Google-Smtp-Source: AGHT+IGezKKWZ25bbGDuM3CK5CVJTtXoxBQHcRsyoeEV3EpwXsWsIoYWuis+AHvCuxSKvkEOsZmGBuCOh9k6CbxtP2I=
+X-Received: by 2002:a17:906:cc92:b0:a38:65e6:b996 with SMTP id
+ oq18-20020a170906cc9200b00a3865e6b996mr1979455ejb.11.1707385644965; Thu, 08
+ Feb 2024 01:47:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240129131729.4311-1-lukas.bulwahn@gmail.com> <ZbsxfYVKqxwn5gl5@gondor.apana.org.au>
+In-Reply-To: <ZbsxfYVKqxwn5gl5@gondor.apana.org.au>
+From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Date: Thu, 8 Feb 2024 10:47:14 +0100
+Message-ID: <CAKXUXMynhktyTY8+JtDAuVHysV2g0eXy7dr09wvSqYxZ=paWUg@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: adjust file entries after crypto vmx file movement
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Danny Tsen <dtsen@linux.ibm.com>, linux-crypto@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kernel-janitors@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Commit 109303336a0c ("crypto: vmx - Move to arch/powerpc/crypto") moves the
-crypto vmx files to arch/powerpc, but misses to adjust the file entries for
-IBM Power VMX Cryptographic instructions and LINUX FOR POWERPC.
+On Thu, Feb 1, 2024 at 6:51=E2=80=AFAM Herbert Xu <herbert@gondor.apana.org=
+.au> wrote:
+>
+> On Mon, Jan 29, 2024 at 02:17:29PM +0100, Lukas Bulwahn wrote:
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 2fb944964be5..15bc79e80e28 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -10307,12 +10307,12 @@ M:  Nayna Jain <nayna@linux.ibm.com>
+> >  M:   Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
+> >  L:   linux-crypto@vger.kernel.org
+> >  S:   Supported
+> > -F:   drivers/crypto/vmx/Kconfig
+> > -F:   drivers/crypto/vmx/Makefile
+> > -F:   drivers/crypto/vmx/aes*
+> > -F:   drivers/crypto/vmx/ghash*
+> > -F:   drivers/crypto/vmx/ppc-xlate.pl
+> > -F:   drivers/crypto/vmx/vmx.c
+> > +F:   arch/powerpc/crypto/Kconfig
+> > +F:   arch/powerpc/crypto/Makefile
+> > +F:   arch/powerpc/crypto/aes*
+>
+> Are you sure about this? There are non-vmx aes* files in that
+> directory.  Perhaps something more specific is needed here?
+>
 
-Hence, ./scripts/get_maintainer.pl --self-test=patterns complains about
-broken references.
+sorry for the late reply. I revisited this patch and now keep the
+match exact in my patch v2:
 
-Adjust these file entries accordingly. To keep the matched files exact
-after the movement, spell out each file name in the new directory.
+https://lore.kernel.org/lkml/20240208093327.23926-1-lukas.bulwahn@gmail.com=
+/
 
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
----
-v1: https://lore.kernel.org/lkml/20240129131729.4311-1-lukas.bulwahn@gmail.com/
+Herbert, I hope you are fine to pick this patch v2.
 
-v1 -> v2:
-  - address Herbert Xu's feedback:
-  keep the matched files exactly those which were in the vmx directory
-
-Danny, please ack.
-Herbert, please pick this minor clean-up patch on your -next tree.
-
- MAINTAINERS | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 58845a852ab1..1820f661bfe1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10329,12 +10329,17 @@ M:	Nayna Jain <nayna@linux.ibm.com>
- M:	Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
- L:	linux-crypto@vger.kernel.org
- S:	Supported
--F:	drivers/crypto/vmx/Kconfig
--F:	drivers/crypto/vmx/Makefile
--F:	drivers/crypto/vmx/aes*
--F:	drivers/crypto/vmx/ghash*
--F:	drivers/crypto/vmx/ppc-xlate.pl
--F:	drivers/crypto/vmx/vmx.c
-+F:	arch/powerpc/crypto/Kconfig
-+F:	arch/powerpc/crypto/Makefile
-+F:	arch/powerpc/crypto/aes.c
-+F:	arch/powerpc/crypto/aes_cbc.c
-+F:	arch/powerpc/crypto/aes_ctr.c
-+F:	arch/powerpc/crypto/aes_xts.c
-+F:	arch/powerpc/crypto/aesp8-ppc.*
-+F:	arch/powerpc/crypto/ghash.c
-+F:	arch/powerpc/crypto/ghashp8-ppc.pl
-+F:	arch/powerpc/crypto/ppc-xlate.pl
-+F:	arch/powerpc/crypto/vmx.c
- 
- IBM ServeRAID RAID DRIVER
- S:	Orphan
-@@ -12428,7 +12433,6 @@ F:	drivers/*/*/*pasemi*
- F:	drivers/*/*pasemi*
- F:	drivers/char/tpm/tpm_ibmvtpm*
- F:	drivers/crypto/nx/
--F:	drivers/crypto/vmx/
- F:	drivers/i2c/busses/i2c-opal.c
- F:	drivers/net/ethernet/ibm/ibmveth.*
- F:	drivers/net/ethernet/ibm/ibmvnic.*
--- 
-2.17.1
-
+Lukas
