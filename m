@@ -1,35 +1,41 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E9325613;
-	Thu,  8 Feb 2024 03:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218222E401;
+	Thu,  8 Feb 2024 04:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707363780; cv=none; b=DnPop0guKHoGfwVkjgs6/rAuKjBELH+6q+tIqWXUXgz7XJsDe1NyYnbDMOQvhWvZWkrKWBZ5VNADlp9c/PSU/gfFqv6/MzbEN0Z7yxUwdL2L/qZNmI9U0euop7s2xSW4/JpWtBlSsJL1gFC9KAQHZ7l5GJwBLVZWWH4hzsDTYqI=
+	t=1707366591; cv=none; b=fmtOHQAyks9rfFwIo0DAqNfWWPr95Pdqgcdr55JGWCm68bV4HE1gmhOsp535bGB/mVAAC9L6weuz3Il+/J83Nu4boRpCMFVIKTKfxVbuaAF9WNAlrsy2kJ9CV0tcx8tnHyRQSQu8dFFGu2TvNwjSzBoCBr2dU6ZIZbBZC18OuRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707363780; c=relaxed/simple;
-	bh=rGOPrAcS1Z86EhBz2ty3dct08n2j7GPKeuvvpkVTn6o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NdxeulbsilLG5hoCkKDQ4KOUtQvZ76cLji77FD6gveMPF5tex5LZCvbSVYaNwvp+858zch7qIrh0Ip+dkCjKiT4ezqnU00Sy5T2aD/vw9UVX190hrvT5YntntcxmwuSoZ796KIFACHOc7BMwhYPyzCgWD+G5Tm2fRqFesxtKl+w=
+	s=arc-20240116; t=1707366591; c=relaxed/simple;
+	bh=3dIo8cF3X/XtFxkP8MDrSokYqsaEpIXTy44owBJYHIY=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z3TjBWBstfnS5cgr2+uxhabgbXffuFdAjbAlKXb+NsRYoIJJK+Q/XgKxDAB1CXTQHpLNKsuMuALSArK3n2INerHVRZxuqMpdeaFiK3Mj1T/5rzXdG/rFZ2bCP7pXnnsUjXnMBIrqI4bF7taOABeM1XPpvoM+snPkgdsZTkOKPMQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rXvJ7-00BGtl-49; Thu, 08 Feb 2024 11:42:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Feb 2024 11:42:50 +0800
-Date: Thu, 8 Feb 2024 11:42:50 +0800
+	id 1rXw2d-00BHTV-FD; Thu, 08 Feb 2024 12:29:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Feb 2024 12:29:53 +0800
+Date: Thu, 8 Feb 2024 12:29:53 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Eric Biggers <ebiggers@kernel.org>,
+To: Linus Torvalds <torvalds@linux-foundation.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev
-Subject: Re: A question about modifying the buffer under authenticated
- encryption
-Message-ID: <ZcRNur8+h9BYzRog@gondor.apana.org.au>
-References: <f22dae2c-9cac-a63-fff-3b0b7305be6@redhat.com>
- <20240207004723.GA35324@sol.localdomain>
- <1a4713fc-62c7-4a8f-e28a-14fc5d04977@redhat.com>
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.8
+Message-ID: <ZcRYwZHASH4Cv5Bn@gondor.apana.org.au>
+References: <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+ <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
+ <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+ <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
+ <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
+ <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+ <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
+ <ZbstBewmaIfrFocE@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -38,16 +44,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1a4713fc-62c7-4a8f-e28a-14fc5d04977@redhat.com>
+In-Reply-To: <ZbstBewmaIfrFocE@gondor.apana.org.au>
 
-On Wed, Feb 07, 2024 at 01:51:51PM +0100, Mikulas Patocka wrote:
->
-> I assume that authenticated encryption or decryption using the same buffer 
-> as a source and as a destination should be ok. Right?
+Hi Linus:
 
-Yes, in-place encryption and decryption is OK.
+The following changes since commit c5a2f74db71a849f3a60bc153d684d6d28a0c665:
 
-Cheers,
+  crypto: caam - fix asynchronous hash (2024-01-26 16:35:55 +0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.8-p3 
+
+for you to fetch changes up to 24c890dd712f6345e382256cae8c97abb0406b70:
+
+  crypto: algif_hash - Remove bogus SGL free on zero-length error path (2024-02-02 18:08:12 +0800)
+
+----------------------------------------------------------------
+This push fixes regressions in cbc and algif_hash, as well as an
+older NULL-pointer dereference in ccp.
+----------------------------------------------------------------
+
+Herbert Xu (2):
+      crypto: cbc - Ensure statesize is zero
+      crypto: algif_hash - Remove bogus SGL free on zero-length error path
+
+Kim Phillips (1):
+      crypto: ccp - Fix null pointer dereference in __sev_platform_shutdown_locked
+
+ crypto/algif_hash.c          |  5 +++--
+ crypto/cbc.c                 |  3 +++
+ drivers/crypto/ccp/sev-dev.c | 10 ++++++++--
+ 3 files changed, 14 insertions(+), 4 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
