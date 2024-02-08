@@ -1,152 +1,129 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4D186127
-	for <linux-crypto@vger.kernel.org>; Thu,  8 Feb 2024 17:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8419E7EF19
+	for <linux-crypto@vger.kernel.org>; Thu,  8 Feb 2024 17:29:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707413227; cv=none; b=TZ46vGLMrCGy2TwZId3RUO691PkMUOhkgW5rjkIcl7FP9U9m7WqYysMuMlS23eFlz4ULjT0ijYAj0KshH8JVrFMdaGK6+wEoyffLACa1bPgDGE635P6yEFPax549oDAlFZ5GNimr5bp4Mzx0LuFIT/VtafqywPnUHyGCHGO9k7Q=
+	t=1707413362; cv=none; b=Na4z06mT+IPuiq0s6OYDpNq/DmxMF/23I6rM/qwE1dxKn8FJvrHbYvhqlqaZRPOYt3GJ7baN/oTMVi3ndtA+7g3lkZj13o7sIyE6zK0nMuMHlioKd+NrrjbUlj3ocRLPiaePdDeQsFbEY5QOCX9hvFC3RDh6ZZ5kJVNB6IAqvdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707413227; c=relaxed/simple;
-	bh=sx6KhQk9Is/4dxTU8a0rjN3JOBcYjPFn14qRnNkA5SY=;
+	s=arc-20240116; t=1707413362; c=relaxed/simple;
+	bh=AX7TeYinvud28ImFWW86bz254UkZVLDeLl1zuOjja7E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=m0bDt3AVujfCpxtwEX45aaW8GvZtJt8MQyHyuj4h9WQIb+RPZzimhJjv36EayjwVT68Fu8loKVEuydP2DJJcZGkfylUIi+197qzJBj9LdD04KPDsTpBwPcwiNvvcIPMpZyBBamdWc2dIjYyNCLIq9cbC8ndkpwtmn+TDSavIQCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gn175dGl; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=o+Nj4XWuWyLwai7Ouk84yvuPjJ3wVwaOk8O07hmyTUsSJKnDi3lvWzobLdKoUMup5/kswpEZUJ0miKgAkDKTSScc8q+r/6v9uES+AkvmfRtTcDajlcPUR6W2LFNlPyhX/VnhtQt+Y5ZW7dtaf70BMgjUktlZBUaAJTdmbKW52MQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N3WR4wMs; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gn175dGl"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e04e1ac036so57548b3a.3
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Feb 2024 09:27:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N3WR4wMs"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc64b659a9cso23393276.3
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Feb 2024 09:29:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707413224; x=1708018024; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707413358; x=1708018158; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gBwp2cY+kDK1oMSufcYCS0Brw297vTH+3c3ODiiUoog=;
-        b=Gn175dGli9LztjZ+EVogEBA46VYuRBuiuZ4zQYf0EVSw8NFYfO/rGT1H8cFWX/5aVE
-         U1ykf89PUDhWzmLxcblWZIpkvewo+/sszS80JcQnsl0vOX1+2MejjTBe2rU0fa2lR2/+
-         qPAPbn5+weGildRfWjvYbrsrKP8OybaRpOVE5hQ+beBS6nuUkj8R2XSAOLvnoqiL++MC
-         cNjBWWFIGPR9wmoxqOFw7FQvMur61sOxID6kjJqQkv0MOK+y6P3UMawwO6D1tJ44boJn
-         6RDI0Fd00H2tx1CEIXuRVnqo0h7+AZbSi2HVbEazMVZzLd1SS6KPJvDMFWlpRVb3cx0Q
-         NCiA==
+        bh=6cgRpz8693x11vAqn90eHX9IMRr7lrwTkc2QUZSb++M=;
+        b=N3WR4wMsGynGy2bWzK4Czp/sVabFsDvpY9DJucUs/M4UUC+ja8aepqcdTDSMjhpUH+
+         38My9oEqYCDvIOnSXJijCdl5H+yvob4kxBizwpf0/ElD5KsH3Li6v04QISFiP/z9vylh
+         zJRhOqC1RT1vmmL+BBuko3kn/48AvXfqphNCM0tey9bCBog9XKmz/thyiJH2/FlglutR
+         xb+KW1jfu5gUAseyFrsl4PcIPytxHz2Bgzo5QkIkBgT3wPKEBRINVF8hlFlZ5bQpqbpC
+         N8PhX4ngTCX0erzCmPR2Oh/yX4N6QE6/4/UJrhZGKq5KsO0wTgV3a3FfzQnXliHgrIv4
+         Dnyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707413224; x=1708018024;
+        d=1e100.net; s=20230601; t=1707413358; x=1708018158;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gBwp2cY+kDK1oMSufcYCS0Brw297vTH+3c3ODiiUoog=;
-        b=PHQRnkMSDHbzZTaNlmZQYcbc0xp6PQjcB/5IyvlhpSWsxlpanHgaJyte8DRrKGWaFK
-         iUgDe8sqlGOM+IkgjwI22uaiqKFx2cHGwpeiiByRQ6xJcppOeKjbFHGvh4FV1htGG4Yd
-         5gk6VsMG3gzXU6d/HFr9mpiCJyWvqb6nBpy3M9DiJfcK4CjvV1GbJOdy+12wjqmRtrTx
-         EnTGoPKglBDJHIGt7LPmn6Ah2KTgeouVwogq4AEsQui4zoSY1dGUuzkGuoxYNvxxYadv
-         nVyIH7FletZ0WSVrFG9xgYA+f25lwxy2RB2uj2K04/pKirnhrqZoOn86aq8ZBkRFZt5U
-         5wjg==
-X-Gm-Message-State: AOJu0Yw1HvHYtPtpKBpkcTsOyvlU7iiEGdHPGSb9bPTWIuvhFSLpNUFJ
-	wSsyIAXLUr37JPjjFlWQ8++tjR+/veLxoSQnIeJDK6d5x2CwA7kei2HETrC7DjzrBKxPc1mm77E
-	CPw==
-X-Google-Smtp-Source: AGHT+IF6y2Fj9Q0xzklv4qNxJB4M0iqYnYF4z+RAImjVdV5uh7OyzZLHK0LW86J/FLUDUS/+nQQagI/rkCc=
+        bh=6cgRpz8693x11vAqn90eHX9IMRr7lrwTkc2QUZSb++M=;
+        b=aCZ/XW8CETNlTOWaIQOy8yB4MKnWOMAOJhTe6U8SRjVZdZZQypIoJSKBNiWsg0eFCh
+         DGJpC4f6z61Hw91fm5yvnFz1uIKogxW4WEUzc3A9I6cDfllAAUNUzb4t27+MgRwaK0pq
+         WpLY8PA5fSmLo7SdEqxhiEsuBVK5fwdAnm2cyowhqSLdw0ScDx17dEq2/cptEn+xKKxG
+         RxxFdnX1iov6Hf261/DoW/BeWdGJNYP3j5vaMMj0Gb3K84Gg7L1Vjm2rTvE9TBWxCUo/
+         ScduOWYs1Ke90Dqan3nfng9Di/3UTP+4/bz+sUAd+xOHJ2WBt2iuVPuJy7Spqq3JkO43
+         Sy6A==
+X-Forwarded-Encrypted: i=1; AJvYcCUIA2gWTR94WQqzAr+3EPGQZfnknJZ9Bujur0wnIoUPgi5hgkgEqaAy2bMbZywlxpYl/pA/KthdyR8R3d981Zkx0wyxBzw65ir8JEl0
+X-Gm-Message-State: AOJu0YwgO0szB5cctjLqYpQt39itnhgFBtfuPEq1GvY7Z/k6/USlM2Z0
+	Bi2iGU6RbcXq1zrUMNPqQKYyVIhBLmjNqajxTNHUBBAWkGSTOBd3+07gD/O14rKtmoDdngHJemf
+	Fkg==
+X-Google-Smtp-Source: AGHT+IHvm3H6o6yo8+Vn1cBwz43f6GmzmcO3Z4xZiRVKXYRGzCH9lsIFsssSc9r8mHXp4gU3C6XX9+NehWg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2281:b0:6df:e3d1:dd0f with SMTP id
- f1-20020a056a00228100b006dfe3d1dd0fmr365573pfe.4.1707413224273; Thu, 08 Feb
- 2024 09:27:04 -0800 (PST)
-Date: Thu, 8 Feb 2024 09:27:02 -0800
-In-Reply-To: <20240208002420.34mvemnzrwwsaesw@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:70b:b0:dc6:55ac:d08d with SMTP id
+ k11-20020a056902070b00b00dc655acd08dmr22497ybt.5.1707413358591; Thu, 08 Feb
+ 2024 09:29:18 -0800 (PST)
+Date: Thu, 8 Feb 2024 09:29:16 -0800
+In-Reply-To: <761a3982-c7a1-40f1-92d8-5c08dad8383a@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231016115028.996656-1-michael.roth@amd.com> <20231016115028.996656-9-michael.roth@amd.com>
- <ZbmenP05fo8hZU8N@google.com> <20240208002420.34mvemnzrwwsaesw@amd.com>
-Message-ID: <ZcUO5sFEAIH68JIA@google.com>
-Subject: Re: [PATCH RFC gmem v1 8/8] KVM: x86: Determine shared/private faults
- based on vm_type
+References: <20231016115028.996656-1-michael.roth@amd.com> <20231016115028.996656-4-michael.roth@amd.com>
+ <761a3982-c7a1-40f1-92d8-5c08dad8383a@arm.com>
+Message-ID: <ZcUPbO2hmf9y1Zii@google.com>
+Subject: Re: [PATCH RFC gmem v1 3/8] KVM: x86: Add gmem hook for initializing memory
 From: Sean Christopherson <seanjc@google.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com, isaku.yamahata@intel.com, 
-	ackerleytng@google.com, vbabka@suse.cz, ashish.kalra@amd.com, 
-	nikunj.dadhania@amd.com, jroedel@suse.de, pankaj.gupta@amd.com, 
-	thomas.lendacky@amd.com
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	pbonzini@redhat.com, isaku.yamahata@intel.com, ackerleytng@google.com, 
+	vbabka@suse.cz, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	jroedel@suse.de, pankaj.gupta@amd.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Feb 07, 2024, Michael Roth wrote:
-> On Tue, Jan 30, 2024 at 05:13:00PM -0800, Sean Christopherson wrote:
-> > On Mon, Oct 16, 2023, Michael Roth wrote:
-> > > For KVM_X86_SNP_VM, only the PFERR_GUEST_ENC_MASK flag is needed to
-> > > determine with an #NPF is due to a private/shared access by the guest.
-> > > Implement that handling here. Also add handling needed to deal with
-> > > SNP guests which in some cases will make MMIO accesses with the
-> > > encryption bit.
-> > 
-> > ...
-> > 
-> > > @@ -4356,12 +4357,19 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> > >  			return RET_PF_EMULATE;
-> > >  	}
-> > >  
-> > > -	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-> > > +	/*
-> > > +	 * In some cases SNP guests will make MMIO accesses with the encryption
-> > > +	 * bit set. Handle these via the normal MMIO fault path.
-> > > +	 */
-> > > +	if (!slot && private_fault && kvm_is_vm_type(vcpu->kvm, KVM_X86_SNP_VM))
-> > > +		private_fault = false;
-> > 
-> > Why?  This is inarguably a guest bug.
+On Thu, Feb 08, 2024, Suzuki K Poulose wrote:
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 8c5c017ab4e9..c7f82c2f1bcf 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2403,9 +2403,19 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> >   #endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
+> >   #ifdef CONFIG_KVM_PRIVATE_MEM
+> > +int __kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+> > +		       gfn_t gfn, kvm_pfn_t *pfn, int *max_order, bool prep);
+> >   int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+> >   			      gfn_t gfn, kvm_pfn_t *pfn, int *max_order);
+> >   #else
+> > +static inline int __kvm_gmem_get_pfn(struct kvm *kvm,
+> > +				     struct kvm_memory_slot *slot, gfn_t gfn,
+> > +				     kvm_pfn_t *pfn, int *max_order)
 > 
-> AFAICT this isn't explicitly disallowed by the SNP spec.
-
-There are _lots_ of things that aren't explicitly disallowed by the APM, that
-doesn't mean that _KVM_ needs to actively support them.
-
-I am *not* taking on more broken crud in KVM to workaround OVMF's stupidity, the
-KVM_X86_QUIRK_CD_NW_CLEARED has taken up literally days of my time at this point.
-
-> So KVM would need to allow for these cases in order to be fully compatible
-> with existing SNP guests that do this.
-
-No.  KVM does not yet support SNP, so as far as KVM's ABI goes, there are no
-existing guests.  Yes, I realize that I am burying my head in the sand to some
-extent, but it is simply not sustainable for KVM to keep trying to pick up the
-pieces of poorly defined hardware specs and broken guest firmware.
-
-> > > +static bool kvm_mmu_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 err)
-> > > +{
-> > > +	bool private_fault = false;
-> > > +
-> > > +	if (kvm_is_vm_type(kvm, KVM_X86_SNP_VM)) {
-> > > +		private_fault = !!(err & PFERR_GUEST_ENC_MASK);
-> > > +	} else if (kvm_is_vm_type(kvm, KVM_X86_SW_PROTECTED_VM)) {
-> > > +		/*
-> > > +		 * This handling is for gmem self-tests and guests that treat
-> > > +		 * userspace as the authority on whether a fault should be
-> > > +		 * private or not.
-> > > +		 */
-> > > +		private_fault = kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
-> > > +	}
-> > 
-> > This can be more simply:
-> > 
-> > 	if (kvm_is_vm_type(kvm, KVM_X86_SNP_VM))
-> > 		return !!(err & PFERR_GUEST_ENC_MASK);
-> > 
-> > 	if (kvm_is_vm_type(kvm, KVM_X86_SW_PROTECTED_VM))
-> > 		return kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
-> > 
+> Missing "bool prep" here ?
 > 
-> Yes, indeed. But TDX has taken a different approach for SW_PROTECTED_VM
-> case where they do this check in kvm_mmu_page_fault() and then synthesize
-> the PFERR_GUEST_ENC_MASK into error_code before calling
-> kvm_mmu_do_page_fault(). It's not in the v18 patchset AFAICT, but it's
-> in the tdx-upstream git branch that corresponds to it:
-> 
->   https://github.com/intel/tdx/commit/3717a903ef453aa7b62e7eb65f230566b7f158d4
-> 
-> Would you prefer that SNP adopt the same approach?
+> minor nit: Do we need to export both __kvm_gmem_get_pfn and kvm_gmem_get_pfn
 
-Ah, yes, 'twas my suggestion in the first place.  FWIW, I was just reviewing the
-literal code here and wasn't paying much attention to the content.
+Minor nit on the nit: s/export/expose.  My initial reaction was "we should *never*
+export any of these" :-)
 
-https://lore.kernel.org/all/f474282d701aca7af00e4f7171445abb5e734c6f.1689893403.git.isaku.yamahata@intel.com
+> ? I don't see anyone else using the former.
+> 
+> We could have :
+> 
+> #ifdef CONFIG_KVM_PRIVATE_MEM
+> int __kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+> 		       gfn_t gfn, kvm_pfn_t *pfn, int *max_order, bool prep);
+> #else
+> static inline int __kvm_gmem_get_pfn(struct kvm *kvm,
+> 				    struct kvm_memory_slot *slot, gfn_t gfn,
+> 				    kvm_pfn_t *pfn, int *max_order,
+> 				    bool prep)
+> {
+> 	KVM_BUG_ON(1, kvm);
+> 	return -EIO;
+> }
+> #endif
+> 
+> static inline int kvm_gmem_get_pfn(struct kvm *kvm,
+> 				 struct kvm_memory_slot *slot, gfn_t gfn,
+> 				kvm_pfn_t *pfn, int *max_order)
+> {
+> 	return __kvm_gmem_get_pfn(kvm, slot, gfn, pfn, max_order, true);
+> }
+
+I suspect all of this will be moot.  As discussed on the PUCK call[1] and in the
+SNP enabling series[2], the plan is to have guest_memfd do (or at least initiate)
+the actual copying into the backing pages, e.g. to guarantee that the pages are
+in the correct state, that the appropriate locks are held, etc.
+
+[1] https://drive.google.com/drive/folders/116YTH1h9yBZmjqeJc03cV4_AhSe-VBkc?resourcekey=0-sOGeFEUi60-znJJmZBsTHQ&usp=drive_link
+[2] https://lore.kernel.org/all/ZcLuGxZ-w4fPmFxd@google.com
