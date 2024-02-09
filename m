@@ -1,143 +1,176 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54940374F8;
-	Fri,  9 Feb 2024 13:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA86C69941
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Feb 2024 14:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707483860; cv=none; b=CFTivHRXOUad9eNcuOAZPqYgbPcxmXwycBpK7ZnQEzUFvT+LVV85NytAVCA8IWEA+mDX0+eORBfz7XBTvqmEvR2O1NExwM0tUT2xfoIutSiy+pZV+YoCfN/8S63XDq5SM8up5DmZkeRditU5jfXOzbZCqtrihqSqMjlTv56RJaU=
+	t=1707488888; cv=none; b=RJasGAjfcUhOYtT1HUVdPM99tjQD/0HTmj6yo2qDHDCMMtd788m4tUF6WE8ar4+ICYlqgFfQRE5+D0hnBQhkC/h8HIXymTLWlNFDXOMBCiO0+JT2TH3JP8LoMV2V959LRn3YEPi/lBzneM2AhAS4PW3BSe0LzQkj2kXJaqsO/nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707483860; c=relaxed/simple;
-	bh=nugzDsB6Q+f9z8qPXPTyJX7QccnEmmXny29RETfpCs8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TqFnlM3tZwZz/DhavYtuvv7D9rc1RMpTpSxVw5qsVIXv2Jd6M036akVDcBQN6vhhSkk4PYms9OkM+bR6JSZiU4ak+NEAG7enz9f/BbLthyOEnOdhnEC61s1FdAvlSxfTVjLkQ1LNiTdzymAmvdL9UFdgd3PVravuTG/W23uQgdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j2VuWLWd; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1707488888; c=relaxed/simple;
+	bh=HUx7t17vxGA5IaYOV8ff1kr8+jU/9ANSxbnT6H9GSco=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iMM/CC84efDH2bSK48N/93r1uYZxKmAGM+JDOlZwiyKZjGNItJwpUPAIyRdMFk28RVemjYeXlOTnFxIg9LZADlip0irCAWzSRPzOiZLPYrkzss/g7huvhFeS4s4zkaHWiXlu8T/MdIyUiGGUtc8x5Sb6QxqkELvn8s+sNtvej14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZXpPNRmQ; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j2VuWLWd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707483859; x=1739019859;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=nugzDsB6Q+f9z8qPXPTyJX7QccnEmmXny29RETfpCs8=;
-  b=j2VuWLWdploFPPXfJoPcWhT9ZfQp9U8xDk0bYq2+LfS4dSP786o0UgE+
-   633HlfW4EIF98b3ihZ6j3FE1WO34gvj83o+0KOUDKyZWHFHsT3Hvow/Ep
-   Hbo0bA/hlTl4LkrY/d6H2aifUqsXOu7LXksWjsOGmr7Hw8nW4xo1NWsHP
-   4KJ/Ek4dre8Qr2BIieZwkNgyA6sRPea3Ep+NQa5HN+KVg4+3hm19wmSvc
-   3X7F5Ru1gACO3u7wMWMu18aBRnWah/wrHeySrpeqlGFnmBwN0rVjEAVek
-   UrNGaQk3I/28NEWJnqa+bLiozIfbs85qqaCrtCrU8kFuuPzVravnv1ojv
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10978"; a="5241347"
-X-IronPort-AV: E=Sophos;i="6.05,256,1701158400"; 
-   d="scan'208";a="5241347"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 05:04:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,256,1701158400"; 
-   d="scan'208";a="6553030"
-Received: from r031s002_zp31l10c01.deacluster.intel.com (HELO localhost.localdomain) ([10.219.171.29])
-  by fmviesa003.fm.intel.com with ESMTP; 09 Feb 2024 05:04:16 -0800
-From: Damian Muszynski <damian.muszynski@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Damian Muszynski <damian.muszynski@intel.com>,
-	stable@vger.kernel.org,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - resolve race condition during AER recovery
-Date: Fri,  9 Feb 2024 13:43:42 +0100
-Message-ID: <20240209124403.44781-1-damian.muszynski@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZXpPNRmQ"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5ee22efe5eeso20360687b3.3
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Feb 2024 06:28:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707488886; x=1708093686; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uCfsv6GrpUFnVCwcL3J5Wem8yNPUxVMsIIYMkBzD0b0=;
+        b=ZXpPNRmQeW+Sm8OzwxON1DpjmSlXeodKp3uxsBZq1Cg5uqJA8J7OR0zmKyk1akz2Yy
+         5EywEk/vM6zchQkTO/MSC9+Yucn6xjqlLJXS5II+SRuUGG5D3/myvb/anp4h/lhMlUIG
+         ZcZcRAnBDNFUNDeH/AEX9RhWOJlV1M6SbJDFo/Eax51+lByy3q3Dg7L8HJx5FRfGnOhl
+         sabcrTwvk8718sVD0CAGGXFZLyzHPoNW6pzR4LcloHCjJlb0MDm2i6LNBXTuYHY0+3L1
+         YbngJFU/xjyYwKCM/BH9Ajz03VQupmY8A4LEcC1lUozX9lXFnBzk7XDTJUskDv3PBTXF
+         fhHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707488886; x=1708093686;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uCfsv6GrpUFnVCwcL3J5Wem8yNPUxVMsIIYMkBzD0b0=;
+        b=e1cy5hQLA0ZnFYiEGy/DuoWqq+fkuicVPlbM7+/2IFX5rOwo8df5WyXzAfseYvNPgA
+         4pR6EVTDtXT8r8R21bLYd9fOaZkN3L8TUY/nhT9QSLP0gcyNIdK0OIZhsZCPeiVVZryV
+         E/LkQ86APxC3486cMlKL6tLKdMRVHkTg8lqiv8G5oVx9AKUcN2iNFt4RYxHKYH+RIHPQ
+         VLfr5XZuqcHVTw/F/5cVKaByQtifQes5g2zStscu23lv2aSSAUYG99rQ37b7fWk0nc2E
+         qqnWk6pGyHInc0aZwZr75qMYWEezWN4Mao0ihcLd8C/LDRBO271z7i+6nLOAUIs9N9v7
+         GZPg==
+X-Gm-Message-State: AOJu0Yx7p4QRR4flGSkEeHM3cM3Az1OoBhhfBE1BYbc2imLDMqeLNcbn
+	mOA8n3zZFRHbA26/crBKpYCNepNraatBhFEYgZz+qhmZAR4kgUaLeQTFqeMpziHF6ChGrQujxl2
+	cJw==
+X-Google-Smtp-Source: AGHT+IHy+djrwH9lBwMcfClT+8pK1QZMj2IcA9F/oSlT9qX98kneABwsfBtcWfL+f67hdIOBZn1ACZ3Dunw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:6d82:0:b0:5ff:a885:65b with SMTP id
+ i124-20020a816d82000000b005ffa885065bmr252030ywc.10.1707488885935; Fri, 09
+ Feb 2024 06:28:05 -0800 (PST)
+Date: Fri, 9 Feb 2024 06:28:04 -0800
+In-Reply-To: <e7125fcb-52b1-4942-9ae7-c85049e92e5c@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20231016115028.996656-1-michael.roth@amd.com> <20231016115028.996656-5-michael.roth@amd.com>
+ <e7125fcb-52b1-4942-9ae7-c85049e92e5c@arm.com>
+Message-ID: <ZcY2VRsRd03UQdF7@google.com>
+Subject: Re: [PATCH RFC gmem v1 4/8] KVM: x86: Add gmem hook for invalidating memory
+From: Sean Christopherson <seanjc@google.com>
+To: Steven Price <steven.price@arm.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, "tabba@google.com" <tabba@google.com>, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	pbonzini@redhat.com, isaku.yamahata@intel.com, ackerleytng@google.com, 
+	vbabka@suse.cz, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	jroedel@suse.de, pankaj.gupta@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-During the PCI AER system's error recovery process, the kernel driver
-may encounter a race condition with freeing the reset_data structure's
-memory. If the device restart will take more than 10 seconds the function
-scheduling that restart will exit due to a timeout, and the reset_data
-structure will be freed. However, this data structure is used for
-completion notification after the restart is completed, which leads
-to a UAF bug.
+On Fri, Feb 09, 2024, Steven Price wrote:
+> On 16/10/2023 12:50, Michael Roth wrote:
+> > In some cases, like with SEV-SNP, guest memory needs to be updated in a
+> > platform-specific manner before it can be safely freed back to the host.
+> > Wire up arch-defined hooks to the .free_folio kvm_gmem_aops callback to
+> > allow for special handling of this sort when freeing memory in response
+> > to FALLOC_FL_PUNCH_HOLE operations and when releasing the inode, and go
+> > ahead and define an arch-specific hook for x86 since it will be needed
+> > for handling memory used for SEV-SNP guests.
+> 
+> Hi all,
+> 
+> Arm CCA has a similar need to prepare/unprepare memory (granule
+> delegate/undelegate using our terminology) before it is used for
+> protected memory.
+> 
+> However I see a problem with the current gmem implementation that the
+> "invalidations" are not precise enough for our RMI API. When punching a
+> hole in the memfd the code currently hits the same path (ending in
+> kvm_unmap_gfn_range()) as if a VMA is modified in the same range (for
+> the shared version).
+>
+> The Arm CCA architecture doesn't allow the protected memory to be removed and
+> refaulted without the permission of the guest (the memory contents would be
+> wiped in this case).
 
-This results in a KFENCE bug notice.
+TDX behaves almost exactly like CCA.  Well, that's not technically true, strictly
+speaking, as there are TDX APIs that do allow for *temporarily* marking mappings
+!PRESENT, but those aren't in play for invalidation events like this.
 
-  BUG: KFENCE: use-after-free read in adf_device_reset_worker+0x38/0xa0 [intel_qat]
-  Use-after-free read at 0x00000000bc56fddf (in kfence-#142):
-  adf_device_reset_worker+0x38/0xa0 [intel_qat]
-  process_one_work+0x173/0x340
+SNP does allow zapping page table mappings, but fully removing a page, as PUNCH_HOLE
+would do, is destructive, so SNP also behaves the same way for all intents and
+purposes.
 
-To resolve this race condition, the memory associated to the container
-of the work_struct is freed on the worker if the timeout expired,
-otherwise on the function that schedules the worker.
-The timeout detection can be done by checking if the caller is
-still waiting for completion or not by using completion_done() function.
+> One option that I've considered is to implement a seperate CCA ioctl to
+> notify KVM whether the memory should be mapped protected.
 
-Fixes: d8cba25d2c68 ("crypto: qat - Intel(R) QAT driver framework")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/intel/qat/qat_common/adf_aer.c | 22 ++++++++++++++-----
- 1 file changed, 16 insertions(+), 6 deletions(-)
+That's what KVM_SET_MEMORY_ATTRIBUTES+KVM_MEMORY_ATTRIBUTE_PRIVATE is for, no?
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-index 3597e7605a14..9da2278bd5b7 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-@@ -130,7 +130,8 @@ static void adf_device_reset_worker(struct work_struct *work)
- 	if (adf_dev_restart(accel_dev)) {
- 		/* The device hanged and we can't restart it so stop here */
- 		dev_err(&GET_DEV(accel_dev), "Restart device failed\n");
--		if (reset_data->mode == ADF_DEV_RESET_ASYNC)
-+		if (reset_data->mode == ADF_DEV_RESET_ASYNC ||
-+		    completion_done(&reset_data->compl))
- 			kfree(reset_data);
- 		WARN(1, "QAT: device restart failed. Device is unusable\n");
- 		return;
-@@ -146,11 +147,19 @@ static void adf_device_reset_worker(struct work_struct *work)
- 	adf_dev_restarted_notify(accel_dev);
- 	clear_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
- 
--	/* The dev is back alive. Notify the caller if in sync mode */
--	if (reset_data->mode == ADF_DEV_RESET_SYNC)
--		complete(&reset_data->compl);
--	else
-+	/*
-+	 * The dev is back alive. Notify the caller if in sync mode
-+	 *
-+	 * If device restart will take a more time than expected,
-+	 * the schedule_reset() function can timeout and exit. This can be
-+	 * detected by calling the completion_done() function. In this case
-+	 * the reset_data structure needs to be freed here.
-+	 */
-+	if (reset_data->mode == ADF_DEV_RESET_ASYNC ||
-+	    completion_done(&reset_data->compl))
- 		kfree(reset_data);
-+	else
-+		complete(&reset_data->compl);
- }
- 
- static int adf_dev_aer_schedule_reset(struct adf_accel_dev *accel_dev,
-@@ -183,8 +192,9 @@ static int adf_dev_aer_schedule_reset(struct adf_accel_dev *accel_dev,
- 			dev_err(&GET_DEV(accel_dev),
- 				"Reset device timeout expired\n");
- 			ret = -EFAULT;
-+		} else {
-+			kfree(reset_data);
- 		}
--		kfree(reset_data);
- 		return ret;
- 	}
- 	return 0;
+> The invalidations would then be ignored on ranges that are currently
+> protected for this guest.
 
-base-commit: 86f2ff2d4ec09a7eea931a56fbed2105037ba2ee
--- 
-2.43.0
+That's backwards.  Invalidations on a guest_memfd should affect only *protected*
+mappings.  And for that, the plan/proposal is to plumb only_{shared,private} flags
+into "struct kvm_gfn_range"[1] so that guest_memfd invalidations don't zap shared
+mappings, and mmu_notifier invalidation don't zap private mappings.  Sample usage
+in the TDX context[2] (disclaimer, I'm pretty sure I didn't write most of that
+patch despite, I only provided a rough sketch).
 
+[1] https://lore.kernel.org/all/20231027182217.3615211-13-seanjc@google.com
+[2] https://lore.kernel.org/all/0b308fb6dd52bafe7153086c7f54bfad03da74b1.1705965635.git.isaku.yamahata@intel.com
+
+> This 'solves' the problem nicely except for the case where the VMM
+> deliberately punches holes in memory which the guest is using.
+
+I don't see what problem there is to solve in this case.  PUNCH_HOLE is destructive,
+so don't do that.
+
+> The issue in this case is that there's no way of failing the punch hole
+> operation - we can detect that the memory is in use and shouldn't be
+> freed, but this callback doesn't give the opportunity to actually block
+> the freeing of the memory.
+
+Why is this KVM's problem?  E.g. the same exact thing happens without guest_memfd
+if userspace munmap()s memory the guest is using.
+
+> Sadly there's no easy way to map from a physical page in a gmem back to
+> which VM (and where in the VM) the page is mapped. So actually ripping
+> the page out of the appropriate VM isn't really possible in this case.
+
+I don't follow.  guest_memfd has a 1:1 binding with a VM *and* a gfn, how can you
+not know what exactly needs to be invalidated?
+
+> How is this situation handled on x86? Is it possible to invalidate and
+> then refault a protected page without affecting the memory contents? My
+> guess is yes and that is a CCA specific problem - is my understanding
+> correct?
+> 
+> My current thoughts for CCA are one of three options:
+> 
+> 1. Represent shared and protected memory as two separate memslots. This
+> matches the underlying architecture more closely (the top address bit is
+> repurposed as a 'shared' flag), but I don't like it because it's a
+> deviation from other CoCo architectures (notably pKVM).
+> 
+> 2. Allow punch-hole to fail on CCA if the memory is mapped into the
+> guest's protected space. Again, this is CCA being different and also
+> creates nasty corner cases where the gmem descriptor could have to
+> outlive the VMM - so looks like a potential source of memory leaks.
+> 
+> 3. 'Fix' the invalidation to provide more precise semantics. I haven't
+> yet prototyped it but it might be possible to simply provide a flag from
+> kvm_gmem_invalidate_begin specifying that the invalidation is for the
+> protected memory. KVM would then only unmap the protected memory when
+> this flag is set (avoiding issues with VMA updates causing spurious unmaps).
+> 
+> Fairly obviously (3) is my preferred option, but it relies on the
+> guarantees that the "invalidation" is actually a precise set of
+> addresses where the memory is actually being freed.
+
+#3 is what we are planning for x86, and except for the only_{shared,private} flags,
+the requisite functionality should already be in Linus' tree, though it does need
+to be wired up for ARM.
