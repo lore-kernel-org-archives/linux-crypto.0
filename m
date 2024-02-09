@@ -1,43 +1,43 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE267381C4;
-	Fri,  9 Feb 2024 13:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54940374F8;
+	Fri,  9 Feb 2024 13:04:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707483772; cv=none; b=JNEcBLhgMaJz8LpMBade+YmMOy2usZF0M72DVPC6lDDQ8XhZePaqtdJ34B3MTuJOH9BPPS7ZwytV9ccykKDtjYxMvscKRRpzggqto4zzTKjF+hBocS8RgTYRGwFfZphj+xeCDVe875rdDKeV5I8wcA+U/XlmH66vdpJ2mUuVVn8=
+	t=1707483860; cv=none; b=CFTivHRXOUad9eNcuOAZPqYgbPcxmXwycBpK7ZnQEzUFvT+LVV85NytAVCA8IWEA+mDX0+eORBfz7XBTvqmEvR2O1NExwM0tUT2xfoIutSiy+pZV+YoCfN/8S63XDq5SM8up5DmZkeRditU5jfXOzbZCqtrihqSqMjlTv56RJaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707483772; c=relaxed/simple;
-	bh=TrzC6Q+ENQub50IvZdjXEQf8L/dRuTrBN8Z7LS3tSDo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SPDwDpv+PwLIVydwx7sBXo2dyxZkOpjDCv6a+T6/KgYlrJvVXpQWZ0i6P84xvKBsyx7bHiHnBmYT4wbJ4+6x8ZzU5cnFM38zc02RNYu9W5E2UeH0t9syNcuu92UhyFboev5uGgc73TLPzkZ4HohBLlp2ufB2k3uRWuDq+l699ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dn/joOpM; arc=none smtp.client-ip=192.55.52.88
+	s=arc-20240116; t=1707483860; c=relaxed/simple;
+	bh=nugzDsB6Q+f9z8qPXPTyJX7QccnEmmXny29RETfpCs8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TqFnlM3tZwZz/DhavYtuvv7D9rc1RMpTpSxVw5qsVIXv2Jd6M036akVDcBQN6vhhSkk4PYms9OkM+bR6JSZiU4ak+NEAG7enz9f/BbLthyOEnOdhnEC61s1FdAvlSxfTVjLkQ1LNiTdzymAmvdL9UFdgd3PVravuTG/W23uQgdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j2VuWLWd; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dn/joOpM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j2VuWLWd"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707483770; x=1739019770;
+  t=1707483859; x=1739019859;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=TrzC6Q+ENQub50IvZdjXEQf8L/dRuTrBN8Z7LS3tSDo=;
-  b=dn/joOpMFEOoaZRVdlMXFYgxHYw/TKxCyElajYRPBGukzQ4raK+vZroS
-   2n5ks1JLY9sCyeVoD3KZ6I+sp+6Q2057qQuy46uOhUAS3zXogz8NPiaHi
-   Gpr9FM+nEy6NXluxA0tkIN602M1kV2zV6CAkcU0gHaaOkS7yaELC+35zg
-   D8aSz/g8y+blh0poTr9urJCgwKuQqPT7wXOmben9s2w/z6iSKkcVKQAGv
-   cwbv1i8le0SleE0wq6Bpt9dRh6MKOcfO1hZcNE/i+3TmBs5j+ItlNwf3u
-   frfSLV0Uk7Sq6zrIiqX6DYQZES+bH5v8KPvvYWt5aVd54TazJ6m4Lv/Cq
+  bh=nugzDsB6Q+f9z8qPXPTyJX7QccnEmmXny29RETfpCs8=;
+  b=j2VuWLWdploFPPXfJoPcWhT9ZfQp9U8xDk0bYq2+LfS4dSP786o0UgE+
+   633HlfW4EIF98b3ihZ6j3FE1WO34gvj83o+0KOUDKyZWHFHsT3Hvow/Ep
+   Hbo0bA/hlTl4LkrY/d6H2aifUqsXOu7LXksWjsOGmr7Hw8nW4xo1NWsHP
+   4KJ/Ek4dre8Qr2BIieZwkNgyA6sRPea3Ep+NQa5HN+KVg4+3hm19wmSvc
+   3X7F5Ru1gACO3u7wMWMu18aBRnWah/wrHeySrpeqlGFnmBwN0rVjEAVek
+   UrNGaQk3I/28NEWJnqa+bLiozIfbs85qqaCrtCrU8kFuuPzVravnv1ojv
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10978"; a="436561160"
+X-IronPort-AV: E=McAfee;i="6600,9927,10978"; a="5241347"
 X-IronPort-AV: E=Sophos;i="6.05,256,1701158400"; 
-   d="scan'208";a="436561160"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 05:02:49 -0800
+   d="scan'208";a="5241347"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 05:04:17 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,256,1701158400"; 
-   d="scan'208";a="6577599"
+   d="scan'208";a="6553030"
 Received: from r031s002_zp31l10c01.deacluster.intel.com (HELO localhost.localdomain) ([10.219.171.29])
-  by orviesa005.jf.intel.com with ESMTP; 09 Feb 2024 05:02:47 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 09 Feb 2024 05:04:16 -0800
 From: Damian Muszynski <damian.muszynski@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
@@ -45,9 +45,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Damian Muszynski <damian.muszynski@intel.com>,
 	stable@vger.kernel.org,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - change SLAs cleanup flow at shutdown
-Date: Fri,  9 Feb 2024 13:42:07 +0100
-Message-ID: <20240209124237.44530-1-damian.muszynski@intel.com>
+Subject: [PATCH] crypto: qat - resolve race condition during AER recovery
+Date: Fri,  9 Feb 2024 13:43:42 +0100
+Message-ID: <20240209124403.44781-1-damian.muszynski@intel.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -58,71 +58,86 @@ MIME-Version: 1.0
 Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
 
-The implementation of the Rate Limiting (RL) feature includes the cleanup
-of all SLAs during device shutdown. For each SLA, the firmware is notified
-of the removal through an admin message, the data structures that take
-into account the budgets are updated and the memory is freed.
-However, this explicit cleanup is not necessary as (1) the device is
-reset, and the firmware state is lost and (2) all RL data structures
-are freed anyway.
+During the PCI AER system's error recovery process, the kernel driver
+may encounter a race condition with freeing the reset_data structure's
+memory. If the device restart will take more than 10 seconds the function
+scheduling that restart will exit due to a timeout, and the reset_data
+structure will be freed. However, this data structure is used for
+completion notification after the restart is completed, which leads
+to a UAF bug.
 
-In addition, if the device is unresponsive, for example after a PCI
-AER error is detected, the admin interface might not be available.
-This might slow down the shutdown sequence and cause a timeout in
-the recovery flows which in turn makes the driver believe that the
-device is not recoverable.
+This results in a KFENCE bug notice.
 
-Fix by replacing the explicit SLAs removal with just a free of the
-SLA data structures.
+  BUG: KFENCE: use-after-free read in adf_device_reset_worker+0x38/0xa0 [intel_qat]
+  Use-after-free read at 0x00000000bc56fddf (in kfence-#142):
+  adf_device_reset_worker+0x38/0xa0 [intel_qat]
+  process_one_work+0x173/0x340
 
-Fixes: d9fb8408376e ("crypto: qat - add rate limiting feature to qat_4xxx")
+To resolve this race condition, the memory associated to the container
+of the work_struct is freed on the worker if the timeout expired,
+otherwise on the function that schedules the worker.
+The timeout detection can be done by checking if the caller is
+still waiting for completion or not by using completion_done() function.
+
+Fixes: d8cba25d2c68 ("crypto: qat - Intel(R) QAT driver framework")
 Cc: <stable@vger.kernel.org>
 Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/intel/qat/qat_common/adf_rl.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ drivers/crypto/intel/qat/qat_common/adf_aer.c | 22 ++++++++++++++-----
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_rl.c b/drivers/crypto/intel/qat/qat_common/adf_rl.c
-index de1b214dba1f..d4f2db3c53d8 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_rl.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_rl.c
-@@ -788,6 +788,24 @@ static void clear_sla(struct adf_rl *rl_data, struct rl_sla *sla)
- 	sla_type_arr[node_id] = NULL;
- }
- 
-+static void free_all_sla(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_rl *rl_data = accel_dev->rate_limiting;
-+	int sla_id;
-+
-+	mutex_lock(&rl_data->rl_lock);
-+
-+	for (sla_id = 0; sla_id < RL_NODES_CNT_MAX; sla_id++) {
-+		if (!rl_data->sla[sla_id])
-+			continue;
-+
-+		kfree(rl_data->sla[sla_id]);
-+		rl_data->sla[sla_id] = NULL;
-+	}
-+
-+	mutex_unlock(&rl_data->rl_lock);
-+}
-+
- /**
-  * add_update_sla() - handles the creation and the update of an SLA
-  * @accel_dev: pointer to acceleration device structure
-@@ -1155,7 +1173,7 @@ void adf_rl_stop(struct adf_accel_dev *accel_dev)
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+index 3597e7605a14..9da2278bd5b7 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+@@ -130,7 +130,8 @@ static void adf_device_reset_worker(struct work_struct *work)
+ 	if (adf_dev_restart(accel_dev)) {
+ 		/* The device hanged and we can't restart it so stop here */
+ 		dev_err(&GET_DEV(accel_dev), "Restart device failed\n");
+-		if (reset_data->mode == ADF_DEV_RESET_ASYNC)
++		if (reset_data->mode == ADF_DEV_RESET_ASYNC ||
++		    completion_done(&reset_data->compl))
+ 			kfree(reset_data);
+ 		WARN(1, "QAT: device restart failed. Device is unusable\n");
  		return;
+@@ -146,11 +147,19 @@ static void adf_device_reset_worker(struct work_struct *work)
+ 	adf_dev_restarted_notify(accel_dev);
+ 	clear_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
  
- 	adf_sysfs_rl_rm(accel_dev);
--	adf_rl_remove_sla_all(accel_dev, true);
-+	free_all_sla(accel_dev);
+-	/* The dev is back alive. Notify the caller if in sync mode */
+-	if (reset_data->mode == ADF_DEV_RESET_SYNC)
+-		complete(&reset_data->compl);
+-	else
++	/*
++	 * The dev is back alive. Notify the caller if in sync mode
++	 *
++	 * If device restart will take a more time than expected,
++	 * the schedule_reset() function can timeout and exit. This can be
++	 * detected by calling the completion_done() function. In this case
++	 * the reset_data structure needs to be freed here.
++	 */
++	if (reset_data->mode == ADF_DEV_RESET_ASYNC ||
++	    completion_done(&reset_data->compl))
+ 		kfree(reset_data);
++	else
++		complete(&reset_data->compl);
  }
  
- void adf_rl_exit(struct adf_accel_dev *accel_dev)
+ static int adf_dev_aer_schedule_reset(struct adf_accel_dev *accel_dev,
+@@ -183,8 +192,9 @@ static int adf_dev_aer_schedule_reset(struct adf_accel_dev *accel_dev,
+ 			dev_err(&GET_DEV(accel_dev),
+ 				"Reset device timeout expired\n");
+ 			ret = -EFAULT;
++		} else {
++			kfree(reset_data);
+ 		}
+-		kfree(reset_data);
+ 		return ret;
+ 	}
+ 	return 0;
 
-base-commit: 84c2f23ad68a847e36dc9cae44f21c5e321a321c
+base-commit: 86f2ff2d4ec09a7eea931a56fbed2105037ba2ee
 -- 
 2.43.0
 
