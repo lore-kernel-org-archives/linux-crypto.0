@@ -1,228 +1,192 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B11167E8A;
-	Fri,  9 Feb 2024 10:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707473502; cv=none; b=cgCAp7LMlXR4Vc8cjfmMw8QGHoPm1HApeVJ0l3K4BOoxYyrJqkZLXXdiXL12n0hH64+v4LHjStyRI0btUAhOOHC/+CMciuPX4b8CEn4l6RMjiedN4K/hgDncJOPi7TgryPyyJurNYP6c0pGJkSZqAa0Bi0Jo9krGI3CK1K7A0Zs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707473502; c=relaxed/simple;
-	bh=sJ+o92d/lwk1g9oSwisR/d0SlJfcelUCjwmiemb5sy8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=li/Z+NMcDh1qtOEXGLzwQuAv03OzPQwyVQOvh2tWae0SaiTi8d51j8qWYYkwydGSOKza+1V0JebFxGi5n5dDQuBDOThgSOHQxsag0l2eIDatonweTH1Whe38jnn5ikSFmTM9fLPIQf1/JO0yxMFzART0TNZgg4qnbmblGPKGFXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9739BDA7;
-	Fri,  9 Feb 2024 02:12:20 -0800 (PST)
-Received: from [10.1.37.16] (e122027.cambridge.arm.com [10.1.37.16])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C16773F5A1;
-	Fri,  9 Feb 2024 02:11:34 -0800 (PST)
-Message-ID: <e7125fcb-52b1-4942-9ae7-c85049e92e5c@arm.com>
-Date: Fri, 9 Feb 2024 10:11:32 +0000
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13EF3286AF;
+	Fri,  9 Feb 2024 12:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707480655; cv=fail; b=JF0qf+uwo7IL6hgq2p87yAFdrPhs8tMm3mKEBt5FEthARc/7Zf7bbIL+aX2pYJTHkAEPHaeXgS6HU/Rg6lEtauEjYsaBnWefoCjB0r+r09K65pi6ufGeNckuhIDOJH/GUHieJoE/vtmktg95MMsML3RGXqD+quGPYsgpfJJU1Hw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707480655; c=relaxed/simple;
+	bh=Cz6CSSTbDjt1swvQsdqeFmN8vYKzeim2T6k6kTbUwn0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=MkFQ274kqBmVUvhJDKdO5tbivrO7RG9yDBG39mtBcuIe3fL7a4Uf+TnF4WkvQwLjnHq/9X3c+M7fDUn1XYL+7lge3l+BWzum4SqZ7CChx3l5XMkj58I+JVFCvgbovJth72/zcodwZFwcTZrSaQ6XLqmhMcRBPfxTR3vAEzhIomU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JtL6UtM/; arc=fail smtp.client-ip=40.107.236.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JtL6UtM/"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HiIydW2QZpNobS3dgpUpmPEme+OnxDF07e53r4RNWAThwZSdtgD8vrOGSriNLEcwwyIZ4PYISag3y2qmEI8OCu16UMEDxSVBhUMYIXV9AOAhzPC+SklQ7LvpREXwZ6pVGgQaCMIR089qXJjSC7MURmorLkcx8P09fWkCwL32THH79Y4YT0tmTwoBreBuKdXOB3xDk+CRxMW3dWDy1orIVcNRnh4Erv6LGEpPrH0XhveJfmV4xqyIsfcZngARAezFR50B2h5/hJyP131PpKxJXoGwLuoudQ72mR6iP2r3Gib09z0Z4W33g/jfTzamLvRRHvgIPT8u65E3vTvBYnLO6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1Am80xpNjm8AOD5xG0msvbDbslkXPnt9+U0Q+Coc2Dg=;
+ b=RToAK3NqHD/XbN3x8MwJaPJ6eyeLKOY3NR2m3o3f4yae41BH8RtRCu/nXoJWG6LhgaYpozDrBuUbNnKvvogyX7VXcEQrdnvols0Wz4Nad5j9/f4WnLaiB3zfTEokuEVbNZARc1lDKCiWZhrLRrUrRQ0LhBQMx1ly4pX719N4aDM5wqIL1uzDvdAWL6FEFpteLJ7GaGTWo2Q1BnAisij+hglZYOwplQstcNJx8uIWTW4oFCpSouFhh4ltPy+sqAeOs1ONKYSsd0BmwcVN3HvKPf1SK8LeCY+yYrkdvVFjYxS1rRb8O6v75J8csRD5RsFISihR01DIy0hXJmPqs4/ZPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1Am80xpNjm8AOD5xG0msvbDbslkXPnt9+U0Q+Coc2Dg=;
+ b=JtL6UtM/XyDygD45viHICY9gnfwKU/lJwDJtumhIpkNayuB00Z1h2RPywPQKJ0yfgbsECkrKvvVTz104WCwo88HYH6ACXnPIP8gpzNCTbuPT4uCJQPmAlUta2hZDd959N2mbxXdFANmHj1/zwHN0Wp1s8ktkUZ9S5h5/+FznufvAinKpiQaTjUUYO0+Skz4N/lOmnrZ3odOH3VroSYYGbBg4Wy3nk7zLpqLPT4p4D3e/erHUxDxEXkGI+EMheVmMWZxGE5ETxl2fDwhAwW4vYsY/Dee2aXAwZjZhiQh5DhOI6dBIUe8TyfS73XZVfzqo5B1ztG7sEpCiyIYLTw9axQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.11; Fri, 9 Feb
+ 2024 12:10:47 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873%6]) with mapi id 15.20.7270.012; Fri, 9 Feb 2024
+ 12:10:47 +0000
+Date: Fri, 9 Feb 2024 08:10:45 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: "Zeng, Xin" <xin.zeng@intel.com>
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"yishaih@nvidia.com" <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
+	"Tian, Kevin" <kevin.tian@intel.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	qat-linux <qat-linux@intel.com>, "Cao, Yahui" <yahui.cao@intel.com>
+Subject: Re: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Message-ID: <20240209121045.GP10476@nvidia.com>
+References: <20240201153337.4033490-1-xin.zeng@intel.com>
+ <20240201153337.4033490-11-xin.zeng@intel.com>
+ <20240206125500.GC10476@nvidia.com>
+ <DM4PR11MB550222F7A5454DF9DBEE7FEC884B2@DM4PR11MB5502.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM4PR11MB550222F7A5454DF9DBEE7FEC884B2@DM4PR11MB5502.namprd11.prod.outlook.com>
+X-ClientProxiedBy: SA9PR13CA0157.namprd13.prod.outlook.com
+ (2603:10b6:806:28::12) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC gmem v1 4/8] KVM: x86: Add gmem hook for invalidating
- memory
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- "tabba@google.com" <tabba@google.com>
-Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
- isaku.yamahata@intel.com, ackerleytng@google.com, vbabka@suse.cz,
- ashish.kalra@amd.com, nikunj.dadhania@amd.com, jroedel@suse.de,
- pankaj.gupta@amd.com
-References: <20231016115028.996656-1-michael.roth@amd.com>
- <20231016115028.996656-5-michael.roth@amd.com>
-Content-Language: en-GB
-From: Steven Price <steven.price@arm.com>
-In-Reply-To: <20231016115028.996656-5-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5304:EE_
+X-MS-Office365-Filtering-Correlation-Id: 31e3291b-6b5d-451b-cd3f-08dc296825cf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	lEyuhhwF4GPV15z/S9e+YeHqfNDAsaAOgLoiEtYM4zxEpWFMkD2N4Su7OhRWTOMA2JlDC5F38huu595ktYBOhbdCsbb5hq6jRXSgIQN46FDJu8x0wjOb5fmQqav8hC7JLFWmwsR6huHQJANJ0gHP2Llv/Y5riGRRXirIvR71XzFgr1/CY+/Ize8Nby/UqPukZP9QM40HcC62Ee6pJRv8/9t7fVMWVOAa1fE34K8T+Z5ftUzz8G4aJHUQN2FkxdPUBPukm4BRvR2duE/gYfSYXbm5Lh36ioXS2zHbmYTFcpY5KaX6jndIid+xLVCuQClK0r/DAD/dDfZlHzq9lrbNBSkE0y23psGuz93HfaOuJTlnTItStKnaG5/GA7YKgQF/m9+QZbr0/b06VKpgtq/tQbNumb46hr2cUM2G234sig5tTooh2qrP6mg8Az5LQvTkEbma7J2MKbDRLtcbdhS8uKDol+HZ3ICDiafwE105nZWRktPnH29DFY6HUrruBIgqMYnJSLBJN9Uhwvuru/gFBgzRNSOaQPvQ2ugreNlUwwPOLec2FlU+LEyZR91QdJxs
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(39860400002)(376002)(366004)(136003)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(41300700001)(6506007)(53546011)(478600001)(6486002)(83380400001)(66476007)(5660300002)(2906002)(66946007)(66556008)(1076003)(26005)(2616005)(36756003)(33656002)(6512007)(8936002)(86362001)(8676002)(6916009)(54906003)(4326008)(38100700002)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?pVzv91DqIGTpjySVeuBSireeQEL8OxOfRNhGTYV+iQYU9RoyGTap8OKFRokO?=
+ =?us-ascii?Q?Q9Oc+6zDIJ4+CQzjt0nuk48QPQe4encgcIhPaxmz5Oplhs05oLCgtXeoD8pK?=
+ =?us-ascii?Q?C68L+/fYS0xBukgELqaPGNYKPrKMnXPesmLKTyeOs71ke737aX4BHi6+NS2H?=
+ =?us-ascii?Q?lv/VDkR8efV8ZaYuF2O/JVkPvyo/utGyrL1oFz6xeXutEpCnuvP9qrQ6Q2OE?=
+ =?us-ascii?Q?O/3+zdboOCn/zzJPf5Z546Ik5ejZZxomJ19A4yPfIkqDvp7iqCDH0fYSN/vo?=
+ =?us-ascii?Q?czkJ8PPE86JFu+ZePJ1xEh5xJHhf/R7hEsVRT4PDwgETyA5NulCkn6ibj0jx?=
+ =?us-ascii?Q?2T0gOev58jQotjWnGRPw8LCN5HqAB9hOITtbuQ3wtd0GHIkU5t7VvVznpxjL?=
+ =?us-ascii?Q?ewvXuOOmRhZBq05ILeBsRsYwdInRT2jG5NFU314NUb3UaWXoXhHYTIKxsj5a?=
+ =?us-ascii?Q?iQK8q9/MR2ERpUt6EhWYRG9nlithVkuedPP+9UKAP3g3+N5eDG7Z+y6Kd5sh?=
+ =?us-ascii?Q?7k3Dsu2JkTVdAAmDpPo/j2+wvj/o9LzuOuhA6wCqKAO48Eu2pHKlXfEaJbEM?=
+ =?us-ascii?Q?S0lX9u4fAvH7PUIEB7ZPINtFQ9GOCrIt0zySX5X+BVQxP2DFRnxGBPRSUyY8?=
+ =?us-ascii?Q?PKiqQmcBPjb0RLAdjbAoDBBiumncNrf7A7Qbwa2wntbeMLU++rd39wfq3c5I?=
+ =?us-ascii?Q?XQjl2sA53b7YbwCa776f3Jnv3zckcJuJIpA4RNB4EdTIVsO4NrwM0s1GLjEu?=
+ =?us-ascii?Q?lwByaxUfjjtzlADXkJCrQ+BQkWPEII/Ng14Ghmuh7spwaqjUYQThOo4fba4K?=
+ =?us-ascii?Q?lPonrhccgGbpYK5PegrzSmoVNUazyxMG5SLp4u5WxqxzQtgpax+/+gHoOrxD?=
+ =?us-ascii?Q?A12e4jDdnfYpxH4oO2zppzKaM+kCUlyo3KjfuhK27hjGuc9nTVqOhUOlaGdv?=
+ =?us-ascii?Q?cjJur3EAY5bUt+H9fLTIx9tnm8/7BKAYx/kDCH6zlrS7x7l+g3C1g5c6EVLJ?=
+ =?us-ascii?Q?wc9rE3N9edU3JcdHsN72/S/ADpeG2Y/bS/eNjBxBhxQdtIQjJpz4wzzg+QsX?=
+ =?us-ascii?Q?XRvzWkmEMuj9PCmfkBW4bXtzv0YX6HqjP0UZRLRf8WSxteaQl4kXLYl6zkvg?=
+ =?us-ascii?Q?ZLSXQ8N036Plw+sp+QhNUKQU0X5AJV3+U2wWTJjf1j/dWYAOXpdz3tDsS/tv?=
+ =?us-ascii?Q?ka8Y7KUtaFd+PX01kSvMrxCLBownfjnzW3QnD56tMRLNZD02B8jbY1WXLlu3?=
+ =?us-ascii?Q?x02CEiz5us/4A6VvorvXloOqxan5wxhXnJAivDsWEgaZ8jYcaAqAWiSXpxaI?=
+ =?us-ascii?Q?NMar2XBxHZBYqjaVOSNFkEfa7V5ke6aPbjt1a7dCHNpbUivuREtYTHl5gAjN?=
+ =?us-ascii?Q?atYmig2cmB5+x5a80cVjN3xqQnCO7vx5j1qHQX51/ezPSnKwnvDk5jStoa33?=
+ =?us-ascii?Q?1uqj7P8ZATRcOvObR4uHagvzD4GvyZ8v1Qg731DLzwHq0CWUJ/XC5X6tbBD0?=
+ =?us-ascii?Q?/hkLePz31BQP0xNWdIh3w40ZB0Cz1yd2BkoUyseJ1sQEFgXfVo3qot8VBL9D?=
+ =?us-ascii?Q?vyTpM8OwnICsI747ywsQvHoiDiySHCoCBddQXZgs?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 31e3291b-6b5d-451b-cd3f-08dc296825cf
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2024 12:10:47.0697
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mKnkYFO6aD7cnXDw6jAttqkyZnwJGdJfcc8rhv1O5Ujm4gNVV8ntR48OFqyHL1qw
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5304
 
-On 16/10/2023 12:50, Michael Roth wrote:
-> In some cases, like with SEV-SNP, guest memory needs to be updated in a
-> platform-specific manner before it can be safely freed back to the host.
-> Wire up arch-defined hooks to the .free_folio kvm_gmem_aops callback to
-> allow for special handling of this sort when freeing memory in response
-> to FALLOC_FL_PUNCH_HOLE operations and when releasing the inode, and go
-> ahead and define an arch-specific hook for x86 since it will be needed
-> for handling memory used for SEV-SNP guests.
-
-Hi all,
-
-Arm CCA has a similar need to prepare/unprepare memory (granule
-delegate/undelegate using our terminology) before it is used for
-protected memory.
-
-However I see a problem with the current gmem implementation that the
-"invalidations" are not precise enough for our RMI API. When punching a
-hole in the memfd the code currently hits the same path (ending in
-kvm_unmap_gfn_range()) as if a VMA is modified in the same range (for
-the shared version). The Arm CCA architecture doesn't allow the
-protected memory to be removed and refaulted without the permission of
-the guest (the memory contents would be wiped in this case).
-
-One option that I've considered is to implement a seperate CCA ioctl to
-notify KVM whether the memory should be mapped protected. The
-invalidations would then be ignored on ranges that are currently
-protected for this guest.
-
-This 'solves' the problem nicely except for the case where the VMM
-deliberately punches holes in memory which the guest is using.
-
-The issue in this case is that there's no way of failing the punch hole
-operation - we can detect that the memory is in use and shouldn't be
-freed, but this callback doesn't give the opportunity to actually block
-the freeing of the memory.
-
-Sadly there's no easy way to map from a physical page in a gmem back to
-which VM (and where in the VM) the page is mapped. So actually ripping
-the page out of the appropriate VM isn't really possible in this case.
-
-How is this situation handled on x86? Is it possible to invalidate and
-then refault a protected page without affecting the memory contents? My
-guess is yes and that is a CCA specific problem - is my understanding
-correct?
-
-My current thoughts for CCA are one of three options:
-
-1. Represent shared and protected memory as two separate memslots. This
-matches the underlying architecture more closely (the top address bit is
-repurposed as a 'shared' flag), but I don't like it because it's a
-deviation from other CoCo architectures (notably pKVM).
-
-2. Allow punch-hole to fail on CCA if the memory is mapped into the
-guest's protected space. Again, this is CCA being different and also
-creates nasty corner cases where the gmem descriptor could have to
-outlive the VMM - so looks like a potential source of memory leaks.
-
-3. 'Fix' the invalidation to provide more precise semantics. I haven't
-yet prototyped it but it might be possible to simply provide a flag from
-kvm_gmem_invalidate_begin specifying that the invalidation is for the
-protected memory. KVM would then only unmap the protected memory when
-this flag is set (avoiding issues with VMA updates causing spurious unmaps).
-
-Fairly obviously (3) is my preferred option, but it relies on the
-guarantees that the "invalidation" is actually a precise set of
-addresses where the memory is actually being freed.
-
-Comments, thoughts, objections welcome!
-
-Steve
-
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |  1 +
->  arch/x86/include/asm/kvm_host.h    |  1 +
->  arch/x86/kvm/x86.c                 |  7 +++++++
->  include/linux/kvm_host.h           |  4 ++++
->  virt/kvm/Kconfig                   |  4 ++++
->  virt/kvm/guest_memfd.c             | 14 ++++++++++++++
->  6 files changed, 31 insertions(+)
+On Fri, Feb 09, 2024 at 08:23:32AM +0000, Zeng, Xin wrote:
+> Thanks for your comments, Jason.
+> On Tuesday, February 6, 2024 8:55 PM, Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > > +
+> > > +	ops = mdev->ops;
+> > > +	if (!ops || !ops->init || !ops->cleanup ||
+> > > +	    !ops->open || !ops->close ||
+> > > +	    !ops->save_state || !ops->load_state ||
+> > > +	    !ops->suspend || !ops->resume) {
+> > > +		ret = -EIO;
+> > > +		dev_err(&parent->dev, "Incomplete device migration ops
+> > structure!");
+> > > +		goto err_destroy;
+> > > +	}
+> > 
+> > Why are there ops pointers here? I would expect this should just be
+> > direct function calls to the PF QAT driver.
 > 
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 0c113f42d5c7..f1505a5fa781 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -135,6 +135,7 @@ KVM_X86_OP(complete_emulated_msr)
->  KVM_X86_OP(vcpu_deliver_sipi_vector)
->  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
->  KVM_X86_OP_OPTIONAL_RET0(gmem_prepare)
-> +KVM_X86_OP_OPTIONAL(gmem_invalidate)
->  
->  #undef KVM_X86_OP
->  #undef KVM_X86_OP_OPTIONAL
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 66fc89d1858f..dbec74783f48 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1754,6 +1754,7 @@ struct kvm_x86_ops {
->  	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
->  
->  	int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
-> +	void (*gmem_invalidate)(kvm_pfn_t start, kvm_pfn_t end);
->  };
->  
->  struct kvm_x86_nested_ops {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 33a4cc33d86d..0e95c3a95e59 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13308,6 +13308,13 @@ int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_ord
->  }
->  #endif
->  
-> +#ifdef CONFIG_HAVE_KVM_GMEM_INVALIDATE
-> +void kvm_arch_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end)
-> +{
-> +	static_call_cond(kvm_x86_gmem_invalidate)(start, end);
-> +}
-> +#endif
-> +
->  int kvm_spec_ctrl_test_value(u64 value)
->  {
->  	/*
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index c7f82c2f1bcf..840a5be5962a 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2429,4 +2429,8 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
->  int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order);
->  #endif
->  
-> +#ifdef CONFIG_HAVE_KVM_GMEM_INVALIDATE
-> +void kvm_arch_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
-> +#endif
-> +
->  #endif
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 992cf6ed86ef..7fd1362a7ebe 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -113,3 +113,7 @@ config KVM_GENERIC_PRIVATE_MEM
->  config HAVE_KVM_GMEM_PREPARE
->         bool
->         depends on KVM_PRIVATE_MEM
-> +
-> +config HAVE_KVM_GMEM_INVALIDATE
-> +       bool
-> +       depends on KVM_PRIVATE_MEM
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 72ff8b7b31d5..b4c4df259fb8 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -369,12 +369,26 @@ static int kvm_gmem_error_page(struct address_space *mapping, struct page *page)
->  	return MF_DELAYED;
->  }
->  
-> +#ifdef CONFIG_HAVE_KVM_GMEM_INVALIDATE
-> +static void kvm_gmem_free_folio(struct folio *folio)
-> +{
-> +	struct page *page = folio_page(folio, 0);
-> +	kvm_pfn_t pfn = page_to_pfn(page);
-> +	int order = folio_order(folio);
-> +
-> +	kvm_arch_gmem_invalidate(pfn, pfn + (1ul << order));
-> +}
-> +#endif
-> +
->  static const struct address_space_operations kvm_gmem_aops = {
->  	.dirty_folio = noop_dirty_folio,
->  #ifdef CONFIG_MIGRATION
->  	.migrate_folio	= kvm_gmem_migrate_folio,
->  #endif
->  	.error_remove_page = kvm_gmem_error_page,
-> +#ifdef CONFIG_HAVE_KVM_GMEM_INVALIDATE
-> +	.free_folio = kvm_gmem_free_folio,
-> +#endif
->  };
->  
->  static int kvm_gmem_getattr(struct mnt_idmap *idmap, const struct path *path,
+> I indeed had a version where the direct function calls are Implemented in
+> QAT driver, while when I look at the functions, most of them 
+> only translate the interface to the ops pointer. That's why I put
+> ops pointers directly into vfio variant driver.
 
+But why is there an ops indirection at all? Are there more than one
+ops?
+
+> > > +static void qat_vf_pci_aer_reset_done(struct pci_dev *pdev)
+> > > +{
+> > > +	struct qat_vf_core_device *qat_vdev = qat_vf_drvdata(pdev);
+> > > +
+> > > +	if (!qat_vdev->core_device.vdev.mig_ops)
+> > > +		return;
+> > > +
+> > > +	/*
+> > > +	 * As the higher VFIO layers are holding locks across reset and using
+> > > +	 * those same locks with the mm_lock we need to prevent ABBA
+> > deadlock
+> > > +	 * with the state_mutex and mm_lock.
+> > > +	 * In case the state_mutex was taken already we defer the cleanup work
+> > > +	 * to the unlock flow of the other running context.
+> > > +	 */
+> > > +	spin_lock(&qat_vdev->reset_lock);
+> > > +	qat_vdev->deferred_reset = true;
+> > > +	if (!mutex_trylock(&qat_vdev->state_mutex)) {
+> > > +		spin_unlock(&qat_vdev->reset_lock);
+> > > +		return;
+> > > +	}
+> > > +	spin_unlock(&qat_vdev->reset_lock);
+> > > +	qat_vf_state_mutex_unlock(qat_vdev);
+> > > +}
+> > 
+> > Do you really need this? I thought this ugly thing was going to be a
+> > uniquely mlx5 thing..
+> 
+> I think that's still required to make the migration state synchronized
+> if the VF is reset by other VFIO emulation paths. Is it the case? 
+> BTW, this implementation is not only in mlx5 driver, but also in other
+> Vfio pci variant drivers such as hisilicon acc driver and pds
+> driver.
+
+It had to specifically do with the mm lock interaction that, I
+thought, was going to be unique to the mlx driver. Otherwise you could
+just directly hold the state_mutex here.
+
+Yishai do you remember the exact trace for the mmlock entanglement?
+
+Jason
