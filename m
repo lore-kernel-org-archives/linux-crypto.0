@@ -1,202 +1,166 @@
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED1023B1;
-	Fri,  9 Feb 2024 20:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDE95B692
+	for <linux-crypto@vger.kernel.org>; Sat, 10 Feb 2024 15:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707510731; cv=none; b=mr0mV2Thy90uzXwhmGLtG/GXiYACATOlmTKiqFbvbBWZ4y0XTxwRfSrdUx2wqBsmpDNPerLKhKg0Jpsi6f66liVzzjfrjft4mSBauEDXIXsk8xJBGDRWL3yuwKiGI6Yg9jGCW1c6cIiH4I6WLvKmMJ0YTOlD24P0UTqS8aY97U0=
+	t=1707578734; cv=none; b=A5endzEd5qqpkkUvMJVgk2MwG0Kq7yFptv/Fpmh0ClGI5iy8klmHjSJlEq9iAHunfVlOjzmGk8hujH1WD3dfqB9Uk5buEmrFA36Y0ZReUgyeac9YuNJ69cAoiaMQkXStxN6KXXY54Xy+4KFf3rFon0vFIVdt5VZfeQGBdEXpmbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707510731; c=relaxed/simple;
-	bh=W4hX4Fr27kDfOqCWn6zXDk0H9YB1rKxtALyMNKxVk4o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=by9URIP60WTQrCWub5K32hvG3K43Xv7yJlU4QT+TfazPQ9lHlq/4P/1w7BJdxS4Z9+njgFzxKsQ7Q1HStGHC5IFHKag9kfbR4I9CgQy9a1e4IwilVQ8JdvZPcPFl7pb5cSSnT8e9X93vt1Fkt78+QSriscI7CbGppoAFQxXQyRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 9FB682800B767;
-	Fri,  9 Feb 2024 21:32:04 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 808144D3896; Fri,  9 Feb 2024 21:32:04 +0100 (CET)
-Date: Fri, 9 Feb 2024 21:32:04 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: Bjorn Helgaas <helgaas@kernel.org>, David Howells <dhowells@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, linuxarm@huawei.com,
-	David Box <david.e.box@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, "Li, Ming" <ming4.li@intel.com>,
-	Zhi Wang <zhi.a.wang@intel.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 07/12] spdm: Introduce library to authenticate devices
-Message-ID: <20240209203204.GA5850@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
- <89a83f42ae3c411f46efd968007e9b2afd839e74.1695921657.git.lukas@wunner.de>
- <5d0e75-993c-3978-8ccf-60bfb7cac10@linux.intel.com>
+	s=arc-20240116; t=1707578734; c=relaxed/simple;
+	bh=ZVoslugSGMhMVUD18y4BcRNe+EEdIzOmrHzcC8imdcs=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=sr35MfV7rinIP9qZl3p0v3dfgKd00XCz1pcjatciumSTooIXjGrugO4O+udri3D6pmeJZwCQqauG0dnrTR+Y6dhUJJhM1XaELLJSKpQTUC0Gcw+NZJufqt3cLqT/EoGpc34EWlKWF+1JGmTsNzTGQeca1m5/sPjjW9Vup5Ece1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=RkXON8je; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="RkXON8je"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1d7431e702dso17800425ad.1
+        for <linux-crypto@vger.kernel.org>; Sat, 10 Feb 2024 07:25:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1707578732; x=1708183532; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zlEfppOFDKm/ps4r+9qSEREyPWdjHVQY01GkaqhYUUk=;
+        b=RkXON8jemDJc99tr2oHEkPcfBYH696X+iZmLsALmaN20O6EwQVEQWMeC4pnz6L53Qo
+         9QMMfhBuKVxREt328aHz3lfhvkpJwdGVyBLb+c1utT/mcBJEN+3rI2CAMLa1jaGA37qU
+         PHwdGsWnZXXDHCC9GIw2dN56YIENojydbGKH+vbAuqfKovRNJECaro/r7Y7xlE7UeVF2
+         ueTu4EhqERfT8YWs47hRoHp6je4ei+EvoQd2meKMWsusKJ7qHFE4SOiBbaQ4TbJghlcG
+         7DNLQcOuS2+dSovLynpV7ATyz0w1Kn268DhIjWRv/j3UVHGNyV918wbANoCzj0KAnCXu
+         Hayw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707578732; x=1708183532;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zlEfppOFDKm/ps4r+9qSEREyPWdjHVQY01GkaqhYUUk=;
+        b=BhruYdjnjCju03a9xWTje5QrmCLGteS+8yBHYIbWwUnnL6sn5n5ZM8+GPbcNvMjIOy
+         nhHzxT9dZUZryOGNaRnvBFdHL5zMAupyTKhC1qDguO6vzeT7q3kGuMmhqQPeQoSDhXyQ
+         rg//iRTzgcs9/DSh3wF1Y97lOivqkKRdVSLukL5SLvTwYH+ovD8aGbPCChwclVjAwLQK
+         6dW6QnXqbQOHUtkRYtKpF6hdgEQ78PoT/1HZwHl2MaSOHxhWZICrXwHSZZw1j2U2oWVI
+         C/DlkbgJO92qjN7K9Jj3GgIzlr4YP8cnHpJRizg3Ng1Uo2imMG5n4YcWiyKIRM3UdNQH
+         foYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaKzwXXYqYXJGpzn6TorIbBxYpsy4g8ymq4dnSymjgB2wCbkZoDc6AkowgmVG5X2jiAcCc7lIjqCeKbYBx+SJ7Rzo7wTyBbRDciwVR
+X-Gm-Message-State: AOJu0Yx166YbH6V8IlYf9KgIgeuYIKXR86DDdrdnwhrdIZT2TeDokBtE
+	GwXsqe6y8nE1vGzKv7orLspQOz4qby9+4i0YENY1fKauq+L9gdVdO1DkOnhVG2E=
+X-Google-Smtp-Source: AGHT+IHHJAdhfjj7JqBp9ra8No8Slk0aKWukt6ixBwWc0Y8yC6NlQl6qyqfgwIYeixkLe/3fdE0YwQ==
+X-Received: by 2002:a17:903:246:b0:1d8:e4b8:95d6 with SMTP id j6-20020a170903024600b001d8e4b895d6mr2403272plh.27.1707578732216;
+        Sat, 10 Feb 2024 07:25:32 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCViMKCSm4GQ+Nyv4rH8MvySBgoBa9MijGWRQk21Y7FDsRt20JvMXK7RMNnqR6RfWEluMxVI8up0CBcFbub81M1lVCv03wsd+liPjQHeKHJNbmRFkkgM0dGahQjdF6ZfOaOdxy1pguMkG/RSISqrHxSGPv5MfrP3YwieobvVlUHmFDQFAlD9uFyDl9/qY1Lbxxv9V6pYE6PXALf4u2q1/WssJrrOZmL2nrQK8ZMsbbc980rupySVBzshmauxMw==
+Received: from ?IPv6:2402:7500:5dc:b102:45ed:2306:e8a6:d144? ([2402:7500:5dc:b102:45ed:2306:e8a6:d144])
+        by smtp.gmail.com with ESMTPSA id kp15-20020a170903280f00b001d90fe6da6esm3172756plb.305.2024.02.10.07.25.30
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 10 Feb 2024 07:25:31 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5d0e75-993c-3978-8ccf-60bfb7cac10@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
+Subject: Re: [PATCH riscv/for-next] crypto: riscv - parallelize AES-CBC
+ decryption
+From: Jerry Shih <jerry.shih@sifive.com>
+In-Reply-To: <20240208060851.154129-1-ebiggers@kernel.org>
+Date: Sat, 10 Feb 2024 23:25:27 +0800
+Cc: linux-riscv@lists.infradead.org,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ linux-crypto@vger.kernel.org,
+ =?utf-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>,
+ Heiko Stuebner <heiko@sntech.de>,
+ Phoebe Chen <phoebe.chen@sifive.com>,
+ Andy Chiu <andy.chiu@sifive.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <04703246-6EF6-4B54-B8F1-96EDEC2FBA6B@sifive.com>
+References: <20240208060851.154129-1-ebiggers@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+X-Mailer: Apple Mail (2.3445.9.7)
 
-On Tue, Oct 03, 2023 at 01:35:26PM +0300, Ilpo Järvinen wrote:
-> On Thu, 28 Sep 2023, Lukas Wunner wrote:
-> > +typedef int (spdm_transport)(void *priv, struct device *dev,
-> > +                          const void *request, size_t request_sz,
-> > +                          void *response, size_t response_sz);
-> 
-> This returns a length or an error, right? If so return ssize_t instead.
-> 
-> If you make this change, alter the caller types too.
+On Feb 8, 2024, at 14:08, Eric Biggers <ebiggers@kernel.org> wrote:
+> From: Eric Biggers <ebiggers@google.com>
+>=20
+> Since CBC decryption is parallelizable, make the RISC-V implementation
+> of AES-CBC decryption process multiple blocks at a time, instead of
+> processing the blocks one by one.  This should improve performance.
+>=20
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+> arch/riscv/crypto/aes-riscv64-zvkned.S | 24 +++++++++++++++---------
+> 1 file changed, 15 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/arch/riscv/crypto/aes-riscv64-zvkned.S =
+b/arch/riscv/crypto/aes-riscv64-zvkned.S
+> index 78d4e1186c074..43541aad6386c 100644
+> --- a/arch/riscv/crypto/aes-riscv64-zvkned.S
+> +++ b/arch/riscv/crypto/aes-riscv64-zvkned.S
+> @@ -132,33 +132,39 @@ SYM_FUNC_END(aes_ecb_decrypt_zvkned)
+> 	addi		INP, INP, 16
+> 	addi		OUTP, OUTP, 16
+> 	addi		LEN, LEN, -16
+> 	bnez		LEN, 1b
+>=20
+> 	vse32.v		v16, (IVP)	// Store next IV
+> 	ret
+> .endm
+>=20
+> .macro	aes_cbc_decrypt	keylen
+> +	srli		LEN, LEN, 2	// Convert LEN from bytes to =
+words
+> 	vle32.v		v16, (IVP)	// Load IV
+> 1:
+> -	vle32.v		v17, (INP)	// Load ciphertext block
+> -	vmv.v.v		v18, v17	// Save ciphertext block
+> -	aes_decrypt	v17, \keylen	// Decrypt
+> -	vxor.vv		v17, v17, v16	// XOR with IV or prev =
+ciphertext block
+> -	vse32.v		v17, (OUTP)	// Store plaintext block
+> -	vmv.v.v		v16, v18	// Next "IV" is prev ciphertext =
+block
+> -	addi		INP, INP, 16
+> -	addi		OUTP, OUTP, 16
+> -	addi		LEN, LEN, -16
+> +	vsetvli		t0, LEN, e32, m4, ta, ma
+> +	vle32.v		v20, (INP)	// Load ciphertext blocks
+> +	vslideup.vi	v16, v20, 4	// Setup prev ciphertext blocks
+> +	addi		t1, t0, -4
+> +	vslidedown.vx	v24, v20, t1	// Save last ciphertext block
 
-Alright, I've changed the types in __spdm_exchange() and spdm_exchange().
+Do we need to setup the `e32, len=3Dt0` for next IV?
+I think we only need 128bit IV (with VL=3D4).
 
-However the callers of those functions assign the result to an "rc" variable
-which is also used to receive an "int" return value.
-E.g. spdm_get_digests() assigns the ssize_t result of spdm_exchange() to rc
-but also the int result of crypto_shash_update().
+> +	aes_decrypt	v20, \keylen	// Decrypt the blocks
+> +	vxor.vv		v20, v20, v16	// XOR with prev ciphertext =
+blocks
+> +	vse32.v		v20, (OUTP)	// Store plaintext blocks
+> +	vmv.v.v		v16, v24	// Next "IV" is last ciphertext =
+block
 
-It feels awkward to change the type of "rc" to "ssize_t" in those
-functions, so I kept "int".
+Same VL issue here.
 
+> +	slli		t1, t0, 2	// Words to bytes
+> +	add		INP, INP, t1
+> +	add		OUTP, OUTP, t1
+> +	sub		LEN, LEN, t0
+> 	bnez		LEN, 1b
+>=20
+> +	vsetivli	zero, 4, e32, m1, ta, ma
+> 	vse32.v		v16, (IVP)	// Store next IV
+> 	ret
+> .endm
+>=20
+> // void aes_cbc_encrypt_zvkned(const struct crypto_aes_ctx *key,
+> //			       const u8 *in, u8 *out, size_t len, u8 =
+iv[16]);
+> //
+> // |len| must be nonzero and a multiple of 16 (AES_BLOCK_SIZE).
+> SYM_FUNC_START(aes_cbc_encrypt_zvkned)
+> 	aes_begin	KEYP, 128f, 192f
+>=20
+> base-commit: cb4ede926134a65bc3bf90ed58dace8451d7e759
+> --=20
+> 2.43.0
+>=20
 
-> > +} __packed;
-> > +
-> > +#define SPDM_GET_CAPABILITIES 0xE1
-> 
-> There's non-capital hex later in the file, please try to be consistent.
-
-The spec uses capital hex characters, so this was done to ease
-connecting the implementation to the spec.
-
-OTOH I don't want to capitalize all the hex codes in enum spdm_error_code.
-
-So I guess consistency takes precedence and I've amended the
-patch to downcase all hex characters, as you've requested.
-
-
-> > +struct spdm_error_rsp {
-> > +	u8 version;
-> > +	u8 code;
-> > +	enum spdm_error_code error_code:8;
-> > +	u8 error_data;
-> > +
-> > +	u8 extended_error_data[];
-> > +} __packed;
-> 
-> Is this always going to produce the layout you want given the alignment 
-> requirements for the storage unit for u8 and enum are probably different?
-
-Yes, the __packed attribute forces the compiler to avoid padding.
-
-
-> > +	spdm_state->responder_caps = le32_to_cpu(rsp->flags);
-> 
-> Earlier, unaligned accessors where used with the version_number_entries.
-> Is it intentional they're not used here (I cannot see what would be 
-> reason for this difference)?
-
-Thanks, good catch.  Indeed this is not necessarily naturally aligned
-because the GET_CAPABILITIES request and response succeeds the
-GET_VERSION response in the same allocation.  And the GET_VERSION
-response size is a multiple of 2, but not always a multiple of 4.
-
-So I've amended the patch to use a separate allocation for the
-GET_CAPABILITIES request and response.  The spec-defined struct layout
-of those messages is such that the 32-bit accesses are indeed always
-naturally aligned.
-
-The existing unaligned accessor in spdm_get_version() turned out
-to be unnecessary after taking a closer look, so I dropped that one.
-
-
-> > +static int spdm_negotiate_algs(struct spdm_state *spdm_state,
-> > +			       void *transcript, size_t transcript_sz)
-> > +{
-> > +	struct spdm_req_alg_struct *req_alg_struct;
-> > +	struct spdm_negotiate_algs_req *req;
-> > +	struct spdm_negotiate_algs_rsp *rsp;
-> > +	size_t req_sz = sizeof(*req);
-> > +	size_t rsp_sz = sizeof(*rsp);
-> > +	int rc, length;
-> > +
-> > +	/* Request length shall be <= 128 bytes (SPDM 1.1.0 margin no 185) */
-> > +	BUILD_BUG_ON(req_sz > 128);
-> 
-> I don't know why this really has to be here? This could be static_assert()
-> below the struct declaration.
-
-A follow-on patch to add key exchange support increases req_sz based on
-an SPDM_MAX_REQ_ALG_STRUCT macro defined here in front of the function
-where it's used.  That's the reason why the size is checked here as well.
-
-
-> > +static int spdm_get_certificate(struct spdm_state *spdm_state, u8 slot)
-> > +{
-> > +	struct spdm_get_certificate_req req = {
-> > +		.code = SPDM_GET_CERTIFICATE,
-> > +		.param1 = slot,
-> > +	};
-> > +	struct spdm_get_certificate_rsp *rsp;
-> > +	struct spdm_cert_chain *certs = NULL;
-> > +	size_t rsp_sz, total_length, header_length;
-> > +	u16 remainder_length = 0xffff;
-> 
-> 0xffff in this function should use either U16_MAX or SZ_64K - 1.
-
-The SPDM spec uses 0xffff so I'm deliberately using that as well
-to make the connection to the spec obvious.
-
-
-> > +static void spdm_create_combined_prefix(struct spdm_state *spdm_state,
-> > +					const char *spdm_context, void *buf)
-> > +{
-> > +	u8 minor = spdm_state->version & 0xf;
-> > +	u8 major = spdm_state->version >> 4;
-> > +	size_t len = strlen(spdm_context);
-> > +	int rc, zero_pad;
-> > +
-> > +	rc = snprintf(buf, SPDM_PREFIX_SZ + 1,
-> > +		      "dmtf-spdm-v%hhx.%hhx.*dmtf-spdm-v%hhx.%hhx.*"
-> > +		      "dmtf-spdm-v%hhx.%hhx.*dmtf-spdm-v%hhx.%hhx.*",
-> > +		      major, minor, major, minor, major, minor, major, minor);
-> 
-> Why are these using s8 formatting specifier %hhx ??
-
-I don't quite follow, "%hhx" is an unsigned char, not a signed char.
-
-spdm_state->version may contain e.g. 0x12 which is converted to
-"dmtf-spdm-v1.2.*" here.
-
-The question is what happens if the major or minor version goes beyond 9.
-The total length of the prefix is hard-coded by the spec, hence my
-expectation is that 1.10 will be represented as "dmtf-spdm-v1.a.*"
-to not exceed the length.  The code follows that expectation.
-
-Thanks for taking a look!   I've amended the patch to take all your
-other feedback into account.
-
-Lukas
