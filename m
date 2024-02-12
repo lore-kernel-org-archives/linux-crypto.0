@@ -1,61 +1,61 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9732345BE6
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2024 17:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C86546557
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2024 17:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707757849; cv=none; b=PgGgXyGgUEQ+ZogNoDEMqrQ2chMOt6fqqFqGqZPAcvseRwM74dTRFF92lGzdrJBUT5DIbP7P07rY72QUo7Iw5KMuTZCm929YdFXpbZ1tTl1Qnh8UKIAEYpKoTViPam6ibYaQpLw4fKDU/vJ0xlj2bmeIlu723X8usq2QJRISHDM=
+	t=1707757886; cv=none; b=saQnPuBVTX68Dda7wguNHWNH4mWdFrJtRQR5BoxMNo1Lz1Cqy0ggWIC+C04a4bW5QstLWlt97TnTEkjeTr9wPzG4p+NJuR3gM+2xL+hafSVAphlO4pMqcgkhz9a0o6p4yzNO3Tx60MWLSuZF5juxh0UUBBDDJBbYGtBXvYmKKco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707757849; c=relaxed/simple;
-	bh=ACgWgiARc/AvHlxGkph6QCWkNli6hCa9jPNldi9bgR0=;
+	s=arc-20240116; t=1707757886; c=relaxed/simple;
+	bh=45yRGF4FB4tNV5Am4KTFPJYvWefFkp+bk+Ru65wYll8=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Y4tXGuRMyqkxQTcrNaCsgZ4lHSiWuCUr7pRnmTx3pB1oDt/WJFM2LqIBS2m0VDJvQBdB+T1hTNzCCG4wrvhyIVuBf7Mq3LeyMZsezehouePbo4pyK7FzuMFSFQkle6AwgFDAJnDJzTiwrkdJ5/+BKVo2z5xXOOcS4z54kXm5TWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PE23QV8/; arc=none smtp.client-ip=209.85.128.50
+	 In-Reply-To:Content-Type; b=h7jkIYSQCsWb8EnSaAu2PzNIWbPRUtVy7HaKQCfJPZygCMbj18tK/mcmYiYDxXBktZCdPEDTVLGgG6z4qxIgE1WqNZ5dNHlM4tg5z8bAq5dOAPDAnhHFJsZXi0MYGW0ttITXe2kxZG/8TjsckUFY0fpV5RrhTGl2iQ5nJe2cb2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YiMAb9cB; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PE23QV8/"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4114e0a2978so4785395e9.3
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2024 09:10:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YiMAb9cB"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33b8807b55aso444657f8f.3
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2024 09:11:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707757846; x=1708362646; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1707757882; x=1708362682; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=aGvoruSq5+YyVDp5RLm++NC4frHeOZ73PUQlBpNiOaA=;
-        b=PE23QV8/u5zztxWzhIusX7L+19ENs1xpw/rGGOi8HkO5Cp0UbCgCkX8wDWRNTnKCXS
-         hhuNWA5YmMHdGlydxYHWRdKPPuK2R1uEbo+vEHk3Si7lZ9WXV14Qd9P2nkPo8zuFLtIl
-         yZ6Vlj67ZBmXOKFAjMZBtvW4zOq9IsmHiS4++wj73rRMRK4CfhUpavFIRrPvM6nFf6Ku
-         XSue307QRNc4ZaqqGBxt9uJIr94d60xBDHBj6s0THtVy2mo9b5b20vfRr1zlH6lzq+wJ
-         UYJWJuf3cqxrDg0cLTvfvRBJmffQiL7xDe3J+rP3ODveL48sSu18n9xeROAb8vC7EULM
-         7mCw==
+        bh=z88dR7PUkTcRGj5lNakDVXVkWGFXVN89MP6hxtmCpLI=;
+        b=YiMAb9cBc7b0t6okVwgW/miYKO65BIBt4W0U2yC1bj7xosVHp/g5ZmW9+R/iJ+Bu1/
+         n2ddlNnAZHzShJjAaVDN0wR0jC73xXhddNhIs87rWo3Rd4hoBK7bubbsqesxJxS0vv6K
+         jWwUoAcPmMagz2/WMNPNHX1YLs5UFe59QlK4pdMjhHVbCXM+N96sgvfV4exgSta8ky9K
+         mwsKgcwgznGYYr80nyplmrIzCGwT6dxMWc6dTjDl4siuT9NTDY0s+xnhdVId3xqr91mQ
+         w177wU/5lgAQBC88QiJoLEgU86vp34Tv1Zpk9lx4Wjyu0XthV81xwmhyS00LN/ke0BmM
+         h7mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707757846; x=1708362646;
+        d=1e100.net; s=20230601; t=1707757882; x=1708362682;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=aGvoruSq5+YyVDp5RLm++NC4frHeOZ73PUQlBpNiOaA=;
-        b=WkvVA4hcCjQjNPkcS7DDfvXV11ZSn+ah0wMfPc+uE435KbfqwrH+MNitjsryClnPFy
-         NKZTXRxVwuExmBmydCoUTAmjXrTGDGePsoYHesHv9Ifs3B+T7Q3nGJYcmP+Sn3/frGoq
-         HIdfyT7/S4Y1WxKrkXtpCGIEwsZHXEjwCb9y5UXOHSwjlPDtMs6G6cb+zHhMICJPImPi
-         Aeq+mRvEYt1td4HhkuE6wIZ58GvgHuFl37PA83xcYIYq3xUoIaKkQvygm45IMIgeXJ6o
-         OGsmDHOhUCoKLZYvU+qyCPphvak29EcEjXs5l+oOWlojXKFMpopcTFME1lXwJtCsnfOR
-         MfgQ==
-X-Gm-Message-State: AOJu0YyjbVuOptuUbUSDU3wu+zZApA8ZxBs4NoKghYSrUDyEB8Y0HLky
-	f4VyzG2t1oNSiMlib0/MkkGVv9kSVv9MnItkx2a53Gz8G7CGwjMCOuRhkrK0uRA=
-X-Google-Smtp-Source: AGHT+IHv8Iv2oon4/pAefr7VSRrspM+Uy/4mCCVPMigXDwU/+OPple5+0vJd3k1xTpdbpcl05kjDoA==
-X-Received: by 2002:a05:6000:1a85:b0:33b:bf2:a2f6 with SMTP id f5-20020a0560001a8500b0033b0bf2a2f6mr6873205wry.65.1707757845739;
-        Mon, 12 Feb 2024 09:10:45 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXGOIgfTzE63pZ6poBPoQYRrQlvVwEwgtFQ+YK2UaU8T2eS9CeG28pbIHi+I8xotMsaeO3OPyIbociF8Wof2kfkAt8yGaWYrXiW8GnBLcLTes1nEb/O8IGLYN1nBklT1iq3wcHAvx+1tnr2Pc9Q1JLzlWJ1Rh9dFpkQFxnLArfd8vRKB/4/NTbNhhX6r0Y9POLcQk9ekot8P7fID8VC6HxuwC9rbaTBsAtNkJTrLRjUq5FfINzb8esuVZMr1Bn2A9hNr/e5ds93o6sOu7rexooG5O+RmrOBX8LoGrbatEmwBVaZs6KzmqnWE1XbLAgks1Y+30K5ucOskmjXwmIDMWSMDv6Fy9JuHH1YX0MAR1ezBmwiK+kFtGOw7SoH0HqxLlIPl0a2l7gTEgt965qCmQN6nWa5LQ8Y564VmHh9Zdf5A/QA9KkovdPXAkax3/TYodICl7Ag+LoL4ZOueyK5ycH3x++fgyCYqdAulRPAVv3dxlEoZvYcaFFaTedk/qkcCR49wxqJsiCZWqgR17GngaVM8tTMboj+m7IcBqRdfojq0m6kqmyaU8iE9rVLCSNwRsH2e7OA5jfxnDkSWU3IziAjPgF8ROvUvzug
+        bh=z88dR7PUkTcRGj5lNakDVXVkWGFXVN89MP6hxtmCpLI=;
+        b=JimqFbxZhpxnX7yjOKbVzGmOvQ/17ybBi2TDutcmFcC0HBp+grf78UBhBrs80SjLEA
+         TNpMXF9CexFifjUwgzklZpgyQqJbmUVxPsFnLHhgjZGbBfODWhdk/H5O7Ec4ANyXDQk0
+         1H9kzXNlOA5d9/Tfga2K9/NDpvwHvxk5t8UasTmtuSldnyDAm9nXOf/VfC/QbKr+A1N4
+         U/EBi+uny/JJRz2SLpIUT11SDKjVB5f6lwuIh6KEjye3SbhozWoBuEuPJrcNALFAWH/W
+         0hwOsc1JgHjN7Jn1XQ+howEwS+aL3oucj5OtKvAtNFaUbQYqA+qFpTq684ffCXtpxf7L
+         /sqw==
+X-Gm-Message-State: AOJu0YyB8SE1Ya+QvPKw7EV+PgWxerL9JD35f9NL1TdBudgv22wjlXF8
+	58E71wNl6mATON9b0yM015ixy4YeB2WxTLrGC+aqKNkjbeyS1kqzWxBoX7Nz3gw=
+X-Google-Smtp-Source: AGHT+IGBNdxn1mzGqbZ273VsCbHhIKxKw+Ok3uY/Ud8yKtGlif2B8ukwVxDWaYYg5Y0mAqINm6+ORw==
+X-Received: by 2002:a5d:490b:0:b0:33b:2fdd:daf8 with SMTP id x11-20020a5d490b000000b0033b2fdddaf8mr5110953wrq.21.1707757881869;
+        Mon, 12 Feb 2024 09:11:21 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWeNEu1npYYlncp0jQv1FNO760HTnDLPJSlgdJ0xDQ+O/KSiOHvDOI8s9zWA64eeGlff5F7BMYt8iSkGsr+K9rs+rN+t9FGYcP0LyJC92jlwTegS1pwTEL5thLaa7DSz+vJW3fWkWZQldhcpgFMlyDOGesAsr4kdrJYUpM0ZFCwofWi0/ipDx8SaDRPLKO4J7gaFWo+mhtZg6RbJP74TjW5FYnn0YQiqTJDDpqH784wWQ8bCaV1vv31j2sDsQncyfP6pPyEmrudmzrwRP/caPcOxuim6djy4H0qAlR2paKyuOE1GsAPcjN5J3wV72vkycBt5XnOGhnVTyYGew5s5LVNeLQYhwy2XjMhrje59yN/EClZmau90cGXAt/+nUmawRK+EThaZv7C3Vhki3gdguOYFP2Di3GNctrQ+q743KoM95N7tPRY7XsGKwmQdF/aDY3V7UPCLMZXgmA5musziHNXSf38O15ZWzzkspJXsXku4H1imwJLg+mI8n2lCA1BJOCTXem9WfvCweNfc2XU2LCL/ssaysmxvmdnp6kA0i9lZA8Fa9X0IH0hEr4wecZTbxrOTUi63Gdv12yDbXIVq4Ad7cQkZ7/S92GQ
 Received: from ?IPV6:2a01:e0a:982:cbb0:fcee:f026:296d:135f? ([2a01:e0a:982:cbb0:fcee:f026:296d:135f])
-        by smtp.gmail.com with ESMTPSA id ck13-20020a5d5e8d000000b0033b684d6d5csm7440536wrb.20.2024.02.12.09.10.44
+        by smtp.gmail.com with ESMTPSA id ck13-20020a5d5e8d000000b0033b684d6d5csm7440536wrb.20.2024.02.12.09.11.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 09:10:45 -0800 (PST)
-Message-ID: <0ccbe65c-4a68-472e-8de0-79e88691d364@linaro.org>
-Date: Mon, 12 Feb 2024 18:10:44 +0100
+        Mon, 12 Feb 2024 09:11:21 -0800 (PST)
+Message-ID: <6cbbf8ff-8e8b-4b37-846c-a9d4084f3f2d@linaro.org>
+Date: Mon, 12 Feb 2024 18:11:20 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -65,8 +65,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: neil.armstrong@linaro.org
 Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH v4 03/20] drivers: crypto: meson: make CLK controller
- optional
+Subject: Re: [PATCH v4 04/20] drivers: crypto: meson: add MMIO helpers
 Content-Language: en-US, fr
 To: Alexey Romanov <avromanov@salutedevices.com>, clabbe@baylibre.com,
  herbert@gondor.apana.org.au, davem@davemloft.net, robh+dt@kernel.org,
@@ -77,7 +76,7 @@ Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
  linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
 References: <20240212135108.549755-1-avromanov@salutedevices.com>
- <20240212135108.549755-4-avromanov@salutedevices.com>
+ <20240212135108.549755-5-avromanov@salutedevices.com>
 Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
  GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
@@ -103,96 +102,87 @@ Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
  QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
 Organization: Linaro Developer Services
-In-Reply-To: <20240212135108.549755-4-avromanov@salutedevices.com>
+In-Reply-To: <20240212135108.549755-5-avromanov@salutedevices.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 12/02/2024 14:50, Alexey Romanov wrote:
-> Amlogic crypto IP doesn't take a clock input on some
-> SoCs: AXG / A1 / S4 / G12. So make it optional.
+> Add MMIO access helpers: meson_dma_start() and meson_dma_ready().
 > 
 > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
 > ---
->   drivers/crypto/amlogic/amlogic-gxl-core.c | 21 ++++++++-------------
->   drivers/crypto/amlogic/amlogic-gxl.h      |  2 ++
->   2 files changed, 10 insertions(+), 13 deletions(-)
+>   drivers/crypto/amlogic/amlogic-gxl-cipher.c |  2 +-
+>   drivers/crypto/amlogic/amlogic-gxl-core.c   | 24 ++++++++++++++++-----
+>   drivers/crypto/amlogic/amlogic-gxl.h        |  2 ++
+>   3 files changed, 22 insertions(+), 6 deletions(-)
 > 
+> diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+> index 7eff3ae7356f..1fe916b0a138 100644
+> --- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+> +++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+> @@ -225,7 +225,7 @@ static int meson_cipher(struct skcipher_request *areq)
+>   
+>   	reinit_completion(&mc->chanlist[flow].complete);
+>   	mc->chanlist[flow].status = 0;
+> -	writel(mc->chanlist[flow].t_phy | 2, mc->base + ((mc->pdata->descs_reg + flow) << 2));
+> +	meson_dma_start(mc, flow);
+>   	wait_for_completion_interruptible_timeout(&mc->chanlist[flow].complete,
+>   						  msecs_to_jiffies(500));
+>   	if (mc->chanlist[flow].status == 0) {
 > diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> index 4d1b1d5b7a54..54113c524ec5 100644
+> index 54113c524ec5..372c30f72072 100644
 > --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
 > +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> @@ -250,6 +250,7 @@ static void meson_unregister_algs(struct meson_dev *mc)
->   static const struct meson_pdata meson_gxl_pdata = {
->   	.descs_reg = 0x0,
->   	.status_reg = 0x4,
-> +	.need_clk = true,
->   };
+> @@ -23,18 +23,32 @@
 >   
->   static const struct of_device_id meson_crypto_of_match_table[] = {
-> @@ -285,17 +286,14 @@ static int meson_crypto_probe(struct platform_device *pdev)
->   		dev_err(&pdev->dev, "Cannot request MMIO err=%d\n", err);
->   		return err;
->   	}
-> -	mc->busclk = devm_clk_get(&pdev->dev, "blkmv");
-> -	if (IS_ERR(mc->busclk)) {
-> -		err = PTR_ERR(mc->busclk);
-> -		dev_err(&pdev->dev, "Cannot get core clock err=%d\n", err);
-> -		return err;
-> -	}
+>   #include "amlogic-gxl.h"
 >   
-> -	err = clk_prepare_enable(mc->busclk);
-> -	if (err != 0) {
-> -		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
-> -		return err;
-> +	if (mc->pdata->need_clk) {
-> +		mc->busclk = devm_clk_get_enabled(&pdev->dev, "blkmv");
-> +		if (IS_ERR(mc->busclk)) {
-> +			err = PTR_ERR(mc->busclk);
-> +			dev_err(&pdev->dev, "Cannot get and enable core clock err=%d\n", err);
-> +			return err;
-> +		}
->   	}
+> +void meson_dma_start(struct meson_dev *mc, int flow)
+> +{
+> +	u32 offset = (mc->pdata->descs_reg + flow) << 2;
+> +
+> +	writel(mc->chanlist[flow].t_phy | 2, mc->base + offset);
+> +}
+> +
+> +static bool meson_dma_ready(struct meson_dev *mc, int flow)
+> +{
+> +	u32 offset = (mc->pdata->status_reg + flow) << 2;
+> +	u32 data = readl(mc->base + offset);
+> +
+> +	if (data)
+> +		writel_relaxed(0xF, mc->base + offset);
+> +
+> +	return data;
+> +}
+> +
+>   static irqreturn_t meson_irq_handler(int irq, void *data)
+>   {
+>   	struct meson_dev *mc = (struct meson_dev *)data;
+>   	int flow;
+> -	u32 p;
 >   
->   	err = meson_allocate_chanlist(mc);
-> @@ -322,7 +320,6 @@ static int meson_crypto_probe(struct platform_device *pdev)
->   	meson_unregister_algs(mc);
->   error_flow:
->   	meson_free_chanlist(mc, mc->flow_cnt - 1);
-> -	clk_disable_unprepare(mc->busclk);
->   	return err;
->   }
->   
-> @@ -337,8 +334,6 @@ static void meson_crypto_remove(struct platform_device *pdev)
->   	meson_unregister_algs(mc);
->   
->   	meson_free_chanlist(mc, mc->flow_cnt - 1);
-> -
-> -	clk_disable_unprepare(mc->busclk);
->   }
->   
->   static struct platform_driver meson_crypto_driver = {
+>   	for (flow = 0; flow < mc->flow_cnt; flow++) {
+>   		if (mc->chanlist[flow].irq == irq) {
+> -			p = readl(mc->base + ((mc->pdata->status_reg + flow) << 2));
+> -			if (p) {
+> -				writel_relaxed(0xF, mc->base +
+> -					      ((mc->pdata->status_reg + flow) << 2));
+> +			if (meson_dma_ready(mc, flow)) {
+>   				mc->chanlist[flow].status = 1;
+>   				complete(&mc->chanlist[flow].complete);
+>   				return IRQ_HANDLED;
 > diff --git a/drivers/crypto/amlogic/amlogic-gxl.h b/drivers/crypto/amlogic/amlogic-gxl.h
-> index 9ad75da214ff..a36b9bac63a0 100644
+> index a36b9bac63a0..59fc6a67e0a9 100644
 > --- a/drivers/crypto/amlogic/amlogic-gxl.h
 > +++ b/drivers/crypto/amlogic/amlogic-gxl.h
-> @@ -82,10 +82,12 @@ struct meson_flow {
->    * struct meson_pdata - SoC series dependent data.
->    * @reg_descs:	offset to descriptors register
->    * @reg_status:	offset to status register
-> + * @need_clk:	clock input is needed
->    */
->   struct meson_pdata {
->   	u32 descs_reg;
->   	u32 status_reg;
-> +	bool need_clk;
+> @@ -163,6 +163,8 @@ struct meson_alg_template {
+>   #endif
 >   };
 >   
->   /*
+> +void meson_dma_start(struct meson_dev *mc, int flow);
+> +
+>   int meson_enqueue(struct crypto_async_request *areq, u32 type);
+>   
+>   int meson_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
 
-You may use devm_clk_get_optional_enabled() instead, bindings will ensure
-clock is provided when needed.
-
-With this you can also drop the clk_disable_unprepare() in meson_crypto_remove().
-
-Neil
-
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
