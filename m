@@ -1,113 +1,120 @@
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183E246441;
-	Mon, 12 Feb 2024 13:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE2D3D0CF
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2024 16:27:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707745914; cv=none; b=CVgGEJf5aQshAge2ytBD2JVN8jRF4e6PxDXth1jYFJBiq0W4wNrjX/2atwFuwblLigB0rzBlrM2aVkZtr2OhHBHknshhJ8lkjRX5C2Y78hG9CM4Zyi14SAFOpuyIU8ADFf84PUOL4PTmFwQ7sFFTCIh+GR77iL5S8h567IkYKm8=
+	t=1707755245; cv=none; b=HBrd6X7GO3f1DCQQBWxbHd1ApoPgQrwC7D0uXEeefW6jeJi/01iefd28ajKKNtDeW85trRXnnnDmVCUmYm8wknA1EmTdWWrpsQwlpfEgxpSr/MsMEusf4eHICa7ulGYWJw2yagZ/yvv4UGQMfQ0JMtu8N4kLKdJAR4Q2sG/R/Vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707745914; c=relaxed/simple;
-	bh=Ru6hXvCeTAnfORs9yMxPiZ4zCFc1RDkZ/xsEFN+AkVw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T5jd+YXp4sqV1eIUIBdG5++kDHSaD/S8fW6+HnPGraJ6BBeUeUhKrBk9X9K/AmMWqJMPWE+D5htmfS6BhYOpqDTnl8etEDHrxXICl+y4tIBvDxVSXE7aSA4PrKyDNgwsB3jGdNsxnLM+oCCRtp1NWC3as+H5BQ5SHX5AIV3WLpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=mCC5II/K; arc=none smtp.client-ip=37.18.73.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	s=arc-20240116; t=1707755245; c=relaxed/simple;
+	bh=Ldgz4EaDjAiFoWUe/b915SB6Or4QvlmL0gWc1JCpdjQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Vq4FLxHMNVgqdsRISC44Ly3YmZXvNagvCE96mLI0ow/F3MW70wQNDQSV8vF++sjYJeuO3xn/LUNoD1zf0Qiv/AthLkHEfxqi2AkyKeKE2o46CjpDarS6PxNhVLTP73qVO/baLAiMGh/wLvdmW3tICdfI2JRgMxAho5WpD/pXILY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O/x9p0N4; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="mCC5II/K"
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 9A9FE100018;
-	Mon, 12 Feb 2024 16:51:50 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 9A9FE100018
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1707745910;
-	bh=5LWLWzPentNfWzTfJIcR7e8QMpJRbsTGDQOdz9TvN8g=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=mCC5II/Kl/epWsZaCOs8Uuvh9jJqDvxMuxUnZdc3SKquPNIfpNEVgxG9XSFNiVyd7
-	 f4q4Vl8DO5TtX50e9rblX1fEEortNPy64zG7ZMyQj18NVL25lnpfEXq8LvFC9TwFfx
-	 jSWDatidixJmsOGXhJjZJbqyz/FMM7vwIbJLavjKeko3ANi/4wI0A6A7NIidFTn+oI
-	 eBL72MU2R55DcA2ujwSk0vjM3GVGfVuK/hDv6J55HzGOl43PANDkE9lx8jp65LVDyd
-	 kNAnJsNWgHNdkotCIh4KoEioXnT5WZOvW7kSSK4YCFD54IOW/ryHOvET3HVR5wU+Wr
-	 EW91U5TaqNJHQ==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Mon, 12 Feb 2024 16:51:50 +0300 (MSK)
-Received: from user-A520M-DS3H.sberdevices.ru (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 12 Feb 2024 16:51:50 +0300
-From: Alexey Romanov <avromanov@salutedevices.com>
-To: <neil.armstrong@linaro.org>, <clabbe@baylibre.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-	<khilman@baylibre.com>, <jbrunet@baylibre.com>,
-	<martin.blumenstingl@googlemail.com>, <vadim.fedorenko@linux.dev>
-CC: <linux-crypto@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kernel@salutedevices.com>, Alexey
- Romanov <avromanov@salutedevices.com>
-Subject: [PATCH v4 20/20] arch: arm64: dts: meson: axg: add crypto node
-Date: Mon, 12 Feb 2024 16:51:08 +0300
-Message-ID: <20240212135108.549755-21-avromanov@salutedevices.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240212135108.549755-1-avromanov@salutedevices.com>
-References: <20240212135108.549755-1-avromanov@salutedevices.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O/x9p0N4"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcc15b03287so147463276.3
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2024 08:27:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707755243; x=1708360043; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jEjTcKce0fZYlWVBDi232LEPLK7jT44Dgj/oRcn95IY=;
+        b=O/x9p0N4LKvhXVYOd82ekpVjqc2RNJVb3t5bVbajDYfuOW4z/+HMPdZelBpHrekri9
+         9AR34o47I1Jm1ZLQkGA8nlXC05Dh4AdpKHi3kUpQ/n2I8NEIt0vloc3Yc8fqU5mtIc7v
+         NeMurczZEv3nBCzow6N5d8VeB2jMz+nkJHbpiF7jBe9spgZZYwg4w52C1LeMzO4eRlke
+         VdnGZCbqUPgVtz6F0Q7xw54FwH5OF6dTRFk4XQ/cABHYAb7yQpqN+ksJofVCAtNjICzq
+         9VmKnsoQJPu1s7v3cziMGCbqrG0EcZsAok0Xm5CkWx4N581QhXYYLeCG9TLiURQ+SuM3
+         ZUdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707755243; x=1708360043;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jEjTcKce0fZYlWVBDi232LEPLK7jT44Dgj/oRcn95IY=;
+        b=GAsgW5JEUET6wUCt9yK4WFLl65qMt5TiIRgIw2mGoONDNaHunxo1gPnlPz14U6/PNF
+         svbAJmwH3EwwT/1S8D8yHbBl0IhrNdtnyXTsycLsSRRXBAk8R9751WH+NvkoVPj68Vyl
+         rylnxo5cp7jyzaF9mlqivyPhWSwzcRMHBAu/e540C0Bge8fNNiI/TABKNdz1lBI0DgpD
+         dwXzEeqtymrRbE6jZhhzTopUbgs0jKyL/xS0AR62fhURa7aNlCvIIh5wE+9HV7oOFxvn
+         N+ObBCQzNIj/trxwh9dXzP9mXopwNXK1A8/saSDu0879tbn8CfX9il0pYEkrb8HAyX7c
+         BHAg==
+X-Gm-Message-State: AOJu0Yw+qtYz/RZYoUf5nHA62B6quQqsYpGG7y/Xg+6jJiOdKP1zi6AN
+	wJwM4KEsbZ6QNS6VzAhjTPTS2sE0dPk96FN+o7EAB8c9UVaDSRELtgpON3BGlSUK7g/1qGuhd1P
+	K9A==
+X-Google-Smtp-Source: AGHT+IEsXJBF4/bgLbVzuTLfn0V+5NyBJ3BEiCA1tlOmkNRLRYQ2dckzNx5kcO0b5SJRLl+MJVUD0K6FNQI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1005:b0:dcb:c2c0:b319 with SMTP id
+ w5-20020a056902100500b00dcbc2c0b319mr42995ybt.9.1707755243421; Mon, 12 Feb
+ 2024 08:27:23 -0800 (PST)
+Date: Mon, 12 Feb 2024 08:27:21 -0800
+In-Reply-To: <CABgObfanrHTL429Cr8tcMGqs-Ov+6LWeQbzghvjQiGu9tz0EUA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 183368 [Feb 12 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.3
-X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;smtp.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/02/12 07:49:00 #23556813
-X-KSMG-AntiVirus-Status: Clean, skipped
+Mime-Version: 1.0
+References: <20231230172351.574091-1-michael.roth@amd.com> <20231230172351.574091-10-michael.roth@amd.com>
+ <CABgObfanrHTL429Cr8tcMGqs-Ov+6LWeQbzghvjQiGu9tz0EUA@mail.gmail.com>
+Message-ID: <ZcpG6Ul4_8xAsnuy@google.com>
+Subject: Re: [PATCH v11 09/35] KVM: x86: Determine shared/private faults based
+ on vm_type
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-This patch adds a crypto node declaration. With the
-Amlogic crypto driver we can use HW implementation
-of SHA1/224/256 and AES algo.
+On Mon, Feb 12, 2024, Paolo Bonzini wrote:
+> On Sat, Dec 30, 2023 at 6:24=E2=80=AFPM Michael Roth <michael.roth@amd.co=
+m> wrote:
+> >
+> > For KVM_X86_SNP_VM, only the PFERR_GUEST_ENC_MASK flag is needed to
+> > determine with an #NPF is due to a private/shared access by the guest.
+> > Implement that handling here. Also add handling needed to deal with
+> > SNP guests which in some cases will make MMIO accesses with the
+> > encryption bit.
+> >
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c          | 12 ++++++++++--
+> >  arch/x86/kvm/mmu/mmu_internal.h | 20 +++++++++++++++++++-
+> >  2 files changed, 29 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index d3fbfe0686a0..61213f6648a1 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4331,6 +4331,7 @@ static int kvm_faultin_pfn_private(struct kvm_vcp=
+u *vcpu,
+> >  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fa=
+ult *fault)
+> >  {
+> >         struct kvm_memory_slot *slot =3D fault->slot;
+> > +       bool private_fault =3D fault->is_private;
+>=20
+> I think it's nicer to just make the fault !is_private in
+> kvm_mmu_do_page_fault().
 
-Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
----
- arch/arm64/boot/dts/amlogic/meson-axg.dtsi | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/amlogic/meson-axg.dtsi b/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
-index 6d12b760b90f..b19be72abdd6 100644
---- a/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
-+++ b/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
-@@ -294,6 +294,12 @@ ethmac: ethernet@ff3f0000 {
- 			status = "disabled";
- 		};
- 
-+		crypto: crypto@ff63e000 {
-+			compatible = "amlogic,axg-crypto";
-+			reg = <0x0 0xff63e000 0x0 0x48>;
-+			interrupts = <GIC_SPI 180 IRQ_TYPE_EDGE_RISING>;
-+		};
-+
- 		pcie_phy: phy@ff644000 {
- 			compatible = "amlogic,axg-pcie-phy";
- 			reg = <0x0 0xff644000 0x0 0x1c>;
--- 
-2.34.1
-
+Yeah.  I'm starting to recall more of this discussion.  This is one of the =
+reasons
+I suggested/requested stuffing the error code to piggy-back the new SNP bit=
+; doing
+so allows is_private to be computed from the get-go without needing any ven=
+dor
+specific hooks.
