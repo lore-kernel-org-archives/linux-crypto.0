@@ -1,61 +1,61 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C86546557
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2024 17:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A8A47F58
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2024 17:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707757886; cv=none; b=saQnPuBVTX68Dda7wguNHWNH4mWdFrJtRQR5BoxMNo1Lz1Cqy0ggWIC+C04a4bW5QstLWlt97TnTEkjeTr9wPzG4p+NJuR3gM+2xL+hafSVAphlO4pMqcgkhz9a0o6p4yzNO3Tx60MWLSuZF5juxh0UUBBDDJBbYGtBXvYmKKco=
+	t=1707757909; cv=none; b=u6sDVy3AFMmThC9bJgAqHw+idEeiHfvygtpn6RaWaOWsA8UTWG/Cuq3ep0raJn5LHGv8f7t+UvodEjaZ/e4TVfTY6K+aK9BkhwNSDSF1FBZ14JUnse/tJatVsxJ8wU6h0ws/bi0wsLfSrEntCIX9pqzWLooSASj5Gz4Fouz5N0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707757886; c=relaxed/simple;
-	bh=45yRGF4FB4tNV5Am4KTFPJYvWefFkp+bk+Ru65wYll8=;
+	s=arc-20240116; t=1707757909; c=relaxed/simple;
+	bh=uulIj6TfB/ZV4I5bkj6MyGgQMxfCzMPW7BLDpK0dpek=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=h7jkIYSQCsWb8EnSaAu2PzNIWbPRUtVy7HaKQCfJPZygCMbj18tK/mcmYiYDxXBktZCdPEDTVLGgG6z4qxIgE1WqNZ5dNHlM4tg5z8bAq5dOAPDAnhHFJsZXi0MYGW0ttITXe2kxZG/8TjsckUFY0fpV5RrhTGl2iQ5nJe2cb2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YiMAb9cB; arc=none smtp.client-ip=209.85.221.46
+	 In-Reply-To:Content-Type; b=SfAvLsuPJ+QwNIzxe0B+tm+r2gzAN7JBKP8Pu9uBJbfGhwMcoP+c+L3ijO1iuwmBpbn7JQCFNEhylFWXQM0v+N2Ks4JQ0zzq61xuiHl3/Iqr0DNS5NUyA82X9RsCdWWFegXDTkDhyqc6I9ye+YmsbfInrzcpp4oRfeN2n5qLHFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LI9nh+eC; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YiMAb9cB"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33b8807b55aso444657f8f.3
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2024 09:11:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LI9nh+eC"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33b28aadb28so2206742f8f.3
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2024 09:11:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707757882; x=1708362682; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1707757906; x=1708362706; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=z88dR7PUkTcRGj5lNakDVXVkWGFXVN89MP6hxtmCpLI=;
-        b=YiMAb9cBc7b0t6okVwgW/miYKO65BIBt4W0U2yC1bj7xosVHp/g5ZmW9+R/iJ+Bu1/
-         n2ddlNnAZHzShJjAaVDN0wR0jC73xXhddNhIs87rWo3Rd4hoBK7bubbsqesxJxS0vv6K
-         jWwUoAcPmMagz2/WMNPNHX1YLs5UFe59QlK4pdMjhHVbCXM+N96sgvfV4exgSta8ky9K
-         mwsKgcwgznGYYr80nyplmrIzCGwT6dxMWc6dTjDl4siuT9NTDY0s+xnhdVId3xqr91mQ
-         w177wU/5lgAQBC88QiJoLEgU86vp34Tv1Zpk9lx4Wjyu0XthV81xwmhyS00LN/ke0BmM
-         h7mQ==
+        bh=eVnKk/5FnfiICNJz+devKSEGOObsIesF/dGQJ+bTx3c=;
+        b=LI9nh+eCpsycHVzZEvFGBTkg0gEYu4suyst9pnwHa8Lh3vb33bfpyCov5PgfXe5YGX
+         UVEQNm+74tMdKKL7N/F+CQ4+5VkCpAjnA7CqhieLObd1NAB2XbANx9e1he2klR6YdXB9
+         dBLixacdaEa24uejKU3chCNw7nA/TTnpRV/Mq7C0d4tlcEnlZGxb6T1e/g8yAOA5/di/
+         Gb9UBbhUluKWahRZWnYCl/Ss/q/FhwUXf2LkDbZlqS9anOmjQ9JHSNQ0LNHyYUhWB0z9
+         vmvTkIxSbeGFm2WipOBUtAztdISKfKKXCT8kVGIvAFSLuG9FfL47w+Fg2CG9Z/WNmS7i
+         mRTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707757882; x=1708362682;
+        d=1e100.net; s=20230601; t=1707757906; x=1708362706;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=z88dR7PUkTcRGj5lNakDVXVkWGFXVN89MP6hxtmCpLI=;
-        b=JimqFbxZhpxnX7yjOKbVzGmOvQ/17ybBi2TDutcmFcC0HBp+grf78UBhBrs80SjLEA
-         TNpMXF9CexFifjUwgzklZpgyQqJbmUVxPsFnLHhgjZGbBfODWhdk/H5O7Ec4ANyXDQk0
-         1H9kzXNlOA5d9/Tfga2K9/NDpvwHvxk5t8UasTmtuSldnyDAm9nXOf/VfC/QbKr+A1N4
-         U/EBi+uny/JJRz2SLpIUT11SDKjVB5f6lwuIh6KEjye3SbhozWoBuEuPJrcNALFAWH/W
-         0hwOsc1JgHjN7Jn1XQ+howEwS+aL3oucj5OtKvAtNFaUbQYqA+qFpTq684ffCXtpxf7L
-         /sqw==
-X-Gm-Message-State: AOJu0YyB8SE1Ya+QvPKw7EV+PgWxerL9JD35f9NL1TdBudgv22wjlXF8
-	58E71wNl6mATON9b0yM015ixy4YeB2WxTLrGC+aqKNkjbeyS1kqzWxBoX7Nz3gw=
-X-Google-Smtp-Source: AGHT+IGBNdxn1mzGqbZ273VsCbHhIKxKw+Ok3uY/Ud8yKtGlif2B8ukwVxDWaYYg5Y0mAqINm6+ORw==
-X-Received: by 2002:a5d:490b:0:b0:33b:2fdd:daf8 with SMTP id x11-20020a5d490b000000b0033b2fdddaf8mr5110953wrq.21.1707757881869;
-        Mon, 12 Feb 2024 09:11:21 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWeNEu1npYYlncp0jQv1FNO760HTnDLPJSlgdJ0xDQ+O/KSiOHvDOI8s9zWA64eeGlff5F7BMYt8iSkGsr+K9rs+rN+t9FGYcP0LyJC92jlwTegS1pwTEL5thLaa7DSz+vJW3fWkWZQldhcpgFMlyDOGesAsr4kdrJYUpM0ZFCwofWi0/ipDx8SaDRPLKO4J7gaFWo+mhtZg6RbJP74TjW5FYnn0YQiqTJDDpqH784wWQ8bCaV1vv31j2sDsQncyfP6pPyEmrudmzrwRP/caPcOxuim6djy4H0qAlR2paKyuOE1GsAPcjN5J3wV72vkycBt5XnOGhnVTyYGew5s5LVNeLQYhwy2XjMhrje59yN/EClZmau90cGXAt/+nUmawRK+EThaZv7C3Vhki3gdguOYFP2Di3GNctrQ+q743KoM95N7tPRY7XsGKwmQdF/aDY3V7UPCLMZXgmA5musziHNXSf38O15ZWzzkspJXsXku4H1imwJLg+mI8n2lCA1BJOCTXem9WfvCweNfc2XU2LCL/ssaysmxvmdnp6kA0i9lZA8Fa9X0IH0hEr4wecZTbxrOTUi63Gdv12yDbXIVq4Ad7cQkZ7/S92GQ
+        bh=eVnKk/5FnfiICNJz+devKSEGOObsIesF/dGQJ+bTx3c=;
+        b=eyFj3QfICbUrlKRkrG/Yt4eGQkk38M1/1hmG8kYeVE98iLO9uijRfbFM0ZjQ3hE0LH
+         W5oYOcQKCt62z8Fq5ArHSqWu1MxAnCDckt3F1jj71HfoqeLHEO0omcnQHpw8QF51PvMq
+         cJJSw0X7w7F3+HHS1Yw/LyQwFhCX5EmGALLxh392TMJru8vcE7fBMdMQSo+vuMR0Bs/H
+         AveA6GK8oZfInFKP55Jxn93LywQ5PaGZNcEUfVwKsePeJiGa6co5c8P2BOvUz/sPAyFm
+         lT4toKbOVb3K18KnNctDAe28Q2avvNaz8/b3GrxLELHz0w0HKKJ8VsurJkJ+vTp0MYHS
+         tkgA==
+X-Gm-Message-State: AOJu0YzEh29zT2dotoFYGf9SXHgFa4AXNyqqF2FNCmU4VM6w1ydiFHMn
+	fqnXWjVCf8Dw9FI8dUAGVhoeqjGZyv+VF8tyRDLfmv+zM0HOxzv1FgewaGdccZ8=
+X-Google-Smtp-Source: AGHT+IFDyA3iUozb7O4U2GHtBdZnEM2GYv8Nn3cefwc2OPHBrLiZEfC59GkTOu5wa+sUrLRTx1u+SQ==
+X-Received: by 2002:a05:6000:120a:b0:33b:6369:6485 with SMTP id e10-20020a056000120a00b0033b63696485mr4649346wrx.24.1707757906192;
+        Mon, 12 Feb 2024 09:11:46 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWcj4BaboNfVdwv9LDtaSrk5oLkki+VTqOdnwarKJmJHX1HpzGqW0aLPCEIggG9gFU1C1SnlCQYPQloRYRJMJLicBFHps1J/ZI2ZYpEm/AVnK7qYVPWzXlbjO4FHjOAs/50IHWvYq1Vkz4nk0JzhMoUbRzJnGCaNT5OQQU3iJEmaN9+8tvPuYwqyTrwXJr1Pc18saQOFL3JMYBWasIUoTI7g9vSuoTBzNjy61dlYEdWmITF2nQ15NuYXH4lrKM7b/Vy7f/WPIZqngAjZm/Xd6Pw/k1Tifbr9U0b+9ka2n62HKz0AgpTyRwJVTHeeyFxCDJaLO82gbygzxTHWj+FQyTwqN1Y50FdqWqlXPONyZmA2cpAmJGhWe/zdCjtFXRU8gLGRWIScfgQ1xGUQnAFP+dtVTqQkHSNE9tWVq0ciCHry4xx3cG5LXQYSk/ZA2BPO7NCLROsuQW1/yuywyGqgmmIHu9Qi5XsBUgU0fcKcluDcGhCn3udY+/4anqCKTXztN1lsqR9vInWo1IXj6W3dFwOsaZzQXDgn7vN/pT78gKsD1K+XcKb+gHdyHotkaIZeMyGBLuC7dWlrhW1TmRj/349Z1AUiZ7twtDG
 Received: from ?IPV6:2a01:e0a:982:cbb0:fcee:f026:296d:135f? ([2a01:e0a:982:cbb0:fcee:f026:296d:135f])
-        by smtp.gmail.com with ESMTPSA id ck13-20020a5d5e8d000000b0033b684d6d5csm7440536wrb.20.2024.02.12.09.11.20
+        by smtp.gmail.com with ESMTPSA id ck13-20020a5d5e8d000000b0033b684d6d5csm7440536wrb.20.2024.02.12.09.11.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 09:11:21 -0800 (PST)
-Message-ID: <6cbbf8ff-8e8b-4b37-846c-a9d4084f3f2d@linaro.org>
-Date: Mon, 12 Feb 2024 18:11:20 +0100
+        Mon, 12 Feb 2024 09:11:45 -0800 (PST)
+Message-ID: <3c0b7daf-29f9-4569-9aa3-fe8f381de821@linaro.org>
+Date: Mon, 12 Feb 2024 18:11:45 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -65,7 +65,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: neil.armstrong@linaro.org
 Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH v4 04/20] drivers: crypto: meson: add MMIO helpers
+Subject: Re: [PATCH v4 05/20] drivers: crypto: meson: move get_engine_number()
 Content-Language: en-US, fr
 To: Alexey Romanov <avromanov@salutedevices.com>, clabbe@baylibre.com,
  herbert@gondor.apana.org.au, davem@davemloft.net, robh+dt@kernel.org,
@@ -76,7 +76,7 @@ Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
  linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
 References: <20240212135108.549755-1-avromanov@salutedevices.com>
- <20240212135108.549755-5-avromanov@salutedevices.com>
+ <20240212135108.549755-6-avromanov@salutedevices.com>
 Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
  GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
@@ -102,87 +102,82 @@ Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
  QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
 Organization: Linaro Developer Services
-In-Reply-To: <20240212135108.549755-5-avromanov@salutedevices.com>
+In-Reply-To: <20240212135108.549755-6-avromanov@salutedevices.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 12/02/2024 14:50, Alexey Romanov wrote:
-> Add MMIO access helpers: meson_dma_start() and meson_dma_ready().
+> Move get_engine_number() function from cipher.c to core.c
 > 
 > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
 > ---
->   drivers/crypto/amlogic/amlogic-gxl-cipher.c |  2 +-
->   drivers/crypto/amlogic/amlogic-gxl-core.c   | 24 ++++++++++++++++-----
->   drivers/crypto/amlogic/amlogic-gxl.h        |  2 ++
->   3 files changed, 22 insertions(+), 6 deletions(-)
+>   drivers/crypto/amlogic/amlogic-gxl-cipher.c | 9 ++-------
+>   drivers/crypto/amlogic/amlogic-gxl-core.c   | 5 +++++
+>   drivers/crypto/amlogic/amlogic-gxl.h        | 2 ++
+>   3 files changed, 9 insertions(+), 7 deletions(-)
 > 
 > diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-> index 7eff3ae7356f..1fe916b0a138 100644
+> index 1fe916b0a138..18e9e2d39b1f 100644
 > --- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
 > +++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-> @@ -225,7 +225,7 @@ static int meson_cipher(struct skcipher_request *areq)
+> @@ -17,11 +17,6 @@
+>   #include <crypto/internal/skcipher.h>
+>   #include "amlogic-gxl.h"
 >   
->   	reinit_completion(&mc->chanlist[flow].complete);
->   	mc->chanlist[flow].status = 0;
-> -	writel(mc->chanlist[flow].t_phy | 2, mc->base + ((mc->pdata->descs_reg + flow) << 2));
-> +	meson_dma_start(mc, flow);
->   	wait_for_completion_interruptible_timeout(&mc->chanlist[flow].complete,
->   						  msecs_to_jiffies(500));
->   	if (mc->chanlist[flow].status == 0) {
+> -static int get_engine_number(struct meson_dev *mc)
+> -{
+> -	return atomic_inc_return(&mc->flow) % mc->flow_cnt;
+> -}
+> -
+>   static bool meson_cipher_need_fallback(struct skcipher_request *areq)
+>   {
+>   	struct scatterlist *src_sg = areq->src;
+> @@ -282,7 +277,7 @@ int meson_skdecrypt(struct skcipher_request *areq)
+>   	rctx->op_dir = MESON_DECRYPT;
+>   	if (meson_cipher_need_fallback(areq))
+>   		return meson_cipher_do_fallback(areq);
+> -	e = get_engine_number(op->mc);
+> +	e = meson_get_engine_number(op->mc);
+>   	engine = op->mc->chanlist[e].engine;
+>   	rctx->flow = e;
+>   
+> @@ -300,7 +295,7 @@ int meson_skencrypt(struct skcipher_request *areq)
+>   	rctx->op_dir = MESON_ENCRYPT;
+>   	if (meson_cipher_need_fallback(areq))
+>   		return meson_cipher_do_fallback(areq);
+> -	e = get_engine_number(op->mc);
+> +	e = meson_get_engine_number(op->mc);
+>   	engine = op->mc->chanlist[e].engine;
+>   	rctx->flow = e;
+>   
 > diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> index 54113c524ec5..372c30f72072 100644
+> index 372c30f72072..51291fdcf8b6 100644
 > --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
 > +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> @@ -23,18 +23,32 @@
+> @@ -23,6 +23,11 @@
 >   
 >   #include "amlogic-gxl.h"
 >   
-> +void meson_dma_start(struct meson_dev *mc, int flow)
+> +int meson_get_engine_number(struct meson_dev *mc)
 > +{
-> +	u32 offset = (mc->pdata->descs_reg + flow) << 2;
-> +
-> +	writel(mc->chanlist[flow].t_phy | 2, mc->base + offset);
+> +	return atomic_inc_return(&mc->flow) % mc->flow_cnt;
 > +}
 > +
-> +static bool meson_dma_ready(struct meson_dev *mc, int flow)
-> +{
-> +	u32 offset = (mc->pdata->status_reg + flow) << 2;
-> +	u32 data = readl(mc->base + offset);
-> +
-> +	if (data)
-> +		writel_relaxed(0xF, mc->base + offset);
-> +
-> +	return data;
-> +}
-> +
->   static irqreturn_t meson_irq_handler(int irq, void *data)
+>   void meson_dma_start(struct meson_dev *mc, int flow)
 >   {
->   	struct meson_dev *mc = (struct meson_dev *)data;
->   	int flow;
-> -	u32 p;
->   
->   	for (flow = 0; flow < mc->flow_cnt; flow++) {
->   		if (mc->chanlist[flow].irq == irq) {
-> -			p = readl(mc->base + ((mc->pdata->status_reg + flow) << 2));
-> -			if (p) {
-> -				writel_relaxed(0xF, mc->base +
-> -					      ((mc->pdata->status_reg + flow) << 2));
-> +			if (meson_dma_ready(mc, flow)) {
->   				mc->chanlist[flow].status = 1;
->   				complete(&mc->chanlist[flow].complete);
->   				return IRQ_HANDLED;
+>   	u32 offset = (mc->pdata->descs_reg + flow) << 2;
 > diff --git a/drivers/crypto/amlogic/amlogic-gxl.h b/drivers/crypto/amlogic/amlogic-gxl.h
-> index a36b9bac63a0..59fc6a67e0a9 100644
+> index 59fc6a67e0a9..5f5e3115fcdf 100644
 > --- a/drivers/crypto/amlogic/amlogic-gxl.h
 > +++ b/drivers/crypto/amlogic/amlogic-gxl.h
 > @@ -163,6 +163,8 @@ struct meson_alg_template {
 >   #endif
 >   };
 >   
-> +void meson_dma_start(struct meson_dev *mc, int flow);
+> +int meson_get_engine_number(struct meson_dev *mc);
 > +
->   int meson_enqueue(struct crypto_async_request *areq, u32 type);
+>   void meson_dma_start(struct meson_dev *mc, int flow);
 >   
->   int meson_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+>   int meson_enqueue(struct crypto_async_request *areq, u32 type);
 
 Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
