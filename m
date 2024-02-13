@@ -1,161 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F46250E5;
-	Tue, 13 Feb 2024 10:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292A022627
+	for <linux-crypto@vger.kernel.org>; Tue, 13 Feb 2024 10:29:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707819242; cv=none; b=eFvU8NLm8TdDIIC8omy2Hu/J76v2P78C2vrTJyPir8V2oikCfuwz9CMoMYXLMiTQaYmtLhxxbklPUy/AgI15o70HkfSlK4J6V9lXRv5DgR6ZNYfeYfp8pboA5nOg4KgmMHpTpmd2i9pDBRsFfiBgnGcLq3w24AsbVzi9lQbyI90=
+	t=1707820201; cv=none; b=uxB59QuqEnpdIeMOOlvsE3yZ08rXOONOHXYNN1+QVWZw5d8qrlb1W+ZEVM/vofBar+Mab+tf9/tXOAQVF2ToTS4rR7Wbr/YWhVnwf1zbNFygI8TMac/zHrtKZ8+rviwcBpFBedZRsEiPqZdUX4fpcjsUl2R9jvox2bb3Q2aVuZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707819242; c=relaxed/simple;
-	bh=pJXnaVkOmADfzOfCpLbYu/Clp0Z96iKVydBpYB8ckH0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AKZXkhguWaZxyoU5c9LG1H9WBdkMyDZMwy7y/mMJd+QYiS7gXomq5qkQiXmZ19Wg9PNnTgozngRRXWjvQ0uVVnI42V9AHKLAd+Y4x80n2GDzq75ELrc4KKgU5R2d/g85POtEODY53aJZTgM1TjaGMEkKFYUIBcVJ++JIirTAh54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5u6HgeY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707820201; c=relaxed/simple;
+	bh=BAFPNPzJQXtyCWF5XDn1RobzHn1V1SnAs/ZanbUdfKY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qRB+LDeOiqbYKWz5dXJIOfkM+BqZYphQSk5vn3eikDpJda758m/0V5t7HbNT1k9HaUyCFs4AAfq3CxycVEOCAUQyfUCLzi7eo5zDEjoUjbt3UfVqFoQIxD62d5L4vRgeKvJWxBuWQKEHJU7pP5umZHHBbJshDpnwcRMo8zeu8XM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DcNcbdEK; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5u6HgeY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40900C433F1;
-	Tue, 13 Feb 2024 10:13:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707819242;
-	bh=pJXnaVkOmADfzOfCpLbYu/Clp0Z96iKVydBpYB8ckH0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=B5u6HgeYAzEr5R34fLeTyjNoBpg1ig8esgtWrTsxTVmSPFRIpTNB2wf+bEsSR3UHF
-	 6m1W693PjIIQsdL787qcI/AH5nNFASF4HBJ2qKmylayQMLVS2Sb1FdQjrMxtP5C18K
-	 wdIJAgrFuUE/mS10P8htbTT2/iYhNA9U4lZuhrdc4lMy31bhwnor8JLqpLjV4BoKYx
-	 xGI3oCP7Ciifaa7KEeAQtZzzPvJsgLD+7m0AGzVngnl+3eHIYBLCO95wDE4yyakv2C
-	 mXwcnW0xBIOpDhLTi51fw1ET7SsTdyXJWHHlEe36yJ8QgMUIl1nZzvBd+wSm7h4sPI
-	 jClKDXE31FRWg==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Ard Biesheuvel <ardb@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH] ARM: crypto: fix function cast warnings
-Date: Tue, 13 Feb 2024 11:13:44 +0100
-Message-Id: <20240213101356.460376-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DcNcbdEK"
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dcc80d6006aso481443276.0
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Feb 2024 02:29:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1707820198; x=1708424998; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+EqDonj7KQZLiaPp6D4ZvH1t+lrAEwUNc/fnEAHBEOI=;
+        b=DcNcbdEKUxMv4AtS+vABGbgp0+Yl2IvqLbxYGiAwtW96WJ2uzGzFpCsdsJV2NigBmv
+         72oKFdlJmEwojo3olVaRTcsMmVIQqI3UDtSzqFSsT9yG/xKR/TEYi4KZCnC2DMtJa7Ng
+         4wo18UIcsvKnjuVSq8u65kcNBzl9tMVVVh/2CmdvU59oEky8eWuJ9qC/duiTLnNxmmsf
+         7LuOL21lAhH904E+T2V1nJyK6S+7O4+eN4/ua1BZU/JrhGgYBjJBbNyg/KpZsiI6oy1H
+         dVcVqa0NoPpvEJOrBjLFSXJMjCIhyOslNq5ot0WEcxMDI3cWy2U6fn148pmJmxIRUMHW
+         aBGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707820198; x=1708424998;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+EqDonj7KQZLiaPp6D4ZvH1t+lrAEwUNc/fnEAHBEOI=;
+        b=f0tc7YUXQkrCigv6GDNNouM0mw9TqL/CarlKm4LePwUnO1Jjm7w/jqUCRwmSG9bNkE
+         unEzeJBnXdPbpIbSZVnotaBHcPaVQwdaAHV4aIrfUpftm86P6DEvdHk0cLjrOl9TAj0D
+         D6WZOlEFXSSqCG7ot1e75yTtwN8xEDvVZdQhgF2S5CAZCw8olO7AAoXGyRU1HMtdAV3K
+         DH83obqcOkBRSIK0MPQN3aMyeKxnBZdEocAc+ejDyRl7EzQ5CGD9yIsaLMAtz4YlPXrY
+         M12lfStMeCkBkZanYYgERjj4ZXVxmE5KmnPmeGkGYgnz8m1In4+y/VnxpFoiYa88PfPW
+         CnEw==
+X-Forwarded-Encrypted: i=1; AJvYcCWww1sLll0IDqUPKtxUN8CfuyynwAMGejflsntWC30rmaXRuB8D1L+zqFPzhDjNN+NsPEvc5VwwKGSAlrww2Oc+jzO9BKssxDIOL6AW
+X-Gm-Message-State: AOJu0Yzg+y/soDxJmzW7UIjaCdHzbncNrBT5PuV8WAyYnCK9RASU1w55
+	fyavHLy6RnBBrJPuszAziOgMTml890iD/fI6veJNZV119IwBH1YICP65+ZA5FGMQxmKOrNSl9MR
+	3yuIk30lI3Vt7qDE6a7e9gqc2la0p9yjJ9RJW5Q==
+X-Google-Smtp-Source: AGHT+IHkdJx+zFat9qPbr3h4Rdcuck1pBATP4FKcmKR8VS5uJISAam7tCEk56SEDoapPdlF1E/YwhM52Daf0RNngWRA=
+X-Received: by 2002:a25:ad45:0:b0:dc7:4313:8b6f with SMTP id
+ l5-20020a25ad45000000b00dc743138b6fmr7824715ybe.54.1707820198159; Tue, 13 Feb
+ 2024 02:29:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240121-sm7125-upstream-v4-0-f7d1212c8ebb@gmail.com>
+ <20240121-sm7125-upstream-v4-2-f7d1212c8ebb@gmail.com> <20240212222232.GB2655166-robh@kernel.org>
+In-Reply-To: <20240212222232.GB2655166-robh@kernel.org>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Tue, 13 Feb 2024 12:29:47 +0200
+Message-ID: <CAA8EJpoymmOBc3CfNHJKBT8BNje_s2a5uGPde3QHYv3vQ97=-Q@mail.gmail.com>
+Subject: Re: [PATCH v4 2/8] dt-bindings: ufs: qcom: Add SC7180 compatible string
+To: Rob Herring <robh@kernel.org>
+Cc: David Wronek <davidwronek@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Alim Akhtar <alim.akhtar@samsung.com>, 
+	Avri Altman <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, Andy Gross <agross@kernel.org>, 
+	Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, 
+	cros-qcom-dts-watchers@chromium.org, linux-arm-msm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-phy@lists.infradead.org, ~postmarketos/upstreaming@lists.sr.ht, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Tue, 13 Feb 2024 at 00:22, Rob Herring <robh@kernel.org> wrote:
+>
+> On Sun, Jan 21, 2024 at 05:57:42PM +0100, David Wronek wrote:
+> > Document the compatible for the UFS found on SC7180.
+> >
+> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> > Signed-off-by: David Wronek <davidwronek@gmail.com>
+> > ---
+> >  Documentation/devicetree/bindings/ufs/qcom,ufs.yaml | 2 ++
+> >  1 file changed, 2 insertions(+)
+>
+> Should have been picked up by SCSI/UFS maintainers, but it
+> hasn't, so I applied it.
 
-clang-16 warns about casting between incompatible function types:
+And it now triggers schema warnings, because sc7180-ufshc has 7 clocks
+and 1 reg entries.
 
-arch/arm/crypto/sha256_glue.c:37:5: error: cast from 'void (*)(u32 *, const void *, unsigned int)' (aka 'void (*)(unsigned int *, const void *, unsigned int)') to 'sha256_block_fn *' (aka 'void (*)(struct sha256_state *, const unsigned char *, int)') converts to incompatible function type [-Werror,-Wcast-function-type-strict]
-   37 |                                 (sha256_block_fn *)sha256_block_data_order);
-      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-arch/arm/crypto/sha512-glue.c:34:3: error: cast from 'void (*)(u64 *, const u8 *, int)' (aka 'void (*)(unsigned long long *, const unsigned char *, int)') to 'sha512_block_fn *' (aka 'void (*)(struct sha512_state *, const unsigned char *, int)') converts to incompatible function type [-Werror,-Wcast-function-type-strict]
-   34 |                 (sha512_block_fn *)sha512_block_data_order);
-      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> Rob
+>
 
-Rework the sha256/sha512 code to instead go through a trivial helper
-function to preserve the calling conventions.
 
-Fixes: c80ae7ca3726 ("crypto: arm/sha512 - accelerated SHA-512 using ARM generic ASM and NEON")
-Fixes: b59e2ae3690c ("crypto: arm/sha256 - move SHA-224/256 ASM/NEON implementation to base layer")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- arch/arm/crypto/sha256_glue.c | 18 ++++++++++--------
- arch/arm/crypto/sha512-glue.c | 11 ++++++++---
- 2 files changed, 18 insertions(+), 11 deletions(-)
-
-diff --git a/arch/arm/crypto/sha256_glue.c b/arch/arm/crypto/sha256_glue.c
-index 433ee4ddce6c..d80448d96ab3 100644
---- a/arch/arm/crypto/sha256_glue.c
-+++ b/arch/arm/crypto/sha256_glue.c
-@@ -27,29 +27,31 @@
- asmlinkage void sha256_block_data_order(u32 *digest, const void *data,
- 					unsigned int num_blks);
- 
--int crypto_sha256_arm_update(struct shash_desc *desc, const u8 *data,
--			     unsigned int len)
-+static void sha256_block_data_order_wrapper(struct sha256_state *sst, u8 const *src, int blocks)
- {
- 	/* make sure casting to sha256_block_fn() is safe */
- 	BUILD_BUG_ON(offsetof(struct sha256_state, state) != 0);
- 
--	return sha256_base_do_update(desc, data, len,
--				(sha256_block_fn *)sha256_block_data_order);
-+	return sha256_block_data_order((u32 *)sst, src, blocks);
-+}
-+
-+int crypto_sha256_arm_update(struct shash_desc *desc, const u8 *data,
-+			     unsigned int len)
-+{
-+	return sha256_base_do_update(desc, data, len, sha256_block_data_order_wrapper);
- }
- EXPORT_SYMBOL(crypto_sha256_arm_update);
- 
- static int crypto_sha256_arm_final(struct shash_desc *desc, u8 *out)
- {
--	sha256_base_do_finalize(desc,
--				(sha256_block_fn *)sha256_block_data_order);
-+	sha256_base_do_finalize(desc, sha256_block_data_order_wrapper);
- 	return sha256_base_finish(desc, out);
- }
- 
- int crypto_sha256_arm_finup(struct shash_desc *desc, const u8 *data,
- 			    unsigned int len, u8 *out)
- {
--	sha256_base_do_update(desc, data, len,
--			      (sha256_block_fn *)sha256_block_data_order);
-+	sha256_base_do_update(desc, data, len, sha256_block_data_order_wrapper);
- 	return crypto_sha256_arm_final(desc, out);
- }
- EXPORT_SYMBOL(crypto_sha256_arm_finup);
-diff --git a/arch/arm/crypto/sha512-glue.c b/arch/arm/crypto/sha512-glue.c
-index 0635a65aa488..1b2c9c0c8a5f 100644
---- a/arch/arm/crypto/sha512-glue.c
-+++ b/arch/arm/crypto/sha512-glue.c
-@@ -27,17 +27,22 @@ MODULE_ALIAS_CRYPTO("sha512-arm");
- 
- asmlinkage void sha512_block_data_order(u64 *state, u8 const *src, int blocks);
- 
-+static void sha512_block_data_order_wrapper(struct sha512_state *sst, u8 const *src, int blocks)
-+{
-+	return sha512_block_data_order((u64 *)sst, src, blocks);
-+}
-+
- int sha512_arm_update(struct shash_desc *desc, const u8 *data,
- 		      unsigned int len)
- {
- 	return sha512_base_do_update(desc, data, len,
--		(sha512_block_fn *)sha512_block_data_order);
-+		sha512_block_data_order_wrapper);
- }
- 
- static int sha512_arm_final(struct shash_desc *desc, u8 *out)
- {
- 	sha512_base_do_finalize(desc,
--		(sha512_block_fn *)sha512_block_data_order);
-+		sha512_block_data_order_wrapper);
- 	return sha512_base_finish(desc, out);
- }
- 
-@@ -45,7 +50,7 @@ int sha512_arm_finup(struct shash_desc *desc, const u8 *data,
- 		     unsigned int len, u8 *out)
- {
- 	sha512_base_do_update(desc, data, len,
--		(sha512_block_fn *)sha512_block_data_order);
-+		sha512_block_data_order_wrapper);
- 	return sha512_arm_final(desc, out);
- }
- 
 -- 
-2.39.2
-
+With best wishes
+Dmitry
