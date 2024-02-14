@@ -1,38 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B33E1420BD
-	for <linux-crypto@vger.kernel.org>; Wed, 14 Feb 2024 23:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB991864C
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Feb 2024 23:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707953719; cv=none; b=ACiQdss4GyckchDuiqMmKM7mEyJd/2HwQBpvKH4ZRz5HnAkh2zi3qCbRsavqWgtRabQNvGQG4Gw5Kdn2BwT7ZUZN2DRTutvNJPkiXXhkNYL6PXuMSsvLTqiLSRhqxXdUXbus9Fvo6kx444eAcOl2y6ltRGCwIEvD0odwv3hXjv0=
+	t=1707954114; cv=none; b=nDTvwKR0LoKix9h3Z6ivjHaiPtkOqCTDaOBKVo2HhXPMXi+2lmrsc+hju4xwC3kF2d3MXOnuXi2DT71DoKHDJ5l6S8x4Ph4/BL57tKrl2xj/yLq8UFUU1aSG+nkhjx3T1p81/1yD74z7+nsQLgcOgka3uLmTCqBndZOshAmX/jQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707953719; c=relaxed/simple;
-	bh=lAxBWrdhb4LJ6Gw3eRCtWSu9qxq/Tlk/O6tFLzdiXmM=;
+	s=arc-20240116; t=1707954114; c=relaxed/simple;
+	bh=CEb7IBHx+fjusQQcE8apVrNp83EBkkAjWwir31Bc96Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qm5mNK5VnGyGIPWECCMdBVt444EOFL2HgRtwPgL/ueJXZAL+2vCVdN+aQKrtnZAI8MHU21tyZ3QsmLKF4uTbej/pbnkyjEp9hvI20HFOKVT8V5NRpunH2nblGgMPKsbakNijUsJlV7HSIzevWnL3jhC8xufhoVj0BIjXagmEhNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cv08SZH+; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=CsFpJ4QxPih9nNJOGaaAfRNhpA6+0fRoo0GFqOP3mJWmPYX9ygT+iIb97bQ+UFheKfHnWaRBX1mSc3XuzwomV5OY9BUNo3AxkNQFVzTtsGcUBKD67o5y9M7qnPaHLoB0TA3Z7ZdvHiIyWi5Dwg7W6WGbwSVdpWdHPhZROOD8WRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WtbdFJe8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cv08SZH+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E31CC43390;
-	Wed, 14 Feb 2024 23:35:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WtbdFJe8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72B11C433C7;
+	Wed, 14 Feb 2024 23:41:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707953719;
-	bh=lAxBWrdhb4LJ6Gw3eRCtWSu9qxq/Tlk/O6tFLzdiXmM=;
+	s=k20201202; t=1707954113;
+	bh=CEb7IBHx+fjusQQcE8apVrNp83EBkkAjWwir31Bc96Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Cv08SZH+0LzNmqUTDqs4yUs+TEQFuEZUMQvtvaiscbb9IfskZEnT85sCF2b7YaLy3
-	 PCnCXxlakKp9V+o7er57UOtBEh4Bjdl9JuykO13tmujiAo2DbdMX2OO1ZbCKrB8Ymg
-	 JoisG4ScIycSSo8pPDqkT5G9GQO14VCAD7yz62WXYQbFp9Pi2M7h3si4JxQuDsj8c3
-	 XGael73XY1IFqt0bF3AVZUfxfUUWGsMktF1kjMLQDTjKgBOJENTDqgJtrJ4UL0+hjU
-	 130O0W3OOk0joLYFp+yzlVENR5sU8fwV/H/QQOmXBH08oCb9OBRDVB/erO/AbfgACa
-	 hdcFpNsBS2pNA==
-Date: Wed, 14 Feb 2024 15:35:17 -0800
+	b=WtbdFJe8M9eTIYkkR8eeyYnwPV44QBQjaIvcpB0Oy99auSOYUfCqYA/REFb02mdYO
+	 /JHAyoB8P/ejLDK2Clea2vUd3QdzkiGQAyKhpk6cq0pd8XwehKeoagr18f+qq60uxp
+	 GklWnAPeVxQju9EdkvBFFR30N6CriRYyTI+NhtbIl0LhQdN04+xksd1rKu5+T8rLj1
+	 4ID3bNmfrPGdkyifwe+1tCZh4rC8pd7QiH7WvkdBF126BTMAs2co1jl4AUU78qZNIo
+	 gpoatCfFlYUuWAcxRaV3XS3lMG+u4csbyBAM5i+7bJsaYOPfIspRlAvIL2ro3DzJiJ
+	 xu/o5b3UFciTg==
+Date: Wed, 14 Feb 2024 15:41:51 -0800
 From: Eric Biggers <ebiggers@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 00/15] crypto: Add twopass lskcipher for adiantum
-Message-ID: <20240214233517.GD1638@sol.localdomain>
+Subject: Re: [PATCH 09/15] crypto: chacha-generic - Convert from skcipher to
+ lskcipher
+Message-ID: <20240214234151.GE1638@sol.localdomain>
 References: <cover.1707815065.git.herbert@gondor.apana.org.au>
+ <1585df67b3f356eba2c23ac9f36c7181432d191e.1707815065.git.herbert@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,45 +43,38 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1707815065.git.herbert@gondor.apana.org.au>
+In-Reply-To: <1585df67b3f356eba2c23ac9f36c7181432d191e.1707815065.git.herbert@gondor.apana.org.au>
 
-On Tue, Feb 13, 2024 at 05:04:25PM +0800, Herbert Xu wrote:
-> [PATCH 00/15] crypto: Add twopass lskcipher for adiantum
+On Wed, Dec 06, 2023 at 01:49:32PM +0800, Herbert Xu wrote:
+> +static int chacha_stream_xor(const struct chacha_ctx *ctx, const u8 *src,
+> +			     u8 *dst, unsigned nbytes, u8 *siv, u32 flags)
 
-Thanks.  Can you include an explanation of the high-level context and goals for
-this work?  It's still not clear to me.  I'm guessing that the main goal is to
-get rid of the vaddr => scatterlist => vaddr round trip for software
-encryption/decryption, which hopefully will improve performance and make the API
-easier to use?  And to do that, all software algorithms need to be converted to
-"lskcipher"?  Will skcipher API users actually be able to convert to lskcipher,
-or will they be blocked by people expecting to be able to use hardware crypto
-accelerators?  Would you accept lskcipher being used alongside skcipher?
-Previously you had said you don't want shash being used alongside ahash.
+In cryptography, siv normally stands for Synthetic Initialization Vector.  I
+*think* that here you're having it stand for "state and IV", or something like
+that.  Is there a better name for it?  Maybe it should just be state?
 
-I'd prefer there was a clear plan before merging a bunch of patches that leave
-everything in a half-finished state.
+> -static int crypto_xchacha_crypt(struct skcipher_request *req)
+> +static int crypto_xchacha_crypt(struct crypto_lskcipher *tfm, const u8 *src,
+> +				u8 *dst, unsigned nbytes, u8 *siv, u32 flags)
+>  {
+> -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> -	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +	struct chacha_ctx *ctx = crypto_lskcipher_ctx(tfm);
+>  	struct chacha_ctx subctx;
+> -	u32 state[16];
+> -	u8 real_iv[16];
+> +	u8 *real_iv;
+> +	u32 *state;
+>  
+> -	/* Compute the subkey given the original key and first 128 nonce bits */
+> -	chacha_init_generic(state, ctx->key, req->iv);
+> -	hchacha_block_generic(state, subctx.key, ctx->nrounds);
+> +	real_iv = siv + XCHACHA_IV_SIZE;
+> +	state = (u32 *)(real_iv + CHACHA_IV_SIZE);
 
-By the way, note that hctr2 requires two passes too, as it's an SPRP like
-Adiantum.  Also note that SPRPs in general may require more than two passes,
-though Adiantum and HCTR2 were designed to only need two (technically they have
-three passes, but two are combinable).  It's fine to support only two passes if
-that's what's needed now; I just thought I'd mention that there's no guarantee
-that two passes will be enough forever.
+So the "siv" contains xchacha_iv || real_iv || state?  That's 112 bytes, which
+is more than the 80 that's allocated for it.
 
-> In addition to converting adiantum, the underlying chacha algorithm
-> is also converted over to lskcipher.
-> 
-> The algorithms cts + xts have been converted too to ensure that the
-> tailsize mechanism works properly for them.  While doing this the
-> parameters for cts + xts have been modified so that blocksize is now
-> 1.  This entails changing the paramters of all drivers that support
-> cts and/or xts.
-
-cts and xts have nothing to do with adiantum.  So this further indicates that
-the scope of this work is broader than just "crypto: Add twopass lskcipher for
-adiantum" as suggested by the title.
-
-It would be good to have a sense for the direction of this work.  What will be
-coming next?
+Isn't the state the only thing that actually needs to be carried forward?
 
 - Eric
