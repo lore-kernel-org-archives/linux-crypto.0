@@ -1,40 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB991864C
-	for <linux-crypto@vger.kernel.org>; Wed, 14 Feb 2024 23:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85FA42556E
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Feb 2024 23:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707954114; cv=none; b=nDTvwKR0LoKix9h3Z6ivjHaiPtkOqCTDaOBKVo2HhXPMXi+2lmrsc+hju4xwC3kF2d3MXOnuXi2DT71DoKHDJ5l6S8x4Ph4/BL57tKrl2xj/yLq8UFUU1aSG+nkhjx3T1p81/1yD74z7+nsQLgcOgka3uLmTCqBndZOshAmX/jQ=
+	t=1707954255; cv=none; b=DPKMP8VHsbL/BE+go9aaHtGOZreqIoMsGIz4DaKlEr66Bx0xrgMNHNPZa7Rf4YRMAfrxPTT5Tl6bjnW9Flr2ZtPjO4SnUAmkGrrFGFVJsjMJx4D3D2ZPMEMgcSgpuMsJDY7bn4pVm53BPmTdgm0w3zJFVMgKJQqj+DcYejaZAAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707954114; c=relaxed/simple;
-	bh=CEb7IBHx+fjusQQcE8apVrNp83EBkkAjWwir31Bc96Q=;
+	s=arc-20240116; t=1707954255; c=relaxed/simple;
+	bh=SovgcSCUQcz6Oewmmah/YSpBnM0TLMcB4SgxM+mB79c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CsFpJ4QxPih9nNJOGaaAfRNhpA6+0fRoo0GFqOP3mJWmPYX9ygT+iIb97bQ+UFheKfHnWaRBX1mSc3XuzwomV5OY9BUNo3AxkNQFVzTtsGcUBKD67o5y9M7qnPaHLoB0TA3Z7ZdvHiIyWi5Dwg7W6WGbwSVdpWdHPhZROOD8WRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WtbdFJe8; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=n1aRSnY3QvmIOq/d2OOJdxbopQpN80gyRWdXhLVlOE1CTWgvz7waIrx9Ww6Zy9V9p/HKr8E6Y40WH7535l4sRmWsw6NQA1+gYo0Eu6AcbMKfxqtLAcDlksnoVQmC+MUgi4UpOW85CScskfncBS1qZLSlVrPD2xE44E1+Hr5mnMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FtQkQNda; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WtbdFJe8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72B11C433C7;
-	Wed, 14 Feb 2024 23:41:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FtQkQNda"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDE2AC433F1;
+	Wed, 14 Feb 2024 23:44:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707954113;
-	bh=CEb7IBHx+fjusQQcE8apVrNp83EBkkAjWwir31Bc96Q=;
+	s=k20201202; t=1707954255;
+	bh=SovgcSCUQcz6Oewmmah/YSpBnM0TLMcB4SgxM+mB79c=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WtbdFJe8M9eTIYkkR8eeyYnwPV44QBQjaIvcpB0Oy99auSOYUfCqYA/REFb02mdYO
-	 /JHAyoB8P/ejLDK2Clea2vUd3QdzkiGQAyKhpk6cq0pd8XwehKeoagr18f+qq60uxp
-	 GklWnAPeVxQju9EdkvBFFR30N6CriRYyTI+NhtbIl0LhQdN04+xksd1rKu5+T8rLj1
-	 4ID3bNmfrPGdkyifwe+1tCZh4rC8pd7QiH7WvkdBF126BTMAs2co1jl4AUU78qZNIo
-	 gpoatCfFlYUuWAcxRaV3XS3lMG+u4csbyBAM5i+7bJsaYOPfIspRlAvIL2ro3DzJiJ
-	 xu/o5b3UFciTg==
-Date: Wed, 14 Feb 2024 15:41:51 -0800
+	b=FtQkQNdaTar/RKQFNeQHWMDvV/qJ3eLqkTZmgC7kb4w7mkNyrOi8OV5F8i9EIYmc5
+	 SFHFygAWM9eve+tTgnS7OgniFnuIgiSZcvURh1B1SPcIhuk4WBOlr14kEQAj9K0m0n
+	 vOmph2VxJbEv3t6I4sgEzl91tDiI5TFA6zf6t+wF3Ivqpu+gslOQsBoAj19fZWGEwJ
+	 Yn3tcmdKeV2lDW7h30QU372EiXaJzUJfq5RT+asBTikbra2w9v5mE9GQbqpvyMm4/Y
+	 kuPr016LIe625qCq0Nnb5UnSbrz1OS7a/DsYgFAvdX/rPi1pjSX4czM/uK8Stynftl
+	 1xdjh/JqtWyFg==
+Date: Wed, 14 Feb 2024 15:44:13 -0800
 From: Eric Biggers <ebiggers@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 09/15] crypto: chacha-generic - Convert from skcipher to
- lskcipher
-Message-ID: <20240214234151.GE1638@sol.localdomain>
+Subject: Re: [PATCH 01/15] crypto: skcipher - Add tailsize attribute
+Message-ID: <20240214234413.GF1638@sol.localdomain>
 References: <cover.1707815065.git.herbert@gondor.apana.org.au>
- <1585df67b3f356eba2c23ac9f36c7181432d191e.1707815065.git.herbert@gondor.apana.org.au>
+ <39cd9244cd3e4aba23653464c95f94da5b2dc3ec.1707815065.git.herbert@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,38 +42,39 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1585df67b3f356eba2c23ac9f36c7181432d191e.1707815065.git.herbert@gondor.apana.org.au>
+In-Reply-To: <39cd9244cd3e4aba23653464c95f94da5b2dc3ec.1707815065.git.herbert@gondor.apana.org.au>
 
-On Wed, Dec 06, 2023 at 01:49:32PM +0800, Herbert Xu wrote:
-> +static int chacha_stream_xor(const struct chacha_ctx *ctx, const u8 *src,
-> +			     u8 *dst, unsigned nbytes, u8 *siv, u32 flags)
+On Sat, Dec 02, 2023 at 12:55:02PM +0800, Herbert Xu wrote:
+> This patch adds a new tailsize attribute to skcipher and lskcipher
+> algorithms.  This will be used by algorithms such as CTS which may
+> need to withhold a number of blocks until the end has been reached.
+> 
+> When issuing a NOTFINAL request, the user must ensure that at least
+> tailsize bytes will be supplied later on a final request.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+>  crypto/lskcipher.c                 |  1 +
+>  crypto/skcipher.c                  | 16 ++++++++++++++-
+>  include/crypto/internal/skcipher.h |  1 +
+>  include/crypto/skcipher.h          | 33 ++++++++++++++++++++++++++++++
+>  4 files changed, 50 insertions(+), 1 deletion(-)
+> 
+> diff --git a/crypto/lskcipher.c b/crypto/lskcipher.c
+> index 0b6dd8aa21f2..2a602911f4fc 100644
+> --- a/crypto/lskcipher.c
+> +++ b/crypto/lskcipher.c
+> @@ -300,6 +300,7 @@ static void __maybe_unused crypto_lskcipher_show(
+>  	seq_printf(m, "ivsize       : %u\n", skcipher->co.ivsize);
+>  	seq_printf(m, "chunksize    : %u\n", skcipher->co.chunksize);
+>  	seq_printf(m, "statesize    : %u\n", skcipher->co.statesize);
+> +	seq_printf(m, "tailsize     : %u\n", skcipher->co.tailsize);
 
-In cryptography, siv normally stands for Synthetic Initialization Vector.  I
-*think* that here you're having it stand for "state and IV", or something like
-that.  Is there a better name for it?  Maybe it should just be state?
+Do we really want to add new attributes like this to /proc/crypto?
 
-> -static int crypto_xchacha_crypt(struct skcipher_request *req)
-> +static int crypto_xchacha_crypt(struct crypto_lskcipher *tfm, const u8 *src,
-> +				u8 *dst, unsigned nbytes, u8 *siv, u32 flags)
->  {
-> -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> -	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +	struct chacha_ctx *ctx = crypto_lskcipher_ctx(tfm);
->  	struct chacha_ctx subctx;
-> -	u32 state[16];
-> -	u8 real_iv[16];
-> +	u8 *real_iv;
-> +	u32 *state;
->  
-> -	/* Compute the subkey given the original key and first 128 nonce bits */
-> -	chacha_init_generic(state, ctx->key, req->iv);
-> -	hchacha_block_generic(state, subctx.key, ctx->nrounds);
-> +	real_iv = siv + XCHACHA_IV_SIZE;
-> +	state = (u32 *)(real_iv + CHACHA_IV_SIZE);
+I worry about userspace starting to depend on these algorithm attributes in a
+weird way.
 
-So the "siv" contains xchacha_iv || real_iv || state?  That's 112 bytes, which
-is more than the 80 that's allocated for it.
-
-Isn't the state the only thing that actually needs to be carried forward?
+What is the use case for exposing them to userspace?
 
 - Eric
