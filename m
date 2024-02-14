@@ -1,213 +1,528 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39F279DF
-	for <linux-crypto@vger.kernel.org>; Wed, 14 Feb 2024 08:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60974612E3
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Feb 2024 16:34:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707900966; cv=none; b=UkS0I6U1uf0+if/iScbU7PAkljbjFXgzeSWWrsMHCzFB/hT+74vNGRFLMX1rS5BBq/slSO941Y0dNSSYuuOjy8MPWvTtbiP6BV1NRhxIRl3pmifDR4TK0AO6e5srNdZ55fHzrsrGl5sb9qYv899VW1XNOC7MaPFUvZKdBHtLkJ8=
+	t=1707928457; cv=none; b=U9JLtkidxG4/boCO+UhMqoyDGBw9y/xkljUmAZD58uJ0rX4EOqglTPz0NNBdjF9AJC46yQIyhA9nVppHwahbgJsryG+C25YJ9B6ZWoVAY3xx8CuHXhoxHlencz3T4PMtT6RQxx3vtQFVv3TAVmCHjeLvK5gVWKeEtfa7FBQoFKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707900966; c=relaxed/simple;
-	bh=seU+VubZDxRKHlz/IYUta4RkwMrn8jtaSqsjf1TwkaA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bheNA+7LelA7lYX5v+xkmizY5DiuqChmzCu5yoGs1zAguBVwXdTm2IMV1nf6b/hhJ/yc12CtJob4/NXOgfseiMhrLX4DxZt6I5hkrut4GCEDztfXT2rM6r4ZSqtuvQ39o7dOooFEks9Y/8QqKgz91cos3KgSNmMf14T7osSWmp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Q9jmjc71; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1707928457; c=relaxed/simple;
+	bh=36qMbc210b+KoaBIAA3hbp2B8tJQpcWxBQIkn9CxIsw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nTa93RHqmOtUHt4x5dYBuksYr+1dK4+K7UAmpRXJEKHdmcFiReYWHdKF4yl5twfNPq2EMdC6bXmqTrogDxwa7tj1FPooLtCOCCB7eFFSW0HerjumW5Izg2cFFWH6l/2arGiUfnsBz7fFvv0T5toIZ+UWpBhECsfrMpABW4ZOJi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LM3KRNWG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q9jmjc71"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a28a6cef709so706833966b.1
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Feb 2024 00:56:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707900963; x=1708505763; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=t6CpUTvlMcNqRo8XepyQNVrnC/CoT51gZejZ28v0Jlc=;
-        b=Q9jmjc71ycTlDgpNu3/BH7te7vk11pvPUjb74w4SwZB70/zVqhC/E61z+xojw2wJ4u
-         ZWN8Engh6bhcziiFJtphzxv/xwMvsoGCyaPzB46BFOul7zhSrLlF5gMbxI5QUAyjtdaU
-         EQw9fKJlivzcdA+HddiAMfPRnwnGLbknBbcBC3JUh2zPmcu0EzD75NlpvdZ6FMwc6B0O
-         +xUFBtnw8JXm+9UuwLhTBlrhxBB/daJb+wG/pzyWQEguYf4vg8OnInrum8Vj183RhLaw
-         hLrGUIG10llbm/PyKI0akQ4kLDrBiqjo+sFyiT9efIB0kppo4tg5WmhDK52wzg/yaSGq
-         MSwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707900963; x=1708505763;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t6CpUTvlMcNqRo8XepyQNVrnC/CoT51gZejZ28v0Jlc=;
-        b=NEjqBjuGEI5afs9eL7OS3MOF0aBV0CJ3VafRmRq6equ8tetkX8FWo6vXbNpaSx6m4o
-         HaD8RJwJsYAMg29u7aDhEqliMBl3iiulWo6oy7K+CIHmcqGvsXlII64U5BEvVu6KOg5r
-         k3b9Y8dzk1j1Fj9ehECPCvtfrX0UYiTQrxBlmwTTRFv3HhhBX25uuYFOm82feDXuhGtg
-         Z9p5aChC0m8Qwq2wSrm2/qAScb1aRswogXl2Yapvy5+9v6v9rgdzxkHdKNnsiMkQVKXj
-         uvAaHmLzDA6G9ZvL/av9Ou70t6HYnSJm9O2zBgFeGYrjyoig+Oa/IbRRJqIagGObGAl/
-         onhw==
-X-Forwarded-Encrypted: i=1; AJvYcCWvmTs0DixS7DecDH3zj/DsvzFIyl43AZl2j8tc2ZuZjxbEd1LE1lLB7h4UEILABe+EKiAPreqJrUmgYPGC8AHW8RNdEwCsUs8isnJ3
-X-Gm-Message-State: AOJu0YwBz4WSRZ7Gv4Q72JVXIntOWwcFqXH8numFDPFpHpuHNCWBxXij
-	ulYtIR+bEWZUysSG/tn2pYLabsOaVGA1R7E8lO37gXvBL/au2Nctn9Kkl8M+LxA=
-X-Google-Smtp-Source: AGHT+IFv53OqyKfCS2AyE5QoKSqZ4vvx8TNNN5nJHOC0yja0St3b4kFIh57OSkH4RJa89iWyy8q47g==
-X-Received: by 2002:a17:906:fa06:b0:a3d:1214:90d with SMTP id lo6-20020a170906fa0600b00a3d1214090dmr1221446ejb.16.1707900963109;
-        Wed, 14 Feb 2024 00:56:03 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXMtxAmcF6e+TOX5s+TM0JUdrisWtAAxtai7TwdZG2HspeeM/DulbdXVS9f0+kOgJyo4ulwvQXBB4oH5GVSVVCj2Ht//HpnWPK2LHMnIyvw/lfnjpRWK5foPTEn4f8T36yGXqlwarpGJj5cVSOQ1jOAwCNt9zUnMBD1i9GD/2Jn8E6niScnhqkoAStzZzUl+3TGC6u5Vjdk0CdW/Cybs0UedQlDXHX46z6sN1IO1zrI0OYbBk5Q8TP0Y7Q59r8YmImIhsH97GcJPtbVWY+E5xg0ht4ZSv7yLrvay51PXgqrg895ohgCxL/rb8mg9hoN2ZD33+PmOtqBrrOgh7MaNGa8ZiFLLMGK6hKmLn2DsNSjioXaZrK64g78Ddv0wgAspXkdT7GqV4NYiS0dLwb2UA4oLqUzfhl6/7E/2LeXGlyHyjlGRR3oJm9/d1Z1aiID8nJFAj9eUcErrq3CQABv/ZCpBKUDUE8V3x3ZGrkxV9jqsIJs7PaJw5lz/Wg4PPPzvDvG6a5A4n7SLgDQfcmKX4a7HeOfMAKkyCCRuwXgUGXIjLs+kpaVPktRwY0OShkLQPunsn/h8BQO4kdcBu1O1+RseRUWH834PAIzJb1cXZ8bgK6s8trKclaUVHopvedBDzi/MA78kFQO+GChKW6Z3+2pM2lU/JA0ViBck/IgUV0EhxrFJu7zsC1okufliwDq7Cs0Eqwt10vqnnuNpOdjkH4GbDW0k2+cloaCtPf35E9NYis+P1FX8aC+ezCYuy95go4VARuiNvvMNqLPgU+sVrYT6d7GClZFbfr+qD1Ls8tp3ZE44M1MbL+8/ZUqAmxCx8f+rQWlTBew8mckyG8U5cs=
-Received: from [192.168.0.22] ([78.10.207.130])
-        by smtp.gmail.com with ESMTPSA id vu6-20020a170907a64600b00a3d19aed4cesm1082935ejc.21.2024.02.14.00.56.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Feb 2024 00:56:02 -0800 (PST)
-Message-ID: <9dcca70b-2c34-4b5b-8b8a-18bd9b4e6e5b@linaro.org>
-Date: Wed, 14 Feb 2024 09:56:00 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LM3KRNWG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAC62C433B1
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Feb 2024 16:34:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707928456;
+	bh=36qMbc210b+KoaBIAA3hbp2B8tJQpcWxBQIkn9CxIsw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=LM3KRNWGtvMjpho4XSzLriwkvb3Ho7n2RpcX5DIPVYVAb3WlUCmevFmXz+qzm5pBo
+	 Hbuq/E0j0tyzD1Pcn5EgLxJk336A+e6EYN/k/jDk29OtHd0mHQt5r0bgWgxQnnvCbS
+	 0KgmIX7XUJSyfYfoqoGFK04OlGpbliQ2g7eNe3gSUpfh2Ux7cNEiybJNdyTrxUETmd
+	 +d5owyIfnSr+G6nK6CuS30X1AKSCPmk1EAqXIo2G2B0oEuOljUpa/zWSiaiInThDSr
+	 wdSyq6WH1hTTR9d+xzYjdDAKEn6we31z8pRLXumWHKEWvT9fqASKqc8AsjK5EC9LU7
+	 eNJYrxJaYtIqQ==
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6e2df9e9074so1441281a34.3
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Feb 2024 08:34:16 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXL9JJlRCqoWnMunY9ckGuyqujpHeQJtgd1mImb2ETYxgIigOgCx2XIBFZrvFGqBkNwT9q61PlJX3iixm8baqkrIM94Pe8TWikzbU9S
+X-Gm-Message-State: AOJu0YwTgEt58slzWQ1Ed3SIxH0YtspKyBxOU4SAwJX7y8yLNGdGf0Z/
+	PEyT4Eg0HI1DQ3wKHq49v9A0Iy29OlAvMPKdGZl7LlTKgp8PdaC/mp2Ma2yGtvB9FECKNkqHX4g
+	bzGIgh5hGBduBOAjrtuSXe1N/8LA=
+X-Google-Smtp-Source: AGHT+IGsooOF6jZGXdektz9NsyZuzovRTEY1tnDygVMAryIJlFdaZN7GjG6MUvV59+s2u0PhZPyg7JzVggqoiArxXLg=
+X-Received: by 2002:a05:6870:40c3:b0:21b:9acb:2230 with SMTP id
+ l3-20020a05687040c300b0021b9acb2230mr3075273oal.47.1707928455993; Wed, 14 Feb
+ 2024 08:34:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/8] dt-bindings: ufs: qcom: Add SC7180 compatible
- string
-To: Rob Herring <robh@kernel.org>,
- Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: David Wronek <davidwronek@gmail.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>,
- Bart Van Assche <bvanassche@acm.org>, Andy Gross <agross@kernel.org>,
- Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
- cros-qcom-dts-watchers@chromium.org, linux-arm-msm@vger.kernel.org,
- linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-phy@lists.infradead.org, ~postmarketos/upstreaming@lists.sr.ht
-References: <20240121-sm7125-upstream-v4-0-f7d1212c8ebb@gmail.com>
- <20240121-sm7125-upstream-v4-2-f7d1212c8ebb@gmail.com>
- <20240212222232.GB2655166-robh@kernel.org>
- <CAA8EJpoymmOBc3CfNHJKBT8BNje_s2a5uGPde3QHYv3vQ97=-Q@mail.gmail.com>
- <CAL_JsqLGVBjiYt5tG0GFxxeHmNDD1PgJx3ab-n2x0nHPEaX9iQ@mail.gmail.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <CAL_JsqLGVBjiYt5tG0GFxxeHmNDD1PgJx3ab-n2x0nHPEaX9iQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240213055442.35954-1-ebiggers@kernel.org>
+In-Reply-To: <20240213055442.35954-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Wed, 14 Feb 2024 17:34:03 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEjEhZY6zoQQzJioBB6QVGJbCmO2w5T3+T0=iPxHmvYJQ@mail.gmail.com>
+Message-ID: <CAMj1kXEjEhZY6zoQQzJioBB6QVGJbCmO2w5T3+T0=iPxHmvYJQ@mail.gmail.com>
+Subject: Re: [PATCH riscv/for-next] crypto: riscv - add vector crypto
+ accelerated AES-CBC-CTS
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-riscv@lists.infradead.org, Palmer Dabbelt <palmer@dabbelt.com>, 
+	linux-crypto@vger.kernel.org, Jerry Shih <jerry.shih@sifive.com>, 
+	=?UTF-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>, 
+	Heiko Stuebner <heiko@sntech.de>, Phoebe Chen <phoebe.chen@sifive.com>, 
+	Andy Chiu <andy.chiu@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 13/02/2024 19:11, Rob Herring wrote:
-> On Tue, Feb 13, 2024 at 4:30 AM Dmitry Baryshkov
-> <dmitry.baryshkov@linaro.org> wrote:
->>
->> On Tue, 13 Feb 2024 at 00:22, Rob Herring <robh@kernel.org> wrote:
->>>
->>> On Sun, Jan 21, 2024 at 05:57:42PM +0100, David Wronek wrote:
->>>> Document the compatible for the UFS found on SC7180.
->>>>
->>>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->>>> Signed-off-by: David Wronek <davidwronek@gmail.com>
->>>> ---
->>>>  Documentation/devicetree/bindings/ufs/qcom,ufs.yaml | 2 ++
->>>>  1 file changed, 2 insertions(+)
->>>
->>> Should have been picked up by SCSI/UFS maintainers, but it
->>> hasn't, so I applied it.
->>
->> And it now triggers schema warnings, because sc7180-ufshc has 7 clocks
->> and 1 reg entries.
-> 
-> And now dropped... Perhaps the dts changes should be too.
-> 
-> Maybe QCom maintainers should require a report of dtbs_check on new
-> boards. My comparisons of Linus vs. next warnings often show an
-> increase in QCom warnings. Like right now:
-> 
-> linus: arch/arm64/boot/dts/qcom:1990:265
-> next: arch/arm64/boot/dts/qcom:1610:298
+On Tue, 13 Feb 2024 at 06:57, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Add an implementation of cts(cbc(aes)) accelerated using the Zvkned
+> RISC-V vector crypto extension.  This is mainly useful for fscrypt,
+> where cts(cbc(aes)) is the "default" filenames encryption algorithm.  In
+> that use case, typically most messages are short and are block-aligned.
 
-I was tracking new dtbs_check warnings on Qualcomm for selected
-subsystems and for selected boards, but that grew faster than I was able
-to fix it so I gave up...
+Does this mean the storage space for filenames is rounded up to AES block size?
 
-After all these months and all these review feedbacks many people still
-do not test their DTS with dtbs_check, so maybe the solution is to start
-dropping people's patches? Detect new warnings and drop the patch from
-Qualcomm tree?
+> The CBC-CTS variant implemented is CS3; this is the variant Linux uses.
+>
+> To perform well on short messages, the new implementation processes the
+> full message in one call to the assembly function if the data is
+> contiguous.  Otherwise it falls back to CBC operations followed by CTS
+> at the end.  For decryption, to further improve performance on short
+> messages, especially block-aligned messages, the CBC-CTS assembly
+> function parallelizes the AES decryption of all full blocks.
 
-> 
-> First number is total warnings. Second number is unique warnings
-> (stripping dtb name). Some of this is just mismatch between schemas
-> and dts changes showing up in next, but it doesn't tend to go to 0 as
-> the merge window approaches. I've seen this several cycles. All the
-> data is available from my CI jobs, and I regularly look at the diff
-> with this:
-> 
-> $ less ~/bin/gl-diff-dtb-warnings
-> #!/bin/sh
-> 
-> [ -z "$1" ] && { echo "Missing arch!"; exit 1; }
-> 
-> arch="$1"
-> 
-> job="job-dtbs-check"
-> logfile="platform-warnings.log"
-> 
-> # url <branch> <arch>
-> url() {
->         local branch="$1"
->         local arch="$2"
->         echo "https://gitlab.com/robherring/linux-dt/-/jobs/artifacts/${branch}/raw/${logfile}?job=${job}%3A+%5B${arch}%5D"
-> 
-> }
-> 
-> curl -Ls -o orig.log $(url linus ${arch})
-> curl -Ls -o next.log $(url next ${arch})
-> meld orig.log next.log
+Nice!
 
-That's useful, thanks!
+> This
+> improves on the arm64 implementation of cts(cbc(aes)), which always
+> splits the CBC part(s) from the CTS part, doing the AES decryptions for
+> the last two blocks serially and usually loading the round keys twice.
+>
 
-Best regards,
-Krzysztof
+So is the overhead of this sub-optimal approach mostly in the
+redundant loading of the round keys? Or are there other significant
+benefits?
 
+If there are, I suppose we might port this improvement to x86 too, but
+otherwise, I guess it'll only make sense for arm64.
+
+
+> Tested in QEMU with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  arch/riscv/crypto/Kconfig              |   4 +-
+>  arch/riscv/crypto/aes-riscv64-glue.c   |  93 ++++++++++++++-
+>  arch/riscv/crypto/aes-riscv64-zvkned.S | 153 +++++++++++++++++++++++++
+>  3 files changed, 245 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
+> index 2ad44e1d464a..ad58dad9a580 100644
+> --- a/arch/riscv/crypto/Kconfig
+> +++ b/arch/riscv/crypto/Kconfig
+> @@ -1,23 +1,23 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>
+>  menu "Accelerated Cryptographic Algorithms for CPU (riscv)"
+>
+>  config CRYPTO_AES_RISCV64
+> -       tristate "Ciphers: AES, modes: ECB, CBC, CTR, XTS"
+> +       tristate "Ciphers: AES, modes: ECB, CBC, CTS, CTR, XTS"
+>         depends on 64BIT && RISCV_ISA_V && TOOLCHAIN_HAS_VECTOR_CRYPTO
+>         select CRYPTO_ALGAPI
+>         select CRYPTO_LIB_AES
+>         select CRYPTO_SKCIPHER
+>         help
+>           Block cipher: AES cipher algorithms
+> -         Length-preserving ciphers: AES with ECB, CBC, CTR, XTS
+> +         Length-preserving ciphers: AES with ECB, CBC, CTS, CTR, XTS
+>
+>           Architecture: riscv64 using:
+>           - Zvkned vector crypto extension
+>           - Zvbb vector extension (XTS)
+>           - Zvkb vector crypto extension (CTR)
+>           - Zvkg vector crypto extension (XTS)
+>
+>  config CRYPTO_CHACHA_RISCV64
+>         tristate "Ciphers: ChaCha"
+>         depends on 64BIT && RISCV_ISA_V && TOOLCHAIN_HAS_VECTOR_CRYPTO
+> diff --git a/arch/riscv/crypto/aes-riscv64-glue.c b/arch/riscv/crypto/aes-riscv64-glue.c
+> index 37bc6ef0be40..f814ee048555 100644
+> --- a/arch/riscv/crypto/aes-riscv64-glue.c
+> +++ b/arch/riscv/crypto/aes-riscv64-glue.c
+> @@ -1,20 +1,22 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+>  /*
+>   * AES using the RISC-V vector crypto extensions.  Includes the bare block
+> - * cipher and the ECB, CBC, CTR, and XTS modes.
+> + * cipher and the ECB, CBC, CBC-CTS, CTR, and XTS modes.
+>   *
+>   * Copyright (C) 2023 VRULL GmbH
+>   * Author: Heiko Stuebner <heiko.stuebner@vrull.eu>
+>   *
+>   * Copyright (C) 2023 SiFive, Inc.
+>   * Author: Jerry Shih <jerry.shih@sifive.com>
+> + *
+> + * Copyright 2024 Google LLC
+>   */
+>
+>  #include <asm/simd.h>
+>  #include <asm/vector.h>
+>  #include <crypto/aes.h>
+>  #include <crypto/internal/cipher.h>
+>  #include <crypto/internal/simd.h>
+>  #include <crypto/internal/skcipher.h>
+>  #include <crypto/scatterwalk.h>
+>  #include <crypto/xts.h>
+> @@ -33,20 +35,24 @@ asmlinkage void aes_ecb_encrypt_zvkned(const struct crypto_aes_ctx *key,
+>  asmlinkage void aes_ecb_decrypt_zvkned(const struct crypto_aes_ctx *key,
+>                                        const u8 *in, u8 *out, size_t len);
+>
+>  asmlinkage void aes_cbc_encrypt_zvkned(const struct crypto_aes_ctx *key,
+>                                        const u8 *in, u8 *out, size_t len,
+>                                        u8 iv[AES_BLOCK_SIZE]);
+>  asmlinkage void aes_cbc_decrypt_zvkned(const struct crypto_aes_ctx *key,
+>                                        const u8 *in, u8 *out, size_t len,
+>                                        u8 iv[AES_BLOCK_SIZE]);
+>
+> +asmlinkage void aes_cbc_cts_crypt_zvkned(const struct crypto_aes_ctx *key,
+> +                                        const u8 *in, u8 *out, size_t len,
+> +                                        const u8 iv[AES_BLOCK_SIZE], bool enc);
+> +
+>  asmlinkage void aes_ctr32_crypt_zvkned_zvkb(const struct crypto_aes_ctx *key,
+>                                             const u8 *in, u8 *out, size_t len,
+>                                             u8 iv[AES_BLOCK_SIZE]);
+>
+>  asmlinkage void aes_xts_encrypt_zvkned_zvbb_zvkg(
+>                         const struct crypto_aes_ctx *key,
+>                         const u8 *in, u8 *out, size_t len,
+>                         u8 tweak[AES_BLOCK_SIZE]);
+>
+>  asmlinkage void aes_xts_decrypt_zvkned_zvbb_zvkg(
+> @@ -157,21 +163,21 @@ static int riscv64_aes_ecb_encrypt(struct skcipher_request *req)
+>         return riscv64_aes_ecb_crypt(req, true);
+>  }
+>
+>  static int riscv64_aes_ecb_decrypt(struct skcipher_request *req)
+>  {
+>         return riscv64_aes_ecb_crypt(req, false);
+>  }
+>
+>  /* AES-CBC */
+>
+> -static inline int riscv64_aes_cbc_crypt(struct skcipher_request *req, bool enc)
+> +static int riscv64_aes_cbc_crypt(struct skcipher_request *req, bool enc)
+>  {
+>         struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+>         const struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+>         struct skcipher_walk walk;
+>         unsigned int nbytes;
+>         int err;
+>
+>         err = skcipher_walk_virt(&walk, req, false);
+>         while ((nbytes = walk.nbytes) != 0) {
+>                 kernel_vector_begin();
+> @@ -195,20 +201,84 @@ static inline int riscv64_aes_cbc_crypt(struct skcipher_request *req, bool enc)
+>  static int riscv64_aes_cbc_encrypt(struct skcipher_request *req)
+>  {
+>         return riscv64_aes_cbc_crypt(req, true);
+>  }
+>
+>  static int riscv64_aes_cbc_decrypt(struct skcipher_request *req)
+>  {
+>         return riscv64_aes_cbc_crypt(req, false);
+>  }
+>
+> +/* AES-CBC-CTS */
+> +
+> +static int riscv64_aes_cbc_cts_crypt(struct skcipher_request *req, bool enc)
+> +{
+> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +       const struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +       struct scatterlist sg_src[2], sg_dst[2];
+> +       struct skcipher_request subreq;
+> +       struct scatterlist *src, *dst;
+> +       struct skcipher_walk walk;
+> +       unsigned int cbc_len;
+> +       int err;
+> +
+> +       if (req->cryptlen < AES_BLOCK_SIZE)
+> +               return -EINVAL;
+> +
+> +       err = skcipher_walk_virt(&walk, req, false);
+> +       if (err)
+> +               return err;
+> +       /*
+> +        * If the full message is available in one step, decrypt it in one call
+> +        * to the CBC-CTS assembly function.  This reduces overhead, especially
+> +        * on short messages.  Otherwise, fall back to doing CBC up to the last
+> +        * two blocks, then invoke CTS just for the ciphertext stealing.
+> +        */
+> +       if (unlikely(walk.nbytes != req->cryptlen)) {
+> +               cbc_len = round_down(req->cryptlen - AES_BLOCK_SIZE - 1,
+> +                                    AES_BLOCK_SIZE);
+> +               skcipher_walk_abort(&walk);
+> +               skcipher_request_set_tfm(&subreq, tfm);
+> +               skcipher_request_set_callback(&subreq,
+> +                                             skcipher_request_flags(req),
+> +                                             NULL, NULL);
+> +               skcipher_request_set_crypt(&subreq, req->src, req->dst,
+> +                                          cbc_len, req->iv);
+> +               err = riscv64_aes_cbc_crypt(&subreq, enc);
+> +               if (err)
+> +                       return err;
+> +               dst = src = scatterwalk_ffwd(sg_src, req->src, cbc_len);
+> +               if (req->dst != req->src)
+> +                       dst = scatterwalk_ffwd(sg_dst, req->dst, cbc_len);
+> +               skcipher_request_set_crypt(&subreq, src, dst,
+> +                                          req->cryptlen - cbc_len, req->iv);
+> +               err = skcipher_walk_virt(&walk, &subreq, false);
+> +               if (err)
+> +                       return err;
+> +       }
+> +       kernel_vector_begin();
+> +       aes_cbc_cts_crypt_zvkned(ctx, walk.src.virt.addr, walk.dst.virt.addr,
+> +                                walk.nbytes, req->iv, enc);
+> +       kernel_vector_end();
+> +       return skcipher_walk_done(&walk, 0);
+> +}
+> +
+> +static int riscv64_aes_cbc_cts_encrypt(struct skcipher_request *req)
+> +{
+> +       return riscv64_aes_cbc_cts_crypt(req, true);
+> +}
+> +
+> +static int riscv64_aes_cbc_cts_decrypt(struct skcipher_request *req)
+> +{
+> +       return riscv64_aes_cbc_cts_crypt(req, false);
+> +}
+> +
+>  /* AES-CTR */
+>
+>  static int riscv64_aes_ctr_crypt(struct skcipher_request *req)
+>  {
+>         struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+>         const struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+>         unsigned int nbytes, p1_nbytes;
+>         struct skcipher_walk walk;
+>         u32 ctr32, nblocks;
+>         int err;
+> @@ -427,20 +497,36 @@ static struct skcipher_alg riscv64_zvkned_aes_skcipher_algs[] = {
+>                 .max_keysize = AES_MAX_KEY_SIZE,
+>                 .ivsize = AES_BLOCK_SIZE,
+>                 .base = {
+>                         .cra_blocksize = AES_BLOCK_SIZE,
+>                         .cra_ctxsize = sizeof(struct crypto_aes_ctx),
+>                         .cra_priority = 300,
+>                         .cra_name = "cbc(aes)",
+>                         .cra_driver_name = "cbc-aes-riscv64-zvkned",
+>                         .cra_module = THIS_MODULE,
+>                 },
+> +       }, {
+> +               .setkey = riscv64_aes_setkey_skcipher,
+> +               .encrypt = riscv64_aes_cbc_cts_encrypt,
+> +               .decrypt = riscv64_aes_cbc_cts_decrypt,
+> +               .min_keysize = AES_MIN_KEY_SIZE,
+> +               .max_keysize = AES_MAX_KEY_SIZE,
+> +               .ivsize = AES_BLOCK_SIZE,
+> +               .walksize = 4 * AES_BLOCK_SIZE, /* matches LMUL=4 */
+> +               .base = {
+> +                       .cra_blocksize = AES_BLOCK_SIZE,
+> +                       .cra_ctxsize = sizeof(struct crypto_aes_ctx),
+> +                       .cra_priority = 300,
+> +                       .cra_name = "cts(cbc(aes))",
+> +                       .cra_driver_name = "cts-cbc-aes-riscv64-zvkned",
+> +                       .cra_module = THIS_MODULE,
+> +               },
+>         }
+>  };
+>
+>  static struct skcipher_alg riscv64_zvkned_zvkb_aes_skcipher_alg = {
+>         .setkey = riscv64_aes_setkey_skcipher,
+>         .encrypt = riscv64_aes_ctr_crypt,
+>         .decrypt = riscv64_aes_ctr_crypt,
+>         .min_keysize = AES_MIN_KEY_SIZE,
+>         .max_keysize = AES_MAX_KEY_SIZE,
+>         .ivsize = AES_BLOCK_SIZE,
+> @@ -533,18 +619,19 @@ static void __exit riscv64_aes_mod_exit(void)
+>         if (riscv_isa_extension_available(NULL, ZVKB))
+>                 crypto_unregister_skcipher(&riscv64_zvkned_zvkb_aes_skcipher_alg);
+>         crypto_unregister_skciphers(riscv64_zvkned_aes_skcipher_algs,
+>                                     ARRAY_SIZE(riscv64_zvkned_aes_skcipher_algs));
+>         crypto_unregister_alg(&riscv64_zvkned_aes_cipher_alg);
+>  }
+>
+>  module_init(riscv64_aes_mod_init);
+>  module_exit(riscv64_aes_mod_exit);
+>
+> -MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS (RISC-V accelerated)");
+> +MODULE_DESCRIPTION("AES-ECB/CBC/CTS/CTR/XTS (RISC-V accelerated)");
+>  MODULE_AUTHOR("Jerry Shih <jerry.shih@sifive.com>");
+>  MODULE_LICENSE("GPL");
+>  MODULE_ALIAS_CRYPTO("aes");
+>  MODULE_ALIAS_CRYPTO("ecb(aes)");
+>  MODULE_ALIAS_CRYPTO("cbc(aes)");
+> +MODULE_ALIAS_CRYPTO("cts(cbc(aes))");
+>  MODULE_ALIAS_CRYPTO("ctr(aes)");
+>  MODULE_ALIAS_CRYPTO("xts(aes)");
+> diff --git a/arch/riscv/crypto/aes-riscv64-zvkned.S b/arch/riscv/crypto/aes-riscv64-zvkned.S
+> index 43541aad6386..23d063f94ce6 100644
+> --- a/arch/riscv/crypto/aes-riscv64-zvkned.S
+> +++ b/arch/riscv/crypto/aes-riscv64-zvkned.S
+> @@ -177,10 +177,163 @@ SYM_FUNC_END(aes_cbc_encrypt_zvkned)
+>
+>  // Same prototype and calling convention as the encryption function
+>  SYM_FUNC_START(aes_cbc_decrypt_zvkned)
+>         aes_begin       KEYP, 128f, 192f
+>         aes_cbc_decrypt 256
+>  128:
+>         aes_cbc_decrypt 128
+>  192:
+>         aes_cbc_decrypt 192
+>  SYM_FUNC_END(aes_cbc_decrypt_zvkned)
+> +
+> +.macro aes_cbc_cts_encrypt     keylen
+> +
+> +       // CBC-encrypt all blocks except the last.  But don't store the
+> +       // second-to-last block to the output buffer yet, since it will be
+> +       // handled specially in the ciphertext stealing step.  Exception: if the
+> +       // message is single-block, still encrypt the last (and only) block.
+> +       li              t0, 16
+> +       j               2f
+> +1:
+> +       vse32.v         v16, (OUTP)     // Store ciphertext block
+> +       addi            OUTP, OUTP, 16
+> +2:
+> +       vle32.v         v17, (INP)      // Load plaintext block
+> +       vxor.vv         v16, v16, v17   // XOR with IV or prev ciphertext block
+> +       aes_encrypt     v16, \keylen    // Encrypt
+> +       addi            INP, INP, 16
+> +       addi            LEN, LEN, -16
+> +       bgt             LEN, t0, 1b     // Repeat if more than one block remains
+> +
+> +       // Special case: if the message is a single block, just do CBC.
+> +       beqz            LEN, .Lcts_encrypt_done\@
+> +
+> +       // Encrypt the last two blocks using ciphertext stealing as follows:
+> +       //      C[n-1] = Encrypt(Encrypt(P[n-1] ^ C[n-2]) ^ P[n])
+> +       //      C[n] = Encrypt(P[n-1] ^ C[n-2])[0..LEN]
+> +       //
+> +       // C[i] denotes the i'th ciphertext block, and likewise P[i] the i'th
+> +       // plaintext block.  Block n, the last block, may be partial; its length
+> +       // is 1 <= LEN <= 16.  If there are only 2 blocks, C[n-2] means the IV.
+> +       //
+> +       // v16 already contains Encrypt(P[n-1] ^ C[n-2]).
+> +       // INP points to P[n].  OUTP points to where C[n-1] should go.
+> +       // To support in-place encryption, load P[n] before storing C[n].
+> +       addi            t0, OUTP, 16    // Get pointer to where C[n] should go
+> +       vsetvli         zero, LEN, e8, m1, tu, ma
+> +       vle8.v          v17, (INP)      // Load P[n]
+> +       vse8.v          v16, (t0)       // Store C[n]
+> +       vxor.vv         v16, v16, v17   // v16 = Encrypt(P[n-1] ^ C[n-2]) ^ P[n]
+> +       vsetivli        zero, 4, e32, m1, ta, ma
+> +       aes_encrypt     v16, \keylen
+> +.Lcts_encrypt_done\@:
+> +       vse32.v         v16, (OUTP)     // Store C[n-1] (or C[n] in single-block case)
+> +       ret
+> +.endm
+> +
+> +#define LEN32          t4 // Length of remaining full blocks in 32-bit words
+> +#define LEN_MOD16      t5 // Length of message in bytes mod 16
+> +
+> +.macro aes_cbc_cts_decrypt     keylen
+> +       andi            LEN32, LEN, ~15
+> +       srli            LEN32, LEN32, 2
+> +       andi            LEN_MOD16, LEN, 15
+> +
+> +       // Save C[n-2] in v28 so that it's available later during the ciphertext
+> +       // stealing step.  If there are fewer than three blocks, C[n-2] means
+> +       // the IV, otherwise it means the third-to-last ciphertext block.
+> +       vmv.v.v         v28, v16        // IV
+> +       add             t0, LEN, -33
+> +       bltz            t0, .Lcts_decrypt_loop\@
+> +       andi            t0, t0, ~15
+> +       add             t0, t0, INP
+> +       vle32.v         v28, (t0)
+> +
+> +       // CBC-decrypt all full blocks.  For the last full block, or the last 2
+> +       // full blocks if the message is block-aligned, this doesn't write the
+> +       // correct output blocks (unless the message is only a single block),
+> +       // because it XORs the wrong values with the raw AES plaintexts.  But we
+> +       // fix this after this loop without redoing the AES decryptions.  This
+> +       // approach allows more of the AES decryptions to be parallelized.
+> +.Lcts_decrypt_loop\@:
+> +       vsetvli         t0, LEN32, e32, m4, ta, ma
+> +       addi            t1, t0, -4
+> +       vle32.v         v20, (INP)      // Load next set of ciphertext blocks
+> +       vmv.v.v         v24, v16        // Get IV or last ciphertext block of prev set
+> +       vslideup.vi     v24, v20, 4     // Setup prev ciphertext blocks
+> +       vslidedown.vx   v16, v20, t1    // Save last ciphertext block of this set
+> +       aes_decrypt     v20, \keylen    // Decrypt this set of blocks
+> +       vxor.vv         v24, v24, v20   // XOR prev ciphertext blocks with decrypted blocks
+> +       vse32.v         v24, (OUTP)     // Store this set of plaintext blocks
+> +       sub             LEN32, LEN32, t0
+> +       slli            t0, t0, 2       // Words to bytes
+> +       add             INP, INP, t0
+> +       add             OUTP, OUTP, t0
+> +       bnez            LEN32, .Lcts_decrypt_loop\@
+> +
+> +       vsetivli        zero, 4, e32, m4, ta, ma
+> +       vslidedown.vx   v20, v20, t1    // Extract raw plaintext of last full block
+> +       addi            t0, OUTP, -16   // Get pointer to last full plaintext block
+> +       bnez            LEN_MOD16, .Lcts_decrypt_non_block_aligned\@
+> +
+> +       // Special case: if the message is a single block, just do CBC.
+> +       li              t1, 16
+> +       beq             LEN, t1, .Lcts_decrypt_done\@
+> +
+> +       // Block-aligned message.  Just fix up the last 2 blocks.  We need:
+> +       //
+> +       //      P[n-1] = Decrypt(C[n]) ^ C[n-2]
+> +       //      P[n] = Decrypt(C[n-1]) ^ C[n]
+> +       //
+> +       // We have C[n] in v16, Decrypt(C[n]) in v20, and C[n-2] in v28.
+> +       // Together with Decrypt(C[n-1]) ^ C[n-2] from the output buffer, this
+> +       // is everything needed to fix the output without re-decrypting blocks.
+> +       addi            t1, OUTP, -32   // Get pointer to where P[n-1] should go
+> +       vxor.vv         v20, v20, v28   // Decrypt(C[n]) ^ C[n-2] == P[n-1]
+> +       vle32.v         v24, (t1)       // Decrypt(C[n-1]) ^ C[n-2]
+> +       vse32.v         v20, (t1)       // Store P[n-1]
+> +       vxor.vv         v20, v24, v16   // Decrypt(C[n-1]) ^ C[n-2] ^ C[n] == P[n] ^ C[n-2]
+> +       j               .Lcts_decrypt_finish\@
+> +
+> +.Lcts_decrypt_non_block_aligned\@:
+> +       // Decrypt the last two blocks using ciphertext stealing as follows:
+> +       //
+> +       //      P[n-1] = Decrypt(C[n] || Decrypt(C[n-1])[LEN_MOD16..16]) ^ C[n-2]
+> +       //      P[n] = (Decrypt(C[n-1]) ^ C[n])[0..LEN_MOD16]
+> +       //
+> +       // We already have Decrypt(C[n-1]) in v20 and C[n-2] in v28.
+> +       vmv.v.v         v16, v20        // v16 = Decrypt(C[n-1])
+> +       vsetvli         zero, LEN_MOD16, e8, m1, tu, ma
+> +       vle8.v          v20, (INP)      // v20 = C[n] || Decrypt(C[n-1])[LEN_MOD16..16]
+> +       vxor.vv         v16, v16, v20   // v16 = Decrypt(C[n-1]) ^ C[n]
+> +       vse8.v          v16, (OUTP)     // Store P[n]
+> +       vsetivli        zero, 4, e32, m1, ta, ma
+> +       aes_decrypt     v20, \keylen    // v20 = Decrypt(C[n] || Decrypt(C[n-1])[LEN_MOD16..16])
+> +.Lcts_decrypt_finish\@:
+> +       vxor.vv         v20, v20, v28   // XOR with C[n-2]
+> +       vse32.v         v20, (t0)       // Store last full plaintext block
+> +.Lcts_decrypt_done\@:
+> +       ret
+> +.endm
+> +
+> +.macro aes_cbc_cts_crypt       keylen
+> +       vle32.v         v16, (IVP)      // Load IV
+> +       beqz            a5, .Lcts_decrypt\@
+> +       aes_cbc_cts_encrypt \keylen
+> +.Lcts_decrypt\@:
+> +       aes_cbc_cts_decrypt \keylen
+> +.endm
+> +
+> +// void aes_cbc_cts_crypt_zvkned(const struct crypto_aes_ctx *key,
+> +//                              const u8 *in, u8 *out, size_t len,
+> +//                              const u8 iv[16], bool enc);
+> +//
+> +// Encrypts or decrypts a message with the CS3 variant of AES-CBC-CTS.
+> +// This is the variant that unconditionally swaps the last two blocks.
+> +SYM_FUNC_START(aes_cbc_cts_crypt_zvkned)
+> +       aes_begin       KEYP, 128f, 192f
+> +       aes_cbc_cts_crypt 256
+> +128:
+> +       aes_cbc_cts_crypt 128
+> +192:
+> +       aes_cbc_cts_crypt 192
+> +SYM_FUNC_END(aes_cbc_cts_crypt_zvkned)
+>
+> base-commit: cb4ede926134a65bc3bf90ed58dace8451d7e759
+> prerequisite-patch-id: 2a69e1270be0fa567cc43269826171d6e46d65de
+> --
+> 2.43.0
+>
