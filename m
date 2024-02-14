@@ -1,104 +1,118 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52347604D9;
-	Wed, 14 Feb 2024 16:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694031DDD7;
+	Wed, 14 Feb 2024 22:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707929829; cv=none; b=l+TXiAczdAh+48ZrnUBrp3qrfnRwbEd6nVvCOPRu20A8C4jRc+D0hhSz4Giq/MHSqHQHd9PvOry60k4Ro9xtdpyn7GBkxiVfdST/Xz13OkjbHtm20Jvc8/AMCQYmYP6u33ONiE4SuYzdPGwFxGYYiCzW9SMSgtoU8pk6xIVHtbs=
+	t=1707949930; cv=none; b=gDSCZ8qBkfu1nC2vegAwFZgsVPB5Y333YZPGF6/GTeXDhjaePZIfZ1rH36K8nZRgh0LE+lPhq+LzgmUks4ISY9zeV4/AT5MobntwxsW9JgOANbNraLVwzWv9o1pshwuZDkF2vGPKztJrJIjvXDRiOWTqxDvH27CQ8dDNlAY4178=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707929829; c=relaxed/simple;
-	bh=biuzYcQMelgQl+J54Kbot+3JqcMvoeGyuw3X50yl3uo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Doth6bbzK9QQxGdZQ7ypCOWBdct5BFDMGquFXIlADHU0qBWMLNDfiCuZF1gLQWVHBSkqMGmSlfJXc2CUIoLr+Sv9w7MN1gGIckWxcSGr2iN4v3QncSm0QCi1wwjDbw5GMIJDpsoT9C4j9ul7VAfoC+rr4CinoFGjlAuVddjx5fU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=bcp4Da1B; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1707949930; c=relaxed/simple;
+	bh=ZAx0hbDQxNxPk3gnGrB2LfNm++Pl1HRQT6UpuMGGB8w=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=OpEsVfAH4zQ55u3ydKgZldRyXY1djsaGkffQg7NVRa2ifOx6y5KY52mO3za+bKjrZkqZtHSVaVIiblhEr5y2V228pGX0XPiJtRCCmNQjiw+g91LkmIvNP+faRYWhNvoes7N6uSMVTJA0P3SSIkLHz2KyzhOUZawOxQ5veTRGMXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=d9fzbD43; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="bcp4Da1B"
-Received: from [100.66.32.72] (unknown [108.143.43.187])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 4C6E120B2000;
-	Wed, 14 Feb 2024 08:56:59 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4C6E120B2000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1707929827;
-	bh=ckiTjQJyYMqOqp6nmIcopayJUmMXUp+ALCH4tNreFgA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bcp4Da1BitmockWhF96LYrtqTtYF1wsfqg1TsvWy2uwN7ngUJtjxpHOsFsOFkYRJo
-	 Oc1JJKqKMD6tBVucLCv3I/J+wJYE56PeZVCCO7qQ3ND3CBRPqEuGxsTyjNc2QPe9EQ
-	 6yEqS9dEv9MTe2x16MuoGJbktHyukuLjD1rAvyRk=
-Message-ID: <b6f00233-0cbf-4d9a-aa8b-babc8a9ca696@linux.microsoft.com>
-Date: Wed, 14 Feb 2024 17:56:56 +0100
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="d9fzbD43"
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41ELiRZa022683;
+	Wed, 14 Feb 2024 22:31:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2023-11-20;
+ bh=eDxweK6fe3oib7W6T/1evsdFVVmS/oc6yGKmx5PFwhs=;
+ b=d9fzbD43R6Q5J4Et3YoOoBxkTq6KwLIyYUEK/KkNDnkAKazBGrbpmzB0WroOL8Yi4Rnk
+ LiRlYhnlZS1SaQYJfJDSR8qNAtHnWJSOsb+6osV2oS8C/f0PmAtuNUZbGE8tTT/I7xhD
+ 0rK2JuKZAxzhky6RgqN4EozvsLfLs23FP4OezCWdjZ23CgZQUU5QjDMnDHvw03okrN5B
+ GYGtR8yEI8DuV+Lh8r/GaxpXE1Zy5LKH57sYIJYswpeE0Def0LDfHMXE9gk5wDQmoIc1
+ MvEQtEyTOZAfieXY1TNdPRu8zlnecP2xIZPAE/jmzuEB0T43Fm7W7DXh4SkHqWq8TIfl Kg== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w92ppghjt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 14 Feb 2024 22:31:35 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41EL03gA000480;
+	Wed, 14 Feb 2024 22:31:33 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3w5yk9n76t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 14 Feb 2024 22:31:33 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41EMVTV0004281;
+	Wed, 14 Feb 2024 22:31:33 GMT
+Received: from bur-virt-x6-2-100.us.oracle.com (bur-virt-x6-2-100.us.oracle.com [10.153.92.40])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3w5yk9n72r-4
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 14 Feb 2024 22:31:32 +0000
+From: Ross Philipson <ross.philipson@oracle.com>
+To: linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+        linux-efi@vger.kernel.org
+Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        dave.hansen@linux.intel.com, ardb@kernel.org, mjg59@srcf.ucam.org,
+        James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
+        jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
+        nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
+        davem@davemloft.net, kanth.ghatraju@oracle.com,
+        trenchboot-devel@googlegroups.com
+Subject: [PATCH v8 03/15] x86: Secure Launch Kconfig
+Date: Wed, 14 Feb 2024 14:18:35 -0800
+Message-Id: <20240214221847.2066632-4-ross.philipson@oracle.com>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20240214221847.2066632-1-ross.philipson@oracle.com>
+References: <20240214221847.2066632-1-ross.philipson@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 04/26] x86/sev: Add the host SEV-SNP initialization
- support
-To: Borislav Petkov <bp@alien8.de>, Michael Roth <michael.roth@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
- linux-mm@kvack.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
- jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
- pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
- jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
- slp@redhat.com, pgonda@google.com, peterz@infradead.org,
- srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
- vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
- tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
- "liam.merwick@oracle.com Brijesh Singh" <brijesh.singh@amd.com>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-5-michael.roth@amd.com>
- <f60c5fe0-9909-468d-8160-34d5bae39305@linux.microsoft.com>
- <20240105160916.GDZZgprE8T6xbbHJ9E@fat_crate.local>
- <20240105162142.GEZZgslgQCQYI7twat@fat_crate.local>
- <0c4aac73-10d8-4e47-b6a8-f0c180ba1900@linux.microsoft.com>
- <20240108170418.GDZZwrEiIaGuMpV0B0@fat_crate.local>
- <b5b57b60-1573-44f4-8161-e2249eb6f9b6@linux.microsoft.com>
- <20240109122906.GCZZ08Esh86vhGwVx1@fat_crate.local>
- <20240109124440.GDZZ0/uDY9RRPIOxOB@fat_crate.local>
-Content-Language: en-US
-From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-In-Reply-To: <20240109124440.GDZZ0/uDY9RRPIOxOB@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-14_14,2024-02-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0 mlxscore=0
+ bulkscore=0 spamscore=0 malwarescore=0 adultscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2402140170
+X-Proofpoint-ORIG-GUID: qEOAt4N6P_IfV-bRj579FavWBYHDulDu
+X-Proofpoint-GUID: qEOAt4N6P_IfV-bRj579FavWBYHDulDu
 
-On 09/01/2024 13:44, Borislav Petkov wrote:
-> On Tue, Jan 09, 2024 at 01:29:06PM +0100, Borislav Petkov wrote:
->> At least three issues I see with that:
->>
->> - the allocation can fail so it is a lot more convenient when the
->>   firmware prepares it
->>
->> - the RMP_BASE and RMP_END writes need to be verified they actially did
->>   set up the RMP range because if they haven't, you might as well
->>   throw SNP security out of the window. In general, letting the kernel
->>   do the RMP allocation needs to be verified very very thoroughly.
->>
->> - a future feature might make this more complicated
-> 
-> - What do you do if you boot on a system which has the RMP already
->   allocated in the BIOS?
-> 
-> - How do you detect that it is the L1 kernel that must allocate the RMP?
-> 
-> - Why can't you use the BIOS allocated RMP in your scenario too instead
->   of the L1 kernel allocating it?
-> 
-> - ...
-> 
-> I might think of more.
-> 
+Initial bits to bring in Secure Launch functionality. Add Kconfig
+options for compiling in/out the Secure Launch code.
 
-Sorry for not replying back sooner.
+Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+---
+ arch/x86/Kconfig | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-I agree, lets get the base SNP stuff in and then talk about extensions.
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 5edec175b9bf..d96d75f6f1a9 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -2071,6 +2071,18 @@ config EFI_RUNTIME_MAP
+ 
+ 	  See also Documentation/ABI/testing/sysfs-firmware-efi-runtime-map.
+ 
++config SECURE_LAUNCH
++	bool "Secure Launch support"
++	default n
++	depends on X86_64 && X86_X2APIC
++	help
++	   The Secure Launch feature allows a kernel to be loaded
++	   directly through an Intel TXT measured launch. Intel TXT
++	   establishes a Dynamic Root of Trust for Measurement (DRTM)
++	   where the CPU measures the kernel image. This feature then
++	   continues the measurement chain over kernel configuration
++	   information and init images.
++
+ source "kernel/Kconfig.hz"
+ 
+ config ARCH_SUPPORTS_KEXEC
+-- 
+2.39.3
 
-I want to sync up with Michael to make sure he's onboard with what I'm
-proposing. I'll add more design/documentation/usecase descriptions with the
-next submission and will make sure to address all the issues you brought up.
-
-Jeremi
