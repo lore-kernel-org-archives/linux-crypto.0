@@ -1,49 +1,51 @@
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677BD1864C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA231DDEE;
 	Wed, 14 Feb 2024 22:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707949930; cv=none; b=GtMzW5H1Jw3npoKHRKUL4Z5eELdQO2YsXse2AIN4n/NvzCdR/n2NYwsTvGzhAX6Evxd3L1bdkjbKrzCvUM8nYNF5evDokkX7qkw3sfLlCHdxo1L6Gu+gX8cCZ9GCBGkrtIwtzm8ZUuoYxktS21OQjb7CU1bWFDr/kl08t+8wYYw=
+	t=1707949930; cv=none; b=lQEI9ZUV9ROUJshKbQ2Q2J+NwJaMFVAYLF1w98gCwp+ZKOPgqbvbHXjSO7y6MsJ/SBU/MUTr//nxMYjqERIrqCqiqjuV564DsD+yY7/hT4FuIKeVJu4ObIXcB+2xz2e9yZnbnFqSh00ZY5HG7GdIXhSS7a0DuyKEUdZd8JTWa94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707949930; c=relaxed/simple;
-	bh=IQ+bB8zoweKg0wCoPyekdYVQg87SPMbfrO504YvdT6w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YU5I+FH4/y5RaUs6xUyIFD/fYqyxvo2ItcfKm7HaMnNQAo265kHuoN7juofiFcU10iXVDPeTodi2VjC+9trty3ChoysTDhNH9aQPAzXee2hRLVn0G5CI2nMeG3sbCMk7Jf1F5v0XF4scfo2EH+9ZmiR9OhtxTU2lhddUd+zLnIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=mRso2/sy; arc=none smtp.client-ip=205.220.165.32
+	bh=OBQETCp60QolK2ACcaoCswSey8FWg2r2fZA2Tzq1MQM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=KXDiHBkDvLx/KBnPCH1/GBOuk1lqvPnkvL17UJNnCgeC227/x4BLlTyr7xzX7Ruy/njaUPXQdRbSH3NkX3wmVdPb5qGS45JQChi//JKMkjFmPcLUvhpHiosDxGkatHHdNWfcJ5s1IME3AaZDxKO2sXHADrPS2EDwnqpPUPvJmCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=JlhttMfY; arc=none smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mRso2/sy"
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41ELiRJF022678;
-	Wed, 14 Feb 2024 22:31:32 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JlhttMfY"
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41ELibbP015442;
+	Wed, 14 Feb 2024 22:31:36 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2023-11-20; bh=z6xV/oVPSipdumkYUteqxUD+EwVYQ2g1SORZEnn8bxw=;
- b=mRso2/sy6HaQZeyVXnlXYU8wOwuz/0GERSHLm95SPRlYUXVZgGaQMxzyCfHO0IRW0GNA
- KcoIz0ijcpTNXi/FMmgcHDq87EG5GgZ6MMrpVuUe4uypQsmgANJ+rsB+15Zmxa0pvOTX
- 65wlnXw6y+rYoFSpRM7QBPJEl5HLgzQZQxUElwDHbIw80bRDufSvYyIEiRbr9qpZjAbQ
- /ktqKKe++5bXLyVmo9LpP0afwmjQ8ArtameLK7bXXOXC/Ix9caNIxMLhTCizrc3VY/cf
- 0I9K5pmjdgW0WeMjmYVbRzOG2XoYXlFZxrlKwq7bT/FAR0ENzWkdJ9kMmUc8H3m07CKm JA== 
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2023-11-20;
+ bh=N1woEGeXIrMGyDtYfkH+QQvf7qsEVIADRes1IgQnr3s=;
+ b=JlhttMfYa4GKXy6HH62GjiX/tpJfU/hWeYutdgB7ycYEZSULz3duBf8FvXlImQ3Z40AK
+ xJlidTrMznWbixWuCFes4D95w5WRoypj6hMP2TehCRVaRz1IGtT4jTV3cY1FmIwLyM/A
+ /WsH1q8okTVHKtaUIDWwSz5TRfhilnv1R2Sq92F29SC3m0y+IG9nSCdyC6HmFZheDas/
+ bXlGuM0CYaKtYEzCEtO+ATCWW/++LKLExZb2O57u7rIVPO9A00gK1ozG+4okyfHdCH1G
+ y43K6NXrRpSSUzKx9CDhe9dCGmsdysrjSRO4j0pVroFs9WEc5Fmu8IWXfHHCC8oTw/dA bg== 
 Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w92ppghjr-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w92s70gv1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 14 Feb 2024 22:31:31 +0000
+	Wed, 14 Feb 2024 22:31:36 +0000
 Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41EM0KMM000657;
-	Wed, 14 Feb 2024 22:31:30 GMT
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41EL5RG5000608;
+	Wed, 14 Feb 2024 22:31:35 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3w5yk9n747-1
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3w5yk9n777-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 14 Feb 2024 22:31:30 +0000
+	Wed, 14 Feb 2024 22:31:34 +0000
 Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41EMVTUs004281;
-	Wed, 14 Feb 2024 22:31:29 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41EMVTV2004281;
+	Wed, 14 Feb 2024 22:31:34 GMT
 Received: from bur-virt-x6-2-100.us.oracle.com (bur-virt-x6-2-100.us.oracle.com [10.153.92.40])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3w5yk9n72r-1
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3w5yk9n72r-5
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 14 Feb 2024 22:31:29 +0000
+	Wed, 14 Feb 2024 22:31:34 +0000
 From: Ross Philipson <ross.philipson@oracle.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org,
         linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -57,10 +59,12 @@ Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
         nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
         davem@davemloft.net, kanth.ghatraju@oracle.com,
         trenchboot-devel@googlegroups.com
-Subject: [PATCH v8 00/15] x86: Trenchboot secure dynamic launch Linux kernel support
-Date: Wed, 14 Feb 2024 14:18:32 -0800
-Message-Id: <20240214221847.2066632-1-ross.philipson@oracle.com>
+Subject: [PATCH v8 04/15] x86: Secure Launch Resource Table header file
+Date: Wed, 14 Feb 2024 14:18:36 -0800
+Message-Id: <20240214221847.2066632-5-ross.philipson@oracle.com>
 X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20240214221847.2066632-1-ross.philipson@oracle.com>
+References: <20240214221847.2066632-1-ross.philipson@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -75,266 +79,294 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 p
  bulkscore=0 spamscore=0 malwarescore=0 adultscore=0 suspectscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
  definitions=main-2402140170
-X-Proofpoint-ORIG-GUID: ODJVpcSsykUgv2zewX6PNAZH4dBPWwT_
-X-Proofpoint-GUID: ODJVpcSsykUgv2zewX6PNAZH4dBPWwT_
+X-Proofpoint-GUID: uVfO37Fg3rZ9Ad54IaKcgrvC9Clle2Pi
+X-Proofpoint-ORIG-GUID: uVfO37Fg3rZ9Ad54IaKcgrvC9Clle2Pi
 
-The larger focus of the TrenchBoot project (https://github.com/TrenchBoot) is to
-enhance the boot security and integrity in a unified manner. The first area of
-focus has been on the Trusted Computing Group's Dynamic Launch for establishing
-a hardware Root of Trust for Measurement, also know as DRTM (Dynamic Root of
-Trust for Measurement). The project has been and continues to work on providing
-a unified means to Dynamic Launch that is a cross-platform (Intel and AMD) and
-cross-architecture (x86 and Arm), with our recent involvment in the upcoming
-Arm DRTM specification. The order of introducing DRTM to the Linux kernel
-follows the maturity of DRTM in the architectures. Intel's Trusted eXecution
-Technology (TXT) is present today and only requires a preamble loader, e.g. a
-boot loader, and an OS kernel that is TXT-aware. AMD DRTM implementation has
-been present since the introduction of AMD-V but requires an additional
-component that is AMD specific and referred to in the specification as the
-Secure Loader, which the TrenchBoot project has an active prototype in
-development. Finally Arm's implementation is in specification development stage
-and the project is looking to support it when it becomes available.
+Introduce the Secure Launch Resource Table which forms the formal
+interface between the pre and post launch code.
 
-This patchset provides detailed documentation of DRTM, the approach used for
-adding the capbility, and relevant API/ABI documentation. In addition to the
-documentation the patch set introduces Intel TXT support as the first platform
-for Linux Secure Launch.
-
-A quick note on terminology. The larger open source project itself is called
-TrenchBoot, which is hosted on Github (links below). The kernel feature enabling
-the use of Dynamic Launch technology is referred to as "Secure Launch" within
-the kernel code. As such the prefixes sl_/SL_ or slaunch/SLAUNCH will be seen
-in the code. The stub code discussed above is referred to as the SL stub.
-
-The Secure Launch feature starts with patch #2. Patch #1 was authored by Arvind
-Sankar. There is no further status on this patch at this point but
-Secure Launch depends on it so it is included with the set.
-
-Links:
-
-The TrenchBoot project including documentation:
-
-https://trenchboot.org
-
-The TrenchBoot project on Github:
-
-https://github.com/trenchboot
-
-Intel TXT is documented in its own specification and in the SDM Instruction Set volume:
-
-https://www.intel.com/content/dam/www/public/us/en/documents/guides/intel-txt-software-development-guide.pdf
-https://software.intel.com/en-us/articles/intel-sdm
-
-AMD SKINIT is documented in the System Programming manual:
-
-https://www.amd.com/system/files/TechDocs/24593.pdf
-
-The TrenchBoot project provides a quick start guide to help get a system
-up and running with Secure Launch for Linux:
-
-https://github.com/TrenchBoot/documentation/blob/master/QUICKSTART.md
-
-Patch set based on commit:
-
-torvolds/master/54be6c6c5ae8e0d93a6c4641cb7528eb0b6ba478
-
-Thanks
-Ross Philipson and Daniel P. Smith
-
-Changes in v2:
-
- - Modified 32b entry code to prevent causing relocations in the compressed
-   kernel.
- - Dropped patches for compressed kernel TPM PCR extender.
- - Modified event log code to insert log delimiter events and not rely
-   on TPM access.
- - Stop extending PCRs in the early Secure Launch stub code.
- - Removed Kconfig options for hash algorithms and use the algorithms the
-   ACM used.
- - Match Secure Launch measurement algorithm use to those reported in the
-   TPM 2.0 event log.
- - Read the TPM events out of the TPM and extend them into the PCRs using
-   the mainline TPM driver. This is done in the late initcall module.
- - Allow use of alternate PCR 19 and 20 for post ACM measurements.
- - Add Kconfig constraints needed by Secure Launch (disable KASLR
-   and add x2apic dependency).
- - Fix testing of SL_FLAGS when determining if Secure Launch is active
-   and the architecture is TXT.
- - Use SYM_DATA_START_LOCAL macros in early entry point code.
- - Security audit changes:
-   - Validate buffers passed to MLE do not overlap the MLE and are
-     properly laid out.
-   - Validate buffers and memory regions used by the MLE are
-     protected by IOMMU PMRs.
- - Force IOMMU to not use passthrough mode during a Secure Launch.
- - Prevent KASLR use during a Secure Launch.
-
-Changes in v3:
-
- - Introduce x86 documentation patch to provide background, overview
-   and configuration/ABI information for the Secure Launch kernel
-   feature.
- - Remove the IOMMU patch with special cases for disabling IOMMU
-   passthrough. Configuring the IOMMU is now a documentation matter
-   in the previously mentioned new patch.
- - Remove special case KASLR disabling code. Configuring KASLR is now
-   a documentation matter in the previously mentioned new patch.
- - Fix incorrect panic on TXT public register read.
- - Properly handle and measure setup_indirect bootparams in the early
-   launch code.
- - Use correct compressed kernel image base address when testing buffers
-   in the early launch stub code. This bug was introduced by the changes
-   to avoid relocation in the compressed kernel.
- - Use CPUID feature bits instead of CPUID vendor strings to determine
-   if SMX mode is supported and the system is Intel.
- - Remove early NMI re-enable on the BSP. This can be safely done later
-   on the BSP after an IDT is setup.
-
-Changes in v4:
- - Expand the cover letter to provide more context to the order that DRTM
-   support will be added.
- - Removed debug tracing in TPM request locality funciton and fixed
-   local variable declarations.
- - Fixed missing break in default case in slmodule.c.
- - Reworded commit messages in patches 1 and 2 per suggestions.
-
-Changes in v5:
- - Comprehensive documentation rewrite.
- - Use boot param loadflags to communicate Secure Launch status to
-   kernel proper.
- - Fix incorrect check of X86_FEATURE_BIT_SMX bit.
- - Rename the alternate details and authorities PCR support.
- - Refactor the securityfs directory and file setup in slmodule.c.
- - Misc. cleanup from internal code reviews.
- - Use reverse fir tree format for variables.
-
-Changes in v6:
- - Support for the new Secure Launch Resourse Table that standardizes
-   the information passed and forms the ABI between the pre and post
-   launch code.
- - Support for booting Linux through the EFI stub entry point and
-   then being able to do a Secure Launch once EFI stub is done and EBS
-   is called.
- - Updates to the documentation to reflect the previous two items listed.
-
-Changes in v7:
- - Switch to using MONITOR/MWAIT instead of NMIs to park the APs for
-   later bringup by the SMP code.
- - Use static inline dummy functions instead of macros when the Secure
-   Launch feature is disabled.
- - Move early SHA1 code to lib/crypto and pull it in from there.
- - Numerous formatting fixes from comments on LKML.
- - Remove efi-stub/DL stub patch temporarily for redesign/rework.
-
-Changes in v8:
- - Reintroduce efi-stub Linux kernel booting through the dynamic launch
-   stub (DL stub).
- - Add new approach to setting localities > 0 through kernel and sysfs
-   interfaces in the TPM mainline driver.
- - General code cleanup from v7 post comments.
-
-Arvind Sankar (1):
-  x86/boot: Place kernel_info at a fixed offset
-
-Daniel P. Smith (2):
-  x86: Add early SHA support for Secure Launch early measurements
-  x86: Secure Launch late initcall platform module
-
-Ross Philipson (12):
-  Documentation/x86: Secure Launch kernel documentation
-  x86: Secure Launch Kconfig
-  x86: Secure Launch Resource Table header file
-  x86: Secure Launch main header file
-  x86: Secure Launch kernel early boot stub
-  x86: Secure Launch kernel late boot stub
-  x86: Secure Launch SMP bringup support
-  kexec: Secure Launch kexec SEXIT support
-  reboot: Secure Launch SEXIT support on reboot paths
-  tpm: Add ability to set the preferred locality the TPM chip uses
-  tpm: Add sysfs interface to allow setting and querying the preferred
-    locality
-  x86: EFI stub DRTM launch support for Secure Launch
-
-*** BLURB HERE ***
-
-Arvind Sankar (1):
-  x86/boot: Place kernel_info at a fixed offset
-
-Daniel P. Smith (2):
-  x86: Add early SHA support for Secure Launch early measurements
-  x86: Secure Launch late initcall platform module
-
-Ross Philipson (12):
-  Documentation/x86: Secure Launch kernel documentation
-  x86: Secure Launch Kconfig
-  x86: Secure Launch Resource Table header file
-  x86: Secure Launch main header file
-  x86: Secure Launch kernel early boot stub
-  x86: Secure Launch kernel late boot stub
-  x86: Secure Launch SMP bringup support
-  kexec: Secure Launch kexec SEXIT support
-  reboot: Secure Launch SEXIT support on reboot paths
-  tpm: Add ability to set the preferred locality the TPM chip uses
-  tpm: Add sysfs interface to allow setting and querying the preferred
-    locality
-  x86: EFI stub DRTM launch support for Secure Launch
-
- Documentation/arch/x86/boot.rst               |  21 +
- Documentation/security/index.rst              |   1 +
- .../security/launch-integrity/index.rst       |  11 +
- .../security/launch-integrity/principles.rst  | 320 ++++++++
- .../secure_launch_details.rst                 | 584 +++++++++++++++
- .../secure_launch_overview.rst                | 226 ++++++
- arch/x86/Kconfig                              |  12 +
- arch/x86/boot/compressed/Makefile             |   3 +
- arch/x86/boot/compressed/early_sha1.c         |  12 +
- arch/x86/boot/compressed/early_sha256.c       |   6 +
- arch/x86/boot/compressed/head_64.S            |  34 +
- arch/x86/boot/compressed/kernel_info.S        |  53 +-
- arch/x86/boot/compressed/kernel_info.h        |  12 +
- arch/x86/boot/compressed/sl_main.c            | 582 +++++++++++++++
- arch/x86/boot/compressed/sl_stub.S            | 705 ++++++++++++++++++
- arch/x86/boot/compressed/vmlinux.lds.S        |   6 +
- arch/x86/include/asm/msr-index.h              |   5 +
- arch/x86/include/asm/realmode.h               |   3 +
- arch/x86/include/uapi/asm/bootparam.h         |   1 +
- arch/x86/kernel/Makefile                      |   2 +
- arch/x86/kernel/asm-offsets.c                 |  20 +
- arch/x86/kernel/reboot.c                      |  10 +
- arch/x86/kernel/setup.c                       |   3 +
- arch/x86/kernel/slaunch.c                     | 598 +++++++++++++++
- arch/x86/kernel/slmodule.c                    | 511 +++++++++++++
- arch/x86/kernel/smpboot.c                     |  58 +-
- arch/x86/realmode/init.c                      |   3 +
- arch/x86/realmode/rm/header.S                 |   3 +
- arch/x86/realmode/rm/trampoline_64.S          |  32 +
- drivers/char/tpm/tpm-chip.c                   |  24 +-
- drivers/char/tpm/tpm-interface.c              |  15 +
- drivers/char/tpm/tpm-sysfs.c                  |  30 +
- drivers/char/tpm/tpm.h                        |   1 +
- drivers/firmware/efi/libstub/x86-stub.c       |  55 ++
- drivers/iommu/intel/dmar.c                    |   4 +
- include/crypto/sha1.h                         |   1 +
- include/linux/slaunch.h                       | 542 ++++++++++++++
- include/linux/slr_table.h                     | 270 +++++++
- include/linux/tpm.h                           |  10 +
- kernel/kexec_core.c                           |   4 +
- lib/crypto/sha1.c                             |  81 ++
- 41 files changed, 4867 insertions(+), 7 deletions(-)
- create mode 100644 Documentation/security/launch-integrity/index.rst
- create mode 100644 Documentation/security/launch-integrity/principles.rst
- create mode 100644 Documentation/security/launch-integrity/secure_launch_details.rst
- create mode 100644 Documentation/security/launch-integrity/secure_launch_overview.rst
- create mode 100644 arch/x86/boot/compressed/early_sha1.c
- create mode 100644 arch/x86/boot/compressed/early_sha256.c
- create mode 100644 arch/x86/boot/compressed/kernel_info.h
- create mode 100644 arch/x86/boot/compressed/sl_main.c
- create mode 100644 arch/x86/boot/compressed/sl_stub.S
- create mode 100644 arch/x86/kernel/slaunch.c
- create mode 100644 arch/x86/kernel/slmodule.c
- create mode 100644 include/linux/slaunch.h
+Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+---
+ include/linux/slr_table.h | 270 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 270 insertions(+)
  create mode 100644 include/linux/slr_table.h
 
+diff --git a/include/linux/slr_table.h b/include/linux/slr_table.h
+new file mode 100644
+index 000000000000..42020988233a
+--- /dev/null
++++ b/include/linux/slr_table.h
+@@ -0,0 +1,270 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Secure Launch Resource Table
++ *
++ * Copyright (c) 2023, Oracle and/or its affiliates.
++ */
++
++#ifndef _LINUX_SLR_TABLE_H
++#define _LINUX_SLR_TABLE_H
++
++/* Put this in efi.h if it becomes a standard */
++#define SLR_TABLE_GUID				EFI_GUID(0x877a9b2a, 0x0385, 0x45d1, 0xa0, 0x34, 0x9d, 0xac, 0x9c, 0x9e, 0x56, 0x5f)
++
++/* SLR table header values */
++#define SLR_TABLE_MAGIC		0x4452544d
++#define SLR_TABLE_REVISION	1
++
++/* Current revisions for the policy and UEFI config */
++#define SLR_POLICY_REVISION		1
++#define SLR_UEFI_CONFIG_REVISION	1
++
++/* SLR defined architectures */
++#define SLR_INTEL_TXT		1
++#define SLR_AMD_SKINIT		2
++
++/* SLR defined bootloaders */
++#define SLR_BOOTLOADER_INVALID	0
++#define SLR_BOOTLOADER_GRUB	1
++
++/* Log formats */
++#define SLR_DRTM_TPM12_LOG	1
++#define SLR_DRTM_TPM20_LOG	2
++
++/* DRTM Policy Entry Flags */
++#define SLR_POLICY_FLAG_MEASURED	0x1
++#define SLR_POLICY_IMPLICIT_SIZE	0x2
++
++/* Array Lengths */
++#define TPM_EVENT_INFO_LENGTH		32
++#define TXT_VARIABLE_MTRRS_LENGTH	32
++
++/* Tags */
++#define SLR_ENTRY_INVALID	0x0000
++#define SLR_ENTRY_DL_INFO	0x0001
++#define SLR_ENTRY_LOG_INFO	0x0002
++#define SLR_ENTRY_ENTRY_POLICY	0x0003
++#define SLR_ENTRY_INTEL_INFO	0x0004
++#define SLR_ENTRY_AMD_INFO	0x0005
++#define SLR_ENTRY_ARM_INFO	0x0006
++#define SLR_ENTRY_UEFI_INFO	0x0007
++#define SLR_ENTRY_UEFI_CONFIG	0x0008
++#define SLR_ENTRY_END		0xffff
++
++/* Entity Types */
++#define SLR_ET_UNSPECIFIED	0x0000
++#define SLR_ET_SLRT		0x0001
++#define SLR_ET_BOOT_PARAMS	0x0002
++#define SLR_ET_SETUP_DATA	0x0003
++#define SLR_ET_CMDLINE		0x0004
++#define SLR_ET_UEFI_MEMMAP	0x0005
++#define SLR_ET_RAMDISK		0x0006
++#define SLR_ET_TXT_OS2MLE	0x0010
++#define SLR_ET_UNUSED		0xffff
++
++#ifndef __ASSEMBLY__
++
++/*
++ * Primary SLR Table Header
++ */
++struct slr_table {
++	u32 magic;
++	u16 revision;
++	u16 architecture;
++	u32 size;
++	u32 max_size;
++	/* entries[] */
++} __packed;
++
++/*
++ * Common SLRT Table Header
++ */
++struct slr_entry_hdr {
++	u16 tag;
++	u16 size;
++} __packed;
++
++/*
++ * Boot loader context
++ */
++struct slr_bl_context {
++	u16 bootloader;
++	u16 reserved;
++	u64 context;
++} __packed;
++
++/*
++ * DRTM Dynamic Launch Configuration
++ */
++struct slr_entry_dl_info {
++	struct slr_entry_hdr hdr;
++	struct slr_bl_context bl_context;
++	u64 dl_handler;
++	u64 dce_base;
++	u32 dce_size;
++	u64 dlme_entry;
++} __packed;
++
++/*
++ * TPM Log Information
++ */
++struct slr_entry_log_info {
++	struct slr_entry_hdr hdr;
++	u16 format;
++	u16 reserved;
++	u64 addr;
++	u32 size;
++} __packed;
++
++/*
++ * DRTM Measurement Policy
++ */
++struct slr_entry_policy {
++	struct slr_entry_hdr hdr;
++	u16 revision;
++	u16 nr_entries;
++	/* policy_entries[] */
++} __packed;
++
++/*
++ * DRTM Measurement Entry
++ */
++struct slr_policy_entry {
++	u16 pcr;
++	u16 entity_type;
++	u16 flags;
++	u16 reserved;
++	u64 entity;
++	u64 size;
++	char evt_info[TPM_EVENT_INFO_LENGTH];
++} __packed;
++
++/*
++ * Secure Launch defined MTRR saving structures
++ */
++struct slr_txt_mtrr_pair {
++	u64 mtrr_physbase;
++	u64 mtrr_physmask;
++} __packed;
++
++struct slr_txt_mtrr_state {
++	u64 default_mem_type;
++	u64 mtrr_vcnt;
++	struct slr_txt_mtrr_pair mtrr_pair[TXT_VARIABLE_MTRRS_LENGTH];
++} __packed;
++
++/*
++ * Intel TXT Info table
++ */
++struct slr_entry_intel_info {
++	struct slr_entry_hdr hdr;
++	u64 saved_misc_enable_msr;
++	struct slr_txt_mtrr_state saved_bsp_mtrrs;
++} __packed;
++
++/*
++ * AMD SKINIT Info table
++ */
++struct slr_entry_amd_info {
++	struct slr_entry_hdr hdr;
++} __packed;
++
++/*
++ * ARM DRTM Info table
++ */
++struct slr_entry_arm_info {
++	struct slr_entry_hdr hdr;
++} __packed;
++
++struct slr_entry_uefi_config {
++	struct slr_entry_hdr hdr;
++	u16 revision;
++	u16 nr_entries;
++	/* uefi_cfg_entries[] */
++} __packed;
++
++struct slr_uefi_cfg_entry {
++	u16 pcr;
++	u16 reserved;
++	u64 cfg; /* address or value */
++	u32 size;
++	char evt_info[TPM_EVENT_INFO_LENGTH];
++} __packed;
++
++static inline void *slr_end_of_entrys(struct slr_table *table)
++{
++	return (((void *)table) + table->size);
++}
++
++static inline struct slr_entry_hdr *
++slr_next_entry(struct slr_table *table,
++	       struct slr_entry_hdr *curr)
++{
++	struct slr_entry_hdr *next = (struct slr_entry_hdr *)
++				((u8 *)curr + curr->size);
++
++	if ((void *)next >= slr_end_of_entrys(table))
++		return NULL;
++	if (next->tag == SLR_ENTRY_END)
++		return NULL;
++
++	return next;
++}
++
++static inline struct slr_entry_hdr *
++slr_next_entry_by_tag(struct slr_table *table,
++		      struct slr_entry_hdr *entry,
++		      u16 tag)
++{
++	if (!entry) /* Start from the beginning */
++		entry = (struct slr_entry_hdr *)(((u8 *)table) + sizeof(*table));
++
++	for ( ; ; ) {
++		if (entry->tag == tag)
++			return entry;
++
++		entry = slr_next_entry(table, entry);
++		if (!entry)
++			return NULL;
++	}
++
++	return NULL;
++}
++
++static inline int
++slr_add_entry(struct slr_table *table,
++	      struct slr_entry_hdr *entry)
++{
++	struct slr_entry_hdr *end;
++
++	if ((table->size + entry->size) > table->max_size)
++		return -1;
++
++	memcpy((u8 *)table + table->size - sizeof(*end), entry, entry->size);
++	table->size += entry->size;
++
++	end  = (struct slr_entry_hdr *)((u8 *)table + table->size - sizeof(*end));
++	end->tag = SLR_ENTRY_END;
++	end->size = sizeof(*end);
++
++	return 0;
++}
++
++static inline void
++slr_init_table(struct slr_table *slrt, u16 architecture, u32 max_size)
++{
++	struct slr_entry_hdr *end;
++
++	slrt->magic = SLR_TABLE_MAGIC;
++	slrt->revision = SLR_TABLE_REVISION;
++	slrt->architecture = architecture;
++	slrt->size = sizeof(*slrt) + sizeof(*end);
++	slrt->max_size = max_size;
++	end = (struct slr_entry_hdr *)((u8 *)slrt + sizeof(*slrt));
++	end->tag = SLR_ENTRY_END;
++	end->size = sizeof(*end);
++}
++
++#endif /* !__ASSEMBLY */
++
++#endif /* _LINUX_SLR_TABLE_H */
 -- 
 2.39.3
 
