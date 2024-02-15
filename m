@@ -1,69 +1,105 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CA2DDD1
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Feb 2024 07:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C514BA37;
+	Thu, 15 Feb 2024 07:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707983852; cv=none; b=d9ag/RgtMH5b9CooaYc2C4o3Ua+SNeeGHoJEZM0MByVH8XVndFxIDZpYtK0NPaEK1ZufAdesVJYM3ky5Me6TbH5JPnkDiq79iqdPiApBY7L6WL+auiyZ+imcZ8zlEVIUoesZcZD/1reSzCdWCxw8J8iU2FrJHVRkE0MB9DZ5pas=
+	t=1707983982; cv=none; b=d8p2UsGNkDZ6uLNt3oHjjy7fCRJT5OPXTYzEx+OogK5DmKjDmFHQgc3HaUw+mPOmnLAnS2e6fbI8yoWYxkQuVJS/Zm/ZwSGHDIGiaX/c9CipIqztlKj1oQuVxE0tPfq8XW3SjzjbA1wfcYF/wC/tM6ZHX3IX1aWIWdRrx0ucCNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707983852; c=relaxed/simple;
-	bh=KIg42TbGbh0NfpfLij0mzr4rIY1wKc4aSNIDjzY0sHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kdWswrjv1P9WqlM53rpZBYi6AfTV1pe9Yz1zEgU1k+ULZH2vpcoq8CE/3GVOr2UMiD/QJ6j/puwiajlfvioLymTW8VRAGQI8tXssTY4l3NS8nDA1+lP5Tfce393UePv3+y5a8Yvpb8NqBGIlT8XxCPaa3RacgrRu5uY5NTYa+Ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1raWcW-00Dr2B-KG; Thu, 15 Feb 2024 15:57:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 15 Feb 2024 15:57:38 +0800
-Date: Thu, 15 Feb 2024 15:57:38 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 13/15] crypto: cts,xts - Update parameters
- blocksize/chunksize/tailsize
-Message-ID: <Zc3D8kwfZXiCagOL@gondor.apana.org.au>
-References: <cover.1707815065.git.herbert@gondor.apana.org.au>
- <b149e8743355be694c96da02ced0811963298373.1707815065.git.herbert@gondor.apana.org.au>
- <20240214230021.GC1638@sol.localdomain>
+	s=arc-20240116; t=1707983982; c=relaxed/simple;
+	bh=lglMDlZkFJKsCIT7Fn8mnC0sShe/3fOaUD6KwdKeRb4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RQhNgzrklGP/12xfVrv9u38GY8aKAeZUIQjIpjV4x8YE+XwbF2kZ7wR3jMzQUxF35pI78v/tEEF+IULpLFMaHqp48RUQuMuOmYPYCFbQapZZlQOvLw4fhYyD0vR+JqCycrR2TpEnHZbTQOfJsCZVjZTM8BgIixIbqDEGLaPJ5is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CEYad3Pe; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CEYad3Pe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0F6DC433A6;
+	Thu, 15 Feb 2024 07:59:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707983981;
+	bh=lglMDlZkFJKsCIT7Fn8mnC0sShe/3fOaUD6KwdKeRb4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=CEYad3Pec9rSmWPcYhdduNgmoa7KOhGjCI0MBxDg7AhPRC8sNL1DTZ/tqGc5Sb4/V
+	 nUYef9ls3xuZTT8BD2qUJZphInbwGWoKoejY0HkhKGoToxxzxy712koyGEOSkvQnKy
+	 CsfiJYgrfZGeLpwaHirxGD+uIirvYSDmo+Cc9elHJcXSTd6MC8nuduwJBbwdzF/rrM
+	 9f4TbAphPqfEcpd3Unrvc72PbWm43zAscaXJQT4LPOV0Zk+S4Wr3CzErkLe8uTS31Q
+	 vLSVtVt2UZspkYhZju46AepuPzW8elm1OLcb07F8K/1rPKJm2sJEu9gMY8pSDl1UIa
+	 wJQX4cTjoJg4Q==
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d180d6bd32so7178561fa.1;
+        Wed, 14 Feb 2024 23:59:41 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWXuGQg+Pli6Px0P+FSwOyoHd4HRSoSSnX8go6KH3pbWJzaGKKOY6hN5VMo5UcUBV4cOvqaz54nNDsn0ljkTU6kOnbiUI3JAffD0OKCo7M1NUVV9xwWBTR15vTMB9Po9tBcmIpm93O+u6WR86tNkXk7kMqOa8T/Z4x7oqmcQSMDcaUFD9Zn7wlb5OVyh7dQBWZurepw7AoLZEdqUB3YCxN+v2TZ
+X-Gm-Message-State: AOJu0YxAWSsQKTEHD702xTMeF6atQmItVV9wYuX0P5IqjDtmtNJFCqAN
+	mXd3kZoiyu3JWZ754Y4AuoTl5ZYdJbEGqt2+CrcFVaogOtqKojUpk6XZ8jCwfvrCiGNj2CZfA6p
+	n6E9UUT9mP+bBvwog66cFZuQ1z4o=
+X-Google-Smtp-Source: AGHT+IE1UYvZkxI1EHEg3S8OzBox7W7fKR3c8y6QpY2+mbq0oQnr/WTTSEAnxqLhggjEtq/NwYteLwaSmzpeW6JkJSE=
+X-Received: by 2002:a19:f70b:0:b0:512:55c8:da20 with SMTP id
+ z11-20020a19f70b000000b0051255c8da20mr789212lfe.56.1707983979967; Wed, 14 Feb
+ 2024 23:59:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240214230021.GC1638@sol.localdomain>
+References: <20240214221847.2066632-1-ross.philipson@oracle.com> <20240214221847.2066632-4-ross.philipson@oracle.com>
+In-Reply-To: <20240214221847.2066632-4-ross.philipson@oracle.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 15 Feb 2024 08:59:28 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHxvmHo-FWa8PXoZSTVyeSsgFyOaSuXP=2Bhj2YjxCALQ@mail.gmail.com>
+Message-ID: <CAMj1kXHxvmHo-FWa8PXoZSTVyeSsgFyOaSuXP=2Bhj2YjxCALQ@mail.gmail.com>
+Subject: Re: [PATCH v8 03/15] x86: Secure Launch Kconfig
+To: Ross Philipson <ross.philipson@oracle.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
+	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
+	linux-efi@vger.kernel.org, dpsmith@apertussolutions.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, 
+	mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, 
+	jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, kanth.ghatraju@oracle.com, 
+	trenchboot-devel@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 14, 2024 at 03:00:21PM -0800, Eric Biggers wrote:
+On Wed, 14 Feb 2024 at 23:31, Ross Philipson <ross.philipson@oracle.com> wrote:
 >
-> Before messing around with cra_blocksize, it needs to be decided what it
-> actually means, and document it appropriately.  According to the current
-> specification, AES_BLOCK_SIZE is correct here, not 1:
+> Initial bits to bring in Secure Launch functionality. Add Kconfig
+> options for compiling in/out the Secure Launch code.
+>
+> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+> ---
+>  arch/x86/Kconfig | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 5edec175b9bf..d96d75f6f1a9 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -2071,6 +2071,18 @@ config EFI_RUNTIME_MAP
+>
+>           See also Documentation/ABI/testing/sysfs-firmware-efi-runtime-map.
+>
+> +config SECURE_LAUNCH
+> +       bool "Secure Launch support"
+> +       default n
 
-Block size should always be set to 1 unless the algorithm is only
-capable of handling input data that is a multiple of block size.
+'n' is already the default, so you can drop this line.
 
->  * @cra_blocksize: Minimum block size of this transformation. The size in bytes
->  *		   of the smallest possible unit which can be transformed with
->  *		   this algorithm. The users must respect this value.
->  *		   In case of HASH transformation, it is possible for a smaller
->  *		   block than @cra_blocksize to be passed to the crypto API for
->  *		   transformation, in case of any other transformation type, an
->  * 		   error will be returned upon any attempt to transform smaller
->  *		   than @cra_blocksize chunks.
+> +       depends on X86_64 && X86_X2APIC
 
-OK this is wrong.  We should fix it.  For skciphers, the input
-length must be a multiple of blocksize.
+This depends on CONFIG_TCG_TPM as well (I got build failures without it)
 
-We should probably replace this comment with one that refers to
-each algorithm type and then document the meaning there.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> +       help
+> +          The Secure Launch feature allows a kernel to be loaded
+> +          directly through an Intel TXT measured launch. Intel TXT
+> +          establishes a Dynamic Root of Trust for Measurement (DRTM)
+> +          where the CPU measures the kernel image. This feature then
+> +          continues the measurement chain over kernel configuration
+> +          information and init images.
+> +
+>  source "kernel/Kconfig.hz"
+>
+>  config ARCH_SUPPORTS_KEXEC
+> --
+> 2.39.3
+>
