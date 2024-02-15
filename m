@@ -1,33 +1,33 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16A62CA7
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Feb 2024 06:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74AA3B67E
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Feb 2024 06:51:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707979620; cv=none; b=eVWoLSGrZqnrKlvBbghgLvS6GuApPVb7wE5ENK2AhP84lZAzDK8eW9A0XNLe6wSHESFHZnvykC3xBZOCQXAPxntwCEabUMNg3+m0ub/IkT/AfNPTmbFZ85iMcbL6HB02F7XhoWyUHOVv5Wjs+MqSS3q0MW31XvHf/ebJwdoCjDM=
+	t=1707979917; cv=none; b=D8B+jFkgcpjAzkHk71JVk/MkRO75Pl6QXyXNIkEqNCV9ObaAyxARBW0gnpXnjV5bC9Izrg/frR+Ug5R+l9EO4wOpkumZALZB9SItUWLZcQxRdeaJpBUkSCZTCbwF8h1Ot/vlm9CkfCcTjLqGgfylOrmxhcsMgaRxtxnPs1UdU4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707979620; c=relaxed/simple;
-	bh=tZ1AiBNKWK3q0AfxhMlRIC9dbh/wZFhMMGyNejBJPXE=;
+	s=arc-20240116; t=1707979917; c=relaxed/simple;
+	bh=3f1DVHN1YHA21G8RTBQTZBmH/bafHM/CnmL4dBIjLEc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TaTe2CHTAh/t0AhSStGwbLcd6aItgPVv/LfcK45MrtFJHsXByYx4irCHmc5efwyTx82V9f/wYc9cU8gDGf3U2XedoBHolhKCuT3QMECSP1K4k5ySbs+MDD3qLZz/mH/cI6myLFpt+DKP8gnTdgJvnD9jAlZB+oSCdzHXs5ODxVs=
+	 Content-Type:Content-Disposition:In-Reply-To; b=I9uZuSu7KXDnNNqZUZd04hhui3k8EIOhTNhh19b0b9g6WU9mlMe7vBxPyS4hzUro/IT6BG6kCR4NbA2O+2yE+9WS9embfhZ7jvpYzvWjIr2AmQJFmAoINu+yjXim8wdq++mZe4GGFBRy6dYmHE/ZGU3epKCma4YHa7cJQ7oclos=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1raVWH-00Dpy5-At; Thu, 15 Feb 2024 14:46:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 15 Feb 2024 14:47:07 +0800
-Date: Thu, 15 Feb 2024 14:47:07 +0800
+	id 1raVb4-00DpzX-4d; Thu, 15 Feb 2024 14:51:51 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 15 Feb 2024 14:52:04 +0800
+Date: Thu, 15 Feb 2024 14:52:04 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 06/15] crypto: algif_skcipher - Disallow nonincremental
- algorithms
-Message-ID: <Zc2za7szGC+nxEHM@gondor.apana.org.au>
+Subject: Re: [PATCH 09/15] crypto: chacha-generic - Convert from skcipher to
+ lskcipher
+Message-ID: <Zc20lNlotnAW9e9P@gondor.apana.org.au>
 References: <cover.1707815065.git.herbert@gondor.apana.org.au>
- <a22dc748fdd6b67efb5356fd7855610170da30d9.1707815065.git.herbert@gondor.apana.org.au>
- <20240214225638.GB1638@sol.localdomain>
+ <1585df67b3f356eba2c23ac9f36c7181432d191e.1707815065.git.herbert@gondor.apana.org.au>
+ <20240214234151.GE1638@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -36,26 +36,31 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240214225638.GB1638@sol.localdomain>
+In-Reply-To: <20240214234151.GE1638@sol.localdomain>
 
-On Wed, Feb 14, 2024 at 02:56:38PM -0800, Eric Biggers wrote:
->
-> Shouldn't they still be supported if the data is being read/written all at once?
+On Wed, Feb 14, 2024 at 03:41:51PM -0800, Eric Biggers wrote:
+> On Wed, Dec 06, 2023 at 01:49:32PM +0800, Herbert Xu wrote:
+> > +static int chacha_stream_xor(const struct chacha_ctx *ctx, const u8 *src,
+> > +			     u8 *dst, unsigned nbytes, u8 *siv, u32 flags)
+> 
+> In cryptography, siv normally stands for Synthetic Initialization Vector.  I
+> *think* that here you're having it stand for "state and IV", or something like
+> that.  Is there a better name for it?  Maybe it should just be state?
 
-It is supported, or at least it worked for my libkcapi tests on
-adiantum.  This error only triggers if we enter the code-path that
-splits the operation into two or more (because the user didn't
-write all the data in one go).
+Thanks, I'll change this to ivst.
 
-> Also, ENOSYS isn't really an appropriate error code.  ENOSYS normally means that
-> the system call isn't supported at all.  Maybe use EOPNOTSUPP?
+> So the "siv" contains xchacha_iv || real_iv || state?  That's 112 bytes, which
+> is more than the 80 that's allocated for it.
 
-Within the crypto subsystem ENOSYS means that a particular
-functionality is not supported.  I'm happy to change that but
-that should go into a different patch as there are existing uses
-which are similar (e.g., cloning).
+Correct, it's 112 bytes.  The caller is meant to allocate enough
+space for the IV and state: 32(ivsize) + 80(statesize).
 
-Thanks,
+> Isn't the state the only thing that actually needs to be carried forward?
+
+Some algorithms (statesize == 0) will carry all their state in
+the IV, e.g., cbc.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
