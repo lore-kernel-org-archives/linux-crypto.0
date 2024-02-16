@@ -1,165 +1,142 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB7E10788;
-	Fri, 16 Feb 2024 04:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD70317BD6
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Feb 2024 08:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708056553; cv=none; b=ds4+6ILfTv//s4UdI/tGzrhhL5fJOY/rTrp4Yq56sm3VrRxWsmNeiw58361ByPERofQyg45ZgTMZeW4JZVbbKO+u/NOLPwG9PwIQjSGfzTUHzbs70K5dCDx9u43dow8lVk13epXkRGsrPfEpoMFsh5ArzoZ8dsDqeVKiO832kA4=
+	t=1708072215; cv=none; b=bDWEGuytCrzVGQyDzBVFFjIzLXZS7HDbBlMT5EZ1vvRQ+nmvoUnMjE5ANwMho31CE4vRW8mF9bYSYYR5s1aC9/ZM0tt1G/0nj6wFwErsrMybOBOAXUYA9Brl8FCifgf7tfTh5US6+8Sql5MH7lMrICoLs+xx//KKUPCFyleGiz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708056553; c=relaxed/simple;
-	bh=OXsYoToIjgeSRYAs9X9E0bo5WCdOjPMMPVgmJGURH78=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qznwB3oiexBQtinZgQY/92Z+Mzt1VMTj3KjhU9rdwrjKv/SorVpy/9hUeA5CHZVe2jSiIA4NlmTCchawOKiypF34rtM7wbtJeAdenB6ObItRxsW1etKUK3ECldC5ssYLhWiR6nP0dDQ51wZdCBKKI8hl3vr2imO/dHx4xvJO9IQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W9laoRfr; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708072215; c=relaxed/simple;
+	bh=GdhjGGCW1tp746L2kvnuzcO0JGGixFXgKt1BGfXddiY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fC0ypB97hq8Gv0i/pAVbk1HbrHNJ4Z1+xGBsLnHkWcvmMJibnPWn7czg0XREOWeJNABABrv7wC4mnG+Y71uK9SJxR3YqPAk127ETJGV1dqScXS9rTq1O5w58AERi7+WRs1EQ/H0PTRQvcO9YOFQjCAp3LShTvr8qEEOVD9Ba/eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yosryahmed.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U4LmP0dC; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yosryahmed.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W9laoRfr"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-296e22f85abso1300705a91.3;
-        Thu, 15 Feb 2024 20:09:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U4LmP0dC"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc64b659a9cso3160751276.3
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Feb 2024 00:30:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708056551; x=1708661351; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kW/qQndLj7MYeSMYgAPMliKXg25U647vW1M3U8+Bgew=;
-        b=W9laoRfrE/T09iHCVRLFbI8zka3kijD7BoRxno6o/kmTi5KhiwxvnaQS2u5W0kR0+r
-         bWjFe0SbynejbmGc0u7uMk+uNY2apLeN2MGRsAbaUuBoHs+s2/be0wPOgum3OtKi9ZMW
-         /pSvlZ+0z7Dmrl5Boq2Xq5pTbNdZiDeIoHj83W+2A4AQ8dUpou7EPLxesGAStGoEca5u
-         1oTRXuJVqAI1PymDnaKtT6y4WHfli+1dekEofu7PlIQ7fLm3MqbKfFDnlKS5pDhszCnY
-         dTegKOKgCHdqAQ4OmPq0Kpmhkrdr7fzNJFSea2s2KhiBBej2VjO4JXgaP/u54YbVv5dk
-         NfOg==
+        d=google.com; s=20230601; t=1708072212; x=1708677012; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E+T406awSm0PZWvamxb/O4glPc/yswynyie5XG4DmHE=;
+        b=U4LmP0dCaq4iHak9mnXeylJInSYJBN1c9RyGjaGrqu3c6Q62tDgnXHeZNF5J2s/xdR
+         K0y9/GD6Xy7avGjAki16V9natPYQErk6JaWgj4PP7q7KvkGkENFrAwEyoO+8tfbSw+fu
+         5PSXqMO7xToNSnGozZFLLHaX2YbNRFY6sYhDKodTeV++1/VvuZKvMIuQRCCFS1/f22au
+         nrXFTx7qfDe05HdZzNoYtzKINvQCvJtQUGyImdOf6VM5w8d/4W1y9+5pZ9rPQL2sXUe2
+         nNI3S6rSBAPu5/24iYxBcXxd7yDj97T/sbJgYLV+ZXgJXYEmku0eLnJ3dWSwV3vjLUrx
+         wOGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708056551; x=1708661351;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kW/qQndLj7MYeSMYgAPMliKXg25U647vW1M3U8+Bgew=;
-        b=amcm23+UC2DIrWlqd0A9BVlBbwES5CS1z13WZPIuEtNYR5yfEMfwLlpgiW3QQD3QUc
-         8Z8cmPIdJ3BjULee8alGPVyub8x7KqIr4BS+u3wQUjcyMylOEbg+5YqMonHutSX2os+9
-         nLIcHc3Fx0NW3xB3+nATjbMLWw8MLDuyF5XUAbod9DISHXLGoUnd9QHXMWqTBz2lidsf
-         dr2d7N2UyrnFlUXtj6KDdh3yLnHnABOdf8Vj7ciEWBLr51olAt8WToxiAxSWgF/ahZN4
-         huRpDDWdLdyAlBOqCy8f2gCgER1suCPl7N2lbly+J4UAURU6ZzlqJHLLE0Bl5ReOmqSp
-         N1wg==
-X-Forwarded-Encrypted: i=1; AJvYcCVBd6BzBsEMbIYRqVw8bTpUa6WkuVChWD6h/a+Xv5hwdrlTzx30vOyRLV0Pw4ZtvOuPLdsIeu9mi5MPAckBG0ikuNFWwZxeH5Bl7cftSDOu8ltTR3RXv81kMyLF8Y7ac75l+KgdhEllRlh1
-X-Gm-Message-State: AOJu0YzSWeuntVGnFEGf9SdF0zTzN6OOIDEaQVfJORfKBG7JI/1iJpGz
-	6hKU0Bvuy5ff4TYXZHP8bpPuId3yIZQBoZjd49oSlIC7I/A3/CgN
-X-Google-Smtp-Source: AGHT+IGAI6evbaJJ5nvBvX/krSGwKcXuM/Fjm1hRJ4n+X39jOxzqtqrVSivqkrRIltKTg3jrBP8pEQ==
-X-Received: by 2002:a17:90a:eac1:b0:298:d1d3:9ef4 with SMTP id ev1-20020a17090aeac100b00298d1d39ef4mr3368864pjb.27.1708056551160;
-        Thu, 15 Feb 2024 20:09:11 -0800 (PST)
-Received: from barry-desktop.hub ([2407:7000:8942:5500:f28b:3925:777f:45d4])
-        by smtp.gmail.com with ESMTPSA id pt12-20020a17090b3d0c00b00298ff26e4c8sm2321393pjb.26.2024.02.15.20.09.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 20:09:10 -0800 (PST)
-From: Barry Song <21cnbao@gmail.com>
-To: akpm@linux-foundation.org,
-	davem@davemloft.net,
-	hannes@cmpxchg.org,
-	herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org,
-	linux-mm@kvack.org,
-	nphamcs@gmail.com,
-	yosryahmed@google.com,
-	zhouchengming@bytedance.com
-Cc: chriscli@google.com,
-	chrisl@kernel.org,
-	ddstreet@ieee.org,
-	linux-kernel@vger.kernel.org,
-	sjenning@redhat.com,
-	vitaly.wool@konsulko.com,
-	Barry Song <v-songbaohua@oppo.com>
-Subject: [PATCH v2 3/3] crypto: scompress: remove memcpy if sg_nents is 1
-Date: Fri, 16 Feb 2024 17:08:15 +1300
-Message-Id: <20240216040815.114202-4-21cnbao@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240216040815.114202-1-21cnbao@gmail.com>
-References: <20240216040815.114202-1-21cnbao@gmail.com>
+        d=1e100.net; s=20230601; t=1708072212; x=1708677012;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E+T406awSm0PZWvamxb/O4glPc/yswynyie5XG4DmHE=;
+        b=L5G/eIpeuz2231C7O3A5xWOQB1u7HMSfT2wQL7tZBf7uJ9uAVJ6I3PG8AXBjrCE+8n
+         y07g63CoyAvLpCHpa+tMiYRgjgbqmUimQZnaJYVIz5LHnCc5qVJstMyDr2N+TXdqbRMj
+         KEdcMyf2Q1vrEMpAwwziALRr4K5TXwgzR91ai4IsOeiy4iJaaewN9zjGuvgDkTgMqJpJ
+         B4LUWcwuOsEp3M8cMmuKgrobGUMKcRtlCPFnGNCPlS7f7o5KK3zT375K9wEim9n5Y/jo
+         mS+o2+0Bbf8QSIkPkcTyrtttt3HBlZGHZuJiL9YBBg91YgQBgWHhDeeYvbxXxpvySujq
+         +69Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVTI5RASguV9wyjNPlR39ZDT7YzDfbBX43kgrDROjfY0nx8IdGkJdMO332LMPSJ8Dk02GQ8ZCO5ixK386/eZJQoLDTUbBbvMCn15lNt
+X-Gm-Message-State: AOJu0YwZb2izcq+Xh1WoeThQMeIxrI5hGqeCPYq0Ab8ghrP3yB2P6TUK
+	LvgjxVOTk2y1ZwzvTA/wYC3Dtn05+qjHJ4iMsbvtYvtLuuP9xjBBum5kwhp6uXiCx1iIAqY0xzt
+	CN4FkX7RRE2MgfbsShQ==
+X-Google-Smtp-Source: AGHT+IF3trf13BJQXu17kJIafk/jn8S7KsSWkMDfarAi4KXYdoqAcTw5cjuzS+fWLBF6eBz3av4bvJ/YSiMvk+Xj
+X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:29b4])
+ (user=yosryahmed job=sendgmr) by 2002:a05:6902:728:b0:dcd:ac69:eb1a with SMTP
+ id l8-20020a056902072800b00dcdac69eb1amr950084ybt.12.1708072212743; Fri, 16
+ Feb 2024 00:30:12 -0800 (PST)
+Date: Fri, 16 Feb 2024 08:30:10 +0000
+In-Reply-To: <20240216040815.114202-3-21cnbao@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240216040815.114202-1-21cnbao@gmail.com> <20240216040815.114202-3-21cnbao@gmail.com>
+Message-ID: <Zc8dEn7eqFmC_Kcd@google.com>
+Subject: Re: [PATCH v2 2/3] mm/zswap: remove the memcpy if acomp is not sleepable
+From: Yosry Ahmed <yosryahmed@google.com>
+To: Barry Song <21cnbao@gmail.com>
+Cc: akpm@linux-foundation.org, davem@davemloft.net, hannes@cmpxchg.org, 
+	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, linux-mm@kvack.org, 
+	nphamcs@gmail.com, zhouchengming@bytedance.com, chriscli@google.com, 
+	chrisl@kernel.org, ddstreet@ieee.org, linux-kernel@vger.kernel.org, 
+	sjenning@redhat.com, vitaly.wool@konsulko.com, 
+	Barry Song <v-songbaohua@oppo.com>
+Content-Type: text/plain; charset="us-ascii"
 
-From: Barry Song <v-songbaohua@oppo.com>
+On Fri, Feb 16, 2024 at 05:08:14PM +1300, Barry Song wrote:
+> From: Barry Song <v-songbaohua@oppo.com>
+> 
+> Most compressors are actually CPU-based and won't sleep during
+> compression and decompression. We should remove the redundant
+> memcpy for them.
+> 
+> Signed-off-by: Barry Song <v-songbaohua@oppo.com>
+> Tested-by: Chengming Zhou <zhouchengming@bytedance.com>
+> Reviewed-by: Nhat Pham <nphamcs@gmail.com>
+> ---
+>  mm/zswap.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/mm/zswap.c b/mm/zswap.c
+> index 350dd2fc8159..6319d2281020 100644
+> --- a/mm/zswap.c
+> +++ b/mm/zswap.c
+> @@ -168,6 +168,7 @@ struct crypto_acomp_ctx {
+>  	struct crypto_wait wait;
+>  	u8 *buffer;
+>  	struct mutex mutex;
+> +	bool is_sleepable;
+>  };
+>  
+>  /*
+> @@ -716,6 +717,7 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+>  		goto acomp_fail;
+>  	}
+>  	acomp_ctx->acomp = acomp;
+> +	acomp_ctx->is_sleepable = acomp_is_sleepable(acomp);
 
-while sg_nents is 1 which is always true for the current kernel
-as the only user - zswap is the case, we should remove two big
-memcpy.
+Just one question here. In patch 1, sleepable seems to mean "not async".
+IIUC, even a synchronous algorithm may sleep (e.g. if there is a
+cond_resched or waiting for a mutex). Does sleepable in acomp terms the
+same as "atomic" in scheduling/preemption terms?
 
-Signed-off-by: Barry Song <v-songbaohua@oppo.com>
-Tested-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- crypto/scompress.c | 36 +++++++++++++++++++++++++++++-------
- 1 file changed, 29 insertions(+), 7 deletions(-)
+Also, was this tested with debug options to catch any possible sleeps in
+atomic context?
 
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index b108a30a7600..50a487eac792 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -117,6 +117,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 	struct crypto_scomp *scomp = *tfm_ctx;
- 	void **ctx = acomp_request_ctx(req);
- 	struct scomp_scratch *scratch;
-+	void *src, *dst;
- 	unsigned int dlen;
- 	int ret;
- 
-@@ -134,13 +135,25 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 	scratch = raw_cpu_ptr(&scomp_scratch);
- 	spin_lock(&scratch->lock);
- 
--	scatterwalk_map_and_copy(scratch->src, req->src, 0, req->slen, 0);
-+	if (sg_nents(req->src) == 1) {
-+		src = kmap_local_page(sg_page(req->src)) + req->src->offset;
-+	} else {
-+		scatterwalk_map_and_copy(scratch->src, req->src, 0,
-+					 req->slen, 0);
-+		src = scratch->src;
-+	}
-+
-+	if (req->dst && sg_nents(req->dst) == 1)
-+		dst = kmap_local_page(sg_page(req->dst)) + req->dst->offset;
-+	else
-+		dst = scratch->dst;
-+
- 	if (dir)
--		ret = crypto_scomp_compress(scomp, scratch->src, req->slen,
--					    scratch->dst, &req->dlen, *ctx);
-+		ret = crypto_scomp_compress(scomp, src, req->slen,
-+					    dst, &req->dlen, *ctx);
- 	else
--		ret = crypto_scomp_decompress(scomp, scratch->src, req->slen,
--					      scratch->dst, &req->dlen, *ctx);
-+		ret = crypto_scomp_decompress(scomp, src, req->slen,
-+					      dst, &req->dlen, *ctx);
- 	if (!ret) {
- 		if (!req->dst) {
- 			req->dst = sgl_alloc(req->dlen, GFP_ATOMIC, NULL);
-@@ -152,10 +165,19 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 			ret = -ENOSPC;
- 			goto out;
- 		}
--		scatterwalk_map_and_copy(scratch->dst, req->dst, 0, req->dlen,
--					 1);
-+		if (dst == scratch->dst) {
-+			scatterwalk_map_and_copy(scratch->dst, req->dst, 0,
-+						 req->dlen, 1);
-+		} else {
-+			flush_dcache_page(sg_page(req->dst));
-+		}
- 	}
- out:
-+	if (src != scratch->src)
-+		kunmap_local(src);
-+	if (dst != scratch->dst)
-+		kunmap_local(dst);
-+
- 	spin_unlock(&scratch->lock);
- 	return ret;
- }
--- 
-2.34.1
+If the answer to both questions is yes, the change otherwise LGTM. Feel
+free to add:
+Acked-by: Yosry Ahmed <yosryahmed@google.com>
 
+Thanks!
+
+>  
+>  	req = acomp_request_alloc(acomp_ctx->acomp);
+>  	if (!req) {
+> @@ -1368,7 +1370,7 @@ static void __zswap_load(struct zswap_entry *entry, struct page *page)
+>  	mutex_lock(&acomp_ctx->mutex);
+>  
+>  	src = zpool_map_handle(zpool, entry->handle, ZPOOL_MM_RO);
+> -	if (!zpool_can_sleep_mapped(zpool)) {
+> +	if (acomp_ctx->is_sleepable && !zpool_can_sleep_mapped(zpool)) {
+>  		memcpy(acomp_ctx->buffer, src, entry->length);
+>  		src = acomp_ctx->buffer;
+>  		zpool_unmap_handle(zpool, entry->handle);
+> @@ -1382,7 +1384,7 @@ static void __zswap_load(struct zswap_entry *entry, struct page *page)
+>  	BUG_ON(acomp_ctx->req->dlen != PAGE_SIZE);
+>  	mutex_unlock(&acomp_ctx->mutex);
+>  
+> -	if (zpool_can_sleep_mapped(zpool))
+> +	if (!acomp_ctx->is_sleepable || zpool_can_sleep_mapped(zpool))
+>  		zpool_unmap_handle(zpool, entry->handle);
+>  }
+>  
+> -- 
+> 2.34.1
+> 
