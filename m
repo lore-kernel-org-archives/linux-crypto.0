@@ -1,231 +1,150 @@
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892A41BF5C;
-	Fri, 16 Feb 2024 10:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BCE3537FB
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Feb 2024 10:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708078219; cv=none; b=Qw6DC46EyS3HETIKXyiVEOFfCt+9kXKo+f6LHpQdmRqWkAvYfv+dJs1mwMmusU8baqq+VGVf/pQFR7UFYzlGtlIp/GEpHBAOfiarU5XbqVIjD7Tj7zmmTPmG42I5Q/AA4VkORAkWncC4ysyfGOSwwWqsm3eXEgs2Fn6v7+QbXfQ=
+	t=1708080414; cv=none; b=u4nJfyDNaOWGiYiL2dadMAue3lP8ZFkN+ZjxWHF53Z6lG9okdoutKGkE/ySmR5htnxiH+W3X0wZbAlcUFpi4m1EP3BjWCr4DS9v3Lt0pindx6EEMj9rdido+9X8FHoJ3vyoPgrnXcP7kXPX6+XmrnLADv6TEwhv4Ixp4OUjG//M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708078219; c=relaxed/simple;
-	bh=qmJKpLziGLsqa42azR1puMC/gEi8CKY4n/XU1SYvzyE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KtXo/H+nCkEnGanF8B/GJQXGhESsYgBocZYPv5ACK+opToXvvZHEo8ATRxTItkSlGW0AmdPUjIyaSO4cQbyBaj4wqzv+czM+uNC1LkXjzJOnnnvU8/jn5zdMfMYGEo2RrDxRqBq4ctugxlX44m63YdTAvlV6FFCI8Z0HVPDdRqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D+MBYkqu; arc=none smtp.client-ip=209.85.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708080414; c=relaxed/simple;
+	bh=/Fv7pZduc9Bvxjs3c+I5eHvPrfvb1kDFVxbm5FfqWTc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=TXzhE/sCsc7uRiZiJnEpkh2Frodvbahdf9Ki2MDZHZgvZbop1MDHEJrxGMHAcDbhDTLA0luDjAGqzHSDwVG+3H8fkyaBJDCGKqzDvh/3ndShuAO1xOnDlNvGnv960dhkszggFEScCOHJVnQ4JgEMAoYGJmfsHNK+KwVEZrhvNa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=paic9VLj; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+MBYkqu"
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-4c01076b9faso875900e0c.2;
-        Fri, 16 Feb 2024 02:10:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="paic9VLj"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a3122b70439so217867566b.3
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Feb 2024 02:46:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708078216; x=1708683016; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=fairphone.com; s=fair; t=1708080410; x=1708685210; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5JkzbFOHD1LBq/kZlIZ36OV9INmft/mRs0RusCRScXg=;
-        b=D+MBYkquU0oyoh5UiDG361HyqNjj2KTN8ZP+2wWK7Zk1AfH0LuLEGiKV6AM5xFdE13
-         HhXuVGS3ewo3enYRSDYltI3NNhHbo3cprxHvvHVIvrfwcZte+3ujhKD2CT/coJb0AdxK
-         4G+prKb86oeU/Omt2joMTExEaZ1LGYuhT1m2FoP6nHHToaIZ1Yj8jA8YiXPIiRyOymSK
-         WpMjtvN/To8Hi09IXQkxuflAls4NFkZDKdLr0Fv90ItVAxy9bR30YbvTviHc8Eb0voo2
-         emOYSX/ykIf6gOY6GPZOJsuj6ko3iSJI+YXTwvF6Qm+fIPtH1CNH5j9G2wkVHSb7uguy
-         jCWw==
+        bh=ZN902PZ33RtjgjeWH2GYWtC877xiVrHyazftcFvMCYA=;
+        b=paic9VLj5iB9jqOQ7uUKubylKN1a13uNYqBxMszXFySy6AwDGoraMfpiKIdSn/tJbx
+         AtFXy2km0WaFV+IGqjfMCFzgiGCH9fLImFZ53UPYkitkoayNT+DYjRp5QUP2CZZqK4vM
+         HfkobiS62CI/VmoeUimZCJW7yfKnwmhntyyWcHrFZ9Nz2c3ASXEXiiCAC2kdRNA/0EZJ
+         cj60P7QOFkr2TjNct+EnZaox2mw9Q5zUiqRSPZsnB3uUFYdbxEPnIwlzI4gaR/msZ1nE
+         NLqgixfq4ACI2xAFLTHsRgeqZJYM8xcZvInGgDOk6gRwgX3SaGgrcO6zSw5YC6RUGwG3
+         dHpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708078216; x=1708683016;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5JkzbFOHD1LBq/kZlIZ36OV9INmft/mRs0RusCRScXg=;
-        b=qcpYbEMhi3WrN936fugkthaxsuhdiCDXQHtabIoHOlrpSJ32QYKyeqdGucGB0COrWM
-         1G0YAw6YlnoXmJG7EHXowXaM76B19jA8D++jE4UOubnCjYI9lORk3Fj9nMa9z/+WI1Ct
-         yw/ZvbAyh3ZNOpVeU3gXBYS7amiyjOnlqDfVXca/nSQrpBuJPhooaE7u2SG5vAWsBUjJ
-         fHUKXvsvtFMnCXl7qf/LHr5R2zYNgm+lMAHskOenF32CNpwcGpYwvPq1tKCfGxaYfgsB
-         CLtMBghPDrTkQsVk6vs/VapkDzRbWUHVOC1ZWwnMuZjhIZknAD9rbt4JoVz+7RA1FjgN
-         NmAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVSjrd+ORSMn8O2YKv3PSBoY4MTiA2+lkAeMDEhPegVcXXdVoApmSai6eDxVXss7tHDh1SWhiNxAuyHvDSJWpQLIH4RY4vx46V85JQxCutkJPJzjxyU1JKqWkuDUXWti7XpHkjHu0BExRfH
-X-Gm-Message-State: AOJu0YwU483QifGqJ5pnUx9j7AelW3xL9u7wVGcbgvIzoO1KPnoxOTeT
-	vQKsEGbsO4S8DvHwjOv2txnub9agX6yjJb355+FCzfmRmFfU/BxZ1MkpPnZAneHK8o7jhve23rQ
-	Lda5cXZi2Z1D4RZJaKBjZPzxWWEg=
-X-Google-Smtp-Source: AGHT+IH1dSaXgm/Qiz9YTbYv81wbn+JFDDceA34zHrKDgZ/8eZ+F38uzQOKuRFzuO+hj41Yo+z3nNHAe2WBoNUtB3c0=
-X-Received: by 2002:a1f:4b07:0:b0:4c0:285e:79a with SMTP id
- y7-20020a1f4b07000000b004c0285e079amr3929989vka.3.1708078216129; Fri, 16 Feb
- 2024 02:10:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708080410; x=1708685210;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZN902PZ33RtjgjeWH2GYWtC877xiVrHyazftcFvMCYA=;
+        b=IfgbSL+Uj5AQdnsh3+48FOQBX1nub9tFhoSpFA4iTDu7C05ctq4bCEvZfaQhVD0EOz
+         Yrw2M45ZgyprxhnefTOd0r1RB521YcXAmEjShM8hhgGdkxM9OfcQrH7Q4x1fk0VorIr2
+         7NUbRwnP/m0jgwBC875QIVem4wrhScvixUTviOff+Gdt+LBd9tnXriT99QDeLwo19nAb
+         nwxz3e2unek7FdrVN8/GWpAhzzGnSj3lHlylUiswrgCPTJ8PY5aLwlwyz1h8AGfjhX3c
+         8uiQwQ7sp8w9otMy3i5hJuUsv296xdDt/lKDvTUHAji5XujvXz5TXpqMZuXq5eIxHZMD
+         wurQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXeXzDn1nl1RhT5Y5VDqpN5inmfynKKeTkOrB5/w5TRP66nPTsGok0mRFMLHHOWj+hUQ5BQLB+QSP1PS+cjlywJWKlWp9UlW1zg2/8K
+X-Gm-Message-State: AOJu0Yz9lX/50QqK6TYnH+0N1ZNeXBW7vMAH31d1bDix5yYol2e9H5Pg
+	fpcQOt/Svcg/RUDj3Smb9v26WRIQU+MVygt3BDYeaXG0uRGIJbqVa8Da/sKU7kg=
+X-Google-Smtp-Source: AGHT+IG5rkARmaWUictA1Ft2Xt9RaqG2EvVFtFJRmC7NNAJ+R9vH+8s1KCC+Eq70YL/6ULgKJ1LJ7w==
+X-Received: by 2002:a17:906:3757:b0:a3d:9e6b:2776 with SMTP id e23-20020a170906375700b00a3d9e6b2776mr2966222ejc.17.1708080410468;
+        Fri, 16 Feb 2024 02:46:50 -0800 (PST)
+Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id p17-20020a1709060e9100b00a3d11feb32esm1429131ejf.186.2024.02.16.02.46.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Feb 2024 02:46:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240216040815.114202-1-21cnbao@gmail.com> <20240216040815.114202-3-21cnbao@gmail.com>
- <Zc8dEn7eqFmC_Kcd@google.com>
-In-Reply-To: <Zc8dEn7eqFmC_Kcd@google.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Fri, 16 Feb 2024 23:10:04 +1300
-Message-ID: <CAGsJ_4x6z48N9Sq1V8Bn16eSdRAjBcy3=O_a2iizg=D-tPng=Q@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] mm/zswap: remove the memcpy if acomp is not sleepable
-To: Yosry Ahmed <yosryahmed@google.com>
-Cc: akpm@linux-foundation.org, davem@davemloft.net, hannes@cmpxchg.org, 
-	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, linux-mm@kvack.org, 
-	nphamcs@gmail.com, zhouchengming@bytedance.com, chriscli@google.com, 
-	chrisl@kernel.org, ddstreet@ieee.org, linux-kernel@vger.kernel.org, 
-	sjenning@redhat.com, vitaly.wool@konsulko.com, 
-	Barry Song <v-songbaohua@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 16 Feb 2024 11:46:49 +0100
+Message-Id: <CZ6FYZLGWT3K.ZBHYDQ7TDN4B@fairphone.com>
+Cc: "Andy Gross" <agross@kernel.org>, "Bjorn Andersson"
+ <andersson@kernel.org>, "Konrad Dybcio" <konrad.dybcio@linaro.org>, "Thara
+ Gopinath" <thara.gopinath@gmail.com>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ "Rob Herring" <robh+dt@kernel.org>, "Krzysztof Kozlowski"
+ <krzysztof.kozlowski+dt@linaro.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Bhupesh Sharma" <bhupesh.sharma@linaro.org>,
+ <~postmarketos/upstreaming@lists.sr.ht>, <phone-devel@vger.kernel.org>,
+ <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 2/2] arm64: dts: qcom: sm6350: Add Crypto Engine
+From: "Luca Weiss" <luca.weiss@fairphone.com>
+To: "Stephan Gerhold" <stephan@gerhold.net>
+X-Mailer: aerc 0.15.2
+References: <20240105-sm6350-qce-v1-0-416e5c7319ac@fairphone.com>
+ <20240105-sm6350-qce-v1-2-416e5c7319ac@fairphone.com>
+ <ZZguvdJTyVgfxm4D@gerhold.net>
+In-Reply-To: <ZZguvdJTyVgfxm4D@gerhold.net>
 
-On Fri, Feb 16, 2024 at 9:30=E2=80=AFPM Yosry Ahmed <yosryahmed@google.com>=
- wrote:
->
-> On Fri, Feb 16, 2024 at 05:08:14PM +1300, Barry Song wrote:
-> > From: Barry Song <v-songbaohua@oppo.com>
-> >
-> > Most compressors are actually CPU-based and won't sleep during
-> > compression and decompression. We should remove the redundant
-> > memcpy for them.
-> >
-> > Signed-off-by: Barry Song <v-songbaohua@oppo.com>
-> > Tested-by: Chengming Zhou <zhouchengming@bytedance.com>
-> > Reviewed-by: Nhat Pham <nphamcs@gmail.com>
+On Fri Jan 5, 2024 at 5:30 PM CET, Stephan Gerhold wrote:
+> On Fri, Jan 05, 2024 at 05:15:44PM +0100, Luca Weiss wrote:
+> > Add crypto engine (CE) and CE BAM related nodes and definitions for thi=
+s
+> > SoC.
+> >=20
+> > For reference:
+> >=20
+> >   [    2.297419] qcrypto 1dfa000.crypto: Crypto device found, version 5=
+.5.1
+> >=20
+> > Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
 > > ---
-> >  mm/zswap.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/mm/zswap.c b/mm/zswap.c
-> > index 350dd2fc8159..6319d2281020 100644
-> > --- a/mm/zswap.c
-> > +++ b/mm/zswap.c
-> > @@ -168,6 +168,7 @@ struct crypto_acomp_ctx {
-> >       struct crypto_wait wait;
-> >       u8 *buffer;
-> >       struct mutex mutex;
-> > +     bool is_sleepable;
-> >  };
-> >
-> >  /*
-> > @@ -716,6 +717,7 @@ static int zswap_cpu_comp_prepare(unsigned int cpu,=
- struct hlist_node *node)
-> >               goto acomp_fail;
-> >       }
-> >       acomp_ctx->acomp =3D acomp;
-> > +     acomp_ctx->is_sleepable =3D acomp_is_sleepable(acomp);
+> >  arch/arm64/boot/dts/qcom/sm6350.dtsi | 31 ++++++++++++++++++++++++++++=
++++
+> >  1 file changed, 31 insertions(+)
+> >=20
+> > diff --git a/arch/arm64/boot/dts/qcom/sm6350.dtsi b/arch/arm64/boot/dts=
+/qcom/sm6350.dtsi
+> > index 8fd6f4d03490..516aadbb16bb 100644
+> > --- a/arch/arm64/boot/dts/qcom/sm6350.dtsi
+> > +++ b/arch/arm64/boot/dts/qcom/sm6350.dtsi
+> > @@ -1212,6 +1212,37 @@ ufs_mem_phy_lanes: phy@1d87400 {
+> >  			};
+> >  		};
+> > =20
+> > +		cryptobam: dma-controller@1dc4000 {
+> > +			compatible =3D "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
+> > +			reg =3D <0 0x01dc4000 0 0x24000>;
+> > +			interrupts =3D <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+> > +			#dma-cells =3D <1>;
+> > +			qcom,ee =3D <0>;
+> > +			qcom,controlled-remotely;
+> > +			num-channels =3D <16>;
+> > +			qcom,num-ees =3D <4>;
+> > +			iommus =3D <&apps_smmu 0x432 0x0000>,
+> > +				 <&apps_smmu 0x438 0x0001>,
+> > +				 <&apps_smmu 0x43f 0x0000>,
+> > +				 <&apps_smmu 0x426 0x0011>,
+> > +				 <&apps_smmu 0x436 0x0011>;
 >
-> Just one question here. In patch 1, sleepable seems to mean "not async".
-> IIUC, even a synchronous algorithm may sleep (e.g. if there is a
-> cond_resched or waiting for a mutex). Does sleepable in acomp terms the
-> same as "atomic" in scheduling/preemption terms?
+> The last two lines look equivalent to me: 0x436 & ~0x0011 =3D 0x426.
 
-I think the answer is yes though async and sleepable are slightly
-different semantically
-generally speaking. but for comp cases, they are equal.
+I don't understand the IOMMU SID + mask really, but I think I've seen
+somewhere before like here that TZ can be a bit picky with the SIDs?
 
-We have two backends for compression/ decompression - scomp and acomp. if c=
-omp
-is using scomp backend, we can safely think they are not sleepable at
-least from the
-below three facts.
+https://lore.kernel.org/linux-arm-msm/opqdrmyj3y64nqqqmakjydn5rkspizufyeavm=
+7ec7c7ufqz4wk@ey2a7bq3shfj/
+https://lore.kernel.org/linux-arm-msm/11b5db69-49f5-4d7b-81c9-687d66a5cb0d@=
+linaro.org/
 
-1. in zRAM, we are using scomp APIs only - crypto_comp_decompress()/
-crypto_comp_compress(),  which are definitely scomp, we have never consider=
-ed
-sleeping problem in zram drivers:
-static int zram_read_from_zspool(struct zram *zram, struct page *page,
-                                 u32 index)
-{
-        struct zcomp_strm *zstrm;
-        unsigned long handle;
-        unsigned int size;
-        void *src, *dst;
-        u32 prio;
-        int ret;
+I don't quite want to risk having some obscure use case breaking because
+we cleaned up the dts ;)
 
-        handle =3D zram_get_handle(zram, index);
-        ...
-        src =3D zs_map_object(zram->mem_pool, handle, ZS_MM_RO);
-        if (size =3D=3D PAGE_SIZE) {
-                dst =3D kmap_local_page(page);
-                memcpy(dst, src, PAGE_SIZE);
-                kunmap_local(dst);
-                ret =3D 0;
-        } else {
-                dst =3D kmap_local_page(page);
-                ret =3D zcomp_decompress(zstrm, src, size, dst);
-                kunmap_local(dst);
-                zcomp_stream_put(zram->comps[prio]);
-        }
-        zs_unmap_object(zram->mem_pool, handle);
-        return ret;
-}
-
-2. zswap used to only support scomp before we moved to use
-crypto_acomp_compress()
-and crypto_acomp_decompress() APIs whose backends can be either scomp
-or acomp, thus new hardware-based compression drivers can be used in zswap.
-
-But before we moved to these new APIs in commit  1ec3b5fe6eec782 ("mm/zswap=
-:
-move to use crypto_acomp API for hardware acceleration") , zswap had
-never considered
-sleeping problems just like zRAM.
-
-3. There is no sleeping in drivers using scomp backend.
-
-$ git grep crypto_register_scomp
-crypto/842.c:   ret =3D crypto_register_scomp(&scomp);
-crypto/deflate.c:       ret =3D crypto_register_scomp(&scomp);
-crypto/lz4.c:   ret =3D crypto_register_scomp(&scomp);
-crypto/lz4hc.c: ret =3D crypto_register_scomp(&scomp);
-crypto/lzo-rle.c:       ret =3D crypto_register_scomp(&scomp);
-crypto/lzo.c:   ret =3D crypto_register_scomp(&scomp);
-crypto/zstd.c:  ret =3D crypto_register_scomp(&scomp);
-drivers/crypto/cavium/zip/zip_main.c:   ret =3D
-crypto_register_scomp(&zip_scomp_deflate);
-drivers/crypto/cavium/zip/zip_main.c:   ret =3D
-crypto_register_scomp(&zip_scomp_lzs);
-
-which are the most common cases.
+But if you're more sure than me that it won't break, let me know!
 
 >
-> Also, was this tested with debug options to catch any possible sleeps in
-> atomic context?
+> It's also a bit weird that the mask has one more digit than the stream
+> ID. And ordered numerically (by stream ID, first number) it would be a
+> bit easier to read. :-)
 
-yes. i have enabled CONFIG_DEBUG_ATOMIC_SLEEP=3Dy.
-
->
-> If the answer to both questions is yes, the change otherwise LGTM. Feel
-> free to add:
-> Acked-by: Yosry Ahmed <yosryahmed@google.com>
-
-Thanks!
+Sorting them is no problem, can do that for v2.
 
 >
-> Thanks!
->
-> >
-> >       req =3D acomp_request_alloc(acomp_ctx->acomp);
-> >       if (!req) {
-> > @@ -1368,7 +1370,7 @@ static void __zswap_load(struct zswap_entry *entr=
-y, struct page *page)
-> >       mutex_lock(&acomp_ctx->mutex);
-> >
-> >       src =3D zpool_map_handle(zpool, entry->handle, ZPOOL_MM_RO);
-> > -     if (!zpool_can_sleep_mapped(zpool)) {
-> > +     if (acomp_ctx->is_sleepable && !zpool_can_sleep_mapped(zpool)) {
-> >               memcpy(acomp_ctx->buffer, src, entry->length);
-> >               src =3D acomp_ctx->buffer;
-> >               zpool_unmap_handle(zpool, entry->handle);
-> > @@ -1382,7 +1384,7 @@ static void __zswap_load(struct zswap_entry *entr=
-y, struct page *page)
-> >       BUG_ON(acomp_ctx->req->dlen !=3D PAGE_SIZE);
-> >       mutex_unlock(&acomp_ctx->mutex);
-> >
-> > -     if (zpool_can_sleep_mapped(zpool))
-> > +     if (!acomp_ctx->is_sleepable || zpool_can_sleep_mapped(zpool))
-> >               zpool_unmap_handle(zpool, entry->handle);
-> >  }
-> >
-> > --
-> > 2.34.1
-> >
+> Thanks,
+> Stephan
 
-Thanks
-Barry
