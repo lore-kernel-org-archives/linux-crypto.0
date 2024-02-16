@@ -1,167 +1,123 @@
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB3010A08;
-	Fri, 16 Feb 2024 03:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82716134A4;
+	Fri, 16 Feb 2024 04:08:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708055724; cv=none; b=NxHDc2+7QRzVZoNixMUDrQQBO5M9hS8tniZ/It2jYU7gKjA4qTt52DxvJHGWcj3eilxphszWwqWe5AIpRQPllxRhA9CXwsp4Z1or8qPAa+K71MSAQeCgv8yyci/YNcR5TmfPIZHEt+BsCsMizOyQgMOg1Gsx4JPTIvtBrZJJ304=
+	t=1708056531; cv=none; b=KkOvA5LFevt6q4BnvztUUS0Dxk7pJBvfTCycymUyvVnlL/zCT+Nnd/Bvlrs87LuYvj8R4/dpeBiJTO/2VB7tMsjKNsWj1OhhafZHAVzwXV1r7JuLo7BK68x3dtJ7eFSniuguYFmZavzpGHpJ7u5UwP9t4jeDi4Ucp8rQFaDcECQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708055724; c=relaxed/simple;
-	bh=6Fp2wjgOC/nAoMzGcntuhicS8v+wr/GQBkNxnoYVz0U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VCCbbuXDu+Ti/XSRWvfPzBkz3QGxHlLAscV+I+E0vFVnAFNqQClgd+1l0w9fY48+fpCZi3We6XUmqP13jNivSe7/GbFAnDBjIasIdonHabfzxBpu1NAUa3vNRYsjDFzOMfWktf+mdK0BlJg8JkQUr0OhtOYhcYWbhMMlq0q2wxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AVd6kItc; arc=none smtp.client-ip=209.85.222.43
+	s=arc-20240116; t=1708056531; c=relaxed/simple;
+	bh=vqVfXZrYe/yyq7Yk1lGwJ/c9MmJ5pqN2j4VN9jcJ7MQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZsVMW0TILDaL/a24yuHv054maRE/u8q62nojO9ov4KXEzbc7W8fmdFcYY5uGWzHk4/NUBGiEbQthikwdXTwvFCCrZXluhypsXaG1+uYb179oCPsD9FnxvugT4cGTD/Fc01jOXVRfZTsWFEWf2bUAaDGpFXPsG0EufcaUOcgrkFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=blgXYit6; arc=none smtp.client-ip=209.85.216.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AVd6kItc"
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-7d5bddb0f4cso602720241.2;
-        Thu, 15 Feb 2024 19:55:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="blgXYit6"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-295c67ab2ccso1350944a91.1;
+        Thu, 15 Feb 2024 20:08:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708055721; x=1708660521; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pqCF2ZMQVeGmSlU3Ex8qv7o02hkUoFRiavSd1UVM5HI=;
-        b=AVd6kItc0hEH+rAABThJMWR3cPaKkjj8DzpK+LD/Pl3JXOKg8r96AH1Chhn/1dn96F
-         tvtdsSYYyM5/Ke2bl9cYlhF1U7fjeJyX20QqatcAxQcFPKIrSPBFJrzt48c9GLyjgLT4
-         q4zI4zzZ4gJ1Zsw+FEQAeJ+MW+AFV2+bElGCKjFaDPEU7zyVH/pAyBXrmMXDiERvR+u/
-         ikXR43GGZ8cfEMzzCx/RWQDbfjXmbjwlQoLjs+PUdhPf3djRI5nsg26VIBgFQfdm600a
-         2qo+j8Gp/EEz5Ok5SQ+578lmNtkWyHO7ygOkXJjkxu66BguGv8JwS7F+H1iYYTgxQOEm
-         NrJw==
+        d=gmail.com; s=20230601; t=1708056530; x=1708661330; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9gIkxtNMiM4jWMz/QymqiYWPEEBA3/zmYvJ0m52F/Sw=;
+        b=blgXYit6mmBEwvzVh/044cAmoIspxnStGDcwogdlUL9Nhb8O1Tdr1uoO+tWLbUZdrc
+         EnQssfXOX0rtJlS0BdvGHPemmtkWWWiJPBDWdlay5S/boKcl9HmtCkASoIDPt8Wes2TC
+         5+3ZrkHs34xpwEq3EqnzIUhTsmNYMkO+QUOJwZU8cT8ePnuTLJBNJtDi4Enc9y1zxlDw
+         /rEeTNc4vJcHYSYaKq2TXzNCpLNUQQB0+ogEuji8NRaqdCb9Wgmyx7mOaPnpKX/Y16MO
+         BjSYl16KUMTLPgogxH2g7w2PfX0FqF+isxo6mxb4swUOJK5OsdGmDNiJEb8XcR18gNUl
+         rNJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708055721; x=1708660521;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pqCF2ZMQVeGmSlU3Ex8qv7o02hkUoFRiavSd1UVM5HI=;
-        b=nlBIDcsbtoPbzk6yWZ5Hxg6jsWOR5Oq8cVFdG9sw/RUzwoxc4jf1uL6tmME3ls4DcV
-         Mi8+/VHRqw7oHVw4+OhTjs7vWoM+h607lRIJ+Tx/l7BwSN7jCJC9xJtyMSHx3THAQPv6
-         0WPINIAMi0kGpWH7En8CL+2WiWNVkzG859A8ttQqF6zCXuI+v4iIBfXmopoMeXBc/mLh
-         VMHONvwKxudNoqYipsU1ApBdt9+IScXsuiQOnvfr1x/qKR5EdsRBzGfJixsjfnW5rED6
-         qRqgqz1xSInGuij0zpZ8dgA788f7L1ilbMNwQfk+NnIQmaK54zoGpboucWYsqfeSbLEq
-         cNiA==
-X-Forwarded-Encrypted: i=1; AJvYcCU0y0moWUiIx4E+nR7nN+33f8LwasXK1srMYAdcp8mvmOujvvzKgiuGv8og1Wz9D7HxLYD3MxfNGBASr8XDiamg7g2XHtgnB0t/OWoGv7v+q5kiPjsi5JiEaPluhlBcHgYemxYkjWltbSfH
-X-Gm-Message-State: AOJu0YxAVYoQqM2RwlubKBBALohaJGQxlgYabwfSwv0VWKh1dv30klEA
-	Q1BzZWHbP3JHrZGtUdOaP6Ll4XNG924OndVh6jdXOh4MkNrSvJKCF2rEJdXlgnd8iAb0ep8mDPF
-	7zrTjeGmXuRq24CwPbkzfgUmr4nc=
-X-Google-Smtp-Source: AGHT+IEnqBVjFHpxPK9mH1okTBVmVH62qZ+PmjPj0sEpxqtIjmDFLINSkENjUffAWo3Gjet5gF13u1wY7CkBGdj833s=
-X-Received: by 2002:a1f:ca47:0:b0:4c0:3b05:75cb with SMTP id
- a68-20020a1fca47000000b004c03b0575cbmr3186113vkg.10.1708055721190; Thu, 15
- Feb 2024 19:55:21 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708056530; x=1708661330;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9gIkxtNMiM4jWMz/QymqiYWPEEBA3/zmYvJ0m52F/Sw=;
+        b=MYzPtfV2UkanZDcAGlV6IaM3zRXT0yLukycqOyWM0LiPBDfsqPVxucXiqfzps6DbXp
+         FCSxRn7K0n6cg80mnGkYdPKvqCG0dp/EVRrqbtWRVAGY5gprqAx+DpN2ZtLreV2/gPLh
+         omlcDDp5bPCLBnBhg9icgL84E+wfOXqdhzH6dMrBwXS0QUtV5zUBn+ikyoS9yWF7yQ8I
+         HDJ982asV5cMvA5u5DY5B5TACtUDlMkFS3yDPhOp8yfxE+TTRFwA0PEBToiDc2XYEIZS
+         YZRoWN/Y0e/7Ws3zLHgbMAsza/KS2bkiMge3b31zNsOr2nK+fQ3rd7RTUXhv4JohqAjT
+         uVmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVWVz/q9gHWFNvXZGMqzWolAY8UlvhGV0JzH78Smpt1vTmUG64NieZHUSgdVQa7WhBTgNvnjuwKqzq9nb60xW+zzDIsfIGjj5uBOa/WuhLJpG0Vkmggpor72T5ivqf0hwnsMUtORXqZCYHd
+X-Gm-Message-State: AOJu0YzgB94k+6PRVUDhyj8pMF5KKu/uQXTs+7OBh9MBA8sy+tDzXIBt
+	EFq8q+tx9xi4zv8LFwg0zMymLhHN3Kjam/XxbPdq8BuOifZSKdov
+X-Google-Smtp-Source: AGHT+IGAeMakd3Fn/lSdvXKtNpwx3rj2aLJGuDgaufePUPLOyq3lT5SfwNYhexb0cGxh8XNtSZqHmg==
+X-Received: by 2002:a17:90a:fe15:b0:290:9e9e:a87e with SMTP id ck21-20020a17090afe1500b002909e9ea87emr3514685pjb.42.1708056529701;
+        Thu, 15 Feb 2024 20:08:49 -0800 (PST)
+Received: from barry-desktop.hub ([2407:7000:8942:5500:f28b:3925:777f:45d4])
+        by smtp.gmail.com with ESMTPSA id pt12-20020a17090b3d0c00b00298ff26e4c8sm2321393pjb.26.2024.02.15.20.08.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Feb 2024 20:08:49 -0800 (PST)
+From: Barry Song <21cnbao@gmail.com>
+To: akpm@linux-foundation.org,
+	davem@davemloft.net,
+	hannes@cmpxchg.org,
+	herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org,
+	linux-mm@kvack.org,
+	nphamcs@gmail.com,
+	yosryahmed@google.com,
+	zhouchengming@bytedance.com
+Cc: chriscli@google.com,
+	chrisl@kernel.org,
+	ddstreet@ieee.org,
+	linux-kernel@vger.kernel.org,
+	sjenning@redhat.com,
+	vitaly.wool@konsulko.com,
+	Barry Song <v-songbaohua@oppo.com>
+Subject: [PATCH v2 0/3] mm/zswap & crypto/acompress: remove a couple of memcpy
+Date: Fri, 16 Feb 2024 17:08:12 +1300
+Message-Id: <20240216040815.114202-1-21cnbao@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103095006.608744-1-21cnbao@gmail.com> <20240103095006.608744-3-21cnbao@gmail.com>
- <CAKEwX=MDNuW72OS81mXgAKMdBnT2MCTGJtXx8cgMLh=J_Nv-ew@mail.gmail.com>
-In-Reply-To: <CAKEwX=MDNuW72OS81mXgAKMdBnT2MCTGJtXx8cgMLh=J_Nv-ew@mail.gmail.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Fri, 16 Feb 2024 16:55:10 +1300
-Message-ID: <CAGsJ_4xfQow4bGiyxVRN7xDN3Hu=jPSZA+XpK9XdAb9pjWXcRg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] mm/zswap: remove the memcpy if acomp is not asynchronous
-To: Nhat Pham <nphamcs@gmail.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, 
-	akpm@linux-foundation.org, ddstreet@ieee.org, sjenning@redhat.com, 
-	vitaly.wool@konsulko.com, linux-crypto@vger.kernel.org, chriscli@google.com, 
-	chrisl@kernel.org, hannes@cmpxchg.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, yosryahmed@google.com, zhouchengming@bytedance.com, 
-	Barry Song <v-songbaohua@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 4, 2024 at 1:38=E2=80=AFPM Nhat Pham <nphamcs@gmail.com> wrote:
->
-> On Wed, Jan 3, 2024 at 1:50=E2=80=AFAM Barry Song <21cnbao@gmail.com> wro=
-te:
-> >
-> > From: Barry Song <v-songbaohua@oppo.com>
-> >
-> > Most compressors are actually CPU-based and won't sleep during
-> > compression and decompression. We should remove the redundant
-> > memcpy for them.
-> >
-> > Signed-off-by: Barry Song <v-songbaohua@oppo.com>
-> > Tested-by: Chengming Zhou <zhouchengming@bytedance.com>
->
+From: Barry Song <v-songbaohua@oppo.com>
 
-Hi Nhat,
-Thanks for reviewing!
+The patchset removes a couple of memcpy in zswap and crypto
+to improve zswap's performance.
 
-> nit: it might help to include the test numbers in the changelog in
-> this patch here too. Save a couple of clicks to dig out the original
-> patch cover for the numbers :)
+Thanks for Chengming Zhou's test and perf data.
+Quote from Chengming,
+ I just tested these three patches on my server, found improvement in the
+ kernel build testcase on a tmpfs with zswap (lz4 + zsmalloc) enabled.
+ 
+         mm-stable 501a06fe8e4c  patched
+ real    1m38.028s               1m32.317s
+ user    19m11.482s              18m39.439s
+ sys     19m26.445s              17m5.646s
 
-Chengming's test data is for the whole series. so i can't find the
-proper commit to put the data. but it seems Andrew does have
-a good habit to collect some important cover-letter info to commits,
-so in v2, i'd keep the commit message as is.
+As zswap is the direct use of this patchset and zswap benefits from
+this series, It is probably better for this patchset to go through
+Andrew's mm tree than Herbert's crypto tree if there is no objection
+from Herbert.
 
->
-> > ---
-> >  mm/zswap.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/mm/zswap.c b/mm/zswap.c
-> > index ca25b676048e..36898614ebcc 100644
-> > --- a/mm/zswap.c
-> > +++ b/mm/zswap.c
-> > @@ -168,6 +168,7 @@ struct crypto_acomp_ctx {
-> >         struct crypto_wait wait;
-> >         u8 *buffer;
-> >         struct mutex mutex;
-> > +       bool is_async; /* if acomp can sleep */
->
-> nit: seems like this comment isn't necessary. is_async is pretty
-> self-explanatory to me. But definitely not a show stopper tho :)
+-v2:
+  * add flush_dcache_page() in scomp_acomp_comp_decomp() according to
+    Herbert's suggestion, thanks!
+  * collect Reviewed-by of Nhat, thanks!
+  * rename is_async to is_sleepable according to Yosry's suggestion,
+    thanks!
 
-Thanks. I am changing the name to is_sleepable according to
-Yosry's suggestion. As a result, the comment is removed as well.
+Barry Song (3):
+  crypto: introduce acomp_is_sleepable to expose if a acomp has a scomp
+    backend
+  mm/zswap: remove the memcpy if acomp is not sleepable
+  crypto: scompress: remove memcpy if sg_nents is 1
 
->
-> >  };
-> >
-> >  /*
-> > @@ -716,6 +717,7 @@ static int zswap_cpu_comp_prepare(unsigned int cpu,=
- struct hlist_node *node)
-> >                 goto acomp_fail;
-> >         }
-> >         acomp_ctx->acomp =3D acomp;
-> > +       acomp_ctx->is_async =3D acomp_is_async(acomp);
-> >
-> >         req =3D acomp_request_alloc(acomp_ctx->acomp);
-> >         if (!req) {
-> > @@ -1370,7 +1372,7 @@ static void __zswap_load(struct zswap_entry *entr=
-y, struct page *page)
-> >         mutex_lock(&acomp_ctx->mutex);
-> >
-> >         src =3D zpool_map_handle(zpool, entry->handle, ZPOOL_MM_RO);
-> > -       if (!zpool_can_sleep_mapped(zpool)) {
-> > +       if (acomp_ctx->is_async && !zpool_can_sleep_mapped(zpool)) {
-> >                 memcpy(acomp_ctx->buffer, src, entry->length);
-> >                 src =3D acomp_ctx->buffer;
-> >                 zpool_unmap_handle(zpool, entry->handle);
-> > @@ -1384,7 +1386,7 @@ static void __zswap_load(struct zswap_entry *entr=
-y, struct page *page)
-> >         BUG_ON(acomp_ctx->req->dlen !=3D PAGE_SIZE);
-> >         mutex_unlock(&acomp_ctx->mutex);
-> >
-> > -       if (zpool_can_sleep_mapped(zpool))
-> > +       if (!acomp_ctx->is_async || zpool_can_sleep_mapped(zpool))
-> >                 zpool_unmap_handle(zpool, entry->handle);
-> >  }
-> >
-> > --
-> > 2.34.1
-> >
->
-> The zswap side looks good to me. I don't have expertise/authority to
-> ack the crypto API change (but FWIW it LGTM too based on a cursory
-> code read).
-> Reviewed-by: Nhat Pham <nphamcs@gmail.com>
+ crypto/acompress.c         |  8 ++++++++
+ crypto/scompress.c         | 36 +++++++++++++++++++++++++++++-------
+ include/crypto/acompress.h |  9 +++++++++
+ mm/zswap.c                 |  6 ++++--
+ 4 files changed, 50 insertions(+), 9 deletions(-)
 
-Thanks!
-Barry
+-- 
+2.34.1
+
