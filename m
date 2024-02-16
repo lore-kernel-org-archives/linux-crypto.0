@@ -1,321 +1,176 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AE3145347;
-	Thu, 15 Feb 2024 23:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4A8DDA7;
+	Fri, 16 Feb 2024 01:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708038884; cv=none; b=UizmpQtsnlkKhks1CEUVHc8FFIA5rliQp9p9MkSuywzy/haKgCQtRvRZtVi6e8JEtd/Qw7MpTOCtcV6UIipn89LN+6PlgXww+J4kdvD0cH7UfkzBKLsQ2B+eQLmUKQqOpIhW7u1PHiSKMHVes/X05gzov5x90yNmBQNDJ6q2ZxE=
+	t=1708048488; cv=none; b=hoHHT/67LqHQPGrn9n9Dg1wdzMEDYfKSCTZ2RezQ8IN2V6Zu1POMJMw4FmGM9cI3KxOjcux1IY68Hwv8wedSFV4gRkJYTOoTWFZ5Fd50N/kAGORnUXHzWgd4UrreGAWxNcAJUqSjhiwClwRUBIblAgWf1TLGtx5MoiOwWe/Mw/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708038884; c=relaxed/simple;
-	bh=MJtbtakGRx/ECuD1utzjsbGjrmdKesauv5SvppvQjL8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DdPKr2KNF3cI1/ml1Hvhnvh/RB6M/+mFUzfcQ35X9e/RtWV61Z3iLxG+Y4rSKOqtMGCQwRW1MN++8fkBq8HxvklZJQ6jCnBjZbStwD/3SpJaKFcw3Z7nvD02iF7foozhyslaqrzPLKsnwjHg3rTjHAkQ5cEModT6UdOmfomo9RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mt4LEgG/; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1708048488; c=relaxed/simple;
+	bh=ELe4LEal0dJOP+F2HGkC1aCnEIJ8KzGDyQcgMtnRmzo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QB8RlyamMf/32iH80rSCb6YcHO3qJmO9t75U+M4jSYMJLRd17d0jc/1zv+JAHa4zG4Yn1pG0agjrxviaLhHh8Hk+zGH2kwgFcXgB8FMgHJ6vEKjv4w8A9bNzaJNApeKJrryjxZoeCc26JSAtoT4nZB0z4+7017uoJ/KzIyn7PXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qx3MjGFx; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mt4LEgG/"
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41FLFagF007912;
-	Thu, 15 Feb 2024 23:14:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=dArPa5/gW/FG93KPR96YEJvHNQv0WSEXUvrhkMfIgv0=;
- b=mt4LEgG/oLQRGdK6SH3OucwrZIcJ+M+E4uveRjSsGTptgzgc8qfOhYH6OAzGZhPHlfj4
- G8V1vneyEUn9gl0rqRCrQgSEQ3bdeHuhwLHr6JsjuJaPNMhsFH0VDN4W3jNFJQ/upuIf
- ILYbwQB8C01ODxObwuDA3lmvoQZhA0/hhZKtwO/R5pVsEkeDIwXnSSjBFp8kCcFxRhTI
- 8OKNYHuZ/JRkZMRa/qPWPYJ6Fguv5i1cdPM4BbLrNUi/8cQy/oD2IPyNmLJ2s32uEpOR
- ifhC/4KNx75t8gmaLaIyXZpHmbHCd0sqMUVaUmxZGr6Gd0wh708irUkfc/ndAXmiFQyJ BA== 
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w9q8n7j5y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 23:14:34 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41FLA9VI009886;
-	Thu, 15 Feb 2024 23:14:34 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w6p637dvc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 23:14:33 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41FNEVws58065340
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 15 Feb 2024 23:14:33 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3008758052;
-	Thu, 15 Feb 2024 23:14:31 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7FC3358050;
-	Thu, 15 Feb 2024 23:14:30 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 15 Feb 2024 23:14:30 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.ibm.com>
-To: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br,
-        Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH v2 13/14] crypto: ecdh - Use functions to copy digits from and to byte array
-Date: Thu, 15 Feb 2024 18:14:12 -0500
-Message-ID: <20240215231414.3857320-14-stefanb@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240215231414.3857320-1-stefanb@linux.ibm.com>
-References: <20240215231414.3857320-1-stefanb@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qx3MjGFx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708048486; x=1739584486;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ELe4LEal0dJOP+F2HGkC1aCnEIJ8KzGDyQcgMtnRmzo=;
+  b=Qx3MjGFxP0mgbSjkTnmhRT9DWY9zBNxqtCa0IO+7MXqG8/9kAO3E9Bfw
+   42G7yKeVAuZESj84TePOOrU+rtuF8EaNf0Xg1Tia29s+zfYrPjX9LkRP0
+   V9zQfpcCiz1LymESz7zDEqZ025CL9fFD/iTHCgbM44LB1CuAZLOvsTYd7
+   EuP3ITgfLJonaemRIw/ufTiBuvYD1fa9KRfcb2u09pYoJySx6G/u8uQgF
+   Cc27bLfyeBUu1Sr823NmjBwLCYGID1Wzza7j6u9vJox2FXInDTQoZdDC0
+   FgDiXwxQO7aDUS/n9XMXQcvrCryxGgrJrY47BgQndWAKBKgcjLZHrOpDI
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10985"; a="2026566"
+X-IronPort-AV: E=Sophos;i="6.06,163,1705392000"; 
+   d="scan'208";a="2026566"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 17:54:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,163,1705392000"; 
+   d="scan'208";a="3793970"
+Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
+  by orviesa010.jf.intel.com with ESMTP; 15 Feb 2024 17:54:38 -0800
+Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ranQo-0000vw-1g;
+	Fri, 16 Feb 2024 01:54:34 +0000
+Date: Fri, 16 Feb 2024 09:53:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ross Philipson <ross.philipson@oracle.com>,
+	linux-kernel@vger.kernel.org, x86@kernel.org,
+	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+	linux-efi@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	ross.philipson@oracle.com, dpsmith@apertussolutions.com,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+	dave.hansen@linux.intel.com, ardb@kernel.org, mjg59@srcf.ucam.org,
+	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
+	jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
+	nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
+	davem@davemloft.net, kanth.ghatraju@oracle.com,
+	trenchboot-devel@googlegroups.com
+Subject: Re: [PATCH v8 14/15] x86: Secure Launch late initcall platform module
+Message-ID: <202402160909.BRTtBK7T-lkp@intel.com>
+References: <20240214221847.2066632-15-ross.philipson@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: D_J4uA7UYiN8AlODo15ZK1sxJL__kLi0
-X-Proofpoint-ORIG-GUID: D_J4uA7UYiN8AlODo15ZK1sxJL__kLi0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-15_22,2024-02-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
- impostorscore=0 adultscore=0 suspectscore=0 bulkscore=0 spamscore=0
- lowpriorityscore=0 malwarescore=0 priorityscore=1501 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402150181
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240214221847.2066632-15-ross.philipson@oracle.com>
 
-All curves supported so far provide full 64bit digit arrays to convert
-coordinates from and to. For NIST P521 only 8 digits and 2 bytes will be
-given per coordinate so that conversion from 9 digits does not work since
-some bytes are missing. Therefore, regard the input (output)
-arrays as byte arrays that need to be converted to digits (from digits).
-Use ecc_digits_from_bytes to convert a byte array to digits and
-ecc_digits_to_bytes to convert digits to a byte array.
+Hi Ross,
 
-crypt_ecdh_shared_secret creates 'rand_z' from 'nbytes' of random bytes.
-Also convert this array to fill a byte array with 'nbytes' of random bytes
-and create the rand_z digits from the byte array. The most significant
-digit of rand_z needs to be adjusted to mask out unnecessary bits beyond
-the 521 bits of NIST P521. Therefore, apply the appropriate mask to the
-most significant digit keeping only the 9 most significant bits.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
----
- crypto/ecc.c                  | 27 +++++++++++++++------------
- crypto/ecdh.c                 | 26 +++++++++++++++-----------
- include/crypto/internal/ecc.h | 10 +++++++---
- 3 files changed, 37 insertions(+), 26 deletions(-)
+[auto build test WARNING on char-misc/char-misc-testing]
+[also build test WARNING on char-misc/char-misc-next char-misc/char-misc-linus herbert-cryptodev-2.6/master herbert-crypto-2.6/master linus/master v6.8-rc4 next-20240215]
+[cannot apply to tip/x86/core]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index f643719450b8..ced77eb6e533 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -1542,7 +1542,8 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64 *privkey)
- EXPORT_SYMBOL(ecc_gen_privkey);
- 
- int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
--		     const u64 *private_key, u64 *public_key)
-+		     const u64 *private_key, u8 *public_key,
-+		     unsigned int nbytes)
- {
- 	int ret = 0;
- 	struct ecc_point *pk;
-@@ -1570,8 +1571,8 @@ int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
- 		goto err_free_point;
- 	}
- 
--	ecc_swap_digits(pk->x, public_key, ndigits);
--	ecc_swap_digits(pk->y, &public_key[ndigits], ndigits);
-+	ecc_digits_to_bytes(pk->x, ndigits, public_key, nbytes);
-+	ecc_digits_to_bytes(pk->y, ndigits, &public_key[nbytes], nbytes);
- 
- err_free_point:
- 	ecc_free_point(pk);
-@@ -1641,14 +1642,14 @@ int ecc_is_pubkey_valid_full(const struct ecc_curve *curve,
- EXPORT_SYMBOL(ecc_is_pubkey_valid_full);
- 
- int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
--			      const u64 *private_key, const u64 *public_key,
--			      u64 *secret)
-+			      const u64 *private_key, const u8 *public_key,
-+			      unsigned int nbytes, u8 *secret, u64 msd_mask)
- {
- 	int ret = 0;
- 	struct ecc_point *product, *pk;
- 	u64 priv[ECC_MAX_DIGITS];
- 	u64 rand_z[ECC_MAX_DIGITS];
--	unsigned int nbytes;
-+	u8 tmp[ECC_MAX_DIGITS << ECC_DIGITS_TO_BYTES_SHIFT];
- 	const struct ecc_curve *curve = ecc_get_curve(curve_id);
- 
- 	if (!private_key || !public_key || !curve ||
-@@ -1657,9 +1658,10 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
- 		goto out;
- 	}
- 
--	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
--
--	get_random_bytes(rand_z, nbytes);
-+	get_random_bytes(tmp, nbytes);
-+	ecc_digits_from_bytes(tmp, nbytes, rand_z, ndigits);
-+	if (msd_mask)
-+		rand_z[ndigits - 1] &= msd_mask;
- 
- 	pk = ecc_alloc_point(ndigits);
- 	if (!pk) {
-@@ -1667,8 +1669,9 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
- 		goto out;
- 	}
- 
--	ecc_swap_digits(public_key, pk->x, ndigits);
--	ecc_swap_digits(&public_key[ndigits], pk->y, ndigits);
-+	ecc_digits_from_bytes(public_key, nbytes, pk->x, ndigits);
-+	ecc_digits_from_bytes(&public_key[nbytes], nbytes, pk->y, ndigits);
-+
- 	ret = ecc_is_pubkey_valid_partial(curve, pk);
- 	if (ret)
- 		goto err_alloc_product;
-@@ -1688,7 +1691,7 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
- 		goto err_validity;
- 	}
- 
--	ecc_swap_digits(product->x, secret, ndigits);
-+	ecc_digits_to_bytes(product->x, ndigits, secret, nbytes);
- 
- err_validity:
- 	memzero_explicit(priv, sizeof(priv));
-diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-index f187365db7b6..e64133428552 100644
---- a/crypto/ecdh.c
-+++ b/crypto/ecdh.c
-@@ -15,6 +15,8 @@
- struct ecdh_ctx {
- 	unsigned int curve_id;
- 	unsigned int ndigits;
-+	unsigned int nbytes;
-+	u64 msd_mask;
- 	u64 private_key[ECC_MAX_DIGITS];
- };
- 
-@@ -28,7 +30,6 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
- {
- 	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
- 	u64 priv[ECC_MAX_DIGITS];
--	unsigned int nbytes;
- 	struct ecdh params;
- 
- 	if (crypto_ecdh_decode_key(buf, len, &params) < 0 ||
-@@ -39,10 +40,8 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
- 		return ecc_gen_privkey(ctx->curve_id, ctx->ndigits,
- 				       ctx->private_key);
- 
--	nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
--
--	memcpy(ctx->private_key, params.key, nbytes);
--	ecc_swap_digits(ctx->private_key, priv, ctx->ndigits);
-+	ecc_digits_from_bytes(params.key, ctx->nbytes, priv, ctx->ndigits);
-+	ecc_swap_digits(priv, ctx->private_key, ctx->ndigits);
- 
- 	if (ecc_is_key_valid(ctx->curve_id, ctx->ndigits,
- 			     priv, params.key_size) < 0) {
-@@ -56,13 +55,13 @@ static int ecdh_compute_value(struct kpp_request *req)
- {
- 	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
- 	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
--	u64 *public_key;
--	u64 *shared_secret = NULL;
-+	unsigned int nbytes = ctx->nbytes;
-+	u8 *public_key;
-+	u8 *shared_secret = NULL;
- 	void *buf;
--	size_t copied, nbytes, public_key_sz;
-+	size_t copied, public_key_sz;
- 	int ret = -ENOMEM;
- 
--	nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
- 	/* Public part is a point thus it has both coordinates */
- 	public_key_sz = 2 * nbytes;
- 
-@@ -91,12 +90,14 @@ static int ecdh_compute_value(struct kpp_request *req)
- 
- 		ret = crypto_ecdh_shared_secret(ctx->curve_id, ctx->ndigits,
- 						ctx->private_key, public_key,
--						shared_secret);
-+						nbytes, shared_secret,
-+						ctx->msd_mask);
- 
- 		buf = shared_secret;
- 	} else {
- 		ret = ecc_make_pub_key(ctx->curve_id, ctx->ndigits,
--				       ctx->private_key, public_key);
-+				       ctx->private_key, public_key,
-+				       nbytes);
- 		buf = public_key;
- 		nbytes = public_key_sz;
- 	}
-@@ -134,6 +135,7 @@ static int ecdh_nist_p192_init_tfm(struct crypto_kpp *tfm)
- 
- 	ctx->curve_id = ECC_CURVE_NIST_P192;
- 	ctx->ndigits = ECC_CURVE_NIST_P192_DIGITS;
-+	ctx->nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
- 
- 	return 0;
- }
-@@ -159,6 +161,7 @@ static int ecdh_nist_p256_init_tfm(struct crypto_kpp *tfm)
- 
- 	ctx->curve_id = ECC_CURVE_NIST_P256;
- 	ctx->ndigits = ECC_CURVE_NIST_P256_DIGITS;
-+	ctx->nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
- 
- 	return 0;
- }
-@@ -184,6 +187,7 @@ static int ecdh_nist_p384_init_tfm(struct crypto_kpp *tfm)
- 
- 	ctx->curve_id = ECC_CURVE_NIST_P384;
- 	ctx->ndigits = ECC_CURVE_NIST_P384_DIGITS;
-+	ctx->nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
- 
- 	return 0;
- }
-diff --git a/include/crypto/internal/ecc.h b/include/crypto/internal/ecc.h
-index 5d485d3221d3..328a82bd35c8 100644
---- a/include/crypto/internal/ecc.h
-+++ b/include/crypto/internal/ecc.h
-@@ -138,12 +138,14 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64 *privkey);
-  * @ndigits:		curve's number of digits
-  * @private_key:	pregenerated private key for the given curve
-  * @public_key:		buffer for storing the generated public key
-+ * @nbytes:		number of bytes per coordinate of public key
-  *
-  * Returns 0 if the public key was generated successfully, a negative value
-  * if an error occurred.
-  */
- int ecc_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
--		     const u64 *private_key, u64 *public_key);
-+		     const u64 *private_key, u8 *public_key,
-+		     unsigned int nbytes);
- 
- /**
-  * crypto_ecdh_shared_secret() - Compute a shared secret
-@@ -152,7 +154,9 @@ int ecc_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
-  * @ndigits:		curve's number of digits
-  * @private_key:	private key of part A
-  * @public_key:		public key of counterpart B
-+ * @nbytes:		number of bytes per coordinate of public key
-  * @secret:		buffer for storing the calculated shared secret
-+ * @msd_mask:		optional mask to apply to the most significant digit
-  *
-  * Note: It is recommended that you hash the result of crypto_ecdh_shared_secret
-  * before using it for symmetric encryption or HMAC.
-@@ -161,8 +165,8 @@ int ecc_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
-  * if an error occurred.
-  */
- int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
--			      const u64 *private_key, const u64 *public_key,
--			      u64 *secret);
-+			      const u64 *private_key, const u8 *public_key,
-+			      unsigned int nbytes, u8 *secret, u64 msd_mask);
- 
- /**
-  * ecc_is_pubkey_valid_partial() - Partial public key validation
+url:    https://github.com/intel-lab-lkp/linux/commits/Ross-Philipson/x86-boot-Place-kernel_info-at-a-fixed-offset/20240215-064712
+base:   char-misc/char-misc-testing
+patch link:    https://lore.kernel.org/r/20240214221847.2066632-15-ross.philipson%40oracle.com
+patch subject: [PATCH v8 14/15] x86: Secure Launch late initcall platform module
+config: x86_64-allmodconfig (https://download.01.org/0day-ci/archive/20240216/202402160909.BRTtBK7T-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240216/202402160909.BRTtBK7T-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202402160909.BRTtBK7T-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from arch/x86/kernel/slmodule.c:28:
+   In file included from include/linux/slaunch.h:185:
+   include/linux/tpm_eventlog.h:167:6: warning: variable 'mapping_size' set but not used [-Wunused-but-set-variable]
+     167 |         int mapping_size;
+         |             ^
+>> arch/x86/kernel/slmodule.c:352:4: warning: unannotated fall-through between switch labels [-Wimplicit-fallthrough]
+     352 |                         default:
+         |                         ^
+   arch/x86/kernel/slmodule.c:352:4: note: insert 'break;' to avoid fall-through
+     352 |                         default:
+         |                         ^
+         |                         break; 
+   2 warnings generated.
+
+
+vim +352 arch/x86/kernel/slmodule.c
+
+   313	
+   314	static void slaunch_tpm20_extend_event(struct tpm_chip *tpm, void __iomem *txt,
+   315					       struct tcg_pcr_event2_head *event)
+   316	{
+   317		u16 *alg_id_field = (u16 *)((u8 *)event + sizeof(struct tcg_pcr_event2_head));
+   318		struct tpm_digest *digests;
+   319		u8 *dptr;
+   320		u32 i, j;
+   321		int ret;
+   322	
+   323		digests = kcalloc(tpm->nr_allocated_banks, sizeof(*digests),
+   324				  GFP_KERNEL);
+   325		if (!digests)
+   326			slaunch_txt_reset(txt, "Failed to allocate array of digests\n",
+   327					  SL_ERROR_GENERIC);
+   328	
+   329		for (i = 0; i < tpm->nr_allocated_banks; i++)
+   330			digests[i].alg_id = tpm->allocated_banks[i].alg_id;
+   331	
+   332		/* Early SL code ensured there was a max count of 2 digests */
+   333		for (i = 0; i < event->count; i++) {
+   334			dptr = (u8 *)alg_id_field + sizeof(u16);
+   335	
+   336			for (j = 0; j < tpm->nr_allocated_banks; j++) {
+   337				if (digests[j].alg_id != *alg_id_field)
+   338					continue;
+   339	
+   340				switch (digests[j].alg_id) {
+   341				case TPM_ALG_SHA256:
+   342					memcpy(&digests[j].digest[0], dptr,
+   343					       SHA256_DIGEST_SIZE);
+   344					alg_id_field = (u16 *)((u8 *)alg_id_field +
+   345						SHA256_DIGEST_SIZE + sizeof(u16));
+   346					break;
+   347				case TPM_ALG_SHA1:
+   348					memcpy(&digests[j].digest[0], dptr,
+   349					       SHA1_DIGEST_SIZE);
+   350					alg_id_field = (u16 *)((u8 *)alg_id_field +
+   351						SHA1_DIGEST_SIZE + sizeof(u16));
+ > 352				default:
+   353					break;
+   354				}
+   355			}
+   356		}
+   357	
+   358		ret = tpm_pcr_extend(tpm, event->pcr_idx, digests);
+   359		if (ret) {
+   360			pr_err("Error extending TPM20 PCR, result: %d\n", ret);
+   361			slaunch_txt_reset(txt, "Failed to extend TPM20 PCR\n",
+   362					  SL_ERROR_TPM_EXTEND);
+   363		}
+   364	
+   365		kfree(digests);
+   366	}
+   367	
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
