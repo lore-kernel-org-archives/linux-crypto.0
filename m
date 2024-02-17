@@ -1,165 +1,165 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC9B1CF8B;
-	Sat, 17 Feb 2024 04:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8320E1D553;
+	Sat, 17 Feb 2024 07:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708145503; cv=none; b=A08wxn7k5odK9mWA0Zpm4XCJrlYQlMs3geU3Yes+c8gggnaPi+uc+O00cVjxrPsLb4DcWV2rnofXL0WXLB8N8HfvARQ2wb6Rdc6B4PlfGkdp63ppvfWyKIe+6+IdNshLHuuT3g+4Sbawn8ZeiNxsVlvtT2RMhGiIA1p4DwMdQUA=
+	t=1708155151; cv=none; b=g6TfllgdtKm2+Ri6/xuYx8cL2duM3/uxQVCSsxIMVwzmJkRgQh23nwoGNNosgD1o235iEhRnV/qaWPqmS0bC0/VPmpm4qPh8NSCBRFKFaPejjTLLNxabJaQNlrNlIGxmrB8U5NrlHlReryZ4LMrzJAWq2qyKKuGuwSvXP4IZlvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708145503; c=relaxed/simple;
-	bh=OXsYoToIjgeSRYAs9X9E0bo5WCdOjPMMPVgmJGURH78=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kCEQojNmjLnpL671iBNqw9ABIKqpozRsEV+tVE/Q4LtYWLqSHGk/X6uHkD3WyPPIL9gakE5Tgtf7ydLO0P8NYc9lB3i3TdTPpjB7lWcI/YwRRdlBDT4G+kIw3maKI9UbNxqD5CZ22kXamFGxoYDqgL16jAZCZzaTHXxpqJ76+UY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GhD1c8DO; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708155151; c=relaxed/simple;
+	bh=ccjuSqOZPclsskdcJMYR2Q3/YUCIG6fCIeDpqvIsxfk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dp6HhaM4hSFh/ngBt70MLqMO0UB7oCoVPAOn8PWtNbCUuw/eTJshvvOg6p+ftDFbuX0zNDYivXS1FOsy6yNlcinU3NEFAQzy5VAC5qFnCiB87Rz1tVDGB55FsCOwrcOTZ97ZkQ12M3V2HHzDw1sWUCwq/V9A4gGg4kAgZL1X3NY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=REo/RTBu; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GhD1c8DO"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7bf7e37dc60so145971739f.3;
-        Fri, 16 Feb 2024 20:51:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708145500; x=1708750300; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kW/qQndLj7MYeSMYgAPMliKXg25U647vW1M3U8+Bgew=;
-        b=GhD1c8DOfSx/cvZLwz0Xk2k2Et3ZwFV169yH93IYF0UPQWfZdf8zNSH4tse5ipK53w
-         PKgh/Y4f5q9CrylOtc6a+ot+k76IzBr7Pr1BBYQGGEhDOyUNP9+kJryEF+PB7nAeB0YU
-         1XPpJFiz+JJL/EEKUE5ZQ4cHrH7FgEDOnkI8XeOob610Ms1B4a91eTJMKeSJ3Wu3iDxe
-         uFQ9r1Tu66qq01zgid2EFxz7bAaQIFYjxAIb3EY/TrwZYvDeVtROdbayCuvM0cstN3wi
-         Rk4pX4yvEKMW4EuSvF+pvd5CBrt5P+VqvZzEmdIVWOVA+hNoBbjdfnYskS9i/dy7qCiV
-         6tPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708145500; x=1708750300;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kW/qQndLj7MYeSMYgAPMliKXg25U647vW1M3U8+Bgew=;
-        b=eEkoOAZ4HiQCxgEs6ZCh6W4CIsFtC45qdbB2RUoSrBZawozVhrDAgH2p08nHtCiqLM
-         l7CyI3Mmb4+FVR/El+yWQ+TFKLo1/saHdl8UMA2gDIk7N3PoFK7NDA+j/lDhpRIevn35
-         tF/p6zKCO/XpKv4/g1M9ZcLwMd8TkSK0BRE4G4YRwIUc53mTtwgH+2ikP2eLR3cHv48M
-         y23t52HCqxYAbbia1YYAJUqgvbcVJpZH5rPsLfB6Z2IiXOUx3XmyTTMDpFDlib2mKgY3
-         3b2hn72EDMPcdtTwZkhngdmNZBB4FCAqoVgyQ97bvERgiT7UTeQJIQjsNPBnAiTjaGXi
-         kebw==
-X-Forwarded-Encrypted: i=1; AJvYcCUoPilh/j3il++8x/aM5Jx/3oEK63zsBP7p9x3ZA7XqZ8mS9dhAArvT+viR872gUeD1WZVW0fqqVH0KYmGcGJDej6L1uhS5jJnS0/hvlcsc4mnIADc5+/7s4Gr0Eajgl4njYoxMxlYkCMkc
-X-Gm-Message-State: AOJu0YwmO9H0cM0ovuKrS5RA65sDrh+8QGuKeyOoEyZSjeg/6nH07OLh
-	cKTAyojN1zDThOQ1ynxUCQFau2RmX0SkgLSsGdDt+Mz/L+ttbsX0
-X-Google-Smtp-Source: AGHT+IEOW4DS9BP7Ysw7VmEnIq9KlLgS920AXTvAFRO+XZXAmVk4YcCGu0RWQu1NKlAdLNbOmorNFg==
-X-Received: by 2002:a05:6e02:13e2:b0:363:c63a:7975 with SMTP id w2-20020a056e0213e200b00363c63a7975mr6639713ilj.24.1708145500701;
-        Fri, 16 Feb 2024 20:51:40 -0800 (PST)
-Received: from barry-desktop.hub ([2407:7000:8942:5500:e82e:22f2:1bdb:989f])
-        by smtp.gmail.com with ESMTPSA id n14-20020a635c4e000000b005dc2ca5b667sm610703pgm.10.2024.02.16.20.51.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 20:51:40 -0800 (PST)
-From: Barry Song <21cnbao@gmail.com>
-To: akpm@linux-foundation.org,
-	davem@davemloft.net,
-	hannes@cmpxchg.org,
-	herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org,
-	linux-mm@kvack.org,
-	nphamcs@gmail.com,
-	yosryahmed@google.com,
-	zhouchengming@bytedance.com
-Cc: chriscli@google.com,
-	chrisl@kernel.org,
-	ddstreet@ieee.org,
-	linux-kernel@vger.kernel.org,
-	sjenning@redhat.com,
-	vitaly.wool@konsulko.com,
-	Barry Song <v-songbaohua@oppo.com>
-Subject: [PATCH v3 3/3] crypto: scompress: remove memcpy if sg_nents is 1
-Date: Sat, 17 Feb 2024 17:51:02 +1300
-Message-Id: <20240217045102.55339-4-21cnbao@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240217045102.55339-1-21cnbao@gmail.com>
-References: <20240217045102.55339-1-21cnbao@gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="REo/RTBu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708155150; x=1739691150;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ccjuSqOZPclsskdcJMYR2Q3/YUCIG6fCIeDpqvIsxfk=;
+  b=REo/RTBuEGbVtXwGOb7X+qBJRmwHfW5pQaELEGkcAzXcyprypdGk3a12
+   m8/PbyBtrW7Tv10B9HA4OUWmOASZ/BRQ89Pr1wqSW7b/ElYHuYj0VXMeG
+   CQj+TfqsHF9bAgvKzvLeUji99p1z/3kOtlo2VYSaZ7PgvaUJXDe/x0OLA
+   vz6h8yxeMWRQs323kLYdim2DEIZj8F85AnN6Yw2VLbbPIiM04aFPXw8XZ
+   Z5JLGcOPQKJE6zNnE7Ux4dR3MHLDGHJSonHtM70rDJ2WaU2NbYXM1k6Vm
+   nUdQGmK14ysc4QbtAJiBU+ZlTgAHf2xPeZpsME+6PYtBdQD2HmHaROR1w
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10986"; a="2433567"
+X-IronPort-AV: E=Sophos;i="6.06,165,1705392000"; 
+   d="scan'208";a="2433567"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2024 23:32:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,165,1705392000"; 
+   d="scan'208";a="8656739"
+Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
+  by fmviesa004.fm.intel.com with ESMTP; 16 Feb 2024 23:32:23 -0800
+Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rbFBN-0001vY-01;
+	Sat, 17 Feb 2024 07:32:21 +0000
+Date: Sat, 17 Feb 2024 15:31:26 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ross Philipson <ross.philipson@oracle.com>,
+	linux-kernel@vger.kernel.org, x86@kernel.org,
+	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+	linux-efi@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, ross.philipson@oracle.com,
+	dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
+	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+	ardb@kernel.org, mjg59@srcf.ucam.org,
+	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
+	jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
+	nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
+	davem@davemloft.net, kanth.ghatraju@oracle.com,
+	trenchboot-devel@googlegroups.com
+Subject: Re: [PATCH v8 15/15] x86: EFI stub DRTM launch support for Secure
+ Launch
+Message-ID: <202402171503.kLhNHtkM-lkp@intel.com>
+References: <20240214221847.2066632-16-ross.philipson@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240214221847.2066632-16-ross.philipson@oracle.com>
 
-From: Barry Song <v-songbaohua@oppo.com>
+Hi Ross,
 
-while sg_nents is 1 which is always true for the current kernel
-as the only user - zswap is the case, we should remove two big
-memcpy.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Barry Song <v-songbaohua@oppo.com>
-Tested-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- crypto/scompress.c | 36 +++++++++++++++++++++++++++++-------
- 1 file changed, 29 insertions(+), 7 deletions(-)
+[auto build test ERROR on char-misc/char-misc-testing]
+[also build test ERROR on char-misc/char-misc-next char-misc/char-misc-linus herbert-cryptodev-2.6/master herbert-crypto-2.6/master linus/master v6.8-rc4 next-20240216]
+[cannot apply to tip/x86/core]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index b108a30a7600..50a487eac792 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -117,6 +117,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 	struct crypto_scomp *scomp = *tfm_ctx;
- 	void **ctx = acomp_request_ctx(req);
- 	struct scomp_scratch *scratch;
-+	void *src, *dst;
- 	unsigned int dlen;
- 	int ret;
- 
-@@ -134,13 +135,25 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 	scratch = raw_cpu_ptr(&scomp_scratch);
- 	spin_lock(&scratch->lock);
- 
--	scatterwalk_map_and_copy(scratch->src, req->src, 0, req->slen, 0);
-+	if (sg_nents(req->src) == 1) {
-+		src = kmap_local_page(sg_page(req->src)) + req->src->offset;
-+	} else {
-+		scatterwalk_map_and_copy(scratch->src, req->src, 0,
-+					 req->slen, 0);
-+		src = scratch->src;
-+	}
-+
-+	if (req->dst && sg_nents(req->dst) == 1)
-+		dst = kmap_local_page(sg_page(req->dst)) + req->dst->offset;
-+	else
-+		dst = scratch->dst;
-+
- 	if (dir)
--		ret = crypto_scomp_compress(scomp, scratch->src, req->slen,
--					    scratch->dst, &req->dlen, *ctx);
-+		ret = crypto_scomp_compress(scomp, src, req->slen,
-+					    dst, &req->dlen, *ctx);
- 	else
--		ret = crypto_scomp_decompress(scomp, scratch->src, req->slen,
--					      scratch->dst, &req->dlen, *ctx);
-+		ret = crypto_scomp_decompress(scomp, src, req->slen,
-+					      dst, &req->dlen, *ctx);
- 	if (!ret) {
- 		if (!req->dst) {
- 			req->dst = sgl_alloc(req->dlen, GFP_ATOMIC, NULL);
-@@ -152,10 +165,19 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 			ret = -ENOSPC;
- 			goto out;
- 		}
--		scatterwalk_map_and_copy(scratch->dst, req->dst, 0, req->dlen,
--					 1);
-+		if (dst == scratch->dst) {
-+			scatterwalk_map_and_copy(scratch->dst, req->dst, 0,
-+						 req->dlen, 1);
-+		} else {
-+			flush_dcache_page(sg_page(req->dst));
-+		}
- 	}
- out:
-+	if (src != scratch->src)
-+		kunmap_local(src);
-+	if (dst != scratch->dst)
-+		kunmap_local(dst);
-+
- 	spin_unlock(&scratch->lock);
- 	return ret;
- }
+url:    https://github.com/intel-lab-lkp/linux/commits/Ross-Philipson/x86-boot-Place-kernel_info-at-a-fixed-offset/20240215-064712
+base:   char-misc/char-misc-testing
+patch link:    https://lore.kernel.org/r/20240214221847.2066632-16-ross.philipson%40oracle.com
+patch subject: [PATCH v8 15/15] x86: EFI stub DRTM launch support for Secure Launch
+config: i386-randconfig-052-20240215 (https://download.01.org/0day-ci/archive/20240217/202402171503.kLhNHtkM-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240217/202402171503.kLhNHtkM-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202402171503.kLhNHtkM-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/firmware/efi/libstub/x86-stub.c:862:18: error: invalid input size for constraint 'a'
+     862 |                       : : "a" (dlinfo->dl_handler), "D" (&dlinfo->bl_context));
+         |                                ^
+   1 error generated.
+
+
+vim +/a +862 drivers/firmware/efi/libstub/x86-stub.c
+
+   813	
+   814	static void efi_secure_launch(struct boot_params *boot_params)
+   815	{
+   816		struct slr_entry_uefi_config *uefi_config;
+   817		struct slr_uefi_cfg_entry *uefi_entry;
+   818		struct slr_entry_dl_info *dlinfo;
+   819		efi_guid_t guid = SLR_TABLE_GUID;
+   820		struct slr_table *slrt;
+   821		u64 memmap_hi;
+   822		void *table;
+   823		u8 buf[64] = {0};
+   824	
+   825		table = get_efi_config_table(guid);
+   826	
+   827		/*
+   828		 * The presence of this table indicated a Secure Launch
+   829		 * is being requested.
+   830		 */
+   831		if (!table)
+   832			return;
+   833	
+   834		slrt = (struct slr_table *)table;
+   835	
+   836		if (slrt->magic != SLR_TABLE_MAGIC)
+   837			return;
+   838	
+   839		/* Add config information to measure the UEFI memory map */
+   840		uefi_config = (struct slr_entry_uefi_config *)buf;
+   841		uefi_config->hdr.tag = SLR_ENTRY_UEFI_CONFIG;
+   842		uefi_config->hdr.size = sizeof(*uefi_config) + sizeof(*uefi_entry);
+   843		uefi_config->revision = SLR_UEFI_CONFIG_REVISION;
+   844		uefi_config->nr_entries = 1;
+   845		uefi_entry = (struct slr_uefi_cfg_entry *)(buf + sizeof(*uefi_config));
+   846		uefi_entry->pcr = 18;
+   847		uefi_entry->cfg = boot_params->efi_info.efi_memmap;
+   848		memmap_hi = boot_params->efi_info.efi_memmap_hi;
+   849		uefi_entry->cfg |= memmap_hi << 32;
+   850		uefi_entry->size = boot_params->efi_info.efi_memmap_size;
+   851		memcpy(&uefi_entry->evt_info[0], "Measured UEFI memory map",
+   852			strlen("Measured UEFI memory map"));
+   853	
+   854		if (slr_add_entry(slrt, (struct slr_entry_hdr *)uefi_config))
+   855			return;
+   856	
+   857		/* Jump through DL stub to initiate Secure Launch */
+   858		dlinfo = (struct slr_entry_dl_info *)
+   859			slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_DL_INFO);
+   860	
+   861		asm volatile ("jmp *%%rax"
+ > 862			      : : "a" (dlinfo->dl_handler), "D" (&dlinfo->bl_context));
+   863	}
+   864	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
