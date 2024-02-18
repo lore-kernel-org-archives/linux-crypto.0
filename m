@@ -1,166 +1,136 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792D17E596;
-	Sat, 17 Feb 2024 20:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0DD4C61;
+	Sun, 18 Feb 2024 05:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708200463; cv=none; b=oIj5G6StB+M+d69nBOrXy1pbbTUek23WKi8LOxx1fwut7sowujdKl5vqGyFDEjuFfRT4APF7Y7C5tzL1eUEoTWXJ0ECe3fZavtFtSJOkt6lZknQXi5+MA+1WbmXpxlNVDPktxy33czxQsHiGg624pXzs+RtjhVRWUwCsqbaBQ8g=
+	t=1708234334; cv=none; b=c3/o1cd7NVLCBY4NbIVyBoxx1bsZ+n17cAs+cUTf79/KZAEteaNTOC+DFALP8TC56vv2CrdpfARpIjRdhuWzi1IBW7WoiG7bBD7Yr6y+DyvpJHN8FIg1DiBlrvEG8MQF2nn9opOv5zUb3XEGGMi9VZA6hTQgRjjWrlRxG2I0dII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708200463; c=relaxed/simple;
-	bh=/69HW9NzBJsJX+iI5iUdtA0unbwpwPW5fq7scXx+J5o=;
+	s=arc-20240116; t=1708234334; c=relaxed/simple;
+	bh=U3IsuMFCY2SLEhgmSDpSae5NUyuIOOh6Nqk3N9U+d/E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hn54m8xYm6TG0AQ6/Bfvocg0znUmtQOyzxIpnZQdDdPi/N+8V+7Os9iVJCK9nEiXgpO9H7qcc+JRo17e6EE8r96x+hY7dUlBeNAj8CB8GTg7AmjpS24HQJt8OGBaltf0jjeK8k7aTkxA5yctZgsR7P4fz+17OIGSbNYb3Ql5h38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JEomp9Ix; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=gM93ZQgdPftrRplhK822fcfjt1LTZDJ1Tii8U8XbVMvkp8dFWEPOPqEG83ECWInON8EmlUgh21SQyXED5VkFWoTPzM2ozK0PI8F066BPRWoQ4qmN05tPEAIFKzgEBD2of9vFjYRWJpbp8uXNSsD1GhOVlzPoG/744pxLuHvpjU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hzWuiSA1; arc=none smtp.client-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JEomp9Ix"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708200461; x=1739736461;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/69HW9NzBJsJX+iI5iUdtA0unbwpwPW5fq7scXx+J5o=;
-  b=JEomp9IxilrusFwFmY5Gvs+SI/7xj3nq73bwW/4turY6J1iDtecBAbeW
-   Fjm0ytzMzUHgkeQdUc3fJVwa5yvEuWymRGQH1HZnmB4uixZv9o3GCiaif
-   c3Bz4U5utU5gO/vdg+4gr0QDj9C3lVboAgI9JUQIo6gFThkdLBqfqikuf
-   LqFMHUUKR/xK9evTiovBjxrEGVs8VmHzMRCSS3tL4VPQHqKPYgE6Lk0ug
-   OzsEz2AAjrjZC37uhuuWGfqtukgH5jkAsZvJKLhSvN11KvZ0/ky9xde/I
-   fszQgpUhTnLntvYafdYBkMCR7R59pSzcPe8ctxmnJIyZ9M0IwZ2d5ejNv
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10987"; a="2180177"
-X-IronPort-AV: E=Sophos;i="6.06,167,1705392000"; 
-   d="scan'208";a="2180177"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2024 12:07:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,167,1705392000"; 
-   d="scan'208";a="8727084"
-Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
-  by fmviesa003.fm.intel.com with ESMTP; 17 Feb 2024 12:07:35 -0800
-Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rbQyC-0002Te-24;
-	Sat, 17 Feb 2024 20:07:32 +0000
-Date: Sun, 18 Feb 2024 04:06:36 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ross Philipson <ross.philipson@oracle.com>,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
-	linux-efi@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, ross.philipson@oracle.com,
-	dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
-	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
-	ardb@kernel.org, mjg59@srcf.ucam.org,
-	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
-	jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
-	nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
-	davem@davemloft.net, kanth.ghatraju@oracle.com,
-	trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v8 15/15] x86: EFI stub DRTM launch support for Secure
- Launch
-Message-ID: <202402180324.a3PqEegg-lkp@intel.com>
-References: <20240214221847.2066632-16-ross.philipson@oracle.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hzWuiSA1"
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6e2f12059f4so1676140a34.0;
+        Sat, 17 Feb 2024 21:32:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708234331; x=1708839131; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=L+mYOP74oT/fmnKuLJNRG+jgvNKGCnpPTuzdRRiDPHU=;
+        b=hzWuiSA1rF9zQsYa2J+ODX6CVRpG26xj3H2/uOjo0mWLAFxVotF+ugQc7/EFVWAaLm
+         qd2L3zmtPHQfVZZ7f5+vwuAnAHTBwsbyz3xjko9lkAntHH8SSbk7OZ8j/lvMgWJUvoAY
+         lpsVUqSWuJsqND4pmFx4/gr6yUWCyH1+0WOn6wcNvJu7H20RtFrq6DMVaSmYqEbQj7V0
+         PWkWPmy9YeGZNoDpWrr9zYHUvUeO9xmzhpE2i+JIMPXV7DyzmsCQBAMloLJEsT3U8UyJ
+         HPlVgXcbfHgAzI3H8ZaNXDcfoZJ96Zrb/KifiJV8ffTDtmewXRuCTTNcQkhKSG9OsTZ9
+         uxxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708234331; x=1708839131;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L+mYOP74oT/fmnKuLJNRG+jgvNKGCnpPTuzdRRiDPHU=;
+        b=UkbRX6E3P16tIXeg3BDzjZFZWvMYiClyIIH0NtPEZ4MlX0B3l3s+yIYPp1/I+go9t2
+         dE6ACk5QJopnJpGaNW82eXKsb9XT1l0KYvbHCSVrnu+BvdoOrBKKcLsspD67A74uJChq
+         QpYxbBVTe8z7WJWf6S2zLBkjYh6JP0sXDpXVqJVXX8nxUCZIOoSahj5bEugiGiUPufQU
+         ylH0MuHtxQMCjqa2pxSQKFgcAE+bBNKvZam8XY0bursj7C7D9JgGDUp66n4rvVszwhzz
+         UgHwoqW7ZILpavAmuXutQjGnkpty2T60ikAPSlfmPnFPfwzIVjQZPUeCn45qATqPsTpT
+         begQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWaNpWR532GZu1QLKGJIVLBxwleBxmn71okkbR5rTDPA1FYtxtOhnWtLjkT6Ouic6bUEo3vnyYYAgjFsUntYHGiQ0hk4FpL/xrkWswNgKm/BtfrtRdSR2Pu0C+p9F+ST2HK9EzXQnx43f5j
+X-Gm-Message-State: AOJu0YxbBFWUtO27+LpoiGMNqLcDQRgXMnUHfkI6o4XEvKMOkwEwl15K
+	PVM+xhCHGdSpcAlTNUWl7nJFMbJvKv5GVQ8hJ+DQ3w2AVkqixWl1
+X-Google-Smtp-Source: AGHT+IF6zRDmg8LbXEK4+VgIoMIeLzccP/PeHDdh6rX2SeYbpbyn6mdCeMY3wck1Z02klSwCAoFEAA==
+X-Received: by 2002:a05:6808:170f:b0:3c0:3389:3b33 with SMTP id bc15-20020a056808170f00b003c033893b33mr10927802oib.27.1708234331172;
+        Sat, 17 Feb 2024 21:32:11 -0800 (PST)
+Received: from archie.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id y4-20020a056a00190400b006e1463c18f8sm2438589pfi.37.2024.02.17.21.32.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 Feb 2024 21:32:10 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id 237C01846B483; Sun, 18 Feb 2024 12:32:05 +0700 (WIB)
+Date: Sun, 18 Feb 2024 12:32:05 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Randy Dunlap <rdunlap@infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto <linux-crypto@vger.kernel.org>
+Cc: Robert Elliott <elliott@hpe.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Christoph Biedl <bugzilla.kernel.bpeb@manchmal.in-ulm.de>
+Subject: Re: CONFIG_JITTERENTROPY needs more explanation?
+Message-ID: <ZdGWVVIZx8uIu83K@archie.me>
+References: <ZcJBk_NQvLzwzprn@archie.me>
+ <8992c7f0-b0b1-4bbb-b5a3-2906159e2e24@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="lUtBZG1DyXRBGt0O"
 Content-Disposition: inline
-In-Reply-To: <20240214221847.2066632-16-ross.philipson@oracle.com>
-
-Hi Ross,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on char-misc/char-misc-testing]
-[also build test ERROR on char-misc/char-misc-next char-misc/char-misc-linus herbert-cryptodev-2.6/master herbert-crypto-2.6/master linus/master v6.8-rc4 next-20240216]
-[cannot apply to tip/x86/core]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Ross-Philipson/x86-boot-Place-kernel_info-at-a-fixed-offset/20240215-064712
-base:   char-misc/char-misc-testing
-patch link:    https://lore.kernel.org/r/20240214221847.2066632-16-ross.philipson%40oracle.com
-patch subject: [PATCH v8 15/15] x86: EFI stub DRTM launch support for Secure Launch
-config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20240218/202402180324.a3PqEegg-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240218/202402180324.a3PqEegg-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202402180324.a3PqEegg-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In function 'efi_secure_launch',
-       inlined from 'efi_stub_entry' at drivers/firmware/efi/libstub/x86-stub.c:990:2:
->> drivers/firmware/efi/libstub/x86-stub.c:861:9: error: inconsistent operand constraints in an 'asm'
-     861 |         asm volatile ("jmp *%%rax"
-         |         ^~~
+In-Reply-To: <8992c7f0-b0b1-4bbb-b5a3-2906159e2e24@infradead.org>
 
 
-vim +/asm +861 drivers/firmware/efi/libstub/x86-stub.c
+--lUtBZG1DyXRBGt0O
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-   813	
-   814	static void efi_secure_launch(struct boot_params *boot_params)
-   815	{
-   816		struct slr_entry_uefi_config *uefi_config;
-   817		struct slr_uefi_cfg_entry *uefi_entry;
-   818		struct slr_entry_dl_info *dlinfo;
-   819		efi_guid_t guid = SLR_TABLE_GUID;
-   820		struct slr_table *slrt;
-   821		u64 memmap_hi;
-   822		void *table;
-   823		u8 buf[64] = {0};
-   824	
-   825		table = get_efi_config_table(guid);
-   826	
-   827		/*
-   828		 * The presence of this table indicated a Secure Launch
-   829		 * is being requested.
-   830		 */
-   831		if (!table)
-   832			return;
-   833	
-   834		slrt = (struct slr_table *)table;
-   835	
-   836		if (slrt->magic != SLR_TABLE_MAGIC)
-   837			return;
-   838	
-   839		/* Add config information to measure the UEFI memory map */
-   840		uefi_config = (struct slr_entry_uefi_config *)buf;
-   841		uefi_config->hdr.tag = SLR_ENTRY_UEFI_CONFIG;
-   842		uefi_config->hdr.size = sizeof(*uefi_config) + sizeof(*uefi_entry);
-   843		uefi_config->revision = SLR_UEFI_CONFIG_REVISION;
-   844		uefi_config->nr_entries = 1;
-   845		uefi_entry = (struct slr_uefi_cfg_entry *)(buf + sizeof(*uefi_config));
-   846		uefi_entry->pcr = 18;
-   847		uefi_entry->cfg = boot_params->efi_info.efi_memmap;
-   848		memmap_hi = boot_params->efi_info.efi_memmap_hi;
-   849		uefi_entry->cfg |= memmap_hi << 32;
-   850		uefi_entry->size = boot_params->efi_info.efi_memmap_size;
-   851		memcpy(&uefi_entry->evt_info[0], "Measured UEFI memory map",
-   852			strlen("Measured UEFI memory map"));
-   853	
-   854		if (slr_add_entry(slrt, (struct slr_entry_hdr *)uefi_config))
-   855			return;
-   856	
-   857		/* Jump through DL stub to initiate Secure Launch */
-   858		dlinfo = (struct slr_entry_dl_info *)
-   859			slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_DL_INFO);
-   860	
- > 861		asm volatile ("jmp *%%rax"
-   862			      : : "a" (dlinfo->dl_handler), "D" (&dlinfo->bl_context));
-   863	}
-   864	
+On Sat, Feb 17, 2024 at 08:56:48AM -0800, Randy Dunlap wrote:
+>=20
+>=20
+> On 2/6/24 06:26, Bagas Sanjaya wrote:
+> > Hi,
+> >=20
+> > On Bugzilla,  Christoph Biedl <bugzilla.kernel.bpeb@manchmal.in-ulm.de>
+> > wrote a question on CRYPTO_JITTERENTROPY description [1]:
+> >=20
+> >> The desciption of the CRYPTO_JITTERENTROPY kernel option in crypto/Kco=
+nfig has an incomplete sentence:
+> >>
+> >> | This RNG does not perform any cryptographic whitening of the generat=
+ed
+> >> |
+> >> | See https://www.chronox.de/jent.html
+> >>
+> >> This was introduced in a9a98d49da52 ("crypto: Kconfig - simplify compr=
+ession/RNG entries") - please fix when convenient.
+> >=20
+> > Can you explain why the Kconfig description says so?
+> >=20
+> > Thanks.
+> >=20
+> > [1]: https://bugzilla.kernel.org/show_bug.cgi?id=3D218458
+> >=20
+>=20
+> Hi,
+> Fixup patch has been posted.
+> Thanks for the report.
+>=20
+> Subject: should be CRYPTO_JITTERENTRY.
+>=20
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+OK, thanks!
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--lUtBZG1DyXRBGt0O
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZdGWUQAKCRD2uYlJVVFO
+o3aqAQDiy2tA4OaINnPNORdABB1smTA2ILL6uHwCq2cl4csC9gEAlJ9HqGAkl4C1
+WXDmN8GK/2cvUgu5+nCdqokqrZt3sgA=
+=OYxZ
+-----END PGP SIGNATURE-----
+
+--lUtBZG1DyXRBGt0O--
