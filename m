@@ -1,139 +1,99 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from shout02.mail.de (shout02.mail.de [62.201.172.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E62746B;
-	Sun, 18 Feb 2024 05:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9E66F07C;
+	Sun, 18 Feb 2024 22:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.201.172.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708234397; cv=none; b=Jh0i2gyI+oSbfBbMyAhJd2OFwfBJvf7NE97uOA8hpWuFF8ZVHc4LrppOEdFYrYmlIg7fW56/oiew1qf4V2qt9c4dz+qM407XfA1We9iRmHwnQQVvKhVP2xdU+7tFUEZ/BaJ1oLIW7yUCyRW9Rs5H+Wsm/BKXQz8LeU7TS5arOy8=
+	t=1708294662; cv=none; b=b4M9nXMYSfpFcuXFoLQg5WQSDakEKSCwsXkYMwTXqqA6mmcG425iND8K4yxiX6cozseo+LXt9gpRQlbkSOazjbCBFntyFpgLnkI8NKYXYYROY0HgSElb6KAxyOlKECjqaawhYnpteuJFV4aXoaAX7QM2bWmvALrQg/nQb78NhSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708234397; c=relaxed/simple;
-	bh=GqNYA2Bj3/SL4As+R9FGWzLCJHAv3u/RQsuABRTN2Fo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=INUvOz575fAtA7S0nRaqoZlnR6d3m5nefLRkLhwMY6+kIKAyDrgENLbY5mm/IqSYAE2Heyea8d+vNEhOE9DKCGQ57UliRqFpUx/qT+14VYJSE5nKWaXHhVYG1dm9bVq4lxLGJQzT9RhivFuxUmfDU5okvV9tZ8kxiFkcGk+KrY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YxXswUeI; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708294662; c=relaxed/simple;
+	bh=N3H39/B4i2sFZWcEBwc/gNTosE/eDkGZGZvxmMONy6s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WWHXINPzmG+rBkK8Z1k62nharQZ5rOPR+pge6oHN/ORflkmjt+oyceX4g19bfm/PkcQLs/YKtTkCDd8LLuwruaSpuUfpJ+R38zHaFJ3LPG8niHYgTAj26jWXKrLu8XpIJfXE96UkWoqXqpnCBD1bwUojRo3TJNcTCiIbJjh6GvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mail.de; spf=pass smtp.mailfrom=mail.de; dkim=pass (2048-bit key) header.d=mail.de header.i=@mail.de header.b=b0Oz+t44; arc=none smtp.client-ip=62.201.172.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mail.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YxXswUeI"
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5cddc5455aeso1631859a12.1;
-        Sat, 17 Feb 2024 21:33:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708234386; x=1708839186; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y68dTqA0jekNS95QL0SJwxszqmGOVWXly2G1K5IHR+E=;
-        b=YxXswUeIdCGtUxuUv1GCyUahj2FJOSqrtmSt9jAHe9WUT7zt6F1Rk9aLuCVPPOEC7C
-         TmG+5vTcopPs0k0oM+bTTWwq405LplG1gjlLQAJj20hb/pVWSrm0pAOFgMg7m7Iagr7t
-         Kl/y43ENRbrT9yxYVyFakBKUsz98cJPEySpL0n+jLhw7UykV4zXv3RhOuJT6fnR/Q3EP
-         B19NtW5JlW3rQBxLHb+J1tv2nlte21PtPOvzmLBRurILLNfXJhpyQApFvYL21F69FqBB
-         JOfv9/2IPMXSyH8XBNIN5rym5uyvT1r+ycG0Fw+fcQ/iWc6FA80qIxTW8y4JMZAhcYcI
-         cPXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708234386; x=1708839186;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y68dTqA0jekNS95QL0SJwxszqmGOVWXly2G1K5IHR+E=;
-        b=hknpUrW/vcmkTgjlkMSQM8ZdtzLXYfdyXvsNE0KTmWUgNit4TUHN6aIUzM5ViMvuaS
-         XQMG3Ke/haDvjxXGDWRisVqmJJPbgoW9atZZEZTePunDD2iPnAj0J1hmkp4tkvQM3oJi
-         EluTXb/2sGpJnBuzmThKTlnOIaVkamjEk2yz7bNY8vLD5dMAoNskeJby4t/Ynqfbgrvr
-         LUzxGu48LqkB+YBa465PmDDqzJT2nmQgbgYXqONX2ik78yQ8aX8MRJWo7E+FSmIy9N9N
-         QMD+7pXqTAsZOk7njKfVlZL0rBebBvWxc4BSCcc/Z9iUXNdOfEWXw729j6OXcXdC4oBI
-         Nx8g==
-X-Forwarded-Encrypted: i=1; AJvYcCVvq2oeT99+j6wq9eo4XBaxlP50vb1oaeV27s+7wOy5PNxwWx7WUXJhr6q2+T2358rs1RZ9eScASe2SPwzqgnuD72BxIRYIQlsL1vAIc5KU86u/TiWV1lI08WP+o1XVQaQ1SO8hB64SrcvS
-X-Gm-Message-State: AOJu0YymsNrOtzRh92PpLs1KC7ggQJIhSU8qmC0yMaETg+6fmCxgV4e8
-	Whh8S0ajMJMOwRMosVM4xK0/OeFwUoDc3uO/DuIpz25pf/3RfzDwSkuymMzxfl0=
-X-Google-Smtp-Source: AGHT+IFUWZDeYa0ir/9aq6y8x3xP/MrbRtZoz+v+Z4r43s7Sm1Xjv+6GvTp4EvbBngI9OZl9VNSL5A==
-X-Received: by 2002:a17:90a:ff09:b0:299:2454:9746 with SMTP id ce9-20020a17090aff0900b0029924549746mr5996295pjb.22.1708234385574;
-        Sat, 17 Feb 2024 21:33:05 -0800 (PST)
-Received: from archie.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id sy8-20020a17090b2d0800b002963cab9e2asm2608339pjb.2.2024.02.17.21.33.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 17 Feb 2024 21:33:05 -0800 (PST)
-Received: by archie.me (Postfix, from userid 1000)
-	id 846541846B483; Sun, 18 Feb 2024 12:33:00 +0700 (WIB)
-Date: Sun, 18 Feb 2024 12:33:00 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
-Cc: Robert Elliott <elliott@hpe.com>,
-	Christoph Biedl <bugzilla.kernel.bpeb@manchmal.in-ulm.de>,
+	dkim=pass (2048-bit key) header.d=mail.de header.i=@mail.de header.b="b0Oz+t44"
+Received: from postfix01.mail.de (postfix01.bt.mail.de [10.0.121.125])
+	by shout02.mail.de (Postfix) with ESMTP id CA911240D76;
+	Sun, 18 Feb 2024 23:17:22 +0100 (CET)
+Received: from smtp01.mail.de (smtp01.bt.mail.de [10.0.121.211])
+	by postfix01.mail.de (Postfix) with ESMTP id ABD9480145;
+	Sun, 18 Feb 2024 23:17:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mail.de;
+	s=mailde202009; t=1708294642;
+	bh=N3H39/B4i2sFZWcEBwc/gNTosE/eDkGZGZvxmMONy6s=;
+	h=From:To:Cc:Subject:Date:Message-Id:From:To:CC:Subject:Reply-To;
+	b=b0Oz+t444Iy/mMVCQexZJsa1Ia2Us0mQOjygXNPbAUtL0T1Vnku6T40CJffkGJaGz
+	 6OgqXvUed2qmuU38ESaV/Eu8UQcWJQzWpZl2f5b2Y2vQERbpDRyH6NRCYu9BJRaldy
+	 l+4T4zSOoujJARpo1FOeXKakoqmTGPOP2W4Kc7qAAVvaLjK/RuET9y6Dos2bd/vMth
+	 tnXH3FBckSIBKs3ayyn8TyJKdzeMtLFW0L1OdtbRgpTxeme1sfQ9H8hAp3mDZj3geU
+	 kctTBYYaFUE6h1C2oz2mOKssrpPbNDkJix5hylwE8LGHKxIN6oZPm0ETupwO2ZdlHT
+	 xO9NEBDI2i3iw==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp01.mail.de (Postfix) with ESMTPSA id 23479240550;
+	Sun, 18 Feb 2024 23:17:04 +0100 (CET)
+From: Kilian Zinnecker <kilian.zinnecker@mail.de>
+To: Corentin Labbe <clabbe@baylibre.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: fix CRYPTO_JITTERENTROPY help text
-Message-ID: <ZdGWjFvnVKPiaiec@archie.me>
-References: <20240217165513.24061-1-rdunlap@infradead.org>
+	"David S . Miller" <davem@davemloft.net>,
+	Heiko Stuebner <heiko@sntech.de>
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Kilian Zinnecker <kilian.zinnecker@mail.de>
+Subject: [PATCH] crypto: rockchip - fix to check return value
+Date: Sun, 18 Feb 2024 23:16:58 +0100
+Message-Id: <20240218221658.131043-1-kilian.zinnecker@mail.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="eE075mgGRLmg7yKw"
-Content-Disposition: inline
-In-Reply-To: <20240217165513.24061-1-rdunlap@infradead.org>
+Content-Transfer-Encoding: 8bit
+X-purgate: clean
+X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
+X-purgate-type: clean
+X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
+X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
+X-purgate: clean
+X-purgate-size: 1095
+X-purgate-ID: 154282::1708294642-065BF670-B0B11907/0/0
 
+crypto_engine_alloc_init may fail, e.g., as result of a fail of
+devm_kzalloc or kthread_create_worker. Other drivers (e.g.,
+amlogic-gxl-core.c, aspeed-acry.c, aspeed-hace.c, jr.c, etc.) check
+crypto_engine_alloc_init's return value and return -ENOMEM in case
+a NULL pointer is returned. This patch inserts a corresponding
+return value check to rk3288_crypto.c.
 
---eE075mgGRLmg7yKw
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Kilian Zinnecker <kilian.zinnecker@mail.de>
+---
+ drivers/crypto/rockchip/rk3288_crypto.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-On Sat, Feb 17, 2024 at 08:55:13AM -0800, Randy Dunlap wrote:
-> Correct various small problems in the help text:
-> a. change 2 spaces to ", "
-> b. finish an incomplete sentence
-> c. change non-working URL to working URL
->=20
-> Fixes: a9a98d49da52 ("crypto: Kconfig - simplify compression/RNG entries")
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=3D218458
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Bagas Sanjaya <bagasdotme@gmail.com>
-> Cc: Robert Elliott <elliott@hpe.com>
-> Cc: Christoph Biedl <bugzilla.kernel.bpeb@manchmal.in-ulm.de>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> ---
->  crypto/Kconfig |    5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff -- a/crypto/Kconfig b/crypto/Kconfig
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -1269,10 +1269,11 @@ config CRYPTO_JITTERENTROPY
-> =20
->  	  A non-physical non-deterministic ("true") RNG (e.g., an entropy source
->  	  compliant with NIST SP800-90B) intended to provide a seed to a
-> -	  deterministic RNG (e.g.  per NIST SP800-90C).
-> +	  deterministic RNG (e.g., per NIST SP800-90C).
->  	  This RNG does not perform any cryptographic whitening of the generated
-> +	  random numbers.
-> =20
-> -	  See https://www.chronox.de/jent.html
-> +	  See https://www.chronox.de/jent/
-> =20
->  if CRYPTO_JITTERENTROPY
->  if CRYPTO_FIPS && EXPERT
+diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
+index 70edf40bc523..f74b3c81ba6d 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto.c
++++ b/drivers/crypto/rockchip/rk3288_crypto.c
+@@ -371,6 +371,11 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	crypto_info->engine = crypto_engine_alloc_init(&pdev->dev, true);
++	if (!crypto_info->engine) {
++		err = -ENOMEM;
++		goto err_crypto;
++	}
++
+ 	crypto_engine_start(crypto_info->engine);
+ 	init_completion(&crypto_info->complete);
+ 
+-- 
+2.34.1
 
-LGTM, thanks!
-
-Acked-by: Bagas Sanjaya <bagasdotme@gmail.com>
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---eE075mgGRLmg7yKw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZdGWjAAKCRD2uYlJVVFO
-oxkkAPwNrD/EDUlf7d/c09ydmX95bxp3vXJwWjlje88gLPaOogEAg0YO8EG4vKJe
-MJg/+ioZZi5iUpuKS+9JxqhoHK4mQg0=
-=KrEh
------END PGP SIGNATURE-----
-
---eE075mgGRLmg7yKw--
