@@ -1,172 +1,168 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2074.outbound.protection.outlook.com [40.107.93.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00361DDFA;
-	Mon, 19 Feb 2024 14:40:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708353652; cv=none; b=nY4/f1xSZwMNn5mssqfhxE4t4jaoF+tFgdtgDVhV47TST/8S1grHRUwSv7ZZOYbXVx2XmnbQWxwVO1ivqs0SF5GXCcgVH33yEYd0qazPcsucxdYHCEzqkjLR7jwsB7aR/h/jS3GV14wh3of1Zf43fhZYI3Dr4PrZGq+wXhAWY/I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708353652; c=relaxed/simple;
-	bh=lS6tnNIEG62vn9NZlJr0TcmEITMimGmfMmhLb4jK/Wo=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=PJXdiHxJj4o2jTT3qp1MSrJgQcR4q0W3QI5609lyrWFM/Wp05YeSa5qJIc6VJ0Z6GjPDfprqvG35PzpYFtVEGTAQfdGBQXPdEKQf4YGrCkfKYnPIfUMs15hcfGstjn1bwExfbUCUvfH7D12KHXjWqAsBn/j11Csu0v/8LX+u9L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gTiUYdrp; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FAD482C0;
+	Mon, 19 Feb 2024 17:26:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708363568; cv=fail; b=CcAKBk75J5793THMnnd+MizHH7T3CuGCwLiih/iagtRG8g4k1WAQdYMPwvHDRR8HakFFWNZeMGzu3otkSFhFdXDfOZmKXGrPkRGvzQtD2OU7ZeF6Kp26mE0mcoM13zj3FoCODBoakHvBYTru8qic9LXikoJXJ0QkawZNoQpaBgQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708363568; c=relaxed/simple;
+	bh=6eqcNqMIN3hhMhS9nrdbSBMfZW/xBNN9fKEBNaaApjc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S8x8tXbASN8eF9j/+8+wXelmLOD24GK2spG0i+hnwWOC46hk0ruNuZ3MiX9dQxJkGUL5UTnA3bIBvmUdm9kdGccjxdbGOUdCr+feUmB5VXjIkc2Hne6U5MVz91O/fSSjOlE1FCHlbGxfubHWGGj9VEtSLC3lRUCVYpMXprEVCSM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=c0MveooC; arc=fail smtp.client-ip=40.107.93.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gTiUYdrp"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41JDX5o6032426;
-	Mon, 19 Feb 2024 14:40:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : from : subject : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=bJP5HIx5nNqhT4TUNKgIkLEZ2q/UydeD2C4sJY7sccA=;
- b=gTiUYdrpDW5hvTNopJBeamT3UzLhzbjIyQsZ//pGMtN1oNtfSVMJpYVgO91yLBAihj5q
- vtDcliz3hCzKgmWkjFqhvJKmNHejmKk12hcn+udibAOZjR+aXio8lpyNjwgKvsBXXUVM
- gv+nMnCmz4Q181/re1lj+KSSWT3hWg1UDi0QM5Ug1nFJviCGRR6LAt43H0U/Dpgf4Kzj
- Fi0mDqzsYoLxxeHv0d4RQuTMiU2o87TOdfIwgsQjAUiTsE2L9+PnwOABXx01H9Hs4np0
- XyJuCyolK3cdbq+b/ZuHWREfNSZaRs4wkRw+2XoBkLokmqYTeepoOHydw5YKzdChyktZ 1g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wc7ygt1be-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Feb 2024 14:40:43 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41JEbVpH021477;
-	Mon, 19 Feb 2024 14:40:43 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wc7ygt1b2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Feb 2024 14:40:43 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41JEHwIN009583;
-	Mon, 19 Feb 2024 14:40:42 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wb84p1rwn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Feb 2024 14:40:42 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41JEeduj3015676
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 19 Feb 2024 14:40:42 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DE14A58065;
-	Mon, 19 Feb 2024 14:40:39 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1574B58059;
-	Mon, 19 Feb 2024 14:40:39 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 19 Feb 2024 14:40:38 +0000 (GMT)
-Message-ID: <98005c8e-816f-4b58-9572-f2af538e6728@linux.ibm.com>
-Date: Mon, 19 Feb 2024 09:40:38 -0500
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="c0MveooC"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y//XYKgf2FfIDhDcbXBkT33NZuSXWKtaghmUtJ512ZcjI0ryIOe+83GgdvNBAcRAWmUr8ve+5cpR3wYl+nL4FaVCf6Bm5XlQ6jKoW9wikdc6wnEWVYt33v4ZeN9F52xZISNtKB+M083n9bzzHNYOKHLulRaONTv/VsFL8HQogNfnO61zICwfrNC40w++n6A1Esai0FaXxYcayCbI8FCUwXLenMXiSZKQjyLGUv0lXSffNUqCDMAZA3LmsZw+rJ7GiAfoOm/xPGCxrIl7G9bWafTQZFG1emk0Ba8QHk28oO2oc2U1QstwwrjEouiMWxOZ97f4TWp168mUUbDOMNSF0Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=irmUWWBwz5LD6tafzqLlC1pSCXCF6FsXn1OzaSGMaQk=;
+ b=h8HWozvGr6zn3v8n2yD6p1gXtE1U3r0JPvW9eF1NHnqeHldkIrp1BAqTr/XpzbV0d0aHahRGi+TpgxpBlUi1XxoCXVukgbdwTiLjz1wXfr8IAYK8UGULfQgRxG8AmUXV5E3J7BNVfBr8Kvby6Wz3jLWj+NO2DsATpVSp1vS6FP7WPAVaDTl/goOVJbRH80Q39bO3mah5qAehmkrw4YRlpnVAb7oFfhhzgIoLaNiUpjbXMuy5mCk8fmjWI1ymwJ25xda/sDc94RCtCWJ4DiDssglE3N/F3hRoU8GvIOI9suYf1YigdjY/XiMvVPtdCPlvUj72CFlfhptIGQsObjsSkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=gondor.apana.org.au
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=irmUWWBwz5LD6tafzqLlC1pSCXCF6FsXn1OzaSGMaQk=;
+ b=c0MveooCarkvU6iU1r+bvmfV2dLz3AYoOgYmo/PWI/k/w57y9e7v+K+La1an5gQwSlGCIAxRqqWO1zb0g92N+ShzfFkXEyCwvl0qqD2zXzrlby0qbQuGqhji5tDozAVGq8eggVqOjfD1+eYbeKpu9vDVRm4WkDcQI8tIx3Xru8QRBR2vxFExqKSHtXFlnnIDzCRobCVu5Eq6RYrGUv0tQmsZUStTDqoWaeKEyo+iawY+SWF4uqJxqJ6GiY3N87lI5ZMGgraAIA4+tV6GA7j+T0bYnJsZ+txxCzk5w3D7Vk8ZyfT4KSqRpUNn+2BMEcGkiD9MPcf7EItNn3yVHZMplg==
+Received: from SJ0PR03CA0111.namprd03.prod.outlook.com (2603:10b6:a03:333::26)
+ by SA0PR12MB4461.namprd12.prod.outlook.com (2603:10b6:806:9c::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.19; Mon, 19 Feb
+ 2024 17:26:04 +0000
+Received: from SJ5PEPF000001C9.namprd05.prod.outlook.com
+ (2603:10b6:a03:333:cafe::b7) by SJ0PR03CA0111.outlook.office365.com
+ (2603:10b6:a03:333::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.37 via Frontend
+ Transport; Mon, 19 Feb 2024 17:26:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ5PEPF000001C9.mail.protection.outlook.com (10.167.242.37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7292.25 via Frontend Transport; Mon, 19 Feb 2024 17:26:03 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 19 Feb
+ 2024 09:25:45 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Mon, 19 Feb
+ 2024 09:25:44 -0800
+Received: from BUILDSERVER-IO-L4T.nvidia.com (10.127.8.14) by mail.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Mon, 19 Feb 2024 09:25:40 -0800
+From: Akhil R <akhilrajeev@nvidia.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+	<conor+dt@kernel.org>, <thierry.reding@gmail.com>, <jonathanh@nvidia.com>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <mperttunen@nvidia.com>,
+	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-tegra@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<krzk@kernel.org>
+CC: Akhil R <akhilrajeev@nvidia.com>
+Subject: [PATCH v5 0/5] Add Tegra Security Engine driver
+Date: Mon, 19 Feb 2024 22:55:25 +0530
+Message-ID: <20240219172530.20517-1-akhilrajeev@nvidia.com>
+X-Mailer: git-send-email 2.17.1
+X-NVConfidentiality: public
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Stefan Berger <stefanb@linux.ibm.com>
-Subject: Re: [PATCH v2 00/14] Add support for NIST P521 to ecdsa and ecdh
-To: Simo Sorce <simo@redhat.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br
-References: <20240215231414.3857320-1-stefanb@linux.ibm.com>
- <3bdb1c9e0ac35c7dc3fbba1233bc7df80ac466a2.camel@redhat.com>
- <b507fd52-a807-4325-981b-3852f4f6190b@linux.ibm.com>
- <c7feceb3a7816c2f8686a907fbea2028477464a0.camel@redhat.com>
-Content-Language: en-US
-In-Reply-To: <c7feceb3a7816c2f8686a907fbea2028477464a0.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: lj8fOMihFw8P0xDnV9dpv8Bmv_bA0JO7
-X-Proofpoint-GUID: mO5g91bceedikjZJxmsczi5AWouqqweR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-19_10,2024-02-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- impostorscore=0 adultscore=0 clxscore=1015 mlxscore=0 lowpriorityscore=0
- bulkscore=0 spamscore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402190109
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001C9:EE_|SA0PR12MB4461:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0e4c12ac-1780-4b8b-c01c-08dc316fd96a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	kvfTDLc3RRyMU/stZxQuR8ulc8zXEAp7UDHVWGlgmtWXxKjnpnnc3UkjF6jeMNQNzHWe65OzdFyM9s04PfMaBb9GZ6uwjow0oQBEbiLzGw/Q5OvHY9NyRCA2x3zFxK/9Bo7JzRuFVHO3bopwOdfcoBGBuqlQj52pBttp/5r37GpLvG8xighU8Pw/dB2h8X1Fgeyv1It1xfwMZ+1AQ0kVAEGq7JymbGrmO6e9v4WaiNPLER+yMXe8xTLBfQ9+65WorXzNg+W25SZW5vqGT7qFBsa9PUriOSJSP/697J6POyU7IR0TZp4zzfSIp6kBu6x4z0pgTXtymIt9a95QyrpGJQsabwXI/TgLJzabef24QnfUYwISSkAoYrxFmIdsAzcZdrmDodqCG9F5tUmbGHXSRiA1evVqPG35emjx0oEqcT0Jl4ugyeV5RHIuFeQ9g6WsDN81ESof+4ZfBZhUZelhqjYoOK6v/dMBxancrnk/V5ZSXRvtp03eIzreRAR7rHR1HFoW6TuQPSZe3UHk/68OYlIAH2evm1rmo7PMTGzIKjU6QLs4PEPaQ+bI589nUnuTM7ffkI1tiP1CPBoTW9BFcu5tvOgvOglpPf5W5lmais0A6hl/gmxM9T6RtwYOvH/cnz9gMrrqgcADLBfWj8ey8vfAJAlt9XwTSnn6nVX34quNv4dp1EZxuDwWe+nGEddC
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(230273577357003)(36860700004)(46966006)(40470700004)(921011);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2024 17:26:03.5894
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0e4c12ac-1780-4b8b-c01c-08dc316fd96a
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001C9.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4461
 
+Add support for Tegra Security Engine which can accelerates various
+crypto algorithms. The Engine has two separate instances within for
+AES and HASH algorithms respectively.
 
+The driver registers two crypto engines - one for AES and another for
+HASH algorithms and these operate independently and both uses the host1x
+bus. Additionally, it provides  hardware-assisted key protection for up to
+15 symmetric keys which it can use for the cipher operations.
 
-On 2/16/24 14:40, Simo Sorce wrote:
-> On Fri, 2024-02-16 at 14:32 -0500, Stefan Berger wrote:
->>
->> On 2/16/24 14:27, Simo Sorce wrote:
->>> On Thu, 2024-02-15 at 18:13 -0500, Stefan Berger wrote:
->>>> This series of patches adds support for the NIST P521 curve to ecdsa and
->>>> ecdh. Test cases for NIST P521 are added to both modules.
->>>>
->>>> An issue with the current code in ecdsa and ecdh is that it assumes that
->>>> input arrays providing key coordinates for example, are arrays of digits
->>>> (a 'digit' is a 'u64'). This works well for all currently supported
->>>> curves, such as NIST P192/256/384, but does not work for NIST P521 where
->>>> coordinates are 8 digits + 2 bytes long. So some of the changes deal with
->>>> converting byte arrays to digits and digits to byte arrays.
->>>>
->>>>
->>>> Regards,
->>>>      Stefan
->>>>
->>>> v2:
->>>>    - Reformulated some patch descriptions
->>>>    - Fixed issue detected by krobot
->>>>    - Some other small changes to the code
->>>>
->>>> Stefan Berger (14):
->>>>     crypto: ecdsa - Convert byte arrays with key coordinates to digits
->>>>     crypto: ecdsa - Adjust tests on length of key parameters
->>>>     crypto: ecdsa - Extend res.x mod n calculation for NIST P521
->>>>     crypto: ecc - Implement vli_mmod_fast_521 for NIST p521
->>>>     crypto: ecc - For NIST P521 use vli_num_bits to get number of bits
->>>>     crypto: ecc - Add NIST P521 curve parameters
->>>>     crypto: ecdsa - Register NIST P521 and extend test suite
->>>>     x509: Add OID for NIST P521 and extend parser for it
->>>>     crypto: ecdh - Use properly formatted digits to check for valid key
->>>>     crypto: ecc - Implement ecc_digits_to_bytes to convert digits to byte
->>>>       array
->>>>     crypto: Add nbits field to ecc_curve structure
->>>>     crypto: ecc - Implement and use ecc_curve_get_nbytes to get curve's
->>>>       nbytes
->>>>     crypto: ecdh - Use functions to copy digits from and to byte array
->>>>     crypto: ecdh - Add support for NIST P521 and add test case
->>>>
->>>>    crypto/asymmetric_keys/x509_cert_parser.c |   3 +
->>>>    crypto/ecc.c                              |  71 +++++--
->>>>    crypto/ecc_curve_defs.h                   |  45 +++++
->>>>    crypto/ecdh.c                             |  59 +++++-
->>>>    crypto/ecdsa.c                            |  48 ++++-
->>>>    crypto/testmgr.c                          |  14 ++
->>>>    crypto/testmgr.h                          | 225 ++++++++++++++++++++++
->>>>    include/crypto/ecc_curve.h                |   3 +
->>>>    include/crypto/ecdh.h                     |   1 +
->>>>    include/crypto/internal/ecc.h             |  61 +++++-
->>>>    include/linux/oid_registry.h              |   1 +
->>>>    11 files changed, 495 insertions(+), 36 deletions(-)
->>>
->>> Hi Stefan,
->>> what kind of side-channel testing was performed on this code?
->>> And what is the use case you are adding it for?
->>
->> We're using public keys for signature verification. I am not aware that
->> public key usage is critical to side channels.
->>
->> The use case for adding it is primarily driven by closing a gap to
->> complete the support for the common ECDSA NIST curves.
-> 
-> Is there an assumption the ECDH code uses exclusively ephemeral keys?
-> 
-It can use both, provided keys and ephemeral keys. I think at this point 
-it's best to drop ecdh support from this series.
+v4->v5:
+* Move copy/paste of intermediate results in export()/import() to
+  'update()' callback
+v3->v4:
+* Remove unused header in bindings doc.
+* Update commit message in host1x change.
+* Fix test bot warning.
+v2->v3:
+* Update compatible in driver and device trees.
+* Remove extra new lines and symbols in binding doc.
+v1->v2:
+* Update probe errors with 'dev_err_probe'.
+* Clean up function prototypes and redundant prints.
+* Remove readl/writel wrappers.
+* Fix test bot warnings.
 
-    Stefan
+Akhil R (5):
+  dt-bindings: crypto: Add Tegra Security Engine
+  gpu: host1x: Add Tegra SE to SID table
+  crypto: tegra: Add Tegra Security Engine driver
+  arm64: defconfig: Enable Tegra Security Engine
+  arm64: tegra: Add Tegra Security Engine DT nodes
 
-> Simo.
-> 
+ .../crypto/nvidia,tegra234-se-aes.yaml        |   52 +
+ .../crypto/nvidia,tegra234-se-hash.yaml       |   52 +
+ MAINTAINERS                                   |    5 +
+ arch/arm64/boot/dts/nvidia/tegra234.dtsi      |   16 +
+ arch/arm64/configs/defconfig                  |    1 +
+ drivers/crypto/Kconfig                        |    8 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/tegra/Makefile                 |    9 +
+ drivers/crypto/tegra/tegra-se-aes.c           | 1932 +++++++++++++++++
+ drivers/crypto/tegra/tegra-se-hash.c          | 1048 +++++++++
+ drivers/crypto/tegra/tegra-se-key.c           |  156 ++
+ drivers/crypto/tegra/tegra-se-main.c          |  439 ++++
+ drivers/crypto/tegra/tegra-se.h               |  569 +++++
+ drivers/gpu/host1x/dev.c                      |   24 +
+ 14 files changed, 4312 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-aes.yaml
+ create mode 100644 Documentation/devicetree/bindings/crypto/nvidia,tegra234-se-hash.yaml
+ create mode 100644 drivers/crypto/tegra/Makefile
+ create mode 100644 drivers/crypto/tegra/tegra-se-aes.c
+ create mode 100644 drivers/crypto/tegra/tegra-se-hash.c
+ create mode 100644 drivers/crypto/tegra/tegra-se-key.c
+ create mode 100644 drivers/crypto/tegra/tegra-se-main.c
+ create mode 100644 drivers/crypto/tegra/tegra-se.h
+
+-- 
+2.17.1
+
