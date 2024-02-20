@@ -1,107 +1,98 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AC7535D0;
-	Tue, 20 Feb 2024 04:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E14717554;
+	Tue, 20 Feb 2024 04:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708402445; cv=none; b=Q/eq0Pzsh3jI8qdq8XxyM+4M6Vm083SYp25+enwI1WuyQrynf95Tgzhl4CjUzfrDoMrxFix2v9wzy3jt2iSa9mmVknB9RFyXxt9exIEQNQBvWZouDu1XDnf6EWsNP+2wpgHw0FRO0CFK3dO54z7H4JUjRZw8bT0VezDo8kBgw+Q=
+	t=1708404163; cv=none; b=lP6aImu78SKDeoLqkWD/qZREr4pgtoSC6iuOHG1qtCxMXeS7HIDRBLJkrpMU/swZev6ICb8Pu21rdVxn6e9GyRQPT843Ir7KtoO/x5g1iUVdR1ZLFGI1/nsLprdcwDkHdjJ+OfJ/gVs2EnTg/We3osBu5R/ZHnN+0673gGSSyGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708402445; c=relaxed/simple;
-	bh=Rw0SNFpu2lvJoc2ZPCuOeQBEPxOptGaW+GgiAziczGM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lds7qmnp7zZqRHP2ck9UWvyxL3zHK/nxU5gdXYmKfbbzNBZZnhx6YmGDInslCndiT8mZu1VuugcTDvw3E/gG4XX9tpzS+WwX6aKpFjXuWSO8xVxKMrqZf5U+ezF1XobVi1Bvnrz68Bc52O7hfAfsuG4bvpW+sDBLR6i/Pdu5gps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rcHVP-00FWFK-U5; Tue, 20 Feb 2024 12:13:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 20 Feb 2024 12:13:34 +0800
-Date: Tue, 20 Feb 2024 12:13:34 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Barry Song <21cnbao@gmail.com>
-Cc: akpm@linux-foundation.org, davem@davemloft.net, hannes@cmpxchg.org,
-	linux-crypto@vger.kernel.org, linux-mm@kvack.org, nphamcs@gmail.com,
-	yosryahmed@google.com, zhouchengming@bytedance.com,
-	chriscli@google.com, chrisl@kernel.org, ddstreet@ieee.org,
-	linux-kernel@vger.kernel.org, sjenning@redhat.com,
-	vitaly.wool@konsulko.com, Barry Song <v-songbaohua@oppo.com>,
+	s=arc-20240116; t=1708404163; c=relaxed/simple;
+	bh=7pvaqoLmPrwWYnFwOVxUo22bsimQIabq7xOyzIwKpN8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ek0d75ckZQQO0vfkDB+hqLFha5nbj/tEc9z5ycEfOZ97szR1gITMGPe3ynLidNezcGHzj27du3fbj5YrIqazNDwu8NRQbGdzRZluRodhMuigZMOzfm/SwSvqkNy+fZ9+PIJ+nNTBoUrnBqIjfh/0duLgqN6vz8gf6QLXG4ZoFR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hD8fdPdC; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hD8fdPdC"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5cedfc32250so4091108a12.0;
+        Mon, 19 Feb 2024 20:42:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708404160; x=1709008960; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AqVfvVlCEsMFd8kDIu0G8Zi9nnrXu8SbCnlkzTz8Wyk=;
+        b=hD8fdPdCbzQRv3HlNQuIPEqK2o52blpVNRQV8c6k+aqV2t6jFCtwt4eAWWWxYlIdnn
+         QN7eWOfHaQBhuuIQROiaZjCU3OtCkRok77faIQxsUQ6yDfxNvSoVrmIevTvvzavYNqdD
+         r2nv0Q56zGnjQOFq/o0z5vDpfQ2G2P1LA3hQpJNEfyudNQ5QCR4Xc8C1zmCbVyiDiS8M
+         pjytBRvPMWKS2p1JVXC/nb4BbAIHX0NaKzYL2HMHxndzpFXN3a75m/1gAIhMo0sto+uD
+         n9fMuOd+xSe28AoDalbHO/Ly1LKFPrd6P3PfxaOUkvvYuYDSItmhZ4FU2BskdjAVbnCb
+         F2HA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708404160; x=1709008960;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AqVfvVlCEsMFd8kDIu0G8Zi9nnrXu8SbCnlkzTz8Wyk=;
+        b=DabyDf/ymGL6Msa+VPBXPmLArg20KJoAUaYjrD2/106EWP0A6oDHLiBFMR5bLshxnq
+         OI8fhGgah8BDC8DQxOluKA2Ct1mN1aD5g3di/BxUEFbSs5WD1tAA2G/8diDPDmvlP2FG
+         YOuK00NlvF7gEaIcucZQNYtLu7/YhzVo7Dzd+BLqevZzLPjP1tgXpQ3FH3d174qo3zT1
+         E8wItmbqHuQ4NDi7Q3KWLUXJdcurYPGkhC5jrC+z1i7OAX6bXEkuIdHjRyXc69pCoNzH
+         +FCGjzPOOLQYd28uusBi4EtdH12WGhZ2gF+7BjHK7tYg4sHWbIxHWFGPfOFJmJX3ckQY
+         kmzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGASa5hM5BJVv7HXvkAAvw7P+/NEV3j7jMvWAKLEbgul41eCiF1R6ua3x0m4UNXcRn0LqExVz/AEVU7/+Kl3kMLiS40jVn2BDsUkoM
+X-Gm-Message-State: AOJu0YzYtmKkSqdroeTC2BMto7FuuBGTdX0sCJevQNW1NnAT6t1TLtEG
+	VEztFkMi/mmh/8xLmyl52u/y1dQgCJHFtyZWpAZVgDxEpkD2iAS1WsXOpZdewnQ=
+X-Google-Smtp-Source: AGHT+IH7b8iYxtKzocgG0J0SkAeGEF419TU5CXcVokvMNLXSl8f/lZ3WhG4rT5AOx6Ao9Hyid25Tag==
+X-Received: by 2002:a05:6a21:1789:b0:1a0:9939:c7f9 with SMTP id nx9-20020a056a21178900b001a09939c7f9mr6968166pzb.13.1708404160369;
+        Mon, 19 Feb 2024 20:42:40 -0800 (PST)
+Received: from barry-desktop.hub ([2407:7000:8942:5500:a5bd:9c11:af2b:aecf])
+        by smtp.gmail.com with ESMTPSA id f9-20020a17090274c900b001d9eefef30csm5195923plt.6.2024.02.19.20.42.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 20:42:40 -0800 (PST)
+From: Barry Song <21cnbao@gmail.com>
+X-Google-Original-From: Barry Song <v-songbaohua@oppo.com>
+To: davem@davemloft.net,
+	herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Barry Song <v-songbaohua@oppo.com>,
 	Yang Shen <shenyang39@huawei.com>,
-	Zhou Wang <wangzhou1@hisilicon.com>,
-	Tom Zanussi <tom.zanussi@linux.intel.com>
-Subject: Re: [PATCH v4 1/3] crypto: introduce crypto_acomp_get_alg_flags to
- expose algorithm flags
-Message-ID: <ZdQm7n6Jc3tqsg1F@gondor.apana.org.au>
-References: <20240220025545.194886-1-21cnbao@gmail.com>
- <20240220025545.194886-2-21cnbao@gmail.com>
+	Zhou Wang <wangzhou1@hisilicon.com>
+Subject: [PATCH 1/2] crypto: hisilicon/zip - fix the missing CRYPTO_ALG_ASYNC in cra_flags
+Date: Tue, 20 Feb 2024 17:42:21 +1300
+Message-Id: <20240220044222.197614-1-v-songbaohua@oppo.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240220025545.194886-2-21cnbao@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 20, 2024 at 03:55:43PM +1300, Barry Song wrote:
->
-> diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-> index c650c741a18d..94e2d66b04b6 100644
-> --- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-> +++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-> @@ -591,6 +591,7 @@ static struct acomp_alg hisi_zip_acomp_deflate = {
->  	.base			= {
->  		.cra_name		= "deflate",
->  		.cra_driver_name	= "hisi-deflate-acomp",
-> +		.cra_flags		= CRYPTO_ALG_ASYNC,
->  		.cra_module		= THIS_MODULE,
->  		.cra_priority		= HZIP_ALG_PRIORITY,
->  		.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
-> diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> index dfd3baf0a8d8..91adf9d76a2e 100644
-> --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> @@ -1916,6 +1916,7 @@ static struct acomp_alg iaa_acomp_fixed_deflate = {
->  	.base			= {
->  		.cra_name		= "deflate",
->  		.cra_driver_name	= "deflate-iaa",
-> +		.cra_flags		= CRYPTO_ALG_ASYNC,
->  		.cra_ctxsize		= sizeof(struct iaa_compression_ctx),
->  		.cra_module		= THIS_MODULE,
->  		.cra_priority		= IAA_ALG_PRIORITY,
+Add the missing CRYPTO_ALG_ASYNC flag since hisilizon zip driver
+works asynchronously.
 
-Good catch.  I think this should go into a separate bug-fix patch.
+Cc: Yang Shen <shenyang39@huawei.com>
+Cc: Zhou Wang <wangzhou1@hisilicon.com>
+Signed-off-by: Barry Song <v-songbaohua@oppo.com>
+---
+ drivers/crypto/hisilicon/zip/zip_crypto.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-> index 574cffc90730..07bd8f6bc79a 100644
-> --- a/include/crypto/acompress.h
-> +++ b/include/crypto/acompress.h
-> @@ -160,6 +160,11 @@ static inline void acomp_request_set_tfm(struct acomp_req *req,
->  	req->base.tfm = crypto_acomp_tfm(tfm);
->  }
->  
-> +static inline u32 crypto_acomp_get_alg_flags(struct crypto_acomp *tfm)
-> +{
-> +	return crypto_tfm_alg_flags(crypto_acomp_tfm(tfm));
-> +}
-
-Sorry, my mistake.  I shouldn't have suggested copying skcipher
-since that gets the tfm flags as opposed to the alg flags which
-you've found out.
-
-I think you should just go with your original function acomp_is_async
-but do it like this:
-
-static inline bool acomp_is_async(struct crypto_acomp *tfm)
-{
-	return crypto_comp_alg_common(tfm)->base.cra_flags &
-	       CRYPTO_ALG_ASYNC;
-}
-
-Thanks,
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index c650c741a18d..94e2d66b04b6 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -591,6 +591,7 @@ static struct acomp_alg hisi_zip_acomp_deflate = {
+ 	.base			= {
+ 		.cra_name		= "deflate",
+ 		.cra_driver_name	= "hisi-deflate-acomp",
++		.cra_flags		= CRYPTO_ALG_ASYNC,
+ 		.cra_module		= THIS_MODULE,
+ 		.cra_priority		= HZIP_ALG_PRIORITY,
+ 		.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
