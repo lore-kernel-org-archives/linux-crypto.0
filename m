@@ -1,214 +1,120 @@
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7F850A98;
-	Mon, 19 Feb 2024 23:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC8439AFA;
+	Tue, 20 Feb 2024 02:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708385668; cv=none; b=MeUTM/7OzC9S2Oo8iVf42dISh+9J6QL0iiGntCgTxkVMMzd4YmT3LWECMbd91Cs0GttpvfS7S3EF5aeU7WjNLbPEVaTbQaJcnXyG5WgTjopLKGaN70ZvE/euFIXBEcUoJCm39ZM1WFvtU7etjO1EoNaH5kOlmI+Twci50lTiyxw=
+	t=1708397766; cv=none; b=RswsBJJrSFIcD//tkKspZQmIaoqHmMykT8zfNj34fOfEtO4VNg8RhusETy82cIAQjHEJcoLLha5fhELNH76sU/SWw1e0yXbvypGourPeNmALL6NVrAoM72ebkJC95UaR6NyeumX0GNUe7ysvWI4vYfnAvYLn1KraJ3SsIcDSkfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708385668; c=relaxed/simple;
-	bh=CzieSxkoG1zST6hxWsw+rZeYFiANR8Mb9+qCQ/dMX5E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PQIcb7l6jCLaHbZYqjznEwmC5OaiXfxtCTJ6xm5QsYQJs2FOmgLohN2Y8WMUw3RfIzFAWk1AtAkdU4yGFCbLPyFkY8727BI04RyGbOQBjULwhHvWB0FkNkw1iWv2ikucsIf+pci8zNcRqziPhi4LjzwVAcKOCTVlMLh5q3sY94U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U7h1/DEA; arc=none smtp.client-ip=209.85.222.46
+	s=arc-20240116; t=1708397766; c=relaxed/simple;
+	bh=S1sS2CIfRu5VdScV0YoYXahlKvwg66mxp8c5UQaDWVY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aGL8GKStfucg4pibP79mp1ags4s4kaGfvqq7xQowl7R1wN9LGzfQPcyjFtzjQ5JLRO9+T5OflGXjsyZ4Gd2tL+cnl/r1nF2MIJt5CsmATQcDsJjmEW7qCWqxpy8pDlr/500HmsVFdhWlihP9YUXBmttHAIDOfC2HknrF6mUpbpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e1QCdxbO; arc=none smtp.client-ip=209.85.167.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U7h1/DEA"
-Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-7d2e007751eso2827013241.1;
-        Mon, 19 Feb 2024 15:34:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1QCdxbO"
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3bbc649c275so2754405b6e.0;
+        Mon, 19 Feb 2024 18:56:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708385665; x=1708990465; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PYfQRgerInCmwNvZqW81uhkqssL/LY3qNELwtrgooew=;
-        b=U7h1/DEADhmxMTDpEfFzwMGatEjqTjnAAFn7o61lhBuzo/Hlxt/75d96Ci2ltEgSdB
-         WkXjPxeUZvHIq9wvzZfLSOtOlWUWvPue1mqX4DI74RqaXzhDFSvb38Fd9SqvfIP8JvyY
-         1dQiKlDOHRz5xzirYRHexP2v0IRVOufGpcAEhl7sOXTbMzLR1eDPnFu7u6z6gqaTE/Py
-         wsQJVnMSg1DrNcoaHvf/gJFAW2x/JTplkkVUk7Xt9oZtuURRYVYw+hIwc7dm3YNIA0jU
-         sEeC/DK67S9U26WuXqvvEq5uXrSGF9VZSm4D+puJlGnqjDs3M9iVXLwg3JFrEzKt6c7S
-         /RoA==
+        d=gmail.com; s=20230601; t=1708397764; x=1709002564; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Ew2uLDYa+YibzlC1ysi9/XNB2ZeTVfWqOboQZAqpaQ=;
+        b=e1QCdxbOLK7h7iutY1FF5ElukJwBJ1Iw4qynejlFvb5I8HIcH5U0lCsQXRxaviSvc8
+         YCzJI5Qttx2fLIqZ4QhyEWQwfE3RtTtJM2NHR6nkcUyTwFTCdqHTNn4on4IPdbDa7HbC
+         ZauqTgnPN9i+9lRR+YWMteHhcSi7+ysYe5b30fLJs+zrcg1b6qzYC1gNxEdy+1OKLDtu
+         ymXAjPKcK9Kn/FjMHVJom7a9Vi/3RfwPX8y+4mbe/7KbIZMU1XRjhlVYRXY8NdvjnFDg
+         bW/wg9P7ug8lgtQ855R18PpRhpWnJ18kWA18AS9f+YCuGlF2ZyKE4r9koFf4NgQ36+58
+         QRjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708385665; x=1708990465;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PYfQRgerInCmwNvZqW81uhkqssL/LY3qNELwtrgooew=;
-        b=KCwSLMmC7XRaUbbk3oQKVXJVdVRVvdHrDlDkXhS+1On5ikrepQBcfqaoMssA1iwiMH
-         gLgeA+XgD76khTBxPNj7nnoAFlpOhMLhmTdV9gTcTbT2ZjWfNbvfhJcFU8RmmnNsxWrA
-         zY1n8nbrmZJqMkMVhIKaSajo/m0REJG9ehhDRIml7ey/qRfxrrfc5QJXnlhhAbCBnOEM
-         lgYh38rvSKKQUt8NeilnPL7ROdvSur+ND1OoyL6SujjLAGJqbSzvOkt7K8zVmqZd6u9a
-         V4MdmcQpsk7ti3SukSBekLEI8nXhj8n6oEdh8dPPwmZIbPGlPe+Syluw6U+YN5O2gfCd
-         z/7A==
-X-Forwarded-Encrypted: i=1; AJvYcCXCd6o2ckm+RzxT+PZQsQupbEqGmpelRB4I8NKd8YwNniGrF5Ion/ZBlPlwbIBjWWTqnq+PpBAbmuEZWJzboSPG1E2Pv3FELRg+BqbWel0CxJ7TMYnCaNyxJJ0+O03JCAOIRSN4183JJfz5
-X-Gm-Message-State: AOJu0Yx+nNHpWWxh18fmgRrRLeuKkc/0Brg4M4z/hc+wbf9Gtrge5cGM
-	vvc7M1WPtu/7DQolADMPB86lYE9hlCUNjDYEqppNRyC9kuFvzYlQhs9u8G56PhUBk8kmqQ4bSZz
-	XT2KRtFCxVoJgqcvNNAn0KsVswmA=
-X-Google-Smtp-Source: AGHT+IHwkTvyF1TswRoNzdISthd89fzuOxw7pUd6Bks5jp9D6WExL/64dz8lBAZZTYmsoQTyR5kerUTdbLJ6xL08xHE=
-X-Received: by 2002:a05:6102:a4f:b0:46d:2956:6b11 with SMTP id
- i15-20020a0561020a4f00b0046d29566b11mr14474307vss.16.1708385665377; Mon, 19
- Feb 2024 15:34:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708397764; x=1709002564;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7Ew2uLDYa+YibzlC1ysi9/XNB2ZeTVfWqOboQZAqpaQ=;
+        b=dIqapQzpFmGlR7+cWnPTu8zSTX4GHbHWVOHh4Dga8kF/w5XCRkYUpf1dcSskt5zI5j
+         0VRYzzd+tZboYcJlqQC3tE75E3GQa9K/kAY/SmtIzrc7pO9VNPxeRDUxSUNbGpoDMh4A
+         XTUT9oOH36yCM/d8opQkcjPv1I6X273GbpppoeMI8N3mLg8Lzdw8Z8CpA2R8U5zedN4j
+         BoqWoIw8vGsGhbSR9XxI8lwZ3pfi4XVyRfyo3Mj5axGZZQ+c87q3HQJvvlBZcYlm8fFN
+         SovVnlGKIQdD3+ClLLwg24mRN6xDliKx2Z/GOYZeY8NjJ1IhJlb4BPlRwFcL+rUY74I5
+         jPSA==
+X-Forwarded-Encrypted: i=1; AJvYcCW6aMStua+jyOmB98b2fLeH6yBwMro7HxmUFohOPPHE6BzhGci9wTYju2nloYMQohJcN43h9nei9ufAoJ24/X07l/Mms0jwUWXhmOrH4zszzINGnkRh6Uq5dOzRB4mJMKteZrcuaLABEB14
+X-Gm-Message-State: AOJu0Yzjvsp0wylagHbwNsxidtYUs2pZEDchDXXtUXK4VBjkqy603Pza
+	c7m6NvwqQX8gx6Ae8C1FNLCUfL9ZFrIxXTNbg8HnT7gUEZhIA87K
+X-Google-Smtp-Source: AGHT+IHVzDYuPtr1PDixjROU95D2WOpMV8YqDATlijBv/laOgNSF6wkze5o4QPBD98zajktdx5oSsw==
+X-Received: by 2002:a05:6808:1642:b0:3c0:4d21:e62a with SMTP id az2-20020a056808164200b003c04d21e62amr17385554oib.31.1708397764271;
+        Mon, 19 Feb 2024 18:56:04 -0800 (PST)
+Received: from barry-desktop.hub ([2407:7000:8942:5500:a5bd:9c11:af2b:aecf])
+        by smtp.gmail.com with ESMTPSA id j34-20020a63fc22000000b005dc1edf7371sm5500047pgi.9.2024.02.19.18.55.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 18:56:03 -0800 (PST)
+From: Barry Song <21cnbao@gmail.com>
+To: akpm@linux-foundation.org,
+	davem@davemloft.net,
+	hannes@cmpxchg.org,
+	herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org,
+	linux-mm@kvack.org,
+	nphamcs@gmail.com,
+	yosryahmed@google.com,
+	zhouchengming@bytedance.com
+Cc: chriscli@google.com,
+	chrisl@kernel.org,
+	ddstreet@ieee.org,
+	linux-kernel@vger.kernel.org,
+	sjenning@redhat.com,
+	vitaly.wool@konsulko.com,
+	Barry Song <v-songbaohua@oppo.com>
+Subject: [PATCH v4 0/3] mm/zswap & crypto/compress: remove a couple of memcpy 
+Date: Tue, 20 Feb 2024 15:55:42 +1300
+Message-Id: <20240220025545.194886-1-21cnbao@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240217045102.55339-1-21cnbao@gmail.com> <20240217045102.55339-2-21cnbao@gmail.com>
- <ZdLYE8mx0AJ7a7+t@gondor.apana.org.au> <CAGsJ_4xo02oKGX5nBvaGsSiv+omjah0A5jCGc9wJeU467V8VuQ@mail.gmail.com>
-In-Reply-To: <CAGsJ_4xo02oKGX5nBvaGsSiv+omjah0A5jCGc9wJeU467V8VuQ@mail.gmail.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Tue, 20 Feb 2024 12:34:14 +1300
-Message-ID: <CAGsJ_4zGnsD+f9+yQ0N0v=9nTJtQAUL3177vWQoSUzUOn-mYVA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] crypto: introduce acomp_is_sleepable to expose if
- comp drivers might sleep
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: akpm@linux-foundation.org, davem@davemloft.net, hannes@cmpxchg.org, 
-	linux-crypto@vger.kernel.org, linux-mm@kvack.org, nphamcs@gmail.com, 
-	yosryahmed@google.com, zhouchengming@bytedance.com, chriscli@google.com, 
-	chrisl@kernel.org, ddstreet@ieee.org, linux-kernel@vger.kernel.org, 
-	sjenning@redhat.com, vitaly.wool@konsulko.com, 
-	Barry Song <v-songbaohua@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 20, 2024 at 12:07=E2=80=AFPM Barry Song <21cnbao@gmail.com> wro=
-te:
->
-> On Mon, Feb 19, 2024 at 5:25=E2=80=AFPM Herbert Xu <herbert@gondor.apana.=
-org.au> wrote:
-> >
-> > On Sat, Feb 17, 2024 at 05:51:00PM +1300, Barry Song wrote:
-> > .
-> > > diff --git a/crypto/acompress.c b/crypto/acompress.c
-> > > index 1c682810a484..fa15df394a4c 100644
-> > > --- a/crypto/acompress.c
-> > > +++ b/crypto/acompress.c
-> > > @@ -152,6 +152,14 @@ struct crypto_acomp *crypto_alloc_acomp_node(con=
-st char *alg_name, u32 type,
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(crypto_alloc_acomp_node);
-> > >
-> > > +bool acomp_is_sleepable(struct crypto_acomp *acomp)
-> > > +{
-> > > +     struct crypto_tfm *tfm =3D crypto_acomp_tfm(acomp);
-> > > +
-> > > +     return tfm->__crt_alg->cra_type =3D=3D &crypto_acomp_type;
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(acomp_is_sleepable);
-> >
-> > Just because something is of acomp_type it doesn't mean that it's
-> > async.  You should be testing the algorithm flags.
->
-> I guess I got your point, drivers using acomp framework might actually
-> be SYNC if they don't set CRYPTO_ALG_ASYNC.
->
-> >
-> > So introduce a helper crypto_acomp_get_flags (see the similar
-> > helper crypto_skcipher_get_flags) and test it against CRYPTO_ALG_ASYNC.
->
-> On the other hand, some drivers which are actually ASYNC, are lacking
-> CRYPTO_ALG_ASYNC for example:
->
-> diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c
-> b/drivers/crypto/hisilicon/zip/zip_crypto.c
-> index c650c741a18d..94e2d66b04b6 100644
-> --- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-> +++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-> @@ -591,6 +591,7 @@ static struct acomp_alg hisi_zip_acomp_deflate =3D {
->         .base                   =3D {
->                 .cra_name               =3D "deflate",
->                 .cra_driver_name        =3D "hisi-deflate-acomp",
-> +               .cra_flags              =3D CRYPTO_ALG_ASYNC,
->                 .cra_module             =3D THIS_MODULE,
->                 .cra_priority           =3D HZIP_ALG_PRIORITY,
->                 .cra_ctxsize            =3D sizeof(struct hisi_zip_ctx),
-> diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> index dfd3baf0a8d8..91adf9d76a2e 100644
-> --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-> @@ -1916,6 +1916,7 @@ static struct acomp_alg iaa_acomp_fixed_deflate =3D=
- {
->         .base                   =3D {
->                 .cra_name               =3D "deflate",
->                 .cra_driver_name        =3D "deflate-iaa",
-> +               .cra_flags              =3D CRYPTO_ALG_ASYNC,
->                 .cra_ctxsize            =3D sizeof(struct iaa_compression=
-_ctx),
->                 .cra_module             =3D THIS_MODULE,
->                 .cra_priority           =3D IAA_ALG_PRIORITY,
-> diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-> index 574cffc90730..5b10bd075a07 100644
-> --- a/include/crypto/acompress.h
-> +++ b/include/crypto/acompress.h
-> @@ -160,6 +160,11 @@ static inline void acomp_request_set_tfm(struct
-> acomp_req *req,
->         req->base.tfm =3D crypto_acomp_tfm(tfm);
->  }
->
-> +static inline u32 crypto_acomp_get_flags(struct crypto_acomp *tfm)
-> +{
-> +       return crypto_tfm_get_flags(crypto_acomp_tfm(tfm));
-> +}
+From: Barry Song <v-songbaohua@oppo.com>
 
-This seems to be wrong. we are expecting cra_flags not crt_flags. should be
-the below?
+The patchset removes a couple of memcpy in zswap and crypto
+to improve zswap's performance.
 
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-index 574cffc90730..07bd8f6bc79a 100644
---- a/include/crypto/acompress.h
-+++ b/include/crypto/acompress.h
-@@ -160,6 +160,11 @@ static inline void acomp_request_set_tfm(struct
-acomp_req *req,
-        req->base.tfm =3D crypto_acomp_tfm(tfm);
- }
+Thanks for Chengming Zhou's test and perf data.
+Quote from Chengming,
+ I just tested these three patches on my server, found improvement in the
+ kernel build testcase on a tmpfs with zswap (lz4 + zsmalloc) enabled.
+ 
+         mm-stable 501a06fe8e4c  patched
+ real    1m38.028s               1m32.317s
+ user    19m11.482s              18m39.439s
+ sys     19m26.445s              17m5.646s
 
-+static inline u32 crypto_acomp_get_alg_flags(struct crypto_acomp *tfm)
-+{
-+       return crypto_tfm_alg_flags(crypto_acomp_tfm(tfm));
-+}
-+
- static inline struct crypto_acomp *crypto_acomp_reqtfm(struct acomp_req *r=
-eq)
- {
-        return __crypto_acomp_tfm(req->base.tfm);
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index b164da5e129e..811bfaf8b6f8 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -467,6 +467,11 @@ static inline unsigned int
-crypto_tfm_alg_blocksize(struct crypto_tfm *tfm)
-        return tfm->__crt_alg->cra_blocksize;
- }
 
-+static inline unsigned int crypto_tfm_alg_flags(struct crypto_tfm *tfm)
-+{
-+       return tfm->__crt_alg->cra_flags;
-+}
-+
- static inline unsigned int crypto_tfm_alg_alignmask(struct crypto_tfm *tfm=
-)
- {
-        return tfm->__crt_alg->cra_alignmask;
+This patchset applies to mm-unstable as recently zswap has
+lots of change.
 
-> +
->  static inline struct crypto_acomp *crypto_acomp_reqtfm(struct acomp_req =
-*req)
->  {
->         return __crypto_acomp_tfm(req->base.tfm);
->
->
-> Herbert, Is the above code what you would prefer?
->
-> >
-> > Cheers,
-> > --
-> > Email: Herbert Xu <herbert@gondor.apana.org.au>
-> > Home Page: http://gondor.apana.org.au/~herbert/
-> > PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
-Thanks
-Barry
+-v4:
+  * introduce a helper for algorithm flags according to Herbert
+  * fix cra_flags for intel and hisilicon async drivers
+
+Barry Song (3):
+  crypto: introduce crypto_acomp_get_alg_flags to expose algorithm flags
+  mm/zswap: remove the memcpy if acomp is not sleepable
+  crypto: scompress: remove memcpy if sg_nents is 1
+
+ crypto/scompress.c                         | 36 +++++++++++++++++-----
+ drivers/crypto/hisilicon/zip/zip_crypto.c  |  1 +
+ drivers/crypto/intel/iaa/iaa_crypto_main.c |  1 +
+ include/crypto/acompress.h                 |  5 +++
+ include/linux/crypto.h                     |  5 +++
+ mm/zswap.c                                 |  7 +++--
+ 6 files changed, 46 insertions(+), 9 deletions(-)
+
+-- 
+2.34.1
+
