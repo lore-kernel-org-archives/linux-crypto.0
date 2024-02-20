@@ -1,301 +1,196 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB01971B4A;
-	Tue, 20 Feb 2024 15:11:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708441871; cv=none; b=TqcFrwCmqZYHUIGboCi6CG17mWMOJ2JkdKhhzs3LannEp7VIv0urcarv6r1wv3nAOJCvjDedTlY7IDRBWMoZdDK5BgjuWdaCnj7Cc05H3/zcJN8dYEfn2u4jqLQulvhzG2sxA/QjsB9mVs30ARrpwlfQAWEYiAulNh07bcx3gYU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708441871; c=relaxed/simple;
-	bh=tgbkUpu6qTn2TmKhbD8vITvgwgVYXSpQdQG6ZCoKe1A=;
-	h=Message-Id:From:Date:Subject:To:Cc; b=UrQyPJpnhC6U9VSeSmwf4hQR7OGdMtxU3sLqVYUSpzpN+tfM1USFsh8ydJSHWRohyXyHI/STCOtScNo/frol9FqI0NSI7mr4dZMAzVzzY+FnSglbsANxsf/8WEBWpNSaT8tQgVpZnCc4caAXRbAedtigiOyiIbdxPN4sr0mNIBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id DEE25100D5877;
-	Tue, 20 Feb 2024 16:10:57 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id B126C4DD9F0; Tue, 20 Feb 2024 16:10:57 +0100 (CET)
-Message-Id: <63cc7ab17a5064756e26e50bc605e3ff8914f05a.1708439875.git.lukas@wunner.de>
-From: Lukas Wunner <lukas@wunner.de>
-Date: Tue, 20 Feb 2024 16:10:39 +0100
-Subject: [PATCH v3] X.509: Introduce scope-based x509_certificate allocation
-To: David Howells <dhowells@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Peter Zijlstra <peterz@infradead.org>, Dan Williams <dan.j.williams@intel.com>, Ard Biesheuvel <ardb@kernel.org>, Jarkko Sakkinen <jarkko@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <nathan@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C624762E0;
+	Tue, 20 Feb 2024 15:53:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708444395; cv=fail; b=haQ2wvdFY0pdsTqSjaC8ugpYvNDOh1M3mGgLDPA91lUhes79RRHYCGSlX1W1qPu/JPPsRemTrV2/g/IuCvbRL8R9NFlxx80/1/YyKCW08mxOEUvlSQwRlSKiZPreMS3M3Gwp+o7mpTlPFrzgbl8DqB1XyqPaOqTB5LVy6UDijIo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708444395; c=relaxed/simple;
+	bh=trmtpXt0zdm0Q5Xcp8sqGATMiV5Q9WOWH8NltYT+PdQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CAeZ0DI6CihyiixQ0TUMuIT1AomoqwnaqN/eY7fRa0noryrAjQQlOUy6YA15tTbiYj9PQZXKdr2ty40lgdiioC9m6KB8VwGCN+JxfKE+UpPU/QZW08QmFCwkxf4F3vkQRIG7Z+fqyYr89lrF0bHLHbtfPuChktakOMXzGX0hwMo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lKe0/fez; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lKe0/fez"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708444393; x=1739980393;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=trmtpXt0zdm0Q5Xcp8sqGATMiV5Q9WOWH8NltYT+PdQ=;
+  b=lKe0/feznJkiPTrO69XizSFceiQ4T00NezCN0ncfRZYVmJuASOpR1mrM
+   lDb0uE3qUkx9O83Uav2uX+yWxPSpa6llJOl99crlMLIcHgcC8XmqaMGbz
+   UNlWN9uaHtSpancmWJZv4vcgiM+XIf+F/LoezktqZSuQYRpiAU0P0PKab
+   /oeR78wran4Y71FEF9Y3N9ODZZZebnt21PYtM99irsWgvi+nXLIoE+OkX
+   kXyIWahHcXMTdnugkXrkeYhZ+WQZAy4o0y2A5fGEL1qW//CW2ZgOCZk5f
+   kxTin+BicIcrZiXu97CDOyc9cTOdaLE9COPJkfpfjK9n2wUTsFZ305+xv
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="2416356"
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="2416356"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 07:53:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="9479934"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Feb 2024 07:53:13 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 20 Feb 2024 07:53:12 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 20 Feb 2024 07:53:11 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 20 Feb 2024 07:53:11 -0800
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.41) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 20 Feb 2024 07:53:11 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OAFcsdUgLwIhMsH4KTmIP0cLKT4GXY2OuK7L5h8fLZWN6QQ61mGx2zEtJtxo33or2ETijkURI8oGZ2riCsTaqWHO2suzvnRHLf7koz3JFwTMmbWah39Te0fw6nwQsggzxUsgY67eZLeEtezgca7uALz3B1YtPRBnOCdTxPMPsne5K0yvJD3fVkNp34F+t3M+0WhQW/Ip2V97DjJXnSJYger5fQERJ0g2l+r8wXYOGvl7nneaUdT+fi+RoGKO1odal4S298zMCgIjIuLhw0uGX5ht+680nlinGMe0HNlJArMJWBC0fBG74GXo0tDhSIfhbXQ6SoM0/eb5fp0HdBEySA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=trmtpXt0zdm0Q5Xcp8sqGATMiV5Q9WOWH8NltYT+PdQ=;
+ b=ekWS6flWy7bHzrsxRMo4zy1UsLiJ+6C5LMGyQpHStWlOU81EXAKjW+Zi7PSst4sgM/L5JVzl241d4s5YT3bCIv6XryfgsbFcmA0pu813vNEcBs8Oom600cgSyAawtu7xwgN9QOKmyZOdRkI4SDzrBrJZILRdCqTtKpN8y89Q6SU0Xst5tuGnvhUIlGzSlw4zR5V2scHFn3F0KbdWXO+oX0u1/NogYBIXCSEjfV56+zzU3arrRiUY8X5RL5PhwtDsq3iexunYlui3+zh6vEEeeePUg0sl2gAbvUG2mqWRXs3sofAuYP4jWZ2zuU7HAbalqS6gx4ekVOkyPRmNDNxTRQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4PR11MB5502.namprd11.prod.outlook.com (2603:10b6:5:39e::23)
+ by SJ2PR11MB7453.namprd11.prod.outlook.com (2603:10b6:a03:4cb::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.30; Tue, 20 Feb
+ 2024 15:53:08 +0000
+Received: from DM4PR11MB5502.namprd11.prod.outlook.com
+ ([fe80::502d:eb38:b486:eef0]) by DM4PR11MB5502.namprd11.prod.outlook.com
+ ([fe80::502d:eb38:b486:eef0%4]) with mapi id 15.20.7292.036; Tue, 20 Feb 2024
+ 15:53:08 +0000
+From: "Zeng, Xin" <xin.zeng@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Yishai Hadas <yishaih@nvidia.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, qat-linux <qat-linux@intel.com>,
+	"Cao, Yahui" <yahui.cao@intel.com>
+Subject: RE: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Thread-Topic: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Thread-Index: AQHaVSVFJ9K0TVMQD0C9btTtb+JmirD9TRgAgAQ3vqCAAHLkgIAC42sAgAhyjxCABghogIAADukQ
+Date: Tue, 20 Feb 2024 15:53:08 +0000
+Message-ID: <DM4PR11MB5502BE3CC8BD098584F31E8D88502@DM4PR11MB5502.namprd11.prod.outlook.com>
+References: <20240201153337.4033490-1-xin.zeng@intel.com>
+ <20240201153337.4033490-11-xin.zeng@intel.com>
+ <20240206125500.GC10476@nvidia.com>
+ <DM4PR11MB550222F7A5454DF9DBEE7FEC884B2@DM4PR11MB5502.namprd11.prod.outlook.com>
+ <20240209121045.GP10476@nvidia.com>
+ <e740d9ec-6783-4777-b984-98262566974c@nvidia.com>
+ <DM4PR11MB550274B713F6AE416CDF7FDB88532@DM4PR11MB5502.namprd11.prod.outlook.com>
+ <20240220132459.GM13330@nvidia.com>
+In-Reply-To: <20240220132459.GM13330@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR11MB5502:EE_|SJ2PR11MB7453:EE_
+x-ms-office365-filtering-correlation-id: 389ad2e2-7810-4d94-98cf-08dc322c08c0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: DFyTvyLwbp/o42diJ9vHOwz0aIPI8xLg4b8Q4VP5Mx5bk5njUGFYM0QYUL0tYC6IKQpeETLB8yYR0wWdvJ3885yhynYYmW/LIve7optYT5XQbPWYeCl8DvGFFYmripJqVFngDCVAmrvu2Z4i52+yNy4PDN2E8qccB4Q3N4EYrKMD7Gne51F51yLA+OxT6Wf8bRkylCY8BIfvnds346SGwaE4C37Xcmg3DTppTSA0MElRrSbc7dOWp6EaxZ2heqEL+slYPOnfB3H/wLwo7pgCuIH4N1L0Pl/ScInidzBiyWWDCeu6rPcGbAIOLn2U4dCmOHXd+vwhPLuZ5KCiJ11RgHiPgwyVwLQJ5Fxpj5GapkGjoJwRBQDYjnRO/V4Rz9KSq8kR89GiQWQZLgdP3PgT9pBMmBaQNSaoZdio8bhNbW2XAERJCrhnp/iGnCiA9QF6viwo0tL8SJXFvuA3cYJIxA4W2dJQVHRZozqVtdoPeAg9sPUTYLJNkARVY3Vpgkro3ZExjhWVqa3HRwy+uz0bn8VJad1Katr79e6QMDhrhhuWiK9Vp72SvvE+kcrdLYPgjH4fBs7Tz8Ob8MQGN7Bo50+kRB30FGdVAAquTD3z2QhbdngU6MapxodfNnvgg57Z
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5502.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?atYyu+u3DWVdLj8cFrmvpPECYmxP0Ylfm2HJqUBs8ShAbIhneaJrLVBgWk04?=
+ =?us-ascii?Q?S3YdlxeWDSiMjmbXT2SXfR2gx2suMEpZ2Aj6E1km3T3iefsI1DaAHZuzoXey?=
+ =?us-ascii?Q?76hP3iZDGMK72puX+rWAsNYOh5EvmtoRixO5GB9dmif/b1aaScwRqBGQG4af?=
+ =?us-ascii?Q?So83O0QNg3jge77eq5/cQ6Iqvz4AAKjc8uHjUqdkQukvFzpnFyIVVZwB7pNu?=
+ =?us-ascii?Q?pneTkFkSUmqTJylqEiy+tjegxnNknlOEUbsxehnmAdy1RCUS7SqjXqlwtjDI?=
+ =?us-ascii?Q?LC+bi1YbZRrIoHhRpNnEK0G+OmKUv/yDcQyjWGX1wJZOsGNCSB2vhVWbPcj6?=
+ =?us-ascii?Q?ygw3Yl5S+Zg4qPVOcY0Ag17ZX906hCvOs/sd+p8bpL7cFtqayxJId43fBODc?=
+ =?us-ascii?Q?M+Su8TrDDeQtK38agF45PK5+FhUaXlon32tLA4iW5J5VpX0vEHJYnERjnLoV?=
+ =?us-ascii?Q?tfHNMjbpMVcSec50Mbi7uXJvQjyV8ibvCPrfZCXY9SZX8G4kny1tb1EetOz6?=
+ =?us-ascii?Q?Y1Lqh7ZO3+uAsjtmnbl0Vj9f4iu7MgXYloKi/sBaW6F+4Jbz+U0YRbr5Y1d8?=
+ =?us-ascii?Q?q6hi2H0gFRJpJwU+Tvir2nAhutWMWO/BbTn48kjeQnAR2LqWJmW6WTOi25NL?=
+ =?us-ascii?Q?TQNxeqpVrlmhh1rh3JERnpIn9HEMDzA+R/OPlIDR3sboEEnnzGN88rKWxQ/p?=
+ =?us-ascii?Q?P/VDD0Q0iqoKhxcZoFZckoiiQ4BnSlfjJ74EmnYZt2TdN4UPHa48V/djnYTx?=
+ =?us-ascii?Q?Enh67oTehVwu0QWILJwGjEnHI9tZs76f/a8C/ru0aUd9YkH2Wh8/AiAQuKP1?=
+ =?us-ascii?Q?NVTr/YjBATHv802Y6bIKVOhBkghQICWh5Z17F1IrqwP8Y8LFVMdZVwHi+/qH?=
+ =?us-ascii?Q?gH5vzHCCO6ESMKXF/HuVppDcsMV4gQp6hd2KiRCmpI46vHzC8VDwvfIzK84b?=
+ =?us-ascii?Q?6YcrVpqLesOhX44n32bfY2L7ZV+VYFTWG+vNfe2Pwy607hYyu9byLUB0LLl3?=
+ =?us-ascii?Q?W8Hz8oYSfffbEb3vrs5yuxMI6NDN2VrPbYyUAXhspnUHz2jEfb9TCy/TzLko?=
+ =?us-ascii?Q?ZHT03NiGlIJvUl1GVKR9Cnf/ICrET7dXK8Pyq1MgKzn2jYU67IoZeyvhJ+fG?=
+ =?us-ascii?Q?jsNcxhKnDjNenHxy4QQdn4+2DWf2HFgCPkI9k12zJlvA1+9Zw1RoKMIi37rS?=
+ =?us-ascii?Q?qWc3yOxpRDJjp6uuxapgqeyntO38++bMP5K7NALLOM0wvTUBfL4970ugynE8?=
+ =?us-ascii?Q?GWTDT7LK2T+UAYU+xzagcYSF0m/6SbpmGBLeEvSeXAgoS6Ei+kMG6u9FlZTO?=
+ =?us-ascii?Q?ta37Y0uq4d6KZc9YLbiAGG4ktVGBQez2FMKziXXoXyUrWDyU2ic8MlA1RLLI?=
+ =?us-ascii?Q?zUtzI7+EP2GBCcvma9XknEFQMf17a3toGacLfapmsg7Uri/EurVOqDLexCym?=
+ =?us-ascii?Q?mwaJPVKSdQmt3UrJfxkITW/+p1WUWoN6EGe5cxlMU+dkYZU1Dv8EimyDNq3Y?=
+ =?us-ascii?Q?VF5FPvjNWaQOUOa5NM0qnx13vfsm0Z38pcIlzKyAqkiJ8r4BHe4KnBRlxUHP?=
+ =?us-ascii?Q?53wCC0KEo21xzUoLL+26YNJ97aRc/Ro+xyuMTNVc?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5502.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 389ad2e2-7810-4d94-98cf-08dc322c08c0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Feb 2024 15:53:08.6304
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3GpU+nmhAaHFion+8pjcG7nbXv+NEevwd8QIGNzVpSlv4V26C+geUpyEU8w2FlSTrZmXAHrxZRQwgro/8HfsCg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7453
+X-OriginatorOrg: intel.com
 
-Add a DEFINE_FREE() clause for x509_certificate structs and use it in
-x509_cert_parse() and x509_key_preparse().  These are the only functions
-where scope-based x509_certificate allocation currently makes sense.
-A third user will be introduced with the forthcoming SPDM library
-(Security Protocol and Data Model) for PCI device authentication.
+On Tuesday, February 20, 2024 9:25 PM, Jason Gunthorpe wrote:
+> To: Zeng, Xin <xin.zeng@intel.com>
+> Cc: Yishai Hadas <yishaih@nvidia.com>; herbert@gondor.apana.org.au;
+> alex.williamson@redhat.com; shameerali.kolothum.thodi@huawei.com; Tian,
+> Kevin <kevin.tian@intel.com>; linux-crypto@vger.kernel.org;
+> kvm@vger.kernel.org; qat-linux <qat-linux@intel.com>; Cao, Yahui
+> <yahui.cao@intel.com>
+> Subject: Re: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF=
+ devices
+>=20
+> On Sat, Feb 17, 2024 at 04:20:20PM +0000, Zeng, Xin wrote:
+>=20
+> > Thanks for this information, but this flow is not clear to me why it
+> > cause deadlock. From this flow, CPU0 is not waiting for any resource
+> > held by CPU1, so after CPU0 releases mmap_lock, CPU1 can continue
+> > to run. Am I missing something?
+>=20
+> At some point it was calling copy_to_user() under the state
+> mutex. These days it doesn't.
+>=20
+> copy_to_user() would nest the mm_lock under the state mutex which is a
+> locking inversion.
+>=20
+> So I wonder if we still have this problem now that the copy_to_user()
+> is not under the mutex?
 
-Unlike most other DEFINE_FREE() clauses, this one checks for IS_ERR()
-instead of NULL before calling x509_free_certificate() at end of scope.
-That's because the "constructor" of x509_certificate structs,
-x509_cert_parse(), returns a valid pointer or an ERR_PTR(), but never
-NULL.
+In protocol v2, we still have the scenario in precopy_ioctl where copy_to_u=
+ser is
+called under state_mutex.
 
-I've compared the Assembler output before/after and they are identical,
-save for the fact that gcc-12 always generates two return paths when
-__cleanup() is used, one for the success case and one for the error case.
-
-In x509_cert_parse(), add a hint for the compiler that kzalloc() never
-returns an ERR_PTR().  Otherwise the compiler adds a gratuitous IS_ERR()
-check on return.  Introduce a handy assume() macro for this which can be
-re-used elsewhere in the kernel to provide hints for the compiler.
-
-Suggested-by: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Link: https://lore.kernel.org/all/20231003153937.000034ca@Huawei.com/
-Link: https://lwn.net/Articles/934679/
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
----
-Changes v2 -> v3:
- * Add curly braces to "do { } while" loop in assume() macro (Andy).
- * Rephrase commit message: Drop first paragraph, use "Link:" tag for
-   LWN article (Jarkko).
-
-Link to v2:
- https://lore.kernel.org/all/4143b15418c4ecf87ddeceb36813943c3ede17aa.1707734526.git.lukas@wunner.de/
-
- crypto/asymmetric_keys/x509_cert_parser.c | 43 ++++++++++++-------------------
- crypto/asymmetric_keys/x509_parser.h      |  3 +++
- crypto/asymmetric_keys/x509_public_key.c  | 31 +++++++---------------
- include/linux/compiler.h                  |  2 ++
- 4 files changed, 30 insertions(+), 49 deletions(-)
-
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index 487204d..aeffbf6 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -60,24 +60,24 @@ void x509_free_certificate(struct x509_certificate *cert)
-  */
- struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
- {
--	struct x509_certificate *cert;
--	struct x509_parse_context *ctx;
-+	struct x509_certificate *cert __free(x509_free_certificate);
-+	struct x509_parse_context *ctx __free(kfree) = NULL;
- 	struct asymmetric_key_id *kid;
- 	long ret;
- 
--	ret = -ENOMEM;
- 	cert = kzalloc(sizeof(struct x509_certificate), GFP_KERNEL);
-+	assume(!IS_ERR(cert)); /* Avoid gratuitous IS_ERR() check on return */
- 	if (!cert)
--		goto error_no_cert;
-+		return ERR_PTR(-ENOMEM);
- 	cert->pub = kzalloc(sizeof(struct public_key), GFP_KERNEL);
- 	if (!cert->pub)
--		goto error_no_ctx;
-+		return ERR_PTR(-ENOMEM);
- 	cert->sig = kzalloc(sizeof(struct public_key_signature), GFP_KERNEL);
- 	if (!cert->sig)
--		goto error_no_ctx;
-+		return ERR_PTR(-ENOMEM);
- 	ctx = kzalloc(sizeof(struct x509_parse_context), GFP_KERNEL);
- 	if (!ctx)
--		goto error_no_ctx;
-+		return ERR_PTR(-ENOMEM);
- 
- 	ctx->cert = cert;
- 	ctx->data = (unsigned long)data;
-@@ -85,7 +85,7 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
- 	/* Attempt to decode the certificate */
- 	ret = asn1_ber_decoder(&x509_decoder, ctx, data, datalen);
- 	if (ret < 0)
--		goto error_decode;
-+		return ERR_PTR(ret);
- 
- 	/* Decode the AuthorityKeyIdentifier */
- 	if (ctx->raw_akid) {
-@@ -95,20 +95,19 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
- 				       ctx->raw_akid, ctx->raw_akid_size);
- 		if (ret < 0) {
- 			pr_warn("Couldn't decode AuthKeyIdentifier\n");
--			goto error_decode;
-+			return ERR_PTR(ret);
- 		}
- 	}
- 
--	ret = -ENOMEM;
- 	cert->pub->key = kmemdup(ctx->key, ctx->key_size, GFP_KERNEL);
- 	if (!cert->pub->key)
--		goto error_decode;
-+		return ERR_PTR(-ENOMEM);
- 
- 	cert->pub->keylen = ctx->key_size;
- 
- 	cert->pub->params = kmemdup(ctx->params, ctx->params_size, GFP_KERNEL);
- 	if (!cert->pub->params)
--		goto error_decode;
-+		return ERR_PTR(-ENOMEM);
- 
- 	cert->pub->paramlen = ctx->params_size;
- 	cert->pub->algo = ctx->key_algo;
-@@ -116,33 +115,23 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
- 	/* Grab the signature bits */
- 	ret = x509_get_sig_params(cert);
- 	if (ret < 0)
--		goto error_decode;
-+		return ERR_PTR(ret);
- 
- 	/* Generate cert issuer + serial number key ID */
- 	kid = asymmetric_key_generate_id(cert->raw_serial,
- 					 cert->raw_serial_size,
- 					 cert->raw_issuer,
- 					 cert->raw_issuer_size);
--	if (IS_ERR(kid)) {
--		ret = PTR_ERR(kid);
--		goto error_decode;
--	}
-+	if (IS_ERR(kid))
-+		return ERR_CAST(kid);
- 	cert->id = kid;
- 
- 	/* Detect self-signed certificates */
- 	ret = x509_check_for_self_signed(cert);
- 	if (ret < 0)
--		goto error_decode;
--
--	kfree(ctx);
--	return cert;
-+		return ERR_PTR(ret);
- 
--error_decode:
--	kfree(ctx);
--error_no_ctx:
--	x509_free_certificate(cert);
--error_no_cert:
--	return ERR_PTR(ret);
-+	return_ptr(cert);
- }
- EXPORT_SYMBOL_GPL(x509_cert_parse);
- 
-diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
-index 97a886c..0688c22 100644
---- a/crypto/asymmetric_keys/x509_parser.h
-+++ b/crypto/asymmetric_keys/x509_parser.h
-@@ -5,6 +5,7 @@
-  * Written by David Howells (dhowells@redhat.com)
-  */
- 
-+#include <linux/cleanup.h>
- #include <linux/time.h>
- #include <crypto/public_key.h>
- #include <keys/asymmetric-type.h>
-@@ -44,6 +45,8 @@ struct x509_certificate {
-  * x509_cert_parser.c
-  */
- extern void x509_free_certificate(struct x509_certificate *cert);
-+DEFINE_FREE(x509_free_certificate, struct x509_certificate *,
-+	    if (!IS_ERR(_T)) x509_free_certificate(_T))
- extern struct x509_certificate *x509_cert_parse(const void *data, size_t datalen);
- extern int x509_decode_time(time64_t *_t,  size_t hdrlen,
- 			    unsigned char tag,
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 6a4f00b..00ac715 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -161,12 +161,11 @@ int x509_check_for_self_signed(struct x509_certificate *cert)
-  */
- static int x509_key_preparse(struct key_preparsed_payload *prep)
- {
--	struct asymmetric_key_ids *kids;
--	struct x509_certificate *cert;
-+	struct x509_certificate *cert __free(x509_free_certificate);
-+	struct asymmetric_key_ids *kids __free(kfree) = NULL;
-+	char *p, *desc __free(kfree) = NULL;
- 	const char *q;
- 	size_t srlen, sulen;
--	char *desc = NULL, *p;
--	int ret;
- 
- 	cert = x509_cert_parse(prep->data, prep->datalen);
- 	if (IS_ERR(cert))
-@@ -188,9 +187,8 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 	}
- 
- 	/* Don't permit addition of blacklisted keys */
--	ret = -EKEYREJECTED;
- 	if (cert->blacklisted)
--		goto error_free_cert;
-+		return -EKEYREJECTED;
- 
- 	/* Propose a description */
- 	sulen = strlen(cert->subject);
-@@ -202,10 +200,9 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 		q = cert->raw_serial;
- 	}
- 
--	ret = -ENOMEM;
- 	desc = kmalloc(sulen + 2 + srlen * 2 + 1, GFP_KERNEL);
- 	if (!desc)
--		goto error_free_cert;
-+		return -ENOMEM;
- 	p = memcpy(desc, cert->subject, sulen);
- 	p += sulen;
- 	*p++ = ':';
-@@ -215,16 +212,14 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 
- 	kids = kmalloc(sizeof(struct asymmetric_key_ids), GFP_KERNEL);
- 	if (!kids)
--		goto error_free_desc;
-+		return -ENOMEM;
- 	kids->id[0] = cert->id;
- 	kids->id[1] = cert->skid;
- 	kids->id[2] = asymmetric_key_generate_id(cert->raw_subject,
- 						 cert->raw_subject_size,
- 						 "", 0);
--	if (IS_ERR(kids->id[2])) {
--		ret = PTR_ERR(kids->id[2]);
--		goto error_free_kids;
--	}
-+	if (IS_ERR(kids->id[2]))
-+		return PTR_ERR(kids->id[2]);
- 
- 	/* We're pinning the module by being linked against it */
- 	__module_get(public_key_subtype.owner);
-@@ -242,15 +237,7 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 	cert->sig = NULL;
- 	desc = NULL;
- 	kids = NULL;
--	ret = 0;
--
--error_free_kids:
--	kfree(kids);
--error_free_desc:
--	kfree(desc);
--error_free_cert:
--	x509_free_certificate(cert);
--	return ret;
-+	return 0;
- }
- 
- static struct asymmetric_key_parser x509_key_parser = {
-diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-index bb1339c..aee74ba 100644
---- a/include/linux/compiler.h
-+++ b/include/linux/compiler.h
-@@ -139,6 +139,8 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
- } while (0)
- #endif
- 
-+#define assume(cond) do { if (!(cond)) __builtin_unreachable(); } while (0)
-+
- /*
-  * KENTRY - kernel entry point
-  * This can be used to annotate symbols (functions or data) that are used
--- 
-2.43.0
+Thanks,
+Xin
 
