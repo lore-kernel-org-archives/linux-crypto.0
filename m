@@ -1,145 +1,262 @@
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2083.outbound.protection.outlook.com [40.107.96.83])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CACEA6A00F;
-	Tue, 20 Feb 2024 13:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708435505; cv=fail; b=dWc5lnKPnTOnG1iRAxe+RMKBGih0+IiHYGKV7NXY412c/Hqs7mC52ax6KEFjabKc2OoHifi+sxtUQtRZ9Z54nS9OqEzdU6Waegar9DNjUIFbKj9azFS5vhtUlkfaLR+ls0zm4rqjvbiqaDHu4NDV+xbxSPfgFThwXrZT6yH4+kc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708435505; c=relaxed/simple;
-	bh=Z6OXxAi4QoRBly2N3j9a5s82VKFbEenW/df80n7xQ6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Gud4yyMICI4z+fcQIuZv3CeJLDhV/Eo1oDo4hjkEgoqLG3k1Ih2FDc9p+9NQyRkssRp3Ptrurgrqd44I0cQzWLhwWZq6Gn+uJAOvNQ/+a4wUz35Jf0k5Jb59RZnkhEl908FRPoI+va1r5j1gu+P313SON+JLxK1fNCdRHHD4HwM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qjJLMm7x; arc=fail smtp.client-ip=40.107.96.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qjJLMm7x"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZG8UmAahMp7HpMIkxVPN3s/C+IC9nK4XNz+nN3qEVZ2ZMihRy14vag9SPrCjKdh9eiQjxvYs7/DA0aieD+168FfH85n4am9pxhM46NRX0ic1Yr9fuYvMbCPX/wqnl0KsQYML2HbU1zCTpvSyyyvV5ch5pSy4q40LzpZLfBh++WDOIYeaEIvToRZ31ytFeTvRYTz+abL6BgJXnmfnnA+Q2E1Cq8t4XUqeZnHllcIbwG95876zf2EA5ljc76cqDU+Yg+1SV4AiZ05v3ZfO5lIJBoz3bVt+7MMzXFJnFAm8K8E7TZEl+hf+lDbdKjI9KX3lJcXhkNmDo39jsrUmhi/sfQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oNg335CJfsyI/rCBbmKlHwQjljN7i5TzGqwrjwBpSgM=;
- b=M6BsGXvE1u+h5Fp92LLsizsRKuu08l6K+V2vgdyicXv3rtIL6reFr3sxDKBzKuUW9ybAfpmnVV2DryvymYCaBkWLMcO6ClGd9k6dVaZAzoMaWdHgQ3WFFj1KYN2hRxMU0Dp1dUwKKhFhrETwKdKxy+jbME4bHETJfFZoAQFQ3ieNp9AQlKxF33GUnNV7B1qZHTajIncPCwK68HiCjDnGHufyuTpgcB6KUYwOGkgRNRciUxJtX2gArFlcqplAm2Pat3Uj69wgUsUj114SlOMtSaSaF1hAysXeDYI+DFGaTLyb2MLDXuPzO1bcG8428B3LrZ/75KlTYipmF3xUATxVvg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oNg335CJfsyI/rCBbmKlHwQjljN7i5TzGqwrjwBpSgM=;
- b=qjJLMm7xr7XVKiQZVb7pnvWPUXNQh/zXIjg30gCMaU0ROToAhHYaxm+KCmMeJ4ScXaJpEyKbI4l23mDQvhj53SmSeKpZnZ8L9IgPCbW2AGfsmoGO7w6X7Iji9kZu5vL9Ct8UmJ5nIa+euC/x29kRSMseWw++arKhi3dyO2MW0Ioy6yPCUdOSwJXAUfwHFDw/FqU5zTYkHRYxoAmLmQpMwq0wvFUmj0oTvKLlcNKdnJUOVUglibjHiDV2g7EJQX6gCih3Hfl/rVfBPOJNPw0oyOe14KWT6CZlbgO90wsxwnHoU50+LwPB/FXDu0L5O9899v4fnUSiV7fStix6t1cuVg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SN7PR12MB6767.namprd12.prod.outlook.com (2603:10b6:806:269::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.19; Tue, 20 Feb
- 2024 13:25:00 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::96dd:1160:6472:9873]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::96dd:1160:6472:9873%6]) with mapi id 15.20.7316.018; Tue, 20 Feb 2024
- 13:25:00 +0000
-Date: Tue, 20 Feb 2024 09:24:59 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: "Zeng, Xin" <xin.zeng@intel.com>
-Cc: Yishai Hadas <yishaih@nvidia.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
-	"Tian, Kevin" <kevin.tian@intel.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	qat-linux <qat-linux@intel.com>, "Cao, Yahui" <yahui.cao@intel.com>
-Subject: Re: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-Message-ID: <20240220132459.GM13330@nvidia.com>
-References: <20240201153337.4033490-1-xin.zeng@intel.com>
- <20240201153337.4033490-11-xin.zeng@intel.com>
- <20240206125500.GC10476@nvidia.com>
- <DM4PR11MB550222F7A5454DF9DBEE7FEC884B2@DM4PR11MB5502.namprd11.prod.outlook.com>
- <20240209121045.GP10476@nvidia.com>
- <e740d9ec-6783-4777-b984-98262566974c@nvidia.com>
- <DM4PR11MB550274B713F6AE416CDF7FDB88532@DM4PR11MB5502.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM4PR11MB550274B713F6AE416CDF7FDB88532@DM4PR11MB5502.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL1PR13CA0321.namprd13.prod.outlook.com
- (2603:10b6:208:2c1::26) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEB62C6AA
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Feb 2024 14:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708440141; cv=none; b=tBpXJ9LDEZWl0Uy+PwRUtvWerqkaRjHk8p410Dy/oLXJIvHHDFtGMhc2wf5dlDUJNm3BlIhF0rPnKHSwU83ptJLetN7vHCCCdD+EceFeZ73UJqMP26v0H8V+RZGpiJAT3SQlWUg6ctmUA5q1gJsrFBo/vW9n/0KLUvFY5uH9RZQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708440141; c=relaxed/simple;
+	bh=/j9TSxsg0U2CWkDn+jqQtyXZfCYVcLD52vIC3gDqNsU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Ns7E1H+vD2A2eaob91tZgpdRqSY0x9sWQ4vK2uvgCvx5pGpiHelT/o5VHzNYmWNSa/6k+v6QYtdDo78AFVumDm7InQv6j2MdiSImtv0I6sCxFfcQ7QaSynqIf3rKDxj1KSoQtGJyftAZX6TN3himVgkwySsetOjWKvtunSO4TJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-365256f2efcso27222185ab.0
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Feb 2024 06:42:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708440138; x=1709044938;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Gsk7rpBiwMjo/yvd4RdYag7s3UmdrA6atoOI+6+UT7E=;
+        b=WQKSF4MzQGTzupIm4qb3oWsjdRvZ3xgYcYyB9zE2cEODYEk+pm0EP2kvJARRHTyJFl
+         OCTMMXz3UNUNeFvAK9DlA85dOpWmw5k03oX1CAX3ibXsBXFnAAygHl2XO+AhmgK8V/Qk
+         55m84cgcbQlpWDRDjw5ZFRcta/TA5SGbWwP0FVeDTZ+V8SRei2ccVR6Z/Sx5Qm10NBc3
+         K8HyDVGSAbGWMOkyuomxeYgNN4QXJsAnFMrBeWjnW+cmnSaIgiH975VWK+jARAhqq67i
+         OoJjmRaOrTR8QAP1mdvFBIMVUcFINgBfDQqzTShm68EwX8ftWMupjgIDFBq+krzYFFCB
+         6LYA==
+X-Forwarded-Encrypted: i=1; AJvYcCUnmDXCQbYyUorC7YZpwapf2HRNM4x51wCrvsrHBa1e9kek/zTfxPWM7id1iw73BlwTi6WMwc4dIzaAYPTYLw8JqI2JAEyv7ZE+lmOv
+X-Gm-Message-State: AOJu0YxG6fcuzKmJqUWvKoN0CrBL38AC19LvVh2w+DLhgyekkgceT0vg
+	drvnV7obFQzUTCtWpOxWpTtDrgVg1HkofrRTGRcbdDWxpZ3FTQbG+fvbsN3zoEI3G3L3vvNH+Ce
+	qy6WFTYK+09Iy3Q6ziCAbNtky3LOYI4B08h1XHKc9gD0N0OIrpXjOuOc=
+X-Google-Smtp-Source: AGHT+IE/K3YomCc3f3WamjoH8Nr2N1ValaVP3z3F0IOQHHYxAui57mX3HA+w8rlCFP3OZ0k1AC9niZYZbH/GZquWm6BEc1TB3bsd
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SN7PR12MB6767:EE_
-X-MS-Office365-Filtering-Correlation-Id: cbc4f465-d323-421b-ed4b-08dc321756dd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	nHtpgBatBgo2LM8Muukwe2SjjTzB3+U20SWwV51YP22gNDfwZfzODo3fQA8vQMGgYJOnYRPWXpNsuM0sor4UQzv3qTVJVHSTvDjD62pLQGmgmWn35dG+MeU9LXOmDreUN8JXDJAD9BX9N6QnAPffWB7wCXPiGReDoIMXehL9e965k513skTZzkdOtRlOkZEq4BatG3K2tBjwLcXIRkg7qV6ugdmvarfkOLHoVWxL4BBIfsvYZmD28DbsGbj/FyxGBIqDEDvVH3onUxhTa7DWEVhr3ryIu9YLPZFsiuyI3J42FU537v5+0qlEEVU+DYUulVnxUSzmmm/s5u/LEV5n6xImAn0FDRzH3NZzhtRVv3B1A5uTc1fcmpe2wPMyuJFqmBaJq1/aGHmZ98eVCVOhZNINZvDlzci4bnZznSTaHNg1X4W5+rCnbQkMMPHOr+m1LkZkb8QEFcejg0R904UBVhQg2AuXKUKC/rcSAqJpvnc4Y6GokrdlmauVBoPvwEs673bI3nL6RsmyL4AOy1fXkoL9CoknGS/NirDx34YT3Nw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?RkGLZucmsippcEPjnfHhMmkHIZFQQ3wSkoUQF3o2ukPT6X7fupEpUoIzlN0g?=
- =?us-ascii?Q?0r+wmDVdtgJVN1dfooWQmDf9BqmSJUN1Qa6zncmXyezAKOtfELf2wP3CSbrT?=
- =?us-ascii?Q?idwXoP5yyE5b8eX+coB+I5bp/tdP7/Fr2vXXWXzTDw3e+EpkSRCLOaqyiCw+?=
- =?us-ascii?Q?z0fbeqzhO/RAxNy2L9+WYesU7mDZraqoJ0DojeGX4fOTrtsaQ/x7VeBP8NtY?=
- =?us-ascii?Q?qVMcE/WmnyeZmUUCGYNCyz7IimH6y5BxYbYr9S2E5R2cLzXw0zd+9fSTUjkS?=
- =?us-ascii?Q?rX1Wt+aJwfAZVUJDwuOr3bvXqZPTyx2VC0Evz97LUjTFkrbN1jKcz4RAAWho?=
- =?us-ascii?Q?Zo5ijz2Hrh6FQm6DNAG3+ZrKrLEtCbadQPweVDZA5AEA+Twm3NPWIUxkkPbP?=
- =?us-ascii?Q?a7mCFxc6brrqg82RMKZIPWlb+JbfuGKKnmb4/qOFG8z2eqveDo1bSy/s0Jsr?=
- =?us-ascii?Q?tr2TyX+ravs10Tp98S1wsU8wqlL2ShmaMvLvW8FHSdxxWWw+bTgH80fA23vv?=
- =?us-ascii?Q?Gx6yWVPIiAEqFuanQxgSfpqYcfhATGMdxMfvH//jVU/cId1lDZ/wlYsQ/27S?=
- =?us-ascii?Q?NmJ6iArWXRkVM2Ox/26tPGo/gicNxauwfyh2euhs9bNltV160e1rQ+Vl53Gm?=
- =?us-ascii?Q?vMoX7QfFXgm23TAGux60DR7c0b5/e9M92OLB5A2cgOep644FpZ9WYl7C9yPC?=
- =?us-ascii?Q?iFv5ZwmvwXyv+oSqSu1zrkh47WCbZw/oqcVqxyIqVHQq2vtwpW0DfkHpUDQr?=
- =?us-ascii?Q?eoDEK8OZodcoJwUj8v+vIp5NvSVhpUn9unQX2LLHRNIFQ99I9zNDqrdwNwP+?=
- =?us-ascii?Q?elamr3T3qVImCpSwFuste8ZUy4dzEZXqFsB09rGwhR5TK5kJZlDQ6ERN2Tyw?=
- =?us-ascii?Q?gmGgBDuJCKw7S/N/+Ir6MkfnWDw+KNEAkXkmU2rXLGH+hRAMrQe2cjYo0ACc?=
- =?us-ascii?Q?afTOug8SNFopxFj/P3+1XUr5N5UC9pZaNowpik5bujnCs28KMDVDNKJd5tau?=
- =?us-ascii?Q?ZtxUT3qbW+iAEngJgueMDCbSFx/l/ehg4dQGVu0liR607NRLjCKBrAQ1Yx0a?=
- =?us-ascii?Q?qUTTNAw6SDPTtPg45lXUnYvyynCsUiINJipNQ3PKbLeQdKLBVmOd/Eb7/Yzj?=
- =?us-ascii?Q?ngIHax2U/OXQ/H8dvGTyun2FKn/S8MOWw0nYdDASCSBugy17+CMbxlUibsgk?=
- =?us-ascii?Q?+PvVRK+eFxeLgzLb/uxK8z37pfyTFTScLBGz+Ki+9y11rb2bAC8PiOCRkhUO?=
- =?us-ascii?Q?Z2LSPV5VVLYS845JpRobnsKeuazJK5CmoqrXbgmlcEpoCfuED8AQgThmyyP5?=
- =?us-ascii?Q?FZYYGYB90nu0D2YlC0XP9sYOU0+etMBMydJBNyGLIhHWIKW4dFzQDpoelgFn?=
- =?us-ascii?Q?i5xrOmhtybNHiGvWngKAMKiJB67G7f+HHx+RBywLSADldsHXqWXrbINnyI8w?=
- =?us-ascii?Q?DIeSqpC7cNtz0Uc/KcuXIgy3QecYm+/HTXxOrv6o+hD93k0VYK+XFrR2ZP9n?=
- =?us-ascii?Q?xhDpdJh3QNtRyUVRLYOXDQCySusl6u3wowOrfC2G9xBJEp8zcxKoZ/e0Ispa?=
- =?us-ascii?Q?7vFCU73V96kDCNK9zfVIWIPmYR9+tP/zEj4PRJcf?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cbc4f465-d323-421b-ed4b-08dc321756dd
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 13:25:00.3952
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dUT+zQw+Y4R9wlLdTjKRzh/oug6jm2YXHaE9Inr6TxApVH8bxb03+W1Fxuh57472
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6767
+X-Received: by 2002:a05:6e02:3710:b0:363:9176:ca06 with SMTP id
+ ck16-20020a056e02371000b003639176ca06mr1368561ilb.2.1708440138805; Tue, 20
+ Feb 2024 06:42:18 -0800 (PST)
+Date: Tue, 20 Feb 2024 06:42:18 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000097f7f90611d1370c@google.com>
+Subject: [syzbot] [crypto?] KMSAN: uninit-value in des3_ede_decrypt
+From: syzbot <syzbot+b90b904ef6bdfdafec1d@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Feb 17, 2024 at 04:20:20PM +0000, Zeng, Xin wrote:
+Hello,
 
-> Thanks for this information, but this flow is not clear to me why it 
-> cause deadlock. From this flow, CPU0 is not waiting for any resource
-> held by CPU1, so after CPU0 releases mmap_lock, CPU1 can continue
-> to run. Am I missing something?
+syzbot found the following issue on:
 
-At some point it was calling copy_to_user() under the state
-mutex. These days it doesn't.
+HEAD commit:    4f5e5092fdbf Merge tag 'net-6.8-rc5' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1679e7b2180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e3dd779fba027968
+dashboard link: https://syzkaller.appspot.com/bug?extid=b90b904ef6bdfdafec1d
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-copy_to_user() would nest the mm_lock under the state mutex which is a
-locking inversion.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-So I wonder if we still have this problem now that the copy_to_user()
-is not under the mutex?
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/34924e0466d4/disk-4f5e5092.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/29d0b1935c61/vmlinux-4f5e5092.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2e033c3d8679/bzImage-4f5e5092.xz
 
-Jason
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b90b904ef6bdfdafec1d@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in des3_ede_decrypt+0x845/0x19a0 lib/crypto/des.c:884
+ des3_ede_decrypt+0x845/0x19a0 lib/crypto/des.c:884
+ crypto_des3_ede_decrypt+0x32/0x40 crypto/des_generic.c:82
+ crypto_ecb_crypt crypto/ecb.c:23 [inline]
+ crypto_ecb_decrypt2+0x18b/0x2f0 crypto/ecb.c:51
+ crypto_lskcipher_crypt+0x66d/0x750 crypto/lskcipher.c:160
+ crypto_lskcipher_decrypt+0x82/0xb0 crypto/lskcipher.c:194
+ crypto_cbc_decrypt_inplace crypto/cbc.c:108 [inline]
+ crypto_cbc_decrypt+0x4df/0x8e0 crypto/cbc.c:131
+ crypto_lskcipher_crypt_sg+0x43f/0x930 crypto/lskcipher.c:229
+ crypto_lskcipher_decrypt_sg+0x8a/0xc0 crypto/lskcipher.c:258
+ crypto_skcipher_decrypt+0x10d/0x1c0 crypto/skcipher.c:693
+ cts_cbc_decrypt+0x51b/0x720 crypto/cts.c:219
+ crypto_cts_decrypt+0x77f/0x9b0 crypto/cts.c:280
+ crypto_skcipher_decrypt+0x189/0x1c0 crypto/skcipher.c:695
+ _skcipher_recvmsg crypto/algif_skcipher.c:199 [inline]
+ skcipher_recvmsg+0x1691/0x2190 crypto/algif_skcipher.c:221
+ sock_recvmsg_nosec net/socket.c:1046 [inline]
+ sock_recvmsg net/socket.c:1068 [inline]
+ ____sys_recvmsg+0x283/0x7f0 net/socket.c:2803
+ ___sys_recvmsg+0x223/0x840 net/socket.c:2845
+ do_recvmmsg+0x4fc/0xfd0 net/socket.c:2939
+ __sys_recvmmsg net/socket.c:3018 [inline]
+ __do_sys_recvmmsg net/socket.c:3041 [inline]
+ __se_sys_recvmmsg net/socket.c:3034 [inline]
+ __x64_sys_recvmmsg+0x397/0x490 net/socket.c:3034
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was stored to memory at:
+ memcpy_dir crypto/scatterwalk.c:23 [inline]
+ scatterwalk_copychunks crypto/scatterwalk.c:38 [inline]
+ scatterwalk_map_and_copy+0x6dc/0x9a0 crypto/scatterwalk.c:67
+ cts_cbc_decrypt+0x3e2/0x720 crypto/cts.c:211
+ crypto_cts_decrypt+0x77f/0x9b0 crypto/cts.c:280
+ crypto_skcipher_decrypt+0x189/0x1c0 crypto/skcipher.c:695
+ _skcipher_recvmsg crypto/algif_skcipher.c:199 [inline]
+ skcipher_recvmsg+0x1691/0x2190 crypto/algif_skcipher.c:221
+ sock_recvmsg_nosec net/socket.c:1046 [inline]
+ sock_recvmsg net/socket.c:1068 [inline]
+ ____sys_recvmsg+0x283/0x7f0 net/socket.c:2803
+ ___sys_recvmsg+0x223/0x840 net/socket.c:2845
+ do_recvmmsg+0x4fc/0xfd0 net/socket.c:2939
+ __sys_recvmmsg net/socket.c:3018 [inline]
+ __do_sys_recvmmsg net/socket.c:3041 [inline]
+ __se_sys_recvmmsg net/socket.c:3034 [inline]
+ __x64_sys_recvmmsg+0x397/0x490 net/socket.c:3034
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was stored to memory at:
+ cts_cbc_decrypt+0x3a3/0x720 crypto/cts.c:208
+ crypto_cts_decrypt+0x77f/0x9b0 crypto/cts.c:280
+ crypto_skcipher_decrypt+0x189/0x1c0 crypto/skcipher.c:695
+ _skcipher_recvmsg crypto/algif_skcipher.c:199 [inline]
+ skcipher_recvmsg+0x1691/0x2190 crypto/algif_skcipher.c:221
+ sock_recvmsg_nosec net/socket.c:1046 [inline]
+ sock_recvmsg net/socket.c:1068 [inline]
+ ____sys_recvmsg+0x283/0x7f0 net/socket.c:2803
+ ___sys_recvmsg+0x223/0x840 net/socket.c:2845
+ do_recvmmsg+0x4fc/0xfd0 net/socket.c:2939
+ __sys_recvmmsg net/socket.c:3018 [inline]
+ __do_sys_recvmmsg net/socket.c:3041 [inline]
+ __se_sys_recvmmsg net/socket.c:3034 [inline]
+ __x64_sys_recvmmsg+0x397/0x490 net/socket.c:3034
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was stored to memory at:
+ __crypto_xor+0x171/0x1310 lib/crypto/utils.c:45
+ crypto_xor include/crypto/utils.h:31 [inline]
+ cts_cbc_decrypt+0x2da/0x720 crypto/cts.c:199
+ crypto_cts_decrypt+0x77f/0x9b0 crypto/cts.c:280
+ crypto_skcipher_decrypt+0x189/0x1c0 crypto/skcipher.c:695
+ _skcipher_recvmsg crypto/algif_skcipher.c:199 [inline]
+ skcipher_recvmsg+0x1691/0x2190 crypto/algif_skcipher.c:221
+ sock_recvmsg_nosec net/socket.c:1046 [inline]
+ sock_recvmsg net/socket.c:1068 [inline]
+ ____sys_recvmsg+0x283/0x7f0 net/socket.c:2803
+ ___sys_recvmsg+0x223/0x840 net/socket.c:2845
+ do_recvmmsg+0x4fc/0xfd0 net/socket.c:2939
+ __sys_recvmmsg net/socket.c:3018 [inline]
+ __do_sys_recvmmsg net/socket.c:3041 [inline]
+ __se_sys_recvmmsg net/socket.c:3034 [inline]
+ __x64_sys_recvmmsg+0x397/0x490 net/socket.c:3034
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was stored to memory at:
+ memcpy_dir crypto/scatterwalk.c:23 [inline]
+ scatterwalk_copychunks crypto/scatterwalk.c:38 [inline]
+ scatterwalk_map_and_copy+0x6dc/0x9a0 crypto/scatterwalk.c:67
+ cts_cbc_decrypt+0x1b9/0x720 crypto/cts.c:197
+ crypto_cts_decrypt+0x77f/0x9b0 crypto/cts.c:280
+ crypto_skcipher_decrypt+0x189/0x1c0 crypto/skcipher.c:695
+ _skcipher_recvmsg crypto/algif_skcipher.c:199 [inline]
+ skcipher_recvmsg+0x1691/0x2190 crypto/algif_skcipher.c:221
+ sock_recvmsg_nosec net/socket.c:1046 [inline]
+ sock_recvmsg net/socket.c:1068 [inline]
+ ____sys_recvmsg+0x283/0x7f0 net/socket.c:2803
+ ___sys_recvmsg+0x223/0x840 net/socket.c:2845
+ do_recvmmsg+0x4fc/0xfd0 net/socket.c:2939
+ __sys_recvmmsg net/socket.c:3018 [inline]
+ __do_sys_recvmmsg net/socket.c:3041 [inline]
+ __se_sys_recvmmsg net/socket.c:3034 [inline]
+ __x64_sys_recvmmsg+0x397/0x490 net/socket.c:3034
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was stored to memory at:
+ __crypto_xor+0x171/0x1310 lib/crypto/utils.c:45
+ crypto_xor include/crypto/utils.h:31 [inline]
+ crypto_cbc_decrypt_segment crypto/cbc.c:81 [inline]
+ crypto_cbc_decrypt+0x2b1/0x8e0 crypto/cbc.c:133
+ crypto_lskcipher_crypt_sg+0x43f/0x930 crypto/lskcipher.c:229
+ crypto_lskcipher_decrypt_sg+0x8a/0xc0 crypto/lskcipher.c:258
+ crypto_skcipher_decrypt+0x10d/0x1c0 crypto/skcipher.c:693
+ crypto_cts_decrypt+0x704/0x9b0 crypto/cts.c:279
+ crypto_skcipher_decrypt+0x189/0x1c0 crypto/skcipher.c:695
+ _skcipher_recvmsg crypto/algif_skcipher.c:199 [inline]
+ skcipher_recvmsg+0x1691/0x2190 crypto/algif_skcipher.c:221
+ sock_recvmsg_nosec net/socket.c:1046 [inline]
+ sock_recvmsg net/socket.c:1068 [inline]
+ ____sys_recvmsg+0x283/0x7f0 net/socket.c:2803
+ ___sys_recvmsg+0x223/0x840 net/socket.c:2845
+ do_recvmmsg+0x4fc/0xfd0 net/socket.c:2939
+ __sys_recvmmsg net/socket.c:3018 [inline]
+ __do_sys_recvmmsg net/socket.c:3041 [inline]
+ __se_sys_recvmmsg net/socket.c:3034 [inline]
+ __x64_sys_recvmmsg+0x397/0x490 net/socket.c:3034
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3819 [inline]
+ slab_alloc_node mm/slub.c:3860 [inline]
+ __do_kmalloc_node mm/slub.c:3980 [inline]
+ __kmalloc+0x919/0xf80 mm/slub.c:3994
+ kmalloc include/linux/slab.h:594 [inline]
+ sock_kmalloc+0x134/0x1f0 net/core/sock.c:2685
+ af_alg_alloc_areq+0xe4/0x3a0 crypto/af_alg.c:1202
+ _skcipher_recvmsg crypto/algif_skcipher.c:118 [inline]
+ skcipher_recvmsg+0x4f0/0x2190 crypto/algif_skcipher.c:221
+ sock_recvmsg_nosec net/socket.c:1046 [inline]
+ sock_recvmsg net/socket.c:1068 [inline]
+ ____sys_recvmsg+0x283/0x7f0 net/socket.c:2803
+ ___sys_recvmsg+0x223/0x840 net/socket.c:2845
+ do_recvmmsg+0x4fc/0xfd0 net/socket.c:2939
+ __sys_recvmmsg net/socket.c:3018 [inline]
+ __do_sys_recvmmsg net/socket.c:3041 [inline]
+ __se_sys_recvmmsg net/socket.c:3034 [inline]
+ __x64_sys_recvmmsg+0x397/0x490 net/socket.c:3034
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+CPU: 0 PID: 11510 Comm: syz-executor.0 Not tainted 6.8.0-rc4-syzkaller-00180-g4f5e5092fdbf #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
