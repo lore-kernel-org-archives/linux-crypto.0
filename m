@@ -1,195 +1,177 @@
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C5D7FBBF;
-	Wed, 21 Feb 2024 15:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708528304; cv=fail; b=KsyNI+WRkGX+Pl8cCQrQkZarul+0upUKiuzHqdWmqFo64mLqfsqpa0UWQrMbjinXTPoZyEmBEjlkCcEFx5u4UPcGkWCdKzlx6Tb2GW+zyrJApysAXZuFYmvdOpUMkJhs9zORreTrM/uIcSJJpZysQ6cFCq51lho/Uw41MC94uwc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708528304; c=relaxed/simple;
-	bh=ofHgS2vfWQHjLr96ETkVQCJhzbsgpOVkjNP6m4CZ6yU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=H64n0j4JS8u99AZxbuW8enYYnThd7L9NpLcNv02lmaq730TxBCGw58MgGl7BkYzQWweznJD2HjBuXJegT8MTQlPnWslpV63qY20gF+R2cqbHvuGFB7vl79wAXvihawU6GkTmHm1ZPw16XlMk6BsQXaGkdBLxSEFxxfSYsZOMtsE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=laRvX2/e; arc=fail smtp.client-ip=40.107.236.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED9782869;
+	Wed, 21 Feb 2024 15:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708531139; cv=none; b=bpCMkvVnqrzKcSPglxyU43B4GGjwDNe2hDo/Vbt4JAp0WHKtHWus1m68zYVRBlnZbC34hHgXsVfCmrkjmEfoRufRyWkCIgck+sIAVG2TlXVpA8LX0Gw+UwDVFSpkGrlAermLO4e+vTxpZkqu4nVt5HvW1e+z7+BPPimBH30/QbQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708531139; c=relaxed/simple;
+	bh=kO+x8f1GcY1UOI/mEjLp3C52JBVsivM06TIuI/siDAY=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=fKJ627jyV9KZAdhTFupaL4bljNIU8DHR/txTS9STNuHh61ePRwUQmdmBsRgLckbg0HtgGEHAl+wAg6z9YKHQJhCn7nTDmesvVDLW2Lq3Dys/UJtmrKHZJ9Zs8VfKx1vkvjhkqWT6gdfp0w9QPWBsje0ofN4NTQ5uJaQDdZX2qCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eiV55Yhx; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="laRvX2/e"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AYZTd5CQ2T5HR2SGUDq4fe3vcpn87dqGWlMSdEBjkcxytCAIorZPd5FxuCAb2/JqNid0YyG9DMpGaxZ1HDWh50FfxicvufHi9k659jpENK6RWA3ydsj8uknJQWeNWP3wiXQ64gaUNX3Wy+/l0MEKBQo8ivLGt1gkovRI4ND9es5J3KWnQUSNw0n0NemLOxssFF9ZNrVmOb3j3l1iCbIS2jeE96cIl+Hhh8ARqEZaJ3EQhZXtLIwkWd+NhMtG4A7O7fetyt0NTqfyshJPKJbGwT8h3thjjrRUuNV7rWqIP5YM6duCo9+sAdl0AGPiaFdjz5GxGIUcmXzdIbDhFa7LIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zUs+eMkUb8WwqB4CnrUZhSQkQmu3Pe2NzGB2vovYnA8=;
- b=oH9gWGjfZCEM8oHp5fE7QvHZ7Jl1yR41KgSAt4qEjU/RQ7O34JH1SPcI5tjPZJWeV+Oo2cbcOUKGiidLWewqM4WCNfgKcfSUw9X3wyffBrwly8snbKEXRt7nnbIEhNOd0ayzpDcl8seNia5em9fynSHe+zzzu8oA6idZDebKmymqzrPhSRykeGZvB2O0KCPxda5pp9D5OtImCla76bpHIKziwGeeBLGoEUReBNI6hWKra6IoP6h/7eVg743o/Q9RhNx4/dTlqyTLZaPJjF2fq2garAfE9WOoh+G2KU8gtAzOvTQonWhObuquzt4WnNfHSYZTSZlPPWbbv1mmPYjZGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zUs+eMkUb8WwqB4CnrUZhSQkQmu3Pe2NzGB2vovYnA8=;
- b=laRvX2/eXlz+oZCtwsSgQe5jTBN7j5WG1+ZBsykXZ/rHkZwT4QxXJfnpQlvJMACCn8M0Xz+dp54Cvk8CdtrqbdDEtsyEz16f669VPYFaS4e3eA0kl9ul+r0C1aM6Ym73U911mL04RGGThBrzofays6w5QL2XJpnLbqfUHtlE3OAgbnwEi65PbI4HHntQRzTjBoZG5vjGYRGOlXavCxPLLZd47drQX7nwqKms7rYv70KDo77P7UbjG3Ze9kpTdHyeckOdl6pdNEG7pjAOPZwYwP7pkyc8LgDj1FvAGhIqPOxZZPd8rmfKhp6a/W0QiLCR9VW4RTwlLIzBE2JmFQ/IXw==
-Received: from SN6PR01CA0012.prod.exchangelabs.com (2603:10b6:805:b6::25) by
- DM6PR12MB4468.namprd12.prod.outlook.com (2603:10b6:5:2ac::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7316.22; Wed, 21 Feb 2024 15:11:38 +0000
-Received: from SN1PEPF0002636D.namprd02.prod.outlook.com
- (2603:10b6:805:b6:cafe::b7) by SN6PR01CA0012.outlook.office365.com
- (2603:10b6:805:b6::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.40 via Frontend
- Transport; Wed, 21 Feb 2024 15:11:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF0002636D.mail.protection.outlook.com (10.167.241.138) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.25 via Frontend Transport; Wed, 21 Feb 2024 15:11:37 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 21 Feb
- 2024 07:11:16 -0800
-Received: from [172.27.50.144] (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Wed, 21 Feb
- 2024 07:11:12 -0800
-Message-ID: <461b50e9-c539-46c0-96ad-d379da581d8c@nvidia.com>
-Date: Wed, 21 Feb 2024 17:11:10 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eiV55Yhx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708531137; x=1740067137;
+  h=from:to:cc:subject:date:message-id;
+  bh=kO+x8f1GcY1UOI/mEjLp3C52JBVsivM06TIuI/siDAY=;
+  b=eiV55YhxzVSojQQ0+NymtjByafR5qiPVMcNx0jmOB+0p2h06KzIYaO2l
+   EmcsVT39dEnVOcW6HlXJjVXrn/DZLcx8lA5phW4lsz3KTU3l5w1t6XoPM
+   TaaPeCjD1a9QOmwIFcQsGYSwo3OrjNPD5QwYM+onrTKP2QA2Y0BeehhyC
+   m8qZHfZUVcHk5rl8W5fd9rRzUjvgw86ZEJ3rOiox/36KlgMbxVD0oCDVk
+   1GAM7S3mG8+Bnr6o640YCxy7874yIfGCdOmBB8x6Fqe53npnHLCPCjpd5
+   kT8FWlmIWg7pU9L53rTfjNmLrfCNrGpO7WKixgsoWkDExSjPEjFm6u+eH
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10991"; a="2568655"
+X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
+   d="scan'208";a="2568655"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 07:58:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
+   d="scan'208";a="9760781"
+Received: from qat-server-archercity1.sh.intel.com ([10.67.111.115])
+  by fmviesa004.fm.intel.com with ESMTP; 21 Feb 2024 07:58:41 -0800
+From: Xin Zeng <xin.zeng@intel.com>
+To: herbert@gondor.apana.org.au,
+	alex.williamson@redhat.com,
+	jgg@nvidia.com,
+	yishaih@nvidia.com,
+	shameerali.kolothum.thodi@huawei.com,
+	kevin.tian@intel.com
+Cc: linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org,
+	qat-linux@intel.com,
+	Xin Zeng <xin.zeng@intel.com>
+Subject: [PATCH v3 00/10] crypto: qat - enable QAT GEN4 SRIOV VF live migration for QAT GEN4
+Date: Wed, 21 Feb 2024 23:49:58 +0800
+Message-Id: <20240221155008.960369-1-xin.zeng@intel.com>
+X-Mailer: git-send-email 2.18.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-Content-Language: en-US
-To: Jason Gunthorpe <jgg@nvidia.com>, "Zeng, Xin" <xin.zeng@intel.com>
-CC: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, qat-linux <qat-linux@intel.com>,
-	"Cao, Yahui" <yahui.cao@intel.com>
-References: <20240201153337.4033490-11-xin.zeng@intel.com>
- <20240206125500.GC10476@nvidia.com>
- <DM4PR11MB550222F7A5454DF9DBEE7FEC884B2@DM4PR11MB5502.namprd11.prod.outlook.com>
- <20240209121045.GP10476@nvidia.com>
- <e740d9ec-6783-4777-b984-98262566974c@nvidia.com>
- <DM4PR11MB550274B713F6AE416CDF7FDB88532@DM4PR11MB5502.namprd11.prod.outlook.com>
- <20240220132459.GM13330@nvidia.com>
- <DM4PR11MB5502BE3CC8BD098584F31E8D88502@DM4PR11MB5502.namprd11.prod.outlook.com>
- <20240220170315.GO13330@nvidia.com>
- <DM4PR11MB550223E2A68FA6A95970873888572@DM4PR11MB5502.namprd11.prod.outlook.com>
- <20240221131856.GS13330@nvidia.com>
-From: Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <20240221131856.GS13330@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002636D:EE_|DM6PR12MB4468:EE_
-X-MS-Office365-Filtering-Correlation-Id: 50c61f50-41d9-4339-6c99-08dc32ef669b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	dnJ+2wwwDyYNEFRia00s5+3D5+wUIxBRPtO47rmHTv9UqVudZd1GFgQ2NNB542a0GgRGpmd9E7Xv2nqU2HDhmv0nhj91XrM34peaNyiDxF8KvAA5jxc3nVCJBXiyatiGMmf7K+SiuIJMElauGDjovz2d9qLnQVH07mWi5mIhVFziCrpt8Q80yxcOt+K3RiyPg9HzXohAiS+KD01OBdOhjnmg+VUCiUVSysoU7pQB6uoEcxW2XiuY9QdIu3PkxrOXhcBPIi8EDLcxeWK6BNs/aGfI8W0LkqGhjGyn/Xm55/9gQa1BWcW3/YXID8A4Zw6e9HkZxr1/1+lI6bMU+0gbkFm8rWCoOHnCWy/5pWBbEEHpR3Xt+rmETZ84pLJC2SDMY/luuJTKUwtIzbEiWmoHajBstWOD2p/e0rc2Js7JmhmKw0aFXrqTH+NBjPSs0CSY9CITI/IiSYjgMPa5x3mHkTw/fSftSqyeo4LfeJyk/mK8WnH8DX5F1K/aqB0mfAi7Bi+0vq5xErXfzlVGSv3DZ07J0zMV09320fBwunlKQNN7DoD1NV0ctw3f0TBI3uIXVM5VacXvXR2Mr28qv9Ydy2heZZFJOmbhG77I2RJ21hN9duz+6NLBDZJGZaxFqLFW0ljf8pQaQBnibUozasptiJ9C0OAM/4v3iwoWpIvhtM9qIRqeO+IDgQ58bBel4sUoDrnSStbxEItuv/DpS29MiQ==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(40470700004)(46966006);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2024 15:11:37.7927
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 50c61f50-41d9-4339-6c99-08dc32ef669b
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002636D.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4468
 
-On 21/02/2024 15:18, Jason Gunthorpe wrote:
-> On Wed, Feb 21, 2024 at 08:44:31AM +0000, Zeng, Xin wrote:
->> On Wednesday, February 21, 2024 1:03 AM, Jason Gunthorpe wrote:
->>> On Tue, Feb 20, 2024 at 03:53:08PM +0000, Zeng, Xin wrote:
->>>> On Tuesday, February 20, 2024 9:25 PM, Jason Gunthorpe wrote:
->>>>> To: Zeng, Xin <xin.zeng@intel.com>
->>>>> Cc: Yishai Hadas <yishaih@nvidia.com>; herbert@gondor.apana.org.au;
->>>>> alex.williamson@redhat.com; shameerali.kolothum.thodi@huawei.com;
->>> Tian,
->>>>> Kevin <kevin.tian@intel.com>; linux-crypto@vger.kernel.org;
->>>>> kvm@vger.kernel.org; qat-linux <qat-linux@intel.com>; Cao, Yahui
->>>>> <yahui.cao@intel.com>
->>>>> Subject: Re: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
->>> devices
->>>>>
->>>>> On Sat, Feb 17, 2024 at 04:20:20PM +0000, Zeng, Xin wrote:
->>>>>
->>>>>> Thanks for this information, but this flow is not clear to me why it
->>>>>> cause deadlock. From this flow, CPU0 is not waiting for any resource
->>>>>> held by CPU1, so after CPU0 releases mmap_lock, CPU1 can continue
->>>>>> to run. Am I missing something?
->>>>>
->>>>> At some point it was calling copy_to_user() under the state
->>>>> mutex. These days it doesn't.
->>>>>
->>>>> copy_to_user() would nest the mm_lock under the state mutex which is
->>> a
->>>>> locking inversion.
->>>>>
->>>>> So I wonder if we still have this problem now that the copy_to_user()
->>>>> is not under the mutex?
->>>>
->>>> In protocol v2, we still have the scenario in precopy_ioctl where
->>> copy_to_user is
->>>> called under state_mutex.
->>>
->>> Why? Does mlx5 do that? It looked Ok to me:
->>>
->>>          mlx5vf_state_mutex_unlock(mvdev);
->>>          if (copy_to_user((void __user *)arg, &info, minsz))
->>>                  return -EFAULT;
->>
->> Indeed, thanks, Jason. BTW, is there any reason why was "deferred_reset" mode
->> still implemented in mlx5 driver given this deadlock condition has been avoided
->> with migration protocol v2 implementation.
-> 
-> I do not remember. Yishai?
-> 
+This set enables live migration for Intel QAT GEN4 SRIOV Virtual
+Functions (VFs).
+It is composed of 10 patches. Patch 1~6 refactor the original QAT PF
+driver implementation which will be reused by the following patches.
+Patch 7 introduces the logic to the QAT PF driver that allows to save
+and restore the state of a bank (a QAT VF is a wrapper around banks) and
+drain a ring pair. Patch 8 adds the QAT PF driver a set of interfaces to
+allow to save and restore the state of a VF that will be called by the
+module qat_vfio_pci which will be introduced in the last patch. Patch 9
+implements the defined device interfaces. The last one adds a vfio pci
+extension specific for QAT which intercepts the vfio device operations
+for a QAT VF to allow live migration.
 
-Long time passed.., I also don't fully remember whether this was the 
-only potential problem here, maybe Yes.
+Here are the steps required to test the live migration of a QAT GEN4 VF:
+1. Bind one or more QAT GEN4 VF devices to the module qat_vfio_pci.ko 
+2. Assign the VFs to the virtual machine and enable device live
+migration 
+3. Run a workload using a QAT VF inside the VM, for example using qatlib
+(https://github.com/intel/qatlib) 
+4. Migrate the VM from the source node to a destination node
 
-My plan is to prepare a cleanup patch for mlx5 and put it into our 
-regression for a while, if all will be good, I may send it for the next 
-kernel cycle.
+Changes in v3 from v2: https://lore.kernel.org/kvm/20240220032052.66834-1-xin.zeng@intel.com
+-  Use state_mutex directly instead of unnecessary deferred_reset
+   mode (Jason)
 
-By the way, there are other drivers around (i.e. hisi and mtty) that 
-still run copy_to_user() under the state mutex and might hit the problem 
-without the 'deferred_rest', see here[1].
+Changes in v2 from v1: https://lore.kernel.org/all/20240201153337.4033490-1-xin.zeng@intel.com
+-  Add VFIO_MIGRATION_PRE_COPY support (Alex)
+-  Remove unnecessary module dependancy in Kconfig (Alex)
+-  Use direct function calls instead of function pointers in qat vfio
+   variant driver (Jason)
+-  Address the comments including uncessary pointer check and kfree,
+   missing lock and direct use of pci_iov_vf_id (Shameer)
+-  Change CHECK_STAT macro to avoid repeat comparison (Kamlesh)
 
-If we'll reach to the conclusion that the only reason for that mechanism 
-was the copy_to_user() under the state_mutex, those drivers can change 
-their code easily and also send a patch to cleanup the 'deferred_reset'.
+Changes in v1 from RFC: https://lore.kernel.org/all/20230630131304.64243-1-xin.zeng@intel.com
+-  Address comments including the right module dependancy in Kconfig,
+   source file name and module description (Alex)
+-  Added PCI error handler and P2P state handler (Suggested by Kevin)
+-  Refactor the state check duing loading ring state (Kevin) 
+-  Fix missed call to vfio_put_device in the error case (Breet)
+-  Migrate the shadow states in PF driver
+-  Rebase on top of 6.8-rc1
 
-[1] 
-https://elixir.bootlin.com/linux/v6.8-rc5/source/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c#L808
-[2] 
-https://elixir.bootlin.com/linux/v6.8-rc5/source/samples/vfio-mdev/mtty.c#L878
+Giovanni Cabiddu (2):
+  crypto: qat - adf_get_etr_base() helper
+  crypto: qat - relocate CSR access code
 
-Yishai
+Siming Wan (3):
+  crypto: qat - rename get_sla_arr_of_type()
+  crypto: qat - expand CSR operations for QAT GEN4 devices
+  crypto: qat - add bank save and restore flows
+
+Xin Zeng (5):
+  crypto: qat - relocate and rename 4xxx PF2VM definitions
+  crypto: qat - move PFVF compat checker to a function
+  crypto: qat - add interface for live migration
+  crypto: qat - implement interface for live migration
+  vfio/qat: Add vfio_pci driver for Intel QAT VF devices
+
+ MAINTAINERS                                   |    8 +
+ .../intel/qat/qat_420xx/adf_420xx_hw_data.c   |    3 +
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |    5 +
+ .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |    1 +
+ .../qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c     |    1 +
+ .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |    1 +
+ .../intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c |    1 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |    6 +-
+ .../intel/qat/qat_common/adf_accel_devices.h  |   88 ++
+ .../intel/qat/qat_common/adf_common_drv.h     |   10 +
+ .../qat/qat_common/adf_gen2_hw_csr_data.c     |  101 ++
+ .../qat/qat_common/adf_gen2_hw_csr_data.h     |   86 ++
+ .../intel/qat/qat_common/adf_gen2_hw_data.c   |   97 --
+ .../intel/qat/qat_common/adf_gen2_hw_data.h   |   76 --
+ .../qat/qat_common/adf_gen4_hw_csr_data.c     |  231 ++++
+ .../qat/qat_common/adf_gen4_hw_csr_data.h     |  188 +++
+ .../intel/qat/qat_common/adf_gen4_hw_data.c   |  380 +++++--
+ .../intel/qat/qat_common/adf_gen4_hw_data.h   |  127 +--
+ .../intel/qat/qat_common/adf_gen4_pfvf.c      |    8 +-
+ .../intel/qat/qat_common/adf_gen4_vf_mig.c    | 1010 +++++++++++++++++
+ .../intel/qat/qat_common/adf_gen4_vf_mig.h    |   10 +
+ .../intel/qat/qat_common/adf_mstate_mgr.c     |  318 ++++++
+ .../intel/qat/qat_common/adf_mstate_mgr.h     |   89 ++
+ .../intel/qat/qat_common/adf_pfvf_pf_proto.c  |    8 +-
+ .../intel/qat/qat_common/adf_pfvf_utils.h     |   11 +
+ drivers/crypto/intel/qat/qat_common/adf_rl.c  |   10 +-
+ drivers/crypto/intel/qat/qat_common/adf_rl.h  |    2 +
+ .../crypto/intel/qat/qat_common/adf_sriov.c   |    7 +-
+ .../intel/qat/qat_common/adf_transport.c      |    4 +-
+ .../crypto/intel/qat/qat_common/qat_mig_dev.c |  130 +++
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |    1 +
+ .../qat_dh895xccvf/adf_dh895xccvf_hw_data.c   |    1 +
+ drivers/vfio/pci/Kconfig                      |    2 +
+ drivers/vfio/pci/Makefile                     |    2 +
+ drivers/vfio/pci/intel/qat/Kconfig            |   12 +
+ drivers/vfio/pci/intel/qat/Makefile           |    3 +
+ drivers/vfio/pci/intel/qat/main.c             |  663 +++++++++++
+ include/linux/qat/qat_mig_dev.h               |   31 +
+ 38 files changed, 3345 insertions(+), 387 deletions(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_vf_mig.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_vf_mig.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_mstate_mgr.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_mstate_mgr.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/qat_mig_dev.c
+ create mode 100644 drivers/vfio/pci/intel/qat/Kconfig
+ create mode 100644 drivers/vfio/pci/intel/qat/Makefile
+ create mode 100644 drivers/vfio/pci/intel/qat/main.c
+ create mode 100644 include/linux/qat/qat_mig_dev.h
 
 
-
+base-commit: a821f4cadc99272701016641bc821182fdfca289
+-- 
+2.18.2
 
