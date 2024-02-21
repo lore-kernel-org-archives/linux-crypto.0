@@ -1,149 +1,215 @@
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825D339FE4;
-	Wed, 21 Feb 2024 06:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708495848; cv=none; b=VIP1/zXxzEwcp3sRe8+GeuU3JPJsfjaCs0q2DGctxax7Ggp7pVChy47JJEMBr+2j86Or47pEjv6QjU/GMS52EYqgKnXUPWld9ksK662uuSbfGBTeA2meod4oSeGmp8Uirqaf/PAh5R4Zn+HsOTdY1szbBW97+iNj5WuqRlFG78w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708495848; c=relaxed/simple;
-	bh=nOFgbZ8HBxTz94wttEmZFotxCzQC7NygkRCq5asfT10=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kygH3WsnG28FCyCj3gvKg7RNnTAgR8iuNooN9WRtC/51biCSjXSN6lOLh36jY1njVaBZH0FCQaGc9cOFpthiu+4hpLvK026Kl3Xkd5uKCuHgVrGq4UmCHK6fFARSQFARNqnixKGANj8qIT8KwkoVJq/FLCrrGYvVz5nefXMfcCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHdXJ5Sa; arc=none smtp.client-ip=209.85.222.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAABA3C6A4;
+	Wed, 21 Feb 2024 08:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708505078; cv=fail; b=lb1pkw+tl2py8ByIXzVEJiimsW5ZT7lnYh91NYJfxjHjC7V+4uVyIj+DdXyTEos83RdRbTJS9U4qamkUmUFUfWx+p5Cij9ZeuSdMUcybPBSmKiKieYijxwDqUBc88zuI+BSxBAkFYO3w8P14vMTWMbP4dfV9vkI2FmMVeY+6OD8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708505078; c=relaxed/simple;
+	bh=2L2XnyXvLBXGvmqL9Br+jsDpNqLL2e0paCdCAJ5PPPA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SQ/wOl9JTHofYI1rHeuX2FxNTFgFIVEK6wAkkyCvxuwqgVcyhahnG6GiqEHPmdZocC9pAVMqLBVukRcV/LudUT8erMWNj5xFmnJ6/QlCD9pxkucwiD16W/D0ib7NEcXVKc20kdzKoBgof7qp9c2K+6OQFmVDkvL2hrXuZIqgktg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j4XQyt99; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHdXJ5Sa"
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-7d5bfdd2366so139462241.3;
-        Tue, 20 Feb 2024 22:10:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708495845; x=1709100645; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gP/yx5IKqNIOfZ+RA2vffQW+rHFO3lsQYKh8HrE0o3E=;
-        b=HHdXJ5SaGesN3QoM3eABmgK5F+SX8IV+DuslS3L7SLDs53TWts7Fklks9moa0IiM9K
-         JB/Nd72eaEVmVFAb2xJkAFMAuhkFSHjA89IbHeWQM0yPKwdx1VnbtYKeEIHVbjO+zKUp
-         UBYX4o5vgARhcrLq3Q/eu4Tn+ZrB/J63lQDIbNUt+C06XjEyOQpMhCu5UqcN1qiMHdWL
-         N+kGDsm19yDog+C40SGQsyqHei8nyg0qnlin5Kir6G7o43QnB6tDe7WRoVj1cStaZZKE
-         aoPflG2ADsSUnlwH8CVhfaNwfdv2gVR/X7NrXY2YXFnBFhcNbv9txvkz1Ta/OHiEYGPg
-         iWqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708495845; x=1709100645;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gP/yx5IKqNIOfZ+RA2vffQW+rHFO3lsQYKh8HrE0o3E=;
-        b=fmliHnE/a1FTZWVD3Bo2jnRuKcfBgEfijolIoJOOXTzD9pi+uJPWCV3+ngt8Q3un3e
-         NDb/TaxF4Ph+PPr+s4HlmRewdFmWgcqTi3GPF1MMNaUQdzIcj02JIrOCSPnTZhDb1RPN
-         1VM5yI+6nGr9mEx3zdKEnfMYCpk3EpoDwhRNJK7vcMX2BDLTgXfOKjYs/9ZQaI2NFmbh
-         BsJBus2FF7AclF67bWHAVS0MHAbtsoGZquhecsSZfH0hwxBKxSsfJBvM3w5FLoAuIshb
-         riQrUMWiZKzRB4mbF+a1a6S6lSwiO10mz+fU/WjfhCvUtOxsfD5w+J3XEDhg80AnmbYv
-         u5cA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/D2XdjKQqkQ1q0HziZoc4xjQ/as4ayanKgsx27kGmE7SBHkcUoR2vvZKbf72+JxnFvRS+c6EGaH48aQvUnddxdGvd/kQ1qVPURY/P9jBdCLvd6djIM2xf5hlH/Uvhz95G8uqd5v58QBkn
-X-Gm-Message-State: AOJu0YwE2iOOeB4Rlk54obCJJVargmQrGWeL7iTtkZuszeBFnsacUuWc
-	5hmF0RD7F9zpAxYLOyI3E/r0S99XVzB9tnCmH4EnfWAwRvUYn01jZn1DhB6lDzM7XNhzE7p3MT7
-	V+3VjY+4qoRn2C29pd0P0nScOsS0=
-X-Google-Smtp-Source: AGHT+IEC4mk/79rg9qunBsxTl0hy7B1wG1nWoGnl3shs9m7Fv4hs8dl+Pn9sauvzLmUcSGHVDFdCF1muxDuOUqrsjGQ=
-X-Received: by 2002:a05:6102:1894:b0:470:4bff:830a with SMTP id
- ji20-20020a056102189400b004704bff830amr7751496vsb.13.1708495845413; Tue, 20
- Feb 2024 22:10:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j4XQyt99"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708505076; x=1740041076;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=2L2XnyXvLBXGvmqL9Br+jsDpNqLL2e0paCdCAJ5PPPA=;
+  b=j4XQyt992jLsGnDKG+uAS2jRViDUbzYjpQldluTncNjU7xVKgJYRV+Lr
+   S7WcFFMgXOkXrvI9mrWI7Aw9swMw7KkaETZHwtpb1M1LbGxdI69A5Dif0
+   EVaPaaKKXsfoBiDJp3SDUu7o7uemEgLE9A9EF2d1aiXBbjoLgkTtHjvwV
+   MnXKuD9JwIj4n0cGp/GCGe8bo76NIYHTnyFy1yUXhKS71SV+2bRTwoib9
+   dnv4tzEmA0zdFbvOcE5/N+5NZafI4CapMJhrj6z7FVyt+fll9ghj1As7S
+   B3A1RHBKPns9/xW70+d63GzWj3Rwcyk8hj9ndF8NDErmLYXAg+ES8amxK
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="20193040"
+X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
+   d="scan'208";a="20193040"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 00:44:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
+   d="scan'208";a="9705261"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Feb 2024 00:44:35 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 21 Feb 2024 00:44:33 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 21 Feb 2024 00:44:33 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 21 Feb 2024 00:44:33 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dD6pz3JY5zl5SBrBaroWc/PQgj4r9TJp/BMjbhalDa5KCTkiQ3wbixwiB1n2Xf2oNy50D7fifPYNobnRe1IznmadGkB2VB19mh5LRPOBbL0lI08Ln1WGw6UK6rmYpU69UBBjXEtwUX6/NSlPZhbMZH16DEvjeNnTzcvAxEtKFyGldzkmQqRln63GEBSy5Gk3fK+wZw8Dpa9mn1WT9ed1AmnDeIiP0BUw0jy8TQi9qG4NwsX6eBqhAvEUvtjyAOz336bY7eq1JGUmti5ci0Gf85z8rzFasVDr9pE7UgrJvJ7vN0aWIxP7OQd4PqdNS7cFxjybYBZyBRXpdMWMNWQfwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XNe4jSprJdXc657n+ngehqnRzgo3FmIAaNuxCEkHkv0=;
+ b=OW+e2vDjdtMS49GKUv8WwvcKaYs9q5Nne4sh3FLf7kqFbpJk/8785Je1OaNTUeGTdjTWfanbNfabb0nPweVJXixmzjpmtne+2CNsggw8sHC+sybrepEUSzE5O3PDr+Y9eV+O9THs2vstjKsUNAE0gUZwOiUMVl+Wuksg4IlJ0W8LcHCxfJCl3WDVRS/88+15BbI00e5ITcqc8RWBDJf3FJT8Xxixs1GmDydgEtVAMc6ee8pgA/mkKMqVKa8dmwOjeaCjhUtLovNmFXKiN/nHqcFei6eDOmiarDCfvhDKU2BcFp9QEE6Wf6ZbXrYlwPEgqabegnCEl/F6nX9ugA00uw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4PR11MB5502.namprd11.prod.outlook.com (2603:10b6:5:39e::23)
+ by SJ1PR11MB6132.namprd11.prod.outlook.com (2603:10b6:a03:45d::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Wed, 21 Feb
+ 2024 08:44:31 +0000
+Received: from DM4PR11MB5502.namprd11.prod.outlook.com
+ ([fe80::502d:eb38:b486:eef0]) by DM4PR11MB5502.namprd11.prod.outlook.com
+ ([fe80::502d:eb38:b486:eef0%4]) with mapi id 15.20.7292.036; Wed, 21 Feb 2024
+ 08:44:31 +0000
+From: "Zeng, Xin" <xin.zeng@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Yishai Hadas <yishaih@nvidia.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, qat-linux <qat-linux@intel.com>,
+	"Cao, Yahui" <yahui.cao@intel.com>
+Subject: RE: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Thread-Topic: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Thread-Index: AQHaVSVFJ9K0TVMQD0C9btTtb+JmirD9TRgAgAQ3vqCAAHLkgIAC42sAgAhyjxCABghogIAADukQgAAuE4CAAQBLIA==
+Date: Wed, 21 Feb 2024 08:44:31 +0000
+Message-ID: <DM4PR11MB550223E2A68FA6A95970873888572@DM4PR11MB5502.namprd11.prod.outlook.com>
+References: <20240201153337.4033490-1-xin.zeng@intel.com>
+ <20240201153337.4033490-11-xin.zeng@intel.com>
+ <20240206125500.GC10476@nvidia.com>
+ <DM4PR11MB550222F7A5454DF9DBEE7FEC884B2@DM4PR11MB5502.namprd11.prod.outlook.com>
+ <20240209121045.GP10476@nvidia.com>
+ <e740d9ec-6783-4777-b984-98262566974c@nvidia.com>
+ <DM4PR11MB550274B713F6AE416CDF7FDB88532@DM4PR11MB5502.namprd11.prod.outlook.com>
+ <20240220132459.GM13330@nvidia.com>
+ <DM4PR11MB5502BE3CC8BD098584F31E8D88502@DM4PR11MB5502.namprd11.prod.outlook.com>
+ <20240220170315.GO13330@nvidia.com>
+In-Reply-To: <20240220170315.GO13330@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR11MB5502:EE_|SJ1PR11MB6132:EE_
+x-ms-office365-filtering-correlation-id: a4b77399-5800-4f99-7930-08dc32b9526b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 1pfjhTGZIPcyC54XMV2pNrL4630amzM6bmQ1e7PbafmgUaQtv7C0rr2c8Hzx3DiVzaUWaj+Dr4xK7qwbgRaXwlgFHcndE/KPQOeoAXU8skbXCigK8XQ67dB961UiUAagwvG4GsA9NSxBxoAgvXROoovHFT0uwvXhK5YBnSc0L0Vy8NhOd/Firw4dGB/Wpbrq9O6D61xEzj3HbwDOFZyeymX7n962HwhvvbcF4twWAjSJvKqbeL1dI5/e0OxSWsqyfcEIUXsTzNNRUc6a1cOO6DnJzcx1wbCp+dgHHa6iyVwOE/jepuTASoxntsIEZxPmA+ToLcsuoJi5J59acZtVysy7k5YMuP2CHCrkcPorw22vDYCRWwSB0zBDt4FI5a03b6TkXbV3W6vnSx6ByvKj6Uf5nHOpTRO7Bhfgah+YRG12dqt5kvplk7RhFQBBF7AEta5V+X3KYCoGy7eqzdEX4z9FF0QbRsA0Pr5Cz6iAVxxVpJUd5hSpq7M5XrP/oMnJG+F2aXj9EPfy6WNLghCqHV7hUjhSclz0ymw6cPtcvJGlmw7SfDZWdcyRb2RkUZ4xUXG/OU9PSGVvjzfp0AS6zwtjCpxf6Yoodl59M+CZiGgAcbYrPULYLlFC3KF/xz2y
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5502.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?m64YW1c09uUEESGSB2fPrREZAriQi3JB8p5PPWpFPoISwh6vI1rxQVi6f2DL?=
+ =?us-ascii?Q?DfZb3gKNI2lKuUcYqCezLOegCCRDZLEfTPk+5F02ob0YSIdvTiRtdPjpcEGE?=
+ =?us-ascii?Q?be5sTCq1uVtp29+dW9dptoJY39xaUFHnK+Di0FatZwKy3nOObr294daYJYAc?=
+ =?us-ascii?Q?8zNcHzSzl1zPQwpSughW65WlJ1fE9nfePQqkqU3nhXoYNwJ1zPidiRr94YEl?=
+ =?us-ascii?Q?F+lpUTOk/B3LQwFUDTON9GpIx19FrBz2p+/IcN0zcekn8SsMCueP7LABILFp?=
+ =?us-ascii?Q?v9c45ozP8fEBN07wPobtw75p586iNiVAro4EUifrz9hd33OquAsaQrBq0WG0?=
+ =?us-ascii?Q?w/X1sgZ+nVj5ruvsVlJ47JQphRNEZRU4vDLzG9rYQzLf7dAQGKpiweFctr/f?=
+ =?us-ascii?Q?8YXL1pmGB+ND4Aqc0jFHM2D1vInwm5p9UcF1j8rP1n8hkcVfR+DtT3cHTL3U?=
+ =?us-ascii?Q?kbsxYmgUsd0elGuodhRfMjdSRk2U3up/SNGYU6nkVwzDOhdG0Uotixv6v6Gt?=
+ =?us-ascii?Q?aAwKNXIVoSUpjAGLzZFdOz801lJmY+w408QNb1uN69LxL5jnmh3Zr+cNT7cr?=
+ =?us-ascii?Q?yNbj5darbNcmiHu7n1DrJKuctjV3SoVrVKtqDRHG7fGnEjCcvjoW+/5bHM+Q?=
+ =?us-ascii?Q?GtkXgNy7noQzSdVAr6rBWc9MWu319HxToGzvcuZng6mzKABqZnAlMN3w4Y4z?=
+ =?us-ascii?Q?C3rH8h5ntm9bCWx8z/Rri4mACBS6f8w+HNdhlpSZ5aZ/pRejajnwoM2nCZYz?=
+ =?us-ascii?Q?6p5rV8SPS6zSv6z//eRI1sPcijkgMocx3NxtLtKUcQc59hMphztjx6p9iF1p?=
+ =?us-ascii?Q?DKu9ZNgvC4YGLXD2V9OH+8/6GyFiGTOBTmNDeFFHIuuG6m6DjcUbEKtCDAJK?=
+ =?us-ascii?Q?I/jDEAn2teRYlK78inIYfi/94u4usiEo090zit4ENq2SRvuYZCfuDXE1ACcv?=
+ =?us-ascii?Q?UuI/fhQgZlpJvrp3I6MHEsL3nmnx9IDkILEmKEHIv8vDpStkbngzeIDKm4qT?=
+ =?us-ascii?Q?iku28/I0TWtarqATaQai6GYChq8pG+guYPYH2fCRm+klz0PC7sScs1MJ4LW5?=
+ =?us-ascii?Q?vkC6MJBri++VD95RL4fEYemVgG/H8rA6c7Dnwe9YBJSWmZoSDTXszfF3jrTK?=
+ =?us-ascii?Q?FdsbdGaPicrEofPulgzVVaryR1s2cQfleyu9z6S31FU2sB99fEgpkAcTuTxY?=
+ =?us-ascii?Q?CiAq+DWNOimVpMQdWl4Y7XCtXuEiEKMrcb6b5+lGAoIgPYzbqkSV6xahiVJm?=
+ =?us-ascii?Q?VOUDERbASLFsHDOVaJSModmK61i5bgKKByIKRMq2O0tVvalvhyS7BbASEw5c?=
+ =?us-ascii?Q?1Xjf+ezUi3ttXqpjtERkrU4PaX0BT8iWhIJ8QN+r00AHOJEOULB0Vp1hgg9k?=
+ =?us-ascii?Q?6m/2GMVcaEWPWFijiTedfQSTsPS7fR4670vlDkbPYhVeFPOEmLQCULg8jLJC?=
+ =?us-ascii?Q?eKdKLvAkX9XNL63VnuTde3c344DgVCX8d5OLUHcRpfTWf4nrRIU+CSj6JkzD?=
+ =?us-ascii?Q?bQ+b+VqNfy+o5y5NTyu5Ov65uBzwzA75SukQ4x35MZdpjtFiulsUZoMVoMfe?=
+ =?us-ascii?Q?8LlRBk9JlKFszR4KKsQbwmnm3vg8Q+y08WeyAt4m?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240220064414.262582-1-21cnbao@gmail.com> <20240220064414.262582-4-21cnbao@gmail.com>
- <ZdWLim6zYSl/x1Bk@gondor.apana.org.au> <CAGsJ_4xCgSWz832N8+RsE=5StWwuc1zu3KpeCGxq7LdyVLY+Sg@mail.gmail.com>
-In-Reply-To: <CAGsJ_4xCgSWz832N8+RsE=5StWwuc1zu3KpeCGxq7LdyVLY+Sg@mail.gmail.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Wed, 21 Feb 2024 19:10:33 +1300
-Message-ID: <CAGsJ_4y69s7-_UW=gaUuk3TJzwj3xRCoZhamsn0-6k65cbeR0A@mail.gmail.com>
-Subject: Re: [PATCH v5 3/3] crypto: scompress: remove memcpy if sg_nents is 1
-To: Herbert Xu <herbert@gondor.apana.org.au>, akpm@linux-foundation.org
-Cc: davem@davemloft.net, hannes@cmpxchg.org, linux-crypto@vger.kernel.org, 
-	linux-mm@kvack.org, nphamcs@gmail.com, yosryahmed@google.com, 
-	zhouchengming@bytedance.com, chriscli@google.com, chrisl@kernel.org, 
-	ddstreet@ieee.org, linux-kernel@vger.kernel.org, sjenning@redhat.com, 
-	vitaly.wool@konsulko.com, Barry Song <v-songbaohua@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5502.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a4b77399-5800-4f99-7930-08dc32b9526b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2024 08:44:31.2783
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: uc0nkSlR8BVMJHQSWMzEqKX1rE+y1HbE6qpGj44dJW32Nac7QB8Qq5MD+iyA774WRLDobygQha2w704PUmDOEg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6132
+X-OriginatorOrg: intel.com
 
-On Wed, Feb 21, 2024 at 6:55=E2=80=AFPM Barry Song <21cnbao@gmail.com> wrot=
-e:
->
-> On Wed, Feb 21, 2024 at 6:35=E2=80=AFPM Herbert Xu <herbert@gondor.apana.=
-org.au> wrote:
-> >
-> > On Tue, Feb 20, 2024 at 07:44:14PM +1300, Barry Song wrote:
-> > > From: Barry Song <v-songbaohua@oppo.com>
+On Wednesday, February 21, 2024 1:03 AM, Jason Gunthorpe wrote:
+> On Tue, Feb 20, 2024 at 03:53:08PM +0000, Zeng, Xin wrote:
+> > On Tuesday, February 20, 2024 9:25 PM, Jason Gunthorpe wrote:
+> > > To: Zeng, Xin <xin.zeng@intel.com>
+> > > Cc: Yishai Hadas <yishaih@nvidia.com>; herbert@gondor.apana.org.au;
+> > > alex.williamson@redhat.com; shameerali.kolothum.thodi@huawei.com;
+> Tian,
+> > > Kevin <kevin.tian@intel.com>; linux-crypto@vger.kernel.org;
+> > > kvm@vger.kernel.org; qat-linux <qat-linux@intel.com>; Cao, Yahui
+> > > <yahui.cao@intel.com>
+> > > Subject: Re: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QA=
+T VF
+> devices
 > > >
-> > > while sg_nents is 1 which is always true for the current kernel
-> > > as the only user - zswap is the case, we should remove two big
-> > > memcpy.
+> > > On Sat, Feb 17, 2024 at 04:20:20PM +0000, Zeng, Xin wrote:
 > > >
-> > > Signed-off-by: Barry Song <v-songbaohua@oppo.com>
-> > > Tested-by: Chengming Zhou <zhouchengming@bytedance.com>
-> > > ---
-> > >  crypto/scompress.c | 36 +++++++++++++++++++++++++++++-------
-> > >  1 file changed, 29 insertions(+), 7 deletions(-)
-> >
-> > This patch is independent of the other two.  Please split it
-> > out so I can apply it directly.
->
-> Ok. OTOH, patch 3/3 has no dependency with other patches. so patch
-> 3/3 should be perfectly applicable to crypto :-)
->
-> Hi Andrew,
-> Would you please handle patch 1/3 and 2/3 in mm-tree given Herbert's ack =
-on
-> 1/3?
->
-> >
-> > > @@ -134,13 +135,25 @@ static int scomp_acomp_comp_decomp(struct acomp=
-_req *req, int dir)
-> > >       scratch =3D raw_cpu_ptr(&scomp_scratch);
-> > >       spin_lock(&scratch->lock);
+> > > > Thanks for this information, but this flow is not clear to me why i=
+t
+> > > > cause deadlock. From this flow, CPU0 is not waiting for any resourc=
+e
+> > > > held by CPU1, so after CPU0 releases mmap_lock, CPU1 can continue
+> > > > to run. Am I missing something?
 > > >
-> > > -     scatterwalk_map_and_copy(scratch->src, req->src, 0, req->slen, =
-0);
-> > > +     if (sg_nents(req->src) =3D=3D 1) {
-> > > +             src =3D kmap_local_page(sg_page(req->src)) + req->src->=
-offset;
+> > > At some point it was calling copy_to_user() under the state
+> > > mutex. These days it doesn't.
+> > >
+> > > copy_to_user() would nest the mm_lock under the state mutex which is
+> a
+> > > locking inversion.
+> > >
+> > > So I wonder if we still have this problem now that the copy_to_user()
+> > > is not under the mutex?
 > >
-> > What if the SG entry is longer than PAGE_SIZE (or indeed crosses a
-> > page boundary)? I think the test needs to be strengthened.
->
-> I don't understand what is the problem for a nents to cross two pages
-> as anyway they are contiguous in both physical and virtual addresses.
-> if they are not contiguous, they will be two nents.
+> > In protocol v2, we still have the scenario in precopy_ioctl where
+> copy_to_user is
+> > called under state_mutex.
+>=20
+> Why? Does mlx5 do that? It looked Ok to me:
+>=20
+>         mlx5vf_state_mutex_unlock(mvdev);
+>         if (copy_to_user((void __user *)arg, &info, minsz))
+>                 return -EFAULT;
 
-second thought,  you are right.  sorry for my noise.
-The test was running on a platform like arm64 without HIGHMEM. thus,
-kmap_local_page always returns mapped page_address of normal
-zone.
+Indeed, thanks, Jason. BTW, is there any reason why was "deferred_reset" mo=
+de
+still implemented in mlx5 driver given this deadlock condition has been avo=
+ided
+with migration protocol v2 implementation.
+Anyway, I'll use state_mutex directly instead of the "deferred_reset" mode =
+in qat
+variant driver and update it in next version soon, please help to review.
+Thanks,
+Xin
 
-but for platforms with HIGHMEM for example arm32, x86_32 , we can't use
-the virtual address of the first page as the start address of two pages tho=
-ugh
-they are physically contiguous.
-
-I will rework on this.  ideally, we should still avoid the memcpy though
-two pages are within one nents :-) we are really this case for zswap
-as the dst is always two pages in case the compressed data is
-longer than the original data.
-
->
-> >
-> > Thanks,
-> > --
-> > Email: Herbert Xu <herbert@gondor.apana.org.au>
-> > Home Page: http://gondor.apana.org.au/~herbert/
-> > PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
-
-Thanks
-Barry
