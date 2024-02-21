@@ -1,83 +1,152 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56867CF03;
-	Wed, 21 Feb 2024 21:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBCD56456;
+	Wed, 21 Feb 2024 23:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708550328; cv=none; b=fRZyPcBdfoCupn7T63iC5efLSI7RIfyOpCr691VqYc5L5ZOAXVC6qUyxH222Gz/ms3xu15DzHiYylPhMRmvv7qflH9rr+P2KXml3epfxHFyfy8OQIkGyOLx3ip5B6QxiWEgOW8IERwZiZFPK9l4Gs444cBA9WQBVxkwvWuEWsrE=
+	t=1708557862; cv=none; b=bXgU2jiPSdcUFeC6nq9/Qpw2zdwS/FJLxKrx6uuLARE4b7tPNzu1ossHia/rDzsD18Jq6KEDdKh2vMt4d7gmi9YN2f6ObCB66XPOC/TuHQovLxS/0uqnXl0ayOAsGAefgaBWGa5XVT5IO91FgQEbCm5wa1LCn+AjhZYSWuWVDB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708550328; c=relaxed/simple;
-	bh=DhCPdG9f8Kah1j1vo++kMiYvGYVWmU8eGfvXbTqXl0I=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tkZINPReasSOpwCFv8ymbHveH6NjPMmrKRjUA4GWniyu4uYmkyPX+upIYC/oG92dy4DHglIzW9Wdx/1dr3noiJ7O/42qMGMZyLh6uOgt9r/Ar0GkMJOtIHFXmQHS5LVp6QpBZRJeXc4alF/qGZBpuTTt+giOWtt3YcK12FswXr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kSMRNXxV; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1708557862; c=relaxed/simple;
+	bh=o0pBvdU+JHgT39C/oZ43v61yIgxOBybqfEpddDffT+s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X4BOlSGoxPIU5l4AobN6VjfgXmiDgDv5hqQvSGx3xa3c65QB7eMHJtTkcYLfRLU51C8OKtl7CQoXmQWytOTZ3lGDbADrRJzBu7a6z7cWLzXSoKu22yv7Bsh+EH3sgF8XDOLY9T0PUdCXrIhdLSdej4i1LBDBLcf2RFXmQBwyGpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uo6j9C+3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kSMRNXxV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708550327; x=1740086327;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=DhCPdG9f8Kah1j1vo++kMiYvGYVWmU8eGfvXbTqXl0I=;
-  b=kSMRNXxVnSRhKHCbE5JCeEDd6vLaJQeXUWZhcXcqM2VIXdGS1QIk4b3C
-   wM4vn0pXlP/KJhBTmm0wPjx6/Lj1RVaXbGNvtNLsAt3ImJ64jXWwvWq1p
-   XxA04z8oM5UVAC0JTooeQvauHCuFqYiWL/qJPGxeS+7Vc0y/ykSrxz1LT
-   5KGtFwcUJTSE7dZl0zQ7NZNl8wotUHp1wgtcC496+yCjzYhBwSJbRerTc
-   r25hTjlwXrtHyHbVmDQR6LB00Vg7i0RUZGTlaCb5CQyN7n4F5iNMfhzl/
-   2JPjqj80SwIvopEHgyP04a+uXzuaYZIltqnHFCJJ3r0bIXZ++WG/Ind1k
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10991"; a="14161362"
-X-IronPort-AV: E=Sophos;i="6.06,176,1705392000"; 
-   d="scan'208";a="14161362"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 13:18:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,176,1705392000"; 
-   d="scan'208";a="36052649"
-Received: from allencha-mobl1.amr.corp.intel.com ([10.213.172.38])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 13:18:44 -0800
-Message-ID: <d82015f3b373790e75dbf71e4f6d62cdbecb4bfc.camel@linux.intel.com>
-Subject: Re: [PATCH 2/2] crypto: iaa - fix the missing CRYPTO_ALG_ASYNC in
- cra_flags
-From: Tom Zanussi <tom.zanussi@linux.intel.com>
-To: Barry Song <21cnbao@gmail.com>, davem@davemloft.net, 
-	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Barry Song <v-songbaohua@oppo.com>
-Date: Wed, 21 Feb 2024 15:18:43 -0600
-In-Reply-To: <20240220044222.197614-2-v-songbaohua@oppo.com>
-References: <20240220044222.197614-1-v-songbaohua@oppo.com>
-	 <20240220044222.197614-2-v-songbaohua@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uo6j9C+3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D2A2C433B2;
+	Wed, 21 Feb 2024 23:24:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708557862;
+	bh=o0pBvdU+JHgT39C/oZ43v61yIgxOBybqfEpddDffT+s=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Uo6j9C+3yRULLuhfUameeJdnFArY/DJQDmDNfb1NtvgSUoJu5xf4jfx3Gzy+QWSD9
+	 /Ki6xXWWXFKWco2i+oBjemS298yxFH2zmONSAJcVKpgnn5ASa+vrnmQIpFxASzABp+
+	 xoSQLSGYl7MTRjNIb7yQfurBY6V9FXK8ivBg1ovDs85Q1KUONIJVWj5xmY8Ur8JYYU
+	 fZHc/w3kaVNWAkptQF2laAOVKKd9frUPsRF+EkoYYE7i6AHxoYzxa8iLUf660a9KUD
+	 GjhfnDzRtt2+7CtEkm91mWF+v2OU9tMK+ATcehpGg8SBuGV4NPe2dcC3yYgKO2TTcg
+	 nGOx4pK29xnCA==
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d2531294faso19792401fa.2;
+        Wed, 21 Feb 2024 15:24:22 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVyNDcEzKTTQSv5DNDzm/PrucU88RphNZGanUIZpAW4RGjDQJRoA7FJlrzpZTt4kpx2CrcO1ZAs3P9e/iVNqF1VhthsobAG+dhfnKTe7wSsSdjrnEPK160TbQEifnJ6cxMni/EG6Kb7xGz3/xfbB6BHeSGx4yzb7N1MvOkq+WCmOCrewD+AbEAMPqmnF+BWfUgQNA48h1Km3vftmz4GB/6o3gILoVIaorvMToST92829DTGtVOhqZFyPaf6tC0X4XMJ
+X-Gm-Message-State: AOJu0YxaIvoxLHyGYb7bxG007v0Gnu3PS5YuKWr7ng7EE0b9ZPf+wHTt
+	YQ0yIU0PViUTWaBbYJ1dhHKJnMQTD7DbPx79iV/ma/Dee8P1mLaifevw0t3hppN3dAzc3eNCzkT
+	vnyRwpFbEarFUMmBRf6EbMcc5eYc=
+X-Google-Smtp-Source: AGHT+IEFjS3UH7erXEZ4kbkF96yuQm9TlfZ1AWhPucU81wH0eazr9XKjePangSR6zBzRuAu+rhDmfGqI9zl7A6Q+3YI=
+X-Received: by 2002:a2e:b8c8:0:b0:2d0:c77c:b1ca with SMTP id
+ s8-20020a2eb8c8000000b002d0c77cb1camr14950388ljp.49.1708557860236; Wed, 21
+ Feb 2024 15:24:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240214221847.2066632-1-ross.philipson@oracle.com>
+ <20240214221847.2066632-16-ross.philipson@oracle.com> <CAMj1kXF3k_c4Wn9GU+NC_+_aYfDpAzAUnfR=A4L_T+re1H3G=w@mail.gmail.com>
+ <dc53f100-062b-47ae-abc8-5414ce8d041c@oracle.com> <C98F883A-31D5-4F67-97FF-4AEFAADDDC74@zytor.com>
+In-Reply-To: <C98F883A-31D5-4F67-97FF-4AEFAADDDC74@zytor.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 22 Feb 2024 00:24:06 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFYVbCd3EaweseNndhmOwdbzEmvB1vjWk2rmTBxAoPCxg@mail.gmail.com>
+Message-ID: <CAMj1kXFYVbCd3EaweseNndhmOwdbzEmvB1vjWk2rmTBxAoPCxg@mail.gmail.com>
+Subject: Re: [PATCH v8 15/15] x86: EFI stub DRTM launch support for Secure Launch
+To: "H. Peter Anvin" <hpa@zytor.com>, Kees Cook <keescook@chromium.org>
+Cc: ross.philipson@oracle.com, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
+	linux-efi@vger.kernel.org, dpsmith@apertussolutions.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, 
+	mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, 
+	jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, kanth.ghatraju@oracle.com, 
+	trenchboot-devel@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGkgQmFycnksCgpPbiBUdWUsIDIwMjQtMDItMjAgYXQgMTc6NDIgKzEzMDAsIEJhcnJ5IFNvbmcg
-d3JvdGU6Cj4gQWRkIHRoZSBtaXNzaW5nIENSWVBUT19BTEdfQVNZTkMgZmxhZyBzaW5jZSBpbnRl
-bCBpYWEgZHJpdmVyCj4gd29ya3MgYXN5bmNocm9ub3VzbHkuCj4gCj4gQ2M6IFRvbSBaYW51c3Np
-IDx0b20uemFudXNzaUBsaW51eC5pbnRlbC5jb20+Cj4gU2lnbmVkLW9mZi1ieTogQmFycnkgU29u
-ZyA8di1zb25nYmFvaHVhQG9wcG8uY29tPgo+IC0tLQo+IMKgZHJpdmVycy9jcnlwdG8vaW50ZWwv
-aWFhL2lhYV9jcnlwdG9fbWFpbi5jIHwgMSArCj4gwqAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRp
-b24oKykKPiAKPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vaW50ZWwvaWFhL2lhYV9jcnlw
-dG9fbWFpbi5jCj4gYi9kcml2ZXJzL2NyeXB0by9pbnRlbC9pYWEvaWFhX2NyeXB0b19tYWluLmMK
-PiBpbmRleCBkZmQzYmFmMGE4ZDguLjkxYWRmOWQ3NmEyZSAxMDA2NDQKPiAtLS0gYS9kcml2ZXJz
-L2NyeXB0by9pbnRlbC9pYWEvaWFhX2NyeXB0b19tYWluLmMKPiArKysgYi9kcml2ZXJzL2NyeXB0
-by9pbnRlbC9pYWEvaWFhX2NyeXB0b19tYWluLmMKPiBAQCAtMTkxNiw2ICsxOTE2LDcgQEAgc3Rh
-dGljIHN0cnVjdCBhY29tcF9hbGcgaWFhX2Fjb21wX2ZpeGVkX2RlZmxhdGUKPiA9IHsKPiDCoMKg
-wqDCoMKgwqDCoMKgLmJhc2XCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoD0g
-ewo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgLmNyYV9uYW1lwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgPSAiZGVmbGF0ZSIsCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAuY3JhX2RyaXZlcl9uYW1lwqDCoMKgwqDCoMKgwqDCoD0gImRlZmxhdGUtaWFhIiwK
-PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgLmNyYV9mbGFnc8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqA9IENSWVBUT19BTEdfQVNZTkMsCgpNYWtlcyBzZW5zZSwgdGhhbmtzIGZv
-ciB0aGUgcGF0Y2guCgpBY2tlZC1ieTogVG9tIFphbnVzc2kgPHRvbS56YW51c3NpQGxpbnV4Lmlu
-dGVsLmNvbT4KCgo=
+On Wed, 21 Feb 2024 at 21:37, H. Peter Anvin <hpa@zytor.com> wrote:
+>
+> On February 21, 2024 12:17:30 PM PST, ross.philipson@oracle.com wrote:
+> >On 2/15/24 1:01 AM, Ard Biesheuvel wrote:
+> >> On Wed, 14 Feb 2024 at 23:32, Ross Philipson <ross.philipson@oracle.co=
+m> wrote:
+> >>>
+> >>> This support allows the DRTM launch to be initiated after an EFI stub
+> >>> launch of the Linux kernel is done. This is accomplished by providing
+> >>> a handler to jump to when a Secure Launch is in progress. This has to=
+ be
+> >>> called after the EFI stub does Exit Boot Services.
+> >>>
+> >>> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+> >>> ---
+> >>>   drivers/firmware/efi/libstub/x86-stub.c | 55 ++++++++++++++++++++++=
++++
+> >>>   1 file changed, 55 insertions(+)
+> >>>
+> >>> diff --git a/drivers/firmware/efi/libstub/x86-stub.c b/drivers/firmwa=
+re/efi/libstub/x86-stub.c
+> >>> index 0d510c9a06a4..4df2cf539194 100644
+> >>> --- a/drivers/firmware/efi/libstub/x86-stub.c
+> >>> +++ b/drivers/firmware/efi/libstub/x86-stub.c
+> >>> @@ -9,6 +9,7 @@
+> >>>   #include <linux/efi.h>
+> >>>   #include <linux/pci.h>
+> >>>   #include <linux/stddef.h>
+> >>> +#include <linux/slr_table.h>
+> >>>
+> >>>   #include <asm/efi.h>
+> >>>   #include <asm/e820/types.h>
+> >>> @@ -810,6 +811,57 @@ static efi_status_t efi_decompress_kernel(unsign=
+ed long *kernel_entry)
+> >>>          return EFI_SUCCESS;
+> >>>   }
+> >>>
+> >>> +static void efi_secure_launch(struct boot_params *boot_params)
+> >>> +{
+> >>> +       struct slr_entry_uefi_config *uefi_config;
+> >>> +       struct slr_uefi_cfg_entry *uefi_entry;
+> >>> +       struct slr_entry_dl_info *dlinfo;
+> >>> +       efi_guid_t guid =3D SLR_TABLE_GUID;
+> >>> +       struct slr_table *slrt;
+> >>> +       u64 memmap_hi;
+> >>> +       void *table;
+> >>> +       u8 buf[64] =3D {0};
+> >>> +
+> >>
+> >> If you add a flex array to slr_entry_uefi_config as I suggested in
+> >> response to the other patch, we could simplify this substantially
+> >
+> >I feel like there is some reason why we did not use flex arrays. We were=
+ talking and we seem to remember we used to use them and someone asked us t=
+o remove them. We are still looking into it. But if we can go back to them,=
+ I will take all the changes you recommended here.
+> >
+>
+> Linux kernel code doesn't use VLAs because of the limited stack size, and=
+ VLAs or alloca() makes stack size tracking impossible. Although this techn=
+ically speaking runs in a different environment, it is easier to enforce th=
+e constraint globally.
 
+Flex array !=3D VLA
+
+VLAs were phased out because of this reason (and VLAISs [VLAs in
+structs] were phased out before that because they are a GNU extension
+and not supported by Clang)
+
+Today, VLAs are not supported anywhere in the kernel.
+
+Flex arrays are widely used in the kernel. A flex array is a trailing
+array of unspecified size in a struct that makes the entire *type*
+have a variable size. But that does not make them VLAs (or VLAISs) - a
+VLA is a stack allocated *variable* whose size is based on a function
+parameter.
+
+Instances of types containing flex arrays can be allocated statically,
+or dynamically on the heap. This is common practice in the kernel, and
+even supported by instrumentation to help the compiler track the
+runtime size and flag overruns. We are even in the process of adding
+compiler support to annotate struct members as carrying the number of
+elements in an associated flex arrays, to improve the coverage of the
+instrumentation.
+
+I am not asking for a VLA here, only a flex array.
