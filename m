@@ -1,43 +1,43 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BCE081AA5;
-	Wed, 21 Feb 2024 15:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6554F82D91;
+	Wed, 21 Feb 2024 15:59:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708531166; cv=none; b=LltzaYqlNj3levjS6Zcus4xQNpQjliy4kpHhr09KOwsm6SFyuareu1jzzj0QIxck7MCtTYNBYy0BNT9o3WDQfIcEDJ6HlyrDb0U6Zzgx0WcS57q5S5eR5lvBEfeBS90Y6fumOp7xXGBPp5lsASBbyY/Vf8UNP3Kn/AftB2mGf80=
+	t=1708531167; cv=none; b=Ye8s/Vi1yXaUTLyz/KwxEPVDsqVk42FbHwz00+FKZUtGLCfp+JZCyY1X/geEMatkwbLLfNehqwDfFiKGO+eAwOWf1xd/IW2GrZEfQQREmL0bxJumWUMKdBjkqtb5qoacjYdNAovBngCFFlTjqpReC1wfaH1ZsKht0JLTcI6Kngo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708531166; c=relaxed/simple;
-	bh=Dq50jBV/cJWnyIx2pRibTqefwuL+uikgvzDKmQq3hwQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=L6K+wO0t/CDH2fN7v9N/lWvZwEaomZgCnQYrLXb1Fs/fVF1hli60L4HUdboO1He3q33EqjGQRwU1cxPsp9yv2ejgVRg/twN1OEqK3wD9KHXT4v1/38g+dbSEZfmk2wi0hKrHZc1PNx9Bl4XdruENAPTIbZI/68daAGFnZYVcmCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LFOx6ds3; arc=none smtp.client-ip=192.198.163.19
+	s=arc-20240116; t=1708531167; c=relaxed/simple;
+	bh=tXm2AUnRIeOiFPqvc10RMVAIitrxexXPi1ajm/TZ1ws=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=pJmx545jvocF28GHxU7mkwuXXrIN9cgK9wl9Lk3PFVzu06kqWXZXcEFNxqhLf8u1UD8eBKqed6evFOa4j0Cmv4ZJxV/OJUxaNtrA6HZS1O02a+kae7UHkwyrVoaniiEhLHkX883FNTGXyoDP8xrSFhwMnlf3Bn65VBIoaGM1zI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OSBSXR/n; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LFOx6ds3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OSBSXR/n"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708531163; x=1740067163;
+  t=1708531165; x=1740067165;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=Dq50jBV/cJWnyIx2pRibTqefwuL+uikgvzDKmQq3hwQ=;
-  b=LFOx6ds3jFqRz0Zk1H4L9MEy/JKSdhVrB/k/vBolo0ewwzK3HlGXKyR2
-   Xzt3uEK2e2uZIXTwSr1UYJ3RdbycnOZfvX1zAU7p58yoDtMYULmiTYo3V
-   FQk2pIGLA4gigdfSUkkZorFA0hervU6+rMrkmxDrpSBwdH6bR4kGmxLa4
-   P27s9+rRNcS/KPdUSs9SdxaXG8V9ifkgBHmAQLoLOInxt2d0XntiPbs9V
-   dZCWP8Oxahf2ffGGoD+NtXzVHmJClOTFsLPOlwEYVkC7t0hxr4ImeZzwn
-   3Nvmnfy62rvn65yiQPiv/vUExUBo558z3BVZnoWlRXJDViWo32KrF46Qo
+  bh=tXm2AUnRIeOiFPqvc10RMVAIitrxexXPi1ajm/TZ1ws=;
+  b=OSBSXR/nXel//Itv9BmsxopY1gtgAfKC1cOTLB8yz5DS26m64ogGJOHR
+   5qg58dlJ71r0inCF7krpy3DYXfyS8EzA4iWQCsSdPQnSyzqf4eOfWOrFI
+   PMxuj3VlOJDfHlGnOLgYoQ3BZ3ivA6Bjc2CaUnfIAdh6Qy5kEYxOu3QNl
+   E0a8TZBUSVYKSLl2F87T/XQBcRISHXNLalx+s9Ur+aX/A8RKW4a0lSbXi
+   Trl5LqFB2TZqUfOUK2dmIa4dtKiFJqXNSRpLhfvsPcgvJ42wYh2PPlAOp
+   GrGiYr6L2KZU2zkxAtRu5WF/mzfpPYsHz39qpIjbgB/z9YZclxQ0UqWFZ
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10991"; a="2568796"
+X-IronPort-AV: E=McAfee;i="6600,9927,10991"; a="2568873"
 X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
-   d="scan'208";a="2568796"
+   d="scan'208";a="2568873"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 07:58:56 -0800
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 07:59:05 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
-   d="scan'208";a="9760874"
+   d="scan'208";a="9760950"
 Received: from qat-server-archercity1.sh.intel.com ([10.67.111.115])
-  by fmviesa004.fm.intel.com with ESMTP; 21 Feb 2024 07:58:52 -0800
+  by fmviesa004.fm.intel.com with ESMTP; 21 Feb 2024 07:59:01 -0800
 From: Xin Zeng <xin.zeng@intel.com>
 To: herbert@gondor.apana.org.au,
 	alex.williamson@redhat.com,
@@ -48,11 +48,11 @@ To: herbert@gondor.apana.org.au,
 Cc: linux-crypto@vger.kernel.org,
 	kvm@vger.kernel.org,
 	qat-linux@intel.com,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Siming Wan <siming.wan@intel.com>,
 	Xin Zeng <xin.zeng@intel.com>
-Subject: [PATCH v3 04/10] crypto: qat - relocate CSR access code
-Date: Wed, 21 Feb 2024 23:50:02 +0800
-Message-Id: <20240221155008.960369-5-xin.zeng@intel.com>
+Subject: [PATCH v3 07/10] crypto: qat - add bank save and restore flows
+Date: Wed, 21 Feb 2024 23:50:05 +0800
+Message-Id: <20240221155008.960369-8-xin.zeng@intel.com>
 X-Mailer: git-send-email 2.18.2
 In-Reply-To: <20240221155008.960369-1-xin.zeng@intel.com>
 References: <20240221155008.960369-1-xin.zeng@intel.com>
@@ -62,1000 +62,427 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+From: Siming Wan <siming.wan@intel.com>
 
-As the common hw_data files are growing and the adf_hw_csr_ops is going
-to be extended with new operations, move all logic related to ring CSRs
-to the newly created adf_gen[2|4]_hw_csr_data.[c|h] files.
+Add logic to save, restore, quiesce and drain a ring bank for QAT GEN4
+devices.
+This allows to save and restore the state of a Virtual Function (VF) and
+will be used to implement VM live migration.
 
-This does not introduce any functional change.
-
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Signed-off-by: Siming Wan <siming.wan@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Reviewed-by: Xin Zeng <xin.zeng@intel.com>
 Signed-off-by: Xin Zeng <xin.zeng@intel.com>
 ---
- .../intel/qat/qat_420xx/adf_420xx_hw_data.c   |   1 +
- .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |   1 +
- .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |   1 +
- .../qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c     |   1 +
- .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |   1 +
- .../intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c |   1 +
- drivers/crypto/intel/qat/qat_common/Makefile  |   2 +
- .../qat/qat_common/adf_gen2_hw_csr_data.c     | 101 ++++++++++++++++++
- .../qat/qat_common/adf_gen2_hw_csr_data.h     |  86 +++++++++++++++
- .../intel/qat/qat_common/adf_gen2_hw_data.c   |  97 -----------------
- .../intel/qat/qat_common/adf_gen2_hw_data.h   |  76 -------------
- .../qat/qat_common/adf_gen4_hw_csr_data.c     | 101 ++++++++++++++++++
- .../qat/qat_common/adf_gen4_hw_csr_data.h     |  97 +++++++++++++++++
- .../intel/qat/qat_common/adf_gen4_hw_data.c   |  97 -----------------
- .../intel/qat/qat_common/adf_gen4_hw_data.h   |  94 +---------------
- .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |   1 +
- .../qat_dh895xccvf/adf_dh895xccvf_hw_data.c   |   1 +
- 17 files changed, 397 insertions(+), 362 deletions(-)
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.h
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.h
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |   2 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |  38 +++
+ .../intel/qat/qat_common/adf_gen4_hw_data.c   | 279 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_gen4_hw_data.h   |  19 ++
+ 4 files changed, 338 insertions(+)
 
-diff --git a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-index 1102c47f8293..9ccbf5998d5c 100644
---- a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-@@ -10,6 +10,7 @@
- #include <adf_fw_config.h>
- #include <adf_gen4_config.h>
- #include <adf_gen4_dc.h>
-+#include <adf_gen4_hw_csr_data.h>
- #include <adf_gen4_hw_data.h>
- #include <adf_gen4_pfvf.h>
- #include <adf_gen4_pm.h>
 diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-index 927506cf271d..ef4b0aa36603 100644
+index ef4b0aa36603..eaf055e6f938 100644
 --- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
 +++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -10,6 +10,7 @@
- #include <adf_fw_config.h>
- #include <adf_gen4_config.h>
- #include <adf_gen4_dc.h>
-+#include <adf_gen4_hw_csr_data.h>
- #include <adf_gen4_hw_data.h>
- #include <adf_gen4_pfvf.h>
- #include <adf_gen4_pm.h>
-diff --git a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-index a882e0ea2279..201f9412c582 100644
---- a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-@@ -6,6 +6,7 @@
- #include <adf_common_drv.h>
- #include <adf_gen2_config.h>
- #include <adf_gen2_dc.h>
-+#include <adf_gen2_hw_csr_data.h>
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include "adf_c3xxx_hw_data.h"
-diff --git a/drivers/crypto/intel/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c b/drivers/crypto/intel/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
-index 84d9486e04de..a512ca4efd3f 100644
---- a/drivers/crypto/intel/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
-@@ -4,6 +4,7 @@
- #include <adf_common_drv.h>
- #include <adf_gen2_config.h>
- #include <adf_gen2_dc.h>
-+#include <adf_gen2_hw_csr_data.h>
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include <adf_pfvf_vf_msg.h>
-diff --git a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
-index 48cf3eb7c734..6b5b0cf9c7c7 100644
---- a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
-@@ -6,6 +6,7 @@
- #include <adf_common_drv.h>
- #include <adf_gen2_config.h>
- #include <adf_gen2_dc.h>
-+#include <adf_gen2_hw_csr_data.h>
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include "adf_c62x_hw_data.h"
-diff --git a/drivers/crypto/intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c b/drivers/crypto/intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c
-index 751d7aa57fc7..4aaaaf921734 100644
---- a/drivers/crypto/intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c
-@@ -4,6 +4,7 @@
- #include <adf_common_drv.h>
- #include <adf_gen2_config.h>
- #include <adf_gen2_dc.h>
-+#include <adf_gen2_hw_csr_data.h>
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include <adf_pfvf_vf_msg.h>
-diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 5915cde8a7aa..ceaa685352ed 100644
---- a/drivers/crypto/intel/qat/qat_common/Makefile
-+++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -14,9 +14,11 @@ intel_qat-objs := adf_cfg.o \
- 	adf_hw_arbiter.o \
- 	adf_sysfs.o \
- 	adf_sysfs_ras_counters.o \
-+	adf_gen2_hw_csr_data.o \
- 	adf_gen2_hw_data.o \
- 	adf_gen2_config.o \
- 	adf_gen4_config.o \
-+	adf_gen4_hw_csr_data.o \
- 	adf_gen4_hw_data.o \
- 	adf_gen4_pm.o \
- 	adf_gen2_dc.o \
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.c
-new file mode 100644
-index 000000000000..650c9edd8a66
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.c
-@@ -0,0 +1,101 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright(c) 2024 Intel Corporation */
-+#include <linux/types.h>
-+#include "adf_gen2_hw_csr_data.h"
-+
-+static u64 build_csr_ring_base_addr(dma_addr_t addr, u32 size)
-+{
-+	return BUILD_RING_BASE_ADDR(addr, size);
-+}
-+
-+static u32 read_csr_ring_head(void __iomem *csr_base_addr, u32 bank, u32 ring)
-+{
-+	return READ_CSR_RING_HEAD(csr_base_addr, bank, ring);
-+}
-+
-+static void write_csr_ring_head(void __iomem *csr_base_addr, u32 bank, u32 ring,
-+				u32 value)
-+{
-+	WRITE_CSR_RING_HEAD(csr_base_addr, bank, ring, value);
-+}
-+
-+static u32 read_csr_ring_tail(void __iomem *csr_base_addr, u32 bank, u32 ring)
-+{
-+	return READ_CSR_RING_TAIL(csr_base_addr, bank, ring);
-+}
-+
-+static void write_csr_ring_tail(void __iomem *csr_base_addr, u32 bank, u32 ring,
-+				u32 value)
-+{
-+	WRITE_CSR_RING_TAIL(csr_base_addr, bank, ring, value);
-+}
-+
-+static u32 read_csr_e_stat(void __iomem *csr_base_addr, u32 bank)
-+{
-+	return READ_CSR_E_STAT(csr_base_addr, bank);
-+}
-+
-+static void write_csr_ring_config(void __iomem *csr_base_addr, u32 bank,
-+				  u32 ring, u32 value)
-+{
-+	WRITE_CSR_RING_CONFIG(csr_base_addr, bank, ring, value);
-+}
-+
-+static void write_csr_ring_base(void __iomem *csr_base_addr, u32 bank, u32 ring,
-+				dma_addr_t addr)
-+{
-+	WRITE_CSR_RING_BASE(csr_base_addr, bank, ring, addr);
-+}
-+
-+static void write_csr_int_flag(void __iomem *csr_base_addr, u32 bank, u32 value)
-+{
-+	WRITE_CSR_INT_FLAG(csr_base_addr, bank, value);
-+}
-+
-+static void write_csr_int_srcsel(void __iomem *csr_base_addr, u32 bank)
-+{
-+	WRITE_CSR_INT_SRCSEL(csr_base_addr, bank);
-+}
-+
-+static void write_csr_int_col_en(void __iomem *csr_base_addr, u32 bank,
-+				 u32 value)
-+{
-+	WRITE_CSR_INT_COL_EN(csr_base_addr, bank, value);
-+}
-+
-+static void write_csr_int_col_ctl(void __iomem *csr_base_addr, u32 bank,
-+				  u32 value)
-+{
-+	WRITE_CSR_INT_COL_CTL(csr_base_addr, bank, value);
-+}
-+
-+static void write_csr_int_flag_and_col(void __iomem *csr_base_addr, u32 bank,
-+				       u32 value)
-+{
-+	WRITE_CSR_INT_FLAG_AND_COL(csr_base_addr, bank, value);
-+}
-+
-+static void write_csr_ring_srv_arb_en(void __iomem *csr_base_addr, u32 bank,
-+				      u32 value)
-+{
-+	WRITE_CSR_RING_SRV_ARB_EN(csr_base_addr, bank, value);
-+}
-+
-+void adf_gen2_init_hw_csr_ops(struct adf_hw_csr_ops *csr_ops)
-+{
-+	csr_ops->build_csr_ring_base_addr = build_csr_ring_base_addr;
-+	csr_ops->read_csr_ring_head = read_csr_ring_head;
-+	csr_ops->write_csr_ring_head = write_csr_ring_head;
-+	csr_ops->read_csr_ring_tail = read_csr_ring_tail;
-+	csr_ops->write_csr_ring_tail = write_csr_ring_tail;
-+	csr_ops->read_csr_e_stat = read_csr_e_stat;
-+	csr_ops->write_csr_ring_config = write_csr_ring_config;
-+	csr_ops->write_csr_ring_base = write_csr_ring_base;
-+	csr_ops->write_csr_int_flag = write_csr_int_flag;
-+	csr_ops->write_csr_int_srcsel = write_csr_int_srcsel;
-+	csr_ops->write_csr_int_col_en = write_csr_int_col_en;
-+	csr_ops->write_csr_int_col_ctl = write_csr_int_col_ctl;
-+	csr_ops->write_csr_int_flag_and_col = write_csr_int_flag_and_col;
-+	csr_ops->write_csr_ring_srv_arb_en = write_csr_ring_srv_arb_en;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen2_init_hw_csr_ops);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.h b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.h
-new file mode 100644
-index 000000000000..55058b0f9e52
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.h
-@@ -0,0 +1,86 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright(c) 2024 Intel Corporation */
-+#ifndef ADF_GEN2_HW_CSR_DATA_H_
-+#define ADF_GEN2_HW_CSR_DATA_H_
-+
-+#include <linux/bitops.h>
-+#include "adf_accel_devices.h"
-+
-+#define ADF_BANK_INT_SRC_SEL_MASK_0	0x4444444CUL
-+#define ADF_BANK_INT_SRC_SEL_MASK_X	0x44444444UL
-+#define ADF_RING_CSR_RING_CONFIG	0x000
-+#define ADF_RING_CSR_RING_LBASE		0x040
-+#define ADF_RING_CSR_RING_UBASE		0x080
-+#define ADF_RING_CSR_RING_HEAD		0x0C0
-+#define ADF_RING_CSR_RING_TAIL		0x100
-+#define ADF_RING_CSR_E_STAT		0x14C
-+#define ADF_RING_CSR_INT_FLAG		0x170
-+#define ADF_RING_CSR_INT_SRCSEL		0x174
-+#define ADF_RING_CSR_INT_SRCSEL_2	0x178
-+#define ADF_RING_CSR_INT_COL_EN		0x17C
-+#define ADF_RING_CSR_INT_COL_CTL	0x180
-+#define ADF_RING_CSR_INT_FLAG_AND_COL	0x184
-+#define ADF_RING_CSR_INT_COL_CTL_ENABLE	0x80000000
-+#define ADF_RING_BUNDLE_SIZE		0x1000
-+#define ADF_ARB_REG_SLOT		0x1000
-+#define ADF_ARB_RINGSRVARBEN_OFFSET	0x19C
-+
-+#define BUILD_RING_BASE_ADDR(addr, size) \
-+	(((addr) >> 6) & (GENMASK_ULL(63, 0) << (size)))
-+#define READ_CSR_RING_HEAD(csr_base_addr, bank, ring) \
-+	ADF_CSR_RD(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_RING_HEAD + ((ring) << 2))
-+#define READ_CSR_RING_TAIL(csr_base_addr, bank, ring) \
-+	ADF_CSR_RD(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_RING_TAIL + ((ring) << 2))
-+#define READ_CSR_E_STAT(csr_base_addr, bank) \
-+	ADF_CSR_RD(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_E_STAT)
-+#define WRITE_CSR_RING_CONFIG(csr_base_addr, bank, ring, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_RING_CONFIG + ((ring) << 2), value)
-+#define WRITE_CSR_RING_BASE(csr_base_addr, bank, ring, value) \
-+do { \
-+	u32 l_base = 0, u_base = 0; \
-+	l_base = (u32)((value) & 0xFFFFFFFF); \
-+	u_base = (u32)(((value) & 0xFFFFFFFF00000000ULL) >> 32); \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_RING_LBASE + ((ring) << 2), l_base); \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_RING_UBASE + ((ring) << 2), u_base); \
-+} while (0)
-+
-+#define WRITE_CSR_RING_HEAD(csr_base_addr, bank, ring, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_RING_HEAD + ((ring) << 2), value)
-+#define WRITE_CSR_RING_TAIL(csr_base_addr, bank, ring, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_RING_TAIL + ((ring) << 2), value)
-+#define WRITE_CSR_INT_FLAG(csr_base_addr, bank, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_INT_FLAG, value)
-+#define WRITE_CSR_INT_SRCSEL(csr_base_addr, bank) \
-+do { \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+	ADF_RING_CSR_INT_SRCSEL, ADF_BANK_INT_SRC_SEL_MASK_0); \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+	ADF_RING_CSR_INT_SRCSEL_2, ADF_BANK_INT_SRC_SEL_MASK_X); \
-+} while (0)
-+#define WRITE_CSR_INT_COL_EN(csr_base_addr, bank, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_INT_COL_EN, value)
-+#define WRITE_CSR_INT_COL_CTL(csr_base_addr, bank, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_INT_COL_CTL, \
-+		   ADF_RING_CSR_INT_COL_CTL_ENABLE | (value))
-+#define WRITE_CSR_INT_FLAG_AND_COL(csr_base_addr, bank, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
-+		   ADF_RING_CSR_INT_FLAG_AND_COL, value)
-+
-+#define WRITE_CSR_RING_SRV_ARB_EN(csr_addr, index, value) \
-+	ADF_CSR_WR(csr_addr, ADF_ARB_RINGSRVARBEN_OFFSET + \
-+	(ADF_ARB_REG_SLOT * (index)), value)
-+
-+void adf_gen2_init_hw_csr_ops(struct adf_hw_csr_ops *csr_ops);
-+
-+#endif
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.c
-index d1884547b5a1..1f64bf49b221 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.c
-@@ -111,103 +111,6 @@ void adf_gen2_enable_ints(struct adf_accel_dev *accel_dev)
- }
- EXPORT_SYMBOL_GPL(adf_gen2_enable_ints);
+@@ -455,6 +455,8 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data, u32 dev_id)
+ 	hw_data->get_ring_to_svc_map = adf_gen4_get_ring_to_svc_map;
+ 	hw_data->disable_iov = adf_disable_sriov;
+ 	hw_data->ring_pair_reset = adf_gen4_ring_pair_reset;
++	hw_data->bank_state_save = adf_gen4_bank_state_save;
++	hw_data->bank_state_restore = adf_gen4_bank_state_restore;
+ 	hw_data->enable_pm = adf_gen4_enable_pm;
+ 	hw_data->handle_pm_interrupt = adf_gen4_handle_pm_interrupt;
+ 	hw_data->dev_config = adf_gen4_dev_config;
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+index d1f3f5a822ff..986e63ec702d 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+@@ -140,6 +140,40 @@ struct admin_info {
+ 	u32 mailbox_offset;
+ };
  
--static u64 build_csr_ring_base_addr(dma_addr_t addr, u32 size)
--{
--	return BUILD_RING_BASE_ADDR(addr, size);
--}
--
--static u32 read_csr_ring_head(void __iomem *csr_base_addr, u32 bank, u32 ring)
--{
--	return READ_CSR_RING_HEAD(csr_base_addr, bank, ring);
--}
--
--static void write_csr_ring_head(void __iomem *csr_base_addr, u32 bank, u32 ring,
--				u32 value)
--{
--	WRITE_CSR_RING_HEAD(csr_base_addr, bank, ring, value);
--}
--
--static u32 read_csr_ring_tail(void __iomem *csr_base_addr, u32 bank, u32 ring)
--{
--	return READ_CSR_RING_TAIL(csr_base_addr, bank, ring);
--}
--
--static void write_csr_ring_tail(void __iomem *csr_base_addr, u32 bank, u32 ring,
--				u32 value)
--{
--	WRITE_CSR_RING_TAIL(csr_base_addr, bank, ring, value);
--}
--
--static u32 read_csr_e_stat(void __iomem *csr_base_addr, u32 bank)
--{
--	return READ_CSR_E_STAT(csr_base_addr, bank);
--}
--
--static void write_csr_ring_config(void __iomem *csr_base_addr, u32 bank,
--				  u32 ring, u32 value)
--{
--	WRITE_CSR_RING_CONFIG(csr_base_addr, bank, ring, value);
--}
--
--static void write_csr_ring_base(void __iomem *csr_base_addr, u32 bank, u32 ring,
--				dma_addr_t addr)
--{
--	WRITE_CSR_RING_BASE(csr_base_addr, bank, ring, addr);
--}
--
--static void write_csr_int_flag(void __iomem *csr_base_addr, u32 bank, u32 value)
--{
--	WRITE_CSR_INT_FLAG(csr_base_addr, bank, value);
--}
--
--static void write_csr_int_srcsel(void __iomem *csr_base_addr, u32 bank)
--{
--	WRITE_CSR_INT_SRCSEL(csr_base_addr, bank);
--}
--
--static void write_csr_int_col_en(void __iomem *csr_base_addr, u32 bank,
--				 u32 value)
--{
--	WRITE_CSR_INT_COL_EN(csr_base_addr, bank, value);
--}
--
--static void write_csr_int_col_ctl(void __iomem *csr_base_addr, u32 bank,
--				  u32 value)
--{
--	WRITE_CSR_INT_COL_CTL(csr_base_addr, bank, value);
--}
--
--static void write_csr_int_flag_and_col(void __iomem *csr_base_addr, u32 bank,
--				       u32 value)
--{
--	WRITE_CSR_INT_FLAG_AND_COL(csr_base_addr, bank, value);
--}
--
--static void write_csr_ring_srv_arb_en(void __iomem *csr_base_addr, u32 bank,
--				      u32 value)
--{
--	WRITE_CSR_RING_SRV_ARB_EN(csr_base_addr, bank, value);
--}
--
--void adf_gen2_init_hw_csr_ops(struct adf_hw_csr_ops *csr_ops)
--{
--	csr_ops->build_csr_ring_base_addr = build_csr_ring_base_addr;
--	csr_ops->read_csr_ring_head = read_csr_ring_head;
--	csr_ops->write_csr_ring_head = write_csr_ring_head;
--	csr_ops->read_csr_ring_tail = read_csr_ring_tail;
--	csr_ops->write_csr_ring_tail = write_csr_ring_tail;
--	csr_ops->read_csr_e_stat = read_csr_e_stat;
--	csr_ops->write_csr_ring_config = write_csr_ring_config;
--	csr_ops->write_csr_ring_base = write_csr_ring_base;
--	csr_ops->write_csr_int_flag = write_csr_int_flag;
--	csr_ops->write_csr_int_srcsel = write_csr_int_srcsel;
--	csr_ops->write_csr_int_col_en = write_csr_int_col_en;
--	csr_ops->write_csr_int_col_ctl = write_csr_int_col_ctl;
--	csr_ops->write_csr_int_flag_and_col = write_csr_int_flag_and_col;
--	csr_ops->write_csr_ring_srv_arb_en = write_csr_ring_srv_arb_en;
--}
--EXPORT_SYMBOL_GPL(adf_gen2_init_hw_csr_ops);
--
- u32 adf_gen2_get_accel_cap(struct adf_accel_dev *accel_dev)
- {
- 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h
-index 6bd341061de4..708e9186127b 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h
-@@ -6,78 +6,9 @@
- #include "adf_accel_devices.h"
- #include "adf_cfg_common.h"
- 
--/* Transport access */
--#define ADF_BANK_INT_SRC_SEL_MASK_0	0x4444444CUL
--#define ADF_BANK_INT_SRC_SEL_MASK_X	0x44444444UL
--#define ADF_RING_CSR_RING_CONFIG	0x000
--#define ADF_RING_CSR_RING_LBASE		0x040
--#define ADF_RING_CSR_RING_UBASE		0x080
--#define ADF_RING_CSR_RING_HEAD		0x0C0
--#define ADF_RING_CSR_RING_TAIL		0x100
--#define ADF_RING_CSR_E_STAT		0x14C
--#define ADF_RING_CSR_INT_FLAG		0x170
--#define ADF_RING_CSR_INT_SRCSEL		0x174
--#define ADF_RING_CSR_INT_SRCSEL_2	0x178
--#define ADF_RING_CSR_INT_COL_EN		0x17C
--#define ADF_RING_CSR_INT_COL_CTL	0x180
--#define ADF_RING_CSR_INT_FLAG_AND_COL	0x184
--#define ADF_RING_CSR_INT_COL_CTL_ENABLE	0x80000000
--#define ADF_RING_BUNDLE_SIZE		0x1000
- #define ADF_GEN2_RX_RINGS_OFFSET	8
- #define ADF_GEN2_TX_RINGS_MASK		0xFF
- 
--#define BUILD_RING_BASE_ADDR(addr, size) \
--	(((addr) >> 6) & (GENMASK_ULL(63, 0) << (size)))
--#define READ_CSR_RING_HEAD(csr_base_addr, bank, ring) \
--	ADF_CSR_RD(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_RING_HEAD + ((ring) << 2))
--#define READ_CSR_RING_TAIL(csr_base_addr, bank, ring) \
--	ADF_CSR_RD(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_RING_TAIL + ((ring) << 2))
--#define READ_CSR_E_STAT(csr_base_addr, bank) \
--	ADF_CSR_RD(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_E_STAT)
--#define WRITE_CSR_RING_CONFIG(csr_base_addr, bank, ring, value) \
--	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_RING_CONFIG + ((ring) << 2), value)
--#define WRITE_CSR_RING_BASE(csr_base_addr, bank, ring, value) \
--do { \
--	u32 l_base = 0, u_base = 0; \
--	l_base = (u32)((value) & 0xFFFFFFFF); \
--	u_base = (u32)(((value) & 0xFFFFFFFF00000000ULL) >> 32); \
--	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_RING_LBASE + ((ring) << 2), l_base); \
--	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_RING_UBASE + ((ring) << 2), u_base); \
--} while (0)
--
--#define WRITE_CSR_RING_HEAD(csr_base_addr, bank, ring, value) \
--	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_RING_HEAD + ((ring) << 2), value)
--#define WRITE_CSR_RING_TAIL(csr_base_addr, bank, ring, value) \
--	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_RING_TAIL + ((ring) << 2), value)
--#define WRITE_CSR_INT_FLAG(csr_base_addr, bank, value) \
--	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_INT_FLAG, value)
--#define WRITE_CSR_INT_SRCSEL(csr_base_addr, bank) \
--do { \
--	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--	ADF_RING_CSR_INT_SRCSEL, ADF_BANK_INT_SRC_SEL_MASK_0); \
--	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--	ADF_RING_CSR_INT_SRCSEL_2, ADF_BANK_INT_SRC_SEL_MASK_X); \
--} while (0)
--#define WRITE_CSR_INT_COL_EN(csr_base_addr, bank, value) \
--	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_INT_COL_EN, value)
--#define WRITE_CSR_INT_COL_CTL(csr_base_addr, bank, value) \
--	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_INT_COL_CTL, \
--		   ADF_RING_CSR_INT_COL_CTL_ENABLE | (value))
--#define WRITE_CSR_INT_FLAG_AND_COL(csr_base_addr, bank, value) \
--	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * (bank)) + \
--		   ADF_RING_CSR_INT_FLAG_AND_COL, value)
--
- /* AE to function map */
- #define AE2FUNCTION_MAP_A_OFFSET	(0x3A400 + 0x190)
- #define AE2FUNCTION_MAP_B_OFFSET	(0x3A400 + 0x310)
-@@ -106,12 +37,6 @@ do { \
- #define ADF_ARB_OFFSET			0x30000
- #define ADF_ARB_WRK_2_SER_MAP_OFFSET	0x180
- #define ADF_ARB_CONFIG			(BIT(31) | BIT(6) | BIT(0))
--#define ADF_ARB_REG_SLOT		0x1000
--#define ADF_ARB_RINGSRVARBEN_OFFSET	0x19C
--
--#define WRITE_CSR_RING_SRV_ARB_EN(csr_addr, index, value) \
--	ADF_CSR_WR(csr_addr, ADF_ARB_RINGSRVARBEN_OFFSET + \
--	(ADF_ARB_REG_SLOT * (index)), value)
- 
- /* Power gating */
- #define ADF_POWERGATE_DC		BIT(23)
-@@ -158,7 +83,6 @@ u32 adf_gen2_get_num_aes(struct adf_hw_device_data *self);
- void adf_gen2_enable_error_correction(struct adf_accel_dev *accel_dev);
- void adf_gen2_cfg_iov_thds(struct adf_accel_dev *accel_dev, bool enable,
- 			   int num_a_regs, int num_b_regs);
--void adf_gen2_init_hw_csr_ops(struct adf_hw_csr_ops *csr_ops);
- void adf_gen2_get_admin_info(struct admin_info *admin_csrs_info);
- void adf_gen2_get_arb_info(struct arb_info *arb_info);
- void adf_gen2_enable_ints(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.c
-new file mode 100644
-index 000000000000..652ef4598930
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.c
-@@ -0,0 +1,101 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright(c) 2024 Intel Corporation */
-+#include <linux/types.h>
-+#include "adf_gen4_hw_csr_data.h"
++struct ring_config {
++	u64 base;
++	u32 config;
++	u32 head;
++	u32 tail;
++	u32 reserved0;
++};
 +
-+static u64 build_csr_ring_base_addr(dma_addr_t addr, u32 size)
-+{
-+	return BUILD_RING_BASE_ADDR(addr, size);
-+}
++struct bank_state {
++	u32 ringstat0;
++	u32 ringstat1;
++	u32 ringuostat;
++	u32 ringestat;
++	u32 ringnestat;
++	u32 ringnfstat;
++	u32 ringfstat;
++	u32 ringcstat0;
++	u32 ringcstat1;
++	u32 ringcstat2;
++	u32 ringcstat3;
++	u32 iaintflagen;
++	u32 iaintflagreg;
++	u32 iaintflagsrcsel0;
++	u32 iaintflagsrcsel1;
++	u32 iaintcolen;
++	u32 iaintcolctl;
++	u32 iaintflagandcolen;
++	u32 ringexpstat;
++	u32 ringexpintenable;
++	u32 ringsrvarben;
++	u32 reserved0;
++	struct ring_config rings[ADF_ETR_MAX_RINGS_PER_BANK];
++};
 +
-+static u32 read_csr_ring_head(void __iomem *csr_base_addr, u32 bank, u32 ring)
-+{
-+	return READ_CSR_RING_HEAD(csr_base_addr, bank, ring);
-+}
-+
-+static void write_csr_ring_head(void __iomem *csr_base_addr, u32 bank, u32 ring,
-+				u32 value)
-+{
-+	WRITE_CSR_RING_HEAD(csr_base_addr, bank, ring, value);
-+}
-+
-+static u32 read_csr_ring_tail(void __iomem *csr_base_addr, u32 bank, u32 ring)
-+{
-+	return READ_CSR_RING_TAIL(csr_base_addr, bank, ring);
-+}
-+
-+static void write_csr_ring_tail(void __iomem *csr_base_addr, u32 bank, u32 ring,
-+				u32 value)
-+{
-+	WRITE_CSR_RING_TAIL(csr_base_addr, bank, ring, value);
-+}
-+
-+static u32 read_csr_e_stat(void __iomem *csr_base_addr, u32 bank)
-+{
-+	return READ_CSR_E_STAT(csr_base_addr, bank);
-+}
-+
-+static void write_csr_ring_config(void __iomem *csr_base_addr, u32 bank, u32 ring,
-+				  u32 value)
-+{
-+	WRITE_CSR_RING_CONFIG(csr_base_addr, bank, ring, value);
-+}
-+
-+static void write_csr_ring_base(void __iomem *csr_base_addr, u32 bank, u32 ring,
-+				dma_addr_t addr)
-+{
-+	WRITE_CSR_RING_BASE(csr_base_addr, bank, ring, addr);
-+}
-+
-+static void write_csr_int_flag(void __iomem *csr_base_addr, u32 bank,
-+			       u32 value)
-+{
-+	WRITE_CSR_INT_FLAG(csr_base_addr, bank, value);
-+}
-+
-+static void write_csr_int_srcsel(void __iomem *csr_base_addr, u32 bank)
-+{
-+	WRITE_CSR_INT_SRCSEL(csr_base_addr, bank);
-+}
-+
-+static void write_csr_int_col_en(void __iomem *csr_base_addr, u32 bank, u32 value)
-+{
-+	WRITE_CSR_INT_COL_EN(csr_base_addr, bank, value);
-+}
-+
-+static void write_csr_int_col_ctl(void __iomem *csr_base_addr, u32 bank,
-+				  u32 value)
-+{
-+	WRITE_CSR_INT_COL_CTL(csr_base_addr, bank, value);
-+}
-+
-+static void write_csr_int_flag_and_col(void __iomem *csr_base_addr, u32 bank,
-+				       u32 value)
-+{
-+	WRITE_CSR_INT_FLAG_AND_COL(csr_base_addr, bank, value);
-+}
-+
-+static void write_csr_ring_srv_arb_en(void __iomem *csr_base_addr, u32 bank,
-+				      u32 value)
-+{
-+	WRITE_CSR_RING_SRV_ARB_EN(csr_base_addr, bank, value);
-+}
-+
-+void adf_gen4_init_hw_csr_ops(struct adf_hw_csr_ops *csr_ops)
-+{
-+	csr_ops->build_csr_ring_base_addr = build_csr_ring_base_addr;
-+	csr_ops->read_csr_ring_head = read_csr_ring_head;
-+	csr_ops->write_csr_ring_head = write_csr_ring_head;
-+	csr_ops->read_csr_ring_tail = read_csr_ring_tail;
-+	csr_ops->write_csr_ring_tail = write_csr_ring_tail;
-+	csr_ops->read_csr_e_stat = read_csr_e_stat;
-+	csr_ops->write_csr_ring_config = write_csr_ring_config;
-+	csr_ops->write_csr_ring_base = write_csr_ring_base;
-+	csr_ops->write_csr_int_flag = write_csr_int_flag;
-+	csr_ops->write_csr_int_srcsel = write_csr_int_srcsel;
-+	csr_ops->write_csr_int_col_en = write_csr_int_col_en;
-+	csr_ops->write_csr_int_col_ctl = write_csr_int_col_ctl;
-+	csr_ops->write_csr_int_flag_and_col = write_csr_int_flag_and_col;
-+	csr_ops->write_csr_ring_srv_arb_en = write_csr_ring_srv_arb_en;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen4_init_hw_csr_ops);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.h
-new file mode 100644
-index 000000000000..08d803432d9f
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.h
-@@ -0,0 +1,97 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright(c) 2024 Intel Corporation */
-+#ifndef ADF_GEN4_HW_CSR_DATA_H_
-+#define ADF_GEN4_HW_CSR_DATA_H_
-+
-+#include <linux/bitops.h>
-+#include "adf_accel_devices.h"
-+
-+#define ADF_BANK_INT_SRC_SEL_MASK	0x44UL
-+#define ADF_RING_CSR_RING_CONFIG	0x1000
-+#define ADF_RING_CSR_RING_LBASE		0x1040
-+#define ADF_RING_CSR_RING_UBASE		0x1080
-+#define ADF_RING_CSR_RING_HEAD		0x0C0
-+#define ADF_RING_CSR_RING_TAIL		0x100
-+#define ADF_RING_CSR_E_STAT		0x14C
-+#define ADF_RING_CSR_INT_FLAG		0x170
-+#define ADF_RING_CSR_INT_SRCSEL		0x174
-+#define ADF_RING_CSR_INT_COL_CTL	0x180
-+#define ADF_RING_CSR_INT_FLAG_AND_COL	0x184
-+#define ADF_RING_CSR_INT_COL_CTL_ENABLE	0x80000000
-+#define ADF_RING_CSR_INT_COL_EN		0x17C
-+#define ADF_RING_CSR_ADDR_OFFSET	0x100000
-+#define ADF_RING_BUNDLE_SIZE		0x2000
-+#define ADF_RING_CSR_RING_SRV_ARB_EN	0x19C
-+
-+#define BUILD_RING_BASE_ADDR(addr, size) \
-+	((((addr) >> 6) & (GENMASK_ULL(63, 0) << (size))) << 6)
-+#define READ_CSR_RING_HEAD(csr_base_addr, bank, ring) \
-+	ADF_CSR_RD((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + \
-+		   ADF_RING_CSR_RING_HEAD + ((ring) << 2))
-+#define READ_CSR_RING_TAIL(csr_base_addr, bank, ring) \
-+	ADF_CSR_RD((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + \
-+		   ADF_RING_CSR_RING_TAIL + ((ring) << 2))
-+#define READ_CSR_E_STAT(csr_base_addr, bank) \
-+	ADF_CSR_RD((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + ADF_RING_CSR_E_STAT)
-+#define WRITE_CSR_RING_CONFIG(csr_base_addr, bank, ring, value) \
-+	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + \
-+		   ADF_RING_CSR_RING_CONFIG + ((ring) << 2), value)
-+#define WRITE_CSR_RING_BASE(csr_base_addr, bank, ring, value)	\
-+do { \
-+	void __iomem *_csr_base_addr = csr_base_addr; \
-+	u32 _bank = bank;						\
-+	u32 _ring = ring;						\
-+	dma_addr_t _value = value;					\
-+	u32 l_base = 0, u_base = 0;					\
-+	l_base = lower_32_bits(_value);					\
-+	u_base = upper_32_bits(_value);					\
-+	ADF_CSR_WR((_csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET,		\
-+		   ADF_RING_BUNDLE_SIZE * (_bank) +			\
-+		   ADF_RING_CSR_RING_LBASE + ((_ring) << 2), l_base);	\
-+	ADF_CSR_WR((_csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET,		\
-+		   ADF_RING_BUNDLE_SIZE * (_bank) +			\
-+		   ADF_RING_CSR_RING_UBASE + ((_ring) << 2), u_base);	\
-+} while (0)
-+
-+#define WRITE_CSR_RING_HEAD(csr_base_addr, bank, ring, value) \
-+	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + \
-+		   ADF_RING_CSR_RING_HEAD + ((ring) << 2), value)
-+#define WRITE_CSR_RING_TAIL(csr_base_addr, bank, ring, value) \
-+	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + \
-+		   ADF_RING_CSR_RING_TAIL + ((ring) << 2), value)
-+#define WRITE_CSR_INT_FLAG(csr_base_addr, bank, value) \
-+	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + \
-+		   ADF_RING_CSR_INT_FLAG, (value))
-+#define WRITE_CSR_INT_SRCSEL(csr_base_addr, bank) \
-+	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + \
-+		   ADF_RING_CSR_INT_SRCSEL, ADF_BANK_INT_SRC_SEL_MASK)
-+#define WRITE_CSR_INT_COL_EN(csr_base_addr, bank, value) \
-+	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + \
-+		   ADF_RING_CSR_INT_COL_EN, (value))
-+#define WRITE_CSR_INT_COL_CTL(csr_base_addr, bank, value) \
-+	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + \
-+		   ADF_RING_CSR_INT_COL_CTL, \
-+		   ADF_RING_CSR_INT_COL_CTL_ENABLE | (value))
-+#define WRITE_CSR_INT_FLAG_AND_COL(csr_base_addr, bank, value) \
-+	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + \
-+		   ADF_RING_CSR_INT_FLAG_AND_COL, (value))
-+
-+#define WRITE_CSR_RING_SRV_ARB_EN(csr_base_addr, bank, value) \
-+	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
-+		   ADF_RING_BUNDLE_SIZE * (bank) + \
-+		   ADF_RING_CSR_RING_SRV_ARB_EN, (value))
-+
-+void adf_gen4_init_hw_csr_ops(struct adf_hw_csr_ops *csr_ops);
-+
-+#endif
+ struct adf_hw_csr_ops {
+ 	u64 (*build_csr_ring_base_addr)(dma_addr_t addr, u32 size);
+ 	u32 (*read_csr_ring_head)(void __iomem *csr_base_addr, u32 bank,
+@@ -271,6 +305,10 @@ struct adf_hw_device_data {
+ 	void (*enable_ints)(struct adf_accel_dev *accel_dev);
+ 	void (*set_ssm_wdtimer)(struct adf_accel_dev *accel_dev);
+ 	int (*ring_pair_reset)(struct adf_accel_dev *accel_dev, u32 bank_nr);
++	int (*bank_state_save)(struct adf_accel_dev *accel_dev, u32 bank_number,
++			       struct bank_state *state);
++	int (*bank_state_restore)(struct adf_accel_dev *accel_dev,
++				  u32 bank_number, struct bank_state *state);
+ 	void (*reset_device)(struct adf_accel_dev *accel_dev);
+ 	void (*set_msix_rttable)(struct adf_accel_dev *accel_dev);
+ 	const char *(*uof_get_name)(struct adf_accel_dev *accel_dev, u32 obj_num);
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-index b8a6d24f791f..12269e309fbf 100644
+index 12269e309fbf..41a0979e68c1 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
 +++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-@@ -8,103 +8,6 @@
- #include "adf_gen4_hw_data.h"
- #include "adf_gen4_pm.h"
- 
--static u64 build_csr_ring_base_addr(dma_addr_t addr, u32 size)
--{
--	return BUILD_RING_BASE_ADDR(addr, size);
--}
--
--static u32 read_csr_ring_head(void __iomem *csr_base_addr, u32 bank, u32 ring)
--{
--	return READ_CSR_RING_HEAD(csr_base_addr, bank, ring);
--}
--
--static void write_csr_ring_head(void __iomem *csr_base_addr, u32 bank, u32 ring,
--				u32 value)
--{
--	WRITE_CSR_RING_HEAD(csr_base_addr, bank, ring, value);
--}
--
--static u32 read_csr_ring_tail(void __iomem *csr_base_addr, u32 bank, u32 ring)
--{
--	return READ_CSR_RING_TAIL(csr_base_addr, bank, ring);
--}
--
--static void write_csr_ring_tail(void __iomem *csr_base_addr, u32 bank, u32 ring,
--				u32 value)
--{
--	WRITE_CSR_RING_TAIL(csr_base_addr, bank, ring, value);
--}
--
--static u32 read_csr_e_stat(void __iomem *csr_base_addr, u32 bank)
--{
--	return READ_CSR_E_STAT(csr_base_addr, bank);
--}
--
--static void write_csr_ring_config(void __iomem *csr_base_addr, u32 bank, u32 ring,
--				  u32 value)
--{
--	WRITE_CSR_RING_CONFIG(csr_base_addr, bank, ring, value);
--}
--
--static void write_csr_ring_base(void __iomem *csr_base_addr, u32 bank, u32 ring,
--				dma_addr_t addr)
--{
--	WRITE_CSR_RING_BASE(csr_base_addr, bank, ring, addr);
--}
--
--static void write_csr_int_flag(void __iomem *csr_base_addr, u32 bank,
--			       u32 value)
--{
--	WRITE_CSR_INT_FLAG(csr_base_addr, bank, value);
--}
--
--static void write_csr_int_srcsel(void __iomem *csr_base_addr, u32 bank)
--{
--	WRITE_CSR_INT_SRCSEL(csr_base_addr, bank);
--}
--
--static void write_csr_int_col_en(void __iomem *csr_base_addr, u32 bank, u32 value)
--{
--	WRITE_CSR_INT_COL_EN(csr_base_addr, bank, value);
--}
--
--static void write_csr_int_col_ctl(void __iomem *csr_base_addr, u32 bank,
--				  u32 value)
--{
--	WRITE_CSR_INT_COL_CTL(csr_base_addr, bank, value);
--}
--
--static void write_csr_int_flag_and_col(void __iomem *csr_base_addr, u32 bank,
--				       u32 value)
--{
--	WRITE_CSR_INT_FLAG_AND_COL(csr_base_addr, bank, value);
--}
--
--static void write_csr_ring_srv_arb_en(void __iomem *csr_base_addr, u32 bank,
--				      u32 value)
--{
--	WRITE_CSR_RING_SRV_ARB_EN(csr_base_addr, bank, value);
--}
--
--void adf_gen4_init_hw_csr_ops(struct adf_hw_csr_ops *csr_ops)
--{
--	csr_ops->build_csr_ring_base_addr = build_csr_ring_base_addr;
--	csr_ops->read_csr_ring_head = read_csr_ring_head;
--	csr_ops->write_csr_ring_head = write_csr_ring_head;
--	csr_ops->read_csr_ring_tail = read_csr_ring_tail;
--	csr_ops->write_csr_ring_tail = write_csr_ring_tail;
--	csr_ops->read_csr_e_stat = read_csr_e_stat;
--	csr_ops->write_csr_ring_config = write_csr_ring_config;
--	csr_ops->write_csr_ring_base = write_csr_ring_base;
--	csr_ops->write_csr_int_flag = write_csr_int_flag;
--	csr_ops->write_csr_int_srcsel = write_csr_int_srcsel;
--	csr_ops->write_csr_int_col_en = write_csr_int_col_en;
--	csr_ops->write_csr_int_col_ctl = write_csr_int_col_ctl;
--	csr_ops->write_csr_int_flag_and_col = write_csr_int_flag_and_col;
--	csr_ops->write_csr_ring_srv_arb_en = write_csr_ring_srv_arb_en;
--}
--EXPORT_SYMBOL_GPL(adf_gen4_init_hw_csr_ops);
--
- u32 adf_gen4_get_accel_mask(struct adf_hw_device_data *self)
- {
- 	return ADF_GEN4_ACCELERATORS_MASK;
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only)
+ /* Copyright(c) 2020 Intel Corporation */
+ #include <linux/iopoll.h>
++#include <asm/div64.h>
+ #include "adf_accel_devices.h"
+ #include "adf_cfg_services.h"
+ #include "adf_common_drv.h"
+@@ -390,3 +391,281 @@ u16 adf_gen4_get_ring_to_svc_map(struct adf_accel_dev *accel_dev)
+ 	return ring_to_svc_map;
+ }
+ EXPORT_SYMBOL_GPL(adf_gen4_get_ring_to_svc_map);
++
++/*
++ * adf_gen4_bank_quiesce_coal_timer() - quiesce bank coalesced interrupt timer
++ * @accel_dev: Pointer to the device structure
++ * @bank_idx: Offset to the bank within this device
++ * @timeout_ms: Timeout in milliseconds for the operation
++ *
++ * This function tries to quiesce the coalesced interrupt timer of a bank if
++ * it has been enabled and triggered.
++ *
++ * Returns 0 on success, error code otherwise
++ *
++ */
++int adf_gen4_bank_quiesce_coal_timer(struct adf_accel_dev *accel_dev,
++				     u32 bank_idx, int timeout_ms)
++{
++	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
++	struct adf_hw_csr_ops *csr_ops = GET_CSR_OPS(accel_dev);
++	void __iomem *csr_misc = adf_get_pmisc_base(accel_dev);
++	void __iomem *csr_etr = adf_get_etr_base(accel_dev);
++	u32 int_col_ctl, int_col_mask, int_col_en;
++	u32 e_stat, intsrc;
++	u64 wait_us;
++	int ret;
++
++	if (timeout_ms < 0)
++		return -EINVAL;
++
++	int_col_ctl = csr_ops->read_csr_int_col_ctl(csr_etr, bank_idx);
++	int_col_mask = csr_ops->get_int_col_ctl_enable_mask();
++	if (!(int_col_ctl & int_col_mask))
++		return 0;
++
++	int_col_en = csr_ops->read_csr_int_col_en(csr_etr, bank_idx);
++	int_col_en &= BIT(ADF_WQM_CSR_RP_IDX_RX);
++
++	e_stat = csr_ops->read_csr_e_stat(csr_etr, bank_idx);
++	if (!(~e_stat & int_col_en))
++		return 0;
++
++	wait_us = 2 * ((int_col_ctl & ~int_col_mask) << 8) * USEC_PER_SEC;
++	do_div(wait_us, hw_data->clock_frequency);
++	wait_us = min(wait_us, (u64)timeout_ms * USEC_PER_MSEC);
++	dev_dbg(&GET_DEV(accel_dev),
++		"wait for bank %d - coalesced timer expires in %llu us (max=%u ms estat=0x%x intcolen=0x%x)\n",
++		bank_idx, wait_us, timeout_ms, e_stat, int_col_en);
++
++	ret = read_poll_timeout(ADF_CSR_RD, intsrc, intsrc,
++				ADF_COALESCED_POLL_DELAY_US, wait_us, true,
++				csr_misc, ADF_WQM_CSR_RPINTSOU(bank_idx));
++	if (ret)
++		dev_warn(&GET_DEV(accel_dev),
++			 "coalesced timer for bank %d expired (%llu us)\n",
++			 bank_idx, wait_us);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(adf_gen4_bank_quiesce_coal_timer);
++
++static int drain_bank(void __iomem *csr, u32 bank_number, int timeout_us)
++{
++	u32 status;
++
++	ADF_CSR_WR(csr, ADF_WQM_CSR_RPRESETCTL(bank_number),
++		   ADF_WQM_CSR_RPRESETCTL_DRAIN);
++
++	return read_poll_timeout(ADF_CSR_RD, status,
++				status & ADF_WQM_CSR_RPRESETSTS_STATUS,
++				ADF_RPRESET_POLL_DELAY_US, timeout_us, true,
++				csr, ADF_WQM_CSR_RPRESETSTS(bank_number));
++}
++
++void adf_gen4_bank_drain_finish(struct adf_accel_dev *accel_dev,
++				u32 bank_number)
++{
++	void __iomem *csr = adf_get_etr_base(accel_dev);
++
++	ADF_CSR_WR(csr, ADF_WQM_CSR_RPRESETSTS(bank_number),
++		   ADF_WQM_CSR_RPRESETSTS_STATUS);
++}
++
++int adf_gen4_bank_drain_start(struct adf_accel_dev *accel_dev,
++			      u32 bank_number, int timeout_us)
++{
++	void __iomem *csr = adf_get_etr_base(accel_dev);
++	int ret;
++
++	dev_dbg(&GET_DEV(accel_dev), "Drain bank %d\n", bank_number);
++
++	ret = drain_bank(csr, bank_number, timeout_us);
++	if (ret)
++		dev_err(&GET_DEV(accel_dev), "Bank drain failed (timeout)\n");
++	else
++		dev_dbg(&GET_DEV(accel_dev), "Bank drain successful\n");
++
++	return ret;
++}
++
++static void bank_state_save(struct adf_hw_csr_ops *ops, void __iomem *base,
++			    u32 bank, struct bank_state *state, u32 num_rings)
++{
++	u32 i;
++
++	state->ringstat0 = ops->read_csr_stat(base, bank);
++	state->ringuostat = ops->read_csr_uo_stat(base, bank);
++	state->ringestat = ops->read_csr_e_stat(base, bank);
++	state->ringnestat = ops->read_csr_ne_stat(base, bank);
++	state->ringnfstat = ops->read_csr_nf_stat(base, bank);
++	state->ringfstat = ops->read_csr_f_stat(base, bank);
++	state->ringcstat0 = ops->read_csr_c_stat(base, bank);
++	state->iaintflagen = ops->read_csr_int_en(base, bank);
++	state->iaintflagreg = ops->read_csr_int_flag(base, bank);
++	state->iaintflagsrcsel0 = ops->read_csr_int_srcsel(base, bank);
++	state->iaintcolen = ops->read_csr_int_col_en(base, bank);
++	state->iaintcolctl = ops->read_csr_int_col_ctl(base, bank);
++	state->iaintflagandcolen = ops->read_csr_int_flag_and_col(base, bank);
++	state->ringexpstat = ops->read_csr_exp_stat(base, bank);
++	state->ringexpintenable = ops->read_csr_exp_int_en(base, bank);
++	state->ringsrvarben = ops->read_csr_ring_srv_arb_en(base, bank);
++
++	for (i = 0; i < num_rings; i++) {
++		state->rings[i].head = ops->read_csr_ring_head(base, bank, i);
++		state->rings[i].tail = ops->read_csr_ring_tail(base, bank, i);
++		state->rings[i].config = ops->read_csr_ring_config(base, bank, i);
++		state->rings[i].base = ops->read_csr_ring_base(base, bank, i);
++	}
++}
++
++#define CHECK_STAT(op, expect_val, name, args...) \
++({ \
++	u32 __expect_val = (expect_val); \
++	u32 actual_val = op(args); \
++	(__expect_val == actual_val) ? 0 : \
++		(pr_err("QAT: Fail to restore %s register. Expected 0x%x, actual 0x%x\n", \
++			name, __expect_val, actual_val), -EINVAL); \
++})
++
++static int bank_state_restore(struct adf_hw_csr_ops *ops, void __iomem *base,
++			      u32 bank, struct bank_state *state, u32 num_rings,
++			      int tx_rx_gap)
++{
++	u32 val, tmp_val, i;
++	int ret;
++
++	for (i = 0; i < num_rings; i++)
++		ops->write_csr_ring_base(base, bank, i, state->rings[i].base);
++
++	for (i = 0; i < num_rings; i++)
++		ops->write_csr_ring_config(base, bank, i, state->rings[i].config);
++
++	for (i = 0; i < num_rings / 2; i++) {
++		int tx = i * (tx_rx_gap + 1);
++		int rx = tx + tx_rx_gap;
++
++		ops->write_csr_ring_head(base, bank, tx, state->rings[tx].head);
++		ops->write_csr_ring_tail(base, bank, tx, state->rings[tx].tail);
++
++		/*
++		 * The TX ring head needs to be updated again to make sure that
++		 * the HW will not consider the ring as full when it is empty
++		 * and the correct state flags are set to match the recovered state.
++		 */
++		if (state->ringestat & BIT(tx)) {
++			val = ops->read_csr_int_srcsel(base, bank);
++			val |= ADF_RP_INT_SRC_SEL_F_RISE_MASK;
++			ops->write_csr_int_srcsel_w_val(base, bank, val);
++			ops->write_csr_ring_head(base, bank, tx, state->rings[tx].head);
++		}
++
++		ops->write_csr_ring_tail(base, bank, rx, state->rings[rx].tail);
++		val = ops->read_csr_int_srcsel(base, bank);
++		val |= ADF_RP_INT_SRC_SEL_F_RISE_MASK << ADF_RP_INT_SRC_SEL_RANGE_WIDTH;
++		ops->write_csr_int_srcsel_w_val(base, bank, val);
++
++		ops->write_csr_ring_head(base, bank, rx, state->rings[rx].head);
++		val = ops->read_csr_int_srcsel(base, bank);
++		val |= ADF_RP_INT_SRC_SEL_F_FALL_MASK << ADF_RP_INT_SRC_SEL_RANGE_WIDTH;
++		ops->write_csr_int_srcsel_w_val(base, bank, val);
++
++		/*
++		 * The RX ring tail needs to be updated again to make sure that
++		 * the HW will not consider the ring as empty when it is full
++		 * and the correct state flags are set to match the recovered state.
++		 */
++		if (state->ringfstat & BIT(rx))
++			ops->write_csr_ring_tail(base, bank, rx, state->rings[rx].tail);
++	}
++
++	ops->write_csr_int_flag_and_col(base, bank, state->iaintflagandcolen);
++	ops->write_csr_int_en(base, bank, state->iaintflagen);
++	ops->write_csr_int_col_en(base, bank, state->iaintcolen);
++	ops->write_csr_int_srcsel_w_val(base, bank, state->iaintflagsrcsel0);
++	ops->write_csr_exp_int_en(base, bank, state->ringexpintenable);
++	ops->write_csr_int_col_ctl(base, bank, state->iaintcolctl);
++	ops->write_csr_ring_srv_arb_en(base, bank, state->ringsrvarben);
++
++	/* Check that all ring statuses match the saved state. */
++	ret = CHECK_STAT(ops->read_csr_stat, state->ringstat0, "ringstat",
++			 base, bank);
++	if (ret)
++		return ret;
++
++	ret = CHECK_STAT(ops->read_csr_e_stat, state->ringestat, "ringestat",
++			 base, bank);
++	if (ret)
++		return ret;
++
++	ret = CHECK_STAT(ops->read_csr_ne_stat, state->ringnestat, "ringnestat",
++			 base, bank);
++	if (ret)
++		return ret;
++
++	ret = CHECK_STAT(ops->read_csr_nf_stat, state->ringnfstat, "ringnfstat",
++			 base, bank);
++	if (ret)
++		return ret;
++
++	ret = CHECK_STAT(ops->read_csr_f_stat, state->ringfstat, "ringfstat",
++			 base, bank);
++	if (ret)
++		return ret;
++
++	ret = CHECK_STAT(ops->read_csr_c_stat, state->ringcstat0, "ringcstat",
++			 base, bank);
++	if (ret)
++		return ret;
++
++	tmp_val = ops->read_csr_exp_stat(base, bank);
++	val = state->ringexpstat;
++	if (tmp_val && !val) {
++		pr_err("QAT: Bank was restored with exception: 0x%x\n", val);
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++int adf_gen4_bank_state_save(struct adf_accel_dev *accel_dev, u32 bank_number,
++			     struct bank_state *state)
++{
++	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
++	struct adf_hw_csr_ops *csr_ops = GET_CSR_OPS(accel_dev);
++	void __iomem *csr_base = adf_get_etr_base(accel_dev);
++
++	if (bank_number >= hw_data->num_banks || !state)
++		return -EINVAL;
++
++	dev_dbg(&GET_DEV(accel_dev), "Saving state of bank %d\n", bank_number);
++
++	bank_state_save(csr_ops, csr_base, bank_number, state,
++			hw_data->num_rings_per_bank);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(adf_gen4_bank_state_save);
++
++int adf_gen4_bank_state_restore(struct adf_accel_dev *accel_dev, u32 bank_number,
++				struct bank_state *state)
++{
++	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
++	struct adf_hw_csr_ops *csr_ops = GET_CSR_OPS(accel_dev);
++	void __iomem *csr_base = adf_get_etr_base(accel_dev);
++	int ret;
++
++	if (bank_number >= hw_data->num_banks  || !state)
++		return -EINVAL;
++
++	dev_dbg(&GET_DEV(accel_dev), "Restoring state of bank %d\n", bank_number);
++
++	ret = bank_state_restore(csr_ops, csr_base, bank_number, state,
++				 hw_data->num_rings_per_bank, hw_data->tx_rx_gap);
++	if (ret)
++		dev_err(&GET_DEV(accel_dev),
++			"Unable to restore state of bank %d\n", bank_number);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(adf_gen4_bank_state_restore);
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
-index c153f41162ec..719f7757e587 100644
+index 719f7757e587..e8cb930e80c9 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
 +++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
-@@ -1,7 +1,7 @@
- /* SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only) */
- /* Copyright(c) 2020 Intel Corporation */
--#ifndef ADF_GEN4_HW_CSR_DATA_H_
--#define ADF_GEN4_HW_CSR_DATA_H_
-+#ifndef ADF_GEN4_HW_DATA_H_
-+#define ADF_GEN4_HW_DATA_H_
+@@ -77,10 +77,19 @@
+ #define ADF_RPRESET_POLL_TIMEOUT_US	(5 * USEC_PER_SEC)
+ #define ADF_RPRESET_POLL_DELAY_US	20
+ #define ADF_WQM_CSR_RPRESETCTL_RESET	BIT(0)
++#define ADF_WQM_CSR_RPRESETCTL_DRAIN	BIT(2)
+ #define ADF_WQM_CSR_RPRESETCTL(bank)	(0x6000 + ((bank) << 3))
+ #define ADF_WQM_CSR_RPRESETSTS_STATUS	BIT(0)
+ #define ADF_WQM_CSR_RPRESETSTS(bank)	(ADF_WQM_CSR_RPRESETCTL(bank) + 4)
  
- #include <linux/units.h>
- 
-@@ -54,95 +54,6 @@
- #define ADF_GEN4_ADMINMSGLR_OFFSET	0x500578
- #define ADF_GEN4_MAILBOX_BASE_OFFSET	0x600970
- 
--/* Transport access */
--#define ADF_BANK_INT_SRC_SEL_MASK	0x44UL
--#define ADF_RING_CSR_RING_CONFIG	0x1000
--#define ADF_RING_CSR_RING_LBASE		0x1040
--#define ADF_RING_CSR_RING_UBASE		0x1080
--#define ADF_RING_CSR_RING_HEAD		0x0C0
--#define ADF_RING_CSR_RING_TAIL		0x100
--#define ADF_RING_CSR_E_STAT		0x14C
--#define ADF_RING_CSR_INT_FLAG		0x170
--#define ADF_RING_CSR_INT_SRCSEL		0x174
--#define ADF_RING_CSR_INT_COL_CTL	0x180
--#define ADF_RING_CSR_INT_FLAG_AND_COL	0x184
--#define ADF_RING_CSR_INT_COL_CTL_ENABLE	0x80000000
--#define ADF_RING_CSR_INT_COL_EN		0x17C
--#define ADF_RING_CSR_ADDR_OFFSET	0x100000
--#define ADF_RING_BUNDLE_SIZE		0x2000
--
--#define BUILD_RING_BASE_ADDR(addr, size) \
--	((((addr) >> 6) & (GENMASK_ULL(63, 0) << (size))) << 6)
--#define READ_CSR_RING_HEAD(csr_base_addr, bank, ring) \
--	ADF_CSR_RD((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + \
--		   ADF_RING_CSR_RING_HEAD + ((ring) << 2))
--#define READ_CSR_RING_TAIL(csr_base_addr, bank, ring) \
--	ADF_CSR_RD((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + \
--		   ADF_RING_CSR_RING_TAIL + ((ring) << 2))
--#define READ_CSR_E_STAT(csr_base_addr, bank) \
--	ADF_CSR_RD((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + ADF_RING_CSR_E_STAT)
--#define WRITE_CSR_RING_CONFIG(csr_base_addr, bank, ring, value) \
--	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + \
--		   ADF_RING_CSR_RING_CONFIG + ((ring) << 2), value)
--#define WRITE_CSR_RING_BASE(csr_base_addr, bank, ring, value)	\
--do { \
--	void __iomem *_csr_base_addr = csr_base_addr; \
--	u32 _bank = bank;						\
--	u32 _ring = ring;						\
--	dma_addr_t _value = value;					\
--	u32 l_base = 0, u_base = 0;					\
--	l_base = lower_32_bits(_value);					\
--	u_base = upper_32_bits(_value);					\
--	ADF_CSR_WR((_csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET,		\
--		   ADF_RING_BUNDLE_SIZE * (_bank) +			\
--		   ADF_RING_CSR_RING_LBASE + ((_ring) << 2), l_base);	\
--	ADF_CSR_WR((_csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET,		\
--		   ADF_RING_BUNDLE_SIZE * (_bank) +			\
--		   ADF_RING_CSR_RING_UBASE + ((_ring) << 2), u_base);	\
--} while (0)
--
--#define WRITE_CSR_RING_HEAD(csr_base_addr, bank, ring, value) \
--	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + \
--		   ADF_RING_CSR_RING_HEAD + ((ring) << 2), value)
--#define WRITE_CSR_RING_TAIL(csr_base_addr, bank, ring, value) \
--	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + \
--		   ADF_RING_CSR_RING_TAIL + ((ring) << 2), value)
--#define WRITE_CSR_INT_FLAG(csr_base_addr, bank, value) \
--	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + \
--		   ADF_RING_CSR_INT_FLAG, (value))
--#define WRITE_CSR_INT_SRCSEL(csr_base_addr, bank) \
--	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + \
--		   ADF_RING_CSR_INT_SRCSEL, ADF_BANK_INT_SRC_SEL_MASK)
--#define WRITE_CSR_INT_COL_EN(csr_base_addr, bank, value) \
--	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + \
--		   ADF_RING_CSR_INT_COL_EN, (value))
--#define WRITE_CSR_INT_COL_CTL(csr_base_addr, bank, value) \
--	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + \
--		   ADF_RING_CSR_INT_COL_CTL, \
--		   ADF_RING_CSR_INT_COL_CTL_ENABLE | (value))
--#define WRITE_CSR_INT_FLAG_AND_COL(csr_base_addr, bank, value) \
--	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + \
--		   ADF_RING_CSR_INT_FLAG_AND_COL, (value))
--
--/* Arbiter configuration */
--#define ADF_RING_CSR_RING_SRV_ARB_EN 0x19C
--
--#define WRITE_CSR_RING_SRV_ARB_EN(csr_base_addr, bank, value) \
--	ADF_CSR_WR((csr_base_addr) + ADF_RING_CSR_ADDR_OFFSET, \
--		   ADF_RING_BUNDLE_SIZE * (bank) + \
--		   ADF_RING_CSR_RING_SRV_ARB_EN, (value))
--
- /* Default ring mapping */
- #define ADF_GEN4_DEFAULT_RING_TO_SRV_MAP \
- 	(ASYM << ADF_CFG_SERV_RING_PAIR_0_SHIFT | \
-@@ -234,7 +145,6 @@ u32 adf_gen4_get_num_aes(struct adf_hw_device_data *self);
- enum dev_sku_info adf_gen4_get_sku(struct adf_hw_device_data *self);
- u32 adf_gen4_get_sram_bar_id(struct adf_hw_device_data *self);
- int adf_gen4_init_device(struct adf_accel_dev *accel_dev);
--void adf_gen4_init_hw_csr_ops(struct adf_hw_csr_ops *csr_ops);
- int adf_gen4_ring_pair_reset(struct adf_accel_dev *accel_dev, u32 bank_number);
- void adf_gen4_set_msix_default_rttable(struct adf_accel_dev *accel_dev);
++/* Ring interrupt */
++#define ADF_RP_INT_SRC_SEL_F_RISE_MASK	BIT(2)
++#define ADF_RP_INT_SRC_SEL_F_FALL_MASK	GENMASK(2, 0)
++#define ADF_RP_INT_SRC_SEL_RANGE_WIDTH	4
++#define ADF_COALESCED_POLL_DELAY_US	1000
++#define ADF_WQM_CSR_RPINTSOU(bank)	(0x200000 + ((bank) << 12))
++#define ADF_WQM_CSR_RP_IDX_RX		1
++
+ /* Error source registers */
+ #define ADF_GEN4_ERRSOU0	(0x41A200)
+ #define ADF_GEN4_ERRSOU1	(0x41A204)
+@@ -150,5 +159,15 @@ void adf_gen4_set_msix_default_rttable(struct adf_accel_dev *accel_dev);
  void adf_gen4_set_ssm_wdtimer(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-index af14090cc4be..6e24d57e6b98 100644
---- a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-@@ -5,6 +5,7 @@
- #include <adf_common_drv.h>
- #include <adf_gen2_config.h>
- #include <adf_gen2_dc.h>
-+#include <adf_gen2_hw_csr_data.h>
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include "adf_dh895xcc_hw_data.h"
-diff --git a/drivers/crypto/intel/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c b/drivers/crypto/intel/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
-index 70e56cc16ece..f4ee4c2e00da 100644
---- a/drivers/crypto/intel/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
-@@ -4,6 +4,7 @@
- #include <adf_common_drv.h>
- #include <adf_gen2_config.h>
- #include <adf_gen2_dc.h>
-+#include <adf_gen2_hw_csr_data.h>
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include <adf_pfvf_vf_msg.h>
+ int adf_gen4_init_thd2arb_map(struct adf_accel_dev *accel_dev);
+ u16 adf_gen4_get_ring_to_svc_map(struct adf_accel_dev *accel_dev);
++int adf_gen4_bank_quiesce_coal_timer(struct adf_accel_dev *accel_dev,
++				     u32 bank_idx, int timeout_ms);
++int adf_gen4_bank_drain_start(struct adf_accel_dev *accel_dev,
++			      u32 bank_number, int timeout_us);
++void adf_gen4_bank_drain_finish(struct adf_accel_dev *accel_dev,
++				u32 bank_number);
++int adf_gen4_bank_state_save(struct adf_accel_dev *accel_dev, u32 bank_number,
++			     struct bank_state *state);
++int adf_gen4_bank_state_restore(struct adf_accel_dev *accel_dev,
++				u32 bank_number, struct bank_state *state);
+ 
+ #endif
 -- 
 2.18.2
 
