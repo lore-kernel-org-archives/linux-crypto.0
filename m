@@ -1,108 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE08C76C83;
-	Tue, 20 Feb 2024 18:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91533A35
+	for <linux-crypto@vger.kernel.org>; Wed, 21 Feb 2024 05:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708452188; cv=none; b=i5Q8Bq5l1XsZZEkollUoXw0WgytT0ennN184KqvvfpJ0aY0e4f/V5/VlWDOmtWWsip0y/gfztv76DBrgT5i0sapZM4Tqp8mLJ68tphRGhFCjRnsQR0AuSx2zQ2rGJec9VcNAuLfWKtORlpfV8SVyY27zu6ThRHcCO+EkfOhVDqE=
+	t=1708492756; cv=none; b=lDqRqzaOpCfKwb8IjJb/Du6kVGLlKvyx9oiIuthMipTLC9RyCfPoAUieTsA2mc+EksFejbifdY0UcZOuNBaFRMnDoOC7DOv8aRYwW5rgztMt9u9TpTEXTcyvZEIDv9GQhmfR+2jgC8VtBAlFwRRO+uAVe3KU1e55idmn912qNzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708452188; c=relaxed/simple;
-	bh=yPSlryxt4R8pj3MxRFRtP46K8MzZYDku9kbAxbJ3Otk=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=Sdg1DiMGbLWDKcAoKkv0ckMe4xP/WjYNanfM+u6/LcEaRETs2a8mwyvLrirE3+Z48S4SvNPeFG0w9uwx4bqKKdzZycLLW5qYnHTXquGcutrvsqRe4V7K2//eAqR79pfWksx8g8hEVtKzcdn1nhdWBVDPagkDgpew2AxXtrwoP6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOw0sgVg; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOw0sgVg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1483EC433F1;
-	Tue, 20 Feb 2024 18:03:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708452188;
-	bh=yPSlryxt4R8pj3MxRFRtP46K8MzZYDku9kbAxbJ3Otk=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=AOw0sgVg1wZzwis6jy7i+48gWccEwvAKQ5XzAiSMdjdvIwecnoKrGJ3CJrRAIcxMk
-	 ESLoHXy8xOfVx/f1dk0xyGE0qGGdvcXdrcqnq1zStYYnl4C+3Ab+7Vnyn8Eru9z9kG
-	 WloTdBOA9uVO+4lAKClLHUZSXDRSLTFVSQp9w/2ondklXbqO4PMB+P8WLfG+kIwWrS
-	 Zszw1DtlKXZyL99jF7tIRkqUseioutq79fzQBeRhOtp7E4G+PDkL7xXf5NiYdeQoAY
-	 Ct9e3+OO6SzIflZ4b+Qsz+4q75FFwyFDnO6+phbnpINmLAQM9XIRLvEQQDQGHGjnJ1
-	 U2w3URs4IL2lg==
+	s=arc-20240116; t=1708492756; c=relaxed/simple;
+	bh=a630WBtM15Lun9BatAeO/yXInRGZCfYm0X/zw7kuh2s=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Ahdd8w4x+PUZEznAgkAieshCHnjAXVcx+rBr2EJiihC62blngvjaQVXnHEj3k3VD9qYCrQRPN3WxYSke6n2H4lXAZjUpvL5PTAr5yTu7pIZSjuBJBiWZFnoDQ9PfU/SGkhlqruHu2dKO/PJN73OLfnH2L05cQ7itDsxFZo0Gnv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rcf0X-00FwdQ-7G; Wed, 21 Feb 2024 13:19:02 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 21 Feb 2024 13:19:15 +0800
+Date: Wed, 21 Feb 2024 13:19:15 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Nicolai Stange <nstange@suse.de>, Hannes Reinecke <hare@suse.de>,
+	Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] crypto: dh - Make public key test FIPS-only
+Message-ID: <ZdWH02dVyhgw7fmr@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 20 Feb 2024 18:03:02 +0000
-Message-Id: <CZA3R5R9CVYD.1HH1S662FW2RX@seitikki>
-Cc: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>, "Andy
- Shevchenko" <andriy.shevchenko@linux.intel.com>, "Peter Zijlstra"
- <peterz@infradead.org>, "Dan Williams" <dan.j.williams@intel.com>, "Ard
- Biesheuvel" <ardb@kernel.org>, "Nick Desaulniers"
- <ndesaulniers@google.com>, "Nathan Chancellor" <nathan@kernel.org>
-Subject: Re: [PATCH v3] X.509: Introduce scope-based x509_certificate
- allocation
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Jarkko Sakkinen" <jarkko@kernel.org>, "Lukas Wunner" <lukas@wunner.de>,
- "David Howells" <dhowells@redhat.com>, "Herbert Xu"
- <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
- "Jonathan Cameron" <Jonathan.Cameron@huawei.com>
-X-Mailer: aerc 0.15.2
-References: <63cc7ab17a5064756e26e50bc605e3ff8914f05a.1708439875.git.lukas@wunner.de> <CZA3PCY3U4YU.3R05ZC4X16EX0@seitikki>
-In-Reply-To: <CZA3PCY3U4YU.3R05ZC4X16EX0@seitikki>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Tue Feb 20, 2024 at 6:00 PM UTC, Jarkko Sakkinen wrote:
-> On Tue Feb 20, 2024 at 3:10 PM UTC, Lukas Wunner wrote:
-> > Add a DEFINE_FREE() clause for x509_certificate structs and use it in
-> > x509_cert_parse() and x509_key_preparse().  These are the only function=
-s
-> > where scope-based x509_certificate allocation currently makes sense.
-> > A third user will be introduced with the forthcoming SPDM library
-> > (Security Protocol and Data Model) for PCI device authentication.
->
-> I think you are adding scope-based memory management and not
-> DEFINE_FREE(). Otherwise, this would be one-liner patch.
->
-> I'm not sure if the last sentence adds more than clutter as this
-> patch has nothing to do with SPDM changes per se.
->
-> > Unlike most other DEFINE_FREE() clauses, this one checks for IS_ERR()
-> > instead of NULL before calling x509_free_certificate() at end of scope.
-> > That's because the "constructor" of x509_certificate structs,
-> > x509_cert_parse(), returns a valid pointer or an ERR_PTR(), but never
-> > NULL.
-> >
-> > I've compared the Assembler output before/after and they are identical,
-> > save for the fact that gcc-12 always generates two return paths when
-> > __cleanup() is used, one for the success case and one for the error cas=
-e.
->
-> Use passive as commit message is not a personal letter.
->
-> >
-> > In x509_cert_parse(), add a hint for the compiler that kzalloc() never
-> > returns an ERR_PTR().  Otherwise the compiler adds a gratuitous IS_ERR(=
-)
-> > check on return.  Introduce a handy assume() macro for this which can b=
-e
-> > re-used elsewhere in the kernel to provide hints for the compiler.
->
-> Does not explain why it is "handy".
->
-> I don't see a story here but instead I see bunch of disordered tecnical
-> terms.
->
-> We have the code diff for detailed technical stuff. The commit message
-> should simply explain why we want this and what it does for us. And we
-> zero care about PCI changes in the scope of this patch, especially since
-> this is not part of such patch set.
+The function dh_is_pubkey_valid was added to for FIPS but it was
+only partially conditional to fips_enabled.
 
-I mean think it this way.
+In particular, the first test in the function relies on the last
+test to work properly, but the last test is only run in FIPS mode.
 
-What is the most important function of a commit message? Well, it comes
-when the commit is in the mainline. It reminds of the *reasons* why a
-change was made and this commit message does not really serve well in
-that role.
+Fix this inconsistency by making the whole function conditional
+on fips_enabled.
 
-BR, Jarkko
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ crypto/dh.c | 63 +++++++++++++++++++++++++++--------------------------
+ 1 file changed, 32 insertions(+), 31 deletions(-)
+
+diff --git a/crypto/dh.c b/crypto/dh.c
+index 0fcad279e6fe..68d11d66c0b5 100644
+--- a/crypto/dh.c
++++ b/crypto/dh.c
+@@ -106,6 +106,12 @@ static int dh_set_secret(struct crypto_kpp *tfm, const void *buf,
+  */
+ static int dh_is_pubkey_valid(struct dh_ctx *ctx, MPI y)
+ {
++	MPI val, q;
++	int ret;
++
++	if (!fips_enabled)
++		return 0;
++
+ 	if (unlikely(!ctx->p))
+ 		return -EINVAL;
+ 
+@@ -125,41 +131,36 @@ static int dh_is_pubkey_valid(struct dh_ctx *ctx, MPI y)
+ 	 *
+ 	 * For the safe-prime groups q = (p - 1)/2.
+ 	 */
+-	if (fips_enabled) {
+-		MPI val, q;
+-		int ret;
+-
+-		val = mpi_alloc(0);
+-		if (!val)
+-			return -ENOMEM;
+-
+-		q = mpi_alloc(mpi_get_nlimbs(ctx->p));
+-		if (!q) {
+-			mpi_free(val);
+-			return -ENOMEM;
+-		}
+-
+-		/*
+-		 * ->p is odd, so no need to explicitly subtract one
+-		 * from it before shifting to the right.
+-		 */
+-		mpi_rshift(q, ctx->p, 1);
+-
+-		ret = mpi_powm(val, y, q, ctx->p);
+-		mpi_free(q);
+-		if (ret) {
+-			mpi_free(val);
+-			return ret;
+-		}
+-
+-		ret = mpi_cmp_ui(val, 1);
++	val = mpi_alloc(0);
++	if (!val)
++		return -ENOMEM;
+ 
++	q = mpi_alloc(mpi_get_nlimbs(ctx->p));
++	if (!q) {
+ 		mpi_free(val);
+-
+-		if (ret != 0)
+-			return -EINVAL;
++		return -ENOMEM;
+ 	}
+ 
++	/*
++	 * ->p is odd, so no need to explicitly subtract one
++	 * from it before shifting to the right.
++	 */
++	mpi_rshift(q, ctx->p, 1);
++
++	ret = mpi_powm(val, y, q, ctx->p);
++	mpi_free(q);
++	if (ret) {
++		mpi_free(val);
++		return ret;
++	}
++
++	ret = mpi_cmp_ui(val, 1);
++
++	mpi_free(val);
++
++	if (ret != 0)
++		return -EINVAL;
++
+ 	return 0;
+ }
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
