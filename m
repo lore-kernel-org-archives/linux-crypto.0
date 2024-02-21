@@ -1,77 +1,112 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED443DB92;
-	Wed, 21 Feb 2024 09:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAB73D386
+	for <linux-crypto@vger.kernel.org>; Wed, 21 Feb 2024 09:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708506643; cv=none; b=RrUVba2Vr7YGSf7/qgMgEdfVwt3QUVz4U3wsYLfYDgxbHV2EWlu5CMnrcNd/bZPlCag5UuevCFGEOo3x/E5cLre7vNvAfnCwP9Xw8WIRM6f3C6jLhPBNgiOzKWjpdNjC3mWp3Ip8i2e+K0jVsf6ikptZQr1sAIfVr2nEkJeCgOg=
+	t=1708507204; cv=none; b=GLxbCEPCGI5IdYA7ekPDRzsPdl9tG6Br4ovSTC4GrSDidhQnfSnwwuWRhYQum+IMqPlrKcUtq33CdEoePqYTZqKsc9+gUMYDIdlKVtxOl+7Gcw3fiaYGdsw6z28gLizhXtxgtjtoMtF/zO3hNW1yHHIRTrW1X4EyvZUrCJZ/VQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708506643; c=relaxed/simple;
-	bh=KjpoedeNb7Zngx+JZi7/7eN5vwhr8MINxhAkzC2Vi/M=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IdVs0MJnSGjHELBf94a5l0Pq1FIFqSSmlMZFu0DUG/z1UDEDfNsfKm1SzJ4qm0Bm9ld0AEhMiYoSC1JqzqiRlSHgRrLZ10uVUbs+glx7AKwxiBIy/SfOgmK5XJ5EIeRhC4R2InpNqYe/58BJFAPV+xfe1LhGdS+rEG3+H5rGnyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rcicb-00G0sb-La; Wed, 21 Feb 2024 17:10:34 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 21 Feb 2024 17:10:48 +0800
-Date: Wed, 21 Feb 2024 17:10:48 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.8
-Message-ID: <ZdW+GCkO4s3MSeLX@gondor.apana.org.au>
-References: <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
- <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
- <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
- <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
- <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
- <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
- <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
- <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
- <ZbstBewmaIfrFocE@gondor.apana.org.au>
- <ZcRYwZHASH4Cv5Bn@gondor.apana.org.au>
+	s=arc-20240116; t=1708507204; c=relaxed/simple;
+	bh=4XKCRgUfql1oqSuMEzciwfrGkQGpXj7xWamweMtvSpI=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=LeyM5mqmG6xC4yBw9eEzpmWE+17gidzhe1iDPhFUrjapHs6qF9W7ie07Ldo0iHe/VZCHadLroTqGpHcFj1426Cx6omP9t7g5SmMsaLgk1rCmC4pitb2s3vfBTQwRZovXhe6vfJ10zweuTwXIvt5HESy1TzBHrk3+0+ofVniO2ZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=JMKOfvPE; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="JMKOfvPE"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a3f1bf03722so134127366b.1
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Feb 2024 01:20:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1708507201; x=1709112001; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=rCRVDVCLmJfFciYW4Erv9msTdo2+veeqDEBTOdxyHoo=;
+        b=JMKOfvPEJs+JnftpENEfGIkeOxQtuH130EhAGgTO2GEFzFlOc4Z3dWdvWpjRZ1eWO8
+         6oze6QC+IMwl919hh2CsCUTDwFJPFrvniNBEULYrDmCujnqXdYpnqbi3Xe9hcV8mHA7G
+         ek3p9nIVtjT3JZTqHJYy/nz7OEFt6Nhvews37K2pGYxHNmbOIpgHGcpTc8SFDHFWGW75
+         4TWrjH6tQZ7dl8DvDwNBtVcaMiirAFEQGiBTG2FmIE7ezPWv9N+hEiGLoON7p7oD3Hjf
+         OwFRSSk+zAdl1dZiHpUN1wyurVWqqRkoMLb+bnr1gGETmim5MyweCbowEhjNbV1ylWOI
+         Zgzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708507201; x=1709112001;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rCRVDVCLmJfFciYW4Erv9msTdo2+veeqDEBTOdxyHoo=;
+        b=N3Yw6FSuWdPvbXOmb5CJei+KYfPQWdeH+Ka5cv8ipn8vkdYiXkXWM7DJWPmH8YsIaF
+         gReR70MhCa5Dqx5VitjeR15yi5N4MRYKFrIS06LX7F5nRlaZ+egvpAEewPJiwMRev+/A
+         9/4ZxjWrV8Sfxi+sqc6Ke7Iqbz1m6puPINgyOr9jJfNl6ZQYIX7c3Y06Pl4jTJdjrYFS
+         GkLOYPimqShABD2yOWoLR5zyTPt+iCThwokK3qQPLsIBPtCjrlabb2i8WrbNvDOAjunv
+         vEKTq858E+W8HCMjH8BhrsbGu1ZuCDtAk+xI068oErS2jOL0iq9NH2WvfTbRVfo11P41
+         yVpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUz5pmaroYIOa9Cm5lXBCC9wmSbipoU+Zg4DZ79+TfPffL7fwnBnX0VXiQOBgty8Dc4NMVW2UBXjJry9XXgmC1MIKRjwLC6R5jwAvI2
+X-Gm-Message-State: AOJu0YxtvEh6ufU32Y+bAh18NvAtb1rTiBV939N41RPY8ob0FvI0ZC3/
+	L7whaVhvs9dhIBIjq8WFLku2C4/sUPT65i2yVwpRo/s2sob5AsBeswkiLT+RAWU=
+X-Google-Smtp-Source: AGHT+IHc93EonCQYXHRQASAv9tZM3yEJ5V7LFqiM5p0TzdSVqsAegne55+3xR6hpv3gdYC4FnMCD2g==
+X-Received: by 2002:a17:906:81d3:b0:a3e:c9f5:fbaa with SMTP id e19-20020a17090681d300b00a3ec9f5fbaamr5180374ejx.68.1708507200808;
+        Wed, 21 Feb 2024 01:20:00 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:d4])
+        by smtp.gmail.com with ESMTPSA id jw2-20020a170906e94200b00a3f0d98c125sm1199602ejb.155.2024.02.21.01.19.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Feb 2024 01:20:00 -0800 (PST)
+References: <20240115220803.1973440-1-vadfed@meta.com>
+ <20240115220803.1973440-3-vadfed@meta.com> <87frxmmci7.fsf@cloudflare.com>
+User-agent: mu4e 1.6.10; emacs 29.2
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jakub Kicinski
+ <kuba@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Andrii
+ Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Mykola
+ Lysenko <mykolal@fb.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ netdev@vger.kernel.org, linux-crypto@vger.kernel.org, bpf@vger.kernel.org,
+ Victor Stewart <v@nametag.social>
+Subject: Re: [PATCH bpf-next v8 3/3] selftests: bpf: crypto skcipher algo
+ selftests
+Date: Wed, 21 Feb 2024 10:19:34 +0100
+In-reply-to: <87frxmmci7.fsf@cloudflare.com>
+Message-ID: <87bk8amawx.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZcRYwZHASH4Cv5Bn@gondor.apana.org.au>
+Content-Type: text/plain
 
-Hi Linus:
+On Wed, Feb 21, 2024 at 09:43 AM +01, Jakub Sitnicki wrote:
+> On Mon, Jan 15, 2024 at 02:08 PM -08, Vadim Fedorenko wrote:
+>> Add simple tc hook selftests to show the way to work with new crypto
+>> BPF API. Some tricky dynptr initialization is used to provide empty iv
+>> dynptr. Simple AES-ECB algo is used to demonstrate encryption and
+>> decryption of fixed size buffers.
+>>
+>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+>> ---
+>
+> [...]
+>
+>> diff --git a/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
+>> b/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
+>> new file mode 100644
+>> index 000000000000..70bde9640651
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
+>> @@ -0,0 +1,217 @@
+>
+> [...]
+>
+>> +static void deinit_afalg(void)
+>> +{
+>> +	if (tfmfd)
+>> +		close(tfmfd);
+>> +	if (opfd)
+>> +		close(opfd);
+>> +}
+>
+> Did you mean tfmfd/opfd != -1?
+>
+> [...]
 
-The following changes since commit 24c890dd712f6345e382256cae8c97abb0406b70:
-
-  crypto: algif_hash - Remove bogus SGL free on zero-length error path (2024-02-02 18:08:12 +0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.8-p4 
-
-for you to fetch changes up to c0ec2a712daf133d9996a8a1b7ee2d4996080363:
-
-  crypto: virtio/akcipher - Fix stack overflow on memcpy (2024-02-09 12:55:53 +0800)
-
-----------------------------------------------------------------
-This push fixes a stack overflow in virtio.
-----------------------------------------------------------------
-
-zhenwei pi (1):
-      crypto: virtio/akcipher - Fix stack overflow on memcpy
-
- drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Nevermind. I missed Martin's earlier feedback.
