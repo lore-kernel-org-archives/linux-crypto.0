@@ -1,152 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBCD56456;
-	Wed, 21 Feb 2024 23:24:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718FB126F00;
+	Wed, 21 Feb 2024 23:38:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708557862; cv=none; b=bXgU2jiPSdcUFeC6nq9/Qpw2zdwS/FJLxKrx6uuLARE4b7tPNzu1ossHia/rDzsD18Jq6KEDdKh2vMt4d7gmi9YN2f6ObCB66XPOC/TuHQovLxS/0uqnXl0ayOAsGAefgaBWGa5XVT5IO91FgQEbCm5wa1LCn+AjhZYSWuWVDB0=
+	t=1708558681; cv=none; b=n3TP5VtTZ6LN/cdGeXXIIhHA3q69R4bRc/7uKSub9S0DyA218S+E6ZySW3/ZXf3r4YcdXX5getksYs4XI7NQ6wonNbf/NBBzUBqnlWHhqKxQSDPEEkBacMasBC3yV7zLtjjI1br963H4nEfmOaZZVnm7Ep7M6mnhyS3mgl9O35I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708557862; c=relaxed/simple;
-	bh=o0pBvdU+JHgT39C/oZ43v61yIgxOBybqfEpddDffT+s=;
+	s=arc-20240116; t=1708558681; c=relaxed/simple;
+	bh=WAXaGEI2juxPFHl35+ioThue0wtLioF1NPhr5VM0UkQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X4BOlSGoxPIU5l4AobN6VjfgXmiDgDv5hqQvSGx3xa3c65QB7eMHJtTkcYLfRLU51C8OKtl7CQoXmQWytOTZ3lGDbADrRJzBu7a6z7cWLzXSoKu22yv7Bsh+EH3sgF8XDOLY9T0PUdCXrIhdLSdej4i1LBDBLcf2RFXmQBwyGpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uo6j9C+3; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=V1tZ+v/80EnoR4EOsNcQhTf4Z1Cuco6zRbfgZc8GHb7ZxSuidZjkFYov2DgnIx/w0MhcnGxAiqx26UjrCGhn42kcSIZkLwsUSYXnU9U4i54606zXGxu8kklGeTintN/RylRERqojEJ5ocWQ2Ix5dvfkPhiZx3iXtjgEhvzvy9oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UaKnizN0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uo6j9C+3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D2A2C433B2;
-	Wed, 21 Feb 2024 23:24:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UaKnizN0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBD99C433C7;
+	Wed, 21 Feb 2024 23:38:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708557862;
-	bh=o0pBvdU+JHgT39C/oZ43v61yIgxOBybqfEpddDffT+s=;
+	s=k20201202; t=1708558680;
+	bh=WAXaGEI2juxPFHl35+ioThue0wtLioF1NPhr5VM0UkQ=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Uo6j9C+3yRULLuhfUameeJdnFArY/DJQDmDNfb1NtvgSUoJu5xf4jfx3Gzy+QWSD9
-	 /Ki6xXWWXFKWco2i+oBjemS298yxFH2zmONSAJcVKpgnn5ASa+vrnmQIpFxASzABp+
-	 xoSQLSGYl7MTRjNIb7yQfurBY6V9FXK8ivBg1ovDs85Q1KUONIJVWj5xmY8Ur8JYYU
-	 fZHc/w3kaVNWAkptQF2laAOVKKd9frUPsRF+EkoYYE7i6AHxoYzxa8iLUf660a9KUD
-	 GjhfnDzRtt2+7CtEkm91mWF+v2OU9tMK+ATcehpGg8SBuGV4NPe2dcC3yYgKO2TTcg
-	 nGOx4pK29xnCA==
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d2531294faso19792401fa.2;
-        Wed, 21 Feb 2024 15:24:22 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVyNDcEzKTTQSv5DNDzm/PrucU88RphNZGanUIZpAW4RGjDQJRoA7FJlrzpZTt4kpx2CrcO1ZAs3P9e/iVNqF1VhthsobAG+dhfnKTe7wSsSdjrnEPK160TbQEifnJ6cxMni/EG6Kb7xGz3/xfbB6BHeSGx4yzb7N1MvOkq+WCmOCrewD+AbEAMPqmnF+BWfUgQNA48h1Km3vftmz4GB/6o3gILoVIaorvMToST92829DTGtVOhqZFyPaf6tC0X4XMJ
-X-Gm-Message-State: AOJu0YxaIvoxLHyGYb7bxG007v0Gnu3PS5YuKWr7ng7EE0b9ZPf+wHTt
-	YQ0yIU0PViUTWaBbYJ1dhHKJnMQTD7DbPx79iV/ma/Dee8P1mLaifevw0t3hppN3dAzc3eNCzkT
-	vnyRwpFbEarFUMmBRf6EbMcc5eYc=
-X-Google-Smtp-Source: AGHT+IEFjS3UH7erXEZ4kbkF96yuQm9TlfZ1AWhPucU81wH0eazr9XKjePangSR6zBzRuAu+rhDmfGqI9zl7A6Q+3YI=
-X-Received: by 2002:a2e:b8c8:0:b0:2d0:c77c:b1ca with SMTP id
- s8-20020a2eb8c8000000b002d0c77cb1camr14950388ljp.49.1708557860236; Wed, 21
- Feb 2024 15:24:20 -0800 (PST)
+	b=UaKnizN0x8enyIettGm+0P9IFjEgQle8zT06jCvWpkm0F+ga7+XKvPsmE4mZiHQS0
+	 BtxooqOJbBXO+orTooSB2dk79aZLlvx55IOj7iMoQ9tC+gsYfVrezizdGqzykHDM65
+	 0LpbaMrtIPBHN9vTlzpMdStwUdJ2V4OR2UfX1Ac/x/on6gneACcmSeU3wtNoGE0mrs
+	 VPnn8nOwxumtIm+12Av4cOyLGvpx/2j2iEPpNXKDNgj5wjwxJ6vCXxb61c0IQUrpye
+	 qbXyG8P5/wJymdr3qpppBsIvqcv00sWt0t9VowKXp7K+bJlG8Vb6SLL40fRKNJwAJF
+	 WK4CLvUEnGkCA==
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-511ac32fe38so11071978e87.1;
+        Wed, 21 Feb 2024 15:38:00 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUcV2BLMgAGEuaU81K8xVwOmrrFx2ZSjxRqVw/Sl38dghL5Qp0rQICtHRLl75pGwnqyVh4JaADGLWAW9dgvGjMEHXJTg64H
+X-Gm-Message-State: AOJu0YzmTdmtreZ98JyH1G8WYfXAkxwvc6Jf1Mvrv8jFj/q1CyQy5v9S
+	oncY+kMn6QUUtiPxIWM5miQvlSxt7mH+ix32DHN9+GXJ3pBKL+tLez4VvGr02rf7/cTUTWI3vvH
+	FGl/XIjYjfkE9jJ9Y6YGYHz0sG4M=
+X-Google-Smtp-Source: AGHT+IGenZZOFkRMP6+eKElpXmWoSrGK5FHYxUOF69aa2bLEa/DwqCxn3XiWHJ1Xw5V1AaranzDq5lrQhp2GSIIM9hY=
+X-Received: by 2002:a05:6512:3a83:b0:512:b04a:aa56 with SMTP id
+ q3-20020a0565123a8300b00512b04aaa56mr10911020lfu.24.1708558679072; Wed, 21
+ Feb 2024 15:37:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240214221847.2066632-1-ross.philipson@oracle.com>
- <20240214221847.2066632-16-ross.philipson@oracle.com> <CAMj1kXF3k_c4Wn9GU+NC_+_aYfDpAzAUnfR=A4L_T+re1H3G=w@mail.gmail.com>
- <dc53f100-062b-47ae-abc8-5414ce8d041c@oracle.com> <C98F883A-31D5-4F67-97FF-4AEFAADDDC74@zytor.com>
-In-Reply-To: <C98F883A-31D5-4F67-97FF-4AEFAADDDC74@zytor.com>
+References: <20240217161151.3987164-2-ardb+git@google.com>
+In-Reply-To: <20240217161151.3987164-2-ardb+git@google.com>
 From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 22 Feb 2024 00:24:06 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFYVbCd3EaweseNndhmOwdbzEmvB1vjWk2rmTBxAoPCxg@mail.gmail.com>
-Message-ID: <CAMj1kXFYVbCd3EaweseNndhmOwdbzEmvB1vjWk2rmTBxAoPCxg@mail.gmail.com>
-Subject: Re: [PATCH v8 15/15] x86: EFI stub DRTM launch support for Secure Launch
-To: "H. Peter Anvin" <hpa@zytor.com>, Kees Cook <keescook@chromium.org>
-Cc: ross.philipson@oracle.com, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
-	linux-efi@vger.kernel.org, dpsmith@apertussolutions.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, 
-	mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, 
-	jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, kanth.ghatraju@oracle.com, 
-	trenchboot-devel@googlegroups.com
+Date: Thu, 22 Feb 2024 00:37:45 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXH+k4Z_iowxp+t=yU4tQFwLYjQxAQ92bga-xeZxE734BA@mail.gmail.com>
+Message-ID: <CAMj1kXH+k4Z_iowxp+t=yU4tQFwLYjQxAQ92bga-xeZxE734BA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm64/neonbs - fix out-of-bounds access on short input
+To: Ard Biesheuvel <ardb+git@google.com>
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au, 
+	stable@vger.kernel.org, syzbot+f1ceaa1a09ab891e1934@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, 21 Feb 2024 at 21:37, H. Peter Anvin <hpa@zytor.com> wrote:
+On Sat, 17 Feb 2024 at 17:12, Ard Biesheuvel <ardb+git@google.com> wrote:
 >
-> On February 21, 2024 12:17:30 PM PST, ross.philipson@oracle.com wrote:
-> >On 2/15/24 1:01 AM, Ard Biesheuvel wrote:
-> >> On Wed, 14 Feb 2024 at 23:32, Ross Philipson <ross.philipson@oracle.co=
-m> wrote:
-> >>>
-> >>> This support allows the DRTM launch to be initiated after an EFI stub
-> >>> launch of the Linux kernel is done. This is accomplished by providing
-> >>> a handler to jump to when a Secure Launch is in progress. This has to=
- be
-> >>> called after the EFI stub does Exit Boot Services.
-> >>>
-> >>> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
-> >>> ---
-> >>>   drivers/firmware/efi/libstub/x86-stub.c | 55 ++++++++++++++++++++++=
-+++
-> >>>   1 file changed, 55 insertions(+)
-> >>>
-> >>> diff --git a/drivers/firmware/efi/libstub/x86-stub.c b/drivers/firmwa=
-re/efi/libstub/x86-stub.c
-> >>> index 0d510c9a06a4..4df2cf539194 100644
-> >>> --- a/drivers/firmware/efi/libstub/x86-stub.c
-> >>> +++ b/drivers/firmware/efi/libstub/x86-stub.c
-> >>> @@ -9,6 +9,7 @@
-> >>>   #include <linux/efi.h>
-> >>>   #include <linux/pci.h>
-> >>>   #include <linux/stddef.h>
-> >>> +#include <linux/slr_table.h>
-> >>>
-> >>>   #include <asm/efi.h>
-> >>>   #include <asm/e820/types.h>
-> >>> @@ -810,6 +811,57 @@ static efi_status_t efi_decompress_kernel(unsign=
-ed long *kernel_entry)
-> >>>          return EFI_SUCCESS;
-> >>>   }
-> >>>
-> >>> +static void efi_secure_launch(struct boot_params *boot_params)
-> >>> +{
-> >>> +       struct slr_entry_uefi_config *uefi_config;
-> >>> +       struct slr_uefi_cfg_entry *uefi_entry;
-> >>> +       struct slr_entry_dl_info *dlinfo;
-> >>> +       efi_guid_t guid =3D SLR_TABLE_GUID;
-> >>> +       struct slr_table *slrt;
-> >>> +       u64 memmap_hi;
-> >>> +       void *table;
-> >>> +       u8 buf[64] =3D {0};
-> >>> +
-> >>
-> >> If you add a flex array to slr_entry_uefi_config as I suggested in
-> >> response to the other patch, we could simplify this substantially
-> >
-> >I feel like there is some reason why we did not use flex arrays. We were=
- talking and we seem to remember we used to use them and someone asked us t=
-o remove them. We are still looking into it. But if we can go back to them,=
- I will take all the changes you recommended here.
-> >
+> From: Ard Biesheuvel <ardb@kernel.org>
 >
-> Linux kernel code doesn't use VLAs because of the limited stack size, and=
- VLAs or alloca() makes stack size tracking impossible. Although this techn=
-ically speaking runs in a different environment, it is easier to enforce th=
-e constraint globally.
+> The bit-sliced implementation of AES-CTR operates on blocks of 128
+> bytes, and will fall back to the plain NEON version for tail blocks or
+> inputs that are shorter than 128 bytes to begin with.
+>
+> It will call straight into the plain NEON asm helper, which performs all
+> memory accesses in granules of 16 bytes (the size of a NEON register).
+> For this reason, the associated plain NEON glue code will copy inputs
+> shorter than 16 bytes into a temporary buffer, given that this is a rare
+> occurrence and it is not worth the effort to work around this in the asm
+> code.
+>
+> The fallback from the bit-sliced NEON version fails to take this into
+> account, potentially resulting in out-of-bounds accesses. So clone the
+> same workaround, and use a temp buffer for short in/outputs.
+>
+> Cc: <stable@vger.kernel.org>
+> Reported-by: syzbot+f1ceaa1a09ab891e1934@syzkaller.appspotmail.com
+> Tested-by: syzbot+f1ceaa1a09ab891e1934@syzkaller.appspotmail.com
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 
-Flex array !=3D VLA
+Ping?
 
-VLAs were phased out because of this reason (and VLAISs [VLAs in
-structs] were phased out before that because they are a GNU extension
-and not supported by Clang)
-
-Today, VLAs are not supported anywhere in the kernel.
-
-Flex arrays are widely used in the kernel. A flex array is a trailing
-array of unspecified size in a struct that makes the entire *type*
-have a variable size. But that does not make them VLAs (or VLAISs) - a
-VLA is a stack allocated *variable* whose size is based on a function
-parameter.
-
-Instances of types containing flex arrays can be allocated statically,
-or dynamically on the heap. This is common practice in the kernel, and
-even supported by instrumentation to help the compiler track the
-runtime size and flag overruns. We are even in the process of adding
-compiler support to annotate struct members as carrying the number of
-elements in an associated flex arrays, to improve the coverage of the
-instrumentation.
-
-I am not asking for a VLA here, only a flex array.
+> ---
+>  arch/arm64/crypto/aes-neonbs-glue.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
+> index bac4cabef607..849dc41320db 100644
+> --- a/arch/arm64/crypto/aes-neonbs-glue.c
+> +++ b/arch/arm64/crypto/aes-neonbs-glue.c
+> @@ -227,8 +227,19 @@ static int ctr_encrypt(struct skcipher_request *req)
+>                         src += blocks * AES_BLOCK_SIZE;
+>                 }
+>                 if (nbytes && walk.nbytes == walk.total) {
+> +                       u8 buf[AES_BLOCK_SIZE];
+> +                       u8 *d = dst;
+> +
+> +                       if (unlikely(nbytes < AES_BLOCK_SIZE))
+> +                               src = dst = memcpy(buf + sizeof(buf) - nbytes,
+> +                                                  src, nbytes);
+> +
+>                         neon_aes_ctr_encrypt(dst, src, ctx->enc, ctx->key.rounds,
+>                                              nbytes, walk.iv);
+> +
+> +                       if (unlikely(nbytes < AES_BLOCK_SIZE))
+> +                               memcpy(d, buf + sizeof(buf) - nbytes, nbytes);
+> +
+>                         nbytes = 0;
+>                 }
+>                 kernel_neon_end();
+> --
+> 2.44.0.rc0.258.g7320e95886-goog
+>
