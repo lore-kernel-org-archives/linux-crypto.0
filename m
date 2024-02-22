@@ -1,165 +1,170 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E298E12E40
-	for <linux-crypto@vger.kernel.org>; Thu, 22 Feb 2024 02:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38CAD17548;
+	Thu, 22 Feb 2024 02:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708567403; cv=none; b=FUVJIr5SbipxZkKw5aNZT0N8SvGPmHP1os9RGJcrmvcLmJ/HWV25sJdeIjhQUJwuCF/CwGqfizyXHv+vkUnkeDgiloeim4v8WIaLGMRzZ6BYQdSarLR/4eDAyxuHqcCphBQOqbp93jXWj+C84COxqPs3LQNOzhhRni8vIBcSQWQ=
+	t=1708567598; cv=none; b=RTT4Vzg4j8mX2aR8C2ymLg1/AG9Shuaz2TRvzb8yTe+A/XECwR5G0smq9GiCsyEc2t5DlIgMY6CrdrgzvQztAnMi9CJajV7R6PxlG4mrqFAu0IP2GR8klhHOyB38g6iU924x5RzoMUrXI7soPzCHggZ6S9XK8SvaJmUdnYWuf58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708567403; c=relaxed/simple;
-	bh=JRupkqtOY1jWzd/kLbCtgp183MTrg3adCZsTzQc2mQg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rcIRnrZ12S7eu+W4h/OJpMAd+9OyYB+wlAGgFE51aGrSvo6p6A3nYemxCu48gMCy126L7b9ftnI54SJ1KG0aPq0DKsjarw0fpzjq0OOkv+ijBX6uFgCwQ/n4Ls8Tu67+9TRD1Ao2fS8uNDsgQF4Q1dUH4YwKKViK+7rygNFYvCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=Myd74kcu; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
+	s=arc-20240116; t=1708567598; c=relaxed/simple;
+	bh=Hgwue3VsYVuGAHidF8xeWMBthAFTNIHrbSPwF1lYYYo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D1dzXI3DAb4efQUl2lsTnXG5a0GrbuD0Nl0Hbu21MhXQsxpqD0CnyP/rarpjbz7P7AcQnmtLqz29wbOrFTIaRgRvIAgmLeCCiyLGRdPh2z+60pXfQJTQ65jTqTYrdLfOK6Na078sDsp3e06aOK5mYguXieesQc583qMezgjh+uQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T/EWDyal; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Myd74kcu"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4125df3c40aso40131325e9.3
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Feb 2024 18:03:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T/EWDyal"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-299540b4d18so3182486a91.1;
+        Wed, 21 Feb 2024 18:06:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=citrix.com; s=google; t=1708567400; x=1709172200; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RpCgjNX1LqPX7oZGVuldx9UiwfGbtf89koJSaGuEDxQ=;
-        b=Myd74kcur8vH1I3zmXPqZUmeM5zBeOLvHMqgEu654WOdpzz2U0+KzfJCVPGnEDV9Z1
-         3u8TrpzQqiotDZVjyrdIUIlJpP9n+jXcduSgdmN22sU9FBXLCdql6YLdTDrqiOsXU9Pf
-         Br0vBaZehS8dgnBO76KtsxmJLc3iEu6r32AKM=
+        d=gmail.com; s=20230601; t=1708567596; x=1709172396; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=w64efItMlr6vgLfvpO0/b9Hh1Adb3EB97Cl6D2DGNWI=;
+        b=T/EWDyalSUo5nA2o13oq7qtrKgyZR7TSPb+LqN0FjeujB9sQkfcKJ3kwL3kRUAJt9R
+         TY4U4e8O6uD9gnG3h1wMQLE+wwBgDt03pk+RqNbZ0Fi6XfhxaevbEZXS9hN7/D0qoOeb
+         3fNzjrEOqvBHLDY8HdzOq3phMfjq95yEEvvi0bL4dOgx68WTElaiIObEdUK1RXj+jYfL
+         pAIuwmzFln9dz06/CsU7in8jXinFmKuKztcCbU6RdRBqp6oHesqYiwWd1jV9hURzCMzM
+         aSQkvrBjzccvm6TPyt4uD1sCMPEc4eVZQtZoW3xC3B3Q2dnLdxdiJ3PWEZ7Yy6n0Z52G
+         Txbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708567400; x=1709172200;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RpCgjNX1LqPX7oZGVuldx9UiwfGbtf89koJSaGuEDxQ=;
-        b=l6L8E6N5rGUxitENcwhxY9K0w2hfJW97lHKn5drCoyJTKUqX2BYcdoYgABcy40cGZ+
-         pD1ZEwPMF9Yr38qpaZ/xtH9rYGOxlWplVNMfJpSIjqaCg3E8XaBY57hANjl9ljOhmEJu
-         mHJWTFF3O0gWx7EHG7ahTENdbLLBqnpGDfIFekKCV4J5RyuyGGr9dqDtp7VeLy+Kqk1m
-         bITG6t+4KMYqpkbCFvuFGkTw7ZyoVrv2VJM6FAK+NwqslmabUXXKxO9h64Dyz6YdWWCV
-         xeRYzc6ApEoxFAHUrzg/SngdQZDb7wgmCspTorMl+xhGdWcPU9WoTZagXMkv8psXDBFQ
-         hx8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU83FVMN42VtgGtLn3BqKZ78u0fI4hyplOTIVLo2FsKYBCMGNXW8zcUDgsh9cgsfBS5Vivn6CRhQob2dBnl/Wk9b3ue7/rM/WNf4aHG
-X-Gm-Message-State: AOJu0Yx2nXlwztQY+kA+/OwqzHS7b1JpdA1Lrkw1CLmePJCsmoqHrWV7
-	hol073OggUlYQy2NsG4RVG+jWeiw+Fa9yehwXZhpEjpjDI91ukcgZbg2gRsLs/0=
-X-Google-Smtp-Source: AGHT+IF17JfDiQPU6La0me//6yi5Ziq+H6StnWpBIOWkvLcTMKHIezhdF+lH9T4BxYSFO+mETuw9kA==
-X-Received: by 2002:a05:600c:22c6:b0:411:ef17:9c46 with SMTP id 6-20020a05600c22c600b00411ef179c46mr14985747wmg.39.1708567400316;
-        Wed, 21 Feb 2024 18:03:20 -0800 (PST)
-Received: from [192.168.1.10] (host-92-3-248-192.as13285.net. [92.3.248.192])
-        by smtp.gmail.com with ESMTPSA id f9-20020a05600c44c900b00411e3cc0e0asm19318507wmo.44.2024.02.21.18.03.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Feb 2024 18:03:20 -0800 (PST)
-Message-ID: <08ac69b4-4d12-4454-aa16-40db7e54816f@citrix.com>
-Date: Thu, 22 Feb 2024 02:03:19 +0000
+        d=1e100.net; s=20230601; t=1708567596; x=1709172396;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w64efItMlr6vgLfvpO0/b9Hh1Adb3EB97Cl6D2DGNWI=;
+        b=imPxQOFQCWsD5PEtz2lGzu8uX+i7BAxRTSIHo+aAcDjcT1S2a4z81GG4rK79V7S8mv
+         QQmijE/g8NSb5x5yRBarqkTpKgNVNz1hDZFmTH6wHiT3vnlQ30habAbxSUeaPUn8t6br
+         l1iAi0xIR13b2kXTkKBG06OfqQ0DgmUI3mxKAlE/5W3fU2kiZbuY5GpRILUVT18txuSC
+         QQ8T2zAQedGfTDwSuU1x+9Kz/mb3Yf8Pq3brPdat8Xd3ZqCPjrRvgXlSDdKPSpR8X4h5
+         OQ8m4FNcPuuR6GxZyE62I0oOZsV1TdrKqD4XzvwBQVXz6QTkQrDd2frXA2CCHQNbrEV8
+         PoyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUQsm/CG2YjLpuLVn/JkyourYbmKiZIilq8ArmD9w4JOk4/UL18/vqcKTpe+FL8uiiUr0BNa6ZjpbMiKe6QnUOKJlnbhGrSTXl2C4PUBzZbOnPvzmJ9g9Rt+lL5n4mGmbtzRvp5sppEfAPA
+X-Gm-Message-State: AOJu0Yy0b8mgBfuqoXaemJ+50Il5DxvBjkaxDF9mkt3ZpUTVyJescVp+
+	h9MwyF/4EiE7HMH6bLQNXWswjSzvz2vlS1j7XuwiGwuXcK/4fdYm
+X-Google-Smtp-Source: AGHT+IHNRKbWdWip2xaJ4rSh42cE64zDUSUW22jkBDR/euxKv6s1FFY19/CL0X5rGWFrZG5EezLb7Q==
+X-Received: by 2002:a17:90b:344f:b0:299:2038:11e5 with SMTP id lj15-20020a17090b344f00b00299203811e5mr15017066pjb.27.1708567596274;
+        Wed, 21 Feb 2024 18:06:36 -0800 (PST)
+Received: from barry-desktop.hub ([2407:7000:8942:5500:3b18:a2e2:f00b:c965])
+        by smtp.gmail.com with ESMTPSA id sl6-20020a17090b2e0600b00298ca3a93f1sm2650070pjb.4.2024.02.21.18.06.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Feb 2024 18:06:35 -0800 (PST)
+From: Barry Song <21cnbao@gmail.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+Cc: akpm@linux-foundation.org,
+	linux-kernel@vger.kernel.org,
+	hannes@cmpxchg.org,
+	chriscli@google.com,
+	chrisl@kernel.org,
+	sjenning@redhat.com,
+	vitaly.wool@konsulko.com,
+	Barry Song <v-songbaohua@oppo.com>,
+	Nhat Pham <nphamcs@gmail.com>,
+	Yosry Ahmed <yosryahmed@google.com>,
+	Chengming Zhou <zhouchengming@bytedance.com>
+Subject: [PATCH v6] crypto: scompress: remove memcpy if sg_nents is 1 and pages are lowmem
+Date: Thu, 22 Feb 2024 15:06:17 +1300
+Message-Id: <20240222020617.31041-1-21cnbao@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 04/15] x86: Secure Launch Resource Table header file
-Content-Language: en-GB
-To: Ard Biesheuvel <ardb@kernel.org>,
- Ross Philipson <ross.philipson@oracle.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
- linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, dpsmith@apertussolutions.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
- mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
- nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
- kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com
-References: <20240214221847.2066632-1-ross.philipson@oracle.com>
- <20240214221847.2066632-5-ross.philipson@oracle.com>
- <CAMj1kXGaMfUAR85jpeS2JxcmWBbpkzroCVZOtwa3WDQwStDjMw@mail.gmail.com>
-From: Andrew Cooper <andrew.cooper3@citrix.com>
-Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
- 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
- 6+ahAA==
-In-Reply-To: <CAMj1kXGaMfUAR85jpeS2JxcmWBbpkzroCVZOtwa3WDQwStDjMw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 15/02/2024 8:08 am, Ard Biesheuvel wrote:
-> On Wed, 14 Feb 2024 at 23:31, Ross Philipson <ross.philipson@oracle.com> wrote:
->> +/*
->> + * Primary SLR Table Header
+From: Barry Song <v-songbaohua@oppo.com>
 
-I know it's just a comment, but SLR ought to be written in longhand here.
+while sg_nents is 1, which is always true for the current kernel
+as the only user - zswap is this case, we might have a chance to
+remove memcpy, thus improve the performance.
+Though sg_nents is 1, its buffer might cross two pages. If those
+pages are highmem, we have no cheap way to map them to contiguous
+virtual address because kmap doesn't support more than one page
+(kmap single higmem page could be still expensive for tlb) and
+vmap is expensive.
+So we also test and enure page is not highmem in order to safely
+use page_to_virt before removing the memcpy. The good news is
+that in the most majority of cases, we are lowmem, and we are
+always lowmem in those modern and popular hardware.
 
->> + */
->> +struct slr_table {
->> +       u32 magic;
->> +       u16 revision;
->> +       u16 architecture;
->> +       u32 size;
->> +       u32 max_size;
->> +       /* entries[] */
->> +} __packed;
-> Packing this struct has no effect on the layout so better drop the
-> __packed here. If this table is part of a structure that can appear
-> misaligned in memory, better to pack the outer struct or deal with it
-> there in another way.
+Cc: Johannes Weiner <hannes@cmpxchg.org>
+Cc: Nhat Pham <nphamcs@gmail.com>
+Cc: Yosry Ahmed <yosryahmed@google.com>
+Signed-off-by: Barry Song <v-songbaohua@oppo.com>
+Tested-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ -v6:
+  * separate it from zswap & crypto series[1] according to Herbert;
+  * make sure the code is still safe when buffers cross two pages
+    to address Herbert's comment
+[1] https://lore.kernel.org/linux-mm/20240220064414.262582-1-21cnbao@gmail.com/
 
-As you note, __packed does two things not one.
+ crypto/scompress.c | 31 ++++++++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 7 deletions(-)
 
-The consumer of the random integer that is expected to be a pointer to a
-struct lsr_table doesn't know whether it was invoked by a 16bit
-bootloader or a 32bit bootloader, and this really does make a difference
-for an ABI described only in C.
+diff --git a/crypto/scompress.c b/crypto/scompress.c
+index b108a30a7600..185d2359f28b 100644
+--- a/crypto/scompress.c
++++ b/crypto/scompress.c
+@@ -117,6 +117,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
+ 	struct crypto_scomp *scomp = *tfm_ctx;
+ 	void **ctx = acomp_request_ctx(req);
+ 	struct scomp_scratch *scratch;
++	void *src, *dst;
+ 	unsigned int dlen;
+ 	int ret;
+ 
+@@ -134,13 +135,25 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
+ 	scratch = raw_cpu_ptr(&scomp_scratch);
+ 	spin_lock(&scratch->lock);
+ 
+-	scatterwalk_map_and_copy(scratch->src, req->src, 0, req->slen, 0);
++	if (sg_nents(req->src) == 1 && !PageHighMem(sg_page(req->src))) {
++		src = page_to_virt(sg_page(req->src)) + req->src->offset;
++	} else {
++		scatterwalk_map_and_copy(scratch->src, req->src, 0,
++					 req->slen, 0);
++		src = scratch->src;
++	}
++
++	if (req->dst && sg_nents(req->dst) == 1 && !PageHighMem(sg_page(req->dst)))
++		dst = page_to_virt(sg_page(req->dst)) + req->dst->offset;
++	else
++		dst = scratch->dst;
++
+ 	if (dir)
+-		ret = crypto_scomp_compress(scomp, scratch->src, req->slen,
+-					    scratch->dst, &req->dlen, *ctx);
++		ret = crypto_scomp_compress(scomp, src, req->slen,
++					    dst, &req->dlen, *ctx);
+ 	else
+-		ret = crypto_scomp_decompress(scomp, scratch->src, req->slen,
+-					      scratch->dst, &req->dlen, *ctx);
++		ret = crypto_scomp_decompress(scomp, src, req->slen,
++					      dst, &req->dlen, *ctx);
+ 	if (!ret) {
+ 		if (!req->dst) {
+ 			req->dst = sgl_alloc(req->dlen, GFP_ATOMIC, NULL);
+@@ -152,8 +165,12 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
+ 			ret = -ENOSPC;
+ 			goto out;
+ 		}
+-		scatterwalk_map_and_copy(scratch->dst, req->dst, 0, req->dlen,
+-					 1);
++		if (dst == scratch->dst) {
++			scatterwalk_map_and_copy(scratch->dst, req->dst, 0,
++						 req->dlen, 1);
++		} else {
++			flush_dcache_page(sg_page(req->dst));
++		}
+ 	}
+ out:
+ 	spin_unlock(&scratch->lock);
+-- 
+2.34.1
 
-Then again, we're holding off on setting the spec in stone until there's
-an agreement in principle, so we could retrofit a statement about the
-expected alignment of this structure in memory.
-
-The sane choices are either 8b alignment (there are uint64_t's in
-entires[], but I also see there are some misaligned uint64_t's too,
-which is dull), or using the good old x86 fallback or paragraph
-alignment just in case we really want to extend it with a uint128_t in
-future.
-
-Thoughts?
-
-~Andrew
