@@ -1,614 +1,328 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00F837C;
-	Fri, 23 Feb 2024 14:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2603712880E
+	for <linux-crypto@vger.kernel.org>; Fri, 23 Feb 2024 16:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708700177; cv=none; b=INIY1DLlNf3fu5YS8JgFUCulg2PHHnMEg2PAQK1ASaUx3YHn4Mi6Sd/mUxgCPi/H2W0dKEOao5nPcIDjeg1VsHbvrYZ64qiJvBmHnzXcauvmItKsj23Aiyg6wdrCAVr+WLvNw1H9y66U5gTLUfw/GyS0aPdf5lEt6EvVcKI3jMY=
+	t=1708706540; cv=none; b=sjrCQpHz/io8gek4TGs3+cqVzymMzks7wLyrPGtLAUQ/tm/JsQCu+VFL8lCS/TtHTtiSiHTc+1Ud7JdbSbWki5AG6mhDiIo1qBxDgve5TQh8upGwFsrSuaugbptgMvA2r94CHefVO/wQLtFJEqQMemjd81dktdMMFdhRleo2J70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708700177; c=relaxed/simple;
-	bh=LxDt/wewfMs4rdm3Spu/VxQp8UnCgHgUG2SfONayW4A=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=QRCQ3jblFDNnmkAJtGeUP2ZSvYV51zoZ6AN3TjCuX+dV7doXO/e1Pu0YqSxqr0xmIBrHutwAXm8T12WdsNLcJY6ag4WuRN3JkbYDZgqlycdGbV9o7alcu5DowHsAiWKHr87plfgQyCbw8hGnaWIC4XeFaf2OKTqD3EqHZe1g1z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VMe/DAk1; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708706540; c=relaxed/simple;
+	bh=tzZ5vRou2tzwpiknAbcgvaY03gJD6AH4Ovlu8u2D8nE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E9Rqep1RqsAtx7+JE/8D1Ah8P4HxpyWefightJJvT3bkk4bwE9okPIQ2k6LqtR5kV9y69EV8AkR00Xu5qV4adVj0VvQmt5hcUQDNg9EsGhc8wRl61tfhwwoIzAtIcnIwhjd2Cu74oAc3delIM6XbG1bY9a/1qhBEh34sok5FGUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=Rnnxl9kS; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VMe/DAk1"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-29996cc6382so262701a91.3;
-        Fri, 23 Feb 2024 06:56:15 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Rnnxl9kS"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-512b29f82d1so831953e87.1
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Feb 2024 08:42:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708700175; x=1709304975; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lg3BLWjny4LSUOsBe3HU6vhfBpDPlMpZ368tY0RgQiA=;
-        b=VMe/DAk13BpLpsxR9xDJHvztgAT6fHxpGjyZD41IkIDInl5g/4h6G3nTcBuOMPqieY
-         DRcdzVzPyw23ePyxrfAoL4hUOi0tNVUWpBKnHz3ggoXm/BhmJs32yuq66IdSpgDMmc2t
-         19o2sgsuss5KqZOjdmWIZUKjDUOP9Jcl/Szy42ch/0F+FACFw2aqZpVmTmXZe2C8jfXT
-         RHxG//TpGbIpCzMxrNRg/JkOmbZ5c6jbANKNpvpKLfwfji++CRo75gmmJo+oE+JLTHXx
-         OqvpOy0PO48bYEN3j6ZIs76hbIbzeODS2ZQWtdxh09ZM01xIkwiVyknYNzO5zpvjXK1q
-         hMgQ==
+        d=citrix.com; s=google; t=1708706536; x=1709311336; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qoLuBOTBYwo+qwBs59lcs6973WjeFSpK73YZ5Iw2Km4=;
+        b=Rnnxl9kSa7KrbBm6ey3tFDwIUFl3iGJfUhFX51OlJjp/NL9R+LCjXseVt4sjBDbOQS
+         osAnBZA8jImab66xW4cG3/YUrN4EiBGJnVNmj/yWEvyX7+/q2k+45PCO6z3jumO02XiM
+         ++pi0OAoFJWStxXyzi1xFUSxuFJZd2KisG+AY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708700175; x=1709304975;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Lg3BLWjny4LSUOsBe3HU6vhfBpDPlMpZ368tY0RgQiA=;
-        b=wJnWSToK9nSZo3J/wVI/CfubnIymqU+DGB+pHJll3W1ApqUh4i2PDiDftANwWnscjj
-         eU/idA/zbcfAnWE7UDGlkJPpNMglkt583+5KNQonbMETSM6elnzfYH0vgEdXBfFtzyR4
-         +/lIzEX61KQfOX3q3DqwQj7IJpfNiF0ka0sw4K53HK0WQTJ5k8ZLRIfq+iwZKHZLw/Em
-         v8NUTX/V4ieX/3g0NfPi1mFhK7wU4DgHMIMN9dicCIKHzUpJWdZNeVXxKjJnTGk6BYIC
-         TG7svTm+IPWU3mm5+w5eDi0ji2WIJvhqQpMsfcKWvJhMze6QxA7fNATKRvfI8epcV+j/
-         lUkw==
-X-Forwarded-Encrypted: i=1; AJvYcCXWYcVt+Qa1B6za07tQgwPKrGBEAfWRw7JbPQyjdCOtBtit5thi/sMdHiFMY3M7XK8U6wBMonCGpRHI0U21eoxix0c9M1+3EHzwziNO1oX4eXfdwUSEdM0RZMe9oc+8Uro2d4XJdv9gVFE8
-X-Gm-Message-State: AOJu0Yx84AgM0KWY6ZivKfs93k1ght/xfWe+Pb9O0uyEqJMzcXHADtZ7
-	4QxaD6wzbXBFbIhjzPD9JjHnNu5CLtM+W4AaEaW+5H7PqqNygNhmc8SLTutpMVLOyAJOmoBQigJ
-	bSrCML/o7KogcANlZnTortQPhB2/PC7ZI
-X-Google-Smtp-Source: AGHT+IGV6EZiZMA5Km+71/vmwDQoY7BLwzyQRAYpIoesImoUUt4bev3m+4b+C/SOD3+AKftBZgQiziWUSDmuJrT86Ro=
-X-Received: by 2002:a17:90a:d497:b0:299:11e4:619d with SMTP id
- s23-20020a17090ad49700b0029911e4619dmr23214pju.33.1708700174684; Fri, 23 Feb
- 2024 06:56:14 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708706536; x=1709311336;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qoLuBOTBYwo+qwBs59lcs6973WjeFSpK73YZ5Iw2Km4=;
+        b=DnwN8l7PwUBo2rstJBMqcuElaaoPxMltUc2Zz5L1E5x+EyDy1HyBOllvWZcmZP4hZ1
+         sL+g4QwszpxbS6NOr2C3+csZ2fbWX284zdz2KwqTlv0ARkvGxEZ7PtBcP+F6eGsGJj1G
+         uIDrZmcgJJoMXF8kTbKPKBPJIa3vZZ2O3szLFoEKj+8AmFSA/60PfKDV03pnVQ02f20l
+         tAbWzigpgT2KJPO0kpFCKFkBUq1kI7opY+5nBah3VthTWfHACqwlOlX4fYs7UPE90QxX
+         sm5S0peQOit6aN5i8K+cASTjwkNhlO+lsSstc2dGnbZphg1rbCLTrocKRiH34ONILIgV
+         Fu4g==
+X-Forwarded-Encrypted: i=1; AJvYcCW7Zb0OuZ+jG1iF2G/hf0mmujDiEoUDn5jIXE3U5tUNztzjo/8TfRWf+DzkK5mdby0ubr8tiasmcXxtprLnlWkGeRpzrvqK9EfhdQEt
+X-Gm-Message-State: AOJu0YyapIg23gUN1iXb43Wh1YVXREDH7fWAP7MmnRwVSmX4CUTs2fMr
+	6/W1rphCavmcuVFFAJacYyF/nv0amnmjwpEAIWjK+sV8IKssy0LFCNYR5SliFqI=
+X-Google-Smtp-Source: AGHT+IFVg0FkzeWFv8VAUtlKSwt788AmJwtS0qsDMb5sOGtHb2BLbj86xPtSi/VfS0UFWwlNIJXZJA==
+X-Received: by 2002:a05:6512:3b0f:b0:512:be84:f49d with SMTP id f15-20020a0565123b0f00b00512be84f49dmr227672lfv.63.1708706535842;
+        Fri, 23 Feb 2024 08:42:15 -0800 (PST)
+Received: from [10.80.67.149] (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
+        by smtp.gmail.com with ESMTPSA id x4-20020a0ce244000000b0068f2d2f64d1sm8403702qvl.32.2024.02.23.08.42.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Feb 2024 08:42:15 -0800 (PST)
+Message-ID: <431a0b3a-47e5-4e61-a7fc-31cdf56f4e4c@citrix.com>
+Date: Fri, 23 Feb 2024 16:42:11 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: xingwei lee <xrivendell7@gmail.com>
-Date: Fri, 23 Feb 2024 22:56:03 +0800
-Message-ID: <CABOYnLwxSKJkGLDEOA=H7b6UBH4C77GOVVHc3dTunJ37L7kD0A@mail.gmail.com>
-Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in des3_ede_decrypt
-To: syzbot+b90b904ef6bdfdafec1d@syzkaller.appspotmail.com
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 06/15] x86: Add early SHA support for Secure Launch
+ early measurements
+Content-Language: en-GB
+To: Ard Biesheuvel <ardb@kernel.org>,
+ Andrew Cooper <andrew.cooper3@citrix.com>
+Cc: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+ linux-efi@vger.kernel.org, dpsmith@apertussolutions.com, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+ mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
+ peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
+ nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
+ kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com,
+ Eric Biggers <ebiggers@kernel.org>
+References: <20240214221847.2066632-1-ross.philipson@oracle.com>
+ <20240214221847.2066632-7-ross.philipson@oracle.com>
+ <CAMj1kXEmMBY_jc0uM5UgZbuZ3-C7NPKzg5AScaunyu9XzLgzZA@mail.gmail.com>
+ <98ad92bb-ef17-4c15-88ba-252db2a2e738@citrix.com>
+ <CAMj1kXFTu+bV2kQhAyu15hrYai20NcBLb4Zu8XG2Y-XjL0f+rw@mail.gmail.com>
+ <1a8e69a7-89eb-4d36-94d6-0da662d8b72f@citrix.com>
+ <CAMj1kXEvmGy9RJo4s8tECsFj2dufZ8jBPoJOEtkcGUoj+x2qsw@mail.gmail.com>
+From: Andrew Cooper <andrew.cooper3@citrix.com>
+Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
+ 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
+ 6+ahAA==
+In-Reply-To: <CAMj1kXEvmGy9RJo4s8tECsFj2dufZ8jBPoJOEtkcGUoj+x2qsw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello, I reproduced this bug in the upstream linux.
+On 23/02/2024 9:27 am, Ard Biesheuvel wrote:
+> On Thu, 22 Feb 2024 at 13:30, Andrew Cooper <andrew.cooper3@citrix.com> wrote:
+>> On 22/02/2024 9:34 am, Ard Biesheuvel wrote:
+>>> On Thu, 22 Feb 2024 at 04:05, Andrew Cooper <andrew.cooper3@citrix.com> wrote:
+>>>> On 15/02/2024 8:17 am, Ard Biesheuvel wrote:
+>>>>> On Wed, 14 Feb 2024 at 23:31, Ross Philipson <ross.philipson@oracle.com> wrote:
+>>>>>> From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
+>>>>>>
+>>>>>> The SHA algorithms are necessary to measure configuration information into
+>>>>>> the TPM as early as possible before using the values. This implementation
+>>>>>> uses the established approach of #including the SHA libraries directly in
+>>>>>> the code since the compressed kernel is not uncompressed at this point.
+>>>>>>
+>>>>>> The SHA code here has its origins in the code from the main kernel:
+>>>>>>
+>>>>>> commit c4d5b9ffa31f ("crypto: sha1 - implement base layer for SHA-1")
+>>>>>>
+>>>>>> A modified version of this code was introduced to the lib/crypto/sha1.c
+>>>>>> to bring it in line with the sha256 code and allow it to be pulled into the
+>>>>>> setup kernel in the same manner as sha256 is.
+>>>>>>
+>>>>>> Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
+>>>>>> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+>>>>> We have had some discussions about this, and you really need to
+>>>>> capture the justification in the commit log for introducing new code
+>>>>> that implements an obsolete and broken hashing algorithm.
+>>>>>
+>>>>> SHA-1 is broken and should no longer be used for anything. Introducing
+>>>>> new support for a highly complex boot security feature, and then
+>>>>> relying on SHA-1 in the implementation makes this whole effort seem
+>>>>> almost futile, *unless* you provide some rock solid reasons here why
+>>>>> this is still safe.
+>>>>>
+>>>>> If the upshot would be that some people are stuck with SHA-1 so they
+>>>>> won't be able to use this feature, then I'm not convinced we should
+>>>>> obsess over that.
+>>>> To be absolutely crystal clear here.
+>>>>
+>>>> The choice of hash algorithm(s) are determined by the OEM and the
+>>>> platform, not by Linux.
+>>>>
+>>>> Failing to (at least) cap a PCR in a bank which the OEM/platform left
+>>>> active is a security vulnerability.  It permits the unsealing of secrets
+>>>> if an attacker can replay a good set of measurements into an unused bank.
+>>>>
+>>>> The only way to get rid of the requirement for SHA-1 here is to lobby
+>>>> the IHVs/OEMs, or perhaps the TCG, to produce/spec a platform where the
+>>>> SHA-1 banks can be disabled.  There are no known such platforms in the
+>>>> market today, to the best of our knowledge.
+>>>>
+>>> OK, so mainline Linux does not support secure launch at all today. At
+>>> this point, we need to decide whether or not tomorrow's mainline Linux
+>>> will support secure launch with SHA1 or without, right?
+>> I'd argue that's a slightly unfair characterisation.
+>>
+> Fair enough. I'm genuinely trying to have a precise understanding of
+> this, not trying to be dismissive.
 
-If you fix this issue, please add the following tag to the commit:
-Reported-by: xingwei lee <xrivendell7@gmail.com>
+Sure, and neither am I.  (And frankly, I vastly prefer this reasoned
+discussion to prior ones.)
 
-Notice: I use the same config with syzbot dashboard.
-kernel version: 4f5e5092fdbf5cec6bedc19fbe69cce4f5f08372
-kernel config: https://syzkaller.appspot.com/text?tag=3DKernelConfig&x=3De3=
-dd779fba027968
-with KASAN enabled
-compiler: Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.4=
-0
+Secure Launch technology really is used today as out-of-tree code, and
+it has taken ~15y to get to this point of doing it nicely in an
+ecosystem that is wider than just Linux.  (Not a criticism, just an
+observation)
 
-BTW, I notice the frist patch apply in this bug:
-https://lore.kernel.org/all/ZdW9YBgTtaXo7DGQ@gondor.apana.org.au/T/
-and git apply this patch in the kernel. Since the reproducer is an
-infinite loop, I run the reproducer for about 20minus it doesn=E2=80=99t
-trigger the same issue.
+We're looking not to get blocked with a brand new objection which
+approximates to "it's now not perfect, therefore you can't have
+something that's still a lot better than nothing".
 
-Anyway, the reproducer I=E2=80=99ll provided as below.
+A major reason why the hardware ecosystem is out of date is because
+almost no-one uses it, because it's horribly complicated to configure,
+because it's a set of large out-of-tree patche series against your
+bootloader, hypervisor and kernel.
 
-=3D* repro.c =3D*
-// autogenerated by syzkaller (https://github.com/google/syzkaller)
-#include <arpa/inet.h>
-#include <dirent.h>
-#include <endian.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <pthread.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/prctl.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <unistd.h>
+The goal of the Trenchboot project is to make it easy to use (i.e.
+upstream support in the relevant projects), so that more people can use
+it, in order to drive the hardware ecosystem forward.
 
-#include <linux/futex.h>
-#include <linux/genetlink.h>
-#include <linux/if_addr.h>
-#include <linux/if_link.h>
-#include <linux/in6.h>
-#include <linux/neighbour.h>
-#include <linux/net.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <linux/veth.h>
+Very seriously - Linux taking this series, even off by default and with
+a "SHA-1 considered hazardous for your health" warning somewhere, will
+still have a material positive impact in getting the hardware ecosystem
+to improve.  It is, by far and away, the best thing that we (Trenchboot)
+can do in order to move towards a SHA-1-less future.
 
-static void sleep_ms(uint64_t ms) {
- usleep(ms * 1000);
-}
+Trenchboot do have a specific intent to get to that future, and beyond,
+but it's a multi-year task.
 
-static uint64_t current_time_ms(void) {
- struct timespec ts;
- if (clock_gettime(CLOCK_MONOTONIC, &ts))
-   exit(1);
- return (uint64_t)ts.tv_sec * 1000 + (uint64_t)ts.tv_nsec / 1000000;
-}
 
-static void thread_start(void* (*fn)(void*), void* arg) {
- pthread_t th;
- pthread_attr_t attr;
- pthread_attr_init(&attr);
- pthread_attr_setstacksize(&attr, 128 << 10);
- int i =3D 0;
- for (; i < 100; i++) {
-   if (pthread_create(&th, &attr, fn, arg) =3D=3D 0) {
-     pthread_attr_destroy(&attr);
-     return;
-   }
-   if (errno =3D=3D EAGAIN) {
-     usleep(50);
-     continue;
-   }
-   break;
- }
- exit(1);
-}
+>> We want tomorrow's mainline to support Secure Launch.  What that entails
+>> under the hood is largely outside of the control of the end user.
+>>
+> So the debate is really whether it makes sense at all to support
+> Secure Launch on systems that are stuck on an obsolete and broken hash
+> algorithm. This is not hyperbole: SHA-1 is broken today and once these
+> changes hit production 1-2 years down the line, the situation will
+> only have deteriorated. And another 2-3 years later, we will be the
+> ones chasing obscure bugs on systems that were already obsolete when
+> this support was added.
 
-typedef struct {
- int state;
-} event_t;
+There are indeed collisions, and this will indeed get worse over time.
 
-static void event_init(event_t* ev) {
- ev->state =3D 0;
-}
+But right now it still takes nation-state (or certain corporation)
+resources to calculate a collision, and that would have to be specific
+to the exact firmware/settings/hypervisor/kernel/initrd configuration of
+the target device.
 
-static void event_reset(event_t* ev) {
- ev->state =3D 0;
-}
+Google et al invested the effort in SHAttered in order to drive change
+in the industry, but that doesn't mean it's viable as a general attack
+yet.  There are far more cost effective options, even a $4 wrench...
 
-static void event_set(event_t* ev) {
- if (ev->state)
-   exit(1);
- __atomic_store_n(&ev->state, 1, __ATOMIC_RELEASE);
- syscall(SYS_futex, &ev->state, FUTEX_WAKE | FUTEX_PRIVATE_FLAG, 1000000);
-}
+> So what is the value proposition here? An end user today, who is
+> mindful enough of security to actively invest the effort to migrate
+> their system from ordinary measured boot to secure launch, is really
+> going to do so on a system that only implements SHA-1 support?
 
-static void event_wait(event_t* ev) {
- while (!__atomic_load_n(&ev->state, __ATOMIC_ACQUIRE))
-   syscall(SYS_futex, &ev->state, FUTEX_WAIT | FUTEX_PRIVATE_FLAG, 0, 0);
-}
+Oh both Intel and AMD, the base technology is around in all platforms
+the support virt.
 
-static int event_isset(event_t* ev) {
- return __atomic_load_n(&ev->state, __ATOMIC_ACQUIRE);
-}
+On Intel, it's SKU-limited to vPRO, but platforms with fTPM2.0 have been
+generally SHA1+SHA256 capable for years now.  A security conscious end
+user would just want to cap the SHA1 banks and run with SHA256.
 
-static int event_timedwait(event_t* ev, uint64_t timeout) {
- uint64_t start =3D current_time_ms();
- uint64_t now =3D start;
- for (;;) {
-   uint64_t remain =3D timeout - (now - start);
-   struct timespec ts;
-   ts.tv_sec =3D remain / 1000;
-   ts.tv_nsec =3D (remain % 1000) * 1000 * 1000;
-   syscall(SYS_futex, &ev->state, FUTEX_WAIT | FUTEX_PRIVATE_FLAG, 0, &ts);
-   if (__atomic_load_n(&ev->state, __ATOMIC_ACQUIRE))
-     return 1;
-   now =3D current_time_ms();
-   if (now - start > timeout)
-     return 0;
- }
-}
+Furthermore, when the attestation is based on a SHA1+SHA256 measurement,
+the attestor can spot and reject SHA1 collisions, so this configuration
+really should be safe to the concerns raised here.
 
-static bool write_file(const char* file, const char* what, ...) {
- char buf[1024];
- va_list args;
- va_start(args, what);
- vsnprintf(buf, sizeof(buf), what, args);
- va_end(args);
- buf[sizeof(buf) - 1] =3D 0;
- int len =3D strlen(buf);
- int fd =3D open(file, O_WRONLY | O_CLOEXEC);
- if (fd =3D=3D -1)
-   return false;
- if (write(fd, buf, len) !=3D len) {
-   int err =3D errno;
-   close(fd);
-   errno =3D err;
-   return false;
- }
- close(fd);
- return true;
-}
+On AMD, it's not SKU-limited.  However, their fTPM2.0 isn't SKINIT
+compatible, and we were basically told "show us people using SKINIT
+first".  I'm not sure if we've got as far as trying to an LPC TPM 2.0 on
+AMD yet.  Even bus interception attacks can be defended against with TPM
+encrypted sessions,  but we put this in the "not for v1" bucket.
 
-struct nlmsg {
- char* pos;
- int nesting;
- struct nlattr* nested[8];
- char buf[4096];
-};
 
-static void netlink_init(struct nlmsg* nlmsg,
-                        int typ,
-                        int flags,
-                        const void* data,
-                        int size) {
- memset(nlmsg, 0, sizeof(*nlmsg));
- struct nlmsghdr* hdr =3D (struct nlmsghdr*)nlmsg->buf;
- hdr->nlmsg_type =3D typ;
- hdr->nlmsg_flags =3D NLM_F_REQUEST | NLM_F_ACK | flags;
- memcpy(hdr + 1, data, size);
- nlmsg->pos =3D (char*)(hdr + 1) + NLMSG_ALIGN(size);
-}
+It's not a secret - the intent of getting this technology more-generally
+usable (and therefore used) is to be able to go back to Intel and say
+"hey notice how AMD give this technology to everyone", and to say AMD
+"hey notice how Intel have this working with TPM2".  Both have been
+persuaded along this direction by Microsoft by virtue of including the
+Pluton IP blob in the main CPU package.
 
-static void netlink_attr(struct nlmsg* nlmsg,
-                        int typ,
-                        const void* data,
-                        int size) {
- struct nlattr* attr =3D (struct nlattr*)nlmsg->pos;
- attr->nla_len =3D sizeof(*attr) + size;
- attr->nla_type =3D typ;
- if (size > 0)
-   memcpy(attr + 1, data, size);
- nlmsg->pos +=3D NLMSG_ALIGN(attr->nla_len);
-}
+>>> And the point you are making here is that we need SHA-1 not only to a)
+>>> support systems that are on TPM 1.2 and support nothing else, but also
+>>> to b) ensure that crypto agile TPM 2.0 with both SHA-1 and SHA-256
+>>> enabled can be supported in a safe manner, which would involve
+>>> measuring some terminating event into the SHA-1 PCRs to ensure they
+>>> are not left in a dangling state that might allow an adversary to
+>>> trick the TPM into unsealing a secret that it shouldn't.
+>> Yes.  Also c) because if the end user wants to use SHA-1, they should be
+>> able to.
+>>
+> The end user can do whatever they want, of course. Whether it belongs
+> in the upstream is an entirely different matter, though, especially
+> because we will effectively be forced to support this forever.
+>
+>
+>>> So can we support b) without a), and if so, does measuring an
+>>> arbitrary dummy event into a PCR that is only meant to keep sealed
+>>> forever really require a SHA-1 implementation, or could we just use an
+>>> arbitrary (not even random) sequence of 160 bits and use that instead?
+>> a) and b) are in principle independent, but we cannot support b) without
+>> SHA-1.
+>>
+>> To cap a PCR, the event log still needs to be kept accurate, and that's
+>> at least one SHA-1 calculation.  If you were to simply extend a dummy
+>> value, the system hopefully fails safe, but the user gets "something
+>> went wrong, you're on your own", rather than "we intentionally blocked
+>> the use of SHA-1, everything is good".
+>>
+>> And frankly, you need SHA-1 just to read the event log, if any component
+>> (including TXT itself) wrote a SHA-1 entry into it.
+>>
+>>
+>> To be blunt.  SHA-1 support is not viably optional today as far as
+>> Secure Launch is concerned.  If there's a suitable Kconfig symbol to use
+>> for people who want a completely SHA-1-less kernel, then we can make
+>> Secure Launch depend on that until such time as the hardware ecosystem
+>> has caught up.
+>>
+> Yes, this crossed my mind as well. There is a Kconfig symbol
+> CRYPTO_USER_API_ENABLE_OBSOLETE I added a while ago for a similar
+> purpose.
+>
+> I am still disappointed that we have to go down this path, but I
+> understand the concerns now that you have explained them to me (again)
+> in more detail.
+>
+> These considerations need to be recorded in the documentation or
+> commit logs as well, so that we can easily refer back to them without
+> having to dig through the mail archives.
 
-static int netlink_send_ext(struct nlmsg* nlmsg,
-                           int sock,
-                           uint16_t reply_type,
-                           int* reply_len,
-                           bool dofail) {
- if (nlmsg->pos > nlmsg->buf + sizeof(nlmsg->buf) || nlmsg->nesting)
-   exit(1);
- struct nlmsghdr* hdr =3D (struct nlmsghdr*)nlmsg->buf;
- hdr->nlmsg_len =3D nlmsg->pos - nlmsg->buf;
- struct sockaddr_nl addr;
- memset(&addr, 0, sizeof(addr));
- addr.nl_family =3D AF_NETLINK;
- ssize_t n =3D sendto(sock, nlmsg->buf, hdr->nlmsg_len, 0,
-                    (struct sockaddr*)&addr, sizeof(addr));
- if (n !=3D (ssize_t)hdr->nlmsg_len) {
-   if (dofail)
-     exit(1);
-   return -1;
- }
- n =3D recv(sock, nlmsg->buf, sizeof(nlmsg->buf), 0);
- if (reply_len)
-   *reply_len =3D 0;
- if (n < 0) {
-   if (dofail)
-     exit(1);
-   return -1;
- }
- if (n < (ssize_t)sizeof(struct nlmsghdr)) {
-   errno =3D EINVAL;
-   if (dofail)
-     exit(1);
-   return -1;
- }
- if (hdr->nlmsg_type =3D=3D NLMSG_DONE)
-   return 0;
- if (reply_len && hdr->nlmsg_type =3D=3D reply_type) {
-   *reply_len =3D n;
-   return 0;
- }
- if (n < (ssize_t)(sizeof(struct nlmsghdr) + sizeof(struct nlmsgerr))) {
-   errno =3D EINVAL;
-   if (dofail)
-     exit(1);
-   return -1;
- }
- if (hdr->nlmsg_type !=3D NLMSG_ERROR) {
-   errno =3D EINVAL;
-   if (dofail)
-     exit(1);
-   return -1;
- }
- errno =3D -((struct nlmsgerr*)(hdr + 1))->error;
- return -errno;
-}
+Yes, and I agree.  We're not looking to try and force this in with
+underhand tactics.
 
-static int netlink_query_family_id(struct nlmsg* nlmsg,
-                                  int sock,
-                                  const char* family_name,
-                                  bool dofail) {
- struct genlmsghdr genlhdr;
- memset(&genlhdr, 0, sizeof(genlhdr));
- genlhdr.cmd =3D CTRL_CMD_GETFAMILY;
- netlink_init(nlmsg, GENL_ID_CTRL, 0, &genlhdr, sizeof(genlhdr));
- netlink_attr(nlmsg, CTRL_ATTR_FAMILY_NAME, family_name,
-              strnlen(family_name, GENL_NAMSIZ - 1) + 1);
- int n =3D 0;
- int err =3D netlink_send_ext(nlmsg, sock, GENL_ID_CTRL, &n, dofail);
- if (err < 0) {
-   return -1;
- }
- uint16_t id =3D 0;
- struct nlattr* attr =3D (struct nlattr*)(nlmsg->buf + NLMSG_HDRLEN +
-                                        NLMSG_ALIGN(sizeof(genlhdr)));
- for (; (char*)attr < nlmsg->buf + n;
-      attr =3D (struct nlattr*)((char*)attr + NLMSG_ALIGN(attr->nla_len))) =
-{
-   if (attr->nla_type =3D=3D CTRL_ATTR_FAMILY_ID) {
-     id =3D *(uint16_t*)(attr + 1);
-     break;
-   }
- }
- if (!id) {
-   errno =3D EINVAL;
-   return -1;
- }
- recv(sock, nlmsg->buf, sizeof(nlmsg->buf), 0);
- return id;
-}
+But a blind "nack to any SHA-1" is similarly damaging in the opposite
+direction.
 
-static long syz_genetlink_get_family_id(volatile long name,
-                                       volatile long sock_arg) {
- int fd =3D sock_arg;
- if (fd < 0) {
-   fd =3D socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
-   if (fd =3D=3D -1) {
-     return -1;
-   }
- }
- struct nlmsg nlmsg_tmp;
- int ret =3D netlink_query_family_id(&nlmsg_tmp, fd, (char*)name, false);
- if ((int)sock_arg < 0)
-   close(fd);
- if (ret < 0) {
-   return -1;
- }
- return ret;
-}
-
-static void kill_and_wait(int pid, int* status) {
- kill(-pid, SIGKILL);
- kill(pid, SIGKILL);
- for (int i =3D 0; i < 100; i++) {
-   if (waitpid(-1, status, WNOHANG | __WALL) =3D=3D pid)
-     return;
-   usleep(1000);
- }
- DIR* dir =3D opendir("/sys/fs/fuse/connections");
- if (dir) {
-   for (;;) {
-     struct dirent* ent =3D readdir(dir);
-     if (!ent)
-       break;
-     if (strcmp(ent->d_name, ".") =3D=3D 0 || strcmp(ent->d_name, "..") =3D=
-=3D 0)
-       continue;
-     char abort[300];
-     snprintf(abort, sizeof(abort), "/sys/fs/fuse/connections/%s/abort",
-              ent->d_name);
-     int fd =3D open(abort, O_WRONLY);
-     if (fd =3D=3D -1) {
-       continue;
-     }
-     if (write(fd, abort, 1) < 0) {
-     }
-     close(fd);
-   }
-   closedir(dir);
- } else {
- }
- while (waitpid(-1, status, __WALL) !=3D pid) {
- }
-}
-
-static void setup_test() {
- prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
- setpgrp();
- write_file("/proc/self/oom_score_adj", "1000");
-}
-
-struct thread_t {
- int created, call;
- event_t ready, done;
-};
-
-static struct thread_t threads[16];
-static void execute_call(int call);
-static int running;
-
-static void* thr(void* arg) {
- struct thread_t* th =3D (struct thread_t*)arg;
- for (;;) {
-   event_wait(&th->ready);
-   event_reset(&th->ready);
-   execute_call(th->call);
-   __atomic_fetch_sub(&running, 1, __ATOMIC_RELAXED);
-   event_set(&th->done);
- }
- return 0;
-}
-
-static void execute_one(void) {
- int i, call, thread;
- for (call =3D 0; call < 7; call++) {
-   for (thread =3D 0; thread < (int)(sizeof(threads) / sizeof(threads[0]));
-        thread++) {
-     struct thread_t* th =3D &threads[thread];
-     if (!th->created) {
-       th->created =3D 1;
-       event_init(&th->ready);
-       event_init(&th->done);
-       event_set(&th->done);
-       thread_start(thr, th);
-     }
-     if (!event_isset(&th->done))
-       continue;
-     event_reset(&th->done);
-     th->call =3D call;
-     __atomic_fetch_add(&running, 1, __ATOMIC_RELAXED);
-     event_set(&th->ready);
-     event_timedwait(&th->done, 50);
-     break;
-   }
- }
- for (i =3D 0; i < 100 && __atomic_load_n(&running, __ATOMIC_RELAXED); i++)
-   sleep_ms(1);
-}
-
-static void execute_one(void);
-
-#define WAIT_FLAGS __WALL
-
-static void loop(void) {
- int iter =3D 0;
- for (;; iter++) {
-   int pid =3D fork();
-   if (pid < 0)
-     exit(1);
-   if (pid =3D=3D 0) {
-     setup_test();
-     execute_one();
-     exit(0);
-   }
-   int status =3D 0;
-   uint64_t start =3D current_time_ms();
-   for (;;) {
-     if (waitpid(-1, &status, WNOHANG | WAIT_FLAGS) =3D=3D pid)
-       break;
-     sleep_ms(1);
-     if (current_time_ms() - start < 5000)
-       continue;
-     kill_and_wait(pid, &status);
-     break;
-   }
- }
-}
-
-uint64_t r[2] =3D {0xffffffffffffffff, 0xffffffffffffffff};
-
-void execute_call(int call) {
- intptr_t res =3D 0;
- switch (call) {
-   case 0:
-     res =3D syscall(__NR_socket, /*domain=3D*/0x26ul, /*type=3D*/5ul, /*pr=
-oto=3D*/0);
-     if (res !=3D -1)
-       r[0] =3D res;
-     break;
-   case 1:
-     *(uint16_t*)0x20000000 =3D 0x26;
-     memcpy((void*)0x20000002, "skcipher\000\000\000\000\000\000", 14);
-     *(uint32_t*)0x20000010 =3D 0;
-     *(uint32_t*)0x20000014 =3D 0;
-     memcpy((void*)0x20000018,
-            "cts(cbc(des3_ede))"
-            "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\0=
-00"
-            "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\0=
-00"
-            "\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
-            64);
-     syscall(__NR_bind, /*fd=3D*/r[0], /*addr=3D*/0x20000000ul,
-             /*addrlen=3D*/0x58ul);
-     break;
-   case 2:
-     memcpy((void*)0x20c18000,
-            "\xad\x56\xb6\xc5\x82\x0f\xae\x9d\x6d\xcd\x32\x92\xea\x54\xc7\x=
-be"
-            "\xef\x91\x5d\x56\x4c\x90\xc2\x00",
-            24);
-     syscall(__NR_setsockopt, /*fd=3D*/r[0], /*level=3D*/0x117, /*opt=3D*/1=
-,
-             /*key=3D*/0x20c18000ul, /*keylen=3D*/0x18ul);
-     break;
-   case 3:
-     res =3D syscall(__NR_accept4, /*fd=3D*/r[0], /*peer=3D*/0ul, /*peerlen=
-=3D*/0ul,
-                   /*flags=3D*/0ul);
-     if (res !=3D -1)
-       r[1] =3D res;
-     break;
-   case 4:
-     memcpy((void*)0x20000100, "nl80211\000", 8);
-     syz_genetlink_get_family_id(/*name=3D*/0x20000100, /*fd=3D*/r[1]);
-     break;
-   case 5:
-     *(uint64_t*)0x200001c0 =3D 0;
-     *(uint32_t*)0x200001c8 =3D 0;
-     *(uint64_t*)0x200001d0 =3D 0x20000180;
-     *(uint64_t*)0x20000180 =3D 0x20000140;
-     *(uint32_t*)0x20000140 =3D 0x28;
-     *(uint16_t*)0x20000144 =3D 0;
-     *(uint16_t*)0x20000146 =3D 0;
-     *(uint32_t*)0x20000148 =3D 0;
-     *(uint32_t*)0x2000014c =3D 0;
-     *(uint8_t*)0x20000150 =3D 0x35;
-     *(uint8_t*)0x20000151 =3D 0;
-     *(uint16_t*)0x20000152 =3D 0;
-     *(uint16_t*)0x20000154 =3D 8;
-     *(uint16_t*)0x20000156 =3D 3;
-     *(uint32_t*)0x20000158 =3D 0;
-     *(uint16_t*)0x2000015c =3D 0xc;
-     *(uint16_t*)0x2000015e =3D 0x99;
-     *(uint32_t*)0x20000160 =3D 0;
-     *(uint32_t*)0x20000164 =3D 0;
-     *(uint64_t*)0x20000188 =3D 0x28;
-     *(uint64_t*)0x200001d8 =3D 1;
-     *(uint64_t*)0x200001e0 =3D 0;
-     *(uint64_t*)0x200001e8 =3D 0;
-     *(uint32_t*)0x200001f0 =3D 0;
-     syscall(__NR_sendmsg, /*fd=3D*/r[1], /*msg=3D*/0x200001c0ul, /*f=3D*/0=
-x8000ul);
-     break;
-   case 6:
-     *(uint64_t*)0x20003fc0 =3D 0;
-     *(uint32_t*)0x20003fc8 =3D 0;
-     *(uint64_t*)0x20003fd0 =3D 0x20000080;
-     *(uint64_t*)0x20000080 =3D 0x20000380;
-     memcpy((void*)0x20000380,
-            "\x05\xe2\x7d\x49\x1f\xdb\x75\x96\x99\x7a\xf6\xa7", 12);
-     *(uint64_t*)0x20000088 =3D 0xc;
-     *(uint64_t*)0x20003fd8 =3D 1;
-     *(uint64_t*)0x20003fe0 =3D 0;
-     *(uint64_t*)0x20003fe8 =3D 0;
-     *(uint32_t*)0x20003ff0 =3D 0;
-     *(uint32_t*)0x20003ff8 =3D 0;
-     syscall(__NR_sendmmsg, /*fd=3D*/r[1], /*mmsg=3D*/0x20003fc0ul, /*vlen=
-=3D*/1ul,
-             /*f=3D*/0ul);
-     break;
- }
-}
-int main(void) {
- syscall(__NR_mmap, /*addr=3D*/0x1ffff000ul, /*len=3D*/0x1000ul, /*prot=3D*=
-/0ul,
-         /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
- syscall(__NR_mmap, /*addr=3D*/0x20000000ul, /*len=3D*/0x1000000ul, /*prot=
-=3D*/7ul,
-         /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
- syscall(__NR_mmap, /*addr=3D*/0x21000000ul, /*len=3D*/0x1000ul, /*prot=3D*=
-/0ul,
-         /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
- loop();
- return 0;
-}
-
-Remember to run this repro.txt with the command: syz-execprog -repeat
-0 ./repro.txt and wait, the bug triggered very steady.
-
-=3D* repro.txt =3D*
-r0 =3D socket$alg(0x26, 0x5, 0x0)
-bind$alg(r0, &(0x7f0000000000)=3D{0x26, 'skcipher\x00', 0x0, 0x0,
-'cts(cbc(des3_ede))\x00'}, 0x58)
-setsockopt$ALG_SET_KEY(r0, 0x117, 0x1,
-&(0x7f0000c18000)=3D"ad56b6c5820fae9d6dcd3292ea54c7beef915d564c90c200",
-0x18)
-r1 =3D accept4(r0, 0x0, 0x0, 0x0)
-syz_genetlink_get_family_id$nl80211(&(0x7f0000000100), r1)
-sendmsg$NL80211_CMD_DEL_PMKSA(r1, &(0x7f00000001c0)=3D{0x0, 0x0,
-&(0x7f0000000180)=3D{&(0x7f0000000140)=3D{0x28, 0x0, 0x0, 0x0, 0x0, {{},
-{@val=3D{0x8}, @val=3D{0xc}}}}, 0x28}}, 0x8000)
-sendmmsg$unix(r1, &(0x7f0000003fc0)=3D[{{0x0, 0x0,
-&(0x7f0000000080)=3D[{&(0x7f0000000380)=3D"05e27d491fdb7596997af6a7",
-0xc}], 0x1}}], 0x1, 0x0)
-
-and see also in
-https://gist.github.com/xrivendell7/caa81fc506c57143468d8df12e099831.
-
-I hope it helps.
-Best regards!
-xingwei Lee
+~Andrew
