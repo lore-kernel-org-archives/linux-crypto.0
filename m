@@ -1,91 +1,74 @@
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C67D26D;
-	Fri, 23 Feb 2024 03:25:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A8C125A7
+	for <linux-crypto@vger.kernel.org>; Fri, 23 Feb 2024 06:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708658754; cv=none; b=sEZ0Taf6XpwMjIpgBFf2KC7VGAK9Y4Re/4+wE23VDPohzz4IHMWomfcThu21liqS08k3c+3hvkCxpSO4Xel43RndIYSUuvfE47vYKsdxSXGYJuiIjM/qcvK4EWm1QU5Y5pguN2zaXJTlCl/H86150j8MaSFAi0iUG/vBhgOB328=
+	t=1708668045; cv=none; b=Z4+XsCzjSzQYCpFeu1q0LMnqxEulppMILL9MjbxHm/dnhnGvj60DpqER/WLcVjNIIOE1owmK4DbQ6A+jM/TRA4UAFZaBl/dyv185EkCfiRQ1lK/TDDKS8xEeYViWgQDS1/pZoL3JQS+fd3OwF36XR3JEguYBIWpkkBiPqgezKso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708658754; c=relaxed/simple;
-	bh=n4qpbgJ8v7GPZVfT9Z7r1oiTnMQmcWKFfKrBz37hriw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=F4of1I/noMGxTIKvSuMbKUtn987gdGMpXsxloeSr4agKwFVSzK6oVPLRoPI1fBR6pAUcR3iDX8wlFgWiliTAU70NJlhksXRZrZI23nfOhC0q7SeveC7sFDgKt9KlnAm/+fS8+hxgK65fjEI1pINKidr8S0P2fK0zi5l0KH3/XJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=fFDPhNdW; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	s=arc-20240116; t=1708668045; c=relaxed/simple;
+	bh=MVbqms9Wq34Hcxix5HL6lF7A4qEYOuPN7eJTVqses0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uEnwB3u4yWiccf2232OKaNfRUP2TN9jf3lBdFcI+g6bi8e1mzAkpVx/lV1bESP4oqxbrw1k+GzzZZMlojeEIF7TGGHlWcSPd4JrW52mdpL+rkZghPVTcLFcefVmn3eToanO9GbxQJbpvz6JNKCPpujoTKQJXkOqBQD/Ob8tYHMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BtWwvyJ+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="fFDPhNdW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1708658748;
-	bh=VPIjp5+R9X3jqT9MsfV+RShmi4vdvyr2GGYCyeKsN/Y=;
-	h=Date:From:To:Cc:Subject:From;
-	b=fFDPhNdWyCg9kOgSngASEqst2YWGbQ5tJVIS6DOkHo9srR0Gw4lpmss5U2VWXfIbM
-	 GC3zWyxWtmdfeDZhsnlNqhR5LDQHsiLPZJ9jtLDWcVLQ6DLvQENOfKxqgn9EuQ2ATD
-	 uhWqWryMxKN3q6JoCtDGNQe1bxD3jNEWQvQVpfEjVuWnGLNsCmS1XELDCi3CML7ZyS
-	 UyaTB1YVOOLrX0qmKMAgHz2bF3Dr783JGS3J/i0cUcxeEp4aPWYBvsgmtsEucSCtDa
-	 k/48DJU3EYewv/8wolG491vcdNx8kC4U/UEd0yjXQZtc9fgFWF9X45+rSB6x1zZED0
-	 8y86I9XlxsyXw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TgwQ36p7gz4wcb;
-	Fri, 23 Feb 2024 14:25:47 +1100 (AEDT)
-Date: Fri, 23 Feb 2024 14:25:46 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Herbert Xu
- <herbert@gondor.apana.org.au>
-Cc: Linux Crypto List <linux-crypto@vger.kernel.org>, Li RongQing
- <lirongqing@baidu.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patch in the vhost tree
-Message-ID: <20240223142546.073f7c21@canb.auug.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BtWwvyJ+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E086C433C7;
+	Fri, 23 Feb 2024 06:00:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708668045;
+	bh=MVbqms9Wq34Hcxix5HL6lF7A4qEYOuPN7eJTVqses0s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BtWwvyJ+kjOGiTlMbKRS5fkgjN1Q6zuZSAD/3gCzaKQwjfFicP1g+Uy8fbJuB8+MM
+	 l+hQEgt3Tua1yIb5Eef8QMqW/6Fym2IpZlvb+gtlAlOCjBWjqED5volZrbf61TYMbJ
+	 cu8wDFZm5ZUdFoOGdZvreOyb0QNA030gfA2GtTbH1Uh1CiOCjyd5Cn4NPZc2nvC4wN
+	 q2xOTEAgC87/j3MZJeut0HIyjlltg58vCr4xHQEex8d+mOb7C5DcqrSEYSjtYBLvdK
+	 shrdv04xCdpOjgyjSx1sZP64xvvJAfwGtGs+YJqJC7lZDXvnDZABwooIGR511AOl8O
+	 EhO/0XCComM6A==
+Date: Thu, 22 Feb 2024 22:00:43 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 06/15] crypto: algif_skcipher - Disallow nonincremental
+ algorithms
+Message-ID: <20240223060043.GF25631@sol.localdomain>
+References: <cover.1707815065.git.herbert@gondor.apana.org.au>
+ <a22dc748fdd6b67efb5356fd7855610170da30d9.1707815065.git.herbert@gondor.apana.org.au>
+ <20240214225638.GB1638@sol.localdomain>
+ <Zc2za7szGC+nxEHM@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/PHhm.IMMHBE0tJ_.+tM7ruv";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zc2za7szGC+nxEHM@gondor.apana.org.au>
 
---Sig_/PHhm.IMMHBE0tJ_.+tM7ruv
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, Feb 15, 2024 at 02:47:07PM +0800, Herbert Xu wrote:
+> On Wed, Feb 14, 2024 at 02:56:38PM -0800, Eric Biggers wrote:
+> >
+> > Shouldn't they still be supported if the data is being read/written all at once?
+> 
+> It is supported, or at least it worked for my libkcapi tests on
+> adiantum.  This error only triggers if we enter the code-path that
+> splits the operation into two or more (because the user didn't
+> write all the data in one go).
 
-Hi all,
+Great, that isn't what the commit message says though.
 
-The following commit is also in the crypto tree as a different commit
-(but the same patch):
+> 
+> > Also, ENOSYS isn't really an appropriate error code.  ENOSYS normally means that
+> > the system call isn't supported at all.  Maybe use EOPNOTSUPP?
+> 
+> Within the crypto subsystem ENOSYS means that a particular
+> functionality is not supported.  I'm happy to change that but
+> that should go into a different patch as there are existing uses
+> which are similar (e.g., cloning).
 
-  2374ca8f6556 ("virtio_crypto: remove duplicate check if queue is broken")
+This is a user API; it's not "within the crypto subsystem".  The usual
+conventions for system calls apply.
 
-This is commit
-
-  633eeefab69e ("crypto: virtio - remove duplicate check if queue is broken=
-")
-
-in the crypto tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/PHhm.IMMHBE0tJ_.+tM7ruv
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmXYEDoACgkQAVBC80lX
-0GxKpwf/R0i3r/NTejhG1yI3fIJFZcWxrZbWmh5zYcpAvkAyVpND6guw1wj/47zy
-3FkCHMTEAJN4QPIRtumR1WNLvWTnLjnS2uBPpcD4lMMoZOqV3Zh7m0Q/NJhVHPOZ
-Yt/sbP3JqNIQtTBOG0sARzRb6uAfaopif5DvisjTaMjSxcO8AZ6tYZ1YVjVLAG9N
-/jJtKtFgTLSGO1gazKPVe9OlmaJN9nov6dC9ErpqkMUmRMONDltIjbcEPO7R7K+j
-XRyPbQ76ik/3OWMhnjFGI0lNclWV8704ZfT0brMDKfM6RBMgs0zYyG+JZCp3/LZf
-7xRC/07yhGE78uDxwoTjhSh1NmUn1Q==
-=PhEO
------END PGP SIGNATURE-----
-
---Sig_/PHhm.IMMHBE0tJ_.+tM7ruv--
+- Eric
