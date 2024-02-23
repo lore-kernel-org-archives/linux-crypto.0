@@ -1,60 +1,59 @@
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC75312D1F9;
-	Fri, 23 Feb 2024 17:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEDC143C62;
+	Fri, 23 Feb 2024 17:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708709130; cv=none; b=moor8x7zImsqylNh98MA03X7mjbvh3n0jWzqz6kpWCrtxO76Zkx98f38OCj5/vzYNsBaca81lpqZMVXKEyWPIJPI0R1ElzZDK9XSmm81hv+D2tmLEP+7asH9qHunXJKMTnORY0H/+l9hRjwy9GLwvnPmhDHH72iOzZXj+AyDJ1s=
+	t=1708709157; cv=none; b=lahNm4+LgHUItm9SetHRCtLmp0Z990/DNhfc5xrYmOYqaTS4Kkj8M+nmb7ZEvuIB6mLjKlrBahaI6uMQZB7b1XAqZcMqEcwXhhKI5LyGBIpnN4hyTby4hVY4sRgstiuPIUPEZCKbTO37JMMxx2B9vNxDxKk7uNyS4ch0At3HuGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708709130; c=relaxed/simple;
-	bh=/hz/8AXXj+ZzSkJYQl0qnE60nI3MGQJXY6qlslTKKp0=;
+	s=arc-20240116; t=1708709157; c=relaxed/simple;
+	bh=1pa+nUeiMz0aVLSe9rutUmmIoy3zszoSlnt9C29TgLk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bT3yd/dBQS0D9xmhyyiAVUKn+YcWxhHiSi8kTPWL7fC42qH/oHwH3RvGeKFRr8cpiL0cQdf3z8JGIJY3R1rgrPz5DzbFA7jCV5pXjmpu/zeS4C06eC415BLybVffiG5GoOpAh0CUYa57Y7JPRRmaTYGz7Xe0udeQBxlrGCwctKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=yqoXhedy; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=PO9hmHkZA1ax6xEKaIqdNOxRL9A9rnfFwNVbNLYNzToV8v9JCoFd6ia/cnX1NFafp9RvKjAJxdelXYZMTjJO8GO2Aa/WNRFTdmlohdauDZ/idDy93A+PzC/QD3ez84p/xcicN3fcWXO4pKX4/fpzy+eFTJle+JSVGUQFJZVvn5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ryi3R1uN; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="yqoXhedy"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ryi3R1uN"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1708709113; x=1740245113;
+  t=1708709155; x=1740245155;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/hz/8AXXj+ZzSkJYQl0qnE60nI3MGQJXY6qlslTKKp0=;
-  b=yqoXhedyeY9HQD5E3eqc/HXSflSy8Zpg6TyFpCXS01pBo7pTo/mcXHCC
-   bg2VEEFoKfmX4/6l2P6wluV2cSoxe/J+q7GBATkFT4nroP5y3dU/PmQxS
-   J7Y8AvMT4JDFV2mD2LpvqMMUZ9fo/gJsupQcvsHbHrbaN8rqdAQbkDZb/
-   hvuUaCZkfXJAGhfPdBMBlV8eJYvUbFTYxir2u/4E+O/XYqVE7qnY6Ipn8
-   nTislpP5fMj9hSD4MXUL0UMH4xOKJtKNwN7TNH11SxEDBmyL2fZlsSn6E
-   uWVBpaRJ8yZAISjMOo4VPLgzBiTuPOEBenOO9nV2FP0zj1/e3Mmc22pSS
-   A==;
-X-CSE-ConnectionGUID: /5CNF92eR9i+Xpx5LCibjQ==
-X-CSE-MsgGUID: xtED5/yRT4aDO/oItKs/JA==
+  bh=1pa+nUeiMz0aVLSe9rutUmmIoy3zszoSlnt9C29TgLk=;
+  b=ryi3R1uNhxUfhSqPpHzb6NvvwTX5AwJLdGASi8UXGZBMGe+MJBymDUuU
+   mY0/b+eCYcgjzmiFgchyXJXgzOTBKD791/v3K3tnouzFoLaF1GAXFaZRI
+   BI4aKhBeMFnbu4LsoHdbfaIYKYYN+5yTpVsSmxzaSvnSC3V8xt83B/p7T
+   ZSc60kQYRs3ykG+fOG9jcer/XmCNQx99qmDyosc7+Btd2QXQivzhLaQ9L
+   SZ2CgrePWyQOUD18W73yoaEhGQN0I/i3aKLwSx9xxYdQewhsX2Kh/S5pX
+   iBjpa0z65sYqvovsYwDxRcYWIAjzZW9yj5BKBj++AN80kda5hxKD8DOq7
+   Q==;
+X-CSE-ConnectionGUID: O0kOdwhCRya6tisT8ZRfCw==
+X-CSE-MsgGUID: Bx/RauiIS1ukR8iK3Ocziw==
 X-IronPort-AV: E=Sophos;i="6.06,180,1705388400"; 
-   d="scan'208";a="184009396"
+   d="scan'208";a="16735824"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Feb 2024 10:25:12 -0700
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Feb 2024 10:25:54 -0700
 Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 23 Feb 2024 10:24:58 -0700
+ 15.1.2507.35; Fri, 23 Feb 2024 10:25:51 -0700
 Received: from che-lt-i67070.microchip.com (10.10.85.11) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 23 Feb 2024 10:24:53 -0700
+ 15.1.2507.35 via Frontend Transport; Fri, 23 Feb 2024 10:25:46 -0700
 From: Varshini Rajendran <varshini.rajendran@microchip.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-	<conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
-	<alexandre.belloni@bootlin.com>, <claudiu.beznea@tuxon.dev>,
-	<tudor.ambarus@linaro.org>, <linux-crypto@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <varshini.rajendran@microchip.com>
-Subject: [PATCH v4 05/39] dt-bindings: crypto: add sam9x7 in Atmel TDES
-Date: Fri, 23 Feb 2024 22:54:45 +0530
-Message-ID: <20240223172445.671783-1-varshini.rajendran@microchip.com>
+To: <olivia@selenic.com>, <herbert@gondor.apana.org.au>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
+	<claudiu.beznea@tuxon.dev>, <varshini.rajendran@microchip.com>,
+	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+CC: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v4 10/39] dt-bindings: rng: atmel,at91-trng: add sam9x7 TRNG
+Date: Fri, 23 Feb 2024 22:55:40 +0530
+Message-ID: <20240223172540.672044-1-varshini.rajendran@microchip.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240223171342.669133-1-varshini.rajendran@microchip.com>
 References: <20240223171342.669133-1-varshini.rajendran@microchip.com>
@@ -67,33 +66,31 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Add DT bindings for atmel TDES.
+Add compatbile for Microchip sam9x7 TRNG.
 
 Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
-Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
 Changes in v4:
-- Updated Acked-by tag
+- Updated Reviewed-by tag
 ---
- .../devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml  | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
-index 3d6ed24b1b00..6a441f79efea 100644
---- a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
-+++ b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
-@@ -12,7 +12,11 @@ maintainers:
- 
- properties:
-   compatible:
--    const: atmel,at91sam9g46-tdes
-+    oneOf:
-+      - const: atmel,at91sam9g46-tdes
+diff --git a/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml b/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
+index 3ce45456d867..b38f8252342e 100644
+--- a/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
++++ b/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
+@@ -21,6 +21,10 @@ properties:
+           - enum:
+               - microchip,sama7g5-trng
+           - const: atmel,at91sam9g45-trng
 +      - items:
-+          - const: microchip,sam9x7-tdes
-+          - const: atmel,at91sam9g46-tdes
++          - enum:
++              - microchip,sam9x7-trng
++          - const: microchip,sam9x60-trng
  
-   reg:
+   clocks:
      maxItems: 1
 -- 
 2.25.1
