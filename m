@@ -1,328 +1,252 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2603712880E
-	for <linux-crypto@vger.kernel.org>; Fri, 23 Feb 2024 16:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE8112838F;
+	Fri, 23 Feb 2024 17:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708706540; cv=none; b=sjrCQpHz/io8gek4TGs3+cqVzymMzks7wLyrPGtLAUQ/tm/JsQCu+VFL8lCS/TtHTtiSiHTc+1Ud7JdbSbWki5AG6mhDiIo1qBxDgve5TQh8upGwFsrSuaugbptgMvA2r94CHefVO/wQLtFJEqQMemjd81dktdMMFdhRleo2J70=
+	t=1708708474; cv=none; b=HYJdtJ4H5zxt7bwobf+rtuJhqlB9SqPgNxHrzHcBERHXezI5uubFa7ci6Z0wyhSstj3ejtHf+KxpsHJxuhTOARTKcI3H/8XO7ZbsZ1g6vUdhCCURzc7818fOSLUyiGA+CEWPag+kw1mnm5FEapILnklZEij9SHdf1C5eYm1IyaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708706540; c=relaxed/simple;
-	bh=tzZ5vRou2tzwpiknAbcgvaY03gJD6AH4Ovlu8u2D8nE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E9Rqep1RqsAtx7+JE/8D1Ah8P4HxpyWefightJJvT3bkk4bwE9okPIQ2k6LqtR5kV9y69EV8AkR00Xu5qV4adVj0VvQmt5hcUQDNg9EsGhc8wRl61tfhwwoIzAtIcnIwhjd2Cu74oAc3delIM6XbG1bY9a/1qhBEh34sok5FGUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=Rnnxl9kS; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
+	s=arc-20240116; t=1708708474; c=relaxed/simple;
+	bh=Ya7emYjSkiHqP5u67XOaZtVnw0nOswnxuhZgIQ4BbMo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BA60Lh1hoVd5EDi+CkzfZtCk18vy/EIjT3ZCFSP3eaJkpD/5VgsdiDDkNOQFq+oT5pkce8SfeNViR0t7rw/LcqJBVSWZsYHNSNI1wWL+cDlVApnbeeV5N1tP+5fRzwwddd2vkNNUfs/Q2tv9XxO5YSY0sitxUwmx+CQm6XzG8+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Q+LreEMK; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Rnnxl9kS"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-512b29f82d1so831953e87.1
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Feb 2024 08:42:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=citrix.com; s=google; t=1708706536; x=1709311336; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qoLuBOTBYwo+qwBs59lcs6973WjeFSpK73YZ5Iw2Km4=;
-        b=Rnnxl9kSa7KrbBm6ey3tFDwIUFl3iGJfUhFX51OlJjp/NL9R+LCjXseVt4sjBDbOQS
-         osAnBZA8jImab66xW4cG3/YUrN4EiBGJnVNmj/yWEvyX7+/q2k+45PCO6z3jumO02XiM
-         ++pi0OAoFJWStxXyzi1xFUSxuFJZd2KisG+AY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708706536; x=1709311336;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qoLuBOTBYwo+qwBs59lcs6973WjeFSpK73YZ5Iw2Km4=;
-        b=DnwN8l7PwUBo2rstJBMqcuElaaoPxMltUc2Zz5L1E5x+EyDy1HyBOllvWZcmZP4hZ1
-         sL+g4QwszpxbS6NOr2C3+csZ2fbWX284zdz2KwqTlv0ARkvGxEZ7PtBcP+F6eGsGJj1G
-         uIDrZmcgJJoMXF8kTbKPKBPJIa3vZZ2O3szLFoEKj+8AmFSA/60PfKDV03pnVQ02f20l
-         tAbWzigpgT2KJPO0kpFCKFkBUq1kI7opY+5nBah3VthTWfHACqwlOlX4fYs7UPE90QxX
-         sm5S0peQOit6aN5i8K+cASTjwkNhlO+lsSstc2dGnbZphg1rbCLTrocKRiH34ONILIgV
-         Fu4g==
-X-Forwarded-Encrypted: i=1; AJvYcCW7Zb0OuZ+jG1iF2G/hf0mmujDiEoUDn5jIXE3U5tUNztzjo/8TfRWf+DzkK5mdby0ubr8tiasmcXxtprLnlWkGeRpzrvqK9EfhdQEt
-X-Gm-Message-State: AOJu0YyapIg23gUN1iXb43Wh1YVXREDH7fWAP7MmnRwVSmX4CUTs2fMr
-	6/W1rphCavmcuVFFAJacYyF/nv0amnmjwpEAIWjK+sV8IKssy0LFCNYR5SliFqI=
-X-Google-Smtp-Source: AGHT+IFVg0FkzeWFv8VAUtlKSwt788AmJwtS0qsDMb5sOGtHb2BLbj86xPtSi/VfS0UFWwlNIJXZJA==
-X-Received: by 2002:a05:6512:3b0f:b0:512:be84:f49d with SMTP id f15-20020a0565123b0f00b00512be84f49dmr227672lfv.63.1708706535842;
-        Fri, 23 Feb 2024 08:42:15 -0800 (PST)
-Received: from [10.80.67.149] (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
-        by smtp.gmail.com with ESMTPSA id x4-20020a0ce244000000b0068f2d2f64d1sm8403702qvl.32.2024.02.23.08.42.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Feb 2024 08:42:15 -0800 (PST)
-Message-ID: <431a0b3a-47e5-4e61-a7fc-31cdf56f4e4c@citrix.com>
-Date: Fri, 23 Feb 2024 16:42:11 +0000
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Q+LreEMK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1708708472; x=1740244472;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Ya7emYjSkiHqP5u67XOaZtVnw0nOswnxuhZgIQ4BbMo=;
+  b=Q+LreEMKqMC3g4Tfs4ABkCP+WsyIzbo3xPjj/dsddz4MNPt+41wTKLYc
+   ARmGggZ28DFFuxDjd78wyQU8gdYqckPj7mpB9B/0zk0uwqO6bnHjnQKFm
+   joC5BMbY/6OKAXKuKJdTqs6UaPwuhqkvnVrH9wrbhpJEXkdD7TzVeQ5RV
+   PUhpt75SKl0m729SyxAd+VG7eMUtXpO26ten40P3/1AD5lMW0q2Lv8K1J
+   okTilQG8JmA215J0LdS3FUqf2Hj32A/g+fz44mhHyb4OUB4dDEncnZPqS
+   /x8a4bK0cfMWCulMvmY2UKL+lwrTqDaNb1ufGUHhKNdATlvp4718V6Zej
+   g==;
+X-CSE-ConnectionGUID: Zg+uYWIwR/67x/qNBiMJxA==
+X-CSE-MsgGUID: Zq+OrxYDQK6ZvTWv4XI1Vw==
+X-IronPort-AV: E=Sophos;i="6.06,180,1705388400"; 
+   d="scan'208";a="184008857"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Feb 2024 10:14:28 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 23 Feb 2024 10:14:20 -0700
+Received: from che-lt-i67070.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Fri, 23 Feb 2024 10:13:59 -0700
+From: Varshini Rajendran <varshini.rajendran@microchip.com>
+To: <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+	<conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
+	<alexandre.belloni@bootlin.com>, <claudiu.beznea@tuxon.dev>,
+	<mturquette@baylibre.com>, <sboyd@kernel.org>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <andi.shyti@kernel.org>, <tglx@linutronix.de>,
+	<tudor.ambarus@linaro.org>, <miquel.raynal@bootlin.com>, <richard@nod.at>,
+	<vigneshr@ti.com>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <linus.walleij@linaro.org>, <sre@kernel.org>,
+	<u.kleine-koenig@pengutronix.de>, <p.zabel@pengutronix.de>,
+	<olivia@selenic.com>, <radu_nicolae.pirea@upb.ro>,
+	<richard.genoud@gmail.com>, <gregkh@linuxfoundation.org>,
+	<jirislaby@kernel.org>, <lgirdwood@gmail.com>, <broonie@kernel.org>,
+	<wim@linux-watchdog.org>, <linux@roeck-us.net>, <linux@armlinux.org.uk>,
+	<andrei.simion@microchip.com>, <mihai.sain@microchip.com>,
+	<varshini.rajendran@microchip.com>, <andre.przywara@arm.com>,
+	<neil.armstrong@linaro.org>, <tony@atomide.com>,
+	<durai.manickamkr@microchip.com>, <geert+renesas@glider.be>, <arnd@arndb.de>,
+	<Jason@zx2c4.com>, <rdunlap@infradead.org>, <rientjes@google.com>,
+	<vbabka@suse.cz>, <mripard@kernel.org>, <codrin.ciubotariu@microchip.com>,
+	<eugen.hristev@collabora.com>, <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-clk@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-i2c@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
+	<netdev@vger.kernel.org>, <linux-gpio@vger.kernel.org>,
+	<linux-pm@vger.kernel.org>, <linux-pwm@vger.kernel.org>,
+	<linux-rtc@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+	<linux-serial@vger.kernel.org>, <alsa-devel@alsa-project.org>,
+	<linux-sound@vger.kernel.org>, <linux-watchdog@vger.kernel.org>
+Subject: [PATCH v4 00/39] Add support for sam9x7 SoC family
+Date: Fri, 23 Feb 2024 22:43:42 +0530
+Message-ID: <20240223171342.669133-1-varshini.rajendran@microchip.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 06/15] x86: Add early SHA support for Secure Launch
- early measurements
-Content-Language: en-GB
-To: Ard Biesheuvel <ardb@kernel.org>,
- Andrew Cooper <andrew.cooper3@citrix.com>
-Cc: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, dpsmith@apertussolutions.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
- mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
- nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
- kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com,
- Eric Biggers <ebiggers@kernel.org>
-References: <20240214221847.2066632-1-ross.philipson@oracle.com>
- <20240214221847.2066632-7-ross.philipson@oracle.com>
- <CAMj1kXEmMBY_jc0uM5UgZbuZ3-C7NPKzg5AScaunyu9XzLgzZA@mail.gmail.com>
- <98ad92bb-ef17-4c15-88ba-252db2a2e738@citrix.com>
- <CAMj1kXFTu+bV2kQhAyu15hrYai20NcBLb4Zu8XG2Y-XjL0f+rw@mail.gmail.com>
- <1a8e69a7-89eb-4d36-94d6-0da662d8b72f@citrix.com>
- <CAMj1kXEvmGy9RJo4s8tECsFj2dufZ8jBPoJOEtkcGUoj+x2qsw@mail.gmail.com>
-From: Andrew Cooper <andrew.cooper3@citrix.com>
-Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
- 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
- 6+ahAA==
-In-Reply-To: <CAMj1kXEvmGy9RJo4s8tECsFj2dufZ8jBPoJOEtkcGUoj+x2qsw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On 23/02/2024 9:27 am, Ard Biesheuvel wrote:
-> On Thu, 22 Feb 2024 at 13:30, Andrew Cooper <andrew.cooper3@citrix.com> wrote:
->> On 22/02/2024 9:34 am, Ard Biesheuvel wrote:
->>> On Thu, 22 Feb 2024 at 04:05, Andrew Cooper <andrew.cooper3@citrix.com> wrote:
->>>> On 15/02/2024 8:17 am, Ard Biesheuvel wrote:
->>>>> On Wed, 14 Feb 2024 at 23:31, Ross Philipson <ross.philipson@oracle.com> wrote:
->>>>>> From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
->>>>>>
->>>>>> The SHA algorithms are necessary to measure configuration information into
->>>>>> the TPM as early as possible before using the values. This implementation
->>>>>> uses the established approach of #including the SHA libraries directly in
->>>>>> the code since the compressed kernel is not uncompressed at this point.
->>>>>>
->>>>>> The SHA code here has its origins in the code from the main kernel:
->>>>>>
->>>>>> commit c4d5b9ffa31f ("crypto: sha1 - implement base layer for SHA-1")
->>>>>>
->>>>>> A modified version of this code was introduced to the lib/crypto/sha1.c
->>>>>> to bring it in line with the sha256 code and allow it to be pulled into the
->>>>>> setup kernel in the same manner as sha256 is.
->>>>>>
->>>>>> Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
->>>>>> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
->>>>> We have had some discussions about this, and you really need to
->>>>> capture the justification in the commit log for introducing new code
->>>>> that implements an obsolete and broken hashing algorithm.
->>>>>
->>>>> SHA-1 is broken and should no longer be used for anything. Introducing
->>>>> new support for a highly complex boot security feature, and then
->>>>> relying on SHA-1 in the implementation makes this whole effort seem
->>>>> almost futile, *unless* you provide some rock solid reasons here why
->>>>> this is still safe.
->>>>>
->>>>> If the upshot would be that some people are stuck with SHA-1 so they
->>>>> won't be able to use this feature, then I'm not convinced we should
->>>>> obsess over that.
->>>> To be absolutely crystal clear here.
->>>>
->>>> The choice of hash algorithm(s) are determined by the OEM and the
->>>> platform, not by Linux.
->>>>
->>>> Failing to (at least) cap a PCR in a bank which the OEM/platform left
->>>> active is a security vulnerability.  It permits the unsealing of secrets
->>>> if an attacker can replay a good set of measurements into an unused bank.
->>>>
->>>> The only way to get rid of the requirement for SHA-1 here is to lobby
->>>> the IHVs/OEMs, or perhaps the TCG, to produce/spec a platform where the
->>>> SHA-1 banks can be disabled.  There are no known such platforms in the
->>>> market today, to the best of our knowledge.
->>>>
->>> OK, so mainline Linux does not support secure launch at all today. At
->>> this point, we need to decide whether or not tomorrow's mainline Linux
->>> will support secure launch with SHA1 or without, right?
->> I'd argue that's a slightly unfair characterisation.
->>
-> Fair enough. I'm genuinely trying to have a precise understanding of
-> this, not trying to be dismissive.
+This patch series adds support for the new SoC family - sam9x7.
+ - The device tree, configs and drivers are added
+ - Clock driver for sam9x7 is added
+ - Support for basic peripherals is added
+ - Target board SAM9X75 Curiosity is added
 
-Sure, and neither am I.  (And frankly, I vastly prefer this reasoned
-discussion to prior ones.)
+ Changes in v4:
+ --------------
 
-Secure Launch technology really is used today as out-of-tree code, and
-it has taken ~15y to get to this point of doing it nicely in an
-ecosystem that is wider than just Linux.  (Not a criticism, just an
-observation)
+ - Addressed all the review comments in the patches
+ - Picked up all Acked-by and Reviewed-by tags
+ - Dropped applied patches from the series
+ - Added pwm node and related dt binding documentation
+ - Added support for exporting some clocks to DT
+ - Dropped USB related patches and changes. See NOTE.
+ - All the specific changes are captured in the corresponding patches
 
-We're looking not to get blocked with a brand new objection which
-approximates to "it's now not perfect, therefore you can't have
-something that's still a lot better than nothing".
+ NOTE: Owing to the discussion here
+ https://lore.kernel.org/linux-devicetree/CAL_JsqJ9PrX6fj-EbffeJce09MXs=B7t+KS_kOinxaRx38=WxA@mail.gmail.com/
+ the USB related changes are dropped from this series in order to enable
+ us to work on the mentioned issues before adding new compatibles as
+ said. The issues/warnings will be addressed in subsequent patches.
+ After which the USB related support for sam9x7 SoCs will be added. Hope
+ this works out fine.
 
-A major reason why the hardware ecosystem is out of date is because
-almost no-one uses it, because it's horribly complicated to configure,
-because it's a set of large out-of-tree patche series against your
-bootloader, hypervisor and kernel.
+ Changes in v3:
+ --------------
 
-The goal of the Trenchboot project is to make it easy to use (i.e.
-upstream support in the relevant projects), so that more people can use
-it, in order to drive the hardware ecosystem forward.
-
-Very seriously - Linux taking this series, even off by default and with
-a "SHA-1 considered hazardous for your health" warning somewhere, will
-still have a material positive impact in getting the hardware ecosystem
-to improve.  It is, by far and away, the best thing that we (Trenchboot)
-can do in order to move towards a SHA-1-less future.
-
-Trenchboot do have a specific intent to get to that future, and beyond,
-but it's a multi-year task.
+ - Fixed the DT documentation errors pointed out in v2.
+ - Dropped Acked-by tag in tcb DT doc patch as it had to be adapted
+   according to sam9x7 correctly.
+ - Picked by the previously missed tags.
+ - Dropped this patch "dt-bindings: usb: generic-ehci: Document clock-names
+   property" as the warning was not found while validating DT-schema for
+   at91-sam9x75_curiosity.dtb.
+ - Dropped redundant words in the commit message.
+ - Fixed the CHECK_DTBS warnings validated against
+   at91-sam9x75_curiosity.dtb.
+ - Renamed dt nodes according to naming convention.
+ - Dropped unwanted status property in dts.
+ - Removed nodes that are not in use from the board dts.
+ - Removed spi DT doc patch from the series as it was already applied
+   and a fix patch was applied subsequently. Added a patch to remove the
+   compatible to adapt sam9x7.
+ - Added sam9x7 compatibles in usb dt documentation.
 
 
->> We want tomorrow's mainline to support Secure Launch.  What that entails
->> under the hood is largely outside of the control of the end user.
->>
-> So the debate is really whether it makes sense at all to support
-> Secure Launch on systems that are stuck on an obsolete and broken hash
-> algorithm. This is not hyperbole: SHA-1 is broken today and once these
-> changes hit production 1-2 years down the line, the situation will
-> only have deteriorated. And another 2-3 years later, we will be the
-> ones chasing obscure bugs on systems that were already obsolete when
-> this support was added.
+ Changes in v2:
+ --------------
 
-There are indeed collisions, and this will indeed get worse over time.
-
-But right now it still takes nation-state (or certain corporation)
-resources to calculate a collision, and that would have to be specific
-to the exact firmware/settings/hypervisor/kernel/initrd configuration of
-the target device.
-
-Google et al invested the effort in SHAttered in order to drive change
-in the industry, but that doesn't mean it's viable as a general attack
-yet.  There are far more cost effective options, even a $4 wrench...
-
-> So what is the value proposition here? An end user today, who is
-> mindful enough of security to actively invest the effort to migrate
-> their system from ordinary measured boot to secure launch, is really
-> going to do so on a system that only implements SHA-1 support?
-
-Oh both Intel and AMD, the base technology is around in all platforms
-the support virt.
-
-On Intel, it's SKU-limited to vPRO, but platforms with fTPM2.0 have been
-generally SHA1+SHA256 capable for years now.  A security conscious end
-user would just want to cap the SHA1 banks and run with SHA256.
-
-Furthermore, when the attestation is based on a SHA1+SHA256 measurement,
-the attestor can spot and reject SHA1 collisions, so this configuration
-really should be safe to the concerns raised here.
-
-On AMD, it's not SKU-limited.  However, their fTPM2.0 isn't SKINIT
-compatible, and we were basically told "show us people using SKINIT
-first".  I'm not sure if we've got as far as trying to an LPC TPM 2.0 on
-AMD yet.  Even bus interception attacks can be defended against with TPM
-encrypted sessions,  but we put this in the "not for v1" bucket.
+ - Added sam9x7 specific compatibles in DT with fallbacks
+ - Documented all the newly added DT compatible strings
+ - Added device tree for the target board sam9x75 curiosity and
+   documented the same in the DT bindings documentation
+ - Removed the dt nodes that are not supported at the moment
+ - Removed the configs added by previous version that are not supported
+   at the moment
+ - Fixed all the corrections in the commit message
+ - Changed all the instances of copyright year to 2023
+ - Added sam9x7 flag in PIT64B configuration
+ - Moved macro definitions to header file
+ - Added another divider in mck characteristics in the pmc driver
+ - Fixed the memory leak in the pmc driver
+ - Dropped patches that are no longer needed
+ - Picked up Acked-by and Reviewed-by tags
 
 
-It's not a secret - the intent of getting this technology more-generally
-usable (and therefore used) is to be able to go back to Intel and say
-"hey notice how AMD give this technology to everyone", and to say AMD
-"hey notice how Intel have this working with TPM2".  Both have been
-persuaded along this direction by Microsoft by virtue of including the
-Pluton IP blob in the main CPU package.
+Varshini Rajendran (39):
+  dt-bindings: net: cdns,macb: add sam9x7 ethernet interface
+  dt-bindings: atmel-sysreg: add sam9x7
+  dt-bindings: crypto: add sam9x7 in Atmel AES
+  dt-bindings: crypto: add sam9x7 in Atmel SHA
+  dt-bindings: crypto: add sam9x7 in Atmel TDES
+  dt-bindings: i2c: at91: Add sam9x7 compatible string
+  dt-bindings: atmel-ssc: add microchip,sam9x7-ssc
+  dt-bindings: atmel-nand: add microchip,sam9x7-pmecc
+  dt-bindings: pinctrl: at91: add sam9x7
+  dt-bindings: rng: atmel,at91-trng: add sam9x7 TRNG
+  dt-bindings: rtt: at91rm9260: add sam9x7 compatible
+  dt-bindings: serial: atmel,at91-usart: add compatible for sam9x7.
+  ASoC: dt-bindings: atmel-classd: add sam9x7 compatible
+  dt-bindings: pwm: at91: Add sam9x7 compatible strings list
+  dt-bindings: watchdog: sama5d4-wdt: add compatible for sam9x7-wdt
+  spi: dt-bindings: atmel,at91rm9200-spi: remove 9x60 compatible from
+    list
+  ASoC: dt-bindings: microchip: add sam9x7
+  ARM: at91: pm: add support for sam9x7 SoC family
+  ARM: at91: pm: add sam9x7 SoC init config
+  ARM: at91: add support in SoC driver for new sam9x7
+  dt-bindings: clk: at91: add sam9x7
+  dt-bindings: clk: at91: add sam9x7 clock controller
+  clk: at91: clk-sam9x60-pll: re-factor to support individual core freq
+    outputs
+  clk: at91: sam9x7: add support for HW PLL freq dividers
+  clk: at91: sama7g5: move mux table macros to header file
+  dt-bindings: clock: at91: Allow PLLs to be exported and referenced in
+    DT
+  clk: at91: sam9x7: add sam9x7 pmc driver
+  dt-bindings: irqchip/atmel-aic5: Add support for sam9x7 aic
+  irqchip/atmel-aic5: Add support to get nirqs from DT for sam9x60 &
+    sam9x7
+  power: reset: at91-poweroff: lookup for proper pmc dt node for sam9x7
+  power: reset: at91-reset: add reset support for sam9x7 SoC
+  power: reset: at91-reset: add sdhwc support for sam9x7 SoC
+  dt-bindings: reset: atmel,at91sam9260-reset: add sam9x7
+  dt-bindings: power: reset: atmel,sama5d2-shdwc: add sam9x7
+  ARM: at91: Kconfig: add config flag for SAM9X7 SoC
+  ARM: configs: at91: enable config flags for sam9x7 SoC family
+  ARM: dts: at91: sam9x7: add device tree for SoC
+  dt-bindings: arm: add sam9x75 curiosity board
+  ARM: dts: at91: sam9x75_curiosity: add sam9x75 curiosity board
 
->>> And the point you are making here is that we need SHA-1 not only to a)
->>> support systems that are on TPM 1.2 and support nothing else, but also
->>> to b) ensure that crypto agile TPM 2.0 with both SHA-1 and SHA-256
->>> enabled can be supported in a safe manner, which would involve
->>> measuring some terminating event into the SHA-1 PCRs to ensure they
->>> are not left in a dangling state that might allow an adversary to
->>> trick the TPM into unsealing a secret that it shouldn't.
->> Yes.  Also c) because if the end user wants to use SHA-1, they should be
->> able to.
->>
-> The end user can do whatever they want, of course. Whether it belongs
-> in the upstream is an entirely different matter, though, especially
-> because we will effectively be forced to support this forever.
->
->
->>> So can we support b) without a), and if so, does measuring an
->>> arbitrary dummy event into a PCR that is only meant to keep sealed
->>> forever really require a SHA-1 implementation, or could we just use an
->>> arbitrary (not even random) sequence of 160 bits and use that instead?
->> a) and b) are in principle independent, but we cannot support b) without
->> SHA-1.
->>
->> To cap a PCR, the event log still needs to be kept accurate, and that's
->> at least one SHA-1 calculation.  If you were to simply extend a dummy
->> value, the system hopefully fails safe, but the user gets "something
->> went wrong, you're on your own", rather than "we intentionally blocked
->> the use of SHA-1, everything is good".
->>
->> And frankly, you need SHA-1 just to read the event log, if any component
->> (including TXT itself) wrote a SHA-1 entry into it.
->>
->>
->> To be blunt.  SHA-1 support is not viably optional today as far as
->> Secure Launch is concerned.  If there's a suitable Kconfig symbol to use
->> for people who want a completely SHA-1-less kernel, then we can make
->> Secure Launch depend on that until such time as the hardware ecosystem
->> has caught up.
->>
-> Yes, this crossed my mind as well. There is a Kconfig symbol
-> CRYPTO_USER_API_ENABLE_OBSOLETE I added a while ago for a similar
-> purpose.
->
-> I am still disappointed that we have to go down this path, but I
-> understand the concerns now that you have explained them to me (again)
-> in more detail.
->
-> These considerations need to be recorded in the documentation or
-> commit logs as well, so that we can easily refer back to them without
-> having to dig through the mail archives.
+ .../devicetree/bindings/arm/atmel-at91.yaml   |    6 +
+ .../devicetree/bindings/arm/atmel-sysregs.txt |    7 +-
+ .../bindings/clock/atmel,at91rm9200-pmc.yaml  |    2 +
+ .../bindings/clock/atmel,at91sam9x5-sckc.yaml |    4 +-
+ .../crypto/atmel,at91sam9g46-aes.yaml         |    6 +-
+ .../crypto/atmel,at91sam9g46-sha.yaml         |    6 +-
+ .../crypto/atmel,at91sam9g46-tdes.yaml        |    6 +-
+ .../bindings/i2c/atmel,at91sam-i2c.yaml       |    4 +-
+ .../interrupt-controller/atmel,aic.txt        |    2 +-
+ .../devicetree/bindings/misc/atmel-ssc.txt    |    1 +
+ .../devicetree/bindings/mtd/atmel-nand.txt    |    1 +
+ .../devicetree/bindings/net/cdns,macb.yaml    |    5 +
+ .../bindings/pinctrl/atmel,at91-pinctrl.txt   |    2 +
+ .../power/reset/atmel,sama5d2-shdwc.yaml      |    3 +
+ .../bindings/pwm/atmel,at91sam-pwm.yaml       |    3 +
+ .../reset/atmel,at91sam9260-reset.yaml        |    4 +
+ .../bindings/rng/atmel,at91-trng.yaml         |    4 +
+ .../bindings/rtc/atmel,at91sam9260-rtt.yaml   |    4 +-
+ .../bindings/serial/atmel,at91-usart.yaml     |   12 +-
+ .../bindings/sound/atmel,sama5d2-classd.yaml  |    7 +-
+ .../sound/microchip,sama7g5-i2smcc.yaml       |   11 +-
+ .../bindings/spi/atmel,at91rm9200-spi.yaml    |    1 -
+ .../bindings/watchdog/atmel,sama5d4-wdt.yaml  |   12 +-
+ arch/arm/boot/dts/microchip/Makefile          |    3 +
+ .../dts/microchip/at91-sam9x75_curiosity.dts  |  309 +++++
+ arch/arm/boot/dts/microchip/sam9x60.dtsi      |    1 +
+ arch/arm/boot/dts/microchip/sam9x7.dtsi       | 1214 +++++++++++++++++
+ arch/arm/configs/at91_dt_defconfig            |    1 +
+ arch/arm/mach-at91/Kconfig                    |   23 +-
+ arch/arm/mach-at91/Makefile                   |    1 +
+ arch/arm/mach-at91/generic.h                  |    2 +
+ arch/arm/mach-at91/pm.c                       |   35 +
+ arch/arm/mach-at91/sam9x7.c                   |   34 +
+ drivers/clk/at91/Makefile                     |    1 +
+ drivers/clk/at91/clk-sam9x60-pll.c            |   50 +-
+ drivers/clk/at91/pmc.h                        |   18 +
+ drivers/clk/at91/sam9x60.c                    |    7 +
+ drivers/clk/at91/sam9x7.c                     |  946 +++++++++++++
+ drivers/clk/at91/sama7g5.c                    |   42 +-
+ drivers/irqchip/irq-atmel-aic5.c              |   12 +-
+ drivers/power/reset/Kconfig                   |    4 +-
+ drivers/power/reset/at91-sama5d2_shdwc.c      |    1 +
+ drivers/soc/atmel/soc.c                       |   23 +
+ drivers/soc/atmel/soc.h                       |    9 +
+ include/dt-bindings/clock/at91.h              |    4 +
+ 45 files changed, 2788 insertions(+), 65 deletions(-)
+ create mode 100644 arch/arm/boot/dts/microchip/at91-sam9x75_curiosity.dts
+ create mode 100644 arch/arm/boot/dts/microchip/sam9x7.dtsi
+ create mode 100644 arch/arm/mach-at91/sam9x7.c
+ create mode 100644 drivers/clk/at91/sam9x7.c
 
-Yes, and I agree.  We're not looking to try and force this in with
-underhand tactics.
+-- 
+2.25.1
 
-But a blind "nack to any SHA-1" is similarly damaging in the opposite
-direction.
-
-~Andrew
