@@ -1,38 +1,30 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF6117C8;
-	Sat, 24 Feb 2024 00:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C939D1864
+	for <linux-crypto@vger.kernel.org>; Sat, 24 Feb 2024 00:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708735833; cv=none; b=uNvH/ctve5HBzU6mS4aalwsfcgYXu8JP7BH7K+Q0rjejDw9/ZjYoUwvMJDXAVbm9tmEQowrCW1pQ3ipWQ10Mr+KbSAaAL9O40YRP4HRDeIojb3rmpvbHeYsLyyDlNQSriXsWgRgr7S2uIJV0BCjmdUe0IjpT+ynOshoE6S9j0Eg=
+	t=1708735870; cv=none; b=eR8pqEu4m4xfIsaKWjJexBiWxGjfLbp6ZkE4bQJVvDUbgclxrCR/9MPqug0J6JhoH9x/j3PkrEz+XWCfx2vncXvmFq6nTlGWO1HICcvE8aaG6g0TXZkzrW5sIyho8ICYbgQJYq9JRkiprllpvOs/tC7VZR0tAiQnqs2vklQb/tA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708735833; c=relaxed/simple;
-	bh=1Yx8JWtZT7NJ/ks9g6HxK/LqurKWFCidlnpb6hkrE10=;
+	s=arc-20240116; t=1708735870; c=relaxed/simple;
+	bh=Tx8QJFbihMA2dtuOXPZCxecF73Op+GYtbHDdV8Pp1+g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sZs44ZEmlGhapqM9+GRj0EzO0L449Qk62zfP0EzV089pqSVPWDdGDb7l7dMCKBoNXFlrsD71ssy3HqalPHA5uelUfwi75YBMxMB4CN2eHBgbjCGWRtC9lVDRxzzCFly0jPAOKWLKu3oXYw4XvHwWkZQR6YzUv0yeZ9iXHDTm3/w=
+	 Content-Type:Content-Disposition:In-Reply-To; b=DJ0vViHvZ3IgQgFOqo9rVsaB0nfxo2tmCEHgTnVr2OfiK6anFY1hPi08YWBal1fkp2pQV2nnlNlrVwPEIjG2IP2Kp/8h3QBuhjzqyRFVFPbFV36FQ1bV39CYz2Ql6MgivAgPkuADn2lX+cQRiRu1+PpOS5Zb2mMvoGEeigSruvs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rdgF6-00HDvZ-OA; Sat, 24 Feb 2024 08:50:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 Feb 2024 08:50:31 +0800
-Date: Sat, 24 Feb 2024 08:50:31 +0800
+	id 1rdgFs-00HDy8-Ng; Sat, 24 Feb 2024 08:51:05 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 Feb 2024 08:51:19 +0800
+Date: Sat, 24 Feb 2024 08:51:19 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Damian Muszynski <damian.muszynski@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
-	Tero Kristo <tero.kristo@linux.intel.com>,
-	Markas Rapoportas <markas.rapoportas@intel.com>,
-	qat-linux@intel.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] crypto: qat - uninitialized variable in
- adf_hb_error_inject_write()
-Message-ID: <Zdk9V06gKW8EsH2k@gondor.apana.org.au>
-References: <193d36b0-961a-4b66-b945-37988f157ebe@moroto.mountain>
+To: Adam Guerin <adam.guerin@intel.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
+Subject: Re: [PATCH 0/6] crypto: qat - fix warnings reported by clang
+Message-ID: <Zdk9h3SFGS2Wzejf@gondor.apana.org.au>
+References: <20240216151959.19382-1-adam.guerin@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,27 +33,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <193d36b0-961a-4b66-b945-37988f157ebe@moroto.mountain>
+In-Reply-To: <20240216151959.19382-1-adam.guerin@intel.com>
 
-On Tue, Feb 13, 2024 at 09:09:41PM +0300, Dan Carpenter wrote:
-> There are a few issues in this code.  If *ppos is non-zero then the
-> first part of the buffer is not initialized.  We never initialize the
-> last character of the buffer.  The return is not checked so it's
-> possible that none of the buffer is initialized.
+On Fri, Feb 16, 2024 at 03:19:54PM +0000, Adam Guerin wrote:
+> This set fixes a list of warnings found by compiling the QAT driver with
+> "CC=clang W=2" and with the Clang tool scan-build.
 > 
-> This is debugfs code which is root only and the impact of these bugs is
-> very small.  However, it's still worth fixing.  To fix this:
-> 1) Check that *ppos is zero.
-> 2) Use copy_from_user() instead of simple_write_to_buffer().
-> 3) Explicitly add a NUL terminator.
+> These fixes include removing unused macros in both adf_cnv_dbgfs.c and
+> qat_comp_alg.c, fix initialization of multiple variables, check that
+> delta_us is not 0, and fixing the comment structures in multiple files.
 > 
-> Fixes: e2b67859ab6e ("crypto: qat - add heartbeat error simulator")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  .../crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+> Adam Guerin (6):
+>   crypto: qat - remove unused macros in qat_comp_alg.c
+>   crypto: qat - removed unused macro in adf_cnv_dbgfs.c
+>   crypto: qat - avoid division by zero
+>   crypto: qat - remove double initialization of value
+>   crypto: qat - remove unnecessary description from comment
+>   crypto: qat - fix comment structure
+> 
+>  drivers/crypto/intel/qat/qat_common/adf_clock.c     | 3 +++
+>  drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c | 1 -
+>  drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c   | 4 ++--
+>  drivers/crypto/intel/qat/qat_common/adf_gen4_ras.c  | 6 ++----
+>  drivers/crypto/intel/qat/qat_common/adf_isr.c       | 2 --
+>  drivers/crypto/intel/qat/qat_common/adf_vf_isr.c    | 2 --
+>  drivers/crypto/intel/qat/qat_common/qat_comp_algs.c | 9 ---------
+>  drivers/crypto/intel/qat/qat_common/qat_crypto.c    | 4 ++--
+>  8 files changed, 9 insertions(+), 22 deletions(-)
+> 
+> 
+> base-commit: 7a35f3adf4535a9a56ef7b3e75355806632030ca
+> -- 
+> 2.40.1
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
