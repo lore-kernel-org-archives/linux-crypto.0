@@ -1,112 +1,110 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7579F23BF;
-	Sat, 24 Feb 2024 01:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EDA64C6B
+	for <linux-crypto@vger.kernel.org>; Sat, 24 Feb 2024 16:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708737553; cv=none; b=e7378TQsdXd1L6BUxPy62hU37FMkHsrV+sn/NCr9JeZBOCl3zWs4SBtxJczkefvKOS7S2d1xbonxItQYlyG9WPi4vNEwMGicoT3p7tT0KZB/9akoEZ5YJqr4RDN6yUF6FgnoMkFm6H7uBFhNhbfWvhrvKA1lK+KYYX79aLOSN5U=
+	t=1708793591; cv=none; b=lKiNoOGRBvdkiTw9zF+jVa5HbGjHDnmXQaDkYyvH2gzqfUtwa9XYqvjEAWo/btO7h/1EywpHkl/cZEs8jfIAhHUJ8IwSLjptHW/Z7KmYHDTL3t+BC3AIminusJL+I37aCTgHJQk//ZPP9FJPNlDrZe2ZBAWleow/5kpSGwYbmYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708737553; c=relaxed/simple;
-	bh=0W8qjJDpYcgYroDsZAHS1ygwFOJj7ZrezH6oMeip5ik=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Iwd8YPN/o0YuuBIpQjzcHLXtDfkR+tePZNQDip86CpbBpF7CaGHo09oTkQektsAjM3ldm3qRb4FOehMgtvqwRr8R8SGar3qyQ5Muoxl2nDLTaLD5HMlqicP8TuN73nxkj9tuS7hbHKh97D5S7Hxhw9yOOJvDLaV/G2kxWMfB0g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ff/ekrVk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708793591; c=relaxed/simple;
+	bh=Tfm5vL4QfZKNlU2j8c6/gIq0W0rievB9CY/7Swb9hPA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uRZNATRmBT8gi5R0vFmOYWSn5kqVwss2koILuCStizTdZ8oFmLBkhmIv1HnfbsNkUc2h7kX8d0LsP/gDqMSSElkbrfNKpmypPBhFm6qldMxC+14pw+p+gjNAxMZ30MTAaPrT/g7Qbk0vcVMQMLSLnrVtXW2rI+80Cp6tRNzkICY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FAXqseTh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ff/ekrVk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506E6C433C7;
-	Sat, 24 Feb 2024 01:18:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FAXqseTh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 870BBC43390
+	for <linux-crypto@vger.kernel.org>; Sat, 24 Feb 2024 16:53:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708737553;
-	bh=0W8qjJDpYcgYroDsZAHS1ygwFOJj7ZrezH6oMeip5ik=;
-	h=From:To:In-Reply-To:References:Subject:Date:From;
-	b=Ff/ekrVkMNWJBDGkpsP/ovqQh2yy1ijB5ftoTK+/UMaqJWDxNbNOKDQ24y0qlURiT
-	 N86GGDRMnW5AEO+3RHaO2XaXOYxDA4ibfnVDmk9OplY/pQbkQdRWg0E13BTRhyo/Ey
-	 E7GKyzybhjWoin88WA6LDL8n39i41+9gmBImeMju6zTBmw38Z6z8mKdPpWm1Cai1Dh
-	 tLR7TBInqGjbW6nemQL6B37MrpxV1aa2e6/jocEVz4mmQME8ahbk6OREfwpjeHQwqx
-	 7OGusmZWog/eiFdepXGySC4Gi90Xc7Qb6ZzLMm5U/Vj7pI5DjSk+10zDXroo9bbYdH
-	 4E1uvU+UVBQNg==
-From: Mark Brown <broonie@kernel.org>
-To: robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, 
- conor+dt@kernel.org, nicolas.ferre@microchip.com, 
- alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev, 
- mturquette@baylibre.com, sboyd@kernel.org, herbert@gondor.apana.org.au, 
- davem@davemloft.net, andi.shyti@kernel.org, tglx@linutronix.de, 
- tudor.ambarus@linaro.org, miquel.raynal@bootlin.com, richard@nod.at, 
- vigneshr@ti.com, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
- linus.walleij@linaro.org, sre@kernel.org, u.kleine-koenig@pengutronix.de, 
- p.zabel@pengutronix.de, olivia@selenic.com, radu_nicolae.pirea@upb.ro, 
- richard.genoud@gmail.com, gregkh@linuxfoundation.org, jirislaby@kernel.org, 
- lgirdwood@gmail.com, wim@linux-watchdog.org, linux@roeck-us.net, 
- linux@armlinux.org.uk, andrei.simion@microchip.com, 
- mihai.sain@microchip.com, andre.przywara@arm.com, neil.armstrong@linaro.org, 
- tony@atomide.com, durai.manickamkr@microchip.com, geert+renesas@glider.be, 
- arnd@arndb.de, Jason@zx2c4.com, rdunlap@infradead.org, rientjes@google.com, 
- vbabka@suse.cz, mripard@kernel.org, codrin.ciubotariu@microchip.com, 
- eugen.hristev@collabora.com, devicetree@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org, 
- linux-i2c@vger.kernel.org, linux-mtd@lists.infradead.org, 
- netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
- linux-pm@vger.kernel.org, linux-pwm@vger.kernel.org, 
- linux-rtc@vger.kernel.org, linux-spi@vger.kernel.org, 
- linux-serial@vger.kernel.org, alsa-devel@alsa-project.org, 
- linux-sound@vger.kernel.org, linux-watchdog@vger.kernel.org, 
- Varshini Rajendran <varshini.rajendran@microchip.com>
-In-Reply-To: <20240223171342.669133-1-varshini.rajendran@microchip.com>
-References: <20240223171342.669133-1-varshini.rajendran@microchip.com>
-Subject: Re: (subset) [PATCH v4 00/39] Add support for sam9x7 SoC family
-Message-Id: <170873753899.4074329.1874365978346259745.b4-ty@kernel.org>
-Date: Sat, 24 Feb 2024 01:18:58 +0000
+	s=k20201202; t=1708793590;
+	bh=Tfm5vL4QfZKNlU2j8c6/gIq0W0rievB9CY/7Swb9hPA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=FAXqseTh5vYvdvl8IWFawUCV7PpiFA1YomIqeokjSNEnbKYU47a5CzoeX6Gc7oCkv
+	 RmUqbA8Y7leZTzdDisDqBIy0N7kDQ1XLGW5hQCrSkBeYfuhdYKfDvSQsZHCo8Peeba
+	 a7trVps5PO/7nMTXE80SpdMosncxeKP82UqlQseKvnPkPBkfylMyeE9i0dSmCzY3BM
+	 xIJh/IofhbBOhSA97EZJ4FxLVY9XXY7TRzKAXm2HehwSnqn/a9w7WHVjVcbjHaDmsT
+	 ES+cE9cC0bkBCyRXSigBzZ9yVtihE9STOKfggmu+YKvZux7szU+6o7NYDsxqEmg0ZE
+	 UvaC0Z+omtuCg==
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-364f791a428so4690945ab.3
+        for <linux-crypto@vger.kernel.org>; Sat, 24 Feb 2024 08:53:10 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWNl/CJt02EseCIOWoW527ywCvo/Ns0bvwcD0/o37vzFx+Tjq+/5O1sNkkHr0rwwnrTDha0FC5Y5CQEaLvLRvkpO24/NLXhNMJTec27
+X-Gm-Message-State: AOJu0YwMbCYs4VIGE3AIUe25QEJsw/LboQ6eHNjZmgLVywFyX3tPX1nv
+	uO47zqsMHH3MZNsXvdpcHm0n83jYKEXtLsrp4gV/uyqNOPZBkVGeasv4rDeUVYs4LWUPc18026X
+	BfFveOrLnxHvGTcnAIwXL1KDGyui553nOTliK
+X-Google-Smtp-Source: AGHT+IET/vQwF9sNTEZtiDwCGllyEYJS5225ocQgvaHlCzNjk/1CUgLtTdfYdNes+92RKN878GTYPqLQjt9oyH+bxHY=
+X-Received: by 2002:a92:ce4e:0:b0:364:21b0:6050 with SMTP id
+ a14-20020a92ce4e000000b0036421b06050mr3242498ilr.6.1708793589855; Sat, 24 Feb
+ 2024 08:53:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-0438c
+References: <20240222081135.173040-1-21cnbao@gmail.com> <20240222081135.173040-2-21cnbao@gmail.com>
+In-Reply-To: <20240222081135.173040-2-21cnbao@gmail.com>
+From: Chris Li <chrisl@kernel.org>
+Date: Sat, 24 Feb 2024 08:52:57 -0800
+X-Gmail-Original-Message-ID: <CAF8kJuO13XoRQE+qqZ9gy6s4_0Qrvv4kWAQJE7UGExLcyWP6cg@mail.gmail.com>
+Message-ID: <CAF8kJuO13XoRQE+qqZ9gy6s4_0Qrvv4kWAQJE7UGExLcyWP6cg@mail.gmail.com>
+Subject: Re: [PATCH v6 1/2] crypto: introduce: acomp_is_async to expose if
+ comp drivers might sleep
+To: Barry Song <21cnbao@gmail.com>
+Cc: akpm@linux-foundation.org, davem@davemloft.net, hannes@cmpxchg.org, 
+	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, linux-mm@kvack.org, 
+	nphamcs@gmail.com, yosryahmed@google.com, zhouchengming@bytedance.com, 
+	ddstreet@ieee.org, linux-kernel@vger.kernel.org, sjenning@redhat.com, 
+	vitaly.wool@konsulko.com, Barry Song <v-songbaohua@oppo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 23 Feb 2024 22:43:42 +0530, Varshini Rajendran wrote:
-> This patch series adds support for the new SoC family - sam9x7.
->  - The device tree, configs and drivers are added
->  - Clock driver for sam9x7 is added
->  - Support for basic peripherals is added
->  - Target board SAM9X75 Curiosity is added
-> 
->  Changes in v4:
->  --------------
-> 
-> [...]
+On Thu, Feb 22, 2024 at 12:12=E2=80=AFAM Barry Song <21cnbao@gmail.com> wro=
+te:
+>
+> From: Barry Song <v-songbaohua@oppo.com>
+>
+> acomp's users might want to know if acomp is really async to
+> optimize themselves. One typical user which can benefit from
+> exposed async stat is zswap.
+>
+> In zswap, zsmalloc is the most commonly used allocator for
+> (and perhaps the only one). For zsmalloc, we cannot sleep
+> while we map the compressed memory, so we copy it to a
+> temporary buffer. By knowing the alg won't sleep can help
+> zswap to avoid the need for a buffer. This shows noticeable
+> improvement in load/store latency of zswap.
+>
+> Signed-off-by: Barry Song <v-songbaohua@oppo.com>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Applied to
+Acked-by: Chris Li <chrisl@kernel.org>
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/sound.git for-next
+Chris
 
-Thanks!
-
-[13/39] ASoC: dt-bindings: atmel-classd: add sam9x7 compatible
-        commit: 89f3180d5915d4ea40e044ee102cd5c1ec81e7ef
-[17/39] ASoC: dt-bindings: microchip: add sam9x7
-        commit: c06a7a8e885753a024163bbb0dfd7349e8054643
-
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
-
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
-
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
-
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-Thanks,
-Mark
-
+> ---
+>  include/crypto/acompress.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+> index 574cffc90730..80e243611fe2 100644
+> --- a/include/crypto/acompress.h
+> +++ b/include/crypto/acompress.h
+> @@ -160,6 +160,12 @@ static inline void acomp_request_set_tfm(struct acom=
+p_req *req,
+>         req->base.tfm =3D crypto_acomp_tfm(tfm);
+>  }
+>
+> +static inline bool acomp_is_async(struct crypto_acomp *tfm)
+> +{
+> +       return crypto_comp_alg_common(tfm)->base.cra_flags &
+> +              CRYPTO_ALG_ASYNC;
+> +}
+> +
+>  static inline struct crypto_acomp *crypto_acomp_reqtfm(struct acomp_req =
+*req)
+>  {
+>         return __crypto_acomp_tfm(req->base.tfm);
+> --
+> 2.34.1
+>
