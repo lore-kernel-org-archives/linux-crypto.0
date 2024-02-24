@@ -1,39 +1,38 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CB1138A;
-	Sat, 24 Feb 2024 00:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF6117C8;
+	Sat, 24 Feb 2024 00:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708735821; cv=none; b=gd2DIRIWFAfccX/srFjTERMpuM3juCR0t5r6/fT+ZGlXmL7FiLS0AmjZIUyTbkTuikNfbQWYdALBKVlKZpFvOnTVjaM/4DbgOkFt9nbNI3hMKa5Aom6EN43ZKaPD5YeevxlvezwAzKNsXQBXCXmf4t3RwesVZkhLmNfm8G5jmAQ=
+	t=1708735833; cv=none; b=uNvH/ctve5HBzU6mS4aalwsfcgYXu8JP7BH7K+Q0rjejDw9/ZjYoUwvMJDXAVbm9tmEQowrCW1pQ3ipWQ10Mr+KbSAaAL9O40YRP4HRDeIojb3rmpvbHeYsLyyDlNQSriXsWgRgr7S2uIJV0BCjmdUe0IjpT+ynOshoE6S9j0Eg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708735821; c=relaxed/simple;
-	bh=OURXWeTGQgQ2HAg6ncbqMkI52asahTJjjBDFRcVHSJQ=;
+	s=arc-20240116; t=1708735833; c=relaxed/simple;
+	bh=1Yx8JWtZT7NJ/ks9g6HxK/LqurKWFCidlnpb6hkrE10=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bkUAI1w6aiABy0DqDkWqrX4ANCYsMtGxXRDu9B5VrcSSzgOOOnyVivhXRVU/b5G5uhcfK49/9Pv5D8pcQCU6kmDLXo8ZWPmcqQKaamwuJRUlC4VnMeEcxkEnL8dDp5opD+qRJcljMoWbHNa+f5C+2d4ApEyCzVfBZWyK1jggOWM=
+	 Content-Type:Content-Disposition:In-Reply-To; b=sZs44ZEmlGhapqM9+GRj0EzO0L449Qk62zfP0EzV089pqSVPWDdGDb7l7dMCKBoNXFlrsD71ssy3HqalPHA5uelUfwi75YBMxMB4CN2eHBgbjCGWRtC9lVDRxzzCFly0jPAOKWLKu3oXYw4XvHwWkZQR6YzUv0yeZ9iXHDTm3/w=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rdgEX-00HDv3-Uo; Sat, 24 Feb 2024 08:49:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 Feb 2024 08:49:56 +0800
-Date: Sat, 24 Feb 2024 08:49:56 +0800
+	id 1rdgF6-00HDvZ-OA; Sat, 24 Feb 2024 08:50:17 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 Feb 2024 08:50:31 +0800
+Date: Sat, 24 Feb 2024 08:50:31 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, "David S. Miller" <davem@davemloft.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH] [v2] ARM: crypto: fix function cast warnings
-Message-ID: <Zdk9NLCwfmsiDhTQ@gondor.apana.org.au>
-References: <20240213135000.3400052-1-arnd@kernel.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Damian Muszynski <damian.muszynski@intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+	Tero Kristo <tero.kristo@linux.intel.com>,
+	Markas Rapoportas <markas.rapoportas@intel.com>,
+	qat-linux@intel.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] crypto: qat - uninitialized variable in
+ adf_hb_error_inject_write()
+Message-ID: <Zdk9V06gKW8EsH2k@gondor.apana.org.au>
+References: <193d36b0-961a-4b66-b945-37988f157ebe@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,33 +41,25 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240213135000.3400052-1-arnd@kernel.org>
+In-Reply-To: <193d36b0-961a-4b66-b945-37988f157ebe@moroto.mountain>
 
-On Tue, Feb 13, 2024 at 02:49:46PM +0100, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Tue, Feb 13, 2024 at 09:09:41PM +0300, Dan Carpenter wrote:
+> There are a few issues in this code.  If *ppos is non-zero then the
+> first part of the buffer is not initialized.  We never initialize the
+> last character of the buffer.  The return is not checked so it's
+> possible that none of the buffer is initialized.
 > 
-> clang-16 warns about casting between incompatible function types:
+> This is debugfs code which is root only and the impact of these bugs is
+> very small.  However, it's still worth fixing.  To fix this:
+> 1) Check that *ppos is zero.
+> 2) Use copy_from_user() instead of simple_write_to_buffer().
+> 3) Explicitly add a NUL terminator.
 > 
-> arch/arm/crypto/sha256_glue.c:37:5: error: cast from 'void (*)(u32 *, const void *, unsigned int)' (aka 'void (*)(unsigned int *, const void *, unsigned int)') to 'sha256_block_fn *' (aka 'void (*)(struct sha256_state *, const unsigned char *, int)') converts to incompatible function type [-Werror,-Wcast-function-type-strict]
->    37 |                                 (sha256_block_fn *)sha256_block_data_order);
->       |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> arch/arm/crypto/sha512-glue.c:34:3: error: cast from 'void (*)(u64 *, const u8 *, int)' (aka 'void (*)(unsigned long long *, const unsigned char *, int)') to 'sha512_block_fn *' (aka 'void (*)(struct sha512_state *, const unsigned char *, int)') converts to incompatible function type [-Werror,-Wcast-function-type-strict]
->    34 |                 (sha512_block_fn *)sha512_block_data_order);
->       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> Fix the prototypes for the assembler functions to match the typedef.
-> The code already relies on the digest being the first part of the
-> state structure, so there is no change in behavior.
-> 
-> Fixes: c80ae7ca3726 ("crypto: arm/sha512 - accelerated SHA-512 using ARM generic ASM and NEON")
-> Fixes: b59e2ae3690c ("crypto: arm/sha256 - move SHA-224/256 ASM/NEON implementation to base layer")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Fixes: e2b67859ab6e ("crypto: qat - add heartbeat error simulator")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > ---
-> v2: rewrite change as suggested by Herbert Xu.
-> ---
->  arch/arm/crypto/sha256_glue.c | 13 +++++--------
->  arch/arm/crypto/sha512-glue.c | 12 +++++-------
->  2 files changed, 10 insertions(+), 15 deletions(-)
+>  .../crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
 
 Patch applied.  Thanks.
 -- 
