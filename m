@@ -1,81 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F72F4C62A;
-	Sat, 24 Feb 2024 19:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF181B800;
+	Sun, 25 Feb 2024 20:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708804227; cv=none; b=ZbI5S5OvOj5I5H9IfZf1u6X91/IM/XI1iwgUWTbs/hupFdtCPsERZsgtDQDPggQQMOeeued3d6gh0RcLZs9FxFGs54s3Op/EWY1vgSd8ZyQWLcUpqhAEj7CvogkQxOO81Z8huYCc1+dWp7tx+gnSfy+QunwoUS4dB9vNo0bLZvw=
+	t=1708891914; cv=none; b=dYBXw37otS2m5AaJRLXC6nazTIJKZr5CbPtOXd3c2DY8Yzf328B6S+pudPq/fL72u4707YF5VNgmdV8qAp74y9mLTaWrh2pOGmbm7gv+vbI4Khctd2TdcNtFWcFoxvws220llNqkHe60phD0whrT7GSCHuXSIO3FmnvUAXE+oKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708804227; c=relaxed/simple;
-	bh=jUjbcrmBdSoT6UEmaAHxZ4HtVcfMr4YFxSXUAg99ZDc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=llrXH4Rl122E5LjzdRMnLnCs8KtHPT5WGCIRBAoTaj2CBHPVVn0IO6iNxLqryDhc2EvTSTdxyz9+ITonSjFbuvhYHwxPMgshZCWIa3a6lRuX1+nEYcpRza1Jn3w1Mn1paALTNfAhN65/iub2YmWxFF266hD/FmpGEFZhyQ9rEW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMdVmFg9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708891914; c=relaxed/simple;
+	bh=ipeSeJEnGh8gKOqj8bEZj+meMRjyyaDgYj/HDJhNvV0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gsOdmyV2XBfDv4lNsdmdsxLTNwvxPSSVN8lidpidKfIjKXJFUMpbRsa/zTrl85nN2jjUjqLMlZDOItM2R6qcTo1qGRAdtOur4/g0emQLHTIZ62/v0fTdYFyovltBZj0UIunR54Gkcg0MlS0TiQKG3SEB7OYgIhqdsFKGkAW3C0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NPUeLmKO; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMdVmFg9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FD87C433C7;
-	Sat, 24 Feb 2024 19:50:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708804226;
-	bh=jUjbcrmBdSoT6UEmaAHxZ4HtVcfMr4YFxSXUAg99ZDc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IMdVmFg9SZXsnZF/G2iL5OmPjbm6KM+K30qKAmoemFHExQw1oR+fGQV6prRgvctoz
-	 HoP+F2G1lBKS70IgswLX/5eBVcT8erZxLcYyac6bb1fwJTTc6l+7QMkXs6jvYSzRmh
-	 eW8VT29nXbFcPHmwM67idULOK02xbqLdO5+yKbZOZT0HK+obgSHtEf48WxyiFH4AgY
-	 bryzL5Lg0WwV0J4YLVoMmm0NYTFPI+smnnpGfgKVf9TyIp6dvSLPOtCWIk/QIGn87/
-	 ofFZ1kyy11w3bfyOxoZmk3BftWoHqDZCPNDDaX5e3VSOX/jiKHxmDBDB56pnDxoAki
-	 osMone8Bz8GQw==
-Date: Sat, 24 Feb 2024 19:50:21 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Varshini Rajendran <varshini.rajendran@microchip.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-	claudiu.beznea@tuxon.dev, tudor.ambarus@linaro.org,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 05/39] dt-bindings: crypto: add sam9x7 in Atmel TDES
-Message-ID: <20240224-willpower-crewmate-7b433999d01f@spud>
-References: <20240223171342.669133-1-varshini.rajendran@microchip.com>
- <20240223172445.671783-1-varshini.rajendran@microchip.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NPUeLmKO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708891914; x=1740427914;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ipeSeJEnGh8gKOqj8bEZj+meMRjyyaDgYj/HDJhNvV0=;
+  b=NPUeLmKO+oRNw2j2I4podqsa05LUZNdy1I5QTqob6jBEMU9AsbkZzfLn
+   /pwAOTYMegkHOE4xOp65/9nF7qZzNwcTQIahR8IYUYrwwoFA15gsT3oM6
+   z1nD0n7MEfApTsSl8bEGW9HxQYawi1Ux9DrDxr2BAmFGw0Q/Y9LoRWASR
+   fDO/ncvok8sOYY4NNF93vU/xIdqwbFbmO7DfMrbYI9+NjfZiwSnRleV/6
+   o6Jh32lu10seFUsMHs62j08bpk5iU6s5Wei2bK9iJBuK54AjXtVBqnSnw
+   LdBzPjTunw8+8waz7s8aY4iVYNTC2+ZACWd+O7LZa5S39n8lNgKq+NGTF
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="25639526"
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="25639526"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2024 12:11:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="29632546"
+Received: from rfredric-mobl.amr.corp.intel.com (HELO tzanussi-mobl1.amr.corp.intel.com) ([10.213.171.152])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2024 12:11:51 -0800
+From: Tom Zanussi <tom.zanussi@linux.intel.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: rex.zhang@intel.com,
+	andre.glover@linux.intel.com,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org
+Subject: [PATCH 0/2] crypto: Intel Analytics Accelerator (IAA) bugfixes
+Date: Sun, 25 Feb 2024 14:11:32 -0600
+Message-Id: <20240225201134.759335-1-tom.zanussi@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wAYqK0v+us/roCxH"
-Content-Disposition: inline
-In-Reply-To: <20240223172445.671783-1-varshini.rajendran@microchip.com>
+Content-Transfer-Encoding: 8bit
 
+Hi Herbert,
 
---wAYqK0v+us/roCxH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Here are a couple of bugfixes for some minor problems discovered while
+testing.
 
-On Fri, Feb 23, 2024 at 10:54:45PM +0530, Varshini Rajendran wrote:
-> Add DT bindings for atmel TDES.
->=20
-> Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
-> Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+Thanks,
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Tom
 
-Cheers,
-Conor.
+Tom Zanussi (2):
+  crypto: iaa - Fix async_disable descriptor leak
+  crypto: iaa - Fix comp/decomp delay statistics
 
---wAYqK0v+us/roCxH
-Content-Type: application/pgp-signature; name="signature.asc"
+ drivers/crypto/intel/iaa/iaa_crypto_main.c  | 13 ++++++++--
+ drivers/crypto/intel/iaa/iaa_crypto_stats.c | 28 ---------------------
+ drivers/crypto/intel/iaa/iaa_crypto_stats.h |  8 +++---
+ 3 files changed, 15 insertions(+), 34 deletions(-)
 
------BEGIN PGP SIGNATURE-----
+-- 
+2.34.1
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZdpIfQAKCRB4tDGHoIJi
-0kcZAQCLTx3n0ifSkfQ1CzJAHTEbTiGBk2r3CIY0lS8cZ4ZM2QD/VizY07kOiBzM
-c4Z1DJjpFBDSAnmenvYYgAIV+4O9tAs=
-=Av39
------END PGP SIGNATURE-----
-
---wAYqK0v+us/roCxH--
