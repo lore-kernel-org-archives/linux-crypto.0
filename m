@@ -1,103 +1,63 @@
-Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6316D1C292;
-	Mon, 26 Feb 2024 08:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D7439FFA;
+	Mon, 26 Feb 2024 08:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708935348; cv=none; b=bVxP8VmN2ayOz20cJRKATgJME9Lg3/GyEj2Jqiqp/g1wsZXaclMuLDSv7OM6ZVsEkuA+hpxiWvVfDv293CeVCaPZ86Wd8yYhAAIBq3gFEcuHp1DHdvdEOXbAfv94Ru6Pt/oBH6X1lMxGxtFUT0wdsyj+9XWPinyZfEtLmfPAirg=
+	t=1708936397; cv=none; b=d4ry8HBqOIrkeT1GrkQF2U5ekQZ+vfesMx8oIEVgujkYXVeqChcV4rUn8bGISwqfT+Ca81S+FYRgf5PvVj/rf0lhfSBuFudLgX6hhpGhQ1TyQh2wZxUH2kABN8pShkoGNHg/+Ch95s3pM0OJyW3iphzdzS4n7VD7TVSbRlRFogE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708935348; c=relaxed/simple;
-	bh=gOnZYDgEPaUyxmyyfWi9fPSzeqDFwFnfKgtLfSpD0mg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TQE8cGj1YMbMoPjRFOzVqFPzIBYz8ogI2ANIpWgEMGNM0IXp4zf1+UJnKED5WhzjkcBF+jrOtNl/6StGd0idIyC8nI0TxMds+fdZks6eZ4aa4HPQrFJsE1VUvLEWwa0lGxiAPHNoq9SXlMqBqiBg3vGXLM3X/5Aa3vzjEMnG2dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=v5/yDgLn; arc=none smtp.client-ip=115.28.160.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="v5/yDgLn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-	t=1708935343; bh=gOnZYDgEPaUyxmyyfWi9fPSzeqDFwFnfKgtLfSpD0mg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=v5/yDgLnrAHr7z3v+SEOCCq/Lkm8yMusJ7UjwWPqzRvsFklNr6hu3irxieAkc0hmA
-	 OhAR2Gcwnki740xd5qLyXPGA0kcZu2z0TqVXwq6JRseFZH0phG7eZvZcIXgAsqqC0K
-	 7lFn2Wj2Vk7goqpcYu5B+YdUQwx9Z/yePRboBIKo=
-Received: from [28.0.0.1] (unknown [101.230.251.34])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 9EE916006F;
-	Mon, 26 Feb 2024 16:15:43 +0800 (CST)
-Message-ID: <48afa638-9145-40ee-9868-fa82a1fce271@xen0n.name>
-Date: Mon, 26 Feb 2024 16:15:42 +0800
+	s=arc-20240116; t=1708936397; c=relaxed/simple;
+	bh=8YnqCvaVNYar5aIZBImce4B4KXZMqOiJJmxtzNMwcOY=;
+	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID:
+	 References:In-Reply-To; b=Q9DizdHYmIF7GroclEUu76lV9uT0uYJQYkcUjzyg+Hbd5+BBpV9WuvJ46CvHQ5dis7PprGP7s0GTXQTPStgkJ+o+Bv0z1pfsRP48mBUzF1K2r6JvPKPPemt9TgJesmfhGmHlDTHgxHC5FCPMRZPpH1Sosjo1KOmSCkmpQDder+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=15.184.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+X-QQ-GoodBg: 1
+X-QQ-SSF: 00400000000000F0
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
+X-QQ-FEAT: B8vEhG33zUTqMh/Df+7C7/cZTpPTQihZsq8pvLymg+J8YWdC3ZJw6O6x4eqO/
+	nti0nNjmZ4R4ntBHTIbWl61+2eCvit1id/VezWT+CFzzdaClVgACFXFN06iCxbgC4C2/0Hn
+	UisnnP2IRvPIl+zzxNzXr84Q5npOIp5Bo5xGB4hXLeojn12YtboYb5N0URS7qPW+iAknfUF
+	ubIZ+KCzOhPJjijpVNvY3gsNFLFHb5//f1UPweiVFIfYlMQnAdHNRpx6B6xF3ar9rLTL/SB
+	RRVIU9g5n8eoD14SyEjCVx044dFtzFyQzMnl9XxoPBMDllh3pdwcnt++pIyyTZ/g9Rh3cER
+	hkfddYg7NQAPVoBKwAcYKMQbe9XHLyyWYYertnbSAZl3uHTpbc=
+X-QQ-BUSINESS-ORIGIN: 2
+X-QQ-Originating-IP: Cyo8Q8zJxI1JsbZ6iSukuqr7xFbz3rxXnIeXv/emwKg=
+X-QQ-STYLE: 
+X-QQ-mid: t5gz7a-2t1708935908t4705339
+From: "=?utf-8?B?5YWz5paH5rab?=" <guanwentao@uniontech.com>
+To: "=?utf-8?B?V0FORyBYdWVydWk=?=" <kernel@xen0n.name>, "=?utf-8?B?546L5pix5Yqb?=" <wangyuli@uniontech.com>, "=?utf-8?B?aGVyYmVydA==?=" <herbert@gondor.apana.org.au>, "=?utf-8?B?ZGF2ZW0=?=" <davem@davemloft.net>, "=?utf-8?B?Y2hlbmh1YWNhaQ==?=" <chenhuacai@kernel.org>
+Cc: "=?utf-8?B?bGludXgtY3J5cHRv?=" <linux-crypto@vger.kernel.org>, "=?utf-8?B?bG9vbmdhcmNo?=" <loongarch@lists.linux.dev>, "=?utf-8?B?bGludXgta2VybmVs?=" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] loongarch/crypto: Clean up useless assignment operations
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] loongarch/crypto: Clean up useless assignment operations
-Content-Language: en-US
-To: WangYuli <wangyuli@uniontech.com>, herbert@gondor.apana.org.au,
- davem@davemloft.net, chenhuacai@kernel.org
-Cc: linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, Guan Wentao <guanwentao@uniontech.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+Date: Mon, 26 Feb 2024 08:25:07 +0000
+X-Priority: 3
+Message-ID: <tencent_29355025499B47007555CE13@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
 References: <20240226080328.334021-1-wangyuli@uniontech.com>
-From: WANG Xuerui <kernel@xen0n.name>
-In-Reply-To: <20240226080328.334021-1-wangyuli@uniontech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+	<48afa638-9145-40ee-9868-fa82a1fce271@xen0n.name>
+In-Reply-To: <48afa638-9145-40ee-9868-fa82a1fce271@xen0n.name>
+X-QQ-ReplyHash: 3202933845
+X-BIZMAIL-ID: 12383567994983227794
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1])
+	by smtp.qq.com (ESMTP) with SMTP
+	id ; Mon, 26 Feb 2024 16:25:10 +0800 (CST)
+Feedback-ID: t:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-0
 
-On 2/26/24 16:03, WangYuli wrote:
-> Both crc32 and crc32c hw accelerated funcs will calculate the
-> remaining len. Those codes are derived from
-> arch/mips/crypto/crc32-mips.c and "len -= sizeof(u32)" is not
-> necessary for 64-bit CPUs.
-> 
-> Removing it can make context code style more unified and improve
-> code readability.
-> 
-> Suggested-by: Guan Wentao <guanwentao@uniontech.com>
-> Signed-off-by: WangYuli <wangyuli@uniontech.com>
-> ---
->   arch/loongarch/crypto/crc32-loongarch.c | 2 --
->   1 file changed, 2 deletions(-)
-> 
-> diff --git a/arch/loongarch/crypto/crc32-loongarch.c b/arch/loongarch/crypto/crc32-loongarch.c
-> index a49e507af38c..3eebea3a7b47 100644
-> --- a/arch/loongarch/crypto/crc32-loongarch.c
-> +++ b/arch/loongarch/crypto/crc32-loongarch.c
-> @@ -44,7 +44,6 @@ static u32 crc32_loongarch_hw(u32 crc_, const u8 *p, unsigned int len)
->   
->   		CRC32(crc, value, w);
->   		p += sizeof(u32);
-> -		len -= sizeof(u32);
->   	}
->   
->   	if (len & sizeof(u16)) {
-> @@ -80,7 +79,6 @@ static u32 crc32c_loongarch_hw(u32 crc_, const u8 *p, unsigned int len)
->   
->   		CRC32C(crc, value, w);
->   		p += sizeof(u32);
-> -		len -= sizeof(u32);
->   	}
->   
->   	if (len & sizeof(u16)) {
-
-Sure, but IIRC Loongson still has hopes in having 32-bit-only models 
-support upstream? The possibility cannot be ruled out because from 
-public information (e.g. the 2023-11-28 news event), Loongson is known 
-to be actively licensing their reduced 32-bit-only IP cores to third 
-parties.
-
-Ultimately whether we want to imply 64-bit operation with the crc32 
-module is up to Loongson to decide, and I think Huacai may have 
-something to add, but IMO at least we could gate the statement with 
-#ifdef's so we don't outright lose 32-bit compatibility with this code.
-
--- 
-WANG "xen0n" Xuerui
-
-Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
+U3VyZSxidXQgd2Ugbm90IHNlZW0gdG8gaGF2ZSAiY3JjLncuZC53IiBkd29yZCBhc20gaW4g
+bG9vbmdhcmNoIDMyYml0IG1vZGUsbm93IHRoZSB3aG9sZSBmaWxlIGNhbiBvbmx5IHJ1biBp
+biA2NGJpdCBtb2RlPw0KDQpUaGFua3Mu
 
