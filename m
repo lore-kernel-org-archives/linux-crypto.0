@@ -1,91 +1,103 @@
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.62.65])
+Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30481C692;
-	Mon, 26 Feb 2024 08:04:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.62.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6316D1C292;
+	Mon, 26 Feb 2024 08:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708934702; cv=none; b=nGzfX8xr7EmggxUVnsiKi5m3LJWr2Jo4Cowc+FCm8K1W1irfBNKVTdD1xDLwIKGLi7P/QQmyNNLnH3/bblbczs6bSQAazpS6XFelRVJpvnyJkux1EoCiQ72gpRvLXwY+P/31CUtb2Bxgf5t9UpFumqHdamPz6nR7Q/W8dnsoTC8=
+	t=1708935348; cv=none; b=bVxP8VmN2ayOz20cJRKATgJME9Lg3/GyEj2Jqiqp/g1wsZXaclMuLDSv7OM6ZVsEkuA+hpxiWvVfDv293CeVCaPZ86Wd8yYhAAIBq3gFEcuHp1DHdvdEOXbAfv94Ru6Pt/oBH6X1lMxGxtFUT0wdsyj+9XWPinyZfEtLmfPAirg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708934702; c=relaxed/simple;
-	bh=dN3E446p7hva0FnMIQ6NFdYTCxG7DQq3CBiJFrGa6Ew=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BQgfzVqPqqg3kaWnSoSqTwnzJGMvgHXYx8UNWTIk0otiX+L5Loe1YVKxsFB1HF1IdiaN+vQ2tS9R0N+GgUBYiWnfUmp7zHPGZUJXNg+ahPh+NnZzFxPHxBmGv4/LrVcmaWMSV/nmeAUa3GNahWJiqz294wjn292hR4ZWJjzqxuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=114.132.62.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-X-QQ-mid: bizesmtp86t1708934613towayw64
-X-QQ-Originating-IP: cPL1Ck3yLJrKvXVPFv3NE+RF3uFMoNuGQ35pxT3KDRM=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 26 Feb 2024 16:03:31 +0800 (CST)
-X-QQ-SSF: 01400000000000C0B000000A0000000
-X-QQ-FEAT: RrZlkntZBflMICK+qs6fwIpCV2d/qsk9tQTFhoQEIKaT681VwUo/mZi9pW5Ep
-	k5lwP9mwmvUt2QBdS310uRcAPLffXOPehuc42UEt/wCNHf+/7u8S45VGzlTcfGHC23d3E75
-	vqpTuSj1AtuHvx/0sh5Mv4ezn6qFXRJBaSW4RVk3qrzHe4RKByXHxB0bNB25Leq7ft2oO0A
-	OGP64dY2zxxCOYhS+KkycSsm7LU+AcvDyKppNaUg4Uv70uUBpEADPbHuCL9oN8f0N9x429u
-	fjMZ8NzlJx7PAc47q1mFwtN4pzGlPMH98oLm+LOzIIV/MKj/TiHz/jBOFIHhNWRA4SRjcS4
-	ta28ykuSow/hEtK+tkdFQPPVFOb7Ohg7xHU/sJcbCmHyjKDwUDpwfymOCMa1AAFXtx+bHOM
-	cjoCqCmgnl5yIl8+2CTISg==
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 7263635772186819798
-From: WangYuli <wangyuli@uniontech.com>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	chenhuacai@kernel.org,
-	kernel@xen0n.name
-Cc: linux-crypto@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	WangYuli <wangyuli@uniontech.com>,
-	Guan Wentao <guanwentao@uniontech.com>
-Subject: [PATCH] loongarch/crypto: Clean up useless assignment operations
-Date: Mon, 26 Feb 2024 16:03:28 +0800
-Message-Id: <20240226080328.334021-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.33.1
+	s=arc-20240116; t=1708935348; c=relaxed/simple;
+	bh=gOnZYDgEPaUyxmyyfWi9fPSzeqDFwFnfKgtLfSpD0mg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TQE8cGj1YMbMoPjRFOzVqFPzIBYz8ogI2ANIpWgEMGNM0IXp4zf1+UJnKED5WhzjkcBF+jrOtNl/6StGd0idIyC8nI0TxMds+fdZks6eZ4aa4HPQrFJsE1VUvLEWwa0lGxiAPHNoq9SXlMqBqiBg3vGXLM3X/5Aa3vzjEMnG2dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=v5/yDgLn; arc=none smtp.client-ip=115.28.160.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="v5/yDgLn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
+	t=1708935343; bh=gOnZYDgEPaUyxmyyfWi9fPSzeqDFwFnfKgtLfSpD0mg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=v5/yDgLnrAHr7z3v+SEOCCq/Lkm8yMusJ7UjwWPqzRvsFklNr6hu3irxieAkc0hmA
+	 OhAR2Gcwnki740xd5qLyXPGA0kcZu2z0TqVXwq6JRseFZH0phG7eZvZcIXgAsqqC0K
+	 7lFn2Wj2Vk7goqpcYu5B+YdUQwx9Z/yePRboBIKo=
+Received: from [28.0.0.1] (unknown [101.230.251.34])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	(No client certificate requested)
+	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 9EE916006F;
+	Mon, 26 Feb 2024 16:15:43 +0800 (CST)
+Message-ID: <48afa638-9145-40ee-9868-fa82a1fce271@xen0n.name>
+Date: Mon, 26 Feb 2024 16:15:42 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] loongarch/crypto: Clean up useless assignment operations
+Content-Language: en-US
+To: WangYuli <wangyuli@uniontech.com>, herbert@gondor.apana.org.au,
+ davem@davemloft.net, chenhuacai@kernel.org
+Cc: linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Guan Wentao <guanwentao@uniontech.com>
+References: <20240226080328.334021-1-wangyuli@uniontech.com>
+From: WANG Xuerui <kernel@xen0n.name>
+In-Reply-To: <20240226080328.334021-1-wangyuli@uniontech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Both crc32 and crc32c hw accelerated funcs will calculate the
-remaining len. Those codes are derived from
-arch/mips/crypto/crc32-mips.c and "len -= sizeof(u32)" is not
-necessary for 64-bit CPUs.
+On 2/26/24 16:03, WangYuli wrote:
+> Both crc32 and crc32c hw accelerated funcs will calculate the
+> remaining len. Those codes are derived from
+> arch/mips/crypto/crc32-mips.c and "len -= sizeof(u32)" is not
+> necessary for 64-bit CPUs.
+> 
+> Removing it can make context code style more unified and improve
+> code readability.
+> 
+> Suggested-by: Guan Wentao <guanwentao@uniontech.com>
+> Signed-off-by: WangYuli <wangyuli@uniontech.com>
+> ---
+>   arch/loongarch/crypto/crc32-loongarch.c | 2 --
+>   1 file changed, 2 deletions(-)
+> 
+> diff --git a/arch/loongarch/crypto/crc32-loongarch.c b/arch/loongarch/crypto/crc32-loongarch.c
+> index a49e507af38c..3eebea3a7b47 100644
+> --- a/arch/loongarch/crypto/crc32-loongarch.c
+> +++ b/arch/loongarch/crypto/crc32-loongarch.c
+> @@ -44,7 +44,6 @@ static u32 crc32_loongarch_hw(u32 crc_, const u8 *p, unsigned int len)
+>   
+>   		CRC32(crc, value, w);
+>   		p += sizeof(u32);
+> -		len -= sizeof(u32);
+>   	}
+>   
+>   	if (len & sizeof(u16)) {
+> @@ -80,7 +79,6 @@ static u32 crc32c_loongarch_hw(u32 crc_, const u8 *p, unsigned int len)
+>   
+>   		CRC32C(crc, value, w);
+>   		p += sizeof(u32);
+> -		len -= sizeof(u32);
+>   	}
+>   
+>   	if (len & sizeof(u16)) {
 
-Removing it can make context code style more unified and improve
-code readability.
+Sure, but IIRC Loongson still has hopes in having 32-bit-only models 
+support upstream? The possibility cannot be ruled out because from 
+public information (e.g. the 2023-11-28 news event), Loongson is known 
+to be actively licensing their reduced 32-bit-only IP cores to third 
+parties.
 
-Suggested-by: Guan Wentao <guanwentao@uniontech.com>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
----
- arch/loongarch/crypto/crc32-loongarch.c | 2 --
- 1 file changed, 2 deletions(-)
+Ultimately whether we want to imply 64-bit operation with the crc32 
+module is up to Loongson to decide, and I think Huacai may have 
+something to add, but IMO at least we could gate the statement with 
+#ifdef's so we don't outright lose 32-bit compatibility with this code.
 
-diff --git a/arch/loongarch/crypto/crc32-loongarch.c b/arch/loongarch/crypto/crc32-loongarch.c
-index a49e507af38c..3eebea3a7b47 100644
---- a/arch/loongarch/crypto/crc32-loongarch.c
-+++ b/arch/loongarch/crypto/crc32-loongarch.c
-@@ -44,7 +44,6 @@ static u32 crc32_loongarch_hw(u32 crc_, const u8 *p, unsigned int len)
- 
- 		CRC32(crc, value, w);
- 		p += sizeof(u32);
--		len -= sizeof(u32);
- 	}
- 
- 	if (len & sizeof(u16)) {
-@@ -80,7 +79,6 @@ static u32 crc32c_loongarch_hw(u32 crc_, const u8 *p, unsigned int len)
- 
- 		CRC32C(crc, value, w);
- 		p += sizeof(u32);
--		len -= sizeof(u32);
- 	}
- 
- 	if (len & sizeof(u16)) {
 -- 
-2.33.1
+WANG "xen0n" Xuerui
+
+Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
 
