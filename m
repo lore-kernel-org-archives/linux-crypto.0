@@ -1,167 +1,163 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2084.outbound.protection.outlook.com [40.107.93.84])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D2B1E4A0;
-	Mon, 26 Feb 2024 19:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708974747; cv=fail; b=p4ufowPWJ91DWm6QABjp/lfgM4GWS4jyGgw443qmEUAN6kCYUhi5zQ6p6OB4j42lRV4YNODG0/4mEblKcA1po3JLt62X7ADE4H0yDOVsVqrIoKyXzx9tGtej7iIFFdzMPfYJZieH5qTfWyFKRQIUoSgVlzXWYiA5GDVKn9s27y4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708974747; c=relaxed/simple;
-	bh=wrnDA23CZEACNg9kmNV+HoHpiTM9ek1f2uigq4awNI0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=cRTDneA+Yk4u4m5HXmOOrW21bu2WtAuhePXLNO7HHosx+YZuZfd7NgSYyPe7klhce88mNShy9miXzEn4mzBCr6PYDjWH26RPuAN/OgNtdWXmwo8gvX12ZgfsQwruPd3pc4PQmgnRBx1752KSVabTe09/9OS4DZrTL/t4DsF9ml4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rFgi8hsj; arc=fail smtp.client-ip=40.107.93.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A9612F588
+	for <linux-crypto@vger.kernel.org>; Mon, 26 Feb 2024 19:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708976481; cv=none; b=btcHGc3h6fiGY0v2wTlrsrpQamu1gdAFIfNZEH2k98gkoizt2+Z0WXz18aYpuvHRRtZgy2G1BVZeG7UcHjWE9/UMTehaGY9xF1IRuHcllE+fW8j2x6t6Yjss061d+tlBdsCETDV3NZZHUSqjCKsuU8GrgcBDRzStocj9GrmC+Oc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708976481; c=relaxed/simple;
+	bh=x628PMNIjEu+GPKy+4TVIAw2AOn9qlhn8qxd9uSv5uM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AanR06DnnK+KVb/KDeoqrkIRuYGxX+8e8xH1fHdbVGWrfTOOq61ia5lTfqf2v8+Q9EMZ7vkTdabHBaqmpgduzKgDvvnfI+1S89ZMc06K9odRwZQJMBfebZ/S1TfbPqkRhIwdDzJp6IOJnmDKZfRcB9XhU31Wd0u6gaWtElsjh1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g1AqjQym; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rFgi8hsj"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QRBA86K37oLsrdFtBb7JHYP18uPHd/95QlnIxHwQrafLEmCQvHFWySvojaiWv2tKhjdakFdKFS8OYjMDKVJhWecYdrDOHSxZGg/DQkI0T9e327h91Qcu+0TC/HQxT3xvZFiFkj6zYS+nAcDB/sjneYfDbyhgaNWaLwT/z8YLaPIKiUILsiO11CFS4qpX3Po8AGpI+8BIeHygpNe/ZwyEP/d1u9qUO+Dcaiq14rqTbWLkQ5i8LKrfAexBQ4d3frjWlMNp9mJcSeIYxSmL2n0AlL0tmtQp46C9jik6uAbKa1XoDzVlaWhZfYPTrMFPEJwA3UM9Y1MJRXVIPznvuzdylw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rTCFf7kyjyyfIT/CaweZHovtbyrjFjSYlJ9dZM1SKjY=;
- b=GVRN4pdylfTBfKXKOAKx16FGDqVdehSlwfCet2XP1lbTLbPflfBO914rJAesiEUMX5GdXoZOAEtvCuxp9TCVSHJ04XcsUCtOy7FWznfTI5llW71b+QmAWZNFYwYEe2EhoVx591lohw51jSI+ii//AeMz+OCSdxR5V10UEqAu+vsSpI3h18z6TLdGPKSKnAcrK+HB5f0D+3h2LGLq55ZiPyk+hUworeiwr1j2QGYehCHp28z6o9KiS42EsxYDHyaJQl3yVl3S2jLakfUkplWAPO5EeCCj71aQPP77SoP93vafqZTNEkTNrzDaY1T9lilRZRR+KALcZ7LTWl0Oxe5sQw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rTCFf7kyjyyfIT/CaweZHovtbyrjFjSYlJ9dZM1SKjY=;
- b=rFgi8hsj+L6B5ifXjersVGgXwqIuv9Hmrvcha8OGKcET5uRbEoR9qVGOwEyZhvVynC0YJh49kQ4I9IeiOadttuE0/V24W6RJftgpEXjBnwgofqhWKa2hMdjXjHcYHJ4QUufxG6/U5Ac012CmrxXibjAe+KqE863cOIqEiogiXYneIMWriiObeM5l3pNQNEfuJuWbYeNzqETt06oAI1xl22k3P0PLjIP2vwbtPZgrT9HAmckgfqtHHah8VC7+TGPAQWKhXxPbLyyRDv2J8riF+CJWRuqxYLsrQq/X+vGj3PvDlnh/o2B+dBomBYlxwC/15ZnXTvs52rkfRA9/Rt/xpg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by PH8PR12MB6940.namprd12.prod.outlook.com (2603:10b6:510:1bf::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.27; Mon, 26 Feb
- 2024 19:12:22 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::2e3e:c7c0:84da:3941]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::2e3e:c7c0:84da:3941%6]) with mapi id 15.20.7316.034; Mon, 26 Feb 2024
- 19:12:21 +0000
-Date: Mon, 26 Feb 2024 15:12:20 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g1AqjQym"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708976477;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=badWDkj2YkXDjBt3ARyYRqGgukXsc8wuzH22/FWY+Zg=;
+	b=g1AqjQymmo1ss8VKRIrFOtX5KJ8q3enpJ+1PWwIdESjAzqUoXzzdCxHIkRQzkJtabPHaMN
+	BkcrHwYTykNB8ktgsuH9lWMmmLy7sVYeiaqeK6NKgxHZIVaxqHhmSmdM4r5J8cQpgg0WlX
+	gmN47BDXIK+5Lqt42SeMRQSo8CXhGa4=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-459-a36bC-CCNDKM0IHXv4PJbg-1; Mon, 26 Feb 2024 14:41:10 -0500
+X-MC-Unique: a36bC-CCNDKM0IHXv4PJbg-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c7857e6cb8so373290939f.3
+        for <linux-crypto@vger.kernel.org>; Mon, 26 Feb 2024 11:41:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708976469; x=1709581269;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=badWDkj2YkXDjBt3ARyYRqGgukXsc8wuzH22/FWY+Zg=;
+        b=W3A8xZnm7mIvjTdXVwH8AYxLDPaJGYjXWwwVhXNqNZ3i6ODRcWSnmAEzf/3+YYCcsK
+         5LuAcJm47izsod0jyfnZIbEn6jC5dIW9Llnj+/xY14/Np9P8enoU5wKT8yJJ+iEc2hvS
+         4xgGusRDAV1Wil5Up8CXPofdhDp3LFgV00VniAg+vFy3/u0ASq96PD8pmezaXUfkFoNC
+         1IEyC3kMP0vEn8ntTuW/v4onrjx2DM/lunxPDICFrRqxrVoyNjPA+/DHpEZIL+Xg3llg
+         I/E2RDNYdIguu9Jo9WADHrSTt1cmg1kchdh7GIzwmc7YdGI1WkPbBUPKU1bvvA7HO/z8
+         33nA==
+X-Forwarded-Encrypted: i=1; AJvYcCWI2eOyZ0jbX4ep5FsTVl+6FeF/cgeSvZc2y5qvdZGwLEvua4hFQ4ATiHzkxqfufCAAXy3/HPEc1h2gP17pf0plJvJG2S848S0WeLPI
+X-Gm-Message-State: AOJu0YzwZGDazKyey3Zu3Pbz3KcL1+2yjxFxPpJBASp7BK/GIWM5xQtw
+	5zYeGie14Q7XVpR+E9f/Q/PdrvGpyGwyk/tJPYbfXN1LmLHrAQjvFuNiX/+Pfv07c71nUSe4kcw
+	qSaFSXdWQjfx1Uiq424kXBcaDHbtjYMJL2SLnNzNkX8JlfkMnAE/JYhGBays1iQ==
+X-Received: by 2002:a6b:7002:0:b0:7c7:e215:d7a3 with SMTP id l2-20020a6b7002000000b007c7e215d7a3mr122856ioc.18.1708976469034;
+        Mon, 26 Feb 2024 11:41:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHIK/Dy6sFQlbBs99kDqRsbW0lPK+LM/dnqKqgSgFP+8ik3ExkiF17wdCn80lyzWXN1TM8SDA==
+X-Received: by 2002:a6b:7002:0:b0:7c7:e215:d7a3 with SMTP id l2-20020a6b7002000000b007c7e215d7a3mr122843ioc.18.1708976468794;
+        Mon, 26 Feb 2024 11:41:08 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id r4-20020a056638044400b0047469899515sm1409393jap.154.2024.02.26.11.41.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Feb 2024 11:41:07 -0800 (PST)
+Date: Mon, 26 Feb 2024 12:41:07 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
 Cc: Xin Zeng <xin.zeng@intel.com>, herbert@gondor.apana.org.au,
-	yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-	kevin.tian@intel.com, linux-crypto@vger.kernel.org,
-	kvm@vger.kernel.org, qat-linux@intel.com,
-	Yahui Cao <yahui.cao@intel.com>
+ yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+ kevin.tian@intel.com, linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+ qat-linux@intel.com, Yahui Cao <yahui.cao@intel.com>
 Subject: Re: [PATCH v3 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
  devices
-Message-ID: <20240226191220.GM13330@nvidia.com>
+Message-ID: <20240226124107.4317b3c3.alex.williamson@redhat.com>
+In-Reply-To: <20240226191220.GM13330@nvidia.com>
 References: <20240221155008.960369-1-xin.zeng@intel.com>
- <20240221155008.960369-11-xin.zeng@intel.com>
- <20240226115556.3f494157.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240226115556.3f494157.alex.williamson@redhat.com>
-X-ClientProxiedBy: DM6PR01CA0020.prod.exchangelabs.com (2603:10b6:5:296::25)
- To DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+	<20240221155008.960369-11-xin.zeng@intel.com>
+	<20240226115556.3f494157.alex.williamson@redhat.com>
+	<20240226191220.GM13330@nvidia.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|PH8PR12MB6940:EE_
-X-MS-Office365-Filtering-Correlation-Id: 964b8bde-a286-41a3-7b9c-08dc36fedbb5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	qZ1eNr01hno94TIlp2pmCoVr5Uw2RdPyg3afSKhlRlfRsdqef9BzaGmJ34hwDH08Jr4ONc5a4IV0yKg17RaEc2cnro8zu/ElTgp+QPtV9GpUNjiXXXTSVnXneafHkWGybZHFGQ2J0O/IGS5ilZforU7gowZ034j0Sedu0L1ZUHPwXH4bXkZjSiCcXIJIwN6BNCrUDWkbtaCw4zqTiG5dVk2BU7nDi+S6tfHEWxcuWEg5jprPho96MJ1upkDrx3ZXkI4YGfe5lPinIloxfuSYZ/qOZuDK+LrXFUlLhsluQEuDUvl/Qm9NacgvwbxawEKwHTBa+DqQuUuePtXLRmnDriliWd16DLn4lJQhWr9Dk0Mu1GCNYwPMPipsa8IloXrtoYcUOnD0Uxotrriwbk0rHHacSMpyqqwaOnzdKjG90TBuLIhm3Y1KJxOlmYxOjdShLDGs9eMj19aaHgY9hknG+ie07rqNqpjb2JbAbokG12uAztKXkHT9RZ2KvZY05nGsrimM7RlS01xS16sgw2CmwhfVvAc4W9E+LKsSvoncxlDr+jt6sHIEJVa8ncuVK3+G2QHXlkJd83Z/jDS0gOHOCdVJIB9o5MDS5su75m7aj0R04ZSY8Y7yIsVQXNMSVSJBXVqW8TCHA9wvrDJWN9BDBg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?v7OPfwDPNM+rw9hCcWBSBp6Vbgc8i+kM6b4/G46I8GqHROVCV6ukj9Bpi2ji?=
- =?us-ascii?Q?EUfAedGCMTUOAh8f2jgu59Y74gZtmFUVb0wcJEjXdso4f6jppFieUKMYvcZW?=
- =?us-ascii?Q?tcGFCYggOz/VKP0uekP1TCJXnEiV4RbbTHfkfV6hOE0Ee5/1wXfgntuWQITQ?=
- =?us-ascii?Q?2jfmrAs4nPG7YmQZKm1TM/ei4+G8NleI3IdLf2GZo+rRVRjx3bTDgRlS6fHL?=
- =?us-ascii?Q?PbaBcFtlBkQLOMt4MOGpyONxD5IBQXnWmOo72jz5GT2GAJcxYjK+xJH+4PeY?=
- =?us-ascii?Q?k7T/KuEEefZWoFH4ijt+Ej/6Gj2GJvJdwi0MZwh5+jJNztlTPCOksCkAjff/?=
- =?us-ascii?Q?EOWvw62BE5KGuNv5ckkE04vcetTtAXxQMutGm0X0Ht/G3/yBcK9fIU9k0pRi?=
- =?us-ascii?Q?jGHFSUYabrVGun+2iDpr4jK2g7rkUcppR4SbXDB/GQ5YxX8Gu/iCzBYETN4I?=
- =?us-ascii?Q?qXJ+mOIstBGfuSaIOmEglIZh4CZux5L7OjP2Had0JWRk9MlXyJjd5EQ2H3Lk?=
- =?us-ascii?Q?xTVksvz1mumnoLW9e2iAR7mQUSu29jceijL2fpKBFD8X9DT4y5a+WxTa4EcH?=
- =?us-ascii?Q?aJVe+ch1QTvjVxhPT9nW15BEj6k5ZdFF5+COaU7/bAlXjlMCYA2A86qa1Oxi?=
- =?us-ascii?Q?Ngdwugt6IusLXPGS2nude07gYK9bQUFZhdwzvO4Cmyf47t1d/w70Tn8tl9XI?=
- =?us-ascii?Q?XE7LqO83ehCRgGteIYGvNWHAJn+Qa5B2IWpKxK3UWsLpCV58lc1AAu4HOC+Y?=
- =?us-ascii?Q?/L3yH8v0jKDW5kfe+rnXA3KOB123YhgndZZgeyLflIMxQu8LIChhYIStLVna?=
- =?us-ascii?Q?Yxqr/eCQZU6FHR1Bc7Lvd4rFdaqMSoxNNpoeJOp0PNMs1NmGkBQr2UGXnVn2?=
- =?us-ascii?Q?bXdx85gf0VYn/5Ofk67tyRRlDrV1EBQwlyFYEcfM4KFZveYtg+wcgB3k5zcx?=
- =?us-ascii?Q?dgKbig1xc7JDWk53x85EfOhOrm/X3+x60pKGa61H/Ye5vFq0GAqu+JmdgrQ2?=
- =?us-ascii?Q?M2+BbmpvP7O21uVKUbKqbDMr4cMIzxCdoms6fhwT+h/RksguU41p+v4xfGe4?=
- =?us-ascii?Q?hkVichupHYCsZLzEQecE1fV2zlN6Qa+yvB9PshhMVWOUiFSjrXAyNcJ9wpTl?=
- =?us-ascii?Q?TD3nAQPxwrTgBGhND0yVculQL/8L4a69EBIovHvIYRVV9KMxMkOjpuZVwscF?=
- =?us-ascii?Q?n8g1gBdvc4zE+bVQ7K7lAHBRZQxMmkNTQNEIJeWM7OsL2Z4XJ+8lH8v76SdW?=
- =?us-ascii?Q?mmAtAQ7H/r+flws6MM2Fd5kGoGUW/wOQWWdeYCWrmesJvmXfTlaViDcUJ1uc?=
- =?us-ascii?Q?ZGPGdGrSgX2U7Nt0pmSQbt0QMLRQH6MQpzSf7DPQFgl+aTJi71VpkB7sZbpZ?=
- =?us-ascii?Q?NzsAHeZMCm59NoiFJCiL3BQNDXsFuKPAI1hDfNQbH7o7O2Fv0i1o6SsOLJC5?=
- =?us-ascii?Q?m9zMPhE1cv4NsxnllXlZUCcLtJq7d0wMVLIKYHwGkKjVzRFZsm5uFzTIrdrW?=
- =?us-ascii?Q?vDM3GEKyXHc7wpnhl9q6bhi75mEmz8rmtBJ0c5MuYTny2/sU/G0nMVSnXFHP?=
- =?us-ascii?Q?sP0OhPJbWDYrIadnGAaXy66XURBZ3vHNK2oiuTTt?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 964b8bde-a286-41a3-7b9c-08dc36fedbb5
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2024 19:12:21.6787
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: py62IEa95OsVRUXEXRQw257WGYN+ooD7nFY0XDaKOfJoY/dgRhYD3Xl6ffy5GzZX
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6940
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 26, 2024 at 11:55:56AM -0700, Alex Williamson wrote:
-> This will be the first intel vfio-pci variant driver, I don't think we
-> need an intel sub-directory just yet.
+On Mon, 26 Feb 2024 15:12:20 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Mon, Feb 26, 2024 at 11:55:56AM -0700, Alex Williamson wrote:
+> > This will be the first intel vfio-pci variant driver, I don't think we
+> > need an intel sub-directory just yet.
+> > 
+> > Tangentially, I think an issue we're running into with
+> > PCI_DRIVER_OVERRIDE_DEVICE_VFIO is that we require driver_override to
+> > bind the device and therefore the id_table becomes little more than a
+> > suggestion.  Our QE is already asking, for example, if they should use
+> > mlx5-vfio-pci for all mlx5 compatible devices.  
 > 
-> Tangentially, I think an issue we're running into with
-> PCI_DRIVER_OVERRIDE_DEVICE_VFIO is that we require driver_override to
-> bind the device and therefore the id_table becomes little more than a
-> suggestion.  Our QE is already asking, for example, if they should use
-> mlx5-vfio-pci for all mlx5 compatible devices.
+> They don't have to, but it works fine, there is no reason not to.
 
-They don't have to, but it works fine, there is no reason not to.
+But there's also no reason to.  None of the metadata exposed by the
+driver suggests it should be a general purpose vfio-pci stand-in.
 
-I imagined that users would always bind the variant driver, it is why
-the drivers all have "disabled" fallbacks to just be normal vfio-pci.
-
-> I wonder if all vfio-pci variant drivers that specify an id_table
-> shouldn't include in their probe function:
+> I imagined that users would always bind the variant driver, it is why
+> the drivers all have "disabled" fallbacks to just be normal vfio-pci.
 > 
-> 	if (!pci_match_id(pdev, id)) {
-> 		pci_info(pdev, "Incompatible device, disallowing driver_override\n");
-> 		return -ENODEV;
-> 	}
+> > I wonder if all vfio-pci variant drivers that specify an id_table
+> > shouldn't include in their probe function:
+> > 
+> > 	if (!pci_match_id(pdev, id)) {
+> > 		pci_info(pdev, "Incompatible device, disallowing driver_override\n");
+> > 		return -ENODEV;
+> > 	}  
+> 
+> Certainly an interesting idea, doesn't that completely defeat driver
+> binding and new_id though?
 
-Certainly an interesting idea, doesn't that completely defeat driver
-binding and new_id though?
+I guess we always send a compatible id, so it'd be more a matter of
+exporting and testing id against pci_device_id_any, that would be the
+footprint of just a driver_override match (or an extremely liberal
+dynamic id).
 
-You are worried about someone wrongly loading a mlx5 driver on, say,
-an Intel device?
+> You are worried about someone wrongly loading a mlx5 driver on, say,
+> an Intel device?
 
-> (And yes, I see the irony that vfio introduced driver_override and
-> we've created variant drivers that require driver_override and now we
-> want to prevent driver_overrides)
+That's sort of where we're headed if we consider it valid to bind a CX5
+to mlx5-vfio-pci just because they have a host driver with a similar
+name in common.  It's essentially a free for all.  I worry about test
+matrices, user confusion, and being on guard for arbitrary devices at
+every turn in variant drivers if our policy is that they should all work
+equivalent to a basic vfio-pci-core implementation for anything.
 
-Heh
- 
-> Jason, are you seeing any of this as well and do you have a better
-> suggestion how we might address the issue?  Thanks,
+> > (And yes, I see the irony that vfio introduced driver_override and
+> > we've created variant drivers that require driver_override and now we
+> > want to prevent driver_overrides)  
+> 
+> Heh
+>  
+> > Jason, are you seeing any of this as well and do you have a better
+> > suggestion how we might address the issue?  Thanks,  
+> 
+> I haven't heard of confusion here.. People who don't care just use
+> vfio-pci like the internet tells them, people who do care seem to be
+> very sophisticated right now..
+> 
+> Did the userspace tool Max sketched out to automatically parse the id
+> tables ever get completed? That seems like the best solution, just
+> automate it and remove the decision from the user.
 
-I haven't heard of confusion here.. People who don't care just use
-vfio-pci like the internet tells them, people who do care seem to be
-very sophisticated right now..
+libvirt recently implemented support for managed="yes" with variant
+drivers where it will find the best "vfio_pci" driver for a device
+using an algorithm like Max suggested, but in practice it's not clear
+how useful that will be considering devices likes CX7 require
+configuration before binding to the variant driver.  libvirt has no
+hooks to specify or perform configuration at that point.
 
-Did the userspace tool Max sketched out to automatically parse the id
-tables ever get completed? That seems like the best solution, just
-automate it and remove the decision from the user.
+The driverctl script also exists and could maybe consider the
+"vfio-pci" driver name to be a fungible alias for the best matching
+vfio_pci class driver, but I'm not sure if driverctl has a sufficient
+following to make a difference.  Thanks,
 
-Jason
+Alex
+
