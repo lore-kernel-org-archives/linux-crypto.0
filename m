@@ -1,63 +1,90 @@
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D7439FFA;
-	Mon, 26 Feb 2024 08:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AF4481AD;
+	Mon, 26 Feb 2024 09:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936397; cv=none; b=d4ry8HBqOIrkeT1GrkQF2U5ekQZ+vfesMx8oIEVgujkYXVeqChcV4rUn8bGISwqfT+Ca81S+FYRgf5PvVj/rf0lhfSBuFudLgX6hhpGhQ1TyQh2wZxUH2kABN8pShkoGNHg/+Ch95s3pM0OJyW3iphzdzS4n7VD7TVSbRlRFogE=
+	t=1708939040; cv=none; b=JqmoZgZgfS+ixqVvLnpNo8QnpyOfk1wakUQAmhScPe1Ztg/BE726PS0jDynIp+9zRs80KRcMXiVRGRZwNKrjI6Zxx2zOFnJNHcF4CiuS0Kzgz9MZEjTOLjXAWj2UlHqe9aucCbengxkYHJk7wZ8xtUAy6BXdFY/8WofzYzL6NtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708936397; c=relaxed/simple;
-	bh=8YnqCvaVNYar5aIZBImce4B4KXZMqOiJJmxtzNMwcOY=;
-	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID:
-	 References:In-Reply-To; b=Q9DizdHYmIF7GroclEUu76lV9uT0uYJQYkcUjzyg+Hbd5+BBpV9WuvJ46CvHQ5dis7PprGP7s0GTXQTPStgkJ+o+Bv0z1pfsRP48mBUzF1K2r6JvPKPPemt9TgJesmfhGmHlDTHgxHC5FCPMRZPpH1Sosjo1KOmSCkmpQDder+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=15.184.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-X-QQ-GoodBg: 1
-X-QQ-SSF: 00400000000000F0
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-FEAT: B8vEhG33zUTqMh/Df+7C7/cZTpPTQihZsq8pvLymg+J8YWdC3ZJw6O6x4eqO/
-	nti0nNjmZ4R4ntBHTIbWl61+2eCvit1id/VezWT+CFzzdaClVgACFXFN06iCxbgC4C2/0Hn
-	UisnnP2IRvPIl+zzxNzXr84Q5npOIp5Bo5xGB4hXLeojn12YtboYb5N0URS7qPW+iAknfUF
-	ubIZ+KCzOhPJjijpVNvY3gsNFLFHb5//f1UPweiVFIfYlMQnAdHNRpx6B6xF3ar9rLTL/SB
-	RRVIU9g5n8eoD14SyEjCVx044dFtzFyQzMnl9XxoPBMDllh3pdwcnt++pIyyTZ/g9Rh3cER
-	hkfddYg7NQAPVoBKwAcYKMQbe9XHLyyWYYertnbSAZl3uHTpbc=
-X-QQ-BUSINESS-ORIGIN: 2
-X-QQ-Originating-IP: Cyo8Q8zJxI1JsbZ6iSukuqr7xFbz3rxXnIeXv/emwKg=
-X-QQ-STYLE: 
-X-QQ-mid: t5gz7a-2t1708935908t4705339
-From: "=?utf-8?B?5YWz5paH5rab?=" <guanwentao@uniontech.com>
-To: "=?utf-8?B?V0FORyBYdWVydWk=?=" <kernel@xen0n.name>, "=?utf-8?B?546L5pix5Yqb?=" <wangyuli@uniontech.com>, "=?utf-8?B?aGVyYmVydA==?=" <herbert@gondor.apana.org.au>, "=?utf-8?B?ZGF2ZW0=?=" <davem@davemloft.net>, "=?utf-8?B?Y2hlbmh1YWNhaQ==?=" <chenhuacai@kernel.org>
-Cc: "=?utf-8?B?bGludXgtY3J5cHRv?=" <linux-crypto@vger.kernel.org>, "=?utf-8?B?bG9vbmdhcmNo?=" <loongarch@lists.linux.dev>, "=?utf-8?B?bGludXgta2VybmVs?=" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] loongarch/crypto: Clean up useless assignment operations
+	s=arc-20240116; t=1708939040; c=relaxed/simple;
+	bh=TDPshTEB2YgsSzMjFOliwieaa4N3m+QIe+o0VAqCL30=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=GAXBXatlOrAZXkL/tWrRUW82HMHz3nbagFVQPcsyirRRohAoU0d4FgoamT8AmCSuWvIkaodjKEWbIp7iMqVyn4QDdTkP9ACtUZwCk5EnuXxpYQMOwcHNvDtmwABMJ3xp08zDqIp/v/xlgCDW5DQFZHBzRl69gyv1ppLt/tdjDI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HXu9YeOJ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HXu9YeOJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DB87C433F1;
+	Mon, 26 Feb 2024 09:17:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708939040;
+	bh=TDPshTEB2YgsSzMjFOliwieaa4N3m+QIe+o0VAqCL30=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=HXu9YeOJLt1Yvf8NXTZ1efm0443uX2U1V2DLHVLDjanw7eFOgW7x2+1m103AC/PZK
+	 WXamFGx2xgSh7mVv/kXFnpgIE9Ch3mU5XP+4HQ02nLndcsNVMiSm9vuUANAHNQbjM7
+	 aNRDSIORRFc3AdpzsAw+aQzpxyQzkjg/OuOEe2AicvH/xDk71DkEKXiNOEUtyGgcU2
+	 5DpSDGRzkIpDdtqF7BzdhFkBJaizksaEHqsoj4PbPCeYLLJ31diCmfAV27euPJvF4M
+	 hqsBUHxgrjvyCxzCRVR+V2KdU3tVlT26TPFhxLyoiAkCsMSOHhPibfQyZ7iWb69/lR
+	 T8Taz6GzuK1OQ==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-Date: Mon, 26 Feb 2024 08:25:07 +0000
-X-Priority: 3
-Message-ID: <tencent_29355025499B47007555CE13@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-References: <20240226080328.334021-1-wangyuli@uniontech.com>
-	<48afa638-9145-40ee-9868-fa82a1fce271@xen0n.name>
-In-Reply-To: <48afa638-9145-40ee-9868-fa82a1fce271@xen0n.name>
-X-QQ-ReplyHash: 3202933845
-X-BIZMAIL-ID: 12383567994983227794
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1])
-	by smtp.qq.com (ESMTP) with SMTP
-	id ; Mon, 26 Feb 2024 16:25:10 +0800 (CST)
-Feedback-ID: t:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 26 Feb 2024 11:17:11 +0200
+Message-Id: <CZEWBSXM7LHU.15UW6P0T61VBN@suppilovahvero>
+Subject: Re: [PATCH v5 0/6] DCP as trusted keys backend
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Richard Weinberger" <richard@sigma-star.at>, "Mimi Zohar"
+ <zohar@linux.ibm.com>, "James Bottomley" <jejb@linux.ibm.com>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ <upstream@sigma-star.at>, "David Howells" <dhowells@redhat.com>
+Cc: "Shawn Guo" <shawnguo@kernel.org>, "Jonathan Corbet" <corbet@lwn.net>,
+ "Sascha Hauer" <s.hauer@pengutronix.de>, "kernel@pengutronix.de"
+ <kernel@pengutronix.de>, "Fabio Estevam" <festevam@gmail.com>, "NXP Linux
+ Team" <linux-imx@nxp.com>, "Ahmad Fatoum" <a.fatoum@pengutronix.de>, "sigma
+ star Kernel Team" <upstream+dcp@sigma-star.at>, "Li Yang"
+ <leoyang.li@nxp.com>, "Paul Moore" <paul@paul-moore.com>, "James Morris"
+ <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, "Paul E.
+ McKenney" <paulmck@kernel.org>, "Randy Dunlap" <rdunlap@infradead.org>,
+ "Catalin Marinas" <catalin.marinas@arm.com>, "Rafael J. Wysocki"
+ <rafael.j.wysocki@intel.com>, "Tejun Heo" <tj@kernel.org>, "Steven Rostedt
+ (Google)" <rostedt@goodmis.org>, <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+ "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <linuxppc-dev@lists.ozlabs.org>,
+ "linux-security-module@vger.kernel.org"
+ <linux-security-module@vger.kernel.org>, "David Gstir"
+ <david@sigma-star.at>
+X-Mailer: aerc 0.15.2
+References: <20231215110639.45522-1-david@sigma-star.at>
+ <7AED262F-9387-446D-B11A-C549C02542F9@sigma-star.at>
+ <47439997.XUcTiDjVJD@somecomputer> <1733761.uacIGzncQW@somecomputer>
+In-Reply-To: <1733761.uacIGzncQW@somecomputer>
 
-U3VyZSxidXQgd2Ugbm90IHNlZW0gdG8gaGF2ZSAiY3JjLncuZC53IiBkd29yZCBhc20gaW4g
-bG9vbmdhcmNoIDMyYml0IG1vZGUsbm93IHRoZSB3aG9sZSBmaWxlIGNhbiBvbmx5IHJ1biBp
-biA2NGJpdCBtb2RlPw0KDQpUaGFua3Mu
+On Mon Feb 26, 2024 at 12:20 AM EET, Richard Weinberger wrote:
+> Mimi, James, Jarkko, David,
+>
+> you remained silent for a whole release cycle.
+> Is there anything we can do to get this forward?
+>
+> Thanks,
+> //richard
 
+Thanks for reminding.
+
+From my side, I've had pretty busy month as I've adapted to a new work
+project: https://sochub.fi/
+
+I exported the thread [1] and will look into it within this or next week
+in detail (thus the large'ish time window).
+
+[1] https://lore.kernel.org/linux-integrity/1733761.uacIGzncQW@somecomputer=
+/t.mbox.gz
+
+BR, Jarkko
