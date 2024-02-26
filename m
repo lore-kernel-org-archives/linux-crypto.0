@@ -1,214 +1,157 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E401B962
-	for <linux-crypto@vger.kernel.org>; Sun, 25 Feb 2024 22:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4D314A98
+	for <linux-crypto@vger.kernel.org>; Mon, 26 Feb 2024 01:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708899638; cv=none; b=sMe4A1+5TK01/MfwbR2eDww1mfMpXx6+sc6rhgW6uRT+m2mjc4VN60e5e6CQ20sVXSXVoqOOpOLl1UaChm3zH96TnqkOjGqRUQVXNejepg3Es1WMIzNFlYr90X7DMymzi7CVfywzOPhbqnRU9fXZzpyN/KUc4b6EXmv+VB6vwTU=
+	t=1708911620; cv=none; b=VlBDvVVc3ee6k5zU2OZ5Q0Wa6pORXDsC2vtGeC5Nc71njKCMLBg4Y5n7L7KwUxlOxp2l4vKRw8HpMENxiDKBELAnM3GIQVWbPV4CcBBDUyxRUhcHguixZPJ414jKg/xLHev6onooG8xWNVS1kUc0Ga1H0RYbZadsQtnpi1Pdwfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708899638; c=relaxed/simple;
-	bh=UXS6o52/gxylcEk77QTCs8vWUzpJEIdKr/eTjoCMKJk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AX4L/Ky7Lc6AP5j5BRHayUIFHVy8OWq6PykJfx0Rl8vgabcgz9JFPTcpuKaHJVBzeYWMuQtuOr4yncBeqWOhzO/WpuVPhkzzSeKtl9PfUpQ7Beum9wJdXNp+OSpL+dMOJZrpOQh2j39nt7Ga+7AKriwa79iSyxpb7Sv9taRBjUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at; spf=pass smtp.mailfrom=sigma-star.at; dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b=ZWzz/A1+; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigma-star.at
+	s=arc-20240116; t=1708911620; c=relaxed/simple;
+	bh=CEF5PY0v162e8nADzCCdKuh/9GsYfRE40wXrl7GU0Gg=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=Tq+6I/T0pth/FpZQMbHsl4idfcNTFc32VPOosti5cFTQGayPupiGJsLRA6twOkG+conRCL5cjkd0IjM/R7YYc0Fnc28Gw15lwDiXlK8DPmkgdAKcjogBHsWe9gFF/EUvKDw/Lo7OZCHvksEEZmRTO9usG/k2uFXsb4x6xaKdDXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=hh1wLVTo; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b="ZWzz/A1+"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-55a8fd60af0so2945300a12.1
-        for <linux-crypto@vger.kernel.org>; Sun, 25 Feb 2024 14:20:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="hh1wLVTo"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6da202aa138so1605188b3a.2
+        for <linux-crypto@vger.kernel.org>; Sun, 25 Feb 2024 17:40:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sigma-star.at; s=google; t=1708899634; x=1709504434; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=sifive.com; s=google; t=1708911618; x=1709516418; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vcAAMbo5fPSeSlUc+G3Ds0RoWmjIC7d5lnGAqCLP7+0=;
-        b=ZWzz/A1+/0hUq9nDjW7N3dGG7LW0a25pVAl4SI7JWbix8Ltz4Y5g7CQa0X19SpZvrt
-         m0GmEH/4k1aw2+YaXYQWzMvA49bfciqVUt/kubYMWAfGocim+0pbUwS4a90JpIm+UucR
-         rdSrZ1sCdsthEBmpbj9+wTzVstNYGC3tqeE5NZ7Temc2jwHK6oo5aHlSF8hvuMrITMcu
-         5l9wPI4BUwWVFm9OQP+ykoWDa0GS+o/3IPjv+EWumaiPBhxHrDdk1HvypueugaWP8lA6
-         e17B5V0hWi03vQZfx1NVYorirpMQDGTkg/zoCRONcwXcJLnRJgbr96bJ39Hv7REZ5rX+
-         00jA==
+        bh=gao7hRUfZpXivOmhIfnNUfW8TTK3M/4khJ9JgCKSDQQ=;
+        b=hh1wLVTodmB84UDVO/dzjHZ9nJiQ8bE9iHVsmejcIoH9U3N45ObaMGrhaXOfB72Qfn
+         JJ2sM9wdnWCkttN1oQAlcWPZlYs76LtoEacrlxV3dqFPnuDs3aQFErVXWVd5tqBm9/hw
+         L6n1hUksh1huqjxi/1G/5A9q8HUpjEErXDwDchcxPxYg7rakasnV2L5NvCveyDwgDr2o
+         svNk0qtlZiSXYvbNXRqD5z6ehGW4qF6dhWsvU5cVbRdH38h8cJutBQY+c6EZlHdvUcv1
+         Fx3mWjoJiwm2s23qKOsOIYkJV1IDDZtoNE2Vg24wRZrUOFPkSbKXEI9A/wjroz1PXlIW
+         Xixg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708899634; x=1709504434;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1708911618; x=1709516418;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vcAAMbo5fPSeSlUc+G3Ds0RoWmjIC7d5lnGAqCLP7+0=;
-        b=YWrPUaB9DuBSllQFgRjzdBbyRfvbYxxnQ37nqxOzN3ZNDrJgNeCXeBJWHOAMdTVDmH
-         WbimBuLyT9P3Z+QGvNaAH36EmwtygfVvNrx8VT2zfdCwy+pbentIWdFZDVrNkbnT7Ip4
-         n/BEgE6d9yQQiOVRfktCzCzVnm7WXPk+Byb6zzgtqdy1CNwpwk5MEg+YeZoNHphTW5zK
-         Wr0bBR0MiIZZuKg8yv21y/UxGeGR3ezKjTj5/vYU8dH8Oe9vaj5lAHEAxZdF1C8Hq+Yx
-         JzHs7b3eB0JkYglpynVc2Wa5mICjxXgsvubQ3Io9ndVn/PwOpnZnz0X8JOz3pPYgJKZ4
-         Lc5A==
-X-Forwarded-Encrypted: i=1; AJvYcCWxGrxuHhbz+dwx6SeENFWgX2rztTFCJfxqdO5KlsnR/xhMddUleapucdiFMneQrAUZnLNY25HiRdCjkvah70mXFEqTfZGaGuS21uzu
-X-Gm-Message-State: AOJu0Yy14Xp8rhqNOQAR+xH/VJnwtDG6Mp3YTTtBk+hI+FPC0SF/IswW
-	ulpI5TuspyhxRrCdHvc/9Zddmu7s+NnUYCyEOTBLCDPqAATRdiZfjQkT06kznBs=
-X-Google-Smtp-Source: AGHT+IG5bJ/fK8sFX2rG8b+VDYEkiBFr76ZXZ4JyDKWlPw45GhDGbdPCrTlUaWepqwiGPkAAQmeUww==
-X-Received: by 2002:a17:906:3c18:b0:a3e:d5ac:9995 with SMTP id h24-20020a1709063c1800b00a3ed5ac9995mr3150880ejg.59.1708899633957;
-        Sun, 25 Feb 2024 14:20:33 -0800 (PST)
-Received: from blindfold.localnet (84-115-239-180.cable.dynamic.surfer.at. [84.115.239.180])
-        by smtp.gmail.com with ESMTPSA id h4-20020a1709062dc400b00a3f355aeb0bsm1828968eji.131.2024.02.25.14.20.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Feb 2024 14:20:33 -0800 (PST)
-From: Richard Weinberger <richard@sigma-star.at>
-To: Mimi Zohar <zohar@linux.ibm.com>, James Bottomley <jejb@linux.ibm.com>, Jarkko Sakkinen <jarkko@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, upstream@sigma-star.at, David Howells <dhowells@redhat.com>
-Cc: Shawn Guo <shawnguo@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, "kernel@pengutronix.de" <kernel@pengutronix.de>, 
-	Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>, 
-	Ahmad Fatoum <a.fatoum@pengutronix.de>, 
-	sigma star Kernel Team <upstream+dcp@sigma-star.at>, Li Yang <leoyang.li@nxp.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Randy Dunlap <rdunlap@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, Tejun Heo <tj@kernel.org>, 
-	"Steven Rostedt (Google)" <rostedt@goodmis.org>, linux-doc@vger.kernel.org, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>, 
-	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	linuxppc-dev@lists.ozlabs.org, 
-	"linux-security-module@vger.kernel.org" <linux-security-module@vger.kernel.org>, David Gstir <david@sigma-star.at>
-Subject: Re: [PATCH v5 0/6] DCP as trusted keys backend
-Date: Sun, 25 Feb 2024 23:20:31 +0100
-Message-ID: <1733761.uacIGzncQW@somecomputer>
-In-Reply-To: <47439997.XUcTiDjVJD@somecomputer>
-References: <20231215110639.45522-1-david@sigma-star.at> <7AED262F-9387-446D-B11A-C549C02542F9@sigma-star.at> <47439997.XUcTiDjVJD@somecomputer>
+        bh=gao7hRUfZpXivOmhIfnNUfW8TTK3M/4khJ9JgCKSDQQ=;
+        b=CoF/3A5Y0YCSdYUIXsjjQzLs9LNNmdXj+r5pXPTw4FGNxPrkv8LubjnfPbAxs0d6AE
+         s0XJCxoNa7N73Zl+0rLbSp6oMKY6+gmxM/TAGRR/2N7uqPuXp+ynQkV7eV0xUW6SzA/5
+         KQbJg0AlJdCmwHov/IetsaACFyL1rJ1H0khGtQrqFoS3DsZj7wy/3i3+Yyl9Rpncxrvt
+         1X+3PNaSkP6RPIMafes1TwToitPEMpP4fj1yydMR0NfV4fzdA8kfvYqAXi8FMWVHwFlA
+         cWA2gP70kgwamrs3U7G9bvaUJ8HBWk7H43aLzDfV7BSOlRjzBovtIxHrcU33FTqDrcbL
+         6cig==
+X-Forwarded-Encrypted: i=1; AJvYcCUiwk1VZKBSRbvb69XUw71g9Z6aORIHv1CyQyKlpgSjXy5mUPsXCH7hHhk3jzgRSNUdJ3HgP5AX7CIFd4t/GMmzo/I35jUsR2iMTiUK
+X-Gm-Message-State: AOJu0YzpknYdysX3QTVPfKcm9hVk+2CaHqT2uspNaic10cwT2mZjBHh0
+	fCdiSYi9zs2Spm5SdGYWIXVE4n8BCuzeikBbeyk1zxOQIrsea4VW4cDBZT1Pz9s=
+X-Google-Smtp-Source: AGHT+IHTuQoynqJXhnnP1IcEo6E63UPeUVZkFOzSf4oem6puafXcOc8BzJSUIQCfain5+m3MPFeN0g==
+X-Received: by 2002:a05:6a00:14c5:b0:6e5:2f27:5235 with SMTP id w5-20020a056a0014c500b006e52f275235mr1867135pfu.11.1708911618546;
+        Sun, 25 Feb 2024 17:40:18 -0800 (PST)
+Received: from ?IPv6:2402:7500:5dc:7e53:808:399a:34d8:b170? ([2402:7500:5dc:7e53:808:399a:34d8:b170])
+        by smtp.gmail.com with ESMTPSA id e17-20020aa79811000000b006e45c5d7720sm2903150pfl.93.2024.02.25.17.40.16
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 25 Feb 2024 17:40:17 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
+Subject: Re: [PATCH riscv/for-next] crypto: riscv - parallelize AES-CBC
+ decryption
+From: Jerry Shih <jerry.shih@sifive.com>
+In-Reply-To: <20240210181240.GA1098@sol.localdomain>
+Date: Mon, 26 Feb 2024 09:40:14 +0800
+Cc: linux-riscv@lists.infradead.org,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ linux-crypto@vger.kernel.org,
+ =?utf-8?Q?Christoph_M=C3=BCllner?= <christoph.muellner@vrull.eu>,
+ Heiko Stuebner <heiko@sntech.de>,
+ Phoebe Chen <phoebe.chen@sifive.com>,
+ Andy Chiu <andy.chiu@sifive.com>
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
+Message-Id: <71CC95E2-D5A2-4158-ADD2-C28216B00F3A@sifive.com>
+References: <20240208060851.154129-1-ebiggers@kernel.org>
+ <04703246-6EF6-4B54-B8F1-96EDEC2FBA6B@sifive.com>
+ <20240210181240.GA1098@sol.localdomain>
+To: Eric Biggers <ebiggers@kernel.org>
+X-Mailer: Apple Mail (2.3445.9.7)
 
-Mimi, James, Jarkko, David,
-
-you remained silent for a whole release cycle.
-Is there anything we can do to get this forward?
-
-Thanks,
-//richard
-
-Am Dienstag, 13. Februar 2024, 10:59:56 CET schrieb Richard Weinberger:
-> Am Montag, 5. Februar 2024, 09:39:07 CET schrieb David Gstir:
-> > Hi,
-> >=20
-> > > On 15.12.2023, at 12:06, David Gstir <david@sigma-star.at> wrote:
-> > >=20
-> > > This is a revival of the previous patch set submitted by Richard Wein=
-berger:
-> > > https://lore.kernel.org/linux-integrity/20210614201620.30451-1-richar=
-d@nod.at/
-> > >=20
-> > > v4 is here:
-> > > https://lore.kernel.org/keyrings/20231024162024.51260-1-david@sigma-s=
-tar.at/
-> > >=20
-> > > v4 -> v5:
-> > > - Make Kconfig for trust source check scalable as suggested by Jarkko=
- Sakkinen
-> > > - Add Acked-By from Herbert Xu to patch #1 - thanks!
-> > > v3 -> v4:
-> > > - Split changes on MAINTAINERS and documentation into dedicated patch=
-es
-> > > - Use more concise wording in commit messages as suggested by Jarkko =
-Sakkinen
-> > > v2 -> v3:
-> > > - Addressed review comments from Jarkko Sakkinen
-> > > v1 -> v2:
-> > > - Revive and rebase to latest version
-> > > - Include review comments from Ahmad Fatoum
-> > >=20
-> > > The Data CoProcessor (DCP) is an IP core built into many NXP SoCs such
-> > > as i.mx6ull.
-> > >=20
-> > > Similar to the CAAM engine used in more powerful SoCs, DCP can AES-
-> > > encrypt/decrypt user data using a unique, never-disclosed,
-> > > device-specific key. Unlike CAAM though, it cannot directly wrap and
-> > > unwrap blobs in hardware. As DCP offers only the bare minimum feature
-> > > set and a blob mechanism needs aid from software. A blob in this case
-> > > is a piece of sensitive data (e.g. a key) that is encrypted and
-> > > authenticated using the device-specific key so that unwrapping can on=
-ly
-> > > be done on the hardware where the blob was wrapped.
-> > >=20
-> > > This patch series adds a DCP based, trusted-key backend and is similar
-> > > in spirit to the one by Ahmad Fatoum [0] that does the same for CAAM.
-> > > It is of interest for similar use cases as the CAAM patch set, but for
-> > > lower end devices, where CAAM is not available.
-> > >=20
-> > > Because constructing and parsing the blob has to happen in software,
-> > > we needed to decide on a blob format and chose the following:
-> > >=20
-> > > struct dcp_blob_fmt {
-> > > __u8 fmt_version;
-> > > __u8 blob_key[AES_KEYSIZE_128];
-> > > __u8 nonce[AES_KEYSIZE_128];
-> > > __le32 payload_len;
-> > > __u8 payload[];
-> > > } __packed;
-> > >=20
-> > > The `fmt_version` is currently 1.
-> > >=20
-> > > The encrypted key is stored in the payload area. It is AES-128-GCM
-> > > encrypted using `blob_key` and `nonce`, GCM auth tag is attached at
-> > > the end of the payload (`payload_len` does not include the size of
-> > > the auth tag).
-> > >=20
-> > > The `blob_key` itself is encrypted in AES-128-ECB mode by DCP using
-> > > the OTP or UNIQUE device key. A new `blob_key` and `nonce` are genera=
-ted
-> > > randomly, when sealing/exporting the DCP blob.
-> > >=20
-> > > This patchset was tested with dm-crypt on an i.MX6ULL board.
-> > >=20
-> > > [0] https://lore.kernel.org/keyrings/20220513145705.2080323-1-a.fatou=
-m@pengutronix.de/
-> > >=20
-> > > David Gstir (6):
-> > >  crypto: mxs-dcp: Add support for hardware-bound keys
-> > >  KEYS: trusted: improve scalability of trust source config
-> > >  KEYS: trusted: Introduce NXP DCP-backed trusted keys
-> > >  MAINTAINERS: add entry for DCP-based trusted keys
-> > >  docs: document DCP-backed trusted keys kernel params
-> > >  docs: trusted-encrypted: add DCP as new trust source
-> > >=20
-> > > .../admin-guide/kernel-parameters.txt         |  13 +
-> > > .../security/keys/trusted-encrypted.rst       |  85 +++++
-> > > MAINTAINERS                                   |   9 +
-> > > drivers/crypto/mxs-dcp.c                      | 104 +++++-
-> > > include/keys/trusted_dcp.h                    |  11 +
-> > > include/soc/fsl/dcp.h                         |  17 +
-> > > security/keys/trusted-keys/Kconfig            |  18 +-
-> > > security/keys/trusted-keys/Makefile           |   2 +
-> > > security/keys/trusted-keys/trusted_core.c     |   6 +-
-> > > security/keys/trusted-keys/trusted_dcp.c      | 311 ++++++++++++++++++
-> > > 10 files changed, 562 insertions(+), 14 deletions(-)
-> > > create mode 100644 include/keys/trusted_dcp.h
-> > > create mode 100644 include/soc/fsl/dcp.h
-> > > create mode 100644 security/keys/trusted-keys/trusted_dcp.c
-> >=20
-> > Jarkko, Mimi, David do you need anything from my side for these patches=
- to get them merged?
+On Feb 11, 2024, at 02:12, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Sat, Feb 10, 2024 at 11:25:27PM +0800, Jerry Shih wrote:
+>>> .macro	aes_cbc_decrypt	keylen
+>>> +	srli		LEN, LEN, 2	// Convert LEN from bytes to =
+words
+>>> 	vle32.v		v16, (IVP)	// Load IV
+>>> 1:
+>>> -	vle32.v		v17, (INP)	// Load ciphertext block
+>>> -	vmv.v.v		v18, v17	// Save ciphertext block
+>>> -	aes_decrypt	v17, \keylen	// Decrypt
+>>> -	vxor.vv		v17, v17, v16	// XOR with IV or prev =
+ciphertext block
+>>> -	vse32.v		v17, (OUTP)	// Store plaintext block
+>>> -	vmv.v.v		v16, v18	// Next "IV" is prev ciphertext =
+block
+>>> -	addi		INP, INP, 16
+>>> -	addi		OUTP, OUTP, 16
+>>> -	addi		LEN, LEN, -16
+>>> +	vsetvli		t0, LEN, e32, m4, ta, ma
+>>> +	vle32.v		v20, (INP)	// Load ciphertext blocks
+>>> +	vslideup.vi	v16, v20, 4	// Setup prev ciphertext blocks
+>>> +	addi		t1, t0, -4
+>>> +	vslidedown.vx	v24, v20, t1	// Save last ciphertext block
+>>=20
+>> Do we need to setup the `e32, len=3Dt0` for next IV?
+>> I think we only need 128bit IV (with VL=3D4).
+>>=20
+>>> +	aes_decrypt	v20, \keylen	// Decrypt the blocks
+>>> +	vxor.vv		v20, v20, v16	// XOR with prev ciphertext =
+blocks
+>>> +	vse32.v		v20, (OUTP)	// Store plaintext blocks
+>>> +	vmv.v.v		v16, v24	// Next "IV" is last ciphertext =
+block
+>>=20
+>> Same VL issue here.
 >=20
-> Friendly ping also from my side. :-)
+> It's true that the vslidedown.vx and vmv.v.v only need vl=3D4.  But it =
+also works
+> fine with vl unchanged.  It just results in some extra data being =
+moved in the
+> registers.  My hypothesis is that this is going to be faster than =
+having the
+> three extra instructions per loop iteration to change the vl to 4 =
+twice.
 >=20
-> Thanks,
-> //richard
+> I still have no real hardware to test on, so I have no quantitative =
+data.  All I
+> can do is go with my instinct which is that the shorter version will =
+be better.
 >=20
-> --=20
-> =E2=80=8B=E2=80=8B=E2=80=8B=E2=80=8B=E2=80=8Bsigma star gmbh | Eduard-Bod=
-em-Gasse 6, 6020 Innsbruck, AUT
-> UID/VAT Nr: ATU 66964118 | FN: 374287y
+> If you have access to a real CPU that supports the RISC-V vector =
+crypto
+> extensions, I'd be interested in the performance you get from each =
+variant.
+> (Of course, different RISC-V CPU implementations may have quite =
+different
+> performance characteristics, so that still won't be definitive.)
+
+Hi Eric,
+Thank you. I think the extra vl doesn't affect performance =
+significantly. The main
+tasks are still the aes body.
+The original implementation is enough right now.
+
+> In general, this level of micro-optimization probably needs to be wait =
+until
+> there are a variety of CPUs to test on.  We know that parallelizing =
+the
+> algorithms is helpful, so we should do that, as this patch does.  But =
+the
+> effects of small variations in the instruction sequences are currently =
+unclear.
 >=20
-
-
-=2D-=20
-=E2=80=8B=E2=80=8B=E2=80=8B=E2=80=8B=E2=80=8Bsigma star gmbh | Eduard-Bodem=
-=2DGasse 6, 6020 Innsbruck, AUT
-UID/VAT Nr: ATU 66964118 | FN: 374287y
-
+> - Eric
 
