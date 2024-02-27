@@ -1,64 +1,76 @@
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.62.65])
+Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5D7136644;
-	Tue, 27 Feb 2024 09:15:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.62.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A1C55E7C;
+	Tue, 27 Feb 2024 09:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709025354; cv=none; b=UsDUyQY63wj87Q6rt5N8TC1T0xHf9rBKfjWbJB4J6cp0H+b/AJUQDK18kcX5dRB9abB55hZrc8haGfhkBhVCC8EI+zvr8DtnB0YnckScYNEfC7QV5QzWJC9nBrLMCr3ygq8x2uIXI5iGSdZRdDuxkza99nivMn2brFmXznu3Y40=
+	t=1709025748; cv=none; b=epiMreXJd+M3frx4N5RtXmVrgJVAZbr0NXywJE+Ll3S6R2N2PuF+/uoP05sa7F3kiWsQVMAV91JV5EWJys1/mZIk5awJdEpTwo3jL9VCon4Ob12OdNmhvvjRAkEVbdnKw8rql7+XTv7Bhj+nRO0DiNmv73kUkYOp9cKnchiC8+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709025354; c=relaxed/simple;
-	bh=q3X4DyIN6ikii6oyoObnkh3BANWnYYwXcgEqll1XmI0=;
-	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID:
-	 References:In-Reply-To; b=PIgYboLoJ6Bto/pkYjzlJkEf3uLgNULb7s0MPfunoBlUh+/3vKeSup2ET97BljfRzRUmGkgwlwgYdX2qMP8hUr0oevUHxlp2+rpxJ99638cDcL1qHY9SNR8YISuOKxAOW/4j4ZMlQvXK3E+qlllnGb5xlyaU+RYp+OycsPh+HaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=114.132.62.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-X-QQ-GoodBg: 1
-X-QQ-SSF: 00400000000000F0
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-X-QQ-FEAT: Q4gfBD3K7t9Ff30Vz19LwZL0M515kJvPrV724lJtybTSINIYtQ1l8UqYjgBx8
-	by99BmmNiJ9qRcuU+ymazD+3yEW992KNHyY/Daohciw17T11kx3OE1HxQwvSnaMMJkqphNh
-	pxfkd6V6lFusW52EM1SCpSNOjBHE7NWFJuP4/cdpGsHlBcY7rBzjfFLRf0MmwvoxkC4bi7A
-	kVMKDHV0vsDw02+DfmujndNQtnR3etqcVFkIx9BI9QGujvCa0EMovexmHpRFDqqJdjN2fJl
-	SeOJS+y2b61FlCWs62mHrHBYjrolsuC9VQtpIfrve/YsnrTuakUEyGhRWkZVi0FkoFIEtOm
-	BnKZD/kiCI70GNCwuDBhTnEJ6rhKFtAZIiTcc8zLstPSQxAS31fmIHmsxC+sw==
-X-QQ-BUSINESS-ORIGIN: 2
-X-QQ-Originating-IP: c4I++hesTy1A7ZFcNMsz9OLPOJeAWWdLhjaoUqczMUw=
-X-QQ-STYLE: 
-X-QQ-mid: t6gz8a-0t1709025277t7164113
-From: "=?utf-8?B?546L5pix5Yqb?=" <wangyuli@uniontech.com>
-To: "=?utf-8?B?5YWz5paH5rab?=" <guanwentao@uniontech.com>, "=?utf-8?B?V0FORyBYdWVydWk=?=" <kernel@xen0n.name>, "=?utf-8?B?ZGF2ZW0=?=" <davem@davemloft.net>, "=?utf-8?B?Y2hlbmh1YWNhaQ==?=" <chenhuacai@kernel.org>
-Cc: "=?utf-8?B?bGludXgtY3J5cHRv?=" <linux-crypto@vger.kernel.org>, "=?utf-8?B?bG9vbmdhcmNo?=" <loongarch@lists.linux.dev>, "=?utf-8?B?bGludXgta2VybmVs?=" <linux-kernel@vger.kernel.org>
+	s=arc-20240116; t=1709025748; c=relaxed/simple;
+	bh=8n5SeuaXS9ESMxi7WWn6HeQWdF7/6qZ2yjERbOU9mCE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ehpiFvBZFEA6X7Uda4RFLjdFVzF4jAtzKLaiMk7Ubq3BgqnEnf/oleZjGaFA8a6FMCiZDGJP2ubvjD5F+CSIM/GeziMhcmbI4xmMKWknezRc7ur/xyjQRHNkJ3UIs/Ir6FIfiLFCc6prsgLkW8kvQh7WCBYXDkloq2wIG6tEBbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=neWoXe42; arc=none smtp.client-ip=89.208.246.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="neWoXe42"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
+	s=default; t=1709025743;
+	bh=8n5SeuaXS9ESMxi7WWn6HeQWdF7/6qZ2yjERbOU9mCE=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=neWoXe42MrAZUcU7VfQPt2nnRYcujiHnGtA3//A1kg8aaJeHF+JmKkA5AEaYNBZlV
+	 rNdJ8iAxq6ufAlDFNQYqIJ4wcD/sEhYbECjW01fEAH9ValTZOI+lj1Yw0jdRvdSB4V
+	 6NiSt/e+ltjti7/DtGiNxCdrCjhXf0Hg+SQs0eyc=
+Received: from [127.0.0.1] (unknown [IPv6:2001:470:683e::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id 6A0E566D60;
+	Tue, 27 Feb 2024 04:22:21 -0500 (EST)
+Message-ID: <b858ec2a84546d7cdb666fd01c44a23714a33332.camel@xry111.site>
 Subject: Re: [PATCH] loongarch/crypto: Clean up useless assignment operations
+From: Xi Ruoyao <xry111@xry111.site>
+To: WANG Xuerui <kernel@xen0n.name>, =?gb2312?Q?=B9=D8=CE=C4=CC=CE?=
+	 <guanwentao@uniontech.com>, =?gb2312?Q?=CD=F5=EA=C5=C1=A6?=
+	 <wangyuli@uniontech.com>, herbert <herbert@gondor.apana.org.au>, davem
+	 <davem@davemloft.net>, chenhuacai <chenhuacai@kernel.org>
+Cc: linux-crypto <linux-crypto@vger.kernel.org>, loongarch
+	 <loongarch@lists.linux.dev>, linux-kernel <linux-kernel@vger.kernel.org>
+Date: Tue, 27 Feb 2024 17:22:18 +0800
+In-Reply-To: <0a7d0a9e-c56e-4ee2-a83b-00164a450abe@xen0n.name>
+References: <20240226080328.334021-1-wangyuli@uniontech.com>
+	 <48afa638-9145-40ee-9868-fa82a1fce271@xen0n.name>
+	 <tencent_29355025499B47007555CE13@qq.com>
+	 <0a7d0a9e-c56e-4ee2-a83b-00164a450abe@xen0n.name>
+Autocrypt: addr=xry111@xry111.site; prefer-encrypt=mutual;
+ keydata=mDMEYnkdPhYJKwYBBAHaRw8BAQdAsY+HvJs3EVKpwIu2gN89cQT/pnrbQtlvd6Yfq7egugi0HlhpIFJ1b3lhbyA8eHJ5MTExQHhyeTExMS5zaXRlPoiTBBMWCgA7FiEEkdD1djAfkk197dzorKrSDhnnEOMFAmJ5HT4CGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQrKrSDhnnEOPHFgD8D9vUToTd1MF5bng9uPJq5y3DfpcxDp+LD3joA3U2TmwA/jZtN9xLH7CGDHeClKZK/ZYELotWfJsqRcthOIGjsdAPuDgEYnkdPhIKKwYBBAGXVQEFAQEHQG+HnNiPZseiBkzYBHwq/nN638o0NPwgYwH70wlKMZhRAwEIB4h4BBgWCgAgFiEEkdD1djAfkk197dzorKrSDhnnEOMFAmJ5HT4CGwwACgkQrKrSDhnnEOPjXgD/euD64cxwqDIqckUaisT3VCst11RcnO5iRHm6meNIwj0BALLmWplyi7beKrOlqKfuZtCLbiAPywGfCNg8LOTt4iMD
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-Date: Tue, 27 Feb 2024 17:14:36 +0800
-X-Priority: 3
-Message-ID: <tencent_5A62BE3B57D34B9C2C5D3DF3@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-References: <20240226080328.334021-1-wangyuli@uniontech.com>
-	<48afa638-9145-40ee-9868-fa82a1fce271@xen0n.name>
-	<48fd3c4d-9b72-4515-9a95-d241857915b4@xen0n.name>
-	<tencent_1407D9AC6F6B4411233FEAD6@qq.com>
-In-Reply-To: <tencent_1407D9AC6F6B4411233FEAD6@qq.com>
-X-QQ-ReplyHash: 1643990783
-X-BIZMAIL-ID: 12681889040870989663
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1])
-	by smtp.qq.com (ESMTP) with SMTP
-	id ; Tue, 27 Feb 2024 17:14:38 +0800 (CST)
-Feedback-ID: t:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5a-3
+MIME-Version: 1.0
 
-VGhhdCdzIHdoeSBJIGRpZG4ndCBoYXZlIHNlbnQgYSBwYXRjaCB0byBNSVBTIGdyb3VwLiAN
-Cg0KV2FuZ1l1bGk=
+On Tue, 2024-02-27 at 15:42 +0800, WANG Xuerui wrote:
+> Sorry. I have checked the manual and it turns out you & Yuli are=20
+> correct: even though the narrower CRC instructions doesn't require=20
+> GRLEN=3D64, they still *aren't* part of LA32 (LoongArch reference manual
+> v1.10, Volume 1, Table 2-1). Counter-intuitive as it is, the original=20
+> patch is correct nevertheless.
 
+But I don't think the table in the spec will 100% reflect the real
+status of the LA32 hardware.  And we should use CPUCFG to detect it
+anyway.
+
+Based on my experience programming some aeronautic device I'd say having
+some hardware CRC support should be useful even in embedded area.
+
+--=20
+Xi Ruoyao <xry111@xry111.site>
+School of Aerospace Science and Technology, Xidian University
