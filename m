@@ -1,232 +1,101 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from 19.mo550.mail-out.ovh.net (19.mo550.mail-out.ovh.net [178.32.97.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB61B133295
-	for <linux-crypto@vger.kernel.org>; Mon, 26 Feb 2024 22:25:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123DD5C82
+	for <linux-crypto@vger.kernel.org>; Tue, 27 Feb 2024 01:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.32.97.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708986306; cv=none; b=BMqOfIYZe1wk9eNUk5vj989JJGaoKHFsk0dGbWy+KQVjMdyDVGDj0sJ2+7HeFRgE5Fg/DmHQuzMTl+t0fWCid6cIQxkFf2j1GGQ+9oNw493pMvqYfDyQQLpsF7j5sHQ3T6yTArwOLPo4xFF+EUmyWpebkg4XgC4HLUc/ELwdMz0=
+	t=1708998005; cv=none; b=do+5t1XGw08LwqjRe8097uiDwRuRumk8bDTzulEHoySJyA3fjGjLRVQoDM5Ii1pPHrhGtc8m0f2HzbZJ26d4mNt9/25PJ1F4wz4s5ufAgrzxbaA84VBST/+LeZkGy1GqnlwfEEYIMlFKevr1i7nzweqHSYRFPu7GtQV8XCy04L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708986306; c=relaxed/simple;
-	bh=LP0ZVgaA1YTfqo65yesfhXlhTo6vABN8oLil7ESND+o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t7VqGAtOT/MEZKPihI3kTpVnII/3qS16iVPONqHHipHdKzITKw/R15tX0XaOeLonExGma6i9RGTb6JtWS0lSbAS8M+G7zz0TOXn9IETtZZp6CbngifrQ7XU+JXuuRUmWBCc2jjHvKGGkJiKE0mXnoEjAa8TvySc3Qv0ngHGMEqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=byhULuj0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="byhULuj0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708986303;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yD9tbFkWs/Hu3mVa1QH2in7ctNLHY9fEwHrXwOBp36s=;
-	b=byhULuj0Ka5DL6lqDlXZmYMZ79V5fcDIy2SPXlIpgu+thliJOk3oEDYvx99kCpuYNlBaZ0
-	sDcHRwIXE54OOrZjeBN9le5UecBd2sD94+6Ct0M7CH7UptzcITvr2se/8zl57Kw3bcwstx
-	6jDKJHiBf+IpwaZfgQYXsczALEXNMIU=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-433-pwMKHGWuO4e5YDm3giSMYw-1; Mon, 26 Feb 2024 17:25:01 -0500
-X-MC-Unique: pwMKHGWuO4e5YDm3giSMYw-1
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-36516bed7c3so21493645ab.0
-        for <linux-crypto@vger.kernel.org>; Mon, 26 Feb 2024 14:25:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708986301; x=1709591101;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yD9tbFkWs/Hu3mVa1QH2in7ctNLHY9fEwHrXwOBp36s=;
-        b=nZ0Jzl9mvtAWx8uEYjY3NAr8ue4Od/Cqf5Lny9Ijxgmkjad4sc9j+6B0H8pHuOrEN+
-         TrHFvHrbCv/iXYrHDovz07U5XNHPGYPf+CUioUQFhd9IC1pUfVFc+KFvmNhiq9xFx4Ex
-         3MvIQgKG/721qWQxrC+0l0E2MZLF/ogsRWoWVxe0jyrMPbbihBy+WAWBRIBHInjyaSbv
-         bu/1QeZJSxcsr1yXewr00WLXI6NqzD2wplAtFusD7n9OgHWii6BYlGV40yKx/4YNt29m
-         orWhBpFyE4KfWTSP5mCvVxWx8BmdTBEATDIIunarfZ47AF11qcY8CIbgLBqT5Bg35ip9
-         40mA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+bInNx3AgwjHh+330+EEAKylK6FkJhfn5vu/gR4n8+9YNXoqmt/ujesopCR8GVMM1HZ34oNFYltpLtVryWhFpWBbkhkhHWhnBoWKE
-X-Gm-Message-State: AOJu0YwNEmsJ14pgcCM35Q8jtatiUrem88FHMBHrhi1KUC0dtQwtTB8i
-	D9N/zrzJdGZlrJPWgEEpydNT8fsqPO67Ke03WojPdJ4DzKMMqi6b9UMKxhERTDolQen0yeJJ3DU
-	lvxOzrp6MwKLnU086xEl+PJhd6vmjVrM55WNVR0rNc3U7aRgSKXv7EKLRlawkgw==
-X-Received: by 2002:a92:c24a:0:b0:365:249c:690 with SMTP id k10-20020a92c24a000000b00365249c0690mr6424535ilo.9.1708986300852;
-        Mon, 26 Feb 2024 14:25:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHSFjfJ3E7pFtjthpRny93fg61UqnyyQlQ/lezUDAjxZNp3tS/G+y3LmblJjXQIDTm332k3Uw==
-X-Received: by 2002:a92:c24a:0:b0:365:249c:690 with SMTP id k10-20020a92c24a000000b00365249c0690mr6424527ilo.9.1708986300555;
-        Mon, 26 Feb 2024 14:25:00 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id q6-20020a056638238600b004747a57b603sm1258086jat.58.2024.02.26.14.24.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 14:25:00 -0800 (PST)
-Date: Mon, 26 Feb 2024 15:24:58 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Xin Zeng <xin.zeng@intel.com>, herbert@gondor.apana.org.au,
- yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
- kevin.tian@intel.com, linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
- qat-linux@intel.com, Yahui Cao <yahui.cao@intel.com>
-Subject: Re: [PATCH v3 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-Message-ID: <20240226152458.2b8a0f83.alex.williamson@redhat.com>
-In-Reply-To: <20240226194952.GO13330@nvidia.com>
-References: <20240221155008.960369-1-xin.zeng@intel.com>
-	<20240221155008.960369-11-xin.zeng@intel.com>
-	<20240226115556.3f494157.alex.williamson@redhat.com>
-	<20240226191220.GM13330@nvidia.com>
-	<20240226124107.4317b3c3.alex.williamson@redhat.com>
-	<20240226194952.GO13330@nvidia.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1708998005; c=relaxed/simple;
+	bh=oP+NUZOFqM2E6ptm+fLs9NHiWljY1OQX7Li7+FuOHyQ=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=KnHPI2CQb4UGYGj+bkfo8vAl4bOQyDTvOYteVlMxrrGX18aNWE1AMiKlu1ieHE/5q/LKcRYCxFVAZQRjWd1Y+qIXp+1SOYxPCY9feoFj5l94f3MHysV7yNPx1oJTb25T919FpKt/P49a8zNCt3uW7YhS2Aogc41AkV/PQXCjx2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=etezian.org; arc=none smtp.client-ip=178.32.97.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etezian.org
+Received: from director2.ghost.mail-out.ovh.net (unknown [10.109.176.96])
+	by mo550.mail-out.ovh.net (Postfix) with ESMTP id 4TkKTD2v4fz1FjR
+	for <linux-crypto@vger.kernel.org>; Tue, 27 Feb 2024 01:21:52 +0000 (UTC)
+Received: from ghost-submission-6684bf9d7b-f4n6p (unknown [10.111.174.252])
+	by director2.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 605D91FD7C;
+	Tue, 27 Feb 2024 01:21:40 +0000 (UTC)
+Received: from etezian.org ([37.59.142.108])
+	by ghost-submission-6684bf9d7b-f4n6p with ESMTPSA
+	id uPD7FCQ53WXtyQAAxDwYeA
+	(envelope-from <andi@etezian.org>); Tue, 27 Feb 2024 01:21:40 +0000
+Authentication-Results:garm.ovh; auth=pass (GARM-108S002fe1109a9-1c88-4d0a-8ee4-2e8d2b473102,
+                    9285090D84508773EC2C25A4099646E261C64314) smtp.auth=andi@etezian.org
+X-OVh-ClientIp:89.217.109.169
+From: Andi Shyti <andi.shyti@kernel.org>
+To: robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, 
+ conor+dt@kernel.org, nicolas.ferre@microchip.com, 
+ alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev, 
+ mturquette@baylibre.com, sboyd@kernel.org, herbert@gondor.apana.org.au, 
+ davem@davemloft.net, tglx@linutronix.de, tudor.ambarus@linaro.org, 
+ miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com, 
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+ linus.walleij@linaro.org, sre@kernel.org, u.kleine-koenig@pengutronix.de, 
+ p.zabel@pengutronix.de, olivia@selenic.com, radu_nicolae.pirea@upb.ro, 
+ richard.genoud@gmail.com, gregkh@linuxfoundation.org, jirislaby@kernel.org, 
+ lgirdwood@gmail.com, broonie@kernel.org, wim@linux-watchdog.org, 
+ linux@roeck-us.net, linux@armlinux.org.uk, andrei.simion@microchip.com, 
+ mihai.sain@microchip.com, andre.przywara@arm.com, neil.armstrong@linaro.org, 
+ tony@atomide.com, durai.manickamkr@microchip.com, geert+renesas@glider.be, 
+ arnd@arndb.de, Jason@zx2c4.com, rdunlap@infradead.org, rientjes@google.com, 
+ vbabka@suse.cz, mripard@kernel.org, codrin.ciubotariu@microchip.com, 
+ eugen.hristev@collabora.com, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ linux-i2c@vger.kernel.org, linux-mtd@lists.infradead.org, 
+ netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
+ linux-pm@vger.kernel.org, linux-pwm@vger.kernel.org, 
+ linux-rtc@vger.kernel.org, linux-spi@vger.kernel.org, 
+ linux-serial@vger.kernel.org, alsa-devel@alsa-project.org, 
+ linux-sound@vger.kernel.org, linux-watchdog@vger.kernel.org, 
+ Varshini Rajendran <varshini.rajendran@microchip.com>
+In-Reply-To: <20240223171342.669133-1-varshini.rajendran@microchip.com>
+References: <20240223171342.669133-1-varshini.rajendran@microchip.com>
+Subject: Re: (subset) [PATCH v4 00/39] Add support for sam9x7 SoC family
+Message-Id: <170899689860.412407.545047377007032928.b4-ty@kernel.org>
+Date: Tue, 27 Feb 2024 02:21:38 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13.0
+X-Ovh-Tracer-Id: 4120793662683875913
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvledrgeefgdeffecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfgjfhfukfffgggtgffosehtjeertdertdejnecuhfhrohhmpeetnhguihcuufhhhihtihcuoegrnhguihdrshhhhihtiheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrhhnpeelkefhieeljeejffdtvddthfffleffueekkefgieelveejjedtudettdeghfdutdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppeduvdejrddtrddtrddupdekledrvddujedruddtledrudeiledpfeejrdehledrudegvddruddtkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomheprghnughisegvthgviihirghnrdhorhhgpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhgpdfovfetjfhoshhtpehmohehhedtpdhmohguvgepshhmthhpohhuth
 
-On Mon, 26 Feb 2024 15:49:52 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+Hi
 
-> On Mon, Feb 26, 2024 at 12:41:07PM -0700, Alex Williamson wrote:
-> > On Mon, 26 Feb 2024 15:12:20 -0400
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Mon, Feb 26, 2024 at 11:55:56AM -0700, Alex Williamson wrote:  
-> > > > This will be the first intel vfio-pci variant driver, I don't think we
-> > > > need an intel sub-directory just yet.
-> > > > 
-> > > > Tangentially, I think an issue we're running into with
-> > > > PCI_DRIVER_OVERRIDE_DEVICE_VFIO is that we require driver_override to
-> > > > bind the device and therefore the id_table becomes little more than a
-> > > > suggestion.  Our QE is already asking, for example, if they should use
-> > > > mlx5-vfio-pci for all mlx5 compatible devices.    
-> > > 
-> > > They don't have to, but it works fine, there is no reason not to.  
-> > 
-> > But there's also no reason to.  None of the metadata exposed by the
-> > driver suggests it should be a general purpose vfio-pci stand-in.  
+On Fri, 23 Feb 2024 22:43:42 +0530, Varshini Rajendran wrote:
+> This patch series adds support for the new SoC family - sam9x7.
+>  - The device tree, configs and drivers are added
+>  - Clock driver for sam9x7 is added
+>  - Support for basic peripherals is added
+>  - Target board SAM9X75 Curiosity is added
 > 
-> I think the intent was to bind it to all the devices in its ID table
-> automatically for VFIO use and it should always be OK to do that. Not
-> doing so is a micro optimization.
-
-Automatic in what sense?  We use PCI_DRIVER_OVERRIDE_DEVICE_VFIO to set
-the id_table entry to override_only, so any binding requires the user
-to specify a driver_override.  Nothing automatically performs that
-driver_override except the recent support in libvirt for "managed"
-devices.
-
-Effectively override_only negates the id_table to little more than a
-suggestion to userspace of how the driver should be used.
-
-> Userspace binding it to other random things is a Bad Thing.
-
-Yes, and GregKH has opinions about who gets to keep the pieces of the
-broken system if a user uses dynamic ids or overrides to bind an
-unsupported driver to a device.
-
-> > > You are worried about someone wrongly loading a mlx5 driver on, say,
-> > > an Intel device?  
-> > 
-> > That's sort of where we're headed if we consider it valid to bind a CX5
-> > to mlx5-vfio-pci just because they have a host driver with a similar
-> > name in common.   
+>  Changes in v4:
+>  --------------
 > 
-> I hope nobody is doing that, everyone should be using a tool that
-> checks that ID table.. If we lack a usable tool for that then it that
-> is the problemm.
+> [...]
 
-These are the sort of questions I'm currently fielding and yes, we
-don't really have any tools to make this automatic outside of the
-recent libvirt support.
+Applied to i2c/i2c-host on
 
-> > It's essentially a free for all.  I worry about test matrices, user
-> > confusion, and being on guard for arbitrary devices at every turn in
-> > variant drivers if our policy is that they should all work
-> > equivalent to a basic vfio-pci-core implementation for anything.  
-> 
-> Today most of the drivers will just NOP themeslves if they can't find
-> a compatible PF driver, the most likely bug in this path would be a
-> NULL ptr deref or something in an untested path, or just total failure
-> to bind.
-> 
-> We could insist that VF drivers are always able to find their PF or
-> binding fails, that would narrow things considerably.
+git://git.kernel.org/pub/scm/linux/kernel/git/andi.shyti/linux.git
 
-I think that conflicts with the guidance we've been giving for things
-like virtio-vfio-pci and nvgrace-gpu-vfio-pci where a device matching
-the id_table should at least get vfio-pci-core level functionality
-because there is no "try the next best driver" protocol defined if
-probing fails.  OTOH, I think it's fair to fail probing of a device
-that does not match the id_table.
+Thank you,
+Andi
 
-Therefore to me, a CX7 VF with matching VID:DID should always bind to
-mlx5-vfio-pci regardless of the PF support for migration because that's
-what the id_table matches and the device has functionality with a
-vfio-pci-core driver.  However I don't see that mlx5-vfio-pci has any
-obligation to bind to a CX5 device.
-
-> > libvirt recently implemented support for managed="yes" with variant
-> > drivers where it will find the best "vfio_pci" driver for a device
-> > using an algorithm like Max suggested, but in practice it's not clear
-> > how useful that will be considering devices likes CX7 require
-> > configuration before binding to the variant driver.  libvirt has no
-> > hooks to specify or perform configuration at that point.  
-> 
-> I don't think this is fully accurate (or at least not what was
-> intended), the VFIO device can be configured any time up until the VM
-> mlx5 driver reaches the device startup.
-> 
-> Is something preventing this? Did we accidentally cache the migratable
-> flag in vfio or something??
-
-I don't think so, I think this was just the policy we had decided
-relative to profiling VFs when they're created rather than providing a
-means to do it though a common vfio variant driver interface[1].
-
-Nothing necessarily prevents libvirt from configuring devices after
-binding to a vfio-pci variant driver, but per the noted thread the
-upstream policy is to have the device configured prior to giving it to
-vfio and any configuration mechanisms are specific to the device and
-variant driver, therefore what more is libvirt to do?
-
-> > The driverctl script also exists and could maybe consider the
-> > "vfio-pci" driver name to be a fungible alias for the best matching
-> > vfio_pci class driver, but I'm not sure if driverctl has a sufficient
-> > following to make a difference.  
-> 
-> I was also thinking about this tool as an alternative instruction to
-> using libvirt.
-> 
-> Maybe this would ecourage more people to use it if it implemented it?
-
-driverctl is a very powerful and very unchecked tool.  It loads the gun
-and points it at the user's foot and taunts them to pull the trigger.
-I suspect use cases beyond vfio are largely theoretical, but it allows
-specifying an arbitrary driver for almost any device.
-
-OTOH, libvirt is more targeted and while it will work automatically for
-a "managed" device specified via domain xml, it's also available as a
-utility through virsh, ex:
-
- # virsh nodedev-detach pci_0000_01_10_0
-
-Which should trigger the code to bind to vfio-pci or the best variant
-driver.
-
-So while there's a place for driverctl and I wouldn't mind driver
-matching being added, I have trouble seeing enterprise distros really
-getting behind it to recommend as best practice without a lot more
-safety checks.
-
-Relative to variant driver probe() re-checking the id_table, I know we
-generally don't try to set policy in the kernel and this sort of
-behavior has been around for a long, long time with new_id, but the
-barrier to entry has been substantially lowered with things like
-driverctl that I'd still entertain the idea.  Thanks,
-
-Alex 
-
-[1]https://lore.kernel.org/all/20231018163333.GZ3952@nvidia.com/
+Patches applied
+===============
+[06/39] dt-bindings: i2c: at91: Add sam9x7 compatible string
+        commit: a856c9e6104f7b4619f09e19ab95903c7888da96
 
