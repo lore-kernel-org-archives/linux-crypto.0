@@ -1,76 +1,101 @@
-Received: from xry111.site (xry111.site [89.208.246.23])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A1C55E7C;
-	Tue, 27 Feb 2024 09:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E1213957E;
+	Tue, 27 Feb 2024 12:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709025748; cv=none; b=epiMreXJd+M3frx4N5RtXmVrgJVAZbr0NXywJE+Ll3S6R2N2PuF+/uoP05sa7F3kiWsQVMAV91JV5EWJys1/mZIk5awJdEpTwo3jL9VCon4Ob12OdNmhvvjRAkEVbdnKw8rql7+XTv7Bhj+nRO0DiNmv73kUkYOp9cKnchiC8+w=
+	t=1709036455; cv=none; b=mwI2klrZAWs0uiW5d90CyPU4tn1Gd3jn/fN4voV8MZaaS3ROFuoBortEyKUw10Y0B2g5HqcGjiogb5mAAvkhc+v6WEkrBv2C75Y+OmP5XpddWv8mc6AkI9COc/dyn9RNrxXK3V7JDRExwMrS7l/eSmFtAa9TZLvoSAvWUnYOjD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709025748; c=relaxed/simple;
-	bh=8n5SeuaXS9ESMxi7WWn6HeQWdF7/6qZ2yjERbOU9mCE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ehpiFvBZFEA6X7Uda4RFLjdFVzF4jAtzKLaiMk7Ubq3BgqnEnf/oleZjGaFA8a6FMCiZDGJP2ubvjD5F+CSIM/GeziMhcmbI4xmMKWknezRc7ur/xyjQRHNkJ3UIs/Ir6FIfiLFCc6prsgLkW8kvQh7WCBYXDkloq2wIG6tEBbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=neWoXe42; arc=none smtp.client-ip=89.208.246.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="neWoXe42"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
-	s=default; t=1709025743;
-	bh=8n5SeuaXS9ESMxi7WWn6HeQWdF7/6qZ2yjERbOU9mCE=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=neWoXe42MrAZUcU7VfQPt2nnRYcujiHnGtA3//A1kg8aaJeHF+JmKkA5AEaYNBZlV
-	 rNdJ8iAxq6ufAlDFNQYqIJ4wcD/sEhYbECjW01fEAH9ValTZOI+lj1Yw0jdRvdSB4V
-	 6NiSt/e+ltjti7/DtGiNxCdrCjhXf0Hg+SQs0eyc=
-Received: from [127.0.0.1] (unknown [IPv6:2001:470:683e::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
-	(Client did not present a certificate)
-	(Authenticated sender: xry111@xry111.site)
-	by xry111.site (Postfix) with ESMTPSA id 6A0E566D60;
-	Tue, 27 Feb 2024 04:22:21 -0500 (EST)
-Message-ID: <b858ec2a84546d7cdb666fd01c44a23714a33332.camel@xry111.site>
-Subject: Re: [PATCH] loongarch/crypto: Clean up useless assignment operations
-From: Xi Ruoyao <xry111@xry111.site>
-To: WANG Xuerui <kernel@xen0n.name>, =?gb2312?Q?=B9=D8=CE=C4=CC=CE?=
-	 <guanwentao@uniontech.com>, =?gb2312?Q?=CD=F5=EA=C5=C1=A6?=
-	 <wangyuli@uniontech.com>, herbert <herbert@gondor.apana.org.au>, davem
-	 <davem@davemloft.net>, chenhuacai <chenhuacai@kernel.org>
-Cc: linux-crypto <linux-crypto@vger.kernel.org>, loongarch
-	 <loongarch@lists.linux.dev>, linux-kernel <linux-kernel@vger.kernel.org>
-Date: Tue, 27 Feb 2024 17:22:18 +0800
-In-Reply-To: <0a7d0a9e-c56e-4ee2-a83b-00164a450abe@xen0n.name>
-References: <20240226080328.334021-1-wangyuli@uniontech.com>
-	 <48afa638-9145-40ee-9868-fa82a1fce271@xen0n.name>
-	 <tencent_29355025499B47007555CE13@qq.com>
-	 <0a7d0a9e-c56e-4ee2-a83b-00164a450abe@xen0n.name>
-Autocrypt: addr=xry111@xry111.site; prefer-encrypt=mutual;
- keydata=mDMEYnkdPhYJKwYBBAHaRw8BAQdAsY+HvJs3EVKpwIu2gN89cQT/pnrbQtlvd6Yfq7egugi0HlhpIFJ1b3lhbyA8eHJ5MTExQHhyeTExMS5zaXRlPoiTBBMWCgA7FiEEkdD1djAfkk197dzorKrSDhnnEOMFAmJ5HT4CGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQrKrSDhnnEOPHFgD8D9vUToTd1MF5bng9uPJq5y3DfpcxDp+LD3joA3U2TmwA/jZtN9xLH7CGDHeClKZK/ZYELotWfJsqRcthOIGjsdAPuDgEYnkdPhIKKwYBBAGXVQEFAQEHQG+HnNiPZseiBkzYBHwq/nN638o0NPwgYwH70wlKMZhRAwEIB4h4BBgWCgAgFiEEkdD1djAfkk197dzorKrSDhnnEOMFAmJ5HT4CGwwACgkQrKrSDhnnEOPjXgD/euD64cxwqDIqckUaisT3VCst11RcnO5iRHm6meNIwj0BALLmWplyi7beKrOlqKfuZtCLbiAPywGfCNg8LOTt4iMD
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 
+	s=arc-20240116; t=1709036455; c=relaxed/simple;
+	bh=iC88RgM5r5SiEYIkA/txize5IVZ7sGnIcuQvwD8EN0s=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mxzZGgch2OekqdyywpffSjdx/5npm/8lsor3LzQ5L7hSl++VFRw9Hp8IB0KAEJfuE6ZLoj+Qq/JPO+T2yPFWiDC8WzqNDsjK3903s7rNCHJyApAhtyF36c4J69BUk7TVnRJ+QtlSgFMfhou9RQJ0EVKfygEzwTsVMD+PShd05zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Tkc1C0j7Lz6K90Z;
+	Tue, 27 Feb 2024 20:17:03 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id B60BF1404F4;
+	Tue, 27 Feb 2024 20:20:47 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 27 Feb
+ 2024 12:20:47 +0000
+Date: Tue, 27 Feb 2024 12:20:46 +0000
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Martin Kaiser <martin@kaiser.cx>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] hwrng: hisi - use dev_err_probe
+Message-ID: <20240227122046.00006c97@Huawei.com>
+In-Reply-To: <20240226185700.39411-1-martin@kaiser.cx>
+References: <20240226185700.39411-1-martin@kaiser.cx>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Tue, 2024-02-27 at 15:42 +0800, WANG Xuerui wrote:
-> Sorry. I have checked the manual and it turns out you & Yuli are=20
-> correct: even though the narrower CRC instructions doesn't require=20
-> GRLEN=3D64, they still *aren't* part of LA32 (LoongArch reference manual
-> v1.10, Volume 1, Table 2-1). Counter-intuitive as it is, the original=20
-> patch is correct nevertheless.
+On Mon, 26 Feb 2024 19:57:00 +0100
+Martin Kaiser <martin@kaiser.cx> wrote:
 
-But I don't think the table in the spec will 100% reflect the real
-status of the LA32 hardware.  And we should use CPUCFG to detect it
-anyway.
+> Replace dev_err + return with dev_err_probe.
+> 
+> Signed-off-by: Martin Kaiser <martin@kaiser.cx>
 
-Based on my experience programming some aeronautic device I'd say having
-some hardware CRC support should be useful even in embedded area.
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
---=20
-Xi Ruoyao <xry111@xry111.site>
-School of Aerospace Science and Technology, Xidian University
+Maybe worth wrapping the line in this subsystem still strives for
+<= 80 chars
+
+
+> ---
+>  drivers/char/hw_random/hisi-rng.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/char/hw_random/hisi-rng.c b/drivers/char/hw_random/hisi-rng.c
+> index b6f27566e0ba..4e501d5c121f 100644
+> --- a/drivers/char/hw_random/hisi-rng.c
+> +++ b/drivers/char/hw_random/hisi-rng.c
+> @@ -89,10 +89,8 @@ static int hisi_rng_probe(struct platform_device *pdev)
+>  	rng->rng.read = hisi_rng_read;
+>  
+>  	ret = devm_hwrng_register(&pdev->dev, &rng->rng);
+> -	if (ret) {
+> -		dev_err(&pdev->dev, "failed to register hwrng\n");
+> -		return ret;
+> -	}
+> +	if (ret)
+> +		return dev_err_probe(&pdev->dev, ret, "failed to register hwrng\n");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+>  
+>  	return 0;
+>  }
+
