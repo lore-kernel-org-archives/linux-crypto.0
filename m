@@ -1,77 +1,82 @@
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2479922F00;
-	Wed, 28 Feb 2024 06:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071CC25601;
+	Wed, 28 Feb 2024 08:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709102926; cv=none; b=A3ILUZuLluTCFKUhkP/BqLyV98yPg75Laxs6toFqu42tvST6+B+FmuK/3KTt9GOPI23kMzMwygRqwKrUWcZn2z9n8n63HSroeKKe9Xm5xkzsvGx9NmTCXlaw1lGM5dpnw4nm3hJZvq01nU72TbHpkP4N5Sbw7Pvq0LabuxdY97E=
+	t=1709107683; cv=none; b=bf/8MNTiEupwEQaHpDRuNL4yBs6GWdXhNg/FYgSSSpplN4K1FzhSvnG6rPP1VDvxg8no2mCfMHqrugt1nBunmX7cf/5H9944xRSYmEg9ASqT+HXb976yml/vK1laJgegJPKUBtgL/qPbhRUH7H6a5xKNcRvXJW6DE60v+YOt67A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709102926; c=relaxed/simple;
-	bh=J0F7oEgNQ9OifyFp0og5GKcg7g1hKuax/CW1CKt2xnM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=uvlx+dbZ3fCb1VuBgwh1F8rxDDTS2X6At+93Vy8Z6k3IXHR/FNxMXX0gAI2UY5PrWYmru2jdpHmBPk2vyydtM6qL6MuwY4RRFn39YsQgg7ZvafnKvBW4VEIWGyyNzp0ETVQrtKF0mpAXzfe28LC9y1zhlPJtBSSoGHf3+hgM648=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Tl4g156swzqjhm;
-	Wed, 28 Feb 2024 14:47:57 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id D2CDE1A016B;
-	Wed, 28 Feb 2024 14:48:34 +0800 (CST)
-Received: from [10.67.121.249] (10.67.121.249) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 28 Feb 2024 14:48:34 +0800
-Message-ID: <7163b400-1e35-49ea-9a12-9dae27428431@huawei.com>
-Date: Wed, 28 Feb 2024 14:48:34 +0800
+	s=arc-20240116; t=1709107683; c=relaxed/simple;
+	bh=gs3X6kzy02az3MYYcXdILjOE/NfEe2sHH8OPDWZSq0U=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VPuHJbKFWZ5KJtxmr7NN1IEXa8Qo9BfKFaAPaZTMUMhjSHDPX4iO3Bp9RhXpNfefiBNdycUni1NYfp0X0H6JGdrTOEajjOVL4yAMRujJDuMvUDn7WzvCf0ktGp9y0NrW/sA9V/jUV5uzD1pYgthNatN7IO4JEc06gIIvSJcYevA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rfEye-001ARI-GX; Wed, 28 Feb 2024 16:07:45 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 Feb 2024 16:07:59 +0800
+Date: Wed, 28 Feb 2024 16:07:59 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.8
+Message-ID: <Zd7p36CRWPsYhA2G@gondor.apana.org.au>
+References: <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+ <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
+ <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
+ <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+ <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
+ <ZbstBewmaIfrFocE@gondor.apana.org.au>
+ <ZcRYwZHASH4Cv5Bn@gondor.apana.org.au>
+ <ZdW+GCkO4s3MSeLX@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] crypto: hisilicon/zip - fix the missing
- CRYPTO_ALG_ASYNC in cra_flags
-To: Barry Song <21cnbao@gmail.com>, <davem@davemloft.net>,
-	<herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, Barry Song <v-songbaohua@oppo.com>, Zhou
- Wang <wangzhou1@hisilicon.com>
-References: <20240220044222.197614-1-v-songbaohua@oppo.com>
-From: Yang Shen <shenyang39@huawei.com>
-In-Reply-To: <20240220044222.197614-1-v-songbaohua@oppo.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZdW+GCkO4s3MSeLX@gondor.apana.org.au>
 
+Hi Linus:
 
+The following changes since commit c0ec2a712daf133d9996a8a1b7ee2d4996080363:
 
-在 2024/2/20 12:42, Barry Song 写道:
-> Add the missing CRYPTO_ALG_ASYNC flag since hisilizon zip driver
-> works asynchronously.
->
-> Cc: Yang Shen <shenyang39@huawei.com>
-> Cc: Zhou Wang <wangzhou1@hisilicon.com>
-> Signed-off-by: Barry Song <v-songbaohua@oppo.com>
-> ---
->   drivers/crypto/hisilicon/zip/zip_crypto.c | 1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-> index c650c741a18d..94e2d66b04b6 100644
-> --- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-> +++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-> @@ -591,6 +591,7 @@ static struct acomp_alg hisi_zip_acomp_deflate = {
->   	.base			= {
->   		.cra_name		= "deflate",
->   		.cra_driver_name	= "hisi-deflate-acomp",
-> +		.cra_flags		= CRYPTO_ALG_ASYNC,
->   		.cra_module		= THIS_MODULE,
->   		.cra_priority		= HZIP_ALG_PRIORITY,
->   		.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
-Thx！
+  crypto: virtio/akcipher - Fix stack overflow on memcpy (2024-02-09 12:55:53 +0800)
 
-Acked-by: Yang Shen <shenyang39@huawei.com>
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.8-p5 
+
+for you to fetch changes up to 1c0cf6d19690141002889d72622b90fc01562ce4:
+
+  crypto: arm64/neonbs - fix out-of-bounds access on short input (2024-02-24 08:37:24 +0800)
+
+----------------------------------------------------------------
+This push fixes a regression in lskcipher and an out-of-bound
+access in arm64/neonbs.
+----------------------------------------------------------------
+
+Ard Biesheuvel (1):
+      crypto: arm64/neonbs - fix out-of-bounds access on short input
+
+Herbert Xu (1):
+      crypto: lskcipher - Copy IV in lskcipher glue code always
+
+ arch/arm64/crypto/aes-neonbs-glue.c | 11 +++++++++++
+ crypto/lskcipher.c                  |  6 ++----
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
