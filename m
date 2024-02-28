@@ -1,72 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7B215DBA1;
-	Wed, 28 Feb 2024 17:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A4671EB9
+	for <linux-crypto@vger.kernel.org>; Wed, 28 Feb 2024 19:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709142517; cv=none; b=GcMHrxdMHtmBUTFLzGpamca5SNTTKCWwF816G76w+OvfJoJGzGRltQgY2TP/QqD23gP6iIHfmmG870Mo5DWYH5/JSKdNlnFmWS4BfHn52/MvNyMugnqMpZyA3NlpD9SWBVp9pmntUOo7sbUl220WB/wFbokpCo1u0ITxadd+3C0=
+	t=1709147239; cv=none; b=e5HFWJrNGFvslpwtO6wj/Y/g+OlOrbIJPbhnOijOYf2ViFjnT1ipJTW+vRya1h8+oBVIOKui20ci8S+6nq/7ErKQYADRcH9u/1svLkgb/5gakLjnAo4/8mQ/X4T2cDeSt3tJ9oNruWqNA9pACuOEPgGvwyOedKdqLxdcpscp6uY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709142517; c=relaxed/simple;
-	bh=2Oje7CGM1hgPJmNAI7zzuUGkldEK2oywfpDOQdcjuMc=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Ze52sM71ysSgKXa6jPOz0uL4ny0lsP1LKtoR1CjPWmn/Aqj0PBsQn9ZDd7ZHWy9IPwf60tdcObxbxACebNSIGKVaLV/TH4N/2W0SZLhCKboETeu0baIca2r9i+jNDSOyT50zqrJZwscKAraXcssZtggPI+7v6WHD8gL13xxm+Ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bsRHcIGc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709147239; c=relaxed/simple;
+	bh=Qz2Vdj2rBC2mJZbNt9ILBRIAFfLJFVWy5MELjmgC5jo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VrqcO///ZcOQXWJoNVq68q/L4bNzvjGEXFacBTPH3e1jF+9tC6jb0CRuigu3IZv2sprJtKw+1IFCIw48KXQYZmK1xfViM3PExZ6yGjoGZZTILYYosC8rmGvA4pPKhCyilfTaNtM+wrDRY7Gs8AZ6oQHlWQ8y0T4LfdwBeKOgfos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b6IR6NnT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bsRHcIGc"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BA4AC433C7;
-	Wed, 28 Feb 2024 17:48:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709142517;
-	bh=2Oje7CGM1hgPJmNAI7zzuUGkldEK2oywfpDOQdcjuMc=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=bsRHcIGciK+/R5/6GLKIQ37FWlUbdinv/4glBtVoHynJZdDlH59gbMafb+v4ZMxNg
-	 bNg/QQqTC8yJCSEmauTezsyrZEDlY35KNWT7+9M3DyD+0nfSrsxyWkDe27e2/3Qvi+
-	 oXdgpPoIgaj4dYhLjedj3vjKyAzzbMSxX3oMhPi3wSfS1ogZ4tc7yQmRpnKTBlxnPY
-	 SfJyfy78WshGeLn0j5/r8hWwwufj32Fph4bB+ULFMp9TWlubDkh/gP64+NsXcQawXc
-	 ih5xgajgP6pu36uxifH/EtIlGXyiPl438DXFjONSinru4BQUgHzr4QlOrF44716oMS
-	 +MylQBsS/l+rA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 766A3C395F1;
-	Wed, 28 Feb 2024 17:48:37 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.8
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <Zd7p36CRWPsYhA2G@gondor.apana.org.au>
-References: <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
- <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
- <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
- <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
- <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
- <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
- <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
- <ZbstBewmaIfrFocE@gondor.apana.org.au>
- <ZcRYwZHASH4Cv5Bn@gondor.apana.org.au>
- <ZdW+GCkO4s3MSeLX@gondor.apana.org.au> <Zd7p36CRWPsYhA2G@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <Zd7p36CRWPsYhA2G@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.8-p5
-X-PR-Tracked-Commit-Id: 1c0cf6d19690141002889d72622b90fc01562ce4
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e326df53af0021f48a481ce9d489efda636c2dc6
-Message-Id: <170914251746.18601.9535622620660987702.pr-tracker-bot@kernel.org>
-Date: Wed, 28 Feb 2024 17:48:37 +0000
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b6IR6NnT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709147236;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rYV4SrxcohGt3HtzPUZ+rdkqbt8EWPpbUaoKo3V+foI=;
+	b=b6IR6NnTAiiJfACCD7pQhVZY8mnAu67FqItpzgL0uGBR14TFGw69q2YKuKjzWWLiGPSCBZ
+	+9f9UNgNVJLtD9yMljjuQg3EShhbGK3d8gwB9HbxFCMEljoGFj3KPf8YzF6IaLIT1jJfH6
+	q/kahHO3zaVnx9VsdBdyGEKqMERRb9k=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-594-mzeSPoI_PZ6055kU9_9R1g-1; Wed, 28 Feb 2024 14:07:11 -0500
+X-MC-Unique: mzeSPoI_PZ6055kU9_9R1g-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c7e21711d0so1530839f.3
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Feb 2024 11:07:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709147230; x=1709752030;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rYV4SrxcohGt3HtzPUZ+rdkqbt8EWPpbUaoKo3V+foI=;
+        b=ssVpQPD2TVuz2uYN+QutrWXFq74EvqoqXPAxBtw+w6Gf8J6ZWZb8yc+CZzGscXmVJD
+         5K4SqW+sXsjpfK6t0JRIfqilFH1rPo6VNp+wiPs0i4QkrI4lUreOjgFmiVHLc56W0VuD
+         ZZJWwJGGe7rrgRywl3Z/eIe5bYO2lj7cUYGIlfF9JzByZ9P31J6VMDd6V5l+XW2O+Mgp
+         NglZCBzl/JkFYE1236y0qNZgi13LMwXl08NzORjIB+bNmKVDnMdV1JhdJaDI8YyTJTB+
+         5KRMwEXkHoV3QDmnvps83/DQhcL26pfX7dzISHUStWbhvWPGR6mRcjDsC8ythitGMm0S
+         jSoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUb7WP5XLHpn/6COcnM1/FhUC+Kv5On7UqExPyuMx5lp7gmNHRRsy0X5Je/+WT2Fm6jeM8SNKjRYJFqcgVCuJn5O10KehOTU23Bl3Uq
+X-Gm-Message-State: AOJu0YwXwHxBfucabqtqCw5gEjgu0YOFrODjLtk+E6PBz4bAO0DNX/KK
+	L4lcaN0fG7J3WUX30H8PF8fAw56Y6SXi7SP440lPgPh+FwcW3VmHCue7ShdukumsrctZyQaznH3
+	IYsIyAzpT5KcpvjvgcK/7xbetNWPZxNPNjqfOqC7E48hp2w8BIj5N5iQjzItCKA==
+X-Received: by 2002:a5e:c249:0:b0:7c7:8fda:e836 with SMTP id w9-20020a5ec249000000b007c78fdae836mr120305iop.0.1709147230206;
+        Wed, 28 Feb 2024 11:07:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFmyZUluB62eCjXZWTg6QnIXee6qM5qrhHOGBlbNEDBmI1cB3oVfXg/I91wseTQnvRrL5Hn8g==
+X-Received: by 2002:a5e:c249:0:b0:7c7:8fda:e836 with SMTP id w9-20020a5ec249000000b007c78fdae836mr120281iop.0.1709147229895;
+        Wed, 28 Feb 2024 11:07:09 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id eh3-20020a056638298300b0047466fd3b1dsm2360704jab.22.2024.02.28.11.07.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 11:07:09 -0800 (PST)
+Date: Wed, 28 Feb 2024 12:07:06 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Xin Zeng <xin.zeng@intel.com>, herbert@gondor.apana.org.au,
+ yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+ kevin.tian@intel.com, linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+ qat-linux@intel.com, Yahui Cao <yahui.cao@intel.com>
+Subject: Re: [PATCH v3 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Message-ID: <20240228120706.715bc385.alex.williamson@redhat.com>
+In-Reply-To: <20240226152458.2b8a0f83.alex.williamson@redhat.com>
+References: <20240221155008.960369-1-xin.zeng@intel.com>
+	<20240221155008.960369-11-xin.zeng@intel.com>
+	<20240226115556.3f494157.alex.williamson@redhat.com>
+	<20240226191220.GM13330@nvidia.com>
+	<20240226124107.4317b3c3.alex.williamson@redhat.com>
+	<20240226194952.GO13330@nvidia.com>
+	<20240226152458.2b8a0f83.alex.williamson@redhat.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Wed, 28 Feb 2024 16:07:59 +0800:
+On Mon, 26 Feb 2024 15:24:58 -0700
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.8-p5
+> On Mon, 26 Feb 2024 15:49:52 -0400
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> > On Mon, Feb 26, 2024 at 12:41:07PM -0700, Alex Williamson wrote:  
+> > > On Mon, 26 Feb 2024 15:12:20 -0400
+> > > libvirt recently implemented support for managed="yes" with variant
+> > > drivers where it will find the best "vfio_pci" driver for a device
+> > > using an algorithm like Max suggested, but in practice it's not clear
+> > > how useful that will be considering devices likes CX7 require
+> > > configuration before binding to the variant driver.  libvirt has no
+> > > hooks to specify or perform configuration at that point.    
+> > 
+> > I don't think this is fully accurate (or at least not what was
+> > intended), the VFIO device can be configured any time up until the VM
+> > mlx5 driver reaches the device startup.
+> > 
+> > Is something preventing this? Did we accidentally cache the migratable
+> > flag in vfio or something??  
+> 
+> I don't think so, I think this was just the policy we had decided
+> relative to profiling VFs when they're created rather than providing a
+> means to do it though a common vfio variant driver interface[1].
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e326df53af0021f48a481ce9d489efda636c2dc6
+Turns out that yes, migration support needs to be established at probe
+time.  vfio_pci_core_register_device() expects migration_flags,
+mig_ops, and log_ops to all be established by this point, which for
+mlx5-vfio-pci occurs when the .init function calls
+mlx5vf_cmd_set_migratable().
 
-Thank you!
+So the VF does indeed need to be "profiled" to enabled migration prior
+to binding to the mlx5-vfio-pci driver in order to report support.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+That also makes me wonder what happens if migration support is disabled
+via devlink after binding the VF to mlx5-vfio-pci.  Arguably this could
+be considered user error, but what's the failure mode and support
+implication?  Thanks,
+
+Alex
+
