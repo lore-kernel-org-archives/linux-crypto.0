@@ -1,149 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681727A728;
-	Wed, 28 Feb 2024 11:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B816CDBC;
+	Wed, 28 Feb 2024 13:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709119160; cv=none; b=Zxn8fMkRMiz1ztB81gcZBLJu7D5PO0vup9UtxP+gYDja5jxY6uroKVR1UpEW6o28ymPvWIvtgZIxUsD5tR9XDVrD2UljXGGuKW582vlnVem4RFFf841ZCyRc8TWXylA4a2dhOkP3QvAObaFkfUogt877cadtTctjg0QTg4uLUIA=
+	t=1709127432; cv=none; b=Gn84rqy6ZNDLYnS44YkBUUK56FoLc/foVCvZIVDVLk4jHxSc3fzOtTKZVSMEP/296JQn5SiJHeMZaJnChbw8fhpFvFCbs0KrRF+dJLu2bBhVgi8Fhqke1gli/Dc2jPHt9DUDvc3LRvM93cWIY58d6+xQVB2VFxbgdj04S2A/ko8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709119160; c=relaxed/simple;
-	bh=k9YHtI7jHipmokPKQWwD0PwKV0bONau5eJ2uz027Y+8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I8rmmgjiInA/xCjMvm25XbUDt8M5zXtQ55raSqfVpjMvHJ9mzIv/aCgVLOze81noU3p/FCnpwy60/n23CKav+afa7tseqmg+d/S9+BnVeGN0iOJA9uFh9jBEtfqVb/IPatB6XdWrGeIg6yYTU6pRMBs8PyNzTrFR0gGEDp84w2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IhLoNFaK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709127432; c=relaxed/simple;
+	bh=ddrGq1PYFEZRFjXjELgtDdkhdZ0Hcl1sDKmCR90e5sU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=OhtRn9l4w9NrGzM/LvmOiDTItynLCa2/qZV6CA6iL/cuI4GKwzT1v7Gdod0Ny0cQnj9aG67AXBSEuzSI1hnMzV0NVBdGAto0P8TG0n5wS6pJDwsqUaljbpCmtIZiX8CoDYKunoarT8JGKBADzgBewVLYHnrTN8VDVba5GBMPE9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=vVU5JbFI; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IhLoNFaK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC640C433C7;
-	Wed, 28 Feb 2024 11:19:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709119160;
-	bh=k9YHtI7jHipmokPKQWwD0PwKV0bONau5eJ2uz027Y+8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IhLoNFaKAQdVot2WS3QbJN46t2xwvd5iAZeyv1fJxI0L0G0bNHvBAiBibtz4Tebbt
-	 NZ4+7MJdH4KmZ3Eu134/XgIKniJfaivXns3Tl+/tOtwggGPIya21SKzB2zRqyjGcHi
-	 kHi+UK/Nu+1lhk/cGCWh9+7kHoB2tPmOsKYvV2gf/J+MkItLm5I6dCvdNZuuGA9Nzg
-	 kxhDinCnPoc1AkKOQqICR9jq05wRfN1wKN6gcwjmpmuhhX6Yy6z9i45IQ9OfFA1cyd
-	 v1bqleQhztYAFc86kbu5VsASnA2cxDmhkZwVHyF++Oc2RXrMw2efRTVfuVQvFTabFo
-	 JfuKnV9PZE+KA==
-Date: Wed, 28 Feb 2024 11:19:15 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Jia Jie Ho <jiajie.ho@starfivetech.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>,
-	Vinod Koul <vkoul@kernel.org>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dmaengine@vger.kernel.org
-Subject: Re: [PATCH v3 1/6] dt-bindings: crypto: starfive: Add jh8100 support
-Message-ID: <20240228-margarita-glory-73db09c5fc91@spud>
-References: <20240227163758.198133-1-jiajie.ho@starfivetech.com>
- <20240227163758.198133-2-jiajie.ho@starfivetech.com>
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="vVU5JbFI"
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 3D22D1200C3;
+	Wed, 28 Feb 2024 16:37:03 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 3D22D1200C3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1709127423;
+	bh=lJqOIM7OsyE8lty1WXQViweyrfNmBhB/Fjd3i8JuK+Q=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version:From;
+	b=vVU5JbFIqdv/2Ml9TpFG8JCqWbaAoZ5OH2ikRwkgAVzDwyGFulSNjo+LUwOxt66PL
+	 SFsYgdVb/xYyDX826cAXBPEKCHxmXHkAz9fEJx0ok5dwMJbry+Pyi/GmR4s7Zexi1t
+	 khVPSL1jcxFTwA3pQDfASaFVm2UoyfAjVT3mGnOylPsC+6EaJzoWPEvU1SxlAKVW8s
+	 Vhzsq+j58GTFM6HsC/H4NzeqxjWj1ZOsFgnPs2TaoNIYFdcLVQ9SblsSW6N/brX8T0
+	 zPGxG8pFAfdjoOYRfqkaWRhAFNb7oOJ3ocmApA64mXxhSleTdQQVz0F7amSc9Ev/9z
+	 X5GmhrVWe7ocQ==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Wed, 28 Feb 2024 16:37:03 +0300 (MSK)
+Received: from p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) by
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 28 Feb 2024 16:37:02 +0300
+Received: from p-i-exch-sc-m01.sberdevices.ru ([fe80::6d41:e8f1:b95e:ba1]) by
+ p-i-exch-sc-m01.sberdevices.ru ([fe80::6d41:e8f1:b95e:ba1%7]) with mapi id
+ 15.02.1118.040; Wed, 28 Feb 2024 16:37:02 +0300
+From: Alexey Romanov <avromanov@salutedevices.com>
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+CC: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "khilman@baylibre.com"
+	<khilman@baylibre.com>, "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
+	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
+Subject: Re: [PATCH v4 00/20] Support more Amlogic SoC families in crypto
+ driver
+Thread-Topic: [PATCH v4 00/20] Support more Amlogic SoC families in crypto
+ driver
+Thread-Index: AQHaXbqRFptCyAwKyUyy1Cn5x5FmZLEHrLEAgANeQYCABgkagIAOlJgA
+Date: Wed, 28 Feb 2024 13:37:02 +0000
+Message-ID: <20240228133656.24bic6djmjvkill7@cab-wsm-0029881>
+References: <20240212135108.549755-1-avromanov@salutedevices.com>
+ <ZcsYaPIUrBSg8iXu@Red>
+ <20240215104719.njq6ie2niisntcnv@cab-wsm-0029881.sigma.sbrf.ru>
+ <ZdL713ae1swwTU_B@Red>
+In-Reply-To: <ZdL713ae1swwTU_B@Red>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <E91E88FC744FBA45BBD1A9B1BC1C41E0@sberdevices.ru>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="6rTo2fkA4bSImk4p"
-Content-Disposition: inline
-In-Reply-To: <20240227163758.198133-2-jiajie.ho@starfivetech.com>
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 183823 [Feb 28 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.3
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_uf_ne_domains}, {Track_E25351}, {Tracking_from_domain_doesnt_match_to}, gist.github.com:7.1.1;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/02/28 10:18:00
+X-KSMG-LinksScanning: Clean, bases: 2024/02/28 12:36:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/02/28 11:31:00 #23869932
+X-KSMG-AntiVirus-Status: Clean, skipped
 
+Hello,
 
---6rTo2fkA4bSImk4p
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Feb 28, 2024 at 12:37:53AM +0800, Jia Jie Ho wrote:
-> Add compatible string and additional interrupt for StarFive JH8100
-> crypto engine.
+On Mon, Feb 19, 2024 at 07:57:27AM +0100, Corentin Labbe wrote:
+> Le Thu, Feb 15, 2024 at 10:47:24AM +0000, Alexey Romanov a 'ecrit :
+> > On Tue, Feb 13, 2024 at 08:21:12AM +0100, Corentin Labbe wrote:
+> > > Le Mon, Feb 12, 2024 at 04:50:48PM +0300, Alexey Romanov a 'ecrit :
+> > > > Hello!
+> > > >=20
+> > > > This patchset expand the funcionality of the Amlogic
+> > > > crypto driver by adding support for more SoC families:
+> > > > AXG, G12A, G12B, SM1, A1, S4.
+> > > >=20
+> > > > Also specify and enable crypto node in device tree
+> > > > for reference Amlogic devices.
+> > > >=20
+> > > > Tested on AXG, G12A/B, SM1, A1 and S4 devices via
+> > > > custom tests [1] and tcrypt module.
+> > > >=20
+> > > > ---
+> > > >=20
+> > >=20
+> > > added patchs up to  "drivers: crypto: meson: process more than MAXDES=
+CS descriptors"
+> >=20
+> > Including this patch or not?
 >=20
-> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+> The crash start with "drivers: crypto: meson: move algs definition and ci=
+pher API to cipher.c"
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Unfortunately I was unable to reproduce this. I use Khadas Vim1 board
+and my custom tests (https://gist.github.com/mRrvz/3fb8943a7487ab7b943ec140=
+706995e7).
+Tried both build as module and built-in.
 
-Cheers,
-Conor.
+Can you, please, give more information? Maybe your test cases?
 
-> ---
->  .../crypto/starfive,jh7110-crypto.yaml        | 30 +++++++++++++++++--
->  1 file changed, 28 insertions(+), 2 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/crypto/starfive,jh7110-cry=
-pto.yaml b/Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.=
-yaml
-> index 71a2876bd6e4..d44d77908966 100644
-> --- a/Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml
-> @@ -12,7 +12,9 @@ maintainers:
-> =20
->  properties:
->    compatible:
-> -    const: starfive,jh7110-crypto
-> +    enum:
-> +      - starfive,jh8100-crypto
-> +      - starfive,jh7110-crypto
-> =20
->    reg:
->      maxItems: 1
-> @@ -28,7 +30,10 @@ properties:
->        - const: ahb
-> =20
->    interrupts:
-> -    maxItems: 1
-> +    minItems: 1
-> +    items:
-> +      - description: SHA2 module irq
-> +      - description: SM3 module irq
-> =20
->    resets:
->      maxItems: 1
-> @@ -54,6 +59,27 @@ required:
-> =20
->  additionalProperties: false
-> =20
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          const: starfive,jh7110-crypto
-> +
-> +    then:
-> +      properties:
-> +        interrupts:
-> +          maxItems: 1
-> +
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          const: starfive,jh8100-crypto
-> +
-> +    then:
-> +      properties:
-> +        interrupts:
-> +          maxItems: 2
-> +
->  examples:
->    - |
->      crypto: crypto@16000000 {
-> --=20
-> 2.34.1
->=20
-
---6rTo2fkA4bSImk4p
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZd8WswAKCRB4tDGHoIJi
-0scyAQCyzlNaU4MW+ttTttfD9zVood2a3GWnh9luZay5NWSbwAD/YoGkkKgWc9jh
-Gk/AToNTyc/NecNiJZkRXrDV7ig7FwU=
-=byAE
------END PGP SIGNATURE-----
-
---6rTo2fkA4bSImk4p--
+--=20
+Thank you,
+Alexey=
