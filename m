@@ -1,72 +1,77 @@
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88921D6A8;
-	Tue, 27 Feb 2024 20:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2479922F00;
+	Wed, 28 Feb 2024 06:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709065428; cv=none; b=kldx9SWlqytSmz/CBmjvAorBti+NoRTZUDMwRCLDkerMOCJzTz+Zjqt+Vh2yUFc3RJyXSeqpXT4hAft5IZFpfHW7d4ucAx0eNF3vxROsQs5o8+T9uCJXxnxVr8LK8SVHTd7LHofVlpzY0NSdojzpLNBd6F98RLQhNBpDvNA7m5M=
+	t=1709102926; cv=none; b=A3ILUZuLluTCFKUhkP/BqLyV98yPg75Laxs6toFqu42tvST6+B+FmuK/3KTt9GOPI23kMzMwygRqwKrUWcZn2z9n8n63HSroeKKe9Xm5xkzsvGx9NmTCXlaw1lGM5dpnw4nm3hJZvq01nU72TbHpkP4N5Sbw7Pvq0LabuxdY97E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709065428; c=relaxed/simple;
-	bh=irdNq1Mm9AfgWRQih82uRLxz7KfkC+JUxWNIWOC5zx0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FRTbdigH8ZNxuRSEbk1VX1EXKokAGnAP+fK4Bg01RBeGkrxsAVtnW6ck1pLfD1Vqd/JoGvr9lG5RrFmVjNjCntghktrewUmCtCJ0EzDyDUCY8VQMZbx/4wCE6lRpEYp3VF9nFs3BSzGWsU+JcQ9N5DVlSGtdooTTFhTZxNE3QUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 82110300002C4;
-	Tue, 27 Feb 2024 21:15:52 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 756A15D8259; Tue, 27 Feb 2024 21:15:52 +0100 (CET)
-Date: Tue, 27 Feb 2024 21:15:52 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br
-Subject: Re: [PATCH v3 06/10] crypte: ecc - Implement ecc_curve_get_nbits to
- get number of bits
-Message-ID: <20240227201552.GA32765@wunner.de>
-References: <20240223204149.4055630-1-stefanb@linux.ibm.com>
- <20240223204149.4055630-7-stefanb@linux.ibm.com>
+	s=arc-20240116; t=1709102926; c=relaxed/simple;
+	bh=J0F7oEgNQ9OifyFp0og5GKcg7g1hKuax/CW1CKt2xnM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=uvlx+dbZ3fCb1VuBgwh1F8rxDDTS2X6At+93Vy8Z6k3IXHR/FNxMXX0gAI2UY5PrWYmru2jdpHmBPk2vyydtM6qL6MuwY4RRFn39YsQgg7ZvafnKvBW4VEIWGyyNzp0ETVQrtKF0mpAXzfe28LC9y1zhlPJtBSSoGHf3+hgM648=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Tl4g156swzqjhm;
+	Wed, 28 Feb 2024 14:47:57 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id D2CDE1A016B;
+	Wed, 28 Feb 2024 14:48:34 +0800 (CST)
+Received: from [10.67.121.249] (10.67.121.249) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 28 Feb 2024 14:48:34 +0800
+Message-ID: <7163b400-1e35-49ea-9a12-9dae27428431@huawei.com>
+Date: Wed, 28 Feb 2024 14:48:34 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240223204149.4055630-7-stefanb@linux.ibm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] crypto: hisilicon/zip - fix the missing
+ CRYPTO_ALG_ASYNC in cra_flags
+To: Barry Song <21cnbao@gmail.com>, <davem@davemloft.net>,
+	<herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, Barry Song <v-songbaohua@oppo.com>, Zhou
+ Wang <wangzhou1@hisilicon.com>
+References: <20240220044222.197614-1-v-songbaohua@oppo.com>
+From: Yang Shen <shenyang39@huawei.com>
+In-Reply-To: <20240220044222.197614-1-v-songbaohua@oppo.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-On Fri, Feb 23, 2024 at 03:41:45PM -0500, Stefan Berger wrote:
-> --- a/include/crypto/internal/ecc.h
-> +++ b/include/crypto/internal/ecc.h
-> @@ -75,6 +75,17 @@ static inline void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
->  	ecc_swap_digits(tmp, out, ndigits);
->  }
->  
-> +/**
-> + * ecc_curve_get_nbits() - Get the number of bits of the curve
-> + * @curve:    The curve
-> + */
-> +static inline unsigned int ecc_curve_get_nbits(const struct ecc_curve *curve)
-> +{
-> +	if (curve->nbits)
-> +		return curve->nbits;
-> +	return curve->g.ndigits << ECC_DIGITS_TO_BYTES_SHIFT * 8;
-> +}
 
-Since you're amending struct ecc_curve with an extra nbits value anyway,
-why not statically fill it in for all curves, instead of adding this
-extra complexity in the code?
 
-Thanks,
+在 2024/2/20 12:42, Barry Song 写道:
+> Add the missing CRYPTO_ALG_ASYNC flag since hisilizon zip driver
+> works asynchronously.
+>
+> Cc: Yang Shen <shenyang39@huawei.com>
+> Cc: Zhou Wang <wangzhou1@hisilicon.com>
+> Signed-off-by: Barry Song <v-songbaohua@oppo.com>
+> ---
+>   drivers/crypto/hisilicon/zip/zip_crypto.c | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+> index c650c741a18d..94e2d66b04b6 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_crypto.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+> @@ -591,6 +591,7 @@ static struct acomp_alg hisi_zip_acomp_deflate = {
+>   	.base			= {
+>   		.cra_name		= "deflate",
+>   		.cra_driver_name	= "hisi-deflate-acomp",
+> +		.cra_flags		= CRYPTO_ALG_ASYNC,
+>   		.cra_module		= THIS_MODULE,
+>   		.cra_priority		= HZIP_ALG_PRIORITY,
+>   		.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
+Thx！
 
-Lukas
+Acked-by: Yang Shen <shenyang39@huawei.com>
