@@ -1,130 +1,135 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A4671EB9
-	for <linux-crypto@vger.kernel.org>; Wed, 28 Feb 2024 19:07:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CFB2CA8;
+	Wed, 28 Feb 2024 20:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709147239; cv=none; b=e5HFWJrNGFvslpwtO6wj/Y/g+OlOrbIJPbhnOijOYf2ViFjnT1ipJTW+vRya1h8+oBVIOKui20ci8S+6nq/7ErKQYADRcH9u/1svLkgb/5gakLjnAo4/8mQ/X4T2cDeSt3tJ9oNruWqNA9pACuOEPgGvwyOedKdqLxdcpscp6uY=
+	t=1709151578; cv=none; b=Be3Fuvd3+82In8V4VdA15T7Lm36+qO+zZlpWY2Ml/fiMZxEtVeZVp4locVMfLkPQcoFlyeRWJcatgo6UMeUyjwXJ0WZNz3IXAU1+tuciIK/gAEU/IDG580FDjGh+Jcaqrd6uZf1k8ktHwI/00RH0RHW8rJMsvxPjh+rNAhAHfeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709147239; c=relaxed/simple;
-	bh=Qz2Vdj2rBC2mJZbNt9ILBRIAFfLJFVWy5MELjmgC5jo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VrqcO///ZcOQXWJoNVq68q/L4bNzvjGEXFacBTPH3e1jF+9tC6jb0CRuigu3IZv2sprJtKw+1IFCIw48KXQYZmK1xfViM3PExZ6yGjoGZZTILYYosC8rmGvA4pPKhCyilfTaNtM+wrDRY7Gs8AZ6oQHlWQ8y0T4LfdwBeKOgfos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b6IR6NnT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1709151578; c=relaxed/simple;
+	bh=XdH1gVAmPrYrirTX0Zyh+LhBwvzthAkxOMyXwhAk/mE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q0NNRosGmKY0O/7mV0XyEawJ8ci5LUc8xWOfyBsccveyQYq7k2h+4OVgd3lTrTqIOO6V/sNXvT8yHsPIktVrzG/LMk6e/g2kdWPpSBXMhNV6fgwo5pYH5URRwpReTP4c4CNmsp71tDPfrYN/myxAIB28ROl2Cxer9+97dV9iZG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iFbxjVCT; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b6IR6NnT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709147236;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rYV4SrxcohGt3HtzPUZ+rdkqbt8EWPpbUaoKo3V+foI=;
-	b=b6IR6NnTAiiJfACCD7pQhVZY8mnAu67FqItpzgL0uGBR14TFGw69q2YKuKjzWWLiGPSCBZ
-	+9f9UNgNVJLtD9yMljjuQg3EShhbGK3d8gwB9HbxFCMEljoGFj3KPf8YzF6IaLIT1jJfH6
-	q/kahHO3zaVnx9VsdBdyGEKqMERRb9k=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-mzeSPoI_PZ6055kU9_9R1g-1; Wed, 28 Feb 2024 14:07:11 -0500
-X-MC-Unique: mzeSPoI_PZ6055kU9_9R1g-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c7e21711d0so1530839f.3
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Feb 2024 11:07:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iFbxjVCT"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d288bac3caso1367851fa.2;
+        Wed, 28 Feb 2024 12:19:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709151575; x=1709756375; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AaYkftKp1y11sdAWaYMn4v1B8t9t+mmU/Hhe9qMT1cc=;
+        b=iFbxjVCTC8qWr95n1EzEApjXV0OhXODOKVDCWwpKw+MtI2tXNgLrp+me5D3JTLVszI
+         xo8XxHmEe6JrBRtZXu/eaUcydS3l5oap7UZSeh/aY42w66VOPaTHFWQLeZomrgL02SfQ
+         33KfPMhmnL7NKYmQhLt5QlHYdMAMjVRT8whOP2lj9cfLORdmV+rOmlgOioKe0aYI1nkD
+         Ww2Z39/YC7BmY9Ze7BUsCG2GzDmca5ZDvCBM2In9t2Y4wdClpE2PiKCs5OI9gOisn3Ki
+         TCmzN22kpfNaB1TmiWViHHPGTs7NDIAa7hyzpakETzuWqGMhVTvMe2qQKZ2ilp0u98mk
+         jaiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709147230; x=1709752030;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rYV4SrxcohGt3HtzPUZ+rdkqbt8EWPpbUaoKo3V+foI=;
-        b=ssVpQPD2TVuz2uYN+QutrWXFq74EvqoqXPAxBtw+w6Gf8J6ZWZb8yc+CZzGscXmVJD
-         5K4SqW+sXsjpfK6t0JRIfqilFH1rPo6VNp+wiPs0i4QkrI4lUreOjgFmiVHLc56W0VuD
-         ZZJWwJGGe7rrgRywl3Z/eIe5bYO2lj7cUYGIlfF9JzByZ9P31J6VMDd6V5l+XW2O+Mgp
-         NglZCBzl/JkFYE1236y0qNZgi13LMwXl08NzORjIB+bNmKVDnMdV1JhdJaDI8YyTJTB+
-         5KRMwEXkHoV3QDmnvps83/DQhcL26pfX7dzISHUStWbhvWPGR6mRcjDsC8ythitGMm0S
-         jSoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUb7WP5XLHpn/6COcnM1/FhUC+Kv5On7UqExPyuMx5lp7gmNHRRsy0X5Je/+WT2Fm6jeM8SNKjRYJFqcgVCuJn5O10KehOTU23Bl3Uq
-X-Gm-Message-State: AOJu0YwXwHxBfucabqtqCw5gEjgu0YOFrODjLtk+E6PBz4bAO0DNX/KK
-	L4lcaN0fG7J3WUX30H8PF8fAw56Y6SXi7SP440lPgPh+FwcW3VmHCue7ShdukumsrctZyQaznH3
-	IYsIyAzpT5KcpvjvgcK/7xbetNWPZxNPNjqfOqC7E48hp2w8BIj5N5iQjzItCKA==
-X-Received: by 2002:a5e:c249:0:b0:7c7:8fda:e836 with SMTP id w9-20020a5ec249000000b007c78fdae836mr120305iop.0.1709147230206;
-        Wed, 28 Feb 2024 11:07:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFmyZUluB62eCjXZWTg6QnIXee6qM5qrhHOGBlbNEDBmI1cB3oVfXg/I91wseTQnvRrL5Hn8g==
-X-Received: by 2002:a5e:c249:0:b0:7c7:8fda:e836 with SMTP id w9-20020a5ec249000000b007c78fdae836mr120281iop.0.1709147229895;
-        Wed, 28 Feb 2024 11:07:09 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id eh3-20020a056638298300b0047466fd3b1dsm2360704jab.22.2024.02.28.11.07.08
+        d=1e100.net; s=20230601; t=1709151575; x=1709756375;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AaYkftKp1y11sdAWaYMn4v1B8t9t+mmU/Hhe9qMT1cc=;
+        b=sK0eognUGJevje7VB6rpjcl33ja0nEaCw5d7hNT6IoQ/MFYsPyQlFwFeZK7ODO5H+f
+         pHTiFiCPN2itLrLD2JjboUukwzsgVDWw4qYanZGTWDqPT4ty4B5qtJlT9rvMZhWWLvwg
+         DLbSJ5HUheXKpWfmCutUgWc6Z2Vky18wBec2/jtaMbfxv+eg0pKIGfSLtUpLgrqejDXJ
+         5AUS7lQFYWIvywTjx6JXsLqlUb8tgXk4DuAztqikw5pGF2DaWxXu3ZtcfqpAaLEkn5rO
+         t5Q2RuPE/h3GWUEDdK86uaV0SbQb2O3jzU014S3qlcCi5uxu8WwsWNvH+I8BAL5ThG8G
+         /ZHg==
+X-Forwarded-Encrypted: i=1; AJvYcCX6NpZMC7djRN1aRXZjX2wKg9ulaDNR/WKhCzq4qbNx/xNdSDBbWiJ+0HCSlnXAv118F0H3NY9H/wu+mqfHTG2AYsKDZ0Hn2eXpRfYEX3/JsjjvaZlrV16gqciH4UEmgKqqzb3F54vWQd0V+8EHQUqel8SVdHFtXel4PXkl0IZh0aA5fj3WIw==
+X-Gm-Message-State: AOJu0YwAqYkPBkehCjUSLmF9L4FN0EWL3pXSrvNkteanK0F+qW57pChy
+	qSJMkwn5CnrTbMni8t/pPgmu/umdGN8jgaKW8cMHh8W+YCJS+r4A
+X-Google-Smtp-Source: AGHT+IEmzFheUvrhk7elS7+uTO42EaEZigwC+piudVPdSqGPkd8eJkZq1RdUGfSUAb28YaMidt4oZQ==
+X-Received: by 2002:a2e:978b:0:b0:2d2:a4e2:bb84 with SMTP id y11-20020a2e978b000000b002d2a4e2bb84mr3894714lji.47.1709151574660;
+        Wed, 28 Feb 2024 12:19:34 -0800 (PST)
+Received: from Red ([2a01:cb1d:3d5:a100:4a02:2aff:fe07:1efc])
+        by smtp.googlemail.com with ESMTPSA id bk25-20020a0560001d9900b0033dd98c518bsm10293993wrb.50.2024.02.28.12.19.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 11:07:09 -0800 (PST)
-Date: Wed, 28 Feb 2024 12:07:06 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Xin Zeng <xin.zeng@intel.com>, herbert@gondor.apana.org.au,
- yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
- kevin.tian@intel.com, linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
- qat-linux@intel.com, Yahui Cao <yahui.cao@intel.com>
-Subject: Re: [PATCH v3 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-Message-ID: <20240228120706.715bc385.alex.williamson@redhat.com>
-In-Reply-To: <20240226152458.2b8a0f83.alex.williamson@redhat.com>
-References: <20240221155008.960369-1-xin.zeng@intel.com>
-	<20240221155008.960369-11-xin.zeng@intel.com>
-	<20240226115556.3f494157.alex.williamson@redhat.com>
-	<20240226191220.GM13330@nvidia.com>
-	<20240226124107.4317b3c3.alex.williamson@redhat.com>
-	<20240226194952.GO13330@nvidia.com>
-	<20240226152458.2b8a0f83.alex.williamson@redhat.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+        Wed, 28 Feb 2024 12:19:34 -0800 (PST)
+Date: Wed, 28 Feb 2024 21:19:32 +0100
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+To: Alexey Romanov <avromanov@salutedevices.com>
+Cc: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"khilman@baylibre.com" <khilman@baylibre.com>,
+	"jbrunet@baylibre.com" <jbrunet@baylibre.com>,
+	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	kernel <kernel@sberdevices.ru>
+Subject: Re: [PATCH v4 00/20] Support more Amlogic SoC families in crypto
+ driver
+Message-ID: <Zd-VVGXHoH2ikbmV@Red>
+References: <20240212135108.549755-1-avromanov@salutedevices.com>
+ <ZcsYaPIUrBSg8iXu@Red>
+ <20240215104719.njq6ie2niisntcnv@cab-wsm-0029881.sigma.sbrf.ru>
+ <ZdL713ae1swwTU_B@Red>
+ <20240228133656.24bic6djmjvkill7@cab-wsm-0029881>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240228133656.24bic6djmjvkill7@cab-wsm-0029881>
 
-On Mon, 26 Feb 2024 15:24:58 -0700
-Alex Williamson <alex.williamson@redhat.com> wrote:
-
-> On Mon, 26 Feb 2024 15:49:52 -0400
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
+Le Wed, Feb 28, 2024 at 01:37:02PM +0000, Alexey Romanov a écrit :
+> Hello,
 > 
-> > On Mon, Feb 26, 2024 at 12:41:07PM -0700, Alex Williamson wrote:  
-> > > On Mon, 26 Feb 2024 15:12:20 -0400
-> > > libvirt recently implemented support for managed="yes" with variant
-> > > drivers where it will find the best "vfio_pci" driver for a device
-> > > using an algorithm like Max suggested, but in practice it's not clear
-> > > how useful that will be considering devices likes CX7 require
-> > > configuration before binding to the variant driver.  libvirt has no
-> > > hooks to specify or perform configuration at that point.    
+> On Mon, Feb 19, 2024 at 07:57:27AM +0100, Corentin Labbe wrote:
+> > Le Thu, Feb 15, 2024 at 10:47:24AM +0000, Alexey Romanov a 'ecrit :
+> > > On Tue, Feb 13, 2024 at 08:21:12AM +0100, Corentin Labbe wrote:
+> > > > Le Mon, Feb 12, 2024 at 04:50:48PM +0300, Alexey Romanov a 'ecrit :
+> > > > > Hello!
+> > > > > 
+> > > > > This patchset expand the funcionality of the Amlogic
+> > > > > crypto driver by adding support for more SoC families:
+> > > > > AXG, G12A, G12B, SM1, A1, S4.
+> > > > > 
+> > > > > Also specify and enable crypto node in device tree
+> > > > > for reference Amlogic devices.
+> > > > > 
+> > > > > Tested on AXG, G12A/B, SM1, A1 and S4 devices via
+> > > > > custom tests [1] and tcrypt module.
+> > > > > 
+> > > > > ---
+> > > > > 
+> > > > 
+> > > > added patchs up to  "drivers: crypto: meson: process more than MAXDESCS descriptors"
+> > > 
+> > > Including this patch or not?
 > > 
-> > I don't think this is fully accurate (or at least not what was
-> > intended), the VFIO device can be configured any time up until the VM
-> > mlx5 driver reaches the device startup.
-> > 
-> > Is something preventing this? Did we accidentally cache the migratable
-> > flag in vfio or something??  
+> > The crash start with "drivers: crypto: meson: move algs definition and cipher API to cipher.c"
 > 
-> I don't think so, I think this was just the policy we had decided
-> relative to profiling VFs when they're created rather than providing a
-> means to do it though a common vfio variant driver interface[1].
+> Unfortunately I was unable to reproduce this. I use Khadas Vim1 board
+> and my custom tests (https://gist.github.com/mRrvz/3fb8943a7487ab7b943ec140706995e7).
+> Tried both build as module and built-in.
+> 
+> Can you, please, give more information? Maybe your test cases?
 
-Turns out that yes, migration support needs to be established at probe
-time.  vfio_pci_core_register_device() expects migration_flags,
-mig_ops, and log_ops to all be established by this point, which for
-mlx5-vfio-pci occurs when the .init function calls
-mlx5vf_cmd_set_migratable().
+My test case is simple, simply load the driver.
 
-So the VF does indeed need to be "profiled" to enabled migration prior
-to binding to the mlx5-vfio-pci driver in order to report support.
+The problem is that you moved the algs[i].mc = mc after the register of algs (in drivers: crypto: meson: move algs definition and cipher API to cipher.c)
+Test could happen as soon the register is done and so mc is deferenced.
 
-That also makes me wonder what happens if migration support is disabled
-via devlink after binding the VF to mlx5-vfio-pci.  Arguably this could
-be considered user error, but what's the failure mode and support
-implication?  Thanks,
+Since you didnt hit the case, I suspect you didnt test the driver as module.
 
-Alex
-
+Regards
