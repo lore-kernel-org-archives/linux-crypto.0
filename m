@@ -1,39 +1,31 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA31D2DF87;
-	Wed, 28 Feb 2024 09:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B85B2C842;
+	Wed, 28 Feb 2024 09:16:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709111601; cv=none; b=SxFbnJgIx8zTgvRVRqsxIpr+fhRUlA4IzsFtr/Rl9tkb9Fmj2XmsphbumBf6vU8fG1lcy5WC8kswoastcUmyIoNEW7uNwCZmggJPjhdIyE1BNNV2dqd2Ufzdv48Q2J7x9SVQVJcGEci/Vj7US/U3YOejD1nwU1dFoC6A79u654M=
+	t=1709111808; cv=none; b=LK327NT5d+qVP451aX4y9ESPaWyvkfMAj77FXRLqzysK+2xwvHGigso8ZtQ9MhY0gk+5ckTyvcDw9VLxnuudSzTE3HGELntp0dVL/b5BX3YaTYz2m+SHTexBdYHQ+aSu3aeYnRbc+M54qx/XzM6TFoJnEITzy2aR5kRxaWYeKAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709111601; c=relaxed/simple;
-	bh=gaACaJ7SEGbNoAdS1kKtOIYeRQlHqJEzNTRFXxGtqWA=;
+	s=arc-20240116; t=1709111808; c=relaxed/simple;
+	bh=lB9K5uApJy+tn2hGHqPrpGhuY93fnVhl1OJxa0CesEA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UDwQKiB4ACZIK7i3bVSsqNDPmRvo2ziqCEeY/d/1o1zsePPEjKSlecycRlIyjJOM86dNlVHQRRZ0n8kAZGrdmeoBigwOSHIn+8vXfESBMurt7s1q3BXuH3LMY2zVqErre+kFpwzqW5zNWHZ8ODPSMJFZmvhgCo2FeElBDJkoHCU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=FT0WRN5sgYxD+jyuRE2Z5yVpHgVmu4/3IBnFK0rqpgud4NPKNLuYj7NtA0EBgRFKJNI0fmTe0/mvzi4NKDWJj80lEa3IJKtSFFq++hyqvq0u1D/zu1Mc5x4vU1pRjZF1bb65DaISEbpaApWQKQMcjnsCwuSZgJWbj3TWlLdQXy0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rfFzo-001CIB-TT; Wed, 28 Feb 2024 17:13:02 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 Feb 2024 17:13:16 +0800
-Date: Wed, 28 Feb 2024 17:13:16 +0800
+	id 1rfG3K-001CNA-8L; Wed, 28 Feb 2024 17:16:39 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 Feb 2024 17:16:53 +0800
+Date: Wed, 28 Feb 2024 17:16:53 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Andrey Skvortsov <andrej.skvortzov@gmail.com>
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Ovidiu Panait <ovidiu.panait@windriver.com>,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Arnaud Ferraris <arnaud.ferraris@collabora.com>
-Subject: [PATCH] crypto: rk3288 - Fix use after free in unprepare
-Message-ID: <Zd75LLhzlJx4nJiP@gondor.apana.org.au>
-References: <20240226215358.555234-1-andrej.skvortzov@gmail.com>
+To: syzbot <syzbot+b6ce97de27db385d5cd7@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in aes_decrypt
+Message-ID: <Zd76BRRjiokokLLg@gondor.apana.org.au>
+References: <000000000000e0c9f206126d869f@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,35 +34,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240226215358.555234-1-andrej.skvortzov@gmail.com>
+In-Reply-To: <000000000000e0c9f206126d869f@google.com>
 
-The unprepare call must be carried out before the finalize call
-as the latter can free the request.
+On Wed, Feb 28, 2024 at 01:11:23AM -0800, syzbot wrote:
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    603c04e27c3e Merge tag 'parisc-for-6.8-rc6' of git://git.k..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=12bc1372180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=1b015d567058472
+> dashboard link: https://syzkaller.appspot.com/bug?extid=b6ce97de27db385d5cd7
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> userspace arch: i386
 
-Fixes: c66c17a0f69b ("crypto: rk3288 - Remove prepare/unprepare request")
-Reported-by: Andrey Skvortsov <andrej.skvortzov@gmail.com>
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-index 1b13b4aa16ec..a235e6c300f1 100644
---- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-@@ -332,12 +332,12 @@ static int rk_hash_run(struct crypto_engine *engine, void *breq)
- theend:
- 	pm_runtime_put_autosuspend(rkc->dev);
- 
-+	rk_hash_unprepare(engine, breq);
-+
- 	local_bh_disable();
- 	crypto_finalize_hash_request(engine, breq, err);
- 	local_bh_enable();
- 
--	rk_hash_unprepare(engine, breq);
--
- 	return 0;
- }
- 
+#syz dup: KMSAN: uninit-value in des3_ede_decrypt
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
