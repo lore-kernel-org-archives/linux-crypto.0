@@ -1,123 +1,110 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6FD1552F8;
-	Wed, 28 Feb 2024 15:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCE615CD6E;
+	Wed, 28 Feb 2024 15:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709135475; cv=none; b=ndByAyrv1VhwLbyiszy4VLQRQUvYlP6Rn1+P9ol76zpRAv0qIGxa5prB+OWlEPg7WTIDt7JohXv3fJJE27L7DRzi6v0xbsnxTW9jqpVFO0l/Rg0qWignqs3g2EAwBrRqjlj+chLGX5XYoKAviHma4PC1+thReBrSBByxdKMK1vI=
+	t=1709135630; cv=none; b=Rc0iRWJ8YCDxdaHLxX9hgYK8K709KlFkfOAISTfaQjH7oN0+j8Ij4fEv1EilEi6MSwi4eAwJTo7vzhjbjwYAn5/h2Z9unKzPvj8adcZHinh4IYDYY5ItE9k3IfBE6lPv5WCfIYGIvsaoZWw0fzwfPXH1SqQepR4YS1/KJpNy6T0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709135475; c=relaxed/simple;
-	bh=bBANsiX1oqnfELIhJ2Ldb94oj+2VzQup9IpDxs0eqNw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HYBP2pCt7YDu1QXovGj5wov9YnabGCl6r1DkSmyKQdWt4vGxoIYZPWqbWzUJxIZVejLqpebEVZ+2VCiXBQN8uAQW0sXD4+uJ1Z5Qmzb+bJ7Kq/MQ1I+gHtwTjUL9otkxCKkWTX8QxPdNJEU+XUKV9Fj++iK5RBs2G+KGgotK4ZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JyAE0/Wu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709135630; c=relaxed/simple;
+	bh=vxRLRVprDDB/c/3M41BNMbhxG1UwYXmCdbjUbmB3KKE=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=N9Wr/wmzXUbn8xDF9Uds8NtC7iTGnjmBuOuTOtXQX0ugoeRjV7PBjhdjyNXpsuLa91uqToBkLDkAqehOi2OFTWKgSPvRZ2mtn/PRVqb4oU54k7tLY/DgghAzgw0VwOZFXs+MSs489mwhE8zxum4BwtJzHm4oo/Q3KyVWaaGHA7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fH/VpNsC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JyAE0/Wu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04038C433C7;
-	Wed, 28 Feb 2024 15:51:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fH/VpNsC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1C4CC433F1;
+	Wed, 28 Feb 2024 15:53:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709135475;
-	bh=bBANsiX1oqnfELIhJ2Ldb94oj+2VzQup9IpDxs0eqNw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JyAE0/WuLiyanl4AqhvdmoyyCs6ZyNSZ7MlqNMRQ5+1IIOffTm+eRgtri2sd4+agA
-	 S0jcKZcceEDROliTshY9ZBYADM2jMCpCf7wMwt6Vx5tNXUmhtlB77aMHxihfG7HyWo
-	 c1zJ/pwFSjLzL1hAT+lSzVv04nlummiIM5VUBzmQf/AMtYEpY+coMS7LAHH9bSRelg
-	 XKsCvVm/XYCPEKtm9Zry30vkB2cA+s2MWEOvwzBMPsq6Da8wMXnI82sy14QsDzG147
-	 Ep2zWHqwrFN5Rf38qfZqFtSLM3vODS7ClRt8v9wFejRW8w8KfAVDUjPwO2JXV7FFRQ
-	 uNJAHrnwhI7AQ==
-Date: Wed, 28 Feb 2024 09:51:12 -0600
-From: Rob Herring <robh@kernel.org>
-To: Jia Jie Ho <jiajie.ho@starfivetech.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>,
-	Vinod Koul <vkoul@kernel.org>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dmaengine@vger.kernel.org
-Subject: Re: [PATCH v3 1/6] dt-bindings: crypto: starfive: Add jh8100 support
-Message-ID: <20240228155112.GA4059153-robh@kernel.org>
-References: <20240227163758.198133-1-jiajie.ho@starfivetech.com>
- <20240227163758.198133-2-jiajie.ho@starfivetech.com>
+	s=k20201202; t=1709135629;
+	bh=vxRLRVprDDB/c/3M41BNMbhxG1UwYXmCdbjUbmB3KKE=;
+	h=From:To:In-Reply-To:References:Subject:Date:From;
+	b=fH/VpNsCC6yrehn5cwmf2mjsgU1Ga7kLFvddPlrtSi5Jr4CqpQYnnimGO6HSWNh3O
+	 P1sksEi+taf0EXpKgvTWOTnRbkQja9l+bSOOMPcaOGxOgSq88KAUk6A8OE94ZgekUk
+	 PKdQLGs/2dsH+cPT3ecRVpohSJXMsiWDkMudBu1wj0oL9BuvtO87S4FKrMnmaXAGxp
+	 SG4Uzyv1B5O67FmVmHVGx4IRrSCy5EQ9LvQB1aqs1ZQfSHMSBrY3mVj+nFOJNScIHn
+	 h/H6FZUVqL4iXcGgFr9D757QehRG1OTvDYME//d5Zi8AqSrdF6Nofkun3/EW0W2f+w
+	 hJcYB3olR0OOg==
+From: Mark Brown <broonie@kernel.org>
+To: robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, 
+ conor+dt@kernel.org, nicolas.ferre@microchip.com, 
+ alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev, 
+ mturquette@baylibre.com, sboyd@kernel.org, herbert@gondor.apana.org.au, 
+ davem@davemloft.net, andi.shyti@kernel.org, tglx@linutronix.de, 
+ tudor.ambarus@linaro.org, miquel.raynal@bootlin.com, richard@nod.at, 
+ vigneshr@ti.com, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+ linus.walleij@linaro.org, sre@kernel.org, u.kleine-koenig@pengutronix.de, 
+ p.zabel@pengutronix.de, olivia@selenic.com, radu_nicolae.pirea@upb.ro, 
+ richard.genoud@gmail.com, gregkh@linuxfoundation.org, jirislaby@kernel.org, 
+ lgirdwood@gmail.com, wim@linux-watchdog.org, linux@roeck-us.net, 
+ linux@armlinux.org.uk, andrei.simion@microchip.com, 
+ mihai.sain@microchip.com, andre.przywara@arm.com, neil.armstrong@linaro.org, 
+ tony@atomide.com, durai.manickamkr@microchip.com, geert+renesas@glider.be, 
+ arnd@arndb.de, Jason@zx2c4.com, rdunlap@infradead.org, rientjes@google.com, 
+ vbabka@suse.cz, mripard@kernel.org, codrin.ciubotariu@microchip.com, 
+ eugen.hristev@collabora.com, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ linux-i2c@vger.kernel.org, linux-mtd@lists.infradead.org, 
+ netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
+ linux-pm@vger.kernel.org, linux-pwm@vger.kernel.org, 
+ linux-rtc@vger.kernel.org, linux-spi@vger.kernel.org, 
+ linux-serial@vger.kernel.org, alsa-devel@alsa-project.org, 
+ linux-sound@vger.kernel.org, linux-watchdog@vger.kernel.org, 
+ Varshini Rajendran <varshini.rajendran@microchip.com>
+In-Reply-To: <20240223171342.669133-1-varshini.rajendran@microchip.com>
+References: <20240223171342.669133-1-varshini.rajendran@microchip.com>
+Subject: Re: (subset) [PATCH v4 00/39] Add support for sam9x7 SoC family
+Message-Id: <170913561744.333382.15677696645878162142.b4-ty@kernel.org>
+Date: Wed, 28 Feb 2024 15:53:37 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240227163758.198133-2-jiajie.ho@starfivetech.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-a684c
 
-On Wed, Feb 28, 2024 at 12:37:53AM +0800, Jia Jie Ho wrote:
-> Add compatible string and additional interrupt for StarFive JH8100
-> crypto engine.
+On Fri, 23 Feb 2024 22:43:42 +0530, Varshini Rajendran wrote:
+> This patch series adds support for the new SoC family - sam9x7.
+>  - The device tree, configs and drivers are added
+>  - Clock driver for sam9x7 is added
+>  - Support for basic peripherals is added
+>  - Target board SAM9X75 Curiosity is added
 > 
-> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
-> ---
->  .../crypto/starfive,jh7110-crypto.yaml        | 30 +++++++++++++++++--
->  1 file changed, 28 insertions(+), 2 deletions(-)
+>  Changes in v4:
+>  --------------
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml b/Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml
-> index 71a2876bd6e4..d44d77908966 100644
-> --- a/Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml
-> @@ -12,7 +12,9 @@ maintainers:
->  
->  properties:
->    compatible:
-> -    const: starfive,jh7110-crypto
-> +    enum:
-> +      - starfive,jh8100-crypto
-> +      - starfive,jh7110-crypto
->  
->    reg:
->      maxItems: 1
-> @@ -28,7 +30,10 @@ properties:
->        - const: ahb
->  
->    interrupts:
-> -    maxItems: 1
-> +    minItems: 1
-> +    items:
-> +      - description: SHA2 module irq
-> +      - description: SM3 module irq
->  
->    resets:
->      maxItems: 1
-> @@ -54,6 +59,27 @@ required:
->  
->  additionalProperties: false
->  
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          const: starfive,jh7110-crypto
-> +
-> +    then:
-> +      properties:
-> +        interrupts:
-> +          maxItems: 1
-> +
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          const: starfive,jh8100-crypto
-> +
-> +    then:
-> +      properties:
-> +        interrupts:
-> +          maxItems: 2
+> [...]
 
-This is already the max. Don't you want 'minItems: 2'?
+Applied to
 
-> +
->  examples:
->    - |
->      crypto: crypto@16000000 {
-> -- 
-> 2.34.1
-> 
+   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/spi.git for-next
+
+Thanks!
+
+[16/39] spi: dt-bindings: atmel,at91rm9200-spi: remove 9x60 compatible from list
+        commit: 666db8fd4265f938795004838d2a9335ce7b9da1
+
+All being well this means that it will be integrated into the linux-next
+tree (usually sometime in the next 24 hours) and sent to Linus during
+the next merge window (or sooner if it is a bug fix), however if
+problems are discovered then the patch may be dropped or reverted.
+
+You may get further e-mails resulting from automated or manual testing
+and review of the tree, please engage with people reporting problems and
+send followup patches addressing any issues that are reported if needed.
+
+If any updates are required or you are submitting further changes they
+should be sent as incremental updates against current git, existing
+patches will not be replaced.
+
+Please add any relevant lists and maintainers to the CCs when replying
+to this mail.
+
+Thanks,
+Mark
+
