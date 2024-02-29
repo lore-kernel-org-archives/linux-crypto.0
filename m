@@ -1,59 +1,61 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F151353F8;
-	Thu, 29 Feb 2024 14:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6A61386C9
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Feb 2024 15:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709218725; cv=none; b=N2Rp+Z8+zljKdvLjSvB5a0GuDNGLhMfUD0B9+eLh3QfKuj8GJu/dzRTGFtyLOubUq3+44OxmGJpEaw4Q/phmxv8org6n8TGt3b4XOnNfA464mDDvVeOF4PjR6IdgfS4tTKApVEWO1cLZoylvyGH4sWU/Qz4+KJH2XyFJjOrCLFc=
+	t=1709219656; cv=none; b=t4phj15Lt/FnVzx+1hUnKeDjnGdoTkj65WpPsQmC+5YDsVyRe2iTbmaSZ1pE6Df9d2u1YS379f23SOgaH9mdofkoR4cU08YjKCWc4jbuKKd3VZt7xb0W/xMnkNVv0zSW38nhEsI79+I5qUgCw28WTzC2CQUUWBd4oyFkfFX4Ow8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709218725; c=relaxed/simple;
-	bh=vt8AtWviueFaNUh2SIRA7kFo2RoOzji6O8iI5DEzmzQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l+w+I1AgTm9+iiZCIEUuRBkGSmythVUTQFTwzbKqIP3GUwnIlZsMcSKfU3vAt5EnXrvZIsLxU9sugXtHVA9uxEWpEQ3hWXOLPET2OO9bnaRwCZJVPelgsRFW1ZYGCV2BJwhAul7FGAvsrrKCGzsmnb3vT8dvwgtjJic2eh2Ftt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bEQ3KDEP; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1709219656; c=relaxed/simple;
+	bh=qCUSI7hzEBIgieQ+TKOpTD8trXzeXh6ezG4o/l5h41U=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ay3LszPo3Giu4WeQf0JhJXqy8zq/9XjuqgE+9hdFeeCdhdsGrUOhF1r9raI5AWEFj1JeItEF+OITJ6sKkF3Qu6fA0pqu6lRws9PDcRS6HpCC3Ac+INVL8oMYZJH2QKQe7+Jn59ZBL6Ly/o0eeKmljMdzYgB1wY/haz/K824uj+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RMR7OVga; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bEQ3KDEP"
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41TES2QI014349;
-	Thu, 29 Feb 2024 14:57:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=r/t14PRcRophG5LFLb15IuPPFzri/0d0atNhzF7nkec=;
- b=bEQ3KDEPRcFxBuYEmgeihUIoqRNivj6jS0cHkOSvcHTrpB0EDA5M88FacHVcH8A7Gfoo
- 3vRLMIG+q6bUZKvn++PMR0dx252dkekBX3t8D5wqA3T6IiUdsZdOXPrcbyR4fqETMwoj
- FW/6MHWHiYO7vnVGFKZUVOx0K9eXinmgGEwiuMG4LxgWdFV/TFER/CxMi//JDI2XX8EL
- wDwYdT+rjvktyp8G+5iY4MxrCAK+c71FNMAoOD+BdpRVI4GVjnolb8APUYlOsfE/EwX1
- ErzkdMDenZkBj/EvMnlkLNkQR0kZEcY+C04wemh/CjfqBmdMcJBilgP0IsRhqUn6tX8q og== 
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wjuq7rutv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Feb 2024 14:57:35 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41TDf9UY008782;
-	Thu, 29 Feb 2024 14:57:34 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wftstxakd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Feb 2024 14:57:34 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41TEvVhF57606594
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 29 Feb 2024 14:57:33 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 48F1958063;
-	Thu, 29 Feb 2024 14:57:31 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9980E5805B;
-	Thu, 29 Feb 2024 14:57:30 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 29 Feb 2024 14:57:30 +0000 (GMT)
-Message-ID: <aabeec7b-618c-4d15-b033-4162b6e54f6a@linux.ibm.com>
-Date: Thu, 29 Feb 2024 09:57:30 -0500
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RMR7OVga"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-412a14299a4so7935115e9.1
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Feb 2024 07:14:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1709219653; x=1709824453; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BXEUZD7HIc5+BDhLp1eCYIkSCHTY2l0iyo8ZM3GFsdA=;
+        b=RMR7OVgahViloB+vMkQvVHYjiTfFAJt9iEfF0NJFuCYdrhmhE48CzzGBjZC93mCBKS
+         lAxD4bfGrRcK2HCh3tY9eVBJVqmvH7rAVuPvlhLsGbFhYtYyY0wXLGHIiZKrAX5NBBCg
+         coiY/LEEZvOLmIcE9CViawHiYr9hogoPD85i3QLgOza/I7eJRhbgFkts28edK1UWCCEB
+         vpiaaRVh2AKBZijpot467jZVrKVv5rwUwwFWf5/rv8zNlb3P/caKdChv1OAZgJ3sM4x/
+         1UKhwemSa8Tu8Z1gvOlM8QiBmmaqgGbK8eZh+eQvEZ8dZAHyh8zXDkXagDEBKAxkBRxy
+         eseA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709219653; x=1709824453;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BXEUZD7HIc5+BDhLp1eCYIkSCHTY2l0iyo8ZM3GFsdA=;
+        b=r+XBWziVegSRbodSFvBbTRfpQlyiqlVFzzDaXspYwU0KNrErXz44uaKgArvrIlP/rT
+         ydteFT67Mj05qDTLnYqnJQeBQUmYFLaBMaJfye2fau8o3QZsF+TTN81orByTX0iaqMRs
+         g/5kuJAVZEWKLwW+xeVTeWtC9FnkQejFNQk9PBKOTuuNbAZnIrEsHLmu4AtsHsI+w0Q+
+         e2mauNVE7ZVf9RT9NvB4KJtkhnawT7mOnOpI8Bj/KSqktzzYkzdEjFRD9X6hvfsaTJpe
+         Xm6sxTErPTq203m7cwTvSBH9+mAJ0dViTmp++zjuXaSLy1boNdIiG5cW8S7lhWj7e9HG
+         QI9A==
+X-Forwarded-Encrypted: i=1; AJvYcCXNmjPTokr5ydJDxI0zamNorwOOotq4EB00f25eb5N0x5Woxgg3U3pnKu0ZPLeSCMepovW5WtQEajnoiLKyS2AS3IXdZ0dlxyEbhLwi
+X-Gm-Message-State: AOJu0YyosFQLM1hsvJMBA+NYoQJ8dZE3Y1WJAVitkbvf1/LacFCrCexJ
+	r+YAr9xwXCK9s2I7V2TdFQ1WV2afkm7ik+1OLNjmhyd8ktP/I2JOdfdUiLr25hU=
+X-Google-Smtp-Source: AGHT+IEiNaycCnI+8/fdk5xkL9CXSWuu/KBH0Xt6zhKFcDq5ZtgRezOd+aaT2eCbXnVsaGyxIl30yA==
+X-Received: by 2002:a05:600c:4ec7:b0:412:a206:ad3c with SMTP id g7-20020a05600c4ec700b00412a206ad3cmr2261718wmq.3.1709219652688;
+        Thu, 29 Feb 2024 07:14:12 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:982:cbb0:651:5318:b12c:be82? ([2a01:e0a:982:cbb0:651:5318:b12c:be82])
+        by smtp.gmail.com with ESMTPSA id h3-20020adfa4c3000000b0033dd2a7167fsm2010514wrb.29.2024.02.29.07.14.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Feb 2024 07:14:12 -0800 (PST)
+Message-ID: <456a6aa7-60e0-4a56-9efa-731f717012ac@linaro.org>
+Date: Thu, 29 Feb 2024 16:14:10 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,83 +63,166 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/10] crypto: ecdsa - Convert byte arrays with key
- coordinates to digits
-Content-Language: en-US
-To: Lukas Wunner <lukas@wunner.de>
-Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br
-References: <20240223204149.4055630-1-stefanb@linux.ibm.com>
- <20240223204149.4055630-2-stefanb@linux.ibm.com>
- <20240229091105.GA29363@wunner.de>
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <20240229091105.GA29363@wunner.de>
+From: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH v4 00/20] Support more Amlogic SoC families in crypto
+ driver
+To: Alexey Romanov <avromanov@salutedevices.com>,
+ Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc: "clabbe@baylibre.com" <clabbe@baylibre.com>,
+ "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "robh+dt@kernel.org" <robh+dt@kernel.org>,
+ "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+ "conor+dt@kernel.org" <conor+dt@kernel.org>,
+ "khilman@baylibre.com" <khilman@baylibre.com>,
+ "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
+ "martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
+ "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
+References: <20240212135108.549755-1-avromanov@salutedevices.com>
+ <ZcsYaPIUrBSg8iXu@Red>
+ <20240215104719.njq6ie2niisntcnv@cab-wsm-0029881.sigma.sbrf.ru>
+ <ZdL713ae1swwTU_B@Red> <20240228133656.24bic6djmjvkill7@cab-wsm-0029881>
+ <Zd-VVGXHoH2ikbmV@Red> <20240229025337.ftbvoaafmu5zvyha@cab-wsm-0029881>
+Content-Language: en-US, fr
+Autocrypt: addr=neil.armstrong@linaro.org; keydata=
+ xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
+ GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
+ BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
+ qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
+ 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
+ AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
+ OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
+ Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
+ YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
+ GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
+ UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
+ GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
+ yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
+ QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
+ SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
+ 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
+ Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
+ oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
+ M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
+ 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
+ KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
+ 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
+ QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
+Organization: Linaro Developer Services
+In-Reply-To: <20240229025337.ftbvoaafmu5zvyha@cab-wsm-0029881>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: e8QKhuV7oPEm9p7MO45mPyckdj26FnXI
-X-Proofpoint-ORIG-GUID: e8QKhuV7oPEm9p7MO45mPyckdj26FnXI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-29_02,2024-02-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- priorityscore=1501 mlxlogscore=999 lowpriorityscore=0 bulkscore=0
- clxscore=1011 suspectscore=0 malwarescore=0 impostorscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402290114
 
-
-
-On 2/29/24 04:11, Lukas Wunner wrote:
-> On Fri, Feb 23, 2024 at 03:41:40PM -0500, Stefan Berger wrote:
->> +static inline void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
->> +					 u64 *out, unsigned int ndigits)
->> +{
->> +	unsigned int sz = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
->> +	u8 tmp[ECC_MAX_DIGITS << ECC_DIGITS_TO_BYTES_SHIFT];
->> +	unsigned int o = sz - nbytes;
->> +
->> +	memset(tmp, 0, o);
->> +	memcpy(&tmp[o], in, nbytes);
->> +	ecc_swap_digits(tmp, out, ndigits);
->> +}
+On 29/02/2024 14:05, Alexey Romanov wrote:
+> Hello!
 > 
-> Copying the whole key into tmp seems inefficient.  You only need
-> special handling for the first few bytes of "in" (6 bytes in the
-> P521 case) and could use ecc_swap_digits() to convert the rest
-> of "in" directly to "out" without using tmp.
+> On Wed, Feb 28, 2024 at 09:19:32PM +0100, Corentin Labbe wrote:
+>> Le Wed, Feb 28, 2024 at 01:37:02PM +0000, Alexey Romanov a 'ecrit :
+>>> Hello,
+>>>
+>>> On Mon, Feb 19, 2024 at 07:57:27AM +0100, Corentin Labbe wrote:
+>>>> Le Thu, Feb 15, 2024 at 10:47:24AM +0000, Alexey Romanov a 'ecrit :
+>>>>> On Tue, Feb 13, 2024 at 08:21:12AM +0100, Corentin Labbe wrote:
+>>>>>> Le Mon, Feb 12, 2024 at 04:50:48PM +0300, Alexey Romanov a 'ecrit :
+>>>>>>> Hello!
+>>>>>>>
+>>>>>>> This patchset expand the funcionality of the Amlogic
+>>>>>>> crypto driver by adding support for more SoC families:
+>>>>>>> AXG, G12A, G12B, SM1, A1, S4.
+>>>>>>>
+>>>>>>> Also specify and enable crypto node in device tree
+>>>>>>> for reference Amlogic devices.
+>>>>>>>
+>>>>>>> Tested on AXG, G12A/B, SM1, A1 and S4 devices via
+>>>>>>> custom tests [1] and tcrypt module.
+>>>>>>>
+>>>>>>> ---
+>>>>>>>
+>>>>>>
+>>>>>> added patchs up to  "drivers: crypto: meson: process more than MAXDESCS descriptors"
+>>>>>
+>>>>> Including this patch or not?
+>>>>
+>>>> The crash start with "drivers: crypto: meson: move algs definition and cipher API to cipher.c"
+>>>
+>>> Unfortunately I was unable to reproduce this. I use Khadas Vim1 board
+>>> and my custom tests (https://gist.github.com/mRrvz/3fb8943a7487ab7b943ec140706995e7).
+>>> Tried both build as module and built-in.
+>>>
+>>> Can you, please, give more information? Maybe your test cases?
+>>
+>> My test case is simple, simply load the driver.
+>>
+>> The problem is that you moved the algs[i].mc = mc after the register of algs (in drivers: crypto: meson: move algs definition and cipher API to cipher.c)
+>> Test could happen as soon the register is done and so mc is deferenced.
 > 
-> So it would be sufficient to allocate the first digit on the stack,
-> memset + memcpy, then convert that to native byte order into "in[0]"
-> and use ecc_swap_digits() for the rest.
+> Yeah, you are right. Will fix it. Thank you.
 > 
-> And the special handling would be conditional on "!o", so is skipped
-> for existing curves.
+>>
+>> Since you didnt hit the case, I suspect you didnt test the driver as module.
+> 
+> No, I test the driver as module.
+> I think the problem is that on my system no one uses this crypto backend
+> outside of my tests module, unlike your system.
 
-Thanks. It looks like this now:
+I reproduced the issue, testing each commit with enabled runtime cryto tests:
 
-static inline void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
-                                          u64 *out, unsigned int ndigits)
-{
-         unsigned int o = nbytes & 7;
-         u64 msd = 0;
-         size_t i;
+I get the following when applying "drivers: crypto: meson: introduce hasher":
+[    4.514031] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
+[    4.517193] Mem abort info:
+[    4.519934]   ESR = 0x0000000086000004
+[    4.523641]   EC = 0x21: IABT (current EL), IL = 32 bits
+[    4.528903]   SET = 0, FnV = 0
+[    4.531920]   EA = 0, S1PTW = 0
+[    4.535025]   FSC = 0x04: level 0 translation fault
+[    4.539856] [0000000000000000] user address but active_mm is swapper
+[    4.546155] Internal error: Oops: 0000000086000004 [#1] PREEMPT SMP
+[    4.552359] Modules linked in:
+[    4.555376] CPU: 2 PID: 77 Comm: cryptomgr_test Not tainted 6.8.0-rc6-next-20240229-g2296d426c21a #105
+[    4.564608] Hardware name: Libre Computer AML-S905X-CC (DT)
+[    4.570125] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[    4.577025] pc : 0x0
+[    4.579178] lr : ahash_def_finup+0x12c/0x14c
+[    4.583406] sp : ffff8000825037a0
+[    4.586683] x29: ffff8000825037a0 x28: 0000000000000001 x27: ffff000007ab8060
+[    4.593758] x26: ffff800082503958 x25: 0000000000000400 x24: ffff800082503918
+[    4.600830] x23: 0000000000000820 x22: ffff0000048ec390 x21: ffff000003d9e200
+[    4.607903] x20: ffff0000048ee300 x19: ffff000003d9e400 x18: 0000000000000020
+[    4.614976] x17: 00000000b5f74d5b x16: ffff800081bbbc60 x15: ffffffffffffffff
+[    4.622048] x14: ffff0000049fb380 x13: 0000000000000000 x12: 0000000000000000
+[    4.629120] x11: ffff800082503778 x10: ffff800082503780 x9 : 0000000000001388
+[    4.636193] x8 : ffff800082503988 x7 : fefefefefefefefe x6 : 0101010101010101
+[    4.643265] x5 : ffff0000049fb300 x4 : ffff00007f2d5830 x3 : 0000000000000000
+[    4.650338] x2 : 0000000000000000 x1 : ffff0000048ee300 x0 : ffff000003d9e200
+[    4.657411] Call trace:
+[    4.659823]  0x0
+[    4.661633]  crypto_ahash_finup+0x38/0x44
+[    4.665602]  test_ahash_vec_cfg+0x680/0x7dc
+[    4.669742]  test_hash_vec+0xac/0x1ec
+[    4.673364]  __alg_test_hash+0x158/0x308
+[    4.677246]  alg_test_hash+0xfc/0x1a0
+[    4.680868]  alg_test.part.0+0x51c/0x524
+[    4.684750]  alg_test+0x20/0x64
+[    4.687854]  cryptomgr_test+0x24/0x44
+[    4.691477]  kthread+0x118/0x11c
+[    4.694668]  ret_from_fork+0x10/0x20
+[    4.698214] Code: ???????? ???????? ???????? ???????? (????????)
+[    4.704247] ---[ end trace 0000000000000000 ]---
 
-         if (o == 0) {
-                 ecc_swap_digits(in, out, ndigits);
-         } else {
-                 for (i = 0; i < o; i++)
-                         msd = (msd << 8) | in[i];
-                 out[ndigits - 1] = msd;
-                 ecc_swap_digits(&in[o], out, ndigits - 1);
-         }
-}
+Please make sure every single commit builds without error and doesn't regress at runtime on existing platforms.
 
-
-   Stefan
+Thanks,
+Neil
 
 > 
-> Thanks,
+>>
+>> Regards
 > 
-> Lukas
+
