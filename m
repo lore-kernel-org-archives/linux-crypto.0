@@ -1,108 +1,149 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CA435F18;
-	Thu, 29 Feb 2024 03:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B865E535AF;
+	Thu, 29 Feb 2024 08:46:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709175934; cv=none; b=f6IypB2Pnooia/tmc6sCH7GA+VnCDI8XWZ2lJdhBMkyDpCA1LSzX7zB/tODC2f0sSDji/whuV/xUY0um5sU3Tc11AWBXw1RejDBq5emhfu6aaUyhHiT59Z0ApLGL3M0fgq7RzIhLfg4nYXVFCKCZgYIOSFTBjydRn9gfEyXv53E=
+	t=1709196407; cv=none; b=rydlZVmZvFhRRhAS/lHPZXcSd0CGIa3CCj/1qNmLfQhe/fvJfZyc1Q0uJ8Nz1xpwDn6SJ24s6SM6ZPD6w2Z8NB5nSNQvwXeLcBuGyUwLT8H+G8fTgDMJpOyygZqwbv0DSf0vVXkqitQ3GXdgtMfofwk8FHJa/U6YfWfvw+atfKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709175934; c=relaxed/simple;
-	bh=tQQ7xj//LU316ukpe78B00k15tsraKruobbXoWY9rrg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bTRDDc3mgO8KumFvJEQsjbZpweWvEFFwc42FhB6euuJMUXxcPoahZSU+r42R+DjPWjTJJHwEQlhjefBZ5Krn6clI9sdSp9rBEvHBYQdK3V/Ycx0yWrwJluDtlbimW/Gq6UYtreZunE0Rp6cdwO61vtMjKX0m5G/U4cNVPSNrJ3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gfvWxeR3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709196407; c=relaxed/simple;
+	bh=qwCh4HkETlXqvXQiDnkTAVSKoofLJRfU5jEJr6Y2t1E=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=CAsbI5SuAl6SG2S/MKKRPP7TKpz8J8tuL31mvJf4EkN1ruXylYtSArdPuy6oLyQx2sKggudMabFz3Sl3KevgyHyuVpdz+zp9NZlX6nUJvMsuHoOY9rjrMzW3o/zp3JuRascHrKgedVLxev4GzVK7tCnYUmLnH3L02j57HDT4Bm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=IfH4fgTH; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gfvWxeR3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F118DC433B1;
-	Thu, 29 Feb 2024 03:05:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709175934;
-	bh=tQQ7xj//LU316ukpe78B00k15tsraKruobbXoWY9rrg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=gfvWxeR3pbs8ghgSbBlJCLmuK/7aVZUzt93Irm/LS4k5mTSaydV+NuqvOMspAjW1A
-	 4Bbs3e6FUYLqVah3jC9FsdAUDt0FgVOUy7WVuGe+VBQI0kU91/DcH0tKF+nSr3wlJk
-	 L+U4Jg4m3yH30n3/8uRSibcfYK9LL+5mGSKFfM16DSSZBQCEy/deWwknSAfIhjbJ7g
-	 a2dBVOWgyeVqrsvpeivOsMsGY0L0V1uI8ni8nY4qpTFdJtrV33cQhp8Wasj5wVxmOM
-	 jUZynJQXc8USJyRSrus9rpCOE2Lx2VS8GW/bNuIkJHhY1c3dKH+qACvLhDq2UHCzBx
-	 KDzHel7v/SZrQ==
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a3566c0309fso62737066b.1;
-        Wed, 28 Feb 2024 19:05:33 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWXPUCkcNjfDkJvwoG/uJFmH1UA0RQcQQbstxzJllOed7Q7QbcXavP38hFJh31Mo6ZNZEs3dRb6dhe4yUi2hsULAG+1e41ann4/M0wKbBoUfd3w//P5JxZYYI9SrD3OLZRWiEsipGnMbcta
-X-Gm-Message-State: AOJu0Yywx1SDd9XisWST2nWhy+XCIb+WOselyuZVc7ZJ1lV/5+t4gn9p
-	X6cSrS6plvwvzWjWxvWkd0FCvtEJfaTEL58Omu0O7KHJ19pgm3lhdOYfPnjnWri5XDGhMEYdF8/
-	VNm0Pf+ap9yT8DZhWCCrTQuVdW54=
-X-Google-Smtp-Source: AGHT+IFVMoyGoA0xQbS/JsIg1Cl7TXgTjZPzrXNORPXtgXO6d+4IGnmLrfhNOxwcomGzNF2eNNE8ozfcarOb4XUphl4=
-X-Received: by 2002:a17:906:ca49:b0:a44:1be1:66f0 with SMTP id
- jx9-20020a170906ca4900b00a441be166f0mr447407ejb.57.1709175932312; Wed, 28 Feb
- 2024 19:05:32 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="IfH4fgTH"
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 41T8jSoB094393;
+	Thu, 29 Feb 2024 02:45:28 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1709196328;
+	bh=Ulcrfge3dIu9txF9ZPWk1YqG9TlLAnjzw2E2aDqON2c=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date;
+	b=IfH4fgTHaE4W04yHnZz6V9XlunSfeUzgZ3pdOsDqyvv+MW7GaKzyXSez2HnXFO7Hx
+	 mamka70Odc/h0m6xvZVc1tHjC15u3MZEmGY45aqsmA85HoZEAe1JyrDoJrsFO/Pvys
+	 AIH3JMDB54TXFWFbuGzjNu+Jdic7xRkc7mMqi/7w=
+Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 41T8jRZb035729
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 29 Feb 2024 02:45:27 -0600
+Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 29
+ Feb 2024 02:45:27 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 29 Feb 2024 02:45:27 -0600
+Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 41T8jQQj078498;
+	Thu, 29 Feb 2024 02:45:27 -0600
+From: Kamlesh Gurudasani <kamlesh@ti.com>
+To: "Elliott, Robert (Servers)" <elliott@hpe.com>,
+        Eric Biggers
+	<ebiggers@kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof
+ Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        "Tero Kristo" <kristo@kernel.org>,
+        Catalin Marinas
+	<catalin.marinas@arm.com>,
+        "Will Deacon" <will@kernel.org>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+        "linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>
+Subject: RE:  Re: [PATCH v2 2/6] crypto: crc64 - add crc64-iso framework
+In-Reply-To: <MW5PR84MB18424EC8DDB4863777D302E2AB562@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
+ <20230719-mcrc-upstream-v2-2-4152b987e4c2@ti.com>
+ <20230812025520.GE971@sol.localdomain>
+ <87jztserrf.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+ <MW5PR84MB18424EC8DDB4863777D302E2AB562@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+Date: Thu, 29 Feb 2024 14:15:25 +0530
+Message-ID: <87plwfk6ai.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240226080328.334021-1-wangyuli@uniontech.com>
-In-Reply-To: <20240226080328.334021-1-wangyuli@uniontech.com>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Thu, 29 Feb 2024 11:05:22 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4CXW5Lkn1=hMnMbcY3MO2eoos8bSr3Z5jY_piAbpP+5A@mail.gmail.com>
-Message-ID: <CAAhV-H4CXW5Lkn1=hMnMbcY3MO2eoos8bSr3Z5jY_piAbpP+5A@mail.gmail.com>
-Subject: Re: [PATCH] loongarch/crypto: Clean up useless assignment operations
-To: WangYuli <wangyuli@uniontech.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, kernel@xen0n.name, 
-	linux-crypto@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Guan Wentao <guanwentao@uniontech.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Hi, Yuli,
+"Elliott, Robert (Servers)" <elliott@hpe.com> writes:
 
-The code is fine to me, please change loongarch to LoongArch in the
-subject, and update your commit message with Xuerui's review in V2.
+>> -----Original Message-----
+>> From: Kamlesh Gurudasani <kamlesh@ti.com>
+>> Sent: Friday, August 18, 2023 2:26 AM
+>> Subject: Re: [EXTERNAL] Re: [PATCH v2 2/6] crypto: crc64 - add crc64-iso
+>> framework
+>> 
+>> Eric Biggers <ebiggers@kernel.org> writes:
+>> 
+>> > Is "crc64-iso" clear enough, or should it be "crc64-iso3309"?  There are
+>> > thousands of ISO standards.  Different CRC variants are specified by
+>> different
+>> > ISO standards.  Is this particular variant indeed commonly referred to
+>> as simply
+>> > the "ISO" CRC-64?  Even if it's currently the case that all other CRCs
+>> in ISO
+>> > standards are different widths than 64 bits (which may be unlikely?),
+>> I'm not
+>> > sure we should count on no CRC-64 variant ever being standardized by
+>> ISO.
+>> >
+>> > - Eric
+>> https://en.wikipedia.org/wiki/Cyclic_redundancy_check
+>> 
+>> Last entry CRC-64-ISO in the table.
+>> It is mentioned as crc64-iso and that's the
+>> only 64-bit CRC standardized by ISO. 
+>
+> ECMA-182 (DLT-1 tapes) was contributed to become ISO/IEC 13421 in 1993, so
+> that was another "64-bit CRC standardized by ISO." Plus, ISO could publish new
+> standards with new CRCs at any time.
+>
+>> But I do agree that crc64-iso3309 would be more specific, will change it
+>> to crc64-iso3309 in next revision. Thanks.
+>> 
+>> Regards,
+>> Kamlesh
+>
+> ISO-3309:1991 was withdrawn and revised by
+> ISO/IEC 3309:1993, which was withdrawn and revised by
+> ISO/IEC 13239:2002, which was confirmed in 2007 and is still current.
+>
+> Apparently only the 1991 version defined a CRC-64; later versions dropped
+> that.
+>
+> Is there really a demand for adding a 23 year old deprecated algorithm to
+> the kernel?
+I understand your concern but a lot of TI's K3 based J7* and AM6* SOCs
+have MCRC and MCRC64(Mostly on AM6* SOCs)
+Where MCRC64 only supports above mentioned CRC64 algorithm and few
+customers wants to use the hardware based CRC to ensure FFI, so we
+actually need it.
+If it is available in upstream and can be used easily, a lot of
+customers would want to use it.
 
-Huacai
+I'll look into the naming and will provide something specific to that
+particular algo.
 
-On Mon, Feb 26, 2024 at 4:04=E2=80=AFPM WangYuli <wangyuli@uniontech.com> w=
-rote:
->
-> Both crc32 and crc32c hw accelerated funcs will calculate the
-> remaining len. Those codes are derived from
-> arch/mips/crypto/crc32-mips.c and "len -=3D sizeof(u32)" is not
-> necessary for 64-bit CPUs.
->
-> Removing it can make context code style more unified and improve
-> code readability.
->
-> Suggested-by: Guan Wentao <guanwentao@uniontech.com>
-> Signed-off-by: WangYuli <wangyuli@uniontech.com>
-> ---
->  arch/loongarch/crypto/crc32-loongarch.c | 2 --
->  1 file changed, 2 deletions(-)
->
-> diff --git a/arch/loongarch/crypto/crc32-loongarch.c b/arch/loongarch/cry=
-pto/crc32-loongarch.c
-> index a49e507af38c..3eebea3a7b47 100644
-> --- a/arch/loongarch/crypto/crc32-loongarch.c
-> +++ b/arch/loongarch/crypto/crc32-loongarch.c
-> @@ -44,7 +44,6 @@ static u32 crc32_loongarch_hw(u32 crc_, const u8 *p, un=
-signed int len)
->
->                 CRC32(crc, value, w);
->                 p +=3D sizeof(u32);
-> -               len -=3D sizeof(u32);
->         }
->
->         if (len & sizeof(u16)) {
-> @@ -80,7 +79,6 @@ static u32 crc32c_loongarch_hw(u32 crc_, const u8 *p, u=
-nsigned int len)
->
->                 CRC32C(crc, value, w);
->                 p +=3D sizeof(u32);
-> -               len -=3D sizeof(u32);
->         }
->
->         if (len & sizeof(u16)) {
-> --
-> 2.33.1
->
+Kamlesh
