@@ -1,183 +1,168 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2081.outbound.protection.outlook.com [40.107.94.81])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9B176EF4;
-	Thu, 29 Feb 2024 12:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.81
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709210200; cv=fail; b=kul1jmeXd/Y8RIl8c8sGnrf4QB7rB+8leWTY9D046MGfOUyEQw2BSa1vxsGa7BdLubBuLr8bLBf4MJ+oY9RPEA1ZcARcVQlQbjyBAGe3TWIvZFtp5g1oZaYBUJvgZQgS2yGpQjkRGUzBz/QDs+Q2MyE5CvnOenooDQ+U6P43DTE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709210200; c=relaxed/simple;
-	bh=5BH8LT9Fs0ZnCcKJsgz8qrCQkaPbx40Tkg2s8Upp9sI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MGGBCXHSHZKi59ycOX5OkUIGR+4vv+s3tC5SFOw9Nx94bWfBk9+DdY0qWvFVfA24yOBN2x10wmoDckM8uqJLdTPMptNRkQu6IemlhPj5x2XQWkOMFmBa2liAzoJgaFZW9SVZTN1W8lOkkcPY0fXdGakLndMQfDURa081S7qixBs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Hn9GdPAF; arc=fail smtp.client-ip=40.107.94.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7377D1EB46;
+	Thu, 29 Feb 2024 13:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709211929; cv=none; b=mUPuqffHXyiIR4sgVAaH0x8TerJSRrcAcPAqSpf3sljHJvk40md3+doV81o4EPrE18tkrmElZTDIz5oGa3mLBOjgI41ecIS5f4ug5f/hLbTylKJ6p9NAAT1J/DZg4dVgUExal8NM//e6horgABvKh3UR9eYyv3zeGjTg5bv9D3Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709211929; c=relaxed/simple;
+	bh=XoeSuzG8jqCz1UT3PLYTSpgiX+WG8nr3dkKjB0srM1w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=KER6XS+I6JWIyC8BmSnb1MfaQtbvNk2pf7B0cv5dmyGgBuQeAB1dl38wdsxk3yKAADQOd5xfspXv2joWY3V6YMeXF92foVdWdXnsl4SwvcTsBBLPEwbxGbaxjg7Gd5xTDIt8KA9uFCl0WMMZ9S91mBAbEiEMYFr+KkWNNDxny08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=Z0ZSWkfl; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Hn9GdPAF"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fhZJfPFV17OhCeTtAxK5+NCAHQb7XF2Y32tyrwityw9r3iBiOdadpjaZ17DuL91xdoPNeqqdoeKEqyZcq79EJJeiSEG+W3UmC6FxP5gagKY8qADNAXRHRmKUjwAd94mr9pY9sAG9uy90OwcouYxn7FwGmPlZxePMWLx8fkMAHBXh8qg0XOZSLs0kEN5L33njD85gTB8BjqCmZROWr2pQSn7+d/LOYrZ3uIncCxtX0U+xs3Lig+N8aye0HNOXbLgsDmKonrwCpbBn/nlIk7+ufxJ52JwPJLIOcbCWxZLiBPRlhrOA8eKEkBgA29G+Ew/lpNiWLK3EYyWpb+FzvWGuIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NR5GaIR8XnHwSW4zyTh2E0mMKyyfcK4yaiN0CtivFzw=;
- b=hA4uEgHBIaNOwXeJD1O2k+qzJmIidAZZiEeF/1gTV0h0n58eV7wzH9E3vugYW+nVHuVwvpRheRkCGWxEI3AU4c6nizO5np+tTTjnLa3CLCjxkLV4hYYku3YjCMSO7qsDB7O9+e6jZuvsy814GFQDWVyOqDIPrNjurm1XNYsMIyKKQihwb72U4AK7Nyjo4SAgeiZIl5d1tbq3yG/S6+unPNRMH4WIxSMo1k50pYtuA5BGUaGFzubLgejP3/X3SQa8o1JyXbiy2eySbDaTMGGVKJ87YLJWO29NMWXESX5yy5wG5TCVr42gjhzbitUEUqsJ76CF61WFb3+I/p4lpP5Wjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NR5GaIR8XnHwSW4zyTh2E0mMKyyfcK4yaiN0CtivFzw=;
- b=Hn9GdPAFRz22nqU1fbP74y1WzJsBHnXOstxoUwDnCdDW7yX5wGENBV+QJWi4d7/A6qe5HtUvkH0LsYkFVeMDimC0JGLtyKMCCIfnQfXhceoG6qD1Zjm8PXWbwlpYTP7MTPcTrOywfaQbjZspxSSWf4nbHPu5Qvj8LrDHcHaHV1nVZrNcHSeVLTw7savK7bzcsgYG3wcRgji3Oxr97yhwP2ZhuS/uoK2YP5SHzOy8tN3GKCBZGTtLFjaHRerQoT5k6swTrHKemg7A199GJLinGwCU7RNS4tibVr5i5/5IuRcSkxYXolptLW+B+uLIXg9+Yczjkn/FL0dRuQRgytuqWw==
-Received: from SJ0PR05CA0130.namprd05.prod.outlook.com (2603:10b6:a03:33d::15)
- by DS0PR12MB8247.namprd12.prod.outlook.com (2603:10b6:8:f5::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Thu, 29 Feb
- 2024 12:36:34 +0000
-Received: from SJ5PEPF000001D3.namprd05.prod.outlook.com
- (2603:10b6:a03:33d:cafe::58) by SJ0PR05CA0130.outlook.office365.com
- (2603:10b6:a03:33d::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.30 via Frontend
- Transport; Thu, 29 Feb 2024 12:36:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ5PEPF000001D3.mail.protection.outlook.com (10.167.242.55) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.25 via Frontend Transport; Thu, 29 Feb 2024 12:36:33 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 29 Feb
- 2024 04:36:17 -0800
-Received: from [172.27.52.232] (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Thu, 29 Feb
- 2024 04:36:13 -0800
-Message-ID: <0c23d2c9-6c1e-4887-ab95-ca74f0dcb844@nvidia.com>
-Date: Thu, 29 Feb 2024 14:36:14 +0200
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="Z0ZSWkfl"
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 43A361200E1;
+	Thu, 29 Feb 2024 16:05:15 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 43A361200E1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1709211915;
+	bh=umX0LQkKpv8OA4NwzbRwcDsOZahJ/+JAK3alNhNh6mY=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version:From;
+	b=Z0ZSWkflb/3WTeTWGLCVaFAvggT1+HLi6gWtWUbklDrHudg9ZgRq6Bj9yneR5TOIx
+	 YQvXnqsNchedAAQnKPIwYYs2lhTqrqNWDlgGZ9ZWSdO8B/Tc0J0bj2/YN1/H8uk6H/
+	 4wbjRYAq2nHaQOuCj05/yhgq+BsiXoTxg5cz4CbDrPw7sLLvt/RK3eb3PF29E1Tcqa
+	 ilTjzHjWDJXQTehH22Rwh0afOnufZOvNOfos6RXOfmG+8N6t0Aq6oyUV+X+slLLqUz
+	 y3v3nDhYbT68rLt4sG91YEeJNuymzq630EmLd92UV0vpaZgLWpvpDYmumivivRg8vU
+	 HpW02/xEMY6SA==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Thu, 29 Feb 2024 16:05:14 +0300 (MSK)
+Received: from p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) by
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 29 Feb 2024 16:05:14 +0300
+Received: from p-i-exch-sc-m01.sberdevices.ru ([fe80::6d41:e8f1:b95e:ba1]) by
+ p-i-exch-sc-m01.sberdevices.ru ([fe80::6d41:e8f1:b95e:ba1%7]) with mapi id
+ 15.02.1118.040; Thu, 29 Feb 2024 16:05:14 +0300
+From: Alexey Romanov <avromanov@salutedevices.com>
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+CC: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "khilman@baylibre.com"
+	<khilman@baylibre.com>, "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
+	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
+Subject: Re: [PATCH v4 00/20] Support more Amlogic SoC families in crypto
+ driver
+Thread-Topic: [PATCH v4 00/20] Support more Amlogic SoC families in crypto
+ driver
+Thread-Index: AQHaXbqRFptCyAwKyUyy1Cn5x5FmZLEHrLEAgANeQYCABgkagIAOlJgAgABwfQCAAG4bgA==
+Date: Thu, 29 Feb 2024 13:05:14 +0000
+Message-ID: <20240229025337.ftbvoaafmu5zvyha@cab-wsm-0029881>
+References: <20240212135108.549755-1-avromanov@salutedevices.com>
+ <ZcsYaPIUrBSg8iXu@Red>
+ <20240215104719.njq6ie2niisntcnv@cab-wsm-0029881.sigma.sbrf.ru>
+ <ZdL713ae1swwTU_B@Red> <20240228133656.24bic6djmjvkill7@cab-wsm-0029881>
+ <Zd-VVGXHoH2ikbmV@Red>
+In-Reply-To: <Zd-VVGXHoH2ikbmV@Red>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <5ABEBF99DA6D414FA14316970D4C439A@sberdevices.ru>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-To: Alex Williamson <alex.williamson@redhat.com>, Jason Gunthorpe
-	<jgg@nvidia.com>
-CC: Xin Zeng <xin.zeng@intel.com>, <herbert@gondor.apana.org.au>,
-	<shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
-	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>, <qat-linux@intel.com>,
-	Yahui Cao <yahui.cao@intel.com>
-References: <20240221155008.960369-1-xin.zeng@intel.com>
- <20240221155008.960369-11-xin.zeng@intel.com>
- <20240226115556.3f494157.alex.williamson@redhat.com>
- <20240226191220.GM13330@nvidia.com>
- <20240226124107.4317b3c3.alex.williamson@redhat.com>
- <20240226194952.GO13330@nvidia.com>
- <20240226152458.2b8a0f83.alex.williamson@redhat.com>
- <20240228120706.715bc385.alex.williamson@redhat.com>
-Content-Language: en-US
-From: Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <20240228120706.715bc385.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D3:EE_|DS0PR12MB8247:EE_
-X-MS-Office365-Filtering-Correlation-Id: 158181ad-9b44-466d-d7ad-08dc39231048
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	OEnwyvwLqW52OPt0ewsm3mXKm5twVb15IkQlgrFACOVj2gxbCGrEa7qPHxdWPts4gCMOx4HuYJsu0MEGkH+oY2ppigBwhqfhrxcfevzpGFIwkth694M199rtyZMXh6BS5ab7vUAyjwBWAIBmF4zFWO9w6bBQ0rOYXUJsVTArvYAkyOP5BPySGU4Y5FTOUYe52YHA7VjnhG0Vidkv693DXtTG0rUvhVtmRflZk0UU01EHcXG6szV7zrcLu+1T5TinOvHkG7DjyyAakaJsv9zlASJhRnOM3YscrD2gE9/RU0FJ64RXrPM6X0yIBIgHpikSp/68CsiHq6X3Sw6eG5KqXCR47MihhPUo91iMvTSsaIIAaux4+8xm7Coi/jSnFGUBpEjFM6b9ulklD31SFegZG8uz2OcVZ25TnYutPlhijILJ5qPx4XZg8RAYUtv6zGvnm6iTf2xwJaZTeyAv1q8b5AynSduw83QDaU8B9GpURE30xOYaldR0vm/nE2Y0K3B/GKzOh5MWARffNeplJCEbtcoSkc/0zPTzRiG9QiERtodE0VYZPRxWjKgmcTupiaBEH8XEOHRF0wynDSTRFHOdSRNONCheJnoMh+7tE4J7J677eFFqBltQOb44LuKX8tkUt2YnIUJCypAPqKIaFlvGaG+cF9Ous9H16k6YK8T0sxDDMs6HM0VN6gE4TePhJ8Q6OSwzdOXSkVO+Of+I4dqh4oUPlV93yGx88iTxi5lrx/P8vRDJDN6ns2UPiNDbe+xG
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 12:36:33.8990
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 158181ad-9b44-466d-d7ad-08dc39231048
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001D3.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8247
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 183854 [Feb 29 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.3
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_uf_ne_domains}, {Track_E25351}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;gist.github.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/02/29 11:23:00
+X-KSMG-LinksScanning: Clean, bases: 2024/02/29 11:23:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/02/29 08:31:00 #23888373
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On 28/02/2024 21:07, Alex Williamson wrote:
-> On Mon, 26 Feb 2024 15:24:58 -0700
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
->> On Mon, 26 Feb 2024 15:49:52 -0400
->> Jason Gunthorpe <jgg@nvidia.com> wrote:
->>
->>> On Mon, Feb 26, 2024 at 12:41:07PM -0700, Alex Williamson wrote:
->>>> On Mon, 26 Feb 2024 15:12:20 -0400
->>>> libvirt recently implemented support for managed="yes" with variant
->>>> drivers where it will find the best "vfio_pci" driver for a device
->>>> using an algorithm like Max suggested, but in practice it's not clear
->>>> how useful that will be considering devices likes CX7 require
->>>> configuration before binding to the variant driver.  libvirt has no
->>>> hooks to specify or perform configuration at that point.
->>>
->>> I don't think this is fully accurate (or at least not what was
->>> intended), the VFIO device can be configured any time up until the VM
->>> mlx5 driver reaches the device startup.
->>>
->>> Is something preventing this? Did we accidentally cache the migratable
->>> flag in vfio or something??
->>
->> I don't think so, I think this was just the policy we had decided
->> relative to profiling VFs when they're created rather than providing a
->> means to do it though a common vfio variant driver interface[1].
-> 
-> Turns out that yes, migration support needs to be established at probe
-> time.  vfio_pci_core_register_device() expects migration_flags,
-> mig_ops, and log_ops to all be established by this point, which for
-> mlx5-vfio-pci occurs when the .init function calls
-> mlx5vf_cmd_set_migratable().
-> 
-> So the VF does indeed need to be "profiled" to enabled migration prior
-> to binding to the mlx5-vfio-pci driver in order to report support.
-> 
+Hello!
 
-Right, the 'profiling' of the VF in mlx5 case, need to be done prior to 
-its probing/binding.
+On Wed, Feb 28, 2024 at 09:19:32PM +0100, Corentin Labbe wrote:
+> Le Wed, Feb 28, 2024 at 01:37:02PM +0000, Alexey Romanov a 'ecrit :
+> > Hello,
+> >=20
+> > On Mon, Feb 19, 2024 at 07:57:27AM +0100, Corentin Labbe wrote:
+> > > Le Thu, Feb 15, 2024 at 10:47:24AM +0000, Alexey Romanov a 'ecrit :
+> > > > On Tue, Feb 13, 2024 at 08:21:12AM +0100, Corentin Labbe wrote:
+> > > > > Le Mon, Feb 12, 2024 at 04:50:48PM +0300, Alexey Romanov a 'ecrit=
+ :
+> > > > > > Hello!
+> > > > > >=20
+> > > > > > This patchset expand the funcionality of the Amlogic
+> > > > > > crypto driver by adding support for more SoC families:
+> > > > > > AXG, G12A, G12B, SM1, A1, S4.
+> > > > > >=20
+> > > > > > Also specify and enable crypto node in device tree
+> > > > > > for reference Amlogic devices.
+> > > > > >=20
+> > > > > > Tested on AXG, G12A/B, SM1, A1 and S4 devices via
+> > > > > > custom tests [1] and tcrypt module.
+> > > > > >=20
+> > > > > > ---
+> > > > > >=20
+> > > > >=20
+> > > > > added patchs up to  "drivers: crypto: meson: process more than MA=
+XDESCS descriptors"
+> > > >=20
+> > > > Including this patch or not?
+> > >=20
+> > > The crash start with "drivers: crypto: meson: move algs definition an=
+d cipher API to cipher.c"
+> >=20
+> > Unfortunately I was unable to reproduce this. I use Khadas Vim1 board
+> > and my custom tests (https://gist.github.com/mRrvz/3fb8943a7487ab7b943e=
+c140706995e7).
+> > Tried both build as module and built-in.
+> >=20
+> > Can you, please, give more information? Maybe your test cases?
+>=20
+> My test case is simple, simply load the driver.
+>=20
+> The problem is that you moved the algs[i].mc =3D mc after the register of=
+ algs (in drivers: crypto: meson: move algs definition and cipher API to ci=
+pher.c)
+> Test could happen as soon the register is done and so mc is deferenced.
 
-This is achieved today by running 'devlink <xxx> migratable enable' post 
-of creating the VF.
+Yeah, you are right. Will fix it. Thank you.
 
-> That also makes me wonder what happens if migration support is disabled
-> via devlink after binding the VF to mlx5-vfio-pci.  Arguably this could
-> be considered user error,
+>=20
+> Since you didnt hit the case, I suspect you didnt test the driver as modu=
+le.
 
-Yes, this is a clear user error.
+No, I test the driver as module.
+I think the problem is that on my system no one uses this crypto backend
+outside of my tests module, unlike your system.
 
-  but what's the failure mode and support
-> implication?  Thanks,
-> 
+>=20
+> Regards
 
-The user will simply get an error from the firmware, the kernel and 
-other stuff around will stay safe.
-
-Further details:
-In the source side, once the VM will be started the 'disable' itself 
-will fail as that configuration can't be changed once the VF is 
-running/active already.
-
-In the target, as it's in a pending mode, the 'disable' will succeed. 
-However, the migration will just fail later on in the firmware upon 
-running a migration related command, as expected.
-
-Yishai
+--=20
+Thank you,
+Alexey=
