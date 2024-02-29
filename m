@@ -1,37 +1,45 @@
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C765D91B;
-	Thu, 29 Feb 2024 09:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1570562167;
+	Thu, 29 Feb 2024 09:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709199264; cv=none; b=H8GLn/TR/wDOyN6r7MU9E8wD/gkErSI19ZIswF9T5893r08I9MYZmuk0sb79bIMr/DdRNFp1VVWnP7L4lpeyHTckO4J3oRLryuVlFDQnXf+o5blXjyFDT7zoVpE8/bmqKy8G63oX0Es4h16yH81Fyg9GLv0WlYdDLSDITG0KLvk=
+	t=1709199900; cv=none; b=tMEYNOMPKRaHaENYX2tmXcX2OJcvEzMryMI9z39TqI3X7sOfqHH6bMCFDsJQsliBDuMNFm0tLIFM742BrHuY+O8yC9d5sm4SolfZUcRUcOitaLLdJWvO1eRTS2ZvZwUYEgbQiU0hF+AL7X73U5bYAxKx1zLTnqS2HM4fskXulyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709199264; c=relaxed/simple;
-	bh=AIypsgqbCFGVRElhXEqL4dlDKOmK1OT1uzTwp7CIJHg=;
+	s=arc-20240116; t=1709199900; c=relaxed/simple;
+	bh=LRJVFzBwH7MuVtq2csaTPRAM3cjLsMOfo43jLit+25Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B/H5QPT2jakk3kkQ22LItn7COFF8BHYHDr6Fnv7SyEVFL1h8Rj7kHZWcFMFBANeqBsVT7faSYxoluxwzQOeek4+Ox37KT7ljANNpNqrel8EZ2On1k8pxevwbSZeK1Iswx8GYW3TChLv1Im5VdkDG4Uw3TCUyDuwSqE7+gk2Cgqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id C45012800BB90;
-	Thu, 29 Feb 2024 10:34:19 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id B787513B544; Thu, 29 Feb 2024 10:34:19 +0100 (CET)
-Date: Thu, 29 Feb 2024 10:34:19 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br
-Subject: Re: [PATCH v3 00/10] Add support for NIST P521 to ecdsa
-Message-ID: <20240229093419.GA32424@wunner.de>
-References: <20240223204149.4055630-1-stefanb@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QfqUW0oJAvGh5vomtFDJo+i9PTMXLGAIW5HflM4LMD9JQxIXBKC9gbzhQGhqg8b3UXikl/rRsoqKiit+RGBfkRD0g6ZWxQHTAlZC9d/srR9coKPFcfg7zwVHVEJpjHJjcqFlbTVJhoevmARrxsfV4mXxQ0E7xCWjDgsVZR8XMag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rfcxv-001mAd-8M; Thu, 29 Feb 2024 17:44:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 29 Feb 2024 17:44:50 +0800
+Date: Thu, 29 Feb 2024 17:44:50 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Akhil R <akhilrajeev@nvidia.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"thierry.reding@gmail.com" <thierry.reding@gmail.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>,
+	Mikko Perttunen <mperttunen@nvidia.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"krzk@kernel.org" <krzk@kernel.org>
+Subject: Re: [PATCH v5 3/5] crypto: tegra: Add Tegra Security Engine driver
+Message-ID: <ZeBSEviAw/JVpICl@gondor.apana.org.au>
+References: <20240219172530.20517-1-akhilrajeev@nvidia.com>
+ <20240219172530.20517-4-akhilrajeev@nvidia.com>
+ <SJ1PR12MB63392983F30CA57CBCB69B93C05F2@SJ1PR12MB6339.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -40,27 +48,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240223204149.4055630-1-stefanb@linux.ibm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <SJ1PR12MB63392983F30CA57CBCB69B93C05F2@SJ1PR12MB6339.namprd12.prod.outlook.com>
 
-On Fri, Feb 23, 2024 at 03:41:39PM -0500, Stefan Berger wrote:
-> This series adds support for the NIST P521 curve to the ecdsa module.
-> 
-> An issue with the current code in ecdsa is that it assumes that input
-> arrays providing key coordinates for example, are arrays of digits
-> (a 'digit' is a 'u64'). This works well for all currently supported
-> curves, such as NIST P192/256/384, but does not work for NIST P521 where
-> coordinates are 8 digits + 2 bytes long. So some of the changes deal with
-> converting byte arrays to digits and adjusting tests on input byte
-> array lengths to tolerate arrays not providing multiples of 8 bytes.
+On Thu, Feb 29, 2024 at 09:20:48AM +0000, Akhil R wrote:
+>
+> Do we have any other concerns with the driver currently, which I can address
+> in the next revision?
 
-Don't you also need to amend software_key_query()?  In the "issig" case,
-it calculates len = crypto_sig_maxsize(sig), which is 72 bytes for P521,
-then further below calculates "info->max_sig_size = 2 * (len + 3) + 2;"
+The sha export/import code looks good now.  Does it pass all the
+self-tests, including extra fuzzing?
 
-I believe the ASN.1 encoded integers are just 66 bytes instead of 72,
-so info->max_sig_size is 6 bytes too large.  Am I missing something?
+The same export/import issue still exists with cmac so please fix
+that.
 
 Thanks,
-
-Lukas
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
