@@ -1,149 +1,75 @@
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B865E535AF;
-	Thu, 29 Feb 2024 08:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B355810B;
+	Thu, 29 Feb 2024 09:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709196407; cv=none; b=rydlZVmZvFhRRhAS/lHPZXcSd0CGIa3CCj/1qNmLfQhe/fvJfZyc1Q0uJ8Nz1xpwDn6SJ24s6SM6ZPD6w2Z8NB5nSNQvwXeLcBuGyUwLT8H+G8fTgDMJpOyygZqwbv0DSf0vVXkqitQ3GXdgtMfofwk8FHJa/U6YfWfvw+atfKA=
+	t=1709197877; cv=none; b=nu2w3FKQC+e+q0rNrwvaMK7GfnVZmc/lumxiQWRF05hzacogfyFvK9JyeN7hB6JnKi9gNYnrZddJET7npikiDjIDOlEgZm9FhRsTrTrMdGfOsASjFYMKEtlCJRUoYMU1uTjSy0yJIGXcTN2VTQuhXGNyJ7Ckx+AaI58VK84vKAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709196407; c=relaxed/simple;
-	bh=qwCh4HkETlXqvXQiDnkTAVSKoofLJRfU5jEJr6Y2t1E=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=CAsbI5SuAl6SG2S/MKKRPP7TKpz8J8tuL31mvJf4EkN1ruXylYtSArdPuy6oLyQx2sKggudMabFz3Sl3KevgyHyuVpdz+zp9NZlX6nUJvMsuHoOY9rjrMzW3o/zp3JuRascHrKgedVLxev4GzVK7tCnYUmLnH3L02j57HDT4Bm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=IfH4fgTH; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="IfH4fgTH"
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 41T8jSoB094393;
-	Thu, 29 Feb 2024 02:45:28 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1709196328;
-	bh=Ulcrfge3dIu9txF9ZPWk1YqG9TlLAnjzw2E2aDqON2c=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date;
-	b=IfH4fgTHaE4W04yHnZz6V9XlunSfeUzgZ3pdOsDqyvv+MW7GaKzyXSez2HnXFO7Hx
-	 mamka70Odc/h0m6xvZVc1tHjC15u3MZEmGY45aqsmA85HoZEAe1JyrDoJrsFO/Pvys
-	 AIH3JMDB54TXFWFbuGzjNu+Jdic7xRkc7mMqi/7w=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 41T8jRZb035729
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 29 Feb 2024 02:45:27 -0600
-Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 29
- Feb 2024 02:45:27 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 29 Feb 2024 02:45:27 -0600
-Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 41T8jQQj078498;
-	Thu, 29 Feb 2024 02:45:27 -0600
-From: Kamlesh Gurudasani <kamlesh@ti.com>
-To: "Elliott, Robert (Servers)" <elliott@hpe.com>,
-        Eric Biggers
-	<ebiggers@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        "Krzysztof
- Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        "Tero Kristo" <kristo@kernel.org>,
-        Catalin Marinas
-	<catalin.marinas@arm.com>,
-        "Will Deacon" <will@kernel.org>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-        "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>
-Subject: RE:  Re: [PATCH v2 2/6] crypto: crc64 - add crc64-iso framework
-In-Reply-To: <MW5PR84MB18424EC8DDB4863777D302E2AB562@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
- <20230719-mcrc-upstream-v2-2-4152b987e4c2@ti.com>
- <20230812025520.GE971@sol.localdomain>
- <87jztserrf.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
- <MW5PR84MB18424EC8DDB4863777D302E2AB562@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-Date: Thu, 29 Feb 2024 14:15:25 +0530
-Message-ID: <87plwfk6ai.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+	s=arc-20240116; t=1709197877; c=relaxed/simple;
+	bh=iIH1ah9G+zFyTlqxkBJJeg8/4Q1M35aDXxtZ20ZjMe0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jv+j2p8G/HPM4E4JZRx7BXN2K6RskLTKN4LOUiDgbJvDRYoo/+oXFD2mSFg9V3qKZ+ivVKJB/cKKTdppR83hZgRTLjG3WMwCX3C2aQ1HsNabvufrz2yOqcJzJLLI6vTnmGR3ofiEDmxwvOixcd9zxbOm6Cqqu9YZiWg3rUddLfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout3.hostsharing.net (Postfix) with ESMTPS id C26B4100E2018;
+	Thu, 29 Feb 2024 10:11:05 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 97603527B51; Thu, 29 Feb 2024 10:11:05 +0100 (CET)
+Date: Thu, 29 Feb 2024 10:11:05 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Stefan Berger <stefanb@linux.ibm.com>
+Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br
+Subject: Re: [PATCH v3 01/10] crypto: ecdsa - Convert byte arrays with key
+ coordinates to digits
+Message-ID: <20240229091105.GA29363@wunner.de>
+References: <20240223204149.4055630-1-stefanb@linux.ibm.com>
+ <20240223204149.4055630-2-stefanb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240223204149.4055630-2-stefanb@linux.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-"Elliott, Robert (Servers)" <elliott@hpe.com> writes:
+On Fri, Feb 23, 2024 at 03:41:40PM -0500, Stefan Berger wrote:
+> +static inline void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
+> +					 u64 *out, unsigned int ndigits)
+> +{
+> +	unsigned int sz = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+> +	u8 tmp[ECC_MAX_DIGITS << ECC_DIGITS_TO_BYTES_SHIFT];
+> +	unsigned int o = sz - nbytes;
+> +
+> +	memset(tmp, 0, o);
+> +	memcpy(&tmp[o], in, nbytes);
+> +	ecc_swap_digits(tmp, out, ndigits);
+> +}
 
->> -----Original Message-----
->> From: Kamlesh Gurudasani <kamlesh@ti.com>
->> Sent: Friday, August 18, 2023 2:26 AM
->> Subject: Re: [EXTERNAL] Re: [PATCH v2 2/6] crypto: crc64 - add crc64-iso
->> framework
->> 
->> Eric Biggers <ebiggers@kernel.org> writes:
->> 
->> > Is "crc64-iso" clear enough, or should it be "crc64-iso3309"?  There are
->> > thousands of ISO standards.  Different CRC variants are specified by
->> different
->> > ISO standards.  Is this particular variant indeed commonly referred to
->> as simply
->> > the "ISO" CRC-64?  Even if it's currently the case that all other CRCs
->> in ISO
->> > standards are different widths than 64 bits (which may be unlikely?),
->> I'm not
->> > sure we should count on no CRC-64 variant ever being standardized by
->> ISO.
->> >
->> > - Eric
->> https://en.wikipedia.org/wiki/Cyclic_redundancy_check
->> 
->> Last entry CRC-64-ISO in the table.
->> It is mentioned as crc64-iso and that's the
->> only 64-bit CRC standardized by ISO. 
->
-> ECMA-182 (DLT-1 tapes) was contributed to become ISO/IEC 13421 in 1993, so
-> that was another "64-bit CRC standardized by ISO." Plus, ISO could publish new
-> standards with new CRCs at any time.
->
->> But I do agree that crc64-iso3309 would be more specific, will change it
->> to crc64-iso3309 in next revision. Thanks.
->> 
->> Regards,
->> Kamlesh
->
-> ISO-3309:1991 was withdrawn and revised by
-> ISO/IEC 3309:1993, which was withdrawn and revised by
-> ISO/IEC 13239:2002, which was confirmed in 2007 and is still current.
->
-> Apparently only the 1991 version defined a CRC-64; later versions dropped
-> that.
->
-> Is there really a demand for adding a 23 year old deprecated algorithm to
-> the kernel?
-I understand your concern but a lot of TI's K3 based J7* and AM6* SOCs
-have MCRC and MCRC64(Mostly on AM6* SOCs)
-Where MCRC64 only supports above mentioned CRC64 algorithm and few
-customers wants to use the hardware based CRC to ensure FFI, so we
-actually need it.
-If it is available in upstream and can be used easily, a lot of
-customers would want to use it.
+Copying the whole key into tmp seems inefficient.  You only need
+special handling for the first few bytes of "in" (6 bytes in the
+P521 case) and could use ecc_swap_digits() to convert the rest
+of "in" directly to "out" without using tmp.
 
-I'll look into the naming and will provide something specific to that
-particular algo.
+So it would be sufficient to allocate the first digit on the stack,
+memset + memcpy, then convert that to native byte order into "in[0]"
+and use ecc_swap_digits() for the rest.
 
-Kamlesh
+And the special handling would be conditional on "!o", so is skipped
+for existing curves.
+
+Thanks,
+
+Lukas
