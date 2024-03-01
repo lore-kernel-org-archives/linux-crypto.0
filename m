@@ -1,68 +1,64 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AFF3A8C6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936DD3A8CB;
 	Fri,  1 Mar 2024 02:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709259622; cv=none; b=sR7LM/g272jicsB4V2HhHhyV/rid+vwBl/yhIF79WSR+xmcXlRdfdwhD8UdFRe7E25xjdTXzGOMOoaXnXaYBeey/55+H9gRwpy7Sj3aCbgec/p1K7zRMYw+NEB0ag8v614bUVZeqyhdO0kVlOMiwAYSiJ+bl6kulBUUjo+lCTDc=
+	t=1709259622; cv=none; b=ML1U1IhGSDKMOE0HD3LMENQpb0zyvNfBPqP/Hxg8JNY9JIiDaCLpjkgyropQ9c4hUk4Ybb5jqPvR2LdWNFISCR9W7jhscQjB3XOnexRShDaQ+U/RTUoJ/tv4jJIhHS9enuDuN6Mu57IrfghWrs5LtLBb72R0yzLhCuH8R4S3raY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709259622; c=relaxed/simple;
-	bh=F9JCCoeaCU/lTB7xcWQoFQ8Dpn+YW0NgKZAPTBFE/TU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q01xuteF5yKpudbgHaoH/3T7ngRLpmFyuzAncVibeuuPhqRHJkxWRk6nyYC5DbIAfbHbuGBTaqPzAnX/DuDLr5f+gtOuuTv+lFT0os6i5Qnwjav64UCa+cwPiA99KHJvKk6gGyDlxUC815ZxSDXOq3eiUUSULv8cYzDuikABhBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lfROeEDr; arc=none smtp.client-ip=148.163.158.5
+	bh=0ASI0QBgr5mKYcrNbcJsHaME97RTiEsh8W1nyHlpaQM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rkd0LOtmALmJgadav1Y2qqGqqsazh38cwL0TDx+WioE0fDvrnuY162lRs2Q3N035wcS9gW28q2luUDhSvKQ4CyMPlc7ZaOwGlvveLQvNlS4+LAjp2OV/SrkS3BRsdJWOzAgQKW1r0FqIXi6JGuRcrQimMhbW2B8LHxoy1FzpqOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fZ8drxjY; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lfROeEDr"
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4211vUC3023350;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fZ8drxjY"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4211HTfR007771;
 	Fri, 1 Mar 2024 02:20:14 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=7qL62/qeeizBEmA5iVXsHGLyOkGG+/bWbPU+VDhGC8I=;
- b=lfROeEDr0w6Kh8Sxlv68FH+2YtkeAjWXEEybKFINJGk+vK7qzVWG2CySP9VztFsWW9qk
- 5D2wZctslw7mf6ixVx0LZgRzkZy1hoCzBehP6A3/PpmU7wvsOPz9SgEMtTcfsT7IGCVW
- ZGFgKS6zwMVZLFMCSqP+vrgf7bQdyIIMqfTS0PEwcEvIVTTEWZTKuH2HbUcckHV8Y7qA
- otDABdMk+T48SO3hpRTcf46ycVwIvLjQOA+C67zpHTzKpDljLGQbomBywuxTsNecGFL8
- BkjXTTpp8gyHf5qlU+8i3SoVwfox1uv2T4VjqhVcTZp7/aMEzeGBP6k0WVZmSbJ/FS94 dA== 
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wk5tergfs-1
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=JjpeBF+HPJkru1kwSAxmoUSoOHgw4cHjXPFWE8PXlk4=;
+ b=fZ8drxjYeMezieTKQYIixC8G6cnDHzfcRStFfbjXpiG7wQ4Re7XwSMOAK5nd3e5VTf1t
+ ptf747minO8FF92Q9BCNaRfXqWqBYa2viLFL8mWa63cP/k5UpxObSXfT53bH+5h+AXH2
+ fkZgEKiwZ3ATAqSEX7drCrec9s2Sth1sd+bICmVrhE4nW+4BGKxUE3ect6MwgkrJIntq
+ RtUj3dUkOsxdVzJObM6sSu5FmnN/X+o0NyhTozrZs27h7Qn9GTggqTIOrRJiGV/cHL7z
+ SUJjZpDm93BzOq0Vd3u0Tvk/pG7SqwYEXg4UrZZ3yT6FCGqXyZmAXW7hBlX76bpSMn+j ew== 
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wk57h1dec-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Fri, 01 Mar 2024 02:20:13 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42108KKF008802;
-	Fri, 1 Mar 2024 02:20:13 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wftsu1w68-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Mar 2024 02:20:13 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4212KAUg38797610
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4211FCMs008189;
 	Fri, 1 Mar 2024 02:20:12 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wfv9msefa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Mar 2024 02:20:12 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4212K9988323772
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 1 Mar 2024 02:20:11 GMT
 Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A8F7F58068;
-	Fri,  1 Mar 2024 02:20:10 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 7A0F458067;
+	Fri,  1 Mar 2024 02:20:09 +0000 (GMT)
 Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2A1C158056;
-	Fri,  1 Mar 2024 02:20:10 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 03DEB58069;
+	Fri,  1 Mar 2024 02:20:09 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
 	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  1 Mar 2024 02:20:10 +0000 (GMT)
+	Fri,  1 Mar 2024 02:20:08 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.ibm.com>
 To: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         herbert@gondor.apana.org.au, davem@davemloft.net
 Cc: linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br, lukas@wunner.de,
         Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH v4 02/12] crypto: ecdsa - Adjust tests on length of key parameters
-Date: Thu, 29 Feb 2024 21:19:57 -0500
-Message-ID: <20240301022007.344948-3-stefanb@linux.ibm.com>
+Subject: [PATCH v4 00/12] Add support for NIST P521 to ecdsa
+Date: Thu, 29 Feb 2024 21:19:55 -0500
+Message-ID: <20240301022007.344948-1-stefanb@linux.ibm.com>
 X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240301022007.344948-1-stefanb@linux.ibm.com>
-References: <20240301022007.344948-1-stefanb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -71,46 +67,77 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: sdDmLsLBbv_gBUesRd9wLXb6qvtA1_eC
-X-Proofpoint-ORIG-GUID: sdDmLsLBbv_gBUesRd9wLXb6qvtA1_eC
+X-Proofpoint-GUID: 5FlnokoOG48JoA31FUNuV0UKgGBxWpkA
+X-Proofpoint-ORIG-GUID: 5FlnokoOG48JoA31FUNuV0UKgGBxWpkA
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-02-29_08,2024-02-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 impostorscore=0 phishscore=0
- mlxlogscore=999 priorityscore=1501 malwarescore=0 suspectscore=0
- mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 mlxscore=0 adultscore=0 spamscore=0 phishscore=0
+ priorityscore=1501 impostorscore=0 mlxlogscore=999 clxscore=1015
+ bulkscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311290000 definitions=main-2403010018
 
-In preparation for support of NIST P521, adjust the basic tests on the
-length of the provided key parameters to only ensure that the length of the
-x plus y coordinates parameter array is not an odd number and that each
-coordinate fits into an array of 'ndigits' digits. Mathematical tests on
-the key's parameters are then done in ecc_is_pubkey_valid_full rejecting
-invalid keys.
+This series adds support for the NIST P521 curve to the ecdsa module
+to enable signature verification with it.
 
-The change is necessary since NIST P521 keys do not have keys with
-coordinates that each fully require 'full' digits (= u64), unlike
-NIST P192/256/384 that all require multiple 'full' digits.
+An issue with the current code in ecdsa is that it assumes that input
+arrays providing key coordinates for example, are arrays of digits
+(a 'digit' is a 'u64'). This works well for all currently supported
+curves, such as NIST P192/256/384, but does not work for NIST P521 where
+coordinates are 8 digits + 2 bytes long. So some of the changes deal with
+converting byte arrays to digits and adjusting tests on input byte
+array lengths to tolerate arrays not providing multiples of 8 bytes.
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
----
- crypto/ecdsa.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+   Stefan
 
-diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
-index 6653dec17327..64e1e69d53ba 100644
---- a/crypto/ecdsa.c
-+++ b/crypto/ecdsa.c
-@@ -230,7 +230,7 @@ static int ecdsa_set_pub_key(struct crypto_akcipher *tfm, const void *key, unsig
- 	if (ret < 0)
- 		return ret;
- 
--	if (keylen < 1 || (((keylen - 1) >> 1) % sizeof(u64)) != 0)
-+	if (keylen < 1 || ((keylen - 1) & 1) != 0)
- 		return -EINVAL;
- 	/* we only accept uncompressed format indicated by '4' */
- 	if (d[0] != 4)
+v4:
+ - Followed suggestions by Lukas Wummer (1,5,8/12)
+ - Use nbits rather than ndigits where needed (8/12)
+ - Renaming 'keylen' variablest to bufsize where necessary (9/12)
+ - Adjust signature size calculation for NIST P521 (11/12)
+
+v3:
+ - Dropped ecdh support
+ - Use ecc_get_curve_nbits for getting number of bits in NIST P521 curve
+   in ecc_point_mult (7/10)
+
+v2:
+ - Reformulated some patch descriptions
+ - Fixed issue detected by krobot
+ - Some other small changes to the code
+
+
+Stefan Berger (12):
+  crypto: ecdsa - Convert byte arrays with key coordinates to digits
+  crypto: ecdsa - Adjust tests on length of key parameters
+  crypto: ecdsa - Extend res.x mod n calculation for NIST P521
+  crypto: ecc - Implement vli_mmod_fast_521 for NIST p521
+  crypto: ecc - Add nbits field to ecc_curve structure
+  crypto: ecc - Add special case for NIST P521 in ecc_point_mult
+  crypto: ecc - Add NIST P521 curve parameters
+  crypto: ecdsa - Replace ndigits with nbits where precision is needed
+  crypto: ecdsa - Rename keylen to bufsize where necessary
+  crypto: ecdsa - Register NIST P521 and extend test suite
+  crypto: asymmetric_keys - Adjust signature size calculation for NIST
+    P521
+  crypto: x509 - Add OID for NIST P521 and extend parser for it
+
+ crypto/asymmetric_keys/public_key.c       |  14 ++-
+ crypto/asymmetric_keys/x509_cert_parser.c |   3 +
+ crypto/ecc.c                              |  38 +++++-
+ crypto/ecc_curve_defs.h                   |  49 ++++++++
+ crypto/ecdsa.c                            |  62 ++++++---
+ crypto/ecrdsa_defs.h                      |   5 +
+ crypto/testmgr.c                          |   7 ++
+ crypto/testmgr.h                          | 146 ++++++++++++++++++++++
+ include/crypto/ecc_curve.h                |   3 +
+ include/crypto/ecdh.h                     |   1 +
+ include/crypto/internal/ecc.h             |  27 +++-
+ include/linux/oid_registry.h              |   1 +
+ 12 files changed, 339 insertions(+), 17 deletions(-)
+
 -- 
 2.43.0
 
