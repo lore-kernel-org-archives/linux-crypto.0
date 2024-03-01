@@ -1,131 +1,139 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EDA56B8A;
-	Fri,  1 Mar 2024 21:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6646C59149
+	for <linux-crypto@vger.kernel.org>; Fri,  1 Mar 2024 23:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709328016; cv=none; b=fyEPJ4zD2FIvtJQOokwFP+ozRBk5ERbor0YFuWOTOj7YyUsDjcQ8YEv3EqK30VnYTpslxKDqXDDZH6VaWSOuj59lLhcnNgGg+2U0nu0ih9s9clywd12VEiNSW4aPpxvIrS1lNLjpcwTPboZwe2crUnX0brGoZAomcygwXmEKrS4=
+	t=1709337535; cv=none; b=HomKebZMoN1T5mk8YHnpW7o4NcC45jHCYIR+Rn9y4ey3xeA0HE3JeAaFceKzp92GI0Abxev2sHYk6ZIxnCsoHBSeBh6t09xd3nYdFzdIMXr1OxuLwjSeY9dehEQm4uyLAhqFtkSEeCwvIaGNZkBRJnOYjX0u+xWkTkg1SWLJyRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709328016; c=relaxed/simple;
-	bh=Fp36LTyYV9kpvNDK+hVtBJ7X8DZcQYNdYOtSiayQAFI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TNNWYK8t9lK8209oonXKBs47nsD9g0nwbvsE0gi7y94JzTfmMvm/maA2rPPzrk3VbJiKmwRShSyIO98Ly8ejqBInIx8lijayPLC4ec5VKXgWzfLiQlhEfitymahexDUld4C8VZ4HSlt94sgEis+wyz1a5y2hDma/SAyQk/3uJkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SobCjazG; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1709337535; c=relaxed/simple;
+	bh=TEiZWx4zhHeYJu6Wn/bCg5XXbQXaRGha6ZvizIYbH7I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eAECmjtf7BfBnzuLrxnVMAO7z1C7FbCVXBmxcFzJKmWIYIXjhzmG3tc954OpliMugCkATzO0j5+RvEv1IT+iZrldmA8wHa9U9yRHQIKUevUUOPQHEepjauFd48H28129iMuqnQLV0C9rR7EDums+tOl9PZlP341Mz/4wfVtpNz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HcF0iIua; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SobCjazG"
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 421LHs9n003197;
-	Fri, 1 Mar 2024 21:20:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=+RMLsOnNosJmVE5b3aZfPjID67/Lvajwmqc6g347uww=;
- b=SobCjazGG0pUI4x3HPRPyh5z9AlBLh3s6MkkBZm0vVwVYI7NPMz0WgW90v6ayP8DqAMa
- MQOAdZaL5JwVFXzurGEIQU9VlF0DwlvCjymfnR9+0eJn2kSrH07M3ps8HMtNAql1AJHz
- u5ScJdkaSxnPlyjVksSszF3z8WFTacW3UnULDwXxceUvC6ZCwPJD/Jjp3OO4wLokstST
- dpwVAzgoKSw1zBEqZgiDZCfOI7aamS+zA7SKE5U8hrwp+y5AmAjjhl/fLniBYjvflcPi
- 99iMSd8BAACl3XCatV9qr6G5ZyhVZnYRQ3ecxJ8kjp4s3EeXiysfMetwcfUUHLdH93ty gg== 
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wkpt5g1ga-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Mar 2024 21:20:05 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 421K0KM7008142;
-	Fri, 1 Mar 2024 21:20:04 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wfv9mxxtu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Mar 2024 21:20:04 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 421LK1w27078838
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 1 Mar 2024 21:20:04 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 93F0158055;
-	Fri,  1 Mar 2024 21:20:01 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9F4F158063;
-	Fri,  1 Mar 2024 21:20:00 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  1 Mar 2024 21:20:00 +0000 (GMT)
-Message-ID: <00bd9f8d-cde7-44a7-ab1a-888d8fd66cd8@linux.ibm.com>
-Date: Fri, 1 Mar 2024 16:20:00 -0500
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HcF0iIua"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709337532;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YlCAVuX4UaRN1aV/EeYQU1fnCBON103irv5ZBsuVOqI=;
+	b=HcF0iIuakwYsFtvRAu+TuIf3Bl4qy0S/msXCjzkIpExHT8+LmNsT38p6J2PHz7TvT+qj8Q
+	LYbhDKeZ+jSJEqbSq0GcCVxYwCDNVTDiN18vFHO03aRkVJFmEbw3aEHVNoz9MdPPuvW1Dy
+	CU/4YKILd4YgQ6dhiMhvGcN02EVPMxg=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-90-XWXs8MOcMNa7wPunTzP5sg-1; Fri, 01 Mar 2024 18:58:51 -0500
+X-MC-Unique: XWXs8MOcMNa7wPunTzP5sg-1
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36424431577so32257305ab.3
+        for <linux-crypto@vger.kernel.org>; Fri, 01 Mar 2024 15:58:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709337530; x=1709942330;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YlCAVuX4UaRN1aV/EeYQU1fnCBON103irv5ZBsuVOqI=;
+        b=iUroZ8z/B0c9HZY2OV2Qw51c8FJq7Tsdin1FkZ82oqxopkD7lV2H78fKVOIeY9hP5Y
+         njrj8BmZTXqtefbcTbLcBBK8YYHcWF4otKWpyo2Z0T1JqwuGJPSpkz+a9kzRkO01i3oT
+         rngu5S2ZkyKHl4sCMRW4byPQKASAM18IdRq9F0RrNxBokwyC96PuDdq92VvXdD17Kwgn
+         YG7D5r0YWEPtFGOy3Qqne/t0BruT8jZwaByjY+Rd5y9BDcGoa88JeTpYLpZU0mAMq7CD
+         Ho6PGWMAxU2btMF4sTSv5/BHy9iezmFearWtUAFxPFpVlxn3fqHgHXqEVMhGYEuD80YF
+         fqqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU/2FATyCNw54gA9fut1u8Qk2asrunk6CUD+A58nacNpT6aN5Wb9P8yhfyE/zDESlnypOC3P2Q73zXxJmf12RwTvM9Yfyu95MfMJSMS
+X-Gm-Message-State: AOJu0YyxLh50+hyUXYo/Rk7zCAs2BwgmsfUbGIbSdk2F8A6WpI1mjhVk
+	jOEqEcJYwZYCogphZUOpawhsDZ4IjCIAYiFC54TTYPyxf+WY2aPHiSZpcfWvHlSN8tpEAf1R5TE
+	Ss1lv2RrIbkmP1bJZTYrjOLhnZ1esMzsYWrIKWjhq7DXV47rc1VCouG27QmEsTA==
+X-Received: by 2002:a05:6e02:2164:b0:365:1b7c:670 with SMTP id s4-20020a056e02216400b003651b7c0670mr4106982ilv.8.1709337530257;
+        Fri, 01 Mar 2024 15:58:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGbRepeUVWR47zVjqTIDy6q8VcNd2j88dfXjLkatYc3K1nuWkkGOazRwHcZWscPqnqCuZazBQ==
+X-Received: by 2002:a05:6e02:2164:b0:365:1b7c:670 with SMTP id s4-20020a056e02216400b003651b7c0670mr4106972ilv.8.1709337529949;
+        Fri, 01 Mar 2024 15:58:49 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id y11-20020a92c74b000000b003642688819csm1177284ilp.69.2024.03.01.15.58.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Mar 2024 15:58:49 -0800 (PST)
+Date: Fri, 1 Mar 2024 16:58:48 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Xin Zeng <xin.zeng@intel.com>
+Cc: herbert@gondor.apana.org.au, jgg@nvidia.com, yishaih@nvidia.com,
+ shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+ linux-crypto@vger.kernel.org, kvm@vger.kernel.org, qat-linux@intel.com,
+ Yahui Cao <yahui.cao@intel.com>
+Subject: Re: [PATCH v4 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Message-ID: <20240301165848.37cfffaf.alex.williamson@redhat.com>
+In-Reply-To: <20240228143402.89219-11-xin.zeng@intel.com>
+References: <20240228143402.89219-1-xin.zeng@intel.com>
+	<20240228143402.89219-11-xin.zeng@intel.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 09/12] crypto: ecdsa - Rename keylen to bufsize where
- necessary
-Content-Language: en-US
-To: Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br, lukas@wunner.de
-References: <20240301022007.344948-1-stefanb@linux.ibm.com>
- <20240301022007.344948-10-stefanb@linux.ibm.com>
- <CZIPDP0W9TOP.3CCT8QUB0R4L3@suppilovahvero>
- <90606a3c-1384-407b-8270-dd76dccc700b@linux.ibm.com>
- <CZIPKTL42F1Z.2U4Q28IIQ159K@suppilovahvero>
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <CZIPKTL42F1Z.2U4Q28IIQ159K@suppilovahvero>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: nXiz26RnlBkFlwg5vbrlGyglIK2iYYA4
-X-Proofpoint-ORIG-GUID: nXiz26RnlBkFlwg5vbrlGyglIK2iYYA4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-01_22,2024-03-01_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
- lowpriorityscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0 spamscore=0
- impostorscore=0 malwarescore=0 clxscore=1015 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2403010177
+
+On Wed, 28 Feb 2024 22:34:02 +0800
+Xin Zeng <xin.zeng@intel.com> wrote:
+> +static int
+> +qat_vf_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct qat_vf_core_device *qat_vdev;
+> +	int ret;
+> +
+> +	if (!pci_match_id(id, pdev)) {
+> +		pci_err(pdev, "Incompatible device, disallowing driver_override\n");
+> +		return -ENODEV;
+> +	}
+
+I think the question of whether this is the right thing to do is still
+up for debate, but as noted in the thread where I raised the question,
+this mechanism doesn't actually work.
+
+The probe callback is passed the matching ID from the set of dynamic
+IDs added via new_id, the driver id_table, or pci_device_id_any for a
+strictly driver_override match.  Any of those would satisfy
+pci_match_id().
+
+If we wanted the probe function to exclusively match devices in the
+id_table, we should call this as:
+
+	if (!pci_match_id(qat_vf_vfio_pci_table, pdev))...
+
+If we wanted to still allow dynamic IDs, the test might be more like:
+
+	if (id == &pci_device_id_any)...
+
+Allowing dynamic IDs but failing driver_override requires a slightly
+more sophisticated user, but is inconsistent.  Do we have any
+consensus on this?  Thanks,
+
+Alex
 
 
+> +
+> +	qat_vdev = vfio_alloc_device(qat_vf_core_device, core_device.vdev, dev, &qat_vf_pci_ops);
+> +	if (IS_ERR(qat_vdev))
+> +		return PTR_ERR(qat_vdev);
+> +
+> +	pci_set_drvdata(pdev, &qat_vdev->core_device);
+> +	ret = vfio_pci_core_register_device(&qat_vdev->core_device);
+> +	if (ret)
+> +		goto out_put_device;
+> +
+> +	return 0;
+> +
+> +out_put_device:
+> +	vfio_put_device(&qat_vdev->core_device.vdev);
+> +	return ret;
+> +}
 
-On 3/1/24 15:50, Jarkko Sakkinen wrote:
-> On Fri Mar 1, 2024 at 10:47 PM EET, Stefan Berger wrote:
->>
->>
->> On 3/1/24 15:41, Jarkko Sakkinen wrote:
->>> On Fri Mar 1, 2024 at 4:20 AM EET, Stefan Berger wrote:
->>>> In some cases the name keylen does not reflect the purpose of the variable
->>>> anymore once NIST P521 is used but it is the size of the buffer. There-
->>>> for, rename keylen to bufsize where appropriate.
->>>>
->>>> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
->>>> ---
->>>>    crypto/ecdsa.c | 12 ++++++------
->>>>    1 file changed, 6 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
->>>> index 4daefb40c37a..4e847b59622a 100644
->>>> --- a/crypto/ecdsa.c
->>>> +++ b/crypto/ecdsa.c
->>>> @@ -35,8 +35,8 @@ struct ecdsa_signature_ctx {
->>>>    static int ecdsa_get_signature_rs(u64 *dest, size_t hdrlen, unsigned char tag,
->>>>    				  const void *value, size_t vlen, unsigned int ndigits)
->>>>    {
->>>> -	size_t keylen = ndigits * sizeof(u64);
->>>> -	ssize_t diff = vlen - keylen;
->>>> +	size_t bufsize = ndigits * sizeof(u64);
->>>
->>> why not just "* 8"? using sizeof here makes this function only unreadable.
->>
->> 'unreadable' is a 'strong' word ...
-> 
-> so what is the gain when writing sizeof(u64)?
-
-It matches existing code and a digit is a 'u64'.
-
-
-> 
-> BR, Jarkko
