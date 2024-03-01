@@ -1,150 +1,74 @@
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4342820E6;
-	Fri,  1 Mar 2024 11:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668C91115
+	for <linux-crypto@vger.kernel.org>; Fri,  1 Mar 2024 12:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709291876; cv=none; b=baQMZuOrPBwW43LCA6i4uTld2CRlHszgW1JjzU3NtS4wbMS3n6F04Ia4TQX+uJXsuRbhMcXupYVXawUCJHiJzR8eQzs3Yu2Uo3N6f6PxqVBi6BKg6o2MK0zupBcAV4uYjb7P24uBbCK/c6lAx2UZVbrUN561D2z43GA/2i0U4UM=
+	t=1709296596; cv=none; b=mnSwqugkpxWYUtTOQc8Zx9kGEL/DZAMM1GOxK2oB0BaQ1+iSKLzvnLDMgKrnKoH/ctNgOyzft+80VCR4/wMqKTjsUW/D7aPtqaYJyqcpEV84eu9xNCqv1Vh5Pgz0pW9ENPNt5byYGZqPA9hWNEm3wxRl/ydJYts9kxBW5r7NWIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709291876; c=relaxed/simple;
-	bh=D4Yzpe7+BaiWIZI79CoBEFuH6u33sbHObSSwGbqQXoM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Eiw2ECyPmKy3zdt2Ndocw5RoV3iHAwTV0ga/hXz8bkuqjYCIzkCZP0D+b5UuvhscE0SxoUkmdtJdCfGRFNSwjPUFkU79AulSU+L1D9l9NHkCmJ0QOjWppXOvEJR/r7ntpJrdn2svjsXYDo7e3iAaIW5hXhVVRAWELBKmRfwQWwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FckhzRTP; arc=none smtp.client-ip=209.85.217.54
+	s=arc-20240116; t=1709296596; c=relaxed/simple;
+	bh=46QQdgNfVCnY0kDCTnTRBIKamFFvFvZLtfXf6iIr6kA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=J4u8epc5hfuBJKHZf2fUXPMjhNNFHok6upAXBq4Wt54YdhHOQl0da1LtcGAyq6Bd4z9DnW05dVCLLhWndoQ8ipZCSdgbNp574lKrk6XZihg86tx02FTXbkgQsQZ8b46nw+/WtG0aeCQiiLmDpxaLhQvUT6NLbSBjWh/B8zNsr/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZQu6g3pV; arc=none smtp.client-ip=209.85.161.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FckhzRTP"
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-47265631782so444049137.0;
-        Fri, 01 Mar 2024 03:17:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZQu6g3pV"
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5a0deaf21efso1118045eaf.0
+        for <linux-crypto@vger.kernel.org>; Fri, 01 Mar 2024 04:36:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709291874; x=1709896674; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4PIzBFt3045Qodp8Tc294RcaDOpUCULciO01suUMZ2Y=;
-        b=FckhzRTPYbWyFXi9YY/sEKAy+XOj6ov05hbjcmLGM68HWsQ5jZs+s4CcF4O/d7Hz5z
-         oT9TzAH4NWnBOATDnOsBsrvG+kXO6Arqk7qLxvPL17rs4WzzM8gbnpR8poKla+kPlhUu
-         EQEzonpCDWC2TWipoxd1/7k6wwqKk5wNKLSehPkOW3lV96DSO2ALyznauTBDEnudkqgD
-         qFFvjYTzAzkadBaQsWdZm2Gs7UOCGdy5YiL8qG1s0INwZZF/ces7NLgpgXa/Opzz+Ghb
-         mWNurQqkkakAKixewxTn4nPiXqgTkPbzGnWRdeoASlWbrMH+utScjbCe+zxDzSew2aJm
-         Kk7A==
+        d=gmail.com; s=20230601; t=1709296594; x=1709901394; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=46QQdgNfVCnY0kDCTnTRBIKamFFvFvZLtfXf6iIr6kA=;
+        b=ZQu6g3pV6jRuYFXEpvsI93TCvrSomvNZH58rzPAeWYVZjM8oACGd2+qnxdrY63Maiv
+         iezRwunbxuGHROflfO7bbgfpvXj9qlOBmkkR0RnS2EIdqsFfyyRPsPWXbeY/bt4uY9R+
+         C9OvUW0DiL9vFAI0spGxWc7JsYZxX+y06p3sY/S8Ddu5Cl0LVoFq1EfHZiVs2T4q5iuS
+         LePitR2yYwfVY/T5mht24bmsWauv09dOX/12Y70NUr4sVH4defAN4OpesLoGqVLJ8gVM
+         pS6PhYQupOlMA5LY6UW30o8SAV3aZFO9vXV2KDCwSj9VUQqd9iIfKYfc9SS7O7xfsm1N
+         7QNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709291874; x=1709896674;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4PIzBFt3045Qodp8Tc294RcaDOpUCULciO01suUMZ2Y=;
-        b=RP7249RX6wzSILBsJ+9TGU5YlJe9jv1qVJN5ntkdLKV5/5NbllgaTcG3gDU8Es1LGG
-         Fx/U20VYV8Z6ZgrnwdmMCfNWuoXxM40U6Vi2UMYlKuy3c42xaf6qvICgLwiwpQhZliiU
-         cXl4/gTmN0Boz+6crZ5vkLBq6liGOSKahTOi4GSpOuD/p3OAM2uQMFdDdxGJzgvvuubz
-         xJBACs8j1QJtfvQR8hNlMzC4AWl4SypNj+4h23v+Tt/n3ZYlGtdD2gPkQtTWX5v3rLTt
-         +eji3nsVamfUUxeVwnsyiGzbp7N81D8+3jKwpfH4FhYqIYWw1x22uz+xuHtpFKaUONcd
-         QoEg==
-X-Forwarded-Encrypted: i=1; AJvYcCXuwpEwCeABbt7nrpzUOQEGLPzo4N2fnJFcCFENFZraNuYb9M1hG4D5rJdkVTWHm9O7/lBuEy/QGKdDmqK+QIZf9wdXcv1GTsIVTGisyb/dOG4UQP9tKIjP+dNfjl+43sKSjeQsG+7dCd2j
-X-Gm-Message-State: AOJu0Yx+ZeuiX1uzZP5I2PJ5+GKHyO1dBCujMbKkPbJpU1iOr+QHCYxf
-	bnXqKBzt+E57LgTRQqVioJy4XQrknSnRTIskiQ9kPtX0P8B9xuD2Tnr4MZiahnkOTm1OphKjJKj
-	EQNDHc/hju1Mj3DaIC3EYGTYbs0w=
-X-Google-Smtp-Source: AGHT+IEVUu5WnCqYzCDVF/JN8zQh7b9mKD8dIEo85xmhV+/TubfvNX658CQmk3ZrNVANuGIUx+iSoSocNWzV57UojK8=
-X-Received: by 2002:a05:6102:134f:b0:470:3ade:7b99 with SMTP id
- j15-20020a056102134f00b004703ade7b99mr1036570vsl.23.1709291874194; Fri, 01
- Mar 2024 03:17:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709296594; x=1709901394;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=46QQdgNfVCnY0kDCTnTRBIKamFFvFvZLtfXf6iIr6kA=;
+        b=hLf0ERqnYfatnAwx7TKDEFcfAv5pTk1/Os0tEFI1HrlxZJrxudbhg0Aow+sprcg+pN
+         vKzj1/w4OB6uiyD19SwLrSiv5IHVzyiI3vqM8mGOv5/gqpyDo8XFD+X5C1fXJf9ggCzg
+         GKaM0vzdDNDZ2Xc5CoyI+2aPBm6BwB+70v8FUZfCKox1pvnLZfz/j/6ryF6SU/XXci34
+         X329Zfu+922IJclNj1RTf6kkR0VieW9BmvX3PuVwhGRV6BSDaLw0i1E5jLF5ns/NN6g6
+         dz62sZApDK5lD9GVEPa3ndNyolPVSV8xnjZBcfMRhOGe85Jo+tir9EXghyjC3VulDCpG
+         +xQA==
+X-Gm-Message-State: AOJu0YzkgfsMEvHhiEntU2JcKreuB0Qo8LUk5Eky7xwZ8XKw2WQFIziW
+	qAwSkaNMaJh5qlCRHB7qOWaa+/08IcLU1EQgPKmKFTxjfNyJEKk/05LPnrKMDQjP4qbGT1hlrBr
+	k6TseW2pSrVBGL6QSUYnUkxL/vJ/dmsOa3Q==
+X-Google-Smtp-Source: AGHT+IG5S/kZXX5IeZ92K4sbaoqWk+raWhVwmQJUhLMZ/fbCcM2Zn5XXAWo4pbSLZAUKvM3ZWf4J9dXgNBIQ0fKVnBM=
+X-Received: by 2002:a4a:3557:0:b0:5a1:82c:be8b with SMTP id
+ w23-20020a4a3557000000b005a1082cbe8bmr543161oog.0.1709296594147; Fri, 01 Mar
+ 2024 04:36:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240222020617.31041-1-21cnbao@gmail.com> <ZeGtrvm9WGv5cxQV@gondor.apana.org.au>
-In-Reply-To: <ZeGtrvm9WGv5cxQV@gondor.apana.org.au>
-From: Barry Song <21cnbao@gmail.com>
-Date: Sat, 2 Mar 2024 00:17:42 +1300
-Message-ID: <CAGsJ_4wPeXMZTAQpXsqN0Q3E5_vvF83UzeoVqL01qjnDZACJzQ@mail.gmail.com>
-Subject: Re: [PATCH v6] crypto: scompress: remove memcpy if sg_nents is 1 and
- pages are lowmem
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Chris Li <chriscli@google.com>, Chris Li <chrisl@kernel.org>, 
-	Seth Jennings <sjenning@redhat.com>, Vitaly Wool <vitaly.wool@konsulko.com>, 
-	Barry Song <v-songbaohua@oppo.com>, Nhat Pham <nphamcs@gmail.com>, 
-	Yosry Ahmed <yosryahmed@google.com>, Chengming Zhou <zhouchengming@bytedance.com>, 
-	Matthew Wilcox <willy@infradead.org>, Kent Overstreet <kent.overstreet@linux.dev>, 
-	"Darrick J. Wong" <djwong@kernel.org>, Christoph Hellwig <hch@lst.de>, Al Viro <viro@zeniv.linux.org.uk>
+From: "Jayalakshmi Manunath Bhat ," <bhat.jayalakshmi@gmail.com>
+Date: Fri, 1 Mar 2024 18:05:57 +0530
+Message-ID: <CALq8RvJDQ9U4x_Beew0jGQqSQtm3TGXh9m5aSvrzPZeft0h0Kg@mail.gmail.com>
+Subject: https over ESP is not working in kernel version 5.10.199
+To: linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 1, 2024 at 11:28=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> On Thu, Feb 22, 2024 at 03:06:17PM +1300, Barry Song wrote:
-> >
-> > -     scatterwalk_map_and_copy(scratch->src, req->src, 0, req->slen, 0)=
-;
-> > +     if (sg_nents(req->src) =3D=3D 1 && !PageHighMem(sg_page(req->src)=
-)) {
-> > +             src =3D page_to_virt(sg_page(req->src)) + req->src->offse=
-t;
->
-> Incidentally this made me look at other uses of PageHighMem in
-> the kernel.
->
-> The one in copy_page_from_iter_atomic looks buggy because it assumes
-> that the kmap never maps a page if PageHighMem is false, which is not
-> the case for CONFIG_DEBUG_KMAP_LOCAL_FORCE_MAP.
+Hi All.
 
-You are right. This needs to be fixed.
+On our device I am able to establish IPsec IKEv1 rules successfully on
+kernel version 5.10.199. Ping, Telnet, http (port 80) etc works fine.
+However when I am trying to https to device, operation fails and error
+is in xfrm_input.c and error is
+if (nexthdr == -EBADMSG), nexthdr is EBADMSG and the packet is
+dropped. I do not understand why https fails.
 
->
-> > @@ -152,8 +165,12 @@ static int scomp_acomp_comp_decomp(struct acomp_re=
-q *req, int dir)
-> >                       ret =3D -ENOSPC;
-> >                       goto out;
-> >               }
-> > -             scatterwalk_map_and_copy(scratch->dst, req->dst, 0, req->=
-dlen,
-> > -                                      1);
-> > +             if (dst =3D=3D scratch->dst) {
-> > +                     scatterwalk_map_and_copy(scratch->dst, req->dst, =
-0,
-> > +                                              req->dlen, 1);
-> > +             } else {
-> > +                     flush_dcache_page(sg_page(req->dst));
->
-> I think this is still wrong for the > PAGE_SIZE case.  The existing
-> code flushes each page sequentially  but the new code only flushes the
-> first page.
+Have any of you come across this error?
 
-right, can it be fixed like the below?
-
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 185d2359f28b..d85f0318f273 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -169,7 +169,11 @@ static int scomp_acomp_comp_decomp(struct
-acomp_req *req, int dir)
-                        scatterwalk_map_and_copy(scratch->dst, req->dst, 0,
-                                                 req->dlen, 1);
-                } else {
--                       flush_dcache_page(sg_page(req->dst));
-+                       int nr_pages =3D DIV_ROUND_UP(req->dst->offset +
-req->dlen, PAGE_SIZE);
-+                       int i;
-+
-+                       for (i =3D 0; i < nr_pages; i++)
-+                               flush_dcache_page(sg_page(req->dst) + i);
-                }
-        }
- out:
-
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
-
-Thanks
-Barry
+Regards,
+Jaya
