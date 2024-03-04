@@ -1,102 +1,97 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1A94C64
-	for <linux-crypto@vger.kernel.org>; Mon,  4 Mar 2024 05:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7081811C89;
+	Mon,  4 Mar 2024 06:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709530742; cv=none; b=htlPiRt+MT7BQPbYWzteoLX3oBCKEiKMoskn4xzazEKVQCFklDR+1D3/gqLuOmRZPyw+1TR2ttUF4Ih+4WP7zp25HeM1drLrKrRHAtHr+Wk7X0u/lm8ObIY8sa+sQpIp+PwQ6iEKQq6gdHsGs9M4Lavc0fWC9tcrBmdi4zbqEyk=
+	t=1709535430; cv=none; b=J25kTagMBnmm02dRiR3aOSXnJzaspIbLZgALpYh+wmrhVphV7MUVN9tNyqBqwhUc4svG58EMFRmdoCNV3E3RLIbUqLgaEsJ86B9jsjG2zbjZz4HJEqpSih5Phx9Yc+VNJa4dcgEeGc1r2DO/hydwuP/KG4UjF1Y+1FkRSW1WF2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709530742; c=relaxed/simple;
-	bh=IGMpVOaDuul+6Yn30cVRBhndZAfKwj/zXJ64LiBFh48=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bfwlH+XqBKb0ygYvHBJF87b5+GGrkFMBPfQkrMFv9fli7hhu8p8VIZP5OHHgMZ8co4AmDieNEbqyfPzr91GuFnjNNAcrvlFy+y1v6ZZEwcAqQzNRXDz428iVdmkMupJqllslQdcXcnnvNqzZobOOUzVS5bVTZpaHLQUImqL/7lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gKziHclK; arc=none smtp.client-ip=209.85.160.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gKziHclK"
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-21edca2a89dso2145390fac.3
-        for <linux-crypto@vger.kernel.org>; Sun, 03 Mar 2024 21:39:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709530740; x=1710135540; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IGMpVOaDuul+6Yn30cVRBhndZAfKwj/zXJ64LiBFh48=;
-        b=gKziHclKL6kRKHhUUHtp5D48eFsgV9fGEPFXx1fdSSTP5d+s1vm7Mj29IWn4P0mOyj
-         ZMKAIUnEKELZkoD1TD9sHp/lZXq190sCyteTM0qF2s33698XFrYhkm3TURwLVeY6RU5I
-         LFg6gajC86Mpjnh10ucoqIuQQvQXEM0KSOpQzNS2a+IiTMyBXDkIxXFFSC3zP1y62gaP
-         qK6mU0ner9CTCFBB2LDAym4RUuYJUrDNMwyoVMl46IlOMG1T2LrwLcPEfBMWgOuiu3mT
-         IV2wDQfBmj8lpo2c63omVSIx6xouDfOeokMCiC0Fsv6MjhgNbS0dtqbS/MTpsmgX2cnW
-         MXtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709530740; x=1710135540;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IGMpVOaDuul+6Yn30cVRBhndZAfKwj/zXJ64LiBFh48=;
-        b=QmltAUG2jVWBGTENkAgAF1bOTkNqXtheeo2X1cO33sqHb5SrtmDx24ftjWMSEHSIq9
-         gjfoOO0IetPv1KOkJLwvucYSh5zdlR1/LvypuvN97FUHPH9i1p5gTWe/y5dBLDyCfzJo
-         /2+CpwYrgYtulODlPimm65svuEkZVsDo7DK7YdOgwJHbcHwCL80ZcoK2nzPMzHnUo7Ut
-         Rs0foCAx2kXA1XwIOKz8pJaDeoBIf+uiOnAMJUE8zx/PGW3IJ98PYw6wCL+xcBzj9Xus
-         k4p+fLXU0+kH3L5Vhl/Q1bGl+gcs3q/JcG6jLf0T5jFBFKBaOScgZJ235jz2NgL7oBVs
-         QfCA==
-X-Gm-Message-State: AOJu0Yzlk2L+LlE5j8lEEprEorfI0OwhLCDRUrVGO1UZId9wSDZYa3Eq
-	EW+ciNQgyZSmRPrJc/ktRZhm7mIIVGxURYerp+d1Rh8bgh2G/GLORz0oGRieeSR/Iczo4jzC4sY
-	SJCxplhlT6fZZDoV+WhxqD9MfEabzgsfjwQ==
-X-Google-Smtp-Source: AGHT+IHnmDtbctXAiyWMPBCWDvaXeE0sMDe32eReEpD9OvzX4JJe6lpujWY76gROCcsqAhHrXX+pOCJj/HZ1TCmSOIY=
-X-Received: by 2002:a05:6870:7b50:b0:220:c3b8:16a5 with SMTP id
- ji16-20020a0568707b5000b00220c3b816a5mr8097354oab.26.1709530740478; Sun, 03
- Mar 2024 21:39:00 -0800 (PST)
+	s=arc-20240116; t=1709535430; c=relaxed/simple;
+	bh=kop2TSr8/P5YK+OY67Fn7ooNzY6XSya1pVvnxs+jX5I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o9a1Ei+7QvieDzMVFXXJSze3sIOpfnpHl4JGtI/sb6DLNnfrXpjVrCnPqG8KbGHvtGrXeZ7Vn1B+WxbPxsY8hHGypQYKtVjpq5BrFt1dz0HHXBFchcy2kcYmvaxAhk/veR2wR+TAh3xp0pzVc5aLE37HlsQfzzi9PHKJKYNHiSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id A0F87300002C4;
+	Mon,  4 Mar 2024 07:57:03 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 950D437E2F; Mon,  4 Mar 2024 07:57:03 +0100 (CET)
+Date: Mon, 4 Mar 2024 07:57:03 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, David Howells <dhowells@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, linuxarm@huawei.com,
+	David Box <david.e.box@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>, "Li, Ming" <ming4.li@intel.com>,
+	Zhi Wang <zhi.a.wang@intel.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 03/12] X.509: Move certificate length retrieval into new
+ helper
+Message-ID: <20240304065703.GA24373@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+ <16c06528d13b2c0081229a45cacd4b1b9cdff738.1695921657.git.lukas@wunner.de>
+ <65205cc1c1f40_ae7e72949d@dwillia2-xfh.jf.intel.com.notmuch>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALq8RvJDQ9U4x_Beew0jGQqSQtm3TGXh9m5aSvrzPZeft0h0Kg@mail.gmail.com>
- <82a5cacf-73f5-44e5-ab65-0ff9554037b3@linux.microsoft.com>
-In-Reply-To: <82a5cacf-73f5-44e5-ab65-0ff9554037b3@linux.microsoft.com>
-From: "Jayalakshmi Manunath Bhat ," <bhat.jayalakshmi@gmail.com>
-Date: Mon, 4 Mar 2024 11:08:24 +0530
-Message-ID: <CALq8Rv+i9omudxjB6B2tP4ij+-onKuZ4s2cju62rX6Hf=FhzEg@mail.gmail.com>
-Subject: Re: https over ESP is not working in kernel version 5.10.199
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65205cc1c1f40_ae7e72949d@dwillia2-xfh.jf.intel.com.notmuch>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hi Easwar,
+On Fri, Oct 06, 2023 at 12:15:13PM -0700, Dan Williams wrote:
+> Lukas Wunner wrote:
+> > The upcoming in-kernel SPDM library (Security Protocol and Data Model,
+> > https://www.dmtf.org/dsp/DSP0274) needs to retrieve the length from
+> > ASN.1 DER-encoded X.509 certificates.
+> > 
+> > Such code already exists in x509_load_certificate_list(), so move it
+> > into a new helper for reuse by SPDM.
+[...]
+> > +EXPORT_SYMBOL_GPL(x509_get_certificate_length);
+> 
+> Given CONFIG_PCI is a bool, is the export needed? Maybe save this export
+> until the modular consumer arrives, or identify the modular consumer in the
+> changelog?
 
-Thank you for the response. In ourcase 5.10 is the identified the
-kernel for the products to be released.
-6.6 is not a feasible option.
+The x509_get_certificate_length() helper introduced by this patch
+isn't needed directly by the PCI core, but by the SPDM library.
 
-Regards,
-Jayalakshmi
+The SPDM library is tristate and is selected by CONFIG_PCI_CMA,
+which is indeed bool.
 
+However SCSI and ATA (both tristate) have explicitly expressed an
+interest to use the SPDM library.
 
-On Fri, Mar 1, 2024 at 10:29=E2=80=AFPM Easwar Hariharan
-<eahariha@linux.microsoft.com> wrote:
->
-> On 3/1/2024 4:35 AM, Jayalakshmi Manunath Bhat , wrote:
-> > Hi All.
-> >
-> > On our device I am able to establish IPsec IKEv1 rules successfully on
-> > kernel version 5.10.199. Ping, Telnet, http (port 80) etc works fine.
-> > However when I am trying to https to device, operation fails and error
-> > is in xfrm_input.c and error is
-> > if (nexthdr =3D=3D -EBADMSG), nexthdr is EBADMSG and the packet is
-> > dropped. I do not understand why https fails.
-> >
-> > Have any of you come across this error?
-> >
-> > Regards,
-> > Jaya
->
-> Can you try with a more recent kernel? Try mainline, or a recent 6.6.* st=
-able kernel.
->
-> Thanks,
-> Easwar
+If I drop the export, I'd have to declare the SPDM library bool.
+
+I'm leaning towards keeping the SPDM library tristate (and keep the
+export) to accommodate SCSI, ATA and possibly others.
+
+Please let me know if you disagree.
+
+Thanks,
+
+Lukas
