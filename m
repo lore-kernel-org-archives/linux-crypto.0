@@ -1,195 +1,87 @@
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271683EA88;
-	Mon,  4 Mar 2024 13:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3698226293;
+	Mon,  4 Mar 2024 18:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709560199; cv=none; b=LOyn8vr5U83G02nbi1SjDT6iqIsLkawLdW0krpZA73m3Qhp9KNXAnj98YJrws2XQdzIo92h3PdObEeUuymR5f8M0xE2E3FlqoxFjnzsFEKzTV8sNWXedntLyxzEI6+hD6E/WzdAr5ez3A9n0CkJWJMRxTgoIAaCzlG2LNHw140w=
+	t=1709575811; cv=none; b=GxsigLePETG/nKgqkJ2ZIxU2TyAdgLHhd4gfbmIDfp5Ji+diNDPE+x2aY4xWSSKMIZocJ1gR5BJRnmPfGRwKZffVGX0q0uvppSzAdPpwjZvUgccjCZ1g2m1k3CLQjhjgDmv8naV5I4U/edolm3WbhIbhVFQfnMg5ucQghJnWylE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709560199; c=relaxed/simple;
-	bh=58D6ebcjk8KLk8CII8GL/GHVhbo+dUmqw9nPg10UTCQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gXP1MbIpebWZjXGRXl+bnW1hzNfYTzAObVCBlTjsiYuw0uDGNt2lDOgMlddY/vAGf/y8vl4Cry3mIYDASo+rxqp4fuX2xexthttxeIrrJvLePOYUC72yn2VfCNImCgp9lj5y/mtaKv/3nmtlmxs2GS1+uqEAnd+RQagzhXizFy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=Vq9e9s+A; arc=none smtp.client-ip=37.18.73.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="Vq9e9s+A"
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id D4D3810000A;
-	Mon,  4 Mar 2024 16:49:46 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru D4D3810000A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1709560186;
-	bh=pwwpRwyfONwWk//y+tBtyGsJGgbXPSMvyR6jl6OmDgI=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version:From;
-	b=Vq9e9s+AuV3T+kHpKUXL7fwvjVXrQvM8PiWG6SUPXWPPNRgwFPdbeNYk90w8mi9h+
-	 Juol9IeA7kOFdpR9iSu0TGl+NL0YrwbJAnI1t5ro0kt4CfqMHLeqtE9yaw4CX0w4li
-	 9bNCgZ3PjtaBqPo5L19tiK2tmrrl7VgO7gbaZI0DYEzijYtBWcGiKItGrIwzhZd4p7
-	 yjkT8Q/ovtweJV8I+do01U4dcqprsYtrZ0p/Zq0TBHJoeLKUbnb99Uw4KTX4bw//2b
-	 g/jyPFrlKEqypPcPOBOv4CUkMi2a+lXG7xqweEdIAT7XbY9hYyM6p3vqXwuiaNqKFf
-	 tTpYVxZr+2sZw==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Mon,  4 Mar 2024 16:49:46 +0300 (MSK)
-Received: from p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 4 Mar 2024 16:49:46 +0300
-Received: from p-i-exch-sc-m01.sberdevices.ru ([fe80::6d41:e8f1:b95e:ba1]) by
- p-i-exch-sc-m01.sberdevices.ru ([fe80::6d41:e8f1:b95e:ba1%7]) with mapi id
- 15.02.1118.040; Mon, 4 Mar 2024 16:49:46 +0300
-From: Alexey Romanov <avromanov@salutedevices.com>
-To: Jerome Brunet <jbrunet@baylibre.com>
-CC: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "khilman@baylibre.com"
-	<khilman@baylibre.com>, "martin.blumenstingl@googlemail.com"
-	<martin.blumenstingl@googlemail.com>, "vadim.fedorenko@linux.dev"
-	<vadim.fedorenko@linux.dev>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "linux-amlogic@lists.infradead.org"
-	<linux-amlogic@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
-Subject: Re: [PATCH v5 03/21] drivers: crypto: meson: make CLK controller
- optional
-Thread-Topic: [PATCH v5 03/21] drivers: crypto: meson: make CLK controller
- optional
-Thread-Index: AQHaa9yRWJ/V2yQniEGD1LRIiVhVdrEizjUAgASdYgA=
-Date: Mon, 4 Mar 2024 13:49:46 +0000
-Message-ID: <20240304134923.hk5xp5rs3itgw3pk@cab-wsm-0029881.sigma.sbrf.ru>
-References: <20240301132936.621238-1-avromanov@salutedevices.com>
- <20240301132936.621238-4-avromanov@salutedevices.com>
- <1jwmqmrmva.fsf@starbuckisacylon.baylibre.com>
-In-Reply-To: <1jwmqmrmva.fsf@starbuckisacylon.baylibre.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <4B84D65356BE894DBF25ACCD733B0601@sberdevices.ru>
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1709575811; c=relaxed/simple;
+	bh=x0eZK5rcwQvEGrW6u7NlGUZQo+NZ9PROPEyyThAMNXo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CpWNjO1SLg48qt1HE9S0OPsyaodT9mT+yLFU3x0DozI6mLXUn9fFJ5qMslpVRpMcnyS0RnPwIPgTucsbPVwXpGOosXYxUJnaFrL55inatP4ttrs2vR5WLbjms95ZsvW1atnUHMQQwO3xHqnavIWSZ/kH6PvgELXfdxsexIaJrz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 33F293000094C;
+	Mon,  4 Mar 2024 19:10:04 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 2D7FD31A6D; Mon,  4 Mar 2024 19:10:04 +0100 (CET)
+Date: Mon, 4 Mar 2024 19:10:04 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Stefan Berger <stefanb@linux.ibm.com>
+Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br
+Subject: Re: [PATCH v4 00/12] Add support for NIST P521 to ecdsa
+Message-ID: <20240304181004.GA14180@wunner.de>
+References: <20240301022007.344948-1-stefanb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 183875 [Feb 29 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.3
-X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Track_E25351}, {Tracking_from_domain_doesnt_match_to}, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/02/29 19:21:00 #23899999
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240301022007.344948-1-stefanb@linux.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hello Jerome,
+On Thu, Feb 29, 2024 at 09:19:55PM -0500, Stefan Berger wrote:
+> This series adds support for the NIST P521 curve to the ecdsa module
+> to enable signature verification with it.
+> 
+> An issue with the current code in ecdsa is that it assumes that input
+> arrays providing key coordinates for example, are arrays of digits
+> (a 'digit' is a 'u64'). This works well for all currently supported
+> curves, such as NIST P192/256/384, but does not work for NIST P521 where
+> coordinates are 8 digits + 2 bytes long. So some of the changes deal with
+> converting byte arrays to digits and adjusting tests on input byte
+> array lengths to tolerate arrays not providing multiples of 8 bytes.
 
-On Fri, Mar 01, 2024 at 04:21:20PM +0100, Jerome Brunet wrote:
->=20
-> On Fri 01 Mar 2024 at 16:29, Alexey Romanov <avromanov@salutedevices.com>=
- wrote:
->=20
-> > Amlogic crypto IP doesn't take a clock input on some
-> > SoCs: AXG / A1 / S4 / G12. So make it optional.
-> >
->=20
-> I commented this patch on v2 and the comment keep on being un-addressed.
->=20
-> The SoC either:
-> * has a clock that is required for the IP to work
-> * Or does not
->=20
-> It is not something you are free to provide or not.
->=20
-> For the record, I find very hard believe that some SoC would have clock,
-> and other would not, for the same HW.
->=20
-> Isn't it more likely that the clock just happens to be left enabled by
-> the bootloader on some SoC and it conviently allows to ignore it ?
+When respinning this series as v5, feel free to add my
+
+Tested-by: Lukas Wunner <lukas@wunner.de>
 
 
-S905X and newer SoC's uses DMA engine for crypto HW and they
-don't required clock input to work. Clock input is needed for
-blkmv engine.
+I cherry-picked the commits from your nist_p521.v5 branch...
 
-Therefore, I'm not sure that it is needed for GXL too (and the second
-interrupt line). I tested it on vim1 board witouht them and everything
-works correctly.
+https://github.com/stefanberger/linux-ima-namespaces/commits/nist_p521.v5/
 
->=20
-> > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
-> > ---
-> >  drivers/crypto/amlogic/amlogic-gxl-core.c | 14 +++-----------
-> >  1 file changed, 3 insertions(+), 11 deletions(-)
-> >
-> > diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto=
-/amlogic/amlogic-gxl-core.c
-> > index e9e733ed98e0..a3a69a59f476 100644
-> > --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-> > +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> > @@ -269,16 +269,11 @@ static int meson_crypto_probe(struct platform_dev=
-ice *pdev)
-> >  		dev_err(&pdev->dev, "Cannot request MMIO err=3D%d\n", err);
-> >  		return err;
-> >  	}
-> > -	mc->busclk =3D devm_clk_get(&pdev->dev, "blkmv");
-> > +
-> > +	mc->busclk =3D devm_clk_get_optional_enabled(&pdev->dev, "blkmv");
-> >  	if (IS_ERR(mc->busclk)) {
-> >  		err =3D PTR_ERR(mc->busclk);
-> > -		dev_err(&pdev->dev, "Cannot get core clock err=3D%d\n", err);
-> > -		return err;
-> > -	}
-> > -
-> > -	err =3D clk_prepare_enable(mc->busclk);
-> > -	if (err !=3D 0) {
-> > -		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
-> > +		dev_err(&pdev->dev, "Cannot get and enable core clock err=3D%d\n", e=
-rr);
-> >  		return err;
-> >  	}
-> > =20
-> > @@ -306,7 +301,6 @@ static int meson_crypto_probe(struct platform_devic=
-e *pdev)
-> >  	meson_unregister_algs(mc);
-> >  error_flow:
-> >  	meson_free_chanlist(mc, mc->flow_cnt - 1);
-> > -	clk_disable_unprepare(mc->busclk);
-> >  	return err;
-> >  }
-> > =20
-> > @@ -321,8 +315,6 @@ static void meson_crypto_remove(struct platform_dev=
-ice *pdev)
-> >  	meson_unregister_algs(mc);
-> > =20
-> >  	meson_free_chanlist(mc, mc->flow_cnt - 1);
-> > -
-> > -	clk_disable_unprepare(mc->busclk);
-> >  }
-> > =20
-> >  static const struct meson_pdata meson_gxl_pdata =3D {
->=20
->=20
-> --=20
-> Jerome
+...onto my development branch for PCI device authentication...
 
---=20
-Thank you,
-Alexey=
+https://github.com/l1k/linux/commits/doe
+
+...and tested against qemu+libspdm that an emulated NVMe drive
+is able to present a valid signature using NIST P521 + SHA384
+which can be verified correctly by the kernel.
+
+I needed to fix up two of my patches, one which adds P1363
+signature format support to the kernel and another fixup to
+add NIST P521 support to the in-kernel SPDM library
+(two top-most commits on my above-linked development branch).
+
+I performed this test against your f81547267725 head and notice
+that you pushed a new version today (with "curve->nbits == 521"
+instead of strcmp), but I'm confident those two small changes
+wouldn't alter the outcone, hence my Tested-by stands.
+
+Thanks,
+
+Lukas
