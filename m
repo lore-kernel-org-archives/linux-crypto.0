@@ -1,168 +1,163 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2126.outbound.protection.partner.outlook.cn [139.219.17.126])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BDB482DA;
-	Mon,  4 Mar 2024 22:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709592701; cv=none; b=a36yWANtnKKRftqdLZuu+CJzfnbTZRUAiuFHBEtuRDOiNCnz172Jm7S7MAuk9t472o8BK+ZNvX7LRrXDRuZyh2Siu1O0HHMO5OSDJPoeF4KRXci7JsbYmrxc6sma9Hqz5XzB9O/HtUs+8c2Z+uARQquL0W4eICqExwzLT//JM5c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709592701; c=relaxed/simple;
-	bh=YhKdEjJYfUK5PGnDdyu7Ox1LTeRZMNbyU1Aoe9uCC1k=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=fGa1E4wzttQZDHWcN03J8Uv0Kw2GEv39ImjkrIvIihMDEiHb+0Qq/9eRuEPxRy8oVBZoY4kr7Sk/eVhtgAfTFHssQ7NvCmTJKesvQHU9vT8Lo0MyTtCFoLkUn1TRsCqtpDGubdWVwHj+T3yTysmp4G84R3fJtXk+lWW/DgJt138=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qH7ghQWU; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qH7ghQWU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD380C433C7;
-	Mon,  4 Mar 2024 22:51:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709592701;
-	bh=YhKdEjJYfUK5PGnDdyu7Ox1LTeRZMNbyU1Aoe9uCC1k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qH7ghQWUmWQSFGS9dlXBIbNWYEOOV2jZSCJ5jRYtKU+tKXVwRV3OzXUDwdQCSfBcu
-	 ILXJufnw4gwvdFpU28/Ac0v+55ZUgCnLN5hWfIViC8GuEbcJHk+1n1WNQH1F9ozfck
-	 eOYFpNFCdzT4p8oxHi08FIGAODLqPl/HQsDxr51Apj5rdpBtdjjRXT6esVMAVPcbJC
-	 N2Mv+13ROf8vZNFvpecIxb3OxpBw7iuSSafDNlQVCRvmBjMlNu9DQ2/ucT98HNiR5g
-	 yDDWTIMc4cPTIFkdL1o9fRuyQiBDkdEhahBQtZRB8OyaQAb2z8VmXTSy4DkvZFnuTu
-	 aBWa4hCcB5ErA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B466445005;
+	Tue,  5 Mar 2024 07:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.126
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709622633; cv=fail; b=uNj+KiO2lcTwKzkfhLHg5CzL4j9D7G0fCuMuz2yueec/6P+funzx4Y+rZqfIDhqcBw1ReYcJUGozgNtdu40ddjUd+mpx69kqQ+pUgBrlup4cgEHfvuyGWEJHsjtryRpCSSLbNtcsyCle6nptg2ebiAw99a6nsIzpN/rbYxc+D24=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709622633; c=relaxed/simple;
+	bh=lCUd9sY4DiRxf5QwG7u31+btY1ga9PJzd8YghrHSDX0=;
+	h=From:To:Subject:Date:Message-Id:Content-Type:MIME-Version; b=i4Vftp7ABIGx7Rs+WYJ+fxa29Oyxm8SsD/4/7QFKZRAK5FvKnjFH4g+B12AIW5KfItM6Yj0HWqbibS07UIW9ADpMLXzF79gL+Uf/bfWJs2cKkrdxhYZNXfpi24FIpeE8GKea7nWWHUPf4csgtka0JCpU61ygtmf4Mg0vH5jQPa0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.126
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LvIT1v9WybX863TpqX5plfNAlCO0OJ+QcdjGuLunzOyKG7q/W2Noof5PvwurpFbvBeJmsCC8Zzw5/fFImQsIlGpC7UXunZkXMxY3taZG9clWNwoonqxxYFl+L8LDvKrmDgiT5N6rN4IDpwRV2xvk5JhRT47S8BZVxuykjNMjynZLkERsRyTaE8i4VGbiPamarJaINqLSLC3rU8g9qEt0OXcPEoI7+raiIN92SAVCh0nJ6oPUkLDX+Ba4K3SWzhk/6l+xH1CW9pAE+WJkjO/I9pPjTBDooklO49sFX8sU3a2qy+3rAJjdWk24RjM9PBI1m/WU6fVeXRYjzlFJvgyhzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yCpmkM+i2ozDhf4c8Fe7JodACJFOXykq9RVlJpCOavw=;
+ b=hYDzHblEtdNKdOF5VuHZot+Q/v57daeYjdYMrbMB90MCQxQUG1b12xunL3280osICyjDzv0u6fOrFS9d96hPuWFLYfvyUi0ukt2s70S6vmwg1tRi2SA3hmHSbPL4Uf3kyd+BdTmkUbhWtjvEAKjdsfp3IniwEtkhpmLaTWNWXaCkyKQ6zE7AM+iUTVZPOwmLxkvAqgl0JuTwl30JeTVeu6fWhXlChwJZe7yUX6UMRVlWfnkUlcgsjMndpYbNtsW+Wv1+59sWRRSITV6NCDJlX037YMts1r+26xdDTBdtus++Ps2at7PQi3HCEzFcMl6WfAZ74P4hTYgVRTFNkCdDqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+Received: from SHXPR01MB0670.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:26::16) by SHXPR01MB0462.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:1e::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.51; Tue, 5 Mar
+ 2024 07:10:18 +0000
+Received: from SHXPR01MB0670.CHNPR01.prod.partner.outlook.cn
+ ([fe80::9ffd:1956:b45a:4a5d]) by
+ SHXPR01MB0670.CHNPR01.prod.partner.outlook.cn ([fe80::9ffd:1956:b45a:4a5d%6])
+ with mapi id 15.20.7249.041; Tue, 5 Mar 2024 07:10:18 +0000
+From: Jia Jie Ho <jiajie.ho@starfivetech.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dmaengine@vger.kernel.org
+Subject: [PATCH v4 0/7] crypto: starfive: Add support for JH8100
+Date: Tue,  5 Mar 2024 15:09:59 +0800
+Message-Id: <20240305071006.2181158-1-jiajie.ho@starfivetech.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: NT0PR01CA0019.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c510:c::22) To SHXPR01MB0670.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:26::16)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 05 Mar 2024 00:51:33 +0200
-Message-Id: <CZLC14YSOYS5.XWHWWQYZCFZ3@suppilovahvero>
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Paul Moore" <paul@paul-moore.com>, "David Gstir" <david@sigma-star.at>,
- "Mimi Zohar" <zohar@linux.ibm.com>, "David Howells" <dhowells@redhat.com>
-Cc: "James Bottomley" <jejb@linux.ibm.com>, "Herbert Xu"
- <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
- "Shawn Guo" <shawnguo@kernel.org>, "Jonathan Corbet" <corbet@lwn.net>,
- "Sascha Hauer" <s.hauer@pengutronix.de>, "Pengutronix Kernel Team"
- <kernel@pengutronix.de>, "Fabio Estevam" <festevam@gmail.com>, "NXP Linux
- Team" <linux-imx@nxp.com>, "Ahmad Fatoum" <a.fatoum@pengutronix.de>, "sigma
- star Kernel Team" <upstream+dcp@sigma-star.at>, "Li Yang"
- <leoyang.li@nxp.com>, "James Morris" <jmorris@namei.org>, "Serge E. Hallyn"
- <serge@hallyn.com>, "Paul E. McKenney" <paulmck@kernel.org>, "Randy Dunlap"
- <rdunlap@infradead.org>, "Catalin Marinas" <catalin.marinas@arm.com>,
- "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, "Tejun Heo"
- <tj@kernel.org>, "Steven Rostedt (Google)" <rostedt@goodmis.org>,
- <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-integrity@vger.kernel.org>, <keyrings@vger.kernel.org>,
- <linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <linuxppc-dev@lists.ozlabs.org>, <linux-security-module@vger.kernel.org>
-Subject: Re: [PATCH v5 0/6] DCP as trusted keys backend
-X-Mailer: aerc 0.15.2
-References: <20231215110639.45522-1-david@sigma-star.at>
- <CAHC9VhSRjwN=a9=V--m46_xh4fQNwZ9781YBCDpAmAV1mofhQg@mail.gmail.com>
-In-Reply-To: <CAHC9VhSRjwN=a9=V--m46_xh4fQNwZ9781YBCDpAmAV1mofhQg@mail.gmail.com>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SHXPR01MB0670:EE_|SHXPR01MB0462:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0f403a54-41f4-4231-68e9-08dc3ce35074
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Ryrcbg1ITEZrLmo0d1tmXV9n4ey29Whb9xf37D62//2EEE4us6i58OhkbPlWD3kaECmn8N/wKjZGIG/UYaYXRGF8TgDYMHAxd15MZYzc+8HxEn8znTjm/WslDPO6z0Jadh1MEJBANThXSlH0WSZxvExR90fHjAnjqx2ZTFjOFeK38qKqWW5dsJan3PMK0EDLuf4evyFoSIy/LuDN9C6vzfPfgFLes5khi/GnWhX+AeqKGihxGnJgOrcgY3IWcH6eqJCBSyzwPpxde1Sy0IIWoLPXOoGRgHBIXAWJd0VUOUdlxCn3bedRo9L1jERb8C0zL5RmXfdhPdbaHL9gHZzt0gldXDLEgmpo14iBYyacDUgaIuPWzCGdWr50r2H+TBtYjvFgqiQ+R20SvlK9XSwqfz+/BeNjgn8Pfa64wjp9g9r6j3G4ATgh3X5NoguxxbjNW1Uwe6YCTAUedfHmFWswfSEO+u4jN92rkHxxaPCkbXS3gQ8Eh8goeNIGYlhBOT/ieA/oIGAp29YbyupaDawFGlBOR//2eijz+x7v/3ZEJZkDB1oEZBAuU13tkbZdmgtu3XESEwGHnHkp6svjBLZGFqaO+XYcn1ybOXyI4/iqFx8RBNS+CZmOrCKiELl14T0ihJJpETw6AcjXCnIpN7C1Kg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0670.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230031)(41320700004)(38350700005)(921011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?QCCYxNstuKTxnXd746rcA6fCdiosnwdK+SEvCaPe6S9GyG5UAiFxg6ikQNdQ?=
+ =?us-ascii?Q?jYCUWWqcgxMbwQt+hBnYKPQhv7GbYL3q9JTzX0yZBhVD4rbQHhvrakEEgknj?=
+ =?us-ascii?Q?rYSyIVDOZKh90BXszqq/BQTb2wUtBorE4VuXCMxwfVT+ytcvQCUWHQuVjElv?=
+ =?us-ascii?Q?XZMAlyXXH/pWXM6/QyUJNq24hnTO8UNfdYZ4eL3yvBWQWQPSE76xLuhGc2U2?=
+ =?us-ascii?Q?q8n0x44tpDRg6OenDHiRfW2oVuAumqY+VZGdk/8voI2BC676I9tSUiAPfBR6?=
+ =?us-ascii?Q?OMNxJaELpl9ZRIB8X+4ZeHL4NL6Lp+lzOPsPgLJIHf3CsGxGdt+a6abXdpz1?=
+ =?us-ascii?Q?4YqP9QJNXzmOLlP5sH+NAg+Qe0ybS60BSPoe+3hPj3Wf4rLQQv6b6ER2skHq?=
+ =?us-ascii?Q?EYly8DFxdbhlymNH/70q+rzAPxY+AQ/evPgrLGU32k+ldfl4LkANhDB49rLp?=
+ =?us-ascii?Q?ne5HCxYhePDjDAawTpnuDaYb4t/rXZA5qJ8zzaxwjCXXo4jQ+vSc2UcjvMEn?=
+ =?us-ascii?Q?DsFG4q+ixEB42AW0fCOP9VqJpu++caysdxq+9CCvx8yeTz9Vu3VgCbPUpBQ2?=
+ =?us-ascii?Q?+YvKbqD9n4C5S0/1QnCj7LLVMriSTOz9HlD+fOo2Fbdy0IGAGEbu+6fTDesP?=
+ =?us-ascii?Q?FjiOdIepfSPqnTtZUIjfLeG6t++Vb8s/alk2f+Sh+Q64ng8WWNg/XgD+81Mx?=
+ =?us-ascii?Q?vcoN5520asIu7ibi80vsTE1bILBOwgetdvuWWE15+VJmZnS4r5B1k12VasKa?=
+ =?us-ascii?Q?J+ECwnB8/3MFujn6ccuS3rtcjWMbc4rBRibSbnXh1N6p62bdIyVcGNCn5Uqb?=
+ =?us-ascii?Q?uS6hazwS35b23VqeGRShU6pFvOgodhM4UZ754OWRJxHp1keN1z/Zo3yft9h8?=
+ =?us-ascii?Q?fshYNkjcUva+wrxPTD0jZ0MS+MfFf6LAvMSOutAaB+tpU0xQ3Eple9QyzzfI?=
+ =?us-ascii?Q?d1iWvAZqFa8P36zh0TeEYlfdSMVC9ildcNIKqf4O31/r3i2lQhGXPlQUJkCR?=
+ =?us-ascii?Q?ne3OSR0MRRmRCoA0yRVVBWQPB8uyUhVgauIxE9NKO6cir+Jwoz3wRVzDlIjc?=
+ =?us-ascii?Q?39IO1ruZi5o9WJmDaVuf3zaJpqCBr3rJdiRxcuuCvm4NtkpoRbCayG462shx?=
+ =?us-ascii?Q?IUWKche/yQ3jkSTK9mT40GPFqjsnB8LDO73FeFM7H/PxYvMnsJlURfgOv11B?=
+ =?us-ascii?Q?G/eW1ZK90NTw8M/c8D8vy1+VCM6SNlfi5JoytVmae3WccHCRzocG6EHoaRXa?=
+ =?us-ascii?Q?wppnNrj41sjZMMLWcnCZIW+2bAS35Gmrk5tEgJb0SwEeVlJQTOHiqJFmdcbd?=
+ =?us-ascii?Q?mqbH0jbpZj4oSt7bR8slwbyFBtS8PZknaI6Rl076L5IWz1jYsfVApu2jqH11?=
+ =?us-ascii?Q?Bdj5c/a54V7pMtTDEF1Vm5BAUwNJQnAKkmSKbT7ssviAdHfJ+ihmN7sryrMl?=
+ =?us-ascii?Q?OZ9KuD+oHPHmTeZFGoNKV9hYhUayw++iHSrjjrxoXDFl2irklR7eJZ+vEj6+?=
+ =?us-ascii?Q?esd3Zzsc01q65xUTH7y8Ato9ECy/ll3HJcygblSD94aEKuSaJ1/RWBJAh2cy?=
+ =?us-ascii?Q?7m313lt48pDSeSo2BMPXRZCXI/WFaJq5ZgSJIXt5sU2tWyqwdS3i8ElXC/YP?=
+ =?us-ascii?Q?Aw=3D=3D?=
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f403a54-41f4-4231-68e9-08dc3ce35074
+X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0670.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2024 07:10:18.5662
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lhM/nDK+X0+9MgkrHB9/PYdvQA7JPk7qrrwUmprSCL8dXmHaB2gwb5BO1mDSMdjez7abdvrgYAxy4AQgjN7iuZ5dWQ8DKbfkqUwvnJnZcCk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0462
 
-On Tue Dec 19, 2023 at 2:45 AM EET, Paul Moore wrote:
-> On Fri, Dec 15, 2023 at 6:07=E2=80=AFAM David Gstir <david@sigma-star.at>=
- wrote:
-> >
-> > This is a revival of the previous patch set submitted by Richard Weinbe=
-rger:
-> > https://lore.kernel.org/linux-integrity/20210614201620.30451-1-richard@=
-nod.at/
-> >
-> > v4 is here:
-> > https://lore.kernel.org/keyrings/20231024162024.51260-1-david@sigma-sta=
-r.at/
-> >
-> > v4 -> v5:
-> > - Make Kconfig for trust source check scalable as suggested by Jarkko S=
-akkinen
-> > - Add Acked-By from Herbert Xu to patch #1 - thanks!
-> > v3 -> v4:
-> > - Split changes on MAINTAINERS and documentation into dedicated patches
-> > - Use more concise wording in commit messages as suggested by Jarkko Sa=
-kkinen
-> > v2 -> v3:
-> > - Addressed review comments from Jarkko Sakkinen
-> > v1 -> v2:
-> > - Revive and rebase to latest version
-> > - Include review comments from Ahmad Fatoum
-> >
-> > The Data CoProcessor (DCP) is an IP core built into many NXP SoCs such
-> > as i.mx6ull.
-> >
-> > Similar to the CAAM engine used in more powerful SoCs, DCP can AES-
-> > encrypt/decrypt user data using a unique, never-disclosed,
-> > device-specific key. Unlike CAAM though, it cannot directly wrap and
-> > unwrap blobs in hardware. As DCP offers only the bare minimum feature
-> > set and a blob mechanism needs aid from software. A blob in this case
-> > is a piece of sensitive data (e.g. a key) that is encrypted and
-> > authenticated using the device-specific key so that unwrapping can only
-> > be done on the hardware where the blob was wrapped.
-> >
-> > This patch series adds a DCP based, trusted-key backend and is similar
-> > in spirit to the one by Ahmad Fatoum [0] that does the same for CAAM.
-> > It is of interest for similar use cases as the CAAM patch set, but for
-> > lower end devices, where CAAM is not available.
-> >
-> > Because constructing and parsing the blob has to happen in software,
-> > we needed to decide on a blob format and chose the following:
-> >
-> > struct dcp_blob_fmt {
-> >         __u8 fmt_version;
-> >         __u8 blob_key[AES_KEYSIZE_128];
-> >         __u8 nonce[AES_KEYSIZE_128];
-> >         __le32 payload_len;
-> >         __u8 payload[];
-> > } __packed;
-> >
-> > The `fmt_version` is currently 1.
-> >
-> > The encrypted key is stored in the payload area. It is AES-128-GCM
-> > encrypted using `blob_key` and `nonce`, GCM auth tag is attached at
-> > the end of the payload (`payload_len` does not include the size of
-> > the auth tag).
-> >
-> > The `blob_key` itself is encrypted in AES-128-ECB mode by DCP using
-> > the OTP or UNIQUE device key. A new `blob_key` and `nonce` are generate=
-d
-> > randomly, when sealing/exporting the DCP blob.
-> >
-> > This patchset was tested with dm-crypt on an i.MX6ULL board.
-> >
-> > [0] https://lore.kernel.org/keyrings/20220513145705.2080323-1-a.fatoum@=
-pengutronix.de/
-> >
-> > David Gstir (6):
-> >   crypto: mxs-dcp: Add support for hardware-bound keys
-> >   KEYS: trusted: improve scalability of trust source config
-> >   KEYS: trusted: Introduce NXP DCP-backed trusted keys
-> >   MAINTAINERS: add entry for DCP-based trusted keys
-> >   docs: document DCP-backed trusted keys kernel params
-> >   docs: trusted-encrypted: add DCP as new trust source
-> >
-> >  .../admin-guide/kernel-parameters.txt         |  13 +
-> >  .../security/keys/trusted-encrypted.rst       |  85 +++++
-> >  MAINTAINERS                                   |   9 +
-> >  drivers/crypto/mxs-dcp.c                      | 104 +++++-
-> >  include/keys/trusted_dcp.h                    |  11 +
-> >  include/soc/fsl/dcp.h                         |  17 +
-> >  security/keys/trusted-keys/Kconfig            |  18 +-
-> >  security/keys/trusted-keys/Makefile           |   2 +
-> >  security/keys/trusted-keys/trusted_core.c     |   6 +-
-> >  security/keys/trusted-keys/trusted_dcp.c      | 311 ++++++++++++++++++
-> >  10 files changed, 562 insertions(+), 14 deletions(-)
-> >  create mode 100644 include/keys/trusted_dcp.h
-> >  create mode 100644 include/soc/fsl/dcp.h
-> >  create mode 100644 security/keys/trusted-keys/trusted_dcp.c
->
-> Jarkko, Mimi, David - if this patchset isn't already in your review
-> queue, can you take a look at it from a security/keys perspective?
->
-> Thanks.
+This patch series add driver support for StarFive JH8100 SoC crypto
+engine. Patch 1 adds compatible string and update irq descriptions for
+JH8100 device. Subsequent patches update current driver implementations
+to support both 7110 and 8100 variants.
 
-I gave my 5 cents. I had no intention not to review it, somehow just
-slipped. I try to do my best but sometimes this still does happen :-) So
-please ping me if there is radio silence.=20
+v3->v4:
+- Updated interrupts descriptions for jh8100-crypto compatible. (Rob)
+- Added patch 3 to skip unneeded key freeing for RSA module.
 
-BR, Jarkko
+v2->v3:
+- Use of device data instead of #ifdef CONFIG_ for different device
+  variants.
+- Updated dt bindings compatible and interrupts descriptions.
+- Added patch 4 to support hardware quirks for dw-axi-dmac driver.
+
+v1->v2:
+- Resolved build warnings reported by kernel test robot
+  https://lore.kernel.org/oe-kbuild-all/202312170614.24rtwf9x-lkp@intel.com/
+
+Jia Jie Ho (7):
+  dt-bindings: crypto: starfive: Add jh8100 support
+  crypto: starfive: Update hash dma usage
+  crypto: starfive: Skip unneeded key free
+  crypto: starfive: Use dma for aes requests
+  dmaengine: dw-axi-dmac: Support hardware quirks
+  crypto: starfive: Add sm3 support for JH8100
+  crypto: starfive: Add sm4 support for JH8100
+
+ .../crypto/starfive,jh7110-crypto.yaml        |   30 +-
+ drivers/crypto/starfive/Kconfig               |   30 +-
+ drivers/crypto/starfive/Makefile              |    5 +-
+ drivers/crypto/starfive/jh7110-aes.c          |  592 ++++++---
+ drivers/crypto/starfive/jh7110-cryp.c         |   77 +-
+ drivers/crypto/starfive/jh7110-cryp.h         |  114 +-
+ drivers/crypto/starfive/jh7110-hash.c         |  316 +++--
+ drivers/crypto/starfive/jh7110-rsa.c          |    3 +
+ drivers/crypto/starfive/jh8100-sm3.c          |  544 ++++++++
+ drivers/crypto/starfive/jh8100-sm4.c          | 1119 +++++++++++++++++
+ .../dma/dw-axi-dmac/dw-axi-dmac-platform.c    |   32 +-
+ drivers/dma/dw-axi-dmac/dw-axi-dmac.h         |    2 +
+ include/linux/dma/dw_axi.h                    |   11 +
+ 13 files changed, 2437 insertions(+), 438 deletions(-)
+ create mode 100644 drivers/crypto/starfive/jh8100-sm3.c
+ create mode 100644 drivers/crypto/starfive/jh8100-sm4.c
+ create mode 100644 include/linux/dma/dw_axi.h
+
+-- 
+2.34.1
+
