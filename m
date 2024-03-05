@@ -1,105 +1,209 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95B856452
-	for <linux-crypto@vger.kernel.org>; Tue,  5 Mar 2024 11:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8108593E;
+	Tue,  5 Mar 2024 13:47:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709638148; cv=none; b=VgGVtbKR2cWNTqEDdrWze7muK2TGRPPreytGjNKbpDoXej9Zb4544jVpAgdTVtKIp8b8vLwAe2/vSkBebLhTRibznQzCzy7iCf5trb1CnTm7oDy/4siZ/LGDqMpuCfb3EpqIatsv4H9vgsG2yPydNiqT9ZnPyNf42yOgenFzABc=
+	t=1709646471; cv=none; b=aKCW+eudsMqLWrU/lcGRBmaGOOSKzYRScb+UorgPV+i0TzviljT1BY66RTSRFDl+a7p3cKyqrsFTBeege8t1wMaaZBiTQA1D3mZK7UeqQWID75xpZ2nuSRnbu5KVmaTGCqmmggfWacIxCiI7l7M5/S9bMuu7Yw7q0mighZFlfe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709638148; c=relaxed/simple;
-	bh=TmQ01O8f2BZc947ilvuoz0cIFN7jT34RVi/K0/99LXU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KM8w/108xeUW/BZa3Xn8X1ABXR7njwhnVkCStUzxJ2Hm8lL02T4NXaqaauyBuXBvWNwhjOWN5q7WhSAceeSOJmFdQ72BUoeFWR11ad8Jq/U6y2RJH1pgsHsSiy03m0hZ5nw0QVf7oXxtESXMcZNjSr7PeE1IDc9/tTo4LZmykP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=Rs51GbvC; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1709646471; c=relaxed/simple;
+	bh=PSQDKOjTYlxyNhw+5gg0aHr6AbyCsuy0sLTOZ2AjNf0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=WgavJDu0foTNTKV6izsrRx8Pa4gXOE3uEUcLS1Mt61YqR/b+bK+gAe5Cfsj9pvMXbTBwVob9/XnOifC5rptkvj5usMmaQhh5s1N5vUwGBeSSDWdU1tLmqQV3ytm4dAL7ohdcnsjAq9DlocsNH4YmNil/98mfM9rZLvOlHy4iC3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=mew/wGtc; arc=none smtp.client-ip=37.18.73.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="Rs51GbvC"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dd01ea35b5so15720985ad.0
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Mar 2024 03:29:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1709638146; x=1710242946; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E2EoSCzy/147CxL4roqHZsmcuqQUEW9KZKt7o+RAWoU=;
-        b=Rs51GbvCwMAWEs/CH1h0ZdkrM4y/JpZqGxrO7aXUs3sw9EzygP+42mcJgRbFlzJMXi
-         DIKneYID8CNhYK1r+2A9FbWVqbIEDq74lUWsl0FTmr86o9nnbrAqHFurwe0ph3ujEZzA
-         2+4J8irNOyQXplM93Ru+frQgr50py2HIaYD0Y=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709638146; x=1710242946;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E2EoSCzy/147CxL4roqHZsmcuqQUEW9KZKt7o+RAWoU=;
-        b=eXvMGZtH0kayvXbqI07xyX8mFzsW14VghWquh2gLTh+yCB/pSIb9MEp/PYDGW6LSRO
-         oDzH3JlpOeGMrCaA2BOTaquI9xtsYUaZnSLKaqKtW6ywJXhtIpt8rgqPQGe+DZERQhK5
-         QbIVKyVMPTkg/jPBBIgmd5jMiakda/cOQz+4pwlkl1wJMAAjqAWMkxJcxEAmJnJDDnF/
-         cRX3aAAGjBZWi6HVWTHl33wLizYjEwaWf/cM8Odfm1SffL4w9rNGNnJyIMx2r6xX42kw
-         UVwvOypBBvcOydE3A+FKXbIw42zzy+7E4jBAcV7CWIiP38TljKlA00jKEICO2eC1O1me
-         Cpig==
-X-Forwarded-Encrypted: i=1; AJvYcCWQipkI6XOBmFhCN2SwX1f6mt3QCHz1TaibRL4CWILltFT7QEIcMD3W6siIVDY3wkt8oTUewemnAYwS4PDxDosljd1k6GkWj8eCScdm
-X-Gm-Message-State: AOJu0YxlIhd/hRIjNfWKq837I9GF8WIqRaOwOb6SKCCcZnVTCYyuziKF
-	sAYvo/ko5FyDhZBSRrw5/UW/hA643UX6jDUMwaQIAMSV9pTif9vl3HRK7VC/D+s=
-X-Google-Smtp-Source: AGHT+IE1VLqRAjoQxeM4yGTSOs8xACpKPjOhXHY4GIE+hsH/6c2Rygi26uhOpyD59fxxx+O8eYtsdQ==
-X-Received: by 2002:a17:903:595:b0:1dc:b531:82c with SMTP id jv21-20020a170903059500b001dcb531082cmr1034133plb.52.1709638146270;
-        Tue, 05 Mar 2024 03:29:06 -0800 (PST)
-Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id mp16-20020a170902fd1000b001db7e461d8asm10287212plb.130.2024.03.05.03.29.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 03:29:05 -0800 (PST)
-From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-To: herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org
-Cc: Ruud.Derwig@synopsys.com,
-	manjunath.hadli@vayavyalabs.com,
-	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-Subject: [PATCH 4/4] Enable Driver compilation in crypto Kconfig and Makefile file
-Date: Tue,  5 Mar 2024 16:58:31 +0530
-Message-Id: <20240305112831.3380896-5-pavitrakumarm@vayavyalabs.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240305112831.3380896-1-pavitrakumarm@vayavyalabs.com>
-References: <20240305112831.3380896-1-pavitrakumarm@vayavyalabs.com>
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="mew/wGtc"
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 4492B10000D;
+	Tue,  5 Mar 2024 16:47:38 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 4492B10000D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1709646458;
+	bh=fcKXA9lISEMg682+/DBPrSA2kktQOMdU0ud7akHaBpk=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version:From;
+	b=mew/wGtcPW1yjR9vUouwfuKRMUg+JtvkzC4/2j5wsnQXzRLPwZmgrl0cUEQ3k/xE/
+	 CozZw8m7QSBItRa1G3ZgTkzGy0Ymcq81Ea023w2lx9UqH4dxLk23oTRC/BNp/wrPmO
+	 BaHRuPzJJ7Iuyn6pZ2pZmLBSwLZRh2wvUgf3Wgi0M03ffVAP2+o78/QzEpQ2gyoNo+
+	 JQl3fvzl0FSBJg+xKM7fOT6RpYd5JCf+G9dvXAgqX8G2Zg3yr8TCUYyAiD+IzHATW2
+	 3dpkEnPIJ0Lp6Q9NxSAlTGuAIuxC8iVvsQHQkSkAeE1DeXzH7mDD1pGYvOzcFSaBcU
+	 jUIyLIdAXPBrQ==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Tue,  5 Mar 2024 16:47:38 +0300 (MSK)
+Received: from p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) by
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 5 Mar 2024 16:47:37 +0300
+Received: from p-i-exch-sc-m01.sberdevices.ru ([fe80::6d41:e8f1:b95e:ba1]) by
+ p-i-exch-sc-m01.sberdevices.ru ([fe80::6d41:e8f1:b95e:ba1%7]) with mapi id
+ 15.02.1118.040; Tue, 5 Mar 2024 16:47:37 +0300
+From: Alexey Romanov <avromanov@salutedevices.com>
+To: Jerome Brunet <jbrunet@baylibre.com>
+CC: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "khilman@baylibre.com"
+	<khilman@baylibre.com>, "martin.blumenstingl@googlemail.com"
+	<martin.blumenstingl@googlemail.com>, "vadim.fedorenko@linux.dev"
+	<vadim.fedorenko@linux.dev>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "linux-amlogic@lists.infradead.org"
+	<linux-amlogic@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
+Subject: Re: [PATCH v5 03/21] drivers: crypto: meson: make CLK controller
+ optional
+Thread-Topic: [PATCH v5 03/21] drivers: crypto: meson: make CLK controller
+ optional
+Thread-Index: AQHaa9yRWJ/V2yQniEGD1LRIiVhVdrEizjUAgASdYgCAAZG9AA==
+Date: Tue, 5 Mar 2024 13:47:37 +0000
+Message-ID: <20240305134732.z6eyo4nppj7oc2su@cab-wsm-0029881.sigma.sbrf.ru>
+References: <20240301132936.621238-1-avromanov@salutedevices.com>
+ <20240301132936.621238-4-avromanov@salutedevices.com>
+ <1jwmqmrmva.fsf@starbuckisacylon.baylibre.com>
+ <20240304134923.hk5xp5rs3itgw3pk@cab-wsm-0029881.sigma.sbrf.ru>
+In-Reply-To: <20240304134923.hk5xp5rs3itgw3pk@cab-wsm-0029881.sigma.sbrf.ru>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <591DBD4D237CE74D9FE5610D447E944D@sberdevices.ru>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 183875 [Feb 29 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.3
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Track_E25351}, {Tracking_from_domain_doesnt_match_to}, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/02/29 19:21:00 #23899999
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Signed-off-by: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
----
- drivers/crypto/Kconfig  | 1 +
- drivers/crypto/Makefile | 1 +
- 2 files changed, 2 insertions(+)
+On Mon, Mar 04, 2024 at 01:49:46PM +0000, Alexey Romanov wrote:
+> Hello Jerome,
+>=20
+> On Fri, Mar 01, 2024 at 04:21:20PM +0100, Jerome Brunet wrote:
+> >=20
+> > On Fri 01 Mar 2024 at 16:29, Alexey Romanov <avromanov@salutedevices.co=
+m> wrote:
+> >=20
+> > > Amlogic crypto IP doesn't take a clock input on some
+> > > SoCs: AXG / A1 / S4 / G12. So make it optional.
+> > >
+> >=20
+> > I commented this patch on v2 and the comment keep on being un-addressed=
+.
+> >=20
+> > The SoC either:
+> > * has a clock that is required for the IP to work
+> > * Or does not
+> >=20
+> > It is not something you are free to provide or not.
+> >=20
+> > For the record, I find very hard believe that some SoC would have clock=
+,
+> > and other would not, for the same HW.
+> >=20
+> > Isn't it more likely that the clock just happens to be left enabled by
+> > the bootloader on some SoC and it conviently allows to ignore it ?
+>=20
+>=20
+> S905X and newer SoC's uses DMA engine for crypto HW and they
+> don't required clock input to work. Clock input is needed for
+> blkmv engine.
+>=20
+> Therefore, I'm not sure that it is needed for GXL too (and the second
+> interrupt line). I tested it on vim1 board witouht them and everything
+> works correctly.
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 3d02702456a5..aa384d138ae1 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -704,6 +704,7 @@ config CRYPTO_DEV_BCM_SPU
- 	  ahash, and aead algorithms with the kernel cryptographic API.
- 
- source "drivers/crypto/stm32/Kconfig"
-+source "drivers/crypto/dwc-spacc/Kconfig"
- 
- config CRYPTO_DEV_SAFEXCEL
- 	tristate "Inside Secure's SafeXcel cryptographic engine driver"
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 95331bc6456b..4408927a5a0c 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -47,6 +47,7 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
- obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += inside-secure/
- obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
- obj-y += xilinx/
-+obj-y += dwc-spacc/
- obj-y += hisilicon/
- obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
- obj-y += intel/
--- 
-2.25.1
+Amlogic says that the crypto HW based on DMA engine doesn't require
+a clock input. GXL uses DMA engine, so, I think we have to remove
+whole clock controller calls in the next series from driver/dts/bindings.
+And the second interrupt line from crypto node in meson-gxl.dtsi too.
 
+>=20
+> >=20
+> > > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
+> > > ---
+> > >  drivers/crypto/amlogic/amlogic-gxl-core.c | 14 +++-----------
+> > >  1 file changed, 3 insertions(+), 11 deletions(-)
+> > >
+> > > diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/cryp=
+to/amlogic/amlogic-gxl-core.c
+> > > index e9e733ed98e0..a3a69a59f476 100644
+> > > --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
+> > > +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+> > > @@ -269,16 +269,11 @@ static int meson_crypto_probe(struct platform_d=
+evice *pdev)
+> > >  		dev_err(&pdev->dev, "Cannot request MMIO err=3D%d\n", err);
+> > >  		return err;
+> > >  	}
+> > > -	mc->busclk =3D devm_clk_get(&pdev->dev, "blkmv");
+> > > +
+> > > +	mc->busclk =3D devm_clk_get_optional_enabled(&pdev->dev, "blkmv");
+> > >  	if (IS_ERR(mc->busclk)) {
+> > >  		err =3D PTR_ERR(mc->busclk);
+> > > -		dev_err(&pdev->dev, "Cannot get core clock err=3D%d\n", err);
+> > > -		return err;
+> > > -	}
+> > > -
+> > > -	err =3D clk_prepare_enable(mc->busclk);
+> > > -	if (err !=3D 0) {
+> > > -		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
+> > > +		dev_err(&pdev->dev, "Cannot get and enable core clock err=3D%d\n",=
+ err);
+> > >  		return err;
+> > >  	}
+> > > =20
+> > > @@ -306,7 +301,6 @@ static int meson_crypto_probe(struct platform_dev=
+ice *pdev)
+> > >  	meson_unregister_algs(mc);
+> > >  error_flow:
+> > >  	meson_free_chanlist(mc, mc->flow_cnt - 1);
+> > > -	clk_disable_unprepare(mc->busclk);
+> > >  	return err;
+> > >  }
+> > > =20
+> > > @@ -321,8 +315,6 @@ static void meson_crypto_remove(struct platform_d=
+evice *pdev)
+> > >  	meson_unregister_algs(mc);
+> > > =20
+> > >  	meson_free_chanlist(mc, mc->flow_cnt - 1);
+> > > -
+> > > -	clk_disable_unprepare(mc->busclk);
+> > >  }
+> > > =20
+> > >  static const struct meson_pdata meson_gxl_pdata =3D {
+> >=20
+> >=20
+> > --=20
+> > Jerome
+>=20
+> --=20
+> Thank you,
+> Alexey
+
+--=20
+Thank you,
+Alexey=
