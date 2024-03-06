@@ -1,101 +1,81 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54C4F4E2;
-	Wed,  6 Mar 2024 07:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8369A5F467;
+	Wed,  6 Mar 2024 09:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709710183; cv=none; b=e7jVEDFBxl7DXXaBPQLSNQ1RenidU9aN1J3oQscOuVKMraBIhNdsYAIdjiwdxuX8Yn/n6djztBhJq9W9PjDCiYwk9twTOAqCueGyxGDGlYv0q+X+uVy+y+4uBnza8uv6d8MgQyNhPttewwOX6dP3yCSaXQyYYSTjJJ628eUsul0=
+	t=1709718464; cv=none; b=J2w7ZAw+hfdoeUurUxAjTxJplCPvY8yJvxgR5N56vNRHXlSLOnGkcayyROpM7rhqptPUyDv6vL+CyyLc/kTriOzP3E+EFgzU+V/Cj3IKEv1cBe2XBymNfGRD2XVTFhk70n6Gp8tvirbDZSS/A7Jg+W4guVvxmBEG/kvN4ewurLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709710183; c=relaxed/simple;
-	bh=5vkLVH4W2suH2i15pu3k1KbCeweYu1gW0CcodmLh1Gw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Yi59wSMeiBQ1I4HLv2HoLPE2oiDZ0pfp8JubYDVRGRboAna0FXtv/dxJKSZUK1i0RAGCdPJkCdpZ20cNnW9AM+IzDshLRX472C4Xx9pyPQIYHhY8EIdNTVtsfQQosygpmbnYmwLeUN75/fGpuHykEQUVF9Z/ELG5NlBcOLy+Ykw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (78.37.41.175) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 6 Mar
- 2024 10:29:28 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>
-CC: Roman Smirnov <r.smirnov@omp.ru>, Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Karina Yankevich <k.yankevich@omp.ru>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH] crypto: algboss: remove NULL check in cryptomgr_schedule_probe()
-Date: Wed, 6 Mar 2024 10:29:08 +0300
-Message-ID: <20240306072908.5234-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1709718464; c=relaxed/simple;
+	bh=l6hUZC8Id6TcIs72184GnXjWFsML70AR2ab+dSEGB4w=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lkx5KLo42NGw/1ozsT1GidRNv7y1bTrKL7BU8Oizl/jGkoqcyqVGH05pcOC8uMrTd1i6KvGddaX2ajrwfpne15gf0QdSXn1vWQIbmEEO4SdqjX5CnscDuWfKMzbte7stMnhfui247Qlo/BSGwIm05lX45U7W6nyIgu+FJ6sMn0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rhnrw-003ysg-LN; Wed, 06 Mar 2024 17:47:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 06 Mar 2024 17:47:40 +0800
+Date: Wed, 6 Mar 2024 17:47:40 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.8
+Message-ID: <Zeg7vD6GeVHAxYWf@gondor.apana.org.au>
+References: <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
+ <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
+ <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+ <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
+ <ZbstBewmaIfrFocE@gondor.apana.org.au>
+ <ZcRYwZHASH4Cv5Bn@gondor.apana.org.au>
+ <ZdW+GCkO4s3MSeLX@gondor.apana.org.au>
+ <Zd7p36CRWPsYhA2G@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/06/2024 07:05:24
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183983 [Mar 06 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 8 0.3.8 4a99897b35b48c45ee5c877607d26a2d9f419920
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 78.37.41.175 in (user) dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;78.37.41.175:7.4.1,7.7.3;127.0.0.199:7.1.2;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: {cloud_iprep_silent}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 78.37.41.175
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/06/2024 07:11:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/6/2024 3:22:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zd7p36CRWPsYhA2G@gondor.apana.org.au>
 
-The variable i will never be zero, so the check can be removed.
+Hi Linus:
 
-Found by Linux Verification Center (linuxtesting.org) with Svace.
+The following changes since commit 1c0cf6d19690141002889d72622b90fc01562ce4:
 
-Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
----
- crypto/algboss.c | 3 ---
- 1 file changed, 3 deletions(-)
+  crypto: arm64/neonbs - fix out-of-bounds access on short input (2024-02-24 08:37:24 +0800)
 
-diff --git a/crypto/algboss.c b/crypto/algboss.c
-index 0de1e6697949..1aa5f306998a 100644
---- a/crypto/algboss.c
-+++ b/crypto/algboss.c
-@@ -138,9 +138,6 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
- 			goto err_free_param;
- 	}
- 
--	if (!i)
--		goto err_free_param;
--
- 	param->tb[i + 1] = NULL;
- 
- 	param->type.attr.rta_len = sizeof(param->type);
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.8-p6 
+
+for you to fetch changes up to c0afb6b88fbbc177fa322a835f874be217bffe45:
+
+  crypto: rk3288 - Fix use after free in unprepare (2024-03-01 18:33:29 +0800)
+
+----------------------------------------------------------------
+This push fixes potential use-after-frees in rk3288 and sun8i-ce.
+----------------------------------------------------------------
+
+Andrey Skvortsov (1):
+      crypto: sun8i-ce - Fix use after free in unprepare
+
+Herbert Xu (1):
+      crypto: rk3288 - Fix use after free in unprepare
+
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c    | 34 +++++++++++-----------
+ drivers/crypto/rockchip/rk3288_crypto_ahash.c      |  4 +--
+ 2 files changed, 19 insertions(+), 19 deletions(-)
+
+Thanks,
 -- 
-2.34.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
