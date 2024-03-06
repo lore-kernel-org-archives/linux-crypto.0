@@ -1,103 +1,190 @@
-Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053575FDDC;
-	Wed,  6 Mar 2024 11:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6883612FB0F;
+	Wed,  6 Mar 2024 14:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709722948; cv=none; b=i+dmJoq40fEYAVY5iKg3vxjn9pMgfpJtkvLrMBwW9nJJHxLtWTq6hFtpz2oIoKj61opfFQT+6VFzM2UlCRDWV+31QrKkEJxHxqmHYs3hhnSqIcYlQLBtrAlhIEFcpCHR6iepaxY2b+Ym6tw6W+mWqOCBAYIUIc19+FPdd3NDYxs=
+	t=1709734061; cv=none; b=ICtV6d8kH8LB3/y1uO8fXFGRQFyvQPt9EQPRdy3iVWEN1Sebuw5NMTKDkfpPhJxDnTHVbw3jrwNuLs7EuSxL7RCVWP9c3EvV2wpjM/2oeBhZFG61xyXtLWOZjVMs/gr+gVagq4LDQK9X5DEKaJ9JffbdojaIHxCPBsV/a8eCEjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709722948; c=relaxed/simple;
-	bh=ygeqKWDT5AUJTASqGDnzwYh7qL3fkE+eprFpeq8/5qE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LfkGlGSYz3vRnZZhveBbqE09uu/toyJa7b8csisLXLGzGn6Z2Kh8E5tkNeHEyImHP9hk3r/wJtIMGpZCDprTLCoZqLsZHxSuP+SFbIx1gWDFmSpobcJqVbmK7Jhwq4bDgQWkjD6Hl+w5Tgta9gc480PKZVQ/96/G9meNlL9aJbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=C9t6H1Fi; arc=none smtp.client-ip=109.73.34.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+	s=arc-20240116; t=1709734061; c=relaxed/simple;
+	bh=6k3BmwKEkNhaSQyUJBuaJb9Q8Qc+bZwh1oVVhkeGYzk=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=mF5PC2hDrMo4QmoMcB4EbRStnDFb7Vy/bvBLoY/v8xZJ9gmKMljAuXMg3zPPmxOCXo0pksH2PMoLsFFed9D2rFpRdhfqDIgKxDFWAmYF4KTtIRcngMRwQOO3Fsu54D+LHfM6jz9swg14Dx8ZEXqcF7Xx2mwMwTh8/MPI1z60Cws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EEUNEjiE; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="C9t6H1Fi"
-Received: from mx1.t-argos.ru (localhost [127.0.0.1])
-	by mx1.t-argos.ru (Postfix) with ESMTP id 78EF5100003;
-	Wed,  6 Mar 2024 14:01:58 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
-	t=1709722918; bh=GrRSzn9Rpz5WKnpCUHJQlFPcoyVDSZorDUnPZWrVOLk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=C9t6H1FiPnk/xI3wNj1felIYHPoyg5MAhnESLm9uEPMj6EWA6homM1qDxruIkVjKe
-	 aPAMwCB61MU++fPi/5/7XYFGsT+O1+Uusrih1Ofqh6mG/vttndwTyxn/wppgdLXIqH
-	 bmNm1b16k5uHfsu4ulmu1RI/YlRdNLf2rSWFnzkGAHbehpQoeG57KTB2bmTKMm6Qil
-	 cto0U56VhDkFG0qtDTaIe5+BIx+kFmQfSovlyPovn1xkAppbNeYtXkrAhydOEMAgxh
-	 UPXAuLlzizRDN9OnVsb1gXjNPVYLK7VDM1QEvYmLSRXjXewnJaS0Se88/W7gwWg27u
-	 XoHLmWjwtEXMQ==
-Received: from mx1.t-argos.ru.ru (mail.t-argos.ru [172.17.13.212])
-	by mx1.t-argos.ru (Postfix) with ESMTP;
-	Wed,  6 Mar 2024 14:01:13 +0300 (MSK)
-Received: from localhost.localdomain (172.17.215.6) by ta-mail-02
- (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 6 Mar 2024
- 14:00:48 +0300
-From: Aleksandr Mishin <amishin@t-argos.ru>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Aleksandr Mishin <amishin@t-argos.ru>, "David S. Miller"
-	<davem@davemloft.net>, Steve Lin <steven.lin1@broadcom.com>, Rob Rice
-	<rob.rice@broadcom.com>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH] crypto: bcm/spu2
-Date: Wed, 6 Mar 2024 14:00:22 +0300
-Message-ID: <20240306110022.21574-1-amishin@t-argos.ru>
-X-Mailer: git-send-email 2.30.2
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EEUNEjiE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709734060; x=1741270060;
+  h=from:to:cc:subject:date:message-id;
+  bh=6k3BmwKEkNhaSQyUJBuaJb9Q8Qc+bZwh1oVVhkeGYzk=;
+  b=EEUNEjiE8IxfJ33JsthVeNu4xrJxdI6QpekLKJfTp+6pTz6ejmGwsoPK
+   CGUD5efBoArNCeGiA55xfIArqGGX9yqX1y+J8e8wvanQ3hxeBYIOI72AQ
+   H4rXWN6pghJIQEcxATCrIUd3zxouRhvBq2LBav45cHaM2bUDYTeO0Mql0
+   Tw1RNaewU/mwYalRWysJFtWXZe79pmZ05EGSryOpT+7J0EGggx1sfx6dq
+   SMVjatcti93Zqz6SLrC89QjFyjR8EWsfV48HGAwrm0f/CgHxPEIcRrKPR
+   +7fIPctXmcy1KS+Y8xQE3pZXylgjRl44SlnyiGrAi+Z9MYpAaHiUVZBAp
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="15490286"
+X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
+   d="scan'208";a="15490286"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 06:07:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
+   d="scan'208";a="10192150"
+Received: from qat-server-archercity1.sh.intel.com ([10.67.111.115])
+  by orviesa007.jf.intel.com with ESMTP; 06 Mar 2024 06:07:36 -0800
+From: Xin Zeng <xin.zeng@intel.com>
+To: herbert@gondor.apana.org.au,
+	alex.williamson@redhat.com,
+	jgg@nvidia.com,
+	yishaih@nvidia.com,
+	shameerali.kolothum.thodi@huawei.com,
+	kevin.tian@intel.com
+Cc: linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org,
+	qat-linux@intel.com,
+	Xin Zeng <xin.zeng@intel.com>
+Subject: [PATCH v5 00/10] crypto: qat - enable QAT GEN4 SRIOV VF live migration for QAT GEN4
+Date: Wed,  6 Mar 2024 21:58:45 +0800
+Message-Id: <20240306135855.4123535-1-xin.zeng@intel.com>
+X-Mailer: git-send-email 2.18.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
- (172.17.13.212)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 183989 [Mar 06 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.3
-X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 9 0.3.9 e923e63e431b6489f12901471775b2d1b59df0ba, {Tracking_from_domain_doesnt_match_to}, t-argos.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;mx1.t-argos.ru.ru:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/03/06 10:26:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/03/06 07:15:00 #24010220
-X-KSMG-AntiVirus-Status: Clean, skipped
 
-In spu2_dump_omd() value of ptr is increased by ciph_key_len
-instead of hash_iv_len which could lead to going beyond the
-buffer boundaries.
+This set enables live migration for Intel QAT GEN4 SRIOV Virtual
+Functions (VFs).
+It is composed of 10 patches. Patch 1~6 refactor the original QAT PF
+driver implementation which will be reused by the following patches.
+Patch 7 introduces the logic to the QAT PF driver that allows to save
+and restore the state of a bank (a QAT VF is a wrapper around banks) and
+drain a ring pair. Patch 8 adds the QAT PF driver a set of interfaces to
+allow to save and restore the state of a VF that will be called by the
+module qat_vfio_pci which will be introduced in the last patch. Patch 9
+implements the defined device interfaces. The last one adds a vfio pci
+extension specific for QAT which intercepts the vfio device operations
+for a QAT VF to allow live migration.
 
-Fix this bug by changing ciph_key_len to hash_iv_len.
+Here are the steps required to test the live migration of a QAT GEN4 VF:
+1. Bind one or more QAT GEN4 VF devices to the module qat_vfio_pci.ko 
+2. Assign the VFs to the virtual machine and enable device live
+migration 
+3. Run a workload using a QAT VF inside the VM, for example using qatlib
+(https://github.com/intel/qatlib) 
+4. Migrate the VM from the source node to a destination node
 
-Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
+Changes in v5 since v4: https://lore.kernel.org/kvm/20240228143402.89219-9-xin.zeng@intel.com
+-  Remove device ID recheck as no consensus has been reached yet (Kevin)
+-  Add missing state PRE_COPY_P2P in precopy_iotcl (Kevin)
+-  Rearrange the state transition flow for better readability (Kevin)
+-  Remove unnecessary Reviewed-by in commit message (Kevin)
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+Changes in v4 since v3: https://lore.kernel.org/kvm/20240221155008.960369-11-xin.zeng@intel.com
+-  Change the order of maintainer entry for QAT vfio pci driver in
+   MAINTAINERS to make it alphabetical (Alex)
+-  Put QAT VFIO PCI driver under vfio/pci directly instead of
+   vfio/pci/intel (Alex)
+-  Add id_table recheck during device probe (Alex)
 
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
----
- drivers/crypto/bcm/spu2.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v3 since v2: https://lore.kernel.org/kvm/20240220032052.66834-1-xin.zeng@intel.com
+-  Use state_mutex directly instead of unnecessary deferred_reset mode
+   (Jason)
 
-diff --git a/drivers/crypto/bcm/spu2.c b/drivers/crypto/bcm/spu2.c
-index 07989bb8c220..3fdc64b5a65e 100644
---- a/drivers/crypto/bcm/spu2.c
-+++ b/drivers/crypto/bcm/spu2.c
-@@ -495,7 +495,7 @@ static void spu2_dump_omd(u8 *omd, u16 hash_key_len, u16 ciph_key_len,
- 	if (hash_iv_len) {
- 		packet_log("  Hash IV Length %u bytes\n", hash_iv_len);
- 		packet_dump("  hash IV: ", ptr, hash_iv_len);
--		ptr += ciph_key_len;
-+		ptr += hash_iv_len;
- 	}
- 
- 	if (ciph_iv_len) {
+Changes in v2 since v1: https://lore.kernel.org/all/20240201153337.4033490-1-xin.zeng@intel.com
+-  Add VFIO_MIGRATION_PRE_COPY support (Alex)
+-  Remove unnecessary module dependancy in Kconfig (Alex)
+-  Use direct function calls instead of function pointers in qat vfio
+   variant driver (Jason)
+-  Address the comments including uncessary pointer check and kfree,
+   missing lock and direct use of pci_iov_vf_id (Shameer)
+-  Change CHECK_STAT macro to avoid repeat comparison (Kamlesh)
+
+Changes in v1 since RFC: https://lore.kernel.org/all/20230630131304.64243-1-xin.zeng@intel.com
+-  Address comments including the right module dependancy in Kconfig,
+   source file name and module description (Alex)
+-  Added PCI error handler and P2P state handler (Suggested by Kevin)
+-  Refactor the state check duing loading ring state (Kevin) 
+-  Fix missed call to vfio_put_device in the error case (Breet)
+-  Migrate the shadow states in PF driver
+-  Rebase on top of 6.8-rc1
+
+Giovanni Cabiddu (2):
+  crypto: qat - adf_get_etr_base() helper
+  crypto: qat - relocate CSR access code
+
+Siming Wan (3):
+  crypto: qat - rename get_sla_arr_of_type()
+  crypto: qat - expand CSR operations for QAT GEN4 devices
+  crypto: qat - add bank save and restore flows
+
+Xin Zeng (5):
+  crypto: qat - relocate and rename 4xxx PF2VM definitions
+  crypto: qat - move PFVF compat checker to a function
+  crypto: qat - add interface for live migration
+  crypto: qat - implement interface for live migration
+  vfio/qat: Add vfio_pci driver for Intel QAT VF devices
+
+ MAINTAINERS                                   |    8 +
+ .../intel/qat/qat_420xx/adf_420xx_hw_data.c   |    3 +
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |    5 +
+ .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |    1 +
+ .../qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c     |    1 +
+ .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |    1 +
+ .../intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c |    1 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |    6 +-
+ .../intel/qat/qat_common/adf_accel_devices.h  |   88 ++
+ .../intel/qat/qat_common/adf_common_drv.h     |   10 +
+ .../qat/qat_common/adf_gen2_hw_csr_data.c     |  101 ++
+ .../qat/qat_common/adf_gen2_hw_csr_data.h     |   86 ++
+ .../intel/qat/qat_common/adf_gen2_hw_data.c   |   97 --
+ .../intel/qat/qat_common/adf_gen2_hw_data.h   |   76 --
+ .../qat/qat_common/adf_gen4_hw_csr_data.c     |  231 ++++
+ .../qat/qat_common/adf_gen4_hw_csr_data.h     |  188 +++
+ .../intel/qat/qat_common/adf_gen4_hw_data.c   |  380 +++++--
+ .../intel/qat/qat_common/adf_gen4_hw_data.h   |  127 +--
+ .../intel/qat/qat_common/adf_gen4_pfvf.c      |    8 +-
+ .../intel/qat/qat_common/adf_gen4_vf_mig.c    | 1010 +++++++++++++++++
+ .../intel/qat/qat_common/adf_gen4_vf_mig.h    |   10 +
+ .../intel/qat/qat_common/adf_mstate_mgr.c     |  318 ++++++
+ .../intel/qat/qat_common/adf_mstate_mgr.h     |   89 ++
+ .../intel/qat/qat_common/adf_pfvf_pf_proto.c  |    8 +-
+ .../intel/qat/qat_common/adf_pfvf_utils.h     |   11 +
+ drivers/crypto/intel/qat/qat_common/adf_rl.c  |   10 +-
+ drivers/crypto/intel/qat/qat_common/adf_rl.h  |    2 +
+ .../crypto/intel/qat/qat_common/adf_sriov.c   |    7 +-
+ .../intel/qat/qat_common/adf_transport.c      |    4 +-
+ .../crypto/intel/qat/qat_common/qat_mig_dev.c |  130 +++
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |    1 +
+ .../qat_dh895xccvf/adf_dh895xccvf_hw_data.c   |    1 +
+ drivers/vfio/pci/Kconfig                      |    2 +
+ drivers/vfio/pci/Makefile                     |    2 +
+ drivers/vfio/pci/qat/Kconfig                  |   12 +
+ drivers/vfio/pci/qat/Makefile                 |    3 +
+ drivers/vfio/pci/qat/main.c                   |  662 +++++++++++
+ include/linux/qat/qat_mig_dev.h               |   31 +
+ 38 files changed, 3344 insertions(+), 387 deletions(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_vf_mig.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_vf_mig.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_mstate_mgr.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_mstate_mgr.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/qat_mig_dev.c
+ create mode 100644 drivers/vfio/pci/qat/Kconfig
+ create mode 100644 drivers/vfio/pci/qat/Makefile
+ create mode 100644 drivers/vfio/pci/qat/main.c
+ create mode 100644 include/linux/qat/qat_mig_dev.h
+
+
+base-commit: 318407ed77e4140d02e43a001b1f4753e3ce6b5f
 -- 
-2.30.2
+2.18.2
 
