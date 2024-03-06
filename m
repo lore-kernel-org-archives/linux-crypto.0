@@ -1,81 +1,103 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8369A5F467;
-	Wed,  6 Mar 2024 09:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053575FDDC;
+	Wed,  6 Mar 2024 11:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709718464; cv=none; b=J2w7ZAw+hfdoeUurUxAjTxJplCPvY8yJvxgR5N56vNRHXlSLOnGkcayyROpM7rhqptPUyDv6vL+CyyLc/kTriOzP3E+EFgzU+V/Cj3IKEv1cBe2XBymNfGRD2XVTFhk70n6Gp8tvirbDZSS/A7Jg+W4guVvxmBEG/kvN4ewurLs=
+	t=1709722948; cv=none; b=i+dmJoq40fEYAVY5iKg3vxjn9pMgfpJtkvLrMBwW9nJJHxLtWTq6hFtpz2oIoKj61opfFQT+6VFzM2UlCRDWV+31QrKkEJxHxqmHYs3hhnSqIcYlQLBtrAlhIEFcpCHR6iepaxY2b+Ym6tw6W+mWqOCBAYIUIc19+FPdd3NDYxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709718464; c=relaxed/simple;
-	bh=l6hUZC8Id6TcIs72184GnXjWFsML70AR2ab+dSEGB4w=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lkx5KLo42NGw/1ozsT1GidRNv7y1bTrKL7BU8Oizl/jGkoqcyqVGH05pcOC8uMrTd1i6KvGddaX2ajrwfpne15gf0QdSXn1vWQIbmEEO4SdqjX5CnscDuWfKMzbte7stMnhfui247Qlo/BSGwIm05lX45U7W6nyIgu+FJ6sMn0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rhnrw-003ysg-LN; Wed, 06 Mar 2024 17:47:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 06 Mar 2024 17:47:40 +0800
-Date: Wed, 6 Mar 2024 17:47:40 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.8
-Message-ID: <Zeg7vD6GeVHAxYWf@gondor.apana.org.au>
-References: <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
- <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
- <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
- <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
- <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
- <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
- <ZbstBewmaIfrFocE@gondor.apana.org.au>
- <ZcRYwZHASH4Cv5Bn@gondor.apana.org.au>
- <ZdW+GCkO4s3MSeLX@gondor.apana.org.au>
- <Zd7p36CRWPsYhA2G@gondor.apana.org.au>
+	s=arc-20240116; t=1709722948; c=relaxed/simple;
+	bh=ygeqKWDT5AUJTASqGDnzwYh7qL3fkE+eprFpeq8/5qE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LfkGlGSYz3vRnZZhveBbqE09uu/toyJa7b8csisLXLGzGn6Z2Kh8E5tkNeHEyImHP9hk3r/wJtIMGpZCDprTLCoZqLsZHxSuP+SFbIx1gWDFmSpobcJqVbmK7Jhwq4bDgQWkjD6Hl+w5Tgta9gc480PKZVQ/96/G9meNlL9aJbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=C9t6H1Fi; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="C9t6H1Fi"
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id 78EF5100003;
+	Wed,  6 Mar 2024 14:01:58 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1709722918; bh=GrRSzn9Rpz5WKnpCUHJQlFPcoyVDSZorDUnPZWrVOLk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=C9t6H1FiPnk/xI3wNj1felIYHPoyg5MAhnESLm9uEPMj6EWA6homM1qDxruIkVjKe
+	 aPAMwCB61MU++fPi/5/7XYFGsT+O1+Uusrih1Ofqh6mG/vttndwTyxn/wppgdLXIqH
+	 bmNm1b16k5uHfsu4ulmu1RI/YlRdNLf2rSWFnzkGAHbehpQoeG57KTB2bmTKMm6Qil
+	 cto0U56VhDkFG0qtDTaIe5+BIx+kFmQfSovlyPovn1xkAppbNeYtXkrAhydOEMAgxh
+	 UPXAuLlzizRDN9OnVsb1gXjNPVYLK7VDM1QEvYmLSRXjXewnJaS0Se88/W7gwWg27u
+	 XoHLmWjwtEXMQ==
+Received: from mx1.t-argos.ru.ru (mail.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Wed,  6 Mar 2024 14:01:13 +0300 (MSK)
+Received: from localhost.localdomain (172.17.215.6) by ta-mail-02
+ (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 6 Mar 2024
+ 14:00:48 +0300
+From: Aleksandr Mishin <amishin@t-argos.ru>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Aleksandr Mishin <amishin@t-argos.ru>, "David S. Miller"
+	<davem@davemloft.net>, Steve Lin <steven.lin1@broadcom.com>, Rob Rice
+	<rob.rice@broadcom.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH] crypto: bcm/spu2
+Date: Wed, 6 Mar 2024 14:00:22 +0300
+Message-ID: <20240306110022.21574-1-amishin@t-argos.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zd7p36CRWPsYhA2G@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 183989 [Mar 06 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.3
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 9 0.3.9 e923e63e431b6489f12901471775b2d1b59df0ba, {Tracking_from_domain_doesnt_match_to}, t-argos.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;mx1.t-argos.ru.ru:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/03/06 10:26:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/03/06 07:15:00 #24010220
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Hi Linus:
+In spu2_dump_omd() value of ptr is increased by ciph_key_len
+instead of hash_iv_len which could lead to going beyond the
+buffer boundaries.
 
-The following changes since commit 1c0cf6d19690141002889d72622b90fc01562ce4:
+Fix this bug by changing ciph_key_len to hash_iv_len.
 
-  crypto: arm64/neonbs - fix out-of-bounds access on short input (2024-02-24 08:37:24 +0800)
+Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
 
-are available in the Git repository at:
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.8-p6 
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+---
+ drivers/crypto/bcm/spu2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-for you to fetch changes up to c0afb6b88fbbc177fa322a835f874be217bffe45:
-
-  crypto: rk3288 - Fix use after free in unprepare (2024-03-01 18:33:29 +0800)
-
-----------------------------------------------------------------
-This push fixes potential use-after-frees in rk3288 and sun8i-ce.
-----------------------------------------------------------------
-
-Andrey Skvortsov (1):
-      crypto: sun8i-ce - Fix use after free in unprepare
-
-Herbert Xu (1):
-      crypto: rk3288 - Fix use after free in unprepare
-
- .../crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c    | 34 +++++++++++-----------
- drivers/crypto/rockchip/rk3288_crypto_ahash.c      |  4 +--
- 2 files changed, 19 insertions(+), 19 deletions(-)
-
-Thanks,
+diff --git a/drivers/crypto/bcm/spu2.c b/drivers/crypto/bcm/spu2.c
+index 07989bb8c220..3fdc64b5a65e 100644
+--- a/drivers/crypto/bcm/spu2.c
++++ b/drivers/crypto/bcm/spu2.c
+@@ -495,7 +495,7 @@ static void spu2_dump_omd(u8 *omd, u16 hash_key_len, u16 ciph_key_len,
+ 	if (hash_iv_len) {
+ 		packet_log("  Hash IV Length %u bytes\n", hash_iv_len);
+ 		packet_dump("  hash IV: ", ptr, hash_iv_len);
+-		ptr += ciph_key_len;
++		ptr += hash_iv_len;
+ 	}
+ 
+ 	if (ciph_iv_len) {
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.30.2
+
