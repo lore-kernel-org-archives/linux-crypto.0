@@ -1,261 +1,169 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33616D51D;
-	Wed,  6 Mar 2024 02:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709693262; cv=fail; b=DFqgamcxsHmvBeBLSYmzUlK90ZkFM3AKCIx82tOXs0UfOP3218aBjrkA2aDbBRcn/Y17Uz0tXjQxgSv5ju/ye3F/NQNhwLpfnZBrbjDkTmAglhlPwFVRHMAxpkfIjmZNaaZ3YpE3jVHoI1/fQ8pNJesVHqKc73GsLvmgcMUa0Eo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709693262; c=relaxed/simple;
-	bh=6KS2PB+J/nDNECSUvu6r6WLh7L2PcCmqAg0TNEHXsfA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=QDcHcBqVOSGp8SXQsyXiPSU/Lu0Y0qf2ItagoeWpxUW8f96hOKq523q0zfzRIntmOHe2AG1wZ/fVvMKjIKg/bIW8oMfcI25hIMfxxHoajymgodIa8CwOK7hdZH2fmyuDuzSfxSrg7FYJJmHhQkJuip/zmb5V1sVo5XaK1lk9Xi8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=asbbMXpP; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6335314273
+	for <linux-crypto@vger.kernel.org>; Wed,  6 Mar 2024 03:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709696804; cv=none; b=DfUjPYvEP2NqRzXvku2hkP9Cjrx30CRG3TD1AUSoQ/2GTqAtv77pimm1NjaKoyicVZT6wiZOYy1DVIseTtzGDndYmFpj1jeOve4hRj0FJ+fakgN8wEDKMrM1qfYv9+iBPRG0dQXZJghAXPadPtFQ9NzWV1c2dHhduSIzwZLP6OE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709696804; c=relaxed/simple;
+	bh=2c78cK1XQnmsmG8+7n8w2V7n1cMXuquRqGreCLUPgjk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HGfnPJi+oZZZFe3gT9QKZTD6CW39kII4VhpIfwoexzFp/5pnRbaD+KzM4kixchVr6nvCbDTEDNVryOBMFCV32YUw1gcwj79pUcsFHtdWPH3iz9dJezpT3+KDT/t6Om8Z21VQROSBJyTwwDsByV8cZjU/NzBEvOGo6Tfgv6L21/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=agwg0mcA; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="asbbMXpP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709693260; x=1741229260;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=6KS2PB+J/nDNECSUvu6r6WLh7L2PcCmqAg0TNEHXsfA=;
-  b=asbbMXpPxvnWDOMN4QzCvTu4ye4l40aKp6aeQYeDtJMDRNNyCCbMu5hr
-   02WiSYdtFkgUIgA6OERPLm/SoSyBw/pg79DaoJOFg8L/i+vJSZe6+SHWR
-   ERlqnWDpZYcsY4bJ62rkRfdtyVMxDxdWgMkI7f+WiCF8T6qHxfX3GjLC+
-   0NJi6kXzh2PbLfNxbMPvEp6AzdO4saKqD7DqFxcVstCpTNGT63zUztvPf
-   +Z6+2AhZGZM/xmRL+K339t6n4RapWnklkhe6d5z2UbNphQW826Nr0eaZA
-   sGnspPkVae+i0a32TrxTL5T1vkeg89v0UhAazkFrQh0GI6ZpiWSljkfUR
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="4458951"
-X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
-   d="scan'208";a="4458951"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 18:47:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
-   d="scan'208";a="14295773"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Mar 2024 18:47:39 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 5 Mar 2024 18:47:38 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 5 Mar 2024 18:47:38 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 5 Mar 2024 18:47:38 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b0+7Un3GKAinIn3LFAv/PxC0+WaxoFp5HdaahX5XUZDd3jX8yVYWqEYNeaO6N6CINYQkHO3falW2+18BVoUDLUwsyHfyUMX4ffiJDTtOKgNVo04gGPB+bfziOiaabxDZq0lrjdDyRv5Q0nOYwAQK5DyNu/EkVuOl6H5XQjiuHL8sfwT49oD3VgLxsKjZB6+NGKswa5SEAA0AGf0iSM6rXb6MpUYpkhyCstt7nlb+jkpVkNq8xbl2RngIys3S2vf1YcrcrTu/8MaqpkkJ2MIqXTR04Uc+jouaiixHNwNSGaltonM+/YPd4X80zfblo6seXqp7+wc7RT/VhuQ1uf9tQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GAuCaNCyzXLZhJHOx0IQX84Eoj9L8+K6hnYy2fiXGCc=;
- b=TBB7RbiEh6y42VAPP7EM+8xHoGRNrPqghZBZJgrFzgCdyHVF8JMG3x8t410LF8+rsgv9SCxnoYzq6hLBsVvOGBdinVblJ4OAyx+WIprU3tMZaanBVlKo4GOFEIqvG1Z0rV93BryT71H/Pa3vf9Od0mbfqTz6fsokwkRRzSLLD7oZzOFdKG/QaNq9xO1UjEKon2w/lSWA/cYwdKBNY+4wSap1ing7gXuObkJiQUFjw2AU9xTNQXcU9GnTQEA73O+KOkY8JKvwGVxNzpNRuxaf4j2X1VaUonGkvvZYtH2UX93gJfFbLX2j53/qnf0IvKVgoYm1bQ4VuSpLrPSQs2Bj+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM4PR11MB5502.namprd11.prod.outlook.com (2603:10b6:5:39e::23)
- by PH7PR11MB8501.namprd11.prod.outlook.com (2603:10b6:510:308::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.23; Wed, 6 Mar
- 2024 02:47:36 +0000
-Received: from DM4PR11MB5502.namprd11.prod.outlook.com
- ([fe80::3487:7a1:bef5:979e]) by DM4PR11MB5502.namprd11.prod.outlook.com
- ([fe80::3487:7a1:bef5:979e%7]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
- 02:47:36 +0000
-From: "Zeng, Xin" <xin.zeng@intel.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
-	"yishaih@nvidia.com" <yishaih@nvidia.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>
-CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, qat-linux <qat-linux@intel.com>,
-	"Cao, Yahui" <yahui.cao@intel.com>
-Subject: RE: [PATCH v4 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-Thread-Topic: [PATCH v4 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-Thread-Index: AQHaalR9StzovMarUEC10fvX40lRFLEoy0sAgAAnj9A=
-Date: Wed, 6 Mar 2024 02:47:36 +0000
-Message-ID: <DM4PR11MB550263F49D2EA8755F3CCFA588212@DM4PR11MB5502.namprd11.prod.outlook.com>
-References: <20240228143402.89219-1-xin.zeng@intel.com>
- <20240228143402.89219-11-xin.zeng@intel.com>
- <BN9PR11MB5276492EDE7F9CA57117FE518C222@BN9PR11MB5276.namprd11.prod.outlook.com>
-In-Reply-To: <BN9PR11MB5276492EDE7F9CA57117FE518C222@BN9PR11MB5276.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR11MB5502:EE_|PH7PR11MB8501:EE_
-x-ms-office365-filtering-correlation-id: da9b25af-8f17-40a4-2e5a-08dc3d87c7f1
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: DO54RL9SveuMkEKkt+5aHIQd7IM7DzdYZ8d569P4xB00xFMcVpQgP+jopmNyyXuW5jXAkgH8Q4k1gxyR2P6mtAI1Ak1tI/bL3npZP3kiHzTl0UjDynYXQoWhGdV+QuQGb7srAfT5i2wh1fG1GJnDfBpPJkq+ChFVA5vKmUFZui74vR0lnweQ9WF0XGVsyYgaggvgTi+WvVHMXY8bSlH4b9puaf5PCmMmvtJcuBKXvfKIyeug8yVdWp9LGhA06XZUQ3f4/tbj/hRo2mLGifnGIqfFWOr7hnZE+fg/MLgTuXGxyHZee3YrKI8oG9s6zRmEFNjYisTRL41EfemwPGtXC0vBIvBwEh1K8BomPbIRetZ1O0xdp0dH3xZFypUTgDQpWurP3z9h4C53SW/SRBqOE39RTsfgJaz3qu23QOyTx1a7gBgVQaAzRkiz9ahE0lmOxyXgCamAtUCB0S1lVXy+TLekSKeLpyC0sAjtp8m9QbBuQn5edaoZ79Q/55JrmYIm2fiYVU/+ppdb4m/26kdQ8S2pUKbwryvX3yTdxxQi2vCAEnor76wrMMFA9vknOKXJOniYZOx97ZNYStRanxhmMhA4xDi0yWOnLdR2qn/vuAL/h+Es0Urs6Q4EupBwVv41CccZEg8Aeekec/MxUjEhedrciaDchQVcz/gQjJb6dmjc/0pSy0fTzuryXuey2aaWA0Zj97Sb5y1hkaVnHKVfZ/P9Lxh1+uW9UKaeufvyhFc=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5502.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?2OTsKs5oYk50VhSF+EIXZ1Co3SbIsi42GmLOO772AQsrbmk5ZtNwRUaOKlcE?=
- =?us-ascii?Q?sqvgvssdBrKKii/hBmrMOtCd7RKLH6fhwvRI9dY233r1vDR4qm7TT8IMFnMN?=
- =?us-ascii?Q?k01TLSby3HznMR5Ix8/Bx9p/pnshW00v9DkcpaeFM6UD/brtrTiO0ZpHKkU1?=
- =?us-ascii?Q?iVbg9UoQzzEhRlSb8PWX3aQZjDZ7RYoItuxpIuUnvFo6dHSvYfosS1X1+usO?=
- =?us-ascii?Q?uCJbKV0YzhV0gTYBgarxFFVD53DqdZXrvgMKFpWO2eydhMESiUKALnG/X8iG?=
- =?us-ascii?Q?NvFNkzjvHny04BHG/jyDY6FbwacS7f2gwAASVgZLnDNz2U9BVIREbGGdur4W?=
- =?us-ascii?Q?AEO1cYhP8iHwtBESTikUccTi8j6eQwdeoWL7YrH9jxe+afIYOv/fpWvOhSdi?=
- =?us-ascii?Q?4aGdwulDQ/U91e2sdsfrXcXNlloqXqwbVuA3pkxNVRYOOfAMxPbIzdwG0/sU?=
- =?us-ascii?Q?KJGJrBXTHnrpnsvRDKFNNk9zATgEMA4I6s63KjFI0o7TUHJ0TI6wjKki+hYv?=
- =?us-ascii?Q?DZ7qnBzJVDxM44Bjhi6EcehFynCvr+l8QR9CyXmNeUJZlrUYMx4ZCbrO876P?=
- =?us-ascii?Q?gtn9P4i1rn1IUySMqdTrLHujCpK6CKxufidNxlq1/4MIOtiDx+gnBgRB6xJE?=
- =?us-ascii?Q?EXASYZdOCun03BfTt4PJvGakv2H4n7aoeQRSMaKAZYOQLzfDJxcl1ClskVQq?=
- =?us-ascii?Q?dyfUZMbg41fNPkp+I0H92fdkoZn/xfH57remF/t1BvKRjrstzcC4ImWENoY8?=
- =?us-ascii?Q?e1aoCl5xNnJ7Lru/tzpBEGhDRUbcmYiJgg151NqpOO2NjB+bicSmfU1vt1kz?=
- =?us-ascii?Q?/MoX8mcK9OwBU4Ntip/MwVCbINnhvHi/aayysisI9luVhzVOaN7bXnLiazRx?=
- =?us-ascii?Q?B/ZyD5poTGy/5a4K7zROVjEVbf25dA1uR7mBPxwfhL7Gg1M33I7OWTdQZrbW?=
- =?us-ascii?Q?ulAESH+qncMkna+xsF61TP/CkA93nynuflfk6d3/2Z5EJzIbfXLmMuaksDlx?=
- =?us-ascii?Q?kRYKDnY6/55J3zEfTKjwab1iFCgZDETJ59k15DTt3u5z1Rksi0MPWK4RVtZT?=
- =?us-ascii?Q?RtJgnZGPaghBWpEpAJUc12LnTJtuzunJqAgtdDq9Bk82sYXj9jpgzJTEylcx?=
- =?us-ascii?Q?vJYNYz4XzMyHzaIHbDTDCkA8ufU3PsVVQxTWcgASsDp7Ou8u4bCtZxD1LKOi?=
- =?us-ascii?Q?MvL8+R3LpCh44XWuGV/kGRO9R1+Y8cONXh+nTrWMZIU1o+y3o3TdoaEd2iCG?=
- =?us-ascii?Q?79o+pgcsptLTKH0oxMS9M4SmqSbmR1Es0NInRyQjGhL0VGjgTQQXvK87b3vr?=
- =?us-ascii?Q?fnLHft6x+54av4Z3x3yJoVr33sXpT5QFXh+1z/UNQ4QOSA5utGcBVOoUMrG/?=
- =?us-ascii?Q?meWWQdYDaEawiB7cJbKH5YrpSZwxSg4OUgSNVU84nB8u6EvVjvwvhcybmvrP?=
- =?us-ascii?Q?ZdOjshG3KVLK4uOj0L8Sc17AROYiWkr7eN5aaEWrv7iplI5pTkLuQaEPKCsE?=
- =?us-ascii?Q?VlhQisf3oUPHE3pxS47sx3VH6OSUhcMiONjr2s8x8aMoqzD/O+yhUjueOT6h?=
- =?us-ascii?Q?lbkNsRWylPFQNm50QveT0Ja0oGLKI/SSy+p+fH7r?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="agwg0mcA"
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-60983233a0dso5500157b3.3
+        for <linux-crypto@vger.kernel.org>; Tue, 05 Mar 2024 19:46:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1709696802; x=1710301602; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ouY2hpmeW2k/P5GfJGCZNfQwVVpUUR+xpZsAYl3McfM=;
+        b=agwg0mcAvPYaoFsEv5oaWm/xAh5RoZ5wi4BfYhk/CmIFJdEuN+2J7F8Kh1qkCdLlzW
+         i0jl2PiuvXdHIaX0UiJJTMd+S7hd66lOSKhL1axn79pSUfValIJsNolYaJtCB+sLqNj4
+         vcxJPg51wfd+ByWN+9tTARaI8ITGmYJCZyg3I=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709696802; x=1710301602;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ouY2hpmeW2k/P5GfJGCZNfQwVVpUUR+xpZsAYl3McfM=;
+        b=ggEF42DT9c1bKc/1ccvRW9t7kdJioxv+ti0nDPxvDw41YlMYZcBKxwdtC/Ds9ruO6v
+         JYVBFbysLZDw20XqZhJkb4pZniHLf4BBy8EoEHmNcdmMEAd/oRcEPzZ4425eweI+qcbW
+         3+bfYjTtelACRMilbQlT8ajjQh5pPSGm/3o3w3KCRHDxf492X+z9pjaSDIOD585NAWb2
+         GA9oA3Fm9CDjXbUdUybcz9/bJCs+2kr6iw0AbSnFxaJjZ2U4Mj7iX4TeB9kfzFkZhbpU
+         VYc1hFk9ySask3ljPdXdpnAq0x9BOAT7U/6Uz0ARl39FyyA0l4/u4XcmRBr30jLH0kJ2
+         OsCA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmAqs+wxa4o0Sn3E9Q6Mh8w0LADQYU1du5jUxtbLp66/YbVDGe1hnnShd6h22BYWwvI/vnRusanjLV8XEB4neQxA8NLdFQqBJ+OfpA
+X-Gm-Message-State: AOJu0YynjHE3fAQeG3yb6aDMGERs9uapPj8ARs+8TX+jxGS5VYybdl+P
+	ce6iRhrsoz5TyFUcv6ttwqRnjUW+ihBj3dl2unzqR702dqfkmNm4VfJW58Ay6RWl19uWoQE0mjX
+	86iOWHwE85R1td9W4dW2LQ09QBklKxLhl+I4CRA==
+X-Google-Smtp-Source: AGHT+IF4OR562RLSvhFbbL1fZZC9wIqI0yqHTgnE1V2E0Abmnulx7GG75/aiJTdCzrVIdEZlvt/zsJdLY3B0N1vfBgA=
+X-Received: by 2002:a0d:f504:0:b0:608:d1b3:30ac with SMTP id
+ e4-20020a0df504000000b00608d1b330acmr15675551ywf.30.1709696802436; Tue, 05
+ Mar 2024 19:46:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5502.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: da9b25af-8f17-40a4-2e5a-08dc3d87c7f1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2024 02:47:36.3893
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6ZYrHE66lY+Mtm38UESi1d/+JeXkodn94EDQ1pQ7wNAr0CwAlCxew8FQr66aBWuCY5B4qrWRJMlLe6QwPjKTAQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8501
-X-OriginatorOrg: intel.com
+References: <20240305112831.3380896-1-pavitrakumarm@vayavyalabs.com> <20240305211318.GA1202@sol.localdomain>
+In-Reply-To: <20240305211318.GA1202@sol.localdomain>
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Date: Wed, 6 Mar 2024 09:16:31 +0530
+Message-ID: <CALxtO0kp+vDstePYkq3AYSD-h6LRt1HvRm4HdW-OtTQm5ipqkw@mail.gmail.com>
+Subject: Re: [PATCH 0/4] Add spacc crypto driver support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, 
+	Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for the comments, Kevin.
-On Tuesday, March 5, 2024 3:38 PM, Tian, Kevin <kevin.tian@intel.com> wrote=
-:
-> > From: Zeng, Xin <xin.zeng@intel.com>
-> > Sent: Wednesday, February 28, 2024 10:34 PM
-> > +
-> > +static long qat_vf_precopy_ioctl(struct file *filp, unsigned int cmd,
-> > +				 unsigned long arg)
-> > +{
-> > +	struct qat_vf_migration_file *migf =3D filp->private_data;
-> > +	struct qat_vf_core_device *qat_vdev =3D migf->qat_vdev;
-> > +	struct qat_mig_dev *mig_dev =3D qat_vdev->mdev;
-> > +	struct vfio_precopy_info info;
-> > +	loff_t *pos =3D &filp->f_pos;
-> > +	unsigned long minsz;
-> > +	int ret =3D 0;
-> > +
-> > +	if (cmd !=3D VFIO_MIG_GET_PRECOPY_INFO)
-> > +		return -ENOTTY;
-> > +
-> > +	minsz =3D offsetofend(struct vfio_precopy_info, dirty_bytes);
-> > +
-> > +	if (copy_from_user(&info, (void __user *)arg, minsz))
-> > +		return -EFAULT;
-> > +	if (info.argsz < minsz)
-> > +		return -EINVAL;
-> > +
-> > +	mutex_lock(&qat_vdev->state_mutex);
-> > +	if (qat_vdev->mig_state !=3D VFIO_DEVICE_STATE_PRE_COPY) {
-> > +		mutex_unlock(&qat_vdev->state_mutex);
-> > +		return -EINVAL;
-> > +	}
->=20
-> what about PRE_COPY_P2P?
+Hi Eric,
+  Yes we have tested this with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=3Dy
 
-Good catch, will add it in next version.
+  Also is it fine if those additional algos stay inside that disabled
+CONFIG. SPAcc hardware
+  does support those algos.
 
->=20
-> > +static struct qat_vf_migration_file *
-> > +qat_vf_save_device_data(struct qat_vf_core_device *qat_vdev, bool
-> > pre_copy)
-> > +{
-> > +	struct qat_vf_migration_file *migf;
-> > +	int ret;
-> > +
-> > +	migf =3D kzalloc(sizeof(*migf), GFP_KERNEL);
-> > +	if (!migf)
-> > +		return ERR_PTR(-ENOMEM);
-> > +
-> > +	migf->filp =3D anon_inode_getfile("qat_vf_mig", &qat_vf_save_fops,
-> > +					migf, O_RDONLY);
-> > +	ret =3D PTR_ERR_OR_ZERO(migf->filp);
-> > +	if (ret) {
-> > +		kfree(migf);
-> > +		return ERR_PTR(ret);
-> > +	}
-> > +
-> > +	stream_open(migf->filp->f_inode, migf->filp);
-> > +	mutex_init(&migf->lock);
-> > +
-> > +	if (pre_copy)
-> > +		ret =3D qat_vf_save_setup(qat_vdev, migf);
-> > +	else
-> > +		ret =3D qat_vf_save_state(qat_vdev, migf);
-> > +	if (ret) {
-> > +		fput(migf->filp);
-> > +		return ERR_PTR(ret);
-> > +	}
->=20
-> lack of kfree(migf). Using goto can avoid such typo in error unwind.
+- PK
 
-kfree(migf) will be invoked in fput. This was pointed out by
-Shameer and I updated it in v2. :-)
 
->=20
-> > +
-> > +static struct file *qat_vf_pci_step_device_state(struct
-> qat_vf_core_device
-> > *qat_vdev, u32 new)
-> > +{
-> > +	u32 cur =3D qat_vdev->mig_state;
-> > +	int ret;
-> > +
-> > +	if ((cur =3D=3D VFIO_DEVICE_STATE_RUNNING && new =3D=3D
-> > VFIO_DEVICE_STATE_RUNNING_P2P) ||
-> > +	    (cur =3D=3D VFIO_DEVICE_STATE_PRE_COPY && new =3D=3D
-> > VFIO_DEVICE_STATE_PRE_COPY_P2P)) {
-> > +		ret =3D qat_vfmig_suspend(qat_vdev->mdev);
-> > +		if (ret)
-> > +			return ERR_PTR(ret);
-> > +		return NULL;
-> > +	}
->=20
-> could you arrange the transitions in pair as mlx does e.g. following
-> above is the reverse one calling qat_vfmig_resume()?
-
-Sure, will update it in next version.
-
->=20
-> > +
-> > +MODULE_LICENSE("GPL");
-> > +MODULE_AUTHOR("Intel Corporation");
->=20
-> please use your name as the author.
-
-Sure, will do.
-
+On Wed, Mar 6, 2024 at 2:43=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> w=
+rote:
+>
+> On Tue, Mar 05, 2024 at 04:58:27PM +0530, Pavitrakumar M wrote:
+> > Add the driver for SPAcc(Security Protocol Accelerator), which is a
+> > crypto acceleration IP from Synopsys. The SPAcc supports many cipher,
+> > hash, aead algorithms and various modes.The driver currently supports
+> > below,
+>
+> Has this been tested with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=3Dy?
+>
+> > aead:
+> > - ccm(sm4)
+> > - ccm(aes)
+> > - gcm(sm4)
+> > - gcm(aes)
+> > - rfc8998(gcm(sm4))
+> > - rfc7539(chacha20,poly1305)
+> >
+> > cipher:
+> > - cbc(sm4)
+> > - ecb(sm4)
+> > - ofb(sm4)
+> > - cfb(sm4)
+> > - ctr(sm4)
+> > - cbc(aes)
+> > - ecb(aes)
+> > - ctr(aes)
+> > - xts(aes)
+> > - cts(cbc(aes))
+> > - cbc(des)
+> > - ecb(des)
+> > - cbc(des3_ede)
+> > - ecb(des3_ede)
+> > - chacha20
+> > - xts(sm4)
+> > - cts(cbc(sm4))
+> > - ecb(kasumi)
+> > - f8(kasumi)
+> > - snow3g_uea2
+> > - cs1(cbc(aes))
+> > - cs2(cbc(aes))
+> > - cs1(cbc(sm4))
+> > - cs2(cbc(sm4))
+> > - f8(sm4)
+> >
+> > hash:
+> > - michael_mic
+> > - sm3
+> > - hmac(sm3)
+> > - sha3-512
+> > - sha3-384
+> > - sha3-256
+> > - sha3-224
+> > - hmac(sha512)
+> > - hmac(sha384)
+> > - hmac(sha256)
+> > - hmac(sha224)
+> > - sha512
+> > - sha384
+> > - sha256
+> > - sha224
+> > - sha1
+> > - hmac(sha1)
+> > - md5
+> > - hmac(md5)
+> > - cmac(sm4)
+> > - xcbc(aes)
+> > - cmac(aes)
+> > - xcbc(sm4)
+> > - sha512-224
+> > - hmac(sha512-224)
+> > - sha512-256
+> > - hmac(sha512-256)
+> > - mac(kasumi_f9)
+> > - mac(snow3g)
+> > - mac(zuc)
+> > - sslmac(sha1)
+> > - shake128
+> > - shake256
+> > - cshake128
+> > - cshake256
+> > - kcmac128
+> > - kcmac256
+> > - kcmacxof128
+> > - kcmacxof256
+> > - sslmac(md5)
+>
+> Algorithms that don't have a generic implementation shouldn't be included=
+.
+>
+> - Eric
