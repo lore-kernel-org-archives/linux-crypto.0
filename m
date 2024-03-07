@@ -1,68 +1,32 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0034A1C684;
-	Wed,  6 Mar 2024 22:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2744D1F932;
+	Thu,  7 Mar 2024 07:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709765945; cv=none; b=db13v0Nxbj+ud9YZVU8D5zVFesI1GwVyxrfB4veChRlDmd0xjL1jkW7y+DzZOVGiwdmvycHoJ6ZkoBIQL87Bwdwc78EenU6nQDXpi5U8K9oypYHcDDK7m/llXDM9VheIbyWFbhtTuoxAb3bDX5OSYPkiiWr2SWK5Hsm3rF4imPw=
+	t=1709795652; cv=none; b=A9eczeKoM/jllG9MVuQaCHVdhyX1JPZOmmztTeqPGxLV7uIOggIY5WMKVGuniYflKe5QJjR2MRtJ60b0YhyuRaG83KtdIokIW5ImsRJQdlk7F/CERet0/Qbig/pjpYr1JP6b9RpCfXYF5y/SWID5WFrj6pc3J5czw6Bkvzwb1UA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709765945; c=relaxed/simple;
-	bh=oNL4woPH2GgB/0aAHfXk2961xRNs+WQXgdtPX1mrVSo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=utRuA6WZdaa1bOjybWdTTvsFRhaHcSIj+hTEz1LIPsyJicegm1WjnL/VsAHSljmLNcjBVUJShK+jPJPjRTon8eaK09lRDGsCNKX8IzkhzWSbpw9t34/X1I2MDlrq9eXfezOKaW7Q1OrfjN79+XWobdDzgJS9iV13rZg4pocGylI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VKYrAG//; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VKYrAG//"
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 426MgDw8018256;
-	Wed, 6 Mar 2024 22:58:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=fZBVeTFFrn96qz5boWPG4MRz0Oeii50WF0vdP2piFhs=;
- b=VKYrAG//fcN7izxPTJi1ObzKnhA0D3uIh3cJc0cw7fstngK+WA1siR00uN+WEowtjhjC
- /UmTVEineOuKx36dqyUSXoUBRSm/n4aweD1dhIKJjjYemdp6tHTVzU64DYGjAEDH8h2Y
- pXCjGcA4YxxfgJNzF36MPrq1wX9MMhYVDXS9222fY1fEA8u5X6q74BN1+vHn66O3uZ5L
- lIbO7TPnyVEsMLwg9rHvu+fxav2MKhp0YzImGMMVr9LPlpurDyVb1E3ZJckKQ6SW/Zwe
- 1t3QugfDSAikwQa6YcmYcteZVxunGHfqr86D3zjh35KBpzGVep/owl8q7S/Iu5ephDnK Pg== 
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wq1gugb0f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 06 Mar 2024 22:58:57 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 426MIwG9026216;
-	Wed, 6 Mar 2024 22:23:10 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wmfep1nq3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 06 Mar 2024 22:23:10 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 426MN7Mo13631748
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 6 Mar 2024 22:23:09 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DFCA358061;
-	Wed,  6 Mar 2024 22:23:05 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6208858068;
-	Wed,  6 Mar 2024 22:23:05 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  6 Mar 2024 22:23:05 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.ibm.com>
-To: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br, lukas@wunner.de,
-        Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH v5 06/12] crypto: ecc - Add special case for NIST P521 in ecc_point_mult
-Date: Wed,  6 Mar 2024 17:22:51 -0500
-Message-ID: <20240306222257.979304-7-stefanb@linux.ibm.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240306222257.979304-1-stefanb@linux.ibm.com>
-References: <20240306222257.979304-1-stefanb@linux.ibm.com>
+	s=arc-20240116; t=1709795652; c=relaxed/simple;
+	bh=I0Eb1RcvG2mnFN9txzANi9+x7+5ju+ursRojhbBWMVQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZuDu4Q0K9KtLjR9OfBGnXBcPC7oHr+E6r/a/HEBjmg6cYbJgxTeon5nwY3ZHZo9cwD3fnRZJs0XvsNI66rusrbX/1S/G0sFloqZPL+1ho9ICqAZTE5yLImJd1O48Qml2Dt/ckAuKXhzwcA/E227ZvyOrut5I/Wz4J3DE70mTlxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (78.37.41.175) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 7 Mar
+ 2024 10:13:56 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>
+CC: Roman Smirnov <r.smirnov@omp.ru>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Karina Yankevich <k.yankevich@omp.ru>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH] crypto: ecc: fix NULL pointer dereferencing in ecc_gen_privkey()
+Date: Thu, 7 Mar 2024 10:13:18 +0300
+Message-ID: <20240307071318.5206-1-r.smirnov@omp.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -70,44 +34,74 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5Wi3TuOfounAn6vNDh3bvOoo3h3hx1YA
-X-Proofpoint-ORIG-GUID: 5Wi3TuOfounAn6vNDh3bvOoo3h3hx1YA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-06_12,2024-03-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 suspectscore=0 spamscore=0 adultscore=0 mlxscore=0
- mlxlogscore=999 impostorscore=0 clxscore=1015 malwarescore=0
- lowpriorityscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2311290000 definitions=main-2403060185
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/07/2024 06:56:30
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 184019 [Mar 07 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 9 0.3.9 e923e63e431b6489f12901471775b2d1b59df0ba
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;78.37.41.175:7.4.1,7.7.3;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: {cloud_iprep_silent}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 78.37.41.175
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 03/07/2024 07:02:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 3/7/2024 2:51:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-In ecc_point_mult use the number of bits of the NIST P521 curve + 2. The
-change is required specifically for NIST P521 to pass mathematical tests
-on the public key.
+ecc_get_curve() can return NULL. It is necessary to check
+for NULL before dereferencing.
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-Tested-by: Lukas Wunner <lukas@wunner.de>
+Found by Linux Verification Center (linuxtesting.org) with Svace.
+
+Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 ---
- crypto/ecc.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ crypto/ecc.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/crypto/ecc.c b/crypto/ecc.c
-index 373660e7b19d..55fd390d3386 100644
+index f53fb4d6af99..fd63e354895b 100644
 --- a/crypto/ecc.c
 +++ b/crypto/ecc.c
-@@ -1326,7 +1326,10 @@ static void ecc_point_mult(struct ecc_point *result,
- 	carry = vli_add(sk[0], scalar, curve->n, ndigits);
- 	vli_add(sk[1], sk[0], curve->n, ndigits);
- 	scalar = sk[!carry];
--	num_bits = sizeof(u64) * ndigits * 8 + 1;
-+	if (curve->nbits == 521)
-+		num_bits = curve->nbits + 2;
-+	else
-+		num_bits = sizeof(u64) * ndigits * 8 + 1;
+@@ -1471,9 +1471,14 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64 *privkey)
+ 	const struct ecc_curve *curve = ecc_get_curve(curve_id);
+ 	u64 priv[ECC_MAX_DIGITS];
+ 	unsigned int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+-	unsigned int nbits = vli_num_bits(curve->n, ndigits);
++	unsigned int nbits;
+ 	int err;
  
- 	vli_set(rx[1], point->x, ndigits);
- 	vli_set(ry[1], point->y, ndigits);
++	if (!curve)
++		return -EINVAL;
++
++	nbits = vli_num_bits(curve->n, ndigits);
++
+ 	/* Check that N is included in Table 1 of FIPS 186-4, section 6.1.1 */
+ 	if (nbits < 160 || ndigits > ARRAY_SIZE(priv))
+ 		return -EINVAL;
 -- 
-2.43.0
+2.34.1
 
