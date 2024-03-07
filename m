@@ -1,107 +1,193 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2744D1F932;
-	Thu,  7 Mar 2024 07:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A7E12E1C4
+	for <linux-crypto@vger.kernel.org>; Thu,  7 Mar 2024 14:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709795652; cv=none; b=A9eczeKoM/jllG9MVuQaCHVdhyX1JPZOmmztTeqPGxLV7uIOggIY5WMKVGuniYflKe5QJjR2MRtJ60b0YhyuRaG83KtdIokIW5ImsRJQdlk7F/CERet0/Qbig/pjpYr1JP6b9RpCfXYF5y/SWID5WFrj6pc3J5czw6Bkvzwb1UA=
+	t=1709821474; cv=none; b=tNztL1hb22m+NdEBnhOI5aiO/tJ4WmAV3T1aOzAV8SheSrTllBPHz7dxXyRypBCsDUgs0faTqCsCNy67yOPgqLA84l5Xmo/LRyhhj7/qHZYMTp5YhtbiMTIgflsW8MUe0EicETBJLpBkCaz7iiw/9CFx1WCBrEc+UvCaAR5Wsf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709795652; c=relaxed/simple;
-	bh=I0Eb1RcvG2mnFN9txzANi9+x7+5ju+ursRojhbBWMVQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZuDu4Q0K9KtLjR9OfBGnXBcPC7oHr+E6r/a/HEBjmg6cYbJgxTeon5nwY3ZHZo9cwD3fnRZJs0XvsNI66rusrbX/1S/G0sFloqZPL+1ho9ICqAZTE5yLImJd1O48Qml2Dt/ckAuKXhzwcA/E227ZvyOrut5I/Wz4J3DE70mTlxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (78.37.41.175) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 7 Mar
- 2024 10:13:56 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>
-CC: Roman Smirnov <r.smirnov@omp.ru>, Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Karina Yankevich <k.yankevich@omp.ru>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH] crypto: ecc: fix NULL pointer dereferencing in ecc_gen_privkey()
-Date: Thu, 7 Mar 2024 10:13:18 +0300
-Message-ID: <20240307071318.5206-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1709821474; c=relaxed/simple;
+	bh=XfdgPqsryEimkaX+ec7UD2N0XK3t6eWPFGrc88DKSis=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=OFalocsW1yPoo7WioJ6xFbmraysGbzAAeQrIRfLNKN1JprvA5lCpNnhzUKwQ1l5toyJCvfYYADKZShR+vGYTzOOyhFzdlMt8SmwnPYjZcheuvpmDNHa7vfhUl170DkekkqXjZKdhGwh9UFV7zqIq/SRlj9aZ9Ysczi5WmpTQgaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RaW2xz0W; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RaW2xz0W"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-412f1ccf8d8so9073765e9.1
+        for <linux-crypto@vger.kernel.org>; Thu, 07 Mar 2024 06:24:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1709821471; x=1710426271; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KLkEU65YERPzZDXp5EuRPV0oeNk1pD4FHKA6c0/zoZU=;
+        b=RaW2xz0WwSzhWE1m2APTCZnHb6eDF7qaLL7eM9pmJZhisPLxUXNwjl6lZTbCHjbCoW
+         DLsWBlgsZRE9Azd70ApjYI2OdL2olcWf4cZ3wmZ4JhLZxTcqaKENFej3b9MK+9Nd8brP
+         hMCkrjgLbBHYutoSn93c/3rtGCjtcSUp6lInHukw6MuWBWt4EFwGkYwpiHuMa6xm05du
+         aWMj6kRrpGpnkx91cGwPNiM6/0LWG5pEx0f7TJby7QRowqxnfgIYJC1+yJIgWlLItqXk
+         86FSu9Nq/GMJJtwJp7eJ/inYpi0UBjI+C1yXEeryoltOHVb5fET5xF+XIfdV0eTSBumk
+         G5Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709821471; x=1710426271;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KLkEU65YERPzZDXp5EuRPV0oeNk1pD4FHKA6c0/zoZU=;
+        b=lnB9BNIN2PYWKhzZAa6QpeFO553knm6eRrO3pWt/UdRjJEWiu2IPLoy6CrtzTOZSwy
+         B2HY546PSTa+uUjbqOnSc/P94mKlCP1J7ar2KZKtPpa6KrZzQUOftTt1id+ddG01pw4Q
+         vSmvvUeXOEnabxUp7x/DwZ4acTiTN7Z/MAh0WfHE0xN/p4JZSKZSaNiyyFG1G/SskTAR
+         OChyZBJNjF5Q4UmurRwMxpWOWm+UWgllsot+yCI2tXX2lxD13twFhTf/BVH8wB0TeAPY
+         Yy4c/07r9n9HjI8Q/VDdeNdxBnyI+dv+WAWoZVKupeUuxfUkSldjcM7FAC2fcgpZuGLR
+         M5WQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUyBAVlZvyDXBeeFXccAtrzCpA5b7Gre6BbK2izYAjFNoYJeRtWOProcNYyTs18+Zh+kr8EwaMdRPvrO1QNWCouyZDmc4+zHUgpj6Bs
+X-Gm-Message-State: AOJu0YwDA8UhJX8Pbp31Byr647/cz+8ID/TDMrx2ZFP2FYuvQXW6HAqk
+	1jAlos0zbwb61h5cxJPW5hDxYBf4oLEDEEmzz8x72p+Ok+QvClHrPAq1jlWRX5M=
+X-Google-Smtp-Source: AGHT+IFkS3QjWn6zABoMsQq7lMuBHhk7E02ZrOa2EckIwNumg7/2o3gzTOlzWBFXp44p7lqgjQ21Kw==
+X-Received: by 2002:a05:600c:474a:b0:412:bf52:9ac2 with SMTP id w10-20020a05600c474a00b00412bf529ac2mr14481024wmo.14.1709821470461;
+        Thu, 07 Mar 2024 06:24:30 -0800 (PST)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id bq27-20020a5d5a1b000000b0033e6879817esm1363499wrb.58.2024.03.07.06.24.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Mar 2024 06:24:30 -0800 (PST)
+Date: Thu, 7 Mar 2024 17:24:26 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev,
+	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
+	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com,
+	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+Subject: Re: [PATCH 4/4] Enable Driver compilation in crypto Kconfig and
+ Makefile file
+Message-ID: <c9d89052-74c8-4746-a54c-c199786743fb@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/07/2024 06:56:30
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 184019 [Mar 07 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 9 0.3.9 e923e63e431b6489f12901471775b2d1b59df0ba
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;78.37.41.175:7.4.1,7.7.3;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: {cloud_iprep_silent}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 78.37.41.175
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/07/2024 07:02:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/7/2024 2:51:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240305112831.3380896-5-pavitrakumarm@vayavyalabs.com>
 
-ecc_get_curve() can return NULL. It is necessary to check
-for NULL before dereferencing.
+Hi Pavitrakumar,
 
-Found by Linux Verification Center (linuxtesting.org) with Svace.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
----
- crypto/ecc.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index f53fb4d6af99..fd63e354895b 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -1471,9 +1471,14 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64 *privkey)
- 	const struct ecc_curve *curve = ecc_get_curve(curve_id);
- 	u64 priv[ECC_MAX_DIGITS];
- 	unsigned int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
--	unsigned int nbits = vli_num_bits(curve->n, ndigits);
-+	unsigned int nbits;
- 	int err;
- 
-+	if (!curve)
-+		return -EINVAL;
-+
-+	nbits = vli_num_bits(curve->n, ndigits);
-+
- 	/* Check that N is included in Table 1 of FIPS 186-4, section 6.1.1 */
- 	if (nbits < 160 || ndigits > ARRAY_SIZE(priv))
- 		return -EINVAL;
+url:    https://github.com/intel-lab-lkp/linux/commits/Pavitrakumar-M/Add-SPAcc-driver-to-Linux-kernel/20240305-193337
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20240305112831.3380896-5-pavitrakumarm%40vayavyalabs.com
+patch subject: [PATCH 4/4] Enable Driver compilation in crypto Kconfig and Makefile file
+config: m68k-randconfig-r081-20240307 (https://download.01.org/0day-ci/archive/20240307/202403072256.em3Fk3At-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 13.2.0
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202403072256.em3Fk3At-lkp@intel.com/
+
+New smatch warnings:
+drivers/crypto/dwc-spacc/spacc_ahash.c:1057 spacc_hash_digest() error: uninitialized symbol 'total_len'.
+
+Old smatch warnings:
+drivers/crypto/dwc-spacc/spacc_ahash.c:271 spacc_hash_init_dma() error: uninitialized symbol 'sgl_buffer'.
+
+vim +/total_len +1057 drivers/crypto/dwc-spacc/spacc_ahash.c
+
+6ad822cec22644 Pavitrakumar M 2024-03-05   981  
+6ad822cec22644 Pavitrakumar M 2024-03-05   982  static int spacc_hash_digest(struct ahash_request *req)
+6ad822cec22644 Pavitrakumar M 2024-03-05   983  {
+6ad822cec22644 Pavitrakumar M 2024-03-05   984  	int final = 0;
+6ad822cec22644 Pavitrakumar M 2024-03-05   985  	int rc, total_len;
+6ad822cec22644 Pavitrakumar M 2024-03-05   986  	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
+6ad822cec22644 Pavitrakumar M 2024-03-05   987  	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
+6ad822cec22644 Pavitrakumar M 2024-03-05   988  	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
+6ad822cec22644 Pavitrakumar M 2024-03-05   989  	struct spacc_priv *priv = dev_get_drvdata(tctx->dev);
+6ad822cec22644 Pavitrakumar M 2024-03-05   990  
+6ad822cec22644 Pavitrakumar M 2024-03-05   991  	if (tctx->flag_ppp) {
+6ad822cec22644 Pavitrakumar M 2024-03-05   992  		/* from finup */
+6ad822cec22644 Pavitrakumar M 2024-03-05   993  		ctx->single_shot = 0;
+6ad822cec22644 Pavitrakumar M 2024-03-05   994  		ctx->final_part_pck = 1;
+6ad822cec22644 Pavitrakumar M 2024-03-05   995  		final = 2;
+6ad822cec22644 Pavitrakumar M 2024-03-05   996  	} else {
+6ad822cec22644 Pavitrakumar M 2024-03-05   997  		/* direct single shot digest call */
+6ad822cec22644 Pavitrakumar M 2024-03-05   998  		ctx->single_shot = 1;
+6ad822cec22644 Pavitrakumar M 2024-03-05   999  		ctx->rem_len = 0;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1000  		ctx->total_nents = sg_nents(req->src);
+6ad822cec22644 Pavitrakumar M 2024-03-05  1001  	}
+6ad822cec22644 Pavitrakumar M 2024-03-05  1002  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1003  	if (tctx->handle < 0 || !tctx->ctx_valid ||
+6ad822cec22644 Pavitrakumar M 2024-03-05  1004  	    req->nbytes > priv->max_msg_len)
+6ad822cec22644 Pavitrakumar M 2024-03-05  1005  		goto fallback;
+
+"total_len" not intialized for these gotos
+
+6ad822cec22644 Pavitrakumar M 2024-03-05  1006  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1007  	rc = spacc_hash_init_dma(tctx->dev, req, final);
+6ad822cec22644 Pavitrakumar M 2024-03-05  1008  	if (rc < 0)
+6ad822cec22644 Pavitrakumar M 2024-03-05  1009  		goto fallback;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1010  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1011  	if (rc == 0)
+6ad822cec22644 Pavitrakumar M 2024-03-05  1012  		return 0;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1013  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1014  	if (final) {
+6ad822cec22644 Pavitrakumar M 2024-03-05  1015  		if (ctx->total_nents) {
+6ad822cec22644 Pavitrakumar M 2024-03-05  1016  			/* INIT-UPDATE-UPDATE-FINUP/FINAL */
+6ad822cec22644 Pavitrakumar M 2024-03-05  1017  			total_len = tctx->ppp_sgl[0].length;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1018  		} else if (req->src->length == 0 && ctx->total_nents == 0) {
+6ad822cec22644 Pavitrakumar M 2024-03-05  1019  			/* zero msg handling */
+6ad822cec22644 Pavitrakumar M 2024-03-05  1020  			total_len = 0;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1021  		} else {
+6ad822cec22644 Pavitrakumar M 2024-03-05  1022  			/* handle INIT-FINUP sequence, process req->nbytes */
+6ad822cec22644 Pavitrakumar M 2024-03-05  1023  			total_len = req->nbytes;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1024  		}
+6ad822cec22644 Pavitrakumar M 2024-03-05  1025  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1026  		rc = spacc_packet_enqueue_ddt(&priv->spacc, ctx->acb.new_handle,
+6ad822cec22644 Pavitrakumar M 2024-03-05  1027  				&ctx->src, &ctx->dst, total_len,
+6ad822cec22644 Pavitrakumar M 2024-03-05  1028  				0, total_len, 0, 0, 0);
+6ad822cec22644 Pavitrakumar M 2024-03-05  1029  	} else {
+6ad822cec22644 Pavitrakumar M 2024-03-05  1030  		rc = spacc_packet_enqueue_ddt(&priv->spacc, ctx->acb.new_handle,
+6ad822cec22644 Pavitrakumar M 2024-03-05  1031  				&ctx->src, &ctx->dst, req->nbytes,
+6ad822cec22644 Pavitrakumar M 2024-03-05  1032  				0, req->nbytes, 0, 0, 0);
+6ad822cec22644 Pavitrakumar M 2024-03-05  1033  	}
+6ad822cec22644 Pavitrakumar M 2024-03-05  1034  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1035  	if (rc < 0) {
+6ad822cec22644 Pavitrakumar M 2024-03-05  1036  		spacc_hash_cleanup_dma(tctx->dev, req);
+6ad822cec22644 Pavitrakumar M 2024-03-05  1037  		spacc_close(&priv->spacc, ctx->acb.new_handle);
+6ad822cec22644 Pavitrakumar M 2024-03-05  1038  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1039  		if (rc != -EBUSY) {
+6ad822cec22644 Pavitrakumar M 2024-03-05  1040  			pr_debug("Failed to enqueue job, ERR: %d\n", rc);
+6ad822cec22644 Pavitrakumar M 2024-03-05  1041  			return rc;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1042  		}
+6ad822cec22644 Pavitrakumar M 2024-03-05  1043  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1044  		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
+6ad822cec22644 Pavitrakumar M 2024-03-05  1045  			return -EBUSY;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1046  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1047  		goto fallback;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1048  	}
+6ad822cec22644 Pavitrakumar M 2024-03-05  1049  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1050  	return -EINPROGRESS;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1051  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1052  fallback:
+6ad822cec22644 Pavitrakumar M 2024-03-05  1053  	/* Start from scratch as init is not called before digest */
+6ad822cec22644 Pavitrakumar M 2024-03-05  1054  	ctx->fb.hash_req.base = req->base;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1055  	ahash_request_set_tfm(&ctx->fb.hash_req, tctx->fb.hash);
+6ad822cec22644 Pavitrakumar M 2024-03-05  1056  
+6ad822cec22644 Pavitrakumar M 2024-03-05 @1057  	ctx->fb.hash_req.nbytes = total_len;
+                                                                                  ^^^^^^^^^
+
+6ad822cec22644 Pavitrakumar M 2024-03-05  1058  	ctx->fb.hash_req.src = req->src;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1059  	ctx->fb.hash_req.result = req->result;
+6ad822cec22644 Pavitrakumar M 2024-03-05  1060  
+6ad822cec22644 Pavitrakumar M 2024-03-05  1061  	return crypto_ahash_digest(&ctx->fb.hash_req);
+6ad822cec22644 Pavitrakumar M 2024-03-05  1062  }
+
 -- 
-2.34.1
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
