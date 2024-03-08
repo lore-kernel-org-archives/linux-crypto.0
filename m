@@ -1,107 +1,140 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2076.outbound.protection.outlook.com [40.107.220.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0D455E57
-	for <linux-crypto@vger.kernel.org>; Fri,  8 Mar 2024 12:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709899905; cv=none; b=pYPlVvMnaT5nl5I69JZCa3DXB81cKWIk8Ir5FzjI/C3RuWXM4tvk3t5m3Nuq3JF04OPHXnvfkrOJOC1ubTofl+xdCt1L9Ah78NiE5V36EpU7vJHV0/OwC2aQagrdDO2SXmFavgUkZNBmFJQQSCFh4qcpfIlWcnC8gs4HiXf9ZCE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709899905; c=relaxed/simple;
-	bh=h1EUAZcY4Sa9OLfLS8GuZCaKJI43c+bS6eKGcPLLqVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DzRoiqZJwY0C1DcH+LmwbO7Upd/NAYScU7iCIiiQU4Iwfz70ytIZwCMhlX+lDQtuwgLmThlC/B5qBIZQho0+kRuu8HnzFgevoAKgIJRZ0fT/EU9ZoL0Ss/cqZ91p1EoCcHmdt+GzwVm1mXif1/58rHNe7JMh3T4jpbkAHqFsUAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org; spf=pass smtp.mailfrom=cmpxchg.org; dkim=pass (2048-bit key) header.d=cmpxchg-org.20230601.gappssmtp.com header.i=@cmpxchg-org.20230601.gappssmtp.com header.b=pbzvu5tR; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmpxchg.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4A4179B1;
+	Fri,  8 Mar 2024 16:52:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709916765; cv=fail; b=TkzaQxwsFEHub1pRlvFb4SQDwhuHX400VcXgY9PNErDrWVx0CaeCxzrnsyI/XyPJmkQEC0/JwLa32VBhgQEqD+BKK5G1PlcHzBbUtTsM1S1bFGg0Nz7yR2IYpL9/bLw1QaXc6YSnltTLG1G/CoonDQYUQTMvx8+Z7vQCZjOFnxw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709916765; c=relaxed/simple;
+	bh=ND1ZDL2nH2hQR6V8DzT4YAiKmBwDYGT8znlt9PVpzzc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=C/1ED/qgy8ZkMHxDMLvMlBs4n8q91wo4BlAM+oXDBTzJ+J2gJZkQ0OtAG/ZPs7BEZLUoPdqEM2Nu6i+dn5srxmZT4C+K2+A45j/+lLHV3YYzxnS19qS6ejhH2jEsyORusiBGBSXiMdq1OchVIHugRl9hNywpqZfVqZkZG872ErM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sgEowgLW; arc=fail smtp.client-ip=40.107.220.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cmpxchg-org.20230601.gappssmtp.com header.i=@cmpxchg-org.20230601.gappssmtp.com header.b="pbzvu5tR"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-78850a904e4so26407885a.1
-        for <linux-crypto@vger.kernel.org>; Fri, 08 Mar 2024 04:11:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20230601.gappssmtp.com; s=20230601; t=1709899901; x=1710504701; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LFWHyOgkTFQ1yJTh6kQ8rZCjVUuuePKTHTw1zfzOKuU=;
-        b=pbzvu5tRB/lqisuP71hR0ywqb5B3VpAK2GgJE+5luY3O8a47GFGrh1pVkuCammvtTu
-         sNpRkU220qbOq2k2Cagz+ncOMJ5zuVMfHBXE2Ezn7bkuo4VId9JD7fXBcfSbna/r0uFB
-         Mgj62TpaYAyaZH3rTNdNo+c0tnU4oMPNGyEU3now5lrmaqy5+L+n08O+N4GiNxjzZt+L
-         KyMJWPe++8rkl9Gl0XRJlRbrvN21X5I5Roh2Cg2d2phphqDLU+0jTzYZAZdWYnEmaH5Q
-         MChyAo9kJ0d6EMlXyauaqPjDsmu4s9/Nu3X0OF+EMPjZHQ4jeBiXPfyaCVxEkcukPzwN
-         xM8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709899901; x=1710504701;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LFWHyOgkTFQ1yJTh6kQ8rZCjVUuuePKTHTw1zfzOKuU=;
-        b=VOROSvXr0KqjY4w8XIolAYrengoTeftOspN6WudciCm4//iN6nkXDPr6AW3PcA8DfR
-         TN8PgIYEiUawYtrYNc4Kcm+UoxOChWOsyrihR170OOZYyWZjJyEVGZHDIplWOZWBU8YQ
-         /jXjxukh4W5ryMydy2JlYd9nga1cy6Kdf4GGcnYQnDNTWT+RDXmiTHpa/mApl2ERJ2iz
-         knoPEWBtkAgAftl+QN9FZoWmfGBQUO44P3pacbJgR3PGhb8FOezqm7O5s1fXCUGt1YkT
-         lBDzGRPLQ5Zr8upiVtZBx65Ytd+ubncSaCsKn7sUDV7ilSImuHgsEwWsk6uuEQhttJBx
-         E0GQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWwdK8DVdKzkdtZ966QPKOLCjJQjMCHvFM+lHg2k2ronSfhrJf/nJt4UAGqeF6/INuuY3u7P54npkDGtjIerA7r5VcFIPpjybIBIcmy
-X-Gm-Message-State: AOJu0YxqMa3trvU0h9r+iGvzArhLfdWjxQg0MQdGsQPt4XMcyZRipjpb
-	dUsyT8FqTMHKEgn+XkgNaFB70OsX6DsaC5BJ3B16M+lXOt/H8iE5u7qxelhaJqg=
-X-Google-Smtp-Source: AGHT+IEzxOxVKkJMR57UwDLb3/yh3+LCr6bD0C5SHDj0C+YHgMECjWjVL0bqStieUxK8nnlRvm1EGA==
-X-Received: by 2002:a05:620a:1265:b0:788:1dbd:efe6 with SMTP id b5-20020a05620a126500b007881dbdefe6mr10872949qkl.55.1709899901345;
-        Fri, 08 Mar 2024 04:11:41 -0800 (PST)
-Received: from localhost (2603-7000-0c01-2716-da5e-d3ff-fee7-26e7.res6.spectrum.com. [2603:7000:c01:2716:da5e:d3ff:fee7:26e7])
-        by smtp.gmail.com with ESMTPSA id s18-20020ae9f712000000b007882b33f6d5sm4969471qkg.114.2024.03.08.04.11.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 04:11:40 -0800 (PST)
-Date: Fri, 8 Mar 2024 07:11:39 -0500
-From: Johannes Weiner <hannes@cmpxchg.org>
-To: Barry Song <21cnbao@gmail.com>
-Cc: akpm@linux-foundation.org, davem@davemloft.net,
-	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	linux-mm@kvack.org, nphamcs@gmail.com, yosryahmed@google.com,
-	zhouchengming@bytedance.com, chriscli@google.com, chrisl@kernel.org,
-	ddstreet@ieee.org, linux-kernel@vger.kernel.org,
-	sjenning@redhat.com, vitaly.wool@konsulko.com,
-	Barry Song <v-songbaohua@oppo.com>
-Subject: Re: [PATCH v6 0/2] zswap: remove the memcpy if acomp is not sleepable
-Message-ID: <20240308121139.GA116548@cmpxchg.org>
-References: <20240222081135.173040-1-21cnbao@gmail.com>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sgEowgLW"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bmak2JhFsExQL+x/UVymj5f95G63UPImrAXwSk4E1TUyfF68ZNXWY+Lf+XmTCh6MI9qoyuvG/h4Fw3vFnvzZHxSXxl5HF+vnPoKO1B5ThbGimaWc65hPfYwW8fjx4hUCYTSwVLMThH45AUr0EAgtPyMX0hpMRBjKUxsqxaclq8DKMM80H2rrTjfjQ2vdLbVgfqnpqnmWUH6Dc9UwFXr5rxWvKYeaSEgS5J+xVG/ER1u74OlHk3z7Ds7O/KEYGbWCD3oZDzRdFNbPyTGn519RlVhBoDQSAm9+hyISRXunxbxV8WGwveBJlCNDqjvpsjlwUXtkur1fvkW6P1LDFKzMcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Yozgr54+N7OPj5Vx9Pm3yQ4xZXKAT/012iRB+m81R2Q=;
+ b=C7xu/vWb73qYSYywhPdTv28ZidlreNNI5rgMsMP/f9/+YUcUhDA0mJbxJg/+a1c/7VzeAzMjD+2X1o6gQEAqtTwQahMf/WdqA0kakWrUqZYrqFNigWghFK41joys8QJh3T/kc/sGoP5jRhTK8Fl0+jkpbmd6hjQwryfI0ceCY3f8bywhqRsIL2ovI5hp/lBFwvI9KUg4MGxWpn9oLHnuQMEAT8U002IeNuF/VtzfuorEA2mz3xRCYjEfVNY/PQUtSr8RMN0A9mYBMZxCbzM3bzdmuSLPte/jAQTmJdO37Hk+MHcSo5KvilFOfJLdJ5+JycitiOi5WLkskyZ0qKd6Lg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Yozgr54+N7OPj5Vx9Pm3yQ4xZXKAT/012iRB+m81R2Q=;
+ b=sgEowgLWcMZvHSg2pA4VfQVO9rPmDr5LcL976kphDZmx6BXHqvbxUWqp0TnB5K2A2UJNzgSZdjaa0es5KRnrBSKMt7EaFBB67qbKJK41/yqEvf/lcZyBxnRCZEJE77qoM7HRlWKsu+LsjXShSV76PEhUWN4ogww5q3H5cU9b0sFrmKgXbNp39TYLlSNgAtM6NRgr2RecjipKV9bXYf4X9xQnAun1aIEBjPjZUsOOLcsbF77R1GhLUvSnA9PzuLGcE4goP+i354LEqpcXp0EDvfzpCoSdD/xG3rudaavmbR5qfHn/Ai3SVBa81KS0ktVZH1ecZcWsvDVujSjRZGhCUg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by SN7PR12MB8004.namprd12.prod.outlook.com (2603:10b6:806:341::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.26; Fri, 8 Mar
+ 2024 16:52:39 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::6aec:dbca:a593:a222%5]) with mapi id 15.20.7362.019; Fri, 8 Mar 2024
+ 16:52:34 +0000
+Date: Fri, 8 Mar 2024 12:52:32 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Xin Zeng <xin.zeng@intel.com>
+Cc: herbert@gondor.apana.org.au, alex.williamson@redhat.com,
+	yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+	kevin.tian@intel.com, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org, qat-linux@intel.com
+Subject: Re: [PATCH v5 08/10] crypto: qat - add interface for live migration
+Message-ID: <20240308165232.GU9179@nvidia.com>
+References: <20240306135855.4123535-1-xin.zeng@intel.com>
+ <20240306135855.4123535-9-xin.zeng@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306135855.4123535-9-xin.zeng@intel.com>
+X-ClientProxiedBy: SA1P222CA0186.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c4::18) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240222081135.173040-1-21cnbao@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SN7PR12MB8004:EE_
+X-MS-Office365-Filtering-Correlation-Id: d4d9d062-d8b5-420a-1379-08dc3f9026fc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	zzGhYtrJCbh2TMoXjTowoDatfufXTJiPk8z9PlwJmX/jt+cXBGSq5EzFk2/+AB+eJFjvXt103xfwBXePVZTwDIAav2LTuomMp3w7d+t2+jNrKDpUQ86BpTtJ3q5uxoKqdmJ02D0y2yZzUnlTTvtFCzLSNdZj/WvmwSKv2JORUAn4d7B5hXmw7RdriuMs9qSLnyOOEwNV8XN77rTe33l51Ktc/+VGcliti0MyusSTebHMjOjB98jwITA2ccUtEs5IcmocuT36t3podhIN4UTR+I/Pg+OR5DltXG5VKNqqB2Q9bpJiXCJasz/KG9SBvImeURsGPd6cihR5BdiN8lAQc9RLS0JVawlZGF8MF8Vj3kC8K6jeFolzX3GYY4kHof4kB8tXiOGnwbKjMb3AeWTD+7DrZ2J7Dqn1Y3G7MTqerc67Ign5FnD7/92JqfcWnFyLjP8MWLSiAFSEBbv8V1w6B3mwApfY716VVqjW81fXBUEfa5GpbKpIZLyTm5XecYHyiplxZHZjxfJXhQnWAOoZ38SJn64vgsp0qRWHGOLNpZQvo25dKtYdFmp+0QgfiLoLnzfDtj9nuxEq6jAn1lCVaPBAu/3vzgZVyyiaafEuxUyEDBtV2C5oGh6M+UeP/YiDdAhSLVhShto8rQjMq9IjawWXI3/5L4rgJBfvl8MxARI=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?VTpKBRNgDw61b5fOn/1kvkMT68ogEcqXmCwPJwyutAiP2yZRFwygP5TjqoTY?=
+ =?us-ascii?Q?7wL/6Ny/p8bChP6sH5IPzbk+H5lr23/LGV/L3Q3bE8OgEf+tFny7rl/NLiGq?=
+ =?us-ascii?Q?TrgWrvFjo5G9Xxkti8JaU95ZPj2We2Le5y5/B8BHrzSDPyutDMEkbsuKW+d5?=
+ =?us-ascii?Q?zIFeI/YULD9TmV5DXNPg5jr6Y6s1+R3LFAfoaLjM3GH/HBRaV5ooz+a6o6JL?=
+ =?us-ascii?Q?fAFBK/7xez/j+76jBP93tzZjsk1PEgv3+n5U2W5XjVDr7q/IdXqYbSAJ7LyG?=
+ =?us-ascii?Q?W/6oqD44ydcaoY06s9O48u7y4ZsLW9qAMRm8VcZ0OZMcLjA+ulJsWdF9YJal?=
+ =?us-ascii?Q?gbp39utt/dhwiwr6eby2AE8L7M8RuypCzoGHUD0IXoynT9lu0gTVu5f3PdU7?=
+ =?us-ascii?Q?UhZZ8PxepA/f3E3jUQHIfTXrE1hym5qOI6E6nXmqgL6Rm61Kl+fkxLpE+opJ?=
+ =?us-ascii?Q?qhclrbJonXIDGiXRVKPYJiyGgPNkHGPBGtMvtR4UbgJdcAeoVgy+Eg9OPKIJ?=
+ =?us-ascii?Q?KLu/iuGq3DTmqik51rg03f9beMC6jOWpuM7fs8G7smgwm8ka8Gds8wNLqTxF?=
+ =?us-ascii?Q?gg8HHemU1XkiOuAL57z4dV6bi7L2iWjmReYIon0lgEHyW18pZn/O/V7wWyOJ?=
+ =?us-ascii?Q?2WFMolufIn0OnvaJaSKSt8ozLXr7sxIKBILnfJrk5N8MWSNJMlJ+9GRJ00GO?=
+ =?us-ascii?Q?I50PXwJJpYS1wxbNSoCXkg38KDdIJO11GYOoA/RBZjTvNOjcJdBoVQ9hqlW3?=
+ =?us-ascii?Q?A6du0PyhrH5J8cigteTafLGOmpY3NEYeish4FBqznNz0fmvq9kIJQW0lx5vu?=
+ =?us-ascii?Q?2DdRoKkuktuioYq/nZVq8RNsD4qoe9G2TW7UGz7/sMw3vzRlhYdqL3GU3jZp?=
+ =?us-ascii?Q?QSgxmXeuLzOJY1+/CrJi3nkVHTD9Qpi2ziIdHu7Lv5XrRUJS3b0YE6KnsWlI?=
+ =?us-ascii?Q?R5voHfBjH0yFGwhOfibwtqWy0kATYY1fsp9AhNjMzLabitdA8TRG0eQHgdI6?=
+ =?us-ascii?Q?Ufg7xCEo/1ao5XVgoqHruzZSevDCbSoIl0lTcfvTlZq5JL589eC4e5ZftkmX?=
+ =?us-ascii?Q?EQpJRZOThGsuV+KDHOJOd8UfB07pcDVbCXfJ7rhsaj/3lhfjVHT76uhMdJP0?=
+ =?us-ascii?Q?RXx39rJC0sx9lGOeFutVtEVfN7MaW46SndUR6iw7pKKB2GnnOzo+ARqp8XK9?=
+ =?us-ascii?Q?QWR41riCILpKQsW/MRunGePH4PmSE1nzDUh+GaQQ3izanTr19RlGNqsDvbax?=
+ =?us-ascii?Q?IBV8BVE5pkzkOamhmNdDFyPy+Ks/hb1DI7+gFNR3Kj3MEhkjy4g2kXLs48wN?=
+ =?us-ascii?Q?ZuK8XKB0QHWM35LveXvuBbhxA2QOkR5eNE5HheTqrrwabteLKu9q38IfQQU5?=
+ =?us-ascii?Q?t4aT77OhDKLvJRKqPHQC5203LcZg/CaA/pj6sEx452V9f6Bgy+7ToQc5uT4a?=
+ =?us-ascii?Q?UmJxAPGkfcjho+5I1W/J7/EDZBHj6KvSCsIWwJ6VAUPLyQVDPygLrwvMziFn?=
+ =?us-ascii?Q?zupLemhStTHI9Dw3+yplJ1Q45iyeGsPlWs8vesrXAziQ0doWZ54LsfonKHOq?=
+ =?us-ascii?Q?7+WwmfLGyCEu+udszUoZs/WZ5S1rSjocewGQCp7w?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4d9d062-d8b5-420a-1379-08dc3f9026fc
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2024 16:52:34.4639
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VrVOKEmN2REhKZqt0sUu/Vt4dAaziiFIxzP3W//DYt4ZhCJtRN/b5cjkt3CuK77E
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8004
 
-On Thu, Feb 22, 2024 at 09:11:33PM +1300, Barry Song wrote:
-> From: Barry Song <v-songbaohua@oppo.com>
-> 
-> In zswap, if we use zsmalloc, we cannot sleep while we map the
-> compressed memory, so we copy it to a temporary buffer. By
-> knowing the alg won't sleep can help zswap to avoid the
-> memcpy.
-> Thus we introduce an API in crypto to expose if acomp is async,
-> and zswap can use it to decide if it can remove copying to the
-> tmp buffer.
-> 
-> -v6:
->  * add acked-by of Herbert, Thanks!
->  * remove patch 3/3 from the series, as that one will go
->    through crypto
-> 
-> Barry Song (2):
->   crypto: introduce: acomp_is_async to expose if comp drivers might
->     sleep
->   mm/zswap: remove the memcpy if acomp is not sleepable
-> 
->  include/crypto/acompress.h | 6 ++++++
->  mm/zswap.c                 | 6 ++++--
->  2 files changed, 10 insertions(+), 2 deletions(-)
+On Wed, Mar 06, 2024 at 09:58:53PM +0800, Xin Zeng wrote:
+> @@ -258,6 +259,20 @@ struct adf_dc_ops {
+>  	void (*build_deflate_ctx)(void *ctx);
+>  };
+>  
+> +struct qat_migdev_ops {
+> +	int (*init)(struct qat_mig_dev *mdev);
+> +	void (*cleanup)(struct qat_mig_dev *mdev);
+> +	void (*reset)(struct qat_mig_dev *mdev);
+> +	int (*open)(struct qat_mig_dev *mdev);
+> +	void (*close)(struct qat_mig_dev *mdev);
+> +	int (*suspend)(struct qat_mig_dev *mdev);
+> +	int (*resume)(struct qat_mig_dev *mdev);
+> +	int (*save_state)(struct qat_mig_dev *mdev);
+> +	int (*save_setup)(struct qat_mig_dev *mdev);
+> +	int (*load_state)(struct qat_mig_dev *mdev);
+> +	int (*load_setup)(struct qat_mig_dev *mdev, int size);
+> +};
 
-Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+Why do we still have these ops? There is only one implementation
 
-Looks good to me.
-
-One small question: why cache is_sleepable in zswap instead of
-checking acomp_is_async() directly? It doesn't look expensive.
+Jason
