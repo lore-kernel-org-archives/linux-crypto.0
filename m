@@ -1,33 +1,34 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79FBA5380F;
-	Fri,  8 Mar 2024 10:19:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30A1535D7;
+	Fri,  8 Mar 2024 10:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709893153; cv=none; b=EJJlf1pB3e3+a8CXMiYbBcvmHlq0gWDGTOwmVCdcM733XWhZDrJfpedhbNNga7PFsstKg1+kwO9OMH2E54JF3zvsn4vwqn/Z06fTf3vfcWaXzao4zMaYihLhPnGKwV2Zur5/rEVPeGi2hx1FNB90o+YQUgNQr/+8PgNLFaCEY4E=
+	t=1709893497; cv=none; b=RNEnJZ02tziD+cgKNO456bOq7oZ5VORXtEpDhZ04FYE9eoqnV44NxaRgRiqYKX9XNKlM7E5bIvkXkubg0ZFoLjxeOv6XcPZiVRs/ACne9DSVYLnuoZD1hJ8XDNNv8AUOR8K+G4dxyxo93a3QXWzmvoQFBq/i3qWixYqPdcLZDHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709893153; c=relaxed/simple;
-	bh=o4kROZZaMlT9MHw4rxVnPT0wK6D0X294PyFRuzqQc9A=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=H9wMe97cmoWBDgebBfUKRaPIaNIyZs69iXRu/WZSB8Yl5HcfJfd4BhGDXzDGdNLdxiM2BBtI3GlfcziIcuMBggcAzC0d0NuhpD67djRNt6U3JaR1tJ2vmx7JYdA/y6TIMV1fVSltcm1XIblBvMRR1fdRnCiokryRk9v2YkmvnI0=
+	s=arc-20240116; t=1709893497; c=relaxed/simple;
+	bh=FHgKrmtpL5qJMcf6wT+EWhuFyHiWEd/Ju4BGzDwllvM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pxtWMay3oWs5n8W+GFrXueKng1MW9PJlWrCrZ6qbqMSVXF5Ete+9ZZbM3SoOs9QEgKt1Ht66PvzCk+bGkEH6TlTKBunf2XKyKFJfYKhWRdHJVONy314zSkVo+6Jmj3DkuvzQKOcD/ryS/M2Jtg5vjBgxzuhHzWhOXk4mlr3s1GA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1riXJP-004rex-4M; Fri, 08 Mar 2024 18:18:48 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Mar 2024 18:19:02 +0800
-Date: Fri, 8 Mar 2024 18:19:02 +0800
+	id 1riXPB-004rot-G7; Fri, 08 Mar 2024 18:24:46 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Mar 2024 18:25:01 +0800
+Date: Fri, 8 Mar 2024 18:25:01 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: WangYuli <wangyuli@uniontech.com>
 Cc: davem@davemloft.net, chenhuacai@kernel.org, kernel@xen0n.name,
 	linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org, wangyuli@uniontech.com,
-	guanwentao@uniontech.com
+	linux-kernel@vger.kernel.org, guanwentao@uniontech.com
 Subject: Re: [PATCH v2] LoongArch/crypto: Clean up useless assignment
  operations
-Message-ID: <ZermFgvsJymZkz4u@gondor.apana.org.au>
+Message-ID: <ZernfR9PlbJzxhI+@gondor.apana.org.au>
+References: <79D75E042AE5B03F+20240229100449.1001261-1-wangyuli@uniontech.com>
+ <ZermFgvsJymZkz4u@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -36,37 +37,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <79D75E042AE5B03F+20240229100449.1001261-1-wangyuli@uniontech.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <ZermFgvsJymZkz4u@gondor.apana.org.au>
 
-WangYuli <wangyuli@uniontech.com> wrote:
-> The LoongArch CRC32 hw acceleration is based on
-> arch/mips/crypto/crc32-mips.c. While the MIPS code supports both
-> MIPS32 and MIPS64, LA32 lacks the CRC instruction. As a result,
-> "line len -= sizeof(u32)" is unnecessary.
+On Fri, Mar 08, 2024 at 06:19:02PM +0800, Herbert Xu wrote:
+>
+> > diff --git a/arch/loongarch/crypto/crc32-loongarch.c b/arch/loongarch/crypto/crc32-loongarch.c
+> > index a49e507af38c..3eebea3a7b47 100644
+> > --- a/arch/loongarch/crypto/crc32-loongarch.c
+> > +++ b/arch/loongarch/crypto/crc32-loongarch.c
+> > @@ -44,7 +44,6 @@ static u32 crc32_loongarch_hw(u32 crc_, const u8 *p, unsigned int len)
+> > 
+> >                CRC32(crc, value, w);
+> >                p += sizeof(u32);
+> > -               len -= sizeof(u32);
+> >        }
 > 
-> Removing it can make context code style more unified and improve
-> code readability.
-> 
-> Suggested-by: Guan Wentao <guanwentao@uniontech.com>
-> Signed-off-by: WangYuli <wangyuli@uniontech.com>
-> ---
-> arch/loongarch/crypto/crc32-loongarch.c | 2 --
-> 1 file changed, 2 deletions(-)
-> 
-> diff --git a/arch/loongarch/crypto/crc32-loongarch.c b/arch/loongarch/crypto/crc32-loongarch.c
-> index a49e507af38c..3eebea3a7b47 100644
-> --- a/arch/loongarch/crypto/crc32-loongarch.c
-> +++ b/arch/loongarch/crypto/crc32-loongarch.c
-> @@ -44,7 +44,6 @@ static u32 crc32_loongarch_hw(u32 crc_, const u8 *p, unsigned int len)
-> 
->                CRC32(crc, value, w);
->                p += sizeof(u32);
-> -               len -= sizeof(u32);
->        }
+> This makes no sense whatsoever.  Please review this patch carefully
+> before you resubmit.
 
-This makes no sense whatsoever.  Please review this patch carefully
-before you resubmit.
+Nevermind, I see what's going on now.  Your reference to the lack
+of a CRC instruction utterly confused me.
+
+The fact that len -= is unnecessary has nothing to do with whether
+there is a CRC instruction.
+
+Please modify your patch description so that it is not needlessly
+confusing.  You should simply state that len -= is unnecessary
+because you only test whether the relevant bit is set in len for
+the tail case.
 
 Thanks,
 -- 
