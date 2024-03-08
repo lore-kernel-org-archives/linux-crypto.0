@@ -1,39 +1,33 @@
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E994D5A2;
-	Fri,  8 Mar 2024 08:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79FBA5380F;
+	Fri,  8 Mar 2024 10:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709887327; cv=none; b=YrqbqRZnMd3/FNkhYYVT+nzdg2BV8N6K1pqvH7fGXhQeyfm7v4X+mYeDhKT3GT3tpzQVGzSyi5pe5u24jMeYshQ0zD9RJ8RB2IxXWn1lyLPZprTp81DeZ+TXHIC3cHaBkVLPu1SM7FPlyCEiGxUVtVt/m3oQrsqSYUuaxFpl55Q=
+	t=1709893153; cv=none; b=EJJlf1pB3e3+a8CXMiYbBcvmHlq0gWDGTOwmVCdcM733XWhZDrJfpedhbNNga7PFsstKg1+kwO9OMH2E54JF3zvsn4vwqn/Z06fTf3vfcWaXzao4zMaYihLhPnGKwV2Zur5/rEVPeGi2hx1FNB90o+YQUgNQr/+8PgNLFaCEY4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709887327; c=relaxed/simple;
-	bh=/slvoAHN49wbRpn5WRNcBiT9EoixUWwXrRJ1fG5Uhc4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RHZmxl/iTUoXkU3c66J1u6+r8K0rmm+QbxxSB/+A+fWKguhKReLvnHRWr8oyh/GoUXRB/f0S2mCPhnVAr9TiaTezKzmCvhVf4lcbzMd1FFT4BO/qYqvO1e8xtfxeM4qWtQ2ZndP1kFLGwoN16DbNv4OT6KXPboAfIbA4SL9tp8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 3DADB300034CC;
-	Fri,  8 Mar 2024 09:41:55 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 26D6043C6CA; Fri,  8 Mar 2024 09:41:55 +0100 (CET)
-Date: Fri, 8 Mar 2024 09:41:55 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br
-Subject: Re: [PATCH v5 01/12] crypto: ecdsa - Convert byte arrays with key
- coordinates to digits
-Message-ID: <ZerPU6pJiosjOvDq@wunner.de>
-References: <20240306222257.979304-1-stefanb@linux.ibm.com>
- <20240306222257.979304-2-stefanb@linux.ibm.com>
+	s=arc-20240116; t=1709893153; c=relaxed/simple;
+	bh=o4kROZZaMlT9MHw4rxVnPT0wK6D0X294PyFRuzqQc9A=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=H9wMe97cmoWBDgebBfUKRaPIaNIyZs69iXRu/WZSB8Yl5HcfJfd4BhGDXzDGdNLdxiM2BBtI3GlfcziIcuMBggcAzC0d0NuhpD67djRNt6U3JaR1tJ2vmx7JYdA/y6TIMV1fVSltcm1XIblBvMRR1fdRnCiokryRk9v2YkmvnI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1riXJP-004rex-4M; Fri, 08 Mar 2024 18:18:48 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Mar 2024 18:19:02 +0800
+Date: Fri, 8 Mar 2024 18:19:02 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: WangYuli <wangyuli@uniontech.com>
+Cc: davem@davemloft.net, chenhuacai@kernel.org, kernel@xen0n.name,
+	linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org, wangyuli@uniontech.com,
+	guanwentao@uniontech.com
+Subject: Re: [PATCH v2] LoongArch/crypto: Clean up useless assignment
+ operations
+Message-ID: <ZermFgvsJymZkz4u@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,49 +36,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240306222257.979304-2-stefanb@linux.ibm.com>
+In-Reply-To: <79D75E042AE5B03F+20240229100449.1001261-1-wangyuli@uniontech.com>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 
-On Wed, Mar 06, 2024 at 05:22:46PM -0500, Stefan Berger wrote:
-> +static inline void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
-> +					 u64 *out, unsigned int ndigits)
-> +{
-> +	unsigned int o = nbytes & 7;
-> +	u64 msd = 0;
+WangYuli <wangyuli@uniontech.com> wrote:
+> The LoongArch CRC32 hw acceleration is based on
+> arch/mips/crypto/crc32-mips.c. While the MIPS code supports both
+> MIPS32 and MIPS64, LA32 lacks the CRC instruction. As a result,
+> "line len -= sizeof(u32)" is unnecessary.
+> 
+> Removing it can make context code style more unified and improve
+> code readability.
+> 
+> Suggested-by: Guan Wentao <guanwentao@uniontech.com>
+> Signed-off-by: WangYuli <wangyuli@uniontech.com>
+> ---
+> arch/loongarch/crypto/crc32-loongarch.c | 2 --
+> 1 file changed, 2 deletions(-)
+> 
+> diff --git a/arch/loongarch/crypto/crc32-loongarch.c b/arch/loongarch/crypto/crc32-loongarch.c
+> index a49e507af38c..3eebea3a7b47 100644
+> --- a/arch/loongarch/crypto/crc32-loongarch.c
+> +++ b/arch/loongarch/crypto/crc32-loongarch.c
+> @@ -44,7 +44,6 @@ static u32 crc32_loongarch_hw(u32 crc_, const u8 *p, unsigned int len)
+> 
+>                CRC32(crc, value, w);
+>                p += sizeof(u32);
+> -               len -= sizeof(u32);
+>        }
 
-My sincere apologies, I made a mistake when I proposed this:
-It needs to be __be64 instead of u64...
-
-> +
-> +	if (o) {
-> +		memcpy((u8 *)&msd + sizeof(msd) - o, in, o);
-> +		out[--ndigits] = be64_to_cpu(msd);
-> +		in += o;
-> +	}
-
-...otherwise sparse complains:
-
-    crypto/ecdsa.c: note: in included file:
-    >> include/crypto/internal/ecc.h:74:34: sparse: sparse: cast to restricted __be64
-    >> include/crypto/internal/ecc.h:74:34: sparse: sparse: cast to restricted __be64
-    [...]
-    66	static inline void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
-    67						 u64 *out, unsigned int ndigits)
-    68	{
-    69		unsigned int o = nbytes & 7;
-    70		u64 msd = 0;
-    71	
-    72		if (o) {
-    73			memcpy((u8 *)&msd + sizeof(msd) - o, in, o);
-  > 74			out[--ndigits] = be64_to_cpu(msd);
-    75			in += o;
-    76		}
-    77		ecc_swap_digits(in, out, ndigits);
-    78	}
-    79	
-
-0-day alerted me about this, it's monitoring my GitHub repo and
-I've got your patches on one of my development branches.
+This makes no sense whatsoever.  Please review this patch carefully
+before you resubmit.
 
 Thanks,
-
-Lukas
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
