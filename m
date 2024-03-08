@@ -1,127 +1,139 @@
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F11556471;
-	Fri,  8 Mar 2024 11:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2A657880;
+	Fri,  8 Mar 2024 12:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709899074; cv=none; b=T+B2R+2dJkAZFC5hy6Mj9dMDTKQvCV9H5l0CdI9rA6mF7Cb3422PdMRV8yznxwocZqCIyAn1V4Kf0iC5E1M2KrJmFH4Oh+1F+XbZGdJ/aHCOynDPVm+lNHGIE4kqohFIyfAWdTsvrTQ0U8V30ta4OBQw75zx9zbmR5tnECm1AxU=
+	t=1709899896; cv=none; b=L2gLJvqLMhcFnAUNjQ4IagyIJ9BaEIhKjm9TU58ZPaVZKtZkkegPp0v1hQwvHhq1koEHx/5UqgUF1+ZYJbhNbM4HlBf69zCQrHGuD4r/QN1XXdlhu+ONvIamfb0X9XU2Vko1I4IgiKBCaEDxfC6G7egW5Ru/EepiH0a9LsWMOkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709899074; c=relaxed/simple;
-	bh=R2I6P5DZQH2SX13IhgnDgZJqBst0fT5mk8J2V9I1+FY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j5WLay2f4hvTViA1Db3ewJh/1kOfPQ6s7WU9X/tuuYn0dNaaPVSOye+M72UhkYbVpxbY6QhcvMlthElEBtUuq3f/BBaAB0sDZdJP4E+cnO5gBphS69S5xRUIAoQuc+ksmqsC8LzeXvj48rmg12YJnnaWSJK7ari58vES7yVWc/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FYyY1e8H; arc=none smtp.client-ip=209.85.217.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1709899896; c=relaxed/simple;
+	bh=ZrmhIau01iblULmsGvpRh7gT6Esf3sYRsWvciH1vB68=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ICmy6CcnIJsGBD7x8Kc4FcvOqJ0qPUtfsOrGvmKora28mXA8VcRGHnCpJ15msj7iVn3Zgy3hTDmG7S8DFG2PyuKrWsaIniBAgd9TUNECIfOVusfsSv1qReK/RGQVoOte5CRQ+k/B85YtDQbqmsZOeirm93u0ASZ4Q4ubaR8SzyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NMpBeWb2; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FYyY1e8H"
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-4729da13d05so677201137.3;
-        Fri, 08 Mar 2024 03:57:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709899071; x=1710503871; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DpLZe2hcB9flMvKtGZYykmOP+UhfIqyfryfyFk51Q5A=;
-        b=FYyY1e8HFFi+5MKREOuHPODN5clxjD75IMfRZEhRFd7qsH0fMJMAl8nwbncvFrwTwq
-         1KyO4oFijrcIwfqdl4AJs0OHtKvmfDwmYkiZqpRo1U7eL5+l/n8lX3er09wNnNzIBxPL
-         ysprxVGmDcciGKQJpavnTW+vRSPBjP7C8XRnTnl/Re9LsY70LAzWf5/27LI2XWUo73oe
-         XU+5/HV8HrbtEDAEAzdy5xj/EAAVN32ZMLjogWvPnMD3q5W81CTLZ0j+U4VH0upHuuG5
-         9XMm6X8vZ2a6PZGIQ6+F9ftkxemD52Cci5NTanocl/RT8RwDZh1k16oNOp4+XRWUh/Iy
-         +Ldg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709899071; x=1710503871;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DpLZe2hcB9flMvKtGZYykmOP+UhfIqyfryfyFk51Q5A=;
-        b=MBYX5Em8bxZXhFxZ9uxfaUWovdP6Gb++MOL4ZwencBa9YmcQEwZ+Y3TIolgD8y2AZr
-         1TGWaqkEs0TeI1emU72oZ5bmXICtk3rag7duyFsk3D61le1ZjtKGw9+oNmhZCg3wud+U
-         dHHcvatw/ChR5hvsd7qdZSbOi8Iv6DIRKta4/8Ia8f2fnEGM/mshR2aAaAR8qySMYtYM
-         xfQ5hUjscGB7NYWf15yvlhPCDOuapg7tm2DXH0nf8ePhXXvfbTXx5zZKTApzojh0a03t
-         5MozVj3d5ND2tLqr07ershrISwP04QDQiv4wA4KzdwFdMEU5ge8I9SOz/WuquTzPKstz
-         3qIg==
-X-Forwarded-Encrypted: i=1; AJvYcCXprxdUeAODpgKb2RZVmhW5skD1cMWn5cw0pAyNz0EGpeSrNh1CFYtSBJwRPQR0kl/8ccUmEAP67yofejWSYzHIxCCiJ/ocktxQHJXzv1YZEuYp8KirYK+f1s22e6tVx09P097iMNPuXwng
-X-Gm-Message-State: AOJu0Yx7G5zeItpKvObW8TfZJFIJRrFgkJya/rJi9ztWaAHOnfFkqtYz
-	gU9WJT0HI7TBhCPNJ4MRcoYtW5ZmkITAFwraJUw9lWLwPgh/ojGVLreJMZg0Cw+GL7y8QdPkC5z
-	TTtzfK65HtcU9HDLRX9qCSeQ5RD4=
-X-Google-Smtp-Source: AGHT+IHkaoOcEi8CFjru+qwmdcjDwYSPtHeTY6nRgbwgxx4xGSdOd/MnYct0qhYxQA/YYbOO6Brvkpi6ydOO0VshCEA=
-X-Received: by 2002:a67:e952:0:b0:470:564e:a58e with SMTP id
- p18-20020a67e952000000b00470564ea58emr9877194vso.2.1709899069862; Fri, 08 Mar
- 2024 03:57:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NMpBeWb2"
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 428BCDmv007270;
+	Fri, 8 Mar 2024 12:11:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=UAsfsXYcMiGqRElxJy9HtXhURXs3MYYs7S6xER/cnww=;
+ b=NMpBeWb2ZX9F+03Fw90cf9zbENhL0DJKY3xRT2WXKWjGTY2wkXgc73P1Eve9kznmFfW7
+ 7SkS1SxGo407pmzVdCEkFaRssaCQYIZSgNwDqgutbq3XPZ4HvviZ+0Dk7QDkLHZk6rGV
+ Afz+27ASh8JslVABwp7BjBxJl/1EjdMIhyiA8Pn2bWuBXREy3b9LZTF6CobvB30SmbGk
+ Pi0l1DxDT0OrisgghUKeX6sDRq/vDHRppPjW/1fI6uPGsvFY3Xybh6aiFZpPmwdr3gjE
+ cbeITpg75w8XhmYNaXQBKarQghfjD8DeBWai3YdFzDvX6iKgMH/JqI6B61jsFaofLYBA +g== 
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wr1ke10y8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Mar 2024 12:11:27 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 428B5Wvl025371;
+	Fri, 8 Mar 2024 12:11:26 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wmeu04ete-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Mar 2024 12:11:26 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 428CBNJc23134806
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 8 Mar 2024 12:11:25 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7EDC958059;
+	Fri,  8 Mar 2024 12:11:23 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E028258043;
+	Fri,  8 Mar 2024 12:11:22 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  8 Mar 2024 12:11:22 +0000 (GMT)
+Message-ID: <eedf397f-24c6-4ee6-96b4-67f52c0ef8f4@linux.ibm.com>
+Date: Fri, 8 Mar 2024 07:11:22 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240222081135.173040-1-21cnbao@gmail.com>
-In-Reply-To: <20240222081135.173040-1-21cnbao@gmail.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Fri, 8 Mar 2024 19:57:38 +0800
-Message-ID: <CAGsJ_4wMGNDcgc3pqSUicYoH7Z_miczkT=uwZU+yhDF0fd57Rg@mail.gmail.com>
-Subject: Re: [PATCH v6 0/2] zswap: remove the memcpy if acomp is not sleepable
-To: akpm@linux-foundation.org, herbert@gondor.apana.org.au
-Cc: chriscli@google.com, chrisl@kernel.org, ddstreet@ieee.org, 
-	linux-kernel@vger.kernel.org, sjenning@redhat.com, vitaly.wool@konsulko.com, 
-	Barry Song <v-songbaohua@oppo.com>, davem@davemloft.net, hannes@cmpxchg.org, 
-	linux-crypto@vger.kernel.org, linux-mm@kvack.org, zhouchengming@bytedance.com, 
-	nphamcs@gmail.com, yosryahmed@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 01/12] crypto: ecdsa - Convert byte arrays with key
+ coordinates to digits
+Content-Language: en-US
+To: Lukas Wunner <lukas@wunner.de>
+Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br
+References: <20240306222257.979304-1-stefanb@linux.ibm.com>
+ <20240306222257.979304-2-stefanb@linux.ibm.com> <ZerPU6pJiosjOvDq@wunner.de>
+From: Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <ZerPU6pJiosjOvDq@wunner.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Gnf7ZvAwUzD0dPz9RqlHaUicwpqtBxkM
+X-Proofpoint-ORIG-GUID: Gnf7ZvAwUzD0dPz9RqlHaUicwpqtBxkM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-08_08,2024-03-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
+ bulkscore=0 lowpriorityscore=0 adultscore=0 suspectscore=0 impostorscore=0
+ clxscore=1015 priorityscore=1501 mlxlogscore=999 phishscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2403080097
 
-Hi Andrew,
 
-On Thu, Feb 22, 2024 at 4:11=E2=80=AFPM Barry Song <21cnbao@gmail.com> wrot=
-e:
->
-> From: Barry Song <v-songbaohua@oppo.com>
->
-> In zswap, if we use zsmalloc, we cannot sleep while we map the
-> compressed memory, so we copy it to a temporary buffer. By
-> knowing the alg won't sleep can help zswap to avoid the
-> memcpy.
-> Thus we introduce an API in crypto to expose if acomp is async,
-> and zswap can use it to decide if it can remove copying to the
-> tmp buffer.
->
-> -v6:
->  * add acked-by of Herbert, Thanks!
->  * remove patch 3/3 from the series, as that one will go
->    through crypto
 
-Can you please pull this into mm-tree? This used to have 3 patches.
+On 3/8/24 03:41, Lukas Wunner wrote:
+> On Wed, Mar 06, 2024 at 05:22:46PM -0500, Stefan Berger wrote:
+>> +static inline void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
+>> +					 u64 *out, unsigned int ndigits)
+>> +{
+>> +	unsigned int o = nbytes & 7;
+>> +	u64 msd = 0;
+> 
+> My sincere apologies, I made a mistake when I proposed this:
+> It needs to be __be64 instead of u64...
+> 
+>> +
+>> +	if (o) {
+>> +		memcpy((u8 *)&msd + sizeof(msd) - o, in, o);
+>> +		out[--ndigits] = be64_to_cpu(msd);
+>> +		in += o;
+>> +	}
+> 
+> ...otherwise sparse complains:
+> 
+>      crypto/ecdsa.c: note: in included file:
+>      >> include/crypto/internal/ecc.h:74:34: sparse: sparse: cast to restricted __be64
+>      >> include/crypto/internal/ecc.h:74:34: sparse: sparse: cast to restricted __be64
+>      [...]
+>      66	static inline void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
+>      67						 u64 *out, unsigned int ndigits)
+>      68	{
+>      69		unsigned int o = nbytes & 7;
+>      70		u64 msd = 0;
+>      71	
+>      72		if (o) {
+>      73			memcpy((u8 *)&msd + sizeof(msd) - o, in, o);
+>    > 74			out[--ndigits] = be64_to_cpu(msd);
+>      75			in += o;
+>      76		}
+>      77		ecc_swap_digits(in, out, ndigits);
+>      78	}
+>      79	
+> 
+> 0-day alerted me about this, it's monitoring my GitHub repo and
+> I've got your patches on one of my development branches.
 
-3/3 was separated according to Herbert's requirements and has
-been in a crypto tree.
-crypto: scomp - remove memcpy if sg_nents is 1 and pages are lowmem
-https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/c=
-ommit/?id=3D77292bb8ca
+Thanks. Fixed.
 
-Two drivers fixes(patch 1 needs) have also been in crypto tree:
-crypto: hisilicon/zip - fix the missing CRYPTO_ALG_ASYNC in cra_flags
-https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/c=
-ommit/?id=3Ddb8ac88385
-
-crypto: iaa - fix the missing CRYPTO_ALG_ASYNC in cra_flags
-https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/c=
-ommit/?id=3D30dd94dba35
-
-So it should be quite safe to pull this series into mm-tree now.
-
->
-> Barry Song (2):
->   crypto: introduce: acomp_is_async to expose if comp drivers might
->     sleep
->   mm/zswap: remove the memcpy if acomp is not sleepable
->
->  include/crypto/acompress.h | 6 ++++++
->  mm/zswap.c                 | 6 ++++--
->  2 files changed, 10 insertions(+), 2 deletions(-)
->
-> --
-> 2.34.1
-
-Thanks
-Barry
+> 
+> Thanks,
+> 
+> Lukas
+> 
