@@ -1,68 +1,69 @@
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D953C5D729;
-	Mon, 11 Mar 2024 16:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6B85E07E;
+	Mon, 11 Mar 2024 16:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710173993; cv=fail; b=qs8y1viNkZ/2XUx+SzN89WM6c6XqmQ/Kn15xFVpPC/FvFtSngDOejVe7oTJKPNcgo/lWBSaVR0dqs5I9RZNQIBybd/5VZ+623knDtHonhVPodXafL53ua5r2+XErThLpE97cjW9dLB5xLXsIcyw80hrC7P7x18+U8bpB8zNyQiw=
+	t=1710173995; cv=fail; b=ZDHjcWXHuzStZi3L2VasAA5mSl4VciMGCbc9xFyROjnfyzozt0HkB766WFw4MgPEGY+fR2PrcPDr8Zoy4AKQIDCWsPktPnONwyncnDeCnJrc0wN9wSSnYgM2oRRLNHGjB9iW1ZgEL3iNX1sfapCFZQBBSQs20NpdLqJ6Lz50JEo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710173993; c=relaxed/simple;
-	bh=yxnMWaSE5m/nl8S70GUCtImWexpWp7WL7svZEgHNGSk=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=j/xe0+5N6XMXE/ut8bAfwC+1HTgvpkiYpPh8Au2rownNbf0ATdzcqRpIhf1TF5WBNB9ZD8W7BkZ9HjbO/i4yI47FZTsphneP2XG2gHfsIfKC124mR/jYTSq1aAvTtC3yUtf/ikk272Kr1LqpQUnFIu1LO0DvG+cMwSJAOS0pxMk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=SLiZ+SwV; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=mkRnDoCB; arc=fail smtp.client-ip=205.220.177.32
+	s=arc-20240116; t=1710173995; c=relaxed/simple;
+	bh=xcrhHqLX1QxvBXLNbERqRhW3R9fU/hZftTHRlhmOTjM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=H39slwnLoivsbtkOkOJpIRGre0ZuxlnMBDTkR/ydvbN82f3wsUvJAxrdWHynTfO9UYq0WG1typHp2uDZ4mPaJCO/h6xylMoSTWaTe8n+mgGpIH5Vlj1tbf1ji3kM2cqHd94xW9QuXvQy0O2Ef2TP+msw83X8GzaeQuBQMY8dVlM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=eXmnghvy; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=sUZ0cbqa; arc=fail smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="SLiZ+SwV";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="mkRnDoCB"
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42BG3qGi020986;
-	Mon, 11 Mar 2024 16:19:06 GMT
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eXmnghvy";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="sUZ0cbqa"
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42BG46Rs011922;
+	Mon, 11 Mar 2024 16:19:28 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : content-transfer-encoding : content-type :
- mime-version; s=corp-2023-11-20;
- bh=LFtntaSnTfuCo9yFppeHceVxSonv8Alnena0GKd0yyI=;
- b=SLiZ+SwVOe6Sw1v36f87kbCezgY/+bmU3iF52FDsFjFOUPpb+P1OefvQ0cd7n8jp54ii
- 6Y7fZKRF0j4peQIiNj1oVSSFfeyiWsfbRdx9XxBAxaOm90ex9w39iLLtLtRzBhIsL+yE
- tUHm86m0LNHivgeF3o+3BJ45H9fkfZ/Xrs11ddDf7EGevb0/PcdbjWmbW06iJ39hOhax
- /A4n1bdgKiwRsyQQHVeZeiJMcbAuX38R67p8CckPhZj7KWYcO54HYBC+kxuOWz/YtWcB
- oI8GwgH8/QObxgxf9qDfenBWyvSM6VQzn0d8gyk+HRwRGWNfpZSF3o0xvY8GyBGmf4FY gA== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wrfcubsnb-1
+ subject : date : message-id : in-reply-to : references :
+ content-transfer-encoding : content-type : mime-version;
+ s=corp-2023-11-20; bh=lE3zGi4lx+LX4xh6HplVkjuqDf23NSoKJ1pIIqNEmH8=;
+ b=eXmnghvyqxY56qagtRq9Zw64OicbEd2qbCYvXMX62HPZENT4SzWB29Xz8rJHFP0emfMr
+ nXh/9SduNUBxSHEao+nMGwBVAWvZw7S3fp6ZhXn5xHsOMDTNV+qGJdkIGY1Czp9h0PAE
+ yG2CtuphLAuO+SbhdSJEvWo7V5NTY7wKvkS56gkDPcJw2SPDo/izKWaLAFioqUXHSiEK
+ iCX7vr7uwlcOm8kKChejoBhdlN7ICpO1x5kvk39J5ZxuJKPx/UysJwUOOXCvvlvaKhSO
+ gnqBPC1bsSrj8TR2HXZ82iXpxI4RLShDcB8S3K/s4a6aCtAfq8A1diLv1ulGryO4FeGu /A== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wre6ebskn-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Mar 2024 16:19:05 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 42BGBkVc033806;
-	Mon, 11 Mar 2024 16:19:05 GMT
+	Mon, 11 Mar 2024 16:19:28 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 42BG7DMk037978;
+	Mon, 11 Mar 2024 16:19:27 GMT
 Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2041.outbound.protection.outlook.com [104.47.66.41])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3wre75qx2a-1
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3wre75yaua-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Mar 2024 16:19:04 +0000
+	Mon, 11 Mar 2024 16:19:27 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xr+HyfVTDH0U9SFh2R4Pc5V5ed5VPmDawJhyrnJngfsCYD845cNcOxWl8EzoG8BFKSDY2u5m6R0Lgx6oN2jENZXrqliyerI3pjp4Acw5dA+8b4+Hz2wstXkxY0oDHoLDrXCcA7FT1fiYRAE7Ju0gMd/tSCcGTFV/NgmHv0K5X4QsPQ3dcXbK4vgywU6WLC4od0tNzKV5mdDonUxYC3ho4MM+C82Kk3LYZ0WUrOnsSbd92eeYw28D6W7LdSkto8Hu28Ynj3diQebAwJkPAAlWw9m7cSKjPWsucezxbtAUyh3JT+ycrUsDp3UxLsDHBu1OyNCNNUYiJuGzIjJQleu51A==
+ b=iz4AYFPH8sdo3u90Z/CTmWRCh5o2Vd8YJWwITcionmFEkEC18H8C4n6yEVQUfMoWff0J+/7vx0JoWLk2eMbIO5p/e/B83r6G/SAX5lRq5tJ09TlNjG2UpnOTjDfpl9nuUCNKbvs25zxPmYf7a89xyEHRb8qiiOHW0/V8uxkJFsmxkQvKle32WT9IIgN9f2ssB73jjzrtHSHSK3NCscU2XCreilQ/R7yQ4rYhZqdcrFCTZ+WR18M+qZQlcCeK8aQMjV0dawO7Zi9uuqzrnqOWw0Yd2cVFvTxa46EOs4NNtikkIQQBcNzvSdefl4y+cYEoEECxDoupcdpOEtkOiAe74Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LFtntaSnTfuCo9yFppeHceVxSonv8Alnena0GKd0yyI=;
- b=nynu3VQeydGG1V6WMP1QLbvq9cdpv3M0ZC0ybvvx30ruI9QLDdA5uTnXnopea/T/S2KY8AO90QuF0SUmK5+enfvrV9kCbb+h12HYyBS0r1M8NUBEDskkKe194RQvcCuuPRVQq41pczOrhUs/XJ3DVFccr0mWr0xFpS6Di7G1up3S4DFAZANisZDR9G829dnXOZPjm62Jduc2/ZTbb/1Tq6Xm6QAtELPbH9khRPC3+dX1wOqypwSwzmpfJmXQSGSu28LZqE9Mgpx8ORpM4PWNRU58jHk5Bm0rKIpZzvV6bIbfTXjl1Dq0APHvMb3yrPVshLQ1qSVkcCTLI4XhtXzIKg==
+ bh=lE3zGi4lx+LX4xh6HplVkjuqDf23NSoKJ1pIIqNEmH8=;
+ b=bC0jbtv2JdOzB+nNpfOG3r1IS7cSwnohuToPYA4CCz92EX3nie0kt+fB1SPiMxq4Mhi170266srdkN7rFPzwQH/PrEK3ckruHd5PKaEf85+OD3l6C7EbPjP4lTeys4tnDuvTbfxIS+0RZtU2Sg8Hv/ds8bAD2oYIvRBkFw9AkvQOEvmLvDoLRzIE6G44fyrZWCexXyI8Y/fpZCG+Skd4UW5qbu6UYxBQEw/9AM55CCfdXVEw3ymyPSZGjKJCkf7KV07bwKfaOHJGAnSxB71UHGYWM8VfgDks05kBkvOuAXTI0rd8DeEDtZTD3YVzyRYbJ4UjZE4FUmKpxLLquOPv1g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LFtntaSnTfuCo9yFppeHceVxSonv8Alnena0GKd0yyI=;
- b=mkRnDoCB4pYy3+DoPB4C2MCv0p1w07HUtWvtVA+W1ryOS1KRyEV5YxsfNzz5agEYjK9cpX5sH4d2efzXCYVEJUyLUJHI4WukWxai1oxYmlguC/2ZS/4p/4QlX9+bCH/dHKyQj3dw+igAWfYLmkKHXXrHozRHlkC8+nZ3vn+2MrU=
+ bh=lE3zGi4lx+LX4xh6HplVkjuqDf23NSoKJ1pIIqNEmH8=;
+ b=sUZ0cbqaYo+aTfO8v67aVeBPd8w6ZhM1JQelDA3towc5Wd0LSNMyNfsfzrYeY4+gRzP72/qCLPjuEF98EjX5xm9Ebr+Z65T+s1+4ZXPDLRX8uF6XfGGgjsNWzHgkfRqQfgxsG4rXfJ8kA8/WuoBPQ2XsGA+axZi8OKr4Ckh4AqU=
 Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
- by DS7PR10MB5119.namprd10.prod.outlook.com (2603:10b6:5:297::7) with
+ by MW6PR10MB7589.namprd10.prod.outlook.com (2603:10b6:303:23b::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.36; Mon, 11 Mar
- 2024 16:19:02 +0000
+ 2024 16:19:25 +0000
 Received: from CH2PR10MB4150.namprd10.prod.outlook.com
  ([fe80::9ade:bfad:c78e:e1f9]) by CH2PR10MB4150.namprd10.prod.outlook.com
  ([fe80::9ade:bfad:c78e:e1f9%7]) with mapi id 15.20.7362.035; Mon, 11 Mar 2024
- 16:19:02 +0000
+ 16:19:25 +0000
 From: Eric Snowberg <eric.snowberg@oracle.com>
 To: linux-security-module@vger.kernel.org
 Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au,
@@ -74,14 +75,16 @@ Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au,
         linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org,
         linux-integrity@vger.kernel.org
-Subject: [PATCH RFC 0/8] Clavis LSM
-Date: Mon, 11 Mar 2024 12:11:03 -0400
-Message-Id: <20240311161111.3268190-1-eric.snowberg@oracle.com>
+Subject: [PATCH RFC 6/8] keys: Add ability to track intended usage of the public key
+Date: Mon, 11 Mar 2024 12:11:09 -0400
+Message-Id: <20240311161111.3268190-7-eric.snowberg@oracle.com>
 X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20240311161111.3268190-1-eric.snowberg@oracle.com>
+References: <20240311161111.3268190-1-eric.snowberg@oracle.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BL1PR13CA0126.namprd13.prod.outlook.com
- (2603:10b6:208:2bb::11) To CH2PR10MB4150.namprd10.prod.outlook.com
+X-ClientProxiedBy: BLAPR05CA0013.namprd05.prod.outlook.com
+ (2603:10b6:208:36e::28) To CH2PR10MB4150.namprd10.prod.outlook.com
  (2603:10b6:610:ac::13)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -90,217 +93,182 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PR10MB4150:EE_|DS7PR10MB5119:EE_
-X-MS-Office365-Filtering-Correlation-Id: 051fb2e3-c40e-48ff-8c71-08dc41e6f6c3
+X-MS-TrafficTypeDiagnostic: CH2PR10MB4150:EE_|MW6PR10MB7589:EE_
+X-MS-Office365-Filtering-Correlation-Id: 184d2b49-4e09-4190-b7b2-08dc41e7048b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info: 
-	t7XTgH0mcl7lLtFeojdElSEDOHxmKMdEIjRyUXRl8HFRFDsxIjSapzVBsnDjCoAamw3mckic6dkyA1ZYKR2FOz4G5r+Oc1XnFJn6a/j5aoQSb9VhXRcf6Wnim1/8H4SPqRfyZpTM9YWnzFgFLhAphewuIzFCkl21ZlrqEFc/B8KbNIRig1dDWww3Uxcn+37SJpScme8qGdtEECSAnqVddzRh9VSLJIRl8SFACAObVt2m8w8Z2+kzOXK1ZJ2DAkYNqoMISV7YkpF4oCGXLteZOByedhXEIA7ZnNildWTgaen0Lx2x8vnAXQnjybiAhAPNTnAtEBcSR7lpkMPNbl8qdTq4YesMmRQPJTsRk0qo++iAMPPpfCRHNw0SYUEyr/z/QHbSmzwszq193bHpcgdH5yzd2oJnLQ+2pUN6/x5BxgfY3kjv8yOMbSr6J2mp7UThBd1QuKflW3bdvyHinf0I71Gct6Mh8YyKqAROWNj2v/oObaVag+SKk9s9MAalZoFeLLnmRQt+DdjUcKU6FTvXOqcBpZhqH4HllCcJehzfwI7hazX0bl2iVy9D0lmf/eiE5PXg+rjjDKwZ9jL4vvgBvw6zW41eKWxPDm2/VEHUBUb0EN+Sh9XOjTVaOQK6uqrxQl6Uuf8VAhPyeXBM+GfeLZtaFVgEpZ9spuQiFWqxODE=
+	RzyadAldFzjpXeIb1ufuyUeGYRkTl0rS4gY9b6VKC1zvuSlwMw8dm2iEr+BZ4DMyKB0pR+Z+KkM1f177JT3v+BvUfHXXPEoDzyoZC1fkV26W8U0jzS+GhI5PekmQOymwOXRoGOn1Lmqy9iog38EWfS7Doyz/0pf1Tb2SFuZ47s6PFQ1bAQW2YtFyzFXao2tv+j8pcCxvEujY6WYuCELv9OLVYZLKCz56mD7gBHT6I0AMBPusfFtHthBHyzSjQfPTYuZjE/JuSN5aKKeXCCVctMmBeMFAnw0iUkZDu3LH+piy7wyV1iHCMT/80c7+uYCtCDDkIbPBkVW34eSiJZsuUApn2EDFlm0JbzIRBUGQ8evaOWbuFbMhLz28jfA/qRJVstFCa5GJZK5/HE+UMukGBZoq4ruGeu8fb1YBXWUcySHjLpjt1bDC61n1/BF6zPgB/hdlY8FHBeq1phn+hEr2yTK5h8x4WxKSh5/CFKzSGP8BSHjcddAcVn004NA0c33ELnxvOl/nv87fmfQR0TmF30yFcyQFWQki77IEEV+y/OshJZPe2jwxPddO07mnn40MUXLMTHE0r2ED5fMXS+93nqXgjsXaJ8pUwKppnD+PG4LrtwLjUM7JbRYN6tGHuuNbJJEOZM0YjLHQ31sNZwqjSlf9EoRadA4M/pnLpH+ngeM=
 X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?qCnAA8nL4RqCsu3Nq2cIs+oF/sGJqS5yS8RDO6Os3QofwKZ00tP7zqs1DG47?=
- =?us-ascii?Q?zjCUcMBXOrMdLle6oKJeGB7f6TgE66Lyw4sEI8pSHLw78msbuTtVY5NTnMNO?=
- =?us-ascii?Q?XvVcd7jLqSF0HWHa7EHg8d2pxOGs9J6OJ67z1d9LUBcHYqoD+cIEZRWTI7ZX?=
- =?us-ascii?Q?afhhwGiwF6vuvHByOxwZF/hv5mVdWtdZwvRwcOvjtEeteS6dF8qLD2tFy2qU?=
- =?us-ascii?Q?cnCwQpew0krgjC+aypcw3vEEQkgX4tbG76BmGN3ZIsKG42lhDKwsypxva9KV?=
- =?us-ascii?Q?PzP66b5fGxTQl39fdtLk0r7lO1F4hh2RaMi2YfVfgkNAE11073uofwFeu4/F?=
- =?us-ascii?Q?l9FUSumsvbs+IjX2KZ6RSQ5GhGsXkzozkd5M2/bPHM5Yz/YDad1K9j5Z5g4o?=
- =?us-ascii?Q?EddmtnhcagnX9NtTWHjA8/bKU5YHuEp2/t+x06o5bk31eRT/cr2V0alIVLoL?=
- =?us-ascii?Q?MlzM/uZQpA4ARdaK8h/Cikh/CI/fZAVAha9GI+NZ3GyTsON6cbGLYw2t1x7s?=
- =?us-ascii?Q?1YfMEzrGUWnh+zk+rv8SKg8f0iG0UiJHWFiIkrkwC4d5Cho4BBusO/R0uTRC?=
- =?us-ascii?Q?unRBjCCdw3BmnSctlAL4PzGq69k91eVPr7Du0yF8/w+uzGqUxC18bBQs1mjC?=
- =?us-ascii?Q?CTMq9bSOKc84feixf4XM1LmnDuCjjjgWd6LTHfAkH9YPF0i3yJePQIwGEQVI?=
- =?us-ascii?Q?EiybU3qvNqeW4dZmk2SPpC/MfhMkrBMt9W/PEFBfJ1peBgT152TsfqTu0RBT?=
- =?us-ascii?Q?rgMzxXBMjSPatlg96LTk/uxEDlz++0Ov/8tgUyYFq1RxwyiEdXaicC484KnS?=
- =?us-ascii?Q?jE5x4K1HbScWe9WCRbscNK7cd2F+xILWfIABQdHDzQul7G4nC0qruUxOPKcC?=
- =?us-ascii?Q?CTVQ9mCkoDriL4KKrhHmbwD+GRLhZrlnd1/f+GYNcz+EMYuMjyXndUupfHIp?=
- =?us-ascii?Q?WQ4RSqy09sumpp0yPXOfBfBk099bF6lB3iYD54RJmHz0TNZox6xxSm2OX8/4?=
- =?us-ascii?Q?8DufgnIrwco0bAGA5T7GvgVuNGZ88n0IuC0SSQNIvZ2VMsqdMkaRHQeIjtm2?=
- =?us-ascii?Q?Aqt11EcOIU/JCTTdR7ywUx0N2snaB+YiCbpmQ7VguTEcquSXpthlVZieQXyd?=
- =?us-ascii?Q?vTzITdRVTG9mhcC6r4TMqzf3wj0z3WAb3CtModazFfpys9J/lr5r+iJp4eAi?=
- =?us-ascii?Q?fOLR1qPsahp4ZVtgfbfqHS+PZ3eJiLyFpz2uIzBsKcwb0KhmtzD5UU0vzJnA?=
- =?us-ascii?Q?2UPaX0rUZnVANP2o0iUkkccOofSFDTo9sEXtR4O9nM+tDUC4KFd2rP7GaZCR?=
- =?us-ascii?Q?PohFay77Ec1nSQMxpWURIQP+abJfc3xFjgp6nNEtKYq8BUt5R+qoOzDkgCvF?=
- =?us-ascii?Q?plm4oIO+/fTHG1AT1EZdudJpy63EhIONohSWo3lw2dDVh38ukJy6ts7l67U4?=
- =?us-ascii?Q?eNQ1rGbctttmRQDQNbLEj5Hh/D2lMeJ4Ar1gy1CKTCAvBxYLdTMY6mf7ImyV?=
- =?us-ascii?Q?O19G7XheuiXl2i6tXcbY6jU825FEjaPejUwFu70gnYBR1bP3eD3vlfUbo9XC?=
- =?us-ascii?Q?BuOlXtm54Oa7ArEi+GFG0pwLVwq6SCDQlwe0ABc2w/XTGFgYfS956VEBh1cC?=
- =?us-ascii?Q?NE79//Tho9t80Qd+nZpl+uM=3D?=
+	=?us-ascii?Q?ph3P5hCXQ2liPkTTaqGm3dwW9+2/XcnKHx0X4lzKmvPh56/eksJJAmEhFdjd?=
+ =?us-ascii?Q?7pGG5dreavXZDG04xAYDcmiknGUk205H8qNUp9iPav3AT7wiIEc60o5VB/1v?=
+ =?us-ascii?Q?metTPo7pPx5qHN4F9CCFtP1VEwX7JlXfev69/sL6Hst8f6Y+TWMjAtjyPutl?=
+ =?us-ascii?Q?B9QI/3HTA9H3bXXOVYCzUAMcggYKDvSk85kbqPGFXTnhdWOeAf+2RBxk3Rj7?=
+ =?us-ascii?Q?fhSVpQpNPjl36OADJuBVZTdPrL14wbkKsgkClNP0r1GIP1vyoVt/+N0fNXr0?=
+ =?us-ascii?Q?O/6iBlz3dcWwZLjPDmGwJMmeolcTiTCPuJ8GV8mTYYYPfAp3TPn90GDCayV+?=
+ =?us-ascii?Q?nA1wD3WuwHKorjhZAXpisgTqLBeHTePjEQtHA2vA95UgJvPUf4XhovvSiecV?=
+ =?us-ascii?Q?k+YWjIYDoNASybths5Qq/2TtPhC2H+SxBLbRCCnguDvm3+l/HxzEQKCPH1Lj?=
+ =?us-ascii?Q?508wX9VkGcz4yq4+UKroqp55v6YL9CyWW1lxSL2QLvIHWJpbmSbXdGjCrN7o?=
+ =?us-ascii?Q?nnKvDaJXiHw7/1Kix9EbGL1ESQpeMkmmfUl9Ncyd/I3VscIGIH332ZBxFGS/?=
+ =?us-ascii?Q?BCAhFLOPG/KHw2mC8tkAYKwrC4RQTuLKSkRJNlmYdKeT2fiDOgfN4jvNSGGW?=
+ =?us-ascii?Q?szxkhNd7y38Cff14wPGdlwhjX9DK0jH+r07/EhOppyluOewGusWpSWOpoZqE?=
+ =?us-ascii?Q?s7P+UNSBOnRxgS5+HVnqc98YeqoMKrTQQVd3/RKWH9+NFY+AC9z4AuCzKcMs?=
+ =?us-ascii?Q?j8b4L5kTQkaWO66HzQ2pLvU9+EXZAMrgrfwZM0FrXvJ9QEQOLgs8VSrbfVSr?=
+ =?us-ascii?Q?4Vpryux0M8cLTh8pcH18caS0ZX029EoJTWJ7l2q5nPfxJ1cYdzadVU2mHQnk?=
+ =?us-ascii?Q?YycoaJKC2B8A3TPPxb3HiXmCr1tRhSRQ33ngLOWcM/TDcxeqDCElI2WFgYgp?=
+ =?us-ascii?Q?fFhpEm38vKhG6qVunzqP7ot7t7O0LQH521pGSJNOh2QIp4ZOzSh+DVwwgLVa?=
+ =?us-ascii?Q?TMJkjNx4uukUZ97Md9eV5tUYREcIQ8Lqyka90oblMzyeHlR07wfYLJw0AdCY?=
+ =?us-ascii?Q?MyjUmvDO7KrxuplEqgAcYZeouNdSh4JywrS/RNFUcxI3pp3pcFsXnzhdvQO8?=
+ =?us-ascii?Q?LIyK3Tb5WKwFCdtj8/sxbmBAhLbZSk3O25hyImHFDV35jwA+OurqloS0wqhS?=
+ =?us-ascii?Q?mnOwCbxUallb6cDBPZN8Ea5TdPqIwer8AQIOL7adnCluICrs2kNNQQFJMmhr?=
+ =?us-ascii?Q?1kwHTElRN+bpIf6cNaIHldYdFrERm9qLEFiVchJZ7dPPJ8VZQo1ouC4lj/de?=
+ =?us-ascii?Q?ys2TbfUmHUHOSBnE940uXS+e77SN7vyj6i687HvdP/fnfl1wDDcn1+CBaSJ2?=
+ =?us-ascii?Q?Tf22Aib2Rz3pqzm7SXPYEG1N6h8EFjCuH0nk3FAi1K20L8hgCxc8AQtqiQIY?=
+ =?us-ascii?Q?KkA6begpzHqkRTwdsLmC5/4rAy05vQ7P9FuNe212vN8SEMZlFIWuiYskdBWw?=
+ =?us-ascii?Q?AtFKjTL6rgOqb2cjn5Y/AXLZWrtyev+pIVzPSeXiCg56GyogUPHos49iPbZh?=
+ =?us-ascii?Q?HxGbgyyUphvntiomHTQaZm6JSfk9yQiZAchefILT//Cyruwt4nS81CLvdSeJ?=
+ =?us-ascii?Q?6tPehWtpOsT6zBYYhoxnEC8=3D?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	/3E//jkMk87K3xO62szcroogeJLyllyAvdwNaP3FjrQgMQeT8pHSQJO+lFzHHpk7qpDg6t11NF0i45IoFjSmky7+TbXx3y7YjQKTJ2+8eyC++V/cstZf5PZEDs99Oxpmgf1PqQaKfemju6mlMIKt8npP9MVgzmnKxRLe5tM0+o2yFo2UtL49SVyE9IzHY2TGXoSfm3YkVmE1zyJ0J8quWlW7DMJ6Ie7nN5iQYeDJxjS5uUkpoQ5PN9seTfVKOxqP+FEM6SZE4EZZj23qWYpN9vpY7BBKoe73Cmrm3msayuk8lt+dxDQAtPo2WVpoDRm6Ai5A64ruYuZDkArm6CcjH/bZW1iB5oF3/MEXUqEzzcJaT6Raua3360llnQJCrmNxs2n1wpZjIWBMRnsJN5x8bzqhpE+xhSIkTTs0Va2FR2IG6ZoV0/pgG58GM8CDXRxFGY+kywk3P4KzkypaAkrr5ef92ZtVzsnkkkM8tc+KwSKx1XYNZVkGmST3JpJJu6RLikGrqK30I9hcls+K0CHQwZru3WLv37KknX48riCxEPTiUQUIKW+3jk26DHb8SDmylrywEKQToa09N+DfQiHOqU6oDHFcqp/gU6w/8sYeHzQ=
+	C1ongw3z/d5O8w3EF5ul18Wg39gaOoBNkhFwl3VlVohchSRz3iCNovH/x2VBV1WOutGTl2TF24f4hFuMFtx7XtGCym8RXrKjB4R0vvtuwIzi404/xd9vKZB+lIogLGDe8OEcZ7QKWSMeoKkGUZd5RKfXysB8t72vsihiFRMzQCcuIRp9yEvMUVE5vwMCRNRdDO0GkJQGCSj2P5XFTusut93qU+nOv69jRTdYpLjGQDq4HBP2ue50yDWZsC3uYgfzJ5OcA9sOuf5xqhnvMSOXrNypZ5WWQils5Qg3Sdcu5pYqU043sAzUqm/1iLC2hdYkdw2krhAXrrlDF+ND5k0BVW6qIu/LY6m6Hb0yDamFc1hMAPcZCs3BnwEyI0YtkANAIgeIw8Yiu2cMSKkZAlGV9WUOzNpo5bNtkFTubCZAbVi6tE78bT1Ef4OXPqrNA7mxjYtS3e5TuyfmNeUqUGUFXtb5XieKwRHi3+acl8pRpiY5LwvdJ1MNPvQTTn+T28fZtwe/6qurSR0G3L7fK2VB7Dpo0d7ReRcwnhoSvHxrLmGsPBjtcylodx8GgPVqLxRXbnNJIN/tXdc1k+XAXbji9sO/WinFwChPMwEx1plpB4M=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 051fb2e3-c40e-48ff-8c71-08dc41e6f6c3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 184d2b49-4e09-4190-b7b2-08dc41e7048b
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2024 16:19:02.1264
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2024 16:19:25.1908
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9GDp3XJilN9070autVkRJitd1TeA4QwDqQWbZQESdoXOK/4qrBhAA0654MurfEbJVQT6SCloSWuKsbhgTGo9hoD8hyWCTu3f/K9KSe+PNa4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5119
+X-MS-Exchange-CrossTenant-UserPrincipalName: J0K1DBHSsYzkzpChCxjHtI0LMmLn9E5LLLXB8FPY/fe5MBeq3HbKCHJALViPDB8ZN/rcpcOsYIBH/BgA83HowVVvADzmTX9tLqoX5Cfluto=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR10MB7589
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-03-11_10,2024-03-11_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
- mlxlogscore=999 malwarescore=0 mlxscore=0 bulkscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=0
+ malwarescore=0 spamscore=0 mlxscore=0 adultscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311290000 definitions=main-2403110124
-X-Proofpoint-ORIG-GUID: ftMaMqjLpR-_MbyRzJ4hCziGYCEt7oUE
-X-Proofpoint-GUID: ftMaMqjLpR-_MbyRzJ4hCziGYCEt7oUE
+X-Proofpoint-GUID: v3HYcdjVo_CUrjQAjCGV1A_0Af7hpTLR
+X-Proofpoint-ORIG-GUID: v3HYcdjVo_CUrjQAjCGV1A_0Af7hpTLR
 
-Introduce a new LSM called Clavis (Latin word meaning key).  The motivation
-behind this LSM is to provide access control for system keys.  Before spending
-more time on this LSM, I am sending this as an RFC to start a discussion to see
-if the current direction taken has a possibility of being accepted in the future.
+Add two new fields in public_key_signature to track the intended usage of
+the signature.  Also add a flag for the revocation pass.  During signiture
+validation, two verifications can take place for the same signature.  One
+to see if it verifies against something on the .blacklist keyring and
+the other to see if it verifies against the supplied keyring. The flag
+is used to determine which stage the verification is in.
 
-Today the kernel has the following system keyrings: .builtin_trusted_keyring,
-.secondary_trusted_keyring, and the .machine.  It also has the .platform keyring
-which has limited capabilities; it can only be used to verify a kernel for kexec.
+Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+---
+ certs/blacklist.c                     |  3 +++
+ crypto/asymmetric_keys/pkcs7_trust.c  | 20 ++++++++++++++++++++
+ crypto/asymmetric_keys/pkcs7_verify.c |  4 ++++
+ include/crypto/pkcs7.h                |  3 +++
+ include/crypto/public_key.h           |  4 ++++
+ 5 files changed, 34 insertions(+)
 
-Today the kernel also tracks key usage for verification done with any of these
-keys. Current verification usage includes: VERIFYING_MODULE_SIGNATURE,
-VERIFYING_FIRMWARE_SIGNATURE, VERIFYING_KEXEC_PE_SIGNATURE, VERIFYING_KEY_SIGNATURE,
-VERIFYING_KEY_SELF_SIGNATURE, and VERIFYING_UNSPECIFIED_SIGNATURE. After these usage
-types were originally introduced, most additions have typically used the
-VERIFYING_UNSPECIFIED_SIGNATURE.
-
-At the moment, besides the usage enforcement for .platform keys, any key
-contained within the system keyrings can be used for any verification
-purpose.  For example, a key that was originally created to sign kernel
-modules could be used for BPF verification.
-
-This new LSM adds the ability to do access control for all system keys. When
-enabled, only the .builtin_trusted_keys are available for loading kernel modules
-and doing a kexec.  Until an ACL entry is added for a specific key, no other
-system key may be used for any other purpose.
-
-Enabling the LSM is done during initial boot by passing in a single asymmetric
-key id within a new "clavis=" boot param. The asymmetric key id must match one
-already contained within any of the system keyrings.  If a match is found, a
-link is created into the new .clavis keyring.  This key shall be used as the
-root of trust for any keyring ACL updates afterwards.
-
-On UEFI systems the "clavis" boot param is mirrored into a new UEFI variable
-within the EFI stub code. This variable will persist until the next power on
-reset.  This same type of functionality is done within shim. Since this variable
-is created before ExitBootServices (EBS) it will not have the NVRAM bit set,
-signifying it was created during the Boot Services phase. This is being used
-so the "clavis" boot param can not be changed via kexec, thereby preventing
-a pivot of the root of trust.
-
-As mentioned earlier, this LSM introduces a new .clavis keyring.  Following
-boot, no new asymmetric keys can be added to this keyring and only the key
-designated via the initial boot param may be used. This LSM can not be started
-at any other point in time.  The .clavis keyring also holds the access control
-list for system keys. A new key type called clavis_key_acl is being introduced.
-This contains the usage followed by the asymmetric key id. To be added to the
-clavis keyring, the clavis_key_acl must be S/MIME signed by the sole asymmetric
-key contained within it. New ACL additions to the .clavis keyring may be added
-at any time.
-
-Currently this LSM does not require new changes or modifications to any user
-space tools.  It also does not have a securityfs interface.  Everything is
-done using the existing keyctl tool through the new .clavis keyring. The
-S/MIME signing can be done with a simple OpenSSL command. If additions or
-updates need to be added in the future, new acl key types could be created.
-With this approach, maintainability should not be an issue in the future
-if missing items are identified.
-
-For setup and usage instructions, the final patch includes an admin-guide.
-
-Future enhancements to this LSM could include:
-
-1. Subsystems that currently use system keys with
-   VERIFYING_UNSPECIFIED_SIGNATURE could be updated with their specific
-   usage type.  For example, a usage type for IMA, BPF, etc could be
-   added.
-
-2. Currently, each clavis_key_acl must be individually signed.  Add the ability
-   to sign multiple clavis_key_acl entries within the same file.
-
-3. Currently, this LSM does not place key usage restrictions on the builtin
-   keys for kexec and kernel module verification. This was done to prevent a
-   regression that could  prevent the kernel from booting.  This could be
-   changed if there was a way at compile time to pre-populate the .clavis
-   keyring. This would allow the ephemeral key used to sign the kernel
-   modules to be included within the .clavis keyring, allowing the kernel
-   to boot.
-
-4. UEFI Secure Boot Advanced Targeting (SBAT) support. Since
-   the boot param is mirrored into UEFI before EBS is called,
-   this LSM could be enhanced to not only enforce key usage,
-   but also SBAT levels across kexec.
-
-5. Having the ability to allow platform keys to be on par with
-   all other system keys when using this LSM. This would be useful
-   for a user that controls their entire UEFI SB DB key chain and
-   doesn't want to use MOK keys.
-
-I would appreciate any feedback on this approach. Thanks.
-
-This series is based off lsm/dev commit commit edc6670233a3 ("cred: Use
-KMEM_CACHE() instead of kmem_cache_create()")
-
-Eric Snowberg (8):
-  certs: Introduce ability to link to a system key
-  clavis: Introduce a new system keyring called clavis
-  efi: Make clavis boot param persist across kexec
-  clavis: Prevent clavis boot param from changing during kexec
-  keys: Add new verification type (VERIFYING_CLAVIS_SIGNATURE)
-  keys: Add ability to track intended usage of the public key
-  clavis: Introduce a new key type called clavis_key_acl
-  clavis: Introduce new LSM called clavis
-
- Documentation/admin-guide/LSM/clavis.rst      | 190 +++++++++++
- MAINTAINERS                                   |   7 +
- certs/blacklist.c                             |   3 +
- certs/system_keyring.c                        |  29 ++
- crypto/asymmetric_keys/asymmetric_type.c      |   1 +
- crypto/asymmetric_keys/pkcs7_trust.c          |  20 ++
- crypto/asymmetric_keys/pkcs7_verify.c         |   5 +
- crypto/asymmetric_keys/signature.c            |   4 +
- drivers/firmware/efi/Kconfig                  |  12 +
- drivers/firmware/efi/libstub/Makefile         |   1 +
- drivers/firmware/efi/libstub/clavis.c         |  33 ++
- .../firmware/efi/libstub/efi-stub-helper.c    |   2 +
- drivers/firmware/efi/libstub/efi-stub.c       |   2 +
- drivers/firmware/efi/libstub/efistub.h        |   8 +
- drivers/firmware/efi/libstub/x86-stub.c       |   2 +
- include/crypto/pkcs7.h                        |   3 +
- include/crypto/public_key.h                   |   4 +
- include/keys/system_keyring.h                 |   7 +-
- include/linux/efi.h                           |   1 +
- include/linux/lsm_hook_defs.h                 |   2 +
- include/linux/security.h                      |  11 +
- include/linux/verification.h                  |   1 +
- include/uapi/linux/lsm.h                      |   1 +
- security/Kconfig                              |  11 +-
- security/Makefile                             |   1 +
- security/clavis/Kconfig                       |   9 +
- security/clavis/Makefile                      |   7 +
- security/clavis/clavis.c                      |  25 ++
- security/clavis/clavis.h                      |  16 +
- security/clavis/clavis_efi.c                  |  50 +++
- security/clavis/clavis_keyring.c              | 313 ++++++++++++++++++
- security/integrity/iint.c                     |   2 +
- security/security.c                           |  16 +-
- 33 files changed, 792 insertions(+), 7 deletions(-)
- create mode 100644 Documentation/admin-guide/LSM/clavis.rst
- create mode 100644 drivers/firmware/efi/libstub/clavis.c
- create mode 100644 security/clavis/Kconfig
- create mode 100644 security/clavis/Makefile
- create mode 100644 security/clavis/clavis.c
- create mode 100644 security/clavis/clavis.h
- create mode 100644 security/clavis/clavis_efi.c
- create mode 100644 security/clavis/clavis_keyring.c
-
-
-base-commit: edc6670233a333ccfd1ec0548f068bd121d209c8
+diff --git a/certs/blacklist.c b/certs/blacklist.c
+index 675dd7a8f07a..dd34e56a6362 100644
+--- a/certs/blacklist.c
++++ b/certs/blacklist.c
+@@ -17,6 +17,7 @@
+ #include <linux/uidgid.h>
+ #include <keys/asymmetric-type.h>
+ #include <keys/system_keyring.h>
++#include <crypto/public_key.h>
+ #include "blacklist.h"
+ 
+ /*
+@@ -289,7 +290,9 @@ int is_key_on_revocation_list(struct pkcs7_message *pkcs7)
+ {
+ 	int ret;
+ 
++	pkcs7_set_usage_flag(pkcs7, PKS_REVOCATION_PASS);
+ 	ret = pkcs7_validate_trust(pkcs7, blacklist_keyring);
++	pkcs7_clear_usage_flag(pkcs7, PKS_REVOCATION_PASS);
+ 
+ 	if (ret == 0)
+ 		return -EKEYREJECTED;
+diff --git a/crypto/asymmetric_keys/pkcs7_trust.c b/crypto/asymmetric_keys/pkcs7_trust.c
+index 9a87c34ed173..64d70eb68864 100644
+--- a/crypto/asymmetric_keys/pkcs7_trust.c
++++ b/crypto/asymmetric_keys/pkcs7_trust.c
+@@ -131,6 +131,26 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
+ 	return 0;
+ }
+ 
++void pkcs7_clear_usage_flag(struct pkcs7_message *pkcs7, unsigned long usage)
++{
++	struct pkcs7_signed_info *sinfo;
++
++	for (sinfo = pkcs7->signed_infos; sinfo; sinfo = sinfo->next) {
++		if (sinfo->sig)
++			clear_bit(usage, &sinfo->sig->usage_flags);
++	}
++}
++
++void pkcs7_set_usage_flag(struct pkcs7_message *pkcs7, unsigned long usage)
++{
++	struct pkcs7_signed_info *sinfo;
++
++	for (sinfo = pkcs7->signed_infos; sinfo; sinfo = sinfo->next) {
++		if (sinfo->sig)
++			set_bit(usage, &sinfo->sig->usage_flags);
++	}
++}
++
+ /**
+  * pkcs7_validate_trust - Validate PKCS#7 trust chain
+  * @pkcs7: The PKCS#7 certificate to validate
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index 1dc80e68ce96..44b8bd0ad4d8 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -455,6 +455,10 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
+ 			return ret;
+ 		}
+ 		actual_ret = 0;
++		if (sinfo->sig) {
++			sinfo->sig->usage = usage;
++			set_bit(PKS_USAGE_SET, &sinfo->sig->usage_flags);
++		}
+ 	}
+ 
+ 	kleave(" = %d", actual_ret);
+diff --git a/include/crypto/pkcs7.h b/include/crypto/pkcs7.h
+index 38ec7f5f9041..6c3c9061b118 100644
+--- a/include/crypto/pkcs7.h
++++ b/include/crypto/pkcs7.h
+@@ -32,6 +32,9 @@ extern int pkcs7_get_content_data(const struct pkcs7_message *pkcs7,
+ extern int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
+ 				struct key *trust_keyring);
+ 
++extern void pkcs7_set_usage_flag(struct pkcs7_message *pkcs7, unsigned long usage);
++extern void pkcs7_clear_usage_flag(struct pkcs7_message *pkcs7, unsigned long usage);
++
+ /*
+  * pkcs7_verify.c
+  */
+diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+index 462f8a34cdf8..3ddfbc20a55f 100644
+--- a/include/crypto/public_key.h
++++ b/include/crypto/public_key.h
+@@ -48,6 +48,10 @@ struct public_key_signature {
+ 	const char *pkey_algo;
+ 	const char *hash_algo;
+ 	const char *encoding;
++	u32 usage;		/* Intended usage */
++	unsigned long usage_flags;
++#define PKS_USAGE_SET		0
++#define PKS_REVOCATION_PASS	1
+ };
+ 
+ extern void public_key_signature_free(struct public_key_signature *sig);
 -- 
 2.39.3
 
