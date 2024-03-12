@@ -1,333 +1,155 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E5014262B;
-	Tue, 12 Mar 2024 18:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1CF142906
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Mar 2024 20:26:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710268679; cv=none; b=Mu0tx65B5thU9di8LELUeiXon6MskgLukMR3EeZzSUfDN0PzS1YFFoYR6IPzd2ZhgjUHAFNfr+pM3Aa3fPwtxBdI2ch78LaoE8ivuMk/SCx+rdXrZHsmXFPam9TDn9MsiMvww0wMme9IBQ1s76RLCa7JhB1UrcIkXoRN29kyn9s=
+	t=1710275206; cv=none; b=NP0ERUUG+eSN1d8AGkj74IKjh1ew3Dh7U1T0pkT7zzYnHF7zQLaK9SYRTOausAhnMD9D1EhECctwFqCCJmROgIG5Xify0wt1WRMmIbOAiYYVaLtTLx7uBZe6cv5DgMcM+x8lpqz60FBH3wooFdgDYPNRfKPoxMOV8jajTZR7dik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710268679; c=relaxed/simple;
-	bh=DTBTM6f8LwBGQcFVUINl0BA+lhK0xqz9c2bHiY1EEyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iDQDy34MY6zRxwS6WPs2iNDzux1/qh8AcX24u3RZsBXJtpP2AitRW86CpRGGn0XVYrXWhKMdR2skPX8xw1/aitg6IrbPGbYCM2+mYGWLX0h0fS55vaY7Ckrf7W/49OTWQ3Wx60MyFTjmt92062KXFo95cUL8q9ybTReiqCRS6ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=l4Ww7yD7; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+	s=arc-20240116; t=1710275206; c=relaxed/simple;
+	bh=Yh+LhS5yhRkoUraEclEvC+FapyUA4I8kLPY2KFzzQ6E=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ZVrvBTY1Pk8FLeM8FYZacUyNZanUJ3oQX9zbCXKDcVCtFDyiKGfwm8XyuQgLYDcxU+1j5Z5KbZvXVTWaEXEKNwWtXq5fGwq5ke6Q1tkGl+xoVQ1G7eK/Pq9E9CoD7GHhRNULlEZxAq4nRqG7ufJaZUPgG9AMp4wOIrgcNx75fFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PuyKhozq; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l4Ww7yD7"
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42CI2htE006750;
-	Tue, 12 Mar 2024 18:36:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=dUfg6aScrj2mmM+yo5vrr5j8NziNtbrlt8B88BFFeas=;
- b=l4Ww7yD7AuIQPNtKCgczvi2vHWZZVrOalbCaxGV08rQmreozOhM4etIN9Zi/aaUX6PIM
- zgW1EcPzBy8cnXniz85JIb4SjAKNNcXB/IoLV0cRXdxYtV6pHPXYCyd+dJB3PmexLqta
- cSP6AQfGBvKENAix5/stYeNAuSZ6YzRMQEpMmnefCIHefBsg9m9NMeY6nXXThdtMh3zb
- 0GGHLNprIVm/utvddim4YG/5JBtpfpZP1ysf54o7gnLknYVF6mr5JlqlbMDECuVUzYBl
- CiaNgoTWt51DiHL4KJYmFnAeEUVlxvh/L4ahVOSjhk0MAnv9jfu+KqUE89o1oICvR7g/ 5g== 
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wtuyw0he7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Mar 2024 18:36:36 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42CGluij013553;
-	Tue, 12 Mar 2024 18:36:35 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ws4ak8gug-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Mar 2024 18:36:35 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42CIaWbW46924272
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 12 Mar 2024 18:36:35 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BE43E58055;
-	Tue, 12 Mar 2024 18:36:32 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D00F25804E;
-	Tue, 12 Mar 2024 18:36:31 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 12 Mar 2024 18:36:31 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-To: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br, lukas@wunner.de,
-        bbhushan2@marvell.com, jarkko@kernel.org,
-        Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH v6 11/13] crypto: ecdsa - Register NIST P521 and extend test suite
-Date: Tue, 12 Mar 2024 14:36:16 -0400
-Message-ID: <20240312183618.1211745-12-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240312183618.1211745-1-stefanb@linux.vnet.ibm.com>
-References: <20240312183618.1211745-1-stefanb@linux.vnet.ibm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PuyKhozq"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcbee93a3e1so7728364276.3
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Mar 2024 13:26:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710275203; x=1710880003; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qkdeVHiZ4dO2mKNOI6prWlI/035w5V9mRcS9wJoax+0=;
+        b=PuyKhozqlfbC+6hjQddM8pdLLVWSOXVaU+Qw5kWbrPZi8VvDIU6rEYnZ0YlPJults/
+         LnKpQhiNDnMV3RY1NbpN4XoQMk9zhOoeb1R2U4BqIYLaiYoxmc7S43aejdEjwf3z43d2
+         5AYQ+IATL+JlW3ZV4UKmKUUYmHegeYGcPbP1I29y8ZpOzpc2JMlFQ4L0dSIpgFKd8OQm
+         AHfasU3Jac1Mnzde8e3VyJ8atIrEg2Rh9pjE9y2VFye0CFBIVtoQ4kitdL3J0XaQsDTg
+         STsvy1rnghf+urEwTL7Qg4kISHFOIYms9zMTzVOn/i8H16Gn0yMGPGJYWx/jrLdeYCNc
+         Pofw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710275203; x=1710880003;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qkdeVHiZ4dO2mKNOI6prWlI/035w5V9mRcS9wJoax+0=;
+        b=H9ayYqBu2sbauJ5vn2I+2kc8X+fblYPLMVtOq0L6LHi5ebEOq6MpAdmpWC84Fxxqur
+         Qgedtggg5qt4U4tqRyf1kXnDmngME+DjTiuNJpe2pfbBeyo5wWJP/sLZMWxmutvRPMWq
+         wchmQmmRA6U3LV0lhzDsxjfBVH1IiaoXA0UKNCmsQbxNm0ppKTurzgFS/Zs3Sh3gclPq
+         UBu01x4CqqNAHpQDkv+P+BSrM9ZrpIhJdo7sunajdITX550BbTVfQcYv9Glmwqx0HYPB
+         4lg+zmYCmzc241tWQl9zMYfcOYHdwFx9Zo1AKU8wk4QPIb+fnDaIRnsXJOB0FVhsOCav
+         5s8w==
+X-Forwarded-Encrypted: i=1; AJvYcCVLzJv+dCaLYZz+3S7fa9gYkM7dMKYx7z+EhT3zvSFRsJ2NSga1T2j6Wil4DUUNTqBgWjiqu/emun6iVd0WPPaj/WbQQmLeBxj4inTO
+X-Gm-Message-State: AOJu0YyDoON3rmIN3aivfegN0Y6/+Ibt1uvKec6Jq5hTLfkf1jHB64pp
+	G18HdW3/eaZ83Hgeep4MsiW0/zHMdSt8uYlmwA83bTyFgejW5heueCjsAd48JuVzHf4KQg0AQFe
+	BEQ==
+X-Google-Smtp-Source: AGHT+IFUmGhOgcd89e4lrqvlrIUFlYT8TKtqW8wVsN51aYrWhEhHnUI06gztJWUkIbtg80Ly0GbAPRIO8Ug=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:114a:b0:dc6:d890:1a97 with SMTP id
+ p10-20020a056902114a00b00dc6d8901a97mr59614ybu.9.1710275203718; Tue, 12 Mar
+ 2024 13:26:43 -0700 (PDT)
+Date: Tue, 12 Mar 2024 13:26:42 -0700
+In-Reply-To: <20240311172431.zqymfqd4xlpd3pft@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: c1vdBwPTF2NV2XUWeQRmCXPFtrGO2F9t
-X-Proofpoint-ORIG-GUID: c1vdBwPTF2NV2XUWeQRmCXPFtrGO2F9t
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-12_11,2024-03-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- clxscore=1015 malwarescore=0 mlxlogscore=999 spamscore=0 impostorscore=0
- suspectscore=0 phishscore=0 bulkscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2403120139
+Mime-Version: 1.0
+References: <20231016115028.996656-1-michael.roth@amd.com> <20231016115028.996656-5-michael.roth@amd.com>
+ <e7125fcb-52b1-4942-9ae7-c85049e92e5c@arm.com> <ZcY2VRsRd03UQdF7@google.com>
+ <84d62953-527d-4837-acf8-315391f4b225@arm.com> <ZcZBCdTA2kBoSeL8@google.com> <20240311172431.zqymfqd4xlpd3pft@amd.com>
+Message-ID: <ZfC6gnqVhZQJnB_3@google.com>
+Subject: Re: [PATCH RFC gmem v1 4/8] KVM: x86: Add gmem hook for invalidating memory
+From: Sean Christopherson <seanjc@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, "tabba@google.com" <tabba@google.com>, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	pbonzini@redhat.com, isaku.yamahata@intel.com, ackerleytng@google.com, 
+	vbabka@suse.cz, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	jroedel@suse.de, pankaj.gupta@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-From: Stefan Berger <stefanb@linux.ibm.com>
+On Mon, Mar 11, 2024, Michael Roth wrote:
+> On Fri, Feb 09, 2024 at 07:13:13AM -0800, Sean Christopherson wrote:
+> > On Fri, Feb 09, 2024, Steven Price wrote:
+> > > >> One option that I've considered is to implement a seperate CCA ioctl to
+> > > >> notify KVM whether the memory should be mapped protected.
+> > > > 
+> > > > That's what KVM_SET_MEMORY_ATTRIBUTES+KVM_MEMORY_ATTRIBUTE_PRIVATE is for, no?
+> > > 
+> > > Sorry, I really didn't explain that well. Yes effectively this is the
+> > > attribute flag, but there's corner cases for destruction of the VM. My
+> > > thought was that if the VMM wanted to tear down part of the protected
+> > > range (without making it shared) then a separate ioctl would be needed
+> > > to notify KVM of the unmap.
+> > 
+> > No new uAPI should be needed, because the only scenario time a benign VMM should
+> > do this is if the guest also knows the memory is being removed, in which case
+> > PUNCH_HOLE will suffice.
+> > 
+> > > >> This 'solves' the problem nicely except for the case where the VMM
+> > > >> deliberately punches holes in memory which the guest is using.
+> > > > 
+> > > > I don't see what problem there is to solve in this case.  PUNCH_HOLE is destructive,
+> > > > so don't do that.
+> > > 
+> > > A well behaving VMM wouldn't PUNCH_HOLE when the guest is using it, but
+> > > my concern here is a VMM which is trying to break the host. In this case
+> > > either the PUNCH_HOLE needs to fail, or we actually need to recover the
+> > > memory from the guest (effectively killing the guest in the process).
+> > 
+> > The latter.  IIRC, we talked about this exact case somewhere in the hour-long
+> > rambling discussion on guest_memfd at PUCK[1].  And we've definitely discussed
+> > this multiple times on-list, though I don't know that there is a single thread
+> > that captures the entire plan.
+> > 
+> > The TL;DR is that gmem will invoke an arch hook for every "struct kvm_gmem"
+> > instance that's attached to a given guest_memfd inode when a page is being fully
+> > removed, i.e. when a page is being freed back to the normal memory pool.  Something
+> > like this proposed SNP patch[2].
+> > 
+> > Mike, do have WIP patches you can share?
+> 
+> Sorry, I missed this query earlier. I'm a bit confused though, I thought
+> the kvm_arch_gmem_invalidate() hook provided in this patch was what we
+> ended up agreeing on during the PUCK call in question.
 
-Register NIST P521 as an akcipher and extend the testmgr with
-NIST P521-specific test vectors.
+Heh, I trust your memory of things far more than I trust mine.  I'm just proving
+Cunningham's Law.  :-)
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-Tested-by: Lukas Wunner <lukas@wunner.de>
----
- crypto/ecdsa.c   |  30 ++++++++++
- crypto/testmgr.c |   7 +++
- crypto/testmgr.h | 146 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 183 insertions(+)
+> There was an open question about what to do if a use-case came along
+> where we needed to pass additional parameters to
+> kvm_arch_gmem_invalidate() other than just the start/end PFN range for
+> the pages being freed, but we'd determined that SNP and TDX did not
+> currently need this, so I didn't have any changes planned in this
+> regard.
+> 
+> If we now have such a need, what we had proposed was to modify
+> __filemap_remove_folio()/page_cache_delete() to defer setting
+> folio->mapping to NULL so that we could still access it in
+> kvm_gmem_free_folio() so that we can still access mapping->i_private_list
+> to get the list of gmem/KVM instances and pass them on via
+> kvm_arch_gmem_invalidate().
 
-diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
-index 4e847b59622a..894599f1885f 100644
---- a/crypto/ecdsa.c
-+++ b/crypto/ecdsa.c
-@@ -269,6 +269,28 @@ static unsigned int ecdsa_max_size(struct crypto_akcipher *tfm)
- 	return DIV_ROUND_UP(ctx->curve->nbits, 8);
- }
- 
-+static int ecdsa_nist_p521_init_tfm(struct crypto_akcipher *tfm)
-+{
-+	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
-+
-+	return ecdsa_ecc_ctx_init(ctx, ECC_CURVE_NIST_P521);
-+}
-+
-+static struct akcipher_alg ecdsa_nist_p521 = {
-+	.verify = ecdsa_verify,
-+	.set_pub_key = ecdsa_set_pub_key,
-+	.max_size = ecdsa_max_size,
-+	.init = ecdsa_nist_p521_init_tfm,
-+	.exit = ecdsa_exit_tfm,
-+	.base = {
-+		.cra_name = "ecdsa-nist-p521",
-+		.cra_driver_name = "ecdsa-nist-p521-generic",
-+		.cra_priority = 100,
-+		.cra_module = THIS_MODULE,
-+		.cra_ctxsize = sizeof(struct ecc_ctx),
-+	},
-+};
-+
- static int ecdsa_nist_p384_init_tfm(struct crypto_akcipher *tfm)
- {
- 	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
-@@ -352,8 +374,15 @@ static int __init ecdsa_init(void)
- 	if (ret)
- 		goto nist_p384_error;
- 
-+	ret = crypto_register_akcipher(&ecdsa_nist_p521);
-+	if (ret)
-+		goto nist_p521_error;
-+
- 	return 0;
- 
-+nist_p521_error:
-+	crypto_unregister_akcipher(&ecdsa_nist_p384);
-+
- nist_p384_error:
- 	crypto_unregister_akcipher(&ecdsa_nist_p256);
- 
-@@ -369,6 +398,7 @@ static void __exit ecdsa_exit(void)
- 		crypto_unregister_akcipher(&ecdsa_nist_p192);
- 	crypto_unregister_akcipher(&ecdsa_nist_p256);
- 	crypto_unregister_akcipher(&ecdsa_nist_p384);
-+	crypto_unregister_akcipher(&ecdsa_nist_p521);
- }
- 
- subsys_initcall(ecdsa_init);
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index c26aeda85787..a017b4ad119b 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5097,6 +5097,13 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.suite = {
- 			.akcipher = __VECS(ecdsa_nist_p384_tv_template)
- 		}
-+	}, {
-+		.alg = "ecdsa-nist-p521",
-+		.test = alg_test_akcipher,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.akcipher = __VECS(ecdsa_nist_p521_tv_template)
-+		}
- 	}, {
- 		.alg = "ecrdsa",
- 		.test = alg_test_akcipher,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 986f331a5fc2..9bde04be8df9 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -991,6 +991,152 @@ static const struct akcipher_testvec ecdsa_nist_p384_tv_template[] = {
- 	},
- };
- 
-+static const struct akcipher_testvec ecdsa_nist_p521_tv_template[] = {
-+	{
-+	.key = /* secp521r1(sha224) */
-+	"\x04\x01\x4f\x43\x18\xb6\xa9\xc9\x5d\x68\xd3\xa9\x42\xf8\x98\xc0"
-+	"\xd2\xd1\xa9\x50\x3b\xe8\xc4\x40\xe6\x11\x78\x88\x4b\xbd\x76\xa7"
-+	"\x9a\xe0\xdd\x31\xa4\x67\x78\x45\x33\x9e\x8c\xd1\xc7\x44\xac\x61"
-+	"\x68\xc8\x04\xe7\x5c\x79\xb1\xf1\x41\x0c\x71\xc0\x53\xa8\xbc\xfb"
-+	"\xf5\xca\xd4\x01\x40\xfd\xa3\x45\xda\x08\xe0\xb4\xcb\x28\x3b\x0a"
-+	"\x02\x35\x5f\x02\x9f\x3f\xcd\xef\x08\x22\x40\x97\x74\x65\xb7\x76"
-+	"\x85\xc7\xc0\x5c\xfb\x81\xe1\xa5\xde\x0c\x4e\x8b\x12\x31\xb6\x47"
-+	"\xed\x37\x0f\x99\x3f\x26\xba\xa3\x8e\xff\x79\x34\x7c\x3a\xfe\x1f"
-+	"\x3b\x83\x82\x2f\x14",
-+	.key_len = 133,
-+	.params =
-+	"\x30\x10\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x05\x2b\x81\x04"
-+	"\x00\x23",
-+	.param_len = 18,
-+	.m =
-+	"\xa2\x3a\x6a\x8c\x7b\x3c\xf2\x51\xf8\xbe\x5f\x4f\x3b\x15\x05\xc4"
-+	"\xb5\xbc\x19\xe7\x21\x85\xe9\x23\x06\x33\x62\xfb",
-+	.m_size = 28,
-+	.algo = OID_id_ecdsa_with_sha224,
-+	.c =
-+	"\x30\x81\x86\x02\x41\x01\xd6\x43\xe7\xff\x42\xb2\xba\x74\x35\xf6"
-+	"\xdc\x6d\x02\x7b\x22\xac\xe2\xef\x07\x92\xee\x60\x94\x06\xf8\x3f"
-+	"\x59\x0f\x74\xf0\x3f\xd8\x18\xc6\x37\x8a\xcb\xa7\xd8\x7d\x98\x85"
-+	"\x29\x88\xff\x0b\x94\x94\x6c\xa6\x9b\x89\x8b\x1e\xfd\x09\x46\x6b"
-+	"\xc7\xaf\x7a\xb9\x19\x0a\x02\x41\x3a\x26\x0d\x55\xcd\x23\x1e\x7d"
-+	"\xa0\x5e\xf9\x88\xf3\xd2\x32\x90\x57\x0f\xf8\x65\x97\x6b\x09\x4d"
-+	"\x22\x26\x0b\x5f\x49\x32\x6b\x91\x99\x30\x90\x0f\x1c\x8f\x78\xd3"
-+	"\x9f\x0e\x64\xcc\xc4\xe8\x43\xd9\x0e\x1c\xad\x22\xda\x82\x00\x35"
-+	"\xa3\x50\xb1\xa5\x98\x92\x2a\xa5\x52",
-+	.c_size = 137,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	},
-+	{
-+	.key = /* secp521r1(sha256) */
-+	"\x04\x01\x05\x3a\x6b\x3b\x5a\x0f\xa7\xb9\xb7\x32\x53\x4e\xe2\xae"
-+	"\x0a\x52\xc5\xda\xdd\x5a\x79\x1c\x30\x2d\x33\x07\x79\xd5\x70\x14"
-+	"\x61\x0c\xec\x26\x4d\xd8\x35\x57\x04\x1d\x88\x33\x4d\xce\x05\x36"
-+	"\xa5\xaf\x56\x84\xfa\x0b\x9e\xff\x7b\x30\x4b\x92\x1d\x06\xf8\x81"
-+	"\x24\x1e\x51\x00\x09\x21\x51\xf7\x46\x0a\x77\xdb\xb5\x0c\xe7\x9c"
-+	"\xff\x27\x3c\x02\x71\xd7\x85\x36\xf1\xaa\x11\x59\xd8\xb8\xdc\x09"
-+	"\xdc\x6d\x5a\x6f\x63\x07\x6c\xe1\xe5\x4d\x6e\x0f\x6e\xfb\x7c\x05"
-+	"\x8a\xe9\x53\xa8\xcf\xce\x43\x0e\x82\x20\x86\xbc\x88\x9c\xb7\xe3"
-+	"\xe6\x77\x1e\x1f\x8a",
-+	.key_len = 133,
-+	.params =
-+	"\x30\x10\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x05\x2b\x81\x04"
-+	"\x00\x23",
-+	.param_len = 18,
-+	.m =
-+	"\xcc\x97\x73\x0c\x73\xa2\x53\x2b\xfa\xd7\x83\x1d\x0c\x72\x1b\x39"
-+	"\x80\x71\x8d\xdd\xc5\x9b\xff\x55\x32\x98\x25\xa2\x58\x2e\xb7\x73",
-+	.m_size = 32,
-+	.algo = OID_id_ecdsa_with_sha256,
-+	.c =
-+	"\x30\x81\x88\x02\x42\x00\xcd\xa5\x5f\x57\x52\x27\x78\x3a\xb5\x06"
-+	"\x0f\xfd\x83\xfc\x0e\xd9\xce\x50\x9f\x7d\x1f\xca\x8b\xa8\x2d\x56"
-+	"\x3c\xf6\xf0\xd8\xe1\xb7\x5d\x95\x35\x6f\x02\x0e\xaf\xe1\x4c\xae"
-+	"\xce\x54\x76\x9a\xc2\x8f\xb8\x38\x1f\x46\x0b\x04\x64\x34\x79\xde"
-+	"\x7e\xd7\x59\x10\xe9\xd9\xd5\x02\x42\x01\xcf\x50\x85\x38\xf9\x15"
-+	"\x83\x18\x04\x6b\x35\xae\x65\xb5\x99\x12\x0a\xa9\x79\x24\xb9\x37"
-+	"\x35\xdd\xa0\xe0\x87\x2c\x44\x4b\x5a\xee\xaf\xfa\x10\xdd\x9b\xfb"
-+	"\x36\x1a\x31\x03\x42\x02\x5f\x50\xf0\xa2\x0d\x1c\x57\x56\x8f\x12"
-+	"\xb7\x1d\x91\x55\x38\xb6\xf6\x34\x65\xc7\xbd",
-+	.c_size = 139,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	},
-+	{
-+	.key = /* secp521r1(sha384) */
-+	"\x04\x00\x2e\xd6\x21\x04\x75\xc3\xdc\x7d\xff\x0e\xf3\x70\x25\x2b"
-+	"\xad\x72\xfc\x5a\x91\xf1\xd5\x9c\x64\xf3\x1f\x47\x11\x10\x62\x33"
-+	"\xfd\x2e\xe8\x32\xca\x9e\x6f\x0a\x4c\x5b\x35\x9a\x46\xc5\xe7\xd4"
-+	"\x38\xda\xb2\xf0\xf4\x87\xf3\x86\xf4\xea\x70\xad\x1e\xd4\x78\x8c"
-+	"\x36\x18\x17\x00\xa2\xa0\x34\x1b\x2e\x6a\xdf\x06\xd6\x99\x2d\x47"
-+	"\x50\x92\x1a\x8a\x72\x9c\x23\x44\xfa\xa7\xa9\xed\xa6\xef\x26\x14"
-+	"\xb3\x9d\xfe\x5e\xa3\x8c\xd8\x29\xf8\xdf\xad\xa6\xab\xfc\xdd\x46"
-+	"\x22\x6e\xd7\x35\xc7\x23\xb7\x13\xae\xb6\x34\xff\xd7\x80\xe5\x39"
-+	"\xb3\x3b\x5b\x1b\x94",
-+	.key_len = 133,
-+	.params =
-+	"\x30\x10\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x05\x2b\x81\x04"
-+	"\x00\x23",
-+	.param_len = 18,
-+	.m =
-+	"\x36\x98\xd6\x82\xfa\xad\xed\x3c\xb9\x40\xb6\x4d\x9e\xb7\x04\x26"
-+	"\xad\x72\x34\x44\xd2\x81\xb4\x9b\xbe\x01\x04\x7a\xd8\x50\xf8\x59"
-+	"\xba\xad\x23\x85\x6b\x59\xbe\xfb\xf6\x86\xd4\x67\xa8\x43\x28\x76",
-+	.m_size = 48,
-+	.algo = OID_id_ecdsa_with_sha384,
-+	.c =
-+	"\x30\x81\x88\x02\x42\x00\x93\x96\x76\x3c\x27\xea\xaa\x9c\x26\xec"
-+	"\x51\xdc\xe8\x35\x5e\xae\x16\xf2\x4b\x64\x98\xf7\xec\xda\xc7\x7e"
-+	"\x42\x71\x86\x57\x2d\xf1\x7d\xe4\xdf\x9b\x7d\x9e\x47\xca\x33\x32"
-+	"\x76\x06\xd0\xf9\xc0\xe4\xe6\x84\x59\xfd\x1a\xc4\x40\xdd\x43\xb8"
-+	"\x6a\xdd\xfb\xe6\x63\x4e\x28\x02\x42\x00\xff\xc3\x6a\x87\x6e\xb5"
-+	"\x13\x1f\x20\x55\xce\x37\x97\xc9\x05\x51\xe5\xe4\x3c\xbc\x93\x65"
-+	"\x57\x1c\x30\xda\xa7\xcd\x26\x28\x76\x3b\x52\xdf\xc4\xc0\xdb\x54"
-+	"\xdb\x8a\x0d\x6a\xc3\xf3\x7a\xd1\xfa\xe7\xa7\xe5\x5a\x94\x56\xcf"
-+	"\x8f\xb4\x22\xc6\x4f\xab\x2b\x62\xc1\x42\xb1",
-+	.c_size = 139,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	},
-+	{
-+	.key = /* secp521r1(sha512) */
-+	"\x04\x00\xc7\x65\xee\x0b\x86\x7d\x8f\x02\xf1\x74\x5b\xb0\x4c\x3f"
-+	"\xa6\x35\x60\x9f\x55\x23\x11\xcc\xdf\xb8\x42\x99\xee\x6c\x96\x6a"
-+	"\x27\xa2\x56\xb2\x2b\x03\xad\x0f\xe7\x97\xde\x09\x5d\xb4\xc5\x5f"
-+	"\xbd\x87\x37\xbf\x5a\x16\x35\x56\x08\xfd\x6f\x06\x1a\x1c\x84\xee"
-+	"\xc3\x64\xb3\x00\x9e\xbd\x6e\x60\x76\xee\x69\xfd\x3a\xb8\xcd\x7e"
-+	"\x91\x68\x53\x57\x44\x13\x2e\x77\x09\x2a\xbe\x48\xbd\x91\xd8\xf6"
-+	"\x21\x16\x53\x99\xd5\xf0\x40\xad\xa6\xf8\x58\x26\xb6\x9a\xf8\x77"
-+	"\xfe\x3a\x05\x1a\xdb\xa9\x0f\xc0\x6c\x76\x30\x8c\xd8\xde\x44\xae"
-+	"\xd0\x17\xdf\x49\x6a",
-+	.key_len = 133,
-+	.params =
-+	"\x30\x10\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x05\x2b\x81\x04"
-+	"\x00\x23",
-+	.param_len = 18,
-+	.m =
-+	"\x5c\xa6\xbc\x79\xb8\xa0\x1e\x11\x83\xf7\xe9\x05\xdf\xba\xf7\x69"
-+	"\x97\x22\x32\xe4\x94\x7c\x65\xbd\x74\xc6\x9a\x8b\xbd\x0d\xdc\xed"
-+	"\xf5\x9c\xeb\xe1\xc5\x68\x40\xf2\xc7\x04\xde\x9e\x0d\x76\xc5\xa3"
-+	"\xf9\x3c\x6c\x98\x08\x31\xbd\x39\xe8\x42\x7f\x80\x39\x6f\xfe\x68",
-+	.m_size = 64,
-+	.algo = OID_id_ecdsa_with_sha512,
-+	.c =
-+	"\x30\x81\x88\x02\x42\x01\x5c\x71\x86\x96\xac\x21\x33\x7e\x4e\xaa"
-+	"\x86\xec\xa8\x05\x03\x52\x56\x63\x0e\x02\xcc\x94\xa9\x05\xb9\xfb"
-+	"\x62\x1e\x42\x03\x6c\x74\x8a\x1f\x12\x3e\xb7\x7e\x51\xff\x7f\x27"
-+	"\x93\xe8\x6c\x49\x7d\x28\xfc\x80\xa6\x13\xfc\xb6\x90\xf7\xbb\x28"
-+	"\xb5\x04\xb0\xb6\x33\x1c\x7e\x02\x42\x01\x70\x43\x52\x1d\xe3\xc6"
-+	"\xbd\x5a\x40\x95\x35\x89\x4f\x41\x5f\x9e\x19\x88\x05\x3e\x43\x39"
-+	"\x01\xbd\xb7\x7a\x76\x37\x51\x47\x49\x98\x12\x71\xd0\xe9\xca\xa7"
-+	"\xc0\xcb\xaa\x00\x55\xbb\x6a\xb4\x73\x00\xd2\x72\x74\x13\x63\x39"
-+	"\xa6\xe5\x25\x46\x1e\x77\x44\x78\xe0\xd1\x04",
-+	.c_size = 139,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	},
-+};
-+
- /*
-  * EC-RDSA test vectors are generated by gost-engine.
-  */
--- 
-2.43.0
+Yeah, this is what I was remembering.  I obviously forgot that we didn't have a
+need to iterate over all bindings at this time.
 
+> So that's doable, but it's not clear from this discussion that that's
+> needed.
+
+Same here.  And even if it is needed, it's not your problem to solve.  The above
+blurb about needing to preserve folio->mapping being free_folio() is sufficient
+to get the ARM code moving in the right direction.
+
+Thanks!
+
+> If the idea to block/kill the guest if VMM tries to hole-punch,
+> and ARM CCA already has plans to wire up the shared/private flags in
+> kvm_unmap_gfn_range(), wouldn't that have all the information needed to
+> kill that guest? At that point, kvm_gmem_free_folio() can handle
+> additional per-page cleanup (with additional gmem/KVM info plumbed in
+> if necessary).
