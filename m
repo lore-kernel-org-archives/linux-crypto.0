@@ -1,108 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D8A33E5;
-	Tue, 12 Mar 2024 15:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B25E7BB04;
+	Tue, 12 Mar 2024 15:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710256700; cv=none; b=u+6FPAvEuXo0n7nQ0aAVQNZfwF9vDukzuHECnDZeUJvv/Jh5AeoLHu/1XDtbwacenhS/Rt96uDJWMfKWnUBQtuorlDPeJ1bEjKYOkXUtPKYseAJ17atDjvoIsWsyrKJ994vMRTWAmbn2m6A7nTE6urgzL5cpkTVhD2bEwcJskgY=
+	t=1710256732; cv=none; b=sJTii9dSzgt4yIIUMSXp2l1Whs6rjG6zOpP1KvNu44QLs/Qqc6MDICUGX7FttjVyg1lx+pqExYl7bQkQ0DJjA5m6ruOy0nHL2jzOwzpq+v602Q/E5nll8oNbkyP87dBIRAqoToTLg5R5EoyVZuqwIVI2eiXJbgJMS2hsTFdsKSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710256700; c=relaxed/simple;
-	bh=eXtkhVp6w8XaPIrh/gC59EgLMCdR8bJ5MCc/7TCQTbI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gPKUYjI5u8rLjti//XwHT7kRJDbAvymc8MjS72WZi64a3JpbircU/VQxWHqWHi9NDxYAywZam4tAl1Yui07OjHwnI3Bd8uTsNarMWRQzFMi2w65p4KJBp7Pch+8EzwaW7T7LZ6puQpBIaq3STUsIgfgjKybLeP55OSAWIbKMMsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nxv0y2Zx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710256732; c=relaxed/simple;
+	bh=e9D3nRiUkzwoDNU1WO9Mvab1qnoYPq79dDij4jjwu3k=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=DIV1v4BikQ5votpyOmv7W3jlNrfUs21j4+mxn8oVwlcjEa9B0D6SS+sJkuZr0j9LSNX4Iwndn/6iAwnufkGX3P49vH3Ig0jOV9gnf/8dIF+wDYkZ6DGCTgdy31H7YEcdxmu1uIGkbqqo69Y0PC8KTH3aaFQyLGMEpcOroJMCwJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h1Lmwl5P; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nxv0y2Zx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C89AC433C7;
-	Tue, 12 Mar 2024 15:18:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h1Lmwl5P"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74728C433F1;
+	Tue, 12 Mar 2024 15:18:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710256700;
-	bh=eXtkhVp6w8XaPIrh/gC59EgLMCdR8bJ5MCc/7TCQTbI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Nxv0y2ZxaaPYTAT6ow9IxCbNVuNIwWnv8Xv8ShGEOBAN33Fc14oBFWKrG5ZaxPeIM
-	 8J8UHbsljL2SCzk5fYD9/3eUYHpAFTdZvDUmxB/reD2oBjGUXyaR8CHa5HZgVwcPOc
-	 nKid86ugCjPU8GF5EixC2JD/4z45C9/owEyDW+OVnw6RSW9JaZq02B+ctCBXEaNnxd
-	 01DCgi3AewxB28vp6NwGFQkLIQwqUhkKAya8yI5LFAfMFypF6m8MUTW97fiLoOQ+/M
-	 VpD34Rvw3DWDrB8KxioP3TBNm0/ooPX/Kv5APK+OhOKsW2obL6mcVYKm3k77fyUzbK
-	 h4RYdY2yHjDEA==
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d33986dbc0so63943251fa.2;
-        Tue, 12 Mar 2024 08:18:20 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWruXUP7qQKPKMR3YUaTZy3w2iVmCXBecPSc0Ifjms+uqO1Lv5+Wi+SpvL+ZLTfpSrNem9V07cQbPp3d5HJsdM+MQsIkef5VzQ2L+sw
-X-Gm-Message-State: AOJu0YyXimHS4cFWceM+QZtzaRow486SpIEM1r22Qdn87a0SXuxbw65m
-	sTs99GCnLmZlxHiQo5GvDmcQhfCK+Gwy63Z8ghENmN3gdkAinbePvVxdYZtYy2wqGcCFjRFv91L
-	TdYcuWU5GPJWvpcYUDSk8pL7u7GI=
-X-Google-Smtp-Source: AGHT+IG1znAq0/jal+D+vEUxxYq92BGZ8RvqGbk5p9JAK86FNhSvbUKvbZeqsM81GXzNkWnWgnycZky1/AynJ1Jew5M=
-X-Received: by 2002:a2e:bb90:0:b0:2d2:3915:cfc4 with SMTP id
- y16-20020a2ebb90000000b002d23915cfc4mr1597225lje.4.1710256698339; Tue, 12 Mar
- 2024 08:18:18 -0700 (PDT)
+	s=k20201202; t=1710256731;
+	bh=e9D3nRiUkzwoDNU1WO9Mvab1qnoYPq79dDij4jjwu3k=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=h1Lmwl5P+pE/kbBOvKdZOZM25nEbfDfgOnhEj7uMpL3lrvqSkVH9DeyjsZEf7DTHn
+	 hE+C1iPnYAEHMQA1AkgjHn1CDxlvyhvh92FjY/rUU57Pura7j3mc/fwaDBHM0YxPTJ
+	 EuoUD49zHXeU5FjxnjVBGrnmBZIibE94K4SxGOVFkYeERZITcH2CIZ7Ggl+fqv6eoh
+	 IeaxrCO5fembgp1vdfcOdBpTepENLylh42LBlMDfzVapAhKGludQ50rVeZJO1++Zzs
+	 ezP/6E7bAq6njdK/Y/+nWz0kYO4KifZtj2dwllKvMBdw9TGXv7C5OxDFZpWF+4z+48
+	 mk2gdGgwHJZMw==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230607053558.GC941@sol.localdomain> <20240311213232.128240-1-chang.seok.bae@intel.com>
- <CAMj1kXEQpFhDaxJ-rBb221ggdZEYWPzeoueKJr5SqRx60Ezf-w@mail.gmail.com> <7d463faa-94ae-4c62-b3bc-b4d1084e4600@intel.com>
-In-Reply-To: <7d463faa-94ae-4c62-b3bc-b4d1084e4600@intel.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 12 Mar 2024 16:18:06 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXEr3egDCZ+DYrZt8ohG3fA3jEr_D2iLZp+c9yoj3mr5eQ@mail.gmail.com>
-Message-ID: <CAMj1kXEr3egDCZ+DYrZt8ohG3fA3jEr_D2iLZp+c9yoj3mr5eQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: x86/aesni - Update aesni_set_key() to return void
-To: "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, ebiggers@kernel.org, 
-	x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 12 Mar 2024 17:18:45 +0200
+Message-Id: <CZRVET5930A0.3KM5Q2BAH05LT@kernel.org>
+Cc: "open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
+ "David Howells" <dhowells@redhat.com>, "David Woodhouse"
+ <dwmw2@infradead.org>, "herbert@gondor.apana.org.au"
+ <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
+ "Ard Biesheuvel" <ardb@kernel.org>, "paul@paul-moore.com"
+ <paul@paul-moore.com>, "jmorris@namei.org" <jmorris@namei.org>,
+ "serge@hallyn.com" <serge@hallyn.com>, "zohar@linux.ibm.com"
+ <zohar@linux.ibm.com>, "roberto.sassu@huawei.com"
+ <roberto.sassu@huawei.com>, "dmitry.kasatkin@gmail.com"
+ <dmitry.kasatkin@gmail.com>, "mic@digikod.net" <mic@digikod.net>,
+ "casey@schaufler-ca.com" <casey@schaufler-ca.com>, "stefanb@linux.ibm.com"
+ <stefanb@linux.ibm.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "keyrings@vger.kernel.org"
+ <keyrings@vger.kernel.org>, "linux-crypto@vger.kernel.org"
+ <linux-crypto@vger.kernel.org>, "linux-efi@vger.kernel.org"
+ <linux-efi@vger.kernel.org>, "linux-integrity@vger.kernel.org"
+ <linux-integrity@vger.kernel.org>
+Subject: Re: [PATCH RFC 1/8] certs: Introduce ability to link to a system
+ key
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Eric Snowberg" <eric.snowberg@oracle.com>
+X-Mailer: aerc 0.17.0
+References: <20240311161111.3268190-1-eric.snowberg@oracle.com>
+ <20240311161111.3268190-2-eric.snowberg@oracle.com>
+ <CZR5W1VPAVJC.2VZOSD53YNT9I@kernel.org>
+ <77AE4DEA-9474-44A1-88DC-852523C36797@oracle.com>
+In-Reply-To: <77AE4DEA-9474-44A1-88DC-852523C36797@oracle.com>
 
-On Tue, 12 Mar 2024 at 16:03, Chang S. Bae <chang.seok.bae@intel.com> wrote:
+On Mon Mar 11, 2024 at 11:31 PM EET, Eric Snowberg wrote:
 >
-> On 3/12/2024 12:46 AM, Ard Biesheuvel wrote:
-> > On Mon, 11 Mar 2024 at 22:48, Chang S. Bae <chang.seok.bae@intel.com> wrote:
-> >>
-> >> @@ -241,7 +241,7 @@ static int aes_set_key_common(struct crypto_aes_ctx *ctx,
-> >>                  err = aes_expandkey(ctx, in_key, key_len);
-> >>          else {
-> >>                  kernel_fpu_begin();
-> >> -               err = aesni_set_key(ctx, in_key, key_len);
-> >> +               aesni_set_key(ctx, in_key, key_len);
-> >
-> > This will leave 'err' uninitialized.
 >
-> Ah, right. Thanks for catching it.
+> > On Mar 11, 2024, at 1:18=E2=80=AFPM, Jarkko Sakkinen <jarkko@kernel.org=
+> wrote:
+> >=20
+> > On Mon Mar 11, 2024 at 6:11 PM EET, Eric Snowberg wrote:
+> >> + return -1;
+> >=20
+> > Missed this one: why a magic number?
 >
-> Also, upon reviewing aes_expandkey(), I noticed there's no error case,
-> except for the key length sanity check.
->
-> While addressing this, perhaps additional cleanup is considerable like:
->
-> @@ -233,19 +233,20 @@ static int aes_set_key_common(struct
-> crypto_aes_ctx *ctx,
->   {
->          int err;
->
-> -       if (key_len != AES_KEYSIZE_128 && key_len != AES_KEYSIZE_192 &&
-> -           key_len != AES_KEYSIZE_256)
-> -               return -EINVAL;
-> +       err = aes_check_keylen(key_len);
-> +       if (err)
-> +               return err;
->
->          if (!crypto_simd_usable())
-> -               err = aes_expandkey(ctx, in_key, key_len);
-> +               /* no error with a valid key length  */
-> +               aes_expandkey(ctx, in_key, key_len);
->          else {
->                  kernel_fpu_begin();
-> -               err = aesni_set_key(ctx, in_key, key_len);
-> +               aesni_set_key(ctx, in_key, key_len);
->                  kernel_fpu_end();
->          }
->
-> -       return err;
-> +       return 0;
->   }
->
+> Good point, I'll change this to return -ENOKEY.  Thanks.
 
-I wonder whether we need aesni_set_key() at all.
+Either that or a boolean function, which ever fits to the overall
+flow better... The upside of error code is less branching in the call
+sites. The upside of boolean is that caller exactly knows all the
+values that ever should come out as a result.
+
+Your choice ofc.
+
+BR, Jarkko
