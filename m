@@ -1,60 +1,25 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A1018CEAB
-	for <linux-crypto@vger.kernel.org>; Wed, 13 Mar 2024 16:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18D0E612FC;
+	Wed, 13 Mar 2024 17:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710348480; cv=none; b=bGQTWqFRsijRPT1qs0H79Sv4zt8k6BLJaErcCyMbryCBTS3oOl4t96OehFprlgJcko8GWWBVkog9oORoiQnoIdQIRBcgKd0CbCzRcDqH0IPBF8jn60ehoMh1OBuEyOehBzUgo8dvf4maShQYErLJDOJuBYcFdvYCv+TkFRtbxR4=
+	t=1710349898; cv=none; b=GjnuHwPOr7MEl7t35TTIVWt5x0DHjznT1VPmNfDCVclpTBdiSR/NryZNm8AB0gkc9Zbk2F8TNotFXHNICJ9iyEya2qEHHtW8gi2PG+XawSMShskAEvxi9iAk5J8MrLiYgqUwbSyI4QxzYAXjkSz1X1aBjs4ThLhFEFoMLJjxNB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710348480; c=relaxed/simple;
-	bh=OABrLHkuFcQXG/wDXLMHESQAG2PiCXNRa2hkf80/5kM=;
+	s=arc-20240116; t=1710349898; c=relaxed/simple;
+	bh=o3yUCeYnmGTYvzE+DYAY+ANpaPKcBEzwnq4w44cGrVw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qeRUFvx8h3gz8zO+4iEGaXSikJWL3P1/7T392jzKBSUtcjfvygHKJ5uAOMNAsAb8VsFcu16qnzUK5Z9SuU00F4VLoM4WqvDIXwewfxikwnZJo1wzlL4yQ0cI2kpV+WUCHyi2aqzp2ftHLlb0Snz4HyWNXIzR+L5UACN/yxtlk14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vdmrIvLo; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vdmrIvLo"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-413ef6a4f4bso385925e9.0
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Mar 2024 09:47:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1710348476; x=1710953276; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aL2HNMMWYIQUqUiL5ub2nwsmZvrAMS79QvM7mKq9XnU=;
-        b=vdmrIvLoFbB3M2ouFxtTtZ2aeCQa97jVV+HlsAGIK25749y43OwpUTHNjOOBVEqyWI
-         XIplHh+EUuhBtcewR0UAe245ALospGqXynRD7kja6EGXMMNSn1P4rD/FzJw+ttSZPoMP
-         b5U/oFcacvwNwuvt2mpJ4CuZ2BmDPNxzElpqw9O+BzzCdvufcst4dT5C9M4kwEvILcGJ
-         IyMUDoPCuwvC3BxQ5xMtSOxiovvOFx8HHe4wMOFaXeqSOJl9i10xd9vVR2uN00CZJpWF
-         gdyqxrOMgf2JVqFW5lLJA9mhOLBKXOL3oEY9vxyFiWXyD/kCQ5v6rN5A8d22oVe0847D
-         No7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710348476; x=1710953276;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aL2HNMMWYIQUqUiL5ub2nwsmZvrAMS79QvM7mKq9XnU=;
-        b=gPlcngXKHfDACg64wbJqqec9S/bOjFomAfUGLDsshu66GOSHFu+5i6F3cUA24aAynE
-         90523IKl5iFRoR2SkN5lxn3l3UOaCMyLp8g9OdI0qZSpOFm3ety/G69ux6Xm/LkrrccV
-         +gmckdjyZj2PcTuqFJfS3HvFfq7Si6CsvvI6i/VI4gKcT+8F1cEg0gCPzh8X+SasVxGi
-         WNYMTMBFkRMSWaOAGpLFlksum4V311tLn5rjFBnuCSvD7n0pnePBS6NUIu50wC+qhz7f
-         Jm01VWXeGid3tM+/Kzrhi7G+dCH6N0RyBptbvM8YnAezkDzz1D1ZWrpIIosNQNQbyMLj
-         uhAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVugj45/7Kz267x9aJVYcDPhVZTIcjL4L7uwnkCjJiPaPfpdqZ75u04zpxUlkteCCSlVb6mpuS4MTvRTzVVFu+N7HE/swyQaaK097C9
-X-Gm-Message-State: AOJu0Yzb8lZpEInW6NKRYMpnqQ3TaA3ZHs37nRIP6pmejmGnRuFsls9n
-	9abuBPt32uHLdouO90QjbU4z+lXuqsiTUo2mKsFzXj8LTQ3bBYMfOU+cCPkJDhw=
-X-Google-Smtp-Source: AGHT+IH0kSLdw4SyxenHbvADWPBA+1/ymroD7wywet+sZrpLPA6tHINQFd4bvIKAxr345/cxFAIuQw==
-X-Received: by 2002:a05:600c:1f07:b0:413:1828:b8fe with SMTP id bd7-20020a05600c1f0700b004131828b8femr423510wmb.21.1710348476329;
-        Wed, 13 Mar 2024 09:47:56 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.222.97])
-        by smtp.gmail.com with ESMTPSA id fm26-20020a05600c0c1a00b00413ebdca679sm1679024wmb.37.2024.03.13.09.47.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Mar 2024 09:47:55 -0700 (PDT)
-Message-ID: <98c662ef-e6ef-4ef1-85df-6d8e3432101e@linaro.org>
-Date: Wed, 13 Mar 2024 17:47:53 +0100
+	 In-Reply-To:Content-Type; b=LqwTZydkwXDx+cKMD+QOopTzqTeIOXxs2TDbGTJ8UkZwZQrctTfJbFeO7gr1Wk1y8jFvRq/HPHGLZ39L1PXJha3GKXPalTo1GKtHyTbAaJJmWnS3alfmauyX+PVPnGKn8iJ6rtmrImfG5oNmPFrFIUbcfJLudAWtqsWcjCiAPyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C30631007;
+	Wed, 13 Mar 2024 10:12:11 -0700 (PDT)
+Received: from [10.57.15.67] (unknown [10.57.15.67])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BA6BE3F73F;
+	Wed, 13 Mar 2024 10:11:31 -0700 (PDT)
+Message-ID: <c21e247f-3140-4812-9516-f8b9d0ceea2d@arm.com>
+Date: Wed, 13 Mar 2024 17:11:29 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,79 +27,125 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: ice: Document sc7280 inline
- crypto engine
-To: Luca Weiss <luca.weiss@fairphone.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, cros-qcom-dts-watchers@chromium.org
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240313-sc7280-ice-v1-0-3fa089fb7a27@fairphone.com>
- <20240313-sc7280-ice-v1-1-3fa089fb7a27@fairphone.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240313-sc7280-ice-v1-1-3fa089fb7a27@fairphone.com>
+Subject: Re: [PATCH RFC gmem v1 4/8] KVM: x86: Add gmem hook for invalidating
+ memory
+To: Sean Christopherson <seanjc@google.com>,
+ Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ "tabba@google.com" <tabba@google.com>, linux-coco@lists.linux.dev,
+ linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+ linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ pbonzini@redhat.com, isaku.yamahata@intel.com, ackerleytng@google.com,
+ vbabka@suse.cz, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ jroedel@suse.de, pankaj.gupta@amd.com
+References: <20231016115028.996656-1-michael.roth@amd.com>
+ <20231016115028.996656-5-michael.roth@amd.com>
+ <e7125fcb-52b1-4942-9ae7-c85049e92e5c@arm.com> <ZcY2VRsRd03UQdF7@google.com>
+ <84d62953-527d-4837-acf8-315391f4b225@arm.com> <ZcZBCdTA2kBoSeL8@google.com>
+ <20240311172431.zqymfqd4xlpd3pft@amd.com> <ZfC6gnqVhZQJnB_3@google.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <ZfC6gnqVhZQJnB_3@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 13/03/2024 13:53, Luca Weiss wrote:
-> Document the compatible used for the inline crypto engine found on
-> SC7280.
+On 12/03/2024 20:26, Sean Christopherson wrote:
+> On Mon, Mar 11, 2024, Michael Roth wrote:
+>> On Fri, Feb 09, 2024 at 07:13:13AM -0800, Sean Christopherson wrote:
+>>> On Fri, Feb 09, 2024, Steven Price wrote:
+>>>>>> One option that I've considered is to implement a seperate CCA ioctl to
+>>>>>> notify KVM whether the memory should be mapped protected.
+>>>>>
+>>>>> That's what KVM_SET_MEMORY_ATTRIBUTES+KVM_MEMORY_ATTRIBUTE_PRIVATE is for, no?
+>>>>
+>>>> Sorry, I really didn't explain that well. Yes effectively this is the
+>>>> attribute flag, but there's corner cases for destruction of the VM. My
+>>>> thought was that if the VMM wanted to tear down part of the protected
+>>>> range (without making it shared) then a separate ioctl would be needed
+>>>> to notify KVM of the unmap.
+>>>
+>>> No new uAPI should be needed, because the only scenario time a benign VMM should
+>>> do this is if the guest also knows the memory is being removed, in which case
+>>> PUNCH_HOLE will suffice.
+>>>
+>>>>>> This 'solves' the problem nicely except for the case where the VMM
+>>>>>> deliberately punches holes in memory which the guest is using.
+>>>>>
+>>>>> I don't see what problem there is to solve in this case.  PUNCH_HOLE is destructive,
+>>>>> so don't do that.
+>>>>
+>>>> A well behaving VMM wouldn't PUNCH_HOLE when the guest is using it, but
+>>>> my concern here is a VMM which is trying to break the host. In this case
+>>>> either the PUNCH_HOLE needs to fail, or we actually need to recover the
+>>>> memory from the guest (effectively killing the guest in the process).
+>>>
+>>> The latter.  IIRC, we talked about this exact case somewhere in the hour-long
+>>> rambling discussion on guest_memfd at PUCK[1].  And we've definitely discussed
+>>> this multiple times on-list, though I don't know that there is a single thread
+>>> that captures the entire plan.
+>>>
+>>> The TL;DR is that gmem will invoke an arch hook for every "struct kvm_gmem"
+>>> instance that's attached to a given guest_memfd inode when a page is being fully
+>>> removed, i.e. when a page is being freed back to the normal memory pool.  Something
+>>> like this proposed SNP patch[2].
+>>>
+>>> Mike, do have WIP patches you can share?
+>>
+>> Sorry, I missed this query earlier. I'm a bit confused though, I thought
+>> the kvm_arch_gmem_invalidate() hook provided in this patch was what we
+>> ended up agreeing on during the PUCK call in question.
 > 
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> ---
+> Heh, I trust your memory of things far more than I trust mine.  I'm just proving
+> Cunningham's Law.  :-)
+> 
+>> There was an open question about what to do if a use-case came along
+>> where we needed to pass additional parameters to
+>> kvm_arch_gmem_invalidate() other than just the start/end PFN range for
+>> the pages being freed, but we'd determined that SNP and TDX did not
+>> currently need this, so I didn't have any changes planned in this
+>> regard.
+>>
+>> If we now have such a need, what we had proposed was to modify
+>> __filemap_remove_folio()/page_cache_delete() to defer setting
+>> folio->mapping to NULL so that we could still access it in
+>> kvm_gmem_free_folio() so that we can still access mapping->i_private_list
+>> to get the list of gmem/KVM instances and pass them on via
+>> kvm_arch_gmem_invalidate().
+> 
+> Yeah, this is what I was remembering.  I obviously forgot that we didn't have a
+> need to iterate over all bindings at this time.
+> 
+>> So that's doable, but it's not clear from this discussion that that's
+>> needed.
+> 
+> Same here.  And even if it is needed, it's not your problem to solve.  The above
+> blurb about needing to preserve folio->mapping being free_folio() is sufficient
+> to get the ARM code moving in the right direction.
+> 
+> Thanks!
+> 
+>> If the idea to block/kill the guest if VMM tries to hole-punch,
+>> and ARM CCA already has plans to wire up the shared/private flags in
+>> kvm_unmap_gfn_range(), wouldn't that have all the information needed to
+>> kill that guest? At that point, kvm_gmem_free_folio() can handle
+>> additional per-page cleanup (with additional gmem/KVM info plumbed in
+>> if necessary).
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Yes, the missing piece of the puzzle was provided by "KVM: Prepare for
+handling only shared mappings in mmu_notifier events"[1] - namely the
+"only_shared" flag. We don't need to actually block/kill the guest until
+it attempts access to the memory which has been removed from the guest -
+at that point the guest cannot continue because the security properties
+have been violated (the protected memory contents have been lost) so
+attempts to continue the guest will fail.
 
-Best regards,
-Krzysztof
+You can ignore most of my other ramblings - as long as everyone is happy
+with that flag then Arm CCA should be fine. I was just looking at other
+options.
 
+Thanks,
+
+Steve
+
+[1]
+https://lore.kernel.org/lkml/20231027182217.3615211-13-seanjc@google.com/
