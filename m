@@ -1,165 +1,99 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8F3EAC8
-	for <linux-crypto@vger.kernel.org>; Wed, 13 Mar 2024 10:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3BA6AD6
+	for <linux-crypto@vger.kernel.org>; Wed, 13 Mar 2024 12:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710326629; cv=none; b=n0qtEoQzAzrf9uez4d8QfTk0xTScUijmqRzamGZm7sbPxsXAmdxMb6j3hkpuKEsbrBk5YdK853/gHD9fOUQAd89GApMQoQHFf1MLOF/8gNq/FsQWCZkDPxgdTnmm95Wo7lyK5TYp3IHAZcSQSXCOZr8RV1D3WAmcFw4LP1HuN54=
+	t=1710334415; cv=none; b=dvTDiW+4DZK56znncAHWiGWRTLCuxziSRktmPpZtSWtP0aFWLybDfMHDInm9+a3WF1qMDXaW2znZfkc65o/C+QMLHJA2iHazj+FptlWhTSjgksecAQpeRtXRPhMKwQhJcbGfOb7mYcjz2eOXy1EY+KtiV8WeY+SffjyarHykSM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710326629; c=relaxed/simple;
-	bh=gEppbyG4qtw7JZw3iiLeNi9lT7CPEASQXeZKWF8MCfI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q6XihKS0cREKJI7hPQMqCLW2UyHfEP2FgYz/1qQL+bQyEyNKM3vUDCnpExMERgZrrEl2fBnoe1v/O2FTA1eWpD94kmb5nU1kJJ1FYvzMQFtfBDZ90bGKMmjMmXgn4hYWOoTqZudw9VXMBgtLk5Qjvdxaj+UPLNeiorZ1CVsYvVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gxQrFT+b; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1710334415; c=relaxed/simple;
+	bh=YMw6FXUUv+blIKXVMARtF/BZiC35J4VjJ2wII6LwQ1Q=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=n0Y+95Jh2N8iRiip8qhNsWvecF4z1vu9Rld+mWK73WWBV+8x6t8hWaWfi3of28HP+9OFZfHEfJHL2K+UNLokpWh/eP2XdNf4XpVf6UN7jeqfg0Mm/Rj2X9evV399vghJvRgzY14VK3lvhOvKiQeS5j+SzWddn7sYDFjSgSsxmEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=xR3PO07V; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gxQrFT+b"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710326627; x=1741862627;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gEppbyG4qtw7JZw3iiLeNi9lT7CPEASQXeZKWF8MCfI=;
-  b=gxQrFT+bjd9EoLbrICbx1BT8U3g3Ux22UimOLgxCAFeRNNK82OmKUg/h
-   XF7Uc+LzxtGWXMbJ8tcbef6l8ug1rbG5+kJGybfXi/Kfzp7M4uxx5v1zH
-   46yMuqqXyDwtv/kwc5BpAQ+kBBU0EVDPt1KEcC0/XPAbgmdhK8Nbd1DRs
-   xPrWdgVFy6q6dbo4uQiM4fj0qfDu/NlHEqs9HdBXOqpZFPIRSjIFplfNZ
-   28lgVjFGkIAC5iDzi6uQBFsPLZX94DyNUTRxS4oabhVE/v6dUD8KuXr7T
-   PWTn96rW+vrQx2Esjy9j1bjWRToyyEaoy23341ddCH+Y3J9cKVZ9TdYak
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="5252035"
-X-IronPort-AV: E=Sophos;i="6.07,122,1708416000"; 
-   d="scan'208";a="5252035"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2024 03:43:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,122,1708416000"; 
-   d="scan'208";a="16452335"
-Received: from lkp-server01.sh.intel.com (HELO b21307750695) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 13 Mar 2024 03:43:45 -0700
-Received: from kbuild by b21307750695 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rkM5G-000CHf-2Z;
-	Wed, 13 Mar 2024 10:43:42 +0000
-Date: Wed, 13 Mar 2024 18:43:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
-	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Ruud.Derwig@synopsys.com,
-	manjunath.hadli@vayavyalabs.com,
-	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-Subject: Re: [PATCH 4/4] Enable Driver compilation in crypto Kconfig and
- Makefile file
-Message-ID: <202403131810.zpesoKjk-lkp@intel.com>
-References: <20240305112831.3380896-5-pavitrakumarm@vayavyalabs.com>
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="xR3PO07V"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5686677bda1so1569535a12.0
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Mar 2024 05:53:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fairphone.com; s=fair; t=1710334411; x=1710939211; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=V8ViWIka8v0fvl6fi9rfxOWkjF5zhtO+EwXsSRYTTAY=;
+        b=xR3PO07VvOpLlimM9PTTDU7rpOilBc8WtFa9zUgljEfKdKCREtGrDKzeR8Hr/AcY+k
+         6ap/ULQofv4LclBv5x0KyOIs5xwlg4bz7+6ES7i2D6Qpkb4N/ik2R/12Bea9A1onc1MG
+         YmNXf8+mxrrHL8o69rg+U+8HEk+anazBwrupS58jM7jwkaIeQRaZ0q8nTZlnhOvd0lDR
+         0aOP+1aT0v+v4OyD6d4Rr2K+1fFfn+Zqv1U8+SXR6HNf8jEg+HA/H3juxojlGFg290sU
+         HBuygBjlPa+ygtVEUnQSxtZGLUwWaAfvZNkhqAPaEhOksivOKrWX1tdgDopecT1tvatR
+         NvXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710334411; x=1710939211;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V8ViWIka8v0fvl6fi9rfxOWkjF5zhtO+EwXsSRYTTAY=;
+        b=gPintzFzSBN92Go4Ev0kZAykHytdCxFybsqcHwcKNMQIhgcKzRx/dUkfJ0Z+NlR1Ke
+         T+NFb2QIIe2bgc0aj7zsrcrXCWIG+d47sbNc268AXtKm37whiqF/LX1dvxqKsdY1BWg3
+         8AfUcS769aACfXawbFaiR/I9v4WOdzICM8K6fi6CWDm5us3ed1SDkwYE1QT+AcTzvyKj
+         vR4lnHwPHnBpfqNpv4ac3oFKrW9s/ZSqkHvZNjON5izWVcaZeBdDmHznycWeiW7N6BXu
+         Pw+f2AlhZgdEjcSsb18hV4ODW/cXPTZ2D7TjO0i6ojE6WIEYgQrSIF/BYrvWUEorTgtp
+         7OXA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFF3FAKIduXRecwnxzcUTbfDeHWRjVqmYXv3qWzDlnyOZuJKP/8FNKcEg+ZF4h9P5yafOpuSKyMuNAioR8aJuOQdjqcnypPYTbBw7h
+X-Gm-Message-State: AOJu0YxUcbayY77LgSWb8pCkjqO/pNWsRYaHDf10z/CeuBwASiyzIy0t
+	aMfQxa/nQ8XTJ1vMlNvUmDAiwK33LGmweTmj22jbN93zieTODNs2ChglCZehir4=
+X-Google-Smtp-Source: AGHT+IEARlJFryEqeY6MQ0xjILbFvD8WfbU2PPjwCmUkH81u0Z36qkT5RKRMbiaOFmE/vvt1bS6N5A==
+X-Received: by 2002:a17:907:cb87:b0:a46:13d3:e5e6 with SMTP id un7-20020a170907cb8700b00a4613d3e5e6mr2421588ejc.0.1710334411048;
+        Wed, 13 Mar 2024 05:53:31 -0700 (PDT)
+Received: from otso.luca.vpn.lucaweiss.eu (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id jw22-20020a170906e95600b00a4623030893sm3249098ejb.126.2024.03.13.05.53.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Mar 2024 05:53:30 -0700 (PDT)
+From: Luca Weiss <luca.weiss@fairphone.com>
+Subject: [PATCH 0/2] Add Inline Crypto Engine for SC7280 UFS
+Date: Wed, 13 Mar 2024 13:53:13 +0100
+Message-Id: <20240313-sc7280-ice-v1-0-3fa089fb7a27@fairphone.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240305112831.3380896-5-pavitrakumarm@vayavyalabs.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALmh8WUC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI2NDIwML3eJkcyMLA93M5FTdRFNTAzMjs6S0ZANLJaCGgqLUtMwKsGHRsbW
+ 1AFIEwhpcAAAA
+To: Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konrad.dybcio@linaro.org>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, cros-qcom-dts-watchers@chromium.org
+Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Luca Weiss <luca.weiss@fairphone.com>
+X-Mailer: b4 0.13.0
 
-Hi Pavitrakumar,
+Add the required bits to support Inline Crypto Engine on SC7280 SoC with
+UFS.
 
-kernel test robot noticed the following build errors:
+Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+---
+Luca Weiss (2):
+      dt-bindings: crypto: ice: Document sc7280 inline crypto engine
+      arm64: dts: qcom: sc7280: Add inline crypto engine
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master linus/master v6.8 next-20240313]
-[cannot apply to xilinx-xlnx/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+ .../devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml    | 1 +
+ arch/arm64/boot/dts/qcom/sc7280.dtsi                             | 9 +++++++++
+ 2 files changed, 10 insertions(+)
+---
+base-commit: 5f19977109ce685937fee9feea9b807599dfc925
+change-id: 20231208-sc7280-ice-a550626bfc09
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Pavitrakumar-M/Add-SPAcc-driver-to-Linux-kernel/20240305-193337
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20240305112831.3380896-5-pavitrakumarm%40vayavyalabs.com
-patch subject: [PATCH 4/4] Enable Driver compilation in crypto Kconfig and Makefile file
-config: csky-allyesconfig (https://download.01.org/0day-ci/archive/20240313/202403131810.zpesoKjk-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240313/202403131810.zpesoKjk-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202403131810.zpesoKjk-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/crypto/dwc-spacc/spacc_core.c:2835:56: warning: 'reg_names' defined but not used [-Wunused-const-variable=]
-    2835 | static const struct { unsigned int addr; char *name; } reg_names[] = {
-         |                                                        ^~~~~~~~~
-   drivers/crypto/dwc-spacc/spacc_core.c:984:26: warning: 'names' defined but not used [-Wunused-const-variable=]
-     984 | static const char *const names[] = {
-         |                          ^~~~~
-   In file included from <command-line>:
-   In function 'spacc_sg_chain',
-       inlined from 'fixup_sg' at drivers/crypto/dwc-spacc/spacc_core.c:1115:4,
-       inlined from 'spacc_sgs_to_ddt' at drivers/crypto/dwc-spacc/spacc_core.c:1144:16:
->> include/linux/compiler_types.h:435:45: error: call to '__compiletime_assert_252' declared with attribute error: BUILD_BUG_ON failed: IS_ENABLED(CONFIG_DEBUG_SG)
-     435 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |                                             ^
-   include/linux/compiler_types.h:416:25: note: in definition of macro '__compiletime_assert'
-     416 |                         prefix ## suffix();                             \
-         |                         ^~~~~~
-   include/linux/compiler_types.h:435:9: note: in expansion of macro '_compiletime_assert'
-     435 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ^~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-      50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-         |         ^~~~~~~~~~~~~~~~
-   drivers/crypto/dwc-spacc/spacc_core.c:1082:9: note: in expansion of macro 'BUILD_BUG_ON'
-    1082 |         BUILD_BUG_ON(IS_ENABLED(CONFIG_DEBUG_SG));
-         |         ^~~~~~~~~~~~
-   In function 'spacc_sg_chain',
-       inlined from 'fixup_sg' at drivers/crypto/dwc-spacc/spacc_core.c:1115:4,
-       inlined from 'spacc_sg_to_ddt' at drivers/crypto/dwc-spacc/spacc_core.c:1252:15:
->> include/linux/compiler_types.h:435:45: error: call to '__compiletime_assert_252' declared with attribute error: BUILD_BUG_ON failed: IS_ENABLED(CONFIG_DEBUG_SG)
-     435 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |                                             ^
-   include/linux/compiler_types.h:416:25: note: in definition of macro '__compiletime_assert'
-     416 |                         prefix ## suffix();                             \
-         |                         ^~~~~~
-   include/linux/compiler_types.h:435:9: note: in expansion of macro '_compiletime_assert'
-     435 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ^~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-      50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-         |         ^~~~~~~~~~~~~~~~
-   drivers/crypto/dwc-spacc/spacc_core.c:1082:9: note: in expansion of macro 'BUILD_BUG_ON'
-    1082 |         BUILD_BUG_ON(IS_ENABLED(CONFIG_DEBUG_SG));
-         |         ^~~~~~~~~~~~
-
-
-vim +/__compiletime_assert_252 +435 include/linux/compiler_types.h
-
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  421  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  422  #define _compiletime_assert(condition, msg, prefix, suffix) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  423  	__compiletime_assert(condition, msg, prefix, suffix)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  424  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  425  /**
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  426   * compiletime_assert - break build and emit msg if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  427   * @condition: a compile-time constant condition to check
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  428   * @msg:       a message to emit if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  429   *
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  430   * In tradition of POSIX assert, this macro will break the build if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  431   * supplied condition is *false*, emitting the supplied error message if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  432   * compiler has support to do so.
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  433   */
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  434  #define compiletime_assert(condition, msg) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21 @435  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  436  
-
+Best regards,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Luca Weiss <luca.weiss@fairphone.com>
+
