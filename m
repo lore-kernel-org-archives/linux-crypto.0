@@ -1,155 +1,119 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1CF142906
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Mar 2024 20:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8058F61;
+	Wed, 13 Mar 2024 00:57:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710275206; cv=none; b=NP0ERUUG+eSN1d8AGkj74IKjh1ew3Dh7U1T0pkT7zzYnHF7zQLaK9SYRTOausAhnMD9D1EhECctwFqCCJmROgIG5Xify0wt1WRMmIbOAiYYVaLtTLx7uBZe6cv5DgMcM+x8lpqz60FBH3wooFdgDYPNRfKPoxMOV8jajTZR7dik=
+	t=1710291481; cv=none; b=ZyHY7YmPpJaukZeBzMjl6RnFPHVtncl96Fasc5n6P+QrOhaFR7lxBQ9uNpd05tdqXXQM9z6uvh5GkbcQnpE4thEIGc+6UdI+0jYkIh6zzHTosjaUM37aXa0yD/RRA75Qgl9XAz+N31f6aJoIYaTjsaxlBlUP+AicoG/VvM8SLAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710275206; c=relaxed/simple;
-	bh=Yh+LhS5yhRkoUraEclEvC+FapyUA4I8kLPY2KFzzQ6E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZVrvBTY1Pk8FLeM8FYZacUyNZanUJ3oQX9zbCXKDcVCtFDyiKGfwm8XyuQgLYDcxU+1j5Z5KbZvXVTWaEXEKNwWtXq5fGwq5ke6Q1tkGl+xoVQ1G7eK/Pq9E9CoD7GHhRNULlEZxAq4nRqG7ufJaZUPgG9AMp4wOIrgcNx75fFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PuyKhozq; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1710291481; c=relaxed/simple;
+	bh=z8YYzN2gZCm6QRJjFH2HLsqFoMBdgH4m1IlqLZ7rCS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ExaF9k7SBboN2fG2znfW/1wq2WqsBB8+bUGwR9xUJttu22lAP6bGAKYw0DCAiXKC6Yo8uK+aPDUvqoPyd92xdtEjAoIXYhIK+jZSbgu3cGZWZphvtyYDcsdScQCfDGMYxcTCiPgTTEXlc9Tls3NN1TWaCFIllbLia0YmM1pidAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=fdZhuLf6; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PuyKhozq"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcbee93a3e1so7728364276.3
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Mar 2024 13:26:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710275203; x=1710880003; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qkdeVHiZ4dO2mKNOI6prWlI/035w5V9mRcS9wJoax+0=;
-        b=PuyKhozqlfbC+6hjQddM8pdLLVWSOXVaU+Qw5kWbrPZi8VvDIU6rEYnZ0YlPJults/
-         LnKpQhiNDnMV3RY1NbpN4XoQMk9zhOoeb1R2U4BqIYLaiYoxmc7S43aejdEjwf3z43d2
-         5AYQ+IATL+JlW3ZV4UKmKUUYmHegeYGcPbP1I29y8ZpOzpc2JMlFQ4L0dSIpgFKd8OQm
-         AHfasU3Jac1Mnzde8e3VyJ8atIrEg2Rh9pjE9y2VFye0CFBIVtoQ4kitdL3J0XaQsDTg
-         STsvy1rnghf+urEwTL7Qg4kISHFOIYms9zMTzVOn/i8H16Gn0yMGPGJYWx/jrLdeYCNc
-         Pofw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710275203; x=1710880003;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qkdeVHiZ4dO2mKNOI6prWlI/035w5V9mRcS9wJoax+0=;
-        b=H9ayYqBu2sbauJ5vn2I+2kc8X+fblYPLMVtOq0L6LHi5ebEOq6MpAdmpWC84Fxxqur
-         Qgedtggg5qt4U4tqRyf1kXnDmngME+DjTiuNJpe2pfbBeyo5wWJP/sLZMWxmutvRPMWq
-         wchmQmmRA6U3LV0lhzDsxjfBVH1IiaoXA0UKNCmsQbxNm0ppKTurzgFS/Zs3Sh3gclPq
-         UBu01x4CqqNAHpQDkv+P+BSrM9ZrpIhJdo7sunajdITX550BbTVfQcYv9Glmwqx0HYPB
-         4lg+zmYCmzc241tWQl9zMYfcOYHdwFx9Zo1AKU8wk4QPIb+fnDaIRnsXJOB0FVhsOCav
-         5s8w==
-X-Forwarded-Encrypted: i=1; AJvYcCVLzJv+dCaLYZz+3S7fa9gYkM7dMKYx7z+EhT3zvSFRsJ2NSga1T2j6Wil4DUUNTqBgWjiqu/emun6iVd0WPPaj/WbQQmLeBxj4inTO
-X-Gm-Message-State: AOJu0YyDoON3rmIN3aivfegN0Y6/+Ibt1uvKec6Jq5hTLfkf1jHB64pp
-	G18HdW3/eaZ83Hgeep4MsiW0/zHMdSt8uYlmwA83bTyFgejW5heueCjsAd48JuVzHf4KQg0AQFe
-	BEQ==
-X-Google-Smtp-Source: AGHT+IFUmGhOgcd89e4lrqvlrIUFlYT8TKtqW8wVsN51aYrWhEhHnUI06gztJWUkIbtg80Ly0GbAPRIO8Ug=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:114a:b0:dc6:d890:1a97 with SMTP id
- p10-20020a056902114a00b00dc6d8901a97mr59614ybu.9.1710275203718; Tue, 12 Mar
- 2024 13:26:43 -0700 (PDT)
-Date: Tue, 12 Mar 2024 13:26:42 -0700
-In-Reply-To: <20240311172431.zqymfqd4xlpd3pft@amd.com>
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="fdZhuLf6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1710291474;
+	bh=u+UT7fns9W2mUZzIbsCdXkJaDwtFBocLMd9qUaNKNK0=;
+	h=Date:From:To:Cc:Subject:From;
+	b=fdZhuLf6d2QbhreshmuVSnbKlEAc7xQKQeOx+pJh2KPzE7igJosoNf2BdfxJDmCgX
+	 nI5TFgpq5LmGv6O37BzeKi1waEqonZJStYGSIBL9xUgC/foiVtJyledpZ0gE5+V+VR
+	 WQtxVAwxppcqoEHpRZCEfyd6Ejliub7yu4URV5kD18Deq3oDVbXbfbmQSLqc1wklqv
+	 Kez4kVhsmUkSLszOb70Qz1IFqzXzBacEL/aOxWZQ2FZ153qGUqWKrwZeLTNhTk5bel
+	 w142D8gAzHL0KcEc/MRhtEkQut9AqC8lKZRCaFMht0Hu8vetWqfhPPylee4ACMPqSC
+	 n6B0AWm4aP+MQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TvXDd1g6Mz4wx5;
+	Wed, 13 Mar 2024 11:57:52 +1100 (AEDT)
+Date: Wed, 13 Mar 2024 11:57:51 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Andrew Morton
+ <akpm@linux-foundation.org>
+Cc: Eric Biggers <ebiggers@google.com>, Barry Song <v-songbaohua@oppo.com>,
+ Linux Crypto List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the crypto tree
+Message-ID: <20240313115751.36b01158@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231016115028.996656-1-michael.roth@amd.com> <20231016115028.996656-5-michael.roth@amd.com>
- <e7125fcb-52b1-4942-9ae7-c85049e92e5c@arm.com> <ZcY2VRsRd03UQdF7@google.com>
- <84d62953-527d-4837-acf8-315391f4b225@arm.com> <ZcZBCdTA2kBoSeL8@google.com> <20240311172431.zqymfqd4xlpd3pft@amd.com>
-Message-ID: <ZfC6gnqVhZQJnB_3@google.com>
-Subject: Re: [PATCH RFC gmem v1 4/8] KVM: x86: Add gmem hook for invalidating memory
-From: Sean Christopherson <seanjc@google.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, "tabba@google.com" <tabba@google.com>, linux-coco@lists.linux.dev, 
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	pbonzini@redhat.com, isaku.yamahata@intel.com, ackerleytng@google.com, 
-	vbabka@suse.cz, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	jroedel@suse.de, pankaj.gupta@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/pEpBEmTvEMreNxq9yb47kWI";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Mon, Mar 11, 2024, Michael Roth wrote:
-> On Fri, Feb 09, 2024 at 07:13:13AM -0800, Sean Christopherson wrote:
-> > On Fri, Feb 09, 2024, Steven Price wrote:
-> > > >> One option that I've considered is to implement a seperate CCA ioctl to
-> > > >> notify KVM whether the memory should be mapped protected.
-> > > > 
-> > > > That's what KVM_SET_MEMORY_ATTRIBUTES+KVM_MEMORY_ATTRIBUTE_PRIVATE is for, no?
-> > > 
-> > > Sorry, I really didn't explain that well. Yes effectively this is the
-> > > attribute flag, but there's corner cases for destruction of the VM. My
-> > > thought was that if the VMM wanted to tear down part of the protected
-> > > range (without making it shared) then a separate ioctl would be needed
-> > > to notify KVM of the unmap.
-> > 
-> > No new uAPI should be needed, because the only scenario time a benign VMM should
-> > do this is if the guest also knows the memory is being removed, in which case
-> > PUNCH_HOLE will suffice.
-> > 
-> > > >> This 'solves' the problem nicely except for the case where the VMM
-> > > >> deliberately punches holes in memory which the guest is using.
-> > > > 
-> > > > I don't see what problem there is to solve in this case.  PUNCH_HOLE is destructive,
-> > > > so don't do that.
-> > > 
-> > > A well behaving VMM wouldn't PUNCH_HOLE when the guest is using it, but
-> > > my concern here is a VMM which is trying to break the host. In this case
-> > > either the PUNCH_HOLE needs to fail, or we actually need to recover the
-> > > memory from the guest (effectively killing the guest in the process).
-> > 
-> > The latter.  IIRC, we talked about this exact case somewhere in the hour-long
-> > rambling discussion on guest_memfd at PUCK[1].  And we've definitely discussed
-> > this multiple times on-list, though I don't know that there is a single thread
-> > that captures the entire plan.
-> > 
-> > The TL;DR is that gmem will invoke an arch hook for every "struct kvm_gmem"
-> > instance that's attached to a given guest_memfd inode when a page is being fully
-> > removed, i.e. when a page is being freed back to the normal memory pool.  Something
-> > like this proposed SNP patch[2].
-> > 
-> > Mike, do have WIP patches you can share?
-> 
-> Sorry, I missed this query earlier. I'm a bit confused though, I thought
-> the kvm_arch_gmem_invalidate() hook provided in this patch was what we
-> ended up agreeing on during the PUCK call in question.
+--Sig_/pEpBEmTvEMreNxq9yb47kWI
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Heh, I trust your memory of things far more than I trust mine.  I'm just proving
-Cunningham's Law.  :-)
+Hi all,
 
-> There was an open question about what to do if a use-case came along
-> where we needed to pass additional parameters to
-> kvm_arch_gmem_invalidate() other than just the start/end PFN range for
-> the pages being freed, but we'd determined that SNP and TDX did not
-> currently need this, so I didn't have any changes planned in this
-> regard.
-> 
-> If we now have such a need, what we had proposed was to modify
-> __filemap_remove_folio()/page_cache_delete() to defer setting
-> folio->mapping to NULL so that we could still access it in
-> kvm_gmem_free_folio() so that we can still access mapping->i_private_list
-> to get the list of gmem/KVM instances and pass them on via
-> kvm_arch_gmem_invalidate().
+After merging the crypto tree, today's linux-next build (powerpc
+ppc64_defconfig) failed like this:
 
-Yeah, this is what I was remembering.  I obviously forgot that we didn't have a
-need to iterate over all bindings at this time.
+In file included from mm/zswap.c:30:
+include/crypto/acompress.h: In function 'acomp_is_async':
+include/crypto/acompress.h:124:16: error: implicit declaration of function =
+'crypto_comp_alg_common'; did you mean 'crypto_tfm_alg_name'? [-Werror=3Dim=
+plicit-function-declaration]
+  124 |         return crypto_comp_alg_common(tfm)->base.cra_flags &
+      |                ^~~~~~~~~~~~~~~~~~~~~~
+      |                crypto_tfm_alg_name
+include/crypto/acompress.h:124:43: error: invalid type argument of '->' (ha=
+ve 'int')
+  124 |         return crypto_comp_alg_common(tfm)->base.cra_flags &
+      |                                           ^~
+include/crypto/acompress.h:126:1: error: control reaches end of non-void fu=
+nction [-Werror=3Dreturn-type]
+  126 | }
+      | ^
+cc1: some warnings being treated as errors
 
-> So that's doable, but it's not clear from this discussion that that's
-> needed.
+Caused by commit
 
-Same here.  And even if it is needed, it's not your problem to solve.  The above
-blurb about needing to preserve folio->mapping being free_folio() is sufficient
-to get the ARM code moving in the right direction.
+  86464db929ca ("crypto: introduce: acomp_is_async to expose if comp driver=
+s might sleep")
 
-Thanks!
+from the mm-unstable branch of the mm tree interacting with commit
 
-> If the idea to block/kill the guest if VMM tries to hole-punch,
-> and ARM CCA already has plans to wire up the shared/private flags in
-> kvm_unmap_gfn_range(), wouldn't that have all the information needed to
-> kill that guest? At that point, kvm_gmem_free_folio() can handle
-> additional per-page cleanup (with additional gmem/KVM info plumbed in
-> if necessary).
+  2beb81fbf0c0 ("crypto: remove CONFIG_CRYPTO_STATS")
+
+from the crypto tree.
+
+I have reverted these commits from the mm-unstable branch for today:
+
+  86464db929ca ("crypto: introduce: acomp_is_async to expose if comp driver=
+s might sleep")
+  791f798331bc ("mm/zswap: remove the memcpy if acomp is not sleepable")
+
+I will stop merging the -unstable parts of the mm tree from tomorrow.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/pEpBEmTvEMreNxq9yb47kWI
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmXw+g8ACgkQAVBC80lX
+0GwN1gf/Z9bhPozr10QDiOQn/NmWbZAocaJhHllkJWsK3mjoWahO4JnFhpfwqmo0
+hVfizUv2KIB8cwXtNoNrJD5LwjeCRw+GjVtNqARxm89DRuj3M6XGnFal0wXj1hqu
+UWGNJZHWwUchnaVr+/pEiU5FPkb2wGps236A9YIvl8Fsw45LTNr1pDs7XLOx8MhU
+1xusarOJfkM/Xv2kEM8sZTC5xJ6/9HuCh5PuwRW//Hyl3RZSiRgisBfJmAmrp8Oj
+3tt+AnD+7SsHlQPak8SjIZci6zrGu2dusH0bzsEC01RHJfQ7XTEzPOHlhv5y1ygc
+Io4bc7vs1fJPcTFdaZPMenqe8zpxpA==
+=0+3t
+-----END PGP SIGNATURE-----
+
+--Sig_/pEpBEmTvEMreNxq9yb47kWI--
