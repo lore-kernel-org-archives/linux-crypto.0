@@ -1,81 +1,118 @@
-Received: from smtp1.ms.mff.cuni.cz (smtp-in1.ms.mff.cuni.cz [195.113.20.234])
+Received: from esa8.hc1455-7.c3s2.iphmx.com (esa8.hc1455-7.c3s2.iphmx.com [139.138.61.253])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58879433A0
-	for <linux-crypto@vger.kernel.org>; Thu, 14 Mar 2024 08:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.113.20.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCE36BFBA;
+	Thu, 14 Mar 2024 08:47:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.253
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710403849; cv=none; b=Kosq6GmIj6pZyo3UGmbMtAfUMxq3tZbzPGQl4ZYA1m2X7z5B+QU9qI0WSknOXeZ74WK81RCY5vCSzBK4MABtCSZjPd3u3lbe0E4xXE4JijW1VN75nBMOZX9kzWcUD45KXFQTCCNeLc5ypvNyz3Sn89wGVyl7gTjnmLSSVg6ckYQ=
+	t=1710406046; cv=none; b=rROxpfQoM/XF0HGQKOR9k8jufvXk/h7sIKMMuBq63jg9E9rSyRFhJ3TFPM65IFW1Xj5SbplYt0lRXKcqRh0G+x7E06KTV6T4fZBMl6MEaeXu+/IfM6q9CZWY64R7Vqd1kE41PZyGZL9q4LZWQ3Qb+9VdCsD+i0DTk0x5kUB+pdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710403849; c=relaxed/simple;
-	bh=49yIHFFM4D8uhYFoMXrapMVE1Go2KxtcaF5olJvsteM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Cc:Subject:
-	 References:In-Reply-To; b=sCEKSN+ZGKqRFi6YrX/vUY+Ma5QW0m0Jw0jakdtpacHVYm1VofjIutgvEZIbQQ8NQGaumf5Voxld7jqq4QuW94lMzamRF1/9MCT8Rh1RHKWPJC+MNDBAz1tTVNBzEM0/KLHXL1qyJ2zNz83YX4KDwVZlCv6xo1bmwfd75ijy034=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=matfyz.cz; spf=pass smtp.mailfrom=matfyz.cz; arc=none smtp.client-ip=195.113.20.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=matfyz.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=matfyz.cz
-X-SubmittedBy: id balejk@matfyz.cz subject /postalCode=110+2000/O=Univerzita+20Karlova/street=Ovocn+5CxC3+5CxBD+20trh+20560/5/ST=Praha,+20Hlavn+5CxC3+5CxAD+20m+5CxC4+5Cx9Bsto/C=CZ/CN=Karel+20Balej/emailAddress=balejk@matfyz.cz
-	serial F5FD910E8FE2121B897F7E55B84E351D
-	issued by /C=NL/O=GEANT+20Vereniging/CN=GEANT+20Personal+20CA+204
-	auth type TLS.CUNI
-Received: from localhost (koleje-wifi-0013.koleje.cuni.cz [78.128.191.13])
-	(authenticated)
-	by smtp1.ms.mff.cuni.cz (8.16.1/8.16.1) with ESMTPS id 42E8AbKT011126
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Thu, 14 Mar 2024 09:10:39 +0100 (CET)
-	(envelope-from balejk@matfyz.cz)
+	s=arc-20240116; t=1710406046; c=relaxed/simple;
+	bh=gGWn3mJJ9//foGhzo+3DZQDoFfejY38eJYOl4hXpaPE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FoJx+pT/293VUXzIdW32IcHv9QGg7LxaG6cipw3ZFX1NirzpLvMrnAg9syrWgh4QEkZdzlBGbbZ0ctjBPJU/UiCwv+JVpZ0DwpG0pRMyEHu9ed7c8vOR1KJGWX/phYqvXYsQ+fzY/R+1Ci+5ddH32FlI7bIPzDcOW53kWEM9n60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=d8evgziB; arc=none smtp.client-ip=139.138.61.253
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="d8evgziB"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1710406042; x=1741942042;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gGWn3mJJ9//foGhzo+3DZQDoFfejY38eJYOl4hXpaPE=;
+  b=d8evgziBxRREljQ54t0SlhKgIbHDZEKNvcIsY2isxqG88CbQekfHLeVD
+   1juIF9hz84szkoTDJJxNMv0SNyVl+dgkGZGFrnWUAaNDFKj0kAD2hmL3O
+   T/x3bbtXefTCxyDEMtgEaA3jkuFpgQIwv8fGS1VyQ47K2ociMLAndc0U5
+   9qfUtYJGV54SgMqvKQSOJFUtrG47uPs1DWxfVIeyHAXxWkQJ5q8sqes8A
+   VdJ3h71pRCv9cCMk2tRBTLkauoVkaBxWOUIN9pC8rut4mUETMuqFQSuOS
+   I9bvHBtmUJT9ORapRUHj99Hgacly4l6aMuK5HZxg9colHJmynXozMMTOu
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11012"; a="140239806"
+X-IronPort-AV: E=Sophos;i="6.07,124,1708354800"; 
+   d="scan'208";a="140239806"
+Received: from unknown (HELO oym-r2.gw.nic.fujitsu.com) ([210.162.30.90])
+  by esa8.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 17:46:10 +0900
+Received: from oym-m1.gw.nic.fujitsu.com (oym-nat-oym-m1.gw.nic.fujitsu.com [192.168.87.58])
+	by oym-r2.gw.nic.fujitsu.com (Postfix) with ESMTP id A5526F0FC5;
+	Thu, 14 Mar 2024 17:46:08 +0900 (JST)
+Received: from kws-ab4.gw.nic.fujitsu.com (kws-ab4.gw.nic.fujitsu.com [192.51.206.22])
+	by oym-m1.gw.nic.fujitsu.com (Postfix) with ESMTP id CA48BC520E;
+	Thu, 14 Mar 2024 17:46:07 +0900 (JST)
+Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
+	by kws-ab4.gw.nic.fujitsu.com (Postfix) with ESMTP id 230566895D;
+	Thu, 14 Mar 2024 17:46:07 +0900 (JST)
+Received: from localhost.localdomain (unknown [10.167.226.45])
+	by edo.cn.fujitsu.com (Postfix) with ESMTP id 890DF1A006B;
+	Thu, 14 Mar 2024 16:46:06 +0800 (CST)
+From: Li Zhijian <lizhijian@fujitsu.com>
+To: linux-kernel@vger.kernel.org
+Cc: Li Zhijian <lizhijian@fujitsu.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH] hwrng: core: Convert sprintf/snprintf to sysfs_emit
+Date: Thu, 14 Mar 2024 16:45:59 +0800
+Message-Id: <20240314084559.1321951-1-lizhijian@fujitsu.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 14 Mar 2024 09:11:08 +0100
-Message-Id: <CZTBKHQZXJTR.3VMFEA8MZSP5W@matfyz.cz>
-To: "Eric Biggers" <ebiggers@kernel.org>
-From: "Karel Balej" <balejk@matfyz.cz>
-Cc: <keyrings@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-        <iwd@lists.linux.dev>, "James Prestwood" <prestwoj@gmail.com>,
-        "Dimitri
- John Ledkov" <dimitri.ledkov@canonical.com>,
-        <linux-crypto@vger.kernel.org>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Revert "crypto: pkcs7 - remove sha1 support"
-References: <20240313233227.56391-1-ebiggers@kernel.org>
-In-Reply-To: <20240313233227.56391-1-ebiggers@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28250.006
+X-TM-AS-User-Approved-Sender: Yes
+X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28250.006
+X-TMASE-Result: 10--5.801500-10.000000
+X-TMASE-MatchedRID: ebEStOsB1eE4ibokZ3+Q0CoiRKlBVkYIBXngI6jFvpfDqO6/8R69QE8U
+	roFNOGp7a6aAZTOwtJmRloiW1Kgftd2ZdKe8BPbSleLXPzO3VNH0swHSFcVJ6C99T+uJIleRfDo
+	fTpsyCK+KztDhRgoFQW4suX2uLJTkj56IjTnLR+lO5y1KmK5bJRSLgSFq3Tnj31GU/N5W5BD+y9
+	1WXLvD2XP+9mhbDjvthKK/bK+QypCR9GF2J2xqMxRFJJyf5BJeZVXUb4KTaXv6C0ePs7A07cNbT
+	FVOzjU8Qwlgq3zGvE/GtGPM+O9THGFiNemrkjMpfRLemXXHCzw=
+X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
 
-Eric,
+Per filesystems/sysfs.rst, show() should only use sysfs_emit()
+or sysfs_emit_at() when formatting the value to be returned to user space.
 
-Eric Biggers, 2024-03-13T16:32:27-07:00:
-> From: Eric Biggers <ebiggers@google.com>
->
-> This reverts commit 16ab7cb5825fc3425c16ad2c6e53d827f382d7c6 because it
-> broke iwd.  iwd uses the KEYCTL_PKEY_* UAPIs via its dependency libell,
-> and apparently it is relying on SHA-1 signature support.  These UAPIs
-> are fairly obscure, and their documentation does not mention which
-> algorithms they support.  iwd really should be using a properly
-> supported userspace crypto library instead.  Regardless, since something
-> broke we have to revert the change.
->
-> It may be possible that some parts of this commit can be reinstated
-> without breaking iwd (e.g. probably the removal of MODULE_SIG_SHA1), but
-> for now this just does a full revert to get things working again.
->
-> Reported-by: Karel Balej <balejk@matfyz.cz>
-> Closes: https://lore.kernel.org/r/CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz
-> Cc: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+coccinelle complains that there are still a couple of functions that use
+snprintf(). Convert them to sysfs_emit().
 
-thank you very much for the revert. I have compiled 6.8 with this patch
-and attest that it solves my eduroam connection issue.
+sprintf() will be converted as weel if they have.
 
-Tested-by: Karel Balej <balejk@matfyz.cz>
+Generally, this patch is generated by
+make coccicheck M=<path/to/file> MODE=patch \
+COCCI=scripts/coccinelle/api/device_attr_show.cocci
 
-May I please ask, though, why you did not Cc stable (and add a Fixes
-trailer for that matter)? It seems like something that would be nice to
-see fixed in 6.7.y and 6.8.y too as soon as possible.
+No functional change intended
 
-Kind regards,
-K. B.
+CC: Olivia Mackall <olivia@selenic.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>
+CC: linux-crypto@vger.kernel.org
+Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
+---
+This is a part of the work "Fix coccicheck device_attr_show warnings"[1]
+Split them per subsystem so that the maintainer can review it easily
+[1] https://lore.kernel.org/lkml/20240116041129.3937800-1-lizhijian@fujitsu.com/
+---
+ drivers/char/hw_random/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index a3bbdd6e60fc..f5c71a617a99 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -382,7 +382,7 @@ static ssize_t rng_current_show(struct device *dev,
+ 	if (IS_ERR(rng))
+ 		return PTR_ERR(rng);
+ 
+-	ret = snprintf(buf, PAGE_SIZE, "%s\n", rng ? rng->name : "none");
++	ret = sysfs_emit(buf, "%s\n", rng ? rng->name : "none");
+ 	put_rng(rng);
+ 
+ 	return ret;
+-- 
+2.29.2
+
