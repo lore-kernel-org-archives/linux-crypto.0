@@ -1,115 +1,91 @@
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A577650A60
-	for <linux-crypto@vger.kernel.org>; Fri, 15 Mar 2024 17:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFE912B82
+	for <linux-crypto@vger.kernel.org>; Fri, 15 Mar 2024 21:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710525342; cv=none; b=DIt7Pt0MInybuhzeEH0WNva+bYjzXTO5t351zh38SmtLYFPEmPmQQobRnxly7hHNg1nXapLqX6SKpmLpiuTEXfuY8nlPR0Z4YRptHiGkOUEDPHj89tIqzDthaAYiZRuQvML0nFQg3elj6yPdXHSkFVGmYHcJgxbqD+VKotUYgd0=
+	t=1710539530; cv=none; b=IwqxVzJagnyc8ytt2Wg9nUDRYvmxF4HD+4qMBxcPvWZfUdgB8N8Pa2b4LrK1TyxuM4fHNpqFOpHdzkx+J4tUnJPao6g6viWwrAbsauKZLo+aAPdul0PHsb7WKiCmAHkdZo6fLOpEm7mnDBFms1zu7fgZJSivYnJa1wWhRZjE5EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710525342; c=relaxed/simple;
-	bh=LGt8WK/1hB86Nlqgbkb4iVLi6lNryc9HuXvBLw4wgBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U00rAWozB1r7+ZRmhl/EtK1SX84kPfTqE7k05hEEPZF18JBf67jRI2KeywE2Cek1d3N1DeZMKrmU2MxCSfNQJq61Bhy1Q7sbAme1OhU7N5RQ3O2tELNyzgVC5rQgHNFDdYYEbYAqKvA09kVRxvmPF0S7yzcqNh06iE8JeVxI2SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=il/XMT7D; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1710539530; c=relaxed/simple;
+	bh=IyIpIH288LBLHuUuNbtFcXDqgJgXrcBCDbQP3frm8Wo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KXbiOtK1mQFvgwks70lkiaZ7QO7aTQQl5IGN1PvaIsMYse7fAaB55SLA34cwES123mSzNx2tuWZ7vL5V82uuMWzDsA/qSw30mUnbBSkusnDx1FK6M7foFvR4sjBzX8x96cFGK+zFYgiKWOkGBYpKNRZ2eW10i7p0LB3KC+n+EQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=VMVFqIX5; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="il/XMT7D"
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dc6d8bd612dso2228983276.1
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Mar 2024 10:55:39 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="VMVFqIX5"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a466f796fc1so308195966b.3
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Mar 2024 14:52:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1710525338; x=1711130138; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vJ9xZeTvmbYgKVwvBBdEbKjvWmRS5XdcC5rxmLmvB6g=;
-        b=il/XMT7DvG7VHlrNe1BaRJZYwS1R42OGOl0kz+erO8m4fpAsdWoOG6e+jPJkSk/vnE
-         y5AMf3vkgSJW56LxtHgvf+7sKbiE2KoTrt5IWwvwFJjIkYQl87VrIPHaYlSK3bOeJ4cI
-         DTHsxdGtED4RAzaMr/z0MJnDLC9Z2D+MEq596hjmvUHg7tbkPpThdhYeyQpWWxsczJvX
-         vRKFdEbBPc/i3TFDGuX7I4g0/hDFL593fob7aMialKvmUibQmhxh3RzhROdkpyK5VIni
-         L9YoiVe3e7j1pmQuzUmqPEcqc3YtL9Q8tgXgs7Kh2PnlSc5AQqKxzxXVkkDfoX1f3kGM
-         mCnA==
+        d=linux-foundation.org; s=google; t=1710539525; x=1711144325; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mTlz3zPOeF7VRKW7iDziXL9MnFItMolhxGcmkvxBX3k=;
+        b=VMVFqIX5ZDR+2tOoMCYzsx0dn2fQhH5+58WSp+xRyFiaFVJCVm7Pxtf9qy0Jh8ZYt2
+         xAFsmIFLEy6q4O6SdvSfz67fgdLPsH+zxFid0KBNJWOC6ftZ7qEJAuCScUZHHoDWGQ4J
+         jcXBFN7mqQJzm9eMQRBMFbBMk3nsrJkfG2fKc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710525338; x=1711130138;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vJ9xZeTvmbYgKVwvBBdEbKjvWmRS5XdcC5rxmLmvB6g=;
-        b=mmWSxG/nD3ajfck5WzMtZPkkFxGenNan/AjcOn36vyrnFjFFXAEbLnQZCKdBUg+/tX
-         kcvELCr49AU6NnFUWSLAhfPC0U+sM2PwqHNN7Z1TZegLsM/oSdWqd1mgQTJ8gzwa6V9R
-         cCwrk6PMPXQNej8cq8fzEjwKk2R+U2/7CuuJOAJuZQuhI9kijtI0TmhbwHCzPcoQe3BX
-         kLJbAqm/W3yb0mWysz1PTTcDmzSzcgk4/fnz8YOpNc12RglYqWacdIQHIfa40zU52+gn
-         ncTTBFQbtngeLhB5JOkgSMxaR/U7RzRGxQaPaGanUVAxOYFytt8HaAp6C3eyyaIvJ21I
-         idEQ==
-X-Gm-Message-State: AOJu0YxoXf+IwVlvIdQRg9yBwK9dYJb80HNt4FG2pHdOCBSsDMj8yo9W
-	ATgiXhVrlKCfMYurROiCjlvaiu7OTJs3ThbYL9/QiT/NZP4vx9GcAd+RoifTk+YI2gwedv/Jg9k
-	x
-X-Google-Smtp-Source: AGHT+IE5kr3EfmKvWeo/HTCiCav1ad4ePMl8DcEQtX93jnr9ryzM3scbfrTIz2Kec/6bwW9kFSgRKA==
-X-Received: by 2002:a25:b119:0:b0:dd0:6f7:bc3b with SMTP id g25-20020a25b119000000b00dd006f7bc3bmr3280728ybj.10.1710525338551;
-        Fri, 15 Mar 2024 10:55:38 -0700 (PDT)
-Received: from localhost ([184.147.116.200])
-        by smtp.gmail.com with ESMTPSA id d6-20020ac86686000000b004308bdcfc2csm2187661qtp.6.2024.03.15.10.55.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Mar 2024 10:55:38 -0700 (PDT)
-Date: Fri, 15 Mar 2024 13:55:29 -0400
-From: Ralph Siemsen <ralph.siemsen@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] crypto: af_alg - Disallow multiple in-flight AIO requests
-Message-ID: <20240315175529.GA268782@maple.netwinder.org>
-References: <ZWWkDZRR33ypncn7@gondor.apana.org.au>
+        d=1e100.net; s=20230601; t=1710539525; x=1711144325;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mTlz3zPOeF7VRKW7iDziXL9MnFItMolhxGcmkvxBX3k=;
+        b=aygRpAXsycIKqIQ+UpPJQ5eCoB0wWUSEYuSQxYR5Qr5TdSkj/KkOo9KCVO92PVmhdF
+         5Ic5mhyGDRO3Sq2xLr63Cl3Ips5d8cdvRJP5nhEPmyXZi8z2DhZFOaLSgdklM2I3CKW9
+         vXgUQsOntNMnnnONHVTTkpwG/q4vdvQycZxQj460Cj3uXhu5Yt1fnT/jyE3+4Xp6TRqj
+         SJA3oSttW5Wf2t6JItJf/MH+omKA9IpZ+WmI1c5RAT0oTGFvHiKeM9DT3qGqhLixSF4d
+         efVrJEIbGo3QMGoMagizb506YAWv/UKtc+hmtOG+1EqqgWqEl/4iAK9ezZbEy7eFm8k/
+         +jGw==
+X-Forwarded-Encrypted: i=1; AJvYcCV0/pfLV6Zw2IF/0NYeWkr4cQrWJsjvGSLAcoJ9XR9kd+1vWCSy7ZL2ZLwkQxt3BWhJV/AUzdimdXjnv4DN7ELLEJqzyo1Xuqzktb4o
+X-Gm-Message-State: AOJu0YyzfGxMWjC5Z67QUGn5n4kYnUmrp3EJlIvtGYs9dkpKDcLs4J60
+	K5mFAgNjIVD0CW3J1tpzz4F9jdtxYvbCIC0ZgYnJOIMHZs9V7uk5tNbevF3T2vd+gorhnwhA/+A
+	Rm7DCFA==
+X-Google-Smtp-Source: AGHT+IGZC5Lj5R1Tm/7xgoWggpid1t0/7VQ6HX2diFKnXcapNeLr6RfMhVfBIYF3lkvWpFjVsadb1Q==
+X-Received: by 2002:a17:906:3b10:b0:a46:9f04:5073 with SMTP id g16-20020a1709063b1000b00a469f045073mr371515ejf.9.1710539524954;
+        Fri, 15 Mar 2024 14:52:04 -0700 (PDT)
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com. [209.85.218.50])
+        by smtp.gmail.com with ESMTPSA id x23-20020a170906711700b00a43815bf5edsm2056524ejj.133.2024.03.15.14.52.03
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Mar 2024 14:52:04 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a466f796fc1so308194466b.3
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Mar 2024 14:52:03 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWUZnhPoVNVOmYmHuuoVdDs7iCF5LRM3WoirkUNu/mIUw3V7EF13fCihxIvCmZg7CCF77lVPPtnEc3XgNVPPukVpbvHlHa0x7X5IFqZ
+X-Received: by 2002:a17:906:d104:b0:a45:7946:8782 with SMTP id
+ b4-20020a170906d10400b00a4579468782mr4083903ejz.1.1710539523611; Fri, 15 Mar
+ 2024 14:52:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <ZWWkDZRR33ypncn7@gondor.apana.org.au>
+References: <YpC1/rWeVgMoA5X1@gondor.apana.org.au> <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+ <Yzv0wXi4Uu2WND37@gondor.apana.org.au> <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+ <Y/MDmL02XYfSz8XX@gondor.apana.org.au> <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au> <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+ <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au> <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au> <ZfO6zKtvp2jSO4vF@gondor.apana.org.au>
+In-Reply-To: <ZfO6zKtvp2jSO4vF@gondor.apana.org.au>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 15 Mar 2024 14:51:47 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wirkYjV=-R0bdtSTLXSAf=SkcsXKCsQeKd0eSbue1AoDA@mail.gmail.com>
+Message-ID: <CAHk-=wirkYjV=-R0bdtSTLXSAf=SkcsXKCsQeKd0eSbue1AoDA@mail.gmail.com>
+Subject: Re: [GIT PULL] Crypto Update for 6.9
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Herbert,
-
-I have found a regression in userspace behaviour after this patch was 
-merged into the 4.19.y kernel. The fix seems to involve backporting a 
-few more changes. Could you review details below and confirm if this is 
-the right approach?
-
-On Tue, Nov 28, 2023 at 04:25:49PM +0800, Herbert Xu wrote:
->Having multiple in-flight AIO requests results in unpredictable
->output because they all share the same IV.  Fix this by only allowing
->one request at a time.
+On Thu, 14 Mar 2024 at 20:04, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
->Fixes: 83094e5e9e49 ("crypto: af_alg - add async support to algif_aead")
->Fixes: a596999b7ddf ("crypto: algif - change algif_skcipher to be asynchronous")
->Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->---
-> crypto/af_alg.c         | 14 +++++++++++++-
-> include/crypto/if_alg.h |  3 +++
-> 2 files changed, 16 insertions(+), 1 deletion(-)
+> Drivers:
+>
+> - Add queue stop/query debugfs support in hisilicon/qm.
 
-This change got backported on the 4.19 kernel in January:
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=linux-4.19.y&id=19af0310c8767c993f2a5d5261e4df3f9f465ce1
+There's a lot more than that in there. Fairl ybig Intel qat updates
+from what I can see, for example.
 
-Since then, I am seeing a regression in a simple openssl encoding test:
-
-openssl enc -k mysecret -aes-256-cbc -in plain.txt -out cipher.txt -engine afalg
-
-It fails intermittently with the message "error writing to file", but 
-this error is a bit misleading, the actual problem is that the kernel 
-returns -16 (EBUSY) on the encoding operation.
-
-This happens only in 4.19, and not under 5.10. The patch seems correct, 
-however it seems we are missing a couple of other patches on 4.19:
-
-f3c802a1f3001 crypto: algif_aead - Only wake up when ctx->more is zero
-21dfbcd1f5cbf crypto: algif_aead - fix uninitialized ctx->init
-
-I was able to cherry-pick those into 4.19.y, with just a minor conflict 
-in one case. With those applied, the openssl command no longer fails.
-
-I suspect similar changes would be needed also in 5.4 kernel, however I 
-neither checked that, nor have I run any tests on that version.
-
-Regards,
--Ralph
+           Linus
