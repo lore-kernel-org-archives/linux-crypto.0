@@ -1,72 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 971D811CBD;
-	Fri, 15 Mar 2024 21:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843117F6;
+	Sat, 16 Mar 2024 00:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710539940; cv=none; b=LP5He3O7sgNSwqtTbykGulbvcWr63GNrYc9lQEpnMiJlupnjXVWfEw9JODIPWfpmwfV5wRaR90AT8cOB9HUlI8nYYjFgua4hyUp585r7jff1cfPtQM28bmnNAdTgMxEzAdseIrtwjBRfud9zcz7ni+UlLNtejbIAeAlUR7E+5Xs=
+	t=1710548789; cv=none; b=a3MvwrX2l4YmSg8kIPxTscrhW8fSPX3yoaLKamfr0hTVn7R9ECl/D6PAufEyc+0CcPPQ5SK+5dWRney+hNyyAZJzADXTCPXCHo3j3VMRCoUkXNz7YGIRuYAU6HLaTuN3t/3msOTkZSUyogc9ocJehPY3WoGmpYRV/KJvJ35EGcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710539940; c=relaxed/simple;
-	bh=8aZ+pmjWSb/0DZIDsIVsfKlFSg58+SNcPCdeb4HH3Jk=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=kA+f5u97UTuGzDf3Bol/mUk/GgvtCqBI5aD5AAbaqS3toOjrRaySEx+viVPFK5UV1fII8BxZTETvehmgdBnGwEZSNnbMQUNA9TPRadmv1AvuocRqodJXox48krlvhm2PH+n7fZ1Le+ikWc/0rvZV3f29PMtcV30av5B7L822GSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kDt+BH49; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710548789; c=relaxed/simple;
+	bh=FTVzweEJdBb3KGekCmN9WfLK44PXS9oJJetwk3q2GY4=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=RXZfMiyXwmfaKKYpSeqhSAefHWk432Jp3n9ahXyu35tk0R3Bu+Ml8DT9MUNg/oA0as51OxpSSDzcOFAL4Jgn2hwWdXDRJK1SxUxnnfaSE9KimcTAjBNKj46T/hnOKcHIzNTQV7ikF8Wl0jZfqB9mBJI/v8cmhZZ4ZbyEGLeQgj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=A76P9CZH; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kDt+BH49"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 77A3EC433C7;
-	Fri, 15 Mar 2024 21:59:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710539940;
-	bh=8aZ+pmjWSb/0DZIDsIVsfKlFSg58+SNcPCdeb4HH3Jk=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=kDt+BH490Z9I3RGlltHqZrhIZ2+YaLfsu7Y6rKwnpyn3bvf4noQNRryf4A5Q38H0l
-	 9D49gzuib6AsaIFFJ30pDAebDBalz3hqDiHRd71o6pcjGe0H672J46u7GkDEuUjKFV
-	 Nnc/W1cApZr/um0FA+ASxilZGyvkD/G57QlXFCRBc0vWzA1Sx9xlA8wWImmZZS56Cq
-	 +4RXN88p8USi11lnsSpu8Iwm3V7rU9rlBScmr4hGrHasyxuvI0/PcZfBva54XK2Yxa
-	 RD+KTtZs7w/AXSGuRTtsYgUbwRNEo8xbNP0yBnk+7+qkBzxn09nlSwv+Lwdh78Vhp7
-	 578oM71LSSAeg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6F514D95060;
-	Fri, 15 Mar 2024 21:59:00 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Update for 6.9
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <ZfO6zKtvp2jSO4vF@gondor.apana.org.au>
-References: <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
- <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
- <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
- <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
- <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
- <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
- <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
- <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
- <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au> <ZfO6zKtvp2jSO4vF@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <ZfO6zKtvp2jSO4vF@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.9-p1
-X-PR-Tracked-Commit-Id: 6a8dbd71a70620c42d4fa82509204ba18231f28d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: c8e769961668ef56acabc67f040c58ed769c57e4
-Message-Id: <171053994044.16900.13425460754107329710.pr-tracker-bot@kernel.org>
-Date: Fri, 15 Mar 2024 21:59:00 +0000
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="A76P9CZH"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42G0PG6s011596;
+	Sat, 16 Mar 2024 00:26:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	date:from:to:cc:subject:message-id:mime-version:content-type; s=
+	qcppdkim1; bh=FTVzweEJdBb3KGekCmN9WfLK44PXS9oJJetwk3q2GY4=; b=A7
+	6P9CZHIHAgYdS8VqUrdoIHFL0PV300C9pz2swflBtdwkbrgqYTNC05DUs5nDFuHD
+	3U8nw5MAjp357WpmO0mtK/cZE+nrnedZC+bafs51fruQbPVxwLJSRH8rxBINpnR2
+	fP5GRn9Sgk+RrHvQXZy81ZPONr32ah/yTMPV/m8IhUtnsKJ6smH6oqRFZfq/jwbx
+	285Y2ygfk4HCsk5Bx+My+nSUgDA/EZhy5owPKcWIEldqv/elPXOBa/qlKmEY6KMN
+	8QRaa+Yyx4fYiuncfDzMzDoYSLLeHPW2QcdoEc/v8A5nNUL1N2yTYj8XNR08hSCF
+	K9Ay7RD4VY/7aGVs53Og==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wvj82sd49-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 16 Mar 2024 00:26:23 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42G0QMco025523
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 16 Mar 2024 00:26:22 GMT
+Received: from hu-cgoldswo-sd.qualcomm.com (10.80.80.8) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 15 Mar 2024 17:26:22 -0700
+Date: Fri, 15 Mar 2024 17:26:21 -0700
+From: Chris Goldsworthy <quic_cgoldswo@quicinc.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Driver supporting HW decompression and SW decompression
+Message-ID: <20240316002443.GA31904@hu-cgoldswo-sd.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.24 (2015-08-30)
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: vioKnUnLSsDY9tMB6QFwLy0zuyxPwO4G
+X-Proofpoint-GUID: vioKnUnLSsDY9tMB6QFwLy0zuyxPwO4G
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-15_08,2024-03-15_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ lowpriorityscore=0 phishscore=0 impostorscore=0 mlxscore=0 malwarescore=0
+ mlxlogscore=629 priorityscore=1501 adultscore=0 bulkscore=0 suspectscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2403140001 definitions=main-2403160000
 
-The pull request you sent on Fri, 15 Mar 2024 11:04:44 +0800:
+Hi There,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.9-p1
+If a compression driver were submitted upstream that used HW LZO decompression
+and SW LZO compression, could it be accepted? It would be geared towards
+decompressing boot images on IOT-type targets with exteremely limited secondary
+storage.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/c8e769961668ef56acabc67f040c58ed769c57e4
+Thanks,
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Chris.
