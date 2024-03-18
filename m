@@ -1,46 +1,70 @@
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3B722EF4;
-	Mon, 18 Mar 2024 07:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A8522EFB
+	for <linux-crypto@vger.kernel.org>; Mon, 18 Mar 2024 07:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710746152; cv=none; b=kQOajtstgfH8UxmW+2wPwlaGhdLROGXzVIbHyKBFc1fblj6HJB8XYiWMTWH5zNBNC1w71iI1Brk7RmbUhFBTC2SX8wzcqR0lFHu9zxM1pMTF0eyYbTzxNJ02Ongwdj4a3TrPZthQ4+6GB6wRIdGCsUGoXjsGwgZ903ziHXF4S2M=
+	t=1710748166; cv=none; b=VYwFmrkyvqSL/sTA6QrIq5BevlhTYwgi7QpdHnJIN0THkFJT1i+j5Ts12+e0VUOLHLbatgyv9SgpGiEwjgy+uWROajju4oVAlcmSV11xHTg9ovsgwWh2JzykznbpAcvnZfd9ceV+GmsZgWuasV1EEz+z/A9mj7Fi7qDh1RTmL1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710746152; c=relaxed/simple;
-	bh=H0xcAujiHOPzW4Dxw69wqAMqrD7WsCFBdG5Om9v6QJQ=;
+	s=arc-20240116; t=1710748166; c=relaxed/simple;
+	bh=15xcVyjtS23QwfOxh5npEThTgAr9K+GFqp6y/Hir+nI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mOypWlguqofd67900eYlc+LTjN+BguiPVwuQWKxo7tuA86fku1fifpNupND0BgebV9yuVP7w0e1R7WM+8pymXawimmljyngrJhyCjQcC9aYcl0QtJZUdh1MEOqbXBhUev6sMfctl8tPdEfvM02t3xbT0XKf0B7YVTSNNhbONpFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id AFF932800BBC5;
-	Mon, 18 Mar 2024 08:06:01 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 9C3F8577CCE; Mon, 18 Mar 2024 08:06:01 +0100 (CET)
-Date: Mon, 18 Mar 2024 08:06:01 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Bharat Bhushan <bbhushan2@marvell.com>
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>,
-	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"saulo.alessandre@tse.jus.br" <saulo.alessandre@tse.jus.br>,
-	"jarkko@kernel.org" <jarkko@kernel.org>,
-	Stefan Berger <stefanb@linux.ibm.com>
-Subject: Re: [EXTERNAL] [PATCH v6 12/13] crypto: asymmetric_keys - Adjust
- signature size calculation for NIST P521
-Message-ID: <Zffn2XpvwPk9GVhv@wunner.de>
-References: <20240312183618.1211745-1-stefanb@linux.vnet.ibm.com>
- <20240312183618.1211745-13-stefanb@linux.vnet.ibm.com>
- <SN7PR18MB531481F0A287ADCED3711193E32D2@SN7PR18MB5314.namprd18.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HUa35jDl0S2rWQ/u96/8/mg+NlRv9Df40QsASxJjerXBxzLWuQBLH5vTB+BX1ylGuA7pK0vDYPa3s6PI4wO3B4bDVwMD68XIqfdg7qKrPayU5cbZTd1UXFkNrWjZtOzUC5ZxrOfgwGL7DoPqWfotbeWsO3F3q5tepXvYwUweYM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=chMVj7YM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chMVj7YM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710748163;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hw3N3rKbRfObqQCjnzMro1ULUvDI+xFvOVwAh3eTCiU=;
+	b=chMVj7YMhI3uVZ9p5gPALWL3+O9E9iEE3lTgNmSIEKrVnzyV6vpt+fccUVS1BYJz6hMjoG
+	a0oIEQWMwOV6CLUIx41pyuSI3FCuktjFpC5S18cLzs3p92bZfJsvHz8V4XbFsucASoEQO+
+	HMGZ3uqt0LxVIApiF7hU+XJRWiZDf3I=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-76-sNcyokC-NomJZNQFAjnaoQ-1; Mon, 18 Mar 2024 03:49:22 -0400
+X-MC-Unique: sNcyokC-NomJZNQFAjnaoQ-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-430baecb018so25956971cf.2
+        for <linux-crypto@vger.kernel.org>; Mon, 18 Mar 2024 00:49:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710748161; x=1711352961;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hw3N3rKbRfObqQCjnzMro1ULUvDI+xFvOVwAh3eTCiU=;
+        b=PJZq6jHprOBhrwR0J7xI1FZXE7whjnj4sVe1Z56M2OhPgPV7EbbU5Xpc2dzUbl8w1y
+         oZsq2lhj4HXzzF9OXqwvzVhU1t8CRKMyR8MbDtdXM5bxemsT7Dy1PdBEhAnvLGBO532A
+         HSnHXv4e1y7+HCD6WSbmA92cee/rgeb7J43lRLabse1qhAeehkbG+tExldUGA7Jqy+3/
+         sMHja2euDExfXWviN6FHXDkICA7wm8mVTQHaNQpeU3HCY+Vo7/0szUpOUtqpBYt8fhJ9
+         DXuF8zDecCjfUAo+8TqJNFROGGvt4qAlasnhis92IaUuf/IIjYG/ddt61Axm9B3Gn2oJ
+         pWbA==
+X-Forwarded-Encrypted: i=1; AJvYcCWe01qNqCdX3+7f/eyNeRiyzPPETzjcSvdRNTKQn3FsimXyN67ObIAg3J5pkhtoucAqLveF41601ZHPXHtOByPuL6lLGn0y/Ki3u1ty
+X-Gm-Message-State: AOJu0YzIIL0kfRzQ2OaTZSu4bpPYUlArI9eNMH/FpTALdc/2vHv6zaqP
+	EPA3CkcPSHhoTM4kU7mWKoAxRWk2fNDrXecgZcK33rKdU2vQJ/yDl67V3Z75/PRFQpoPi7ydbZ9
+	xdjvJIr8a81UviKgn+fkBrVyjOFKz4VQbRA1sOu6UZUO/eYuzvU/m4JTj/tolaQ==
+X-Received: by 2002:ac8:7d0e:0:b0:430:c769:c747 with SMTP id g14-20020ac87d0e000000b00430c769c747mr4158275qtb.22.1710748161575;
+        Mon, 18 Mar 2024 00:49:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFUm3RY8ZnlG2VNiVbIkjz1nSzJks63N+Pz5IdxrajiTHHgE59rRqHBxHQ/JyqB9k3qzRWU1A==
+X-Received: by 2002:ac8:7d0e:0:b0:430:c769:c747 with SMTP id g14-20020ac87d0e000000b00430c769c747mr4158261qtb.22.1710748161261;
+        Mon, 18 Mar 2024 00:49:21 -0700 (PDT)
+Received: from localhost (ip70-163-216-141.ph.ph.cox.net. [70.163.216.141])
+        by smtp.gmail.com with ESMTPSA id h20-20020ac87154000000b0042c61b99f42sm4715917qtp.46.2024.03.18.00.49.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Mar 2024 00:49:20 -0700 (PDT)
+Date: Mon, 18 Mar 2024 00:49:19 -0700
+From: Jerry Snitselaar <jsnitsel@redhat.com>
+To: Tom Zanussi <tom.zanussi@linux.intel.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org, 
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH] crypto: iaa: Fix some errors in IAA documentation
+Message-ID: <jhpuhcengkgdpgyb7qsez4lugpa5nhjjn3zqehbcbrtr2xh5md@cc3vz7v2xzdu>
+References: <20240318064421.833348-1-jsnitsel@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,57 +73,117 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SN7PR18MB531481F0A287ADCED3711193E32D2@SN7PR18MB5314.namprd18.prod.outlook.com>
+In-Reply-To: <20240318064421.833348-1-jsnitsel@redhat.com>
 
-On Mon, Mar 18, 2024 at 05:58:23AM +0000, Bharat Bhushan wrote:
-> > --- a/crypto/asymmetric_keys/public_key.c
-> > +++ b/crypto/asymmetric_keys/public_key.c
-> > @@ -233,6 +233,7 @@ static int software_key_query(const struct
-> > kernel_pkey_params *params,
-> >  	info->key_size = len * 8;
-> > 
-> >  	if (strncmp(pkey->pkey_algo, "ecdsa", 5) == 0) {
-> > +		int slen = len;
-> >  		/*
-> >  		 * ECDSA key sizes are much smaller than RSA, and thus could
-> >  		 * operate on (hashed) inputs that are larger than key size.
-> > @@ -246,8 +247,19 @@ static int software_key_query(const struct
-> > kernel_pkey_params *params,
-> >  		 * Verify takes ECDSA-Sig (described in RFC 5480) as input,
-> >  		 * which is actually 2 'key_size'-bit integers encoded in
-> >  		 * ASN.1.  Account for the ASN.1 encoding overhead here.
-> > +		 *
-> > +		 * NIST P192/256/384 may prepend a '0' to a coordinate to
-> > +		 * indicate a positive integer. NIST P521 never needs it.
-> >  		 */
-> > -		info->max_sig_size = 2 * (len + 3) + 2;
-> > +		if (strcmp(pkey->pkey_algo, "ecdsa-nist-p521") != 0)
-> > +			slen += 1;
-> > +		/* Length of encoding the x & y coordinates */
-> > +		slen = 2 * (slen + 2);
-> > +		/*
-> > +		 * If coordinate encoding takes at least 128 bytes then an
-> > +		 * additional byte for length encoding is needed.
-> > +		 */
-> > +		info->max_sig_size = 1 + (slen >= 128) + 1 + slen;
+On Sun, Mar 17, 2024 at 11:44:21PM -0700, Jerry Snitselaar wrote:
+> This cleans up the following issues I ran into when trying to use the
+> scripts and commands in the iaa-crypto.rst document.
 > 
-> Is "(slen >= 128)" valid for P192/256/384 also?
+> - Fix incorrect arguments being passed to accel-config
+>   config-wq.
+>     - Replace --device_name with --driver-name.
+>     - Replace --driver_name with --driver-name.
+>     - Replace --size with --wq-size.
+>     - Add missing --priority argument.
+> - Add missing accel-config config-engine command after the
+>   config-wq commands.
+> - Fix wq name passed to accel-config config-wq.
+> - Add rmmod/modprobe of iaa_crypto to script that disables,
+>   then enables all devices and workqueues to avoid enable-wq
+>   failing with -EEXIST when trying to register to compression
+>   algorithm.
+> - Fix device name in cases where iaa was used instead of iax.
+> 
+> Cc: Tom Zanussi <tom.zanussi@linux.intel.com>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-doc@vger.kernel.org
+> Signed-off-by: Jerry Snitselaar <jsnitsel@redhat.com>
+> ---
+>  .../driver-api/crypto/iaa/iaa-crypto.rst      | 22 ++++++++++++++-----
+>  1 file changed, 16 insertions(+), 6 deletions(-)
+> 
+> diff --git a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
+> index de587cf9cbed..330d35df5f16 100644
+> --- a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
+> +++ b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
+> @@ -179,7 +179,9 @@ has the old 'iax' device naming in place) ::
+>  
+>    # configure wq1.0
+>  
+> -  accel-config config-wq --group-id=0 --mode=dedicated --type=kernel --name="iaa_crypto" --device_name="crypto" iax1/wq1.0
+> +  accel-config config-wq --group-id=0 --mode=dedicated --type=kernel --priority=10 --name="iaa_crypto" --driver-name="crypto" iax1/wq1.0
+> +
+> +  accel-config config-engine iax1/engine1.0 --group-id=0
+>  
+>    # enable IAA device iax1
+>  
+> @@ -536,12 +538,20 @@ The below script automatically does that::
+>  
+>    echo "End Disable IAA"
+>  
+> +  echo "Reload iaa_crypto module"
+> +
+> +  rmmod iaa_crypto
+> +  modprobe iaa_crypto
+> +
+> +  echo "End Reload iaa_crypto module"
+> +
+>    #
+>    # configure iaa wqs and devices
+>    #
+>    echo "Configure IAA"
+>    for ((i = 1; i < ${num_iaa} * 2; i += 2)); do
+> -      accel-config config-wq --group-id=0 --mode=dedicated --size=128 --priority=10 --type=kernel --name="iaa_crypto" --driver_name="crypto" iax${i}/wq${i}
+> +      accel-config config-wq --group-id=0 --mode=dedicated --wq-size=128 --priority=10 --type=kernel --name="iaa_crypto" --driver-name="crypto" iax${i}/wq${i}.0
+> +      accel-config config-engine iax${i}/engine${i}.0 --group-id=0
+>    done
+>  
+>    echo "End Configure IAA"
+> @@ -552,10 +562,10 @@ The below script automatically does that::
+>    echo "Enable IAA"
+>  
+>    for ((i = 1; i < ${num_iaa} * 2; i += 2)); do
+> -      echo enable iaa iaa${i}
+> -      accel-config enable-device iaa${i}
+> -      echo enable wq iaa${i}/wq${i}.0
+> -      accel-config enable-wq iaa${i}/wq${i}.0
+> +      echo enable iaa iax${i}
+> +      accel-config enable-device iax${i}
+> +      echo enable wq iax${i}/wq${i}.0
+> +      accel-config enable-wq iax${i}/wq${i}.0
+>    done
+>  
+>    echo "End Enable IAA"
+> -- 
+> 2.41.0
+> 
 
-It is valid but never true for those.
+In addition to the above, the sections related to the modes seem
+to be off to me.
 
-The signature consists of two integers encoded in ASN.1.
-So each integer is prepended by 1 byte for the tag and 1 byte for the length.
+Legacy mode in the Intel IOMMU context is when the IOMMU does not have
+scalable mode enabled. If you pass intel_iommu=off the Intel IOMMU
+will not be initialized, and I think that would correspond to the No IOMMU
+mode instead of Legacy mode. The other suggestion for Legacy mode of
+disabling VT-d in the BIOS would also be No IOMMU mode, but in
+addition to the dma remapping units being disabled it would disable
+interrupt remapping since the DMAR table would no longer be presented
+to the OS by the BIOS.
 
-The two integers are bundled together in a "sequence", which in turn requires
-1 byte for the tag and 1 byte for the length.  However, for P521 the length
-of the sequence is at least 2*(1+1+66) = 136 bytes, which exceeds 128 bytes
-and therefore the length of the sequence occupies 2 bytes instead of 1.
+I think the modes should be:
 
-For the shorter key lengths, the sequence fits in less than 128 bytes and
-does not require the extra byte for the sequence length.
+Scalable mode: intel_iommu=on,sm_on
+Legacy mode: intel_iommu=on
+No IOMMU mode: intel_iommu=off (or VT-d disabled in BIOS)
 
-So the code is fine AFAICS.
 
-Thanks,
+Since Intel IOMMU and scabale mode have config options that allow them
+to be enabled by default, there are different parameter variations
+that would match the above cases. I don't know if they need to
+be detailed here, or if it would just make it more confusing.
 
-Lukas
+
+Regards,
+Jerry
+
