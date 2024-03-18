@@ -1,221 +1,139 @@
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACCD4C84;
-	Mon, 18 Mar 2024 05:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710741524; cv=fail; b=RDVLV53DsJNd9vEudriFTQKNqgwZZ6XMTIRjUsS5eTggfwIPSu+G3vK/iiqDaIW9xZytKokCY4oMOtELf6jj3KPyV/0wYx6JF5zT5wqQ1hOnk6KFs39g+5mkxS6fm8FAB6o2jX1uLKiFEL5oqfXWgOuAuUR+MEHilMeAfzeCLS8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710741524; c=relaxed/simple;
-	bh=vZMhh1tS57E3I1BwHYWnfEq2ayIKr3xRX73KypGpo+Y=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=fVi1MIiV/JfPrQAEVnFjaLN4914NNRpk2qOVmwpCzrTFPqrBt6CWzNoRp9M0aq0jEa+gVDFxFUeecETaxSfuzQ8bHcnBGK+VC2TuQGRxOaXS+KFkix7uT5Q/YH/5XfJbpAdAj8Lus4uD9hXiQ7YjpB0ZZxGSXAmMgfHOBQFJj8Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=a1xO4zSz; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11A61CA89
+	for <linux-crypto@vger.kernel.org>; Mon, 18 Mar 2024 06:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710744279; cv=none; b=PG2k8N1T/9+KiAGOhO7Du8/qTNoOyFOAzcYq8FPSa1UIvI2J6Qb9O5eXC9Mxjq+/3CTmHybFxeLjs1OJnm/S5a1WOKgl3wWE8RR5b/HxPScwyUbZSZ39hJHb4JUikUjQS1mLF85atpWtGW4Z0uCQtLlRRuk7BkEKBihsLGeBEY8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710744279; c=relaxed/simple;
+	bh=skEsCZKyKJolpTxFMXOKRN6j1kC3rXie0+a+1lIxssk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g0HnPbTCtu6CN+KdHAGl6lhlj1iz1w6TJfm9xQVPUi6jRLbdGw8HVONHT6482J3mBu2KbgUKm0yGdBf/CIGqAnqZyFzkqnXdmbkF76lMcY78a71yb8Hoi5kCpwGdgnYGe/05H8DvIDdJhD3EO2xYHxQw8uquPeBJCgw6RBB7JuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DrhDOnNJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="a1xO4zSz"
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42HN11HT016545;
-	Sun, 17 Mar 2024 22:58:27 -0700
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2169.outbound.protection.outlook.com [104.47.58.169])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3wwaxgbq50-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 17 Mar 2024 22:58:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZcdP2JFMSBf9bdvIu0uEbuMnkR/+eTcCrZdRsxWGhZMNWYdRSFN5MAG7yN7vTF2TUawuhqcuNXFQ5sNWTi9BjSAxTdDPaSd8weRQeMtIIHveP3j+LDtZSRn+ROBA4RJU5XDKs4P7EUy13aHPYL+V0SS4BHmuXzyEFSgYiXazkphGW4aeSDwdf+bCeGYmyjLOOdpU096q+S1T5yO7JdnCR6CNXkzC6r7KdnX2GzZwZVYTJDGpcX2JSqdGOpOpCAVxOljvCqmhIUgNFc0MRjpZEAIe2lWazZtuM7pwvwemO02UV5T+BrMByx4nx85i2vYTMMHH0iNoD1Vq5VVObZ4oCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QFEMSMFIro3fNxCwZgs8wiXil/NHez/Kyhq6J4r/H7U=;
- b=GtZ8SCBwkAJIdN0AvNqwUvl9v02tYoBQ6JQtcn23bJ5/ee84/QtwSlIK5fBw53DUKvkif5zaK/BbtvC3X5muKTjpNvajWhtA5edBWlUHgwRlBjpmB73JO5Xjp4tBuE6uSVAOSUrE1+cYRwCWT4acn1jZQYq6PW6xGywctrFxFzbXeqmtT8yQavcMVQPcmYnA4Ldd0WkXaZ/S8z5UealKd/cb5e/cTz7+ZRiPrpDWabqqrV5DPbcqUewzZmGHcjnIXaf/3/ps9IOrcc3wA06dZBQCWOfgVpnn4EIvLweIIhe/xwHl75pEoohvcs4iwMvkelEd+ah+5gK4CM72Qs8wWQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QFEMSMFIro3fNxCwZgs8wiXil/NHez/Kyhq6J4r/H7U=;
- b=a1xO4zSzGh1dYgC5qAsgG1Zyi7urgCI5+e6osVffkZjoHEFKkUKSdMQfS6WW0uMwB7v1boEsnWM7v2vnoSsHNkUcr8k9eDlEZFlVL06iJVAswWhxVduTVdxBa5qpJqktACJU/4k9sP2QEykD2f2xlmTLLJT9E27chtLARcdTPP4=
-Received: from SN7PR18MB5314.namprd18.prod.outlook.com (2603:10b6:806:2ef::8)
- by DM8PR18MB4503.namprd18.prod.outlook.com (2603:10b6:8:3e::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.27; Mon, 18 Mar
- 2024 05:58:24 +0000
-Received: from SN7PR18MB5314.namprd18.prod.outlook.com
- ([fe80::926a:6eb8:6d4b:656a]) by SN7PR18MB5314.namprd18.prod.outlook.com
- ([fe80::926a:6eb8:6d4b:656a%7]) with mapi id 15.20.7386.025; Mon, 18 Mar 2024
- 05:58:23 +0000
-From: Bharat Bhushan <bbhushan2@marvell.com>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        "keyrings@vger.kernel.org"
-	<keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "saulo.alessandre@tse.jus.br" <saulo.alessandre@tse.jus.br>,
-        "lukas@wunner.de" <lukas@wunner.de>,
-        "jarkko@kernel.org" <jarkko@kernel.org>,
-        Stefan Berger <stefanb@linux.ibm.com>
-Subject: RE: [EXTERNAL] [PATCH v6 12/13] crypto: asymmetric_keys - Adjust
- signature size calculation for NIST P521
-Thread-Topic: [EXTERNAL] [PATCH v6 12/13] crypto: asymmetric_keys - Adjust
- signature size calculation for NIST P521
-Thread-Index: AQHadKxnbxR4a5LtXUqbsGZIoA/WRLE9CEiw
-Date: Mon, 18 Mar 2024 05:58:23 +0000
-Message-ID: 
- <SN7PR18MB531481F0A287ADCED3711193E32D2@SN7PR18MB5314.namprd18.prod.outlook.com>
-References: <20240312183618.1211745-1-stefanb@linux.vnet.ibm.com>
- <20240312183618.1211745-13-stefanb@linux.vnet.ibm.com>
-In-Reply-To: <20240312183618.1211745-13-stefanb@linux.vnet.ibm.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN7PR18MB5314:EE_|DM8PR18MB4503:EE_
-x-ms-office365-filtering-correlation-id: 4680eb97-6b2c-4661-3113-08dc47106c1f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- yrrDh0F5+5z/uswH9NYKE5uoo2l2k8f4XEIomw2DMZv4Pud8klAXuKujMac1Xtai8F2HozfhU/U4ZUfP/I07lEe+rpI6svnlSG5g6onx9ki82O2f+kxe+mjFgEVPLu6Co3gahSXAglkCABTXF5kjZ9TZ00W39TDCU8YXMNmMRMQoXL422P45HS6HB5MuUtRpCM9nfQCHnWJ0PeZpuHUTGYwnDPCWtup/Tb5q9jXCFz7aYxzloCaYQDyeaRuULWX4cGOOtV9MVcE95J12wDMZNOUSBj7kGaMuJOuMkx7vSz52f6BsDEy4VZgan06w8g7K0KRiXZbFLUytIcig7bBwH8saYIpwajDuh/6Tx0s9Rj8uTep+HpY4wcFcz3EtWclYj8NQrE+jcgdUewsKM185qdxsCY9GINtsGq9G23d9XhFTQJkT7HP51Xl+dEtL8uAd+PyNLfqKUwvQPGNbsMb5T/HWJOhB3L3tghesEG863Oic5J0+80eisaYdJqT8o9o3b8iT6RR9J8dKsUzQ7kOHTaX5gc5cNMhLl9Jh30rbYc8i9lRai7kupeWz8ELpWk8bTKEqQuAamYURSSR6iIy6mpyqNU8CEI/rjaQpgcjWvFTK0VlomKycPQZ7gqn7gA9djDQ06paMpkyRkCy+bLD8+t/1Gp2IQxjdEpWoXRmpIcUrXDk/gsK7mG250CKciG5RJ0X91q6goo8e0k1DQz+bQ0Sdirvrxky5r6b5g5MOkxw=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR18MB5314.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?1ss7uPV5gvIBO550qtCCqrKRSe7UWLRnTUDJjoYGYJSmGag7UhA/dwih4GqT?=
- =?us-ascii?Q?esDbR1AL5BkLJTdaiL9wf+gGZL1qwh7hWF+5ZOPIqWa3/A4ewP9PDBrpkYEV?=
- =?us-ascii?Q?1MyhA/gcBrCwM3p30meQ4FcjiA/lZwW43kqugX5pSDEg9W1SEttmFn5klVJX?=
- =?us-ascii?Q?YMpBm1RsqVmdR0o5CwJx9wh2BLVc6upDmiVfsRFpsD74p44KWZBbiB6g51DG?=
- =?us-ascii?Q?LWsEv+d3vDIZiDQ+XmPhrtY/h/IFbVfHJ8GIEThGUKoxvAcc/el5duGzR22h?=
- =?us-ascii?Q?BIv/VBFZ+2Um8hL4sKvBvmFB2H2o+PP6uuWwoC8g3i4/N/EUT4elXfaUM+qI?=
- =?us-ascii?Q?oeHe2z0LEmTUTUcS8C8J+eEXpcUZ+RdJBZwx0QxzBHqqZqhgT/hIVBeUhRsy?=
- =?us-ascii?Q?dOAuujhd7zQdq3iKhmFVni6wzurzkPtxO0Lc+V7ZcBLR1aqtUQS6S7gp3agN?=
- =?us-ascii?Q?MbKwCODcqRmlEinDvauvoFxxTDHlb1Oyu1Nt613teAnG4lwCEClobD00bRqM?=
- =?us-ascii?Q?133GK0TZ2fud1NuGGwsDM55+25VQ8dZu58PSAdqJn9h0v7Jtmw8mSCHtiYc5?=
- =?us-ascii?Q?DptVSROakVcmky0BSd9MTc405BtB2+EeEYdNqHN7W5/D3W7m+IriXOGibveA?=
- =?us-ascii?Q?hZIA3OY1Tups3U2H+u0yaGqGhmSpt5s6sTZmZHchrfyl5AgyI4fNU5zRvHg8?=
- =?us-ascii?Q?Uz24ClkS20Bz3z3Uqqi2OLwS4p8i1WrqES35Rahm/UA6NXVteqXzM58Fovie?=
- =?us-ascii?Q?toAbDZztV4utwEm734KqE5Lx95OUSwAWiaIcrv7uAsn06oLnOOCyU3IVryoJ?=
- =?us-ascii?Q?dMuELvAMxMXMJwj7WOkXOv8xWnurRQrpAhDYAnx3RM4sLsreZR+P0MhaDIs1?=
- =?us-ascii?Q?GcWDTBpcqLxoy8Hu+4m4udcKzoO6CvsoTreOYx1fIfbIHbwTnrj/flQoAZBP?=
- =?us-ascii?Q?SdI+CWqDUKSlRJGSiaMocQme8qeNDUoTo6+ifMSbuXSvxlgyepSigOB/moIA?=
- =?us-ascii?Q?98YVnCS70BY+yRHd+YzNCISF2FmFfINkGhd4BXiwakoYx2Os8C+1QOuis+dN?=
- =?us-ascii?Q?inMrGWo8YMC5oh+bhL0U/OMlcW3rDum4DmxX0xb2hbKMWBX0KSiy6Z7+QIz7?=
- =?us-ascii?Q?htUskiv5uMOg33ezRu9YeLJrQ6Bp5l4vajaGgcxwcx741nnmgBXbx1lIGtHW?=
- =?us-ascii?Q?bKYmrp0WrffE4QdSOVQST2AGPiTuNjA1hExe0JWSScptDsyFKk+2Q2qfDwIJ?=
- =?us-ascii?Q?ENr12xDnYdM8occyGFmPjPNF30rewGWvZuYDjjsHxDzhb7ZaqwIZm7rGhPJb?=
- =?us-ascii?Q?V9y9fPfVUn7mTuQme32vPyWz4OsCVLiJNsJ/WTmStBghP9EtCqpTakwsbSDE?=
- =?us-ascii?Q?2/eOBRelxEDGU/Ubvk5TGEd8OZw5dXBpdioXijr6S2JJYVhH2ADo7oNoFHZ1?=
- =?us-ascii?Q?fxaACznROT1z1TeC9/6W8Q6o4apEqsCFcO4hYhaIKISZwHhLaKCT21rr/8A4?=
- =?us-ascii?Q?a4oKyWTFVhRKM6D9RAsHAauO9GQ8QWLhx5BuPFfn2OUC+6hRsiC3CDIl/A7G?=
- =?us-ascii?Q?9pxtVASDrcfvlqIppn7GryYQdyU5dLwX1802O3ZK?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DrhDOnNJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710744276;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=osDyJdcJu79eMx8AxQ473FAUCgGzUBaif8zLPvxwRZ0=;
+	b=DrhDOnNJ7rSol3jphUDQc4iSHu336aqQBq0NlR2mslJrnyGwxdJyenrqnDqC9bQeHB6u4E
+	NaKo0zCqrImE+QfLsqX2AdXsBwzmDL5lL+c06FbIGrmECVCePYPJ70WwZ7bNjHj4UwxfU1
+	RvCcoGav9PKYp7cM/b05KN/ZgXFK/gk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-490-KNM635-VOJiaQzITiPsPyw-1; Mon, 18 Mar 2024 02:44:33 -0400
+X-MC-Unique: KNM635-VOJiaQzITiPsPyw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E96268007A3;
+	Mon, 18 Mar 2024 06:44:32 +0000 (UTC)
+Received: from cantor.redhat.com (unknown [10.2.16.24])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5C324C04121;
+	Mon, 18 Mar 2024 06:44:32 +0000 (UTC)
+From: Jerry Snitselaar <jsnitsel@redhat.com>
+To: Tom Zanussi <tom.zanussi@linux.intel.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH] crypto: iaa: Fix some errors in IAA documentation
+Date: Sun, 17 Mar 2024 23:44:21 -0700
+Message-ID: <20240318064421.833348-1-jsnitsel@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR18MB5314.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4680eb97-6b2c-4661-3113-08dc47106c1f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2024 05:58:23.8749
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kvp99VZglZS1YcJ/e4khNUuEg4FqJvfVHBPF3tZj9XhRaPqKUIhniSYp9Pn3WohFxcNSVwceLvyR64uTnWDzTQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR18MB4503
-X-Proofpoint-GUID: OaINCsPMB36j2AXaSvgLH4J5FRK4RvuC
-X-Proofpoint-ORIG-GUID: OaINCsPMB36j2AXaSvgLH4J5FRK4RvuC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-17_12,2024-03-15_01,2023-05-22_02
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
+This cleans up the following issues I ran into when trying to use the
+scripts and commands in the iaa-crypto.rst document.
 
+- Fix incorrect arguments being passed to accel-config
+  config-wq.
+    - Replace --device_name with --driver-name.
+    - Replace --driver_name with --driver-name.
+    - Replace --size with --wq-size.
+    - Add missing --priority argument.
+- Add missing accel-config config-engine command after the
+  config-wq commands.
+- Fix wq name passed to accel-config config-wq.
+- Add rmmod/modprobe of iaa_crypto to script that disables,
+  then enables all devices and workqueues to avoid enable-wq
+  failing with -EEXIST when trying to register to compression
+  algorithm.
+- Fix device name in cases where iaa was used instead of iax.
 
-> -----Original Message-----
-> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> Sent: Wednesday, March 13, 2024 12:06 AM
-> To: keyrings@vger.kernel.org; linux-crypto@vger.kernel.org;
-> herbert@gondor.apana.org.au; davem@davemloft.net
-> Cc: linux-kernel@vger.kernel.org; saulo.alessandre@tse.jus.br;
-> lukas@wunner.de; Bharat Bhushan <bbhushan2@marvell.com>;
-> jarkko@kernel.org; Stefan Berger <stefanb@linux.ibm.com>
-> Subject: [EXTERNAL] [PATCH v6 12/13] crypto: asymmetric_keys - Adjust
-> signature size calculation for NIST P521
-> ----------------------------------------------------------------------
-> From: Stefan Berger <stefanb@linux.ibm.com>
->=20
-> Adjust the calculation of the maximum signature size for support of NIST
-> P521. While existing curves may prepend a 0 byte to their coordinates (to
-> make the number positive), NIST P521 will not do this since only the firs=
-t bit in
-> the most significant byte is used.
->=20
-> If the encoding of the x & y coordinates requires at least 128 bytes then=
- an
-> additional byte is needed for the encoding of the length. Take this into =
-account
-> when calculating the maximum signature size.
->=20
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> Reviewed-by: Lukas Wunner <lukas@wunner.de>
-> Tested-by: Lukas Wunner <lukas@wunner.de>
-> ---
->  crypto/asymmetric_keys/public_key.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
->=20
-> diff --git a/crypto/asymmetric_keys/public_key.c
-> b/crypto/asymmetric_keys/public_key.c
-> index e5f22691febd..16cc0be28929 100644
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-> @@ -233,6 +233,7 @@ static int software_key_query(const struct
-> kernel_pkey_params *params,
->  	info->key_size =3D len * 8;
->=20
->  	if (strncmp(pkey->pkey_algo, "ecdsa", 5) =3D=3D 0) {
-> +		int slen =3D len;
->  		/*
->  		 * ECDSA key sizes are much smaller than RSA, and thus could
->  		 * operate on (hashed) inputs that are larger than key size.
-> @@ -246,8 +247,19 @@ static int software_key_query(const struct
-> kernel_pkey_params *params,
->  		 * Verify takes ECDSA-Sig (described in RFC 5480) as input,
->  		 * which is actually 2 'key_size'-bit integers encoded in
->  		 * ASN.1.  Account for the ASN.1 encoding overhead here.
-> +		 *
-> +		 * NIST P192/256/384 may prepend a '0' to a coordinate to
-> +		 * indicate a positive integer. NIST P521 never needs it.
->  		 */
-> -		info->max_sig_size =3D 2 * (len + 3) + 2;
-> +		if (strcmp(pkey->pkey_algo, "ecdsa-nist-p521") !=3D 0)
-> +			slen +=3D 1;
-> +		/* Length of encoding the x & y coordinates */
-> +		slen =3D 2 * (slen + 2);
-> +		/*
-> +		 * If coordinate encoding takes at least 128 bytes then an
-> +		 * additional byte for length encoding is needed.
-> +		 */
-> +		info->max_sig_size =3D 1 + (slen >=3D 128) + 1 + slen;
+Cc: Tom Zanussi <tom.zanussi@linux.intel.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Signed-off-by: Jerry Snitselaar <jsnitsel@redhat.com>
+---
+ .../driver-api/crypto/iaa/iaa-crypto.rst      | 22 ++++++++++++++-----
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-Is "(slen >=3D 128)" valid for P192/256/384 also?
-
-Thanks
--Bharat
-
->  	} else {
->  		info->max_data_size =3D len;
->  		info->max_sig_size =3D len;
-> --
-> 2.43.0
+diff --git a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
+index de587cf9cbed..330d35df5f16 100644
+--- a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
++++ b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
+@@ -179,7 +179,9 @@ has the old 'iax' device naming in place) ::
+ 
+   # configure wq1.0
+ 
+-  accel-config config-wq --group-id=0 --mode=dedicated --type=kernel --name="iaa_crypto" --device_name="crypto" iax1/wq1.0
++  accel-config config-wq --group-id=0 --mode=dedicated --type=kernel --priority=10 --name="iaa_crypto" --driver-name="crypto" iax1/wq1.0
++
++  accel-config config-engine iax1/engine1.0 --group-id=0
+ 
+   # enable IAA device iax1
+ 
+@@ -536,12 +538,20 @@ The below script automatically does that::
+ 
+   echo "End Disable IAA"
+ 
++  echo "Reload iaa_crypto module"
++
++  rmmod iaa_crypto
++  modprobe iaa_crypto
++
++  echo "End Reload iaa_crypto module"
++
+   #
+   # configure iaa wqs and devices
+   #
+   echo "Configure IAA"
+   for ((i = 1; i < ${num_iaa} * 2; i += 2)); do
+-      accel-config config-wq --group-id=0 --mode=dedicated --size=128 --priority=10 --type=kernel --name="iaa_crypto" --driver_name="crypto" iax${i}/wq${i}
++      accel-config config-wq --group-id=0 --mode=dedicated --wq-size=128 --priority=10 --type=kernel --name="iaa_crypto" --driver-name="crypto" iax${i}/wq${i}.0
++      accel-config config-engine iax${i}/engine${i}.0 --group-id=0
+   done
+ 
+   echo "End Configure IAA"
+@@ -552,10 +562,10 @@ The below script automatically does that::
+   echo "Enable IAA"
+ 
+   for ((i = 1; i < ${num_iaa} * 2; i += 2)); do
+-      echo enable iaa iaa${i}
+-      accel-config enable-device iaa${i}
+-      echo enable wq iaa${i}/wq${i}.0
+-      accel-config enable-wq iaa${i}/wq${i}.0
++      echo enable iaa iax${i}
++      accel-config enable-device iax${i}
++      echo enable wq iax${i}/wq${i}.0
++      accel-config enable-wq iax${i}/wq${i}.0
+   done
+ 
+   echo "End Enable IAA"
+-- 
+2.41.0
 
