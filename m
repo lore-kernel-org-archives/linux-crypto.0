@@ -1,29 +1,29 @@
 Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DF95823E;
-	Mon, 18 Mar 2024 20:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E85558101;
+	Mon, 18 Mar 2024 20:39:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710794155; cv=none; b=fLLiJLiZcG99ZOantUJ8jmqjXObYDzE1nSTD22IeYOzATAFKymSTQ62/eGLqZOsnUrvbctD2MS+J/BEO0vLCysRENYPZsHiV57p3WKYOIZObU84bx5fgdD+KFfxMOx0Gj8szZ6xhEc5McGc+apqdcvztsOFybJkqAVR49SEx6rg=
+	t=1710794357; cv=none; b=u10sBwwWVsioxm3eD7OQjFngFxbP/qkb++57bBjkWdBtix8FK+OiZwGuwsqLKOCnExmb+sctiIu78SP1SXGMX8GkreWpE5CQSKYHZUYGvxo3+320z7Zx/UHfxB6HFvzV3IpNLSGUbB0x/XZ5NUFBB7xt+IuJsLQSrN2KZUHPg0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710794155; c=relaxed/simple;
-	bh=LTrlYGiDWbmiAPcVZXDPnbLX7y9tzRYIsFoAoMLA1VU=;
+	s=arc-20240116; t=1710794357; c=relaxed/simple;
+	bh=ReFqyHxcEKeh7w/BK0VTSDZ0C9vGF4T9kJDfsz3o/xw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D8/9TijRLiMzjn2jsf/KssRIcubWyBoI1yc4ceKcu0C44Yu72UcFDh0pGS5GKUUxrzTcdYX6UsKFOMiTVWhUVLKw5Q2VHEYh5LbFKGm5fsLF5Y8Vx82JaDvYdtB0o3i+uKyHEAUYJOEmzj+3M8AkJTHVTLu8XlHmsXmAPilP6Fc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=G+KYui6QjMkHULxmWgtschbVjmrOxyOmZWQm/5tArdFf5jF8DQc6ivWaaMhEGGeaAwPcw0mezTYKg4rEHTz4QPyNAF13wnZmk170X8dnUVbdprGNQsqOfVYFvW+PoQ3wTs4vxK6Xm1az7njl1I36ulXARd49efnavpo49wedYRI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
 	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
 	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 3638E2800BD88;
-	Mon, 18 Mar 2024 21:35:48 +0100 (CET)
+	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 1BC9D2800BD88;
+	Mon, 18 Mar 2024 21:39:13 +0100 (CET)
 Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 1BF9B5912B0; Mon, 18 Mar 2024 21:35:48 +0100 (CET)
-Date: Mon, 18 Mar 2024 21:35:48 +0100
+	id 0719C5931A7; Mon, 18 Mar 2024 21:39:13 +0100 (CET)
+Date: Mon, 18 Mar 2024 21:39:12 +0100
 From: Lukas Wunner <lukas@wunner.de>
 To: Jarkko Sakkinen <jarkko@kernel.org>
 Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, keyrings@vger.kernel.org,
@@ -31,12 +31,12 @@ Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, keyrings@vger.kernel.org,
 	davem@davemloft.net, linux-kernel@vger.kernel.org,
 	saulo.alessandre@tse.jus.br, bbhushan2@marvell.com,
 	Stefan Berger <stefanb@linux.ibm.com>
-Subject: Re: [PATCH v6 02/13] crypto: ecdsa - Convert byte arrays with key
- coordinates to digits
-Message-ID: <ZfilpAf4UE2T3lXn@wunner.de>
+Subject: Re: [PATCH v6 04/13] crypto: ecdsa - Extend res.x mod n calculation
+ for NIST P521
+Message-ID: <ZfimcDtBNQ42UEqB@wunner.de>
 References: <20240312183618.1211745-1-stefanb@linux.vnet.ibm.com>
- <20240312183618.1211745-3-stefanb@linux.vnet.ibm.com>
- <CZX5LR621YXT.A2MGGVPKINOG@kernel.org>
+ <20240312183618.1211745-5-stefanb@linux.vnet.ibm.com>
+ <CZX5VA5Q4NYY.34VCD8R3ND3KL@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,21 +45,17 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CZX5LR621YXT.A2MGGVPKINOG@kernel.org>
+In-Reply-To: <CZX5VA5Q4NYY.34VCD8R3ND3KL@kernel.org>
 
-On Mon, Mar 18, 2024 at 10:21:20PM +0200, Jarkko Sakkinen wrote:
+On Mon, Mar 18, 2024 at 10:33:47PM +0200, Jarkko Sakkinen wrote:
 > On Tue Mar 12, 2024 at 8:36 PM EET, Stefan Berger wrote:
-> > From: Stefan Berger <stefanb@linux.ibm.com>
-> >
-> > For NIST P192/256/384 the public key's x and y parameters could be copied
-> > directly from a given array since both parameters filled 'ndigits' of
+> > Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+> > Tested-by: Lukas Wunner <lukas@wunner.de>
 > 
-> We "could" do various things but a commit message should describe the
-> gain or motivation of doing something, even if you think it should be
-> obvious.
+> What was there to test in this anyway? I see only comment change below.
 
-"could" is past participle of the verb "can".  We were able to copy
-directly but no longer can due to the odd key size of P521.
+The full series was tested, irrespective of the content of the individual
+patches.
 
 Thanks,
 
