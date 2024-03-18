@@ -1,239 +1,211 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A0A5644E
-	for <linux-crypto@vger.kernel.org>; Mon, 18 Mar 2024 17:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E126638DD6;
+	Mon, 18 Mar 2024 18:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710784736; cv=none; b=GTwUPLqCm8VM3GenVN98muyQtyLcvcUelJPdRzfGFk33NNbCtEmyfzAwhx5UyIaQfqiv00BVzVj7ZgHH7IH0SR/Dh5Ya/RzJCExKBbAwtS6UkqRyuuw8BrGxPTkyYJc7mm58J6eKa+bIirJ9HipgX3JL8GzXw6VO0vy6I7h0eJU=
+	t=1710787133; cv=none; b=Iq7LhxG5aOK6amgZYZb7OxptWa3UMU/vq4pHiYh3txa9R7Vmtl88Q4s/SLaC+qnoPc5p9HG7N+qqF2L6P24LDwELYpzscFxEUnOoGvhe3NQdzftBJ0e/cChZlzaiVqcCJShvyNIwscbv5V/annJsiPv6nzi8gCdfyCGXLnruHes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710784736; c=relaxed/simple;
-	bh=M0lYPdq6gZvP9XA7abbEiFJfN+8f8N/2HWpURxOJKy0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ped/aUJjHqX2ZNR/Q8odLcld9M96J1asGTAyTUBU6pUfIpC2L3Wz2SYnmMeDgPO9E9WCaG9b1acrzkwz3mlcIFhQDeJyNSMF7DZejbouyUkdjVXOTzW1m7KnUiwEu15fFhDa4Ooa/V15XapIiimKf9VFLIvXdkrGK11eI6opaYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CRDsZBeH; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1710787133; c=relaxed/simple;
+	bh=lNojrL3UxXWw3wWblZQzw2mMNG0wfpdAKKG4HmbwfwM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Subject; b=NKw4W7l0I36iMnhZgGbbDI6I99jdzDi5HwlJFtGG8R5XhiqMlxvQY9edvfy3HzywnLEk1FlMfeZerUc65Zb8EV++BxjsFqSLvOd3xapiF8XYaTe4L+dbyLDvkP01ZtamRab3+y5R2j6TTJ/O4KnVcA1r8V22iggArMJfT02NDzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MYpmvMOU; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRDsZBeH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710784733;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=okOiWDrPolsdiUTKJz5kckyz9ECFo32ZFjUOlTarkZM=;
-	b=CRDsZBeH2Zwo1hHMRpfe97hr3aBGaq2jC+7DYatUVx90HYE/lPXUH8jHzdgq3Ouggxf4Ur
-	baGxJ/dpOS9VmnArtdQKMyTLJVBdTw3oeHGoQ/SJ6lKhkeSOdR6Tlh1VUB6wHD/cSL7zOi
-	Fq2jnReeZuvzWcWTS1/F63XkcQmdmSo=
-Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
- [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-110-8uRhjiACPniW5RnGARHD_w-1; Mon, 18 Mar 2024 13:58:51 -0400
-X-MC-Unique: 8uRhjiACPniW5RnGARHD_w-1
-Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-47669714d2cso397083137.1
-        for <linux-crypto@vger.kernel.org>; Mon, 18 Mar 2024 10:58:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710784731; x=1711389531;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=okOiWDrPolsdiUTKJz5kckyz9ECFo32ZFjUOlTarkZM=;
-        b=N1nWrZiHGoIhkGhYseVtqObEs1gF5XdWjHXWdO+7rYnJMxKcgIVHXPTpWiKa0msGDj
-         N+X3IafCLNnY6DgWEFmDpktUonBM+LeN9KG1ctdDVIwDyrtshBwW5v2S3lCApiWNVuRG
-         psUWwjzUGsxsJj/5jB0CQJx2Ofd67uINtVbYlQSlzzKd9wcYvK4xkBrM7ujdAojbXR/D
-         KY/WZwLTa/KOgNx7O9QazGPUz5WXWwAWAZM76DO4Gc88fWCn+IzWOZuNYNdyo+kELe0d
-         9vVymOCk3fE0VZVXKeTQszSb2yZ9l/DV9n5syoh9hZQqynsfQebkRxg540rV5HyrQAL4
-         GL0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXJj7PaX9Yth7zOcs2XsxyYfCJaWDRXSEfiaX61TygYUBpe05ru4PShb5g2sswqiscFVAlw0btQqxxKc90GuvydRgg99cOvfI2KVJ/1
-X-Gm-Message-State: AOJu0YwKelbyYF0k9mgWBSvP2MsufLQbAv2i8MlY3HHAxhUm1Aax/kJv
-	a3neRQGVGLXdOZvxeJSzOFFs2RApquuuWrig2bFs4FEBZlxku0TP5ciisEsoM7LD8fUNL9AYlWP
-	I83cU4ynYYp/ljDWV47s3gK5dAn0mwlgvzOxUkHGTlC9LAJvZcw7KmXYCJfRFwg==
-X-Received: by 2002:a05:6102:4c58:b0:474:c443:2fd6 with SMTP id jz24-20020a0561024c5800b00474c4432fd6mr36113vsb.10.1710784730973;
-        Mon, 18 Mar 2024 10:58:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFml4BWyqgb5yrN/Dv4NEnw0o0gvweGci2BQdvBDDj8fBXECnj4qB5vcGgeQidcdW+hW4V/Dg==
-X-Received: by 2002:a05:6102:4c58:b0:474:c443:2fd6 with SMTP id jz24-20020a0561024c5800b00474c4432fd6mr36096vsb.10.1710784730596;
-        Mon, 18 Mar 2024 10:58:50 -0700 (PDT)
-Received: from localhost (ip70-163-216-141.ph.ph.cox.net. [70.163.216.141])
-        by smtp.gmail.com with ESMTPSA id x8-20020a0c8e88000000b006915f47090dsm5423797qvb.68.2024.03.18.10.58.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Mar 2024 10:58:49 -0700 (PDT)
-Date: Mon, 18 Mar 2024 10:58:46 -0700
-From: Jerry Snitselaar <jsnitsel@redhat.com>
-To: Tom Zanussi <tom.zanussi@linux.intel.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org, 
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH] crypto: iaa: Fix some errors in IAA documentation
-Message-ID: <hdb2l73guzxz2ck5qbkvpmpfiez646t33ocfqawdgxrnemwrpp@izvr4k6b2jft>
-References: <20240318064421.833348-1-jsnitsel@redhat.com>
- <jhpuhcengkgdpgyb7qsez4lugpa5nhjjn3zqehbcbrtr2xh5md@cc3vz7v2xzdu>
- <f6487dcb03a31c35c272225197af87795df2a409.camel@linux.intel.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MYpmvMOU"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42IHfZmQ012582;
+	Mon, 18 Mar 2024 18:38:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : subject; s=pp1;
+ bh=EGAUIEI6SbQpYfub6BCl42LM7sTqQsBWk3dKyRUTVVg=;
+ b=MYpmvMOUvlqTEsxfsilQx0IzaVbCpFRdHGBe2dr6Su7EZH7laM45FPFi9CaGZ7b9K3tM
+ 8Vt7qUbMNzwuyVKbfozucYyPMtRb68C0CTd/moOGvG5UnMMOZ/yWovcVD8zLM3gyIwmA
+ ysVI3xRx8c6IzxHq2gxLM1wkq6BdyReP7R4BzatvLsA4Gqws/NJz7xu3lSDgSmcCzOLx
+ 3HTk9OqX8XIe58vRHMhxG6rcEJ+lqi4886f0aUQvj/A/soQ2ASfXBIfYDoy7iciS0paz
+ eWRBQX/ZtHbbrsZMcuttYIQ1vQ/F22mnvRKoXspQJFhABIDwWQiQCwqPAQ58TBwbhgox 8A== 
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wxt3r0b70-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Mar 2024 18:38:37 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42IH0uOU002780;
+	Mon, 18 Mar 2024 18:38:36 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wwrf2a55y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Mar 2024 18:38:36 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42IIcY0G45351360
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 18 Mar 2024 18:38:36 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0F83358055;
+	Mon, 18 Mar 2024 18:38:34 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F20D85805B;
+	Mon, 18 Mar 2024 18:38:32 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 18 Mar 2024 18:38:32 +0000 (GMT)
+Message-ID: <4151f2f0-aa92-480d-aad5-2bf4333b4265@linux.ibm.com>
+Date: Mon, 18 Mar 2024 14:38:32 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f6487dcb03a31c35c272225197af87795df2a409.camel@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Bharat Bhushan <bbhushan2@marvell.com>,
+        Stefan Berger <stefanb@linux.vnet.ibm.com>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "saulo.alessandre@tse.jus.br" <saulo.alessandre@tse.jus.br>,
+        "lukas@wunner.de" <lukas@wunner.de>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+References: <20240312183618.1211745-1-stefanb@linux.vnet.ibm.com>
+ <20240312183618.1211745-7-stefanb@linux.vnet.ibm.com>
+ <SN7PR18MB5314CB6B4CF9678BDDF0D012E32D2@SN7PR18MB5314.namprd18.prod.outlook.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <SN7PR18MB5314CB6B4CF9678BDDF0D012E32D2@SN7PR18MB5314.namprd18.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: wSNjPDBhFanHNTjf9WxtXUObvZZKBVbJ
+X-Proofpoint-ORIG-GUID: wSNjPDBhFanHNTjf9WxtXUObvZZKBVbJ
+Subject: Re:  [PATCH v6 06/13] crypto: ecc - Implement vli_mmod_fast_521 for NIST
+ p521
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-18_12,2024-03-18_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 malwarescore=0 adultscore=0 mlxlogscore=999 mlxscore=0
+ phishscore=0 clxscore=1015 impostorscore=0 lowpriorityscore=0 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403140000 definitions=main-2403180141
 
-On Mon, Mar 18, 2024 at 11:26:31AM -0500, Tom Zanussi wrote:
-> Hi Jerry,
+
+
+On 3/18/24 01:47, Bharat Bhushan wrote:
 > 
-> On Mon, 2024-03-18 at 00:49 -0700, Jerry Snitselaar wrote:
-> > On Sun, Mar 17, 2024 at 11:44:21PM -0700, Jerry Snitselaar wrote:
-> > > This cleans up the following issues I ran into when trying to use
-> > > the
-> > > scripts and commands in the iaa-crypto.rst document.
-> > > 
-> > > - Fix incorrect arguments being passed to accel-config
-> > >   config-wq.
-> > >     - Replace --device_name with --driver-name.
-> > >     - Replace --driver_name with --driver-name.
-> > >     - Replace --size with --wq-size.
-> > >     - Add missing --priority argument.
-> > > - Add missing accel-config config-engine command after the
-> > >   config-wq commands.
-> > > - Fix wq name passed to accel-config config-wq.
-> > > - Add rmmod/modprobe of iaa_crypto to script that disables,
-> > >   then enables all devices and workqueues to avoid enable-wq
-> > >   failing with -EEXIST when trying to register to compression
-> > >   algorithm.
-> > > - Fix device name in cases where iaa was used instead of iax.
-> > > 
-> > > Cc: Tom Zanussi <tom.zanussi@linux.intel.com>
-> > > Cc: Jonathan Corbet <corbet@lwn.net>
-> > > Cc: linux-crypto@vger.kernel.org
-> > > Cc: linux-doc@vger.kernel.org
-> > > Signed-off-by: Jerry Snitselaar <jsnitsel@redhat.com>
-> > > ---
-> > >  .../driver-api/crypto/iaa/iaa-crypto.rst      | 22 ++++++++++++++-
-> > > ----
-> > >  1 file changed, 16 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
-> > > b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
-> > > index de587cf9cbed..330d35df5f16 100644
-> > > --- a/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
-> > > +++ b/Documentation/driver-api/crypto/iaa/iaa-crypto.rst
-> > > @@ -179,7 +179,9 @@ has the old 'iax' device naming in place) ::
-> > >  
-> > >    # configure wq1.0
-> > >  
-> > > -  accel-config config-wq --group-id=0 --mode=dedicated --
-> > > type=kernel --name="iaa_crypto" --device_name="crypto" iax1/wq1.0
-> > > +  accel-config config-wq --group-id=0 --mode=dedicated --
-> > > type=kernel --priority=10 --name="iaa_crypto" --driver-
-> > > name="crypto" iax1/wq1.0
-> > > +
-> > > +  accel-config config-engine iax1/engine1.0 --group-id=0
-> > >  
-> > >    # enable IAA device iax1
-> > >  
-> > > @@ -536,12 +538,20 @@ The below script automatically does that::
-> > >  
-> > >    echo "End Disable IAA"
-> > >  
-> > > +  echo "Reload iaa_crypto module"
-> > > +
-> > > +  rmmod iaa_crypto
-> > > +  modprobe iaa_crypto
-> > > +
-> > > +  echo "End Reload iaa_crypto module"
-> > > +
-> > >    #
-> > >    # configure iaa wqs and devices
-> > >    #
-> > >    echo "Configure IAA"
-> > >    for ((i = 1; i < ${num_iaa} * 2; i += 2)); do
-> > > -      accel-config config-wq --group-id=0 --mode=dedicated --
-> > > size=128 --priority=10 --type=kernel --name="iaa_crypto" --
-> > > driver_name="crypto" iax${i}/wq${i}
-> > > +      accel-config config-wq --group-id=0 --mode=dedicated --wq-
-> > > size=128 --priority=10 --type=kernel --name="iaa_crypto" --driver-
-> > > name="crypto" iax${i}/wq${i}.0
-> > > +      accel-config config-engine iax${i}/engine${i}.0 --group-id=0
-> > >    done
-> > >  
-> > >    echo "End Configure IAA"
-> > > @@ -552,10 +562,10 @@ The below script automatically does that::
-> > >    echo "Enable IAA"
-> > >  
-> > >    for ((i = 1; i < ${num_iaa} * 2; i += 2)); do
-> > > -      echo enable iaa iaa${i}
-> > > -      accel-config enable-device iaa${i}
-> > > -      echo enable wq iaa${i}/wq${i}.0
-> > > -      accel-config enable-wq iaa${i}/wq${i}.0
-> > > +      echo enable iaa iax${i}
-> > > +      accel-config enable-device iax${i}
-> > > +      echo enable wq iax${i}/wq${i}.0
-> > > +      accel-config enable-wq iax${i}/wq${i}.0
-> > >    done
-> > >  
-> > >    echo "End Enable IAA"
-> > > -- 
-> > > 2.41.0
-> > > 
-> > 
-> > In addition to the above, the sections related to the modes seem
-> > to be off to me.
-> > 
-> > Legacy mode in the Intel IOMMU context is when the IOMMU does not
-> > have
-> > scalable mode enabled. If you pass intel_iommu=off the Intel IOMMU
-> > will not be initialized, and I think that would correspond to the No
-> > IOMMU
-> > mode instead of Legacy mode. The other suggestion for Legacy mode of
-> > disabling VT-d in the BIOS would also be No IOMMU mode, but in
-> > addition to the dma remapping units being disabled it would disable
-> > interrupt remapping since the DMAR table would no longer be presented
-> > to the OS by the BIOS.
-> > 
-> > I think the modes should be:
-> > 
-> > Scalable mode: intel_iommu=on,sm_on
-> > Legacy mode: intel_iommu=on
-> > No IOMMU mode: intel_iommu=off (or VT-d disabled in BIOS)
-> > 
 > 
-> Yes, I think you're correct, those make more sense.
+>> -----Original Message-----
+>> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> Sent: Wednesday, March 13, 2024 12:06 AM
+>> To: keyrings@vger.kernel.org; linux-crypto@vger.kernel.org;
+>> herbert@gondor.apana.org.au; davem@davemloft.net
+>> Cc: linux-kernel@vger.kernel.org; saulo.alessandre@tse.jus.br;
+>> lukas@wunner.de; Bharat Bhushan <bbhushan2@marvell.com>;
+>> jarkko@kernel.org; Stefan Berger <stefanb@linux.ibm.com>
+>> Subject: [EXTERNAL] [PATCH v6 06/13] crypto: ecc - Implement
+>> vli_mmod_fast_521 for NIST p521
+>>
+>> Prioritize security for external emails: Confirm sender and content safety
+>> before clicking links or opening attachments
+>>
+>> ----------------------------------------------------------------------
+>> From: Stefan Berger <stefanb@linux.ibm.com>
+>>
+>> Implement vli_mmod_fast_521 following the description for how to calculate
+>> the modulus for NIST P521 in the NIST publication "Recommendations for
+>> Discrete Logarithm-Based Cryptography: Elliptic Curve Domain Parameters"
+>> section G.1.4.
+>>
+>> NIST p521 requires 9 64bit digits, so increase the ECC_MAX_DIGITS so that
+>> arrays fit the larger numbers.
+>>
+>> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+>> ---
+>>   crypto/ecc.c                  | 25 +++++++++++++++++++++++++
+>>   include/crypto/internal/ecc.h |  3 ++-
+>>   2 files changed, 27 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/crypto/ecc.c b/crypto/ecc.c index 415a2f4e7291..99d41887c005
+>> 100644
+>> --- a/crypto/ecc.c
+>> +++ b/crypto/ecc.c
+>> @@ -902,6 +902,28 @@ static void vli_mmod_fast_384(u64 *result, const
+>> u64 *product,  #undef AND64H  #undef AND64L
+>>
+>> +/*
+>> + * Computes result = product % curve_prime
+>> + * from "Recommendations for Discrete Logarithm-Based Cryptography:
+>> + *       Elliptic Curve Domain Parameters" section G.1.4
+>> + */
+>> +static void vli_mmod_fast_521(u64 *result, const u64 *product,
+>> +			      const u64 *curve_prime, u64 *tmp) {
+>> +	const unsigned int ndigits = ECC_CURVE_NIST_P521_DIGITS;
+>> +	size_t i;
+>> +
+>> +	/* Initialize result with lowest 521 bits from product */
+>> +	vli_set(result, product, ndigits);
+>> +	result[8] &= 0x1ff;
+>> +
+>> +	for (i = 0; i < ndigits; i++)
+>> +		tmp[i] = (product[8 + i] >> 9) | (product[9 + i] << 55);
+>> +	tmp[8] &= 0x1ff;
 > 
-> > Since Intel IOMMU and scabale mode have config options that allow
-> > them
-> > to be enabled by default, there are different parameter variations
-> > that would match the above cases. I don't know if they need to
-> > be detailed here, or if it would just make it more confusing.
-> > 
+> Can we get away from this hardcoding, like 9, 55, 0x1ff etc.
+> Or at least add comment about these.
 > 
-> Personally, I think it would be useful to have them detailed and might
-> lessen confusion for people setting things up and/or debugging a setup.
+>> +
+>> +	vli_mod_add(result, result, tmp, curve_prime, ndigits); }
+>> +
+>>   /* Computes result = product % curve_prime for different curve_primes.
+>>    *
+>>    * Note that curve_primes are distinguished just by heuristic check and @@ -
+>> 941,6 +963,9 @@ static bool vli_mmod_fast(u64 *result, u64 *product,
+>>   	case ECC_CURVE_NIST_P384_DIGITS:
+>>   		vli_mmod_fast_384(result, product, curve_prime, tmp);
+>>   		break;
+>> +	case ECC_CURVE_NIST_P521_DIGITS:
+>> +		vli_mmod_fast_521(result, product, curve_prime, tmp);
+>> +		break;
+>>   	default:
+>>   		pr_err_ratelimited("ecc: unsupported digits size!\n");
+>>   		return false;
+>> diff --git a/include/crypto/internal/ecc.h b/include/crypto/internal/ecc.h index
+>> ab722a8986b7..4e2f5f938e91 100644
+>> --- a/include/crypto/internal/ecc.h
+>> +++ b/include/crypto/internal/ecc.h
+>> @@ -33,7 +33,8 @@
+>>   #define ECC_CURVE_NIST_P192_DIGITS  3
+>>   #define ECC_CURVE_NIST_P256_DIGITS  4
+>>   #define ECC_CURVE_NIST_P384_DIGITS  6
+>> -#define ECC_MAX_DIGITS              (512 / 64) /* due to ecrdsa */
+>> +#define ECC_CURVE_NIST_P521_DIGITS  9
 > 
-> Thanks,
-> 
-> Tom
+> Maybe these can be defined as:
+> #define ECC_CURVE_NIST_P521_DIGITS  (DIV_ROUND_UP(521, 64) /* NIST P521 */)
 
-Hi Tom,
-
-This is what I came up with last night for the kernel parameters when thinking about it:
-
-
-| mode \ default enable | intel_iommu + /sm + | intel_iommu + / sm - | intel_iommu - / sm +  | intel_iommu - / sm - |
-|-----------------------+---------------------+----------------------+-----------------------+----------------------|
-| Scalable Mode         | nothing             | intel_iommu=sm_on    | intel_iommu=on        | intel_iommu=on,sm_on |
-| Legacy Mode           | intel_iommu=sm_off  | nothing              | intel_iommu=on,sm_off | intel_iommu=on       |
-| No IOMMU Mode         | intel_iommu=off     | intel_iommu=off      | nothing               | nothing              |
-
-
-Regards,
-Jerry
-
-
+I think for NIST P521 9 can be pre-calculated. It will not change 
+anymore in the future.
 
 > 
-> > Regards,
-> > Jerry
-> > 
+>> +#define ECC_MAX_DIGITS              DIV_ROUND_UP(521, 64) /* NIST P521 */
 > 
+> /* NIST_P521 is max digits */
+> #define ECC_MAX_DIGITS              ECC_CURVE_ _DIGITS
 
+In this case I think the DIV_ROUND_UP() along with the comment shows 
+that it needs to be updated if ever a larger curve comes along.
+
+> 
+> Thanks
+> -Bharat
+> 
+>>
+>>   #define ECC_DIGITS_TO_BYTES_SHIFT 3
+>>
+>> --
+>> 2.43.0
+> 
