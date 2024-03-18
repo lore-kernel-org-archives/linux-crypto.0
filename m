@@ -1,201 +1,128 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239C15A786;
-	Mon, 18 Mar 2024 22:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712655F859;
+	Mon, 18 Mar 2024 23:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710802499; cv=none; b=fHjRTU4ten63sKywpvoBWam6yxu7iirNLYOrAO37Y2wS30TEZWtNcA3jR71zEeHY5mwMo8KryWagpW+eD6SCdVIJ6bZFez0tU0bkCYpk/KjF2C5FPmTlodXXXPVNXfXHcgxcG/7Z3GW34mK2yB4CUph6PncQvhVRk/ufmOTV2Jo=
+	t=1710805145; cv=none; b=AuQp2vawRqTbW1j3sdmUNtrryyUVomPepuhgnZ3S0Rsv/jlMpm8nKhDbveBp2EMCdK6frS0y6oQywY2GC5Zc9gbM5rov35N6WClS2WdOOYFoLvI+S66kl+XdLkxTaDw84aokJW3FC0lpdq17TzHzMSMG2BQ31acZvClALvQ33qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710802499; c=relaxed/simple;
-	bh=NNxUzknMUx6JvNgGo1q+hdGtgoR/iRzhtpKz2FKCeCE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZMwwkydgxQocJrQiYM4ol9CxlNYIAnZZSYYwdv59JwDMWhTSUrj0nj6Qi4fBlNchVZrDb0/w5kVkTGpwro2+rH2iMelIGODJgYKv+9V0d7zMB7mArE30R9jsUo8lvuJAlALisF48FrWEFnFAqMC43xFFohRCcKi7HMlGf+5WARQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bE6l2bqz; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1710805145; c=relaxed/simple;
+	bh=vNPV+Zm1jo6GQke9UBMxQprrLogWyW6mK1dZOZf+eZ4=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=AASBViRejV7jwIgjj+TW5gZgGwB0qUAp1iLUrDulUylYjECAxz/P/xpSgTfAUl/s/DVSzj0cigz0oLs0XeTXN6N3BBd4sm2vTBkmJ5Q52ofxcE2psyFY/eZLXg2fcYhj22p24gXlNMaK7ZmO2ngODUV+TXWPlMqnAeml/QHT4uA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fRxQxe1v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bE6l2bqz"
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42IMWZO3022155;
-	Mon, 18 Mar 2024 22:54:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=no0ND6ofS1ljLX84cue1h9RXKCUPZ3al3cKsA5mJDw0=;
- b=bE6l2bqzKqqrgWGuKJosXW7gbIKTu5W0EV89aKiCqbyKQ19tg4PlhTod4PfBgvgtERx0
- MGr6FAx3De78heBz8ByQP4UgCU9vGUawHUtOGiwVDXxSu8SKx9TXJaokzg0Lz+M/hGig
- tFBLYAdvwGeOdrwphTstWAoXFS20RReBXwf7jJZeW1a47Zwj4MXPwz8x59lENdsvlKjh
- mtNZ2s+GhlyyNIgiDvjiznlXF6MEBt2POH0tNZA/qbhzn8Ab+nXVG+HXHLHuIL+Q46tf
- JFYDEwW9q3HJl94nz0x+7KzVcUkL463JnYTMkflz5f4jL0+Ukx80XdslNtp4iM01jaIK 8w== 
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wxxgbr24g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Mar 2024 22:54:45 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42IKuZW5017231;
-	Mon, 18 Mar 2024 22:54:44 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wwnrt3ym2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Mar 2024 22:54:44 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42IMsfgT50463148
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Mar 2024 22:54:43 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BE39258059;
-	Mon, 18 Mar 2024 22:54:41 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AF29D58055;
-	Mon, 18 Mar 2024 22:54:40 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 18 Mar 2024 22:54:40 +0000 (GMT)
-Message-ID: <d462e493-c719-4372-8991-cdd860f433d9@linux.ibm.com>
-Date: Mon, 18 Mar 2024 18:54:40 -0400
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fRxQxe1v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5A9FC433F1;
+	Mon, 18 Mar 2024 23:39:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710805144;
+	bh=vNPV+Zm1jo6GQke9UBMxQprrLogWyW6mK1dZOZf+eZ4=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=fRxQxe1vX8gFA4H4/tqhTxyx1PTwtyNbL63yiwezOezdjGrGu2yUxdzdrO6YfwvDJ
+	 Gy2MYnigaGTllxZyONLD/zOrf14lQ9QxcUqxZc4DwlWfec16z2A2zYb3Ja7d2ggEAj
+	 SDGtivMXm0puj/iglEDdFF7AJBHiljiYpaCvuaopqHnubCGqrkbs+ijVyhNaALqQpb
+	 jFacRouvnfhdEc9PNNd1FFZquD0pWYM6LXBh7iot2GreTyHec1jci00jEH0FwPmum/
+	 C8QpZe/h539LeIGNqtwghhAZzX2XYyqzRk3f2Hd6ddNmiBkELNZuQjVwWXXvGPs1JW
+	 6Z436URGh79cA==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 08/13] crypto: ecc - Add NIST P521 curve parameters
-Content-Language: en-US
-To: Jarkko Sakkinen <jarkko@kernel.org>,
-        Stefan Berger <stefanb@linux.vnet.ibm.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br, lukas@wunner.de,
-        bbhushan2@marvell.com
-References: <20240312183618.1211745-1-stefanb@linux.vnet.ibm.com>
- <20240312183618.1211745-9-stefanb@linux.vnet.ibm.com>
- <CZX6JM30P6FG.138133OLNGMS2@kernel.org>
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <CZX6JM30P6FG.138133OLNGMS2@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: AVgnEwh_6dFHKv5oxjldq-1355trb3_B
-X-Proofpoint-ORIG-GUID: AVgnEwh_6dFHKv5oxjldq-1355trb3_B
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-18_12,2024-03-18_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- phishscore=0 priorityscore=1501 clxscore=1015 malwarescore=0
- suspectscore=0 adultscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403140000 definitions=main-2403180173
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 19 Mar 2024 01:39:00 +0200
+Message-Id: <CZX9T3TU6YU0.3JE9M7M3ENUE0@kernel.org>
+Cc: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>, "Sergey
+ Shtylyov" <s.shtylyov@omp.ru>
+Subject: Re: [PATCH] KEYS: prevent NULL pointer dereference in
+ find_asymmetric_key()
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Roman Smirnov" <r.smirnov@omp.ru>, "David Howells"
+ <dhowells@redhat.com>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David
+ S. Miller" <davem@davemloft.net>, "Andrew Zaborowski"
+ <andrew.zaborowski@intel.com>
+X-Mailer: aerc 0.15.2
+References: <20240315103320.18754-1-r.smirnov@omp.ru>
+In-Reply-To: <20240315103320.18754-1-r.smirnov@omp.ru>
+
+On Fri Mar 15, 2024 at 12:33 PM EET, Roman Smirnov wrote:
+> With the current code, in case all NULLs are passed in id_{0,1,2},
+
+"current code" is not unambigious reference of any part of the kernel
+tree. Please just write down the function name instead.
+
+> the kernel will first print out a WARNING and then have an oops
+> because id_2 gets dereferenced anyway.
+
+Would be more exact":
+
+s/print out a WARNING/emit WARN/
+
+> Note that WARN_ON() is also considered harmful by Greg Kroah-
+> Hartman since it causes the Android kernels to panic as they
+> get booted with the panic_on_warn option.
+
+Despite full respect to Greg, and agreeing what he had said about
+the topic (which you are lacking lore link meaning that in all
+cases the current description is incomplete), the only thing that
+should be documented should be that since WARN_ON() can emit
+panic when panic_on_warn is set in the *kernel command-line*
+(not "option") this condition should be relaxed.
+
+>
+> Found by Linux Verification Center (linuxtesting.org) with Svace.
+
+I'm not sure if this should be part of the commit message.
+
+>
+> Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AKID")
+> Suggested-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+Should be reported-by.
+
+> Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> ---
+>  crypto/asymmetric_keys/asymmetric_type.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric=
+_keys/asymmetric_type.c
+> index a5da8ccd353e..f5cbd6ff14e2 100644
+> --- a/crypto/asymmetric_keys/asymmetric_type.c
+> +++ b/crypto/asymmetric_keys/asymmetric_type.c
+> @@ -60,17 +60,17 @@ struct key *find_asymmetric_key(struct key *keyring,
+>  	char *req, *p;
+>  	int len;
+> =20
+> -	WARN_ON(!id_0 && !id_1 && !id_2);
+> -
+
+Weird, I recall discussing about this issue in the past. Unfortunately
+could not find the thread from lore.
+
+Anyway I agree with the code change.
+
+>  	if (id_0) {
+>  		lookup =3D id_0->data;
+>  		len =3D id_0->len;
+>  	} else if (id_1) {
+>  		lookup =3D id_1->data;
+>  		len =3D id_1->len;
+> -	} else {
+> +	} else if (id_2) {
+>  		lookup =3D id_2->data;
+>  		len =3D id_2->len;
+> +	} else {
+> +		return ERR_PTR(-EINVAL);
+>  	}
+> =20
+>  	/* Construct an identifier "id:<keyid>". */
 
 
-
-On 3/18/24 17:05, Jarkko Sakkinen wrote:
-> On Tue Mar 12, 2024 at 8:36 PM EET, Stefan Berger wrote:
->> From: Stefan Berger <stefanb@linux.ibm.com>
->>
->> Add the parameters for the NIST P521 curve and define a new curve ID
->> for it. Make the curve available in ecc_get_curve.
-> 
-> This is rare example of "complete story" in this series despite being
-> short, so no complains :-)
-
-Wew :-) Thanks for the reviews.
-
-> 
->>
->> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
->> Tested-by: Lukas Wunner <lukas@wunner.de>
->> ---
->>   crypto/ecc.c            |  2 ++
->>   crypto/ecc_curve_defs.h | 45 +++++++++++++++++++++++++++++++++++++++++
->>   include/crypto/ecdh.h   |  1 +
->>   3 files changed, 48 insertions(+)
->>
->> diff --git a/crypto/ecc.c b/crypto/ecc.c
->> index ead40b5ebb46..4f6fa8617308 100644
->> --- a/crypto/ecc.c
->> +++ b/crypto/ecc.c
->> @@ -60,6 +60,8 @@ const struct ecc_curve *ecc_get_curve(unsigned int curve_id)
->>   		return &nist_p256;
->>   	case ECC_CURVE_NIST_P384:
->>   		return &nist_p384;
->> +	case ECC_CURVE_NIST_P521:
->> +		return &nist_p521;
->>   	default:
->>   		return NULL;
->>   	}
->> diff --git a/crypto/ecc_curve_defs.h b/crypto/ecc_curve_defs.h
->> index ab1ef3d94be5..0ecade7d02f5 100644
->> --- a/crypto/ecc_curve_defs.h
->> +++ b/crypto/ecc_curve_defs.h
->> @@ -89,6 +89,51 @@ static struct ecc_curve nist_p384 = {
->>   	.b = nist_p384_b
->>   };
->>   
->> +/* NIST P-521 */
->> +static u64 nist_p521_g_x[] = { 0xf97e7e31c2e5bd66ull, 0x3348b3c1856a429bull,
->> +				0xfe1dc127a2ffa8deull, 0xa14b5e77efe75928ull,
->> +				0xf828af606b4d3dbaull, 0x9c648139053fb521ull,
->> +				0x9e3ecb662395b442ull, 0x858e06b70404e9cdull,
->> +				0xc6ull };
->> +static u64 nist_p521_g_y[] = { 0x88be94769fd16650ull, 0x353c7086a272c240ull,
->> +				0xc550b9013fad0761ull, 0x97ee72995ef42640ull,
->> +				0x17afbd17273e662cull, 0x98f54449579b4468ull,
->> +				0x5c8a5fb42c7d1bd9ull, 0x39296a789a3bc004ull,
->> +				0x118ull };
->> +static u64 nist_p521_p[] = { 0xffffffffffffffffull, 0xffffffffffffffffull,
->> +				0xffffffffffffffffull, 0xffffffffffffffffull,
->> +				0xffffffffffffffffull, 0xffffffffffffffffull,
->> +				0xffffffffffffffffull, 0xffffffffffffffffull,
->> +				0x1ffull };
->> +static u64 nist_p521_n[] = { 0xbb6fb71e91386409ull, 0x3bb5c9b8899c47aeull,
->> +				0x7fcc0148f709a5d0ull, 0x51868783bf2f966bull,
->> +				0xfffffffffffffffaull, 0xffffffffffffffffull,
->> +				0xffffffffffffffffull, 0xffffffffffffffffull,
->> +				0x1ffull };
->> +static u64 nist_p521_a[] = { 0xfffffffffffffffcull, 0xffffffffffffffffull,
->> +				0xffffffffffffffffull, 0xffffffffffffffffull,
->> +				0xffffffffffffffffull, 0xffffffffffffffffull,
->> +				0xffffffffffffffffull, 0xffffffffffffffffull,
->> +				0x1ffull };
->> +static u64 nist_p521_b[] = { 0xef451fd46b503f00ull, 0x3573df883d2c34f1ull,
->> +				0x1652c0bd3bb1bf07ull, 0x56193951ec7e937bull,
->> +				0xb8b489918ef109e1ull, 0xa2da725b99b315f3ull,
->> +				0x929a21a0b68540eeull, 0x953eb9618e1c9a1full,
->> +				0x051ull };
->> +static struct ecc_curve nist_p521 = {
->> +	.name = "nist_521",
->> +	.nbits = 521,
->> +	.g = {
->> +		.x = nist_p521_g_x,
->> +		.y = nist_p521_g_y,
->> +		.ndigits = 9,
->> +	},
->> +	.p = nist_p521_p,
->> +	.n = nist_p521_n,
->> +	.a = nist_p521_a,
->> +	.b = nist_p521_b
->> +};
->> +
->>   /* curve25519 */
->>   static u64 curve25519_g_x[] = { 0x0000000000000009, 0x0000000000000000,
->>   				0x0000000000000000, 0x0000000000000000 };
->> diff --git a/include/crypto/ecdh.h b/include/crypto/ecdh.h
->> index a9f98078d29c..9784ecdd2fb4 100644
->> --- a/include/crypto/ecdh.h
->> +++ b/include/crypto/ecdh.h
->> @@ -26,6 +26,7 @@
->>   #define ECC_CURVE_NIST_P192	0x0001
->>   #define ECC_CURVE_NIST_P256	0x0002
->>   #define ECC_CURVE_NIST_P384	0x0003
->> +#define ECC_CURVE_NIST_P521	0x0004
->>   
->>   /**
->>    * struct ecdh - define an ECDH private key
-> 
-> 
-> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-> 
-> BR, Jarkko
-> 
+BR, Jarkko
