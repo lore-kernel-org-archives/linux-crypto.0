@@ -1,178 +1,167 @@
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE6B5474B;
-	Tue, 19 Mar 2024 10:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.154.123
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710845169; cv=fail; b=TjyXa5VV9PleVBCDhK1PMlFC656+m1hU/lzyhZVCw61kWAR2amLMtA/4omGDRWVvyfynIvCRTS6TTAWjOUQlISz3P23h/r8uOXAGXeBlWTOYgTHqCwrbsMtpFNVrdQ26XbOkssB2eiGOUuyK6DnjWQeGXLtQnJybQYd7k4yQOM8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710845169; c=relaxed/simple;
-	bh=ZX4vHHdGZDQlQoUzD2voqQ1gLQaRNcGlFJlvZKWUFB0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tk4iojoHD5JKXFatLjtvT2tukxqDLU+Py/KQefCIITrjjzf179hSO7T4VLN036HLBbrZ6To7xup/AjqDQBPLR0vUccH3Hp+dTH0SnIqNzk/Pdj4BZKicREQofnGsDJok6XFcTRJD6el3DkHSiWM6zT+jfam+zSxI+95OJ35s960=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=EfF3nOyQ; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=iV/rlQ+r; arc=fail smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E422A7CF03;
+	Tue, 19 Mar 2024 11:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710846069; cv=none; b=TRtUsG8fGsx6acjNk8q4xk+Iy2zXstY3POPn+yxh7A6bBY0Cemm9vG5w3B1EtDHwb9n/GfrjftJ9zD//7wBAhD5sswXp0FyFTiyrR6u7PafoH6C2WZobY9wUlXg4tx8G4VpKL5T32gaqV8q34N9p4h4u3temZBOXRanWVNrrN1w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710846069; c=relaxed/simple;
+	bh=V8dQ99e5Y9M3LuuWQ364Upo7u+6yPLvJxT/d6XYPtps=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cdWB+kgfqTpx3RtTPb9fW3vRjSXO/ae0Jb7f6gEAImamI50WzA7Kq/S7b0lHV7jPPCIk68RXvutvpLzSFF3VVk18uXD3kQLQmUkelDrPSeH6jD50vS64Te9VegL3qWzs6MkH1483CwnCNj7lzvU5XtBjZYSavrWRptx9bwa46ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RCxZDADs; arc=none smtp.client-ip=209.85.217.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="EfF3nOyQ";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="iV/rlQ+r"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1710845164; x=1742381164;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=ZX4vHHdGZDQlQoUzD2voqQ1gLQaRNcGlFJlvZKWUFB0=;
-  b=EfF3nOyQ3r/NdihTmE5B4AeX9Q11nT7EqztB3h2b4OfmGdl/BVsIDWed
-   7Quk9RDSiOKeFhc8ht/1F65qhmWsHRW7/KENpL6K9QJWQ3QBgNnyT2nDy
-   GSZ/N/NvISnK8HchBXOR1KmhZizVuENVRvqxuifq+HSNZ1gqnCBGdb3K2
-   8s4dcsAtWK6nXYk/m2KjWRWRxEO/gALlCW1DPqOvdJ6Re8geQo2bOukMJ
-   0U2isyj6ctT7J64UTvMm4Juq4bEoaOCEeAyhZixztYdu7fjAHqsl9NLPW
-   G9kUrSbBbfV/4FNnvsyHqvw07AQdACwky8yYKt/7asBy5tEni8H+ar53j
-   Q==;
-X-CSE-ConnectionGUID: Gvfzvks/SJuqyehc92eZew==
-X-CSE-MsgGUID: PfUofqoyR8K/XjrzZdadZw==
-X-IronPort-AV: E=Sophos;i="6.07,136,1708412400"; 
-   d="scan'208";a="18366491"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Mar 2024 03:46:03 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 19 Mar 2024 03:45:46 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 19 Mar 2024 03:45:45 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ntzLigjXbeqsTqNGxLo2XTqiCxJ3GELcXTx/DRl3MMgVI64cncMZ+kYCf0r13Tc44wFvJ79m+ByOfx83lBH9EKJ3EQQgaSYBzHfNfG7XzmxYOUr+w5J/vL6a4sZjVTVtpgNIpYoKUWuhubghuq4r6y+GL0LVtz+9mHwwqLr2TS6dLO5nSuzETxX9kJUp9ML5HhSQ+HRRnUzWsL8VeUdeA0ubw0UJftgbZLiNCNtg7z0auUFKOrwL6KbxlWtMjZWxJd5ngGKcAckayAxz3WUuATN3Bcj0EvqeXcna1g9xSH7Pl4HOeE4kWRT3ik2Ll2qThbMyYsNgJ8h6ucZ9PZ7qvg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZX4vHHdGZDQlQoUzD2voqQ1gLQaRNcGlFJlvZKWUFB0=;
- b=IGJhLlTeRYKS894Lsx8I14Ho9HbcjelQ0v4aWW9WoAQjCyNsCxGKLvNnzAIVyMVkOEVt+vfmM+lszvGRtu/oZ/y4KBjSjL+iR8gt9wqr7BKtHOb+yX26P7GQwsQGOciS59uRnpFAEhS2Wp0aXEHQRmN4UdtUAL7L1LbTv9Y1wSOueVCt7rlRYLMaClS5kODfET+n9uqepA8vCVhc6Y2cGqsVNDQH5kRuj028ALTpO5WrNt2oVyJww9WUBbqN2BjKqiAHS5PAz8Lx8RYZG+j/kVSL5WNHiVplgYk5E3aBcKZfvQvIZ/+i3ebFWN1hBRQwhzAD6gT7O5slFtaVCHPakw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZX4vHHdGZDQlQoUzD2voqQ1gLQaRNcGlFJlvZKWUFB0=;
- b=iV/rlQ+r2t94+SNU+EnFTx1Tfu2nD2js3R3CvvU3biK1xF7dqVwkuwhPGhofnMB8H8SIuCRIP2kh3JX99c1CTWVgxYqrzSXQOEFyhbQQPZ4ADP5TQ34nVThCao834Mo3RSJ6wHS3M3Dm47efrZmYM96kac2Ke78sxdTb0+cPqB9+WtPwDcA8qYi3RcJyjEH7OMVj7XpRngZDr85tX7N54x2uPDkp4WfhxhHo/xp/lN9JL84A9HNrFUTF9QtbTG2d09dQfp/mSzixnEFBTYCEStRrA1DCpAKHSqaMCXUkcDtQWehdL4h949Ziy+qXya/b7GTQ1MURiz6/kldCtWNs/A==
-Received: from MN0PR11MB6231.namprd11.prod.outlook.com (2603:10b6:208:3c4::15)
- by DM6PR11MB4753.namprd11.prod.outlook.com (2603:10b6:5:2ac::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.15; Tue, 19 Mar
- 2024 10:45:44 +0000
-Received: from MN0PR11MB6231.namprd11.prod.outlook.com
- ([fe80::6440:4b82:c32c:9eb7]) by MN0PR11MB6231.namprd11.prod.outlook.com
- ([fe80::6440:4b82:c32c:9eb7%5]) with mapi id 15.20.7409.010; Tue, 19 Mar 2024
- 10:45:43 +0000
-From: <Balamanikandan.Gunasundar@microchip.com>
-To: <linux-kernel@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
-	<linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-CC: <Hari.PrasathGE@microchip.com>, <Balamanikandan.Gunasundar@microchip.com>
-Subject: Re: [PATCH] MAINTAINERS: update maintainer for microchip nand and
- pmecc drivers
-Thread-Topic: [PATCH] MAINTAINERS: update maintainer for microchip nand and
- pmecc drivers
-Thread-Index: AQHaediUUJ5azV0iCEGZ+AASReGbVLE+4XuA
-Date: Tue, 19 Mar 2024 10:45:43 +0000
-Message-ID: <bc2930e6-f599-41f4-9df5-2583910a1d9c@microchip.com>
-References: <20240319083620.88181-1-balamanikandan.gunasundar@microchip.com>
-In-Reply-To: <20240319083620.88181-1-balamanikandan.gunasundar@microchip.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB6231:EE_|DM6PR11MB4753:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: XmBRmsXbodR5VJLgV6V8ZxBOkBLhYPssw/soakxOqUY3xzNvHBxWl1jxvlGa4KVSIfInWzwBWbI9yKHrSkiMjGRdSjqzneeJ44pHv7nRZHmgBEKQDank4YY6BloSkdHxmrB8v6ZI4fwpunGDDZC6GY9vfotfBTKD3/DmqSehm7CFi5/xJuhHE+BSd1pgPUEVWXuJt0xrknyyz5697t98FXAGcalAXAqsxT4MDR+tKOuCDgupEZDsHV1O1ShxbsXlGfBYCxXRAImF6qjMzBx+cZU6/w7HvnBSf1WV3QwaD+zH7HvOwYYRgJ6GzFzhKss1GYSyMK0evI1e/iFSr8PVeRigS21swxhVOknv1s2wgY2zNab3Oo4wp7/KFpgsB9spcji5HopLV49TPKTSq307fXttsW1/Gd2hIVHCXE7LYG/7nikzNBKgdFcwB5hrmKO9kw3jqcdKUjbw0WgDHevscCyWN2KaAfBYAKO27wk3umQOhDkppWMdzvgCtqBL2vJTH6yLzwsH08iUFbVTTdA3tnSnydMJtYOytAy4423PgyQ7tlor1p/ZtQsmLfslr2es7cqIGInVF3vXsgOwUE/LsRIUkYhUoVNw8Z3G48uGgXvkn0zYxjyL6y5CcRVnFFYe/FQ3CPiR0xuqx/JzoqnoCcPL44joxHZaxqeG2Fe2NEE=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB6231.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NTc5NEQ0dzRhRVJhMTZsZ245UHFhb1V1K1h6Mm9HNkxqQUY5WW9UWGZmTDBj?=
- =?utf-8?B?QmFlTEQrYVRZbFM5Ym9ZbWpMY0NnTHFoYzFnaTd1Rnp6SXg2RkVtS3h6ZDFT?=
- =?utf-8?B?YmpONC9BVXlHRC8rcEpvYU9nRlEwdTNZUVhZOHNFQXlXdkdkNWxJMjlYNmJ2?=
- =?utf-8?B?bGcyb1lYMko4ZGo5QUs0S29odjBNUG8ybUNNdDhoVEZDNjRwb1o2UE1KSDhH?=
- =?utf-8?B?S3N0bDBRZGJZb0hrQS8zZkdJaGpSeHZUN3BXY1E1YkJCZXRpSnFlWkhTSGJ4?=
- =?utf-8?B?eHdhcFc4RlplM21JL3lDYmJrRlRFWjl1Ym1namxSalJUSFlmYXQxS2Y4bitX?=
- =?utf-8?B?cU5rWVFNajZMTlBNUzhYZ3oxQk5yYnBFdllKa0x6ZlU1RkIwdlNDVU5aVC93?=
- =?utf-8?B?cmphZGdGbSswb3JpRnlHTUhvdHN4eFNlY3VyRmNyT2krOXcrdDl6OFhNN0tu?=
- =?utf-8?B?QzNTTTluNG52M1Ara2lrRHV6UVlnQzNkQS9xYkRqNGZZZVM1SHIwdUlNQjNK?=
- =?utf-8?B?c1JRVTkxeDFWaEZxUXlKeFdzb2R1N1FNZnkzV3FaNEN4R3gwclNuUkc2Q3ZI?=
- =?utf-8?B?dnBBNWFNN3BOOHBDZTdsK0VWTzR1U3RocHlNbGNIQVdOeUJjOTRiVEVTVWUr?=
- =?utf-8?B?d1JXcElEeWtIYUFxdG11RXRpL3BwRmYrVXMycmlYS3ZSaUdzNnN5WmFiVEZV?=
- =?utf-8?B?azd1ZzR5NENTRGNBNDY4R0ZJL0w2T1JUdHhSd0JTL0xQT2ZoOGEvSENSM05I?=
- =?utf-8?B?ZWRMSFFqSmJsN1VPZFM1V3J2eTZ4cDhJMjJqdzBYVW1UQzFZbHFDeUJaWi9u?=
- =?utf-8?B?ZnBPcFM3RysyT2lMVnJRdXArQlR2V3BVZTNaRmNoOERlT2tVbFBIU0RtRFhq?=
- =?utf-8?B?a01RMDNNTnBaVTVuZDcyR1lBcVEyK3p0alpTWE1mT3p5T1BWbENFNDJIQnFs?=
- =?utf-8?B?RFN1dzdUL0FaWlg4ZHdYWEJkbWVYaTBRQWIzNXU4R2J1TFZLTW42dVQ0enlj?=
- =?utf-8?B?Q0lmazRod2s5UW5Pdm9XaUNabVBJZkMzcEJHdDlSS3JnZC9maUxRUGFGU0VD?=
- =?utf-8?B?blR4NUhSRTVYRUJ2b3gvRlFPSnFJQm1QVHc3eVJaMTY2byt0K1FTTnFaMnQw?=
- =?utf-8?B?RXV6RjhaR3lzOFE5MmZTNVV5UGlwenVCRUJ3djhVaXpURVhhdUh3LzgvcmJY?=
- =?utf-8?B?NldYbEJoaTdXZEZwZnJmRWNKK0U4bUJnYUFCdHBCaUtLMktUZUVHVUx3M3pJ?=
- =?utf-8?B?d2tWazFmV09hTjBhVHpSTjZCS0VwaTI1SjNjWDNqYkx2UlFtdU5pY09mM1RM?=
- =?utf-8?B?UllZRVlMUXpmWjJ5d0ptU01mV0gzZ00zcDR1TmdLQmhMY2xYQkxPNGZ1Y09r?=
- =?utf-8?B?RkV0NzBXcXhKK3lvSUdQcGl5OE51ZjM5MWpWMzJWU3NiU2VBMW9JY20rYkRG?=
- =?utf-8?B?cDU2ellHSjZ5NENzdkdNQmdUQ05vd21ReXc0MXBqcEZUNFRjRUhlWlg2Tk9y?=
- =?utf-8?B?cFFKak9lMjF0b3hYUERNQWJZeHFDTnFTMmppaWlTL05ReHJlWkRGcGJwS3ZU?=
- =?utf-8?B?Z2k2Z1p2SkNyUnFCVDgxbFBYL3VxOGk2ZWhvMHdpSHBOUFZBL2hOdC9nR2JJ?=
- =?utf-8?B?TmxMKy9ORnc5VnJMVnJMMG5RU3Rvc3U2RnA2cmtBajRIQkZhLzNMbFpoTElT?=
- =?utf-8?B?RnFMVStWcmNYUkhBamw4MVJtekRsSXV4THhsVWJpTHhxZlR2S1RYSytZbnBX?=
- =?utf-8?B?d0pMckFoOFl0dDNoNzVFVFVmNXFxWkUrRTJ5djEzQ0pNVTZPUDRVTGJmQlJB?=
- =?utf-8?B?cTJYTnIvSkM2aEpKS3lqUlVhNk41RjliUExzQ1FkeUVZOE5IU2UwYzBTTnNP?=
- =?utf-8?B?ZEpxa2pEK213OUNLVFVtUGEvZUNSNG82NVpZMGR6YWloaVhwbWpFck9ISDl0?=
- =?utf-8?B?bVUzK0FKQjVqVFdab2xWYm9wNXBTZU5YZ2xEcFR6SUVyenVPYUFqemozTzVR?=
- =?utf-8?B?d3BlMFdwcWdjWmFXbUcyZlJUYUk1RXNkR0VUZE1sZytSZmN4OE9lRldib082?=
- =?utf-8?B?aTBYbnhzdzE3RDdJSUdzcER1ZnVTcHdjYmwwZ2ZhZEwvc0FHSXlSdmhUdUc5?=
- =?utf-8?B?dW1VM2tLV3RBN3BzN0JySnc1TkkrUW5SSlgzWjR1RmtaWHZLeDVFTWNRbVlC?=
- =?utf-8?Q?oiDkSmXwCQQ7IU1+/ftpRqg=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <07032E11F474514CA311794CEBF07E08@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RCxZDADs"
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-47689bdbc5aso606317137.2;
+        Tue, 19 Mar 2024 04:01:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710846067; x=1711450867; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kOBLKV0xQ7AJ5900qlJ5sX84DjfeTGhfWKoI9iiPc1I=;
+        b=RCxZDADs9AbGFvwhC7zk35begld1yZDA/yz5VmOC3bB1ckFfC5zP+y2PyYj2Jf01ua
+         d/dIfxG8Cb2+/gOODYoaQxExxhuFSlCfX0y8Rl+P9okqy7Tj1RaxDpquuKSNB90KIzY9
+         ZYqKAhCF5oot8jl++udKjf1CFq/dc0kjsMZaQ9auw652vzOYUo7cUMWlJfkBizV4sE9K
+         H6jtdAPqDulqNruMQ2Bj+RkOODXUnTkukPCjhriBehPzzxrk068ex7odu/9JJP0Na5r0
+         2HIUN73NA1fzaaXmlDkkiWExowUOLTBc7aTH8g3iJ0Q7zaUXmQ5/I9enUuEsChzL0vb5
+         MZJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710846067; x=1711450867;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kOBLKV0xQ7AJ5900qlJ5sX84DjfeTGhfWKoI9iiPc1I=;
+        b=W7mvPuqngiqR5ZILZUUhYHzLMmSqrHqP7i8fX+I7Np4zryApYSy9KNTI3Ra/LkKDYR
+         /WJ257YVjEZZt8U2d9UwRMoqr9TueJVV4A3KliwOoiIqzdG6Hab0Hb3RsG1Hl7yr+N4C
+         iHgTOdpjmdHHWTXHUpMnFnyz6VO5x0t/IooA+Jtb9iGDN8ja+zTjg5sfT/V07KNuYHc5
+         8093HHNC5G/jAEqZXv3X9wpDeXpRUVM7oHWyZIr0x9QZB5cUfDRgUKuDe3EiAf0Kp40G
+         3Z/v0Y9ffaH9FILqqAuiwocH66nj3p46T9XlDoGaYoWBW1c5e8G5MqbVgnuuFZLZ6Hz6
+         ISGA==
+X-Forwarded-Encrypted: i=1; AJvYcCVjVkq6D4OvqZbzBLya2BG35XQCtZrKlqY2CszYEBwYwv02wVCzKcQ1PFuHWMAO544rD57VtGkN7qe9OhyVCKj34E6uWWM7P2kFiCTs42ASZeohA45lVhGts6bNb4BvPgwSvKpHb5y4OY3a
+X-Gm-Message-State: AOJu0Yyu/b5vPbh18cy9aUHUBGxWPwYW8pavMt+CZl11y0f0Q+U0g97i
+	Y/azMqzcIKPx2QPZDZ+ePdVe6AZAuUNBsx45J45Aut7fh1npb8ZCH4DZRUrRH8CqDgdFMfmFIqr
+	fKqosKSbq8UmeE8AFhnG6j55Qdro=
+X-Google-Smtp-Source: AGHT+IGdbW0VUwa9qosaiw9cgqJN6DwQC54NdjZWWS92EGosoQQuO0RaG4psVVbqF4D15bN7RBb5MF2n462s5LhYXB8=
+X-Received: by 2002:a67:f296:0:b0:473:1a3e:57ce with SMTP id
+ m22-20020a67f296000000b004731a3e57cemr11704297vsk.27.1710846066747; Tue, 19
+ Mar 2024 04:01:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB6231.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96e3fb80-ef9e-49aa-5e74-08dc4801ba68
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Mar 2024 10:45:43.8820
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RgzO/vnKto+LAMtftShkgnWa2utXE8WOjEQx/M/jI8ZNNtEtSHzW2oVFVTasIr/cci3CgxiD2Vr+NklogFP1e8pgNnNf9GFgUxBvV8IFyU6q5HQwWMUFOAbWyiHQyXEh
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4753
+References: <20240222081135.173040-1-21cnbao@gmail.com> <20240308121139.GA116548@cmpxchg.org>
+In-Reply-To: <20240308121139.GA116548@cmpxchg.org>
+From: Barry Song <21cnbao@gmail.com>
+Date: Tue, 19 Mar 2024 19:00:55 +0800
+Message-ID: <CAGsJ_4wSSvVxPb7eJqewqM1My7y+yT1hNZC0s04G=mD06tq4=g@mail.gmail.com>
+Subject: Re: [PATCH v6 0/2] zswap: remove the memcpy if acomp is not sleepable
+To: Johannes Weiner <hannes@cmpxchg.org>, Tom Zanussi <tom.zanussi@linux.intel.com>, 
+	herbert@gondor.apana.org.au
+Cc: akpm@linux-foundation.org, davem@davemloft.net, 
+	linux-crypto@vger.kernel.org, linux-mm@kvack.org, nphamcs@gmail.com, 
+	yosryahmed@google.com, zhouchengming@bytedance.com, chriscli@google.com, 
+	chrisl@kernel.org, ddstreet@ieee.org, linux-kernel@vger.kernel.org, 
+	sjenning@redhat.com, vitaly.wool@konsulko.com, 
+	Barry Song <v-songbaohua@oppo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGksDQoNCktpbmRseSBpZ25vcmUgdGhpcyBwYXRjaC4gSGF2ZSBtYWRlIGEgbWlzdGFrZS4gSSB3
-aWxsIHNlbmQgYSB2Mi4gU29ycnkgDQpmb3IgdGhlIG5vaXNlLg0KDQpUaGFua3MsDQpCYWxhDQoN
-Ck9uIDE5LzAzLzI0IDI6MDYgcG0sIEJhbGFtYW5pa2FuZGFuIEd1bmFzdW5kYXIgd3JvdGU6DQo+
-IFVwZGF0ZSBteXNlbGYgYXMgbWFpbnRhaW5lciBmb3IgbWljcm9jaGlwIG5hbmQgYW5kIHBtZWNj
-IGRyaXZlcnMuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBCYWxhbWFuaWthbmRhbiBHdW5hc3VuZGFy
-IDxiYWxhbWFuaWthbmRhbi5ndW5hc3VuZGFyQG1pY3JvY2hpcC5jb20+DQo+IC0tLQ0KPiAgIE1B
-SU5UQUlORVJTIHwgNiArKysrLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCsp
-LCAyIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL01BSU5UQUlORVJTIGIvTUFJTlRB
-SU5FUlMNCj4gaW5kZXggODI4OTZjM2UwNTU5Li40NmMxNzdhYTJiNjAgMTAwNjQ0DQo+IC0tLSBh
-L01BSU5UQUlORVJTDQo+ICsrKyBiL01BSU5UQUlORVJTDQo+IEBAIC0xNDM5NCw4ICsxNDM5NCw5
-IEBAIEY6CURvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9tZWRpYS9taWNyb2NoaXAs
-Y3NpMmRjLnlhbWwNCj4gICBGOglkcml2ZXJzL21lZGlhL3BsYXRmb3JtL21pY3JvY2hpcC9taWNy
-b2NoaXAtY3NpMmRjLmMNCj4gICANCj4gICBNSUNST0NISVAgRUNDIERSSVZFUg0KPiArTToJQmFs
-YW1hbmlrYW5kYW4gR3VuYXN1bmRhciA8YmFsYW1hbmlrYW5kYW4uZ3VuYXN1bmRhckBtaWNyb2No
-aXAuY29tPg0KPiAgIEw6CWxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmcNCj4gLVM6CU9ycGhh
-bg0KPiArUzoJU3VwcG9ydGVkDQo+ICAgRjoJZHJpdmVycy9jcnlwdG8vYXRtZWwtZWNjLioNCj4g
-ICANCj4gICBNSUNST0NISVAgRUlDIERSSVZFUg0KPiBAQCAtMTQ1MDAsOCArMTQ1MDEsOSBAQCBT
-OglNYWludGFpbmVkDQo+ICAgRjoJZHJpdmVycy9tbWMvaG9zdC9hdG1lbC1tY2kuYw0KPiAgIA0K
-PiAgIE1JQ1JPQ0hJUCBOQU5EIERSSVZFUg0KPiArTToJQmFsYW1hbmlrYW5kYW4gR3VuYXN1bmRh
-ciA8YmFsYW1hbmlrYW5kYW4uZ3VuYXN1bmRhckBtaWNyb2NoaXAuY29tPg0KPiAgIEw6CWxpbnV4
-LW10ZEBsaXN0cy5pbmZyYWRlYWQub3JnDQo+IC1TOglPcnBoYW4NCj4gK1M6CVN1cHBvcnRlZA0K
-PiAgIEY6CURvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9tdGQvYXRtZWwtbmFuZC50
-eHQNCj4gICBGOglkcml2ZXJzL210ZC9uYW5kL3Jhdy9hdG1lbC8qDQo+ICAgDQoNCg==
+On Fri, Mar 8, 2024 at 8:11=E2=80=AFPM Johannes Weiner <hannes@cmpxchg.org>=
+ wrote:
+>
+> On Thu, Feb 22, 2024 at 09:11:33PM +1300, Barry Song wrote:
+> > From: Barry Song <v-songbaohua@oppo.com>
+> >
+> > In zswap, if we use zsmalloc, we cannot sleep while we map the
+> > compressed memory, so we copy it to a temporary buffer. By
+> > knowing the alg won't sleep can help zswap to avoid the
+> > memcpy.
+> > Thus we introduce an API in crypto to expose if acomp is async,
+> > and zswap can use it to decide if it can remove copying to the
+> > tmp buffer.
+> >
+> > -v6:
+> >  * add acked-by of Herbert, Thanks!
+> >  * remove patch 3/3 from the series, as that one will go
+> >    through crypto
+> >
+> > Barry Song (2):
+> >   crypto: introduce: acomp_is_async to expose if comp drivers might
+> >     sleep
+> >   mm/zswap: remove the memcpy if acomp is not sleepable
+> >
+> >  include/crypto/acompress.h | 6 ++++++
+> >  mm/zswap.c                 | 6 ++++--
+> >  2 files changed, 10 insertions(+), 2 deletions(-)
+>
+> Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+>
+> Looks good to me.
+>
+> One small question: why cache is_sleepable in zswap instead of
+> checking acomp_is_async() directly? It doesn't look expensive.
+
+Thank you, Johannes. Your question sparked an idea for me. Drivers, such as
+drivers/crypto/intel/iaa/iaa_crypto_main.c, have the capability to dynamica=
+lly
+switch between synchronous and asynchronous modes. Consequently, they
+also have the opportunity to dynamically modify cra_flags. This means that
+we may not require the cache. right now, iaa always has an ASYNC flag and
+needs a memcpy. If we can dynamically change the flag, the iaa platform mig=
+ht
+be able to further remove a memcpy in zswap if sync mode is set for it.
+
+/*
+ * The iaa crypto driver supports three 'sync' methods determining how
+ * compressions and decompressions are performed:
+ *
+ * - sync:      the compression or decompression completes before
+ *              returning.  This is the mode used by the async crypto
+ *              interface when the sync mode is set to 'sync' and by
+ *              the sync crypto interface regardless of setting.
+ *
+ * - async:     the compression or decompression is submitted and returns
+ *              immediately.  Completion interrupts are not used so
+ *              the caller is responsible for polling the descriptor
+ *              for completion.  This mode is applicable to only the
+ *              async crypto interface and is ignored for anything
+ *              else.
+ *
+ * - async_irq: the compression or decompression is submitted and
+ *              returns immediately.  Completion interrupts are
+ *              enabled so the caller can wait for the completion and
+ *              yield to other threads.  When the compression or
+ *              decompression completes, the completion is signaled
+ *              and the caller awakened.  This mode is applicable to
+ *              only the async crypto interface and is ignored for
+ *              anything else.
+ *
+ * These modes can be set using the iaa_crypto sync_mode driver
+ * attribute.
+ */
+
+But it seems we will get lots of synchronized issues particularly when we a=
+re
+changing the mode by sysfs.
+
+static ssize_t sync_mode_store(struct device_driver *driver,
+      const char *buf, size_t count)
+{
+           ...
+}
+
+I don't have any iaa hardware. But I'd like to ask if this can interest Tom=
+, the
+maintainer of INTEL IAA CRYPTO DRIVER to have a go :-)
+
++Tom Zanussi
+
+Thanks
+Barry
