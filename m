@@ -1,167 +1,112 @@
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E422A7CF03;
-	Tue, 19 Mar 2024 11:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FEBB23A8;
+	Tue, 19 Mar 2024 14:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710846069; cv=none; b=TRtUsG8fGsx6acjNk8q4xk+Iy2zXstY3POPn+yxh7A6bBY0Cemm9vG5w3B1EtDHwb9n/GfrjftJ9zD//7wBAhD5sswXp0FyFTiyrR6u7PafoH6C2WZobY9wUlXg4tx8G4VpKL5T32gaqV8q34N9p4h4u3temZBOXRanWVNrrN1w=
+	t=1710859485; cv=none; b=NN9imhUuPNwsjh7L+72dxvQQ7NROetZNmwV2eyNt2RX76/ux5oJtqN/tScQTFybfy2TokZWJZuv62aLsvdLaihpvnhdEXPSczxgJgZ+tcsjrcEMzh5aIYLiH7Zax3IuBmDo+bIBfECbLBHizhVGkEVzy3pSm+lwjO/2KAVycSv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710846069; c=relaxed/simple;
-	bh=V8dQ99e5Y9M3LuuWQ364Upo7u+6yPLvJxT/d6XYPtps=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cdWB+kgfqTpx3RtTPb9fW3vRjSXO/ae0Jb7f6gEAImamI50WzA7Kq/S7b0lHV7jPPCIk68RXvutvpLzSFF3VVk18uXD3kQLQmUkelDrPSeH6jD50vS64Te9VegL3qWzs6MkH1483CwnCNj7lzvU5XtBjZYSavrWRptx9bwa46ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RCxZDADs; arc=none smtp.client-ip=209.85.217.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RCxZDADs"
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-47689bdbc5aso606317137.2;
-        Tue, 19 Mar 2024 04:01:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710846067; x=1711450867; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kOBLKV0xQ7AJ5900qlJ5sX84DjfeTGhfWKoI9iiPc1I=;
-        b=RCxZDADs9AbGFvwhC7zk35begld1yZDA/yz5VmOC3bB1ckFfC5zP+y2PyYj2Jf01ua
-         d/dIfxG8Cb2+/gOODYoaQxExxhuFSlCfX0y8Rl+P9okqy7Tj1RaxDpquuKSNB90KIzY9
-         ZYqKAhCF5oot8jl++udKjf1CFq/dc0kjsMZaQ9auw652vzOYUo7cUMWlJfkBizV4sE9K
-         H6jtdAPqDulqNruMQ2Bj+RkOODXUnTkukPCjhriBehPzzxrk068ex7odu/9JJP0Na5r0
-         2HIUN73NA1fzaaXmlDkkiWExowUOLTBc7aTH8g3iJ0Q7zaUXmQ5/I9enUuEsChzL0vb5
-         MZJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710846067; x=1711450867;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kOBLKV0xQ7AJ5900qlJ5sX84DjfeTGhfWKoI9iiPc1I=;
-        b=W7mvPuqngiqR5ZILZUUhYHzLMmSqrHqP7i8fX+I7Np4zryApYSy9KNTI3Ra/LkKDYR
-         /WJ257YVjEZZt8U2d9UwRMoqr9TueJVV4A3KliwOoiIqzdG6Hab0Hb3RsG1Hl7yr+N4C
-         iHgTOdpjmdHHWTXHUpMnFnyz6VO5x0t/IooA+Jtb9iGDN8ja+zTjg5sfT/V07KNuYHc5
-         8093HHNC5G/jAEqZXv3X9wpDeXpRUVM7oHWyZIr0x9QZB5cUfDRgUKuDe3EiAf0Kp40G
-         3Z/v0Y9ffaH9FILqqAuiwocH66nj3p46T9XlDoGaYoWBW1c5e8G5MqbVgnuuFZLZ6Hz6
-         ISGA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjVkq6D4OvqZbzBLya2BG35XQCtZrKlqY2CszYEBwYwv02wVCzKcQ1PFuHWMAO544rD57VtGkN7qe9OhyVCKj34E6uWWM7P2kFiCTs42ASZeohA45lVhGts6bNb4BvPgwSvKpHb5y4OY3a
-X-Gm-Message-State: AOJu0Yyu/b5vPbh18cy9aUHUBGxWPwYW8pavMt+CZl11y0f0Q+U0g97i
-	Y/azMqzcIKPx2QPZDZ+ePdVe6AZAuUNBsx45J45Aut7fh1npb8ZCH4DZRUrRH8CqDgdFMfmFIqr
-	fKqosKSbq8UmeE8AFhnG6j55Qdro=
-X-Google-Smtp-Source: AGHT+IGdbW0VUwa9qosaiw9cgqJN6DwQC54NdjZWWS92EGosoQQuO0RaG4psVVbqF4D15bN7RBb5MF2n462s5LhYXB8=
-X-Received: by 2002:a67:f296:0:b0:473:1a3e:57ce with SMTP id
- m22-20020a67f296000000b004731a3e57cemr11704297vsk.27.1710846066747; Tue, 19
- Mar 2024 04:01:06 -0700 (PDT)
+	s=arc-20240116; t=1710859485; c=relaxed/simple;
+	bh=P40Vdq5Nbbd2vIKB85O00otSW5GtKAMdXan8b0B8sCE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=J88m519p4Cg4lzPdNVHcmqNRrj7Ny8gSORrEWk4YymyO5OZwl4bv1QdscrCO+d81avSKhTpb7dxubbwkFnzCv1OD9f7ETiaPAGHgTETV5WTcdc5taHOkqFzXdGtFJa6ixDy0nGhZIZ2AVPJJUc2ymrIMD0yZZv/JrHqsWChbexY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from msexch01.omp.ru (10.188.4.12) by msexch02.omp.ru (10.188.4.13)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 19 Mar
+ 2024 17:44:35 +0300
+Received: from msexch01.omp.ru ([fe80::485b:1c4a:fb7f:c753]) by
+ msexch01.omp.ru ([fe80::485b:1c4a:fb7f:c753%5]) with mapi id 15.02.1258.012;
+ Tue, 19 Mar 2024 17:44:35 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
+To: Jarkko Sakkinen <jarkko@kernel.org>, David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, Andrew Zaborowski <andrew.zaborowski@intel.com>
+CC: "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>, "Sergey
+ Shtylyov" <s.shtylyov@omp.ru>
+Subject: Re: [PATCH] KEYS: prevent NULL pointer dereference in
+ find_asymmetric_key()
+Thread-Topic: [PATCH] KEYS: prevent NULL pointer dereference in
+ find_asymmetric_key()
+Thread-Index: AQHadsRHcr0dJekxEkCC6oTcOjjyP7E9+xQAgAEukF0=
+Date: Tue, 19 Mar 2024 14:44:35 +0000
+Message-ID: <b5f21d1175c142efb52e68a24bc4165a@omp.ru>
+References: <20240315103320.18754-1-r.smirnov@omp.ru>,<CZX9T3TU6YU0.3JE9M7M3ENUE0@kernel.org>
+In-Reply-To: <CZX9T3TU6YU0.3JE9M7M3ENUE0@kernel.org>
+Accept-Language: ru-RU, en-US
+Content-Language: ru-RU
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-kse-serverinfo: msexch02.omp.ru, 9
+x-kse-antivirus-interceptor-info: scan successful
+x-kse-antivirus-info: Clean, bases: 3/19/2024 12:55:00 PM
+x-kse-attachment-filter-triggered-rules: Clean
+x-kse-attachment-filter-triggered-filters: Clean
+x-kse-bulkmessagesfiltering-scan-result: InTheLimit
+Content-Type: text/plain; charset="koi8-r"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240222081135.173040-1-21cnbao@gmail.com> <20240308121139.GA116548@cmpxchg.org>
-In-Reply-To: <20240308121139.GA116548@cmpxchg.org>
-From: Barry Song <21cnbao@gmail.com>
-Date: Tue, 19 Mar 2024 19:00:55 +0800
-Message-ID: <CAGsJ_4wSSvVxPb7eJqewqM1My7y+yT1hNZC0s04G=mD06tq4=g@mail.gmail.com>
-Subject: Re: [PATCH v6 0/2] zswap: remove the memcpy if acomp is not sleepable
-To: Johannes Weiner <hannes@cmpxchg.org>, Tom Zanussi <tom.zanussi@linux.intel.com>, 
-	herbert@gondor.apana.org.au
-Cc: akpm@linux-foundation.org, davem@davemloft.net, 
-	linux-crypto@vger.kernel.org, linux-mm@kvack.org, nphamcs@gmail.com, 
-	yosryahmed@google.com, zhouchengming@bytedance.com, chriscli@google.com, 
-	chrisl@kernel.org, ddstreet@ieee.org, linux-kernel@vger.kernel.org, 
-	sjenning@redhat.com, vitaly.wool@konsulko.com, 
-	Barry Song <v-songbaohua@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 8, 2024 at 8:11=E2=80=AFPM Johannes Weiner <hannes@cmpxchg.org>=
- wrote:
->
-> On Thu, Feb 22, 2024 at 09:11:33PM +1300, Barry Song wrote:
-> > From: Barry Song <v-songbaohua@oppo.com>
+On Tue, 19 Mar 2024 01:39:00 +0200 Jarkko Sakkinen wrote:
+> On Fri Mar 15, 2024 at 12:33 PM EET, Roman Smirnov wrote:
+> > With the current code, in case all NULLs are passed in id_{0,1,2},
+>=20
+> "current code" is not unambigious reference of any part of the kernel
+> tree. Please just write down the function name instead.
+>=20
+> > the kernel will first print out a WARNING and then have an oops
+> > because id_2 gets dereferenced anyway.
+>=20
+> Would be more exact":
+>=20
+> s/print out a WARNING/emit WARN/
+
+Okay, I'll prepare a second version of the patch.
+
+> > Note that WARN_ON() is also considered harmful by Greg Kroah-
+> > Hartman since it causes the Android kernels to panic as they
+> > get booted with the panic_on_warn option.
+>=20
+> Despite full respect to Greg, and agreeing what he had said about
+> the topic (which you are lacking lore link meaning that in all
+> cases the current description is incomplete), the only thing that
+> should be documented should be that since WARN_ON() can emit
+> panic when panic_on_warn is set in the *kernel command-line*
+> (not "option") this condition should be relaxed.
+
+Here's a link to the discussion:
+https://lore.kernel.org/all/2024011213-situated-augmented-64a4@gregkh/
+From the context, I thought WARN_ON() would be better removed.
+
 > >
-> > In zswap, if we use zsmalloc, we cannot sleep while we map the
-> > compressed memory, so we copy it to a temporary buffer. By
-> > knowing the alg won't sleep can help zswap to avoid the
-> > memcpy.
-> > Thus we introduce an API in crypto to expose if acomp is async,
-> > and zswap can use it to decide if it can remove copying to the
-> > tmp buffer.
+> > Found by Linux Verification Center (linuxtesting.org) with Svace.
+>=20
+> I'm not sure if this should be part of the commit message.
+
+I have already submitted patches with this line, some have been
+accepted. It is important for the Linux Verification Center to mark
+patches as closing issues found with Svace.
+
 > >
-> > -v6:
-> >  * add acked-by of Herbert, Thanks!
-> >  * remove patch 3/3 from the series, as that one will go
-> >    through crypto
-> >
-> > Barry Song (2):
-> >   crypto: introduce: acomp_is_async to expose if comp drivers might
-> >     sleep
-> >   mm/zswap: remove the memcpy if acomp is not sleepable
-> >
-> >  include/crypto/acompress.h | 6 ++++++
-> >  mm/zswap.c                 | 6 ++++--
-> >  2 files changed, 10 insertions(+), 2 deletions(-)
->
-> Acked-by: Johannes Weiner <hannes@cmpxchg.org>
->
-> Looks good to me.
->
-> One small question: why cache is_sleepable in zswap instead of
-> checking acomp_is_async() directly? It doesn't look expensive.
+> > Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AKID=
+")
+> > Suggested-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+>=20
+> Should be reported-by.
 
-Thank you, Johannes. Your question sparked an idea for me. Drivers, such as
-drivers/crypto/intel/iaa/iaa_crypto_main.c, have the capability to dynamica=
-lly
-switch between synchronous and asynchronous modes. Consequently, they
-also have the opportunity to dynamically modify cra_flags. This means that
-we may not require the cache. right now, iaa always has an ASYNC flag and
-needs a memcpy. If we can dynamically change the flag, the iaa platform mig=
-ht
-be able to further remove a memcpy in zswap if sync mode is set for it.
+The suggested-by tag belongs to Sergey because he suggested the fix,
+subject/description of the patch. The tag reported-by belongs to
+Svace tool.
 
-/*
- * The iaa crypto driver supports three 'sync' methods determining how
- * compressions and decompressions are performed:
- *
- * - sync:      the compression or decompression completes before
- *              returning.  This is the mode used by the async crypto
- *              interface when the sync mode is set to 'sync' and by
- *              the sync crypto interface regardless of setting.
- *
- * - async:     the compression or decompression is submitted and returns
- *              immediately.  Completion interrupts are not used so
- *              the caller is responsible for polling the descriptor
- *              for completion.  This mode is applicable to only the
- *              async crypto interface and is ignored for anything
- *              else.
- *
- * - async_irq: the compression or decompression is submitted and
- *              returns immediately.  Completion interrupts are
- *              enabled so the caller can wait for the completion and
- *              yield to other threads.  When the compression or
- *              decompression completes, the completion is signaled
- *              and the caller awakened.  This mode is applicable to
- *              only the async crypto interface and is ignored for
- *              anything else.
- *
- * These modes can be set using the iaa_crypto sync_mode driver
- * attribute.
- */
-
-But it seems we will get lots of synchronized issues particularly when we a=
-re
-changing the mode by sysfs.
-
-static ssize_t sync_mode_store(struct device_driver *driver,
-      const char *buf, size_t count)
-{
-           ...
-}
-
-I don't have any iaa hardware. But I'd like to ask if this can interest Tom=
-, the
-maintainer of INTEL IAA CRYPTO DRIVER to have a go :-)
-
-+Tom Zanussi
-
-Thanks
-Barry
+Thank you for the reply.=
