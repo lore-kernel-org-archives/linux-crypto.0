@@ -1,66 +1,66 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51843FB3F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A6C3FB95;
 	Wed, 20 Mar 2024 11:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710935284; cv=none; b=IgDrsACUwLtVLJzS2uqnsAbNORXu67ICghIKtYPCSc+FyCf4oIe5fcafmjDWNFWn/qZ9Qgv+/7daHd8tFbuPcc3AyHuqWXmvXRhUFCf/LEUL7khXbIcXtqZfN7q4PlUboO/pV53JVzUuK3XXnuv8M+0ZM7e3i75u0bxd7VeV3/U=
+	t=1710935284; cv=none; b=gpmenWc3f05PpgFI6kXA8IB9QOjTjz3hwpfyy8Asx2eJ7PKHtW8VewwEnm1oah+3leXufNbwWp+Tk6HMX9crkbbMRKPe4Mv1VgsetvSvood2WQB9aNiNoAW09yOqIQzQkmL+KHUGHlJrBKSMR7kQBuDn4pP8IfeoiOSiSZl22Tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710935284; c=relaxed/simple;
-	bh=0LJAbvCt4Qe8ibvb9FfoDYCrZXlHL0jJfNNPGsH/M7Q=;
+	bh=ECD6UYt8ly+hvwCPWZOIZbTGsBNVn9SePrs7rpx9N8E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=niKhjK1QQ/01xkBY74QNUQOPN/MNhi/m/0xgT8dO0DHsK6NBZkH5tnNVSK+53nGmt8IICd8r8+cONeU9xvzUmvpByMiH3anCpoqn5TzdRd4E7DPlrrCrg+jb3LTxLKVDHytAKiWuOaNMk61fHEVTsNuwW8pQhwXvmkxgEVMjkGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RXQZBAkU; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=ijMq1to9aCrGPMTEmFV9qeqnFCUyD063LQXAZNIEwpt93pdNcDkeK8jrPaMyPf0Vfdui3DqWh+TQEg9YN9u5uXas0jU4SWB7GTVpFeYdH0d/lP7b5XwxKF/xrKtqKAwYiU3suOawTtVYj/pr75qwq6s8oZjU1fjTsL34NOx1bTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fLHjshW1; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RXQZBAkU"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42KBhddq018278;
-	Wed, 20 Mar 2024 11:47:52 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fLHjshW1"
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42KBTJjK003623;
+	Wed, 20 Mar 2024 11:47:57 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=uA2p9mSk0L1ZpsS7jxFDbrW8SRhpWN+F0J8POcJbgVA=;
- b=RXQZBAkU6g/ymvBsdTaUC0/iI8+pnN9PPr4bHUg/6Xcp0YzAziVosHE3W5u1R/Y8d42v
- HdqRksvt1n2X+F/UXIJMYvDu0jFphcC4c98plWle0cFDi6S11CmWteSbKTDdahYw0bPZ
- 5k/+UBg/WbwWuWEti8tyGQ8jrwi/77KxYIbZxSdML9AFg8Crg+r5K203di0oCtksDrJr
- 1KYBHNhYlU5hF+Di1016t+Zk8HMgzIwoZradwoubVoH/DgBxt4lnzmDxjqQh8gJK8KH1
- TziLE5LrA2cVTuInsm3zO9iQo9tSxEn9FsTbXkZiy4NNFhVYb0i7Jj6NvO16ZUBnw7ih cg== 
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wyy5f00c9-1
+ bh=XSXyAIueAHJ1lWNywrbbM71EPIyVuF7P/7ioWN+Hylo=;
+ b=fLHjshW1fLz0xZzgvCSwVDzKlJ2H8reLdMo2axrqTu4yc8wvAQxUb0DnCqpvBh16WmRE
+ +yWgbFQMzT/UmuayQzkqwQWZmSrIQk2QfIhFV1lg5DulHiLhTViqwFkxXboMX6MxDY35
+ cSbnZZwISPgXzTNcslktj6X2tjwuKs350dyq9eP40oMEW2yceekA4KFr0Y5Cr5sOM4jO
+ gdVeoTlCtIC6iR5RGnQ2xBIRqwBDUVCcO8UY8bkqw4wa5EOP/RyIN8kq1olq4j30l69O
+ DogUDI14U0Y5inTAedmMeoh6AYEi/CilsT2vv9OmflOm7ZHsD49xbcSGsS1CvrrCwMzE 1g== 
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wyxst026n-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Mar 2024 11:47:51 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42KA1GuD002799;
-	Wed, 20 Mar 2024 11:47:50 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wwrf2nk32-1
+	Wed, 20 Mar 2024 11:47:56 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42KA8uWZ010083;
+	Wed, 20 Mar 2024 11:47:54 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wxvav314t-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Mar 2024 11:47:50 +0000
+	Wed, 20 Mar 2024 11:47:54 +0000
 Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42KBllSM46334510
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42KBlqVb26870506
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 20 Mar 2024 11:47:49 GMT
+	Wed, 20 Mar 2024 11:47:54 GMT
 Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 58BC858067;
-	Wed, 20 Mar 2024 11:47:47 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 2EE9B58061;
+	Wed, 20 Mar 2024 11:47:52 +0000 (GMT)
 Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B330F58057;
-	Wed, 20 Mar 2024 11:47:46 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 615CA58057;
+	Wed, 20 Mar 2024 11:47:51 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
 	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 20 Mar 2024 11:47:46 +0000 (GMT)
+	Wed, 20 Mar 2024 11:47:51 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.ibm.com>
 To: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         herbert@gondor.apana.org.au, davem@davemloft.net
 Cc: linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br, lukas@wunner.de,
         bbhushan2@marvell.com, jarkko@kernel.org,
         Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH v7 03/13] crypto: ecdsa - Adjust tests on length of key parameters
-Date: Wed, 20 Mar 2024 07:47:15 -0400
-Message-ID: <20240320114725.1644921-4-stefanb@linux.ibm.com>
+Subject: [PATCH v7 09/13] crypto: ecdsa - Replace ndigits with nbits where precision is needed
+Date: Wed, 20 Mar 2024 07:47:21 -0400
+Message-ID: <20240320114725.1644921-10-stefanb@linux.ibm.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240320114725.1644921-1-stefanb@linux.ibm.com>
 References: <20240320114725.1644921-1-stefanb@linux.ibm.com>
@@ -72,28 +72,20 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: L9mTeHBF4o9MMywG9kEw2TfNMrGcYHdr
-X-Proofpoint-ORIG-GUID: L9mTeHBF4o9MMywG9kEw2TfNMrGcYHdr
+X-Proofpoint-ORIG-GUID: cpEFCd5-Ul1kema4TV_rNOq5FbYVLyqi
+X-Proofpoint-GUID: cpEFCd5-Ul1kema4TV_rNOq5FbYVLyqi
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-03-20_08,2024-03-18_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 mlxlogscore=999 malwarescore=0 bulkscore=0 phishscore=0
- mlxscore=0 clxscore=1015 adultscore=0 suspectscore=0 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403140000 definitions=main-2403200093
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ mlxlogscore=999 adultscore=0 spamscore=0 clxscore=1015 impostorscore=0
+ malwarescore=0 bulkscore=0 phishscore=0 suspectscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2403140000
+ definitions=main-2403200093
 
-In preparation for support of NIST P521, adjust the basic tests on the
-length of the provided key parameters to only ensure that the length of the
-x plus y coordinates parameter array is not an odd number and that each
-coordinate fits into an array of 'ndigits' digits. Mathematical tests on
-the key's parameters are then done in ecc_is_pubkey_valid_full rejecting
-invalid keys.
-
-The change is necessary since NIST P521 keys do not have keys with
-coordinates that each require 'full' digits (= all bits in u64 used).
-NIST P521 only requires 2 bytes (9 bits) in the most significant digit
-unlike NIST P192/256/384 that each require multiple 'full' digits.
+Replace the usage of ndigits with nbits where precise space calculations
+are needed, such as in ecdsa_max_size where the length of a coordinate is
+determined.
 
 Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 Tested-by: Lukas Wunner <lukas@wunner.de>
@@ -102,18 +94,18 @@ Tested-by: Lukas Wunner <lukas@wunner.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
-index 6653dec17327..64e1e69d53ba 100644
+index 1814f009f971..4daefb40c37a 100644
 --- a/crypto/ecdsa.c
 +++ b/crypto/ecdsa.c
-@@ -230,7 +230,7 @@ static int ecdsa_set_pub_key(struct crypto_akcipher *tfm, const void *key, unsig
- 	if (ret < 0)
- 		return ret;
+@@ -266,7 +266,7 @@ static unsigned int ecdsa_max_size(struct crypto_akcipher *tfm)
+ {
+ 	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
  
--	if (keylen < 1 || (((keylen - 1) >> 1) % sizeof(u64)) != 0)
-+	if (keylen < 1 || ((keylen - 1) & 1) != 0)
- 		return -EINVAL;
- 	/* we only accept uncompressed format indicated by '4' */
- 	if (d[0] != 4)
+-	return ctx->pub_key.ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++	return DIV_ROUND_UP(ctx->curve->nbits, 8);
+ }
+ 
+ static int ecdsa_nist_p384_init_tfm(struct crypto_akcipher *tfm)
 -- 
 2.43.0
 
