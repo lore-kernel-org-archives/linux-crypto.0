@@ -1,239 +1,163 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5E04F885
-	for <linux-crypto@vger.kernel.org>; Tue, 19 Mar 2024 22:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE58F6FC3
+	for <linux-crypto@vger.kernel.org>; Wed, 20 Mar 2024 01:48:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710886767; cv=none; b=Yn51Ds4suGkn0J6KomwBc5volzXW5FirebtB/1hvVJwXDg5LLLOWq7MmuitlD1PYA3x3D3KTy47MwAJXUzmEpzomGQ+XCv1prNZZETCXjlyJGt9a0EVO+jZXjLVIneEdb/BOz12aPXDQgoSfuE5VShotpY2wKprXjIJFr/RH/QI=
+	t=1710899338; cv=none; b=PP+6yJEFDaT1dsml/Rxx/jIbMUfVxMdx6Vi5ToYrw185y13XeuXZ5/ahEkO12ezpjk4b95TDPU6Z8rmzOMJMHJMaAhrHfNKkZ1bfQKab9IyWFjIKrWUd1Dx1vdpZ2ZZXodN3v1A3GRlEhjkA8VLR1bpyvoi6ZhJb1XGTtqLJVJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710886767; c=relaxed/simple;
-	bh=o3jCWnvDkfqsEsH1ZkOdIJ7gCNPovZX350ROv8lyLQU=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=M8LscHZdUxUpKm+FH1/3NnxA3B26SRufPI7N0/tNp0boPtzGxTnSEWrL667TCl8pw8FR1qJei8kjCbvoSP7Xa3SrFYjSILfqfA7I+kjAbegGsd4tVxjbImq3WGZ/mZnM6pvt1v3NEgirY58MXdwe0rGA9I5uNTvk4ubsGz0s5yM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dTYFJdp/; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1710899338; c=relaxed/simple;
+	bh=qI5Tub3LHNOZFOE4/6hw3EHPShN11Tc+qwy45TA6jzI=;
+	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
+	 Content-Type; b=eRXzwmA6PuxT82t1ZDPacICKxFelWCKKhoU4BJ3DXU93l4I9Ja/Zu9vlPa5o3bXHdU+0J8TaD/GVYXB5dQQbLo0w4DB174/YiWYapoXfB35YQW+6nl/rfWkJTMa6UA+dNGyB1lkfIptL+/e5OQgUnXY54F6hTDWHzucIwrs3ABc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=bgQHemEv; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dTYFJdp/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710886765; x=1742422765;
-  h=message-id:subject:from:to:date:in-reply-to:references:
-   content-transfer-encoding:mime-version;
-  bh=o3jCWnvDkfqsEsH1ZkOdIJ7gCNPovZX350ROv8lyLQU=;
-  b=dTYFJdp/jETVRv3iN9cX6OsGJzBDJlc5w3f3ch6wKAj/ARvOgDGBAQRp
-   JGT4OXCYfQDi1eNjlg/UI3ciqNIqZGdg1Vl1pXEY34wH3U4Jk/7HqZoQq
-   MqImcAIGAwLgw6pUpc41ZwEzPPg64EAtJjVyqQkkQHbOKMBBPoXiLVjP6
-   kqbLY0gqLvD9WJAf0XDY+y/QLboTJWBHzlTCA3SblHSfrqt3hJOEd3l0Z
-   XlLgJMQfFsgDl9OESWy3aEWYgIu1Oon2fjuAfqGU95hhuqYPGLCXD5UDW
-   gDU5VJBAKmJsoSRSj2xu8jCnZM+clPr9J3cQy/UYHxuzUzoVwk2zcOCbt
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11018"; a="16523636"
-X-IronPort-AV: E=Sophos;i="6.07,138,1708416000"; 
-   d="scan'208";a="16523636"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2024 15:19:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,138,1708416000"; 
-   d="scan'208";a="18609700"
-Received: from yyu32-mobl.amr.corp.intel.com ([10.212.107.7])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2024 15:19:24 -0700
-Message-ID: <39f73bd559aa96051b4d5c8e42d0ce942194b64f.camel@linux.intel.com>
-Subject: Re: Divide by zero in iaa_crypto during boot of a kdump kernel
-From: Tom Zanussi <tom.zanussi@linux.intel.com>
-To: Jerry Snitselaar <jsnitsel@redhat.com>, Herbert Xu
-	 <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	linux-crypto@vger.kernel.org
-Date: Tue, 19 Mar 2024 17:19:22 -0500
-In-Reply-To: <hyf3fggjvnjjdbkk4hvocmlfhbz2wapxjhmppurthqavgvk23m@j47q5vlzb2om>
-References: 
-	<hyf3fggjvnjjdbkk4hvocmlfhbz2wapxjhmppurthqavgvk23m@j47q5vlzb2om>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="bgQHemEv"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6e709e0c123so3055301b3a.1
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Mar 2024 18:48:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1710899335; x=1711504135; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0XFWeUGhARFGLtFMmrEktN1r5EqqYdHQ1yDObB41VHU=;
+        b=bgQHemEvN05cdGU6PpvED1zoIXJgO5LBFTlnx50deFNOuq+GHUAaD7l6X6AZeWsNJQ
+         1plwhb/c1gHnH8CX4ofdt0KwXvycCbWRqrjaMWEoAZqkDU0abR8J6zUK964XMUM84i3y
+         m0jGe4hOoPUABl+sORRsya0599TlvqK56yuJe7Xhp7fNPbL+YSSYdeec6RTgnBrNpZob
+         xybC4lfWlAccgPfc+HFxo6jhah3Zeoe172z0ZQvSdKPMfJRUfsJKkp9FHnK8ZX2VfhdE
+         mgwrO2RO2QPXa3nenA2EbMNh4RdKOzhMpBndkRFcmGXwEZN4OplqdUak+gI7NCAHIv+0
+         tLdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710899335; x=1711504135;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0XFWeUGhARFGLtFMmrEktN1r5EqqYdHQ1yDObB41VHU=;
+        b=OUsnXzgCVN0ae36mr4MJz7Uw4lkUL1gZPA26l+n3HVqcuMfp8M/tVw75wptwTEbCgs
+         3JwA3ksMyz2qWEI6w/6jQHac0RHR9bXIXkYtaKw5tybz7hJ9qBiVSQY5w8XEXyWggTqO
+         z93OlIV9hKhmDkB4KEOEjrotAzJKCctbJ5lXbVwq2qcq4T4Wa9vtqr6/SeU/9sUgtNoU
+         buaCCrHnwNnMsG5HTVygMrg8zk+BccspFofpiW8heiLx9vr63rxw18NDtolntvzyhLff
+         yiNxRxKBB4VsRC4AxU44RE++pFpBCzQl2M+Beg4hfBYb8GFGEbdvcAP8KIyNN+mybE+8
+         sOsA==
+X-Forwarded-Encrypted: i=1; AJvYcCU4wNn3At/yZUY9PQKf5ouNe3jOHM2chJA27dNPupP9GLI8ARFjMY7vzMHVx+8l3LbS5jcxVn/tViu7vLY+tje6HbR7AB8oOX/UDmhM
+X-Gm-Message-State: AOJu0YwnevWW67bJi70Bl74uqmUTy4X1Kz27kfggV+un5PBAVQi2MW42
+	pBofR22ZQ9mvOn/AYDOb+ogBwh1kuM5Yegk3T6Bhp9en6tlMe5DD32ciW6GrcDQ=
+X-Google-Smtp-Source: AGHT+IEsM1/0CXsqPV1u7HWDW2kWwLy9n8txe/RJcjigdZRgO1jABEpVpPsAnwHTQDrbVR7Cz8D3Jw==
+X-Received: by 2002:a05:6a20:b915:b0:1a3:69a9:e3e7 with SMTP id fe21-20020a056a20b91500b001a369a9e3e7mr4012756pzb.18.1710899334899;
+        Tue, 19 Mar 2024 18:48:54 -0700 (PDT)
+Received: from localhost ([50.213.54.97])
+        by smtp.gmail.com with ESMTPSA id ld11-20020a170902facb00b001db5079b705sm1628209plb.36.2024.03.19.18.48.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Mar 2024 18:48:54 -0700 (PDT)
+Date: Tue, 19 Mar 2024 18:48:54 -0700 (PDT)
+X-Google-Original-Date: Tue, 19 Mar 2024 18:48:50 PDT (-0700)
+Subject:     Re: [PATCH riscv/for-next] crypto: riscv - parallelize AES-CBC decryption
+In-Reply-To: <20240210181240.GA1098@sol.localdomain>
+CC: jerry.shih@sifive.com, linux-riscv@lists.infradead.org,
+  linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu, Heiko Stuebner <heiko@sntech.de>,
+  phoebe.chen@sifive.com, andy.chiu@sifive.com
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: ebiggers@kernel.org
+Message-ID: <mhng-7b6264a7-c1cd-46b2-97f1-b2c3d3dbb716@palmer-ri-x1c9a>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Jerry,
+On Sat, 10 Feb 2024 10:12:40 PST (-0800), ebiggers@kernel.org wrote:
+> On Sat, Feb 10, 2024 at 11:25:27PM +0800, Jerry Shih wrote:
+>> > .macro	aes_cbc_decrypt	keylen
+>> > +	srli		LEN, LEN, 2	// Convert LEN from bytes to words
+>> > 	vle32.v		v16, (IVP)	// Load IV
+>> > 1:
+>> > -	vle32.v		v17, (INP)	// Load ciphertext block
+>> > -	vmv.v.v		v18, v17	// Save ciphertext block
+>> > -	aes_decrypt	v17, \keylen	// Decrypt
+>> > -	vxor.vv		v17, v17, v16	// XOR with IV or prev ciphertext block
+>> > -	vse32.v		v17, (OUTP)	// Store plaintext block
+>> > -	vmv.v.v		v16, v18	// Next "IV" is prev ciphertext block
+>> > -	addi		INP, INP, 16
+>> > -	addi		OUTP, OUTP, 16
+>> > -	addi		LEN, LEN, -16
+>> > +	vsetvli		t0, LEN, e32, m4, ta, ma
+>> > +	vle32.v		v20, (INP)	// Load ciphertext blocks
+>> > +	vslideup.vi	v16, v20, 4	// Setup prev ciphertext blocks
+>> > +	addi		t1, t0, -4
+>> > +	vslidedown.vx	v24, v20, t1	// Save last ciphertext block
+>>
+>> Do we need to setup the `e32, len=t0` for next IV?
+>> I think we only need 128bit IV (with VL=4).
+>>
+>> > +	aes_decrypt	v20, \keylen	// Decrypt the blocks
+>> > +	vxor.vv		v20, v20, v16	// XOR with prev ciphertext blocks
+>> > +	vse32.v		v20, (OUTP)	// Store plaintext blocks
+>> > +	vmv.v.v		v16, v24	// Next "IV" is last ciphertext block
+>>
+>> Same VL issue here.
+>
+> It's true that the vslidedown.vx and vmv.v.v only need vl=4.  But it also works
+> fine with vl unchanged.  It just results in some extra data being moved in the
+> registers.  My hypothesis is that this is going to be faster than having the
+> three extra instructions per loop iteration to change the vl to 4 twice.
+>
+> I still have no real hardware to test on, so I have no quantitative data.  All I
+> can do is go with my instinct which is that the shorter version will be better.
+>
+> If you have access to a real CPU that supports the RISC-V vector crypto
+> extensions, I'd be interested in the performance you get from each variant.
+> (Of course, different RISC-V CPU implementations may have quite different
+> performance characteristics, so that still won't be definitive.)
 
-On Tue, 2024-03-19 at 13:51 -0700, Jerry Snitselaar wrote:
-> Hi Tom,
->=20
-> While looking at a different issue on a GNR system I noticed that
-> during the boot of the kdump kernel it crashes when probing
-> iaa_crypto
-> due to a divide by zero in rebalance_wq_table. The problem is that
-> the
-> kdump kernel comes up with a single cpu, and if there are multiple
-> iaa
-> devices cpus_per_iaa is going to be calculated to be 0, and then the
-> 'if ((cpu % cpus_per_iaa) =3D=3D 0)' in rebalance_wq_table results in a
-> divide by zero. I reproduced it with the 6.8 eln kernel, and so far
-> have reproduced it on GNR, EMR, and SRF systems. I'm assuming the
-> same
-> will be the case on and SPR system with IAA devices enabled if I can
-> find one.
->=20
+We're stacking up a lot of stuff with HW-dependent performance 
+questions, I think it's fine to just take what's reasonably simple for 
+now.  If we try to speculate about what future hardware might do we're 
+just going to go crazy with possibilities, IMO we're way better off just 
+optimizing as things show up.
 
-Good catch, I've never tested that before. Thanks for reporting it.
+> Here is the alternative variant given as a diff from this patch:
+>
+> diff --git a/arch/riscv/crypto/aes-riscv64-zvkned.S b/arch/riscv/crypto/aes-riscv64-zvkned.S
+> index 43541aad6386c..ef380771f606a 100644
+> --- a/arch/riscv/crypto/aes-riscv64-zvkned.S
+> +++ b/arch/riscv/crypto/aes-riscv64-zvkned.S
+> @@ -146,10 +146,13 @@ SYM_FUNC_END(aes_ecb_decrypt_zvkned)
+>  	vle32.v		v20, (INP)	// Load ciphertext blocks
+>  	vslideup.vi	v16, v20, 4	// Setup prev ciphertext blocks
+>  	addi		t1, t0, -4
+> +	vsetivli	zero, 4, e32, m4, ta, ma
+>  	vslidedown.vx	v24, v20, t1	// Save last ciphertext block
+> +	vsetvli		t0, LEN, e32, m4, ta, ma
+>  	aes_decrypt	v20, \keylen	// Decrypt the blocks
+>  	vxor.vv		v20, v20, v16	// XOR with prev ciphertext blocks
+>  	vse32.v		v20, (OUTP)	// Store plaintext blocks
+> +	vsetivli	zero, 4, e32, m4, ta, ma
+>  	vmv.v.v		v16, v24	// Next "IV" is last ciphertext block
+>  	slli		t1, t0, 2	// Words to bytes
+>  	add		INP, INP, t1
+> @@ -157,7 +160,6 @@ SYM_FUNC_END(aes_ecb_decrypt_zvkned)
+>  	sub		LEN, LEN, t0
+>  	bnez		LEN, 1b
+>
+> -	vsetivli	zero, 4, e32, m1, ta, ma
+>  	vse32.v		v16, (IVP)	// Store next IV
+>  	ret
+>  .endm
+>
+> A third variant would be to just replace vmv.v.v with vmv1r.v.
+>
+> In general, this level of micro-optimization probably needs to be wait until
+> there are a variety of CPUs to test on.  We know that parallelizing the
+> algorithms is helpful, so we should do that, as this patch does.  But the
+> effects of small variations in the instruction sequences are currently unclear.
 
-> Should save_iaa_wq return an error if the number of iaa devices is
-> greater
-> than the number of cpus?
->=20
+Ya, I agree.  So I'm fine with this, it's a base and we can always 
+improve it when there's something concrete to run on.
 
-No, you should still be able to use the driver with just one cpu, maybe
-it just always maps to the same device. I'll take a look and come up
-with a fix.
-
-Tom
-
->=20
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.242696] idxd: crypto: iaa_crypto now =
-ENABLED
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.248641] divide error: 0000 [#1] PREEM=
-PT SMP NOPTI
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.254358] CPU: 0 PID: 396 Comm: systemd=
--udevd Not tainted
-> 6.8.0-63.eln136.1.x86_64 #1
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.263399] Hardware name: Intel Corporat=
-ion
-> AvenueCity/AvenueCity, BIOS BHSDCRB1.IPC.2780.D02.2311070514
-> 11/07/2023
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.275266] RIP: 0010:rebalance_wq_table.=
-part.0+0x163/0x220
-> [iaa_crypto]
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.282851] Code: 85 c0 74 c1 8b 35 6d ed=
- f3 c2 31 db 48 39 f3
-> 73 4d 48 89 da 4c 89 f7 e8 9b 5a 26 c1 3b 05 55 ed f3 c2 89 c6 73 38
-> 31 d2 89 d8 <f7> 35 9f 76 00 00 83 fa 01 41 83 d5 00 44 89 ef e8 68
-> f9 ff ff 85
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.303974] RSP: 0018:ffa0000001147bb0 EF=
-LAGS: 00010246
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.309895] RAX: 0000000000000000 RBX: 00=
-00000000000000 RCX:
-> 00000000ffffffff
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.317956] RDX: 0000000000000000 RSI: 00=
-00000000000000 RDI:
-> 0000000000000000
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.326016] RBP: 0000000000000000 R08: 00=
-00000000000000 R09:
-> 0000000000000001
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.334076] R10: ff1100005bff93c0 R11: 00=
-00000000000003 R12:
-> ffffffff826cbba8
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.342137] R13: 00000000ffffffff R14: ff=
-1100005bff93c0 R15:
-> ff110000563968e0
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.350197] FS:=C2=A0 00007f0697de8540(00=
-00)
-> GS:ff1100005ba00000(0000) knlGS:0000000000000000
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.359333] CS:=C2=A0 0010 DS: 0000 ES: 0=
-000 CR0: 0000000080050033
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.365834] CR2: 000055bf003ad358 CR3: 00=
-00000046632003 CR4:
-> 0000000000f71eb0
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.373900] DR0: 0000000000000000 DR1: 00=
-00000000000000 DR2:
-> 0000000000000000
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.381960] DR3: 0000000000000000 DR6: 00=
-000000fffe07f0 DR7:
-> 0000000000000400
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.390020] PKRU: 55555554
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.393113] Call Trace:
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.395905]=C2=A0 <TASK>
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.398310]=C2=A0 ? die+0x36/0x90
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.401600]=C2=A0 ? do_trap+0xda/0x100
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.405373]=C2=A0 ? rebalance_wq_table.pa=
-rt.0+0x163/0x220
-> [iaa_crypto]
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.412265]=C2=A0 ? do_error_trap+0x65/0x=
-80
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.416519]=C2=A0 ? rebalance_wq_table.pa=
-rt.0+0x163/0x220
-> [iaa_crypto]
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.423412]=C2=A0 ? exc_divide_error+0x38=
-/0x50
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.427970]=C2=A0 ? rebalance_wq_table.pa=
-rt.0+0x163/0x220
-> [iaa_crypto]
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.434861]=C2=A0 ? asm_exc_divide_error+=
-0x1a/0x20
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.439805]=C2=A0 ? rebalance_wq_table.pa=
-rt.0+0x163/0x220
-> [iaa_crypto]
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.446696]=C2=A0 iaa_crypto_probe+0x117/=
-0x2e0 [iaa_crypto]
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.452514]=C2=A0 really_probe+0x19b/0x3e=
-0
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.456674]=C2=A0 ? __pfx___driver_attach=
-+0x10/0x10
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.461715]=C2=A0 __driver_probe_device+0=
-x78/0x160
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.466659]=C2=A0 driver_probe_device+0x1=
-f/0xa0
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.471313]=C2=A0 __driver_attach+0xba/0x=
-1c0
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.475665]=C2=A0 bus_for_each_dev+0x8c/0=
-xe0
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.480028]=C2=A0 bus_add_driver+0x116/0x=
-220
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.484380]=C2=A0 driver_register+0x5c/0x=
-100
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.488731]=C2=A0 iaa_crypto_init_module+=
-0xe5/0xff0 [iaa_crypto]
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.495043]=C2=A0 ? __pfx_iaa_crypto_init=
-_module+0x10/0x10
-> [iaa_crypto]
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.502032]=C2=A0 do_one_initcall+0x58/0x=
-310
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.506385]=C2=A0 do_init_module+0x60/0x2=
-40
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.510640]=C2=A0 __do_sys_init_module+0x=
-17a/0x1b0
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.515587]=C2=A0 do_syscall_64+0x81/0x16=
-0
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.519746]=C2=A0 ? handle_mm_fault+0xdd/=
-0x360
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.524302]=C2=A0 ? do_user_addr_fault+0x=
-2fe/0x670
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.529248]=C2=A0 ? exc_page_fault+0x6b/0=
-x150
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.533697]=C2=A0 entry_SYSCALL_64_after_=
-hwframe+0x6e/0x76
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.539413] RIP: 0033:0x7f0698a2ef1e
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.543479] Code: 48 8b 0d 05 af 0e 00 f7=
- d8 64 89 01 48 83 c8
-> ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 49 89 ca b8 af 00
-> 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d2 ae 0e 00 f7 d8
-> 64 89 01 48
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.564605] RSP: 002b:00007ffe27da0918 EF=
-LAGS: 00000246
-> ORIG_RAX: 00000000000000af
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.573156] RAX: ffffffffffffffda RBX: 00=
-0055beffb45cb0 RCX:
-> 00007f0698a2ef1e
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.581216] RDX: 000055beffb78ba0 RSI: 00=
-00000000026400 RDI:
-> 000055bf00386cf0
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.589276] RBP: 000055bf00386cf0 R08: 00=
-0055beffb70340 R09:
-> 0000000000026010
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.597337] R10: 0000000000000005 R11: 00=
-00000000000246 R12:
-> 000055beffb78ba0
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.605397] R13: 000055beffb71110 R14: 00=
-00000000000000 R15:
-> 000055beffb45fe0
-> =C2=A0=C2=A0=C2=A0 [=C2=A0=C2=A0 17.613459]=C2=A0 </TASK>
->=20
->=20
-> Regards,
-> Jerry
->=20
-
+> - Eric
