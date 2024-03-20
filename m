@@ -1,163 +1,322 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE58F6FC3
-	for <linux-crypto@vger.kernel.org>; Wed, 20 Mar 2024 01:48:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C1E125CE;
+	Wed, 20 Mar 2024 02:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710899338; cv=none; b=PP+6yJEFDaT1dsml/Rxx/jIbMUfVxMdx6Vi5ToYrw185y13XeuXZ5/ahEkO12ezpjk4b95TDPU6Z8rmzOMJMHJMaAhrHfNKkZ1bfQKab9IyWFjIKrWUd1Dx1vdpZ2ZZXodN3v1A3GRlEhjkA8VLR1bpyvoi6ZhJb1XGTtqLJVJ0=
+	t=1710903489; cv=none; b=De5hWmFCAaMUW1cQMUD7E3aGJEJZxbBXOkX47w7FnuBHE4/mcSacVrG8F1cCJNAIpgj8sCrfcYBvXHlSNPiZHrFYrM86w6w07FNB3IgPfNnVmrogc+DhfbTCex8TKTlH9HQB9Ilsukts4JlPSrjjWVVnnIM69obZGTjgDYJvUdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710899338; c=relaxed/simple;
-	bh=qI5Tub3LHNOZFOE4/6hw3EHPShN11Tc+qwy45TA6jzI=;
-	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
-	 Content-Type; b=eRXzwmA6PuxT82t1ZDPacICKxFelWCKKhoU4BJ3DXU93l4I9Ja/Zu9vlPa5o3bXHdU+0J8TaD/GVYXB5dQQbLo0w4DB174/YiWYapoXfB35YQW+6nl/rfWkJTMa6UA+dNGyB1lkfIptL+/e5OQgUnXY54F6hTDWHzucIwrs3ABc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=bgQHemEv; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
+	s=arc-20240116; t=1710903489; c=relaxed/simple;
+	bh=y5McYz92/dYSqFuneRQ133fc4vz1ZAYsNNSag/LrbtA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ufOzYqy7VlJkXTFIS1yDbQWn8S4ZIttBz+vSlOvcV/hqZ88SkJuinLOs/Zriwr/0yRuoK4bKtAZg6+km7HxZ7QBm7K5Es7KaMKbqucy6Wx6IRisFCm2y/ptkPxxGY9LJJhqSEUw1LZktawoufta8PMYO7ATVXKh5guZqPkOlP4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TsgMWJtE; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="bgQHemEv"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6e709e0c123so3055301b3a.1
-        for <linux-crypto@vger.kernel.org>; Tue, 19 Mar 2024 18:48:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TsgMWJtE"
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3c396fec63aso551432b6e.0;
+        Tue, 19 Mar 2024 19:58:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1710899335; x=1711504135; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0XFWeUGhARFGLtFMmrEktN1r5EqqYdHQ1yDObB41VHU=;
-        b=bgQHemEvN05cdGU6PpvED1zoIXJgO5LBFTlnx50deFNOuq+GHUAaD7l6X6AZeWsNJQ
-         1plwhb/c1gHnH8CX4ofdt0KwXvycCbWRqrjaMWEoAZqkDU0abR8J6zUK964XMUM84i3y
-         m0jGe4hOoPUABl+sORRsya0599TlvqK56yuJe7Xhp7fNPbL+YSSYdeec6RTgnBrNpZob
-         xybC4lfWlAccgPfc+HFxo6jhah3Zeoe172z0ZQvSdKPMfJRUfsJKkp9FHnK8ZX2VfhdE
-         mgwrO2RO2QPXa3nenA2EbMNh4RdKOzhMpBndkRFcmGXwEZN4OplqdUak+gI7NCAHIv+0
-         tLdA==
+        d=gmail.com; s=20230601; t=1710903487; x=1711508287; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ISSGcUlaf1DV7cbQ9p9F3X2z/M69GiJkRNSoooM6Ai4=;
+        b=TsgMWJtEqidJbof+Fjnlvr1b456JGpEptZE/A3CWlqz63XD9Ige4rbTl2eVq0YXIT5
+         9ZEVnDKMsDBVCOHjW3lShHgwwFuOsnVmTP0U7glOJLPj/h7Ekp+GiL1164TNNMEIgs8G
+         kTgtreg7dE7Hu014ESRTXgxvkWi4l+wrOfx6m6nr/yEbv/vf7VN2ntVTf+kjUBOkt12F
+         kXb4PMqCQKnBul5QwgS+21n+/Dmo8foavnpjGrCNsP5I9hTvGjjDYFIzuGgfiqn4GvKj
+         QyIFPnDPokxOEPwsb7SxoekNRtYS2DW/UQZK5MY8HDOM7veHk3l0xPLHS8X7g7H6YlW1
+         BBKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710899335; x=1711504135;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0XFWeUGhARFGLtFMmrEktN1r5EqqYdHQ1yDObB41VHU=;
-        b=OUsnXzgCVN0ae36mr4MJz7Uw4lkUL1gZPA26l+n3HVqcuMfp8M/tVw75wptwTEbCgs
-         3JwA3ksMyz2qWEI6w/6jQHac0RHR9bXIXkYtaKw5tybz7hJ9qBiVSQY5w8XEXyWggTqO
-         z93OlIV9hKhmDkB4KEOEjrotAzJKCctbJ5lXbVwq2qcq4T4Wa9vtqr6/SeU/9sUgtNoU
-         buaCCrHnwNnMsG5HTVygMrg8zk+BccspFofpiW8heiLx9vr63rxw18NDtolntvzyhLff
-         yiNxRxKBB4VsRC4AxU44RE++pFpBCzQl2M+Beg4hfBYb8GFGEbdvcAP8KIyNN+mybE+8
-         sOsA==
-X-Forwarded-Encrypted: i=1; AJvYcCU4wNn3At/yZUY9PQKf5ouNe3jOHM2chJA27dNPupP9GLI8ARFjMY7vzMHVx+8l3LbS5jcxVn/tViu7vLY+tje6HbR7AB8oOX/UDmhM
-X-Gm-Message-State: AOJu0YwnevWW67bJi70Bl74uqmUTy4X1Kz27kfggV+un5PBAVQi2MW42
-	pBofR22ZQ9mvOn/AYDOb+ogBwh1kuM5Yegk3T6Bhp9en6tlMe5DD32ciW6GrcDQ=
-X-Google-Smtp-Source: AGHT+IEsM1/0CXsqPV1u7HWDW2kWwLy9n8txe/RJcjigdZRgO1jABEpVpPsAnwHTQDrbVR7Cz8D3Jw==
-X-Received: by 2002:a05:6a20:b915:b0:1a3:69a9:e3e7 with SMTP id fe21-20020a056a20b91500b001a369a9e3e7mr4012756pzb.18.1710899334899;
-        Tue, 19 Mar 2024 18:48:54 -0700 (PDT)
-Received: from localhost ([50.213.54.97])
-        by smtp.gmail.com with ESMTPSA id ld11-20020a170902facb00b001db5079b705sm1628209plb.36.2024.03.19.18.48.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Mar 2024 18:48:54 -0700 (PDT)
-Date: Tue, 19 Mar 2024 18:48:54 -0700 (PDT)
-X-Google-Original-Date: Tue, 19 Mar 2024 18:48:50 PDT (-0700)
-Subject:     Re: [PATCH riscv/for-next] crypto: riscv - parallelize AES-CBC decryption
-In-Reply-To: <20240210181240.GA1098@sol.localdomain>
-CC: jerry.shih@sifive.com, linux-riscv@lists.infradead.org,
-  linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu, Heiko Stuebner <heiko@sntech.de>,
-  phoebe.chen@sifive.com, andy.chiu@sifive.com
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: ebiggers@kernel.org
-Message-ID: <mhng-7b6264a7-c1cd-46b2-97f1-b2c3d3dbb716@palmer-ri-x1c9a>
+        d=1e100.net; s=20230601; t=1710903487; x=1711508287;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ISSGcUlaf1DV7cbQ9p9F3X2z/M69GiJkRNSoooM6Ai4=;
+        b=fVRkTQZFp8GIXQfJQAkuD5FDF9u9LYZmg886LtU+T3VS2I/aM+ALItQZlEqDlc2CX9
+         +ICre6KhiouQnu2+r7Igro0poSXJJ9jur6oWnUjaIp3tjDyJZ9RVX29K5GkN9bmryKsV
+         8IDkak9ZBmcwtEASWoMi2JNY8+ygzWJ/3TQFsCj9cz+lpYkf6uehKLmK9b1jAJOXHlu7
+         MKRTZikPkXu2IXt47IH9oPmt3opn6QMaRHMtjRNPnbnVzFc/LY9uBGue58LTacl4ZlvZ
+         A/XhTFHTObbxhSo0RjpvAt86wYnBDQ/XyY8wZ5/PwEfYUHJRQ4LgcILbuEuIxKpI+R2N
+         TEWw==
+X-Forwarded-Encrypted: i=1; AJvYcCXkeYwHKg0yi2j+gC/X7Ua+ie5CJVdS2hkVlQ7N/neJosORj7Ujr0+ZkMd8zWbRE0vdEWJE0zAHlYDKdsoeA+U8s1dUz+kqbZuwluF8
+X-Gm-Message-State: AOJu0YzJehORsi5rm8vFSnamvgFOFwRYGVKLWVfZv/QF+El0ELE2ZQIA
+	ox1bF8rb3ybfNu5T2B4/q+qRCLxwsx2P/VZNH4RjCo2ayuQXYAvjHkGjgOGLXW2/ubQbFof+6f9
+	nF4okkNzrcCvY6Rbx4c7NVt9/IVRcpruV3iU=
+X-Google-Smtp-Source: AGHT+IG6ndj718DS4hkj3dKRRsVK64bwSAC7yvQpsVsV+W8zwtg96Cu8doXxL3IEYweb+P4m5LuYTE/1bFOjtKJ80yg=
+X-Received: by 2002:a05:6808:bcd:b0:3c3:9e28:3053 with SMTP id
+ o13-20020a0568080bcd00b003c39e283053mr2247375oik.20.1710903487032; Tue, 19
+ Mar 2024 19:58:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+From: xingwei lee <xrivendell7@gmail.com>
+Date: Wed, 20 Mar 2024 10:57:53 +0800
+Message-ID: <CABOYnLzjayx369ygmr0PsGYGeRpnBnaH1XPqfbispL5nAeOJ9w@mail.gmail.com>
+Subject: BUG: unable to handle kernel paging request in crypto_sha3_update
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
+	samsun1006219@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, 10 Feb 2024 10:12:40 PST (-0800), ebiggers@kernel.org wrote:
-> On Sat, Feb 10, 2024 at 11:25:27PM +0800, Jerry Shih wrote:
->> > .macro	aes_cbc_decrypt	keylen
->> > +	srli		LEN, LEN, 2	// Convert LEN from bytes to words
->> > 	vle32.v		v16, (IVP)	// Load IV
->> > 1:
->> > -	vle32.v		v17, (INP)	// Load ciphertext block
->> > -	vmv.v.v		v18, v17	// Save ciphertext block
->> > -	aes_decrypt	v17, \keylen	// Decrypt
->> > -	vxor.vv		v17, v17, v16	// XOR with IV or prev ciphertext block
->> > -	vse32.v		v17, (OUTP)	// Store plaintext block
->> > -	vmv.v.v		v16, v18	// Next "IV" is prev ciphertext block
->> > -	addi		INP, INP, 16
->> > -	addi		OUTP, OUTP, 16
->> > -	addi		LEN, LEN, -16
->> > +	vsetvli		t0, LEN, e32, m4, ta, ma
->> > +	vle32.v		v20, (INP)	// Load ciphertext blocks
->> > +	vslideup.vi	v16, v20, 4	// Setup prev ciphertext blocks
->> > +	addi		t1, t0, -4
->> > +	vslidedown.vx	v24, v20, t1	// Save last ciphertext block
->>
->> Do we need to setup the `e32, len=t0` for next IV?
->> I think we only need 128bit IV (with VL=4).
->>
->> > +	aes_decrypt	v20, \keylen	// Decrypt the blocks
->> > +	vxor.vv		v20, v20, v16	// XOR with prev ciphertext blocks
->> > +	vse32.v		v20, (OUTP)	// Store plaintext blocks
->> > +	vmv.v.v		v16, v24	// Next "IV" is last ciphertext block
->>
->> Same VL issue here.
->
-> It's true that the vslidedown.vx and vmv.v.v only need vl=4.  But it also works
-> fine with vl unchanged.  It just results in some extra data being moved in the
-> registers.  My hypothesis is that this is going to be faster than having the
-> three extra instructions per loop iteration to change the vl to 4 twice.
->
-> I still have no real hardware to test on, so I have no quantitative data.  All I
-> can do is go with my instinct which is that the shorter version will be better.
->
-> If you have access to a real CPU that supports the RISC-V vector crypto
-> extensions, I'd be interested in the performance you get from each variant.
-> (Of course, different RISC-V CPU implementations may have quite different
-> performance characteristics, so that still won't be definitive.)
+Hello I found a bug titled "BUG: unable to handle kernel paging
+request in crypto_sha3_update", and maybe is related with net/crypto.
+I also confirmed in the latest upstream and latest net tree.
 
-We're stacking up a lot of stuff with HW-dependent performance 
-questions, I think it's fine to just take what's reasonably simple for 
-now.  If we try to speculate about what future hardware might do we're 
-just going to go crazy with possibilities, IMO we're way better off just 
-optimizing as things show up.
+If you fix this issue, please add the following tag to the commit:
+Reported-by: xingwei lee <xrivendell7@gmail.com>
+Reported-by: yue sun <samsun1006219@gmail.com>
 
-> Here is the alternative variant given as a diff from this patch:
->
-> diff --git a/arch/riscv/crypto/aes-riscv64-zvkned.S b/arch/riscv/crypto/aes-riscv64-zvkned.S
-> index 43541aad6386c..ef380771f606a 100644
-> --- a/arch/riscv/crypto/aes-riscv64-zvkned.S
-> +++ b/arch/riscv/crypto/aes-riscv64-zvkned.S
-> @@ -146,10 +146,13 @@ SYM_FUNC_END(aes_ecb_decrypt_zvkned)
->  	vle32.v		v20, (INP)	// Load ciphertext blocks
->  	vslideup.vi	v16, v20, 4	// Setup prev ciphertext blocks
->  	addi		t1, t0, -4
-> +	vsetivli	zero, 4, e32, m4, ta, ma
->  	vslidedown.vx	v24, v20, t1	// Save last ciphertext block
-> +	vsetvli		t0, LEN, e32, m4, ta, ma
->  	aes_decrypt	v20, \keylen	// Decrypt the blocks
->  	vxor.vv		v20, v20, v16	// XOR with prev ciphertext blocks
->  	vse32.v		v20, (OUTP)	// Store plaintext blocks
-> +	vsetivli	zero, 4, e32, m4, ta, ma
->  	vmv.v.v		v16, v24	// Next "IV" is last ciphertext block
->  	slli		t1, t0, 2	// Words to bytes
->  	add		INP, INP, t1
-> @@ -157,7 +160,6 @@ SYM_FUNC_END(aes_ecb_decrypt_zvkned)
->  	sub		LEN, LEN, t0
->  	bnez		LEN, 1b
->
-> -	vsetivli	zero, 4, e32, m1, ta, ma
->  	vse32.v		v16, (IVP)	// Store next IV
->  	ret
->  .endm
->
-> A third variant would be to just replace vmv.v.v with vmv1r.v.
->
-> In general, this level of micro-optimization probably needs to be wait until
-> there are a variety of CPUs to test on.  We know that parallelizing the
-> algorithms is helpful, so we should do that, as this patch does.  But the
-> effects of small variations in the instruction sequences are currently unclear.
+kernel: net 32fa4366cc4da1c97b725a0066adf43c6b298f37
+kernel config: https://syzkaller.appspot.com/text?tag=KernelConfig&x=9f47e8dfa53b0b11
+with KASAN enabled
+compiler: gcc (Debian 12.2.0-14) 12.2.0
 
-Ya, I agree.  So I'm fine with this, it's a base and we can always 
-improve it when there's something concrete to run on.
+BUG: unable to handle page fault for address: ffff88802c583080
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 14a01067 P4D 14a01067 PUD 14a02067 PMD 26119063 PTE 800fffffd3a7c060
+Oops: 0000 [#1] PREEMPT SMP KASAN NOPTI
+CPU: 0 PID: 8138 Comm: a0c Not tainted 6.8.0-05242-g32fa4366cc4d #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:get_unaligned_le64 include/asm-generic/unaligned.h:37 [inline]
+RIP: 0010:crypto_sha3_update+0x233/0x4c0 crypto/sha3_generic.c:197
+Code: c0 40 84 ff 40 0f 95 c7 41 84 f8 0f 85 eb 01 00 00 83 e1 07 40
+38 ce 40 0f 9e c7 40 84 f6 0f 91
+RSP: 0018:ffffc90012b7f8c8 EFLAGS: 00010246
+RAX: ffff88802c583080 RBX: 0000000000000009 RCX: 0000000000000000
+RDX: ffff888018b15bc0 RSI: 0000000000000000 RDI: 0000000000000001
+RBP: ffff88802fb10b00 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000009 R11: 0000000000000001 R12: 0000000000000000
+R13: dffffc0000000000 R14: ffff88802c583080 R15: ffff88802fb10b00
+FS:  00000000334d4380(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffff88802c583080 CR3: 000000014d8dc000 CR4: 0000000000750ef0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ shash_ahash_update+0x1ac/0x1f0 crypto/ahash.c:71
+ crypto_ahash_update+0x7b/0x110 crypto/ahash.c:350
+ hash_sendmsg+0x2a9/0xf30 crypto/algif_hash.c:149
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0xab5/0xc90 net/socket.c:2584
+ ___sys_sendmsg+0x135/0x1e0 net/socket.c:2638
+ __sys_sendmsg+0x117/0x1f0 net/socket.c:2667
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+RIP: 0033:0x432cb9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c8
+RSP: 002b:00007ffe88e07ef8 EFLAGS: 00000217 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007ffe88e08128 RCX: 0000000000432cb9
+RDX: 47933e2b0522cf63 RSI: 0000000020000180 RDI: 0000000000000004
+RBP: 00007ffe88e07f10 R08: 00007ffe88e07f10 R09: 00007ffe88e07f10
+R10: 0000000000000000 R11: 0000000000000217 R12: 0000000000000001
+R13: 00007ffe88e08118 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
 
-> - Eric
+=* repro.c =*
+#define _GNU_SOURCE
+
+#include <dirent.h>
+#include <endian.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/prctl.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
+
+#ifndef __NR_memfd_secret
+#define __NR_memfd_secret 447
+#endif
+
+static void sleep_ms(uint64_t ms) {
+  usleep(ms * 1000);
+}
+
+static uint64_t current_time_ms(void) {
+  struct timespec ts;
+  if (clock_gettime(CLOCK_MONOTONIC, &ts))
+    exit(1);
+  return (uint64_t)ts.tv_sec * 1000 + (uint64_t)ts.tv_nsec / 1000000;
+}
+
+static bool write_file(const char* file, const char* what, ...) {
+  char buf[1024];
+  va_list args;
+  va_start(args, what);
+  vsnprintf(buf, sizeof(buf), what, args);
+  va_end(args);
+  buf[sizeof(buf) - 1] = 0;
+  int len = strlen(buf);
+  int fd = open(file, O_WRONLY | O_CLOEXEC);
+  if (fd == -1)
+    return false;
+  if (write(fd, buf, len) != len) {
+    int err = errno;
+    close(fd);
+    errno = err;
+    return false;
+  }
+  close(fd);
+  return true;
+}
+
+static void kill_and_wait(int pid, int* status) {
+  kill(-pid, SIGKILL);
+  kill(pid, SIGKILL);
+  for (int i = 0; i < 100; i++) {
+    if (waitpid(-1, status, WNOHANG | __WALL) == pid)
+      return;
+    usleep(1000);
+  }
+  DIR* dir = opendir("/sys/fs/fuse/connections");
+  if (dir) {
+    for (;;) {
+      struct dirent* ent = readdir(dir);
+      if (!ent)
+        break;
+      if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
+        continue;
+      char abort[300];
+      snprintf(abort, sizeof(abort), "/sys/fs/fuse/connections/%s/abort",
+               ent->d_name);
+      int fd = open(abort, O_WRONLY);
+      if (fd == -1) {
+        continue;
+      }
+      if (write(fd, abort, 1) < 0) {
+      }
+      close(fd);
+    }
+    closedir(dir);
+  } else {
+  }
+  while (waitpid(-1, status, __WALL) != pid) {
+  }
+}
+
+static void setup_test() {
+  prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
+  setpgrp();
+  write_file("/proc/self/oom_score_adj", "1000");
+}
+
+static void execute_one(void);
+
+#define WAIT_FLAGS __WALL
+
+static void loop(void) {
+  int iter = 0;
+  for (;; iter++) {
+    int pid = fork();
+    if (pid < 0)
+      exit(1);
+    if (pid == 0) {
+      setup_test();
+      execute_one();
+      exit(0);
+    }
+    int status = 0;
+    uint64_t start = current_time_ms();
+    for (;;) {
+      if (waitpid(-1, &status, WNOHANG | WAIT_FLAGS) == pid)
+        break;
+      sleep_ms(1);
+      if (current_time_ms() - start < 5000)
+        continue;
+      kill_and_wait(pid, &status);
+      break;
+    }
+  }
+}
+
+uint64_t r[3] = {0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff};
+
+void execute_one(void) {
+  intptr_t res = 0;
+  res = syscall(__NR_socket, /*domain=*/0x26ul, /*type=*/5ul, /*proto=*/0);
+  if (res != -1)
+    r[0] = res;
+  *(uint16_t*)0x20000000 = 0x26;
+  memcpy((void*)0x20000002, "hash\000\000\000\000\000\000\000\000\000\000", 14);
+  *(uint32_t*)0x20000010 = 0;
+  *(uint32_t*)0x20000014 = 0;
+  memcpy((void*)0x20000018,
+         "sha3-"
+         "512\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
+         "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
+         "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
+         "\000\000\000\000\000\000",
+         64);
+  syscall(__NR_bind, /*fd=*/r[0], /*addr=*/0x20000000ul, /*addrlen=*/0x58ul);
+  res = syscall(__NR_accept, /*fd=*/r[0], /*peer=*/0ul, /*peerlen=*/0ul);
+  if (res != -1)
+    r[1] = res;
+  res = syscall(__NR_memfd_secret, /*flags=*/0ul);
+  if (res != -1)
+    r[2] = res;
+  syscall(__NR_mmap, /*addr=*/0x20000000ul, /*len=*/0xb36000ul,
+          /*prot=*/0x2000003ul, /*flags=*/0x28011ul, /*fd=*/r[2],
+          /*offset=*/0ul);
+  syscall(__NR_ftruncate, /*fd=*/r[2], /*len=*/0xde99ul);
+  *(uint64_t*)0x20000180 = 0;
+  *(uint32_t*)0x20000188 = 0;
+  *(uint64_t*)0x20000190 = 0x20000140;
+  *(uint64_t*)0x20000140 = 0x20000080;
+  *(uint64_t*)0x20000148 = 0xb0;
+  *(uint64_t*)0x20000198 = 1;
+  *(uint64_t*)0x200001a0 = 0;
+  *(uint64_t*)0x200001a8 = 0;
+  *(uint32_t*)0x200001b0 = 0;
+  syscall(__NR_sendmsg, /*fd=*/r[1], /*msg=*/0x20000180ul,
+          /*f=*/0x47933e2b0522cf63ul);
+}
+int main(void) {
+  syscall(__NR_mmap, /*addr=*/0x1ffff000ul, /*len=*/0x1000ul, /*prot=*/0ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  syscall(__NR_mmap, /*addr=*/0x20000000ul, /*len=*/0x1000000ul, /*prot=*/7ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  syscall(__NR_mmap, /*addr=*/0x21000000ul, /*len=*/0x1000ul, /*prot=*/0ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  loop();
+  return 0;
+}
+
+
+=* repro.txt =*
+r0 = socket$alg(0x26, 0x5, 0x0)
+bind$alg(r0, &(0x7f0000000000)={0x26, 'hash\x00', 0x0, 0x0,
+'sha3-512\x00'}, 0x58)
+r1 = accept(r0, 0x0, 0x0)
+r2 = memfd_secret(0x0)
+mmap(&(0x7f0000000000/0xb36000)=nil, 0xb36000, 0x2000003, 0x28011, r2, 0x0)
+ftruncate(r2, 0xde99)
+sendmsg$DEVLINK_CMD_RELOAD(r1, &(0x7f0000000180)={0x0, 0x0,
+&(0x7f0000000140)={&(0x7f0000000080)=ANY=[], 0xb0}},
+0x47933e2b0522cf63)
+
+
+see aslo https://gist.github.com/xrivendell7/411acf9336ff0b6a70b9742702bbfb1a.
+
+I hope it helps.
+best regards.
+xingwei Lee
