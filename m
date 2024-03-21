@@ -1,111 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BC479C3;
-	Thu, 21 Mar 2024 18:25:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63693135A5F;
+	Thu, 21 Mar 2024 21:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711045526; cv=none; b=Mks2a4aLmgLr/ZEDSOn8S08d2GBGjdrwTJbr8eRPPzg3QmZikiz69G8pUeCJlC3vteW7WzVP0tG4Ruf/cMMD6meNiHze4OF8miQ5LIC7v/06W0IUM9Zdhz34boOyMgAruDfO2GBXK/ATALujdQb+6wxIgi6foE2Mhp1cVRw0fAg=
+	t=1711055332; cv=none; b=fLlE2RE8wDV1cSG8Nu8pTmwAiz32zIATfVG6mUP4v039kuzAlKaATD5CZouw0/sFrEL1Vlrresj5k8Cwu28uoDVp6RYS+SszPPSd0tUF3FV3F8WT9hOzkkYJMvkWCXw6+cDCUozYSryVljvCGAURK7t/SytuY1Gd9+l4sB9nm5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711045526; c=relaxed/simple;
-	bh=GSm30TNvJb3WRtML6WpgbGZ659hB6xOjASeoFE5AicI=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=GG3cW6PXjvyTwXbYypLc4KVuaurnhEmnia34JOna9WxzOEA/EK1yc7ReF8bC1U5xDm/G1tEvzGX+pYuC/n7+31F0zkmoZIv7gxVwwvtjYqDYG1E2lQLZZJGbiNvuRcaFX6FgL06zAYmLnIk5Hf8xQNngnj6+kI0qTwfrpZdBuII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Omyzrrfr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711055332; c=relaxed/simple;
+	bh=tAHdcxLcylUOp0OcDrI5LkZ+ZBHBQXHQILLjPqtaq3s=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=sP63tVuIe89R/FsVNyMhQFd8UpZvt+jNIk0v0S+luNlBo/j+FSZ1nhPKCGtX84am01y+X37nSO7b2Ybi65VSe6/sZi5H7tKM20wSDp0blz7XLo4pFt9eNHVle+fa8h80+x2pbDBX5LSDS/BWPd3sr8Cs1j9GOX58JMMi357m2q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=frgxmtvc; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Omyzrrfr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D83A2C433C7;
-	Thu, 21 Mar 2024 18:25:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711045525;
-	bh=GSm30TNvJb3WRtML6WpgbGZ659hB6xOjASeoFE5AicI=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=OmyzrrfrgBYAsSaQSWU4pA/fRi563CAGY/aoIPyzl78XLfH3G1Sq+Te0Xl7IpO07b
-	 4i0Kf9hPbDbpO05M2Y/daA7DOy3bR+/7TXlkSyATk7XVSfW2b1nbiicGD605uS1Gxs
-	 rwK2jSgRL4st1o5V12W+0k07kPWbQ9uDkuPkoPUFzDXztr1YwbFrFBICZ+9cxQCl1Q
-	 cO/kXYk+FxpmUP8L7vEiVK9Dv6nVEOY2/5BHZWWHAmUdqn82FbAsn6eBzcnXHNsJIQ
-	 L4wGjGJuuFeCap0xUdoH/XZNaSa4wIDMvV7HjkHKpucMCeSwO9SvSxs6+GBL4c5kFH
-	 /OiYAwEOMxQVA==
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="frgxmtvc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711055332; x=1742591332;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=tAHdcxLcylUOp0OcDrI5LkZ+ZBHBQXHQILLjPqtaq3s=;
+  b=frgxmtvcrydE8FSAr35g3xm7vYWXPGOM4zWzZU3TqTt/g1F9spR0V1jG
+   0TGd17mbdCbvnaI+NrYv4tWHpQyFdM8MmbmKs/YI+CNeJQ4ygZ5iraLQb
+   wjSSFRvMWoPJDd5+4YKsqpzj0RuWoD0bzKzeF/dvk/du1lw2w/6a1EOkv
+   fMZKw6y+4m2PFGa6Kmg6BwIgDmMoAGTQiuTQGe0SvVuQEHU1F2L6GyM+l
+   12k4FQE4E161d1aOt4fPQrjIK8McXAy/PoEK2leZ32+wG/M9rlaJ6wIKK
+   7OEF7NN4FgbTGkX2OYEOZXG9Zfm3cDU9eJ31BFtEm0GJFqokFTDW1seqD
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="28551479"
+X-IronPort-AV: E=Sophos;i="6.07,143,1708416000"; 
+   d="scan'208";a="28551479"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 14:08:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,143,1708416000"; 
+   d="scan'208";a="19362673"
+Received: from derragan-mobl.amr.corp.intel.com (HELO tzanussi-mobl1.amr.corp.intel.com) ([10.213.183.52])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 14:08:50 -0700
+From: Tom Zanussi <tom.zanussi@linux.intel.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: jsnitsel@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH 1/2] crypto: iaa - Fix nr_cpus < nr_iaa case
+Date: Thu, 21 Mar 2024 16:08:45 -0500
+Message-Id: <20240321210846.1307596-2-tom.zanussi@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240321210846.1307596-1-tom.zanussi@linux.intel.com>
+References: <20240321210846.1307596-1-tom.zanussi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 21 Mar 2024 20:25:22 +0200
-Message-Id: <CZZN0LEJ6DA6.1CGFPODVM7RCH@kernel.org>
-Cc: <linux-kernel@vger.kernel.org>, <saulo.alessandre@tse.jus.br>,
- <lukas@wunner.de>, <bbhushan2@marvell.com>, "David Howells"
- <dhowells@redhat.com>
-Subject: Re: [PATCH v7 13/13] crypto: x509 - Add OID for NIST P521 and
- extend parser for it
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Stefan Berger" <stefanb@linux.ibm.com>, <keyrings@vger.kernel.org>,
- <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>,
- <davem@davemloft.net>
-X-Mailer: aerc 0.17.0
-References: <20240320114725.1644921-1-stefanb@linux.ibm.com>
- <20240320114725.1644921-14-stefanb@linux.ibm.com>
- <CZZLN3B7TMG5.1A0518I6Z3MEA@kernel.org>
- <0216c143-445b-472d-a62a-57cbe8b19c24@linux.ibm.com>
-In-Reply-To: <0216c143-445b-472d-a62a-57cbe8b19c24@linux.ibm.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu Mar 21, 2024 at 7:42 PM EET, Stefan Berger wrote:
->
->
-> On 3/21/24 13:20, Jarkko Sakkinen wrote:
-> > On Wed Mar 20, 2024 at 1:47 PM EET, Stefan Berger wrote:
-> >> Enable the x509 parser to accept NIST P521 certificates and add the
-> >> OID for ansip521r1, which is the identifier for NIST P521.
-> >>
-> >> Cc: David Howells <dhowells@redhat.com>
-> >> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> >> Tested-by: Lukas Wunner <lukas@wunner.de>
-> >> ---
-> >>   crypto/asymmetric_keys/x509_cert_parser.c | 3 +++
-> >>   include/linux/oid_registry.h              | 1 +
-> >>   2 files changed, 4 insertions(+)
-> >>
-> >> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymme=
-tric_keys/x509_cert_parser.c
-> >> index 487204d39426..99f809b7910b 100644
-> >> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> >> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> >> @@ -538,6 +538,9 @@ int x509_extract_key_data(void *context, size_t hd=
-rlen,
-> >>   		case OID_id_ansip384r1:
-> >>   			ctx->cert->pub->pkey_algo =3D "ecdsa-nist-p384";
-> >>   			break;
-> >> +		case OID_id_ansip521r1:
-> >> +			ctx->cert->pub->pkey_algo =3D "ecdsa-nist-p521";
-> >> +			break;
-> >>   		default:
-> >>   			return -ENOPKG;
-> >>   		}
-> >> diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry=
-.h
-> >> index 3921fbed0b28..af16d96fbbf2 100644
-> >> --- a/include/linux/oid_registry.h
-> >> +++ b/include/linux/oid_registry.h
-> >> @@ -65,6 +65,7 @@ enum OID {
-> >>   	OID_Scram,			/* 1.3.6.1.5.5.14 */
-> >>   	OID_certAuthInfoAccess,		/* 1.3.6.1.5.5.7.1.1 */
-> >>   	OID_id_ansip384r1,		/* 1.3.132.0.34 */
-> >> +	OID_id_ansip521r1,		/* 1.3.132.0.35 */
-> >>   	OID_sha256,			/* 2.16.840.1.101.3.4.2.1 */
-> >>   	OID_sha384,			/* 2.16.840.1.101.3.4.2.2 */
-> >>   	OID_sha512,			/* 2.16.840.1.101.3.4.2.3 */
-> >=20
-> > Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-> >=20
-> > BR, Jarkko
->
->
-> Thanks for the tags.
+If nr_cpus < nr_iaa, the calculated cpus_per_iaa will be 0, which
+causes a divide-by-0 in rebalance_wq_table().
 
-Sure, at least the noise I've made is the sign that someone actually did
-read through all the code changes, right? :-)
+Make sure cpus_per_iaa is 1 in that case, and also in the nr_iaa == 0
+case, even though cpus_per_iaa is never used if nr_iaa == 0, for
+paranoia.
 
-BR, Jarkko
+Reported-by: Jerry Snitselaar <jsnitsel@redhat.com>
+Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+---
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+index 1cd304de5388..b2191ade9011 100644
+--- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
++++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+@@ -806,6 +806,8 @@ static int save_iaa_wq(struct idxd_wq *wq)
+ 		return -EINVAL;
+ 
+ 	cpus_per_iaa = (nr_nodes * nr_cpus_per_node) / nr_iaa;
++	if (!cpus_per_iaa)
++		cpus_per_iaa = 1;
+ out:
+ 	return 0;
+ }
+@@ -821,10 +823,12 @@ static void remove_iaa_wq(struct idxd_wq *wq)
+ 		}
+ 	}
+ 
+-	if (nr_iaa)
++	if (nr_iaa) {
+ 		cpus_per_iaa = (nr_nodes * nr_cpus_per_node) / nr_iaa;
+-	else
+-		cpus_per_iaa = 0;
++		if (!cpus_per_iaa)
++			cpus_per_iaa = 1;
++	} else
++		cpus_per_iaa = 1;
+ }
+ 
+ static int wq_table_add_wqs(int iaa, int cpu)
+-- 
+2.34.1
+
