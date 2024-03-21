@@ -1,147 +1,118 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF681E489;
-	Thu, 21 Mar 2024 14:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B337556B87;
+	Thu, 21 Mar 2024 14:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711031913; cv=none; b=XxRmfa3Bz38NcCfwN4VAU+vsxN6p2A83p8BzKWOXl3ZXnj8+cIealZzR5x3JLvM4rHLJV2xU0Q0Fsbqkp5jka5iVoucUQvsqz0ikiiKFlLwTCnStuzmnN60qnQ7r20GzKpxpd4sLCFTAItysRfoiHLEg/tXlsuFtGGlWm8V01uM=
+	t=1711032284; cv=none; b=luTufoPkSjkbC4c78+xvYp/eOuU2PEVq/wINlhZq88MHido3nTqNSbQ2aBMkUhv8N5FiZvkjD1kLQX2nkP9fEGS6KljhgfsgsT6h/YCxEB5SN6i8YTmy2KTokHbbSL2NMs6YFuUS7hKFE7t3flI6HL/uJFH8qH+tHiNIISKieWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711031913; c=relaxed/simple;
-	bh=RAQ520Hii3irGnjwDHNU7yDztGgwPSbcqoKrMeg0w4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M6gwnDNhdfgrUYdD8aXlHIscGtSinXb2ZvGnXXdHTg+G5bOEzXdiKIZN63a3FLF+grWJhRiRiLZCk8VAwp8DeDICFfYcg1y78RQ0uuaMhrHO4iGpbz88P3otdMv5eMZDWe4DecYTPsXPvtV7C5VhqjJ1WN6R+rW2VRKpL5iLmtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Mya7w6N0; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1711032284; c=relaxed/simple;
+	bh=GHV19E+IBElV1HjhsoN0rUYno6v+PERuBg5m8iwesa4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TvsV3tuAh6rvKLU9VqdvNEBugCa5i3rrDs5bmoWZktg1YlBqq0Fi+8FTH6aJ+wjq1ItAjzAqkwWl9HELEiHPwFzc7P6en8ISzlDBi76Vxhj6oeo5sloLxnzP2buoK3gW+m9DHEGP0iRF2KvSN9261mwUiI+xowomD2ewE48ubNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=dAn9q1GT; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Mya7w6N0"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42LEZZqm029685;
-	Thu, 21 Mar 2024 14:38:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=gpJiJIbsLQEj0SH7oUtsPYbzPyoaC3a2bGY1xXzVpAk=;
- b=Mya7w6N0V0qpC5UW3GfgIMF/p9VlO2rs8zLtq3bORPyBXSgt2sK5vAyFkhThDevHU6CT
- enTTJVu2v7v6i220QyB0EhELicTdN9/Ced1mh5FOkjhsTd0C7Ya+YDxjdsivpsELmNEb
- HTyCrguQ/dbzpaU5niHtQBLuHTA54Pr5+S2rQGzpSZh+2bQvYoTL4VQHvsOUR7ado+SX
- +jUQlRtE4N54yzJbG+BNT110upUBqvH79d9j8EQZ6jvlT1Jg5Hwpb7gowKIBMU6D2nvs
- z8aokhbt7af5SDS87UryQ6IdR3dF+HGYUbvno8JRQfiDd4fff4I/LgqcOa3F8pszjUmC cA== 
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x0nnng9n1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Mar 2024 14:38:23 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42LD1Fpk011539;
-	Thu, 21 Mar 2024 14:38:22 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wwq8mdpc8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Mar 2024 14:38:22 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42LEcK1N24576636
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 21 Mar 2024 14:38:22 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 10C8558070;
-	Thu, 21 Mar 2024 14:38:20 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 757615806C;
-	Thu, 21 Mar 2024 14:38:19 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 21 Mar 2024 14:38:19 +0000 (GMT)
-Message-ID: <fd0c6728-91f5-4de8-963c-bb7c4d00dbb5@linux.ibm.com>
-Date: Thu, 21 Mar 2024 10:38:18 -0400
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="dAn9q1GT"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2d109e82bd0so14161231fa.3;
+        Thu, 21 Mar 2024 07:44:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20230601; t=1711032281; x=1711637081; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=b8VpfnYNXxRvaolQUnhnA+r2PHKQUq2ZHCH8gy6DqyQ=;
+        b=dAn9q1GTzvccJ67zFZDF2Fn6QS/PSXrZQzMdLoVTuZgML9iBrbPEAy2c59FbAmhthT
+         luCRALA1cEGmSAq0+yvTuo+vtAzqoTRKVKs7w8+KADWWjqDaEahrv5era5RhWeX/O3LR
+         MiuPFyfQs+aWltNoLhj30OW1enm84iWqswW8OcAvHtoV40lsXbkK5mbqzfY4BmZYQiOE
+         IYinb6adb1oynXK6+TphJBTyH9pxcwDPG8Sg13jImhcaj2TszeL7GFHTp3O5KOEJ+j0D
+         FMEdmLUcnDOl+kHBPqT9aeVLT9XpSRSiu794VUbyKQtcLcquLI7CjoB6mwPdcOYNMCaC
+         5qTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711032281; x=1711637081;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=b8VpfnYNXxRvaolQUnhnA+r2PHKQUq2ZHCH8gy6DqyQ=;
+        b=uhfjLrm2Le2g7MAsYa6RSJVXiyganp6wYmVouqb7wiV923eGes6/JcZrds1qqjM6wC
+         KfB2dVKFQ+C8qZGMHaLSvRXMrppE8D0femFWAgVJBgZV/g69pNbtB9/Yx8RWjASz2W4v
+         nJPDnvVokYG8OArO34oE6PjPC0dQNqXrQJW5edNrQrFjC0W0+9BRxBAd0k4CpHJvU4wT
+         UeMr2//tlyMTx/knaEfsYSW2ADsRxI8rsVe6opWlkjzECovuniHM2QSzJSrR4+6/PGEc
+         xReoiRVkNonRSmkb1oAsJtQ20ewDkM7bFYgx9lNQpSucK23v9r0XWV4zN+dQ6dAFXMwP
+         Ji4g==
+X-Forwarded-Encrypted: i=1; AJvYcCUe/jFMb/zfdbhTCryJkHBNUsNRbBcebyGjpcTJUrNm93Dlvtzsl2H74ekyxTWh3h6TBHfsq9Hj8CaIfj7XhMosR9vpf6rsT6aM2qqCgmPS36XTxGbyq72GeGVdDDm9Np0lZsHxfkaR+Fj3OOzeoWFZf4jZGRdsIY4WFWgH0Cz7Pjbg8fXpHA==
+X-Gm-Message-State: AOJu0YwUXS5C46tlhvLPYe2ylvSYCv9qgeLEBvcLgPns9rGeQ874l6fm
+	NARSrgoThCprjpSiy78pyp/oLxoal8IKDAefJOUKA+sSHpdZ2R4ZEk5mW8aZuiCPciAHRjTgf3D
+	lbRWHd+37ppicvdmnPs/89/VxJo8=
+X-Google-Smtp-Source: AGHT+IGr1ms4JR4kYjpeJV3wIcwJsEiCRzYihEA1mukdW2EGaSm7U9CLw3TEXhqJsiavO3Z/lPGBgFwwkyrqLk1Q6Qw=
+X-Received: by 2002:a2e:a0d2:0:b0:2d6:90e4:1ced with SMTP id
+ f18-20020a2ea0d2000000b002d690e41cedmr3750172ljm.22.1711032280632; Thu, 21
+ Mar 2024 07:44:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: ecrdsa - Fix module auto-load on add_key
-Content-Language: en-US
-To: Vitaly Chikunov <vt@altlinux.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc: Paul Wolneykien <manowar@altlinux.org>,
-        "David S. Miller" <davem@davemloft.net>
-References: <20240318004241.2925876-1-vt@altlinux.org>
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <20240318004241.2925876-1-vt@altlinux.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8UwHRqbJLSe8gp1P0MCTWVfXQN9lHs7g
-X-Proofpoint-ORIG-GUID: 8UwHRqbJLSe8gp1P0MCTWVfXQN9lHs7g
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-21_10,2024-03-21_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1011
- suspectscore=0 mlxscore=0 malwarescore=0 adultscore=0 phishscore=0
- bulkscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2403140000 definitions=main-2403210105
+References: <20240313233227.56391-1-ebiggers@kernel.org> <CZXWE5J2QMIN.1L4QKQU7C7UMN@kernel.org>
+ <20240321041015.GB2387@sol.localdomain>
+In-Reply-To: <20240321041015.GB2387@sol.localdomain>
+From: Andrew Zaborowski <balrogg@googlemail.com>
+Date: Thu, 21 Mar 2024 15:44:28 +0100
+Message-ID: <CAOq732+nyLtnafARgfx_dByRNxdw9E0hE8zWvKrPayUrx+MNgg@mail.gmail.com>
+Subject: Re: [PATCH] Revert "crypto: pkcs7 - remove sha1 support"
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Jarkko Sakkinen <jarkko@kernel.org>, linux-crypto@vger.kernel.org, 
+	Herbert Xu <herbert@gondor.apana.org.au>, keyrings@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, iwd@lists.linux.dev, 
+	James Prestwood <prestwoj@gmail.com>, Dimitri John Ledkov <dimitri.ledkov@canonical.com>, 
+	Karel Balej <balejk@matfyz.cz>
+Content-Type: text/plain; charset="UTF-8"
 
+On Thu, 21 Mar 2024 at 05:10, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Tue, Mar 19, 2024 at 07:20:54PM +0200, Jarkko Sakkinen wrote:
+> > I'd like to think that there is common will to eventually get rid of
+> > all of SHA-1, and thus in cases where it is not yet possible it would
+> > make sense to guide what to needs to be done to make it happen, right?
+> >
+> > BR, Jarkko
+>
+> This is supposed to just be a revert, so it's best not to mess around with
+> adding additional stuff that wasn't in the original commit.  The sha1 signatures
+> are also not unique; iwd is also forcing the kernel to keep supporting MD4, RC4,
+> KEYCTL_DH_COMPUTE, KEYCTL_PKEY_{QUERY,ENCRYPT,DECRYPT,SIGN,VERIFY}, etc.
+> Probably more than I don't know about.  I guess all of this should be documented
+> in the code in appropriate places.  Probably the iwd folks should step in to do
+> this, as they know best what they're using and they got a lot of this added to
+> the kernel in the first place.
 
+As far as I know none of these were added specifically for iwd but I
+could be wrong.  RC4 is not in the kernel anymore.
 
-On 3/17/24 20:42, Vitaly Chikunov wrote:
-> Add module alias with the algorithm cra_name similar to what we have for
-> RSA-related and other algorithms.
-> 
-> The kernel attempts to modprobe asymmetric algorithms using the names
-> "crypto-$cra_name" and "crypto-$cra_name-all." However, since these
-> aliases are currently missing, the modules are not loaded. For instance,
-> when using the `add_key` function, the hash algorithm is typically
-> loaded automatically, but the asymmetric algorithm is not.
-> 
-> Steps to test:
-> 
-> 1. Cert is generated usings ima-evm-utils test suite with
->     `gen-keys.sh`, example cert is provided below:
-> 
->    $ base64 -d >test-gost2012_512-A.cer <<EOF
->    MIIB/DCCAWagAwIBAgIUK8+whWevr3FFkSdU9GLDAM7ure8wDAYIKoUDBwEBAwMFADARMQ8wDQYD
->    VQQDDAZDQSBLZXkwIBcNMjIwMjAxMjIwOTQxWhgPMjA4MjEyMDUyMjA5NDFaMBExDzANBgNVBAMM
->    BkNBIEtleTCBoDAXBggqhQMHAQEBAjALBgkqhQMHAQIBAgEDgYQABIGALXNrTJGgeErBUOov3Cfo
->    IrHF9fcj8UjzwGeKCkbCcINzVUbdPmCopeJRHDJEvQBX1CQUPtlwDv6ANjTTRoq5nCk9L5PPFP1H
->    z73JIXHT0eRBDVoWy0cWDRz1mmQlCnN2HThMtEloaQI81nTlKZOcEYDtDpi5WODmjEeRNQJMdqCj
->    UDBOMAwGA1UdEwQFMAMBAf8wHQYDVR0OBBYEFCwfOITMbE9VisW1i2TYeu1tAo5QMB8GA1UdIwQY
->    MBaAFCwfOITMbE9VisW1i2TYeu1tAo5QMAwGCCqFAwcBAQMDBQADgYEAmBfJCMTdC0/NSjz4BBiQ
->    qDIEjomO7FEHYlkX5NGulcF8FaJW2jeyyXXtbpnub1IQ8af1KFIpwoS2e93LaaofxpWlpQLlju6m
->    KYLOcO4xK3Whwa2hBAz9YbpUSFjvxnkS2/jpH2MsOSXuUEeCruG/RkHHB3ACef9umG6HCNQuAPY=
->    EOF
-> 
-> 2. Optionally, trace module requests with: trace-cmd stream -e module &
-> 
-> 3. Trigger add_key call for the cert:
-> 
->    # keyctl padd asymmetric "" @u <test-gost2012_512-A.cer
->    939910969
->    # lsmod | head -3
->    Module                  Size  Used by
->    ecrdsa_generic         16384  0
->    streebog_generic       28672  0
-> 
-> Repored-by: Paul Wolneykien <manowar@altlinux.org>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+With regards to SHA1 it is used by iwd directly through an API but
+more importantly it's a dependency for x509 support in practice.
+Outside of module signing most x509 certificates in the wild use SHA1:
+wifi, https.  This thread originally talked about the removal of SHA1
+access through some API, not SHA1 in general.
 
-Tested-by: Stefan Berger <stefanb@linux.ibm.com>
+Regarding the use of the kernel crypto in iwd, IIRC some of the motivation was:
 
-> ---
->   crypto/ecrdsa.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/crypto/ecrdsa.c b/crypto/ecrdsa.c
-> index f3c6b5e15e75..3811f3805b5d 100644
-> --- a/crypto/ecrdsa.c
-> +++ b/crypto/ecrdsa.c
-> @@ -294,4 +294,5 @@ module_exit(ecrdsa_mod_fini);
->   MODULE_LICENSE("GPL");
->   MODULE_AUTHOR("Vitaly Chikunov <vt@altlinux.org>");
->   MODULE_DESCRIPTION("EC-RDSA generic algorithm");
-> +MODULE_ALIAS_CRYPTO("ecrdsa");
->   MODULE_ALIAS_CRYPTO("ecrdsa-generic");
+* to avoid duplication.  On a small system it's hard to justify having
+the same algorithms in the kernel and in userspace.  openssl is
+probably larger than all of ell+iwd.
+
+* (various arguments can be made about how duplication doesn't help
+security, but an argument can be made the other way as well)
+
+* there is (was?) a plan to use the kernel keys API to abstract
+passing keys/keyrings between processes to greatly reduce the presence
+of the actual key contents in memory/filesystem.  Network Manager
+could load a key from file or a PKCS11 device and pass its kernel
+handle to iwd or other userspace instead of file paths, with the files
+necessarily being readable by multiple processes and loaded multiple
+times into memory.  The keys could also be loaded once on boot.  Or
+the keys could be in TPM and never be seen in main memory, only their
+API handles.
+
+Best regards
