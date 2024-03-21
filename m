@@ -1,60 +1,80 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62FF2A1C6;
-	Thu, 21 Mar 2024 09:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB5D762C7;
+	Thu, 21 Mar 2024 12:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711014892; cv=none; b=arvlyb+vLMtriH8C1NyuHKAerR6FmhKO8RQD8F7SRiT4e0u1ytTPVrj28hUHw7F9n5GyBRP+GVUE22/NsuVljM+jJuCDewkHuVkQeTFk1HMlOHriIuqAluWa0W1nhnhiz4h4+4U2V5edsZnHcr31LkImzU9DMkKv7bS7DgsfE4Q=
+	t=1711022480; cv=none; b=tMyrHFKjWTVkR/QlNqj9Mdtouc3ij4fVqcHavLApaWBuDPubO1J17oM4U04OMMZC2y61dW/Dw3k4iAnL3N7Eq+tejNzDM5eZVYz3hahFBTGOqKQ+8FS70mhR+rAR/p+HMzdDfbrYyyuXurZUSJm8bQyAK0Sj5B2Zrp5jcomhvgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711014892; c=relaxed/simple;
-	bh=YNDfDBDwvH49zpBRMhXsnHAI/XLGH24RbzQx1/V7T18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LM/LIDG1/vyIyEHVEs+aq/dYPvhmLzDTGj79huqxozSu8CekJVQRZqdHP26K78G1vmT/5QJ9UkbaslVWEajTgj87iFk5Mxo9JFnbZDienrRW+/ZI2gkE2hNxzbnC6zRa4PXmwwTJhyq+IXLfSIdhCDaB5XChCK6TQ+Tsj1hP3FM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rnF7z-00987R-QK; Thu, 21 Mar 2024 17:54:28 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 21 Mar 2024 17:54:44 +0800
-Date: Thu, 21 Mar 2024 17:54:44 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Roman Smirnov <r.smirnov@omp.ru>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Karina Yankevich <k.yankevich@omp.ru>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+	s=arc-20240116; t=1711022480; c=relaxed/simple;
+	bh=TdeHwXHZLnolNP4pruQ3Emm6FQMzC7xzcbxQhC6EuSI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ObBvh8CTD66GQ/9DlALV1zzkjQXxaLRlUHMpsEgqH66+lJamdON+EGCRluAXnTQOYvO9RR0JxirSah6OgVgiCTkMHIUOBiPmxcBfVoy9dDYfacH3Jm1PHVot/ISrr0EZn+0afPqWEw2rMErUFDc9aEliJuLiLFc8nG19TnPI1Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from msexch01.omp.ru (10.188.4.12) by msexch02.omp.ru (10.188.4.13)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 21 Mar
+ 2024 15:01:03 +0300
+Received: from msexch01.omp.ru ([fe80::485b:1c4a:fb7f:c753]) by
+ msexch01.omp.ru ([fe80::485b:1c4a:fb7f:c753%5]) with mapi id 15.02.1258.012;
+ Thu, 21 Mar 2024 15:01:03 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "David S. Miller" <davem@davemloft.net>, Sergey Shtylyov
+	<s.shtylyov@omp.ru>, Karina Yankevich <k.yankevich@omp.ru>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
 Subject: Re: [PATCH] crypto: ecc: fix NULL pointer dereferencing in
  ecc_gen_privkey()
-Message-ID: <ZfwD5EojMLYqBaid@gondor.apana.org.au>
-References: <20240307071318.5206-1-r.smirnov@omp.ru>
+Thread-Topic: [PATCH] crypto: ecc: fix NULL pointer dereferencing in
+ ecc_gen_privkey()
+Thread-Index: AQHacF8ItH6zDpkXIUCmX8XUSBZ4lbFB2JEAgABVggk=
+Date: Thu, 21 Mar 2024 12:01:02 +0000
+Message-ID: <e5a3f28ec5cf426998f00083ec4f1f58@omp.ru>
+References: <20240307071318.5206-1-r.smirnov@omp.ru>,<ZfwD5EojMLYqBaid@gondor.apana.org.au>
+In-Reply-To: <ZfwD5EojMLYqBaid@gondor.apana.org.au>
+Accept-Language: ru-RU, en-US
+Content-Language: ru-RU
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-kse-serverinfo: msexch02.omp.ru, 9
+x-kse-antivirus-interceptor-info: scan successful
+x-kse-antivirus-info: Clean, bases: 3/21/2024 9:59:00 AM
+x-kse-attachment-filter-triggered-rules: Clean
+x-kse-attachment-filter-triggered-filters: Clean
+x-kse-bulkmessagesfiltering-scan-result: InTheLimit
+Content-Type: text/plain; charset="koi8-r"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240307071318.5206-1-r.smirnov@omp.ru>
 
-On Thu, Mar 07, 2024 at 10:13:18AM +0300, Roman Smirnov wrote:
-> ecc_get_curve() can return NULL. It is necessary to check
-> for NULL before dereferencing.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with Svace.
-> 
-> Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
-> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> ---
->  crypto/ecc.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+On Thu, 21 Mar 2024 17:54:44 +0800, Herbert Xu wrote:
+> On Thu, Mar 07, 2024 at 10:13:18AM +0300, Roman Smirnov wrote:
+> > ecc_get_curve() can return NULL. It is necessary to check
+> > for NULL before dereferencing.
+> >=20
+> > Found by Linux Verification Center (linuxtesting.org) with Svace.
+> >=20
+> > Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
+> > Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> > ---
+> >  crypto/ecc.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+>=20
+> Please point me to the exact code path where this can happen.
 
-Please point me to the exact code path where this can happen.
+I didn't find a specific path. Several places in the file have this
+check:
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ecc_make_pub_key()
+crypto_ecdh_shared_secret()
+
+I thought it was needed in this place too.
