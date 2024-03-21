@@ -1,56 +1,53 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63693135A5F;
-	Thu, 21 Mar 2024 21:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC472135A72;
+	Thu, 21 Mar 2024 21:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711055332; cv=none; b=fLlE2RE8wDV1cSG8Nu8pTmwAiz32zIATfVG6mUP4v039kuzAlKaATD5CZouw0/sFrEL1Vlrresj5k8Cwu28uoDVp6RYS+SszPPSd0tUF3FV3F8WT9hOzkkYJMvkWCXw6+cDCUozYSryVljvCGAURK7t/SytuY1Gd9+l4sB9nm5Q=
+	t=1711055333; cv=none; b=pyK1EB5H8saxS3XUBFqT97VofWKaNhIXqWsJilqqQJSYR7s5GkgsdDdGNRrMYhzdFuCwWF5YBIZdYThSZfI5tCbSGYFPo49ugPdFshq4kmoemNeXokyKQ1SMy4vNHiPGQBjWRBLWTaeiCsbdx934DSqt65Zb5c84CMkuXctg1dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711055332; c=relaxed/simple;
-	bh=tAHdcxLcylUOp0OcDrI5LkZ+ZBHBQXHQILLjPqtaq3s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sP63tVuIe89R/FsVNyMhQFd8UpZvt+jNIk0v0S+luNlBo/j+FSZ1nhPKCGtX84am01y+X37nSO7b2Ybi65VSe6/sZi5H7tKM20wSDp0blz7XLo4pFt9eNHVle+fa8h80+x2pbDBX5LSDS/BWPd3sr8Cs1j9GOX58JMMi357m2q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=frgxmtvc; arc=none smtp.client-ip=198.175.65.9
+	s=arc-20240116; t=1711055333; c=relaxed/simple;
+	bh=TeJGj1/tK9CmXzP6fD4kuH3rPg5TtofR/Xu7iirtjCM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mBj53jROMJNakzM0g9JzhjOetGVmoAkO7O8theMpZZ5aVS9e/DytHHEVQ+AUP/fwtK9yUJ7HvD/qMkIgnJRVXAA+H0TVig/Vvbk9VvMgvCdSsLq07HaqSnpMEquazIN/jV9KMPRrIV7JNkN1PbpdZjnNYOJT9ns8XqrTet0bmsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fJK5qdcN; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="frgxmtvc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fJK5qdcN"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711055332; x=1742591332;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=tAHdcxLcylUOp0OcDrI5LkZ+ZBHBQXHQILLjPqtaq3s=;
-  b=frgxmtvcrydE8FSAr35g3xm7vYWXPGOM4zWzZU3TqTt/g1F9spR0V1jG
-   0TGd17mbdCbvnaI+NrYv4tWHpQyFdM8MmbmKs/YI+CNeJQ4ygZ5iraLQb
-   wjSSFRvMWoPJDd5+4YKsqpzj0RuWoD0bzKzeF/dvk/du1lw2w/6a1EOkv
-   fMZKw6y+4m2PFGa6Kmg6BwIgDmMoAGTQiuTQGe0SvVuQEHU1F2L6GyM+l
-   12k4FQE4E161d1aOt4fPQrjIK8McXAy/PoEK2leZ32+wG/M9rlaJ6wIKK
-   7OEF7NN4FgbTGkX2OYEOZXG9Zfm3cDU9eJ31BFtEm0GJFqokFTDW1seqD
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="28551479"
+  t=1711055330; x=1742591330;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=TeJGj1/tK9CmXzP6fD4kuH3rPg5TtofR/Xu7iirtjCM=;
+  b=fJK5qdcNnuCXkgIVYmKJIzhd5Ozt3eQhd+LQtrhpTJxABI1GXi7IceGy
+   Y+cFuOW/FJo/+4WRnMHh99gCnFe2gC3cICrHsVcRS9U9x5M0v2zDNIeTn
+   5XbgVvt9rznhu2dK/n9EU+wJ+ItYVesXIC08PeL4KzrNc6X6fVOK52D1E
+   JflKouytRPqgUJNakPWcRIoHZ07h90X9jSpU1+DbR923iupD+OXkNTwiR
+   2NLLABnVxBhSvQa5z9Y8suBrIBWzBDkwdwwTZJDdZiBIXY6lPU9i9LS8U
+   nXPjHDJShlZZxqffxmd28sgc/7NDzZFgc+GE++10ovF4s4vmbHNgJ63dk
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="28551474"
 X-IronPort-AV: E=Sophos;i="6.07,143,1708416000"; 
-   d="scan'208";a="28551479"
+   d="scan'208";a="28551474"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 14:08:51 -0700
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 14:08:50 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,143,1708416000"; 
-   d="scan'208";a="19362673"
+   d="scan'208";a="19362672"
 Received: from derragan-mobl.amr.corp.intel.com (HELO tzanussi-mobl1.amr.corp.intel.com) ([10.213.183.52])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 14:08:50 -0700
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 14:08:48 -0700
 From: Tom Zanussi <tom.zanussi@linux.intel.com>
 To: herbert@gondor.apana.org.au,
 	davem@davemloft.net
 Cc: jsnitsel@redhat.com,
 	linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH 1/2] crypto: iaa - Fix nr_cpus < nr_iaa case
-Date: Thu, 21 Mar 2024 16:08:45 -0500
-Message-Id: <20240321210846.1307596-2-tom.zanussi@linux.intel.com>
+Subject: [PATCH 0/2] crypto: iaa - A couple of bugfixes
+Date: Thu, 21 Mar 2024 16:08:44 -0500
+Message-Id: <20240321210846.1307596-1-tom.zanussi@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240321210846.1307596-1-tom.zanussi@linux.intel.com>
-References: <20240321210846.1307596-1-tom.zanussi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -59,48 +56,33 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If nr_cpus < nr_iaa, the calculated cpus_per_iaa will be 0, which
-causes a divide-by-0 in rebalance_wq_table().
+Hi Herbert,
 
-Make sure cpus_per_iaa is 1 in that case, and also in the nr_iaa == 0
-case, even though cpus_per_iaa is never used if nr_iaa == 0, for
-paranoia.
+Here are a couple of bugfixes to iaa_crypto.
 
-Reported-by: Jerry Snitselaar <jsnitsel@redhat.com>
-Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
----
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+The first is a documentation fix from Jerry Snitselaar, which I added
+my Reviewed-by: to.
 
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 1cd304de5388..b2191ade9011 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -806,6 +806,8 @@ static int save_iaa_wq(struct idxd_wq *wq)
- 		return -EINVAL;
- 
- 	cpus_per_iaa = (nr_nodes * nr_cpus_per_node) / nr_iaa;
-+	if (!cpus_per_iaa)
-+		cpus_per_iaa = 1;
- out:
- 	return 0;
- }
-@@ -821,10 +823,12 @@ static void remove_iaa_wq(struct idxd_wq *wq)
- 		}
- 	}
- 
--	if (nr_iaa)
-+	if (nr_iaa) {
- 		cpus_per_iaa = (nr_nodes * nr_cpus_per_node) / nr_iaa;
--	else
--		cpus_per_iaa = 0;
-+		if (!cpus_per_iaa)
-+			cpus_per_iaa = 1;
-+	} else
-+		cpus_per_iaa = 1;
- }
- 
- static int wq_table_add_wqs(int iaa, int cpu)
+The second is a fix for a divide-by-0 bug when running with a single
+cpu, which was reported by Jerry as well, and which I've tested with
+various numbers of cpus and other permutations with no problems.
+
+Thanks to Jerry for the patch and bug report.
+
+Thanks,
+
+Tom
+
+Jerry Snitselaar (1):
+  crypto: iaa: Fix some errors in IAA documentation
+
+Tom Zanussi (1):
+  crypto: iaa - Fix nr_cpus < nr_iaa case
+
+ .../driver-api/crypto/iaa/iaa-crypto.rst      | 22 ++++++++++++++-----
+ drivers/crypto/intel/iaa/iaa_crypto_main.c    | 10 ++++++---
+ 2 files changed, 23 insertions(+), 9 deletions(-)
+
 -- 
 2.34.1
 
