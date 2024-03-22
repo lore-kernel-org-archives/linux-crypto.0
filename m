@@ -1,114 +1,106 @@
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7677F47A40;
-	Fri, 22 Mar 2024 14:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B9C1E53A;
+	Fri, 22 Mar 2024 21:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711117230; cv=none; b=IacdUQx7ES+57nRtm/z9neZiz/c7rSG2bb7B22vsxsezqV31n3E6CLu8FyWGRtZ+XSwB0VOz3aLjRCqxvonFBb5J8voaMbRwiE81Li+FhlhZ8HJMmOjydMDiPNym2ze/64bMRhZKAA+AbCR3R0omuPxNfEo1vGmsUTDctNgRhE8=
+	t=1711141276; cv=none; b=n8RN25344mT8G761FO8bqh92VwKHE6WfqZ6k6pfO0SjNasxy+B+dkuJYIemfwrrOg+vbiPwouOYq9vnd2DwdsPxejP3I5OgAvM+KL78jUPjbnv6f/4b7nZwdqX5Yt/Yf8FuHVH8rYFLMb3B652MPlQka4/lknDUQJc2A8g/KDoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711117230; c=relaxed/simple;
-	bh=aB18poa/nAuHxUYgK7CDuG4N2UPsaq85ox+8DKB04kM=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=ZJ+2ARzZvPrEJtKp42hi9o199C43WE5O3bG38jAkRnDy38hxBtXyT1G3Okb89VUUhit58kcvUHSgPbcPMiIjZ1VxyYTUl85XM0eA5EY5WJmWeiQaG0gHS1NtWpIrHWDwAuGY+ZPR2tkDmOpyHaIBLx+74MtgkbmjFSK6uJhMr8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ZETGE8z3; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+	s=arc-20240116; t=1711141276; c=relaxed/simple;
+	bh=qHZQxL/07nk39dovZ4jroYtYQAGKCNn3FZb5dLi7uuM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Bf0K8UvM6gJ9IQYHOxjvlP/mbUQ9Iu2bBVmQy0psxwY4+qCyl94VIUm2GYH0ghTqJFD4+9rIAi1y5oz2tyHjo2ww2sVTgt3nZnHNdfkaiV3AQvJyfJjhqieVKKQguoalNRg3FcPzSea/KUy/XO13sMC1kXuXm03Bv4TVJo7iwP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=YcJreD3M; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ZETGE8z3"
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.17.2/8.17.1) with ESMTPSA id 42MEJ2ZV3496390
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 22 Mar 2024 07:19:03 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 42MEJ2ZV3496390
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2024031401; t=1711117149;
-	bh=aB18poa/nAuHxUYgK7CDuG4N2UPsaq85ox+8DKB04kM=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=ZETGE8z3u9I9yJvR5e/CQUJ9GmkJb4wq8snvbhDmH/87Lzwf+k/ZGo1AYaXFYl9nd
-	 uETOnzCevSP6x3/Jys4AjBwWIYxjN9AYiGaZOvlyuMh07rolz2MUbUQq4v4IpcmfbH
-	 XaZ2kjkRbA92EYSzRvO14ZBO4HfRYvjEeGadQEOmjwCnKNtbWI9V4I8BadIyN7/QVt
-	 DeVXQnWkfk815Zq/7e7UNEjKO+YrQ5XnPO0G5EbeTFGaD7lwA438bf/x93wt39mE9f
-	 IPdJFoxWZE023tvibiGtBG/M2k5vMMP30t9IEatLMPA/6G+NKk1Qm1CeXy3mgZtMya
-	 5XnVwvHOIMJMQ==
-Date: Fri, 22 Mar 2024 07:18:58 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: "Daniel P. Smith" <dpsmith@apertussolutions.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Ross Philipson <ross.philipson@oracle.com>
-CC: linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
-        linux-efi@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, mjg59@srcf.ucam.org,
-        James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
-        jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
-        nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
-        davem@davemloft.net, kanth.ghatraju@oracle.com,
-        trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v8 01/15] x86/boot: Place kernel_info at a fixed offset
-User-Agent: K-9 Mail for Android
-In-Reply-To: <9d01a6d2-4dd9-4331-8fc9-b01c07cfdbb5@apertussolutions.com>
-References: <20240214221847.2066632-1-ross.philipson@oracle.com> <20240214221847.2066632-2-ross.philipson@oracle.com> <CAMj1kXH3Gvr3vDRLDdXuc0s7ZAQYE6+D7tmCRBjJWwWt2fn4-w@mail.gmail.com> <9d01a6d2-4dd9-4331-8fc9-b01c07cfdbb5@apertussolutions.com>
-Message-ID: <32FDA47A-C87F-406F-A0B9-3AA1BB2EBAFB@zytor.com>
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="YcJreD3M"
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id E2E7F100002;
+	Sat, 23 Mar 2024 00:00:52 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1711141252; bh=AHaDfWqKeTOZ0MS8fprzUVNZEFZ6lLX0Zn06/jjcUO8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=YcJreD3M2b03HXR8f2Z8GrN2oP2kikzXvI0qZ0/hl6wggjnME5zguGAmROJ3jqrvc
+	 tgSCw1+6K4B/drfyHlkKKE8HQc2kDNShSsTo+26o50fUvo0S0bfLUxW1qUQDt3yAqO
+	 Z9FX0XWPKbuMyEYo2G9JB9GDlBNYX8ofGuQP0EfncSEODxXc7dC0kpL8GbP8ByipPw
+	 H45jEZyfyAqaS56042t7QjL2ogau2+kSNYDeWyReekqKE2sXsaGEsgegkg8lOZtI2Z
+	 03rnvt0dOiGfcUq7Mr6b9I20eJedYvnko4V9vNbeqpkbHfjURG5YKALPqSIw7CsV4Q
+	 Wrb/+V+w6ZtIg==
+Received: from mx1.t-argos.ru.ru (mail.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Sat, 23 Mar 2024 00:00:05 +0300 (MSK)
+Received: from localhost.localdomain (172.17.215.6) by ta-mail-02
+ (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 22 Mar
+ 2024 23:59:45 +0300
+From: Aleksandr Mishin <amishin@t-argos.ru>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Aleksandr Mishin <amishin@t-argos.ru>, "David S. Miller"
+	<davem@davemloft.net>, Steve Lin <steven.lin1@broadcom.com>, Rob Rice
+	<rob.rice@broadcom.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH v2] crypto: bcm/spu2 - Add buffer size check
+Date: Fri, 22 Mar 2024 23:59:15 +0300
+Message-ID: <20240322205915.13305-1-amishin@t-argos.ru>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240306110022.21574-1-amishin@t-argos.ru>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 184367 [Mar 22 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 11 0.3.11 5ecf9895443a5066245fcb91e8430edf92b1b594, {Tracking_from_domain_doesnt_match_to}, mx1.t-argos.ru.ru:7.1.1;t-argos.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/03/22 20:48:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/03/22 14:30:00 #24353062
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On March 21, 2024 6:45:48 AM PDT, "Daniel P=2E Smith" <dpsmith@apertussolut=
-ions=2Ecom> wrote:
->Hi Ard!
->
->On 2/15/24 02:56, Ard Biesheuvel wrote:
->> On Wed, 14 Feb 2024 at 23:31, Ross Philipson <ross=2Ephilipson@oracle=
-=2Ecom> wrote:
->>>=20
->>> From: Arvind Sankar <nivedita@alum=2Emit=2Eedu>
->>>=20
->>> There are use cases for storing the offset of a symbol in kernel_info=
-=2E
->>> For example, the trenchboot series [0] needs to store the offset of th=
-e
->>> Measured Launch Environment header in kernel_info=2E
->>>=20
->>=20
->> Why? Is this information consumed by the bootloader?
->
->Yes, the bootloader needs a standardized means to find the offset of the =
-MLE header, which communicates a set of meta-data needed by the DCE in orde=
-r to set up for and start the loaded kernel=2E Arm will also need to provid=
-e a similar metadata structure and alternative entry point (or a complete r=
-ewrite of the existing entry point), as the current Arm entry point is in d=
-irect conflict with Arm DRTM specification=2E
->
->> I'd like to get away from x86 specific hacks for boot code and boot
->> images, so I would like to explore if we can avoid kernel_info, or at
->> least expose it in a generic way=2E We might just add a 32-bit offset
->> somewhere in the first 64 bytes of the bootable image: this could
->> co-exist with EFI bootable images, and can be implemented on arm64,
->> RISC-V and LoongArch as well=2E
->
->With all due respect, I would not refer to boot params and the kern_info =
-extension designed by the x86 maintainers as a hack=2E It is the well-defin=
-ed boot protocol for x86, just as Arm has its own boot protocol around Devi=
-ce Tree=2E
->
->We would gladly adopt a cross arch/cross image type, zImage and bzImage, =
-means to embedded meta-data about the kernel that can be discovered by a bo=
-otloader=2E Otherwise, we are relegated to doing a per arch/per image type =
-discovery mechanism=2E If you have any suggestions that are cross arch/cros=
-s image type that we could explore, we would be grateful and willing to inv=
-estigate how to adopt such a method=2E
->
->V/r,
->Daniel
+In spu2_dump_omd() value of ptr is increased by ciph_key_len
+instead of hash_iv_len which could lead to going beyond the
+buffer boundaries.
+Fix this bug by changing ciph_key_len to hash_iv_len.
 
-To be fair, the way things are going UEFI, i=2Ee=2E PE/COFF, is becoming t=
-he new standard format=2E Yes, ELF would have been better, but=2E=2E=2E
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+---
+v2: Fix commit message according to the Linux kernel rules
+
+ drivers/crypto/bcm/spu2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/bcm/spu2.c b/drivers/crypto/bcm/spu2.c
+index 07989bb8c220..3fdc64b5a65e 100644
+--- a/drivers/crypto/bcm/spu2.c
++++ b/drivers/crypto/bcm/spu2.c
+@@ -495,7 +495,7 @@ static void spu2_dump_omd(u8 *omd, u16 hash_key_len, u16 ciph_key_len,
+ 	if (hash_iv_len) {
+ 		packet_log("  Hash IV Length %u bytes\n", hash_iv_len);
+ 		packet_dump("  hash IV: ", ptr, hash_iv_len);
+-		ptr += ciph_key_len;
++		ptr += hash_iv_len;
+ 	}
+ 
+ 	if (ciph_iv_len) {
+-- 
+2.30.2
+
