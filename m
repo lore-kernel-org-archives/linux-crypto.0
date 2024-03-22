@@ -1,91 +1,89 @@
-Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F73E81733;
-	Fri, 22 Mar 2024 22:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9A2823DB;
+	Fri, 22 Mar 2024 23:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711146488; cv=none; b=QWi4WvisN9el7eSLowlcXmMC9k7H6gUyApmRxMNDC8qaifgVLSXDynzt0dE0p92vNgZeqbo2CgkohWpcYfE6aYYR/EXyaBIXfgx9piJrNsxz186PavOsZSDCkSl5yeG6Fx4kQHD4xCuFhLdbFVxQmWh3gISjDDfP2unl97pUjlU=
+	t=1711149646; cv=none; b=HDawZ86zS9bnxklJOducbKUEnQ/4BqwIyTzADDc5YP3b7K/OMX2vxMEGPAqE6MYQWtxbtQcwYY/ZsBeWrplFk+Wjit9i7M0yjLzpQYD2nt2rUJAeYOrMhuJXE/lxWsZi/TOhB5v4OjVteZydTLC2GpdvY0pM67uKRYohM30Y9sI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711146488; c=relaxed/simple;
-	bh=2dtKlD5/Zn6482Sk/YiH9qaWhZ1YrikhQwIjP0TL7Bo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ON1ClMa8vqRlAf/bbXlJYunk5BW5+9s/YFztJL+2ETM9JmmAARqQKtiYTJI/JzQVPNeSTbDjDZgdZa/ms+2nT4Nsr2ylbpOErQpbdbeylUXH8XHjgmydrCN6Vp/2ECt1NIfObxBHHZRwKTKjqgKq4RGEbRvVkWxfX8J0oyQ4o8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-	by vmicros1.altlinux.org (Postfix) with ESMTP id 12FCF72C8F5;
-	Sat, 23 Mar 2024 01:27:58 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-	by imap.altlinux.org (Postfix) with ESMTPSA id 090D736D071C;
-	Sat, 23 Mar 2024 01:27:58 +0300 (MSK)
-Date: Sat, 23 Mar 2024 01:27:57 +0300
-From: Vitaly Chikunov <vt@altlinux.org>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, linux-kernel@vger.kernel.org,
-	saulo.alessandre@tse.jus.br
-Subject: Re: [PATCH] crypto: ecdsa - Fix module auto-load on add-key
-Message-ID: <20240322222757.gsr4kto47imm5spj@altlinux.org>
-References: <20240321144433.1671394-1-stefanb@linux.ibm.com>
+	s=arc-20240116; t=1711149646; c=relaxed/simple;
+	bh=ebOkpUDlnY+ZOdsMS50jXdJSlUYtcAdWbayQmEjRjVg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=mU0ciSvcjDZuy+VlxqHyOok48Se6qu6Hl8IthwNLLGcb2b6F3wFf4gqtPthDvGm6VQeq/1tiJFAxSkQ4xuI84eIVdqQEHxhMsB/KqzibE/84m7FmIXA8otl0iIOvZyOuMGUBMOFOWE9Mdni966ImacfToRW/DJfIScpUcVnc3n8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fQA9+YsP; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fQA9+YsP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711149645; x=1742685645;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ebOkpUDlnY+ZOdsMS50jXdJSlUYtcAdWbayQmEjRjVg=;
+  b=fQA9+YsPV88wAPbuxd3t/EsZhuBhPI5HAu8JPJCdzH/s4CtTwk6eNefT
+   EsLJD/Di4OBhJh5vYtgti4x9OzvDshLYNfre5OfxDa5K++yy4bJ1l30Se
+   pn5SU1OFwzg//ltqclI/mFcPIALiZTBj3MNHlyCSwP2XGxTBWT6CaEgt8
+   KnPqiTHbsX7N1W+yG4Ie6q1MBDSuCaSoxnzbvDEtG8IgjuNFUSIkwzXtV
+   v35ZQjQMQlqCRZtNdj4/3+Jqwg4G2WMMqdsQfp1EXiwZRceOh/V5StiEz
+   jcMsZFt8L2dQCz1B1S5Qiufcq7jkox97yhrAtwY0asyTvEUwUmRozyGxu
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11021"; a="6408542"
+X-IronPort-AV: E=Sophos;i="6.07,147,1708416000"; 
+   d="scan'208";a="6408542"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 16:20:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,147,1708416000"; 
+   d="scan'208";a="19748979"
+Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
+  by orviesa004.jf.intel.com with ESMTP; 22 Mar 2024 16:20:44 -0700
+From: "Chang S. Bae" <chang.seok.bae@intel.com>
+To: linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	ebiggers@kernel.org,
+	ardb@kernel.org,
+	x86@kernel.org,
+	chang.seok.bae@intel.com
+Subject: [PATCH v2 0/2] crypto: x86/aesni - Simplify AES key expansion code
+Date: Fri, 22 Mar 2024 16:04:57 -0700
+Message-Id: <20240322230459.456606-1-chang.seok.bae@intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240311213232.128240-1-chang.seok.bae@intel.com>
+References: <20240311213232.128240-1-chang.seok.bae@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <20240321144433.1671394-1-stefanb@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 21, 2024 at 10:44:33AM -0400, Stefan Berger wrote:
-> Add module alias with the algorithm cra_name similar to what we have for
-> RSA-related and other algorithms.
-> 
-> The kernel attempts to modprobe asymmetric algorithms using the names
-> "crypto-$cra_name" and "crypto-$cra_name-all." However, since these
-> aliases are currently missing, the modules are not loaded. For instance,
-> when using the `add_key` function, the hash algorithm is typically
-> loaded automatically, but the asymmetric algorithm is not.
-> 
-> Steps to test:
-> 
-> 1. Create certificate
-> 
->   openssl req -x509 -sha256 -newkey ec \
->   -pkeyopt "ec_paramgen_curve:secp384r1" -keyout key.pem -days 365 \
->   -subj '/CN=test' -nodes -outform der -out nist-p384.der
-> 
-> 2. Optionally, trace module requests with: trace-cmd stream -e module &
-> 
-> 3. Trigger add_key call for the cert:
-> 
->    # keyctl padd asymmetric "" @u < nist-p384.der
->    641069229
->    # lsmod | head -2
->    Module                  Size  Used by
->    ecdsa_generic          16384  0
-> 
-> Fixes: c12d448ba939 ("crypto: ecdsa - Register NIST P384 and extend test suite")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Previously, V1 [1] was posted to update the aesni_set_key() prototype to
+remove an unnecessary error code return type.
 
-Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
+During the review process, it was discovered that both aes_expandkey()
+and the AES-NI glue code redundantly check the key size. V2 includes a
+cleanup to invoke aes_expandkey() immediately if AES-NI is unusable.
 
-> ---
->  crypto/ecdsa.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
-> index fbd76498aba8..3f9ec273a121 100644
-> --- a/crypto/ecdsa.c
-> +++ b/crypto/ecdsa.c
-> @@ -373,4 +373,7 @@ module_exit(ecdsa_exit);
->  MODULE_LICENSE("GPL");
->  MODULE_AUTHOR("Stefan Berger <stefanb@linux.ibm.com>");
->  MODULE_DESCRIPTION("ECDSA generic algorithm");
-> +MODULE_ALIAS_CRYPTO("ecdsa-nist-p192");
-> +MODULE_ALIAS_CRYPTO("ecdsa-nist-p256");
-> +MODULE_ALIAS_CRYPTO("ecdsa-nist-p384");
->  MODULE_ALIAS_CRYPTO("ecdsa-generic");
-> -- 
-> 2.43.0
+Thanks,
+Chang
+
+[1]: https://lore.kernel.org/lkml/20240311213232.128240-1-chang.seok.bae@intel.com/
+
+Chang S. Bae (2):
+  crypto: x86/aesni - Rearrange AES key size check
+  crypto: x86/aesni - Update aesni_set_key() to return void
+
+ arch/x86/crypto/aesni-intel_asm.S  |  5 ++---
+ arch/x86/crypto/aesni-intel_glue.c | 24 +++++++++++-------------
+ 2 files changed, 13 insertions(+), 16 deletions(-)
+
+
+base-commit: e8f897f4afef0031fe618a8e94127a0934896aba
+-- 
+2.34.1
+
