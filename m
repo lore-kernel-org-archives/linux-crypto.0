@@ -1,32 +1,34 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D852F7E6;
-	Fri, 22 Mar 2024 11:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279AE3F8F4;
+	Fri, 22 Mar 2024 11:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711107890; cv=none; b=D4uabmKCnkIaKZMdkypShA4UTH4HvVq/FIF+LUWMml/QVF0q32Qoj78IMYRgp7aH+naU+SJByQzbHoFS3rzNBY7oXEd4JUmFRYPSAbnlpDonoVl+CHgHtQa1MruvJ6/451CZ51eQVygOEwzYLX1v+3a8z8ah+lc3Bi/KcH3O6Y0=
+	t=1711107902; cv=none; b=tCC8bFI8XJoR4T6c6K7iaUiVNGBLkTO0I758ikqMt9bvfO1jzex3KA4oYjiAPglMaWbl2QUG0NTyzAGqu2wPP/w0IgKJw6QNM3QMlBqseglq73iVoh8DaRbreygyyYGj042Xgwe4zbSF85nR9WSNIDKOqXkGwEPch/4lu9CDYKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711107890; c=relaxed/simple;
-	bh=Nf16gHegt7RFSlZ5m6gyIwYaJn5Q1p5AtJUL9MJfAjA=;
+	s=arc-20240116; t=1711107902; c=relaxed/simple;
+	bh=3TzN2Lt6QPOtvQCHtJ7t44fnCg8LERCTZqdH35s6BEY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=trdTrIkbwx7xgdLknQcUrspFaotGIJOYwhc6hIH2EZBMvsXijNIQjU2oS4DcBfCw64bPM7wycFS5zDcTRQ6Pk+XmMp2xSVusFKuHJUQ+YKCuQ5CmnbNZSAUJJSup/YwSMhU4Rwx5fMqKkZMMna1iL4Ez0Ghvl4JpLITZtfwrAHI=
+	 Content-Type:Content-Disposition:In-Reply-To; b=E/3xWJZ636Xmd1z9dFFBrxlD3Y2/vBZbQRBIuemvw7sHrGCb+UrWHyUjW02YRnitxc9VIJvOKFX8Ug/4s5NIxaTS1kJTI64oZPAqTUgRZuBo/DP8AYcCIK3GvvGS2O91zfnFllF+U5w5WQuPmsDyiIYLct6nbs/BBzsGUMdSxOE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rndK6-009XMb-La; Fri, 22 Mar 2024 19:44:35 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Mar 2024 19:44:50 +0800
-Date: Fri, 22 Mar 2024 19:44:50 +0800
+	id 1rndKP-009XMk-Km; Fri, 22 Mar 2024 19:44:54 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Mar 2024 19:45:09 +0800
+Date: Fri, 22 Mar 2024 19:45:09 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Tom Zanussi <tom.zanussi@linux.intel.com>
-Cc: davem@davemloft.net, jsnitsel@redhat.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/2] crypto: iaa - Fix nr_cpus < nr_iaa case
-Message-ID: <Zf1vMuXMF7mUuDAK@gondor.apana.org.au>
-References: <20240321210846.1307596-1-tom.zanussi@linux.intel.com>
- <20240321210846.1307596-2-tom.zanussi@linux.intel.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+	linux-wireless@vger.kernel.org, iwd@lists.linux.dev,
+	James Prestwood <prestwoj@gmail.com>,
+	Dimitri John Ledkov <dimitri.ledkov@canonical.com>,
+	Karel Balej <balejk@matfyz.cz>
+Subject: Re: [PATCH] Revert "crypto: pkcs7 - remove sha1 support"
+Message-ID: <Zf1vRbvwYvj1KcTS@gondor.apana.org.au>
+References: <20240313233227.56391-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,21 +37,37 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240321210846.1307596-2-tom.zanussi@linux.intel.com>
+In-Reply-To: <20240313233227.56391-1-ebiggers@kernel.org>
 
-On Thu, Mar 21, 2024 at 04:08:45PM -0500, Tom Zanussi wrote:
-> If nr_cpus < nr_iaa, the calculated cpus_per_iaa will be 0, which
-> causes a divide-by-0 in rebalance_wq_table().
+On Wed, Mar 13, 2024 at 04:32:27PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Make sure cpus_per_iaa is 1 in that case, and also in the nr_iaa == 0
-> case, even though cpus_per_iaa is never used if nr_iaa == 0, for
-> paranoia.
+> This reverts commit 16ab7cb5825fc3425c16ad2c6e53d827f382d7c6 because it
+> broke iwd.  iwd uses the KEYCTL_PKEY_* UAPIs via its dependency libell,
+> and apparently it is relying on SHA-1 signature support.  These UAPIs
+> are fairly obscure, and their documentation does not mention which
+> algorithms they support.  iwd really should be using a properly
+> supported userspace crypto library instead.  Regardless, since something
+> broke we have to revert the change.
 > 
-> Reported-by: Jerry Snitselaar <jsnitsel@redhat.com>
-> Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+> It may be possible that some parts of this commit can be reinstated
+> without breaking iwd (e.g. probably the removal of MODULE_SIG_SHA1), but
+> for now this just does a full revert to get things working again.
+> 
+> Reported-by: Karel Balej <balejk@matfyz.cz>
+> Closes: https://lore.kernel.org/r/CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz
+> Cc: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
->  drivers/crypto/intel/iaa/iaa_crypto_main.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+>  crypto/asymmetric_keys/mscode_parser.c    |  3 +
+>  crypto/asymmetric_keys/pkcs7_parser.c     |  4 ++
+>  crypto/asymmetric_keys/public_key.c       |  3 +-
+>  crypto/asymmetric_keys/signature.c        |  2 +-
+>  crypto/asymmetric_keys/x509_cert_parser.c |  8 +++
+>  crypto/testmgr.h                          | 80 +++++++++++++++++++++++
+>  include/linux/oid_registry.h              |  4 ++
+>  kernel/module/Kconfig                     |  5 ++
+>  8 files changed, 107 insertions(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
