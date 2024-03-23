@@ -1,45 +1,75 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4213922625
-	for <linux-crypto@vger.kernel.org>; Sat, 23 Mar 2024 16:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936A122625;
+	Sat, 23 Mar 2024 16:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711212264; cv=none; b=SORuAwnHC665EfWrnPmHtwU/mqz51k67rF2miKCtVBLumG7kL5HSoqdnXdlqY3TSr4q+t06yj7YjV3lms0ImbqLsTksce0t5XFjC2Gw0GIUU+aBX7AbMcNfXZILEk+1In9jXXovd5vdNc62XBM9RRGQs+jS7vly8Q+GiG0TUJ/Q=
+	t=1711212271; cv=none; b=Pes3N68ixPEsioNyd4PHwYafu8onxSSw27XxzjjEkCq49lPuPJFLmXWQdKfecfuG/Hx+E+i+3L+L06aoYS/sqtMSyZWHgVMHM4U35+fOhw0AxyvqN79EFJFn21QnhEdh3lG9hYEFyW4BxvZei/9kyRO6ahdvpkhEhEAn+GFRGDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711212264; c=relaxed/simple;
-	bh=qWhalT5AFc1DCUsjm2smHCmR8gPAi8ueh2u9ZzM/EO4=;
+	s=arc-20240116; t=1711212271; c=relaxed/simple;
+	bh=qgss4wmPeBO4mgK11p8/bjoZvc4VOd4Jab5WKK2s68k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=etYyjAmtlY87YElgiY6xDds2VSvfIjOcN03WNSu4LmlprZj4Af4psOinGZ4g4zhEoWLl0leVj36ijov770ev78nHws0SDK09aMM+ROzR3kO5ndbvVCMgD4wJVAEdhHL+W3qZY1qQs1A2gEB3tRiThw2AEwcUEBw6Ki4owvwWMSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ciykNqV6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=O608B9L9z2GDjkltEVhmEBpIYJCYFbGQ0/6GJc3rF3GtgmNxBZzp4IY6gD0IAsP04W6gfRb3Et0l2sUGHQhH18S3dy67MIW0WcxHawtavzWUaJVmV64lOsuMfOXq0XNvuwo7SIJq3QtmOYaUzp59/nwsrCV9n4iE/RDZchicZgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H6Z8QuN0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ciykNqV6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9FABC433A6;
-	Sat, 23 Mar 2024 16:44:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H6Z8QuN0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BB83C433B1;
+	Sat, 23 Mar 2024 16:44:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711212263;
-	bh=qWhalT5AFc1DCUsjm2smHCmR8gPAi8ueh2u9ZzM/EO4=;
+	s=k20201202; t=1711212271;
+	bh=qgss4wmPeBO4mgK11p8/bjoZvc4VOd4Jab5WKK2s68k=;
 	h=From:List-Id:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ciykNqV6DNyO2GnPcg7Mzpqmz+IO7hbdziknNYL4ZYcPrCzrDSoEZlwhKB/CO2gRq
-	 jiy86hKo1bd/FIBaPEb409mzobSuN2GYivo1J7aUP9bwtajSar03f8lmsPm2ZYMxsd
-	 Zg6qrOmFZ8XrocjLmF4iA0uoJbnB0DqJzaAO8maSsUoaUntO0+lRq3601wiEW0qO1q
-	 /oEcEgc5twpRVZOoLkACfxRt6AeH7JAmHCVeIbNM193x8AVZDupJX1pgZxRXG7c1v3
-	 CPdwawrSYm9N5yJcNLvf2okuy82EbszJLr5vOjK08xBNCxf/imQ10bnNYDtCVClIRT
-	 cLsRqDAYQrMhA==
+	b=H6Z8QuN0qLSAkYgkJfTEpAtG3yJH11UkMPNfp54Efv/CnDWLZVtS89hRKJb+G11aY
+	 0IwESkNng1DTb00+bD35+Q5bnr3b2eGN3gPfErprUNbjVHVIBpa3ceztt6usrcboSG
+	 s9/O9l+vk/0Gzw0m6yFTVi+HhC5IjJbgY6ousuIxqQKp0VpgAg9Qvw+DAa+mPyjWvF
+	 fi/Cbb6t29WqbueVVPoUksRzWsPjO592I1rDDhimJzwJjfF69dLpBVo/alzHNxx2BK
+	 3KbNWm8tcTB5YirP7tPIcsJsxVIlfvvuFiVhPRl+BlS9hJKeO/lr6XovbTdOhHlirM
+	 j8RUy16CDYOsA==
 From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
 To: Arnd Bergmann <arnd@arndb.de>,
 	Gregory CLEMENT <gregory.clement@bootlin.com>,
 	soc@kernel.org,
 	arm@kernel.org,
-	Andy Shevchenko <andy@kernel.org>,
-	Olivia Mackall <olivia@selenic.com>,
+	=?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-crypto@vger.kernel.org
+	"David S. Miller" <davem@davemloft.net>,
+	Bamvor Jian Zhang <bamv2005@gmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Douglas Anderson <dianders@chromium.org>,
+	Andrzej Hajda <andrzej.hajda@intel.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Robert Foss <rfoss@kernel.org>,
+	Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
+	Jonas Karlman <jonas@kwiboo.se>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	James Seo <james@equiv.tech>,
+	Jean Delvare <jdelvare@suse.com>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Matti Vaittinen <mazziesaccount@gmail.com>,
+	Naresh Solanki <naresh.solanki@9elements.com>,
+	Patrick Rudolph <patrick.rudolph@9elements.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Eddie James <eajames@linux.ibm.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-hwmon@vger.kernel.org
 Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-Subject: [PATCH v5 07/11] platform: cznic: turris-omnia-mcu: Add support for MCU provided TRNG
-Date: Sat, 23 Mar 2024 17:43:55 +0100
-Message-ID: <20240323164359.21642-8-kabel@kernel.org>
+Subject: [PATCH v5 08/11] devm-helpers: Add resource managed version of debugfs directory create function
+Date: Sat, 23 Mar 2024 17:43:56 +0100
+Message-ID: <20240323164359.21642-9-kabel@kernel.org>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240323164359.21642-1-kabel@kernel.org>
 References: <20240323164359.21642-1-kabel@kernel.org>
@@ -52,216 +82,353 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add support for true random number generator provided by the MCU.
-New Omnia boards come without the Atmel SHA204-A chip. Instead the
-crypto functionality is provided by new microcontroller, which has
-a TRNG peripheral.
+A few drivers register a devm action to remove a debugfs directory,
+implementing a one-liner function that calls debufs_remove_recursive().
+Help drivers avoid this repeated implementations by adding managed
+version of debugfs directory create function.
+
+Use the new function devm_debugfs_create_dir() in the following
+drivers:
+  drivers/crypto/caam/ctrl.c
+  drivers/gpu/drm/bridge/ti-sn65dsi86.c
+  drivers/hwmon/hp-wmi-sensors.c
+  drivers/hwmon/mr75203.c
+  drivers/hwmon/pmbus/pmbus_core.c
+
+Also use the action function devm_debugfs_dir_recursive_drop() in
+driver
+  drivers/gpio/gpio-mockup.c
+
+As per Dan Williams' request [1], do not touch the driver
+  drivers/cxl/mem.c
+
+[1] https://lore.kernel.org/linux-gpio/65d7918b358a5_1ee3129432@dwillia2-mobl3.amr.corp.intel.com.notmuch/
 
 Signed-off-by: Marek Behún <kabel@kernel.org>
 ---
- drivers/platform/cznic/Kconfig                |  2 +
- drivers/platform/cznic/Makefile               |  1 +
- .../platform/cznic/turris-omnia-mcu-base.c    |  6 +-
- .../platform/cznic/turris-omnia-mcu-gpio.c    |  2 +-
- .../platform/cznic/turris-omnia-mcu-trng.c    | 89 +++++++++++++++++++
- drivers/platform/cznic/turris-omnia-mcu.h     |  8 ++
- 6 files changed, 106 insertions(+), 2 deletions(-)
- create mode 100644 drivers/platform/cznic/turris-omnia-mcu-trng.c
+ drivers/crypto/caam/ctrl.c            | 16 +++--------
+ drivers/gpio/gpio-mockup.c            | 11 ++------
+ drivers/gpu/drm/bridge/ti-sn65dsi86.c | 13 ++-------
+ drivers/hwmon/hp-wmi-sensors.c        | 15 ++--------
+ drivers/hwmon/mr75203.c               | 15 ++++------
+ drivers/hwmon/pmbus/pmbus_core.c      | 16 ++++-------
+ include/linux/devm-helpers.h          | 40 +++++++++++++++++++++++++++
+ 7 files changed, 61 insertions(+), 65 deletions(-)
 
-diff --git a/drivers/platform/cznic/Kconfig b/drivers/platform/cznic/Kconfig
-index e2649cdecc38..750d5f47dba8 100644
---- a/drivers/platform/cznic/Kconfig
-+++ b/drivers/platform/cznic/Kconfig
-@@ -19,6 +19,7 @@ config TURRIS_OMNIA_MCU
- 	depends on I2C
- 	select GPIOLIB
- 	select GPIOLIB_IRQCHIP
-+	select HW_RANDOM
- 	select RTC_CLASS
- 	select WATCHDOG_CORE
- 	help
-@@ -28,6 +29,7 @@ config TURRIS_OMNIA_MCU
- 	  - board poweroff into true low power mode (with voltage regulators
- 	    disabled) and the ability to configure wake up from this mode (via
- 	    rtcwake)
-+	  - true random number generator (if available on the MCU)
- 	  - MCU watchdog
- 	  - GPIO pins
- 	    - to get front button press events (the front button can be
-diff --git a/drivers/platform/cznic/Makefile b/drivers/platform/cznic/Makefile
-index a43997a12d74..8fd4c6cbcb1b 100644
---- a/drivers/platform/cznic/Makefile
-+++ b/drivers/platform/cznic/Makefile
-@@ -4,4 +4,5 @@ obj-$(CONFIG_TURRIS_OMNIA_MCU)	+= turris-omnia-mcu.o
- turris-omnia-mcu-objs		:= turris-omnia-mcu-base.o
- turris-omnia-mcu-objs		+= turris-omnia-mcu-gpio.o
- turris-omnia-mcu-objs		+= turris-omnia-mcu-sys-off-wakeup.o
-+turris-omnia-mcu-objs		+= turris-omnia-mcu-trng.o
- turris-omnia-mcu-objs		+= turris-omnia-mcu-watchdog.o
-diff --git a/drivers/platform/cznic/turris-omnia-mcu-base.c b/drivers/platform/cznic/turris-omnia-mcu-base.c
-index 5a45834003cd..30771004a627 100644
---- a/drivers/platform/cznic/turris-omnia-mcu-base.c
-+++ b/drivers/platform/cznic/turris-omnia-mcu-base.c
-@@ -335,7 +335,11 @@ static int omnia_mcu_probe(struct i2c_client *client)
- 	if (err)
- 		return err;
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index bdf367f3f679..ea3ed9a17f1a 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -7,6 +7,7 @@
+  */
  
--	return omnia_mcu_register_gpiochip(mcu);
-+	err = omnia_mcu_register_gpiochip(mcu);
-+	if (err)
-+		return err;
-+
-+	return omnia_mcu_register_trng(mcu);
- }
- 
- static const struct of_device_id of_omnia_mcu_match[] = {
-diff --git a/drivers/platform/cznic/turris-omnia-mcu-gpio.c b/drivers/platform/cznic/turris-omnia-mcu-gpio.c
-index 7f885be23a47..90b2caa679ea 100644
---- a/drivers/platform/cznic/turris-omnia-mcu-gpio.c
-+++ b/drivers/platform/cznic/turris-omnia-mcu-gpio.c
-@@ -161,7 +161,7 @@ static const struct omnia_gpio {
- };
- 
- /* mapping from interrupts to indexes of GPIOs in the omnia_gpios array */
--static const u8 omnia_int_to_gpio_idx[32] = {
-+const u8 omnia_int_to_gpio_idx[32] = {
- 	[__bf_shf(INT_CARD_DET)]		= 4,
- 	[__bf_shf(INT_MSATA_IND)]		= 5,
- 	[__bf_shf(INT_USB30_OVC)]		= 6,
-diff --git a/drivers/platform/cznic/turris-omnia-mcu-trng.c b/drivers/platform/cznic/turris-omnia-mcu-trng.c
-new file mode 100644
-index 000000000000..b08111b5c337
---- /dev/null
-+++ b/drivers/platform/cznic/turris-omnia-mcu-trng.c
-@@ -0,0 +1,89 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * CZ.NIC's Turris Omnia MCU TRNG driver
-+ *
-+ * 2024 by Marek Behún <kabel@kernel.org>
-+ */
-+
-+#include <linux/bitfield.h>
-+#include <linux/completion.h>
+ #include <linux/device.h>
 +#include <linux/devm-helpers.h>
-+#include <linux/irqdomain.h>
-+#include <linux/minmax.h>
-+#include <linux/module.h>
-+#include <linux/string.h>
-+#include <linux/turris-omnia-mcu-interface.h>
-+#include <linux/types.h>
-+
-+#include "turris-omnia-mcu.h"
-+
-+#define CMD_TRNG_MAX_ENTROPY_LEN	64
-+
-+static irqreturn_t omnia_trng_irq_handler(int irq, void *dev_id)
-+{
-+	struct omnia_mcu *mcu = dev_id;
-+
-+	complete(&mcu->trng_completion);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static int omnia_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-+{
-+	struct omnia_mcu *mcu = (struct omnia_mcu *)rng->priv;
-+	u8 reply[1 + CMD_TRNG_MAX_ENTROPY_LEN];
-+	int err, bytes;
-+
-+	if (!wait && !completion_done(&mcu->trng_completion))
-+		return 0;
-+
-+	do {
-+		if (wait_for_completion_interruptible(&mcu->trng_completion))
-+			return -EINTR;
-+
-+		err = omnia_cmd_read(mcu->client, CMD_TRNG_COLLECT_ENTROPY,
-+				     reply, sizeof(reply));
-+		if (err)
-+			return err;
-+
-+		bytes = min3(reply[0], max, CMD_TRNG_MAX_ENTROPY_LEN);
-+	} while (wait && !bytes);
-+
-+	memcpy(data, &reply[1], bytes);
-+
-+	return bytes;
-+}
-+
-+int omnia_mcu_register_trng(struct omnia_mcu *mcu)
-+{
-+	struct device *dev = &mcu->client->dev;
-+	int irq, err;
-+	u8 irq_idx;
-+
-+	if (!(mcu->features & FEAT_TRNG))
-+		return 0;
-+
-+	irq_idx = omnia_int_to_gpio_idx[__bf_shf(INT_TRNG)];
-+	irq = devm_irq_create_mapping(dev, mcu->gc.irq.domain, irq_idx);
-+	if (irq <= 0)
-+		return dev_err_probe(dev, irq ?: -ENXIO,
-+				     "Cannot map TRNG IRQ\n");
-+
-+	init_completion(&mcu->trng_completion);
-+
-+	err = devm_request_threaded_irq(dev, irq, NULL, omnia_trng_irq_handler,
-+					IRQF_ONESHOT, "turris-omnia-mcu-trng",
-+					mcu);
-+	if (err)
-+		return dev_err_probe(dev, err, "Cannot request TRNG IRQ\n");
-+
-+	mcu->trng.name = "turris-omnia-mcu-trng";
-+	mcu->trng.read = omnia_trng_read;
-+	mcu->trng.priv = (unsigned long)mcu;
-+
-+	err = devm_hwrng_register(dev, &mcu->trng);
-+	if (err)
-+		return dev_err_probe(dev, err, "Cannot register TRNG\n");
-+
-+	return 0;
-+}
-diff --git a/drivers/platform/cznic/turris-omnia-mcu.h b/drivers/platform/cznic/turris-omnia-mcu.h
-index 3e2c96079e64..f5b8f7ed3e6e 100644
---- a/drivers/platform/cznic/turris-omnia-mcu.h
-+++ b/drivers/platform/cznic/turris-omnia-mcu.h
-@@ -9,7 +9,9 @@
- #define __TURRIS_OMNIA_MCU_H
- 
- #include <linux/bitops.h>
-+#include <linux/completion.h>
- #include <linux/gpio/driver.h>
-+#include <linux/hw_random.h>
- #include <linux/i2c.h>
- #include <linux/if_ether.h>
- #include <linux/mutex.h>
-@@ -46,6 +48,10 @@ struct omnia_mcu {
- 
- 	/* MCU watchdog */
- 	struct watchdog_device wdt;
-+
-+	/* true random number generator */
-+	struct hwrng trng;
-+	struct completion trng_completion;
- };
- 
- static inline int omnia_cmd_write(const struct i2c_client *client, void *cmd,
-@@ -166,11 +172,13 @@ static inline int omnia_cmd_read_u8(const struct i2c_client *client, u8 cmd)
- 	return err ?: reply;
+ #include <linux/of_address.h>
+ #include <linux/of_irq.h>
+ #include <linux/platform_device.h>
+@@ -604,11 +605,6 @@ static int init_clocks(struct device *dev, const struct caam_imx_data *data)
+ 	return devm_add_action_or_reset(dev, disable_clocks, ctrlpriv);
  }
  
-+extern const u8 omnia_int_to_gpio_idx[32];
- extern const struct attribute_group omnia_mcu_gpio_group;
- extern const struct attribute_group omnia_mcu_poweroff_group;
+-static void caam_remove_debugfs(void *root)
+-{
+-	debugfs_remove_recursive(root);
+-}
+-
+ #ifdef CONFIG_FSL_MC_BUS
+ static bool check_version(struct fsl_mc_version *mc_version, u32 major,
+ 			  u32 minor, u32 revision)
+@@ -1058,13 +1054,9 @@ static int caam_probe(struct platform_device *pdev)
+ 	ctrlpriv->era = caam_get_era(perfmon);
+ 	ctrlpriv->domain = iommu_get_domain_for_dev(dev);
  
- int omnia_mcu_register_gpiochip(struct omnia_mcu *mcu);
- int omnia_mcu_register_sys_off_and_wakeup(struct omnia_mcu *mcu);
-+int omnia_mcu_register_trng(struct omnia_mcu *mcu);
- int omnia_mcu_register_watchdog(struct omnia_mcu *mcu);
+-	dfs_root = debugfs_create_dir(dev_name(dev), NULL);
+-	if (IS_ENABLED(CONFIG_DEBUG_FS)) {
+-		ret = devm_add_action_or_reset(dev, caam_remove_debugfs,
+-					       dfs_root);
+-		if (ret)
+-			return ret;
+-	}
++	dfs_root = devm_debugfs_create_dir(dev, dev_name(dev), NULL);
++	if (IS_ERR(dfs_root))
++		return PTR_ERR(dfs_root);
  
- #endif /* __TURRIS_OMNIA_MCU_H */
+ 	caam_debugfs_init(ctrlpriv, perfmon, dfs_root);
+ 
+diff --git a/drivers/gpio/gpio-mockup.c b/drivers/gpio/gpio-mockup.c
+index 455eecf6380e..adbe0fe09490 100644
+--- a/drivers/gpio/gpio-mockup.c
++++ b/drivers/gpio/gpio-mockup.c
+@@ -12,6 +12,7 @@
+ #include <linux/cleanup.h>
+ #include <linux/debugfs.h>
+ #include <linux/device.h>
++#include <linux/devm-helpers.h>
+ #include <linux/gpio/driver.h>
+ #include <linux/interrupt.h>
+ #include <linux/irq.h>
+@@ -390,13 +391,6 @@ static void gpio_mockup_debugfs_setup(struct device *dev,
+ 	}
+ }
+ 
+-static void gpio_mockup_debugfs_cleanup(void *data)
+-{
+-	struct gpio_mockup_chip *chip = data;
+-
+-	debugfs_remove_recursive(chip->dbg_dir);
+-}
+-
+ static void gpio_mockup_dispose_mappings(void *data)
+ {
+ 	struct gpio_mockup_chip *chip = data;
+@@ -480,7 +474,8 @@ static int gpio_mockup_probe(struct platform_device *pdev)
+ 
+ 	gpio_mockup_debugfs_setup(dev, chip);
+ 
+-	return devm_add_action_or_reset(dev, gpio_mockup_debugfs_cleanup, chip);
++	return devm_add_action_or_reset(dev, devm_debugfs_dir_recursive_drop,
++					chip->dbg_dir);
+ }
+ 
+ static const struct of_device_id gpio_mockup_of_match[] = {
+diff --git a/drivers/gpu/drm/bridge/ti-sn65dsi86.c b/drivers/gpu/drm/bridge/ti-sn65dsi86.c
+index 84698a0b27a8..85987350f108 100644
+--- a/drivers/gpu/drm/bridge/ti-sn65dsi86.c
++++ b/drivers/gpu/drm/bridge/ti-sn65dsi86.c
+@@ -10,6 +10,7 @@
+ #include <linux/bits.h>
+ #include <linux/clk.h>
+ #include <linux/debugfs.h>
++#include <linux/devm-helpers.h>
+ #include <linux/gpio/consumer.h>
+ #include <linux/gpio/driver.h>
+ #include <linux/i2c.h>
+@@ -427,18 +428,12 @@ static int status_show(struct seq_file *s, void *data)
+ 
+ DEFINE_SHOW_ATTRIBUTE(status);
+ 
+-static void ti_sn65dsi86_debugfs_remove(void *data)
+-{
+-	debugfs_remove_recursive(data);
+-}
+-
+ static void ti_sn65dsi86_debugfs_init(struct ti_sn65dsi86 *pdata)
+ {
+ 	struct device *dev = pdata->dev;
+ 	struct dentry *debugfs;
+-	int ret;
+ 
+-	debugfs = debugfs_create_dir(dev_name(dev), NULL);
++	debugfs = devm_debugfs_create_dir(dev, dev_name(dev), NULL);
+ 
+ 	/*
+ 	 * We might get an error back if debugfs wasn't enabled in the kernel
+@@ -447,10 +442,6 @@ static void ti_sn65dsi86_debugfs_init(struct ti_sn65dsi86 *pdata)
+ 	if (IS_ERR_OR_NULL(debugfs))
+ 		return;
+ 
+-	ret = devm_add_action_or_reset(dev, ti_sn65dsi86_debugfs_remove, debugfs);
+-	if (ret)
+-		return;
+-
+ 	debugfs_create_file("status", 0600, debugfs, pdata, &status_fops);
+ }
+ 
+diff --git a/drivers/hwmon/hp-wmi-sensors.c b/drivers/hwmon/hp-wmi-sensors.c
+index b5325d0e72b9..2a7c33763ce8 100644
+--- a/drivers/hwmon/hp-wmi-sensors.c
++++ b/drivers/hwmon/hp-wmi-sensors.c
+@@ -23,6 +23,7 @@
+ 
+ #include <linux/acpi.h>
+ #include <linux/debugfs.h>
++#include <linux/devm-helpers.h>
+ #include <linux/hwmon.h>
+ #include <linux/jiffies.h>
+ #include <linux/mutex.h>
+@@ -1304,12 +1305,6 @@ static int current_reading_show(struct seq_file *seqf, void *ignored)
+ }
+ DEFINE_SHOW_ATTRIBUTE(current_reading);
+ 
+-/* hp_wmi_devm_debugfs_remove - devm callback for debugfs cleanup */
+-static void hp_wmi_devm_debugfs_remove(void *res)
+-{
+-	debugfs_remove_recursive(res);
+-}
+-
+ /* hp_wmi_debugfs_init - create and populate debugfs directory tree */
+ static void hp_wmi_debugfs_init(struct device *dev, struct hp_wmi_info *info,
+ 				struct hp_wmi_platform_events *pevents,
+@@ -1320,21 +1315,15 @@ static void hp_wmi_debugfs_init(struct device *dev, struct hp_wmi_info *info,
+ 	struct dentry *debugfs;
+ 	struct dentry *entries;
+ 	struct dentry *dir;
+-	int err;
+ 	u8 i;
+ 
+ 	/* dev_name() gives a not-very-friendly GUID for WMI devices. */
+ 	scnprintf(buf, sizeof(buf), "hp-wmi-sensors-%u", dev->id);
+ 
+-	debugfs = debugfs_create_dir(buf, NULL);
++	debugfs = devm_debugfs_create_dir(dev, buf, NULL);
+ 	if (IS_ERR(debugfs))
+ 		return;
+ 
+-	err = devm_add_action_or_reset(dev, hp_wmi_devm_debugfs_remove,
+-				       debugfs);
+-	if (err)
+-		return;
+-
+ 	entries = debugfs_create_dir("sensor", debugfs);
+ 
+ 	for (i = 0; i < icount; i++, info++) {
+diff --git a/drivers/hwmon/mr75203.c b/drivers/hwmon/mr75203.c
+index 50a8b9c3f94d..50f348fca108 100644
+--- a/drivers/hwmon/mr75203.c
++++ b/drivers/hwmon/mr75203.c
+@@ -10,6 +10,7 @@
+ #include <linux/bits.h>
+ #include <linux/clk.h>
+ #include <linux/debugfs.h>
++#include <linux/devm-helpers.h>
+ #include <linux/hwmon.h>
+ #include <linux/kstrtox.h>
+ #include <linux/module.h>
+@@ -216,17 +217,11 @@ static const struct file_operations pvt_ts_coeff_j_fops = {
+ 	.llseek = default_llseek,
+ };
+ 
+-static void devm_pvt_ts_dbgfs_remove(void *data)
+-{
+-	struct pvt_device *pvt = (struct pvt_device *)data;
+-
+-	debugfs_remove_recursive(pvt->dbgfs_dir);
+-	pvt->dbgfs_dir = NULL;
+-}
+-
+ static int pvt_ts_dbgfs_create(struct pvt_device *pvt, struct device *dev)
+ {
+-	pvt->dbgfs_dir = debugfs_create_dir(dev_name(dev), NULL);
++	pvt->dbgfs_dir = devm_debugfs_create_dir(dev, dev_name(dev), NULL);
++	if (IS_ERR(pvt->dbgfs_dir))
++		return PTR_ERR(pvt->dbgfs_dir);
+ 
+ 	debugfs_create_u32("ts_coeff_h", 0644, pvt->dbgfs_dir,
+ 			   &pvt->ts_coeff.h);
+@@ -237,7 +232,7 @@ static int pvt_ts_dbgfs_create(struct pvt_device *pvt, struct device *dev)
+ 	debugfs_create_file("ts_coeff_j", 0644, pvt->dbgfs_dir, pvt,
+ 			    &pvt_ts_coeff_j_fops);
+ 
+-	return devm_add_action_or_reset(dev, devm_pvt_ts_dbgfs_remove, pvt);
++	return 0;
+ }
+ 
+ static umode_t pvt_is_visible(const void *data, enum hwmon_sensor_types type,
+diff --git a/drivers/hwmon/pmbus/pmbus_core.c b/drivers/hwmon/pmbus/pmbus_core.c
+index cb4c65a7f288..88d27bb3b69a 100644
+--- a/drivers/hwmon/pmbus/pmbus_core.c
++++ b/drivers/hwmon/pmbus/pmbus_core.c
+@@ -7,6 +7,7 @@
+  */
+ 
+ #include <linux/debugfs.h>
++#include <linux/devm-helpers.h>
+ #include <linux/kernel.h>
+ #include <linux/math64.h>
+ #include <linux/module.h>
+@@ -3336,13 +3337,6 @@ static const struct file_operations pmbus_debugfs_ops_mfr = {
+ 	.open = simple_open,
+ };
+ 
+-static void pmbus_remove_debugfs(void *data)
+-{
+-	struct dentry *entry = data;
+-
+-	debugfs_remove_recursive(entry);
+-}
+-
+ static int pmbus_init_debugfs(struct i2c_client *client,
+ 			      struct pmbus_data *data)
+ {
+@@ -3357,8 +3351,9 @@ static int pmbus_init_debugfs(struct i2c_client *client,
+ 	 * Create the debugfs directory for this device. Use the hwmon device
+ 	 * name to avoid conflicts (hwmon numbers are globally unique).
+ 	 */
+-	data->debugfs = debugfs_create_dir(dev_name(data->hwmon_dev),
+-					   pmbus_debugfs_dir);
++	data->debugfs = devm_debugfs_create_dir(data->dev,
++						dev_name(data->hwmon_dev),
++						pmbus_debugfs_dir);
+ 	if (IS_ERR_OR_NULL(data->debugfs)) {
+ 		data->debugfs = NULL;
+ 		return -ENODEV;
+@@ -3542,8 +3537,7 @@ static int pmbus_init_debugfs(struct i2c_client *client,
+ 		}
+ 	}
+ 
+-	return devm_add_action_or_reset(data->dev,
+-					pmbus_remove_debugfs, data->debugfs);
++	return 0;
+ }
+ #else
+ static int pmbus_init_debugfs(struct i2c_client *client,
+diff --git a/include/linux/devm-helpers.h b/include/linux/devm-helpers.h
+index 3805551fd433..feefe152c752 100644
+--- a/include/linux/devm-helpers.h
++++ b/include/linux/devm-helpers.h
+@@ -23,6 +23,7 @@
+  * already ran.
+  */
+ 
++#include <linux/debugfs.h>
+ #include <linux/device.h>
+ #include <linux/kconfig.h>
+ #include <linux/irqdomain.h>
+@@ -130,4 +131,43 @@ static inline int devm_irq_create_mapping(struct device *dev,
+ 	return virq;
+ }
+ 
++static inline void devm_debugfs_dir_recursive_drop(void *res)
++{
++	debugfs_remove_recursive(res);
++}
++
++/**
++ * devm_debugfs_create_dir - Resource managed debugfs directory creation
++ * @dev:	Device which lifetime the directory is bound to
++ * @name:	a pointer to a string containing the name of the directory to
++ *		create
++ * @parent:	a pointer to the parent dentry for this file.  This should be a
++ *		directory dentry if set.  If this parameter is NULL, then the
++ *		directory will be created in the root of the debugfs filesystem.
++ *
++ * Create a debugfs directory which is automatically recursively removed when
++ * the driver is detached. A few drivers create debugfs directories which they
++ * want removed before driver is detached.
++ * devm_debugfs_create_dir() can be used to omit the explicit
++ * debugfs_remove_recursive() call when driver is detached.
++ */
++static inline struct dentry *
++devm_debugfs_create_dir(struct device *dev, const char *name,
++			struct dentry *parent)
++{
++	struct dentry *dentry;
++	int err;
++
++	dentry = debugfs_create_dir(name, parent);
++	if (IS_ERR(dentry))
++		return dentry;
++
++	err = devm_add_action_or_reset(dev, devm_debugfs_dir_recursive_drop,
++				       dentry);
++	if (err < 0)
++		return ERR_PTR(err);
++
++	return dentry;
++}
++
+ #endif
 -- 
 2.43.2
 
