@@ -1,140 +1,142 @@
-Received: from sender4-of-o51.zoho.com (sender4-of-o51.zoho.com [136.143.188.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24FC6A31;
-	Sat, 23 Mar 2024 01:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711157675; cv=pass; b=Z3bb8jjGWAP5v9ecWBzBvrMOlnc0Mp92ZRfBid6an3mLFWtwpowDrp0wJzSDnQxw6esmVRB8BCSrlubzbmSKV5esOLv2pXhh/pFdYbnPBPR7B/1rcqDHjrRlGFMg4Z6kjRid3d9pYTAWYhuroaOfYz1YP7obsUG3w11Ze5IUWzo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711157675; c=relaxed/simple;
-	bh=Pcc+e6eivZ3tG225DvlUBIsuw9gooMR9r1KyZYl9irU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VtCBBHk2njlM8IQ6WwSYmd/Tvjd+aekLzwsGtepqisu6hkLUh1BMXT95jz5hqpW0kQQExtNv+3dexwCwWY/c/sdcWIJ5PzmzQjncRi2YE/3psnZpOkI9bFscW5wGgHiZqhay/LM+sslZe+Xc6j5+GaZW+04KbSrYJzKUpff4ioI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com; spf=pass smtp.mailfrom=apertussolutions.com; dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b=V0YnjjmU; arc=pass smtp.client-ip=136.143.188.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=apertussolutions.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235747483;
+	Sat, 23 Mar 2024 16:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711212247; cv=none; b=bz4da+t3XFa5+t3/yuscuMBkvTzhljJMpDDuO1E4i+XvlYeOENqOeVOqfZsGMzhgihdi5OnYwf/wF8ZO9eHljfLOZv4yyuABuyDdHpwceU5YKrQIMkJToFqjdqxeOoMi20v/+q5A6WMQQmIM35zgzes48zzaAQA903e/41bn/hg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711212247; c=relaxed/simple;
+	bh=6kri9cAqdeLQSwynoX/Mgs7Zl64zCLiK2ixhjODz/Ms=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EbzVuUUQbH+ql94A7C30/jYNA3s0iUUggBPbZAredasR2ksQUXCAt8hSS0OokgclHLvpWb152jbKcksQrEjn0t1jtQe701DFG8sWtMvjDs/Yy+3joYI7L6HAnNkiSpvRybBKIXl0WTYqMwLVSB/H+O7DrI7nQwYw3lOS87xmGr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BSpS9Eg/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b="V0YnjjmU"
-ARC-Seal: i=1; a=rsa-sha256; t=1711157626; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Y0P/6LGXB6XbnIcWo4Qk8zcdc8Jw+lAadY5AVPmkdkTcjKL1xfq/phucxRZdbbNgfKSheA1gZ2TCgQmpSop9a93QySuKrHzUX9cA/llTHTSpSkXW+MnPVF1RuubNen2kklKjmr1fhdL+1VTSotCBBBygMpSAIKA4weDZR7NPjbo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1711157626; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=zTwwKIN0GuMJg2NfAmR7tXmcZNVQ9X8RONWejAf+ILA=; 
-	b=KDRxtlHCwaLfbAAuvARZF6Zb1Yd9S4Wk7hw94ajl31mDeFrjtRGKo03f3oU0hbeYXY+Twf6jhUzk66U3KG0HakCt85ulldco9lnwqTycdGJ/nGtzkdpct84+lOyaIr0+1VU+BLWyQm0sidgRu09Q3t6da3gTLqs77MzOejmgKmM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=apertussolutions.com;
-	spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
-	dmarc=pass header.from=<dpsmith@apertussolutions.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1711157626;
-	s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=zTwwKIN0GuMJg2NfAmR7tXmcZNVQ9X8RONWejAf+ILA=;
-	b=V0YnjjmUHOoqSu0E6ecOozxCpL45ni+sdwedBmm/G4ETjsKhjJ9rjKO5YeE+1DyK
-	8x6FH+Z/xHt3BdkK9FPNXFzVS1wE10LyGtbPUcYy13Uwzinw3iZREXxoO1pIcB+2Gnz
-	gro6z8WYudke6koxfL07M5d2VG3TE55huGqNCVv0=
-Received: from [10.10.1.138] (static-72-81-132-2.bltmmd.fios.verizon.net [72.81.132.2]) by mx.zohomail.com
-	with SMTPS id 1711157624195513.236242023147; Fri, 22 Mar 2024 18:33:44 -0700 (PDT)
-Message-ID: <e52bbf77-4a80-4ebd-88f2-39e9b4063044@apertussolutions.com>
-Date: Fri, 22 Mar 2024 21:33:41 -0400
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BSpS9Eg/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82F63C433F1;
+	Sat, 23 Mar 2024 16:44:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711212246;
+	bh=6kri9cAqdeLQSwynoX/Mgs7Zl64zCLiK2ixhjODz/Ms=;
+	h=From:List-Id:To:Cc:Subject:Date:From;
+	b=BSpS9Eg/l+jRAko4Tz+ZMN4JCRwHeQdIYDpwIFJvgc226TRfGH4lO7KFm0HfyEk4N
+	 QHc+jaFbJbeJiqblewqW6zH8z311yjUlRYbc8QwrovBl8/iHMp/qfBAYHeRk7oLhdP
+	 5IiBfQzDjXjsCXYQrG9kf7QF/htVTR19FxpQSkB9Zsw3c0mmpSEwLMczirzljbgrWx
+	 sPhY3/3j56aA886Q3ykqgJ3Hga9PU8kyd1Q+FxjDo58YxSUGjuV+z8109u6Ddplcyi
+	 ks2EQegxrXkJvon8ZBFpuoQRquk4cyc/ytK6z0WZ+MvxZ8zzfZeB1se0xXW/QShgFv
+	 f7tmL5+5HfinQ==
+From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>,
+	Gregory CLEMENT <gregory.clement@bootlin.com>,
+	soc@kernel.org,
+	arm@kernel.org,
+	Alessandro Zummo <a.zummo@towertech.it>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	devicetree@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-crypto@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-rtc@vger.kernel.org,
+	linux-watchdog@vger.kernel.org,
+	Rob Herring <robh+dt@kernel.org>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Matti Vaittinen <mazziesaccount@gmail.com>
+Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+Subject: [PATCH v5 00/11] Turris Omnia MCU driver
+Date: Sat, 23 Mar 2024 17:43:48 +0100
+Message-ID: <20240323164359.21642-1-kabel@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 01/15] x86/boot: Place kernel_info at a fixed offset
-Content-Language: en-US
-To: "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
- Ross Philipson <ross.philipson@oracle.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
- linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, mjg59@srcf.ucam.org,
- James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, jarkko@kernel.org,
- jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu,
- herbert@gondor.apana.org.au, davem@davemloft.net, kanth.ghatraju@oracle.com,
- trenchboot-devel@googlegroups.com
-References: <20240214221847.2066632-1-ross.philipson@oracle.com>
- <20240214221847.2066632-2-ross.philipson@oracle.com>
- <CAMj1kXH3Gvr3vDRLDdXuc0s7ZAQYE6+D7tmCRBjJWwWt2fn4-w@mail.gmail.com>
- <9d01a6d2-4dd9-4331-8fc9-b01c07cfdbb5@apertussolutions.com>
- <32FDA47A-C87F-406F-A0B9-3AA1BB2EBAFB@zytor.com>
-From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
-Autocrypt: addr=dpsmith@apertussolutions.com; keydata=
- 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
-In-Reply-To: <32FDA47A-C87F-406F-A0B9-3AA1BB2EBAFB@zytor.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 3/22/24 10:18, H. Peter Anvin wrote:
-> On March 21, 2024 6:45:48 AM PDT, "Daniel P. Smith" <dpsmith@apertussolutions.com> wrote:
->> Hi Ard!
->>
->> On 2/15/24 02:56, Ard Biesheuvel wrote:
->>> On Wed, 14 Feb 2024 at 23:31, Ross Philipson <ross.philipson@oracle.com> wrote:
->>>>
->>>> From: Arvind Sankar <nivedita@alum.mit.edu>
->>>>
->>>> There are use cases for storing the offset of a symbol in kernel_info.
->>>> For example, the trenchboot series [0] needs to store the offset of the
->>>> Measured Launch Environment header in kernel_info.
->>>>
->>>
->>> Why? Is this information consumed by the bootloader?
->>
->> Yes, the bootloader needs a standardized means to find the offset of the MLE header, which communicates a set of meta-data needed by the DCE in order to set up for and start the loaded kernel. Arm will also need to provide a similar metadata structure and alternative entry point (or a complete rewrite of the existing entry point), as the current Arm entry point is in direct conflict with Arm DRTM specification.
->>
->>> I'd like to get away from x86 specific hacks for boot code and boot
->>> images, so I would like to explore if we can avoid kernel_info, or at
->>> least expose it in a generic way. We might just add a 32-bit offset
->>> somewhere in the first 64 bytes of the bootable image: this could
->>> co-exist with EFI bootable images, and can be implemented on arm64,
->>> RISC-V and LoongArch as well.
->>
->> With all due respect, I would not refer to boot params and the kern_info extension designed by the x86 maintainers as a hack. It is the well-defined boot protocol for x86, just as Arm has its own boot protocol around Device Tree.
->>
->> We would gladly adopt a cross arch/cross image type, zImage and bzImage, means to embedded meta-data about the kernel that can be discovered by a bootloader. Otherwise, we are relegated to doing a per arch/per image type discovery mechanism. If you have any suggestions that are cross arch/cross image type that we could explore, we would be grateful and willing to investigate how to adopt such a method.
->>
->> V/r,
->> Daniel
-> 
-> To be fair, the way things are going UEFI, i.e. PE/COFF, is becoming the new standard format. Yes, ELF would have been better, but...
+Hello Andy, Linus, Arnd, Gregory, and others,
 
-Fully agree with the ELF sentiment. We started looking to see if PE/COFF 
-has something similar to a ELF NOTE, but figured maybe this has been 
-solved for other cases. If that is not the case or there are not any 
-suggestions, then we can see what we can devise.
+I am sending v5 of the series adding Turris Omnia MCU driver.
+See the cover letters for v1, v2, v3 and v4:
+  https://patchwork.kernel.org/project/linux-soc/cover/20230823161012.6986-1-kabel@kernel.org/
+  https://patchwork.kernel.org/project/linux-soc/cover/20230919103815.16818-1-kabel@kernel.org/
+  https://patchwork.kernel.org/project/linux-soc/cover/20231023143130.11602-1-kabel@kernel.org/
+  https://patchwork.kernel.org/project/linux-soc/cover/20231026161803.16750-1-kabel@kernel.org/
+
+Changes since v4:
+- added new patches
+    06/11 devm-helpers: Add resource managed version of irq_create_mapping()
+    07/11 platform: cznic: turris-omnia-mcu: Add support for MCU provided TRNG
+    08/11 devm-helpers: Add resource managed version of debugfs directory create
+          function
+    09/11 platform: cznic: turris-omnia-mcu: Add support for digital message
+          signing via debugfs
+- for changes specific to patches which were also sent in previous versions see
+  the notes in those patches
+
+Marek Behún (11):
+  dt-bindings: arm: add cznic,turris-omnia-mcu binding
+  platform: cznic: Add preliminary support for Turris Omnia MCU
+  platform: cznic: turris-omnia-mcu: Add support for MCU connected GPIOs
+  platform: cznic: turris-omnia-mcu: Add support for poweroff and wakeup
+  platform: cznic: turris-omnia-mcu: Add support for MCU watchdog
+  devm-helpers: Add resource managed version of irq_create_mapping()
+  platform: cznic: turris-omnia-mcu: Add support for MCU provided TRNG
+  devm-helpers: Add resource managed version of debugfs directory create
+    function
+  platform: cznic: turris-omnia-mcu: Add support for digital message
+    signing via debugfs
+  ARM: dts: turris-omnia: Add MCU system-controller node
+  ARM: dts: turris-omnia: Add GPIO key node for front button
+
+ .../ABI/testing/debugfs-turris-omnia-mcu      |   13 +
+ .../sysfs-bus-i2c-devices-turris-omnia-mcu    |  126 ++
+ .../bindings/arm/cznic,turris-omnia-mcu.yaml  |   86 ++
+ MAINTAINERS                                   |    5 +
+ .../dts/marvell/armada-385-turris-omnia.dts   |   35 +-
+ drivers/crypto/caam/ctrl.c                    |   16 +-
+ drivers/crypto/caam/jr.c                      |    8 +-
+ drivers/gpio/gpio-mockup.c                    |   11 +-
+ drivers/gpu/drm/bridge/ti-sn65dsi86.c         |   13 +-
+ drivers/hwmon/hp-wmi-sensors.c                |   15 +-
+ drivers/hwmon/mr75203.c                       |   15 +-
+ drivers/hwmon/pmbus/pmbus_core.c              |   16 +-
+ drivers/platform/Kconfig                      |    2 +
+ drivers/platform/Makefile                     |    1 +
+ drivers/platform/cznic/Kconfig                |   51 +
+ drivers/platform/cznic/Makefile               |   10 +
+ .../platform/cznic/turris-omnia-mcu-base.c    |  406 +++++++
+ .../platform/cznic/turris-omnia-mcu-debugfs.c |  216 ++++
+ .../platform/cznic/turris-omnia-mcu-gpio.c    | 1056 +++++++++++++++++
+ .../cznic/turris-omnia-mcu-sys-off-wakeup.c   |  258 ++++
+ .../platform/cznic/turris-omnia-mcu-trng.c    |   89 ++
+ .../cznic/turris-omnia-mcu-watchdog.c         |  122 ++
+ drivers/platform/cznic/turris-omnia-mcu.h     |  214 ++++
+ include/linux/devm-helpers.h                  |   94 ++
+ include/linux/turris-omnia-mcu-interface.h    |  238 ++++
+ 25 files changed, 3044 insertions(+), 72 deletions(-)
+ create mode 100644 Documentation/ABI/testing/debugfs-turris-omnia-mcu
+ create mode 100644 Documentation/ABI/testing/sysfs-bus-i2c-devices-turris-omnia-mcu
+ create mode 100644 Documentation/devicetree/bindings/arm/cznic,turris-omnia-mcu.yaml
+ create mode 100644 drivers/platform/cznic/Kconfig
+ create mode 100644 drivers/platform/cznic/Makefile
+ create mode 100644 drivers/platform/cznic/turris-omnia-mcu-base.c
+ create mode 100644 drivers/platform/cznic/turris-omnia-mcu-debugfs.c
+ create mode 100644 drivers/platform/cznic/turris-omnia-mcu-gpio.c
+ create mode 100644 drivers/platform/cznic/turris-omnia-mcu-sys-off-wakeup.c
+ create mode 100644 drivers/platform/cznic/turris-omnia-mcu-trng.c
+ create mode 100644 drivers/platform/cznic/turris-omnia-mcu-watchdog.c
+ create mode 100644 drivers/platform/cznic/turris-omnia-mcu.h
+ create mode 100644 include/linux/turris-omnia-mcu-interface.h
+
+-- 
+2.43.2
+
