@@ -1,75 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936A122625;
-	Sat, 23 Mar 2024 16:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DA24E1B3
+	for <linux-crypto@vger.kernel.org>; Sat, 23 Mar 2024 16:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711212271; cv=none; b=Pes3N68ixPEsioNyd4PHwYafu8onxSSw27XxzjjEkCq49lPuPJFLmXWQdKfecfuG/Hx+E+i+3L+L06aoYS/sqtMSyZWHgVMHM4U35+fOhw0AxyvqN79EFJFn21QnhEdh3lG9hYEFyW4BxvZei/9kyRO6ahdvpkhEhEAn+GFRGDk=
+	t=1711212273; cv=none; b=HZETI5gI79B29qrSqGBVR76q9EhxWsPzT3jhNTWrpgXvreF3EzNX4XxTVo6v5YM9Ts1H36dvELCtQBmuED9HpQDGlZoz5cf8TseZfdSI345UyuHA9B9jUtJx+CLOu8Bno0PUooTKAqKuRPuAeTdlsMH1uXnjQJX3rCMj9B1ngrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711212271; c=relaxed/simple;
-	bh=qgss4wmPeBO4mgK11p8/bjoZvc4VOd4Jab5WKK2s68k=;
+	s=arc-20240116; t=1711212273; c=relaxed/simple;
+	bh=0EhLKfdIjNhBlTlY97qqsKZLV1ZGdY2hjAjUqvIy5+I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O608B9L9z2GDjkltEVhmEBpIYJCYFbGQ0/6GJc3rF3GtgmNxBZzp4IY6gD0IAsP04W6gfRb3Et0l2sUGHQhH18S3dy67MIW0WcxHawtavzWUaJVmV64lOsuMfOXq0XNvuwo7SIJq3QtmOYaUzp59/nwsrCV9n4iE/RDZchicZgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H6Z8QuN0; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=HLutnH/ds11lyk3reOmLbLPUrECoYnx7LkiYLWGo9vaCvjVDf8gM5OaVEtMl5HAlKJkdpESoWuqOTq3LtH0gjZqX0oX8adcIAd81afbEXX7JtBWHgSrM3lBycjyZDHc7ojYqmhMaMboemedK42ag9Hf/3UyYRA0Hpk7N6KQiMDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mtnv3yqq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H6Z8QuN0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BB83C433B1;
-	Sat, 23 Mar 2024 16:44:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mtnv3yqq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73707C433B2;
+	Sat, 23 Mar 2024 16:44:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711212271;
-	bh=qgss4wmPeBO4mgK11p8/bjoZvc4VOd4Jab5WKK2s68k=;
+	s=k20201202; t=1711212273;
+	bh=0EhLKfdIjNhBlTlY97qqsKZLV1ZGdY2hjAjUqvIy5+I=;
 	h=From:List-Id:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=H6Z8QuN0qLSAkYgkJfTEpAtG3yJH11UkMPNfp54Efv/CnDWLZVtS89hRKJb+G11aY
-	 0IwESkNng1DTb00+bD35+Q5bnr3b2eGN3gPfErprUNbjVHVIBpa3ceztt6usrcboSG
-	 s9/O9l+vk/0Gzw0m6yFTVi+HhC5IjJbgY6ousuIxqQKp0VpgAg9Qvw+DAa+mPyjWvF
-	 fi/Cbb6t29WqbueVVPoUksRzWsPjO592I1rDDhimJzwJjfF69dLpBVo/alzHNxx2BK
-	 3KbNWm8tcTB5YirP7tPIcsJsxVIlfvvuFiVhPRl+BlS9hJKeO/lr6XovbTdOhHlirM
-	 j8RUy16CDYOsA==
+	b=mtnv3yqqlnjqROpuIqkeu8yp2Yo3C4+R5U0stgmwFH6nVrzQFjN0FbzBnNQil/08S
+	 J4lVGmt5PKv8cbKsLNuNZbH3w2sPWR1cPJ1f1bvDeKLxSVdp7hFhySEU5KrZT+i1BF
+	 XTzbuXJBYwSoI6wMiNtJQJFH/udNaX/qvVu399xfCFKEizlpiOUnPGp5Z5ZU0jx3xB
+	 jUoUjDt0xs2PcXE8OwyHwb/VZ2+nQFv4rlsMhdLQeHPc9Hqq5RfNZSxdmh62brX9kW
+	 KqYZvKkzxC9f+H1l8K3Xf8zqfLg9xKyM9Er6Ga2uSY07eGJZ+CP2bUSebFYyFjXJj0
+	 dscgxw1GffFvg==
 From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
 To: Arnd Bergmann <arnd@arndb.de>,
 	Gregory CLEMENT <gregory.clement@bootlin.com>,
 	soc@kernel.org,
 	arm@kernel.org,
-	=?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Bamvor Jian Zhang <bamv2005@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Douglas Anderson <dianders@chromium.org>,
-	Andrzej Hajda <andrzej.hajda@intel.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Robert Foss <rfoss@kernel.org>,
-	Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
-	Jonas Karlman <jonas@kwiboo.se>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>,
-	Daniel Vetter <daniel@ffwll.ch>,
-	James Seo <james@equiv.tech>,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Matti Vaittinen <mazziesaccount@gmail.com>,
-	Naresh Solanki <naresh.solanki@9elements.com>,
-	Patrick Rudolph <patrick.rudolph@9elements.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	James Clark <james.clark@arm.com>,
-	Eddie James <eajames@linux.ibm.com>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linux-hwmon@vger.kernel.org
+	Andy Shevchenko <andy@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-crypto@vger.kernel.org
 Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-Subject: [PATCH v5 08/11] devm-helpers: Add resource managed version of debugfs directory create function
-Date: Sat, 23 Mar 2024 17:43:56 +0100
-Message-ID: <20240323164359.21642-9-kabel@kernel.org>
+Subject: [PATCH v5 09/11] platform: cznic: turris-omnia-mcu: Add support for digital message signing via debugfs
+Date: Sat, 23 Mar 2024 17:43:57 +0100
+Message-ID: <20240323164359.21642-10-kabel@kernel.org>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240323164359.21642-1-kabel@kernel.org>
 References: <20240323164359.21642-1-kabel@kernel.org>
@@ -82,353 +50,528 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-A few drivers register a devm action to remove a debugfs directory,
-implementing a one-liner function that calls debufs_remove_recursive().
-Help drivers avoid this repeated implementations by adding managed
-version of debugfs directory create function.
+Add support for digital message signing with private key stored in the
+MCU. Boards with MKL MCUs have a NIST256p ECDSA private key created
+when manufactured. The private key is not readable from the MCU, but
+MCU allows for signing messages with it and retrieving the public key.
 
-Use the new function devm_debugfs_create_dir() in the following
-drivers:
-  drivers/crypto/caam/ctrl.c
-  drivers/gpu/drm/bridge/ti-sn65dsi86.c
-  drivers/hwmon/hp-wmi-sensors.c
-  drivers/hwmon/mr75203.c
-  drivers/hwmon/pmbus/pmbus_core.c
+As described in a similar commit 50524d787de3 ("firmware:
+turris-mox-rwtm: support ECDSA signatures via debugfs"):
+  The optimal solution would be to register an akcipher provider via
+  kernel's crypto API, but crypto API does not yet support accessing
+  akcipher API from userspace (and probably won't for some time, see
+  https://www.spinics.net/lists/linux-crypto/msg38388.html).
 
-Also use the action function devm_debugfs_dir_recursive_drop() in
-driver
-  drivers/gpio/gpio-mockup.c
-
-As per Dan Williams' request [1], do not touch the driver
-  drivers/cxl/mem.c
-
-[1] https://lore.kernel.org/linux-gpio/65d7918b358a5_1ee3129432@dwillia2-mobl3.amr.corp.intel.com.notmuch/
+Therefore we add support for accessing this signature generation
+mechanism via debugfs for now, so that userspace can access it.
 
 Signed-off-by: Marek Behún <kabel@kernel.org>
 ---
- drivers/crypto/caam/ctrl.c            | 16 +++--------
- drivers/gpio/gpio-mockup.c            | 11 ++------
- drivers/gpu/drm/bridge/ti-sn65dsi86.c | 13 ++-------
- drivers/hwmon/hp-wmi-sensors.c        | 15 ++--------
- drivers/hwmon/mr75203.c               | 15 ++++------
- drivers/hwmon/pmbus/pmbus_core.c      | 16 ++++-------
- include/linux/devm-helpers.h          | 40 +++++++++++++++++++++++++++
- 7 files changed, 61 insertions(+), 65 deletions(-)
+ .../ABI/testing/debugfs-turris-omnia-mcu      |  13 ++
+ .../sysfs-bus-i2c-devices-turris-omnia-mcu    |  13 ++
+ MAINTAINERS                                   |   1 +
+ drivers/platform/cznic/Kconfig                |   2 +
+ drivers/platform/cznic/Makefile               |  12 +-
+ .../platform/cznic/turris-omnia-mcu-base.c    |  45 +++-
+ .../platform/cznic/turris-omnia-mcu-debugfs.c | 216 ++++++++++++++++++
+ drivers/platform/cznic/turris-omnia-mcu.h     |  40 +++-
+ 8 files changed, 331 insertions(+), 11 deletions(-)
+ create mode 100644 Documentation/ABI/testing/debugfs-turris-omnia-mcu
+ create mode 100644 drivers/platform/cznic/turris-omnia-mcu-debugfs.c
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index bdf367f3f679..ea3ed9a17f1a 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -7,6 +7,7 @@
-  */
- 
- #include <linux/device.h>
-+#include <linux/devm-helpers.h>
- #include <linux/of_address.h>
- #include <linux/of_irq.h>
- #include <linux/platform_device.h>
-@@ -604,11 +605,6 @@ static int init_clocks(struct device *dev, const struct caam_imx_data *data)
- 	return devm_add_action_or_reset(dev, disable_clocks, ctrlpriv);
- }
- 
--static void caam_remove_debugfs(void *root)
--{
--	debugfs_remove_recursive(root);
--}
--
- #ifdef CONFIG_FSL_MC_BUS
- static bool check_version(struct fsl_mc_version *mc_version, u32 major,
- 			  u32 minor, u32 revision)
-@@ -1058,13 +1054,9 @@ static int caam_probe(struct platform_device *pdev)
- 	ctrlpriv->era = caam_get_era(perfmon);
- 	ctrlpriv->domain = iommu_get_domain_for_dev(dev);
- 
--	dfs_root = debugfs_create_dir(dev_name(dev), NULL);
--	if (IS_ENABLED(CONFIG_DEBUG_FS)) {
--		ret = devm_add_action_or_reset(dev, caam_remove_debugfs,
--					       dfs_root);
--		if (ret)
--			return ret;
--	}
-+	dfs_root = devm_debugfs_create_dir(dev, dev_name(dev), NULL);
-+	if (IS_ERR(dfs_root))
-+		return PTR_ERR(dfs_root);
- 
- 	caam_debugfs_init(ctrlpriv, perfmon, dfs_root);
- 
-diff --git a/drivers/gpio/gpio-mockup.c b/drivers/gpio/gpio-mockup.c
-index 455eecf6380e..adbe0fe09490 100644
---- a/drivers/gpio/gpio-mockup.c
-+++ b/drivers/gpio/gpio-mockup.c
-@@ -12,6 +12,7 @@
- #include <linux/cleanup.h>
- #include <linux/debugfs.h>
- #include <linux/device.h>
-+#include <linux/devm-helpers.h>
- #include <linux/gpio/driver.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
-@@ -390,13 +391,6 @@ static void gpio_mockup_debugfs_setup(struct device *dev,
- 	}
- }
- 
--static void gpio_mockup_debugfs_cleanup(void *data)
--{
--	struct gpio_mockup_chip *chip = data;
--
--	debugfs_remove_recursive(chip->dbg_dir);
--}
--
- static void gpio_mockup_dispose_mappings(void *data)
- {
- 	struct gpio_mockup_chip *chip = data;
-@@ -480,7 +474,8 @@ static int gpio_mockup_probe(struct platform_device *pdev)
- 
- 	gpio_mockup_debugfs_setup(dev, chip);
- 
--	return devm_add_action_or_reset(dev, gpio_mockup_debugfs_cleanup, chip);
-+	return devm_add_action_or_reset(dev, devm_debugfs_dir_recursive_drop,
-+					chip->dbg_dir);
- }
- 
- static const struct of_device_id gpio_mockup_of_match[] = {
-diff --git a/drivers/gpu/drm/bridge/ti-sn65dsi86.c b/drivers/gpu/drm/bridge/ti-sn65dsi86.c
-index 84698a0b27a8..85987350f108 100644
---- a/drivers/gpu/drm/bridge/ti-sn65dsi86.c
-+++ b/drivers/gpu/drm/bridge/ti-sn65dsi86.c
-@@ -10,6 +10,7 @@
- #include <linux/bits.h>
- #include <linux/clk.h>
- #include <linux/debugfs.h>
-+#include <linux/devm-helpers.h>
- #include <linux/gpio/consumer.h>
- #include <linux/gpio/driver.h>
- #include <linux/i2c.h>
-@@ -427,18 +428,12 @@ static int status_show(struct seq_file *s, void *data)
- 
- DEFINE_SHOW_ATTRIBUTE(status);
- 
--static void ti_sn65dsi86_debugfs_remove(void *data)
--{
--	debugfs_remove_recursive(data);
--}
--
- static void ti_sn65dsi86_debugfs_init(struct ti_sn65dsi86 *pdata)
- {
- 	struct device *dev = pdata->dev;
- 	struct dentry *debugfs;
--	int ret;
- 
--	debugfs = debugfs_create_dir(dev_name(dev), NULL);
-+	debugfs = devm_debugfs_create_dir(dev, dev_name(dev), NULL);
- 
- 	/*
- 	 * We might get an error back if debugfs wasn't enabled in the kernel
-@@ -447,10 +442,6 @@ static void ti_sn65dsi86_debugfs_init(struct ti_sn65dsi86 *pdata)
- 	if (IS_ERR_OR_NULL(debugfs))
- 		return;
- 
--	ret = devm_add_action_or_reset(dev, ti_sn65dsi86_debugfs_remove, debugfs);
--	if (ret)
--		return;
--
- 	debugfs_create_file("status", 0600, debugfs, pdata, &status_fops);
- }
- 
-diff --git a/drivers/hwmon/hp-wmi-sensors.c b/drivers/hwmon/hp-wmi-sensors.c
-index b5325d0e72b9..2a7c33763ce8 100644
---- a/drivers/hwmon/hp-wmi-sensors.c
-+++ b/drivers/hwmon/hp-wmi-sensors.c
-@@ -23,6 +23,7 @@
- 
- #include <linux/acpi.h>
- #include <linux/debugfs.h>
-+#include <linux/devm-helpers.h>
- #include <linux/hwmon.h>
- #include <linux/jiffies.h>
- #include <linux/mutex.h>
-@@ -1304,12 +1305,6 @@ static int current_reading_show(struct seq_file *seqf, void *ignored)
- }
- DEFINE_SHOW_ATTRIBUTE(current_reading);
- 
--/* hp_wmi_devm_debugfs_remove - devm callback for debugfs cleanup */
--static void hp_wmi_devm_debugfs_remove(void *res)
--{
--	debugfs_remove_recursive(res);
--}
--
- /* hp_wmi_debugfs_init - create and populate debugfs directory tree */
- static void hp_wmi_debugfs_init(struct device *dev, struct hp_wmi_info *info,
- 				struct hp_wmi_platform_events *pevents,
-@@ -1320,21 +1315,15 @@ static void hp_wmi_debugfs_init(struct device *dev, struct hp_wmi_info *info,
- 	struct dentry *debugfs;
- 	struct dentry *entries;
- 	struct dentry *dir;
--	int err;
- 	u8 i;
- 
- 	/* dev_name() gives a not-very-friendly GUID for WMI devices. */
- 	scnprintf(buf, sizeof(buf), "hp-wmi-sensors-%u", dev->id);
- 
--	debugfs = debugfs_create_dir(buf, NULL);
-+	debugfs = devm_debugfs_create_dir(dev, buf, NULL);
- 	if (IS_ERR(debugfs))
- 		return;
- 
--	err = devm_add_action_or_reset(dev, hp_wmi_devm_debugfs_remove,
--				       debugfs);
--	if (err)
--		return;
--
- 	entries = debugfs_create_dir("sensor", debugfs);
- 
- 	for (i = 0; i < icount; i++, info++) {
-diff --git a/drivers/hwmon/mr75203.c b/drivers/hwmon/mr75203.c
-index 50a8b9c3f94d..50f348fca108 100644
---- a/drivers/hwmon/mr75203.c
-+++ b/drivers/hwmon/mr75203.c
-@@ -10,6 +10,7 @@
- #include <linux/bits.h>
- #include <linux/clk.h>
- #include <linux/debugfs.h>
-+#include <linux/devm-helpers.h>
- #include <linux/hwmon.h>
- #include <linux/kstrtox.h>
- #include <linux/module.h>
-@@ -216,17 +217,11 @@ static const struct file_operations pvt_ts_coeff_j_fops = {
- 	.llseek = default_llseek,
- };
- 
--static void devm_pvt_ts_dbgfs_remove(void *data)
--{
--	struct pvt_device *pvt = (struct pvt_device *)data;
--
--	debugfs_remove_recursive(pvt->dbgfs_dir);
--	pvt->dbgfs_dir = NULL;
--}
--
- static int pvt_ts_dbgfs_create(struct pvt_device *pvt, struct device *dev)
- {
--	pvt->dbgfs_dir = debugfs_create_dir(dev_name(dev), NULL);
-+	pvt->dbgfs_dir = devm_debugfs_create_dir(dev, dev_name(dev), NULL);
-+	if (IS_ERR(pvt->dbgfs_dir))
-+		return PTR_ERR(pvt->dbgfs_dir);
- 
- 	debugfs_create_u32("ts_coeff_h", 0644, pvt->dbgfs_dir,
- 			   &pvt->ts_coeff.h);
-@@ -237,7 +232,7 @@ static int pvt_ts_dbgfs_create(struct pvt_device *pvt, struct device *dev)
- 	debugfs_create_file("ts_coeff_j", 0644, pvt->dbgfs_dir, pvt,
- 			    &pvt_ts_coeff_j_fops);
- 
--	return devm_add_action_or_reset(dev, devm_pvt_ts_dbgfs_remove, pvt);
-+	return 0;
- }
- 
- static umode_t pvt_is_visible(const void *data, enum hwmon_sensor_types type,
-diff --git a/drivers/hwmon/pmbus/pmbus_core.c b/drivers/hwmon/pmbus/pmbus_core.c
-index cb4c65a7f288..88d27bb3b69a 100644
---- a/drivers/hwmon/pmbus/pmbus_core.c
-+++ b/drivers/hwmon/pmbus/pmbus_core.c
-@@ -7,6 +7,7 @@
-  */
- 
- #include <linux/debugfs.h>
-+#include <linux/devm-helpers.h>
- #include <linux/kernel.h>
- #include <linux/math64.h>
- #include <linux/module.h>
-@@ -3336,13 +3337,6 @@ static const struct file_operations pmbus_debugfs_ops_mfr = {
- 	.open = simple_open,
- };
- 
--static void pmbus_remove_debugfs(void *data)
--{
--	struct dentry *entry = data;
--
--	debugfs_remove_recursive(entry);
--}
--
- static int pmbus_init_debugfs(struct i2c_client *client,
- 			      struct pmbus_data *data)
- {
-@@ -3357,8 +3351,9 @@ static int pmbus_init_debugfs(struct i2c_client *client,
- 	 * Create the debugfs directory for this device. Use the hwmon device
- 	 * name to avoid conflicts (hwmon numbers are globally unique).
- 	 */
--	data->debugfs = debugfs_create_dir(dev_name(data->hwmon_dev),
--					   pmbus_debugfs_dir);
-+	data->debugfs = devm_debugfs_create_dir(data->dev,
-+						dev_name(data->hwmon_dev),
-+						pmbus_debugfs_dir);
- 	if (IS_ERR_OR_NULL(data->debugfs)) {
- 		data->debugfs = NULL;
- 		return -ENODEV;
-@@ -3542,8 +3537,7 @@ static int pmbus_init_debugfs(struct i2c_client *client,
- 		}
- 	}
- 
--	return devm_add_action_or_reset(data->dev,
--					pmbus_remove_debugfs, data->debugfs);
-+	return 0;
- }
- #else
- static int pmbus_init_debugfs(struct i2c_client *client,
-diff --git a/include/linux/devm-helpers.h b/include/linux/devm-helpers.h
-index 3805551fd433..feefe152c752 100644
---- a/include/linux/devm-helpers.h
-+++ b/include/linux/devm-helpers.h
-@@ -23,6 +23,7 @@
-  * already ran.
-  */
- 
-+#include <linux/debugfs.h>
- #include <linux/device.h>
- #include <linux/kconfig.h>
- #include <linux/irqdomain.h>
-@@ -130,4 +131,43 @@ static inline int devm_irq_create_mapping(struct device *dev,
- 	return virq;
- }
- 
-+static inline void devm_debugfs_dir_recursive_drop(void *res)
-+{
-+	debugfs_remove_recursive(res);
-+}
+diff --git a/Documentation/ABI/testing/debugfs-turris-omnia-mcu b/Documentation/ABI/testing/debugfs-turris-omnia-mcu
+new file mode 100644
+index 000000000000..1665005c2dcd
+--- /dev/null
++++ b/Documentation/ABI/testing/debugfs-turris-omnia-mcu
+@@ -0,0 +1,13 @@
++What:		/sys/kernel/debug/turris-omnia-mcu/do_sign
++Date:		July 2024
++KernelVersion:	6.10
++Contact:	Marek Behún <kabel@kernel.org>
++Description:
 +
-+/**
-+ * devm_debugfs_create_dir - Resource managed debugfs directory creation
-+ * @dev:	Device which lifetime the directory is bound to
-+ * @name:	a pointer to a string containing the name of the directory to
-+ *		create
-+ * @parent:	a pointer to the parent dentry for this file.  This should be a
-+ *		directory dentry if set.  If this parameter is NULL, then the
-+ *		directory will be created in the root of the debugfs filesystem.
-+ *
-+ * Create a debugfs directory which is automatically recursively removed when
-+ * the driver is detached. A few drivers create debugfs directories which they
-+ * want removed before driver is detached.
-+ * devm_debugfs_create_dir() can be used to omit the explicit
-+ * debugfs_remove_recursive() call when driver is detached.
-+ */
-+static inline struct dentry *
-+devm_debugfs_create_dir(struct device *dev, const char *name,
-+			struct dentry *parent)
++		======= ===========================================================
++		(Write) Message to sign with the ECDSA private key stored in MCU.
++		        The message must be exactly 32 bytes long (since this is
++		        intended to be a SHA-256 hash).
++		(Read)  The resulting signature, 64 bytes. This contains the R and
++			S values of the ECDSA signature, both in big-endian format.
++		======= ===========================================================
+diff --git a/Documentation/ABI/testing/sysfs-bus-i2c-devices-turris-omnia-mcu b/Documentation/ABI/testing/sysfs-bus-i2c-devices-turris-omnia-mcu
+index 564119849388..b239224cf9bc 100644
+--- a/Documentation/ABI/testing/sysfs-bus-i2c-devices-turris-omnia-mcu
++++ b/Documentation/ABI/testing/sysfs-bus-i2c-devices-turris-omnia-mcu
+@@ -90,6 +90,19 @@ Description:	(RO) Contains the microcontroller type (STM32, GD32, MKL).
+ 
+ 		Format: %s.
+ 
++What:		/sys/bus/i2c/devices/<mcu_device>/public_key
++Date:		July 2024
++KernelVersion:	6.10
++Contact:	Marek Behún <kabel@kernel.org>
++Description:	(RO) Contains board ECDSA public key.
++
++		Only available if MCU supports signing messages with the ECDSA
++		algorithm. If so, the board has a private key stored in the MCU
++		that was generated during manufacture and cannot be retrieved
++		from the MCU.
++
++		Format: %s.
++
+ What:		/sys/bus/i2c/devices/<mcu_device>/reset_selector
+ Date:		July 2024
+ KernelVersion:	6.10
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 529e16d386e8..3706a4ec818e 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2139,6 +2139,7 @@ M:	Marek Behún <kabel@kernel.org>
+ S:	Maintained
+ W:	https://www.turris.cz/
+ F:	Documentation/ABI/testing/debugfs-moxtet
++F:	Documentation/ABI/testing/debugfs-turris-omnia-mcu
+ F:	Documentation/ABI/testing/sysfs-bus-i2c-devices-turris-omnia-mcu
+ F:	Documentation/ABI/testing/sysfs-bus-moxtet-devices
+ F:	Documentation/ABI/testing/sysfs-firmware-turris-mox-rwtm
+diff --git a/drivers/platform/cznic/Kconfig b/drivers/platform/cznic/Kconfig
+index 750d5f47dba8..2d45495c0a2d 100644
+--- a/drivers/platform/cznic/Kconfig
++++ b/drivers/platform/cznic/Kconfig
+@@ -30,6 +30,8 @@ config TURRIS_OMNIA_MCU
+ 	    disabled) and the ability to configure wake up from this mode (via
+ 	    rtcwake)
+ 	  - true random number generator (if available on the MCU)
++	  - ECDSA message signing with board private key (if available on the
++	    MCU)
+ 	  - MCU watchdog
+ 	  - GPIO pins
+ 	    - to get front button press events (the front button can be
+diff --git a/drivers/platform/cznic/Makefile b/drivers/platform/cznic/Makefile
+index 8fd4c6cbcb1b..22ac5075b750 100644
+--- a/drivers/platform/cznic/Makefile
++++ b/drivers/platform/cznic/Makefile
+@@ -1,8 +1,10 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ 
+ obj-$(CONFIG_TURRIS_OMNIA_MCU)	+= turris-omnia-mcu.o
+-turris-omnia-mcu-objs		:= turris-omnia-mcu-base.o
+-turris-omnia-mcu-objs		+= turris-omnia-mcu-gpio.o
+-turris-omnia-mcu-objs		+= turris-omnia-mcu-sys-off-wakeup.o
+-turris-omnia-mcu-objs		+= turris-omnia-mcu-trng.o
+-turris-omnia-mcu-objs		+= turris-omnia-mcu-watchdog.o
++turris-omnia-mcu-objs-y		:= turris-omnia-mcu-base.o
++turris-omnia-mcu-objs-y		+= turris-omnia-mcu-gpio.o
++turris-omnia-mcu-objs-y		+= turris-omnia-mcu-sys-off-wakeup.o
++turris-omnia-mcu-objs-y		+= turris-omnia-mcu-trng.o
++turris-omnia-mcu-objs-y		+= turris-omnia-mcu-watchdog.o
++turris-omnia-mcu-objs-$(CONFIG_DEBUG_FS) += turris-omnia-mcu-debugfs.o
++turris-omnia-mcu-objs		:= $(turris-omnia-mcu-objs-y)
+diff --git a/drivers/platform/cznic/turris-omnia-mcu-base.c b/drivers/platform/cznic/turris-omnia-mcu-base.c
+index 30771004a627..0113d6c876c6 100644
+--- a/drivers/platform/cznic/turris-omnia-mcu-base.c
++++ b/drivers/platform/cznic/turris-omnia-mcu-base.c
+@@ -125,6 +125,16 @@ static ssize_t board_revision_show(struct device *dev,
+ }
+ static DEVICE_ATTR_RO(board_revision);
+ 
++static ssize_t public_key_show(struct device *dev, struct device_attribute *a,
++			       char *buf)
 +{
-+	struct dentry *dentry;
++	struct omnia_mcu *mcu = i2c_get_clientdata(to_i2c_client(dev));
++
++	return sysfs_emit(buf, "%*phN\n", OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN,
++			  mcu->board_public_key);
++}
++static DEVICE_ATTR_RO(public_key);
++
+ static struct attribute *omnia_mcu_base_attrs[] = {
+ 	&dev_attr_fw_version_hash_application.attr,
+ 	&dev_attr_fw_version_hash_bootloader.attr,
+@@ -134,6 +144,7 @@ static struct attribute *omnia_mcu_base_attrs[] = {
+ 	&dev_attr_serial_number.attr,
+ 	&dev_attr_first_mac_address.attr,
+ 	&dev_attr_board_revision.attr,
++	&dev_attr_public_key.attr,
+ 	NULL
+ };
+ 
+@@ -149,6 +160,9 @@ static umode_t omnia_mcu_base_attrs_visible(struct kobject *kobj,
+ 	     a == &dev_attr_board_revision.attr) &&
+ 	    !(mcu->features & FEAT_BOARD_INFO))
+ 		mode = 0;
++	else if (a == &dev_attr_public_key.attr &&
++		 !(mcu->features & FEAT_CRYPTO))
++		mode = 0;
+ 
+ 	return mode;
+ }
+@@ -299,6 +313,24 @@ static int omnia_mcu_read_board_info(struct omnia_mcu *mcu)
+ 	return 0;
+ }
+ 
++static int omnia_mcu_read_public_key(struct omnia_mcu *mcu)
++{
++	u8 reply[1 + OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN];
 +	int err;
 +
-+	dentry = debugfs_create_dir(name, parent);
-+	if (IS_ERR(dentry))
-+		return dentry;
++	err = omnia_cmd_read(mcu->client, CMD_CRYPTO_GET_PUBLIC_KEY, reply,
++			     sizeof(reply));
++	if (err)
++		return err;
 +
-+	err = devm_add_action_or_reset(dev, devm_debugfs_dir_recursive_drop,
-+				       dentry);
-+	if (err < 0)
-+		return ERR_PTR(err);
++	if (reply[0] != OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN)
++		return -EIO;
 +
-+	return dentry;
++	memcpy(mcu->board_public_key, &reply[1], sizeof(mcu->board_public_key));
++
++	return 0;
 +}
 +
- #endif
+ static int omnia_mcu_probe(struct i2c_client *client)
+ {
+ 	struct device *dev = &client->dev;
+@@ -327,6 +359,13 @@ static int omnia_mcu_probe(struct i2c_client *client)
+ 					     "Cannot read board info\n");
+ 	}
+ 
++	if (mcu->features & FEAT_CRYPTO) {
++		err = omnia_mcu_read_public_key(mcu);
++		if (err)
++			return dev_err_probe(dev, err,
++					     "Cannot read board public key\n");
++	}
++
+ 	err = omnia_mcu_register_sys_off_and_wakeup(mcu);
+ 	if (err)
+ 		return err;
+@@ -339,7 +378,11 @@ static int omnia_mcu_probe(struct i2c_client *client)
+ 	if (err)
+ 		return err;
+ 
+-	return omnia_mcu_register_trng(mcu);
++	err = omnia_mcu_register_trng(mcu);
++	if (err)
++		return err;
++
++	return omnia_mcu_register_debugfs(mcu);
+ }
+ 
+ static const struct of_device_id of_omnia_mcu_match[] = {
+diff --git a/drivers/platform/cznic/turris-omnia-mcu-debugfs.c b/drivers/platform/cznic/turris-omnia-mcu-debugfs.c
+new file mode 100644
+index 000000000000..6c4baaf26b2c
+--- /dev/null
++++ b/drivers/platform/cznic/turris-omnia-mcu-debugfs.c
+@@ -0,0 +1,216 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * CZ.NIC's Turris Omnia MCU ECDSA message signing via debugfs
++ *
++ * 2024 by Marek Behún <kabel@kernel.org>
++ */
++
++#include <linux/bitfield.h>
++#include <linux/completion.h>
++#include <linux/debugfs.h>
++#include <linux/devm-helpers.h>
++#include <linux/irqdomain.h>
++#include <linux/module.h>
++#include <linux/mutex.h>
++#include <linux/string.h>
++#include <linux/turris-omnia-mcu-interface.h>
++#include <linux/types.h>
++#include <linux/uaccess.h>
++
++#include "turris-omnia-mcu.h"
++
++#define CMD_CRYPTO_SIGN_MESSAGE_LEN	32
++
++enum {
++	SIGN_STATE_CLOSED	= 0,
++	SIGN_STATE_OPEN		= 1,
++	SIGN_STATE_REQUESTED	= 2,
++	SIGN_STATE_COLLECTED	= 3,
++};
++
++static irqreturn_t omnia_msg_signed_irq_handler(int irq, void *dev_id)
++{
++	u8 reply[1 + OMNIA_MCU_CRYPTO_SIGNATURE_LEN];
++	struct omnia_mcu *mcu = dev_id;
++	int err;
++
++	err = omnia_cmd_read(mcu->client, CMD_CRYPTO_COLLECT_SIGNATURE, reply,
++			     sizeof(reply));
++	if (!err && reply[0] != OMNIA_MCU_CRYPTO_SIGNATURE_LEN)
++		err = -EIO;
++
++	guard(mutex)(&mcu->sign_lock);
++
++	if (mcu->sign_state == SIGN_STATE_REQUESTED) {
++		mcu->sign_err = err;
++		if (!err)
++			memcpy(mcu->signature, &reply[1],
++			       OMNIA_MCU_CRYPTO_SIGNATURE_LEN);
++		mcu->sign_state = SIGN_STATE_COLLECTED;
++		complete(&mcu->msg_signed_completion);
++	}
++
++	return IRQ_HANDLED;
++}
++
++static int do_sign_open(struct inode *inode, struct file *file)
++{
++	struct omnia_mcu *mcu = inode->i_private;
++
++	guard(mutex)(&mcu->sign_lock);
++
++	/* do_sign is allowed to be opened only once */
++	if (mcu->sign_state != SIGN_STATE_CLOSED)
++		return -EBUSY;
++
++	mcu->sign_state = SIGN_STATE_OPEN;
++
++	file->private_data = mcu;
++
++	return nonseekable_open(inode, file);
++}
++
++static int do_sign_release(struct inode *inode, struct file *file)
++{
++	struct omnia_mcu *mcu = file->private_data;
++
++	guard(mutex)(&mcu->sign_lock);
++
++	mcu->sign_state = SIGN_STATE_CLOSED;
++
++	/* forget signature on release even if it was not read, for security */
++	memzero_explicit(mcu->signature, sizeof(mcu->signature));
++
++	return 0;
++}
++
++static ssize_t do_sign_read(struct file *file, char __user *buf, size_t len,
++			    loff_t *ppos)
++{
++	struct omnia_mcu *mcu = file->private_data;
++
++	/* only allow read of one whole signature */
++	if (len != sizeof(mcu->signature))
++		return -EINVAL;
++
++	scoped_guard(mutex, &mcu->sign_lock)
++		if (mcu->sign_state != SIGN_STATE_REQUESTED &&
++		    mcu->sign_state != SIGN_STATE_COLLECTED)
++			return -ENODATA;
++
++	if (wait_for_completion_interruptible(&mcu->msg_signed_completion))
++		return -EINTR;
++
++	guard(mutex)(&mcu->sign_lock);
++
++	mcu->sign_state = SIGN_STATE_OPEN;
++
++	if (mcu->sign_err)
++		return mcu->sign_err;
++
++	if (copy_to_user(buf, mcu->signature, len))
++		return -EFAULT;
++
++	/* on read forget the signature, for security */
++	memzero_explicit(mcu->signature, sizeof(mcu->signature));
++
++	return len;
++}
++
++static ssize_t do_sign_write(struct file *file, const char __user *buf,
++			     size_t len, loff_t *ppos)
++{
++	u8 cmd[1 + CMD_CRYPTO_SIGN_MESSAGE_LEN], reply;
++	struct omnia_mcu *mcu = file->private_data;
++	int err;
++
++	/*
++	 * the input is a SHA-256 hash of a message to sign, so exactly
++	 * 32 bytes have to be read
++	 */
++	if (len != CMD_CRYPTO_SIGN_MESSAGE_LEN)
++		return -EINVAL;
++
++	cmd[0] = CMD_CRYPTO_SIGN_MESSAGE;
++
++	if (copy_from_user(&cmd[1], buf, len))
++		return -EFAULT;
++
++	guard(mutex)(&mcu->sign_lock);
++
++	if (mcu->sign_state != SIGN_STATE_OPEN)
++		return -EBUSY;
++
++	err = omnia_cmd_write_read(mcu->client, cmd, sizeof(cmd), &reply, 1);
++	if (err)
++		return err;
++
++	if (reply)
++		mcu->sign_state = SIGN_STATE_REQUESTED;
++
++	return reply ? len : -EBUSY;
++}
++
++static const struct file_operations do_sign_fops = {
++	.owner		= THIS_MODULE,
++	.open		= do_sign_open,
++	.read		= do_sign_read,
++	.write		= do_sign_write,
++	.release	= do_sign_release,
++	.llseek		= no_llseek,
++};
++
++/* this will go away once we have devm_mutex_init() */
++static void omnia_mcu_mutex_destroy(void *lock)
++{
++	mutex_destroy(lock);
++}
++
++int omnia_mcu_register_debugfs(struct omnia_mcu *mcu)
++{
++	struct device *dev = &mcu->client->dev;
++	struct dentry *root, *entry;
++	int irq, err;
++	u8 irq_idx;
++
++	if (!(mcu->features & FEAT_CRYPTO))
++		return 0;
++
++	irq_idx = omnia_int_to_gpio_idx[__bf_shf(INT_MESSAGE_SIGNED)];
++	irq = devm_irq_create_mapping(dev, mcu->gc.irq.domain, irq_idx);
++	if (irq <= 0)
++		return dev_err_probe(dev, irq ?: -ENXIO,
++				     "Cannot map MESSAGE_SIGNED IRQ\n");
++
++	mutex_init(&mcu->sign_lock);
++	err = devm_add_action_or_reset(dev, omnia_mcu_mutex_destroy,
++				       &mcu->sign_lock);
++	if (err)
++		return err;
++
++	mcu->sign_state = 0;
++
++	init_completion(&mcu->msg_signed_completion);
++
++	err = devm_request_threaded_irq(dev, irq, NULL,
++					omnia_msg_signed_irq_handler,
++					IRQF_ONESHOT,
++					"turris-omnia-mcu-debugfs", mcu);
++	if (err)
++		return dev_err_probe(dev, err,
++				     "Cannot request MESSAGE_SIGNED IRQ\n");
++
++	root = devm_debugfs_create_dir(dev, "turris-omnia-mcu", NULL);
++	if (IS_ERR(root))
++		return dev_err_probe(dev, PTR_ERR(root),
++				     "Cannot create debugfs dir\n");
++
++
++	entry = debugfs_create_file_unsafe("do_sign", 0600, root, mcu,
++					   &do_sign_fops);
++	if (IS_ERR(entry))
++		return dev_err_probe(dev, PTR_ERR(entry),
++				     "Cannot create debugfs entry\n");
++
++	return 0;
++}
+diff --git a/drivers/platform/cznic/turris-omnia-mcu.h b/drivers/platform/cznic/turris-omnia-mcu.h
+index f5b8f7ed3e6e..b4f1f2e8f936 100644
+--- a/drivers/platform/cznic/turris-omnia-mcu.h
++++ b/drivers/platform/cznic/turris-omnia-mcu.h
+@@ -22,6 +22,9 @@
+ #include <asm/byteorder.h>
+ #include <asm/unaligned.h>
+ 
++#define OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN	33
++#define OMNIA_MCU_CRYPTO_SIGNATURE_LEN	64
++
+ struct omnia_mcu {
+ 	struct i2c_client *client;
+ 	const char *type;
+@@ -31,6 +34,7 @@ struct omnia_mcu {
+ 	u64 board_serial_number;
+ 	u8 board_first_mac[ETH_ALEN];
+ 	u8 board_revision;
++	u8 board_public_key[OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN];
+ 
+ 	/* GPIO chip */
+ 	struct gpio_chip gc;
+@@ -52,6 +56,16 @@ struct omnia_mcu {
+ 	/* true random number generator */
+ 	struct hwrng trng;
+ 	struct completion trng_completion;
++
++#ifdef CONFIG_DEBUG_FS
++	/* MCU ECDSA message signing via debugfs */
++	struct dentry *debugfs_root;
++	struct completion msg_signed_completion;
++	struct mutex sign_lock;
++	unsigned int sign_state;
++	u8 signature[OMNIA_MCU_CRYPTO_SIGNATURE_LEN];
++	int sign_err;
++#endif
+ };
+ 
+ static inline int omnia_cmd_write(const struct i2c_client *client, void *cmd,
+@@ -94,19 +108,20 @@ static inline int omnia_cmd_write_u32(const struct i2c_client *client, u8 cmd,
+ 	return omnia_cmd_write(client, buf, sizeof(buf));
+ }
+ 
+-static inline int omnia_cmd_read(const struct i2c_client *client, u8 cmd,
+-				 void *reply, unsigned int len)
++static inline int omnia_cmd_write_read(const struct i2c_client *client,
++				       void *cmd, unsigned int cmd_len,
++				       void *reply, unsigned int reply_len)
+ {
+ 	struct i2c_msg msgs[2];
+ 	int ret;
+ 
+ 	msgs[0].addr = client->addr;
+ 	msgs[0].flags = 0;
+-	msgs[0].len = 1;
+-	msgs[0].buf = &cmd;
++	msgs[0].len = cmd_len;
++	msgs[0].buf = cmd;
+ 	msgs[1].addr = client->addr;
+ 	msgs[1].flags = I2C_M_RD;
+-	msgs[1].len = len;
++	msgs[1].len = reply_len;
+ 	msgs[1].buf = reply;
+ 
+ 	ret = i2c_transfer(client->adapter, msgs, ARRAY_SIZE(msgs));
+@@ -118,6 +133,12 @@ static inline int omnia_cmd_read(const struct i2c_client *client, u8 cmd,
+ 	return 0;
+ }
+ 
++static inline int omnia_cmd_read(const struct i2c_client *client, u8 cmd,
++				 void *reply, unsigned int len)
++{
++	return omnia_cmd_write_read(client, &cmd, 1, reply, len);
++}
++
+ /* Returns 0 on success */
+ static inline int omnia_cmd_read_bits(const struct i2c_client *client, u8 cmd,
+ 				      u32 bits, u32 *dst)
+@@ -181,4 +202,13 @@ int omnia_mcu_register_sys_off_and_wakeup(struct omnia_mcu *mcu);
+ int omnia_mcu_register_trng(struct omnia_mcu *mcu);
+ int omnia_mcu_register_watchdog(struct omnia_mcu *mcu);
+ 
++#ifdef CONFIG_DEBUG_FS
++int omnia_mcu_register_debugfs(struct omnia_mcu *mcu);
++#else
++static inline int omnia_mcu_register_debugfs(struct omnia_mcu *mcu)
++{
++	return 0;
++}
++#endif
++
+ #endif /* __TURRIS_OMNIA_MCU_H */
 -- 
 2.43.2
 
