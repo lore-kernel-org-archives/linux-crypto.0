@@ -1,124 +1,101 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF06CA64
-	for <linux-crypto@vger.kernel.org>; Sun, 24 Mar 2024 16:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E848C19CAF1;
+	Sun, 24 Mar 2024 22:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711296761; cv=none; b=qBb15QBtPOFua+ATDWJTUvApOfNYr3+kmUy/fWEwxmRgFZmRRdHQbSSOqE79CFFiaqC7/51nC2fq9UHxJ1YT8xBJxWCFUqjC75JsKUe89Eyu+H9DKObasrFG5gAzpJAaTkWq11Own2/RVpgpj+i4AX3YknJ9o/0h6Eu0jnWRL9g=
+	t=1711320166; cv=none; b=Yw6Opx9sh9KRO2p65ebzbxUEwINFfXhonjKvofVk2gQdPTPMLTcy/7jY8x0dQcwT69px+O+2z6eKhMMGUoAjxH7XcOuiam50cRl5U7gqtkMrAqNWbhOO3ybDCy5CN2OUr6QhiVWPM45CRTp/8rW5g2p8HQk02WK+38n7iNdiAGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711296761; c=relaxed/simple;
-	bh=zbkEwfF5XQTLA9liaCLXZUMnOSsMSZXLUe2tGPyJB50=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ev83SpIoO7p8eQkRRrl1Y4kPou+xOJQ8EKS9eiCd0i5hKV/lD/rMBd+WuX0II+A4n2ixSOjjVeDAmFXKePVY6O6rq9e3MpKe6RfFsWCImvizLzXD4dlMHyrnzE4AELCHje8RbBuQEmg5rZ/98BY+lr9KDFKdOWpkwqcJQOXQlYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1roQSY-0000c3-PB; Sun, 24 Mar 2024 17:12:34 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1roQSW-008Fq5-Mo; Sun, 24 Mar 2024 17:12:32 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1roQSW-00AT6p-21;
-	Sun, 24 Mar 2024 17:12:32 +0100
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org,
-	kernel@pengutronix.de,
-	linux-kbuild@vger.kernel.org
-Subject: [PATCH v2] hwrng: mxc-rnga: Drop usage of platform_driver_probe()
-Date: Sun, 24 Mar 2024 17:12:26 +0100
-Message-ID: <20240324161227.239718-2-u.kleine-koenig@pengutronix.de>
+	s=arc-20240116; t=1711320166; c=relaxed/simple;
+	bh=Pwr9JTI1lW88i45ASza7K28OaiCIZy6DkegWIHpOUZo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=q2ghyTYJcF0ANJWFJZ5P+V3CO3k5nug+e+6o6g9ow4gmglVkptYrLsT6g+nL9qpV0FU/qvh1eH1zK1KUIbAA07Zaes1VG0Pzbea3AgxxD39p37F87PSBM28DetEMTvMj821rNfLJ4FIWn0h/BH73JgYGupkxPhevRkIYhwVPHm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QrxSzL3b; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QrxSzL3b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8F42C43394;
+	Sun, 24 Mar 2024 22:42:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711320165;
+	bh=Pwr9JTI1lW88i45ASza7K28OaiCIZy6DkegWIHpOUZo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=QrxSzL3bHgMvrgocDKjYKqqXD6IiMtSRRakIJmcCaBGJVAbG9kfOodnOmOexeyLRC
+	 FRk/Qzky7u5bqgdIjv24hUY7tVK3qr3NGS+hHqQ3SBENRhlIot7JHPLeyOf4WyiaqX
+	 UiUNJbm7GV/yhu8XhkQA5gQLVT7voCl5yrKl6Ma0DvuyQik4YtaT2B7LVoGAL+ZcdM
+	 J3rdgYKYTEaUmUgaWQwhaYDbOJRKkYQkPMsbVZKdjdIsX+N/C5jkGyIUzdEK+zDIg8
+	 77lEIttNdJjgytcSkPEqG7pxnjLXLAaWFuiU2mYw5fYxi4lHlpOmr8aQ2VTE/XXRKm
+	 nRTp8+2gbBGFQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Robert Elliott <elliott@hpe.com>,
+	Christoph Biedl <bugzilla.kernel.bpeb@manchmal.in-ulm.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.8 473/715] crypto: jitter - fix CRYPTO_JITTERENTROPY help text
+Date: Sun, 24 Mar 2024 18:30:52 -0400
+Message-ID: <20240324223455.1342824-474-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240324223455.1342824-1-sashal@kernel.org>
+References: <20240324223455.1342824-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2289; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=zbkEwfF5XQTLA9liaCLXZUMnOSsMSZXLUe2tGPyJB50=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBmAFDrL4GkQ1S58miTfSLNkPs7rx8eHVWFk045g tOTVnuUghuJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZgBQ6wAKCRCPgPtYfRL+ TqBTB/sFdbZbF2ZZ8cAouSVwVgAdNK2Qquq8h1b/P7bo753XD9k6mOd5/85x7APNecfNNg9jzo5 JlhAkHg/kuBcLKQun+fUeEYxhU9yh9GvrTcvUE6gja0tPdDdQcJYqyd9TEpPjqbwpqRVyggNNvN 7VPIaoInV5vJJbvOaZbFFG3PLnIdLNbDK4KlgZddmPG6rc4JBC9WDp2sixRMN1fUF5w6lfqydJ0 jMJ5Z+mqrPscFdndO6giFqpluEIIegoprXh3s5fnBXXmsE9Gl6B2hKy+wMy5QvQW7tDvzHVSlAG FZ5X+PHAVwBu9MwNc0ifBnJwRofGV6ZhVbt6si8HSWmrN0zD
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 
-There are considerations to drop platform_driver_probe() as a concept
-that isn't relevant any more today. It comes with an added complexity
-that makes many users hold it wrong. (E.g. this driver should have mark
-the driver struct with __refdata.)
+From: Randy Dunlap <rdunlap@infradead.org>
 
-Convert the driver to the more usual module_platform_driver().
+[ Upstream commit e63df1ec9a16dd9e13e9068243e64876de06f795 ]
 
-This fixes a W=1 build warning:
+Correct various small problems in the help text:
+a. change 2 spaces to ", "
+b. finish an incomplete sentence
+c. change non-working URL to working URL
 
-	WARNING: modpost: drivers/char/hw_random/mxc-rnga: section mismatch in reference: mxc_rnga_driver+0x10 (section: .data) -> mxc_rnga_remove (section: .exit.text)
-
-with CONFIG_HW_RANDOM_MXC_RNGA=m.
-
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Fixes: a9a98d49da52 ("crypto: Kconfig - simplify compression/RNG entries")
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218458
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Robert Elliott <elliott@hpe.com>
+Cc: Christoph Biedl <bugzilla.kernel.bpeb@manchmal.in-ulm.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Acked-by: Bagas Sanjaya <bagasdotme@gmail.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Hello,
+ crypto/Kconfig | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-while I indeed fixed the mentioned warning in (implicit) v1, I
-introduced another one because I failed to drop __init from
-mxc_rnga_probe. :-\
-
-This is fixed here.
-
-Best regards
-Uwe
-
- drivers/char/hw_random/mxc-rnga.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/char/hw_random/mxc-rnga.c b/drivers/char/hw_random/mxc-rnga.c
-index 07ec000e4cd7..94ee18a1120a 100644
---- a/drivers/char/hw_random/mxc-rnga.c
-+++ b/drivers/char/hw_random/mxc-rnga.c
-@@ -131,7 +131,7 @@ static void mxc_rnga_cleanup(struct hwrng *rng)
- 	__raw_writel(ctrl & ~RNGA_CONTROL_GO, mxc_rng->mem + RNGA_CONTROL);
- }
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 7d156c75f15f2..44661c2e30ca5 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1269,10 +1269,11 @@ config CRYPTO_JITTERENTROPY
  
--static int __init mxc_rnga_probe(struct platform_device *pdev)
-+static int mxc_rnga_probe(struct platform_device *pdev)
- {
- 	int err;
- 	struct mxc_rng *mxc_rng;
-@@ -176,7 +176,7 @@ static int __init mxc_rnga_probe(struct platform_device *pdev)
- 	return err;
- }
+ 	  A non-physical non-deterministic ("true") RNG (e.g., an entropy source
+ 	  compliant with NIST SP800-90B) intended to provide a seed to a
+-	  deterministic RNG (e.g.  per NIST SP800-90C).
++	  deterministic RNG (e.g., per NIST SP800-90C).
+ 	  This RNG does not perform any cryptographic whitening of the generated
++	  random numbers.
  
--static void __exit mxc_rnga_remove(struct platform_device *pdev)
-+static void mxc_rnga_remove(struct platform_device *pdev)
- {
- 	struct mxc_rng *mxc_rng = platform_get_drvdata(pdev);
+-	  See https://www.chronox.de/jent.html
++	  See https://www.chronox.de/jent/
  
-@@ -197,10 +197,11 @@ static struct platform_driver mxc_rnga_driver = {
- 		.name = "mxc_rnga",
- 		.of_match_table = mxc_rnga_of_match,
- 	},
--	.remove_new = __exit_p(mxc_rnga_remove),
-+	.probe = mxc_rnga_probe,
-+	.remove_new = mxc_rnga_remove,
- };
- 
--module_platform_driver_probe(mxc_rnga_driver, mxc_rnga_probe);
-+module_platform_driver(mxc_rnga_driver);
- 
- MODULE_AUTHOR("Freescale Semiconductor, Inc.");
- MODULE_DESCRIPTION("H/W RNGA driver for i.MX");
-
-base-commit: 70293240c5ce675a67bfc48f419b093023b862b3
+ if CRYPTO_JITTERENTROPY
+ if CRYPTO_FIPS && EXPERT
 -- 
 2.43.0
 
