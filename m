@@ -1,59 +1,42 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AADB17BC7;
-	Sun, 24 Mar 2024 15:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF06CA64
+	for <linux-crypto@vger.kernel.org>; Sun, 24 Mar 2024 16:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711292923; cv=none; b=qGXsEdQU6nlmHKVnN5X8wSZjlqplxD2FK+vVNVoKAO1m+jJu7T9Y+i0uS8wOkXgvWXcuNqKGTYqd/GphzX9xtIbutiAVd+DnWoiyhagEPIh94l7rbW+tu9vvvMxLUXj+gz8JYrLsl+pO89kwie77OtAswFFtuq4R6TBnINpMY9M=
+	t=1711296761; cv=none; b=qBb15QBtPOFua+ATDWJTUvApOfNYr3+kmUy/fWEwxmRgFZmRRdHQbSSOqE79CFFiaqC7/51nC2fq9UHxJ1YT8xBJxWCFUqjC75JsKUe89Eyu+H9DKObasrFG5gAzpJAaTkWq11Own2/RVpgpj+i4AX3YknJ9o/0h6Eu0jnWRL9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711292923; c=relaxed/simple;
-	bh=jbSdBHS0w1eaicjduO3/4ltPjzKnV2+4/Gm18hBir+0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ijRQ4lNHlL173oHqBqQ71u+nL5SGXr/O+duF+MwDOia0Qu6RBmViSJOjmLidbjca2gomZpGR0c7pH1wvZQjAp+aZPP1Tb5IpTyLv9nhCQd5gS514DzTSy+NOvP4XSmL/pUxdEZhN3lsa4TWJEG0EyQ9WBT2c7flkKRhCw9bQrjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CCaqs4Q0; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CCaqs4Q0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE7ADC433C7;
-	Sun, 24 Mar 2024 15:08:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711292923;
-	bh=jbSdBHS0w1eaicjduO3/4ltPjzKnV2+4/Gm18hBir+0=;
-	h=Date:From:To:List-Id:Cc:Subject:In-Reply-To:References:From;
-	b=CCaqs4Q0v54OS/qibjDzeR5rnTLCeMB5BEWL9FOQOm8nUsrsP4agxz9UeijgZT7BG
-	 4MKSbYfhrQ29CGt+4vnpliHU74QTU5qGLG+bJ0dnax0OIzumnGe5d79tXGVUDVMCwA
-	 SUnGl4wT7Kx7SgjiwWQGT8hc1XE8NU7wy5/lvXLsYw1SyVT+Lk0Y7KoBDoIr+Sq5kz
-	 G3RLG4eMVQAo0e9iXkjKdxwniW2P5X8xhO9Ro3uHGyprv5IKfuJrfyJjlUyZ06toot
-	 J/zg4uC6SCjy+mHbaghEESneDQeaLg4J7rdI5mJb4e8SPi2cU5WxgujzdHnBylvUEu
-	 2BTwaVwc1gecg==
-Date: Sun, 24 Mar 2024 16:08:28 +0100
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Jonathan.Cameron@huawei.com, Laurent.pinchart@ideasonboard.com,
- airlied@gmail.com, andrzej.hajda@intel.com, arm@kernel.org, arnd@arndb.de,
- bamv2005@gmail.com, brgl@bgdev.pl, daniel@ffwll.ch, davem@davemloft.net,
- dianders@chromium.org, dri-devel@lists.freedesktop.org,
- eajames@linux.ibm.com, gaurav.jain@nxp.com, gregory.clement@bootlin.com,
- hdegoede@redhat.com, herbert@gondor.apana.org.au, horia.geanta@nxp.com,
- james.clark@arm.com, james@equiv.tech, jdelvare@suse.com,
- jernej.skrabec@gmail.com, jonas@kwiboo.se, linus.walleij@linaro.org,
- linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux@roeck-us.net, maarten.lankhorst@linux.intel.com,
- mazziesaccount@gmail.com, mripard@kernel.org, naresh.solanki@9elements.com,
- neil.armstrong@linaro.org, pankaj.gupta@nxp.com,
- patrick.rudolph@9elements.com, rfoss@kernel.org, soc@kernel.org,
- tzimmermann@suse.de
-Subject: Re: [PATCH v5 08/11] devm-helpers: Add resource managed version of
- debugfs directory create function
-Message-ID: <20240324160828.7f873a96@thinkpad>
-In-Reply-To: <69264f8a-a113-4d49-b8a6-fb9e858584e4@wanadoo.fr>
-References: <20240323164359.21642-1-kabel@kernel.org>
-	<20240323164359.21642-9-kabel__6885.49310886941$1711212291$gmane$org@kernel.org>
-	<f7c64a5a-2abc-4b7e-95db-7ca57b5427c0@wanadoo.fr>
-	<20240323222506.4ffbdd71@thinkpad>
-	<69264f8a-a113-4d49-b8a6-fb9e858584e4@wanadoo.fr>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.39; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1711296761; c=relaxed/simple;
+	bh=zbkEwfF5XQTLA9liaCLXZUMnOSsMSZXLUe2tGPyJB50=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ev83SpIoO7p8eQkRRrl1Y4kPou+xOJQ8EKS9eiCd0i5hKV/lD/rMBd+WuX0II+A4n2ixSOjjVeDAmFXKePVY6O6rq9e3MpKe6RfFsWCImvizLzXD4dlMHyrnzE4AELCHje8RbBuQEmg5rZ/98BY+lr9KDFKdOWpkwqcJQOXQlYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1roQSY-0000c3-PB; Sun, 24 Mar 2024 17:12:34 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1roQSW-008Fq5-Mo; Sun, 24 Mar 2024 17:12:32 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1roQSW-00AT6p-21;
+	Sun, 24 Mar 2024 17:12:32 +0100
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org,
+	kernel@pengutronix.de,
+	linux-kbuild@vger.kernel.org
+Subject: [PATCH v2] hwrng: mxc-rnga: Drop usage of platform_driver_probe()
+Date: Sun, 24 Mar 2024 17:12:26 +0100
+Message-ID: <20240324161227.239718-2-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,61 +44,81 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2289; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=zbkEwfF5XQTLA9liaCLXZUMnOSsMSZXLUe2tGPyJB50=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBmAFDrL4GkQ1S58miTfSLNkPs7rx8eHVWFk045g tOTVnuUghuJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZgBQ6wAKCRCPgPtYfRL+ TqBTB/sFdbZbF2ZZ8cAouSVwVgAdNK2Qquq8h1b/P7bo753XD9k6mOd5/85x7APNecfNNg9jzo5 JlhAkHg/kuBcLKQun+fUeEYxhU9yh9GvrTcvUE6gja0tPdDdQcJYqyd9TEpPjqbwpqRVyggNNvN 7VPIaoInV5vJJbvOaZbFFG3PLnIdLNbDK4KlgZddmPG6rc4JBC9WDp2sixRMN1fUF5w6lfqydJ0 jMJ5Z+mqrPscFdndO6giFqpluEIIegoprXh3s5fnBXXmsE9Gl6B2hKy+wMy5QvQW7tDvzHVSlAG FZ5X+PHAVwBu9MwNc0ifBnJwRofGV6ZhVbt6si8HSWmrN0zD
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 
-On Sun, 24 Mar 2024 10:21:28 +0100
-Christophe JAILLET <christophe.jaillet@wanadoo.fr> wrote:
+There are considerations to drop platform_driver_probe() as a concept
+that isn't relevant any more today. It comes with an added complexity
+that makes many users hold it wrong. (E.g. this driver should have mark
+the driver struct with __refdata.)
 
-> Le 23/03/2024 =C3=A0 22:25, Marek Beh=C3=BAn a =C3=A9crit=C2=A0:
-> > On Sat, 23 Mar 2024 22:10:40 +0100
-> > Christophe JAILLET <christophe.jaillet@wanadoo.fr> wrote:
-> >  =20
->=20
-> ...
->=20
-> >>>    static int pvt_ts_dbgfs_create(struct pvt_device *pvt, struct devi=
-ce *dev)
-> >>>    {
-> >>> -	pvt->dbgfs_dir =3D debugfs_create_dir(dev_name(dev), NULL);
-> >>> +	pvt->dbgfs_dir =3D devm_debugfs_create_dir(dev, dev_name(dev), NULL=
-);
-> >>> +	if (IS_ERR(pvt->dbgfs_dir))
-> >>> +		return PTR_ERR(pvt->dbgfs_dir); =20
-> >>
-> >> Not sure if the test and error handling should be added here.
-> >> *If I'm correct*, functions related to debugfs already handle this case
-> >> and just do nothing. And failure in debugfs related code is not
-> >> considered as something that need to be reported and abort a probe fun=
-ction.
-> >>
-> >> Maybe the same other (already existing) tests in this patch should be
-> >> removed as well, in a separated patch. =20
-> >=20
-> > Functions related to debugfs maybe do, but devm_ resource management
-> > functions may fail to allocate release structure, and those errors need
-> > to be handled, AFAIK. =20
->=20
-> I would say no.
-> If this memory allocation fails, then debugfs_create_dir() will not be=20
-> called, but that's not a really big deal if the driver itself can still=20
-> run normally without it.
+Convert the driver to the more usual module_platform_driver().
 
-debugfs_create_dir() will always be called. Resource allocation is done
-afterwards, and if it fails, then the created dir will be removed.
+This fixes a W=1 build warning:
 
-But now I don't know what to do, because yes, it seems that the debugfs
-errors are being ignored at many places...
+	WARNING: modpost: drivers/char/hw_random/mxc-rnga: section mismatch in reference: mxc_rnga_driver+0x10 (section: .data) -> mxc_rnga_remove (section: .exit.text)
 
->=20
-> Up to you to leave it as-is or remove what I think is a useless error=20
-> handling.
-> At least, maybe it could be said in the commit log, so that maintainers=20
-> can comment on it, if they don't spot the error handling you introduce.
->=20
-> CJ
->=20
-> >=20
-> > Marek
-> >  =20
->=20
+with CONFIG_HW_RANDOM_MXC_RNGA=m.
+
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+Hello,
+
+while I indeed fixed the mentioned warning in (implicit) v1, I
+introduced another one because I failed to drop __init from
+mxc_rnga_probe. :-\
+
+This is fixed here.
+
+Best regards
+Uwe
+
+ drivers/char/hw_random/mxc-rnga.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/char/hw_random/mxc-rnga.c b/drivers/char/hw_random/mxc-rnga.c
+index 07ec000e4cd7..94ee18a1120a 100644
+--- a/drivers/char/hw_random/mxc-rnga.c
++++ b/drivers/char/hw_random/mxc-rnga.c
+@@ -131,7 +131,7 @@ static void mxc_rnga_cleanup(struct hwrng *rng)
+ 	__raw_writel(ctrl & ~RNGA_CONTROL_GO, mxc_rng->mem + RNGA_CONTROL);
+ }
+ 
+-static int __init mxc_rnga_probe(struct platform_device *pdev)
++static int mxc_rnga_probe(struct platform_device *pdev)
+ {
+ 	int err;
+ 	struct mxc_rng *mxc_rng;
+@@ -176,7 +176,7 @@ static int __init mxc_rnga_probe(struct platform_device *pdev)
+ 	return err;
+ }
+ 
+-static void __exit mxc_rnga_remove(struct platform_device *pdev)
++static void mxc_rnga_remove(struct platform_device *pdev)
+ {
+ 	struct mxc_rng *mxc_rng = platform_get_drvdata(pdev);
+ 
+@@ -197,10 +197,11 @@ static struct platform_driver mxc_rnga_driver = {
+ 		.name = "mxc_rnga",
+ 		.of_match_table = mxc_rnga_of_match,
+ 	},
+-	.remove_new = __exit_p(mxc_rnga_remove),
++	.probe = mxc_rnga_probe,
++	.remove_new = mxc_rnga_remove,
+ };
+ 
+-module_platform_driver_probe(mxc_rnga_driver, mxc_rnga_probe);
++module_platform_driver(mxc_rnga_driver);
+ 
+ MODULE_AUTHOR("Freescale Semiconductor, Inc.");
+ MODULE_DESCRIPTION("H/W RNGA driver for i.MX");
+
+base-commit: 70293240c5ce675a67bfc48f419b093023b862b3
+-- 
+2.43.0
 
