@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E848C19CAF1;
-	Sun, 24 Mar 2024 22:42:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0FE12AAF6;
+	Sun, 24 Mar 2024 22:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711320166; cv=none; b=Yw6Opx9sh9KRO2p65ebzbxUEwINFfXhonjKvofVk2gQdPTPMLTcy/7jY8x0dQcwT69px+O+2z6eKhMMGUoAjxH7XcOuiam50cRl5U7gqtkMrAqNWbhOO3ybDCy5CN2OUr6QhiVWPM45CRTp/8rW5g2p8HQk02WK+38n7iNdiAGs=
+	t=1711320942; cv=none; b=KfbRelJRdqSv2GAyJR0aWvt9YhkhkVAs8VMJYBVAJwWkOtBHEnLxcTSAz7Qx8+vOf+h+nq3vi/rmbHZ+UmVdSm8ffyMLFK1UVdCQJ19ImF8UmyB4VCJHVcLMklzsMSLE846sYiceuWw78ouikGq+0FsJNfMlUNJ8HAnW5L9m6qA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711320166; c=relaxed/simple;
-	bh=Pwr9JTI1lW88i45ASza7K28OaiCIZy6DkegWIHpOUZo=;
+	s=arc-20240116; t=1711320942; c=relaxed/simple;
+	bh=Q5PokMvx+yqsVWZoRFasbAauWNKXBiHyG0ZpRTC1A9U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q2ghyTYJcF0ANJWFJZ5P+V3CO3k5nug+e+6o6g9ow4gmglVkptYrLsT6g+nL9qpV0FU/qvh1eH1zK1KUIbAA07Zaes1VG0Pzbea3AgxxD39p37F87PSBM28DetEMTvMj821rNfLJ4FIWn0h/BH73JgYGupkxPhevRkIYhwVPHm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QrxSzL3b; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=GiKoXVl+BW1W7QKdHTyFPXM8RefqvcxzZ3DnJI+zqbv0nqVLVXia8MPgLhe41JurPN96qd0IrGb3eolzRVyK2RaBmXpLBp4sBehLtlIH/LQl2cTYbEdrVapG14x+kwYrS8GRXr6UZDcsv7sl53ft2n0FQwCTz0OhVPBhkccj59k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HBxtaOfL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QrxSzL3b"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8F42C43394;
-	Sun, 24 Mar 2024 22:42:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HBxtaOfL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AA0EC433F1;
+	Sun, 24 Mar 2024 22:55:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711320165;
-	bh=Pwr9JTI1lW88i45ASza7K28OaiCIZy6DkegWIHpOUZo=;
+	s=k20201202; t=1711320941;
+	bh=Q5PokMvx+yqsVWZoRFasbAauWNKXBiHyG0ZpRTC1A9U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QrxSzL3bHgMvrgocDKjYKqqXD6IiMtSRRakIJmcCaBGJVAbG9kfOodnOmOexeyLRC
-	 FRk/Qzky7u5bqgdIjv24hUY7tVK3qr3NGS+hHqQ3SBENRhlIot7JHPLeyOf4WyiaqX
-	 UiUNJbm7GV/yhu8XhkQA5gQLVT7voCl5yrKl6Ma0DvuyQik4YtaT2B7LVoGAL+ZcdM
-	 J3rdgYKYTEaUmUgaWQwhaYDbOJRKkYQkPMsbVZKdjdIsX+N/C5jkGyIUzdEK+zDIg8
-	 77lEIttNdJjgytcSkPEqG7pxnjLXLAaWFuiU2mYw5fYxi4lHlpOmr8aQ2VTE/XXRKm
-	 nRTp8+2gbBGFQ==
+	b=HBxtaOfLmkPuvG1b5dHW4lLRj8k+T7LStBowGV6SqLXMOehCyWc8N3LaMKgCXgEwn
+	 hp05lZuzwjQMiiETOSUmHBYj4TJTRgUEQLex75V86Y9C7arfvBF8mLagwcU41twZsX
+	 5Z5B1DVCrUIDFDcMmKXru1UymsPnwibpgkg3qO1E5cD8mgqPWYkNH1nOJ+Ue9y9l0R
+	 KWN1nmWhouGDoUvHIEmoW3DOL73Y2QuuGO3hCgIL8xDfB3RbTaUEF4+fkC+8+jk5yv
+	 BsVozLp8snTaWmOmFQ2lUz+2HboBmKGOAPVPQp6QDfDJ/Fg1yM7sT+dcUUXgvjUQsT
+	 FU4nTvCH0uBqg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -37,12 +37,12 @@ Cc: Randy Dunlap <rdunlap@infradead.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.8 473/715] crypto: jitter - fix CRYPTO_JITTERENTROPY help text
-Date: Sun, 24 Mar 2024 18:30:52 -0400
-Message-ID: <20240324223455.1342824-474-sashal@kernel.org>
+Subject: [PATCH 6.7 504/713] crypto: jitter - fix CRYPTO_JITTERENTROPY help text
+Date: Sun, 24 Mar 2024 18:43:50 -0400
+Message-ID: <20240324224720.1345309-505-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240324223455.1342824-1-sashal@kernel.org>
-References: <20240324223455.1342824-1-sashal@kernel.org>
+In-Reply-To: <20240324224720.1345309-1-sashal@kernel.org>
+References: <20240324224720.1345309-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -79,10 +79,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 7d156c75f15f2..44661c2e30ca5 100644
+index 70661f58ee41c..dd5353c5eb24d 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -1269,10 +1269,11 @@ config CRYPTO_JITTERENTROPY
+@@ -1292,10 +1292,11 @@ config CRYPTO_JITTERENTROPY
  
  	  A non-physical non-deterministic ("true") RNG (e.g., an entropy source
  	  compliant with NIST SP800-90B) intended to provide a seed to a
