@@ -1,146 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7597170A5A
-	for <linux-crypto@vger.kernel.org>; Mon, 25 Mar 2024 09:57:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85CAD1B7F53
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Mar 2024 11:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711360667; cv=none; b=rQiU3x+4OPZfAYwZPryeX+O04J4b0vGWQqSEOYuzT1vccNYbRb3mw/jBPun2eM0icHPolUJRO7It/ddJDvbJxndADblpYzFfKKnSBPw8S2b/Jg3wRIbq0o1528KdT/Cr2DTpLOAdyoNqFl9LCALfpMRvrf81dzRDd2EPvmAuUrw=
+	t=1711364738; cv=none; b=HiyzpPG0DsF9gqLH5ek9eaFugDLPDfx1PekyZewX/rB7Ud5lJLfwtTC+f5FGyObLTCp89AQ6fAgBFPg6xK3aUqSdWmHvlXxMGBIGFC6jgz/CalV7SlXszmqVEzcFshUhU/6yW9gO5yETsgkrd/4lr1bmS0KqsC/i4tzZft1TRrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711360667; c=relaxed/simple;
-	bh=uJggmdCEy5qVc+JdGsZIsamqVNi9SsgkOafj6qmYN/Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cnMD/ZhjYrH8ff0PDgxxVoREKqHMWIByNP7/4KlCl4l2jb4dWlEH6wl4VKd3bU3Hi4FON9XMw13ePEWuVbEN4uyaK7tTgRa3Fgc52da3RfJ3funOns5zVVSeJijC21QPhjVDYGdCP8nI4hHmuctrZu+MTog6m4wyv3sY+668Rg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LX8wlBFV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711364738; c=relaxed/simple;
+	bh=7iS7PHbquIUiCrCMtkBdkxuqi/jTqc2cY3j9OhS1Ij4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=amU6HUlogVnGZnlNMmPLVRu/SXceIq/Lhf1WTSIviQJTNix1anVqWdyvAHkENvWP/kgIQVJXY/XHdiuPlBw3lY7wVLbH2m/5NPZj4GCsuGgD0yxqR4+/w7/oda4CfYW1b35FhgefcXB629xna+jsakP7Jkqg5RoksPfi5L8ehx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yybf2YRz; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LX8wlBFV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D67DC433F1;
-	Mon, 25 Mar 2024 09:57:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711360667;
-	bh=uJggmdCEy5qVc+JdGsZIsamqVNi9SsgkOafj6qmYN/Y=;
-	h=Date:From:To:List-Id:Cc:Subject:In-Reply-To:References:From;
-	b=LX8wlBFV50sMIWwXwrYZ6t/fxX0pZ2hZQLC75vbMKhuga/ESKhs9LEiUjeWZ5DZ3K
-	 wQ3GG7/UxVZxx7weOuhHGOECmqtJwLCoVEGFpiXE/QBd6nZKl/78gAAJpGqZbZnT6c
-	 kZZ/D8Fwb8EmKtGcCZNreONmV6B8IY/T9wuVlOp2+3dKcj4a2Zhtua09nwNwAe1udD
-	 bma7JsaraAVCuWPfUYIY2k8yH19uDGy+C1/lzWioEY7QfEOJs9OttlpZc6J7QaI4Z5
-	 3ygnMPfL0Wtl25a+y1wMgI3Hw8i9LzN1ulg6Fqynd9iBU1aKCNsnjkdlQQ7yihl1SE
-	 YiqqkCQQ8yNrg==
-Date: Mon, 25 Mar 2024 10:57:42 +0100
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Matti Vaittinen <mazziesaccount@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Gregory CLEMENT
- <gregory.clement@bootlin.com>, soc@kernel.org, arm@kernel.org, Hans de
- Goede <hdegoede@redhat.com>, Horia =?UTF-8?B?R2VhbnTEgw==?=
- <horia.geanta@nxp.com>, Pankaj Gupta <pankaj.gupta@nxp.com>, Gaurav Jain
- <gaurav.jain@nxp.com>, linux-crypto@vger.kernel.org, Herbert Xu
- <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5 06/11] devm-helpers: Add resource managed version of
- irq_create_mapping()
-Message-ID: <20240325105742.0e1c8906@dellmb>
-In-Reply-To: <dd4c655f-39c4-47c1-b5fb-4d6fc94cc430@gmail.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yybf2YRz"
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a474d26fb41so158121966b.2
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Mar 2024 04:05:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711364734; x=1711969534; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FRILSzvwAIpvZwjiJmtXP3wS29AHppU0XGaszbPtEV8=;
+        b=yybf2YRz6BdziJvnzuIzK0mlybWc0quywKx9lFEYwuMGpFGMwwuqd7rGVqTcWiCUW3
+         u5Kf50ZmAXMWjZ+GVzGk7heO5znoRwDrB6jvIcukzzUm1eWgU/RVzCjnJRZpXBPLjo43
+         CbKYaS4g1qIH+LPfFB38T6MPWDJbOo4WmrVcnpSb/pIB+LM7ftlKQxhZbjK6zezpxki1
+         7QjLFn6ob9ipuRMF1uSgmuzp1bi2pqdlYVKXrfX+BqC3/qy0OfUiQfbvkVC2H6BEvZ7e
+         v9aU1GJeto8AgaSTqYR1GBG2achbjMQBRMacmqkej2SVzjOfSuomr/GiDtspIxppE8gD
+         f3Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711364734; x=1711969534;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FRILSzvwAIpvZwjiJmtXP3wS29AHppU0XGaszbPtEV8=;
+        b=e6NQWgw06QUKHuVWK8cD9nJqpno81w8I3leBWpYriOcovOrZrrqbzuw0JGQpVRPW/n
+         KGq0Z2ODuNoqCbdswSMGAJiLlEio7VWXa+8Sf5ODUL8tYZpHPMFIiyuxQlYe+Q97JqsY
+         uu49rDmmWRFpIpKUee5xatE48k5/+CkLUxNyUtQTT5Dk1VUiu/2uFMH+6G3yNZ2lf0pt
+         pxfTZP7o5ylOgyUDZ7FsRTDOQ/XGpOR1yASMbPgTYdn/I/zzI9FWLxTODSoLcvol1USH
+         mNE1ldhLFGQIjtkIJKse8K0FZOT/r4qJjuA5rdy5vQaRs0I0anUf+3EF+Qn1+y3hCLsH
+         hDGw==
+X-Forwarded-Encrypted: i=1; AJvYcCU0avuULXAlj8yoM6rD2M/XiIJDkJ6ptmAd2haDJGt5l4yIPKDvw5KAC9cL36RHNAIHwSsaXCyi+nYmShbIbXykr0QpLXnzAK7/IXpJ
+X-Gm-Message-State: AOJu0Yz+m6ORooVtZscHHvZg186f/ZxKkkGl4BufefCqZUqNG414lkXw
+	C6XMWmzb+WVmqUtZJE/omHtRZpTLPNll8d531UMVuifaKryNhtvE0Om32Gxgul8=
+X-Google-Smtp-Source: AGHT+IEhtdf7x6x6qjqq4K75Nxdbj/nJMl44w91CE9A41I8PB9hLaFhw4s15oV2TjS9l0ZLDyPjoIA==
+X-Received: by 2002:a17:906:40ca:b0:a47:206b:5951 with SMTP id a10-20020a17090640ca00b00a47206b5951mr4770720ejk.59.1711364733579;
+        Mon, 25 Mar 2024 04:05:33 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id m3-20020a1709061ec300b00a449026672esm2901792ejj.81.2024.03.25.04.05.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Mar 2024 04:05:33 -0700 (PDT)
+Date: Mon, 25 Mar 2024 14:05:29 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Jonathan.Cameron@huawei.com, Laurent.pinchart@ideasonboard.com,
+	airlied@gmail.com, andrzej.hajda@intel.com, arm@kernel.org,
+	arnd@arndb.de, bamv2005@gmail.com, brgl@bgdev.pl, daniel@ffwll.ch,
+	davem@davemloft.net, dianders@chromium.org,
+	dri-devel@lists.freedesktop.org, eajames@linux.ibm.com,
+	gaurav.jain@nxp.com, gregory.clement@bootlin.com,
+	hdegoede@redhat.com, herbert@gondor.apana.org.au,
+	horia.geanta@nxp.com, james.clark@arm.com, james@equiv.tech,
+	jdelvare@suse.com, jernej.skrabec@gmail.com, jonas@kwiboo.se,
+	linus.walleij@linaro.org, linux-crypto@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux@roeck-us.net,
+	maarten.lankhorst@linux.intel.com, mazziesaccount@gmail.com,
+	mripard@kernel.org, naresh.solanki@9elements.com,
+	neil.armstrong@linaro.org, pankaj.gupta@nxp.com,
+	patrick.rudolph@9elements.com, rfoss@kernel.org, soc@kernel.org,
+	tzimmermann@suse.de
+Subject: Re: [PATCH v5 08/11] devm-helpers: Add resource managed version of
+ debugfs directory create function
+Message-ID: <486947a7-98fc-4884-a5fd-354677fa66ce@moroto.mountain>
 References: <20240323164359.21642-1-kabel@kernel.org>
-	<20240323164359.21642-7-kabel@kernel.org>
-	<dd4c655f-39c4-47c1-b5fb-4d6fc94cc430@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.39; x86_64-pc-linux-gnu)
+ <20240323164359.21642-9-kabel__6885.49310886941$1711212291$gmane$org@kernel.org>
+ <f7c64a5a-2abc-4b7e-95db-7ca57b5427c0@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f7c64a5a-2abc-4b7e-95db-7ca57b5427c0@wanadoo.fr>
 
-On Mon, 25 Mar 2024 11:40:20 +0200
-Matti Vaittinen <mazziesaccount@gmail.com> wrote:
+On Sat, Mar 23, 2024 at 10:10:40PM +0100, Christophe JAILLET wrote:
+> >   static int pvt_ts_dbgfs_create(struct pvt_device *pvt, struct device *dev)
+> >   {
+> > -	pvt->dbgfs_dir = debugfs_create_dir(dev_name(dev), NULL);
+> > +	pvt->dbgfs_dir = devm_debugfs_create_dir(dev, dev_name(dev), NULL);
+> > +	if (IS_ERR(pvt->dbgfs_dir))
+> > +		return PTR_ERR(pvt->dbgfs_dir);
+> 
+> Not sure if the test and error handling should be added here.
 
-> On 3/23/24 18:43, Marek Beh=C3=BAn wrote:
-> > Add resource managed version of irq_create_mapping(), to help drivers
-> > automatically dispose a linux irq mapping when driver is detached.
-> >=20
-> > The new function devm_irq_create_mapping() is not yet used, but the
-> > action function can be used in the FSL CAAM driver.
-> >=20
-> > Signed-off-by: Marek Beh=C3=BAn <kabel@kernel.org>
-> > ---
-> >   drivers/crypto/caam/jr.c     |  8 ++----
-> >   include/linux/devm-helpers.h | 54 ++++++++++++++++++++++++++++++++++++
-> >   2 files changed, 56 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-> > index 26eba7de3fb0..ad0295b055f8 100644
-> > --- a/drivers/crypto/caam/jr.c
-> > +++ b/drivers/crypto/caam/jr.c
-> > @@ -7,6 +7,7 @@
-> >    * Copyright 2019, 2023 NXP
-> >    */
-> >  =20
-> > +#include <linux/devm-helpers.h>
-> >   #include <linux/of_irq.h>
-> >   #include <linux/of_address.h>
-> >   #include <linux/platform_device.h>
-> > @@ -576,11 +577,6 @@ static int caam_jr_init(struct device *dev)
-> >   	return error;
-> >   }
-> >  =20
-> > -static void caam_jr_irq_dispose_mapping(void *data)
-> > -{
-> > -	irq_dispose_mapping((unsigned long)data);
-> > -}
-> > -
-> >   /*
-> >    * Probe routine for each detected JobR subsystem.
-> >    */
-> > @@ -656,7 +652,7 @@ static int caam_jr_probe(struct platform_device *pd=
-ev)
-> >   		return -EINVAL;
-> >   	}
-> >  =20
-> > -	error =3D devm_add_action_or_reset(jrdev, caam_jr_irq_dispose_mapping,
-> > +	error =3D devm_add_action_or_reset(jrdev, devm_irq_mapping_drop,
-> >   					 (void *)(unsigned long)jrpriv->irq);
-> >   	if (error)
-> >   		return error;
-> > diff --git a/include/linux/devm-helpers.h b/include/linux/devm-helpers.h
-> > index 74891802200d..3805551fd433 100644
-> > --- a/include/linux/devm-helpers.h
-> > +++ b/include/linux/devm-helpers.h
-> > @@ -24,6 +24,8 @@
-> >    */
-> >  =20
-> >   #include <linux/device.h>
-> > +#include <linux/kconfig.h>
-> > +#include <linux/irqdomain.h>
-> >   #include <linux/workqueue.h> =20
->=20
-> My confidence level is not terribly high today, so I am likely to accept=
-=20
-> just about any counter arguments :) But ... More I think of this whole=20
-> header, less convinced I am that this (the header) is a great idea. I=20
-> wonder who has authored a concept like this... :rolleyes:
->=20
-> Pulling punch of unrelated APIs (or, unrelated except the devm-usage) in=
-=20
-> one header has potential to be including a lot of unneeded stuff to the=20
-> users. I am under impression this can be bad for example for the build=20
-> times.
->=20
-> I think that ideally the devm-APIs should live close to their non-devm=20
-> counterparts, and this header should be just used as a last resort, when=
-=20
-> all the other options fail :) May I assume all other options have failed=
-=20
-> for the IRQ stuff?
->=20
-> Well, I will leave the big picture to the bigger minds. When just=20
-> looking at the important things like the function names and coding style=
-=20
-> - this change looks Ok to me ;)
+Yep.  debugfs_create_dir() is not supposed to be checked here.  It
+breaks the driver if CONFIG_DEBUGFS is disabled.  I have written a blog
+about this:
 
-If the authors of devm-helpers or someone else decide it should not
-exist (due for example of long build times), I am OK with that.
+https://staticthinking.wordpress.com/2023/07/24/debugfs-functions-are-not-supposed-to-be-checked/
 
-But currently this seems to me to be the proper place to put this into.
+regards,
+dan carpenter
 
-Marek
