@@ -1,72 +1,64 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D35E1BC26;
-	Mon, 25 Mar 2024 18:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C137112B6C;
+	Mon, 25 Mar 2024 19:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711390705; cv=none; b=P/5zbKt8IrvBPnU5zJgekHqGShnVZv/KJTKr7Drb3R736EgmsViHOQ3w4eSsn06GknFAjZiGibhU+K0VB0jz8UZWbDZ6n/gsQtbGZ0zgD/W5yUB2JbreceXYQlVRKg4PI/vg3SR6jtVmIXo9wnJcv5oWxT3yt71OFhO229T5FXA=
+	t=1711394330; cv=none; b=tdk2FJOEc8+Rc2NGZGm/nwwBNaSxFhclfJVoh5QDxExSO5qZOAcXL9MNjZ8RjG+3QfJsWkss3kV5okTLhUwi93r1fRYJGn/JR5kxeETQwhUuws/hP5HVk6UTpzkl3QG4HT+KuqnaCQ115uanc346Cqod4x2bPtYTNG1/IcZUQDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711390705; c=relaxed/simple;
-	bh=Cy8SG3kgC5qh5bF6hshu0seExL8BhIOy/OqpHXkKNzU=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=jbqWHkcIDUDTiK2XlnmeLQCsU7E2Yu6tOTixqNz1jwlYp/5N+Q01x84+5N+gVOYnVGEwaWBg4zHrpyfI/+A4c0WlDqLnZO1DOSwO1B1GY2FDtGaQqaAnPz2FbNwbcoNeKrWY5OKK87tHHJDBiCC2zuVZ+IzXthREp9hsJEZziLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=trbfjCVh; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="trbfjCVh"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E9B20C433F1;
-	Mon, 25 Mar 2024 18:18:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711390704;
-	bh=Cy8SG3kgC5qh5bF6hshu0seExL8BhIOy/OqpHXkKNzU=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=trbfjCVht9Nb+tVsjtZ2jtu2o8jYjqGsakyEhF5HjRD4Gw2WXtUlshRLVqMXC6bay
-	 JsG/7lajxLURdu/Na/4dMQQFLqkdmYsV5ipytbdxHGCsj6+5EcEy8ffOzOf8k3RzB1
-	 sAeBUMgzLePMEBFlIYfkKUrwoC5OJ+o1hqsprKnZCrcPEI8ZvuABgWdc9xuqNVDRvg
-	 lo+vrF1MCFN2gwTARPEgsmw7jpe8cp4CirduOr+xydqrX1T1ZGLWVGPU4oKeRMqtmr
-	 HJu5SQEOK6TcT/CNgJiZwVQgz8cSP/uZ3I4YP6fYLAF7Q87LPInrdNxZYipuUX/8VG
-	 sMDNrsp+K/GYA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E0947D2D0E0;
-	Mon, 25 Mar 2024 18:18:24 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.9
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
-References: <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
- <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
- <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
- <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
- <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
- <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
- <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
- <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
- <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
- <ZbstBewmaIfrFocE@gondor.apana.org.au> <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.9-p2
-X-PR-Tracked-Commit-Id: 5a7e89d3315d1be86aff8a8bf849023cda6547f7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 174fdc93a241af54772ae3e745ec719e9f6cebfc
-Message-Id: <171139070490.16418.14798772464511355023.pr-tracker-bot@kernel.org>
-Date: Mon, 25 Mar 2024 18:18:24 +0000
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	s=arc-20240116; t=1711394330; c=relaxed/simple;
+	bh=eo8SEgIiydINJpLrrNpDWriCqpURl3Xcf6eqpBDXGTc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VWO4QxFu5lBkxc45NKuBWlFGNRCK8DsOdAQ7vl0om1Geh6YVHnPD3rYRS+7rGS1iPkLTnYWNAIZXTdB1TQEqeSa88VmBa3QG5i0GfAqnnXeQW2mcEOzY5oSE8ULguF2NvZau7dc/tY8kFmgV696c2dYeN4+FSePU99quO3U/HMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 899E82800BBDF;
+	Mon, 25 Mar 2024 20:18:37 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 744B170E41A; Mon, 25 Mar 2024 20:18:37 +0100 (CET)
+Date: Mon, 25 Mar 2024 20:18:37 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Stefan Berger <stefanb@linux.ibm.com>
+Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br,
+	bbhushan2@marvell.com, jarkko@kernel.org
+Subject: Re: [PATCH v7 00/13] Add support for NIST P521 to ecdsa
+Message-ID: <ZgHODQL-XLxTDO4b@wunner.de>
+References: <20240320114725.1644921-1-stefanb@linux.ibm.com>
+ <5c6c5f51-125b-4cc7-ac27-5a5358d514c7@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5c6c5f51-125b-4cc7-ac27-5a5358d514c7@linux.ibm.com>
 
-The pull request you sent on Mon, 25 Mar 2024 17:47:43 +0800:
+On Wed, Mar 20, 2024 at 08:44:52AM -0400, Stefan Berger wrote:
+> On 3/20/24 07:47, Stefan Berger wrote:
+> > This series adds support for the NIST P521 curve to the ecdsa module
+> > to enable signature verification with it.
+> > 
+> > An issue with the current code in ecdsa is that it assumes that input
+> > arrays providing key coordinates for example, are arrays of digits
+> > (a 'digit' is a 'u64'). This works well for all currently supported
+> > curves, such as NIST P192/256/384, but does not work for NIST P521 where
+> > coordinates are 8 digits + 2 bytes long. So some of the changes deal with
+> > converting byte arrays to digits and adjusting tests on input byte
+> > array lengths to tolerate arrays not providing multiples of 8 bytes.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.9-p2
+I've tested the whole series successfully on v6.9-rc1 by authenticating
+a PCI device with a NIST P521 certificate using my PCI/CMA development
+branch: https://github.com/l1k/linux/commits/doe
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/174fdc93a241af54772ae3e745ec719e9f6cebfc
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Tested-by: Lukas Wunner <lukas@wunner.de>
