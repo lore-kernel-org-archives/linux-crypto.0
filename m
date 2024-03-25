@@ -1,39 +1,43 @@
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C137112B6C;
-	Mon, 25 Mar 2024 19:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35ECA71739;
+	Mon, 25 Mar 2024 20:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711394330; cv=none; b=tdk2FJOEc8+Rc2NGZGm/nwwBNaSxFhclfJVoh5QDxExSO5qZOAcXL9MNjZ8RjG+3QfJsWkss3kV5okTLhUwi93r1fRYJGn/JR5kxeETQwhUuws/hP5HVk6UTpzkl3QG4HT+KuqnaCQ115uanc346Cqod4x2bPtYTNG1/IcZUQDM=
+	t=1711399499; cv=none; b=AfQiccP/gWoWnfdXYSR3JPFI3eId3z8eZ8sxveDQoRwRDxRVmkxwSoG8Go2rIcPkY/0Qt4v1Nn2BbhXetG3VD/+ZKVvWuctFpRZmaEOcf/xmnQMWxEYEvXJUYlLAKkzF4QOk2wP/D7TuXb/yEsrLTMvzRijRN6XNE8iEeja8ypg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711394330; c=relaxed/simple;
-	bh=eo8SEgIiydINJpLrrNpDWriCqpURl3Xcf6eqpBDXGTc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VWO4QxFu5lBkxc45NKuBWlFGNRCK8DsOdAQ7vl0om1Geh6YVHnPD3rYRS+7rGS1iPkLTnYWNAIZXTdB1TQEqeSa88VmBa3QG5i0GfAqnnXeQW2mcEOzY5oSE8ULguF2NvZau7dc/tY8kFmgV696c2dYeN4+FSePU99quO3U/HMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 899E82800BBDF;
-	Mon, 25 Mar 2024 20:18:37 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 744B170E41A; Mon, 25 Mar 2024 20:18:37 +0100 (CET)
-Date: Mon, 25 Mar 2024 20:18:37 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br,
-	bbhushan2@marvell.com, jarkko@kernel.org
-Subject: Re: [PATCH v7 00/13] Add support for NIST P521 to ecdsa
-Message-ID: <ZgHODQL-XLxTDO4b@wunner.de>
-References: <20240320114725.1644921-1-stefanb@linux.ibm.com>
- <5c6c5f51-125b-4cc7-ac27-5a5358d514c7@linux.ibm.com>
+	s=arc-20240116; t=1711399499; c=relaxed/simple;
+	bh=8Q5dBDtztW2JoXr9nD0hK47pMWPXBqeI3oSF7O+vO+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=paYpFtouHn/71TrMkP4rbNF2IA+Y7IiwusvagECDRcpScfA52AxKCGSxsfUQeLrBThzvfwZDFJGytJEcEcsZsF8EJrLl9fshdRJtzvi2l4BgIDvSPGiGbMOFn+c92s95ZIYIAptTlji7AWTXCB2xihj+qTIxDVBP+OvZia411qM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ibWoL9px; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ibWoL9px"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7716C433B2;
+	Mon, 25 Mar 2024 20:44:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711399498;
+	bh=8Q5dBDtztW2JoXr9nD0hK47pMWPXBqeI3oSF7O+vO+Q=;
+	h=Date:From:To:Cc:Subject:From;
+	b=ibWoL9pxXqCF2Ggso3naA2fD2G+wfd/tLQLp9GtIz1ZJxRdpx4wyIylnAk70loO4Q
+	 fqC++a7QClTXwKYl+rqx2yq/KxOMF6el7gcH+3IItQ2RPBnHtZUU8I8GYnew92AWl3
+	 cwdSQoCZSnY2SEyDgnmPRtGNj4aJuPHGBToEMLbw2PF6XKhwqZ+ulQmEuV6A6AqL68
+	 9B4r/D1GnrYMTuXJkMJcadrI5i6Ge6BUvUxse+BmTNJ1gck4oChgKclkW9q9eMsXIa
+	 B8iM+DBPW0oLwRuH+I4jU1FbJXAAFtB5uBxdiwaPP7FQ/EQm/YGk+HdvpoxZJM4hKv
+	 yeX2J6n6l7OfA==
+Date: Mon, 25 Mar 2024 14:44:55 -0600
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH][next] crypto: qat - Avoid -Wflex-array-member-not-at-end
+ warnings
+Message-ID: <ZgHiR7j2NYl5M4mW@neat>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,23 +46,85 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5c6c5f51-125b-4cc7-ac27-5a5358d514c7@linux.ibm.com>
 
-On Wed, Mar 20, 2024 at 08:44:52AM -0400, Stefan Berger wrote:
-> On 3/20/24 07:47, Stefan Berger wrote:
-> > This series adds support for the NIST P521 curve to the ecdsa module
-> > to enable signature verification with it.
-> > 
-> > An issue with the current code in ecdsa is that it assumes that input
-> > arrays providing key coordinates for example, are arrays of digits
-> > (a 'digit' is a 'u64'). This works well for all currently supported
-> > curves, such as NIST P192/256/384, but does not work for NIST P521 where
-> > coordinates are 8 digits + 2 bytes long. So some of the changes deal with
-> > converting byte arrays to digits and adjusting tests on input byte
-> > array lengths to tolerate arrays not providing multiples of 8 bytes.
+-Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
+ready to enable it globally.
 
-I've tested the whole series successfully on v6.9-rc1 by authenticating
-a PCI device with a NIST P521 certificate using my PCI/CMA development
-branch: https://github.com/l1k/linux/commits/doe
+Use the `__struct_group()` helper to separate the flexible array
+from the rest of the members in flexible `struct qat_alg_buf_list`,
+through tagged `struct qat_alg_buf_list_hdr`, and avoid embedding the
+flexible-array member in the middle of `struct qat_alg_fixed_buf_list`.
 
-Tested-by: Lukas Wunner <lukas@wunner.de>
+Also, use `container_of()` whenever we need to retrieve a pointer to
+the flexible structure.
+
+So, with these changes, fix the following warnings:
+drivers/crypto/intel/qat/qat_common/qat_bl.h:25:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+drivers/crypto/intel/qat/qat_common/qat_bl.h:25:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+drivers/crypto/intel/qat/qat_common/qat_bl.h:25:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+drivers/crypto/intel/qat/qat_common/qat_bl.h:25:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+drivers/crypto/intel/qat/qat_common/qat_bl.h:25:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+drivers/crypto/intel/qat/qat_common/qat_bl.h:25:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+drivers/crypto/intel/qat/qat_common/qat_bl.h:25:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+drivers/crypto/intel/qat/qat_common/qat_bl.h:25:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+
+Link: https://github.com/KSPP/linux/issues/202
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ drivers/crypto/intel/qat/qat_common/qat_bl.c |  6 ++++--
+ drivers/crypto/intel/qat/qat_common/qat_bl.h | 11 +++++++----
+ 2 files changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_bl.c b/drivers/crypto/intel/qat/qat_common/qat_bl.c
+index 76baed0a76c0..338acf29c487 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_bl.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_bl.c
+@@ -81,7 +81,8 @@ static int __qat_bl_sgl_to_bufl(struct adf_accel_dev *accel_dev,
+ 		if (unlikely(!bufl))
+ 			return -ENOMEM;
+ 	} else {
+-		bufl = &buf->sgl_src.sgl_hdr;
++		bufl = container_of(&buf->sgl_src.sgl_hdr,
++				    struct qat_alg_buf_list, hdr);
+ 		memset(bufl, 0, sizeof(struct qat_alg_buf_list));
+ 		buf->sgl_src_valid = true;
+ 	}
+@@ -139,7 +140,8 @@ static int __qat_bl_sgl_to_bufl(struct adf_accel_dev *accel_dev,
+ 			if (unlikely(!buflout))
+ 				goto err_in;
+ 		} else {
+-			buflout = &buf->sgl_dst.sgl_hdr;
++			buflout = container_of(&buf->sgl_dst.sgl_hdr,
++					       struct qat_alg_buf_list, hdr);
+ 			memset(buflout, 0, sizeof(struct qat_alg_buf_list));
+ 			buf->sgl_dst_valid = true;
+ 		}
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_bl.h b/drivers/crypto/intel/qat/qat_common/qat_bl.h
+index d87e4f35ac39..85bc32a9ec0e 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_bl.h
++++ b/drivers/crypto/intel/qat/qat_common/qat_bl.h
+@@ -15,14 +15,17 @@ struct qat_alg_buf {
+ } __packed;
+ 
+ struct qat_alg_buf_list {
+-	u64 resrvd;
+-	u32 num_bufs;
+-	u32 num_mapped_bufs;
++	/* New members must be added within the __struct_group() macro below. */
++	__struct_group(qat_alg_buf_list_hdr, hdr, __packed,
++		u64 resrvd;
++		u32 num_bufs;
++		u32 num_mapped_bufs;
++	);
+ 	struct qat_alg_buf buffers[];
+ } __packed;
+ 
+ struct qat_alg_fixed_buf_list {
+-	struct qat_alg_buf_list sgl_hdr;
++	struct qat_alg_buf_list_hdr sgl_hdr;
+ 	struct qat_alg_buf descriptors[QAT_MAX_BUFF_DESC];
+ } __packed __aligned(64);
+ 
+-- 
+2.34.1
+
