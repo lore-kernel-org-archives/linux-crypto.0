@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014641C2AF;
-	Tue, 26 Mar 2024 18:04:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D941A1CAA6;
+	Tue, 26 Mar 2024 18:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711476293; cv=none; b=LIuD8tXiz1ctkXP3rOxhlzoZYytlSQOaoiIOBkjbNXPRUB9FXGGwkOBcOq6OW7OLEeVcx8LAJborbdZzxbVqgZO18NjZFq/qrStzQ1uaooB9HI1Uxw7wemDGETARcEQ70enx+2KmeYts3kSoRmJ+xiW2SpyN1m67anbzbwdh5K8=
+	t=1711476584; cv=none; b=pTR75ufTnT7Zws4Qy1dcKeNibTz+6PJQ/MXwFV6MwBXegjR56+z1qwAXzixqp5b/l3AMbKb64ggE5FyLBMtHeHYuu/VTEO1AD8jNsWWoF7C4chOBXkg/cl1TAF7mhER76VEdvnPkLVEKsrOp4cnS0spBG4zhkApT+bbtDlc6oS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711476293; c=relaxed/simple;
-	bh=FpwR17g2PH56G0XDh6Pi3WB67cdLCnSyZjbxboXsr0w=;
+	s=arc-20240116; t=1711476584; c=relaxed/simple;
+	bh=BoZYsRYkImtz4DrtH6xel+18JVsPtJGNgh1WEY1wxXI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h1xPafAie7fDsuf+0O8Hs6Ahv6Nefcio/yyFwhZO3O9+gyGBOHh+PiCJND6Q94P/Bban9JziEnRuO4OVMOp3OWbKyhkjzaC8rO4ahKeBDwI6BdoDlAnhE4GClMaPaGDKu8xnv662CuGk1JyP98y69CkJu4GArg/XKFm78V5Gg8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OhqPwuZT; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=XuUWZQudTPOsRUIMxs2ESI//pv1hZ0B2RxWv3l01HxRZtgzL12ePlnDQpwxHq7FIN9ctu8XoCXnXJl6JE+mtXyGmagqGTkIHYqT5YRbsM2PwX2IEgaGkO8cryRoldjjybX91VbFDxHMU4IIbg/EcapC2FAI7UKFxADXaxnlendA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOHCFZ9b; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OhqPwuZT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14588C433F1;
-	Tue, 26 Mar 2024 18:04:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOHCFZ9b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CDD0C433F1;
+	Tue, 26 Mar 2024 18:09:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711476292;
-	bh=FpwR17g2PH56G0XDh6Pi3WB67cdLCnSyZjbxboXsr0w=;
+	s=k20201202; t=1711476583;
+	bh=BoZYsRYkImtz4DrtH6xel+18JVsPtJGNgh1WEY1wxXI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OhqPwuZTdQ1s7BpgL1VIfuejwlhhnnaQebCxnJRAG0seH7mpEyQLj8LiyS6MhTs3D
-	 lAsHUNE6c5YMjRyPqRfd1SioWqtf+T74GNlkByMBviw6YJiCSjPGxhY8iRV7s+qwcw
-	 qvxfkjefy4d0o2sX9eBnM6zuVZg4clFyVlPCmIJyIxM8jje4z1vxa1H/D7ZoHNxCAe
-	 guE2pbxtTTqlzpZDIeZhzbw08HFzcIv+Jo5mI8SXPjbXWVcQQZBNyz5cPX9gVYg6VV
-	 t3oNj0XtFGgXIuFircYNgE4t+HXmIX9iZSHEVETnqq+FzRLbUdLtwNm0Oh2a/ILudH
-	 H3VeWif2pNhEA==
-Date: Tue, 26 Mar 2024 18:04:46 +0000
+	b=AOHCFZ9bDZOrngpBwpMwYFCeEDFkL77M5GOcuPWQRkrWUjl+XdKuDZr8hcfK9o0vZ
+	 HRhT0RkXWKow1fzxVkShJL1uD2BSPMXVokd4IRhLwwgbpsAjkDRlX3pLEjgxCh5emD
+	 zLBOfhOuUIvlztzxtgeSCN7ua5iJpN5DsUUNVf0tL1AeyhDeoqvz0ZAmTQSFzcjAfk
+	 FmMcFTwXzT9mwsqSbPXZp+PGkmo0O+HGdiNEdsvnehCAYPJpqvyAmMVo7oOuEWmo1B
+	 WzBAKvhpSArGc60m/n5vwVxQf5GTmftn5jjhANsPazROoKgNW7V8nI8Dk0WQ751yBY
+	 OkAkwhx1Oa0tQ==
+Date: Tue, 26 Mar 2024 18:09:37 +0000
 From: Conor Dooley <conor@kernel.org>
 To: Alexey Romanov <avromanov@salutedevices.com>
 Cc: neil.armstrong@linaro.org, clabbe@baylibre.com,
@@ -37,10 +37,11 @@ Cc: neil.armstrong@linaro.org, clabbe@baylibre.com,
 	linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
 	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
-Subject: Re: [PATCH v6 19/23] dt-bindings: crypto: meson: support new SoC's
-Message-ID: <20240326-boneless-patrol-b1156a4be70b@spud>
+Subject: Re: [PATCH v6 17/23] dt-bindings: crypto: meson: remove clk and
+ second interrupt line for GXL
+Message-ID: <20240326-obscurity-angriness-d7bb48bc9eaa@spud>
 References: <20240326153219.2915080-1-avromanov@salutedevices.com>
- <20240326153219.2915080-20-avromanov@salutedevices.com>
+ <20240326153219.2915080-18-avromanov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,74 +49,85 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="TsFS7LpYqhJ6X8MW"
+	protocol="application/pgp-signature"; boundary="+unRSAILer2Qnn5+"
 Content-Disposition: inline
-In-Reply-To: <20240326153219.2915080-20-avromanov@salutedevices.com>
+In-Reply-To: <20240326153219.2915080-18-avromanov@salutedevices.com>
 
 
---TsFS7LpYqhJ6X8MW
+--+unRSAILer2Qnn5+
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 26, 2024 at 06:32:15PM +0300, Alexey Romanov wrote:
-> Now crypto module available at G12A/G12B/S4/A1/SM1/AXG.
+On Tue, Mar 26, 2024 at 06:32:13PM +0300, Alexey Romanov wrote:
+> GXL crypto IP uses DMA engine, which doesn't require clk input
+> and second interrupt line.
 >=20
-> 1. Add new compatibles:
->   - amlogic,g12a-crypto
->   - amlogic,axg-crypto
->   - amlogic,a1-crypto
->   - amlogic,s4-crypto (uses a1-crypto as fallback)
->=20
-> 2. Add power-domains in schema.
->=20
+> Fixes: c4a0457eb858 ("ARM64: dts: amlogic: adds crypto hardware node")
+
+How does this fix a commit that only modifies a dts? The commit cited
+here should be a dt-bindings commit.
+
+However, your commit message says "require" but you do more than remove
+these as required, you remove them entirely. What am I missing?
+
+Thanks,
+Conor.
+
 > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
 > ---
->  .../bindings/crypto/amlogic,gxl-crypto.yaml       | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
+>  .../bindings/crypto/amlogic,gxl-crypto.yaml         | 13 +------------
+>  1 file changed, 1 insertion(+), 12 deletions(-)
 >=20
 > diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.=
 yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> index d3af7b4d5f39..c92edde314aa 100644
+> index 948e11ebe4ee..d3af7b4d5f39 100644
 > --- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
 > +++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> @@ -11,8 +11,16 @@ maintainers:
-> =20
->  properties:
->    compatible:
-> -    items:
-> -      - const: amlogic,gxl-crypto
-> +    oneOf:
-> +      - items:
-> +          - enum:
-> +              - amlogic,s4-crypto
-> +          - const: amlogic,a1-crypto
-> +      - enum:
-> +          - amlogic,gxl-crypto
-> +          - amlogic,axg-crypto
-> +          - amlogic,g12a-crypto
-> +          - amlogic,a1-crypto
-> =20
->    reg:
->      maxItems: 1
-> @@ -21,6 +29,9 @@ properties:
+> @@ -20,20 +20,11 @@ properties:
+>    interrupts:
 >      items:
 >        - description: Interrupt for flow 0
+> -      - description: Interrupt for flow 1
+> -
+> -  clocks:
+> -    maxItems: 1
+> -
+> -  clock-names:
+> -    const: blkmv
 > =20
-> +  power-domains:
-> +    maxItems: 1
+>  required:
+>    - compatible
+>    - reg
+>    - interrupts
+> -  - clocks
+> -  - clock-names
+> =20
+>  additionalProperties: false
+> =20
+> @@ -46,7 +37,5 @@ examples:
+>      crypto: crypto-engine@c883e000 {
+>          compatible =3D "amlogic,gxl-crypto";
+>          reg =3D <0xc883e000 0x36>;
+> -        interrupts =3D <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>, <GIC_SPI 189 =
+IRQ_TYPE_EDGE_RISING>;
+> -        clocks =3D <&clkc CLKID_BLKMV>;
+> -        clock-names =3D "blkmv";
+> +        interrupts =3D <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>;
+>      };
+> --=20
+> 2.34.1
+>=20
 
-Is power-domains valid for the devices that existed prior to your patch?
-
---TsFS7LpYqhJ6X8MW
+--+unRSAILer2Qnn5+
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZgMOPgAKCRB4tDGHoIJi
-0tshAQCtbEqOHiJFUm5lxRMtAn+5YxU2CDgCh0rFA4v9v07M5QEAtxnoZzj0b3c8
-yH8w5AJrE8FRKbXSqTKMNF83M4Te2Qo=
-=OFV3
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZgMPYQAKCRB4tDGHoIJi
+0gUyAQDBzDH7NW6Up524dyfrQC8iScX/snnaCE/sN+SA8QNCzgD/RMPYlpchBH5p
+HInA6ICfV7K+t9Br+NT/w6F9vNuzyQY=
+=FyeI
 -----END PGP SIGNATURE-----
 
---TsFS7LpYqhJ6X8MW--
+--+unRSAILer2Qnn5+--
