@@ -1,173 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E060F13664E;
-	Tue, 26 Mar 2024 08:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FD412AAEC;
+	Tue, 26 Mar 2024 08:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711440365; cv=none; b=hWYC6fQZDImJ4+QnUqdrLvlCdvScfDCtn0KGb9cpH2XyReSN1zXhy8ZQu6Qd1DoXzFuCsJFPJ0tHZatVA/8IeRWqBc1/UQ027LVOrm2P00R93Hn7PBcUlhQd6O/GNAtopvFCAvl6SgD6vZIcCnzRr7zfMaCNxuU4nwzm87gNfbY=
+	t=1711440620; cv=none; b=GBwL+GClP5Mgy7VZZTzx3OyeaZIpdubxPqdpBd2DWfaCvJ5gSEpW6fm8PFPhiob+CwqX+X58mXATP612YknMqL/HYUXnAg60OSGaKAOUTMliGND0RdxtsThI8wjkZ8nCQigF7nhqVWM/qVKot/Hb5gnQGxpYfm4iaBokwEIly7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711440365; c=relaxed/simple;
-	bh=ZlxDvu9l7nXvQJFAq2dKxijHSNJoP2+Pk3O48836x94=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pZUhsBWg+JDsW3gAR3OtdlOAEpDEeJUgU7iD4w2niacXkFXf6cnEskbWiyWfxiTf8LMOAh2Nw4rfHs9gvOd/ES9q05qaC+g/D8YaobvYIPYd+pFEuAlx7BDUHCqtsx+SjjiG9uLNQtCaiRtW0lfO8z2/9whmDADLkd9FMSJH9bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4KcKZBM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711440620; c=relaxed/simple;
+	bh=UE+rBO/SzfXH+xegaXkyksSZkdDCOyLf+Zjv/2b9PkY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U3vCC0T1MCzQFEaF3yH5T3SVup78tRhZUBOHs8e3oI0v8tsrg3zEq2i+PSpdUz07yqXRcBlLPC8Axo6U5YDjzckH2/LbxJeY8qlKFnvDQJYVPdgCv8jKAP22GfV04JXFp1Tg2a59NdOfGIieW4I/msP7LnehD2llHPYllzJqqTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VW209+LY; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4KcKZBM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62F71C3278B;
-	Tue, 26 Mar 2024 08:06:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711440364;
-	bh=ZlxDvu9l7nXvQJFAq2dKxijHSNJoP2+Pk3O48836x94=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q4KcKZBM2G6Qk7FZnb50z68YbUTHN5CRMPKrjC/0cGBPlSBEkwOqAkrn7IVaZGIsR
-	 Dn4rDmDtaHefrljTmmPSVuJhdSvxPddDfViTTuvi5vHRLZPqnVnARK8FGCrL8gvoAl
-	 OLjwITM8kb0jYXxW3osyQ3HdfvFaH2S9xisY/YPI4hcOaxFDg8S39aG0nT+0XZ+1g4
-	 ma2h0nCypRPFYrzm8GHJlS3vNqxLP45/SXMAeRoXoUUznYyUKe/Y5cGy6KR0zxf6mg
-	 KdBjX2sSsrxv5M/4iCEWn5rD7ZMLs+F7KBuFTQhzX5Aqwd8sXEAj9eeZ/LGekY12uN
-	 Gbctuzqm7UwEA==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-	x86@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VW209+LY"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-513d599dbabso6832286e87.1;
+        Tue, 26 Mar 2024 01:10:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711440617; x=1712045417; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PzQhaG35S/6UwDeOcfUmN5ro7w9ToDnNuXjMnx/wsTI=;
+        b=VW209+LYXSpN8ilQ91OjEQYyxRJT4CMsKwJ1HtquVeQN2G2/OzHyjYuHyVCE/fIPh4
+         OEJGGwCeNG1/4vOYTZmhNM8EOw9SOt8aWw6+QTfMf8EET2EQEi6Gbu4+IdrgVqiPDdTO
+         tFL0LkmbJpnqbUK6UzOrjQtvy+jY2bbwIpUaPsivrCartPyR29GPEmi7zFV2ghPFegwQ
+         B5LAKGsoTIxms3gbzA2vfqwX6ImzaX6CO9L8z2WO36Hbd7WyjxVULCiGcgrXj7SwWsZN
+         XKpcFbnKgU4r3ESUjZDmlK5XZoVq6bAurg/e+KSU5Fzj/7Sryvw5o3LvB+IvxPnyKd9t
+         MMcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711440617; x=1712045417;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PzQhaG35S/6UwDeOcfUmN5ro7w9ToDnNuXjMnx/wsTI=;
+        b=kAcKnf6dKztLOZ98+lPgkMsxwQBvORIWevHRygd1Q6Q+JjfzbuJp5JOdT9byr5l8L7
+         RES+0AQKvSI0S/ycPTVe0TTMxzt+HyGQlQcxGIkk97CUIyUWwnJYsKYe7AoaqgBeFEDJ
+         7+fxvfCf0ve4fZgWgQ4qEzFfFrI3pHY3sLiVeMFHI3+Ryw8nowJwIubVo5nBUh/cg4fU
+         liFVmQ4j2W4TNoP8MKoepDCw8Yggj/HzIDiEApQr9+Dvv2h2Mv3iL1wepZhNSfGv43hR
+         bmzh/9ScTzvMyL63hkx7naTB8vB0eomXgzJDkkWeJK8qdxSd9n6QYM3B88MSzw80qcGB
+         birA==
+X-Forwarded-Encrypted: i=1; AJvYcCXdZqbaDo4fCs9OkUHjp+0bTEovGeyu/xLl4bm/Wq1uYXGSDKj8aqDaSgCqkIJMzsYK6OQvFqMrFuI+cUVb34+Ege23rGLSeLSqF8ch
+X-Gm-Message-State: AOJu0YwCAaxeEYG5Je0tNjJ3rpPirvWAAX1ocwFuobw0+FfIM/dt9ryu
+	4sEXP8Iq8APw4bGRmT9ZIgu+wvXu6YWfE2P50dBL15WUIuIv7h2k
+X-Google-Smtp-Source: AGHT+IF8yfTE2aE3kJKB+qSMX2f+wOgVJF6x8Yxdvk7qZLHIUGBPxD2j1bvns39914MaPNqihYxK1Q==
+X-Received: by 2002:a05:6512:616:b0:513:ccec:a822 with SMTP id b22-20020a056512061600b00513cceca822mr6810025lfe.28.1711440616315;
+        Tue, 26 Mar 2024 01:10:16 -0700 (PDT)
+Received: from gmail.com (1F2EF63C.nat.pool.telekom.hu. [31.46.246.60])
+        by smtp.gmail.com with ESMTPSA id t25-20020a056402241900b0056bd13ce50esm3828015eda.44.2024.03.26.01.10.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 01:10:15 -0700 (PDT)
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Date: Tue, 26 Mar 2024 09:10:13 +0100
+From: Ingo Molnar <mingo@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
 	Andy Lutomirski <luto@kernel.org>,
 	"Chang S . Bae" <chang.seok.bae@intel.com>
-Subject: [PATCH 6/6] crypto: x86/aes-xts - wire up VAES + AVX10/512 implementation
-Date: Tue, 26 Mar 2024 01:03:04 -0700
-Message-ID: <20240326080305.402382-7-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240326080305.402382-1-ebiggers@kernel.org>
+Subject: Re: [PATCH 1/6] x86: add kconfig symbols for assembler VAES and
+ VPCLMULQDQ support
+Message-ID: <ZgKC5dcqWSEkwuTX@gmail.com>
 References: <20240326080305.402382-1-ebiggers@kernel.org>
+ <20240326080305.402382-2-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240326080305.402382-2-ebiggers@kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
 
-Add an AES-XTS implementation "xts-aes-vaes-avx10_512" for x86_64 CPUs
-with the VAES, VPCLMULQDQ, and either AVX10/512 or AVX512BW + AVX512VL
-extensions.  This implementation uses zmm registers to operate on four
-AES blocks at a time.  The assembly code is instantiated using a macro
-so that most of the source code is shared with other implementations.
+* Eric Biggers <ebiggers@kernel.org> wrote:
 
-To avoid downclocking on older Intel CPU models, an exclusion list is
-used to prevent this 512-bit implementation from being used by default
-on some CPU models.  They will use xts-aes-vaes-avx10_256 instead.  For
-now, this exclusion list is simply coded into aesni-intel_glue.c.  It
-may make sense to eventually move it into a more central location.
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Add config symbols AS_VAES and AS_VPCLMULQDQ that expose whether the
+> assembler supports the vector AES and carryless multiplication
+> cryptographic extensions.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  arch/x86/Kconfig.assembler | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/arch/x86/Kconfig.assembler b/arch/x86/Kconfig.assembler
+> index 8ad41da301e5..59aedf32c4ea 100644
+> --- a/arch/x86/Kconfig.assembler
+> +++ b/arch/x86/Kconfig.assembler
+> @@ -23,9 +23,19 @@ config AS_TPAUSE
+>  config AS_GFNI
+>  	def_bool $(as-instr,vgf2p8mulb %xmm0$(comma)%xmm1$(comma)%xmm2)
+>  	help
+>  	  Supported by binutils >= 2.30 and LLVM integrated assembler
+>  
+> +config AS_VAES
+> +	def_bool $(as-instr,vaesenc %ymm0$(comma)%ymm1$(comma)%ymm2)
+> +	help
+> +	  Supported by binutils >= 2.30 and LLVM integrated assembler
 
-xts-aes-vaes-avx10_512 is slightly faster than xts-aes-vaes-avx10_256 on
-some current CPUs.  E.g., on Intel Sapphire Rapids, AES-256-XTS
-decryption throughput increases by 5.6% with 4096-byte inputs, or 8.9%
-with 512-byte inputs.  On AMD Genoa, AES-256-XTS decryption throughput
-increases by 15.3% with 4096-byte inputs, or 7.6% with 512-byte inputs.
+Nit: any reason it isn't called AS_VAESENC, like the instruction itself?
 
-Future CPUs may provide stronger 512-bit support, in which case a larger
-benefit should be seen.
+The other new AS_ Kconfig symbols follow the same nomenclature:
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/aes-xts-avx-x86_64.S |  9 ++++++++
- arch/x86/crypto/aesni-intel_glue.c   | 33 +++++++++++++++++++++++++++-
- 2 files changed, 41 insertions(+), 1 deletion(-)
+> +config AS_VPCLMULQDQ
+> +	def_bool $(as-instr,vpclmulqdq \$0x10$(comma)%ymm0$(comma)%ymm1$(comma)%ymm2)
+> +	help
+> +	  Supported by binutils >= 2.30 and LLVM integrated assembler
+> +
+>  config AS_WRUSS
+>  	def_bool $(as-instr,wrussq %rax$(comma)(%rbx))
+>  	help
+>  	  Supported by binutils >= 2.31 and LLVM integrated assembler
 
-diff --git a/arch/x86/crypto/aes-xts-avx-x86_64.S b/arch/x86/crypto/aes-xts-avx-x86_64.S
-index c868b9af443b..024fc12c9a94 100644
---- a/arch/x86/crypto/aes-xts-avx-x86_64.S
-+++ b/arch/x86/crypto/aes-xts-avx-x86_64.S
-@@ -782,6 +782,15 @@ SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx10_256)
- 	aes_xts_crypt	1
- SYM_FUNC_END(aes_xts_encrypt_vaes_avx10_256)
- SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx10_256)
- 	aes_xts_crypt	0
- SYM_FUNC_END(aes_xts_decrypt_vaes_avx10_256)
-+
-+.set	VL, 64
-+.set	USE_AVX10, 1
-+SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx10_512)
-+	aes_xts_crypt	1
-+SYM_FUNC_END(aes_xts_encrypt_vaes_avx10_512)
-+SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx10_512)
-+	aes_xts_crypt	0
-+SYM_FUNC_END(aes_xts_decrypt_vaes_avx10_512)
- #endif /* CONFIG_AS_VAES && CONFIG_AS_VPCLMULQDQ */
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index ac45e0b952b7..49b259dff81f 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1296,12 +1296,32 @@ static struct simd_skcipher_alg *aes_xts_simdalg_##suffix
- 
- DEFINE_XTS_ALG(aesni_avx, "xts-aes-aesni-avx", 500);
- #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)
- DEFINE_XTS_ALG(vaes_avx2, "xts-aes-vaes-avx2", 600);
- DEFINE_XTS_ALG(vaes_avx10_256, "xts-aes-vaes-avx10_256", 700);
-+DEFINE_XTS_ALG(vaes_avx10_512, "xts-aes-vaes-avx10_512", 800);
- #endif
- 
-+/*
-+ * This is a list of CPU models that are known to suffer from downclocking when
-+ * zmm registers (512-bit vectors) are used.  On these CPUs, the AES-XTS
-+ * implementation with zmm registers won't be used by default.  An
-+ * implementation with ymm registers (256-bit vectors) will be used instead.
-+ */
-+static const struct x86_cpu_id zmm_exclusion_list[] = {
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_SKYLAKE_X },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_X },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_D },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_L },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_NNPI },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_TIGERLAKE_L },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_TIGERLAKE },
-+	/* Allow Rocket Lake and later, and Sapphire Rapids and later. */
-+	/* Also allow AMD CPUs (starting with Zen 4, the first with AVX-512). */
-+};
-+
- static int __init register_xts_algs(void)
- {
- 	int err;
- 
- 	if (!boot_cpu_has(X86_FEATURE_AVX))
-@@ -1331,11 +1351,19 @@ static int __init register_xts_algs(void)
- 
- 	err = simd_register_skciphers_compat(&aes_xts_alg_vaes_avx10_256, 1,
- 					     &aes_xts_simdalg_vaes_avx10_256);
- 	if (err)
- 		return err;
--#endif
-+
-+	if (x86_match_cpu(zmm_exclusion_list))
-+		aes_xts_alg_vaes_avx10_512.base.cra_priority = 1;
-+
-+	err = simd_register_skciphers_compat(&aes_xts_alg_vaes_avx10_512, 1,
-+					     &aes_xts_simdalg_vaes_avx10_512);
-+	if (err)
-+		return err;
-+#endif /* CONFIG_AS_VAES && CONFIG_AS_VPCLMULQDQ */
- 	return 0;
- }
- 
- static void unregister_xts_algs(void)
- {
-@@ -1346,10 +1374,13 @@ static void unregister_xts_algs(void)
- 		simd_unregister_skciphers(&aes_xts_alg_vaes_avx2, 1,
- 					  &aes_xts_simdalg_vaes_avx2);
- 	if (aes_xts_simdalg_vaes_avx10_256)
- 		simd_unregister_skciphers(&aes_xts_alg_vaes_avx10_256, 1,
- 					  &aes_xts_simdalg_vaes_avx10_256);
-+	if (aes_xts_simdalg_vaes_avx10_512)
-+		simd_unregister_skciphers(&aes_xts_alg_vaes_avx10_512, 1,
-+					  &aes_xts_simdalg_vaes_avx10_512);
- }
- #else
- static int __init register_xts_algs(void)
- {
- 	return 0;
--- 
-2.44.0
+With the nit above fixed:
 
+  Reviewed-by: Ingo Molnar <mingo@kernel.org>
+
+Thanks,
+
+	Ingo
