@@ -1,134 +1,152 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAB51428FA
-	for <linux-crypto@vger.kernel.org>; Tue, 26 Mar 2024 20:24:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC073FD4;
+	Tue, 26 Mar 2024 21:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711484683; cv=none; b=J6BRbcKjG8Q73WNjTNzCkzzyT6WSHegTkBhInBGscIRNdZeP5A5uOj1b44PDO8tgGJv98E/l/lRGJ5BhxF771JsVknR2AT6mu8oFfngj010daiTGL6C38KGt0vwG7GeqbzYkCVGNftitUhyRy92qDk2GF/R3u/UXQcFyMW7ZcOI=
+	t=1711489311; cv=none; b=HSlPd/ssiBAa9dmK3vRLAJhnyHyXiY4yzL4cfU5j6CF75bguPOHFWxvUJcLV/RGfWgfTVsR4ezM5qgd1nt7PQV4NZ8lURsTpv+loptYml5NtlYhNPTsAMR5LCaV/NrGA81G0L1RzEUmGy5oT7lHKbIJTlnStNeKHqhcDMoa6VKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711484683; c=relaxed/simple;
-	bh=ojs7mEKPrcvVUr2JWEMqEzKtHrhLtgwuKK5bfH7PiKY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=PtgGyPCsQ22rXKvbGRfHouYr6cAUnwDAYNDaYuYPpb+LOAranWZb2lKpHRmmczT0L/MeQzKFiPTQ9/+MPzAUt149Fsz5TR0P5Qpp2TSbMzFGbPa3mdq2z2I6EDIOBPatm+dTxASgXrhFywFUH2iavIC4R3HroahKd4xnBGTOakc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Z+Krid79; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1711489311; c=relaxed/simple;
+	bh=BzpgpbWcoTc7ijZRETE4B+xMagDt/ZzZpxxIA4FcHFA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dCqOpAr5QqpBZnzlEBsKpUS6wDzNSDSfxGTXHPQi+Hdj7rnsE41sK03/xqEFVuYbD99k0m2UCcv2tn0LDRJDCNB7+sqpkHVPIxXM0FGNbp6n85/p25M/V6ffWDYdR6MaTnj+bxFTRhQEvFjDxbIYmMfAUJ6JyRDSon9xB2FxyLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NAPOQrsf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z+Krid79"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-568c714a9c7so7001047a12.2
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Mar 2024 13:24:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711484679; x=1712089479; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Evydkn1Lb5ncyuedil0BLosCcwb0y4nVC6Xek2Vd9oM=;
-        b=Z+Krid795vrVpYVCGUSU7L98sxumHHvjb32dFWYWSuNrUGG/JPr0kvGaUbFdXGOYCL
-         VXwQLSRMwahixlxjmiA9sQ295xkKKKXgJuOY7Ztp+kGFOZ9K+2Xx7NbLB6LLUyUDdWO5
-         sHp0hT3NX+yF51CQ9PGp0FXfegNkAjbwOXZQvnCRTRtG0YxCHYW+WdEuVS3Gx0h2E/BM
-         7HellXDPEGPuhgs/ul366uHAgTHWFhgZ5A/ua60jTJYQkkPYSFJAI7S6oKI4jL6qp2un
-         D0Gl1M3S4fblm4/w++33Kn80NMAGEMZzxzuIywL8AtPHSwLd7QePMpsPm85/duAjVt7z
-         JQzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711484679; x=1712089479;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Evydkn1Lb5ncyuedil0BLosCcwb0y4nVC6Xek2Vd9oM=;
-        b=pBpj8oeb/m7FCDwD65aOIRk25gwKpkuZftRFwrYUCY/gVPrZYtMirbAbbTz8W6pB37
-         jNP2MeMdVBf5jddveZnMZqWw/4jTy4ceLbdt027a1U40Y4IxKA3I7MeTE7eI+HfhMcdK
-         PltCkiaHm5ZeDQ1/BsA9kesN7e6Z7ibcAD5QX0J7hKHVyhDxMTa530nTAyRf2scrbNco
-         kxIG74ZDb+6aGJsTYAcIolL5LDAuhAdIoElw39XsStaDVW45pxV5Q9UTE9unIfkyvvTd
-         XsdHONrRYKG/DMafmpw/jx/c2qYGNHP+2kEMp4qSQjWYr8VqmVNptNOiGRqDeP3RiDBo
-         D2Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCU6P7zZPWvlBkmAzn/Sxg7OHCHHVzmsYPgzFT6h002W21mIQCFSi9Tw4CraDX4k7VTrcaQc1y5ZRiMen/vDk8pINF0Po8wiqAL6Oizy
-X-Gm-Message-State: AOJu0Yw1dMTeit9/kScfQi4bLOEP7QBXEypTrVjRxCoyaBEBfjS6t1Ie
-	bGMxps5M1C1tWteo3xQ8ZjFbtZkLffwG955ih9tw1yZ9InBZWZsUKbyHlwGBXy8=
-X-Google-Smtp-Source: AGHT+IFgvfjWWox9Uo3i/AT2VYhjSoo4ckuT5rPp5BpEMm6OBEQgZd29xjK7bZzgB1ctJUvP8kQ51A==
-X-Received: by 2002:a17:906:3013:b0:a47:3409:2948 with SMTP id 19-20020a170906301300b00a4734092948mr499391ejz.38.1711484678778;
-        Tue, 26 Mar 2024 13:24:38 -0700 (PDT)
-Received: from [127.0.1.1] ([178.197.222.44])
-        by smtp.gmail.com with ESMTPSA id b2-20020a1709062b4200b00a4725e4f53asm4584492ejg.40.2024.03.26.13.24.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 13:24:38 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Tue, 26 Mar 2024 21:23:49 +0100
-Subject: [PATCH 19/19] vfio: amba: drop owner assignment
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NAPOQrsf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9564FC43390;
+	Tue, 26 Mar 2024 21:41:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711489310;
+	bh=BzpgpbWcoTc7ijZRETE4B+xMagDt/ZzZpxxIA4FcHFA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NAPOQrsf9xO+R4J++979fPR1mikCnDwT2YSA3eK5h6kFH5ZvtO+EH4mROmh3jCTkb
+	 NdGVwPhQ9N7LaJlSmZJLUD00Wg1nn7pSzRprRip0XlPX3BVGf/+WIJ8gbGBsXJTjOk
+	 ThYy/tIUsivm9/O47z73Y2hFxdek6ao2HiQIEzaTo5RxUJVx5+6KeKKedtsnb/15rT
+	 rU9ZczreTQJq/5f+QievxNgsRhIn4jrmxJ0fYCh9yP+Qi8VSE2J/kzUc/IlqxqVIGi
+	 HM+bdbs2HbhqJcZHe7PuQraZmQrI2a+rJBHMhI5NFCcDHUcHVpVWGiM2CgcMFDYzKP
+	 1XknHlt85fr/w==
+Date: Tue, 26 Mar 2024 16:41:48 -0500
+From: Rob Herring <robh@kernel.org>
+To: Conor Dooley <conor@kernel.org>
+Cc: Animesh Agarwal <animeshagarwal28@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: crypto: ti,omap-sham: Convert to dtschema
+Message-ID: <20240326214148.GA3709211-robh@kernel.org>
+References: <20240326120107.13442-1-animeshagarwal28@gmail.com>
+ <20240326-spectrum-talon-0fc977c32c5c@spud>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240326-module-owner-amba-v1-19-4517b091385b@linaro.org>
-References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
-In-Reply-To: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
-To: Russell King <linux@armlinux.org.uk>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Mike Leach <mike.leach@linaro.org>, James Clark <james.clark@arm.com>, 
- Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Linus Walleij <linus.walleij@linaro.org>, 
- Andi Shyti <andi.shyti@kernel.org>, Olivia Mackall <olivia@selenic.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, Vinod Koul <vkoul@kernel.org>, 
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, 
- Michal Simek <michal.simek@amd.com>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
- Eric Auger <eric.auger@redhat.com>, 
- Alex Williamson <alex.williamson@redhat.com>
-Cc: linux-kernel@vger.kernel.org, coresight@lists.linaro.org, 
- linux-arm-kernel@lists.infradead.org, 
- linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org, 
- linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
- linux-input@vger.kernel.org, kvm@vger.kernel.org
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=679;
- i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=ojs7mEKPrcvVUr2JWEMqEzKtHrhLtgwuKK5bfH7PiKY=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBmAy7cQ2wMjp46pnEE8icKKqMelI6pPSmG+hUfb
- 2ZrlhxjMw+JAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZgMu3AAKCRDBN2bmhouD
- 13gZD/4v9CVFU7qVO1P9WYH/VG3+reXnSoM713azcrYjyCKdI7dioF4epmmI1zi/UB/Ls061Qv8
- SrlosGP6BdnuD97+Kvw/cpKXm9HmT9jZkcDUKzpPh9JIh/t1us2INa0wjhDPp4P4wb5vS1VQbqf
- knzsoX+/dcV5b+/3iPoc6xeP0r9lhTYHmVHMmW+eSiiGBW2QCBbJsYnKrnNhv6rLaRSq57U1nHx
- pT71c7XiLtDPKStg5wPxjzjpHq4jWPxaTFrh3LQmtnRzN5bhVUbrCUzab+4ktZS9yimWLF4a+Oo
- iAT7g98DxDdr8jSClcqQu87kLTLqjxaseT/J1dplC/DdXUdP5Mep1DYMRjKI3Q/YYlWvTBJ0lNt
- 5myY9ur2Ia4Nueg1OJ3LZT3VmNq2tcSG3uWqM3D1NLDlM8ptjTMnfEMaAio2NCUpuiRo2x6H2Jc
- ZcF1QzB99fnqpxdMfZ4KJNgdRfZyMp3/9Z7xlMC4J2UTLz1mm1aQRplMfE5t2wRcqNTDQ6SEorz
- Ok5M2JDCYslcCDpBS8zXB/nwzbwFGsCubbWPopaZpdma6LdVcyKYFnBHeRjMptl4qFsnIPRL+J2
- zLgKtjqK87ihte/KUXER7VcN2ABZHfh6N3p+xK2LfGxwdEyjrz72tFdE1bh8ND0soV3z3u97Ju4
- aPVYjjB/5NvG2Zw==
-X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
- fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240326-spectrum-talon-0fc977c32c5c@spud>
 
-Amba bus core already sets owner, so driver does not need to.
+On Tue, Mar 26, 2024 at 06:20:05PM +0000, Conor Dooley wrote:
+> On Tue, Mar 26, 2024 at 05:31:00PM +0530, Animesh Agarwal wrote:
+> > Convert the OMAP SoC SHA crypto Module bindings to DT Schema.
+> > 
+> > Signed-off-by: Animesh Agarwal <animeshagarwal28@gmail.com>
+> > ---
+> >  .../devicetree/bindings/crypto/omap-sham.txt  | 28 ----------
+> >  .../bindings/crypto/ti,omap-sham.yaml         | 56 +++++++++++++++++++
+> >  2 files changed, 56 insertions(+), 28 deletions(-)
+> >  delete mode 100644 Documentation/devicetree/bindings/crypto/omap-sham.txt
+> >  create mode 100644 Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
+> > 
+> > diff --git a/Documentation/devicetree/bindings/crypto/omap-sham.txt b/Documentation/devicetree/bindings/crypto/omap-sham.txt
+> > deleted file mode 100644
+> > index ad9115569611..000000000000
+> > --- a/Documentation/devicetree/bindings/crypto/omap-sham.txt
+> > +++ /dev/null
+> > @@ -1,28 +0,0 @@
+> > -OMAP SoC SHA crypto Module
+> > -
+> > -Required properties:
+> > -
+> > -- compatible : Should contain entries for this and backward compatible
+> > -  SHAM versions:
+> > -  - "ti,omap2-sham" for OMAP2 & OMAP3.
+> > -  - "ti,omap4-sham" for OMAP4 and AM33XX.
+> > -  - "ti,omap5-sham" for OMAP5, DRA7 and AM43XX.
+> > -- ti,hwmods: Name of the hwmod associated with the SHAM module
+> > -- reg : Offset and length of the register set for the module
+> > -- interrupts : the interrupt-specifier for the SHAM module.
+> > -
+> > -Optional properties:
+> > -- dmas: DMA specifiers for the rx dma. See the DMA client binding,
+> > -	Documentation/devicetree/bindings/dma/dma.txt
+> > -- dma-names: DMA request name. Should be "rx" if a dma is present.
+> > -
+> > -Example:
+> > -	/* AM335x */
+> > -	sham: sham@53100000 {
+> > -		compatible = "ti,omap4-sham";
+> > -		ti,hwmods = "sham";
+> > -		reg = <0x53100000 0x200>;
+> > -		interrupts = <109>;
+> > -		dmas = <&edma 36>;
+> > -		dma-names = "rx";
+> > -	};
+> > diff --git a/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml b/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
+> > new file mode 100644
+> > index 000000000000..7a2529cc4cae
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
+> > @@ -0,0 +1,56 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/crypto/ti,omap-sham.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: OMAP SoC SHA crypto Module
+> > +
+> > +maintainers:
+> > +  - Animesh Agarwal <animeshagarwal28@gmail.com>
+> > +
+> > +properties:
+> > +  compatible:
+> > +    enum:
+> > +      - ti,omap2-sham
+> > +      - ti,omap4-sham
+> > +      - ti,omap5-sham
+> > +
+> > +  ti,hwmods:
+> > +    description: Name of the hwmod associated with the SHAM module
+> > +    $ref: /schemas/types.yaml#/definitions/string
+> > +    enum: [sham]
+> 
+> Is there really only one value possible here?
+> Also, the convention is to put vendor properties like this after more
+> common properties like reg, interrupts etc.
+> 
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  interrupts:
+> > +    maxItems: 1
+> > +
+> > +  dmas:
+> > +    maxItems: 1
+> > +
+> > +  dma-names:
+> > +    const: rx
+> > +
+> > +dependencies:
+> > +  dmas: [dma-names]
+> 
+> Is this needed? Unless I'm sorely mistaken dt-schema enforces this itself
+> (and same for any $foo-names).
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+dtschema does not. It does do the other way around. This seems fine.
 
----
-
-Depends on first amba patch.
----
- drivers/vfio/platform/vfio_amba.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/vfio/platform/vfio_amba.c b/drivers/vfio/platform/vfio_amba.c
-index 485c6f9161a9..ff8ff8480968 100644
---- a/drivers/vfio/platform/vfio_amba.c
-+++ b/drivers/vfio/platform/vfio_amba.c
-@@ -134,7 +134,6 @@ static struct amba_driver vfio_amba_driver = {
- 	.id_table = vfio_amba_ids,
- 	.drv = {
- 		.name = "vfio-amba",
--		.owner = THIS_MODULE,
- 	},
- 	.driver_managed_dma = true,
- };
-
--- 
-2.34.1
-
+Rob
