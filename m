@@ -1,133 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailrelay5-1.pub.mailoutpod3-cph3.one.com (mailrelay5-1.pub.mailoutpod3-cph3.one.com [46.30.211.244])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D941A1CAA6;
-	Tue, 26 Mar 2024 18:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E339721344
+	for <linux-crypto@vger.kernel.org>; Tue, 26 Mar 2024 18:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.30.211.244
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711476584; cv=none; b=pTR75ufTnT7Zws4Qy1dcKeNibTz+6PJQ/MXwFV6MwBXegjR56+z1qwAXzixqp5b/l3AMbKb64ggE5FyLBMtHeHYuu/VTEO1AD8jNsWWoF7C4chOBXkg/cl1TAF7mhER76VEdvnPkLVEKsrOp4cnS0spBG4zhkApT+bbtDlc6oS4=
+	t=1711476974; cv=none; b=lOvGL8+cj6v5jN/o9bUrSOmnY4pXRvLwN4gv92m/BwDMA2M9yz1sfYU16wRgY77CxfqJCP9dhYKSh8AWonxtRnYZtLcyxi3J1EbNnKtdzwUKeu6desBDhcwsJ4VbFsga/nw/XUZIvc967uZaEnGrYVSvtVaP/hOOLtQWlROf6bQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711476584; c=relaxed/simple;
-	bh=BoZYsRYkImtz4DrtH6xel+18JVsPtJGNgh1WEY1wxXI=;
+	s=arc-20240116; t=1711476974; c=relaxed/simple;
+	bh=OQxXZfgehtfbFagTkSKRUD8y2GHLUHk2uynjOfd4oRI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XuUWZQudTPOsRUIMxs2ESI//pv1hZ0B2RxWv3l01HxRZtgzL12ePlnDQpwxHq7FIN9ctu8XoCXnXJl6JE+mtXyGmagqGTkIHYqT5YRbsM2PwX2IEgaGkO8cryRoldjjybX91VbFDxHMU4IIbg/EcapC2FAI7UKFxADXaxnlendA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOHCFZ9b; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=chajFYIPzXgkR6dunbQLOWt4jFOn4Kd9R8HwcL/3KPo/om2KvhxjmQFyJvfkKnOTNQPCx8vO1Od43YAStVqK/CNttebA4Zb1koM/MAkPtiS1PE9v7wY2zb7H+kZxs8MT197GliprKpXDmA4YduBNCSB1LQzHfCRxIlBWJxUERHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org; spf=none smtp.mailfrom=ravnborg.org; dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=nyeOTCdX; dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=rL+ukD2Q; arc=none smtp.client-ip=46.30.211.244
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ravnborg.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOHCFZ9b"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CDD0C433F1;
-	Tue, 26 Mar 2024 18:09:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711476583;
-	bh=BoZYsRYkImtz4DrtH6xel+18JVsPtJGNgh1WEY1wxXI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AOHCFZ9bDZOrngpBwpMwYFCeEDFkL77M5GOcuPWQRkrWUjl+XdKuDZr8hcfK9o0vZ
-	 HRhT0RkXWKow1fzxVkShJL1uD2BSPMXVokd4IRhLwwgbpsAjkDRlX3pLEjgxCh5emD
-	 zLBOfhOuUIvlztzxtgeSCN7ua5iJpN5DsUUNVf0tL1AeyhDeoqvz0ZAmTQSFzcjAfk
-	 FmMcFTwXzT9mwsqSbPXZp+PGkmo0O+HGdiNEdsvnehCAYPJpqvyAmMVo7oOuEWmo1B
-	 WzBAKvhpSArGc60m/n5vwVxQf5GTmftn5jjhANsPazROoKgNW7V8nI8Dk0WQ751yBY
-	 OkAkwhx1Oa0tQ==
-Date: Tue, 26 Mar 2024 18:09:37 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Alexey Romanov <avromanov@salutedevices.com>
-Cc: neil.armstrong@linaro.org, clabbe@baylibre.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, khilman@baylibre.com, jbrunet@baylibre.com,
-	martin.blumenstingl@googlemail.com, vadim.fedorenko@linux.dev,
-	linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
-Subject: Re: [PATCH v6 17/23] dt-bindings: crypto: meson: remove clk and
- second interrupt line for GXL
-Message-ID: <20240326-obscurity-angriness-d7bb48bc9eaa@spud>
-References: <20240326153219.2915080-1-avromanov@salutedevices.com>
- <20240326153219.2915080-18-avromanov@salutedevices.com>
+	dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="nyeOTCdX";
+	dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="rL+ukD2Q"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=ravnborg.org; s=rsa2;
+	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+	 from:date:from;
+	bh=8cfX7j0cZTLxYnTUI6w58EoQmIDSw6kaORCfZyfLSls=;
+	b=nyeOTCdXkrX+AnYb2SH2o8UNaN7MEL/eLOuR/HxjUcCojfmUxEf1IYSvFe57aGwCXPRpwJnc2eKvF
+	 IgVer08UY4ywfd6yHdwNmVKKsRplrooqtKDG3xkplHga149okVZxGGy9GInR2g3HT1EKFlEQgQiI6/
+	 UskNZ+kb3sCMlzUq7OWUJ8PNQG9121mKwNR04NB58zJFOYpyjgEF4Bal4nwnL9WKEfF5dYXjMgU4fa
+	 ufj3SWJcgNd/3HKna6TzqZNQOCM8nFm4hnfFS26/dBKYNRmJso1M4n6mF9Sl0icrUSk6rEE+NCUHfW
+	 Ff2IMnIPUeikUZZpj8PhtuY9h0mersw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+	d=ravnborg.org; s=ed2;
+	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+	 from:date:from;
+	bh=8cfX7j0cZTLxYnTUI6w58EoQmIDSw6kaORCfZyfLSls=;
+	b=rL+ukD2QXe4F+m5MLDkbUa/qyyilhQ/TiMT4rGWt3HqeijcmTmhKSIz4EVkcvr5PlEK0+Oj/0biOq
+	 Ngc23tKDA==
+X-HalOne-ID: c19233ce-eb9c-11ee-bd8a-9fce02cdf4bb
+Received: from ravnborg.org (2-105-2-98-cable.dk.customer.tdc.net [2.105.2.98])
+	by mailrelay5.pub.mailoutpod3-cph3.one.com (Halon) with ESMTPSA
+	id c19233ce-eb9c-11ee-bd8a-9fce02cdf4bb;
+	Tue, 26 Mar 2024 18:15:01 +0000 (UTC)
+Date: Tue, 26 Mar 2024 19:15:00 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
+	Rob Clark <robdclark@gmail.com>,
+	Abhinav Kumar <quic_abhinavk@quicinc.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Oded Gabbay <ogabbay@kernel.org>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	intel-xe@lists.freedesktop.org, linux-mips@vger.kernel.org,
+	sparclinux@vger.kernel.org
+Subject: Re: Build regressions/improvements in v6.9-rc1
+Message-ID: <20240326181500.GA1501083@ravnborg.org>
+References: <CAHk-=wgOw_13JuuX4khpn4K+n09cRG3EBQWufAPBWoa0GLLQ0A@mail.gmail.com>
+ <20240325200315.3896021-1-geert@linux-m68k.org>
+ <8d78894-dd89-9f4d-52bb-1b873c50be9c@linux-m68k.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+unRSAILer2Qnn5+"
-Content-Disposition: inline
-In-Reply-To: <20240326153219.2915080-18-avromanov@salutedevices.com>
-
-
---+unRSAILer2Qnn5+
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <8d78894-dd89-9f4d-52bb-1b873c50be9c@linux-m68k.org>
 
-On Tue, Mar 26, 2024 at 06:32:13PM +0300, Alexey Romanov wrote:
-> GXL crypto IP uses DMA engine, which doesn't require clk input
-> and second interrupt line.
->=20
-> Fixes: c4a0457eb858 ("ARM64: dts: amlogic: adds crypto hardware node")
+Hi all.
 
-How does this fix a commit that only modifies a dts? The commit cited
-here should be a dt-bindings commit.
+>   + error: arch/sparc/kernel/process_32.o: relocation truncated to fit: R_SPARC_WDISP22 against `.text':  => (.fixup+0xc), (.fixup+0x4)
+>   + error: arch/sparc/kernel/signal_32.o: relocation truncated to fit: R_SPARC_WDISP22 against `.text':  => (.fixup+0x18), (.fixup+0x8), (.fixup+0x0), (.fixup+0x20), (.fixup+0x10)
+>   + error: relocation truncated to fit: R_SPARC_WDISP22 against `.init.text':  => (.head.text+0x5100), (.head.text+0x5040)
+>   + error: relocation truncated to fit: R_SPARC_WDISP22 against symbol `leon_smp_cpu_startup' defined in .text section in arch/sparc/kernel/trampoline_32.o:  => (.init.text+0xa4)
 
-However, your commit message says "require" but you do more than remove
-these as required, you remove them entirely. What am I missing?
+Looks like something is too big for the available space here.
+Any hints how to dig into this would be nice.
 
-Thanks,
-Conor.
+Note: this is a sparc32 allmodconfig build
 
-> Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
-> ---
->  .../bindings/crypto/amlogic,gxl-crypto.yaml         | 13 +------------
->  1 file changed, 1 insertion(+), 12 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.=
-yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> index 948e11ebe4ee..d3af7b4d5f39 100644
-> --- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> @@ -20,20 +20,11 @@ properties:
->    interrupts:
->      items:
->        - description: Interrupt for flow 0
-> -      - description: Interrupt for flow 1
-> -
-> -  clocks:
-> -    maxItems: 1
-> -
-> -  clock-names:
-> -    const: blkmv
-> =20
->  required:
->    - compatible
->    - reg
->    - interrupts
-> -  - clocks
-> -  - clock-names
-> =20
->  additionalProperties: false
-> =20
-> @@ -46,7 +37,5 @@ examples:
->      crypto: crypto-engine@c883e000 {
->          compatible =3D "amlogic,gxl-crypto";
->          reg =3D <0xc883e000 0x36>;
-> -        interrupts =3D <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>, <GIC_SPI 189 =
-IRQ_TYPE_EDGE_RISING>;
-> -        clocks =3D <&clkc CLKID_BLKMV>;
-> -        clock-names =3D "blkmv";
-> +        interrupts =3D <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>;
->      };
-> --=20
-> 2.34.1
->=20
-
---+unRSAILer2Qnn5+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZgMPYQAKCRB4tDGHoIJi
-0gUyAQDBzDH7NW6Up524dyfrQC8iScX/snnaCE/sN+SA8QNCzgD/RMPYlpchBH5p
-HInA6ICfV7K+t9Br+NT/w6F9vNuzyQY=
-=FyeI
------END PGP SIGNATURE-----
-
---+unRSAILer2Qnn5+--
+	Sam
