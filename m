@@ -1,110 +1,121 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FE517C6C;
-	Tue, 26 Mar 2024 16:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014641C2AF;
+	Tue, 26 Mar 2024 18:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711471678; cv=none; b=ljekaWX7mwl3+6wqU5h/osNLBQWuk2A6xnu3K9J6bvjEWwKxtEK2hG7Yiot3/dEnm88hX9gnv6nAY26nBwxq3+ku8XlOGXJ7gaSvGH9IWIxWbu9Oj0S9UrYpPIkOa/4tbx4JzOgikjmnswXPtmY81fO09ag3gVve3HoDkjKDrV8=
+	t=1711476293; cv=none; b=LIuD8tXiz1ctkXP3rOxhlzoZYytlSQOaoiIOBkjbNXPRUB9FXGGwkOBcOq6OW7OLEeVcx8LAJborbdZzxbVqgZO18NjZFq/qrStzQ1uaooB9HI1Uxw7wemDGETARcEQ70enx+2KmeYts3kSoRmJ+xiW2SpyN1m67anbzbwdh5K8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711471678; c=relaxed/simple;
-	bh=YEWSItngtZtSn6YzsyAmXAncFmLGbQet0N0nNxxkTbw=;
+	s=arc-20240116; t=1711476293; c=relaxed/simple;
+	bh=FpwR17g2PH56G0XDh6Pi3WB67cdLCnSyZjbxboXsr0w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N+Ta46iQiNweHMaakmhhheg33FeJi4lKk7Dp/fuSWaLbO2m+YacZytk9S2/wq2w0stf2F0bmZfYWmHiHsV9CLq0Y9V6Urxn+87pgiqeWeAEXMYVsVVTT+XcSxg+gae8tP/dWFRqm5BSwhKWYizyFmbeuvHuCF4XlZ3xrbzaYrAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GsBNkVxy; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=h1xPafAie7fDsuf+0O8Hs6Ahv6Nefcio/yyFwhZO3O9+gyGBOHh+PiCJND6Q94P/Bban9JziEnRuO4OVMOp3OWbKyhkjzaC8rO4ahKeBDwI6BdoDlAnhE4GClMaPaGDKu8xnv662CuGk1JyP98y69CkJu4GArg/XKFm78V5Gg8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OhqPwuZT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GsBNkVxy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72050C433C7;
-	Tue, 26 Mar 2024 16:47:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OhqPwuZT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14588C433F1;
+	Tue, 26 Mar 2024 18:04:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711471677;
-	bh=YEWSItngtZtSn6YzsyAmXAncFmLGbQet0N0nNxxkTbw=;
+	s=k20201202; t=1711476292;
+	bh=FpwR17g2PH56G0XDh6Pi3WB67cdLCnSyZjbxboXsr0w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GsBNkVxyCJewwHQBer/ntQVvTwAoLpDeWXg8Nm6vLTXD7gIp9Ko2YpDW9hv/UlVlo
-	 kUx5S2xAS9jrdS707aVXb3iSK84iDoMHKS05+xNcTN3Rc4GgFH0Owu2YYLSF3quON2
-	 4s6I3oEAbnad0R1j56paUY49WPO7xdtcJBHHGZk9M1WLZR+c6N3T89KTYqr8fw0qGi
-	 O/vlqEkSZH2X6059V7LO/1G+ftUMNL5152km04iSYaQgPpJbmdoGq9AfV4qMg/XEHx
-	 GhJOMADaVg/T2uEAVHdV6vCde/43cFgqdf4HGuiVY2Umc9g3JsQAH/WK5yCX5ac2Am
-	 sM56/1IPTWJ6Q==
-Date: Tue, 26 Mar 2024 09:47:55 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
-	"Chang S . Bae" <chang.seok.bae@intel.com>
-Subject: Re: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
-Message-ID: <20240326164755.GB1524@sol.localdomain>
-References: <20240326080305.402382-1-ebiggers@kernel.org>
- <CAMj1kXH4fNevFzrbazJptadxh_spEY3W91FZni5eMqD+UKrSUQ@mail.gmail.com>
+	b=OhqPwuZTdQ1s7BpgL1VIfuejwlhhnnaQebCxnJRAG0seH7mpEyQLj8LiyS6MhTs3D
+	 lAsHUNE6c5YMjRyPqRfd1SioWqtf+T74GNlkByMBviw6YJiCSjPGxhY8iRV7s+qwcw
+	 qvxfkjefy4d0o2sX9eBnM6zuVZg4clFyVlPCmIJyIxM8jje4z1vxa1H/D7ZoHNxCAe
+	 guE2pbxtTTqlzpZDIeZhzbw08HFzcIv+Jo5mI8SXPjbXWVcQQZBNyz5cPX9gVYg6VV
+	 t3oNj0XtFGgXIuFircYNgE4t+HXmIX9iZSHEVETnqq+FzRLbUdLtwNm0Oh2a/ILudH
+	 H3VeWif2pNhEA==
+Date: Tue, 26 Mar 2024 18:04:46 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Alexey Romanov <avromanov@salutedevices.com>
+Cc: neil.armstrong@linaro.org, clabbe@baylibre.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, khilman@baylibre.com, jbrunet@baylibre.com,
+	martin.blumenstingl@googlemail.com, vadim.fedorenko@linux.dev,
+	linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
+Subject: Re: [PATCH v6 19/23] dt-bindings: crypto: meson: support new SoC's
+Message-ID: <20240326-boneless-patrol-b1156a4be70b@spud>
+References: <20240326153219.2915080-1-avromanov@salutedevices.com>
+ <20240326153219.2915080-20-avromanov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="TsFS7LpYqhJ6X8MW"
+Content-Disposition: inline
+In-Reply-To: <20240326153219.2915080-20-avromanov@salutedevices.com>
+
+
+--TsFS7LpYqhJ6X8MW
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXH4fNevFzrbazJptadxh_spEY3W91FZni5eMqD+UKrSUQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 26, 2024 at 10:51:48AM +0200, Ard Biesheuvel wrote:
-> > Open questions:
-> >
-> > - Is the policy that I implemented for preferring ymm registers to zmm
-> >   registers the right one?  arch/x86/crypto/poly1305_glue.c thinks that
-> >   only Skylake has the bad downclocking.  My current proposal is a bit
-> >   more conservative; it also excludes Ice Lake and Tiger Lake.  Those
-> >   CPUs supposedly still have some downclocking, though not as much.
-> >
-> > - Should the policy on the use of zmm registers be in a centralized
-> >   place?  It probably doesn't make sense to have random different
-> >   policies for different crypto algorithms (AES, Poly1305, ARIA, etc.).
-> >
-> > - Are there any other known issues with using AVX512 in kernel mode?  It
-> >   seems to work, and technically it's not new because Poly1305 and ARIA
-> >   already use AVX512, including the mask registers and zmm registers up
-> >   to 31.  So if there was a major issue, like the new registers not
-> >   being properly saved and restored, it probably would have already been
-> >   found.  But AES-XTS support would introduce a wider use of it.
-> >
-> 
-> I don't have much input here, except that I think we should just
-> disable AVX512 kernel-wide on systems where there is no benefit in
-> terms of throughput. I suspect this might change with algorithms that
-> rely more heavily on the masking, but so far, we have been making
-> quite effective use of simple permute vectors and overlapping loads
-> and stores to do the same. And as Eric points out, the only relevant
-> use case in the kernel is blocks of size 2^n where n is at least 9.
+On Tue, Mar 26, 2024 at 06:32:15PM +0300, Alexey Romanov wrote:
+> Now crypto module available at G12A/G12B/S4/A1/SM1/AXG.
+>=20
+> 1. Add new compatibles:
+>   - amlogic,g12a-crypto
+>   - amlogic,axg-crypto
+>   - amlogic,a1-crypto
+>   - amlogic,s4-crypto (uses a1-crypto as fallback)
+>=20
+> 2. Add power-domains in schema.
+>=20
+> Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
+> ---
+>  .../bindings/crypto/amlogic,gxl-crypto.yaml       | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.=
+yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+> index d3af7b4d5f39..c92edde314aa 100644
+> --- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+> @@ -11,8 +11,16 @@ maintainers:
+> =20
+>  properties:
+>    compatible:
+> -    items:
+> -      - const: amlogic,gxl-crypto
+> +    oneOf:
+> +      - items:
+> +          - enum:
+> +              - amlogic,s4-crypto
+> +          - const: amlogic,a1-crypto
+> +      - enum:
+> +          - amlogic,gxl-crypto
+> +          - amlogic,axg-crypto
+> +          - amlogic,g12a-crypto
+> +          - amlogic,a1-crypto
+> =20
+>    reg:
+>      maxItems: 1
+> @@ -21,6 +29,9 @@ properties:
+>      items:
+>        - description: Interrupt for flow 0
+> =20
+> +  power-domains:
+> +    maxItems: 1
 
-There are several benefits to AVX512 besides the 512-bit zmm registers.  Besides
-masking, there are also twice as many SIMD registers which make it possible to
-cache all the AES round keys.  There are also other new instructions such as
-vpternlogd which I've used in AES-XTS to XOR values together more efficiently.
+Is power-domains valid for the devices that existed prior to your patch?
 
-That's why this patchset adds both xts-aes-vaes-avx10_256 and
-xts-aes-vaes-avx10_512.  And I've adopted the new "AVX10" naming, maybe a bit
-early, to emphasize that it's not just about 512-bit...
+--TsFS7LpYqhJ6X8MW
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Consider Intel Ice Lake for example, these are the AES-256-XTS encryption speeds
-on 4096-byte messages in MB/s I'm seeing:
+-----BEGIN PGP SIGNATURE-----
 
-    xts-aes-aesni                  5136
-    xts-aes-aesni-avx              5366
-    xts-aes-vaes-avx2              9337
-    xts-aes-vaes-avx10_256         9876
-    xts-aes-vaes-avx10_512         10215
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZgMOPgAKCRB4tDGHoIJi
+0tshAQCtbEqOHiJFUm5lxRMtAn+5YxU2CDgCh0rFA4v9v07M5QEAtxnoZzj0b3c8
+yH8w5AJrE8FRKbXSqTKMNF83M4Te2Qo=
+=OFV3
+-----END PGP SIGNATURE-----
 
-So yes, on that CPU the biggest boost comes just from VAES, staying on AVX2.
-But taking advantage of AVX512 does help a bit more, first from the parts other
-than 512-bit registers, then a bit more from 512-bit registers.
-
-I do have Ice Lake on the exclusion list from xts-aes-vaes-avx10_512 anyway,
-since the concern with downclocking is not really about the performance of the
-code itself but rather the impact on unrelated code running on the CPU.
-
-And I *think* the right policy is to just disable the use of the zmm registers,
-as opposed to AVX512 entirely.  As AVX512 was originally presented it did tie
-these together, but they don't have to be.  AVX10 (which supposedly future
-x86_64 CPUs will have) explicitly moves away from that by repackaging the
-existing AVX512 features and making the zmm registers optional.
-
-- Eric
+--TsFS7LpYqhJ6X8MW--
