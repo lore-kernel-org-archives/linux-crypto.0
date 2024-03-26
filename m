@@ -1,70 +1,44 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FD412AAEC;
-	Tue, 26 Mar 2024 08:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5264B21A0D;
+	Tue, 26 Mar 2024 08:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711440620; cv=none; b=GBwL+GClP5Mgy7VZZTzx3OyeaZIpdubxPqdpBd2DWfaCvJ5gSEpW6fm8PFPhiob+CwqX+X58mXATP612YknMqL/HYUXnAg60OSGaKAOUTMliGND0RdxtsThI8wjkZ8nCQigF7nhqVWM/qVKot/Hb5gnQGxpYfm4iaBokwEIly7Y=
+	t=1711441098; cv=none; b=D7YaqpICqmZCzJCN+y1QJcw2oxI+RSGsUD4T/vXL4NsPTkjxMvgxajVdWbka/wkXiZNjfijzqkyT1OUCpSxZk1db/2p7ziRzgughgFoIcIQDY6EmUqyIfVCl38NFxw5oviOM6ZLrtg10drTOF8fedzYeLnhVp93QxrCBi1q7Lrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711440620; c=relaxed/simple;
-	bh=UE+rBO/SzfXH+xegaXkyksSZkdDCOyLf+Zjv/2b9PkY=;
+	s=arc-20240116; t=1711441098; c=relaxed/simple;
+	bh=M/XyZ/Z+QBR65BVhuTqcNZ0wsFkc0/b4T3XmpOmoruo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U3vCC0T1MCzQFEaF3yH5T3SVup78tRhZUBOHs8e3oI0v8tsrg3zEq2i+PSpdUz07yqXRcBlLPC8Axo6U5YDjzckH2/LbxJeY8qlKFnvDQJYVPdgCv8jKAP22GfV04JXFp1Tg2a59NdOfGIieW4I/msP7LnehD2llHPYllzJqqTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VW209+LY; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=hRXac8ImZtchiBFk4thE9DtZXCGz9nJ+iZ2VjaeYwG9BqGmOL2ZeAWjYPI4BD7s5ROU5co9tCe0he4daCXctpFA914aj7cESYbzymcw3u5mfwLHmH/VOmGRBY8OYnTZxBBUatyzVYY52tPUzNu4UVFQDv5Xb30XHzhx5ASGq0l4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kc8a5xJ7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VW209+LY"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-513d599dbabso6832286e87.1;
-        Tue, 26 Mar 2024 01:10:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711440617; x=1712045417; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PzQhaG35S/6UwDeOcfUmN5ro7w9ToDnNuXjMnx/wsTI=;
-        b=VW209+LYXSpN8ilQ91OjEQYyxRJT4CMsKwJ1HtquVeQN2G2/OzHyjYuHyVCE/fIPh4
-         OEJGGwCeNG1/4vOYTZmhNM8EOw9SOt8aWw6+QTfMf8EET2EQEi6Gbu4+IdrgVqiPDdTO
-         tFL0LkmbJpnqbUK6UzOrjQtvy+jY2bbwIpUaPsivrCartPyR29GPEmi7zFV2ghPFegwQ
-         B5LAKGsoTIxms3gbzA2vfqwX6ImzaX6CO9L8z2WO36Hbd7WyjxVULCiGcgrXj7SwWsZN
-         XKpcFbnKgU4r3ESUjZDmlK5XZoVq6bAurg/e+KSU5Fzj/7Sryvw5o3LvB+IvxPnyKd9t
-         MMcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711440617; x=1712045417;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PzQhaG35S/6UwDeOcfUmN5ro7w9ToDnNuXjMnx/wsTI=;
-        b=kAcKnf6dKztLOZ98+lPgkMsxwQBvORIWevHRygd1Q6Q+JjfzbuJp5JOdT9byr5l8L7
-         RES+0AQKvSI0S/ycPTVe0TTMxzt+HyGQlQcxGIkk97CUIyUWwnJYsKYe7AoaqgBeFEDJ
-         7+fxvfCf0ve4fZgWgQ4qEzFfFrI3pHY3sLiVeMFHI3+Ryw8nowJwIubVo5nBUh/cg4fU
-         liFVmQ4j2W4TNoP8MKoepDCw8Yggj/HzIDiEApQr9+Dvv2h2Mv3iL1wepZhNSfGv43hR
-         bmzh/9ScTzvMyL63hkx7naTB8vB0eomXgzJDkkWeJK8qdxSd9n6QYM3B88MSzw80qcGB
-         birA==
-X-Forwarded-Encrypted: i=1; AJvYcCXdZqbaDo4fCs9OkUHjp+0bTEovGeyu/xLl4bm/Wq1uYXGSDKj8aqDaSgCqkIJMzsYK6OQvFqMrFuI+cUVb34+Ege23rGLSeLSqF8ch
-X-Gm-Message-State: AOJu0YwCAaxeEYG5Je0tNjJ3rpPirvWAAX1ocwFuobw0+FfIM/dt9ryu
-	4sEXP8Iq8APw4bGRmT9ZIgu+wvXu6YWfE2P50dBL15WUIuIv7h2k
-X-Google-Smtp-Source: AGHT+IF8yfTE2aE3kJKB+qSMX2f+wOgVJF6x8Yxdvk7qZLHIUGBPxD2j1bvns39914MaPNqihYxK1Q==
-X-Received: by 2002:a05:6512:616:b0:513:ccec:a822 with SMTP id b22-20020a056512061600b00513cceca822mr6810025lfe.28.1711440616315;
-        Tue, 26 Mar 2024 01:10:16 -0700 (PDT)
-Received: from gmail.com (1F2EF63C.nat.pool.telekom.hu. [31.46.246.60])
-        by smtp.gmail.com with ESMTPSA id t25-20020a056402241900b0056bd13ce50esm3828015eda.44.2024.03.26.01.10.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 01:10:15 -0700 (PDT)
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Date: Tue, 26 Mar 2024 09:10:13 +0100
-From: Ingo Molnar <mingo@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kc8a5xJ7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3853C43390;
+	Tue, 26 Mar 2024 08:18:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711441097;
+	bh=M/XyZ/Z+QBR65BVhuTqcNZ0wsFkc0/b4T3XmpOmoruo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kc8a5xJ72UrCiowd/D+/6dcTC177LepbBe5CCJ1VxL9LDPvfQ1uiIDRKrd8vVGHNs
+	 CWrGENPXYaCH3rutS82h99rVzz5tjagR9ly/EH2o3hGrpdD4j81TEW0lmjnEJBvEQm
+	 n8cRshukS5TYFz/OLP3Pvo/u89AHfMKEPSb3Z4U5dc7lxLUJvtgKsfAzy1i2k/3VBj
+	 XM5ceIXvquQ217Vu0Gy9ohXxNrvAvfiuXgVcvPPbwQLLAC5ZN95aggYz3m/S4hHKqR
+	 YS9H1CkQilaVaw2Z7Bjw/t+7m/HVkwLjJ9XsJov0FFz5KHlNDJ2jakKXKccX+OgxMI
+	 ouqx8EWW71opQ==
+Date: Tue, 26 Mar 2024 01:18:16 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ingo Molnar <mingo@kernel.org>
 Cc: linux-crypto@vger.kernel.org, x86@kernel.org,
 	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
 	Andy Lutomirski <luto@kernel.org>,
 	"Chang S . Bae" <chang.seok.bae@intel.com>
 Subject: Re: [PATCH 1/6] x86: add kconfig symbols for assembler VAES and
  VPCLMULQDQ support
-Message-ID: <ZgKC5dcqWSEkwuTX@gmail.com>
+Message-ID: <20240326081816.GA431948@sol.localdomain>
 References: <20240326080305.402382-1-ebiggers@kernel.org>
  <20240326080305.402382-2-ebiggers@kernel.org>
+ <ZgKC5dcqWSEkwuTX@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -73,55 +47,49 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240326080305.402382-2-ebiggers@kernel.org>
+In-Reply-To: <ZgKC5dcqWSEkwuTX@gmail.com>
 
-
-* Eric Biggers <ebiggers@kernel.org> wrote:
-
-> From: Eric Biggers <ebiggers@google.com>
+On Tue, Mar 26, 2024 at 09:10:13AM +0100, Ingo Molnar wrote:
 > 
-> Add config symbols AS_VAES and AS_VPCLMULQDQ that expose whether the
-> assembler supports the vector AES and carryless multiplication
-> cryptographic extensions.
+> * Eric Biggers <ebiggers@kernel.org> wrote:
 > 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  arch/x86/Kconfig.assembler | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+> > From: Eric Biggers <ebiggers@google.com>
+> > 
+> > Add config symbols AS_VAES and AS_VPCLMULQDQ that expose whether the
+> > assembler supports the vector AES and carryless multiplication
+> > cryptographic extensions.
+> > 
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> > ---
+> >  arch/x86/Kconfig.assembler | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> > 
+> > diff --git a/arch/x86/Kconfig.assembler b/arch/x86/Kconfig.assembler
+> > index 8ad41da301e5..59aedf32c4ea 100644
+> > --- a/arch/x86/Kconfig.assembler
+> > +++ b/arch/x86/Kconfig.assembler
+> > @@ -23,9 +23,19 @@ config AS_TPAUSE
+> >  config AS_GFNI
+> >  	def_bool $(as-instr,vgf2p8mulb %xmm0$(comma)%xmm1$(comma)%xmm2)
+> >  	help
+> >  	  Supported by binutils >= 2.30 and LLVM integrated assembler
+> >  
+> > +config AS_VAES
+> > +	def_bool $(as-instr,vaesenc %ymm0$(comma)%ymm1$(comma)%ymm2)
+> > +	help
+> > +	  Supported by binutils >= 2.30 and LLVM integrated assembler
 > 
-> diff --git a/arch/x86/Kconfig.assembler b/arch/x86/Kconfig.assembler
-> index 8ad41da301e5..59aedf32c4ea 100644
-> --- a/arch/x86/Kconfig.assembler
-> +++ b/arch/x86/Kconfig.assembler
-> @@ -23,9 +23,19 @@ config AS_TPAUSE
->  config AS_GFNI
->  	def_bool $(as-instr,vgf2p8mulb %xmm0$(comma)%xmm1$(comma)%xmm2)
->  	help
->  	  Supported by binutils >= 2.30 and LLVM integrated assembler
->  
-> +config AS_VAES
-> +	def_bool $(as-instr,vaesenc %ymm0$(comma)%ymm1$(comma)%ymm2)
-> +	help
-> +	  Supported by binutils >= 2.30 and LLVM integrated assembler
+> Nit: any reason it isn't called AS_VAESENC, like the instruction itself?
+> 
+> The other new AS_ Kconfig symbols follow the same nomenclature:
 
-Nit: any reason it isn't called AS_VAESENC, like the instruction itself?
+The CPU feature flag is called VAES.  It guards the vaesenc, vaesenclast,
+vaesdec, and vaesdeclast instructions when used on ymm and zmm registers.
 
-The other new AS_ Kconfig symbols follow the same nomenclature:
+So the name AS_VAES seems fine as-is.
 
-> +config AS_VPCLMULQDQ
-> +	def_bool $(as-instr,vpclmulqdq \$0x10$(comma)%ymm0$(comma)%ymm1$(comma)%ymm2)
-> +	help
-> +	  Supported by binutils >= 2.30 and LLVM integrated assembler
-> +
->  config AS_WRUSS
->  	def_bool $(as-instr,wrussq %rax$(comma)(%rbx))
->  	help
->  	  Supported by binutils >= 2.31 and LLVM integrated assembler
+I think you may have been confused by AS_VPCLMULQDQ, because in that case the
+feature happens to provides a single instruction with the same name as the CPU
+feature flag.
 
-With the nit above fixed:
-
-  Reviewed-by: Ingo Molnar <mingo@kernel.org>
-
-Thanks,
-
-	Ingo
+- Eric
