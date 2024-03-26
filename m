@@ -1,130 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from xavier.telenet-ops.be (xavier.telenet-ops.be [195.130.132.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E055B697;
-	Mon, 25 Mar 2024 21:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06083131BB9
+	for <linux-crypto@vger.kernel.org>; Tue, 26 Mar 2024 07:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711400520; cv=none; b=Zx2CXPf6cU0AM6SXOKzoPPbP7C93UCdRsywyoJYwuzZZAhq1TQvGN4CMW9S+w6YtLh4RVsC3I/V4GHUVQLbgdSKdR5KfLZKFDPn87vPdfyvh3ne/BbiRJShrnn6ipnocZoKb4fUP+I15XrSpBms9MdD9+AnvTSqiuz6lim8t3Fs=
+	t=1711439467; cv=none; b=bcGqfcjPW/XUAB4XO6Osxk1/Mvl8n6NJDX88IZxA6qmXhJIjEoiLraH/RleywO46Shkz9Kl59b1fBn9D+oW0QiJY7NaLLqxbMcExkIqxo/jWvZO0DdUjon1iUiuP3YGoylJZluW9LhuafpamcoF+UocGmM+Bl7mYe9hPq6BJZPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711400520; c=relaxed/simple;
-	bh=QD9mCtSDgTE2JsbSwKtRCG1cdUsU99jd/s3QwXZpqus=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Ed8MCoxDfTl1+A0HCN86uFKq0ptJm/GCVZ26kDxSnel058qzpQKnbQJ4wgkaaBUp6qQvaw1E28LzdjTkXtpjIU8XSTNcx3E4Xg+4/fCSJlgDj54PlSqa4YlCSKo4iyicOe0TleEDZcTKzBpTG9R0Adv6TLWHgkFdVv4LvS6ffWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FBgTU9iN; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FBgTU9iN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E9D7C433F1;
-	Mon, 25 Mar 2024 21:01:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711400519;
-	bh=QD9mCtSDgTE2JsbSwKtRCG1cdUsU99jd/s3QwXZpqus=;
-	h=Date:From:To:Cc:Subject:From;
-	b=FBgTU9iNOaz8qPBzGSWWoDVReoNp0jN5qTpOswGPS4eGm651fe0T54SFbWjY+owWY
-	 BpnOpx4XS3msKcfrWN2y9C2nwABMQnB0oQ2GRnZ6E1Sn2bC+UDSi29eWBYaiLP+NiP
-	 IeHCPcKrRb3eIokeKlPugwlb57toS3+9YXL3BPxjcQlNszVNqN6A9lrZbHKAF9IPcV
-	 SWIibznPWrHgBxhG+vxRdwAcyHW+jgmoM1XrEOI5ooX1PlODH9qJxNGMaztuFaZ8IT
-	 flwhznFsFZLp7osHcRoElffSsnQPPEen/7rhBVRT5LnHMwXpyF2+H2RsRPp3MO972S
-	 im2fvCsWO6q6Q==
-Date: Mon, 25 Mar 2024 15:01:56 -0600
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Haren Myneni <haren@us.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH][next] crypto/nx: Avoid potential
- -Wflex-array-member-not-at-end warning
-Message-ID: <ZgHmRNcR+a4EJX94@neat>
+	s=arc-20240116; t=1711439467; c=relaxed/simple;
+	bh=gr9JgkrESZ4jhKkfEzPbJwRvivaU77MYSxc+lDGeHU4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=nBKMOnc3BcaQEksVPae3/FVCYH96rOR9jJwg23rmJ6++FfIIKvbb5gDJAYjwO6eLnlzJOKpt+NJMh6dhBcCJUlIyDY6Ryj2ShLQXauKaSi7FijMjcT/KqMRwDZtgUUL7VAq0IzbQQUgrvAOjHEFgVtwboyw/aCo7X4lUEJaSceo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.132.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:76d0:2bff:fec8:549])
+	by xavier.telenet-ops.be with bizsmtp
+	id 3Kqp2C00C0SSLxL01KqpkN; Tue, 26 Mar 2024 08:50:56 +0100
+Received: from geert (helo=localhost)
+	by ramsan.of.borg with local-esmtp (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1rp1a5-004zii-Gc;
+	Tue, 26 Mar 2024 08:50:49 +0100
+Date: Tue, 26 Mar 2024 08:50:49 +0100 (CET)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: linux-kernel@vger.kernel.org
+cc: linux-crypto@vger.kernel.org, Chris Zankel <chris@zankel.net>, 
+    Max Filippov <jcmvbkbc@gmail.com>, Rob Clark <robdclark@gmail.com>, 
+    Abhinav Kumar <quic_abhinavk@quicinc.com>, 
+    Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
+    linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+    freedreno@lists.freedesktop.org, 
+    Lucas De Marchi <lucas.demarchi@intel.com>, 
+    Oded Gabbay <ogabbay@kernel.org>, 
+    =?ISO-8859-15?Q?Thomas_Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>, 
+    intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+    linux-mips@vger.kernel.org, sparclinux@vger.kernel.org
+Subject: Re: Build regressions/improvements in v6.9-rc1
+In-Reply-To: <20240325200315.3896021-1-geert@linux-m68k.org>
+Message-ID: <8d78894-dd89-9f4d-52bb-1b873c50be9c@linux-m68k.org>
+References: <CAHk-=wgOw_13JuuX4khpn4K+n09cRG3EBQWufAPBWoa0GLLQ0A@mail.gmail.com> <20240325200315.3896021-1-geert@linux-m68k.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
--Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
-ready to enable it globally.
+On Mon, 25 Mar 2024, Geert Uytterhoeven wrote:
+> Below is the list of build error/warning regressions/improvements in
+> v6.9-rc1[1] compared to v6.8[2].
+>
+> Summarized:
+>  - build errors: +8/-8
 
-Use the `__struct_group()` helper to separate the flexible array
-from the rest of the members in flexible `struct nx842_crypto_header`,
-through tagged `struct nx842_crypto_header_hdr`, and avoid embedding
-the flexible-array member in the middle of `struct nx842_crypto_ctx`.
+   + /kisskb/src/crypto/scompress.c: error: unused variable 'dst_page' [-Werror=unused-variable]:  => 174:38
 
-Also, use `container_of()` whenever we need to retrieve a pointer to
-the flexible structure.
+xtensa-gcc13/xtensa-allmodconfig
 
-This code was detected with the help of Coccinelle, and audited and
-modified manually.
+   + /kisskb/src/drivers/gpu/drm/msm/adreno/adreno_gen7_0_0_snapshot.h: error: 'gen7_0_0_external_core_regs' defined but not used [-Werror=unused-variable]:  => 924:19
+   + /kisskb/src/drivers/gpu/drm/msm/adreno/adreno_gen7_2_0_snapshot.h: error: 'gen7_2_0_external_core_regs' defined but not used [-Werror=unused-variable]:  => 748:19
 
-Link: https://github.com/KSPP/linux/issues/202
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
- drivers/crypto/nx/nx-842.c |  6 ++++--
- drivers/crypto/nx/nx-842.h | 11 +++++++----
- 2 files changed, 11 insertions(+), 6 deletions(-)
+arm64-gcc5/arm64-allmodconfig
+powerpc-gcc5/powerpc-allmodconfig
+powerpc-gcc5/powerpc-allyesconfig
+powerpc-gcc5/ppc32_allmodconfig
+powerpc-gcc5/ppc64_book3e_allmodconfig
+powerpc-gcc5/ppc64le_allmodconfig
+sparc64-gcc5/sparc64-allmodconfig
 
-diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
-index 2ab90ec10e61..82214cde2bcd 100644
---- a/drivers/crypto/nx/nx-842.c
-+++ b/drivers/crypto/nx/nx-842.c
-@@ -251,7 +251,9 @@ int nx842_crypto_compress(struct crypto_tfm *tfm,
- 			  u8 *dst, unsigned int *dlen)
- {
- 	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct nx842_crypto_header *hdr = &ctx->header;
-+	struct nx842_crypto_header *hdr =
-+				container_of(&ctx->header,
-+					     struct nx842_crypto_header, hdr);
- 	struct nx842_crypto_param p;
- 	struct nx842_constraints c = *ctx->driver->constraints;
- 	unsigned int groups, hdrsize, h;
-@@ -490,7 +492,7 @@ int nx842_crypto_decompress(struct crypto_tfm *tfm,
- 	}
- 
- 	memcpy(&ctx->header, src, hdr_len);
--	hdr = &ctx->header;
-+	hdr = container_of(&ctx->header, struct nx842_crypto_header, hdr);
- 
- 	for (n = 0; n < hdr->groups; n++) {
- 		/* ignore applies to last group */
-diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
-index 7590bfb24d79..1f42c83d2683 100644
---- a/drivers/crypto/nx/nx-842.h
-+++ b/drivers/crypto/nx/nx-842.h
-@@ -157,9 +157,12 @@ struct nx842_crypto_header_group {
- } __packed;
- 
- struct nx842_crypto_header {
--	__be16 magic;		/* NX842_CRYPTO_MAGIC */
--	__be16 ignore;		/* decompressed end bytes to ignore */
--	u8 groups;		/* total groups in this header */
-+	/* New members must be added within the __struct_group() macro below. */
-+	__struct_group(nx842_crypto_header_hdr, hdr, __packed,
-+		__be16 magic;		/* NX842_CRYPTO_MAGIC */
-+		__be16 ignore;		/* decompressed end bytes to ignore */
-+		u8 groups;		/* total groups in this header */
-+	);
- 	struct nx842_crypto_header_group group[];
- } __packed;
- 
-@@ -171,7 +174,7 @@ struct nx842_crypto_ctx {
- 	u8 *wmem;
- 	u8 *sbounce, *dbounce;
- 
--	struct nx842_crypto_header header;
-+	struct nx842_crypto_header_hdr header;
- 	struct nx842_crypto_header_group group[NX842_CRYPTO_GROUP_MAX];
- 
- 	struct nx842_driver *driver;
--- 
-2.34.1
+   + /kisskb/src/drivers/gpu/drm/xe/xe_lrc.c: error: "END" redefined [-Werror]:  => 100
 
+mips-gcc8/mips-allmodconfig
+mips-gcc13/mips-allmodconfig
+
+   + error: arch/sparc/kernel/process_32.o: relocation truncated to fit: R_SPARC_WDISP22 against `.text':  => (.fixup+0xc), (.fixup+0x4)
+   + error: arch/sparc/kernel/signal_32.o: relocation truncated to fit: R_SPARC_WDISP22 against `.text':  => (.fixup+0x18), (.fixup+0x8), (.fixup+0x0), (.fixup+0x20), (.fixup+0x10)
+   + error: relocation truncated to fit: R_SPARC_WDISP22 against `.init.text':  => (.head.text+0x5100), (.head.text+0x5040)
+   + error: relocation truncated to fit: R_SPARC_WDISP22 against symbol `leon_smp_cpu_startup' defined in .text section in arch/sparc/kernel/trampoline_32.o:  => (.init.text+0xa4)
+
+sparc64-gcc13/sparc-allmodconfig
+
+> [1] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/4cece764965020c22cff7665b18a012006359095/ (all 138 configs)
+> [2] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/e8f897f4afef0031fe618a8e94127a0934896aba/ (all 138 configs)
+
+Gr{oetje,eeting}s,
+
+ 						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+ 							    -- Linus Torvalds
