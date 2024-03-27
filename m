@@ -1,94 +1,128 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B667364AA;
-	Wed, 27 Mar 2024 09:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1329B36E
+	for <linux-crypto@vger.kernel.org>; Wed, 27 Mar 2024 09:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711531367; cv=none; b=Hx71qb3vcwLrwrH0MGSsCKQ8dJx/fVSj8GuJsPu2gjT+nvYb08sdUTQ6r4NDhfHOXHG1H2nyEqfxPuoBIym1rmMXn8p7L+hIA3qPYXa1h+8NC8k6VxZ7HZV3I5nAwpGVjy10NbxxOMLglXYRewlm1iM95LkFqW6ZH068t6yto1A=
+	t=1711532065; cv=none; b=GwSO3/tqH98Yq75p8NZKmybSBsMvjkeggClR+tYPAi+Iw///j17uL0QGjnIkX28q8vGsGf4hiL2emd+wVN7q5NLf+57u1e4I/nx88PglHRwg5NLH9/fZqDl9m4T9+Z1GzpRcIC8VMcV+Hd0Rn9Ip/MMGZCOOJb12DhayfrT9p/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711531367; c=relaxed/simple;
-	bh=ZWv952oYFxc39419lBwrbDg10Bj8qOEyHA+YfiwWqv0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hF84bndqtOg51K99PF+k56GoKptqawZ9cuyp7UI3FLErWFw7hD/3KYDUuLb8PvAc4G0b3kwxuO0K4xLoiC/MPKGOvn1SVUiNL5aSUHzUbAFaKXYhSAa1jOMEuZRzbAwclnAlmDUv8QHcnPrukbN7XrlpH34ZlhMgegjoqny4z18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 243A52F4;
-	Wed, 27 Mar 2024 02:23:13 -0700 (PDT)
-Received: from [10.57.81.167] (unknown [10.57.81.167])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4EF5C3F7C5;
-	Wed, 27 Mar 2024 02:22:35 -0700 (PDT)
-Message-ID: <d8fa8e1a-b2ce-4d91-9ab5-ad1b160111c6@arm.com>
-Date: Wed, 27 Mar 2024 09:22:33 +0000
+	s=arc-20240116; t=1711532065; c=relaxed/simple;
+	bh=XOchda7odJ/zW6uaAUv9JGZx87HRnkrBQzCLGmin4Dw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Xji8YEEdIg5m5v87ZYcFK3GkgVvQWW+dU/i8eE05lVEzFQRPkI9BHjnJBLt45fpLCo0w1U9aORilIpcrvcwqFwqhpEIE6qgD28MGJo5UcBi1hoA3Uf0hnKzOakCBBULFMkNhbqUBBFiiS30VfmeTzfQMc4j4EG4uzhefBJUaUrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KyzhW8nQ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KyzhW8nQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 363F1C43390;
+	Wed, 27 Mar 2024 09:34:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711532064;
+	bh=XOchda7odJ/zW6uaAUv9JGZx87HRnkrBQzCLGmin4Dw=;
+	h=Date:From:To:List-Id:Cc:Subject:In-Reply-To:References:From;
+	b=KyzhW8nQpffWoB4I/r3U7sDPkbl9c2jA0qOvFbYuE+RveNigmNv4z3wSkRTbPLcbQ
+	 gJsFalp8TAIJYTys0jclVwt+KkW2+21zPfii39f44hIsXBYjlM01aJ0MinTHZE0TXE
+	 2Av2yHlBqgCC0ehpERNrcf1Dy1wFcdt8nhBsrN7ZEmIWmZvZXhP05hGdGBUXMkhvmO
+	 ZJNYAu7QkSrEGNoTadYhovLm8gfPEH7qoiPS6laVr0oGXv4vGi+FGqLV29YyiWb/eQ
+	 Wry0PyjKgPIiXIYbnEBEwHW/MQfQMaXWP5xZB77CJWlEpalv4h3dZyjQLU19Qjg3rD
+	 oKmQAC7m+SRJg==
+Date: Wed, 27 Mar 2024 10:34:19 +0100
+From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Gregory CLEMENT
+ <gregory.clement@bootlin.com>, soc@kernel.org, arm@kernel.org, Hans de
+ Goede <hdegoede@redhat.com>, Matti Vaittinen <mazziesaccount@gmail.com>,
+ Horia =?UTF-8?B?R2VhbnTEgw==?= <horia.geanta@nxp.com>, Pankaj Gupta
+ <pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>,
+ linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v5 06/11] devm-helpers: Add resource managed version of
+ irq_create_mapping()
+Message-ID: <20240327103419.3918953a@dellmb>
+In-Reply-To: <72bf31c3-337d-4747-8353-639492507a7b@moroto.mountain>
+References: <20240323164359.21642-1-kabel@kernel.org>
+	<20240323164359.21642-7-kabel@kernel.org>
+	<72bf31c3-337d-4747-8353-639492507a7b@moroto.mountain>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.39; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/19] amba: store owner from modules with
- amba_driver_register()
-Content-Language: en-GB
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- Russell King <linux@armlinux.org.uk>, Mike Leach <mike.leach@linaro.org>,
- James Clark <james.clark@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Linus Walleij <linus.walleij@linaro.org>, Andi Shyti
- <andi.shyti@kernel.org>, Olivia Mackall <olivia@selenic.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Vinod Koul <vkoul@kernel.org>,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Michal Simek <michal.simek@amd.com>, Eric Auger <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>
-Cc: linux-kernel@vger.kernel.org, coresight@lists.linaro.org,
- linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
- linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
- linux-input@vger.kernel.org, kvm@vger.kernel.org
-References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
- <3f61d6d3-a0d6-4c49-b094-6ba62d09ab14@arm.com>
- <f23f2e60-e5c0-4c3c-9722-dba63a6e7ef6@linaro.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <f23f2e60-e5c0-4c3c-9722-dba63a6e7ef6@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On 27/03/2024 05:57, Krzysztof Kozlowski wrote:
-> On 27/03/2024 00:24, Suzuki K Poulose wrote:
->> Hi Krzysztof
->>
->> On 26/03/2024 20:23, Krzysztof Kozlowski wrote:
->>> Merging
->>> =======
->>> All further patches depend on the first amba patch, therefore please ack
->>> and this should go via one tree.
->>
->> Are you able to provide a stable branch with these patches once you pull
-> 
-> I doubt I will be merging this. I think amba code goes through Russell.
-> 
->> them in to "one tree" here ? We have changes coming up in the coresight
->> tree, which would conflict with the changes here (horribly).
->>
-> 
-> You mean conflict with  coresight conversion to platform driver? Worst
+On Tue, 26 Mar 2024 12:00:25 +0300
+Dan Carpenter <dan.carpenter@linaro.org> wrote:
 
-Yes.
+> On Sat, Mar 23, 2024 at 05:43:54PM +0100, Marek Beh=C3=BAn wrote:
+> > +/**
+> > + * devm_irq_create_mapping - Resource managed version of irq_create_ma=
+pping()
+> > + * @dev:	Device which lifetime the mapping is bound to
+> > + * @domain:	domain owning this hardware interrupt or NULL for default =
+domain
+> > + * @hwirq:	hardware irq number in that domain space
+> > + *
+> > + * Create an irq mapping to linux irq space which is automatically dis=
+posed when
+> > + * the driver is detached.
+> > + * devm_irq_create_mapping() can be used to omit the explicit
+> > + * irq_dispose_mapping() call when driver is detached.
+> > + *
+> > + * Returns a linux irq number on success, 0 if mapping could not be cr=
+eated, or =20
+>                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^=
+^^^^^
+>=20
+> > + * a negative error number if devm action could not be added.
+> > + */
+> > +static inline int devm_irq_create_mapping(struct device *dev,
+> > +					  struct irq_domain *domain,
+> > +					  irq_hw_number_t hwirq)
+> > +{
+> > +	unsigned int virq =3D irq_create_mapping(domain, hwirq);
+> > +
+> > +	if (!virq)
+> > +		return 0; =20
+>=20
+> What is the point of returning zero instead of an error code?  Neither
+> of the callers that are introduced later in the patchset use this.
+>=20
+> I understand that it matches some of the other legacy irq function
+> behaviors, but I think we are trying to move away from that because it
+> just leads to bugs.
+>=20
+> Since we don't need the zero now, let's wait until we have a user before
+> introducing this behavior.  Then we can add a new function that returns
+> zero, but we'll still encourage people to use the standard error code
+> function where possible.  And at the same time, when we do introduce the
+> zero is an error code, function you should contact
+> kernel-janitors@vger.kernel.org so someone an write a static checker
+> rule to detect the bugs that result from it.
 
-> case it is solveable: just drop .owner.
+Hi Dan,
 
-Or, we could merge the CoreSight changes (as they are really not
-affected by the problem this series is trying to address) after the
-base changes land in AMBA, via the CoreSight tree.
+the first user of this function is the very next patch of this series,
+and it does this:
 
++	irq =3D devm_irq_create_mapping(dev, mcu->gc.irq.domain, irq_idx);
++	if (irq <=3D 0)
++		return dev_err_probe(dev, irq ?: -ENXIO,
++				     "Cannot map MESSAGE_SIGNED IRQ\n");
 
-Suzuki
+So it handles !irq as -ENXIO.
 
-> 
-> Best regards,
-> Krzysztof
-> 
+I looked into several users who do
+  virq =3D irq_create_mapping()
+and then reutrn errno if !virq:
 
+  git grep -A 3 'virq =3D irq_create_mapping'
+
+Some return -ENOMEM, some -ENXIO, some -EINVAL.
+
+What do you think?
+
+Or should I send this driver without introducing this helper for now?
+
+Marek
