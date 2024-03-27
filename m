@@ -1,188 +1,159 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03CC94A35;
-	Wed, 27 Mar 2024 05:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C850D17984
+	for <linux-crypto@vger.kernel.org>; Wed, 27 Mar 2024 05:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711518600; cv=none; b=NiewU+ge+9yCm9ltPE6wBz25Nq0HWOeeUzmiQjFz3ITTitjDoYWDUWH5Ge3XgXEK3BSL+C83VZbMCKJDssFYDhlR1XyOalDRzbfz0EHX5ScjikZMzqaQRfbPaXEZsLJu0l1e/xZWilY3CJE09kx4foCy2yqgphsIcVJh/l1UrUM=
+	t=1711519056; cv=none; b=YqEa7kG2bUnY3Qscy+8zyXoL5n3EA6xhl3xi5s6666NaKKI+Q88T/I6PDUcPGxjhC9M0CBjKBr0CJtmebi40XzK2UW2XE6hiSC06Agb/Rga0ZduftiAE0WaQ2K9w3NU8bHgWBIbXnwR6UcQYhn2gSqcLnLyJXp3sGMeZb8YMR6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711518600; c=relaxed/simple;
-	bh=FHstnsP1SDrBUHQB6q/i/oufx2RAf4ywwFzHK0KTvDg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jX+G3XDLDu4IWCMmzTMK2iIZjHbrkwn5dagfwiB40ImmwHZ2HIooNGi7/StiZQG806Ob/IqvOsfIAgPR+VI0GBuVSmSr3op8r4NvJF+cZGs6sxklejUAu8TUGAO887/+Uycv6azhCDRzRjZS541ICdEi61GcjSgP0sf+3oIpiZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y2LOMQek; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1711519056; c=relaxed/simple;
+	bh=A+E6Q8O/+odDiW3CmDioCMgwZfI7X8h9ZMP4WmUHwBE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g+kgy3J5ktk2iZWdZv74IsRbgLT2UuMZRqtEjKNN5hIZpYLlW6wlkaX4hXnbzaWjjtfD+2rFssQscQydg532ZM4YQR5uH+HcfAYpc17AEyJ7LCh2j2xUjNkTqRZinpvgJUlz2Bdz7pvr0O6AhHWtDPA+ZiH2r9m/qfHNH43s7Dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YQ7unryc; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y2LOMQek"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1dffa5e3f2dso41460545ad.2;
-        Tue, 26 Mar 2024 22:49:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YQ7unryc"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56bf6591865so5865537a12.0
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Mar 2024 22:57:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711518598; x=1712123398; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=P7OYcKJp51JHzqHwSq9XW851pfhTE1Ptp9rlfuz3R/c=;
-        b=Y2LOMQek1HWcsx/2cPHQY85aS0zZn/4lOH9zC7IUr1Ffh7yDYgma3hrBrikIC3ajAq
-         okIllRKD2wYBucAvjSfQFFEkx5EBmDy7/Sdmq/JuZCz4AHWfqwBX3j7wZfwx5msMmlfa
-         VKHRtqHHtIZCLU6wdF4nzJuWZiTOPQsNThT2UKkHtl0QgRagmjJNQGlXwnLX70Uzld/h
-         Q1CXZluJ3FxBtJ0806dyojf4IR5YtGRZC/tbrO5DjL5cf5te/u2J5CEd1VAoC58kiXMC
-         KGWJfXlfILRSV8yHEwj+KOHDlshWWUcqnjoOvH5bGDeamFRNzzs4+pthbh7qtkreTOTk
-         Tyzg==
+        d=linaro.org; s=google; t=1711519053; x=1712123853; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=vauhzS1zFrSoAno2ebrQWSRp6RiLw20nALTCk+DSh4A=;
+        b=YQ7unrycEQzcL0CpfY7iaq8l+p0vR5BmeT1rDhDj4xbxg2DhKiY1Kf1CgvA1o4geDC
+         zb9ZsQsBKmIrmKceYOpf6HSVIGcPhIQsCbsIdKnovz4uZnJiuMZRzFTwr7TacgYlP9zr
+         FPi1hmr7ifb1dhK5hP4NWXNpr8NL0Pa3ETyumrif0HRQuABgeUoqE7RqpqFI1hn3sm8v
+         BuwQyJCArIgpNbx/fqzwaAINx9dRolmNZovSG+3A5PyoErSPVbP3q2pC2ngr1VL1Fqb4
+         Yk5xBBygI+nz87qnXovPxXIijSJRrS3pvhZr2u6Ouwl/sXzsYjxQto9H9xkXk+6+ZOUi
+         sH8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711518598; x=1712123398;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P7OYcKJp51JHzqHwSq9XW851pfhTE1Ptp9rlfuz3R/c=;
-        b=m0gc2RJTp8PAky6S+v0BeRF/zKBUQQzV3S/WX63rGe27yNkaghy5086YMJYqFQHQho
-         fzbpkWqHUw6l18g3NM/Mvz4hPn5oVyXTTOb/9wIXwhoHXkK7OUoyEqd7AS1AodlAle4M
-         MWnFTNwZ4T/YLPiVEk+LlCmVug4JF+zKObbV4jwuRHbHbk3+v1iRAqAWXv4Nxq50UAq/
-         AIUsLSOibpu6YPzMAHwS0HRQyhb0co0QymPHnubRZt/BYwFuixt8mpYI5aiPK/M4I4Es
-         h1Kb+dwNCAUimn6pMUnMTEfc92O1T0787ep8NgoG2suBXr+XH5J+XmHm0wyYxPOmnWKS
-         J9Yw==
-X-Forwarded-Encrypted: i=1; AJvYcCUbAb560ybYVrG6e/r7rsCEYENBRNjuzzL/ZoV2znsUXkLkwgoR8cexjozHDmZWpIQ2UFcB7Rrft47hl1xieMVTQbrf2YKw/JIGMfW3eV0Qk0vpsAumWTnwEctcyUtum4f8zPWMwZ47O5ZXYRRHZfk/ZW/N1Solgod1XffPfQ5viKB6FwVAhw==
-X-Gm-Message-State: AOJu0Yw+w0KItWt+PX08mSZMdLKMUk/kD7XV3mD4JzoNdAA+MsGfInVj
-	Q6rvCRydnIYC7xBs+dnLi7QBWhDHJ+Hm1w0fjho7QrsPUIAQJ+bn
-X-Google-Smtp-Source: AGHT+IGMXSmuZrJ0pAAbisJq5ouEdATuxX9zC6nD4xEns155NaylWRnsFrQ06hSn2zG9SE67Bd4vqg==
-X-Received: by 2002:a17:903:2409:b0:1e0:d630:f18e with SMTP id e9-20020a170903240900b001e0d630f18emr361813plo.14.1711518598242;
-        Tue, 26 Mar 2024 22:49:58 -0700 (PDT)
-Received: from fedora.. ([2409:40f4:37:3d1f:3a25:2b3d:10de:3da2])
-        by smtp.gmail.com with ESMTPSA id l7-20020a170902f68700b001e0b863b815sm5761707plg.96.2024.03.26.22.49.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 22:49:57 -0700 (PDT)
-From: Animesh Agarwal <animeshagarwal28@gmail.com>
-To: 
-Cc: animeshagarwal28@gmail.com,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] dt-bindings: crypto: ti,omap-sham: Convert to dtschema
-Date: Wed, 27 Mar 2024 11:19:06 +0530
-Message-ID: <20240327054911.43093-1-animeshagarwal28@gmail.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1711519053; x=1712123853;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vauhzS1zFrSoAno2ebrQWSRp6RiLw20nALTCk+DSh4A=;
+        b=tP53i8jfcKR0LE8p5K5WCU++1eADXr3XLTH+lYc+12TtMiBsA+zovLbQZCydPX1Kpj
+         sUpk1rM9m9+V2mFhafc9hwLJNhJltJB+KP5oGhAATznn5cywG2mOVHn5QHxqkRLkj9a4
+         AQDtTnkziBv79N4ER8rsySTIKXm6i+fVb9X9Vtb65ha5hXuwvw4gzLYbl7KhdASeBIJ2
+         lTsNiTccSmMm+e5NMj6blJSMs6nOXow0/lG+3LuHA5T7qMZciblFoZ/M7UDKhV7jEbo7
+         Cj8Wrxpp2uL7JEezGk+eXmz037fK8wTer5IcPL8RsNU1YTp8UFftSaPQD1z7Iv1LIqED
+         wTWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXmMImvR5tFbqrgpnq/anMiUlFO5Ha1LpW9xeniPdbdi2b3+ssdbSg8UBmmT5GWbVoOtwZ3m5BnJKOr2XGdrPkxVv9CNcUkoZmOIsgs
+X-Gm-Message-State: AOJu0YzIBSmDKNRnnl5D6GRTCAswqdRWk7bIriF+PP/+nm+Rtd2VBEq6
+	BIsdkE7xrHSVpijPeHms5OAGlw7Cz64qbkUZ1PbSym3tze3HxxOcSYhlm9oC0EY=
+X-Google-Smtp-Source: AGHT+IHgkILYmFrhP+1BUm5J8vIOXx7XAe6AnD/e+QIq7e6Sav87TDQXgMfr4F3e8r5OX6uegtkhNg==
+X-Received: by 2002:a17:906:c35a:b0:a47:223f:2285 with SMTP id ci26-20020a170906c35a00b00a47223f2285mr2239743ejb.7.1711519053181;
+        Tue, 26 Mar 2024 22:57:33 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.199.128])
+        by smtp.gmail.com with ESMTPSA id s10-20020a170906354a00b00a47a33b3aa2sm3466993eja.157.2024.03.26.22.57.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Mar 2024 22:57:32 -0700 (PDT)
+Message-ID: <f23f2e60-e5c0-4c3c-9722-dba63a6e7ef6@linaro.org>
+Date: Wed, 27 Mar 2024 06:57:30 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/19] amba: store owner from modules with
+ amba_driver_register()
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Russell King <linux@armlinux.org.uk>, Mike Leach <mike.leach@linaro.org>,
+ James Clark <james.clark@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Andi Shyti
+ <andi.shyti@kernel.org>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Vinod Koul <vkoul@kernel.org>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Michal Simek <michal.simek@amd.com>, Eric Auger <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-kernel@vger.kernel.org, coresight@lists.linaro.org,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-input@vger.kernel.org, kvm@vger.kernel.org
+References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+ <3f61d6d3-a0d6-4c49-b094-6ba62d09ab14@arm.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <3f61d6d3-a0d6-4c49-b094-6ba62d09ab14@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Convert the OMAP SoC SHA crypto Module bindings to DT Schema.
+On 27/03/2024 00:24, Suzuki K Poulose wrote:
+> Hi Krzysztof
+> 
+> On 26/03/2024 20:23, Krzysztof Kozlowski wrote:
+>> Merging
+>> =======
+>> All further patches depend on the first amba patch, therefore please ack
+>> and this should go via one tree.
+> 
+> Are you able to provide a stable branch with these patches once you pull
 
-Signed-off-by: Animesh Agarwal <animeshagarwal28@gmail.com>
+I doubt I will be merging this. I think amba code goes through Russell.
 
----
-Changes in v2:
-- Moved vendor specific property below more common properties.
----
- .../devicetree/bindings/crypto/omap-sham.txt  | 28 ----------
- .../bindings/crypto/ti,omap-sham.yaml         | 56 +++++++++++++++++++
- 2 files changed, 56 insertions(+), 28 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/crypto/omap-sham.txt
- create mode 100644 Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
+> them in to "one tree" here ? We have changes coming up in the coresight
+> tree, which would conflict with the changes here (horribly).
+> 
 
-diff --git a/Documentation/devicetree/bindings/crypto/omap-sham.txt b/Documentation/devicetree/bindings/crypto/omap-sham.txt
-deleted file mode 100644
-index ad9115569611..000000000000
---- a/Documentation/devicetree/bindings/crypto/omap-sham.txt
-+++ /dev/null
-@@ -1,28 +0,0 @@
--OMAP SoC SHA crypto Module
--
--Required properties:
--
--- compatible : Should contain entries for this and backward compatible
--  SHAM versions:
--  - "ti,omap2-sham" for OMAP2 & OMAP3.
--  - "ti,omap4-sham" for OMAP4 and AM33XX.
--  - "ti,omap5-sham" for OMAP5, DRA7 and AM43XX.
--- ti,hwmods: Name of the hwmod associated with the SHAM module
--- reg : Offset and length of the register set for the module
--- interrupts : the interrupt-specifier for the SHAM module.
--
--Optional properties:
--- dmas: DMA specifiers for the rx dma. See the DMA client binding,
--	Documentation/devicetree/bindings/dma/dma.txt
--- dma-names: DMA request name. Should be "rx" if a dma is present.
--
--Example:
--	/* AM335x */
--	sham: sham@53100000 {
--		compatible = "ti,omap4-sham";
--		ti,hwmods = "sham";
--		reg = <0x53100000 0x200>;
--		interrupts = <109>;
--		dmas = <&edma 36>;
--		dma-names = "rx";
--	};
-diff --git a/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml b/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
-new file mode 100644
-index 000000000000..d69b50228009
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
-@@ -0,0 +1,56 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/ti,omap-sham.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: OMAP SoC SHA crypto Module
-+
-+maintainers:
-+  - Animesh Agarwal <animeshagarwal28@gmail.com>
-+
-+properties:
-+  compatible:
-+    enum:
-+      - ti,omap2-sham
-+      - ti,omap4-sham
-+      - ti,omap5-sham
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  dmas:
-+    maxItems: 1
-+
-+  dma-names:
-+    const: rx
-+
-+  ti,hwmods:
-+    description: Name of the hwmod associated with the SHAM module
-+    $ref: /schemas/types.yaml#/definitions/string
-+    enum: [sham]
-+
-+dependencies:
-+  dmas: [dma-names]
-+
-+additionalProperties: false
-+
-+required:
-+  - compatible
-+  - ti,hwmods
-+  - reg
-+  - interrupts
-+
-+examples:
-+  - |
-+    sham@53100000 {
-+        compatible = "ti,omap4-sham";
-+        ti,hwmods = "sham";
-+        reg = <0x53100000 0x200>;
-+        interrupts = <109>;
-+        dmas = <&edma 36>;
-+        dma-names = "rx";
-+    };
--- 
-2.44.0
+You mean conflict with  coresight conversion to platform driver? Worst
+case it is solveable: just drop .owner.
+
+Best regards,
+Krzysztof
 
