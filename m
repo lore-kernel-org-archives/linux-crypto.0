@@ -1,173 +1,88 @@
-Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2120.outbound.protection.partner.outlook.cn [139.219.146.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560B620DD0;
-	Wed, 27 Mar 2024 03:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.120
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711510056; cv=fail; b=r7/04S3WLHbrh8o//C95mu+sZdevWKWABTtLxq/8PPaemAu4J0MWRiq3iowrw9J9lGjAvRRsqKfpQDAmxb4QrqwWN6QJ1ak/LpP3mwaiYbFXJBkCfZ24amMxTSApe2O+BXEx6F8IKxPZpW3Tt+O7S9CuGSH38Jidh1UAwopgdQc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711510056; c=relaxed/simple;
-	bh=6mNI4TS/DXPa4QYaZCp3GnabEiUkexi5OhQrqeGJcd0=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tOTaEN+epgS0ZUsVRWzIw/KrAUUh7cg7jS5/QIosaeKSGFE/TzKpZ6M2y2iGDo0QQtEq9qMD2iZki3r6EN6KbUhusl9Ez7mmSHCk6+mIMplYPSaEfdGX3R3BLgBYbswcsT5qWfDpnzVNy66qPvH5/rB6xv5hwLBKf8RrmF21jzo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nuAEATmEazILeycjeKlXV3UfxGnVI0L0hkXOBmR2wf1tObMUIDb+co+xVrsrMARDvfNp7As2KfxRLTVjw9Zf2RUhMhjDo4Si0eH8quPEG+9ozhQWjkNhUVqOEuqE4HzoMd+skcVw83+c8cmtMMgtt6qKeNko/7A8h99itWxwxhN0tyRcasLsDUGxnHjX30kbMzTwAmYSa5IIE/S/WkEyUX5/Uc1nvmfkK/HLmN+58Z0htEsd9Z+12LFadT+0V3v4F0+kzjrKpaxwz8n7UHpM8Z7T4FNjAD+/XAVOk/wMthXdDXYmlvKzU6IaAmkrQO6E/xQImT2mAeuEfa4CKSYdig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IdcMCIcERo7vykoimDGDFyaeHTetpEMbQv7DVusPsTg=;
- b=PE6iihaZYjjAQFa1GUduJ8x8EWaohpZJTlUTun9zEI7gzus4VK+Vxd6bxbVpE2aDofKE1eR1wbWlu7j5b8653yoZh/rJmnRK8L5gTBLPUHLnlPY0ybyOush1rg1LNwyHngZ+bseR98cyLmBMSX33FIwsnSjJpCRE0bl41RDHD1PR46gWInS4NstVSUd/QX0fZeFKK0HHBERKyBL0B+6u2VoC5MqcvnTopveoKvUfqromk5xWtBdrW+TeAZULeErImw5FJ/m3s1+UmfrLnQAr26K5FYqowaea+SIHJhHxIm1wP2EZn74J19uC459SDqgX4dKs8Mco952L6fmAht25iA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Received: from NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:10::10) by NT0PR01MB1264.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:12::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Wed, 27 Mar
- 2024 01:55:04 +0000
-Received: from NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
- ([fe80::3dc9:e0c9:9a09:3bb7]) by
- NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn ([fe80::3dc9:e0c9:9a09:3bb7%4])
- with mapi id 15.20.7409.031; Wed, 27 Mar 2024 01:55:04 +0000
-From: JiaJie Ho <jiajie.ho@starfivetech.com>
-To: 'Herbert Xu' <herbert@gondor.apana.org.au>, "'David S . Miller'"
-	<davem@davemloft.net>, 'Rob Herring' <robh+dt@kernel.org>, 'Krzysztof
- Kozlowski' <krzysztof.kozlowski+dt@linaro.org>, 'Conor Dooley'
-	<conor+dt@kernel.org>, 'Eugeniy Paltsev' <Eugeniy.Paltsev@synopsys.com>,
-	'Vinod Koul' <vkoul@kernel.org>, "'linux-crypto@vger.kernel.org'"
-	<linux-crypto@vger.kernel.org>, "'devicetree@vger.kernel.org'"
-	<devicetree@vger.kernel.org>, "'linux-kernel@vger.kernel.org'"
-	<linux-kernel@vger.kernel.org>, "'dmaengine@vger.kernel.org'"
-	<dmaengine@vger.kernel.org>
-Subject: RE: [PATCH v4 0/7] crypto: starfive: Add support for JH8100
-Thread-Topic: [PATCH v4 0/7] crypto: starfive: Add support for JH8100
-Thread-Index: AQHabswuRP6vmqtmzUiwGSiP4uQyCbFK9DVg
-Date: Wed, 27 Mar 2024 01:55:04 +0000
-Message-ID:
- <NT0PR01MB1182C3CD53AA7CB251BDD99D8A34A@NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn>
-References: <20240305071006.2181158-1-jiajie.ho@starfivetech.com>
-In-Reply-To: <20240305071006.2181158-1-jiajie.ho@starfivetech.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: NT0PR01MB1182:EE_|NT0PR01MB1264:EE_
-x-ms-office365-filtering-correlation-id: 6a58d795-5fa5-4a36-b113-08dc4e00ebf1
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- FyyoNmpx69xw9V6F3Jt920pD7QvFM+ZMzpIQdv6ykNn0D6skwysQRH4YvpstdfPsihqRitHVDbvlV9qqFXCHdjVG48wXRDhdVmcHLEYyZB+mwVnZ4Bl9Y8lPMq6syCzkrZSBB1wB3usSPiZN3vqa+gjD4nh72sHPhXEzaq9/M9v/lUDQF1NKICCacqRRpp80cVEeaXURxFVBcB+fHXUTv+hjpJYQW10DI/KP/h11zdcCnfuJWZSHWazjY/oI8WCEjASPp7RumyxzcTQFNAcpA8N1vWjYQrF+mIAdDbFlU9DsWx1Fq4IeYA/pKUmMmPKfhqxWv6PGow65OJqwBuVRqY22VtcGinau7qVEjK2Wg7CEtLudYCv2K7EB/jcAkQgTT0JWJGNKNEPaasmueARwHLh2HGHAw7XdIrTXghMdibhrQaDt/IcD7ubAJmLy9ZIMjicskxl6l+e2oa5VeFm0NLi14kIMlVUsi7SMdIP+r7KpY094W6H6NpeayYBCi6jlzgPMMS3ogbbdjRYlG9kjA2q+oh9Dd6cP9AnEeRibLgI89hbsv5cWQyyZ0bPiETmy7ixFoYz43pykDb9M7COqPe0sqIP+ekMHjjWLC/FTqb1XUic/9xln20/FMCQs+RmU/fbgbuYoScoNzg7dbAClfw==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230031)(7416005)(41320700004)(1800799015)(366007)(38070700009)(921011);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?0qffVL/8J822Ra1K1k0+YVG8qTDkWO0Nx2xGdQanPSsVTL3TgN46tpWGnAD0?=
- =?us-ascii?Q?p6Kt+n4Y5Ou4SwMwdvQ3Z5RNcDUzgN0OaykSiOVdIPLL8n8TNbvg5vV+pEBz?=
- =?us-ascii?Q?mC46CThCr3XmFH+/Zh4Q8vdgsueO6hFVxvKnRrrjvj7wJhskhkH5EBRUwESc?=
- =?us-ascii?Q?gxCCFnigREePZW6MtEkYOn0fSG6vYdOVYFz7azy66ANFZfLX6TEwpTK7jBkR?=
- =?us-ascii?Q?ombdvLNDwyyWbmHajbCpJIpQWw2nbSCByUv+5vJXk3j/wl1wf8ed5/J0BLDO?=
- =?us-ascii?Q?3TFGSMpUf+bKbtsSrrwKuUHpuQmHf+Nx5gTXL2BFdAoN+l4RxOkzbqsqXCpN?=
- =?us-ascii?Q?kTxL0AUlA2GcKxD7N4VPEGauxGd1a01WbyiMHSy3+nv6YvuaiLusyLr083WM?=
- =?us-ascii?Q?Xej7RuyBgIkCHNt+3unAy2am5ZqcJO1SyxEoMkgiE1K6p9cilDR9a7mvsXOg?=
- =?us-ascii?Q?LhoK8sjXPLQr/LruH5Puf3RBu6AihKH6Qlhs71pIH05dlNoPjgZlKHN9LmZH?=
- =?us-ascii?Q?1y2ywn+YULz9SZUF8xC43D2StkJjdxEhsouQUGE3L2NKqkZuxJRfRf7tGXHc?=
- =?us-ascii?Q?97MQZ74uEloU9a8ko5TuMwg8OVnES4XrLGitXK5olVqmLK4lCyIAY+wxmqNM?=
- =?us-ascii?Q?eGrAat5NWaw4VTK3UzoajFQvgtaihUABVzaj3laPHx8KaBrnGiwU50Ace8gO?=
- =?us-ascii?Q?I2Rp+CDepmctahLm/lTV0irjJ2Npf6OcCsZApjG+U/BTomCuS1roGjgzj9jp?=
- =?us-ascii?Q?rdkdB34oK69r0LobGzxTCb3ol0a79GHpfdquo+cz3Zbk1TZRLOtYCRQJdA6d?=
- =?us-ascii?Q?DBNvuu0TOvzJplUJQrSGhRLlcOQhIU96Mzpynn2oqniBU5VNotIwrT8xROxa?=
- =?us-ascii?Q?A0z50/OgHF1nj4yUjL3ybe1VHf496FcBJc5RbTMxLyZho4xi4eP5o3iH2a9L?=
- =?us-ascii?Q?+7ht62Lq3eDTWx3ORlLdkm9NvxPizyJSbRTY5vttf09Y5bUav5MDyOlGI4E4?=
- =?us-ascii?Q?pAcIZC6p71s7D2VzQIXJP5Uv0RjnTkw2+unLPB8shJbAx2xj9/aU6CQAlKCL?=
- =?us-ascii?Q?1tOLKXr1LNUA0/kbGz7pcWHG6n1Jtye8JWBg8SCZ5cYoDVu+psR6tnuBU2bo?=
- =?us-ascii?Q?DyPobTDcgBTQYfirzftuO2y8MOTQuxZfXUBPIHrbsI8Weix+nH6quQFaOO+h?=
- =?us-ascii?Q?8dDF02qlDQPQ3zG7K0LWA5BvAC2AmhGOeGPfWFergFmOCyHHHwLY1cXgFffG?=
- =?us-ascii?Q?SQFBDEpjZH2qwWUW5ntx9eVf9bWPMISdyA7+/87yCq0T3nTpfUwROqWD2AW4?=
- =?us-ascii?Q?/NMYGg/cEg7kaj3GopAc8G+yTzGpb6eJvqic2fv/NErtJYr9fEHiSjv3tyFv?=
- =?us-ascii?Q?XbBRgktGXeF7frmAh9q9e6UvbbvD6uaQ4EX+soNErO8FMrfyaRMWV1NEDec9?=
- =?us-ascii?Q?tn7dYwpPj60TWPU5axo94r2d1AzVISA/2KHmf+F3cIjVUbrV8eTpCxZO5qUg?=
- =?us-ascii?Q?qhTDF81FCwiX+J2SXxZlCLIAnPOVqGL1g27upDwbrl12HQ2nbqxuMR/arwGG?=
- =?us-ascii?Q?8MhOFkJ4fqjcSoEmaneJHCIr+cBxZ/oe9dsQvHr7?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1213DAC14;
+	Wed, 27 Mar 2024 05:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711516663; cv=none; b=E9YpVc0MplUh7oor/4rIQfWU0CIZjJNbln14YE5uYzoXRZ34qbW/QW21z7oadnNjcXFWxF8i5VzbLHTvaMiKZ4tB8CppFjm0vbvRvBHGWAG6UZnm9nw0Fc2hiEJeOtwyhGFPg3o/CebtXljSo70ewD7OagwzVUYOKikMP0+pjTo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711516663; c=relaxed/simple;
+	bh=4riwaZTrjtC5kVDX3WEdO9qoYzGpgy3W1V3CwdcjKDw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JUWZ4cbVI6CTKw5jmiE6jzIhH85EsydA/b+PxhkV9MElrflxr36gGpxOIPaGY3EF0hbWM03PwdxC+GXm8YWxxMIf2W0OWt0y+7jOd/RJEO6/oonjpdhUJdez+q7zDltcdFH/e8YU4NNPVOslaAD4DvplBtEAkUVx7jpNzvxvwXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hwM7MVjc; arc=none smtp.client-ip=209.85.160.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hwM7MVjc"
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-229bd1776dcso2544636fac.0;
+        Tue, 26 Mar 2024 22:17:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711516661; x=1712121461; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4riwaZTrjtC5kVDX3WEdO9qoYzGpgy3W1V3CwdcjKDw=;
+        b=hwM7MVjcScCVkUnctASgPg3i9sPEHZD7lXwhit9BfsGOzH3DtxJ2Fhxb2sSHPPyafv
+         HZS+vF3Jvg2Cx39ZhDQE5lW4Q3kOM3GJAbTyo1OSj3bpSbHU1vIQ+fnEvFOKq4zNwfjR
+         +2EO9QmvGuZv1FE2eQak0c+URhGXhhpyIS2Gf0ek/k8oI9eCAYdavI+jZKVKSSPcyXKx
+         7IrDbl5XmK4KH0Me8SBN18e1HnbEW0eZmVDMQx60FX68wSYVP6OkgkLAb8swlnQJhpU4
+         SU9qwujP1IdJSD4seX0yUmfIBUtxjgIJurmj1hu4uvdNRHg0to+f7Byu5VpDg4MzWc2h
+         CBpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711516661; x=1712121461;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4riwaZTrjtC5kVDX3WEdO9qoYzGpgy3W1V3CwdcjKDw=;
+        b=ka6DbanLKSjH7V8S1m4sxG0inYM1LiU7F1MN4DzQKIo+y9DBtszytdDolXWqUZBCiQ
+         ovR1cAfZ+JA6wap8fGIH58x6b0eRIZbqphLQDwe51G8f9f4KdiSpGiHy2nTiuxJCjxT6
+         ujQlTtbsBzHjD+q6tjofjYY2eT+MKvZGHrvrayiJNY6JssABmV4NlyL0uaRgw8MnEEt8
+         c93jWFmXjeTbGLPotgYyTyBPdDzhY+RMbvGfBhxDN7gPF3cGBVYGXXEQ/ynXZiMcv2Bd
+         uIsmiE66GGweeH51kANZwOoGHM0ryixOl3J4OrTCXzTFzKmKMZ98XCack3DQ2mlnzgsL
+         xwuw==
+X-Forwarded-Encrypted: i=1; AJvYcCWNqfgy7/dehf91Mc+afnbc0yQ6tScxbkgoZVn6kMSI11itFVYaE2mOywh8oVStYGjzQP8gv+XxwOxqCwRr0HgQg4Ns38rfaRgHqHRN85QfqZ9Xw1PW3S1rnWdIcgyqczwYi7IKR7PyZNt9JMynjyrGdU8TBE3s/mpGiyYHYPl4N2hLRPmUaw==
+X-Gm-Message-State: AOJu0Yxi4XVxjPGj2wG9yXnFQ6S/v+6eqijYce62oLkBamo8iBhfF1VD
+	cJX9krAWtxYTjEit5/9eW587o5edrUst7rCiIUp+HaBCMBUSy9mB0t6kDiNGegziyGn30uBGxJ9
+	HI7gn5PxXmkYCJ/7tMJxySzX/T7w=
+X-Google-Smtp-Source: AGHT+IET+KpDpFsXH1vZPq1nm9mFae1IJte1812WIdulNEGf93QkoKnilIyxMU1roZlztJpUo4rlwE19CsPfYLJEkfI=
+X-Received: by 2002:a05:6870:d38d:b0:21f:d3b5:bd02 with SMTP id
+ k13-20020a056870d38d00b0021fd3b5bd02mr159760oag.31.1711516661488; Tue, 26 Mar
+ 2024 22:17:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6a58d795-5fa5-4a36-b113-08dc4e00ebf1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Mar 2024 01:55:04.4909
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Dq5uJF/FrrP6BPyhFIA0I7tE6GQgaxqQnhJErKpXE/mwm64px77vsxj4kqjM0dlkf0O9EM4YvwGHb08yPeyVjtzZw0nEaB3GBJ/oMO/C2eY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: NT0PR01MB1264
+References: <20240326120107.13442-1-animeshagarwal28@gmail.com> <20240326-spectrum-talon-0fc977c32c5c@spud>
+In-Reply-To: <20240326-spectrum-talon-0fc977c32c5c@spud>
+From: Animesh Agarwal <animeshagarwal28@gmail.com>
+Date: Wed, 27 Mar 2024 10:47:30 +0530
+Message-ID: <CAE3Oz8237mYOcDuJFOH+7HJ0sLG=hT__F2aTsr4r8Jr3V-c-Xg@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: crypto: ti,omap-sham: Convert to dtschema
+To: Conor Dooley <conor@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> This patch series add driver support for StarFive JH8100 SoC crypto engin=
-e.
-> Patch 1 adds compatible string and update irq descriptions for
-> JH8100 device. Subsequent patches update current driver implementations t=
-o
-> support both 7110 and 8100 variants.
->=20
-> v3->v4:
-> - Updated interrupts descriptions for jh8100-crypto compatible. (Rob)
-> - Added patch 3 to skip unneeded key freeing for RSA module.
->=20
-> v2->v3:
-> - Use of device data instead of #ifdef CONFIG_ for different device
->   variants.
-> - Updated dt bindings compatible and interrupts descriptions.
-> - Added patch 4 to support hardware quirks for dw-axi-dmac driver.
->=20
-> v1->v2:
-> - Resolved build warnings reported by kernel test robot
->   https://lore.kernel.org/oe-kbuild-all/202312170614.24rtwf9x-
-> lkp@intel.com/
->=20
-> Jia Jie Ho (7):
->   dt-bindings: crypto: starfive: Add jh8100 support
->   crypto: starfive: Update hash dma usage
->   crypto: starfive: Skip unneeded key free
->   crypto: starfive: Use dma for aes requests
->   dmaengine: dw-axi-dmac: Support hardware quirks
->   crypto: starfive: Add sm3 support for JH8100
->   crypto: starfive: Add sm4 support for JH8100
->=20
->  .../crypto/starfive,jh7110-crypto.yaml        |   30 +-
->  drivers/crypto/starfive/Kconfig               |   30 +-
->  drivers/crypto/starfive/Makefile              |    5 +-
->  drivers/crypto/starfive/jh7110-aes.c          |  592 ++++++---
->  drivers/crypto/starfive/jh7110-cryp.c         |   77 +-
->  drivers/crypto/starfive/jh7110-cryp.h         |  114 +-
->  drivers/crypto/starfive/jh7110-hash.c         |  316 +++--
->  drivers/crypto/starfive/jh7110-rsa.c          |    3 +
->  drivers/crypto/starfive/jh8100-sm3.c          |  544 ++++++++
->  drivers/crypto/starfive/jh8100-sm4.c          | 1119 +++++++++++++++++
->  .../dma/dw-axi-dmac/dw-axi-dmac-platform.c    |   32 +-
->  drivers/dma/dw-axi-dmac/dw-axi-dmac.h         |    2 +
->  include/linux/dma/dw_axi.h                    |   11 +
->  13 files changed, 2437 insertions(+), 438 deletions(-)  create mode 1006=
-44
-> drivers/crypto/starfive/jh8100-sm3.c
->  create mode 100644 drivers/crypto/starfive/jh8100-sm4.c
->  create mode 100644 include/linux/dma/dw_axi.h
->=20
+On Tue, Mar 26, 2024 at 11:50=E2=80=AFPM Conor Dooley <conor@kernel.org> wr=
+ote:
 
-Hi Herbert,
-Could you please help review this patch series?
+> Is there really only one value possible here?
 
-Thanks,
-Jia Jie
+There aren't any ti,hwmod properties with value other than "sham" at
+least in arch/arm/boot/dts/ti/omap for this module.
+
+> Also, the convention is to put vendor properties like this after more
+> common properties like reg, interrupts etc.
+
+Thanks for letting me know I'll change it.
+
+Thanks and Regards
+Animesh Agarwal
