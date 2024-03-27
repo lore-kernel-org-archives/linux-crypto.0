@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434F214F9DE;
-	Wed, 27 Mar 2024 12:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1DE15AAB3;
+	Wed, 27 Mar 2024 12:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711541673; cv=none; b=r4hFXVAo23XtQEZh3s1QC0vYh3oN2d4/0c8QmFbzIdHmA8hosVnAocA1CWS5jFJ3MZtZvM4LPQk2Aqv3VE67qBEoqdc49MDgZSDhJfqOGK/0xtFS0DIyDHx9samiSSmySWWQqBjKj5FTh/gX8RNrCjawo+oUAr2oFxPEnW+yH1w=
+	t=1711541876; cv=none; b=lYhCvldhPA1Uw2JsgujzwwucoFHbGdFSAcPnwqeTW6VAj5wR/YsMdO0iPOyhpVPpYBIm6+KQYeFjpmKrq8EJeABT0jYsFFVyxQ9MAwyxtPv0G13eDgy34bksT3hm/Lkk0OmojZSOrGI7157uDzksBYJthexbl5fLKc+6agPE2/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711541673; c=relaxed/simple;
-	bh=f52B1KkEW1j3+XwNpb+1tybAlCjy815tAAlHi5Fc9FI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oKcVBKVgo+9TcNMuVThQIUtAnvyz+WehQnTc29fTUQX+eydqA8UbxbZqITWwRNGd4fQhisnT2BZfjbbzk4l3dKno1KzivDEUcW+kv/7VCGUYH//zg4gNDdyl6q336Ed8DNcOo2HZQ72OtKIG1ZA5QoBi0tcmVXixJmvW4jd24f8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pz+ksFeu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711541876; c=relaxed/simple;
+	bh=8KdgN4gMYpFIeyybpCJjFfRxR85qaQxrQ/OatPBxMwA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LSuHGbBAARpa7c0fnlZX4+WTjCuKGkQgjOGsLPAPozMFsBJd6h+VtLPFjz5Bt2HbPIgrOhqyQnXR+641RvC9TexztBWRpbMA5CFuDq+lVKqsclXmxtl/FRoyU1mxVOZxxvVMh+c+pyzXxiXX0mYje9LmURL3dzNAUFXlLHsxEXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YNQFHsLT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pz+ksFeu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1230BC43330;
-	Wed, 27 Mar 2024 12:14:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNQFHsLT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D56C433C7;
+	Wed, 27 Mar 2024 12:17:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711541673;
-	bh=f52B1KkEW1j3+XwNpb+1tybAlCjy815tAAlHi5Fc9FI=;
+	s=k20201202; t=1711541875;
+	bh=8KdgN4gMYpFIeyybpCJjFfRxR85qaQxrQ/OatPBxMwA=;
 	h=From:To:Cc:Subject:Date:From;
-	b=pz+ksFeuIS5lHwIQQYTnlY419jysQfcMvRzphuETumwd8covGWvbaFIl8kZ2b2ZWm
-	 HltkP1eqtoz7evk6Odkncido6hvnezzYmZpa/4jaEpDs9bAIENozDVERdGGsNBYr37
-	 poNxSSKMOJ0PSg8DaI2eZJBUZ6P3VCkk2LQ2uXkYboQ6a308hWjh7AarnWW70yh+Ou
-	 IZXMbbIQaVfyOhCMpLt6bcXrlhaSZrmWNfrjr/sQS/USdwYjPX1pwnFe/wJdu7yBa6
-	 kRmfYvOIWXpPlIlHR/wQac1C6/riKYMTq4h+0ZgTF4qy0d18ZmpXAze2FU6QPIkDe5
-	 tTlJyEr5VlxAg==
+	b=YNQFHsLTdNvPTWB31tU1dFxyzsq0FhO/HlDDVg4XPljDU7oWiCXzyjRWDGkP/s1Kt
+	 ezrsWLMgpkYuKK/anHPpP5knLVSEtvBuGMP0xTekv6zbTPHrXoeN8uLOk25zGtfgvc
+	 RuvF8cvZNa1UxgnxDLjXt5b47ZIObq+SgnQU0nNmTfWUpP2X9uXzmShB74igCL8ZKX
+	 9MrerwISQJLNJ/bs+LOhs+JDnLxj4Ai4CnYryOjNTm/Htrww5D+kbpB6aGDvOcfbRT
+	 5w2rqOj9Lh4Jk5/MotrlxpqiHWmMHlSyIPv6aI4+sLBSOPN2YNpslNq3t1ksYRS/Ya
+	 Z1kNBZ7AvLzow==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	wangyuli@uniontech.com
@@ -34,9 +34,9 @@ Cc: WANG Xuerui <git@xen0n.name>,
 	linux-crypto@vger.kernel.org,
 	loongarch@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: FAILED: Patch "LoongArch/crypto: Clean up useless assignment operations" failed to apply to 5.15-stable tree
-Date: Wed, 27 Mar 2024 08:14:30 -0400
-Message-ID: <20240327121431.2831149-1-sashal@kernel.org>
+Subject: FAILED: Patch "LoongArch/crypto: Clean up useless assignment operations" failed to apply to 5.10-stable tree
+Date: Wed, 27 Mar 2024 08:17:53 -0400
+Message-ID: <20240327121753.2833881-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -48,7 +48,7 @@ X-Patchwork-Hint: ignore
 X-stable: review
 Content-Transfer-Encoding: 8bit
 
-The patch below does not apply to the 5.15-stable tree.
+The patch below does not apply to the 5.10-stable tree.
 If someone wants it applied there, or to any other stable or longterm
 tree, then please email the backport, including the original git commit
 id to <stable@vger.kernel.org>.
