@@ -1,34 +1,32 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3145FBAF;
-	Thu, 28 Mar 2024 10:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D143F53818;
+	Thu, 28 Mar 2024 10:44:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711621335; cv=none; b=MDxgYe6/oXpwVEJtJoDHO1iRZ801/Hyos5X8kxoDk3l0tTSeuqCYdKbo3SNM12eyC1nzvG9ynttvvBBG5mxh+m3hu+RKJhQ3PiuujXjfHKhZT30gPdcP1BjCUrUmakMPA0ZGpu9VBiUssZppYI6k+waN8KdsZNlHFOrHKakLY/U=
+	t=1711622668; cv=none; b=oG1aN3nTFwpdYQT7MBFfwWc7gG561pTtUc/aDeTLsAozX5ixEznjg0LyfDc6tQS6f3VuVv8onEQFk9Ub3LGEPqN5i5FYzYNCu+dJd5F6rkWAw0fhUqU8ntyCKczvTVmbwHgoQ+lure/VzYRvMciAp5uM/jd4LpNGn8YLqWOlRBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711621335; c=relaxed/simple;
-	bh=xi+5DcczHvycuxHFqyLiS+KzYxv8gqLhxcO/MAGfco8=;
+	s=arc-20240116; t=1711622668; c=relaxed/simple;
+	bh=mhF/HUvrBvoHvRE2SKCDRMWLPtYp46iCtm+XUxhGaXM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZBEeFTDyEUW1d23jF1tWkpI12dsTBK7ZZy33dhuPdlpdVDE8OO8/HMP8eiAwfWSJOUk3yD/gsLIcN/60QYoVvR89oEB9/v/owDTPJStpMcFO+z8pfuK463Ws6LcLXN0OrvDFcB/2SfLIx6aJcYX/Eca508aAiP5PxiT09Wcvv78=
+	 Content-Type:Content-Disposition:In-Reply-To; b=VHDYp9M6Mx162fxpQ5T90uP6Aw0l2ZfWliqRdbe3G2tZTMk2OZc/TP1HI1B3/Aje6REL8wmBtGy4LgBvdQrnkiYsUrltsaPxqbI7wnVYb53xN159BOWqvqG4hJ7vOPc3uGJbJAY5Dyh3n1HvofBxnGopS4cpd44Pi6K1pat+TAg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rpmYr-00C7A1-No; Thu, 28 Mar 2024 18:00:42 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:00:58 +0800
-Date: Thu, 28 Mar 2024 18:00:58 +0800
+	id 1rpnF1-00C8Ar-KN; Thu, 28 Mar 2024 18:44:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:44:32 +0800
+Date: Thu, 28 Mar 2024 18:44:32 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Roman Smirnov <r.smirnov@omp.ru>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Karina Yankevich <k.yankevich@omp.ru>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-Subject: Re: [PATCH] crypto: algboss: remove NULL check in
- cryptomgr_schedule_probe()
-Message-ID: <ZgU/2p5Z3HwEdHz3@gondor.apana.org.au>
-References: <20240306072908.5234-1-r.smirnov@omp.ru>
+To: Tom Zanussi <tom.zanussi@linux.intel.com>
+Cc: davem@davemloft.net, andre.glover@linux.intel.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org
+Subject: Re: [PATCH 0/4] crypto: IAA stats bugfixes and simplifications
+Message-ID: <ZgVKECpfxpxyrzfR@gondor.apana.org.au>
+References: <20240304212011.1525003-1-tom.zanussi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -37,18 +35,52 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240306072908.5234-1-r.smirnov@omp.ru>
+In-Reply-To: <20240304212011.1525003-1-tom.zanussi@linux.intel.com>
 
-On Wed, Mar 06, 2024 at 10:29:08AM +0300, Roman Smirnov wrote:
-> The variable i will never be zero, so the check can be removed.
+On Mon, Mar 04, 2024 at 03:20:07PM -0600, Tom Zanussi wrote:
+> Hi Herbert,
 > 
-> Found by Linux Verification Center (linuxtesting.org) with Svace.
+> While doing some testing, I noticed a discrepancy in the
+> decomp_bytes_in stat, which the first patch in this series (crypto:
+> iaa - fix decomp_bytes_in stats) fixes.
+> 
+> I also realized that there were some other problems unrelated to that
+> but also that the stats code could be simplified in a number of ways
+> and that some of it wasn't really useful.  The stats code is debugging
+> code and has been helpful to quickly verify whether things are
+> basically working, but since it's there we should make it as accurate
+> and actually useful as possible.
+> 
+> I realize the second patch (crypto: iaa - Remove comp/decomp delay
+> statistics) removes the code I just fixed up in a patch you just
+> merged (crypto: iaa - Fix comp/decomp delay statistics) - let me know
+> if you want me to combine those if you want to remove the latter from
+> your branch...
+> 
+> Thanks,
+> 
+> Tom
+> 
+> 
+> *** BLURB HERE ***
+> 
+> Tom Zanussi (4):
+>   crypto: iaa - fix decomp_bytes_in stats
+>   crypto: iaa - Remove comp/decomp delay statistics
+>   crypto: iaa - Add global_stats file and remove individual stat files
+>   crypto: iaa - Change iaa statistics to atomic64_t
+> 
+>  .../driver-api/crypto/iaa/iaa-crypto.rst      |  76 +++++---
+>  drivers/crypto/intel/iaa/iaa_crypto.h         |  16 +-
+>  drivers/crypto/intel/iaa/iaa_crypto_main.c    |  13 +-
+>  drivers/crypto/intel/iaa/iaa_crypto_stats.c   | 183 ++++++++----------
+>  drivers/crypto/intel/iaa/iaa_crypto_stats.h   |   8 -
+>  5 files changed, 140 insertions(+), 156 deletions(-)
+> 
+> -- 
+> 2.34.1
 
-Are you sure about this? It does not seem obvious that i cannot
-be zero.  If the tool is correct you need to provide the reasoning
-for it.
-
-Cheers,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
