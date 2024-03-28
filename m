@@ -1,95 +1,111 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD193130E3E
-	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 19:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87AD35FBA7
+	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 19:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711653125; cv=none; b=HSZv7lX0hokMpX0ZQ4VU1Z7P855gCkxdtFoJXMeB44na7Kp96vl/mw2OEgrW+W2O2K8JMqbZXtCsjTlzdAFyw6j5JJlm47VsUmb/hc5fnhGxc6uHtXUHbak4Kcgjq/JhUSQRi7GwNHiJvAZQ17+cBaiBMahR01qMQ//420z8tQw=
+	t=1711654945; cv=none; b=LeHrZZ5eeEjvy8DaULVmwiXxGFql6Q8M2rwDzXKQAd4bY7Zdn0ipaufPHlDyhNspOg8EgJUjzy//Fu2vHkElmN0dxtaaeAf/FgukzLrzrW9UPaFKC5dIdkTFYDLuMdlIlgJt7DRXpVgxdVE227rigipCwtpDrtthVPxGzBqZmD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711653125; c=relaxed/simple;
-	bh=WdT850BrFUtNSdscPDHstvsJSbWJCrq+fJKOb4t3NGE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IFjCBm8gMeQCoEnpjcaf0NdgLlOOaXfsU1YY+u4oRo+zfVDBWjSXPGPjX6q+T6ggnDqYm2tWEiHoY82Y7lT27pZzmfkuqT/3nEXMKoEtw3BPptN8IkaS1i9lCBqnvp/9p30o5f9fBhyWf6DLQOMHx1vZKjRnpSxWDYSGvnClKdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=g1vJID4F; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
+	s=arc-20240116; t=1711654945; c=relaxed/simple;
+	bh=G54bg5q8nSHx+bWgKyzuXCJMK6dG285yA0AuuEKhQKI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kmDyHVevc2FHpI9/uveL5p7ePnvVA2DmaFuIl9u8n9Xabj3iJbgnn08qRu4bTPuydzKQnyxKfHo0itg0NJK/0mwTsOxKzh2WwgvxcVteTQAxfnmOezlfKhDS1kBLl62w6H5W+vYJglWd1K4N4v0vwBRimSg6S8F52xMfWD4CwOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F5df2u2t; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="g1vJID4F"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-56845954ffeso2016477a12.2
-        for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 12:12:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1711653121; x=1712257921; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5wZ6xWGSDhVRLxzfYy01JgWDM8uMS6wBHVe0w0OdNVk=;
-        b=g1vJID4FobpWIKOwA+7AACSU3CZwgsa2k/GOFqOnhibRoTywBnEIrXfEmmJZaAN46L
-         0ARQ8IalTiwraLK9TuOM2g0K9Av/rkwJ+pH3onlDgXxEDK5L/n+IqbYhv4HZOHTWPej/
-         V0dgA3Gnsxo9n2AUetSGwgKKIJkMhxI6KHpMFeMZ6ZCTFqBsTCId4BsKgk8PJ7iVDDVy
-         0LnOei1h9XDUc9S+QUqWtfzGu6WIN9PImS+BoF7WZk78AI+fNz9y8+K7KRrbRnDXaoUb
-         FLUmc1j7wE/Y6IrdyFK2Sryioznk8opuaj8w0uHDd4+9QJX5qFiW4U1btxNeJBnfyFIi
-         qf6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711653121; x=1712257921;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5wZ6xWGSDhVRLxzfYy01JgWDM8uMS6wBHVe0w0OdNVk=;
-        b=ltBFJohUzlIyyGo4AgMyYpEfVEZeX06R6Z4OUW15+XMc5BD+UPgYexA5/ZYY2X3j6j
-         iqwKEa66zd2Ho2Du3PlR3Na+MlflKSiNZUTJdmyMGoSSg0d+8nBtKkax/6IcPCnSE3L5
-         thI0JJSGEvyikdUjQathts2OpdBiRLhCbr1Z4dGV/k9IcrTPe6XnesnAxKSHMz8jvjBb
-         8cN9FRefKtkXhL9+2BsVpL4A3kCxmHvGdkc6WorJPDyrOf4Mh+62xZVvXZmHxgD4nHm7
-         lq5DOFsjjTT9jsqSgNOh/uDD8xBg7Dqk235FyVZAC2QbRvix4xGlcrYccz+xaCsiJVfm
-         axvQ==
-X-Gm-Message-State: AOJu0YxOzLXhxg5e7hG5CXORc4iLR5I708/manbEnEVffMK2t8pkZT7v
-	JN0j+XA0OoJGL7Kjt4u82J6YgvBt4ExlR4AzS8PQscPC7+6E3ulLXVZqCZbEETYgtYHMM26NnN3
-	NK1A=
-X-Google-Smtp-Source: AGHT+IFhc0Re0LenOTCoW82MfYtfd+rbj0ZdqwrNRv+4gqtnacw26OX8Olim4sk0Ad9fmd0Mg3pMiQ==
-X-Received: by 2002:a17:906:180b:b0:a47:35e5:7da0 with SMTP id v11-20020a170906180b00b00a4735e57da0mr98456eje.41.1711653121106;
-        Thu, 28 Mar 2024 12:12:01 -0700 (PDT)
-Received: from fedora.fritz.box (aftr-82-135-80-212.dynamic.mnet-online.de. [82.135.80.212])
-        by smtp.gmail.com with ESMTPSA id n9-20020a1709062bc900b00a469d3df3c1sm1068587ejg.96.2024.03.28.12.12.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 12:12:00 -0700 (PDT)
-From: Thorsten Blum <thorsten.blum@toblux.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thorsten Blum <thorsten.blum@toblux.com>
-Subject: [PATCH] crypto: jitter - Replace http with https
-Date: Thu, 28 Mar 2024 20:05:12 +0100
-Message-ID: <20240328190511.473822-3-thorsten.blum@toblux.com>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F5df2u2t"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711654941;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R9rFKgdnjl1+qP2ulkGzbGF6DQvxAxPK/GjEf2hMSac=;
+	b=F5df2u2ttAPAcMRAylxaI75/GGm/jIZufXMTJ98gfxEUHosSLc1yNcj+tCFyO7nIzFXO1C
+	BUIlrN2dlyMkTp5I4DfuN7IKcL+Cewh+ADUcvl0gl8FbzNnFB6j2R/siKdlDTf5bCFt9IB
+	/LE7bpb5hJedD0IQ1zy45WznJViS/CI=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-577-0pJKG3AIMS6c6E2O9qbhYg-1; Thu,
+ 28 Mar 2024 15:42:16 -0400
+X-MC-Unique: 0pJKG3AIMS6c6E2O9qbhYg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 76DF729AC03F;
+	Thu, 28 Mar 2024 19:42:16 +0000 (UTC)
+Received: from aion.redhat.com (unknown [10.22.32.11])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 61E11C53361;
+	Thu, 28 Mar 2024 19:42:16 +0000 (UTC)
+Received: by aion.redhat.com (Postfix, from userid 1000)
+	id DED8812E8CC; Thu, 28 Mar 2024 15:42:15 -0400 (EDT)
+Date: Thu, 28 Mar 2024 15:42:15 -0400
+From: Scott Mayhew <smayhew@redhat.com>
+To: Chuck Lever III <chuck.lever@oracle.com>
+Cc: jaganmohan kanakala <jaganmohan.kanakala@gmail.com>,
+	Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: [External] : Re: LINUX NFS support for SHA256 hash types
+Message-ID: <ZgXIF1IzGn8dZGAB@aion>
+References: <CAK6vGwma1mALwE1zDUqXhGP+YHjtXdPipykui3Tt0a6NL_KOqw@mail.gmail.com>
+ <2DC5A71F-F7B7-401B-954E-6A0656BDC6A9@oracle.com>
+ <CAK6vGw=50xecARE1MHmB73VrQS_OFzSqA5c1JF9AuOmjusUDNg@mail.gmail.com>
+ <DEC63E8F-A254-4A2C-B0CD-74E2256D0990@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <DEC63E8F-A254-4A2C-B0CD-74E2256D0990@oracle.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-The PDF is also available via https.
+On Mon, 25 Mar 2024, Chuck Lever III wrote:
 
-Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
----
- crypto/jitterentropy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+>=20
+> > On Mar 25, 2024, at 2:34=E2=80=AFAM, jaganmohan kanakala <jaganmohan.ka=
+nakala@gmail.com> wrote:
+> >=20
+> > Hi Chuck,
+> >=20
+> > Following up with my earlier email, I've noted from the following commi=
+t that the support for SHA 256/384 has now been added to Linux NFS.
+> > https://github.com/torvalds/linux/commit/a40cf7530d3104793f9361e69e84ad=
+a7960724f2
+> >=20
+> > The commit message says that the implementation was in 'beta' at the ti=
+me of the commit. Is the implementation still in the 'beta' stage?
+>=20
+> "Beta" was used simply to mean that the code did not have
+> significant test or deployment experience. So far there
+> have been only a few bugs, all known to be fixed at the
+> moment.
+>=20
+>=20
+> > I have an NFS client where I'm trying to support SHA 256 for Krb5. How =
+can I verify my implementation with the Linux NFS server?
+>=20
+> You will need a Linux distribution whose user space
+> Kerberos libraries support AES_SHA2 enctypes, and of
+> course a recent kernel. Scott, anything else? Does the
+> KDC need to handle these enctypes too?
 
-diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
-index 26a9048bc893..f2ffd6332c6c 100644
---- a/crypto/jitterentropy.c
-+++ b/crypto/jitterentropy.c
-@@ -157,8 +157,8 @@ struct rand_data {
- /*
-  * See the SP 800-90B comment #10b for the corrected cutoff for the SP 800-90B
-  * APT.
-- * http://www.untruth.org/~josh/sp80090b/UL%20SP800-90B-final%20comments%20v1.9%2020191212.pdf
-  * In in the syntax of R, this is C = 2 + qbinom(1 − 2^(−30), 511, 2^(-1/osr)).
-+ * https://www.untruth.org/~josh/sp80090b/UL%20SP800-90B-final%20comments%20v1.9%2020191212.pdf
-  * (The original formula wasn't correct because the first symbol must
-  * necessarily have been observed, so there is no chance of observing 0 of these
-  * symbols.)
--- 
-2.44.0
+It depends on whether both the NFS client and the NFS server support the
+enctype negotiation extension (RFC 4537).  If they do, then the KDC
+doesn't need to be able to handle those enctypes.
+
+-Scott
+
+>=20
+> -- Chuck Lever
+>=20
+>=20
 
