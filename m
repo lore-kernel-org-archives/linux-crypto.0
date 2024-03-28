@@ -1,34 +1,29 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1704A57334;
-	Thu, 28 Mar 2024 10:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6405A7BB1F
+	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 10:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711623111; cv=none; b=Gif7kgzP2RPlyHoFu7Ok660LdtgkvrQb2ibQW2yI2RRrMX7v3EWazAFutCymVP5BRt/DWToFK0+uf9YtnIagAMErRnnAH5AYRQeKRnDXXOzLls+PAToVvM7Y0nFCfyDeeUoec5Js3XqlKFe8id93K3hwka4f1Zysx0AUP5p0fNs=
+	t=1711623221; cv=none; b=SXN8QGsy32SC4mpmphroHuMiZ7Fo59h9YirR3f5Gt8FSn8vgXjxPidw2q+lMqt+2cGDaNHlIUR5jcKD+PcBGZNwP1QqTouwj3WLyUE0PAHoj6RaN4+FC+4PV5i3gyJsHaOqk8LIeVnsMYgxAjkk2F9bI1bs/hfktcigT6aJF76U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711623111; c=relaxed/simple;
-	bh=YUac/5Z48Bc82q0skhz4hUdvU/QrE+zgJ4gLeiHGHe8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cOuo3XZJM9vKQ5EZacBUg01aHMzonICuxC+2Hp3d1hMxwBjtg9RvBagcD9t1TALt0Ae/X9PqGvzGmjsr7ANDjKTqBfCWht9qP2gWzWdpU//gZLdLFi2ZLN/Ei+xO5fCTpAS7y5m3aFo+ai7i5VS3vN2hyNGvV2PqpHpykUmqcys=
+	s=arc-20240116; t=1711623221; c=relaxed/simple;
+	bh=/u0KLu9aciEQg81HC+KNVVnaitHqM1DKBqe9dCYqFHM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=kYZDL4SVvdgtkR5YRDOzz63bHcf9EBXDqAKcdXSo2cZ0QiOyeneA/ymGl1HlNm21IIoph/Wz6hEYEhrcQRIgDDsYdYFrpi1pU/xCUee1+5VgJS9oU5hjeN9/xs9nDRcqHywZweMI/Py0E5e64ikIoOAS6SRbKr14ucfrwy0kVL4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rpnLw-00C8Ms-DS; Thu, 28 Mar 2024 18:51:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:51:41 +0800
-Date: Thu, 28 Mar 2024 18:51:41 +0800
+	id 1rpnO1-00C8Om-R1; Thu, 28 Mar 2024 18:53:34 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:53:50 +0800
+Date: Thu, 28 Mar 2024 18:53:50 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Xin Zeng <xin.zeng@intel.com>
-Cc: alex.williamson@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-	linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-	qat-linux@intel.com
-Subject: Re: [PATCH v5 00/10] crypto: qat - enable QAT GEN4 SRIOV VF live
- migration for QAT GEN4
-Message-ID: <ZgVLvdhhU6o7sJwF@gondor.apana.org.au>
-References: <20240306135855.4123535-1-xin.zeng@intel.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, ardb@kernel.org, clabbe@baylibre.com
+Subject: Re: [PATCH v2] crypto: remove CONFIG_CRYPTO_STATS
+Message-ID: <ZgVMPt1eJRbV7qhr@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -37,140 +32,134 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240306135855.4123535-1-xin.zeng@intel.com>
+In-Reply-To: <20240313034821.8253-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 
-On Wed, Mar 06, 2024 at 09:58:45PM +0800, Xin Zeng wrote:
-> This set enables live migration for Intel QAT GEN4 SRIOV Virtual
-> Functions (VFs).
-> It is composed of 10 patches. Patch 1~6 refactor the original QAT PF
-> driver implementation which will be reused by the following patches.
-> Patch 7 introduces the logic to the QAT PF driver that allows to save
-> and restore the state of a bank (a QAT VF is a wrapper around banks) and
-> drain a ring pair. Patch 8 adds the QAT PF driver a set of interfaces to
-> allow to save and restore the state of a VF that will be called by the
-> module qat_vfio_pci which will be introduced in the last patch. Patch 9
-> implements the defined device interfaces. The last one adds a vfio pci
-> extension specific for QAT which intercepts the vfio device operations
-> for a QAT VF to allow live migration.
+Eric Biggers <ebiggers@kernel.org> wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Here are the steps required to test the live migration of a QAT GEN4 VF:
-> 1. Bind one or more QAT GEN4 VF devices to the module qat_vfio_pci.ko 
-> 2. Assign the VFs to the virtual machine and enable device live
-> migration 
-> 3. Run a workload using a QAT VF inside the VM, for example using qatlib
-> (https://github.com/intel/qatlib) 
-> 4. Migrate the VM from the source node to a destination node
+> Remove support for the "Crypto usage statistics" feature
+> (CONFIG_CRYPTO_STATS).  This feature does not appear to have ever been
+> used, and it is harmful because it significantly reduces performance and
+> is a large maintenance burden.
 > 
-> Changes in v5 since v4: https://lore.kernel.org/kvm/20240228143402.89219-9-xin.zeng@intel.com
-> -  Remove device ID recheck as no consensus has been reached yet (Kevin)
-> -  Add missing state PRE_COPY_P2P in precopy_iotcl (Kevin)
-> -  Rearrange the state transition flow for better readability (Kevin)
-> -  Remove unnecessary Reviewed-by in commit message (Kevin)
+> Covering each of these points in detail:
 > 
-> Changes in v4 since v3: https://lore.kernel.org/kvm/20240221155008.960369-11-xin.zeng@intel.com
-> -  Change the order of maintainer entry for QAT vfio pci driver in
->    MAINTAINERS to make it alphabetical (Alex)
-> -  Put QAT VFIO PCI driver under vfio/pci directly instead of
->    vfio/pci/intel (Alex)
-> -  Add id_table recheck during device probe (Alex)
+> 1. Feature is not being used
 > 
-> Changes in v3 since v2: https://lore.kernel.org/kvm/20240220032052.66834-1-xin.zeng@intel.com
-> -  Use state_mutex directly instead of unnecessary deferred_reset mode
->    (Jason)
+> Since these generic crypto statistics are only readable using netlink,
+> it's fairly straightforward to look for programs that use them.  I'm
+> unable to find any evidence that any such programs exist.  For example,
+> Debian Code Search returns no hits except the kernel header and kernel
+> code itself and translations of the kernel header:
+> https://codesearch.debian.net/search?q=CRYPTOCFGA_STAT&literal=1&perpkg=1
 > 
-> Changes in v2 since v1: https://lore.kernel.org/all/20240201153337.4033490-1-xin.zeng@intel.com
-> -  Add VFIO_MIGRATION_PRE_COPY support (Alex)
-> -  Remove unnecessary module dependancy in Kconfig (Alex)
-> -  Use direct function calls instead of function pointers in qat vfio
->    variant driver (Jason)
-> -  Address the comments including uncessary pointer check and kfree,
->    missing lock and direct use of pci_iov_vf_id (Shameer)
-> -  Change CHECK_STAT macro to avoid repeat comparison (Kamlesh)
+> The patch series that added this feature in 2018
+> (https://lore.kernel.org/linux-crypto/1537351855-16618-1-git-send-email-clabbe@baylibre.com/)
+> said "The goal is to have an ifconfig for crypto device."  This doesn't
+> appear to have happened.
 > 
-> Changes in v1 since RFC: https://lore.kernel.org/all/20230630131304.64243-1-xin.zeng@intel.com
-> -  Address comments including the right module dependancy in Kconfig,
->    source file name and module description (Alex)
-> -  Added PCI error handler and P2P state handler (Suggested by Kevin)
-> -  Refactor the state check duing loading ring state (Kevin) 
-> -  Fix missed call to vfio_put_device in the error case (Breet)
-> -  Migrate the shadow states in PF driver
-> -  Rebase on top of 6.8-rc1
+> It's not clear that there is real demand for crypto statistics.  Just
+> because the kernel provides other types of statistics such as I/O and
+> networking statistics and some people find those useful does not mean
+> that crypto statistics are useful too.
 > 
-> Giovanni Cabiddu (2):
->   crypto: qat - adf_get_etr_base() helper
->   crypto: qat - relocate CSR access code
+> Further evidence that programs are not using CONFIG_CRYPTO_STATS is that
+> it was able to be disabled in RHEL and Fedora as a bug fix
+> (https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-9/-/merge_requests/2947).
 > 
-> Siming Wan (3):
->   crypto: qat - rename get_sla_arr_of_type()
->   crypto: qat - expand CSR operations for QAT GEN4 devices
->   crypto: qat - add bank save and restore flows
+> Even further evidence comes from the fact that there are and have been
+> bugs in how the stats work, but they were never reported.  For example,
+> before Linux v6.7 hash stats were double-counted in most cases.
 > 
-> Xin Zeng (5):
->   crypto: qat - relocate and rename 4xxx PF2VM definitions
->   crypto: qat - move PFVF compat checker to a function
->   crypto: qat - add interface for live migration
->   crypto: qat - implement interface for live migration
->   vfio/qat: Add vfio_pci driver for Intel QAT VF devices
+> There has also never been any documentation for this feature, so it
+> might be hard to use even if someone wanted to.
 > 
->  MAINTAINERS                                   |    8 +
->  .../intel/qat/qat_420xx/adf_420xx_hw_data.c   |    3 +
->  .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |    5 +
->  .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |    1 +
->  .../qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c     |    1 +
->  .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |    1 +
->  .../intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c |    1 +
->  drivers/crypto/intel/qat/qat_common/Makefile  |    6 +-
->  .../intel/qat/qat_common/adf_accel_devices.h  |   88 ++
->  .../intel/qat/qat_common/adf_common_drv.h     |   10 +
->  .../qat/qat_common/adf_gen2_hw_csr_data.c     |  101 ++
->  .../qat/qat_common/adf_gen2_hw_csr_data.h     |   86 ++
->  .../intel/qat/qat_common/adf_gen2_hw_data.c   |   97 --
->  .../intel/qat/qat_common/adf_gen2_hw_data.h   |   76 --
->  .../qat/qat_common/adf_gen4_hw_csr_data.c     |  231 ++++
->  .../qat/qat_common/adf_gen4_hw_csr_data.h     |  188 +++
->  .../intel/qat/qat_common/adf_gen4_hw_data.c   |  380 +++++--
->  .../intel/qat/qat_common/adf_gen4_hw_data.h   |  127 +--
->  .../intel/qat/qat_common/adf_gen4_pfvf.c      |    8 +-
->  .../intel/qat/qat_common/adf_gen4_vf_mig.c    | 1010 +++++++++++++++++
->  .../intel/qat/qat_common/adf_gen4_vf_mig.h    |   10 +
->  .../intel/qat/qat_common/adf_mstate_mgr.c     |  318 ++++++
->  .../intel/qat/qat_common/adf_mstate_mgr.h     |   89 ++
->  .../intel/qat/qat_common/adf_pfvf_pf_proto.c  |    8 +-
->  .../intel/qat/qat_common/adf_pfvf_utils.h     |   11 +
->  drivers/crypto/intel/qat/qat_common/adf_rl.c  |   10 +-
->  drivers/crypto/intel/qat/qat_common/adf_rl.h  |    2 +
->  .../crypto/intel/qat/qat_common/adf_sriov.c   |    7 +-
->  .../intel/qat/qat_common/adf_transport.c      |    4 +-
->  .../crypto/intel/qat/qat_common/qat_mig_dev.c |  130 +++
->  .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |    1 +
->  .../qat_dh895xccvf/adf_dh895xccvf_hw_data.c   |    1 +
->  drivers/vfio/pci/Kconfig                      |    2 +
->  drivers/vfio/pci/Makefile                     |    2 +
->  drivers/vfio/pci/qat/Kconfig                  |   12 +
->  drivers/vfio/pci/qat/Makefile                 |    3 +
->  drivers/vfio/pci/qat/main.c                   |  662 +++++++++++
->  include/linux/qat/qat_mig_dev.h               |   31 +
->  38 files changed, 3344 insertions(+), 387 deletions(-)
->  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.c
->  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen2_hw_csr_data.h
->  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.c
->  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_hw_csr_data.h
->  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_vf_mig.c
->  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_vf_mig.h
->  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_mstate_mgr.c
->  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_mstate_mgr.h
->  create mode 100644 drivers/crypto/intel/qat/qat_common/qat_mig_dev.c
->  create mode 100644 drivers/vfio/pci/qat/Kconfig
->  create mode 100644 drivers/vfio/pci/qat/Makefile
->  create mode 100644 drivers/vfio/pci/qat/main.c
->  create mode 100644 include/linux/qat/qat_mig_dev.h
+> 2. CONFIG_CRYPTO_STATS significantly reduces performance
 > 
+> Enabling CONFIG_CRYPTO_STATS significantly reduces the performance of
+> the crypto API, even if no program ever retrieves the statistics.  This
+> primarily affects systems with a large number of CPUs.  For example,
+> https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2039576 reported
+> that Lustre client encryption performance improved from 21.7GB/s to
+> 48.2GB/s by disabling CONFIG_CRYPTO_STATS.
 > 
-> base-commit: 318407ed77e4140d02e43a001b1f4753e3ce6b5f
-> -- 
-> 2.18.2
+> It can be argued that this means that CONFIG_CRYPTO_STATS should be
+> optimized with per-cpu counters similar to many of the networking
+> counters.  But no one has done this in 5+ years.  This is consistent
+> with the fact that the feature appears to be unused, so there seems to
+> be little interest in improving it as opposed to just disabling it.
+> 
+> It can be argued that because CONFIG_CRYPTO_STATS is off by default,
+> performance doesn't matter.  But Linux distros tend to error on the side
+> of enabling options.  The option is enabled in Ubuntu and Arch Linux,
+> and until recently was enabled in RHEL and Fedora (see above).  So, even
+> just having the option available is harmful to users.
+> 
+> 3. CONFIG_CRYPTO_STATS is a large maintenance burden
+> 
+> There are over 1000 lines of code associated with CONFIG_CRYPTO_STATS,
+> spread among 32 files.  It significantly complicates much of the
+> implementation of the crypto API.  After the initial submission, many
+> fixes and refactorings have consumed effort of multiple people to keep
+> this feature "working".  We should be spending this effort elsewhere.
+> 
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> Acked-by: Corentin Labbe <clabbe@baylibre.com>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+> 
+> Changed in v2:
+> - Keep struct comp_alg_common, as per the request at
+>  https://lore.kernel.org/linux-crypto/ZfERP1LK8q+CsoSo@gondor.apana.org.au/,
+>  even though the struct becomes trivial with the stats removed.
+> 
+> - Use consistent comments in include/uapi/linux/cryptouser.h,
+>  and add one to CRYPTO_MSG_GETSTAT which was missing one.
+> 
+> - In crypto/compress.h, remove the forward declaration of sk_buff
+>  because the function prototype that needed it is being removed.
+> 
+> - In crypto_shash_digest(), don't read desc->tfm redundantly.
+> 
+> arch/s390/configs/debug_defconfig            |   1 -
+> arch/s390/configs/defconfig                  |   1 -
+> crypto/Kconfig                               |  20 ---
+> crypto/Makefile                              |   2 -
+> crypto/acompress.c                           |  33 ----
+> crypto/aead.c                                |  84 +--------
+> crypto/ahash.c                               |  63 +------
+> crypto/akcipher.c                            |  31 ----
+> crypto/compress.h                            |   3 -
+> crypto/{crypto_user_base.c => crypto_user.c} |  10 +-
+> crypto/crypto_user_stat.c                    | 176 -------------------
+> crypto/hash.h                                |  30 ----
+> crypto/kpp.c                                 |  30 ----
+> crypto/lskcipher.c                           |  73 +-------
+> crypto/rng.c                                 |  44 +----
+> crypto/scompress.c                           |   3 -
+> crypto/shash.c                               |  75 +-------
+> crypto/sig.c                                 |  13 --
+> crypto/skcipher.c                            |  86 +--------
+> crypto/skcipher.h                            |  10 --
+> include/crypto/acompress.h                   |  73 +-------
+> include/crypto/aead.h                        |  21 ---
+> include/crypto/akcipher.h                    |  78 +-------
+> include/crypto/algapi.h                      |   3 -
+> include/crypto/hash.h                        |  22 ---
+> include/crypto/internal/acompress.h          |   1 -
+> include/crypto/internal/cryptouser.h         |  16 --
+> include/crypto/internal/scompress.h          |   1 -
+> include/crypto/kpp.h                         |  58 +-----
+> include/crypto/rng.h                         |  51 +-----
+> include/crypto/skcipher.h                    |  25 ---
+> include/uapi/linux/cryptouser.h              |  30 ++--
+> 32 files changed, 71 insertions(+), 1096 deletions(-)
+> rename crypto/{crypto_user_base.c => crypto_user.c} (98%)
+> delete mode 100644 crypto/crypto_user_stat.c
+> delete mode 100644 include/crypto/internal/cryptouser.h
 
-Patches 1-9 applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
