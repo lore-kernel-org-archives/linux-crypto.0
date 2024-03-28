@@ -1,30 +1,32 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94854C62E
-	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 10:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E682B9C6;
+	Thu, 28 Mar 2024 10:56:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711623360; cv=none; b=H5nkV9JgRQ/etdbYNZ/pYR+6JxqaxCktn6qE8eQzovyNN+XxefgmCd2RWCmPBCvm/XksZiRGAkEl6wIhHv2x3q1DPTJUyu9XXVvRj49KkH9OzvwtQUQxFp5azHD49RPMQ8akbxDN6EKqnS/bnyw1Mb4JWwWqvlBcLPdPsoJK+Oc=
+	t=1711623413; cv=none; b=W/Hwl0jcQE1itdl9TI9HoWBTXzsLtcU8h9XPSjZawq0Ib8JzJpSvN9ZbLVdA9jtNTFwzvn+/k+4L3p2bC7Jo6Lq5yguHJ4m5hG6bLmM0dpWd0p59lFRSWrz5rdEfM+ohOhEuomf7L/9WmgiFSOAYWjzAEiHBYxtFVMnjsiQnzvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711623360; c=relaxed/simple;
-	bh=FJpI8A6NrgCPAGBZO8P/lsMrsDeicY0KL9y2p22JHWQ=;
+	s=arc-20240116; t=1711623413; c=relaxed/simple;
+	bh=TPIsNz6gfRZzaJZqY9pHJHdC43AuokpDy2fKWTQJ8Rg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CgE+Weu2Eg9exALduNIs0uGjZHE6kLD5ZS8THlFr6hSD9m/VdKMyeBV7bzCXilfqk0GKyDiCd6N1QsR7Yv/IykHdjR0cWxKkpGkOCMs2KjEf6h+xa77MtuNS01+u56NStHgmfvXRC+QKvV8sqPvJkolnymOww8UMRCEYfpOOJ54=
+	 Content-Type:Content-Disposition:In-Reply-To; b=H7R+I/KPCrLtPecqGYfZWsyrhWT9Zt1XOd+lFjxRi6ykAQjPsVzTQf8hqtoc8QF+7RGnDIww6UPOPBZPn0JYkfszorarATOUuLz+io5MI8hBz2Iz+RuURDNfgql3AXaGRfvIzcFrXtD1dzoA6HEgXDZzjXJCOOg/kP6uzRDsAqQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rpnQH-00C8SU-KJ; Thu, 28 Mar 2024 18:55:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:56:10 +0800
-Date: Thu, 28 Mar 2024 18:56:10 +0800
+	id 1rpnQw-00C8T2-2E; Thu, 28 Mar 2024 18:56:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:56:50 +0800
+Date: Thu, 28 Mar 2024 18:56:50 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Joachim Vandersmissen <git@jvdsn.com>
-Cc: linux-crypto@vger.kernel.org, Vitaly Chikunov <vt@altlinux.org>
-Subject: Re: [PATCH] crypto: ecc - update ecc_gen_privkey for FIPS 186-5
-Message-ID: <ZgVMymPK3Q/6tiU7@gondor.apana.org.au>
-References: <20240320051558.62868-1-git@jvdsn.com>
+To: Stefan Berger <stefanb@linux.ibm.com>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br,
+	vt@altlinux.org, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: ecdsa - Fix module auto-load on add-key
+Message-ID: <ZgVM8nNQhkIPgh30@gondor.apana.org.au>
+References: <20240321144433.1671394-1-stefanb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -33,29 +35,42 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240320051558.62868-1-git@jvdsn.com>
+In-Reply-To: <20240321144433.1671394-1-stefanb@linux.ibm.com>
 
-On Wed, Mar 20, 2024 at 12:13:38AM -0500, Joachim Vandersmissen wrote:
-> FIPS 186-5 [1] was released approximately 1 year ago. The most
-> interesting change for ecc_gen_privkey is the removal of curves with
-> order < 224 bits. This is minimum is now checked in step 1. It is
-> unlikely that there is still any benefit in generating private keys for
-> curves with n < 224, as those curves provide less than 112 bits of
-> security strength and are therefore unsafe for any modern usage.
+On Thu, Mar 21, 2024 at 10:44:33AM -0400, Stefan Berger wrote:
+> Add module alias with the algorithm cra_name similar to what we have for
+> RSA-related and other algorithms.
 > 
-> This patch also updates the documentation for __ecc_is_key_valid and
-> ecc_gen_privkey to clarify which FIPS 186-5 method is being used to
-> generate private keys. Previous documentation mentioned that "extra
-> random bits" was used. However, this did not match the code. Instead,
-> the code currently uses (and always has used) the "rejection sampling"
-> ("testing candidates" in FIPS 186-4) method.
+> The kernel attempts to modprobe asymmetric algorithms using the names
+> "crypto-$cra_name" and "crypto-$cra_name-all." However, since these
+> aliases are currently missing, the modules are not loaded. For instance,
+> when using the `add_key` function, the hash algorithm is typically
+> loaded automatically, but the asymmetric algorithm is not.
 > 
-> [1]: https://doi.org/10.6028/NIST.FIPS.186-5
+> Steps to test:
 > 
-> Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
+> 1. Create certificate
+> 
+>   openssl req -x509 -sha256 -newkey ec \
+>   -pkeyopt "ec_paramgen_curve:secp384r1" -keyout key.pem -days 365 \
+>   -subj '/CN=test' -nodes -outform der -out nist-p384.der
+> 
+> 2. Optionally, trace module requests with: trace-cmd stream -e module &
+> 
+> 3. Trigger add_key call for the cert:
+> 
+>    # keyctl padd asymmetric "" @u < nist-p384.der
+>    641069229
+>    # lsmod | head -2
+>    Module                  Size  Used by
+>    ecdsa_generic          16384  0
+> 
+> Fixes: c12d448ba939 ("crypto: ecdsa - Register NIST P384 and extend test suite")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 > ---
->  crypto/ecc.c | 29 +++++++++++++++++------------
->  1 file changed, 17 insertions(+), 12 deletions(-)
+>  crypto/ecdsa.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
 Patch applied.  Thanks.
 -- 
