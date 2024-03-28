@@ -1,32 +1,34 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C28A535A4;
-	Thu, 28 Mar 2024 10:57:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4797657A9;
+	Thu, 28 Mar 2024 10:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711623424; cv=none; b=D3m4JyTxFNl7Y8m4NsB0t8UT9G7fvgHcFxMsoq9Yk9QJXEi8cmApTHRjA2xRdlDmSc+4nbU2hZXbDnauKbCavb4Q4N5BLfBBDv0XxbKaOeKINE6MiZd2Z6aDosY7SdvB7s8Rk0NIJjc6UxQ68lHTZTEPxt8zXzsw2xpgDEImIaY=
+	t=1711623452; cv=none; b=jmeIJy9CqxTIx8KHB39bcNMcFGUbN9d03RW1LOwg9Fe8YpOhQntHHTvDN0KSAeFVAFd5b29fegWw9O+PfDxQMeLFn4B0R+7PQZ9Rx/4KC1ij80BjwtDxw7P+qy5A38wgpyojZFeIlzn8B4Gzq0yZlgJPVG5aKdaX7y8ttK2bW3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711623424; c=relaxed/simple;
-	bh=Kp3dCIxp0BhfM5qsnnXlLRqZvQvUKbpAPfnOn5BdD9c=;
+	s=arc-20240116; t=1711623452; c=relaxed/simple;
+	bh=JFenx0tH3EH5g8x7Z2+LGn7i7pluO4hbZ0l7YkDg+eY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BFnyWNJ2HWpX/Fp4OaG95il7nrwSZlbSnlgSRp2yF3ivbavgjtXw9EYa4ws9NLJVCNx7WFRApRUuP2tZCxiXdPzM3sEiK5Rz/GHFTHfQhJPHwkIxNLpRiKC3UligztTQ3Yn+iE+sB08JLCwauclXOReC+lac6bYJfNXtqKTR8sE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=oXZUJtYHEiiztO/lVytC72xgr0KuQTqmrn/ZBeSd7njVFvMydpphme1AciC9ohgPc6FjgLTBjFkIS2xo2XkT/2dWUrK1saC24Mq5WUlpBZ1/ttyUikMrvFcbG2AfMyjZnY8xcGV/iZ2EG+VXxEOc8x2Bxh33m9JLUuWoBuz0t4E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rpnRF-00C8UK-39; Thu, 28 Mar 2024 18:56:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:57:09 +0800
-Date: Thu, 28 Mar 2024 18:57:09 +0800
+	id 1rpnRm-00C8W9-Jf; Thu, 28 Mar 2024 18:57:27 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:57:43 +0800
+Date: Thu, 28 Mar 2024 18:57:43 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Tom Zanussi <tom.zanussi@linux.intel.com>
-Cc: davem@davemloft.net, jsnitsel@redhat.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 2/2] crypto: iaa: Fix some errors in IAA documentation
-Message-ID: <ZgVNBQ6RDFdxdpSc@gondor.apana.org.au>
-References: <20240321210846.1307596-1-tom.zanussi@linux.intel.com>
- <20240321210846.1307596-3-tom.zanussi@linux.intel.com>
+To: "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	davem@davemloft.net, ebiggers@kernel.org, ardb@kernel.org,
+	x86@kernel.org
+Subject: Re: [PATCH v2 0/2] crypto: x86/aesni - Simplify AES key expansion
+ code
+Message-ID: <ZgVNJ+YASurGz1sB@gondor.apana.org.au>
+References: <20240311213232.128240-1-chang.seok.bae@intel.com>
+ <20240322230459.456606-1-chang.seok.bae@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,39 +37,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240321210846.1307596-3-tom.zanussi@linux.intel.com>
+In-Reply-To: <20240322230459.456606-1-chang.seok.bae@intel.com>
 
-On Thu, Mar 21, 2024 at 04:08:46PM -0500, Tom Zanussi wrote:
-> From: Jerry Snitselaar <jsnitsel@redhat.com>
+On Fri, Mar 22, 2024 at 04:04:57PM -0700, Chang S. Bae wrote:
+> Previously, V1 [1] was posted to update the aesni_set_key() prototype to
+> remove an unnecessary error code return type.
 > 
-> This cleans up the following issues I ran into when trying to use the
-> scripts and commands in the iaa-crypto.rst document.
+> During the review process, it was discovered that both aes_expandkey()
+> and the AES-NI glue code redundantly check the key size. V2 includes a
+> cleanup to invoke aes_expandkey() immediately if AES-NI is unusable.
 > 
-> - Fix incorrect arguments being passed to accel-config
->   config-wq.
->     - Replace --device_name with --driver-name.
->     - Replace --driver_name with --driver-name.
->     - Replace --size with --wq-size.
->     - Add missing --priority argument.
-> - Add missing accel-config config-engine command after the
->   config-wq commands.
-> - Fix wq name passed to accel-config config-wq.
-> - Add rmmod/modprobe of iaa_crypto to script that disables,
->   then enables all devices and workqueues to avoid enable-wq
->   failing with -EEXIST when trying to register to compression
->   algorithm.
-> - Fix device name in cases where iaa was used instead of iax.
+> Thanks,
+> Chang
 > 
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-doc@vger.kernel.org
-> Signed-off-by: Jerry Snitselaar <jsnitsel@redhat.com>
-> Reviewed-by: Tom Zanussi <tom.zanussi@linux.intel.com>
-> ---
->  .../driver-api/crypto/iaa/iaa-crypto.rst      | 22 ++++++++++++++-----
->  1 file changed, 16 insertions(+), 6 deletions(-)
+> [1]: https://lore.kernel.org/lkml/20240311213232.128240-1-chang.seok.bae@intel.com/
+> 
+> Chang S. Bae (2):
+>   crypto: x86/aesni - Rearrange AES key size check
+>   crypto: x86/aesni - Update aesni_set_key() to return void
+> 
+>  arch/x86/crypto/aesni-intel_asm.S  |  5 ++---
+>  arch/x86/crypto/aesni-intel_glue.c | 24 +++++++++++-------------
+>  2 files changed, 13 insertions(+), 16 deletions(-)
+> 
+> 
+> base-commit: e8f897f4afef0031fe618a8e94127a0934896aba
+> -- 
+> 2.34.1
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
