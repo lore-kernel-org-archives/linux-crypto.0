@@ -1,31 +1,34 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5E35223
-	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 10:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3145FBAF;
+	Thu, 28 Mar 2024 10:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711621044; cv=none; b=tzDAflstCc3+5RzLyAPK8lUMk7do1JStBzb0U8zraAwAujtWqxQA68S+zS4z92oHchQrILt10cpsv9466qkqNO16uuOiNlKiHI5+hImMUWgPbJOkJNxU6KHekW7WI0pKbngjwANeoySKOMHLdEkjJ4bBdBRcLsldRqrcFdOeUZs=
+	t=1711621335; cv=none; b=MDxgYe6/oXpwVEJtJoDHO1iRZ801/Hyos5X8kxoDk3l0tTSeuqCYdKbo3SNM12eyC1nzvG9ynttvvBBG5mxh+m3hu+RKJhQ3PiuujXjfHKhZT30gPdcP1BjCUrUmakMPA0ZGpu9VBiUssZppYI6k+waN8KdsZNlHFOrHKakLY/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711621044; c=relaxed/simple;
-	bh=7NCOP9+2sqRClXSKEASo7Uwi3USYyilhrNI8GfJnpkk=;
+	s=arc-20240116; t=1711621335; c=relaxed/simple;
+	bh=xi+5DcczHvycuxHFqyLiS+KzYxv8gqLhxcO/MAGfco8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SJZrLtPt7oKwhWUSHJ6ORgzS9yUq8K2RupCc88G5iFmu595aNkSO5woY791VuDHvV9756npqrGBbBCDwY9mZN7AXeGLeSpP+mxGxYVqEIXA04c7CCZwpCa4SfyNWCHEypCNzpRzsa/uxXu2/Ueaziaq+Z9yv57Ect+SyfbzaxeQ=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZBEeFTDyEUW1d23jF1tWkpI12dsTBK7ZZy33dhuPdlpdVDE8OO8/HMP8eiAwfWSJOUk3yD/gsLIcN/60QYoVvR89oEB9/v/owDTPJStpMcFO+z8pfuK463Ws6LcLXN0OrvDFcB/2SfLIx6aJcYX/Eca508aAiP5PxiT09Wcvv78=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rpmot-00C7Ww-L6; Thu, 28 Mar 2024 18:17:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:17:32 +0800
-Date: Thu, 28 Mar 2024 18:17:32 +0800
+	id 1rpmYr-00C7A1-No; Thu, 28 Mar 2024 18:00:42 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:00:58 +0800
+Date: Thu, 28 Mar 2024 18:00:58 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Joachim Vandersmissen <git@jvdsn.com>
-Cc: linux-crypto@vger.kernel.org,
-	Salvator Benedetto <salvatore.benedetto@intel.com>
-Subject: Re: [PATCH] crypto: ecdh - explicitly zeroize private_key
-Message-ID: <ZgVDvHT1sIOW+ZwV@gondor.apana.org.au>
-References: <20240320045106.61875-1-git@jvdsn.com>
+To: Roman Smirnov <r.smirnov@omp.ru>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Karina Yankevich <k.yankevich@omp.ru>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Subject: Re: [PATCH] crypto: algboss: remove NULL check in
+ cryptomgr_schedule_probe()
+Message-ID: <ZgU/2p5Z3HwEdHz3@gondor.apana.org.au>
+References: <20240306072908.5234-1-r.smirnov@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -34,27 +37,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240320045106.61875-1-git@jvdsn.com>
+In-Reply-To: <20240306072908.5234-1-r.smirnov@omp.ru>
 
-On Tue, Mar 19, 2024 at 11:51:06PM -0500, Joachim Vandersmissen wrote:
->
-> diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-> index 80afee3234fb..ce332b39b705 100644
-> --- a/crypto/ecdh.c
-> +++ b/crypto/ecdh.c
-> @@ -33,6 +33,8 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
->  	    params.key_size > sizeof(u64) * ctx->ndigits)
->  		return -EINVAL;
->  
-> +	memzero_explicit(ctx->private_key, sizeof(ctx->private_key));
+On Wed, Mar 06, 2024 at 10:29:08AM +0300, Roman Smirnov wrote:
+> The variable i will never be zero, so the check can be removed.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with Svace.
 
-Please use memset instead of memzero_explicit unless it is actually
-needed (which is not the case here).
+Are you sure about this? It does not seem obvious that i cannot
+be zero.  If the tool is correct you need to provide the reasoning
+for it.
 
-I know there is another memzero_explicit in this function which should
-also be memset so it's not your fault.
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
