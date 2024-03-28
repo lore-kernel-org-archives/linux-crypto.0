@@ -1,98 +1,81 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB159153BF7
-	for <linux-crypto@vger.kernel.org>; Wed, 27 Mar 2024 22:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4403B1CD13;
+	Thu, 28 Mar 2024 01:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711578379; cv=none; b=YlFeUHCuCkqe08i28nTvtHlirjb8u8WBxE8P0p16FhQNf0Zy+RSJQcwJF3F8eL3saqPsofNE+N3yuYOqyV90AMgnoIJFhAkgWkwLdKnacWlLX9avJDiYyqNYcQGPa5WUwWrL/t29ZT/80BNKcn7uIR6lWvTz+spy6PJ7ZwZTB/A=
+	t=1711589667; cv=none; b=l3/jQ27WCVi9twKStYsL8hMIQDTwqbNs6xIjfbmdavr2EQ9Uellf4Py6buS2G27QsC3yNbZqg5XMrikdq6tN/zg7wqzQFDETyGHlTSo+fvotiUzWqfeEGgQFpvyGMf8iNwLHP0nDfhMGfyhr4+Btyihu2UUoaXUAPjBebcdvZg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711578379; c=relaxed/simple;
-	bh=IpFdxipUZyLZ1WGndAkgbYxrgUnIpmiqCPmPgoQjeak=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ILKAkVy1exFtx6c07tDu/UJafnRD+aCWVHFoWujDpDcczhY+rvtImAk1Nn8P6SnkOfiV2h9hPAM5YFNsyJcXYhqzgoO+76NtCce25bqTLl97DXQWzP8HPdLfkL/Xa6aSD/aJVW4FiuSAUp4lo6ceJPJUNB8VZcoLyfzbBJLFjP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=0/rHPNp2; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
+	s=arc-20240116; t=1711589667; c=relaxed/simple;
+	bh=L6xuTU/BIJ81u/Exo74EZKfqkItD2NhK9282T6fsiME=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uyaXBqy1GFVU9Dzj4E6s/561jqDDXo03R5FyUfndwfi+Di93plv24N2ENUOitk5dDQci7pa1n3HWfmW8itCFyMkSSD6Ls2Mp47DbU3Ih40OxSwF+onJvmfp5HLIqWxS4mJJMIfgudx6ktuqtdkl8B58Nil+CgwxAWqwAwthfhu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gpXJtoR0; arc=none smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="0/rHPNp2"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-41495d16568so2238325e9.1
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Mar 2024 15:26:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gpXJtoR0"
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5a522ae3747so203418eaf.1;
+        Wed, 27 Mar 2024 18:34:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1711578376; x=1712183176; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jc/kebwJfSc9In02r4D75fEwv6vQMObeE/5ZkpkXrTQ=;
-        b=0/rHPNp2PG3YSSyg3i/Z7nSAkPEyb0wtVIr1Bd64nIBXoswvKUu60vXe8pZGTDEf0L
-         /qoZkQhmGC0YTlwWhPLh6I0FSTnK/4THPJbhgyIZmAqVotF+4tmxBsROSAaislUr7WTO
-         ls/1PVKhlQuh77EumOXhDE4Np/cLSiVg+YlqF8CPpZHYTzXQFc1UpMuYkIpGNpmEHskB
-         vOhWQJ77qxUvlwTfIcEcPIVQApQNYmrk0LKwzDqdmU0agYXVwKFKY6clRK1iUOREXcXE
-         PgVy2eq988AkC5xClpoanmj6YGawXV7/uFE3roXPBQRh3CKpeVbgi8ynSX8FHGs4qg5S
-         TjVA==
+        d=gmail.com; s=20230601; t=1711589665; x=1712194465; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L6xuTU/BIJ81u/Exo74EZKfqkItD2NhK9282T6fsiME=;
+        b=gpXJtoR0LR9GA/dHxLdcxSKn0Rs+1Ql46+hQuc1IrhAPLqoPpYh0Yqn27GEtA5OLmG
+         uyNXT2CVbuBJlsGAqF9wJ9DIq+4bKhI+eid13lN4Z4XdqKZ3TQmXHBIcUW2SawXwt5j6
+         W83xKF0mUC15Aan4/JydQ/AJ4YjFJLs7+i0en0j9mfEDUfbNxuQ8grQ/fvYVtkw+5PkH
+         BjoHKaJVtOsepk7cNJRY9Ez+NOr+zNvUnGPxttumXG7yEohWMpNrXM6EKNoq/bI97hqu
+         oAVFkPTAijuEqhfmlhHga08vJiZK0N7E9hdMUTu6DzBfnw9m2s7F5DhDuLkRjTnlHh/2
+         FYqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711578376; x=1712183176;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jc/kebwJfSc9In02r4D75fEwv6vQMObeE/5ZkpkXrTQ=;
-        b=avm21QTg5rDENwJmnJduU/6os/+2D/+GjFzhuncyT4zHXN52PzLMNP9aP2uZ103LDV
-         KCZkhztj7NgOA2kR/av3qkGc3NmidWQwYH29V1964C8Ohn2VLcN7MNgJ9YKFpchl1oH6
-         Z1r2Q+zqT1YvqKpJUv77p8ZFccKv5E0Qsr4m01/BUXnasfO9voc2L59AS8JZT/ZcRTfQ
-         +MkqK38DL7PxScIJJSMEaU2mLaycRiaG4g732LsQJHUjPLGveI7/A0KRSRUfS2DnfR7/
-         3wbn1NUtvmwR14GTF+uMzfomfPgQloqPJHmw2KGcJyz2KP8ACJ0sqPfWwTr3u3kpUFy2
-         Sacw==
-X-Gm-Message-State: AOJu0Yw2F5D9XetZEGCBsNp3cB9sZGtNdqECq53/RZnvaZgZBN3IKXpQ
-	tGkXVP0kT4hRrHCyCZnWnbGycLFEeZejNdvi0JHvg06MKN9WjKMvSyCoQfKSagyekAap1BrDvKq
-	9
-X-Google-Smtp-Source: AGHT+IFwNhiusV4dv7iZPuOpk/UITq2tStkbzgluwVYTIG7ZthGgEhWlZHDMpFJQMLFh/fxwUE2peg==
-X-Received: by 2002:a05:600c:22d7:b0:414:8889:5a65 with SMTP id 23-20020a05600c22d700b0041488895a65mr1177566wmg.30.1711578375898;
-        Wed, 27 Mar 2024 15:26:15 -0700 (PDT)
-Received: from fedora.fritz.box (aftr-82-135-80-212.dynamic.mnet-online.de. [82.135.80.212])
-        by smtp.gmail.com with ESMTPSA id l20-20020a05600c1d1400b004146a304863sm3390089wms.34.2024.03.27.15.26.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 15:26:15 -0700 (PDT)
-From: Thorsten Blum <thorsten.blum@toblux.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thorsten Blum <thorsten.blum@toblux.com>
-Subject: [PATCH] crypto: jitter - Use kvfree_sensitive() to fix Coccinelle warning
-Date: Wed, 27 Mar 2024 23:25:09 +0100
-Message-ID: <20240327222507.42731-3-thorsten.blum@toblux.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1711589665; x=1712194465;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=L6xuTU/BIJ81u/Exo74EZKfqkItD2NhK9282T6fsiME=;
+        b=ib47JnkBmo6HXyU/zsH0aPSMV6bPtmb/b5DgEelYgntO1RUzNza/LzKkphLIIZFiUL
+         KWd8wN5R/1ra8VejHwGqiPFT7/AnhBm+PB//cpCMjHc9X6UzMrzneK+ww3CI4GIO0qfF
+         /WaDR8qE5zUZtU7blchAhNkj9tQ9S2DEAMO5DWlQiWrVcDiuNLF/djAyPUWnO8jXMK29
+         zVuNOgf2MiCaAdQNyMqXNDzV5fcbXNhYgUueHT0WIMxs+MW6Tcqnxp6VNBnMdYkYJcoQ
+         DoOVn4dxf6M+JBppKdfCD0YdaZGmw69nDVcwWQ7mxetm4V5OWZVA6YyHBC+11y93ok4Z
+         uzcw==
+X-Forwarded-Encrypted: i=1; AJvYcCUb3VyHqrjK/KJ8yDG3hwkBvuDSV7crnowznCij69cpkeBzn3AVNJPyAcrgmVgXsEdBO3pjcz25u2QNb7tGSDr8db5yhPzABsFhFloGg5M+PKGEx0Q6Zn4CX4Ng8+GGzmh+OkIJgJ3j6IKMQVVbLRV1gyRdsrBRrLdvmR72rtGwFfNgpA73Fw==
+X-Gm-Message-State: AOJu0YxoLJnWOJeHAogGfrjO7PUwnxoch/yO2EM8faYrv9eNFeOkXllc
+	woMir+w28oN3ZG3iASNQ1Y1PKkhIrKlZjEVcm4TL580lisUbroPLu38ikTV4LiwjUXb9ZXJVjfO
+	nOtWxHoYwtIS7udxiY0sIRYwfHx7owJGlPCnoXw==
+X-Google-Smtp-Source: AGHT+IGXkuTKkhRtnqE/dOn/vFFQiMLFJ9Pr2hBPvSkc5soyRkaXFS1pB9IbOJgrTtVImy0f2Px1i+Uc3Bc4eOU+h3o=
+X-Received: by 2002:a05:6870:2ce:b0:22a:278c:817c with SMTP id
+ r14-20020a05687002ce00b0022a278c817cmr452768oaf.14.1711589665217; Wed, 27 Mar
+ 2024 18:34:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240327054911.43093-1-animeshagarwal28@gmail.com> <20240327-attribute-stubbly-d09613567e0d@spud>
+In-Reply-To: <20240327-attribute-stubbly-d09613567e0d@spud>
+From: Animesh Agarwal <animeshagarwal28@gmail.com>
+Date: Thu, 28 Mar 2024 07:04:13 +0530
+Message-ID: <CAE3Oz81taAcXd-Zxx1rs=9v6C8BNs5_JdcfVk6op6=2W2S=msA@mail.gmail.com>
+Subject: Re: [PATCH v2] dt-bindings: crypto: ti,omap-sham: Convert to dtschema
+To: Conor Dooley <conor@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Replace memzero_explicit() and kvfree() with kvfree_sensitive() to fix
-the following Coccinelle/coccicheck warning reported by
-kfree_sensitive.cocci:
+On Wed, Mar 27, 2024 at 10:22=E2=80=AFPM Conor Dooley <conor@kernel.org> wr=
+ote:
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
-	WARNING opportunity for kfree_sensitive/kvfree_sensitive
+Thanks for the review, Conor.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
----
- crypto/jitterentropy-kcapi.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
-index 76edbf8af0ac..c24d4ff2b4a8 100644
---- a/crypto/jitterentropy-kcapi.c
-+++ b/crypto/jitterentropy-kcapi.c
-@@ -61,8 +61,7 @@ void *jent_kvzalloc(unsigned int len)
- 
- void jent_kvzfree(void *ptr, unsigned int len)
- {
--	memzero_explicit(ptr, len);
--	kvfree(ptr);
-+	kvfree_sensitive(ptr, len);
- }
- 
- void *jent_zalloc(unsigned int len)
--- 
-2.44.0
-
+Regards,
+Animesh Agarwal.
