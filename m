@@ -1,151 +1,172 @@
-Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B63C405CC
-	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 05:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2ED153E05
+	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 07:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711602998; cv=none; b=WYRKWRXFL1z2Y/5f1YskX2D8V4tUiTGxOeQ0BMc9F8e+5flwYmr4W041dsoPAPUdgneRGBk9z7MIchD+S4m1hqBcwFSj/n0OoBWDw1j4QcKrfTOsX3a/M5LzNjX1hymEnZaWfhManMdRArDMwa3VoXGWfUXPtcxy4wOQRxnRFlU=
+	t=1711612321; cv=none; b=ZqzF+yiQ7TXrxAkT/P2Od0HQnIqFGRzDIZyvGIzjBgCoJk7r+Dn5lkeNDzwRbVtHohd00Et/ZYZQtKo+cLX96Q45TTu9ra28heq4bLdKjjY7IBkpbR3RX6EHdjAD+vTTXNnxPXNGpag7/aPZvbDwMvgvMnGreYGbdaNZvM4cSXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711602998; c=relaxed/simple;
-	bh=sBPTJcGEYTbv3hcgUwqNauzYtskOKb+GWpnb7br0MOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lbSKhW5A/+hpvvIL1eV++hH/cbKIwU4PeM849tC0zZfq6YP6K2P0umvdJ7Y8mrcxfFNssLMcygGXHWjHYuVrC6tUtTEIVrSbv/eBR3RPtl2deNwZ8Th02pL7PhmFmOL4qpj7QckhwOeRaEZzH+4cQF9NhwwWtfLZ8LB6IaIUFd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gXPbjKTb; arc=none smtp.client-ip=209.85.161.51
+	s=arc-20240116; t=1711612321; c=relaxed/simple;
+	bh=Oi4D9lTrBK5LxMVsvn+m+xvSmAC6nHrSQxGDBSqviBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E+XAgWjhYoukV8hhsbsN9gBD9PVdW4Q7/Ng1PnLYdVTdT7IJBXzoSAUQkG67yptxPMgM9seq6lu+9FLsanfnxdbXBEf6sazUgVxouZf3Rp0KSxJ7DVp3srMUqKucOPE8gcMlK53BDZbr6SHH/NjCDiCzKAZZN2eHVfdGBh60aO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bSQ2IEQM; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gXPbjKTb"
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5a58009fe88so308060eaf.0
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Mar 2024 22:16:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bSQ2IEQM"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-415482308f8so689525e9.1
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 00:51:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711602994; x=1712207794; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NCBBqATkrmhAqNvcc7V5yUc6Bj0MDD2J9Hd2vuTQUac=;
-        b=gXPbjKTbrvtfpT6/qEmVUxns+A30LH6QOiAjT4F0xLZUPzUZg0ordNOvATabg2F/Wl
-         kPv7rlwtWOxfgPm2w1j9yiVchrEqiifXfpuqKbM3c55rO+d/cQmcOVsJtdO/BdsefRN9
-         RxOKLZQ8lQKHo0Up3S4+54dabwBIgvbFJlg0eTR2NGULCedimJYCVi8NEO/uINa2jv1N
-         m9SrGDUqniaEzEwLDKjTqPO6IIW3ujVusL7p6WPrXVYciMFtPwv7L9mAU+/qpWitn5fr
-         hH1CJycNEicAhv28MTJZUrDtXoqvUlSPCv54sDagwBcdt6nzOokgIGUCvI13cWlf71La
-         jDOg==
+        d=linaro.org; s=google; t=1711612318; x=1712217118; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2WIu5epjAJHOEWnR5hcLu+XP8J82cuP3g6jjZF3M8iI=;
+        b=bSQ2IEQMn8xpszHJwx/k5kzPvGQr1aJ7xVN5DDD3Q2yUVDq2H279NO9BAhSXDUmVub
+         FW7i3yzc23EQkUbIb1OsW5oo/OfJsa/jtIRd+6QmGlUXsWDFlX1fbO9MUJUmuE1pMoBr
+         Hl8o05NVG5NPAQPAi4yJGW9msXrdun3cxgOdJKHGqrtQhm269hv59GHXgiUdGqmkSLFA
+         kB4mwv9Mh+RExoRZEAN2vfcD6pQIW4IuzvhcOoR0aYRMXbW9y51Qua1KT0JdNv8JEuos
+         r5uwYO6CQcmjY3puG/6Wk1Ea3j7OD2DjXhaZqBLEdEXR0v/s3JMEkBaE09R5y5RhPS+P
+         PeFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711602994; x=1712207794;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1711612318; x=1712217118;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NCBBqATkrmhAqNvcc7V5yUc6Bj0MDD2J9Hd2vuTQUac=;
-        b=PhjcpNd4B5QNtO5LiY3diZLr3WqRwrNwsYtiCpLADwkDgmWkeO6BDsz2ULhzSQOqQv
-         8R6p3dg6uakJSg2pH5B55zdQXLE/sJMGu8JLvWUAoErfUaFWj0SeuGQdH6rgTgpGy+h8
-         96nO8BoGWeSgsRJU4lbxKC00AKWa2I6sRZUpWaT7SXD1xVGmjzFSRoz8aCV0Na1xrWN0
-         cGtd1dKSivzZC+OOy8IiQkp3NvvDAJxE+lpAqZTphwDC2vskEFpqvRh21HrkhieqTa00
-         6+vWeTNVyzDWkc9pnSUeXbXE50+vWNkr0CJL2NSx8RN1TF9G94goseDxNxKxhtqLvV9F
-         eN5A==
-X-Forwarded-Encrypted: i=1; AJvYcCWQ1M7GYFWhyPuHkzlcjo7ZJzjA74Vo99RYfg+uyMNSgg7ndtUO4jK8cX8v3YTEBMH2Fpkc9CSTcWx+WVYhSIHLnojuPCLurLoJUVGu
-X-Gm-Message-State: AOJu0YyDHPjxet9ymIKpx+sU2diPJgbVxPO4FCwQ8KgzHi6RPDnTOVz9
-	8nwqLnvSDAyUK2MMcPNBGAfitByv/10n87w0yeqQqeEZNBf9L2+lTS95LyTsPWk=
-X-Google-Smtp-Source: AGHT+IENjWm30W77Sho1F7STKjVDKRSghd/5qoLRwkalJNx2D7PN+W1+MnXgZZvq+TiwN/1tI/fojA==
-X-Received: by 2002:a05:6358:5307:b0:17e:8f90:dd31 with SMTP id n7-20020a056358530700b0017e8f90dd31mr1555244rwf.32.1711602994298;
-        Wed, 27 Mar 2024 22:16:34 -0700 (PDT)
-Received: from localhost ([122.172.85.206])
-        by smtp.gmail.com with ESMTPSA id u23-20020a63df17000000b005e857bba96csm433309pgg.10.2024.03.27.22.16.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 22:16:33 -0700 (PDT)
-Date: Thu, 28 Mar 2024 10:46:31 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gonglei <arei.gonglei@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Viresh Kumar <vireshk@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	David Airlie <airlied@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
-	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
-Message-ID: <20240328051631.c5eitp4mzaj4bh6i@vireshk-i7>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+        bh=2WIu5epjAJHOEWnR5hcLu+XP8J82cuP3g6jjZF3M8iI=;
+        b=s7kaQMS6DmkmxY3SzlgabOzh6z8uN8bGYmqt4shXilQrprCmguI/MiR+S24a58OkrJ
+         3libqbRVFoP2EBTxH1C1xv93VmpJ0JYm1FGam3KatIzjyioawDvIPKEisOe5yrfs9pFe
+         v++5ogX3fqYfZmNMTsabIsJc0iTZwTxu6UZwTEUWa8NfD257qZ90u6r03Twhz0GGdiws
+         KcrSw1p0OuleRN+I1XbtTHJhU3E0LMbgNrqbcqamxfhjc+eS6DnS7qQLO7v0qXZtJHP7
+         8pLa1zwEjTVagWmf3AqCLlxiDOguRwExuyGiAbkKEnHcXkKnmTISfgcwCmkEfGwibkEB
+         iSKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXclpvszXzEeO+yqGVwjfGbqjBxvVn2oX/5nOVIU1D+5drR5qRR0/mkB+n2vzPUFWE7D/XR3WMFudqb7uxaMHJW6u3JwKoygz9+IzGj
+X-Gm-Message-State: AOJu0YxR7MrNaH87ImvlX+VOLYvGnB4Wv28rgCqkRoMXGzu+JdbT9lmG
+	CZiDg0EyRQnF1N8M2ERM+zpfvY94Ay47kighWNHgIkJa8td66H7Zz9qsU3UqgMs=
+X-Google-Smtp-Source: AGHT+IFXMQWdOmZhU5YF1GpARsMqHvRsZ6j2ByO2I8Vygrxh4HD+auy0yyJigMMJuCmYaSgf3lHGDg==
+X-Received: by 2002:a05:600c:3c9f:b0:414:6211:14a7 with SMTP id bg31-20020a05600c3c9f00b00414621114a7mr1475302wmb.14.1711612318113;
+        Thu, 28 Mar 2024 00:51:58 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.219.148])
+        by smtp.gmail.com with ESMTPSA id bg34-20020a05600c3ca200b004148cd4d484sm4594451wmb.9.2024.03.28.00.51.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Mar 2024 00:51:57 -0700 (PDT)
+Message-ID: <c33833ad-9102-40e6-97bf-9a4e1bf0a3d9@linaro.org>
+Date: Thu, 28 Mar 2024 08:51:55 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/19] amba: store owner from modules with
+ amba_driver_register()
+To: Andi Shyti <andi.shyti@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Mike Leach
+ <mike.leach@linaro.org>, James Clark <james.clark@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Olivia Mackall
+ <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Vinod Koul <vkoul@kernel.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Michal Simek <michal.simek@amd.com>, Eric Auger <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>, linux-kernel@vger.kernel.org,
+ coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-input@vger.kernel.org, kvm@vger.kernel.org
+References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+ <20240326-module-owner-amba-v1-1-4517b091385b@linaro.org>
+ <6p4cdmbhrezm7fqbe3kgrkblqgrhaq4fgiw5x4n5dnptii7kjp@vmbj2pkjglp7>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <6p4cdmbhrezm7fqbe3kgrkblqgrhaq4fgiw5x4n5dnptii7kjp@vmbj2pkjglp7>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 27-03-24, 13:41, Krzysztof Kozlowski wrote:
-> virtio core already sets the .owner, so driver does not need to.
+On 27/03/2024 21:33, Andi Shyti wrote:
+> Hi Krzysztof,
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ...
 > 
-> ---
+>>  /**
+>> - *	amba_driver_register - register an AMBA device driver
+>> + *	__amba_driver_register - register an AMBA device driver
+>>   *	@drv: amba device driver structure
+>> + *	@owner: owning module/driver
+>>   *
+>>   *	Register an AMBA device driver with the Linux device model
+>>   *	core.  If devices pre-exist, the drivers probe function will
+>>   *	be called.
+>>   */
+>> -int amba_driver_register(struct amba_driver *drv)
+>> +int __amba_driver_register(struct amba_driver *drv,
 > 
-> Depends on the first patch.
-> ---
->  drivers/gpio/gpio-virtio.c | 1 -
->  1 file changed, 1 deletion(-)
+> ...
 > 
-> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
-> index fcc5e8c08973..9fae8e396c58 100644
-> --- a/drivers/gpio/gpio-virtio.c
-> +++ b/drivers/gpio/gpio-virtio.c
-> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver = {
->  	.remove			= virtio_gpio_remove,
->  	.driver			= {
->  		.name		= KBUILD_MODNAME,
-> -		.owner		= THIS_MODULE,
->  	},
->  };
->  module_virtio_driver(virtio_gpio_driver);
+>> +/*
+>> + * use a macro to avoid include chaining to get THIS_MODULE
+>> + */
+> 
+> Should the documentation be moved here? Well... I don't see any
+> documentation linking this file yet, but in case it comes we want
+> documented amba_driver_register() rather than
+> __amba_driver_register().
+> 
 
-Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+That's just a wrapper, not API... why would we care to have kerneldoc
+for it?
 
--- 
-viresh
+Best regards,
+Krzysztof
+
