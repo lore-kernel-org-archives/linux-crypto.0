@@ -1,37 +1,31 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936114F898;
-	Thu, 28 Mar 2024 10:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5E35223
+	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 10:17:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711620813; cv=none; b=sg+tNeTTlqv0OkOUZYBR9d20G7auHGAZllavZcrVtDE0XQ9j6QZn5AvCTbc3ITWh7OTQ632bZYCf5zCX1vOJmt7WdKAHT/XWW+Q3wby45RVxunfa2CIp8KUdsxHU+AyZSzshUGhIjj4gP/+yg3P+QPOmu8/CnhDKfBHzYPs+QfI=
+	t=1711621044; cv=none; b=tzDAflstCc3+5RzLyAPK8lUMk7do1JStBzb0U8zraAwAujtWqxQA68S+zS4z92oHchQrILt10cpsv9466qkqNO16uuOiNlKiHI5+hImMUWgPbJOkJNxU6KHekW7WI0pKbngjwANeoySKOMHLdEkjJ4bBdBRcLsldRqrcFdOeUZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711620813; c=relaxed/simple;
-	bh=pTxd538wVuXNyNcE4MbNtDi3ldZbzx8ENExdQ/8ndl4=;
+	s=arc-20240116; t=1711621044; c=relaxed/simple;
+	bh=7NCOP9+2sqRClXSKEASo7Uwi3USYyilhrNI8GfJnpkk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CM/FQ17xsszZo2Sn2eskHF2gT7YTKK/GVXOt9h3Dz9vZ1ngYL+FCiOOnT9b8gBc+kzNKrKaozXry7nuIUD7Kae3uNRBoFUbp1ixgZfB4O19+opHoaTOJtG9r4j8eUQhDf4ABaSwQV4CWE8YYNHFmVw5egH+ih6af1r6sPNDnR3U=
+	 Content-Type:Content-Disposition:In-Reply-To; b=SJZrLtPt7oKwhWUSHJ6ORgzS9yUq8K2RupCc88G5iFmu595aNkSO5woY791VuDHvV9756npqrGBbBCDwY9mZN7AXeGLeSpP+mxGxYVqEIXA04c7CCZwpCa4SfyNWCHEypCNzpRzsa/uxXu2/Ueaziaq+Z9yv57Ect+SyfbzaxeQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rpmkw-00C7Rn-5k; Thu, 28 Mar 2024 18:13:11 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:13:26 +0800
-Date: Thu, 28 Mar 2024 18:13:26 +0800
+	id 1rpmot-00C7Ww-L6; Thu, 28 Mar 2024 18:17:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:17:32 +0800
+Date: Thu, 28 Mar 2024 18:17:32 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Akhil R <akhilrajeev@nvidia.com>
-Cc: davem@davemloft.net, robh@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, thierry.reding@gmail.com, jonathanh@nvidia.com,
-	catalin.marinas@arm.com, will@kernel.org, mperttunen@nvidia.com,
-	airlied@gmail.com, daniel@ffwll.ch, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-tegra@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	dri-devel@lists.freedesktop.org
-Subject: Re: [PATCH v6 3/5] crypto: tegra: Add Tegra Security Engine driver
-Message-ID: <ZgVCxnI0sZcE04io@gondor.apana.org.au>
-References: <20240319082306.34716-1-akhilrajeev@nvidia.com>
- <20240319082306.34716-4-akhilrajeev@nvidia.com>
+To: Joachim Vandersmissen <git@jvdsn.com>
+Cc: linux-crypto@vger.kernel.org,
+	Salvator Benedetto <salvatore.benedetto@intel.com>
+Subject: Re: [PATCH] crypto: ecdh - explicitly zeroize private_key
+Message-ID: <ZgVDvHT1sIOW+ZwV@gondor.apana.org.au>
+References: <20240320045106.61875-1-git@jvdsn.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -40,21 +34,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240319082306.34716-4-akhilrajeev@nvidia.com>
+In-Reply-To: <20240320045106.61875-1-git@jvdsn.com>
 
-On Tue, Mar 19, 2024 at 01:53:04PM +0530, Akhil R wrote:
+On Tue, Mar 19, 2024 at 11:51:06PM -0500, Joachim Vandersmissen wrote:
 >
-> +struct tegra_sha_reqctx {
-> +	struct ahash_request fallback_req;
+> diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+> index 80afee3234fb..ce332b39b705 100644
+> --- a/crypto/ecdh.c
+> +++ b/crypto/ecdh.c
+> @@ -33,6 +33,8 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+>  	    params.key_size > sizeof(u64) * ctx->ndigits)
+>  		return -EINVAL;
+>  
+> +	memzero_explicit(ctx->private_key, sizeof(ctx->private_key));
 
-This doesn't work because ahash_request is dynamically sized.
-So you'll end up clobbering the rest of the struct if a fallback
-ends up being used.
+Please use memset instead of memzero_explicit unless it is actually
+needed (which is not the case here).
 
-You should place the fallback_req at the end of the reqctx and set
-the reqsize based on the fallback reqsize.
+I know there is another memzero_explicit in this function which should
+also be memset so it's not your fault.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
