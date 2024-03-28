@@ -1,566 +1,246 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05A77C6C9
-	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 12:50:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3637F489
+	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 13:36:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711630262; cv=none; b=SwW+mUJ3OC2EarD7SahGadqrjAnN6Z+Sj79aQXh7fBbZAt+4g5BkiiOkoazemDFcS7Ouy0DzALsG4fhEOqpnhMzE6IdMtBUhD+o/kpxdIHoZBKw83eoS9Jj4Ug+bU8xnGA3DD2HEJ+s+9JiRYgRhmoi92EXBF6d9/tajiajo9JE=
+	t=1711633006; cv=none; b=Eaqw0KHytsetsqNotCp5ZSQL/5Dtc3Ozjl/XHSAt1BvCFeICqiDeyLOn0DVlulLpjGT5TXr3Qw9F7f+rUFlMuwllwdnYFGTChgIOLqfGptpXJ/hrsfLJ9UFEHSObrylH5qtQ2avt36qnNo+BwvJKO1maSdjnsVn12B/UnELRyo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711630262; c=relaxed/simple;
-	bh=rdN1pFeha0f9tKG4t+JjNFR432HjwkQ4D1LmY4k7tMY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hXdyvtgDMEK5+BhGQmGVwnxCsnIng6rmjvYvk/btDXZUHNs5NrKj1sk5xiVFv6jBzMYxUfb3CfgM5APMizvrj9iIxVfKLOaFGoQuzk9Y2dDKERzlAg4stQdAZZrPDkVQC7oCvSPNhjmMblLpsC/QyY1XEmH/zgLPtQXv7RTWnF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NEmLn1ns; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1711633006; c=relaxed/simple;
+	bh=ImeiQvEeK4vVx6wgVtnrIyHLe/KlQ6pY3d5ytHEwbuc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rzLue6LRJ+AaTo7qAI6wE5gcLxIKszEegCzuS/ViRKHsxNUtYx6W+TcCMJk8me0We9/3TG2iDx0U1XVv9GtBJjnr2CbK+FhVY+U8enO1XdarXxOf7WFDAUGz+uAgwA70KFrPqKSjt5cMktQLgLd2A5J71PH9FZscRU/aG+nt25c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ls7eTJPH; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NEmLn1ns"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4154614b47eso2697565e9.1
-        for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 05:50:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ls7eTJPH"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4148c6132b4so12005325e9.1
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 06:36:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711630258; x=1712235058; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xxobAC0/bca3Of9tKqehzUHK1AlBIsmrq33t7pWCqwQ=;
-        b=NEmLn1nsrxfHXQSWoH/gyrYhPKpSCykM89FAyVmTLRKmGybk/EcSNUnZLfnxb3ZYnL
-         SEvgEx/E0IiODWG1l5fJV+dlTPLQydJB6Nr0yyaAFI5+qzt9bvZi4tCkJnD25tSEwqOA
-         GADUeOiHr2RGo4XMQlQHVdaYCAOKf73T4ueZxf35T9FgsPySIFaO+UFsHZewDGY1pCi0
-         SJ0N5r1+QxYwgqM5ZxYWGw2YFduee8w9G+AYCO+ggB3yqo7KYQJcwnOpE70IE0hIKkPC
-         V0kSReeNmlS68e2uEuCrfPyiP07z4qIMLnKM7RrZVFi9YzCZdknjZN3zteMxcJ21Xs1s
-         IqpQ==
+        d=linaro.org; s=google; t=1711633003; x=1712237803; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1IePTNqHmG2u8C44qjEuGkD7ttbOGPgyCjA8yYZ50bc=;
+        b=ls7eTJPHiC5L1ZjnEH3HxkoCDdjo5ndDi1hffwr+ln8UC6/VVTXLl5uBXEmaTVLzgc
+         Qr8DFzXBRBWD3p7ft7QK7UG04VmXtnrxglgvoPjaYnjxyTcSdNNJ/95EN1g1LJlUbowV
+         D8wxtc8u01Qc/x8b+WBRvIY7yHEVRSn1pTK0CoTJxnyXuE8BB2auCZOtVkryoAlk+Zsp
+         McMfvBtcnQSqXNrCY0heLEWB+B2fOAWt3SlXamPM4SB0COYbsO2bWXKJdNiIZMwo+xFb
+         FUQSGqPve5UK2g+YiCMoTm3/shvejOQYmJQlEgHOODwm2TdDdcjcceGpGHQU4KTs+YgB
+         Rizg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711630258; x=1712235058;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xxobAC0/bca3Of9tKqehzUHK1AlBIsmrq33t7pWCqwQ=;
-        b=IOY7SxqSkOJBBrUyr9pcTJoM+YH95B5nY7gMnkEeRwc7yZ7yuqQG9RlPGPy7t1xdcX
-         c3W12cLOsL3LOWl7s7EbFmtVj9ypRB0WtI0cQqKE0FgrFuPQWoZZaVyCqSBntuQbm4Da
-         eMNo/fmLYKmKzAXUO5AOfOIREqepjEeqhGXXEbIFHWv1i5qi67/wNi85Hg7TLJibGoPD
-         /I85eV/G0/8OqiaGYmvSZvKClrxfk8Q5FfdeiJ9nfHSi58pdg4zO3dojDRPq4xkKk/6B
-         scg7UUebwzmOl8W2cftopbY17JRmAErBxWWuagmdv5+LBSisLUL3hDG2OQqAaDRlh9DO
-         8n6w==
-X-Forwarded-Encrypted: i=1; AJvYcCXZ57iRdSEEnNQPqtMsHFRNwPoH0MDb4OOysrn1wzGioSaRukyF5qIt93a2KwHLz/mILttaXG1m4YIrPp9qciQxBNOm/hrcGucq60om
-X-Gm-Message-State: AOJu0YzYfMbdYqaIuqQLUQjSoqZziX8hqIwENPY/r/woPzz2bN/CzpRB
-	cXQUcmfTqwBxC5aPycY4i2e+xDHEL7nZ77yH5liBfiWsyLbDmwLag5D9BseCDK4=
-X-Google-Smtp-Source: AGHT+IG5L9BPtVxCb3WgLIfWQpYrth5CdCVN7VgA0GMTCu7jLYCVSgCGpYDqwpd3RaqFeq+q26Sgvg==
-X-Received: by 2002:a05:600c:3d99:b0:415:475c:2cb7 with SMTP id bi25-20020a05600c3d9900b00415475c2cb7mr1227108wmb.3.1711630258233;
-        Thu, 28 Mar 2024 05:50:58 -0700 (PDT)
-Received: from tux.Home ([2a02:c7c:7213:c700:e992:6869:474c:a63f])
-        by smtp.gmail.com with ESMTPSA id d3-20020a05600c3ac300b00412a31d2e2asm2216700wms.32.2024.03.28.05.50.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 05:50:57 -0700 (PDT)
-From: Alexey Klimov <alexey.klimov@linaro.org>
-To: olivia@selenic.com,
-	herbert@gondor.apana.org.au,
-	sehi.kim@samsung.com,
-	linux-samsung-soc@vger.kernel.org,
-	peter.griffin@linaro.org
-Cc: krzysztof.kozlowski@linaro.org,
-	alim.akhtar@samsung.com,
-	alexey.klimov@linaro.org,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@android.com,
-	andre.draszik@linaro.org,
-	willmcvicker@google.com,
-	saravanak@google.com,
-	elder@linaro.org,
-	tudor.ambarus@linaro.org,
-	klimov.linux@gmail.com
-Subject: [PATCH REVIEW] hwrng: add exynos Secure World RNG device driver
-Date: Thu, 28 Mar 2024 12:50:56 +0000
-Message-ID: <20240328125056.1054878-1-alexey.klimov@linaro.org>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1711633003; x=1712237803;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1IePTNqHmG2u8C44qjEuGkD7ttbOGPgyCjA8yYZ50bc=;
+        b=dUEX3TtVbL/JyrmAVzFbp1KbodPcHz1NKlpcAJoe1PhPeafW+FckrhLOWdp4UHno4N
+         UR/7NyIKN2IjbC2oVTROxwiR8Mc8CjX/jGaKxP1IJjflp+x1iu1gYwIVdFWi4voEordJ
+         m4P0HdQDwU5eF6QJ7lSbaw88Nz5kfdE0vdMDg0yXmufuMcmQqktRBQXMYgK1a0hiOrvp
+         CLaS8TB3mR8+/d9yMNvaKlyQyBSPH1sLWJOj7xgjxyYTicbAvAhJB+mkvw5xxc3FgSqV
+         mXSSl2NWu5q/FQvsBxpNevIcFKyNlnClVBJCxGGm+3trUZk7rjO95of0VKtEEtOhpTIc
+         fLJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUPIhlNygboglyEo3N1egTE4rRETCI98YiNqGYVnyxcMlgMrYf30xJX/rEwp3wqjqXQKc4uN6JbpkBeN3PGzMBzSafztZhWWry8CV4/
+X-Gm-Message-State: AOJu0Yx93jPRrA8quKLZiN7F99NXnpydR7Oh3ewug89wMtghRBl3znkS
+	UUFEETxRov9xmjS3vgBf5Yx6+6ci3xuh7ymVPeipUBBvU8n1IIk5+8ur88Y1bg4=
+X-Google-Smtp-Source: AGHT+IEqy69lfejNCICnEF+Lz3j5+RW5/EqlqxH994OBXzrzmpwHtFr1ILfHmp+nOsj3wq2bEQxAVA==
+X-Received: by 2002:adf:e6cb:0:b0:343:343f:85da with SMTP id y11-20020adfe6cb000000b00343343f85damr886818wrm.33.1711633002735;
+        Thu, 28 Mar 2024 06:36:42 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.223.50])
+        by smtp.gmail.com with ESMTPSA id fj3-20020a05600c0c8300b00414896b61e4sm5493647wmb.16.2024.03.28.06.36.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Mar 2024 06:36:42 -0700 (PDT)
+Message-ID: <6b691a48-ca97-4f23-a09f-69b9254f0c11@linaro.org>
+Date: Thu, 28 Mar 2024 14:36:40 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH REVIEW] hwrng: add exynos Secure World RNG device driver
+To: Alexey Klimov <alexey.klimov@linaro.org>, olivia@selenic.com,
+ herbert@gondor.apana.org.au, sehi.kim@samsung.com,
+ linux-samsung-soc@vger.kernel.org, peter.griffin@linaro.org,
+ =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
+Cc: alim.akhtar@samsung.com, linux-crypto@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kernel-team@android.com, andre.draszik@linaro.org, willmcvicker@google.com,
+ saravanak@google.com, elder@linaro.org, tudor.ambarus@linaro.org,
+ klimov.linux@gmail.com
+References: <20240328125056.1054878-1-alexey.klimov@linaro.org>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240328125056.1054878-1-alexey.klimov@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The Exynos TRNG device is controlled by firmware and shared between
-non-secure world and secure world. Access to it is exposed via SMC
-interface which is implemented here. The firmware code does
-additional security checks, start-up test and some checks on resume.
+On 28/03/2024 13:50, Alexey Klimov wrote:
+> The Exynos TRNG device is controlled by firmware and shared between
 
-This device is found, for instance, in Google Tensor GS101-family
-of devices.
+No, it is not. I have TRNG perfectly usable on my board. Maybe you are
+refer to some specific SoC...
 
-Signed-off-by: Alexey Klimov <alexey.klimov@linaro.org>
----
- drivers/char/hw_random/Kconfig           |  12 +
- drivers/char/hw_random/Makefile          |   1 +
- drivers/char/hw_random/exynos-swd-trng.c | 423 +++++++++++++++++++++++
- 3 files changed, 436 insertions(+)
- create mode 100644 drivers/char/hw_random/exynos-swd-trng.c
+Please always Cc existing TRNG driver maintainer.
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 442c40efb200..bff7c3ec129a 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -479,6 +479,18 @@ config HW_RANDOM_EXYNOS
- 
- 	  If unsure, say Y.
- 
-+config HW_RANDOM_EXYNOS_SWD
-+	tristate "Exynos SWD HW random number generator support"
-+	default n
-+	help
-+	  This driver provides kernel-side support for accessing Samsung
-+	  TRNG hardware located in secure world using smc calls.
-+
-+	  To compile this driver as a module, choose M here: the
-+	  module will be called exynos-swd-trng.
-+
-+	  If unsure, say N.
-+
- config HW_RANDOM_OPTEE
- 	tristate "OP-TEE based Random Number Generator support"
- 	depends on OPTEE
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 32549a1186dc..ce64929d461a 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -15,6 +15,7 @@ obj-$(CONFIG_HW_RANDOM_N2RNG) += n2-rng.o
- n2-rng-y := n2-drv.o n2-asm.o
- obj-$(CONFIG_HW_RANDOM_VIA) += via-rng.o
- obj-$(CONFIG_HW_RANDOM_EXYNOS) += exynos-trng.o
-+obj-$(CONFIG_HW_RANDOM_EXYNOS_SWD) += exynos-swd-trng.o
- obj-$(CONFIG_HW_RANDOM_IXP4XX) += ixp4xx-rng.o
- obj-$(CONFIG_HW_RANDOM_OMAP) += omap-rng.o
- obj-$(CONFIG_HW_RANDOM_OMAP3_ROM) += omap3-rom-rng.o
-diff --git a/drivers/char/hw_random/exynos-swd-trng.c b/drivers/char/hw_random/exynos-swd-trng.c
-new file mode 100644
-index 000000000000..29def8e6d0b7
---- /dev/null
-+++ b/drivers/char/hw_random/exynos-swd-trng.c
-@@ -0,0 +1,423 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * exynos-swd-trng.c - Random Number Generator driver for the exynos TRNG
-+ * located in secure world
-+ * Copyright (C) Linaro Ltd 2024 Alexey Klimov <alexey.klimov@linaro.org>
-+ *
-+ * Based on downstream driver:
-+ * Copyright (C) 2018 Samsung Electronics
-+ * Sehee Kim <sehi.kim@samsung.com>
-+ */
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/delay.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/platform_device.h>
-+#include <linux/pm_runtime.h>
-+
-+/* DTRNG smc */
-+#define SMC_CMD_RANDOM			(0x82001012)
-+
-+/* DTRNG smc commands */
-+#define HWRNG_INIT			(0x0)
-+#define HWRNG_EXIT			(0x1)
-+#define HWRNG_GET_DATA			(0x2)
-+#define HWRNG_RESUME			(0x3)
-+
-+#define HWRNG_RET_OK			0
-+#define HWRNG_RET_INVALID_ERROR		1
-+#define HWRNG_RET_RETRY_ERROR		2
-+#define HWRNG_RET_INVALID_FLAG_ERROR	3
-+#define HWRNG_RET_TEST_ERROR		4
-+#define HWRNG_RET_START_UP_TEST_DONE	5
-+#define HWRNG_RET_TEST_KAT_ERROR	0xC
-+
-+#define EXYRNG_START_UP_SIZE		(4096 + 1)
-+#define EXYRNG_RETRY_MAX_COUNT		1000000
-+#define EXYRNG_START_UP_TEST_MAX_RETRY	2
-+
-+#define DRVNAME	"exynos_swd_trng"
-+
-+enum state {
-+	INACTIVE = 0,
-+	ACTIVE,
-+};
-+
-+struct exyswd_rng {
-+	struct hwrng rng;
-+	enum state state;
-+	struct device *dev;
-+	/* to track and protect state of the device */
-+	struct mutex lock;
-+};
-+
-+static int __exynos_cm_smc(u64 *arg0, u64 *arg1,
-+			   u64 *arg2, u64 *arg3)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_smc(*arg0, *arg1, *arg2, *arg3, 0, 0, 0, 0, &res);
-+
-+	*arg0 = res.a0;
-+	*arg1 = res.a1;
-+	*arg2 = res.a2;
-+	*arg3 = res.a3;
-+
-+	return *arg0;
-+}
-+
-+static int exynos_cm_cmd(int cmd)
-+{
-+	u64 reg0, reg1, reg2, reg3;
-+
-+	reg0 = SMC_CMD_RANDOM;
-+	reg1 = cmd;
-+	reg3 = reg2 = 0;
-+
-+	return __exynos_cm_smc(&reg0, &reg1, &reg2, &reg3);
-+}
-+
-+static int exynos_cm_get_data(u64 *arg0, u64 *arg1,
-+			      u64 *arg2, u64 *arg3)
-+{
-+	*arg0 = SMC_CMD_RANDOM;
-+	*arg1 = HWRNG_GET_DATA;
-+	*arg3 = 0;
-+
-+	return __exynos_cm_smc(arg0, arg1, arg2, arg3);
-+}
-+
-+static int exynos_swd_get_data(u64 *arg0, u64 *arg1, u64 *arg2, u64 *arg3,
-+			       struct exyswd_rng *exyswd_rng)
-+{
-+	u32 retry_cnt = 0;
-+	int ret;
-+
-+	while (retry_cnt++ < EXYRNG_RETRY_MAX_COUNT) {
-+		ret = exynos_cm_get_data(arg0, arg1, arg2, arg3);
-+
-+		if (ret == HWRNG_RET_OK)
-+			return 0;
-+
-+		if (ret == HWRNG_RET_RETRY_ERROR) {
-+			usleep_range(50, 100);
-+			continue;
-+		}
-+
-+		if (ret == HWRNG_RET_TEST_ERROR) {
-+			dev_dbg(exyswd_rng->dev, "error while testing\n");
-+			return -EAGAIN;
-+		}
-+
-+		return -EFAULT;
-+	}
-+
-+	ret = -EFAULT;
-+	dev_warn(exyswd_rng->dev, "retry counter is reached\n");
-+	return ret;
-+}
-+
-+static int exynos_swd_init(void)
-+{
-+	u32 retry_cnt = 0;
-+	int ret;
-+
-+	do {
-+		ret = exynos_cm_cmd(HWRNG_INIT);
-+		if (ret == HWRNG_RET_RETRY_ERROR) {
-+			if (retry_cnt++ > EXYRNG_RETRY_MAX_COUNT)
-+				break;
-+
-+			usleep_range(50, 100);
-+		}
-+	} while (ret == HWRNG_RET_RETRY_ERROR);
-+
-+	return ret;
-+}
-+
-+static void exynos_swd_exit(void)
-+{
-+	u32 retry_cnt = 0;
-+
-+	while (retry_cnt++ < EXYRNG_RETRY_MAX_COUNT) {
-+		if (!exynos_cm_cmd(HWRNG_EXIT))
-+			break;
-+		usleep_range(50, 100);
-+	}
-+}
-+
-+static int exynos_swd_startup_test(struct exyswd_rng *exyswd_rng)
-+{
-+	u64 reg0, reg1, reg2, reg3;
-+	int start_up_size = EXYRNG_START_UP_SIZE;
-+	u32 retry_cnt = 0;
-+	int ret;
-+
-+	ret = exynos_swd_init();
-+	if (ret != HWRNG_RET_OK) {
-+		if (ret == HWRNG_RET_TEST_ERROR) {
-+			ret = -EAGAIN;
-+			goto out;
-+		} else
-+			return -EFAULT;
-+	}
-+
-+	while (start_up_size > 0) {
-+		/* For start-up test the 3-rd argument has to be set to 1 */
-+		reg2 = 1;
-+		ret = exynos_cm_get_data(&reg0, &reg1, &reg2, &reg3);
-+		if (ret == HWRNG_RET_RETRY_ERROR) {
-+			if (retry_cnt++ > EXYRNG_RETRY_MAX_COUNT) {
-+				dev_warn(exyswd_rng->dev,
-+					 "exceeded retry in start-up test\n");
-+				break;
-+			}
-+			usleep_range(50, 100);
-+			continue;
-+		}
-+
-+		if (ret == HWRNG_RET_TEST_ERROR ||
-+		    ret == HWRNG_RET_TEST_KAT_ERROR) {
-+			dev_err(exyswd_rng->dev,
-+				"malfunction of TRNG(HW) is detected\n");
-+			return -EFAULT;
-+		}
-+
-+		if (ret == HWRNG_RET_START_UP_TEST_DONE) {
-+			dev_dbg(exyswd_rng->dev,
-+				"start-up test is already done\n");
-+			ret = 0;
-+			break;
-+		}
-+
-+		if (ret != HWRNG_RET_OK) {
-+			dev_dbg(exyswd_rng->dev, "failed to get random data\n");
-+			return -EFAULT;
-+		}
-+
-+		start_up_size -= 32;
-+		retry_cnt = 0;
-+	}
-+
-+out:
-+	exynos_swd_exit();
-+	return ret;
-+}
-+
-+static int exynos_swd_read(struct hwrng *rng, void *data, size_t max, bool wait)
-+{
-+	struct exyswd_rng *exyswd_rng =
-+				container_of(rng, struct exyswd_rng, rng);
-+	u64 reg0, reg1, reg2, reg3;
-+	u32 *read_buf = data;
-+	u32 read_size = max;
-+	u32 retry_cnt;
-+	int ret = HWRNG_RET_OK;
-+
-+	mutex_lock(&exyswd_rng->lock);
-+	ret = exynos_swd_init();
-+	if (ret != HWRNG_RET_OK) {
-+		if (ret == HWRNG_RET_TEST_ERROR) {
-+			ret = -EAGAIN;
-+			goto out_locked;
-+		} else {
-+			mutex_unlock(&exyswd_rng->lock);
-+			return -EFAULT;
-+		}
-+	}
-+
-+	exyswd_rng->state = ACTIVE;
-+	mutex_unlock(&exyswd_rng->lock);
-+
-+	retry_cnt = 0;
-+	while (read_size >= 8) {
-+		reg2 = 0;
-+		ret = exynos_swd_get_data(&reg0, &reg1, &reg2, &reg3, exyswd_rng);
-+		if (ret)
-+			goto out;
-+
-+		*(u32 *)(read_buf++) = (u32)reg2;
-+		*(u32 *)(read_buf++) = (u32)reg3;
-+
-+		read_size -= 8;
-+		retry_cnt = 0;
-+	}
-+
-+	/*
-+	 * rng_buf_size is 32 bytes or cache line usually, it is unlikely
-+	 * we will have remaining bytes to read here.
-+	 */
-+	if (unlikely(read_size > 0)) {
-+		reg2 = 0;
-+		ret = exynos_swd_get_data(&reg0, &reg1, &reg2, &reg3, exyswd_rng);
-+		if (ret)
-+			goto out;
-+		if (read_size >= 4) {
-+			*(u32 *)(read_buf++) = (u32)reg2;
-+			read_size -= 4;
-+		}
-+
-+		if (read_size) {
-+			memcpy(read_buf, &reg3, read_size);
-+			read_size = 0;
-+		}
-+	}
-+
-+	ret = max;
-+out:
-+	mutex_lock(&exyswd_rng->lock);
-+out_locked:
-+	exynos_swd_exit();
-+	exyswd_rng->state = INACTIVE;
-+	mutex_unlock(&exyswd_rng->lock);
-+
-+	return ret;
-+}
-+
-+static int exyswd_rng_probe(struct platform_device *pdev)
-+{
-+	struct exyswd_rng *exyswd_rng;
-+	int ret;
-+
-+	exyswd_rng = devm_kzalloc(&pdev->dev, sizeof(*exyswd_rng), GFP_KERNEL);
-+	if (!exyswd_rng)
-+		return -ENOMEM;
-+
-+	exyswd_rng->rng.name = DRVNAME;
-+	exyswd_rng->rng.read = exynos_swd_read;
-+	exyswd_rng->rng.quality = 500;
-+	exyswd_rng->dev = &pdev->dev;
-+	exyswd_rng->state = INACTIVE;
-+	mutex_init(&exyswd_rng->lock);
-+
-+	/*
-+	 * Do the startup test first. If it works we've got the device
-+	 * and can finish probe().
-+	 */
-+	ret = exynos_swd_startup_test(exyswd_rng);
-+	if (ret) {
-+		dev_dbg(&pdev->dev, "start-up test failed\n");
-+		return -ENODEV;
-+	}
-+
-+	ret = devm_hwrng_register(&pdev->dev, &exyswd_rng->rng);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				     "failed to register hwrng\n");
-+
-+	platform_set_drvdata(pdev, exyswd_rng);
-+	dev_set_drvdata(&pdev->dev, exyswd_rng);
-+
-+	dev_info(&pdev->dev, "hwrng registered\n");
-+
-+	return 0;
-+}
-+
-+static int exyswd_rng_remove(struct platform_device *pdev)
-+{
-+	struct exyswd_rng *exyswd_rng = platform_get_drvdata(pdev);
-+
-+	devm_hwrng_unregister(&pdev->dev, &exyswd_rng->rng);
-+
-+	mutex_lock(&exyswd_rng->lock);
-+	if (exyswd_rng->state == ACTIVE) {
-+		exynos_swd_exit();
-+		exyswd_rng->state = INACTIVE;
-+	}
-+	mutex_unlock(&exyswd_rng->lock);
-+
-+	return 0;
-+}
-+
-+#if defined(CONFIG_PM_SLEEP) || defined(CONFIG_PM_RUNTIME)
-+static int exyswd_rng_suspend(struct device *dev)
-+{
-+	struct exyswd_rng *exyswd_rng = dev_get_drvdata(dev);
-+	int ret = 0;
-+
-+	mutex_lock(&exyswd_rng->lock);
-+	if (exyswd_rng->state) {
-+		ret = exynos_cm_cmd(HWRNG_EXIT);
-+		if (ret != HWRNG_RET_OK)
-+			dev_warn(dev,
-+				 "failed to enter suspend, error %d\n", ret);
-+	}
-+	mutex_unlock(&exyswd_rng->lock);
-+
-+	return ret;
-+}
-+
-+static int exyswd_rng_resume(struct device *dev)
-+{
-+	struct exyswd_rng *exyswd_rng = dev_get_drvdata(dev);
-+	int ret;
-+
-+	mutex_lock(&exyswd_rng->lock);
-+	ret = exynos_cm_cmd(HWRNG_RESUME);
-+	if (ret != HWRNG_RET_OK)
-+		dev_warn(dev, "failed to resume, error %d\n", ret);
-+	if (exyswd_rng->state) {
-+		ret = exynos_cm_cmd(HWRNG_INIT);
-+		if (ret != HWRNG_RET_OK)
-+			dev_warn(dev,
-+				 "failed to init hwrng on resume, error %d\n",
-+				 ret);
-+	}
-+	mutex_unlock(&exyswd_rng->lock);
-+
-+	return ret;
-+}
-+#endif
-+
-+static UNIVERSAL_DEV_PM_OPS(exyswd_rng_pm_ops, exyswd_rng_suspend,
-+			    exyswd_rng_resume, NULL);
-+
-+static struct platform_driver exyswd_rng_driver = {
-+	.probe		= exyswd_rng_probe,
-+	.remove		= exyswd_rng_remove,
-+	.driver		= {
-+		.name	= DRVNAME,
-+		.owner	= THIS_MODULE,
-+		.pm     = &exyswd_rng_pm_ops,
-+	},
-+};
-+
-+static struct platform_device *exyswd_rng_pdev;
-+
-+static int __init exyswd_rng_init(void)
-+{
-+	int ret;
-+
-+	exyswd_rng_pdev = platform_device_register_simple(DRVNAME, -1, NULL, 0);
-+	if (IS_ERR(exyswd_rng_pdev))
-+		pr_err(DRVNAME ": could not register device: %ld\n",
-+		       PTR_ERR(exyswd_rng_pdev));
-+
-+	ret = platform_driver_register(&exyswd_rng_driver);
-+	if (ret) {
-+		platform_device_unregister(exyswd_rng_pdev);
-+		return ret;
-+	}
-+
-+	pr_info("ExyRNG driver, (c) 2014 Samsung Electronics\n");
-+
-+	return 0;
-+}
-+
-+static void __exit exyswd_rng_exit(void)
-+{
-+	platform_driver_unregister(&exyswd_rng_driver);
-+	platform_device_unregister(exyswd_rng_pdev);
-+}
-+
-+module_init(exyswd_rng_init);
-+module_exit(exyswd_rng_exit);
-+
-+MODULE_DESCRIPTION("Exynos SWD H/W Random Number Generator driver");
-+MODULE_AUTHOR("Alexey Klimov <alexey.klimov@linaro.org>");
-+MODULE_AUTHOR("Sehee Kim <sehi.kim@samsung.com>");
-+MODULE_LICENSE("GPL");
--- 
-2.43.0
+> non-secure world and secure world. Access to it is exposed via SMC
+> interface which is implemented here. The firmware code does
+> additional security checks, start-up test and some checks on resume.
+> 
+> This device is found, for instance, in Google Tensor GS101-family
+> of devices.
+
+Nothing here explains why this cannot be integrated into existing
+driver. Maybe it, maybe it cannot...
+
+You try to upstream again vendor driver ignoring that community already
+did it and instead it might be enough to customize it.
+
+Guys, the same as all the MCT, PHYs and PCI in previous works of various
+people: stop duplicating drivers by upstreaming new vendor stuff with
+all the issues we already fixed and please work on re-using existing
+drivers.
+
+Sometimes work cannot be combined, so come with arguments. Otherwise we
+keep repeating and repeating the same feedback.
+
+> 
+> Signed-off-by: Alexey Klimov <alexey.klimov@linaro.org>
+> ---
+>  drivers/char/hw_random/Kconfig           |  12 +
+>  drivers/char/hw_random/Makefile          |   1 +
+>  drivers/char/hw_random/exynos-swd-trng.c | 423 +++++++++++++++++++++++
+>  3 files changed, 436 insertions(+)
+>  create mode 100644 drivers/char/hw_random/exynos-swd-trng.c
+> 
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> index 442c40efb200..bff7c3ec129a 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -479,6 +479,18 @@ config HW_RANDOM_EXYNOS
+>  
+>  	  If unsure, say Y.
+>  
+> +config HW_RANDOM_EXYNOS_SWD
+> +	tristate "Exynos SWD HW random number generator support"
+
+What is SWD?
+
+> +	default n
+> +	help
+> +	  This driver provides kernel-side support for accessing Samsung
+> +	  TRNG hardware located in secure world using smc calls.
+> +
+> +	  To compile this driver as a module, choose M here: the
+> +	  module will be called exynos-swd-trng.
+> +
+> +	  If unsure, say N.
+> +
+
+
+...
+
+> +
+> +static UNIVERSAL_DEV_PM_OPS(exyswd_rng_pm_ops, exyswd_rng_suspend,
+> +			    exyswd_rng_resume, NULL);
+> +
+> +static struct platform_driver exyswd_rng_driver = {
+> +	.probe		= exyswd_rng_probe,
+> +	.remove		= exyswd_rng_remove,
+> +	.driver		= {
+> +		.name	= DRVNAME,
+> +		.owner	= THIS_MODULE,
+
+So this was fixed ~8-10 years ago. Yet it re-appears. Please do not use
+downstream code as template.
+
+Take upstream driver and either change it or customize it.
+
+
+> +		.pm     = &exyswd_rng_pm_ops,
+> +	},
+> +};
+> +
+> +static struct platform_device *exyswd_rng_pdev;
+
+And if I have multiple devices?
+
+> +
+> +static int __init exyswd_rng_init(void)
+> +{
+> +	int ret;
+> +
+> +	exyswd_rng_pdev = platform_device_register_simple(DRVNAME, -1, NULL, 0);
+> +	if (IS_ERR(exyswd_rng_pdev))
+> +		pr_err(DRVNAME ": could not register device: %ld\n",
+> +		       PTR_ERR(exyswd_rng_pdev));
+
+This is some oddity... Why do you create devices based on module load?
+So I load this on Qualcomm anbd you create exynos device? This does not
+make sense.
+
+
+> +
+> +	ret = platform_driver_register(&exyswd_rng_driver);
+> +	if (ret) {
+> +		platform_device_unregister(exyswd_rng_pdev);
+> +		return ret;
+> +	}
+> +
+> +	pr_info("ExyRNG driver, (c) 2014 Samsung Electronics\n");
+
+Drop, dirvers should not print code just because I load a driver. Again:
+imagine I load it on Qualcomm.
+
+
+Best regards,
+Krzysztof
 
