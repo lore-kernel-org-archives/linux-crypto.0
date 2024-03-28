@@ -1,53 +1,37 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405BF3C0B;
-	Thu, 28 Mar 2024 09:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FC553804;
+	Thu, 28 Mar 2024 10:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711617001; cv=none; b=lbtHWiyLLQa+F4ct5N0vjDYAYFDUsEi0qArHcVoy6YrRKDzIWbId3BF37ZOIz4mUsYfEHue9VLXraYep4Rt5eGVb5TDQOnz6zJuHphr8zFrR5SwPZ5NF4LTKwgLjHhzaaABA1WgRbOJ4DP8rei/Z1HA2NDHCK3oFSFEUP0ct8Xc=
+	t=1711620375; cv=none; b=AXRlhScg0CmOJDlgTzOBpXq2Upjo6eWb+Z5kRQHyTtRxzecgm6Gpc996VQGb+MmDRJiDOAt21giVsk/APB1haEiN/YRIA4KRHDVvssGiIXw9KjZJd7DMKAQsmsAisDzGwytsv7/ESIhkI2aqcUmmTIGZtU1LT/5GKdgtwgELNNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711617001; c=relaxed/simple;
-	bh=buN5Ppu9AGNZtC/if8g17RcZZEQzgqGlib2VdnuWvYg=;
+	s=arc-20240116; t=1711620375; c=relaxed/simple;
+	bh=4dG8UhkcaQYzhOF03nvm3E5xZ94yc0It4+G2sZOnS6k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=llnRjhtlzYMgw9mR22yVZWJIz/eVD+RxtsnbndqRTfr3ths1g80V92Jk4Q8QoNii8e04StK1eEeITfG9bqzhHNWT0IuIOuEcQkyiO9DAVl0CsPwTshgg2Jt2KQpz13Qofgek37N2gpByTQ4i8U2jZCDoUlAISgbzeGst2QfCGj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OFLlSdaF; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OFLlSdaF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DAA8C433F1;
-	Thu, 28 Mar 2024 09:10:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711617000;
-	bh=buN5Ppu9AGNZtC/if8g17RcZZEQzgqGlib2VdnuWvYg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OFLlSdaFgLJfwlccYTUQ07QIz60FOyuC8o6pcVV92LZbtE4gq7IAodXVpi6MWqQKD
-	 /P4Fl8Qvp5yVtqoZgDTztgedrMv69WkJQHT0+Txctf1PpT/Xt7GN34m4JFuIr7B2Ob
-	 ZenIk9jv0ixo23yCmoRslgOW7owKOyIYOaTT9eixAfQmT/MLYqxgdsDEciF2ow33fx
-	 8Bp/LnCK2rxFLnCW0HllcXCOe0nR3LyIMLLjxk5pVqhide4zeg+ntfoRA3RYM/BQBD
-	 2/XHLh2NMuIq7tdO8199Pn4n+qV0Z9Lu1bznDyMzbl74t5Y9igoKy2SgIRxUTfCqJ8
-	 VO6OdnuV01Mcg==
-Date: Thu, 28 Mar 2024 10:09:57 +0100
-From: Andi Shyti <andi.shyti@kernel.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Russell King <linux@armlinux.org.uk>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Mike Leach <mike.leach@linaro.org>, 
-	James Clark <james.clark@arm.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Vinod Koul <vkoul@kernel.org>, 
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
-	Michal Simek <michal.simek@amd.com>, Eric Auger <eric.auger@redhat.com>, 
-	Alex Williamson <alex.williamson@redhat.com>, linux-kernel@vger.kernel.org, coresight@lists.linaro.org, 
-	linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
-	linux-input@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 01/19] amba: store owner from modules with
- amba_driver_register()
-Message-ID: <bm7xoej6ihtzw63mhocvkkb7j5no2wnhztwrvvlogmuxjycviv@7frc2s3dsi5h>
-References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
- <20240326-module-owner-amba-v1-1-4517b091385b@linaro.org>
- <6p4cdmbhrezm7fqbe3kgrkblqgrhaq4fgiw5x4n5dnptii7kjp@vmbj2pkjglp7>
- <c33833ad-9102-40e6-97bf-9a4e1bf0a3d9@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=c+p2kILkvV0JE9Lupxm5tPhsAr1midKPe2tWaEWehzXlhnoa8wKB4BRjtplaQQzH2lVIohF/C/SfiJ+IxoKSqemhyJJwYskkakLup5gJGbbXn0eDVMa+a7jqiGauRxEiZYRTC9rAXVkYd/ee1Uyd3S07OEWmkVoWwoPhhjhrEbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rpmdb-00C7Dr-R3; Thu, 28 Mar 2024 18:05:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Mar 2024 18:05:52 +0800
+Date: Thu, 28 Mar 2024 18:05:52 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Akhil R <akhilrajeev@nvidia.com>
+Cc: davem@davemloft.net, robh@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, thierry.reding@gmail.com, jonathanh@nvidia.com,
+	catalin.marinas@arm.com, will@kernel.org, mperttunen@nvidia.com,
+	airlied@gmail.com, daniel@ffwll.ch, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-tegra@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	dri-devel@lists.freedesktop.org
+Subject: Re: [PATCH v6 3/5] crypto: tegra: Add Tegra Security Engine driver
+Message-ID: <ZgVBAFmfK7GKgmYi@gondor.apana.org.au>
+References: <20240319082306.34716-1-akhilrajeev@nvidia.com>
+ <20240319082306.34716-4-akhilrajeev@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -56,49 +40,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c33833ad-9102-40e6-97bf-9a4e1bf0a3d9@linaro.org>
+In-Reply-To: <20240319082306.34716-4-akhilrajeev@nvidia.com>
 
-Hi Krzysztof,
+On Tue, Mar 19, 2024 at 01:53:04PM +0530, Akhil R wrote:
+>
+> +		.alg.skcipher.op.do_one_request	= tegra_aes_do_one_req,
+> +		.alg.skcipher.base = {
+> +			.init = tegra_aes_cra_init,
+> +			.exit = tegra_aes_cra_exit,
+> +			.setkey = tegra_aes_setkey,
+> +			.encrypt = tegra_aes_encrypt,
+> +			.decrypt = tegra_aes_decrypt,
+> +			.min_keysize = AES_MIN_KEY_SIZE,
+> +			.max_keysize = AES_MAX_KEY_SIZE,
+> +			.ivsize	= AES_BLOCK_SIZE,
+> +			.base = {
+> +				.cra_name = "ofb(aes)",
+> +				.cra_driver_name = "ofb-aes-tegra",
+> +				.cra_priority = 500,
+> +				.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER | CRYPTO_ALG_ASYNC,
+> +				.cra_blocksize = AES_BLOCK_SIZE,
+> +				.cra_ctxsize = sizeof(struct tegra_aes_ctx),
+> +				.cra_alignmask = 0xf,
+> +				.cra_module = THIS_MODULE,
+> +			},
+> +		}
+> +	}, {
 
-> >>  /**
-> >> - *	amba_driver_register - register an AMBA device driver
-> >> + *	__amba_driver_register - register an AMBA device driver
-> >>   *	@drv: amba device driver structure
-> >> + *	@owner: owning module/driver
-> >>   *
-> >>   *	Register an AMBA device driver with the Linux device model
-> >>   *	core.  If devices pre-exist, the drivers probe function will
-> >>   *	be called.
-> >>   */
-> >> -int amba_driver_register(struct amba_driver *drv)
-> >> +int __amba_driver_register(struct amba_driver *drv,
-> > 
-> > ...
-> > 
-> >> +/*
-> >> + * use a macro to avoid include chaining to get THIS_MODULE
-> >> + */
-> > 
-> > Should the documentation be moved here? Well... I don't see any
-> > documentation linking this file yet, but in case it comes we want
-> > documented amba_driver_register() rather than
-> > __amba_driver_register().
-> > 
-> 
-> That's just a wrapper, not API... why would we care to have kerneldoc
-> for it?
+OFB no longer exists in the kernel.  Please remove all traces of it
+from your driver.
 
-Because everyone should use the wrapper while the real function
-will be used only once or twice.
+Also please ensure that yuor driver passes the extra fuzz tests.
 
-I see also that this is a common practice which I don't surely
-like.
-
-In any case there is no documentation exported for AMBA so that
-this discussion does not bring any tangible benefit.
-
-So that, considering that it's a good improvement,
-
-Reviewed-by: Andi Shyti <andi.shyti@kernel.org>
-
-Andi
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
