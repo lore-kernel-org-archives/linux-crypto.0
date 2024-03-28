@@ -1,65 +1,63 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F93E12F38C;
-	Thu, 28 Mar 2024 17:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E757B132805
+	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 18:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711647912; cv=none; b=NREPul0fah30+zY1eC07AyPm5qPLjD1GTe0pxxEfFApr1axfbDaK9LIOw7VtrIn62AlZU7gn/Zv9um4LTkiQUA5NImHEW9LlFlENCPWPyTN/hforoUv8Zi8LGs4SG0gdqLHi4ZE1T96t7QesJ0S9r2oujLWfp2oFwVLrIPQkK6M=
+	t=1711650434; cv=none; b=j1DPJhV8qMyLCxpVa7IcnRjE/TFzziR1OeQofmUqvIsMppUTxlynarUrCZDyOoPWfUCYD2vSmFbyQEyHf2nfh8CMBpi4UqPMhrR0luFVtBozWs8OFOQMlwjDWFR8j9knK3CKZ8hb0DEq10G/eavLussoO/BJCXbztyIoNhsEGn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711647912; c=relaxed/simple;
-	bh=OiI+HabGYQA9Bx+Wt6goUKKVjRy0/sOX9BxjFGUxS9g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WZAhey7kuJl2d74Vp0hmLxMTTDjfG0N1qyBtZ3E+OkYi9XOJiugGt5jbV8cUJ3ZYQNn1TVAXC63Ho5VDQYRNmqEHYUMaC4gHI/TwMoRQ0HiCWE3Wah/tzfwoFOFdoHLTR5V0DWIQqSkiy9SltZfs3eEM6MG2DVWpyJorEgfUHYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JcsbCQW6; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1711650434; c=relaxed/simple;
+	bh=yR3VIVzIm7J5DlRe3h9y8sO4VZfZwjLRaPB8+Bn9+kY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PvXpPVXwyuzoWijmOXUaRU3hZbzYmViOLqC1hKFp1XtRhnV+FIdaTQMfYbUYUXxdHK0bUmPnjYX35Aar0Cg0q4DjSlpfMAwuYT6xn9ZcHlfB2bH3HBFGGQbgKPsBDE707wQYj3lblXqLVslyaE25EHIVL+wgRsGlPn+GoEJP6vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=DObq9Uv2; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JcsbCQW6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711647911; x=1743183911;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=OiI+HabGYQA9Bx+Wt6goUKKVjRy0/sOX9BxjFGUxS9g=;
-  b=JcsbCQW63AFEA15h5HoZP0cK0oiJkakEvpZCBZhLd90cwWrVhH4u2XYS
-   7qofSy0xnl7pvqQiNzOUnDGDLEKd6UcvIQF1XhfXtLvGkxlSFMp3opLQ9
-   VWy9V7x3RD38VHRFmMafYNxaQJLOjkD6IzhTXsm9FnfTJhUIABOgVXADW
-   T63avfO+MAbIri/ZK927neJWLjNCLXvSEfABM3EBdZigVGiA8H5LIH9Di
-   Fhl8IZ9Pd8SfoGyq7VxxFxTcbcMZ/gMB6rck59sPuU86SEVAc/s9sq8P3
-   VosAGmgwFh/eNV3AMgH9eNk2nLpTO+U783hzvkxaCyqO72vNs729aTLi/
-   Q==;
-X-CSE-ConnectionGUID: GIv0eCI5RdS9WzVgjNd1Uw==
-X-CSE-MsgGUID: 2mWrmFxmS7u9Ud8XM3kAnw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="10631360"
-X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="10631360"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 10:45:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="16675654"
-Received: from jf5300-b11a264t.jf.intel.com ([10.242.51.89])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 10:45:00 -0700
-From: Andre Glover <andre.glover@linux.intel.com>
-To: tom.zanussi@linux.intel.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: dave.jiang@intel.com,
-	fenghua.yu@intel.com,
-	wajdi.k.feghali@intel.com,
-	james.guilford@intel.com,
-	vinodh.gopal@intel.com,
-	tony.luck@intel.com,
-	linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org,
-	andre.glover@linux.intel.com
-Subject: [PATCH 4/4] crypto: iaa - Add Software Compression stats to IAA Compression Accelerator stats
-Date: Thu, 28 Mar 2024 10:44:45 -0700
-Message-Id: <f5136e3a9f4745dc8ecdfc9f0cc8ebd793fbd602.1710969449.git.andre.glover@linux.intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <cover.1710969449.git.andre.glover@linux.intel.com>
-References: <cover.1710969449.git.andre.glover@linux.intel.com>
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="DObq9Uv2"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1dff837d674so10606895ad.3
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 11:27:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1711650432; x=1712255232; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UqlCZa15/EgDhJqRplHZCJq6k9U555sbwgZc/ouqfYE=;
+        b=DObq9Uv2NiUPf3cdnIKtzudVR0PKK108u0mSD6SApBGBR5rDMjmsl5sIQFcvdkZAk6
+         sDE4LP77X1dLlrOcgN9T1X9ahjxt6fv1rkjI1bRupzHUpHTRK0Yuqh96Ccc6CVJbSDG3
+         /qqWFG/IEYtjFPDoys6PJJZt/FJA1o/I7cT6g=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711650432; x=1712255232;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UqlCZa15/EgDhJqRplHZCJq6k9U555sbwgZc/ouqfYE=;
+        b=Wc9KFaVXs/VrKXMisxFuEMcbLeSC1P7yb5VJICv8EzbZcXpZtXlpqswtVRQYexhAmr
+         vGW2PoHMUNGXA3NXgXgrnFkRtjoa3pxk2V6e54hvfdJ2DtbI/t3uHsLat15SMAn636ne
+         oKCpquf6NiNhgxUt1iPP3+UZqgz3VwexH6a2YWp989S3QgxQPsodDX3osLyT2zgx5o5G
+         eLqMYgQ0oqteFi2c5vy3+6DqY2U6/+1Sqf5wbGSLorjEaCSSwSnGU+eNpBJkGh1zpZwq
+         gp/47KNJMznuRQ2S0jDG4fS3JvxeMH/y+MN/5SLe4j6yzc76IYLkuvp8qLYxRdpQUa4w
+         blNw==
+X-Forwarded-Encrypted: i=1; AJvYcCXOWlafEw5BfUHjhG9HGWzg37G4SlMJKUy8oc/d9VLsa4HLUWX7KqqRbxUz5gZvY6RffwekqEJm7xJni7fJBe4Wiy2vI8sQpwmeT0Vx
+X-Gm-Message-State: AOJu0YzZRQrdQcgxIO6d81u3WEGwFcS5at8t1DtpRLff5tij8D0WvmLq
+	joXsn5v+PZ4OdN+C9rEgAxafb04rBWaok2CDY3pPiBfQVpMuG9Fx73H1/hmMFlE=
+X-Google-Smtp-Source: AGHT+IELR26GDFv20Um5GW18RJ4NuK1Oy06CGuUdBW3WF6fnnyeXmrl3qYbfYq/AaWEBKXR2kPaebA==
+X-Received: by 2002:a17:903:2c9:b0:1e2:875:f215 with SMTP id s9-20020a17090302c900b001e20875f215mr343600plk.30.1711650432130;
+        Thu, 28 Mar 2024 11:27:12 -0700 (PDT)
+Received: from localhost.localdomain ([103.108.57.9])
+        by smtp.gmail.com with ESMTPSA id i7-20020a170902c94700b001e223c9679asm846059pla.93.2024.03.28.11.27.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Mar 2024 11:27:11 -0700 (PDT)
+From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+To: herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org
+Cc: Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com,
+	bhoomikak@vayavyalabs.com,
+	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH v1 0/4] Add spacc crypto driver support
+Date: Thu, 28 Mar 2024 23:56:48 +0530
+Message-Id: <20240328182652.3587727-1-pavitrakumarm@vayavyalabs.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,84 +66,129 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Update optional debugfs statistics support for IAA with additional software
-compression statistics. The software compression statistics will track
-instances where iaa falls back to software deflate (e.g. when the source
-data input length is greater than 4KB).
+Add the driver for SPAcc(Security Protocol Accelerator), which is a
+crypto acceleration IP from Synopsys. The SPAcc supports many cipher,
+hash, aead algorithms and various modes.The driver currently supports
+below,
 
-Signed-off-by: Andre Glover <andre.glover@linux.intel.com>
----
- drivers/crypto/intel/iaa/iaa_crypto_main.c  | 2 ++
- drivers/crypto/intel/iaa/iaa_crypto_stats.c | 8 ++++++++
- drivers/crypto/intel/iaa/iaa_crypto_stats.h | 2 ++
- 3 files changed, 12 insertions(+)
+aead:
+- ccm(sm4)
+- ccm(aes)
+- gcm(sm4)
+- gcm(aes)
+- rfc8998(gcm(sm4))
+- rfc7539(chacha20,poly1305)
 
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 4d34096b80ca..ad88ad727d0a 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -1152,6 +1152,8 @@ static int deflate_generic_compress(struct acomp_req *req)
- 	kunmap_local(src);
- 	kunmap_local(dst);
- 
-+	update_total_sw_comp_calls();
-+
- 	return ret;
- }
- 
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_stats.c b/drivers/crypto/intel/iaa/iaa_crypto_stats.c
-index f5cc3d29ca19..42aae8a738ac 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_stats.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_stats.c
-@@ -19,6 +19,7 @@
- 
- static atomic64_t total_comp_calls;
- static atomic64_t total_decomp_calls;
-+static atomic64_t total_sw_comp_calls;
- static atomic64_t total_sw_decomp_calls;
- static atomic64_t total_comp_bytes_out;
- static atomic64_t total_decomp_bytes_in;
-@@ -43,6 +44,11 @@ void update_total_decomp_calls(void)
- 	atomic64_inc(&total_decomp_calls);
- }
- 
-+void update_total_sw_comp_calls(void)
-+{
-+	atomic64_inc(&total_sw_comp_calls);
-+}
-+
- void update_total_sw_decomp_calls(void)
- {
- 	atomic64_inc(&total_sw_decomp_calls);
-@@ -174,6 +180,8 @@ static int global_stats_show(struct seq_file *m, void *v)
- 		   atomic64_read(&total_comp_calls));
- 	seq_printf(m, "  total_decomp_calls: %llu\n",
- 		   atomic64_read(&total_decomp_calls));
-+	seq_printf(m, "  total_sw_comp_calls: %llu\n",
-+		   atomic64_read(&total_sw_comp_calls));
- 	seq_printf(m, "  total_sw_decomp_calls: %llu\n",
- 		   atomic64_read(&total_sw_decomp_calls));
- 	seq_printf(m, "  total_comp_bytes_out: %llu\n",
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_stats.h b/drivers/crypto/intel/iaa/iaa_crypto_stats.h
-index 3787a5f507eb..6e0c6f9939bf 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_stats.h
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_stats.h
-@@ -11,6 +11,7 @@ void	iaa_crypto_debugfs_cleanup(void);
- void	update_total_comp_calls(void);
- void	update_total_comp_bytes_out(int n);
- void	update_total_decomp_calls(void);
-+void	update_total_sw_comp_calls(void);
- void	update_total_sw_decomp_calls(void);
- void	update_total_decomp_bytes_in(int n);
- void	update_completion_einval_errs(void);
-@@ -29,6 +30,7 @@ static inline void	iaa_crypto_debugfs_cleanup(void) {}
- static inline void	update_total_comp_calls(void) {}
- static inline void	update_total_comp_bytes_out(int n) {}
- static inline void	update_total_decomp_calls(void) {}
-+static inline void	update_total_sw_comp_calls(void) {}
- static inline void	update_total_sw_decomp_calls(void) {}
- static inline void	update_total_decomp_bytes_in(int n) {}
- static inline void	update_completion_einval_errs(void) {}
+cipher:
+- cbc(sm4)
+- ecb(sm4)
+- ofb(sm4)
+- cfb(sm4)
+- ctr(sm4)
+- cbc(aes)
+- ecb(aes)
+- ctr(aes)
+- xts(aes)
+- cts(cbc(aes))
+- cbc(des)
+- ecb(des)
+- cbc(des3_ede)
+- ecb(des3_ede)
+- chacha20
+- xts(sm4)
+- cts(cbc(sm4))
+- ecb(kasumi)
+- f8(kasumi)
+- snow3g_uea2
+- cs1(cbc(aes))
+- cs2(cbc(aes))
+- cs1(cbc(sm4))
+- cs2(cbc(sm4))
+- f8(sm4)
+
+hash:
+- michael_mic
+- sm3
+- hmac(sm3)
+- sha3-512
+- sha3-384
+- sha3-256
+- sha3-224
+- hmac(sha512)
+- hmac(sha384)
+- hmac(sha256)
+- hmac(sha224)
+- sha512
+- sha384
+- sha256
+- sha224
+- sha1
+- hmac(sha1)
+- md5
+- hmac(md5)
+- cmac(sm4)
+- xcbc(aes)
+- cmac(aes)
+- xcbc(sm4) 
+- sha512-224
+- hmac(sha512-224)
+- sha512-256
+- hmac(sha512-256)
+- mac(kasumi_f9)
+- mac(snow3g)
+- mac(zuc)
+- sslmac(sha1)
+- shake128
+- shake256
+- cshake128
+- cshake256
+- kcmac128
+- kcmac256
+- kcmacxof128
+- kcmacxof256
+- sslmac(md5)
+
+Pavitrakumar M (4):
+  Add SPAcc driver to Linux kernel
+  Add SPACC Kconfig and Makefile
+  Add SPAcc dts overlay
+  Enable Driver compilation in crypto Kconfig and Makefile file
+
+ arch/arm64/boot/dts/xilinx/Makefile           |    3 +
+ .../arm64/boot/dts/xilinx/snps-dwc-spacc.dtso |   35 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/dwc-spacc/Kconfig              |   95 +
+ drivers/crypto/dwc-spacc/Makefile             |   16 +
+ drivers/crypto/dwc-spacc/spacc_aead.c         | 1382 ++++++++
+ drivers/crypto/dwc-spacc/spacc_ahash.c        | 1183 +++++++
+ drivers/crypto/dwc-spacc/spacc_core.c         | 2917 +++++++++++++++++
+ drivers/crypto/dwc-spacc/spacc_core.h         |  839 +++++
+ drivers/crypto/dwc-spacc/spacc_device.c       |  324 ++
+ drivers/crypto/dwc-spacc/spacc_device.h       |  236 ++
+ drivers/crypto/dwc-spacc/spacc_hal.c          |  365 +++
+ drivers/crypto/dwc-spacc/spacc_hal.h          |  113 +
+ drivers/crypto/dwc-spacc/spacc_interrupt.c    |  204 ++
+ drivers/crypto/dwc-spacc/spacc_manager.c      |  670 ++++
+ drivers/crypto/dwc-spacc/spacc_skcipher.c     |  754 +++++
+ 17 files changed, 9138 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/xilinx/snps-dwc-spacc.dtso
+ create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+ create mode 100644 drivers/crypto/dwc-spacc/Makefile
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_aead.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
+
+
+base-commit: 6a8dbd71a70620c42d4fa82509204ba18231f28d
 -- 
-2.27.0
+2.25.1
 
