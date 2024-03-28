@@ -1,167 +1,195 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A889A8004F
-	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 17:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF32426AF6;
+	Thu, 28 Mar 2024 17:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711645558; cv=none; b=jSFeAbUhIjVqOATmVKEsgdaD/KYKXuNAp7AB9veOJGOXBI5AwjgaiHZR1PhzRf4z2iaggfihYCWnC49s02uZ/WAx2aGLpVcjmNaKks2E0JZ10sAgGcH/6gKk19ViWLdA20O14NPOPDwO3tr0ACm3yZ2PrAM26lS0ckdTdYjFWNY=
+	t=1711647907; cv=none; b=UhJ+Df7Ry/7U+fDp77tWqRgLp2/6RsJJkTnCtVxPKrlDMXyRQwer6bDmU9/pUUrVHAeAw8JSsh9TwMF5GJ2AaSsImQYRAldLXZ/MAm7VZmiENd0qil+BwMcnT+iR8UFNQ+1M7BPrDmgptoTeCB3qg906iboTtfJaJu1xjVcYpBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711645558; c=relaxed/simple;
-	bh=wSsry2PMXLPRJT5NhTiuPA1FZxtDvgfhBGHxg4riOr4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=DcMFSl89sefNbC5bAL0uhkkFv45Jc/wCEB+vZrjjLOhzLWqiqwCSW4XSh5qmotnvv1mHEWJToLflQW5i09TCHiUPXwzYP2JPiDrNAc4cv9+GlOuJWMXO/LJTrxHtNnAeyyw5v2yId+/m5lKHzVbBDkGcjDd0w3dLWkT+YjSa3+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VzTVIOOh; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1711647907; c=relaxed/simple;
+	bh=njo01UyIuCS4hJErYPZdC79rPyF1110IDRpOnxYG0K0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=H07QDQvVyZaLN+9KIH9o+qCh2BxR/VoTGlwBrrjY3pk6X99Zm4DaCvPdVzyi9Ua6LH2O8XPVNgKqTnUYbzgpSHA6ubW7QGcCqDDPpK/JGzl9eboUvHuEjbn9nc0KVuFvO6ntH5uY9iNqq5x+MVeXGznePcvNcjOKaJO+H9H769Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TjEzPczO; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VzTVIOOh"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d6c8d741e8so17956261fa.3
-        for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 10:05:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711645555; x=1712250355; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8UV269C+zXw1qTig2GGB1q1grJrIL/P42czrgTeCgxA=;
-        b=VzTVIOOhSUQTcx1vlA6ObXvp6qGaHNcxqRblLYzeUefZZWXD6LEvFA3QC5ode6oUyd
-         TsZQnmm/gKQaAKC2AeMWMOuMlndV7iY/gmSQN466WEE/vQLZP1zKoaJVUo8zJQazo/aR
-         KZHCjlo0U1/934njzM2FldbSWa6TGuknKwj7maa7YO9swLJyVgihujEUofIhvIegxa9f
-         FvShosevcp13L9Zh0GLNJrm80dfhqUGTe9N8W7li0w8iodWsWR4CppqRTaneHLKuGpBq
-         9NBxazIkdG3D6QJTkd58KibPMnONOE/WOmMGlinZz0aWNFtmx2bYbLdg9sJ1dKC1mAqE
-         zeGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711645555; x=1712250355;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8UV269C+zXw1qTig2GGB1q1grJrIL/P42czrgTeCgxA=;
-        b=YF91nPQVWpN3YemhUFy0XqvQ6jiX4AA76I89k6Rtc/tX2MypjXztHd3UC3kmH9JWfF
-         1+S0WkzLu8nawBPOb0i1NwW0Sy5re0Ahwnhpx//p5QmXBaJ5zQITRXRp8d+zImhth39E
-         0vfrr96x58tvTwZlPD6bz2aLW60ZBfosVIIYBDrz8ApPMxjDAc+FwGYseWbckd049M7R
-         zL96IYT2o/zIcqvYJw0j3jpiX1VT6FA8o2Qt9/lf8fhdwwJSm4WrrxfTPUllFNfem59A
-         5cmYnxDt3X4HxDX8iL0kVRtZlKzT8zR6tEYQq2zDF88+FCHZ4ljmC+wLcI+dGLVo4Oyf
-         niYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUl33LP6/uRrcRH9dJhQKdf5AXcUc+bzlb6mIpLZAl7fQQyCUFBM20+uOcanEmWkEsmN6wuChnEmZi/0vMJRwUU93YBHE+hVEDN4w5k
-X-Gm-Message-State: AOJu0YyssLBzf+b3o3XkuvNZmiqFuLcFZndueK3HyqE6zwU7fQG7d2wi
-	H6zPz93qyf4U16pYAATvVWEsbl8SLLLnSrT1T+6dg/biHTt92RvSAQIvpfYEa/I=
-X-Google-Smtp-Source: AGHT+IFZbbgEPpP8HiHWB0MFkZHwyrileLkAqzyfyUOIrjDjVaxKv38u5/6CSekNPHOY1gdBGyKJ9A==
-X-Received: by 2002:a2e:8606:0:b0:2d6:f62b:6e08 with SMTP id a6-20020a2e8606000000b002d6f62b6e08mr2511766lji.27.1711645554835;
-        Thu, 28 Mar 2024 10:05:54 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.223.50])
-        by smtp.gmail.com with ESMTPSA id u15-20020a05600c00cf00b00414041032casm4810878wmm.1.2024.03.28.10.05.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Mar 2024 10:05:54 -0700 (PDT)
-Message-ID: <38d2156e-fdc5-4196-b598-644a00a0c35f@linaro.org>
-Date: Thu, 28 Mar 2024 18:05:52 +0100
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TjEzPczO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711647906; x=1743183906;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=njo01UyIuCS4hJErYPZdC79rPyF1110IDRpOnxYG0K0=;
+  b=TjEzPczOrfyLnTJ+rAOcj4pIP8/N+ybP8xNfr/tOdIvHVdk0AbQivpYo
+   R34uyu7dKHEoNf3ymc1ZzRSZv8QxxlhAcMerwopNjDZrMMwRbycT+aznQ
+   LJ073iwW4nHviTNq6stigd4ncVJyDHvwIKt0qIb3ouGNxk9GoShmVgezp
+   VKLShyheirxO5/Tdy/i0JyFs7V8wonIH5fq9Geh63K1MKxOYH/x2Z6N/A
+   JgL3IfOv1BaNW/rAzCBsSxpPM/o9bX5L3iTpzUV546009si4Qlvmh6GVv
+   X+DcQkRJPAZ3u8ejNI7u+HQ4on3aSwgZgUb5Op6gsCaxRgt+GYdV4oz1I
+   A==;
+X-CSE-ConnectionGUID: mozWwTXBRlSf8jc3KwBplg==
+X-CSE-MsgGUID: Hf1mjSBnSVub/4wzwOBAJA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="10631342"
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="10631342"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 10:44:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="16675562"
+Received: from jf5300-b11a264t.jf.intel.com ([10.242.51.89])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 10:44:57 -0700
+From: Andre Glover <andre.glover@linux.intel.com>
+To: tom.zanussi@linux.intel.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: dave.jiang@intel.com,
+	fenghua.yu@intel.com,
+	wajdi.k.feghali@intel.com,
+	james.guilford@intel.com,
+	vinodh.gopal@intel.com,
+	tony.luck@intel.com,
+	linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org,
+	andre.glover@linux.intel.com
+Subject: [PATCH 0/4] crypto: Add new compression modes for zlib and IAA 
+Date: Thu, 28 Mar 2024 10:44:41 -0700
+Message-Id: <cover.1710969449.git.andre.glover@linux.intel.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH REVIEW] hwrng: add exynos Secure World RNG device driver
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Alexey Klimov <alexey.klimov@linaro.org>, olivia@selenic.com,
- herbert@gondor.apana.org.au, sehi.kim@samsung.com,
- linux-samsung-soc@vger.kernel.org, peter.griffin@linaro.org,
- =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
-Cc: alim.akhtar@samsung.com, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kernel-team@android.com, andre.draszik@linaro.org, willmcvicker@google.com,
- saravanak@google.com, elder@linaro.org, tudor.ambarus@linaro.org,
- klimov.linux@gmail.com
-References: <20240328125056.1054878-1-alexey.klimov@linaro.org>
- <6b691a48-ca97-4f23-a09f-69b9254f0c11@linaro.org>
- <83607b46-56e4-45eb-ac69-9bc5be5bdee4@linaro.org>
-Content-Language: en-US
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <83607b46-56e4-45eb-ac69-9bc5be5bdee4@linaro.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 28/03/2024 18:01, Krzysztof Kozlowski wrote:
-> On 28/03/2024 14:36, Krzysztof Kozlowski wrote:
->>> +
->>> +static UNIVERSAL_DEV_PM_OPS(exyswd_rng_pm_ops, exyswd_rng_suspend,
->>> +			    exyswd_rng_resume, NULL);
->>> +
->>> +static struct platform_driver exyswd_rng_driver = {
->>> +	.probe		= exyswd_rng_probe,
->>> +	.remove		= exyswd_rng_remove,
->>> +	.driver		= {
->>> +		.name	= DRVNAME,
->>> +		.owner	= THIS_MODULE,
->>
->> So this was fixed ~8-10 years ago. Yet it re-appears. Please do not use
->> downstream code as template.
->>
->> Take upstream driver and either change it or customize it.
-> 
-> Alex Elder pointed out that some of my comments might not be precise or
-> not helping enough. Let me clarify then:
-> 
-> Please run all standard, open-source tools when submitting new driver,
-> which is:
-> 1. Coccinelle, which points to this specific line since 2014,
-> 2. smatch,
-> 3. sparse,
-> 4. checkpatch,
-> 5. If changing bindings: dt_binding_check,
-> 6. If changing DTS or bindings: dtbs_check.
+This patch series adds 'canned' compression for Intel IAA and zlib. It
+also adds 'dynamic' compression for Intel IAA which is compatible with zlib
+deflate algorithms. 
 
-And I forgot:
-7. make W=1
+The original IAA crypto submissions [1] included a 'canned' compression
+mode, but support for 'canned' compression was removed during the review
+because it didn't have an equivalent software implementation available [2].
 
-Many of these, including W=1 above, can be with target, e.g.
-	`make W=1 drivers/char/hw_random/`
-to reduce the scope of tests/warnings etc.
+Deflate compression can be done in a variety of modes. The dynamic mode
+uses Huffman tables that are generated/optimized for that particular
+input. This gives the best compression ratio but has the longest latency.
+The fixed mode uses Huffman tables that are defined by the Deflate
+standard. It generally gives the best latency but with a lower compression
+ratio. The 'canned' compression mode implements a compression scheme that
+uses a statically defined set of Huffman tables, but where the Deflate
+Block Header is implied rather than stored with the compressed data. 
 
-Best regards,
-Krzysztof
+The 'canned' mode results in lower compression/decompression latencies
+compared to using the dynamic mode, but it results in a better compression
+ratio than using the fixed mode.
+
+Below is a table showing the latency improvements with zlib, between
+zlib dynamic and zlib canned modes, and the compression ratio for 
+each mode while using a set of 4300 4KB pages sampled from SPEC 
+CPU17 workloads:
+_________________________________________________________
+| Zlib Level |  Canned Latency Gain  |    Comp Ratio    |
+|------------|-----------------------|------------------|
+|            | compress | decompress | dynamic | canned |
+|____________|__________|____________|_________|________|
+|     1      |    49%   |    29%     |  3.16   |  2.92  |
+|------------|----------|------------|---------|--------|
+|     6	     |    27%   |    28%     |  3.35   |  3.09  |
+|------------|----------|------------|---------|--------|
+|     9      |    12%   |    29%     |  3.36   |  3.11  |
+|____________|__________|____________|_________|________|
+
+Using the same data set as for the above table, IAA fixed-mode compression
+results in a compression ratio of 2.69. Using IAA canned-mode compression
+results in a ratio of 2.88, which is a 7% improvement. This data shows that
+the canned mode results in better latencies than the dynamic mode, but a
+better ratio than the fixed mode. Thus, the canned mode would be preferred
+when compression and decompression latencies are valued more than the
+compression ratio.
+
+'Dynamic' mode IAA compression is a HW accelerated dynamic Deflate that is
+fully compatible with software decompress implementations, including zlib.
+'Dynamic' IAA compression allows users to perform hardware-accelerated
+compression that achieves a higher compression ratio than both 'canned'
+and 'fixed' compression modes. Thus, Dynamic IAA compression should be
+used when the goal is to produce the best compression ratio while
+minimizing latencies by using IAA hardware acceleration.  IAA
+decompression is fully compatible with software compress implementations,
+when the uncompressed size is no more than 4KB.
+
+Below is a table showing the compression ratio seen when compressing a
+data set of 4300 4KB pages sampled from SPEC CPU17 workloads via various
+IAA compression modes:
+
+|---------------------------------------|
+|		 Intel IAA              |
+|---------------------------------------|
+| compression mode | compression ratio  |
+|---------------------------------------|
+| fixed	           |	2.69            |
+|---------------------------------------|
+| canned           |	2.88		|
+|---------------------------------------|
+| dynamic          |	3.14		|
+|---------------------------------------|
+
+Patch 1/4 adds a software implementation of “canned’ mode to the
+existing zlib software library and exposes it as “deflate-canned”.
+This was done instead of creating a new canned-mode library to avoid a lot
+of code duplication. Testing shows that this change has no performance
+impact to the existing zlib algorithms.
+
+Patch 2/4 adds IAA 'canned' support which is based on the original
+implementation [1] and will be exposed as 'deflate-iaa-canned'
+
+Patch 3/4 adds 'dynamic' mode IAA compression support and will be exposed
+as 'deflate-iaa-dynamic'.
+
+Patch 4/4 adds software compression stats to the optional debugfs
+statistics support for IAA.
+
+[1] https://lore.kernel.org/lkml/20230605201536.738396-1-tom.zanussi@linux.intel.com/
+[2] https://lore.kernel.org/lkml/ZIw%2Fjtxdg6O1O0j3@gondor.apana.org.au/
+
+Andre Glover (4):
+  crypto: Add 'canned' compression mode for zlib
+  crypto: iaa - Add deflate-canned compression algorithm
+  crypto: iaa - Add deflate-iaa-dynamic compression algorithm
+  crypto: iaa - Add Software Compression stats to IAA Compression
+    Accelerator stats
+
+ .../driver-api/crypto/iaa/iaa-crypto.rst      |  36 +-
+ crypto/deflate.c                              |  72 +++-
+ crypto/testmgr.c                              |  30 ++
+ crypto/testmgr.h                              | 220 +++++++++++
+ drivers/crypto/intel/iaa/Kconfig              |   1 +
+ drivers/crypto/intel/iaa/Makefile             |   2 +-
+ drivers/crypto/intel/iaa/iaa_crypto.h         |  44 ++-
+ .../crypto/intel/iaa/iaa_crypto_comp_canned.c | 116 ++++++
+ .../intel/iaa/iaa_crypto_comp_dynamic.c       |  22 ++
+ .../crypto/intel/iaa/iaa_crypto_comp_fixed.c  |   1 +
+ drivers/crypto/intel/iaa/iaa_crypto_main.c    | 361 ++++++++++++++++--
+ drivers/crypto/intel/iaa/iaa_crypto_stats.c   |   8 +
+ drivers/crypto/intel/iaa/iaa_crypto_stats.h   |   2 +
+ include/linux/zlib.h                          |  10 +
+ lib/Kconfig                                   |   9 +
+ lib/zlib_deflate/defcanned.h                  | 118 ++++++
+ lib/zlib_deflate/deflate.c                    |   8 +-
+ lib/zlib_deflate/deftree.c                    |  15 +-
+ lib/zlib_inflate/infcanned.h                  | 191 +++++++++
+ lib/zlib_inflate/inflate.c                    |  15 +-
+ lib/zlib_inflate/inflate.h                    |   5 +-
+ lib/zlib_inflate/infutil.h                    |  16 +
+ 22 files changed, 1255 insertions(+), 47 deletions(-)
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_comp_canned.c
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_comp_dynamic.c
+ create mode 100644 lib/zlib_deflate/defcanned.h
+ create mode 100644 lib/zlib_inflate/infcanned.h
+
+-- 
+2.27.0
 
