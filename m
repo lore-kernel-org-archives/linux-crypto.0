@@ -1,142 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF96132492
-	for <linux-crypto@vger.kernel.org>; Fri, 29 Mar 2024 13:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE0823A8
+	for <linux-crypto@vger.kernel.org>; Fri, 29 Mar 2024 15:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711718921; cv=none; b=t0K4SrpEi0bUVCyv9FhbcURLBxg4eF/N57qwcPoZWMB/X45jxJTBISrE9FSRywMrzkuqEwdIt5nxz/WOHNWuRF5KPSeMtmFqQzjmUVy9sbPrann/ZfMfYwNfM55p/PQchoZmgYIAtxXGQWVADeci6uPNHhn3dF2x44OMrv7AbFM=
+	t=1711727360; cv=none; b=cfVYV5spEV4EAGSDS6vbeq/IDMGksNp+UMCc2rE/2Qdo8kcnDuQUEoP+SyQXdyXHTfOHQ1KvZp7nvjq+Vjkr17mrl5ODzupehk3496l0kaoRcMRGuWSYZByBJK5p8OpGiDTY4isKk4E3Y3uMwrNMhN6FbUMLM2OzGFT+hWbEEj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711718921; c=relaxed/simple;
-	bh=zlmV0sBDPPllGZWjPqa2/c1/r7nXDK5/rzJZO9Fvals=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kTx65mt1FpiR3dSd87eS/n0DyhXGLo7kfzP6IApyt1WpiQOJYXXHZJ67zkKOJ49xGEYGyL48+Dml6NOfZWw/8q+7xpKbiBH6g/cXIudRdjopyC3KrZQAYaY+Odrdi5ZMnufwogFjC57scJPbVZBBdTdSAvuJn4mYlRISOLUzA+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IUDXgm2k; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711727360; c=relaxed/simple;
+	bh=lnooIcnRm+Tj9mcyOfrRGjNu8vfwrgz8A/shrwBRbbw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=udxSUQwhVEUjUzuEHMQqJ0hg3FfnAF1uNNOoLvC/Y3KonSZCL/QoIH59/X/uqsdWyebrCO/2/pCR7lmjdMa0ClwQNroqxBxXk6OLr9XyqWEEk80tZfsoR9FsgOs6FsqwjYUQA6hplbxa1uUR1Y2lQWr9R64v2zk6vP2V7rUh9B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=fMQo+Z7A; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IUDXgm2k"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711718918;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9b2+syugljaMrrOP++3j3QqL3+aM8ytb7iOaLk3Q4wQ=;
-	b=IUDXgm2kOl9/CN/lhCVgoBjWiVVVwUt5rBIo9bSfsN0DUnUCU2Di83i8B8QVZ9/uRrHU2v
-	HiWjjesvrN8Qf3DWBUSub7BKFKH5vNhk02uIBr3cj/ZDu/ZGZKKbSzLesA1/nL3E2h0Ed7
-	NXmppQUWSIftHX8LY7SCkJOAH64TCms=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-x-GE3AlYN-SJiFOMV9rHrA-1; Fri, 29 Mar 2024 09:28:36 -0400
-X-MC-Unique: x-GE3AlYN-SJiFOMV9rHrA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33ecc0f0c95so1042531f8f.3
-        for <linux-crypto@vger.kernel.org>; Fri, 29 Mar 2024 06:28:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711718915; x=1712323715;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="fMQo+Z7A"
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a4751063318so266718966b.0
+        for <linux-crypto@vger.kernel.org>; Fri, 29 Mar 2024 08:49:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1711727356; x=1712332156; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9b2+syugljaMrrOP++3j3QqL3+aM8ytb7iOaLk3Q4wQ=;
-        b=jet0U386a9TRMT8qLuhArURvNUzNa3qmV0mnMIhF/gsOlcJ1nwwTOdgEEkeP2qA1Mt
-         Ussp0BDfbtMS1ADQX18SFcf1gr8SWzTKb2FwQlgnvth2kpWqAEF73717DgA/NuoM+eWk
-         lVUk+2Qp6thltsUePpiV9lsdJy+O5NXR8+wKJP/VoRkWT0pQgXLkrBgndeE7N/rr+i/f
-         HeeaPNEgDh+iW7vOZ0rMUdka6iMlMxTudzRMO8R/o7Sg9rAs8CoBkiuAoZEkcXyecS+9
-         AMkoWhgFMHDps+lm9Mbi8lqddA8juEaWgE0vg/TdMD/0aTVMe14kUVoN6AoScTqlm2Xk
-         KtHg==
-X-Forwarded-Encrypted: i=1; AJvYcCUyBFgTsi9v4SFD4PDxSmJ/QSApc9+pUCM+uR/KIkUBtrBM8tnh5TA/Deog9rbm9fJSzT+eNfZCHW08g6ILywZuXeBxeZ7grjnMX5n3
-X-Gm-Message-State: AOJu0YxcYLJSGSsEdFQGjgvsM/esmL3BUy4L9sPSS/50RjGlrdPuBCZO
-	o+lg5aM/U56+AaUNT5OIUTgl0mYtKnRHW3xNSQCwMth1k1lQsNCEJ7gA2JYA6u3BJB/hxYNJS7Q
-	z5GcdU8OMDpPa8PUWpA/p0+q4NFw8e+L0Dnnr7jofTpD+3jSJFMu+A5jlngNeaQ==
-X-Received: by 2002:a05:6000:258:b0:343:3e54:6208 with SMTP id m24-20020a056000025800b003433e546208mr405070wrz.55.1711718915571;
-        Fri, 29 Mar 2024 06:28:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG0y693U6Mrafzyu7YFm6f17FVsvRLIAvGL111PeLg9URymVxfxN4rrw7+XNw571qiaGR1ycw==
-X-Received: by 2002:a05:6000:258:b0:343:3e54:6208 with SMTP id m24-20020a056000025800b003433e546208mr405040wrz.55.1711718915211;
-        Fri, 29 Mar 2024 06:28:35 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-25-33.business.telecomitalia.it. [87.12.25.33])
-        by smtp.gmail.com with ESMTPSA id e11-20020a056000194b00b00341c6b53358sm4171063wry.66.2024.03.29.06.28.31
+        bh=Xl4g7kNwbZSWPZHN5jBx2cvEXqgu3O7G1Se4DzXl3uE=;
+        b=fMQo+Z7AL8tM9cuYXErnx7hO9gy514ZVipjF13lMr+GvGtE4v+lrJWKI3X8uT+rbZs
+         QpbytKBsloff8/EsV8zd/13KYoU1rthfRTg67nKHk3GKCbHaj6AW4pqtca4LEnmQxPtY
+         dSwL3Pjt9SAJ91SoLqZYzc69eVKEhbqyefHBEIA7tc0UgCp/ZHZhCURlRS/Ml0LXxq9t
+         YCu1EN/W/B2hByHflGuC/QXpGGSWWf7mqwuVwDC6swbMlxbLwe6489v2c7oUKdWSLr9S
+         fvyn0JSPkkcWAQxg6oST42poH/n802O4xS2kptY+5UmZ2Y0tWM5tBjcEA+dzdq3q4Lo5
+         tOkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711727356; x=1712332156;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Xl4g7kNwbZSWPZHN5jBx2cvEXqgu3O7G1Se4DzXl3uE=;
+        b=hmkEvs5TtkAfO/ciqbqz39Kau7WYrZE73tf30EBaf+N1CjaZXNx/LtnnQxlGS0lya8
+         rAq2vhzhzFNH6SoVZ1XkFLQ27xB0JwPKpuXenJHgIusDhSRm+/hZk6k99zBCIrNUJA6c
+         2c2/FONhRRiHw4iJU7ahz2THGEHjc6z3zGfP0PnWbrgitCdAPL0AlOb2diYXNmoI8yGl
+         V+GCfjmS5/IkCgX3QiB+TleSz9BA1ddZMqQ/ts5ZRRHc6Xsbs0rCSsXmwwnlaOHZWmL9
+         Z0TLJZGrLBT74Wtfvfkvh4mOH+g8BdKF0JrSYfzcIBWm3/dcEeJ1gTZY3Ab6CDllLREC
+         /oZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVprBGcoaYc3TaeNzMpU276bTuVobpUCEHYITsxNZS2ODuImFZsO37OebIPf7KSZilOszWmsTX8AvWnsKsiwsUvi7ZicPaHJ6Kpqe5a
+X-Gm-Message-State: AOJu0YyRlAgvqHEAiGHNwd5W9yUjTBStf4i5MbUvlZ2SeM89rmKcY3ci
+	nTABm3OimQe9Ig9QU046h5Ax9c9g/o1rPfsG1K9WxGNjfLosMG1aUYqawfSmvgs=
+X-Google-Smtp-Source: AGHT+IEoTDNuKniQKyvP1LcAKCmnmgTPpoKnq+nHfUNUTmyJXKTX+6p6o2lqqh+la6T6vBc+BWJu3g==
+X-Received: by 2002:a17:907:7e9c:b0:a46:ec44:477c with SMTP id qb28-20020a1709077e9c00b00a46ec44477cmr2119729ejc.41.1711727356324;
+        Fri, 29 Mar 2024 08:49:16 -0700 (PDT)
+Received: from fedora.fritz.box (aftr-82-135-80-212.dynamic.mnet-online.de. [82.135.80.212])
+        by smtp.gmail.com with ESMTPSA id bw17-20020a170906c1d100b00a46b4544da2sm2038962ejb.125.2024.03.29.08.49.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 06:28:34 -0700 (PDT)
-Date: Fri, 29 Mar 2024 14:28:27 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
-	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	David Airlie <airlied@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu <olvaffe@gmail.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
-	Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, 
-	Christian Schoenebeck <linux_oss@crudebyte.com>, Kalle Valo <kvalo@kernel.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, netdev@vger.kernel.org, 
-	v9fs@lists.linux.dev, kvm@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 01/22] virtio: store owner from modules with
- register_virtio_driver()
-Message-ID: <e2xy5kjdctpitcrev2byqc5gcwntvsd6pfutrvp3l2kfe3llgs@l2xp5opj7xu2>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-1-0feffab77d99@linaro.org>
- <oaoiehcpkjs3wrhc22pwx676pompxml2z5dcq32a6fvsyntonw@hnohrbbp6wpm>
- <d01cc73e-a365-4ce8-a25f-780ea45bc581@linaro.org>
+        Fri, 29 Mar 2024 08:49:15 -0700 (PDT)
+From: Thorsten Blum <thorsten.blum@toblux.com>
+To: thorsten.blum@toblux.com
+Cc: davem@davemloft.net,
+	herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] crypto: jitter - Remove duplicate word in comment
+Date: Fri, 29 Mar 2024 16:44:54 +0100
+Message-ID: <20240329154455.1733-3-thorsten.blum@toblux.com>
+X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240328160401.445647-2-thorsten.blum@toblux.com>
+References: <20240328160401.445647-2-thorsten.blum@toblux.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <d01cc73e-a365-4ce8-a25f-780ea45bc581@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 29, 2024 at 01:07:31PM +0100, Krzysztof Kozlowski wrote:
->On 29/03/2024 12:42, Stefano Garzarella wrote:
->>> };
->>>
->>> -int register_virtio_driver(struct virtio_driver *driver)
->>> +int __register_virtio_driver(struct virtio_driver *driver, struct module *owner)
->>> {
->>> 	/* Catch this early. */
->>> 	BUG_ON(driver->feature_table_size && !driver->feature_table);
->>> 	driver->driver.bus = &virtio_bus;
->>> +	driver->driver.owner = owner;
->>> +
->>
->> `.driver.name =  KBUILD_MODNAME` also seems very common, should we put
->> that in the macro as well?
->
->This is a bit different thing. Every driver is expected to set owner to
->itself (THIS_MODULE), but is every driver name KBUILD_MODNAME?
+s/in//
 
-Nope, IIUC we have 2 exceptions:
-- drivers/firmware/arm_scmi/virtio.c
-- arch/um/drivers/virt-pci.c
+Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
+---
+Changes in v2:
+- Fix the commit diff because I made a mistake when breaking up changes
+  into individual patches
+---
+ crypto/jitterentropy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->Remember that this overrides whatever driver actually put there.
-
-They can call __register_virtio_driver() where we can add the `name`
-parameter. That said, I don't have a strong opinion, we can leave it
-as it is.
-
-Thanks,
-Stefano
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index 26a9048bc893..ee2aa0b7aa9e 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -158,7 +158,7 @@ struct rand_data {
+  * See the SP 800-90B comment #10b for the corrected cutoff for the SP 800-90B
+  * APT.
+  * http://www.untruth.org/~josh/sp80090b/UL%20SP800-90B-final%20comments%20v1.9%2020191212.pdf
+- * In in the syntax of R, this is C = 2 + qbinom(1 − 2^(−30), 511, 2^(-1/osr)).
++ * In the syntax of R, this is C = 2 + qbinom(1 − 2^(−30), 511, 2^(-1/osr)).
+  * (The original formula wasn't correct because the first symbol must
+  * necessarily have been observed, so there is no chance of observing 0 of these
+  * symbols.)
+-- 
+2.44.0
 
