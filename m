@@ -1,172 +1,185 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F40F50A97;
-	Fri, 29 Mar 2024 08:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD772554B;
+	Fri, 29 Mar 2024 09:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711699562; cv=none; b=GLvee0OC4/vaz9Q5gHg12MFuAiN4bYN1RjAVIMItjQHIby+yZvDGfgy8gwH9RIfNp6yDLmJlYEOGfwAuhXbWfnTI20Xso8agqBRpaglyj2exhPKXW9Ibpzv+xCH0FoiyQc2sInkyac5K/4AIjKN9KXOIPL3OZ+2MHqdMLyj5LeI=
+	t=1711703000; cv=none; b=pkqnBM7NignsdOkTOvRXKZbza4HANHJMZS+VncXqdf/B5g1obVp5dUQBWdK31FEEqqxZsdHn9bluT6l1FdLro762BblzZVRSrRW4GoKvyF0temDujoDjhCxbcfSn/VlfA8e7jG0IoLmF334dlxr6cgI/Jc0HvNZLuhK35WoLR+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711699562; c=relaxed/simple;
-	bh=RGIruG4V66PZQcVzovXySY0XyiLGcDc08NnJCgDt1EM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LvrzPtKLQoDF/7lRgpDjKcSf+uBoOyupKQUyq3EexHzfyAiim6YrWsKGJqjb73yODxmbn8iGStQiSx9ZXRRtuL3WCBUh+LQMfZyAm4SYE3iDTZzE9dPi/HAuh0B+bNMvPXvyr68DdTzY3m1k1Up1ef787c+1CCFziTWbHu64+Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVth4ZHg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711703000; c=relaxed/simple;
+	bh=9+XxVWlnVEGD6Kgr0GSGU5MeBsUU3Gt2QSEOy7liNpo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Mvhygaqj/i0gFjJcCMalWAWC7QTlruDV5umi1JGWYM3vdxruJnPRGwP2N1isfaKMTW4K1PwmlohI+0+vFS+N7l87L+/RqoQpuIyDZgKcgpeWvihOb//CmcQjKHoHci1ZakUmDZnVOUcXVRNpJeYCWzr3l+Ns+wMRJ1hhVeQmd3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s/GSuVGj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVth4ZHg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FCDFC43143;
-	Fri, 29 Mar 2024 08:06:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s/GSuVGj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 276E7C433C7;
+	Fri, 29 Mar 2024 09:03:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711699561;
-	bh=RGIruG4V66PZQcVzovXySY0XyiLGcDc08NnJCgDt1EM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BVth4ZHgqbzBaZonyjaLYOQ+Oet0j5PB2Dcj6q2n2fz54LfXwCYqYreuQPLXFfhUq
-	 7SKJGDVflqvBqbdVwTRCBPgPqkMCjdrYDa2gIGHlLdJ6WHtYmWGaV5i5OUDlDL9wox
-	 TDb0Y77nadEKS3jAZ3j1bSIk+zMdL9clRbtBagrCNaviILmy5XZUT1ktTmxB+QYCd8
-	 eoHUUpbX/NSvlfS6ftYs9SnsjYRvWs1ZpiWygxvFE9jQuAypohCfdwnwgy0Q6aZQgd
-	 qk+xENZ5rBgGragXv0LX80yVKaXAbwHWTOSOxSR844CSCO3pdpQlLekfSfZNm4IHnH
-	 VmqOTd/DcEkmQ==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-	x86@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Andy Lutomirski <luto@kernel.org>,
-	"Chang S . Bae" <chang.seok.bae@intel.com>
-Subject: [PATCH v2 6/6] crypto: x86/aes-xts - wire up VAES + AVX10/512 implementation
-Date: Fri, 29 Mar 2024 01:03:54 -0700
-Message-ID: <20240329080355.2871-7-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240329080355.2871-1-ebiggers@kernel.org>
-References: <20240329080355.2871-1-ebiggers@kernel.org>
+	s=k20201202; t=1711703000;
+	bh=9+XxVWlnVEGD6Kgr0GSGU5MeBsUU3Gt2QSEOy7liNpo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=s/GSuVGjyKWXBQXEJEukGgl6lfAyaQuQbdVdbltFjUfdjZBDvdj1CYrBj3x4lE/RI
+	 PGJFmxI70SH7YccdP8gd6nJAJRDjUBiU+ZUcjL9KjNY7k0MjlTYKz5YZiNEKiMkYcB
+	 aYzBF0GOrjxppZNslwQNsiSEsUEjx4PiNaIXxjShK0ClvQW5n8Qx+1jSHUua3BMtzP
+	 auhpOlwENkoSoymAn1PVEOizJs4ZegFlibOtOMkTNri4sYLg2onSZ4HIWPtbfiWbda
+	 Lk0wpGmu3tt49jwS5HN8/sgdhMZL3LHFsWxfojC6M+RXEQTRwUiWo8bUjsO21ZRFCJ
+	 i8YMWoXFKHGpg==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-515c3eeea5dso1840095e87.1;
+        Fri, 29 Mar 2024 02:03:20 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUgAWwVos3nUtU2Y+Cq2nsJ34oJOxYZ2J4m+w+qpBZjro4Evzy+WYCysxx4pdmkyRIiKm2yCvgOxQoEnEQZqTqJEQLVYiOxsGluGjEN
+X-Gm-Message-State: AOJu0Yzkd5sm6s9TqnHJj9OUNxTSTLyXkiVEYF52YGkpHxcvgEqVh6UR
+	rQSX63zC0vtfQYohkVgXMpBkH3GzqtkbGTb9l11QMUphgU/TMm9wrCFr3Rxy836LgcYVmRR6ASD
+	t9lszTuALPKgp1/NzpTNMGwcrZ5E=
+X-Google-Smtp-Source: AGHT+IGy3Yn/+h8SR2x5X5rKl+0pk4khdVWMdTeWMdjmcHsyPPT4Zwby1ei1AAVW2/CwgoNDZ0FBLpXRAfRqY97qh4M=
+X-Received: by 2002:ac2:4d0f:0:b0:515:bf51:a533 with SMTP id
+ r15-20020ac24d0f000000b00515bf51a533mr973506lfi.23.1711702998438; Fri, 29 Mar
+ 2024 02:03:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240329080355.2871-1-ebiggers@kernel.org>
+In-Reply-To: <20240329080355.2871-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 29 Mar 2024 11:03:07 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEupfkpe98PdtbxQbtx1z5J_fZFPzT7wJ2tsJnCT9uaxA@mail.gmail.com>
+Message-ID: <CAMj1kXEupfkpe98PdtbxQbtx1z5J_fZFPzT7wJ2tsJnCT9uaxA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] Faster AES-XTS on modern x86_64 CPUs
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	Andy Lutomirski <luto@kernel.org>, "Chang S . Bae" <chang.seok.bae@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, 29 Mar 2024 at 10:06, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> This patchset adds new AES-XTS implementations that accelerate disk and
+> file encryption on modern x86_64 CPUs.
+>
+> The largest improvements are seen on CPUs that support the VAES
+> extension: Intel Ice Lake (2019) and later, and AMD Zen 3 (2020) and
+> later.  However, an implementation using plain AESNI + AVX is also added
+> and provides a boost on older CPUs too.
+>
+> To try to handle the mess that is x86 SIMD, the code for all the new
+> AES-XTS implementations is generated from an assembly macro.  This makes
+> it so that we e.g. don't have to have entirely different source code
+> just for different vector lengths (xmm, ymm, zmm).
+>
+> To avoid downclocking effects, zmm registers aren't used on certain
+> Intel CPU models such as Ice Lake.  These CPU models default to an
+> implementation using ymm registers instead.
+>
+> To make testing easier, all four new AES-XTS implementations are
+> registered separately with the crypto API.  They are prioritized
+> appropriately so that the best one for the CPU is used by default.
+>
+> There's no separate kconfig option for the new implementations, as they
+> are included in the existing option CONFIG_CRYPTO_AES_NI_INTEL.
+>
+> This patchset increases the throughput of AES-256-XTS by the following
+> amounts on the following CPUs:
+>
+>                           | 4096-byte messages | 512-byte messages |
+>     ----------------------+--------------------+-------------------+
+>     Intel Skylake         |        6%          |       31%         |
+>     Intel Cascade Lake    |        4%          |       26%         |
+>     Intel Ice Lake        |       127%         |      120%         |
+>     Intel Sapphire Rapids |       151%         |      112%         |
+>     AMD Zen 1             |        61%         |       73%         |
+>     AMD Zen 2             |        36%         |       59%         |
+>     AMD Zen 3             |       138%         |       99%         |
+>     AMD Zen 4             |       155%         |      117%         |
+>
+> To summarize how the XTS implementations perform in general, here are
+> benchmarks of all of them on AMD Zen 4, with 4096-byte messages.  (Of
+> course, in practice only the best one for the CPU actually gets used.)
+>
+>     xts-aes-aesni                  4247 MB/s
+>     xts-aes-aesni-avx              5669 MB/s
+>     xts-aes-vaes-avx2              9588 MB/s
+>     xts-aes-vaes-avx10_256         9631 MB/s
+>     xts-aes-vaes-avx10_512         10868 MB/s
+>
+> ... and on Intel Sapphire Rapids:
+>
+>     xts-aes-aesni                  4848 MB/s
+>     xts-aes-aesni-avx              5287 MB/s
+>     xts-aes-vaes-avx2              11685 MB/s
+>     xts-aes-vaes-avx10_256         11938 MB/s
+>     xts-aes-vaes-avx10_512         12176 MB/s
+>
+> Notes about benchmarking methods:
+>
+> - All my benchmarks were done using a custom kernel module that invokes
+>   the crypto_skcipher API.  Note that benchmarking the crypto API from
+>   userspace using AF_ALG, e.g. as 'cryptsetup benchmark' does, is bad at
+>   measuring fast algorithms due to the syscall overhead of AF_ALG.  I
+>   don't recommend that method.  Instead, I measured the crypto
+>   performance directly, as that's what this patchset focuses on.
+>
+> - All numbers I give are for decryption.  However, on all the CPUs I
+>   tested, encryption performs almost identically to decryption.
+>
+> Open questions:
+>
+> - Is the policy that I implemented for preferring ymm registers to zmm
+>   registers the right one?  arch/x86/crypto/poly1305_glue.c thinks that
+>   only Skylake has the bad downclocking.  My current proposal is a bit
+>   more conservative; it also excludes Ice Lake and Tiger Lake.  Those
+>   CPUs supposedly still have some downclocking, though not as much.
+>
+> - Should the policy on the use of zmm registers be in a centralized
+>   place?  It probably doesn't make sense to have random different
+>   policies for different crypto algorithms (AES, Poly1305, ARIA, etc.).
+>
+> - Are there any other known issues with using AVX512 in kernel mode?  It
+>   seems to work, and technically it's not new because Poly1305 and ARIA
+>   already use AVX512, including the mask registers and zmm registers up
+>   to 31.  So if there was a major issue, like the new registers not
+>   being properly saved and restored, it probably would have already been
+>   found.  But AES-XTS support would introduce a wider use of it.
+>
+> - Should we perhaps not even bother with AVX512 / AVX10 at all for now,
+>   given that on current CPUs most of the improvement is achieved by
+>   going to VAES + AVX2?  I.e. should we skip the last two patches?  I'm
+>   hoping the improvement will be greater on future CPUs, though.
+>
+> Changed in v2:
+>   - Additional optimizations:
+>       - Interleaved the tweak computation with AES en/decryption.  This
+>         helps significantly on some CPUs, especially those without VAES.
+>       - Further optimized for single-page sources and destinations.
+>       - Used fewer instructions to update tweaks in VPCLMULQDQ case.
+>       - Improved handling of "round 0".
+>       - Eliminated a jump instruction from the main loop.
+>   - Other
+>       - Fixed zmm_exclusion_list[] to be null-terminated.
+>       - Added missing #ifdef to unregister_xts_algs().
+>       - Added some more comments.
+>       - Improved cover letter and some commit messages.
+>       - Now that the next tweak is always computed anyways, made it be
+>         returned unconditionally.
+>       - Moved the IV encryption to a separate function.
+>
+> Eric Biggers (6):
+>   x86: add kconfig symbols for assembler VAES and VPCLMULQDQ support
+>   crypto: x86/aes-xts - add AES-XTS assembly macro for modern CPUs
+>   crypto: x86/aes-xts - wire up AESNI + AVX implementation
+>   crypto: x86/aes-xts - wire up VAES + AVX2 implementation
+>   crypto: x86/aes-xts - wire up VAES + AVX10/256 implementation
+>   crypto: x86/aes-xts - wire up VAES + AVX10/512 implementation
+>
 
-Add an AES-XTS implementation "xts-aes-vaes-avx10_512" for x86_64 CPUs
-with the VAES, VPCLMULQDQ, and either AVX10/512 or AVX512BW + AVX512VL
-extensions.  This implementation uses zmm registers to operate on four
-AES blocks at a time.  The assembly code is instantiated using a macro
-so that most of the source code is shared with other implementations.
+Retested this v2:
 
-To avoid downclocking on older Intel CPU models, an exclusion list is
-used to prevent this 512-bit implementation from being used by default
-on some CPU models.  They will use xts-aes-vaes-avx10_256 instead.  For
-now, this exclusion list is simply coded into aesni-intel_glue.c.  It
-may make sense to eventually move it into a more central location.
+Tested-by: Ard Biesheuvel <ardb@kernel.org>
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
-xts-aes-vaes-avx10_512 is slightly faster than xts-aes-vaes-avx10_256 on
-some current CPUs.  E.g., on AMD Zen 4, AES-256-XTS decryption
-throughput increases by 13% with 4096-byte inputs, or 14% with 512-byte
-inputs.  On Intel Sapphire Rapids, AES-256-XTS decryption throughput
-increases by 2% with 4096-byte inputs, or 3% with 512-byte inputs.
-
-Future CPUs may provide stronger 512-bit support, in which case a larger
-benefit should be seen.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/aes-xts-avx-x86_64.S |  9 ++++++++
- arch/x86/crypto/aesni-intel_glue.c   | 32 ++++++++++++++++++++++++++++
- 2 files changed, 41 insertions(+)
-
-diff --git a/arch/x86/crypto/aes-xts-avx-x86_64.S b/arch/x86/crypto/aes-xts-avx-x86_64.S
-index 71be474b22da..b8005d0205f8 100644
---- a/arch/x86/crypto/aes-xts-avx-x86_64.S
-+++ b/arch/x86/crypto/aes-xts-avx-x86_64.S
-@@ -824,6 +824,15 @@ SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx10_256)
- 	_aes_xts_crypt	1
- SYM_FUNC_END(aes_xts_encrypt_vaes_avx10_256)
- SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx10_256)
- 	_aes_xts_crypt	0
- SYM_FUNC_END(aes_xts_decrypt_vaes_avx10_256)
-+
-+.set	VL, 64
-+.set	USE_AVX10, 1
-+SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx10_512)
-+	_aes_xts_crypt	1
-+SYM_FUNC_END(aes_xts_encrypt_vaes_avx10_512)
-+SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx10_512)
-+	_aes_xts_crypt	0
-+SYM_FUNC_END(aes_xts_decrypt_vaes_avx10_512)
- #endif /* CONFIG_AS_VAES && CONFIG_AS_VPCLMULQDQ */
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 914cbf5d1f5c..0855ace8659c 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1298,12 +1298,33 @@ static struct simd_skcipher_alg *aes_xts_simdalg_##suffix
- 
- DEFINE_XTS_ALG(aesni_avx, "xts-aes-aesni-avx", 500);
- #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)
- DEFINE_XTS_ALG(vaes_avx2, "xts-aes-vaes-avx2", 600);
- DEFINE_XTS_ALG(vaes_avx10_256, "xts-aes-vaes-avx10_256", 700);
-+DEFINE_XTS_ALG(vaes_avx10_512, "xts-aes-vaes-avx10_512", 800);
- #endif
- 
-+/*
-+ * This is a list of CPU models that are known to suffer from downclocking when
-+ * zmm registers (512-bit vectors) are used.  On these CPUs, the AES-XTS
-+ * implementation with zmm registers won't be used by default.  An
-+ * implementation with ymm registers (256-bit vectors) will be used instead.
-+ */
-+static const struct x86_cpu_id zmm_exclusion_list[] = {
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_SKYLAKE_X },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_X },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_D },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_L },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_NNPI },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_TIGERLAKE_L },
-+	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_TIGERLAKE },
-+	/* Allow Rocket Lake and later, and Sapphire Rapids and later. */
-+	/* Also allow AMD CPUs (starting with Zen 4, the first with AVX-512). */
-+	{},
-+};
-+
- static int __init register_xts_algs(void)
- {
- 	int err;
- 
- 	if (!boot_cpu_has(X86_FEATURE_AVX))
-@@ -1333,10 +1354,18 @@ static int __init register_xts_algs(void)
- 
- 	err = simd_register_skciphers_compat(&aes_xts_alg_vaes_avx10_256, 1,
- 					     &aes_xts_simdalg_vaes_avx10_256);
- 	if (err)
- 		return err;
-+
-+	if (x86_match_cpu(zmm_exclusion_list))
-+		aes_xts_alg_vaes_avx10_512.base.cra_priority = 1;
-+
-+	err = simd_register_skciphers_compat(&aes_xts_alg_vaes_avx10_512, 1,
-+					     &aes_xts_simdalg_vaes_avx10_512);
-+	if (err)
-+		return err;
- #endif /* CONFIG_AS_VAES && CONFIG_AS_VPCLMULQDQ */
- 	return 0;
- }
- 
- static void unregister_xts_algs(void)
-@@ -1349,10 +1378,13 @@ static void unregister_xts_algs(void)
- 		simd_unregister_skciphers(&aes_xts_alg_vaes_avx2, 1,
- 					  &aes_xts_simdalg_vaes_avx2);
- 	if (aes_xts_simdalg_vaes_avx10_256)
- 		simd_unregister_skciphers(&aes_xts_alg_vaes_avx10_256, 1,
- 					  &aes_xts_simdalg_vaes_avx10_256);
-+	if (aes_xts_simdalg_vaes_avx10_512)
-+		simd_unregister_skciphers(&aes_xts_alg_vaes_avx10_512, 1,
-+					  &aes_xts_simdalg_vaes_avx10_512);
- #endif
- }
- #else /* CONFIG_X86_64 */
- static int __init register_xts_algs(void)
- {
--- 
-2.44.0
-
+Hopefully, the AES-KL keylocker implementation can be based on this
+template as well. I wouldn't mind retiring the existing xts(aesni)
+code entirely, and using the xts() wrapper around ecb-aes-aesni on
+32-bit and on non-AVX uarchs with AES-NI.
