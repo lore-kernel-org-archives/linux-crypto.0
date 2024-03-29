@@ -1,152 +1,177 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AFCF6AFAE
-	for <linux-crypto@vger.kernel.org>; Fri, 29 Mar 2024 10:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B79364BA;
+	Fri, 29 Mar 2024 11:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711709893; cv=none; b=YOSEUHqRm4lJDTibAnNXiPnDK1rD/g5CDMGAznLkBEWqf9+LsbLRRzuA9DcLGkf6w1VtUgK7W4d/fqRtvonHyYUrXaerIs0zZlE7fVUxmnf2tmOeYMiRiou/oDgiIHBaVEhyi97hys/037ULNHLYIOgYE1/kDmcD///dw4d//Sk=
+	t=1711710884; cv=none; b=tL+dh3/GGXwlSs/Wle6konSi1KnL2w3eEEQ301MPBf8xzs7uxSB5RIlVJ/ZCA2Bb/XXMcnvEQgkhi/wgeH3HdEI/mvfKvTaI9/7MD1c3yR3SDStyoK67R5ACkveZH6SK9YiW9WxPhLwE01MlO4bQuFoQMNQ0S//FNPkEn4guixY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711709893; c=relaxed/simple;
-	bh=g8OQfrHBwhFx8ET7d7s7wkLQtKO+Fbki+HGAG42ZO84=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B04p4NaVgbeVexEU1UN26RJFL9FGr09TYmPP97WvlyQOd74MJD+1OvsEw6d+AOdlyQM0rZNraEtwjNdR6z87JxhzKFa/UdM/ZNXIF0WmYwmc5weU87Ai8PxuetoK+D4URuEZkaqcZ8YZgNjZHjhJRzO2KCsD+WlOoIEIbDfujAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QbLejqej; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711710884; c=relaxed/simple;
+	bh=z6p08nGmnn5rR1/CMeOGPwFv//6ITv/V2s6q+dQt9Dg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=pnKszxWWNRIggb4W1Yt7d5zeXk/rF0VAVcziCHiAdReG2hr5HKZVgWslehhvZ55PXckrrz3DlZZYeb1t+olGDAhaML+xoBQu7wRU3BW5WKu0LS18dECjMK49dJHAikcSqoVa+ItGpN2b0oGXzUqCb4ISuJ1W1tgqANxO+mgPKkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=WKjL+cp6; arc=none smtp.client-ip=37.18.73.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QbLejqej"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711709889;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ObmCChwbxI4fnx/oMY/3duoto3dJqKFQjwXK6r0ebbk=;
-	b=QbLejqejcTXYnpi6v7P/hoStHyYIo+wo9scz/Tc21eZlzdurPz0hDHn0u7VKd+9Qp0eSEF
-	m62Hk0k8EnkFDeazd8L6AH5Qina9/+ibheUyOUNdXuW//tJ7croU+Hbw0j3p2AjtmDyqBg
-	ad+MedvinPyTUtcIQ53sR+lJuC914dU=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-122-EZ6PKx9iN_Giq5HIzoLXSg-1; Fri, 29 Mar 2024 06:58:08 -0400
-X-MC-Unique: EZ6PKx9iN_Giq5HIzoLXSg-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50e91f9d422so1922984e87.2
-        for <linux-crypto@vger.kernel.org>; Fri, 29 Mar 2024 03:58:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711709886; x=1712314686;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ObmCChwbxI4fnx/oMY/3duoto3dJqKFQjwXK6r0ebbk=;
-        b=t6SG2jmxSpLHDf8Ug3keYy7wQXxJNbHDQDRprMAntBcE1v7j03M/ciOEdmsC06GDTs
-         HWKYnZ51cAEWs3Ub1OMi+R6D9sBPEfii4bSzYEYmt8252bwp2cy/wAGypBgMgZBH9tg3
-         eOw7V1TEdLIoiz0wytEfU/VdNb3lxhYQ2mpBUtKSapAujTdl3YjgoGZrtNsDG5Yvk5qm
-         L5nihemGLyZMC8rzgLWroGW3ncdcwwlfftj/2TCc6OVDuia7iKnPp7i3WqMyXqNUF/Tx
-         365hrOlqC3zkk48VMpxKmPOqWQJ0e03a4Wzcx1SVzfaaE7ymy0uaZU3i3Fio7nv6K6P9
-         55qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUNXET9AfRJuIKE5JZs8n/Zhqf6yzey8s5joyxuA/NfmQZwLq294pQ9R+K3xndp2nwp9TgXgQYc6FQsRwsd1FCAyyVkDcjyciE/JGwq
-X-Gm-Message-State: AOJu0Yz9/vehGvZ0FwKo9IZq674SyIchhK33ZnA3IE1pXk46+pcpD3zf
-	NYV/Yj/Jh/aVaLZntPzECVAUeJbR4pNlMN9/AHXP3JrpWc/jbrmQ+xk8yNKfAVxG4dxaJYeA/TX
-	VreRqqoeMPEKPyVETiE793Gyl+THKk/czFYyGgc+8jIkGHfXxCMfIK7oZCVzcug==
-X-Received: by 2002:ac2:4197:0:b0:513:d3c0:f66 with SMTP id z23-20020ac24197000000b00513d3c00f66mr1297976lfh.51.1711709886670;
-        Fri, 29 Mar 2024 03:58:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG29WemiigJFVRUgtZdZmONK+lboYNHffuMAIXm6vtZQPUrBU42pJdYIugnsyliFC3CMebqVw==
-X-Received: by 2002:ac2:4197:0:b0:513:d3c0:f66 with SMTP id z23-20020ac24197000000b00513d3c00f66mr1297956lfh.51.1711709886231;
-        Fri, 29 Mar 2024 03:58:06 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-25-33.business.telecomitalia.it. [87.12.25.33])
-        by smtp.gmail.com with ESMTPSA id f4-20020a056402194400b0056c4cdc987esm1879596edz.8.2024.03.29.03.58.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 03:58:05 -0700 (PDT)
-Date: Fri, 29 Mar 2024 11:58:00 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
-	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, David Airlie <airlied@redhat.com>, 
-	Gerd Hoffmann <kraxel@redhat.com>, Gurchetan Singh <gurchetansingh@chromium.org>, 
-	Chia-I Wu <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
-	Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, 
-	Christian Schoenebeck <linux_oss@crudebyte.com>, Kalle Valo <kvalo@kernel.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, netdev@vger.kernel.org, 
-	v9fs@lists.linux.dev, kvm@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
-Message-ID: <wevexb25pa4cwa73tmmlpqyf527drjyfr56j46ddrglofh2mew@sv5hxdqpiu73>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
- <CAMRc=McY6PJj7fmLkNv07ogcYq=8fUb2o6w2uA1=D9cbzyoRoA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="WKjL+cp6"
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id A777510001B;
+	Fri, 29 Mar 2024 14:14:30 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A777510001B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1711710870;
+	bh=lFNNpWUo5GpWFV+9AKZ9Cfm8NfVqj08JFZwNdFWkc2I=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version:From;
+	b=WKjL+cp6zqFDN/D6whRQUAVUpp/FDIit+CaMjN0kz1d5zAIPPdxXNyS1P2mCOKAO+
+	 NXgvBjHQ+S6JtVkha3w9clLOQaN0BdzYV1iJevPPQrECJ4vo91NQ9mawoNS95juTAY
+	 1xnxZf/yb2w56JZNiExZrDNMqk8jYs+iVoSwpq0/0EDY6M79zOPmW47e5Hy8HpU6Jj
+	 As6WSS1vmMGNqX/MiF0nwqRYA+ur/8SDn4hxh8HCrUFJjpjlGD8Rg+tcVocZVqoXZ4
+	 MDs8Tvc1ePQPgd5h8Qm1pPjEyVKJL5d7YnB0MjKZDVlEI0+QUmp/GCdKcErFqR+eXz
+	 o+2Le3qA6CscA==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Fri, 29 Mar 2024 14:14:30 +0300 (MSK)
+Received: from p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) by
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 29 Mar 2024 14:14:30 +0300
+Received: from p-i-exch-sc-m02.sberdevices.ru ([fe80::10c3:6e04:fd07:c511]) by
+ p-i-exch-sc-m02.sberdevices.ru ([fe80::10c3:6e04:fd07:c511%9]) with mapi id
+ 15.02.1118.040; Fri, 29 Mar 2024 14:14:30 +0300
+From: Alexey Romanov <avromanov@salutedevices.com>
+To: Conor Dooley <conor@kernel.org>
+CC: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "khilman@baylibre.com"
+	<khilman@baylibre.com>, "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
+	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
+Subject: Re: [PATCH v6 17/23] dt-bindings: crypto: meson: remove clk and
+ second interrupt line for GXL
+Thread-Topic: [PATCH v6 17/23] dt-bindings: crypto: meson: remove clk and
+ second interrupt line for GXL
+Thread-Index: AQHaf5LgFGLoYbivnUaU5PLAkeGrbrFKIBaAgARC/AA=
+Date: Fri, 29 Mar 2024 11:14:29 +0000
+Message-ID: <20240329111424.i2zp2coznqpnibk4@cab-wsm-0029881>
+References: <20240326153219.2915080-1-avromanov@salutedevices.com>
+ <20240326153219.2915080-18-avromanov@salutedevices.com>
+ <20240326-obscurity-angriness-d7bb48bc9eaa@spud>
+In-Reply-To: <20240326-obscurity-angriness-d7bb48bc9eaa@spud>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <CEBAC2ABE34F8A4AB4996A1D926E8A4F@sberdevices.ru>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=McY6PJj7fmLkNv07ogcYq=8fUb2o6w2uA1=D9cbzyoRoA@mail.gmail.com>
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 184489 [Mar 29 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 14 0.3.14 5a0c43d8a1c3c0e5b0916cc02a90d4b950c01f96, {Track_E25351}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/03/29 06:35:00 #24505095
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Fri, Mar 29, 2024 at 11:27:19AM +0100, Bartosz Golaszewski wrote:
->On Wed, Mar 27, 2024 at 1:45 PM Krzysztof Kozlowski
-><krzysztof.kozlowski@linaro.org> wrote:
->>
->> virtio core already sets the .owner, so driver does not need to.
->>
->> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->>
->> ---
->>
->> Depends on the first patch.
->> ---
->>  drivers/gpio/gpio-virtio.c | 1 -
->>  1 file changed, 1 deletion(-)
->>
->> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
->> index fcc5e8c08973..9fae8e396c58 100644
->> --- a/drivers/gpio/gpio-virtio.c
->> +++ b/drivers/gpio/gpio-virtio.c
->> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver = {
->>         .remove                 = virtio_gpio_remove,
->>         .driver                 = {
->>                 .name           = KBUILD_MODNAME,
->> -               .owner          = THIS_MODULE,
->>         },
->>  };
->>  module_virtio_driver(virtio_gpio_driver);
->>
->> --
->> 2.34.1
->>
->
->Applied, thanks!
+Hi Conor,
 
-Did you also applied the first patch of this series?
+On Tue, Mar 26, 2024 at 06:09:37PM +0000, Conor Dooley wrote:
+> On Tue, Mar 26, 2024 at 06:32:13PM +0300, Alexey Romanov wrote:
+> > GXL crypto IP uses DMA engine, which doesn't require clk input
+> > and second interrupt line.
+> >=20
+> > Fixes: c4a0457eb858 ("ARM64: dts: amlogic: adds crypto hardware node")
+>=20
+> How does this fix a commit that only modifies a dts? The commit cited
+> here should be a dt-bindings commit.
 
-Without that I'm not sure it's a good idea to apply this patch as also
-Krzysztof mentioned after ---.
+Yep, my bad. Will fix it in next series.
 
-Thanks,
-Stefano
+>=20
+> However, your commit message says "require" but you do more than remove
+> these as required, you remove them entirely. What am I missing?
 
+Crypto HW isn't connected to clk / 2nd interrput line, so we must remove
+them from dt. I will reformulate commit message.
+
+>=20
+> Thanks,
+> Conor.
+>=20
+> > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
+> > ---
+> >  .../bindings/crypto/amlogic,gxl-crypto.yaml         | 13 +------------
+> >  1 file changed, 1 insertion(+), 12 deletions(-)
+> >=20
+> > diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypt=
+o.yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+> > index 948e11ebe4ee..d3af7b4d5f39 100644
+> > --- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+> > +++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+> > @@ -20,20 +20,11 @@ properties:
+> >    interrupts:
+> >      items:
+> >        - description: Interrupt for flow 0
+> > -      - description: Interrupt for flow 1
+> > -
+> > -  clocks:
+> > -    maxItems: 1
+> > -
+> > -  clock-names:
+> > -    const: blkmv
+> > =20
+> >  required:
+> >    - compatible
+> >    - reg
+> >    - interrupts
+> > -  - clocks
+> > -  - clock-names
+> > =20
+> >  additionalProperties: false
+> > =20
+> > @@ -46,7 +37,5 @@ examples:
+> >      crypto: crypto-engine@c883e000 {
+> >          compatible =3D "amlogic,gxl-crypto";
+> >          reg =3D <0xc883e000 0x36>;
+> > -        interrupts =3D <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>, <GIC_SPI 18=
+9 IRQ_TYPE_EDGE_RISING>;
+> > -        clocks =3D <&clkc CLKID_BLKMV>;
+> > -        clock-names =3D "blkmv";
+> > +        interrupts =3D <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>;
+> >      };
+> > --=20
+> > 2.34.1
+> >=20
+
+
+
+--=20
+Thank you,
+Alexey=
