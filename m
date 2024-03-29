@@ -1,113 +1,110 @@
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6072714534E;
-	Sun, 31 Mar 2024 16:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005FA757FB;
+	Sun, 31 Mar 2024 16:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=62.96.220.36
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711901480; cv=fail; b=QM0Rk2/SlS8Z4/CRdVgxmcXqz03hnuKuGXQ6339KRdP1difX0Q1pixhSekOrl2IfeWGRBQqy375horLEshva86LaRkPV0Q4jSbMK+8He/yD5RTsNJXT0eixixBrTpPDoPtG+CLI2Id3FHe43u+JLgWwAWDJ6WrTjlXsEbz+FxCY=
+	t=1711902492; cv=fail; b=QS6QCT/weA7zlXUuX3tQsXH/n9aBYcLqqpKIV/oJO0DqEXOkugXhy3wY9vL9ksu378yAdCBrIHc52S9hx38N9TFZuIuWaOwJqwrSvVK5uxW1LakzRwTblvdIbwjB4X1viqKpS0eqb14qCBZWTQxafswrXtoU0HpK0i3SRZcNJy4=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711901480; c=relaxed/simple;
-	bh=3UCi3fnrNU2K+yDpbt4ldzvoGw1nSxCEmPIbOXjzKOQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iCSrs/5wZvQX3II8oT4sGmbvtnk9xY5PIw6NjH6Vs85wC0q+v7riSHMjJJGA+k2uLXcn4PMgCZyf9U/svP0dDYg2xKCoipFs7X1rShJt7KG/zpf/DAgA3SJatbWe1vwT6vX219TlRZ5LIx4vEHOdkrjLRBT9j20x+TQW4geWtz4=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tIqmA0po reason="signature verification failed"; arc=fail smtp.client-ip=40.107.236.40; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; arc=fail smtp.client-ip=62.96.220.36
+	s=arc-20240116; t=1711902492; c=relaxed/simple;
+	bh=TJLEmBKTyUHJSLtbEEE/kGBu3MlXQPtp/VYO30wLKPY=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=kJ8gIG+44Amq1Np+wLAIzshjtGBuWpK/0a5sHVMrt/cp3Ov++FzlAhc4qasogPKb9BVkgd/AOyrmJKH0uYPMkBJSOVVUlJDOeABRqjrmbPbQm/9w6UhriaRt2jRsxs5HYgHZDjIryewGpUNbwq4S+GbzDJY/A6ym9+RjQYeDQ1s=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QMl5bUwl reason="signature verification failed"; arc=fail smtp.client-ip=40.107.237.95; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; arc=fail smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tIqmA0po"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QMl5bUwl"
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 045E0208A3;
-	Sun, 31 Mar 2024 18:11:15 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id 7D07520820;
+	Sun, 31 Mar 2024 18:28:07 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id obBfEuAfVdni; Sun, 31 Mar 2024 18:11:12 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	with ESMTP id na5_6u64Yrpt; Sun, 31 Mar 2024 18:28:05 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 2E809208D0;
-	Sun, 31 Mar 2024 18:11:12 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 2E809208D0
+	by a.mx.secunet.com (Postfix) with ESMTPS id 43085208CC;
+	Sun, 31 Mar 2024 18:28:05 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 43085208CC
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 7F7D0800053;
-	Sun, 31 Mar 2024 18:02:13 +0200 (CEST)
+	by mailout2.secunet.com (Postfix) with ESMTP id 32F94800056;
+	Sun, 31 Mar 2024 18:28:05 +0200 (CEST)
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 31 Mar 2024 18:02:13 +0200
+ 15.1.2507.35; Sun, 31 Mar 2024 18:28:04 +0200
 Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
- 15.1.2507.17; Sun, 31 Mar 2024 15:52:41 +0000
-X-sender: <linux-crypto+bounces-3108-steffen.klassert=secunet.com@vger.kernel.org>
+ 15.1.2507.17; Sun, 31 Mar 2024 16:23:35 +0000
+X-sender: <linux-crypto+bounces-3085-steffen.klassert=secunet.com@vger.kernel.org>
 X-Receiver: <steffen.klassert@secunet.com>
  ORCPT=rfc822;steffen.klassert@secunet.com NOTIFY=NEVER;
  X-ExtendedProps=BQAVABYAAgAAAAUAFAARAPDFCS25BAlDktII2g02frgPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4YwUACwAXAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5nZSBBZG1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl2ZSBHcm91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAHQAPAAwAAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAAwAAgAABQBsAAIAAAUAWAAXAEoAAADwxQktuQQJQ5LSCNoNNn64Q049S2xhc3NlcnQgU3RlZmZlbixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9ye
 	TogRmFsc2UNCg8ALwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
 X-CreatedBy: MSExchange15
-X-HeloDomain: b.mx.secunet.com
-X-ExtendedProps: BQBjAAoAbw5rGbMv3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAHAAAAHN0ZWZmZW4ua2xhc3NlcnRAc2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAYgAKAEIAAADNigAABQBkAA8AAwAAAEh1Yg==
-X-Source: SMTP:Default MBX-ESSEN-01
-X-SourceIPAddress: 62.96.220.37
-X-EndOfInjectedXHeaders: 21158
+X-HeloDomain: a.mx.secunet.com
+X-ExtendedProps: BQBjAAoAhZPp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBjAAAAjIoAAAUABAAUIAEAAAAcAAAAc3RlZmZlbi5rbGFzc2VydEBzZWN1bmV0LmNvbQUABgACAAEFACkAAgABDwAJAAAAQ0lBdWRpdGVkAgABBQACAAcAAQAAAAUAAwAHAAAAAAAFAAUAAgABBQBkAA8AAwAAAEh1Yg==
+X-Source: SMTP:Default MBX-DRESDEN-01
+X-SourceIPAddress: 62.96.220.36
+X-EndOfInjectedXHeaders: 29238
 X-Virus-Scanned: by secunet
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=139.178.88.99; helo=sv.mirrors.kernel.org; envelope-from=linux-crypto+bounces-3108-steffen.klassert=secunet.com@vger.kernel.org; receiver=steffen.klassert@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 8102A200BB
-Authentication-Results: b.mx.secunet.com;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tIqmA0po"
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
+Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=139.178.88.99; helo=sv.mirrors.kernel.org; envelope-from=linux-crypto+bounces-3085-steffen.klassert=secunet.com@vger.kernel.org; receiver=steffen.klassert@secunet.com 
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 09F3320883
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.95
 ARC-Seal: i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711753628; cv=fail; b=NAyU4Ql1nzqh8Ta+6+4fkuH3r8iuNk9YQFSF2A6/gisj9px5BkNYKlBn4AgIMyWt1I567ugxqpkl3AYixa0QaggzXoehxx6L6ncHvn8I7Ez2tFYoL9vZNbZ6wk3Abq1m4Yl3ARVXTYgiBOs5wDFCDMLeLe6eG2QE/wdDDqys51o=
+	t=1711752070; cv=fail; b=iT73yaJATXPF6TexZMUEAV2/sxEWzNiLK5TUnvPX0Cy2E14qbaNwPyBNeqaglJ//Jx+6uFKjnxeQq+z+nMgdQg7F1U37PDX1ZUB+DIlOCzOGWxC06t1YWT90Ew/eW+Rh3ApI8I72qztLjrFodKVarmzb+wwckGDk0XXy7Qh/CJs=
 ARC-Message-Signature: i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711753628; c=relaxed/simple;
-	bh=/LyX0lMdUIy7Re5uMF7sJFrGKLk94ez+2D00SwZmmSM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P4Ct+4Fh5CFHklVz8ec/KI+Vy8l6gy8sMrsA8G0VSc6BXV51aSZvcce5TO0VWpkgWRO6L20qOjtIvW71UBRjh/dpKSwVxN3thY6iXTtS2sn6wbWKOTbs/7n5LW4tFODW5ZD6LyYgDgXpsXkY2D4E35ysdtbX5m/Gl5n/SGm3LLc=
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tIqmA0po; arc=fail smtp.client-ip=40.107.236.40
+	s=arc-20240116; t=1711752070; c=relaxed/simple;
+	bh=+qwRVQtAUFwc+mzfaMAXarOygq0dR3IZtuet68K/Fyc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=G29ZIU+yv38ZuTtXNi+N8C9Zhwjmp44eIvzsKJgCft7KwIkeThqwQKY9NS8L4PwEr46ODNkpxKhj/5OKv8BT1YCNoJfs/awO/a9KJkRV+vJZaAlNqOJlgGXBdjfLBdz3f3I2QS98P/ZBr6R+qHJydYb7baxyGFy6LT11pI9R0o0=
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QMl5bUwl; arc=fail smtp.client-ip=40.107.237.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ndNy51RAtRmNI8klSsRuUDkZ+QOIkz6PU7RicglEDrpSyeD334tm0h8TSmMzsqeKS6iJHpCYyPb/2bgRTgXwHuE5nHOCRWpYsQEUf9FfnAoZgq/FS6Ag1+n/PW1+XMjGrd3hTaQEMzt4f+mR1+LDDkpXF6HZbdDWTZG2jzrQfcx3peXwGhSzI8Mp7fmiZjGo3auxlW9277c3ZxbV6l/RzlDC8dI1+yGUojFlO4mTFp9PJnkeSg2YDsVKIVAYEAoYZXTUzSuLTkJJqQLWjodWuLBih6ic/HZU09yGVYj2AxSh3I65W1AeCVMVbbEa8KbrhsCIUknM1mpNPA/gEPz2Ag==
+ b=BkkM76oyZTz2Q2LpBR6pBvhemX3+VK0fBLimXRngfvWCLdPfuoYo/vDDc9RbYD4UJCpFX6s1jEACDTyMlHtRFRtONzRJPjfA5pmccOwplO8CEa6s0ovxM9Hl35Er48H48WBDOpZd1uPtQB3DDta7kBsPc3EIceVFUm/Gm1wTOx55QotP37QBX1KD8mX4WMa0LZynfQjnkStLhLnWXcdQwsSPer6kiUjqteQovSGXfh7YMRVKbeMRw21NQro0Qy+gQ/LA6DPgby5/cQICN4eDyYN95UrX4YKucYI2oBsPICG3c8q8kvw9fCtKbZwnr1grISQQtUC1KNVzYdiMagOGFA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=;
- b=gMrC496qK2lsX87+6Bzyto2bAcxON65hdXqTeSYWXiTb9dMrUdvT2nBXXHCO9PSCV8BRKATgr3QFZL2DbJrjIrQrsltBxeFF71VRItM5A+TTH4AicOLngecTmO8rH7zlYENBB2oVx3wSKnvuU6N30ye3Cjzdcs1BVE9Zy9sB4Ul91SoyuDz+mggYy57PkPNmCmlx2d166CZHTTZJJJYqBcsHxO085W4pD2XSkVkLV72jqVcUQau02SVCvvx1k9v76Lrx1CsfhE62bu8cgJJLFXucZdWOwY5ft5+iXGnW/Bwt1HJdv9FcbPLjhvfQZ/2KhAPqUXvJYyvL0lc5vYMNWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
+ bh=lm2yVCaf9RoiDruxpEx206c6phucY5FX3RMdmFeXZ9k=;
+ b=RDOAGF7+Ik4xDCrKfFjYUaCEgFCp8rPLEoyGEJGfpLOXNIa7YWeEWzZ1VotCI/ZUgTSOVN6QiqcPcDBe5GBx9DmXLKN4YMa19/hFyoPmXJz6oq65UWNMaTUYLl0AXj/clPXTRfxyopcl4hYjwIcO71g4dftgFJvWksN77W1OGtqxvf8pbLNnC0Zgx3QmEOw2m5F4R8LYVLl/bBFar8vjgNGERX4KUT1jJPql2hneEZv8TzpArkgEtYh2C0+YAbEHtbkVjmyx76VGDNFvy3BkIlL1Pl871ZsykDD0NONy0TJd+zaD5o2zx4yCgWb8Y8juLnwrKvehR4dlgdslxCuzqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=;
- b=tIqmA0poLlOQSgC8NQymU+wMavstViScDkmLWx+nPuwEKSNoq8248LCA6B4ywz4GfDsUL/JVBQork/uEDWaaxIugEnRZyot0VUV/YkV9/1sII8p7qKebIp15+bvVlPGAntwT+ov4j9ElzGeCZbgxsHd/5BERvoXJ+Xjp3NdTnpU=
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-From: Michael Roth <michael.roth@amd.com>
-To: <kvm@vger.kernel.org>
-CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
-	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
-	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
-	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
-	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
-	<ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: [PATCH v12 02/29] [TEMP] x86/cc: Add cc_platform_set/_clear() helpers
-Date: Fri, 29 Mar 2024 17:58:08 -0500
-Message-ID: <20240329225835.400662-3-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
-References: <20240329225835.400662-1-michael.roth@amd.com>
+ bh=lm2yVCaf9RoiDruxpEx206c6phucY5FX3RMdmFeXZ9k=;
+ b=QMl5bUwlMCq6WdH4tCDHxZVKXNBku4/gXeVQ0tOLa0L6+pc48BPHNHT7qZrod8KvPGtXue3FRb7oTQXlMpourqiZouj8qHTvXYQHCn2cmmywW2ROkv52VRi3CV/u471+HApu4l8pEYs1PhJ1Ycjjvse/PRcpKPKO/VLPR5Dq27w=
+Message-ID: <8d543a15-af62-4403-b2e0-3b395edfe9e4@amd.com>
+Date: Fri, 29 Mar 2024 17:38:52 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 04/15] x86: Secure Launch Resource Table header file
+To: Ross Philipson <ross.philipson@oracle.com>,
+	<linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+	<linux-integrity@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <kexec@lists.infradead.org>,
+	<linux-efi@vger.kernel.org>
+CC: <dpsmith@apertussolutions.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<bp@alien8.de>, <hpa@zytor.com>, <dave.hansen@linux.intel.com>,
+	<ardb@kernel.org>, <mjg59@srcf.ucam.org>,
+	<James.Bottomley@hansenpartnership.com>, <peterhuewe@gmx.de>,
+	<jarkko@kernel.org>, <jgg@ziepe.ca>, <luto@amacapital.net>,
+	<nivedita@alum.mit.edu>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <kanth.ghatraju@oracle.com>,
+	<trenchboot-devel@googlegroups.com>
+References: <20240214221847.2066632-1-ross.philipson@oracle.com>
+ <20240214221847.2066632-5-ross.philipson@oracle.com>
+Content-Language: en-US
+From: Kim Phillips <kim.phillips@amd.com>
+Organization: AMD
+In-Reply-To: <20240214221847.2066632-5-ross.philipson@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: SN1PR12CA0079.namprd12.prod.outlook.com
+ (2603:10b6:802:21::14) To DS7PR12MB6263.namprd12.prod.outlook.com
+ (2603:10b6:8:95::17)
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -115,641 +112,380 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017092:EE_|CY8PR12MB7730:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94ffad58-535d-4024-6cb1-08dc5044f290
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6263:EE_|SJ1PR12MB6217:EE_
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0GqJcz06FWXScvO9q8UIen2Z5TIMPCwU7rdZJGHj+mAWkK5UWm4PnDKCmYgyV6KpeW5mNlwQEgzWXz89aRhNwVa9wB2gRYvrLIgGWw4N6Vr4jp4dfl8VwdC0ycC93sxY2xW+fe4jdeZgPhu/SB4QLT2sV1ndIpuyq40tUT/o0P/0nz3TFNAeu7DWQtwO9KM1gGCLv2c2YWaG2I28urqVBAEPs/Lh7IB9KQK2t3Q81bePUBE3DM6N5Un4Q9wYfgoHPRTlgN+Bh9FkttL47rOMJ/EVcgsz+MQmLB8WK66RMLcIwfu/vtN5y6nLduBqBfhorBcp6zuEs+PTOhNcN+CFyqBClZmAJ8QdSuOlmTWjymD3lzO1y3oa0U/+yLlDAcMsYKIUpx+5WQ5j4/lAZVO0q6s8IPE/Dc+d60WxY1YU28uCX49WJM5XsQDmNxH0XrGqxIGyQZ0OZG+XWbADxRLmF7wtKjB1K4TnGmFbGxlv/VDZqHCcq+fnJCBe64OkMcnbvkErwcuRbZnRIpyyoGQaZNbaa+GScMLvc2hjsnKH9ehVr+YXspEX9UHlliDBQHx99aXyp2F7q/0rnaYKqbHpMo4ZK26eAjrPsaaPwox+sjWJqIifSdzkr/G99zUVnLEkfYHuelBcZ+UO++2QpNKzeTssudbif+5NjNuyXxfRTfOYllVrmGeB2cLdGZT0KfYdernQqt8vm5t2THsWM9CWDi2o4SF+TnOkjV3wIec1H3DVG759Esk29a322K114Jm/
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(7416005)(82310400014)(1800799015)(376005)(36860700004);DIR:OUT;SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:07:03.6536
+X-Microsoft-Antispam-Message-Info: Hkl8K+NUU2xWpYzCX8iWlZCRIWfimJSM5pZ+gyjCjEOSL9P3Rn9yyjmZPpvXl3BxjwRv/Cuh5ARzlvVKIDJQNknQ+d9K98CwpJ6AG1WgKw8W/W1P4HYReUgaauK+aeb3mU2y61lAnHTQ3UutFp9RR5La01iCOkdNx7tX7tHj64Xn2m0lZdu4aahAw7jDi8kiVarGCtHi1SYN93JWcJeGfur9hrKFPBXEq5qyZe2qrUjzW1RBkE0EU1dA20+IEQacqFdX2s9hq/KatEZz5elGbJ2HvS67b239PYcUDEuXxQD7QK3UMILH8ejMlh2k2rRZmnLykNRbEuw7fCSlAT1OwinM80debtnCjVK+99ISveNjFJ0rqFqcc7Z1SKr49EbuiI/pSO2qOrPXjIoMi0LOM38OU4IDG+QzFFHpfVfu85RQg4dvDdMW2HpVnpQzwlwK5OAJhZ/ox3f/OhAizj7rmhbmSY527shjIkG3d6wbLA7LKaUdzB/8JZPGalCjvDkLwH1OmNE8fsgsIy/RSZpf127efi7ROacRLZCh6SJPGWdyuT4UkObzNajAtVe7PDGRWLhPpXCpCYFawvQEJIX0VT3//a/59t0c7N7YZghjEOrjaxif3qE6/rjtvCOKfdwGKU9p5gNTL1MSzSYO/V1ZmMdyRHtgaN+HY7oYjlH9QKA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6263.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(376005)(1800799015);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WHlDbnV5TnB2SlVNYjVRbUlLRUh0eEVBZkkxMlg5dmMvRDJLRGZ6cXV3Qngr?=
+ =?utf-8?B?aWhIdTNkVHUwQThydWlDU081WGd5TUF5U2ZoamVIcWx4UHJxTVJzLzNXd0xw?=
+ =?utf-8?B?MmdVUkx4OFJRNW9TUllwOXY1WlZIcDdubEwzWmY5WlZ6WUpOK0RlRE9ocjhD?=
+ =?utf-8?B?K0RhWll1eHlLOE0vMVhHNU5pVTlDUkZCK04xemlheFZGbDVONlVodmZvVjg4?=
+ =?utf-8?B?UEZRS09TYkUzN0hIL0hidVBjdjV6RWYwZE1oT1VPVGJmd2Q2bGZmaHMzdUlx?=
+ =?utf-8?B?V1d2UUxYNzRlTkliMTVqd3B1VldjOGJVTDZxZG5KNC9yUk5KSXFYSGlXSUNH?=
+ =?utf-8?B?anFvN21Xam5zYjZqeEZlc2NaQkJZV0hWOTVzT1ZMaUppejdNYlErNWlyM00y?=
+ =?utf-8?B?dE9BU0x6dUpycWUxUERQTTA0cEF4bzEwczIyYzFaT05GV3NHS1d3SHo4aExQ?=
+ =?utf-8?B?TG5CSkNJTS9URC94YlAxbHRkRW5oSXRpZENrQnJ6V0RrbTBBU0RDSmY4N2dm?=
+ =?utf-8?B?RkQwN3dtK3M4V3JYdlFVM2RSdFJja3NEVFQ4ZTMvTFZvMm9KcisxZk83QVJU?=
+ =?utf-8?B?b1NQOG5naURkeWNjeFlwaWtObytydytpT0xpMDlZd2V4cnpVNHR0OVlETmtn?=
+ =?utf-8?B?TDhETUxicVJSTW1OdUpiQ1BCZ2FMUVczUFhDSW1UeXNZbnR6ZDVBS0NtM0JH?=
+ =?utf-8?B?MzFUeGt5SUM2YnRwOXp2WDI2WW93TEdoMytIS1RyN2N1QXk0RitHaWtIZXZw?=
+ =?utf-8?B?QTRLcVZzUlFtRG1JSE56VFhjY2dFZEhuUDUvK0pOeC9vYVpVaUN0YTh5Nm9E?=
+ =?utf-8?B?RUs5TDQyWTc2RmlDM0NkTks2ZTZIU1ZWMFNER05XOGh0amxYbTRZUjhlWlcy?=
+ =?utf-8?B?aWh4eDZlMGNETTRSVFF4dU5BMDJZMW9hdk9NZzhVdDNtck9ncWdGYWNyaDJl?=
+ =?utf-8?B?ZXlIY0V0V05ibHBBTnAwOTVNQmFrai9KNDFyUlA5bzhPQ1ptT2UyL3dIUk4w?=
+ =?utf-8?B?WWhxa01Mb21pTk5iQ3NvMmxvSHBqald4dng2WXdkTUZEenptUTNVenV6VFVa?=
+ =?utf-8?B?M3NkM2RTRS9tTEFEZFVxdHpQMVc5RlpncnhZRnB0SXJNUmlLRTFZQlA3Z1BQ?=
+ =?utf-8?B?ZnF3UDN0Um1NR0h2cVZGdWIwUTEvdjkyVEUrSCswL01PdTZWSEhpeG1EKzBt?=
+ =?utf-8?B?UGtBY1lhckVQaWhRK0dZSVpuMXlnMmtxSHAyZ0p0bzdyakJHQzlWNjVyalY4?=
+ =?utf-8?B?Nk1rUzc2Z0cydFl4elJnOEJreEhKY1dYd2h2R1R1djJzc0FEUVU2U05UYzhM?=
+ =?utf-8?B?UG1pKzRiK2RLNHIzbFA1aGJGaDlRanVZZlFIVkViVzZlMWFpcFUvZ0t5UVlO?=
+ =?utf-8?B?ZnBwcW1qQ0RRK0tHcTdFQjM2d2t6MWxYajJtYkNjSlQwODFHSWhTcUhwOENP?=
+ =?utf-8?B?Q1VGc2VvNWd0cjYwd0p5VXl4bmFsRFBrOTYrellCOG4yWkNrTi9YdkNlVUpp?=
+ =?utf-8?B?ZS9Dekp2KzB4ak4rQktURzNpT0FkaC82bFlxK1F1VjV4QTdyajh4Qlp3UGd0?=
+ =?utf-8?B?MWIvUEtydWhzS0VBMExSY1AvZDkvYzNyOGVudUNITExPcHI4RERSUHh0RHBT?=
+ =?utf-8?B?Y2MvSjBBclFXNnNDZ0g5QjhSRTJTb1gvOUxkRFczRWpMc29iQWF3QzN0Rzcv?=
+ =?utf-8?B?OXdFa2N2OEFaOU84eXZMZ1pOTUljM0tpbDJKOWxsR1h1OE1pRWpTeTMxVU42?=
+ =?utf-8?B?RmRwRnhydzVCTEl6a2ZIWmxkTzBSUjBnbDRtbXZVSTVKT0crK1huN1dLMTFu?=
+ =?utf-8?B?ZEo4UzlaRmErOFRDUVNTWVQybUhGelhhNjdwZTM0c0NGeDF0ZVdBZmgrWDd5?=
+ =?utf-8?B?ZnRKNXpsSTR0NkdZZkxPTWRRTmFJRGRyc0oxT1hOVWJpR3hRM0FzSS8vS0Fi?=
+ =?utf-8?B?RzJiZ2xCUTM4dmcrWWJ5NG1xZCtTOXRKNVFXWm1GREZGdlJYbkh4M3c2ckk5?=
+ =?utf-8?B?MGxIQnJuYXJpbmQ5THFCTjZqUzkyTEtpbjF0K3hvdk5teWVNMXJJbHNoLzdN?=
+ =?utf-8?B?ZnFvU0t0YVlnUnJuUzBDVUVWZ3JKWFZGQVFUQVF3NFAyeVlyaEFNRTdxcll4?=
+ =?utf-8?Q?zvdhYQzh59VITtzKjJgRMSRq2?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fcf4d61-e37a-4595-254c-08dc50414fbf
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6263.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 22:41:02.2410
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94ffad58-535d-4024-6cb1-08dc5044f290
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017092.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7730
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ilGgkrAbN/QGxCRDsFAVzxGCrnuii09s15bGN/0TY5T4fJ/decyRW+CsMzueQ3DxrQoL7F9fC4wqSyBOwuyPuw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6217
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
-Message-ID: <20240329225808.aeLu4We0jCAGo3kLQP9EWf1JvtMaC5hvAxGUCom1T7A@z>
+Message-ID: <20240329223852.qh47YuFyCG8Egi8uSI2ARTp7OHie6mdkaatWpWyR3DU@z>
 
-From: "Borislav Petkov (AMD)" <bp@alien8.de>
+Hi Ross,
 
-Add functionality to set and/or clear different attributes of the
-machine as a confidential computing platform. Add the first one too:
-whether the machine is running as a host for SEV-SNP guests.
+On 2/14/24 4:18 PM, Ross Philipson wrote:
+> Introduce the Secure Launch Resource Table which forms the formal
+> interface between the pre and post launch code.
+>=20
+> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+> ---
+>   include/linux/slr_table.h | 270 ++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 270 insertions(+)
+>   create mode 100644 include/linux/slr_table.h
 
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
- arch/x86/coco/core.c        | 52 +++++++++++++++++++++++++++++++++++++
- include/linux/cc_platform.h | 12 +++++++++
- 2 files changed, 64 insertions(+)
+> diff --git a/include/linux/slr_table.h b/include/linux/slr_table.h
+> new file mode 100644
+> index 000000000000..42020988233a
+> --- /dev/null
+> +++ b/include/linux/slr_table.h
+> @@ -0,0 +1,270 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Secure Launch Resource Table
+> + *
+> + * Copyright (c) 2023, Oracle and/or its affiliates.
+> + */
+> +
+> +#ifndef _LINUX_SLR_TABLE_H
+> +#define _LINUX_SLR_TABLE_H
+> +
+> +/* Put this in efi.h if it becomes a standard */
+> +#define SLR_TABLE_GUID				EFI_GUID(0x877a9b2a, 0x0385, 0x45d1, 0xa0, 0x3=
+4, 0x9d, 0xac, 0x9c, 0x9e, 0x56, 0x5f)
+> +
+> +/* SLR table header values */
+> +#define SLR_TABLE_MAGIC		0x4452544d
+> +#define SLR_TABLE_REVISION	1
+> +
+> +/* Current revisions for the policy and UEFI config */
+> +#define SLR_POLICY_REVISION		1
+> +#define SLR_UEFI_CONFIG_REVISION	1
+> +
+> +/* SLR defined architectures */
+> +#define SLR_INTEL_TXT		1
+> +#define SLR_AMD_SKINIT		2
+> +
+> +/* SLR defined bootloaders */
+> +#define SLR_BOOTLOADER_INVALID	0
+> +#define SLR_BOOTLOADER_GRUB	1
+> +
+> +/* Log formats */
+> +#define SLR_DRTM_TPM12_LOG	1
+> +#define SLR_DRTM_TPM20_LOG	2
+> +
+> +/* DRTM Policy Entry Flags */
+> +#define SLR_POLICY_FLAG_MEASURED	0x1
+> +#define SLR_POLICY_IMPLICIT_SIZE	0x2
+> +
+> +/* Array Lengths */
+> +#define TPM_EVENT_INFO_LENGTH		32
+> +#define TXT_VARIABLE_MTRRS_LENGTH	32
+> +
+> +/* Tags */
+> +#define SLR_ENTRY_INVALID	0x0000
+> +#define SLR_ENTRY_DL_INFO	0x0001
+> +#define SLR_ENTRY_LOG_INFO	0x0002
+> +#define SLR_ENTRY_ENTRY_POLICY	0x0003
+> +#define SLR_ENTRY_INTEL_INFO	0x0004
+> +#define SLR_ENTRY_AMD_INFO	0x0005
+> +#define SLR_ENTRY_ARM_INFO	0x0006
+> +#define SLR_ENTRY_UEFI_INFO	0x0007
+> +#define SLR_ENTRY_UEFI_CONFIG	0x0008
+> +#define SLR_ENTRY_END		0xffff
+> +
+> +/* Entity Types */
+> +#define SLR_ET_UNSPECIFIED	0x0000
+> +#define SLR_ET_SLRT		0x0001
+> +#define SLR_ET_BOOT_PARAMS	0x0002
+> +#define SLR_ET_SETUP_DATA	0x0003
+> +#define SLR_ET_CMDLINE		0x0004
+> +#define SLR_ET_UEFI_MEMMAP	0x0005
+> +#define SLR_ET_RAMDISK		0x0006
+> +#define SLR_ET_TXT_OS2MLE	0x0010
+> +#define SLR_ET_UNUSED		0xffff
+> +
+> +#ifndef __ASSEMBLY__
+> +
+> +/*
+> + * Primary SLR Table Header
+> + */
+> +struct slr_table {
+> +	u32 magic;
+> +	u16 revision;
+> +	u16 architecture;
+> +	u32 size;
+> +	u32 max_size;
 
-diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
-index d07be9d05cd0..8c3fae23d3c6 100644
---- a/arch/x86/coco/core.c
-+++ b/arch/x86/coco/core.c
-@@ -16,6 +16,11 @@
- enum cc_vendor cc_vendor __ro_after_init =3D CC_VENDOR_NONE;
- u64 cc_mask __ro_after_init;
-=20
-+static struct cc_attr_flags {
-+	__u64 host_sev_snp	: 1,
-+	      __resv		: 63;
-+} cc_flags;
-+
- static bool noinstr intel_cc_platform_has(enum cc_attr attr)
- {
- 	switch (attr) {
-@@ -89,6 +94,9 @@ static bool noinstr amd_cc_platform_has(enum cc_attr attr=
-)
- 	case CC_ATTR_GUEST_SEV_SNP:
- 		return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
-=20
-+	case CC_ATTR_HOST_SEV_SNP:
-+		return cc_flags.host_sev_snp;
-+
- 	default:
- 		return false;
- 	}
-@@ -148,3 +156,47 @@ u64 cc_mkdec(u64 val)
- 	}
- }
- EXPORT_SYMBOL_GPL(cc_mkdec);
-+
-+static void amd_cc_platform_clear(enum cc_attr attr)
-+{
-+	switch (attr) {
-+	case CC_ATTR_HOST_SEV_SNP:
-+		cc_flags.host_sev_snp =3D 0;
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+void cc_platform_clear(enum cc_attr attr)
-+{
-+	switch (cc_vendor) {
-+	case CC_VENDOR_AMD:
-+		amd_cc_platform_clear(attr);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+static void amd_cc_platform_set(enum cc_attr attr)
-+{
-+	switch (attr) {
-+	case CC_ATTR_HOST_SEV_SNP:
-+		cc_flags.host_sev_snp =3D 1;
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+void cc_platform_set(enum cc_attr attr)
-+{
-+	switch (cc_vendor) {
-+	case CC_VENDOR_AMD:
-+		amd_cc_platform_set(attr);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-diff --git a/include/linux/cc_platform.h b/include/linux/cc_platform.h
-index cb0d6cd1c12f..60693a145894 100644
---- a/include/linux/cc_platform.h
-+++ b/include/linux/cc_platform.h
-@@ -90,6 +90,14 @@ enum cc_attr {
- 	 * Examples include TDX Guest.
- 	 */
- 	CC_ATTR_HOTPLUG_DISABLED,
-+
-+	/**
-+	 * @CC_ATTR_HOST_SEV_SNP: AMD SNP enabled on the host.
-+	 *
-+	 * The host kernel is running with the necessary features
-+	 * enabled to run SEV-SNP guests.
-+	 */
-+	CC_ATTR_HOST_SEV_SNP,
- };
-=20
- #ifdef CONFIG_ARCH_HAS_CC_PLATFORM
-@@ -107,10 +115,14 @@ enum cc_attr {
-  * * FALSE - Specified Confidential Computing attribute is not active
-  */
- bool cc_platform_has(enum cc_attr attr);
-+void cc_platform_set(enum cc_attr attr);
-+void cc_platform_clear(enum cc_attr attr);
-=20
- #else	/* !CONFIG_ARCH_HAS_CC_PLATFORM */
-=20
- static inline bool cc_platform_has(enum cc_attr attr) { return false; }
-+static inline void cc_platform_set(enum cc_attr attr) { }
-+static inline void cc_platform_clear(enum cc_attr attr) { }
-=20
- #endif	/* CONFIG_ARCH_HAS_CC_PLATFORM */
-=20
---=20
-2.25.1
+Do these need to have their endianness specified with, e.g., __le32?
 
+> +	/* entries[] */
 
-X-sender: <kvm+bounces-13134-martin.weber=3Dsecunet.com@vger.kernel.org>
-X-Receiver: <martin.weber@secunet.com> ORCPT=3Drfc822;martin.weber@secunet.=
-com NOTIFY=3DNEVER; X-ExtendedProps=3DBQAVABYAAgAAAAUAFAARAJuYHy0vkvxLoOu7f=
-W2WcxcPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNS=
-ZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAU=
-AEgAPAF4AAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWU=
-RJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249V2ViZXIgTWFydGluOTU1BQALABcAvgAAA=
-LMpUnVJ4+pPsL47FHo+lvtDTj1EQjIsQ049RGF0YWJhc2VzLENOPUV4Y2hhbmdlIEFkbWluaXN0=
-cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpLENOPUFkbWluaXN0cmF0aXZlIEdyb3Vwcyx=
-DTj1zZWN1bmV0LENOPU1pY3Jvc29mdCBFeGNoYW5nZSxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cm=
-F0aW9uLERDPXNlY3VuZXQsREM9ZGUFAA4AEQBACf3SYEkDT461FZzDv+B7BQAdAA8ADAAAAG1ie=
-C1lc3Nlbi0wMQUAPAACAAAPADYAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0Lk1haWxS=
-ZWNpcGllbnQuRGlzcGxheU5hbWUPAA0AAABXZWJlciwgTWFydGluBQAMAAIAAAUAbAACAAAFAFg=
-AFwBGAAAAm5gfLS+S/Eug67t9bZZzF0NOPVdlYmVyIE1hcnRpbixPVT1Vc2VycyxPVT1NaWdyYX=
-Rpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc=
-3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8ALwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5U=
-cmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQA=
-jAAIAAQ=3D=3D
-X-CreatedBy: MSExchange15
-X-HeloDomain: a.mx.secunet.com
-X-ExtendedProps: BQBjAAoAbw5rGbMv3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc2=
-9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAA=
-AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAGAAAAG1hcnRpbi53ZWJlckBzZWN1bmV0=
-LmNvbQUABgACAAEFACkAAgABDwAJAAAAQ0lBdWRpdGVkAgABBQACAAcAAQAAAAUAAwAHAAAAAAA=
-FAAUAAgABBQBiAAoAQwAAAM2KAAAFAGQADwADAAAASHVi
-X-Source: SMTP:Default MBX-ESSEN-01
-X-SourceIPAddress: 62.96.220.36
-X-EndOfInjectedXHeaders: 20972
-Received: from cas-essen-02.secunet.de (10.53.40.202) by
- mbx-essen-01.secunet.de (10.53.40.197) with Microsoft SMTP Server
- (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sat, 30 Mar 2024 00:07:18 +0100
-Received: from a.mx.secunet.com (62.96.220.36) by cas-essen-02.secunet.de
- (10.53.40.202) with Microsoft SMTP Server (version=3DTLS1_2,
- cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Fronte=
-nd
- Transport; Sat, 30 Mar 2024 00:07:18 +0100
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 99E64207E4
-	for <martin.weber@secunet.com>; Sat, 30 Mar 2024 00:07:18 +0100 (CET)
-X-Virus-Scanned: by secunet
-X-Spam-Flag: NO
-X-Spam-Score: -5.15
-X-Spam-Level:
-X-Spam-Status: No, score=3D-5.15 tagged_above=3D-999 required=3D2.1
-	tests=3D[BAYES_00=3D-1.9, DKIMWL_WL_HIGH=3D-0.099, DKIM_SIGNED=3D0.1,
-	DKIM_VALID=3D-0.1, DKIM_VALID_AU=3D-0.1,
-	HEADER_FROM_DIFFERENT_DOMAINS=3D0.249, MAILING_LIST_MULTI=3D-1,
-	RCVD_IN_DNSWL_MED=3D-2.3, SPF_HELO_NONE=3D0.001, SPF_PASS=3D-0.001]
-	autolearn=3Dham autolearn_force=3Dno
-Authentication-Results: a.mx.secunet.com (amavisd-new);
-	dkim=3Dpass (1024-bit key) header.d=3Damd.com
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rhf5LjiMR-HQ for <martin.weber@secunet.com>;
-	Sat, 30 Mar 2024 00:07:17 +0100 (CET)
-Received-SPF: Pass (sender SPF authorized) identity=3Dmailfrom; client-ip=
-=3D139.178.88.99; helo=3Dsv.mirrors.kernel.org; envelope-from=3Dkvm+bounces=
--13134-martin.weber=3Dsecunet.com@vger.kernel.org; receiver=3Dmartin.weber@=
-secunet.com=20
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 0364420754
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99]=
-)
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 0364420754
-	for <martin.weber@secunet.com>; Sat, 30 Mar 2024 00:07:17 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.2=
-5.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C4A72845E3
-	for <martin.weber@secunet.com>; Fri, 29 Mar 2024 23:07:15 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A6013E3F1;
-	Fri, 29 Mar 2024 23:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.com header.b=
-=3D"tIqmA0po"
-X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11=
-on2040.outbound.protection.outlook.com [40.107.236.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8751513BAD2;
-	Fri, 29 Mar 2024 23:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=3Dfail smtp.client-ip=
-=3D40.107.236.40
-ARC-Seal: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org; s=3Darc-20240116;
-	t=3D1711753628; cv=3Dfail; b=3DNAyU4Ql1nzqh8Ta+6+4fkuH3r8iuNk9YQFSF2A6/gis=
-j9px5BkNYKlBn4AgIMyWt1I567ugxqpkl3AYixa0QaggzXoehxx6L6ncHvn8I7Ez2tFYoL9vZNb=
-Z6wk3Abq1m4Yl3ARVXTYgiBOs5wDFCDMLeLe6eG2QE/wdDDqys51o=3D
-ARC-Message-Signature: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org;
-	s=3Darc-20240116; t=3D1711753628; c=3Drelaxed/simple;
-	bh=3D/LyX0lMdUIy7Re5uMF7sJFrGKLk94ez+2D00SwZmmSM=3D;
-	h=3DFrom:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=3DP4Ct+4Fh5CFHklVz8ec/KI+Vy8l6gy8sMrsA8G0VSc=
-6BXV51aSZvcce5TO0VWpkgWRO6L20qOjtIvW71UBRjh/dpKSwVxN3thY6iXTtS2sn6wbWKOTbs/=
-7n5LW4tFODW5ZD6LyYgDgXpsXkY2D4E35ysdtbX5m/Gl5n/SGm3LLc=3D
-ARC-Authentication-Results: i=3D2; smtp.subspace.kernel.org; dmarc=3Dpass (=
-p=3Dquarantine dis=3Dnone) header.from=3Damd.com; spf=3Dfail smtp.mailfrom=
-=3Damd.com; dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.c=
-om header.b=3DtIqmA0po; arc=3Dfail smtp.client-ip=3D40.107.236.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=3Dpass (p=3Dquarant=
-ine dis=3Dnone) header.from=3Damd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=3Dfail smtp.mailfrom=
-=3Damd.com
-ARC-Seal: i=3D1; a=3Drsa-sha256; s=3Darcselector9901; d=3Dmicrosoft.com; cv=
-=3Dnone;
- b=3DndNy51RAtRmNI8klSsRuUDkZ+QOIkz6PU7RicglEDrpSyeD334tm0h8TSmMzsqeKS6iJHp=
-CYyPb/2bgRTgXwHuE5nHOCRWpYsQEUf9FfnAoZgq/FS6Ag1+n/PW1+XMjGrd3hTaQEMzt4f+mR1=
-+LDDkpXF6HZbdDWTZG2jzrQfcx3peXwGhSzI8Mp7fmiZjGo3auxlW9277c3ZxbV6l/RzlDC8dI1=
-+yGUojFlO4mTFp9PJnkeSg2YDsVKIVAYEAoYZXTUzSuLTkJJqQLWjodWuLBih6ic/HZU09yGVYj=
-2AxSh3I65W1AeCVMVbbEa8KbrhsCIUknM1mpNPA/gEPz2Ag=3D=3D
-ARC-Message-Signature: i=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Dmicr=
-osoft.com;
- s=3Darcselector9901;
- h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-A=
-ntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Ex=
-change-AntiSpam-MessageData-1;
- bh=3DpvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=3D;
- b=3DgMrC496qK2lsX87+6Bzyto2bAcxON65hdXqTeSYWXiTb9dMrUdvT2nBXXHCO9PSCV8BRKA=
-Tgr3QFZL2DbJrjIrQrsltBxeFF71VRItM5A+TTH4AicOLngecTmO8rH7zlYENBB2oVx3wSKnvuU=
-6N30ye3Cjzdcs1BVE9Zy9sB4Ul91SoyuDz+mggYy57PkPNmCmlx2d166CZHTTZJJJYqBcsHxO08=
-5W4pD2XSkVkLV72jqVcUQau02SVCvvx1k9v76Lrx1CsfhE62bu8cgJJLFXucZdWOwY5ft5+iXGn=
-W/Bwt1HJdv9FcbPLjhvfQZ/2KhAPqUXvJYyvL0lc5vYMNWA=3D=3D
-ARC-Authentication-Results: i=3D1; mx.microsoft.com 1; spf=3Dpass (sender i=
-p is
- 165.204.84.17) smtp.rcpttodomain=3Dvger.kernel.org smtp.mailfrom=3Damd.com=
-;
- dmarc=3Dpass (p=3Dquarantine sp=3Dquarantine pct=3D100) action=3Dnone
- header.from=3Damd.com; dkim=3Dnone (message not signed); arc=3Dnone (0)
-DKIM-Signature: v=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Damd.com; s=
-=3Dselector1;
- h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-S=
-enderADCheck;
- bh=3DpvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=3D;
- b=3DtIqmA0poLlOQSgC8NQymU+wMavstViScDkmLWx+nPuwEKSNoq8248LCA6B4ywz4GfDsUL/=
-JVBQork/uEDWaaxIugEnRZyot0VUV/YkV9/1sII8p7qKebIp15+bvVlPGAntwT+ov4j9ElzGeCZ=
-bgxsHd/5BERvoXJ+Xjp3NdTnpU=3D
-Received: from DM6PR01CA0007.prod.exchangelabs.com (2603:10b6:5:296::12) by
- CY8PR12MB7730.namprd12.prod.outlook.com (2603:10b6:930:85::17) with Micros=
-oft
- SMTP Server (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA=
-384) id
- 15.20.7409.41; Fri, 29 Mar 2024 23:07:03 +0000
-Received: from DS1PEPF00017092.namprd03.prod.outlook.com
- (2603:10b6:5:296:cafe::1c) by DM6PR01CA0007.outlook.office365.com
- (2603:10b6:5:296::12) with Microsoft SMTP Server (version=3DTLS1_2,
- cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.41 via Front=
-end
- Transport; Fri, 29 Mar 2024 23:07:03 +0000
-X-MS-Exchange-Authentication-Results: spf=3Dpass (sender IP is 165.204.84.1=
-7)
- smtp.mailfrom=3Damd.com; dkim=3Dnone (message not signed)
- header.d=3Dnone;dmarc=3Dpass action=3Dnone header.from=3Damd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=3Dprotection.outlook.com;
- client-ip=3D165.204.84.17; helo=3DSATLEXMB04.amd.com; pr=3DC
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF00017092.mail.protection.outlook.com (10.167.17.135) with Microsoft
- SMTP Server (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA=
-256) id
- 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 23:07:03 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=3DTLS1_2,
- cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 M=
-ar
- 2024 18:07:02 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: <kvm@vger.kernel.org>
-CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
-	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
-	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
-	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
-	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
-	<ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: [PATCH v12 02/29] [TEMP] x86/cc: Add cc_platform_set/_clear() help=
-ers
-Date: Fri, 29 Mar 2024 17:58:08 -0500
-Message-ID: <20240329225835.400662-3-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
-References: <20240329225835.400662-1-michael.roth@amd.com>
-Precedence: bulk
-X-Mailing-List: kvm@vger.kernel.org
-List-Id: <kvm.vger.kernel.org>
-List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017092:EE_|CY8PR12MB7730:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94ffad58-535d-4024-6cb1-08dc5044f2=
-90
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0GqJcz06FWXScvO9q8UIen2Z5TIMPCwU7rdZJGHj=
-+mAWkK5UWm4PnDKCmYgyV6KpeW5mNlwQEgzWXz89aRhNwVa9wB2gRYvrLIgGWw4N6Vr4jp4dfl8=
-VwdC0ycC93sxY2xW+fe4jdeZgPhu/SB4QLT2sV1ndIpuyq40tUT/o0P/0nz3TFNAeu7DWQtwO9K=
-M1gGCLv2c2YWaG2I28urqVBAEPs/Lh7IB9KQK2t3Q81bePUBE3DM6N5Un4Q9wYfgoHPRTlgN+Bh=
-9FkttL47rOMJ/EVcgsz+MQmLB8WK66RMLcIwfu/vtN5y6nLduBqBfhorBcp6zuEs+PTOhNcN+CF=
-yqBClZmAJ8QdSuOlmTWjymD3lzO1y3oa0U/+yLlDAcMsYKIUpx+5WQ5j4/lAZVO0q6s8IPE/Dc+=
-d60WxY1YU28uCX49WJM5XsQDmNxH0XrGqxIGyQZ0OZG+XWbADxRLmF7wtKjB1K4TnGmFbGxlv/V=
-DZqHCcq+fnJCBe64OkMcnbvkErwcuRbZnRIpyyoGQaZNbaa+GScMLvc2hjsnKH9ehVr+YXspEX9=
-UHlliDBQHx99aXyp2F7q/0rnaYKqbHpMo4ZK26eAjrPsaaPwox+sjWJqIifSdzkr/G99zUVnLEk=
-fYHuelBcZ+UO++2QpNKzeTssudbif+5NjNuyXxfRTfOYllVrmGeB2cLdGZT0KfYdernQqt8vm5t=
-2THsWM9CWDi2o4SF+TnOkjV3wIec1H3DVG759Esk29a322K114Jm/
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;I=
-PV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS=
-:(13230031)(7416005)(82310400014)(1800799015)(376005)(36860700004);DIR:OUT;=
-SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:07:03.6536
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94ffad58-535d-4024-6cb1-08dc5=
-044f290
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3D=
-3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=3D[165.204.84.17];Helo=3D[SATLEXMB0=
-4.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017092.namprd03.prod.outlook=
-.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7730
-Return-Path: kvm+bounces-13134-martin.weber=3Dsecunet.com@vger.kernel.org
-X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 23:07:18.6549
- (UTC)
-X-MS-Exchange-Organization-Network-Message-Id: 544ea24c-7a6c-485b-d3a8-08dc=
-5044fb75
-X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.36
-X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.202
-X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-02.s=
-ecunet.de
-X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dmbx-es=
-sen-01.secunet.de:TOTAL-HUB=3D0.394|SMR=3D0.320(SMRDE=3D0.003|SMRC=3D0.316(=
-SMRCL=3D0.102|X-SMRCR=3D0.316))|CAT=3D0.073(CATOS=3D0.001
- |CATRESL=3D0.027(CATRESLP2R=3D0.005)|CATORES=3D0.042(CATRS=3D0.042(CATRS-T=
-ransport
- Rule Agent=3D0.001 (X-ETREX=3D0.001)|CATRS-Index Routing
- Agent=3D0.040)));2024-03-29T23:07:19.052Z
-X-MS-Exchange-Forest-ArrivalHubServer: mbx-essen-01.secunet.de
-X-MS-Exchange-Organization-AuthSource: cas-essen-02.secunet.de
-X-MS-Exchange-Organization-AuthAs: Anonymous
-X-MS-Exchange-Organization-FromEntityHeader: Internet
-X-MS-Exchange-Organization-OriginalSize: 14879
-X-MS-Exchange-Organization-HygienePolicy: Standard
-X-MS-Exchange-Organization-MessageLatency: SRV=3Dcas-essen-02.secunet.de:TO=
-TAL-FE=3D6.000|SMR=3D0.006(SMRPI=3D0.003(SMRPI-FrontendProxyAgent=3D0.003))
-X-MS-Exchange-Organization-Recipient-Limit-Verified: True
-X-MS-Exchange-Organization-TotalRecipientCount: 1
-X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
--482ee6223cf2%%%fd34672d-751c-45ae-a963-ed177fcabe23%%%d8080257-b0c3-47b4-b=
-0db-23bc0c8ddb3c%%%95e591a2-5d7d-4afa-b1d0-7573d6c0a5d9%%%f7d0f6bc-4dcc-487=
-6-8c5d-b3d6ddbb3d55%%%16355082-c50b-4214-9c7d-d39575f9f79b
-X-MS-Exchange-Forest-RulesExecuted: mbx-essen-01
-X-MS-Exchange-Organization-RulesExecuted: mbx-essen-01
-X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAe8GAAAPAAADH4sIAAAAAAAEAMVXbVPb=
-RhA+2ZJtjAWhkD
- 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
- YtMTYiPz4NCjxFbWFpbFNldD4NCiAgPFZlcnNpb24+MTUuMC4wLjA8
- L1ZlcnNpb24+DQogIDxFbWFpbHM+DQogICAgPEVtYWlsIFN0YXJ0SW
- 5kZXg9IjMxIj4NCiAgICAgIDxFbWFpbFN0cmluZz5icEBhbGllbjgu
- ZGU8L0VtYWlsU3RyaW5nPg0KICAgIDwvRW1haWw+DQogICAgPEVtYW
- lsIFN0YXJ0SW5kZXg9IjMzMSIgUG9zaXRpb249IlNpZ25hdHVyZSI+
- DQogICAgICA8RW1haWxTdHJpbmc+bWljaGFlbC5yb3RoQGFtZC5jb2
- 08L0VtYWlsU3RyaW5nPg0KICAgIDwvRW1haWw+DQogIDwvRW1haWxz
- Pg0KPC9FbWFpbFNldD4BDJ0HPD94bWwgdmVyc2lvbj0iMS4wIiBlbm
- NvZGluZz0idXRmLTE2Ij8+DQo8Q29udGFjdFNldD4NCiAgPFZlcnNp
- b24+MTUuMC4wLjA8L1ZlcnNpb24+DQogIDxDb250YWN0cz4NCiAgIC
- A8Q29udGFjdCBTdGFydEluZGV4PSIyNjQiPg0KICAgICAgPFBlcnNv
- biBTdGFydEluZGV4PSIyNjQiPg0KICAgICAgICA8UGVyc29uU3RyaW
- 5nPkJvcmlzbGF2IFBldGtvdjwvUGVyc29uU3RyaW5nPg0KICAgICAg
- PC9QZXJzb24+DQogICAgICA8RW1haWxzPg0KICAgICAgICA8RW1haW
- wgU3RhcnRJbmRleD0iMjg3Ij4NCiAgICAgICAgICA8RW1haWxTdHJp
- bmc+YnBAYWxpZW44LmRlPC9FbWFpbFN0cmluZz4NCiAgICAgICAgPC
- 9FbWFpbD4NCiAgICAgIDwvRW1haWxzPg0KICAgICAgPENvbnRhY3RT
- dHJpbmc+Qm9yaXNsYXYgUGV0a292IChBTUQpICZsdDticEBhbGllbj
- guZGU8L0NvbnRhY3RTdHJpbmc+DQogICAgPC9Db250YWN0Pg0KICAg
- IDxDb250YWN0IFN0YXJ0SW5kZXg9IjMxNyIgUG9zaXRpb249IlNpZ2
- 5hdHVyZSI+DQogICAgICA8UGVyc29uIFN0YXJ0SW5kZXg9IjMxNyIg
- UG9zaXRpb249IlNpZ25hdHVyZSI+DQogICAgICAgIDxQZXJzb25TdH
- Jpbmc+TWljaGFlbCBSb3RoPC9QZXJzb25TdHJpbmc+DQogICAgICA8
- L1BlcnNvbj4NCiAgICAgIDxFbWFpbHM+DQogICAgICAgIDxFbWFpbC
- BTdGFydEluZGV4PSIzMzEiIFBvc2l0aW9uPSJTaWduYXR1cmUiPg0K
- ICAgICAgICAgIDxFbWFpbFN0cmluZz5taWNoYWVsLnJvdGhAYW1kLm
- NvbTwvRW1haWxTdHJpbmc+DQogICAgICAgIDwvRW1haWw+DQogICAg
- ICA8L0VtYWlscz4NCiAgICAgIDxDb250YWN0U3RyaW5nPk1pY2hhZW
- wgUm90aCAmbHQ7bWljaGFlbC5yb3RoQGFtZC5jb208L0NvbnRhY3RT
- dHJpbmc+DQogICAgPC9Db250YWN0Pg0KICA8L0NvbnRhY3RzPg0KPC
- 9Db250YWN0U2V0PgEOzwFSZXRyaWV2ZXJPcGVyYXRvciwxMCwxO1Jl
- dHJpZXZlck9wZXJhdG9yLDExLDE7UG9zdERvY1BhcnNlck9wZXJhdG
- 9yLDEwLDA7UG9zdERvY1BhcnNlck9wZXJhdG9yLDExLDA7UG9zdFdv
- cmRCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDEwLDE7UG9zdFdvcm
- RCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDExLDA7VHJhbnNwb3J0
- V3JpdGVyUHJvZHVjZXIsMjAsMjI=3D
-X-MS-Exchange-Forest-IndexAgent: 1 3260
-X-MS-Exchange-Forest-EmailMessageHash: 8CD23995
-X-MS-Exchange-Forest-Language: en
-X-MS-Exchange-Organization-Processed-By-Journaling: Journal Agent
+Instead of the above line, a legit 'entries' can be enabled using:
 
-From: "Borislav Petkov (AMD)" <bp@alien8.de>
+DECLARE_FLEX_ARRAY(struct slr_entry_hdr, entries);
 
-Add functionality to set and/or clear different attributes of the
-machine as a confidential computing platform. Add the first one too:
-whether the machine is running as a host for SEV-SNP guests.
+> +} __packed;
 
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
- arch/x86/coco/core.c        | 52 +++++++++++++++++++++++++++++++++++++
- include/linux/cc_platform.h | 12 +++++++++
- 2 files changed, 64 insertions(+)
+You'd have to move this above struct slr_table which would need it:
 
-diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
-index d07be9d05cd0..8c3fae23d3c6 100644
---- a/arch/x86/coco/core.c
-+++ b/arch/x86/coco/core.c
-@@ -16,6 +16,11 @@
- enum cc_vendor cc_vendor __ro_after_init =3D CC_VENDOR_NONE;
- u64 cc_mask __ro_after_init;
-=20
-+static struct cc_attr_flags {
-+	__u64 host_sev_snp	: 1,
-+	      __resv		: 63;
-+} cc_flags;
-+
- static bool noinstr intel_cc_platform_has(enum cc_attr attr)
- {
- 	switch (attr) {
-@@ -89,6 +94,9 @@ static bool noinstr amd_cc_platform_has(enum cc_attr attr=
-)
- 	case CC_ATTR_GUEST_SEV_SNP:
- 		return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
-=20
-+	case CC_ATTR_HOST_SEV_SNP:
-+		return cc_flags.host_sev_snp;
-+
- 	default:
- 		return false;
- 	}
-@@ -148,3 +156,47 @@ u64 cc_mkdec(u64 val)
- 	}
- }
- EXPORT_SYMBOL_GPL(cc_mkdec);
-+
-+static void amd_cc_platform_clear(enum cc_attr attr)
-+{
-+	switch (attr) {
-+	case CC_ATTR_HOST_SEV_SNP:
-+		cc_flags.host_sev_snp =3D 0;
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+void cc_platform_clear(enum cc_attr attr)
-+{
-+	switch (cc_vendor) {
-+	case CC_VENDOR_AMD:
-+		amd_cc_platform_clear(attr);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+static void amd_cc_platform_set(enum cc_attr attr)
-+{
-+	switch (attr) {
-+	case CC_ATTR_HOST_SEV_SNP:
-+		cc_flags.host_sev_snp =3D 1;
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+void cc_platform_set(enum cc_attr attr)
-+{
-+	switch (cc_vendor) {
-+	case CC_VENDOR_AMD:
-+		amd_cc_platform_set(attr);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-diff --git a/include/linux/cc_platform.h b/include/linux/cc_platform.h
-index cb0d6cd1c12f..60693a145894 100644
---- a/include/linux/cc_platform.h
-+++ b/include/linux/cc_platform.h
-@@ -90,6 +90,14 @@ enum cc_attr {
- 	 * Examples include TDX Guest.
- 	 */
- 	CC_ATTR_HOTPLUG_DISABLED,
-+
-+	/**
-+	 * @CC_ATTR_HOST_SEV_SNP: AMD SNP enabled on the host.
-+	 *
-+	 * The host kernel is running with the necessary features
-+	 * enabled to run SEV-SNP guests.
-+	 */
-+	CC_ATTR_HOST_SEV_SNP,
- };
-=20
- #ifdef CONFIG_ARCH_HAS_CC_PLATFORM
-@@ -107,10 +115,14 @@ enum cc_attr {
-  * * FALSE - Specified Confidential Computing attribute is not active
-  */
- bool cc_platform_has(enum cc_attr attr);
-+void cc_platform_set(enum cc_attr attr);
-+void cc_platform_clear(enum cc_attr attr);
-=20
- #else	/* !CONFIG_ARCH_HAS_CC_PLATFORM */
-=20
- static inline bool cc_platform_has(enum cc_attr attr) { return false; }
-+static inline void cc_platform_set(enum cc_attr attr) { }
-+static inline void cc_platform_clear(enum cc_attr attr) { }
-=20
- #endif	/* CONFIG_ARCH_HAS_CC_PLATFORM */
-=20
---=20
-2.25.1
+> +/*
+> + * Common SLRT Table Header
+> + */
+> +struct slr_entry_hdr {
+> +	u16 tag;
+> +	u16 size;
+> +} __packed;
+> +
+> +/*
+> + * Boot loader context
+> + */
+> +struct slr_bl_context {
+> +	u16 bootloader;
+> +	u16 reserved;
+> +	u64 context;
+> +} __packed;
+> +
+> +/*
+> + * DRTM Dynamic Launch Configuration
+> + */
+> +struct slr_entry_dl_info {
+> +	struct slr_entry_hdr hdr;
+> +	struct slr_bl_context bl_context;
+> +	u64 dl_handler;
+> +	u64 dce_base;
+> +	u32 dce_size;
+> +	u64 dlme_entry;
+> +} __packed;
+> +
+> +/*
+> + * TPM Log Information
+> + */
+> +struct slr_entry_log_info {
+> +	struct slr_entry_hdr hdr;
+> +	u16 format;
+> +	u16 reserved;
+> +	u64 addr;
+> +	u32 size;
+> +} __packed;
+> +
+> +/*
+> + * DRTM Measurement Policy
+> + */
+> +struct slr_entry_policy {
+> +	struct slr_entry_hdr hdr;
+> +	u16 revision;
+> +	u16 nr_entries;
+> +	/* policy_entries[] */
+> +} __packed;
+> +
+> +/*
+> + * DRTM Measurement Entry
+> + */
+> +struct slr_policy_entry {
+> +	u16 pcr;
+> +	u16 entity_type;
+> +	u16 flags;
+> +	u16 reserved;
+> +	u64 entity;
+> +	u64 size;
+> +	char evt_info[TPM_EVENT_INFO_LENGTH];
+> +} __packed;
+> +
+> +/*
+> + * Secure Launch defined MTRR saving structures
+> + */
+> +struct slr_txt_mtrr_pair {
+> +	u64 mtrr_physbase;
+> +	u64 mtrr_physmask;
+> +} __packed;
+> +
+> +struct slr_txt_mtrr_state {
+> +	u64 default_mem_type;
+> +	u64 mtrr_vcnt;
+> +	struct slr_txt_mtrr_pair mtrr_pair[TXT_VARIABLE_MTRRS_LENGTH];
+> +} __packed;
+> +
+> +/*
+> + * Intel TXT Info table
+> + */
+> +struct slr_entry_intel_info {
+> +	struct slr_entry_hdr hdr;
+> +	u64 saved_misc_enable_msr;
+> +	struct slr_txt_mtrr_state saved_bsp_mtrrs;
+> +} __packed;
+> +
+> +/*
+> + * AMD SKINIT Info table
+> + */
+> +struct slr_entry_amd_info {
+> +	struct slr_entry_hdr hdr;
+> +} __packed;
+> +
+> +/*
+> + * ARM DRTM Info table
+> + */
+> +struct slr_entry_arm_info {
+> +	struct slr_entry_hdr hdr;
+> +} __packed;
 
+Shouldn't these three structs be added as part of their
+separate per-vendor enablement patches?
 
-X-sender: <linux-kernel+bounces-125513-steffen.klassert=3Dsecunet.com@vger.=
+> +struct slr_entry_uefi_config {
+> +	struct slr_entry_hdr hdr;
+> +	u16 revision;
+> +	u16 nr_entries;
+> +	/* uefi_cfg_entries[] */
+> +} __packed;
+> +
+> +struct slr_uefi_cfg_entry {
+> +	u16 pcr;
+> +	u16 reserved;
+> +	u64 cfg; /* address or value */
+> +	u32 size;
+> +	char evt_info[TPM_EVENT_INFO_LENGTH];
+> +} __packed;
+> +
+> +static inline void *slr_end_of_entrys(struct slr_table *table)
+> +{
+> +	return (((void *)table) + table->size);
+> +}
+> +
+> +static inline struct slr_entry_hdr *
+> +slr_next_entry(struct slr_table *table,
+> +	       struct slr_entry_hdr *curr)
+> +{
+> +	struct slr_entry_hdr *next =3D (struct slr_entry_hdr *)
+> +				((u8 *)curr + curr->size);
+> +
+> +	if ((void *)next >=3D slr_end_of_entrys(table))
+> +		return NULL;
+> +	if (next->tag =3D=3D SLR_ENTRY_END)
+> +		return NULL;
+> +
+> +	return next;
+> +}
+> +
+> +static inline struct slr_entry_hdr *
+> +slr_next_entry_by_tag(struct slr_table *table,
+> +		      struct slr_entry_hdr *entry,
+> +		      u16 tag)
+> +{
+> +	if (!entry) /* Start from the beginning */
+> +		entry =3D (struct slr_entry_hdr *)(((u8 *)table) + sizeof(*table));
+
+Back to the 'entries', the above line can now be made more readable:
+
+entry =3D table->entries;
+
+That's just one example, this flex array simplification can be made
+in other structs in this series, too.
+
+Cheers,
+
+Kim
+
+> +
+> +	for ( ; ; ) {
+> +		if (entry->tag =3D=3D tag)
+> +			return entry;
+> +
+> +		entry =3D slr_next_entry(table, entry);
+> +		if (!entry)
+> +			return NULL;
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +static inline int
+> +slr_add_entry(struct slr_table *table,
+> +	      struct slr_entry_hdr *entry)
+> +{
+> +	struct slr_entry_hdr *end;
+> +
+> +	if ((table->size + entry->size) > table->max_size)
+> +		return -1;
+> +
+> +	memcpy((u8 *)table + table->size - sizeof(*end), entry, entry->size);
+> +	table->size +=3D entry->size;
+> +
+> +	end  =3D (struct slr_entry_hdr *)((u8 *)table + table->size - sizeof(*e=
+nd));
+> +	end->tag =3D SLR_ENTRY_END;
+> +	end->size =3D sizeof(*end);
+> +
+> +	return 0;
+> +}
+> +
+> +static inline void
+> +slr_init_table(struct slr_table *slrt, u16 architecture, u32 max_size)
+> +{
+> +	struct slr_entry_hdr *end;
+> +
+> +	slrt->magic =3D SLR_TABLE_MAGIC;
+> +	slrt->revision =3D SLR_TABLE_REVISION;
+> +	slrt->architecture =3D architecture;
+> +	slrt->size =3D sizeof(*slrt) + sizeof(*end);
+> +	slrt->max_size =3D max_size;
+> +	end =3D (struct slr_entry_hdr *)((u8 *)slrt + sizeof(*slrt));
+> +	end->tag =3D SLR_ENTRY_END;
+> +	end->size =3D sizeof(*end);
+> +}
+> +
+> +#endif /* !__ASSEMBLY */
+> +
+> +#endif /* _LINUX_SLR_TABLE_H */
+
+X-sender: <linux-kernel+bounces-125479-steffen.klassert=3Dsecunet.com@vger.=
 kernel.org>
 X-Receiver: <steffen.klassert@secunet.com> ORCPT=3Drfc822;steffen.klassert@=
 secunet.com NOTIFY=3DNEVER; X-ExtendedProps=3DBQAVABYAAgAAAAUAFAARAPDFCS25B=
@@ -769,27 +505,27 @@ XV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8ALwAAAE1p=
 Y3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmV=
 yc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ=3D=3D
 X-CreatedBy: MSExchange15
-X-HeloDomain: a.mx.secunet.com
-X-ExtendedProps: BQBjAAoAbw5rGbMv3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc2=
+X-HeloDomain: b.mx.secunet.com
+X-ExtendedProps: BQBjAAoAh5Pp8x1Q3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc2=
 9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAA=
-AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAHAAAAHN0ZWZmZW4ua2xhc3NlcnRAc2Vj=
-dW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwA=
-AAAAABQAFAAIAAQUAYgAKAEQAAADNigAABQBkAA8AAwAAAEh1Yg=3D=3D
-X-Source: SMTP:Default MBX-ESSEN-01
-X-SourceIPAddress: 62.96.220.36
-X-EndOfInjectedXHeaders: 20997
+AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAGIACgBkAAAAjIoAAAUABAAUIAEAAAAcAAAAc3RlZmZl=
+bi5rbGFzc2VydEBzZWN1bmV0LmNvbQUABgACAAEFACkAAgABDwAJAAAAQ0lBdWRpdGVkAgABBQA=
+CAAcAAQAAAAUAAwAHAAAAAAAFAAUAAgABBQBkAA8AAwAAAEh1Yg=3D=3D
+X-Source: SMTP:Default MBX-DRESDEN-01
+X-SourceIPAddress: 62.96.220.37
+X-EndOfInjectedXHeaders: 29326
 Received: from cas-essen-02.secunet.de (10.53.40.202) by
- mbx-essen-01.secunet.de (10.53.40.197) with Microsoft SMTP Server
+ mbx-dresden-01.secunet.de (10.53.40.199) with Microsoft SMTP Server
  (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sat, 30 Mar 2024 00:07:28 +0100
-Received: from a.mx.secunet.com (62.96.220.36) by cas-essen-02.secunet.de
+ 15.1.2507.37; Fri, 29 Mar 2024 23:41:33 +0100
+Received: from b.mx.secunet.com (62.96.220.37) by cas-essen-02.secunet.de
  (10.53.40.202) with Microsoft SMTP Server (version=3DTLS1_2,
  cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Fronte=
 nd
- Transport; Sat, 30 Mar 2024 00:07:28 +0100
+ Transport; Fri, 29 Mar 2024 23:41:33 +0100
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 6B8D9207E4
-	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 00:07:28 +0100 (CET)
+	by b.mx.secunet.com (Postfix) with ESMTP id B6FDC2032C
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:41:33 +0100 (CET)
 X-Virus-Scanned: by secunet
 X-Spam-Flag: NO
 X-Spam-Score: -2.85
@@ -799,435 +535,717 @@ X-Spam-Status: No, score=3D-2.85 tagged_above=3D-999 required=3D2.1
 	DKIM_VALID=3D-0.1, DKIM_VALID_AU=3D-0.1,
 	HEADER_FROM_DIFFERENT_DOMAINS=3D0.249, MAILING_LIST_MULTI=3D-1,
 	RCVD_IN_DNSWL_NONE=3D-0.0001, SPF_HELO_NONE=3D0.001, SPF_PASS=3D-0.001]
-	autolearn=3Dunavailable autolearn_force=3Dno
+	autolearn=3Dham autolearn_force=3Dno
 Authentication-Results: a.mx.secunet.com (amavisd-new);
 	dkim=3Dpass (1024-bit key) header.d=3Damd.com
-Received: from a.mx.secunet.com ([127.0.0.1])
+Received: from b.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RQjBiIKHILZN for <steffen.klassert@secunet.com>;
-	Sat, 30 Mar 2024 00:07:27 +0100 (CET)
+	with ESMTP id 2ehXfJaQBnYJ for <steffen.klassert@secunet.com>;
+	Fri, 29 Mar 2024 23:41:32 +0100 (CET)
 Received-SPF: Pass (sender SPF authorized) identity=3Dmailfrom; client-ip=
-=3D147.75.80.249; helo=3Dam.mirrors.kernel.org; envelope-from=3Dlinux-kerne=
-l+bounces-125513-steffen.klassert=3Dsecunet.com@vger.kernel.org; receiver=
+=3D147.75.48.161; helo=3Dsy.mirrors.kernel.org; envelope-from=3Dlinux-kerne=
+l+bounces-125479-steffen.klassert=3Dsecunet.com@vger.kernel.org; receiver=
 =3Dsteffen.klassert@secunet.com=20
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com D027120754
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249]=
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com D68E5200BB
+Authentication-Results: b.mx.secunet.com;
+	dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.com header.b=
+=3D"QMl5bUwl"
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161]=
 )
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id D027120754
-	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 00:07:27 +0100 (CET)
+	by b.mx.secunet.com (Postfix) with ESMTPS id D68E5200BB
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:41:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.2=
 5.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EAEF1F23987
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:07:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 735C8B22E9E
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 22:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3634913E6D0;
-	Fri, 29 Mar 2024 23:07:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A5D713E02F;
+	Fri, 29 Mar 2024 22:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
 	dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.com header.b=
-=3D"tIqmA0po"
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11=
-on2040.outbound.protection.outlook.com [40.107.236.40])
+=3D"QMl5bUwl"
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12=
+on2095.outbound.protection.outlook.com [40.107.237.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8751513BAD2;
-	Fri, 29 Mar 2024 23:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157B128DCA;
+	Fri, 29 Mar 2024 22:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=3Dfail smtp.client-ip=
-=3D40.107.236.40
+=3D40.107.237.95
 ARC-Seal: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org; s=3Darc-20240116;
-	t=3D1711753628; cv=3Dfail; b=3DNAyU4Ql1nzqh8Ta+6+4fkuH3r8iuNk9YQFSF2A6/gis=
-j9px5BkNYKlBn4AgIMyWt1I567ugxqpkl3AYixa0QaggzXoehxx6L6ncHvn8I7Ez2tFYoL9vZNb=
-Z6wk3Abq1m4Yl3ARVXTYgiBOs5wDFCDMLeLe6eG2QE/wdDDqys51o=3D
+	t=3D1711752070; cv=3Dfail; b=3DiT73yaJATXPF6TexZMUEAV2/sxEWzNiLK5TUnvPX0Cy=
+2E14qbaNwPyBNeqaglJ//Jx+6uFKjnxeQq+z+nMgdQg7F1U37PDX1ZUB+DIlOCzOGWxC06t1YWT=
+90Ew/eW+Rh3ApI8I72qztLjrFodKVarmzb+wwckGDk0XXy7Qh/CJs=3D
 ARC-Message-Signature: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org;
-	s=3Darc-20240116; t=3D1711753628; c=3Drelaxed/simple;
-	bh=3D/LyX0lMdUIy7Re5uMF7sJFrGKLk94ez+2D00SwZmmSM=3D;
-	h=3DFrom:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=3DP4Ct+4Fh5CFHklVz8ec/KI+Vy8l6gy8sMrsA8G0VSc=
-6BXV51aSZvcce5TO0VWpkgWRO6L20qOjtIvW71UBRjh/dpKSwVxN3thY6iXTtS2sn6wbWKOTbs/=
-7n5LW4tFODW5ZD6LyYgDgXpsXkY2D4E35ysdtbX5m/Gl5n/SGm3LLc=3D
+	s=3Darc-20240116; t=3D1711752070; c=3Drelaxed/simple;
+	bh=3D+qwRVQtAUFwc+mzfaMAXarOygq0dR3IZtuet68K/Fyc=3D;
+	h=3DMessage-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=3DG29ZIU+yv38ZuTtXNi+N8C9Zhwjmp44eIvzsKJgCft=
+7KwIkeThqwQKY9NS8L4PwEr46ODNkpxKhj/5OKv8BT1YCNoJfs/awO/a9KJkRV+vJZaAlNqOJlg=
+GXBdjfLBdz3f3I2QS98P/ZBr6R+qHJydYb7baxyGFy6LT11pI9R0o0=3D
 ARC-Authentication-Results: i=3D2; smtp.subspace.kernel.org; dmarc=3Dpass (=
 p=3Dquarantine dis=3Dnone) header.from=3Damd.com; spf=3Dfail smtp.mailfrom=
 =3Damd.com; dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.c=
-om header.b=3DtIqmA0po; arc=3Dfail smtp.client-ip=3D40.107.236.40
+om header.b=3DQMl5bUwl; arc=3Dfail smtp.client-ip=3D40.107.237.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=3Dpass (p=3Dquarant=
 ine dis=3Dnone) header.from=3Damd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=3Dfail smtp.mailfrom=
 =3Damd.com
 ARC-Seal: i=3D1; a=3Drsa-sha256; s=3Darcselector9901; d=3Dmicrosoft.com; cv=
 =3Dnone;
- b=3DndNy51RAtRmNI8klSsRuUDkZ+QOIkz6PU7RicglEDrpSyeD334tm0h8TSmMzsqeKS6iJHp=
-CYyPb/2bgRTgXwHuE5nHOCRWpYsQEUf9FfnAoZgq/FS6Ag1+n/PW1+XMjGrd3hTaQEMzt4f+mR1=
-+LDDkpXF6HZbdDWTZG2jzrQfcx3peXwGhSzI8Mp7fmiZjGo3auxlW9277c3ZxbV6l/RzlDC8dI1=
-+yGUojFlO4mTFp9PJnkeSg2YDsVKIVAYEAoYZXTUzSuLTkJJqQLWjodWuLBih6ic/HZU09yGVYj=
-2AxSh3I65W1AeCVMVbbEa8KbrhsCIUknM1mpNPA/gEPz2Ag=3D=3D
+ b=3DBkkM76oyZTz2Q2LpBR6pBvhemX3+VK0fBLimXRngfvWCLdPfuoYo/vDDc9RbYD4UJCpFX6=
+s1jEACDTyMlHtRFRtONzRJPjfA5pmccOwplO8CEa6s0ovxM9Hl35Er48H48WBDOpZd1uPtQB3DD=
+ta7kBsPc3EIceVFUm/Gm1wTOx55QotP37QBX1KD8mX4WMa0LZynfQjnkStLhLnWXcdQwsSPer6k=
+iUjqteQovSGXfh7YMRVKbeMRw21NQro0Qy+gQ/LA6DPgby5/cQICN4eDyYN95UrX4YKucYI2oBs=
+PICG3c8q8kvw9fCtKbZwnr1grISQQtUC1KNVzYdiMagOGFA=3D=3D
 ARC-Message-Signature: i=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Dmicr=
 osoft.com;
  s=3Darcselector9901;
  h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-A=
 ntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Ex=
 change-AntiSpam-MessageData-1;
- bh=3DpvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=3D;
- b=3DgMrC496qK2lsX87+6Bzyto2bAcxON65hdXqTeSYWXiTb9dMrUdvT2nBXXHCO9PSCV8BRKA=
-Tgr3QFZL2DbJrjIrQrsltBxeFF71VRItM5A+TTH4AicOLngecTmO8rH7zlYENBB2oVx3wSKnvuU=
-6N30ye3Cjzdcs1BVE9Zy9sB4Ul91SoyuDz+mggYy57PkPNmCmlx2d166CZHTTZJJJYqBcsHxO08=
-5W4pD2XSkVkLV72jqVcUQau02SVCvvx1k9v76Lrx1CsfhE62bu8cgJJLFXucZdWOwY5ft5+iXGn=
-W/Bwt1HJdv9FcbPLjhvfQZ/2KhAPqUXvJYyvL0lc5vYMNWA=3D=3D
-ARC-Authentication-Results: i=3D1; mx.microsoft.com 1; spf=3Dpass (sender i=
-p is
- 165.204.84.17) smtp.rcpttodomain=3Dvger.kernel.org smtp.mailfrom=3Damd.com=
-;
- dmarc=3Dpass (p=3Dquarantine sp=3Dquarantine pct=3D100) action=3Dnone
- header.from=3Damd.com; dkim=3Dnone (message not signed); arc=3Dnone (0)
+ bh=3Dlm2yVCaf9RoiDruxpEx206c6phucY5FX3RMdmFeXZ9k=3D;
+ b=3DRDOAGF7+Ik4xDCrKfFjYUaCEgFCp8rPLEoyGEJGfpLOXNIa7YWeEWzZ1VotCI/ZUgTSOVN=
+6QiqcPcDBe5GBx9DmXLKN4YMa19/hFyoPmXJz6oq65UWNMaTUYLl0AXj/clPXTRfxyopcl4hYjw=
+IcO71g4dftgFJvWksN77W1OGtqxvf8pbLNnC0Zgx3QmEOw2m5F4R8LYVLl/bBFar8vjgNGERX4K=
+UT1jJPql2hneEZv8TzpArkgEtYh2C0+YAbEHtbkVjmyx76VGDNFvy3BkIlL1Pl871ZsykDD0NON=
+y0TJd+zaD5o2zx4yCgWb8Y8juLnwrKvehR4dlgdslxCuzqQ=3D=3D
+ARC-Authentication-Results: i=3D1; mx.microsoft.com 1; spf=3Dpass
+ smtp.mailfrom=3Damd.com; dmarc=3Dpass action=3Dnone header.from=3Damd.com;=
+ dkim=3Dpass
+ header.d=3Damd.com; arc=3Dnone
 DKIM-Signature: v=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Damd.com; s=
 =3Dselector1;
  h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-S=
 enderADCheck;
- bh=3DpvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=3D;
- b=3DtIqmA0poLlOQSgC8NQymU+wMavstViScDkmLWx+nPuwEKSNoq8248LCA6B4ywz4GfDsUL/=
-JVBQork/uEDWaaxIugEnRZyot0VUV/YkV9/1sII8p7qKebIp15+bvVlPGAntwT+ov4j9ElzGeCZ=
-bgxsHd/5BERvoXJ+Xjp3NdTnpU=3D
-Received: from DM6PR01CA0007.prod.exchangelabs.com (2603:10b6:5:296::12) by
- CY8PR12MB7730.namprd12.prod.outlook.com (2603:10b6:930:85::17) with Micros=
+ bh=3Dlm2yVCaf9RoiDruxpEx206c6phucY5FX3RMdmFeXZ9k=3D;
+ b=3DQMl5bUwlMCq6WdH4tCDHxZVKXNBku4/gXeVQ0tOLa0L6+pc48BPHNHT7qZrod8KvPGtXue=
+3FRb7oTQXlMpourqiZouj8qHTvXYQHCn2cmmywW2ROkv52VRi3CV/u471+HApu4l8pEYs1PhJ1Y=
+cjjvse/PRcpKPKO/VLPR5Dq27w=3D
+Received: from DS7PR12MB6263.namprd12.prod.outlook.com (2603:10b6:8:95::17)=
+ by
+ SJ1PR12MB6217.namprd12.prod.outlook.com (2603:10b6:a03:458::6) with Micros=
 oft
  SMTP Server (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA=
 384) id
- 15.20.7409.41; Fri, 29 Mar 2024 23:07:03 +0000
-Received: from DS1PEPF00017092.namprd03.prod.outlook.com
- (2603:10b6:5:296:cafe::1c) by DM6PR01CA0007.outlook.office365.com
- (2603:10b6:5:296::12) with Microsoft SMTP Server (version=3DTLS1_2,
- cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.41 via Front=
-end
- Transport; Fri, 29 Mar 2024 23:07:03 +0000
-X-MS-Exchange-Authentication-Results: spf=3Dpass (sender IP is 165.204.84.1=
-7)
- smtp.mailfrom=3Damd.com; dkim=3Dnone (message not signed)
- header.d=3Dnone;dmarc=3Dpass action=3Dnone header.from=3Damd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=3Dprotection.outlook.com;
- client-ip=3D165.204.84.17; helo=3DSATLEXMB04.amd.com; pr=3DC
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF00017092.mail.protection.outlook.com (10.167.17.135) with Microsoft
- SMTP Server (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA=
-256) id
- 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 23:07:03 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=3DTLS1_2,
- cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 M=
-ar
- 2024 18:07:02 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: <kvm@vger.kernel.org>
-CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
-	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
-	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
-	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
-	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
-	<ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: [PATCH v12 02/29] [TEMP] x86/cc: Add cc_platform_set/_clear() help=
-ers
-Date: Fri, 29 Mar 2024 17:58:08 -0500
-Message-ID: <20240329225835.400662-3-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
-References: <20240329225835.400662-1-michael.roth@amd.com>
+ 15.20.7409.33; Fri, 29 Mar 2024 22:41:02 +0000
+Received: from DS7PR12MB6263.namprd12.prod.outlook.com
+ ([fe80::b286:7d11:bee0:2d37]) by DS7PR12MB6263.namprd12.prod.outlook.com
+ ([fe80::b286:7d11:bee0:2d37%4]) with mapi id 15.20.7409.039; Fri, 29 Mar 2=
+024
+ 22:41:02 +0000
+Message-ID: <8d543a15-af62-4403-b2e0-3b395edfe9e4@amd.com>
+Date: Fri, 29 Mar 2024 17:38:52 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 04/15] x86: Secure Launch Resource Table header file
+To: Ross Philipson <ross.philipson@oracle.com>,
+	<linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+	<linux-integrity@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <kexec@lists.infradead.org>,
+	<linux-efi@vger.kernel.org>
+CC: <dpsmith@apertussolutions.com>, <tglx@linutronix.de>, <mingo@redhat.com=
+>,
+	<bp@alien8.de>, <hpa@zytor.com>, <dave.hansen@linux.intel.com>,
+	<ardb@kernel.org>, <mjg59@srcf.ucam.org>,
+	<James.Bottomley@hansenpartnership.com>, <peterhuewe@gmx.de>,
+	<jarkko@kernel.org>, <jgg@ziepe.ca>, <luto@amacapital.net>,
+	<nivedita@alum.mit.edu>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <kanth.ghatraju@oracle.com>,
+	<trenchboot-devel@googlegroups.com>
+References: <20240214221847.2066632-1-ross.philipson@oracle.com>
+ <20240214221847.2066632-5-ross.philipson@oracle.com>
+Content-Language: en-US
+From: Kim Phillips <kim.phillips@amd.com>
+Organization: AMD
+In-Reply-To: <20240214221847.2066632-5-ross.philipson@oracle.com>
+Content-Type: text/plain; charset=3DUTF-8; format=3Dflowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN1PR12CA0079.namprd12.prod.outlook.com
+ (2603:10b6:802:21::14) To DS7PR12MB6263.namprd12.prod.outlook.com
+ (2603:10b6:8:95::17)
 Precedence: bulk
 X-Mailing-List: linux-kernel@vger.kernel.org
 List-Id: <linux-kernel.vger.kernel.org>
 List-Subscribe: <mailto:linux-kernel+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kernel+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017092:EE_|CY8PR12MB7730:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94ffad58-535d-4024-6cb1-08dc5044f2=
-90
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6263:EE_|SJ1PR12MB6217:EE_
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0GqJcz06FWXScvO9q8UIen2Z5TIMPCwU7rdZJGHj=
-+mAWkK5UWm4PnDKCmYgyV6KpeW5mNlwQEgzWXz89aRhNwVa9wB2gRYvrLIgGWw4N6Vr4jp4dfl8=
-VwdC0ycC93sxY2xW+fe4jdeZgPhu/SB4QLT2sV1ndIpuyq40tUT/o0P/0nz3TFNAeu7DWQtwO9K=
-M1gGCLv2c2YWaG2I28urqVBAEPs/Lh7IB9KQK2t3Q81bePUBE3DM6N5Un4Q9wYfgoHPRTlgN+Bh=
-9FkttL47rOMJ/EVcgsz+MQmLB8WK66RMLcIwfu/vtN5y6nLduBqBfhorBcp6zuEs+PTOhNcN+CF=
-yqBClZmAJ8QdSuOlmTWjymD3lzO1y3oa0U/+yLlDAcMsYKIUpx+5WQ5j4/lAZVO0q6s8IPE/Dc+=
-d60WxY1YU28uCX49WJM5XsQDmNxH0XrGqxIGyQZ0OZG+XWbADxRLmF7wtKjB1K4TnGmFbGxlv/V=
-DZqHCcq+fnJCBe64OkMcnbvkErwcuRbZnRIpyyoGQaZNbaa+GScMLvc2hjsnKH9ehVr+YXspEX9=
-UHlliDBQHx99aXyp2F7q/0rnaYKqbHpMo4ZK26eAjrPsaaPwox+sjWJqIifSdzkr/G99zUVnLEk=
-fYHuelBcZ+UO++2QpNKzeTssudbif+5NjNuyXxfRTfOYllVrmGeB2cLdGZT0KfYdernQqt8vm5t=
-2THsWM9CWDi2o4SF+TnOkjV3wIec1H3DVG759Esk29a322K114Jm/
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;I=
-PV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS=
-:(13230031)(7416005)(82310400014)(1800799015)(376005)(36860700004);DIR:OUT;=
-SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:07:03.6536
+X-Microsoft-Antispam-Message-Info: Hkl8K+NUU2xWpYzCX8iWlZCRIWfimJSM5pZ+gyjC=
+jEOSL9P3Rn9yyjmZPpvXl3BxjwRv/Cuh5ARzlvVKIDJQNknQ+d9K98CwpJ6AG1WgKw8W/W1P4HY=
+ReUgaauK+aeb3mU2y61lAnHTQ3UutFp9RR5La01iCOkdNx7tX7tHj64Xn2m0lZdu4aahAw7jDi8=
+kiVarGCtHi1SYN93JWcJeGfur9hrKFPBXEq5qyZe2qrUjzW1RBkE0EU1dA20+IEQacqFdX2s9hq=
+/KatEZz5elGbJ2HvS67b239PYcUDEuXxQD7QK3UMILH8ejMlh2k2rRZmnLykNRbEuw7fCSlAT1O=
+winM80debtnCjVK+99ISveNjFJ0rqFqcc7Z1SKr49EbuiI/pSO2qOrPXjIoMi0LOM38OU4IDG+Q=
+zFFHpfVfu85RQg4dvDdMW2HpVnpQzwlwK5OAJhZ/ox3f/OhAizj7rmhbmSY527shjIkG3d6wbLA=
+7LKaUdzB/8JZPGalCjvDkLwH1OmNE8fsgsIy/RSZpf127efi7ROacRLZCh6SJPGWdyuT4UkObzN=
+ajAtVe7PDGRWLhPpXCpCYFawvQEJIX0VT3//a/59t0c7N7YZghjEOrjaxif3qE6/rjtvCOKfdwG=
+KU9p5gNTL1MSzSYO/V1ZmMdyRHtgaN+HY7oYjlH9QKA=3D
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;I=
+PV:NLI;SFV:NSPM;H:DS7PR12MB6263.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS=
+:(13230031)(366007)(7416005)(376005)(1800799015);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =3D?utf-8?B?WHlDbnV5TnB2SlVNYjVRbUlLR=
+Uh0eEVBZkkxMlg5dmMvRDJLRGZ6cXV3Qngr?=3D
+ =3D?utf-8?B?aWhIdTNkVHUwQThydWlDU081WGd5TUF5U2ZoamVIcWx4UHJxTVJzLzNXd0xw?=
+=3D
+ =3D?utf-8?B?MmdVUkx4OFJRNW9TUllwOXY1WlZIcDdubEwzWmY5WlZ6WUpOK0RlRE9ocjhD?=
+=3D
+ =3D?utf-8?B?K0RhWll1eHlLOE0vMVhHNU5pVTlDUkZCK04xemlheFZGbDVONlVodmZvVjg4?=
+=3D
+ =3D?utf-8?B?UEZRS09TYkUzN0hIL0hidVBjdjV6RWYwZE1oT1VPVGJmd2Q2bGZmaHMzdUlx?=
+=3D
+ =3D?utf-8?B?V1d2UUxYNzRlTkliMTVqd3B1VldjOGJVTDZxZG5KNC9yUk5KSXFYSGlXSUNH?=
+=3D
+ =3D?utf-8?B?anFvN21Xam5zYjZqeEZlc2NaQkJZV0hWOTVzT1ZMaUppejdNYlErNWlyM00y?=
+=3D
+ =3D?utf-8?B?dE9BU0x6dUpycWUxUERQTTA0cEF4bzEwczIyYzFaT05GV3NHS1d3SHo4aExQ?=
+=3D
+ =3D?utf-8?B?TG5CSkNJTS9URC94YlAxbHRkRW5oSXRpZENrQnJ6V0RrbTBBU0RDSmY4N2dm?=
+=3D
+ =3D?utf-8?B?RkQwN3dtK3M4V3JYdlFVM2RSdFJja3NEVFQ4ZTMvTFZvMm9KcisxZk83QVJU?=
+=3D
+ =3D?utf-8?B?b1NQOG5naURkeWNjeFlwaWtObytydytpT0xpMDlZd2V4cnpVNHR0OVlETmtn?=
+=3D
+ =3D?utf-8?B?TDhETUxicVJSTW1OdUpiQ1BCZ2FMUVczUFhDSW1UeXNZbnR6ZDVBS0NtM0JH?=
+=3D
+ =3D?utf-8?B?MzFUeGt5SUM2YnRwOXp2WDI2WW93TEdoMytIS1RyN2N1QXk0RitHaWtIZXZw?=
+=3D
+ =3D?utf-8?B?QTRLcVZzUlFtRG1JSE56VFhjY2dFZEhuUDUvK0pOeC9vYVpVaUN0YTh5Nm9E?=
+=3D
+ =3D?utf-8?B?RUs5TDQyWTc2RmlDM0NkTks2ZTZIU1ZWMFNER05XOGh0amxYbTRZUjhlWlcy?=
+=3D
+ =3D?utf-8?B?aWh4eDZlMGNETTRSVFF4dU5BMDJZMW9hdk9NZzhVdDNtck9ncWdGYWNyaDJl?=
+=3D
+ =3D?utf-8?B?ZXlIY0V0V05ibHBBTnAwOTVNQmFrai9KNDFyUlA5bzhPQ1ptT2UyL3dIUk4w?=
+=3D
+ =3D?utf-8?B?WWhxa01Mb21pTk5iQ3NvMmxvSHBqald4dng2WXdkTUZEenptUTNVenV6VFVa?=
+=3D
+ =3D?utf-8?B?M3NkM2RTRS9tTEFEZFVxdHpQMVc5RlpncnhZRnB0SXJNUmlLRTFZQlA3Z1BQ?=
+=3D
+ =3D?utf-8?B?ZnF3UDN0Um1NR0h2cVZGdWIwUTEvdjkyVEUrSCswL01PdTZWSEhpeG1EKzBt?=
+=3D
+ =3D?utf-8?B?UGtBY1lhckVQaWhRK0dZSVpuMXlnMmtxSHAyZ0p0bzdyakJHQzlWNjVyalY4?=
+=3D
+ =3D?utf-8?B?Nk1rUzc2Z0cydFl4elJnOEJreEhKY1dYd2h2R1R1djJzc0FEUVU2U05UYzhM?=
+=3D
+ =3D?utf-8?B?UG1pKzRiK2RLNHIzbFA1aGJGaDlRanVZZlFIVkViVzZlMWFpcFUvZ0t5UVlO?=
+=3D
+ =3D?utf-8?B?ZnBwcW1qQ0RRK0tHcTdFQjM2d2t6MWxYajJtYkNjSlQwODFHSWhTcUhwOENP?=
+=3D
+ =3D?utf-8?B?Q1VGc2VvNWd0cjYwd0p5VXl4bmFsRFBrOTYrellCOG4yWkNrTi9YdkNlVUpp?=
+=3D
+ =3D?utf-8?B?ZS9Dekp2KzB4ak4rQktURzNpT0FkaC82bFlxK1F1VjV4QTdyajh4Qlp3UGd0?=
+=3D
+ =3D?utf-8?B?MWIvUEtydWhzS0VBMExSY1AvZDkvYzNyOGVudUNITExPcHI4RERSUHh0RHBT?=
+=3D
+ =3D?utf-8?B?Y2MvSjBBclFXNnNDZ0g5QjhSRTJTb1gvOUxkRFczRWpMc29iQWF3QzN0Rzcv?=
+=3D
+ =3D?utf-8?B?OXdFa2N2OEFaOU84eXZMZ1pOTUljM0tpbDJKOWxsR1h1OE1pRWpTeTMxVU42?=
+=3D
+ =3D?utf-8?B?RmRwRnhydzVCTEl6a2ZIWmxkTzBSUjBnbDRtbXZVSTVKT0crK1huN1dLMTFu?=
+=3D
+ =3D?utf-8?B?ZEo4UzlaRmErOFRDUVNTWVQybUhGelhhNjdwZTM0c0NGeDF0ZVdBZmgrWDd5?=
+=3D
+ =3D?utf-8?B?ZnRKNXpsSTR0NkdZZkxPTWRRTmFJRGRyc0oxT1hOVWJpR3hRM0FzSS8vS0Fi?=
+=3D
+ =3D?utf-8?B?RzJiZ2xCUTM4dmcrWWJ5NG1xZCtTOXRKNVFXWm1GREZGdlJYbkh4M3c2ckk5?=
+=3D
+ =3D?utf-8?B?MGxIQnJuYXJpbmQ5THFCTjZqUzkyTEtpbjF0K3hvdk5teWVNMXJJbHNoLzdN?=
+=3D
+ =3D?utf-8?B?ZnFvU0t0YVlnUnJuUzBDVUVWZ3JKWFZGQVFUQVF3NFAyeVlyaEFNRTdxcll4?=
+=3D
+ =3D?utf-8?Q?zvdhYQzh59VITtzKjJgRMSRq2?=3D
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fcf4d61-e37a-4595-254c-08dc5=
+0414fbf
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6263.namprd12.prod.outlook.c=
+om
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 22:41:02.2410
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94ffad58-535d-4024-6cb1-08dc5=
-044f290
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3D=
-3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=3D[165.204.84.17];Helo=3D[SATLEXMB0=
-4.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017092.namprd03.prod.outlook=
-.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7730
-Return-Path: linux-kernel+bounces-125513-steffen.klassert=3Dsecunet.com@vge=
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ilGgkrAbN/QGxCRDsFAVzxGCrnuii0=
+9s15bGN/0TY5T4fJ/decyRW+CsMzueQ3DxrQoL7F9fC4wqSyBOwuyPuw=3D=3D
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6217
+Return-Path: linux-kernel+bounces-125479-steffen.klassert=3Dsecunet.com@vge=
 r.kernel.org
-X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 23:07:28.4654
+X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 22:41:33.7810
  (UTC)
-X-MS-Exchange-Organization-Network-Message-Id: 5afd3314-ec38-46c5-ccbe-08dc=
-5045014e
-X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.36
+X-MS-Exchange-Organization-Network-Message-Id: 693ef732-a9f2-4f1a-c89c-08dc=
+504162a4
+X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.37
 X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.202
 X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-02.s=
 ecunet.de
-X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dmbx-es=
-sen-01.secunet.de:TOTAL-HUB=3D0.211|SMR=3D0.129(SMRDE=3D0.003|SMRC=3D0.126(=
-SMRCL=3D0.102|X-SMRCR=3D0.126))|CAT=3D0.080(CATRESL=3D0.024
- (CATRESLP2R=3D0.004)|CATORES=3D0.051(CATRS=3D0.051(CATRS-Index Routing
- Agent=3D0.050))|CATORT=3D0.001 (CATRT=3D0.001));2024-03-29T23:07:28.682Z
-X-MS-Exchange-Forest-ArrivalHubServer: mbx-essen-01.secunet.de
+X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dmbx-dr=
+esden-01.secunet.de:TOTAL-HUB=3D0.440|SMR=3D0.346(SMRDE=3D0.035|SMRC=3D0.31=
+0(SMRCL=3D0.102|X-SMRCR=3D0.311))|CAT=3D0.092(CATOS=3D0.012
+ (CATSM=3D0.011(CATSM-Malware
+ Agent=3D0.011))|CATRESL=3D0.039(CATRESLP2R=3D0.019)|CATORES=3D0.039
+ (CATRS=3D0.039(CATRS-Index Routing Agent=3D0.038)));2024-03-29T22:41:34.22=
+9Z
+X-MS-Exchange-Forest-ArrivalHubServer: mbx-dresden-01.secunet.de
 X-MS-Exchange-Organization-AuthSource: cas-essen-02.secunet.de
 X-MS-Exchange-Organization-AuthAs: Anonymous
 X-MS-Exchange-Organization-FromEntityHeader: Internet
-X-MS-Exchange-Organization-OriginalSize: 14942
+X-MS-Exchange-Organization-OriginalSize: 21081
 X-MS-Exchange-Organization-HygienePolicy: Standard
 X-MS-Exchange-Organization-MessageLatency: SRV=3Dcas-essen-02.secunet.de:TO=
-TAL-FE=3D9.000|SMR=3D0.009(SMRPI=3D0.006(SMRPI-FrontendProxyAgent=3D0.006))
+TAL-FE=3D0.008|SMR=3D0.007(SMRPI=3D0.005(SMRPI-FrontendProxyAgent=3D0.005))=
+|SMS=3D0.001
+X-MS-Exchange-Organization-AVStamp-Enterprise: 1.0
 X-MS-Exchange-Organization-Recipient-Limit-Verified: True
 X-MS-Exchange-Organization-TotalRecipientCount: 1
 X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
 -482ee6223cf2%%%fd34672d-751c-45ae-a963-ed177fcabe23%%%d8080257-b0c3-47b4-b=
 0db-23bc0c8ddb3c%%%95e591a2-5d7d-4afa-b1d0-7573d6c0a5d9%%%f7d0f6bc-4dcc-487=
 6-8c5d-b3d6ddbb3d55%%%16355082-c50b-4214-9c7d-d39575f9f79b
-X-MS-Exchange-Forest-RulesExecuted: mbx-essen-01
-X-MS-Exchange-Organization-RulesExecuted: mbx-essen-01
-X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAe8GAAAPAAADH4sIAAAAAAAEAMVXbVPb=
-RhA+2ZJtjAWhkD
- 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
- YtMTYiPz4NCjxFbWFpbFNldD4NCiAgPFZlcnNpb24+MTUuMC4wLjA8
- L1ZlcnNpb24+DQogIDxFbWFpbHM+DQogICAgPEVtYWlsIFN0YXJ0SW
- 5kZXg9IjMxIj4NCiAgICAgIDxFbWFpbFN0cmluZz5icEBhbGllbjgu
- ZGU8L0VtYWlsU3RyaW5nPg0KICAgIDwvRW1haWw+DQogICAgPEVtYW
- lsIFN0YXJ0SW5kZXg9IjMzMSIgUG9zaXRpb249IlNpZ25hdHVyZSI+
- DQogICAgICA8RW1haWxTdHJpbmc+bWljaGFlbC5yb3RoQGFtZC5jb2
- 08L0VtYWlsU3RyaW5nPg0KICAgIDwvRW1haWw+DQogIDwvRW1haWxz
- Pg0KPC9FbWFpbFNldD4BDJ0HPD94bWwgdmVyc2lvbj0iMS4wIiBlbm
- NvZGluZz0idXRmLTE2Ij8+DQo8Q29udGFjdFNldD4NCiAgPFZlcnNp
- b24+MTUuMC4wLjA8L1ZlcnNpb24+DQogIDxDb250YWN0cz4NCiAgIC
- A8Q29udGFjdCBTdGFydEluZGV4PSIyNjQiPg0KICAgICAgPFBlcnNv
- biBTdGFydEluZGV4PSIyNjQiPg0KICAgICAgICA8UGVyc29uU3RyaW
- 5nPkJvcmlzbGF2IFBldGtvdjwvUGVyc29uU3RyaW5nPg0KICAgICAg
- PC9QZXJzb24+DQogICAgICA8RW1haWxzPg0KICAgICAgICA8RW1haW
- wgU3RhcnRJbmRleD0iMjg3Ij4NCiAgICAgICAgICA8RW1haWxTdHJp
- bmc+YnBAYWxpZW44LmRlPC9FbWFpbFN0cmluZz4NCiAgICAgICAgPC
- 9FbWFpbD4NCiAgICAgIDwvRW1haWxzPg0KICAgICAgPENvbnRhY3RT
- dHJpbmc+Qm9yaXNsYXYgUGV0a292IChBTUQpICZsdDticEBhbGllbj
- guZGU8L0NvbnRhY3RTdHJpbmc+DQogICAgPC9Db250YWN0Pg0KICAg
- IDxDb250YWN0IFN0YXJ0SW5kZXg9IjMxNyIgUG9zaXRpb249IlNpZ2
- 5hdHVyZSI+DQogICAgICA8UGVyc29uIFN0YXJ0SW5kZXg9IjMxNyIg
- UG9zaXRpb249IlNpZ25hdHVyZSI+DQogICAgICAgIDxQZXJzb25TdH
- Jpbmc+TWljaGFlbCBSb3RoPC9QZXJzb25TdHJpbmc+DQogICAgICA8
- L1BlcnNvbj4NCiAgICAgIDxFbWFpbHM+DQogICAgICAgIDxFbWFpbC
- BTdGFydEluZGV4PSIzMzEiIFBvc2l0aW9uPSJTaWduYXR1cmUiPg0K
- ICAgICAgICAgIDxFbWFpbFN0cmluZz5taWNoYWVsLnJvdGhAYW1kLm
- NvbTwvRW1haWxTdHJpbmc+DQogICAgICAgIDwvRW1haWw+DQogICAg
- ICA8L0VtYWlscz4NCiAgICAgIDxDb250YWN0U3RyaW5nPk1pY2hhZW
- wgUm90aCAmbHQ7bWljaGFlbC5yb3RoQGFtZC5jb208L0NvbnRhY3RT
- dHJpbmc+DQogICAgPC9Db250YWN0Pg0KICA8L0NvbnRhY3RzPg0KPC
- 9Db250YWN0U2V0PgEOzwFSZXRyaWV2ZXJPcGVyYXRvciwxMCwxO1Jl
- dHJpZXZlck9wZXJhdG9yLDExLDE7UG9zdERvY1BhcnNlck9wZXJhdG
- 9yLDEwLDA7UG9zdERvY1BhcnNlck9wZXJhdG9yLDExLDA7UG9zdFdv
- cmRCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDEwLDM7UG9zdFdvcm
- RCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDExLDA7VHJhbnNwb3J0
- V3JpdGVyUHJvZHVjZXIsMjAsMzM=3D
-X-MS-Exchange-Forest-IndexAgent: 1 3260
-X-MS-Exchange-Forest-EmailMessageHash: 8CD23995
+X-MS-Exchange-Forest-RulesExecuted: mbx-dresden-01
+X-MS-Exchange-Organization-RulesExecuted: mbx-dresden-01
+X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAZwOAAAPAAADH4sIAAAAAAAEALUZa3Pa=
+Vlayedv4GTvNdr
+ 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
+ m9SCg3Iz4JQ+AoJ85ZShiMWpoQKAPvw2hKowskf47QchyTTOCKwc8V
+ nzCFFoVyI0q4QnIzAs4SJRXfvQdCaTZb87I9n5SrlEVwTC8JR0k4V8
+ HAFKqaE8bdFYDkwP/+uEs4i9IynPiUw1maonOkzzIvN2LuewaCm42a
+ 6RGuTjVwE3IsB59yPjD2/w+bSqyrni4AAAEK4AE8P3htbCB2ZXJzaW
+ 9uPSIxLjAiIGVuY29kaW5nPSJ1dGYtMTYiPz4NCjxFbWFpbFNldD4N
+ CiAgPFZlcnNpb24+MTUuMC4wLjA8L1ZlcnNpb24+DQogIDxFbWFpbH
+ M+DQogICAgPEVtYWlsIFN0YXJ0SW5kZXg9IjIxMSI+DQogICAgICA8
+ RW1haWxTdHJpbmc+cm9zcy5waGlsaXBzb25Ab3JhY2xlLmNvbTwvRW
+ 1haWxTdHJpbmc+DQogICAgPC9FbWFpbD4NCiAgPC9FbWFpbHM+DQo8
+ L0VtYWlsU2V0PgEM/wM8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW
+ 5nPSJ1dGYtMTYiPz4NCjxDb250YWN0U2V0Pg0KICA8VmVyc2lvbj4x
+ NS4wLjAuMDwvVmVyc2lvbj4NCiAgPENvbnRhY3RzPg0KICAgIDxDb2
+ 50YWN0IFN0YXJ0SW5kZXg9IjE5NSI+DQogICAgICA8UGVyc29uIFN0
+ YXJ0SW5kZXg9IjE5NSI+DQogICAgICAgIDxQZXJzb25TdHJpbmc+Um
+ 9zcyBQaGlsaXBzb248L1BlcnNvblN0cmluZz4NCiAgICAgIDwvUGVy
+ c29uPg0KICAgICAgPEVtYWlscz4NCiAgICAgICAgPEVtYWlsIFN0YX
+ J0SW5kZXg9IjIxMSI+DQogICAgICAgICAgPEVtYWlsU3RyaW5nPnJv
+ c3MucGhpbGlwc29uQG9yYWNsZS5jb208L0VtYWlsU3RyaW5nPg0KIC
+ AgICAgICA8L0VtYWlsPg0KICAgICAgPC9FbWFpbHM+DQogICAgICA8
+ Q29udGFjdFN0cmluZz5Sb3NzIFBoaWxpcHNvbiAmbHQ7cm9zcy5waG
+ lsaXBzb25Ab3JhY2xlLmNvbTwvQ29udGFjdFN0cmluZz4NCiAgICA8
+ L0NvbnRhY3Q+DQogIDwvQ29udGFjdHM+DQo8L0NvbnRhY3RTZXQ+AQ
+ 7PAVJldHJpZXZlck9wZXJhdG9yLDEwLDA7UmV0cmlldmVyT3BlcmF0
+ b3IsMTEsMTtQb3N0RG9jUGFyc2VyT3BlcmF0b3IsMTAsMDtQb3N0RG
+ 9jUGFyc2VyT3BlcmF0b3IsMTEsMDtQb3N0V29yZEJyZWFrZXJEaWFn
+ bm9zdGljT3BlcmF0b3IsMTAsMztQb3N0V29yZEJyZWFrZXJEaWFnbm
+ 9zdGljT3BlcmF0b3IsMTEsMDtUcmFuc3BvcnRXcml0ZXJQcm9kdWNl ciwyMCwyNg=3D=3D
+X-MS-Exchange-Forest-IndexAgent: 1 4705
+X-MS-Exchange-Forest-EmailMessageHash: 9294DE99
 X-MS-Exchange-Forest-Language: en
 X-MS-Exchange-Organization-Processed-By-Journaling: Journal Agent
 
-From: "Borislav Petkov (AMD)" <bp@alien8.de>
+Hi Ross,
 
-Add functionality to set and/or clear different attributes of the
-machine as a confidential computing platform. Add the first one too:
-whether the machine is running as a host for SEV-SNP guests.
+On 2/14/24 4:18 PM, Ross Philipson wrote:
+> Introduce the Secure Launch Resource Table which forms the formal
+> interface between the pre and post launch code.
+>=20
+> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+> ---
+>   include/linux/slr_table.h | 270 ++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 270 insertions(+)
+>   create mode 100644 include/linux/slr_table.h
 
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
- arch/x86/coco/core.c        | 52 +++++++++++++++++++++++++++++++++++++
- include/linux/cc_platform.h | 12 +++++++++
- 2 files changed, 64 insertions(+)
+> diff --git a/include/linux/slr_table.h b/include/linux/slr_table.h
+> new file mode 100644
+> index 000000000000..42020988233a
+> --- /dev/null
+> +++ b/include/linux/slr_table.h
+> @@ -0,0 +1,270 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Secure Launch Resource Table
+> + *
+> + * Copyright (c) 2023, Oracle and/or its affiliates.
+> + */
+> +
+> +#ifndef _LINUX_SLR_TABLE_H
+> +#define _LINUX_SLR_TABLE_H
+> +
+> +/* Put this in efi.h if it becomes a standard */
+> +#define SLR_TABLE_GUID				EFI_GUID(0x877a9b2a, 0x0385, 0x45d1, 0xa0, 0x3=
+4, 0x9d, 0xac, 0x9c, 0x9e, 0x56, 0x5f)
+> +
+> +/* SLR table header values */
+> +#define SLR_TABLE_MAGIC		0x4452544d
+> +#define SLR_TABLE_REVISION	1
+> +
+> +/* Current revisions for the policy and UEFI config */
+> +#define SLR_POLICY_REVISION		1
+> +#define SLR_UEFI_CONFIG_REVISION	1
+> +
+> +/* SLR defined architectures */
+> +#define SLR_INTEL_TXT		1
+> +#define SLR_AMD_SKINIT		2
+> +
+> +/* SLR defined bootloaders */
+> +#define SLR_BOOTLOADER_INVALID	0
+> +#define SLR_BOOTLOADER_GRUB	1
+> +
+> +/* Log formats */
+> +#define SLR_DRTM_TPM12_LOG	1
+> +#define SLR_DRTM_TPM20_LOG	2
+> +
+> +/* DRTM Policy Entry Flags */
+> +#define SLR_POLICY_FLAG_MEASURED	0x1
+> +#define SLR_POLICY_IMPLICIT_SIZE	0x2
+> +
+> +/* Array Lengths */
+> +#define TPM_EVENT_INFO_LENGTH		32
+> +#define TXT_VARIABLE_MTRRS_LENGTH	32
+> +
+> +/* Tags */
+> +#define SLR_ENTRY_INVALID	0x0000
+> +#define SLR_ENTRY_DL_INFO	0x0001
+> +#define SLR_ENTRY_LOG_INFO	0x0002
+> +#define SLR_ENTRY_ENTRY_POLICY	0x0003
+> +#define SLR_ENTRY_INTEL_INFO	0x0004
+> +#define SLR_ENTRY_AMD_INFO	0x0005
+> +#define SLR_ENTRY_ARM_INFO	0x0006
+> +#define SLR_ENTRY_UEFI_INFO	0x0007
+> +#define SLR_ENTRY_UEFI_CONFIG	0x0008
+> +#define SLR_ENTRY_END		0xffff
+> +
+> +/* Entity Types */
+> +#define SLR_ET_UNSPECIFIED	0x0000
+> +#define SLR_ET_SLRT		0x0001
+> +#define SLR_ET_BOOT_PARAMS	0x0002
+> +#define SLR_ET_SETUP_DATA	0x0003
+> +#define SLR_ET_CMDLINE		0x0004
+> +#define SLR_ET_UEFI_MEMMAP	0x0005
+> +#define SLR_ET_RAMDISK		0x0006
+> +#define SLR_ET_TXT_OS2MLE	0x0010
+> +#define SLR_ET_UNUSED		0xffff
+> +
+> +#ifndef __ASSEMBLY__
+> +
+> +/*
+> + * Primary SLR Table Header
+> + */
+> +struct slr_table {
+> +	u32 magic;
+> +	u16 revision;
+> +	u16 architecture;
+> +	u32 size;
+> +	u32 max_size;
 
-diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
-index d07be9d05cd0..8c3fae23d3c6 100644
---- a/arch/x86/coco/core.c
-+++ b/arch/x86/coco/core.c
-@@ -16,6 +16,11 @@
- enum cc_vendor cc_vendor __ro_after_init =3D CC_VENDOR_NONE;
- u64 cc_mask __ro_after_init;
-=20
-+static struct cc_attr_flags {
-+	__u64 host_sev_snp	: 1,
-+	      __resv		: 63;
-+} cc_flags;
-+
- static bool noinstr intel_cc_platform_has(enum cc_attr attr)
- {
- 	switch (attr) {
-@@ -89,6 +94,9 @@ static bool noinstr amd_cc_platform_has(enum cc_attr attr=
-)
- 	case CC_ATTR_GUEST_SEV_SNP:
- 		return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
-=20
-+	case CC_ATTR_HOST_SEV_SNP:
-+		return cc_flags.host_sev_snp;
-+
- 	default:
- 		return false;
- 	}
-@@ -148,3 +156,47 @@ u64 cc_mkdec(u64 val)
- 	}
- }
- EXPORT_SYMBOL_GPL(cc_mkdec);
-+
-+static void amd_cc_platform_clear(enum cc_attr attr)
-+{
-+	switch (attr) {
-+	case CC_ATTR_HOST_SEV_SNP:
-+		cc_flags.host_sev_snp =3D 0;
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+void cc_platform_clear(enum cc_attr attr)
-+{
-+	switch (cc_vendor) {
-+	case CC_VENDOR_AMD:
-+		amd_cc_platform_clear(attr);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+static void amd_cc_platform_set(enum cc_attr attr)
-+{
-+	switch (attr) {
-+	case CC_ATTR_HOST_SEV_SNP:
-+		cc_flags.host_sev_snp =3D 1;
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+void cc_platform_set(enum cc_attr attr)
-+{
-+	switch (cc_vendor) {
-+	case CC_VENDOR_AMD:
-+		amd_cc_platform_set(attr);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-diff --git a/include/linux/cc_platform.h b/include/linux/cc_platform.h
-index cb0d6cd1c12f..60693a145894 100644
---- a/include/linux/cc_platform.h
-+++ b/include/linux/cc_platform.h
-@@ -90,6 +90,14 @@ enum cc_attr {
- 	 * Examples include TDX Guest.
- 	 */
- 	CC_ATTR_HOTPLUG_DISABLED,
-+
-+	/**
-+	 * @CC_ATTR_HOST_SEV_SNP: AMD SNP enabled on the host.
-+	 *
-+	 * The host kernel is running with the necessary features
-+	 * enabled to run SEV-SNP guests.
-+	 */
-+	CC_ATTR_HOST_SEV_SNP,
- };
-=20
- #ifdef CONFIG_ARCH_HAS_CC_PLATFORM
-@@ -107,10 +115,14 @@ enum cc_attr {
-  * * FALSE - Specified Confidential Computing attribute is not active
-  */
- bool cc_platform_has(enum cc_attr attr);
-+void cc_platform_set(enum cc_attr attr);
-+void cc_platform_clear(enum cc_attr attr);
-=20
- #else	/* !CONFIG_ARCH_HAS_CC_PLATFORM */
-=20
- static inline bool cc_platform_has(enum cc_attr attr) { return false; }
-+static inline void cc_platform_set(enum cc_attr attr) { }
-+static inline void cc_platform_clear(enum cc_attr attr) { }
-=20
- #endif	/* CONFIG_ARCH_HAS_CC_PLATFORM */
-=20
---=20
-2.25.1
+Do these need to have their endianness specified with, e.g., __le32?
 
+> +	/* entries[] */
+
+Instead of the above line, a legit 'entries' can be enabled using:
+
+DECLARE_FLEX_ARRAY(struct slr_entry_hdr, entries);
+
+> +} __packed;
+
+You'd have to move this above struct slr_table which would need it:
+
+> +/*
+> + * Common SLRT Table Header
+> + */
+> +struct slr_entry_hdr {
+> +	u16 tag;
+> +	u16 size;
+> +} __packed;
+> +
+> +/*
+> + * Boot loader context
+> + */
+> +struct slr_bl_context {
+> +	u16 bootloader;
+> +	u16 reserved;
+> +	u64 context;
+> +} __packed;
+> +
+> +/*
+> + * DRTM Dynamic Launch Configuration
+> + */
+> +struct slr_entry_dl_info {
+> +	struct slr_entry_hdr hdr;
+> +	struct slr_bl_context bl_context;
+> +	u64 dl_handler;
+> +	u64 dce_base;
+> +	u32 dce_size;
+> +	u64 dlme_entry;
+> +} __packed;
+> +
+> +/*
+> + * TPM Log Information
+> + */
+> +struct slr_entry_log_info {
+> +	struct slr_entry_hdr hdr;
+> +	u16 format;
+> +	u16 reserved;
+> +	u64 addr;
+> +	u32 size;
+> +} __packed;
+> +
+> +/*
+> + * DRTM Measurement Policy
+> + */
+> +struct slr_entry_policy {
+> +	struct slr_entry_hdr hdr;
+> +	u16 revision;
+> +	u16 nr_entries;
+> +	/* policy_entries[] */
+> +} __packed;
+> +
+> +/*
+> + * DRTM Measurement Entry
+> + */
+> +struct slr_policy_entry {
+> +	u16 pcr;
+> +	u16 entity_type;
+> +	u16 flags;
+> +	u16 reserved;
+> +	u64 entity;
+> +	u64 size;
+> +	char evt_info[TPM_EVENT_INFO_LENGTH];
+> +} __packed;
+> +
+> +/*
+> + * Secure Launch defined MTRR saving structures
+> + */
+> +struct slr_txt_mtrr_pair {
+> +	u64 mtrr_physbase;
+> +	u64 mtrr_physmask;
+> +} __packed;
+> +
+> +struct slr_txt_mtrr_state {
+> +	u64 default_mem_type;
+> +	u64 mtrr_vcnt;
+> +	struct slr_txt_mtrr_pair mtrr_pair[TXT_VARIABLE_MTRRS_LENGTH];
+> +} __packed;
+> +
+> +/*
+> + * Intel TXT Info table
+> + */
+> +struct slr_entry_intel_info {
+> +	struct slr_entry_hdr hdr;
+> +	u64 saved_misc_enable_msr;
+> +	struct slr_txt_mtrr_state saved_bsp_mtrrs;
+> +} __packed;
+> +
+> +/*
+> + * AMD SKINIT Info table
+> + */
+> +struct slr_entry_amd_info {
+> +	struct slr_entry_hdr hdr;
+> +} __packed;
+> +
+> +/*
+> + * ARM DRTM Info table
+> + */
+> +struct slr_entry_arm_info {
+> +	struct slr_entry_hdr hdr;
+> +} __packed;
+
+Shouldn't these three structs be added as part of their
+separate per-vendor enablement patches?
+
+> +struct slr_entry_uefi_config {
+> +	struct slr_entry_hdr hdr;
+> +	u16 revision;
+> +	u16 nr_entries;
+> +	/* uefi_cfg_entries[] */
+> +} __packed;
+> +
+> +struct slr_uefi_cfg_entry {
+> +	u16 pcr;
+> +	u16 reserved;
+> +	u64 cfg; /* address or value */
+> +	u32 size;
+> +	char evt_info[TPM_EVENT_INFO_LENGTH];
+> +} __packed;
+> +
+> +static inline void *slr_end_of_entrys(struct slr_table *table)
+> +{
+> +	return (((void *)table) + table->size);
+> +}
+> +
+> +static inline struct slr_entry_hdr *
+> +slr_next_entry(struct slr_table *table,
+> +	       struct slr_entry_hdr *curr)
+> +{
+> +	struct slr_entry_hdr *next =3D (struct slr_entry_hdr *)
+> +				((u8 *)curr + curr->size);
+> +
+> +	if ((void *)next >=3D slr_end_of_entrys(table))
+> +		return NULL;
+> +	if (next->tag =3D=3D SLR_ENTRY_END)
+> +		return NULL;
+> +
+> +	return next;
+> +}
+> +
+> +static inline struct slr_entry_hdr *
+> +slr_next_entry_by_tag(struct slr_table *table,
+> +		      struct slr_entry_hdr *entry,
+> +		      u16 tag)
+> +{
+> +	if (!entry) /* Start from the beginning */
+> +		entry =3D (struct slr_entry_hdr *)(((u8 *)table) + sizeof(*table));
+
+Back to the 'entries', the above line can now be made more readable:
+
+entry =3D table->entries;
+
+That's just one example, this flex array simplification can be made
+in other structs in this series, too.
+
+Cheers,
+
+Kim
+
+> +
+> +	for ( ; ; ) {
+> +		if (entry->tag =3D=3D tag)
+> +			return entry;
+> +
+> +		entry =3D slr_next_entry(table, entry);
+> +		if (!entry)
+> +			return NULL;
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +static inline int
+> +slr_add_entry(struct slr_table *table,
+> +	      struct slr_entry_hdr *entry)
+> +{
+> +	struct slr_entry_hdr *end;
+> +
+> +	if ((table->size + entry->size) > table->max_size)
+> +		return -1;
+> +
+> +	memcpy((u8 *)table + table->size - sizeof(*end), entry, entry->size);
+> +	table->size +=3D entry->size;
+> +
+> +	end  =3D (struct slr_entry_hdr *)((u8 *)table + table->size - sizeof(*e=
+nd));
+> +	end->tag =3D SLR_ENTRY_END;
+> +	end->size =3D sizeof(*end);
+> +
+> +	return 0;
+> +}
+> +
+> +static inline void
+> +slr_init_table(struct slr_table *slrt, u16 architecture, u32 max_size)
+> +{
+> +	struct slr_entry_hdr *end;
+> +
+> +	slrt->magic =3D SLR_TABLE_MAGIC;
+> +	slrt->revision =3D SLR_TABLE_REVISION;
+> +	slrt->architecture =3D architecture;
+> +	slrt->size =3D sizeof(*slrt) + sizeof(*end);
+> +	slrt->max_size =3D max_size;
+> +	end =3D (struct slr_entry_hdr *)((u8 *)slrt + sizeof(*slrt));
+> +	end->tag =3D SLR_ENTRY_END;
+> +	end->size =3D sizeof(*end);
+> +}
+> +
+> +#endif /* !__ASSEMBLY */
+> +
+> +#endif /* _LINUX_SLR_TABLE_H */
 
