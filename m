@@ -1,84 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC8A4F5E6;
-	Fri, 29 Mar 2024 09:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF3F58231
+	for <linux-crypto@vger.kernel.org>; Fri, 29 Mar 2024 10:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711704695; cv=none; b=DJmThGbAIA4mcuBsDR1LJC+L0BZp1oFHY7pA+SfFC6Q1cpeXGkEzkKCay15wQc6tYcATsZMTGWQh4P8lzox1UJR3vUilPjX62sWPDUAEBOgyQ8A4ap8h4LptWy8qnCGQLckACtjW8qxlCXBul+EhOMQSM06mMvhRmPIHNedjUkw=
+	t=1711708055; cv=none; b=bJm6TOi7v2h8H6ATeepw48FhQUe9EfJQtx3+l3jiwCoy4OzbZYugtYTRP/0+xxfYO+aJjd0qziCLfwCG19LFGq/QdBcg1Jgr//YjdRYm8cEdng7ZR/J76dq6NHUhU7lpd/gesP/vDHhS7b0cXZ8RyEh3ZILqFnOxpQXi2cfadLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711704695; c=relaxed/simple;
-	bh=22g7mmTzwyhTsP+0wGXlDY7nA4zn4oruXJTUzUq+dRQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m3EDa6PlgdvizTekpI+Sj1nXzfr2pzXZUdB0VT1L7VWoBqYfXPTKNag/VoH8bQ84rmbSnVgp3uvYSoODQ9XSwRhhq2ARmFFq+4ejoQmgVHPwcikZxvcO1dy7gWfzrcKcAaRjZXDKIl+/mOm2o5wqU0k/XW9KIaz09u3Fba6l/zI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jq6iCQ5z; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711708055; c=relaxed/simple;
+	bh=n8h0843dN8D5vA/PkugrZHKUYOVTJ3ipk22+mvTL/rQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NRZW6bI5bEVb1FoBiEqBo4Ri+zz4QvZziSYzIg5avc87Rh5cpSW2z1RvKiEVXRMQ4veOW+KScCnUqRFu/a7jKLkQNSzBzBPcusMkQtzq6IKu6qKGytCMPz+bBz9xGjOyRxE9uV58XVix3p74QBpdoGoKIK4USOjbqdeOMH4mP+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=dyuwjWZU; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jq6iCQ5z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53D97C433C7;
-	Fri, 29 Mar 2024 09:31:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711704694;
-	bh=22g7mmTzwyhTsP+0wGXlDY7nA4zn4oruXJTUzUq+dRQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jq6iCQ5znoerRWqIp7rCQTKYh9nrasdXnhphKKBvFgJM+XGHhgofkct75A0ZslnV9
-	 HieVjvWr0eISQ1l21D8eGPxRSLZu0zEPjArajBlO02hekmm9u/ptD/cjO87u0PRJ8m
-	 qEnkSjLsI42+GmcMnMc9zXwIKz/gGDVa7XFjNmGh0DtEjAnUQfh3FKdzsdXDkJUn+0
-	 gx1hLCfMMjV28kUkxIeoUKJBzAYKHS7x1QQ38zY2CpAGGmLdYow28MYuPgbXhegEv/
-	 3Szpmx5OOzYZ8DtlgiK8s+VyzlfA8+2XAZLrbBlbir6b2J2i1tSLtbelbi9kefoQk7
-	 7FVvMwIDs6KIA==
-Date: Fri, 29 Mar 2024 02:31:30 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
-	"Chang S . Bae" <chang.seok.bae@intel.com>
-Subject: Re: [PATCH v2 0/6] Faster AES-XTS on modern x86_64 CPUs
-Message-ID: <20240329093130.GA65937@sol.localdomain>
-References: <20240329080355.2871-1-ebiggers@kernel.org>
- <CAMj1kXEupfkpe98PdtbxQbtx1z5J_fZFPzT7wJ2tsJnCT9uaxA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="dyuwjWZU"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-513d212f818so1993685e87.2
+        for <linux-crypto@vger.kernel.org>; Fri, 29 Mar 2024 03:27:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711708050; x=1712312850; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uPUqPHiAYDsvF7c6mpbUarOnTLvyyWG07eUiOIJt2gQ=;
+        b=dyuwjWZUfGWzJVysscD30kfuI2gyGOnYyqbGUlDCiWGyqIwspDyRcAC9eFt55TQL4N
+         WILwNtOpVmkAH6RhWJ5Env6RPZV06CR7mPyYYVYbhe3cH5Lkf2lHDRGq8DvyUcF8mDZK
+         RY4O9ESRZG2Von8kNqG99fYZs1oYfSfZ6QPfSiXa0Whm+GooCBUofQDP8KzW+V2gl/Ks
+         m4V83+ciic4KyZm5qF+aYKpJ6koSYpKheZAUuqpjyqFKfTpxRWd+WM0zyf54/DaM9Cfu
+         hEIMEmDg629P+tLfaGcJ5JJkJPLzByeLVH5rL9j0QQUHqoxyFDOj2qrT845zjvviERic
+         cYOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711708050; x=1712312850;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uPUqPHiAYDsvF7c6mpbUarOnTLvyyWG07eUiOIJt2gQ=;
+        b=C5g/VOlZtOCnQJ0F938Fali7PBGKi6bJ/2Uq3In/k5alT8E8B3aC0Fbx6oqNaAUH/Q
+         DtI9ZmTLbWHJPgEGfDKNv0EyNRP/aUkEv0IZ13sY8z+1VyK+mCIqzz2E4pL7AC31HjQ7
+         ikuL6yxBZJvPlPltP+ohbYsotpDfXz2LdWYg7mOExrDnoq4SUgjnRg2PZntU4L1fiG5W
+         3b8//FVPUB8Nz6jBmwiGQAGIFEc9gtGumn8jDAjrnl7oldRCSk+UKAgvqk0swW/4GIQB
+         P5hOYNvehzxzDzo7vVpMnMNfX1L25P7crTAzHMFbiPHqblL7X1zDuk7enxUqsw732y51
+         JwFg==
+X-Forwarded-Encrypted: i=1; AJvYcCUvyjF2f9hHRvcJJSGxhJOxzh3bNN7VAe8ZKwctn9cJQIm4uh+9H/u9lWyJG8LuzCeSvltx8IxpJjk0tSTi0HAnztpxsilui77BO5cQ
+X-Gm-Message-State: AOJu0Yy3IFFSES+EuzTqqKsrmNVfk+yMB5NWE92F2X0iU10kFctqV6X3
+	ocmT1xeL8AfcHqfTPENshVspnR1ADgn6sfApWAbkpVpiQAx+SK7vI7B7qV3QCW4S8kfl6iYZdcS
+	LDiPkYv48/g8J8vZ6bJomGaipCMQGOO8yo8JoVg==
+X-Google-Smtp-Source: AGHT+IGkJetMoIDH9w2TQurNFFXLK7XsHfl+lPbtCC+0MeMFYTkyF7Alb8el7pzIkiwo9JvBX9h3ULKBGoxrg4XKpUU=
+X-Received: by 2002:a05:6512:33ce:b0:513:af27:df1c with SMTP id
+ d14-20020a05651233ce00b00513af27df1cmr1559870lfg.11.1711708050041; Fri, 29
+ Mar 2024 03:27:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXEupfkpe98PdtbxQbtx1z5J_fZFPzT7wJ2tsJnCT9uaxA@mail.gmail.com>
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org> <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+In-Reply-To: <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 29 Mar 2024 11:27:19 +0100
+Message-ID: <CAMRc=McY6PJj7fmLkNv07ogcYq=8fUb2o6w2uA1=D9cbzyoRoA@mail.gmail.com>
+Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Richard Weinberger <richard@nod.at>, 
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
+	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, David Airlie <airlied@redhat.com>, 
+	Gerd Hoffmann <kraxel@redhat.com>, Gurchetan Singh <gurchetansingh@chromium.org>, 
+	Chia-I Wu <olvaffe@gmail.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
+	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
+	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal <vgoyal@redhat.com>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, virtualization@lists.linux.dev, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-um@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, 
+	netdev@vger.kernel.org, v9fs@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
+	linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
+	linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 29, 2024 at 11:03:07AM +0200, Ard Biesheuvel wrote:
-> 
-> Retested this v2:
-> 
-> Tested-by: Ard Biesheuvel <ardb@kernel.org>
-> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-> 
-> Hopefully, the AES-KL keylocker implementation can be based on this
-> template as well.
+On Wed, Mar 27, 2024 at 1:45=E2=80=AFPM Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+>
+> virtio core already sets the .owner, so driver does not need to.
+>
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>
+> ---
+>
+> Depends on the first patch.
+> ---
+>  drivers/gpio/gpio-virtio.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
+> index fcc5e8c08973..9fae8e396c58 100644
+> --- a/drivers/gpio/gpio-virtio.c
+> +++ b/drivers/gpio/gpio-virtio.c
+> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver =3D {
+>         .remove                 =3D virtio_gpio_remove,
+>         .driver                 =3D {
+>                 .name           =3D KBUILD_MODNAME,
+> -               .owner          =3D THIS_MODULE,
+>         },
+>  };
+>  module_virtio_driver(virtio_gpio_driver);
+>
+> --
+> 2.34.1
+>
 
-As-is, it would be a bit ugly to add keylocker support to my template because my
-template always processes 4 registers of AES blocks per iteration of the main
-loop (like the existing aes-xts-aesni), whereas the keylocker instructions are
-hardcoded to operate on 8 AES blocks at a time in xmm0-xmm7, presumably to
-reduce the overhead of unwrapping the key.
+Applied, thanks!
 
-I did try an 8-wide version briefly.  There are some older CPUs on which it
-helps.  (On newer CPUs, AES latency is lower, and the width increases by moving
-to ymm or zmm registers anyway.)  But it didn't seem too attractive to me.  It
-causes registers to spill, and it becomes a bit awkward to unroll the AES rounds
-when the code size is twice as large, so it may need to be re-rolled.  I should
-take a closer look, but I decided to just stay with a 4-wide version for now.
-
-So I *think* AES-KL is best kept separate for now.  I do wonder if the AES-KL
-code should adopt the idea of using VEX-coded instructions, though --- surely
-it's the case that in practice, any CPU with AES-KL also supports AVX.
-
-> I wouldn't mind retiring the existing xts(aesni)
-> code entirely, and using the xts() wrapper around ecb-aes-aesni on
-> 32-bit and on non-AVX uarchs with AES-NI.
-
-Yes, it will need to be benchmarked, but that probably makes sense.  If
-Wikipedia is to be trusted, on the Intel side only Westmere (from 2010) has
-AES-NI but not AVX, and on the AMD side all CPUs with AES-NI have AVX...
-
-- Eric
+Bart
