@@ -1,443 +1,289 @@
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2095.outbound.protection.outlook.com [40.107.237.95])
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2079.outbound.protection.outlook.com [40.107.212.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157B128DCA;
-	Fri, 29 Mar 2024 22:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DAD13EFEE;
+	Fri, 29 Mar 2024 22:59:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.79
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711752070; cv=fail; b=iT73yaJATXPF6TexZMUEAV2/sxEWzNiLK5TUnvPX0Cy2E14qbaNwPyBNeqaglJ//Jx+6uFKjnxeQq+z+nMgdQg7F1U37PDX1ZUB+DIlOCzOGWxC06t1YWT90Ew/eW+Rh3ApI8I72qztLjrFodKVarmzb+wwckGDk0XXy7Qh/CJs=
+	t=1711753153; cv=fail; b=BYbUnnfXmxEtv1PkrIHV+7kzVO0y3a1Ye+F4TRsm29EL0omYnNLvNDSQwPMrK6Z80fnDzyU2l8EfE3Fm6gpXmT0qiFAbN87V7eOZwJzuqVAJ70gFqLeQEMXZ56g8tSRZScOkyyPbWGrEyHg/1rRmBrm3pQuOvLWGoHZ3WptkQF8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711752070; c=relaxed/simple;
-	bh=+qwRVQtAUFwc+mzfaMAXarOygq0dR3IZtuet68K/Fyc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=G29ZIU+yv38ZuTtXNi+N8C9Zhwjmp44eIvzsKJgCft7KwIkeThqwQKY9NS8L4PwEr46ODNkpxKhj/5OKv8BT1YCNoJfs/awO/a9KJkRV+vJZaAlNqOJlgGXBdjfLBdz3f3I2QS98P/ZBr6R+qHJydYb7baxyGFy6LT11pI9R0o0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QMl5bUwl; arc=fail smtp.client-ip=40.107.237.95
+	s=arc-20240116; t=1711753153; c=relaxed/simple;
+	bh=32N0Xx4fpPiGgE4gdCbkfdfNikRkU8p14GCc9880qic=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X6h1fEpizL+9h9BpHNiFVub3+3P5w3JD0lfdk8PZptPGziwiP5AnrmvxqeGRjE4W5Le1zkKGCVue4EUqS+y04Y+rXUZSUK9J9lyDqkdMCJHY1wU1Byy/7PBF40xIkza8bvGO9bcWbA8C/FJ2d55TKdQO+/guAX1pBzwbXtegNUk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=q9r7dIZC; arc=fail smtp.client-ip=40.107.212.79
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QMl5bUwl"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="q9r7dIZC"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BkkM76oyZTz2Q2LpBR6pBvhemX3+VK0fBLimXRngfvWCLdPfuoYo/vDDc9RbYD4UJCpFX6s1jEACDTyMlHtRFRtONzRJPjfA5pmccOwplO8CEa6s0ovxM9Hl35Er48H48WBDOpZd1uPtQB3DDta7kBsPc3EIceVFUm/Gm1wTOx55QotP37QBX1KD8mX4WMa0LZynfQjnkStLhLnWXcdQwsSPer6kiUjqteQovSGXfh7YMRVKbeMRw21NQro0Qy+gQ/LA6DPgby5/cQICN4eDyYN95UrX4YKucYI2oBsPICG3c8q8kvw9fCtKbZwnr1grISQQtUC1KNVzYdiMagOGFA==
+ b=CA9+EpoNiZ9ayMmuF+uTwSeBjPBlCFrkeWODbOoFlUQYPDABUEHwtqo28a8PW/imB4XHrnE6Mt7E6/eCJocLwL2ciZisEmC7AJ22GL9xbPbPArTsRqEhdNCCbYLP8qWdMy7FpFKDiSu99P3EtkWJOVuZR6wJ1zXPkVsxJAHxQ1NZ77Qa85K/ObPQ8AXhBmWwf+YD98Gd+ZIg+6gXsRxooicVQa7Y3DkW94F4Dp2asJhZho3IOy1uRIKUanolI+9CLEqcJE1wd8Pj9ElUfYP1G1okbc8A1YOlkTe5b9ULGwMufalRk2pkDIBD7XR36PUU/mnLms1Qwwj+VM+0nGkajg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lm2yVCaf9RoiDruxpEx206c6phucY5FX3RMdmFeXZ9k=;
- b=RDOAGF7+Ik4xDCrKfFjYUaCEgFCp8rPLEoyGEJGfpLOXNIa7YWeEWzZ1VotCI/ZUgTSOVN6QiqcPcDBe5GBx9DmXLKN4YMa19/hFyoPmXJz6oq65UWNMaTUYLl0AXj/clPXTRfxyopcl4hYjwIcO71g4dftgFJvWksN77W1OGtqxvf8pbLNnC0Zgx3QmEOw2m5F4R8LYVLl/bBFar8vjgNGERX4KUT1jJPql2hneEZv8TzpArkgEtYh2C0+YAbEHtbkVjmyx76VGDNFvy3BkIlL1Pl871ZsykDD0NONy0TJd+zaD5o2zx4yCgWb8Y8juLnwrKvehR4dlgdslxCuzqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+ bh=85xfxLH74OdKCMM2bG4Ka/efKmeDa+urj4S6khYBEhI=;
+ b=XUVPXyEnaWzdYWoJNkvqerhl6Svq2T8m2knayzG2+AeIbpHftkICKGYxj3BhyGshE2fO6TH9GpjHVrVPkK/+CpJ64AIdKw86jsY6ZbM8HQwf8klvQ5RxPozzGqx8MCi//iIwzzm3KPNqhj3Ww+jF4+8AE9bU9otOpkMOebIPanjg1MidwxVrLnfjkq7hfRkk/I+aj940z2p1XCAH17I0WNoHu8EhR4AyoCVtX/44RDF24bsnopzDbUsoOPAjhJ/fk/qtp+XVd5ANyraXcDOdxzpXNzWDFF6h5vNh9oBEnYh/p27lBZGuXOhT4rZfFcCDSYu2vULKOAr2b0ovUb+ebg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lm2yVCaf9RoiDruxpEx206c6phucY5FX3RMdmFeXZ9k=;
- b=QMl5bUwlMCq6WdH4tCDHxZVKXNBku4/gXeVQ0tOLa0L6+pc48BPHNHT7qZrod8KvPGtXue3FRb7oTQXlMpourqiZouj8qHTvXYQHCn2cmmywW2ROkv52VRi3CV/u471+HApu4l8pEYs1PhJ1Ycjjvse/PRcpKPKO/VLPR5Dq27w=
-Received: from DS7PR12MB6263.namprd12.prod.outlook.com (2603:10b6:8:95::17) by
- SJ1PR12MB6217.namprd12.prod.outlook.com (2603:10b6:a03:458::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7409.33; Fri, 29 Mar 2024 22:41:02 +0000
-Received: from DS7PR12MB6263.namprd12.prod.outlook.com
- ([fe80::b286:7d11:bee0:2d37]) by DS7PR12MB6263.namprd12.prod.outlook.com
- ([fe80::b286:7d11:bee0:2d37%4]) with mapi id 15.20.7409.039; Fri, 29 Mar 2024
- 22:41:02 +0000
-Message-ID: <8d543a15-af62-4403-b2e0-3b395edfe9e4@amd.com>
-Date: Fri, 29 Mar 2024 17:38:52 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 04/15] x86: Secure Launch Resource Table header file
-To: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org
-Cc: dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, ardb@kernel.org,
- mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
- nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
- kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com
-References: <20240214221847.2066632-1-ross.philipson@oracle.com>
- <20240214221847.2066632-5-ross.philipson@oracle.com>
-Content-Language: en-US
-From: Kim Phillips <kim.phillips@amd.com>
-Organization: AMD
-In-Reply-To: <20240214221847.2066632-5-ross.philipson@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN1PR12CA0079.namprd12.prod.outlook.com
- (2603:10b6:802:21::14) To DS7PR12MB6263.namprd12.prod.outlook.com
- (2603:10b6:8:95::17)
+ bh=85xfxLH74OdKCMM2bG4Ka/efKmeDa+urj4S6khYBEhI=;
+ b=q9r7dIZCmGAMsb5Qf5qevjsO+u2qguOTQwgvMMQeTMWFxL30f5651Ih1rIv4M6gqyWlZAEDGO0VJA6/trmWh7JWA1JQmddseBxmacNU4bozvpuXx54+2xHpPUF3BfBuyIDYp3RuPMt3lUtS6+dQfKoYUuLkX31Den1QT9hFH4FA=
+Received: from DS7PR03CA0074.namprd03.prod.outlook.com (2603:10b6:5:3bb::19)
+ by SN7PR12MB6861.namprd12.prod.outlook.com (2603:10b6:806:266::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40; Fri, 29 Mar
+ 2024 22:59:07 +0000
+Received: from CY4PEPF0000FCC4.namprd03.prod.outlook.com
+ (2603:10b6:5:3bb:cafe::79) by DS7PR03CA0074.outlook.office365.com
+ (2603:10b6:5:3bb::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40 via Frontend
+ Transport; Fri, 29 Mar 2024 22:59:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000FCC4.mail.protection.outlook.com (10.167.242.106) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 22:59:01 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 Mar
+ 2024 17:59:00 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: <kvm@vger.kernel.org>
+CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
+	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
+	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
+	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
+	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
+	<ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
+	<brijesh.singh@amd.com>
+Subject: [PATCH v12 09/29] KVM: SEV: Add initial SEV-SNP support
+Date: Fri, 29 Mar 2024 17:58:15 -0500
+Message-ID: <20240329225835.400662-10-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
+References: <20240329225835.400662-1-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6263:EE_|SJ1PR12MB6217:EE_
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC4:EE_|SN7PR12MB6861:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8a450cd9-fdcd-4e47-ed16-08dc5043d334
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	Hkl8K+NUU2xWpYzCX8iWlZCRIWfimJSM5pZ+gyjCjEOSL9P3Rn9yyjmZPpvXl3BxjwRv/Cuh5ARzlvVKIDJQNknQ+d9K98CwpJ6AG1WgKw8W/W1P4HYReUgaauK+aeb3mU2y61lAnHTQ3UutFp9RR5La01iCOkdNx7tX7tHj64Xn2m0lZdu4aahAw7jDi8kiVarGCtHi1SYN93JWcJeGfur9hrKFPBXEq5qyZe2qrUjzW1RBkE0EU1dA20+IEQacqFdX2s9hq/KatEZz5elGbJ2HvS67b239PYcUDEuXxQD7QK3UMILH8ejMlh2k2rRZmnLykNRbEuw7fCSlAT1OwinM80debtnCjVK+99ISveNjFJ0rqFqcc7Z1SKr49EbuiI/pSO2qOrPXjIoMi0LOM38OU4IDG+QzFFHpfVfu85RQg4dvDdMW2HpVnpQzwlwK5OAJhZ/ox3f/OhAizj7rmhbmSY527shjIkG3d6wbLA7LKaUdzB/8JZPGalCjvDkLwH1OmNE8fsgsIy/RSZpf127efi7ROacRLZCh6SJPGWdyuT4UkObzNajAtVe7PDGRWLhPpXCpCYFawvQEJIX0VT3//a/59t0c7N7YZghjEOrjaxif3qE6/rjtvCOKfdwGKU9p5gNTL1MSzSYO/V1ZmMdyRHtgaN+HY7oYjlH9QKA=
+	nsYawN22RK6vpJl8VU3uLdBNz2wKwfigLe9u15MYJjT0NXQV3Yzjn6a1OjYj4LPzeDO8cf52t0bld23f73IhgDjhPepqbc7IwHTzPhZ/pO0fb1Dc4F6dPKSdnsPrwbyyhJI21uoEBXlb9DpAIEIBOyVjZmH+wtq/OnN34HGIHNnAASx0iEdmOS44o1oEugf+lFgXmiA6AQWu+IikoKRj2YItSH3Txq0G7BC/TRGiWq2KqdmgFh+n5Hsot5lhcjxEP+iWzkso8UiBcRHFE8Sju6gjTCdVv1uIDSSjI3OvUAubuGZeTloeeL4ALMLAdXglcVDTAeML83k7xVUpdU2UJQx0wb/97jBfBau1zhrRC78B3NehLm2mU8sjwnExhuP/MfHsbmuX5VvLn2CPH9T81lSMjdxVYlZI/ytN2lzlTQ6vcxI+8hSPG9PpG923elprnKSAI7fsLuCaIOF+SPmZqnI+RcAfIX4fms89ZDSC6lffhLHDFAraZ3I86fN9ZemKTUgctwPvboQCfEG3mDxYzLPPQYhchCxYb1wWaG8jFR5sFSVsrE7JQ/SDBGTYpRHKn9KLxD3rVWSX7nTCof7mJAPHXd2W0DPkpcx9TiDMdcZ4+2WH9Ez1YUqwMRjAYVmxwirJl9RK3NI4in6GXQmovhcw4JB7RQikwOS3iiudBKTtfKGD6mR80tiSkJb9G8Bw9pvoQHQlT6bQl8BXfRTgx5cMzVuv0ny3ytgj4cr3PKrxvNDbOm6IUcK3cMc8E9Ls
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6263.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(376005)(1800799015);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WHlDbnV5TnB2SlVNYjVRbUlLRUh0eEVBZkkxMlg5dmMvRDJLRGZ6cXV3Qngr?=
- =?utf-8?B?aWhIdTNkVHUwQThydWlDU081WGd5TUF5U2ZoamVIcWx4UHJxTVJzLzNXd0xw?=
- =?utf-8?B?MmdVUkx4OFJRNW9TUllwOXY1WlZIcDdubEwzWmY5WlZ6WUpOK0RlRE9ocjhD?=
- =?utf-8?B?K0RhWll1eHlLOE0vMVhHNU5pVTlDUkZCK04xemlheFZGbDVONlVodmZvVjg4?=
- =?utf-8?B?UEZRS09TYkUzN0hIL0hidVBjdjV6RWYwZE1oT1VPVGJmd2Q2bGZmaHMzdUlx?=
- =?utf-8?B?V1d2UUxYNzRlTkliMTVqd3B1VldjOGJVTDZxZG5KNC9yUk5KSXFYSGlXSUNH?=
- =?utf-8?B?anFvN21Xam5zYjZqeEZlc2NaQkJZV0hWOTVzT1ZMaUppejdNYlErNWlyM00y?=
- =?utf-8?B?dE9BU0x6dUpycWUxUERQTTA0cEF4bzEwczIyYzFaT05GV3NHS1d3SHo4aExQ?=
- =?utf-8?B?TG5CSkNJTS9URC94YlAxbHRkRW5oSXRpZENrQnJ6V0RrbTBBU0RDSmY4N2dm?=
- =?utf-8?B?RkQwN3dtK3M4V3JYdlFVM2RSdFJja3NEVFQ4ZTMvTFZvMm9KcisxZk83QVJU?=
- =?utf-8?B?b1NQOG5naURkeWNjeFlwaWtObytydytpT0xpMDlZd2V4cnpVNHR0OVlETmtn?=
- =?utf-8?B?TDhETUxicVJSTW1OdUpiQ1BCZ2FMUVczUFhDSW1UeXNZbnR6ZDVBS0NtM0JH?=
- =?utf-8?B?MzFUeGt5SUM2YnRwOXp2WDI2WW93TEdoMytIS1RyN2N1QXk0RitHaWtIZXZw?=
- =?utf-8?B?QTRLcVZzUlFtRG1JSE56VFhjY2dFZEhuUDUvK0pOeC9vYVpVaUN0YTh5Nm9E?=
- =?utf-8?B?RUs5TDQyWTc2RmlDM0NkTks2ZTZIU1ZWMFNER05XOGh0amxYbTRZUjhlWlcy?=
- =?utf-8?B?aWh4eDZlMGNETTRSVFF4dU5BMDJZMW9hdk9NZzhVdDNtck9ncWdGYWNyaDJl?=
- =?utf-8?B?ZXlIY0V0V05ibHBBTnAwOTVNQmFrai9KNDFyUlA5bzhPQ1ptT2UyL3dIUk4w?=
- =?utf-8?B?WWhxa01Mb21pTk5iQ3NvMmxvSHBqald4dng2WXdkTUZEenptUTNVenV6VFVa?=
- =?utf-8?B?M3NkM2RTRS9tTEFEZFVxdHpQMVc5RlpncnhZRnB0SXJNUmlLRTFZQlA3Z1BQ?=
- =?utf-8?B?ZnF3UDN0Um1NR0h2cVZGdWIwUTEvdjkyVEUrSCswL01PdTZWSEhpeG1EKzBt?=
- =?utf-8?B?UGtBY1lhckVQaWhRK0dZSVpuMXlnMmtxSHAyZ0p0bzdyakJHQzlWNjVyalY4?=
- =?utf-8?B?Nk1rUzc2Z0cydFl4elJnOEJreEhKY1dYd2h2R1R1djJzc0FEUVU2U05UYzhM?=
- =?utf-8?B?UG1pKzRiK2RLNHIzbFA1aGJGaDlRanVZZlFIVkViVzZlMWFpcFUvZ0t5UVlO?=
- =?utf-8?B?ZnBwcW1qQ0RRK0tHcTdFQjM2d2t6MWxYajJtYkNjSlQwODFHSWhTcUhwOENP?=
- =?utf-8?B?Q1VGc2VvNWd0cjYwd0p5VXl4bmFsRFBrOTYrellCOG4yWkNrTi9YdkNlVUpp?=
- =?utf-8?B?ZS9Dekp2KzB4ak4rQktURzNpT0FkaC82bFlxK1F1VjV4QTdyajh4Qlp3UGd0?=
- =?utf-8?B?MWIvUEtydWhzS0VBMExSY1AvZDkvYzNyOGVudUNITExPcHI4RERSUHh0RHBT?=
- =?utf-8?B?Y2MvSjBBclFXNnNDZ0g5QjhSRTJTb1gvOUxkRFczRWpMc29iQWF3QzN0Rzcv?=
- =?utf-8?B?OXdFa2N2OEFaOU84eXZMZ1pOTUljM0tpbDJKOWxsR1h1OE1pRWpTeTMxVU42?=
- =?utf-8?B?RmRwRnhydzVCTEl6a2ZIWmxkTzBSUjBnbDRtbXZVSTVKT0crK1huN1dLMTFu?=
- =?utf-8?B?ZEo4UzlaRmErOFRDUVNTWVQybUhGelhhNjdwZTM0c0NGeDF0ZVdBZmgrWDd5?=
- =?utf-8?B?ZnRKNXpsSTR0NkdZZkxPTWRRTmFJRGRyc0oxT1hOVWJpR3hRM0FzSS8vS0Fi?=
- =?utf-8?B?RzJiZ2xCUTM4dmcrWWJ5NG1xZCtTOXRKNVFXWm1GREZGdlJYbkh4M3c2ckk5?=
- =?utf-8?B?MGxIQnJuYXJpbmQ5THFCTjZqUzkyTEtpbjF0K3hvdk5teWVNMXJJbHNoLzdN?=
- =?utf-8?B?ZnFvU0t0YVlnUnJuUzBDVUVWZ3JKWFZGQVFUQVF3NFAyeVlyaEFNRTdxcll4?=
- =?utf-8?Q?zvdhYQzh59VITtzKjJgRMSRq2?=
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(1800799015)(7416005)(376005)(36860700004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5fcf4d61-e37a-4595-254c-08dc50414fbf
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6263.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 22:41:02.2410
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 22:59:01.5166
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8a450cd9-fdcd-4e47-ed16-08dc5043d334
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ilGgkrAbN/QGxCRDsFAVzxGCrnuii09s15bGN/0TY5T4fJ/decyRW+CsMzueQ3DxrQoL7F9fC4wqSyBOwuyPuw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6217
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000FCC4.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6861
 
-Hi Ross,
+SEV-SNP builds upon existing SEV and SEV-ES functionality while adding
+new hardware-based security protection. SEV-SNP adds strong memory
+encryption and integrity protection to help prevent malicious
+hypervisor-based attacks such as data replay, memory re-mapping, and
+more, to create an isolated execution environment.
 
-On 2/14/24 4:18 PM, Ross Philipson wrote:
-> Introduce the Secure Launch Resource Table which forms the formal
-> interface between the pre and post launch code.
-> 
-> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
-> ---
->   include/linux/slr_table.h | 270 ++++++++++++++++++++++++++++++++++++++
->   1 file changed, 270 insertions(+)
->   create mode 100644 include/linux/slr_table.h
+Define a new KVM_X86_SNP_VM type which makes use of these capabilities
+and extend the KVM_SEV_INIT2 ioctl to support it. Also add a basic
+helper to check whether SNP is enabled.
 
-> diff --git a/include/linux/slr_table.h b/include/linux/slr_table.h
-> new file mode 100644
-> index 000000000000..42020988233a
-> --- /dev/null
-> +++ b/include/linux/slr_table.h
-> @@ -0,0 +1,270 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Secure Launch Resource Table
-> + *
-> + * Copyright (c) 2023, Oracle and/or its affiliates.
-> + */
-> +
-> +#ifndef _LINUX_SLR_TABLE_H
-> +#define _LINUX_SLR_TABLE_H
-> +
-> +/* Put this in efi.h if it becomes a standard */
-> +#define SLR_TABLE_GUID				EFI_GUID(0x877a9b2a, 0x0385, 0x45d1, 0xa0, 0x34, 0x9d, 0xac, 0x9c, 0x9e, 0x56, 0x5f)
-> +
-> +/* SLR table header values */
-> +#define SLR_TABLE_MAGIC		0x4452544d
-> +#define SLR_TABLE_REVISION	1
-> +
-> +/* Current revisions for the policy and UEFI config */
-> +#define SLR_POLICY_REVISION		1
-> +#define SLR_UEFI_CONFIG_REVISION	1
-> +
-> +/* SLR defined architectures */
-> +#define SLR_INTEL_TXT		1
-> +#define SLR_AMD_SKINIT		2
-> +
-> +/* SLR defined bootloaders */
-> +#define SLR_BOOTLOADER_INVALID	0
-> +#define SLR_BOOTLOADER_GRUB	1
-> +
-> +/* Log formats */
-> +#define SLR_DRTM_TPM12_LOG	1
-> +#define SLR_DRTM_TPM20_LOG	2
-> +
-> +/* DRTM Policy Entry Flags */
-> +#define SLR_POLICY_FLAG_MEASURED	0x1
-> +#define SLR_POLICY_IMPLICIT_SIZE	0x2
-> +
-> +/* Array Lengths */
-> +#define TPM_EVENT_INFO_LENGTH		32
-> +#define TXT_VARIABLE_MTRRS_LENGTH	32
-> +
-> +/* Tags */
-> +#define SLR_ENTRY_INVALID	0x0000
-> +#define SLR_ENTRY_DL_INFO	0x0001
-> +#define SLR_ENTRY_LOG_INFO	0x0002
-> +#define SLR_ENTRY_ENTRY_POLICY	0x0003
-> +#define SLR_ENTRY_INTEL_INFO	0x0004
-> +#define SLR_ENTRY_AMD_INFO	0x0005
-> +#define SLR_ENTRY_ARM_INFO	0x0006
-> +#define SLR_ENTRY_UEFI_INFO	0x0007
-> +#define SLR_ENTRY_UEFI_CONFIG	0x0008
-> +#define SLR_ENTRY_END		0xffff
-> +
-> +/* Entity Types */
-> +#define SLR_ET_UNSPECIFIED	0x0000
-> +#define SLR_ET_SLRT		0x0001
-> +#define SLR_ET_BOOT_PARAMS	0x0002
-> +#define SLR_ET_SETUP_DATA	0x0003
-> +#define SLR_ET_CMDLINE		0x0004
-> +#define SLR_ET_UEFI_MEMMAP	0x0005
-> +#define SLR_ET_RAMDISK		0x0006
-> +#define SLR_ET_TXT_OS2MLE	0x0010
-> +#define SLR_ET_UNUSED		0xffff
-> +
-> +#ifndef __ASSEMBLY__
-> +
-> +/*
-> + * Primary SLR Table Header
-> + */
-> +struct slr_table {
-> +	u32 magic;
-> +	u16 revision;
-> +	u16 architecture;
-> +	u32 size;
-> +	u32 max_size;
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+[mdr: commit fixups, use similar ASID reporting as with SEV/SEV-ES]
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+---
+ arch/x86/include/asm/svm.h      |  3 ++-
+ arch/x86/include/uapi/asm/kvm.h |  1 +
+ arch/x86/kvm/svm/sev.c          | 21 ++++++++++++++++++++-
+ arch/x86/kvm/svm/svm.c          |  3 ++-
+ arch/x86/kvm/svm/svm.h          | 12 ++++++++++++
+ arch/x86/kvm/x86.c              |  2 +-
+ 6 files changed, 38 insertions(+), 4 deletions(-)
 
-Do these need to have their endianness specified with, e.g., __le32?
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index 728c98175b9c..544a43c1cf11 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -285,7 +285,8 @@ static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == X2AVIC_
+ 
+ #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
+ 
+-#define SVM_SEV_FEAT_DEBUG_SWAP                        BIT(5)
++#define SVM_SEV_FEAT_SNP_ACTIVE				BIT(0)
++#define SVM_SEV_FEAT_DEBUG_SWAP				BIT(5)
+ 
+ struct vmcb_seg {
+ 	u16 selector;
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 51b13080ed4b..725b75cfe9ff 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -868,5 +868,6 @@ struct kvm_hyperv_eventfd {
+ #define KVM_X86_SW_PROTECTED_VM	1
+ #define KVM_X86_SEV_VM		2
+ #define KVM_X86_SEV_ES_VM	3
++#define KVM_X86_SNP_VM		4
+ 
+ #endif /* _ASM_X86_KVM_H */
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 1e65f5634ad3..3d9771163562 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -46,6 +46,9 @@ module_param_named(sev, sev_enabled, bool, 0444);
+ static bool sev_es_enabled = true;
+ module_param_named(sev_es, sev_es_enabled, bool, 0444);
+ 
++/* enable/disable SEV-SNP support */
++static bool sev_snp_enabled;
++
+ /* enable/disable SEV-ES DebugSwap support */
+ static bool sev_es_debug_swap_enabled = true;
+ module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0444);
+@@ -275,6 +278,9 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+ 	sev->es_active = es_active;
+ 	sev->vmsa_features = data->vmsa_features;
+ 
++	if (vm_type == KVM_X86_SNP_VM)
++		sev->vmsa_features |= SVM_SEV_FEAT_SNP_ACTIVE;
++
+ 	ret = sev_asid_new(sev);
+ 	if (ret)
+ 		goto e_no_asid;
+@@ -326,7 +332,8 @@ static int sev_guest_init2(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 		return -EINVAL;
+ 
+ 	if (kvm->arch.vm_type != KVM_X86_SEV_VM &&
+-	    kvm->arch.vm_type != KVM_X86_SEV_ES_VM)
++	    kvm->arch.vm_type != KVM_X86_SEV_ES_VM &&
++	    kvm->arch.vm_type != KVM_X86_SNP_VM)
+ 		return -EINVAL;
+ 
+ 	if (copy_from_user(&data, u64_to_user_ptr(argp->data), sizeof(data)))
+@@ -2297,11 +2304,16 @@ void __init sev_set_cpu_caps(void)
+ 		kvm_cpu_cap_set(X86_FEATURE_SEV_ES);
+ 		kvm_caps.supported_vm_types |= BIT(KVM_X86_SEV_ES_VM);
+ 	}
++	if (sev_snp_enabled) {
++		kvm_cpu_cap_set(X86_FEATURE_SEV_SNP);
++		kvm_caps.supported_vm_types |= BIT(KVM_X86_SNP_VM);
++	}
+ }
+ 
+ void __init sev_hardware_setup(void)
+ {
+ 	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
++	bool sev_snp_supported = false;
+ 	bool sev_es_supported = false;
+ 	bool sev_supported = false;
+ 
+@@ -2382,6 +2394,7 @@ void __init sev_hardware_setup(void)
+ 	sev_es_asid_count = min_sev_asid - 1;
+ 	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count));
+ 	sev_es_supported = true;
++	sev_snp_supported = sev_snp_enabled && cc_platform_has(CC_ATTR_HOST_SEV_SNP);
+ 
+ out:
+ 	if (boot_cpu_has(X86_FEATURE_SEV))
+@@ -2394,9 +2407,15 @@ void __init sev_hardware_setup(void)
+ 		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
+ 			sev_es_supported ? "enabled" : "disabled",
+ 			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
++	if (boot_cpu_has(X86_FEATURE_SEV_SNP))
++		pr_info("SEV-SNP %s (ASIDs %u - %u)\n",
++			sev_snp_supported ? "enabled" : "disabled",
++			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
+ 
+ 	sev_enabled = sev_supported;
+ 	sev_es_enabled = sev_es_supported;
++	sev_snp_enabled = sev_snp_supported;
++
+ 	if (!sev_es_enabled || !cpu_feature_enabled(X86_FEATURE_DEBUG_SWAP) ||
+ 	    !cpu_feature_enabled(X86_FEATURE_NO_NESTED_DATA_BP))
+ 		sev_es_debug_swap_enabled = false;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 0f3b59da0d4a..2c162f6a1d78 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4890,7 +4890,8 @@ static int svm_vm_init(struct kvm *kvm)
+ 
+ 	if (type != KVM_X86_DEFAULT_VM &&
+ 	    type != KVM_X86_SW_PROTECTED_VM) {
+-		kvm->arch.has_protected_state = (type == KVM_X86_SEV_ES_VM);
++		kvm->arch.has_protected_state =
++			(type == KVM_X86_SEV_ES_VM || type == KVM_X86_SNP_VM);
+ 		to_kvm_sev_info(kvm)->need_init = true;
+ 	}
+ 
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 157eb3f65269..4a01a81dd9b9 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -348,6 +348,18 @@ static __always_inline bool sev_es_guest(struct kvm *kvm)
+ #endif
+ }
+ 
++static __always_inline bool sev_snp_guest(struct kvm *kvm)
++{
++#ifdef CONFIG_KVM_AMD_SEV
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++
++	return (sev->vmsa_features & SVM_SEV_FEAT_SNP_ACTIVE) &&
++	       !WARN_ON_ONCE(!sev_es_guest(kvm));
++#else
++	return false;
++#endif
++}
++
+ static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
+ {
+ 	vmcb->control.clean = 0;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 64eda7949f09..f85735b6235d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12603,7 +12603,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 
+ 	kvm->arch.vm_type = type;
+ 	kvm->arch.has_private_mem =
+-		(type == KVM_X86_SW_PROTECTED_VM);
++		(type == KVM_X86_SW_PROTECTED_VM || type == KVM_X86_SNP_VM);
+ 
+ 	ret = kvm_page_track_init(kvm);
+ 	if (ret)
+-- 
+2.25.1
 
-> +	/* entries[] */
-
-Instead of the above line, a legit 'entries' can be enabled using:
-
-DECLARE_FLEX_ARRAY(struct slr_entry_hdr, entries);
-
-> +} __packed;
-
-You'd have to move this above struct slr_table which would need it:
-
-> +/*
-> + * Common SLRT Table Header
-> + */
-> +struct slr_entry_hdr {
-> +	u16 tag;
-> +	u16 size;
-> +} __packed;
-> +
-> +/*
-> + * Boot loader context
-> + */
-> +struct slr_bl_context {
-> +	u16 bootloader;
-> +	u16 reserved;
-> +	u64 context;
-> +} __packed;
-> +
-> +/*
-> + * DRTM Dynamic Launch Configuration
-> + */
-> +struct slr_entry_dl_info {
-> +	struct slr_entry_hdr hdr;
-> +	struct slr_bl_context bl_context;
-> +	u64 dl_handler;
-> +	u64 dce_base;
-> +	u32 dce_size;
-> +	u64 dlme_entry;
-> +} __packed;
-> +
-> +/*
-> + * TPM Log Information
-> + */
-> +struct slr_entry_log_info {
-> +	struct slr_entry_hdr hdr;
-> +	u16 format;
-> +	u16 reserved;
-> +	u64 addr;
-> +	u32 size;
-> +} __packed;
-> +
-> +/*
-> + * DRTM Measurement Policy
-> + */
-> +struct slr_entry_policy {
-> +	struct slr_entry_hdr hdr;
-> +	u16 revision;
-> +	u16 nr_entries;
-> +	/* policy_entries[] */
-> +} __packed;
-> +
-> +/*
-> + * DRTM Measurement Entry
-> + */
-> +struct slr_policy_entry {
-> +	u16 pcr;
-> +	u16 entity_type;
-> +	u16 flags;
-> +	u16 reserved;
-> +	u64 entity;
-> +	u64 size;
-> +	char evt_info[TPM_EVENT_INFO_LENGTH];
-> +} __packed;
-> +
-> +/*
-> + * Secure Launch defined MTRR saving structures
-> + */
-> +struct slr_txt_mtrr_pair {
-> +	u64 mtrr_physbase;
-> +	u64 mtrr_physmask;
-> +} __packed;
-> +
-> +struct slr_txt_mtrr_state {
-> +	u64 default_mem_type;
-> +	u64 mtrr_vcnt;
-> +	struct slr_txt_mtrr_pair mtrr_pair[TXT_VARIABLE_MTRRS_LENGTH];
-> +} __packed;
-> +
-> +/*
-> + * Intel TXT Info table
-> + */
-> +struct slr_entry_intel_info {
-> +	struct slr_entry_hdr hdr;
-> +	u64 saved_misc_enable_msr;
-> +	struct slr_txt_mtrr_state saved_bsp_mtrrs;
-> +} __packed;
-> +
-> +/*
-> + * AMD SKINIT Info table
-> + */
-> +struct slr_entry_amd_info {
-> +	struct slr_entry_hdr hdr;
-> +} __packed;
-> +
-> +/*
-> + * ARM DRTM Info table
-> + */
-> +struct slr_entry_arm_info {
-> +	struct slr_entry_hdr hdr;
-> +} __packed;
-
-Shouldn't these three structs be added as part of their
-separate per-vendor enablement patches?
-
-> +struct slr_entry_uefi_config {
-> +	struct slr_entry_hdr hdr;
-> +	u16 revision;
-> +	u16 nr_entries;
-> +	/* uefi_cfg_entries[] */
-> +} __packed;
-> +
-> +struct slr_uefi_cfg_entry {
-> +	u16 pcr;
-> +	u16 reserved;
-> +	u64 cfg; /* address or value */
-> +	u32 size;
-> +	char evt_info[TPM_EVENT_INFO_LENGTH];
-> +} __packed;
-> +
-> +static inline void *slr_end_of_entrys(struct slr_table *table)
-> +{
-> +	return (((void *)table) + table->size);
-> +}
-> +
-> +static inline struct slr_entry_hdr *
-> +slr_next_entry(struct slr_table *table,
-> +	       struct slr_entry_hdr *curr)
-> +{
-> +	struct slr_entry_hdr *next = (struct slr_entry_hdr *)
-> +				((u8 *)curr + curr->size);
-> +
-> +	if ((void *)next >= slr_end_of_entrys(table))
-> +		return NULL;
-> +	if (next->tag == SLR_ENTRY_END)
-> +		return NULL;
-> +
-> +	return next;
-> +}
-> +
-> +static inline struct slr_entry_hdr *
-> +slr_next_entry_by_tag(struct slr_table *table,
-> +		      struct slr_entry_hdr *entry,
-> +		      u16 tag)
-> +{
-> +	if (!entry) /* Start from the beginning */
-> +		entry = (struct slr_entry_hdr *)(((u8 *)table) + sizeof(*table));
-
-Back to the 'entries', the above line can now be made more readable:
-
-entry = table->entries;
-
-That's just one example, this flex array simplification can be made
-in other structs in this series, too.
-
-Cheers,
-
-Kim
-
-> +
-> +	for ( ; ; ) {
-> +		if (entry->tag == tag)
-> +			return entry;
-> +
-> +		entry = slr_next_entry(table, entry);
-> +		if (!entry)
-> +			return NULL;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +static inline int
-> +slr_add_entry(struct slr_table *table,
-> +	      struct slr_entry_hdr *entry)
-> +{
-> +	struct slr_entry_hdr *end;
-> +
-> +	if ((table->size + entry->size) > table->max_size)
-> +		return -1;
-> +
-> +	memcpy((u8 *)table + table->size - sizeof(*end), entry, entry->size);
-> +	table->size += entry->size;
-> +
-> +	end  = (struct slr_entry_hdr *)((u8 *)table + table->size - sizeof(*end));
-> +	end->tag = SLR_ENTRY_END;
-> +	end->size = sizeof(*end);
-> +
-> +	return 0;
-> +}
-> +
-> +static inline void
-> +slr_init_table(struct slr_table *slrt, u16 architecture, u32 max_size)
-> +{
-> +	struct slr_entry_hdr *end;
-> +
-> +	slrt->magic = SLR_TABLE_MAGIC;
-> +	slrt->revision = SLR_TABLE_REVISION;
-> +	slrt->architecture = architecture;
-> +	slrt->size = sizeof(*slrt) + sizeof(*end);
-> +	slrt->max_size = max_size;
-> +	end = (struct slr_entry_hdr *)((u8 *)slrt + sizeof(*slrt));
-> +	end->tag = SLR_ENTRY_END;
-> +	end->size = sizeof(*end);
-> +}
-> +
-> +#endif /* !__ASSEMBLY */
-> +
-> +#endif /* _LINUX_SLR_TABLE_H */
