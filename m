@@ -1,46 +1,46 @@
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2077.outbound.protection.outlook.com [40.107.101.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7893A13DBB3;
-	Fri, 29 Mar 2024 23:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A9F1E4AF;
+	Fri, 29 Mar 2024 23:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.77
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711753398; cv=fail; b=HFuT+KiiVQI+Uuq+VlznNW/DuqEPEGdVllPpUv17O8ePjG+WbrcEpMCo6qNhMUd8BqLav2NVptOiY/nxIFoHjcDsRqvjvPhBLQShi9fHpvjLUPY3wvijuj4sqYN1ZBQ2yWqaXL9vC08nLaUCVIAjTJXi6v0eeXf3TaOehg0IYf8=
+	t=1711753422; cv=fail; b=rMU1NtBwp4Hd6Fxf1U9DDmN5eYb0pU13cFCd8hpAuHVSylf0x/J5MBl/rI7eJmzD0MpwUX8zEMwFrnAIXR2JCPHcu++64mha5isKGpE3UAC2hoSMDIttW4ZWBBdDZ/ZAW3/Aq368Q1cdVXOlygxj8OzoMB4N1lq6tDcRP9/BDJg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711753398; c=relaxed/simple;
-	bh=ADKCuQ5ZPgcMUSBkIs3y/3J0nN07ibiIkpAjcxmMd9k=;
+	s=arc-20240116; t=1711753422; c=relaxed/simple;
+	bh=vIzATd98VzOyuDrm4VbaxOOex0ltOq97UuALYLFKSMg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zt+t+EbaeVaNcu/qmoayx6Y1SCFsErGu4f6sFreT4/PBxdyt6UYNsmZyuFKEw+9plmB3zaES5zt7eohvx8DPVnjMo0Dxep+n5IAmAXtfplSqlHeyGXWYjSBE+Fmyo1rsfjq81pmCrSfE95U7XYjkrNtl4/Ikg1IAaThdwo6KBzk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0qaiMEu3; arc=fail smtp.client-ip=40.107.236.41
+	 MIME-Version:Content-Type; b=mDs3C+bhyOUH4sgxC9PTAXnQJchFJS7j/enSqw2gX4plIN6tzosyWuCqxCXihld51McQ7bZPessQwlfiwdlt55jwqy7oJt2Jxn7wrY4XcMkvwZRZi3ZI2VKJ697PZfzEULwqbhY7HtVCmIcNfQA/ONmHyiS+GWz4tJdDvtuSXoI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=H2gFxNoV; arc=fail smtp.client-ip=40.107.101.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0qaiMEu3"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="H2gFxNoV"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ad/NYbmdBkY5J3ovtCg2lgYBkwmWXGapNT6gLIfx47F38R6sLdvQ+OwyCEN7TGJOo11LNY1+2RoN24BqXXErFTKSdUAOBf6ViEtI/sp+c9D9ZbNccJEHBvssoTrlm01adFBVWB7wiLiaIdTM5k5Cq1ENaDisxohOCA757aYnZrW9f+eMCbsksV8r0EZf+RQ+/PMyWLmJqzS8fDGg6e1OA92fveLe2YPqHxuCElB2NdhzrFSLMnEIfnC/gv86B0S77VuZJSGQV+nhMMVKIrHpKNQrKhGTQHIEkmDGzzr/gKBAWUfLUQdtmUHshvBTXqiwqslsC0rxIt87Pj+eKbP+Uw==
+ b=i48fQDEOj/8dRK51Id6S/9o3EAN4xvi9ceeYpAiVnTtH/vr/nfOm6kTSAN98Q3yl/UcQYwbT9kS8GM2Vpz8NbWn7QGR+m3sslwfA9w2subA7mCbYgN0Vp1/euZziurvTcCgMZQWFfMgotzLgMLhgADgnzDy4JMqkuOQ1rrvPpZfJMJR+sUk1ZMEz9kgk0xai5ZTSpaYeefDQqJjg9g3iB/RTnlhyiPJ5gTBaQwUak97KqtSu+T6R4ycWveSlNxZzKvAUf1D8o7KrEVAVGY3/ktbu++jI4QTY+peJ0zU+/KnkOkZl1dI26CZ/xK0v5TqKPIZh93IdzVwnlNXGexVvcw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VvmmF8DWUNh/hIchD9go/drdRtrw4d4tU0BqDNiQuvs=;
- b=Kz/bVd4b2iwTHvBSc8p77Ogb7ZOhyYmb8GtLurWpdBI1Hh+2xzrDBz2ervY1ZEYi0y4Id8vBLp6KuE/8tUIKf153QqcBPt5i7rwykTs+YKrY5Vmh18rijsQKifno53VbGxNUzMEAlIr+cDKW6NhZOqQJ2Mbn9/kVHdaMUDmOYtFtuIy7jy1oRQQaZCCKL0SuZ17iCpfspvb5VNn0IWrT5IqyTJIlnlg4IF1a1hdqcJ2DO69FUW7xeAEhKR7LSbLWK/2TCAghxVEqoEe286aQfCaEpIcl30F0kAMxA/cS2y4PDwW2uqCLp4ebgiqomVk/JC1EkGm1DxFgZ9pAmK4q1w==
+ bh=7VO3r/bt94cDkKVua2Tq1Z2O2aIdPgDkRUdiMXFLmR0=;
+ b=Rq9VbMVRX6DcAXV9TB4jwbQeqLksEIvNX6LBDY9DQiVFKm6zApH/jHR1IaouPxHBBtbh+zTKwoRgH/Y7vLxvdNS3UlxqRKH7ZeG2SCTC1s8/2LPPuZAyVUCk3lTF/u14GLZObWQ67vEf3n6tQ4TnZjTNmerIfMVZXPm6GNHfR2Bi2j7YEUSkutZQTg7DnNEJpNuaZxkp90o++qg2oZvBtWEUkHQPcdEqC6vc3H3ASjexG94uhVXKSgtZSmkZ0TVBxJcsTeo6jEC32b7dbhaFJpnySzpE0CCjPcdx4ocXZhw8PVz9skc0seiPb4qo6OM20eOIc5a/zXfkTobtzS6dnA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VvmmF8DWUNh/hIchD9go/drdRtrw4d4tU0BqDNiQuvs=;
- b=0qaiMEu3a2xCIbByvz6b7XPeqlnhpALKFapsKh9b+47gc1Gbw8LLkKirYQKunZX+bJ17MC0cImJCKVaKNb5f3aHzFTsePWYxqwEyBBtK7RFruSJ7JDlA7Ig/+nmlEHMIxemW4VE0ZWBfkVBBFZKbGFS4+XgHDD8N8BiccQ6Xbz8=
-Received: from SJ0PR03CA0024.namprd03.prod.outlook.com (2603:10b6:a03:33a::29)
- by IA1PR12MB8493.namprd12.prod.outlook.com (2603:10b6:208:447::12) with
+ bh=7VO3r/bt94cDkKVua2Tq1Z2O2aIdPgDkRUdiMXFLmR0=;
+ b=H2gFxNoVIxwjkJN7sQXk/PK9L966wrvFDltDQniz7yrOpreX3E4ARTCwza7dEH6UXFwyhLzUFhJoE5bKERR7l1g7+e/2+uUQnhB7N6mRNmdpKPlQgxf5WXPhaR9TuR+dUqA69reTu4HOotfQAS+ojwKV4JtIdfiPyMahA1Tf0XE=
+Received: from BYAPR01CA0023.prod.exchangelabs.com (2603:10b6:a02:80::36) by
+ SJ0PR12MB8166.namprd12.prod.outlook.com (2603:10b6:a03:4e2::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40; Fri, 29 Mar
- 2024 23:03:13 +0000
-Received: from SJ1PEPF00001CDE.namprd05.prod.outlook.com
- (2603:10b6:a03:33a:cafe::70) by SJ0PR03CA0024.outlook.office365.com
- (2603:10b6:a03:33a::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.41 via Frontend
- Transport; Fri, 29 Mar 2024 23:03:13 +0000
+ 2024 23:03:35 +0000
+Received: from SJ1PEPF00001CE3.namprd05.prod.outlook.com
+ (2603:10b6:a02:80:cafe::6d) by BYAPR01CA0023.outlook.office365.com
+ (2603:10b6:a02:80::36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.13 via Frontend
+ Transport; Fri, 29 Mar 2024 23:03:35 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF00001CDE.mail.protection.outlook.com (10.167.242.6) with Microsoft
+ SJ1PEPF00001CE3.mail.protection.outlook.com (10.167.242.11) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 23:03:13 +0000
+ 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 23:03:34 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 Mar
- 2024 18:03:12 -0500
+ 2024 18:03:33 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -71,9 +71,9 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
 	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: [PATCH v12 20/29] KVM: SEV: Add support for GHCB-based termination requests
-Date: Fri, 29 Mar 2024 17:58:26 -0500
-Message-ID: <20240329225835.400662-21-michael.roth@amd.com>
+Subject: [PATCH v12 01/29] [TEMP] x86/kvm/Kconfig: Have KVM_AMD_SEV select ARCH_HAS_CC_PLATFORM
+Date: Fri, 29 Mar 2024 17:58:07 -0500
+Message-ID: <20240329225835.400662-2-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
@@ -89,68 +89,53 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDE:EE_|IA1PR12MB8493:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6480f0c9-db72-4f68-283f-08dc50446929
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE3:EE_|SJ0PR12MB8166:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4dd7663f-2221-4834-b1fa-08dc50447622
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	4xNaBWQcZ3bIgw+WuiB0tPsj3M5ahRIiRsRfiLY4T5qkgl1AixP6rmkzIdpZST/4jN0hjto5zAc5KXbIT6KacSBmjKKL+MBBbxtr2MJSCvUxS+xVI3vV/DQGCUfGHznXR+EnN38dhiKcAhlMaa0ocbk1w08IC5xf67rewBVQ1NkNZ6ZKQ5feBTUU2uzaa+qRJaicoeJjQeCqPJiKGKHKZLGN33eoq6JMXYyZS0Qhc6VXy028sjkjJSaWA8UaTOzXFANuMMhUtrPe9hm8oLPeiR/3svkX+YJrvp3QZ2ZKVD12v1DWPDXgiKU8yqWmZuWSA+xioJTER3y61jnKaQJ+4FrLFwkw4Nb85NpXKLjmMFQy4CkHkJ2sP82tQTirBrMqdFoKOwG9IHI4FYE9gH9waqc+3Q2nsU5TM43f/GoDWrQUJuP5jKzBwPqRs+ll4YPeETw+ZWnxiJWWolArSpP/XSG5pRJVrsCAAR4jf28M/pe8Txme/s7c+NMozsNPZzNGNxHL4vlVS+BiwCXLSjK5n5m6HrvJp1p5YouSoi+B8EKMbvRaL6WrQtdtrvmQ10fc9IGsxf6F/MDu/HllBMUWR5rn3sTGNjIV7ejxxNsTJb+PkcZShe6FZHg1fBoSoBWuV/Zr89XISGb4ri/q05z/v/tVfL8MDyvaodW29RekXa8Axpt3TWQhse71SdHiJa7FGxYXcPUl7FIz4maHPeHYTaOCJf4LH/gXj0d7cxKuIyE6/ec7AHZRKQlx+bVjlu+E
+	q1a44oEoclQyLltv0DghRv6UzX4yPmzDJy0E4V5q0enbPY/0LMEmlJN0FmiTXORQywgLi2R1bI9DEBzwuKEXeIeA7bXthjq4XAbeN8Bpi2nlwQLyJT7BfGjqIWUvw47GMggx8J/y2TqEBXkmE8Em4kLr6zR+C3VuZlVkcNThXlFEaP3TxEg8N07Y+ww/1Hvt6piwMdCe9MvOIKcq6THrfoFwpLiat5lFRfiw2DLeQ6vVRSWJyC2pVxFb0OqnP8FOZ/zMl+GEAbLevzVJFdYL90guxKFXj5uDaZs+rw4Ftrbp6PiUXyj0lnW+cwg08yURA2eo/Dyas1CVhJRICBtTcU/1pJXVn7Ons2Eg2ZlmkBlZFqTzB4rj8CZ3JPEd+NCDBXDMt5mIZPqZlNth3rVwgX4GX+7HtXPMqG0P5A5FfTrfcqVhJXTGpLJVjHrVi3J//Nq/oD3LeVGY4blDSKHeDvEpDTqAPtJx+Ms7s8LumsUGXNsDzx+3Qx3/UWZI7IkvdY0f/KNAU8AlvmuIlwcCzWQ+GCjlCxAYGdSsZrzX4WdyGmOFKjBebFKcLPOdofAo4EXxon4eJBdb4AIGVUWRbzeH2/14dBKeEwBBqYSgv4NMmLbYqHH+14bjErKF48aqdg9JYIJtIkvdEAz8bUI1XjcxmgZbHNNBmgDGYWoEudHDU/6n/snU63VWuq3UZ0DPIqm4cG7KLlm4Q9/S/YBzFVZZmkoH9F7zO3KA2fTuSG6PwhpJEG3Z4VRonTQsDD5E
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(376005)(7416005)(1800799015)(82310400014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(82310400014)(36860700004)(376005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:03:13.0821
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:03:34.8657
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6480f0c9-db72-4f68-283f-08dc50446929
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4dd7663f-2221-4834-b1fa-08dc50447622
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CDE.namprd05.prod.outlook.com
+	SJ1PEPF00001CE3.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8493
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8166
 
-GHCB version 2 adds support for a GHCB-based termination request that
-a guest can issue when it reaches an error state and wishes to inform
-the hypervisor that it should be terminated. Implement support for that
-similarly to GHCB MSR-based termination requests that are already
-available to SEV-ES guests via earlier versions of the GHCB protocol.
+From: "Borislav Petkov (AMD)" <bp@alien8.de>
 
-See 'Termination Request' in the 'Invoking VMGEXIT' section of the GHCB
-specification for more details.
+The functionality to load SEV-SNP guests by the host will soon rely on
+cc_platform* helpers because the cpu_feature* API with the early
+patching is insufficient when SNP support needs to be disabled late.
 
+Therefore, pull that functionality in.
+
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ arch/x86/kvm/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 7dfbf12b454b..9ea13c2de668 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3214,6 +3214,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 	case SVM_VMGEXIT_HV_FEATURES:
- 	case SVM_VMGEXIT_PSC:
-+	case SVM_VMGEXIT_TERM_REQUEST:
- 		break;
- 	default:
- 		reason = GHCB_ERR_INVALID_EVENT;
-@@ -3889,6 +3890,14 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 
- 		ret = 1;
- 		break;
-+	case SVM_VMGEXIT_TERM_REQUEST:
-+		pr_info("SEV-ES guest requested termination: reason %#llx info %#llx\n",
-+			control->exit_info_1, control->exit_info_2);
-+		vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-+		vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SEV_TERM;
-+		vcpu->run->system_event.ndata = 1;
-+		vcpu->run->system_event.data[0] = control->ghcb_gpa;
-+		break;
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		vcpu_unimpl(vcpu,
- 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 8c3032a96caf..6a76ba7b6bac 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -122,6 +122,7 @@ config KVM_AMD_SEV
+ 	bool "AMD Secure Encrypted Virtualization (SEV) support"
+ 	depends on KVM_AMD && X86_64
+ 	depends on CRYPTO_DEV_SP_PSP && !(KVM_AMD=y && CRYPTO_DEV_CCP_DD=m)
++	select ARCH_HAS_CC_PLATFORM
+ 	help
+ 	  Provides support for launching Encrypted VMs (SEV) and Encrypted VMs
+ 	  with Encrypted State (SEV-ES) on AMD processors.
 -- 
 2.25.1
 
