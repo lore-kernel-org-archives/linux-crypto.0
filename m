@@ -1,85 +1,85 @@
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7322116D4F5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7316B16D4F3;
 	Sun, 31 Mar 2024 16:46:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=62.96.220.36
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711903590; cv=fail; b=RJAVuPpVczPsleT9aYmeXSG1CW7Jx8WDiT+vuoR0VoTscL4hupOPt7f0Psm9pGEeJxbceDVCoKK+NZlvmWxdQ66ItQ+SgHR1xyVqU1mORYON5OG7q5WEtZbc1EKvZ7O+LsyaJYAqBBksjDYkjCw+Khy4bcwOnoN0EYoTcqoMxYM=
+	t=1711903590; cv=fail; b=FpHIJ3AWpQLv8Xz3mWZhlsyGTmPAIRSkAIE6Wo3mI6RSNe2qAPtpmpqqa6PgnqcaypyayCHQdz49Cnd4qoTk565++GzI6gnpTewwC82PbJ9kMbdGRBJGlvZkBhQRVa5jM/rAWlV1Ex3A0VHmFAsr3aI2C14Ks0gXqJ03H4MHMgA=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711903590; c=relaxed/simple;
-	bh=13CQSWfGKoihbUHW1s83WGQSQ7YL/L22184eBDsTAms=;
+	bh=FtqcMRESQOXZ15kk0JbrI24sWAYIXYfVVlGvbk+Tjr4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RlzxDnoU0xF0+V/QqgFC1evVqDbzAxyN61YYX/PUPIZ69QraQY7ZLBlldk73cLblCvY3lu96vapYuONO+PjkOdBycwzj5teuxRIEnHAxDLgOcPLrme0otSuhd344CjmgZS0r97EcOZwA/bkT9zZmUSQanghuq4UMVZHhhi6mhow=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2/X0W5nB reason="signature verification failed"; arc=fail smtp.client-ip=40.107.237.50; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; arc=fail smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=p7xtZwWoaQdFw5q/bx4wePCPI+7wGo65nZg464Wvva3hi+wPdv7/TujezZNy7+CW7T6X+tXmDKrFSt6JhF/4n1KtYxohVA3vEv5u1o7h6rLjtQOY151v/h8x0lYJAPhw81FkpBTdBdadOqp02CFyu+uBj3NIhp8u1fnCeN5/LGA=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3OpGT4EG reason="signature verification failed"; arc=fail smtp.client-ip=40.107.220.40; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; arc=fail smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2/X0W5nB"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3OpGT4EG"
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 36A1D208E4;
-	Sun, 31 Mar 2024 18:46:22 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id 510B3208E7;
+	Sun, 31 Mar 2024 18:46:23 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2of3fzzFrl91; Sun, 31 Mar 2024 18:46:20 +0200 (CEST)
+	with ESMTP id zYKmc34kWTbR; Sun, 31 Mar 2024 18:46:21 +0200 (CEST)
 Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 3D074208E5;
+	by a.mx.secunet.com (Postfix) with ESMTPS id 3F8CD208E6;
 	Sun, 31 Mar 2024 18:46:13 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 3D074208E5
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 3F8CD208E6
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id A3B6D80005B;
+	by mailout1.secunet.com (Postfix) with ESMTP id 4E05B80005A;
 	Sun, 31 Mar 2024 18:40:25 +0200 (CEST)
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.1.2507.35; Sun, 31 Mar 2024 18:40:25 +0200
 Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
- 15.1.2507.17; Sun, 31 Mar 2024 16:36:18 +0000
-X-sender: <linux-crypto+bounces-3110-steffen.klassert=secunet.com@vger.kernel.org>
+ 15.1.2507.17; Sun, 31 Mar 2024 16:36:44 +0000
+X-sender: <linux-kernel+bounces-125514-steffen.klassert=secunet.com@vger.kernel.org>
 X-Receiver: <steffen.klassert@secunet.com>
  ORCPT=rfc822;steffen.klassert@secunet.com NOTIFY=NEVER;
- X-ExtendedProps=BQAVABYAAgAAAAUAFAARAPDFCS25BAlDktII2g02frgPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4YwUACwAXAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5nZSBBZG1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl2ZSBHcm91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAHQAPAAwAAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAAwAAgAABQBsAAIAAAUAWAAXAEoAAADwxQktuQQJQ5LSCNoNNn64Q049S2xhc3NlcnQgU3RlZmZlbixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9ye
+ X-ExtendedProps=DwA1AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5EaXJlY3RvcnlEYXRhLklzUmVzb3VyY2UCAAAFABUAFgACAAAABQAUABEA8MUJLbkECUOS0gjaDTZ+uAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4YwUACwAXAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5nZSBBZG1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl2ZSBHcm91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAHQAPAAwAAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAGwAAgAABQBYABcASgAAAPDFCS25BAlDktII2g02frhDTj1LbGFzc2VydCBTdGVmZmVuLE9VPVVzZXJzLE9VPU1pZ3JhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAMAAIAAAUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9ye
 	TogRmFsc2UNCg8ALwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
 X-CreatedBy: MSExchange15
 X-HeloDomain: b.mx.secunet.com
-X-ExtendedProps: BQBjAAoA6kmmlidQ3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAHAAAAHN0ZWZmZW4ua2xhc3NlcnRAc2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAYgAKAFoAAADOigAABQBkAA8AAwAAAEh1Yg==
+X-ExtendedProps: BQBjAAoA6kmmlidQ3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAHAAAAHN0ZWZmZW4ua2xhc3NlcnRAc2VjdW5ldC5jb20FAAYAAgABDwAqAAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5SZXN1Ym1pdENvdW50BwACAAAADwAJAAAAQ0lBdWRpdGVkAgABBQACAAcAAQAAAAUAAwAHAAAAAAAFAAUAAgABBQBiAAoAWQAAAM6KAAAFAGQADwADAAAASHViBQApAAIAAQ8APwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRGlyZWN0b3J5RGF0YS5NYWlsRGVsaXZlcnlQcmlvcml0eQ8AAwAAAExvdw==
 X-Source: SMTP:Default MBX-ESSEN-02
 X-SourceIPAddress: 62.96.220.37
-X-EndOfInjectedXHeaders: 31957
+X-EndOfInjectedXHeaders: 32641
 X-Virus-Scanned: by secunet
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.48.161; helo=sy.mirrors.kernel.org; envelope-from=linux-crypto+bounces-3110-steffen.klassert=secunet.com@vger.kernel.org; receiver=steffen.klassert@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com DD609200BB
+Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.199.223; helo=ny.mirrors.kernel.org; envelope-from=linux-kernel+bounces-125514-steffen.klassert=secunet.com@vger.kernel.org; receiver=steffen.klassert@secunet.com 
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com D51C3200BB
 Authentication-Results: b.mx.secunet.com;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2/X0W5nB"
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.50
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3OpGT4EG"
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.40
 ARC-Seal: i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711753651; cv=fail; b=bf2jjCnhfXgVAh7Q/vA+TDx++V8aXhhvWMk42IW5HCrtGoHL8rug4Se8kCeg80THGFe5gLYZoTMiZBDzo0UPw0m1VmU4F75xpU4Op95o18NaTDpab6l9/ExmwdSlo5pcHI3hyyX/nzUUqVyZ+ggzpj8vbHcp8bJ9WgrEsLcsI+s=
+	t=1711753638; cv=fail; b=CgT3fu8Kh/rfuq3RaJgcmKeE4gl7xX0VeW3V7nlqCZuv+WwFell2+RIwEdY2vDGb+5d1uKMk5n6YeEOqngyaka40E/cB98WOFJ+iJforLhzxMsxOAVZ1b7LRCNxprk7eWFGa7pLcF8XM2A/m+bzfhxUXFV6LLqJdYfRN8vXOkEw=
 ARC-Message-Signature: i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711753651; c=relaxed/simple;
-	bh=AuY2NMnF/F0eKaAZp9hi/QFwQoIZNLKhY4i1/5N3D9s=;
+	s=arc-20240116; t=1711753638; c=relaxed/simple;
+	bh=iO2iFV0D4Z3b8js9r4NsAySgcAByp//a+Wxx+cgicic=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CHcLqA1zJJJw1emEI6Mt5T6jfWTlJK9ybjmsnXwEFNUYEC70cTAKaqpsKvMqqk00m++zDptjHzoR2oJ99t/HvPvowJIq2V8y8RYa6k+Ud1ji9Pwv+QY5k9adJ2A+GGT07KHI6Gm2g6T8KM7oYaTAlBKl+q4g0vsa4lKSKCTbYBE=
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2/X0W5nB; arc=fail smtp.client-ip=40.107.237.50
+	 MIME-Version:Content-Type; b=dvJOucIkPBmFVLHO/85qrYnL4fNrIIrVq65ZGymJc4wmqldGv+YWyHuo+4jMAuW+WKhjLgiKTrtrbamLhoiUbigOq/EInQA/iw3M9WOX7UY6e8VS/8yywTd4b6Ai8j0LyL+gDxLvzKOZjZwxPJ5bQWK7pGBwaR4f+X24fw7k8Q8=
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3OpGT4EG; arc=fail smtp.client-ip=40.107.220.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B8RyJEt/gLT+Q3ntE+VTap3fAuWeh0NusiwR8TjW9b5LKQpD0e5iXZTC2PjyhwF6NHQH5PgtiaLGczcledBExFT2vBw/BXWj/9Dc6skUj1Zf9BuCWXMqJXnCv92Sj2RAaj/DHi2CbZRloCM88HF4osOkw0lD+qidmEYFqMZyjlXE8gulAp5FQLuKrk0MPhXsf6pAV9h/29/ZAGnMh0tHw6p4D9nkBDiwMQmyq0+HJd4U/fRw2RPucWJD9USgMgmcFY6VEpGBX98Q86v2R3LohXaUiDHagz1RaV3FKN8ITDyL1neYoxhZDz5ED9Fe7E5SHBn5E/PGig8+2ge6XYFagw==
+ b=F6vPn01wWitfm0OyBggnox6k/C7nJumwhBhojwRn/hCFHvRuUW+aUNSrDZnkFhy7ShpnRM8EHj/PTvnGThXDX7foumt3wJBz372plnsZzQiR0GJTKyxfuPtD19iu0pagjqN0yEg8h5qGNqvg+H/zEx/6+3l9jm+5ZVHiRYgQEj84c+PDUx5SSLuHzvoGSkg8dHVSz72dAujsR5+ixgIyTlge7K1etr0MpaQY5GNGd//l4fWmhaxP0HT2wieg7K84JGw0/CoRnsdxPXk4hV6CX95kA4fmcjZW/6bHoFMFrU1CAPLhIreVl+XozY0Z5ubDav86Ly7OnmbQMn/uqDw2eQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=taVbrIHOx6Vdes43tKem9S8Cee5XAjBK9GyxEIOMYEc=;
- b=KSxusj4xyHoqDKiHZ3XSJVVpROATGNSMyeu4tPRhqpSV5joO8dnTQyfhaywwop+AlfwRLP98z8ReRm6BYKp5uvOUtdfDMpIY2hw6N5FcewbiTcqIgOb6iYkYEk96MF+uT/6/WvVPAOoWIQiNVyuMZCukydE1RSA6rxg8GJIBCh7C7DSsaXlLixAKF4brgYQ78zw5zbKj5X6W1hWq7v91OaPGob06PN8FxZulC4+L4v1XMZRxYBVKyYe2aQz6FdEZbOv6Uoq98i7PfYbZPqaU7Bcxm39QZC5Y/NkYZT3LdI4rhQenigbWTzqnnPVOCpejj5mjfqwK1BcPKXSRmwNCKA==
+ bh=s+jARY3LyCLvz/TtnABCSlbVvSce/wUnD7GAV92FEJo=;
+ b=P1eC4RkpzXGsPO5hcLzZLDG4QbyU/jwxA2Booh1DxLBS9U+NtcHeJPQFYVoEqDmGDyjzUuMTSIds1O7qEX0cBVgPTBVuCikK0ihEBcRYypDyfZMWtDAGICi3FU3YeiabmgJqPRppgbXOoVzT5fZlPJ5HNz0rKVIl4xsFhS0mjTt4B95cQTvfdTmawLzje49caztOhkAx+cnPUBgbMe8vxZr8TqQsqyt0h0LHRQkT70oGAoIW+AX0PI/HxIIs/IdiCO8EBbJqQu49zlDWYt7e8+72FXoHsMIej/IR7E5Ok8wrUWbKVXJa5fPaeDIrp8qTvSxgake1f7elDlJGywvxew==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=taVbrIHOx6Vdes43tKem9S8Cee5XAjBK9GyxEIOMYEc=;
- b=2/X0W5nBoIQgjPbXpzId5s79hkITJn4qEsCseoAaWqcXrrOC8u7BAqa7BlB12MS2MFzs2IQWh6ZvKCUqVljnldha36u3xKoNXDtRdTFhpgWqpldjTTWo0+5punzN0zonCHtehR9jGW/7BNddBXIEU86anrjLUTtar714Kubvn6Q=
+ bh=s+jARY3LyCLvz/TtnABCSlbVvSce/wUnD7GAV92FEJo=;
+ b=3OpGT4EGhPXNQFf3stZynRyM5E6TNZK3/oDGAjcNVPOd09orf/XxKjdbkKrtGLqlGDNQHxoEGllYlQpNzks8irzrzxu4JPu0Hpcx3QeRR+jXGxG5maLbPQ9rAMVeZzyc/wvBJil5QKn6qUEPlqsD+6lG8QLfESyOW8G3xlj0pC0=
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -102,9 +102,9 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
 	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: [PATCH v12 03/29] [TEMP] x86/CPU/AMD: Track SNP host status with cc_platform_*()
-Date: Fri, 29 Mar 2024 17:58:09 -0500
-Message-ID: <20240329225835.400662-4-michael.roth@amd.com>
+Subject: [PATCH v12 29/29] KVM: SEV: Provide support for SNP_EXTENDED_GUEST_REQUEST NAE event
+Date: Fri, 29 Mar 2024 17:58:35 -0500
+Message-ID: <20240329225835.400662-30-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
@@ -121,414 +121,396 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017091:EE_|BY5PR12MB4260:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0e7d57fe-8506-46bc-df93-08dc5044ff0f
+X-MS-TrafficTypeDiagnostic: DS1PEPF0001708E:EE_|LV2PR12MB5728:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5a569d29-705e-4060-04c6-08dc5044e613
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Cxx5VtOLnKMFgtSO/4Wzq/K44byZ3gsNedFkAhUlTQdg7uoHF1mDoAWqN9Lq6q18OCw05/wnFfUjWEGS1PQyIQYsIULWCQU9m0N7R48F14iU95iVtSh5pS+N0oSISCyGJcVv0qQCCsiEJ/zR1ktHTH15ttTkHWd42a+mgjcW0fiByNMuhaWyORvfePFPs2Ur17gmZOfUTAi053KJ0VPMm5gbizMLN98+IrAwICpwm26vVKAdXZ85Um+YStUR+GnQCuONHP6Mfmfmtu8tsoVV41VAviL/JLM5kuQcAI9yE4XLhD2iHjLVmyHS2SwcwiOEkxMbCykkHNFRF2c0GHNhLGIXZ6+jX7hPpGQopaAE/eNMnd3PM0UEhNw3z3z16pq4DZtKlVRiKswy1cCMyAoSB+wuXwZGuSm0MEHBjWcG7LyFzFP2ZL+gN9e1dN1c2vzg56xEL1lHud3XAfsgKGdZOCG8F7Ccv4jub4Rc6ryuv7DAuToeF9dfDWmfw54Sif1UaHuS19WaO/GbLq+3PY7WlwhL8S0lV1lbStm7Ti/KVTjFdOljrPL00KXRjEBuz40MRSu6yjD8BP6l4mOeqPT+4SYsiNe6d0W312YPuThmbgOM8jUJUel1WHP5fvJ2dzXmke3lnLw+VhGS77DrCjVyc6c9Lk4C2NnwNOD0AncvFHVCq448mue4TSALjPmzPqmAeUpDhbuDWWB7jkMxNYqyvS3bxhm0h9NbU7qB6W2Bz1k+2J7kYICtPwlzJGld1GOW
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(376005)(7416005)(1800799015)(36860700004);DIR:OUT;SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:07:24.6058
+X-Microsoft-Antispam-Message-Info: zbSsOQJRgVjd70hqFRHL9lECQmnrDOE63vUgqZVCCO+J9PT8Y2d6pOC/oZ6vSn7UXBbbo6dacvUsK7gDWOuvE6R64UTCrhEybQ1qy0pCklyy934AzNEsEX/pV0nWq50tmyTe9bXRgrtqgQyR1ZL8aMUUvaMhu/hGyoI1XgtWBacj3k5pQ/yvfITfadCKsWEqX0e5rNRzauSogv0B3GLifpgl/uecFaFSw2/JVmEsEdAvLIwXLwsDVRoE92m3W1l86UiB2w2swCOkrJIH/jStIVEcMxJp0dkhm7/yk9Yjnx1e1/lZm8Zhf21qCZyAzsNz3+BQ4TKKts4WJs4wVoqqUaLODjqEFllyTQZMTPY72vRva4e1qd34VGqdizyxk71u3H302SFdXQ2IJW1SStZW5pcz7dJR82Vioa7hdY0zL1gbd+HpU2vk/+rs5c9qgBZkmO2YQLCoPOYdgxuRlKkUuga0zMWlAq1pm27qH8cmrPYHtFLdtLZSxwAC9ShD3yjNL1j14eNFGPqr3WcPvG9awmaDFj5bUOkoG1b3foRgf3wTlDpbvCWlqrzk+SwcAZCuNy2I+7WHip3Zi7uEM+ySvvDNjKx6nGXvidVH3R+Df5dI6S8l1fZPVLUwAI7VM58IwuWyrIfy4JjyJfbh3qGqlykEZzIWJ5gvxVagIbX5DKzB2dy0BWIjsrh117hV+lU7RCc3aGRdBQr05ipPTZFyqXcukaZ76Uv2wO7sf6QoEdnoSMo4e4BrRV1ryCEqTm/h
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(1800799015)(82310400014)(7416005)(36860700004);DIR:OUT;SFP:1101;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:06:42.6990
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e7d57fe-8506-46bc-df93-08dc5044ff0f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a569d29-705e-4060-04c6-08dc5044e613
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017091.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0001708E.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4260
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5728
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
-Message-ID: <20240329225809.718e2oDx8DAC6Qc_YtWvPo3-aU7U_Py9Y-aCQ1cYbFo@z>
+Message-ID: <20240329225835.RGVYqL8G4p2gNDCpLnBbIyfpK3lxMi3t6MzrMBahALE@z>
 
-From: "Borislav Petkov (AMD)" <bp@alien8.de>
+Version 2 of GHCB specification added support for the SNP Extended Guest
+Request Message NAE event. This event serves a nearly identical purpose
+to the previously-added SNP_GUEST_REQUEST event, but allows for
+additional certificate data to be supplied via an additional
+guest-supplied buffer to be used mainly for verifying the signature of
+an attestation report as returned by firmware.
 
-The host SNP worthiness can determined later, after alternatives have
-been patched, in snp_rmptable_init() depending on cmdline options like
-iommu=pt which is incompatible with SNP, for example.
+This certificate data is supplied by userspace, so unlike with
+SNP_GUEST_REQUEST events, SNP_EXTENDED_GUEST_REQUEST events are first
+forwarded to userspace via a KVM_EXIT_VMGEXIT exit type, and then the
+firmware request is made only afterward.
 
-Which means that one cannot use X86_FEATURE_SEV_SNP and will need to
-have a special flag for that control.
+Implement handling for these events.
 
-Use that newly added CC_ATTR_HOST_SEV_SNP in the appropriate places.
+Since there is a potential for race conditions where the
+userspace-supplied certificate data may be out-of-sync relative to the
+reported TCB or VLEK that firmware will use when signing attestation
+reports, make use of the synchronization mechanisms wired up to the
+SNP_{PAUSE,RESUME}_ATTESTATION SEV device ioctls such that the guest
+will be told to retry the request while attestation has been paused due
+to an update being underway on the system.
 
-Move kdump_sev_callback() to its rightfull place, while at it.
-
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/include/asm/sev.h         |  4 ++--
- arch/x86/kernel/cpu/amd.c          | 38 ++++++++++++++++++------------
- arch/x86/kernel/cpu/mtrr/generic.c |  2 +-
- arch/x86/kernel/sev.c              | 10 --------
- arch/x86/kvm/svm/sev.c             |  2 +-
- arch/x86/virt/svm/sev.c            | 26 +++++++++++++-------
- drivers/crypto/ccp/sev-dev.c       |  2 +-
- drivers/iommu/amd/init.c           |  4 +++-
- 8 files changed, 49 insertions(+), 39 deletions(-)
+ Documentation/virt/kvm/api.rst | 26 ++++++++++++
+ arch/x86/include/asm/sev.h     |  4 ++
+ arch/x86/kvm/svm/sev.c         | 75 ++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.h         |  3 ++
+ arch/x86/virt/svm/sev.c        | 21 ++++++++++
+ include/uapi/linux/kvm.h       |  6 +++
+ 6 files changed, 135 insertions(+)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 85099198a10f..6cf186ed8f66 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -7066,6 +7066,7 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+ 		struct kvm_user_vmgexit {
+ 		#define KVM_USER_VMGEXIT_PSC_MSR	1
+ 		#define KVM_USER_VMGEXIT_PSC		2
++		#define KVM_USER_VMGEXIT_EXT_GUEST_REQ	3
+ 			__u32 type; /* KVM_USER_VMGEXIT_* type */
+ 			union {
+ 				struct {
+@@ -7079,6 +7080,11 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+ 					__u64 shared_gpa;
+ 					__u64 ret;
+ 				} psc;
++				struct {
++					__u64 data_gpa;
++					__u64 data_npages;
++					__u32 ret;
++				} ext_guest_req;
+ 			};
+ 		};
+ 
+@@ -7108,6 +7114,26 @@ private/shared state. Userspace will return a value in 'ret' that is in
+ agreement with the GHCB-defined return values that the guest will expect
+ in the SW_EXITINFO2 field of the GHCB in response to these requests.
+ 
++For the KVM_USER_VMGEXIT_EXT_GUEST_REQ type, the ext_guest_req union type
++is used. The kernel will supply in 'data_gpa' the value the guest supplies
++via the RAX field of the GHCB when issued extended guest requests.
++'data_npages' will similarly contain the value the guest supplies in RBX
++denoting the number of shared pages available to write the certificate
++data into.
++
++  - If the supplied number of pages is sufficient, userspace should write
++    the certificate data blob (in the format defined by the GHCB spec) in
++    the address indicated by 'data_gpa' and set 'ret' to 0.
++
++  - If the number of pages supplied is not sufficient, userspace must write
++    the required number of pages in 'data_npages' and then set 'ret' to 1.
++
++  - If userspace is temporarily unable to handle the request, 'ret' should
++    be set to 2 to inform the guest to retry later.
++
++  - If some other error occurred, userspace should set 'ret' to a non-zero
++    value that is distinct from the specific return values mentioned above.
++
+ 6. Capabilities that can be enabled on vCPUs
+ ============================================
+ 
 diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index 9477b4053bce..780182cda3ab 100644
+index 975e92005438..0e092c8c5614 100644
 --- a/arch/x86/include/asm/sev.h
 +++ b/arch/x86/include/asm/sev.h
-@@ -228,7 +228,6 @@ int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, struct sn
- void snp_accept_memory(phys_addr_t start, phys_addr_t end);
- u64 snp_get_unsupported_features(u64 status);
- u64 sev_get_status(void);
--void kdump_sev_callback(void);
- void sev_show_status(void);
- #else
- static inline void sev_es_ist_enter(struct pt_regs *regs) { }
-@@ -258,7 +257,6 @@ static inline int snp_issue_guest_request(u64 exit_code, struct snp_req_data *in
- static inline void snp_accept_memory(phys_addr_t start, phys_addr_t end) { }
- static inline u64 snp_get_unsupported_features(u64 status) { return 0; }
- static inline u64 sev_get_status(void) { return 0; }
--static inline void kdump_sev_callback(void) { }
- static inline void sev_show_status(void) { }
- #endif
- 
-@@ -270,6 +268,7 @@ int psmash(u64 pfn);
- int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, u32 asid, bool immutable);
- int rmp_make_shared(u64 pfn, enum pg_level level);
- void snp_leak_pages(u64 pfn, unsigned int npages);
-+void kdump_sev_callback(void);
+@@ -274,6 +274,8 @@ void snp_leak_pages(u64 pfn, unsigned int npages);
+ void kdump_sev_callback(void);
+ int snp_pause_attestation(u64 *transaction_id);
+ void snp_resume_attestation(u64 *transaction_id);
++u64 snp_transaction_get_id(void);
++bool snp_transaction_is_stale(u64 transaction_id);
  #else
  static inline bool snp_probe_rmptable_info(void) { return false; }
  static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return -ENODEV; }
-@@ -282,6 +281,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, u32 as
- }
- static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
- static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
-+static inline void kdump_sev_callback(void) { }
+@@ -289,6 +291,8 @@ static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
+ static inline void kdump_sev_callback(void) { }
+ static inline int snp_pause_attestation(u64 *transaction_id) { return 0; }
+ static inline void snp_resume_attestation(u64 *transaction_id) {}
++static inline u64 snp_transaction_get_id(void) { return 0; }
++static inline bool snp_transaction_is_stale(u64 transaction_id) { return false; }
  #endif
  
  #endif
-diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-index 6d8677e80ddb..9bf17c9c29da 100644
---- a/arch/x86/kernel/cpu/amd.c
-+++ b/arch/x86/kernel/cpu/amd.c
-@@ -345,6 +345,28 @@ static void srat_detect_node(struct cpuinfo_x86 *c)
- #endif
- }
- 
-+static void bsp_determine_snp(struct cpuinfo_x86 *c)
-+{
-+#ifdef CONFIG_ARCH_HAS_CC_PLATFORM
-+	cc_vendor = CC_VENDOR_AMD;
-+
-+	if (cpu_has(c, X86_FEATURE_SEV_SNP)) {
-+		/*
-+		 * RMP table entry format is not architectural and is defined by the
-+		 * per-processor PPR. Restrict SNP support on the known CPU models
-+		 * for which the RMP table entry format is currently defined for.
-+		 */
-+		if (!cpu_has(c, X86_FEATURE_HYPERVISOR) &&
-+		    c->x86 >= 0x19 && snp_probe_rmptable_info()) {
-+			cc_platform_set(CC_ATTR_HOST_SEV_SNP);
-+		} else {
-+			setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-+			cc_platform_clear(CC_ATTR_HOST_SEV_SNP);
-+		}
-+	}
-+#endif
-+}
-+
- static void bsp_init_amd(struct cpuinfo_x86 *c)
- {
- 	if (cpu_has(c, X86_FEATURE_CONSTANT_TSC)) {
-@@ -452,21 +474,7 @@ static void bsp_init_amd(struct cpuinfo_x86 *c)
- 		break;
- 	}
- 
--	if (cpu_has(c, X86_FEATURE_SEV_SNP)) {
--		/*
--		 * RMP table entry format is not architectural and it can vary by processor
--		 * and is defined by the per-processor PPR. Restrict SNP support on the
--		 * known CPU model and family for which the RMP table entry format is
--		 * currently defined for.
--		 */
--		if (!boot_cpu_has(X86_FEATURE_ZEN3) &&
--		    !boot_cpu_has(X86_FEATURE_ZEN4) &&
--		    !boot_cpu_has(X86_FEATURE_ZEN5))
--			setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
--		else if (!snp_probe_rmptable_info())
--			setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
--	}
--
-+	bsp_determine_snp(c);
- 	return;
- 
- warn:
-diff --git a/arch/x86/kernel/cpu/mtrr/generic.c b/arch/x86/kernel/cpu/mtrr/generic.c
-index 422a4ddc2ab7..7b29ebda024f 100644
---- a/arch/x86/kernel/cpu/mtrr/generic.c
-+++ b/arch/x86/kernel/cpu/mtrr/generic.c
-@@ -108,7 +108,7 @@ static inline void k8_check_syscfg_dram_mod_en(void)
- 	      (boot_cpu_data.x86 >= 0x0f)))
- 		return;
- 
--	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return;
- 
- 	rdmsr(MSR_AMD64_SYSCFG, lo, hi);
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index b59b09c2f284..1e1a3c3bd1e8 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -2287,16 +2287,6 @@ static int __init snp_init_platform_device(void)
- }
- device_initcall(snp_init_platform_device);
- 
--void kdump_sev_callback(void)
--{
--	/*
--	 * Do wbinvd() on remote CPUs when SNP is enabled in order to
--	 * safely do SNP_SHUTDOWN on the local CPU.
--	 */
--	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP))
--		wbinvd();
--}
--
- void sev_show_status(void)
- {
- 	int i;
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index d30bd30d4f7a..7b872f97a452 100644
+index f56f04553e81..1da45e23ee14 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -3279,7 +3279,7 @@ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
- 	unsigned long pfn;
- 	struct page *p;
+@@ -3225,6 +3225,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 	case SVM_VMGEXIT_PSC:
+ 	case SVM_VMGEXIT_TERM_REQUEST:
+ 	case SVM_VMGEXIT_GUEST_REQUEST:
++	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
+ 		break;
+ 	default:
+ 		reason = GHCB_ERR_INVALID_EVENT;
+@@ -3725,6 +3726,77 @@ static void snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp
+ 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
+ }
  
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++static int snp_complete_ext_guest_req(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++	struct vmcb_control_area *control;
++	struct kvm *kvm = vcpu->kvm;
++	sev_ret_code fw_err = 0;
++	int vmm_ret;
++
++	vmm_ret = vcpu->run->vmgexit.ext_guest_req.ret;
++	if (vmm_ret) {
++		if (vmm_ret == SNP_GUEST_VMM_ERR_INVALID_LEN)
++			vcpu->arch.regs[VCPU_REGS_RBX] =
++				vcpu->run->vmgexit.ext_guest_req.data_npages;
++		goto abort_request;
++	}
++
++	control = &svm->vmcb->control;
++
++	if (!__snp_handle_guest_req(kvm, control->exit_info_1, control->exit_info_2,
++				    &fw_err))
++		vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
++
++	/*
++	 * Give errors related to stale transactions precedence to provide more
++	 * potential options for servicing firmware while guests are running.
++	 */
++	if (snp_transaction_is_stale(svm->snp_transaction_id))
++		vmm_ret = SNP_GUEST_VMM_ERR_BUSY;
++
++abort_request:
++	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
++
++	return 1; /* resume guest */
++}
++
++static int snp_begin_ext_guest_req(struct kvm_vcpu *vcpu)
++{
++	int vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
++	struct vcpu_svm *svm = to_svm(vcpu);
++	unsigned long data_npages;
++	sev_ret_code fw_err;
++	gpa_t data_gpa;
++
++	if (!sev_snp_guest(vcpu->kvm))
++		goto abort_request;
++
++	data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
++	data_npages = vcpu->arch.regs[VCPU_REGS_RBX];
++
++	if (!IS_ALIGNED(data_gpa, PAGE_SIZE))
++		goto abort_request;
++
++	svm->snp_transaction_id = snp_transaction_get_id();
++	if (snp_transaction_is_stale(svm->snp_transaction_id)) {
++		vmm_ret = SNP_GUEST_VMM_ERR_BUSY;
++		goto abort_request;
++	}
++
++	vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
++	vcpu->run->vmgexit.type = KVM_USER_VMGEXIT_EXT_GUEST_REQ;
++	vcpu->run->vmgexit.ext_guest_req.data_gpa = data_gpa;
++	vcpu->run->vmgexit.ext_guest_req.data_npages = data_npages;
++	vcpu->arch.complete_userspace_io = snp_complete_ext_guest_req;
++
++	return 0; /* forward request to userspace */
++
++abort_request:
++	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
++	return 1; /* resume guest */
++}
++
+ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ {
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+@@ -3989,6 +4061,9 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		snp_handle_guest_req(svm, control->exit_info_1, control->exit_info_2);
+ 		ret = 1;
+ 		break;
++	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
++		ret = snp_begin_ext_guest_req(vcpu);
++		break;
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		vcpu_unimpl(vcpu,
+ 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 746f819a6de4..7af6d0e9de17 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -303,6 +303,9 @@ struct vcpu_svm {
  
- 	/*
+ 	/* Guest GIF value, used when vGIF is not enabled */
+ 	bool guest_gif;
++
++	/* Transaction ID associated with SNP config updates */
++	u64 snp_transaction_id;
+ };
+ 
+ struct svm_cpu_data {
 diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index cffe1157a90a..ab0e8448bb6e 100644
+index 09d62870306b..30638d10a1b9 100644
 --- a/arch/x86/virt/svm/sev.c
 +++ b/arch/x86/virt/svm/sev.c
-@@ -77,7 +77,7 @@ static int __mfd_enable(unsigned int cpu)
- {
- 	u64 val;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return 0;
- 
- 	rdmsrl(MSR_AMD64_SYSCFG, val);
-@@ -98,7 +98,7 @@ static int __snp_enable(unsigned int cpu)
- {
- 	u64 val;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return 0;
- 
- 	rdmsrl(MSR_AMD64_SYSCFG, val);
-@@ -174,11 +174,11 @@ static int __init snp_rmptable_init(void)
- 	u64 rmptable_size;
- 	u64 val;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return 0;
- 
- 	if (!amd_iommu_snp_en)
--		return 0;
-+		goto nosnp;
- 
- 	if (!probed_rmp_size)
- 		goto nosnp;
-@@ -225,7 +225,7 @@ static int __init snp_rmptable_init(void)
- 	return 0;
- 
- nosnp:
--	setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-+	cc_platform_clear(CC_ATTR_HOST_SEV_SNP);
- 	return -ENOSYS;
+@@ -611,3 +611,24 @@ void snp_resume_attestation(u64 *transaction_id)
+ 	mutex_unlock(&snp_pause_attestation_lock);
  }
- 
-@@ -246,7 +246,7 @@ static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
- {
- 	struct rmpentry *large_entry, *entry;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return ERR_PTR(-ENODEV);
- 
- 	entry = get_rmpentry(pfn);
-@@ -363,7 +363,7 @@ int psmash(u64 pfn)
- 	unsigned long paddr = pfn << PAGE_SHIFT;
- 	int ret;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return -ENODEV;
- 
- 	if (!pfn_valid(pfn))
-@@ -472,7 +472,7 @@ static int rmpupdate(u64 pfn, struct rmp_state *state)
- 	unsigned long paddr = pfn << PAGE_SHIFT;
- 	int ret, level;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return -ENODEV;
- 
- 	level = RMP_TO_PG_LEVEL(state->pagesize);
-@@ -558,3 +558,13 @@ void snp_leak_pages(u64 pfn, unsigned int npages)
- 	spin_unlock(&snp_leaked_pages_list_lock);
- }
- EXPORT_SYMBOL_GPL(snp_leak_pages);
+ EXPORT_SYMBOL_GPL(snp_resume_attestation);
 +
-+void kdump_sev_callback(void)
++u64 snp_transaction_get_id(void)
 +{
-+	/*
-+	 * Do wbinvd() on remote CPUs when SNP is enabled in order to
-+	 * safely do SNP_SHUTDOWN on the local CPU.
-+	 */
-+	if (cc_platform_has(CC_ATTR_HOST_SEV_SNP))
-+		wbinvd();
++	return snp_transaction_id;
 +}
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index f44efbb89c34..2102377f727b 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1090,7 +1090,7 @@ static int __sev_snp_init_locked(int *error)
- 	void *arg = &data;
- 	int cmd, rc = 0;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return -ENODEV;
- 
- 	sev = psp->sev_data;
-diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-index e7a44929f0da..33228c1c8980 100644
---- a/drivers/iommu/amd/init.c
-+++ b/drivers/iommu/amd/init.c
-@@ -3228,7 +3228,7 @@ static bool __init detect_ivrs(void)
- static void iommu_snp_enable(void)
- {
- #ifdef CONFIG_KVM_AMD_SEV
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return;
- 	/*
- 	 * The SNP support requires that IOMMU must be enabled, and is
-@@ -3236,12 +3236,14 @@ static void iommu_snp_enable(void)
- 	 */
- 	if (no_iommu || iommu_default_passthrough()) {
- 		pr_err("SNP: IOMMU disabled or configured in passthrough mode, SNP cannot be supported.\n");
-+		cc_platform_clear(CC_ATTR_HOST_SEV_SNP);
- 		return;
- 	}
- 
- 	amd_iommu_snp_en = check_feature(FEATURE_SNP);
- 	if (!amd_iommu_snp_en) {
- 		pr_err("SNP: IOMMU SNP feature not enabled, SNP cannot be supported.\n");
-+		cc_platform_clear(CC_ATTR_HOST_SEV_SNP);
- 		return;
- 	}
++EXPORT_SYMBOL_GPL(snp_transaction_get_id);
++
++bool snp_transaction_is_stale(u64 transaction_id)
++{
++	bool stale;
++
++	mutex_lock(&snp_pause_attestation_lock);
++
++	stale = (snp_attestation_paused ||
++		 transaction_id != snp_transaction_id);
++
++	mutex_unlock(&snp_pause_attestation_lock);
++
++	return stale;
++}
++EXPORT_SYMBOL_GPL(snp_transaction_is_stale);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index e33c48bfbd67..585de3a2591e 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -138,6 +138,7 @@ struct kvm_xen_exit {
+ struct kvm_user_vmgexit {
+ #define KVM_USER_VMGEXIT_PSC_MSR	1
+ #define KVM_USER_VMGEXIT_PSC		2
++#define KVM_USER_VMGEXIT_EXT_GUEST_REQ	3
+ 	__u32 type; /* KVM_USER_VMGEXIT_* type */
+ 	union {
+ 		struct {
+@@ -151,6 +152,11 @@ struct kvm_user_vmgexit {
+ 			__u64 shared_gpa;
+ 			__u64 ret;
+ 		} psc;
++		struct {
++			__u64 data_gpa;
++			__u64 data_npages;
++			__u32 ret;
++		} ext_guest_req;
+ 	};
+ };
  
 -- 
 2.25.1
 
 
-X-sender: <linux-kernel+bounces-125515-steffen.klassert=secunet.com@vger.kernel.org>
-X-Receiver: <steffen.klassert@secunet.com> ORCPT=rfc822;steffen.klassert@secunet.com
+X-sender: <kvm+bounces-13135-martin.weber=secunet.com@vger.kernel.org>
+X-Receiver: <martin.weber@secunet.com> ORCPT=rfc822;martin.weber@secunet.com
 X-CreatedBy: MSExchange15
-X-HeloDomain: mbx-dresden-01.secunet.de
-X-ExtendedProps: BQBjAAoAJEqmlidQ3AgFADcAAgAADwA8AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50Lk9yZ2FuaXphdGlvblNjb3BlEQAAAAAAAAAAAAAAAAAAAAAADwA/AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5EaXJlY3RvcnlEYXRhLk1haWxEZWxpdmVyeVByaW9yaXR5DwADAAAATG93
+X-HeloDomain: mbx-essen-01.secunet.de
+X-ExtendedProps: BQBjAAoAH0qmlidQ3AgFADcAAgAADwA8AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50Lk9yZ2FuaXphdGlvblNjb3BlEQAAAAAAAAAAAAAAAAAAAAAADwA/AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5EaXJlY3RvcnlEYXRhLk1haWxEZWxpdmVyeVByaW9yaXR5DwADAAAATG93
 X-Source: SMTP:Default MBX-ESSEN-02
-X-SourceIPAddress: 10.53.40.199
-X-EndOfInjectedXHeaders: 22279
-Received: from mbx-dresden-01.secunet.de (10.53.40.199) by
+X-SourceIPAddress: 10.53.40.197
+X-EndOfInjectedXHeaders: 22426
+Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  mbx-essen-02.secunet.de (10.53.40.198) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.37; Sat, 30 Mar 2024 00:08:06 +0100
-Received: from a.mx.secunet.com (62.96.220.36) by cas-essen-01.secunet.de
- (10.53.40.201) with Microsoft SMTP Server (version=TLS1_2,
+ 15.1.2507.37; Sat, 30 Mar 2024 00:07:40 +0100
+Received: from b.mx.secunet.com (62.96.220.37) by cas-essen-02.secunet.de
+ (10.53.40.202) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Sat, 30 Mar 2024 00:08:06 +0100
+ Transport; Sat, 30 Mar 2024 00:07:40 +0100
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 342C0207E4
-	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 00:08:06 +0100 (CET)
+	by b.mx.secunet.com (Postfix) with ESMTP id B2E462032C
+	for <martin.weber@secunet.com>; Sat, 30 Mar 2024 00:07:40 +0100 (CET)
 X-Virus-Scanned: by secunet
 X-Spam-Flag: NO
-X-Spam-Score: -5.15
+X-Spam-Score: -2.85
 X-Spam-Level:
-X-Spam-Status: No, score=-5.15 tagged_above=-999 required=2.1
+X-Spam-Status: No, score=-2.85 tagged_above=-999 required=2.1
 	tests=[BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.099, DKIM_SIGNED=0.1,
 	DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
 	HEADER_FROM_DIFFERENT_DOMAINS=0.249, MAILING_LIST_MULTI=-1,
-	RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001, SPF_PASS=-0.001]
-	autolearn=unavailable autolearn_force=no
+	RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001]
+	autolearn=ham autolearn_force=no
 Authentication-Results: a.mx.secunet.com (amavisd-new);
 	dkim=pass (1024-bit key) header.d=amd.com
-Received: from a.mx.secunet.com ([127.0.0.1])
+Received: from b.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pC7s6ytjgtZQ for <steffen.klassert@secunet.com>;
-	Sat, 30 Mar 2024 00:08:05 +0100 (CET)
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=139.178.88.99; helo=sv.mirrors.kernel.org; envelope-from=linux-kernel+bounces-125515-steffen.klassert=secunet.com@vger.kernel.org; receiver=steffen.klassert@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 9D87220754
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	with ESMTP id 9MAqm0fZAoXN for <martin.weber@secunet.com>;
+	Sat, 30 Mar 2024 00:07:38 +0100 (CET)
+Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=147.75.48.161; helo=sy.mirrors.kernel.org; envelope-from=kvm+bounces-13135-martin.weber=secunet.com@vger.kernel.org; receiver=martin.weber@secunet.com 
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com C88DD200BB
+Authentication-Results: b.mx.secunet.com;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3OpGT4EG"
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 9D87220754
-	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 00:08:04 +0100 (CET)
+	by b.mx.secunet.com (Postfix) with ESMTPS id C88DD200BB
+	for <martin.weber@secunet.com>; Sat, 30 Mar 2024 00:07:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36B742846B6
-	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:08:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34E01B21928
+	for <martin.weber@secunet.com>; Fri, 29 Mar 2024 23:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E7A313E6BE;
-	Fri, 29 Mar 2024 23:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60C413E6DD;
+	Fri, 29 Mar 2024 23:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2/X0W5nB"
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2050.outbound.protection.outlook.com [40.107.237.50])
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3OpGT4EG"
+X-Original-To: kvm@vger.kernel.org
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2040.outbound.protection.outlook.com [40.107.220.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9439D13E6B9;
-	Fri, 29 Mar 2024 23:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FBDF29D03;
+	Fri, 29 Mar 2024 23:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.40
 ARC-Seal: i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711753651; cv=fail; b=bf2jjCnhfXgVAh7Q/vA+TDx++V8aXhhvWMk42IW5HCrtGoHL8rug4Se8kCeg80THGFe5gLYZoTMiZBDzo0UPw0m1VmU4F75xpU4Op95o18NaTDpab6l9/ExmwdSlo5pcHI3hyyX/nzUUqVyZ+ggzpj8vbHcp8bJ9WgrEsLcsI+s=
+	t=1711753638; cv=fail; b=CgT3fu8Kh/rfuq3RaJgcmKeE4gl7xX0VeW3V7nlqCZuv+WwFell2+RIwEdY2vDGb+5d1uKMk5n6YeEOqngyaka40E/cB98WOFJ+iJforLhzxMsxOAVZ1b7LRCNxprk7eWFGa7pLcF8XM2A/m+bzfhxUXFV6LLqJdYfRN8vXOkEw=
 ARC-Message-Signature: i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711753651; c=relaxed/simple;
-	bh=AuY2NMnF/F0eKaAZp9hi/QFwQoIZNLKhY4i1/5N3D9s=;
+	s=arc-20240116; t=1711753638; c=relaxed/simple;
+	bh=iO2iFV0D4Z3b8js9r4NsAySgcAByp//a+Wxx+cgicic=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CHcLqA1zJJJw1emEI6Mt5T6jfWTlJK9ybjmsnXwEFNUYEC70cTAKaqpsKvMqqk00m++zDptjHzoR2oJ99t/HvPvowJIq2V8y8RYa6k+Ud1ji9Pwv+QY5k9adJ2A+GGT07KHI6Gm2g6T8KM7oYaTAlBKl+q4g0vsa4lKSKCTbYBE=
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2/X0W5nB; arc=fail smtp.client-ip=40.107.237.50
+	 MIME-Version:Content-Type; b=dvJOucIkPBmFVLHO/85qrYnL4fNrIIrVq65ZGymJc4wmqldGv+YWyHuo+4jMAuW+WKhjLgiKTrtrbamLhoiUbigOq/EInQA/iw3M9WOX7UY6e8VS/8yywTd4b6Ai8j0LyL+gDxLvzKOZjZwxPJ5bQWK7pGBwaR4f+X24fw7k8Q8=
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3OpGT4EG; arc=fail smtp.client-ip=40.107.220.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B8RyJEt/gLT+Q3ntE+VTap3fAuWeh0NusiwR8TjW9b5LKQpD0e5iXZTC2PjyhwF6NHQH5PgtiaLGczcledBExFT2vBw/BXWj/9Dc6skUj1Zf9BuCWXMqJXnCv92Sj2RAaj/DHi2CbZRloCM88HF4osOkw0lD+qidmEYFqMZyjlXE8gulAp5FQLuKrk0MPhXsf6pAV9h/29/ZAGnMh0tHw6p4D9nkBDiwMQmyq0+HJd4U/fRw2RPucWJD9USgMgmcFY6VEpGBX98Q86v2R3LohXaUiDHagz1RaV3FKN8ITDyL1neYoxhZDz5ED9Fe7E5SHBn5E/PGig8+2ge6XYFagw==
+ b=F6vPn01wWitfm0OyBggnox6k/C7nJumwhBhojwRn/hCFHvRuUW+aUNSrDZnkFhy7ShpnRM8EHj/PTvnGThXDX7foumt3wJBz372plnsZzQiR0GJTKyxfuPtD19iu0pagjqN0yEg8h5qGNqvg+H/zEx/6+3l9jm+5ZVHiRYgQEj84c+PDUx5SSLuHzvoGSkg8dHVSz72dAujsR5+ixgIyTlge7K1etr0MpaQY5GNGd//l4fWmhaxP0HT2wieg7K84JGw0/CoRnsdxPXk4hV6CX95kA4fmcjZW/6bHoFMFrU1CAPLhIreVl+XozY0Z5ubDav86Ly7OnmbQMn/uqDw2eQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=taVbrIHOx6Vdes43tKem9S8Cee5XAjBK9GyxEIOMYEc=;
- b=KSxusj4xyHoqDKiHZ3XSJVVpROATGNSMyeu4tPRhqpSV5joO8dnTQyfhaywwop+AlfwRLP98z8ReRm6BYKp5uvOUtdfDMpIY2hw6N5FcewbiTcqIgOb6iYkYEk96MF+uT/6/WvVPAOoWIQiNVyuMZCukydE1RSA6rxg8GJIBCh7C7DSsaXlLixAKF4brgYQ78zw5zbKj5X6W1hWq7v91OaPGob06PN8FxZulC4+L4v1XMZRxYBVKyYe2aQz6FdEZbOv6Uoq98i7PfYbZPqaU7Bcxm39QZC5Y/NkYZT3LdI4rhQenigbWTzqnnPVOCpejj5mjfqwK1BcPKXSRmwNCKA==
+ bh=s+jARY3LyCLvz/TtnABCSlbVvSce/wUnD7GAV92FEJo=;
+ b=P1eC4RkpzXGsPO5hcLzZLDG4QbyU/jwxA2Booh1DxLBS9U+NtcHeJPQFYVoEqDmGDyjzUuMTSIds1O7qEX0cBVgPTBVuCikK0ihEBcRYypDyfZMWtDAGICi3FU3YeiabmgJqPRppgbXOoVzT5fZlPJ5HNz0rKVIl4xsFhS0mjTt4B95cQTvfdTmawLzje49caztOhkAx+cnPUBgbMe8vxZr8TqQsqyt0h0LHRQkT70oGAoIW+AX0PI/HxIIs/IdiCO8EBbJqQu49zlDWYt7e8+72FXoHsMIej/IR7E5Ok8wrUWbKVXJa5fPaeDIrp8qTvSxgake1f7elDlJGywvxew==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=taVbrIHOx6Vdes43tKem9S8Cee5XAjBK9GyxEIOMYEc=;
- b=2/X0W5nBoIQgjPbXpzId5s79hkITJn4qEsCseoAaWqcXrrOC8u7BAqa7BlB12MS2MFzs2IQWh6ZvKCUqVljnldha36u3xKoNXDtRdTFhpgWqpldjTTWo0+5punzN0zonCHtehR9jGW/7BNddBXIEU86anrjLUTtar714Kubvn6Q=
-Received: from DM6PR11CA0030.namprd11.prod.outlook.com (2603:10b6:5:190::43)
- by BY5PR12MB4260.namprd12.prod.outlook.com (2603:10b6:a03:206::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.40; Fri, 29 Mar
- 2024 23:07:25 +0000
-Received: from DS1PEPF00017091.namprd03.prod.outlook.com
- (2603:10b6:5:190:cafe::57) by DM6PR11CA0030.outlook.office365.com
- (2603:10b6:5:190::43) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.41 via Frontend
- Transport; Fri, 29 Mar 2024 23:07:24 +0000
+ bh=s+jARY3LyCLvz/TtnABCSlbVvSce/wUnD7GAV92FEJo=;
+ b=3OpGT4EGhPXNQFf3stZynRyM5E6TNZK3/oDGAjcNVPOd09orf/XxKjdbkKrtGLqlGDNQHxoEGllYlQpNzks8irzrzxu4JPu0Hpcx3QeRR+jXGxG5maLbPQ9rAMVeZzyc/wvBJil5QKn6qUEPlqsD+6lG8QLfESyOW8G3xlj0pC0=
+Received: from DS7PR05CA0103.namprd05.prod.outlook.com (2603:10b6:8:56::18) by
+ LV2PR12MB5728.namprd12.prod.outlook.com (2603:10b6:408:17c::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7409.41; Fri, 29 Mar 2024 23:06:43 +0000
+Received: from DS1PEPF0001708E.namprd03.prod.outlook.com
+ (2603:10b6:8:56:cafe::da) by DS7PR05CA0103.outlook.office365.com
+ (2603:10b6:8:56::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.17 via Frontend
+ Transport; Fri, 29 Mar 2024 23:06:42 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -536,13 +518,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF00017091.mail.protection.outlook.com (10.167.17.133) with Microsoft
+ DS1PEPF0001708E.mail.protection.outlook.com (10.167.17.134) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 23:07:24 +0000
+ 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 23:06:42 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 Mar
- 2024 18:07:23 -0500
+ 2024 18:06:41 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -559,17 +541,17 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
 	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: [PATCH v12 03/29] [TEMP] x86/CPU/AMD: Track SNP host status with cc_platform_*()
-Date: Fri, 29 Mar 2024 17:58:09 -0500
-Message-ID: <20240329225835.400662-4-michael.roth@amd.com>
+Subject: [PATCH v12 29/29] KVM: SEV: Provide support for SNP_EXTENDED_GUEST_REQUEST NAE event
+Date: Fri, 29 Mar 2024 17:58:35 -0500
+Message-ID: <20240329225835.400662-30-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
 Precedence: bulk
-X-Mailing-List: linux-kernel@vger.kernel.org
-List-Id: <linux-kernel.vger.kernel.org>
-List-Subscribe: <mailto:linux-kernel+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-kernel+unsubscribe@vger.kernel.org>
+X-Mailing-List: kvm@vger.kernel.org
+List-Id: <kvm.vger.kernel.org>
+List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -577,329 +559,309 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017091:EE_|BY5PR12MB4260:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0e7d57fe-8506-46bc-df93-08dc5044ff0f
+X-MS-TrafficTypeDiagnostic: DS1PEPF0001708E:EE_|LV2PR12MB5728:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5a569d29-705e-4060-04c6-08dc5044e613
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Cxx5VtOLnKMFgtSO/4Wzq/K44byZ3gsNedFkAhUlTQdg7uoHF1mDoAWqN9Lq6q18OCw05/wnFfUjWEGS1PQyIQYsIULWCQU9m0N7R48F14iU95iVtSh5pS+N0oSISCyGJcVv0qQCCsiEJ/zR1ktHTH15ttTkHWd42a+mgjcW0fiByNMuhaWyORvfePFPs2Ur17gmZOfUTAi053KJ0VPMm5gbizMLN98+IrAwICpwm26vVKAdXZ85Um+YStUR+GnQCuONHP6Mfmfmtu8tsoVV41VAviL/JLM5kuQcAI9yE4XLhD2iHjLVmyHS2SwcwiOEkxMbCykkHNFRF2c0GHNhLGIXZ6+jX7hPpGQopaAE/eNMnd3PM0UEhNw3z3z16pq4DZtKlVRiKswy1cCMyAoSB+wuXwZGuSm0MEHBjWcG7LyFzFP2ZL+gN9e1dN1c2vzg56xEL1lHud3XAfsgKGdZOCG8F7Ccv4jub4Rc6ryuv7DAuToeF9dfDWmfw54Sif1UaHuS19WaO/GbLq+3PY7WlwhL8S0lV1lbStm7Ti/KVTjFdOljrPL00KXRjEBuz40MRSu6yjD8BP6l4mOeqPT+4SYsiNe6d0W312YPuThmbgOM8jUJUel1WHP5fvJ2dzXmke3lnLw+VhGS77DrCjVyc6c9Lk4C2NnwNOD0AncvFHVCq448mue4TSALjPmzPqmAeUpDhbuDWWB7jkMxNYqyvS3bxhm0h9NbU7qB6W2Bz1k+2J7kYICtPwlzJGld1GOW
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(376005)(7416005)(1800799015)(36860700004);DIR:OUT;SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:07:24.6058
+X-Microsoft-Antispam-Message-Info: zbSsOQJRgVjd70hqFRHL9lECQmnrDOE63vUgqZVCCO+J9PT8Y2d6pOC/oZ6vSn7UXBbbo6dacvUsK7gDWOuvE6R64UTCrhEybQ1qy0pCklyy934AzNEsEX/pV0nWq50tmyTe9bXRgrtqgQyR1ZL8aMUUvaMhu/hGyoI1XgtWBacj3k5pQ/yvfITfadCKsWEqX0e5rNRzauSogv0B3GLifpgl/uecFaFSw2/JVmEsEdAvLIwXLwsDVRoE92m3W1l86UiB2w2swCOkrJIH/jStIVEcMxJp0dkhm7/yk9Yjnx1e1/lZm8Zhf21qCZyAzsNz3+BQ4TKKts4WJs4wVoqqUaLODjqEFllyTQZMTPY72vRva4e1qd34VGqdizyxk71u3H302SFdXQ2IJW1SStZW5pcz7dJR82Vioa7hdY0zL1gbd+HpU2vk/+rs5c9qgBZkmO2YQLCoPOYdgxuRlKkUuga0zMWlAq1pm27qH8cmrPYHtFLdtLZSxwAC9ShD3yjNL1j14eNFGPqr3WcPvG9awmaDFj5bUOkoG1b3foRgf3wTlDpbvCWlqrzk+SwcAZCuNy2I+7WHip3Zi7uEM+ySvvDNjKx6nGXvidVH3R+Df5dI6S8l1fZPVLUwAI7VM58IwuWyrIfy4JjyJfbh3qGqlykEZzIWJ5gvxVagIbX5DKzB2dy0BWIjsrh117hV+lU7RCc3aGRdBQr05ipPTZFyqXcukaZ76Uv2wO7sf6QoEdnoSMo4e4BrRV1ryCEqTm/h
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(1800799015)(82310400014)(7416005)(36860700004);DIR:OUT;SFP:1101;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:06:42.6990
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e7d57fe-8506-46bc-df93-08dc5044ff0f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a569d29-705e-4060-04c6-08dc5044e613
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017091.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0001708E.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4260
-Return-Path: linux-kernel+bounces-125515-steffen.klassert=secunet.com@vger.kernel.org
-X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 23:08:06.2338
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5728
+Return-Path: kvm+bounces-13135-martin.weber=secunet.com@vger.kernel.org
+X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 23:07:40.7672
  (UTC)
-X-MS-Exchange-Organization-Network-Message-Id: c21458c2-4e02-4c25-f16f-08dc504517d1
-X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.36
-X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.201
-X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-01.secunet.de
-X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=cas-essen-01.secunet.de:TOTAL-FE=0.026|SMR=0.026(SMRPI=0.022(SMRPI-FrontendProxyAgent=0.022));2024-03-29T23:08:06.259Z
+X-MS-Exchange-Organization-Network-Message-Id: 070575c8-7445-4145-0f13-08dc504508a4
+X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.37
+X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.202
+X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-02.secunet.de
+X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=cas-essen-02.secunet.de:TOTAL-FE=0.009|SMR=0.008(SMRPI=0.005(SMRPI-FrontendProxyAgent=0.005));2024-03-29T23:07:40.776Z
 X-MS-Exchange-Forest-ArrivalHubServer: mbx-essen-02.secunet.de
-X-MS-Exchange-Organization-AuthSource: cas-essen-01.secunet.de
+X-MS-Exchange-Organization-AuthSource: cas-essen-02.secunet.de
 X-MS-Exchange-Organization-AuthAs: Anonymous
-X-MS-Exchange-Organization-OriginalSize: 21732
+X-MS-Exchange-Organization-OriginalSize: 21879
 X-MS-Exchange-Organization-Transport-Properties: DeliveryPriority=Low
 X-MS-Exchange-Organization-Prioritization: 2:ShadowRedundancy
 X-MS-Exchange-Organization-IncludeInSla: False:ShadowRedundancy
 
-From: "Borislav Petkov (AMD)" <bp@alien8.de>
+Version 2 of GHCB specification added support for the SNP Extended Guest
+Request Message NAE event. This event serves a nearly identical purpose
+to the previously-added SNP_GUEST_REQUEST event, but allows for
+additional certificate data to be supplied via an additional
+guest-supplied buffer to be used mainly for verifying the signature of
+an attestation report as returned by firmware.
 
-The host SNP worthiness can determined later, after alternatives have
-been patched, in snp_rmptable_init() depending on cmdline options like
-iommu=pt which is incompatible with SNP, for example.
+This certificate data is supplied by userspace, so unlike with
+SNP_GUEST_REQUEST events, SNP_EXTENDED_GUEST_REQUEST events are first
+forwarded to userspace via a KVM_EXIT_VMGEXIT exit type, and then the
+firmware request is made only afterward.
 
-Which means that one cannot use X86_FEATURE_SEV_SNP and will need to
-have a special flag for that control.
+Implement handling for these events.
 
-Use that newly added CC_ATTR_HOST_SEV_SNP in the appropriate places.
+Since there is a potential for race conditions where the
+userspace-supplied certificate data may be out-of-sync relative to the
+reported TCB or VLEK that firmware will use when signing attestation
+reports, make use of the synchronization mechanisms wired up to the
+SNP_{PAUSE,RESUME}_ATTESTATION SEV device ioctls such that the guest
+will be told to retry the request while attestation has been paused due
+to an update being underway on the system.
 
-Move kdump_sev_callback() to its rightfull place, while at it.
-
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/include/asm/sev.h         |  4 ++--
- arch/x86/kernel/cpu/amd.c          | 38 ++++++++++++++++++------------
- arch/x86/kernel/cpu/mtrr/generic.c |  2 +-
- arch/x86/kernel/sev.c              | 10 --------
- arch/x86/kvm/svm/sev.c             |  2 +-
- arch/x86/virt/svm/sev.c            | 26 +++++++++++++-------
- drivers/crypto/ccp/sev-dev.c       |  2 +-
- drivers/iommu/amd/init.c           |  4 +++-
- 8 files changed, 49 insertions(+), 39 deletions(-)
+ Documentation/virt/kvm/api.rst | 26 ++++++++++++
+ arch/x86/include/asm/sev.h     |  4 ++
+ arch/x86/kvm/svm/sev.c         | 75 ++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.h         |  3 ++
+ arch/x86/virt/svm/sev.c        | 21 ++++++++++
+ include/uapi/linux/kvm.h       |  6 +++
+ 6 files changed, 135 insertions(+)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 85099198a10f..6cf186ed8f66 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -7066,6 +7066,7 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+ 		struct kvm_user_vmgexit {
+ 		#define KVM_USER_VMGEXIT_PSC_MSR	1
+ 		#define KVM_USER_VMGEXIT_PSC		2
++		#define KVM_USER_VMGEXIT_EXT_GUEST_REQ	3
+ 			__u32 type; /* KVM_USER_VMGEXIT_* type */
+ 			union {
+ 				struct {
+@@ -7079,6 +7080,11 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+ 					__u64 shared_gpa;
+ 					__u64 ret;
+ 				} psc;
++				struct {
++					__u64 data_gpa;
++					__u64 data_npages;
++					__u32 ret;
++				} ext_guest_req;
+ 			};
+ 		};
+ 
+@@ -7108,6 +7114,26 @@ private/shared state. Userspace will return a value in 'ret' that is in
+ agreement with the GHCB-defined return values that the guest will expect
+ in the SW_EXITINFO2 field of the GHCB in response to these requests.
+ 
++For the KVM_USER_VMGEXIT_EXT_GUEST_REQ type, the ext_guest_req union type
++is used. The kernel will supply in 'data_gpa' the value the guest supplies
++via the RAX field of the GHCB when issued extended guest requests.
++'data_npages' will similarly contain the value the guest supplies in RBX
++denoting the number of shared pages available to write the certificate
++data into.
++
++  - If the supplied number of pages is sufficient, userspace should write
++    the certificate data blob (in the format defined by the GHCB spec) in
++    the address indicated by 'data_gpa' and set 'ret' to 0.
++
++  - If the number of pages supplied is not sufficient, userspace must write
++    the required number of pages in 'data_npages' and then set 'ret' to 1.
++
++  - If userspace is temporarily unable to handle the request, 'ret' should
++    be set to 2 to inform the guest to retry later.
++
++  - If some other error occurred, userspace should set 'ret' to a non-zero
++    value that is distinct from the specific return values mentioned above.
++
+ 6. Capabilities that can be enabled on vCPUs
+ ============================================
+ 
 diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index 9477b4053bce..780182cda3ab 100644
+index 975e92005438..0e092c8c5614 100644
 --- a/arch/x86/include/asm/sev.h
 +++ b/arch/x86/include/asm/sev.h
-@@ -228,7 +228,6 @@ int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, struct sn
- void snp_accept_memory(phys_addr_t start, phys_addr_t end);
- u64 snp_get_unsupported_features(u64 status);
- u64 sev_get_status(void);
--void kdump_sev_callback(void);
- void sev_show_status(void);
- #else
- static inline void sev_es_ist_enter(struct pt_regs *regs) { }
-@@ -258,7 +257,6 @@ static inline int snp_issue_guest_request(u64 exit_code, struct snp_req_data *in
- static inline void snp_accept_memory(phys_addr_t start, phys_addr_t end) { }
- static inline u64 snp_get_unsupported_features(u64 status) { return 0; }
- static inline u64 sev_get_status(void) { return 0; }
--static inline void kdump_sev_callback(void) { }
- static inline void sev_show_status(void) { }
- #endif
- 
-@@ -270,6 +268,7 @@ int psmash(u64 pfn);
- int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, u32 asid, bool immutable);
- int rmp_make_shared(u64 pfn, enum pg_level level);
- void snp_leak_pages(u64 pfn, unsigned int npages);
-+void kdump_sev_callback(void);
+@@ -274,6 +274,8 @@ void snp_leak_pages(u64 pfn, unsigned int npages);
+ void kdump_sev_callback(void);
+ int snp_pause_attestation(u64 *transaction_id);
+ void snp_resume_attestation(u64 *transaction_id);
++u64 snp_transaction_get_id(void);
++bool snp_transaction_is_stale(u64 transaction_id);
  #else
  static inline bool snp_probe_rmptable_info(void) { return false; }
  static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return -ENODEV; }
-@@ -282,6 +281,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, u32 as
- }
- static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
- static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
-+static inline void kdump_sev_callback(void) { }
+@@ -289,6 +291,8 @@ static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
+ static inline void kdump_sev_callback(void) { }
+ static inline int snp_pause_attestation(u64 *transaction_id) { return 0; }
+ static inline void snp_resume_attestation(u64 *transaction_id) {}
++static inline u64 snp_transaction_get_id(void) { return 0; }
++static inline bool snp_transaction_is_stale(u64 transaction_id) { return false; }
  #endif
  
  #endif
-diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-index 6d8677e80ddb..9bf17c9c29da 100644
---- a/arch/x86/kernel/cpu/amd.c
-+++ b/arch/x86/kernel/cpu/amd.c
-@@ -345,6 +345,28 @@ static void srat_detect_node(struct cpuinfo_x86 *c)
- #endif
- }
- 
-+static void bsp_determine_snp(struct cpuinfo_x86 *c)
-+{
-+#ifdef CONFIG_ARCH_HAS_CC_PLATFORM
-+	cc_vendor = CC_VENDOR_AMD;
-+
-+	if (cpu_has(c, X86_FEATURE_SEV_SNP)) {
-+		/*
-+		 * RMP table entry format is not architectural and is defined by the
-+		 * per-processor PPR. Restrict SNP support on the known CPU models
-+		 * for which the RMP table entry format is currently defined for.
-+		 */
-+		if (!cpu_has(c, X86_FEATURE_HYPERVISOR) &&
-+		    c->x86 >= 0x19 && snp_probe_rmptable_info()) {
-+			cc_platform_set(CC_ATTR_HOST_SEV_SNP);
-+		} else {
-+			setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-+			cc_platform_clear(CC_ATTR_HOST_SEV_SNP);
-+		}
-+	}
-+#endif
-+}
-+
- static void bsp_init_amd(struct cpuinfo_x86 *c)
- {
- 	if (cpu_has(c, X86_FEATURE_CONSTANT_TSC)) {
-@@ -452,21 +474,7 @@ static void bsp_init_amd(struct cpuinfo_x86 *c)
- 		break;
- 	}
- 
--	if (cpu_has(c, X86_FEATURE_SEV_SNP)) {
--		/*
--		 * RMP table entry format is not architectural and it can vary by processor
--		 * and is defined by the per-processor PPR. Restrict SNP support on the
--		 * known CPU model and family for which the RMP table entry format is
--		 * currently defined for.
--		 */
--		if (!boot_cpu_has(X86_FEATURE_ZEN3) &&
--		    !boot_cpu_has(X86_FEATURE_ZEN4) &&
--		    !boot_cpu_has(X86_FEATURE_ZEN5))
--			setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
--		else if (!snp_probe_rmptable_info())
--			setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
--	}
--
-+	bsp_determine_snp(c);
- 	return;
- 
- warn:
-diff --git a/arch/x86/kernel/cpu/mtrr/generic.c b/arch/x86/kernel/cpu/mtrr/generic.c
-index 422a4ddc2ab7..7b29ebda024f 100644
---- a/arch/x86/kernel/cpu/mtrr/generic.c
-+++ b/arch/x86/kernel/cpu/mtrr/generic.c
-@@ -108,7 +108,7 @@ static inline void k8_check_syscfg_dram_mod_en(void)
- 	      (boot_cpu_data.x86 >= 0x0f)))
- 		return;
- 
--	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return;
- 
- 	rdmsr(MSR_AMD64_SYSCFG, lo, hi);
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index b59b09c2f284..1e1a3c3bd1e8 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -2287,16 +2287,6 @@ static int __init snp_init_platform_device(void)
- }
- device_initcall(snp_init_platform_device);
- 
--void kdump_sev_callback(void)
--{
--	/*
--	 * Do wbinvd() on remote CPUs when SNP is enabled in order to
--	 * safely do SNP_SHUTDOWN on the local CPU.
--	 */
--	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP))
--		wbinvd();
--}
--
- void sev_show_status(void)
- {
- 	int i;
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index d30bd30d4f7a..7b872f97a452 100644
+index f56f04553e81..1da45e23ee14 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -3279,7 +3279,7 @@ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
- 	unsigned long pfn;
- 	struct page *p;
+@@ -3225,6 +3225,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 	case SVM_VMGEXIT_PSC:
+ 	case SVM_VMGEXIT_TERM_REQUEST:
+ 	case SVM_VMGEXIT_GUEST_REQUEST:
++	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
+ 		break;
+ 	default:
+ 		reason = GHCB_ERR_INVALID_EVENT;
+@@ -3725,6 +3726,77 @@ static void snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp
+ 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
+ }
  
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++static int snp_complete_ext_guest_req(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++	struct vmcb_control_area *control;
++	struct kvm *kvm = vcpu->kvm;
++	sev_ret_code fw_err = 0;
++	int vmm_ret;
++
++	vmm_ret = vcpu->run->vmgexit.ext_guest_req.ret;
++	if (vmm_ret) {
++		if (vmm_ret == SNP_GUEST_VMM_ERR_INVALID_LEN)
++			vcpu->arch.regs[VCPU_REGS_RBX] =
++				vcpu->run->vmgexit.ext_guest_req.data_npages;
++		goto abort_request;
++	}
++
++	control = &svm->vmcb->control;
++
++	if (!__snp_handle_guest_req(kvm, control->exit_info_1, control->exit_info_2,
++				    &fw_err))
++		vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
++
++	/*
++	 * Give errors related to stale transactions precedence to provide more
++	 * potential options for servicing firmware while guests are running.
++	 */
++	if (snp_transaction_is_stale(svm->snp_transaction_id))
++		vmm_ret = SNP_GUEST_VMM_ERR_BUSY;
++
++abort_request:
++	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
++
++	return 1; /* resume guest */
++}
++
++static int snp_begin_ext_guest_req(struct kvm_vcpu *vcpu)
++{
++	int vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
++	struct vcpu_svm *svm = to_svm(vcpu);
++	unsigned long data_npages;
++	sev_ret_code fw_err;
++	gpa_t data_gpa;
++
++	if (!sev_snp_guest(vcpu->kvm))
++		goto abort_request;
++
++	data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
++	data_npages = vcpu->arch.regs[VCPU_REGS_RBX];
++
++	if (!IS_ALIGNED(data_gpa, PAGE_SIZE))
++		goto abort_request;
++
++	svm->snp_transaction_id = snp_transaction_get_id();
++	if (snp_transaction_is_stale(svm->snp_transaction_id)) {
++		vmm_ret = SNP_GUEST_VMM_ERR_BUSY;
++		goto abort_request;
++	}
++
++	vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
++	vcpu->run->vmgexit.type = KVM_USER_VMGEXIT_EXT_GUEST_REQ;
++	vcpu->run->vmgexit.ext_guest_req.data_gpa = data_gpa;
++	vcpu->run->vmgexit.ext_guest_req.data_npages = data_npages;
++	vcpu->arch.complete_userspace_io = snp_complete_ext_guest_req;
++
++	return 0; /* forward request to userspace */
++
++abort_request:
++	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
++	return 1; /* resume guest */
++}
++
+ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ {
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+@@ -3989,6 +4061,9 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		snp_handle_guest_req(svm, control->exit_info_1, control->exit_info_2);
+ 		ret = 1;
+ 		break;
++	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
++		ret = snp_begin_ext_guest_req(vcpu);
++		break;
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		vcpu_unimpl(vcpu,
+ 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 746f819a6de4..7af6d0e9de17 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -303,6 +303,9 @@ struct vcpu_svm {
  
- 	/*
+ 	/* Guest GIF value, used when vGIF is not enabled */
+ 	bool guest_gif;
++
++	/* Transaction ID associated with SNP config updates */
++	u64 snp_transaction_id;
+ };
+ 
+ struct svm_cpu_data {
 diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index cffe1157a90a..ab0e8448bb6e 100644
+index 09d62870306b..30638d10a1b9 100644
 --- a/arch/x86/virt/svm/sev.c
 +++ b/arch/x86/virt/svm/sev.c
-@@ -77,7 +77,7 @@ static int __mfd_enable(unsigned int cpu)
- {
- 	u64 val;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return 0;
- 
- 	rdmsrl(MSR_AMD64_SYSCFG, val);
-@@ -98,7 +98,7 @@ static int __snp_enable(unsigned int cpu)
- {
- 	u64 val;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return 0;
- 
- 	rdmsrl(MSR_AMD64_SYSCFG, val);
-@@ -174,11 +174,11 @@ static int __init snp_rmptable_init(void)
- 	u64 rmptable_size;
- 	u64 val;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return 0;
- 
- 	if (!amd_iommu_snp_en)
--		return 0;
-+		goto nosnp;
- 
- 	if (!probed_rmp_size)
- 		goto nosnp;
-@@ -225,7 +225,7 @@ static int __init snp_rmptable_init(void)
- 	return 0;
- 
- nosnp:
--	setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-+	cc_platform_clear(CC_ATTR_HOST_SEV_SNP);
- 	return -ENOSYS;
+@@ -611,3 +611,24 @@ void snp_resume_attestation(u64 *transaction_id)
+ 	mutex_unlock(&snp_pause_attestation_lock);
  }
- 
-@@ -246,7 +246,7 @@ static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
- {
- 	struct rmpentry *large_entry, *entry;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return ERR_PTR(-ENODEV);
- 
- 	entry = get_rmpentry(pfn);
-@@ -363,7 +363,7 @@ int psmash(u64 pfn)
- 	unsigned long paddr = pfn << PAGE_SHIFT;
- 	int ret;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return -ENODEV;
- 
- 	if (!pfn_valid(pfn))
-@@ -472,7 +472,7 @@ static int rmpupdate(u64 pfn, struct rmp_state *state)
- 	unsigned long paddr = pfn << PAGE_SHIFT;
- 	int ret, level;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return -ENODEV;
- 
- 	level = RMP_TO_PG_LEVEL(state->pagesize);
-@@ -558,3 +558,13 @@ void snp_leak_pages(u64 pfn, unsigned int npages)
- 	spin_unlock(&snp_leaked_pages_list_lock);
- }
- EXPORT_SYMBOL_GPL(snp_leak_pages);
+ EXPORT_SYMBOL_GPL(snp_resume_attestation);
 +
-+void kdump_sev_callback(void)
++u64 snp_transaction_get_id(void)
 +{
-+	/*
-+	 * Do wbinvd() on remote CPUs when SNP is enabled in order to
-+	 * safely do SNP_SHUTDOWN on the local CPU.
-+	 */
-+	if (cc_platform_has(CC_ATTR_HOST_SEV_SNP))
-+		wbinvd();
++	return snp_transaction_id;
 +}
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index f44efbb89c34..2102377f727b 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1090,7 +1090,7 @@ static int __sev_snp_init_locked(int *error)
- 	void *arg = &data;
- 	int cmd, rc = 0;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return -ENODEV;
- 
- 	sev = psp->sev_data;
-diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-index e7a44929f0da..33228c1c8980 100644
---- a/drivers/iommu/amd/init.c
-+++ b/drivers/iommu/amd/init.c
-@@ -3228,7 +3228,7 @@ static bool __init detect_ivrs(void)
- static void iommu_snp_enable(void)
- {
- #ifdef CONFIG_KVM_AMD_SEV
--	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return;
- 	/*
- 	 * The SNP support requires that IOMMU must be enabled, and is
-@@ -3236,12 +3236,14 @@ static void iommu_snp_enable(void)
- 	 */
- 	if (no_iommu || iommu_default_passthrough()) {
- 		pr_err("SNP: IOMMU disabled or configured in passthrough mode, SNP cannot be supported.\n");
-+		cc_platform_clear(CC_ATTR_HOST_SEV_SNP);
- 		return;
- 	}
- 
- 	amd_iommu_snp_en = check_feature(FEATURE_SNP);
- 	if (!amd_iommu_snp_en) {
- 		pr_err("SNP: IOMMU SNP feature not enabled, SNP cannot be supported.\n");
-+		cc_platform_clear(CC_ATTR_HOST_SEV_SNP);
- 		return;
- 	}
++EXPORT_SYMBOL_GPL(snp_transaction_get_id);
++
++bool snp_transaction_is_stale(u64 transaction_id)
++{
++	bool stale;
++
++	mutex_lock(&snp_pause_attestation_lock);
++
++	stale = (snp_attestation_paused ||
++		 transaction_id != snp_transaction_id);
++
++	mutex_unlock(&snp_pause_attestation_lock);
++
++	return stale;
++}
++EXPORT_SYMBOL_GPL(snp_transaction_is_stale);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index e33c48bfbd67..585de3a2591e 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -138,6 +138,7 @@ struct kvm_xen_exit {
+ struct kvm_user_vmgexit {
+ #define KVM_USER_VMGEXIT_PSC_MSR	1
+ #define KVM_USER_VMGEXIT_PSC		2
++#define KVM_USER_VMGEXIT_EXT_GUEST_REQ	3
+ 	__u32 type; /* KVM_USER_VMGEXIT_* type */
+ 	union {
+ 		struct {
+@@ -151,6 +152,11 @@ struct kvm_user_vmgexit {
+ 			__u64 shared_gpa;
+ 			__u64 ret;
+ 		} psc;
++		struct {
++			__u64 data_gpa;
++			__u64 data_npages;
++			__u32 ret;
++		} ext_guest_req;
+ 	};
+ };
  
 -- 
 2.25.1
