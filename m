@@ -1,39 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B27F3FB83;
-	Fri, 29 Mar 2024 06:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F293FB8C;
+	Fri, 29 Mar 2024 06:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711694094; cv=none; b=MkSCaBtcmgsHI2oSjn1gSEyFSh+C4jQ+VlPF1FbVu9HYy3XW40i8MCFXbbMzHNkUI19YjtOOoCh194xxjZWk5u268Wol8QdHf1TBsIX3VdSz6xSrUjOIBYsqo7yl0FDQC3Ig051YjoscDnxZE9cSAL52MBfTKKafXjczY3LjLII=
+	t=1711695471; cv=none; b=P44/vE3hjlBgAUKwqwCsCYC6kmX55WBd3RtvwgNhCe/lwVIovBSOVWqVVSNZqbz+lYrvxM0o/wB1pzbSRKKeKW0+454reCzv2ra+7U4Uq1GP2a4B38iTslF53WSn9JZ7q8uQDfn6xX4VZzDHatm55/dk0vz+Rom+U5eBvRjKCyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711694094; c=relaxed/simple;
-	bh=JZDd4vTOWg91ZZZdlKhj2Iuf8kbXcTkZgWQyBW9M9bA=;
+	s=arc-20240116; t=1711695471; c=relaxed/simple;
+	bh=3tp0OjNh8FoNAxu2MnETSB9plHBlxQ/kYzlSx8y1UpU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oG05Lt7UFFjvGGjjZCdd2A+iM3mxYOoPKNwfmKTphuai+jM+eSzUz4HvdtjG/J6P35fKOxeAFe76VGN3LhX2p6cLM+wn0jQyPNLoU+xWlu6xuAha+PSerTZcNk1xO18qIeQdw//K+j2baL2sWKpoRGMcct43CjESPO804KoJMI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YSWhuXv2; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=QyteSu2uykixX1DVdkIx/2rBSWRwB62rtmQzPSXSnEefnfcBJOnmMG1dKfz6xiomo2rGPp3LUPymIwoJ8U8WJoXsf5BJPNz4ofACp4hYnY38i2QbRyxvqAeyJVdPC5d6mP7foeAhflCZlu0GvjANLDrswb7+3GRfVlLaCtE6lHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RPeog6it; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YSWhuXv2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CA35C433C7;
-	Fri, 29 Mar 2024 06:34:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1711694094;
-	bh=JZDd4vTOWg91ZZZdlKhj2Iuf8kbXcTkZgWQyBW9M9bA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YSWhuXv21YBYdVAQHEohit7APVPxdrYw1NjCJ/Q589Zmt9RI8JDhrsn28T0KOF+uL
-	 1VKff0pavugkCoc6CwstGTCfET0pSJ8RJhbAVAXfLKjGhIwhXPVCcC1rU3iHJa2/nE
-	 x08+MIDtIIBgVeRQekeRZRA5hvQI/KW4goeipNSs=
-Date: Fri, 29 Mar 2024 07:34:50 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Chenghai Huang <huangchenghai2@huawei.com>
-Cc: zhangfei.gao@linaro.org, wangzhou1@hisilicon.com,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	fanghao11@huawei.com, shenyang39@huawei.com, liulongfang@huawei.com,
-	qianweili@huawei.com
-Subject: Re: [PATCH] misc: uacce - add the null check for the input pointer
- and its pointer members
-Message-ID: <2024032946-supernova-unstaffed-63ec@gregkh>
-References: <20240329062655.3055646-1-huangchenghai2@huawei.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RPeog6it"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711695470; x=1743231470;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3tp0OjNh8FoNAxu2MnETSB9plHBlxQ/kYzlSx8y1UpU=;
+  b=RPeog6itdr8XcKWKrmQNUQYPfkYt/pQ0yJ5HsnRnfRWG+72H7uAXjtBy
+   7dPHRIvrEg2u3pS9+J8aImXKCwXoeF8JXSzv+kSDCudzj47gxdsSxWasa
+   bq/mWvG3UIkYJmFm7EoPQIfNrOj0LMnhYLPzAEeb+u0y47XI4adcq6EKL
+   Kxoc6FXctL/kGVxb+JxUhMITgXzxGJeN/kZlUdsm7J0COYofjWQy08Vzb
+   65IcXd7WhXZYgye2gwUyk0qC2EmCPmD6bDsr4lIfR/Z2IDHe0WyivA84+
+   MWXuUqJzROS34qTYqiv/ntsIO4VHtQTEVvJfuhnivg34Fta5Jw5jZKOqQ
+   Q==;
+X-CSE-ConnectionGUID: Vr6mqM4oQ1aS2gFIn90QCw==
+X-CSE-MsgGUID: eK9qESqfTnWfuHLKAK91ag==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="18027410"
+X-IronPort-AV: E=Sophos;i="6.07,164,1708416000"; 
+   d="scan'208";a="18027410"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 23:57:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,164,1708416000"; 
+   d="scan'208";a="54351691"
+Received: from atanneer-mobl.amr.corp.intel.com (HELO desk) ([10.209.84.81])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 23:57:49 -0700
+Date: Thu, 28 Mar 2024 23:57:42 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dm-devel@redhat.com, ebiggers@kernel.org, luto@kernel.org,
+	dave.hansen@linux.intel.com, tglx@linutronix.de, bp@alien8.de,
+	mingo@kernel.org, x86@kernel.org, herbert@gondor.apana.org.au,
+	ardb@kernel.org, elliott@hpe.com, dan.j.williams@intel.com,
+	bernie.keany@intel.com, charishma1.gairuboyina@intel.com,
+	Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH v9 10/14] x86/cpu/keylocker: Check Gather Data Sampling
+ mitigation
+Message-ID: <20240329065742.fc5of75e776y2g4b@desk>
+References: <20230603152227.12335-1-chang.seok.bae@intel.com>
+ <20240329015346.635933-1-chang.seok.bae@intel.com>
+ <20240329015346.635933-11-chang.seok.bae@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,17 +65,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240329062655.3055646-1-huangchenghai2@huawei.com>
+In-Reply-To: <20240329015346.635933-11-chang.seok.bae@intel.com>
 
-On Fri, Mar 29, 2024 at 02:26:55PM +0800, Chenghai Huang wrote:
-> The uacce_alloc() is the member of the EXPORT_SYMBOL_GPL. Therefore, null
-> pointer verification is added on the pointer type input parameter and its
-> pointer members.
+On Thu, Mar 28, 2024 at 06:53:42PM -0700, Chang S. Bae wrote:
+> +/*
+> + * The mitigation is implemented at a microcode level. Ensure that the
+> + * microcode update is applied and the mitigation is locked.
+> + */
+> +static bool __init have_gds_mitigation(void)
+> +{
+> +	u64 mcu_ctrl;
+> +
+> +	/* GDS_CTRL is set if new microcode is loaded. */
+> +	if (!(x86_read_arch_cap_msr() & ARCH_CAP_GDS_CTRL))
+> +		goto vulnerable;
+> +
+> +	/* If GDS_MITG_LOCKED is set, GDS_MITG_DIS is forced to 0. */
+> +	rdmsrl(MSR_IA32_MCU_OPT_CTRL, mcu_ctrl);
+> +	if (mcu_ctrl & GDS_MITG_LOCKED)
+> +		return true;
 
-I do not understand, why does the export type matter?  Just fix any
-callers to use this properly and send proper parameters.  What in-tree
-caller needs this?
+Similar to RFDS, above checks can be simplified to:
 
-thanks,
-
-greg k-h
+	if (gds_mitigation == GDS_MITIGATION_FULL_LOCKED)
+		return true;
+> +
+> +vulnerable:
+> +	pr_warn("x86/keylocker: Susceptible to the GDS vulnerability.\n");
+> +	return false;
+> +}
