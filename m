@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CED3381BB;
-	Fri, 29 Mar 2024 02:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC5D23758;
+	Fri, 29 Mar 2024 02:09:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711678182; cv=none; b=OP0GwPh1iW5hiFGjbku4R/7w5YbZMxgdXUD/F4WdeLU4/Sgdbc+2+TZTtSXMzOIsOE2mE0xjr+/9USFsTRqs2HTEPGtuEbcKpuFgkEMt2yYTue8aLuwtC5eHaXvlOUDz9m90QpEsgQaW++YfXPQWfhz3qknCW/uZr9AUVb9nGcU=
+	t=1711678183; cv=none; b=BYX69Og22gqx1aXReF79itqDX55Dx0Sf6hsyhbHfaVg/JUAODKS6bkIlvsAJeZdzqieW0Mln1KSLH1x4Vihvp/X9R0TOOW64jZQMNZqjwR6eZwa+8T/ptIbjaQ/HGcDGcfaN+oFEVvs0IgIZArQ1Yzpk4zOn7pemDu77ibBnBjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711678182; c=relaxed/simple;
-	bh=N6G0WKeysLe36XGor+TH2QHAhPLm6Xleh7fpJIEyD2Y=;
+	s=arc-20240116; t=1711678183; c=relaxed/simple;
+	bh=K9Qk8pSUsltL7/8lG3y5liCiSXgfEq5ZpFkBVaabd6g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=a3y194X/1rJBk8AQQyjVAUxPRKSeSthnBKzwk6UWRVXksx/nHGNba7ZHK4Q7sS48uBQ7WkR8v2t9my65pqUlTr13Er1DOB5kdCjxlUbFOqu6fgrYrRmjsTAhhwtYKsUHbMaMJbqABg6Xga70IE02UtXO6VIN9HiYjc4MGfLoIEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PWtPAJ0m; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=Klc4rMj8bWjPwAg63Ep0hblmV/cbVXNu4Sp6o9Kzbv5NPk9vlSR7dbddCX9BNdP6EuCk1m4YCza4O8eyQzZKjOVEapzXcovJ9RycGgODk40f4N9b/uWIylaFHwnSl72slQNAouUG6xcfC4x3P6z2ZjaAKY0L0cF4RIlbxP67HCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=miLMt+Ye; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PWtPAJ0m"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="miLMt+Ye"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711678180; x=1743214180;
+  t=1711678181; x=1743214181;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=N6G0WKeysLe36XGor+TH2QHAhPLm6Xleh7fpJIEyD2Y=;
-  b=PWtPAJ0mZArmRPOExLeNUWpKcm2uU3SsUOWm/yRQS9f7XRKdA7bwH+xv
-   3QKiGU+iqzduCx/rvNQwIXc6QM9pphqUat75vFoiQpOygJwtw6pwNagcB
-   lx2nixWjWVna1nI6Tq7HJWvY29QjHPtR9y8R2T8Z5MYEEHKO8icVaS8d1
-   t02/TLPAOKFMgZQxsbc1ZYwe0cPf4OoFCAXO11SQvpcpZ8LQTP4UN7PDY
-   czFdtf3an4+i6XUIDjS3YMQXyg6e41HETRWzzFP/HZIMeSGcaPnRp/GaL
-   GC/5ap3E84j1G+XpGxdVMEt4cabAFqd9vgHH43xPlI/spfyePD1XBCYOp
+  bh=K9Qk8pSUsltL7/8lG3y5liCiSXgfEq5ZpFkBVaabd6g=;
+  b=miLMt+Yeu+tm2YLmwr4Gv+XK1plff/SZm9FmoeIt8ECM5VgKQiiN8vyI
+   csQ0KPU2HOouqkFonfJRmepvmRgRWPJcamJnJlN45O/ke3gGrN+X595uq
+   HQETb1VMDj9FBBd9kul4CXFWqAbS2pkP52n6wAq+IaR+3McH4uNPaq+A7
+   2qk75oy4qPmQ4yoaEe1lzc2GNKZboutZQ5QIaJwI5vbnozMWVcyiAlA9c
+   V7oQ5IQVa+4R5OnaLjkOnS4zlSfOOYipFYtkMtIHcsIVwAJh30D83c0Oh
+   Rb9HEIEg/3pd2FlPguRPUVjQw5um9jkRMq+CsC34Gn1ba2nELSPmZPmHh
    w==;
-X-CSE-ConnectionGUID: PWVP/QhtR5W0PGJPUaiKrw==
-X-CSE-MsgGUID: l8eI8ZV3RLKuVAm8QP7rFg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6700039"
+X-CSE-ConnectionGUID: qYWiYffcSGafgreiA5J0HA==
+X-CSE-MsgGUID: rwlPr3+YRFC+HLoSQs55Vw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6700048"
 X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="6700039"
+   d="scan'208";a="6700048"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 19:09:39 -0700
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 19:09:41 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="17301382"
+   d="scan'208";a="17301389"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
-  by orviesa006.jf.intel.com with ESMTP; 28 Mar 2024 19:09:39 -0700
+  by orviesa006.jf.intel.com with ESMTP; 28 Mar 2024 19:09:40 -0700
 From: "Chang S. Bae" <chang.seok.bae@intel.com>
 To: linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: ebiggers@kernel.org,
 	bernie.keany@intel.com,
 	charishma1.gairuboyina@intel.com,
 	chang.seok.bae@intel.com
-Subject: [PATCH v9 03/14] x86/insn: Add Key Locker instructions to the opcode map
-Date: Thu, 28 Mar 2024 18:53:35 -0700
-Message-Id: <20240329015346.635933-4-chang.seok.bae@intel.com>
+Subject: [PATCH v9 04/14] x86/asm: Add a wrapper function for the LOADIWKEY instruction
+Date: Thu, 28 Mar 2024 18:53:36 -0700
+Message-Id: <20240329015346.635933-5-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240329015346.635933-1-chang.seok.bae@intel.com>
 References: <20230603152227.12335-1-chang.seok.bae@intel.com>
@@ -74,128 +74,119 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The x86 instruction decoder needs to know these new instructions that
-are going to be used in the crypto library as well as the x86 core
-code. Add the following:
+Key Locker introduces a CPU-internal wrapping key to encode a user key
+to a key handle. Then a key handle is referenced instead of the plain
+text key.
 
-LOADIWKEY:
-	Load a CPU-internal wrapping key.
+LOADIWKEY loads a wrapping key in the software-inaccessible CPU state.
+It operates only in kernel mode.
 
-ENCODEKEY128:
-	Wrap a 128-bit AES key to a key handle.
-
-ENCODEKEY256:
-	Wrap a 256-bit AES key to a key handle.
-
-AESENC128KL:
-	Encrypt a 128-bit block of data using a 128-bit AES key
-	indicated by a key handle.
-
-AESENC256KL:
-	Encrypt a 128-bit block of data using a 256-bit AES key
-	indicated by a key handle.
-
-AESDEC128KL:
-	Decrypt a 128-bit block of data using a 128-bit AES key
-	indicated by a key handle.
-
-AESDEC256KL:
-	Decrypt a 128-bit block of data using a 256-bit AES key
-	indicated by a key handle.
-
-AESENCWIDE128KL:
-	Encrypt 8 128-bit blocks of data using a 128-bit AES key
-	indicated by a key handle.
-
-AESENCWIDE256KL:
-	Encrypt 8 128-bit blocks of data using a 256-bit AES key
-	indicated by a key handle.
-
-AESDECWIDE128KL:
-	Decrypt 8 128-bit blocks of data using a 128-bit AES key
-	indicated by a key handle.
-
-AESDECWIDE256KL:
-	Decrypt 8 128-bit blocks of data using a 256-bit AES key
-	indicated by a key handle.
-
-The detail can be found in Intel Software Developer Manual.
+The kernel will use this to load a new key at boot time. Establish an
+accessor for the feature setup, and define struct iwkey to pass a key
+value.
 
 Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
 Reviewed-by: Dan Williams <dan.j.williams@intel.com>
 ---
 Changes from v6:
-* Massage the changelog -- add the reason a bit.
+* Massage the changelog -- clarify the reason and the changes a bit.
 
-Changes from RFC v1:
-* Separated out the LOADIWKEY addition in a new patch.
-* Included AES instructions to avoid warning messages when the AES Key
-  Locker module is built.
+Changes from v5:
+* Fix a typo: kernel_cpu_begin() -> kernel_fpu_begin()
+
+Changes from RFC v2:
+* Separate out the code as a new patch.
+* Improve the usability with the new struct as an argument. (Dan
+  Williams)
+
+Previously, Dan questioned the necessity of 'WARN_ON(!irq_fpu_usable())'
+in the load_xmm_iwkey() function. However, it's worth noting that the
+function comment emphasizes the caller's responsibility for invoking
+kernel_fpu_begin(), which effectively performs the sanity check through
+kernel_fpu_begin_mask().
 ---
- arch/x86/lib/x86-opcode-map.txt       | 11 +++++++----
- tools/arch/x86/lib/x86-opcode-map.txt | 11 +++++++----
- 2 files changed, 14 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/keylocker.h     | 25 +++++++++++++++++++++++++
+ arch/x86/include/asm/special_insns.h | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 53 insertions(+)
+ create mode 100644 arch/x86/include/asm/keylocker.h
 
-diff --git a/arch/x86/lib/x86-opcode-map.txt b/arch/x86/lib/x86-opcode-map.txt
-index 12af572201a2..c94988d5130d 100644
---- a/arch/x86/lib/x86-opcode-map.txt
-+++ b/arch/x86/lib/x86-opcode-map.txt
-@@ -800,11 +800,12 @@ cb: sha256rnds2 Vdq,Wdq | vrcp28ss/d Vx,Hx,Wx (66),(ev)
- cc: sha256msg1 Vdq,Wdq | vrsqrt28ps/d Vx,Wx (66),(ev)
- cd: sha256msg2 Vdq,Wdq | vrsqrt28ss/d Vx,Hx,Wx (66),(ev)
- cf: vgf2p8mulb Vx,Wx (66)
-+d8: AESENCWIDE128KL Qpi (F3),(000),(00B) | AESENCWIDE256KL Qpi (F3),(000),(10B) | AESDECWIDE128KL Qpi (F3),(000),(01B) | AESDECWIDE256KL Qpi (F3),(000),(11B)
- db: VAESIMC Vdq,Wdq (66),(v1)
--dc: vaesenc Vx,Hx,Wx (66)
--dd: vaesenclast Vx,Hx,Wx (66)
--de: vaesdec Vx,Hx,Wx (66)
--df: vaesdeclast Vx,Hx,Wx (66)
-+dc: vaesenc Vx,Hx,Wx (66) | LOADIWKEY Vx,Hx (F3) | AESENC128KL Vpd,Qpi (F3)
-+dd: vaesenclast Vx,Hx,Wx (66) | AESDEC128KL Vpd,Qpi (F3)
-+de: vaesdec Vx,Hx,Wx (66) | AESENC256KL Vpd,Qpi (F3)
-+df: vaesdeclast Vx,Hx,Wx (66) | AESDEC256KL Vpd,Qpi (F3)
- f0: MOVBE Gy,My | MOVBE Gw,Mw (66) | CRC32 Gd,Eb (F2) | CRC32 Gd,Eb (66&F2)
- f1: MOVBE My,Gy | MOVBE Mw,Gw (66) | CRC32 Gd,Ey (F2) | CRC32 Gd,Ew (66&F2)
- f2: ANDN Gy,By,Ey (v)
-@@ -814,6 +815,8 @@ f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,
- f7: BEXTR Gy,Ey,By (v) | SHLX Gy,Ey,By (66),(v) | SARX Gy,Ey,By (F3),(v) | SHRX Gy,Ey,By (F2),(v)
- f8: MOVDIR64B Gv,Mdqq (66) | ENQCMD Gv,Mdqq (F2) | ENQCMDS Gv,Mdqq (F3)
- f9: MOVDIRI My,Gy
-+fa: ENCODEKEY128 Ew,Ew (F3)
-+fb: ENCODEKEY256 Ew,Ew (F3)
- EndTable
+diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
+new file mode 100644
+index 000000000000..4e731f577c50
+--- /dev/null
++++ b/arch/x86/include/asm/keylocker.h
+@@ -0,0 +1,25 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++
++#ifndef _ASM_KEYLOCKER_H
++#define _ASM_KEYLOCKER_H
++
++#ifndef __ASSEMBLY__
++
++#include <asm/fpu/types.h>
++
++/**
++ * struct iwkey - A temporary wrapping key storage.
++ * @integrity_key:	A 128-bit key used to verify the integrity of
++ *			key handles
++ * @encryption_key:	A 256-bit encryption key used for wrapping and
++ *			unwrapping clear text keys.
++ *
++ * This storage should be flushed immediately after being loaded.
++ */
++struct iwkey {
++	struct reg_128_bit integrity_key;
++	struct reg_128_bit encryption_key[2];
++};
++
++#endif /*__ASSEMBLY__ */
++#endif /* _ASM_KEYLOCKER_H */
+diff --git a/arch/x86/include/asm/special_insns.h b/arch/x86/include/asm/special_insns.h
+index 2e9fc5c400cd..65267013f1e1 100644
+--- a/arch/x86/include/asm/special_insns.h
++++ b/arch/x86/include/asm/special_insns.h
+@@ -9,6 +9,7 @@
+ #include <linux/errno.h>
+ #include <linux/irqflags.h>
+ #include <linux/jump_label.h>
++#include <asm/keylocker.h>
  
- Table: 3-byte opcode 2 (0x0f 0x3a)
-diff --git a/tools/arch/x86/lib/x86-opcode-map.txt b/tools/arch/x86/lib/x86-opcode-map.txt
-index 12af572201a2..c94988d5130d 100644
---- a/tools/arch/x86/lib/x86-opcode-map.txt
-+++ b/tools/arch/x86/lib/x86-opcode-map.txt
-@@ -800,11 +800,12 @@ cb: sha256rnds2 Vdq,Wdq | vrcp28ss/d Vx,Hx,Wx (66),(ev)
- cc: sha256msg1 Vdq,Wdq | vrsqrt28ps/d Vx,Wx (66),(ev)
- cd: sha256msg2 Vdq,Wdq | vrsqrt28ss/d Vx,Hx,Wx (66),(ev)
- cf: vgf2p8mulb Vx,Wx (66)
-+d8: AESENCWIDE128KL Qpi (F3),(000),(00B) | AESENCWIDE256KL Qpi (F3),(000),(10B) | AESDECWIDE128KL Qpi (F3),(000),(01B) | AESDECWIDE256KL Qpi (F3),(000),(11B)
- db: VAESIMC Vdq,Wdq (66),(v1)
--dc: vaesenc Vx,Hx,Wx (66)
--dd: vaesenclast Vx,Hx,Wx (66)
--de: vaesdec Vx,Hx,Wx (66)
--df: vaesdeclast Vx,Hx,Wx (66)
-+dc: vaesenc Vx,Hx,Wx (66) | LOADIWKEY Vx,Hx (F3) | AESENC128KL Vpd,Qpi (F3)
-+dd: vaesenclast Vx,Hx,Wx (66) | AESDEC128KL Vpd,Qpi (F3)
-+de: vaesdec Vx,Hx,Wx (66) | AESENC256KL Vpd,Qpi (F3)
-+df: vaesdeclast Vx,Hx,Wx (66) | AESDEC256KL Vpd,Qpi (F3)
- f0: MOVBE Gy,My | MOVBE Gw,Mw (66) | CRC32 Gd,Eb (F2) | CRC32 Gd,Eb (66&F2)
- f1: MOVBE My,Gy | MOVBE Mw,Gw (66) | CRC32 Gd,Ey (F2) | CRC32 Gd,Ew (66&F2)
- f2: ANDN Gy,By,Ey (v)
-@@ -814,6 +815,8 @@ f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,
- f7: BEXTR Gy,Ey,By (v) | SHLX Gy,Ey,By (66),(v) | SARX Gy,Ey,By (F3),(v) | SHRX Gy,Ey,By (F2),(v)
- f8: MOVDIR64B Gv,Mdqq (66) | ENQCMD Gv,Mdqq (F2) | ENQCMDS Gv,Mdqq (F3)
- f9: MOVDIRI My,Gy
-+fa: ENCODEKEY128 Ew,Ew (F3)
-+fb: ENCODEKEY256 Ew,Ew (F3)
- EndTable
+ /*
+  * The compiler should not reorder volatile asm statements with respect to each
+@@ -301,6 +302,33 @@ static __always_inline void tile_release(void)
+ 	asm volatile(".byte 0xc4, 0xe2, 0x78, 0x49, 0xc0");
+ }
  
- Table: 3-byte opcode 2 (0x0f 0x3a)
++/**
++ * load_xmm_iwkey - Load a CPU-internal wrapping key into XMM registers.
++ * @key:	A pointer to a struct iwkey containing the key data.
++ *
++ * The caller is responsible for invoking kernel_fpu_begin() before.
++ */
++static inline void load_xmm_iwkey(struct iwkey *key)
++{
++	struct reg_128_bit zeros = { 0 };
++
++	asm volatile ("movdqu %0, %%xmm0; movdqu %1, %%xmm1; movdqu %2, %%xmm2;"
++		      :: "m"(key->integrity_key), "m"(key->encryption_key[0]),
++			 "m"(key->encryption_key[1]));
++
++	/*
++	 * 'LOADIWKEY %xmm1,%xmm2' loads a key from XMM0-2 into a
++	 * software-invisible CPU state. With zero in EAX, CPU does not
++	 * perform hardware randomization and allows key backup.
++	 *
++	 * This instruction is supported by binutils >= 2.36.
++	 */
++	asm volatile (".byte 0xf3,0x0f,0x38,0xdc,0xd1" :: "a"(0));
++
++	asm volatile ("movdqu %0, %%xmm0; movdqu %0, %%xmm1; movdqu %0, %%xmm2;"
++		      :: "m"(zeros));
++}
++
+ #endif /* __KERNEL__ */
+ 
+ #endif /* _ASM_X86_SPECIAL_INSNS_H */
 -- 
 2.34.1
 
