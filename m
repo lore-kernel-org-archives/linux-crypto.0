@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC6344377;
-	Fri, 29 Mar 2024 02:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2207244C63;
+	Fri, 29 Mar 2024 02:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711678204; cv=none; b=J4NZ8/WxccLK0nHv68gwRpkg8TR9RUNISDfz8SzbMHqX0UjgU3XFomItDxiGsf5DP92mhwxGx3ebBGEpnL4sEhyXii8qS4nJduFtyQ299h59wiUpe1XuFNSWUPQ0E/AEFkrKXNJUHpx80UPu48mLz2ROn4EPwZ9kjV/O9dF0KiA=
+	t=1711678204; cv=none; b=uMy+MkafhhtaFoPZ04k64NrhwACpFPvNBw7zdOlxUQUk1OZDCnAnuFw6xLE9Jvw15OGLBPxb10G6G1pG+2kCqwfrinQjAvWRCLpDJyg9J9EE9ROnjYFkDkhpkuGHeN+GzshIKWq6udx/i57TZZhWwCKKU7bVIMosISpaYIGZo/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711678204; c=relaxed/simple;
-	bh=LaXGSbwrzGYECbzg7+ba80GNcN6I8Yse45fG0WYSBy8=;
+	bh=1LDGQG8Tv2hZlx4EpDC4r0s9O2jkinHHSZjPSmJhxNE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JiAylTXcqV4zkyVZAIlr2PeJL5jcR3CWo4z7QGAAoKkOTSB2VW61t/QLUIqs/cQJOpAwXGuc85Y6FbpgnNt4O/S+hWtuWraeaJtRn3p8NXILP0FsNzsko8MdwcTCT7FDhUZRBGhmBelaD8NQcYWMcard/cO/ZF0aYYcLdTFx9O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WgvGm+Kv; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=q1ywNdezDsybGgCDIvC2lupSsygT62tSLLxmv+DbeW2C9arRtxjn0+O3Uz9fu0gb2gfG771OER9UvVr72NmkzS//jmvsC9arK02xH39DSvq46Y9Rc6bkUpaxTgoOllzNWRWGLdmGwf8oQJnpVKVwyhFNHGev4RC9UJK/GQ9c1Aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aQnQ4B4C; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WgvGm+Kv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aQnQ4B4C"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1711678202; x=1743214202;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=LaXGSbwrzGYECbzg7+ba80GNcN6I8Yse45fG0WYSBy8=;
-  b=WgvGm+KvGZH2wj1dlyGfrzPggOmSxnyU0/r9Qwl4GY6EWfT8hT2xJo4W
-   cWBsEhiGW51QPM1IZz/ZzcHjCJeYun45iuJ7S8L9VciD1QEWPSbpeAD5b
-   H6JqIcv1JwYrdSS55UxbHvtdVkuO0UrzBaXHKAJoXmOyGez6h9iUO9Kwc
-   0OfxlL+7MtmvC5iMGSiyc9+HpajW5TFlgNGbquZXiorOdTCWKh9jNPiPL
-   b02DHV8aEs9a11zPvbGPMJtde7Yk+BOSHTspVjxnBORvKHl8sh1VwsOKr
-   2uHHDsr3Ufyv8JXSQS4sYCij3/mRJD1scElWARo/Tg/JB9jKbRN20SuSv
-   A==;
-X-CSE-ConnectionGUID: l0w9IEJDSoavN0BvbkBNpg==
-X-CSE-MsgGUID: xu4unCn0QxSgaxtJB/bXqw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6700136"
+  bh=1LDGQG8Tv2hZlx4EpDC4r0s9O2jkinHHSZjPSmJhxNE=;
+  b=aQnQ4B4CbSVVFgWSqhn6BdQ79uEYypph+ESYl0edKfloc4gt/vdgMeFO
+   o6o7478hz5koEmAIDLhtVcSn0XESqRIxbjBL0maIFvdY8qtkPMNBCyme/
+   huzxzTyzMLe4qbciZXMTYGvbJFQ7LApi80ZdGM1trsvQ4AoPf7hpI8cEh
+   /y+gIB+bdSaXbUR1UjhxUDPZl9vN7LhRKXnN16hCVZoLN+nWxblc41IoR
+   velVM8ystoJkMHxovFClrT807tVuqWKqLQRZxSomIS4qOzYmU1X3INErp
+   dg7O7K3gwMs45mK/sq02kfGyyBP1hKA/XHZ3i6wUKEFUoJNLQ2+R6djue
+   w==;
+X-CSE-ConnectionGUID: R6el/fnyQMa1TGBcBMpLOA==
+X-CSE-MsgGUID: E0ZfMyEVRn6rjvtNEP4WPQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6700147"
 X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="6700136"
+   d="scan'208";a="6700147"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 19:09:53 -0700
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 19:09:54 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="17301432"
+   d="scan'208";a="17301436"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
-  by orviesa006.jf.intel.com with ESMTP; 28 Mar 2024 19:09:53 -0700
+  by orviesa006.jf.intel.com with ESMTP; 28 Mar 2024 19:09:54 -0700
 From: "Chang S. Bae" <chang.seok.bae@intel.com>
 To: linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: ebiggers@kernel.org,
 	bernie.keany@intel.com,
 	charishma1.gairuboyina@intel.com,
 	chang.seok.bae@intel.com
-Subject: [PATCH v9 13/14] crypto: x86/aes - Prepare for new AES-XTS implementation
-Date: Thu, 28 Mar 2024 18:53:45 -0700
-Message-Id: <20240329015346.635933-14-chang.seok.bae@intel.com>
+Subject: [PATCH v9 14/14] crypto: x86/aes-kl - Implement the AES-XTS algorithm
+Date: Thu, 28 Mar 2024 18:53:46 -0700
+Message-Id: <20240329015346.635933-15-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240329015346.635933-1-chang.seok.bae@intel.com>
 References: <20230603152227.12335-1-chang.seok.bae@intel.com>
@@ -74,27 +74,73 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The key Locker's AES instruction set ('AES-KL') shares a similar
-programming interface with AES-NI. The internal ABI in the assembly code
-will have the same prototype as AES-NI, and the glue code will also be
-identical.
+Key Locker is a CPU feature to reduce key exfiltration opportunities.
+It converts the AES key into an encoded form, called 'key handle', to
+reduce the exposure of private key material in memory.
 
-The upcoming AES code will exclusively support the XTS mode as disk
-encryption is the only intended use case.
+This key conversion as well as all subsequent data transformations are
+provided by new AES instructions ('AES-KL'). AES-KL is analogous to
+that of AES-NI as maintains a similar programming interface.
 
-Refactor the XTS-related code to eliminate code duplication and relocate
-certain constant values to make them shareable. Also, introduce wrappers
-for data transformation functions to return an error code, as AES-KL may
-populate it.
+Support the XTS mode as the primary use case is dm-crypt. The support has
+some details worth mentioning, which differentiate itself from AES-NI,
+that users may need to be aware of:
 
-Introduce union x86_aes_ctx as AES-KL will reference an encoded form
-instead of an expanded AES key. This allows different AES context formats
-in the shared code.
+== Key Handle Restriction ==
 
-Inline the refactored code to the caller to prevent the potential
-overhead of indirect calls.
+The AES-KL instruction set supports selecting key usage restrictions at
+key handle creation time. Restrict all key handles created by the kernel
+to kernel mode use only.
 
-No functional changes or performance regressions are intended.
+The AES-KL instructions themselves are executable in userspace. This
+restriction enforces the mode consistency in its operation.
+
+If the key handle is created in userspace but referenced in the kernel,
+then encrypt() and decrypt() functions will return -EINVAL.
+
+=== AES-NI Dependency for AES Compliance ===
+
+Key Locker is not AES compliant as it lacks 192-bit key support.
+However, per the expectations of Linux crypto-cipher implementations,
+the software cipher implementation must support all the AES-compliant
+key sizes.
+
+The AES-KL cipher implementation achieves this constraint by logging a
+warning and falling back to AES-NI. In other words, the 192-bit
+key-size limitation for what can be converted into a key handle is
+only documented, not enforced.
+
+This then creates a rather strong dependency on AES-NI. If this driver
+supports a module build, the exported AES-NI functions cannot be inlined.
+More importantly, indirect calls will impact the performance.
+
+To simplify, disallow a module build for AES-KL and always select AES-NI.
+This restriction can be relaxed if strong use cases arise against it.
+
+== Wrapping Key Restore Failure Handling ==
+
+In the event of hardware failure, the wrapping key is lost from deep
+sleep states. Then, the wrapping key turns to zero which is an unusable
+state.
+
+The x86 core provides valid_keylocker() to indicate the failure.
+Subsequent setkey() as well as encode()/decode() can check it and return
+-ENODEV if failed. In this way, an error code can be returned, instead of
+facing abrupt exceptions.
+
+== Userspace Exposition ==
+
+The Keylocker implementations so far have measurable performance
+penalties. So, keep AES-NI as the default.
+
+However, with a slow storage device, storage bandwidth is the bottleneck,
+even if disk encryption is enabled by AES-KL. Thus, it is an end-user
+consideration for selecting AES-KL. Users may pick it according to the
+name 'xts-aes-aeskl' shown in /proc/crypto.
+
+== 64-bit Only ==
+
+Support 64-bit only, as the 32-bit kernel is being deprecated.
 
 Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
 Acked-by: Dan Williams <dan.j.williams@intel.com>
@@ -103,509 +149,917 @@ Cc: Ard Biesheuvel <ardb@kernel.org>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 Changes from v8:
-* Rebase on the AES-NI changes in the mainline -- mostly cleanup works.
-* Introduce 'union x86_aes_ctx'. (Eric Biggers)
-* Ensure 'inline' for wrapper functions.
-* Tweak the changelog.
+* Rebase on the upstream changes.
+* Combine the XTS enc/dec assembly code in a macro. (Eric Biggers)
+* Define setkey() as void instead of returning 'int'. (Eric Biggers)
+* Rearrange the assembly code to reduce jumps especially for success
+  cases. (Eric Biggers)
+* Update the changelog for clarification. (Eric Biggers)
+* Exclude module build.
 
 Changes from v7:
-* Remove aesni_dec() as not referenced by the refactored helpers. But,
-  keep the ASM symbol '__aesni_dec' to make it appears consistent with
-  its counterpart '__aesni_enc'.
-* Call out 'AES-XTS' in the subject.
+* Update the changelog -- remove 'API Limitation'. (Eric Biggers)
+* Update the comment for valid_keylocker(). (Eric Biggers)
+* Improve the code:
+  - Remove the key-length check and simplify the code. (Eric Biggers)
+  - Remove aeskl_dec() and __aeskl_dec() as not needed.
+  - Simplify the register-function return handling. (Eric Biggers)
+  - Rename setkey functions for coherent naming:
+    aeskl_setkey() -> __aeskl_setkey(),
+    aeskl_setkey_common() -> aeskl_setkey(),
+    aeskl_xts_setkey() -> xts_setkey()
+  - Revert an unnecessary comment.
 
 Changes from v6:
-* Inline the helper code to avoid the indirect call. (Eric Biggers)
-* Rename the filename: aes-intel* -> aes-helper*. (Eric Biggers)
-* Don't export symbols yet here. Instead, do it when needed later.
-* Improve the coding style:
-  - Follow the symbol convention: '_' -> '__' (Eric Biggers)
-  - Fix a style issue -- 'dst = src = ...' catched by checkpatch.pl:
-    "CHECK: multiple assignments should be avoided"
-* Cleanup: move some define back to AES-NI code as not used by AES-KL
+* Merge all the AES-KL patches. (Eric Biggers)
+* Make the driver for the 64-bit mode only. (Eric Biggers)
+* Rework the key-size check code:
+  - Trim unnecessary checks. (Eric Biggers)
+  - Document the reason
+  - Make sure both XTS keys with the same size
+* Adjust the Kconfig change:
+  - Move the location. (Robert Elliott)
+  - Trim the description to follow others such as AES-NI.
+* Update the changelog:
+  - Explain the priority value for the common name under 'User
+    Exposition' (renamed from 'Performance'). (Eric Biggers)
+  - Trim the introduction
+  - Switch to more imperative mood for those explaining the code
+    change
+  - Add a new section '64-bit Only'
+* Adjust the ASM code to return a proper error code. (Eric Biggers)
+* Update assembly code macros:
+  - Remove unused one.
+  - Document the reason for the duplicated ones.
 
 Changes from v5:
-* Clean up the staled function definition -- cbc_crypt_common().
-* Ensure kernel_fpu_end() for the possible error return from
-  xts_crypt_common()->crypt1_fn().
-
-Changes from v4:
-* Drop CBC mode changes. (Eric Biggers)
+* Replace the ret instruction with RET as rebased on the upstream -- commit
+  f94909ceb1ed ("x86: Prepare asm files for straight-line-speculation").
 
 Changes from v3:
-* Drop ECB and CTR mode changes. (Eric Biggers)
-* Export symbols. (Eric Biggers)
+* Exclude non-AES-KL objects. (Eric Biggers)
+* Simplify the assembler dependency check. (Peter Zijlstra)
+* Trim the Kconfig help text. (Dan Williams)
+* Fix a defined-but-not-used warning.
 
 Changes from RFC v2:
-* Massage the changelog. (Dan Williams)
+* Move out each mode support in new patches.
+* Update the changelog to describe the limitation and the tradeoff
+  clearly. (Andy Lutomirski)
 
 Changes from RFC v1:
-* Added as a new patch. (Ard Biesheuvel)
+* Rebased on the refactored code. (Ard Biesheuvel)
+* Dropped exporting the single block interface. (Ard Biesheuvel)
+* Fixed the fallback and error handling paths. (Ard Biesheuvel)
+* Revised the module description. (Dave Hansen and Peter Zijlstra)
+* Made the build depend on the binutils version to support new
+  instructions. (Borislav Petkov and Peter Zijlstra)
+* Updated the changelog accordingly.
 ---
- arch/x86/crypto/aes-helper_asm.S   |  22 +++
- arch/x86/crypto/aes-helper_glue.h  | 167 ++++++++++++++++++++++
- arch/x86/crypto/aesni-intel_asm.S  |  47 +++----
- arch/x86/crypto/aesni-intel_glue.c | 213 ++++++++---------------------
- 4 files changed, 261 insertions(+), 188 deletions(-)
- create mode 100644 arch/x86/crypto/aes-helper_asm.S
- create mode 100644 arch/x86/crypto/aes-helper_glue.h
+ arch/x86/Kconfig.assembler         |   5 +
+ arch/x86/crypto/Kconfig            |  17 ++
+ arch/x86/crypto/Makefile           |   3 +
+ arch/x86/crypto/aes-helper_glue.h  |   7 +-
+ arch/x86/crypto/aeskl-intel_asm.S  | 412 +++++++++++++++++++++++++++++
+ arch/x86/crypto/aeskl-intel_glue.c | 187 +++++++++++++
+ arch/x86/crypto/aeskl-intel_glue.h |  35 +++
+ arch/x86/crypto/aesni-intel_glue.c |  30 +--
+ arch/x86/crypto/aesni-intel_glue.h |  40 +++
+ 9 files changed, 704 insertions(+), 32 deletions(-)
+ create mode 100644 arch/x86/crypto/aeskl-intel_asm.S
+ create mode 100644 arch/x86/crypto/aeskl-intel_glue.c
+ create mode 100644 arch/x86/crypto/aeskl-intel_glue.h
+ create mode 100644 arch/x86/crypto/aesni-intel_glue.h
 
-diff --git a/arch/x86/crypto/aes-helper_asm.S b/arch/x86/crypto/aes-helper_asm.S
-new file mode 100644
-index 000000000000..b31abcdf63cb
---- /dev/null
-+++ b/arch/x86/crypto/aes-helper_asm.S
-@@ -0,0 +1,22 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
+diff --git a/arch/x86/Kconfig.assembler b/arch/x86/Kconfig.assembler
+index 8ad41da301e5..0e58f2b61dd3 100644
+--- a/arch/x86/Kconfig.assembler
++++ b/arch/x86/Kconfig.assembler
+@@ -25,6 +25,11 @@ config AS_GFNI
+ 	help
+ 	  Supported by binutils >= 2.30 and LLVM integrated assembler
+ 
++config AS_HAS_KEYLOCKER
++	def_bool $(as-instr,encodekey256 %eax$(comma)%eax)
++	help
++	  Supported by binutils >= 2.36 and LLVM integrated assembler >= V12
 +
-+/*
-+ * Constant values shared between AES implementations:
-+ */
+ config AS_WRUSS
+ 	def_bool $(as-instr,wrussq %rax$(comma)(%rbx))
+ 	help
+diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
+index c9e59589a1ce..067bb149998b 100644
+--- a/arch/x86/crypto/Kconfig
++++ b/arch/x86/crypto/Kconfig
+@@ -29,6 +29,23 @@ config CRYPTO_AES_NI_INTEL
+ 	  Architecture: x86 (32-bit and 64-bit) using:
+ 	  - AES-NI (AES new instructions)
+ 
++config CRYPTO_AES_KL
++	bool "Ciphers: AES, modes: XTS (AES-KL)"
++	depends on X86 && 64BIT
++	depends on AS_HAS_KEYLOCKER
++	select CRYPTO_AES_NI_INTEL
++	select X86_KEYLOCKER
 +
-+.pushsection .rodata
-+.align 16
-+.Lcts_permute_table:
-+	.byte		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-+	.byte		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-+	.byte		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
-+	.byte		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
-+	.byte		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-+	.byte		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-+.popsection
++	help
++	  Block cipher: AES cipher algorithms
++	  Length-preserving ciphers: AES with XTS
 +
-+.section	.rodata.cst16.gf128mul_x_ble_mask, "aM", @progbits, 16
-+.align 16
-+.Lgf128mul_x_ble_mask:
-+	.octa 0x00000000000000010000000000000087
-+.previous
++	  Architecture: x86 (64-bit) using:
++	  - AES-KL (AES Key Locker)
++	  - AES-NI for a 192-bit key
++
++	  See Documentation/arch/x86/keylocker.rst for more details.
++
+ config CRYPTO_BLOWFISH_X86_64
+ 	tristate "Ciphers: Blowfish, modes: ECB, CBC"
+ 	depends on X86 && 64BIT
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 9aa46093c91b..ae2aa7abd151 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -50,6 +50,9 @@ obj-$(CONFIG_CRYPTO_AES_NI_INTEL) += aesni-intel.o
+ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o
+ aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx-x86_64.o aes_ctrby8_avx-x86_64.o
+ 
++obj-$(CONFIG_CRYPTO_AES_KL) += aeskl-intel.o
++aeskl-intel-y := aeskl-intel_asm.o aeskl-intel_glue.o
++
+ obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
+ sha1-ssse3-y := sha1_avx2_x86_64_asm.o sha1_ssse3_asm.o sha1_ssse3_glue.o
+ sha1-ssse3-$(CONFIG_AS_SHA1_NI) += sha1_ni_asm.o
 diff --git a/arch/x86/crypto/aes-helper_glue.h b/arch/x86/crypto/aes-helper_glue.h
-new file mode 100644
-index 000000000000..52ba1fe5cf71
---- /dev/null
+index 52ba1fe5cf71..262c1cec0011 100644
+--- a/arch/x86/crypto/aes-helper_glue.h
 +++ b/arch/x86/crypto/aes-helper_glue.h
-@@ -0,0 +1,167 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
+@@ -19,16 +19,17 @@
+ #include <crypto/internal/aead.h>
+ #include <crypto/internal/simd.h>
+ 
++#include "aeskl-intel_glue.h"
 +
+ #define AES_ALIGN		16
+ #define AES_ALIGN_ATTR		__attribute__((__aligned__(AES_ALIGN)))
+ #define AES_ALIGN_EXTRA		((AES_ALIGN - 1) & ~(CRYPTO_MINALIGN - 1))
+ #define XTS_AES_CTX_SIZE	(sizeof(struct aes_xts_ctx) + AES_ALIGN_EXTRA)
+ 
+-/*
+- * Preserve data types for various AES implementations available in x86
+- */
++/* Data types for the two AES implementations available in x86 */
+ union x86_aes_ctx {
+ 	struct crypto_aes_ctx aesni;
++	struct aeskl_ctx aeskl;
+ };
+ 
+ struct aes_xts_ctx {
+diff --git a/arch/x86/crypto/aeskl-intel_asm.S b/arch/x86/crypto/aeskl-intel_asm.S
+new file mode 100644
+index 000000000000..81af7f61aab5
+--- /dev/null
++++ b/arch/x86/crypto/aeskl-intel_asm.S
+@@ -0,0 +1,412 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/*
-+ * Shared glue code between AES implementations, refactored from the AES-NI's.
++ * Implement AES algorithm using AES Key Locker instructions.
 + *
-+ * The helper code is inlined for a performance reason. With the mitigation
-+ * for speculative executions like retpoline, indirect calls become very
-+ * expensive at a cost of measurable overhead.
++ * Most code is based from the AES-NI implementation, aesni-intel_asm.S
++ *
 + */
 +
-+#ifndef _AES_HELPER_GLUE_H
-+#define _AES_HELPER_GLUE_H
++#include <linux/linkage.h>
++#include <linux/cfi_types.h>
++#include <asm/errno.h>
++#include <asm/inst.h>
++#include <asm/frame.h>
++#include "aes-helper_asm.S"
 +
++.text
++
++#define STATE1	%xmm0
++#define STATE2	%xmm1
++#define STATE3	%xmm2
++#define STATE4	%xmm3
++#define STATE5	%xmm4
++#define STATE6	%xmm5
++#define STATE7	%xmm6
++#define STATE8	%xmm7
++#define STATE	STATE1
++
++#define IV	%xmm9
++#define KEY	%xmm10
++#define INC	%xmm13
++
++#define IN	%xmm8
++
++#define HANDLEP	%rdi
++#define OUTP	%rsi
++#define KLEN	%r9d
++#define INP	%rdx
++#define T1	%r10
++#define LEN	%rcx
++#define IVP	%r8
++
++#define UKEYP	OUTP
++#define GF128MUL_MASK %xmm11
++
++/*
++ * void __aeskl_setkey(struct crypto_aes_ctx *handlep, const u8 *ukeyp,
++ *		       unsigned int key_len)
++ */
++SYM_FUNC_START(__aeskl_setkey)
++	FRAME_BEGIN
++	movl %edx, 480(HANDLEP)
++	movdqu (UKEYP), STATE1
++	mov $1, %eax
++	cmp $16, %dl
++	je .Lsetkey_128
++
++	movdqu 0x10(UKEYP), STATE2
++	encodekey256 %eax, %eax
++	movdqu STATE4, 0x30(HANDLEP)
++	jmp .Lsetkey_end
++.Lsetkey_128:
++	encodekey128 %eax, %eax
++
++.Lsetkey_end:
++	movdqu STATE1, (HANDLEP)
++	movdqu STATE2, 0x10(HANDLEP)
++	movdqu STATE3, 0x20(HANDLEP)
++
++	FRAME_END
++	RET
++SYM_FUNC_END(__aeskl_setkey)
++
++/*
++ * int __aeskl_enc(const void *handlep, u8 *outp, const u8 *inp)
++ */
++SYM_FUNC_START(__aeskl_enc)
++	FRAME_BEGIN
++	movdqu (INP), STATE
++	movl 480(HANDLEP), KLEN
++
++	cmp $16, KLEN
++	je .Lenc_128
++	aesenc256kl (HANDLEP), STATE
++	jz .Lenc_err
++	xor %rax, %rax
++	jmp .Lenc_end
++.Lenc_128:
++	aesenc128kl (HANDLEP), STATE
++	jz .Lenc_err
++	xor %rax, %rax
++	jmp .Lenc_end
++
++.Lenc_err:
++	mov $(-EINVAL), %rax
++.Lenc_end:
++	movdqu STATE, (OUTP)
++	FRAME_END
++	RET
++SYM_FUNC_END(__aeskl_enc)
++
++/*
++ * XTS implementation
++ */
++
++/*
++ * _aeskl_gf128mul_x_ble: 	internal ABI
++ *	Multiply in GF(2^128) for XTS IVs
++ * input:
++ *	IV:	current IV
++ *	GF128MUL_MASK == mask with 0x87 and 0x01
++ * output:
++ *	IV:	next IV
++ * changed:
++ *	CTR:	== temporary value
++ *
++ * While based on the AES-NI code, this macro is separated here due to
++ * the register constraint. E.g., aesencwide256kl has implicit
++ * operands: XMM0-7.
++ */
++#define _aeskl_gf128mul_x_ble() \
++	pshufd $0x13, IV, KEY; \
++	paddq IV, IV; \
++	psrad $31, KEY; \
++	pand GF128MUL_MASK, KEY; \
++	pxor KEY, IV;
++
++.macro XTS_ENC_DEC operation
++	FRAME_BEGIN
++	movdqa .Lgf128mul_x_ble_mask(%rip), GF128MUL_MASK
++	movups (IVP), IV
++
++	mov 480(HANDLEP), KLEN
++
++.ifc \operation, dec
++	test $15, LEN
++	jz .Lxts_op8_\@
++	sub $16, LEN
++.endif
++
++.Lxts_op8_\@:
++	sub $128, LEN
++	jl .Lxts_op1_pre_\@
++
++	movdqa IV, STATE1
++	movdqu (INP), INC
++	pxor INC, STATE1
++	movdqu IV, (OUTP)
++
++	_aeskl_gf128mul_x_ble()
++	movdqa IV, STATE2
++	movdqu 0x10(INP), INC
++	pxor INC, STATE2
++	movdqu IV, 0x10(OUTP)
++
++	_aeskl_gf128mul_x_ble()
++	movdqa IV, STATE3
++	movdqu 0x20(INP), INC
++	pxor INC, STATE3
++	movdqu IV, 0x20(OUTP)
++
++	_aeskl_gf128mul_x_ble()
++	movdqa IV, STATE4
++	movdqu 0x30(INP), INC
++	pxor INC, STATE4
++	movdqu IV, 0x30(OUTP)
++
++	_aeskl_gf128mul_x_ble()
++	movdqa IV, STATE5
++	movdqu 0x40(INP), INC
++	pxor INC, STATE5
++	movdqu IV, 0x40(OUTP)
++
++	_aeskl_gf128mul_x_ble()
++	movdqa IV, STATE6
++	movdqu 0x50(INP), INC
++	pxor INC, STATE6
++	movdqu IV, 0x50(OUTP)
++
++	_aeskl_gf128mul_x_ble()
++	movdqa IV, STATE7
++	movdqu 0x60(INP), INC
++	pxor INC, STATE7
++	movdqu IV, 0x60(OUTP)
++
++	_aeskl_gf128mul_x_ble()
++	movdqa IV, STATE8
++	movdqu 0x70(INP), INC
++	pxor INC, STATE8
++	movdqu IV, 0x70(OUTP)
++
++	cmp $16, KLEN
++	je .Lxts_op8_128_\@
++.ifc \operation, dec
++	aesdecwide256kl (%rdi)
++.else
++	aesencwide256kl (%rdi)
++.endif
++	jz .Lxts_op_err_\@
++	jmp .Lxts_op8_end_\@
++.Lxts_op8_128_\@:
++.ifc \operation, dec
++	aesdecwide128kl (%rdi)
++.else
++	aesencwide128kl (%rdi)
++.endif
++	jz .Lxts_op_err_\@
++
++.Lxts_op8_end_\@:
++	movdqu 0x00(OUTP), INC
++	pxor INC, STATE1
++	movdqu STATE1, 0x00(OUTP)
++
++	movdqu 0x10(OUTP), INC
++	pxor INC, STATE2
++	movdqu STATE2, 0x10(OUTP)
++
++	movdqu 0x20(OUTP), INC
++	pxor INC, STATE3
++	movdqu STATE3, 0x20(OUTP)
++
++	movdqu 0x30(OUTP), INC
++	pxor INC, STATE4
++	movdqu STATE4, 0x30(OUTP)
++
++	movdqu 0x40(OUTP), INC
++	pxor INC, STATE5
++	movdqu STATE5, 0x40(OUTP)
++
++	movdqu 0x50(OUTP), INC
++	pxor INC, STATE6
++	movdqu STATE6, 0x50(OUTP)
++
++	movdqu 0x60(OUTP), INC
++	pxor INC, STATE7
++	movdqu STATE7, 0x60(OUTP)
++
++	movdqu 0x70(OUTP), INC
++	pxor INC, STATE8
++	movdqu STATE8, 0x70(OUTP)
++
++	_aeskl_gf128mul_x_ble()
++
++	add $128, INP
++	add $128, OUTP
++	test LEN, LEN
++	jnz .Lxts_op8_\@
++
++.Lxts_op_ret_\@:
++	movups IV, (IVP)
++	xor %rax, %rax
++	FRAME_END
++	RET
++
++.Lxts_op1_pre_\@:
++	add $128, LEN
++	jz .Lxts_op_ret_\@
++.ifc \operation, enc
++	sub $16, LEN
++	jl .Lxts_op_cts4_\@
++.endif
++
++.Lxts_op1_\@:
++	movdqu (INP), STATE1
++
++.ifc \operation, dec
++	add $16, INP
++	sub $16, LEN
++	jl .Lxts_op_cts1_\@
++.endif
++
++	pxor IV, STATE1
++
++	cmp $16, KLEN
++	je .Lxts_op1_128_\@
++.ifc \operation, dec
++	aesdec256kl (HANDLEP), STATE1
++.else
++	aesenc256kl (HANDLEP), STATE1
++.endif
++	jz .Lxts_op_err_\@
++	jmp .Lxts_op1_end_\@
++.Lxts_op1_128_\@:
++.ifc \operation, dec
++	aesdec128kl (HANDLEP), STATE1
++.else
++	aesenc128kl (HANDLEP), STATE1
++.endif
++	jz .Lxts_op_err_\@
++
++.Lxts_op1_end_\@:
++	pxor IV, STATE1
++	_aeskl_gf128mul_x_ble()
++
++	test LEN, LEN
++	jz .Lxts_op1_out_\@
++
++.ifc \operation, enc
++	add $16, INP
++	sub $16, LEN
++	jl .Lxts_op_cts1_\@
++.endif
++
++	movdqu STATE1, (OUTP)
++	add $16, OUTP
++	jmp .Lxts_op1_\@
++
++.Lxts_op1_out_\@:
++	movdqu STATE1, (OUTP)
++	jmp .Lxts_op_ret_\@
++
++.Lxts_op_cts4_\@:
++.ifc \operation, enc
++	movdqu STATE8, STATE1
++	sub $16, OUTP
++.endif
++
++.Lxts_op_cts1_\@:
++.ifc \operation, dec
++	movdqa IV, STATE5
++	_aeskl_gf128mul_x_ble()
++
++	pxor IV, STATE1
++
++	cmp $16, KLEN
++	je .Lxts_dec1_cts_pre_128_\@
++	aesdec256kl (HANDLEP), STATE1
++	jz .Lxts_op_err_\@
++	jmp .Lxts_dec1_cts_pre_end_\@
++.Lxts_dec1_cts_pre_128_\@:
++	aesdec128kl (HANDLEP), STATE1
++	jz .Lxts_op_err_\@
++.Lxts_dec1_cts_pre_end_\@:
++	pxor IV, STATE1
++.endif
++
++	lea .Lcts_permute_table(%rip), T1
++	add LEN, INP		/* rewind input pointer */
++	add $16, LEN		/* # bytes in final block */
++	movups (INP), IN
++
++	mov T1, IVP
++	add $32, IVP
++	add LEN, T1
++	sub LEN, IVP
++	add OUTP, LEN
++
++	movups (T1), STATE2
++	movaps STATE1, STATE3
++	pshufb STATE2, STATE1
++	movups STATE1, (LEN)
++
++	movups (IVP), STATE1
++	pshufb STATE1, IN
++	pblendvb STATE3, IN
++	movaps IN, STATE1
++
++.ifc \operation, dec
++	pxor STATE5, STATE1
++.else
++	pxor IV, STATE1
++.endif
++
++	cmp $16, KLEN
++	je .Lxts_op1_cts_128_\@
++.ifc \operation, dec
++	aesdec256kl (HANDLEP), STATE1
++.else
++	aesenc256kl (HANDLEP), STATE1
++.endif
++	jz .Lxts_op_err_\@
++	jmp .Lxts_op1_cts_end_\@
++.Lxts_op1_cts_128_\@:
++.ifc \operation, dec
++	aesdec128kl (HANDLEP), STATE1
++.else
++	aesenc128kl (HANDLEP), STATE1
++.endif
++	jz .Lxts_op_err_\@
++
++.Lxts_op1_cts_end_\@:
++.ifc \operation, dec
++	pxor STATE5, STATE1
++.else
++	pxor IV, STATE1
++.endif
++	movups STATE1, (OUTP)
++	xor %rax, %rax
++	FRAME_END
++	RET
++
++.Lxts_op_err_\@:
++	mov $(-EINVAL), %rax
++	FRAME_END
++	RET
++.endm
++
++/*
++ * int __aeskl_xts_encrypt(const struct aeskl_ctx *handlep, u8 *outp,
++ *			   const u8 *inp, unsigned int klen, le128 *ivp)
++ */
++SYM_FUNC_START(__aeskl_xts_encrypt)
++	XTS_ENC_DEC enc
++SYM_FUNC_END(__aeskl_xts_encrypt)
++
++/*
++ * int __aeskl_xts_decrypt(const struct crypto_aes_ctx *handlep, u8 *outp,
++ *			   const u8 *inp, unsigned int klen, le128 *ivp)
++ */
++SYM_FUNC_START(__aeskl_xts_decrypt)
++	XTS_ENC_DEC dec
++SYM_FUNC_END(__aeskl_xts_decrypt)
++
+diff --git a/arch/x86/crypto/aeskl-intel_glue.c b/arch/x86/crypto/aeskl-intel_glue.c
+new file mode 100644
+index 000000000000..7672c4836da8
+--- /dev/null
++++ b/arch/x86/crypto/aeskl-intel_glue.c
+@@ -0,0 +1,187 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Support for AES Key Locker instructions. This file contains glue
++ * code and the real AES implementation is in aeskl-intel_asm.S.
++ *
++ * Most code is based on AES-NI glue code, aesni-intel_glue.c
++ */
++
++#include <linux/types.h>
++#include <linux/module.h>
 +#include <linux/err.h>
 +#include <crypto/algapi.h>
 +#include <crypto/aes.h>
 +#include <crypto/xts.h>
-+#include <crypto/scatterwalk.h>
-+#include <crypto/internal/aead.h>
++#include <crypto/internal/skcipher.h>
 +#include <crypto/internal/simd.h>
++#include <asm/simd.h>
++#include <asm/cpu_device_id.h>
++#include <asm/fpu/api.h>
++#include <asm/keylocker.h>
 +
-+#define AES_ALIGN		16
-+#define AES_ALIGN_ATTR		__attribute__((__aligned__(AES_ALIGN)))
-+#define AES_ALIGN_EXTRA		((AES_ALIGN - 1) & ~(CRYPTO_MINALIGN - 1))
-+#define XTS_AES_CTX_SIZE	(sizeof(struct aes_xts_ctx) + AES_ALIGN_EXTRA)
++#include "aes-helper_glue.h"
++#include "aesni-intel_glue.h"
++
++asmlinkage void __aeskl_setkey(struct aeskl_ctx *ctx, const u8 *in_key, unsigned int keylen);
++
++asmlinkage int __aeskl_enc(const void *ctx, u8 *out, const u8 *in);
++
++asmlinkage int __aeskl_xts_encrypt(const struct aeskl_ctx *ctx, u8 *out, const u8 *in,
++				   unsigned int len, u8 *iv);
++asmlinkage int __aeskl_xts_decrypt(const struct aeskl_ctx *ctx, u8 *out, const u8 *in,
++				   unsigned int len, u8 *iv);
 +
 +/*
-+ * Preserve data types for various AES implementations available in x86
++ * If a hardware failure occurs, the wrapping key may be lost during
++ * sleep states. The state of the feature can be retrieved via
++ * valid_keylocker().
++ *
++ * Since disabling can occur preemptively, check for availability on
++ * every use along with kernel_fpu_begin().
 + */
-+union x86_aes_ctx {
-+	struct crypto_aes_ctx aesni;
-+};
 +
-+struct aes_xts_ctx {
-+	union x86_aes_ctx tweak_ctx AES_ALIGN_ATTR;
-+	union x86_aes_ctx crypt_ctx AES_ALIGN_ATTR;
-+};
-+
-+static inline void *aes_align_addr(void *addr)
++static int aeskl_setkey(union x86_aes_ctx *ctx, const u8 *in_key, unsigned int keylen)
 +{
-+	return (crypto_tfm_ctx_alignment() >= AES_ALIGN) ? addr : PTR_ALIGN(addr, AES_ALIGN);
-+}
-+
-+static inline struct aes_xts_ctx *aes_xts_ctx(struct crypto_skcipher *tfm)
-+{
-+	return aes_align_addr(crypto_skcipher_ctx(tfm));
-+}
-+
-+static inline int
-+xts_setkey_common(struct crypto_skcipher *tfm, const u8 *key, unsigned int keylen,
-+		  int (*fn)(union x86_aes_ctx *ctx, const u8 *in_key, unsigned int key_len))
-+{
-+	struct aes_xts_ctx *ctx = aes_xts_ctx(tfm);
 +	int err;
 +
-+	err = xts_verify_key(tfm, key, keylen);
++	if (!crypto_simd_usable())
++		return -EBUSY;
++
++	err = aes_check_keylen(keylen);
 +	if (err)
 +		return err;
 +
-+	keylen /= 2;
-+
-+	/* first half of xts-key is for crypt */
-+	err = fn(&ctx->crypt_ctx, key, keylen);
-+	if (err)
-+		return err;
-+
-+	/* second half of xts-key is for tweak */
-+	return fn(&ctx->tweak_ctx, key + keylen, keylen);
-+}
-+
-+static inline int
-+xts_crypt_common(struct skcipher_request *req,
-+		 int (*crypt_fn)(const union x86_aes_ctx *ctx, u8 *out, const u8 *in,
-+				 unsigned int len, u8 *iv),
-+		 int (*crypt1_fn)(const void *ctx, u8 *out, const u8 *in))
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct aes_xts_ctx *ctx = aes_xts_ctx(tfm);
-+	int tail = req->cryptlen % AES_BLOCK_SIZE;
-+	struct skcipher_request subreq;
-+	struct skcipher_walk walk;
-+	int err;
-+
-+	if (req->cryptlen < AES_BLOCK_SIZE)
-+		return -EINVAL;
-+
-+	err = skcipher_walk_virt(&walk, req, false);
-+	if (!walk.nbytes)
-+		return err;
-+
-+	if (unlikely(tail > 0 && walk.nbytes < walk.total)) {
-+		int blocks = DIV_ROUND_UP(req->cryptlen, AES_BLOCK_SIZE) - 2;
-+
-+		skcipher_walk_abort(&walk);
-+
-+		skcipher_request_set_tfm(&subreq, tfm);
-+		skcipher_request_set_callback(&subreq,
-+					      skcipher_request_flags(req),
-+					      NULL, NULL);
-+		skcipher_request_set_crypt(&subreq, req->src, req->dst,
-+					   blocks * AES_BLOCK_SIZE, req->iv);
-+		req = &subreq;
-+
-+		err = skcipher_walk_virt(&walk, req, false);
-+		if (!walk.nbytes)
-+			return err;
-+	} else {
-+		tail = 0;
++	if (unlikely(keylen == AES_KEYSIZE_192)) {
++		pr_warn_once("AES-KL does not support 192-bit key. Use AES-NI.\n");
++		kernel_fpu_begin();
++		aesni_set_key(&ctx->aesni, in_key, keylen);
++		kernel_fpu_end();
++		return 0;
 +	}
++
++	if (!valid_keylocker())
++		return -ENODEV;
 +
 +	kernel_fpu_begin();
-+
-+	/* calculate first value of T */
-+	err = crypt1_fn(&ctx->tweak_ctx, walk.iv, walk.iv);
-+	if (err) {
-+		kernel_fpu_end();
-+		return err;
-+	}
-+
-+	while (walk.nbytes > 0) {
-+		int nbytes = walk.nbytes;
-+
-+		if (nbytes < walk.total)
-+			nbytes &= ~(AES_BLOCK_SIZE - 1);
-+
-+		err = crypt_fn(&ctx->crypt_ctx, walk.dst.virt.addr, walk.src.virt.addr,
-+			       nbytes, walk.iv);
-+		kernel_fpu_end();
-+		if (err)
-+			return err;
-+
-+		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
-+
-+		if (walk.nbytes > 0)
-+			kernel_fpu_begin();
-+	}
-+
-+	if (unlikely(tail > 0 && !err)) {
-+		struct scatterlist sg_src[2], sg_dst[2];
-+		struct scatterlist *src, *dst;
-+
-+		src = scatterwalk_ffwd(sg_src, req->src, req->cryptlen);
-+		if (req->dst != req->src)
-+			dst = scatterwalk_ffwd(sg_dst, req->dst, req->cryptlen);
-+		else
-+			dst = src;
-+
-+		skcipher_request_set_crypt(req, src, dst, AES_BLOCK_SIZE + tail,
-+					   req->iv);
-+
-+		err = skcipher_walk_virt(&walk, &subreq, false);
-+		if (err)
-+			return err;
-+
-+		kernel_fpu_begin();
-+		err = crypt_fn(&ctx->crypt_ctx, walk.dst.virt.addr, walk.src.virt.addr,
-+			       walk.nbytes, walk.iv);
-+		kernel_fpu_end();
-+		if (err)
-+			return err;
-+
-+		err = skcipher_walk_done(&walk, 0);
-+	}
-+	return err;
++	__aeskl_setkey(&ctx->aeskl, in_key, keylen);
++	kernel_fpu_end();
++	return 0;
 +}
 +
-+#endif /* _AES_HELPER_GLUE_H */
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index 7ecb55cae3d6..1015a36a73a0 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -28,6 +28,7 @@
- #include <linux/linkage.h>
- #include <asm/frame.h>
- #include <asm/nospec-branch.h>
-+#include "aes-helper_asm.S"
- 
- /*
-  * The following macros are used to move an (un)aligned 16 byte value to/from
-@@ -1934,9 +1935,9 @@ SYM_FUNC_START(aesni_set_key)
- SYM_FUNC_END(aesni_set_key)
- 
- /*
-- * void aesni_enc(const void *ctx, u8 *dst, const u8 *src)
-+ * void __aesni_enc(const void *ctx, u8 *dst, const u8 *src)
-  */
--SYM_FUNC_START(aesni_enc)
-+SYM_FUNC_START(__aesni_enc)
- 	FRAME_BEGIN
- #ifndef __x86_64__
- 	pushl KEYP
-@@ -1955,7 +1956,7 @@ SYM_FUNC_START(aesni_enc)
- #endif
- 	FRAME_END
- 	RET
--SYM_FUNC_END(aesni_enc)
-+SYM_FUNC_END(__aesni_enc)
- 
- /*
-  * _aesni_enc1:		internal ABI
-@@ -2123,9 +2124,9 @@ SYM_FUNC_START_LOCAL(_aesni_enc4)
- SYM_FUNC_END(_aesni_enc4)
- 
- /*
-- * void aesni_dec (const void *ctx, u8 *dst, const u8 *src)
-+ * void __aesni_dec (const void *ctx, u8 *dst, const u8 *src)
-  */
--SYM_FUNC_START(aesni_dec)
-+SYM_FUNC_START(__aesni_dec)
- 	FRAME_BEGIN
- #ifndef __x86_64__
- 	pushl KEYP
-@@ -2145,7 +2146,7 @@ SYM_FUNC_START(aesni_dec)
- #endif
- 	FRAME_END
- 	RET
--SYM_FUNC_END(aesni_dec)
-+SYM_FUNC_END(__aesni_dec)
- 
- /*
-  * _aesni_dec1:		internal ABI
-@@ -2688,22 +2689,14 @@ SYM_FUNC_START(aesni_cts_cbc_dec)
- 	RET
- SYM_FUNC_END(aesni_cts_cbc_dec)
- 
-+#ifdef __x86_64__
++static inline int aeskl_enc(const void *ctx, u8 *out, const u8 *in)
++{
++	if (!valid_keylocker())
++		return -ENODEV;
 +
- .pushsection .rodata
- .align 16
--.Lcts_permute_table:
--	.byte		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
--	.byte		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
--	.byte		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
--	.byte		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
--	.byte		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
--	.byte		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
--#ifdef __x86_64__
- .Lbswap_mask:
- 	.byte 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
--#endif
- .popsection
- 
--#ifdef __x86_64__
- /*
-  * _aesni_inc_init:	internal ABI
-  *	setup registers used by _aesni_inc
-@@ -2818,12 +2811,6 @@ SYM_FUNC_END(aesni_ctr_enc)
- 
- #endif
- 
--.section	.rodata.cst16.gf128mul_x_ble_mask, "aM", @progbits, 16
--.align 16
--.Lgf128mul_x_ble_mask:
--	.octa 0x00000000000000010000000000000087
--.previous
--
- /*
-  * _aesni_gf128mul_x_ble:		internal ABI
-  *	Multiply in GF(2^128) for XTS IVs
-@@ -2843,10 +2830,10 @@ SYM_FUNC_END(aesni_ctr_enc)
- 	pxor KEY, IV;
- 
- /*
-- * void aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *dst,
-- *			  const u8 *src, unsigned int len, le128 *iv)
-+ * void __aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *dst,
-+ *			    const u8 *src, unsigned int len, le128 *iv)
-  */
--SYM_FUNC_START(aesni_xts_encrypt)
-+SYM_FUNC_START(__aesni_xts_encrypt)
- 	FRAME_BEGIN
- #ifndef __x86_64__
- 	pushl IVP
-@@ -2995,13 +2982,13 @@ SYM_FUNC_START(aesni_xts_encrypt)
- 
- 	movups STATE, (OUTP)
- 	jmp .Lxts_enc_ret
--SYM_FUNC_END(aesni_xts_encrypt)
-+SYM_FUNC_END(__aesni_xts_encrypt)
- 
- /*
-- * void aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *dst,
-- *			  const u8 *src, unsigned int len, le128 *iv)
-+ * void __aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *dst,
-+ *			    const u8 *src, unsigned int len, le128 *iv)
-  */
--SYM_FUNC_START(aesni_xts_decrypt)
-+SYM_FUNC_START(__aesni_xts_decrypt)
- 	FRAME_BEGIN
- #ifndef __x86_64__
- 	pushl IVP
-@@ -3157,4 +3144,4 @@ SYM_FUNC_START(aesni_xts_decrypt)
- 
- 	movups STATE, (OUTP)
- 	jmp .Lxts_dec_ret
--SYM_FUNC_END(aesni_xts_decrypt)
-+SYM_FUNC_END(__aesni_xts_decrypt)
++	return __aeskl_enc(ctx, out, in);
++}
++
++static inline int aeskl_xts_encrypt(const union x86_aes_ctx *ctx, u8 *out, const u8 *in,
++				    unsigned int len, u8 *iv)
++{
++	if (!valid_keylocker())
++		return -ENODEV;
++
++	return __aeskl_xts_encrypt(&ctx->aeskl, out, in, len, iv);
++}
++
++static inline int aeskl_xts_decrypt(const union x86_aes_ctx *ctx, u8 *out, const u8 *in,
++				    unsigned int len, u8 *iv)
++{
++	if (!valid_keylocker())
++		return -ENODEV;
++
++	return __aeskl_xts_decrypt(&ctx->aeskl, out, in, len, iv);
++}
++
++static int xts_setkey(struct crypto_skcipher *tfm, const u8 *key,
++		      unsigned int keylen)
++{
++	return xts_setkey_common(tfm, key, keylen, aeskl_setkey);
++}
++
++static inline u32 xts_keylen(struct skcipher_request *req)
++{
++	struct aes_xts_ctx *ctx = aes_xts_ctx(crypto_skcipher_reqtfm(req));
++
++	return ctx->crypt_ctx.aeskl.key_length;
++}
++
++static int xts_encrypt(struct skcipher_request *req)
++{
++	u32 keylen = xts_keylen(req);
++
++	if (likely(keylen != AES_KEYSIZE_192))
++		return xts_crypt_common(req, aeskl_xts_encrypt, aeskl_enc);
++	else
++		return xts_crypt_common(req, aesni_xts_encrypt, aesni_enc);
++}
++
++static int xts_decrypt(struct skcipher_request *req)
++{
++	u32 keylen = xts_keylen(req);
++
++	if (likely(keylen != AES_KEYSIZE_192))
++		return xts_crypt_common(req, aeskl_xts_decrypt, aeskl_enc);
++	else
++		return xts_crypt_common(req, aesni_xts_decrypt, aesni_enc);
++}
++
++static struct skcipher_alg aeskl_skciphers[] = {
++	{
++		.base = {
++			.cra_name		= "__xts(aes)",
++			.cra_driver_name	= "__xts-aes-aeskl",
++			.cra_priority		= 200,
++			.cra_flags		= CRYPTO_ALG_INTERNAL,
++			.cra_blocksize		= AES_BLOCK_SIZE,
++			.cra_ctxsize		= XTS_AES_CTX_SIZE,
++			.cra_module		= THIS_MODULE,
++		},
++		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
++		.max_keysize	= 2 * AES_MAX_KEY_SIZE,
++		.ivsize		= AES_BLOCK_SIZE,
++		.walksize	= 2 * AES_BLOCK_SIZE,
++		.setkey		= xts_setkey,
++		.encrypt	= xts_encrypt,
++		.decrypt	= xts_decrypt,
++	}
++};
++
++static struct simd_skcipher_alg *aeskl_simd_skciphers[ARRAY_SIZE(aeskl_skciphers)];
++
++static int __init aeskl_init(void)
++{
++	u32 eax, ebx, ecx, edx;
++
++	if (!valid_keylocker())
++		return -ENODEV;
++
++	cpuid_count(KEYLOCKER_CPUID, 0, &eax, &ebx, &ecx, &edx);
++	if (!(ebx & KEYLOCKER_CPUID_EBX_WIDE))
++		return -ENODEV;
++
++	/*
++	 * AES-KL itself does not rely on AES-NI. But, AES-KL does not
++	 * support 192-bit keys. To ensure AES compliance, AES-KL falls
++	 * back to AES-NI.
++	 */
++	if (!boot_cpu_has(X86_FEATURE_AES))
++		return -ENODEV;
++
++	return simd_register_skciphers_compat(aeskl_skciphers, ARRAY_SIZE(aeskl_skciphers),
++					      aeskl_simd_skciphers);
++}
++
++static void __exit aeskl_exit(void)
++{
++	simd_unregister_skciphers(aeskl_skciphers, ARRAY_SIZE(aeskl_skciphers),
++				  aeskl_simd_skciphers);
++}
++
++late_initcall(aeskl_init);
++module_exit(aeskl_exit);
++
++MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm, AES Key Locker implementation");
++MODULE_LICENSE("GPL");
++MODULE_ALIAS_CRYPTO("aes");
+diff --git a/arch/x86/crypto/aeskl-intel_glue.h b/arch/x86/crypto/aeskl-intel_glue.h
+new file mode 100644
+index 000000000000..57cfd6c55a4f
+--- /dev/null
++++ b/arch/x86/crypto/aeskl-intel_glue.h
+@@ -0,0 +1,35 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef _AESKL_INTEL_GLUE_H
++#define _AESKL_INTEL_GLUE_H
++
++#include <crypto/aes.h>
++#include <linux/types.h>
++
++#define AESKL_AAD_SIZE		16
++#define AESKL_TAG_SIZE		16
++#define AESKL_CIPHERTEXT_MAX	AES_KEYSIZE_256
++
++/* The Key Locker handle is an encoded form of the AES key. */
++struct aeskl_handle {
++	u8 additional_authdata[AESKL_AAD_SIZE];
++	u8 integrity_tag[AESKL_TAG_SIZE];
++	u8 ciphre_text[AESKL_CIPHERTEXT_MAX];
++};
++
++/*
++ * Key Locker does not support 192-bit key size. The driver needs to
++ * retrieve the key size in the first place. The offset of the
++ * 'key_length' field here should be compatible with struct
++ * crypto_aes_ctx.
++ */
++#define AESKL_CTX_RESERVED (sizeof(struct crypto_aes_ctx) - sizeof(struct aeskl_handle) \
++			    - sizeof(u32))
++
++struct aeskl_ctx {
++	struct aeskl_handle handle;
++	u8 reserved[AESKL_CTX_RESERVED];
++	u32 key_length;
++};
++
++#endif /* _AESKL_INTEL_GLUE_H */
 diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 0ea3abaaa645..4ac7b9a28967 100644
+index 4ac7b9a28967..d9c4aa055383 100644
 --- a/arch/x86/crypto/aesni-intel_glue.c
 +++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -36,33 +36,25 @@
- #include <linux/spinlock.h>
+@@ -37,6 +37,7 @@
  #include <linux/static_call.h>
  
-+#include "aes-helper_glue.h"
+ #include "aes-helper_glue.h"
++#include "aesni-intel_glue.h"
  
--#define AESNI_ALIGN	16
--#define AESNI_ALIGN_ATTR __attribute__ ((__aligned__(AESNI_ALIGN)))
--#define AES_BLOCK_MASK	(~(AES_BLOCK_SIZE - 1))
  #define RFC4106_HASH_SUBKEY_SIZE 16
--#define AESNI_ALIGN_EXTRA ((AESNI_ALIGN - 1) & ~(CRYPTO_MINALIGN - 1))
--#define CRYPTO_AES_CTX_SIZE (sizeof(struct crypto_aes_ctx) + AESNI_ALIGN_EXTRA)
--#define XTS_AES_CTX_SIZE (sizeof(struct aesni_xts_ctx) + AESNI_ALIGN_EXTRA)
-+#define AES_BLOCK_MASK (~(AES_BLOCK_SIZE - 1))
-+#define CRYPTO_AES_CTX_SIZE (sizeof(struct crypto_aes_ctx) + AES_ALIGN_EXTRA)
- 
- /* This data is stored at the end of the crypto_tfm struct.
-  * It's a type of per "session" data storage location.
-  * This needs to be 16 byte aligned.
-  */
- struct aesni_rfc4106_gcm_ctx {
--	u8 hash_subkey[16] AESNI_ALIGN_ATTR;
--	struct crypto_aes_ctx aes_key_expanded AESNI_ALIGN_ATTR;
-+	u8 hash_subkey[16] AES_ALIGN_ATTR;
-+	struct crypto_aes_ctx aes_key_expanded AES_ALIGN_ATTR;
- 	u8 nonce[4];
- };
- 
- struct generic_gcmaes_ctx {
--	u8 hash_subkey[16] AESNI_ALIGN_ATTR;
--	struct crypto_aes_ctx aes_key_expanded AESNI_ALIGN_ATTR;
--};
--
--struct aesni_xts_ctx {
--	struct crypto_aes_ctx tweak_ctx AESNI_ALIGN_ATTR;
--	struct crypto_aes_ctx crypt_ctx AESNI_ALIGN_ATTR;
-+	u8 hash_subkey[16] AES_ALIGN_ATTR;
-+	struct crypto_aes_ctx aes_key_expanded AES_ALIGN_ATTR;
- };
- 
- #define GCM_BLOCK_LEN 16
-@@ -80,17 +72,10 @@ struct gcm_context_data {
+ #define AES_BLOCK_MASK (~(AES_BLOCK_SIZE - 1))
+@@ -72,9 +73,6 @@ struct gcm_context_data {
  	u8 hash_keys[GCM_BLOCK_LEN * 16];
  };
  
--static inline void *aes_align_addr(void *addr)
--{
--	if (crypto_tfm_ctx_alignment() >= AESNI_ALIGN)
--		return addr;
--	return PTR_ALIGN(addr, AESNI_ALIGN);
--}
--
- asmlinkage void aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
- 			      unsigned int key_len);
--asmlinkage void aesni_enc(const void *ctx, u8 *out, const u8 *in);
--asmlinkage void aesni_dec(const void *ctx, u8 *out, const u8 *in);
-+asmlinkage void __aesni_enc(const void *ctx, u8 *out, const u8 *in);
-+asmlinkage void __aesni_dec(const void *ctx, u8 *out, const u8 *in);
+-asmlinkage void aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
+-			      unsigned int key_len);
+-asmlinkage void __aesni_enc(const void *ctx, u8 *out, const u8 *in);
+ asmlinkage void __aesni_dec(const void *ctx, u8 *out, const u8 *in);
  asmlinkage void aesni_ecb_enc(struct crypto_aes_ctx *ctx, u8 *out,
  			      const u8 *in, unsigned int len);
- asmlinkage void aesni_ecb_dec(struct crypto_aes_ctx *ctx, u8 *out,
-@@ -104,14 +89,20 @@ asmlinkage void aesni_cts_cbc_enc(struct crypto_aes_ctx *ctx, u8 *out,
+@@ -89,21 +87,9 @@ asmlinkage void aesni_cts_cbc_enc(struct crypto_aes_ctx *ctx, u8 *out,
  asmlinkage void aesni_cts_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
  				  const u8 *in, unsigned int len, u8 *iv);
  
+-static inline int aesni_enc(const void *ctx, u8 *out, const u8 *in)
+-{
+-	__aesni_enc(ctx, out, in);
+-	return 0;
+-}
+-
+ #define AVX_GEN2_OPTSIZE 640
+ #define AVX_GEN4_OPTSIZE 4096
+ 
+-asmlinkage void __aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *out,
+-				    const u8 *in, unsigned int len, u8 *iv);
+-
+-asmlinkage void __aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *out,
+-				    const u8 *in, unsigned int len, u8 *iv);
+-
+ #ifdef CONFIG_X86_64
+ 
+ asmlinkage void aesni_ctr_enc(struct crypto_aes_ctx *ctx, u8 *out,
+@@ -271,20 +257,6 @@ static inline int aesni_xts_setkey(union x86_aes_ctx *ctx,
+ 	return aes_set_key_common(&ctx->aesni, in_key, key_len);
+ }
+ 
+-static inline int aesni_xts_encrypt(const union x86_aes_ctx *ctx, u8 *out, const u8 *in,
+-				    unsigned int len, u8 *iv)
+-{
+-	__aesni_xts_encrypt(&ctx->aesni, out, in, len, iv);
+-	return 0;
+-}
+-
+-static inline int aesni_xts_decrypt(const union x86_aes_ctx *ctx, u8 *out, const u8 *in,
+-				    unsigned int len, u8 *iv)
+-{
+-	__aesni_xts_decrypt(&ctx->aesni, out, in, len, iv);
+-	return 0;
+-}
+-
+ static int aesni_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			         unsigned int len)
+ {
+diff --git a/arch/x86/crypto/aesni-intel_glue.h b/arch/x86/crypto/aesni-intel_glue.h
+new file mode 100644
+index 000000000000..999f81f5bcde
+--- /dev/null
++++ b/arch/x86/crypto/aesni-intel_glue.h
+@@ -0,0 +1,40 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++/*
++ * These are AES-NI functions that are used by the AES-KL code as a
++ * fallback when it is given a 192-bit key. Key Locker does not support
++ * 192-bit keys.
++ */
++
++#ifndef _AESNI_INTEL_GLUE_H
++#define _AESNI_INTEL_GLUE_H
++
++asmlinkage void aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
++			      unsigned int key_len);
++asmlinkage void __aesni_enc(const void *ctx, u8 *out, const u8 *in);
++asmlinkage void __aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *out,
++				    const u8 *in, unsigned int len, u8 *iv);
++asmlinkage void __aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *out,
++				    const u8 *in, unsigned int len, u8 *iv);
++
 +static inline int aesni_enc(const void *ctx, u8 *out, const u8 *in)
 +{
 +	__aesni_enc(ctx, out, in);
 +	return 0;
-+}
-+
- #define AVX_GEN2_OPTSIZE 640
- #define AVX_GEN4_OPTSIZE 4096
- 
--asmlinkage void aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *out,
--				  const u8 *in, unsigned int len, u8 *iv);
-+asmlinkage void __aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *out,
-+				    const u8 *in, unsigned int len, u8 *iv);
- 
--asmlinkage void aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *out,
--				  const u8 *in, unsigned int len, u8 *iv);
-+asmlinkage void __aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *out,
-+				    const u8 *in, unsigned int len, u8 *iv);
- 
- #ifdef CONFIG_X86_64
- 
-@@ -223,11 +214,6 @@ static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
- 	return aes_align_addr(raw_ctx);
- }
- 
--static inline struct aesni_xts_ctx *aes_xts_ctx(struct crypto_skcipher *tfm)
--{
--	return aes_align_addr(crypto_skcipher_ctx(tfm));
--}
--
- static int aes_set_key_common(struct crypto_aes_ctx *ctx,
- 			      const u8 *in_key, unsigned int key_len)
- {
-@@ -261,7 +247,7 @@ static void aesni_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 		aes_encrypt(ctx, dst, src);
- 	} else {
- 		kernel_fpu_begin();
--		aesni_enc(ctx, dst, src);
-+		__aesni_enc(ctx, dst, src);
- 		kernel_fpu_end();
- 	}
- }
-@@ -274,11 +260,31 @@ static void aesni_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 		aes_decrypt(ctx, dst, src);
- 	} else {
- 		kernel_fpu_begin();
--		aesni_dec(ctx, dst, src);
-+		__aesni_dec(ctx, dst, src);
- 		kernel_fpu_end();
- 	}
- }
- 
-+static inline int aesni_xts_setkey(union x86_aes_ctx *ctx,
-+				   const u8 *in_key, unsigned int key_len)
-+{
-+	return aes_set_key_common(&ctx->aesni, in_key, key_len);
 +}
 +
 +static inline int aesni_xts_encrypt(const union x86_aes_ctx *ctx, u8 *out, const u8 *in,
@@ -622,203 +1076,7 @@ index 0ea3abaaa645..4ac7b9a28967 100644
 +	return 0;
 +}
 +
- static int aesni_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			         unsigned int len)
- {
-@@ -524,7 +530,7 @@ static int ctr_crypt(struct skcipher_request *req)
- 		nbytes &= ~AES_BLOCK_MASK;
- 
- 		if (walk.nbytes == walk.total && nbytes > 0) {
--			aesni_enc(ctx, keystream, walk.iv);
-+			__aesni_enc(ctx, keystream, walk.iv);
- 			crypto_xor_cpy(walk.dst.virt.addr + walk.nbytes - nbytes,
- 				       walk.src.virt.addr + walk.nbytes - nbytes,
- 				       keystream, nbytes);
-@@ -668,8 +674,8 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
- 			      u8 *iv, void *aes_ctx, u8 *auth_tag,
- 			      unsigned long auth_tag_len)
- {
--	u8 databuf[sizeof(struct gcm_context_data) + (AESNI_ALIGN - 8)] __aligned(8);
--	struct gcm_context_data *data = PTR_ALIGN((void *)databuf, AESNI_ALIGN);
-+	u8 databuf[sizeof(struct gcm_context_data) + (AES_ALIGN - 8)] __aligned(8);
-+	struct gcm_context_data *data = PTR_ALIGN((void *)databuf, AES_ALIGN);
- 	unsigned long left = req->cryptlen;
- 	struct scatter_walk assoc_sg_walk;
- 	struct skcipher_walk walk;
-@@ -824,8 +830,8 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(tfm);
- 	void *aes_ctx = &(ctx->aes_key_expanded);
--	u8 ivbuf[16 + (AESNI_ALIGN - 8)] __aligned(8);
--	u8 *iv = PTR_ALIGN(&ivbuf[0], AESNI_ALIGN);
-+	u8 ivbuf[16 + (AES_ALIGN - 8)] __aligned(8);
-+	u8 *iv = PTR_ALIGN(&ivbuf[0], AES_ALIGN);
- 	unsigned int i;
- 	__be32 counter = cpu_to_be32(1);
- 
-@@ -852,8 +858,8 @@ static int helper_rfc4106_decrypt(struct aead_request *req)
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(tfm);
- 	void *aes_ctx = &(ctx->aes_key_expanded);
--	u8 ivbuf[16 + (AESNI_ALIGN - 8)] __aligned(8);
--	u8 *iv = PTR_ALIGN(&ivbuf[0], AESNI_ALIGN);
-+	u8 ivbuf[16 + (AES_ALIGN - 8)] __aligned(8);
-+	u8 *iv = PTR_ALIGN(&ivbuf[0], AES_ALIGN);
- 	unsigned int i;
- 
- 	if (unlikely(req->assoclen != 16 && req->assoclen != 20))
-@@ -878,126 +884,17 @@ static int helper_rfc4106_decrypt(struct aead_request *req)
- static int xts_aesni_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			    unsigned int keylen)
- {
--	struct aesni_xts_ctx *ctx = aes_xts_ctx(tfm);
--	int err;
--
--	err = xts_verify_key(tfm, key, keylen);
--	if (err)
--		return err;
--
--	keylen /= 2;
--
--	/* first half of xts-key is for crypt */
--	err = aes_set_key_common(&ctx->crypt_ctx, key, keylen);
--	if (err)
--		return err;
--
--	/* second half of xts-key is for tweak */
--	return aes_set_key_common(&ctx->tweak_ctx, key + keylen, keylen);
--}
--
--static int xts_crypt(struct skcipher_request *req, bool encrypt)
--{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct aesni_xts_ctx *ctx = aes_xts_ctx(tfm);
--	int tail = req->cryptlen % AES_BLOCK_SIZE;
--	struct skcipher_request subreq;
--	struct skcipher_walk walk;
--	int err;
--
--	if (req->cryptlen < AES_BLOCK_SIZE)
--		return -EINVAL;
--
--	err = skcipher_walk_virt(&walk, req, false);
--	if (!walk.nbytes)
--		return err;
--
--	if (unlikely(tail > 0 && walk.nbytes < walk.total)) {
--		int blocks = DIV_ROUND_UP(req->cryptlen, AES_BLOCK_SIZE) - 2;
--
--		skcipher_walk_abort(&walk);
--
--		skcipher_request_set_tfm(&subreq, tfm);
--		skcipher_request_set_callback(&subreq,
--					      skcipher_request_flags(req),
--					      NULL, NULL);
--		skcipher_request_set_crypt(&subreq, req->src, req->dst,
--					   blocks * AES_BLOCK_SIZE, req->iv);
--		req = &subreq;
--
--		err = skcipher_walk_virt(&walk, req, false);
--		if (!walk.nbytes)
--			return err;
--	} else {
--		tail = 0;
--	}
--
--	kernel_fpu_begin();
--
--	/* calculate first value of T */
--	aesni_enc(&ctx->tweak_ctx, walk.iv, walk.iv);
--
--	while (walk.nbytes > 0) {
--		int nbytes = walk.nbytes;
--
--		if (nbytes < walk.total)
--			nbytes &= ~(AES_BLOCK_SIZE - 1);
--
--		if (encrypt)
--			aesni_xts_encrypt(&ctx->crypt_ctx,
--					  walk.dst.virt.addr, walk.src.virt.addr,
--					  nbytes, walk.iv);
--		else
--			aesni_xts_decrypt(&ctx->crypt_ctx,
--					  walk.dst.virt.addr, walk.src.virt.addr,
--					  nbytes, walk.iv);
--		kernel_fpu_end();
--
--		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
--
--		if (walk.nbytes > 0)
--			kernel_fpu_begin();
--	}
--
--	if (unlikely(tail > 0 && !err)) {
--		struct scatterlist sg_src[2], sg_dst[2];
--		struct scatterlist *src, *dst;
--
--		dst = src = scatterwalk_ffwd(sg_src, req->src, req->cryptlen);
--		if (req->dst != req->src)
--			dst = scatterwalk_ffwd(sg_dst, req->dst, req->cryptlen);
--
--		skcipher_request_set_crypt(req, src, dst, AES_BLOCK_SIZE + tail,
--					   req->iv);
--
--		err = skcipher_walk_virt(&walk, &subreq, false);
--		if (err)
--			return err;
--
--		kernel_fpu_begin();
--		if (encrypt)
--			aesni_xts_encrypt(&ctx->crypt_ctx,
--					  walk.dst.virt.addr, walk.src.virt.addr,
--					  walk.nbytes, walk.iv);
--		else
--			aesni_xts_decrypt(&ctx->crypt_ctx,
--					  walk.dst.virt.addr, walk.src.virt.addr,
--					  walk.nbytes, walk.iv);
--		kernel_fpu_end();
--
--		err = skcipher_walk_done(&walk, 0);
--	}
--	return err;
-+	return xts_setkey_common(tfm, key, keylen, aesni_xts_setkey);
- }
- 
- static int xts_encrypt(struct skcipher_request *req)
- {
--	return xts_crypt(req, true);
-+	return xts_crypt_common(req, aesni_xts_encrypt, aesni_enc);
- }
- 
- static int xts_decrypt(struct skcipher_request *req)
- {
--	return xts_crypt(req, false);
-+	return xts_crypt_common(req, aesni_xts_decrypt, aesni_enc);
- }
- 
- static struct crypto_alg aesni_cipher_alg = {
-@@ -1152,8 +1049,8 @@ static int generic_gcmaes_encrypt(struct aead_request *req)
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct generic_gcmaes_ctx *ctx = generic_gcmaes_ctx_get(tfm);
- 	void *aes_ctx = &(ctx->aes_key_expanded);
--	u8 ivbuf[16 + (AESNI_ALIGN - 8)] __aligned(8);
--	u8 *iv = PTR_ALIGN(&ivbuf[0], AESNI_ALIGN);
-+	u8 ivbuf[16 + (AES_ALIGN - 8)] __aligned(8);
-+	u8 *iv = PTR_ALIGN(&ivbuf[0], AES_ALIGN);
- 	__be32 counter = cpu_to_be32(1);
- 
- 	memcpy(iv, req->iv, 12);
-@@ -1169,8 +1066,8 @@ static int generic_gcmaes_decrypt(struct aead_request *req)
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct generic_gcmaes_ctx *ctx = generic_gcmaes_ctx_get(tfm);
- 	void *aes_ctx = &(ctx->aes_key_expanded);
--	u8 ivbuf[16 + (AESNI_ALIGN - 8)] __aligned(8);
--	u8 *iv = PTR_ALIGN(&ivbuf[0], AESNI_ALIGN);
-+	u8 ivbuf[16 + (AES_ALIGN - 8)] __aligned(8);
-+	u8 *iv = PTR_ALIGN(&ivbuf[0], AES_ALIGN);
- 
- 	memcpy(iv, req->iv, 12);
- 	*((__be32 *)(iv+12)) = counter;
++#endif /* _AESNI_INTEL_GLUE_H */
 -- 
 2.34.1
 
