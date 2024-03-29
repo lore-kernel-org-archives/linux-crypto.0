@@ -1,36 +1,36 @@
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30A2145331;
-	Sun, 31 Mar 2024 16:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6072714534E;
+	Sun, 31 Mar 2024 16:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=62.96.220.36
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711901244; cv=fail; b=my7oznP2rKFcj01A9ikkXbl98W50pJLDz+PqVnTEt2y7RON5c9nFHGALU7VujUP7Nwh/Z+oru4G9yNjfEU8QOgO2tNbgM5Pe5S5hgknKCLvVgHxh9nGYlr+Y0b+/mFgCuH28rgplaNolfGwWlt5qTpbDxARbcW8c5NR/sdNdntw=
+	t=1711901480; cv=fail; b=QM0Rk2/SlS8Z4/CRdVgxmcXqz03hnuKuGXQ6339KRdP1difX0Q1pixhSekOrl2IfeWGRBQqy375horLEshva86LaRkPV0Q4jSbMK+8He/yD5RTsNJXT0eixixBrTpPDoPtG+CLI2Id3FHe43u+JLgWwAWDJ6WrTjlXsEbz+FxCY=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711901244; c=relaxed/simple;
-	bh=TB9p+NcW0b3LH/HYr+A5vBDYGAAM9iac/lVRPBzTtSo=;
+	s=arc-20240116; t=1711901480; c=relaxed/simple;
+	bh=3UCi3fnrNU2K+yDpbt4ldzvoGw1nSxCEmPIbOXjzKOQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RT6Ygy2vZqqIpALdzsBEe81I5WXaFWt49fxZZpyw425iEaPc3sf8uCsZdQzjQWHdbPQau9C3abJvfEnb+htBWiV51kNsPnAh0CIczCNXx3Rkv/ZjApWxctcbwlDxZQatUC7S4Zn6OlxmZNF0xxZgmx8JT+cv2L+2nMC3l0m6gxw=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zeCqVAyj reason="signature verification failed"; arc=fail smtp.client-ip=40.107.100.70; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; arc=fail smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=iCSrs/5wZvQX3II8oT4sGmbvtnk9xY5PIw6NjH6Vs85wC0q+v7riSHMjJJGA+k2uLXcn4PMgCZyf9U/svP0dDYg2xKCoipFs7X1rShJt7KG/zpf/DAgA3SJatbWe1vwT6vX219TlRZ5LIx4vEHOdkrjLRBT9j20x+TQW4geWtz4=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tIqmA0po reason="signature verification failed"; arc=fail smtp.client-ip=40.107.236.40; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; arc=fail smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zeCqVAyj"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tIqmA0po"
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 44B6D208C3;
-	Sun, 31 Mar 2024 18:07:19 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id 045E0208A3;
+	Sun, 31 Mar 2024 18:11:15 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HhmDJ9tHBpt7; Sun, 31 Mar 2024 18:07:17 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	with ESMTP id obBfEuAfVdni; Sun, 31 Mar 2024 18:11:12 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id F2C38208CE;
-	Sun, 31 Mar 2024 18:07:15 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com F2C38208CE
+	by a.mx.secunet.com (Postfix) with ESMTPS id 2E809208D0;
+	Sun, 31 Mar 2024 18:11:12 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 2E809208D0
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 57829800051;
+	by mailout1.secunet.com (Postfix) with ESMTP id 7F7D0800053;
 	Sun, 31 Mar 2024 18:02:13 +0200 (CEST)
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
@@ -38,48 +38,48 @@ Received: from mbx-essen-01.secunet.de (10.53.40.197) by
  15.1.2507.35; Sun, 31 Mar 2024 18:02:13 +0200
 Received: from Pickup by mbx-essen-01.secunet.de with Microsoft SMTP Server id
  15.1.2507.17; Sun, 31 Mar 2024 15:52:41 +0000
-X-sender: <linux-crypto+bounces-3105-steffen.klassert=secunet.com@vger.kernel.org>
+X-sender: <linux-crypto+bounces-3108-steffen.klassert=secunet.com@vger.kernel.org>
 X-Receiver: <steffen.klassert@secunet.com>
  ORCPT=rfc822;steffen.klassert@secunet.com NOTIFY=NEVER;
  X-ExtendedProps=BQAVABYAAgAAAAUAFAARAPDFCS25BAlDktII2g02frgPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQBHAAIAAAUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4YwUACwAXAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5nZSBBZG1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl2ZSBHcm91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAHQAPAAwAAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5zcG9ydC5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAAwAAgAABQBsAAIAAAUAWAAXAEoAAADwxQktuQQJQ5LSCNoNNn64Q049S2xhc3NlcnQgU3RlZmZlbixPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9ye
 	TogRmFsc2UNCg8ALwAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ==
 X-CreatedBy: MSExchange15
 X-HeloDomain: b.mx.secunet.com
-X-ExtendedProps: BQBjAAoAbw5rGbMv3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAHAAAAHN0ZWZmZW4ua2xhc3NlcnRAc2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAYgAKADgAAADNigAABQBkAA8AAwAAAEh1Yg==
+X-ExtendedProps: BQBjAAoAbw5rGbMv3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAAAAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAHAAAAHN0ZWZmZW4ua2xhc3NlcnRAc2VjdW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwAAAAAABQAFAAIAAQUAYgAKAEIAAADNigAABQBkAA8AAwAAAEh1Yg==
 X-Source: SMTP:Default MBX-ESSEN-01
 X-SourceIPAddress: 62.96.220.37
-X-EndOfInjectedXHeaders: 24900
+X-EndOfInjectedXHeaders: 21158
 X-Virus-Scanned: by secunet
-Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=139.178.88.99; helo=sv.mirrors.kernel.org; envelope-from=linux-crypto+bounces-3105-steffen.klassert=secunet.com@vger.kernel.org; receiver=steffen.klassert@secunet.com 
-DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 422DB200BB
+Received-SPF: Pass (sender SPF authorized) identity=mailfrom; client-ip=139.178.88.99; helo=sv.mirrors.kernel.org; envelope-from=linux-crypto+bounces-3108-steffen.klassert=secunet.com@vger.kernel.org; receiver=steffen.klassert@secunet.com 
+DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 8102A200BB
 Authentication-Results: b.mx.secunet.com;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zeCqVAyj"
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.70
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tIqmA0po"
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
 ARC-Seal: i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711753544; cv=fail; b=BlqqvbGwutAw8URHIgMH30kvA5QpTzs/EidijFPe0fjFy5pMt6gU3Of58WmRgtLC5HdAFWEnpY91icLlr7eYlVXCT6T10fN7aOeDR+taYs5wJQZoRJMsxCRbI3XvUrIl79N5OhELjsPxchrIPeXAKecY7/mL+08bVpQeDnTw0Tg=
+	t=1711753628; cv=fail; b=NAyU4Ql1nzqh8Ta+6+4fkuH3r8iuNk9YQFSF2A6/gisj9px5BkNYKlBn4AgIMyWt1I567ugxqpkl3AYixa0QaggzXoehxx6L6ncHvn8I7Ez2tFYoL9vZNbZ6wk3Abq1m4Yl3ARVXTYgiBOs5wDFCDMLeLe6eG2QE/wdDDqys51o=
 ARC-Message-Signature: i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711753544; c=relaxed/simple;
-	bh=WgjSuePq/wBpCSmmzUyRKNJcA65Zw60gyFDJt37grOw=;
+	s=arc-20240116; t=1711753628; c=relaxed/simple;
+	bh=/LyX0lMdUIy7Re5uMF7sJFrGKLk94ez+2D00SwZmmSM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tadVHjYp3xUeM32EvMaNxfyZwQQAKHmOqhQQ1XMBg9kHp+gJAurvOy+zAHBwq9zTbGuP/KUoD7IDeUX0jGzYICO/4kQRtEwkvcoBPNOkgirp3exZt3Mu9Ku4Nua7UCArN/3crAiO/9CE+CnJguzPNZzA3jmWHwQHpZ5TSvlUC9c=
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zeCqVAyj; arc=fail smtp.client-ip=40.107.100.70
+	 MIME-Version:Content-Type; b=P4Ct+4Fh5CFHklVz8ec/KI+Vy8l6gy8sMrsA8G0VSc6BXV51aSZvcce5TO0VWpkgWRO6L20qOjtIvW71UBRjh/dpKSwVxN3thY6iXTtS2sn6wbWKOTbs/7n5LW4tFODW5ZD6LyYgDgXpsXkY2D4E35ysdtbX5m/Gl5n/SGm3LLc=
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tIqmA0po; arc=fail smtp.client-ip=40.107.236.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LTdfnSa1VhLOPKJevSaKvpUEM+ibK4JR/D4A9skjpRANTv9ZzuAloP8//3oASD3IdNwrh+OSRxi+9Iwq7hxH6bm72GCC8DmsKuP2rDNCei5s/4ioa7Mt0Rgv1Y/9zANhJ5bTNBTPlIJK6vKpaQdARBJ53qfdQwGiJ48PzqDufYciLrHxwSuTMItPHCXugbz1V3S9i0NMupUEJi2oKI/eevatNkz7jMPkOWb7myAeNRT+nOWgFlh4B1G5PybIF2KIVcmpb5vavCiFv2nXckLeBWe3CjlMqZJgIR/2tMwEHDDQjFAfKr1bkg0JIiZoKD5UYARcmLysUNDUnBW6ZIkQcA==
+ b=ndNy51RAtRmNI8klSsRuUDkZ+QOIkz6PU7RicglEDrpSyeD334tm0h8TSmMzsqeKS6iJHpCYyPb/2bgRTgXwHuE5nHOCRWpYsQEUf9FfnAoZgq/FS6Ag1+n/PW1+XMjGrd3hTaQEMzt4f+mR1+LDDkpXF6HZbdDWTZG2jzrQfcx3peXwGhSzI8Mp7fmiZjGo3auxlW9277c3ZxbV6l/RzlDC8dI1+yGUojFlO4mTFp9PJnkeSg2YDsVKIVAYEAoYZXTUzSuLTkJJqQLWjodWuLBih6ic/HZU09yGVYj2AxSh3I65W1AeCVMVbbEa8KbrhsCIUknM1mpNPA/gEPz2Ag==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nBu38l4H29f7TDioCJxMHGn5H0K24coARDh1fYxp94g=;
- b=Tm4mgAX85xml0c02ymLsi9tk5C41IzMLRHOGWwLnQtBjp1JDzL/nwJeVbnGSnlpvk1POZGeLGRF7uiH/vidV2sDKC96d1S85+P55F8F6RGYjLbU4K7b/V5SjUD5EXMBtRAVnjp0PDyxJrRMJyeAM6BYi8RyT7/DfjMT8G35q9tTlJjCWFv6owwahTlfvcX2HoILzjyrKqGAeDieGHKbYsmZOPTPErMVnPAJ8B7I8++OtLIDDvWXeDmrmLRbHlIemWx0QFJKcVf8k3aQiK3tidiyMuCzDuSs0Ua3O7Upae61Gh50WMtQDWQCbIiKYt0jiqt4Exm8sSBJz6uwIWduLZQ==
+ bh=pvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=;
+ b=gMrC496qK2lsX87+6Bzyto2bAcxON65hdXqTeSYWXiTb9dMrUdvT2nBXXHCO9PSCV8BRKATgr3QFZL2DbJrjIrQrsltBxeFF71VRItM5A+TTH4AicOLngecTmO8rH7zlYENBB2oVx3wSKnvuU6N30ye3Cjzdcs1BVE9Zy9sB4Ul91SoyuDz+mggYy57PkPNmCmlx2d166CZHTTZJJJYqBcsHxO085W4pD2XSkVkLV72jqVcUQau02SVCvvx1k9v76Lrx1CsfhE62bu8cgJJLFXucZdWOwY5ft5+iXGnW/Bwt1HJdv9FcbPLjhvfQZ/2KhAPqUXvJYyvL0lc5vYMNWA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nBu38l4H29f7TDioCJxMHGn5H0K24coARDh1fYxp94g=;
- b=zeCqVAyjfRxDQher1AZ5EaOKxM5xY4BftFJ208BZWqiiAjXdof/d4iUhbP36IlOA01+A1BhxmrUQU0P14395af+BJG1LpGQu/iQfEYn8iwN6tfjzVCRINDzlsxLRvhiEfBgRdVKJmno9WURcApRABBx4LkwYntw5GkcQBk5RGlA=
+ bh=pvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=;
+ b=tIqmA0poLlOQSgC8NQymU+wMavstViScDkmLWx+nPuwEKSNoq8248LCA6B4ywz4GfDsUL/JVBQork/uEDWaaxIugEnRZyot0VUV/YkV9/1sII8p7qKebIp15+bvVlPGAntwT+ov4j9ElzGeCZbgxsHd/5BERvoXJ+Xjp3NdTnpU=
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -101,11 +101,10 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
-	<brijesh.singh@amd.com>, Alexey Kardashevskiy <aik@amd.com>
-Subject: [PATCH v12 26/29] KVM: SEV: Provide support for SNP_GUEST_REQUEST NAE event
-Date: Fri, 29 Mar 2024 17:58:32 -0500
-Message-ID: <20240329225835.400662-27-michael.roth@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
+Subject: [PATCH v12 02/29] [TEMP] x86/cc: Add cc_platform_set/_clear() helpers
+Date: Fri, 29 Mar 2024 17:58:08 -0500
+Message-ID: <20240329225835.400662-3-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
@@ -122,202 +121,152 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017091:EE_|DS7PR12MB8346:EE_
-X-MS-Office365-Filtering-Correlation-Id: 29793531-e2ca-491c-1a60-08dc5044c08d
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017092:EE_|CY8PR12MB7730:EE_
+X-MS-Office365-Filtering-Correlation-Id: 94ffad58-535d-4024-6cb1-08dc5044f290
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wFSuaKTvRQfOtdiiZggI/1E9juK+oJc2TRSGXFVjNQH6K1wlm9lAuRi2AABfWovQilmwMVXe1l6T4YxvGuuFifLSCpmtPQOHKjm6x+FajgbzHsEgtMX93cx5A0nttMe/qTI13yLMvcscLwhbPBIdodHYHhzKupmGusDKEUfIkuXqgoS46ONELQ8DpRVI7AvlT51VRqxW6w6SmGYUURqbArpcwis5lJT+cTvGNv8CqPtGPlIy7qfPPfuhv1nCIO9qPPfvEGlgl/Ec+LypJxBtqOEfg2pBgc02cbfF15t+YO5/ue5hwWk2QeyLY/PtzpC6Bue+8ZYMaLgW7iEG237ohWzAvDkoO5JuB0YjPr9df90ZKqzIesdCLnSdeqdDO9BO09jMyX5hg+vOmQmDRLp5MGJZ0CLEXxryinRjW60G57b7aoliHs448u+dW9OMhumg4geX6Ys+dNVlqiUHttX7q1i79Zld8UWIVQxAemTDG5c93reIn0O1bo2r+FTQzyNA60sU19YLtjGrE2CeHrS8UBmvPCHb+dNs/bwEdkpHaysGHJoMSSvphTWHY/GTjqyl61EyVKEXMAdKGOoJEKagRrWl4eg4UKhIYmIVTQyAvx7i9Y2qCbTYlvo+hUPDKlFswU7rnoRM5q0SJo084BAULraS65dFTt/wwZaFs/sG/Pn1sk4sqy3xCY8HS+L4Ka6jAqFvX2LdWGEJVaix3MvIE7CGKTb/0UI+9e3423/5muTUjwuXnqr/9ldh5/UD03xC
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(82310400014)(7416005)(376005)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:05:39.7301
+X-Microsoft-Antispam-Message-Info: 0GqJcz06FWXScvO9q8UIen2Z5TIMPCwU7rdZJGHj+mAWkK5UWm4PnDKCmYgyV6KpeW5mNlwQEgzWXz89aRhNwVa9wB2gRYvrLIgGWw4N6Vr4jp4dfl8VwdC0ycC93sxY2xW+fe4jdeZgPhu/SB4QLT2sV1ndIpuyq40tUT/o0P/0nz3TFNAeu7DWQtwO9KM1gGCLv2c2YWaG2I28urqVBAEPs/Lh7IB9KQK2t3Q81bePUBE3DM6N5Un4Q9wYfgoHPRTlgN+Bh9FkttL47rOMJ/EVcgsz+MQmLB8WK66RMLcIwfu/vtN5y6nLduBqBfhorBcp6zuEs+PTOhNcN+CFyqBClZmAJ8QdSuOlmTWjymD3lzO1y3oa0U/+yLlDAcMsYKIUpx+5WQ5j4/lAZVO0q6s8IPE/Dc+d60WxY1YU28uCX49WJM5XsQDmNxH0XrGqxIGyQZ0OZG+XWbADxRLmF7wtKjB1K4TnGmFbGxlv/VDZqHCcq+fnJCBe64OkMcnbvkErwcuRbZnRIpyyoGQaZNbaa+GScMLvc2hjsnKH9ehVr+YXspEX9UHlliDBQHx99aXyp2F7q/0rnaYKqbHpMo4ZK26eAjrPsaaPwox+sjWJqIifSdzkr/G99zUVnLEkfYHuelBcZ+UO++2QpNKzeTssudbif+5NjNuyXxfRTfOYllVrmGeB2cLdGZT0KfYdernQqt8vm5t2THsWM9CWDi2o4SF+TnOkjV3wIec1H3DVG759Esk29a322K114Jm/
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(7416005)(82310400014)(1800799015)(376005)(36860700004);DIR:OUT;SFP:1101;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:07:03.6536
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 29793531-e2ca-491c-1a60-08dc5044c08d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94ffad58-535d-4024-6cb1-08dc5044f290
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017091.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017092.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8346
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7730
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
-Message-ID: <20240329225832.FUK6sTtkaBmCfzGzh1EN0XrOBrvEAOq5bn54zSKTcAs@z>
+Message-ID: <20240329225808.aeLu4We0jCAGo3kLQP9EWf1JvtMaC5hvAxGUCom1T7A@z>
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+From: "Borislav Petkov (AMD)" <bp@alien8.de>
 
-Version 2 of GHCB specification added support for the SNP Guest Request
-Message NAE event. The event allows for an SEV-SNP guest to make
-requests to the SEV-SNP firmware through hypervisor using the
-SNP_GUEST_REQUEST API defined in the SEV-SNP firmware specification.
+Add functionality to set and/or clear different attributes of the
+machine as a confidential computing platform. Add the first one too:
+whether the machine is running as a host for SEV-SNP guests.
 
-This is used by guests primarily to request attestation reports from
-firmware. There are other request types are available as well, but the
-specifics of what guest requests are being made are opaque to the
-hypervisor, which only serves as a proxy for the guest requests and
-firmware responses.
-
-Implement handling for these events.
-
-Co-developed-by: Alexey Kardashevskiy <aik@amd.com>
-Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-[mdr: ensure FW command failures are indicated to guest, drop extended
- request handling to be re-written as separate patch, massage commit]
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c         | 83 ++++++++++++++++++++++++++++++++++
- include/uapi/linux/sev-guest.h |  9 ++++
- 2 files changed, 92 insertions(+)
+ arch/x86/coco/core.c        | 52 +++++++++++++++++++++++++++++++++++++
+ include/linux/cc_platform.h | 12 +++++++++
+ 2 files changed, 64 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 658116537f3f..f56f04553e81 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -19,6 +19,7 @@
- #include <linux/misc_cgroup.h>
- #include <linux/processor.h>
- #include <linux/trace_events.h>
-+#include <uapi/linux/sev-guest.h>
+diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
+index d07be9d05cd0..8c3fae23d3c6 100644
+--- a/arch/x86/coco/core.c
++++ b/arch/x86/coco/core.c
+@@ -16,6 +16,11 @@
+ enum cc_vendor cc_vendor __ro_after_init =3D CC_VENDOR_NONE;
+ u64 cc_mask __ro_after_init;
 =20
- #include <asm/pkru.h>
- #include <asm/trapnr.h>
-@@ -3223,6 +3224,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *s=
-vm)
- 	case SVM_VMGEXIT_HV_FEATURES:
- 	case SVM_VMGEXIT_PSC:
- 	case SVM_VMGEXIT_TERM_REQUEST:
-+	case SVM_VMGEXIT_GUEST_REQUEST:
- 		break;
- 	default:
- 		reason =3D GHCB_ERR_INVALID_EVENT;
-@@ -3646,6 +3648,83 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
- 	return ret;
- }
-=20
-+static bool snp_setup_guest_buf(struct kvm *kvm, struct sev_data_snp_guest=
-_request *data,
-+				gpa_t req_gpa, gpa_t resp_gpa)
-+{
-+	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
-+	kvm_pfn_t req_pfn, resp_pfn;
++static struct cc_attr_flags {
++	__u64 host_sev_snp	: 1,
++	      __resv		: 63;
++} cc_flags;
 +
-+	if (!IS_ALIGNED(req_gpa, PAGE_SIZE) || !IS_ALIGNED(resp_gpa, PAGE_SIZE))
-+		return false;
-+
-+	req_pfn =3D gfn_to_pfn(kvm, gpa_to_gfn(req_gpa));
-+	if (is_error_noslot_pfn(req_pfn))
-+		return false;
-+
-+	resp_pfn =3D gfn_to_pfn(kvm, gpa_to_gfn(resp_gpa));
-+	if (is_error_noslot_pfn(resp_pfn))
-+		return false;
-+
-+	if (rmp_make_private(resp_pfn, 0, PG_LEVEL_4K, 0, true))
-+		return false;
-+
-+	data->gctx_paddr =3D __psp_pa(sev->snp_context);
-+	data->req_paddr =3D __sme_set(req_pfn << PAGE_SHIFT);
-+	data->res_paddr =3D __sme_set(resp_pfn << PAGE_SHIFT);
-+
-+	return true;
-+}
-+
-+static bool snp_cleanup_guest_buf(struct sev_data_snp_guest_request *data)
-+{
-+	u64 pfn =3D __sme_clr(data->res_paddr) >> PAGE_SHIFT;
-+
-+	if (snp_page_reclaim(pfn))
-+		return false;
-+
-+	if (rmp_make_shared(pfn, PG_LEVEL_4K))
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool __snp_handle_guest_req(struct kvm *kvm, gpa_t req_gpa, gpa_t r=
-esp_gpa,
-+				   sev_ret_code *fw_err)
-+{
-+	struct sev_data_snp_guest_request data =3D {0};
-+	struct kvm_sev_info *sev;
-+	bool ret =3D true;
-+
-+	if (!sev_snp_guest(kvm))
-+		return false;
-+
-+	sev =3D &to_kvm_svm(kvm)->sev_info;
-+
-+	if (!snp_setup_guest_buf(kvm, &data, req_gpa, resp_gpa))
-+		return false;
-+
-+	if (sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, fw_err))
-+		ret =3D false;
-+
-+	if (!snp_cleanup_guest_buf(&data))
-+		ret =3D false;
-+
-+	return ret;
-+}
-+
-+static void snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_=
-t resp_gpa)
-+{
-+	struct kvm_vcpu *vcpu =3D &svm->vcpu;
-+	struct kvm *kvm =3D vcpu->kvm;
-+	sev_ret_code fw_err =3D 0;
-+	int vmm_ret =3D 0;
-+
-+	if (!__snp_handle_guest_req(kvm, req_gpa, resp_gpa, &fw_err))
-+		vmm_ret =3D SNP_GUEST_VMM_ERR_GENERIC;
-+
-+	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err))=
-;
-+}
-+
- static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ static bool noinstr intel_cc_platform_has(enum cc_attr attr)
  {
- 	struct vmcb_control_area *control =3D &svm->vmcb->control;
-@@ -3906,6 +3985,10 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 		vcpu->run->system_event.ndata =3D 1;
- 		vcpu->run->system_event.data[0] =3D control->ghcb_gpa;
- 		break;
-+	case SVM_VMGEXIT_GUEST_REQUEST:
-+		snp_handle_guest_req(svm, control->exit_info_1, control->exit_info_2);
-+		ret =3D 1;
+ 	switch (attr) {
+@@ -89,6 +94,9 @@ static bool noinstr amd_cc_platform_has(enum cc_attr attr=
+)
+ 	case CC_ATTR_GUEST_SEV_SNP:
+ 		return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
+=20
++	case CC_ATTR_HOST_SEV_SNP:
++		return cc_flags.host_sev_snp;
++
+ 	default:
+ 		return false;
+ 	}
+@@ -148,3 +156,47 @@ u64 cc_mkdec(u64 val)
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(cc_mkdec);
++
++static void amd_cc_platform_clear(enum cc_attr attr)
++{
++	switch (attr) {
++	case CC_ATTR_HOST_SEV_SNP:
++		cc_flags.host_sev_snp =3D 0;
 +		break;
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		vcpu_unimpl(vcpu,
- 			    "vmgexit: unsupported event - exit_info_1=3D%#llx, exit_info_2=3D%#=
-llx\n",
-diff --git a/include/uapi/linux/sev-guest.h b/include/uapi/linux/sev-guest.=
-h
-index 154a87a1eca9..7bd78e258569 100644
---- a/include/uapi/linux/sev-guest.h
-+++ b/include/uapi/linux/sev-guest.h
-@@ -89,8 +89,17 @@ struct snp_ext_report_req {
- #define SNP_GUEST_FW_ERR_MASK		GENMASK_ULL(31, 0)
- #define SNP_GUEST_VMM_ERR_SHIFT		32
- #define SNP_GUEST_VMM_ERR(x)		(((u64)x) << SNP_GUEST_VMM_ERR_SHIFT)
-+#define SNP_GUEST_FW_ERR(x)		((x) & SNP_GUEST_FW_ERR_MASK)
-+#define SNP_GUEST_ERR(vmm_err, fw_err)	(SNP_GUEST_VMM_ERR(vmm_err) | \
-+					 SNP_GUEST_FW_ERR(fw_err))
++	default:
++		break;
++	}
++}
++
++void cc_platform_clear(enum cc_attr attr)
++{
++	switch (cc_vendor) {
++	case CC_VENDOR_AMD:
++		amd_cc_platform_clear(attr);
++		break;
++	default:
++		break;
++	}
++}
++
++static void amd_cc_platform_set(enum cc_attr attr)
++{
++	switch (attr) {
++	case CC_ATTR_HOST_SEV_SNP:
++		cc_flags.host_sev_snp =3D 1;
++		break;
++	default:
++		break;
++	}
++}
++
++void cc_platform_set(enum cc_attr attr)
++{
++	switch (cc_vendor) {
++	case CC_VENDOR_AMD:
++		amd_cc_platform_set(attr);
++		break;
++	default:
++		break;
++	}
++}
+diff --git a/include/linux/cc_platform.h b/include/linux/cc_platform.h
+index cb0d6cd1c12f..60693a145894 100644
+--- a/include/linux/cc_platform.h
++++ b/include/linux/cc_platform.h
+@@ -90,6 +90,14 @@ enum cc_attr {
+ 	 * Examples include TDX Guest.
+ 	 */
+ 	CC_ATTR_HOTPLUG_DISABLED,
++
++	/**
++	 * @CC_ATTR_HOST_SEV_SNP: AMD SNP enabled on the host.
++	 *
++	 * The host kernel is running with the necessary features
++	 * enabled to run SEV-SNP guests.
++	 */
++	CC_ATTR_HOST_SEV_SNP,
+ };
 =20
-+/*
-+ * The GHCB spec only formally defines INVALID_LEN/BUSY VMM errors, but de=
-fine
-+ * a GENERIC error code such that it won't ever conflict with GHCB-defined
-+ * errors if any get added in the future.
-+ */
- #define SNP_GUEST_VMM_ERR_INVALID_LEN	1
- #define SNP_GUEST_VMM_ERR_BUSY		2
-+#define SNP_GUEST_VMM_ERR_GENERIC	BIT(31)
+ #ifdef CONFIG_ARCH_HAS_CC_PLATFORM
+@@ -107,10 +115,14 @@ enum cc_attr {
+  * * FALSE - Specified Confidential Computing attribute is not active
+  */
+ bool cc_platform_has(enum cc_attr attr);
++void cc_platform_set(enum cc_attr attr);
++void cc_platform_clear(enum cc_attr attr);
 =20
- #endif /* __UAPI_LINUX_SEV_GUEST_H_ */
+ #else	/* !CONFIG_ARCH_HAS_CC_PLATFORM */
+=20
+ static inline bool cc_platform_has(enum cc_attr attr) { return false; }
++static inline void cc_platform_set(enum cc_attr attr) { }
++static inline void cc_platform_clear(enum cc_attr attr) { }
+=20
+ #endif	/* CONFIG_ARCH_HAS_CC_PLATFORM */
+=20
 --=20
 2.25.1
 
 
-X-sender: <kvm+bounces-13131-martin.weber=3Dsecunet.com@vger.kernel.org>
+X-sender: <kvm+bounces-13134-martin.weber=3Dsecunet.com@vger.kernel.org>
 X-Receiver: <martin.weber@secunet.com> ORCPT=3Drfc822;martin.weber@secunet.=
 com NOTIFY=3DNEVER; X-ExtendedProps=3DBQAVABYAAgAAAAUAFAARAJuYHy0vkvxLoOu7f=
 W2WcxcPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURhdGEuSXNS=
@@ -336,27 +285,27 @@ Rpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQXV0b1Jlc3BvbnNlU3VwcHJlc=
 cmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmVyc0dyb3VwRXhwYW5zaW9uBQA=
 jAAIAAQ=3D=3D
 X-CreatedBy: MSExchange15
-X-HeloDomain: b.mx.secunet.com
+X-HeloDomain: a.mx.secunet.com
 X-ExtendedProps: BQBjAAoAbw5rGbMv3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc2=
 9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAA=
 AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAGAAAAG1hcnRpbi53ZWJlckBzZWN1bmV0=
 LmNvbQUABgACAAEFACkAAgABDwAJAAAAQ0lBdWRpdGVkAgABBQACAAcAAQAAAAUAAwAHAAAAAAA=
-FAAUAAgABBQBiAAoAOQAAAM2KAAAFAGQADwADAAAASHVi
+FAAUAAgABBQBiAAoAQwAAAM2KAAAFAGQADwADAAAASHVi
 X-Source: SMTP:Default MBX-ESSEN-01
-X-SourceIPAddress: 62.96.220.37
-X-EndOfInjectedXHeaders: 24756
+X-SourceIPAddress: 62.96.220.36
+X-EndOfInjectedXHeaders: 20972
 Received: from cas-essen-02.secunet.de (10.53.40.202) by
  mbx-essen-01.secunet.de (10.53.40.197) with Microsoft SMTP Server
  (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sat, 30 Mar 2024 00:06:10 +0100
-Received: from b.mx.secunet.com (62.96.220.37) by cas-essen-02.secunet.de
+ 15.1.2507.35; Sat, 30 Mar 2024 00:07:18 +0100
+Received: from a.mx.secunet.com (62.96.220.36) by cas-essen-02.secunet.de
  (10.53.40.202) with Microsoft SMTP Server (version=3DTLS1_2,
  cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Fronte=
 nd
- Transport; Sat, 30 Mar 2024 00:06:10 +0100
+ Transport; Sat, 30 Mar 2024 00:07:18 +0100
 Received: from localhost (localhost [127.0.0.1])
-	by b.mx.secunet.com (Postfix) with ESMTP id D1805202BD
-	for <martin.weber@secunet.com>; Sat, 30 Mar 2024 00:06:10 +0100 (CET)
+	by a.mx.secunet.com (Postfix) with ESMTP id 99E64207E4
+	for <martin.weber@secunet.com>; Sat, 30 Mar 2024 00:07:18 +0100 (CET)
 X-Virus-Scanned: by secunet
 X-Spam-Flag: NO
 X-Spam-Score: -5.15
@@ -366,86 +315,83 @@ X-Spam-Status: No, score=3D-5.15 tagged_above=3D-999 required=3D2.1
 	DKIM_VALID=3D-0.1, DKIM_VALID_AU=3D-0.1,
 	HEADER_FROM_DIFFERENT_DOMAINS=3D0.249, MAILING_LIST_MULTI=3D-1,
 	RCVD_IN_DNSWL_MED=3D-2.3, SPF_HELO_NONE=3D0.001, SPF_PASS=3D-0.001]
-	autolearn=3Dunavailable autolearn_force=3Dno
+	autolearn=3Dham autolearn_force=3Dno
 Authentication-Results: a.mx.secunet.com (amavisd-new);
 	dkim=3Dpass (1024-bit key) header.d=3Damd.com
-Received: from b.mx.secunet.com ([127.0.0.1])
+Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oAJd4B0w3R4K for <martin.weber@secunet.com>;
-	Sat, 30 Mar 2024 00:06:10 +0100 (CET)
+	with ESMTP id rhf5LjiMR-HQ for <martin.weber@secunet.com>;
+	Sat, 30 Mar 2024 00:07:17 +0100 (CET)
 Received-SPF: Pass (sender SPF authorized) identity=3Dmailfrom; client-ip=
-=3D147.75.199.223; helo=3Dny.mirrors.kernel.org; envelope-from=3Dkvm+bounce=
-s-13131-martin.weber=3Dsecunet.com@vger.kernel.org; receiver=3Dmartin.weber=
-@secunet.com=20
-DKIM-Filter: OpenDKIM Filter v2.11.0 b.mx.secunet.com 03E3A200BB
-Authentication-Results: b.mx.secunet.com;
-	dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.com header.b=
-=3D"zeCqVAyj"
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223=
-])
+=3D139.178.88.99; helo=3Dsv.mirrors.kernel.org; envelope-from=3Dkvm+bounces=
+-13134-martin.weber=3Dsecunet.com@vger.kernel.org; receiver=3Dmartin.weber@=
+secunet.com=20
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 0364420754
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99]=
+)
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by b.mx.secunet.com (Postfix) with ESMTPS id 03E3A200BB
-	for <martin.weber@secunet.com>; Sat, 30 Mar 2024 00:06:10 +0100 (CET)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 0364420754
+	for <martin.weber@secunet.com>; Sat, 30 Mar 2024 00:07:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.2=
 5.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F61B1C212A9
-	for <martin.weber@secunet.com>; Fri, 29 Mar 2024 23:06:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C4A72845E3
+	for <martin.weber@secunet.com>; Fri, 29 Mar 2024 23:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1806913F012;
-	Fri, 29 Mar 2024 23:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A6013E3F1;
+	Fri, 29 Mar 2024 23:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
 	dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.com header.b=
-=3D"zeCqVAyj"
+=3D"tIqmA0po"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04=
-on2070.outbound.protection.outlook.com [40.107.100.70])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11=
+on2040.outbound.protection.outlook.com [40.107.236.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E9C13E6B9;
-	Fri, 29 Mar 2024 23:05:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8751513BAD2;
+	Fri, 29 Mar 2024 23:07:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=3Dfail smtp.client-ip=
-=3D40.107.100.70
+=3D40.107.236.40
 ARC-Seal: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org; s=3Darc-20240116;
-	t=3D1711753544; cv=3Dfail; b=3DBlqqvbGwutAw8URHIgMH30kvA5QpTzs/EidijFPe0fj=
-Fy5pMt6gU3Of58WmRgtLC5HdAFWEnpY91icLlr7eYlVXCT6T10fN7aOeDR+taYs5wJQZoRJMsxC=
-RbI3XvUrIl79N5OhELjsPxchrIPeXAKecY7/mL+08bVpQeDnTw0Tg=3D
+	t=3D1711753628; cv=3Dfail; b=3DNAyU4Ql1nzqh8Ta+6+4fkuH3r8iuNk9YQFSF2A6/gis=
+j9px5BkNYKlBn4AgIMyWt1I567ugxqpkl3AYixa0QaggzXoehxx6L6ncHvn8I7Ez2tFYoL9vZNb=
+Z6wk3Abq1m4Yl3ARVXTYgiBOs5wDFCDMLeLe6eG2QE/wdDDqys51o=3D
 ARC-Message-Signature: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org;
-	s=3Darc-20240116; t=3D1711753544; c=3Drelaxed/simple;
-	bh=3DWgjSuePq/wBpCSmmzUyRKNJcA65Zw60gyFDJt37grOw=3D;
+	s=3Darc-20240116; t=3D1711753628; c=3Drelaxed/simple;
+	bh=3D/LyX0lMdUIy7Re5uMF7sJFrGKLk94ez+2D00SwZmmSM=3D;
 	h=3DFrom:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=3DtadVHjYp3xUeM32EvMaNxfyZwQQAKHmOqhQQ1XMBg9=
-kHp+gJAurvOy+zAHBwq9zTbGuP/KUoD7IDeUX0jGzYICO/4kQRtEwkvcoBPNOkgirp3exZt3Mu9=
-Ku4Nua7UCArN/3crAiO/9CE+CnJguzPNZzA3jmWHwQHpZ5TSvlUC9c=3D
+	 MIME-Version:Content-Type; b=3DP4Ct+4Fh5CFHklVz8ec/KI+Vy8l6gy8sMrsA8G0VSc=
+6BXV51aSZvcce5TO0VWpkgWRO6L20qOjtIvW71UBRjh/dpKSwVxN3thY6iXTtS2sn6wbWKOTbs/=
+7n5LW4tFODW5ZD6LyYgDgXpsXkY2D4E35ysdtbX5m/Gl5n/SGm3LLc=3D
 ARC-Authentication-Results: i=3D2; smtp.subspace.kernel.org; dmarc=3Dpass (=
 p=3Dquarantine dis=3Dnone) header.from=3Damd.com; spf=3Dfail smtp.mailfrom=
 =3Damd.com; dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.c=
-om header.b=3DzeCqVAyj; arc=3Dfail smtp.client-ip=3D40.107.100.70
+om header.b=3DtIqmA0po; arc=3Dfail smtp.client-ip=3D40.107.236.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=3Dpass (p=3Dquarant=
 ine dis=3Dnone) header.from=3Damd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=3Dfail smtp.mailfrom=
 =3Damd.com
 ARC-Seal: i=3D1; a=3Drsa-sha256; s=3Darcselector9901; d=3Dmicrosoft.com; cv=
 =3Dnone;
- b=3DLTdfnSa1VhLOPKJevSaKvpUEM+ibK4JR/D4A9skjpRANTv9ZzuAloP8//3oASD3IdNwrh+=
-OSRxi+9Iwq7hxH6bm72GCC8DmsKuP2rDNCei5s/4ioa7Mt0Rgv1Y/9zANhJ5bTNBTPlIJK6vKpa=
-QdARBJ53qfdQwGiJ48PzqDufYciLrHxwSuTMItPHCXugbz1V3S9i0NMupUEJi2oKI/eevatNkz7=
-jMPkOWb7myAeNRT+nOWgFlh4B1G5PybIF2KIVcmpb5vavCiFv2nXckLeBWe3CjlMqZJgIR/2tMw=
-EHDDQjFAfKr1bkg0JIiZoKD5UYARcmLysUNDUnBW6ZIkQcA=3D=3D
+ b=3DndNy51RAtRmNI8klSsRuUDkZ+QOIkz6PU7RicglEDrpSyeD334tm0h8TSmMzsqeKS6iJHp=
+CYyPb/2bgRTgXwHuE5nHOCRWpYsQEUf9FfnAoZgq/FS6Ag1+n/PW1+XMjGrd3hTaQEMzt4f+mR1=
++LDDkpXF6HZbdDWTZG2jzrQfcx3peXwGhSzI8Mp7fmiZjGo3auxlW9277c3ZxbV6l/RzlDC8dI1=
++yGUojFlO4mTFp9PJnkeSg2YDsVKIVAYEAoYZXTUzSuLTkJJqQLWjodWuLBih6ic/HZU09yGVYj=
+2AxSh3I65W1AeCVMVbbEa8KbrhsCIUknM1mpNPA/gEPz2Ag=3D=3D
 ARC-Message-Signature: i=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Dmicr=
 osoft.com;
  s=3Darcselector9901;
  h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-A=
 ntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Ex=
 change-AntiSpam-MessageData-1;
- bh=3DnBu38l4H29f7TDioCJxMHGn5H0K24coARDh1fYxp94g=3D;
- b=3DTm4mgAX85xml0c02ymLsi9tk5C41IzMLRHOGWwLnQtBjp1JDzL/nwJeVbnGSnlpvk1POZG=
-eLGRF7uiH/vidV2sDKC96d1S85+P55F8F6RGYjLbU4K7b/V5SjUD5EXMBtRAVnjp0PDyxJrRMJy=
-eAM6BYi8RyT7/DfjMT8G35q9tTlJjCWFv6owwahTlfvcX2HoILzjyrKqGAeDieGHKbYsmZOPTPE=
-rMVnPAJ8B7I8++OtLIDDvWXeDmrmLRbHlIemWx0QFJKcVf8k3aQiK3tidiyMuCzDuSs0Ua3O7Up=
-ae61Gh50WMtQDWQCbIiKYt0jiqt4Exm8sSBJz6uwIWduLZQ=3D=3D
+ bh=3DpvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=3D;
+ b=3DgMrC496qK2lsX87+6Bzyto2bAcxON65hdXqTeSYWXiTb9dMrUdvT2nBXXHCO9PSCV8BRKA=
+Tgr3QFZL2DbJrjIrQrsltBxeFF71VRItM5A+TTH4AicOLngecTmO8rH7zlYENBB2oVx3wSKnvuU=
+6N30ye3Cjzdcs1BVE9Zy9sB4Ul91SoyuDz+mggYy57PkPNmCmlx2d166CZHTTZJJJYqBcsHxO08=
+5W4pD2XSkVkLV72jqVcUQau02SVCvvx1k9v76Lrx1CsfhE62bu8cgJJLFXucZdWOwY5ft5+iXGn=
+W/Bwt1HJdv9FcbPLjhvfQZ/2KhAPqUXvJYyvL0lc5vYMNWA=3D=3D
 ARC-Authentication-Results: i=3D1; mx.microsoft.com 1; spf=3Dpass (sender i=
 p is
  165.204.84.17) smtp.rcpttodomain=3Dvger.kernel.org smtp.mailfrom=3Damd.com=
@@ -456,23 +402,22 @@ DKIM-Signature: v=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Damd.com; s=
 =3Dselector1;
  h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-S=
 enderADCheck;
- bh=3DnBu38l4H29f7TDioCJxMHGn5H0K24coARDh1fYxp94g=3D;
- b=3DzeCqVAyjfRxDQher1AZ5EaOKxM5xY4BftFJ208BZWqiiAjXdof/d4iUhbP36IlOA01+A1B=
-hxmrUQU0P14395af+BJG1LpGQu/iQfEYn8iwN6tfjzVCRINDzlsxLRvhiEfBgRdVKJmno9WURcA=
-pRABBx4LkwYntw5GkcQBk5RGlA=3D
-Received: from DS0PR17CA0021.namprd17.prod.outlook.com (2603:10b6:8:191::16=
-)
- by DS7PR12MB8346.namprd12.prod.outlook.com (2603:10b6:8:e5::13) with
- Microsoft SMTP Server (version=3DTLS1_2,
- cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Fri, 29 =
-Mar
- 2024 23:05:39 +0000
-Received: from DS1PEPF00017091.namprd03.prod.outlook.com
- (2603:10b6:8:191:cafe::70) by DS0PR17CA0021.outlook.office365.com
- (2603:10b6:8:191::16) with Microsoft SMTP Server (version=3DTLS1_2,
+ bh=3DpvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=3D;
+ b=3DtIqmA0poLlOQSgC8NQymU+wMavstViScDkmLWx+nPuwEKSNoq8248LCA6B4ywz4GfDsUL/=
+JVBQork/uEDWaaxIugEnRZyot0VUV/YkV9/1sII8p7qKebIp15+bvVlPGAntwT+ov4j9ElzGeCZ=
+bgxsHd/5BERvoXJ+Xjp3NdTnpU=3D
+Received: from DM6PR01CA0007.prod.exchangelabs.com (2603:10b6:5:296::12) by
+ CY8PR12MB7730.namprd12.prod.outlook.com (2603:10b6:930:85::17) with Micros=
+oft
+ SMTP Server (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA=
+384) id
+ 15.20.7409.41; Fri, 29 Mar 2024 23:07:03 +0000
+Received: from DS1PEPF00017092.namprd03.prod.outlook.com
+ (2603:10b6:5:296:cafe::1c) by DM6PR01CA0007.outlook.office365.com
+ (2603:10b6:5:296::12) with Microsoft SMTP Server (version=3DTLS1_2,
  cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.41 via Front=
 end
- Transport; Fri, 29 Mar 2024 23:05:39 +0000
+ Transport; Fri, 29 Mar 2024 23:07:03 +0000
 X-MS-Exchange-Authentication-Results: spf=3Dpass (sender IP is 165.204.84.1=
 7)
  smtp.mailfrom=3Damd.com; dkim=3Dnone (message not signed)
@@ -481,15 +426,15 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=3Dprotection.outlook.com;
  client-ip=3D165.204.84.17; helo=3DSATLEXMB04.amd.com; pr=3DC
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF00017091.mail.protection.outlook.com (10.167.17.133) with Microsoft
+ DS1PEPF00017092.mail.protection.outlook.com (10.167.17.135) with Microsoft
  SMTP Server (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA=
 256) id
- 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 23:05:39 +0000
+ 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 23:07:03 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=3DTLS1_2,
  cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 M=
 ar
- 2024 18:05:39 -0500
+ 2024 18:07:02 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -505,12 +450,11 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
-	<brijesh.singh@amd.com>, Alexey Kardashevskiy <aik@amd.com>
-Subject: [PATCH v12 26/29] KVM: SEV: Provide support for SNP_GUEST_REQUEST =
-NAE event
-Date: Fri, 29 Mar 2024 17:58:32 -0500
-Message-ID: <20240329225835.400662-27-michael.roth@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
+Subject: [PATCH v12 02/29] [TEMP] x86/cc: Add cc_platform_set/_clear() help=
+ers
+Date: Fri, 29 Mar 2024 17:58:08 -0500
+Message-ID: <20240329225835.400662-3-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
@@ -526,63 +470,64 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017091:EE_|DS7PR12MB8346:EE_
-X-MS-Office365-Filtering-Correlation-Id: 29793531-e2ca-491c-1a60-08dc5044c0=
-8d
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017092:EE_|CY8PR12MB7730:EE_
+X-MS-Office365-Filtering-Correlation-Id: 94ffad58-535d-4024-6cb1-08dc5044f2=
+90
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wFSuaKTvRQfOtdiiZggI/1E9juK+oJc2TRSGXFVj=
-NQH6K1wlm9lAuRi2AABfWovQilmwMVXe1l6T4YxvGuuFifLSCpmtPQOHKjm6x+FajgbzHsEgtMX=
-93cx5A0nttMe/qTI13yLMvcscLwhbPBIdodHYHhzKupmGusDKEUfIkuXqgoS46ONELQ8DpRVI7A=
-vlT51VRqxW6w6SmGYUURqbArpcwis5lJT+cTvGNv8CqPtGPlIy7qfPPfuhv1nCIO9qPPfvEGlgl=
-/Ec+LypJxBtqOEfg2pBgc02cbfF15t+YO5/ue5hwWk2QeyLY/PtzpC6Bue+8ZYMaLgW7iEG237o=
-hWzAvDkoO5JuB0YjPr9df90ZKqzIesdCLnSdeqdDO9BO09jMyX5hg+vOmQmDRLp5MGJZ0CLEXxr=
-yinRjW60G57b7aoliHs448u+dW9OMhumg4geX6Ys+dNVlqiUHttX7q1i79Zld8UWIVQxAemTDG5=
-c93reIn0O1bo2r+FTQzyNA60sU19YLtjGrE2CeHrS8UBmvPCHb+dNs/bwEdkpHaysGHJoMSSvph=
-TWHY/GTjqyl61EyVKEXMAdKGOoJEKagRrWl4eg4UKhIYmIVTQyAvx7i9Y2qCbTYlvo+hUPDKlFs=
-wU7rnoRM5q0SJo084BAULraS65dFTt/wwZaFs/sG/Pn1sk4sqy3xCY8HS+L4Ka6jAqFvX2LdWGE=
-JVaix3MvIE7CGKTb/0UI+9e3423/5muTUjwuXnqr/9ldh5/UD03xC
+X-Microsoft-Antispam-Message-Info: 0GqJcz06FWXScvO9q8UIen2Z5TIMPCwU7rdZJGHj=
++mAWkK5UWm4PnDKCmYgyV6KpeW5mNlwQEgzWXz89aRhNwVa9wB2gRYvrLIgGWw4N6Vr4jp4dfl8=
+VwdC0ycC93sxY2xW+fe4jdeZgPhu/SB4QLT2sV1ndIpuyq40tUT/o0P/0nz3TFNAeu7DWQtwO9K=
+M1gGCLv2c2YWaG2I28urqVBAEPs/Lh7IB9KQK2t3Q81bePUBE3DM6N5Un4Q9wYfgoHPRTlgN+Bh=
+9FkttL47rOMJ/EVcgsz+MQmLB8WK66RMLcIwfu/vtN5y6nLduBqBfhorBcp6zuEs+PTOhNcN+CF=
+yqBClZmAJ8QdSuOlmTWjymD3lzO1y3oa0U/+yLlDAcMsYKIUpx+5WQ5j4/lAZVO0q6s8IPE/Dc+=
+d60WxY1YU28uCX49WJM5XsQDmNxH0XrGqxIGyQZ0OZG+XWbADxRLmF7wtKjB1K4TnGmFbGxlv/V=
+DZqHCcq+fnJCBe64OkMcnbvkErwcuRbZnRIpyyoGQaZNbaa+GScMLvc2hjsnKH9ehVr+YXspEX9=
+UHlliDBQHx99aXyp2F7q/0rnaYKqbHpMo4ZK26eAjrPsaaPwox+sjWJqIifSdzkr/G99zUVnLEk=
+fYHuelBcZ+UO++2QpNKzeTssudbif+5NjNuyXxfRTfOYllVrmGeB2cLdGZT0KfYdernQqt8vm5t=
+2THsWM9CWDi2o4SF+TnOkjV3wIec1H3DVG759Esk29a322K114Jm/
 X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;I=
 PV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS=
-:(13230031)(36860700004)(82310400014)(7416005)(376005)(1800799015);DIR:OUT;=
+:(13230031)(7416005)(82310400014)(1800799015)(376005)(36860700004);DIR:OUT;=
 SFP:1101;
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:05:39.7301
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:07:03.6536
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 29793531-e2ca-491c-1a60-08dc5=
-044c08d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94ffad58-535d-4024-6cb1-08dc5=
+044f290
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3D=
 3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=3D[165.204.84.17];Helo=3D[SATLEXMB0=
 4.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017091.namprd03.prod.outlook=
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017092.namprd03.prod.outlook=
 .com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8346
-Return-Path: kvm+bounces-13131-martin.weber=3Dsecunet.com@vger.kernel.org
-X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 23:06:10.8900
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7730
+Return-Path: kvm+bounces-13134-martin.weber=3Dsecunet.com@vger.kernel.org
+X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 23:07:18.6549
  (UTC)
-X-MS-Exchange-Organization-Network-Message-Id: e82b8a82-3a8d-482a-ba73-08dc=
-5044d311
-X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.37
+X-MS-Exchange-Organization-Network-Message-Id: 544ea24c-7a6c-485b-d3a8-08dc=
+5044fb75
+X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.36
 X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.202
 X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-02.s=
 ecunet.de
 X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dmbx-es=
-sen-01.secunet.de:TOTAL-HUB=3D0.189|SMR=3D0.131(SMRDE=3D0.002|SMRC=3D0.128(=
-SMRCL=3D0.101|X-SMRCR=3D0.128))|CAT=3D0.057(CATRESL=3D0.024
- (CATRESLP2R=3D0.004)|CATORES=3D0.030(CATRS=3D0.029(CATRS-Index Routing
- Agent=3D0.028)));2024-03-29T23:06:11.116Z
+sen-01.secunet.de:TOTAL-HUB=3D0.394|SMR=3D0.320(SMRDE=3D0.003|SMRC=3D0.316(=
+SMRCL=3D0.102|X-SMRCR=3D0.316))|CAT=3D0.073(CATOS=3D0.001
+ |CATRESL=3D0.027(CATRESLP2R=3D0.005)|CATORES=3D0.042(CATRS=3D0.042(CATRS-T=
+ransport
+ Rule Agent=3D0.001 (X-ETREX=3D0.001)|CATRS-Index Routing
+ Agent=3D0.040)));2024-03-29T23:07:19.052Z
 X-MS-Exchange-Forest-ArrivalHubServer: mbx-essen-01.secunet.de
 X-MS-Exchange-Organization-AuthSource: cas-essen-02.secunet.de
 X-MS-Exchange-Organization-AuthAs: Anonymous
 X-MS-Exchange-Organization-FromEntityHeader: Internet
-X-MS-Exchange-Organization-OriginalSize: 17547
+X-MS-Exchange-Organization-OriginalSize: 14879
 X-MS-Exchange-Organization-HygienePolicy: Standard
 X-MS-Exchange-Organization-MessageLatency: SRV=3Dcas-essen-02.secunet.de:TO=
-TAL-FE=3D8.027|SMR=3D0.008(SMRPI=3D0.005(SMRPI-FrontendProxyAgent=3D0.005))=
-|SMS=3D0.027
+TAL-FE=3D6.000|SMR=3D0.006(SMRPI=3D0.003(SMRPI-FrontendProxyAgent=3D0.003))
 X-MS-Exchange-Organization-Recipient-Limit-Verified: True
 X-MS-Exchange-Organization-TotalRecipientCount: 1
 X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
@@ -591,287 +536,698 @@ X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
 6-8c5d-b3d6ddbb3d55%%%16355082-c50b-4214-9c7d-d39575f9f79b
 X-MS-Exchange-Forest-RulesExecuted: mbx-essen-01
 X-MS-Exchange-Organization-RulesExecuted: mbx-essen-01
-X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAeoMAAAPAAADH4sIAAAAAAAEAKVYCVPj=
-VhKWfGEMHuaeTK
- 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
- 6jDLQImd7x1Un4hYqQS6FrcukzKqsncguqK/GeJg2ObgXPQyiTDEKR
- zccwpKUXXJrUcpM0yZMiTS4JaRmS/5DgjVzghUZFPUV7MyLJs6FTOU
- r1EiSwCk0gI3o1mTGFuYEMIrHV4iQxxHyZEHuxbFPYpJEh21NKkpkw
- VZ7JzBSpkpIhT0hdIZIZFVpJik26n4Blhug8FSMolOecJzJJzT8nLQ
- XZPMPsvUOWzsZTFLQUEMbHaU5BdPhJWh5JbCphPGIeZ0hFWR4uoUfj
- k19siVcfiSqMFMIQOGUhXzj1cug0L8V8eZFFsU8yycBhgfAlgutBGN
- ynw0jGOsZd8BTQkWvgRZEUzciIFDhcMfTywk7RUaejLBWUmcxIfLne
- YXBi/sbq/WWEEjj+LId9OM+LJYd7eaFluMCCoBeG4JWKpPyHYVv4C5
- nEh5yR7vqY3z7idY1BmSIo4NAsj2vaXOxjKXYYyRcEXb6A0E3QWcaz
- 8WmCLp3KT9BhQfY8h+Nj9ExJxDort0xFyGRHKM9kXJ6GMr8gmVM4ZX
- 0Wnr855a+wl4jFYQkiasMUIOTDESJl9qApIo2eMkiksU2k09PGiegA
- pVjIfjLJKc/kJEzZ+2ACHSmKXaJLi70vYrmXV5/FxT6KLUH/o99Cco
- tS4swPYxrhTpWFHDND2DY+aQsJpZJhJSE/bIC8NvmXTzXCU9kSC3Qd
- As4HbP6lGbXAN1KVQWZCapXlQB49TZCER9z4L4ZKtSgPQTGBPI+t5t
- RyfGm4xssygpN5dfIlDZDhQ4SqTvFAU7CyeP0/WzVSo40lAAABCq8E
- PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTE2Ij8+DQ
- o8RW1haWxTZXQ+DQogIDxWZXJzaW9uPjE1LjAuMC4wPC9WZXJzaW9u
- Pg0KICA8RW1haWxzPg0KICAgIDxFbWFpbCBTdGFydEluZGV4PSIyMS
- I+DQogICAgICA8RW1haWxTdHJpbmc+YnJpamVzaC5zaW5naEBhbWQu
- Y29tPC9FbWFpbFN0cmluZz4NCiAgICA8L0VtYWlsPg0KICAgIDxFbW
- FpbCBTdGFydEluZGV4PSI3MDEiIFBvc2l0aW9uPSJPdGhlciI+DQog
- ICAgICA8RW1haWxTdHJpbmc+YWlrQGFtZC5jb208L0VtYWlsU3RyaW
- 5nPg0KICAgIDwvRW1haWw+DQogICAgPEVtYWlsIFN0YXJ0SW5kZXg9
- Ijg0OSIgUG9zaXRpb249Ik90aGVyIj4NCiAgICAgIDxFbWFpbFN0cm
- luZz5hc2hpc2gua2FscmFAYW1kLmNvbTwvRW1haWxTdHJpbmc+DQog
- ICAgPC9FbWFpbD4NCiAgICA8RW1haWwgU3RhcnRJbmRleD0iMTA0NC
- IgUG9zaXRpb249Ik90aGVyIj4NCiAgICAgIDxFbWFpbFN0cmluZz5t
- aWNoYWVsLnJvdGhAYW1kLmNvbTwvRW1haWxTdHJpbmc+DQogICAgPC
- 9FbWFpbD4NCiAgPC9FbWFpbHM+DQo8L0VtYWlsU2V0PgEOzwFSZXRy
- aWV2ZXJPcGVyYXRvciwxMCwwO1JldHJpZXZlck9wZXJhdG9yLDExLD
- E7UG9zdERvY1BhcnNlck9wZXJhdG9yLDEwLDA7UG9zdERvY1BhcnNl
- ck9wZXJhdG9yLDExLDA7UG9zdFdvcmRCcmVha2VyRGlhZ25vc3RpY0
- 9wZXJhdG9yLDEwLDM7UG9zdFdvcmRCcmVha2VyRGlhZ25vc3RpY09w
- ZXJhdG9yLDExLDA7VHJhbnNwb3J0V3JpdGVyUHJvZHVjZXIsMjAsMT Q=3D
-X-MS-Exchange-Forest-IndexAgent: 1 4091
-X-MS-Exchange-Forest-EmailMessageHash: E4020154
+X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAe8GAAAPAAADH4sIAAAAAAAEAMVXbVPb=
+RhA+2ZJtjAWhkD
+ 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
+ YtMTYiPz4NCjxFbWFpbFNldD4NCiAgPFZlcnNpb24+MTUuMC4wLjA8
+ L1ZlcnNpb24+DQogIDxFbWFpbHM+DQogICAgPEVtYWlsIFN0YXJ0SW
+ 5kZXg9IjMxIj4NCiAgICAgIDxFbWFpbFN0cmluZz5icEBhbGllbjgu
+ ZGU8L0VtYWlsU3RyaW5nPg0KICAgIDwvRW1haWw+DQogICAgPEVtYW
+ lsIFN0YXJ0SW5kZXg9IjMzMSIgUG9zaXRpb249IlNpZ25hdHVyZSI+
+ DQogICAgICA8RW1haWxTdHJpbmc+bWljaGFlbC5yb3RoQGFtZC5jb2
+ 08L0VtYWlsU3RyaW5nPg0KICAgIDwvRW1haWw+DQogIDwvRW1haWxz
+ Pg0KPC9FbWFpbFNldD4BDJ0HPD94bWwgdmVyc2lvbj0iMS4wIiBlbm
+ NvZGluZz0idXRmLTE2Ij8+DQo8Q29udGFjdFNldD4NCiAgPFZlcnNp
+ b24+MTUuMC4wLjA8L1ZlcnNpb24+DQogIDxDb250YWN0cz4NCiAgIC
+ A8Q29udGFjdCBTdGFydEluZGV4PSIyNjQiPg0KICAgICAgPFBlcnNv
+ biBTdGFydEluZGV4PSIyNjQiPg0KICAgICAgICA8UGVyc29uU3RyaW
+ 5nPkJvcmlzbGF2IFBldGtvdjwvUGVyc29uU3RyaW5nPg0KICAgICAg
+ PC9QZXJzb24+DQogICAgICA8RW1haWxzPg0KICAgICAgICA8RW1haW
+ wgU3RhcnRJbmRleD0iMjg3Ij4NCiAgICAgICAgICA8RW1haWxTdHJp
+ bmc+YnBAYWxpZW44LmRlPC9FbWFpbFN0cmluZz4NCiAgICAgICAgPC
+ 9FbWFpbD4NCiAgICAgIDwvRW1haWxzPg0KICAgICAgPENvbnRhY3RT
+ dHJpbmc+Qm9yaXNsYXYgUGV0a292IChBTUQpICZsdDticEBhbGllbj
+ guZGU8L0NvbnRhY3RTdHJpbmc+DQogICAgPC9Db250YWN0Pg0KICAg
+ IDxDb250YWN0IFN0YXJ0SW5kZXg9IjMxNyIgUG9zaXRpb249IlNpZ2
+ 5hdHVyZSI+DQogICAgICA8UGVyc29uIFN0YXJ0SW5kZXg9IjMxNyIg
+ UG9zaXRpb249IlNpZ25hdHVyZSI+DQogICAgICAgIDxQZXJzb25TdH
+ Jpbmc+TWljaGFlbCBSb3RoPC9QZXJzb25TdHJpbmc+DQogICAgICA8
+ L1BlcnNvbj4NCiAgICAgIDxFbWFpbHM+DQogICAgICAgIDxFbWFpbC
+ BTdGFydEluZGV4PSIzMzEiIFBvc2l0aW9uPSJTaWduYXR1cmUiPg0K
+ ICAgICAgICAgIDxFbWFpbFN0cmluZz5taWNoYWVsLnJvdGhAYW1kLm
+ NvbTwvRW1haWxTdHJpbmc+DQogICAgICAgIDwvRW1haWw+DQogICAg
+ ICA8L0VtYWlscz4NCiAgICAgIDxDb250YWN0U3RyaW5nPk1pY2hhZW
+ wgUm90aCAmbHQ7bWljaGFlbC5yb3RoQGFtZC5jb208L0NvbnRhY3RT
+ dHJpbmc+DQogICAgPC9Db250YWN0Pg0KICA8L0NvbnRhY3RzPg0KPC
+ 9Db250YWN0U2V0PgEOzwFSZXRyaWV2ZXJPcGVyYXRvciwxMCwxO1Jl
+ dHJpZXZlck9wZXJhdG9yLDExLDE7UG9zdERvY1BhcnNlck9wZXJhdG
+ 9yLDEwLDA7UG9zdERvY1BhcnNlck9wZXJhdG9yLDExLDA7UG9zdFdv
+ cmRCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDEwLDE7UG9zdFdvcm
+ RCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDExLDA7VHJhbnNwb3J0
+ V3JpdGVyUHJvZHVjZXIsMjAsMjI=3D
+X-MS-Exchange-Forest-IndexAgent: 1 3260
+X-MS-Exchange-Forest-EmailMessageHash: 8CD23995
 X-MS-Exchange-Forest-Language: en
 X-MS-Exchange-Organization-Processed-By-Journaling: Journal Agent
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+From: "Borislav Petkov (AMD)" <bp@alien8.de>
 
-Version 2 of GHCB specification added support for the SNP Guest Request
-Message NAE event. The event allows for an SEV-SNP guest to make
-requests to the SEV-SNP firmware through hypervisor using the
-SNP_GUEST_REQUEST API defined in the SEV-SNP firmware specification.
+Add functionality to set and/or clear different attributes of the
+machine as a confidential computing platform. Add the first one too:
+whether the machine is running as a host for SEV-SNP guests.
 
-This is used by guests primarily to request attestation reports from
-firmware. There are other request types are available as well, but the
-specifics of what guest requests are being made are opaque to the
-hypervisor, which only serves as a proxy for the guest requests and
-firmware responses.
-
-Implement handling for these events.
-
-Co-developed-by: Alexey Kardashevskiy <aik@amd.com>
-Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-[mdr: ensure FW command failures are indicated to guest, drop extended
- request handling to be re-written as separate patch, massage commit]
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c         | 83 ++++++++++++++++++++++++++++++++++
- include/uapi/linux/sev-guest.h |  9 ++++
- 2 files changed, 92 insertions(+)
+ arch/x86/coco/core.c        | 52 +++++++++++++++++++++++++++++++++++++
+ include/linux/cc_platform.h | 12 +++++++++
+ 2 files changed, 64 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 658116537f3f..f56f04553e81 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -19,6 +19,7 @@
- #include <linux/misc_cgroup.h>
- #include <linux/processor.h>
- #include <linux/trace_events.h>
-+#include <uapi/linux/sev-guest.h>
+diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
+index d07be9d05cd0..8c3fae23d3c6 100644
+--- a/arch/x86/coco/core.c
++++ b/arch/x86/coco/core.c
+@@ -16,6 +16,11 @@
+ enum cc_vendor cc_vendor __ro_after_init =3D CC_VENDOR_NONE;
+ u64 cc_mask __ro_after_init;
 =20
- #include <asm/pkru.h>
- #include <asm/trapnr.h>
-@@ -3223,6 +3224,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *s=
-vm)
- 	case SVM_VMGEXIT_HV_FEATURES:
- 	case SVM_VMGEXIT_PSC:
- 	case SVM_VMGEXIT_TERM_REQUEST:
-+	case SVM_VMGEXIT_GUEST_REQUEST:
- 		break;
- 	default:
- 		reason =3D GHCB_ERR_INVALID_EVENT;
-@@ -3646,6 +3648,83 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
- 	return ret;
- }
-=20
-+static bool snp_setup_guest_buf(struct kvm *kvm, struct sev_data_snp_guest=
-_request *data,
-+				gpa_t req_gpa, gpa_t resp_gpa)
-+{
-+	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
-+	kvm_pfn_t req_pfn, resp_pfn;
++static struct cc_attr_flags {
++	__u64 host_sev_snp	: 1,
++	      __resv		: 63;
++} cc_flags;
 +
-+	if (!IS_ALIGNED(req_gpa, PAGE_SIZE) || !IS_ALIGNED(resp_gpa, PAGE_SIZE))
-+		return false;
-+
-+	req_pfn =3D gfn_to_pfn(kvm, gpa_to_gfn(req_gpa));
-+	if (is_error_noslot_pfn(req_pfn))
-+		return false;
-+
-+	resp_pfn =3D gfn_to_pfn(kvm, gpa_to_gfn(resp_gpa));
-+	if (is_error_noslot_pfn(resp_pfn))
-+		return false;
-+
-+	if (rmp_make_private(resp_pfn, 0, PG_LEVEL_4K, 0, true))
-+		return false;
-+
-+	data->gctx_paddr =3D __psp_pa(sev->snp_context);
-+	data->req_paddr =3D __sme_set(req_pfn << PAGE_SHIFT);
-+	data->res_paddr =3D __sme_set(resp_pfn << PAGE_SHIFT);
-+
-+	return true;
-+}
-+
-+static bool snp_cleanup_guest_buf(struct sev_data_snp_guest_request *data)
-+{
-+	u64 pfn =3D __sme_clr(data->res_paddr) >> PAGE_SHIFT;
-+
-+	if (snp_page_reclaim(pfn))
-+		return false;
-+
-+	if (rmp_make_shared(pfn, PG_LEVEL_4K))
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool __snp_handle_guest_req(struct kvm *kvm, gpa_t req_gpa, gpa_t r=
-esp_gpa,
-+				   sev_ret_code *fw_err)
-+{
-+	struct sev_data_snp_guest_request data =3D {0};
-+	struct kvm_sev_info *sev;
-+	bool ret =3D true;
-+
-+	if (!sev_snp_guest(kvm))
-+		return false;
-+
-+	sev =3D &to_kvm_svm(kvm)->sev_info;
-+
-+	if (!snp_setup_guest_buf(kvm, &data, req_gpa, resp_gpa))
-+		return false;
-+
-+	if (sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, fw_err))
-+		ret =3D false;
-+
-+	if (!snp_cleanup_guest_buf(&data))
-+		ret =3D false;
-+
-+	return ret;
-+}
-+
-+static void snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_=
-t resp_gpa)
-+{
-+	struct kvm_vcpu *vcpu =3D &svm->vcpu;
-+	struct kvm *kvm =3D vcpu->kvm;
-+	sev_ret_code fw_err =3D 0;
-+	int vmm_ret =3D 0;
-+
-+	if (!__snp_handle_guest_req(kvm, req_gpa, resp_gpa, &fw_err))
-+		vmm_ret =3D SNP_GUEST_VMM_ERR_GENERIC;
-+
-+	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err))=
-;
-+}
-+
- static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ static bool noinstr intel_cc_platform_has(enum cc_attr attr)
  {
- 	struct vmcb_control_area *control =3D &svm->vmcb->control;
-@@ -3906,6 +3985,10 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 		vcpu->run->system_event.ndata =3D 1;
- 		vcpu->run->system_event.data[0] =3D control->ghcb_gpa;
- 		break;
-+	case SVM_VMGEXIT_GUEST_REQUEST:
-+		snp_handle_guest_req(svm, control->exit_info_1, control->exit_info_2);
-+		ret =3D 1;
+ 	switch (attr) {
+@@ -89,6 +94,9 @@ static bool noinstr amd_cc_platform_has(enum cc_attr attr=
+)
+ 	case CC_ATTR_GUEST_SEV_SNP:
+ 		return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
+=20
++	case CC_ATTR_HOST_SEV_SNP:
++		return cc_flags.host_sev_snp;
++
+ 	default:
+ 		return false;
+ 	}
+@@ -148,3 +156,47 @@ u64 cc_mkdec(u64 val)
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(cc_mkdec);
++
++static void amd_cc_platform_clear(enum cc_attr attr)
++{
++	switch (attr) {
++	case CC_ATTR_HOST_SEV_SNP:
++		cc_flags.host_sev_snp =3D 0;
 +		break;
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		vcpu_unimpl(vcpu,
- 			    "vmgexit: unsupported event - exit_info_1=3D%#llx, exit_info_2=3D%#=
-llx\n",
-diff --git a/include/uapi/linux/sev-guest.h b/include/uapi/linux/sev-guest.=
-h
-index 154a87a1eca9..7bd78e258569 100644
---- a/include/uapi/linux/sev-guest.h
-+++ b/include/uapi/linux/sev-guest.h
-@@ -89,8 +89,17 @@ struct snp_ext_report_req {
- #define SNP_GUEST_FW_ERR_MASK		GENMASK_ULL(31, 0)
- #define SNP_GUEST_VMM_ERR_SHIFT		32
- #define SNP_GUEST_VMM_ERR(x)		(((u64)x) << SNP_GUEST_VMM_ERR_SHIFT)
-+#define SNP_GUEST_FW_ERR(x)		((x) & SNP_GUEST_FW_ERR_MASK)
-+#define SNP_GUEST_ERR(vmm_err, fw_err)	(SNP_GUEST_VMM_ERR(vmm_err) | \
-+					 SNP_GUEST_FW_ERR(fw_err))
++	default:
++		break;
++	}
++}
++
++void cc_platform_clear(enum cc_attr attr)
++{
++	switch (cc_vendor) {
++	case CC_VENDOR_AMD:
++		amd_cc_platform_clear(attr);
++		break;
++	default:
++		break;
++	}
++}
++
++static void amd_cc_platform_set(enum cc_attr attr)
++{
++	switch (attr) {
++	case CC_ATTR_HOST_SEV_SNP:
++		cc_flags.host_sev_snp =3D 1;
++		break;
++	default:
++		break;
++	}
++}
++
++void cc_platform_set(enum cc_attr attr)
++{
++	switch (cc_vendor) {
++	case CC_VENDOR_AMD:
++		amd_cc_platform_set(attr);
++		break;
++	default:
++		break;
++	}
++}
+diff --git a/include/linux/cc_platform.h b/include/linux/cc_platform.h
+index cb0d6cd1c12f..60693a145894 100644
+--- a/include/linux/cc_platform.h
++++ b/include/linux/cc_platform.h
+@@ -90,6 +90,14 @@ enum cc_attr {
+ 	 * Examples include TDX Guest.
+ 	 */
+ 	CC_ATTR_HOTPLUG_DISABLED,
++
++	/**
++	 * @CC_ATTR_HOST_SEV_SNP: AMD SNP enabled on the host.
++	 *
++	 * The host kernel is running with the necessary features
++	 * enabled to run SEV-SNP guests.
++	 */
++	CC_ATTR_HOST_SEV_SNP,
+ };
 =20
-+/*
-+ * The GHCB spec only formally defines INVALID_LEN/BUSY VMM errors, but de=
-fine
-+ * a GENERIC error code such that it won't ever conflict with GHCB-defined
-+ * errors if any get added in the future.
-+ */
- #define SNP_GUEST_VMM_ERR_INVALID_LEN	1
- #define SNP_GUEST_VMM_ERR_BUSY		2
-+#define SNP_GUEST_VMM_ERR_GENERIC	BIT(31)
+ #ifdef CONFIG_ARCH_HAS_CC_PLATFORM
+@@ -107,10 +115,14 @@ enum cc_attr {
+  * * FALSE - Specified Confidential Computing attribute is not active
+  */
+ bool cc_platform_has(enum cc_attr attr);
++void cc_platform_set(enum cc_attr attr);
++void cc_platform_clear(enum cc_attr attr);
 =20
- #endif /* __UAPI_LINUX_SEV_GUEST_H_ */
+ #else	/* !CONFIG_ARCH_HAS_CC_PLATFORM */
+=20
+ static inline bool cc_platform_has(enum cc_attr attr) { return false; }
++static inline void cc_platform_set(enum cc_attr attr) { }
++static inline void cc_platform_clear(enum cc_attr attr) { }
+=20
+ #endif	/* CONFIG_ARCH_HAS_CC_PLATFORM */
+=20
 --=20
 2.25.1
 
+
+X-sender: <linux-kernel+bounces-125513-steffen.klassert=3Dsecunet.com@vger.=
+kernel.org>
+X-Receiver: <steffen.klassert@secunet.com> ORCPT=3Drfc822;steffen.klassert@=
+secunet.com NOTIFY=3DNEVER; X-ExtendedProps=3DBQAVABYAAgAAAAUAFAARAPDFCS25B=
+AlDktII2g02frgPADUAAABNaWNyb3NvZnQuRXhjaGFuZ2UuVHJhbnNwb3J0LkRpcmVjdG9yeURh=
+dGEuSXNSZXNvdXJjZQIAAAUAagAJAAEAAAAAAAAABQAWAAIAAAUAQwACAAAFAEYABwADAAAABQB=
+HAAIAAAUAEgAPAGIAAAAvbz1zZWN1bmV0L291PUV4Y2hhbmdlIEFkbWluaXN0cmF0aXZlIEdyb3=
+VwIChGWURJQk9IRjIzU1BETFQpL2NuPVJlY2lwaWVudHMvY249U3RlZmZlbiBLbGFzc2VydDY4Y=
+wUACwAXAL4AAACheZxkHSGBRqAcAp3ukbifQ049REI2LENOPURhdGFiYXNlcyxDTj1FeGNoYW5n=
+ZSBBZG1pbmlzdHJhdGl2ZSBHcm91cCAoRllESUJPSEYyM1NQRExUKSxDTj1BZG1pbmlzdHJhdGl=
+2ZSBHcm91cHMsQ049c2VjdW5ldCxDTj1NaWNyb3NvZnQgRXhjaGFuZ2UsQ049U2VydmljZXMsQ0=
+49Q29uZmlndXJhdGlvbixEQz1zZWN1bmV0LERDPWRlBQAOABEABiAS9uuMOkqzwmEZDvWNNQUAH=
+QAPAAwAAABtYngtZXNzZW4tMDIFADwAAgAADwA2AAAATWljcm9zb2Z0LkV4Y2hhbmdlLlRyYW5z=
+cG9ydC5NYWlsUmVjaXBpZW50LkRpc3BsYXlOYW1lDwARAAAAS2xhc3NlcnQsIFN0ZWZmZW4FAAw=
+AAgAABQBsAAIAAAUAWAAXAEoAAADwxQktuQQJQ5LSCNoNNn64Q049S2xhc3NlcnQgU3RlZmZlbi=
+xPVT1Vc2VycyxPVT1NaWdyYXRpb24sREM9c2VjdW5ldCxEQz1kZQUAJgACAAEFACIADwAxAAAAQ=
+XV0b1Jlc3BvbnNlU3VwcHJlc3M6IDANClRyYW5zbWl0SGlzdG9yeTogRmFsc2UNCg8ALwAAAE1p=
+Y3Jvc29mdC5FeGNoYW5nZS5UcmFuc3BvcnQuRXhwYW5zaW9uR3JvdXBUeXBlDwAVAAAATWVtYmV=
+yc0dyb3VwRXhwYW5zaW9uBQAjAAIAAQ=3D=3D
+X-CreatedBy: MSExchange15
+X-HeloDomain: a.mx.secunet.com
+X-ExtendedProps: BQBjAAoAbw5rGbMv3AgFAGEACAABAAAABQA3AAIAAA8APAAAAE1pY3Jvc2=
+9mdC5FeGNoYW5nZS5UcmFuc3BvcnQuTWFpbFJlY2lwaWVudC5Pcmdhbml6YXRpb25TY29wZREAA=
+AAAAAAAAAAAAAAAAAAAAAUASQACAAEFAAQAFCABAAAAHAAAAHN0ZWZmZW4ua2xhc3NlcnRAc2Vj=
+dW5ldC5jb20FAAYAAgABBQApAAIAAQ8ACQAAAENJQXVkaXRlZAIAAQUAAgAHAAEAAAAFAAMABwA=
+AAAAABQAFAAIAAQUAYgAKAEQAAADNigAABQBkAA8AAwAAAEh1Yg=3D=3D
+X-Source: SMTP:Default MBX-ESSEN-01
+X-SourceIPAddress: 62.96.220.36
+X-EndOfInjectedXHeaders: 20997
+Received: from cas-essen-02.secunet.de (10.53.40.202) by
+ mbx-essen-01.secunet.de (10.53.40.197) with Microsoft SMTP Server
+ (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sat, 30 Mar 2024 00:07:28 +0100
+Received: from a.mx.secunet.com (62.96.220.36) by cas-essen-02.secunet.de
+ (10.53.40.202) with Microsoft SMTP Server (version=3DTLS1_2,
+ cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Fronte=
+nd
+ Transport; Sat, 30 Mar 2024 00:07:28 +0100
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 6B8D9207E4
+	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 00:07:28 +0100 (CET)
+X-Virus-Scanned: by secunet
+X-Spam-Flag: NO
+X-Spam-Score: -2.85
+X-Spam-Level:
+X-Spam-Status: No, score=3D-2.85 tagged_above=3D-999 required=3D2.1
+	tests=3D[BAYES_00=3D-1.9, DKIMWL_WL_HIGH=3D-0.099, DKIM_SIGNED=3D0.1,
+	DKIM_VALID=3D-0.1, DKIM_VALID_AU=3D-0.1,
+	HEADER_FROM_DIFFERENT_DOMAINS=3D0.249, MAILING_LIST_MULTI=3D-1,
+	RCVD_IN_DNSWL_NONE=3D-0.0001, SPF_HELO_NONE=3D0.001, SPF_PASS=3D-0.001]
+	autolearn=3Dunavailable autolearn_force=3Dno
+Authentication-Results: a.mx.secunet.com (amavisd-new);
+	dkim=3Dpass (1024-bit key) header.d=3Damd.com
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id RQjBiIKHILZN for <steffen.klassert@secunet.com>;
+	Sat, 30 Mar 2024 00:07:27 +0100 (CET)
+Received-SPF: Pass (sender SPF authorized) identity=3Dmailfrom; client-ip=
+=3D147.75.80.249; helo=3Dam.mirrors.kernel.org; envelope-from=3Dlinux-kerne=
+l+bounces-125513-steffen.klassert=3Dsecunet.com@vger.kernel.org; receiver=
+=3Dsteffen.klassert@secunet.com=20
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com D027120754
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249]=
+)
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id D027120754
+	for <steffen.klassert@secunet.com>; Sat, 30 Mar 2024 00:07:27 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.2=
+5.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EAEF1F23987
+	for <steffen.klassert@secunet.com>; Fri, 29 Mar 2024 23:07:27 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3634913E6D0;
+	Fri, 29 Mar 2024 23:07:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.com header.b=
+=3D"tIqmA0po"
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11=
+on2040.outbound.protection.outlook.com [40.107.236.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8751513BAD2;
+	Fri, 29 Mar 2024 23:07:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=3Dfail smtp.client-ip=
+=3D40.107.236.40
+ARC-Seal: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org; s=3Darc-20240116;
+	t=3D1711753628; cv=3Dfail; b=3DNAyU4Ql1nzqh8Ta+6+4fkuH3r8iuNk9YQFSF2A6/gis=
+j9px5BkNYKlBn4AgIMyWt1I567ugxqpkl3AYixa0QaggzXoehxx6L6ncHvn8I7Ez2tFYoL9vZNb=
+Z6wk3Abq1m4Yl3ARVXTYgiBOs5wDFCDMLeLe6eG2QE/wdDDqys51o=3D
+ARC-Message-Signature: i=3D2; a=3Drsa-sha256; d=3Dsubspace.kernel.org;
+	s=3Darc-20240116; t=3D1711753628; c=3Drelaxed/simple;
+	bh=3D/LyX0lMdUIy7Re5uMF7sJFrGKLk94ez+2D00SwZmmSM=3D;
+	h=3DFrom:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=3DP4Ct+4Fh5CFHklVz8ec/KI+Vy8l6gy8sMrsA8G0VSc=
+6BXV51aSZvcce5TO0VWpkgWRO6L20qOjtIvW71UBRjh/dpKSwVxN3thY6iXTtS2sn6wbWKOTbs/=
+7n5LW4tFODW5ZD6LyYgDgXpsXkY2D4E35ysdtbX5m/Gl5n/SGm3LLc=3D
+ARC-Authentication-Results: i=3D2; smtp.subspace.kernel.org; dmarc=3Dpass (=
+p=3Dquarantine dis=3Dnone) header.from=3Damd.com; spf=3Dfail smtp.mailfrom=
+=3Damd.com; dkim=3Dpass (1024-bit key) header.d=3Damd.com header.i=3D@amd.c=
+om header.b=3DtIqmA0po; arc=3Dfail smtp.client-ip=3D40.107.236.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=3Dpass (p=3Dquarant=
+ine dis=3Dnone) header.from=3Damd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=3Dfail smtp.mailfrom=
+=3Damd.com
+ARC-Seal: i=3D1; a=3Drsa-sha256; s=3Darcselector9901; d=3Dmicrosoft.com; cv=
+=3Dnone;
+ b=3DndNy51RAtRmNI8klSsRuUDkZ+QOIkz6PU7RicglEDrpSyeD334tm0h8TSmMzsqeKS6iJHp=
+CYyPb/2bgRTgXwHuE5nHOCRWpYsQEUf9FfnAoZgq/FS6Ag1+n/PW1+XMjGrd3hTaQEMzt4f+mR1=
++LDDkpXF6HZbdDWTZG2jzrQfcx3peXwGhSzI8Mp7fmiZjGo3auxlW9277c3ZxbV6l/RzlDC8dI1=
++yGUojFlO4mTFp9PJnkeSg2YDsVKIVAYEAoYZXTUzSuLTkJJqQLWjodWuLBih6ic/HZU09yGVYj=
+2AxSh3I65W1AeCVMVbbEa8KbrhsCIUknM1mpNPA/gEPz2Ag=3D=3D
+ARC-Message-Signature: i=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Dmicr=
+osoft.com;
+ s=3Darcselector9901;
+ h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-A=
+ntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Ex=
+change-AntiSpam-MessageData-1;
+ bh=3DpvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=3D;
+ b=3DgMrC496qK2lsX87+6Bzyto2bAcxON65hdXqTeSYWXiTb9dMrUdvT2nBXXHCO9PSCV8BRKA=
+Tgr3QFZL2DbJrjIrQrsltBxeFF71VRItM5A+TTH4AicOLngecTmO8rH7zlYENBB2oVx3wSKnvuU=
+6N30ye3Cjzdcs1BVE9Zy9sB4Ul91SoyuDz+mggYy57PkPNmCmlx2d166CZHTTZJJJYqBcsHxO08=
+5W4pD2XSkVkLV72jqVcUQau02SVCvvx1k9v76Lrx1CsfhE62bu8cgJJLFXucZdWOwY5ft5+iXGn=
+W/Bwt1HJdv9FcbPLjhvfQZ/2KhAPqUXvJYyvL0lc5vYMNWA=3D=3D
+ARC-Authentication-Results: i=3D1; mx.microsoft.com 1; spf=3Dpass (sender i=
+p is
+ 165.204.84.17) smtp.rcpttodomain=3Dvger.kernel.org smtp.mailfrom=3Damd.com=
+;
+ dmarc=3Dpass (p=3Dquarantine sp=3Dquarantine pct=3D100) action=3Dnone
+ header.from=3Damd.com; dkim=3Dnone (message not signed); arc=3Dnone (0)
+DKIM-Signature: v=3D1; a=3Drsa-sha256; c=3Drelaxed/relaxed; d=3Damd.com; s=
+=3Dselector1;
+ h=3DFrom:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-S=
+enderADCheck;
+ bh=3DpvZLQjrPFSHZU6UdddtPnKlQpxoW832vsCNW4OOtrX8=3D;
+ b=3DtIqmA0poLlOQSgC8NQymU+wMavstViScDkmLWx+nPuwEKSNoq8248LCA6B4ywz4GfDsUL/=
+JVBQork/uEDWaaxIugEnRZyot0VUV/YkV9/1sII8p7qKebIp15+bvVlPGAntwT+ov4j9ElzGeCZ=
+bgxsHd/5BERvoXJ+Xjp3NdTnpU=3D
+Received: from DM6PR01CA0007.prod.exchangelabs.com (2603:10b6:5:296::12) by
+ CY8PR12MB7730.namprd12.prod.outlook.com (2603:10b6:930:85::17) with Micros=
+oft
+ SMTP Server (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA=
+384) id
+ 15.20.7409.41; Fri, 29 Mar 2024 23:07:03 +0000
+Received: from DS1PEPF00017092.namprd03.prod.outlook.com
+ (2603:10b6:5:296:cafe::1c) by DM6PR01CA0007.outlook.office365.com
+ (2603:10b6:5:296::12) with Microsoft SMTP Server (version=3DTLS1_2,
+ cipher=3DTLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.41 via Front=
+end
+ Transport; Fri, 29 Mar 2024 23:07:03 +0000
+X-MS-Exchange-Authentication-Results: spf=3Dpass (sender IP is 165.204.84.1=
+7)
+ smtp.mailfrom=3Damd.com; dkim=3Dnone (message not signed)
+ header.d=3Dnone;dmarc=3Dpass action=3Dnone header.from=3Damd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=3Dprotection.outlook.com;
+ client-ip=3D165.204.84.17; helo=3DSATLEXMB04.amd.com; pr=3DC
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS1PEPF00017092.mail.protection.outlook.com (10.167.17.135) with Microsoft
+ SMTP Server (version=3DTLS1_2, cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA=
+256) id
+ 15.20.7409.10 via Frontend Transport; Fri, 29 Mar 2024 23:07:03 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=3DTLS1_2,
+ cipher=3DTLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 29 M=
+ar
+ 2024 18:07:02 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: <kvm@vger.kernel.org>
+CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
+	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
+	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
+	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
+	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
+	<ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
+Subject: [PATCH v12 02/29] [TEMP] x86/cc: Add cc_platform_set/_clear() help=
+ers
+Date: Fri, 29 Mar 2024 17:58:08 -0500
+Message-ID: <20240329225835.400662-3-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
+References: <20240329225835.400662-1-michael.roth@amd.com>
+Precedence: bulk
+X-Mailing-List: linux-kernel@vger.kernel.org
+List-Id: <linux-kernel.vger.kernel.org>
+List-Subscribe: <mailto:linux-kernel+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-kernel+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017092:EE_|CY8PR12MB7730:EE_
+X-MS-Office365-Filtering-Correlation-Id: 94ffad58-535d-4024-6cb1-08dc5044f2=
+90
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0GqJcz06FWXScvO9q8UIen2Z5TIMPCwU7rdZJGHj=
++mAWkK5UWm4PnDKCmYgyV6KpeW5mNlwQEgzWXz89aRhNwVa9wB2gRYvrLIgGWw4N6Vr4jp4dfl8=
+VwdC0ycC93sxY2xW+fe4jdeZgPhu/SB4QLT2sV1ndIpuyq40tUT/o0P/0nz3TFNAeu7DWQtwO9K=
+M1gGCLv2c2YWaG2I28urqVBAEPs/Lh7IB9KQK2t3Q81bePUBE3DM6N5Un4Q9wYfgoHPRTlgN+Bh=
+9FkttL47rOMJ/EVcgsz+MQmLB8WK66RMLcIwfu/vtN5y6nLduBqBfhorBcp6zuEs+PTOhNcN+CF=
+yqBClZmAJ8QdSuOlmTWjymD3lzO1y3oa0U/+yLlDAcMsYKIUpx+5WQ5j4/lAZVO0q6s8IPE/Dc+=
+d60WxY1YU28uCX49WJM5XsQDmNxH0XrGqxIGyQZ0OZG+XWbADxRLmF7wtKjB1K4TnGmFbGxlv/V=
+DZqHCcq+fnJCBe64OkMcnbvkErwcuRbZnRIpyyoGQaZNbaa+GScMLvc2hjsnKH9ehVr+YXspEX9=
+UHlliDBQHx99aXyp2F7q/0rnaYKqbHpMo4ZK26eAjrPsaaPwox+sjWJqIifSdzkr/G99zUVnLEk=
+fYHuelBcZ+UO++2QpNKzeTssudbif+5NjNuyXxfRTfOYllVrmGeB2cLdGZT0KfYdernQqt8vm5t=
+2THsWM9CWDi2o4SF+TnOkjV3wIec1H3DVG759Esk29a322K114Jm/
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;I=
+PV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS=
+:(13230031)(7416005)(82310400014)(1800799015)(376005)(36860700004);DIR:OUT;=
+SFP:1101;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 23:07:03.6536
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94ffad58-535d-4024-6cb1-08dc5=
+044f290
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3D=
+3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=3D[165.204.84.17];Helo=3D[SATLEXMB0=
+4.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017092.namprd03.prod.outlook=
+.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7730
+Return-Path: linux-kernel+bounces-125513-steffen.klassert=3Dsecunet.com@vge=
+r.kernel.org
+X-MS-Exchange-Organization-OriginalArrivalTime: 29 Mar 2024 23:07:28.4654
+ (UTC)
+X-MS-Exchange-Organization-Network-Message-Id: 5afd3314-ec38-46c5-ccbe-08dc=
+5045014e
+X-MS-Exchange-Organization-OriginalClientIPAddress: 62.96.220.36
+X-MS-Exchange-Organization-OriginalServerIPAddress: 10.53.40.202
+X-MS-Exchange-Organization-Cross-Premises-Headers-Processed: cas-essen-02.s=
+ecunet.de
+X-MS-Exchange-Organization-OrderedPrecisionLatencyInProgress: LSRV=3Dmbx-es=
+sen-01.secunet.de:TOTAL-HUB=3D0.211|SMR=3D0.129(SMRDE=3D0.003|SMRC=3D0.126(=
+SMRCL=3D0.102|X-SMRCR=3D0.126))|CAT=3D0.080(CATRESL=3D0.024
+ (CATRESLP2R=3D0.004)|CATORES=3D0.051(CATRS=3D0.051(CATRS-Index Routing
+ Agent=3D0.050))|CATORT=3D0.001 (CATRT=3D0.001));2024-03-29T23:07:28.682Z
+X-MS-Exchange-Forest-ArrivalHubServer: mbx-essen-01.secunet.de
+X-MS-Exchange-Organization-AuthSource: cas-essen-02.secunet.de
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Exchange-Organization-FromEntityHeader: Internet
+X-MS-Exchange-Organization-OriginalSize: 14942
+X-MS-Exchange-Organization-HygienePolicy: Standard
+X-MS-Exchange-Organization-MessageLatency: SRV=3Dcas-essen-02.secunet.de:TO=
+TAL-FE=3D9.000|SMR=3D0.009(SMRPI=3D0.006(SMRPI-FrontendProxyAgent=3D0.006))
+X-MS-Exchange-Organization-Recipient-Limit-Verified: True
+X-MS-Exchange-Organization-TotalRecipientCount: 1
+X-MS-Exchange-Organization-Rules-Execution-History: 0b0cf904-14ac-4724-8bdf=
+-482ee6223cf2%%%fd34672d-751c-45ae-a963-ed177fcabe23%%%d8080257-b0c3-47b4-b=
+0db-23bc0c8ddb3c%%%95e591a2-5d7d-4afa-b1d0-7573d6c0a5d9%%%f7d0f6bc-4dcc-487=
+6-8c5d-b3d6ddbb3d55%%%16355082-c50b-4214-9c7d-d39575f9f79b
+X-MS-Exchange-Forest-RulesExecuted: mbx-essen-01
+X-MS-Exchange-Organization-RulesExecuted: mbx-essen-01
+X-MS-Exchange-Forest-IndexAgent-0: AQ0CZW4AAe8GAAAPAAADH4sIAAAAAAAEAMVXbVPb=
+RhA+2ZJtjAWhkD
+ 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
+ YtMTYiPz4NCjxFbWFpbFNldD4NCiAgPFZlcnNpb24+MTUuMC4wLjA8
+ L1ZlcnNpb24+DQogIDxFbWFpbHM+DQogICAgPEVtYWlsIFN0YXJ0SW
+ 5kZXg9IjMxIj4NCiAgICAgIDxFbWFpbFN0cmluZz5icEBhbGllbjgu
+ ZGU8L0VtYWlsU3RyaW5nPg0KICAgIDwvRW1haWw+DQogICAgPEVtYW
+ lsIFN0YXJ0SW5kZXg9IjMzMSIgUG9zaXRpb249IlNpZ25hdHVyZSI+
+ DQogICAgICA8RW1haWxTdHJpbmc+bWljaGFlbC5yb3RoQGFtZC5jb2
+ 08L0VtYWlsU3RyaW5nPg0KICAgIDwvRW1haWw+DQogIDwvRW1haWxz
+ Pg0KPC9FbWFpbFNldD4BDJ0HPD94bWwgdmVyc2lvbj0iMS4wIiBlbm
+ NvZGluZz0idXRmLTE2Ij8+DQo8Q29udGFjdFNldD4NCiAgPFZlcnNp
+ b24+MTUuMC4wLjA8L1ZlcnNpb24+DQogIDxDb250YWN0cz4NCiAgIC
+ A8Q29udGFjdCBTdGFydEluZGV4PSIyNjQiPg0KICAgICAgPFBlcnNv
+ biBTdGFydEluZGV4PSIyNjQiPg0KICAgICAgICA8UGVyc29uU3RyaW
+ 5nPkJvcmlzbGF2IFBldGtvdjwvUGVyc29uU3RyaW5nPg0KICAgICAg
+ PC9QZXJzb24+DQogICAgICA8RW1haWxzPg0KICAgICAgICA8RW1haW
+ wgU3RhcnRJbmRleD0iMjg3Ij4NCiAgICAgICAgICA8RW1haWxTdHJp
+ bmc+YnBAYWxpZW44LmRlPC9FbWFpbFN0cmluZz4NCiAgICAgICAgPC
+ 9FbWFpbD4NCiAgICAgIDwvRW1haWxzPg0KICAgICAgPENvbnRhY3RT
+ dHJpbmc+Qm9yaXNsYXYgUGV0a292IChBTUQpICZsdDticEBhbGllbj
+ guZGU8L0NvbnRhY3RTdHJpbmc+DQogICAgPC9Db250YWN0Pg0KICAg
+ IDxDb250YWN0IFN0YXJ0SW5kZXg9IjMxNyIgUG9zaXRpb249IlNpZ2
+ 5hdHVyZSI+DQogICAgICA8UGVyc29uIFN0YXJ0SW5kZXg9IjMxNyIg
+ UG9zaXRpb249IlNpZ25hdHVyZSI+DQogICAgICAgIDxQZXJzb25TdH
+ Jpbmc+TWljaGFlbCBSb3RoPC9QZXJzb25TdHJpbmc+DQogICAgICA8
+ L1BlcnNvbj4NCiAgICAgIDxFbWFpbHM+DQogICAgICAgIDxFbWFpbC
+ BTdGFydEluZGV4PSIzMzEiIFBvc2l0aW9uPSJTaWduYXR1cmUiPg0K
+ ICAgICAgICAgIDxFbWFpbFN0cmluZz5taWNoYWVsLnJvdGhAYW1kLm
+ NvbTwvRW1haWxTdHJpbmc+DQogICAgICAgIDwvRW1haWw+DQogICAg
+ ICA8L0VtYWlscz4NCiAgICAgIDxDb250YWN0U3RyaW5nPk1pY2hhZW
+ wgUm90aCAmbHQ7bWljaGFlbC5yb3RoQGFtZC5jb208L0NvbnRhY3RT
+ dHJpbmc+DQogICAgPC9Db250YWN0Pg0KICA8L0NvbnRhY3RzPg0KPC
+ 9Db250YWN0U2V0PgEOzwFSZXRyaWV2ZXJPcGVyYXRvciwxMCwxO1Jl
+ dHJpZXZlck9wZXJhdG9yLDExLDE7UG9zdERvY1BhcnNlck9wZXJhdG
+ 9yLDEwLDA7UG9zdERvY1BhcnNlck9wZXJhdG9yLDExLDA7UG9zdFdv
+ cmRCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDEwLDM7UG9zdFdvcm
+ RCcmVha2VyRGlhZ25vc3RpY09wZXJhdG9yLDExLDA7VHJhbnNwb3J0
+ V3JpdGVyUHJvZHVjZXIsMjAsMzM=3D
+X-MS-Exchange-Forest-IndexAgent: 1 3260
+X-MS-Exchange-Forest-EmailMessageHash: 8CD23995
+X-MS-Exchange-Forest-Language: en
+X-MS-Exchange-Organization-Processed-By-Journaling: Journal Agent
+
+From: "Borislav Petkov (AMD)" <bp@alien8.de>
+
+Add functionality to set and/or clear different attributes of the
+machine as a confidential computing platform. Add the first one too:
+whether the machine is running as a host for SEV-SNP guests.
+
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+---
+ arch/x86/coco/core.c        | 52 +++++++++++++++++++++++++++++++++++++
+ include/linux/cc_platform.h | 12 +++++++++
+ 2 files changed, 64 insertions(+)
+
+diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
+index d07be9d05cd0..8c3fae23d3c6 100644
+--- a/arch/x86/coco/core.c
++++ b/arch/x86/coco/core.c
+@@ -16,6 +16,11 @@
+ enum cc_vendor cc_vendor __ro_after_init =3D CC_VENDOR_NONE;
+ u64 cc_mask __ro_after_init;
+=20
++static struct cc_attr_flags {
++	__u64 host_sev_snp	: 1,
++	      __resv		: 63;
++} cc_flags;
++
+ static bool noinstr intel_cc_platform_has(enum cc_attr attr)
+ {
+ 	switch (attr) {
+@@ -89,6 +94,9 @@ static bool noinstr amd_cc_platform_has(enum cc_attr attr=
+)
+ 	case CC_ATTR_GUEST_SEV_SNP:
+ 		return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
+=20
++	case CC_ATTR_HOST_SEV_SNP:
++		return cc_flags.host_sev_snp;
++
+ 	default:
+ 		return false;
+ 	}
+@@ -148,3 +156,47 @@ u64 cc_mkdec(u64 val)
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(cc_mkdec);
++
++static void amd_cc_platform_clear(enum cc_attr attr)
++{
++	switch (attr) {
++	case CC_ATTR_HOST_SEV_SNP:
++		cc_flags.host_sev_snp =3D 0;
++		break;
++	default:
++		break;
++	}
++}
++
++void cc_platform_clear(enum cc_attr attr)
++{
++	switch (cc_vendor) {
++	case CC_VENDOR_AMD:
++		amd_cc_platform_clear(attr);
++		break;
++	default:
++		break;
++	}
++}
++
++static void amd_cc_platform_set(enum cc_attr attr)
++{
++	switch (attr) {
++	case CC_ATTR_HOST_SEV_SNP:
++		cc_flags.host_sev_snp =3D 1;
++		break;
++	default:
++		break;
++	}
++}
++
++void cc_platform_set(enum cc_attr attr)
++{
++	switch (cc_vendor) {
++	case CC_VENDOR_AMD:
++		amd_cc_platform_set(attr);
++		break;
++	default:
++		break;
++	}
++}
+diff --git a/include/linux/cc_platform.h b/include/linux/cc_platform.h
+index cb0d6cd1c12f..60693a145894 100644
+--- a/include/linux/cc_platform.h
++++ b/include/linux/cc_platform.h
+@@ -90,6 +90,14 @@ enum cc_attr {
+ 	 * Examples include TDX Guest.
+ 	 */
+ 	CC_ATTR_HOTPLUG_DISABLED,
++
++	/**
++	 * @CC_ATTR_HOST_SEV_SNP: AMD SNP enabled on the host.
++	 *
++	 * The host kernel is running with the necessary features
++	 * enabled to run SEV-SNP guests.
++	 */
++	CC_ATTR_HOST_SEV_SNP,
+ };
+=20
+ #ifdef CONFIG_ARCH_HAS_CC_PLATFORM
+@@ -107,10 +115,14 @@ enum cc_attr {
+  * * FALSE - Specified Confidential Computing attribute is not active
+  */
+ bool cc_platform_has(enum cc_attr attr);
++void cc_platform_set(enum cc_attr attr);
++void cc_platform_clear(enum cc_attr attr);
+=20
+ #else	/* !CONFIG_ARCH_HAS_CC_PLATFORM */
+=20
+ static inline bool cc_platform_has(enum cc_attr attr) { return false; }
++static inline void cc_platform_set(enum cc_attr attr) { }
++static inline void cc_platform_clear(enum cc_attr attr) { }
+=20
+ #endif	/* CONFIG_ARCH_HAS_CC_PLATFORM */
+=20
+--=20
+2.25.1
 
 
