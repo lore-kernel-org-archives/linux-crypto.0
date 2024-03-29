@@ -1,72 +1,58 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5481EA5F;
-	Fri, 29 Mar 2024 06:31:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B27F3FB83;
+	Fri, 29 Mar 2024 06:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711693890; cv=none; b=sM4X0LAEseYbnfXzLdc3x3mryD3KugpZYIO+bsyEfCc0qvIA0Gy1FtD5hjnelySanY5Qe2BslOpbMD/nbq+YXaVaFJLadMLoTmW0sYhLorQNT+hJif8skyRjLeSTMmLfswKmAhLUoJzDaflkaeY21syZ0umMRs/nhtqdjjXjIPg=
+	t=1711694094; cv=none; b=MkSCaBtcmgsHI2oSjn1gSEyFSh+C4jQ+VlPF1FbVu9HYy3XW40i8MCFXbbMzHNkUI19YjtOOoCh194xxjZWk5u268Wol8QdHf1TBsIX3VdSz6xSrUjOIBYsqo7yl0FDQC3Ig051YjoscDnxZE9cSAL52MBfTKKafXjczY3LjLII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711693890; c=relaxed/simple;
-	bh=uHozoKnGp0hXOQqs0eIHvbbie1iy4qHVQYwmZblr1NE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LdCeMZ0ThPqu8k/t+b5VnuAPIbOcLPHCZJDgFUttJVlQOhSYYHhdWfH50VEgm+wBUicDy0vcj4AM4JfunPpSRH932ADS252KQ1dw4eT7FUqympQK6jeFrNlrPyxh/7rEzD1DywBqD8SBxXnR5npR4oy4oa8mi2r7+KyqS9gCiHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4V5Vpq4DP7zwQZL;
-	Fri, 29 Mar 2024 14:28:35 +0800 (CST)
-Received: from dggpemd200003.china.huawei.com (unknown [7.185.36.122])
-	by mail.maildlp.com (Postfix) with ESMTPS id D109A140158;
-	Fri, 29 Mar 2024 14:31:17 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- dggpemd200003.china.huawei.com (7.185.36.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 29 Mar 2024 14:31:17 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <gregkh@linuxfoundation.org>, <zhangfei.gao@linaro.org>,
-	<wangzhou1@hisilicon.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <shenyang39@huawei.com>, <liulongfang@huawei.com>,
-	<qianweili@huawei.com>
-Subject: [PATCH] misc: uacce - add the null check for the input pointer and its pointer members
-Date: Fri, 29 Mar 2024 14:26:55 +0800
-Message-ID: <20240329062655.3055646-1-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.30.0
+	s=arc-20240116; t=1711694094; c=relaxed/simple;
+	bh=JZDd4vTOWg91ZZZdlKhj2Iuf8kbXcTkZgWQyBW9M9bA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oG05Lt7UFFjvGGjjZCdd2A+iM3mxYOoPKNwfmKTphuai+jM+eSzUz4HvdtjG/J6P35fKOxeAFe76VGN3LhX2p6cLM+wn0jQyPNLoU+xWlu6xuAha+PSerTZcNk1xO18qIeQdw//K+j2baL2sWKpoRGMcct43CjESPO804KoJMI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YSWhuXv2; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YSWhuXv2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CA35C433C7;
+	Fri, 29 Mar 2024 06:34:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1711694094;
+	bh=JZDd4vTOWg91ZZZdlKhj2Iuf8kbXcTkZgWQyBW9M9bA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YSWhuXv21YBYdVAQHEohit7APVPxdrYw1NjCJ/Q589Zmt9RI8JDhrsn28T0KOF+uL
+	 1VKff0pavugkCoc6CwstGTCfET0pSJ8RJhbAVAXfLKjGhIwhXPVCcC1rU3iHJa2/nE
+	 x08+MIDtIIBgVeRQekeRZRA5hvQI/KW4goeipNSs=
+Date: Fri, 29 Mar 2024 07:34:50 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Chenghai Huang <huangchenghai2@huawei.com>
+Cc: zhangfei.gao@linaro.org, wangzhou1@hisilicon.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	fanghao11@huawei.com, shenyang39@huawei.com, liulongfang@huawei.com,
+	qianweili@huawei.com
+Subject: Re: [PATCH] misc: uacce - add the null check for the input pointer
+ and its pointer members
+Message-ID: <2024032946-supernova-unstaffed-63ec@gregkh>
+References: <20240329062655.3055646-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemd200003.china.huawei.com (7.185.36.122)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240329062655.3055646-1-huangchenghai2@huawei.com>
 
-The uacce_alloc() is the member of the EXPORT_SYMBOL_GPL. Therefore, null
-pointer verification is added on the pointer type input parameter and its
-pointer members.
+On Fri, Mar 29, 2024 at 02:26:55PM +0800, Chenghai Huang wrote:
+> The uacce_alloc() is the member of the EXPORT_SYMBOL_GPL. Therefore, null
+> pointer verification is added on the pointer type input parameter and its
+> pointer members.
 
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
----
- drivers/misc/uacce/uacce.c | 3 +++
- 1 file changed, 3 insertions(+)
+I do not understand, why does the export type matter?  Just fix any
+callers to use this properly and send proper parameters.  What in-tree
+caller needs this?
 
-diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-index bdc2e6fda782..964f1a6a16e0 100644
---- a/drivers/misc/uacce/uacce.c
-+++ b/drivers/misc/uacce/uacce.c
-@@ -514,6 +514,9 @@ struct uacce_device *uacce_alloc(struct device *parent,
- 	struct uacce_device *uacce;
- 	int ret;
- 
-+	if (!parent || !interface || !interface->ops)
-+		return ERR_PTR(-EINVAL);
-+
- 	uacce = kzalloc(sizeof(struct uacce_device), GFP_KERNEL);
- 	if (!uacce)
- 		return ERR_PTR(-ENOMEM);
--- 
-2.30.0
+thanks,
 
+greg k-h
