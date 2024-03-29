@@ -1,116 +1,210 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41D24D5AC
-	for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 23:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122B52C68C;
+	Fri, 29 Mar 2024 02:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711667124; cv=none; b=OTVFF0+MKUB68GZ1WgKJP/c9wCNfP8cEd8xW7KHMQgbt3Fug8Us76KI99J1ObhdRo8wR2+7bsOc9Iv4naF0FuFvd0B7UD2FeGL/e2NtCG9N1I4K1xWllyFLW0DDURrkavbtYJdO/vbJu80lxzQoHJr/1OTbAx/VM3w6/PlmTrnA=
+	t=1711678178; cv=none; b=RDdMbRO3MABg4zzNIVbfMNVvm7fAI24g8AuHZVAMRSNQyI/MiKbjcMTqApLuQoUEd4THM1zDbuhWQGdDYfgLT9ofOKUUQtlnAKi0nJ/tAtXS2uMHl89Le9RjPLaI8fYJKCkaUt9IFGPmuoHBUgZNjhEi5fGscIB8I1+dQ01ueOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711667124; c=relaxed/simple;
-	bh=z3tf46ej8qpBQPDevbtFzGy9O5nWOl/MaSu7nJvWxGA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=MKhAsgEWaHPwVJulE/0h0okuMKFN3TYVBKPprtZyvke45Spt1JH8+f2qszQG9AJxYBnqck+J7EsP0ZmJeEJAWlorKts7ebooBYRej64Wu9qGK0DjaaDF10uCG2OJUW3Oi7dqKid/HsR8uno/fkI0TX1E/Un7cA7TehiBsY8OFm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=whoze/eT; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1711678178; c=relaxed/simple;
+	bh=FSsoc2bilwBnLscLx6U4GiKDrWPS92uMLAaFdcmDj7k=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=h9V9bqNfxUhPAzPS0IVL+Aw1QSJlxyf6iLOKVsth1H8oTHM8qSwOe+20KYlJ18CjEvCuogxcFg+96pfmvDDI2jliiYVAYl6dHqQPZVIQfqjVWqkXoVwmigNB46vXZITZVywV6jFt24wykjN4Oo+qn+JuTdKqqiGNtLPCn60dvyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kTxu05Wi; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="whoze/eT"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-29df844539bso403142a91.1
-        for <linux-crypto@vger.kernel.org>; Thu, 28 Mar 2024 16:05:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1711667122; x=1712271922; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/3aFzydSyExlB9BmbA34QemVRJ/ZXxJRv4umeOt6fqw=;
-        b=whoze/eTuQ7WCfQ2KvL3NhiXL9NdmAEclm+rcZS0cncIpOf/Vikox6zms2HxC9Ae2N
-         4cWzjapfm+Ag5yRjl++DCupMT9G0IjnCYZ3nNC+kJfMkiLbw5EVML96+SqYgGbQPf/VS
-         bAegt8fbYFAnyvUsUkMvGFyBvyRQ5XH1TQCwZ8wp/hMoUEc+ou+Jdrl/U/B/9hbIN9Pz
-         ca5G59PaLbaPt/Ea3p2x0ca8jA0mNfAZEvQ0udRXouYnoxRhALy1hoiVPXZMyYFszsBy
-         Y+cdwWib2eaKcRcCvB5aEASf2HOtQ3qrKmO1UrZPwMKUknip7iwA4w74FrCGZOhdUpof
-         hOeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711667122; x=1712271922;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/3aFzydSyExlB9BmbA34QemVRJ/ZXxJRv4umeOt6fqw=;
-        b=jbwY0OwZk6K7QNTZCyn/zdjIl9qLDJsWUvpc71pwSWiPZ9yBCakFJWKhlKPykEkTAk
-         PTu1dnQw075vF0KUEly108qTu8AVr3LDUxmI0Jfnq6t5GUMn28yIleI54QLPSRKaqVKW
-         SDGJaM5aZHPE562P4JDSq8s8i3WbCG/hsbxZpiK44AF09mHsdOB0e0juLpCiY3w/2iMe
-         En3MCEATJWT/W3RRuOSiIdlJkLCZoR9o5wsRFxbBPWJohm8Jk+gI5emXQvjqHo3MDLQ1
-         5Ycz4Tuiy6MA6sniF45Ps0LD2IXiBU+TvVCbW9GeolB0lcd3WB2ZsGTiLzJfAykZ9wVe
-         FJNg==
-X-Forwarded-Encrypted: i=1; AJvYcCWafsFijQOQoQ3S+thq64nO2B4/+dv/02CKKTxs5QdlocNmZEXsvQg0OU1MQjSUcl2CmgeR2BvqEntKRrpYAr55cxJZ293xuXkkG1LS
-X-Gm-Message-State: AOJu0Yw604Q/u6s5DQQOHbB38Rni19M/OBG08K2vsZL8UOX7A4ipHdlt
-	y5mf/C8/zyzZIVcAKp4AjIXV8m9Gz/r3uM1kDd3eubIVD9xw2uePdjZDLCxbBqs=
-X-Google-Smtp-Source: AGHT+IGt0gkc119snKbJARF7UnrFMVXsS7gpTXjZzbZBfCEKd0wr8mr1SMS6Ds7kY42qafqSBM/uug==
-X-Received: by 2002:a17:90b:3504:b0:29b:780c:c671 with SMTP id ls4-20020a17090b350400b0029b780cc671mr907698pjb.0.1711667121826;
-        Thu, 28 Mar 2024 16:05:21 -0700 (PDT)
-Received: from [127.0.0.1] ([50.234.116.5])
-        by smtp.gmail.com with ESMTPSA id cx18-20020a17090afd9200b0029d7e7b7b41sm4013902pjb.33.2024.03.28.16.05.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 16:05:21 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Andrew Morton <akpm@linux-foundation.org>, 
- Muchun Song <muchun.song@linux.dev>, Miaohe Lin <linmiaohe@huawei.com>, 
- Naoya Horiguchi <naoya.horiguchi@nec.com>, 
- John Johansen <john.johansen@canonical.com>, 
- Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
- "Serge E. Hallyn" <serge@hallyn.com>, David Howells <dhowells@redhat.com>, 
- Jarkko Sakkinen <jarkko@kernel.org>, Kees Cook <keescook@chromium.org>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, 
- Pavel Begunkov <asml.silence@gmail.com>, 
- Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, 
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Joel Granados <j.granados@samsung.com>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, linux-mm@kvack.org, 
- linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org, 
- keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
- io-uring@vger.kernel.org, linux-riscv@lists.infradead.org, 
- linux-arm-kernel@lists.infradead.org
-In-Reply-To: <20240328-jag-sysctl_remset_misc-v1-0-47c1463b3af2@samsung.com>
-References: <20240328-jag-sysctl_remset_misc-v1-0-47c1463b3af2@samsung.com>
-Subject: Re: (subset) [PATCH 0/7] sysctl: Remove sentinel elements from
- misc directories
-Message-Id: <171166712004.796545.8747989552701562593.b4-ty@kernel.dk>
-Date: Thu, 28 Mar 2024 17:05:20 -0600
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kTxu05Wi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711678176; x=1743214176;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=FSsoc2bilwBnLscLx6U4GiKDrWPS92uMLAaFdcmDj7k=;
+  b=kTxu05WihevV2ekoa9ehtieAgJVBXLf9PC3nTfzUQZkywYhRbVkWCFd5
+   m9lLRjz35/eh+fbkYpD5RY/NfL1dDDBRY9lc2DJGEY77z4vhFwTmi/Wfc
+   29G9lzsWoBY4TGFrX7ovtkRihUcoZSCmib43qdUgxv64h4P0s3sDUhyKK
+   3a+Y46pFEwmTV9qSaNDDjETgSU6yZqqFiD1JsFB42ZDghPPZeOVbhxd0d
+   q2M+aaJ2dJWsqPU3lzITFLgTcgOuddeHfdTlxG6bC6NI9gBq00uLbXPJt
+   tYE1eBpgsJdB+JSrJLaGJhRBKcAz3M2e+RDWIJfiThv2bD1AimhaQvOJ5
+   Q==;
+X-CSE-ConnectionGUID: GaWborRxRRqH+K5VqPwN/A==
+X-CSE-MsgGUID: 6ftjLkmGRYWujFrMuMJ0Rg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6700009"
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="6700009"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 19:09:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
+   d="scan'208";a="17301369"
+Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
+  by orviesa006.jf.intel.com with ESMTP; 28 Mar 2024 19:09:34 -0700
+From: "Chang S. Bae" <chang.seok.bae@intel.com>
+To: linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	dm-devel@redhat.com
+Cc: ebiggers@kernel.org,
+	luto@kernel.org,
+	dave.hansen@linux.intel.com,
+	tglx@linutronix.de,
+	bp@alien8.de,
+	mingo@kernel.org,
+	x86@kernel.org,
+	herbert@gondor.apana.org.au,
+	ardb@kernel.org,
+	elliott@hpe.com,
+	dan.j.williams@intel.com,
+	bernie.keany@intel.com,
+	charishma1.gairuboyina@intel.com,
+	chang.seok.bae@intel.com
+Subject: [PATCH v9 00/14] x86: Support Key Locker
+Date: Thu, 28 Mar 2024 18:53:32 -0700
+Message-Id: <20240329015346.635933-1-chang.seok.bae@intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230603152227.12335-1-chang.seok.bae@intel.com>
+References: <20230603152227.12335-1-chang.seok.bae@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.5-dev-2aabd
+Content-Transfer-Encoding: 8bit
+
+Hi all,
+
+As posting this version, I wanted to make sure these code changes were
+acknowledgeable at first:
+
+The previous enabling process has been paused to address vulnerabilities
+[1][2] that could compromise Key Locker's ability to protect AES keys.
+Now, with the mainlining of mitigations [3][4], patches (Patch 10-11)
+were added to ensure the application of these mitigations.
+
+During this period, there was a significant change in the mainline commit
+b81fac906a8f ("x86/fpu: Move FPU initialization into
+arch_cpu_finalize_init()"). This affected Key Locker's initialization
+code, which clobbers XMM registers for loading a wrapping key, as it
+depends on FPU initialization.
+
+In this revision, the setup code was adjusted to separate the
+initialization part to be invoked during arch_initcall(). The remaining
+code for copying the wrapping key from the backup resides in the
+identify_cpu() -> setup_keylocker() path. This separation simplifies the
+code and resolves an issue with hotplug.
+
+The remaining changes mainly focus on the AES crypto driver, addressing
+feedback from Eric. Notably, while doing so, it was realized better to
+disallow a module build. Key Locker's AES instructions do not support
+192-bit keys. Supporting a module build would require exporting some
+AES-NI functions, leading to performance-impacting indirect calls. I
+think we can revisit module support later if necessary.
+
+Then, the following is a summary of changes per patch since v8 [6]:
+
+PATCH7-8:
+* Invoke the setup code via arch_initcall() due to upstream changes
+  delaying the FPU setup.
+
+PATCH9-11:
+* Add new patches for security and hotplug support clarification
+
+PATCH12:
+* Drop the "nokeylocker" option. (Borislav Petkov)
+
+PATCH13:
+* Introduce 'union x86_aes_ctx'. (Eric Biggers)
+* Ensure 'inline' for wrapper functions.
+
+PATCH14:
+* Combine the XTS enc/dec assembly code in a macro.  (Eric Biggers)
+* Define setkey() as void instead of returning 'int'.  (Eric Biggers)
+* Rearrange the assembly code to reduce jumps, especially for success
+  cases.  (Eric Biggers)
+* Update the changelog for clarification. (Eric Biggers)
+* Exclude module build.
+
+This series is based on my AES-NI setkey() cleanup [7], which has been
+recently merged into the crypto repository [8], and I thought it was
+better to go first. You can also find this series here:
+    git://github.com/intel-staging/keylocker.git kl-v9
+
+Thanks,
+Chang
+
+[1] Gather Data Sampling (GDS)
+    https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/gather-data-sampling.html
+[2] Register File Data Sampling (RFDS)
+    https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/register-file-data-sampling.html
+[3] Mainlining of GDS mitigation
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=64094e7e3118aff4b0be8ff713c242303e139834
+[4] Mainlining of RFDS Mitigation
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0e33cf955f07e3991e45109cb3e29fbc9ca51d06
+[5]  Initialize FPU late
+    https://lore.kernel.org/lkml/168778151512.3634408.11432553576702911909.tglx@vps.praguecc.cz/
+[6] V8: https://lore.kernel.org/lkml/20230603152227.12335-1-chang.seok.bae@intel.com/
+[7] https://lore.kernel.org/lkml/20240322230459.456606-1-chang.seok.bae@intel.com/
+[8] git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+
+Chang S. Bae (14):
+  Documentation/x86: Document Key Locker
+  x86/cpufeature: Enumerate Key Locker feature
+  x86/insn: Add Key Locker instructions to the opcode map
+  x86/asm: Add a wrapper function for the LOADIWKEY instruction
+  x86/msr-index: Add MSRs for Key Locker wrapping key
+  x86/keylocker: Define Key Locker CPUID leaf
+  x86/cpu/keylocker: Load a wrapping key at boot time
+  x86/PM/keylocker: Restore the wrapping key on the resume from ACPI
+    S3/4
+  x86/hotplug/keylocker: Ensure wrapping key backup capability
+  x86/cpu/keylocker: Check Gather Data Sampling mitigation
+  x86/cpu/keylocker: Check Register File Data Sampling mitigation
+  x86/Kconfig: Add a configuration for Key Locker
+  crypto: x86/aes - Prepare for new AES-XTS implementation
+  crypto: x86/aes-kl - Implement the AES-XTS algorithm
+
+ Documentation/arch/x86/index.rst            |   1 +
+ Documentation/arch/x86/keylocker.rst        |  96 +++++
+ arch/x86/Kconfig                            |   3 +
+ arch/x86/Kconfig.assembler                  |   5 +
+ arch/x86/crypto/Kconfig                     |  17 +
+ arch/x86/crypto/Makefile                    |   3 +
+ arch/x86/crypto/aes-helper_asm.S            |  22 ++
+ arch/x86/crypto/aes-helper_glue.h           | 168 ++++++++
+ arch/x86/crypto/aeskl-intel_asm.S           | 412 ++++++++++++++++++++
+ arch/x86/crypto/aeskl-intel_glue.c          | 187 +++++++++
+ arch/x86/crypto/aeskl-intel_glue.h          |  35 ++
+ arch/x86/crypto/aesni-intel_asm.S           |  47 +--
+ arch/x86/crypto/aesni-intel_glue.c          | 193 ++-------
+ arch/x86/crypto/aesni-intel_glue.h          |  40 ++
+ arch/x86/include/asm/cpufeatures.h          |   1 +
+ arch/x86/include/asm/disabled-features.h    |   8 +-
+ arch/x86/include/asm/keylocker.h            |  42 ++
+ arch/x86/include/asm/msr-index.h            |   6 +
+ arch/x86/include/asm/special_insns.h        |  28 ++
+ arch/x86/include/uapi/asm/processor-flags.h |   2 +
+ arch/x86/kernel/Makefile                    |   1 +
+ arch/x86/kernel/cpu/common.c                |   4 +-
+ arch/x86/kernel/cpu/cpuid-deps.c            |   1 +
+ arch/x86/kernel/keylocker.c                 | 219 +++++++++++
+ arch/x86/lib/x86-opcode-map.txt             |  11 +-
+ arch/x86/power/cpu.c                        |   2 +
+ tools/arch/x86/lib/x86-opcode-map.txt       |  11 +-
+ 27 files changed, 1363 insertions(+), 202 deletions(-)
+ create mode 100644 Documentation/arch/x86/keylocker.rst
+ create mode 100644 arch/x86/crypto/aes-helper_asm.S
+ create mode 100644 arch/x86/crypto/aes-helper_glue.h
+ create mode 100644 arch/x86/crypto/aeskl-intel_asm.S
+ create mode 100644 arch/x86/crypto/aeskl-intel_glue.c
+ create mode 100644 arch/x86/crypto/aeskl-intel_glue.h
+ create mode 100644 arch/x86/crypto/aesni-intel_glue.h
+ create mode 100644 arch/x86/include/asm/keylocker.h
+ create mode 100644 arch/x86/kernel/keylocker.c
 
 
-On Thu, 28 Mar 2024 16:57:47 +0100, Joel Granados wrote:
-> What?
-> These commits remove the sentinel element (last empty element) from the
-> sysctl arrays of all the files under the "mm/", "security/", "ipc/",
-> "init/", "io_uring/", "drivers/perf/" and "crypto/" directories that
-> register a sysctl array. The inclusion of [4] to mainline allows the
-> removal of sentinel elements without behavioral change. This is safe
-> because the sysctl registration code (register_sysctl() and friends) use
-> the array size in addition to checking for a sentinel [1].
-> 
-> [...]
-
-Applied, thanks!
-
-[6/7] io_uring: Remove the now superfluous sentinel elements from ctl_table array
-      (no commit info)
-
-Best regards,
+base-commit: 3a447c31d337bdec7fbc605a7a1e00aff4c492d0
 -- 
-Jens Axboe
-
-
+2.34.1
 
