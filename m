@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9D62C68C;
-	Fri, 29 Mar 2024 02:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B033A1B5;
+	Fri, 29 Mar 2024 02:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711678184; cv=none; b=PW5jF8WSbTrTibDqltiqnlk0jsS/1+SNm0X3CJh6Msy0fo67dubDJg2Ivs+apOfoBV/OfdZ4CcQcYNUYubxpsfwdjGyHE1tkPD6FmZC2KYZOfIzoByVf6PtAaypMSw2YsjWtzFXDpq+FrViMEUc+pywiK9eoe2xoBQF4rUPUtDs=
+	t=1711678186; cv=none; b=UH25RMncErGKqDcHmsDLMA41uA849zDbCW9TOPjWESWBqxV7P4FzMwabWNwnIlq6G1dbKTIWvNzO7wgWRi23rd6/UUQYvHQ49qn7rJXlY7aNrSmFYTj5E0CkoRfOTAmS2tP+2wbDRLY8GStykwjrnHeCLACz+9md6PT3P+yhBtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711678184; c=relaxed/simple;
-	bh=L98bHTa7C7ExooOa5n0J0qSnhQrzRsiRFuKgyofpwGo=;
+	s=arc-20240116; t=1711678186; c=relaxed/simple;
+	bh=aLdZ4Gq66eiPhVW+fge8rLHBtRcUDjGDQQLqA+I8V7E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BCbw1Dn/04izTJgSN4KALb2geLmUgZg/yf2yBv8TQfcMS0Q4sYUZRJwR9OBz5qOhHnluphxy9vOZwNLkk//prmohYaYbglNFBkQzDNioMZjBy4LOdYhRexDvUNZmFhZZhsVJT6NR8L1gJXfiCnTeGXuF/eROclw4CRWCvYkFau4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EcbSpSil; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=m9O2vWyaEPGTB5cID1+gHecE5GSVWdoLULE+a1AEE2SzkPBWAXznqSbBjegbFjHGHdZkYLIATnVfR1o7qEyS+vfzppRGgQgGrnG4Er3UkGwAFkDaK4j99AeWj1eCcmiF8VlaCNGFJT8i7YwP/gLrJBCAgsdEcQUMm8ZMgpJKu2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kv2EoZqV; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EcbSpSil"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kv2EoZqV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711678182; x=1743214182;
+  t=1711678184; x=1743214184;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=L98bHTa7C7ExooOa5n0J0qSnhQrzRsiRFuKgyofpwGo=;
-  b=EcbSpSilF1q10cQmZnWPGSdmIaBO2woJ4Krl3aBh5ZHXlV8yRzaemOj7
-   VCho/C70AvkF5NJ1rS/y0LN09ax03sKHDEy+eaem4mjoPFZdyIjAGBKRP
-   XpGHs9v0AdRmw5EUoc1ogxwZoc1VeQiR30B6pwB8rEQfenYj0R4l3+d2Z
-   HnklJusI0H3TU/PdeZ06jdkFD4PRfJiM5WgqSkBuqEqAxtVWXoPc2ubEH
-   ls5udX1g7Ag50DcOtRcVnlYt1JrGB2U5wCG0n+43J8DYTwGlSP9aPUhdF
-   kbJAmhFdswQ9sf6jm+RUbrkpLpUjQ+yPnWV2e2fWVrLJ7jMZTywpGwy32
+  bh=aLdZ4Gq66eiPhVW+fge8rLHBtRcUDjGDQQLqA+I8V7E=;
+  b=kv2EoZqVdSaIFMmG2g2nJqV+xd7cyJwuR+M6BzsaCWMAqMPxAaDOz3xr
+   /7aVQS5aYBmb8BEq5Y08/xkgAdaNi808cxHA8VD94oD0/S2Yu0ZFLYbpF
+   LKGIKbDIynAsLNHc3/46li8TXgsFhA5vxZ/1h9iiirJFnsWfmyKGhk+Wv
+   ZYZTWYTtZYv7leJJYgs9mxMK07BsUHX18/dLoDsUq2wKCXrCKcdgoXwM6
+   mocTpfDhzlTnn/dbNcjExe7kO83e95q79zp9+7XfMw4H+jL3XSviOK8bc
+   vvS+nTXbdFexeYghrI3ygrBlQECWC/Wtb1Jp5mhpwEme82I3c9zV2uBun
    Q==;
-X-CSE-ConnectionGUID: pu3J4a77RRy5cSoCaDtS0A==
-X-CSE-MsgGUID: yZu85nj+S9+SWi4rbXapkw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6700056"
+X-CSE-ConnectionGUID: dK6owm9xR4GpFSOurCf1yg==
+X-CSE-MsgGUID: mShV2ocBTD2mmtQpcQH2xA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11027"; a="6700064"
 X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="6700056"
+   d="scan'208";a="6700064"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 19:09:42 -0700
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2024 19:09:44 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,162,1708416000"; 
-   d="scan'208";a="17301395"
+   d="scan'208";a="17301402"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
-  by orviesa006.jf.intel.com with ESMTP; 28 Mar 2024 19:09:42 -0700
+  by orviesa006.jf.intel.com with ESMTP; 28 Mar 2024 19:09:43 -0700
 From: "Chang S. Bae" <chang.seok.bae@intel.com>
 To: linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: ebiggers@kernel.org,
 	bernie.keany@intel.com,
 	charishma1.gairuboyina@intel.com,
 	chang.seok.bae@intel.com
-Subject: [PATCH v9 05/14] x86/msr-index: Add MSRs for Key Locker wrapping key
-Date: Thu, 28 Mar 2024 18:53:37 -0700
-Message-Id: <20240329015346.635933-6-chang.seok.bae@intel.com>
+Subject: [PATCH v9 06/14] x86/keylocker: Define Key Locker CPUID leaf
+Date: Thu, 28 Mar 2024 18:53:38 -0700
+Message-Id: <20240329015346.635933-7-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240329015346.635933-1-chang.seok.bae@intel.com>
 References: <20230603152227.12335-1-chang.seok.bae@intel.com>
@@ -74,58 +74,47 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The wrapping key resides in the same power domain as the CPU cache.
-Consequently, any sleep state that invalidates the cache, such as S3,
-also affects the wrapping key's state.
-
-However, as the wrapping key's state is inaccessible to software, a
-specialized mechanism is necessary to save and restore the key during
-deep sleep.
-
-A set of new MSRs is provided as an abstract interface for saving,
-restoring, and checking the wrapping key's status. The wrapping key
-is securely saved in a platform-scoped state using non-volatile media.
-Both the backup storage and its path from the CPU are encrypted and
-integrity-protected to ensure security.
-
-Define those MSRs for saving and restoring the key during S3/4 sleep
-states.
-
-Note that the non-volatility of the backup storage is not architecturally
-guaranteed across off-states such as S5 and G3. In such cases, the kernel
-may generate a new key during the next boot.
+Both Key Locker enabling code in the x86 core and AES Key Locker code
+in the crypto library will need to reference feature-specific CPUID bits.
+Define this CPUID leaf and bits.
 
 Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
 Reviewed-by: Dan Williams <dan.j.williams@intel.com>
 ---
-Changes from v8:
-* Tweak the changelog.
-
 Changes from v6:
-* Tweak the changelog -- put the last for those about other sleep states
+* Tweak the changelog -- comment the reason first and then brief the
+  change.
 
 Changes from RFC v2:
-* Update the changelog. (Dan Williams)
-* Rename the MSRs. (Dan Williams)
+* Separate out the code as a new patch.
 ---
- arch/x86/include/asm/msr-index.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/x86/include/asm/keylocker.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 05956bd8bacf..a451fa1e2cd9 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -1192,4 +1192,10 @@
- 						* a #GP
- 						*/
+diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
+index 4e731f577c50..1213d273c369 100644
+--- a/arch/x86/include/asm/keylocker.h
++++ b/arch/x86/include/asm/keylocker.h
+@@ -5,6 +5,7 @@
  
-+/* MSRs for managing a CPU-internal wrapping key for Key Locker. */
-+#define MSR_IA32_IWKEY_COPY_STATUS		0x00000990
-+#define MSR_IA32_IWKEY_BACKUP_STATUS		0x00000991
-+#define MSR_IA32_BACKUP_IWKEY_TO_PLATFORM	0x00000d91
-+#define MSR_IA32_COPY_IWKEY_TO_LOCAL		0x00000d92
+ #ifndef __ASSEMBLY__
+ 
++#include <linux/bits.h>
+ #include <asm/fpu/types.h>
+ 
+ /**
+@@ -21,5 +22,11 @@ struct iwkey {
+ 	struct reg_128_bit encryption_key[2];
+ };
+ 
++#define KEYLOCKER_CPUID			0x019
++#define KEYLOCKER_CPUID_EAX_SUPERVISOR	BIT(0)
++#define KEYLOCKER_CPUID_EBX_AESKLE	BIT(0)
++#define KEYLOCKER_CPUID_EBX_WIDE	BIT(2)
++#define KEYLOCKER_CPUID_EBX_BACKUP	BIT(4)
 +
- #endif /* _ASM_X86_MSR_INDEX_H */
+ #endif /*__ASSEMBLY__ */
+ #endif /* _ASM_KEYLOCKER_H */
 -- 
 2.34.1
 
