@@ -1,141 +1,127 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1566A8A7
-	for <linux-crypto@vger.kernel.org>; Fri, 29 Mar 2024 11:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917782A1A5;
+	Fri, 29 Mar 2024 11:56:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711712759; cv=none; b=EN7HyjD6JM7ljOAirRzfsXY+kTmpLt7v+7LWuXs0gNGBLcOQd4TkwwK+ZwY4WtYrigXynAxLxcIWZ+2ZWnz2NvWJyqVdiNISwUUbuvHhcXfuYHz/32FRcbkgo/zUQiHbsQ2Am7OUcPW51UR3Up9lFe35y05oy63iB5tIjxnKpk8=
+	t=1711713401; cv=none; b=iuSlqSDl2Fc8+nyjkCKA9CVFZBEunzEACBSu1NkdjaYVX7lmSU107xDS5yBWXLjqS69Ox7FTRhlviLVIpDy5Y++Lx7VUIWZo/fCs3om+aBn9EeQ4xVrDYiawWN+gRF+SRCqroFhJnDz0JznRvkZ4n6O0lOpD3bVv3TlQweghMak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711712759; c=relaxed/simple;
-	bh=kNMj+YT8/hRCP1/RW7aCBo3XA153NEDluUwsJT0u81M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pA6Qq9I4p400EHShnR4hKTEUP1aebzPPZCGJ/6i9HRRnz7tBRstQ5/obxy6opJbEIPkDoHCNFHqrISbprstkfrMMJe5eaKYqwbeQ3wPZRv2+jq0ZoZQwqahWPqXvfz21zT+1f9CRYaBS4TA0GrBR/+tgo474YlfEZrOHJJp/S+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ipqMQXrg; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711713401; c=relaxed/simple;
+	bh=zxYrkuVAUpLl4Z7Yj1bEeeQLX+DhAjPrTYcGONUQg80=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vk9dyGqZvvCgb5ArCv8pny65a3XaepoNRJElBnAkfZR7uGqIVrjERZkGJAh8oNv0i2qiIiZDsPsHdSKcbQ8pcxUqX4G42R8VNrUMw7wZKT886JLA7CmYX/OlCAV4j5aVbrCLsZ2/vamLaLh9YPt2LWQBQy1tld7D27kFt3qsbks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=A1q120mb; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ipqMQXrg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711712756;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+LLP6jd0zeIvxHanQorL3kqCJpFSSxGEDWd7CPARJUA=;
-	b=ipqMQXrgdMsGEYu0j2osRY1fuWMLdGgCZe4aPgvsS5bk6utG0ntwpfmtSAISqalJkEKcmO
-	ODoh3JoxMvdipSvz8JnT3J6zg3uIGGraKI4u5ItiEuaCYYgl53hsadV79Xl7MzJQZTatep
-	BKlyHXq5EkuCxt9NN/NwArCx6bkgRqQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-501-o2dDNmwNPK-0bVBqPDOqcA-1; Fri, 29 Mar 2024 07:45:55 -0400
-X-MC-Unique: o2dDNmwNPK-0bVBqPDOqcA-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-56c07b8b72fso860180a12.1
-        for <linux-crypto@vger.kernel.org>; Fri, 29 Mar 2024 04:45:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711712754; x=1712317554;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+LLP6jd0zeIvxHanQorL3kqCJpFSSxGEDWd7CPARJUA=;
-        b=bp1GxwcruAWnQ4nFlmn0o9CucPoU2bjLrEaRia9Z8JE2qkgF++YZsafAmt3qXMu/SH
-         TjB69HG3B9ZTJf2nrAwCpmSui9o1G3CzK3ohJ7b4U4WjTOkkMmCG4cKRSPuryfEa9sNZ
-         mZ1LCKqceKQq4jYm1L4pobBNNW/4scbnXr3C+iZLrpug3krWCkoVEm5XRUqQIHMmh2Hl
-         WWn1zDehMvEmK499hfG5lzJ+2cNUyr7L0RMpn5K5HTD+sPYL4K+VD6lJfvFh9xI0eMkJ
-         v3xFT4zEA2HqmcMPhqu7y9unGRa2zDhN7esdjUAkmwfuu4abM/3kZF/ACkF0gHiFKx2i
-         aMXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVWRY9L2NOI6bRMsR0h1yyrSZ89U7unaaFmHGV4fLkZPtTGGS1Tj2LDk/0CYfNGsNgYVekobodfzyGdMiD9CFLkxZzjT2cPhPFnz8Gu
-X-Gm-Message-State: AOJu0Yx6KJdaaM4dcbE8Az0VJ2CBU0KLSNRBUwgHzQBwb9RfTMVpit/R
-	8tapgPmvitbA1fnnu4tyCfG5DPPefVZ+NWNiaMg0lsgB2VmbFIZVkSAr1S4A6FnISLEXnHFfOOx
-	dD91kZ9ZME2WLpeaCqhsrc4SrMYQsRgCFdJx9KsqTXMYv12Z+kBneVnHEX4csdg==
-X-Received: by 2002:a50:9b1b:0:b0:566:4aa9:7143 with SMTP id o27-20020a509b1b000000b005664aa97143mr1413894edi.14.1711712753977;
-        Fri, 29 Mar 2024 04:45:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHYo6QfJYFEsVSF15QDDFwx8DOxbmiwf/M/DPk0Gc7NLZc79Ft95vFE1vuYwIhBFYvCdq0kyQ==
-X-Received: by 2002:a50:9b1b:0:b0:566:4aa9:7143 with SMTP id o27-20020a509b1b000000b005664aa97143mr1413848edi.14.1711712753534;
-        Fri, 29 Mar 2024 04:45:53 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-25-33.business.telecomitalia.it. [87.12.25.33])
-        by smtp.gmail.com with ESMTPSA id e12-20020a50d4cc000000b0056bf6287f32sm1991237edj.26.2024.03.29.04.45.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 04:45:52 -0700 (PDT)
-Date: Fri, 29 Mar 2024 12:45:46 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
-	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	David Airlie <airlied@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu <olvaffe@gmail.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
-	Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, 
-	Christian Schoenebeck <linux_oss@crudebyte.com>, Kalle Valo <kvalo@kernel.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, netdev@vger.kernel.org, 
-	v9fs@lists.linux.dev, kvm@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 16/22] net: vmw_vsock: virtio: drop owner assignment
-Message-ID: <xhr3nq5n5acn6m7lg7ai2cfaqvlc2a2nihruj54f7um2bjdpaf@tivbri5udlrb>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-16-0feffab77d99@linaro.org>
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="A1q120mb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1711713399; x=1743249399;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zxYrkuVAUpLl4Z7Yj1bEeeQLX+DhAjPrTYcGONUQg80=;
+  b=A1q120mbOqo+peb+Xn1uEY09ozOGHs4VPBoG9YfHCsACXgOvpZkxDsuX
+   XfNPLDQlfazBmAxMl8xuwNxpk0wI79q6ASXZrEiegYcpdNUJov206iLnI
+   pVZfMld1DCMfI8RCb/yN4p8vqKmc15YCYvh94JGRgs9Jrfvw+PSZOhBBZ
+   L77wUDfIDTnpxeeIziuCfb3gk9smkzeYmzNCQ6sJfy+vyy4bIl1aYb2qg
+   Z6dc6xyrqVY/iUDA2Ao7J22K5VNIyDQS24o7/TGkPqC67acOiEkzp1u2p
+   mSCvOHg8Lkcl19QZX57Vc47pmAdws1pz/tHdiTq/KGPOBcTYpAp+jNcmx
+   Q==;
+X-CSE-ConnectionGUID: KGRIKYohQPW4WiVaONZ8Dw==
+X-CSE-MsgGUID: myZA0OyZQzaL9Pl/CMrcMQ==
+X-IronPort-AV: E=Sophos;i="6.07,164,1708412400"; 
+   d="asc'?scan'208";a="18595909"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2024 04:56:37 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 29 Mar 2024 04:56:16 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex03.mchp-main.com (10.10.85.151)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
+ Transport; Fri, 29 Mar 2024 04:56:13 -0700
+Date: Fri, 29 Mar 2024 11:55:25 +0000
+From: Conor Dooley <conor.dooley@microchip.com>
+To: Alexey Romanov <avromanov@salutedevices.com>
+CC: Conor Dooley <conor@kernel.org>, "neil.armstrong@linaro.org"
+	<neil.armstrong@linaro.org>, "clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>, "robh+dt@kernel.org"
+	<robh+dt@kernel.org>, "krzysztof.kozlowski+dt@linaro.org"
+	<krzysztof.kozlowski+dt@linaro.org>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "khilman@baylibre.com" <khilman@baylibre.com>,
+	"jbrunet@baylibre.com" <jbrunet@baylibre.com>,
+	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
+Subject: Re: [PATCH v6 17/23] dt-bindings: crypto: meson: remove clk and
+ second interrupt line for GXL
+Message-ID: <20240329-dotted-illusive-9f0593805a05@wendy>
+References: <20240326153219.2915080-1-avromanov@salutedevices.com>
+ <20240326153219.2915080-18-avromanov@salutedevices.com>
+ <20240326-obscurity-angriness-d7bb48bc9eaa@spud>
+ <20240329111424.i2zp2coznqpnibk4@cab-wsm-0029881>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="OWDxAKnoP5FbCqUI"
 Content-Disposition: inline
-In-Reply-To: <20240327-module-owner-virtio-v1-16-0feffab77d99@linaro.org>
+In-Reply-To: <20240329111424.i2zp2coznqpnibk4@cab-wsm-0029881>
 
-On Wed, Mar 27, 2024 at 01:41:09PM +0100, Krzysztof Kozlowski wrote:
->virtio core already sets the .owner, so driver does not need to.
->
->Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->
->---
->
->Depends on the first patch.
->---
-> net/vmw_vsock/virtio_transport.c | 1 -
-> 1 file changed, 1 deletion(-)
+--OWDxAKnoP5FbCqUI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+On Fri, Mar 29, 2024 at 11:14:29AM +0000, Alexey Romanov wrote:
+> Hi Conor,
+>=20
+> On Tue, Mar 26, 2024 at 06:09:37PM +0000, Conor Dooley wrote:
+> > On Tue, Mar 26, 2024 at 06:32:13PM +0300, Alexey Romanov wrote:
+> > > GXL crypto IP uses DMA engine, which doesn't require clk input
+> > > and second interrupt line.
+> > >=20
+> > > Fixes: c4a0457eb858 ("ARM64: dts: amlogic: adds crypto hardware node")
+> >=20
+> > How does this fix a commit that only modifies a dts? The commit cited
+> > here should be a dt-bindings commit.
+>=20
+> Yep, my bad. Will fix it in next series.
+>=20
+> >=20
+> > However, your commit message says "require" but you do more than remove
+> > these as required, you remove them entirely. What am I missing?
+>=20
+> Crypto HW isn't connected to clk / 2nd interrput line, so we must remove
+> them from dt. I will reformulate commit message.
 
-Nit: you can use "vsock/virtio: " as prefix for the commit title.
+Yeah, please do. Be clear about the hardware not actually having these
+things. And hopefully Corentin can chime in as to why he thought it did.
 
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 1748268e0694..13f42a62b034 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -858,7 +858,6 @@ static struct virtio_driver virtio_vsock_driver = {
-> 	.feature_table = features,
-> 	.feature_table_size = ARRAY_SIZE(features),
-> 	.driver.name = KBUILD_MODNAME,
->-	.driver.owner = THIS_MODULE,
-> 	.id_table = id_table,
-> 	.probe = virtio_vsock_probe,
-> 	.remove = virtio_vsock_remove,
->
->-- 
->2.34.1
->
 
+--OWDxAKnoP5FbCqUI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZgasLQAKCRB4tDGHoIJi
+0nngAPsFHgCeAZUB7PIObsvIZP/P+DvGPq/PYOyGwboFETQrjAEAtkASonmxY4qS
+yt5TD7EbgaRPDqo9W4bjTUgkIn49Xws=
+=MGQH
+-----END PGP SIGNATURE-----
+
+--OWDxAKnoP5FbCqUI--
