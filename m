@@ -1,66 +1,66 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADED553E01
-	for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 21:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F3C1E898
+	for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 21:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711834558; cv=none; b=mK2jizNfxG9VHmSSZBvZOv6QjGjIeAngFOyDRTkyJ3Leaz1Va1dAbod4TVAy8YdKzqURe3upvRp/RMesFhGI5gXIpfKCSSNo8snDxEt7kzgOUTicq56K3gHtQPq1mV38G3+g1BzJI/gEiXZTKWbXP7+8PzqIcxtUd8yhroN1bog=
+	t=1711835060; cv=none; b=AgnkYl6BU177pCC/42kaXTPOxme34RVEfw+OO09sG84Ecnxxnxd4c4AEr1Yp1t45L9ZOEYGWFjXsmonvBPHldMbAAHkyAWgiqmrztlEpePcYuVg92tp0dQSyD6oSAjZuVbJQeU3nd7xRv92DX0d+7qbFNXb/FcMDtKjRP0+h3I0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711834558; c=relaxed/simple;
-	bh=XGP/bsxmN4UA90jlZmkSiIF6HI+T7qPBdxxu9QCdFjI=;
+	s=arc-20240116; t=1711835060; c=relaxed/simple;
+	bh=RMUAwxfBL6v+GOWep6RijyAhN1Eu1x5xeC0TGBvfsN8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZsHILqnU7JxzV7lD0u1g/5u8/S9mtmJ4pDD8qQlRIiIQ59As4x/pd2/KIU1fOubJj7jw6QUoJUrcgoFDuhx2TNyUrYeK0iLbQrUaX4VMx7ydR+evg+OL+dbopuaG6//RUXyWtVc2BlSOMnb3Iqu+Khs5YkBpuJsqxpN+WmVTHA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=edzURYOC; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=l1VELV71pSE+pitUxO6PZDLwfBWcKxg+NZBKgmvamMpNZDTWNVWFUNDJILdvT1WUWRcMgnNMdbsW48UzMaEtXGJbeN0Tp4hXRMD1kCBTUYfZ8luyvnqc+VHEPXo0CX9cJUVQcGY2C58L3O8/I+J53S+vh89JdFcw8bXSEaqFfq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jPSRLNX5; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="edzURYOC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPSRLNX5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711834553;
+	s=mimecast20190719; t=1711835057;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=R/YdumI8jd8jDImfb7MEXm8pAf+7owyDUrM2XftNAOY=;
-	b=edzURYOCFJVuOxIxSh1ksZBAL0UGPu7VXOXMLyCPfPp4rTQGswX93HzJ8EvG0r0mMucCZM
-	ywkHDRqKu3NE8vtnD7XOVdsc2SJQ02jMcMI8zXw6svXcoxmS16bWN+AwMfPA0Tm/bcGNHq
-	RxZL7PismjkuX8GtGL4nItNQLxvHbgQ=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=izlk5zYEPtQtitZfD1Xa4239xlrb4zQaz31TSnSFbO8=;
+	b=jPSRLNX5ioNiCLGGFgYa15v3rMLzyZj3JtGI5TQBGjZ4f04KM7UUddGP6/ukYlPmaWPi7N
+	vzZf0Y1EtVEI+HAzpoUQZSzLmOJV0LsGKdM/VgPmskY3R5zEhJTda9f6E3Z90q/XYPayyK
+	oYRnDncI3scGlF57yfr0bQjdbSy+dWA=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-8-RmynicKXOH-0H-BwJSYPHw-1; Sat, 30 Mar 2024 17:35:51 -0400
-X-MC-Unique: RmynicKXOH-0H-BwJSYPHw-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50e91f9d422so2894541e87.2
-        for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 14:35:50 -0700 (PDT)
+ us-mta-117-cBSYwqMsOFiIfVXKGdkDYQ-1; Sat, 30 Mar 2024 17:44:15 -0400
+X-MC-Unique: cBSYwqMsOFiIfVXKGdkDYQ-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a473f5a84aaso227899566b.2
+        for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 14:44:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711834548; x=1712439348;
+        d=1e100.net; s=20230601; t=1711835054; x=1712439854;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=R/YdumI8jd8jDImfb7MEXm8pAf+7owyDUrM2XftNAOY=;
-        b=IouwQLJ2RZGq+nmfEfo2RoHQX8cOVnn6y7J3PyJLuEmVh8Dy5fnLbAY7NFPF57x1ed
-         HSUJIOD5mdSSeL5gRGbOvmE1PAouwFQ4nGY6LEZlBOO+JcufJoDzy1AEqravyBInAcMu
-         eF+LonSu5Gb6ioQUuOkQMjC8aDJV2aqNCGqL+yP3DNHYfMFoi4Spyb3dh50cQdThSSUA
-         A5EDGUObV9jPKuI4w+yffjkngoG69cmkCfZoGml18yDZZXWXPImjbxRgHoktckgFbVpu
-         3goZ69ifnHkyEZNChhUWeb56GAn80/AmvyFnkWv+s0g4iyyJXY/r6E3/nJxnm9o/HgxI
-         d8HQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXgbdPKNpSp6x0pqfKIPH7UxydRGmQAsyq2wfAsNOF9Sefd/uzcOpJliopU2eHTtHwULlcYs4mO0/ifhDB5/hQy4wtXIscLoEyvQ0Oa
-X-Gm-Message-State: AOJu0YyPJSuW7MwDC/9Sg96ZOYuImIvc8NWkUzDXWgN7EzYwBPBDOyC2
-	ZDX3rSI3E78xHxq10hIUUkvGMmJESO6eh8H2p1z79F4S76qBQJmRs1570VAfl2zF7VJAho57Qfn
-	pnPpJ8V8V/9hkKNHH6p4O+le41idF1bYyEU6w8xJ4yrrB+Ib1ne5gmif7zZFp4w==
-X-Received: by 2002:ac2:4256:0:b0:515:a5b1:1dd0 with SMTP id m22-20020ac24256000000b00515a5b11dd0mr3175179lfl.55.1711834548603;
-        Sat, 30 Mar 2024 14:35:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGtpVK74hYMJQRsbSNAOxNo0vPDNEDLKCnR39FTY23/i2sK1bKLUmtvrUTSb2GUD2WssCJO3g==
-X-Received: by 2002:ac2:4256:0:b0:515:a5b1:1dd0 with SMTP id m22-20020ac24256000000b00515a5b11dd0mr3175156lfl.55.1711834548253;
-        Sat, 30 Mar 2024 14:35:48 -0700 (PDT)
+        bh=izlk5zYEPtQtitZfD1Xa4239xlrb4zQaz31TSnSFbO8=;
+        b=wPEt9/oTyqQBN7x1/VQ0oLwf6LBh2uXTfMpTJ+iG7gaRZoprv2E9WdtU4e+uroNE4b
+         wbADETChcmLc6+jrdv469jMc0aR3ggVeUzQLsNr0thyIOEi5R3VvGwp9TDlfIDZ6BSWR
+         4Jiju58YLD85ss/678OhI/+74ZiEkbAO5t+fAsg0SRxXoQQspwkdoiYv/8Q70kMfk/1q
+         rkK/h6PmP/IUWujmboBQlvLWNaiWxPA0LbIG/MSqc6rGFYHXsTxvWPUuC3MX0E1fYeEl
+         HiMv/ZPnlnaxDb0H9zTLppZ1n/m8rQFpwkmzWdmDOmpCdAoggE3mPwiWRShRsnz8lngc
+         Q/0A==
+X-Forwarded-Encrypted: i=1; AJvYcCWu2bzr3fGgn23SYlM0dL1SFCT002M8R3pEFlngrR4+3AP4yICROqGWZ+yzicvaxuivVyeu6jjnEvu/8YjjqELZFsKXnGLaOPWNgG/K
+X-Gm-Message-State: AOJu0YzS9ajh19iDGnUVTwOq1RPcPUPMegzW14HxnLShwQEvms9RRLn6
+	jZHSVqvoBxlx1MCCPnzqshth0CSU3obln3Z4DLPIx3Ua2UHNDa+dbILzBPfoS7jWK7fWw9Ixm7A
+	VlN+xS/4cfrq91+3G5WOlGCMtFn7P5mXNbLmVZGx85o5jFI8EiWc/rVbhOdoVpg==
+X-Received: by 2002:a17:906:24d7:b0:a4e:1aef:2d03 with SMTP id f23-20020a17090624d700b00a4e1aef2d03mr3493110ejb.69.1711835054358;
+        Sat, 30 Mar 2024 14:44:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEB4hhnolDV2VDW9ProjEjPrZSmimTTGsoO1Kt1nnLoSJpgttSbznq+JYF5W8Ur6uv2Wrybrg==
+X-Received: by 2002:a17:906:24d7:b0:a4e:1aef:2d03 with SMTP id f23-20020a17090624d700b00a4e1aef2d03mr3493096ejb.69.1711835053917;
+        Sat, 30 Mar 2024 14:44:13 -0700 (PDT)
 Received: from [192.168.10.4] ([151.95.49.219])
-        by smtp.googlemail.com with ESMTPSA id os26-20020a170906af7a00b00a465b72a1f3sm3494452ejb.85.2024.03.30.14.35.45
+        by smtp.googlemail.com with ESMTPSA id d6-20020a1709063ec600b00a474c3c2f9dsm3458900ejj.38.2024.03.30.14.44.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Mar 2024 14:35:47 -0700 (PDT)
-Message-ID: <abbe9937-7e0f-4fbd-be0b-488de07dd56c@redhat.com>
-Date: Sat, 30 Mar 2024 22:35:44 +0100
+        Sat, 30 Mar 2024 14:44:13 -0700 (PDT)
+Message-ID: <8153674b-1b66-4416-a3b8-b6b7867e77f4@redhat.com>
+Date: Sat, 30 Mar 2024 22:44:10 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,8 +68,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 25/29] KVM: SVM: Add module parameter to enable the
- SEV-SNP
+Subject: Re: [PATCH v12 00/29] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
 To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
 Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
@@ -82,10 +82,8 @@ Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
  tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
  alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
- Brijesh Singh <brijesh.singh@amd.com>
+ nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com
 References: <20240329225835.400662-1-michael.roth@amd.com>
- <20240329225835.400662-26-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -123,38 +121,209 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240329225835.400662-26-michael.roth@amd.com>
+In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/29/24 23:58, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+> This patchset is also available at:
 > 
-> Add a module parameter than can be used to enable or disable the SEV-SNP
-> feature. Now that KVM contains the support for the SNP set the GHCB
-> hypervisor feature flag to indicate that SNP is supported.
+>    https://github.com/amdese/linux/commits/snp-host-v12
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> and is based on top of the following series:
+> 
+>    [PATCH gmem 0/6] gmem fix-ups and interfaces for populating gmem pages
+>    https://lore.kernel.org/kvm/20240329212444.395559-1-michael.roth@amd.com/
+> 
+> which in turn is based on:
+> 
+>    https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=kvm-coco-queue
+> 
+> 
+> Patch Layout
+> ------------
+> 
+> 01-04: These patches are minor dependencies for this series and will
+>         eventually make their way upstream through other trees. They are
+>         included here only temporarily.
+> 
+> 05-09: These patches add some basic infrastructure and introduces a new
+>         KVM_X86_SNP_VM vm_type to handle differences verses the existing
+>         KVM_X86_SEV_VM and KVM_X86_SEV_ES_VM types.
+> 
+> 10-12: These implement the KVM API to handle the creation of a
+>         cryptographic launch context, encrypt/measure the initial image
+>         into guest memory, and finalize it before launching it.
+> 
+> 13-20: These implement handling for various guest-generated events such
+>         as page state changes, onlining of additional vCPUs, etc.
+> 
+> 21-24: These implement the gmem hooks needed to prepare gmem-allocated
+>         pages before mapping them into guest private memory ranges as
+>         well as cleaning them up prior to returning them to the host for
+>         use as normal memory. Because this supplants certain activities
+>         like issued WBINVDs during KVM MMU invalidations, there's also
+>         a patch to avoid duplicating that work to avoid unecessary
+>         overhead.
+> 
+> 25:    With all the core support in place, the patch adds a kvm_amd module
+>         parameter to enable SNP support.
+> 
+> 26-29: These patches all deal with the servicing of guest requests to handle
+>         things like attestation, as well as some related host-management
+>         interfaces.
+> 
+> 
+> Testing
+> -------
+> 
+> For testing this via QEMU, use the following tree:
+> 
+>    https://github.com/amdese/qemu/commits/snp-v4-wip2
+> 
+> A patched OVMF is also needed due to upstream KVM no longer supporting MMIO
+> ranges that are mapped as private. It is recommended you build the AmdSevX64
+> variant as it provides the kernel-hashing support present in this series:
+> 
+>    https://github.com/amdese/ovmf/commits/apic-mmio-fix1c
+> 
+> A basic command-line invocation for SNP would be:
+> 
+>   qemu-system-x86_64 -smp 32,maxcpus=255 -cpu EPYC-Milan-v2
+>    -machine q35,confidential-guest-support=sev0,memory-backend=ram1
+>    -object memory-backend-memfd,id=ram1,size=4G,share=true,reserve=false
+>    -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,id-auth=
+>    -bios /home/mroth/ovmf/OVMF_CODE-upstream-20240228-apicfix-1c-AmdSevX64.fd
+> 
+> With kernel-hashing and certificate data supplied:
+> 
+>   qemu-system-x86_64 -smp 32,maxcpus=255 -cpu EPYC-Milan-v2
+>    -machine q35,confidential-guest-support=sev0,memory-backend=ram1
+>    -object memory-backend-memfd,id=ram1,size=4G,share=true,reserve=false
+>    -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,id-auth=,certs-path=/home/mroth/cert.blob,kernel-hashes=on
+>    -bios /home/mroth/ovmf/OVMF_CODE-upstream-20240228-apicfix-1c-AmdSevX64.fd
+>    -kernel /boot/vmlinuz-6.8.0-snp-host-v12-wip40+
+>    -initrd /boot/initrd.img-6.8.0-snp-host-v12-wip40+
+>    -append "root=UUID=d72a6d1c-06cf-4b79-af43-f1bac4f620f9 ro console=ttyS0,115200n8"
+> 
+> 
+> Known issues / TODOs
+> --------------------
+> 
+>   * Base tree in some cases reports "Unpatched return thunk in use. This should
+>     not happen!" the first time it runs an SVM/SEV/SNP guests. This a recent
+>     regression upstream and unrelated to this series:
+> 
+>       https://lore.kernel.org/linux-kernel/CANpmjNOcKzEvLHoGGeL-boWDHJobwfwyVxUqMq2kWeka3N4tXA@mail.gmail.com/T/
+> 
+>   * 2MB hugepage support has been dropped pending discussion on how we plan
+>     to re-enable it in gmem.
+> 
+>   * Host kexec should work, but there is a known issue with handling host
+>     kdump while SNP guests are running which will be addressed as a follow-up.
+> 
+>   * SNP kselftests are currently a WIP and will be included as part of SNP
+>     upstreaming efforts in the near-term.
+> 
+> 
+> SEV-SNP Overview
+> ----------------
+> 
+> This part of the Secure Encrypted Paging (SEV-SNP) series focuses on the
+> changes required to add KVM support for SEV-SNP. This series builds upon
+> SEV-SNP guest support, which is now in mainline, and and SEV-SNP host
+> initialization support, which is now in linux-next.
+> 
+> While series provides the basic building blocks to support booting the
+> SEV-SNP VMs, it does not cover all the security enhancement introduced by
+> the SEV-SNP such as interrupt protection, which will added in the future.
+> 
+> With SNP, when pages are marked as guest-owned in the RMP table, they are
+> assigned to a specific guest/ASID, as well as a specific GFN with in the
+> guest. Any attempts to map it in the RMP table to a different guest/ASID,
+> or a different GFN within a guest/ASID, will result in an RMP nested page
+> fault.
+> 
+> Prior to accessing a guest-owned page, the guest must validate it with a
+> special PVALIDATE instruction which will set a special bit in the RMP table
+> for the guest. This is the only way to set the validated bit outside of the
+> initial pre-encrypted guest payload/image; any attempts outside the guest to
+> modify the RMP entry from that point forward will result in the validated
+> bit being cleared, at which point the guest will trigger an exception if it
+> attempts to access that page so it can be made aware of possible tampering.
+> 
+> One exception to this is the initial guest payload, which is pre-validated
+> by the firmware prior to launching. The guest can use Guest Message requests
+> to fetch an attestation report which will include the measurement of the
+> initial image so that the guest can verify it was booted with the expected
+> image/environment.
+> 
+> After boot, guests can use Page State Change requests to switch pages
+> between shared/hypervisor-owned and private/guest-owned to share data for
+> things like DMA, virtio buffers, and other GHCB requests.
+> 
+> In this implementation of SEV-SNP, private guest memory is managed by a new
+> kernel framework called guest_memfd (gmem). With gmem, a new
+> KVM_SET_MEMORY_ATTRIBUTES KVM ioctl has been added to tell the KVM
+> MMU whether a particular GFN should be backed by shared (normal) memory or
+> private (gmem-allocated) memory. To tie into this, Page State Change
+> requests are forward to userspace via KVM_EXIT_VMGEXIT exits, which will
+> then issue the corresponding KVM_SET_MEMORY_ATTRIBUTES call to set the
+> private/shared state in the KVM MMU.
+> 
+> The gmem / KVM MMU hooks implemented in this series will then update the RMP
+> table entries for the backing PFNs to set them to guest-owned/private when
+> mapping private pages into the guest via KVM MMU, or use the normal KVM MMU
+> handling in the case of shared pages where the corresponding RMP table
+> entries are left in the default shared/hypervisor-owned state.
+> 
+> Feedback/review is very much appreciated!
+> 
+> -Mike
+> 
+> Changes since v11:
+> 
+>   * Rebase series on kvm-coco-queue and re-work to leverage more
+>     infrastructure between SNP/TDX series.
+>   * Drop KVM_SNP_INIT in favor of the new KVM_SEV_INIT2 interface introduced
+>     here (Paolo):
+>       https://lore.kernel.org/lkml/20240318233352.2728327-1-pbonzini@redhat.com/
+>   * Drop exposure API fields related to things like VMPL levels, migration
+>     agents, etc., until they are actually supported/used (Sean)
+>   * Rework KVM_SEV_SNP_LAUNCH_UPDATE handling to use a new
+>     kvm_gmem_populate() interface instead of copying data directly into
+>     gmem-allocated pages (Sean)
+>   * Add support for SNP_LOAD_VLEK, rework the SNP_SET_CONFIG_{START,END} to
+>     have simpler semantics that are applicable to management of SNP_LOAD_VLEK
+>     updates as well, rename interfaces to the now more appropriate
+>     SNP_{PAUSE,RESUME}_ATTESTATION
+>   * Fix up documentation wording and do print warnings for
+>     userspace-triggerable failures (Peter, Sean)
+>   * Fix a race with AP_CREATION wake-up events (Jacob, Sean)
+>   * Fix a memory leak with VMSA pages (Sean)
+>   * Tighten up handling of RMP page faults to better distinguish between real
+>     and spurious cases (Tom)
+>   * Various patch/documentation rewording, cleanups, etc.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+I skipped a few patches that deal mostly with AMD ABIs.  Here are the 
+ones that have nontrivial remarks, that are probably be worth a reply 
+before sending v13:
 
-> ---
->   arch/x86/kvm/svm/sev.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 3e8de7cb3c89..658116537f3f 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -48,7 +48,8 @@ static bool sev_es_enabled = true;
->   module_param_named(sev_es, sev_es_enabled, bool, 0444);
->   
->   /* enable/disable SEV-SNP support */
-> -static bool sev_snp_enabled;
-> +static bool sev_snp_enabled = true;
-> +module_param_named(sev_snp, sev_snp_enabled, bool, 0444);
->   
->   /* enable/disable SEV-ES DebugSwap support */
->   static bool sev_es_debug_swap_enabled = true;
+- patch 10: some extra checks on input parameters, and possibly 
+forbidding SEV/SEV-ES ioctls for SEV-SNP guests?
+
+- patch 12: a (hopefully) simple question on boot_vcpu_handled
+
+- patch 18: see Sean's objections at 
+https://lore.kernel.org/lkml/ZeCqnq7dLcJI41O9@google.com/
+
+- patch 22: question on ignoring PSMASH failures and possibly adding a 
+kvm_arch_gmem_invalidate_begin() API.
+
+With respect to the six preparatory patches, I'll merge them in 
+kvm-coco-queue early next week.  However I'll explode the arguments to 
+kvm_gmem_populate(), while also removing "memslot" and merging "src" 
+with "do_memcpy".  I'll post my version very early.
+
+Paolo
 
