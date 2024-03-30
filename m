@@ -1,66 +1,66 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CD541C93
-	for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 19:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30943A1D3
+	for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 19:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711826949; cv=none; b=CHjZ9zGRCLwVXHkLWyNsP39zmQzT9afZMOhbTBMLHmcqmOOMUcnv5oHpcKXme1rFboPNo5DIYHVcuC8uCFzHoCqvYe+OAfj59AlAtjfaS9uV4WnbEHGvaAfzdE/1y+iWnZtultUzd3TlfAHElXSv6u1n3r1uVVTfVhNBf4Uj8lY=
+	t=1711828732; cv=none; b=upsdmn3j/pblS7NhXXEH6xygwKdcvvz/mK9Ll0qfwlK6LZ21tP9ttmyxN/LvnE/isnknVeYxPJOmk8zhiPgk4ESeH0u11vq2DD3gfe2HqVw/rQn/h7pHY+dXvdcPwdQyf3YGd+kUeXTVrMpPY2MWTbe34rA/ztCmYqPfrnFp+Cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711826949; c=relaxed/simple;
-	bh=svQzHCHWAzJY7vKIICdKjhh9jaM85RqqfFZ0r/q+89k=;
+	s=arc-20240116; t=1711828732; c=relaxed/simple;
+	bh=hf3cXG5C0fUquGqLTgPc2V579FQipFG2QTQsJrAH3ko=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=shOjAhSRHT4uzzhBauT5TAWIp9/BHDByfDD/QD9aNfqJBD3dO/YbaX473CgLfqHCyX20G8xFixQVoIbTNwDeJFb8HFtv6RSrRhSKMo6Bh16xocDHth5CC6GSkT5LeagL/ZSJb9pfbVDBNkv97bKR/MLIR1prK2muYH09SH7ZHd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=INJzhWa0; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=bBm/vyNIenr9IkcGCgfp390EkKYO6en9DoEEY3BnAAVS6FwBUXrX5p9FJi+IBxX2osSrWQR0Hgm+9hrmNQP5YztsrY0zrgNnFsIpoIjOjPgYdNywWPWM0GJ87/SNsvEWdA3dhI8SUbCcmxi1A3+fpMO3xB28VZrfIY61tNjyEUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=duft3vH1; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="INJzhWa0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="duft3vH1"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711826946;
+	s=mimecast20190719; t=1711828729;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=PZaO6UZD4eKxQJPlCVYZh4cOEQwmdgnhpSX42zJ6FmI=;
-	b=INJzhWa0IQ1sbnHgk183CLrfh+vfnTXazgNE36Uc8p4kGH/9ilq+dqQE4LkM2zcX5BXYsG
-	pEsTUgyPkbiqZsrQ6Z++ey2GfZo5Wd/UGa2XQ1Rs3d+IftJp9/eTVKdM0Yvp6Dp1sXS0jO
-	ULqjfHerGkoVjKJrIF6VfC0mpUndThU=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=YCminwhNWaoRY7+GIgboB+tGovxzzkyeTmQzRWRZumA=;
+	b=duft3vH1yVmFBtYxqEtAr6+Ah76eSdIuOFTA88cLBJ0tmz4lIlY8ZAl71zC/lnBfViQ+ry
+	Lp2Gkbgh+uMa3vPAFscumXZZeRGMI+eSGY0xGfQnu6ws9pIGuDFeWyQTk53z2oVAaXKA05
+	FqIwrFLvVoUIfqaNcvu3wjm7Wb1RLjo=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-557-vtHfOYX4MWi72wTdHG_j5w-1; Sat, 30 Mar 2024 15:29:01 -0400
-X-MC-Unique: vtHfOYX4MWi72wTdHG_j5w-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-516a50d2d1cso60275e87.3
-        for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 12:29:00 -0700 (PDT)
+ us-mta-687-ZfCBeSszNPWft5mXQ_rn0A-1; Sat, 30 Mar 2024 15:58:48 -0400
+X-MC-Unique: ZfCBeSszNPWft5mXQ_rn0A-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a45acc7f191so195947766b.0
+        for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 12:58:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711826940; x=1712431740;
+        d=1e100.net; s=20230601; t=1711828727; x=1712433527;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PZaO6UZD4eKxQJPlCVYZh4cOEQwmdgnhpSX42zJ6FmI=;
-        b=wEM/IZGh+fEFcCwnF9jlzuiTfrqiZ7+DcDVnbGakpbqIFJL9M9lxYVfc10cHLViz6Z
-         NGVlXoLhnQLpyAl64teLIOyoKzJXt8seDJhBv31wKurZsivLkwPGX3oqnDYtTRIIChID
-         IPiNedW7AAMUpNuuUGc93zFFsQRYWT1U68dKNthn4NXAK6eKtJTDaRuLgZ9nktZRVTde
-         /OC8n0bBLx4PiPqLAJEjlveAhWV+Qd2cq85Y9cSpOghlJoZf98ZXVxS9GgEgAtDgBJpA
-         4tY+Fiy61vWjvlDG4Pj/XjMnXNIxcvs0Gd/htT9qXF2RG9kTLZOb7WoU5Hlq+ybLtZpa
-         X9zQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkTVnFbE+UC9RR57er8qbU0ro59uZfcmRZ/5s6MUHisCD0G1LybmAeXPmOjlfECzS9fQn/j4dTRWFDoIexgKuGXxZijbfJmpTkSs2W
-X-Gm-Message-State: AOJu0YxkRoaMLybGxJB1xRI3I6MoftmVCMfdX0pbI73VPS6kfSG9c+9+
-	aFfdjCrbSVNGGq/Vje4yCGdFFlXMzFIsHNdk6EPRC9y8uNL8QBhB/OaJk5ZsWldk21JmsEumdyP
-	LcLdcGcLavvc6SqFXvYdUDHbQoKdRfxZPU9Hu4pJ8E+3b2+ztWd5ANdDk5qBBgw==
-X-Received: by 2002:ac2:4e95:0:b0:513:d5bb:3017 with SMTP id o21-20020ac24e95000000b00513d5bb3017mr3570663lfr.36.1711826939898;
-        Sat, 30 Mar 2024 12:28:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IETWcn309M29ldNyARl5R+qPDZ0V3Erl1H0snBe9+7BpyUQrrJ8JzUkquCV4HqdUnWN7bubKg==
-X-Received: by 2002:ac2:4e95:0:b0:513:d5bb:3017 with SMTP id o21-20020ac24e95000000b00513d5bb3017mr3570651lfr.36.1711826939419;
-        Sat, 30 Mar 2024 12:28:59 -0700 (PDT)
+        bh=YCminwhNWaoRY7+GIgboB+tGovxzzkyeTmQzRWRZumA=;
+        b=S1L5wc9UxaqPSddaA5Rduwrl12DdbRNBa4IeDVe6bMcGcwaAzrH7XNd7BwLVZnNErf
+         By4PqXJ5JVY2w6swRLH5Udd2ylvdswIVvEL6EAf2eN8vLdNnTljjaJ7qy+V9iwnN5b6h
+         70msI6qF/j+oSpB9YsI652i2hxGZQaM758t7zgzOXUKT7bjNuhOWuvx0p+Z52Ifo5FIE
+         ZsAueFPmRlT9f9XThCiqAXmY6PfESW0PULzLly6MhQLPPrO/XTklZPgSGQk9i3Lqhv2/
+         4EECTeI2pSsQHBFtOmz2dgfbeqhNsByuCJWTcVP4g1D5wneGMMNrLcUtWB8letO7gRQ2
+         8srQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW5loZoIg1bl4qrt4CIk5rD41agz2bUBkzbXKpl8uSf4E8PbTpuIiVYD6osNQe5Qe9Zo+v0GYEFadDQg5HGpPaLlUyTraWYQ981x+2A
+X-Gm-Message-State: AOJu0YxDAAARHCc8OiYpra4GB96ZYnTxkfh4kY9dQZbsy3jmTsFd2+cj
+	oyzitdC2ipQvLK94KueyXrS6KIoeKlfHUytr76WFmJesoODxXRL4Xu4ynBohd18iqjwGvmvfIuz
+	VIL2lkX8IUU08bV4QjjaU7/D/9o7gXcV0zeuUD4jOsE8yF2nPRDmNrfX1+sRhUw==
+X-Received: by 2002:a17:906:1c4a:b0:a4e:42f3:3c87 with SMTP id l10-20020a1709061c4a00b00a4e42f33c87mr2570754ejg.60.1711828726966;
+        Sat, 30 Mar 2024 12:58:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHy+R3udwrEk7qE8kYGBy3X2m7ot4CCo2QHYfwudjqdFowZGSCCNoO42aevE6XNUz55Zs9VnA==
+X-Received: by 2002:a17:906:1c4a:b0:a4e:42f3:3c87 with SMTP id l10-20020a1709061c4a00b00a4e42f33c87mr2570749ejg.60.1711828726490;
+        Sat, 30 Mar 2024 12:58:46 -0700 (PDT)
 Received: from [192.168.10.4] ([151.95.49.219])
-        by smtp.googlemail.com with ESMTPSA id q27-20020a170906389b00b00a4e2dc1283asm2570523ejd.50.2024.03.30.12.28.56
+        by smtp.googlemail.com with ESMTPSA id wk8-20020a170907054800b00a4e2d7dd2d8sm2617304ejb.182.2024.03.30.12.58.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Mar 2024 12:28:58 -0700 (PDT)
-Message-ID: <3ea21d49-85d8-4631-b94e-6b2fd38a31a8@redhat.com>
-Date: Sat, 30 Mar 2024 20:28:55 +0100
+        Sat, 30 Mar 2024 12:58:45 -0700 (PDT)
+Message-ID: <1296cfd8-3986-4c2f-be94-771ae3fb84f2@redhat.com>
+Date: Sat, 30 Mar 2024 20:58:43 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,8 +68,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 05/29] KVM: x86: Define RMP page fault error bits for
- #NPF
+Subject: Re: [PATCH v12 09/29] KVM: SEV: Add initial SEV-SNP support
 To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
 Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
@@ -85,7 +84,7 @@ Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
  Brijesh Singh <brijesh.singh@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
- <20240329225835.400662-6-michael.roth@amd.com>
+ <20240329225835.400662-10-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -123,67 +122,186 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240329225835.400662-6-michael.roth@amd.com>
+In-Reply-To: <20240329225835.400662-10-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/29/24 23:58, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+> SEV-SNP builds upon existing SEV and SEV-ES functionality while adding
+> new hardware-based security protection. SEV-SNP adds strong memory
+> encryption and integrity protection to help prevent malicious
+> hypervisor-based attacks such as data replay, memory re-mapping, and
+> more, to create an isolated execution environment.
 > 
-> When SEV-SNP is enabled globally, the hardware places restrictions on
-> all memory accesses based on the RMP entry, whether the hypervisor or a
-> VM, performs the accesses. When hardware encounters an RMP access
-> violation during a guest access, it will cause a #VMEXIT(NPF) with a
-> number of additional bits set to indicate the reasons for the #NPF.
-> Define those here.
-> 
-> See APM2 section 16.36.10 for more details.
+> Define a new KVM_X86_SNP_VM type which makes use of these capabilities
+> and extend the KVM_SEV_INIT2 ioctl to support it. Also add a basic
+> helper to check whether SNP is enabled.
 > 
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> [mdr: add some additional details to commit message]
+> [mdr: commit fixups, use similar ASID reporting as with SEV/SEV-ES]
 > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>   arch/x86/include/asm/svm.h      |  3 ++-
+>   arch/x86/include/uapi/asm/kvm.h |  1 +
+>   arch/x86/kvm/svm/sev.c          | 21 ++++++++++++++++++++-
+>   arch/x86/kvm/svm/svm.c          |  3 ++-
+>   arch/x86/kvm/svm/svm.h          | 12 ++++++++++++
+>   arch/x86/kvm/x86.c              |  2 +-
+>   6 files changed, 38 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index 728c98175b9c..544a43c1cf11 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -285,7 +285,8 @@ static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == X2AVIC_
+>   
+>   #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
+>   
+> -#define SVM_SEV_FEAT_DEBUG_SWAP                        BIT(5)
+> +#define SVM_SEV_FEAT_SNP_ACTIVE				BIT(0)
+> +#define SVM_SEV_FEAT_DEBUG_SWAP				BIT(5)
+>   
+>   struct vmcb_seg {
+>   	u16 selector;
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 51b13080ed4b..725b75cfe9ff 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -868,5 +868,6 @@ struct kvm_hyperv_eventfd {
+>   #define KVM_X86_SW_PROTECTED_VM	1
+>   #define KVM_X86_SEV_VM		2
+>   #define KVM_X86_SEV_ES_VM	3
+> +#define KVM_X86_SNP_VM		4
+>   
+>   #endif /* _ASM_X86_KVM_H */
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 1e65f5634ad3..3d9771163562 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -46,6 +46,9 @@ module_param_named(sev, sev_enabled, bool, 0444);
+>   static bool sev_es_enabled = true;
+>   module_param_named(sev_es, sev_es_enabled, bool, 0444);
+>   
+> +/* enable/disable SEV-SNP support */
+> +static bool sev_snp_enabled;
+> +
+>   /* enable/disable SEV-ES DebugSwap support */
+>   static bool sev_es_debug_swap_enabled = true;
+>   module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0444);
+> @@ -275,6 +278,9 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>   	sev->es_active = es_active;
+>   	sev->vmsa_features = data->vmsa_features;
+>   
+> +	if (vm_type == KVM_X86_SNP_VM)
+> +		sev->vmsa_features |= SVM_SEV_FEAT_SNP_ACTIVE;
+> +
+>   	ret = sev_asid_new(sev);
+>   	if (ret)
+>   		goto e_no_asid;
+> @@ -326,7 +332,8 @@ static int sev_guest_init2(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>   		return -EINVAL;
+>   
+>   	if (kvm->arch.vm_type != KVM_X86_SEV_VM &&
+> -	    kvm->arch.vm_type != KVM_X86_SEV_ES_VM)
+> +	    kvm->arch.vm_type != KVM_X86_SEV_ES_VM &&
+> +	    kvm->arch.vm_type != KVM_X86_SNP_VM)
+>   		return -EINVAL;
+>   
+>   	if (copy_from_user(&data, u64_to_user_ptr(argp->data), sizeof(data)))
+> @@ -2297,11 +2304,16 @@ void __init sev_set_cpu_caps(void)
+>   		kvm_cpu_cap_set(X86_FEATURE_SEV_ES);
+>   		kvm_caps.supported_vm_types |= BIT(KVM_X86_SEV_ES_VM);
+>   	}
+> +	if (sev_snp_enabled) {
+> +		kvm_cpu_cap_set(X86_FEATURE_SEV_SNP);
+> +		kvm_caps.supported_vm_types |= BIT(KVM_X86_SNP_VM);
+> +	}
+>   }
+>   
+>   void __init sev_hardware_setup(void)
+>   {
+>   	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
+> +	bool sev_snp_supported = false;
+>   	bool sev_es_supported = false;
+>   	bool sev_supported = false;
+>   
+> @@ -2382,6 +2394,7 @@ void __init sev_hardware_setup(void)
+>   	sev_es_asid_count = min_sev_asid - 1;
+>   	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count));
+>   	sev_es_supported = true;
+> +	sev_snp_supported = sev_snp_enabled && cc_platform_has(CC_ATTR_HOST_SEV_SNP);
+>   
+>   out:
+>   	if (boot_cpu_has(X86_FEATURE_SEV))
+> @@ -2394,9 +2407,15 @@ void __init sev_hardware_setup(void)
+>   		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
+>   			sev_es_supported ? "enabled" : "disabled",
+>   			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
+> +	if (boot_cpu_has(X86_FEATURE_SEV_SNP))
+> +		pr_info("SEV-SNP %s (ASIDs %u - %u)\n",
+> +			sev_snp_supported ? "enabled" : "disabled",
+> +			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
+>   
+>   	sev_enabled = sev_supported;
+>   	sev_es_enabled = sev_es_supported;
+> +	sev_snp_enabled = sev_snp_supported;
+> +
+>   	if (!sev_es_enabled || !cpu_feature_enabled(X86_FEATURE_DEBUG_SWAP) ||
+>   	    !cpu_feature_enabled(X86_FEATURE_NO_NESTED_DATA_BP))
+>   		sev_es_debug_swap_enabled = false;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 0f3b59da0d4a..2c162f6a1d78 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4890,7 +4890,8 @@ static int svm_vm_init(struct kvm *kvm)
+>   
+>   	if (type != KVM_X86_DEFAULT_VM &&
+>   	    type != KVM_X86_SW_PROTECTED_VM) {
+> -		kvm->arch.has_protected_state = (type == KVM_X86_SEV_ES_VM);
+> +		kvm->arch.has_protected_state =
+> +			(type == KVM_X86_SEV_ES_VM || type == KVM_X86_SNP_VM);
+>   		to_kvm_sev_info(kvm)->need_init = true;
+>   	}
+>   
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 157eb3f65269..4a01a81dd9b9 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -348,6 +348,18 @@ static __always_inline bool sev_es_guest(struct kvm *kvm)
+>   #endif
+>   }
+>   
+> +static __always_inline bool sev_snp_guest(struct kvm *kvm)
+> +{
+> +#ifdef CONFIG_KVM_AMD_SEV
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +
+> +	return (sev->vmsa_features & SVM_SEV_FEAT_SNP_ACTIVE) &&
+> +	       !WARN_ON_ONCE(!sev_es_guest(kvm));
+> +#else
+> +	return false;
+> +#endif
+> +}
+> +
+>   static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
+>   {
+>   	vmcb->control.clean = 0;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 64eda7949f09..f85735b6235d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12603,7 +12603,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   
+>   	kvm->arch.vm_type = type;
+>   	kvm->arch.has_private_mem =
+> -		(type == KVM_X86_SW_PROTECTED_VM);
+> +		(type == KVM_X86_SW_PROTECTED_VM || type == KVM_X86_SNP_VM);
+>   
+>   	ret = kvm_page_track_init(kvm);
+>   	if (ret)
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-One nit below.
-
-
-> ---
->   arch/x86/include/asm/kvm_host.h | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 90dc0ae9311a..a3f8eba8d8b6 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -262,9 +262,12 @@ enum x86_intercept_stage;
->   #define PFERR_FETCH_BIT 4
->   #define PFERR_PK_BIT 5
->   #define PFERR_SGX_BIT 15
-> +#define PFERR_GUEST_RMP_BIT 31
->   #define PFERR_GUEST_FINAL_BIT 32
->   #define PFERR_GUEST_PAGE_BIT 33
->   #define PFERR_GUEST_ENC_BIT 34
-> +#define PFERR_GUEST_SIZEM_BIT 35
-> +#define PFERR_GUEST_VMPL_BIT 36
->   #define PFERR_IMPLICIT_ACCESS_BIT 48
->   
->   #define PFERR_PRESENT_MASK	BIT(PFERR_PRESENT_BIT)
-> @@ -277,7 +280,10 @@ enum x86_intercept_stage;
->   #define PFERR_GUEST_FINAL_MASK	BIT_ULL(PFERR_GUEST_FINAL_BIT)
->   #define PFERR_GUEST_PAGE_MASK	BIT_ULL(PFERR_GUEST_PAGE_BIT)
->   #define PFERR_GUEST_ENC_MASK	BIT_ULL(PFERR_GUEST_ENC_BIT)
-> +#define PFERR_GUEST_RMP_MASK	BIT_ULL(PFERR_GUEST_RMP_BIT)
-> +#define PFERR_GUEST_SIZEM_MASK	BIT_ULL(PFERR_GUEST_SIZEM_BIT)
->   #define PFERR_IMPLICIT_ACCESS	BIT_ULL(PFERR_IMPLICIT_ACCESS_BIT)
-> +#define PFERR_GUEST_VMPL_MASK	BIT_ULL(PFERR_GUEST_VMPL_BIT)
-
-Should be kept in either bit order or perhaps alphabetical order 
-(probably bit is better).
-
 Paolo
-
->   #define PFERR_NESTED_GUEST_PAGE (PFERR_GUEST_PAGE_MASK |	\
->   				 PFERR_WRITE_MASK |		\
 
