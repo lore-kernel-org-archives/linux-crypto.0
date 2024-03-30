@@ -1,85 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0119B7FB;
-	Sat, 30 Mar 2024 07:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A829B7FB;
+	Sat, 30 Mar 2024 07:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711782280; cv=none; b=NClnz5hTmHhjpmggQHjUD8wqAHC+oiqw4ql6Mjblgdm6V4ia0OJ4MdrlbUCTM94oPIlYPENDjivp7nFiDvRQypWovHc8wK3kUTt2vzuA2FsnWZMNdtOJdnv3YLcyvXpNa8HZscOmIeVd1mfih4M46EOqJ8Ycwb5VDfaAfRJW4n0=
+	t=1711782621; cv=none; b=sLVUoNhemXUF3SqdS0UKOvPLPwVDzqr8ea0lgFcIrND2ojig2D2ENOpqmX1F6NtUb+ZCcdJXl112j9r+K+MqRDC3sQoiwR94/dKvTBy/FJU0ME3cO43NRwbw7SoMUgNXx/sV5T++T9CtmZl5rdDO9bgP230bDSSCaZzY635+epI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711782280; c=relaxed/simple;
-	bh=6skwf4Qku9XlVc9hVSWid4iW7kN43KKMxd9CZDDFHhE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OSKQ8f6JePNYk/k6avA4FszrYUBqLC49XBMQ6gtf3VaOnhv/VaFz15ssmvetZ8m7N+TcaGSYqwBj8y2+/Bzf0sr9BJzeyrgCZQ81EpxSX0h6UPqhl6QGACC2iavfYpsAk2N+GRSsEeET9uy3rw9rDyaP6n+X3phxzuDVlL1c0AU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YUseh+i5; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YUseh+i5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30554C433C7;
-	Sat, 30 Mar 2024 07:04:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711782278;
-	bh=6skwf4Qku9XlVc9hVSWid4iW7kN43KKMxd9CZDDFHhE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YUseh+i5ndxW1primh8pCO2E/8TcMJ1bPVKtdAnBpp34J90y5pfd2lCIVIurFnpCF
-	 qUonlKS0MzoE3hYx77FM0N3ocDVFhCQOxtJrHjsBDKzkqYSpYGg5nNRFvNhvuQ242X
-	 kYRu3iHREYRhqL5/iJl0o5yh2Qg1uvK1LjVBGrVlH6y3I2xaTNJti0PFtKTd0tOucI
-	 MATCPMf2L7/yedOfhCyS6roaMc1fQFzELcb1DTTiyyoQGTiXQAOgU9DYw78mvsOC1b
-	 eiYs+k87RN1Slf1fM32DtPDORUnnREpf7rXkiX6T2gWKj7ttU+Bv0GvugbZQOnAD2c
-	 NBdl+o9JUzy8Q==
-Date: Sat, 30 Mar 2024 00:04:36 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Zhang Yiqun <zhangyiqun@phytium.com.cn>
-Cc: dhowells@redhat.com, jarkko@kernel.org, corbet@lwn.net,
-	keyrings@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] KEYS: Add ECDH support
-Message-ID: <20240330070436.GA2116@sol.localdomain>
-References: <20240330065506.3146-1-zhangyiqun@phytium.com.cn>
+	s=arc-20240116; t=1711782621; c=relaxed/simple;
+	bh=r4Oy+hqcgYLrYbY0rLIagGI+zMskFwfr1KTW2NYfuyY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=bFUOqHscGoQX5QLi+WgIL9sCpgSU6WHC7q27XESWGWVD5HMqNeFoUP0Enmz2tpMoEjCXzyW95N5Y6zrwD5hpJ8pxNH4qPYwBVx4eGjmdWwcSKDWd11W8mslP6Ojk71M6KDF2aETf1GGDetJrVWd79Iez7acvN0NxrwK5SeFesRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4V67f256PbzNmnP;
+	Sat, 30 Mar 2024 15:08:10 +0800 (CST)
+Received: from dggpemd200003.china.huawei.com (unknown [7.185.36.122])
+	by mail.maildlp.com (Postfix) with ESMTPS id B1FD514010C;
+	Sat, 30 Mar 2024 15:10:14 +0800 (CST)
+Received: from [10.67.120.171] (10.67.120.171) by
+ dggpemd200003.china.huawei.com (7.185.36.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sat, 30 Mar 2024 15:10:14 +0800
+Message-ID: <2251e63b-01f9-415f-bae3-9c64b7d7a7ac@huawei.com>
+Date: Sat, 30 Mar 2024 15:10:14 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240330065506.3146-1-zhangyiqun@phytium.com.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] misc: uacce - add the null check for the input pointer
+ and its pointer members
+To: Greg KH <gregkh@linuxfoundation.org>
+CC: <zhangfei.gao@linaro.org>, <wangzhou1@hisilicon.com>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <shenyang39@huawei.com>, <liulongfang@huawei.com>,
+	<qianweili@huawei.com>
+References: <20240329062655.3055646-1-huangchenghai2@huawei.com>
+ <2024032946-supernova-unstaffed-63ec@gregkh>
+ <d6890b98-2f75-4077-b7bc-e995e9901574@huawei.com>
+ <2024033032-catalyze-clip-cc53@gregkh>
+From: huangchenghai <huangchenghai2@huawei.com>
+In-Reply-To: <2024033032-catalyze-clip-cc53@gregkh>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemd200003.china.huawei.com (7.185.36.122)
 
-[+Cc linux-crypto]
 
-On Sat, Mar 30, 2024 at 02:55:06PM +0800, Zhang Yiqun wrote:
-> This patch is to introduce ECDH into keyctl syscall for
-> userspace usage, containing public key generation and
-> shared secret computation.
-> 
-> It is mainly based on dh code, so it has the same condition
-> to the input which only user keys is supported. The output
-> result is storing into the buffer with the provided length.
-> 
-> Signed-off-by: Zhang Yiqun <zhangyiqun@phytium.com.cn>
-> ---
->  Documentation/security/keys/core.rst |  62 ++++++
->  include/linux/compat.h               |   4 +
->  include/uapi/linux/keyctl.h          |  11 +
->  security/keys/Kconfig                |  12 +
->  security/keys/Makefile               |   2 +
->  security/keys/compat_ecdh.c          |  50 +++++
->  security/keys/ecdh.c                 | 318 +++++++++++++++++++++++++++
->  security/keys/internal.h             |  44 ++++
->  security/keys/keyctl.c               |  10 +
->  9 files changed, 513 insertions(+)
->  create mode 100644 security/keys/compat_ecdh.c
->  create mode 100644 security/keys/ecdh.c
+在 2024/3/30 15:01, Greg KH 写道:
+> On Sat, Mar 30, 2024 at 11:34:24AM +0800, huangchenghai wrote:
+>> On Fri, Mar 29, 2024 at2:34PM, Greg KH wrote:
+>>
+>>> On Fri, Mar 29, 2024 at 02:26:55PM +0800, Chenghai Huang wrote:
+>>>> The uacce_alloc() is the member of the EXPORT_SYMBOL_GPL. Therefore, null
+>>>> pointer verification is added on the pointer type input parameter and its
+>>>> pointer members.
+>>> I do not understand, why does the export type matter?  Just fix any
+>>> callers to use this properly and send proper parameters.  What in-tree
+>>> caller needs this?
+>>>
+>>> thanks,
+>>>
+>>> greg k-h
+>> The interface defined by the export type seems important and the input
+>> parameters need to be verified.
+> The export type does not matter at all.
+>
+>> But I understand from your mail that this is the job of the caller.
+> Exactly.
+>
+>> By the way, I still have a confusion. Interfaces like ioctrl, debugfs, read,
+>> or write require parameter validation. so what kind of kernel interfaces require
+>> parameter validation? Is there a definition?
+> Some do, some do not, it depends on the situation.  If data comes from
+> an untrusted source (i.e. outside the kernel), then it MUST be validated
+> (remember "all input is evil"), but if it's from within the kernel,
+> usually it does not.
+>
+> thanks,
+>
+> greg k-h
 
-Nacked-by: Eric Biggers <ebiggers@google.com>
+I get it, thank you very much.
 
-The existing KEYCTL_PKEY_*, KEYCTL_DH_COMPUTE, and AF_ALG are causing enough
-problems.  We do not need any more UAPIs like this.  They are hard to maintain,
-break often, not properly documented, increase the kernel's attack surface, and
-what they do is better done in userspace.
+thanks,
 
-Please refer to the recent thread
-https://lore.kernel.org/linux-crypto/CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz/T/#u
-where these issues were discussed in detail.
+Chenghai
 
-- Eric
