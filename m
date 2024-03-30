@@ -1,60 +1,60 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550F8EAC6
-	for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 12:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511552D057
+	for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 12:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711801116; cv=none; b=cOTQGAxkiNtb/dpLjYY+xoyi06dKEWrY50+8XeA6hglCMJuPigxX6U+Q2JtxuJXyy4wMyQGLmeFBhYThFuI9VMkjk7u6PbgWrgMAw63yrrvIuDHnM1E0V4zPcUunMVwbhB36YWMpYWbkN1HWlhciu5h5C6wY7FVw52sGR+bB6bE=
+	t=1711801151; cv=none; b=odfaO9t/puEe8FIfiqduhuZk0aqO56tQapWIa/EFHGaCRVm6r16xR50fm8Kqef8b9trIQ95VXqyoaPwemmYYrjFsw4R8CTwJ2iyOEuohqbofSspar0Bfa4fXQzUyNJV66ECnwkZFa/HkdAVXg+MjQ7+tfXBdtkvskdPXWjQ/nhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711801116; c=relaxed/simple;
-	bh=rbWiV6LCoMIz4RT2OXgjrkziWWWOn2fBooEuycqpBRs=;
+	s=arc-20240116; t=1711801151; c=relaxed/simple;
+	bh=gnEUiTCGAKgaizTXQISk0bLTxTnE9U1qA4LHHyfKv8g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z12z0IztQNJM0RXTp/tDMnCLkHHW9DOovfPqTZX+Mq1d7PvDEDTb7x3+VuEQLJrgkPgKF3lQW9nyqsRWYDMAUaIQIGwG1njod3oRu0m5XLnbPn99Ams40F9qevdNaxzkTnLYdf4AFhrBB9GzjfWh8nIWeeMHjmqRvEKTBV7CpAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ojjni/Q/; arc=none smtp.client-ip=209.85.221.47
+	 In-Reply-To:Content-Type; b=kHVv3D3H5HIwGFTnVbXfF40naFVBZJQDZSYEDmA16BRv+z5Wr4eaM0kfcQw2lPi96USyLJ8eO1hOcJgGs71zEqUUv0iViM3O5enW6crZGDfvgHUZNMrTYcwlrQaRJeaLjcaOWe5EnTC4c0kracol+FUJ9RGnTHYKqhbhPUKkXzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bTDp6mzS; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ojjni/Q/"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-34175878e3cso2030164f8f.0
-        for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 05:18:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bTDp6mzS"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33ed4dd8659so2362094f8f.0
+        for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 05:19:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711801113; x=1712405913; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1711801148; x=1712405948; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=bH0VKkyLThWY6MNf2JTOJyg2yMbF29kM0ZaMHkLqmAQ=;
-        b=ojjni/Q/9R/6bhVvsgJxLjTKCi8WFD0JlJwhQOIBckIXzdlhbO7wL4EZgBYqsUvaZT
-         p1ZLA95dQuMKn9OOgkb6+7978yyZjvV9elHb/pkYELtPiIn6wE2NYbYPbhgc3RDWKqt+
-         alfhQ3vN1HVIU+X6GVyrOkwLoGywxlt8rXZC9MUmshj1o1wJyB/ycLUDhGdOzz+YprU4
-         qwAUo8JutiBjqTvPgJ8Sl+8dsVuy+3aPzsYACFdtmFww9z4hslKpO5NQGQRyEBuvjohg
-         xWAxz5/cmoCUZE2rBuQ96riN+F/6XgHVAOczdgecIrv+SI3L3eYzEiE4UyJ74FxvTeEt
-         atCQ==
+        bh=pwRsl4tW7J5i09nNsaEN0WbRHBKT2ZFbRiuCSTzWq2c=;
+        b=bTDp6mzSAuWx4lL5cooxcDpZ9W1mea8O0kdKPspePGuynZIKtNZ/QodKPUZUYN6Sxn
+         bqgHPtu7au3ng4zlAbkXPtudj/aOo+e/SYgeh3gbkQs3UFieCRn6QafMakiJalsq+lK3
+         hRdc3OS2wTijyLDh8yYEofGgKTNGupdxOeqdDR9HQGdzBeiJpnXWjIZ/5X/bPmICFzv6
+         Q7CGGrTCphDqmfQ7M/Vv0ypdsFDyCkarg5/LBvAAefhoqAV1HezQHE9XBLoiN1+Ekq9f
+         QadJbIRoslyjrl6gukO+WRurbyLtrkeopHU0OJvO2+HQbPl8W+KV2yiYvjnied+VaIHN
+         I0vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711801113; x=1712405913;
+        d=1e100.net; s=20230601; t=1711801148; x=1712405948;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bH0VKkyLThWY6MNf2JTOJyg2yMbF29kM0ZaMHkLqmAQ=;
-        b=EsKAdW00oBe5wkb6WvRhKguycq0nk+s4Re1TNKVJTvFyG0KapeX/KD9zxd1h5bwtg+
-         d1dUf9fApEDhWmDNWZbdiSJYtp7jwJ3x2fYXT3j7LZVNQ0YB1rFrB9/1OrC/yFhuB/ZL
-         rKCB3VGKu8W46R3B/4kzf1gi9hUeK9j1bv4dmZD0wxChzHC8xEz2qhUNI6WxNzyxzxLg
-         JPeqFgZT4gGHMDHOjMXPPx2VHoYr3q0Anq4pKwD38efy/56KwXcRCP9IiiOxnICjFkDL
-         b5YCy3Mel3xlso6JDQM0Begurj4iODVLVOGo359EHUcK3e36hk3boP4RcHdyt6+Peq+p
-         8oNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX4akTHOA8AMjp21GsLi/hf9d+sGnB+4QaPqd5a9kLG8Z4Soipe666KT3dVmKavUgAmOtCoQ250ejF1/x7iOd8deiIQh4O8b5HRq3Vp
-X-Gm-Message-State: AOJu0Yz09uRPsYTWBpjIY/oSXaorffKe+isssoBACSnWKlw5DSMnG/iI
-	22VIpocfG50TfrCrZ0ngwTvXbww9GyblW/z14vh37vOR9bCMJQtYV/0FO4kjuD4=
-X-Google-Smtp-Source: AGHT+IFXTj6Oopp+TgXdXNYNRNf/PPJajmoyEILRHRDR4VAErFFTxd6mVFOMxvFL+RdoGqW9r8ISHg==
-X-Received: by 2002:adf:ecce:0:b0:33e:9292:b194 with SMTP id s14-20020adfecce000000b0033e9292b194mr3243693wro.14.1711801112726;
-        Sat, 30 Mar 2024 05:18:32 -0700 (PDT)
+        bh=pwRsl4tW7J5i09nNsaEN0WbRHBKT2ZFbRiuCSTzWq2c=;
+        b=q02TwHnOMd/VFFiYP2mgSnORjzOklXunJwK73ZRdmxCu7pjqpPAmbIYLgzqfCLsjkP
+         SAK/kBsFH9l+jRyoOZuDHp7ao1kVz0+vMxq0i55UULjFp33znf3WXd61skXSfz1kQg7O
+         YFV9AB3XSRM7UaPMrsoPjrJzyA9Vns2RtnwS7oYTmQ6tEFjMKco+7CQhxjzmGdY4z86u
+         B/5/sBxMGiAUeJD9uO6g82whhthjQ2Gai4jYiMjpJ1n/yiybcXQLHQ1tbU1BfDjS88mi
+         4vrjHCIthiEVWOM/coBM6v54KjoG9gWIhBuGo88kyrSyulsu+gcjVjHh7+14EZycXBLu
+         oyew==
+X-Forwarded-Encrypted: i=1; AJvYcCVaS+d5RxRARLQtmSy0AwB0YmOIRa1CXkp/JiqKkmDlJemAjhUyvkNH0nnsUz/Za7pfOFrUlL/hkrPw9xIO7/vbBo7Zv25XP2j7a4FP
+X-Gm-Message-State: AOJu0YwKDjWMaYOuI7IWUqaN7hTUJZDLbXkotFRHat1Sve+0d90vzoxY
+	c+peRgR7mcxFNPPf6uPa1y7pqY4py5dRx1BFJ3ZslCK44gtgN/3hZy0U8UC44D4=
+X-Google-Smtp-Source: AGHT+IGxitXr7L7h8CUcKtleeDnrSZmBoUk9QkYBw9ltjVABur0LBmd4a6MEByPy5E4LS7vzmYpyOA==
+X-Received: by 2002:adf:f403:0:b0:343:39a6:93bc with SMTP id g3-20020adff403000000b0034339a693bcmr3335018wro.11.1711801147697;
+        Sat, 30 Mar 2024 05:19:07 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.223.16])
-        by smtp.gmail.com with ESMTPSA id bl37-20020adfe265000000b0033b87c2725csm6349947wrb.104.2024.03.30.05.18.30
+        by smtp.gmail.com with ESMTPSA id v17-20020adfe291000000b0034174566ec4sm6339522wri.16.2024.03.30.05.19.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Mar 2024 05:18:32 -0700 (PDT)
-Message-ID: <f514d9e1-61fa-4c55-aea1-d70c955bb96a@linaro.org>
-Date: Sat, 30 Mar 2024 13:18:30 +0100
+        Sat, 30 Mar 2024 05:19:07 -0700 (PDT)
+Message-ID: <edd167fb-df0c-4434-8f9f-7c4016b87d83@linaro.org>
+Date: Sat, 30 Mar 2024 13:19:05 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -64,9 +64,9 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 00/19] amba: store owner from modules with
  amba_driver_register()
-To: Russell King <linux@armlinux.org.uk>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Mike Leach
- <mike.leach@linaro.org>, James Clark <james.clark@arm.com>,
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Russell King <linux@armlinux.org.uk>, Mike Leach <mike.leach@linaro.org>,
+ James Clark <james.clark@arm.com>,
  Alexander Shishkin <alexander.shishkin@linux.intel.com>,
  Maxime Coquelin <mcoquelin.stm32@gmail.com>,
  Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -83,6 +83,9 @@ Cc: linux-kernel@vger.kernel.org, coresight@lists.linaro.org,
  linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
  linux-input@vger.kernel.org, kvm@vger.kernel.org
 References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+ <3f61d6d3-a0d6-4c49-b094-6ba62d09ab14@arm.com>
+ <f23f2e60-e5c0-4c3c-9722-dba63a6e7ef6@linaro.org>
+ <d8fa8e1a-b2ce-4d91-9ab5-ad1b160111c6@arm.com>
 Content-Language: en-US
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
@@ -129,66 +132,41 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+In-Reply-To: <d8fa8e1a-b2ce-4d91-9ab5-ad1b160111c6@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 26/03/2024 21:23, Krzysztof Kozlowski wrote:
-> Merging
-> =======
-> All further patches depend on the first amba patch, therefore please ack
-> and this should go via one tree.
+On 27/03/2024 10:22, Suzuki K Poulose wrote:
+> On 27/03/2024 05:57, Krzysztof Kozlowski wrote:
+>> On 27/03/2024 00:24, Suzuki K Poulose wrote:
+>>> Hi Krzysztof
+>>>
+>>> On 26/03/2024 20:23, Krzysztof Kozlowski wrote:
+>>>> Merging
+>>>> =======
+>>>> All further patches depend on the first amba patch, therefore please ack
+>>>> and this should go via one tree.
+>>>
+>>> Are you able to provide a stable branch with these patches once you pull
+>>
+>> I doubt I will be merging this. I think amba code goes through Russell.
+>>
+>>> them in to "one tree" here ? We have changes coming up in the coresight
+>>> tree, which would conflict with the changes here (horribly).
+>>>
+>>
+>> You mean conflict with  coresight conversion to platform driver? Worst
 > 
-> Description
-> ===========
-> Modules registering driver with amba_driver_register() often forget to
-> set .owner field.
+> Yes.
 > 
-> Solve the problem by moving this task away from the drivers to the core
-> amba bus code, just like we did for platform_driver in commit
-> 9447057eaff8 ("platform_device: use a macro instead of
-> platform_driver_register").
+>> case it is solveable: just drop .owner.
 > 
-> Best regards,
+> Or, we could merge the CoreSight changes (as they are really not
+> affected by the problem this series is trying to address) after the
+> base changes land in AMBA, via the CoreSight tree.
 
-I tried to submit this series to Russell patch tracker and failed. This
-is ridiculous. It's 2024 and instead of normal process, like every other
-maintainer, so b4 or Patchwork, we have some unusable system rejecting
-standard patches.
-
-First, it depends some weird, duplicated signed-off-by's. Second it
-submitting patch-by-patch, all with clicking on some web (!!!) interface.
-
-I did it, clicked 19 times and system was happy... but then on email
-said the patches were rejected. Couldn't tell it after submitting first
-patch via the web?
-
-That's the response:
--------------
-Your patch has not been logged because:
-
-Error:   Please supply a summary subject line briefly describing
-         your patch.
-
-
-Error:   Please supply a "KernelVersion: " tag after "PATCH FOLLOWS" or
-"---".
-
-Error:   the patch you are submitting has one or more missing or incorrect
-         Signed-off-by lines:
-
-         - author signoff <krzkreg@gmail.com> is missing.
-
-         Please see the file Documentation/SubmittingPatches, section 11
-         for details on signing off patches.
-
-
-Please see https://www.armlinux.org.uk/developer/patches/info.shtml
-for more information.
--------------
-
-This is unbelievable waste of time. I am not going to use this tracker.
-It's huge obstacle and huge waste of submitters time.
+I'll provide you a stable branch to fetch. I was defeated by Russell's
+patch tracking system.
 
 Best regards,
 Krzysztof
