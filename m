@@ -1,66 +1,66 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAA81DFC6
-	for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 20:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99B52AD21
+	for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 20:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711830038; cv=none; b=H7i8nBTDQ+a8suv4dEPjB/jcjo9KUX3xR0P3/3BXKvr2fknQlSi1N2K7KL1kWKa99u1+Pd9NogFJqcErKNzHb2wO3cEHk+9KifAAPdmzINH7mKm7roYcdnWleWcoTSFJarKwe3X/9CXC1bHIfgen+wbTW+6loShmNCqnOU0d/wI=
+	t=1711830709; cv=none; b=dlIYjdZHIrkX8Zmml21pEfuQ203mYqTo2pJuVLP+fHY50MJvJtcZt7WWYUN4i1kPyJkUuYPutSyK4HVEChAFsd+BWtn5mqxgCfxLq6GQUGIjg1U+cN9MjG34p09ayWQEkVVOkdAPcdE1ONrAJoOJxpctEg5PnuHdLvOkDixTTno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711830038; c=relaxed/simple;
-	bh=oxdPWe+ybLFjcrHDDH17LDCwEaRt9Ub+u4pYIQ6Evnc=;
+	s=arc-20240116; t=1711830709; c=relaxed/simple;
+	bh=6ctr9IjTD/fi10pl5bm0p03fWwzEss7WctNWnahmYJ0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MWUhXVZwrCbnr9zMzv0PqlfxXeZ8JwSGVG0MD6WcKR+N0vfa/IxpABeykXe9Sx6/LRzqwBW18QTgeglFKP890fpeG1ijtfo8uEIqVWaPNa32eItmg1DugRJZaUYiHDY+fsjP/tSv0E3j2z7Z+WSPQwTEB8mAqOPE+Q2HEY9mhVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XVxaULe+; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=mxKzDJRPf3vxgRaUy2Bg8HbgyH7xYy6r4cgd4lvIgzrvVM35qRtLMkU3cJ84ELl+TfjxIpaPkcqtTjPYw7WtP8znHouuhfgcUdK4/AjhAvn9Q23YL3PfIAgF6rh6avcAI2RdZUafor//uIN0Qzpf9zCXxsIzjNIyOQY/LQNOa28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NGRXK6eR; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XVxaULe+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NGRXK6eR"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711830036;
+	s=mimecast20190719; t=1711830706;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=zjsXt6/XI2fGcxfOy299lQeB6mbSKKFDwTLuof4Ifvg=;
-	b=XVxaULe+rEs3zJbA9wB4CT+eezhJTU6xMbR09iS1dsh4ei5qlkRmEz12/vALFQF62yPMYU
-	axDfPx4sy0OHYThb/mvR43ZBTRB9lfFdf12mjbGJqZBTYBvd/FGq/5LEeeMfuG09VkysJV
-	VwhE6nYr23BK1x5TRdzO9n2wQRp/OYY=
+	bh=5D9RsBB4kciPmaMVEYgR85qIqWcP45dPbiaFBD383j8=;
+	b=NGRXK6eRbDKMeBI6wqSaVeW6bfxT32AK137mJVIJzUTneNyqco+mCcZ/Jxxt5TaJlZIjXj
+	Uwfuq5SFbQMMuR/7jOPrpX5QK+hYMJ6SnZgunyPkm8kYOlX8Ybnx3YcBYVaA4EdofbYFE2
+	v+csROiqL/wkosZeKiqvj0aUS2wb+Ks=
 Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
  [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-212-J08J3phEPv-PG-7qMWo94w-1; Sat, 30 Mar 2024 16:20:33 -0400
-X-MC-Unique: J08J3phEPv-PG-7qMWo94w-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a4e49d250b6so37458166b.3
-        for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 13:20:33 -0700 (PDT)
+ us-mta-615-ZpkZdFrbOcymOOMkb5-zWA-1; Sat, 30 Mar 2024 16:31:45 -0400
+X-MC-Unique: ZpkZdFrbOcymOOMkb5-zWA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a466c7b0587so204067966b.0
+        for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 13:31:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711830032; x=1712434832;
+        d=1e100.net; s=20230601; t=1711830704; x=1712435504;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zjsXt6/XI2fGcxfOy299lQeB6mbSKKFDwTLuof4Ifvg=;
-        b=tRp3OvufN1Qxukg/Rwc6+W9nMfUiXtxQpSSYw9zR5hOXLb8LjylPstt0HMeoqmRTde
-         JUc3eccgqXUhnVoIi+taUMp8VAbNDrquDfgYLjmrRxN7IuwbL3ysjntDoXR0qGeDtFUC
-         N+xnhwAojbXcIqNosFDogtpJeU6rqJv/ynUMpdSZX++e4rwJl4THEWBtg6i94p7O2JYI
-         8Z74frCEYv74NMZ05y/HwZ2GHTu+NPaWrEJrw+gm5B2fwmFoIpGOdkAt/ME7uF6G56Pg
-         tFZ0WtArZXKAspUJuq4c0BdKm2n3qqyeeh+tdGnH6epHvqhwa1oUhbxq1Jm1W0OKHj1T
-         mOzA==
-X-Forwarded-Encrypted: i=1; AJvYcCUd6sWy2yXWC8ye7nI22pqYRv62sSohT62JV23ZM7xcoOaTUUC7eyH+6mPP9OrnYQsFdjB36YYF2Q4ks7Qe4Z/IADDDwJDoQUHTqBU3
-X-Gm-Message-State: AOJu0YywDNogtEdtjjveHq/Y9y0o5eXOv6lvdUFMhqJ0oep+bO++/9wa
-	filEn7kyN9oVaSTeVljj5kZ+AtIjzznQRJAF7nxX51VrsC/C0ptMVWL7T5fPXKHo+jpAL5zn21P
-	ozOBY9Ydelw6mO7HtakNj/GEIMEEdjbF42DVtUzSqkAJjejmuSvAH8mOVcYwSpw==
-X-Received: by 2002:a17:907:77cb:b0:a46:8c9f:f783 with SMTP id kz11-20020a17090777cb00b00a468c9ff783mr3882553ejc.67.1711830032707;
-        Sat, 30 Mar 2024 13:20:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHwEafgXikWAWtw1l42yL+gRcN9KYUDKlUA2NmDTs4b3edtP1dqIWZjSciSUbc7uQ5J6ws3jw==
-X-Received: by 2002:a17:907:77cb:b0:a46:8c9f:f783 with SMTP id kz11-20020a17090777cb00b00a468c9ff783mr3882522ejc.67.1711830032343;
-        Sat, 30 Mar 2024 13:20:32 -0700 (PDT)
+        bh=5D9RsBB4kciPmaMVEYgR85qIqWcP45dPbiaFBD383j8=;
+        b=q6BfGaMP4rCuggwUWGSTMpOPH0aSXMvI/luVm4eJ5cEV+1nOH6R06LcmYALOmTmjyL
+         f4ukS/yKpI9Mm5X4YBLGGVr+7yC/LQsfyRaHOjNu5L5+M6IfbskKD02yS0uZpiWETbIe
+         UCdNP9cRz/RyHLV1Qj4saMHtREhMQdoJxxmDOttgfWjIcL44lV2vT6J0JmLMdq4oAYZf
+         mslKGgJn9/tLFmo7Xft7JLi/jiUdGmbCC/bvEUFFc/d3UQjB0NumzdX0YIwt4kSnFstm
+         G4sioqbzMFfwXvnoME+1EaNf7PkL9x0akXw0PKxV9fz4KA2BqPUbry7wDzCiq1B51vqe
+         Z+iw==
+X-Forwarded-Encrypted: i=1; AJvYcCVyp5ky2EoCjsoCtLR9nJ/La6zrhiFvDEWU0k8fprsIOK0fBGo5Tc6M09OLK+3ZN1/+69lFMMReHi50d3Z52Q62bXj365+M7WbbPZcV
+X-Gm-Message-State: AOJu0YyEGBlq4tAarGy4zrZxlNnMOQK2Kp7HfmEwJW9+Iv3pW2YuBaZ7
+	iuexh6IB/iakSCcraYrzDXK/abpFZJ3405YqVCkhpA+8eqRUaTXSYAeNYFSoS1Qov0AH+/yg6Qf
+	OAYeyY8mXh7l0u926OsHAmesV+hLWnizDbFKIFz3Hd7Km6F7FiKttItPSUW9wcg==
+X-Received: by 2002:a17:907:9445:b0:a4e:5540:7c0c with SMTP id dl5-20020a170907944500b00a4e55407c0cmr1073507ejc.70.1711830704072;
+        Sat, 30 Mar 2024 13:31:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFLGTizDL+ipqWK8vAakREtH5rqSNheH+umOQZwMHVXU0gaVZFxsEwVnS2XB/8MH8LYIGhcfQ==
+X-Received: by 2002:a17:907:9445:b0:a4e:5540:7c0c with SMTP id dl5-20020a170907944500b00a4e55407c0cmr1073479ejc.70.1711830703673;
+        Sat, 30 Mar 2024 13:31:43 -0700 (PDT)
 Received: from [192.168.10.4] ([151.95.49.219])
-        by smtp.googlemail.com with ESMTPSA id xc4-20020a170907074400b00a4e5ab88803sm274929ejb.183.2024.03.30.13.20.29
+        by smtp.googlemail.com with ESMTPSA id p17-20020a170906785100b00a4e08e81e7esm3389899ejm.27.2024.03.30.13.31.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Mar 2024 13:20:31 -0700 (PDT)
-Message-ID: <9507220f-1552-4105-93e4-9485dc9500c8@redhat.com>
-Date: Sat, 30 Mar 2024 21:20:28 +0100
+        Sat, 30 Mar 2024 13:31:43 -0700 (PDT)
+Message-ID: <8c3685a6-833c-4b3c-83f4-c0bd78bba36e@redhat.com>
+Date: Sat, 30 Mar 2024 21:31:40 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,7 +68,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 10/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command
+Subject: Re: [PATCH v12 11/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
 To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
 Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
@@ -84,7 +84,7 @@ Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
  Brijesh Singh <brijesh.singh@amd.com>
 References: <20240329225835.400662-1-michael.roth@amd.com>
- <20240329225835.400662-11-michael.roth@amd.com>
+ <20240329225835.400662-12-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -122,39 +122,27 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240329225835.400662-11-michael.roth@amd.com>
+In-Reply-To: <20240329225835.400662-12-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/29/24 23:58, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> KVM_SEV_SNP_LAUNCH_START begins the launch process for an SEV-SNP guest.
-> The command initializes a cryptographic digest context used to construct
-> the measurement of the guest. Other commands can then at that point be
-> used to load/encrypt data into the guest's initial launch image.
-
-Does KVM_SEV_LAUNCH_START fail for SNP guests, or should we take care of 
-forbidding it?
-
-> +	if (params.policy & SNP_POLICY_MASK_SINGLE_SOCKET) {
-> +		pr_debug("SEV-SNP hypervisor does not support limiting guests to a single socket.");
-> +		return -EINVAL;
+> +	memslot = gfn_to_memslot(kvm, params.gfn_start);
+> +	if (!kvm_slot_can_be_private(memslot)) {
+> +		ret = -EINVAL;
+> +		goto out;
 > +	}
 > +
-> +	if (!(params.policy & SNP_POLICY_MASK_SMT)) {
-> +		pr_debug("SEV-SNP hypervisor does not support limiting guests to a single SMT thread.");
-> +		return -EINVAL;
-> +	}
 
-Since you're forbidding some bits, KVM should also check that undefined 
-bits (63:25) are zero.
+This can be moved to kvm_gmem_populate.
 
-Also what about checking that the major version is equal to the one that 
-KVM supports?  From the docs it's not even clear what ABI version they 
-document (QEMU uses 0).
+> +	populate_args.src = u64_to_user_ptr(params.uaddr);
 
-Otherwise looks good.
+This is not used if !do_memcpy, and in fact src is redundant with 
+do_memcpy.  Overall the arguments can be "kvm, gfn, src, npages, 
+post_populate, opaque" which are relatively few and do not need the struct.
+
+I'll do that when posting the next version of the patches in kvm-coco-queue.
 
 Paolo
 
