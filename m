@@ -1,129 +1,149 @@
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8782EFC17;
-	Sat, 30 Mar 2024 13:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258283BBFF
+	for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 17:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711804198; cv=none; b=msGf8CqcdmNeggNMg/HufFCOaYLKDCEWxuH3O/HYKutQkZ8dqKrJKxFTgIAbVfUpzXHxMzCrVvvB60xEHZcVAXZOTIhF344HXeNyftmdq2n3pWpWXTEQD1MKM4ENdiTmmtUT6NrFUm2FDeB4w0fPsSRDoH50rHOJx1oPPXHiP08=
+	t=1711821523; cv=none; b=jcJhoJ4uhMIGtJuZoAWNiHbsXiLTvPQI0mqEkWvTAYKtPFwUZTAnPGXnBJ1oE9yzz3YVdqcY0mI+/cfE3PrTiu9S9tJ4QuaB3jqkUv5IxePXkjJLV0VVWBgee6gXO1Ym3/YFmYpJJlqUeVMs+wi7243upMdCoEYNlxrXgpx0FG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711804198; c=relaxed/simple;
-	bh=c8vGuGwO3AQu+ZaWNspJpBlAkE/1kfO3BpTmIYNdLVY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=koWJdVTSseW/8e2uUM6ICEAmEyd8jACBtp+FVrlMFBK4bjfLXSxLUwl17iJ6Q4/WRy5upZmg4uUPcdR3iidAA5Q0z4E9KQVg020dzp93l+0LaapYMKDoZ36p6gZU8MMaC/WJGpnWCimgg2DXlN+dcSfwVsBkkKDHygzf4/shaF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=k7ZkZ0kL; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=k7ZkZ0kL; arc=none smtp.client-ip=96.44.175.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	s=arc-20240116; t=1711821523; c=relaxed/simple;
+	bh=gznZUdRjC840/RIpKY+qbDdAJIfZQ5O12HDGRmxBxms=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=mLsIutmq49iL5WRAR3afvtKvtpNosRiDfMGLQWCd0CNi2a9WMdEKERPbbrm1peKzJbTO+X8HSa87Lpk/UaERJciRK4wBKGdVFsMJA4x2ywIylIULfMGc82aKv5JSh28ms5VMdIPl7qlvqZPhjVlFr6FRauljE4w6TtDLF7qkU18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kKaSRplx; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="k7ZkZ0kL";
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="k7ZkZ0kL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1711804194;
-	bh=c8vGuGwO3AQu+ZaWNspJpBlAkE/1kfO3BpTmIYNdLVY=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=k7ZkZ0kLppSHzm1nkkO3q6EXCLJvU15p7Y4lbbnMyqVOXBCvW0tp296hLlQGhA2Mb
-	 jSg9QmE2PwlaiJmeLeshYuQjGJ5h+N6dpUEvCH6roKM76amz8+xqYcj29OBdCFvdGG
-	 PkR0QzcjCtuLmBPEQNJv3VQRXqxYHYtYx1SC/Grg=
-Received: from localhost (localhost [127.0.0.1])
-	by bedivere.hansenpartnership.com (Postfix) with ESMTP id F01A11280C22;
-	Sat, 30 Mar 2024 09:09:54 -0400 (EDT)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
- by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
- with ESMTP id xc_84SD9HvHL; Sat, 30 Mar 2024 09:09:54 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1711804194;
-	bh=c8vGuGwO3AQu+ZaWNspJpBlAkE/1kfO3BpTmIYNdLVY=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=k7ZkZ0kLppSHzm1nkkO3q6EXCLJvU15p7Y4lbbnMyqVOXBCvW0tp296hLlQGhA2Mb
-	 jSg9QmE2PwlaiJmeLeshYuQjGJ5h+N6dpUEvCH6roKM76amz8+xqYcj29OBdCFvdGG
-	 PkR0QzcjCtuLmBPEQNJv3VQRXqxYHYtYx1SC/Grg=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id EB8D31280A41;
-	Sat, 30 Mar 2024 09:09:53 -0400 (EDT)
-Message-ID: <087bbfcf95c9014ee8f87d482773244f0833b892.camel@HansenPartnership.com>
-Subject: Re: [PATCH] KEYS: Add ECDH support
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Eric Biggers <ebiggers@kernel.org>, Zhang Yiqun
- <zhangyiqun@phytium.com.cn>
-Cc: dhowells@redhat.com, jarkko@kernel.org, corbet@lwn.net, 
-	keyrings@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Date: Sat, 30 Mar 2024 09:09:51 -0400
-In-Reply-To: <20240330070436.GA2116@sol.localdomain>
-References: <20240330065506.3146-1-zhangyiqun@phytium.com.cn>
-	 <20240330070436.GA2116@sol.localdomain>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kKaSRplx"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4154bf94fe4so11474755e9.2
+        for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 10:58:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711821519; x=1712426319; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QuHz7NbYphgsBERKb7Gi6jBAyiMkVdvzVzWkI73/WU8=;
+        b=kKaSRplxr4TSUYPNLjqHl4XCyJCVQfQyGkzLvNg+0dWI596k65bnjwXajEk6ovJFer
+         ueWceGhzRm2kmkvMxoBIghdPujTLKTqz9igOkbgQH0LAoOSGS63Fxi7MleO9Hfgt6tEz
+         TEaIcVg99h3wZLYxmTs7QmIRl6w15lXuD4i5je5bKDNRSUHEN2dNnn+x0TUOtoQFeTno
+         apoi8pj3EhHtxH9u6Hk99H0dNGkLMSkp0TEjD1NqAIu0zJZ2BCXVXV5fgceBt28pJ713
+         rSRdUCQXNd+nC5dKoENMe8aqN2uJzUk9DwXmw+qIvRzzDh5cQsm27HSkRzXXBwuwfUP4
+         GmxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711821519; x=1712426319;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QuHz7NbYphgsBERKb7Gi6jBAyiMkVdvzVzWkI73/WU8=;
+        b=vr/K4ukZxUKc8ZcHL6iQrsjlfsMiOqU//SF4T1vck9uJ248QH8gNdcqPhlq9yKQ730
+         4GI0eyx6kGvz8rbwG+WsHApqR/+TYAD8+CtUfFIeAZat41dLVWgSpID6RSX0a4R8fUEb
+         Flf1XShHpvhl2N6KPXs+NAngE5P8MqwCiY0E30pRp8BKizg8l/ZxvLG1OtYH4u6vjqRt
+         s6agDQ5DDQmkcpOEAthYEVUUZU/jXpMOk+NIQKr+eF3bBM219OW4JmQOfQCUcN0EwElv
+         1/sxqDLA2WR2m5pnKYnM9DomCPqS6tbi1pQfEfmpUwUenpxQ8VorIZp5HP+RfnoOlku4
+         uqeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW7l3fEG9qI1EPNo0i4k4ib5gXR24DeDHFYPRLQfROcuDPofNXhyNqpSrRBNk2x/T21Ev66n6GQZ4pWjAFrP9W4A0xFz3R2TM6vfKlh
+X-Gm-Message-State: AOJu0Yy25AV40t6gDyvhG8KiiZ/keiEZsMhhCCDchXoUJj5UZwDD19pi
+	CzCXKMBIayRYG0/fSA20wOFCB7KUulpr05LStdqfP74DiFc4LO9xazx8oIrCg1g=
+X-Google-Smtp-Source: AGHT+IGqlMz1alWRKxGaognRF10drFVQxV6mNURT1OgHL5DqwKDRbiiGAjlSz2Ygixur7KvLK2brog==
+X-Received: by 2002:a05:600c:5349:b0:414:8065:2d23 with SMTP id hi9-20020a05600c534900b0041480652d23mr3858145wmb.20.1711821519529;
+        Sat, 30 Mar 2024 10:58:39 -0700 (PDT)
+Received: from [127.0.1.1] ([178.197.223.16])
+        by smtp.gmail.com with ESMTPSA id o41-20020a05600c512900b004149536479esm9235312wms.12.2024.03.30.10.58.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 Mar 2024 10:58:38 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Russell King <linux@armlinux.org.uk>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Mike Leach <mike.leach@linaro.org>, James Clark <james.clark@arm.com>, 
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Linus Walleij <linus.walleij@linaro.org>, 
+ Andi Shyti <andi.shyti@kernel.org>, Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Vinod Koul <vkoul@kernel.org>, 
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+ Miquel Raynal <miquel.raynal@bootlin.com>, 
+ Michal Simek <michal.simek@amd.com>, Eric Auger <eric.auger@redhat.com>, 
+ Alex Williamson <alex.williamson@redhat.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: linux-kernel@vger.kernel.org, coresight@lists.linaro.org, 
+ linux-arm-kernel@lists.infradead.org, 
+ linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+ linux-input@vger.kernel.org, kvm@vger.kernel.org
+In-Reply-To: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+Subject: Re: [PATCH 00/19] amba: store owner from modules with
+ amba_driver_register()
+Message-Id: <171182151736.34189.6433134738765363803.b4-ty@linaro.org>
+Date: Sat, 30 Mar 2024 18:58:37 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13.0
 
-On Sat, 2024-03-30 at 00:04 -0700, Eric Biggers wrote:
-> [+Cc linux-crypto]
+
+On Tue, 26 Mar 2024 21:23:30 +0100, Krzysztof Kozlowski wrote:
+> Merging
+> =======
+> All further patches depend on the first amba patch, therefore please ack
+> and this should go via one tree.
 > 
-> On Sat, Mar 30, 2024 at 02:55:06PM +0800, Zhang Yiqun wrote:
-> > This patch is to introduce ECDH into keyctl syscall for
-> > userspace usage, containing public key generation and
-> > shared secret computation.
-> > 
-> > It is mainly based on dh code, so it has the same condition
-> > to the input which only user keys is supported. The output
-> > result is storing into the buffer with the provided length.
-> > 
-> > Signed-off-by: Zhang Yiqun <zhangyiqun@phytium.com.cn>
-> > ---
-> >  Documentation/security/keys/core.rst |  62 ++++++
-> >  include/linux/compat.h               |   4 +
-> >  include/uapi/linux/keyctl.h          |  11 +
-> >  security/keys/Kconfig                |  12 +
-> >  security/keys/Makefile               |   2 +
-> >  security/keys/compat_ecdh.c          |  50 +++++
-> >  security/keys/ecdh.c                 | 318
-> > +++++++++++++++++++++++++++
-> >  security/keys/internal.h             |  44 ++++
-> >  security/keys/keyctl.c               |  10 +
-> >  9 files changed, 513 insertions(+)
-> >  create mode 100644 security/keys/compat_ecdh.c
-> >  create mode 100644 security/keys/ecdh.c
+> Description
+> ===========
+> Modules registering driver with amba_driver_register() often forget to
+> set .owner field.
 > 
-> Nacked-by: Eric Biggers <ebiggers@google.com>
-> 
-> The existing KEYCTL_PKEY_*, KEYCTL_DH_COMPUTE, and AF_ALG are causing
-> enough problems.  We do not need any more UAPIs like this.  They are
-> hard to maintain, break often, not properly documented, increase the
-> kernel's attack surface, and what they do is better done in
-> userspace.
+> [...]
 
-Actually that's not entirely true.  There is a use case for keys which
-is where you'd like to harden unwrapped key handling and don't have the
-ability to use a device.  The kernel provides a harder exfiltration
-environment than user space, so there is a use case for getting the
-kernel to handle operations on unwrapped keys for the protection it
-affords the crytpographic key material.
+Applied, thanks!
 
-For instance there are people who use the kernel keyring to replace
-ssh-agent and thus *reduce* the attack surface they have for storing
-ssh keys:
+[01/19] amba: store owner from modules with amba_driver_register()
+        (no commit info)
+[02/19] coresight: cti: drop owner assignment
+        (no commit info)
+[03/19] coresight: catu: drop owner assignment
+        (no commit info)
+[04/19] coresight: etm3x: drop owner assignment
+        (no commit info)
+[05/19] coresight: etm4x: drop owner assignment
+        (no commit info)
+[06/19] coresight: funnel: drop owner assignment
+        (no commit info)
+[07/19] coresight: replicator: drop owner assignment
+        (no commit info)
+[08/19] coresight: etb10: drop owner assignment
+        (no commit info)
+[09/19] coresight: stm: drop owner assignment
+        (no commit info)
+[10/19] coresight: tmc: drop owner assignment
+        (no commit info)
+[11/19] coresight: tpda: drop owner assignment
+        (no commit info)
+[12/19] coresight: tpdm: drop owner assignment
+        (no commit info)
+[13/19] coresight: tpiu: drop owner assignment
+        (no commit info)
+[14/19] i2c: nomadik: drop owner assignment
+        (no commit info)
+[15/19] hwrng: nomadik: drop owner assignment
+        (no commit info)
+[16/19] dmaengine: pl330: drop owner assignment
+        (no commit info)
+[17/19] Input: ambakmi - drop owner assignment
+        (no commit info)
+[18/19] memory: pl353-smc: drop owner assignment
+        (no commit info)
+[19/19] vfio: amba: drop owner assignment
+        (no commit info)
 
-https://blog.cloudflare.com/the-linux-kernel-key-retention-service-and-why-you-should-use-it-in-your-next-application/
-
-The same thing could be done with gpg keys or the gnome keyring.
-
-> Please refer to the recent thread
-> https://lore.kernel.org/linux-crypto/CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz/T/#u
-> where these issues were discussed in detail.
-
-This thread was talking about using the kernel for handling the
-algorithms themselves (which is probably best done in userspace) and
-didn't address using the kernel to harden the key protection
-environment.
-
-James
+Best regards,
+-- 
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
