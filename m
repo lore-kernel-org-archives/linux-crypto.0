@@ -1,181 +1,127 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31E6EEC0
-	for <linux-crypto@vger.kernel.org>; Sun, 31 Mar 2024 11:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB92144D13;
+	Sun, 31 Mar 2024 13:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711884043; cv=none; b=gQu+pgBVAJ+DRgtyotpM4NbUUpVdEQdoCyMrMNazZ11DnPVlk7D68XPmkkaXy4kPZka/dvRLSHo3f/yeJ6ayZS2TBYhup1o0ysNKLs20jAD9Q9OuqZ8Z6RYgjHmvFzCAg0iylT6opo1n/W/reJ9pwyidAkrRRs4p2TnQf/0s7JQ=
+	t=1711890091; cv=none; b=WvPUzngRrOueRnV2Pefx7mhU0th7omOAAc1MJxjuJSUf32+EJx8TepY8Fc8CQsxJGE2OazLxCc6eKXZRETcm9d9izt7jpXVnayY8hFQrEQ3zeo4znXKJXTe3Qmt7XkNH2cjMZsu66ouqeZT54uGco7AYaN50ebJJGlVK2yF84SQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711884043; c=relaxed/simple;
-	bh=HA92dRzVt3vZdgr5pQJY02em2UTWtsR+GLFyMiGbHw4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m1tBTK3Lp+mpwrC8OOTmBGpOqYaaLZDufWoBamCm4oesnba6zWPc8z3Ti5ZywYCr3EeYXp8nMnHFVj6Qx4t0+McvJJCZu6fPQmL62bcbOLzlHuSTMHrjl2AiRIzPWDlbl2ygcNJW0ME2nkcQAt7zIYPipG90yF0RpAExJqOLbzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c7i9IAHs; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711890091; c=relaxed/simple;
+	bh=sDzCySBGc78kD08nnzcKeQyX2gLEvAv/rzqBNe7+CzE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=JAUKzYw/ASKD64KJvM7Xd0b5VY226JCVMy8cTgvY5DPDVHki8JuJuIpSDniIMzQ2nQnyZYPGtMx6sQnr7lGP9wUa0gWccOerz7z5lCeiK5Vp/mosWK7T9MjxDT0fH5qF3xlyYNm9U3xgFtHlYW17DPut+uMZyi2Syu4nOL6ZmLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=La0soKW7; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=LIaNafrJ; arc=none smtp.client-ip=96.44.175.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c7i9IAHs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711884038;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZAFJ+0SeTqdsqNS6GC0N4AccV7yeFgGXHpRB2cwbNo4=;
-	b=c7i9IAHsKuupMX+QQPKbD7KgxC0UmvECMDPWeIvRD1pNKLUFH4axWG4pdtxcuX1LmGnPO3
-	gM2r3MOoObjgNNk0gWim29dzL+FITCqjEbrZuABlRIdOhAzG92Y5aSzV59s9BLlwdbVclF
-	t6IoszosnTZQ9ptY4RWIPTQb15+RIGE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-290-upoUIa8QO3yfxywnNj8QHQ-1; Sun, 31 Mar 2024 07:20:35 -0400
-X-MC-Unique: upoUIa8QO3yfxywnNj8QHQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-41481ad9364so21227095e9.0
-        for <linux-crypto@vger.kernel.org>; Sun, 31 Mar 2024 04:20:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711884034; x=1712488834;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZAFJ+0SeTqdsqNS6GC0N4AccV7yeFgGXHpRB2cwbNo4=;
-        b=wFzFp3QpjQKOUbKiZ9+7J5tS00+G213BjQ3yB7Tf62wtRpS/BLmlDjlIFq2WRG6uc/
-         iUO8rO/evt3rFcYc4xWJ1Ha2v/Y67zP9sexkWEV+dwLkbu9Bbenq7wKkBw0PDWphDKd1
-         Jx5ooUGKcXWog4A6atgeMUs3+uSQiL3E4qIqyxQpXFUmu4DvKfiqHnqjLne57HQUHsbD
-         Y+AJub/3XZrfiJN8CujrWVN68Ga3mVejYjBwB3GuMByVMupEXhjYO5biPwF8FGN83LRT
-         JqsDgM4iPkTgkhNMAH8TWUoT4NZJfGbTb4s1eCWWjEazTER1mF1JzDoYBL7kksvhgha7
-         B9GA==
-X-Forwarded-Encrypted: i=1; AJvYcCWkTtW0Srnmp0ihhyJfw+SF5W4G8XN4yYiGkm2zcwkNlJJQwULQ05nudNep8DKp5qdnZOR1uE0pCaObIkYmi4XT6/UTzKcDstid5STz
-X-Gm-Message-State: AOJu0Yzv1UYtt8k2O6Fw/IM3XT8ny8Qf0Ws0zEYihtNwfOsxbWb42OeS
-	PkXgtqocclyDq0gs4dLCQlUnk/f5rkBykG363mI4cxmJbVeM8g2Wxquv9IXkJTWFVfLOHi1zJAT
-	PnkkWrV+yvfiqsvZ3oQh1OkSY5polIpumyttuqpLh30hrq4POTOK2FJE8wA+IoA==
-X-Received: by 2002:a05:600c:220f:b0:413:e19:337f with SMTP id z15-20020a05600c220f00b004130e19337fmr6115871wml.22.1711884034573;
-        Sun, 31 Mar 2024 04:20:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEhoN6xvj4jps7JZJhPCGbovoaf04BQIV4BBUP7925nSfWx1HPIV5PQzN7Ku2MIo02ql2sOQw==
-X-Received: by 2002:a05:600c:220f:b0:413:e19:337f with SMTP id z15-20020a05600c220f00b004130e19337fmr6115845wml.22.1711884033951;
-        Sun, 31 Mar 2024 04:20:33 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:173:c52c:ce6f:ec9c:ca7c:7200])
-        by smtp.gmail.com with ESMTPSA id u22-20020a05600c139600b004148d7b889asm14465567wmf.8.2024.03.31.04.20.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Mar 2024 04:20:33 -0700 (PDT)
-Date: Sun, 31 Mar 2024 07:20:24 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
-	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 01/22] virtio: store owner from modules with
- register_virtio_driver()
-Message-ID: <20240331071546-mutt-send-email-mst@kernel.org>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-1-0feffab77d99@linaro.org>
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="La0soKW7";
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="LIaNafrJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1711890086;
+	bh=sDzCySBGc78kD08nnzcKeQyX2gLEvAv/rzqBNe7+CzE=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=La0soKW7NsRuUh/rimdDOLzAak0a7z/Qw3VmW2h3qshwBezBO5N3vU/HF9TuASSWc
+	 0qt0SsBU/ZTMqwKWrILa0XyIzUDlKvvMNKcysxp8NWXhobpVolWbTiYflaiOrH0m0C
+	 47Tzc2C90RKkz2eV4O1rxIxzuAkw2yv48odeT06E=
+Received: from localhost (localhost [127.0.0.1])
+	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 73D90128681D;
+	Sun, 31 Mar 2024 09:01:26 -0400 (EDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+ by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
+ with ESMTP id AfUzaoxOPFxH; Sun, 31 Mar 2024 09:01:26 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1711890085;
+	bh=sDzCySBGc78kD08nnzcKeQyX2gLEvAv/rzqBNe7+CzE=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=LIaNafrJKwQC0PlYtqfoiToK8eAAYjZpQpkUkk1ND3I5lmO3goivsbWpHTLCHbvPX
+	 w7fy0842lTmLlXDwWGLvY5ZQRMnkraJJcVByghLoNujPf+1fHAuB5xXh6FTMV4STZD
+	 1XLB/XMN63MHZOyGAlVmsFDA4kzSgKOx1V4MjlpY=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 1659512867AB;
+	Sun, 31 Mar 2024 09:01:25 -0400 (EDT)
+Message-ID: <fbc4bb78b39ab5b088b215cf854487022e59bbb4.camel@HansenPartnership.com>
+Subject: Re: [PATCH] KEYS: Add ECDH support
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Zhang Yiqun <zhangyiqun@phytium.com.cn>, dhowells@redhat.com, 
+	jarkko@kernel.org, corbet@lwn.net, keyrings@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Date: Sun, 31 Mar 2024 09:01:22 -0400
+In-Reply-To: <20240331004844.GA104623@sol.localdomain>
+References: <20240330065506.3146-1-zhangyiqun@phytium.com.cn>
+	 <20240330070436.GA2116@sol.localdomain>
+	 <087bbfcf95c9014ee8f87d482773244f0833b892.camel@HansenPartnership.com>
+	 <20240331004844.GA104623@sol.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240327-module-owner-virtio-v1-1-0feffab77d99@linaro.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 27, 2024 at 01:40:54PM +0100, Krzysztof Kozlowski wrote:
-> Modules registering driver with register_virtio_driver() might forget to
-> set .owner field.  i2c-virtio.c for example has it missing.  The field
-> is used by some of other kernel parts for reference counting
-> (try_module_get()), so it is expected that drivers will set it.
+On Sat, 2024-03-30 at 17:48 -0700, Eric Biggers wrote:
+> On Sat, Mar 30, 2024 at 09:09:51AM -0400, James Bottomley wrote:
+[...]
+> > For instance there are people who use the kernel keyring to replace
+> > ssh-agent and thus *reduce* the attack surface they have for
+> > storing
+> > ssh keys:
+> > 
+> > https://blog.cloudflare.com/the-linux-kernel-key-retention-service-and-why-you-should-use-it-in-your-next-application/
+> > 
+> > The same thing could be done with gpg keys or the gnome keyring.
 > 
-> Solve the problem by moving this task away from the drivers to the core
-> amba bus code, just like we did for platform_driver in
-> commit 9447057eaff8 ("platform_device: use a macro instead of
-> platform_driver_register").
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> First, that blog post never actually said that the "replace ssh-agent
+> with kernel keyrings" idea was deployed.  It sounds like a proof of
+> concept idea that someone thought was interesting and decided to blog
+> about.  Upstream OpenSSH has no support for Linux keyrings.
 
+The openssh community is incredibly resistant to out of house
+innovation.  It has no support for engine or provider keys, for TPM
+keys, or for that systemd start patch xz just exploited ...
 
+>   It seems unlikely it would get added, especially given the OpenSSH
+> developers' healthy skepticism of using broken Linux-isms.
+> You're welcome to bring it up on openssh-unix-dev and get their buy-
+> in first.
 
-This makes sense. So this will be:
+I also didn't say just openssh.  You picked the one you apparently know
+hardly ever accepts anyone else's ideas.  I don't disagree that finding
+implementors is reasonable ... I just wouldn't pick openssh as the
+first upstream target.
 
-Fixes: 3cfc88380413 ("i2c: virtio: add a virtio i2c frontend driver")
-Cc: "Jie Deng" <jie.deng@intel.com>
+> Second, as mentioned by the blog post, the kernel also does not
+> support private keys in the default OpenSSH format.  That sort of
+> thing is an example of the fundamental problem with trying to make
+> the kernel support every cryptographic protocol and format in
+> existence.  Userspace simply has much more flexibility to implement
+> whatever it happens to need.
 
-and I think I will pick this patch for this cycle to fix
-the bug. The cleanups can go in the next cycle.
+That's a complete red herring.  You don't need the kernel keyrings to
+support every format, you just need a user space converter to import to
+the kernel keyring format.  Every device or token that can replace key
+handling has their own internal format and they all come with importers
+that do conversion.
 
+> Third, ssh-agent is already a separate process, and like any other
+> process the kernel enforces isolation of its address space.  The
+> potential loopholes are ptrace and coredumps, which ssh-agent already
+> disables, except for ptrace by root which it can't do alone, but the
+> system administrator can do that by setting the ptrace_scope sysctl
+> to 3 or by using SELinux.
 
-> ---
->  Documentation/driver-api/virtio/writing_virtio_drivers.rst | 1 -
->  drivers/virtio/virtio.c                                    | 6 ++++--
->  include/linux/virtio.h                                     | 7 +++++--
->  3 files changed, 9 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/driver-api/virtio/writing_virtio_drivers.rst b/Documentation/driver-api/virtio/writing_virtio_drivers.rst
-> index e14c58796d25..e5de6f5d061a 100644
-> --- a/Documentation/driver-api/virtio/writing_virtio_drivers.rst
-> +++ b/Documentation/driver-api/virtio/writing_virtio_drivers.rst
-> @@ -97,7 +97,6 @@ like this::
->  
->  	static struct virtio_driver virtio_dummy_driver = {
->  		.driver.name =  KBUILD_MODNAME,
-> -		.driver.owner = THIS_MODULE,
->  		.id_table =     id_table,
->  		.probe =        virtio_dummy_probe,
->  		.remove =       virtio_dummy_remove,
-> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-> index f173587893cb..9510c551dce8 100644
-> --- a/drivers/virtio/virtio.c
-> +++ b/drivers/virtio/virtio.c
-> @@ -362,14 +362,16 @@ static const struct bus_type virtio_bus = {
->  	.remove = virtio_dev_remove,
->  };
->  
-> -int register_virtio_driver(struct virtio_driver *driver)
-> +int __register_virtio_driver(struct virtio_driver *driver, struct module *owner)
->  {
->  	/* Catch this early. */
->  	BUG_ON(driver->feature_table_size && !driver->feature_table);
->  	driver->driver.bus = &virtio_bus;
-> +	driver->driver.owner = owner;
-> +
->  	return driver_register(&driver->driver);
->  }
-> -EXPORT_SYMBOL_GPL(register_virtio_driver);
-> +EXPORT_SYMBOL_GPL(__register_virtio_driver);
->  
->  void unregister_virtio_driver(struct virtio_driver *driver)
->  {
-> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> index b0201747a263..26c4325aa373 100644
-> --- a/include/linux/virtio.h
-> +++ b/include/linux/virtio.h
-> @@ -170,7 +170,7 @@ size_t virtio_max_dma_size(const struct virtio_device *vdev);
->  
->  /**
->   * struct virtio_driver - operations for a virtio I/O driver
-> - * @driver: underlying device driver (populate name and owner).
-> + * @driver: underlying device driver (populate name).
->   * @id_table: the ids serviced by this driver.
->   * @feature_table: an array of feature numbers supported by this driver.
->   * @feature_table_size: number of entries in the feature table array.
-> @@ -208,7 +208,10 @@ static inline struct virtio_driver *drv_to_virtio(struct device_driver *drv)
->  	return container_of(drv, struct virtio_driver, driver);
->  }
->  
-> -int register_virtio_driver(struct virtio_driver *drv);
-> +/* use a macro to avoid include chaining to get THIS_MODULE */
-> +#define register_virtio_driver(drv) \
-> +	__register_virtio_driver(drv, THIS_MODULE)
-> +int __register_virtio_driver(struct virtio_driver *drv, struct module *owner);
->  void unregister_virtio_driver(struct virtio_driver *drv);
->  
->  /* module_virtio_driver() - Helper macro for drivers that don't do
-> 
-> -- 
-> 2.34.1
+Well, a) this doesn't survive privilege escalation and b) I don't think
+many people would buy into the notion that we should remove security
+functions from the kernel and give them to userspace daemons because
+it's safer.
+
+James
 
