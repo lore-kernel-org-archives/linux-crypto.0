@@ -1,95 +1,232 @@
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A6C181;
-	Sun, 31 Mar 2024 02:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2256FE24
+	for <linux-crypto@vger.kernel.org>; Sun, 31 Mar 2024 08:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711852689; cv=none; b=gXNEolHo55cI9s9E0fe7uOOSm88Jz7dwj3ls8ge3nw8RDM4vYnsK3QkV/TYCu8HKWXSxelrGFg26OaTa0ta2xAeaumLm+bNicuklMkDBxzgMakTmXxNf8xfV/uZLU1lr3i868qhdgUvfJgx0ptM9DjM8hr8IuQzNZ6hDb2tE66w=
+	t=1711874672; cv=none; b=mrcoZS+ZDcR0PoV07uNk/UkAJUIbfrwRfYAEWka65aU6l6pvd6yRzrLV8ZjkGh2/4efa5pMm3kVCMHraNDVwWW/VTR0faqL1Hxx38TFEAagrr54vW4EJuXqAoqe8Ak2qcid4i7J1ShtAsIoGjTw86+OEbBGAKX9SmMRA6brGyQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711852689; c=relaxed/simple;
-	bh=SNeN2CYj+6bo6yYIrP8F5A4iIl0/Q9yGn+qoKYRUWH4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WX0BCLiJLkXYSF23cXoAUUoCaN3U++73B96a084d5eByR6abt19vx+RRgPeFHn/FNkK/J6TmDIJzyF4IYk3FZTEjQ9I/pyxKjnmYqJBhqHBxbDk+/e+NGJ90rlOfa4MF1hGhvlAequCF3PKJT9TuvWJc3UIpKmFlHj11ZC0GCMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XleIRPSp; arc=none smtp.client-ip=209.85.161.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1711874672; c=relaxed/simple;
+	bh=RbNxoqlZdgy0nYNI8rhm+31pAchfQHzLu9REkEdnoxY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=nz8PwQnC8OIKHwOiW/kDUB3Q2o1O+QqHC7wylilqKLLKt3yQ+vyPY7cSfr0Ms3j/X1nFh+WNIr3avVIzpXwuZI315aVXAJlCQIuKtu5pyDA6+IfzBpOizIXxCZbxl31y4FXQyQtg6uAISMyCZHmqcRgwMUO4Xuy5gIqsw3XR8/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=G9u0ncJe; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XleIRPSp"
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5a47cecb98bso2073304eaf.0;
-        Sat, 30 Mar 2024 19:38:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G9u0ncJe"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41561610fa5so780455e9.2
+        for <linux-crypto@vger.kernel.org>; Sun, 31 Mar 2024 01:44:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711852687; x=1712457487; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lUs6NaIvupBIrN3kNgIHykr6WEWtZD3EhPX18G9uddY=;
-        b=XleIRPSp55P9VHB7a2r/titnJwBaAjVmwFFWncW/trJnpln7+XtSjSvi9uqMgHENno
-         mXoHhat/Z/Iu/etVc504MD8mbcqjpCdo92CyUAjqoOvDmqxWOTlUEoKSZpMXMU1tjGDE
-         XbpXwWhrrBDGTCSBhMimQlOAAiFIgIn6MMASG45+bZdtNZH3XVRJ5bVJUjjXsZsqVSuD
-         EAr0yLfv7Xw4ek1Nrgh1EsDej1shKOAN+fHmpmCt2k67uc0kQqgZTsLvlgNdkJABYumM
-         NqMAc3CT/Ikjfg8Q4m9fVK1ahVo7HmKBBnIuDdfrFTz3L4Mf85eUXTvDWIq6NjILU5Zk
-         EE5A==
+        d=linaro.org; s=google; t=1711874668; x=1712479468; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2sqUaJ3F0oIXdnezjdx4l/HGQrEHUiJM730gZB0fIbE=;
+        b=G9u0ncJex/UqRH7KV2BEHipMSK2IQBV7an3e1SeiBDXctFzrAkdtgXo3dDP2iZUPOz
+         GF6m/RLgv4iZYjaxU8GOQ1m2zUT6aoda1SI7EffP+wi0+yazdYm5pRT4DewbzDG4yjzD
+         1Wv46pTOoFo3RHtOzkjy4/V5wbIXHiDRntYTWvkurOlBQldF8E1Hvbx8z/u/Rfrvnlmc
+         UMw+zBOGynx5nO3qaW8//Ed1/WRzYVvlxuqB0eZa13+4RhcJQ0nOcNqGnqHmNxARfSrP
+         XjVQnnJL7XUbkZCdH85OEgdCk3K8SS03dzqqSpbYHGMGdE3dQJVWG1a0WCsw3UiXjPMs
+         3tmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711852687; x=1712457487;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lUs6NaIvupBIrN3kNgIHykr6WEWtZD3EhPX18G9uddY=;
-        b=dR8iI2wu/bgmWoKgd3fQy1Qs3x8Gg8zaFnPHbg0FZVEZ0RXNeEaOyPNYJ1aIfjy24D
-         15h1F4+67W51lrSYAej/3JXzlWZZfwN+sEoBc+2m+UdBjvHf18AI150uR/j7E1kwLdbX
-         sGYqzl76u5sQvTr0S681UIXwuJI8SbyuckQSRFHBqVNDfJVH0TIeYJflzO0R6FpSMC8R
-         9zz21UCZ3xMyhIWChGyQmc7Wt48iBBORmO2pxhHMcl7c4qiPRydQGd654U39D+gB3weL
-         ELldBLvIApWZmFYYutf7AN/jmQk6rSAo74Gm8P8UkZUIxFx+1qy0xVLs34o8roNuo1WX
-         +QIg==
-X-Forwarded-Encrypted: i=1; AJvYcCVwL3cU3nCsvXYDTwS66oYsIOZe9xNTNPxXhx+b5LI0hF4hupv8P5wIUYO2JPUDl0WepDijhDJPYBg1N560PbnJ5RAa4R88i26Vu9VypwbBZecB5aqbsTeOFXgu4wuUSU6yA7yyNW3bsx+drdJwvoi1WZf5gLyATZ+18fbURnSBI4TAocIuILlIqVomkqoToJcDzLA9S5fTrbiTCkqMZeE=
-X-Gm-Message-State: AOJu0YyW7TJsviPHgdYwWIVD+v3Bv1LiX1phxqUeZ9O5THjJ2TKywZ9M
-	IdQhsJIEEtX7xf5p5m/dh/a51J+VTrkHVZa0tY90NWObJeeGoGmG
-X-Google-Smtp-Source: AGHT+IG8y/mw6Sg+NJ68AiBnOVhIGZhncP4yQFjwCnn6QvLTTTIKr8wBQM2lppgPQLGZ1h9+K7oVJA==
-X-Received: by 2002:a05:6820:260e:b0:5a5:639a:2fb8 with SMTP id cy14-20020a056820260e00b005a5639a2fb8mr6074835oob.4.1711852687375;
-        Sat, 30 Mar 2024 19:38:07 -0700 (PDT)
-Received: from [192.168.1.22] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id bf14-20020a056820174e00b005a4bcb155basm1611035oob.23.2024.03.30.19.38.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Mar 2024 19:38:07 -0700 (PDT)
-Message-ID: <aae9bc89-ca34-400f-9c5e-44be1df2befa@gmail.com>
-Date: Sat, 30 Mar 2024 21:38:05 -0500
+        d=1e100.net; s=20230601; t=1711874668; x=1712479468;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2sqUaJ3F0oIXdnezjdx4l/HGQrEHUiJM730gZB0fIbE=;
+        b=XOj4PRlx6LxdOJ9+Yn/ymBmRypNj7z3RYu2KAd+/eHuKonMkPUJoKluGmvez2IUb8N
+         XWOsqzwv/tiDUQm3Be70yNsTEn3ZInL5aNqNikfq+CfDa6fqv8zHB5G2RdDRl7CuapC9
+         KFpZHLZ2X7G6LEIwVmENlu2jLCxYLy/CtHmz5iNXnbBZLfSmlk7oaM2/v7sdxj0MfAuw
+         wJl0mFUZhXuatCAspi0TnQ5ZuCYbXPuRM8rbLovda/9D5Ffc7HpEFTNEOaFpl9PfbF+E
+         PUxv1nD+6NLMeie7IRNqyGgG/PgLQ2hxFITv8/N2iq6xK7+Yq4AHSRPYS3GwvzzJcrNR
+         nmvA==
+X-Forwarded-Encrypted: i=1; AJvYcCXCib9gk3YXmRQ7jwmLVd8U6pF0EwcpKFJUCw9NFk24pJugYXUvxYh0mC9Gh0BRamGlZvwtbkksLt2sDFEGu2Sg3fCqQn2DG0NJAtHz
+X-Gm-Message-State: AOJu0YwjnVp6uyXU+uvijP8cekFcDikSzHkH5EBKwdB7msr47lBEDXig
+	vL8kpFq9oD6K0tLOrJzcn7GehZT+NDjoj7fnqgUoZyxINgNKVGeiEvVaNApR+2g=
+X-Google-Smtp-Source: AGHT+IGRtVdiB0tbOSLfOXovtwdG5H9mbUjwpU0tBzceuiXLquDRXJG/+3RcRx7InUOrbUq4kV2O/A==
+X-Received: by 2002:a05:600c:4fc3:b0:414:894b:df65 with SMTP id o3-20020a05600c4fc300b00414894bdf65mr4484011wmq.3.1711874667865;
+        Sun, 31 Mar 2024 01:44:27 -0700 (PDT)
+Received: from [127.0.1.1] ([178.197.223.16])
+        by smtp.gmail.com with ESMTPSA id k17-20020adff5d1000000b00341b7388dafsm8436003wrp.77.2024.03.31.01.44.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 Mar 2024 01:44:27 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v2 00/25] virtio: store owner from modules with
+ register_virtio_driver()
+Date: Sun, 31 Mar 2024 10:43:47 +0200
+Message-Id: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KEYS: Add ECDH support
-Content-Language: en-US
-To: Eric Biggers <ebiggers@kernel.org>,
- James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: Zhang Yiqun <zhangyiqun@phytium.com.cn>, dhowells@redhat.com,
- jarkko@kernel.org, corbet@lwn.net, keyrings@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-References: <20240330065506.3146-1-zhangyiqun@phytium.com.cn>
- <20240330070436.GA2116@sol.localdomain>
- <087bbfcf95c9014ee8f87d482773244f0833b892.camel@HansenPartnership.com>
- <20240331004844.GA104623@sol.localdomain>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240331004844.GA104623@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEMiCWYC/32NQQ6CMBBFr0Jm7ZhSkAZX3sOwqDCFSbA1U6waw
+ t2tHMDle8l/f4VIwhThXKwglDhy8Bn0oYB+sn4k5CEzaKVrVWmD9zA8Z8Lw8iSYWBYOeKob01S
+ 3qrdaQ14+hBy/9+q1yzxxXIJ89pNU/uz/XipRoXLknL0ZM7TtZWZvJRyDjNBt2/YFCNOSuLcAA
+ AA=
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, 
+ David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, 
+ Richard Weinberger <richard@nod.at>, 
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
+ Johannes Berg <johannes@sipsolutions.net>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+ Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>, 
+ Arnd Bergmann <arnd@arndb.de>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>, 
+ Sudeep Holla <sudeep.holla@arm.com>, 
+ Cristian Marussi <cristian.marussi@arm.com>, 
+ Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>, 
+ Gurchetan Singh <gurchetansingh@chromium.org>, 
+ Chia-I Wu <olvaffe@gmail.com>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ Daniel Vetter <daniel@ffwll.ch>, 
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
+ Robin Murphy <robin.murphy@arm.com>, Alexander Graf <graf@amazon.com>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
+ Latchesar Ionkov <lucho@ionkov.net>, 
+ Dominique Martinet <asmadeus@codewreck.org>, 
+ Christian Schoenebeck <linux_oss@crudebyte.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
+ Dan Williams <dan.j.williams@intel.com>, 
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
+ Ira Weiny <ira.weiny@intel.com>, 
+ Pankaj Gupta <pankaj.gupta.linux@gmail.com>, 
+ Bjorn Andersson <andersson@kernel.org>, 
+ Mathieu Poirier <mathieu.poirier@linaro.org>, 
+ "James E.J. Bottomley" <jejb@linux.ibm.com>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+ Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-um@lists.infradead.org, 
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
+ linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+ linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
+ linux-sound@vger.kernel.org, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+ Viresh Kumar <viresh.kumar@linaro.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3968;
+ i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
+ bh=RbNxoqlZdgy0nYNI8rhm+31pAchfQHzLu9REkEdnoxY=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBmCSJOfbLDaNdnK7LZ1sjz9p0nKU8yjNOYDTxRF
+ 4/5FYB++7yJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZgkiTgAKCRDBN2bmhouD
+ 16xfD/sGCutGIoRx2mgC/Hzc5lMgoTczIXo0qN8pbpswO/nFngNxF2adSq55q9CTUzlGZru9bWH
+ cNigDmSXMrSx7sM5ybz4qcmCMyehu+O7U8aOA8tW+erFZAOR0aUfLcQqpLPDYLI7hHQ63O8I7Xj
+ VtJUMKdpfYuqQseiDryzJ7zX7vXMTLSRsMPlVp19sEGgRGa3gqRZv83c766vMP83MLwQxLpK4Z0
+ fC4BciD8EYSau1CqSlwHVw0CKNFS+3fOE+eUbMU1/MDg7uNVJhh1g8G4k1IwOMn5an8AH7S3jst
+ Yv6WIreS8LWUyj8KK7ZYISf6/5LWFfQOhTtEUtxJUKYX8x4eYhd3Chzc4as2k6CKZJJLNUufHXk
+ 29XnqUetqiy8dO89GrEG833CGg8DZS69bEER9EIFBUp6npPkX2mRYhs6C2jOw/+HMrrhFRYuj0b
+ 90GkjTaKji3hfg/b20jvDdu8F30M0jhl238jJQ6wc/ehq9fr9tSOnT8crROsB1fo7GJ0QK5fUA4
+ WiGXRrSwF3LgXEqkYWW4FeVmFB4V8uRr3ouRwdLMwRe4mHe2iV5MXhs+XE7nzazEStXPgvNetGF
+ ctJR56fkmyU2W1CRwSQNwxkotC5tYJYs6mW3MbY0xjCNZ5ya5KBoG/F48Dd8KQpSIKmpQVamNr9
+ jmD2MP/z6d7uUdg==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
+ fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-Hi Eric,
+Changes in v2:
+- Three new patches: virtio mem+input+balloon
+- Minor commit msg adjustments
+- Add tags
+- Link to v1: https://lore.kernel.org/r/20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org
 
-> 
-> Amusingly, the existing KEYCTL_DH_* APIs, and the KEYCTL_ECDH_* APIs proposed by
-> this patch, only operate on user keys that the process has READ access to.  This
-> means that the keys can be trivially extracted by a shell script running in your
-> user session.  That's *less* secure than using an isolated process...
-> 
+Merging
+=======
+All further patches depend on the first virtio patch, therefore please ack
+and this should go via one tree: maybe virtio?
 
-I can see this being true for user or session keys, but I don't think this is 
-true of process or thread specific keys.  At least I couldn't read any keys out 
-of a test app when I tried.
+Description
+===========
+Modules registering driver with register_virtio_driver() often forget to
+set .owner field.
 
-Regards,
--Denis
+Solve the problem by moving this task away from the drivers to the core
+virtio code, just like we did for platform_driver in commit
+9447057eaff8 ("platform_device: use a macro instead of
+platform_driver_register").
+
+Best regards,
+Krzysztof
+
+---
+Krzysztof Kozlowski (25):
+      virtio: store owner from modules with register_virtio_driver()
+      virtio: balloon: drop owner assignment
+      virtio: input: drop owner assignment
+      virtio: mem: drop owner assignment
+      um: virt-pci: drop owner assignment
+      virtio_blk: drop owner assignment
+      bluetooth: virtio: drop owner assignment
+      hwrng: virtio: drop owner assignment
+      virtio_console: drop owner assignment
+      crypto: virtio - drop owner assignment
+      firmware: arm_scmi: virtio: drop owner assignment
+      gpio: virtio: drop owner assignment
+      drm/virtio: drop owner assignment
+      iommu: virtio: drop owner assignment
+      misc: nsm: drop owner assignment
+      net: caif: virtio: drop owner assignment
+      net: virtio: drop owner assignment
+      net: 9p: virtio: drop owner assignment
+      vsock/virtio: drop owner assignment
+      wifi: mac80211_hwsim: drop owner assignment
+      nvdimm: virtio_pmem: drop owner assignment
+      rpmsg: virtio: drop owner assignment
+      scsi: virtio: drop owner assignment
+      fuse: virtio: drop owner assignment
+      sound: virtio: drop owner assignment
+
+ Documentation/driver-api/virtio/writing_virtio_drivers.rst | 1 -
+ arch/um/drivers/virt-pci.c                                 | 1 -
+ drivers/block/virtio_blk.c                                 | 1 -
+ drivers/bluetooth/virtio_bt.c                              | 1 -
+ drivers/char/hw_random/virtio-rng.c                        | 1 -
+ drivers/char/virtio_console.c                              | 2 --
+ drivers/crypto/virtio/virtio_crypto_core.c                 | 1 -
+ drivers/firmware/arm_scmi/virtio.c                         | 1 -
+ drivers/gpio/gpio-virtio.c                                 | 1 -
+ drivers/gpu/drm/virtio/virtgpu_drv.c                       | 1 -
+ drivers/iommu/virtio-iommu.c                               | 1 -
+ drivers/misc/nsm.c                                         | 1 -
+ drivers/net/caif/caif_virtio.c                             | 1 -
+ drivers/net/virtio_net.c                                   | 1 -
+ drivers/net/wireless/virtual/mac80211_hwsim.c              | 1 -
+ drivers/nvdimm/virtio_pmem.c                               | 1 -
+ drivers/rpmsg/virtio_rpmsg_bus.c                           | 1 -
+ drivers/scsi/virtio_scsi.c                                 | 1 -
+ drivers/virtio/virtio.c                                    | 6 ++++--
+ drivers/virtio/virtio_balloon.c                            | 1 -
+ drivers/virtio/virtio_input.c                              | 1 -
+ drivers/virtio/virtio_mem.c                                | 1 -
+ fs/fuse/virtio_fs.c                                        | 1 -
+ include/linux/virtio.h                                     | 7 +++++--
+ net/9p/trans_virtio.c                                      | 1 -
+ net/vmw_vsock/virtio_transport.c                           | 1 -
+ sound/virtio/virtio_card.c                                 | 1 -
+ 27 files changed, 9 insertions(+), 30 deletions(-)
+---
+base-commit: 7fdcff3312e16ba8d1419f8a18f465c5cc235ecf
+change-id: 20240327-module-owner-virtio-546763b3ca22
+
+Best regards,
+-- 
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
