@@ -1,329 +1,148 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F3C1E898
-	for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 21:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35546383;
+	Sun, 31 Mar 2024 00:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711835060; cv=none; b=AgnkYl6BU177pCC/42kaXTPOxme34RVEfw+OO09sG84Ecnxxnxd4c4AEr1Yp1t45L9ZOEYGWFjXsmonvBPHldMbAAHkyAWgiqmrztlEpePcYuVg92tp0dQSyD6oSAjZuVbJQeU3nd7xRv92DX0d+7qbFNXb/FcMDtKjRP0+h3I0=
+	t=1711846127; cv=none; b=BZKqmTrdl/RN0V2FsGHWhIP578b9eDgzTT5Fk0PkW/O4wMO8zMJpx3mkUnaNVQURJUmyBpqFGLvg1D4lvDHMq6T2qJM8IBceiGw3yneAT31L0Cg4UYPSv0ZNwOt/inMG8Mj5xys3VjNbkH5Ivlm+GzopgHK7JVWqahwQASY5yy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711835060; c=relaxed/simple;
-	bh=RMUAwxfBL6v+GOWep6RijyAhN1Eu1x5xeC0TGBvfsN8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l1VELV71pSE+pitUxO6PZDLwfBWcKxg+NZBKgmvamMpNZDTWNVWFUNDJILdvT1WUWRcMgnNMdbsW48UzMaEtXGJbeN0Tp4hXRMD1kCBTUYfZ8luyvnqc+VHEPXo0CX9cJUVQcGY2C58L3O8/I+J53S+vh89JdFcw8bXSEaqFfq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jPSRLNX5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711846127; c=relaxed/simple;
+	bh=5R/y/M+p05y5G7U6Q0i8lhl8d1NWN6ZRPceQTVGsVrI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S622OIFwgXW/vLRK1N/i7M0+QXecyfPK2oSHoe8TBkMRMRCieJ7jSF/eKf5/sY1488lSTdHzW2rbjJbSOzIOjZwkaJLP2WFc7Xy8mn7G/e8c7YSnIyXhsVUQQgJz9cgAHbCmG1DvPpP/bvW2so8c/XOw6Tppt4EbNqYdPeBPuKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HnnxChoe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPSRLNX5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711835057;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=izlk5zYEPtQtitZfD1Xa4239xlrb4zQaz31TSnSFbO8=;
-	b=jPSRLNX5ioNiCLGGFgYa15v3rMLzyZj3JtGI5TQBGjZ4f04KM7UUddGP6/ukYlPmaWPi7N
-	vzZf0Y1EtVEI+HAzpoUQZSzLmOJV0LsGKdM/VgPmskY3R5zEhJTda9f6E3Z90q/XYPayyK
-	oYRnDncI3scGlF57yfr0bQjdbSy+dWA=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-117-cBSYwqMsOFiIfVXKGdkDYQ-1; Sat, 30 Mar 2024 17:44:15 -0400
-X-MC-Unique: cBSYwqMsOFiIfVXKGdkDYQ-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a473f5a84aaso227899566b.2
-        for <linux-crypto@vger.kernel.org>; Sat, 30 Mar 2024 14:44:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711835054; x=1712439854;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=izlk5zYEPtQtitZfD1Xa4239xlrb4zQaz31TSnSFbO8=;
-        b=wPEt9/oTyqQBN7x1/VQ0oLwf6LBh2uXTfMpTJ+iG7gaRZoprv2E9WdtU4e+uroNE4b
-         wbADETChcmLc6+jrdv469jMc0aR3ggVeUzQLsNr0thyIOEi5R3VvGwp9TDlfIDZ6BSWR
-         4Jiju58YLD85ss/678OhI/+74ZiEkbAO5t+fAsg0SRxXoQQspwkdoiYv/8Q70kMfk/1q
-         rkK/h6PmP/IUWujmboBQlvLWNaiWxPA0LbIG/MSqc6rGFYHXsTxvWPUuC3MX0E1fYeEl
-         HiMv/ZPnlnaxDb0H9zTLppZ1n/m8rQFpwkmzWdmDOmpCdAoggE3mPwiWRShRsnz8lngc
-         Q/0A==
-X-Forwarded-Encrypted: i=1; AJvYcCWu2bzr3fGgn23SYlM0dL1SFCT002M8R3pEFlngrR4+3AP4yICROqGWZ+yzicvaxuivVyeu6jjnEvu/8YjjqELZFsKXnGLaOPWNgG/K
-X-Gm-Message-State: AOJu0YzS9ajh19iDGnUVTwOq1RPcPUPMegzW14HxnLShwQEvms9RRLn6
-	jZHSVqvoBxlx1MCCPnzqshth0CSU3obln3Z4DLPIx3Ua2UHNDa+dbILzBPfoS7jWK7fWw9Ixm7A
-	VlN+xS/4cfrq91+3G5WOlGCMtFn7P5mXNbLmVZGx85o5jFI8EiWc/rVbhOdoVpg==
-X-Received: by 2002:a17:906:24d7:b0:a4e:1aef:2d03 with SMTP id f23-20020a17090624d700b00a4e1aef2d03mr3493110ejb.69.1711835054358;
-        Sat, 30 Mar 2024 14:44:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEB4hhnolDV2VDW9ProjEjPrZSmimTTGsoO1Kt1nnLoSJpgttSbznq+JYF5W8Ur6uv2Wrybrg==
-X-Received: by 2002:a17:906:24d7:b0:a4e:1aef:2d03 with SMTP id f23-20020a17090624d700b00a4e1aef2d03mr3493096ejb.69.1711835053917;
-        Sat, 30 Mar 2024 14:44:13 -0700 (PDT)
-Received: from [192.168.10.4] ([151.95.49.219])
-        by smtp.googlemail.com with ESMTPSA id d6-20020a1709063ec600b00a474c3c2f9dsm3458900ejj.38.2024.03.30.14.44.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Mar 2024 14:44:13 -0700 (PDT)
-Message-ID: <8153674b-1b66-4416-a3b8-b6b7867e77f4@redhat.com>
-Date: Sat, 30 Mar 2024 22:44:10 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HnnxChoe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72A51C433C7;
+	Sun, 31 Mar 2024 00:48:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711846126;
+	bh=5R/y/M+p05y5G7U6Q0i8lhl8d1NWN6ZRPceQTVGsVrI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HnnxChoe6PD0c253FzpqzrGbGakgdwsrko83C1NyXCjMlc/PkIYrqVejJGzJnRubB
+	 SLh08seHoHgJPf+qCjJqbfUC5LZS3KmneiZh/vCoGOPs9LPhZFp5mRnRTKzAjHQOVw
+	 G/Qnzd/pDbFPQBIBcBVgBp0Ev0HUtGqAt1a+lCPHKpuE4GXTrs2IFjjKGYd+BqYjjR
+	 ixOvthPzaXJ0azrzgMB/UozGCbk2SPB3SpOVWfe0H7eHgF3u8HoH/36lYd8Vp+FFMl
+	 trrs/8GeDhb6fOZFacgfmEzzuYVsjcsBiFUMyvUyyrujhffg/T0MHmMiChmiDDkww6
+	 Q7QKPIw9ue+Gg==
+Date: Sat, 30 Mar 2024 17:48:44 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Zhang Yiqun <zhangyiqun@phytium.com.cn>, dhowells@redhat.com,
+	jarkko@kernel.org, corbet@lwn.net, keyrings@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] KEYS: Add ECDH support
+Message-ID: <20240331004844.GA104623@sol.localdomain>
+References: <20240330065506.3146-1-zhangyiqun@phytium.com.cn>
+ <20240330070436.GA2116@sol.localdomain>
+ <087bbfcf95c9014ee8f87d482773244f0833b892.camel@HansenPartnership.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 00/29] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com,
- vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
- vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
- tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com
-References: <20240329225835.400662-1-michael.roth@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20240329225835.400662-1-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <087bbfcf95c9014ee8f87d482773244f0833b892.camel@HansenPartnership.com>
 
-On 3/29/24 23:58, Michael Roth wrote:
-> This patchset is also available at:
+On Sat, Mar 30, 2024 at 09:09:51AM -0400, James Bottomley wrote:
+> On Sat, 2024-03-30 at 00:04 -0700, Eric Biggers wrote:
+> > [+Cc linux-crypto]
+> > 
+> > On Sat, Mar 30, 2024 at 02:55:06PM +0800, Zhang Yiqun wrote:
+> > > This patch is to introduce ECDH into keyctl syscall for
+> > > userspace usage, containing public key generation and
+> > > shared secret computation.
+> > > 
+> > > It is mainly based on dh code, so it has the same condition
+> > > to the input which only user keys is supported. The output
+> > > result is storing into the buffer with the provided length.
+> > > 
+> > > Signed-off-by: Zhang Yiqun <zhangyiqun@phytium.com.cn>
+> > > ---
+> > >  Documentation/security/keys/core.rst |  62 ++++++
+> > >  include/linux/compat.h               |   4 +
+> > >  include/uapi/linux/keyctl.h          |  11 +
+> > >  security/keys/Kconfig                |  12 +
+> > >  security/keys/Makefile               |   2 +
+> > >  security/keys/compat_ecdh.c          |  50 +++++
+> > >  security/keys/ecdh.c                 | 318
+> > > +++++++++++++++++++++++++++
+> > >  security/keys/internal.h             |  44 ++++
+> > >  security/keys/keyctl.c               |  10 +
+> > >  9 files changed, 513 insertions(+)
+> > >  create mode 100644 security/keys/compat_ecdh.c
+> > >  create mode 100644 security/keys/ecdh.c
+> > 
+> > Nacked-by: Eric Biggers <ebiggers@google.com>
+> > 
+> > The existing KEYCTL_PKEY_*, KEYCTL_DH_COMPUTE, and AF_ALG are causing
+> > enough problems.  We do not need any more UAPIs like this.  They are
+> > hard to maintain, break often, not properly documented, increase the
+> > kernel's attack surface, and what they do is better done in
+> > userspace.
 > 
->    https://github.com/amdese/linux/commits/snp-host-v12
+> Actually that's not entirely true.  There is a use case for keys which
+> is where you'd like to harden unwrapped key handling and don't have the
+> ability to use a device.  The kernel provides a harder exfiltration
+> environment than user space, so there is a use case for getting the
+> kernel to handle operations on unwrapped keys for the protection it
+> affords the crytpographic key material.
 > 
-> and is based on top of the following series:
+> For instance there are people who use the kernel keyring to replace
+> ssh-agent and thus *reduce* the attack surface they have for storing
+> ssh keys:
 > 
->    [PATCH gmem 0/6] gmem fix-ups and interfaces for populating gmem pages
->    https://lore.kernel.org/kvm/20240329212444.395559-1-michael.roth@amd.com/
+> https://blog.cloudflare.com/the-linux-kernel-key-retention-service-and-why-you-should-use-it-in-your-next-application/
 > 
-> which in turn is based on:
-> 
->    https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=kvm-coco-queue
-> 
-> 
-> Patch Layout
-> ------------
-> 
-> 01-04: These patches are minor dependencies for this series and will
->         eventually make their way upstream through other trees. They are
->         included here only temporarily.
-> 
-> 05-09: These patches add some basic infrastructure and introduces a new
->         KVM_X86_SNP_VM vm_type to handle differences verses the existing
->         KVM_X86_SEV_VM and KVM_X86_SEV_ES_VM types.
-> 
-> 10-12: These implement the KVM API to handle the creation of a
->         cryptographic launch context, encrypt/measure the initial image
->         into guest memory, and finalize it before launching it.
-> 
-> 13-20: These implement handling for various guest-generated events such
->         as page state changes, onlining of additional vCPUs, etc.
-> 
-> 21-24: These implement the gmem hooks needed to prepare gmem-allocated
->         pages before mapping them into guest private memory ranges as
->         well as cleaning them up prior to returning them to the host for
->         use as normal memory. Because this supplants certain activities
->         like issued WBINVDs during KVM MMU invalidations, there's also
->         a patch to avoid duplicating that work to avoid unecessary
->         overhead.
-> 
-> 25:    With all the core support in place, the patch adds a kvm_amd module
->         parameter to enable SNP support.
-> 
-> 26-29: These patches all deal with the servicing of guest requests to handle
->         things like attestation, as well as some related host-management
->         interfaces.
-> 
-> 
-> Testing
-> -------
-> 
-> For testing this via QEMU, use the following tree:
-> 
->    https://github.com/amdese/qemu/commits/snp-v4-wip2
-> 
-> A patched OVMF is also needed due to upstream KVM no longer supporting MMIO
-> ranges that are mapped as private. It is recommended you build the AmdSevX64
-> variant as it provides the kernel-hashing support present in this series:
-> 
->    https://github.com/amdese/ovmf/commits/apic-mmio-fix1c
-> 
-> A basic command-line invocation for SNP would be:
-> 
->   qemu-system-x86_64 -smp 32,maxcpus=255 -cpu EPYC-Milan-v2
->    -machine q35,confidential-guest-support=sev0,memory-backend=ram1
->    -object memory-backend-memfd,id=ram1,size=4G,share=true,reserve=false
->    -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,id-auth=
->    -bios /home/mroth/ovmf/OVMF_CODE-upstream-20240228-apicfix-1c-AmdSevX64.fd
-> 
-> With kernel-hashing and certificate data supplied:
-> 
->   qemu-system-x86_64 -smp 32,maxcpus=255 -cpu EPYC-Milan-v2
->    -machine q35,confidential-guest-support=sev0,memory-backend=ram1
->    -object memory-backend-memfd,id=ram1,size=4G,share=true,reserve=false
->    -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,id-auth=,certs-path=/home/mroth/cert.blob,kernel-hashes=on
->    -bios /home/mroth/ovmf/OVMF_CODE-upstream-20240228-apicfix-1c-AmdSevX64.fd
->    -kernel /boot/vmlinuz-6.8.0-snp-host-v12-wip40+
->    -initrd /boot/initrd.img-6.8.0-snp-host-v12-wip40+
->    -append "root=UUID=d72a6d1c-06cf-4b79-af43-f1bac4f620f9 ro console=ttyS0,115200n8"
-> 
-> 
-> Known issues / TODOs
-> --------------------
-> 
->   * Base tree in some cases reports "Unpatched return thunk in use. This should
->     not happen!" the first time it runs an SVM/SEV/SNP guests. This a recent
->     regression upstream and unrelated to this series:
-> 
->       https://lore.kernel.org/linux-kernel/CANpmjNOcKzEvLHoGGeL-boWDHJobwfwyVxUqMq2kWeka3N4tXA@mail.gmail.com/T/
-> 
->   * 2MB hugepage support has been dropped pending discussion on how we plan
->     to re-enable it in gmem.
-> 
->   * Host kexec should work, but there is a known issue with handling host
->     kdump while SNP guests are running which will be addressed as a follow-up.
-> 
->   * SNP kselftests are currently a WIP and will be included as part of SNP
->     upstreaming efforts in the near-term.
-> 
-> 
-> SEV-SNP Overview
-> ----------------
-> 
-> This part of the Secure Encrypted Paging (SEV-SNP) series focuses on the
-> changes required to add KVM support for SEV-SNP. This series builds upon
-> SEV-SNP guest support, which is now in mainline, and and SEV-SNP host
-> initialization support, which is now in linux-next.
-> 
-> While series provides the basic building blocks to support booting the
-> SEV-SNP VMs, it does not cover all the security enhancement introduced by
-> the SEV-SNP such as interrupt protection, which will added in the future.
-> 
-> With SNP, when pages are marked as guest-owned in the RMP table, they are
-> assigned to a specific guest/ASID, as well as a specific GFN with in the
-> guest. Any attempts to map it in the RMP table to a different guest/ASID,
-> or a different GFN within a guest/ASID, will result in an RMP nested page
-> fault.
-> 
-> Prior to accessing a guest-owned page, the guest must validate it with a
-> special PVALIDATE instruction which will set a special bit in the RMP table
-> for the guest. This is the only way to set the validated bit outside of the
-> initial pre-encrypted guest payload/image; any attempts outside the guest to
-> modify the RMP entry from that point forward will result in the validated
-> bit being cleared, at which point the guest will trigger an exception if it
-> attempts to access that page so it can be made aware of possible tampering.
-> 
-> One exception to this is the initial guest payload, which is pre-validated
-> by the firmware prior to launching. The guest can use Guest Message requests
-> to fetch an attestation report which will include the measurement of the
-> initial image so that the guest can verify it was booted with the expected
-> image/environment.
-> 
-> After boot, guests can use Page State Change requests to switch pages
-> between shared/hypervisor-owned and private/guest-owned to share data for
-> things like DMA, virtio buffers, and other GHCB requests.
-> 
-> In this implementation of SEV-SNP, private guest memory is managed by a new
-> kernel framework called guest_memfd (gmem). With gmem, a new
-> KVM_SET_MEMORY_ATTRIBUTES KVM ioctl has been added to tell the KVM
-> MMU whether a particular GFN should be backed by shared (normal) memory or
-> private (gmem-allocated) memory. To tie into this, Page State Change
-> requests are forward to userspace via KVM_EXIT_VMGEXIT exits, which will
-> then issue the corresponding KVM_SET_MEMORY_ATTRIBUTES call to set the
-> private/shared state in the KVM MMU.
-> 
-> The gmem / KVM MMU hooks implemented in this series will then update the RMP
-> table entries for the backing PFNs to set them to guest-owned/private when
-> mapping private pages into the guest via KVM MMU, or use the normal KVM MMU
-> handling in the case of shared pages where the corresponding RMP table
-> entries are left in the default shared/hypervisor-owned state.
-> 
-> Feedback/review is very much appreciated!
-> 
-> -Mike
-> 
-> Changes since v11:
-> 
->   * Rebase series on kvm-coco-queue and re-work to leverage more
->     infrastructure between SNP/TDX series.
->   * Drop KVM_SNP_INIT in favor of the new KVM_SEV_INIT2 interface introduced
->     here (Paolo):
->       https://lore.kernel.org/lkml/20240318233352.2728327-1-pbonzini@redhat.com/
->   * Drop exposure API fields related to things like VMPL levels, migration
->     agents, etc., until they are actually supported/used (Sean)
->   * Rework KVM_SEV_SNP_LAUNCH_UPDATE handling to use a new
->     kvm_gmem_populate() interface instead of copying data directly into
->     gmem-allocated pages (Sean)
->   * Add support for SNP_LOAD_VLEK, rework the SNP_SET_CONFIG_{START,END} to
->     have simpler semantics that are applicable to management of SNP_LOAD_VLEK
->     updates as well, rename interfaces to the now more appropriate
->     SNP_{PAUSE,RESUME}_ATTESTATION
->   * Fix up documentation wording and do print warnings for
->     userspace-triggerable failures (Peter, Sean)
->   * Fix a race with AP_CREATION wake-up events (Jacob, Sean)
->   * Fix a memory leak with VMSA pages (Sean)
->   * Tighten up handling of RMP page faults to better distinguish between real
->     and spurious cases (Tom)
->   * Various patch/documentation rewording, cleanups, etc.
+> The same thing could be done with gpg keys or the gnome keyring.
 
-I skipped a few patches that deal mostly with AMD ABIs.  Here are the 
-ones that have nontrivial remarks, that are probably be worth a reply 
-before sending v13:
+First, that blog post never actually said that the "replace ssh-agent with
+kernel keyrings" idea was deployed.  It sounds like a proof of concept idea that
+someone thought was interesting and decided to blog about.  Upstream OpenSSH has
+no support for Linux keyrings.  It seems unlikely it would get added, especially
+given the OpenSSH developers' healthy skepticism of using broken Linux-isms.
+You're welcome to bring it up on openssh-unix-dev and get their buy-in first.
 
-- patch 10: some extra checks on input parameters, and possibly 
-forbidding SEV/SEV-ES ioctls for SEV-SNP guests?
+Second, as mentioned by the blog post, the kernel also does not support private
+keys in the default OpenSSH format.  That sort of thing is an example of the
+fundamental problem with trying to make the kernel support every cryptographic
+protocol and format in existence.  Userspace simply has much more flexibility to
+implement whatever it happens to need.
 
-- patch 12: a (hopefully) simple question on boot_vcpu_handled
+Third, ssh-agent is already a separate process, and like any other process the
+kernel enforces isolation of its address space.  The potential loopholes are
+ptrace and coredumps, which ssh-agent already disables, except for ptrace by
+root which it can't do alone, but the system administrator can do that by
+setting the ptrace_scope sysctl to 3 or by using SELinux.
 
-- patch 18: see Sean's objections at 
-https://lore.kernel.org/lkml/ZeCqnq7dLcJI41O9@google.com/
+Amusingly, the existing KEYCTL_DH_* APIs, and the KEYCTL_ECDH_* APIs proposed by
+this patch, only operate on user keys that the process has READ access to.  This
+means that the keys can be trivially extracted by a shell script running in your
+user session.  That's *less* secure than using an isolated process...
 
-- patch 22: question on ignoring PSMASH failures and possibly adding a 
-kvm_arch_gmem_invalidate_begin() API.
+That's not to mention that merging this will likely add vulnerabilities
+reachable by unprivileged users, just as the original KEYCTL_DH_* did.  I had to
+fix some of them last time around (e.g. commits 12d41a023efb, bbe240454d86,
+3619dec5103d, 1d9ddde12e3c, ccd9888f14a8, 199512b1234f).  I don't really feel
+like doing it again. (Wait, was this supposed to *improve* security?)
 
-With respect to the six preparatory patches, I'll merge them in 
-kvm-coco-queue early next week.  However I'll explode the arguments to 
-kvm_gmem_populate(), while also removing "memslot" and merging "src" 
-with "do_memcpy".  I'll post my version very early.
+> > Please refer to the recent thread
+> > https://lore.kernel.org/linux-crypto/CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz/T/#u
+> > where these issues were discussed in detail.
+> 
+> This thread was talking about using the kernel for handling the
+> algorithms themselves (which is probably best done in userspace) and
+> didn't address using the kernel to harden the key protection
+> environment.
 
-Paolo
+This patch is about using the kernel to handle a class of algorithm,
+Elliptic-Curve Diffie-Hellman.  Which specific algorithm in that class (i.e.
+which elliptic curve), who knows.  Just like the existing APIs like this, it's
+undocumented which algorithm(s) are actually supported.
 
+- Eric
