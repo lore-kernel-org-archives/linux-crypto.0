@@ -1,168 +1,173 @@
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2057.outbound.protection.outlook.com [40.107.220.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DF354F87
-	for <linux-crypto@vger.kernel.org>; Mon,  1 Apr 2024 21:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712008351; cv=none; b=tCoUxoa0pHWoOMlHn3OXYRyX30KTz890ivHH169DKy9dtX4ICFaR/eAS7bMJY3sQXH81ypKyplf7s3Qy9BhnihAfw4GXfk7VmTi3FOHmOxqk4y+UhZ/NvXKgxSjtMjqzDQDr6itS9B2eQv9IlWQS30DB07br32anF07MT2BPXJI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712008351; c=relaxed/simple;
-	bh=xtYhY6BUwXMkLZQpueJJRtQUlxtILmj53ZBM5qa4QH8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=UIo0nSTsRfw+LnBiwJ7McoEnK5Dae7gUfce4evnxBQzJZcGJeSnlPpBIMGKApkBPuR2swuj5bqMkNnTDZWaSwg+OQMKsQOGqk84/WApILKzU4CQUsyu5q0psdzQekNJlEHnDS6cvuzOH1kyJExGWJYwj1RmlgXPOFezdlkfPi7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7d0330ce3d4so521096839f.1
-        for <linux-crypto@vger.kernel.org>; Mon, 01 Apr 2024 14:52:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712008348; x=1712613148;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yIp5Xn9VQEO0Vio5ZiAXvasphmfPQLpRkI2nVtDTRhw=;
-        b=GDyjds3sGhqG6DiWReNAuFDEZvnU1N6BX/7q62f/hIAS4kBUjLJOsu0F1KbSMmTr8W
-         1DQZel9Z/hYxds2iDsj7vQPYwlZjCzIOdx0UD53AtkNU/8HJlHYZVD6Y5AlIYt0v2HUg
-         vxyZk+a2FOX7Qg9M/QbmR3mSzjSQoYuVXidGdAmohD78hBFEFVYKR6R0BCq01GGMe2IK
-         sYomZIEJgR3BNI3GfG04tZFIs4mEOLjWUs9sXeTWNcSHvgW4MaombUGCa7vzNt6QzGJt
-         dhqU4h5/oLKFEEKkyzvn7AdLAnS0pHhngMIF+KUjGVxj2dQKF6dtj7smLeUC2LyqNl3l
-         h5/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVRuXQjBDVqRjXdRoPbQdEQvuiD7lF6HfKQWEWl0TQWNNIVQzhhgde+YkDZUQOwMFDyukEe17hSFpycJFZ4mNCGNXBuQgB4l3oQMNqo
-X-Gm-Message-State: AOJu0Yxs8C1/ISdnmNQ8mBLF+WVs21SsiIxGqnYyIo1cfhem2KI10+lg
-	UrFUuQEvQMSoq+g5w4ingXQmrP1SrNHWmC5/1mN1pRvL0HLcgFfVydMPmlSoCQCjkthMrgven0y
-	VFjgELqCNh04KdkzP4w8uZqWZnaovIX6xKxVV1AjdTPNyzXoaTjkJhlw=
-X-Google-Smtp-Source: AGHT+IHx3DqEGJH/2qNpD/v9+eFAO9DANdNQdIUC8z82HdCogsPYZmnc3Dhxa36gtK4L2NvXqEXAO+CX4vA2iCnahdwbGO9eUhKo
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7881EB37;
+	Mon,  1 Apr 2024 22:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712010185; cv=fail; b=mwRC2ZBgjCUmupRy4P95N7hYPkuli2zEc1EY0QIYNk9PRWMOYED2bxxlXPUe2Wdl44FUa8Zg7PUulXaIU5k2ZLIEdRZan+hoEXbqNZEOV/rTRcL81UlRaLDyNhVwOxYg+bhynfNHXb72qVN/mBYbG47CDlEDHiG7mBpc0P96Fj0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712010185; c=relaxed/simple;
+	bh=9awq9AKTdgSn7CRyOrgRlvrOr60UIj7X6QJxqX4g8TA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rDc8xwK9NT837hDyC7lEKyCDf+UQLij5wxQu1y9OpR6Pq6JpQcpFsiJpALKduIWaFpAx5sPwA8np+tfqH6EqDUo4nRmFqpNmbiu73PfDGzQuKqYgUz4SW8hVXkqoPzcSEEDm5wzN2HTzTSqNvb2Tk+/8qwRIeCI930O88Neold4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=yRW90wHy; arc=fail smtp.client-ip=40.107.220.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="yRW90wHy"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b/bJ2/a/4DxCEQdWkZl8F1yFad/MJgJt3jUi3NuxEBVmkGQo1h1xK6msc4/cEuOePjjyU0bt2dLK5/1M1bXgISR1Oa5uPlZ8e7kzcqiu7kQxBt3j8kKe2vdWV8ukoKMaYnkNKa2llDSY07gF7NUzqe9WmLmMNQvEcEacoh5w7Y67YS/G6x8clM3qYUg7SaG+mLP+DwV8qU1E3z73QgpoPDMmMrjy8yisWdEMT4/f0LwxjRkemQ6wCPH+oXlaQHH3olMXCwTQnGd8k09BUQk69ZQ1wMXyNXR7TKC/hdEWzXPrQjPjKWLH6vF1bEjxPSh217XcDJsJd4uu1IrsQt/I9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k0N8Vaj10N0dSIsXzzDqTH4AangxrFBtBRt3deKak0U=;
+ b=eZMUtMzBPM553rjA+YA5Zc6zq1oy0h4RMf4t1PKXm0r3uWAxNbKOr6jWiMnNAzQbIh9UM9LGFXkgiuDY55ZSjJss3HfhmuqzRwYerI9FMPJdUKtGaH1tNGACeds3zuxTRZYGYRcOcC50TBhWNf/7CgPQNDLJKLLYz9lIi9dAgRYf7Mp2VlXQyPBb5vHKkp3aWY7Q1yIQ3amCmTiRl1lSd72qw7v0z46qDhtsP/Ka5SfZMnbE9Q8D2qcTAgY7mfl9QK3POmZ4GAGEXXlcDssn3nGRWYEXVeF5IR/24OCB7gtQWRgFIpUey6Dp80yuczKjfZj8CsOZBPGO0cv/SC1Tmw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k0N8Vaj10N0dSIsXzzDqTH4AangxrFBtBRt3deKak0U=;
+ b=yRW90wHygAtZCvp5N1ujSDHEK4mY7Zss8ymANofV/3JZvvobZrRRjeD/3gYzu6QtNJMhWFtF3Yk7ljTUEbJR35o9zHUPXTVnQ4sldNZ0+qg6vz3OKJ0uLELcVyeMp2urykH1Sby4ULM6gGmPSDnwiydk4X23lpVHClW7v4pTcB0=
+Received: from CH2PR16CA0008.namprd16.prod.outlook.com (2603:10b6:610:50::18)
+ by IA1PR12MB8222.namprd12.prod.outlook.com (2603:10b6:208:3f2::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Mon, 1 Apr
+ 2024 22:22:52 +0000
+Received: from CH1PEPF0000AD7D.namprd04.prod.outlook.com
+ (2603:10b6:610:50:cafe::38) by CH2PR16CA0008.outlook.office365.com
+ (2603:10b6:610:50::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46 via Frontend
+ Transport; Mon, 1 Apr 2024 22:22:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CH1PEPF0000AD7D.mail.protection.outlook.com (10.167.244.86) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7452.22 via Frontend Transport; Mon, 1 Apr 2024 22:22:52 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 1 Apr
+ 2024 17:22:50 -0500
+Date: Mon, 1 Apr 2024 17:22:29 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <seanjc@google.com>, <vkuznets@redhat.com>,
+	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
+	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
+	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
+	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
+	<brijesh.singh@amd.com>, Xu Yilun <yilun.xu@linux.intel.com>, Binbin Wu
+	<binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH v12 11/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+Message-ID: <20240401222229.qpnpozdsr6b2sntk@amd.com>
+References: <20240329225835.400662-1-michael.roth@amd.com>
+ <20240329225835.400662-12-michael.roth@amd.com>
+ <8c3685a6-833c-4b3c-83f4-c0bd78bba36e@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2725:b0:476:ed02:e2da with SMTP id
- m37-20020a056638272500b00476ed02e2damr467657jav.5.1712008348259; Mon, 01 Apr
- 2024 14:52:28 -0700 (PDT)
-Date: Mon, 01 Apr 2024 14:52:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000736bd406151001d7@google.com>
-Subject: [syzbot] [crypto?] KMSAN: uninit-value in __crc32c_le_base (4)
-From: syzbot <syzbot+549710bad9c798e25b15@syzkaller.appspotmail.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <8c3685a6-833c-4b3c-83f4-c0bd78bba36e@redhat.com>
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD7D:EE_|IA1PR12MB8222:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3a43d095-3e4e-417d-b0d8-08dc529a455a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	4Ct9tPtFn37krlC2vECNzi4QxEfzsNZIqi7hseJJogkgpd9mMvY9UxfB/TTTot23lXHeNLaSbuKR9VPOmYvuMYj1/hltw3uO14lsxGfPlG+isUkQ/1NGt7htpusU1oZZOodgdEAR/RzS/1dPVPhP4Ah7hcxsUi1soQjf0UjFbXW6/coRoWpbPBPoktCTOlm5x4jCjabrtKpEa/vlJEM7xsNNhZqs8WXGWoXr7eI8bql8Uc7H1O+ADN8ZDejSE1rBSg/jFi21fzUYZuei4dbvk9FC1d9nk9Xr9b8I6Hmbl5X1TRasnlbwevcnMkm+pPyJEJ/67m+hRovPpQvYMNykxp1Mh+iW1FPhpXXSK0VbNmEL4mcvvbTaIlEbsW6Rv49A+FHO+DmA4AC8CmVfPxbU2OtnsCHPaLgyS4VTi5njk/YFkVqyhdHrwyBp8uH8SFP9nR6yT3K7YFAnzNc0LDjwGG2rzIVGhS7qVQ6vfVK2ul5KrffPZA9IjCUCC3V0IKrtMueIXyIubezFeuRQzfTziyHU291P+LmDtrY9EK+AygR0PkI4S4fyYPEf5xUFCX2a4gnYFPHS8XgcTpJH74dC8i82g91Gt+xN+Z6qFUrwExCFV++qjgXMeQYEawbh6X7xNt8QNlUlvG0jYZFWQvcjbKBd3Hu9NaC/rR8ubfmq1PnP0f80M/ryLTa/3/OCHFb8DN5AuHxcgi7C+Dj+OObEiw==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005)(36860700004)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2024 22:22:52.0061
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a43d095-3e4e-417d-b0d8-08dc529a455a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD7D.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8222
 
-Hello,
+On Sat, Mar 30, 2024 at 09:31:40PM +0100, Paolo Bonzini wrote:
+> On 3/29/24 23:58, Michael Roth wrote:
 
-syzbot found the following issue on:
+Cc'ing some more TDX folks.
 
-HEAD commit:    8d025e2092e2 Merge tag 'erofs-for-6.9-rc2-fixes' of git://..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1385be41180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e2599baf258ef795
-dashboard link: https://syzkaller.appspot.com/bug?extid=549710bad9c798e25b15
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> > +	memslot = gfn_to_memslot(kvm, params.gfn_start);
+> > +	if (!kvm_slot_can_be_private(memslot)) {
+> > +		ret = -EINVAL;
+> > +		goto out;
+> > +	}
+> > +
+> 
+> This can be moved to kvm_gmem_populate.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+That does seem nicer, but I hadn't really seen that pattern for
+kvm_gmem_get_pfn()/etc. so wasn't sure if that was by design or not. I
+suppose in those cases the memslot is already available at the main
+KVM page-fault call-sites so maybe it was just unecessary to do the
+lookup internally there.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5ccde1a19e22/disk-8d025e20.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/45420817e7d9/vmlinux-8d025e20.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/354bdafd8c8f/bzImage-8d025e20.xz
+> 
+> > +	populate_args.src = u64_to_user_ptr(params.uaddr);
+> 
+> This is not used if !do_memcpy, and in fact src is redundant with do_memcpy.
+> Overall the arguments can be "kvm, gfn, src, npages, post_populate, opaque"
+> which are relatively few and do not need the struct.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+549710bad9c798e25b15@syzkaller.appspotmail.com
+This was actually a consideration for TDX that was discussed during the
+"Finalizing internal guest_memfd APIs for SNP/TDX" PUCK call. In that
+case, they have a TDH_MEM_PAGE_ADD seamcall that takes @src and encrypts
+it, loads it into the destination page, and then maps it into SecureEPT
+through a single call. So in that particular case, @src would be
+initialized, but the memcpy() would be unecessary.
 
-=====================================================
-BUG: KMSAN: uninit-value in crc32_body lib/crc32.c:110 [inline]
-BUG: KMSAN: uninit-value in crc32_le_generic lib/crc32.c:179 [inline]
-BUG: KMSAN: uninit-value in __crc32c_le_base+0x43c/0xd80 lib/crc32.c:201
- crc32_body lib/crc32.c:110 [inline]
- crc32_le_generic lib/crc32.c:179 [inline]
- __crc32c_le_base+0x43c/0xd80 lib/crc32.c:201
- chksum_update+0x5b/0xd0 crypto/crc32c_generic.c:88
- crypto_shash_update+0x79/0xa0 crypto/shash.c:70
- csum_tree_block+0x35f/0x5d0 fs/btrfs/disk-io.c:96
- btree_csum_one_bio+0x4d5/0xeb0 fs/btrfs/disk-io.c:294
- btrfs_bio_csum fs/btrfs/bio.c:538 [inline]
- btrfs_submit_chunk fs/btrfs/bio.c:741 [inline]
- btrfs_submit_bio+0x1eb6/0x2930 fs/btrfs/bio.c:770
- write_one_eb+0x13fa/0x1570 fs/btrfs/extent_io.c:1750
- submit_eb_page fs/btrfs/extent_io.c:1909 [inline]
- btree_write_cache_pages+0x1d2a/0x29a0 fs/btrfs/extent_io.c:1959
- btree_writepages+0x84/0x270 fs/btrfs/disk-io.c:516
- do_writepages+0x427/0xc30 mm/page-writeback.c:2612
- filemap_fdatawrite_wbc+0x1d8/0x270 mm/filemap.c:397
- __filemap_fdatawrite_range mm/filemap.c:430 [inline]
- filemap_fdatawrite_range+0xe1/0x110 mm/filemap.c:448
- btrfs_write_marked_extents+0x2e7/0x620 fs/btrfs/transaction.c:1154
- btrfs_sync_log+0x9fd/0x3830 fs/btrfs/tree-log.c:2969
- btrfs_sync_file+0x144c/0x1c60 fs/btrfs/file.c:1968
- vfs_fsync_range+0x20d/0x270 fs/sync.c:188
- generic_write_sync include/linux/fs.h:2793 [inline]
- btrfs_do_write_iter+0x1c5f/0x2270 fs/btrfs/file.c:1695
- btrfs_file_write_iter+0x38/0x50 fs/btrfs/file.c:1705
- call_write_iter include/linux/fs.h:2108 [inline]
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xb63/0x1520 fs/read_write.c:590
- ksys_write+0x20f/0x4c0 fs/read_write.c:643
- __do_sys_write fs/read_write.c:655 [inline]
- __se_sys_write fs/read_write.c:652 [inline]
- __x64_sys_write+0x93/0xe0 fs/read_write.c:652
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
+It's not actually clear TDX plans to use this interface. In v19 they still
+used a KVM MMU hook (set_private_spte) that gets triggered through a call
+to KVM_MAP_MEMORY->kvm_mmu_map_tdp_page() prior to starting the guest. But
+more recent discussion[1] suggests that KVM_MAP_MEMORY->kvm_mmu_map_tdp_page()
+would now only be used to create upper levels of SecureEPT, and the
+actual mapping/encrypting of the leaf page would be handled by a
+separate TDX-specific interface.
 
-Uninit was created at:
- __alloc_pages+0x9d6/0xe70 mm/page_alloc.c:4598
- __alloc_pages_bulk+0x19e/0x21e0 mm/page_alloc.c:4523
- alloc_pages_bulk_array include/linux/gfp.h:202 [inline]
- btrfs_alloc_page_array+0x9e/0x460 fs/btrfs/extent_io.c:689
- alloc_eb_folio_array fs/btrfs/extent_io.c:724 [inline]
- alloc_extent_buffer+0xa68/0x4180 fs/btrfs/extent_io.c:3859
- btrfs_find_create_tree_block+0x46/0x60 fs/btrfs/disk-io.c:610
- btrfs_init_new_buffer fs/btrfs/extent-tree.c:5063 [inline]
- btrfs_alloc_tree_block+0x35c/0x17c0 fs/btrfs/extent-tree.c:5178
- btrfs_alloc_log_tree_node fs/btrfs/disk-io.c:960 [inline]
- btrfs_add_log_tree+0x1b7/0x7a0 fs/btrfs/disk-io.c:1008
- start_log_trans fs/btrfs/tree-log.c:208 [inline]
- btrfs_log_inode_parent+0x9b6/0x1dd0 fs/btrfs/tree-log.c:7066
- btrfs_log_dentry_safe+0x9a/0x100 fs/btrfs/tree-log.c:7171
- btrfs_sync_file+0x126c/0x1c60 fs/btrfs/file.c:1933
- vfs_fsync_range+0x20d/0x270 fs/sync.c:188
- generic_write_sync include/linux/fs.h:2793 [inline]
- btrfs_do_write_iter+0x1c5f/0x2270 fs/btrfs/file.c:1695
- btrfs_file_write_iter+0x38/0x50 fs/btrfs/file.c:1705
- call_write_iter include/linux/fs.h:2108 [inline]
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xb63/0x1520 fs/read_write.c:590
- ksys_write+0x20f/0x4c0 fs/read_write.c:643
- __do_sys_write fs/read_write.c:655 [inline]
- __se_sys_write fs/read_write.c:652 [inline]
- __x64_sys_write+0x93/0xe0 fs/read_write.c:652
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
+With that model, the potential for using kvm_gmem_populate() seemed
+plausible to I was trying to make it immediately usable for that
+purpose. But maybe the TDX folks can confirm whether this would be
+usable for them or not. (kvm_gmem_populate was introduced here[2] for
+reference/background)
 
-CPU: 1 PID: 5344 Comm: syz-executor.4 Not tainted 6.9.0-rc1-syzkaller-00061-g8d025e2092e2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-=====================================================
+-Mike
+
+[1] https://lore.kernel.org/kvm/20240319155349.GE1645738@ls.amr.corp.intel.com/T/#m8580d8e39476be565534d6ff5f5afa295fe8d4f7
+[2] https://lore.kernel.org/kvm/20240329212444.395559-3-michael.roth@amd.com/T/#m3aeba660fcc991602820d3703b1265722b871025)
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> 
+> I'll do that when posting the next version of the patches in kvm-coco-queue.
+> 
+> Paolo
+> 
