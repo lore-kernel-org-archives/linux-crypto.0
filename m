@@ -1,30 +1,31 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B11374CF;
-	Mon,  1 Apr 2024 12:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C9B28DC0;
+	Mon,  1 Apr 2024 12:24:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711973820; cv=none; b=lGa265E4sH3LYL8H1D4MoJsszAPFmXL87SuVbY11TS8ELK7r+uchGB3msFdOoNWQzca++1/oUT4+3BvR28zT1Ig4RFa4Kla3gg+ln6EG4hUWimO1kXU+cZxkdU8nPvw8SMVdj/3JoRL2GYNyUpSDfSDquvZl65XE/PLkkaYylyU=
+	t=1711974288; cv=none; b=epKoaITwzc5QhdJlU7RzenYmsjiPzDIUcxcwQFgt2gs8U6vH9lhvWYIquyuij1P9H1qbCXNhVXLLYl0PVsDRgZr3QmhNE5EU2Bx974f6rm+w4JmFLMdSsa7LLdReNY/lXdxlqjz6J0nNDOa2wmOkRVIIfdXFgoYC2gaFmorXJvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711973820; c=relaxed/simple;
-	bh=SqzT1Q13/cs3mhKcKxl3aaKQyX7VYa865bsan6scvqo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RRU3E2uPRtHTzSDtiQSHIdQOahM2DHwZc9F/HhWwUqUaTjMvw+uJ3dBYpb7h1fkFs7Ty9gUjT4/WPLQVf8RT7MNfWE8eNcmKsFaTorYkqvam4DuL2MFM7a2cPT5L18hoikeYm+dCBtIH7oVK/wIfumwIGI8banwGI7LU/BqChSg=
+	s=arc-20240116; t=1711974288; c=relaxed/simple;
+	bh=S17umzcSkzJVxMkeDGKprCS0QF3nLYcojO97hIZGnQk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uONZXgq5dUymxqCl93YesnRGXmxUXSGMQYjBdjztovezYm3ZmUYnQAs00uwqT43ainkmDRccK/zkkdybwU3SpwUGb6ahHyJ4t4UnWaHzcJX4+9dGiUnEvPV2V+imoElKrUGyYbZn1pTX6Q4pbJ34Bo8GNnjHDHV5Dwwt70dJY2E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from msk1wst434n.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 1 Apr
- 2024 15:16:36 +0300
+ 2024 15:24:33 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
 	<davem@davemloft.net>
 CC: Roman Smirnov <r.smirnov@omp.ru>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: [PATCH] crypto: ecc: remove checks in crypto_ecdh_shared_secret() and ecc_make_pub_key()
-Date: Mon, 1 Apr 2024 15:16:23 +0300
-Message-ID: <20240401121623.110263-1-r.smirnov@omp.ru>
+	<linux-kernel@vger.kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH v2] crypto: algboss: remove NULL check in cryptomgr_schedule_probe()
+Date: Mon, 1 Apr 2024 15:22:58 +0300
+Message-ID: <20240401122258.111414-1-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -52,6 +53,8 @@ X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
 X-KSE-AntiSpam-Info: {SMTP from is not routable}
 X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
  b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
+ dbl.spamhaus.org}
 X-KSE-AntiSpam-Info:
 	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;msk1wst434n.omp.ru:7.1.1;81.22.207.138:7.1.2
 X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
@@ -71,41 +74,32 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-With the current state of the code, ecc_get_curve() cannot return
-NULL in crypto_ecdh_shared_secret() and ecc_make_pub_key(). This is
-conditioned by the fact that they are only called from ecdh_compute_value(),
-which implements the kpp_alg::{generate_public_key,compute_shared_secret}()
-methods. Also ecdh implements the kpp_alg::init() method, which is called
-before the other methods and sets ecdh_ctx::curve_id to a valid value.
+The for loop will be executed at least once, so i > 0. If the loop
+is interrupted before i is incremented (e.g., when checking len for NULL),
+i will not be checked.
+
+Found by Linux Verification Center (linuxtesting.org) with Svace.
 
 Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
 Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 ---
- crypto/ecc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ crypto/algboss.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index f53fb4d6af99..5028f7b9d7c7 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -1515,7 +1515,7 @@ int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
- 	u64 priv[ECC_MAX_DIGITS];
- 	const struct ecc_curve *curve = ecc_get_curve(curve_id);
- 
--	if (!private_key || !curve || ndigits > ARRAY_SIZE(priv)) {
-+	if (!private_key || ndigits > ARRAY_SIZE(priv)) {
- 		ret = -EINVAL;
- 		goto out;
+diff --git a/crypto/algboss.c b/crypto/algboss.c
+index 0de1e6697949..1aa5f306998a 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -138,9 +138,6 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
+ 			goto err_free_param;
  	}
-@@ -1617,7 +1617,7 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
- 	unsigned int nbytes;
- 	const struct ecc_curve *curve = ecc_get_curve(curve_id);
  
--	if (!private_key || !public_key || !curve ||
-+	if (!private_key || !public_key ||
- 	    ndigits > ARRAY_SIZE(priv) || ndigits > ARRAY_SIZE(rand_z)) {
- 		ret = -EINVAL;
- 		goto out;
+-	if (!i)
+-		goto err_free_param;
+-
+ 	param->tb[i + 1] = NULL;
+ 
+ 	param->type.attr.rta_len = sizeof(param->type);
 -- 
 2.34.1
 
