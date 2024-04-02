@@ -1,169 +1,167 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2111.outbound.protection.outlook.com [40.107.93.111])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4572D17C7C;
-	Tue,  2 Apr 2024 09:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.111
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712048416; cv=fail; b=oGASHpfi0/IA5mFlDWALB6UjDELDjJ4nKUY7wdsNiPQ5Cli1spcZN5hrhxYlYQhhDo0t7b+iOmgMhay27jxA77Nr2EZWTtBp47ybiW2Klc4iKgEPIHv7tQvXoMOl7H6MVyiabpfoSqFNRsuPM9newl6vT1TD1mYzGi/7wWDLZOg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712048416; c=relaxed/simple;
-	bh=fEG6yF+ldcMD977e8fhehaNi5XoDzWmxme0VNC/ldKw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eWuDKzRl06zVsjjeCzscAvFJTGyX7tEfPXYs13o42C2UNeM+j8M6dEW8s9HBJ0cXvlZ0EtMJOeKFYU/+dt1PvAyDxejf62HjZd+lODIq8WNZ5xyeBZh/RrfR/dMNJrLjdP3AN/TyBiwofU4sJl2XJomiIGRTtPkgKeX0BfW0czM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CRe+ecrf; arc=fail smtp.client-ip=40.107.93.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADB157305;
+	Tue,  2 Apr 2024 09:04:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712048688; cv=none; b=n3qtJF5qpdQE5O1EcgdH/k5Hef1IxUPvEtNb8oRqe6AZj/ZlJK4swbfcUzIG8AM/bt5tjYo8QfwmoIBLCUeT95DE395FCN9JFMZpafqsSW5Y8MvzpYLmlY6igTI8i3Mt7hpwtXCAxS6S/9xKyGUuIOdyHuevbsAjK9nMggXdYxo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712048688; c=relaxed/simple;
+	bh=YvAxsRirqP9WIUZqYwF0tiTfjgDxAvwrGrHJaBMhnbg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IJw0pWL92Na0iVJzfb+DbQLpuoRT3SiwP2Hzyq8x8XGkDZr9hSixS+AHGfNyVGcNFLIZCEoKEoqECIlKSQiadZA913auzQp1lAqgBYqa5SV3nvziOTuh4CE8g+FcX4eQxHsH9DJXkTLWR0fbqm4fN5jy9CVsBt4c71SP6cYuFnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pCC4bfr3; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CRe+ecrf"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Dqv1WnpqSHOEyjirP8SCMZ3/YxEufF4h5MCR53iaIX5dUNVsVVfJx0Q7tGuZZCI7o+Ymz9/8FCYOF+6fFClRjAO2xYbc5+uyDE71cHq1MnMQLhaLmqhSojb5bVo+o5mHU6eCNOOxBGCQSj0c6ZSeqmx0JRbUi5kaS+YhWhhepjnxr2YZAzHCd8cPzKwZganmpByh3EQPpiyoISrb0ljQCQGY8nn1WuTSC6D7SVZhZg+ZLD45pO29+yj9PMZx079gmz94LW7O2FMXTJAXdTJPsDmOrQnDlVpuW3etu29fpsGqP/ZknoGUoYLyTV0FbqUxvYUfv2GukOhS3iwt4ifSSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mDDAnTcgRJ7/AIFnXAerRAJhG6wa91+0iSxtSUB2QwA=;
- b=GX1JBUvzjln0cet6t9WaSBJvLx+C9NBXAM/Rv6Kbnm+YrNHugRvfbJiMg4DdK4eohhP6E96WtHBX3x7F87oelcDcpA6sDG0YgiBDbpEcspcdU68K4F+4kvbobgeqZx9jYDKDR7MT1p7XgQhwd/Hts5/T1f4R4bAehshLXCGJrUYr0dHPbeVwsJ3H9OmtVL83EfRreNGrAQgW9X0AKK48u/UdHw5JHyt+e2tYNRDLD+0vAzd/1cTwwS/okF/XhWaBVkHsySftEB1PclSxKeUOTX4FxmTMngV12R2zHoAsB/ba73e+NdSj5RUHnVUp0V7M3Z4AU2eMNUOUIubsShp+4w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mDDAnTcgRJ7/AIFnXAerRAJhG6wa91+0iSxtSUB2QwA=;
- b=CRe+ecrfj1IwuBXmsObdudsAsfoARty7uwHHlZSwwrc8PBzUzZ68TTyOusRl+43PmrLdIuem8O+AUqP/Opm6+PRALZP45stF163NXq0aQ1/AmDPmR44OgZGOJeXQ7jtDdlFCBvoUnb6PDSG1AOhry1yX3gAVKVT52X4ZZPrqQBJy3WpjC5F6kIpzWd4rhDB4qTELB9IN/Fjg8bJLhCwO0FxNOG/vmZ8Dqy9wjV08cADqmf8x7s1njAhDYQRnndS1LxobPJ8CAdTxptwy7+vExteeRE5TzJ50aHjRpoSJ65TsT1s/o2iQjojxVnch4Y7tv4wRWeZbm9+cq808JtJHLA==
-Received: from SJ1PR12MB6339.namprd12.prod.outlook.com (2603:10b6:a03:454::10)
- by SJ2PR12MB8011.namprd12.prod.outlook.com (2603:10b6:a03:4c8::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 2 Apr
- 2024 09:00:10 +0000
-Received: from SJ1PR12MB6339.namprd12.prod.outlook.com
- ([fe80::ae74:c645:b13d:3d8c]) by SJ1PR12MB6339.namprd12.prod.outlook.com
- ([fe80::ae74:c645:b13d:3d8c%7]) with mapi id 15.20.7409.042; Tue, 2 Apr 2024
- 09:00:10 +0000
-From: Akhil R <akhilrajeev@nvidia.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "robh@kernel.org"
-	<robh@kernel.org>, "krzysztof.kozlowski+dt@linaro.org"
-	<krzysztof.kozlowski+dt@linaro.org>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, "thierry.reding@gmail.com" <thierry.reding@gmail.com>,
-	Jon Hunter <jonathanh@nvidia.com>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>, Mikko
- Perttunen <mperttunen@nvidia.com>, "airlied@gmail.com" <airlied@gmail.com>,
-	"daniel@ffwll.ch" <daniel@ffwll.ch>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-tegra@vger.kernel.org"
-	<linux-tegra@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "dri-devel@lists.freedesktop.org"
-	<dri-devel@lists.freedesktop.org>
-Subject: RE: [PATCH v6 3/5] crypto: tegra: Add Tegra Security Engine driver
-Thread-Topic: [PATCH v6 3/5] crypto: tegra: Add Tegra Security Engine driver
-Thread-Index: AQHaedbyTqDDO44+YUOWKfWU3w8p3rFM+1oAgAfIUmA=
-Date: Tue, 2 Apr 2024 09:00:10 +0000
-Message-ID:
- <SJ1PR12MB63391DEE4A7D11B58E3FCC34C03E2@SJ1PR12MB6339.namprd12.prod.outlook.com>
-References: <20240319082306.34716-1-akhilrajeev@nvidia.com>
- <20240319082306.34716-4-akhilrajeev@nvidia.com>
- <ZgVBAFmfK7GKgmYi@gondor.apana.org.au>
-In-Reply-To: <ZgVBAFmfK7GKgmYi@gondor.apana.org.au>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ1PR12MB6339:EE_|SJ2PR12MB8011:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- Qh+kld80A90kCRkvNdyVgrPY/rnGHZ1zSU8bXOdNyzwsLwwlIrke9iNX8rqiTHRTmFmRLgNgjBknUswKrvcC7Y3umyiiHmyY2dfscCjGOCP61hD6tRtTuXDuSvmQFncFmZHOIMB15nny2US2x5Ot0yNczuL9L9VZXqoKlPV8XEdQkkFixCvMWZv0hS98VrgSsQ8otoQoY51B8e6hU/xoUm52B3YbStv+3L68of0xAnKXnWWkrTMyOiVTzok/vdTTJ+GDOPSq+jFNk/5PdnDES0a75ZEEXWxpvl1vcLKo7BIGqjk2mfBSdlbqhpfkOO7aaZJUaIV7+wBmLfenGigbENRMMXV9ZmJErehdtyNE8EwjVF4ZdQQxWbwshhI9KsWmM63IsdTKaFzfCjUA6LPHg+d3e280YfwIBgbbDXJ1KUZjBkicu41ckOLhWFrRz2jDyhvcz9un0hzb31eEknqusSXaPh/KkTPxz+F+C1F87LANhULIbrgCk0jGMNX2gZesXb5uT/ny+Hf9R89FqfB4vOwAIkziMk2MfAh4dG3YPcRW+BMQpWnKmRihf300W66gtMsr96m39bDVmIyxqrBqdFwkdoIwhWdGIyrFSHOEJxF+4PqTof12EgcVrN0Z7jfBWBh9XALiHdnp264N4I8V7lnRFZjN2D19k0RRWeBABt0=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6339.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?5Heq7ZuhlN1ehdno9+VlHHuokKI3SDhW2Qm17sIOxL9TnepWUTbx1/LJJ0Pg?=
- =?us-ascii?Q?WvB5nzY+P/br3I2aRuWCBKmQAbCnj/YdIcxL81s14LNmdUEs5zvofSG98SfM?=
- =?us-ascii?Q?L12xElyuZxTXl4pVXtv2E4PXYlXXn3MKxNib8UV10cpT5FaFq8zraseuQ8ZG?=
- =?us-ascii?Q?Hi9kTe4bDuOlbh1R9HgUjiLR3iCOazxjd7R26XYcWw8MXO5lH04Ni2lW1reF?=
- =?us-ascii?Q?xH5hai7ykNbk/O6rLkHPY/Wke8SqF1EmzhwXlFD4G9pndqEJvsdhxHd6jk56?=
- =?us-ascii?Q?zYmp0Pmch9KPOE6Uu3VXpZHaerT3vIQtZ1Jn0WSdYazFLY86swoahk/q3sqt?=
- =?us-ascii?Q?AzFZgeD6u/vaTD9B+faYgsyV3vkskDracKo0twwwijhpQzF4u/SeDncmjBka?=
- =?us-ascii?Q?Oh7kcUy4U8iHik9slZ0nM4c4kNPNt7r+zTcMfNdQl9r357UoHDvc6vUSEE5C?=
- =?us-ascii?Q?PaBeZCIuwqgWRQ9dmwP/ECp4tveNGxH60Nt8P07aitdqAubQQBkq23SEpVkD?=
- =?us-ascii?Q?FczoCLN/9jRJekK1QEKkpQdBVR/80Oc+aqBQhDGVaui2VYTau7yc56SGRVCK?=
- =?us-ascii?Q?gmopUKduwHOO0ChJp/qAWQYAPZVPbz92hCxBniBbuqrWVorgXC1JlNp32CIm?=
- =?us-ascii?Q?eUnyks8SU3//+3zVWkXdie+JaGaL6LrFA7p8pvu215maGzbgbXCI8OwVO8yN?=
- =?us-ascii?Q?G3XEB0W1RRVJVc2yjXZWYwK52hs21K74+nnV1E5Yck7lrqlhowjv1YttLmiv?=
- =?us-ascii?Q?sM+GNI9rj4KXTPmUTOWbWsXiAScTPhAmZMSAcwLYc8SabX4SkiFGY1oDJR27?=
- =?us-ascii?Q?b8mMa3JWVJLYS1T4Pt2veFd4Lnbw+uMORE314FUnFzvNOT38HqpW9YiGt+F5?=
- =?us-ascii?Q?MWRBKePIz9AfFMXYfsCokeaEVhhtBb0/vL6kt9ds2uQ75p9XAKOmHolZJSrw?=
- =?us-ascii?Q?pOsr9f+SsmSEghQg8S8RLRsfWLcSSBHVzE8fI/2+W8sQqD9ENj+ckDMTVsuG?=
- =?us-ascii?Q?iRv/xyq1Taz0yFW9Ri/26bWgiaYT5n4bE9NwgGbPlzPMgy5ScaHliTxeeNhV?=
- =?us-ascii?Q?o/+h7gXk1KSyNo28nSNeJsHu1QXqcRKfSpm6Cgpp0VTATjk5fUGIyDN+jxvF?=
- =?us-ascii?Q?66NjPj2Av6wDDa+YhBLn/kV/g62b3EPSmhP2dW/nL8xZxrF0+Lw0cwp8OX2s?=
- =?us-ascii?Q?bFGatArxVuHsf0mkeQtHDcTjIJmAleYhOn+rb5TQfGkEctoyhC1nzvZPpnL7?=
- =?us-ascii?Q?76QsrgcCdJSCzJqtC60KYZdLB2v1qYcptF6FF0B9p3+L5cqR6CT0O0XRDDtX?=
- =?us-ascii?Q?H1olK2dlMyFiQ8LCsnbT7YeVCnPRt78R8TVnJ4F3KuVcJ61prp35VLyAb6o1?=
- =?us-ascii?Q?OjnnT4qHWMPSUMgisakykk3TyIBrM9/HHaZ05J5l/0gPWZAhp5ikB4sZv2ru?=
- =?us-ascii?Q?sm5vgxvTGDbZeUr/Tw9gOcbf0tTSldiZU5lMwKfN3Thk2y05FVGwLWjA2tnl?=
- =?us-ascii?Q?4WOQSeDYegDfRkwtey9kYkQn+mPswGfz9PL838/aCRVm844o60zO5Y0hzfM5?=
- =?us-ascii?Q?bf1pDCGZQ3KyZEqsyPjHn6u40SYZFCXW9eHz7n+m?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pCC4bfr3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/sLPoPRj7yaTMRifvssA4ocGQZQ13k50t3gTbGc6at4=; b=pCC4bfr3tEL7rd4uaTZq+6Fpyu
+	d+b3YySnKJPGaKKYgvve+kH+pO/ODBmZxycpxzsqacSBSdWqeYQDiEntqiuyA5cau6k33vgQiFDsO
+	qTlXke5NWkvtiCNdtwLxqrMeHOqaPZAmWI1PdAVLlcOnyjRqTOfUDAgYt7IIyRB97bgcLAVGHikxE
+	6FDGpSBr+ssVKqsGTlUYERTuxv8xLEMlCVg1uHs/VSLGiOfXKS+hO9Wxmm/9/x+Mpwtl6Z95AWH3e
+	Q6UlRsos1rowDkHF5p/nblE1JIq7nT7xR6M/TLYUUxuWJoHm2dDiLno9T0narThxj9NxMVoafbYWi
+	Xo6yfp7Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39088)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rrZwT-00061T-21;
+	Tue, 02 Apr 2024 09:56:29 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rrZwH-0006pd-Kx; Tue, 02 Apr 2024 09:56:17 +0100
+Date: Tue, 2 Apr 2024 09:56:17 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mike Leach <mike.leach@linaro.org>,
+	James Clark <james.clark@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Vinod Koul <vkoul@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	linux-kernel@vger.kernel.org, coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-input@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 00/19] amba: store owner from modules with
+ amba_driver_register()
+Message-ID: <ZgvIMRDfeQaeVxYt@shell.armlinux.org.uk>
+References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+ <f514d9e1-61fa-4c55-aea1-d70c955bb96a@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6339.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 437a28ca-d641-4383-b7f7-08dc52f34d12
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Apr 2024 09:00:10.2760
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bqeG/O1X1D9WDzrSkGntv8uTYAyOYoExjRTCtLP/YlL2tatUWtx1EmtzQEx+S+dHzTfNRjqUIpXGcqJBQHD9mw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8011
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f514d9e1-61fa-4c55-aea1-d70c955bb96a@linaro.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-> >
-> > +             .alg.skcipher.op.do_one_request =3D tegra_aes_do_one_req,
-> > +             .alg.skcipher.base =3D {
-> > +                     .init =3D tegra_aes_cra_init,
-> > +                     .exit =3D tegra_aes_cra_exit,
-> > +                     .setkey =3D tegra_aes_setkey,
-> > +                     .encrypt =3D tegra_aes_encrypt,
-> > +                     .decrypt =3D tegra_aes_decrypt,
-> > +                     .min_keysize =3D AES_MIN_KEY_SIZE,
-> > +                     .max_keysize =3D AES_MAX_KEY_SIZE,
-> > +                     .ivsize =3D AES_BLOCK_SIZE,
-> > +                     .base =3D {
-> > +                             .cra_name =3D "ofb(aes)",
-> > +                             .cra_driver_name =3D "ofb-aes-tegra",
-> > +                             .cra_priority =3D 500,
-> > +                             .cra_flags =3D CRYPTO_ALG_TYPE_SKCIPHER |
-> CRYPTO_ALG_ASYNC,
-> > +                             .cra_blocksize =3D AES_BLOCK_SIZE,
-> > +                             .cra_ctxsize =3D sizeof(struct tegra_aes_=
-ctx),
-> > +                             .cra_alignmask =3D 0xf,
-> > +                             .cra_module =3D THIS_MODULE,
-> > +                     },
-> > +             }
-> > +     }, {
->=20
-> OFB no longer exists in the kernel.  Please remove all traces of it from =
-your driver.
+On Sat, Mar 30, 2024 at 01:18:30PM +0100, Krzysztof Kozlowski wrote:
+> On 26/03/2024 21:23, Krzysztof Kozlowski wrote:
+> > Merging
+> > =======
+> > All further patches depend on the first amba patch, therefore please ack
+> > and this should go via one tree.
+> > 
+> > Description
+> > ===========
+> > Modules registering driver with amba_driver_register() often forget to
+> > set .owner field.
+> > 
+> > Solve the problem by moving this task away from the drivers to the core
+> > amba bus code, just like we did for platform_driver in commit
+> > 9447057eaff8 ("platform_device: use a macro instead of
+> > platform_driver_register").
+> > 
+> > Best regards,
+> 
+> I tried to submit this series to Russell patch tracker and failed. This
+> is ridiculous. It's 2024 and instead of normal process, like every other
+> maintainer, so b4 or Patchwork, we have some unusable system rejecting
+> standard patches.
 
-Okay. Will remove and post a new version.
+Sorry but no. Stop being offensive.
 
->=20
-> Also please ensure that yuor driver passes the extra fuzz tests.
+> First, it depends some weird, duplicated signed-off-by's.
 
-Yes. It does pass the extra fuzz tests.
+Eh? There is no such logic in there.
 
+> Second it > submitting patch-by-patch, all with clicking on some web
+> (!!!) interface.
 
-Regards,
-Akhil
+Again, no it doesn't, and you're just throwing crap out because you
+failed. Unlike most of the "normal" processes, the patch system allows
+you to submit both by *email* and also by *web* for those cases where
+the emails get screwed up by ones company mail server. That's why the
+web interface exists - to give people *flexibility*.
+
+The fact is, the web interface is merely a front end interface that
+generates an email and submits it in the usual way by email - an
+email that you can perfectly well generate that is *very* close to
+the standard email that git format-patch generates.
+
+The *only* difference is that the patch system wants a KernelVersion:
+tag in the email _somewhere_ and it doesn't matter where it appears.
+Git even has support to do this.
+
+  git format-patch --add-header="KernelVersion: $foo"
+
+Why does it want the kernel version? Because when we were running 2.4
+and 2.5 kernel versions in parallel, it was important to know which
+tree the patch was being submitted for. It has continued to be required
+because it means when there's problems applying a patch, it gives me
+the additional information about the base used for the patch (and it
+keeps on being useful to have.)
+
+> That's the response:
+> -------------
+> Your patch has not been logged because:
+> 
+> Error:   Please supply a summary subject line briefly describing
+>          your patch.
+> 
+> 
+> Error:   Please supply a "KernelVersion: " tag after "PATCH FOLLOWS" or
+> "---".
+> 
+> Error:   the patch you are submitting has one or more missing or incorrect
+>          Signed-off-by lines:
+> 
+>          - author signoff <krzkreg@gmail.com> is missing.
+> 
+>          Please see the file Documentation/SubmittingPatches, section 11
+>          for details on signing off patches.
+
+Lots of people use it without a problem. I've just run the parser
+through its offline tests, and it parses email content correctly.
+I've no idea what you're doing wrong, but it looks like something
+pretty serious if it didn't parse the subject line.
+
+Rather than getting stressed about it, why don't you send me an email
+the first time something goes wrong so I can investigate, turn on
+debugging to capture the problem email?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
