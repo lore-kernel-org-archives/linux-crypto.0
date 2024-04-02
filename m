@@ -1,159 +1,174 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BE215E218
-	for <linux-crypto@vger.kernel.org>; Tue,  2 Apr 2024 20:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB4045019;
+	Tue,  2 Apr 2024 22:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712090090; cv=none; b=OF3qJHk+Q1Qk6dPp538wuR0VynOSGDgegAxACYKWyfMesuyy/26MzyXQzDye6OQpWfl0kloexZ/Kxw9rS7dUWsiGRJWPYM4K+giQYD3x1Jolqy6a2DcMhfZCyWi7pId5WnttxxGqfIICnLdvOXuE3BXdlaLXrg0ykcIyYONmmJ0=
+	t=1712098724; cv=none; b=VNA99uRmaIKNYuA5rqLs3wQh7rzXzjLRiYOi19pWVy9wSuqnXyTQ/+gCdoLaB49Whj+wOCKFCUYdQzS31d0efDQZW+iOX0sX93JJ+Bu+Px4aIV17GFMcqd6vR+3ZJvBlRbdunkyug+oZ4B+tSv5bZBySx4jw2CMg/72HmabdcAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712090090; c=relaxed/simple;
-	bh=PbCYgrPVbVOdhV1jC/4KII4virJ8WGK/ifPusT5Ym9k=;
+	s=arc-20240116; t=1712098724; c=relaxed/simple;
+	bh=n9PG5Gd9QCdKP+TIsy1Z2jPRkRgvC7X2SZe2L3r5+MM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r/iws27Wi2+HtBMpmQOF4/P+3v8OBwTFnLnY5DwFoALE9mMGr/P7MDGkRoAokT6PWcKGpZCypYZdT8zNDQpL8tylIb9vovpD1MuzwyjNrsBLUvtBQPifRHRFF6nrV8UojuEW9bv2XCEbRsPnbGeAOlCdqPAc/vjgsksKUGD5KCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NQjrQN2x; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=f/CWpOr0L5hsGQxSZ6cFk80kqj8jJ32l2h7VsDf9yREDBhB0VUrYJclsUV/blmHxCWcOzCl/VbFOdxclX2XM3oTinPPplhmqyvggbqEVV+GFvUE2Ch+KbVBGW/Gn2L6x2ov0yi7tiAwNI0+rrXBoWAKz34nGx6+4ZkaOpeokXXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XIxUAIsf; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NQjrQN2x"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712090087;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OmliKS7IXk0y+y9ssPc7arVQxLqF15p8TNQCcmbmlpA=;
-	b=NQjrQN2xVA4KRHrFmx3vAO0oSYGP+KWFD2MnCejQcH+DKJjaGo7pBVAxS++JYY4YqOwtZS
-	e5CzciIr8A90fBC9n7VNeNUrM3DiGYr8T4YAFolF8rw7rlyi6PFBcOR/6IycUMg9XOY0z1
-	kILFx3MFwpugCv/FEtDoh1nANNpz01c=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-665-0Tm61sA2Nw-68qBkgUVZgw-1; Tue, 02 Apr 2024 16:34:40 -0400
-X-MC-Unique: 0Tm61sA2Nw-68qBkgUVZgw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BF21F101A520;
-	Tue,  2 Apr 2024 20:34:38 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6A6D640C6DAE;
-	Tue,  2 Apr 2024 20:34:37 +0000 (UTC)
-Date: Tue, 2 Apr 2024 16:34:18 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	David Hildenbrand <david@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Paolo Bonzini <pbonzini@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gonglei <arei.gonglei@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Cristian Marussi <cristian.marussi@arm.com>,
-	Viresh Kumar <vireshk@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	David Airlie <airlied@redhat.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Daniel Vetter <daniel@ffwll.ch>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Alexander Graf <graf@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
-	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH v2 24/25] fuse: virtio: drop owner assignment
-Message-ID: <20240402203418.GG2507314@fedora>
-References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
- <20240331-module-owner-virtio-v2-24-98f04bfaf46a@linaro.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XIxUAIsf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712098723; x=1743634723;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=n9PG5Gd9QCdKP+TIsy1Z2jPRkRgvC7X2SZe2L3r5+MM=;
+  b=XIxUAIsfwatXWsk4GUiREKxtgYU1ZlWAI+Ot0B3xiZSnfncipP0Le+jI
+   WJihhgwX9UUFNgnayNk1CqGx5ncImsQks1bY3gYo1GdYrxJmrbs8R3xm9
+   jhUmbmgV5cEg7oMzSbaFxpK03bl1Yov3paPYuKyWWZk9fpdTqroKbSean
+   GSyWbgOAYO2aHiAsb1u/VN/LtCn5SqK2h9WXhQYIniKAh3bx9BMYEryN8
+   kDg83tp48ZvCtsVSUQTMfZ8YE0P62Xhvpi+QnPUsxYUfPrU2ZtF/mMbkA
+   F0gUShIPh5vHYMkPnsdTOf2X8Tolwahh2/QMB0pLcz7GWvUx9q5fsGoF0
+   Q==;
+X-CSE-ConnectionGUID: flQpB5klTSaYsqDzPd/27g==
+X-CSE-MsgGUID: wHs1siJORuCL/0hwUmY5gw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11032"; a="18747114"
+X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
+   d="scan'208";a="18747114"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 15:58:42 -0700
+X-CSE-ConnectionGUID: G+hY9GcpQa2do2OYHO31bA==
+X-CSE-MsgGUID: yZLG52nDTMerl9bXyvsizQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
+   d="scan'208";a="22978988"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 15:58:41 -0700
+Date: Tue, 2 Apr 2024 15:58:40 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, seanjc@google.com, vkuznets@redhat.com,
+	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+	dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com,
+	Brijesh Singh <brijesh.singh@amd.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Binbin Wu <binbin.wu@linux.intel.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>, isaku.yamahata@intel.com,
+	isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v12 11/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+Message-ID: <20240402225840.GB2444378@ls.amr.corp.intel.com>
+References: <20240329225835.400662-1-michael.roth@amd.com>
+ <20240329225835.400662-12-michael.roth@amd.com>
+ <8c3685a6-833c-4b3c-83f4-c0bd78bba36e@redhat.com>
+ <20240401222229.qpnpozdsr6b2sntk@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="y2TTKZujScqhsi/4"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240331-module-owner-virtio-v2-24-98f04bfaf46a@linaro.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+In-Reply-To: <20240401222229.qpnpozdsr6b2sntk@amd.com>
 
+On Mon, Apr 01, 2024 at 05:22:29PM -0500,
+Michael Roth <michael.roth@amd.com> wrote:
 
---y2TTKZujScqhsi/4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Sat, Mar 30, 2024 at 09:31:40PM +0100, Paolo Bonzini wrote:
+> > On 3/29/24 23:58, Michael Roth wrote:
+> 
+> Cc'ing some more TDX folks.
+> 
+> > > +	memslot = gfn_to_memslot(kvm, params.gfn_start);
+> > > +	if (!kvm_slot_can_be_private(memslot)) {
+> > > +		ret = -EINVAL;
+> > > +		goto out;
+> > > +	}
+> > > +
+> > 
+> > This can be moved to kvm_gmem_populate.
+> 
+> That does seem nicer, but I hadn't really seen that pattern for
+> kvm_gmem_get_pfn()/etc. so wasn't sure if that was by design or not. I
+> suppose in those cases the memslot is already available at the main
+> KVM page-fault call-sites so maybe it was just unecessary to do the
+> lookup internally there.
+> 
+> > 
+> > > +	populate_args.src = u64_to_user_ptr(params.uaddr);
+> > 
+> > This is not used if !do_memcpy, and in fact src is redundant with do_memcpy.
+> > Overall the arguments can be "kvm, gfn, src, npages, post_populate, opaque"
+> > which are relatively few and do not need the struct.
+> 
+> This was actually a consideration for TDX that was discussed during the
+> "Finalizing internal guest_memfd APIs for SNP/TDX" PUCK call. In that
+> case, they have a TDH_MEM_PAGE_ADD seamcall that takes @src and encrypts
+> it, loads it into the destination page, and then maps it into SecureEPT
+> through a single call. So in that particular case, @src would be
+> initialized, but the memcpy() would be unecessary.
+> 
+> It's not actually clear TDX plans to use this interface. In v19 they still
+> used a KVM MMU hook (set_private_spte) that gets triggered through a call
+> to KVM_MAP_MEMORY->kvm_mmu_map_tdp_page() prior to starting the guest. But
+> more recent discussion[1] suggests that KVM_MAP_MEMORY->kvm_mmu_map_tdp_page()
+> would now only be used to create upper levels of SecureEPT, and the
+> actual mapping/encrypting of the leaf page would be handled by a
+> separate TDX-specific interface.
 
-On Sun, Mar 31, 2024 at 10:44:11AM +0200, Krzysztof Kozlowski wrote:
-> virtio core already sets the .owner, so driver does not need to.
->=20
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->=20
-> ---
->=20
-> Depends on the first patch.
-> ---
->  fs/fuse/virtio_fs.c | 1 -
->  1 file changed, 1 deletion(-)
+I think TDX can use it with slight change. Pass vcpu instead of KVM, page pin
+down and mmu_lock.  TDX requires non-leaf Secure page tables to be populated
+before adding a leaf.  Maybe with the assumption that vcpu doesn't run, GFN->PFN
+relation is stable so that mmu_lock isn't needed? What about punch hole?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+The flow would be something like as follows.
 
---y2TTKZujScqhsi/4
-Content-Type: application/pgp-signature; name="signature.asc"
+- lock slots_lock
 
------BEGIN PGP SIGNATURE-----
+- kvm_gmem_populate(vcpu)
+  - pin down source page instead of do_memcopy.
+  - get pfn with __kvm_gmem_get_pfn()
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmYMa8oACgkQnKSrs4Gr
-c8hVnAf/cA3xbyK70jAgkZV9EtimcENA8Vicjc5wwuE2Vt1WSOZUWtD+a8KtqIDS
-ICvCIk7XlMHoB7BYaP8qlXQ0kjkARmT7hwEQyqEDL/MzEgyKhChus/pV8g6Cvywl
-OdPkT57aujxEBU5+l5t8TnP2I8CziPoDf0uizIpf5r2pZstP0q/mRVNFevjTDeSu
-L+LjxHElpmAVApGciiGOH+cpPYuKAejObzy5z92m7jZgh/LfHtcK29bhoWwNTL1l
-e6ryz/B2YrpyrVdDjqUD1iJ2WR2qxEUAI3moU5ySGqG/w5Lg0+ji+9TlCE46xoQ/
-U1ALdKDyNFUB1iRXdA00oKhEe6MUOw==
-=AQF3
------END PGP SIGNATURE-----
+  - read lock mmu_lock
+  - in the post_populate callback
+    - lookup tdp mmu page table to check if the table is populated.
+      lookup only version of kvm_tdp_mmu_map().
+      We need vcpu instead of kvm.
+    - TDH_MEM_PAGE_ADD
+  - read unlock mmu_lock
 
---y2TTKZujScqhsi/4--
+- unlock slots_lock
 
+Thanks,
+
+> With that model, the potential for using kvm_gmem_populate() seemed
+> plausible to I was trying to make it immediately usable for that
+> purpose. But maybe the TDX folks can confirm whether this would be
+> usable for them or not. (kvm_gmem_populate was introduced here[2] for
+> reference/background)
+> 
+> -Mike
+> 
+> [1] https://lore.kernel.org/kvm/20240319155349.GE1645738@ls.amr.corp.intel.com/T/#m8580d8e39476be565534d6ff5f5afa295fe8d4f7
+> [2] https://lore.kernel.org/kvm/20240329212444.395559-3-michael.roth@amd.com/T/#m3aeba660fcc991602820d3703b1265722b871025)
+> 
+> 
+> > 
+> > I'll do that when posting the next version of the patches in kvm-coco-queue.
+> > 
+> > Paolo
+> > 
+> 
+
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
