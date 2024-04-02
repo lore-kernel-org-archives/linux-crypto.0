@@ -1,217 +1,277 @@
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2118.outbound.protection.outlook.com [40.107.8.118])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB2D175BC
-	for <linux-crypto@vger.kernel.org>; Tue,  2 Apr 2024 07:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.8.118
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712041393; cv=fail; b=rkLH2fQbPjW8KffrVPXsl+0wGMUydFx/x4dHApTRlJ7dUvYMpYI1HmfklXuuvyo8xY+BZvJeOWsTH+I8ITI0HERJBQ7c911wndNT2y2E2J20x6rgGCPOyQbwTPwqoDwpHvnDGbaz1KD8czdjleyo34EEWJSXiylQYj4Kk1sPGXE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712041393; c=relaxed/simple;
-	bh=jQKtKb59S8m01UtqXiuwR8SQsADoy1rK1L44kviKFAQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KoNVxZ1DkRHvHHanPgTuKWUk5oc85V/mxJWNZpmRdLW8/whX4Ux82ZZL38bpDlEPxIqNld32nr/wAi2DcgLJEiKrrIuOvN+qYUJXG+/l7HNokdIBSpGJbLYmnlI++fixHHTwsNux+ojhE5ppaHqdB8qZGuocL1i80yHMk6gAAYg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=DePr/9dz; arc=fail smtp.client-ip=40.107.8.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4293D3BD
+	for <linux-crypto@vger.kernel.org>; Tue,  2 Apr 2024 08:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712045281; cv=none; b=H+YNgok2aH8f3S1GTrgodVWHpV2er6Bkm37Kg0lrOix+0+d6UtpxhisWdS5FwePMBIPiBMaKOf3YxdN15hP1jeFDuR/jBolOYJAADIAEmVzZOvVEi7JAnLzPbYeRp+XXoG4ZvOCAcPA6Gk1OQ3wGlOB8JbqKwA2zlxPfju/aUzs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712045281; c=relaxed/simple;
+	bh=cXgGVUNQnsE+Ujww0696zbcLQrrmpRABWERrZBk4cW8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IN1T85ioRBXHs5rJDIMjWToOnLf0r64DfDO1LSNt23raZmCI6e32WhzkjhYquWLdhZr88CiLTne6Pj4cVbu9kAWi53ofgEYtc9Q0BeZPn0wn0zTNUBD/Zq5vLhuOUVjoFoRP8EqDhczE6bF0/xTfm6X8sN6YPdFlOiLLu++s4Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JxROgAI2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="DePr/9dz"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XB0jTXDwgNqiAfrdgJ/1yFJvUsV0+oWqS0RA0QZnXrErut74/NxoF++jclkbA1AsticC01f2WgMvtWoFzdC5CJaHE3MWzhmaCG+3OUl2ah8NuQvs6wmBkiFX/fG6oktoBJFP+zSirhgAmY8yvRl5lfJwCQ6utsPH0vCgCoN6AeHg5Zs93JrAxtXkv4RTDjZDO0E/f3kJX5gUYTqPRnOKzot/eV0i53Z1TMnIccS/Nm4X/SfBlDHTXp5oinW4j7hPMZVPJvD2VZU38GCX0BBiafGT8BxaMK++R1YzjMIINtMaYufZdpHG/8KuxDNLcvdUt+DFGP/nSnVHPAbxPaK45Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jQKtKb59S8m01UtqXiuwR8SQsADoy1rK1L44kviKFAQ=;
- b=fo5LxpsBazn1K6J51RzZbTIoNDBjg+vVXQJQadVq6rra3Mw2za2zHnw0cUCkCEXMt9LTr/WuXfzwzeC32JRihrGPbeAJ36Hm7nX/cidXzXPehC5cVNXaMMOZHKG2XieiiavlEYtjwEpXhaZEYA/6x+9tPMtFNXfOBnInJnbtv0fU76On7LK7wPF4Y+5Hu/iWp9Rth2z+9T5BnrTwS6wuFQKRWhwoOmXMNmfZ71Qm6PtwxbTiV5RbYiM3SllzBixVLHuAu7a703Bv51emHnXz4UtE4C6D0D981BXKw5a7xmJiejl0FkxD1XMsBGtRZ/CshuSIOvGPzaESXdDXgmmLKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jQKtKb59S8m01UtqXiuwR8SQsADoy1rK1L44kviKFAQ=;
- b=DePr/9dzfy2XkJbbYTEfp0OoL4ZyUlkkQ676gyo7BTbegOpBgVIPY+Q7d8xa80W5LamivHOmGZrJI3O0swk/DZ4frqG02nVMpWbxwWM5lvHBdO0uf2SnIhU5ojB9DxcRD4Fj2tSL4GWnO1vEG1cn3qowfA4J2QUPjRKbg5EdRV0=
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com (2603:10a6:208:11a::11)
- by DBBPR04MB7884.eurprd04.prod.outlook.com (2603:10a6:10:1f2::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 2 Apr
- 2024 07:03:07 +0000
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::4662:223:b694:bbc7]) by AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::4662:223:b694:bbc7%6]) with mapi id 15.20.7409.042; Tue, 2 Apr 2024
- 07:03:07 +0000
-From: Gaurav Jain <gaurav.jain@nxp.com>
-To: Ondrej Mosnacek <omosnace@redhat.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Horia Geanta
-	<horia.geanta@nxp.com>, Pankaj Gupta <pankaj.gupta@nxp.com>, Linux Crypto
- Mailing List <linux-crypto@vger.kernel.org>, Varun Sethi <V.Sethi@nxp.com>
-Subject: RE: [EXT] caam test failures with libkcapi
-Thread-Topic: [EXT] caam test failures with libkcapi
-Thread-Index: AQHaNIUs5x+vRqPNKUaISMpgxN6Xu7C1H2qwgAHHygCAESHn8IABYFoAgIu9YkA=
-Date: Tue, 2 Apr 2024 07:03:06 +0000
-Message-ID:
- <AM0PR04MB6004DD14719CD56D86DB32CEE73E2@AM0PR04MB6004.eurprd04.prod.outlook.com>
-References: <ZYT/beBEO7dAlVO2@gondor.apana.org.au>
- <AM0PR04MB6004FDAC2B2C0B4D41A92A89E794A@AM0PR04MB6004.eurprd04.prod.outlook.com>
- <CAFqZXNtb1hErawH30dN4vgGPD0tQv9Rd+9s26MBaT3boRYtPCA@mail.gmail.com>
- <AM0PR04MB6004F095D6800C4BC99E5C4FE760A@AM0PR04MB6004.eurprd04.prod.outlook.com>
- <CAFqZXNs-QzXFm+cLN62LrpPjb_R3DqJHgM_yjrOkzen8LEgS9A@mail.gmail.com>
-In-Reply-To:
- <CAFqZXNs-QzXFm+cLN62LrpPjb_R3DqJHgM_yjrOkzen8LEgS9A@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM0PR04MB6004:EE_|DBBPR04MB7884:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- h+KHkq3/nGMCXvNiM3EEuMNegkMnQ3i4LCtCHf4pP6orxVhFa/qyrtu6VGNafEFd5K07vg7qvmEDgGy9wbqwJfQ2blWK33bHDLBAaxcc/2iX5VdwF7Wl9RyIJGqN+9gULRtA1ZXVVIXmuHHaYuwbBzCVq5TzD3BlAQ8Z9s2kX/iIn4EBMh4Gr3qvdz4PudiOrTzue8OPZQWqpZgDo1H7S/Qpvp3HzY1+ZMD+vGEPxNVX1vy58UZ4jcwb7NnQ9ukzAaNMI/SkEMBDJ0ozzJDWUoA3jGoYvxKNg4FsAidLOxtuxqa0kwvSweibMOWZanpZqrJY6xbUp994yerUlMJSjFnB62q4ywxFMyJ5YVMhUNa0A7H8WTuwDnpDH2ucqolmfEx8KZcpXRbAGS9REUJ4jqEZ2ErWfHFSE8Zd+sNCuVLj/zQh+UJtDFAf4sI3dAFC4+NDWRMv6VXGBoWiA/UBnuiJP+/59zgtZF5kVPXHxtf1qjdRWOQJ6cEYBToWiCfOxyMOl5/a09aNgpgVnDuQpwyT8mZocSWo1H4HCf5kRD8BTJ6dAxGz934Fe4o0d/2E8JWnU66+PK5JdFtCVqkQPbqF/XCTqhocZinhe1wV2Xms0hesvodA3JBfEbkbpMj3TD29mVNYPT0T8BHNTG906XvkL0SlAPSZepWxeFX3Y8s=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6004.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?ei9sTW91U0N4UERERmtEQUpKTmlxMXlzQThKTjlKMlRFREtUN3NZRDFua3lG?=
- =?utf-8?B?cE1jY2NSM3RVV1NEQ29RV21LbHIrNTU4bmJYQnBTZHFVY2UwdUZkc3AyRHhX?=
- =?utf-8?B?dXYrSGUrZmR4WVVlbzZ0UlJ3VnBSa3F1ZXZnVWJYNjY1N0xUc08rcnMrUW5W?=
- =?utf-8?B?QTFmZzZLQ2pZYi9ENFM0dklWbWRLQVA1QmIvSXoyWHhiR2hMTDAvSnk5c042?=
- =?utf-8?B?cS9pUlZmZlh1OU1meFE0L3EzU2YrSEcrR3ZUb01jand1a1g4MDRzTXZCYXU1?=
- =?utf-8?B?TlIzNHczVldlSXZyazRkdWFRVWQ4ZlZ1czFDMHQrOGFqUVhiemdtTm9LUSt5?=
- =?utf-8?B?U3U0VW1uTmxMbDNLN0RCOUxNRGZLbHBmcXM0R2Vmc256ZW5YK0N1c1dZVlcx?=
- =?utf-8?B?WENuZmdOUlY4aldBQWxlUEtIOXY3a3JIYmQvbjZYZXJSd0p3VzRBNStmNFlu?=
- =?utf-8?B?R242ZjYvMUZ5d0tjVWsweVNkQWd6eTgwa3dCOHQxUXZZQ1BCU2tvZUN0YURj?=
- =?utf-8?B?QVQzd2dvb2JNQjRlQUZXTDRYQ0loTFBpQ2hYQzJ6MHdRcFBaNHlTZ1BwaW50?=
- =?utf-8?B?S3lYaythU0xWM09pclZ5Ni8zdVhkSVgwRFl0cmtGVm1BK3ZKZEltUHJoK2x5?=
- =?utf-8?B?bjRYR1pCd0VJdlB5UVVQaFh1VEdiaXZnejNHMDN6c1ZqcElmNEg1dmdpUmJR?=
- =?utf-8?B?YW5NL045dmRqeE5sekZNaWlIbk9QK0gvN0QyaGNMZmpHS3dVOTM3eFB1Unps?=
- =?utf-8?B?Q2ZJMzRqK2xxTXlGYXg2dlVOcXYrdmtqdjFqN25RcHJWbEYxTCsxRTBvQWJG?=
- =?utf-8?B?OEMvd09udTZSTVpUa1NPaXlsVDZpZXZRUnl3eUM4NHdSWUdWR0xCYnZ1MGxr?=
- =?utf-8?B?blZBajlObDdDQzdwQ0g2L0p5bTlRL1E0Zk5DeGhYemVMWW8zL0RRU0VXWlVV?=
- =?utf-8?B?WkYweUhkdFo2eUFQSzlsdEhlR3lUS2dPQWh2OEI1OTJNK2xPNXpkVVllZzZs?=
- =?utf-8?B?SEdZK09sREJEaFIxbklRL005ZldUc1RyYWZEUXNSMzBJampNQlBMakI1Rm9x?=
- =?utf-8?B?QXR3Y0dmOUtlMGZPSG00WDlJT0ZWSFlwVW9TS1pTc3RHekZkdS9iTVE4NUtz?=
- =?utf-8?B?czNVVUhzQkk3TVppTGx5UTY2dzNaNUc0TyttWE1IQ1VkS0tzNUl4b0tzb1ha?=
- =?utf-8?B?ZUpOZWU2NzlzTEd6QUgvT1AvOXJzMGVaVHVNM0p1S3JTbmhhNksyYjRoVTBQ?=
- =?utf-8?B?dmxZRnhPZmJQNEcvK0dxLzQzcnA4TGxSV0VzdVlRS0FBd1J2enZsN204aFdC?=
- =?utf-8?B?TDhmVjYxaldueENHcXVwbko1d1oyMDVnUURzblpUQjNkZG93NVVHODRqRXlO?=
- =?utf-8?B?VDh2Rkw1MkRJRFMyRUM0d3d5TXFOMGtRM2tmZkxNMVJtdzl0M2dxSUJQenZu?=
- =?utf-8?B?UERleVNRWW5wcDZiRUZEdkoxN3V1ejFRSHcwZ1F4dHdIRFUxaTI3N09ZMlNB?=
- =?utf-8?B?aDl6UUxMQVFzSnZlK3UybFFNU2dhQW4zZmpSNFVybFFiU1hTbWhaSmtFd1N6?=
- =?utf-8?B?TE8yTnNId0VjR3VZMFlxWkwzMXVaQ1dDNUErU1cyeXZLS3JUU1E3RzQyOUla?=
- =?utf-8?B?M0JTL2J0bENqZ3RhM3pJMkVSbVVhZlg5QkU3cC9hZkRDbXQydDhTazhrazNL?=
- =?utf-8?B?L00vcVFIc3dCZWZSWjRSQ25MM2RmU0lsTGRQbDY0c3ZQdTRnMXRqMXltRHp1?=
- =?utf-8?B?OUlQZXpJSmY3TUJHZjVvZkhLQ0hGZ1dHOU9xZFNZSVJpV0xtai95R1E4S3dQ?=
- =?utf-8?B?alU0ZHJKVno2UW5rVmlmd2libm1XaGJVemVFRmpGaGlsUkxVM0VZQjVCWjlT?=
- =?utf-8?B?YURjYVRtcXdiSElrZ1FCYmtUdVdvM3FqdEdSZ1l1TWhpMUYrMHVOVEU3dC9i?=
- =?utf-8?B?cmZDSGZyUUFEcnQ0OGE0dWtmMGtUVlVDYTZjSHZuVUozc0huelhTZkljaWhH?=
- =?utf-8?B?eGV5bDVKTjhRQTNxVktqS0hrNTBmY1l2bWNaWXMxUnlreFdMRVhmdXhDK0dO?=
- =?utf-8?B?RlZlTjZOa3FBcm1GUnpmSGFqSTgvaDAxWVJXZjdaaDhDM1VyeUphU0FDS2lC?=
- =?utf-8?Q?+KPTxUAj3uZHz6h3WYZPqRkzr?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JxROgAI2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712045278;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JoFIDsqHrKObELq0jSEditr7BMIC5fqGv2oe/il9p1s=;
+	b=JxROgAI2TaH5SClmV5huZ+FxCgEr/lAbdn+iaKVUg95PKMr8e/fMClJ/x3m0eORqkKngex
+	tXDYNzzlwX+WiputDHTzz+9qE85qdfU8+z7eNQM9HucaBgXZ0HSJ6Mo9HPh7cVpV3azVNI
+	0LJFpvg/FTlzw++8N+YzH4BC7YRxTSw=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-402-q2qKyElwMi2UHLmep1tSQA-1; Tue, 02 Apr 2024 04:07:55 -0400
+X-MC-Unique: q2qKyElwMi2UHLmep1tSQA-1
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3c4ed46350fso856524b6e.2
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Apr 2024 01:07:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712045274; x=1712650074;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JoFIDsqHrKObELq0jSEditr7BMIC5fqGv2oe/il9p1s=;
+        b=KOVBb3yj+o9fOL+4ctloyZRjuAbxtdEWAgosqUC0RxYviF4CU9+JWW9jozg96x5eLb
+         n+hyX+2ap3wqYafbQoCZwqdBjR6fNAcOxbPD1GqRfhwmQYRlCB/jGzCQbtUNAvXbF9MQ
+         qt6rsqM/u7xdcJVTz2A1T0lfCTivFAeFWrMJ/6bOfke4DUSZpj9z5bI8m2d2TtIBREIv
+         HXF9CLSf5skv7PZ4uNV/EV2wCxpSOiV5L5AxYzO2aplg+79ByMMIgF3CuoAsrnWqII+T
+         kZQUhfXSwNLqxnD5lp0BrL+0BezTJVDlYVj49UFhZFc1myGAoNa3aSsPUvAJo0tJX4pu
+         5YNw==
+X-Forwarded-Encrypted: i=1; AJvYcCWxuuAD99gEInBIHp02QCpjDl5X8PXORAlYKp/BhbIquabWI8tWSBpAF2GmbTteeiGeKA+MLwBMFPHi6wIptIBP53ltekGFPzbA+YlP
+X-Gm-Message-State: AOJu0YykQYVi2BQoGldTWcXpE94QUdio9uRDQB6IeHjvLXmZg3ELQbbL
+	7JUPAP9uNAGCawk5OgrNqD/MnKgK17hH7HPTCvxgwkUnVL7w4SRXW4LMCsLULslkSBRZS7uSa8w
+	fWQcycYtpbwyLWsZYwlgOR8O+gtd64veCWKQWQIuUQ5k+daFWPI5Wder0TZe+6S6jqhvsLn1NQb
+	MiEk2PuIm+xuIh02XfJiBOU/DY8gpVv+MLct7/hkJ+D8T75nc=
+X-Received: by 2002:a05:6808:120e:b0:3c3:dfec:d9ee with SMTP id a14-20020a056808120e00b003c3dfecd9eemr13027918oil.32.1712045274672;
+        Tue, 02 Apr 2024 01:07:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGgU/W2Po5ga/DbPrfrZWhW/eCABU8ASAlqZGBbaFqX3tu9DHkD0cVewqmhjybHg3hlKVkIsF9RRhsE6QuTCQ0=
+X-Received: by 2002:a17:903:2cb:b0:1e0:b2d5:5f46 with SMTP id
+ s11-20020a17090302cb00b001e0b2d55f46mr11786625plk.46.1712044823630; Tue, 02
+ Apr 2024 01:00:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6004.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fcac2186-6073-4c1d-1f04-08dc52e2f2d4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Apr 2024 07:03:06.9439
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Z2JftM+juG7pZyRVQ49iuGKSyHbrR4Jmu6o5xD9wRJnGFo9Ae9DCREUwsbSWAEb55MPWHMDjJMsySt3/qyI71A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7884
+References: <ZYT/beBEO7dAlVO2@gondor.apana.org.au> <AM0PR04MB6004FDAC2B2C0B4D41A92A89E794A@AM0PR04MB6004.eurprd04.prod.outlook.com>
+ <CAFqZXNtb1hErawH30dN4vgGPD0tQv9Rd+9s26MBaT3boRYtPCA@mail.gmail.com>
+ <AM0PR04MB6004F095D6800C4BC99E5C4FE760A@AM0PR04MB6004.eurprd04.prod.outlook.com>
+ <CAFqZXNs-QzXFm+cLN62LrpPjb_R3DqJHgM_yjrOkzen8LEgS9A@mail.gmail.com> <AM0PR04MB6004DD14719CD56D86DB32CEE73E2@AM0PR04MB6004.eurprd04.prod.outlook.com>
+In-Reply-To: <AM0PR04MB6004DD14719CD56D86DB32CEE73E2@AM0PR04MB6004.eurprd04.prod.outlook.com>
+From: Ondrej Mosnacek <omosnace@redhat.com>
+Date: Tue, 2 Apr 2024 10:00:12 +0200
+Message-ID: <CAFqZXNsOZNzRv=2N1Y1LvDPESF=Uvh_YLkTOiZqqLb8v7Rg+GQ@mail.gmail.com>
+Subject: Re: [EXT] caam test failures with libkcapi
+To: Gaurav Jain <gaurav.jain@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Horia Geanta <horia.geanta@nxp.com>, 
+	Pankaj Gupta <pankaj.gupta@nxp.com>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Varun Sethi <V.Sethi@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGkNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBPbmRyZWogTW9zbmFj
-ZWsgPG9tb3NuYWNlQHJlZGhhdC5jb20+DQo+IFNlbnQ6IFRodXJzZGF5LCBKYW51YXJ5IDQsIDIw
-MjQgMjowNyBQTQ0KPiBUbzogR2F1cmF2IEphaW4gPGdhdXJhdi5qYWluQG54cC5jb20+DQo+IENj
-OiBIZXJiZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU+OyBIb3JpYSBHZWFudGEN
-Cj4gPGhvcmlhLmdlYW50YUBueHAuY29tPjsgUGFua2FqIEd1cHRhIDxwYW5rYWouZ3VwdGFAbnhw
-LmNvbT47IExpbnV4IENyeXB0bw0KPiBNYWlsaW5nIExpc3QgPGxpbnV4LWNyeXB0b0B2Z2VyLmtl
-cm5lbC5vcmc+OyBWYXJ1biBTZXRoaSA8Vi5TZXRoaUBueHAuY29tPg0KPiBTdWJqZWN0OiBSZTog
-W0VYVF0gY2FhbSB0ZXN0IGZhaWx1cmVzIHdpdGggbGlia2NhcGkNCj4gDQo+IENhdXRpb246IFRo
-aXMgaXMgYW4gZXh0ZXJuYWwgZW1haWwuIFBsZWFzZSB0YWtlIGNhcmUgd2hlbiBjbGlja2luZyBs
-aW5rcyBvciBvcGVuaW5nDQo+IGF0dGFjaG1lbnRzLiBXaGVuIGluIGRvdWJ0LCByZXBvcnQgdGhl
-IG1lc3NhZ2UgdXNpbmcgdGhlICdSZXBvcnQgdGhpcyBlbWFpbCcNCj4gYnV0dG9uDQo+IA0KPiAN
-Cj4gT24gV2VkLCBKYW4gMywgMjAyNCBhdCAxMjo1MOKAr1BNIEdhdXJhdiBKYWluIDxnYXVyYXYu
-amFpbkBueHAuY29tPiB3cm90ZToNCj4gPg0KPiA+DQo+ID4NCj4gPiA+IC0tLS0tT3JpZ2luYWwg
-TWVzc2FnZS0tLS0tDQo+ID4gPiBGcm9tOiBPbmRyZWogTW9zbmFjZWsgPG9tb3NuYWNlQHJlZGhh
-dC5jb20+DQo+ID4gPiBTZW50OiBTYXR1cmRheSwgRGVjZW1iZXIgMjMsIDIwMjMgNzoyOSBQTQ0K
-PiA+ID4gVG86IEdhdXJhdiBKYWluIDxnYXVyYXYuamFpbkBueHAuY29tPg0KPiA+ID4gQ2M6IEhl
-cmJlcnQgWHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT47IEhvcmlhIEdlYW50YQ0KPiA+
-ID4gPGhvcmlhLmdlYW50YUBueHAuY29tPjsgUGFua2FqIEd1cHRhIDxwYW5rYWouZ3VwdGFAbnhw
-LmNvbT47IExpbnV4DQo+ID4gPiBDcnlwdG8gTWFpbGluZyBMaXN0IDxsaW51eC1jcnlwdG9Admdl
-ci5rZXJuZWwub3JnPg0KPiA+ID4gU3ViamVjdDogUmU6IFtFWFRdIGNhYW0gdGVzdCBmYWlsdXJl
-cyB3aXRoIGxpYmtjYXBpDQo+ID4gPg0KPiA+ID4gQ2F1dGlvbjogVGhpcyBpcyBhbiBleHRlcm5h
-bCBlbWFpbC4gUGxlYXNlIHRha2UgY2FyZSB3aGVuIGNsaWNraW5nDQo+ID4gPiBsaW5rcyBvciBv
-cGVuaW5nIGF0dGFjaG1lbnRzLiBXaGVuIGluIGRvdWJ0LCByZXBvcnQgdGhlIG1lc3NhZ2UNCj4g
-PiA+IHVzaW5nIHRoZSAnUmVwb3J0IHRoaXMgZW1haWwnIGJ1dHRvbg0KPiA+ID4NCj4gPiA+DQo+
-ID4gPiBPbiBGcmksIERlYyAyMiwgMjAyMyBhdCAxMTo1MOKAr0FNIEdhdXJhdiBKYWluIDxnYXVy
-YXYuamFpbkBueHAuY29tPiB3cm90ZToNCj4gWy4uLl0NCj4gPiA+ID4gQ2FuIHlvdSBwbGVhc2Ug
-c2hhcmUgdGhlIGxvZ3MgZm9yIGxpYmtjYXBpIHRlc3QgZmFpbHVyZXMuDQo+ID4gPg0KPiA+ID4g
-QSBsb2cgZnJvbSBvdXIga2VybmVsIENJIHRlc3RpbmcgaXMgYXZhaWxhYmxlIGhlcmUgKGl0IGlz
-IGZyb20NCj4gPiA+IENlbnRPUyBTdHJlYW0gOSwgYnV0IGl0IGZhaWxzIGluIHRoZSBzYW1lIHdh
-eSBvbiB0aGUgRmVkb3JhJ3MNCj4gPiA+IDYuNi42LWJhc2VkDQo+ID4gPiBrZXJuZWwpOg0KPiA+
-ID4gaHR0cHM6Ly9ldXIwMS5zYWZlbGlua3MucHJvdGVjdGlvbi5vdXRsb29rLmNvbS8/dXJsPWh0
-dHBzJTNBJTJGJTJGczMNCj4gPiA+IC5hbWF6JTJGJmRhdGE9MDUlN0MwMiU3Q2dhdXJhdi5qYWlu
-JTQwbnhwLmNvbSU3Q2IwNWRiYmY5YzBkODQ4YQ0KPiBmNWJlZg0KPiA+ID4NCj4gMDhkYzBkMDA2
-YjU5JTdDNjg2ZWExZDNiYzJiNGM2ZmE5MmNkOTljNWMzMDE2MzUlN0MwJTdDMCU3QzYzODM5OQ0K
-PiA1NDI2DQo+ID4gPg0KPiA0ODA2OTQyNiU3Q1Vua25vd24lN0NUV0ZwYkdac2IzZDhleUpXSWpv
-aU1DNHdMakF3TURBaUxDSlFJam9pVjJsDQo+IHVNekkNCj4gPiA+DQo+IGlMQ0pCVGlJNklrMWhh
-V3dpTENKWFZDSTZNbjAlM0QlN0MzMDAwJTdDJTdDJTdDJnNkYXRhPXlrcEYlMkJNJQ0KPiAyQkRX
-ag0KPiA+ID4gdzZHSE42MTY1a0xlN2M4V0ZSSlNTTFRmV2QlMkZxTHhJOXclM0QmcmVzZXJ2ZWQ9
-MA0KPiA+ID4gb25hd3MuY29tJTJGYXJyLWNraS1wcm9kLXRydXN0ZWQtYXJ0aWZhY3RzJTJGdHJ1
-c3RlZC0NCj4gPiA+DQo+IGFydGlmYWN0cyUyRjExMDkxODA4NzQlMkZ0ZXN0X2FhcmNoNjQlMkY1
-NzY2NDE0NzI0JTJGYXJ0aWZhY3RzJTJGcnVuDQo+ID4gPiAuZA0KPiA+ID4NCj4gb25lLjAzJTJG
-am9iLjAxJTJGcmVjaXBlcyUyRjE1MTk0NzMzJTJGdGFza3MlMkYzMSUyRmxvZ3MlMkZ0YXNrb3V0
-LmwNCj4gPiA+DQo+IG9nJmRhdGE9MDUlN0MwMiU3Q2dhdXJhdi5qYWluJTQwbnhwLmNvbSU3QzNi
-NTJhODM0NDliZjRiM2ZmZmUyMDhkYw0KPiA+ID4NCj4gMDNiZjRiNjYlN0M2ODZlYTFkM2JjMmI0
-YzZmYTkyY2Q5OWM1YzMwMTYzNSU3QzAlN0MwJTdDNjM4Mzg5MzY3Mw0KPiA+ID4NCj4gMzgwNzI3
-MDklN0NVbmtub3duJTdDVFdGcGJHWnNiM2Q4ZXlKV0lqb2lNQzR3TGpBd01EQWlMQ0pRSWpvaVYy
-bA0KPiA+ID4NCj4gdU16SWlMQ0pCVGlJNklrMWhhV3dpTENKWFZDSTZNbjAlM0QlN0MzMDAwJTdD
-JTdDJTdDJnNkYXRhPTlTQ0ZpVA0KPiA+ID4gMW5Oc1RaZzRiaDZuNzVDZWljREM1MUp3M3dhY1FD
-YUw3dzR2USUzRCZyZXNlcnZlZD0wDQo+ID4NCj4gPiBJbiB0aGlzIGxvZyBJIGNhbm5vdCBzZWUg
-Q0FBTSBmYWlsdXJlcy4gY2FuIHlvdSB0ZWxsIHdoaWNoIENBQU0gdGZtIGZhaWxlZD8NCj4gDQo+
-IFRoZSB0ZXN0IGV4ZXJjaXNlcyB0aGUga2VybmVsIGNyeXB0byBBUEkgdmlhIHRoZSBBRl9BTEcg
-aW50ZXJmYWNlLiBUaGUgZmFpbHVyZXMNCj4gYmFzaWNhbGx5IGRldGVjdCB0aGF0IGZvciBjZXJ0
-YWluIGlucHV0cyB0aGUgY3J5cHRvIEFQSSByZXR1cm5zIGRpZmZlcmVudCByZXN1bHRzDQo+IHRo
-YW4gZXhwZWN0ZWQgd2hlbiB0aGUgQ0FBTSBkcml2ZXIgaXMgdXNlZCAodGhlIG1hY2hpbmUgaW4g
-cXVlc3Rpb24gaGFzIHRoZQ0KPiByZWxldmFudCBoYXJkd2FyZSwgc28gdGhlIGNhYW1fanIgY3J5
-cHRvIGRyaXZlcnMgYXJlIHJlZ2lzdGVyZWQgZm9yIGNlcnRhaW4NCj4gYWxnb3JpdGhtcyBhbmQg
-dGhleSB0YWtlIHByaW9yaXR5KS4NCj4gDQo+IEZvciBleGFtcGxlLCB3aGVuIHlvdSBpbnN0YWxs
-IGxpYmtjYXBpLXRvb2xzIGFuZCBydW46DQo+IA0KPiBrY2FwaSAteCAyIC1zICAtZSAtYyAiZ2Nt
-KGFlcykiIC1pIDE2YzRiNGJkMTE5OGYzOWY0YWU4MTdiNyBcDQo+ICAgICAtayA4N2M5MWE4YjYz
-ZjY2OTM0ZGQzNzAzNDE1YjI1Mzg0NjFmYmZlZjU1Y2U3YTljYTliYjk0MjU0OTlmNGNkMWQ2DQo+
-IFwNCj4gICAgIC1hDQo+ICIzMDNiYjU3ZTQ1MzRiMDhhNGQ1ZjAwMWE4NGIzMDUyYzlkMGQ1OGVl
-MDNlZGE1MjExYTU0MDk1MGU4MTlkYyIgXA0KPiAgICAgLXAgImIwNWZiZDQwM2MyZmE0MWE4Y2M3
-MDJhNzQ3NGVkOWJhNmM1MGZjYzZjMTk3MzJhN2QzMDBmMTExMzg2MmJjIg0KPiAtbCA0DQo+IA0K
-PiAuLi50aGUgY2FhbV9qciBpbXBsZW1lbnRhdGlvbiByZXN1bHRzIGluDQo+IGIwNWZiZDQwM2My
-ZmE0MWE4Y2M3MDJhNzQ3NGVkOWJhNmM1MGZjYzZjMTk3MzJhN2QzMDBmMTExMzg2MmJjNmQyNzUN
-Cj4gNmQ2LA0KPiB3aGlsZSB0aGUgZXhwZWN0ZWQgb3V0cHV0IGlzDQo+IDliZWE1MjYzZTdiMzY1
-ZDVhMDZjYjNjY2FiMGQ0M2NiOWExY2E5NjdkZmI3YjFhNjk1NWIzYzQ5MzAxOGFmNmQyNzUNCj4g
-NmQ2Lg0KPiBZb3UgY2FuIHNlYXJjaCB0aGUgdGVzdCBsb2cgZm9yICJGQUlMRUQiIHRvIGZpbmQg
-dGhlIG90aGVyIGZhaWxpbmcgY29tbWFuZHMgKG5vdGUNCj4gdGhhdCBpbiBzb21lIGNhc2VzIHlv
-dSBuZWVkIHRvIGVzY2FwZSB0aGUgLWMgYXJndW1lbnQgYXMgaXQgY29udGFpbnMNCj4gcGFyZW50
-aGVzZXMpLg0KDQpXZSBoYXZlIGRldmVsb3BlZCBhbiBhcHBsaWNhdGlvbiB0byBydW4gdGhlIGdj
-bShhZXMpIGFsZ29yaXRobSB3aGljaCBpcyBvZmZsb2FkZWQgdG8gY2FhbV9qciBkcml2ZXIgdmlh
-IEFGX0FMRyBpbnRlcmZhY2UuDQp3ZSBoYXZlIHVzZWQgdGhlIGJlbG93IHRlc3QgdmVjdG9yDQpQ
-bGFpbnRleHQgaXMgImIwNWZiZDQwM2MyZmE0MWE4Y2M3MDJhNzQ3NGVkOWJhNmM1MGZjYzZjMTk3
-MzJhN2QzMDBmMTExMzg2MmJjIiAtPiAzMSBieXRlDQpLZXkgaXMgIjg3YzkxYThiNjNmNjY5MzRk
-ZDM3MDM0MTViMjUzODQ2MWZiZmVmNTVjZTdhOWNhOWJiOTQyNTQ5OWY0Y2QxZDYiIC0+IDMyIGJ5
-dGUNCkl2IGlzICIxNmM0YjRiZDExOThmMzlmNGFlODE3YjciIC0+IDEyIGJ5dGUNCkFhZCBpcyAi
-MzAzYmI1N2U0NTM0YjA4YTRkNWYwMDFhODRiMzA1MmM5ZDBkNThlZTAzZWRhNTIxMWE1NDA5NTBl
-ODE5ZGMiIC0+IDMxIGJ5dGUNCg0KT3VyIGFwcGxpY2F0aW9uIHJlc3VsdHMgbWF0Y2hlcyB0aGUg
-ZXhwZWN0ZWQgY2lwaGVydGV4dCB3aGljaCBpcyAiOWJlYTUyNjNlN2IzNjVkNWEwNmNiM2NjYWIw
-ZDQzY2I5YTFjYTk2N2RmYjdiMWE2OTU1YjNjNDkzMDE4YWY2ZDI3NTZkNiIuDQpJIGNhbiBzZWUg
-dGhlIGV4cGVjdGVkIG91dHB1dCBhdCB5b3VyIGVuZCBpcyBiYXNpY2FsbHkgdGhlIHBsYWludGV4
-dCBhcHBlbmRlZCBieSBhdXRoZW50aWNhdGlvbiB0YWcgb2YgNCBieXRlcyAiNmQyNzU2ZDYiLg0K
-Y2FhbV9qciBkcml2ZXIgYWVzLWdjbSBpbXBsZW1lbnRhdGlvbiBpcyBwcm92aWRpbmcgdGhlIGNv
-cnJlY3Qgb3V0cHV0Lg0KDQpSZWdhcmRzDQpHYXVyYXYgSmFpbg0KPiANCj4gLS0NCj4gT25kcmVq
-IE1vc25hY2VrDQo+IFNlbmlvciBTb2Z0d2FyZSBFbmdpbmVlciwgTGludXggU2VjdXJpdHkgLSBT
-RUxpbnV4IGtlcm5lbCBSZWQgSGF0LCBJbmMuDQoNCg==
+On Tue, Apr 2, 2024 at 9:03=E2=80=AFAM Gaurav Jain <gaurav.jain@nxp.com> wr=
+ote:
+>
+> Hi
+>
+> > -----Original Message-----
+> > From: Ondrej Mosnacek <omosnace@redhat.com>
+> > Sent: Thursday, January 4, 2024 2:07 PM
+> > To: Gaurav Jain <gaurav.jain@nxp.com>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>; Horia Geanta
+> > <horia.geanta@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>; Linux Cryp=
+to
+> > Mailing List <linux-crypto@vger.kernel.org>; Varun Sethi <V.Sethi@nxp.c=
+om>
+> > Subject: Re: [EXT] caam test failures with libkcapi
+> >
+> > Caution: This is an external email. Please take care when clicking link=
+s or opening
+> > attachments. When in doubt, report the message using the 'Report this e=
+mail'
+> > button
+> >
+> >
+> > On Wed, Jan 3, 2024 at 12:50=E2=80=AFPM Gaurav Jain <gaurav.jain@nxp.co=
+m> wrote:
+> > >
+> > >
+> > >
+> > > > -----Original Message-----
+> > > > From: Ondrej Mosnacek <omosnace@redhat.com>
+> > > > Sent: Saturday, December 23, 2023 7:29 PM
+> > > > To: Gaurav Jain <gaurav.jain@nxp.com>
+> > > > Cc: Herbert Xu <herbert@gondor.apana.org.au>; Horia Geanta
+> > > > <horia.geanta@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>; Linux
+> > > > Crypto Mailing List <linux-crypto@vger.kernel.org>
+> > > > Subject: Re: [EXT] caam test failures with libkcapi
+> > > >
+> > > > Caution: This is an external email. Please take care when clicking
+> > > > links or opening attachments. When in doubt, report the message
+> > > > using the 'Report this email' button
+> > > >
+> > > >
+> > > > On Fri, Dec 22, 2023 at 11:50=E2=80=AFAM Gaurav Jain <gaurav.jain@n=
+xp.com> wrote:
+> > [...]
+> > > > > Can you please share the logs for libkcapi test failures.
+> > > >
+> > > > A log from our kernel CI testing is available here (it is from
+> > > > CentOS Stream 9, but it fails in the same way on the Fedora's
+> > > > 6.6.6-based
+> > > > kernel):
+> > > > https://eur01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2=
+Fs3
+> > > > .amaz%2F&data=3D05%7C02%7Cgaurav.jain%40nxp.com%7Cb05dbbf9c0d848a
+> > f5bef
+> > > >
+> > 08dc0d006b59%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C638399
+> > 5426
+> > > >
+> > 48069426%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2l
+> > uMzI
+> > > >
+> > iLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3DykpF%2BM%
+> > 2BDWj
+> > > > w6GHN6165kLe7c8WFRJSSLTfWd%2FqLxI9w%3D&reserved=3D0
+> > > > onaws.com%2Farr-cki-prod-trusted-artifacts%2Ftrusted-
+> > > >
+> > artifacts%2F1109180874%2Ftest_aarch64%2F5766414724%2Fartifacts%2Frun
+> > > > .d
+> > > >
+> > one.03%2Fjob.01%2Frecipes%2F15194733%2Ftasks%2F31%2Flogs%2Ftaskout.l
+> > > >
+> > og&data=3D05%7C02%7Cgaurav.jain%40nxp.com%7C3b52a83449bf4b3fffe208dc
+> > > >
+> > 03bf4b66%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C6383893673
+> > > >
+> > 38072709%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2l
+> > > >
+> > uMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3D9SCFiT
+> > > > 1nNsTZg4bh6n75CeicDC51Jw3wacQCaL7w4vQ%3D&reserved=3D0
+> > >
+> > > In this log I cannot see CAAM failures. can you tell which CAAM tfm f=
+ailed?
+> >
+> > The test exercises the kernel crypto API via the AF_ALG interface. The =
+failures
+> > basically detect that for certain inputs the crypto API returns differe=
+nt results
+> > than expected when the CAAM driver is used (the machine in question has=
+ the
+> > relevant hardware, so the caam_jr crypto drivers are registered for cer=
+tain
+> > algorithms and they take priority).
+> >
+> > For example, when you install libkcapi-tools and run:
+> >
+> > kcapi -x 2 -s  -e -c "gcm(aes)" -i 16c4b4bd1198f39f4ae817b7 \
+> >     -k 87c91a8b63f66934dd3703415b2538461fbfef55ce7a9ca9bb9425499f4cd1d6
+> > \
+> >     -a
+> > "303bb57e4534b08a4d5f001a84b3052c9d0d58ee03eda5211a540950e819dc" \
+> >     -p "b05fbd403c2fa41a8cc702a7474ed9ba6c50fcc6c19732a7d300f1113862bc"
+> > -l 4
+> >
+> > ...the caam_jr implementation results in
+> > b05fbd403c2fa41a8cc702a7474ed9ba6c50fcc6c19732a7d300f1113862bc6d275
+> > 6d6,
+> > while the expected output is
+> > 9bea5263e7b365d5a06cb3ccab0d43cb9a1ca967dfb7b1a6955b3c493018af6d275
+> > 6d6.
+> > You can search the test log for "FAILED" to find the other failing comm=
+ands (note
+> > that in some cases you need to escape the -c argument as it contains
+> > parentheses).
+>
+> We have developed an application to run the gcm(aes) algorithm which is o=
+ffloaded to caam_jr driver via AF_ALG interface.
+> we have used the below test vector
+> Plaintext is "b05fbd403c2fa41a8cc702a7474ed9ba6c50fcc6c19732a7d300f111386=
+2bc" -> 31 byte
+> Key is "87c91a8b63f66934dd3703415b2538461fbfef55ce7a9ca9bb9425499f4cd1d6"=
+ -> 32 byte
+> Iv is "16c4b4bd1198f39f4ae817b7" -> 12 byte
+> Aad is "303bb57e4534b08a4d5f001a84b3052c9d0d58ee03eda5211a540950e819dc" -=
+> 31 byte
+>
+> Our application results matches the expected ciphertext which is "9bea526=
+3e7b365d5a06cb3ccab0d43cb9a1ca967dfb7b1a6955b3c493018af6d2756d6".
+> I can see the expected output at your end is basically the plaintext appe=
+nded by authentication tag of 4 bytes "6d2756d6".
+> caam_jr driver aes-gcm implementation is providing the correct output.
+
+How does your application invoke AF_ALG exactly? The libkcapi test
+program invokes it in various different ways (to try to discover bugs)
+and only some of them fail. In this case the key seems to be to send
+the AAD and plaintext separately. This is what an strace of the
+failing invocation looks like:
+
+socket(AF_ALG, SOCK_SEQPACKET, 0)       =3D 3
+bind(3, {sa_family=3DAF_ALG, salg_type=3D"aead", salg_feat=3D0, salg_mask=
+=3D0,
+salg_name=3D"gcm(aes)"}, 88) =3D 0
+pipe2([4, 5], 0)                        =3D 0
+fcntl(4, F_SETPIPE_SZ, 69632)           =3D 131072
+fcntl(5, F_SETPIPE_SZ, 69632)           =3D 131072
+setsockopt(3, SOL_ALG, ALG_SET_AEAD_AUTHSIZE, NULL, 4) =3D 0
+setsockopt(3, SOL_ALG, ALG_SET_KEY,
+"\207\311\32\213c\366i4\3357\3A[%8F\37\277\357U\316z\234\251\273\224%I\237L=
+\321\326",
+32) =3D 0
+accept(3, NULL, NULL)                   =3D 6
+sendmsg(6, {msg_name=3DNULL, msg_namelen=3D0, msg_iov=3DNULL, msg_iovlen=3D=
+0,
+msg_control=3D[{cmsg_len=3D20, cmsg_level=3DSOL_ALG, cmsg_type=3D0x3,
+cmsg_data=3D"\x01\x00\x00\x00"}, {cmsg_len=3D32, cmsg_level=3DSOL_ALG,
+cmsg_type=3D0x2, cmsg_data=3D"\x0c\x00\x00\x00\x16\xc4\xb4\xbd\x11\x98\xf3\=
+x9f\x4a\xe8\x17\xb7"},
+{cmsg_len=3D20, cmsg_level=3DSOL_ALG, cmsg_type=3D0x4,
+cmsg_data=3D"\x1f\x00\x00\x00"}], msg_controllen=3D80, msg_flags=3D0},
+MSG_MORE) =3D 0
+vmsplice(5, [{iov_base=3D"0;\265~E4\260\212M_\0\32\204\263\5,\235\rX\356\3\=
+355\245!\32T\tP\350\31\334",
+iov_len=3D31}], 1, SPLICE_F_MORE|SPLICE_F_GIFT) =3D 31
+splice(4, NULL, 6, NULL, 31, SPLICE_F_MORE) =3D 31
+vmsplice(5, [{iov_base=3D"\260_\275@</\244\32\214\307\2\247GN\331\272lP\374=
+\306\301\2272\247\323\0\361\218b\274",
+iov_len=3D31}], 1, SPLICE_F_GIFT) =3D 31
+splice(4, NULL, 6, NULL, 31, 0)         =3D 31
+recvmsg(6, {msg_name=3DNULL, msg_namelen=3D0, msg_iov=3D[{iov_base=3D"0",
+iov_len=3D1}, {iov_base=3D";", iov_len=3D1}, {iov_base=3D"\265", iov_len=3D=
+1},
+{iov_base=3D"~", iov_len=3D1}, {iov_base=3D"E", iov_len=3D1}, {iov_base=3D"=
+4",
+iov_len=3D1}, {iov_base=3D"\260", iov_len=3D1}, {iov_base=3D"\212",
+iov_len=3D1}, {iov_base=3D"M", iov_len=3D1}, {iov_base=3D"_", iov_len=3D1},
+{iov_base=3D"\0", iov_len=3D1}, {iov_base=3D"\32", iov_len=3D1},
+{iov_base=3D"\204", iov_len=3D1}, {iov_base=3D"\263", iov_len=3D1},
+{iov_base=3D"\5,\235\rX\356\3\355\245!\32T\tP\350\31\334\233\352Rc\347\263e=
+\325\240l\263\314\253\rC"...,
+iov_len=3D48}, {iov_base=3D"m'V\326", iov_len=3D4}], msg_iovlen=3D16,
+msg_controllen=3D0, msg_flags=3D0}, 0) =3D 66
+newfstatat(1, "", {st_mode=3DS_IFCHR|0600, st_rdev=3Dmakedev(0x88, 0x12),
+...}, AT_EMPTY_PATH) =3D 0
+write(1, "9bea5263e7b365d5a06cb3ccab0d43cb"..., 71) =3D 71
+close(6)                                =3D 0
+close(4)                                =3D 0
+close(5)                                =3D 0
+close(3)                                =3D 0
+
+(This is from a non-caam run on my machine, but the invocation should
+be the same, only the results differ.)
+
+--=20
+Ondrej Mosnacek
+Senior Software Engineer, Linux Security - SELinux kernel
+Red Hat, Inc.
+
