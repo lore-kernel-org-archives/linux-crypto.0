@@ -1,131 +1,258 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E112B149E14;
-	Wed,  3 Apr 2024 15:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1675714A4E0;
+	Wed,  3 Apr 2024 15:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712158662; cv=none; b=XlUdXbaAAmmu+8lOjMCPNH5r2bRtkFZGaH3rbs76MKq3YY2r7TZGQ/qLWmnDBVO7Qku+QgGLvFHhduEuxTMuqPKSjfWTlRGmYkn6JDJg9OYiUauIZaxWUJR1ZzyZDkCFbNZEHfxVFR2U9m+XQWN7en/RLTXxWJ4PkIz/VAg1wvs=
+	t=1712159280; cv=none; b=SdBt3zm/tClmgCO0cnZZD3Nr7ZG9R8orDWvDw1P24X5ajibDQhi7qmgu6t5CK8lR5Ava9x2qXr0QXwsX36cDkVKyiHC1aPCYPKHYkGEkynPTvenP31iPAr01WzPgxccxlOH53lM8gb82f6jcP0CwKwasF+Xyw/NzZTJ9uGAsdto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712158662; c=relaxed/simple;
-	bh=QJChaVAp28BDDX83PqbBHFkbmbYUNuu15HZqdJSXkew=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yq+ouACWrd9a+RGUo2tgQN4iuxguQskAXobLtP1F5hoTV4bCjOD245qUwUyCgc96CRB8uuoRl7uuYEmW4VKSMuXptFKddGzsPFWQQZawGYnO15LXGyGU1ROYOGzwJb/fQ4fNske1nSsZYkM317KtPqRw+A2kz+g6NNp4GTFo76M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ie2IcwL4; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1712159280; c=relaxed/simple;
+	bh=rrCR4x657hJj+9Z7FfIwTOL0bKqYr1iVATWuKVnBvdc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=IfaYXXHYKBzEF6hzXXR0y75ac5wwXSIeqeBlBf/82IoNYEa8tnAHz4cD+Ckpz9spJLRhlVwqBaFS//MXMIJiodhTaCYkokEofnOdphDXd/Uut2B7WfuGaETPlyXJs+xCyIeGEkun3MkLVROOSsJLxOUvZ7CpLhJbAS2ISxWIU/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYo0Q27d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ie2IcwL4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712158661; x=1743694661;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=QJChaVAp28BDDX83PqbBHFkbmbYUNuu15HZqdJSXkew=;
-  b=Ie2IcwL4Q7B8mbHEdOUHjfU5XEkJY4D9o82CDnKqJXJlHNX85xbZuZIP
-   HYPbaGjZ0SL/U0juSHptSQN+aC3gbFnojAZ2KQvCYK+5ag9iFbjOrseaK
-   cNDe25mf0o/Jn7po8OEslU0kdKbUA0AygEnLmQW7+KTLvpphDVRbBKOJa
-   nYlK/43Ye28L1BOsl2vXBuivCVN/0vexCfSPyo0uEksXaFBENaRZwvBhI
-   9Tpm1RQxZo+UVMVUimVYHAIfslJmy1Vvbal+VGVaomTcvuKx3ASBuIlaz
-   /anQR21aEr9eFH2/QLO6aOHR9Q9ZqFJo3FZbePgoiGODkE48aq/08b2mQ
-   Q==;
-X-CSE-ConnectionGUID: zCWnttiTQKuBUbaTiDKWKg==
-X-CSE-MsgGUID: Dwvx7rT+R2WHlCOQbFq50w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11033"; a="7978851"
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="7978851"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 08:37:40 -0700
-X-CSE-ConnectionGUID: C9r8JNIGTH6X/XyVwhZi2g==
-X-CSE-MsgGUID: 1aG80udaTneHuT7+mWUbTQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,177,1708416000"; 
-   d="scan'208";a="23177428"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 08:37:39 -0700
-Date: Wed, 3 Apr 2024 08:37:38 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Isaku Yamahata <isaku.yamahata@intel.com>,
-	Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-	linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, seanjc@google.com, vkuznets@redhat.com,
-	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-	dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com,
-	Brijesh Singh <brijesh.singh@amd.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Binbin Wu <binbin.wu@linux.intel.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>, isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v12 11/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
-Message-ID: <20240403153738.GC2444378@ls.amr.corp.intel.com>
-References: <20240329225835.400662-1-michael.roth@amd.com>
- <20240329225835.400662-12-michael.roth@amd.com>
- <8c3685a6-833c-4b3c-83f4-c0bd78bba36e@redhat.com>
- <20240401222229.qpnpozdsr6b2sntk@amd.com>
- <20240402225840.GB2444378@ls.amr.corp.intel.com>
- <CABgObfb4fQpUTzhpX9Bkcu0_+bOcCSCtuy+5-rttTLm-bY8i2w@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYo0Q27d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13591C433C7;
+	Wed,  3 Apr 2024 15:47:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712159279;
+	bh=rrCR4x657hJj+9Z7FfIwTOL0bKqYr1iVATWuKVnBvdc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dYo0Q27dSQQ3Ch8t1bv/4TDEGdVvlFtZiK/Zz2pAtDrV2dGg+D+XOJblloji6lf8f
+	 AT/1G9mjWsRaJTEV3z+NlLz40f+kBk5nFmcrUtgEA41qda5WwW4i8s4RLr/MzdF5zi
+	 YoTjxsD9V0zKYX4yL4N07X1LoysvapSXkS7G6OsnvSJFKJeNikI8cMxk3axKsNBB+y
+	 P6Adfksr8JnIG1LemgmEFRN0C6BpU/ZKYmBXXWJOohD4naX0Imdw+22KIlCXUWOohl
+	 YL80cR6IKID87Ymp816wKnW4iT/VyBYwP0nq6oFeuIpysRTK4u+RGJb+IBGt3Xt9x0
+	 vxIbwg0cDWVFw==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABgObfb4fQpUTzhpX9Bkcu0_+bOcCSCtuy+5-rttTLm-bY8i2w@mail.gmail.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 03 Apr 2024 18:47:51 +0300
+Message-Id: <D0ALT2QCUIYB.8NFTE7Z18JKN@kernel.org>
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "David Gstir" <david@sigma-star.at>, "Mimi Zohar" <zohar@linux.ibm.com>,
+ "James Bottomley" <jejb@linux.ibm.com>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>
+Cc: "Shawn Guo" <shawnguo@kernel.org>, "Jonathan Corbet" <corbet@lwn.net>,
+ "Sascha Hauer" <s.hauer@pengutronix.de>, "Pengutronix Kernel Team"
+ <kernel@pengutronix.de>, "Fabio Estevam" <festevam@gmail.com>, "NXP Linux
+ Team" <linux-imx@nxp.com>, "Ahmad Fatoum" <a.fatoum@pengutronix.de>, "sigma
+ star Kernel Team" <upstream+dcp@sigma-star.at>, "David Howells"
+ <dhowells@redhat.com>, "Li Yang" <leoyang.li@nxp.com>, "Paul Moore"
+ <paul@paul-moore.com>, "James Morris" <jmorris@namei.org>, "Serge E.
+ Hallyn" <serge@hallyn.com>, "Paul E. McKenney" <paulmck@kernel.org>, "Randy
+ Dunlap" <rdunlap@infradead.org>, "Catalin Marinas"
+ <catalin.marinas@arm.com>, "Rafael J. Wysocki"
+ <rafael.j.wysocki@intel.com>, "Tejun Heo" <tj@kernel.org>, "Steven Rostedt
+ (Google)" <rostedt@goodmis.org>, <linux-doc@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-integrity@vger.kernel.org>,
+ <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <linuxppc-dev@lists.ozlabs.org>,
+ <linux-security-module@vger.kernel.org>, "Richard Weinberger"
+ <richard@nod.at>, "David Oberhollenzer" <david.oberhollenzer@sigma-star.at>
+Subject: Re: [PATCH v8 6/6] docs: trusted-encrypted: add DCP as new trust
+ source
+X-Mailer: aerc 0.17.0
+References: <20240403072131.54935-1-david@sigma-star.at>
+ <20240403072131.54935-7-david@sigma-star.at>
+In-Reply-To: <20240403072131.54935-7-david@sigma-star.at>
 
-On Wed, Apr 03, 2024 at 02:51:59PM +0200,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Wed Apr 3, 2024 at 10:21 AM EEST, David Gstir wrote:
+> Update the documentation for trusted and encrypted KEYS with DCP as new
+> trust source:
+>
+> - Describe security properties of DCP trust source
+> - Describe key usage
+> - Document blob format
+>
+> Co-developed-by: Richard Weinberger <richard@nod.at>
+> Signed-off-by: Richard Weinberger <richard@nod.at>
+> Co-developed-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+> Signed-off-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+> Signed-off-by: David Gstir <david@sigma-star.at>
+> ---
+>  .../security/keys/trusted-encrypted.rst       | 53 +++++++++++++++++++
+>  security/keys/trusted-keys/trusted_dcp.c      | 19 +++++++
+>  2 files changed, 72 insertions(+)
+>
+> diff --git a/Documentation/security/keys/trusted-encrypted.rst b/Document=
+ation/security/keys/trusted-encrypted.rst
+> index e989b9802f92..f4d7e162d5e4 100644
+> --- a/Documentation/security/keys/trusted-encrypted.rst
+> +++ b/Documentation/security/keys/trusted-encrypted.rst
+> @@ -42,6 +42,14 @@ safe.
+>           randomly generated and fused into each SoC at manufacturing tim=
+e.
+>           Otherwise, a common fixed test key is used instead.
+> =20
+> +     (4) DCP (Data Co-Processor: crypto accelerator of various i.MX SoCs=
+)
+> +
+> +         Rooted to a one-time programmable key (OTP) that is generally b=
+urnt
+> +         in the on-chip fuses and is accessible to the DCP encryption en=
+gine only.
+> +         DCP provides two keys that can be used as root of trust: the OT=
+P key
+> +         and the UNIQUE key. Default is to use the UNIQUE key, but selec=
+ting
+> +         the OTP key can be done via a module parameter (dcp_use_otp_key=
+).
+> +
+>    *  Execution isolation
+> =20
+>       (1) TPM
+> @@ -57,6 +65,12 @@ safe.
+> =20
+>           Fixed set of operations running in isolated execution environme=
+nt.
+> =20
+> +     (4) DCP
+> +
+> +         Fixed set of cryptographic operations running in isolated execu=
+tion
+> +         environment. Only basic blob key encryption is executed there.
+> +         The actual key sealing/unsealing is done on main processor/kern=
+el space.
+> +
+>    * Optional binding to platform integrity state
+> =20
+>       (1) TPM
+> @@ -79,6 +93,11 @@ safe.
+>           Relies on the High Assurance Boot (HAB) mechanism of NXP SoCs
+>           for platform integrity.
+> =20
+> +     (4) DCP
+> +
+> +         Relies on Secure/Trusted boot process (called HAB by vendor) fo=
+r
+> +         platform integrity.
+> +
+>    *  Interfaces and APIs
+> =20
+>       (1) TPM
+> @@ -94,6 +113,11 @@ safe.
+> =20
+>           Interface is specific to silicon vendor.
+> =20
+> +     (4) DCP
+> +
+> +         Vendor-specific API that is implemented as part of the DCP cryp=
+to driver in
+> +         ``drivers/crypto/mxs-dcp.c``.
+> +
+>    *  Threat model
+> =20
+>       The strength and appropriateness of a particular trust source for a=
+ given
+> @@ -129,6 +153,13 @@ selected trust source:
+>       CAAM HWRNG, enable CRYPTO_DEV_FSL_CAAM_RNG_API and ensure the devic=
+e
+>       is probed.
+> =20
+> +  *  DCP (Data Co-Processor: crypto accelerator of various i.MX SoCs)
+> +
+> +     The DCP hardware device itself does not provide a dedicated RNG int=
+erface,
+> +     so the kernel default RNG is used. SoCs with DCP like the i.MX6ULL =
+do have
+> +     a dedicated hardware RNG that is independent from DCP which can be =
+enabled
+> +     to back the kernel RNG.
+> +
+>  Users may override this by specifying ``trusted.rng=3Dkernel`` on the ke=
+rnel
+>  command-line to override the used RNG with the kernel's random number po=
+ol.
+> =20
+> @@ -231,6 +262,19 @@ Usage::
+>  CAAM-specific format.  The key length for new keys is always in bytes.
+>  Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
+> =20
+> +Trusted Keys usage: DCP
+> +-----------------------
+> +
+> +Usage::
+> +
+> +    keyctl add trusted name "new keylen" ring
+> +    keyctl add trusted name "load hex_blob" ring
+> +    keyctl print keyid
+> +
+> +"keyctl print" returns an ASCII hex copy of the sealed key, which is in =
+format
+> +specific to this DCP key-blob implementation.  The key length for new ke=
+ys is
+> +always in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
+> +
+>  Encrypted Keys usage
+>  --------------------
+> =20
+> @@ -426,3 +470,12 @@ string length.
+>  privkey is the binary representation of TPM2B_PUBLIC excluding the
+>  initial TPM2B header which can be reconstructed from the ASN.1 octed
+>  string length.
+> +
+> +DCP Blob Format
+> +---------------
+> +
+> +.. kernel-doc:: security/keys/trusted-keys/trusted_dcp.c
+> +   :doc: dcp blob format
+> +
+> +.. kernel-doc:: security/keys/trusted-keys/trusted_dcp.c
+> +   :identifiers: struct dcp_blob_fmt
+> diff --git a/security/keys/trusted-keys/trusted_dcp.c b/security/keys/tru=
+sted-keys/trusted_dcp.c
+> index 16c44aafeab3..b5f81a05be36 100644
+> --- a/security/keys/trusted-keys/trusted_dcp.c
+> +++ b/security/keys/trusted-keys/trusted_dcp.c
+> @@ -19,6 +19,25 @@
+>  #define DCP_BLOB_VERSION 1
+>  #define DCP_BLOB_AUTHLEN 16
+> =20
+> +/**
+> + * DOC: dcp blob format
+> + *
+> + * The Data Co-Processor (DCP) provides hardware-bound AES keys using it=
+s
+> + * AES encryption engine only. It does not provide direct key sealing/un=
+sealing.
+> + * To make DCP hardware encryption keys usable as trust source, we defin=
+e
+> + * our own custom format that uses a hardware-bound key to secure the se=
+aling
+> + * key stored in the key blob.
+> + *
+> + * Whenever a new trusted key using DCP is generated, we generate a rand=
+om 128-bit
+> + * blob encryption key (BEK) and 128-bit nonce. The BEK and nonce are us=
+ed to
+> + * encrypt the trusted key payload using AES-128-GCM.
+> + *
+> + * The BEK itself is encrypted using the hardware-bound key using the DC=
+P's AES
+> + * encryption engine with AES-128-ECB. The encrypted BEK, generated nonc=
+e,
+> + * BEK-encrypted payload and authentication tag make up the blob format =
+together
+> + * with a version number, payload length and authentication tag.
+> + */
+> +
+>  /**
+>   * struct dcp_blob_fmt - DCP BLOB format.
+>   *
 
-> On Wed, Apr 3, 2024 at 12:58 AM Isaku Yamahata <isaku.yamahata@intel.com> wrote:
-> > I think TDX can use it with slight change. Pass vcpu instead of KVM, page pin
-> > down and mmu_lock.  TDX requires non-leaf Secure page tables to be populated
-> > before adding a leaf.  Maybe with the assumption that vcpu doesn't run, GFN->PFN
-> > relation is stable so that mmu_lock isn't needed? What about punch hole?
-> >
-> > The flow would be something like as follows.
-> >
-> > - lock slots_lock
-> >
-> > - kvm_gmem_populate(vcpu)
-> >   - pin down source page instead of do_memcopy.
-> 
-> Both pinning the source page and the memcpy can be done in the
-> callback.  I think the right thing to do is:
-> 
-> 1) eliminate do_memcpy, letting AMD code taking care of
->    copy_from_user.
-> 
-> 2) pass to the callback only gfn/pfn/src, where src is computed as
-> 
->     args->src ? args->src + i * PAGE_SIZE : NULL
-> 
-> If another architecture/vendor needs do_memcpy, they can add
-> something like kvm_gmem_populate_copy.
-> 
-> >   - get pfn with __kvm_gmem_get_pfn()
-> >   - read lock mmu_lock
-> >   - in the post_populate callback
-> >     - lookup tdp mmu page table to check if the table is populated.
-> >       lookup only version of kvm_tdp_mmu_map().
-> >       We need vcpu instead of kvm.
-> 
-> Passing vcpu can be done using the opaque callback argument to
-> kvm_gmem_populate.
-> 
-> Likewise, the mmu_lock can be taken by the TDX post_populate
-> callback.
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-Yes, it should work.  Let me give it a try.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+I can only test that this does not break a machine without the
+hardware feature.
+
+Is there anyone who could possibly peer test these patches?
+
+BR, Jarkko
