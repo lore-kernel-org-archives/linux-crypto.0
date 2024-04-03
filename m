@@ -1,24 +1,24 @@
 Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83093135405;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027A8135A6D;
 	Wed,  3 Apr 2024 10:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712138732; cv=none; b=lYWIr557qQng6j+pPWCMPhmwOjM46GPI/t3a2I/hWaHnw824Ze4I7fgLlMI7sZQxYl59PZ+L0+8qFciciJ2exWQXTldAJoE4n5pfZM+Z5dZcXsAsdvx4Fjm2die4ihI50bHpaj+t030sef0zTOCVGpuaP7SlLiSXze565Ze0Rlw=
+	t=1712138733; cv=none; b=pxW5rdPJgSGngr7IUl3i+xMTbB74kKU9Zc+JqZm8foR6e1t8ab/4ZXYwqXopHs+D8VGCERAdUyTrfUwVV6OUCpN2hE8uGCKwdgMHOaVYAzB446sqyGCJZJOg6W2QqtfurplGEeEPkFXYvE8+OTrsqoTAKxCeHdJnPI0sc+FPcIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712138732; c=relaxed/simple;
-	bh=MGF1c7hP756vbZB6s7mhJ9xaU9LW9VFYD7JABjDB6bQ=;
+	s=arc-20240116; t=1712138733; c=relaxed/simple;
+	bh=GyvINQl9YpcU26Hu6L2QtlNHOj9A4KoUaX2wE9uQC+8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uGiFlJKL6ARj67jy4424Op1ejl0sTA7yN5ZlSta7d8ve1hHlrCwPncVe2Rpy7ltN23mtZX+uKkW7R3PNi32ZWcpteqJ5bj2fREyrzkaZ94zliqynqbVUEjTjveWKr9anTU99VmxV4X2PmTT4emyqLPQ1np1RXdyhGpZiUBLRWNg=
+	 MIME-Version:Content-Type; b=fDsvNz1wStFGHE0ME37sbZZEjd3sR2O+9CX//vNpwTPcGuFat+hd62hfhaENE69kCV9EtNzq6V/cKgWJYoz7HLU8WxO2H31jc+7Y0OaiORukL45OSFck073GUSPqULYPyAn5eENtT54XVzDO39mfoI5p097omF1Z0nFMAiAp9iM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4V8gN16245z1GFGj;
-	Wed,  3 Apr 2024 18:04:49 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4V8gN21VLZz1GFMX;
+	Wed,  3 Apr 2024 18:04:50 +0800 (CST)
 Received: from dggpemd200003.china.huawei.com (unknown [7.185.36.122])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4BD7E1A0188;
+	by mail.maildlp.com (Postfix) with ESMTPS id A72C814010C;
 	Wed,  3 Apr 2024 18:05:28 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  dggpemd200003.china.huawei.com (7.185.36.122) with Microsoft SMTP Server
@@ -31,9 +31,9 @@ CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<songzhiqi1@huawei.com>, <qianweili@huawei.com>, <liushangbin@hisilicon.com>,
 	<linwenkai6@hisilicon.com>, <taoqi10@huawei.com>, <wangzhou1@hisilicon.com>,
 	<huangchenghai2@huawei.com>
-Subject: [PATCH 5/9] crypto: hisilicon/qm - Add the default processing branch
-Date: Wed, 3 Apr 2024 18:00:58 +0800
-Message-ID: <20240403100102.2735306-6-huangchenghai2@huawei.com>
+Subject: [PATCH 7/9] crypto: hisilicon/sec - Fix memory leak for sec resource release
+Date: Wed, 3 Apr 2024 18:01:00 +0800
+Message-ID: <20240403100102.2735306-8-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20240403100102.2735306-1-huangchenghai2@huawei.com>
 References: <20240403100102.2735306-1-huangchenghai2@huawei.com>
@@ -48,29 +48,34 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  dggpemd200003.china.huawei.com (7.185.36.122)
 
-The cmd type can be extended. Currently, only four types of cmd
-can be processed. Therefor, add the default processing branch
-to intercept incorrect parameter input.
+The AIV is one of the SEC resources. When releasing resources,
+it need to release the AIV resources at the same time.Otherwise,
+memory leakage occurs.
+
+The aiv resource release is added to the sec resource release
+function.
 
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 92f0a1d9b4a6..cedb3af1fc1a 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -645,6 +645,9 @@ int qm_set_and_get_xqc(struct hisi_qm *qm, u8 cmd, void *xqc, u32 qp_id, bool op
- 		tmp_xqc = qm->xqc_buf.aeqc;
- 		xqc_dma = qm->xqc_buf.aeqc_dma;
- 		break;
-+	default:
-+		dev_err(&qm->pdev->dev, "unknown mailbox cmd %u\n", cmd);
-+		return -EINVAL;
- 	}
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 93a972fcbf63..0558f98e221f 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -481,8 +481,10 @@ static void sec_alg_resource_free(struct sec_ctx *ctx,
  
- 	/* Setting xqc will fail if master OOO is blocked. */
+ 	if (ctx->pbuf_supported)
+ 		sec_free_pbuf_resource(dev, qp_ctx->res);
+-	if (ctx->alg_type == SEC_AEAD)
++	if (ctx->alg_type == SEC_AEAD) {
+ 		sec_free_mac_resource(dev, qp_ctx->res);
++		sec_free_aiv_resource(dev, qp_ctx->res);
++	}
+ }
+ 
+ static int sec_alloc_qp_ctx_resource(struct sec_ctx *ctx, struct sec_qp_ctx *qp_ctx)
 -- 
 2.30.0
 
