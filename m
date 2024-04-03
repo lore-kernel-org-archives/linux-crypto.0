@@ -1,29 +1,29 @@
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B1213DDC7;
-	Wed,  3 Apr 2024 10:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE8513666C;
+	Wed,  3 Apr 2024 10:05:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712138749; cv=none; b=nlXGBPX9QczeLeiZ+vPRw4DOChVu5OqLsR91rp+e0j8Q+MZUIu911DXskBi2qSsi3xekEHPJX3I+zIyJp5Ot9tbv9u1dcLiigSrivvcMuKv3WDb1nr6u7Q5mDKccIoosR3EgbmkGCp48DPT5eCtOVlUP8qK+ZnW6u+h7PWMfUWY=
+	t=1712138755; cv=none; b=q749H9rnIGQClnA9djefcE2umHrZZsW0styM1G1An0gtWPdx12P94yU8/1C46AY3smY5q0Ub2A4oXxxeQe1gvDrvDe2guUfH+bJeYXrcL/kuPeDlrBBVFP/Jpo2NeDFtArxwaQPRbOXxzd/MXcW6joRsxY+9bOqT2GQrfPbLWTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712138749; c=relaxed/simple;
-	bh=IWmag/TML6Tv6Hu6G9U6MPtnz9M6+9Xlreue3sMUpMQ=;
+	s=arc-20240116; t=1712138755; c=relaxed/simple;
+	bh=6juDJaoMe0wdCGTDP0uluhcWqVlklCQTZZ0GR81b9kU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=owl4i6hlKQVd6Cd16fdfTXQeWPDfJv1F/FZY0mTsUlTPN7lTJpoI5mZ8uhUu0MLoSJKN0QJ1gRJLLQw9lj4mQO6t/UNzAkbiHkgXrs0NhoBciJrJqrhz2/lRFtohWuowkhi+rHdmVCrZKIWhTifsxwZe4hD5dZoMGU6RRaaSYSM=
+	 MIME-Version:Content-Type; b=uv2Cfwzu/TvUmws6aQC1/IevLgCZSyxTF8uUaPWQGumQp6kq9vz/290Gqm0u8tUaaVfpKZYydwNsFRYYUoQsv4etFbMJCaLxWeztchABJhqjYFYWI/t8512SXy4kgc+Ii4b6IH/DmE9KKhbmVYscC2IcfPNrUDjeTiAH971Treo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4V8gMh6bNlzbf84;
-	Wed,  3 Apr 2024 18:04:32 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4V8gKM1lP5zXkcR;
+	Wed,  3 Apr 2024 18:02:31 +0800 (CST)
 Received: from dggpemd200003.china.huawei.com (unknown [7.185.36.122])
-	by mail.maildlp.com (Postfix) with ESMTPS id E2F3514037B;
-	Wed,  3 Apr 2024 18:05:27 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id DA9B6140F81;
+	Wed,  3 Apr 2024 18:05:28 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  dggpemd200003.china.huawei.com (7.185.36.122) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 3 Apr 2024 18:05:27 +0800
+ 15.2.1258.28; Wed, 3 Apr 2024 18:05:28 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
@@ -31,9 +31,9 @@ CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<songzhiqi1@huawei.com>, <qianweili@huawei.com>, <liushangbin@hisilicon.com>,
 	<linwenkai6@hisilicon.com>, <taoqi10@huawei.com>, <wangzhou1@hisilicon.com>,
 	<huangchenghai2@huawei.com>
-Subject: [PATCH 3/9] crypto: hisilicon/sgl - Delete redundant parameter verification
-Date: Wed, 3 Apr 2024 18:00:56 +0800
-Message-ID: <20240403100102.2735306-4-huangchenghai2@huawei.com>
+Subject: [PATCH 8/9] crypto: hisilicon/debugfs - Resolve the problem of applying for redundant space in sq dump
+Date: Wed, 3 Apr 2024 18:01:01 +0800
+Message-ID: <20240403100102.2735306-9-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20240403100102.2735306-1-huangchenghai2@huawei.com>
 References: <20240403100102.2735306-1-huangchenghai2@huawei.com>
@@ -48,42 +48,45 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  dggpemd200003.china.huawei.com (7.185.36.122)
 
-The input parameter check in acc_get_sgl is redundant. The
-caller has been verified once. When the check is performed for
-multiple times, the performance deteriorates.
+When dumping SQ, only the corresponding ID's SQE needs to be
+dumped, and there is no need to apply for the entire SQE
+memory. This is because excessive dump operations can lead to
+memory resource waste.
 
-So the redundant parameter verification is deleted, and the
-index verification is changed to the module entry function for
-verification.
+Therefor apply for the space corresponding to sqe_id separately
+to avoid space waste.
 
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/sgl.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ drivers/crypto/hisilicon/debugfs.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
-index 0beca257c20b..568acd0aee3f 100644
---- a/drivers/crypto/hisilicon/sgl.c
-+++ b/drivers/crypto/hisilicon/sgl.c
-@@ -161,9 +161,6 @@ static struct hisi_acc_hw_sgl *acc_get_sgl(struct hisi_acc_sgl_pool *pool,
- 	struct mem_block *block;
- 	u32 block_index, offset;
+diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
+index e9fa42381242..8e259ed4aecd 100644
+--- a/drivers/crypto/hisilicon/debugfs.c
++++ b/drivers/crypto/hisilicon/debugfs.c
+@@ -320,17 +320,16 @@ static int qm_sq_dump(struct hisi_qm *qm, char *s, char *name)
+ 	if (ret)
+ 		return ret;
  
--	if (!pool || !hw_sgl_dma || index >= pool->count)
--		return ERR_PTR(-EINVAL);
--
- 	block = pool->mem_block;
- 	block_index = index / pool->sgl_num_per_block;
- 	offset = index % pool->sgl_num_per_block;
-@@ -230,7 +227,7 @@ hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev,
- 	struct scatterlist *sg;
- 	int sg_n;
+-	sqe = kzalloc(qm->sqe_size * sq_depth, GFP_KERNEL);
++	sqe = kzalloc(qm->sqe_size, GFP_KERNEL);
+ 	if (!sqe)
+ 		return -ENOMEM;
  
--	if (!dev || !sgl || !pool || !hw_sgl_dma)
-+	if (!dev || !sgl || !pool || !hw_sgl_dma || index >= pool->count)
- 		return ERR_PTR(-EINVAL);
+ 	qp = &qm->qp_array[qp_id];
+-	memcpy(sqe, qp->sqe, qm->sqe_size * sq_depth);
+-	sqe_curr = sqe + (u32)(sqe_id * qm->sqe_size);
+-	memset(sqe_curr + qm->debug.sqe_mask_offset, QM_SQE_ADDR_MASK,
++	memcpy(sqe, qp->sqe + sqe_id * qm->sqe_size, qm->sqe_size);
++	memset(sqe + qm->debug.sqe_mask_offset, QM_SQE_ADDR_MASK,
+ 	       qm->debug.sqe_mask_len);
  
- 	sg_n = sg_nents(sgl);
+-	dump_show(qm, sqe_curr, qm->sqe_size, name);
++	dump_show(qm, sqe, qm->sqe_size, name);
+ 
+ 	kfree(sqe);
+ 
 -- 
 2.30.0
 
