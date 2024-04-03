@@ -1,25 +1,25 @@
 Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE081135A44;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0E5135A58;
 	Wed,  3 Apr 2024 10:05:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712138731; cv=none; b=aSn5w3t19kTxvxmqpL5Y6gokG+MA5fCpZjvpftuQ4+bRUxHX6F3C17HPwGoUzEOpVRQfJyyGNOt8x/95c390+qpvJFBZlPG20TWI7aCv0/Ac0voaoOpaMKJyc2vDlgbHGgnPrOnfV8s4WIrEQCiEDtBMqRoWUl0TwK3Es/VnpVk=
+	t=1712138732; cv=none; b=ox4VF7Au0yMVzjhKnMGcXvh1kjX9P6svaMD1GY4TWa4b8jQyXQAJHZvhWiGrdgTKkO/QQn0VwaWRQPfWN4SF3V9IAgUbcen6s4u6bzEHFLVJYtiHYSlnM+bsFxxAK9uoqeduTrwKXnLeSAiL2fFkEGZ4zkievwHOCcorjZaeN/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712138731; c=relaxed/simple;
-	bh=59QhSJcBaUPchWNL7bHjebEqRTh9j7wS95eCWvo0nRg=;
+	s=arc-20240116; t=1712138732; c=relaxed/simple;
+	bh=4X7bb0ikerFe5yNJkCqO9owSgxH9ZYXoE8odVRPTh8M=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YEz3YYTaRaPO0X2PmA6RMHsFXyS8drUO0oGxWcxGcCjjBXw/APyl/COSphoTGJD6Y/L94POq2B4vm9QEeCsnK7byYNpVZAdSkXXhZzNZxdrNKI0+TrBXZILLBBl5JkGnuosWN+sJZc27ghbAMgW6BxFgmu01q6WucMRApPPHJQ0=
+	 MIME-Version:Content-Type; b=er/2FgTim2aQ8+rQNXqtLFmtnlgDmf2Fpgp6EH3wJ4zjw222WvHEoq8okXieyGkA3WhnpKTymTzTYgi9HivcSEH5ajTKETrS/AREmFNZUzHC+KRoJCak2QVI3xn2TdSgix/S2Sjf8u2wQCicccQ6N73j4gd+TWNyimmR3ohFDkc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4V8gKn6y5Nz1QCDj;
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4V8gKn4J1qz1Q8qr;
 	Wed,  3 Apr 2024 18:02:53 +0800 (CST)
 Received: from dggpemd200003.china.huawei.com (unknown [7.185.36.122])
-	by mail.maildlp.com (Postfix) with ESMTPS id 20CB818005D;
-	Wed,  3 Apr 2024 18:05:28 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id B9B4318007F;
+	Wed,  3 Apr 2024 18:05:27 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  dggpemd200003.china.huawei.com (7.185.36.122) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -31,9 +31,9 @@ CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<songzhiqi1@huawei.com>, <qianweili@huawei.com>, <liushangbin@hisilicon.com>,
 	<linwenkai6@hisilicon.com>, <taoqi10@huawei.com>, <wangzhou1@hisilicon.com>,
 	<huangchenghai2@huawei.com>
-Subject: [PATCH 4/9] crypto: hisilicon/debugfs - Fix the processing logic issue in the debugfs creation
-Date: Wed, 3 Apr 2024 18:00:57 +0800
-Message-ID: <20240403100102.2735306-5-huangchenghai2@huawei.com>
+Subject: [PATCH 2/9] crypto: hisilicon/debugfs - Fix debugfs uninit process issue
+Date: Wed, 3 Apr 2024 18:00:55 +0800
+Message-ID: <20240403100102.2735306-3-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20240403100102.2735306-1-huangchenghai2@huawei.com>
 References: <20240403100102.2735306-1-huangchenghai2@huawei.com>
@@ -48,39 +48,74 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  dggpemd200003.china.huawei.com (7.185.36.122)
 
-There is a scenario where the file directory is created but the
-file attribute is not set. In this case, if a user accesses the
-file, an error occurs.
+During the zip probe process, the debugfs failure does not stop
+the probe. When debugfs initialization fails, jumping to the
+error branch will also release regs, in addition to its own
+rollback operation.
 
-So adjust the processing logic in the debugfs creation to
-prevent the file from being accessed before the file attributes
-such as the index are set.
+As a result, it may be released repeatedly during the regs
+uninit process. Therefore, the null check needs to be added to
+the regs uninit process.
 
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/debugfs.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/hisilicon/debugfs.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
-index 6351a452878d..e9fa42381242 100644
+index cd67fa348ca7..6351a452878d 100644
 --- a/drivers/crypto/hisilicon/debugfs.c
 +++ b/drivers/crypto/hisilicon/debugfs.c
-@@ -1090,12 +1090,12 @@ static void qm_create_debugfs_file(struct hisi_qm *qm, struct dentry *dir,
+@@ -809,8 +809,14 @@ static void dfx_regs_uninit(struct hisi_qm *qm,
  {
- 	struct debugfs_file *file = qm->debug.files + index;
+ 	int i;
  
--	debugfs_create_file(qm_debug_file_name[index], 0600, dir, file,
--			    &qm_debug_fops);
--
- 	file->index = index;
- 	mutex_init(&file->lock);
- 	file->debug = &qm->debug;
++	if (!dregs)
++		return;
 +
-+	debugfs_create_file(qm_debug_file_name[index], 0600, dir, file,
-+			    &qm_debug_fops);
+ 	/* Setting the pointer is NULL to prevent double free */
+ 	for (i = 0; i < reg_len; i++) {
++		if (!dregs[i].regs)
++			continue;
++
+ 		kfree(dregs[i].regs);
+ 		dregs[i].regs = NULL;
+ 	}
+@@ -860,14 +866,21 @@ static struct dfx_diff_registers *dfx_regs_init(struct hisi_qm *qm,
+ static int qm_diff_regs_init(struct hisi_qm *qm,
+ 		struct dfx_diff_registers *dregs, u32 reg_len)
+ {
++	int ret;
++
+ 	qm->debug.qm_diff_regs = dfx_regs_init(qm, qm_diff_regs, ARRAY_SIZE(qm_diff_regs));
+-	if (IS_ERR(qm->debug.qm_diff_regs))
+-		return PTR_ERR(qm->debug.qm_diff_regs);
++	if (IS_ERR(qm->debug.qm_diff_regs)) {
++		ret = PTR_ERR(qm->debug.qm_diff_regs);
++		qm->debug.qm_diff_regs = NULL;
++		return ret;
++	}
+ 
+ 	qm->debug.acc_diff_regs = dfx_regs_init(qm, dregs, reg_len);
+ 	if (IS_ERR(qm->debug.acc_diff_regs)) {
+ 		dfx_regs_uninit(qm, qm->debug.qm_diff_regs, ARRAY_SIZE(qm_diff_regs));
+-		return PTR_ERR(qm->debug.acc_diff_regs);
++		ret = PTR_ERR(qm->debug.acc_diff_regs);
++		qm->debug.acc_diff_regs = NULL;
++		return ret;
+ 	}
+ 
+ 	return 0;
+@@ -908,7 +921,9 @@ static int qm_last_regs_init(struct hisi_qm *qm)
+ static void qm_diff_regs_uninit(struct hisi_qm *qm, u32 reg_len)
+ {
+ 	dfx_regs_uninit(qm, qm->debug.acc_diff_regs, reg_len);
++	qm->debug.acc_diff_regs = NULL;
+ 	dfx_regs_uninit(qm, qm->debug.qm_diff_regs, ARRAY_SIZE(qm_diff_regs));
++	qm->debug.qm_diff_regs = NULL;
  }
  
- static int qm_debugfs_atomic64_set(void *data, u64 val)
+ /**
 -- 
 2.30.0
 
