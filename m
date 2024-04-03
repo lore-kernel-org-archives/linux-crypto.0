@@ -1,42 +1,39 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A49217C8;
-	Wed,  3 Apr 2024 00:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918F23EA97;
+	Wed,  3 Apr 2024 04:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712105046; cv=none; b=XU/2jYlns+88Kn1L9Pe7TTr/3V8ai4ElcRkHg0QRWXZygah5VrChTgPBjvQIeKiMMb5Y/ilvnyntF9kNAjp7DJLVKGe7DiYCq4HjcXIa7d1waO0O7BX7ONDQRn2c12efQvwXEOn3dBdJZc5qEHuKD/j5bAurn+QtNco1BSGoLXE=
+	t=1712118893; cv=none; b=JDnOodJCMs5JXHr2c//R0Zk4MqUonrN+ROLA7mF6AJhBoMUfXhwf3On3tZpWY2MbHTNN26XpEXu05nvGphAFZtsSODDBsRWuG6brUfV5vH0G2cqrCsPQN60Xma617BKEsHUAJ9goc/xEEsCQBmZehMCO+kjQCKhvIsqYAsMPx3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712105046; c=relaxed/simple;
-	bh=V61TCSZ0jUsTPk8qUFp6mxf+YZJrztTwe0Nf/jw49Do=;
+	s=arc-20240116; t=1712118893; c=relaxed/simple;
+	bh=d6t0OpZWCleSKwfIZcJNzzOAl2ghFpTA4jbzTs48FsI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G9UbuO/Ej/sjxvkrMahGG3Jccz7NLybMlUGvmT5ZWDT9qardScfCE2np8uwlmAF1DclZjaprMmzoTjpIRJKXqRn2Cfthi9KPv4/NRZ1LE6hHDlzqpms3+/y9Z8TXZrnsRwuNaI0hw99nFAPmeFOC73XQctGoYFhRaFFyeGhhEqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DEkL8ide; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DEkL8ide"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D74EC433F1;
-	Wed,  3 Apr 2024 00:44:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712105045;
-	bh=V61TCSZ0jUsTPk8qUFp6mxf+YZJrztTwe0Nf/jw49Do=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DEkL8ideA+nykk4WpPhrpK+jwhG0lxLaujjNf0+Wm98BlPGJaQsH6m+BIg0Wxncb5
-	 Ykj8+km41Q6RjP4468XKa2u6tdMi5FNiVl8NAHFCXxb4AOnynnwa28GPLPB79BPhUj
-	 Au6aLcMtpZxvOVQrCisSOy6uYbkr/WW72FD8a6xI12rQOqNKJYgsCsDfU3qSmte/yx
-	 s4KpUAgmT9xq0Jd+LAEdRUrG4UXZNnfAwp8+8HnAzUf7pjbGp1BOeVafD5DRcHOIeU
-	 fNqomtEXTS7zT8+oqCmfx5AW+Amji6I79Woeqex7AvHoIb2Nc21iUZreX+eyWsggt7
-	 xce0l8terT+bA==
-Date: Tue, 2 Apr 2024 17:44:04 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
-	"Chang S . Bae" <chang.seok.bae@intel.com>
-Subject: Re: [PATCH v2 0/6] Faster AES-XTS on modern x86_64 CPUs
-Message-ID: <20240403004404.GC2576@sol.localdomain>
-References: <20240329080355.2871-1-ebiggers@kernel.org>
- <CAMj1kXEupfkpe98PdtbxQbtx1z5J_fZFPzT7wJ2tsJnCT9uaxA@mail.gmail.com>
- <20240329093130.GA65937@sol.localdomain>
+	 Content-Type:Content-Disposition:In-Reply-To; b=M0rEbtacjscZfQslUbZxJMdE3qLgQ0Pf9BK9/P9MLVo2FnLbv2RoeoGjv0Ok/e8rdOToqrfJiDMaZ6HslEtvY73/T8sOe/trDZGO/vynf/vok0yQvBnvut7dikFeLSJFboCnQOlTAf9WQdIK7uV5Pdf8HVZanO18YYqyu3ZFDyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rrsKQ-00EQQZ-O8; Wed, 03 Apr 2024 12:34:27 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 03 Apr 2024 12:34:43 +0800
+Date: Wed, 3 Apr 2024 12:34:43 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Mike Rapoport <rppt@linux.ibm.com>, xingwei lee <xrivendell7@gmail.com>,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+	samsun1006219@gmail.com,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Subject: Re: BUG: unable to handle kernel paging request in crypto_sha3_update
+Message-ID: <ZgzcY3/9sZkVWe/O@gondor.apana.org.au>
+References: <CABOYnLzjayx369ygmr0PsGYGeRpnBnaH1XPqfbispL5nAeOJ9w@mail.gmail.com>
+ <ZgvDe6fdJzgb8aZZ@gondor.apana.org.au>
+ <ZgwfoSj7GqFiOOsc@linux.ibm.com>
+ <20240402101023.aea0f8ed981903077dcd9e6b@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,35 +42,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240329093130.GA65937@sol.localdomain>
+In-Reply-To: <20240402101023.aea0f8ed981903077dcd9e6b@linux-foundation.org>
 
-On Fri, Mar 29, 2024 at 02:31:30AM -0700, Eric Biggers wrote:
-> > I wouldn't mind retiring the existing xts(aesni)
-> > code entirely, and using the xts() wrapper around ecb-aes-aesni on
-> > 32-bit and on non-AVX uarchs with AES-NI.
+On Tue, Apr 02, 2024 at 10:10:23AM -0700, Andrew Morton wrote:
+> On Tue, 2 Apr 2024 18:09:21 +0300 Mike Rapoport <rppt@linux.ibm.com> wrote:
+>
+> > Yeah, there was a bug in folio_is_secretmem() that should have throw an
+> > error about this.
+> > 
+> > David Hildenbrand sent a fix, it's in Andrew's tree
+> > 
+> > https://lore.kernel.org/all/20240326143210.291116-1-david@redhat.com
 > 
-> Yes, it will need to be benchmarked, but that probably makes sense.  If
-> Wikipedia is to be trusted, on the Intel side only Westmere (from 2010) has
-> AES-NI but not AVX, and on the AMD side all CPUs with AES-NI have AVX...
+> I'll send "mm/secretmem: fix GUP-fast succeeding on secretmem folios"
+> upstream this week.
 
-It looks like I missed some low-power CPUs.  Intel's Silvermont (2013), Goldmont
-(2016), Goldmont Plus (2017), and Tremont (2020) support AES-NI but not AVX.
-Their successor, Gracemont (2021), supports AVX.
-
-I don't have any one of those immediately available to run a test on.  But just
-doing a quick benchmark on Zen 1, xts-aes-aesni has 62% higher throughput than
-xts(ecb-aes-aesni).  The significant difference seems expected, since there's a
-lot of API overhead in the xts template, and it computes all the tweaks twice in
-C code.
-
-So I'm thinking we'll need to keep xts-aes-aesni around for now, alongside
-xts-aes-aesni-avx.
-
-(And with all the SIMD instructions taking a different number of arguments and
-having different names for AVX vs non-AVX, I don't see a clean way to unify them
-in assembly.  They could be unified if we used C intrinsics instead of assembly
-and compiled a C function with and without the "avx" target.  However,
-intrinsics bring their own issues and make it hard to control the generated
-code.  I don't really want to rely on intrinsics for this code.)
-
-- Eric
+Thanks for the quick follow-up!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
