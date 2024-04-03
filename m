@@ -1,135 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC61C13F425;
-	Wed,  3 Apr 2024 08:11:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677D56F51D
+	for <linux-crypto@vger.kernel.org>; Wed,  3 Apr 2024 08:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712131874; cv=none; b=U5bLDp4cAZWyckf5VobunivZfpKWoMrpN+XbecG3hyJFcnkbBJ64L1rHnIZijIhMzV+qb3X9WkeIuObGOICw80iYeQk/RwMgIhF9w9iL9jXXpgmGsO8XPUwqJKWxqWHu/GrK8nOoVWD1ZEs6dMqJTfBaanGMTppEz+hoqyYBBJE=
+	t=1712132584; cv=none; b=UmlYI4iFr7lqrITJveJ4GBJ00xbXYSy0Wl57yohpXtj/4aDbVS7yKkMpIsD8fAhLIEMACGztDfhmB3HDoipBtt9YGwHxVQerLOrgXe4L2/OFlodcI7PJlHEKAotzxGAZWeFpc7bvGUUw7XHQefiCbMuklSEel5PJWJBf5pFWuOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712131874; c=relaxed/simple;
-	bh=76Xr54el70ulr/k/75H8vH6vpKWaADYSBbvRqxqkFes=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HXR5mecq3xCzPcjLec/ui1oAOTdPI+po8ZpnBXF9Bkgj2pSpwKJx/xoJuSXPg5fmJLBd6GunRzeqOe03kvKYQxIuxOP6hwwNbZKxMxSWO+aMRh9P6+R7nSrOftMhKyosem5VHfp6AiQcbvX6wSsgswxXIBrq4n/USeGZCuhyoZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FWv8o1wp; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FWv8o1wp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0B06C433C7;
-	Wed,  3 Apr 2024 08:11:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712131873;
-	bh=76Xr54el70ulr/k/75H8vH6vpKWaADYSBbvRqxqkFes=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FWv8o1wpk5CWOhTbZ+We/eBhRTQU2fOMPfrRiTyWHTfl/uKhv1Pgg6IEfoFtigE2G
-	 sVwmX8e+2XuUC0TULUzTfrjpk9oAm2+Mer2itkYt+5u5B8Ci2PqAuLJoIQ/D938/yi
-	 BtYtN2+p5vaUpLMAlgLQx3aaYs75HPsAs3V0WlcSWPwY1ulxe4iQg0yZv+t5+CtD8Q
-	 72F9j2M45Tcoh1eSjGgdUIii9R5KwCHdWOhYKh2pY2yaAsEpsVPJnLldyA7p13BqAU
-	 vaCgiYHsZVoWe/nWy5MFTAmx/FpVfMcVlGIuMUi2dzhGn/rm9Kyo2M79jiO5PHn28S
-	 N1CPxhmkwHxRQ==
-From: Arnd Bergmann <arnd@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH 24/34] crypto: ccp - drop platform ifdef checks
-Date: Wed,  3 Apr 2024 10:06:42 +0200
-Message-Id: <20240403080702.3509288-25-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240403080702.3509288-1-arnd@kernel.org>
-References: <20240403080702.3509288-1-arnd@kernel.org>
+	s=arc-20240116; t=1712132584; c=relaxed/simple;
+	bh=/xd3hpbu+Zi9SGSjwWRNxiGqByXLHzVBCsLyu3K7PJI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=sA6x7lsO6WxQPlzo3QpuG2U+0dwU6+QNFhApwCn18BvdcayeQYLKEBVE2NO2IgojcLoLGEqg4mBgRPh0nXf9w5x0Db4iyL97PA75Eot2q6//jBZhF8HyAup49bdbhCET2qB7XJ6A4he61kYxg1J7/1ntXR6EEXySIJ82eJ5VE24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-201-xd3CvAPlOiKWi4y9JosihA-1; Wed, 03 Apr 2024 09:12:35 +0100
+X-MC-Unique: xd3CvAPlOiKWi4y9JosihA-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 3 Apr
+ 2024 09:12:10 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Wed, 3 Apr 2024 09:12:10 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Eric Biggers' <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Andy Lutomirski <luto@kernel.org>, "Chang S .
+ Bae" <chang.seok.bae@intel.com>
+Subject: RE: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
+Thread-Topic: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
+Thread-Index: AQHaf518oZDDPKfpuUWrj9ZpRMjHLrFWPMWw
+Date: Wed, 3 Apr 2024 08:12:09 +0000
+Message-ID: <6629b8120807458ab76e1968056f5e10@AcuMS.aculab.com>
+References: <20240326080305.402382-1-ebiggers@kernel.org>
+ <CAMj1kXH4fNevFzrbazJptadxh_spEY3W91FZni5eMqD+UKrSUQ@mail.gmail.com>
+ <20240326164755.GB1524@sol.localdomain>
+In-Reply-To: <20240326164755.GB1524@sol.localdomain>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: Eric Biggers
+> Sent: 26 March 2024 16:48
+....
+> Consider Intel Ice Lake for example, these are the AES-256-XTS encryption=
+ speeds
+> on 4096-byte messages in MB/s I'm seeing:
+>=20
+>     xts-aes-aesni                  5136
+>     xts-aes-aesni-avx              5366
+>     xts-aes-vaes-avx2              9337
+>     xts-aes-vaes-avx10_256         9876
+>     xts-aes-vaes-avx10_512         10215
+>=20
+> So yes, on that CPU the biggest boost comes just from VAES, staying on AV=
+X2.
+> But taking advantage of AVX512 does help a bit more, first from the parts=
+ other
+> than 512-bit registers, then a bit more from 512-bit registers.
 
-When both ACPI and OF are disabled, the dev_vdata variable is unused:
+How much does the kernel_fpu_begin() cost on real workloads?
+(ie when the registers are live and it forces an extra save/restore)
 
-drivers/crypto/ccp/sp-platform.c:33:34: error: unused variable 'dev_vdata' [-Werror,-Wunused-const-variable]
+I've not looked at the code but I often see what looks like
+excessive inlining in crypto code.
+This will speed up benchmarks but can have a negative effect
+on real code both because of the time taken to load the
+code and the effect of displacing other code.
 
-This is not a useful configuration, and there is not much point in saving
-a few bytes when only one of the two is enabled, so just remove all
-these ifdef checks and rely on of_match_node() and acpi_match_device()
-returning NULL when these subsystems are disabled.
+It might be that this code is a simple loop....
 
-Fixes: 6c5063434098 ("crypto: ccp - Add ACPI support")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/ccp/sp-platform.c | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
+=09David
 
-diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
-index 473301237760..ff6ceb4feee0 100644
---- a/drivers/crypto/ccp/sp-platform.c
-+++ b/drivers/crypto/ccp/sp-platform.c
-@@ -39,44 +39,38 @@ static const struct sp_dev_vdata dev_vdata[] = {
- 	},
- };
- 
--#ifdef CONFIG_ACPI
- static const struct acpi_device_id sp_acpi_match[] = {
- 	{ "AMDI0C00", (kernel_ulong_t)&dev_vdata[0] },
- 	{ },
- };
- MODULE_DEVICE_TABLE(acpi, sp_acpi_match);
--#endif
- 
--#ifdef CONFIG_OF
- static const struct of_device_id sp_of_match[] = {
- 	{ .compatible = "amd,ccp-seattle-v1a",
- 	  .data = (const void *)&dev_vdata[0] },
- 	{ },
- };
- MODULE_DEVICE_TABLE(of, sp_of_match);
--#endif
- 
- static struct sp_dev_vdata *sp_get_of_version(struct platform_device *pdev)
- {
--#ifdef CONFIG_OF
- 	const struct of_device_id *match;
- 
- 	match = of_match_node(sp_of_match, pdev->dev.of_node);
- 	if (match && match->data)
- 		return (struct sp_dev_vdata *)match->data;
--#endif
-+
- 	return NULL;
- }
- 
- static struct sp_dev_vdata *sp_get_acpi_version(struct platform_device *pdev)
- {
--#ifdef CONFIG_ACPI
- 	const struct acpi_device_id *match;
- 
- 	match = acpi_match_device(sp_acpi_match, &pdev->dev);
- 	if (match && match->driver_data)
- 		return (struct sp_dev_vdata *)match->driver_data;
--#endif
-+
- 	return NULL;
- }
- 
-@@ -212,12 +206,8 @@ static int sp_platform_resume(struct platform_device *pdev)
- static struct platform_driver sp_platform_driver = {
- 	.driver = {
- 		.name = "ccp",
--#ifdef CONFIG_ACPI
- 		.acpi_match_table = sp_acpi_match,
--#endif
--#ifdef CONFIG_OF
- 		.of_match_table = sp_of_match,
--#endif
- 	},
- 	.probe = sp_platform_probe,
- 	.remove_new = sp_platform_remove,
--- 
-2.39.2
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
