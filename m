@@ -1,94 +1,107 @@
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677D56F51D
-	for <linux-crypto@vger.kernel.org>; Wed,  3 Apr 2024 08:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A0E6F085;
+	Wed,  3 Apr 2024 09:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712132584; cv=none; b=UmlYI4iFr7lqrITJveJ4GBJ00xbXYSy0Wl57yohpXtj/4aDbVS7yKkMpIsD8fAhLIEMACGztDfhmB3HDoipBtt9YGwHxVQerLOrgXe4L2/OFlodcI7PJlHEKAotzxGAZWeFpc7bvGUUw7XHQefiCbMuklSEel5PJWJBf5pFWuOc=
+	t=1712136979; cv=none; b=DqGmaQh6c1dQyGPLGLtuHyQ8gPX39VtrVwKm5rUXCHlJKgApmVMecWFManJSALz3GP9Upa8zh2UERT1NB25b+AoJuP4tlfJv/40HyWWt7Fg/nk/PNm/yJVAEfwc0djJOH+3+kRYTdiVUf58PM65DJJHbHoE8cYA7TU98YUIn9r4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712132584; c=relaxed/simple;
-	bh=/xd3hpbu+Zi9SGSjwWRNxiGqByXLHzVBCsLyu3K7PJI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=sA6x7lsO6WxQPlzo3QpuG2U+0dwU6+QNFhApwCn18BvdcayeQYLKEBVE2NO2IgojcLoLGEqg4mBgRPh0nXf9w5x0Db4iyL97PA75Eot2q6//jBZhF8HyAup49bdbhCET2qB7XJ6A4he61kYxg1J7/1ntXR6EEXySIJ82eJ5VE24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-201-xd3CvAPlOiKWi4y9JosihA-1; Wed, 03 Apr 2024 09:12:35 +0100
-X-MC-Unique: xd3CvAPlOiKWi4y9JosihA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 3 Apr
- 2024 09:12:10 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 3 Apr 2024 09:12:10 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Eric Biggers' <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>
-CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Andy Lutomirski <luto@kernel.org>, "Chang S .
- Bae" <chang.seok.bae@intel.com>
-Subject: RE: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
-Thread-Topic: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
-Thread-Index: AQHaf518oZDDPKfpuUWrj9ZpRMjHLrFWPMWw
-Date: Wed, 3 Apr 2024 08:12:09 +0000
-Message-ID: <6629b8120807458ab76e1968056f5e10@AcuMS.aculab.com>
-References: <20240326080305.402382-1-ebiggers@kernel.org>
- <CAMj1kXH4fNevFzrbazJptadxh_spEY3W91FZni5eMqD+UKrSUQ@mail.gmail.com>
- <20240326164755.GB1524@sol.localdomain>
-In-Reply-To: <20240326164755.GB1524@sol.localdomain>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1712136979; c=relaxed/simple;
+	bh=72yeARj0IOdQyuSCgecazU8IKrp+Hx1+NQJZD1evZ8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eWarLOTZN+0DZaIhCoFQCeImFSCzE12HDVnEAbgesmCc8CGaz26kjJf0qSXKeNCkV0SsMnS42renH1Ih/3SR22wyzhaG3pnXlT2ugCM6XVVFWOw2yMPoVDqy+QVvg/W4XLQDBUOQktXE5+mQ7rc2qwxLCqeIhGN4w4BCC4vblKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rrx2H-00EXf9-F1; Wed, 03 Apr 2024 17:36:02 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 03 Apr 2024 17:36:18 +0800
+Date: Wed, 3 Apr 2024 17:36:18 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: syzbot <syzbot+0cb5bb0f4bf9e79db3b3@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, luto@kernel.org, peterz@infradead.org,
+	syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+	Daniel Jordan <daniel.m.jordan@oracle.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH] padata: Disable BH when taking works lock on MT path
+Message-ID: <Zg0jEu5OsZaUFzn0@gondor.apana.org.au>
+References: <0000000000001963d306150986f9@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0000000000001963d306150986f9@google.com>
 
-From: Eric Biggers
-> Sent: 26 March 2024 16:48
-....
-> Consider Intel Ice Lake for example, these are the AES-256-XTS encryption=
- speeds
-> on 4096-byte messages in MB/s I'm seeing:
->=20
->     xts-aes-aesni                  5136
->     xts-aes-aesni-avx              5366
->     xts-aes-vaes-avx2              9337
->     xts-aes-vaes-avx10_256         9876
->     xts-aes-vaes-avx10_512         10215
->=20
-> So yes, on that CPU the biggest boost comes just from VAES, staying on AV=
-X2.
-> But taking advantage of AVX512 does help a bit more, first from the parts=
- other
-> than 512-bit registers, then a bit more from 512-bit registers.
+On Mon, Apr 01, 2024 at 07:08:28AM -0700, syzbot wrote:
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    18737353cca0 Merge tag 'edac_urgent_for_v6.9_rc2' of git:/..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=15d605e5180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=f64ec427e98bccd7
+> dashboard link: https://syzkaller.appspot.com/bug?extid=0cb5bb0f4bf9e79db3b3
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-How much does the kernel_fpu_begin() cost on real workloads?
-(ie when the registers are live and it forces an extra save/restore)
+Strictly speaking this can't happen because for the time being
+padata_do_multithreaded cannot run at the same time as the old
+padata which occurs in BH context.
 
-I've not looked at the code but I often see what looks like
-excessive inlining in crypto code.
-This will speed up benchmarks but can have a negative effect
-on real code both because of the time taken to load the
-code and the effect of displacing other code.
+But the simplest fix is to just disable BH:
 
-It might be that this code is a simple loop....
+---8<---
+As the old padata code can execute in softirq context, disable
+softirqs for the new padata_do_mutithreaded code too as otherwise
+lockdep will get antsy.
 
-=09David
+Reported-by: syzbot+0cb5bb0f4bf9e79db3b3@syzkaller.appspotmail.com
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
-
+diff --git a/kernel/padata.c b/kernel/padata.c
+index e3f639ff1670..53f4bc912712 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -106,7 +106,7 @@ static int __init padata_work_alloc_mt(int nworks, void *data,
+ {
+ 	int i;
+ 
+-	spin_lock(&padata_works_lock);
++	spin_lock_bh(&padata_works_lock);
+ 	/* Start at 1 because the current task participates in the job. */
+ 	for (i = 1; i < nworks; ++i) {
+ 		struct padata_work *pw = padata_work_alloc();
+@@ -116,7 +116,7 @@ static int __init padata_work_alloc_mt(int nworks, void *data,
+ 		padata_work_init(pw, padata_mt_helper, data, 0);
+ 		list_add(&pw->pw_list, head);
+ 	}
+-	spin_unlock(&padata_works_lock);
++	spin_unlock_bh(&padata_works_lock);
+ 
+ 	return i;
+ }
+@@ -134,12 +134,12 @@ static void __init padata_works_free(struct list_head *works)
+ 	if (list_empty(works))
+ 		return;
+ 
+-	spin_lock(&padata_works_lock);
++	spin_lock_bh(&padata_works_lock);
+ 	list_for_each_entry_safe(cur, next, works, pw_list) {
+ 		list_del(&cur->pw_list);
+ 		padata_work_free(cur);
+ 	}
+-	spin_unlock(&padata_works_lock);
++	spin_unlock_bh(&padata_works_lock);
+ }
+ 
+ static void padata_parallel_worker(struct work_struct *parallel_work)
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
