@@ -1,288 +1,216 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6865E1487F0;
-	Wed,  3 Apr 2024 13:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712150661; cv=none; b=KuWbjCHQfIDU5gTiIHbiK9Z4VFAmZzt/Ky0MNIjvZ1785KArpIssl4FSQplvicrxcvwnz8PDXRDGNrFflKtuXlxrdgzaqPKIhfIdJMjGJLMbpgM6HqpOdeQycEjOgLPzUEuKpWQJEZ7BrFGDI863U0IfnX3xrEdKWOxjQXI4HRM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712150661; c=relaxed/simple;
-	bh=xJslVArg1gDtzR4Be2/trZQajf4xXSmqhftr6EV1iZo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f6o6dXUYbKLHQHnuBbFTn8RCb1IyTG4sN+mpN7+E9xg5csC0je+9z5W4+0LdU8xti+tZXznqaS7jgKhamo2w4YUNx2h6oRP91iqcBvmBW7ycjhkE5m/vGsxqdJGw7dN1BmzSv25FjLLhby9Ua6Yc06J+mgfESkHkbY6wgpQwa2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PNa/m0VB; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD09314A0AF;
+	Wed,  3 Apr 2024 15:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.100
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712157478; cv=fail; b=dAD2BvdoNyyHrG6cJC5EL4zLNkpER6D3m/uyD6emRhaAZyGx6sq4lgQg0S+Qx7pFg3m0zwNN1E94jryILYcKSQObbFb65fcQUOKsvhmOn8cDc2S89UMQ5V2/3kk+Guq/ZZyFkV8I44KkV/bbTairR1ub2p8QCpsESYT+SElcU2I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712157478; c=relaxed/simple;
+	bh=s11vAPXHSJppLpUI3MosfXlaBLzOYd5YmANCm+Azzo4=;
+	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
+	 Content-Type:MIME-Version; b=WQ1NGWIHErBjOTP2/3kzvt+ny9XFcFnGaeANnVSopm0+EC7BSGdjwrHaAB1Nl+uqtDLvUETW6RPeY1nutcxYQ8SHSp/4MAi8RolRJ5x4L/pF8+9P17TabmlocuyjmDijhb0ko82+DOkhT3iZDdJ7iuYalDyBbN8zaHnmbHUYQrg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0BbMIFco; arc=fail smtp.client-ip=40.107.236.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PNa/m0VB"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1e293335cdeso5437895ad.3;
-        Wed, 03 Apr 2024 06:24:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712150659; x=1712755459; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rQsFbEjOTqJq35XSrf9t5tKMfoIw0aZp1GIU7FAGSpw=;
-        b=PNa/m0VBsApuPk3Dcq78bJpiZmKtnw0r+ENvIk11GjAdOFUsonz6TlMzQKLUXgXhOC
-         vhT5opeVqv2TDpdKzoA+PMezM+iNUyNtFk88ixnWf0hDH+1UQqC1dhUXUq2NxyBNgRuB
-         IhAR4KQIorpIt1XePFlswOpWpiza6t2jCDc4ZIlLfq0jEVw5D/PbV2WohdBDq/nW4Dfc
-         EzTNQ8PqzMY3/EGtZptxHFYAA4GcpZZQGfEFdb+EbjGY1Yr/le7hzM0z/VlXgkZlHGjN
-         g0zDP6B6gprMjeUrma62E6Oi1MDKQUS6r88NjZKzMT+fywOW1viDrPTE+XbHdn516rcw
-         JCGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712150659; x=1712755459;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rQsFbEjOTqJq35XSrf9t5tKMfoIw0aZp1GIU7FAGSpw=;
-        b=o4NTtN/5RaX17n1skNmYkeOCnitTpbwtb7P1Pix++//dl9iJVdJ1UDCRHfDjTPwQAA
-         IZL4Ebo2ma4ZxmO96arKeC76KRSGgeA3Uq73f2yDWthAn04n7RUC3qsI715vUkq30mgR
-         Cr7OEIlW3xNw0+hoND8/k+DMoCgxrFQ9gmiqsQa4I2eNRix8Ai7Kd2DtRCkYYxeswXnR
-         sWJ8A2l4A8DQ6qZJ1sJMNNLj9pom2nA6Foj8if+A/JmwmAMiy/lKGYb15k+5aFFa7M+1
-         XKa9TV1aBFfCRKqQ444voSTVLq2q6Ho9rLQGwIw0ho4CFYzlb5fP7WpqIp6Sc+DudDaQ
-         NAhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVv/wpoofPVfT8wkRAeR65fqEkWRtuT/OPXwotPUXeXb0aAQBxGKq/1w/CbobHVMxWd0rfbn/7YnNftlVhNPsCQKZzkw1kDHzv6Mb81+dJ1t5LGNkXa3wEutgJ7bWlpyzmCeSK3PKJxdF+nYHORJ9psdbsDy7TKQxsIpDNCLq+Ax7PIQGcTwdcDVKU3SkYPhc29M+ixHD9SdY2ZUZ3qDGlQ6ytvXG4Bdf8icLTN9t6jLb3ZTNWNiOpSjRXBDglHpwLTDOzB86YvM4yjD87AQLX4CpFrTxZ2RreHG16M9GyFFpWv7AmS5A0=
-X-Gm-Message-State: AOJu0YzvPutI4QK0jVjpM0hZPdNi2/Fo5oBlYyDTzZPGT5msGwAjYS3C
-	I/WkNMDLjGhTy3cupSdZ4n2wOhvmGOJPbUOtWDBzDKwIQofXGuVP
-X-Google-Smtp-Source: AGHT+IFatdNBQSb3VrVYeBX6Z2JShOnIrwB6FOsdyOnRBQXn1pgGepQ/A/buywtE61oYlMx80pUAVQ==
-X-Received: by 2002:a17:902:c94f:b0:1e0:a784:f965 with SMTP id i15-20020a170902c94f00b001e0a784f965mr18876173pla.65.1712150658416;
-        Wed, 03 Apr 2024 06:24:18 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id i15-20020a170902c94f00b001dd02f4c2casm13275916pla.164.2024.04.03.06.24.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 06:24:17 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 9178318108E2D; Wed,  3 Apr 2024 20:24:15 +0700 (WIB)
-Date: Wed, 3 Apr 2024 20:24:15 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: David Gstir <david@sigma-star.at>, Mimi Zohar <zohar@linux.ibm.com>,
-	James Bottomley <jejb@linux.ibm.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Shawn Guo <shawnguo@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Ahmad Fatoum <a.fatoum@pengutronix.de>,
-	sigma star Kernel Team <upstream+dcp@sigma-star.at>,
-	David Howells <dhowells@redhat.com>, Li Yang <leoyang.li@nxp.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	Tejun Heo <tj@kernel.org>,
-	"Steven Rostedt (Google)" <rostedt@goodmis.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-security-module@vger.kernel.org,
-	Richard Weinberger <richard@nod.at>,
-	David Oberhollenzer <david.oberhollenzer@sigma-star.at>
-Subject: Re: [PATCH v8 6/6] docs: trusted-encrypted: add DCP as new trust
- source
-Message-ID: <Zg1YfyhxO8BwtEfB@archie.me>
-References: <20240403072131.54935-1-david@sigma-star.at>
- <20240403072131.54935-7-david@sigma-star.at>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0BbMIFco"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y7c9Aila7YXe8pWIZu5It+NZ1OJ+opobbtsiSLulUtoEEwu3DKSmPGkjH6aCm1K8PU0hzJ3nf5NOEaLHJh9lr6U2KZoDPOM7QLZ/BKYCusN/fAoFKsaFGyZnXRP9DDhEAJfCe2ClesU/fUpRTwPnmlt0kwBY6kZSaDYCh60Gr24TbzU94+nYjEhcjQftOHQRWWGEkg2uymDkXU9XCCWCPIJ4J4UuXju/EQBWgFL9yCmGJx838XpjOZa3LXpm2cJ3VQTGs0saY5q1rLcpeiExqrU91lTXCE1bvkv7oo/ddmCukxiAjCntvt2VAes9r70oYxJ/UtJq1VHbU3aWRadi9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LkIJxO+k5NgAqNCe4hHiepJ8nTIlLHGfJEUZmxXky4Y=;
+ b=Dc9dHT9FF6RkyXWjXNab/fsS6rIA8ZGhnX8VOnB5xJc0csMiB7/RiuwMLCcSIvp/Fhl2PXWI2K/zrDjbYemPed3FNTBC3soIrL1W7aP0nkgTVMOPWclieaRd73mt3lnNMAQpwx7NFKu6AGtFydAu4EyMXIAYd4q2Gh55Y2N3/DzmpgBuBXRmScF/bpHIEvnUbUJ9wRQrlm4WAMNp5iv+TFeZ5K9FW+22sPTLYNT2hgNI4hroMU+e7rFeYWVW+JUSKggnAhG+ukilTHuL1CzksCqNf3IbfokHlW/VCQKld44oqmorYL1cNIz0Z2PmX79QiMKXijNQDtziGjSdJTO3RQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LkIJxO+k5NgAqNCe4hHiepJ8nTIlLHGfJEUZmxXky4Y=;
+ b=0BbMIFco/9bJKxJfbUxhQQ0HBh7Eiff9g0XVXK7dCmo4yEcVX888ETMvCvN40Yin7ZY7lo8jF0YvI6Gya3GtrNm+CqkPsQ9JWyaAESDfzalik+C7UocdVSMaswuhADIJaieJGk48QClkxvVBsT78LNkIBvYL/oM4WMSjra2mGO4=
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by CH2PR12MB4247.namprd12.prod.outlook.com (2603:10b6:610:7c::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Wed, 3 Apr
+ 2024 15:17:53 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1032:4da5:7572:508]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1032:4da5:7572:508%6]) with mapi id 15.20.7409.042; Wed, 3 Apr 2024
+ 15:17:53 +0000
+Message-ID: <dd7977b9-bdd2-f36f-36bd-a383a2588f6e@amd.com>
+Date: Wed, 3 Apr 2024 10:17:51 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Content-Language: en-US
+To: Arnd Bergmann <arnd@kernel.org>, linux-kernel@vger.kernel.org,
+ John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+ =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+ linux-crypto@vger.kernel.org
+References: <20240403080702.3509288-1-arnd@kernel.org>
+ <20240403080702.3509288-25-arnd@kernel.org>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH 24/34] crypto: ccp - drop platform ifdef checks
+In-Reply-To: <20240403080702.3509288-25-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA0PR11CA0163.namprd11.prod.outlook.com
+ (2603:10b6:806:1bb::18) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="naAkpeAgH+6KHC1j"
-Content-Disposition: inline
-In-Reply-To: <20240403072131.54935-7-david@sigma-star.at>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|CH2PR12MB4247:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	AYlLJ3T6sRa6hulBXQImAHoSRuUdGyByJDPivpK7H5qmaEVPLlkogy17ALsCB17yPW2FjRPltAzqSMJvVCJe3o4kT+jNB/Rw2yTjuY69U5gaMCrO26y2N5VZRVaQs4BgbZNDrLJTrmTYxlhC2NnO1qfHQfudtecItoVIrO10/txAa3Vm/6w7UKtmx2CLuyUinfTbCR7DWVtGeKlNsonb1B15Lg0nSfZ1eTl5+jY9BpGl6gXdq+DV0+k837vM75LYP2ckKPJr1y5wYmu5zXfgI/7KDV9F4KchEFlJVs+9mnL0m4H9p8IadOfGHFadkDvww6knVMfRXeEETJujT2IyffRN9/p5pTbn4Wx7pr3q3u6zb9fmXoK6KURCm3bYSZu5hDrzKHQSMONBKkXsVk7TdIK6tSj8T+tvo1iQREza82JHcLqXw9FOtcG9K8JjnCzLkcVN3J3g0YZbLF0Ft25wawf515dp2b0hNpOSvDVUEdXVBf15+vugKuPtvqoQ+YSHmh/7V2+2e+LIy9ijg8Pn9XvjJFoPEZ1WD8OH4CzzCkBrsw1zX5PI6sCCKOb10gEZXd2Y5xWsQ66H+Jvqd3gojPaEKKDdjGjlg2y4CN1W5vTW2qb1WnLUu0DSi2+BOm2dKYLOxWpRRMx9+gx4FlBj84zmcycVO+JikH0Hv9E3mos=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bk0zcjBNSnN5djh5Mkptb04ycGo0Z2RRcUhlL3haRVdxYTFrREdsMG4vNWlN?=
+ =?utf-8?B?RFRKMmwxNXpZb0svSHZlYTY4QTI1NktSUnM5SHd6aFdzSE5hSDFOZXdGNzl0?=
+ =?utf-8?B?V043cjRpZGV2emVGdElzTUtKUlE1OERqRXA0eFh1OVBHSVE0eElheTRaRnpr?=
+ =?utf-8?B?Wk9iYXBsWFZQK3dzdmtReHNvbjFZZFYyOC9zOUVuL29oeGJSa3pxU0Ixck5Y?=
+ =?utf-8?B?WE1EY2V1dFZhOFliNkU2SXV3elJOS2dWZWpIUVZQU3h0T2hsWDlPc1EwK3hs?=
+ =?utf-8?B?OTRweUhDa2I0WTh6MEZSVTF6cUtTMXlNeXJZNGJZMnM5dzAxM2VJQXRER2RO?=
+ =?utf-8?B?cUE5ZjZLRHZUano1NS8wRHNpVHhOL2tFbGJEc3VTMjF4a2hUMzlLM0UzMFpG?=
+ =?utf-8?B?NjVqbUNKSCtUOGtSR2NYNnBqT3VxZi80YWt5d3hxKzMweDBwNW96N1FJWjJj?=
+ =?utf-8?B?Y2EzOG5rZjU1QjZoZndnSVJyTjlOOHNTMGsrRmtmUExMY3ZpaU81elhyaWJR?=
+ =?utf-8?B?M2x1TG9hcTNzM2tnTWJYcHRjeDQybmNScUszNnoveHZnK1RERGFqSEVjWHhF?=
+ =?utf-8?B?NHZiV1lvVFFZNldmOENIaktMS291ZDh2WjFsUGZBZnZWZTBRWjFLN0xkOVk2?=
+ =?utf-8?B?UEp1eGd4QUdlR2RjYytQN2JPYlJkYy82SmVUMzlwRUQ1Yis5clpEV1VHVHlO?=
+ =?utf-8?B?cS9pTU9heDF3aHR2K0dJcUp6WlFsa0g2VW5ZVUNoOCtuSzREZytEU3ZXS0lk?=
+ =?utf-8?B?NWpPci9PMFVEYjlva09uMWZmSGZ5SjFOM1BBbjcxcGZDeHc1b3BOZ1ZsOFlw?=
+ =?utf-8?B?djJmOWxPTGhoWU4xMzBQaCtleFNwTlBYRy81NDJYdjBUZGJDZ3JSc1cyRGpz?=
+ =?utf-8?B?ak5VMnFWYUpXWk5WRTdlY0luNEdPK0Q3NS9IKzA3VlBzcVU2NDdKcW1pYmph?=
+ =?utf-8?B?K3hqMjVxVkowNFVZeUZJY2pKWURpcmYrOWFkZmczYVlpYXE2OWR0cW5YcGRr?=
+ =?utf-8?B?djdRQlJqUHRNQjM5cHVGcjJueTlaQkdPWTdyeldHV3R4NTZzZS82TmZhZU8v?=
+ =?utf-8?B?RGpvaWh4UEkrOFNMdXUxOEVrVjRIZ1pwQThJdkh1STdCUFRNU0piMWFPeTVt?=
+ =?utf-8?B?M0F2UWN6UFZwVHE4Smlka1ltdkVLUjFVRjRIeU44bUNPT050bmp4anF2djVC?=
+ =?utf-8?B?ZjAwUnJFWkw1MXN0NE1SNnBSM3VncGFWbEg2bkxaMVE1bFVIYi9rdUpheEtG?=
+ =?utf-8?B?T1VxaFNHWUhPRHZOUlNJdUFDZnFjQmlhVU04c0UvcWwySXBERWQ3MzI5b0Y4?=
+ =?utf-8?B?NjFTRFNKUzJOTXpCTlVPMlhWSXhXZHdYYUV0VlZTYVB5alcydVVMZVdOKzhP?=
+ =?utf-8?B?WUNoc1hNZkhyR0ZXSmJEMDZTQ3VUY0xoVlJOSXhkTDlLTEY1dzNpMGhMWWY2?=
+ =?utf-8?B?N3VjS3RtZGI3RE80SElYOEFsdDgrUktQdUxsK2VVMlRCcjQ5YkR1WWE5RjdD?=
+ =?utf-8?B?OGsyZUdFWjdaMENOVkVUTkVnZ2p0UFEyN1dOdmZTak4xRXhTa2JzM0lZaXNi?=
+ =?utf-8?B?cTA3eG92d0FoMnZqS1IxdGhYTkp2dldVdnRmcEtZN0JQeERybm9pZ1JSdkJ1?=
+ =?utf-8?B?MGM5UHl6S1dRaHlxUzRVeVdmWlI2UnB2clJScFFzUGdrdG9jRGxDZ25hWDIx?=
+ =?utf-8?B?eFBqUFRwU0pJV2YxQysyeXJ5ZERSWmNGMEdOd3h5RHdpeHhjZ0lyUG5Oa0c1?=
+ =?utf-8?B?VklmeWhxQTdmZFliY2VKOUd6dzVST1NlaDBSbFJPdHQyVXBrb2FvdnU0VmRp?=
+ =?utf-8?B?dEtGRWdXQzJWTUpEeU9senptQ3dkM2FOb1oxRXp6RGs3Y3FWMThOTWZtUlpT?=
+ =?utf-8?B?K3FmbzRTWENhMkx2ekFJakNvdzUway9za01ENy9ub3lBaktRdEdsaWpZK21M?=
+ =?utf-8?B?NCtEcEV2bmprQ2ZRQlZxMGVkc0F4Tkh4OG5TVkVGSTNjbUV2WnEwK2laOGc3?=
+ =?utf-8?B?OHkzSUl5K0JpY1JOL1hrTXZNbm5hajV2blF2K1p4QzU3WWF3UzkrZFcrQnhM?=
+ =?utf-8?B?WGd3SHBtdDczWHZrQWxRdWNsS2x3Wm1BTE4wRjJuRGNZbXhkZXR0RldBNVN4?=
+ =?utf-8?Q?QiS+Uv2hrRAPLzh/9WQnYN4zz?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7b9b96a-20b3-47ff-0263-08dc53f13bd3
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2024 15:17:53.6913
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kGlPtVhVtcu05/dXb/kuXtvwTsArEV4/ODqS+CXtvukNeWyrJ8ygqgjM/zlt0qkUL5fqk6y+IvhhguyllhS+SQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4247
 
+On 4/3/24 03:06, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> When both ACPI and OF are disabled, the dev_vdata variable is unused:
+> 
+> drivers/crypto/ccp/sp-platform.c:33:34: error: unused variable 'dev_vdata' [-Werror,-Wunused-const-variable]
+> 
+> This is not a useful configuration, and there is not much point in saving
+> a few bytes when only one of the two is enabled, so just remove all
+> these ifdef checks and rely on of_match_node() and acpi_match_device()
+> returning NULL when these subsystems are disabled.
+> 
+> Fixes: 6c5063434098 ("crypto: ccp - Add ACPI support")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
---naAkpeAgH+6KHC1j
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Would using __maybe_unused on dev_vdata be the safer, easier choice?
 
-On Wed, Apr 03, 2024 at 09:21:22AM +0200, David Gstir wrote:
-> diff --git a/Documentation/security/keys/trusted-encrypted.rst b/Document=
-ation/security/keys/trusted-encrypted.rst
-> index e989b9802f92..f4d7e162d5e4 100644
-> --- a/Documentation/security/keys/trusted-encrypted.rst
-> +++ b/Documentation/security/keys/trusted-encrypted.rst
-> @@ -42,6 +42,14 @@ safe.
->           randomly generated and fused into each SoC at manufacturing tim=
-e.
->           Otherwise, a common fixed test key is used instead.
-> =20
-> +     (4) DCP (Data Co-Processor: crypto accelerator of various i.MX SoCs)
-> +
-> +         Rooted to a one-time programmable key (OTP) that is generally b=
-urnt
-> +         in the on-chip fuses and is accessible to the DCP encryption en=
-gine only.
-> +         DCP provides two keys that can be used as root of trust: the OT=
-P key
-> +         and the UNIQUE key. Default is to use the UNIQUE key, but selec=
-ting
-> +         the OTP key can be done via a module parameter (dcp_use_otp_key=
-).
-> +
->    *  Execution isolation
-> =20
->       (1) TPM
-> @@ -57,6 +65,12 @@ safe.
-> =20
->           Fixed set of operations running in isolated execution environme=
-nt.
-> =20
-> +     (4) DCP
-> +
-> +         Fixed set of cryptographic operations running in isolated execu=
-tion
-> +         environment. Only basic blob key encryption is executed there.
-> +         The actual key sealing/unsealing is done on main processor/kern=
-el space.
-> +
->    * Optional binding to platform integrity state
-> =20
->       (1) TPM
-> @@ -79,6 +93,11 @@ safe.
->           Relies on the High Assurance Boot (HAB) mechanism of NXP SoCs
->           for platform integrity.
-> =20
-> +     (4) DCP
-> +
-> +         Relies on Secure/Trusted boot process (called HAB by vendor) for
-> +         platform integrity.
-> +
->    *  Interfaces and APIs
-> =20
->       (1) TPM
-> @@ -94,6 +113,11 @@ safe.
-> =20
->           Interface is specific to silicon vendor.
-> =20
-> +     (4) DCP
-> +
-> +         Vendor-specific API that is implemented as part of the DCP cryp=
-to driver in
-> +         ``drivers/crypto/mxs-dcp.c``.
-> +
->    *  Threat model
-> =20
->       The strength and appropriateness of a particular trust source for a=
- given
-> @@ -129,6 +153,13 @@ selected trust source:
->       CAAM HWRNG, enable CRYPTO_DEV_FSL_CAAM_RNG_API and ensure the device
->       is probed.
-> =20
-> +  *  DCP (Data Co-Processor: crypto accelerator of various i.MX SoCs)
-> +
-> +     The DCP hardware device itself does not provide a dedicated RNG int=
-erface,
-> +     so the kernel default RNG is used. SoCs with DCP like the i.MX6ULL =
-do have
-> +     a dedicated hardware RNG that is independent from DCP which can be =
-enabled
-> +     to back the kernel RNG.
-> +
->  Users may override this by specifying ``trusted.rng=3Dkernel`` on the ke=
-rnel
->  command-line to override the used RNG with the kernel's random number po=
-ol.
-> =20
-> @@ -231,6 +262,19 @@ Usage::
->  CAAM-specific format.  The key length for new keys is always in bytes.
->  Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
-> =20
-> +Trusted Keys usage: DCP
-> +-----------------------
-> +
-> +Usage::
-> +
-> +    keyctl add trusted name "new keylen" ring
-> +    keyctl add trusted name "load hex_blob" ring
-> +    keyctl print keyid
-> +
-> +"keyctl print" returns an ASCII hex copy of the sealed key, which is in =
-format
-> +specific to this DCP key-blob implementation.  The key length for new ke=
-ys is
-> +always in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
-> +
->  Encrypted Keys usage
->  --------------------
-> =20
-> @@ -426,3 +470,12 @@ string length.
->  privkey is the binary representation of TPM2B_PUBLIC excluding the
->  initial TPM2B header which can be reconstructed from the ASN.1 octed
->  string length.
-> +
-> +DCP Blob Format
-> +---------------
-> +
-> +.. kernel-doc:: security/keys/trusted-keys/trusted_dcp.c
-> +   :doc: dcp blob format
-> +
-> +.. kernel-doc:: security/keys/trusted-keys/trusted_dcp.c
-> +   :identifiers: struct dcp_blob_fmt
-> diff --git a/security/keys/trusted-keys/trusted_dcp.c b/security/keys/tru=
-sted-keys/trusted_dcp.c
-> index 16c44aafeab3..b5f81a05be36 100644
-> --- a/security/keys/trusted-keys/trusted_dcp.c
-> +++ b/security/keys/trusted-keys/trusted_dcp.c
-> @@ -19,6 +19,25 @@
->  #define DCP_BLOB_VERSION 1
->  #define DCP_BLOB_AUTHLEN 16
-> =20
-> +/**
-> + * DOC: dcp blob format
-> + *
-> + * The Data Co-Processor (DCP) provides hardware-bound AES keys using its
-> + * AES encryption engine only. It does not provide direct key sealing/un=
-sealing.
-> + * To make DCP hardware encryption keys usable as trust source, we define
-> + * our own custom format that uses a hardware-bound key to secure the se=
-aling
-> + * key stored in the key blob.
-> + *
-> + * Whenever a new trusted key using DCP is generated, we generate a rand=
-om 128-bit
-> + * blob encryption key (BEK) and 128-bit nonce. The BEK and nonce are us=
-ed to
-> + * encrypt the trusted key payload using AES-128-GCM.
-> + *
-> + * The BEK itself is encrypted using the hardware-bound key using the DC=
-P's AES
-> + * encryption engine with AES-128-ECB. The encrypted BEK, generated nonc=
-e,
-> + * BEK-encrypted payload and authentication tag make up the blob format =
-together
-> + * with a version number, payload length and authentication tag.
-> + */
-> +
->  /**
->   * struct dcp_blob_fmt - DCP BLOB format.
->   *
+Either way, I don't think removing the #ifdefs will pose a problem, so:
 
-The doc LGTM, thanks!
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---naAkpeAgH+6KHC1j
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZg1YegAKCRD2uYlJVVFO
-oyJuAQCZD3vF43N1Kkz1HmEgp7130tCkVQsyOA9E8/KbWap6iAD/QxxL8dI+KNzG
-9SR+i7e0WhL71RpnBvHq6ovdU/G2iAI=
-=lGz1
------END PGP SIGNATURE-----
-
---naAkpeAgH+6KHC1j--
+> ---
+>   drivers/crypto/ccp/sp-platform.c | 14 ++------------
+>   1 file changed, 2 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
+> index 473301237760..ff6ceb4feee0 100644
+> --- a/drivers/crypto/ccp/sp-platform.c
+> +++ b/drivers/crypto/ccp/sp-platform.c
+> @@ -39,44 +39,38 @@ static const struct sp_dev_vdata dev_vdata[] = {
+>   	},
+>   };
+>   
+> -#ifdef CONFIG_ACPI
+>   static const struct acpi_device_id sp_acpi_match[] = {
+>   	{ "AMDI0C00", (kernel_ulong_t)&dev_vdata[0] },
+>   	{ },
+>   };
+>   MODULE_DEVICE_TABLE(acpi, sp_acpi_match);
+> -#endif
+>   
+> -#ifdef CONFIG_OF
+>   static const struct of_device_id sp_of_match[] = {
+>   	{ .compatible = "amd,ccp-seattle-v1a",
+>   	  .data = (const void *)&dev_vdata[0] },
+>   	{ },
+>   };
+>   MODULE_DEVICE_TABLE(of, sp_of_match);
+> -#endif
+>   
+>   static struct sp_dev_vdata *sp_get_of_version(struct platform_device *pdev)
+>   {
+> -#ifdef CONFIG_OF
+>   	const struct of_device_id *match;
+>   
+>   	match = of_match_node(sp_of_match, pdev->dev.of_node);
+>   	if (match && match->data)
+>   		return (struct sp_dev_vdata *)match->data;
+> -#endif
+> +
+>   	return NULL;
+>   }
+>   
+>   static struct sp_dev_vdata *sp_get_acpi_version(struct platform_device *pdev)
+>   {
+> -#ifdef CONFIG_ACPI
+>   	const struct acpi_device_id *match;
+>   
+>   	match = acpi_match_device(sp_acpi_match, &pdev->dev);
+>   	if (match && match->driver_data)
+>   		return (struct sp_dev_vdata *)match->driver_data;
+> -#endif
+> +
+>   	return NULL;
+>   }
+>   
+> @@ -212,12 +206,8 @@ static int sp_platform_resume(struct platform_device *pdev)
+>   static struct platform_driver sp_platform_driver = {
+>   	.driver = {
+>   		.name = "ccp",
+> -#ifdef CONFIG_ACPI
+>   		.acpi_match_table = sp_acpi_match,
+> -#endif
+> -#ifdef CONFIG_OF
+>   		.of_match_table = sp_of_match,
+> -#endif
+>   	},
+>   	.probe = sp_platform_probe,
+>   	.remove_new = sp_platform_remove,
