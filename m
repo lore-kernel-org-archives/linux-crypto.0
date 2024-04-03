@@ -1,68 +1,57 @@
-Received: from fout3-smtp.messagingengine.com (fout3-smtp.messagingengine.com [103.168.172.146])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F033B146A96;
-	Wed,  3 Apr 2024 15:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1149E6F099
+	for <linux-crypto@vger.kernel.org>; Wed,  3 Apr 2024 16:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712159448; cv=none; b=pFstUCat2rVlWskVtLDDnMnlXywcubx58LmvKOFfJIU7KUs1VLJijGI14DddojQrwp+urZWrRqPhvW6gaH09NzU2JSF327aqygYG8cSJiJ4/9PanhUMddXTgoz2hMSRHNmrBs8RAT3OosviIPoK/yPRaEyEZTcJHXVLhrIGgjSA=
+	t=1712161947; cv=none; b=VcMRIrDX7ppuV5R/ifpUaWjwpUUKIWujSlE4xmMRzeHifOO/rQYiEbCsGw04lD4w3fQ0o52GCZgNL/pk9eJGswr1HoIm1e4XRR4Tj28sL/PITOqB4kLxUv/kDGegPjIqOF8uJDWkkFi585DyT3XDoEl8NJJnKEzay3/x5aLwQJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712159448; c=relaxed/simple;
-	bh=uFr/skVLhS1k3c7q8qe9cHlRpUnBT4639sAJYyygcq4=;
+	s=arc-20240116; t=1712161947; c=relaxed/simple;
+	bh=0XnUl7dj6Ea6m99gt6Fm1hxbMTZDNcxsfZFaaTdkK5c=;
 	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=Pz2ncl+n+iGsOacVJQlhkxovTp23PKTyUW0SnFkNEGCFYd7Y6+mq0seEtqM+PNi80huqj8tFXaqp6v2Vv6NWPICsno9ZhPHbnMXRy36VAKBrxUloVqmpuUV6B/QhyFmtLH4y3ZsJ7yuOdrScAfTGOQ7GfpEXVme4Rmw9fUqUMh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=dz2if+mR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IGRVSDj8; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	 Subject:Content-Type; b=bgsIb4RWa875sCyUeyQYSPziT6n/qlhAMpBP4NQchd8AcKuk4/9gGZzCIEs6XVfYwNChl4DJ7uM0iB96JdbZLr63vSokKfEQaiWYY0J4x/boqDd9OTBr87Im7+6MRKzhM+kK0Ya3khmMeTcHw9esdWLW4kCd6/vCqKFO5pY3JWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uql05aKA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="dz2if+mR";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IGRVSDj8"
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfout.nyi.internal (Postfix) with ESMTP id D84F11380124;
-	Wed,  3 Apr 2024 11:50:44 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 03 Apr 2024 11:50:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm1; t=1712159444; x=1712245844; bh=TryBBe0l7o
-	sJOQgOLFDSpuO7ArwSuBY7uBCGJfdpPe8=; b=dz2if+mR6qDpvZmiU5S+DNAa2E
-	9p5epSWBU7zbZfknkQPs08hcESu4Gv9MqRd00qOtdVjirHz4s9xJ8Yr3zXCZQ+go
-	LPMCEJd5doBc+/5ayEGCmmhHcy7R9dYrZmEx6fBDzlxRBbJDaJspQaF/jrjpt8Je
-	yWDmUwonarp/cQjcZvAdQ/jVl0R5ibzyX/AD7+tz8OGziINnyJbMEWOU7P7dZmTa
-	2rniPxCX1KS5FkzJMVOVPQW2SFoBpkldeqAiWWJpQOdgB8plSzDJO0TsZa+YdCND
-	i8YRHB4NRcSFkfqF2xSvW8L4AkGPwTzn7AYsmgOlCwSdJjQOQfNlTcWVd8NA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1712159444; x=1712245844; bh=TryBBe0l7osJOQgOLFDSpuO7ArwS
-	uBY7uBCGJfdpPe8=; b=IGRVSDj8ZsWakqdS+p6lpJDs4SrZKYVQq2C2dEVyLKYi
-	GQBWWZQ3XgoPkl9hNCbR+yFHRbTHHaE3oWCL5ap1LmsOnBIcg3H/evxM7Q+bzzhw
-	dy6DAIc8l4VAcwKkVtt1RcLkCQ3uittAA6yuozKxoMdF8wHs+egpDr6u7RA9TPfR
-	AJ0axSfgr7g2uF3iuVJpuGJWAMMlLNu47WSQSZiATpCgbjMdc6ilshBONl5tbO3O
-	Xp2cTjkx8NBRTcYBqGpoWspYVsP624pqeMh8yku7qjj2ayJFVSLtn63b2/ka645g
-	hXwh1HGeRPSxOMs5HSYpUVJL3i7QfxwnhGM6YhVI/g==
-X-ME-Sender: <xms:03oNZucDDYsbhlfq3f5AZwMd6HAECWSU-uZlLsZwr-KSXxlAonsdHQ>
-    <xme:03oNZoNP9hjENGBYUVLgVvEyIepQ3_i_-PbYG-0ZIUdao65Rg412UjBaGsj6CuIap
-    F9Gn_rP9ShOfECJIAk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudefiedghedtucetufdoteggodetrfdotf
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uql05aKA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0197AC433C7;
+	Wed,  3 Apr 2024 16:32:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712161946;
+	bh=0XnUl7dj6Ea6m99gt6Fm1hxbMTZDNcxsfZFaaTdkK5c=;
+	h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
+	b=uql05aKAgEImnVq/QSz6jx5tGoA8MmQi659ovZKz6XF5FTK8q1eEZ1nMMfySImYvd
+	 uY/WRYk51ryCs5J5npiKyedF3TFkcT8PpVUXb8OXx0nPVtnaL5DneFVpfnH5uo4iGG
+	 syyilVoTLpojFeThAyyU34ZiHIhznm9pvsZ9Qlh0acVVYUY23+Dr5pyhAFV0EMiZIu
+	 dejKjsJG2V3tkp93HSNVHFvoyMpfAvmY7hJVt+GiajZTO5R1sQYtWBSOgH3eW3m/N1
+	 uFK7T7+2roRIUKMhD28rVmazEvEPk4R2RQZYw8pM47Pj59mbgkqivfgAalZBkvEmxq
+	 z6dbWKAVV1aLw==
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailfauth.nyi.internal (Postfix) with ESMTP id F06881200066;
+	Wed,  3 Apr 2024 12:32:24 -0400 (EDT)
+Received: from imap48 ([10.202.2.98])
+  by compute3.internal (MEProxy); Wed, 03 Apr 2024 12:32:25 -0400
+X-ME-Sender: <xms:l4QNZnVTcmmcBj3cETMIjQPFeKyW216HWK1kyHvk5ak3_YuBQfomfQ>
+    <xme:l4QNZvnCeko_j7aVMCevTqwRM7_fqcU20j_wDEsVTZHCnw-dG_YTuNPcHDSTz9Ieb
+    ylCWq3tLYhNGdj3CNQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudefiedgheekucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:03oNZvjkc8pffHKULAjFk0l6-vE6BzsImrBCx5DmkH_Ld-SfwCzT3Q>
-    <xmx:03oNZr-5krwo-MBzZBQXjjNtuurVpw8ooTXzQLr7Ty9wvWnDjrya8g>
-    <xmx:03oNZqt0sjd-QsTE-N3kPK7QYE3OAIvDZuU6nysr0zhAe8ckiXlNVQ>
-    <xmx:03oNZiHrV2TRQe1GQYZbfJHI4GFoRQjmIrnLhUEaVAtathLRF4nLGg>
-    <xmx:1HoNZoD7RUebSGBCaH1THA-nrf9r1iPhS8VM8LzX1bxRhwz4jnZMxITt>
-Feedback-ID: i56a14606:Fastmail
+    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
+    nhguhicunfhuthhomhhirhhskhhifdcuoehluhhtoheskhgvrhhnvghlrdhorhhgqeenuc
+    ggtffrrghtthgvrhhnpeduveffvdegvdefhfegjeejlefgtdffueekudfgkeduvdetvddu
+    ieeluefgjeeggfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfh
+    hrohhmpegrnhguhidomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudduiedu
+    keehieefvddqvdeifeduieeitdekqdhluhhtoheppehkvghrnhgvlhdrohhrgheslhhinh
+    hugidrlhhuthhordhush
+X-ME-Proxy: <xmx:l4QNZjYSXaRfEAGTNz9O5uebk2fHJnste73pfQtv3vctGbwaC10s2w>
+    <xmx:l4QNZiWxqHyVWKJiF4QUUEAo6lm2WIE1scUUV-YakZ7XqTXsCRovhg>
+    <xmx:l4QNZhlvWkMn1SVoZn4CWHqQr0aqpqET5Ga7LXEkXKUWMws0gzMLpw>
+    <xmx:l4QNZvdfRIc7OON-ak6PhAoHg4sCtKcl0fcLZQFhY7peszixkio4Ng>
+    <xmx:mIQNZpOteF69teRpNuPDyBpLmH21WrVMM4syyjzPzuEhN6UyjV9zI2Zh>
+Feedback-ID: ieff94742:Fastmail
 Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 4CB7AB6008D; Wed,  3 Apr 2024 11:50:43 -0400 (EDT)
+	id 0360131A0064; Wed,  3 Apr 2024 12:32:22 -0400 (EDT)
 X-Mailer: MessagingEngine.com Webmail Interface
 User-Agent: Cyrus-JMAP/3.11.0-alpha0-333-gbfea15422e-fm-20240327.001-gbfea1542
 Precedence: bulk
@@ -71,42 +60,111 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <ac96323b-80f7-43c0-b99e-b7772eb26802@app.fastmail.com>
-In-Reply-To: <dd7977b9-bdd2-f36f-36bd-a383a2588f6e@amd.com>
-References: <20240403080702.3509288-1-arnd@kernel.org>
- <20240403080702.3509288-25-arnd@kernel.org>
- <dd7977b9-bdd2-f36f-36bd-a383a2588f6e@amd.com>
-Date: Wed, 03 Apr 2024 17:50:23 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Tom Lendacky" <thomas.lendacky@amd.com>,
- "Arnd Bergmann" <arnd@kernel.org>, linux-kernel@vger.kernel.org,
- "John Allen" <john.allen@amd.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>
-Cc: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 24/34] crypto: ccp - drop platform ifdef checks
-Content-Type: text/plain
+Message-Id: <10db421c-77da-4a1c-a25e-2374a7a2ef79@app.fastmail.com>
+In-Reply-To: <20240223183004.GE1112@sol.localdomain>
+References: <20240214221847.2066632-1-ross.philipson@oracle.com>
+ <20240214221847.2066632-7-ross.philipson@oracle.com>
+ <CAMj1kXEmMBY_jc0uM5UgZbuZ3-C7NPKzg5AScaunyu9XzLgzZA@mail.gmail.com>
+ <98ad92bb-ef17-4c15-88ba-252db2a2e738@citrix.com>
+ <CAMj1kXFTu+bV2kQhAyu15hrYai20NcBLb4Zu8XG2Y-XjL0f+rw@mail.gmail.com>
+ <1a8e69a7-89eb-4d36-94d6-0da662d8b72f@citrix.com>
+ <CAMj1kXEvmGy9RJo4s8tECsFj2dufZ8jBPoJOEtkcGUoj+x2qsw@mail.gmail.com>
+ <431a0b3a-47e5-4e61-a7fc-31cdf56f4e4c@citrix.com>
+ <20240223175449.GA1112@sol.localdomain>
+ <e641e2f1-16cf-4717-8a1f-8afac2644efe@citrix.com>
+ <20240223183004.GE1112@sol.localdomain>
+Date: Wed, 03 Apr 2024 09:32:02 -0700
+From: "Andy Lutomirski" <luto@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>,
+ "Andrew Cooper" <andrew.cooper3@citrix.com>
+Cc: "Ard Biesheuvel" <ardb@kernel.org>,
+ "Ross Philipson" <ross.philipson@oracle.com>,
+ "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+ "the arch/x86 maintainers" <x86@kernel.org>, linux-integrity@vger.kernel.org,
+ linux-doc@vger.kernel.org,
+ "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
+ kexec@lists.infradead.org, linux-efi@vger.kernel.org,
+ dpsmith@apertussolutions.com, "Thomas Gleixner" <tglx@linutronix.de>,
+ "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>,
+ "Matthew Garrett" <mjg59@srcf.ucam.org>,
+ James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, jarkko@kernel.org,
+ "Jason Gunthorpe" <jgg@ziepe.ca>,
+ "luto@amacapital.net" <luto@amacapital.net>,
+ "Arvind Sankar" <nivedita@alum.mit.edu>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>, davem@davemloft.net,
+ kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com
+Subject: Re: [PATCH v8 06/15] x86: Add early SHA support for Secure Launch early
+ measurements
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 3, 2024, at 17:17, Tom Lendacky wrote:
-> On 4/3/24 03:06, Arnd Bergmann wrote:
->> From: Arnd Bergmann <arnd@arndb.de>
->> 
->> When both ACPI and OF are disabled, the dev_vdata variable is unused:
->> 
->> drivers/crypto/ccp/sp-platform.c:33:34: error: unused variable 'dev_vdata' [-Werror,-Wunused-const-variable]
->> 
->> This is not a useful configuration, and there is not much point in saving
->> a few bytes when only one of the two is enabled, so just remove all
->> these ifdef checks and rely on of_match_node() and acpi_match_device()
->> returning NULL when these subsystems are disabled.
->> 
->> Fixes: 6c5063434098 ("crypto: ccp - Add ACPI support")
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+On Fri, Feb 23, 2024, at 10:30 AM, Eric Biggers wrote:
+> On Fri, Feb 23, 2024 at 06:20:27PM +0000, Andrew Cooper wrote:
+>> On 23/02/2024 5:54 pm, Eric Biggers wrote:
+>> > On Fri, Feb 23, 2024 at 04:42:11PM +0000, Andrew Cooper wrote:
+>> >> Yes, and I agree.=C2=A0 We're not looking to try and force this in=
+ with
+>> >> underhand tactics.
+>> >>
+>> >> But a blind "nack to any SHA-1" is similarly damaging in the oppos=
+ite
+>> >> direction.
+>> >>
+>> > Well, reviewers have said they'd prefer that SHA-1 not be included =
+and given
+>> > some thoughtful reasons for that.  But also they've given suggestio=
+ns on how to
+>> > make the SHA-1 support more palatable, such as splitting it into a =
+separate
+>> > patch and giving it a proper justification.
+>> >
+>> > All suggestions have been ignored.
+>>=20
+>> The public record demonstrates otherwise.
+>>=20
+>> But are you saying that you'd be happy if the commit message read
+>> something more like:
+>>=20
+>> ---8<---
+>> For better or worse, Secure Launch needs SHA-1 and SHA-256.
+>>=20
+>> The choice of hashes used lie with the platform firmware, not with
+>> software, and is often outside of the users control.
+>>=20
+>> Even if we'd prefer to use SHA-256-only, if firmware elected to start=
+ us
+>> with the SHA-1 and SHA-256 backs active, we still need SHA-1 to parse
+>> the TPM event log thus far, and deliberately cap the SHA-1 PCRs in or=
+der
+>> to safely use SHA-256 for everything else.
+>> ---
 >
-> Would using __maybe_unused on dev_vdata be the safer, easier choice?
+> Please take some time to read through the comments that reviewers have=
+ left on
+> previous versions of the patchset.
 
-It's a simpler change, but leaves the extra complexity that
-is not needed here.
+So I went and read through the old comments, and I'm lost.  In brief sum=
+mary:
 
-      Arnd
+If the hardware+firmware only supports SHA-1, then some reviewers would =
+prefer Linux not to support DRTM.  I personally think this is a bit sill=
+y, but it's not entirely unreasonable.  Maybe it should be a config opti=
+on?
+
+If the hardware+firmware does support SHA-256, then it sounds (to me, re=
+ading this -- I haven't dug into the right spec pages) that, for optimal=
+ security, something still needs to effectively turn SHA-1 *off* at runt=
+ime by capping the event log properly.  And that requires computing a SH=
+A-1 hash.  And, to be clear, (a) this is only on systems that already su=
+pport SHA-256 and that we should support and (b) *not* doing so leaves u=
+s potentially more vulnerable to SHA-1 attacks than doing so.  And no SH=
+A-256-supporting tooling will actually be compromised by a SHA-1 comprom=
+ise if we cap the event log.
+
+So is there a way forward?  Just saying "read through the comments" seem=
+s like a dead end.
+
+Thanks,
+Andy
