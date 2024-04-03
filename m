@@ -1,92 +1,156 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE8513666C;
-	Wed,  3 Apr 2024 10:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD8A146D53
+	for <linux-crypto@vger.kernel.org>; Wed,  3 Apr 2024 12:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712138755; cv=none; b=q749H9rnIGQClnA9djefcE2umHrZZsW0styM1G1An0gtWPdx12P94yU8/1C46AY3smY5q0Ub2A4oXxxeQe1gvDrvDe2guUfH+bJeYXrcL/kuPeDlrBBVFP/Jpo2NeDFtArxwaQPRbOXxzd/MXcW6joRsxY+9bOqT2GQrfPbLWTo=
+	t=1712148738; cv=none; b=f3KCnob24UQ+2puJrDMlNjfybs3oZKfYUJgDs7fLWmOz1Hzewtuh4nsd7rDGi8wXNZzb79qZqVR+CQUmFcC5Akn/2xwVs4eefuU2JUn8JgUJk5VHp5kUlVyfFkVAgEpahSQ7NW2rZf0CBWMVKmomFqdOzyg3bwAEpxAABz2lSFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712138755; c=relaxed/simple;
-	bh=6juDJaoMe0wdCGTDP0uluhcWqVlklCQTZZ0GR81b9kU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uv2Cfwzu/TvUmws6aQC1/IevLgCZSyxTF8uUaPWQGumQp6kq9vz/290Gqm0u8tUaaVfpKZYydwNsFRYYUoQsv4etFbMJCaLxWeztchABJhqjYFYWI/t8512SXy4kgc+Ii4b6IH/DmE9KKhbmVYscC2IcfPNrUDjeTiAH971Treo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4V8gKM1lP5zXkcR;
-	Wed,  3 Apr 2024 18:02:31 +0800 (CST)
-Received: from dggpemd200003.china.huawei.com (unknown [7.185.36.122])
-	by mail.maildlp.com (Postfix) with ESMTPS id DA9B6140F81;
-	Wed,  3 Apr 2024 18:05:28 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- dggpemd200003.china.huawei.com (7.185.36.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 3 Apr 2024 18:05:28 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <shenyang39@huawei.com>,
-	<songzhiqi1@huawei.com>, <qianweili@huawei.com>, <liushangbin@hisilicon.com>,
-	<linwenkai6@hisilicon.com>, <taoqi10@huawei.com>, <wangzhou1@hisilicon.com>,
-	<huangchenghai2@huawei.com>
-Subject: [PATCH 8/9] crypto: hisilicon/debugfs - Resolve the problem of applying for redundant space in sq dump
-Date: Wed, 3 Apr 2024 18:01:01 +0800
-Message-ID: <20240403100102.2735306-9-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240403100102.2735306-1-huangchenghai2@huawei.com>
-References: <20240403100102.2735306-1-huangchenghai2@huawei.com>
+	s=arc-20240116; t=1712148738; c=relaxed/simple;
+	bh=KTbI/ksSemO199S8nZZfV3jPhmS7kS2sBWwVojZaqVc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WYX2ZO5vpq4/4X5DfJL5uIZZtfflsTqrlhHOIW3KOG+rOaXoPbezfDM9fS0SREFIHRquL3r0vDbocQwH4CPcLAWtGNiX28jrX9iNHND1dQ8rNlL6pzCF80IEpht6RmQCzkV3R5BtUOWA498J4vs2m4hPPxDTh/17Uq3LXwxZpnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R1uATYUA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R1uATYUA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712148735;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Lzo04337+pWNqFR9KY5np7872oqctqWVTvayomhrVIY=;
+	b=R1uATYUA4ggZ7o57HmejgazGydMQqrOhLAogWxV9VLIPXHzT5jZ6huaOOhjOtULG4uYXi3
+	Hml9yLdtEpkBkDYxWuxBmef8sVhIkTEfeE8Pc3K0NeS+lF6Ef6XgCRc0ODDSSlDyioS4iC
+	be2DDKCT6N9CTqkfqjCES5AZTDW5gTo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-509-nH6tmWIxOsK7HYEHrRu-6g-1; Wed, 03 Apr 2024 08:52:13 -0400
+X-MC-Unique: nH6tmWIxOsK7HYEHrRu-6g-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3436714e286so1193185f8f.0
+        for <linux-crypto@vger.kernel.org>; Wed, 03 Apr 2024 05:52:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712148732; x=1712753532;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Lzo04337+pWNqFR9KY5np7872oqctqWVTvayomhrVIY=;
+        b=Uate+DbYdUvIvc0/vfiePirsetYCL5CIUe8f7AbJEAxu0PLmYXxCUjK1kau/rH/465
+         ZeC/LXJYEqcZeAGAomBjPHynVVTroEOBT20FtypnMzhV2FUm/Qh+SJh/t4myxcPs3olF
+         337B64LifyIlWv+7PmJIsCtmZ1NRZ2WpqARHhaGrVq8sXBnHGnHqQ0tVsw5shiCCEMIn
+         Ds5DJVx+ZSHmPwR1KN71rA43+wU9K2ip/dfQs73xMJzv31jKkshGjy/8kgWwT5eNxdKL
+         MuMhHOEdni0Wm96BJVO+NjSmbkfamLd36+br32DnjTMpDle0IoZxqX+RCL9KAvuuayY9
+         uCpg==
+X-Forwarded-Encrypted: i=1; AJvYcCUoULyetYVKU4WdESP7uOjlZ+mp6Lv3zMvEK5EWe8fyZW5jc9am9Lz79zBvcY0fK/gL/e9VzDP2f+E6OhXrFydE9ONFSI4vi1CGL2ou
+X-Gm-Message-State: AOJu0YzcVZtWKlSqExrRrHKIsTfEM0HZe927YE3rh9QtL6/mmeUhsAgd
+	Hs2LrdN1UU43zcvKGVR0Yur08XENvCa98iZDvA4yRt49Zj3G4VI0SS2ggAIiJhbnr0B6EIigVH3
+	hAYYMzfu8BA3s85ljz14XzOxeF5llrQAXfhtoZI7M3f3fZFKkjKqqzU9chzPRgNMu/01PcJYLQ4
+	mBKSeWN0oMiYMVae/KfcO5POnhp6DjIEutrrFr
+X-Received: by 2002:a5d:48cc:0:b0:33e:ca29:5a3 with SMTP id p12-20020a5d48cc000000b0033eca2905a3mr10071625wrs.23.1712148731978;
+        Wed, 03 Apr 2024 05:52:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF2UoNabPuQYMXaCFPaD8DdCLeElDGS9RU+nviM9wFLu/qKDV0J6kv+wy2lYCLkobeqVDalIcJhUKiwuGQdPuY=
+X-Received: by 2002:a5d:48cc:0:b0:33e:ca29:5a3 with SMTP id
+ p12-20020a5d48cc000000b0033eca2905a3mr10071597wrs.23.1712148731603; Wed, 03
+ Apr 2024 05:52:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemd200003.china.huawei.com (7.185.36.122)
+References: <20240329225835.400662-1-michael.roth@amd.com> <20240329225835.400662-12-michael.roth@amd.com>
+ <8c3685a6-833c-4b3c-83f4-c0bd78bba36e@redhat.com> <20240401222229.qpnpozdsr6b2sntk@amd.com>
+ <20240402225840.GB2444378@ls.amr.corp.intel.com>
+In-Reply-To: <20240402225840.GB2444378@ls.amr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 3 Apr 2024 14:51:59 +0200
+Message-ID: <CABgObfb4fQpUTzhpX9Bkcu0_+bOcCSCtuy+5-rttTLm-bY8i2w@mail.gmail.com>
+Subject: Re: [PATCH v12 11/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+To: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+	seanjc@google.com, vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, Xu Yilun <yilun.xu@linux.intel.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	isaku.yamahata@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When dumping SQ, only the corresponding ID's SQE needs to be
-dumped, and there is no need to apply for the entire SQE
-memory. This is because excessive dump operations can lead to
-memory resource waste.
+On Wed, Apr 3, 2024 at 12:58=E2=80=AFAM Isaku Yamahata <isaku.yamahata@inte=
+l.com> wrote:
+> I think TDX can use it with slight change. Pass vcpu instead of KVM, page=
+ pin
+> down and mmu_lock.  TDX requires non-leaf Secure page tables to be popula=
+ted
+> before adding a leaf.  Maybe with the assumption that vcpu doesn't run, G=
+FN->PFN
+> relation is stable so that mmu_lock isn't needed? What about punch hole?
+>
+> The flow would be something like as follows.
+>
+> - lock slots_lock
+>
+> - kvm_gmem_populate(vcpu)
+>   - pin down source page instead of do_memcopy.
 
-Therefor apply for the space corresponding to sqe_id separately
-to avoid space waste.
+Both pinning the source page and the memcpy can be done in the
+callback.  I think the right thing to do is:
 
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
----
- drivers/crypto/hisilicon/debugfs.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+1) eliminate do_memcpy, letting AMD code taking care of
+   copy_from_user.
 
-diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
-index e9fa42381242..8e259ed4aecd 100644
---- a/drivers/crypto/hisilicon/debugfs.c
-+++ b/drivers/crypto/hisilicon/debugfs.c
-@@ -320,17 +320,16 @@ static int qm_sq_dump(struct hisi_qm *qm, char *s, char *name)
- 	if (ret)
- 		return ret;
- 
--	sqe = kzalloc(qm->sqe_size * sq_depth, GFP_KERNEL);
-+	sqe = kzalloc(qm->sqe_size, GFP_KERNEL);
- 	if (!sqe)
- 		return -ENOMEM;
- 
- 	qp = &qm->qp_array[qp_id];
--	memcpy(sqe, qp->sqe, qm->sqe_size * sq_depth);
--	sqe_curr = sqe + (u32)(sqe_id * qm->sqe_size);
--	memset(sqe_curr + qm->debug.sqe_mask_offset, QM_SQE_ADDR_MASK,
-+	memcpy(sqe, qp->sqe + sqe_id * qm->sqe_size, qm->sqe_size);
-+	memset(sqe + qm->debug.sqe_mask_offset, QM_SQE_ADDR_MASK,
- 	       qm->debug.sqe_mask_len);
- 
--	dump_show(qm, sqe_curr, qm->sqe_size, name);
-+	dump_show(qm, sqe, qm->sqe_size, name);
- 
- 	kfree(sqe);
- 
--- 
-2.30.0
+2) pass to the callback only gfn/pfn/src, where src is computed as
+
+    args->src ? args->src + i * PAGE_SIZE : NULL
+
+If another architecture/vendor needs do_memcpy, they can add
+something like kvm_gmem_populate_copy.
+
+>   - get pfn with __kvm_gmem_get_pfn()
+>   - read lock mmu_lock
+>   - in the post_populate callback
+>     - lookup tdp mmu page table to check if the table is populated.
+>       lookup only version of kvm_tdp_mmu_map().
+>       We need vcpu instead of kvm.
+
+Passing vcpu can be done using the opaque callback argument to
+kvm_gmem_populate.
+
+Likewise, the mmu_lock can be taken by the TDX post_populate
+callback.
+
+Paolo
+
+>     - TDH_MEM_PAGE_ADD
+>   - read unlock mmu_lock
+>
+> - unlock slots_lock
+>
+> Thanks,
+>
+> > With that model, the potential for using kvm_gmem_populate() seemed
+> > plausible to I was trying to make it immediately usable for that
+> > purpose. But maybe the TDX folks can confirm whether this would be
+> > usable for them or not. (kvm_gmem_populate was introduced here[2] for
+> > reference/background)
+> >
+> > -Mike
+> >
+> > [1] https://lore.kernel.org/kvm/20240319155349.GE1645738@ls.amr.corp.in=
+tel.com/T/#m8580d8e39476be565534d6ff5f5afa295fe8d4f7
+> > [2] https://lore.kernel.org/kvm/20240329212444.395559-3-michael.roth@am=
+d.com/T/#m3aeba660fcc991602820d3703b1265722b871025)
 
