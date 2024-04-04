@@ -1,121 +1,146 @@
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485A783CA2
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Apr 2024 11:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330CC823D0;
+	Thu,  4 Apr 2024 14:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712230893; cv=none; b=LdEVc0L8BVkBf93QHwbwLh/U6YUUOfpas+mlQC2qdxXWagjPqty8YT4KAajOTpbbLRpNNi1WijgvRkSzfVAdoF4yLqlmspnh2oHS8E7ZAccFmoVcVQUhRKQfc5h7cFQenvNimSK8xy4IJYIgRyGZxNlFCBTwRjRKXOPjBEu51Ps=
+	t=1712240389; cv=none; b=IGA3QEFmA//ILjbktITyORDvCKayCZFYvVeiSFkUEoK2OkNZhIft2qgxRC1RIuuwzNL/59/kUDb8uiH1O3ZgbyviZigSCU5QabBNnEcsLjH3sixC+pScz3fJfAXA7OGYealvPuK5fNettBu+JMCJBCNmZhHOlioYVrITVUP/9jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712230893; c=relaxed/simple;
-	bh=xTu/IdCn/048THaVHddyM991QlKheudeHaOzDUEba/4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CbnfdACCpKM7Uc4gFzSIuRFwmKigKjPc5Isqa3rKxlnO63rflNgyWp4oa0Igwxjgy2oh4JUrhAaah0aW3A+CPVh9rXkfOvXd7DPrtRkicJR4IW2sgEQ52w1orcJR64JjxayzrJEsSVFNY9/+GTeLqwau8Gxc92lTxEoXyw1GGzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BzpYfce4; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1712240389; c=relaxed/simple;
+	bh=7n10ky3Ncdz6Lw03XqsMc0gUi5tPtH8zOClFhAgRNDA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SBMzwEg8DuKh7X6yXg6p8+HW0yNKJe+A/htkJOM5/R/XjJ2POdnvcjT9iZjojh1kf8D/DjhSM375dTaBIwOgLA8phK3IyNUmawjA1CjVgGkdf6DJR8DI7rMvSUowborOE5ckUS7AuJicTWDfe+TOjD0b1arm5cnRdSUIdQVxaxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Xk+S9dw+; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BzpYfce4"
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dcc80d6004bso1019456276.0
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Apr 2024 04:41:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712230889; x=1712835689; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xTu/IdCn/048THaVHddyM991QlKheudeHaOzDUEba/4=;
-        b=BzpYfce4q/zv0gCorIvWLSXuzW4HjLtqKmXuLtELMIG7pv5Gw5rD2es8aCVqQFqD//
-         8JggHBzNznjWgNLq2nD9WBWW0NsYaidmHqnL2ihAYJpv7o5gc1VJY6DJ0clWC7aekflL
-         okxkVaJGNSO0qVH2yOxsFJLCq+7hYpnwhkr7HgXgiRTKZmRNaOv51pSZ+2EvNJ7l32Ax
-         3rV1o60Rwqf7/3WoHSX+9OLMYTDALVEnxQwPAvQSTwkL+2+b5q+pMv+fOiTCP+zwNcc+
-         ViJk4rxb2Vw07nE8VHUP+XT2krjKR9JIgTGsriDdaif1hRFImGjHsjVSH1La3PcFbNJH
-         hkUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712230889; x=1712835689;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xTu/IdCn/048THaVHddyM991QlKheudeHaOzDUEba/4=;
-        b=UvGqyMtj5ru97h2Fl3DClzNQm+LW+7DEBVEOsd0XF2sCtFkIzMkJAb0RK1IO/qlzH9
-         7hQmkL2YN+tzC2XDUn4EGKP2bCirF9k61X/UjUyiO3tIqSXV7vfYL3QqVwt3IxZBrlKF
-         LOBuGk/ysgmYqgU3dlwejEo9fpJtINnuSc9hAcfcMsv0Ls1cbPe/4iMVVTGEJkEBGOp7
-         HjFHn0fB7gXmVQxqUfaxpdNPi38c+lwYjUibqZ7Evw9WkkUqOqwJGVtO2wsBs1CqUdJt
-         Cqbk6n33tBUalH8PK8lYsIP+O8FIzfVsa/MUiOLNEuUpGsZfRlJ0TsGDjVLUcMACAfSE
-         qaRg==
-X-Forwarded-Encrypted: i=1; AJvYcCUI9uitRFGvlImH7/jrzvf1dp8fZmajgfH1ONy4FZzps/OPF8WmSupmkYaqosXd+QY8ue52WNcTJfPzQopEzpWUltkXCiUduXAKmTI9
-X-Gm-Message-State: AOJu0YyzEm3bbe6P5FWgnb6LgOcN3w25cVYLFuTMqn9kHzJyUusbngnp
-	qWVpTD370Pm24QJ/1elcjEWYOKIU6RKOdrMY+dzKIldDP4g7XJ1glWyoIScPE9SjeT0obHkejkl
-	hO1b+9WYVCvbYilJoT+HuPhB2a0IhOJ9Vu7z77g==
-X-Google-Smtp-Source: AGHT+IEhL+O4bSIOCRsSy+Vdywn61xtrVBJ3li47sHwN1FOt8H7g9W+tj2/Or7rao9/9euGeRsXbtXq4vPMz7+GnZRc=
-X-Received: by 2002:a25:ba86:0:b0:dd1:6fab:81e4 with SMTP id
- s6-20020a25ba86000000b00dd16fab81e4mr2034373ybg.37.1712230889318; Thu, 04 Apr
- 2024 04:41:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Xk+S9dw+"
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 434EHB1j015894;
+	Thu, 4 Apr 2024 14:19:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=RaKwIs0VmiY7LXrvkCeRa3Sg2tsbMlNxX8BZdybEUJU=;
+ b=Xk+S9dw+etWO2vu9S/obXQIGRw+mhbYjEqwyormYkGH7kFMJw1bPmXI9S2eGNLlEfXEL
+ 0q7vot4fe8S/HjjO/fo5q5+SKsTuesN5xnH4ND3cC/uB0DUUxG6kEZc3BCBkR9X6IwbF
+ 315lN2PdlQyxv9WIHsIwHxuFU7ZAx/DZkzrybWp5pRlgD3DDALodUFJgz3gv0+XkuSbX
+ PBZUj4Og9ZV9+BuM5erd2J4ih4wEzpkN6RKIbD0n8jUfW/KtmWdAQE2xtCtgGugUbG8R
+ 0l2I1BIDQi8Q6ir4c0OWKc2TVC8sV+XLIgeKeCqths8NMbr9daP6/1Mcm4C1KuYfjEmQ fQ== 
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9wu1g04m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Apr 2024 14:19:35 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 434Dcuuo007713;
+	Thu, 4 Apr 2024 14:19:34 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x9epwmjef-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Apr 2024 14:19:34 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 434EJVRN28770824
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 4 Apr 2024 14:19:34 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E3DB858062;
+	Thu,  4 Apr 2024 14:19:31 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 107CA58056;
+	Thu,  4 Apr 2024 14:19:31 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  4 Apr 2024 14:19:30 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.ibm.com>
+To: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br, lukas@wunner.de,
+        bbhushan2@marvell.com, jarkko@kernel.org,
+        Stefan Berger <stefanb@linux.ibm.com>
+Subject: [PATCH v8 01/13] crypto: ecc - Use ECC_CURVE_NIST_P192/256/384_DIGITS where possible
+Date: Thu,  4 Apr 2024 10:18:44 -0400
+Message-ID: <20240404141856.2399142-2-stefanb@linux.ibm.com>
+X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240404141856.2399142-1-stefanb@linux.ibm.com>
+References: <20240404141856.2399142-1-stefanb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org> <20240331-module-owner-virtio-v2-12-98f04bfaf46a@linaro.org>
-In-Reply-To: <20240331-module-owner-virtio-v2-12-98f04bfaf46a@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 4 Apr 2024 13:41:18 +0200
-Message-ID: <CACRpkdYpVUq1SgxnPVfRdTiNg3o8dcBePxoxu9GRYy6LdzUE5A@mail.gmail.com>
-Subject: Re: [PATCH v2 12/25] gpio: virtio: drop owner assignment
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, 
-	David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
-	"David S. Miller" <davem@davemloft.net>, Sudeep Holla <sudeep.holla@arm.com>, 
-	Cristian Marussi <cristian.marussi@arm.com>, Viresh Kumar <vireshk@kernel.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>, 
-	Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu <olvaffe@gmail.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, Daniel Vetter <daniel@ffwll.ch>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Joerg Roedel <joro@8bytes.org>, 
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Alexander Graf <graf@amazon.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
-	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, "James E.J. Bottomley" <jejb@linux.ibm.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal <vgoyal@redhat.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, virtualization@lists.linux.dev, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, 
-	netdev@vger.kernel.org, v9fs@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
-	linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
-	linux-sound@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Viresh Kumar <viresh.kumar@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: a8oYxE7yFiZSQH7FlexhcJqp5SRSRGYH
+X-Proofpoint-GUID: a8oYxE7yFiZSQH7FlexhcJqp5SRSRGYH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-04_10,2024-04-04_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ clxscore=1015 mlxlogscore=999 adultscore=0 spamscore=0 suspectscore=0
+ impostorscore=0 bulkscore=0 priorityscore=1501 lowpriorityscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404040098
 
-On Sun, Mar 31, 2024 at 10:45=E2=80=AFAM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
+Replace hard-coded numbers with ECC_CURVE_NIST_P192/256/384_DIGITS where
+possible.
 
-> virtio core already sets the .owner, so driver does not need to.
->
-> Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Tested-by: Lukas Wunner <lukas@wunner.de>
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ crypto/ecc.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Acked-by: Linus Walleij <linus.walleij@linaro.org>
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index 3581027e9f92..01aa70e97e55 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -689,7 +689,7 @@ static void vli_mmod_barrett(u64 *result, u64 *product, const u64 *mod,
+ static void vli_mmod_fast_192(u64 *result, const u64 *product,
+ 			      const u64 *curve_prime, u64 *tmp)
+ {
+-	const unsigned int ndigits = 3;
++	const unsigned int ndigits = ECC_CURVE_NIST_P192_DIGITS;
+ 	int carry;
+ 
+ 	vli_set(result, product, ndigits);
+@@ -717,7 +717,7 @@ static void vli_mmod_fast_256(u64 *result, const u64 *product,
+ 			      const u64 *curve_prime, u64 *tmp)
+ {
+ 	int carry;
+-	const unsigned int ndigits = 4;
++	const unsigned int ndigits = ECC_CURVE_NIST_P256_DIGITS;
+ 
+ 	/* t */
+ 	vli_set(result, product, ndigits);
+@@ -800,7 +800,7 @@ static void vli_mmod_fast_384(u64 *result, const u64 *product,
+ 				const u64 *curve_prime, u64 *tmp)
+ {
+ 	int carry;
+-	const unsigned int ndigits = 6;
++	const unsigned int ndigits = ECC_CURVE_NIST_P384_DIGITS;
+ 
+ 	/* t */
+ 	vli_set(result, product, ndigits);
+@@ -932,13 +932,13 @@ static bool vli_mmod_fast(u64 *result, u64 *product,
+ 	}
+ 
+ 	switch (ndigits) {
+-	case 3:
++	case ECC_CURVE_NIST_P192_DIGITS:
+ 		vli_mmod_fast_192(result, product, curve_prime, tmp);
+ 		break;
+-	case 4:
++	case ECC_CURVE_NIST_P256_DIGITS:
+ 		vli_mmod_fast_256(result, product, curve_prime, tmp);
+ 		break;
+-	case 6:
++	case ECC_CURVE_NIST_P384_DIGITS:
+ 		vli_mmod_fast_384(result, product, curve_prime, tmp);
+ 		break;
+ 	default:
+-- 
+2.43.0
 
-Yours,
-Linus Walleij
