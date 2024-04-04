@@ -1,165 +1,100 @@
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29FAB13C3DE
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Apr 2024 23:16:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF0A130A7F;
+	Thu,  4 Apr 2024 23:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712272591; cv=none; b=KETe4rUeJsWM25UCMlSEunL/yRfE0kaacPdZgndGxp306DPI9WHFzIdg4QfgKJRnuubIwmC/UMMYuI4G72OVXWdO2w+WyYaXsTQHu4J21nJrRvZqCrItA84135DnbxlQIndez4gPtbNoNUy0NdahB8C7JXE2Qb+YXK/tH5XXiik=
+	t=1712273763; cv=none; b=S2VPRr0HiGCbioW+wBIkpoaS0xEnzl1Yr+O9M3LURRMAehZIx7bFscw/pyy8vjSVsDeQsckdHMd6VmA8vHq2JF98b6w9P/3ADqDY/rTG8sQTNpVlfsUjOVAipPBFruvpoNGFeHeNVExhE7DdJNPtCqK+VUcTX+gHmNyDlcYkadg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712272591; c=relaxed/simple;
-	bh=APEooEWI1lH4C+bL4GyHHSZ5KchOvO14ONUoet0RRr0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cRhfsrWfcvdf0Ws96JVvKVoHN3/I2B8uhIH1HC8icJnJpLFDJAZE6NTTvJ6FuoenNMJAKf6xDpxocsLnRIXUUx/BlU4N7Picvo/uSE03JEJ8JAhR5jvfkQQXqK4CUvaR9DmjF2JOSKJ24c6j5wHWVN+8zfkPYiUS/yKigm3Iumw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GhQB4Lr2; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1712273763; c=relaxed/simple;
+	bh=c4dlqL7Ifu1XCWKPZneuO2tG29yIvg4/flcQpTb0TNk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JbqReZOQZCNPyjdZ8TCm6vMoeyG3f76Nd8qMfaqzGVXaitrojKnvB0/c6dvAu8HgHXhpf94TO5G5ODuk1SjViCgZI874PJrQY2fRmmpK3KF6fmXEIRs+SJf+1KQl5XKBemG8khTERWvvdgiUG74HWevYVDLflPe7ZLI5GF9BDAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a0UVbGX4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GhQB4Lr2"
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dcd7c526cc0so1638552276.1
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Apr 2024 16:16:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712272588; x=1712877388; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=px33Bjt2eInHJiP0NeuRgUTO3pjhGqqLrEOvRjM23DI=;
-        b=GhQB4Lr2TOfRJr0yIbGk1UCRhhyf/EKVpCXPZqXmV/XkgG3+Ip4CUhh5q4gr0g9aWQ
-         bi/MtONwHxDMZ2USmEekynhmPdIj7XimYzkMyO6YIhdhd8laosX9Kqavzc0sEGt4s393
-         x3jIewExo36NNhoGC8fa0dDVejtUCmH++FNYSfkbwZ/UmhgU1sdlt3bN2hQJz5ko/8/2
-         ObAiMXaSN6L+F4xGADKQcR60IRWI0WYZxrQoJLkbTK4kPXRxqPMACqxkEQFVlYIVb5E4
-         NZ/mGrhb+ljA8cMBS1XGt9r2KxFFWpC0uxhpGDOwu+7sHOeMPE3IS3bKmZETlEo4VFCK
-         XvLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712272588; x=1712877388;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=px33Bjt2eInHJiP0NeuRgUTO3pjhGqqLrEOvRjM23DI=;
-        b=r4T35MY3y3yiO60Ax/z3abC8Usn3QceH1KZ23HRVmpPU4hL4ejPj9Kp6ck/ZQE7HbZ
-         hSiPHefwRoyEnrk9Wxb0u2oMw+c1IKX5BQfpZeFhUgO+iyCwQw/330FwZbowegIVGMve
-         junMNWItFAgzLExjYXKhmZzeGasYEzZgpontG+Dz2OpY9oSgduWCSou5J8a8wvz7Go2G
-         H9ZTlD9lrBUSCtvz8Jfp/4y15uOg1Erl+4JbFZCqEpPwtUuIA/5Fhkhe58Ha+HIcoS7a
-         CK1GB0b8cfIHt9CiED2cqn8WGCE1qrsBCaY84s/OaplTcXnRAawfoyHwZUUNP5kxa0Ql
-         Sdew==
-X-Forwarded-Encrypted: i=1; AJvYcCVwH6XqVndz+89zblisV0E26Lv78QGvGeFOESU+FkBwKpSTSgcGbSHgve0EXMpS3IZ70Vv8VhGRrrfXa3KaxqxgCyUX4fM1hV89mf8s
-X-Gm-Message-State: AOJu0YxGLFiNONjiJCKm6eXok6EjdDUYT5fZzTyJOc585zZdv2/ySOib
-	ZlYhntDJt1k1xxhzhI4F0any+2Tx0qlU0umshV/s0HzOf8626pvVIhqDJYMXhgiuI3+Hy1imKdI
-	AmO6kAHE/shay5DaaAjmIQg630H39yIFHroXh
-X-Google-Smtp-Source: AGHT+IFqOT0sdB5Mq8Em3ez8wUqwsDenflcnFBaGGydYTj8cPQz4oQR3/fK7VmQ9yLCyTSRCqikRdMTTYcQR8Kj+db8=
-X-Received: by 2002:a25:c7c6:0:b0:dcc:d5aa:af36 with SMTP id
- w189-20020a25c7c6000000b00dccd5aaaf36mr1095387ybe.44.1712272587959; Thu, 04
- Apr 2024 16:16:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a0UVbGX4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8912AC433C7;
+	Thu,  4 Apr 2024 23:36:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712273763;
+	bh=c4dlqL7Ifu1XCWKPZneuO2tG29yIvg4/flcQpTb0TNk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=a0UVbGX4dyn+lgNOBxBq4IvZRC5S1u0CKnXM25Oh0X2vVpbFBowe338pOPoUZ5JP5
+	 ldMIgl+qUtcymPGNKRDoRvhbBe4MitIO1as1mGQVFqBS3x69CyLKhhb1PHU7Npxfjm
+	 bGOrJqiIPlao8TDDyLu6b0CvnRMO5Uqakf9YJg1Lfa4DX49anqUd+EUMUMXUujDkdH
+	 YXeVPWLl0MbkZIHoFBtcT1Rq8R42kyUCJ8NWDVxVihNJbKskA0/qK/247vmwogOI91
+	 niF4eFrw2ckNf9fnKBV04HrQ5HjMvolN7dx83EBu8txyRVw+QoGbVVzUOqX8CXClUI
+	 TQni90w4qoXhw==
+Date: Thu, 4 Apr 2024 19:36:00 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	Andy Lutomirski <luto@kernel.org>,
+	"Chang S . Bae" <chang.seok.bae@intel.com>
+Subject: Re: [PATCH v2 6/6] crypto: x86/aes-xts - wire up VAES + AVX10/512
+ implementation
+Message-ID: <20240404233600.GA746@quark.localdomain>
+References: <20240329080355.2871-1-ebiggers@kernel.org>
+ <20240329080355.2871-7-ebiggers@kernel.org>
+ <f5461df0-6609-42db-850c-de6a32728fe2@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404165404.3805498-1-surenb@google.com> <Zg7dmp5VJkm1nLRM@casper.infradead.org>
- <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
- <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
- <Zg8qstJNfK07siNn@casper.infradead.org> <jb25mtkveqf63bv74jhynf6ncxmums5s37esveqsv52yurh4z7@5q55ttv34bia>
- <20240404154150.c25ba3a0b98023c8c1eff3a4@linux-foundation.org> <jpaw4hdd73ngt7mvtcdryqscivx6m2ic76ikfkcopceb47becp@vox5czt5bec3>
-In-Reply-To: <jpaw4hdd73ngt7mvtcdryqscivx6m2ic76ikfkcopceb47becp@vox5czt5bec3>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Thu, 4 Apr 2024 16:16:15 -0700
-Message-ID: <CAJuCfpF10COO2nh1nt3CcaZOFe4iSXszsup+a0qAEQ1ngyy5tQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
- the call site
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Matthew Wilcox <willy@infradead.org>, joro@8bytes.org, 
-	will@kernel.org, trond.myklebust@hammerspace.com, anna@kernel.org, 
-	arnd@arndb.de, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	jikos@kernel.org, benjamin.tissoires@redhat.com, tytso@mit.edu, jack@suse.com, 
-	dennis@kernel.org, tj@kernel.org, cl@linux.com, jakub@cloudflare.com, 
-	penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com, 
-	vbabka@suse.cz, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-ext4@vger.kernel.org, linux-mm@kvack.org, 
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f5461df0-6609-42db-850c-de6a32728fe2@intel.com>
 
-On Thu, Apr 4, 2024 at 4:01=E2=80=AFPM Kent Overstreet
-<kent.overstreet@linux.dev> wrote:
->
-> On Thu, Apr 04, 2024 at 03:41:50PM -0700, Andrew Morton wrote:
-> > On Thu, 4 Apr 2024 18:38:39 -0400 Kent Overstreet <kent.overstreet@linu=
-x.dev> wrote:
-> >
-> > > On Thu, Apr 04, 2024 at 11:33:22PM +0100, Matthew Wilcox wrote:
-> > > > On Thu, Apr 04, 2024 at 03:17:43PM -0700, Suren Baghdasaryan wrote:
-> > > > > Ironically, checkpatch generates warnings for these type casts:
-> > > > >
-> > > > > WARNING: unnecessary cast may hide bugs, see
-> > > > > http://c-faq.com/malloc/mallocnocast.html
-> > > > > #425: FILE: include/linux/dma-fence-chain.h:90:
-> > > > > + ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chai=
-n),
-> > > > > GFP_KERNEL))
-> > > > >
-> > > > > I guess I can safely ignore them in this case (since we cast to t=
-he
-> > > > > expected type)?
-> > > >
-> > > > I find ignoring checkpatch to be a solid move 99% of the time.
-> > > >
-> > > > I really don't like the codetags.  This is so much churn, and it co=
-uld
-> > > > all be avoided by just passing in _RET_IP_ or _THIS_IP_ depending o=
-n
-> > > > whether we wanted to profile this function or its caller.  vmalloc
-> > > > has done it this way since 2008 (OK, using __builtin_return_address=
-())
-> > > > and lockdep has used _THIS_IP_ / _RET_IP_ since 2006.
-> > >
-> > > Except you can't. We've been over this; using that approach for traci=
-ng
-> > > is one thing, using it for actual accounting isn't workable.
-> >
-> > I missed that.  There have been many emails.  Please remind us of the
-> > reasoning here.
->
-> I think it's on the other people claiming 'oh this would be so easy if
-> you just do it this other way' to put up some code - or at least more
-> than hot takes.
->
-> But, since you asked - one of the main goals of this patchset was to be
-> fast enough to run in production, and if you do it by return address
-> then you've added at minimum a hash table lookup to every allocate and
-> free; if you do that, running it in production is completely out of the
-> question.
->
-> Besides that - the issues with annotating and tracking the correct
-> callsite really don't go away, they just shift around a bit. It's true
-> that the return address approach would be easier initially, but that's
-> not all we're concerned with; we're concerned with making sure
-> allocations get accounted to the _correct_ callsite so that we're giving
-> numbers that you can trust, and by making things less explicit you make
-> that harder.
->
-> Additionally: the alloc_hooks() macro is for more than this. It's also
-> for more usable fault injection - remember every thread we have where
-> people are begging for every allocation to be __GFP_NOFAIL - "oh, error
-> paths are hard to test, let's just get rid of them" - never mind that
-> actually do have to have error paths - but _per callsite_ selectable
-> fault injection will actually make it practical to test memory error
-> paths.
->
-> And Kees working on stuff that'll make use of the alloc_hooks() macro
-> for segregating kmem_caches.
+On Thu, Apr 04, 2024 at 01:34:04PM -0700, Dave Hansen wrote:
+> On 3/29/24 01:03, Eric Biggers wrote:
+> > +static const struct x86_cpu_id zmm_exclusion_list[] = {
+> > +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_SKYLAKE_X },
+> > +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_X },
+> > +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_D },
+> > +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE },
+> > +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_L },
+> > +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_NNPI },
+> > +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_TIGERLAKE_L },
+> > +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_TIGERLAKE },
+> > +	/* Allow Rocket Lake and later, and Sapphire Rapids and later. */
+> > +	/* Also allow AMD CPUs (starting with Zen 4, the first with AVX-512). */
+> > +	{},
+> > +};
+> 
+> A hard-coded model/family exclusion list is not great.
+> 
+> It'll break when running in guests on newer CPUs that fake any of these
+> models.  Some folks will also surely disagree with the kernel policy
+> implemented here.
+> 
+> Is there no way to implement this other than a hard-coded kernel policy?
 
-Yeah, that pretty much summarizes it. Note that we don't have to make
-the conversions in this patch and accounting will still work but then
-all allocations from different callers will be accounted to the helper
-function and that's less useful than accounting at the call site.
-It's a sizable churn but the conversions are straight-forward and we
-do get accurate, performant and easy to use memory accounting.
+Besides the hardcoded CPU exclusion list, the options are:
 
->
-> This is all stuff that I've explained before; let's please dial back on
-> the whining - or I'll just bookmark this for next time...
+1. Never use zmm registers.
+
+2. Ignore the issue and use zmm registers even on these CPU models.  Systemwide
+   performance may suffer due to downclocking.
+
+3. Do a runtime test to detect whether using zmm registers causes downclocking.
+   This seems impractical.
+
+4. Keep the proposed policy as the default behavior, but allow it to be
+   overridden on the kernel command line.  This would be a bit more flexible;
+   however, most people don't change defaults anyway.
+
+When you write "Some folks will also surely disagree with the kernel policy
+implemented here", are there any specific concerns that you anticipate?  Note
+that Intel has acknowledged the zmm downclocking issues on Ice Lake and
+suggested that using ymm registers instead would be reasonable:
+https://lore.kernel.org/linux-crypto/e8ce1146-3952-6977-1d0e-a22758e58914@intel.com/
+
+If there is really a controversy, my vote is that for now we just go with option
+(1), i.e. drop this patch from the series.  We can reconsider the issue when a
+CPU is released with better 512-bit support.
+
+- Eric
