@@ -1,84 +1,152 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0696F077
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Apr 2024 22:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FB453362;
+	Thu,  4 Apr 2024 22:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712270328; cv=none; b=i41x71HVXiOwfRaD1/nwFISTQVtnHn3911coYumC2htD8WtH/62yblwbb7JJJmUspvHoqW0cCjbPFPCxWMq7q0Eize/eiVlpFw+2uWnW0oyl9RJWscn2d794mBK26tNgvhGwPw7SrrjBkO2GGdx9GbyNYTIMivsC0RbH+EFhVWg=
+	t=1712270458; cv=none; b=dsPhNhicpc2ZGc7DZqpwLYEf3a4MF389bBRF3Upk4CjXCLRNbUQSUP6RrP/PsoHVhd0suacyVN5S73GqWOH1hJk9Sny4eCnNRGrAZp7f/Na7jFaodGp5v5X7BgjswgwPlpQIV2WWhiKrDP7CF94OyYOF1G14qSbCx5raTUOiitY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712270328; c=relaxed/simple;
-	bh=5V6KdJOeWNM6RltGMxp3KI42sNBK0iidSHrpwfSYyXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FpNAMhOi9JY3APBStQU7cTEt+xEuoQQIjAunHASNRcLHnGEES0enKr8ty+ZKITc1Z+8HJ1yvI6+ICEaciRlLahkUmSqx3mxNakLDu5TCf3F3PUVu6/0gZNiv+r4r3QPkZnKYTBSNuQpO827K8/ad9Crfoggk/sKuYVQ/8WgVluE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SAUxTGyw; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1712270458; c=relaxed/simple;
+	bh=DoIlRKwTL8vbnbGM7jECgkzATCO3fQBe1AnqLyBEHww=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:Mime-Version; b=hvdtWGLiPm557JGiRinvU0n83l4s9VspQxBgj3bLHtX0yDFcsDc+60+DVOkaVEPTRXXHVq/dO4S2x49e476/+1LNzgD2Gv+PzaecoGKrQ4nhxNn2HGMFYuMKUTmVJw/DPCPI9bwgEKs7TMPxhdyZ6ySWOY9P7vOXi7n7GPWcD7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=M4oH4Elk; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SAUxTGyw"
-Date: Thu, 4 Apr 2024 18:38:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712270325;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IqILBVwfm/nA4Dp8fGsnDYqiRoHSDvITblhlFgVtQ+U=;
-	b=SAUxTGywnGO9lMg36Yb2FwCo9q4MLPvWVKliB8A6cH5w/sjrb/WdTd6Umo4zcLkMSBRK1Q
-	BE0UEDKEnFkNBgE9qd83+0tLNc30wXqJ2yWdjs62ognxJed0Ch4bu2Pl0Pyyj1mKJMqNpR
-	JfY1MW4y033OYjfXMya1y+rxPLYogzs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Suren Baghdasaryan <surenb@google.com>, akpm@linux-foundation.org, 
-	joro@8bytes.org, will@kernel.org, trond.myklebust@hammerspace.com, 
-	anna@kernel.org, arnd@arndb.de, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	jikos@kernel.org, benjamin.tissoires@redhat.com, tytso@mit.edu, jack@suse.com, 
-	dennis@kernel.org, tj@kernel.org, cl@linux.com, jakub@cloudflare.com, 
-	penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com, vbabka@suse.cz, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, iommu@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-input@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	linux-mm@kvack.org, netdev@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
- the call site
-Message-ID: <jb25mtkveqf63bv74jhynf6ncxmums5s37esveqsv52yurh4z7@5q55ttv34bia>
-References: <20240404165404.3805498-1-surenb@google.com>
- <Zg7dmp5VJkm1nLRM@casper.infradead.org>
- <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
- <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
- <Zg8qstJNfK07siNn@casper.infradead.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="M4oH4Elk"
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 434McIDm029658;
+	Thu, 4 Apr 2024 22:40:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=tQRre0KXLGsI11sDwmF5qub2ia0q8UziRDhc9OD5urk=;
+ b=M4oH4ElkTj3nRz/tWL9Kff0Xl88bJ/Rs677rlZiTTNDA19IJBT8tOpddOdjP8nKzUXWs
+ fEOWkVSANpGC5FcBGZTu5i1OtA1f6weWKP9cWRRQCwSFpcwLNh3JBenmFL2VBA2IK1Z2
+ b1YgHJTT9BPSq5LsFlIPdInLv+ijO/n9tQnp2pYNaufpc29BW1snzyWNERcTdgehKvLT
+ LyNb2N4VmJbDMYsQqrsoXEIgBnbYEJLtZXwVwptoM2Hkp0eoX937LrPPB9CTzLWCOY66
+ DwFokZ687u/NljptomUpJGRhwEVbdTKrfEY1li52sigLAiP/tIrvsBYmjFnIdd9CWt2S qg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xa55mg059-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Apr 2024 22:40:21 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 434MeKfs032203;
+	Thu, 4 Apr 2024 22:40:20 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xa55mg056-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Apr 2024 22:40:20 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 434MZIZf003659;
+	Thu, 4 Apr 2024 22:40:19 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3x9epyf1js-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Apr 2024 22:40:19 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 434MeGZY13107966
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 4 Apr 2024 22:40:18 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A487A5803F;
+	Thu,  4 Apr 2024 22:40:16 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D2CC658062;
+	Thu,  4 Apr 2024 22:40:14 +0000 (GMT)
+Received: from li-5cd3c5cc-21f9-11b2-a85c-a4381f30c2f3.ibm.com (unknown [9.61.110.28])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  4 Apr 2024 22:40:14 +0000 (GMT)
+Message-ID: <c3267eef03fd3e8bffe77c86debd9353627108c1.camel@linux.ibm.com>
+Subject: Re: [PATCH RFC 1/8] certs: Introduce ability to link to a system key
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Eric Snowberg <eric.snowberg@oracle.com>,
+        linux-security-module@vger.kernel.org
+Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, ardb@kernel.org, jarkko@kernel.org,
+        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com, mic@digikod.net,
+        casey@schaufler-ca.com, stefanb@linux.ibm.com,
+        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Date: Thu, 04 Apr 2024 18:40:14 -0400
+In-Reply-To: <20240311161111.3268190-2-eric.snowberg@oracle.com>
+References: <20240311161111.3268190-1-eric.snowberg@oracle.com>
+	 <20240311161111.3268190-2-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-23.el8_9) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zg8qstJNfK07siNn@casper.infradead.org>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: shsqQcvZE4KgIF-sF57SvAQTIjirUnrg
+X-Proofpoint-GUID: FvgZr0pLBBrRXAv1oxnxukm3-50-AxWW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-04_19,2024-04-04_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ suspectscore=0 adultscore=0 mlxscore=0 bulkscore=0 clxscore=1011
+ phishscore=0 malwarescore=0 impostorscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404040163
 
-On Thu, Apr 04, 2024 at 11:33:22PM +0100, Matthew Wilcox wrote:
-> On Thu, Apr 04, 2024 at 03:17:43PM -0700, Suren Baghdasaryan wrote:
-> > Ironically, checkpatch generates warnings for these type casts:
-> > 
-> > WARNING: unnecessary cast may hide bugs, see
-> > http://c-faq.com/malloc/mallocnocast.html
-> > #425: FILE: include/linux/dma-fence-chain.h:90:
-> > + ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain),
-> > GFP_KERNEL))
-> > 
-> > I guess I can safely ignore them in this case (since we cast to the
-> > expected type)?
-> 
-> I find ignoring checkpatch to be a solid move 99% of the time.
-> 
-> I really don't like the codetags.  This is so much churn, and it could
-> all be avoided by just passing in _RET_IP_ or _THIS_IP_ depending on
-> whether we wanted to profile this function or its caller.  vmalloc
-> has done it this way since 2008 (OK, using __builtin_return_address())
-> and lockdep has used _THIS_IP_ / _RET_IP_ since 2006.
+Hi Eric,
 
-Except you can't. We've been over this; using that approach for tracing
-is one thing, using it for actual accounting isn't workable.
+> diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+> index 9de610bf1f4b..b647be49f6e0 100644
+> --- a/certs/system_keyring.c
+> +++ b/certs/system_keyring.c
+> @@ -426,3 +426,32 @@ void __init set_platform_trusted_keys(struct key
+> *keyring)
+>  	platform_trusted_keys = keyring;
+>  }
+>  #endif
+> +
+> +/**
+> + * system_key_link - Link to a system key
+> + * @keyring: The keyring to link into
+> + * @id: The asymmetric key id to look for in the system keyring
+> + */
+> +int system_key_link(struct key *keyring, struct asymmetric_key_id *id)
+> +{
+> +	struct key *tkey;
+> +
+> +#ifdef CONFIG_SECONDARY_TRUSTED_KEYRING
+> +	tkey = find_asymmetric_key(secondary_trusted_keys, id, NULL, NULL,
+> false);
+> +#else
+> +	tkey = find_asymmetric_key(builtin_trusted_keys, id, NULL, NULL, false);
+> +#endif
+> +	if (!IS_ERR(tkey))
+> +		goto found;
+> +
+> +	tkey = find_asymmetric_key(platform_trusted_keys, id, NULL, NULL,
+> false);
+> +
+> +	if (!IS_ERR(tkey))
+> +		goto found;
+> +
+> +	return -1;
+
+Normally "goto" is for the error.  Invert the logic. 
+
+Mimi
+
+> +
+> +found:
+> +	key_link(keyring, tkey);
+> +	return 0;
+> +}
+> 
+
+
+
+
+
