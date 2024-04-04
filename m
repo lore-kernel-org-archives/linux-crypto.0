@@ -1,163 +1,160 @@
-Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B71533EE;
-	Thu,  4 Apr 2024 14:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3F91BDE6;
+	Thu,  4 Apr 2024 14:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712241630; cv=none; b=X+MTb1xNsnUqUW+cqVvkCOP9KQbpXixJwMwfrvYa7myRYwd+5ittY6B3LP1tDXHf7x1JBSzSjIDjUowt08TwnyBpE9yABemeYLWIyKJpS0DjjjrCWz7utJoa6ozeiN4KM5Y3rxyQfU4ywBXWPWuGNYrkNiTnJj8nDRILkhUbfEs=
+	t=1712242530; cv=none; b=lKIuEBVAU2gBGydAiySPoAhvnd7N3rVPO8j1w/LifFULJNFZuWxT31TfrbqeDywOjeDYTcfyVWv2h6fdo0UoIAsmbBkWjlh3cfvb3nHvJEkoFvtBmpxBdjVGXG9xs+6LQzW7qZnaxcdzY6i8np+CUb+9e0TIbApp2Vsve6O0OxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712241630; c=relaxed/simple;
-	bh=PUrWgpbt+2rgwdegBuKqnkjkMWVSHA/E9MzrvMjttRM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sMel8EPmW32wCIP0bmF8ulym0PqKzhHHj5j8jX4pp7x1gNs54iBEqOHKsRbvpkBsDzzIi/LDYd2WC1fxl2pVJVcSfffoe2apjA1ORH64PlywuIn64IL85H1f2ls4fadWjLjyCUo/mX9EhPehAwE3o9dAqbAReH8YKJD8pq6VpDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-	by vmicros1.altlinux.org (Postfix) with ESMTP id 90D7872C8CC;
-	Thu,  4 Apr 2024 17:40:24 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-	by imap.altlinux.org (Postfix) with ESMTPSA id 8360B36D0160;
-	Thu,  4 Apr 2024 17:40:24 +0300 (MSK)
-Date: Thu, 4 Apr 2024 17:40:24 +0300
-From: Vitaly Chikunov <vt@altlinux.org>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br,
-	lukas@wunner.de, bbhushan2@marvell.com, jarkko@kernel.org
-Subject: Re: [PATCH v8 05/13] crypto: ecc - Add nbits field to ecc_curve
- structure
-Message-ID: <20240404144024.congukfjqdfep6n4@altlinux.org>
-References: <20240404141856.2399142-1-stefanb@linux.ibm.com>
- <20240404141856.2399142-6-stefanb@linux.ibm.com>
+	s=arc-20240116; t=1712242530; c=relaxed/simple;
+	bh=G9lUvFywXgRdKLfamnkBnonk8oOiR9MI0r12zS6dtX0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=M7QFfmio2YvYcrlL15LTlLDyF+1BrfFDLYZPNWnhUmZft8KcbUZViPyvPTISFgE1Qkg91KZjx7Mad69ZhXIL7ypl4CgNEzOCeF9TPch1D+7vY4mdn1bJsEkU2Grr7Pv4rrIebuXQSjkG45SI6ywagFxxIJyF/H7mRHdeOWd47Ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aen+RE8a; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aen+RE8a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67D9FC433F1;
+	Thu,  4 Apr 2024 14:55:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712242529;
+	bh=G9lUvFywXgRdKLfamnkBnonk8oOiR9MI0r12zS6dtX0=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=aen+RE8ak25vlpX9Pe4w1s2I0IEuN0Xe8dsQ4xMCxRg401Ddm7Z4hTU7uhk3fCUgW
+	 GO+03+G0RSM+nLr2h8MsZmTZ+t+Y+YtN5Oi35yxECq2gH1KN+OeWgdWfs2BIGtmf07
+	 ozPdiS8nUL1wFS7zlORa+rjPcklbJXgUy6Y0Nvdq7gILpx6w1PCgVGDid/HHCyyQSZ
+	 egq4Ie94OJd3yeK5HZMzHWjCUNOtESyziFGcUDR12e/eav83l6kxPAo3YEAeC/nq/t
+	 2mXF9RP0DOWmABFVLYJWd7tjKUhoJwdz2l7KDmUWMIYSV8FBFzmoolBXAxqTe/LYpm
+	 Rk+PK0mphpHSg==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <20240404141856.2399142-6-stefanb@linux.ibm.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 04 Apr 2024 17:55:22 +0300
+Message-Id: <D0BFBFRVGG47.FXCTWETKP7H4@kernel.org>
+Cc: "Andrew Cooper" <andrew.cooper3@citrix.com>, "Ard Biesheuvel"
+ <ardb@kernel.org>, "Ross Philipson" <ross.philipson@oracle.com>, "Linux
+ Kernel Mailing List" <linux-kernel@vger.kernel.org>, "the arch/x86
+ maintainers" <x86@kernel.org>, <linux-integrity@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, "Linux Crypto Mailing List"
+ <linux-crypto@vger.kernel.org>, <kexec@lists.infradead.org>,
+ <linux-efi@vger.kernel.org>, <dpsmith@apertussolutions.com>, "Thomas
+ Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>, "Borislav
+ Petkov" <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, "Dave Hansen"
+ <dave.hansen@linux.intel.com>, "Matthew Garrett" <mjg59@srcf.ucam.org>,
+ <James.Bottomley@hansenpartnership.com>, <peterhuewe@gmx.de>, "Jason
+ Gunthorpe" <jgg@ziepe.ca>, "luto@amacapital.net" <luto@amacapital.net>,
+ "Arvind Sankar" <nivedita@alum.mit.edu>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+ <kanth.ghatraju@oracle.com>, <trenchboot-devel@googlegroups.com>
+Subject: Re: [PATCH v8 06/15] x86: Add early SHA support for Secure Launch
+ early measurements
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>, "Andy Lutomirski"
+ <luto@kernel.org>
+X-Mailer: aerc 0.17.0
+References: <CAMj1kXEmMBY_jc0uM5UgZbuZ3-C7NPKzg5AScaunyu9XzLgzZA@mail.gmail.com> <98ad92bb-ef17-4c15-88ba-252db2a2e738@citrix.com> <CAMj1kXFTu+bV2kQhAyu15hrYai20NcBLb4Zu8XG2Y-XjL0f+rw@mail.gmail.com> <1a8e69a7-89eb-4d36-94d6-0da662d8b72f@citrix.com> <CAMj1kXEvmGy9RJo4s8tECsFj2dufZ8jBPoJOEtkcGUoj+x2qsw@mail.gmail.com> <431a0b3a-47e5-4e61-a7fc-31cdf56f4e4c@citrix.com> <20240223175449.GA1112@sol.localdomain> <e641e2f1-16cf-4717-8a1f-8afac2644efe@citrix.com> <20240223183004.GE1112@sol.localdomain> <10db421c-77da-4a1c-a25e-2374a7a2ef79@app.fastmail.com> <20240403235635.GA24248@quark.localdomain>
+In-Reply-To: <20240403235635.GA24248@quark.localdomain>
 
-On Thu, Apr 04, 2024 at 10:18:48AM -0400, Stefan Berger wrote:
-> Add the number of bits a curve has to the ecc_curve definition to be able
-> to derive the number of bytes a curve requires for its coordinates from it.
-> It also allows one to identify a curve by its particular size. Set the
-> number of bits on all curve definitions.
-> 
-> Tested-by: Lukas Wunner <lukas@wunner.de>
-> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+On Thu Apr 4, 2024 at 2:56 AM EEST, Eric Biggers wrote:
+> On Wed, Apr 03, 2024 at 09:32:02AM -0700, Andy Lutomirski wrote:
+> > On Fri, Feb 23, 2024, at 10:30 AM, Eric Biggers wrote:
+> > > On Fri, Feb 23, 2024 at 06:20:27PM +0000, Andrew Cooper wrote:
+> > >> On 23/02/2024 5:54 pm, Eric Biggers wrote:
+> > >> > On Fri, Feb 23, 2024 at 04:42:11PM +0000, Andrew Cooper wrote:
+> > >> >> Yes, and I agree.=C2=A0 We're not looking to try and force this i=
+n with
+> > >> >> underhand tactics.
+> > >> >>
+> > >> >> But a blind "nack to any SHA-1" is similarly damaging in the oppo=
+site
+> > >> >> direction.
+> > >> >>
+> > >> > Well, reviewers have said they'd prefer that SHA-1 not be included=
+ and given
+> > >> > some thoughtful reasons for that.  But also they've given suggesti=
+ons on how to
+> > >> > make the SHA-1 support more palatable, such as splitting it into a=
+ separate
+> > >> > patch and giving it a proper justification.
+> > >> >
+> > >> > All suggestions have been ignored.
+> > >>=20
+> > >> The public record demonstrates otherwise.
+> > >>=20
+> > >> But are you saying that you'd be happy if the commit message read
+> > >> something more like:
+> > >>=20
+> > >> ---8<---
+> > >> For better or worse, Secure Launch needs SHA-1 and SHA-256.
+> > >>=20
+> > >> The choice of hashes used lie with the platform firmware, not with
+> > >> software, and is often outside of the users control.
+> > >>=20
+> > >> Even if we'd prefer to use SHA-256-only, if firmware elected to star=
+t us
+> > >> with the SHA-1 and SHA-256 backs active, we still need SHA-1 to pars=
+e
+> > >> the TPM event log thus far, and deliberately cap the SHA-1 PCRs in o=
+rder
+> > >> to safely use SHA-256 for everything else.
+> > >> ---
+> > >
+> > > Please take some time to read through the comments that reviewers hav=
+e left on
+> > > previous versions of the patchset.
+> >=20
+> > So I went and read through the old comments, and I'm lost.  In brief su=
+mmary:
+> >=20
+> > If the hardware+firmware only supports SHA-1, then some reviewers would=
+ prefer
+> > Linux not to support DRTM.  I personally think this is a bit silly, but=
+ it's
+> > not entirely unreasonable.  Maybe it should be a config option?
+> >=20
+> > If the hardware+firmware does support SHA-256, then it sounds (to me, r=
+eading
+> > this -- I haven't dug into the right spec pages) that, for optimal secu=
+rity,
+> > something still needs to effectively turn SHA-1 *off* at runtime by cap=
+ping
+> > the event log properly.  And that requires computing a SHA-1 hash.  And=
+, to be
+> > clear, (a) this is only on systems that already support SHA-256 and tha=
+t we
+> > should support and (b) *not* doing so leaves us potentially more vulner=
+able to
+> > SHA-1 attacks than doing so.  And no SHA-256-supporting tooling will ac=
+tually
+> > be compromised by a SHA-1 compromise if we cap the event log.
+> >=20
+> > So is there a way forward?  Just saying "read through the comments" see=
+ms like
+> > a dead end.
+> >=20
+>
+> It seems there may be a justification for some form of SHA-1 support in t=
+his
+> feature.  As I've said, the problem is that it's not explained in the pat=
+chset
+> itself.  Rather, it just talks about "SHA" and pretends like SHA-1 and SH=
+A-2 are
+> basically the same.  In fact, SHA-1 differs drastically from SHA-2 in ter=
+ms of
+> security.  SHA-1 support should be added in a separate patch, with a clea=
+rly
+> explained rationale *in the patch itself* for the SHA-1 support *specific=
+ally*.
 
-Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
+Yeah, this is important so that we don't end up deleting that support
+by accident. Just adding to denote that this more than just a "process
+issue".
 
-> ---
->  crypto/ecc_curve_defs.h    | 4 ++++
->  crypto/ecrdsa_defs.h       | 5 +++++
->  include/crypto/ecc_curve.h | 2 ++
->  3 files changed, 11 insertions(+)
-> 
-> diff --git a/crypto/ecc_curve_defs.h b/crypto/ecc_curve_defs.h
-> index 9719934c9428..ab1ef3d94be5 100644
-> --- a/crypto/ecc_curve_defs.h
-> +++ b/crypto/ecc_curve_defs.h
-> @@ -17,6 +17,7 @@ static u64 nist_p192_b[] = { 0xFEB8DEECC146B9B1ull, 0x0FA7E9AB72243049ull,
->  				0x64210519E59C80E7ull };
->  static struct ecc_curve nist_p192 = {
->  	.name = "nist_192",
-> +	.nbits = 192,
->  	.g = {
->  		.x = nist_p192_g_x,
->  		.y = nist_p192_g_y,
-> @@ -43,6 +44,7 @@ static u64 nist_p256_b[] = { 0x3BCE3C3E27D2604Bull, 0x651D06B0CC53B0F6ull,
->  				0xB3EBBD55769886BCull, 0x5AC635D8AA3A93E7ull };
->  static struct ecc_curve nist_p256 = {
->  	.name = "nist_256",
-> +	.nbits = 256,
->  	.g = {
->  		.x = nist_p256_g_x,
->  		.y = nist_p256_g_y,
-> @@ -75,6 +77,7 @@ static u64 nist_p384_b[] = { 0x2a85c8edd3ec2aefull, 0xc656398d8a2ed19dull,
->  				0x988e056be3f82d19ull, 0xb3312fa7e23ee7e4ull };
->  static struct ecc_curve nist_p384 = {
->  	.name = "nist_384",
-> +	.nbits = 384,
->  	.g = {
->  		.x = nist_p384_g_x,
->  		.y = nist_p384_g_y,
-> @@ -95,6 +98,7 @@ static u64 curve25519_a[] = { 0x000000000001DB41, 0x0000000000000000,
->  				0x0000000000000000, 0x0000000000000000 };
->  static const struct ecc_curve ecc_25519 = {
->  	.name = "curve25519",
-> +	.nbits = 255,
->  	.g = {
->  		.x = curve25519_g_x,
->  		.ndigits = 4,
-> diff --git a/crypto/ecrdsa_defs.h b/crypto/ecrdsa_defs.h
-> index 0056335b9d03..1c2c2449e331 100644
-> --- a/crypto/ecrdsa_defs.h
-> +++ b/crypto/ecrdsa_defs.h
-> @@ -47,6 +47,7 @@ static u64 cp256a_b[] = {
->  
->  static struct ecc_curve gost_cp256a = {
->  	.name = "cp256a",
-> +	.nbits = 256,
->  	.g = {
->  		.x = cp256a_g_x,
->  		.y = cp256a_g_y,
-> @@ -80,6 +81,7 @@ static u64 cp256b_b[] = {
->  
->  static struct ecc_curve gost_cp256b = {
->  	.name = "cp256b",
-> +	.nbits = 256,
->  	.g = {
->  		.x = cp256b_g_x,
->  		.y = cp256b_g_y,
-> @@ -117,6 +119,7 @@ static u64 cp256c_b[] = {
->  
->  static struct ecc_curve gost_cp256c = {
->  	.name = "cp256c",
-> +	.nbits = 256,
->  	.g = {
->  		.x = cp256c_g_x,
->  		.y = cp256c_g_y,
-> @@ -166,6 +169,7 @@ static u64 tc512a_b[] = {
->  
->  static struct ecc_curve gost_tc512a = {
->  	.name = "tc512a",
-> +	.nbits = 512,
->  	.g = {
->  		.x = tc512a_g_x,
->  		.y = tc512a_g_y,
-> @@ -211,6 +215,7 @@ static u64 tc512b_b[] = {
->  
->  static struct ecc_curve gost_tc512b = {
->  	.name = "tc512b",
-> +	.nbits = 512,
->  	.g = {
->  		.x = tc512b_g_x,
->  		.y = tc512b_g_y,
-> diff --git a/include/crypto/ecc_curve.h b/include/crypto/ecc_curve.h
-> index 70964781eb68..7d90c5e82266 100644
-> --- a/include/crypto/ecc_curve.h
-> +++ b/include/crypto/ecc_curve.h
-> @@ -23,6 +23,7 @@ struct ecc_point {
->   * struct ecc_curve - definition of elliptic curve
->   *
->   * @name:	Short name of the curve.
-> + * @nbits:	The number of bits of a curve.
->   * @g:		Generator point of the curve.
->   * @p:		Prime number, if Barrett's reduction is used for this curve
->   *		pre-calculated value 'mu' is appended to the @p after ndigits.
-> @@ -34,6 +35,7 @@ struct ecc_point {
->   */
->  struct ecc_curve {
->  	char *name;
-> +	u32 nbits;
->  	struct ecc_point g;
->  	u64 *p;
->  	u64 *n;
-> -- 
-> 2.43.0
-> 
+> - Eric
+
+BR, Jarkko
