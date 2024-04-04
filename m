@@ -1,183 +1,110 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01A913C3F0
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Apr 2024 22:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CD513C3F2;
+	Thu,  4 Apr 2024 22:28:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712269082; cv=none; b=FOiatffwv7cXS+Xb4G9HCG9eQZme9f9eCWdphQDpzunYJ3vKYh7o6GEX3KiM2Zg4Ji79k6sGSONCIk3CEm3SvJtvDTPa+H9Oocg6iNOjNM9+KSGjL7VVRELQRH5hsMeJRw5VlvouVUK68JKMYBAjjEOlBKWTWEba2laAcyIGdMk=
+	t=1712269735; cv=none; b=Fe92CmbR1/X/pVu1g4gkGKNOjRzsfEOBOQYaOgI9S5cCV4YST690m1OWDZAvqekdrAoy68D2MYlN+7bgyNZPBPQVnE7dXBhoI+GDTmNlWMiVy38g0CggeMOFcIvyMBjJBWV9rF6BOAIOqyaa/QOuhAnWFesoGAJEdLjMXBmkvMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712269082; c=relaxed/simple;
-	bh=RZPrq+xVDjiyzuvgmiC5bztMCL91wQIMW6JQhQhfvYY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jdvAjDTqCzYknPWOo5B2OjzQGlRoQ6X1u4O0tz+hhUUvrUUxRhDWpU2KsQb1cnieQDgnr//r5cfGxqnygytDCypOsAhR3x46mlgMADjQXeSRHxVEjVBB3qR4tD10u9UMF/GVb+41CtQ2LrZlYdb79hq/ZkpFDf/vHIwUf/IVIrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iNpgHmou; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1712269735; c=relaxed/simple;
+	bh=RxUgTHy6Q08KN0jBS41CMT9Ci5RsJ+C8p9GGt3Gfp6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WshI3BTq2jfGoCHZP84qPcRB6XdOP0LekQMPYD+RdQ2SPBv23Fl7TrY1topH83QW8sADFGC4lLCTPmddk9FZpJbMVQACxgzNAniCQDAk9zpMTlIVwogBvzHFSFSSCeaWb02tXzks8BphRu+IbRYOVn53wN97B1YESQITSXPK91k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MRSqA7hR; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iNpgHmou"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-343d2b20c4bso557076f8f.2
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Apr 2024 15:17:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712269077; x=1712873877; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eIW+Z3FuH4Tlrbj9QrjroPzWQnEb4hQ4AxEw1tDZfk4=;
-        b=iNpgHmouikM3eS2bzDsViRnQPf4IYT0AntRq/pLUycBts1tEtNDBhLAHPWLbGGQuwD
-         QJtB2nqOmcrDZKQqkypAxU9t8BXasLVzM76U6doxh0UD6M0mrI/XgijigKuOcMI2NCIb
-         whmis5i9jCy0XZKIvDNYWGW+znPQeHBEMsfX8rggozuXIuCHf0B+o1YIbhjdkYuLbC6k
-         nmWR9tyq0QFPwh7UUDhI4p73EwefaEhKQVvrdC/li4M77bvJ/3+wYenQP3FJrzs+WVyB
-         h/Tam1ckIRELByLvoQC8mEYZ6O8sMXwbWpK4qyuHRrWaDSukD/B1KlHnI6ojMiGvDvbK
-         uIeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712269077; x=1712873877;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eIW+Z3FuH4Tlrbj9QrjroPzWQnEb4hQ4AxEw1tDZfk4=;
-        b=P6jDj4/JbIQmtv+zM40+akV9182tBQ5JYLtx8S24ztv7v5nEIPJX+QWGRQk6n28bTa
-         2njkIb0BlHcgUsyI467ZtpmyvoK0tM4zhSB2BV3FifBJLiocAo7QAU0ShMUvv1dLUpeH
-         1G1zdThbfpQwHX9vkpFWQ09JyKXSFPkrPBUpKUQa3R/IPykFCYF1P/5SbuiFPmNAU9T/
-         qP1JHvJmPVnp6T3oejlC3cTURfn77dyyFvGHcb+cXxko/voeYc89B8ceN6SaV90Yzpca
-         6+6ZEamwqfpPkBnPkTKwPfuYBaMBW/erJEBpYGuYTsil1eTlBh6GUH4jQy/ndyTTNs6O
-         aK0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVlnxZQ8RhsrONS/R1e4QOnCX5GZq+Uq5lwEzJOPRuz6w/I7fTGMwRUMFQ4TpWaxH3Uqa9+nlJqVvFKbNrJqICLuNlgyRRq7B4+dcR8
-X-Gm-Message-State: AOJu0YzDFOVOkLxbB6ososZ7l7xls0UyWn39lxurDmBg/FauKTl/R/1p
-	E04u4gGX8u3Q1ZUjVBsZue1Zcyol1uPXlM5MJW8cNyCvHeZjyUrJH+BskMBof40bHSQKMmdPc4D
-	OBfeW58PVdiMptmMLu44BgCQlgBGBfCvKagpc
-X-Google-Smtp-Source: AGHT+IEoGycg7Q6yz1U10yVcrqSmmGhsvl59dTKCzdbY+AGkKJwTyJBRF58S2bqCqewHCyhhbzL+kREAY0nZt0Z/KC8=
-X-Received: by 2002:a5d:56cd:0:b0:343:a117:7d2 with SMTP id
- m13-20020a5d56cd000000b00343a11707d2mr434133wrw.71.1712269077043; Thu, 04 Apr
- 2024 15:17:57 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MRSqA7hR"
+Date: Thu, 4 Apr 2024 18:28:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712269730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cfxyCzvtzmWi1KSrX/XZIalfQOEPT3xbF6m5fU6kp1Y=;
+	b=MRSqA7hRXbZz0tmIJVXahqUTpqENt47k4TugvBcfJSyR0Cm1gh2WA4N6yRjmSx7aVgCNTP
+	AtxKikLCy/Cnvx95nkww4y4oLedWDdmjqq1jSIM2X6aubg8cqXD8PoPTacuEpfuX2MFiLW
+	VByPFt5v8rdJJuUvwqP0pi7SRB4TFpA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: Matthew Wilcox <willy@infradead.org>, akpm@linux-foundation.org, 
+	joro@8bytes.org, will@kernel.org, trond.myklebust@hammerspace.com, 
+	anna@kernel.org, arnd@arndb.de, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	jikos@kernel.org, benjamin.tissoires@redhat.com, tytso@mit.edu, jack@suse.com, 
+	dennis@kernel.org, tj@kernel.org, cl@linux.com, jakub@cloudflare.com, 
+	penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com, vbabka@suse.cz, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, iommu@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
+	acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-input@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-mm@kvack.org, netdev@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
+ the call site
+Message-ID: <qwwylzjcezfdyznm25epghmynvybgnzw2cmwahsyvwtqjrptsl@xdag7w65kn7b>
+References: <20240404165404.3805498-1-surenb@google.com>
+ <Zg7dmp5VJkm1nLRM@casper.infradead.org>
+ <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
+ <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404165404.3805498-1-surenb@google.com> <Zg7dmp5VJkm1nLRM@casper.infradead.org>
- <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
-In-Reply-To: <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Thu, 4 Apr 2024 15:17:43 -0700
-Message-ID: <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
-Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
- the call site
-To: Matthew Wilcox <willy@infradead.org>
-Cc: akpm@linux-foundation.org, joro@8bytes.org, will@kernel.org, 
-	trond.myklebust@hammerspace.com, anna@kernel.org, arnd@arndb.de, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, jikos@kernel.org, 
-	benjamin.tissoires@redhat.com, tytso@mit.edu, jack@suse.com, 
-	dennis@kernel.org, tj@kernel.org, cl@linux.com, jakub@cloudflare.com, 
-	penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com, 
-	vbabka@suse.cz, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-ext4@vger.kernel.org, linux-mm@kvack.org, 
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	kent.overstreet@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Apr 4, 2024 at 10:08=E2=80=AFAM Suren Baghdasaryan <surenb@google.c=
-om> wrote:
->
-> On Thu, Apr 4, 2024 at 10:04=E2=80=AFAM Matthew Wilcox <willy@infradead.o=
-rg> wrote:
+On Thu, Apr 04, 2024 at 03:17:43PM -0700, Suren Baghdasaryan wrote:
+> On Thu, Apr 4, 2024 at 10:08 AM Suren Baghdasaryan <surenb@google.com> wrote:
 > >
-> > On Thu, Apr 04, 2024 at 09:54:04AM -0700, Suren Baghdasaryan wrote:
-> > > +++ b/include/linux/dma-fence-chain.h
-> > > @@ -86,10 +86,7 @@ dma_fence_chain_contained(struct dma_fence *fence)
-> > >   *
-> > >   * Returns a new struct dma_fence_chain object or NULL on failure.
-> > >   */
-> > > -static inline struct dma_fence_chain *dma_fence_chain_alloc(void)
-> > > -{
-> > > -     return kmalloc(sizeof(struct dma_fence_chain), GFP_KERNEL);
-> > > -};
-> > > +#define dma_fence_chain_alloc()      kmalloc(sizeof(struct dma_fence=
-_chain), GFP_KERNEL)
-> >
-> > You've removed some typesafety here.  Before, if I wrote:
-> >
-> >         struct page *page =3D dma_fence_chain_alloc();
-> >
-> > the compiler would warn me that I've done something stupid.  Now it
-> > can't tell.  Suggest perhaps:
-> >
-> > #define dma_fence_chain_alloc()                                        =
-   \
-> >         (struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain=
-), \
-> >                                                 GFP_KERNEL)
-> >
-> > but maybe there's a better way of doing that.  There are a few other
-> > occurrences of the same problem in this monster patch.
->
-> Got your point.
-
-Ironically, checkpatch generates warnings for these type casts:
-
-WARNING: unnecessary cast may hide bugs, see
-http://c-faq.com/malloc/mallocnocast.html
-#425: FILE: include/linux/dma-fence-chain.h:90:
-+ ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain),
-GFP_KERNEL))
-
-I guess I can safely ignore them in this case (since we cast to the
-expected type)?
-
->
-> >
-> > > +++ b/include/linux/hid_bpf.h
-> > > @@ -149,10 +149,7 @@ static inline int hid_bpf_connect_device(struct =
-hid_device *hdev) { return 0; }
-> > >  static inline void hid_bpf_disconnect_device(struct hid_device *hdev=
-) {}
-> > >  static inline void hid_bpf_destroy_device(struct hid_device *hid) {}
-> > >  static inline void hid_bpf_device_init(struct hid_device *hid) {}
-> > > -static inline u8 *call_hid_bpf_rdesc_fixup(struct hid_device *hdev, =
-u8 *rdesc, unsigned int *size)
-> > > -{
-> > > -     return kmemdup(rdesc, *size, GFP_KERNEL);
-> > > -}
-> > > +#define call_hid_bpf_rdesc_fixup(_hdev, _rdesc, _size) kmemdup(_rdes=
-c, *(_size), GFP_KERNEL)
-> >
-> > here
-> >
-> > > -static inline handle_t *jbd2_alloc_handle(gfp_t gfp_flags)
-> > > -{
-> > > -     return kmem_cache_zalloc(jbd2_handle_cache, gfp_flags);
-> > > -}
-> > > +#define jbd2_alloc_handle(_gfp_flags)        kmem_cache_zalloc(jbd2_=
-handle_cache, _gfp_flags)
-> >
-> > here
-> >
-> > > +++ b/include/linux/skmsg.h
-> > > @@ -410,11 +410,8 @@ void sk_psock_stop_verdict(struct sock *sk, stru=
-ct sk_psock *psock);
-> > >  int sk_psock_msg_verdict(struct sock *sk, struct sk_psock *psock,
-> > >                        struct sk_msg *msg);
+> > On Thu, Apr 4, 2024 at 10:04 AM Matthew Wilcox <willy@infradead.org> wrote:
 > > >
-> > > -static inline struct sk_psock_link *sk_psock_init_link(void)
-> > > -{
-> > > -     return kzalloc(sizeof(struct sk_psock_link),
-> > > -                    GFP_ATOMIC | __GFP_NOWARN);
-> > > -}
-> > > +#define sk_psock_init_link() \
-> > > +             kzalloc(sizeof(struct sk_psock_link), GFP_ATOMIC | __GF=
-P_NOWARN)
+> > > On Thu, Apr 04, 2024 at 09:54:04AM -0700, Suren Baghdasaryan wrote:
+> > > > +++ b/include/linux/dma-fence-chain.h
+> > > > @@ -86,10 +86,7 @@ dma_fence_chain_contained(struct dma_fence *fence)
+> > > >   *
+> > > >   * Returns a new struct dma_fence_chain object or NULL on failure.
+> > > >   */
+> > > > -static inline struct dma_fence_chain *dma_fence_chain_alloc(void)
+> > > > -{
+> > > > -     return kmalloc(sizeof(struct dma_fence_chain), GFP_KERNEL);
+> > > > -};
+> > > > +#define dma_fence_chain_alloc()      kmalloc(sizeof(struct dma_fence_chain), GFP_KERNEL)
+> > >
+> > > You've removed some typesafety here.  Before, if I wrote:
+> > >
+> > >         struct page *page = dma_fence_chain_alloc();
+> > >
+> > > the compiler would warn me that I've done something stupid.  Now it
+> > > can't tell.  Suggest perhaps:
+> > >
+> > > #define dma_fence_chain_alloc()                                           \
+> > >         (struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain), \
+> > >                                                 GFP_KERNEL)
+> > >
+> > > but maybe there's a better way of doing that.  There are a few other
+> > > occurrences of the same problem in this monster patch.
 > >
-> > here
-> >
-> > ... I kind of gave up at this point.  You'll want to audit for yourself
-> > anyway ;-)
->
-> Yes, I'll go over it and will make the required changes. Thanks for
-> looking into it!
-> Suren.
+> > Got your point.
+> 
+> Ironically, checkpatch generates warnings for these type casts:
+> 
+> WARNING: unnecessary cast may hide bugs, see
+> http://c-faq.com/malloc/mallocnocast.html
+> #425: FILE: include/linux/dma-fence-chain.h:90:
+> + ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain),
+> GFP_KERNEL))
+> 
+> I guess I can safely ignore them in this case (since we cast to the
+> expected type)?
+
+Correct, it's not hiding bugs in this case, it's adding type safety.
+
+checkpatch is definitely not authoritative, you really have to use your
+own judgement with it
