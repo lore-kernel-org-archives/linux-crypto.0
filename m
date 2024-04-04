@@ -1,200 +1,209 @@
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2090.outbound.protection.outlook.com [40.107.96.90])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532AB4E1C1;
-	Thu,  4 Apr 2024 06:18:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.90
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712211526; cv=fail; b=RUIMoM8LQS1OvChcv9ACRTqUwIHxN9QGIKiSDUgzp460N+bVWatZnxbx5O4nz1W0NzsJ0uOt0LGrq8HrTouQ88eUuu37/Pqrfo/65ANpQm4vjpnK6nTsh6BwqU8dw2Iy9pjK6nQozQjO5TU2lMs+YQqtGhL0YerIPXiHeFLj67A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712211526; c=relaxed/simple;
-	bh=5iTFWYeYYgk3kmHc88d3wERfQdd7HrN64KnxhFxbULs=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=rNLe8A7gxEBw8awvHcs9QveqweNVFnmyq0EBUgDR5sRG+cerjx5Ez3iU+2jpYDoO1DgWUtYVWiYxl5Xn1PMqguiRQBBsADQ2lGo0uD4uzjL6j9VvEjGfS/9CBVfaUO85hINqZUG7rh8uylIuYZh2MooGCpwpbrMKxfrZLbqT9Z4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ti4QNbMG; arc=fail smtp.client-ip=40.107.96.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ti4QNbMG"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RtjhKVM57qU5y5mv21WhFCs5hmRlaWNCq448k1bPzi2WieaYQjYn1woTffeSgIKpkiDamD0jmhHDh0as/gRP28zjdAqdqq24V6kBdBZDQz72sU8LZMbItfS/0uJiZSJAG2n3KNiOl7zIOegIrfTlwwNmYHCtyhl0VLPX6ce9surd4HyHY+G8Tgz4hvV6KjfBsgP3qIRRhKzUj98RvcZFsq+12j6iktqgyxbCJ8WNwTX3hc/uGwAoaWzvi5fng3eckMR/WR687u/62af4VdtGNl4M9o7g44HlVdOFfUHaezvAkoDBCkRzhK3/V/d5esxm9udd9QxI9loChKJaGgPNoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sGUygyizDVzBGCSeklfWFqq/09oRo1P3p2+NVZdNwPw=;
- b=C839bf3+/3gt/v0gNUXxnJ+SAWf/4Q5FmBDU830qwOvuSZhImOxKK6oGv3z2Bnlglcla1b3ep4zxoLnlDtb2G1CZmAmz0mc7zipgXVxQD2Fo5gxnuMEwN7R1hndGLzfq8blvBSK+/hax1WAhUmvyJiefJz7RX7su5k+xX0SG2Msulwcxp41GzkTJahYTA7cqIAFdwNz6qLGoruLZIbyPtBsKFLoqWn3YvdNJmUDIOqMmQy7CZp2ls/6gjiSGIDigEpzrs625RG/RJTWd3g7e9r3YwAfepq3pgB5lFppjZ0dbk6pHJcAsN0NbotriUsW2GGWdYsa7TtvwniRW6Yv58A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sGUygyizDVzBGCSeklfWFqq/09oRo1P3p2+NVZdNwPw=;
- b=ti4QNbMGBNM11dvPdJwSfVherCTjHD0M9T0gh6aiVYmr24jCJLM2CmPr83JHE6sLvLd1PaOFrEeWjo2lbC5T/D+tRUL2YVGt42dDvRqMQH7RP/VzI1G3q0giXgFk/KH9oEjlZ20JyP4BIaqx+MWELaJUbl6Q14dS9WSfz6zS3Pg=
-Received: from DM6PR12MB2810.namprd12.prod.outlook.com (2603:10b6:5:41::21) by
- CY8PR12MB8216.namprd12.prod.outlook.com (2603:10b6:930:78::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7409.46; Thu, 4 Apr 2024 06:18:39 +0000
-Received: from DM6PR12MB2810.namprd12.prod.outlook.com
- ([fe80::2385:dab8:fddf:bcba]) by DM6PR12MB2810.namprd12.prod.outlook.com
- ([fe80::2385:dab8:fddf:bcba%6]) with mapi id 15.20.7409.042; Thu, 4 Apr 2024
- 06:18:39 +0000
-Message-ID: <a30d9ff5-638b-9d81-2c4e-8afd585d437c@amd.com>
-Date: Thu, 4 Apr 2024 08:17:48 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2 21/25] nvdimm: virtio_pmem: drop owner assignment
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>,
- David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Olivia Mackall <olivia@selenic.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Sudeep Holla <sudeep.holla@arm.com>,
- Cristian Marussi <cristian.marussi@arm.com>,
- Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
- Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
- <olvaffe@gmail.com>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- Daniel Vetter <daniel@ffwll.ch>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Robin Murphy <robin.murphy@arm.com>, Alexander Graf <graf@amazon.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>,
- Latchesar Ionkov <lucho@ionkov.net>,
- Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>,
- Dan Williams <dan.j.williams@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
- Ira Weiny <ira.weiny@intel.com>, Pankaj Gupta
- <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- "James E.J. Bottomley" <jejb@linux.ibm.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
- Anton Yakovlev <anton.yakovlev@opensynergy.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
- iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
- kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev,
- linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org,
- linux-sound@vger.kernel.org
-References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
- <20240331-module-owner-virtio-v2-21-98f04bfaf46a@linaro.org>
-From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <20240331-module-owner-virtio-v2-21-98f04bfaf46a@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR09CA0091.eurprd09.prod.outlook.com
- (2603:10a6:803:78::14) To DM6PR12MB2810.namprd12.prod.outlook.com
- (2603:10b6:5:41::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFEB5B1EB
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Apr 2024 07:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712217261; cv=none; b=AH/xqVuSUpzAQqe7Kvu0jQamM75hRde7Trj3J2WEDAk+9A/+0LT/hFBAhINLuUjt3KhGw8fwSBdYDYrdTFG1OfqgKW6SuutFtSrkPG1MMA0gzDuM9SkddxXigOz0sK5EA/piMo5JdUeWErFnpRDZ3dqVgzcro7qKctB8zwLZtSw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712217261; c=relaxed/simple;
+	bh=aR0wVCM5LaAu/ECnGr+i9aZMlzTwjmlOljzCBgud3vU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=DQolSJak1isuYsz+Jqw1rxVaTcleR0ymk+TMwkOG6k6EQs5tPKcoXiey8ZPwSpPf9FREFaitWzUBWlpg4oRWyKlw3Cz7mXR7JxsNJRF2T0O1dkM9mFHg7dRa5exuFGPHR7J59wsh/dzWX/xZLGAIBKu78Hwb9BpQFcZaehMVDnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-83-v2x10sXbPHaCrBeJxegpgg-1; Thu, 04 Apr 2024 08:54:14 +0100
+X-MC-Unique: v2x10sXbPHaCrBeJxegpgg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 4 Apr
+ 2024 08:53:48 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Thu, 4 Apr 2024 08:53:48 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Eric Biggers' <ebiggers@kernel.org>
+CC: Ard Biesheuvel <ardb@kernel.org>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Andy
+ Lutomirski" <luto@kernel.org>, "Chang S . Bae" <chang.seok.bae@intel.com>
+Subject: RE: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
+Thread-Topic: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
+Thread-Index: AQHaf518oZDDPKfpuUWrj9ZpRMjHLrFWPMWwgAET/ICAAHT4IA==
+Date: Thu, 4 Apr 2024 07:53:48 +0000
+Message-ID: <142077804bee45daac3b0fad8bc4c2fe@AcuMS.aculab.com>
+References: <20240326080305.402382-1-ebiggers@kernel.org>
+ <CAMj1kXH4fNevFzrbazJptadxh_spEY3W91FZni5eMqD+UKrSUQ@mail.gmail.com>
+ <20240326164755.GB1524@sol.localdomain>
+ <6629b8120807458ab76e1968056f5e10@AcuMS.aculab.com>
+ <20240404013529.GB24248@quark.localdomain>
+In-Reply-To: <20240404013529.GB24248@quark.localdomain>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2810:EE_|CY8PR12MB8216:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	3FffiHvmVY5igagMS6HFuehymN9LrxeNdbbBXpvUSfgEfgdxTVr0Vaf8j89Wo8MTcHWDcxWZuXHqaQWzC1xGreHIwkQlKqYXP9K7Jf7Wof4aSKqaqFpgwFQ9pQFNmtJgSNcCi1l/QrZu/BXkxbkpkcXTZVQKZzZlJ75zkWDe0uKewVkzQF73JuHopJGJ/oG/PGDIKlFOVfi+jY2fd95vjvx3qRqLKO7nvsq9tGlZPBZU44UyYxtaRAmrND6VASBbbEoCSgjURHO3hOPqVBOk45UDBVERXWbgA9/TzPvbujnAbXaLrPKMcZDlkgJpuBl99f7JLPU3TT2tJgZTIhzMLAEw9RCd40ZkAw8Arls5SKlJJ0HDaxPia21Hpca5K3yAOdPSTkqewkBt/ZmPBdAdXfP2N4HAWcTdfHVfeOZFOz3iJHYOUFV/+qaxiYXtZVQtj7HcfBKhMc8z9oofKCUT+Dj4N4Wo0WXh/Z+GqdXb8GIWmjQc1ZIS2cT9OdMzqyDqY0yLuI484nGakhcP/Xxxj9ufPCoTzeBwrqQDhQEeP30d1ju7hOSFKoMMthe43blFzVzkVvVoeFXV+tq4uY882/gIhOInvww+65Md4boluQociatlug6mB0lKm+osdQJp/aVYOSkrbIGG4z+Pq1AqaYF5jLjOXprj4ECvWOZAMer2ZmrxLsYz7Y/k50YLQlPmvbCl1RnyW9hLOwJuRdw8Mg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2810.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005)(921011);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NldqM0VrbkFNditIdUI3c2JSakkrOEJHbnczZUpuTzFvVWxZaTdsUTlvejZ6?=
- =?utf-8?B?c0VKVjE1eUo5VWkycTRoOWVlc3ZQMjFkMHZrREJMSFEzNWhJa0E5bkh5bFpt?=
- =?utf-8?B?TDdISlpPcXBvRTYwQ3RZLzRiK1hUcmZBcUNFai9ka0dGUWtvbHNJdWcySEw0?=
- =?utf-8?B?M1RKU2YwdFVnZE41M3pxanYxSmZwdXZ4dHRSQlRCc3V6dTllY3FIeUdpTjUz?=
- =?utf-8?B?aWU2eVltcU9uWnV5YlRPdDdOZTRlNkRIQU4xV3daTjRDWVIrenBFWHg3SEVK?=
- =?utf-8?B?OE5ERmx1ZHNwSUZGWTFSMG5TQnJ1eTcyZGx2UXhWTTJtNDIrTHpmeW50eExm?=
- =?utf-8?B?blhZMjNlZFU5NEpYdEVrc3Z2WlgxOU8xTHlwTHVwa2RLTnFuOVhiQUNnREtj?=
- =?utf-8?B?Rm9VUW5vcnZ6R1ZJU1FNeE9hRXJzQnhDQ205dUw3RFVsck5KNjV4enVXY2J4?=
- =?utf-8?B?cGhxZ3QvWHJkbHM4Ry9iTDBxWFBVNG9kZmhHbVhWZlNDdFlCQ0xmNGRYSmN1?=
- =?utf-8?B?WHJ4Ullidm9QWTFZdmQvNkVrRCt5cVAwcGJDNC85NTE4UHQ2LzNVOGNPYk1T?=
- =?utf-8?B?ZmhsWlcvQ21yb21YREhSOGlCSDVTajZXV3cxOUlpTGxlQTQvT21WeHM0REFU?=
- =?utf-8?B?Q0ZlV2I0UGJUZ3hVbU8wVTcrd0pBejhtNzlobVp4emJFN1RvVU94REYxRWxP?=
- =?utf-8?B?a0VTbnBYZzh5NUxwTnNMamxnSjUvdkNXUHpyRC9Nenl1SGVpNkQzeGEvZGtY?=
- =?utf-8?B?cWptOVQ3dXVENXNiY3FNK3d4TWFqSFpGTkFiQmFHNHB3bHlBeGpQaUovMEoy?=
- =?utf-8?B?Z2h3d3NzN1JMNkRaSDB4WHIrMTA5b3dSbGdhSHh0bWZKVjRrakMxM3FlNmF6?=
- =?utf-8?B?Y01rYzZJUWMxRysxTkwzTmRjYjB3SitiMXhySHdYdVRYN3BvMWJmZkJQNmsz?=
- =?utf-8?B?RkdTeGg1eUg4Q1R6Y1BUdFlOclBvRXdVdGRPRDh0TUphSXYwdnRSc1J0bDI3?=
- =?utf-8?B?dldxWlNLTy9ld2tUSFB0QlE5MTEzN3QyL1B3NHQ3c095MEtQNjNkMmdxcGVS?=
- =?utf-8?B?MDhqSGwwakNLaHQwbWQ5NzRHR2FHR290azFDaWUwVHpsSm5qdWpnelMwNzc0?=
- =?utf-8?B?RHV0SUVoWEtRK1E0S1AwaENQVWxqOG94eCtrejI0aEpReFlNRENaRUlxN0NS?=
- =?utf-8?B?dk5zK3Fua1NPZlFTNjUyRlhtVjVPcG85dHVnVDV2Q29NK0lVRWMxeS9GMk9D?=
- =?utf-8?B?QXQ3b29wUjZaWUpnYlNMS1VRdERibzB4MHoyamVNV3dEbWlZQlNIYzBpemlE?=
- =?utf-8?B?TG9yZTVZaW0wY2RPQXovVDdhMkpZNUVhcVVCYm0vaDNYNExjdms0MUtWL2tq?=
- =?utf-8?B?cm5vY3REcFJ6T1F4S0swb0wrVHhPVG5Xc0pPa1dnNHBNbmljZjdBa0g1SkNv?=
- =?utf-8?B?dmFwL29VTU5FRnVXNFJ2dDdXYUpOa0JLTVh4Tk9WUWo1d0pnRUJzejhRQ3o5?=
- =?utf-8?B?anJKTkpIV3FvNG9pWEtEaUhHNGl4bm5WL0U5VTMxQnJkb2xuZTBxOUsvTzly?=
- =?utf-8?B?a3dlRlU1WTVnWWpPV21SK0xpZEpnZEZpeDIwaTk4MFk5MjdSVFJGckF1QXln?=
- =?utf-8?B?QWNJZk42OFloK3crUUtxZndXbDVOWUZMUm4zRlBFM0ZIbmF2SzhpU250TlpP?=
- =?utf-8?B?c0ZJK1JhUWFQVDdsUnZBSE9YcGt5N3lCVGNLUGYzVTlVNnF5aHlnbm5sQVNJ?=
- =?utf-8?B?czRtNlI2UGxUbzdkSFN3NUZKSkNmTEJxL3ljakRLYjJ0dElxQzlwR2hjL1p1?=
- =?utf-8?B?MnNacDJuTE1CRWg4QUMvY2hZb0RkbFluclR2QVo1ektwTUNwK2g3eDdVM0t4?=
- =?utf-8?B?K0Z4cDlYaFpqZmtBNXl3NkdLMmNRQTNYeVNFcEhpV0Y0ZjBmRVZwSDN5dzFZ?=
- =?utf-8?B?Y09RcXZodG5iZkg2bFpCcVlHRUp2UmhNWVRFSU9uM0YyaWQ0a1c3VFZ3eGt1?=
- =?utf-8?B?dGpMa3JqTG1XSEc2NjBlLy96SVRkL2pEOUlpOWViTWZLVjNOZDUyMXY1cGpZ?=
- =?utf-8?B?RGREaWpOcUxFbkVBMXZHaVVZNlpmbDlJRkllOUIwbTV1MENhR1AzdTBpem1s?=
- =?utf-8?Q?qw2qYdOwELcIKPD9IK3bVT7xj?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d0fc5c03-d3f1-407b-10f4-08dc546f0ca4
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2810.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 06:18:31.3112
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tdOgk2JHQ+D4pOlbMfhFDQrfxUTlXRzHE0L+I38/h/takAwhkipgrCqw8gQk6S20PrFBvpBv4UbElXDU4YfCTw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8216
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On 3/31/2024 10:44 AM, Krzysztof Kozlowski wrote:
-> virtio core already sets the .owner, so driver does not need to.
-> 
-> Acked-by: Dave Jiang <dave.jiang@intel.com>
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> ---
-> 
-> Depends on the first patch.
-> ---
->   drivers/nvdimm/virtio_pmem.c | 1 -
->   1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-> index 4ceced5cefcf..c9b97aeabf85 100644
-> --- a/drivers/nvdimm/virtio_pmem.c
-> +++ b/drivers/nvdimm/virtio_pmem.c
-> @@ -151,7 +151,6 @@ static struct virtio_driver virtio_pmem_driver = {
->   	.feature_table		= features,
->   	.feature_table_size	= ARRAY_SIZE(features),
->   	.driver.name		= KBUILD_MODNAME,
-> -	.driver.owner		= THIS_MODULE,
->   	.id_table		= id_table,
->   	.validate		= virtio_pmem_validate,
->   	.probe			= virtio_pmem_probe,
-> 
+From: Eric Biggers
+> Sent: 04 April 2024 02:35
+>=20
+> Hi David,
+>=20
+> On Wed, Apr 03, 2024 at 08:12:09AM +0000, David Laight wrote:
+> > From: Eric Biggers
+> > > Sent: 26 March 2024 16:48
+> > ....
+> > > Consider Intel Ice Lake for example, these are the AES-256-XTS encryp=
+tion speeds
+> > > on 4096-byte messages in MB/s I'm seeing:
+> > >
+> > >     xts-aes-aesni                  5136
+> > >     xts-aes-aesni-avx              5366
+> > >     xts-aes-vaes-avx2              9337
+> > >     xts-aes-vaes-avx10_256         9876
+> > >     xts-aes-vaes-avx10_512         10215
+> > >
+> > > So yes, on that CPU the biggest boost comes just from VAES, staying o=
+n AVX2.
+> > > But taking advantage of AVX512 does help a bit more, first from the p=
+arts other
+> > > than 512-bit registers, then a bit more from 512-bit registers.
+> >
+> > How much does the kernel_fpu_begin() cost on real workloads?
+> > (ie when the registers are live and it forces an extra save/restore)
+>=20
+> x86 Linux does lazy restore of the FPU state.  The first kernel_fpu_begin=
+() can
+> have a significant cost, as it issues an XSAVE (or equivalent) instructio=
+n and
+> causes an XRSTOR (or equivalent) instruction to be issued when returning =
+to
+> userspace when it otherwise might not be needed.  Additional kernel_fpu_b=
+egin()
+> / kernel_fpu_end() pairs without returning to userspace have only a small=
+ cost,
+> as they don't cause any more saves or restores of the FPU state to be don=
+e.
+>=20
+> My new xts(aes) implementations have one kernel_fpu_begin() / kernel_fpu_=
+end()
+> pair per message (if the message doesn't span any page boundaries, which =
+is
+> almost always the case).  That's exactly the same as the current xts-aes-=
+aesni.
 
-Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
+I realised after sending it that the code almost certainly already did
+kernel_fpu_begin() - so there probably isn't a difference because all the
+fpu state is always saved.
+(I'm sure there should be a way of getting access to (say) 2 ymm registers
+by providing an on-stack save area to allow wide data copies or special
+instructions - but that is a different issue.)
+
+> I think what you may really be asking is how much the overhead of the XSA=
+VE /
+> XRSTOR pair associated with kernel-mode use of the FPU *increases* if the=
+ kernel
+> clobbers AVX or AVX512 state, instead of just SSE state as xts-aes-aesni =
+does.
+> That's much more relevant to this patchset.
+
+It depends on what has to be saved, not on what is used.
+Although, since all the x/y/zmm registers are caller-saved I think they cou=
+ld
+be 'zapped' on syscall entry (and restored as zero later).
+Trouble is I suspect there is a single piece of code somewhere that relies
+on them being preserved across an inlined system call.
+
+> I think the answer is that there is no additional overhead.  This is beca=
+use the
+> XSAVE / XRSTOR pair happens regardless of the type of state the kernel cl=
+obbers,
+> and it operates on the userspace state, not the kernel's.  Some of the ne=
+wer
+> variants of XSAVE (XSAVEOPT and XSAVES) do have a "modified" optimization=
+ where
+> they don't save parts of the state that are unmodified since the last XRS=
+TOR;
+> however, that is unimportant here because the kernel's FPU state is never=
+ saved.
+>=20
+> (This would change if x86 Linux were to support preemption of kernel-mode=
+ FPU
+> code.  In that case, we may need to take more care to minimize use of AVX=
+ and
+> AVX512 state.  That being said, AES-XTS tends to be used for bulk data an=
+yway.)
+>=20
+> This is based on theory, though.  I'll do a test to confirm that there's =
+indeed
+> no additional overhead.  And also, even if there's no additional overhead=
+, what
+> the existing overhead actually is.
+
+Yes, I was wondering how it is used for 'real applications'.
+If a system call that would normally return immediately (or at least withou=
+t
+a full process switch) hits the aes code it gets the cost of the XSAVE adde=
+d.
+Whereas the benchmark probably doesn't do anywhere near as many.
+
+OTOH this is probably no different.
+
+>=20
+> > I've not looked at the code but I often see what looks like
+> > excessive inlining in crypto code.
+> > This will speed up benchmarks but can have a negative effect
+> > on real code both because of the time taken to load the
+> > code and the effect of displacing other code.
+> >
+> > It might be that this code is a simple loop....
+>=20
+> This is a different topic.  By "inlining" I assume that you also mean thi=
+ngs
+> like loop unrolling.  I totally agree that some of the crypto assembly co=
+de goes
+> way overboard on this, resulting in an unreasonably large machine code si=
+ze.
+> The AVX implementation of AES-GCM (aesni-intel_avx-x86_64.S), which was w=
+ritten
+> by Intel, is the worst offender by far, generating 256011 bytes of machin=
+e code.
+> In OpenSSL, Intel has even taken that to the next level with their VAES
+> optimized implementation of AES-GCM generating 696040 bytes of machine co=
+de.
+
+That is truly stunning!
+I can't believe anything that big is actually 'optimised'.
+Just think of all the TLB misses :-)
+Unless it is slightly faster if you are encrypting several TB of data.
+
+...
+> So, I think my current proposal is at a reasonable place regarding compil=
+ed code
+> size, especially when it's compared to the monstrosity that is some of th=
+e
+> existing crypto assembly code.  But let me know if there are any specific
+> choices I've made that you may have a different opinion on.
+
+At least you've thought about code size.
+
+=09David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
