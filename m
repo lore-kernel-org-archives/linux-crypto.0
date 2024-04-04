@@ -1,167 +1,133 @@
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7794F129E88
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Apr 2024 17:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8A56FE26;
+	Thu,  4 Apr 2024 20:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712250539; cv=none; b=WqpTDFJuwc6hT6xjur3jct0gsks259b25rh0mKguGlCJph5Csx8PbXlAuedjyxN52+Oj0dYepRJgmDIbmVBtmvyz7BgJeZXSsUDGqQ4NazkDB3LLWMJS7m8zy7uzGg460787WUkLKv46BQXeXqDPK8eBLGxVMktsko8E0S925uY=
+	t=1712262850; cv=none; b=IN2Xs1d+1szxnnF7YlTebExkcv2EpVhizNyb1ThV/ZF5d6k1jfc6jHMSN0Zgpzmj+9Wm6WOVnoNhP2jqjBVnWEaQQQOeV/y6oXrp89I57v8EVTikZau0EGB9pFFq3QR0yU9cVfwpHuRvjmomLjfLoS3aAepXCmXP4RaiikiAWJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712250539; c=relaxed/simple;
-	bh=qIeHxQSzEKN+T+ZMX5PFicsmdKmy6EfcZQYdz44LOBA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YHv0JIEMhOmecHQWz+Vfjm4iHLZ1i/vN4mCT6AWDQ5ZGITkz8pCMfgWOCmRvp1HoDSPFqjh0CKbvM0birW6sgmMQUIzG7LhXmCc7mL0gyu7Tc0YOtSNilbYNnmrJjdGKKtor+xtXAsjikYoFZm+95AegTnfbaZWwCThILTzEEzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jC5EaRQM; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1712262850; c=relaxed/simple;
+	bh=EfISDVvrAaKxrRUH0h9JaJqMOAiLpYXNI9NkfNWfA/w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EAr70+v52qSt044Ke8TDCJ9Wv8PK4VtykdkMwPyhh6CqxBuW03OgHEulWFG3PFdCxNmDR28yR1Md+0s14MKfkpUHeC8fPYZ0h9bR9SOVpQVgnff4SL89Zd+MHSY+T2tzNoT2gQ5yQE7NefOI4huDq/uJ55b8FrythSQVR91fCvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dnT5fYUA; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jC5EaRQM"
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dcd9e34430cso1467224276.1
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Apr 2024 10:08:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712250536; x=1712855336; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KuDs1drwJi9Z+z9OuWkhK3ckPKS9r4/p1uVUkFqevFk=;
-        b=jC5EaRQMXoWxXcT/PNqSjrcsftwnvseB5AtKBg2vqgAyyLVQgp20SRegZq7YLIrdO/
-         HTQWScQM/DW37R2IYh+dwMOL2ayL0pQIQzYyP1lXQTLRA97VQiYJ9PHXRyMfJ/Z9ZvVJ
-         oFpUWCWEB1bSpDEyqEQ7RCqnI1td28ZhCzX2yYyMeaCp+6hQUqHZ6EtZjij0pKovvOgy
-         stCx6Jb+d1gT/UvnialtOoZLUIi5qkRs+J/dXYzAxsZr67uO7BH+bPTh4Ub09lLJuNIn
-         17mjFsnILx+0qC4dxBW5VMWwIa7xznM4mAxRt/Jwv9KrNYGo+0DSWcP592JJrWie/m+S
-         e2vQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712250536; x=1712855336;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KuDs1drwJi9Z+z9OuWkhK3ckPKS9r4/p1uVUkFqevFk=;
-        b=CrXJjlM5h0bYayJHAjPYiURbh32Mqrm7MBkU1tjLecCy9OOt1+aDrlU6pw/qzl0LEU
-         NkJ4Fe9oRSXHkv94Hy0TfXMGG/QOEKrcdwfQkjGVLZr01zTDEj/Cl+UWSsk+25+fqlIA
-         ZMbJBYLen+uR5Jg3/agL3iYfcOe+NqKGcgMgkVNFWapJA+PfNZFHitivbxF9aNuqolKD
-         PI/n4yEtjKOiAcsZSCJ8w97bPfGpz574cnPQl6bawQfSJ3yt7jhZdewrDimdsWgjmLF5
-         xcbVpnV4NPvH+QggZXh9kLK0iJROurbxrZ0emX8Lt/587Nv4+ubo5NPoZ11Jybblxb21
-         X5Fg==
-X-Forwarded-Encrypted: i=1; AJvYcCXCWjmZJ+stgM1bHBpN9WsHUftRkZtiJbYPIRh6NiDa5HjIRKptVVTOYcTS+ljO/e6RzBohTon2wChj5OedotbY7bzzageg7g3X6xKX
-X-Gm-Message-State: AOJu0Yz//cauhr8lpezQtho7KTFQactvnfyWIP8OquDarVftXty7phSt
-	ctehzxbcIgEMoQjb/bRajf0QynHodHXiJndNyEiKE0l+fV9xtm2KHycoeyCZ1avt+iSOegiuYzp
-	S925emPF69KNYChtSUY0QhnqRtuW8umhpWsNN
-X-Google-Smtp-Source: AGHT+IFt2ASldzAexjX0sPM2NMrH0Lqtd66mUXGVX9ZgF2XSVZKC+BEFwLxb4crFlAjVgX0qYdICDkkyaJeo+de/1Hw=
-X-Received: by 2002:a25:ac19:0:b0:dcb:b072:82d5 with SMTP id
- w25-20020a25ac19000000b00dcbb07282d5mr3065164ybi.64.1712250536330; Thu, 04
- Apr 2024 10:08:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dnT5fYUA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712262848; x=1743798848;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=EfISDVvrAaKxrRUH0h9JaJqMOAiLpYXNI9NkfNWfA/w=;
+  b=dnT5fYUAYaBluIx0UkZSA1gnQwBr1CYlqNR3nnf2TffD6AEtubtnuNm+
+   Jkqcue2750WGGl15Tns3Z2LWMHYAckXpzSEtZYrGGFB7RpYZw+HHSxa/H
+   1itnR+DG1HvUJ8PqhqN3Fx8oJBHv8b4ei0mfr4yJarpKcGl+3fD3oKfVr
+   OEIyu/EabHkwlItVqolPxDC2e8trfbGDKkAqtzwmNuNHB3KDgKvgsLl3S
+   EiqS2jPJiw2jWv77O76EEgNU0Pm3VvleyGoppNci9rKghNUrA10HjWfQ0
+   9jlMZSPUoCqz6jISuUAmi+RvJE/FmherbPYdfLWKEH91qMH7FQ8NnXMz5
+   Q==;
+X-CSE-ConnectionGUID: iXqkrLizRFap9X21oj/pFA==
+X-CSE-MsgGUID: nwsMoVznRuy5A60RNVqOqA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11034"; a="18310019"
+X-IronPort-AV: E=Sophos;i="6.07,180,1708416000"; 
+   d="scan'208";a="18310019"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 13:34:05 -0700
+X-CSE-ConnectionGUID: gZGUdyeJRJqS3ui3x4jFJg==
+X-CSE-MsgGUID: DFsuHmQ0RrCVC3o8umdx/A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,180,1708416000"; 
+   d="scan'208";a="19509026"
+Received: from vzaharie-mobl.amr.corp.intel.com (HELO [10.209.26.243]) ([10.209.26.243])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2024 13:34:04 -0700
+Message-ID: <f5461df0-6609-42db-850c-de6a32728fe2@intel.com>
+Date: Thu, 4 Apr 2024 13:34:04 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404165404.3805498-1-surenb@google.com> <Zg7dmp5VJkm1nLRM@casper.infradead.org>
-In-Reply-To: <Zg7dmp5VJkm1nLRM@casper.infradead.org>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Thu, 4 Apr 2024 10:08:45 -0700
-Message-ID: <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
- the call site
-To: Matthew Wilcox <willy@infradead.org>
-Cc: akpm@linux-foundation.org, joro@8bytes.org, will@kernel.org, 
-	trond.myklebust@hammerspace.com, anna@kernel.org, arnd@arndb.de, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, jikos@kernel.org, 
-	benjamin.tissoires@redhat.com, tytso@mit.edu, jack@suse.com, 
-	dennis@kernel.org, tj@kernel.org, cl@linux.com, jakub@cloudflare.com, 
-	penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com, 
-	vbabka@suse.cz, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-ext4@vger.kernel.org, linux-mm@kvack.org, 
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	kent.overstreet@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6/6] crypto: x86/aes-xts - wire up VAES + AVX10/512
+ implementation
+To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+ x86@kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+ Andy Lutomirski <luto@kernel.org>, "Chang S . Bae" <chang.seok.bae@intel.com>
+References: <20240329080355.2871-1-ebiggers@kernel.org>
+ <20240329080355.2871-7-ebiggers@kernel.org>
+Content-Language: en-US
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20240329080355.2871-7-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 4, 2024 at 10:04=E2=80=AFAM Matthew Wilcox <willy@infradead.org=
-> wrote:
->
-> On Thu, Apr 04, 2024 at 09:54:04AM -0700, Suren Baghdasaryan wrote:
-> > +++ b/include/linux/dma-fence-chain.h
-> > @@ -86,10 +86,7 @@ dma_fence_chain_contained(struct dma_fence *fence)
-> >   *
-> >   * Returns a new struct dma_fence_chain object or NULL on failure.
-> >   */
-> > -static inline struct dma_fence_chain *dma_fence_chain_alloc(void)
-> > -{
-> > -     return kmalloc(sizeof(struct dma_fence_chain), GFP_KERNEL);
-> > -};
-> > +#define dma_fence_chain_alloc()      kmalloc(sizeof(struct dma_fence_c=
-hain), GFP_KERNEL)
->
-> You've removed some typesafety here.  Before, if I wrote:
->
->         struct page *page =3D dma_fence_chain_alloc();
->
-> the compiler would warn me that I've done something stupid.  Now it
-> can't tell.  Suggest perhaps:
->
-> #define dma_fence_chain_alloc()                                          =
- \
->         (struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain),=
- \
->                                                 GFP_KERNEL)
->
-> but maybe there's a better way of doing that.  There are a few other
-> occurrences of the same problem in this monster patch.
+On 3/29/24 01:03, Eric Biggers wrote:
+> +static const struct x86_cpu_id zmm_exclusion_list[] = {
+> +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_SKYLAKE_X },
+> +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_X },
+> +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_D },
+> +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE },
+> +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_L },
+> +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_ICELAKE_NNPI },
+> +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_TIGERLAKE_L },
+> +	{ .vendor = X86_VENDOR_INTEL, .family = 6, .model = INTEL_FAM6_TIGERLAKE },
+> +	/* Allow Rocket Lake and later, and Sapphire Rapids and later. */
+> +	/* Also allow AMD CPUs (starting with Zen 4, the first with AVX-512). */
+> +	{},
+> +};
 
-Got your point.
+A hard-coded model/family exclusion list is not great.
 
->
-> > +++ b/include/linux/hid_bpf.h
-> > @@ -149,10 +149,7 @@ static inline int hid_bpf_connect_device(struct hi=
-d_device *hdev) { return 0; }
-> >  static inline void hid_bpf_disconnect_device(struct hid_device *hdev) =
-{}
-> >  static inline void hid_bpf_destroy_device(struct hid_device *hid) {}
-> >  static inline void hid_bpf_device_init(struct hid_device *hid) {}
-> > -static inline u8 *call_hid_bpf_rdesc_fixup(struct hid_device *hdev, u8=
- *rdesc, unsigned int *size)
-> > -{
-> > -     return kmemdup(rdesc, *size, GFP_KERNEL);
-> > -}
-> > +#define call_hid_bpf_rdesc_fixup(_hdev, _rdesc, _size) kmemdup(_rdesc,=
- *(_size), GFP_KERNEL)
->
-> here
->
-> > -static inline handle_t *jbd2_alloc_handle(gfp_t gfp_flags)
-> > -{
-> > -     return kmem_cache_zalloc(jbd2_handle_cache, gfp_flags);
-> > -}
-> > +#define jbd2_alloc_handle(_gfp_flags)        kmem_cache_zalloc(jbd2_ha=
-ndle_cache, _gfp_flags)
->
-> here
->
-> > +++ b/include/linux/skmsg.h
-> > @@ -410,11 +410,8 @@ void sk_psock_stop_verdict(struct sock *sk, struct=
- sk_psock *psock);
-> >  int sk_psock_msg_verdict(struct sock *sk, struct sk_psock *psock,
-> >                        struct sk_msg *msg);
-> >
-> > -static inline struct sk_psock_link *sk_psock_init_link(void)
-> > -{
-> > -     return kzalloc(sizeof(struct sk_psock_link),
-> > -                    GFP_ATOMIC | __GFP_NOWARN);
-> > -}
-> > +#define sk_psock_init_link() \
-> > +             kzalloc(sizeof(struct sk_psock_link), GFP_ATOMIC | __GFP_=
-NOWARN)
->
-> here
->
-> ... I kind of gave up at this point.  You'll want to audit for yourself
-> anyway ;-)
+It'll break when running in guests on newer CPUs that fake any of these
+models.  Some folks will also surely disagree with the kernel policy
+implemented here.
 
-Yes, I'll go over it and will make the required changes. Thanks for
-looking into it!
-Suren.
+Is there no way to implement this other than a hard-coded kernel policy?
