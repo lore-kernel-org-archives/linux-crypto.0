@@ -1,160 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3F91BDE6;
-	Thu,  4 Apr 2024 14:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4770317BA8
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Apr 2024 16:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712242530; cv=none; b=lKIuEBVAU2gBGydAiySPoAhvnd7N3rVPO8j1w/LifFULJNFZuWxT31TfrbqeDywOjeDYTcfyVWv2h6fdo0UoIAsmbBkWjlh3cfvb3nHvJEkoFvtBmpxBdjVGXG9xs+6LQzW7qZnaxcdzY6i8np+CUb+9e0TIbApp2Vsve6O0OxY=
+	t=1712246653; cv=none; b=S6+PSY8eoBvG5jjmTebpCiS1MaWwVKIGcPUqM0c4yHqWHVxegpz75MNijZ9kwMuqh66xxDbTgYlQUAm/3HNsATg6m5BquopCQP4nT24H7FaBUE3bvJEKO+ZFEnWZF1mKpv5D9G3/y1jfhwcgfmTT04ZjGizlZJKpKltNYTDmghI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712242530; c=relaxed/simple;
-	bh=G9lUvFywXgRdKLfamnkBnonk8oOiR9MI0r12zS6dtX0=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=M7QFfmio2YvYcrlL15LTlLDyF+1BrfFDLYZPNWnhUmZft8KcbUZViPyvPTISFgE1Qkg91KZjx7Mad69ZhXIL7ypl4CgNEzOCeF9TPch1D+7vY4mdn1bJsEkU2Grr7Pv4rrIebuXQSjkG45SI6ywagFxxIJyF/H7mRHdeOWd47Ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aen+RE8a; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712246653; c=relaxed/simple;
+	bh=AYKWp+p64k+3RQGIf/6q/yPwgymf6ydLwHfuSidhdYM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HhL54ID1o+0xo4C4dNNASqbwWsFfmcWkyultcnQWN4BUJAo2ZFyfJ9Ef/jHhIruBM5H/ql/CFP8sjrS9IDeAg4omHD+EirVz+KDosSYBvf89adLt37TcIV5GsVJWHM1FuK8zjp7TiZPrs8godMhr4TcVm8qRtC8cKAqDzEhG3mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O5rtdcsh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aen+RE8a"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67D9FC433F1;
-	Thu,  4 Apr 2024 14:55:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712242529;
-	bh=G9lUvFywXgRdKLfamnkBnonk8oOiR9MI0r12zS6dtX0=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=aen+RE8ak25vlpX9Pe4w1s2I0IEuN0Xe8dsQ4xMCxRg401Ddm7Z4hTU7uhk3fCUgW
-	 GO+03+G0RSM+nLr2h8MsZmTZ+t+Y+YtN5Oi35yxECq2gH1KN+OeWgdWfs2BIGtmf07
-	 ozPdiS8nUL1wFS7zlORa+rjPcklbJXgUy6Y0Nvdq7gILpx6w1PCgVGDid/HHCyyQSZ
-	 egq4Ie94OJd3yeK5HZMzHWjCUNOtESyziFGcUDR12e/eav83l6kxPAo3YEAeC/nq/t
-	 2mXF9RP0DOWmABFVLYJWd7tjKUhoJwdz2l7KDmUWMIYSV8FBFzmoolBXAxqTe/LYpm
-	 Rk+PK0mphpHSg==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O5rtdcsh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712246651;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hvQMa3e6aa+6chnorpY7KHYDJwijcL8jvc2jYGypk/c=;
+	b=O5rtdcshnrtpKXg7g+Quew7dKXWy6Llad//gFAGbDgbSTcSCtgPpHBtmHeFqehfD9F8wlg
+	UtXaUwoscRI2eEymQeIGr9rhoS13xCI9mpHEFx46+sSe4vF4bQ0DeCWtG0pTmlWjpWFibY
+	xSxR0qelbeoawPTbc/PT4qgBWMWJmWw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-630-XyWwCn2xM9m4Sc8GUsGIZw-1; Thu, 04 Apr 2024 12:04:09 -0400
+X-MC-Unique: XyWwCn2xM9m4Sc8GUsGIZw-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33eca6f6e4bso585447f8f.0
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Apr 2024 09:04:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712246648; x=1712851448;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hvQMa3e6aa+6chnorpY7KHYDJwijcL8jvc2jYGypk/c=;
+        b=n2Ikgf4ROAqwh+NYJu3li9wxcqIG/owrN2hmHtoMZRP5+1S3QhfNtEvJ9q55EAVr2I
+         ryq868wkBkmU6uUy0smK9LvbT+5od1Rr2wxHcZWK0pExoWvq5+NHRVrEK4saa+S8FXHO
+         HuI+yjh4j/sSc1JzBmImIDNAUsOztmy4NKMxBbXomSK+lwg0uzG6mX9xX5Q1q0gh4Euj
+         CAPBKtX9oAn+2SkLSNqG30m63FmQW7MtQha4Hhbl6w/BOjCs+0b0QAJW7/OD9bZ3VLof
+         AvOwqr2tG7h8SltoV7CUATI5UAhKWRfacaya8K5U0XPk/XcM1WVlfVUibFUlVj7Kf88W
+         8enw==
+X-Forwarded-Encrypted: i=1; AJvYcCXyL3cRJ2cAxRaa9g7QQ5kBvCsf3KcgK6TaG9XN6fsgF+UdmJ98OSikQZatylhQmAnRRwyIJM3adVFgmlVAMjMPzG87sAjDwbDCUJni
+X-Gm-Message-State: AOJu0YxXFunphJpklITX2/PiQ4/aWDKJnL8oLYXXi0ncjQvsOA/IuG+O
+	pIQsUH+pAi8/lMfNoIzIrosGUySiL5GWFm96Euv8EZhzqQf91WpulHoNcrwp1A/gfsPXuya8gcn
+	l+pKiHsHOPOax2LZ3T0P2cx1mGqB3zluKMgwW0/1Owym+PC7+wYsBLDiVpJRe2cycUTte8elQwY
+	GedYuA0GDy74brdw+zYmqqVxlA7J0pi9iYDu5P
+X-Received: by 2002:adf:fe0a:0:b0:343:b0b8:d68f with SMTP id n10-20020adffe0a000000b00343b0b8d68fmr18327wrr.25.1712246648574;
+        Thu, 04 Apr 2024 09:04:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE9lMpRrvRHs7aq9HiR8B7m2xP5O9kx9uCjd68Psn0mas4tU/87cr01m6gWW8MfdNwKQqtC9KSc5JGf2m+NNJ0=
+X-Received: by 2002:adf:fe0a:0:b0:343:b0b8:d68f with SMTP id
+ n10-20020adffe0a000000b00343b0b8d68fmr18315wrr.25.1712246648224; Thu, 04 Apr
+ 2024 09:04:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20240329225835.400662-1-michael.roth@amd.com> <20240329225835.400662-12-michael.roth@amd.com>
+In-Reply-To: <20240329225835.400662-12-michael.roth@amd.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 4 Apr 2024 18:03:56 +0200
+Message-ID: <CABgObfaGNsAva0t0_gm8m0QANaOU7d-EeHvcShJSpCozoJwDnw@mail.gmail.com>
+Subject: Re: [PATCH v12 11/29] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com, 
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 04 Apr 2024 17:55:22 +0300
-Message-Id: <D0BFBFRVGG47.FXCTWETKP7H4@kernel.org>
-Cc: "Andrew Cooper" <andrew.cooper3@citrix.com>, "Ard Biesheuvel"
- <ardb@kernel.org>, "Ross Philipson" <ross.philipson@oracle.com>, "Linux
- Kernel Mailing List" <linux-kernel@vger.kernel.org>, "the arch/x86
- maintainers" <x86@kernel.org>, <linux-integrity@vger.kernel.org>,
- <linux-doc@vger.kernel.org>, "Linux Crypto Mailing List"
- <linux-crypto@vger.kernel.org>, <kexec@lists.infradead.org>,
- <linux-efi@vger.kernel.org>, <dpsmith@apertussolutions.com>, "Thomas
- Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>, "Borislav
- Petkov" <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, "Dave Hansen"
- <dave.hansen@linux.intel.com>, "Matthew Garrett" <mjg59@srcf.ucam.org>,
- <James.Bottomley@hansenpartnership.com>, <peterhuewe@gmx.de>, "Jason
- Gunthorpe" <jgg@ziepe.ca>, "luto@amacapital.net" <luto@amacapital.net>,
- "Arvind Sankar" <nivedita@alum.mit.edu>, "Herbert Xu"
- <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
- <kanth.ghatraju@oracle.com>, <trenchboot-devel@googlegroups.com>
-Subject: Re: [PATCH v8 06/15] x86: Add early SHA support for Secure Launch
- early measurements
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Eric Biggers" <ebiggers@kernel.org>, "Andy Lutomirski"
- <luto@kernel.org>
-X-Mailer: aerc 0.17.0
-References: <CAMj1kXEmMBY_jc0uM5UgZbuZ3-C7NPKzg5AScaunyu9XzLgzZA@mail.gmail.com> <98ad92bb-ef17-4c15-88ba-252db2a2e738@citrix.com> <CAMj1kXFTu+bV2kQhAyu15hrYai20NcBLb4Zu8XG2Y-XjL0f+rw@mail.gmail.com> <1a8e69a7-89eb-4d36-94d6-0da662d8b72f@citrix.com> <CAMj1kXEvmGy9RJo4s8tECsFj2dufZ8jBPoJOEtkcGUoj+x2qsw@mail.gmail.com> <431a0b3a-47e5-4e61-a7fc-31cdf56f4e4c@citrix.com> <20240223175449.GA1112@sol.localdomain> <e641e2f1-16cf-4717-8a1f-8afac2644efe@citrix.com> <20240223183004.GE1112@sol.localdomain> <10db421c-77da-4a1c-a25e-2374a7a2ef79@app.fastmail.com> <20240403235635.GA24248@quark.localdomain>
-In-Reply-To: <20240403235635.GA24248@quark.localdomain>
 
-On Thu Apr 4, 2024 at 2:56 AM EEST, Eric Biggers wrote:
-> On Wed, Apr 03, 2024 at 09:32:02AM -0700, Andy Lutomirski wrote:
-> > On Fri, Feb 23, 2024, at 10:30 AM, Eric Biggers wrote:
-> > > On Fri, Feb 23, 2024 at 06:20:27PM +0000, Andrew Cooper wrote:
-> > >> On 23/02/2024 5:54 pm, Eric Biggers wrote:
-> > >> > On Fri, Feb 23, 2024 at 04:42:11PM +0000, Andrew Cooper wrote:
-> > >> >> Yes, and I agree.=C2=A0 We're not looking to try and force this i=
-n with
-> > >> >> underhand tactics.
-> > >> >>
-> > >> >> But a blind "nack to any SHA-1" is similarly damaging in the oppo=
-site
-> > >> >> direction.
-> > >> >>
-> > >> > Well, reviewers have said they'd prefer that SHA-1 not be included=
- and given
-> > >> > some thoughtful reasons for that.  But also they've given suggesti=
-ons on how to
-> > >> > make the SHA-1 support more palatable, such as splitting it into a=
- separate
-> > >> > patch and giving it a proper justification.
-> > >> >
-> > >> > All suggestions have been ignored.
-> > >>=20
-> > >> The public record demonstrates otherwise.
-> > >>=20
-> > >> But are you saying that you'd be happy if the commit message read
-> > >> something more like:
-> > >>=20
-> > >> ---8<---
-> > >> For better or worse, Secure Launch needs SHA-1 and SHA-256.
-> > >>=20
-> > >> The choice of hashes used lie with the platform firmware, not with
-> > >> software, and is often outside of the users control.
-> > >>=20
-> > >> Even if we'd prefer to use SHA-256-only, if firmware elected to star=
-t us
-> > >> with the SHA-1 and SHA-256 backs active, we still need SHA-1 to pars=
-e
-> > >> the TPM event log thus far, and deliberately cap the SHA-1 PCRs in o=
-rder
-> > >> to safely use SHA-256 for everything else.
-> > >> ---
-> > >
-> > > Please take some time to read through the comments that reviewers hav=
-e left on
-> > > previous versions of the patchset.
-> >=20
-> > So I went and read through the old comments, and I'm lost.  In brief su=
-mmary:
-> >=20
-> > If the hardware+firmware only supports SHA-1, then some reviewers would=
- prefer
-> > Linux not to support DRTM.  I personally think this is a bit silly, but=
- it's
-> > not entirely unreasonable.  Maybe it should be a config option?
-> >=20
-> > If the hardware+firmware does support SHA-256, then it sounds (to me, r=
-eading
-> > this -- I haven't dug into the right spec pages) that, for optimal secu=
-rity,
-> > something still needs to effectively turn SHA-1 *off* at runtime by cap=
-ping
-> > the event log properly.  And that requires computing a SHA-1 hash.  And=
-, to be
-> > clear, (a) this is only on systems that already support SHA-256 and tha=
-t we
-> > should support and (b) *not* doing so leaves us potentially more vulner=
-able to
-> > SHA-1 attacks than doing so.  And no SHA-256-supporting tooling will ac=
-tually
-> > be compromised by a SHA-1 compromise if we cap the event log.
-> >=20
-> > So is there a way forward?  Just saying "read through the comments" see=
-ms like
-> > a dead end.
-> >=20
->
-> It seems there may be a justification for some form of SHA-1 support in t=
-his
-> feature.  As I've said, the problem is that it's not explained in the pat=
-chset
-> itself.  Rather, it just talks about "SHA" and pretends like SHA-1 and SH=
-A-2 are
-> basically the same.  In fact, SHA-1 differs drastically from SHA-2 in ter=
-ms of
-> security.  SHA-1 support should be added in a separate patch, with a clea=
-rly
-> explained rationale *in the patch itself* for the SHA-1 support *specific=
-ally*.
+On Sat, Mar 30, 2024 at 12:00=E2=80=AFAM Michael Roth <michael.roth@amd.com=
+> wrote:
 
-Yeah, this is important so that we don't end up deleting that support
-by accident. Just adding to denote that this more than just a "process
-issue".
+> +static int snp_page_reclaim(u64 pfn)
+> +{
+> +       struct sev_data_snp_page_reclaim data =3D {0};
+> +       int err, rc;
+> +
+> +       data.paddr =3D __sme_set(pfn << PAGE_SHIFT);
+> +       rc =3D sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
+> +       if (WARN_ON_ONCE(rc)) {
+> +               /*
+> +                * This shouldn't happen under normal circumstances, but =
+if the
+> +                * reclaim failed, then the page is no longer safe to use=
+.
+> +                */
+> +               snp_leak_pages(pfn, 1);
+> +       }
+> +
+> +       return rc;
+> +}
+> +
+> +static int host_rmp_make_shared(u64 pfn, enum pg_level level, bool leak)
+> +{
+> +       int rc;
+> +
+> +       rc =3D rmp_make_shared(pfn, level);
+> +       if (rc && leak)
+> +               snp_leak_pages(pfn, page_level_size(level) >> PAGE_SHIFT)=
+;
 
-> - Eric
+leak is always true, so I think you can remove the argument.
 
-BR, Jarkko
+Paolo
+
