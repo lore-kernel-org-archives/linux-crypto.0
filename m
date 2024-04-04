@@ -1,73 +1,183 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284E513CF89;
-	Thu,  4 Apr 2024 21:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01A913C3F0
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Apr 2024 22:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712265815; cv=none; b=H7GA5it6Zu8XW7yUlDdBa/ODAIpNNMhQDls59n+AtrDyhcutJv2f/Nvs2LCiSOEwphXJtY7B5v03NObXOg4+5eS2BBkpLOV3ojpyii5oZGL16vKnYCN+DAED+2n4OvHVBbl0Nh8ohiiQqsSDgBjAA4RSODUoGvSkvOjmnSBL4Zw=
+	t=1712269082; cv=none; b=FOiatffwv7cXS+Xb4G9HCG9eQZme9f9eCWdphQDpzunYJ3vKYh7o6GEX3KiM2Zg4Ji79k6sGSONCIk3CEm3SvJtvDTPa+H9Oocg6iNOjNM9+KSGjL7VVRELQRH5hsMeJRw5VlvouVUK68JKMYBAjjEOlBKWTWEba2laAcyIGdMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712265815; c=relaxed/simple;
-	bh=T1v9rRNf+wSRQI9F8X7P3y+HMEB37C+4yTnppFx1rFU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KGXuYJieGlqn/Ub7n45ma4sKHFoU7Uer8w8qdeD8ROww/7/83AahiMLmGeuAd79yDZ6HllJHKW6UgoTydDnb3QBRqoL1SYIQ5yWkDRCP16rDwIT5LL0MVcsdDyxG6kRzp/5hYrVu0c0Y04PZm7tR4vWRp9NNmHGMYFbjxpdV6RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YPyfRvdP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712269082; c=relaxed/simple;
+	bh=RZPrq+xVDjiyzuvgmiC5bztMCL91wQIMW6JQhQhfvYY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jdvAjDTqCzYknPWOo5B2OjzQGlRoQ6X1u4O0tz+hhUUvrUUxRhDWpU2KsQb1cnieQDgnr//r5cfGxqnygytDCypOsAhR3x46mlgMADjQXeSRHxVEjVBB3qR4tD10u9UMF/GVb+41CtQ2LrZlYdb79hq/ZkpFDf/vHIwUf/IVIrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iNpgHmou; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YPyfRvdP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA8FBC43394;
-	Thu,  4 Apr 2024 21:23:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712265815;
-	bh=T1v9rRNf+wSRQI9F8X7P3y+HMEB37C+4yTnppFx1rFU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YPyfRvdPxU1xMgcrS/0FAyxSbXppAwuP09+yjePa1reahzycrJFwzdHJLpW6Ood+F
-	 Z8D0ljKbO2rRnzrYIkz3N6Kz1soTSuDk/3XW8abelwQFTDhl1N94YfsHgADsnmz26R
-	 tYUnpCQYis84eFU6ComEvfMn8/D3TL0hntDwCFNOkZ+pi8yyru1YjSd19CuQPLYbWh
-	 pQRd+hs2K/yieu8sGoLYqnbteJZPjZDWsdhINbxlyDyZuWiqY5D3TV461Ig3UpzPUv
-	 TyYk8nYmblscZGrRcm/qZNFWlttUwy/sLjUQXx8dTyeTKvuV8AFKeDVzNWZXp5R6CZ
-	 eQfh4YmBaEPoQ==
-From: Bjorn Andersson <andersson@kernel.org>
-To: Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	cros-qcom-dts-watchers@chromium.org,
-	Luca Weiss <luca.weiss@fairphone.com>
-Cc: ~postmarketos/upstreaming@lists.sr.ht,
-	phone-devel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: (subset) [PATCH 0/2] Add Inline Crypto Engine for SC7280 UFS
-Date: Thu,  4 Apr 2024 16:23:01 -0500
-Message-ID: <171226578679.615813.10247143708079822717.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240313-sc7280-ice-v1-0-3fa089fb7a27@fairphone.com>
-References: <20240313-sc7280-ice-v1-0-3fa089fb7a27@fairphone.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iNpgHmou"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-343d2b20c4bso557076f8f.2
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Apr 2024 15:17:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712269077; x=1712873877; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eIW+Z3FuH4Tlrbj9QrjroPzWQnEb4hQ4AxEw1tDZfk4=;
+        b=iNpgHmouikM3eS2bzDsViRnQPf4IYT0AntRq/pLUycBts1tEtNDBhLAHPWLbGGQuwD
+         QJtB2nqOmcrDZKQqkypAxU9t8BXasLVzM76U6doxh0UD6M0mrI/XgijigKuOcMI2NCIb
+         whmis5i9jCy0XZKIvDNYWGW+znPQeHBEMsfX8rggozuXIuCHf0B+o1YIbhjdkYuLbC6k
+         nmWR9tyq0QFPwh7UUDhI4p73EwefaEhKQVvrdC/li4M77bvJ/3+wYenQP3FJrzs+WVyB
+         h/Tam1ckIRELByLvoQC8mEYZ6O8sMXwbWpK4qyuHRrWaDSukD/B1KlHnI6ojMiGvDvbK
+         uIeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712269077; x=1712873877;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eIW+Z3FuH4Tlrbj9QrjroPzWQnEb4hQ4AxEw1tDZfk4=;
+        b=P6jDj4/JbIQmtv+zM40+akV9182tBQ5JYLtx8S24ztv7v5nEIPJX+QWGRQk6n28bTa
+         2njkIb0BlHcgUsyI467ZtpmyvoK0tM4zhSB2BV3FifBJLiocAo7QAU0ShMUvv1dLUpeH
+         1G1zdThbfpQwHX9vkpFWQ09JyKXSFPkrPBUpKUQa3R/IPykFCYF1P/5SbuiFPmNAU9T/
+         qP1JHvJmPVnp6T3oejlC3cTURfn77dyyFvGHcb+cXxko/voeYc89B8ceN6SaV90Yzpca
+         6+6ZEamwqfpPkBnPkTKwPfuYBaMBW/erJEBpYGuYTsil1eTlBh6GUH4jQy/ndyTTNs6O
+         aK0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVlnxZQ8RhsrONS/R1e4QOnCX5GZq+Uq5lwEzJOPRuz6w/I7fTGMwRUMFQ4TpWaxH3Uqa9+nlJqVvFKbNrJqICLuNlgyRRq7B4+dcR8
+X-Gm-Message-State: AOJu0YzDFOVOkLxbB6ososZ7l7xls0UyWn39lxurDmBg/FauKTl/R/1p
+	E04u4gGX8u3Q1ZUjVBsZue1Zcyol1uPXlM5MJW8cNyCvHeZjyUrJH+BskMBof40bHSQKMmdPc4D
+	OBfeW58PVdiMptmMLu44BgCQlgBGBfCvKagpc
+X-Google-Smtp-Source: AGHT+IEoGycg7Q6yz1U10yVcrqSmmGhsvl59dTKCzdbY+AGkKJwTyJBRF58S2bqCqewHCyhhbzL+kREAY0nZt0Z/KC8=
+X-Received: by 2002:a5d:56cd:0:b0:343:a117:7d2 with SMTP id
+ m13-20020a5d56cd000000b00343a11707d2mr434133wrw.71.1712269077043; Thu, 04 Apr
+ 2024 15:17:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20240404165404.3805498-1-surenb@google.com> <Zg7dmp5VJkm1nLRM@casper.infradead.org>
+ <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
+In-Reply-To: <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
+From: Suren Baghdasaryan <surenb@google.com>
+Date: Thu, 4 Apr 2024 15:17:43 -0700
+Message-ID: <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
+Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
+ the call site
+To: Matthew Wilcox <willy@infradead.org>
+Cc: akpm@linux-foundation.org, joro@8bytes.org, will@kernel.org, 
+	trond.myklebust@hammerspace.com, anna@kernel.org, arnd@arndb.de, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, jikos@kernel.org, 
+	benjamin.tissoires@redhat.com, tytso@mit.edu, jack@suse.com, 
+	dennis@kernel.org, tj@kernel.org, cl@linux.com, jakub@cloudflare.com, 
+	penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com, 
+	vbabka@suse.cz, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
+	acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-ext4@vger.kernel.org, linux-mm@kvack.org, 
+	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	kent.overstreet@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Apr 4, 2024 at 10:08=E2=80=AFAM Suren Baghdasaryan <surenb@google.c=
+om> wrote:
+>
+> On Thu, Apr 4, 2024 at 10:04=E2=80=AFAM Matthew Wilcox <willy@infradead.o=
+rg> wrote:
+> >
+> > On Thu, Apr 04, 2024 at 09:54:04AM -0700, Suren Baghdasaryan wrote:
+> > > +++ b/include/linux/dma-fence-chain.h
+> > > @@ -86,10 +86,7 @@ dma_fence_chain_contained(struct dma_fence *fence)
+> > >   *
+> > >   * Returns a new struct dma_fence_chain object or NULL on failure.
+> > >   */
+> > > -static inline struct dma_fence_chain *dma_fence_chain_alloc(void)
+> > > -{
+> > > -     return kmalloc(sizeof(struct dma_fence_chain), GFP_KERNEL);
+> > > -};
+> > > +#define dma_fence_chain_alloc()      kmalloc(sizeof(struct dma_fence=
+_chain), GFP_KERNEL)
+> >
+> > You've removed some typesafety here.  Before, if I wrote:
+> >
+> >         struct page *page =3D dma_fence_chain_alloc();
+> >
+> > the compiler would warn me that I've done something stupid.  Now it
+> > can't tell.  Suggest perhaps:
+> >
+> > #define dma_fence_chain_alloc()                                        =
+   \
+> >         (struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain=
+), \
+> >                                                 GFP_KERNEL)
+> >
+> > but maybe there's a better way of doing that.  There are a few other
+> > occurrences of the same problem in this monster patch.
+>
+> Got your point.
 
-On Wed, 13 Mar 2024 13:53:13 +0100, Luca Weiss wrote:
-> Add the required bits to support Inline Crypto Engine on SC7280 SoC with
-> UFS.
-> 
-> 
+Ironically, checkpatch generates warnings for these type casts:
 
-Applied, thanks!
+WARNING: unnecessary cast may hide bugs, see
+http://c-faq.com/malloc/mallocnocast.html
+#425: FILE: include/linux/dma-fence-chain.h:90:
++ ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain),
+GFP_KERNEL))
 
-[2/2] arm64: dts: qcom: sc7280: Add inline crypto engine
-      commit: dfd5ee7b34bb7611d4d2f4f3cb37152baeaae96d
+I guess I can safely ignore them in this case (since we cast to the
+expected type)?
 
-Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+>
+> >
+> > > +++ b/include/linux/hid_bpf.h
+> > > @@ -149,10 +149,7 @@ static inline int hid_bpf_connect_device(struct =
+hid_device *hdev) { return 0; }
+> > >  static inline void hid_bpf_disconnect_device(struct hid_device *hdev=
+) {}
+> > >  static inline void hid_bpf_destroy_device(struct hid_device *hid) {}
+> > >  static inline void hid_bpf_device_init(struct hid_device *hid) {}
+> > > -static inline u8 *call_hid_bpf_rdesc_fixup(struct hid_device *hdev, =
+u8 *rdesc, unsigned int *size)
+> > > -{
+> > > -     return kmemdup(rdesc, *size, GFP_KERNEL);
+> > > -}
+> > > +#define call_hid_bpf_rdesc_fixup(_hdev, _rdesc, _size) kmemdup(_rdes=
+c, *(_size), GFP_KERNEL)
+> >
+> > here
+> >
+> > > -static inline handle_t *jbd2_alloc_handle(gfp_t gfp_flags)
+> > > -{
+> > > -     return kmem_cache_zalloc(jbd2_handle_cache, gfp_flags);
+> > > -}
+> > > +#define jbd2_alloc_handle(_gfp_flags)        kmem_cache_zalloc(jbd2_=
+handle_cache, _gfp_flags)
+> >
+> > here
+> >
+> > > +++ b/include/linux/skmsg.h
+> > > @@ -410,11 +410,8 @@ void sk_psock_stop_verdict(struct sock *sk, stru=
+ct sk_psock *psock);
+> > >  int sk_psock_msg_verdict(struct sock *sk, struct sk_psock *psock,
+> > >                        struct sk_msg *msg);
+> > >
+> > > -static inline struct sk_psock_link *sk_psock_init_link(void)
+> > > -{
+> > > -     return kzalloc(sizeof(struct sk_psock_link),
+> > > -                    GFP_ATOMIC | __GFP_NOWARN);
+> > > -}
+> > > +#define sk_psock_init_link() \
+> > > +             kzalloc(sizeof(struct sk_psock_link), GFP_ATOMIC | __GF=
+P_NOWARN)
+> >
+> > here
+> >
+> > ... I kind of gave up at this point.  You'll want to audit for yourself
+> > anyway ;-)
+>
+> Yes, I'll go over it and will make the required changes. Thanks for
+> looking into it!
+> Suren.
