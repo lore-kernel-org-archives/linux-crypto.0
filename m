@@ -1,170 +1,103 @@
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5973116D9B5
-	for <linux-crypto@vger.kernel.org>; Fri,  5 Apr 2024 13:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8934617279E;
+	Fri,  5 Apr 2024 18:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712325203; cv=none; b=itEBIthWUjcNvJgdJOgaJf7Sj9taIKcIVgKrRv4DSCCVtTgccJ+LOhLAKBgD2WrToehdMcdFnQwUm+RwfgnHttmV+mWoDbXG/foE4KVb4kb4KZZCHoS9zZpnCf7HiwlGBL4u8VQX5Q4NzlvTuK8dU3GhO+XqF/rBJb9S2kOLQ80=
+	t=1712343454; cv=none; b=A4vVnFuAEdOmA+KZr2+/lAC7nQPwhYOqouuUMYC/m55sA9p6meNDitkWGJ1NFoDJz1OnEcf8iZ2kWozOJw6r83XXkEyDR4fYhnYnF3MKAYFMwdoeC3u0xUZdo9ZVyMQMR4iYRkR4suAbCMFwdgOKlz80Z08GRwYOuNWDqO7BOe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712325203; c=relaxed/simple;
-	bh=0BksyQPOyLKGmYa0FEtepwJD1JDHx0EJaEKX0tpkO58=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ILNjJ+VlLB8IBKPqXxdy3PQKMuWqRYxyrztFyZcGjwLgApzUWdHFVCGTcRcr7E3T/jqTLSK3hHNe+nG/R0c6Z/o1l8DNEniFlda13Yu/vwfRYoxhCkL0f97aIrPyS4eHJFJ70sQqYGpIgqK8z6RjL+lIo4x4UZAX1KC4wLQqvuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aYTVf2I+; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1712343454; c=relaxed/simple;
+	bh=LnamEoZaR3iwKuwi0MrPtYbjJA5iVWtngHBMfSeCOnc=;
+	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=SaVewlGbXl/+CUkc4xe4OLGTMy7dN6zebgeNRAX6XM4ydtr7IODBzPG729S6iMQykUSTmWoFN/h/o+ApfpFCswbhCSxEHKHwHA1spL2QqFGpHuO0LtNbENy2h/2F2eLGJgUnDagYkR16P0k6u1F3nbJfNbELNQeZUwr2nwbZXk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S+5e6+2l; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aYTVf2I+"
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dbed0710c74so2069225276.1
-        for <linux-crypto@vger.kernel.org>; Fri, 05 Apr 2024 06:53:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712325200; x=1712930000; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lAHdE5NFk++ufix28SzhuwWBAI0pKipkj98VJiYe3GU=;
-        b=aYTVf2I+TyRnSSdH8+I/CVMYO1BJa7hB9/v01eKTU4OrNL9qd16Jg0wQfeflZu4I00
-         bJzKgnoYGjlF2wFjjjOIkrUvFIjP/gbka8Ca/nK2NNuY96Fo8i0pVlzBoXDg1TkGWJgh
-         e74bm5LQIwxwotdUhDKtFybHE4VYNE/OXkfP4r8mdYC/WVnYYO2zvp0is9rK/LvGlb1u
-         rNp+xyY2kEDgPEpFHmoCvWu4DRKLOea8E3f1pcxL98WGt6zjQX+gyOrqvrhhCb7mBZhQ
-         NliJCHdvq8o1zOgd+ypWl8ttBwBOiemAKjdJsQE5P4duBu286hd2IUmiV+Z3y72bJNxi
-         hYIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712325200; x=1712930000;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lAHdE5NFk++ufix28SzhuwWBAI0pKipkj98VJiYe3GU=;
-        b=P8OD68dR4ERCEdkSqB1qVSSKcyXO8dgNJ2tpdPKp/ZnsAQu1ELZT7HZ5hYLkjPv5vK
-         ADChJ97EZGApbqaBUdDmgM6xC04AtPJu+iyRKzyLJsEWCDb8CCZrzylFZWEu6b8SSCwU
-         2BPnmHW+NC30VBGczpJATY0T6FzlbQUMsGxnYxLBtTyr1NnnIxG+BDTJponJjhOBlTli
-         GFzN+07Ib3l5XSQjXaFHqNvFcEsIV68fr/KcgLiTVF0+Y/Fn0472XaY7Bzn5LPOKtCj9
-         0AUs77AGk5pyJLIr0t+iTPtI0Px03rZMhmYwN027aAZZAsBGVb+MZ3UMHhqBoQNoGCEk
-         eSyw==
-X-Forwarded-Encrypted: i=1; AJvYcCWKvytKu+73KZjNmjmlQ/enHAE1b0rn5AiA5VnfcFlKeo5gauDMhyjMZAEfuSVnizwTte9mkEw7A66eKRfg4STaEvDFJjZCEyxKMU3E
-X-Gm-Message-State: AOJu0YyhjHAWZB5dBgEMEcztmGjnuj617jrUClgekMP/q99FmFd+NmSM
-	1sNtydofWcN+FLRMlf2gVMOaI04TvJXi6uLdIrrTafsF53FJyK+OT9hdV92LUOAPdAxwqUnjQkL
-	5fcIDBfIdocQmjJXc2LuLKDU4ZfbSkneKeryw
-X-Google-Smtp-Source: AGHT+IH/KRHN+9M5N1gYIB2bCPgMB25x0KPnvuKiHgvgSCGh43Ngn+0mkz51p67LhizDAcBL1UgazcYTNlxqGDPZP2o=
-X-Received: by 2002:a25:f454:0:b0:dcd:b624:3e55 with SMTP id
- p20-20020a25f454000000b00dcdb6243e55mr1115241ybe.54.1712325200128; Fri, 05
- Apr 2024 06:53:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S+5e6+2l"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712343453; x=1743879453;
+  h=message-id:subject:from:to:cc:date:
+   content-transfer-encoding:mime-version;
+  bh=LnamEoZaR3iwKuwi0MrPtYbjJA5iVWtngHBMfSeCOnc=;
+  b=S+5e6+2lylHUY1+aSCn5b3LDBG2DhrIHZCpQPhYP8HOmZIUkhlIXtEHu
+   gCAfKKnmDhU/Mt7gXPc6eE50esYYKLOd8sHTDYQGDrsM+9+MXe73th1mM
+   6zPbySyJOu6ad5CjV86ObjkIhEx4MSI5zCqd6KBkLp8byTeL0a9Cf/YfC
+   XP2hjgqIfe72pfXUHCa6g13EUb/bcxYzYzPuC+mQmVFc4Cty1EV72mJbo
+   YDs0aIBKxDstE26pAsgy3G6eXO4+Vnj9FBkWtiQLXUuKwyglwomQw0IaZ
+   B8++6TMx9gNQvek7FlgowkgvScG2jmuNcw/fFxH7xaxW6WHor7GxEz64Z
+   g==;
+X-CSE-ConnectionGUID: ZRCEN42HQF6yaO6UWKtSEQ==
+X-CSE-MsgGUID: NDAFJe+SRLibMf6AQxtA9w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11035"; a="30168079"
+X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
+   d="scan'208";a="30168079"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 11:57:32 -0700
+X-CSE-ConnectionGUID: WVTk02faR+GSXUEVAchgYw==
+X-CSE-MsgGUID: 6tmd2CxkTNygQJMwk8i/Bg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
+   d="scan'208";a="19275901"
+Received: from yessieki-mobl.amr.corp.intel.com ([10.212.83.7])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 11:57:31 -0700
+Message-ID: <afef90304a6985474a9d367efb21423b8c56cc88.camel@linux.intel.com>
+Subject: [PATCH] crypto: iaa - Use cpumask_weight() when rebalancing
+From: Tom Zanussi <tom.zanussi@linux.intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Date: Fri, 05 Apr 2024 13:57:30 -0500
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404165404.3805498-1-surenb@google.com> <Zg7dmp5VJkm1nLRM@casper.infradead.org>
- <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
- <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
- <Zg8qstJNfK07siNn@casper.infradead.org> <jb25mtkveqf63bv74jhynf6ncxmums5s37esveqsv52yurh4z7@5q55ttv34bia>
- <20240404154150.c25ba3a0b98023c8c1eff3a4@linux-foundation.org>
- <jpaw4hdd73ngt7mvtcdryqscivx6m2ic76ikfkcopceb47becp@vox5czt5bec3> <Zg_yHGKpw4HJHdpb@casper.infradead.org>
-In-Reply-To: <Zg_yHGKpw4HJHdpb@casper.infradead.org>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Fri, 5 Apr 2024 06:53:09 -0700
-Message-ID: <CAJuCfpGMSHv7drSu7Veo5CVz3d_Upt8S6Rdx3isi7orct9-uNQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
- the call site
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Kent Overstreet <kent.overstreet@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
-	joro@8bytes.org, will@kernel.org, trond.myklebust@hammerspace.com, 
-	anna@kernel.org, arnd@arndb.de, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, jikos@kernel.org, benjamin.tissoires@redhat.com, 
-	tytso@mit.edu, jack@suse.com, dennis@kernel.org, tj@kernel.org, cl@linux.com, 
-	jakub@cloudflare.com, penberg@kernel.org, rientjes@google.com, 
-	iamjoonsoo.kim@lge.com, vbabka@suse.cz, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-ext4@vger.kernel.org, linux-mm@kvack.org, 
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 5, 2024 at 5:44=E2=80=AFAM Matthew Wilcox <willy@infradead.org>=
- wrote:
->
-> On Thu, Apr 04, 2024 at 07:00:51PM -0400, Kent Overstreet wrote:
-> > On Thu, Apr 04, 2024 at 03:41:50PM -0700, Andrew Morton wrote:
-> > > On Thu, 4 Apr 2024 18:38:39 -0400 Kent Overstreet <kent.overstreet@li=
-nux.dev> wrote:
-> > >
-> > > > On Thu, Apr 04, 2024 at 11:33:22PM +0100, Matthew Wilcox wrote:
-> > > > > On Thu, Apr 04, 2024 at 03:17:43PM -0700, Suren Baghdasaryan wrot=
-e:
-> > > > > > Ironically, checkpatch generates warnings for these type casts:
-> > > > > >
-> > > > > > WARNING: unnecessary cast may hide bugs, see
-> > > > > > http://c-faq.com/malloc/mallocnocast.html
-> > > > > > #425: FILE: include/linux/dma-fence-chain.h:90:
-> > > > > > + ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_ch=
-ain),
-> > > > > > GFP_KERNEL))
-> > > > > >
-> > > > > > I guess I can safely ignore them in this case (since we cast to=
- the
-> > > > > > expected type)?
-> > > > >
-> > > > > I find ignoring checkpatch to be a solid move 99% of the time.
-> > > > >
-> > > > > I really don't like the codetags.  This is so much churn, and it =
-could
-> > > > > all be avoided by just passing in _RET_IP_ or _THIS_IP_ depending=
- on
-> > > > > whether we wanted to profile this function or its caller.  vmallo=
-c
-> > > > > has done it this way since 2008 (OK, using __builtin_return_addre=
-ss())
-> > > > > and lockdep has used _THIS_IP_ / _RET_IP_ since 2006.
-> > > >
-> > > > Except you can't. We've been over this; using that approach for tra=
-cing
-> > > > is one thing, using it for actual accounting isn't workable.
-> > >
-> > > I missed that.  There have been many emails.  Please remind us of the
-> > > reasoning here.
-> >
-> > I think it's on the other people claiming 'oh this would be so easy if
-> > you just do it this other way' to put up some code - or at least more
-> > than hot takes.
->
-> Well, /proc/vmallocinfo exists, and has existed since 2008, so this is
-> slightly more than a "hot take".
->
-> > But, since you asked - one of the main goals of this patchset was to be
-> > fast enough to run in production, and if you do it by return address
-> > then you've added at minimum a hash table lookup to every allocate and
-> > free; if you do that, running it in production is completely out of the
-> > question.
->
-> And yet vmalloc doesn't do that.
->
-> > Besides that - the issues with annotating and tracking the correct
-> > callsite really don't go away, they just shift around a bit. It's true
-> > that the return address approach would be easier initially, but that's
-> > not all we're concerned with; we're concerned with making sure
-> > allocations get accounted to the _correct_ callsite so that we're givin=
-g
-> > numbers that you can trust, and by making things less explicit you make
-> > that harder.
->
-> I'm not convinced that _THIS_IP_ is less precise than a codetag.  They
-> do essentially the same thing, except that codetags embed the source
-> location in the file while _THIS_IP_ requires a tool like faddr2line
-> to decode kernel_clone+0xc0/0x430 into a file + line number.
->
-> > This is all stuff that I've explained before; let's please dial back on
-> > the whining - or I'll just bookmark this for next time...
->
-> Please stop mischaracterising serious thoughtful criticism as whining.
-> I don't understand what value codetags bring over using _THIS_IP_ and
-> _RET_IP_ and you need to explain that.
+If some cpus are offlined, or if the node mask is smaller than
+expected, the 'nonexistent cpu' warning in rebalance_wq_table() may be
+erroneously triggered.
 
-The conceptual difference between codetag and _THIS_IP_/_RET_IP_ is
-that codetag injects counters at the call site, so you don't need to
-spend time finding the appropriate counter to operate on during
-allocation.
+Use cpumask_weight() to make sure we only iterate over the exact
+number of cpus in the mask.
+
+Also use num_possible_cpus() instead of num_online_cpus() to make sure
+all slots in the wq table are initialized.
+
+Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+---
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/in=
+tel/iaa/iaa_crypto_main.c
+index 6229b24b0d35..814fb2c31626 100644
+--- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
++++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+@@ -922,7 +922,7 @@ static void rebalance_wq_table(void)
+ 	for_each_node_with_cpus(node) {
+ 		node_cpus =3D cpumask_of_node(node);
+=20
+-		for (cpu =3D 0; cpu < nr_cpus_per_node; cpu++) {
++		for (cpu =3D 0; cpu <  cpumask_weight(node_cpus); cpu++) {
+ 			int node_cpu =3D cpumask_nth(cpu, node_cpus);
+=20
+ 			if (WARN_ON(node_cpu >=3D nr_cpu_ids)) {
+@@ -2005,7 +2005,7 @@ static int __init iaa_crypto_init_module(void)
+ 	int ret =3D 0;
+ 	int node;
+=20
+-	nr_cpus =3D num_online_cpus();
++	nr_cpus =3D num_possible_cpus();
+ 	for_each_node_with_cpus(node)
+ 		nr_nodes++;
+ 	if (!nr_nodes) {
+--=20
+2.38.1
+
+
