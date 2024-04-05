@@ -1,110 +1,125 @@
-Received: from mail.zeus03.de (www.zeus03.de [194.117.254.33])
+Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540C215FA79
-	for <linux-crypto@vger.kernel.org>; Fri,  5 Apr 2024 08:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B96815FCE2;
+	Fri,  5 Apr 2024 09:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712307188; cv=none; b=rpGA+yxUnIYiTwtlclY0Q0x01UGsKZHznChMhqQ1zAlVyLLaWOFtd8+SYlj89O+OnbWYCLFbYCLogR/aMZ9SBvFj3Qq6vFvSHoFMJxYhhTgqk1Uu0act1MB7Q+EInY627vn5FM9sNCP2vi6ZjDZ1vxvnOj8jOptLMFUiBZBzvQA=
+	t=1712309357; cv=none; b=qNeMiZz5IzN97B9e6L9I6mu1xjljEVVKQSs5pi2R9YvKyxIaO9j6pm8XHB52RYVyQM0CzKLMZ5it6diHmFBWkoP7fS/CIqPZXzYj2/1i1s1dLwTlix/SsqK4SezgJNDA+VeqydcG0RI2aZp6lcVZdjvMulYQGiWQ8zmXUTEFwew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712307188; c=relaxed/simple;
-	bh=b58X/MIMUkzWJKfAi7xukhYyNxm3BVKa9wfMtsb3Sd4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I0VWROAguo1q8jYmopDXK9IONlotJpnX/GpxhAypODYERfesmQ1swYZ4LQ14PY1vz7R3U35DYiReFLo2vh2OaGRQeNXryFBgbLObDepUmon6hJrNXwz9ytCzCfce4f3kahBl5ts5gRWTxR+RUxc2TleTI7KNypBPHaf3paavtGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=KH/O2kU4; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="KH/O2kU4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=date:from:to:cc:subject:message-id
-	:references:mime-version:content-type:in-reply-to; s=k1; bh=b58X
-	/MIMUkzWJKfAi7xukhYyNxm3BVKa9wfMtsb3Sd4=; b=KH/O2kU4AXBavxNzHugQ
-	Cr0XiXqp/GPDBSk990nWASPmI37jJSCyQb7Lmqf/oL1tdcIHRX8jcmo2vwR2Tob2
-	3MSo8HTQY7A27SYWA+SI/NfQ5pqpmi79n6McsjIcB3WFLNWrOIMRU9rOtunrND10
-	HWjAn9CXhCQ+B9a1mPUM02wRXvB9PLITUPY3IFp4RQdrilkojM5jzuhcnTiEv7VH
-	VYyQIaPUSbCJyxVg+Ps6gEY1GV7GeeCVXIVYwLifWiKRkws+ODNIdvmXrsiBWpB2
-	SNQ1HJX7xrINzXmGee9lezHXjMCnmDNUx7uK3emvEkF2ZwnnAUK7Pn+L+1Q5APd7
-	Jg==
-Received: (qmail 4047676 invoked from network); 5 Apr 2024 10:53:03 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 5 Apr 2024 10:53:03 +0200
-X-UD-Smtp-Session: l3s3148p1@2SRllVUV0pYgAwDPXwEGAANOsN0UmmrN
-Date: Fri, 5 Apr 2024 10:53:02 +0200
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Russell King <linux@armlinux.org.uk>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Mike Leach <mike.leach@linaro.org>, 
-	James Clark <james.clark@arm.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Andi Shyti <andi.shyti@kernel.org>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Vinod Koul <vkoul@kernel.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Michal Simek <michal.simek@amd.com>, 
-	Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	linux-kernel@vger.kernel.org, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-input@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 14/19] i2c: nomadik: drop owner assignment
-Message-ID: <fgcn3ly4qk726eqv3lleqbrg7odgyklkyd6d7wmpyl73bbt5ir@tjui6nsxrlgk>
-Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Russell King <linux@armlinux.org.uk>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Mike Leach <mike.leach@linaro.org>, 
-	James Clark <james.clark@arm.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Andi Shyti <andi.shyti@kernel.org>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Vinod Koul <vkoul@kernel.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Michal Simek <michal.simek@amd.com>, 
-	Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	linux-kernel@vger.kernel.org, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-input@vger.kernel.org, kvm@vger.kernel.org
-References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
- <20240326-module-owner-amba-v1-14-4517b091385b@linaro.org>
+	s=arc-20240116; t=1712309357; c=relaxed/simple;
+	bh=Y24ye3Z3sxdzRUqBmE+2D+Ilmvls6rU9q0bvb5UvSM8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=sQnMwVm1MKhQgy5i15FWHbn7cd1i4f4tChFccI677TVvTAqYm5IWCtE7PFUcjayQxvCZ9QDvXBQsNs/T2TWDil7WkD4bI4COOhETmpQg2GyRRwOX4KmqNtIqJXaN871zvAhH9lQjJKo/kaP6vKGjmK7iR/beprZ8MAbiwhPeHI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout3.hostsharing.net (Postfix) with ESMTPS id 1C4E8100DA1A6;
+	Fri,  5 Apr 2024 11:29:06 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id E7B329926C7; Fri,  5 Apr 2024 11:29:05 +0200 (CEST)
+Date: Fri, 5 Apr 2024 11:29:05 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: Re: [PATCH v3] X.509: Introduce scope-based x509_certificate
+ allocation
+Message-ID: <Zg_EYX5m-GTyfPbY@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="honofbm32v4z4vxk"
-Content-Disposition: inline
-In-Reply-To: <20240326-module-owner-amba-v1-14-4517b091385b@linaro.org>
-
-
---honofbm32v4z4vxk
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CZA3R5R9CVYD.1HH1S662FW2RX@seitikki>
+ <CZA3PCY3U4YU.3R05ZC4X16EX0@seitikki>
 
-On Tue, Mar 26, 2024 at 09:23:44PM +0100, Krzysztof Kozlowski wrote:
-> Amba bus core already sets owner, so driver does not need to.
->=20
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->=20
+On Tue, Feb 20, 2024 at 06:00:41PM +0000, Jarkko Sakkinen wrote:
+> On Tue Feb 20, 2024 at 3:10 PM UTC, Lukas Wunner wrote:
+> > Add a DEFINE_FREE() clause for x509_certificate structs and use it in
+> > x509_cert_parse() and x509_key_preparse().  These are the only functions
+> > where scope-based x509_certificate allocation currently makes sense.
+> > A third user will be introduced with the forthcoming SPDM library
+> > (Security Protocol and Data Model) for PCI device authentication.
+> 
+> I think you are adding scope-based memory management and not
+> DEFINE_FREE(). Otherwise, this would be one-liner patch.
 
-Acked-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Above it states very clearly: "and use it in x509_cert_parse() and
+x509_key_preparse()".
+
+That's the reason it is not a one-liner patch.
 
 
---honofbm32v4z4vxk
-Content-Type: application/pgp-signature; name="signature.asc"
+> I'm not sure if the last sentence adds more than clutter as this
+> patch has nothing to do with SPDM changes per se.
 
------BEGIN PGP SIGNATURE-----
+I disagree.  It is important as a justification for the change that
+the two functions converted here are not going to be the only users,
+but that there's a third one coming up.
 
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmYPu+4ACgkQFA3kzBSg
-KbY+PhAAmNuSoACChosjYi33qGWzyeoBhz9tLue2x0d13airycgFlY6FyFx1aY+/
-NadTECwyu8TNhXdRAYk/Y1sTo9S+MezhsboJhiL8+5hiOBEZHXt7U5+8k/Pkg499
-9QHeM8PaeBfpoodRPGG7UCxHkjENntyyR4OV1X5eWgGheKFtzw6F2NwEMqTdus5H
-yGju+VYEMeH97wXMkPRPmqIAUfG140PY+fTfOInco1my/ejprCYy+OJdL+uMDBlG
-3MSIMIrLahtlKK6tkhnA9MdGaC3J4v5bzpo7lgDwM6qPcOHY6ftTfz726DpdI68w
-JLoRj/Ne4xKX4Munav7MMDCPGWaSY3fQ6F1xtzq+EdfVQHnSIxpuhH/zvpj7LDEz
-l+yVUvhjs41B3d8QkXmFp0ByjxaiIdO5EAkraw/OguBo6kv3N0TgEG1BZTdVa5+Q
-UfSRHLLAXCksCuADcBcHaRGXp3dlJB2Ywba2iCYBOeBD2DefxfHGcEurJyY3mp1h
-i+RlMmzHBKEoT5/nYkhzVZyQ8cosiJoL0LeK11p10xoexmDJzd7W8oshLhEDaB2L
-5zXqlT0JmawXt/SmDjByPFelFQPhEtWkIo/D65i4EBb0DnglGQSc4frb9FBiVP5U
-vPwuPyzkXVvObtEfHT2TL6wUD2IVZWJv4tCMQel7J/DK7WEJLjM=
-=o9jg
------END PGP SIGNATURE-----
 
---honofbm32v4z4vxk--
+> > I've compared the Assembler output before/after and they are identical,
+> > save for the fact that gcc-12 always generates two return paths when
+> > __cleanup() is used, one for the success case and one for the error case.
+> 
+> Use passive as commit message is not a personal letter.
+
+Okay, I will respin and change to passive mood.
+
+
+> I don't see a story here but instead I see bunch of disordered tecnical
+> terms.
+
+That doesn't sound like constructive criticism.
+
+
+> We have the code diff for detailed technical stuff. The commit message
+> should simply explain why we want this and what it does for us.
+[...]
+> What is the most important function of a commit message? Well, it comes
+> when the commit is in the mainline. It reminds of the *reasons* why a
+> change was made and this commit message does not really serve well in
+> that role.
+
+The reason for the commit is that Jonathan requested it during code
+review of my PCI device authentication patches.  I've been stating
+this very clearly in the first iteration of the present patch.
+You asked that I delete the sentence and instead use a Suggested-by.
+
+Perhaps it would have been better had I not listened to you.
+Because now you seem to have forgotten the reason for the patch,
+which, again, you asked me to delete.
+
+FWIW, here's the link to Jonathan's review:
+https://lore.kernel.org/all/20231003153937.000034ca@Huawei.com/
+
+And here's the quote with his explicit request to use cleanup.h:
+
+   "Maybe cleanup.h magic?  Seems like it would simplify error paths here a
+    tiny bit. Various other cases follow, but I won't mention this every time
+    [...]
+    Even this could be done with the cleanup.h stuff with appropriate
+    pointer stealing and hence allow direct returns.
+    This is the sort of case that I think really justifies that stuff."
+
+Thanks,
+
+Lukas
