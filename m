@@ -1,103 +1,129 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8934617279E;
-	Fri,  5 Apr 2024 18:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0427B171E5C;
+	Fri,  5 Apr 2024 19:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712343454; cv=none; b=A4vVnFuAEdOmA+KZr2+/lAC7nQPwhYOqouuUMYC/m55sA9p6meNDitkWGJ1NFoDJz1OnEcf8iZ2kWozOJw6r83XXkEyDR4fYhnYnF3MKAYFMwdoeC3u0xUZdo9ZVyMQMR4iYRkR4suAbCMFwdgOKlz80Z08GRwYOuNWDqO7BOe8=
+	t=1712344747; cv=none; b=SoDVSD/Eu+9pLooMUeMziWWxHiwvbcgHrkzJU5bI4GQQ7XK74xmqDaw3VBX9JObEgJinzDLZStjL6YavjexhqYgtFBhof12CDmO5xOQ1qpg9yHIYVcEVazaIP6v05vksk1gy7Dg8f3BPgYry8ZCOSacqk1+T5VPyh+KY4/9rQC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712343454; c=relaxed/simple;
-	bh=LnamEoZaR3iwKuwi0MrPtYbjJA5iVWtngHBMfSeCOnc=;
-	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=SaVewlGbXl/+CUkc4xe4OLGTMy7dN6zebgeNRAX6XM4ydtr7IODBzPG729S6iMQykUSTmWoFN/h/o+ApfpFCswbhCSxEHKHwHA1spL2QqFGpHuO0LtNbENy2h/2F2eLGJgUnDagYkR16P0k6u1F3nbJfNbELNQeZUwr2nwbZXk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S+5e6+2l; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1712344747; c=relaxed/simple;
+	bh=L6vX7CjDCEkXaoyr0KauLMbKwx1/o9eMOU1Qr4aqHT8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P+1rr037p9/flInducb/0AF0PCzbdxZM5nEJ0FuaF1EmnE+Gr8GHYkzTqMKtWXywJtL+z2LqLSUbqZsL1MMgIgG9YITr2LifPE0WPeR+xH3B4TaTZX5BUorA1eJSMHa8pVYbJMoCNIz3ZIwXISqoMuitRKugqvYuHrBA1sVQkYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nglUFMIc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S+5e6+2l"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712343453; x=1743879453;
-  h=message-id:subject:from:to:cc:date:
-   content-transfer-encoding:mime-version;
-  bh=LnamEoZaR3iwKuwi0MrPtYbjJA5iVWtngHBMfSeCOnc=;
-  b=S+5e6+2lylHUY1+aSCn5b3LDBG2DhrIHZCpQPhYP8HOmZIUkhlIXtEHu
-   gCAfKKnmDhU/Mt7gXPc6eE50esYYKLOd8sHTDYQGDrsM+9+MXe73th1mM
-   6zPbySyJOu6ad5CjV86ObjkIhEx4MSI5zCqd6KBkLp8byTeL0a9Cf/YfC
-   XP2hjgqIfe72pfXUHCa6g13EUb/bcxYzYzPuC+mQmVFc4Cty1EV72mJbo
-   YDs0aIBKxDstE26pAsgy3G6eXO4+Vnj9FBkWtiQLXUuKwyglwomQw0IaZ
-   B8++6TMx9gNQvek7FlgowkgvScG2jmuNcw/fFxH7xaxW6WHor7GxEz64Z
-   g==;
-X-CSE-ConnectionGUID: ZRCEN42HQF6yaO6UWKtSEQ==
-X-CSE-MsgGUID: NDAFJe+SRLibMf6AQxtA9w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11035"; a="30168079"
-X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
-   d="scan'208";a="30168079"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 11:57:32 -0700
-X-CSE-ConnectionGUID: WVTk02faR+GSXUEVAchgYw==
-X-CSE-MsgGUID: 6tmd2CxkTNygQJMwk8i/Bg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,181,1708416000"; 
-   d="scan'208";a="19275901"
-Received: from yessieki-mobl.amr.corp.intel.com ([10.212.83.7])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2024 11:57:31 -0700
-Message-ID: <afef90304a6985474a9d367efb21423b8c56cc88.camel@linux.intel.com>
-Subject: [PATCH] crypto: iaa - Use cpumask_weight() when rebalancing
-From: Tom Zanussi <tom.zanussi@linux.intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org
-Date: Fri, 05 Apr 2024 13:57:30 -0500
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nglUFMIc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C1BDC433F1;
+	Fri,  5 Apr 2024 19:19:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712344746;
+	bh=L6vX7CjDCEkXaoyr0KauLMbKwx1/o9eMOU1Qr4aqHT8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nglUFMIcwBXUHbWv00JUtYltYmtLBKyc9V1PPH4fkJp8K8OtAf2qo2d8IX0veYAMv
+	 zXfkn8p5QmSZMVbnHSAeUQ8M6dztnVKDh7B8WghBsg8yuStPkFteW25jFdkEjm3ZHU
+	 a52RLTb1parYC4icBfxD3rlaMQtzUugGH8oWbdtFP0TLMleNeSvVxtWX2MgWVN8yhg
+	 TU2+DzboewbSKsQfGYLZ1dATtZZVFQp6hFtJmfEL3ZNCAlGQzsrx4na5EQRKM3hI/a
+	 gyEJiGyZq2Q1n3XkaWcJ90jxSK7MSJnSmcjQiLJ/lLELFrJbF/YD6CfQeQhfmgwyPy
+	 HbNyNbDweEDfA==
+Date: Fri, 5 Apr 2024 15:19:04 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Laight <David.Laight@aculab.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Andy Lutomirski <luto@kernel.org>,
+	"Chang S . Bae" <chang.seok.bae@intel.com>
+Subject: Re: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
+Message-ID: <20240405191904.GA1205@quark.localdomain>
+References: <20240326080305.402382-1-ebiggers@kernel.org>
+ <CAMj1kXH4fNevFzrbazJptadxh_spEY3W91FZni5eMqD+UKrSUQ@mail.gmail.com>
+ <20240326164755.GB1524@sol.localdomain>
+ <6629b8120807458ab76e1968056f5e10@AcuMS.aculab.com>
+ <20240404013529.GB24248@quark.localdomain>
+ <142077804bee45daac3b0fad8bc4c2fe@AcuMS.aculab.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <142077804bee45daac3b0fad8bc4c2fe@AcuMS.aculab.com>
 
-If some cpus are offlined, or if the node mask is smaller than
-expected, the 'nonexistent cpu' warning in rebalance_wq_table() may be
-erroneously triggered.
+On Thu, Apr 04, 2024 at 07:53:48AM +0000, David Laight wrote:
+> > >
+> > > How much does the kernel_fpu_begin() cost on real workloads?
+> > > (ie when the registers are live and it forces an extra save/restore)
+> > 
+> > x86 Linux does lazy restore of the FPU state.  The first kernel_fpu_begin() can
+> > have a significant cost, as it issues an XSAVE (or equivalent) instruction and
+> > causes an XRSTOR (or equivalent) instruction to be issued when returning to
+> > userspace when it otherwise might not be needed.  Additional kernel_fpu_begin()
+> > / kernel_fpu_end() pairs without returning to userspace have only a small cost,
+> > as they don't cause any more saves or restores of the FPU state to be done.
+> > 
+> > My new xts(aes) implementations have one kernel_fpu_begin() / kernel_fpu_end()
+> > pair per message (if the message doesn't span any page boundaries, which is
+> > almost always the case).  That's exactly the same as the current xts-aes-aesni.
+> 
+> I realised after sending it that the code almost certainly already did
+> kernel_fpu_begin() - so there probably isn't a difference because all the
+> fpu state is always saved.
+> (I'm sure there should be a way of getting access to (say) 2 ymm registers
+> by providing an on-stack save area to allow wide data copies or special
+> instructions - but that is a different issue.)
+> 
+> > I think what you may really be asking is how much the overhead of the XSAVE /
+> > XRSTOR pair associated with kernel-mode use of the FPU *increases* if the kernel
+> > clobbers AVX or AVX512 state, instead of just SSE state as xts-aes-aesni does.
+> > That's much more relevant to this patchset.
+> 
+> It depends on what has to be saved, not on what is used.
+> Although, since all the x/y/zmm registers are caller-saved I think they could
+> be 'zapped' on syscall entry (and restored as zero later).
+> Trouble is I suspect there is a single piece of code somewhere that relies
+> on them being preserved across an inlined system call.
+> 
+> > I think the answer is that there is no additional overhead.  This is because the
+> > XSAVE / XRSTOR pair happens regardless of the type of state the kernel clobbers,
+> > and it operates on the userspace state, not the kernel's.  Some of the newer
+> > variants of XSAVE (XSAVEOPT and XSAVES) do have a "modified" optimization where
+> > they don't save parts of the state that are unmodified since the last XRSTOR;
+> > however, that is unimportant here because the kernel's FPU state is never saved.
+> > 
+> > (This would change if x86 Linux were to support preemption of kernel-mode FPU
+> > code.  In that case, we may need to take more care to minimize use of AVX and
+> > AVX512 state.  That being said, AES-XTS tends to be used for bulk data anyway.)
+> > 
+> > This is based on theory, though.  I'll do a test to confirm that there's indeed
+> > no additional overhead.  And also, even if there's no additional overhead, what
+> > the existing overhead actually is.
+> 
+> Yes, I was wondering how it is used for 'real applications'.
+> If a system call that would normally return immediately (or at least without
+> a full process switch) hits the aes code it gets the cost of the XSAVE added.
+> Whereas the benchmark probably doesn't do anywhere near as many.
+> 
+> OTOH this is probably no different.
 
-Use cpumask_weight() to make sure we only iterate over the exact
-number of cpus in the mask.
+I did some tests on Sapphire Rapids using a system call that I customized to do
+nothing except possibly a kernel_fpu_begin / kernel_fpu_end pair.
 
-Also use num_possible_cpus() instead of num_online_cpus() to make sure
-all slots in the wq table are initialized.
+On average the bare syscall took 70 ns.  The syscall with the kernel_fpu_begin /
+kernel_fpu_end pair took 160 ns if the userspace program used xmm only, 340 ns
+if it used ymm, or 360 ns if it used zmm.  I also tried making the kernel
+clobber different registers in the kernel_fpu_begin / kernel_fpu_end section,
+and as I expected this did not make any difference.
 
-Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
----
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Note that without the kernel_fpu_begin / kernel_fpu_end pair, AES-NI
+instructions cannot be used and the alternative would be xts(ecb(aes-generic)).
+On the same CPU, encrypting a single 512-byte sector with xts(ecb(aes-generic))
+takes about 2235ns.  With xts-aes-vaes-avx10_512 it takes 75 ns.  (Not a typo --
+it really is almost 30 times faster!)  So it seems clear the FPU state save and
+restore is worth it even just for a single sector using the traditional 512-byte
+sector size, let alone a 4096-byte sector size which is recommended these days.
 
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/in=
-tel/iaa/iaa_crypto_main.c
-index 6229b24b0d35..814fb2c31626 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -922,7 +922,7 @@ static void rebalance_wq_table(void)
- 	for_each_node_with_cpus(node) {
- 		node_cpus =3D cpumask_of_node(node);
-=20
--		for (cpu =3D 0; cpu < nr_cpus_per_node; cpu++) {
-+		for (cpu =3D 0; cpu <  cpumask_weight(node_cpus); cpu++) {
- 			int node_cpu =3D cpumask_nth(cpu, node_cpus);
-=20
- 			if (WARN_ON(node_cpu >=3D nr_cpu_ids)) {
-@@ -2005,7 +2005,7 @@ static int __init iaa_crypto_init_module(void)
- 	int ret =3D 0;
- 	int node;
-=20
--	nr_cpus =3D num_online_cpus();
-+	nr_cpus =3D num_possible_cpus();
- 	for_each_node_with_cpus(node)
- 		nr_nodes++;
- 	if (!nr_nodes) {
---=20
-2.38.1
-
-
+- Eric
