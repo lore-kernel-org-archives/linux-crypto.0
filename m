@@ -1,122 +1,79 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4503514291D;
-	Fri,  5 Apr 2024 07:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFFA14D299;
+	Fri,  5 Apr 2024 08:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712303871; cv=none; b=D99VpamlfObRhPL5M74YAl8J+hgPT972BXmezN4DO6nIvrmWRblOPTrp32w9cz1IHo9Y60wyF2czySQnkhqMHEqIFLt2ApuFTQ9TvmY/ZfimtnQpmnK71VGC/cQWxYWqvg199H9oka2Jiu4XoltZB/3QpYTAJBJO/NSJoWdA95A=
+	t=1712304764; cv=none; b=BjgecALpQHm58C5bfAbPkth50E8MpzLgZ4HfS+JxSqv6ztLz7UUMshnIq6jngG25n/ZKUzMP2VlzrxjKjcd+2Tth5AgazitlnD05SJ18lClDV0VXXrAldW6AUCU+tfjeo3hzzNzJ8rc0eruGVY42H09IzIFpavwC2gKXrjcs8iQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712303871; c=relaxed/simple;
-	bh=mxCQfRzszfWYnwK4g0fSWiEg42A5tFJ0IhDbUgekfjo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=lbJFWFCE4CC8sG2GwLfdGs3onIaPfic5GZVPcD4Mt+9nr3816rz8tSt9re397vSq7Sl/a+WHYwHyuWy7x8Jx/sctHbMlRxLzTPmVtz+PC2MnwA/4QpJXsWorSHLt3TSoi4PGWAeHdNjsVeL5og2bBQzuS5SwV2Y6VbU5ye/D7o8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rseSH-00FUEJ-3o; Fri, 05 Apr 2024 15:57:46 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Apr 2024 15:58:02 +0800
-Date: Fri, 5 Apr 2024 15:58:02 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, ardb@kernel.org, luto@kernel.org,
-	chang.seok.bae@intel.com
-Subject: Re: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
-Message-ID: <Zg+vCsQ++CVJ5m3Y@gondor.apana.org.au>
+	s=arc-20240116; t=1712304764; c=relaxed/simple;
+	bh=GXiP+uDMkTskhfWyyo+BigOGT7Sp0II1yXElavMKWW0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TXtAGKOOnewC6QLZRLGg72yie+GxtzapDkZPAES6WZUOBFod773Gl7bpQMtslIyOz1MeOUXzACw/ymtKoAeNb0XjxM6kVt6Pdo2/ni6l8dHo4DQ1qBsMOeYTKUC436ZpcR8SBK9DPS3dmLiBYp93eABSOsIZ4hceK76AjOojJLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lkjzBlKG; arc=none smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lkjzBlKG"
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6e6d063e88bso1190636a34.3;
+        Fri, 05 Apr 2024 01:12:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712304761; x=1712909561; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z9c3bDJ3ex6PwLSEvWrW5Tb1qMTVJqP9dhel5KI3lZ8=;
+        b=lkjzBlKGmf6+x9zY737A9aeQbYxU8A+inm6CfAJ/0LX/dG4vm38coPWyANJYlWbjZp
+         6bxMdcPTZLfMYZh61umDZ38lXyop9JP+yTXYg4Ph+1Hh8TVO7Sd3odhfw0lchnqrRGaA
+         m4Wa7PVlSjLexTJpvYrZ10Dewu9WjQ5/rBnk/2SIcn6Ljk42F14p68QQhBev/yy6odTD
+         uPNlqjDgttZUNNNyqZeYn5muLz9/o+W/OOurOg8V5inteGNKzkgxcSqW5grdtl6Bbv5s
+         l68B+2plcvnyqpiqOPdzso5s4O4FzgwtPHWJRn1caAGfUTaAbd+DztHw0+v5T5iN3ho7
+         VInw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712304761; x=1712909561;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z9c3bDJ3ex6PwLSEvWrW5Tb1qMTVJqP9dhel5KI3lZ8=;
+        b=QPE0RVHeDy4HkLwzol2W/fJlYcOoHN4Qpv6OC5q+tpaCt88D2Hlu3QP8jypGowXY47
+         EySyMFBRDzcc3Gd7A44TNOKAzyUDHU1StbOipCXIHFL/GQqZzh458g/OoUL4r3KEVsXl
+         LnRkkTerjMlhQq+y69Er0ZhM3/xzvEc8aosqoqw6/HMldwZU9D73VxJTGVHvBdCfLtXy
+         760hbeRjhAOCd1jx6Ept6IrShvQZrqZF6l63iSOC51r0lGXmgaCbRWw0MC6HLIE2NmFp
+         xH6Ijwj9RXEXFyFUzG9lHswPVD19MkGw56pqzrwfHRIQa5rX+KXtnehvEsrFgbFzwbsZ
+         ysiw==
+X-Forwarded-Encrypted: i=1; AJvYcCW0E1KRHhSRIr5baPWhcUfZP3IPbtcWftCApyEMbO+QxbJFR1m3b8z9gPjuUF1obAP+sFRx6t2OtCOLt1VrHg/7d8xOJVojKRNCcfpOaggRZVrzc09Na1L3oEJlxU30PiIzAxJF4PaxDii0+yxlSZg8PgVVSXl1lCA4f0z+HfJXq9XnpbJolg==
+X-Gm-Message-State: AOJu0YyW0l7KBGrzgNTCJjIh4Yq+Rxz8lfOuApq/uGWv4upQCEDt6wpV
+	HKj+JFNy/dubfPhHdHwAinLsmh5cg+uj8Xq8VThK2EndYPUlRTRVY7FbvRPB6o1WUJ4v2U7C1O8
+	MalYaMGaXpGZ+aW+g68pQUbRjCow=
+X-Google-Smtp-Source: AGHT+IGJA4qSu/BgqwLCfgWb2f5ZtBV+ihPgrrMO/9aw/0G4Sp4ahheWhLM/jo2bbCVdOazrR+RuAXv6TsavrH9MEDs=
+X-Received: by 2002:a05:6870:7683:b0:22e:9504:9600 with SMTP id
+ dx3-20020a056870768300b0022e95049600mr539457oab.55.1712304761495; Fri, 05 Apr
+ 2024 01:12:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240326080305.402382-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+References: <20240327054911.43093-1-animeshagarwal28@gmail.com> <Zg+tgFFDkwLvWgLv@gondor.apana.org.au>
+In-Reply-To: <Zg+tgFFDkwLvWgLv@gondor.apana.org.au>
+From: Animesh Agarwal <animeshagarwal28@gmail.com>
+Date: Fri, 5 Apr 2024 13:42:29 +0530
+Message-ID: <CAE3Oz803YoKiWqf1zu_3E1Md4pADjR00aSr=twzdKtD_-a_O4Q@mail.gmail.com>
+Subject: Re: [PATCH v2] dt-bindings: crypto: ti,omap-sham: Convert to dtschema
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Eric Biggers <ebiggers@kernel.org> wrote:
-> This patchset adds new AES-XTS implementations that accelerate disk and
-> file encryption on modern x86_64 CPUs.
-> 
-> The largest improvements are seen on CPUs that support the VAES
-> extension: Intel Ice Lake (2019) and later, and AMD Zen 3 (2020) and
-> later.  However, an implementation using plain AESNI + AVX is also added
-> and provides a small boost on older CPUs too.
-> 
-> To try to handle the mess that is x86 SIMD, the code for all the new
-> AES-XTS implementations is generated from an assembly macro.  This makes
-> it so that we e.g. don't have to have entirely different source code
-> just for different vector lengths (xmm, ymm, zmm).
-> 
-> To avoid downclocking effects, zmm registers aren't used on certain
-> Intel CPU models such as Ice Lake.  These CPU models default to an
-> implementation using ymm registers instead.
-> 
-> This patchset increases the throughput of AES-256-XTS decryption by the
-> following amounts on the following CPUs:
->                            
->                          | 4096-byte messages | 512-byte messages |
->    ----------------------+--------------------+-------------------+
->    Intel Skylake         |        1%          |       11%         |
->    Intel Ice Lake        |        92%         |       59%         |
->    Intel Sapphire Rapids |       115%         |       78%         |
->    AMD Zen 1             |        25%         |       20%         |
->    AMD Zen 2             |        26%         |       20%         |
->    AMD Zen 3             |        82%         |       40%         |
->    AMD Zen 4             |       118%         |       48%         |
-> 
-> (The results for encryption are very similar to decryption.  I just tend
-> to measure decryption because decryption performance is more important.)
-> 
-> There's no separate kconfig option for the new AES-XTS implementations,
-> as they are included in the existing option CONFIG_CRYPTO_AES_NI_INTEL.
-> 
-> To make testing easier, all four new AES-XTS implementations are
-> registered separately with the crypto API.  They are prioritized
-> appropriately so that the best one for the CPU is used by default.
-> 
-> Open questions:
-> 
-> - Is the policy that I implemented for preferring ymm registers to zmm
->  registers the right one?  arch/x86/crypto/poly1305_glue.c thinks that
->  only Skylake has the bad downclocking.  My current proposal is a bit
->  more conservative; it also excludes Ice Lake and Tiger Lake.  Those
->  CPUs supposedly still have some downclocking, though not as much.
-> 
-> - Should the policy on the use of zmm registers be in a centralized
->  place?  It probably doesn't make sense to have random different
->  policies for different crypto algorithms (AES, Poly1305, ARIA, etc.).
-> 
-> - Are there any other known issues with using AVX512 in kernel mode?  It
->  seems to work, and technically it's not new because Poly1305 and ARIA
->  already use AVX512, including the mask registers and zmm registers up
->  to 31.  So if there was a major issue, like the new registers not
->  being properly saved and restored, it probably would have already been
->  found.  But AES-XTS support would introduce a wider use of it.
-> 
-> Eric Biggers (6):
->  x86: add kconfig symbols for assembler VAES and VPCLMULQDQ support
->  crypto: x86/aes-xts - add AES-XTS assembly macro for modern CPUs
->  crypto: x86/aes-xts - wire up AESNI + AVX implementation
->  crypto: x86/aes-xts - wire up VAES + AVX2 implementation
->  crypto: x86/aes-xts - wire up VAES + AVX10/256 implementation
->  crypto: x86/aes-xts - wire up VAES + AVX10/512 implementation
-> 
-> arch/x86/Kconfig.assembler           |  10 +
-> arch/x86/crypto/Makefile             |   3 +-
-> arch/x86/crypto/aes-xts-avx-x86_64.S | 796 +++++++++++++++++++++++++++
-> arch/x86/crypto/aesni-intel_glue.c   | 263 ++++++++-
-> 4 files changed, 1070 insertions(+), 2 deletions(-)
-> create mode 100644 arch/x86/crypto/aes-xts-avx-x86_64.S
-> 
-> 
-> base-commit: 4cece764965020c22cff7665b18a012006359095
+On Fri, Apr 5, 2024 at 1:21=E2=80=AFPM Herbert Xu <herbert@gondor.apana.org=
+.au> wrote:
+> Patch applied.  Thanks.
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Glad to hear. Thanks!
+---
+Animesh Agarwal
