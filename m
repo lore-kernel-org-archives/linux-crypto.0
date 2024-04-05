@@ -1,56 +1,31 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33ED912F36F;
-	Fri,  5 Apr 2024 07:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4503514291D;
+	Fri,  5 Apr 2024 07:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712303861; cv=none; b=IHqpm1miK83AGe2UAuAjKrHN+Y9XfCmKjrZsbssF97JWtZjBkqeT5e4JI1u1/C1N3ydJp3EW2tsLZN+Nw13u5xSf84JCLJEdg5+oxRY1l7zbVugoId8m6s/flcD6MHu+sNzvoCnDAc7R5ARsYONrTFlkd9p/i96spPvupS+MGao=
+	t=1712303871; cv=none; b=D99VpamlfObRhPL5M74YAl8J+hgPT972BXmezN4DO6nIvrmWRblOPTrp32w9cz1IHo9Y60wyF2czySQnkhqMHEqIFLt2ApuFTQ9TvmY/ZfimtnQpmnK71VGC/cQWxYWqvg199H9oka2Jiu4XoltZB/3QpYTAJBJO/NSJoWdA95A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712303861; c=relaxed/simple;
-	bh=3n8kIwNnAG2JAJWgK4lWxzjsNrvgfN6/NgUinhjWmMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LQTTpMXiTcq49e8DkJigiG1H40fpvOElXL+XGME3IIaXrYZHvAJdrpf5IvIJFBPbFqRT0glgI4S08O/2Xn417llD7m0xbQ6jDImq8KuTzYaN0G0BNvJEYiYN2LOH3G36HGZGD/ggACR6CljMzzCSYwOO3TDwGuhWgdjYVq1NLUk=
+	s=arc-20240116; t=1712303871; c=relaxed/simple;
+	bh=mxCQfRzszfWYnwK4g0fSWiEg42A5tFJ0IhDbUgekfjo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=lbJFWFCE4CC8sG2GwLfdGs3onIaPfic5GZVPcD4Mt+9nr3816rz8tSt9re397vSq7Sl/a+WHYwHyuWy7x8Jx/sctHbMlRxLzTPmVtz+PC2MnwA/4QpJXsWorSHLt3TSoi4PGWAeHdNjsVeL5og2bBQzuS5SwV2Y6VbU5ye/D7o8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rseRA-00FUA8-A3; Fri, 05 Apr 2024 15:56:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Apr 2024 15:56:53 +0800
-Date: Fri, 5 Apr 2024 15:56:53 +0800
+	id 1rseSH-00FUEJ-3o; Fri, 05 Apr 2024 15:57:46 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Apr 2024 15:58:02 +0800
+Date: Fri, 5 Apr 2024 15:58:02 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: j.granados@samsung.com
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	Miaohe Lin <linmiaohe@huawei.com>,
-	Naoya Horiguchi <naoya.horiguchi@nec.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Kees Cook <keescook@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Luis Chamberlain <mcgrof@kernel.org>, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 3/7] crypto: Remove the now superfluous sentinel element
- from ctl_table array
-Message-ID: <Zg+uxQxlhC6OcoVd@gondor.apana.org.au>
-References: <20240328-jag-sysctl_remset_misc-v1-0-47c1463b3af2@samsung.com>
- <20240328-jag-sysctl_remset_misc-v1-3-47c1463b3af2@samsung.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, ardb@kernel.org, luto@kernel.org,
+	chang.seok.bae@intel.com
+Subject: Re: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
+Message-ID: <Zg+vCsQ++CVJ5m3Y@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -59,25 +34,88 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240328-jag-sysctl_remset_misc-v1-3-47c1463b3af2@samsung.com>
+In-Reply-To: <20240326080305.402382-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 
-On Thu, Mar 28, 2024 at 04:57:50PM +0100, Joel Granados via B4 Relay wrote:
-> From: Joel Granados <j.granados@samsung.com>
+Eric Biggers <ebiggers@kernel.org> wrote:
+> This patchset adds new AES-XTS implementations that accelerate disk and
+> file encryption on modern x86_64 CPUs.
 > 
-> This commit comes at the tail end of a greater effort to remove the
-> empty elements at the end of the ctl_table arrays (sentinels) which will
-> reduce the overall build time size of the kernel and run time memory
-> bloat by ~64 bytes per sentinel (further information Link :
-> https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
+> The largest improvements are seen on CPUs that support the VAES
+> extension: Intel Ice Lake (2019) and later, and AMD Zen 3 (2020) and
+> later.  However, an implementation using plain AESNI + AVX is also added
+> and provides a small boost on older CPUs too.
 > 
-> Remove sentinel from crypto_sysctl_table
+> To try to handle the mess that is x86 SIMD, the code for all the new
+> AES-XTS implementations is generated from an assembly macro.  This makes
+> it so that we e.g. don't have to have entirely different source code
+> just for different vector lengths (xmm, ymm, zmm).
 > 
-> Signed-off-by: Joel Granados <j.granados@samsung.com>
-> ---
->  crypto/fips.c | 1 -
->  1 file changed, 1 deletion(-)
+> To avoid downclocking effects, zmm registers aren't used on certain
+> Intel CPU models such as Ice Lake.  These CPU models default to an
+> implementation using ymm registers instead.
+> 
+> This patchset increases the throughput of AES-256-XTS decryption by the
+> following amounts on the following CPUs:
+>                            
+>                          | 4096-byte messages | 512-byte messages |
+>    ----------------------+--------------------+-------------------+
+>    Intel Skylake         |        1%          |       11%         |
+>    Intel Ice Lake        |        92%         |       59%         |
+>    Intel Sapphire Rapids |       115%         |       78%         |
+>    AMD Zen 1             |        25%         |       20%         |
+>    AMD Zen 2             |        26%         |       20%         |
+>    AMD Zen 3             |        82%         |       40%         |
+>    AMD Zen 4             |       118%         |       48%         |
+> 
+> (The results for encryption are very similar to decryption.  I just tend
+> to measure decryption because decryption performance is more important.)
+> 
+> There's no separate kconfig option for the new AES-XTS implementations,
+> as they are included in the existing option CONFIG_CRYPTO_AES_NI_INTEL.
+> 
+> To make testing easier, all four new AES-XTS implementations are
+> registered separately with the crypto API.  They are prioritized
+> appropriately so that the best one for the CPU is used by default.
+> 
+> Open questions:
+> 
+> - Is the policy that I implemented for preferring ymm registers to zmm
+>  registers the right one?  arch/x86/crypto/poly1305_glue.c thinks that
+>  only Skylake has the bad downclocking.  My current proposal is a bit
+>  more conservative; it also excludes Ice Lake and Tiger Lake.  Those
+>  CPUs supposedly still have some downclocking, though not as much.
+> 
+> - Should the policy on the use of zmm registers be in a centralized
+>  place?  It probably doesn't make sense to have random different
+>  policies for different crypto algorithms (AES, Poly1305, ARIA, etc.).
+> 
+> - Are there any other known issues with using AVX512 in kernel mode?  It
+>  seems to work, and technically it's not new because Poly1305 and ARIA
+>  already use AVX512, including the mask registers and zmm registers up
+>  to 31.  So if there was a major issue, like the new registers not
+>  being properly saved and restored, it probably would have already been
+>  found.  But AES-XTS support would introduce a wider use of it.
+> 
+> Eric Biggers (6):
+>  x86: add kconfig symbols for assembler VAES and VPCLMULQDQ support
+>  crypto: x86/aes-xts - add AES-XTS assembly macro for modern CPUs
+>  crypto: x86/aes-xts - wire up AESNI + AVX implementation
+>  crypto: x86/aes-xts - wire up VAES + AVX2 implementation
+>  crypto: x86/aes-xts - wire up VAES + AVX10/256 implementation
+>  crypto: x86/aes-xts - wire up VAES + AVX10/512 implementation
+> 
+> arch/x86/Kconfig.assembler           |  10 +
+> arch/x86/crypto/Makefile             |   3 +-
+> arch/x86/crypto/aes-xts-avx-x86_64.S | 796 +++++++++++++++++++++++++++
+> arch/x86/crypto/aesni-intel_glue.c   | 263 ++++++++-
+> 4 files changed, 1070 insertions(+), 2 deletions(-)
+> create mode 100644 arch/x86/crypto/aes-xts-avx-x86_64.S
+> 
+> 
+> base-commit: 4cece764965020c22cff7665b18a012006359095
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
