@@ -1,55 +1,55 @@
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551BB16D4FD
-	for <linux-crypto@vger.kernel.org>; Fri,  5 Apr 2024 13:47:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5973116D9B5
+	for <linux-crypto@vger.kernel.org>; Fri,  5 Apr 2024 13:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712324854; cv=none; b=kwXz3zqpUjr+XmbzmOwqGKLeNOIbjgl8CNwXJpuJ91/6YEt13oHu0BKU2ZlAHuGlvUnchfrEOwMHF1m6eu5jBy96mZyvx9UuZ8HDLNUx610Vj2bqHT47WYyAHMQIrXFc1XASiPu06UU5QtOx6R0WRAX73mlh0uoulh6IIFK0Ar4=
+	t=1712325203; cv=none; b=itEBIthWUjcNvJgdJOgaJf7Sj9taIKcIVgKrRv4DSCCVtTgccJ+LOhLAKBgD2WrToehdMcdFnQwUm+RwfgnHttmV+mWoDbXG/foE4KVb4kb4KZZCHoS9zZpnCf7HiwlGBL4u8VQX5Q4NzlvTuK8dU3GhO+XqF/rBJb9S2kOLQ80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712324854; c=relaxed/simple;
-	bh=eHFqbIhCRlO8+eg0bsye3/gnRyfWteI0TtMg8FRqQjs=;
+	s=arc-20240116; t=1712325203; c=relaxed/simple;
+	bh=0BksyQPOyLKGmYa0FEtepwJD1JDHx0EJaEKX0tpkO58=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bCa7kU3dkj85iLCSZytNhAjg79j6ZtPchHC9lKRAbdZjQAkO+i8WFo4zoH7BWEAwqtN8NalgFBozxTtduv/KzkqZVeJ9ISMIbcZh6NqTNji4Q0VhHC9WLcDR18IMP123tITWCSP7jZ1AUr5R/DogjWxWkIWKqRruPgkUS4KT/+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VUbNjwdS; arc=none smtp.client-ip=209.85.128.182
+	 To:Cc:Content-Type; b=ILNjJ+VlLB8IBKPqXxdy3PQKMuWqRYxyrztFyZcGjwLgApzUWdHFVCGTcRcr7E3T/jqTLSK3hHNe+nG/R0c6Z/o1l8DNEniFlda13Yu/vwfRYoxhCkL0f97aIrPyS4eHJFJ70sQqYGpIgqK8z6RjL+lIo4x4UZAX1KC4wLQqvuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aYTVf2I+; arc=none smtp.client-ip=209.85.219.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VUbNjwdS"
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-617d25b2bc4so5439607b3.2
-        for <linux-crypto@vger.kernel.org>; Fri, 05 Apr 2024 06:47:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aYTVf2I+"
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dbed0710c74so2069225276.1
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Apr 2024 06:53:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712324851; x=1712929651; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712325200; x=1712930000; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RDkodhxPHjCRcYuHL8QJdxmj/UyX4mSAQyu360+3BOI=;
-        b=VUbNjwdSHuFql+0qqSA6ulfb92n/na/cVGs9xcWDSze4ziRSFHPv67sZK5aQUDeQsb
-         3TuuRG5ceBVzSdQWK6ylm141wxF/YJSyp+7F71VKNBSU9GB0yjWMTL1R9JapJSI8Gv9m
-         I1YxyWBxwMy9EqXxX8R1RPb6+AcZul2LuqH7ba1Yx/NabSMQyem5R3CkTZ1EEvowdeHa
-         isOarVU/YLDKbyYy/URONSvQu5EcZOyIrMIBbLa5ZzP8Yt3T81nTcDtmT3TWN3wm7gb6
-         4nPV0rPArcITIyCy945cZX7BGr6gY1nwBvjL1nNuQ7LjG+tRrC0uBdBtWdveKzp7pCJ0
-         OsiQ==
+        bh=lAHdE5NFk++ufix28SzhuwWBAI0pKipkj98VJiYe3GU=;
+        b=aYTVf2I+TyRnSSdH8+I/CVMYO1BJa7hB9/v01eKTU4OrNL9qd16Jg0wQfeflZu4I00
+         bJzKgnoYGjlF2wFjjjOIkrUvFIjP/gbka8Ca/nK2NNuY96Fo8i0pVlzBoXDg1TkGWJgh
+         e74bm5LQIwxwotdUhDKtFybHE4VYNE/OXkfP4r8mdYC/WVnYYO2zvp0is9rK/LvGlb1u
+         rNp+xyY2kEDgPEpFHmoCvWu4DRKLOea8E3f1pcxL98WGt6zjQX+gyOrqvrhhCb7mBZhQ
+         NliJCHdvq8o1zOgd+ypWl8ttBwBOiemAKjdJsQE5P4duBu286hd2IUmiV+Z3y72bJNxi
+         hYIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712324851; x=1712929651;
+        d=1e100.net; s=20230601; t=1712325200; x=1712930000;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RDkodhxPHjCRcYuHL8QJdxmj/UyX4mSAQyu360+3BOI=;
-        b=ij9xIQBVXdbNEAhnevmo7R8+DkOcWMDZQ6UJQis7uCdVX2PpgCGb4Ff1cMYd1ExVAy
-         MR4Mz+tsiS3Z6P8msCxkCVK2KFNnqEwM97D5ULwK2Q8WHXuYZ23NvyRV2Jv5JXGXOAes
-         y74OlO96tVJQ4SSTIwqWwjvJiPhhgtkl273Tep2Y7RMJlQ+0fjK6uTPKhloRxENeJeBW
-         GHSAg/7+YCvc0LDmMLsXfRcDi4vLN64gqsir/WXlDufM47fsDNaY2o1dzFXIEbdnm6oB
-         +f6nwAAGCDIZYbpMSjMqch5LvkhuMBrVbK9jdMPNuXDmNwkGV1FfAEKnZGim81TseLiU
-         0MCg==
-X-Forwarded-Encrypted: i=1; AJvYcCXf+m3YvITRLTI9xesmIYL2MErzXNSHDl8peQndnCEZGZRWm0ZfxS1hMC7i6wTpYBMcxDtZyEZGUft4NZA6n5dIxnpdwsCqr9k4d5IV
-X-Gm-Message-State: AOJu0YzRCsm3HYbTFOMW0Z4w/cuR8vM35EDpk06z40JvM51PS8vqE5Bn
-	bYtZEJVIe4TMHIQUSnlXQNjsZebSoYil56tlxISxPSPbyoN5S3jqj/UnaQ/fXISoZbJs10Fpxcr
-	OUgUuxnCzpK/JhbHdXvMDYLFBwLiygo9anD9Q
-X-Google-Smtp-Source: AGHT+IETt+9jSDY6jbVQEtdOA/2Ue8S5T1KTCdTuvtcb7ogtZ6i7ZvA/55fNMoiVG+R35qGWCJRB01iqaNVA/qZfNAE=
-X-Received: by 2002:a25:e30e:0:b0:dd0:2076:4706 with SMTP id
- z14-20020a25e30e000000b00dd020764706mr1142654ybd.31.1712324850962; Fri, 05
- Apr 2024 06:47:30 -0700 (PDT)
+        bh=lAHdE5NFk++ufix28SzhuwWBAI0pKipkj98VJiYe3GU=;
+        b=P8OD68dR4ERCEdkSqB1qVSSKcyXO8dgNJ2tpdPKp/ZnsAQu1ELZT7HZ5hYLkjPv5vK
+         ADChJ97EZGApbqaBUdDmgM6xC04AtPJu+iyRKzyLJsEWCDb8CCZrzylFZWEu6b8SSCwU
+         2BPnmHW+NC30VBGczpJATY0T6FzlbQUMsGxnYxLBtTyr1NnnIxG+BDTJponJjhOBlTli
+         GFzN+07Ib3l5XSQjXaFHqNvFcEsIV68fr/KcgLiTVF0+Y/Fn0472XaY7Bzn5LPOKtCj9
+         0AUs77AGk5pyJLIr0t+iTPtI0Px03rZMhmYwN027aAZZAsBGVb+MZ3UMHhqBoQNoGCEk
+         eSyw==
+X-Forwarded-Encrypted: i=1; AJvYcCWKvytKu+73KZjNmjmlQ/enHAE1b0rn5AiA5VnfcFlKeo5gauDMhyjMZAEfuSVnizwTte9mkEw7A66eKRfg4STaEvDFJjZCEyxKMU3E
+X-Gm-Message-State: AOJu0YyhjHAWZB5dBgEMEcztmGjnuj617jrUClgekMP/q99FmFd+NmSM
+	1sNtydofWcN+FLRMlf2gVMOaI04TvJXi6uLdIrrTafsF53FJyK+OT9hdV92LUOAPdAxwqUnjQkL
+	5fcIDBfIdocQmjJXc2LuLKDU4ZfbSkneKeryw
+X-Google-Smtp-Source: AGHT+IH/KRHN+9M5N1gYIB2bCPgMB25x0KPnvuKiHgvgSCGh43Ngn+0mkz51p67LhizDAcBL1UgazcYTNlxqGDPZP2o=
+X-Received: by 2002:a25:f454:0:b0:dcd:b624:3e55 with SMTP id
+ p20-20020a25f454000000b00dcdb6243e55mr1115241ybe.54.1712325200128; Fri, 05
+ Apr 2024 06:53:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,24 +61,22 @@ References: <20240404165404.3805498-1-surenb@google.com> <Zg7dmp5VJkm1nLRM@caspe
  <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
  <Zg8qstJNfK07siNn@casper.infradead.org> <jb25mtkveqf63bv74jhynf6ncxmums5s37esveqsv52yurh4z7@5q55ttv34bia>
  <20240404154150.c25ba3a0b98023c8c1eff3a4@linux-foundation.org>
- <jpaw4hdd73ngt7mvtcdryqscivx6m2ic76ikfkcopceb47becp@vox5czt5bec3>
- <CAJuCfpF10COO2nh1nt3CcaZOFe4iSXszsup+a0qAEQ1ngyy5tQ@mail.gmail.com> <20240405095327.ufsimeplwahh6mem@quack3>
-In-Reply-To: <20240405095327.ufsimeplwahh6mem@quack3>
+ <jpaw4hdd73ngt7mvtcdryqscivx6m2ic76ikfkcopceb47becp@vox5czt5bec3> <Zg_yHGKpw4HJHdpb@casper.infradead.org>
+In-Reply-To: <Zg_yHGKpw4HJHdpb@casper.infradead.org>
 From: Suren Baghdasaryan <surenb@google.com>
-Date: Fri, 5 Apr 2024 06:47:17 -0700
-Message-ID: <CAJuCfpHG5U5Radv+_D3nD3OxAgqzBa_Za28+RS=NTG53Y=xpsg@mail.gmail.com>
+Date: Fri, 5 Apr 2024 06:53:09 -0700
+Message-ID: <CAJuCfpGMSHv7drSu7Veo5CVz3d_Upt8S6Rdx3isi7orct9-uNQ@mail.gmail.com>
 Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
  the call site
-To: Jan Kara <jack@suse.cz>
+To: Matthew Wilcox <willy@infradead.org>
 Cc: Kent Overstreet <kent.overstreet@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
-	Matthew Wilcox <willy@infradead.org>, joro@8bytes.org, will@kernel.org, 
-	trond.myklebust@hammerspace.com, anna@kernel.org, arnd@arndb.de, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, jikos@kernel.org, 
-	benjamin.tissoires@redhat.com, tytso@mit.edu, jack@suse.com, 
-	dennis@kernel.org, tj@kernel.org, cl@linux.com, jakub@cloudflare.com, 
-	penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com, 
-	vbabka@suse.cz, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	joro@8bytes.org, will@kernel.org, trond.myklebust@hammerspace.com, 
+	anna@kernel.org, arnd@arndb.de, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, jikos@kernel.org, benjamin.tissoires@redhat.com, 
+	tytso@mit.edu, jack@suse.com, dennis@kernel.org, tj@kernel.org, cl@linux.com, 
+	jakub@cloudflare.com, penberg@kernel.org, rientjes@google.com, 
+	iamjoonsoo.kim@lge.com, vbabka@suse.cz, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
 	linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
 	acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, 
 	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
@@ -87,113 +85,86 @@ Cc: Kent Overstreet <kent.overstreet@linux.dev>, Andrew Morton <akpm@linux-found
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 5, 2024 at 2:53=E2=80=AFAM Jan Kara <jack@suse.cz> wrote:
+On Fri, Apr 5, 2024 at 5:44=E2=80=AFAM Matthew Wilcox <willy@infradead.org>=
+ wrote:
 >
-> On Thu 04-04-24 16:16:15, Suren Baghdasaryan wrote:
-> > On Thu, Apr 4, 2024 at 4:01=E2=80=AFPM Kent Overstreet
-> > <kent.overstreet@linux.dev> wrote:
+> On Thu, Apr 04, 2024 at 07:00:51PM -0400, Kent Overstreet wrote:
+> > On Thu, Apr 04, 2024 at 03:41:50PM -0700, Andrew Morton wrote:
+> > > On Thu, 4 Apr 2024 18:38:39 -0400 Kent Overstreet <kent.overstreet@li=
+nux.dev> wrote:
 > > >
-> > > On Thu, Apr 04, 2024 at 03:41:50PM -0700, Andrew Morton wrote:
-> > > > On Thu, 4 Apr 2024 18:38:39 -0400 Kent Overstreet <kent.overstreet@=
-linux.dev> wrote:
-> > > >
-> > > > > On Thu, Apr 04, 2024 at 11:33:22PM +0100, Matthew Wilcox wrote:
-> > > > > > On Thu, Apr 04, 2024 at 03:17:43PM -0700, Suren Baghdasaryan wr=
-ote:
-> > > > > > > Ironically, checkpatch generates warnings for these type cast=
-s:
-> > > > > > >
-> > > > > > > WARNING: unnecessary cast may hide bugs, see
-> > > > > > > http://c-faq.com/malloc/mallocnocast.html
-> > > > > > > #425: FILE: include/linux/dma-fence-chain.h:90:
-> > > > > > > + ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_=
-chain),
-> > > > > > > GFP_KERNEL))
-> > > > > > >
-> > > > > > > I guess I can safely ignore them in this case (since we cast =
-to the
-> > > > > > > expected type)?
+> > > > On Thu, Apr 04, 2024 at 11:33:22PM +0100, Matthew Wilcox wrote:
+> > > > > On Thu, Apr 04, 2024 at 03:17:43PM -0700, Suren Baghdasaryan wrot=
+e:
+> > > > > > Ironically, checkpatch generates warnings for these type casts:
 > > > > > >
-> > > > > > I find ignoring checkpatch to be a solid move 99% of the time.
+> > > > > > WARNING: unnecessary cast may hide bugs, see
+> > > > > > http://c-faq.com/malloc/mallocnocast.html
+> > > > > > #425: FILE: include/linux/dma-fence-chain.h:90:
+> > > > > > + ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_ch=
+ain),
+> > > > > > GFP_KERNEL))
 > > > > > >
-> > > > > > I really don't like the codetags.  This is so much churn, and i=
-t could
-> > > > > > all be avoided by just passing in _RET_IP_ or _THIS_IP_ dependi=
-ng on
-> > > > > > whether we wanted to profile this function or its caller.  vmal=
-loc
-> > > > > > has done it this way since 2008 (OK, using __builtin_return_add=
-ress())
-> > > > > > and lockdep has used _THIS_IP_ / _RET_IP_ since 2006.
+> > > > > > I guess I can safely ignore them in this case (since we cast to=
+ the
+> > > > > > expected type)?
 > > > > >
-> > > > > Except you can't. We've been over this; using that approach for t=
-racing
-> > > > > is one thing, using it for actual accounting isn't workable.
+> > > > > I find ignoring checkpatch to be a solid move 99% of the time.
+> > > > >
+> > > > > I really don't like the codetags.  This is so much churn, and it =
+could
+> > > > > all be avoided by just passing in _RET_IP_ or _THIS_IP_ depending=
+ on
+> > > > > whether we wanted to profile this function or its caller.  vmallo=
+c
+> > > > > has done it this way since 2008 (OK, using __builtin_return_addre=
+ss())
+> > > > > and lockdep has used _THIS_IP_ / _RET_IP_ since 2006.
 > > > >
-> > > > I missed that.  There have been many emails.  Please remind us of t=
-he
-> > > > reasoning here.
+> > > > Except you can't. We've been over this; using that approach for tra=
+cing
+> > > > is one thing, using it for actual accounting isn't workable.
 > > >
-> > > I think it's on the other people claiming 'oh this would be so easy i=
-f
-> > > you just do it this other way' to put up some code - or at least more
-> > > than hot takes.
-> > >
-> > > But, since you asked - one of the main goals of this patchset was to =
-be
-> > > fast enough to run in production, and if you do it by return address
-> > > then you've added at minimum a hash table lookup to every allocate an=
-d
-> > > free; if you do that, running it in production is completely out of t=
-he
-> > > question.
-> > >
-> > > Besides that - the issues with annotating and tracking the correct
-> > > callsite really don't go away, they just shift around a bit. It's tru=
-e
-> > > that the return address approach would be easier initially, but that'=
-s
-> > > not all we're concerned with; we're concerned with making sure
-> > > allocations get accounted to the _correct_ callsite so that we're giv=
-ing
-> > > numbers that you can trust, and by making things less explicit you ma=
-ke
-> > > that harder.
-> > >
-> > > Additionally: the alloc_hooks() macro is for more than this. It's als=
-o
-> > > for more usable fault injection - remember every thread we have where
-> > > people are begging for every allocation to be __GFP_NOFAIL - "oh, err=
-or
-> > > paths are hard to test, let's just get rid of them" - never mind that
-> > > actually do have to have error paths - but _per callsite_ selectable
-> > > fault injection will actually make it practical to test memory error
-> > > paths.
-> > >
-> > > And Kees working on stuff that'll make use of the alloc_hooks() macro
-> > > for segregating kmem_caches.
+> > > I missed that.  There have been many emails.  Please remind us of the
+> > > reasoning here.
 > >
-> > Yeah, that pretty much summarizes it. Note that we don't have to make
-> > the conversions in this patch and accounting will still work but then
-> > all allocations from different callers will be accounted to the helper
-> > function and that's less useful than accounting at the call site.
-> > It's a sizable churn but the conversions are straight-forward and we
-> > do get accurate, performant and easy to use memory accounting.
+> > I think it's on the other people claiming 'oh this would be so easy if
+> > you just do it this other way' to put up some code - or at least more
+> > than hot takes.
 >
-> OK, fair enough. I guess I can live with the allocation macros in jbd2 if
-> type safety is preserved. But please provide a short summary of why we ne=
-ed
-> these macros (e.g. instead of RET_IP approach) in the changelog (or at
-> least a link to some email explaining this if the explanation would get t=
-oo
-> long). Because I was wondering about the same as Andrew (and yes, this is
-> because I wasn't really following the huge discussion last time).
-
-Ack. I'll write up the explanation or if there is a good one already
-in our previous discussion will add a link to it. Thanks!
-
+> Well, /proc/vmallocinfo exists, and has existed since 2008, so this is
+> slightly more than a "hot take".
 >
->                                                                 Honza
-> --
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
+> > But, since you asked - one of the main goals of this patchset was to be
+> > fast enough to run in production, and if you do it by return address
+> > then you've added at minimum a hash table lookup to every allocate and
+> > free; if you do that, running it in production is completely out of the
+> > question.
+>
+> And yet vmalloc doesn't do that.
+>
+> > Besides that - the issues with annotating and tracking the correct
+> > callsite really don't go away, they just shift around a bit. It's true
+> > that the return address approach would be easier initially, but that's
+> > not all we're concerned with; we're concerned with making sure
+> > allocations get accounted to the _correct_ callsite so that we're givin=
+g
+> > numbers that you can trust, and by making things less explicit you make
+> > that harder.
+>
+> I'm not convinced that _THIS_IP_ is less precise than a codetag.  They
+> do essentially the same thing, except that codetags embed the source
+> location in the file while _THIS_IP_ requires a tool like faddr2line
+> to decode kernel_clone+0xc0/0x430 into a file + line number.
+>
+> > This is all stuff that I've explained before; let's please dial back on
+> > the whining - or I'll just bookmark this for next time...
+>
+> Please stop mischaracterising serious thoughtful criticism as whining.
+> I don't understand what value codetags bring over using _THIS_IP_ and
+> _RET_IP_ and you need to explain that.
+
+The conceptual difference between codetag and _THIS_IP_/_RET_IP_ is
+that codetag injects counters at the call site, so you don't need to
+spend time finding the appropriate counter to operate on during
+allocation.
