@@ -1,34 +1,32 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73ABF140370;
-	Fri,  5 Apr 2024 07:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978741422A9;
+	Fri,  5 Apr 2024 07:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712303480; cv=none; b=CZwH0AQxH4pCFTt5+T+6R5Q53YW74JMFnxT5R2Gq3kXgMeAG4yX4FnI7+UwAr/jJCGn7VJ6YRYJ7kFe9sjprtB9JsEmLxCZ8Qzq0U3Bk4mGunbykCoxo1Wk5kGchgCYITUA8rYzs1TlLj6fHncc0YVoX3QfI3wuNlcBafnCvnhk=
+	t=1712303549; cv=none; b=TBkmBl60Um1LGMz2OBISBRYOVv+u5CbEm+Vy+JNxEQsNX3WXkJFTCDIq6SrRqC18AciVzNjkcX0ISHstSv1r3k7qvNGd7G8Hyjfymbz8wO+htb2oHGtTfUauS+pSrGt4/J2Pkkg2lkao7gHjFUd/RDB69ADkJYx1E/Fb5mFvpC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712303480; c=relaxed/simple;
-	bh=xn9mKjCSeAVsNJvtOqh/uYd66Nck7ShW38HVNkEoWQ4=;
+	s=arc-20240116; t=1712303549; c=relaxed/simple;
+	bh=DekmYTDdP+foBZ3QszVaw87bEdiNyHkyN25oulzeP5M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qznJYTcQ/Q0Du1lz9yDd83UuCgvyc7H9y4SPKZAjeV1mlU1QbUBmh0DFwhM1WeplbEEaMq2BVWU1b+euWnGXblQ/92mvuB1YJntyq+oRlnXpEzS4h3v+MsvW5TQfvAnSfEmcTVF8LlXnpru0fic736aSDuP6lRCIUljngA2FJ1M=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Acj5gWfkeaJgQN56rqiVFzTcc2j5xarNl3cnIHkgLoDxuzX3kWVgg1faDkAPu/f/0Fey7iHdE+yUdArvNz6qZ7DvIJZEukgzXoaALSX8o5wsEZZjZhPqvalwX0Kjd49Sg780E3jkIBqPnfoEUG6GNlezc+es3MDEsYTCV1S1/l8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rseLu-00FU2s-Uq; Fri, 05 Apr 2024 15:51:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Apr 2024 15:51:28 +0800
-Date: Fri, 5 Apr 2024 15:51:28 +0800
+	id 1rseN2-00FU5O-N5; Fri, 05 Apr 2024 15:52:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Apr 2024 15:52:37 +0800
+Date: Fri, 5 Apr 2024 15:52:37 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Animesh Agarwal <animeshagarwal28@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] dt-bindings: crypto: ti,omap-sham: Convert to dtschema
-Message-ID: <Zg+tgFFDkwLvWgLv@gondor.apana.org.au>
-References: <20240327054911.43093-1-animeshagarwal28@gmail.com>
+To: Thorsten Blum <thorsten.blum@toblux.com>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: jitter - Use kvfree_sensitive() to fix
+ Coccinelle warning
+Message-ID: <Zg+txTXOpUFp3yH1@gondor.apana.org.au>
+References: <20240327222507.42731-3-thorsten.blum@toblux.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -37,22 +35,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240327054911.43093-1-animeshagarwal28@gmail.com>
+In-Reply-To: <20240327222507.42731-3-thorsten.blum@toblux.com>
 
-On Wed, Mar 27, 2024 at 11:19:06AM +0530, Animesh Agarwal wrote:
-> Convert the OMAP SoC SHA crypto Module bindings to DT Schema.
+On Wed, Mar 27, 2024 at 11:25:09PM +0100, Thorsten Blum wrote:
+> Replace memzero_explicit() and kvfree() with kvfree_sensitive() to fix
+> the following Coccinelle/coccicheck warning reported by
+> kfree_sensitive.cocci:
 > 
-> Signed-off-by: Animesh Agarwal <animeshagarwal28@gmail.com>
+> 	WARNING opportunity for kfree_sensitive/kvfree_sensitive
 > 
+> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
 > ---
-> Changes in v2:
-> - Moved vendor specific property below more common properties.
-> ---
->  .../devicetree/bindings/crypto/omap-sham.txt  | 28 ----------
->  .../bindings/crypto/ti,omap-sham.yaml         | 56 +++++++++++++++++++
->  2 files changed, 56 insertions(+), 28 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/crypto/omap-sham.txt
->  create mode 100644 Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
+>  crypto/jitterentropy-kcapi.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
