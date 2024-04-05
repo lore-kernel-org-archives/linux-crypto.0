@@ -1,125 +1,224 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B96815FCE2;
-	Fri,  5 Apr 2024 09:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4C7161318;
+	Fri,  5 Apr 2024 09:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712309357; cv=none; b=qNeMiZz5IzN97B9e6L9I6mu1xjljEVVKQSs5pi2R9YvKyxIaO9j6pm8XHB52RYVyQM0CzKLMZ5it6diHmFBWkoP7fS/CIqPZXzYj2/1i1s1dLwTlix/SsqK4SezgJNDA+VeqydcG0RI2aZp6lcVZdjvMulYQGiWQ8zmXUTEFwew=
+	t=1712310815; cv=none; b=mIY19KJ4UI01mSUrK/lBBv8QwjcJFR/GcJ6feTqejR8OgeII6d1QwMKbqIJTyzfDe2X7g00bTfU0bh5S7h+NSCXlfxA62h9QQpRYFxXo7OHTIxC2zyX5YlvA7BynzOoUeIx5UKv0uZ6mblIOhEjhQ3rfAySQg7m8fsf0PYzEYx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712309357; c=relaxed/simple;
-	bh=Y24ye3Z3sxdzRUqBmE+2D+Ilmvls6rU9q0bvb5UvSM8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=sQnMwVm1MKhQgy5i15FWHbn7cd1i4f4tChFccI677TVvTAqYm5IWCtE7PFUcjayQxvCZ9QDvXBQsNs/T2TWDil7WkD4bI4COOhETmpQg2GyRRwOX4KmqNtIqJXaN871zvAhH9lQjJKo/kaP6vKGjmK7iR/beprZ8MAbiwhPeHI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	s=arc-20240116; t=1712310815; c=relaxed/simple;
+	bh=iG4O7MMO9gnBVtJZSYs1Hq2UvQRfp2O+8N10zEhPJQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DTPANW0a0wV97PEgXPLudGyv3gNtEeQLhpJBkNuIi948I7CrYZ9fV9IXUO9CHKdzxmRFDqRx0rKF1oJDd3VteF75R6+ZlJBtipMSwfwrUNbT5Fxu40VGFfJ1EKKvwLJtoCIlZQ86OWSzO0Xlf9VMAHYCMnI1p2jWMX1LE6MYm2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=0AXR3Sr9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=mv3acM2x; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Z0+7rq6f; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=lVccGfCI; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="0AXR3Sr9";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="mv3acM2x";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Z0+7rq6f";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="lVccGfCI"
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id 1C4E8100DA1A6;
-	Fri,  5 Apr 2024 11:29:06 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id E7B329926C7; Fri,  5 Apr 2024 11:29:05 +0200 (CEST)
-Date: Fri, 5 Apr 2024 11:29:05 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Nathan Chancellor <nathan@kernel.org>
-Subject: Re: [PATCH v3] X.509: Introduce scope-based x509_certificate
- allocation
-Message-ID: <Zg_EYX5m-GTyfPbY@wunner.de>
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 65BF721A2E;
+	Fri,  5 Apr 2024 09:53:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1712310809; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kxLJbVvPYqfzG83pwvoYNu5wMFXj9ZScFtz4XZeGAUk=;
+	b=0AXR3Sr9XfI+c7rTPImw5uCIqUd0/09qhqdILdsZtrOOOTHNThWW8IWO2LavomosrDlGR4
+	r5zcQ7aU/RB1e9VhO2PeMNtjvZCEdKzHqupTEPNLaoS68JZ7HFWh4OFd1ckPqsmFOlBB7H
+	mcwM4kvxTwfCAYfvPvAMLZZtKWx5vB8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1712310809;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kxLJbVvPYqfzG83pwvoYNu5wMFXj9ZScFtz4XZeGAUk=;
+	b=mv3acM2xzaAtD0goPoMaKRbxprQYlRRQRdWeBSj+XgsIgB6XYwFswsOsyAWM2lrdH+uuj0
+	DSsBpoDlTl2n1rDQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1712310808; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kxLJbVvPYqfzG83pwvoYNu5wMFXj9ZScFtz4XZeGAUk=;
+	b=Z0+7rq6fcjYyrOGJFwhu7EPjxeB2YzEP6/GI4QJE77wXmTpoCFc1mE9dE1Bj/PEGY1tu49
+	ESTilKNYDaC1JrKhdHCnLw44UtjznYqGrEfN+CtNGBPA2Dt9MhQgjmAw2Ok0XXX+qUvUQJ
+	M0o1kG24lT0V2nbGjew3Qb50utPv0T0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1712310808;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kxLJbVvPYqfzG83pwvoYNu5wMFXj9ZScFtz4XZeGAUk=;
+	b=lVccGfCILCM4svVbHjo2v2GSsNkbxp/3kUm/GIkdwdP1GGRDcHYdF3Ew32qMBI0ItKMWtc
+	2n16V0vgVrwCANAQ==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 5716C139F1;
+	Fri,  5 Apr 2024 09:53:28 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id 2Ig+FRjKD2a3YAAAn2gu4w
+	(envelope-from <jack@suse.cz>); Fri, 05 Apr 2024 09:53:28 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 0505DA0814; Fri,  5 Apr 2024 11:53:27 +0200 (CEST)
+Date: Fri, 5 Apr 2024 11:53:27 +0200
+From: Jan Kara <jack@suse.cz>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: Kent Overstreet <kent.overstreet@linux.dev>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Matthew Wilcox <willy@infradead.org>, joro@8bytes.org,
+	will@kernel.org, trond.myklebust@hammerspace.com, anna@kernel.org,
+	arnd@arndb.de, herbert@gondor.apana.org.au, davem@davemloft.net,
+	jikos@kernel.org, benjamin.tissoires@redhat.com, tytso@mit.edu,
+	jack@suse.com, dennis@kernel.org, tj@kernel.org, cl@linux.com,
+	jakub@cloudflare.com, penberg@kernel.org, rientjes@google.com,
+	iamjoonsoo.kim@lge.com, vbabka@suse.cz, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-acpi@vger.kernel.org, acpica-devel@lists.linux.dev,
+	linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
+	bpf@vger.kernel.org, linux-input@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-mm@kvack.org,
+	netdev@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH 1/1] mm: change inlined allocation helpers to account at
+ the call site
+Message-ID: <20240405095327.ufsimeplwahh6mem@quack3>
+References: <20240404165404.3805498-1-surenb@google.com>
+ <Zg7dmp5VJkm1nLRM@casper.infradead.org>
+ <CAJuCfpHbTCwDERz+Hh+aLZzNdtSFKA+Q7sW-xzvmFmtyHCqROg@mail.gmail.com>
+ <CAJuCfpHy5Xo76S7h9rEuA3cQ1pVqurL=wmtQ2cx9-xN1aa_C_A@mail.gmail.com>
+ <Zg8qstJNfK07siNn@casper.infradead.org>
+ <jb25mtkveqf63bv74jhynf6ncxmums5s37esveqsv52yurh4z7@5q55ttv34bia>
+ <20240404154150.c25ba3a0b98023c8c1eff3a4@linux-foundation.org>
+ <jpaw4hdd73ngt7mvtcdryqscivx6m2ic76ikfkcopceb47becp@vox5czt5bec3>
+ <CAJuCfpF10COO2nh1nt3CcaZOFe4iSXszsup+a0qAEQ1ngyy5tQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CZA3R5R9CVYD.1HH1S662FW2RX@seitikki>
- <CZA3PCY3U4YU.3R05ZC4X16EX0@seitikki>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJuCfpF10COO2nh1nt3CcaZOFe4iSXszsup+a0qAEQ1ngyy5tQ@mail.gmail.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[39];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RLinodumkc3pofpwycnya9d5a9)];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[c-faq.com:url,suse.com:email,imap2.dmz-prg2.suse.org:helo,imap2.dmz-prg2.suse.org:rdns,linux.dev:email]
+X-Spam-Score: -3.80
+X-Spam-Flag: NO
 
-On Tue, Feb 20, 2024 at 06:00:41PM +0000, Jarkko Sakkinen wrote:
-> On Tue Feb 20, 2024 at 3:10 PM UTC, Lukas Wunner wrote:
-> > Add a DEFINE_FREE() clause for x509_certificate structs and use it in
-> > x509_cert_parse() and x509_key_preparse().  These are the only functions
-> > where scope-based x509_certificate allocation currently makes sense.
-> > A third user will be introduced with the forthcoming SPDM library
-> > (Security Protocol and Data Model) for PCI device authentication.
+On Thu 04-04-24 16:16:15, Suren Baghdasaryan wrote:
+> On Thu, Apr 4, 2024 at 4:01 PM Kent Overstreet
+> <kent.overstreet@linux.dev> wrote:
+> >
+> > On Thu, Apr 04, 2024 at 03:41:50PM -0700, Andrew Morton wrote:
+> > > On Thu, 4 Apr 2024 18:38:39 -0400 Kent Overstreet <kent.overstreet@linux.dev> wrote:
+> > >
+> > > > On Thu, Apr 04, 2024 at 11:33:22PM +0100, Matthew Wilcox wrote:
+> > > > > On Thu, Apr 04, 2024 at 03:17:43PM -0700, Suren Baghdasaryan wrote:
+> > > > > > Ironically, checkpatch generates warnings for these type casts:
+> > > > > >
+> > > > > > WARNING: unnecessary cast may hide bugs, see
+> > > > > > http://c-faq.com/malloc/mallocnocast.html
+> > > > > > #425: FILE: include/linux/dma-fence-chain.h:90:
+> > > > > > + ((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain),
+> > > > > > GFP_KERNEL))
+> > > > > >
+> > > > > > I guess I can safely ignore them in this case (since we cast to the
+> > > > > > expected type)?
+> > > > >
+> > > > > I find ignoring checkpatch to be a solid move 99% of the time.
+> > > > >
+> > > > > I really don't like the codetags.  This is so much churn, and it could
+> > > > > all be avoided by just passing in _RET_IP_ or _THIS_IP_ depending on
+> > > > > whether we wanted to profile this function or its caller.  vmalloc
+> > > > > has done it this way since 2008 (OK, using __builtin_return_address())
+> > > > > and lockdep has used _THIS_IP_ / _RET_IP_ since 2006.
+> > > >
+> > > > Except you can't. We've been over this; using that approach for tracing
+> > > > is one thing, using it for actual accounting isn't workable.
+> > >
+> > > I missed that.  There have been many emails.  Please remind us of the
+> > > reasoning here.
+> >
+> > I think it's on the other people claiming 'oh this would be so easy if
+> > you just do it this other way' to put up some code - or at least more
+> > than hot takes.
+> >
+> > But, since you asked - one of the main goals of this patchset was to be
+> > fast enough to run in production, and if you do it by return address
+> > then you've added at minimum a hash table lookup to every allocate and
+> > free; if you do that, running it in production is completely out of the
+> > question.
+> >
+> > Besides that - the issues with annotating and tracking the correct
+> > callsite really don't go away, they just shift around a bit. It's true
+> > that the return address approach would be easier initially, but that's
+> > not all we're concerned with; we're concerned with making sure
+> > allocations get accounted to the _correct_ callsite so that we're giving
+> > numbers that you can trust, and by making things less explicit you make
+> > that harder.
+> >
+> > Additionally: the alloc_hooks() macro is for more than this. It's also
+> > for more usable fault injection - remember every thread we have where
+> > people are begging for every allocation to be __GFP_NOFAIL - "oh, error
+> > paths are hard to test, let's just get rid of them" - never mind that
+> > actually do have to have error paths - but _per callsite_ selectable
+> > fault injection will actually make it practical to test memory error
+> > paths.
+> >
+> > And Kees working on stuff that'll make use of the alloc_hooks() macro
+> > for segregating kmem_caches.
 > 
-> I think you are adding scope-based memory management and not
-> DEFINE_FREE(). Otherwise, this would be one-liner patch.
+> Yeah, that pretty much summarizes it. Note that we don't have to make
+> the conversions in this patch and accounting will still work but then
+> all allocations from different callers will be accounted to the helper
+> function and that's less useful than accounting at the call site.
+> It's a sizable churn but the conversions are straight-forward and we
+> do get accurate, performant and easy to use memory accounting.
 
-Above it states very clearly: "and use it in x509_cert_parse() and
-x509_key_preparse()".
+OK, fair enough. I guess I can live with the allocation macros in jbd2 if
+type safety is preserved. But please provide a short summary of why we need
+these macros (e.g. instead of RET_IP approach) in the changelog (or at
+least a link to some email explaining this if the explanation would get too
+long). Because I was wondering about the same as Andrew (and yes, this is
+because I wasn't really following the huge discussion last time).
 
-That's the reason it is not a one-liner patch.
-
-
-> I'm not sure if the last sentence adds more than clutter as this
-> patch has nothing to do with SPDM changes per se.
-
-I disagree.  It is important as a justification for the change that
-the two functions converted here are not going to be the only users,
-but that there's a third one coming up.
-
-
-> > I've compared the Assembler output before/after and they are identical,
-> > save for the fact that gcc-12 always generates two return paths when
-> > __cleanup() is used, one for the success case and one for the error case.
-> 
-> Use passive as commit message is not a personal letter.
-
-Okay, I will respin and change to passive mood.
-
-
-> I don't see a story here but instead I see bunch of disordered tecnical
-> terms.
-
-That doesn't sound like constructive criticism.
-
-
-> We have the code diff for detailed technical stuff. The commit message
-> should simply explain why we want this and what it does for us.
-[...]
-> What is the most important function of a commit message? Well, it comes
-> when the commit is in the mainline. It reminds of the *reasons* why a
-> change was made and this commit message does not really serve well in
-> that role.
-
-The reason for the commit is that Jonathan requested it during code
-review of my PCI device authentication patches.  I've been stating
-this very clearly in the first iteration of the present patch.
-You asked that I delete the sentence and instead use a Suggested-by.
-
-Perhaps it would have been better had I not listened to you.
-Because now you seem to have forgotten the reason for the patch,
-which, again, you asked me to delete.
-
-FWIW, here's the link to Jonathan's review:
-https://lore.kernel.org/all/20231003153937.000034ca@Huawei.com/
-
-And here's the quote with his explicit request to use cleanup.h:
-
-   "Maybe cleanup.h magic?  Seems like it would simplify error paths here a
-    tiny bit. Various other cases follow, but I won't mention this every time
-    [...]
-    Even this could be done with the cleanup.h stuff with appropriate
-    pointer stealing and hence allow direct returns.
-    This is the sort of case that I think really justifies that stuff."
-
-Thanks,
-
-Lukas
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
