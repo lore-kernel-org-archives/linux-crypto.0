@@ -1,213 +1,180 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825443FB83;
-	Sun,  7 Apr 2024 23:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712532049; cv=none; b=HwkggrxWYD3YGS7OZsSioPmfLZkl0qn4CcpiZmzSD3JL0RKl4h5SJ2+VeWZme/BpSZXX2hlpqKjzrCVRySFq2ICDCrPAmn5I1OYKOib2i3WsIMnW5voNzN8zv+H2DzIqLd93h67QUSxQdx7CrvBm5eTjuw1QJw6YmZFkW2NVnwI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712532049; c=relaxed/simple;
-	bh=Guz77wGX67222+ZdfWG+k8ArwL5scaBgVJjI+9Ueoug=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m70iMptQq8FBwP5nTlKQNPfhZVJ0K50XTRMmJCTp5mfhJI6qw/QmMwL/cgDbQXKPYneMB42G1e93RimPuEAzKezEM+Q+W4UovrXEOsp7LV0/9DRLCrNz1AIVd4Z+V6adguiHSfrV5MMnAE8fLgpxqx/qbDcQiKi5WF76+p0a+xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AVyZdntV; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E041DFF2;
+	Sun,  7 Apr 2024 23:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712532271; cv=fail; b=puG8bugFXHWIRevBCGNKhNDFdvEFYps+p+F0PY6aoFrs0lGzv3vqp3kTxdEHJ1s0+EWWsyniKW5XnQbsANxjjaL/5xim7aJSh23FkF4gLMl90S6PEom+ilFklZI/yO+13iKr8xL5wbZjDYB9JI+VmO+vBHtY/mPUjuFNQpg+lDo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712532271; c=relaxed/simple;
+	bh=h4OAq3oXTKqktcXCSA0q/6o9Jxh2Pdfc1OfIf356CX4=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JSFcmD1AQ4ABmVNoO0RPL+GCmer9HzU+Z8fpN8F2Qq7NIgoPeGoPLwQ600gQIASDJNwHDVHfoMvuTWqkT9BRbTFiflI2yea2fVUyCgeuWImdm2VeAY3bsKtqVoZd+ChnkBJTNCMZTZt6ndm6I1R9gyV9SJ6V4SOhos6CZBFd9CE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UWAZ3WXD; arc=fail smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AVyZdntV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UWAZ3WXD"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712532047; x=1744068047;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Guz77wGX67222+ZdfWG+k8ArwL5scaBgVJjI+9Ueoug=;
-  b=AVyZdntVJAOkH2DfIs5EbmHVVj2WrcJI6qvjIPd/bBFe4+XICUjtSuQe
-   XbfJ2MOz1bgFSFyJFS71diSCvvdScNOW9o9/sgl6qaHmLGTV86xYhlKwA
-   SSz/a4JggLnnRIIV/WViajdwKXa/v/5P4oNUDCxARFaUMdgbymKRtWHW2
-   gg2HSCgUUsSbavMSHrYeqjhPQdFRWEDOOES0P9LrcPOjC5fcYxVYoTAas
-   l8shFaBYQgL9V0x4r7Qwx0dWqunEBANUNRDA8FPqypnpF1DtslBhGMJql
-   F2+4M+kylDjIPIHoKOXIydX9KlpL4yLxnnUGwjBBds6JvRAzyon/9/Yy1
-   g==;
-X-CSE-ConnectionGUID: FyJb4sHVTGGPpKFD653Qwg==
-X-CSE-MsgGUID: YyTUCWHaQe+V5JlkduEAhg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11037"; a="11570832"
+  t=1712532270; x=1744068270;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=h4OAq3oXTKqktcXCSA0q/6o9Jxh2Pdfc1OfIf356CX4=;
+  b=UWAZ3WXDuEo1IAIxivyvqGxP7QifvIkZvVHrvN8N1i/UmRgSMjtf+t2i
+   jGkRJW0aR8wu7bB8xBHNlo7F9A/71zeWbVAGtQQi+UhE/qx+g6fVUYeFh
+   pR9cctdpEfTut05OJagWCMOBVmraectgVbc6oeiWRassDOlhedihjrYV6
+   EkxLjCuJr3KBo7d+rSrS+M2JwqfGfJL1dL/ZVExOz68Y/6E0eJbItT/Os
+   xOkHBrowyTboj6bjEplUg3CZemtQgT8ElZlYwW3IzQPWGW537vX3rT28Y
+   LzzFne8G7OSTHmTv3NBhLKwNzVbHvrwuJ15PT6To3zvQhkfO7NsFom5EQ
+   Q==;
+X-CSE-ConnectionGUID: np/px1LES9q5vDlKs7J9zA==
+X-CSE-MsgGUID: xyhKLq7RRNumjWUdiin8ow==
+X-IronPort-AV: E=McAfee;i="6600,9927,11037"; a="33191071"
 X-IronPort-AV: E=Sophos;i="6.07,185,1708416000"; 
-   d="scan'208";a="11570832"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2024 16:20:47 -0700
-X-CSE-ConnectionGUID: TaIMkT2MRMaENMvjVc8q6A==
-X-CSE-MsgGUID: MxY1RVtOQjGqnm+dSNpECw==
+   d="scan'208";a="33191071"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2024 16:24:29 -0700
+X-CSE-ConnectionGUID: sOMWdxfrS7eAJNJSMEHZcw==
+X-CSE-MsgGUID: S5vhBcLmSIOTDKawdSTAQQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,185,1708416000"; 
-   d="scan'208";a="20269732"
-Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
-  by orviesa008.jf.intel.com with ESMTP; 07 Apr 2024 16:20:45 -0700
+   d="scan'208";a="19723069"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Apr 2024 16:24:29 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 7 Apr 2024 16:24:28 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Sun, 7 Apr 2024 16:24:28 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Sun, 7 Apr 2024 16:24:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MFTs2iTpeLH9Y9HW0+sGw+rEeZ9C00jUUPpJ77rQWhL64dIbVInuwbYvs/smqj5XI+nNjKkJ98koi+gfzFczOx1JVZzodt7Ra/bgiArY0kTiCbGfjusfiZ66fMuN6seg4USTxdMutX+65FzV1m1ywSDBBwaXsqP1nJg8CWn1MODTMamd9/LLJL9hdM+65SQ55vu77wOxzEtT9h5rRS34IFVOduMfBaTUfU6zVcuXKQWn8VUrk6+KImAt5HO7ZdCyfpISDI9brvdxRkZQqxooubTsJ52M3FlZq3ThfAxNa8LuHqm3GtlHNJbXVJHHtDYrDhQ8GqODd/eUAU4LeOVlWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7CphyaM7fN0goF8MolvEGPoKFw4s34qawARwKFnExEg=;
+ b=QBl0lTyh9ADiw0X6WN0L8L2ZRx8f3uyBcQR3UoqYyqyFTc1fVytWfFj7FNZv0QWHUzS6IGdqGXiqk7IPx67whaaK16bqGWfAzukQStKXvB3+xlW6tSv7u09ORm7FRKgUUKL/JCZijlF6sPqy7OliIaWnfAtHR3ygEICgFbDsAxvK6zRhOaNaV+yijm6OiLD9bJF8HeoYgR2/qb5Q9du8XI/xJ2NeDL2x0AZv5zcoWWxV9+OK1kSqL/11nOpcxJfQD6tN3oNI3WnYBIpLx3yX7LxBIh+yTZpqCni5J9HYUw+I+iTTXJy3IqaA0mqea+q+SlO6dpLw9GHtqmeWspYf2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB7164.namprd11.prod.outlook.com (2603:10b6:303:212::6)
+ by CH0PR11MB8144.namprd11.prod.outlook.com (2603:10b6:610:18d::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.10; Sun, 7 Apr
+ 2024 23:24:21 +0000
+Received: from MW4PR11MB7164.namprd11.prod.outlook.com
+ ([fe80::b5bc:2406:7431:8c1]) by MW4PR11MB7164.namprd11.prod.outlook.com
+ ([fe80::b5bc:2406:7431:8c1%7]) with mapi id 15.20.7452.019; Sun, 7 Apr 2024
+ 23:24:21 +0000
+Message-ID: <13bb2f0f-5894-4366-be53-44658144a23d@intel.com>
+Date: Sun, 7 Apr 2024 16:24:18 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 00/14] x86: Support Key Locker
+To: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<dm-devel@redhat.com>
+CC: <ebiggers@kernel.org>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
+	<tglx@linutronix.de>, <bp@alien8.de>, <mingo@kernel.org>, <x86@kernel.org>,
+	<herbert@gondor.apana.org.au>, <ardb@kernel.org>, <elliott@hpe.com>,
+	<dan.j.williams@intel.com>, <bernie.keany@intel.com>,
+	<charishma1.gairuboyina@intel.com>
+References: <20230603152227.12335-1-chang.seok.bae@intel.com>
+ <20240329015346.635933-1-chang.seok.bae@intel.com>
+Content-Language: en-US
 From: "Chang S. Bae" <chang.seok.bae@intel.com>
-To: linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Cc: ebiggers@kernel.org,
-	luto@kernel.org,
-	dave.hansen@linux.intel.com,
-	tglx@linutronix.de,
-	bp@alien8.de,
-	mingo@kernel.org,
-	x86@kernel.org,
-	herbert@gondor.apana.org.au,
-	ardb@kernel.org,
-	elliott@hpe.com,
-	dan.j.williams@intel.com,
-	bernie.keany@intel.com,
-	charishma1.gairuboyina@intel.com,
-	chang.seok.bae@intel.com,
-	Dave Hansen <dave.hansen@intel.com>
-Subject: [PATCH v9a 07/14] x86/cpu/keylocker: Load a wrapping key at boot time
-Date: Sun,  7 Apr 2024 16:04:53 -0700
-Message-Id: <20240407230453.912322-1-chang.seok.bae@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240329015346.635933-8-chang.seok.bae@intel.com>
-References: <20240329015346.635933-8-chang.seok.bae@intel.com>
+In-Reply-To: <20240329015346.635933-1-chang.seok.bae@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR06CA0072.namprd06.prod.outlook.com
+ (2603:10b6:a03:14b::49) To MW4PR11MB7164.namprd11.prod.outlook.com
+ (2603:10b6:303:212::6)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB7164:EE_|CH0PR11MB8144:EE_
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kMpmD7n8Zug3Xon9cyN3AvuFU0Eotr9DE2bs/BC15OQFEFq9NGWKhDBFEaVhvQ4dPIEXptY86dAXdIMiI2GC798M3pPVYx+tNtj2IJlXg91Vs/mqQcW+SosFUE9gbIcPlsWVMLxRCWz0SVBOI18aIH23go3J7ZZrO4GPryPZ6Vn0enXFTv4yPIEGVJ6gquKjWRWwjUxmb9dNWQR6Pv5O+U8dCD8wX8A1V1SYUH/gvmHnIJZacbI5MLYawVwuEWnwqGUhXIW3/T8ZQe4NFl/mZTpeskU/mmcWP9D1DtAXT1yhG87OwXvFUf+AnWg9P4y2qyjo5VXW8y6nd21uIlVoOWATTCjmBKak+cUL6jZfJXW9uAleEYGyP8APCX8vfrzIa14ltO7W22WhWVy9WimRXtyqBhVOCJKZ9aPoxBgkshcgkHl8zcd1Mw/xEDr6LXOomRFUMRCXPzqQV9tHe/50X7Ye1zTAEoK320BQBySYhq+DcPxAcOpm+TQXFx40PD4iSZiLYzz2ZmzO3L0gUbTMSHGYDDeZUVEsX6ywwIwR0HWfis0FjB2St+7VeefkR3BX3pGH0d6GOPRnTNqholHezvOkfaIDYmvmF/D57nBgMztjOoWElkAebnIQgcSQ5K6W9V2RzEwIGubQT0bT/HU3k5QIuKBytgJviSCyF3wYfMw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB7164.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bk91dXkzQ0VSTXhXcDR2cjdVMjBJdEdZNEhJbEc1RWJLeE5jd1NrMDlNNVBh?=
+ =?utf-8?B?b0xuRFdjRnJDNVYwRkdHOUMwK3ZNRjYzd2xJSTM2RDJiU3JETmpQNkxUNEIv?=
+ =?utf-8?B?aml5L3ZTS3NkcnNOMTNOWElzazlxKzNFS0IvN3AvLzJMbGdnZlZobWdNbStB?=
+ =?utf-8?B?TlRRWGIvWWdjeVEza1g1NzE1QU1HaEhXVGtCMzdtUFo5cmlvOElYZW1yRW5O?=
+ =?utf-8?B?NTc0dU4vMUYyUW14cEVSV0VWUG5xVUtHWmxROHQ2d2JUQkVEOTVZdDllc3Jn?=
+ =?utf-8?B?R29HcXJLY2YwMEs4aHFyRitKODB1R1YvTlhrZG5VcUV6dzZKWVNFU0FqS0xl?=
+ =?utf-8?B?eEJMeWxPNFByNzh2VjN6bGgzWHUrMnBKblJ0Z0RIMnlZMjZKSm5uTzBvdkUz?=
+ =?utf-8?B?bGRHZkpFOGd3VHUrdnVmclZtTGY4YTJkTUIwYTFSUitYSTBBcTkwaFl5L2xP?=
+ =?utf-8?B?c2k0VXRqRzRxRXBkWFlDS1A3SWR6RnJOQjNTRkZUMGtIM1RBVWxlb01acXdH?=
+ =?utf-8?B?cnIyak9CaDkyclZvVVhyalJxRno4Z2ZNTXNhNTlyQUcwSUowOVpaZUZqZTBJ?=
+ =?utf-8?B?NmJtV0ZqQ05kdW1JV0NwaWw2ckNUVnFZR21uNFN3RUZSMHphRHdRTy9idUpC?=
+ =?utf-8?B?MHVjRHhPQWNnVGVuZmEwZXJXREs3bnEySFpBKys1eUx5SUtyYjE0YkxvbWVK?=
+ =?utf-8?B?UVdQU2h6UndocUZtZ2ZqTi9YTUMyS1k4UlNzVVp2S01xZGE2bjdIaWxuOUJS?=
+ =?utf-8?B?NWZ4bktsTnJnbWZtR1NnZWx3ZkRtUE85YVNMblpIWWZIN0RSeHV4WlAwU1Bu?=
+ =?utf-8?B?dVhjSjRnT2hjbVhFMXN2d0dRMkt2eVl1a3dodVFLUkZyMFF4bnZOTjVEK3p3?=
+ =?utf-8?B?TndCWHorSk8rUkYwNm5yc1RoK2tHa1hSQkdkSC9UZXNHbHo3Zkd3blhjNFZp?=
+ =?utf-8?B?MzdscnpJODJyeVE1a2swS0U4Ync3SEhtK1NJVS9pNnpRZHBEaTdIdWdSNElq?=
+ =?utf-8?B?ZEkrc2taNHNISUxLTm5lMkF6cEVuS2VaQ3dvT3ZTRE96RjdJcTgvcTBsUmtr?=
+ =?utf-8?B?UGNOV3BCVXVZbmZwUW14WS84QnRmWkJpalY4b1hLNy9DZzZUOGJQbmYxWnFn?=
+ =?utf-8?B?TSsyTjZ4d2w1YkVKLzR3NlFEbjhTYjRwamRnYm1SN1FwVldqdWJTbE9MNENa?=
+ =?utf-8?B?OStwRGxmOHc5RWVrUlBIcHpON2pteGRWcHd1UDRBMVJaSnc5TytBY0V5dG0x?=
+ =?utf-8?B?bURZZjlhRnBUcHpaSEFHOERhRHRzVkVPS3hmMy9nZXBrRmZWUGxRdWZ0VHFw?=
+ =?utf-8?B?cDV3WFlETnZUK0JiU1RjQnVuSzgwUHk0RWo0MURlemRlY1VMVEQ0WGhvc3Vu?=
+ =?utf-8?B?MCtHSWxZVEpTSG9nVzhoQmFmTG5LUmlNcXFlVS9YVjdrNUVjWFFlY01ZMGpn?=
+ =?utf-8?B?c3FRa3NoVHYxdE0zdFJCRzFjbVRhTXVmT1ExQUNNZXNtUEhIUzNDWHIwK0tT?=
+ =?utf-8?B?SVNiMWYvYm1jYitBQlVHSnR5a3JuRDhhejN6ZkNkTU9FTUwycEJUZzFlQlZY?=
+ =?utf-8?B?WTNCVjB2cTVxc0Y1ZnZITzlDcjE4QXhqeTBPL0dBMXFNZXVORVE5ZWlpL0JH?=
+ =?utf-8?B?ekZJYVlpQWlVdGU5RFYvSS95WFNBNjlUQm1tMUVhVWh4azFWckxxYi92cysz?=
+ =?utf-8?B?R3pFeFZCeUg5RFNzT0dadnM0ems5NTd5alg5WGdoY0VDMkdTb0NTREVPV25M?=
+ =?utf-8?B?Zy9xeVFKbkM4WGRFRDV5cGdaUEYwWHVFVmlNYkYyV25ZRmpjNEkxRVV2VmI0?=
+ =?utf-8?B?d1V4alR3RHFxS0JaYlhnU3dwTTdHR2ZRUGh2NlJnZ0dnVmFIOFZFcDhWWC8v?=
+ =?utf-8?B?dHg2Sk5UaG5UMEtWb2VTKzZvU0VES1liMzVDczlOTTk3TEdUcXdRa0tiUkk5?=
+ =?utf-8?B?NFh3SU9ycUlYWitVNENQL1pjaG9CbkFZdmw2bE1BQndGaEpsbVN5LzBmNHNU?=
+ =?utf-8?B?ZHhmOUEwUUViQ3VNQ2hXVzdNcDlFLy9nQXlBTXpNcmh0T2dOZFJiM1AwUXlB?=
+ =?utf-8?B?VWh6T3BqQ1JSYm11Z3dBaENZS25wV3JvZDRPdFJyRTI3YWNBaGt0T3hsK3cx?=
+ =?utf-8?B?YmtwT0JaU1JjSWpwUnVsVFl1MnJIOHpFSElVVVE2bW96VStZL3JOSWo5dzZs?=
+ =?utf-8?B?L0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f44d07d-027e-492e-4f5a-08dc5759da95
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB7164.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2024 23:24:21.2173
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: T8n8eSPF3+75awA540e9nw8NXDzd9RgB3ZF+FY88vGtphSbkZyL7VmU4JEntCt+vsFfDM7ugZRZqDzTdA0uPZ1uFG1GOz2HuvCQgNF0OxKE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB8144
+X-OriginatorOrg: intel.com
 
-The wrapping key is an entity to encode a clear text key into a key
-handle. This key is a pivot in protecting user keys. So the value has
-to be randomized before being loaded in the software-invisible CPU
-state.
+On 3/28/2024 6:53 PM, Chang S. Bae wrote:
+> 
+> Then, the following is a summary of changes per patch since v8 [6]:
+> 
+> PATCH7-8:
+> * Invoke the setup code via arch_initcall() due to upstream changes
+>    delaying the FPU setup.
+> 
+> PATCH9-11:
+> * Add new patches for security and hotplug support clarification
 
-The wrapping key needs to be established before the first user. Given
-that the only proposed Linux use case for Key Locker is dm-crypt, the
-feature could be lazily enabled before the first dm-crypt user arrives.
+I've recently made updates to a few patches, primarily related to the
+mitigation parts. While the series is still under review, Eric's VAES
+patches have been merged into the crypto tree and are currently being
+sorted out. Once things settle down, I will make a few adjustments on the
+crypto side. Then, another revision will be necessary thereafter.
 
-But there is no precedent for late enabling of CPU features and it
-adds maintenance burden without demonstrative benefit outside of
-minimizing the visibility of Key Locker to userspace.
-
-Therefore, generate random bytes and load them at boot time, involving
-clobbering XMM registers. Perform this process under arch_initcall(),
-ensuring that it occurs after FPU initialization. Finally, flush out
-random bytes after loading.
-
-Given that the Linux Key Locker support is only intended for bare
-metal dm-crypt use, and that switching wrapping key per virtual machine
-is impractical, explicitly skip this setup in the X86_FEATURE_HYPERVISOR
-case.
-
-Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Dave Hansen <dave.hansen@intel.com>
-Cc: "Elliott, Robert (Servers)" <elliott@hpe.com>
-Cc: Dan Williams <dan.j.williams@intel.com>
----
-Changes from v9:
-* Include 'tlbflush.h' back, which was once removed by mistake.
----
- arch/x86/kernel/Makefile    |  1 +
- arch/x86/kernel/keylocker.c | 78 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 79 insertions(+)
- create mode 100644 arch/x86/kernel/keylocker.c
-
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index 74077694da7d..d105e5785b90 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -137,6 +137,7 @@ obj-$(CONFIG_PERF_EVENTS)		+= perf_regs.o
- obj-$(CONFIG_TRACING)			+= tracepoint.o
- obj-$(CONFIG_SCHED_MC_PRIO)		+= itmt.o
- obj-$(CONFIG_X86_UMIP)			+= umip.o
-+obj-$(CONFIG_X86_KEYLOCKER)		+= keylocker.o
- 
- obj-$(CONFIG_UNWINDER_ORC)		+= unwind_orc.o
- obj-$(CONFIG_UNWINDER_FRAME_POINTER)	+= unwind_frame.o
-diff --git a/arch/x86/kernel/keylocker.c b/arch/x86/kernel/keylocker.c
-new file mode 100644
-index 000000000000..8569b92971da
---- /dev/null
-+++ b/arch/x86/kernel/keylocker.c
-@@ -0,0 +1,78 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+/*
-+ * Setup Key Locker feature and support the wrapping key management.
-+ */
-+
-+#include <linux/random.h>
-+#include <linux/string.h>
-+
-+#include <asm/fpu/api.h>
-+#include <asm/keylocker.h>
-+#include <asm/processor.h>
-+#include <asm/tlbflush.h>
-+
-+static struct iwkey wrapping_key __initdata;
-+
-+static void __init generate_keylocker_data(void)
-+{
-+	get_random_bytes(&wrapping_key.integrity_key, sizeof(wrapping_key.integrity_key));
-+	get_random_bytes(&wrapping_key.encryption_key, sizeof(wrapping_key.encryption_key));
-+}
-+
-+static void __init destroy_keylocker_data(void)
-+{
-+	memzero_explicit(&wrapping_key, sizeof(wrapping_key));
-+}
-+
-+/*
-+ * For loading the wrapping key into each CPU, the feature bit is set
-+ * in the control register and FPU context management is performed.
-+ */
-+static void __init load_keylocker(struct work_struct *unused)
-+{
-+	cr4_set_bits(X86_CR4_KEYLOCKER);
-+
-+	kernel_fpu_begin();
-+	load_xmm_iwkey(&wrapping_key);
-+	kernel_fpu_end();
-+}
-+
-+static int __init init_keylocker(void)
-+{
-+	u32 eax, ebx, ecx, edx;
-+
-+	if (!cpu_feature_enabled(X86_FEATURE_KEYLOCKER))
-+		goto disable;
-+
-+	if (cpu_feature_enabled(X86_FEATURE_HYPERVISOR)) {
-+		pr_debug("x86/keylocker: Not compatible with a hypervisor.\n");
-+		goto clear_cap;
-+	}
-+
-+	cr4_set_bits(X86_CR4_KEYLOCKER);
-+
-+	/* AESKLE depends on CR4.KEYLOCKER */
-+	cpuid_count(KEYLOCKER_CPUID, 0, &eax, &ebx, &ecx, &edx);
-+	if (!(ebx & KEYLOCKER_CPUID_EBX_AESKLE) ||
-+	    !(eax & KEYLOCKER_CPUID_EAX_SUPERVISOR)) {
-+		pr_debug("x86/keylocker: Not fully supported.\n");
-+		goto clear_cap;
-+	}
-+
-+	generate_keylocker_data();
-+	schedule_on_each_cpu(load_keylocker);
-+	destroy_keylocker_data();
-+
-+	pr_info_once("x86/keylocker: Enabled.\n");
-+	return 0;
-+
-+clear_cap:
-+	setup_clear_cpu_cap(X86_FEATURE_KEYLOCKER);
-+	pr_info_once("x86/keylocker: Disabled.\n");
-+disable:
-+	cr4_clear_bits(X86_CR4_KEYLOCKER);
-+	return -ENODEV;
-+}
-+
-+arch_initcall(init_keylocker);
--- 
-2.40.1
-
+Thanks,
+Chang
