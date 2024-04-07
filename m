@@ -1,28 +1,29 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC31748F;
-	Sun,  7 Apr 2024 08:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90701101EC;
+	Sun,  7 Apr 2024 08:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712477074; cv=none; b=tGnBtNP4uMA3TTrea/Pq9DvOTBWUSqikkabQx2hmbmkm6Ra0x2PDJNoGO+WKPEpwILmdjJHP2kpQlqB+RWjs4LEbGnfu4HoEWdmbwByS01icTVggU+1z15tw67WUUHTC8yNWUQuzqXbR+OcJ+C0XUiBFD6hXoJScM+HSq6p2+C4=
+	t=1712477074; cv=none; b=HOL7uaWpTS6Wr5EYe8yBikoBTXbxDry2kGA+QENGPLSaXDiF5qADtKpiMiY9IXZmzcahHtNBr4xyK61MAyVuZZo+nmrZjDvb4eP5iGzzlqXwDtUnK5iOfQq7BtKRz3TfXNwCejp9dWI54dTGXQCcpab137E+86xbGRf0TKsveSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712477074; c=relaxed/simple;
-	bh=WuVmlcXEI6ienjeI1ef3w79EoIsbGXDctKG2kz3xZZM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q/7lUGIH6R7WzcOUwS7RtIchw3VTI326/aAPiOMP1+ywoHtBU5rQoICd5BhGu7E3w6Dj5WB8sXYzo//3gxRkWPIuIxnwQAHOL2Ql0BsFu8vL7Gq8Jx95t0HW61d25FzVRCUw+l2/73MdGh5mCv5Tw2gEnTfO3QpB7trVPc8x4Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+	bh=IWmag/TML6Tv6Hu6G9U6MPtnz9M6+9Xlreue3sMUpMQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TNF9yxWIJ8NXqGWgulOi9MWbNozzhN6sAyIC57wFYJhRjHvs0mGZVuNSJqDDwLu4W323Ru0vn537A8LIs56OOTA/pqAiuBMsinGmh+cM/ziKcBeT/J2OlYDqAglQqbYicdHc8d3RceYbZ82k4v2CVE2hwJNhqjO1hOcRvPJjBow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VC4SF35Blz1QCVb;
-	Sun,  7 Apr 2024 16:01:49 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VC4VF50J3zbfPh;
+	Sun,  7 Apr 2024 16:03:33 +0800 (CST)
 Received: from kwepemi500025.china.huawei.com (unknown [7.221.188.170])
-	by mail.maildlp.com (Postfix) with ESMTPS id A25E21402C7;
-	Sun,  7 Apr 2024 16:04:28 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 71D4C140154;
+	Sun,  7 Apr 2024 16:04:30 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  kwepemi500025.china.huawei.com (7.221.188.170) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sun, 7 Apr 2024 16:04:27 +0800
+ 15.1.2507.35; Sun, 7 Apr 2024 16:04:29 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
@@ -30,10 +31,12 @@ CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<songzhiqi1@huawei.com>, <qianweili@huawei.com>, <liushangbin@hisilicon.com>,
 	<linwenkai6@hisilicon.com>, <taoqi10@huawei.com>, <wangzhou1@hisilicon.com>,
 	<huangchenghai2@huawei.com>
-Subject: [PATCH v2 0/9] crypto: hisilicon - Optimize and fix some driver processes
-Date: Sun, 7 Apr 2024 15:59:51 +0800
-Message-ID: <20240407080000.673435-1-huangchenghai2@huawei.com>
+Subject: [PATCH v2 3/9] crypto: hisilicon/sgl - Delete redundant parameter verification
+Date: Sun, 7 Apr 2024 15:59:54 +0800
+Message-ID: <20240407080000.673435-4-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20240407080000.673435-1-huangchenghai2@huawei.com>
+References: <20240407080000.673435-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,37 +48,42 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemi500025.china.huawei.com (7.221.188.170)
 
-This patch series is mainly used to fix and optimize some
-problems of hisilicon.
+The input parameter check in acc_get_sgl is redundant. The
+caller has been verified once. When the check is performed for
+multiple times, the performance deteriorates.
 
-v1 -> v2
-- fixed codecheck warnings about unused variable
-  | Reported-by: kernel test robot <lkp@intel.com>
-  | Closes: https://lore.kernel.org/oe-kbuild-all/202404040616.cF0Pvb9M-lkp@intel.com/
+So the redundant parameter verification is deleted, and the
+index verification is changed to the module entry function for
+verification.
 
-Chenghai Huang (9):
-  crypto: hisilicon/sec - Add the condition for configuring the sriov
-    function
-  crypto: hisilicon/debugfs - Fix debugfs uninit process issue
-  crypto: hisilicon/sgl - Delete redundant parameter verification
-  crypto: hisilicon/debugfs - Fix the processing logic issue in the
-    debugfs creation
-  crypto: hisilicon/qm - Add the default processing branch
-  crypto: hisilicon - Adjust debugfs creation and release order
-  crypto: hisilicon/sec - Fix memory leak for sec resource release
-  crypto: hisilicon/debugfs - Resolve the problem of applying for
-    redundant space in sq dump
-  crypto: hisilicon/qm - Add the err memory release process to qm uninit
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+---
+ drivers/crypto/hisilicon/sgl.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
- drivers/crypto/hisilicon/debugfs.c         | 38 +++++++++++++++-------
- drivers/crypto/hisilicon/hpre/hpre_main.c  | 21 ++++++------
- drivers/crypto/hisilicon/qm.c              |  8 ++---
- drivers/crypto/hisilicon/sec2/sec_crypto.c |  4 ++-
- drivers/crypto/hisilicon/sec2/sec_main.c   | 26 +++++++--------
- drivers/crypto/hisilicon/sgl.c             |  5 +--
- drivers/crypto/hisilicon/zip/zip_main.c    | 24 +++++++-------
- 7 files changed, 68 insertions(+), 58 deletions(-)
-
+diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
+index 0beca257c20b..568acd0aee3f 100644
+--- a/drivers/crypto/hisilicon/sgl.c
++++ b/drivers/crypto/hisilicon/sgl.c
+@@ -161,9 +161,6 @@ static struct hisi_acc_hw_sgl *acc_get_sgl(struct hisi_acc_sgl_pool *pool,
+ 	struct mem_block *block;
+ 	u32 block_index, offset;
+ 
+-	if (!pool || !hw_sgl_dma || index >= pool->count)
+-		return ERR_PTR(-EINVAL);
+-
+ 	block = pool->mem_block;
+ 	block_index = index / pool->sgl_num_per_block;
+ 	offset = index % pool->sgl_num_per_block;
+@@ -230,7 +227,7 @@ hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev,
+ 	struct scatterlist *sg;
+ 	int sg_n;
+ 
+-	if (!dev || !sgl || !pool || !hw_sgl_dma)
++	if (!dev || !sgl || !pool || !hw_sgl_dma || index >= pool->count)
+ 		return ERR_PTR(-EINVAL);
+ 
+ 	sg_n = sg_nents(sgl);
 -- 
 2.30.0
 
