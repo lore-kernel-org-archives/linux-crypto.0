@@ -1,35 +1,42 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94EB218E02;
-	Sat,  6 Apr 2024 05:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E2AF9CC;
+	Sun,  7 Apr 2024 08:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712380829; cv=none; b=YzbEaLpkY1uVjsGwaQO1u+GcmshnUnFAxY+GcJB8z7/W6G5GIZGCcfBcDEjXLvGBv0crdz8VkQIxs2kmrhvOykKr6zmbeQjKDQT+1V+GgFc8+UV9n4BO280BecUa/nF1cCe8vrCw/5HIHacvrFdeEATQ6v+RiMCvinEcdNzAKq8=
+	t=1712477074; cv=none; b=V9qio7cjFhVfWpB3mUYbChevNUIUPn+w6gToKQsfdIkTnwn3/pZNn6k/xzWJLzlvYVJWM6LM06UsCGadfLHGptbSxz03KiZqPuuBrBLDP/Z7Uzxk3qtBZvgvDfPIXRPzTcUBmgyIKo6umWz/ImAl7RlORq8C7uTC/A0iwhhtr58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712380829; c=relaxed/simple;
-	bh=TBj/hcnPrvS19ZOluMZ12evt8AeDaDrUTBeM5kaTuKY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CZ8xfNFOwOwbOw+X7MQ2mypw2+89BHGbOVaiv57GMPQkzoP+kTI3Of0iGuMzFOUzREJ/5HG1uwWjOnb/738qFydKIOLZPWRcq+fRpVC2c83ScQZah+i6XKs06F3D3U/JknTPeBdxqgBUOHgAXMUknabfbbQJoG8FBKB5p8UrXSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HYazYNyp; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HYazYNyp"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3C5A9C433C7;
-	Sat,  6 Apr 2024 05:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712380828;
-	bh=TBj/hcnPrvS19ZOluMZ12evt8AeDaDrUTBeM5kaTuKY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HYazYNypOS+iPe/PmwIZVgrP0OAjOmuWcCZaXmQBd5/DF3DU2Cm7HK1KTLKVM8W2j
-	 EfdrhznuDsHvbEh7NeV1r2EDMVkxTqo+hmKt5MdFIcqj68UTB4u7gvHG6geAe3ArfV
-	 cYxb7yc2nqhO3pPj8ToTFIgL78NntzPlzi3tNk1u8F7N5z7SqSGJ1Z/QhHbUaQaR1j
-	 GTv/7bDPNNXqFXoXNMGCl3bjIAtmML/lX++bgYkRjXumLNf6dEzpQPrpxdPeyVgSKh
-	 czfxRuHIWxcuBJ6wGSXEzVfHmRCYmRJdToESEDFulu3u4HF5IZUSSU3tkxxLhyQRAI
-	 TbkNIwkM8MMRA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 19C9BD84BAC;
-	Sat,  6 Apr 2024 05:20:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712477074; c=relaxed/simple;
+	bh=4X7bb0ikerFe5yNJkCqO9owSgxH9ZYXoE8odVRPTh8M=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PiC6lXvXk6jM3B78CJsCmNzJXNzgGcW+qoLdZicnPf9KIuUrcZ1xeWypFA/afhKlbRdCMj2tZRmVHbgsieNHSIrokLz/0K0WYf4mW/W3nw+8p3npo2gOJiazDgm/sbr51GZjTX39dqCb2bfQbJRGXn335PU8ykRzw7b4qr28h1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VC4S15gkHzwRTk;
+	Sun,  7 Apr 2024 16:01:37 +0800 (CST)
+Received: from kwepemi500025.china.huawei.com (unknown [7.221.188.170])
+	by mail.maildlp.com (Postfix) with ESMTPS id D7EEA180073;
+	Sun,  7 Apr 2024 16:04:29 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.2) by
+ kwepemi500025.china.huawei.com (7.221.188.170) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Sun, 7 Apr 2024 16:04:29 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <shenyang39@huawei.com>,
+	<songzhiqi1@huawei.com>, <qianweili@huawei.com>, <liushangbin@hisilicon.com>,
+	<linwenkai6@hisilicon.com>, <taoqi10@huawei.com>, <wangzhou1@hisilicon.com>,
+	<huangchenghai2@huawei.com>
+Subject: [PATCH v2 2/9] crypto: hisilicon/debugfs - Fix debugfs uninit process issue
+Date: Sun, 7 Apr 2024 15:59:53 +0800
+Message-ID: <20240407080000.673435-3-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20240407080000.673435-1-huangchenghai2@huawei.com>
+References: <20240407080000.673435-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -37,88 +44,78 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 00/34] address all -Wunused-const warnings
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171238082809.31617.17365732495689756509.git-patchwork-notify@kernel.org>
-Date: Sat, 06 Apr 2024 05:20:28 +0000
-References: <20240403080702.3509288-1-arnd@kernel.org>
-In-Reply-To: <20240403080702.3509288-1-arnd@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, arnd@arndb.de, mpe@ellerman.id.au,
- christophe.leroy@csgroup.eu, dlemoal@kernel.org, jikos@kernel.org,
- gregkh@linuxfoundation.org, minyard@acm.org, peterhuewe@gmx.de,
- jarkko@kernel.org, kristo@kernel.org, sboyd@kernel.org, abbotti@mev.co.uk,
- hsweeten@visionengravers.com, srinivas.pandruvada@linux.intel.com,
- lenb@kernel.org, rafael@kernel.org, john.allen@amd.com,
- herbert@gondor.apana.org.au, vkoul@kernel.org, ardb@kernel.org,
- andersson@kernel.org, mdf@kernel.org, liviu.dudau@arm.com,
- benjamin.tissoires@redhat.com, andi.shyti@kernel.org,
- michael.hennerich@analog.com, peda@axentia.se, lars@metafoo.de,
- jic23@kernel.org, dmitry.torokhov@gmail.com, markuss.broks@gmail.com,
- alexandre.torgue@foss.st.com, lee@kernel.org, kuba@kernel.org,
- Shyam-sundar.S-k@amd.com, iyappan@os.amperecomputing.com,
- yisen.zhuang@huawei.com, stf_xl@wp.pl, kvalo@kernel.org, sre@kernel.org,
- tony@atomide.com, broonie@kernel.org, alexandre.belloni@bootlin.com,
- chenxiang66@hisilicon.com, martin.petersen@oracle.com,
- neil.armstrong@linaro.org, heiko@sntech.de, krzysztof.kozlowski@linaro.org,
- hvaibhav.linux@gmail.com, elder@kernel.org, jirislaby@kernel.org,
- ychuang3@nuvoton.com, deller@gmx.de, hch@lst.de, robin.murphy@arm.com,
- rostedt@goodmis.org, mhiramat@kernel.org, akpm@linux-foundation.org,
- keescook@chromium.org, trond.myklebust@hammerspace.com, anna@kernel.org,
- masahiroy@kernel.org, nathan@kernel.org, tiwai@suse.com,
- linuxppc-dev@lists.ozlabs.org, linux-ide@vger.kernel.org,
- openipmi-developer@lists.sourceforge.net, linux-integrity@vger.kernel.org,
- linux-omap@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-efi@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-fpga@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- linux-leds@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-rtc@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-amlogic@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-samsung-soc@vger.kernel.org,
- greybus-dev@lists.linaro.org, linux-staging@lists.linux.dev,
- linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-fbdev@vger.kernel.org, iommu@lists.linux.dev,
- linux-trace-kernel@vger.kernel.org, kasan-dev@googlegroups.com,
- linux-hardening@vger.kernel.org, linux-nfs@vger.kernel.org,
- linux-kbuild@vger.kernel.org, alsa-devel@alsa-project.org,
- linux-sound@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemi500025.china.huawei.com (7.221.188.170)
 
-Hello:
+During the zip probe process, the debugfs failure does not stop
+the probe. When debugfs initialization fails, jumping to the
+error branch will also release regs, in addition to its own
+rollback operation.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+As a result, it may be released repeatedly during the regs
+uninit process. Therefore, the null check needs to be added to
+the regs uninit process.
 
-On Wed,  3 Apr 2024 10:06:18 +0200 you wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Compilers traditionally warn for unused 'static' variables, but not
-> if they are constant. The reason here is a custom for C++ programmers
-> to define named constants as 'static const' variables in header files
-> instead of using macros or enums.
-> 
-> [...]
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+---
+ drivers/crypto/hisilicon/debugfs.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-Here is the summary with links:
-  - [05/34] 3c515: remove unused 'mtu' variable
-    https://git.kernel.org/netdev/net-next/c/17b35355c2c6
-  - [19/34] sunrpc: suppress warnings for unused procfs functions
-    (no matching commit)
-  - [26/34] isdn: kcapi: don't build unused procfs code
-    https://git.kernel.org/netdev/net-next/c/91188544af06
-  - [28/34] net: xgbe: remove extraneous #ifdef checks
-    https://git.kernel.org/netdev/net-next/c/0ef416e045ad
-  - [33/34] drivers: remove incorrect of_match_ptr/ACPI_PTR annotations
-    (no matching commit)
-
-You are awesome, thank you!
+diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
+index cd67fa348ca7..6351a452878d 100644
+--- a/drivers/crypto/hisilicon/debugfs.c
++++ b/drivers/crypto/hisilicon/debugfs.c
+@@ -809,8 +809,14 @@ static void dfx_regs_uninit(struct hisi_qm *qm,
+ {
+ 	int i;
+ 
++	if (!dregs)
++		return;
++
+ 	/* Setting the pointer is NULL to prevent double free */
+ 	for (i = 0; i < reg_len; i++) {
++		if (!dregs[i].regs)
++			continue;
++
+ 		kfree(dregs[i].regs);
+ 		dregs[i].regs = NULL;
+ 	}
+@@ -860,14 +866,21 @@ static struct dfx_diff_registers *dfx_regs_init(struct hisi_qm *qm,
+ static int qm_diff_regs_init(struct hisi_qm *qm,
+ 		struct dfx_diff_registers *dregs, u32 reg_len)
+ {
++	int ret;
++
+ 	qm->debug.qm_diff_regs = dfx_regs_init(qm, qm_diff_regs, ARRAY_SIZE(qm_diff_regs));
+-	if (IS_ERR(qm->debug.qm_diff_regs))
+-		return PTR_ERR(qm->debug.qm_diff_regs);
++	if (IS_ERR(qm->debug.qm_diff_regs)) {
++		ret = PTR_ERR(qm->debug.qm_diff_regs);
++		qm->debug.qm_diff_regs = NULL;
++		return ret;
++	}
+ 
+ 	qm->debug.acc_diff_regs = dfx_regs_init(qm, dregs, reg_len);
+ 	if (IS_ERR(qm->debug.acc_diff_regs)) {
+ 		dfx_regs_uninit(qm, qm->debug.qm_diff_regs, ARRAY_SIZE(qm_diff_regs));
+-		return PTR_ERR(qm->debug.acc_diff_regs);
++		ret = PTR_ERR(qm->debug.acc_diff_regs);
++		qm->debug.acc_diff_regs = NULL;
++		return ret;
+ 	}
+ 
+ 	return 0;
+@@ -908,7 +921,9 @@ static int qm_last_regs_init(struct hisi_qm *qm)
+ static void qm_diff_regs_uninit(struct hisi_qm *qm, u32 reg_len)
+ {
+ 	dfx_regs_uninit(qm, qm->debug.acc_diff_regs, reg_len);
++	qm->debug.acc_diff_regs = NULL;
+ 	dfx_regs_uninit(qm, qm->debug.qm_diff_regs, ARRAY_SIZE(qm_diff_regs));
++	qm->debug.qm_diff_regs = NULL;
+ }
+ 
+ /**
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.30.0
 
