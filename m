@@ -1,29 +1,29 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90701101EC;
-	Sun,  7 Apr 2024 08:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487741097B;
+	Sun,  7 Apr 2024 08:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712477074; cv=none; b=HOL7uaWpTS6Wr5EYe8yBikoBTXbxDry2kGA+QENGPLSaXDiF5qADtKpiMiY9IXZmzcahHtNBr4xyK61MAyVuZZo+nmrZjDvb4eP5iGzzlqXwDtUnK5iOfQq7BtKRz3TfXNwCejp9dWI54dTGXQCcpab137E+86xbGRf0TKsveSg=
+	t=1712477076; cv=none; b=pz1R4LOFQdWfcVWNwLzTiO50qNMfhpE4O8Bh1FQLP1RG9p85O6FWrz/UYaTaao33Q4JE1rpU0QI8J3w6e2CGdJbyq7bgXxVZ691Wm3+IyrAzVcp5uYqbnCgqsmtqKGRGL6uDxynPP+mUoUl5PgCCFYKAXLfH3wSie/9SkUGCmyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712477074; c=relaxed/simple;
-	bh=IWmag/TML6Tv6Hu6G9U6MPtnz9M6+9Xlreue3sMUpMQ=;
+	s=arc-20240116; t=1712477076; c=relaxed/simple;
+	bh=MGF1c7hP756vbZB6s7mhJ9xaU9LW9VFYD7JABjDB6bQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TNF9yxWIJ8NXqGWgulOi9MWbNozzhN6sAyIC57wFYJhRjHvs0mGZVuNSJqDDwLu4W323Ru0vn537A8LIs56OOTA/pqAiuBMsinGmh+cM/ziKcBeT/J2OlYDqAglQqbYicdHc8d3RceYbZ82k4v2CVE2hwJNhqjO1hOcRvPJjBow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+	 MIME-Version:Content-Type; b=IuuVB3kfFi4dfikBIjXODfkKSMqemNEWyuYvKt/ak1IWkRwioV/GxU/1GCBQmfh/6ioz05s3r+TLCDTfgi9YZamVOfDjWG2kcCzBler/ZwNIiklqOlhNiQgPUPvR65NscLl1IU9lQvSr3d+8caMNKh/N8KWwJyzhM/gRKFsXTik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VC4VF50J3zbfPh;
-	Sun,  7 Apr 2024 16:03:33 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4VC4S654NFz1h4Kl;
+	Sun,  7 Apr 2024 16:01:42 +0800 (CST)
 Received: from kwepemi500025.china.huawei.com (unknown [7.221.188.170])
-	by mail.maildlp.com (Postfix) with ESMTPS id 71D4C140154;
-	Sun,  7 Apr 2024 16:04:30 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id A71191A016C;
+	Sun,  7 Apr 2024 16:04:31 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  kwepemi500025.china.huawei.com (7.221.188.170) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sun, 7 Apr 2024 16:04:29 +0800
+ 15.1.2507.35; Sun, 7 Apr 2024 16:04:30 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
@@ -31,9 +31,9 @@ CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<songzhiqi1@huawei.com>, <qianweili@huawei.com>, <liushangbin@hisilicon.com>,
 	<linwenkai6@hisilicon.com>, <taoqi10@huawei.com>, <wangzhou1@hisilicon.com>,
 	<huangchenghai2@huawei.com>
-Subject: [PATCH v2 3/9] crypto: hisilicon/sgl - Delete redundant parameter verification
-Date: Sun, 7 Apr 2024 15:59:54 +0800
-Message-ID: <20240407080000.673435-4-huangchenghai2@huawei.com>
+Subject: [PATCH v2 5/9] crypto: hisilicon/qm - Add the default processing branch
+Date: Sun, 7 Apr 2024 15:59:56 +0800
+Message-ID: <20240407080000.673435-6-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20240407080000.673435-1-huangchenghai2@huawei.com>
 References: <20240407080000.673435-1-huangchenghai2@huawei.com>
@@ -48,42 +48,29 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemi500025.china.huawei.com (7.221.188.170)
 
-The input parameter check in acc_get_sgl is redundant. The
-caller has been verified once. When the check is performed for
-multiple times, the performance deteriorates.
-
-So the redundant parameter verification is deleted, and the
-index verification is changed to the module entry function for
-verification.
+The cmd type can be extended. Currently, only four types of cmd
+can be processed. Therefor, add the default processing branch
+to intercept incorrect parameter input.
 
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/sgl.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
-index 0beca257c20b..568acd0aee3f 100644
---- a/drivers/crypto/hisilicon/sgl.c
-+++ b/drivers/crypto/hisilicon/sgl.c
-@@ -161,9 +161,6 @@ static struct hisi_acc_hw_sgl *acc_get_sgl(struct hisi_acc_sgl_pool *pool,
- 	struct mem_block *block;
- 	u32 block_index, offset;
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 92f0a1d9b4a6..cedb3af1fc1a 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -645,6 +645,9 @@ int qm_set_and_get_xqc(struct hisi_qm *qm, u8 cmd, void *xqc, u32 qp_id, bool op
+ 		tmp_xqc = qm->xqc_buf.aeqc;
+ 		xqc_dma = qm->xqc_buf.aeqc_dma;
+ 		break;
++	default:
++		dev_err(&qm->pdev->dev, "unknown mailbox cmd %u\n", cmd);
++		return -EINVAL;
+ 	}
  
--	if (!pool || !hw_sgl_dma || index >= pool->count)
--		return ERR_PTR(-EINVAL);
--
- 	block = pool->mem_block;
- 	block_index = index / pool->sgl_num_per_block;
- 	offset = index % pool->sgl_num_per_block;
-@@ -230,7 +227,7 @@ hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev,
- 	struct scatterlist *sg;
- 	int sg_n;
- 
--	if (!dev || !sgl || !pool || !hw_sgl_dma)
-+	if (!dev || !sgl || !pool || !hw_sgl_dma || index >= pool->count)
- 		return ERR_PTR(-EINVAL);
- 
- 	sg_n = sg_nents(sgl);
+ 	/* Setting xqc will fail if master OOO is blocked. */
 -- 
 2.30.0
 
