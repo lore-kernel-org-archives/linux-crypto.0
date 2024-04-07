@@ -1,29 +1,28 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E2AF9CC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC31748F;
 	Sun,  7 Apr 2024 08:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712477074; cv=none; b=V9qio7cjFhVfWpB3mUYbChevNUIUPn+w6gToKQsfdIkTnwn3/pZNn6k/xzWJLzlvYVJWM6LM06UsCGadfLHGptbSxz03KiZqPuuBrBLDP/Z7Uzxk3qtBZvgvDfPIXRPzTcUBmgyIKo6umWz/ImAl7RlORq8C7uTC/A0iwhhtr58=
+	t=1712477074; cv=none; b=tGnBtNP4uMA3TTrea/Pq9DvOTBWUSqikkabQx2hmbmkm6Ra0x2PDJNoGO+WKPEpwILmdjJHP2kpQlqB+RWjs4LEbGnfu4HoEWdmbwByS01icTVggU+1z15tw67WUUHTC8yNWUQuzqXbR+OcJ+C0XUiBFD6hXoJScM+HSq6p2+C4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712477074; c=relaxed/simple;
-	bh=4X7bb0ikerFe5yNJkCqO9owSgxH9ZYXoE8odVRPTh8M=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PiC6lXvXk6jM3B78CJsCmNzJXNzgGcW+qoLdZicnPf9KIuUrcZ1xeWypFA/afhKlbRdCMj2tZRmVHbgsieNHSIrokLz/0K0WYf4mW/W3nw+8p3npo2gOJiazDgm/sbr51GZjTX39dqCb2bfQbJRGXn335PU8ykRzw7b4qr28h1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	bh=WuVmlcXEI6ienjeI1ef3w79EoIsbGXDctKG2kz3xZZM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q/7lUGIH6R7WzcOUwS7RtIchw3VTI326/aAPiOMP1+ywoHtBU5rQoICd5BhGu7E3w6Dj5WB8sXYzo//3gxRkWPIuIxnwQAHOL2Ql0BsFu8vL7Gq8Jx95t0HW61d25FzVRCUw+l2/73MdGh5mCv5Tw2gEnTfO3QpB7trVPc8x4Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VC4S15gkHzwRTk;
-	Sun,  7 Apr 2024 16:01:37 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VC4SF35Blz1QCVb;
+	Sun,  7 Apr 2024 16:01:49 +0800 (CST)
 Received: from kwepemi500025.china.huawei.com (unknown [7.221.188.170])
-	by mail.maildlp.com (Postfix) with ESMTPS id D7EEA180073;
-	Sun,  7 Apr 2024 16:04:29 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id A25E21402C7;
+	Sun,  7 Apr 2024 16:04:28 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  kwepemi500025.china.huawei.com (7.221.188.170) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sun, 7 Apr 2024 16:04:29 +0800
+ 15.1.2507.35; Sun, 7 Apr 2024 16:04:27 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
@@ -31,12 +30,10 @@ CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<songzhiqi1@huawei.com>, <qianweili@huawei.com>, <liushangbin@hisilicon.com>,
 	<linwenkai6@hisilicon.com>, <taoqi10@huawei.com>, <wangzhou1@hisilicon.com>,
 	<huangchenghai2@huawei.com>
-Subject: [PATCH v2 2/9] crypto: hisilicon/debugfs - Fix debugfs uninit process issue
-Date: Sun, 7 Apr 2024 15:59:53 +0800
-Message-ID: <20240407080000.673435-3-huangchenghai2@huawei.com>
+Subject: [PATCH v2 0/9] crypto: hisilicon - Optimize and fix some driver processes
+Date: Sun, 7 Apr 2024 15:59:51 +0800
+Message-ID: <20240407080000.673435-1-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240407080000.673435-1-huangchenghai2@huawei.com>
-References: <20240407080000.673435-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,74 +45,37 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemi500025.china.huawei.com (7.221.188.170)
 
-During the zip probe process, the debugfs failure does not stop
-the probe. When debugfs initialization fails, jumping to the
-error branch will also release regs, in addition to its own
-rollback operation.
+This patch series is mainly used to fix and optimize some
+problems of hisilicon.
 
-As a result, it may be released repeatedly during the regs
-uninit process. Therefore, the null check needs to be added to
-the regs uninit process.
+v1 -> v2
+- fixed codecheck warnings about unused variable
+  | Reported-by: kernel test robot <lkp@intel.com>
+  | Closes: https://lore.kernel.org/oe-kbuild-all/202404040616.cF0Pvb9M-lkp@intel.com/
 
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
----
- drivers/crypto/hisilicon/debugfs.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+Chenghai Huang (9):
+  crypto: hisilicon/sec - Add the condition for configuring the sriov
+    function
+  crypto: hisilicon/debugfs - Fix debugfs uninit process issue
+  crypto: hisilicon/sgl - Delete redundant parameter verification
+  crypto: hisilicon/debugfs - Fix the processing logic issue in the
+    debugfs creation
+  crypto: hisilicon/qm - Add the default processing branch
+  crypto: hisilicon - Adjust debugfs creation and release order
+  crypto: hisilicon/sec - Fix memory leak for sec resource release
+  crypto: hisilicon/debugfs - Resolve the problem of applying for
+    redundant space in sq dump
+  crypto: hisilicon/qm - Add the err memory release process to qm uninit
 
-diff --git a/drivers/crypto/hisilicon/debugfs.c b/drivers/crypto/hisilicon/debugfs.c
-index cd67fa348ca7..6351a452878d 100644
---- a/drivers/crypto/hisilicon/debugfs.c
-+++ b/drivers/crypto/hisilicon/debugfs.c
-@@ -809,8 +809,14 @@ static void dfx_regs_uninit(struct hisi_qm *qm,
- {
- 	int i;
- 
-+	if (!dregs)
-+		return;
-+
- 	/* Setting the pointer is NULL to prevent double free */
- 	for (i = 0; i < reg_len; i++) {
-+		if (!dregs[i].regs)
-+			continue;
-+
- 		kfree(dregs[i].regs);
- 		dregs[i].regs = NULL;
- 	}
-@@ -860,14 +866,21 @@ static struct dfx_diff_registers *dfx_regs_init(struct hisi_qm *qm,
- static int qm_diff_regs_init(struct hisi_qm *qm,
- 		struct dfx_diff_registers *dregs, u32 reg_len)
- {
-+	int ret;
-+
- 	qm->debug.qm_diff_regs = dfx_regs_init(qm, qm_diff_regs, ARRAY_SIZE(qm_diff_regs));
--	if (IS_ERR(qm->debug.qm_diff_regs))
--		return PTR_ERR(qm->debug.qm_diff_regs);
-+	if (IS_ERR(qm->debug.qm_diff_regs)) {
-+		ret = PTR_ERR(qm->debug.qm_diff_regs);
-+		qm->debug.qm_diff_regs = NULL;
-+		return ret;
-+	}
- 
- 	qm->debug.acc_diff_regs = dfx_regs_init(qm, dregs, reg_len);
- 	if (IS_ERR(qm->debug.acc_diff_regs)) {
- 		dfx_regs_uninit(qm, qm->debug.qm_diff_regs, ARRAY_SIZE(qm_diff_regs));
--		return PTR_ERR(qm->debug.acc_diff_regs);
-+		ret = PTR_ERR(qm->debug.acc_diff_regs);
-+		qm->debug.acc_diff_regs = NULL;
-+		return ret;
- 	}
- 
- 	return 0;
-@@ -908,7 +921,9 @@ static int qm_last_regs_init(struct hisi_qm *qm)
- static void qm_diff_regs_uninit(struct hisi_qm *qm, u32 reg_len)
- {
- 	dfx_regs_uninit(qm, qm->debug.acc_diff_regs, reg_len);
-+	qm->debug.acc_diff_regs = NULL;
- 	dfx_regs_uninit(qm, qm->debug.qm_diff_regs, ARRAY_SIZE(qm_diff_regs));
-+	qm->debug.qm_diff_regs = NULL;
- }
- 
- /**
+ drivers/crypto/hisilicon/debugfs.c         | 38 +++++++++++++++-------
+ drivers/crypto/hisilicon/hpre/hpre_main.c  | 21 ++++++------
+ drivers/crypto/hisilicon/qm.c              |  8 ++---
+ drivers/crypto/hisilicon/sec2/sec_crypto.c |  4 ++-
+ drivers/crypto/hisilicon/sec2/sec_main.c   | 26 +++++++--------
+ drivers/crypto/hisilicon/sgl.c             |  5 +--
+ drivers/crypto/hisilicon/zip/zip_main.c    | 24 +++++++-------
+ 7 files changed, 68 insertions(+), 58 deletions(-)
+
 -- 
 2.30.0
 
