@@ -1,29 +1,29 @@
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4873F1096F;
-	Sun,  7 Apr 2024 08:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B1F17984;
+	Sun,  7 Apr 2024 08:04:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712477076; cv=none; b=ktmYXWgXSLMzw/LXclmTWpRDciJtJ6KAA2HutGNPRwEB4lmzH/2hCmMH/Aal+nV7EqSnGVanXJdFUMRKU1q0ELbIgkv7fu0U92tungo7NX7ZtIOSWRkhxAnKU1xInVtWgZC2yeQlEeRykIsqk/1G2HygkkWLK96X1/K9+sdkElQ=
+	t=1712477077; cv=none; b=dk+ON7VXHyp8Cxzxnre4d+UzsZETEB/ra0Y5w2CROWCaNYD3QZoV3uxlvOrojMzh1/mvLwzhlO1RXkpQHDzr8/uDjqDnqNzyveHtvs7tHd6AqoHIBfsPBpLkOyyHAhhtYw7YbQkzJKClr9h41sfdHVdr9N7B7mE3skGr7pcQUwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712477076; c=relaxed/simple;
-	bh=INGEGqdsSMSW8P5U9FPTJWpgdgTcifxfTvht2tN20+A=;
+	s=arc-20240116; t=1712477077; c=relaxed/simple;
+	bh=xrVHxwzA02MzdD0r64wnEfGNcl72eft/PsH9whLFrV4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L6DcqjpT8awZ4VRW6XEK4ZwrIZ1i7Y0h3iJ8zljNv+0dh1DJKz0IFMZ7I/XRMeUZGUJ9NW1YuateX7AM492EfFWoCcHZ9Bcvz8xcydHJepaS6u7pPXxhtcxBFMNz90yH9UFELxXnxSxp4HiP9oAP9DvVsXOuAYwj1N5uedjH94E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	 MIME-Version:Content-Type; b=PnK2bELC8NK/AcKVrYeksC2cpPiNjk6QFqoH+u4laY35p/thoVscO6ttFiVvRcAUjLHb8C+s8uH8Wh78BQAkxcydsQpeg4uHJ2/1pRPHzVgXsDLtSsZSSSFxmBImSk2qNS985YKGf5Jjpz+es0YJah+JDnYzdIKIgHhX/M03T7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4VC4VV6wX0z1GG9P;
-	Sun,  7 Apr 2024 16:03:46 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VC4SL5q4zz1QCVh;
+	Sun,  7 Apr 2024 16:01:54 +0800 (CST)
 Received: from kwepemi500025.china.huawei.com (unknown [7.221.188.170])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3F0C7140416;
-	Sun,  7 Apr 2024 16:04:29 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 0BE3C140158;
+	Sun,  7 Apr 2024 16:04:34 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  kwepemi500025.china.huawei.com (7.221.188.170) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sun, 7 Apr 2024 16:04:28 +0800
+ 15.1.2507.35; Sun, 7 Apr 2024 16:04:33 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
@@ -31,9 +31,9 @@ CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<songzhiqi1@huawei.com>, <qianweili@huawei.com>, <liushangbin@hisilicon.com>,
 	<linwenkai6@hisilicon.com>, <taoqi10@huawei.com>, <wangzhou1@hisilicon.com>,
 	<huangchenghai2@huawei.com>
-Subject: [PATCH v2 1/9] crypto: hisilicon/sec - Add the condition for configuring the sriov function
-Date: Sun, 7 Apr 2024 15:59:52 +0800
-Message-ID: <20240407080000.673435-2-huangchenghai2@huawei.com>
+Subject: [PATCH v2 9/9] crypto: hisilicon/qm - Add the err memory release process to qm uninit
+Date: Sun, 7 Apr 2024 16:00:00 +0800
+Message-ID: <20240407080000.673435-10-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20240407080000.673435-1-huangchenghai2@huawei.com>
 References: <20240407080000.673435-1-huangchenghai2@huawei.com>
@@ -48,32 +48,37 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemi500025.china.huawei.com (7.221.188.170)
 
-When CONFIG_PCI_IOV is disabled, the SRIOV configuration
-function is not required. An error occurs if this function is
-incorrectly called.
+When the qm uninit command is executed, the err data needs to
+be released to prevent memory leakage. The error information
+release operation and uacce_remove are integrated in
+qm_remove_uacce.
 
-Consistent with other modules, add the condition for
-configuring the sriov function of sec_pci_driver.
+So add the qm_remove_uacce to qm uninit to avoid err memory
+leakage.
 
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/sec2/sec_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/crypto/hisilicon/qm.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index c290d8937b19..f4e10741610f 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -1324,7 +1324,8 @@ static struct pci_driver sec_pci_driver = {
- 	.probe = sec_probe,
- 	.remove = sec_remove,
- 	.err_handler = &sec_err_handler,
--	.sriov_configure = hisi_qm_sriov_configure,
-+	.sriov_configure = IS_ENABLED(CONFIG_PCI_IOV) ?
-+				hisi_qm_sriov_configure : NULL,
- 	.shutdown = hisi_qm_dev_shutdown,
- 	.driver.pm = &sec_pm_ops,
- };
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index cedb3af1fc1a..3dac8d8e8568 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -2896,12 +2896,9 @@ void hisi_qm_uninit(struct hisi_qm *qm)
+ 	hisi_qm_set_state(qm, QM_NOT_READY);
+ 	up_write(&qm->qps_lock);
+ 
++	qm_remove_uacce(qm);
+ 	qm_irqs_unregister(qm);
+ 	hisi_qm_pci_uninit(qm);
+-	if (qm->use_sva) {
+-		uacce_remove(qm->uacce);
+-		qm->uacce = NULL;
+-	}
+ }
+ EXPORT_SYMBOL_GPL(hisi_qm_uninit);
+ 
 -- 
 2.30.0
 
