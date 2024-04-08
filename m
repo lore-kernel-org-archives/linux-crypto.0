@@ -1,50 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6DB46CDA9;
-	Mon,  8 Apr 2024 12:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2CA6D1CC;
+	Mon,  8 Apr 2024 12:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712579471; cv=none; b=azcZk6CgfofKWRhvgutAeBfibOe+I75og4c8QtOO6OQ4mmJ0KippK+3yOYU8P6QexlIN4PVp9P/wroRn/oFyDLfMdJSvLDcEMxz4uNZUvph6RpZ1exISALDUYZHt4/QsN7DHk8H5I65kozz6VokNAiuNaP2AaDE82cMFMeWjk/Y=
+	t=1712579857; cv=none; b=CzU9YRrJUtI7GTpM5quDbCNj4X9gPXi89JHnx7s+iRCEAovIuDqlIhLCarvbqsrDUYrrWFs5QU8ba9MN41ZyoDD+FrQTyxigZ34Lzh9scLbnqf6nobFmiU29vOg+eMLFkP99mDoOirI/a3kmAUWq73KmWQjNOY2mAiJjgYzicg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712579471; c=relaxed/simple;
-	bh=hAf068l3Nm0d9JEUttg8/muc9fg+jcdg1rtCCWVZF6Q=;
+	s=arc-20240116; t=1712579857; c=relaxed/simple;
+	bh=eKyMOCTmzVpas0Ku4p4aIG2DFODmyGN4nePJuS4aVi4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lQ5Wu+hphVIcT1+EH5Dndmq9O8b4LxqWg41CyAx4lddRQZ7JFb3ByMbsH42D/rYpqhHzsDKw7RDgSusreKNw/T6lTfyeuif7EfIENMJMakqsuDr9ojPNn+lRbTC08/iSSZ2241O9q3hh0FReOOQs7pyBbNrPYwVcaX89EvSoBs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ugz7LOVy; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ez138fxixe8afbqi2LcXnsIia5O/nwN9Kpu9g+iuA3HQXlV5TjceHh1y0PL83x+gi1FIsliJb47SGbM4c3rxTSo5SsE2Ry013gy/lcZIdhJmnPWPT3nwQCitZEmzPIq5IOtu5BKUmAKh0F4XtHMOP3N8M16EpzHLz35L7rSZckM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oh3RBVdr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ugz7LOVy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDD6DC433C7;
-	Mon,  8 Apr 2024 12:31:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oh3RBVdr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AF87C43330;
+	Mon,  8 Apr 2024 12:37:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712579471;
-	bh=hAf068l3Nm0d9JEUttg8/muc9fg+jcdg1rtCCWVZF6Q=;
+	s=k20201202; t=1712579856;
+	bh=eKyMOCTmzVpas0Ku4p4aIG2DFODmyGN4nePJuS4aVi4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ugz7LOVybBzVtz6+uRTeZl8Jt3HWhp/3g6RT8hgA393jNE6Olgti/L/+Zlz6QE6Jw
-	 haQ8+UvaJ/IdHyHnqSmlovsUdqGpScRkJrolh7VnWFhy4uyg0bw9CN+CzItD5S8zCt
-	 50Igib856+TdoreVjGSI11RlMXbIQbcHa59cCUcb2r1gSnEbAumdjpd18Wen1vyqUs
-	 2wfM8Acjc4PHsoKhVq/L7S3fQ5z3JRnCjfhwlmWCoawySduZ+v/7j5/viTZ53X68iB
-	 oz14SNqp+Chq52CLG6UXXo2gfenspOLqZVGX625Lgrmf+VtaUVQ/OKVLzHfBaXPoo5
-	 WT2Sdh6AutcWw==
-Date: Mon, 8 Apr 2024 08:31:08 -0400
+	b=Oh3RBVdrQUr0HMr7a6y+Rg3f9nttVQFy1Q16vLI3P/3flHrCAI5uw9qF8pmkzecAa
+	 brNKRKJBx7iFo+WzQ8EsitaTQaQZauWSZiEYzsbxIRo8E6E6nDFa0OtQ7Ft45XJM2p
+	 5ld8UnVNfTcs6T61SlF/AxllTzz6Ya4vlBVm/5jk5Pcf26wpusITKcIej73GuZbi89
+	 CSIxAtA8dqfz2wPo6z1mVtGb6Q6dhQA0PiuQts4LvYFcVQZodZBIbRSnLyLvYHSVQ6
+	 Vk/5TcYcsOO3g1a1ilIy4fndG7dx8W1AKKgdMJv0vrMJua/SeKrvFTqAf0l6F5Qc9w
+	 oeYc1WlYHNyYg==
+Date: Mon, 8 Apr 2024 08:37:34 -0400
 From: Eric Biggers <ebiggers@kernel.org>
-To: David Laight <David.Laight@aculab.com>
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"x86@kernel.org" <x86@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Andy Lutomirski <luto@kernel.org>,
-	"Chang S . Bae" <chang.seok.bae@intel.com>
-Subject: Re: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
-Message-ID: <20240408123108.GA732@quark.localdomain>
-References: <20240326080305.402382-1-ebiggers@kernel.org>
- <CAMj1kXH4fNevFzrbazJptadxh_spEY3W91FZni5eMqD+UKrSUQ@mail.gmail.com>
- <20240326164755.GB1524@sol.localdomain>
- <6629b8120807458ab76e1968056f5e10@AcuMS.aculab.com>
- <20240404013529.GB24248@quark.localdomain>
- <142077804bee45daac3b0fad8bc4c2fe@AcuMS.aculab.com>
- <20240405191904.GA1205@quark.localdomain>
- <e49a2868626f4f9e9169ce8b8b926a49@AcuMS.aculab.com>
+To: Stefan Kanthak <stefan.kanthak@nexgo.de>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	tim.c.chen@linux.intel.com, sean.m.gulley@intel.com
+Subject: Re: [PATCH 1/2] crypto: s(h)aving 40+ bytes off
+ arch/x86/crypto/sha256_ni_asm.S
+Message-ID: <20240408123734.GB732@quark.localdomain>
+References: <5EEE09A9021540A5AAD8BFEEE915512D@H270>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,33 +43,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e49a2868626f4f9e9169ce8b8b926a49@AcuMS.aculab.com>
+In-Reply-To: <5EEE09A9021540A5AAD8BFEEE915512D@H270>
 
-On Mon, Apr 08, 2024 at 07:41:44AM +0000, David Laight wrote:
-> From: Eric Biggers
-> > Sent: 05 April 2024 20:19
-> ...
-> > I did some tests on Sapphire Rapids using a system call that I customized to do
-> > nothing except possibly a kernel_fpu_begin / kernel_fpu_end pair.
-> > 
-> > On average the bare syscall took 70 ns.  The syscall with the kernel_fpu_begin /
-> > kernel_fpu_end pair took 160 ns if the userspace program used xmm only, 340 ns
-> > if it used ymm, or 360 ns if it used zmm...
-> > 
-> > Note that without the kernel_fpu_begin / kernel_fpu_end pair, AES-NI
-> > instructions cannot be used and the alternative would be xts(ecb(aes-generic)).
-> > On the same CPU, encrypting a single 512-byte sector with xts(ecb(aes-generic))
-> > takes about 2235ns.  With xts-aes-vaes-avx10_512 it takes 75 ns...
+On Mon, Apr 08, 2024 at 11:26:52AM +0200, Stefan Kanthak wrote:
+> Use shorter SSE2 instructions instead of some SSE4.1
+> use short displacements into K256
 > 
-> So most of the cost of a single 512-byte sector is the kernel_fpu_begin().
-> But it is so much slower any other way it is still faster.
-> 
+> --- -/arch/x86/crypto/sha256_ni_asm.S
+> +++ +/arch/x86/crypto/sha256_ni_asm.S
 
-Yes.  To clarify, the 75 ns time I mentioned for a 512-byte sector is the
-average for repeated calls, amortizing the XSAVE and XRSTOR.  For a real single
-512-byte sector that eats the entire cost of the XSAVE and XRSTOR by itself, if
-all state is in-use it should be about 75 + (360 - 70) = 365 ns (based on the
-syscall benchmarks I did), with the XSAVE and XRSTOR accounting for 80% of that
-time.  But yes, that's still over 6 times faster than the scalar alternative.
+Thanks!  I'd like to benchmark this to see how it affects performance, but
+unfortunately this patch doesn't apply.  It looks your email client corrupted
+your patch by replacing tabs with spaces.  Can you please use 'git send-email'
+to send patches?
 
 - Eric
