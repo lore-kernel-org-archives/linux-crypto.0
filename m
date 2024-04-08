@@ -1,92 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1CF13CFAF;
-	Mon,  8 Apr 2024 14:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F61E7F470
+	for <linux-crypto@vger.kernel.org>; Mon,  8 Apr 2024 15:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712587056; cv=none; b=qX5Nl8gAVj1EBnoRQHtXFbSljt7ceh81fyveLRDEkpOkbGxT0JK6XpWafrXZJJKTT13Z+EaQQEwzDUPO0N9WKEmFI0DA7HYv8ElBcxc2y+mAMCQQ5P/7/Edf+Oa589QszLkt+BH7GAyxT7sN/UPAI0aJr+4Nzde5aeZFTVe2vSM=
+	t=1712589515; cv=none; b=KMsbxQwRiiDhyyTDFHcDeJkiq6/6r6RkPqNdO/P6w4+eZ1uLy/DmJ+eev9mNgrnQ+e/jyMi74zSn+4km7l1YDkzk/7jBLgKqGvBD8R//YoJjxKcUwONnmx9hGGEesuU/shVdehjbIEAWp/wzg8Ip6XskjMdDpkk841ze/ZuvhlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712587056; c=relaxed/simple;
-	bh=zY/qVqZFx784TVeRHAP6KJW2AtpHy59nPe0QednZNHo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KmN6lydCUKzIzPP/IbueAfnpsFgMcfy2G7jMwcdCnHu5o6SJFIok3VxfxMubwOciYQVXtUlwEfiRSp3vgFYhuuA6libtHBHLEB/0srasyOZcaV/nnmor/RWAx2a30WcRO5Q/NbnbWLYdRtdCrRGSb4H1TYltk19+S9AHhJwNuxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I/zw37wc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712589515; c=relaxed/simple;
+	bh=nSc9poOuGHd7JNNiLJZut3JVa3pVm9j6mYo7Ppbr/gk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eFkXDYlDDfA6bc7nyeo14UJ6AL8F1nrvxTL8Gq/biXCJuVHUHDBpRe+TOw/TJCdpNLVVUWRvTY6jAAH/3TtKE/xxWKG0OW2v5W2WPreFjzRsHNiREnZ5puQ/Y2iOvXxEJhrmRXVjJbJcIWYN0K0XknJefr2BAObJAW0sonBLja8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RTl5kRV8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I/zw37wc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1DD7C43390;
-	Mon,  8 Apr 2024 14:37:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RTl5kRV8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0356C433C7;
+	Mon,  8 Apr 2024 15:18:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712587055;
-	bh=zY/qVqZFx784TVeRHAP6KJW2AtpHy59nPe0QednZNHo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=I/zw37wcZK1ziVQ2Bs7hvgieBDAGwapVV02v0CKKvK1Daf0PUKV8/mhtnJSnD2fsl
-	 fgQVsej3lgvHa5Vt1rj4yVWKHWxmNVI4q2r3v9kCjc4vcDvz+y1jxAI4atLWVvm6/P
-	 PL1WNtnfS1rLQLTH+2S/mD5Roo/Q5m5uaOudJofQzpXG6CYqLxC/t5YcnPJiQxPa74
-	 P8BungPr6wsTKmtpX/0voTHc9SVDFTpxpP83LZuEJpS/Y9mQXDYZAeQpq3Dv6gOV3w
-	 AOrgoWHvAVFsz9jWCgw0JMyWPTsx9OJKmv87bbNIv/+UGqxDzR0A1LGBrruy6togYx
-	 jMwKq7v634zMw==
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d88a869ce6so16922041fa.3;
-        Mon, 08 Apr 2024 07:37:35 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVNCyaNLpjZjJbp5J27xXQh7zKU3GM9XIWeio/Gxy6skCbzHjTGhCR3MKmziy9ZbJ2pOZ6uVEJeDKPYMZ5c7yukNa9ajbV2vjW8LZdN
-X-Gm-Message-State: AOJu0YzzOs9lrr8K7sWNSo37EaX1gqoa+KjJw+iB6Yzt4eFdO70WF+5U
-	KSVflBbN0PJxUhEKReWenjpc8y3vYCi1A3ynnFBE/iUItFoZyoEYHyhRBSIBKt42HigJnQPTeJd
-	p0tSJvpqhK/VdRYZpddyiEAyoTpA=
-X-Google-Smtp-Source: AGHT+IGwF8JHhG7QdVgtEZkjWHl3DvPcPdWdlHQEj/e4X0EP9bIE+AUm66Y9qxQf4N2pq0y9cgBt0NYcUKA5VXQgEAw=
-X-Received: by 2002:a2e:9f43:0:b0:2d7:1ce5:3e24 with SMTP id
- v3-20020a2e9f43000000b002d71ce53e24mr6688567ljk.34.1712587053980; Mon, 08 Apr
- 2024 07:37:33 -0700 (PDT)
+	s=k20201202; t=1712589514;
+	bh=nSc9poOuGHd7JNNiLJZut3JVa3pVm9j6mYo7Ppbr/gk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RTl5kRV8AJuMNp6vj3ozzA3FiqESTjfeLe3Q6lhCdQvLfV5/eERzikw+5Yofb+4cX
+	 Ql1DIU0vV7kVMg6+RRPMSKVehfpynAEbk1Wu6I6yO79itIk9uItU6VhNnyZIciIAHt
+	 ubAEEntXGqMpWHG5z71bxjce9zNK+jRkg5GK7i1QPpVhGPC1jewPMhVOAqpaaBTqti
+	 GdDwg/tlkG1ITwnPD42eHxizfr2+8fQ+A1f+RsXK0PTf7zXdLJ3078fD1GQ9uM3knn
+	 bTd3jOp7o2psx0iqBwUU1kiYMhHpXKldVZIZ6zAQruC+im2oFGK2bK1xtaGM+H1/Bo
+	 KcnCMLE8ELQQQ==
+Date: Mon, 8 Apr 2024 11:18:32 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: Stefan Kanthak <stefan.kanthak@nexgo.de>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 1/2] crypto: s(h)aving 40+ bytes off
+ arch/x86/crypto/sha256_ni_asm.S
+Message-ID: <20240408151832.GE732@quark.localdomain>
+References: <5EEE09A9021540A5AAD8BFEEE915512D@H270>
+ <20240408123734.GB732@quark.localdomain>
+ <9088939CC5454139901CEDD97DAFB004@H270>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240408141817.E22F8128369@smtp.subspace.kernel.org>
-In-Reply-To: <20240408141817.E22F8128369@smtp.subspace.kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Mon, 8 Apr 2024 16:37:22 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGTrx_9igrewHOkfHAej4NdJBSKHtpCoQcif08EtF0pAA@mail.gmail.com>
-Message-ID: <CAMj1kXGTrx_9igrewHOkfHAej4NdJBSKHtpCoQcif08EtF0pAA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] crypto: s(h)aving 16 byte constant off arch/x86/crypto/sha1_ni_asm.S
-To: Stefan Kanthak <stefan.kanthak@nexgo.de>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	tim.c.chen@linux.intel.com, Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9088939CC5454139901CEDD97DAFB004@H270>
 
-On Mon, 8 Apr 2024 at 16:18, Stefan Kanthak <stefan.kanthak@nexgo.de> wrote:
->
-> Get rid of 16 byte constant, use shift instead of mask
->
+[+Cc linux-crypto]
 
-This is missing a signoff
+Please use reply-all so that the list gets included.
 
-> --- -/arch/x86/crypto/sha1_ni_asm.S
-> +++ +/arch/x86/crypto/sha1_ni_asm.S
-> @@ -104,9 +104,9 @@
->         add             DATA_PTR, NUM_BLKS      /* pointer to end of data */
->
->         /* load initial hash values */
-> -       pinsrd          $3, 1*16(DIGEST_PTR), E0
-> +       pinsrd          $0, 1*16(DIGEST_PTR), E0
->         movdqu          0*16(DIGEST_PTR), ABCD
-> -       pand            UPPER_WORD_MASK(%rip), E0
-> +       pslldq          $12, E0
->         pshufd          $0x1B, ABCD, ABCD
->
+On Mon, Apr 08, 2024 at 04:15:32PM +0200, Stefan Kanthak wrote:
+> Hi Eric,
+> 
+> > On Mon, Apr 08, 2024 at 11:26:52AM +0200, Stefan Kanthak wrote:
+> >> Use shorter SSE2 instructions instead of some SSE4.1
+> >> use short displacements into K256
+> >> 
+> >> --- -/arch/x86/crypto/sha256_ni_asm.S
+> >> +++ +/arch/x86/crypto/sha256_ni_asm.S
+> > 
+> > Thanks!  I'd like to benchmark this to see how it affects performance,
+> 
+> Performance is NOT affected: if CPUs weren't superscalar, the patch might
+> save 2 to 4 processor cycles as it replaces palignr/pblendw (slow) with
+> punpck*qdq (fast and shorter)
+> 
+> > but unfortunately this patch doesn't apply.  It looks your email client
+> > corrupted your patch by replacing tabs with spaces.  Can you please use
+> > 'git send-email' to send patches?
+> 
+> I don't use git at all; I'll use cURL instead.
+> Since the information on vger.kernel.org states "text/plain", no multipart,
+> I assume that attachments are also not accepted?
 
-Wouldn't it be simpler and therefore better to simply zero register E0
-before loading E into the top lane?
+Please read Documentation/process/submitting-patches.rst, which explains how to
+submit Linux kernel patches.
 
+> >> +        pshufd          $0xB1, STATE0,  STATE0          /* HGFE */
+> >> +        pshufd          $0x1B, STATE1,  STATE1          /* DCBA */
+> >>  
+> >>          movdqu          STATE0, 0*16(DIGEST_PTR)
+> >>          movdqu          STATE1, 1*16(DIGEST_PTR)
+> >
+> > Please make sure to run the crypto self-tests too.
+> 
+> I can't, I don't use Linux at all; I just noticed that this function uses
+> 4-byte displacements and palignr/pblendw instead of punpck?qdq after pshufd 
+> 
+> > The above is storing the two halves of the state in the wrong order.
+> 
+> ARGH, you are right; I recognized it too, wanted to correct it, but was
+> interrupted and forgot it after returning to the patch. Sorry.
 
->         movdqa          PSHUFFLE_BYTE_FLIP_MASK(%rip), SHUF_MASK
-> @@ -297,8 +297,3 @@
->  .align 16
->  PSHUFFLE_BYTE_FLIP_MASK:
->         .octa 0x000102030405060708090a0b0c0d0e0f
-> -
-> -.section       .rodata.cst16.UPPER_WORD_MASK, "aM", @progbits, 16
-> -.align 16
-> -UPPER_WORD_MASK:
-> -       .octa 0xFFFFFFFF000000000000000000000000
->
+I'm afraid that if you don't submit a probably formatted and tested patch, your
+patch can't be accepted.  We can treat it as a suggestion, though since you're
+sending actual code it would really help if it had your Signed-off-by.
+
+- Eric
