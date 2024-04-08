@@ -1,222 +1,314 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mr3.vodafonemail.de (mr3.vodafonemail.de [145.253.228.163])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA011422DB
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2024 09:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB8185C62;
+	Mon,  8 Apr 2024 14:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.253.228.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712828659; cv=none; b=caRMrf9fQTtQg2kMug00F+m+7d2tLUMkqE9br6B+KGWyHEHtoFAn0/U/V06aMxuRRo9e+UEUZYMs9fISTqt6LQsooxFyGScuRE1CyK/l+ZzeFKVXZVd/6EbEP9cHXI+JUdsLeeCDMAw5HIEpnhQO1tK1DkW1rIepurFzapHU2LE=
+	t=1712585863; cv=none; b=O0/cenGmZSxnVDXYF1s8pxF0DrZ78DbmUJb2ZR7uHIOBVAlbLLTEF9FR56QSxseo5eEbLObgzzQ9eJjs0WfxaBwZYf/pSKCATP7hKTpOHhf7EWxtBpoumHoABx+B+MgqVst3rgkXo2tDEVckK5oua2uaqOelrGYivhtrl5QS6qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712828659; c=relaxed/simple;
-	bh=4ytJZXrlLIX4MDl48jzj1jv5bmJfqXaT8kzbsZkajJU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pTe8GJBbZd+Af/bNE7y8FTZ+ZlEFrvDNgJBdy5h9Vn2AmfWZO5pKlDQklq/j64CCyJFDib7sQt4PuEqItZ4pOI0sWE8M65W5nvtZO5fNXyimDRAcxkVXM5aULSRVYHbUCMavsmx6luxt/GjUiR8CDzIGbZcsOuksxcrNU1yZjQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HKcW0jfg; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1712585863; c=relaxed/simple;
+	bh=8YqxLBOsMzMuFEOR2Ah2D/5AjtW1EpVMQ54Y10ln54I=;
+	h=From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=C0xFCM1u0v/ksBOXnjlX/4mOEE8xfDeCbhYAHPX7eDlmePmZAcTxoxC5RtUaOR/6ESOcWKqFDXaPzEuSGf2v4Vpj/6n2RmXP0Kd+JY21/I9mejyrtu7tX6CnATpXMmK63geZUWkvEk+xL5fS9t5XgJpfldUCoJwNw6jZYqDqltI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de; spf=pass smtp.mailfrom=nexgo.de; dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b=XUKiTUDK; arc=none smtp.client-ip=145.253.228.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nexgo.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HKcW0jfg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712828657; x=1744364657;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=4ytJZXrlLIX4MDl48jzj1jv5bmJfqXaT8kzbsZkajJU=;
-  b=HKcW0jfg8VrxoE5XHFV2eYspoxgft2Vq4GcJSykfNtU66skfWPlkWTLC
-   g+1whMYVNJCI+Xai7yEB4Ff1dpAe2GbS6RwmLcEMVCVLBUGjaaWOkIs7g
-   VtGxc2Yuf61bf/hAfMvLEJIlYHmkyLgu0dwu3tciDnDzGILyOoJEmmFI7
-   hUz95tT9r65/uoGtbXadxt/L+MDMZm/E+dS0HJBXzhNfOd+vvfFyRvoGP
-   2cxNyDX3l7Z5/7rZb3BEUPC+6r74n7hzZH9eDq3QhQ7shJpkdPli7c423
-   J/EsWMLlV3CbMLh9SY1Qh8qR4qyVsbZwzKVz79wSHric7CUVHEDAAaOsi
-   Q==;
-X-CSE-ConnectionGUID: 3e5da3R7RjaKkGAETatIFw==
-X-CSE-MsgGUID: MkaYAJOfSoiAVWZoOtkQBA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="8087468"
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="8087468"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 02:44:16 -0700
-X-CSE-ConnectionGUID: jpPfTrzdQhatoxeLaYzNpg==
-X-CSE-MsgGUID: NdNp+182QEWC/FWqEvKzQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="20900588"
-Received: from r031s002_zp31l10c01.deacluster.intel.com (HELO localhost.localdomain) ([10.219.171.29])
-  by fmviesa007.fm.intel.com with ESMTP; 11 Apr 2024 02:44:15 -0700
-From: Damian Muszynski <damian.muszynski@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Damian Muszynski <damian.muszynski@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - implement dh fallback for primes > 4K
-Date: Thu, 11 Apr 2024 11:24:58 +0200
-Message-ID: <20240411092526.127182-1-damian.muszynski@intel.com>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b="XUKiTUDK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nexgo.de;
+	s=vfde-mb-mr2-23sep; t=1712585858;
+	bh=ex5q/rKxiClRhuNx+/psXbPzdEsLjYS4wEnJr37eQlc=;
+	h=From:To:Subject:Date:Content-Type:From;
+	b=XUKiTUDKt0NPY8lG+Ir3Zj1c81LgMDwP68CyHZShmSlmFinWHM0HDnrfb2jrlYMlA
+	 BAnFluqYUuoVntnRKB8n0hwBw3QPM1vp6LaiPSWfKmz8SOQrIqJdMigEMWJSr74/yt
+	 +gWjkgCWUg1JxWsZHaSBdnt8xZVLHeQ8cDdmRIDw=
+Received: from smtp.vodafone.de (unknown [10.0.0.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	(No client certificate requested)
+	by mr3.vodafonemail.de (Postfix) with ESMTPS id 4VCrlQ71h1z1yDK;
+	Mon,  8 Apr 2024 14:17:38 +0000 (UTC)
+Received: from sha256_ni_asm.patch (p5de6d4c4.dip0.t-ipconnect.de [93.230.212.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.vodafone.de (Postfix) with ESMTPSA id 4VCrl60pyGzHpxh;
+	Mon,  8 Apr 2024 14:17:19 +0000 (UTC)
+From: "Stefan Kanthak" <stefan.kanthak@nexgo.de>
+To: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Cc: <tim.c.chen@linux.intel.com>, "Eric Biggers" <ebiggers@kernel.org>
+Subject: [PATCH v2 1/2] crypto: s(h)aving 40+ bytes off arch/x86/crypto/sha256_ni_asm.S
+Date: Mon, 8 Apr 2024 16:08:52 +0200
+Organization: Me, myself & IT
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-purgate-type: clean
+X-purgate: clean
+X-purgate-size: 7521
+X-purgate-ID: 155817::1712585854-F2FFBA77-283C08E7/0/0
+Message-ID: <20240408140852.RskXwnod7hCkdtYE902ZkKih8SiQytD_B0tynIjrABE@z>
 
-The Intel QAT driver provides support for the Diffie-Hellman (DH)
-algorithm, limited to prime numbers up to 4K. This driver is used
-by default on platforms with integrated QAT hardware for all DH requests.
-This has led to failures with algorithms requiring larger prime sizes,
-such as ffdhe6144.
+Use shorter SSE2 instructions instead of some SSE4.1
+use short displacements into K256
 
-  alg: ffdhe6144(dh): test failed on vector 1, err=-22
-  alg: self-tests for ffdhe6144(qat-dh) (ffdhe6144(dh)) failed (rc=-22)
-
-Implement a fallback mechanism when an unsupported request is received.
-
-Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- .../intel/qat/qat_common/qat_asym_algs.c      | 66 +++++++++++++++++--
- 1 file changed, 60 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-index 4128200a9032..85c682e248fb 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-@@ -110,6 +110,8 @@ struct qat_dh_ctx {
- 	unsigned int p_size;
- 	bool g2;
- 	struct qat_crypto_instance *inst;
-+	struct crypto_kpp *ftfm;
-+	bool fallback;
- } __packed __aligned(64);
+--- -/arch/x86/crypto/sha256_ni_asm.S
++++ +/arch/x86/crypto/sha256_ni_asm.S
+@@ -108,17 +108,17 @@
+ 	 * Need to reorder these appropriately
+ 	 * DCBA, HGFE -> ABEF, CDGH
+ 	 */
+-	movdqu		0*16(DIGEST_PTR), STATE0
+-	movdqu		1*16(DIGEST_PTR), STATE1
++	movdqu		0*16(DIGEST_PTR), STATE0	/* DCBA */
++	movdqu		1*16(DIGEST_PTR), STATE1	/* HGFE */
  
- struct qat_asym_request {
-@@ -381,6 +383,36 @@ static int qat_dh_compute_value(struct kpp_request *req)
- 	return ret;
- }
+-	pshufd		$0xB1, STATE0,  STATE0		/* CDAB */
+-	pshufd		$0x1B, STATE1,  STATE1		/* EFGH */
+ 	movdqa		STATE0, MSGTMP4
+-	palignr		$8, STATE1,  STATE0		/* ABEF */
+-	pblendw		$0xF0, MSGTMP4, STATE1		/* CDGH */
++	punpcklqdq	STATE1, STATE0			/* FEBA */
++	punpckhqdq	MSGTMP4, STATE1			/* DCHG */
++	pshufd		$0x1B, STATE0,  STATE0		/* ABEF */
++	pshufd		$0xB1, STATE1,  STATE1		/* CDGH */
  
-+static int qat_dh_generate_public_key(struct kpp_request *req)
-+{
-+	struct kpp_request *nreq = kpp_request_ctx(req);
-+	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
-+	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
-+
-+	if (ctx->fallback) {
-+		memcpy(nreq, req, sizeof(*req));
-+		kpp_request_set_tfm(nreq, ctx->ftfm);
-+		return crypto_kpp_generate_public_key(nreq);
-+	}
-+
-+	return qat_dh_compute_value(req);
-+}
-+
-+static int qat_dh_compute_shared_secret(struct kpp_request *req)
-+{
-+	struct kpp_request *nreq = kpp_request_ctx(req);
-+	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
-+	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
-+
-+	if (ctx->fallback) {
-+		memcpy(nreq, req, sizeof(*req));
-+		kpp_request_set_tfm(nreq, ctx->ftfm);
-+		return crypto_kpp_compute_shared_secret(nreq);
-+	}
-+
-+	return qat_dh_compute_value(req);
-+}
-+
- static int qat_dh_check_params_length(unsigned int p_len)
- {
- 	switch (p_len) {
-@@ -398,9 +430,6 @@ static int qat_dh_set_params(struct qat_dh_ctx *ctx, struct dh *params)
- 	struct qat_crypto_instance *inst = ctx->inst;
- 	struct device *dev = &GET_DEV(inst->accel_dev);
+ 	movdqa		PSHUFFLE_BYTE_FLIP_MASK(%rip), SHUF_MASK
+-	lea		K256(%rip), SHA256CONSTANTS
++	lea		K256+8*16(%rip), SHA256CONSTANTS
  
--	if (qat_dh_check_params_length(params->p_size << 3))
--		return -EINVAL;
--
- 	ctx->p_size = params->p_size;
- 	ctx->p = dma_alloc_coherent(dev, ctx->p_size, &ctx->dma_p, GFP_KERNEL);
- 	if (!ctx->p)
-@@ -454,6 +483,13 @@ static int qat_dh_set_secret(struct crypto_kpp *tfm, const void *buf,
- 	if (crypto_dh_decode_key(buf, len, &params) < 0)
- 		return -EINVAL;
+ .Lloop0:
+ 	/* Save hash values for addition after rounds */
+@@ -129,18 +129,18 @@
+ 	movdqu		0*16(DATA_PTR), MSG
+ 	pshufb		SHUF_MASK, MSG
+ 	movdqa		MSG, MSGTMP0
+-		paddd		0*16(SHA256CONSTANTS), MSG
++		paddd		-8*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
  
-+	if (qat_dh_check_params_length(params.p_size << 3)) {
-+		ctx->fallback = true;
-+		return crypto_kpp_set_secret(ctx->ftfm, buf, len);
-+	}
-+
-+	ctx->fallback = false;
-+
- 	/* Free old secret if any */
- 	qat_dh_clear_ctx(dev, ctx);
+ 	/* Rounds 4-7 */
+ 	movdqu		1*16(DATA_PTR), MSG
+ 	pshufb		SHUF_MASK, MSG
+ 	movdqa		MSG, MSGTMP1
+-		paddd		1*16(SHA256CONSTANTS), MSG
++		paddd		-7*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP1, MSGTMP0
  
-@@ -481,6 +517,9 @@ static unsigned int qat_dh_max_size(struct crypto_kpp *tfm)
- {
- 	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
+@@ -148,9 +148,9 @@
+ 	movdqu		2*16(DATA_PTR), MSG
+ 	pshufb		SHUF_MASK, MSG
+ 	movdqa		MSG, MSGTMP2
+-		paddd		2*16(SHA256CONSTANTS), MSG
++		paddd		-6*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP2, MSGTMP1
  
-+	if (ctx->fallback)
-+		return crypto_kpp_maxsize(ctx->ftfm);
-+
- 	return ctx->p_size;
- }
+@@ -158,151 +158,151 @@
+ 	movdqu		3*16(DATA_PTR), MSG
+ 	pshufb		SHUF_MASK, MSG
+ 	movdqa		MSG, MSGTMP3
+-		paddd		3*16(SHA256CONSTANTS), MSG
++		paddd		-5*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP3, MSGTMP4
+ 	palignr		$4, MSGTMP2, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP0
+ 	sha256msg2	MSGTMP3, MSGTMP0
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP3, MSGTMP2
  
-@@ -489,11 +528,22 @@ static int qat_dh_init_tfm(struct crypto_kpp *tfm)
- 	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
- 	struct qat_crypto_instance *inst =
- 			qat_crypto_get_instance_node(numa_node_id());
-+	const char *alg = kpp_alg_name(tfm);
-+	unsigned int reqsize;
+ 	/* Rounds 16-19 */
+ 	movdqa		MSGTMP0, MSG
+-		paddd		4*16(SHA256CONSTANTS), MSG
++		paddd		-4*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP0, MSGTMP4
+ 	palignr		$4, MSGTMP3, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP1
+ 	sha256msg2	MSGTMP0, MSGTMP1
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP0, MSGTMP3
  
- 	if (!inst)
- 		return -EINVAL;
+ 	/* Rounds 20-23 */
+ 	movdqa		MSGTMP1, MSG
+-		paddd		5*16(SHA256CONSTANTS), MSG
++		paddd		-3*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP1, MSGTMP4
+ 	palignr		$4, MSGTMP0, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP2
+ 	sha256msg2	MSGTMP1, MSGTMP2
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP1, MSGTMP0
  
--	kpp_set_reqsize(tfm, sizeof(struct qat_asym_request) + 64);
-+	ctx->ftfm = crypto_alloc_kpp(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
-+	if (IS_ERR(ctx->ftfm))
-+		return PTR_ERR(ctx->ftfm);
-+
-+	crypto_kpp_set_flags(ctx->ftfm, crypto_kpp_get_flags(tfm));
-+
-+	reqsize = max(sizeof(struct qat_asym_request) + 64,
-+		      sizeof(struct kpp_request) + crypto_kpp_reqsize(ctx->ftfm));
-+
-+	kpp_set_reqsize(tfm, reqsize);
+ 	/* Rounds 24-27 */
+ 	movdqa		MSGTMP2, MSG
+-		paddd		6*16(SHA256CONSTANTS), MSG
++		paddd		-2*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP2, MSGTMP4
+ 	palignr		$4, MSGTMP1, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP3
+ 	sha256msg2	MSGTMP2, MSGTMP3
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP2, MSGTMP1
  
- 	ctx->p_size = 0;
- 	ctx->g2 = false;
-@@ -506,6 +556,9 @@ static void qat_dh_exit_tfm(struct crypto_kpp *tfm)
- 	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
- 	struct device *dev = &GET_DEV(ctx->inst->accel_dev);
+ 	/* Rounds 28-31 */
+ 	movdqa		MSGTMP3, MSG
+-		paddd		7*16(SHA256CONSTANTS), MSG
++		paddd		-1*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP3, MSGTMP4
+ 	palignr		$4, MSGTMP2, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP0
+ 	sha256msg2	MSGTMP3, MSGTMP0
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP3, MSGTMP2
  
-+	if (ctx->ftfm)
-+		crypto_free_kpp(ctx->ftfm);
-+
- 	qat_dh_clear_ctx(dev, ctx);
- 	qat_crypto_put_instance(ctx->inst);
- }
-@@ -1265,8 +1318,8 @@ static struct akcipher_alg rsa = {
+ 	/* Rounds 32-35 */
+ 	movdqa		MSGTMP0, MSG
+-		paddd		8*16(SHA256CONSTANTS), MSG
++		paddd		0*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP0, MSGTMP4
+ 	palignr		$4, MSGTMP3, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP1
+ 	sha256msg2	MSGTMP0, MSGTMP1
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP0, MSGTMP3
  
- static struct kpp_alg dh = {
- 	.set_secret = qat_dh_set_secret,
--	.generate_public_key = qat_dh_compute_value,
--	.compute_shared_secret = qat_dh_compute_value,
-+	.generate_public_key = qat_dh_generate_public_key,
-+	.compute_shared_secret = qat_dh_compute_shared_secret,
- 	.max_size = qat_dh_max_size,
- 	.init = qat_dh_init_tfm,
- 	.exit = qat_dh_exit_tfm,
-@@ -1276,6 +1329,7 @@ static struct kpp_alg dh = {
- 		.cra_priority = 1000,
- 		.cra_module = THIS_MODULE,
- 		.cra_ctxsize = sizeof(struct qat_dh_ctx),
-+		.cra_flags = CRYPTO_ALG_NEED_FALLBACK,
- 	},
- };
+ 	/* Rounds 36-39 */
+ 	movdqa		MSGTMP1, MSG
+-		paddd		9*16(SHA256CONSTANTS), MSG
++		paddd		1*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP1, MSGTMP4
+ 	palignr		$4, MSGTMP0, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP2
+ 	sha256msg2	MSGTMP1, MSGTMP2
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP1, MSGTMP0
  
-
-base-commit: 48ecf78975245006171f255f16348187e1880476
--- 
-2.44.0
-
+ 	/* Rounds 40-43 */
+ 	movdqa		MSGTMP2, MSG
+-		paddd		10*16(SHA256CONSTANTS), MSG
++		paddd		2*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP2, MSGTMP4
+ 	palignr		$4, MSGTMP1, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP3
+ 	sha256msg2	MSGTMP2, MSGTMP3
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP2, MSGTMP1
+ 
+ 	/* Rounds 44-47 */
+ 	movdqa		MSGTMP3, MSG
+-		paddd		11*16(SHA256CONSTANTS), MSG
++		paddd		3*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP3, MSGTMP4
+ 	palignr		$4, MSGTMP2, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP0
+ 	sha256msg2	MSGTMP3, MSGTMP0
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP3, MSGTMP2
+ 
+ 	/* Rounds 48-51 */
+ 	movdqa		MSGTMP0, MSG
+-		paddd		12*16(SHA256CONSTANTS), MSG
++		paddd		4*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP0, MSGTMP4
+ 	palignr		$4, MSGTMP3, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP1
+ 	sha256msg2	MSGTMP0, MSGTMP1
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 	sha256msg1	MSGTMP0, MSGTMP3
+ 
+ 	/* Rounds 52-55 */
+ 	movdqa		MSGTMP1, MSG
+-		paddd		13*16(SHA256CONSTANTS), MSG
++		paddd		5*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP1, MSGTMP4
+ 	palignr		$4, MSGTMP0, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP2
+ 	sha256msg2	MSGTMP1, MSGTMP2
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 
+ 	/* Rounds 56-59 */
+ 	movdqa		MSGTMP2, MSG
+-		paddd		14*16(SHA256CONSTANTS), MSG
++		paddd		6*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+ 	movdqa		MSGTMP2, MSGTMP4
+ 	palignr		$4, MSGTMP1, MSGTMP4
+ 	paddd		MSGTMP4, MSGTMP3
+ 	sha256msg2	MSGTMP2, MSGTMP3
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 
+ 	/* Rounds 60-63 */
+ 	movdqa		MSGTMP3, MSG
+-		paddd		15*16(SHA256CONSTANTS), MSG
++		paddd		7*16(SHA256CONSTANTS), MSG
+ 		sha256rnds2	STATE0, STATE1
+-		pshufd 		$0x0E, MSG, MSG
++		punpckhqdq	MSG, MSG
+ 		sha256rnds2	STATE1, STATE0
+ 
+ 	/* Add current hash values with previously saved */
+@@ -315,11 +315,11 @@
+ 	jne		.Lloop0
+ 
+ 	/* Write hash values back in the correct order */
+-	pshufd		$0x1B, STATE0,  STATE0		/* FEBA */
+-	pshufd		$0xB1, STATE1,  STATE1		/* DCHG */
+ 	movdqa		STATE1, MSGTMP4
+-	pblendw		$0xF0, STATE1,  STATE0		/* DCBA */
+-	palignr		$8, MSGTMP4, STATE1		/* HGFE */
++	punpcklqdq	STATE0, STATE1			/* EFGH */
++	punpckhqdq	MSGTMP4, STATE0			/* CDAB */
++	pshufd		$0x1B, STATE0,  STATE0		/* HGFE */
++	pshufd		$0xB1, STATE1,  STATE1		/* DCBA */
+ 
+ 	movdqu		STATE0, 0*16(DIGEST_PTR)
+ 	movdqu		STATE1, 1*16(DIGEST_PTR)
