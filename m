@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2CA6D1CC;
-	Mon,  8 Apr 2024 12:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B537E575;
+	Mon,  8 Apr 2024 13:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712579857; cv=none; b=CzU9YRrJUtI7GTpM5quDbCNj4X9gPXi89JHnx7s+iRCEAovIuDqlIhLCarvbqsrDUYrrWFs5QU8ba9MN41ZyoDD+FrQTyxigZ34Lzh9scLbnqf6nobFmiU29vOg+eMLFkP99mDoOirI/a3kmAUWq73KmWQjNOY2mAiJjgYzicg8=
+	t=1712581960; cv=none; b=Oek6g7nGBasEA8a5xTsrwO3D9SQ7OQpwxoPXU1lAYmZ9+dBqmoaMmxOTyBdNpOmKEjIsvq0yPnlI+HeeVYzNnbOunjow5Z0SOlnDsk0RgqMgSs15iCsq+Ha1YcXc+nWRw09D1Np5AE3i/lGfLfQOg4cOqQnC1cRFKZpIdEU57XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712579857; c=relaxed/simple;
-	bh=eKyMOCTmzVpas0Ku4p4aIG2DFODmyGN4nePJuS4aVi4=;
+	s=arc-20240116; t=1712581960; c=relaxed/simple;
+	bh=FDyXl726c9B9U4ZoE70AwoSNthND7FSk/8PQFnBAXIE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ez138fxixe8afbqi2LcXnsIia5O/nwN9Kpu9g+iuA3HQXlV5TjceHh1y0PL83x+gi1FIsliJb47SGbM4c3rxTSo5SsE2Ry013gy/lcZIdhJmnPWPT3nwQCitZEmzPIq5IOtu5BKUmAKh0F4XtHMOP3N8M16EpzHLz35L7rSZckM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oh3RBVdr; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ObdbRN2wKUUuU5+B60kDNJ4bY/uQvNjfCi2wI2R+ittPEkCeUqkymYFj1AwFJOZaYBw6cJAHdM1IFha3D/Mx5dxqikrIFdMWn8M/c0wgJUgblq0n7u9e6z33WsMLAB6PCF4spJ3KQ+RsgxYJErYYBi9Qyd1fvBCOqMaLAQc0aeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JRggopEW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oh3RBVdr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AF87C43330;
-	Mon,  8 Apr 2024 12:37:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JRggopEW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16EE6C43390;
+	Mon,  8 Apr 2024 13:12:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712579856;
-	bh=eKyMOCTmzVpas0Ku4p4aIG2DFODmyGN4nePJuS4aVi4=;
+	s=k20201202; t=1712581960;
+	bh=FDyXl726c9B9U4ZoE70AwoSNthND7FSk/8PQFnBAXIE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Oh3RBVdrQUr0HMr7a6y+Rg3f9nttVQFy1Q16vLI3P/3flHrCAI5uw9qF8pmkzecAa
-	 brNKRKJBx7iFo+WzQ8EsitaTQaQZauWSZiEYzsbxIRo8E6E6nDFa0OtQ7Ft45XJM2p
-	 5ld8UnVNfTcs6T61SlF/AxllTzz6Ya4vlBVm/5jk5Pcf26wpusITKcIej73GuZbi89
-	 CSIxAtA8dqfz2wPo6z1mVtGb6Q6dhQA0PiuQts4LvYFcVQZodZBIbRSnLyLvYHSVQ6
-	 Vk/5TcYcsOO3g1a1ilIy4fndG7dx8W1AKKgdMJv0vrMJua/SeKrvFTqAf0l6F5Qc9w
-	 oeYc1WlYHNyYg==
-Date: Mon, 8 Apr 2024 08:37:34 -0400
+	b=JRggopEWyiJOQ1Goi48EjKmJ/RpM5o2bYUPDpk/CcnySwjHAkM5mGQ7Cn/S4ZcaNx
+	 RpSumi87UT83FC6tnrmfTshrX5rbp9LmmkvtA34WKQDhVYx/Fz1Gno6Tj4cSu/GdBt
+	 LNx5wHvReuahjW6/wua7KE6bOtRS247xbfNqRDK1uYnQ9UdjcAQYMkYsICzu+YCpV4
+	 V10Ko0DqGMgkVgFoYJJTMyn+iROs60s3FTYysS13ST/4HOWeS09xNdEprDXqeyZcZ4
+	 cFWv+gIlUBb4AnPo9QETsE3eSN8OKoDFgLhOWIG1RNtYsUGb7A1kty7KkLKVVX9b/d
+	 +Vt8lQqJi8wyA==
+Date: Mon, 8 Apr 2024 09:12:38 -0400
 From: Eric Biggers <ebiggers@kernel.org>
 To: Stefan Kanthak <stefan.kanthak@nexgo.de>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	tim.c.chen@linux.intel.com, sean.m.gulley@intel.com
 Subject: Re: [PATCH 1/2] crypto: s(h)aving 40+ bytes off
  arch/x86/crypto/sha256_ni_asm.S
-Message-ID: <20240408123734.GB732@quark.localdomain>
+Message-ID: <20240408131238.GC732@quark.localdomain>
 References: <5EEE09A9021540A5AAD8BFEEE915512D@H270>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -46,15 +46,26 @@ Content-Disposition: inline
 In-Reply-To: <5EEE09A9021540A5AAD8BFEEE915512D@H270>
 
 On Mon, Apr 08, 2024 at 11:26:52AM +0200, Stefan Kanthak wrote:
-> Use shorter SSE2 instructions instead of some SSE4.1
-> use short displacements into K256
-> 
-> --- -/arch/x86/crypto/sha256_ni_asm.S
-> +++ +/arch/x86/crypto/sha256_ni_asm.S
+> @@ -315,11 +315,11 @@
+>          jne             .Lloop0
+>  
+>          /* Write hash values back in the correct order */
+> -        pshufd          $0x1B, STATE0,  STATE0          /* FEBA */
+> -        pshufd          $0xB1, STATE1,  STATE1          /* DCHG */
+>          movdqa          STATE0, MSGTMP4
+> -        pblendw         $0xF0, STATE1,  STATE0          /* DCBA */
+> -        palignr         $8, MSGTMP4, STATE1             /* HGFE */
+> +        punpcklqdq      STATE1, STATE0                  /* GHEF */
+> +        punpckhqdq      MSGTMP4, STATE1                 /* ABCD */
+> +        pshufd          $0xB1, STATE0,  STATE0          /* HGFE */
+> +        pshufd          $0x1B, STATE1,  STATE1          /* DCBA */
+>  
+>          movdqu          STATE0, 0*16(DIGEST_PTR)
+>          movdqu          STATE1, 1*16(DIGEST_PTR)
 
-Thanks!  I'd like to benchmark this to see how it affects performance, but
-unfortunately this patch doesn't apply.  It looks your email client corrupted
-your patch by replacing tabs with spaces.  Can you please use 'git send-email'
-to send patches?
+Please make sure to run the crypto self-tests too.  The above is storing the two
+halves of the state in the wrong order.
+
+Thanks,
 
 - Eric
