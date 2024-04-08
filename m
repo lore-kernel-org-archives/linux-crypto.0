@@ -1,87 +1,85 @@
-Received: from mr3.vodafonemail.de (mr3.vodafonemail.de [145.253.228.163])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2F72D05D;
-	Mon,  8 Apr 2024 09:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.253.228.163
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6DB46CDA9;
+	Mon,  8 Apr 2024 12:31:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712570153; cv=none; b=NCjLDDAckHAM+KGUOeMfcuVWzbAzlTraeh9z/FohhoRIRXUO4KPy+hvgXyi+4zcYWZKkwUtq6hCTfQM8pwzJ2zJtrwSZ9Sq8/EnZ0zX7fom7p9l4VglTK2QgkFzgtYhsyf8d3uO8H2+YstuLqdhtgTaCqKgaOmw90W9GNaPsS88=
+	t=1712579471; cv=none; b=azcZk6CgfofKWRhvgutAeBfibOe+I75og4c8QtOO6OQ4mmJ0KippK+3yOYU8P6QexlIN4PVp9P/wroRn/oFyDLfMdJSvLDcEMxz4uNZUvph6RpZ1exISALDUYZHt4/QsN7DHk8H5I65kozz6VokNAiuNaP2AaDE82cMFMeWjk/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712570153; c=relaxed/simple;
-	bh=b+ss1pbu8Nyctt8S2ZiLqKtptJtaOp9ebfIid4XFBI8=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=GD1A9Ehig5k5HrN0YCFE25TSjtgj7xEjxaDaIdNBXnNi5scbcYmL7s6MiUxn7/rPt/8TVc/hobuwYm3HeB5VAK46jsP1JaZQovyUy+Ru6Ju1xQpAy7ikysBkrAjAmo8FdHf3M0cjhGqA7U35L1ioNrH9XXLY6jAl0JWQZ2V0BuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de; spf=pass smtp.mailfrom=nexgo.de; dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b=hSpOHSbS; arc=none smtp.client-ip=145.253.228.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nexgo.de
+	s=arc-20240116; t=1712579471; c=relaxed/simple;
+	bh=hAf068l3Nm0d9JEUttg8/muc9fg+jcdg1rtCCWVZF6Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lQ5Wu+hphVIcT1+EH5Dndmq9O8b4LxqWg41CyAx4lddRQZ7JFb3ByMbsH42D/rYpqhHzsDKw7RDgSusreKNw/T6lTfyeuif7EfIENMJMakqsuDr9ojPNn+lRbTC08/iSSZ2241O9q3hh0FReOOQs7pyBbNrPYwVcaX89EvSoBs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ugz7LOVy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b="hSpOHSbS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nexgo.de;
-	s=vfde-mb-mr2-23sep; t=1712569759;
-	bh=EqPE8k2XuYVTtDepIsOZ9NsJpR3M/yKeP15J7IxBfJU=;
-	h=Message-ID:From:To:Subject:Date:Content-Type:X-Mailer:From;
-	b=hSpOHSbSrHHQHC4kxvORRyzWIIbKY+CtjK81dCdycNgfJpnylqrdIRZLiILdiov/N
-	 Xgcknyjy/OuajgFcgTR9FHRDPXy0CswgO+IdxgAY80rteznJWmfuvi72JxNOlNWh31
-	 x+Gwd52Vu1C/pyXXvQR722TTmQV5N1Z/H3JNqE2c=
-Received: from smtp.vodafone.de (unknown [10.0.0.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by mr3.vodafonemail.de (Postfix) with ESMTPS id 4VCknq2QkLz1ynm;
-	Mon,  8 Apr 2024 09:49:19 +0000 (UTC)
-Received: from H270 (p5de6d4c4.dip0.t-ipconnect.de [93.230.212.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.vodafone.de (Postfix) with ESMTPSA id 4VCknY4ZKXzMmXC;
-	Mon,  8 Apr 2024 09:49:02 +0000 (UTC)
-Message-ID: <7F88D9730FA04A02ACCE0B47584422C5@H270>
-From: "Stefan Kanthak" <stefan.kanthak@nexgo.de>
-To: <linux-kernel@vger.kernel.org>>,
-	<linux-crypto@vger.kernel.org>
-Cc: <tim.c.chen@linux.intel.com>,
-	<sean.m.gulley@intel.com>
-Subject: [PATCH 2/2] crypto: s(h)aving 16 byte constant off arch/x86/crypto/sha1_ni_asm.S
-Date: Mon, 8 Apr 2024 11:38:56 +0200
-Organization: Me, myself & IT
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ugz7LOVy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDD6DC433C7;
+	Mon,  8 Apr 2024 12:31:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712579471;
+	bh=hAf068l3Nm0d9JEUttg8/muc9fg+jcdg1rtCCWVZF6Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ugz7LOVybBzVtz6+uRTeZl8Jt3HWhp/3g6RT8hgA393jNE6Olgti/L/+Zlz6QE6Jw
+	 haQ8+UvaJ/IdHyHnqSmlovsUdqGpScRkJrolh7VnWFhy4uyg0bw9CN+CzItD5S8zCt
+	 50Igib856+TdoreVjGSI11RlMXbIQbcHa59cCUcb2r1gSnEbAumdjpd18Wen1vyqUs
+	 2wfM8Acjc4PHsoKhVq/L7S3fQ5z3JRnCjfhwlmWCoawySduZ+v/7j5/viTZ53X68iB
+	 oz14SNqp+Chq52CLG6UXXo2gfenspOLqZVGX625Lgrmf+VtaUVQ/OKVLzHfBaXPoo5
+	 WT2Sdh6AutcWw==
+Date: Mon, 8 Apr 2024 08:31:08 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Laight <David.Laight@aculab.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Andy Lutomirski <luto@kernel.org>,
+	"Chang S . Bae" <chang.seok.bae@intel.com>
+Subject: Re: [PATCH 0/6] Faster AES-XTS on modern x86_64 CPUs
+Message-ID: <20240408123108.GA732@quark.localdomain>
+References: <20240326080305.402382-1-ebiggers@kernel.org>
+ <CAMj1kXH4fNevFzrbazJptadxh_spEY3W91FZni5eMqD+UKrSUQ@mail.gmail.com>
+ <20240326164755.GB1524@sol.localdomain>
+ <6629b8120807458ab76e1968056f5e10@AcuMS.aculab.com>
+ <20240404013529.GB24248@quark.localdomain>
+ <142077804bee45daac3b0fad8bc4c2fe@AcuMS.aculab.com>
+ <20240405191904.GA1205@quark.localdomain>
+ <e49a2868626f4f9e9169ce8b8b926a49@AcuMS.aculab.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-X-MSMail-Priority: Normal
-X-Mailer: Microsoft Windows Mail 6.0.6002.18197
-X-MimeOLE: Produced By Microsoft MimeOLE V6.1.7601.24158
-X-purgate-type: clean
-X-purgate: clean
-X-purgate-size: 892
-X-purgate-ID: 155817::1712569755-63FEDA4B-F9F1E402/0/0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e49a2868626f4f9e9169ce8b8b926a49@AcuMS.aculab.com>
 
-Get rid of 16 byte constant, use shift instead of mask
+On Mon, Apr 08, 2024 at 07:41:44AM +0000, David Laight wrote:
+> From: Eric Biggers
+> > Sent: 05 April 2024 20:19
+> ...
+> > I did some tests on Sapphire Rapids using a system call that I customized to do
+> > nothing except possibly a kernel_fpu_begin / kernel_fpu_end pair.
+> > 
+> > On average the bare syscall took 70 ns.  The syscall with the kernel_fpu_begin /
+> > kernel_fpu_end pair took 160 ns if the userspace program used xmm only, 340 ns
+> > if it used ymm, or 360 ns if it used zmm...
+> > 
+> > Note that without the kernel_fpu_begin / kernel_fpu_end pair, AES-NI
+> > instructions cannot be used and the alternative would be xts(ecb(aes-generic)).
+> > On the same CPU, encrypting a single 512-byte sector with xts(ecb(aes-generic))
+> > takes about 2235ns.  With xts-aes-vaes-avx10_512 it takes 75 ns...
+> 
+> So most of the cost of a single 512-byte sector is the kernel_fpu_begin().
+> But it is so much slower any other way it is still faster.
+> 
 
---- -/arch/x86/crypto/sha1_ni_asm.S
-+++ +/arch/x86/crypto/sha1_ni_asm.S
-@@ -104,9 +104,9 @@
-         add             DATA_PTR, NUM_BLKS      /* pointer to end of data */
- 
-         /* load initial hash values */
--        pinsrd          $3, 1*16(DIGEST_PTR), E0
-+        pinsrd          $0, 1*16(DIGEST_PTR), E0
-         movdqu          0*16(DIGEST_PTR), ABCD
--        pand            UPPER_WORD_MASK(%rip), E0
-+        pslldq          $12, E0
-         pshufd          $0x1B, ABCD, ABCD
- 
-         movdqa          PSHUFFLE_BYTE_FLIP_MASK(%rip), SHUF_MASK
-@@ -297,8 +297,3 @@
- .align 16
- PSHUFFLE_BYTE_FLIP_MASK:
-         .octa 0x000102030405060708090a0b0c0d0e0f
--
--.section        .rodata.cst16.UPPER_WORD_MASK, "aM", @progbits, 16
--.align 16
--UPPER_WORD_MASK:
--        .octa 0xFFFFFFFF000000000000000000000000
+Yes.  To clarify, the 75 ns time I mentioned for a 512-byte sector is the
+average for repeated calls, amortizing the XSAVE and XRSTOR.  For a real single
+512-byte sector that eats the entire cost of the XSAVE and XRSTOR by itself, if
+all state is in-use it should be about 75 + (360 - 70) = 365 ns (based on the
+syscall benchmarks I did), with the XSAVE and XRSTOR accounting for 80% of that
+time.  But yes, that's still over 6 times faster than the scalar alternative.
+
+- Eric
