@@ -1,80 +1,92 @@
-Received: from mr3.vodafonemail.de (mr3.vodafonemail.de [145.253.228.163])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB6912837C;
-	Mon,  8 Apr 2024 14:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.253.228.163
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1CF13CFAF;
+	Mon,  8 Apr 2024 14:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712585897; cv=none; b=G/dG1MruRzwlgTmiva/0+i6ZJ7UM/iugfj7YT/Pjo9Fs9pzJtBdQuVcVS9Jl3W3tyPyxCAHM6x/clAe+3ZVWqI4kAydc66s0dKL2y5dXeWLFXDBGQkWad2dA53qjWJM2S3J4xd9AbowYj/HJcL+6ChzGaeW8QzacCXgVXQNjY8g=
+	t=1712587056; cv=none; b=qX5Nl8gAVj1EBnoRQHtXFbSljt7ceh81fyveLRDEkpOkbGxT0JK6XpWafrXZJJKTT13Z+EaQQEwzDUPO0N9WKEmFI0DA7HYv8ElBcxc2y+mAMCQQ5P/7/Edf+Oa589QszLkt+BH7GAyxT7sN/UPAI0aJr+4Nzde5aeZFTVe2vSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712585897; c=relaxed/simple;
-	bh=irgPcGQf2zed/zi+Zrwi80XgAyLN2AyMzpIrIbtSQE4=;
-	h=From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=AkJTqrWEfTWm8X7cp9gKftIqH6rIQXpSirMuPAxKI8FJZjSdeJviZ2f3pgNLh2/kRYAlqpXzGQkOlSsNlFonwNSdJfAtlwxUY9RAjuhsIrikmk4zV5Nu9gPplYLc0ge8j4xc9cdXc5SgsvyPE2dvl5WUjZBY0fh/RSoYtKhzwxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de; spf=pass smtp.mailfrom=nexgo.de; dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b=OshMzrSd; arc=none smtp.client-ip=145.253.228.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nexgo.de
+	s=arc-20240116; t=1712587056; c=relaxed/simple;
+	bh=zY/qVqZFx784TVeRHAP6KJW2AtpHy59nPe0QednZNHo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KmN6lydCUKzIzPP/IbueAfnpsFgMcfy2G7jMwcdCnHu5o6SJFIok3VxfxMubwOciYQVXtUlwEfiRSp3vgFYhuuA6libtHBHLEB/0srasyOZcaV/nnmor/RWAx2a30WcRO5Q/NbnbWLYdRtdCrRGSb4H1TYltk19+S9AHhJwNuxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I/zw37wc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b="OshMzrSd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nexgo.de;
-	s=vfde-mb-mr2-23sep; t=1712585894;
-	bh=EqPE8k2XuYVTtDepIsOZ9NsJpR3M/yKeP15J7IxBfJU=;
-	h=From:To:Subject:Date:Content-Type:From;
-	b=OshMzrSdvWGepEERjICWAnDNdMgEGg9erQFxL0W7p9k4rHL2ooehPhSX3pSBS/Dr/
-	 Tks9PdY9KdTGSa6pR9a+kTwknWY8WSlkgE4faDpwchnPSLI9gLW5i0fFXZaI7TjeoZ
-	 wzWbGFN5TAOjZuVURdE/2JrzG4UmP6jRZQEWGQEI=
-Received: from smtp.vodafone.de (unknown [10.0.0.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by mr3.vodafonemail.de (Postfix) with ESMTPS id 4VCrm60SJxz2Fmq;
-	Mon,  8 Apr 2024 14:18:14 +0000 (UTC)
-Received: from sha1_ni_asm.patch (p5de6d4c4.dip0.t-ipconnect.de [93.230.212.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.vodafone.de (Postfix) with ESMTPSA id 4VCrln1qV6z9thx;
-	Mon,  8 Apr 2024 14:17:54 +0000 (UTC)
-From: "Stefan Kanthak" <stefan.kanthak@nexgo.de>
-To: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-Cc: <tim.c.chen@linux.intel.com>, "Eric Biggers" <ebiggers@kernel.org>
-Subject: [PATCH v2 1/2] crypto: s(h)aving 16 byte constant off arch/x86/crypto/sha1_ni_asm.S
-Date: Mon, 8 Apr 2024 16:08:52 +0200
-Organization: Me, myself & IT
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I/zw37wc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1DD7C43390;
+	Mon,  8 Apr 2024 14:37:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712587055;
+	bh=zY/qVqZFx784TVeRHAP6KJW2AtpHy59nPe0QednZNHo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=I/zw37wcZK1ziVQ2Bs7hvgieBDAGwapVV02v0CKKvK1Daf0PUKV8/mhtnJSnD2fsl
+	 fgQVsej3lgvHa5Vt1rj4yVWKHWxmNVI4q2r3v9kCjc4vcDvz+y1jxAI4atLWVvm6/P
+	 PL1WNtnfS1rLQLTH+2S/mD5Roo/Q5m5uaOudJofQzpXG6CYqLxC/t5YcnPJiQxPa74
+	 P8BungPr6wsTKmtpX/0voTHc9SVDFTpxpP83LZuEJpS/Y9mQXDYZAeQpq3Dv6gOV3w
+	 AOrgoWHvAVFsz9jWCgw0JMyWPTsx9OJKmv87bbNIv/+UGqxDzR0A1LGBrruy6togYx
+	 jMwKq7v634zMw==
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d88a869ce6so16922041fa.3;
+        Mon, 08 Apr 2024 07:37:35 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVNCyaNLpjZjJbp5J27xXQh7zKU3GM9XIWeio/Gxy6skCbzHjTGhCR3MKmziy9ZbJ2pOZ6uVEJeDKPYMZ5c7yukNa9ajbV2vjW8LZdN
+X-Gm-Message-State: AOJu0YzzOs9lrr8K7sWNSo37EaX1gqoa+KjJw+iB6Yzt4eFdO70WF+5U
+	KSVflBbN0PJxUhEKReWenjpc8y3vYCi1A3ynnFBE/iUItFoZyoEYHyhRBSIBKt42HigJnQPTeJd
+	p0tSJvpqhK/VdRYZpddyiEAyoTpA=
+X-Google-Smtp-Source: AGHT+IGwF8JHhG7QdVgtEZkjWHl3DvPcPdWdlHQEj/e4X0EP9bIE+AUm66Y9qxQf4N2pq0y9cgBt0NYcUKA5VXQgEAw=
+X-Received: by 2002:a2e:9f43:0:b0:2d7:1ce5:3e24 with SMTP id
+ v3-20020a2e9f43000000b002d71ce53e24mr6688567ljk.34.1712587053980; Mon, 08 Apr
+ 2024 07:37:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-purgate-type: clean
-X-purgate: clean
-X-purgate-size: 734
-X-purgate-ID: 155817::1712585889-6FFFDA4B-A983EAB5/0/0
-Message-ID: <20240408140852.7IrbCT995YfkzWGvzZecmdDaYREy6yttd_Db6j1dPAQ@z>
+References: <20240408141817.E22F8128369@smtp.subspace.kernel.org>
+In-Reply-To: <20240408141817.E22F8128369@smtp.subspace.kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Mon, 8 Apr 2024 16:37:22 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGTrx_9igrewHOkfHAej4NdJBSKHtpCoQcif08EtF0pAA@mail.gmail.com>
+Message-ID: <CAMj1kXGTrx_9igrewHOkfHAej4NdJBSKHtpCoQcif08EtF0pAA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] crypto: s(h)aving 16 byte constant off arch/x86/crypto/sha1_ni_asm.S
+To: Stefan Kanthak <stefan.kanthak@nexgo.de>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	tim.c.chen@linux.intel.com, Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Get rid of 16 byte constant, use shift instead of mask
+On Mon, 8 Apr 2024 at 16:18, Stefan Kanthak <stefan.kanthak@nexgo.de> wrote:
+>
+> Get rid of 16 byte constant, use shift instead of mask
+>
 
---- -/arch/x86/crypto/sha1_ni_asm.S
-+++ +/arch/x86/crypto/sha1_ni_asm.S
-@@ -104,9 +104,9 @@
- 	add		DATA_PTR, NUM_BLKS	/* pointer to end of data */
- 
- 	/* load initial hash values */
--	pinsrd		$3, 1*16(DIGEST_PTR), E0
-+	pinsrd		$0, 1*16(DIGEST_PTR), E0
- 	movdqu		0*16(DIGEST_PTR), ABCD
--	pand		UPPER_WORD_MASK(%rip), E0
-+	pslldq		$12, E0
- 	pshufd		$0x1B, ABCD, ABCD
- 
- 	movdqa		PSHUFFLE_BYTE_FLIP_MASK(%rip), SHUF_MASK
-@@ -297,8 +297,3 @@
- .align 16
- PSHUFFLE_BYTE_FLIP_MASK:
- 	.octa 0x000102030405060708090a0b0c0d0e0f
--
--.section	.rodata.cst16.UPPER_WORD_MASK, "aM", @progbits, 16
--.align 16
--UPPER_WORD_MASK:
--	.octa 0xFFFFFFFF000000000000000000000000
+This is missing a signoff
+
+> --- -/arch/x86/crypto/sha1_ni_asm.S
+> +++ +/arch/x86/crypto/sha1_ni_asm.S
+> @@ -104,9 +104,9 @@
+>         add             DATA_PTR, NUM_BLKS      /* pointer to end of data */
+>
+>         /* load initial hash values */
+> -       pinsrd          $3, 1*16(DIGEST_PTR), E0
+> +       pinsrd          $0, 1*16(DIGEST_PTR), E0
+>         movdqu          0*16(DIGEST_PTR), ABCD
+> -       pand            UPPER_WORD_MASK(%rip), E0
+> +       pslldq          $12, E0
+>         pshufd          $0x1B, ABCD, ABCD
+>
+
+Wouldn't it be simpler and therefore better to simply zero register E0
+before loading E into the top lane?
+
+
+>         movdqa          PSHUFFLE_BYTE_FLIP_MASK(%rip), SHUF_MASK
+> @@ -297,8 +297,3 @@
+>  .align 16
+>  PSHUFFLE_BYTE_FLIP_MASK:
+>         .octa 0x000102030405060708090a0b0c0d0e0f
+> -
+> -.section       .rodata.cst16.UPPER_WORD_MASK, "aM", @progbits, 16
+> -.align 16
+> -UPPER_WORD_MASK:
+> -       .octa 0xFFFFFFFF000000000000000000000000
+>
