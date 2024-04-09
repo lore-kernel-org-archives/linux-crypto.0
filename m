@@ -1,78 +1,68 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B99D80045
-	for <linux-crypto@vger.kernel.org>; Tue,  9 Apr 2024 09:51:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B7A80038
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Apr 2024 09:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712656301; cv=none; b=rR98lhK64UxHfAPFiTZE79xtryRbG2YM290t9k0Pr4O4yF31vVR50kszmwzqoO1xsSmq4CKBJIZzguxCbMSXZfuS7hoM9CnGn77mqgvEGfreNYrOtONZb10zNIbQdAoA9720CGFVdjz0CjOIivDvY07m6Tplj/ial2tPrpBzJ2E=
+	t=1712656577; cv=none; b=Gs7Gb9eEo1GVcnHC8CyMNKO0MAkPeg+k+SNpoYDV5MxfD5fIqXRnsK4Pjsy+/aI30c1nul7gof0S5uAdv8x961cRwTdK0qsRomlI9vdqEsvs8AjQeHGcbDnpn4IigLQGM2NO9IAS/pRomJk7wZkAQTQcp98tqRFM2c8K/dTWuJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712656301; c=relaxed/simple;
-	bh=78/5QJap8vVBs4Gy5QinmJjzWMbaMMInwHU+KCD4GL0=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=T26OKutGFYD2R/Qp7gH7Jqxgp/3QyWV0mMLH5VweWIOgXTB7gu4rSkOVaZtAlXIjfWuQT9u2DV0seK0gFAyrVByvdLDJCLN+W2kFVX+c0PjUfHcwrBsaNMrW1wWUD8RVKqzSF206DpOkJ1cislu5fdg6fzTPXdbagXpXcs90EYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XOTJ3q/b; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XOTJ3q/b"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712656297;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=L5OV7jyoR0JrtQAfkWwBnCoP/OfPB4UxrynwWPMgTtE=;
-	b=XOTJ3q/bUidgHcrU7taqGD/FKOxTyPE++kO02VYP2i2R8+0RFTeoh/QuqsucvNFVuyND7o
-	qghZf83VdPOZd65J3A7d/MC6T0Eh9cGfpA9qo3gwhfIR/ARHeHIfz3x4ZvZn8uh2O7y8V1
-	jhk005L7QXKBTFSQ43ckPnCdjYPriCo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-576-Nl9yWVIWPSmcyVXL9e2BHQ-1; Tue, 09 Apr 2024 05:51:36 -0400
-X-MC-Unique: Nl9yWVIWPSmcyVXL9e2BHQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 12EC6104B50A;
-	Tue,  9 Apr 2024 09:51:36 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E42172166B32;
-	Tue,  9 Apr 2024 09:51:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-cc: dhowells@redhat.com, "David S. Miller" <davem@davemloft.net>,
-    linux-crypto@vger.kernel.org
-Subject: Incorrect use of CRYPTO_ALG_ASYNC in crypto_alloc_sync_skcipher()?
+	s=arc-20240116; t=1712656577; c=relaxed/simple;
+	bh=3tudJ8zr0TwEy9GzsXNb7ZK28bJrYL87s3kQv+Iyiog=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jk5D3Ak+YkuvmWdznQoDQnBL3S5kwl9aBopUicJ6ykQ0lVtJZVkKi46Na2S26yCwSrRWdMZ3yCkieM0sETdC+Y1w2n9YDfFIt6wSYYwCYEKXq5hH1/UW9LqAS8EbNvp0eQJY5wuTaIiYf3OnfVxXbji5rjmDfidl3tBqnlxOiRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1ru8Cr-00GyEv-JI; Tue, 09 Apr 2024 17:55:58 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 09 Apr 2024 17:56:14 +0800
+Date: Tue, 9 Apr 2024 17:56:14 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: David Howells <dhowells@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org
+Subject: Re: Incorrect use of CRYPTO_ALG_ASYNC in
+ crypto_alloc_sync_skcipher()?
+Message-ID: <ZhUQvjKGSk0b0O28@gondor.apana.org.au>
+References: <1068289.1712656290@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1068288.1712656290.1@warthog.procyon.org.uk>
-Date: Tue, 09 Apr 2024 10:51:30 +0100
-Message-ID: <1068289.1712656290@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1068289.1712656290@warthog.procyon.org.uk>
 
-Hi Herbert,
+On Tue, Apr 09, 2024 at 10:51:30AM +0100, David Howells wrote:
+> Hi Herbert,
+> 
+> Is the following code in crypto_alloc_sync_skcipher() wrong:
+> 
+> 	/* Only sync algorithms allowed. */
+> 	mask |= CRYPTO_ALG_ASYNC | CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE;
+> 
+> in its specification of CRYPTO_ALG_ASYNC?  Given what the docs say:
+> 
+>     The mask flag restricts the type of cipher. The only allowed flag is
+>     CRYPTO_ALG_ASYNC to restrict the cipher lookup function to
+>     asynchronous ciphers. Usually, a caller provides a 0 for the mask flag.
+>     ^^^^^^^^^^^^
+> 
+> or are the docs wrong?
 
-Is the following code in crypto_alloc_sync_skcipher() wrong:
+The mask is used together with the type bitfield.  You need to set
+CRYPTO_ALG_ASYNC in both bitfields if you want to guarantee getting
+an async cipher.
 
-	/* Only sync algorithms allowed. */
-	mask |= CRYPTO_ALG_ASYNC | CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE;
+If you set CRYPTO_ALG_ASYNC in the mask but leave it unset in the
+type bitfield then you are guaranteed to get an algorithm with this
+bit turned off, in other words a synchronous cipher.
 
-in its specification of CRYPTO_ALG_ASYNC?  Given what the docs say:
-
-    The mask flag restricts the type of cipher. The only allowed flag is
-    CRYPTO_ALG_ASYNC to restrict the cipher lookup function to
-    asynchronous ciphers. Usually, a caller provides a 0 for the mask flag.
-    ^^^^^^^^^^^^
-
-or are the docs wrong?
-
-David
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
