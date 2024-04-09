@@ -1,89 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mr3.vodafonemail.de (mr3.vodafonemail.de [145.253.228.163])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D0B12D755;
-	Tue,  9 Apr 2024 12:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF971386C0;
+	Tue,  9 Apr 2024 16:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.253.228.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712666700; cv=none; b=fkLScKcDpO+PcLaz5Ez9f9NKAj+Z4yUAWjPbEbGxI8xCSwp0RXQSI69+7ZT/NuqAlEhvFXhCc0uQ9GelXYLGAlmBD0e/Dl+NEmdOg3UFJl3C6jl0opeClZkqb+3azYCM3PJ8FwH2xz3jnQZWECd91QeLUuilelF1AE53OALpjOo=
+	t=1712681675; cv=none; b=THPp+sRyVQtBJrNYnO/Aaiugxzny7IzQMbwFHh4SAnfXBt2sqLV9C8Fu4rZ8QvxecXpUaYx6HbTIFFo6wKpKGrTrf0DvjARFMUHMiTCVIIWa4G0FPZu98G9eoBnpRi2olNjMu3L7SSJA/dq9QqMY5MxtU3cQ8g4YqE/vql32z0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712666700; c=relaxed/simple;
-	bh=X7rdsbL7+LXMFqNdb3JPRvZ93H2cU4KFKkX7IKVa+0I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fpXFdl8sqDbkgyBN136AAY8jYW2F4lt/KtN2wPief6S45fMM1uy3n5429Mcm2x5mPg7XN617FW8rxFoO4xbS9Ttg4+nqMoVoQLDQOpCYkC+PyvXLScHvkC+UsPqJEH50pQRYR+vFx/5vR3r+EfVACw4vDwfxdb6O7BRSPeG1EDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pY6p3tJ0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712681675; c=relaxed/simple;
+	bh=HEj8fGwu2M7SCaKbJdG/QejwGPEN39S60SJHeImWezw=;
+	h=Message-ID:From:To:Cc:References:In-Reply-To:Subject:Date:
+	 MIME-Version:Content-Type; b=dDdLY2Jzef+16a8EQSrNgKBR4psz6uusVcdePLMF1p6qovLRcGIGQchlNZUqViUOJGtpGKiO6VK/NTcGl1REGt+VDDHdoIZdGaZn1t9pMWSSkVAIxltjXVkbXjxA0tvnLsNAUPVaxbo9r6/ZeVG33jNAFZ3Cr/IWoIdFacBvBNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de; spf=pass smtp.mailfrom=nexgo.de; dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b=KKkIWzjw; arc=none smtp.client-ip=145.253.228.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nexgo.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pY6p3tJ0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77581C433F1;
-	Tue,  9 Apr 2024 12:44:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712666699;
-	bh=X7rdsbL7+LXMFqNdb3JPRvZ93H2cU4KFKkX7IKVa+0I=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=pY6p3tJ0VLACzQ+VlxGKbtfCJIg1EdeWyxf17BxhDSP16I7MMXsci8Geyk1z07aWt
-	 DvdLzFOhuH4ygHHW7ur5qP1MTUCwqzQAPxZVKq5Mwn1aVi7ty808IveODZsxxRv8EL
-	 ZB3eZ3Vecj5qQAsHAb2h3lxXZT2ccMD0hNEyoyZui7BQ63reZ4JY1P/d9QLoTY/nCC
-	 UnN6j8+obxLD2xOvaXMS9F367B+dHwsddkIGcociYcnuRNAA5wukd9rlsBoX7QAj47
-	 rrdDXHocB1BfRqccT/YBSmqab3rC3FXYGZ7ygpf6t3hrg4EyE4/wt5mZtNqvOHdAmG
-	 FjfRgMhzqc+7A==
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d8b4778f5fso2593561fa.3;
-        Tue, 09 Apr 2024 05:44:59 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUuEwjM8mR89kzTpErVt3cFYOO8DgpciIhQ6LdjSONlpujitn2eeJi4wKAXpMCwkvTJWuK6zFGDM7tqMVTRSIGFWGnu97MvWcPs3ZcC
-X-Gm-Message-State: AOJu0YzVueE9nOEZ7Hy7c6RZnrPTeAMWDcaZAn949n1Bsyt5Lz+cUQm8
-	4JyTXG2kq6ggcNehDSIA8OxOj+toAoOMapdcbUd/mP1ddCll+gkM6HUoMsmCW9PJbvoeKM7gQFV
-	lHzzOfvU+m4qol/gaBd6UTEEBU70=
-X-Google-Smtp-Source: AGHT+IGOINgzpnwmK1fmxSh4NVCczyD/4h57b1sn/qDaziODObN5Qqz23WasWbLTlLiGqe2LrJr9nja9YyhiXOqQ4xk=
-X-Received: by 2002:a2e:9515:0:b0:2d8:918f:55fa with SMTP id
- f21-20020a2e9515000000b002d8918f55famr3962471ljh.18.1712666697842; Tue, 09
- Apr 2024 05:44:57 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b="KKkIWzjw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nexgo.de;
+	s=vfde-mb-mr2-23sep; t=1712681663;
+	bh=Oo30CQZlp5KZEr6FMyyQB9R5JI3hVckU9HntCkKGtq4=;
+	h=Message-ID:From:To:References:In-Reply-To:Subject:Date:
+	 Content-Type:X-Mailer:From;
+	b=KKkIWzjwKJddxVViMBx4zI16tyG15t5cu5dDuNt0qeDI30LXWKnXfCUQGkOSiCLRi
+	 9lBiKd0fyy/p+IHWbplCqd0jTKO4yKEtmn3TSDw5DcXSkHOX3z8waRAGY/1DtWAzSf
+	 MxCVfDStDE/4i08MXEKCh5DmAtT+Bi4zRKvd1y8Q=
+Received: from smtp.vodafone.de (unknown [10.0.0.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	(No client certificate requested)
+	by mr3.vodafonemail.de (Postfix) with ESMTPS id 4VDX9q61dfz2FsG;
+	Tue,  9 Apr 2024 16:54:23 +0000 (UTC)
+Received: from H270 (p54805648.dip0.t-ipconnect.de [84.128.86.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.vodafone.de (Postfix) with ESMTPSA id 4VDX9Z3fKhz9sc3;
+	Tue,  9 Apr 2024 16:54:07 +0000 (UTC)
+Message-ID: <C0FA88ECA90F43B1BF9E7849C53440D7@H270>
+From: "Stefan Kanthak" <stefan.kanthak@nexgo.de>
+To: "Eric Biggers" <ebiggers@kernel.org>,
+	<linux-crypto@vger.kernel.org>
+Cc: <linux-kernel@vger.kernel.org>,
+	<ardb@kernel.org>
+References: <20240409124216.9261-1-ebiggers@kernel.org> <20240409124216.9261-2-ebiggers@kernel.org>
+In-Reply-To: <20240409124216.9261-2-ebiggers@kernel.org>
+Subject: Re: [PATCH 1/2] crypto: x86/sha256-ni - convert to use rounds macros
+Date: Tue, 9 Apr 2024 18:52:02 +0200
+Organization: Me, myself & IT
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240409000154.29799-1-ebiggers@kernel.org> <CAMj1kXEhrPo18dwAuzpn7R7ZGpOxr2pwuoAfGRtWwzgSF+mTsA@mail.gmail.com>
- <20240409121141.GA717@quark.localdomain>
-In-Reply-To: <20240409121141.GA717@quark.localdomain>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 9 Apr 2024 14:44:46 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFxYW-45Ns_C0vss+gwoERiT6QX-h_Pgquf7zggUKdUPA@mail.gmail.com>
-Message-ID: <CAMj1kXFxYW-45Ns_C0vss+gwoERiT6QX-h_Pgquf7zggUKdUPA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: x86/aes-xts - access round keys using single-byte offsets
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	"Chang S . Bae" <chang.seok.bae@intel.com>, Stefan Kanthak <stefan.kanthak@nexgo.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+	charset="Windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Windows Mail 6.0.6002.18197
+X-MimeOLE: Produced By Microsoft MimeOLE V6.1.7601.24158
+X-purgate-type: clean
+X-purgate: clean
+X-purgate-size: 783
+X-purgate-ID: 155817::1712681659-FBFEDA47-1BACD483/0/0
 
-On Tue, 9 Apr 2024 at 14:11, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Tue, Apr 09, 2024 at 11:12:11AM +0200, Ard Biesheuvel wrote:
-> > On Tue, 9 Apr 2024 at 02:02, Eric Biggers <ebiggers@kernel.org> wrote:
-> > >
-> > > From: Eric Biggers <ebiggers@google.com>
-> > >
-> > > Access the AES round keys using offsets -7*16 through 7*16, instead of
-> > > 0*16 through 14*16.  This allows VEX-encoded instructions to address all
-> > > round keys using 1-byte offsets, whereas before some needed 4-byte
-> > > offsets.  This decreases the code size of aes-xts-avx-x86_64.o by 4.2%.
-> > >
-> > > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> >
-> > Nice optimization!
-> >
-> > Do you think we might be able to macrofy this a bit so we can use zero
-> > based indexing for the round keys, and hide the arithmetic?
-> >
-> >
->
-> There are two alternatives I considered: defining variables KEYOFF0 through
-> KEYOFF14 and writing the offsets as KEYOFF\i(KEY), or defining one variable
-> KEYOFF and writing the offsets as \i*16-KEYOFF(KEY).  I think I slightly prefer
-> the current patch where it's less abstracted out, though.  It makes it clear the
-> offsets really are single-byte, and also index 7 is the exact mid-point so going
-> from -7 to 7 still feels fairly natural.  If we wanted to do something more
-> complex like use different offsets for AVX vs. AVX512, then we'd need the
-> abstraction to handle that, but it doesn't seem useful to do that.
->
+"Eric Biggers" <ebiggers@kernel.org> wrote:
 
-Fair enough.
+> +.macro do_4rounds i, m0, m1, m2, m3
+> +.if \i < 16
+> +        movdqu  \i*4(DATA_PTR), MSG
+> +        pshufb  SHUF_MASK, MSG
+> +        movdqa  MSG, \m0
+> +.else
+> +        movdqa  \m0, MSG
+> +.endif
+> +        paddd   \i*4(SHA256CONSTANTS), MSG
+
+To load the round constant independent from and parallel to the previous
+instructions which use \m0 I recommend to change the first lines of the
+do_4rounds macro as follows (this might save 1+ cycle per macro invocation,
+and most obviously 2 lines):
+
+.macro do_4rounds i, m0, m1, m2, m3
+.if \i < 16
+        movdqu  \i*4(DATA_PTR), \m0
+        pshufb  SHUF_MASK, \m0
+.endif
+        movdqa  \i*4(SHA256CONSTANTS), MSG
+        paddd   \m0, MSG
+...
+
+regards
+Stefan
