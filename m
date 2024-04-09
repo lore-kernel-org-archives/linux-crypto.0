@@ -1,68 +1,123 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mr5.vodafonemail.de (mr5.vodafonemail.de [145.253.228.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B7A80038
-	for <linux-crypto@vger.kernel.org>; Tue,  9 Apr 2024 09:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86E61EB46
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Apr 2024 10:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.253.228.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712656577; cv=none; b=Gs7Gb9eEo1GVcnHC8CyMNKO0MAkPeg+k+SNpoYDV5MxfD5fIqXRnsK4Pjsy+/aI30c1nul7gof0S5uAdv8x961cRwTdK0qsRomlI9vdqEsvs8AjQeHGcbDnpn4IigLQGM2NO9IAS/pRomJk7wZkAQTQcp98tqRFM2c8K/dTWuJs=
+	t=1712658936; cv=none; b=fOD7PQmiq9fhH7KB3Smw0Dcf6dSw5PdZMI/4lYqBLadwzvLtAkawrpen+4EfNH5csrf+ui6GQDCCVzUihR+rMM5OPghU9uivfSRyGqkkScMhN+SlC2PCtpXeanmxuzBe9fSdxYg0IWZeoyewA7sZ6YxUqLmJ70g0XFTyJqZnnA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712656577; c=relaxed/simple;
-	bh=3tudJ8zr0TwEy9GzsXNb7ZK28bJrYL87s3kQv+Iyiog=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jk5D3Ak+YkuvmWdznQoDQnBL3S5kwl9aBopUicJ6ykQ0lVtJZVkKi46Na2S26yCwSrRWdMZ3yCkieM0sETdC+Y1w2n9YDfFIt6wSYYwCYEKXq5hH1/UW9LqAS8EbNvp0eQJY5wuTaIiYf3OnfVxXbji5rjmDfidl3tBqnlxOiRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1ru8Cr-00GyEv-JI; Tue, 09 Apr 2024 17:55:58 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 09 Apr 2024 17:56:14 +0800
-Date: Tue, 9 Apr 2024 17:56:14 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: David Howells <dhowells@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org
-Subject: Re: Incorrect use of CRYPTO_ALG_ASYNC in
- crypto_alloc_sync_skcipher()?
-Message-ID: <ZhUQvjKGSk0b0O28@gondor.apana.org.au>
-References: <1068289.1712656290@warthog.procyon.org.uk>
+	s=arc-20240116; t=1712658936; c=relaxed/simple;
+	bh=feIO4vhUUWJr1V0i/YIkTv8TafJAXqFA1Uetb7wB0XU=;
+	h=Message-ID:From:To:Cc:References:In-Reply-To:Subject:Date:
+	 MIME-Version:Content-Type; b=flWJyiKwOuYFBu5O+ivEPP3U0aeLQ9x11nL44pR0c4MeyAyojdYnhFIwN/6hvYLtUCosyiy/cjkAhjxy7HkCIhGhaoMKuzDQjoZsW2xwE5z+P5fa54euWiUxoaG14vwyMFN7YIJQ8xr/tY8GFeEBF9+vOFgd2kMVUaB80l1ixzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de; spf=pass smtp.mailfrom=nexgo.de; dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b=BHkfNvT8; arc=none smtp.client-ip=145.253.228.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nexgo.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b="BHkfNvT8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nexgo.de;
+	s=vfde-mb-mr2-23sep; t=1712658330;
+	bh=8JWY77Jy81sKv/3l+Z79iqEIm5lCvTg7Noh+jhhkpmQ=;
+	h=Message-ID:From:To:References:In-Reply-To:Subject:Date:
+	 Content-Type:X-Mailer:From;
+	b=BHkfNvT8e8qUoeD7GLcmg6DIPaJHkrvYOgYv28JRF5f+L9d+c1cktRKn24QIW/YuT
+	 4Nsrg4dnX5PSPki2fayHIYaisET3WboejGRd1yqDBcq8641jeRKXpEauEYhH0tpVOh
+	 qhp5cjIjZppLbumarKeB6kvPNxyAW+XoJ/EBM5n0=
+Received: from smtp.vodafone.de (unknown [10.0.0.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	(No client certificate requested)
+	by mr5.vodafonemail.de (Postfix) with ESMTPS id 4VDMY60pLJz1yHn;
+	Tue,  9 Apr 2024 10:25:30 +0000 (UTC)
+Received: from H270 (p54805648.dip0.t-ipconnect.de [84.128.86.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.vodafone.de (Postfix) with ESMTPSA id 4VDMXv5yDtz9tj4;
+	Tue,  9 Apr 2024 10:25:16 +0000 (UTC)
+Message-ID: <4D8C090A8BD54C05A97F57A0F640E94F@H270>
+From: "Stefan Kanthak" <stefan.kanthak@nexgo.de>
+To: "Eric Biggers" <ebiggers@kernel.org>,
+	<ardb@kernel.org>
+Cc: <linux-crypto@vger.kernel.org>
+References: <5EEE09A9021540A5AAD8BFEEE915512D@H270> <20240408123734.GB732@quark.localdomain> <9088939CC5454139901CEDD97DAFB004@H270> <20240408151832.GE732@quark.localdomain>
+In-Reply-To: <20240408151832.GE732@quark.localdomain>
+Subject: Re: [PATCH 1/2] crypto: s(h)aving 40+ bytes off arch/x86/crypto/sha256_ni_asm.S
+Date: Tue, 9 Apr 2024 12:23:13 +0200
+Organization: Me, myself & IT
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1068289.1712656290@warthog.procyon.org.uk>
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Windows Mail 6.0.6002.18197
+X-MimeOLE: Produced By Microsoft MimeOLE V6.1.7601.24158
+X-purgate-type: clean
+X-purgate: clean
+X-purgate-size: 2502
+X-purgate-ID: 155817::1712658325-0EFFBA4B-4A8EEA38/0/0
 
-On Tue, Apr 09, 2024 at 10:51:30AM +0100, David Howells wrote:
-> Hi Herbert,
-> 
-> Is the following code in crypto_alloc_sync_skcipher() wrong:
-> 
-> 	/* Only sync algorithms allowed. */
-> 	mask |= CRYPTO_ALG_ASYNC | CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE;
-> 
-> in its specification of CRYPTO_ALG_ASYNC?  Given what the docs say:
-> 
->     The mask flag restricts the type of cipher. The only allowed flag is
->     CRYPTO_ALG_ASYNC to restrict the cipher lookup function to
->     asynchronous ciphers. Usually, a caller provides a 0 for the mask flag.
->     ^^^^^^^^^^^^
-> 
-> or are the docs wrong?
+"Eric Biggers" <ebiggers@kernel.org> wrote:
 
-The mask is used together with the type bitfield.  You need to set
-CRYPTO_ALG_ASYNC in both bitfields if you want to guarantee getting
-an async cipher.
+> [+Cc linux-crypto]
+> 
+> Please use reply-all so that the list gets included.
+> 
+> On Mon, Apr 08, 2024 at 04:15:32PM +0200, Stefan Kanthak wrote:
+>> Hi Eric,
+>> 
+>> > On Mon, Apr 08, 2024 at 11:26:52AM +0200, Stefan Kanthak wrote:
+>> >> Use shorter SSE2 instructions instead of some SSE4.1
+>> >> use short displacements into K256
+>> >> 
+>> >> --- -/arch/x86/crypto/sha256_ni_asm.S
+>> >> +++ +/arch/x86/crypto/sha256_ni_asm.S
+>> > 
+>> > Thanks!  I'd like to benchmark this to see how it affects performance,
+>> 
+>> Performance is NOT affected: if CPUs weren't superscalar, the patch might
+>> save 2 to 4 processor cycles as it replaces palignr/pblendw (slow) with
+>> punpck*qdq (fast and shorter)
+>> 
+>> > but unfortunately this patch doesn't apply.  It looks your email client
+>> > corrupted your patch by replacing tabs with spaces.  Can you please use
+>> > 'git send-email' to send patches?
+>> 
+>> I don't use git at all; I'll use cURL instead.
 
-If you set CRYPTO_ALG_ASYNC in the mask but leave it unset in the
-type bitfield then you are guaranteed to get an algorithm with this
-bit turned off, in other words a synchronous cipher.
+[...]
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>> > Please make sure to run the crypto self-tests too.
+>> 
+>> I can't, I don't use Linux at all; I just noticed that this function uses
+>> 4-byte displacements and palignr/pblendw instead of punpck?qdq after pshufd 
+>> 
+>> > The above is storing the two halves of the state in the wrong order.
+>> 
+>> ARGH, you are right; I recognized it too, wanted to correct it, but was
+>> interrupted and forgot it after returning to the patch. Sorry.
+> 
+> I'm afraid that if you don't submit a probably formatted and tested patch, your
+> patch can't be accepted.  We can treat it as a suggestion, though since you're
+> sending actual code it would really help if it had your Signed-off-by.
+
+Treat is as suggestion.
+I but wonder that in the past 9 years since Tim Chen submitted the SHA-NI code
+(which was copied umpteen times by others and included in their own code bases)
+nobody noticed/questioned (or if so, bothered to submit a patch like mine, that
+reduces the code size by 5%, upstream) why he used 16x "pshufd $14, %xmm0, %xmm0"
+instead of the 1 byte shorter "punpckhqdq %xmm0, %xmm0" or "psrldq $8, %xmm0"
+(which both MAY execute on more ports or faster than the shuffle instructions,
+depending on the micro-architecture), why he used 8x a 4-byte instead of a 1-byte
+displacement, or why he used "palignr/pblendw" instead of the shorter "punpck?qdq".
+
+regards
+Stefan
+
+PS: aaaahhhh, you picked my suggestion up and applied it to the AES routine.
