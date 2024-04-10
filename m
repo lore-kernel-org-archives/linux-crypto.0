@@ -1,170 +1,130 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E93F13D500
-	for <linux-crypto@vger.kernel.org>; Wed, 10 Apr 2024 08:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC02159583;
+	Wed, 10 Apr 2024 10:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712736169; cv=none; b=FpDHxJvaHkZzjXmOZRxUlLuLDt8z4eXGuOhQS065rwi3SRWPNxMdkTOJlt+pG3ZLazChzRQSkYELGHpsxIwBls8bl3hCdMxUepYsWmX7Qqh5mL8wBvfRDOs1mNQiSLeu3UsZhT6HI1h56gD4A7urOHfAVRzOrIszzwspe2ojp04=
+	t=1712745563; cv=none; b=LSNSYFi4rbhMA5XLrlf+9N+yQF5jQAfiByYrE0ys1eMTSLV3MRe9ImkhV1psGXz+eSyLSokMroJxclJsu9XVD5+hbD+N4WAYOrCDZBbCWA50s7G/SCFI96E3uQKghvzSH9lSeSmwCahSwAo4/rrkqt1E+J/atuPaswPQIqJ4SaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712736169; c=relaxed/simple;
-	bh=d1PN1Hm45NhCEHeS1enwZRk3BBE6Kbx5SrWseLrZK54=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dnOqbdRYVv59uOmzOTHPHrk0PC6zpjRuujrhNTjV/BkPkYIQ8l+I5/xxOfn5oDaLtmu7T0XKw234pKZ8OSKwSPKDbryoj5/sGVrngKoba5ZX2cGiYZbkmAWi3uQFSmmVXnYZv5hKp7qVb+PulNFlR9OqL+KsFxJsgI7xkHNNVlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pk97KuT/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1712745563; c=relaxed/simple;
+	bh=PCDujvrJmHAKcuWNCqvSMKsnICM+G/o9ZW/if72dDBI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=E5VfIrAV+7kG3jPZWCXkdyd1r5pUIB+yuqM7jZ6qhy6/eGqGhwi0WpAvZd7ZEYDg7xRG0JTTDSaCzvYZCzb4404XQfTfScdPkFZzVmS3GEc6qXJyNZOPJ0OLJvd3bo3gzgASUJO49tYqxa/KyF/UO9Mc4bLX4kHQxNRAVbcJsik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=CS/UYqwL; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pk97KuT/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712736165;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DXu5GyWFLRYVVgKT/xx47xxPPvyqqTS3jJA/xlCkkm0=;
-	b=Pk97KuT/mE9r5AWVFdqO6INc6z4HesNnp8Eydu2oWb9B1SKZTBktWULMTV6CAv5WHqzYfb
-	lEV3l0VSl46VIecpkz+PButrh4dcw0SGAOKtlkkT+cdzv/cTu9TaijbzP+0LS2xbwPCKPq
-	mqsjrSmvjJQcMxrmicBH/NKgjbxKZms=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-543-hFcCR3DcPsq85eanEl8cRg-1; Wed, 10 Apr 2024 04:02:41 -0400
-X-MC-Unique: hFcCR3DcPsq85eanEl8cRg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4155db7b58cso33153255e9.1
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Apr 2024 01:02:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712736160; x=1713340960;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DXu5GyWFLRYVVgKT/xx47xxPPvyqqTS3jJA/xlCkkm0=;
-        b=uQAOV3cp7V/YDubiKEpmGYT8qrHNlu1oaQqVPvPrXEG/LOObSAuNypZApCE0T4zFHT
-         3Z+BHLjB4N98NlItC05hew/N5tcFfrcbc3EnLYtZlr8nAoqi6LosnzrsuyETbO9zVkDa
-         hYcozD6lI1j3AIecQ4lHlxuuvZ9xCuCdTdqB28rZxRBqMleIUkwZT9ZBTPZnEmw7P0ok
-         +3p6GUCGLTU4MEdzowISHxLTwHRyriw98tIRpzD6lkzyyqyDtgskPJi47PDJaIr0hlU5
-         vZZBYOAmf5D1uiQ34Mj9YmWfRh4+ssyeeRq+nZilMivBmE+nG3sqI/BQlxhKxUpTvmKu
-         YE4g==
-X-Forwarded-Encrypted: i=1; AJvYcCU89isarBiCcHpug6ll0fF5GpXdvhn2E/DpkD8sn4gkAnsLPw5oS30BQa52mcHrtBwbLnRjG3FGBs5XfkWkMXAXAtoz0G1rkdjvORcU
-X-Gm-Message-State: AOJu0YwsUK2CzHyrWXR8eqduBWl/1qFRJtSSu9LFaDxyTF4OTFIxm8A8
-	5fQg7HUVcItVB8Z2LK3k/cNnCVQHJiEqNA/NsX+xml6M82PkHa3HafKLVerGyWhfVjdfyIwu2lM
-	ll0GbvsNzYrvrDNJFOPbW/WpiuQ5cSgdHhRt8GGRaA8d3Gc2FqNP1whLXwLr5FA==
-X-Received: by 2002:a05:600c:1e05:b0:416:6eaa:6179 with SMTP id ay5-20020a05600c1e0500b004166eaa6179mr1616328wmb.6.1712736160208;
-        Wed, 10 Apr 2024 01:02:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFmI+bK+Bmn5+2XukodBdn2GXQ92haKG6VohgZt2mHVdjYtyJPyqjLehKUQ4vb5gN6ueySe/w==
-X-Received: by 2002:a05:600c:1e05:b0:416:6eaa:6179 with SMTP id ay5-20020a05600c1e0500b004166eaa6179mr1616221wmb.6.1712736159530;
-        Wed, 10 Apr 2024 01:02:39 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:179:8bde:8cd:63ff:6fae:3872])
-        by smtp.gmail.com with ESMTPSA id t7-20020a05600c198700b00416c160ff88sm1491111wmq.1.2024.04.10.01.02.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 01:02:38 -0700 (PDT)
-Date: Wed, 10 Apr 2024 04:02:23 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	David Hildenbrand <david@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gonglei <arei.gonglei@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Cristian Marussi <cristian.marussi@arm.com>,
-	Viresh Kumar <vireshk@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	David Airlie <airlied@redhat.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Daniel Vetter <daniel@ffwll.ch>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Alexander Graf <graf@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
-	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>
-Subject: Re: [PATCH v2 00/25] virtio: store owner from modules with
- register_virtio_driver()
-Message-ID: <20240410040140-mutt-send-email-mst@kernel.org>
-References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
- <285be63c-8939-495c-8411-ce2a68e25b2b@linaro.org>
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="CS/UYqwL"
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 7C7EC120040;
+	Wed, 10 Apr 2024 13:39:15 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 7C7EC120040
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1712745555;
+	bh=VgW1qDMO8PWM/O8EZhSuhbAcY1BZE0vdgsOCKDWUWxQ=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version:From;
+	b=CS/UYqwL+D63xVmLoxh+smpQLDcRGs8BiucMk4L2yDZKz7mCHGHHbBvxTF3Mq3nq7
+	 Uynp159IUfh/sddTkWqy5uwBv7M4T5zum2cpoHZyavdMibJSilafPlIWtgzaXpjAX6
+	 piXBMbO65U6MtMoe9vcHgfhaqgyiBv/+v2sEssS0cS0CbM2wsEzVaBtO5rr73+95UV
+	 Iw45CJ+MhmfpNnH9jHRXtmxfw13rdnm5xisGn7pooFNNPqf7TG5oqRNZz3I3GtSp03
+	 V00HmbW19igOToVHyPNvSlAIJWBpR0ZB81HyfBS/jB9ZQcaqrAbQ1lkuStlOvcBOR2
+	 Q4+z0M+u6v//g==
+Received: from smtp.sberdevices.ru (p-i-exch-a-m1.sberdevices.ru [172.24.196.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Wed, 10 Apr 2024 13:39:15 +0300 (MSK)
+Received: from p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) by
+ p-i-exch-a-m1.sberdevices.ru (172.24.196.116) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 10 Apr 2024 13:39:14 +0300
+Received: from p-i-exch-sc-m02.sberdevices.ru ([fe80::10c3:6e04:fd07:c511]) by
+ p-i-exch-sc-m02.sberdevices.ru ([fe80::10c3:6e04:fd07:c511%9]) with mapi id
+ 15.02.1118.040; Wed, 10 Apr 2024 13:39:14 +0300
+From: Alexey Romanov <avromanov@salutedevices.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "khilman@baylibre.com"
+	<khilman@baylibre.com>, "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
+	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
+Subject: Re: [PATCH v6 11/23] drivers: crypto: meson: introduce hasher
+Thread-Topic: [PATCH v6 11/23] drivers: crypto: meson: introduce hasher
+Thread-Index: AQHaf5Lb1cJ4FzSnKk+fpINGfswrY7FZG1UAgAgZ3AA=
+Date: Wed, 10 Apr 2024 10:39:14 +0000
+Message-ID: <20240410103908.suw6x3pywk73nftp@cab-wsm-0029881.sigma.sbrf.ru>
+References: <20240326153219.2915080-1-avromanov@salutedevices.com>
+ <20240326153219.2915080-12-avromanov@salutedevices.com>
+ <Zg+gnrO/wX5S+zlw@gondor.apana.org.au>
+In-Reply-To: <Zg+gnrO/wX5S+zlw@gondor.apana.org.au>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <C48013566364C04996A07E062F8DF7FC@sberdevices.ru>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <285be63c-8939-495c-8411-ce2a68e25b2b@linaro.org>
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 184649 [Apr 10 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 16 0.3.16 6e64c33514fcbd07e515710c86ba61de7f56194e, {Tracking_uf_ne_domains}, {Track_E25351}, {Tracking_from_domain_doesnt_match_to}, cab-wsm-0029881.sigma.sbrf.ru:5.0.1,7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;gondor.apana.org.au:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/04/10 07:25:00
+X-KSMG-LinksScanning: Clean, bases: 2024/04/10 07:25:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/04/10 06:59:00 #24735327
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Wed, Apr 10, 2024 at 09:41:57AM +0200, Krzysztof Kozlowski wrote:
-> On 31/03/2024 10:43, Krzysztof Kozlowski wrote:
-> > Changes in v2:
-> > - Three new patches: virtio mem+input+balloon
-> > - Minor commit msg adjustments
-> > - Add tags
-> > - Link to v1: https://lore.kernel.org/r/20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org
-> > 
-> > Merging
-> > =======
-> > All further patches depend on the first virtio patch, therefore please ack
-> > and this should go via one tree: maybe virtio?
-> 
-> Michael, Jason, Xuan,
-> 
-> Will you be able to take the entire patchset through virtio?
-> 
-> Best regards,
-> Krzysztof
+Hello Herbert,
 
+On Fri, Apr 05, 2024 at 02:56:30PM +0800, Herbert Xu wrote:
+> On Tue, Mar 26, 2024 at 06:32:07PM +0300, Alexey Romanov wrote:
+> > Introduce support for SHA1/SHA224/SHA256 hash algos.
+> > Tested via tcrypt and custom tests.
+> >=20
+> > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
+> > ---
+> >  drivers/crypto/amlogic/Makefile             |   2 +-
+> >  drivers/crypto/amlogic/amlogic-gxl-core.c   |  25 +-
+> >  drivers/crypto/amlogic/amlogic-gxl-hasher.c | 460 ++++++++++++++++++++
+> >  drivers/crypto/amlogic/amlogic-gxl.h        |  51 +++
+> >  4 files changed, 536 insertions(+), 2 deletions(-)
+> >  create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
+>=20
+> Where are the import/export functions?
 
-Hello!
-Yes I intend to take it for the next merge window.
-I am also merging the 1st patch for this release (it's a bugfix).
+Sorry, I miss understand you. What do you mean by "import/epxort
+functions"?
 
--- 
-MST
+>=20
+> Cheers,
+> --=20
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
+--=20
+Thank you,
+Alexey=
