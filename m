@@ -1,78 +1,102 @@
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2130.outbound.protection.outlook.com [40.107.7.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC02159583;
-	Wed, 10 Apr 2024 10:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712745563; cv=none; b=LSNSYFi4rbhMA5XLrlf+9N+yQF5jQAfiByYrE0ys1eMTSLV3MRe9ImkhV1psGXz+eSyLSokMroJxclJsu9XVD5+hbD+N4WAYOrCDZBbCWA50s7G/SCFI96E3uQKghvzSH9lSeSmwCahSwAo4/rrkqt1E+J/atuPaswPQIqJ4SaM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712745563; c=relaxed/simple;
-	bh=PCDujvrJmHAKcuWNCqvSMKsnICM+G/o9ZW/if72dDBI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=E5VfIrAV+7kG3jPZWCXkdyd1r5pUIB+yuqM7jZ6qhy6/eGqGhwi0WpAvZd7ZEYDg7xRG0JTTDSaCzvYZCzb4404XQfTfScdPkFZzVmS3GEc6qXJyNZOPJ0OLJvd3bo3gzgASUJO49tYqxa/KyF/UO9Mc4bLX4kHQxNRAVbcJsik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=CS/UYqwL; arc=none smtp.client-ip=45.89.224.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17EA15ADAA;
+	Wed, 10 Apr 2024 11:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.7.130
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712748347; cv=fail; b=PaHyCViNcGXePkum8VatPHHjEG5yNZe9/6nHILyJoAIgCpflrIG9Yy97ScEjxoeMjxYa+816hBNiy2lzhTFlIZs+jmSXUxQfj44fqzJtBvKGsT7FdNDvEo+uFCsfCSmQkpjueF7g+rp5XmSN9zSyg9EYqG/XDmrBAE0bYbdam3w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712748347; c=relaxed/simple;
+	bh=r/cVI1RNFKGwWjbrpkrJuN5bsV5Q5Dshk4GViG0AbQo=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DFJYdEzv/hVDJ72DLNZDsO68zd36PZvhhWoOTIXoGeOvyY+/6RF6e3raIBx5a0GwwZwDmsmiImCHehgLf7TvseplfXB3vbohwIoC3llxib1THrG5JAf3CyH6hdaNEeXvmTu8FDcBSGbhYvRT4lBrp66pK2nybWrOMzha8DfKSK8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=CqsUJchD; arc=fail smtp.client-ip=40.107.7.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="CS/UYqwL"
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 7C7EC120040;
-	Wed, 10 Apr 2024 13:39:15 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 7C7EC120040
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1712745555;
-	bh=VgW1qDMO8PWM/O8EZhSuhbAcY1BZE0vdgsOCKDWUWxQ=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version:From;
-	b=CS/UYqwL+D63xVmLoxh+smpQLDcRGs8BiucMk4L2yDZKz7mCHGHHbBvxTF3Mq3nq7
-	 Uynp159IUfh/sddTkWqy5uwBv7M4T5zum2cpoHZyavdMibJSilafPlIWtgzaXpjAX6
-	 piXBMbO65U6MtMoe9vcHgfhaqgyiBv/+v2sEssS0cS0CbM2wsEzVaBtO5rr73+95UV
-	 Iw45CJ+MhmfpNnH9jHRXtmxfw13rdnm5xisGn7pooFNNPqf7TG5oqRNZz3I3GtSp03
-	 V00HmbW19igOToVHyPNvSlAIJWBpR0ZB81HyfBS/jB9ZQcaqrAbQ1lkuStlOvcBOR2
-	 Q4+z0M+u6v//g==
-Received: from smtp.sberdevices.ru (p-i-exch-a-m1.sberdevices.ru [172.24.196.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed, 10 Apr 2024 13:39:15 +0300 (MSK)
-Received: from p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) by
- p-i-exch-a-m1.sberdevices.ru (172.24.196.116) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 10 Apr 2024 13:39:14 +0300
-Received: from p-i-exch-sc-m02.sberdevices.ru ([fe80::10c3:6e04:fd07:c511]) by
- p-i-exch-sc-m02.sberdevices.ru ([fe80::10c3:6e04:fd07:c511%9]) with mapi id
- 15.02.1118.040; Wed, 10 Apr 2024 13:39:14 +0300
-From: Alexey Romanov <avromanov@salutedevices.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "khilman@baylibre.com"
-	<khilman@baylibre.com>, "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
-	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
-Subject: Re: [PATCH v6 11/23] drivers: crypto: meson: introduce hasher
-Thread-Topic: [PATCH v6 11/23] drivers: crypto: meson: introduce hasher
-Thread-Index: AQHaf5Lb1cJ4FzSnKk+fpINGfswrY7FZG1UAgAgZ3AA=
-Date: Wed, 10 Apr 2024 10:39:14 +0000
-Message-ID: <20240410103908.suw6x3pywk73nftp@cab-wsm-0029881.sigma.sbrf.ru>
-References: <20240326153219.2915080-1-avromanov@salutedevices.com>
- <20240326153219.2915080-12-avromanov@salutedevices.com>
- <Zg+gnrO/wX5S+zlw@gondor.apana.org.au>
-In-Reply-To: <Zg+gnrO/wX5S+zlw@gondor.apana.org.au>
-Accept-Language: ru-RU, en-US
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="CqsUJchD"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NQpUNWDPCISQ+tYsQNdvG/0rSELhUBDz7JuF2gOyzczYEPOL0f3ITUGOK5ArhvOxbC5owDxJvLGzz0XgsLIYmqbcQjyzeNGTBsUT9Jyl5yVjMZJ58yEc9sptqFCw85WWupymMIUK5aZAdbTmLd2DFHm/6HWit4CTtjbzy1gWc/hP6Xo53Gc+/WefYw7rg67nyci4Sd2bydYyXKZB/yIXF+1XSfi6NdppskK0sZWkV8GeyyExnyM9nnzG7YhXNx15n5o7n2L+jOEghkpoqFYAmQ1LIr4DLnFS66bkEoaYbnZJ5IaIab1Ss2PQVkrLYQnr2cCnSDnoKcmG3CeCG+Ap7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d6fPQr/d0T408iWJ4TG8lAAXFgBL5UGKwyfoj3RqeYw=;
+ b=R1lUSdv2X3GDz9vSZ/jA7Ee2cfsmAEc4N942R8OW9ImQmqdtIdjGFUZH42KJ4GxJYN05f5Sa+e8N8hiP2LQnXM/qQ45tou5DYRwGdWQ8B8gRS7pkWe88M81kBj5z6EJI/XHl5VI/uLXz+6Fo0pPXwJYm0FOhzTlE8IuWy6oGD1NzMVmpV56cUj8jItmOmD/67PkCBE89n79DUxDQ5BzO84Zx/LHU0xDh1zIJUeAJFGS0NbqDvspG8YDfd6DJE+ZDVfPCF2NaJmFrRlR1Q+z9rAHCmhjZy2/sclltoyhftANetsYH7YyeKEnKKGM2F72gEGgPKRQ0LxtjXbtZ+JgOtw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d6fPQr/d0T408iWJ4TG8lAAXFgBL5UGKwyfoj3RqeYw=;
+ b=CqsUJchDc20m1vXheQImNQZ+6RUgKakLp0iH3mBGQHJ1WqJE6eQtIzGXYiVnnZS9SQC/jUBefMhmGZGb4TukSAVXZFmNAcKwfrYGmBtsBHYu/xeGZgTRathT2+UJ8x0fX3elQY5kwUjTi7FmLgdYJETjsGzWtjsG5pO/IKRTq/M=
+Received: from AM0PR04MB6004.eurprd04.prod.outlook.com (2603:10a6:208:11a::11)
+ by PAXPR04MB8444.eurprd04.prod.outlook.com (2603:10a6:102:1db::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.55; Wed, 10 Apr
+ 2024 11:25:41 +0000
+Received: from AM0PR04MB6004.eurprd04.prod.outlook.com
+ ([fe80::4662:223:b694:bbc7]) by AM0PR04MB6004.eurprd04.prod.outlook.com
+ ([fe80::4662:223:b694:bbc7%6]) with mapi id 15.20.7409.053; Wed, 10 Apr 2024
+ 11:25:41 +0000
+From: Gaurav Jain <gaurav.jain@nxp.com>
+To: Pankaj Gupta <pankaj.gupta@nxp.com>, Horia Geanta <horia.geanta@nxp.com>,
+	Varun Sethi <V.Sethi@nxp.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
+	Iuliana Prodan <iuliana.prodan@nxp.com>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, dl-linux-imx <linux-imx@nxp.com>
+Subject: RE: [PATCH v2] caam: init-clk based on caam-page0-access
+Thread-Topic: [PATCH v2] caam: init-clk based on caam-page0-access
+Thread-Index: AQHaix0ngiIpygDrSUiyyhiPAYwZZrFhXRsA
+Date: Wed, 10 Apr 2024 11:25:41 +0000
+Message-ID:
+ <AM0PR04MB6004F1C5AC6CE78447FF555BE7062@AM0PR04MB6004.eurprd04.prod.outlook.com>
+References: <20240410075815.4030570-1-pankaj.gupta@nxp.com>
+In-Reply-To: <20240410075815.4030570-1-pankaj.gupta@nxp.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM0PR04MB6004:EE_|PAXPR04MB8444:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ KrjLSC547Ozh4LS5ZbVb6MqNE9ml7V5sK3d3PJ+LIboAFydCf8YF0WNAXi0WnzdaqzfU8MLaK5IM+b7pRDNHp5B1vMVZ8ckx2Rlh2BPoDGc3VRRApxb+4SO/gX4P7gRgOl5SSI8Z5NmmMDEmi4C/fDaAdi6yZqPo90+ErxN8B2PFWQ7KOGEgU+6egYeswJfxN8/jhBxyxDBGnDEWmZxy8+adO5w84s+BJsIOD76M/dCsKjmLTy3SY0qitGP4T03JS8f3uN7SGRvhM72DpyVtkMMOIhUt0BvL/5B1aa4GwgplaWwUa/ssScOIqsv8GlSJHLeLHEN9PVQ0AGiz5YRXTXRdgd9YrN2yvOMTRh9+YaduxhwSJVbhW/RBf4LdyxQQkVdzcE90uIfQkGYH/2d5TDFwk2jY3w7L8SgXw+yovF172haSYI5bJBb1uKgYY+kyjnTfkll9wzo1zmkw7F9yYaWRZdWeJ/nUToTH6yOy1JqUen5r8swUNeOhfh78KhVppF/3w3sjYwTURtv5e5tfl2GIBLili1ffVED29E4ti3OweCAg7jbh3KdV5dJE2rg3MEY4mBhksOBA/foFrmILfVG2Ehd5mr/1Bll6KPmsxcpVN5ZCWkeB+2wAViK0NxaqXOm6i5QxTVxOmCM+l8DQSWjn6f7q0CaEgXoXUy0gRNI=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6004.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?TcEdoe6MnejzuQklJ3BDvJ3xSYxBdgVNTxN/NIMZuIG2aM+kL8br4St96n0M?=
+ =?us-ascii?Q?O8kygaHmvc8xz0ICBCartAu8uXQU2IehHOPr+AjfKRiU8tCQYLDIrImAL05i?=
+ =?us-ascii?Q?uBChSl6DkTMKrcjq/cUc+dC+VJquUYWqk+E44Z8yK9A8IRNx7tLumlRb+CfE?=
+ =?us-ascii?Q?yED6+UoUsp0KO2MW4LtE4NYNYQuniZRAiMMOQg+Iy2ZW/+shHYnCln31in3+?=
+ =?us-ascii?Q?decPmGCJMy5REeWV03ck3f+wzanSm1JgjC27Bah7q8WcCtdoEY7itqLuB6T2?=
+ =?us-ascii?Q?XMhYGmYvRaFalnTLXefDEIkedU7qbgfkkD8ixqGFKub+lw/rY/7d76HifmXP?=
+ =?us-ascii?Q?2E89SaqSi5D57WN+hZoQu1ogf2yTaGYd2fnlI8SexJ71Q4dRUDsxdb3IXtUw?=
+ =?us-ascii?Q?YmmfGyVrD3jq4mMenMkOxijoRELC1JoCZ306BJlemZLhEDwdOxFo588Phn0p?=
+ =?us-ascii?Q?q42mMaCcg7pTEBOkBQZ9OUK0Y9IudJcv8WQ+Mxr9mb5cqPcf47hqWRmV2KaG?=
+ =?us-ascii?Q?z/gBDd+I/c/hMmmPMyvxT8k+WYjLltgyKFFZiQZVmcnj18WLjjARBFljWFv7?=
+ =?us-ascii?Q?VxdMJweirCxnLiS7bZwklDw7dg5g6JLsVlPR+ZKERNrjFQrvPECApekYfel9?=
+ =?us-ascii?Q?rLkd/Z0GZ25FL+PPHfiEicXCntgcslJLGJEBkWY+Ak+8VzYITxDKx64r3Wxs?=
+ =?us-ascii?Q?JhkwZXrapy1gM3jOtvrm9gowS0RPzP0KVRWNTrbJYD3orHFnTqbbqei7ur+0?=
+ =?us-ascii?Q?rmIrZ5Gg/sufKITmVl7UqUrXaeDbU1yY+XAqn6gSZXcDIDCfRZrU7SrLtuhU?=
+ =?us-ascii?Q?W/r+/03567u20qTaoBCiPMedz8LIypxp81jJMBtnqGd/uDEt4bSmKwd6r4Gj?=
+ =?us-ascii?Q?m+0vI6qk06Q3sJBksEwF9fcQb8Wj94Ivhhu12kTwH+I+ZBkg318zxKNz0G+s?=
+ =?us-ascii?Q?SZm7gqKUF/6oX+b6CNkBcj49vFT1Y7wr0ZK4DIAEuDpxkEeVb+gHFH1I29o9?=
+ =?us-ascii?Q?YcFFjBwhTNj/hCLF0g6bpGKxIxyV9JjDOzdHT+j7EZdMvtVDqwkGrB4jFcRL?=
+ =?us-ascii?Q?zEvMP3pydrWbgkQDssmvhOcRwaZklHwWsfpWGYvE7dKcZO19V5P54m9kziN7?=
+ =?us-ascii?Q?4akIY3cJdZNInoudXQMX0C0Vsa8zbGDyuidId2sF6V9QuMr3mkW+UtJrki95?=
+ =?us-ascii?Q?iLphD2w3ON5r9ovzsbmEMwGfxza7C5Ssb4tDQBAOg27rgPMhl58hSA2RYMeP?=
+ =?us-ascii?Q?rajlzrGwI+VMvPrOA4GzyFHlucp/CdyGuwmAS1bXF4mh9zBKtudnnAv0V7xM?=
+ =?us-ascii?Q?NwtmjoR3+T5ropM230wG4m+/EyHCW7viAKA2dQVGbUuGgooY9ZIijVv7W4ns?=
+ =?us-ascii?Q?zSeQjJapGQVGiKOYLoXsEz29tbK2Ht63m4J8zAbyRMXmEp5vy5gJR51pER5a?=
+ =?us-ascii?Q?qREkRlEM2VJ+jt0aqJkemAOVXeSCeWMysUIgFuiUNYtVWmgUBCarT4BxVrGW?=
+ =?us-ascii?Q?qBBnpP4kLQvnkq9weU6aC3fLuaaJWHvTX5PnQLU431cqGomyEt9WWfsBdD70?=
+ =?us-ascii?Q?9howI0ri/b8n6RaSUze033fLghklBH7lMUh6xpom?=
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <C48013566364C04996A07E062F8DF7FC@sberdevices.ru>
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -80,51 +104,137 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 184649 [Apr 10 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 16 0.3.16 6e64c33514fcbd07e515710c86ba61de7f56194e, {Tracking_uf_ne_domains}, {Track_E25351}, {Tracking_from_domain_doesnt_match_to}, cab-wsm-0029881.sigma.sbrf.ru:5.0.1,7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;gondor.apana.org.au:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/04/10 07:25:00
-X-KSMG-LinksScanning: Clean, bases: 2024/04/10 07:25:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/04/10 06:59:00 #24735327
-X-KSMG-AntiVirus-Status: Clean, skipped
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6004.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5cb7e23-da0d-4872-98ba-08dc5950f4b1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Apr 2024 11:25:41.6849
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dPHGx+/6APXhvfNkf7FNQWTZRDN5XsfMBLJm3AXdAFTIpKyC3L2VeXBOZ2YQAft4H0AkuSWVnLzvAUjbnOLVnA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8444
 
-Hello Herbert,
+Reviewed-by: Gaurav Jain <gaurav.jain@nxp.com>
 
-On Fri, Apr 05, 2024 at 02:56:30PM +0800, Herbert Xu wrote:
-> On Tue, Mar 26, 2024 at 06:32:07PM +0300, Alexey Romanov wrote:
-> > Introduce support for SHA1/SHA224/SHA256 hash algos.
-> > Tested via tcrypt and custom tests.
-> >=20
-> > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
-> > ---
-> >  drivers/crypto/amlogic/Makefile             |   2 +-
-> >  drivers/crypto/amlogic/amlogic-gxl-core.c   |  25 +-
-> >  drivers/crypto/amlogic/amlogic-gxl-hasher.c | 460 ++++++++++++++++++++
-> >  drivers/crypto/amlogic/amlogic-gxl.h        |  51 +++
-> >  4 files changed, 536 insertions(+), 2 deletions(-)
-> >  create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
+> -----Original Message-----
+> From: Pankaj Gupta <pankaj.gupta@nxp.com>
+> Sent: Wednesday, April 10, 2024 1:28 PM
+> To: Gaurav Jain <gaurav.jain@nxp.com>; Horia Geanta <horia.geanta@nxp.com=
+>;
+> Varun Sethi <V.Sethi@nxp.com>; herbert@gondor.apana.org.au;
+> davem@davemloft.net; Iuliana Prodan <iuliana.prodan@nxp.com>; linux-
+> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; dl-linux-imx <linux=
+-
+> imx@nxp.com>
+> Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
+> Subject: [PATCH v2] caam: init-clk based on caam-page0-access
 >=20
-> Where are the import/export functions?
-
-Sorry, I miss understand you. What do you mean by "import/epxort
-functions"?
-
+> CAAM clock initialization to be done based on, soc specific info stored i=
+n struct
+> caam_imx_data:
+> - caam-page0-access flag
+> - num_clks
 >=20
-> Cheers,
-> --=20
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Signed-off-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+> ---
+> v2:
+>  - Considering the OPTEE enablement check too, for setting the
+>    variable 'reg_access'.
+>=20
+>  drivers/crypto/caam/ctrl.c | 25 +++++++++++++++++++++++--
+>  1 file changed, 23 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c inde=
+x
+> bdf367f3f679..355ff92f4549 100644
+> --- a/drivers/crypto/caam/ctrl.c
+> +++ b/drivers/crypto/caam/ctrl.c
+> @@ -512,6 +512,7 @@ static const struct of_device_id caam_match[] =3D
+> {  MODULE_DEVICE_TABLE(of, caam_match);
+>=20
+>  struct caam_imx_data {
+> +	bool page0_access;
+>  	const struct clk_bulk_data *clks;
+>  	int num_clks;
+>  };
+> @@ -524,6 +525,7 @@ static const struct clk_bulk_data caam_imx6_clks[] =
+=3D {  };
+>=20
+>  static const struct caam_imx_data caam_imx6_data =3D {
+> +	.page0_access =3D true,
+>  	.clks =3D caam_imx6_clks,
+>  	.num_clks =3D ARRAY_SIZE(caam_imx6_clks),  }; @@ -534,6 +536,7 @@
+> static const struct clk_bulk_data caam_imx7_clks[] =3D {  };
+>=20
+>  static const struct caam_imx_data caam_imx7_data =3D {
+> +	.page0_access =3D true,
+>  	.clks =3D caam_imx7_clks,
+>  	.num_clks =3D ARRAY_SIZE(caam_imx7_clks),  }; @@ -545,6 +548,7 @@
+> static const struct clk_bulk_data caam_imx6ul_clks[] =3D {  };
+>=20
+>  static const struct caam_imx_data caam_imx6ul_data =3D {
+> +	.page0_access =3D true,
+>  	.clks =3D caam_imx6ul_clks,
+>  	.num_clks =3D ARRAY_SIZE(caam_imx6ul_clks),  }; @@ -554,15 +558,23
+> @@ static const struct clk_bulk_data caam_vf610_clks[] =3D {  };
+>=20
+>  static const struct caam_imx_data caam_vf610_data =3D {
+> +	.page0_access =3D true,
+>  	.clks =3D caam_vf610_clks,
+>  	.num_clks =3D ARRAY_SIZE(caam_vf610_clks),  };
+>=20
+> +static const struct caam_imx_data caam_imx8ulp_data =3D {
+> +	.page0_access =3D false,
+> +	.clks =3D NULL,
+> +	.num_clks =3D 0,
+> +};
+> +
+>  static const struct soc_device_attribute caam_imx_soc_table[] =3D {
+>  	{ .soc_id =3D "i.MX6UL", .data =3D &caam_imx6ul_data },
+>  	{ .soc_id =3D "i.MX6*",  .data =3D &caam_imx6_data },
+>  	{ .soc_id =3D "i.MX7*",  .data =3D &caam_imx7_data },
+>  	{ .soc_id =3D "i.MX8M*", .data =3D &caam_imx7_data },
+> +	{ .soc_id =3D "i.MX8ULP", .data =3D &caam_imx8ulp_data },
+>  	{ .soc_id =3D "VF*",     .data =3D &caam_vf610_data },
+>  	{ .family =3D "Freescale i.MX" },
+>  	{ /* sentinel */ }
+> @@ -860,6 +872,7 @@ static int caam_probe(struct platform_device *pdev)
+>  	int pg_size;
+>  	int BLOCK_OFFSET =3D 0;
+>  	bool reg_access =3D true;
+> +	const struct caam_imx_data *imx_soc_data;
+>=20
+>  	ctrlpriv =3D devm_kzalloc(&pdev->dev, sizeof(*ctrlpriv), GFP_KERNEL);
+>  	if (!ctrlpriv)
+> @@ -889,7 +902,15 @@ static int caam_probe(struct platform_device *pdev)
+>=20
+>  		reg_access =3D !ctrlpriv->optee_en;
+>=20
+> -		if (!imx_soc_match->data) {
+> +		if (imx_soc_match->data) {
+> +			imx_soc_data =3D imx_soc_match->data;
+> +			reg_access =3D reg_access && imx_soc_data-
+> >page0_access;
+> +			/*
+> +			 * CAAM clocks cannot be controlled from kernel.
+> +			 */
+> +			if (!imx_soc_data->num_clks)
+> +				goto iomap_ctrl;
+> +		} else {
+>  			dev_err(dev, "No clock data provided for i.MX SoC");
+>  			return -EINVAL;
+>  		}
+> @@ -899,7 +920,7 @@ static int caam_probe(struct platform_device *pdev)
+>  			return ret;
+>  	}
+>=20
+> -
+> +iomap_ctrl:
+>  	/* Get configuration properties from device tree */
+>  	/* First, get register page */
+>  	ctrl =3D devm_of_iomap(dev, nprop, 0, NULL);
+> --
+> 2.34.1
 
---=20
-Thank you,
-Alexey=
