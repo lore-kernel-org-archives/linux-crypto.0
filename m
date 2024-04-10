@@ -1,240 +1,192 @@
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2130.outbound.protection.outlook.com [40.107.7.130])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2138.outbound.protection.outlook.com [40.107.94.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17EA15ADAA;
-	Wed, 10 Apr 2024 11:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.7.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE83168DC;
+	Wed, 10 Apr 2024 22:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.138
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712748347; cv=fail; b=PaHyCViNcGXePkum8VatPHHjEG5yNZe9/6nHILyJoAIgCpflrIG9Yy97ScEjxoeMjxYa+816hBNiy2lzhTFlIZs+jmSXUxQfj44fqzJtBvKGsT7FdNDvEo+uFCsfCSmQkpjueF7g+rp5XmSN9zSyg9EYqG/XDmrBAE0bYbdam3w=
+	t=1712787276; cv=fail; b=Y7emuZ1oMKCH5B8utgaS7CoSuK9r8cuJTgtYc79Bl6Aq96+TS04Fs5uwwOc8cUrQzCu1h076mKCD9qfzEQQ78Sk7fnREIfR3K6AReAOR44x0n0biTzL6EgqOMjLnpk9MbBQq1fwvyPr0Jx4ukNt8A+SDMTBo0rD1DtfjfXhhMXY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712748347; c=relaxed/simple;
-	bh=r/cVI1RNFKGwWjbrpkrJuN5bsV5Q5Dshk4GViG0AbQo=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DFJYdEzv/hVDJ72DLNZDsO68zd36PZvhhWoOTIXoGeOvyY+/6RF6e3raIBx5a0GwwZwDmsmiImCHehgLf7TvseplfXB3vbohwIoC3llxib1THrG5JAf3CyH6hdaNEeXvmTu8FDcBSGbhYvRT4lBrp66pK2nybWrOMzha8DfKSK8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=CqsUJchD; arc=fail smtp.client-ip=40.107.7.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1712787276; c=relaxed/simple;
+	bh=P2KArS8Jc1Is63tOmqxz4pBy68nDOqZm9dwPMkHd+/Y=;
+	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
+	 Content-Type:MIME-Version; b=T8tmC8qw++AdSznFzPNRxRXzebD1twDD/xnxcSE55xK4kqVdt0tX6IWDJdNr2qwOZo2fC5Ap8Dq3q2aETijvyI66lR5+AY5AZJ3tWTWVcBaTyRqGMmKC7JyDrYdxv1uL/mHxJb5KPPlta6QZZMZs2G/3IYY9BWAgB0CsjOUHEEU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=O2NJv27O; arc=fail smtp.client-ip=40.107.94.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="CqsUJchD"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="O2NJv27O"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NQpUNWDPCISQ+tYsQNdvG/0rSELhUBDz7JuF2gOyzczYEPOL0f3ITUGOK5ArhvOxbC5owDxJvLGzz0XgsLIYmqbcQjyzeNGTBsUT9Jyl5yVjMZJ58yEc9sptqFCw85WWupymMIUK5aZAdbTmLd2DFHm/6HWit4CTtjbzy1gWc/hP6Xo53Gc+/WefYw7rg67nyci4Sd2bydYyXKZB/yIXF+1XSfi6NdppskK0sZWkV8GeyyExnyM9nnzG7YhXNx15n5o7n2L+jOEghkpoqFYAmQ1LIr4DLnFS66bkEoaYbnZJ5IaIab1Ss2PQVkrLYQnr2cCnSDnoKcmG3CeCG+Ap7w==
+ b=nbcNLcAguQpmFlIIQ2a+au6hKRqm4I4zrhWzV0jxB3+oCffWdKCXV0aQhXE92ZaHeQzmfjb0YgbfFdL7tcrHT3kDxSB+M/XXLlIOZLafa03MRFkFoVso9dXwv/n3o0xIhLGibBNmlWlkQ3K7B1lsU16jj8gCxsoXvcABBslU2+02u5ei+9ydrmg/SsEsAqlLLgHYQxt/FNk+RARWS86HDp9dyVSSrrDRxDoVjyBDeIot/gmrxU2ilIJ/7KVOAwSh379Gvxe5E8iDWc5X10OmQ74mqFFr7QYLDj2HtfD4mzpfot7JHHhBWH/ACP/5ex74sOGoY33ow2xZp55+j6n/ow==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=d6fPQr/d0T408iWJ4TG8lAAXFgBL5UGKwyfoj3RqeYw=;
- b=R1lUSdv2X3GDz9vSZ/jA7Ee2cfsmAEc4N942R8OW9ImQmqdtIdjGFUZH42KJ4GxJYN05f5Sa+e8N8hiP2LQnXM/qQ45tou5DYRwGdWQ8B8gRS7pkWe88M81kBj5z6EJI/XHl5VI/uLXz+6Fo0pPXwJYm0FOhzTlE8IuWy6oGD1NzMVmpV56cUj8jItmOmD/67PkCBE89n79DUxDQ5BzO84Zx/LHU0xDh1zIJUeAJFGS0NbqDvspG8YDfd6DJE+ZDVfPCF2NaJmFrRlR1Q+z9rAHCmhjZy2/sclltoyhftANetsYH7YyeKEnKKGM2F72gEGgPKRQ0LxtjXbtZ+JgOtw==
+ bh=xPwrgdURNdnWwxTClsHh/l10by57f3DRAL0QLO5tXu4=;
+ b=h5gQdWVDvNsVYzUAfaMTTr7bVPzh3eib9tUsZyj7CQkQ6w3e6xWMR+4wlzrJFb64miSciGXhQ7ow0d5ZO0Sjt3gzEi2+gknsATSd6SoEw2K8q//9LhyHTodiejGUccubKyIdHDvaOH0JeTxCZVfHd/c/nEPxDrVj/a9aWWEdpFF3VMofduKFP1zw7Gb0QaCYd2JQr1gGGr7PLs1OhpTTtIZyqlbhqCljT5UkC/P6rFy8u2y5SL5NYpo3rVc3JkAd+HzQzni68Dj/ni+ped23DkY+7+78f0El+nkUeaSnDUWYEwQleYtyeHANuHCjNwDkBlLNz7Tr1px2qxPaZBJuqg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d6fPQr/d0T408iWJ4TG8lAAXFgBL5UGKwyfoj3RqeYw=;
- b=CqsUJchDc20m1vXheQImNQZ+6RUgKakLp0iH3mBGQHJ1WqJE6eQtIzGXYiVnnZS9SQC/jUBefMhmGZGb4TukSAVXZFmNAcKwfrYGmBtsBHYu/xeGZgTRathT2+UJ8x0fX3elQY5kwUjTi7FmLgdYJETjsGzWtjsG5pO/IKRTq/M=
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com (2603:10a6:208:11a::11)
- by PAXPR04MB8444.eurprd04.prod.outlook.com (2603:10a6:102:1db::24) with
+ bh=xPwrgdURNdnWwxTClsHh/l10by57f3DRAL0QLO5tXu4=;
+ b=O2NJv27Oj4KWW+StkWwk4fKsI7lv3kV3LBvvp+M5tgd+O6iDCPIVgLJYPkFDgqviZZWjOWGZ9u1MCDqOiPyt8788ObSZzBTUf3ZhnHtTiWNRnd4AChjexQE+sc0V1/3Yo3uouxWInsf68zQvdXE56LK5t4C62L26aO8H/Xm6wTM=
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by PH7PR12MB6660.namprd12.prod.outlook.com (2603:10b6:510:212::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.55; Wed, 10 Apr
- 2024 11:25:41 +0000
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::4662:223:b694:bbc7]) by AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::4662:223:b694:bbc7%6]) with mapi id 15.20.7409.053; Wed, 10 Apr 2024
- 11:25:41 +0000
-From: Gaurav Jain <gaurav.jain@nxp.com>
-To: Pankaj Gupta <pankaj.gupta@nxp.com>, Horia Geanta <horia.geanta@nxp.com>,
-	Varun Sethi <V.Sethi@nxp.com>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
-	Iuliana Prodan <iuliana.prodan@nxp.com>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, dl-linux-imx <linux-imx@nxp.com>
-Subject: RE: [PATCH v2] caam: init-clk based on caam-page0-access
-Thread-Topic: [PATCH v2] caam: init-clk based on caam-page0-access
-Thread-Index: AQHaix0ngiIpygDrSUiyyhiPAYwZZrFhXRsA
-Date: Wed, 10 Apr 2024 11:25:41 +0000
-Message-ID:
- <AM0PR04MB6004F1C5AC6CE78447FF555BE7062@AM0PR04MB6004.eurprd04.prod.outlook.com>
-References: <20240410075815.4030570-1-pankaj.gupta@nxp.com>
-In-Reply-To: <20240410075815.4030570-1-pankaj.gupta@nxp.com>
-Accept-Language: en-US
+ 2024 22:14:31 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1032:4da5:7572:508]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1032:4da5:7572:508%6]) with mapi id 15.20.7409.042; Wed, 10 Apr 2024
+ 22:14:31 +0000
+Message-ID: <14943670-54d7-2255-61ae-046e23e58585@amd.com>
+Date: Wed, 10 Apr 2024 17:14:27 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM0PR04MB6004:EE_|PAXPR04MB8444:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- KrjLSC547Ozh4LS5ZbVb6MqNE9ml7V5sK3d3PJ+LIboAFydCf8YF0WNAXi0WnzdaqzfU8MLaK5IM+b7pRDNHp5B1vMVZ8ckx2Rlh2BPoDGc3VRRApxb+4SO/gX4P7gRgOl5SSI8Z5NmmMDEmi4C/fDaAdi6yZqPo90+ErxN8B2PFWQ7KOGEgU+6egYeswJfxN8/jhBxyxDBGnDEWmZxy8+adO5w84s+BJsIOD76M/dCsKjmLTy3SY0qitGP4T03JS8f3uN7SGRvhM72DpyVtkMMOIhUt0BvL/5B1aa4GwgplaWwUa/ssScOIqsv8GlSJHLeLHEN9PVQ0AGiz5YRXTXRdgd9YrN2yvOMTRh9+YaduxhwSJVbhW/RBf4LdyxQQkVdzcE90uIfQkGYH/2d5TDFwk2jY3w7L8SgXw+yovF172haSYI5bJBb1uKgYY+kyjnTfkll9wzo1zmkw7F9yYaWRZdWeJ/nUToTH6yOy1JqUen5r8swUNeOhfh78KhVppF/3w3sjYwTURtv5e5tfl2GIBLili1ffVED29E4ti3OweCAg7jbh3KdV5dJE2rg3MEY4mBhksOBA/foFrmILfVG2Ehd5mr/1Bll6KPmsxcpVN5ZCWkeB+2wAViK0NxaqXOm6i5QxTVxOmCM+l8DQSWjn6f7q0CaEgXoXUy0gRNI=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6004.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?TcEdoe6MnejzuQklJ3BDvJ3xSYxBdgVNTxN/NIMZuIG2aM+kL8br4St96n0M?=
- =?us-ascii?Q?O8kygaHmvc8xz0ICBCartAu8uXQU2IehHOPr+AjfKRiU8tCQYLDIrImAL05i?=
- =?us-ascii?Q?uBChSl6DkTMKrcjq/cUc+dC+VJquUYWqk+E44Z8yK9A8IRNx7tLumlRb+CfE?=
- =?us-ascii?Q?yED6+UoUsp0KO2MW4LtE4NYNYQuniZRAiMMOQg+Iy2ZW/+shHYnCln31in3+?=
- =?us-ascii?Q?decPmGCJMy5REeWV03ck3f+wzanSm1JgjC27Bah7q8WcCtdoEY7itqLuB6T2?=
- =?us-ascii?Q?XMhYGmYvRaFalnTLXefDEIkedU7qbgfkkD8ixqGFKub+lw/rY/7d76HifmXP?=
- =?us-ascii?Q?2E89SaqSi5D57WN+hZoQu1ogf2yTaGYd2fnlI8SexJ71Q4dRUDsxdb3IXtUw?=
- =?us-ascii?Q?YmmfGyVrD3jq4mMenMkOxijoRELC1JoCZ306BJlemZLhEDwdOxFo588Phn0p?=
- =?us-ascii?Q?q42mMaCcg7pTEBOkBQZ9OUK0Y9IudJcv8WQ+Mxr9mb5cqPcf47hqWRmV2KaG?=
- =?us-ascii?Q?z/gBDd+I/c/hMmmPMyvxT8k+WYjLltgyKFFZiQZVmcnj18WLjjARBFljWFv7?=
- =?us-ascii?Q?VxdMJweirCxnLiS7bZwklDw7dg5g6JLsVlPR+ZKERNrjFQrvPECApekYfel9?=
- =?us-ascii?Q?rLkd/Z0GZ25FL+PPHfiEicXCntgcslJLGJEBkWY+Ak+8VzYITxDKx64r3Wxs?=
- =?us-ascii?Q?JhkwZXrapy1gM3jOtvrm9gowS0RPzP0KVRWNTrbJYD3orHFnTqbbqei7ur+0?=
- =?us-ascii?Q?rmIrZ5Gg/sufKITmVl7UqUrXaeDbU1yY+XAqn6gSZXcDIDCfRZrU7SrLtuhU?=
- =?us-ascii?Q?W/r+/03567u20qTaoBCiPMedz8LIypxp81jJMBtnqGd/uDEt4bSmKwd6r4Gj?=
- =?us-ascii?Q?m+0vI6qk06Q3sJBksEwF9fcQb8Wj94Ivhhu12kTwH+I+ZBkg318zxKNz0G+s?=
- =?us-ascii?Q?SZm7gqKUF/6oX+b6CNkBcj49vFT1Y7wr0ZK4DIAEuDpxkEeVb+gHFH1I29o9?=
- =?us-ascii?Q?YcFFjBwhTNj/hCLF0g6bpGKxIxyV9JjDOzdHT+j7EZdMvtVDqwkGrB4jFcRL?=
- =?us-ascii?Q?zEvMP3pydrWbgkQDssmvhOcRwaZklHwWsfpWGYvE7dKcZO19V5P54m9kziN7?=
- =?us-ascii?Q?4akIY3cJdZNInoudXQMX0C0Vsa8zbGDyuidId2sF6V9QuMr3mkW+UtJrki95?=
- =?us-ascii?Q?iLphD2w3ON5r9ovzsbmEMwGfxza7C5Ssb4tDQBAOg27rgPMhl58hSA2RYMeP?=
- =?us-ascii?Q?rajlzrGwI+VMvPrOA4GzyFHlucp/CdyGuwmAS1bXF4mh9zBKtudnnAv0V7xM?=
- =?us-ascii?Q?NwtmjoR3+T5ropM230wG4m+/EyHCW7viAKA2dQVGbUuGgooY9ZIijVv7W4ns?=
- =?us-ascii?Q?zSeQjJapGQVGiKOYLoXsEz29tbK2Ht63m4J8zAbyRMXmEp5vy5gJR51pER5a?=
- =?us-ascii?Q?qREkRlEM2VJ+jt0aqJkemAOVXeSCeWMysUIgFuiUNYtVWmgUBCarT4BxVrGW?=
- =?us-ascii?Q?qBBnpP4kLQvnkq9weU6aC3fLuaaJWHvTX5PnQLU431cqGomyEt9WWfsBdD70?=
- =?us-ascii?Q?9howI0ri/b8n6RaSUze033fLghklBH7lMUh6xpom?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, hpa@zytor.com,
+ ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+ vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+ dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+ peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+ rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+ vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+ tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+ alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
+ nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
+ Brijesh Singh <brijesh.singh@amd.com>, Alexey Kardashevskiy <aik@amd.com>
+References: <20240329225835.400662-1-michael.roth@amd.com>
+ <20240329225835.400662-27-michael.roth@amd.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v12 26/29] KVM: SEV: Provide support for SNP_GUEST_REQUEST
+ NAE event
+In-Reply-To: <20240329225835.400662-27-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0501CA0067.namprd05.prod.outlook.com
+ (2603:10b6:803:41::44) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|PH7PR12MB6660:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	QMsNGYl7GzGp0LedrukVfvmMTzeXvVfmhFwi/pGITUCZaR8O5vPdm1bEy7ApdsM++t25DQ82EEc9UmayNqfIa8U9vLXC9Nh8ZhRDsm602XhbNvDrJwV7aOlAea1p28XkDeQRNTNaeVvYB9gsEfoWkLWFR+n498ouO+TRNi/SiYJ8gEJzaOq845zwPP4h7eB/kxRH2WP0Layg9JmVjSaKrQB0c1P4V4RCYrUMzaYaoH8iBpDuAgsAwpB31XF/GJlt7DKt1XiJUkhEvJ88205sfGi3dlv9jWToc2xDyP/rTpWdi88Nj2HLoLtY1jDmKooELxeum11EkqldOiBnS+fqRaIS+8HNhmzSJGbIfPgN7d9fp43TTa8k2iJ08yZ4oxlGncYPlnxLHaGM9ROdkPhZODWxJLeDCZ/2YjeM81P60fXVc8Zz/9aXyt2WxGZIWB836mXe3nt1Lt+SMoYr3rPx1BVaHX3jUxuC71VHx8WUGITtcgmXnyU/gwaPd4hf5PE+E0ejzek6PPkYeh0GU1L1NsCAXgkqb94O+NURemznEKT2C8wNprebv+qtwgsM1rWvm5cveJNktDbKDcYRAXYZ8DAYtncTCMmJkVCw9SQa0PMCr5/fjZug6U7b1uV3hBs3X71HAGKbgShd++CsKgYOYot7VPuabR2UwdGKs26KUmM=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(1800799015)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RElwbGE1Nko2UFJDL0I0RU1sYUtLdDRaTll5aTVqUXNmVytBTVFHczhSNkt6?=
+ =?utf-8?B?eGI5M2tOak1SUjBlUndOZzdLK095TVNTN1g3d1llN3YybWZya3NzdGhpZnB2?=
+ =?utf-8?B?MjVFNFp5UDVxa1phVDFKeWppejlVdmxpV0VzNzhaVG9UWE9RRlI2aExncU5u?=
+ =?utf-8?B?NXlVTnpXZ3cvNDZuNk5GNWE4SkFUREtPZVY3c2VNZ3BwVHBPVlFFelZycnh6?=
+ =?utf-8?B?eGc4dzNMa0tHemlUY1VjZTNMWmlhWXhRRDY2SXFzTGVoZk5sTUNEemhObVYx?=
+ =?utf-8?B?VThHRDF0akMwb2FvcGdoL1lsMTBkSWR5TkFKYjZkR0RNaFM4TzNxSnRiTTh4?=
+ =?utf-8?B?dzNVaXFzVmhCN1VyOU8weGgyNFhVMGRWMVVpTEpVWHhYQ2pyb1M2alh1clVq?=
+ =?utf-8?B?UGwxcG9BQThqYyt5cGtmK09KanhRK0VNczB6Y1NxdnRaZCtNUFBFbWtxWlNH?=
+ =?utf-8?B?cnF5N3JWQ1VkTEFmMGlXZVZaQTlPZWp5QUVkQUsvTlFFSjBhZmJvWnBTRTJh?=
+ =?utf-8?B?RUtDMkJQYWRFU09FSm1pdXh6Mk1CSGw1dlhlaUF2UGZVenhSUHJVS0p0UEVV?=
+ =?utf-8?B?VWJ1dGFSdjhDVmx6Z21oMElVM21uREsvSk9QMGlzTWNvc3oySWczTDlTUWd0?=
+ =?utf-8?B?Z2RlKzRUc0xLUDZNazBIR3FQSlM2WEc4RGtlc1h6TFNtaXlkSCt0VlVVVk15?=
+ =?utf-8?B?ZGh2YSsyUk93NlFzM3BLL0NFcDN4SE5BVmVwNU5BNzNzWjQ5ckZyeGZEbUVL?=
+ =?utf-8?B?L3FkalMzVTkrblo2c3NTRFRSSWtoQ2lEZm5OUXlmem5zcWthWUk3OWUvY2Qx?=
+ =?utf-8?B?UlVldE56cjhqVFlQVGRIRkFJRzBHWUxNQmozbmIxTDdLVXY2elRSdFBWVHJK?=
+ =?utf-8?B?TC9NbGUzbFFSVU92TmFUSG1Db2RKV3ZlV3RrVy9uTUJxbUExWUEvbnZLYkZr?=
+ =?utf-8?B?K2Z3YVZ2OEVqT3lwZ0JBaXpvb01WVzNKM1lUKytMM0dCY0MzT1NIUDl1c3h2?=
+ =?utf-8?B?VDI5SWN0dkY1aXZYKzNudVBEZjVYNW5LZDRBaUErcStKMFZKTTVQb3AvN0pP?=
+ =?utf-8?B?czBWb2QzNnFuNmtrT2NwVnVwZGx0SVAvUDA3WC9mSVhlRHFXdGF1dGt1VWhX?=
+ =?utf-8?B?Q2F2ZWlPaUQ0RFNveDY1Ym9jSTh0UWM0OFhwWk1FaUZPTVFGUnN5ZitPM2l3?=
+ =?utf-8?B?Z1RCc29Oa3lDTnlEZnUvL1BjYVZrbnVicEtld3VGdUh3V2xoMmJXTFNjNGpT?=
+ =?utf-8?B?Rlc0cU1QWkQ5RHFMQVFYY0ovS1BLdEUrTEZ3em03RFc2eCt6a0Z3RTY4SlhX?=
+ =?utf-8?B?REZ2bjFCZ1kzZXV4NmxFcHNZRDdLMTdUaEN3a0RHcUpiOUxvNzA1NURONFV6?=
+ =?utf-8?B?c1VTSnJHWGZ0MDZVZ0M1WVZsMURidXhJRXBxNlhMeGszS2k3c3dxWFFwNEM3?=
+ =?utf-8?B?a3ZLdG1aQjNxREtQY3MyVDIyeVJSemNyMDFZalF2S29IbmRWbHJ5ekFHKzh0?=
+ =?utf-8?B?NUdPYUc2QUZjbTM5ZFpqV3ZSaVRacXZBS2FOMXVneit6bUdpNzFGTDMxbzYw?=
+ =?utf-8?B?Y1NUK3o1eHIyWS9QbU9nRnorS2hYSlhoREVuSkhycDFHcTU4YW5adUNaZENI?=
+ =?utf-8?B?OENyY2ZvRnZLT2g1MThZTFJmQkQ1VEFCYWszMXRFU1N0NTFuZk5JK0wrRGUv?=
+ =?utf-8?B?OE04ZUc0alNJNk43UDlaVVJGTVVXWnBLMytXdlc2NTV6UlZCOTJCZlRETDI1?=
+ =?utf-8?B?d29GVkxLK3llSWhVNjNqSjk5VTdoam85bWY4a05zSzBrdDF2TmV6T1drN05W?=
+ =?utf-8?B?WkRrR3pCN3VROHhDWXgvcXRzRlRoYTMyMW4vRllwK3FiM1U5cklPWHpLdTRi?=
+ =?utf-8?B?SjdmTGtOWENZRnZ4amVZV1Z3Ykh5VVpiZTlkQmNNV2NDc0plakJIYmJGNHUy?=
+ =?utf-8?B?YTd5d0lsSDBPYk4zZTZOMFFIWjVOTGdFN0poVXkzQjhzZjlkK0szWWRrZDVZ?=
+ =?utf-8?B?SDV2Mm5Yd2Y0MEdVNGdicHA1Y0RhaGRpUGc5QXNGZmppODdDaTB2WnhPYkNV?=
+ =?utf-8?B?SFp4YXZObkZSZ2hpVUJFTUdMRU1LWGorREpOMlNVdjlGOVJnd3RXNEd6eEVq?=
+ =?utf-8?Q?8NxOm3C6xHs4awO03WlduKdvp?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 424bf5e8-a767-4c86-149a-08dc59ab988f
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6004.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e5cb7e23-da0d-4872-98ba-08dc5950f4b1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Apr 2024 11:25:41.6849
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2024 22:14:31.5077
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dPHGx+/6APXhvfNkf7FNQWTZRDN5XsfMBLJm3AXdAFTIpKyC3L2VeXBOZ2YQAft4H0AkuSWVnLzvAUjbnOLVnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8444
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VxzO3qKox5Z4m2YImK9V/grU1qJFynNsw3jWuolbxSV0lEOi+O1JSEsQm3pZUCKun5g06bTdCq4vnPXFXCp7Tw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6660
 
-Reviewed-by: Gaurav Jain <gaurav.jain@nxp.com>
+On 3/29/24 17:58, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> Version 2 of GHCB specification added support for the SNP Guest Request
+> Message NAE event. The event allows for an SEV-SNP guest to make
+> requests to the SEV-SNP firmware through hypervisor using the
+> SNP_GUEST_REQUEST API defined in the SEV-SNP firmware specification.
+> 
+> This is used by guests primarily to request attestation reports from
+> firmware. There are other request types are available as well, but the
+> specifics of what guest requests are being made are opaque to the
+> hypervisor, which only serves as a proxy for the guest requests and
+> firmware responses.
+> 
+> Implement handling for these events.
+> 
+> Co-developed-by: Alexey Kardashevskiy <aik@amd.com>
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 
-> -----Original Message-----
-> From: Pankaj Gupta <pankaj.gupta@nxp.com>
-> Sent: Wednesday, April 10, 2024 1:28 PM
-> To: Gaurav Jain <gaurav.jain@nxp.com>; Horia Geanta <horia.geanta@nxp.com=
->;
-> Varun Sethi <V.Sethi@nxp.com>; herbert@gondor.apana.org.au;
-> davem@davemloft.net; Iuliana Prodan <iuliana.prodan@nxp.com>; linux-
-> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; dl-linux-imx <linux=
--
-> imx@nxp.com>
-> Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
-> Subject: [PATCH v2] caam: init-clk based on caam-page0-access
->=20
-> CAAM clock initialization to be done based on, soc specific info stored i=
-n struct
-> caam_imx_data:
-> - caam-page0-access flag
-> - num_clks
->=20
-> Signed-off-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+You need to add a Co-developed-by: for Asish here.
+
+> [mdr: ensure FW command failures are indicated to guest, drop extended
+>   request handling to be re-written as separate patch, massage commit]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+
+One minor comment below should another version be required, otherwise:
+
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+
 > ---
-> v2:
->  - Considering the OPTEE enablement check too, for setting the
->    variable 'reg_access'.
->=20
->  drivers/crypto/caam/ctrl.c | 25 +++++++++++++++++++++++--
->  1 file changed, 23 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c inde=
-x
-> bdf367f3f679..355ff92f4549 100644
-> --- a/drivers/crypto/caam/ctrl.c
-> +++ b/drivers/crypto/caam/ctrl.c
-> @@ -512,6 +512,7 @@ static const struct of_device_id caam_match[] =3D
-> {  MODULE_DEVICE_TABLE(of, caam_match);
->=20
->  struct caam_imx_data {
-> +	bool page0_access;
->  	const struct clk_bulk_data *clks;
->  	int num_clks;
->  };
-> @@ -524,6 +525,7 @@ static const struct clk_bulk_data caam_imx6_clks[] =
-=3D {  };
->=20
->  static const struct caam_imx_data caam_imx6_data =3D {
-> +	.page0_access =3D true,
->  	.clks =3D caam_imx6_clks,
->  	.num_clks =3D ARRAY_SIZE(caam_imx6_clks),  }; @@ -534,6 +536,7 @@
-> static const struct clk_bulk_data caam_imx7_clks[] =3D {  };
->=20
->  static const struct caam_imx_data caam_imx7_data =3D {
-> +	.page0_access =3D true,
->  	.clks =3D caam_imx7_clks,
->  	.num_clks =3D ARRAY_SIZE(caam_imx7_clks),  }; @@ -545,6 +548,7 @@
-> static const struct clk_bulk_data caam_imx6ul_clks[] =3D {  };
->=20
->  static const struct caam_imx_data caam_imx6ul_data =3D {
-> +	.page0_access =3D true,
->  	.clks =3D caam_imx6ul_clks,
->  	.num_clks =3D ARRAY_SIZE(caam_imx6ul_clks),  }; @@ -554,15 +558,23
-> @@ static const struct clk_bulk_data caam_vf610_clks[] =3D {  };
->=20
->  static const struct caam_imx_data caam_vf610_data =3D {
-> +	.page0_access =3D true,
->  	.clks =3D caam_vf610_clks,
->  	.num_clks =3D ARRAY_SIZE(caam_vf610_clks),  };
->=20
-> +static const struct caam_imx_data caam_imx8ulp_data =3D {
-> +	.page0_access =3D false,
-> +	.clks =3D NULL,
-> +	.num_clks =3D 0,
-> +};
-> +
->  static const struct soc_device_attribute caam_imx_soc_table[] =3D {
->  	{ .soc_id =3D "i.MX6UL", .data =3D &caam_imx6ul_data },
->  	{ .soc_id =3D "i.MX6*",  .data =3D &caam_imx6_data },
->  	{ .soc_id =3D "i.MX7*",  .data =3D &caam_imx7_data },
->  	{ .soc_id =3D "i.MX8M*", .data =3D &caam_imx7_data },
-> +	{ .soc_id =3D "i.MX8ULP", .data =3D &caam_imx8ulp_data },
->  	{ .soc_id =3D "VF*",     .data =3D &caam_vf610_data },
->  	{ .family =3D "Freescale i.MX" },
->  	{ /* sentinel */ }
-> @@ -860,6 +872,7 @@ static int caam_probe(struct platform_device *pdev)
->  	int pg_size;
->  	int BLOCK_OFFSET =3D 0;
->  	bool reg_access =3D true;
-> +	const struct caam_imx_data *imx_soc_data;
->=20
->  	ctrlpriv =3D devm_kzalloc(&pdev->dev, sizeof(*ctrlpriv), GFP_KERNEL);
->  	if (!ctrlpriv)
-> @@ -889,7 +902,15 @@ static int caam_probe(struct platform_device *pdev)
->=20
->  		reg_access =3D !ctrlpriv->optee_en;
->=20
-> -		if (!imx_soc_match->data) {
-> +		if (imx_soc_match->data) {
-> +			imx_soc_data =3D imx_soc_match->data;
-> +			reg_access =3D reg_access && imx_soc_data-
-> >page0_access;
-> +			/*
-> +			 * CAAM clocks cannot be controlled from kernel.
-> +			 */
-> +			if (!imx_soc_data->num_clks)
-> +				goto iomap_ctrl;
-> +		} else {
->  			dev_err(dev, "No clock data provided for i.MX SoC");
->  			return -EINVAL;
->  		}
-> @@ -899,7 +920,7 @@ static int caam_probe(struct platform_device *pdev)
->  			return ret;
->  	}
->=20
-> -
-> +iomap_ctrl:
->  	/* Get configuration properties from device tree */
->  	/* First, get register page */
->  	ctrl =3D devm_of_iomap(dev, nprop, 0, NULL);
-> --
-> 2.34.1
+>   arch/x86/kvm/svm/sev.c         | 83 ++++++++++++++++++++++++++++++++++
+>   include/uapi/linux/sev-guest.h |  9 ++++
+>   2 files changed, 92 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 658116537f3f..f56f04553e81 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
 
+>   
+> +static bool snp_setup_guest_buf(struct kvm *kvm, struct sev_data_snp_guest_request *data,
+> +				gpa_t req_gpa, gpa_t resp_gpa)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	kvm_pfn_t req_pfn, resp_pfn;
+> +
+> +	if (!IS_ALIGNED(req_gpa, PAGE_SIZE) || !IS_ALIGNED(resp_gpa, PAGE_SIZE))
+
+Minor, but you can use PAGE_ALIGNED() here.
+
+Thanks,
+Tom
+
+> +		return false;
