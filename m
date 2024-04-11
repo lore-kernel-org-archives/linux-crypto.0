@@ -1,183 +1,222 @@
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3930B13B2A8;
-	Thu, 11 Apr 2024 09:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA011422DB
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2024 09:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712828386; cv=none; b=PusHeacMlNx8UuWmN4NbKIVMZcoaG4BKdYp/SRlPNHPaGq7Rwb+PW/8TeXzmByAFPL92qZzyKbEJcOZ4NenJa5ad2MTA0JAHKNKLmsVfQq50PurIT2O6Ec5W45O9pDBU34ahT4O7JZEVWwZkM5L1RPSqmMbfk9KKMxTPd13di5U=
+	t=1712828659; cv=none; b=caRMrf9fQTtQg2kMug00F+m+7d2tLUMkqE9br6B+KGWyHEHtoFAn0/U/V06aMxuRRo9e+UEUZYMs9fISTqt6LQsooxFyGScuRE1CyK/l+ZzeFKVXZVd/6EbEP9cHXI+JUdsLeeCDMAw5HIEpnhQO1tK1DkW1rIepurFzapHU2LE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712828386; c=relaxed/simple;
-	bh=wanp9p18Kaf0ShHZ0lGWcX4M0b7lk+ryk6Qlal5cEOU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=V6pVbqzfPJc7ZepFHHLG6R+/HQ+5hm4Dc0FsZoEHB3Hc68T4bRN5eJ70O2/BbP32elGL92pHfIMI7/c/cL3fCAZO/Gp+YmlWgbpxnSo7s7CkOgg+2cwxg9N81U08ZmXL4G3l725gJxlw0bjioDZYAED3jKQCnnonw4a5+zdEqZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=RH23LTku; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+	s=arc-20240116; t=1712828659; c=relaxed/simple;
+	bh=4ytJZXrlLIX4MDl48jzj1jv5bmJfqXaT8kzbsZkajJU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pTe8GJBbZd+Af/bNE7y8FTZ+ZlEFrvDNgJBdy5h9Vn2AmfWZO5pKlDQklq/j64CCyJFDib7sQt4PuEqItZ4pOI0sWE8M65W5nvtZO5fNXyimDRAcxkVXM5aULSRVYHbUCMavsmx6luxt/GjUiR8CDzIGbZcsOuksxcrNU1yZjQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HKcW0jfg; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="RH23LTku"
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43B7Pfi7029833;
-	Thu, 11 Apr 2024 11:38:52 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=6rfS5zPiSmzZMMxQ4v6y7X7sH1FVnmMas6q+NGiPbP0=; b=RH
-	23LTkuSOQZgrLqSQPcyDWEaHansF0FyzusSDHHejYeeQubA/RF03+Fcw0JO1uxMG
-	vxF1TpPcpGgm0D5a22KTGFQ7B10VA0NGWF7kWPIuCEes6xP+vVpTvGT3WcMqMrto
-	D4vR5lrxgA/glhjYfqpRe5c0L23nsZVK7DVfPfG0lEV5OCEp0AXAts6p2Sz8Eqn+
-	pfNDTysrxZZj3w6etWkPop5DdColzGvEkh0mS5oMq1L4D7HeqW1uQ1DiKhu8ho9x
-	WWExS/Zmj9aq87LkaFiH+L0wv8VNYlPBEg0uHS/sXlEIu+kMGooWvN+/JWrTbuwL
-	XfW02l4cyVpCxpiEPg5w==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3xbfy12h6s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Apr 2024 11:38:51 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id D322A4002D;
-	Thu, 11 Apr 2024 11:38:34 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 906DE2132CA;
-	Thu, 11 Apr 2024 11:37:27 +0200 (CEST)
-Received: from [10.48.86.79] (10.48.86.79) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 11 Apr
- 2024 11:37:25 +0200
-Message-ID: <ee47d2e8-763f-4451-b9f3-b46ded4c1b97@foss.st.com>
-Date: Thu, 11 Apr 2024 11:37:24 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HKcW0jfg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712828657; x=1744364657;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4ytJZXrlLIX4MDl48jzj1jv5bmJfqXaT8kzbsZkajJU=;
+  b=HKcW0jfg8VrxoE5XHFV2eYspoxgft2Vq4GcJSykfNtU66skfWPlkWTLC
+   g+1whMYVNJCI+Xai7yEB4Ff1dpAe2GbS6RwmLcEMVCVLBUGjaaWOkIs7g
+   VtGxc2Yuf61bf/hAfMvLEJIlYHmkyLgu0dwu3tciDnDzGILyOoJEmmFI7
+   hUz95tT9r65/uoGtbXadxt/L+MDMZm/E+dS0HJBXzhNfOd+vvfFyRvoGP
+   2cxNyDX3l7Z5/7rZb3BEUPC+6r74n7hzZH9eDq3QhQ7shJpkdPli7c423
+   J/EsWMLlV3CbMLh9SY1Qh8qR4qyVsbZwzKVz79wSHric7CUVHEDAAaOsi
+   Q==;
+X-CSE-ConnectionGUID: 3e5da3R7RjaKkGAETatIFw==
+X-CSE-MsgGUID: MkaYAJOfSoiAVWZoOtkQBA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="8087468"
+X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
+   d="scan'208";a="8087468"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 02:44:16 -0700
+X-CSE-ConnectionGUID: jpPfTrzdQhatoxeLaYzNpg==
+X-CSE-MsgGUID: NdNp+182QEWC/FWqEvKzQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
+   d="scan'208";a="20900588"
+Received: from r031s002_zp31l10c01.deacluster.intel.com (HELO localhost.localdomain) ([10.219.171.29])
+  by fmviesa007.fm.intel.com with ESMTP; 11 Apr 2024 02:44:15 -0700
+From: Damian Muszynski <damian.muszynski@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Damian Muszynski <damian.muszynski@intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - implement dh fallback for primes > 4K
+Date: Thu, 11 Apr 2024 11:24:58 +0200
+Message-ID: <20240411092526.127182-1-damian.muszynski@intel.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 00/13] Introduce STM32 Firewall framework
-To: Rob Herring <robh+dt@kernel.org>
-CC: Gatien Chevallier <gatien.chevallier@foss.st.com>,
-        <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <vkoul@kernel.org>, <jic23@kernel.org>, <olivier.moysan@foss.st.com>,
-        <arnaud.pouliquen@foss.st.com>, <mchehab@kernel.org>,
-        <fabrice.gasnier@foss.st.com>, <andi.shyti@kernel.org>,
-        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <hugues.fruchet@foss.st.com>, <lee@kernel.org>,
-        <will@kernel.org>, <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
-        <peng.fan@oss.nxp.com>, <lars@metafoo.de>, <rcsekar@samsung.com>,
-        <wg@grandegger.com>, <mkl@pengutronix.de>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20240105130404.301172-1-gatien.chevallier@foss.st.com>
- <61608010-fbce-46c6-a83d-94c04d0f000d@foss.st.com>
- <CAL_JsqJTiBK3qzdMzL-ZuARosKGqnf_PjyCj13_H=V415y9sHQ@mail.gmail.com>
-Content-Language: en-US
-From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
-In-Reply-To: <CAL_JsqJTiBK3qzdMzL-ZuARosKGqnf_PjyCj13_H=V415y9sHQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-11_03,2024-04-09_01,2023-05-22_02
 
-Hi Rob
+The Intel QAT driver provides support for the Diffie-Hellman (DH)
+algorithm, limited to prime numbers up to 4K. This driver is used
+by default on platforms with integrated QAT hardware for all DH requests.
+This has led to failures with algorithms requiring larger prime sizes,
+such as ffdhe6144.
 
-On 4/9/24 19:13, Rob Herring wrote:
-> On Mon, Apr 8, 2024 at 3:44 AM Alexandre TORGUE
-> <alexandre.torgue@foss.st.com> wrote:
->>
->> Hi Gatien,
->>
->> On 1/5/24 14:03, Gatien Chevallier wrote:
->>> Introduce STM32 Firewall framework for STM32MP1x and STM32MP2x
->>> platforms. STM32MP1x(ETZPC) and STM32MP2x(RIFSC) Firewall controllers
->>> register to the framework to offer firewall services such as access
->>> granting.
->>>
->>> This series of patches is a new approach on the previous STM32 system
->>> bus, history is available here:
->>> https://lore.kernel.org/lkml/20230127164040.1047583/
->>>
->>> The need for such framework arises from the fact that there are now
->>> multiple hardware firewalls implemented across multiple products.
->>> Drivers are shared between different products, using the same code.
->>> When it comes to firewalls, the purpose mostly stays the same: Protect
->>> hardware resources. But the implementation differs, and there are
->>> multiple types of firewalls: peripheral, memory, ...
->>>
->>> Some hardware firewall controllers such as the RIFSC implemented on
->>> STM32MP2x platforms may require to take ownership of a resource before
->>> being able to use it, hence the requirement for firewall services to
->>> take/release the ownership of such resources.
->>>
->>> On the other hand, hardware firewall configurations are becoming
->>> more and more complex. These mecanisms prevent platform crashes
->>> or other firewall-related incoveniences by denying access to some
->>> resources.
->>>
->>> The stm32 firewall framework offers an API that is defined in
->>> firewall controllers drivers to best fit the specificity of each
->>> firewall.
->>>
->>> For every peripherals protected by either the ETZPC or the RIFSC, the
->>> firewall framework checks the firewall controlelr registers to see if
->>> the peripheral's access is granted to the Linux kernel. If not, the
->>> peripheral is configured as secure, the node is marked populated,
->>> so that the driver is not probed for that device.
->>>
->>> The firewall framework relies on the access-controller device tree
->>> binding. It is used by peripherals to reference a domain access
->>> controller. In this case a firewall controller. The bus uses the ID
->>> referenced by the access-controller property to know where to look
->>> in the firewall to get the security configuration for the peripheral.
->>> This allows a device tree description rather than a hardcoded peripheral
->>> table in the bus driver.
->>>
->>> The STM32 ETZPC device is responsible for filtering accesses based on
->>> security level, or co-processor isolation for any resource connected
->>> to it.
->>>
->>> The RIFSC is responsible for filtering accesses based on Compartment
->>> ID / security level / privilege level for any resource connected to
->>> it.
->>>
->>> STM32MP13/15/25 SoC device tree files are updated in this series to
->>> implement this mecanism.
->>>
->>
->> ...
->>
->> After minor cosmetic fixes, series applied on stm32-next.
->> Seen with Arnd: it will be part on my next PR and will come through
->> arm-soc tree.
-> 
-> And there's some new warnings in next with it:
-> 
->        1  venc@480e0000: 'access-controllers' does not match any of the
-> regexes: 'pinctrl-[0-9]+'
->        1  vdec@480d0000: 'access-controllers' does not match any of the
-> regexes: 'pinctrl-[0-9]+'
+  alg: ffdhe6144(dh): test failed on vector 1, err=-22
+  alg: self-tests for ffdhe6144(qat-dh) (ffdhe6144(dh)) failed (rc=-22)
 
-Yes I noticed it to my colleague. YAML update has been sent for VEND/VDENC.
+Implement a fallback mechanism when an unsupported request is received.
 
-https://lore.kernel.org/lkml/171276671618.403884.13818480350194550959.robh@kernel.org/T/
+Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ .../intel/qat/qat_common/qat_asym_algs.c      | 66 +++++++++++++++++--
+ 1 file changed, 60 insertions(+), 6 deletions(-)
 
-As soon as it is acked I could merge it in my tree.
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
+index 4128200a9032..85c682e248fb 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
+@@ -110,6 +110,8 @@ struct qat_dh_ctx {
+ 	unsigned int p_size;
+ 	bool g2;
+ 	struct qat_crypto_instance *inst;
++	struct crypto_kpp *ftfm;
++	bool fallback;
+ } __packed __aligned(64);
+ 
+ struct qat_asym_request {
+@@ -381,6 +383,36 @@ static int qat_dh_compute_value(struct kpp_request *req)
+ 	return ret;
+ }
+ 
++static int qat_dh_generate_public_key(struct kpp_request *req)
++{
++	struct kpp_request *nreq = kpp_request_ctx(req);
++	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
++	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
++
++	if (ctx->fallback) {
++		memcpy(nreq, req, sizeof(*req));
++		kpp_request_set_tfm(nreq, ctx->ftfm);
++		return crypto_kpp_generate_public_key(nreq);
++	}
++
++	return qat_dh_compute_value(req);
++}
++
++static int qat_dh_compute_shared_secret(struct kpp_request *req)
++{
++	struct kpp_request *nreq = kpp_request_ctx(req);
++	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
++	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
++
++	if (ctx->fallback) {
++		memcpy(nreq, req, sizeof(*req));
++		kpp_request_set_tfm(nreq, ctx->ftfm);
++		return crypto_kpp_compute_shared_secret(nreq);
++	}
++
++	return qat_dh_compute_value(req);
++}
++
+ static int qat_dh_check_params_length(unsigned int p_len)
+ {
+ 	switch (p_len) {
+@@ -398,9 +430,6 @@ static int qat_dh_set_params(struct qat_dh_ctx *ctx, struct dh *params)
+ 	struct qat_crypto_instance *inst = ctx->inst;
+ 	struct device *dev = &GET_DEV(inst->accel_dev);
+ 
+-	if (qat_dh_check_params_length(params->p_size << 3))
+-		return -EINVAL;
+-
+ 	ctx->p_size = params->p_size;
+ 	ctx->p = dma_alloc_coherent(dev, ctx->p_size, &ctx->dma_p, GFP_KERNEL);
+ 	if (!ctx->p)
+@@ -454,6 +483,13 @@ static int qat_dh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ 	if (crypto_dh_decode_key(buf, len, &params) < 0)
+ 		return -EINVAL;
+ 
++	if (qat_dh_check_params_length(params.p_size << 3)) {
++		ctx->fallback = true;
++		return crypto_kpp_set_secret(ctx->ftfm, buf, len);
++	}
++
++	ctx->fallback = false;
++
+ 	/* Free old secret if any */
+ 	qat_dh_clear_ctx(dev, ctx);
+ 
+@@ -481,6 +517,9 @@ static unsigned int qat_dh_max_size(struct crypto_kpp *tfm)
+ {
+ 	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
+ 
++	if (ctx->fallback)
++		return crypto_kpp_maxsize(ctx->ftfm);
++
+ 	return ctx->p_size;
+ }
+ 
+@@ -489,11 +528,22 @@ static int qat_dh_init_tfm(struct crypto_kpp *tfm)
+ 	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
+ 	struct qat_crypto_instance *inst =
+ 			qat_crypto_get_instance_node(numa_node_id());
++	const char *alg = kpp_alg_name(tfm);
++	unsigned int reqsize;
+ 
+ 	if (!inst)
+ 		return -EINVAL;
+ 
+-	kpp_set_reqsize(tfm, sizeof(struct qat_asym_request) + 64);
++	ctx->ftfm = crypto_alloc_kpp(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(ctx->ftfm))
++		return PTR_ERR(ctx->ftfm);
++
++	crypto_kpp_set_flags(ctx->ftfm, crypto_kpp_get_flags(tfm));
++
++	reqsize = max(sizeof(struct qat_asym_request) + 64,
++		      sizeof(struct kpp_request) + crypto_kpp_reqsize(ctx->ftfm));
++
++	kpp_set_reqsize(tfm, reqsize);
+ 
+ 	ctx->p_size = 0;
+ 	ctx->g2 = false;
+@@ -506,6 +556,9 @@ static void qat_dh_exit_tfm(struct crypto_kpp *tfm)
+ 	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
+ 	struct device *dev = &GET_DEV(ctx->inst->accel_dev);
+ 
++	if (ctx->ftfm)
++		crypto_free_kpp(ctx->ftfm);
++
+ 	qat_dh_clear_ctx(dev, ctx);
+ 	qat_crypto_put_instance(ctx->inst);
+ }
+@@ -1265,8 +1318,8 @@ static struct akcipher_alg rsa = {
+ 
+ static struct kpp_alg dh = {
+ 	.set_secret = qat_dh_set_secret,
+-	.generate_public_key = qat_dh_compute_value,
+-	.compute_shared_secret = qat_dh_compute_value,
++	.generate_public_key = qat_dh_generate_public_key,
++	.compute_shared_secret = qat_dh_compute_shared_secret,
+ 	.max_size = qat_dh_max_size,
+ 	.init = qat_dh_init_tfm,
+ 	.exit = qat_dh_exit_tfm,
+@@ -1276,6 +1329,7 @@ static struct kpp_alg dh = {
+ 		.cra_priority = 1000,
+ 		.cra_module = THIS_MODULE,
+ 		.cra_ctxsize = sizeof(struct qat_dh_ctx),
++		.cra_flags = CRYPTO_ALG_NEED_FALLBACK,
+ 	},
+ };
+ 
 
-Alex
-
-> 
-> Rob
-
-
+base-commit: 48ecf78975245006171f255f16348187e1880476
+-- 
+2.44.0
 
