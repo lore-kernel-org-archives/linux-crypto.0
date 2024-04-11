@@ -1,41 +1,58 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC7C78C6C;
-	Thu, 11 Apr 2024 16:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF5C47A48;
+	Thu, 11 Apr 2024 23:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712852745; cv=none; b=uOEUQQgTyQJ+x5UKfhOrmz2DWuG2QYCO0m3/oSX1M3Xdkln58kiFrK9rncn0senLM25V6tLheYF635BzkCaJm6CEQyyavZUMe5OeQsv4DtLWOJe5zFrlq1ZsvKsfdNUerJSnp7CwFRtt1oWdiBlssvSzL5r2Kd2Hc1clMAmz3ys=
+	t=1712879559; cv=none; b=iXNkU6whZqwvETC8TrIdSQ7VutJmIQplUh6NaFyp0s8qJmEnbsGfw4PsHp3cix54C8305HizT8qfDdGfxnGQ8xH/gsesPKkrym0d/lAEzDv5Urtnf+hE/1c2okD1O+1F+IhWo8oTwYL3diHkG8fWlfjRxDJu5ATlGyV/8prbUGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712852745; c=relaxed/simple;
-	bh=sclbn/VSrfoogdQKY3CA8N8Boiy93My3gD2GlPibz+k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p6dE8i0BJG5fhCGODyzmm3YJN6120zsFGoJu2wvECMHkSsJDTCpN9Ms5bat1QvKW338y+UuMVv9TZDrIWVNZscCmVNkar43vfIl6Ek1RMYEjr+sc9v9vtyk8Dn+rZTPypG4SBMlP2uan60HiFUHNZXCOYdnT1Ow7wiW082LQrps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sox4PT1d; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712879559; c=relaxed/simple;
+	bh=tgpYEE6LUepn+5geXe7MWga6OcWkQHTaKntZy3YoMzI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ciS7vJRYTWB5yZ6U3PWgfVVvpFAdaGvIt8opQ5v/Ja50aK+uxIommDRufPBR3hGxipgoexI1tbHreSXRigmW/FPx4BZ+iGRBFkIgGRmeyiJ7Z8cTgvX4AdAAg0H0hVLiVt8eGyAj1C489GskKfv48c6oiTRQQ/8cMIJrj+n9mFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=g2IQ/siG; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sox4PT1d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91CB3C4AF07;
-	Thu, 11 Apr 2024 16:25:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712852745;
-	bh=sclbn/VSrfoogdQKY3CA8N8Boiy93My3gD2GlPibz+k=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Sox4PT1dhDleQ2En1sA6z1o840zMV02X0SYTZ2GW471vgvaBH4aoGoh9W1SsDd+m3
-	 kgjawz0HP3Ajk1Zaw5IO36N9h0rmvzSV16V44eqI/cMFpX1m+OPeKGxVWAxsrX/rJP
-	 8vkjzu0hpUUt/11aWTa237pckWIRAfUTo2znanZifINMpqp1EmpHwRm1nvHTeq1/id
-	 yMpY6L0yy9lkbRlHISVyBpyy2YLMzIHV3n1/YrJm9YzKv7Pna4wP38GcY1heoOICy8
-	 pMa9GkPqn2VVdCznsHrBh16xrv+YSaN6WyewPiJYcvZQ25g9ZhzGJByxWovLy5UhSN
-	 nCs5rPSaIA6bw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Stefan Kanthak <stefan.kanthak@nexgo.de>
-Subject: [PATCH v2 4/4] crypto: x86/sha256-ni - simplify do_4rounds
-Date: Thu, 11 Apr 2024 09:23:59 -0700
-Message-ID: <20240411162359.39073-5-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240411162359.39073-1-ebiggers@kernel.org>
-References: <20240411162359.39073-1-ebiggers@kernel.org>
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="g2IQ/siG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1712879559; x=1744415559;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lB3haLy2Df6RpkVbSyqVIyO9vLkYGW4NzjkWWLDQawQ=;
+  b=g2IQ/siGRi2iAaWD0IwSeLE5sG6FiJ4qg64dwGNyeP0kJ0rdqiORy/ZH
+   2dPMJ0kgHGNKYijk5wYuej+rwY2qJA8lkN/9vry8ee486r6lXV1Sf6zPS
+   MYrJmyQRgAVv0tSrJwlmKvKL3G7d5utfn8EHWXihoywEO0XQ65XhaCpJM
+   c=;
+X-IronPort-AV: E=Sophos;i="6.07,194,1708387200"; 
+   d="scan'208";a="718520978"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 23:52:38 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:38767]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.244:2525] with esmtp (Farcaster)
+ id d8c349d6-737f-45da-a243-e0955767f67f; Thu, 11 Apr 2024 23:52:37 +0000 (UTC)
+X-Farcaster-Flow-ID: d8c349d6-737f-45da-a243-e0955767f67f
+Received: from EX19D046UWA003.ant.amazon.com (10.13.139.18) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 11 Apr 2024 23:52:33 +0000
+Received: from EX19MTAUEA001.ant.amazon.com (10.252.134.203) by
+ EX19D046UWA003.ant.amazon.com (10.13.139.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 11 Apr 2024 23:52:33 +0000
+Received: from dev-dsk-hailmo-2b-4e49cd2f.us-west-2.amazon.com (172.16.42.153)
+ by mail-relay.amazon.com (10.252.134.102) with Microsoft SMTP Server id
+ 15.2.1258.28 via Frontend Transport; Thu, 11 Apr 2024 23:52:32 +0000
+Received: by dev-dsk-hailmo-2b-4e49cd2f.us-west-2.amazon.com (Postfix, from userid 13307802)
+	id A5E5F41829; Thu, 11 Apr 2024 23:52:32 +0000 (UTC)
+From: Hailey Mothershead <hailmo@amazon.com>
+To: <herbert@gondor.apana.org.au>
+CC: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <hailmo@amazon.com>
+Subject: [PATCH 1/2] crypto: ecdh - zeroize crpytographic keys after use
+Date: Thu, 11 Apr 2024 23:51:56 +0000
+Message-ID: <20240411235157.19801-1-hailmo@amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,47 +60,44 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Eric Biggers <ebiggers@google.com>
+Fips 140-3 specifies that Sensitive Security Parameters (SSPs) must be
+zeroized after use and that overwriting these variables with a new SSP
+is not sufficient for zeroization. So explicitly zeroize the private key
+before it is overwritten in ecdh_set_secret.
 
-Instead of loading the message words into both MSG and \m0 and then
-adding the round constants to MSG, load the message words into \m0 and
-the round constants into MSG and then add \m0 to MSG.  This shortens the
-source code slightly.  It changes the instructions slightly, but it
-doesn't affect binary code size and doesn't seem to affect performance.
+It also requires that variables used in the creation of SSPs
+be zeroized once they are no longer in use. Zeroize the public key as it
+is used in the creation of the shared secret.
 
-Suggested-by: Stefan Kanthak <stefan.kanthak@nexgo.de>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Hailey Mothershead <hailmo@amazon.com>
 ---
- arch/x86/crypto/sha256_ni_asm.S | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ crypto/ecdh.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/crypto/sha256_ni_asm.S b/arch/x86/crypto/sha256_ni_asm.S
-index ffc9f1c75c15..d515a55a3bc1 100644
---- a/arch/x86/crypto/sha256_ni_asm.S
-+++ b/arch/x86/crypto/sha256_ni_asm.S
-@@ -76,17 +76,15 @@
- #define ABEF_SAVE	%xmm9
- #define CDGH_SAVE	%xmm10
+diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+index 80afee3234fb..71599cadf0bc 100644
+--- a/crypto/ecdh.c
++++ b/crypto/ecdh.c
+@@ -33,6 +33,8 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ 	    params.key_size > sizeof(u64) * ctx->ndigits)
+ 		return -EINVAL;
  
- .macro do_4rounds	i, m0, m1, m2, m3
- .if \i < 16
--	movdqu		\i*4(DATA_PTR), MSG
--	pshufb		SHUF_MASK, MSG
--	movdqa		MSG, \m0
--.else
--	movdqa		\m0, MSG
-+	movdqu		\i*4(DATA_PTR), \m0
-+	pshufb		SHUF_MASK, \m0
- .endif
--	paddd		(\i-32)*4(SHA256CONSTANTS), MSG
-+	movdqa		(\i-32)*4(SHA256CONSTANTS), MSG
-+	paddd		\m0, MSG
- 	sha256rnds2	STATE0, STATE1
- .if \i >= 12 && \i < 60
- 	movdqa		\m0, TMP
- 	palignr		$4, \m3, TMP
- 	paddd		TMP, \m1
++	memset(ctx->private_key, 0, sizeof(ctx->private_key));
++
+ 	if (!params.key || !params.key_size)
+ 		return ecc_gen_privkey(ctx->curve_id, ctx->ndigits,
+ 				       ctx->private_key);
+@@ -111,7 +113,7 @@ static int ecdh_compute_value(struct kpp_request *req)
+ free_all:
+ 	kfree_sensitive(shared_secret);
+ free_pubkey:
+-	kfree(public_key);
++	kfree_sensitive(public_key);
+ 	return ret;
+ }
+ 
 -- 
-2.44.0
+2.40.1
 
