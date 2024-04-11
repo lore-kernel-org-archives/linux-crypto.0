@@ -1,89 +1,187 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mr4.vodafonemail.de (mr4.vodafonemail.de [145.253.228.164])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E139013EFE6;
-	Thu, 11 Apr 2024 07:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0E213E8A1;
+	Thu, 11 Apr 2024 07:55:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.253.228.164
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712821196; cv=none; b=h1ymBNU7IH+/Zd7P+rEu8ZkBJ/G6xjjXsX9qASqcd2f3CujyL4FXQ6ZuSLkBKn4YjqjLuhKnfYxUHCNPJND850pk7FRxwqsbQTTkldVWE/5o2JJbGnE4juALMpRy1QG6H5kVah87OrZywMBqwsCX0TKq/5LV9Iemez2f1xjSJtg=
+	t=1712822116; cv=none; b=suzdeQ1cKqkg7pCtrxPieW+wfgSp3koHs5fZ5ArJKnoVAe4kNpZ4Yy0+by6pQ6WHh0A+6bNBFLtXQDG8CbeZU6ij5OiY3kXa6OtMljVb+L8eq5FeUlHghl2FreDXfOYyx7aZrvRCSbF+w/B/+XF/J3ZoHKGxXni33sZMoKFldwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712821196; c=relaxed/simple;
-	bh=wDjj/BxrUT9AJhlIJcBur8HkBzHyYmG/dJLyN88edKw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bTSGjUchnquMkDO9YL6APrVbISECG85817F8AsTaeEY+0ZL+ZWzrJ34FZ0y92suxawZ921/DseTp3jMQWLgsKLnLybO93UOweZsgUfX3Mm5Xeqld1xCY0ie2X008FAnhqvi34p0IImqg8t8WeXi7cgSK3gpxIx1vL7+gpgVVUMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rup1d-000Fuk-TF; Thu, 11 Apr 2024 15:39:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 11 Apr 2024 15:39:31 +0800
-Date: Thu, 11 Apr 2024 15:39:31 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Alexey Romanov <avromanov@salutedevices.com>
-Cc: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"khilman@baylibre.com" <khilman@baylibre.com>,
-	"jbrunet@baylibre.com" <jbrunet@baylibre.com>,
-	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	kernel <kernel@sberdevices.ru>
-Subject: Re: [PATCH v6 11/23] drivers: crypto: meson: introduce hasher
-Message-ID: <ZheTs8kfpSPOtN/1@gondor.apana.org.au>
-References: <20240326153219.2915080-1-avromanov@salutedevices.com>
- <20240326153219.2915080-12-avromanov@salutedevices.com>
- <Zg+gnrO/wX5S+zlw@gondor.apana.org.au>
- <20240410103908.suw6x3pywk73nftp@cab-wsm-0029881.sigma.sbrf.ru>
+	s=arc-20240116; t=1712822116; c=relaxed/simple;
+	bh=Vf9bYYGypv9FbN+9XbupcrTchpbiruWl7TSDs4c4LfQ=;
+	h=Message-ID:From:To:Cc:References:In-Reply-To:Subject:Date:
+	 MIME-Version:Content-Type; b=JVXHMgt/vdqUo8x76dVzo5C7iWjg1dGnKCd3YeaqW+tiZv8UiSq9XcfpRn9IFpG9x9pWjulwb3UZ7Ei+2bl2JhW0L8UFk2eEaxG2+ux/LGbVzubyFP8oGJoq9ozEDs47liJqpPpdo49nSK1+popBlyz88rxTNlDFE00yJR79Wxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de; spf=pass smtp.mailfrom=nexgo.de; dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b=ByEFufFF; arc=none smtp.client-ip=145.253.228.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nexgo.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b="ByEFufFF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nexgo.de;
+	s=vfde-mb-mr2-23sep; t=1712821648;
+	bh=OHW+Te4LEk/4CfJcGxAerYIwwgEc8XtDQqYGwFWpVHY=;
+	h=Message-ID:From:To:References:In-Reply-To:Subject:Date:
+	 Content-Type:X-Mailer:From;
+	b=ByEFufFFulZirbqQeBZHlqXY/Jt5tnRFDkQIpQ21oMYmMcSqWeJi8oBsBpYvxQKg3
+	 xPt2XQk6DQkxqeBzpr1a0u/Y/Ci0ColXtbI7oL1UsjQSDeaDAZLXcM10UN1QQXdTc1
+	 yNF2w359+AjUfuTCnJVElyJrpBzdJSwk2qRAGLdY=
+Received: from smtp.vodafone.de (unknown [10.0.0.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	(No client certificate requested)
+	by mr4.vodafonemail.de (Postfix) with ESMTPS id 4VFWxr0RwVz1y9W;
+	Thu, 11 Apr 2024 07:47:28 +0000 (UTC)
+Received: from H270 (p54805648.dip0.t-ipconnect.de [84.128.86.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.vodafone.de (Postfix) with ESMTPSA id 4VFWxZ4RxJz9scP;
+	Thu, 11 Apr 2024 07:47:11 +0000 (UTC)
+Message-ID: <450F5ED9B5834B2EA883786C32E1A30E@H270>
+From: "Stefan Kanthak" <stefan.kanthak@nexgo.de>
+To: "Eric Biggers" <ebiggers@kernel.org>
+Cc: <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<ardb@kernel.org>
+References: <20240409124216.9261-1-ebiggers@kernel.org> <20240409124216.9261-2-ebiggers@kernel.org> <C0FA88ECA90F43B1BF9E7849C53440D7@H270> <20240409233650.GA1609@quark.localdomain>
+In-Reply-To: <20240409233650.GA1609@quark.localdomain>
+Subject: Re: [PATCH 1/2] crypto: x86/sha256-ni - convert to use rounds macros
+Date: Thu, 11 Apr 2024 09:42:00 +0200
+Organization: Me, myself & IT
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240410103908.suw6x3pywk73nftp@cab-wsm-0029881.sigma.sbrf.ru>
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Windows Mail 6.0.6002.18197
+X-MimeOLE: Produced By Microsoft MimeOLE V6.1.7601.24158
+X-purgate-type: clean
+X-purgate: clean
+X-purgate-size: 4380
+X-purgate-ID: 155817::1712821643-BCFF7A47-8CAAE437/0/0
 
-On Wed, Apr 10, 2024 at 10:39:14AM +0000, Alexey Romanov wrote:
-> Hello Herbert,
+"Eric Biggers" <ebiggers@kernel.org> wrote:
+
+> On Tue, Apr 09, 2024 at 06:52:02PM +0200, Stefan Kanthak wrote:
+>> "Eric Biggers" <ebiggers@kernel.org> wrote:
+>> 
+>> > +.macro do_4rounds i, m0, m1, m2, m3
+>> > +.if \i < 16
+>> > +        movdqu  \i*4(DATA_PTR), MSG
+>> > +        pshufb  SHUF_MASK, MSG
+>> > +        movdqa  MSG, \m0
+>> > +.else
+>> > +        movdqa  \m0, MSG
+>> > +.endif
+>> > +        paddd   \i*4(SHA256CONSTANTS), MSG
+>> 
+>> To load the round constant independent from and parallel to the previous
+>> instructions which use \m0 I recommend to change the first lines of the
+>> do_4rounds macro as follows (this might save 1+ cycle per macro invocation,
+>> and most obviously 2 lines):
+>> 
+>> .macro do_4rounds i, m0, m1, m2, m3
+>> .if \i < 16
+>>         movdqu  \i*4(DATA_PTR), \m0
+>>         pshufb  SHUF_MASK, \m0
+>> .endif
+>>         movdqa  \i*4(SHA256CONSTANTS), MSG
+>>         paddd   \m0, MSG
+>> ...
 > 
-> On Fri, Apr 05, 2024 at 02:56:30PM +0800, Herbert Xu wrote:
-> > On Tue, Mar 26, 2024 at 06:32:07PM +0300, Alexey Romanov wrote:
-> > > Introduce support for SHA1/SHA224/SHA256 hash algos.
-> > > Tested via tcrypt and custom tests.
-> > > 
-> > > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
-> > > ---
-> > >  drivers/crypto/amlogic/Makefile             |   2 +-
-> > >  drivers/crypto/amlogic/amlogic-gxl-core.c   |  25 +-
-> > >  drivers/crypto/amlogic/amlogic-gxl-hasher.c | 460 ++++++++++++++++++++
-> > >  drivers/crypto/amlogic/amlogic-gxl.h        |  51 +++
-> > >  4 files changed, 536 insertions(+), 2 deletions(-)
-> > >  create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
-> > 
-> > Where are the import/export functions?
-> 
-> Sorry, I miss understand you. What do you mean by "import/epxort
-> functions"?
+> Yes, your suggestion looks good.  I don't see any performance difference on
+> Ice Lake, but it does shorten the source code.  It belongs in a separate patch
+> though, since this patch isn't meant to change the output.
 
-The crypto hash API supports partial hashing, which means that
-you need to be able to hash part of the data, save the state,
-and then resume it later.
+Hmmm... the output was already changed: 2 palignr/pblendw and 16 pshufd
+have been replaced with punpck?qdq, and 17 displacements changed.
 
-If your hardware only supports full hashing then you will need
-to add a software fallback.
+Next simplification, and 5 more lines gone: replace the macro do_16rounds
+with a repetition
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+@@ ...
+-.macro do_16rounds i
+-        do_4rounds (\i + 0),  MSGTMP0, MSGTMP1, MSGTMP2, MSGTMP3
+-        do_4rounds (\i + 4),  MSGTMP1, MSGTMP2, MSGTMP3, MSGTMP0
+-        do_4rounds (\i + 8),  MSGTMP2, MSGTMP3, MSGTMP0, MSGTMP1
+-        do_4rounds (\i + 12), MSGTMP3, MSGTMP0, MSGTMP1, MSGTMP2
+-.endm
+-
+@@ ...
+-        do_16rounds 0
+-        do_16rounds 16
+-        do_16rounds 32
+-        do_16rounds 48
++.irp i, 0, 16, 32, 48
++        do_4rounds (\i + 0),  MSGTMP0, MSGTMP1, MSGTMP2, MSGTMP3
++        do_4rounds (\i + 4),  MSGTMP1, MSGTMP2, MSGTMP3, MSGTMP0
++        do_4rounds (\i + 8),  MSGTMP2, MSGTMP3, MSGTMP0, MSGTMP1
++        do_4rounds (\i + 12), MSGTMP3, MSGTMP0, MSGTMP1, MSGTMP2
++.endr
+
+This doesn't change the instructions generated, so it belongs to this patch.
+
+
+The following suggestion changes instructions: AFAIK all processors which
+support the SHA extensions support AVX too
+
+@@ ...
++.ifnotdef AVX
+         movdqa          STATE0, MSGTMP4
+         punpcklqdq      STATE1, STATE0                  /* FEBA */
+         punpckhqdq      MSGTMP4, STATE1                 /* DCHG */
+         pshufd          $0x1B, STATE0,  STATE0          /* ABEF */
+         pshufd          $0xB1, STATE1,  STATE1          /* CDGH */
++.else
++        vpunpckhqdq     STATE0, STATE1, MSGTMP0         /* DCHG */
++        vpunpcklqdq     STATE0, STATE1, MSGTMP1         /* BAFE */
++        pshufd          $0xB1, MSGTMP0, STATE0          /* CDGH */
++        pshufd          $0xB1, MSGTMP1, STATE1          /* ABEF */
++.endif
+@@ ...
++.ifnotdef AVX
+         movdqa  \i*4(SHA256CONSTANTS), MSG
+         paddd   \m0, MSG
++.else
++        vpaddd  \i*4(SHA256CONSTANTS), \m0, MSG
++.endif
+@@ ...
++.ifnotdef AVX
+         movdqa  \m0, MSGTMP4
+         palignr $4, \m3, MSGTMP4
++.else
++        vpalignr $4, \m3, \m0, MSGTMP4
++.endif
+@@ ...
++.ifnotdef AVX
+         movdqa          STATE1, MSGTMP4
+         punpcklqdq      STATE0, STATE1                  /* EFGH */
+         punpckhqdq      MSGTMP4, STATE0                 /* CDAB */
+         pshufd          $0x1B, STATE0,  STATE0          /* DCBA */
+         pshufd          $0xB1, STATE1,  STATE1          /* HGFE */
++.else
++        vpunpckhqdq     STATE0, STATE1, MSGTMP0         /* ABCD */
++        vpunpcklqdq     STATE0, STATE1, MSGTMP1         /* EFGH */
++        pshufd          $0x1B, MSGTMP0, STATE0          /* DCBA */
++        pshufd          $0x1B, MSGTMP1, STATE1          /* HGFE */
++.endif
+
+
+And last: are the "#define ... %xmm?" really necessary?
+
+- MSG can't be anything but %xmm0;
+- MSGTMP4 is despite its prefix MSG also used to shuffle STATE0 and STATE1,
+  so it should be named TMP instead (if kept);
+- MSGTMP0 to MSGTMP3 are the circular message schedule, they should be named
+  MSG0 to MSG3 instead (if kept).
+
+I suggest to remove at least those which are now encapsulated in the macro
+and the repetition.
+
+
+regards
+Stefan
