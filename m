@@ -1,215 +1,198 @@
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2056.outbound.protection.outlook.com [40.107.244.56])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E59114F13D;
-	Thu, 11 Apr 2024 13:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712842442; cv=fail; b=g82uL9vV0pRQbhYTSO61oFIiHoIhChTlymTURvu/02MBVGocF3Y8uNjeeclQFh8joCKUUjeF46rDcPVNwVfGx9IjSl+rJo4TlAvM8lON89z1yfIJvxgkc47gN4MSasgyrvvQWRtgEIwvW6/Klhzdt/rZc/sca7dLjfnPmKAR4Xk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712842442; c=relaxed/simple;
-	bh=o+KkzQc1IDW19NSkJ4Xh/Fw56B5+sNlMM3VRXaFYgPA=;
-	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
-	 Content-Type:MIME-Version; b=XnH7LgHO1jUqfw/n9SK6i92vmLG0VTj+H9qmg5o3dIu07vnZVCC5deOs6un8yUeXrRq1Qi0zHLDFQW3ymlPpSyLbJE6c8bLEgdcGEvlX5HMAYEHSP/VXanjJDHVy14NbxlFkslz5JvOSKn+/Se28k04F7q1NLeEFVE7NAt1CqlA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=5VenDP5k; arc=fail smtp.client-ip=40.107.244.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7AE145FFA;
+	Thu, 11 Apr 2024 13:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712842736; cv=none; b=aHKMDBjgffmyg718qw7Xlc4EPwOjHDV6t7UDHuuanUrvmYYbAmWztzeOii3IZi0PyPicQQe+t18SZVifnPfgV54bZjyjaTB3gFNK3ejSYjImAI7VFtHSnc1iHpwZAk2X+kZPDtmKWCPBzDc+sMOha/YCtwQGsFYM/iKUTGD47EA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712842736; c=relaxed/simple;
+	bh=cYsl/oiu4j/xkoJTZV4MhH9pfcAuMOByGFV5r9tA7Jc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=f913p5WVIxpxm6RS3jU43dbHD0QTxT/eS3bECMC+bVAQMJV6hjBpiM02DqT1qT/ZunvAOtOVjAuJCft1JCbRcLwjeN/fkir/MzzhzXdz2wjNc+nHQ7z51Ze6JeT9C6lfyQcGV0nPASg1XjLJB7jcqgrIROLlbMx4hzfjj2T6+W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=ZpLryE+6; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5VenDP5k"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FrO3dKIFCiOhOE4yzq2EY/KYZylP0Txu7IVLBTx61bhkvbZrR0F4OYz06Q0IRhtmZo9fcYLVSSK5X4LurrprOya1vS8fa9PQz4+yxlzrrpEkwSBskxdiv8ZLPyhQJigJRMVWASkoztAqpQ/PufgOtiFskXlzm0KFH7OnYXIUer/P30oq6QCLzsfxrS1SMvSw4jWwqUYq2L2boYJQGXAy1WYQH8QstXUUuv+oMZEkYkK2JBhYvnqNQLrs2FI+EXdCVIFsXo5e5tdNrz5LXIkIGLaJehu318VSRJ+sxMFDTUSsH1QFVXWQenQCVip9/kmfJpTW1UkYKJJDrTrOX4vKhw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OP7iCONSt2x+x+rkn/Rm1B7Q2oq9yJKrAkYJT2hnBbM=;
- b=a/w/mfBA16zguFB3EVvNL7mn9C5LbVxA8xoXpW70johP7VFn1dVgIL0ew8PA/3rNlWE21Qd/hp3OBHsT0EWuRkicTCijVBtnVmckvGvX60UlakbTQVLI2Z01gFV7ugMIC6QV2ljWmZWjf8C4iiXy0ouz4aww0hUhkHo9u0nArGk6ENob+RwYqFnfxXYk79ldRUb96skpTFxY6wmGHoyAFS/m3do3Q/P+aHS1ITgLuGyYm+7x/KF6Ins8/CZ8TBac1JMk6ANRyJ7atjZ80rzx7nCRswCkI4ROkb2Wl/bjinhoX6BPEtUqIOmHK6k6XmZciv+kGhTOHPRzfkRObb97BA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OP7iCONSt2x+x+rkn/Rm1B7Q2oq9yJKrAkYJT2hnBbM=;
- b=5VenDP5k4w731IfMqFscQbsO2PHBv7lYhHZ3OHyMqH9Z+P676gF8DiyqJE49nKBvtEc2g9gaNYY4L1oOzVtkJ7PLQz0o++Xb5Dq4Y5ei+513+CwQnP8VseJEWOXHA0CNRebyxcqiqXQHo7f0qHK9K5nYRgyCWxMpVnk04Ez5nlw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
- by CY5PR12MB6129.namprd12.prod.outlook.com (2603:10b6:930:27::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Thu, 11 Apr
- 2024 13:33:55 +0000
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::1032:4da5:7572:508]) by BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::1032:4da5:7572:508%6]) with mapi id 15.20.7409.042; Thu, 11 Apr 2024
- 13:33:55 +0000
-Message-ID: <5f0e74f2-6261-d836-5161-a525ed9c497a@amd.com>
-Date: Thu, 11 Apr 2024 08:33:47 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Content-Language: en-US
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, hpa@zytor.com,
- ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
- vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
- vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
- tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com
-References: <20240329225835.400662-1-michael.roth@amd.com>
- <20240329225835.400662-30-michael.roth@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v12 29/29] KVM: SEV: Provide support for
- SNP_EXTENDED_GUEST_REQUEST NAE event
-In-Reply-To: <20240329225835.400662-30-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR13CA0019.namprd13.prod.outlook.com
- (2603:10b6:806:21::24) To BL1PR12MB5732.namprd12.prod.outlook.com
- (2603:10b6:208:387::17)
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="ZpLryE+6"
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 3E53D120065;
+	Thu, 11 Apr 2024 16:38:48 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 3E53D120065
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1712842728;
+	bh=g/cmZ5EcPxVqLW90J3yJ5sNPqD6vla76/ub4sdzsxzk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=ZpLryE+6hwve/7olN4Us/EgR+ZLJNQnc/cighsMUObSdI3AGWbqakdv6NkN4p3ykN
+	 R5FvZjjzq4rf3cY8BJjT1q/7COzDHdA60oiamOBfxuNzLVy2buQQRtvCbEx3EDY8TK
+	 eSmcomtR2sh3Tv2hZKx8096lzGjv94jauuj09Kj3M1G61iy7cMT0Xtiz6XFNN0rNmx
+	 m+xiC5TUp6a8Y7+FbZf1GIKFrYbDkokdvywxHRIBR8ltX4kPcMaWgURQ4bzEXrN0hY
+	 RHP3eJrnD2k7eusfMwUWf3tNwbq0nA6aUUKIT8tnVaCGl9KUDLj5rKCm8NzB0diQxN
+	 fIWEc9CX+WKjw==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Thu, 11 Apr 2024 16:38:48 +0300 (MSK)
+Received: from user-A520M-DS3H.sberdevices.ru (100.64.160.123) by
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 11 Apr 2024 16:38:46 +0300
+From: Alexey Romanov <avromanov@salutedevices.com>
+To: <neil.armstrong@linaro.org>, <clabbe@baylibre.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<khilman@baylibre.com>, <jbrunet@baylibre.com>,
+	<martin.blumenstingl@googlemail.com>, <vadim.fedorenko@linux.dev>
+CC: <linux-crypto@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kernel@salutedevices.com>, Alexey
+ Romanov <avromanov@salutedevices.com>
+Subject: [PATCH v7 00/23] Support more Amlogic SoC families in crypto driver
+Date: Thu, 11 Apr 2024 16:38:09 +0300
+Message-ID: <20240411133832.2896463-1-avromanov@salutedevices.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|CY5PR12MB6129:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9b950d46-f3f6-44fe-88c3-08dc5a2c089d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	E5NXiPUYegdxsM2ENNoHt9iFDVF7jk8RDIyCOUwzuu4loajaahqdubX8mj75OAGaa8CgoW6NwfX4+e/pX59U1Mr3UHBYn9XxBxCFaIrUL6w5rJAt4We9qCKEyN+oYVqzZRbhjF4+JD1K01pYwqKCe3TlvDtCZUX3Orf56QH9/hBJc3+mA6t6TUQ5ky6vbZ26xpQDFQCOnA11/0BV9kNxCAnjE6pcUN7j5qzHZ0Xc8sKqLKYO/UQDVdv/ELnf0NXbugrHHmdgi8v3SrnEmIeNvcCmAlFSVSdZh72JMb+Ddjf3BqnwEjDId8NIQ/c3iN/PJzqQLz50tfQRCZmKYDdiPxewxmgIXdEuE1I/ceTI8QdEUwulT8ahlnEk0yjVAx3pGtHbLjcqCpr6oiQTA4ty2v7fHOl5aIsfN7XnkteFpGRuNgk4xTmtceg26UK0SoJtwDg50OmSw8mWnA6Wq0/vrIUok4NHiAaDeDP+P3l8akutKTwur7smzvi4tOhSi4SE0bX/ZNG0QsCIyGp8RP4h4kdK8rNp890FdvE0+5r69WDfxnGvZGFcJAovPw0iIvzK1sD9Xvy/pxoi+5kajxZxJn8+zw2H+5SPW4WpEQ1CxyMjyhl8/t0weD2R9+mkfiBNbsTjdAEgKsNN4slVhWNh/WRrrMJDqeo0It/H0RoT0eM=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TE5QendCVXpKZnN6eXJRa3ZZTFUvSHJCTktXWGJ4QW5Ocmc3ckJKeFdpUnly?=
- =?utf-8?B?YjRMdjFFL0hzemNhMkpKeUVrSjdVMkNvQXBIb2dEUU9iN3BRV0Q5OWxRUUR2?=
- =?utf-8?B?V0doNFFYYlpzOEtXNjVQVWQ4NTY2cWVuckhBVkVPYXo5SXQxTmJieGkvT2Ev?=
- =?utf-8?B?blhBdTl4bHk0dklKQUY5N3BOcUZpYkwzL0RXNVRBSG9qQXc4OWxzZkJ2NS9z?=
- =?utf-8?B?TjNlNVVwNVJIcHBUZnpKQXNEOEVZbzFzVHowZ3ppdnZxVC9SNlNNWUxwU0Va?=
- =?utf-8?B?bUNqay9Sd3RsVGRrQWhMbjl1WHRNYVQvdzhhajBCMytXeFVlZHJSZThFQjM0?=
- =?utf-8?B?Vms2UEdNWUpycEQ0d0F1WGZLQWNJb1BNWHNYOHlaK2Z0RTJpMmVyaG13cnlp?=
- =?utf-8?B?ZUpMRFdzb0dldDUxYjJhTkl3UUY4cG5WeWtoS1hSUmtCNGE5S1h0elYrUFNU?=
- =?utf-8?B?ZTFSTlRsNFhpWXlQQ2E5MDlqWHRDdEtjRUVkb2wwMmxiK1MxWWdGTEFTZTdU?=
- =?utf-8?B?akFLNmxRNVhOSDBtcTJiUXZwM1ZmZEdEcmh2N1VLVXZ2QWJOMDRGcEpiY1ph?=
- =?utf-8?B?MnAxRkJrdlVPb2RVdGdlazMxdGg1cFpGbktRL09NMFdmT3NSWDZPcllnMWdh?=
- =?utf-8?B?L2RXc25Wc0tkeC9YREdoZ1lpY2hwQ3dJOFdjRkx5OWxRTDNsYThLemo5cHNC?=
- =?utf-8?B?QUFIeW1KRzZ6TDlNbVl6U1ViTzE4YmdyS0xUM3NoVE8ySTRnT2NubDl5aVJG?=
- =?utf-8?B?TGk1UHM2SXlyTDVWcUxqNEliVVJzUmlPZzF2N2lLUzlWdkkwdU1MSGxERlpx?=
- =?utf-8?B?eFl4TEcveEczYjkrSVV4bjFBblJxREVsOWxsL1lZVm1XcnE3a2ExM3Zvc3hB?=
- =?utf-8?B?MVlmRmNEakNEKzgxTDV5cXFibUJGOXU5dVdCWEhpa0pNMkpyNkd5K1RMRVBy?=
- =?utf-8?B?aU1zWnNlRGFiSU1TWXRkQXVkbG1BQkZuZzI3VXhnMzBwSVdzcEM1STMxcjJW?=
- =?utf-8?B?MHpLd0JaelU1bXdrZHNrYnR5d1p3RkFkOTlmZlMwY2txL3g4WThzenVpeS9J?=
- =?utf-8?B?UW9TeTZqN3hVSzFJM0ZveEk0Yy8wZ3MwNjRrdWhtbDVwM3F4UGw1T3RpTi94?=
- =?utf-8?B?bUhQeHZJTUV0L2FXYXJiV21HRVpsV3BkUnVLa3F1Wlp4cU43Mnp5WlA4MjVl?=
- =?utf-8?B?SjRtWVVRNDRMN2J1NUhhQXlpUHpNd3pXejlNVUkrbDE0aDNOejc3V1g1Wlh2?=
- =?utf-8?B?ZEdPKzBIY3A3Z1JQaVRqUmY0eTRwRm4vaFQ0VHRpYjlVWDNTUWU0Y3doeTRX?=
- =?utf-8?B?U0FnU0YyRElIaTVsMWNBclFXTDlQSm5jeGVzSnA1OEduVmZscnF6N2R4Ulp3?=
- =?utf-8?B?VlVZMmcwNEhDVjI4SzhyVGxrbHpjS0NtSlhOTlovSnN2Vm1SN0tIZ0Z4ZzdC?=
- =?utf-8?B?MkEySmlEL2FqZEVPVGFaTnk1UzZJWkJZcXkxcExLcnpEN0k2YXB5ZFdkM3B2?=
- =?utf-8?B?b0tKdHhuMHQycFVINmJrbXNpWlJreEdDTnZwNDI3N294WFFNNEcxNjVyL2Iv?=
- =?utf-8?B?WmNBdTNnSGdwbFBIRWlyZENJWDlFTisvVGxoR2FsLy9LN2JGZXdRY2REb3JQ?=
- =?utf-8?B?L0E0SW01S2wzZEhJMENwdXZtck5KazlUMnVkYWE1U2JvQkxRQVlySno0bDI4?=
- =?utf-8?B?UXorNWJyc2x6UVFzNjFERXExODhRV0x3Q3hTa0ZrS3lZZTVoa3VIQjMvQmZX?=
- =?utf-8?B?MXBtbGdTb1l3ME51c3JkUS9IM2ZBUEJUZnMzR0ZQRXlvYkhmVGVMa04ySmlG?=
- =?utf-8?B?Vk9jZzNZR3VEWWovc1BtQlBHVEphNzRmNXlkd2FoNk1QRWF3aU50UExObG16?=
- =?utf-8?B?Tloxa3p4ckRYejQwYjIzcWFGNnpVMzBmV05DaEhUSnd4b2dLZmQvTmxpVVdi?=
- =?utf-8?B?TjBSSndYSDlFbUx2Z0V2RXpIWWlwRWREMDBiam1zcCtsNzhQNlNzYTB1R2ZB?=
- =?utf-8?B?bGZkZ2FQM1RtZTJIbFpjRkI3UnhoUjJSWStJWHhQMFNqRi9QbWVGeHhIaUs5?=
- =?utf-8?B?ME1KZzJTY0NvcWUya0VBZGV2bkpsWEhxcUV6bWNtNUNFYzYzd3cyMzYrdklL?=
- =?utf-8?Q?dmI+oI8coesRarkATXoJ3ZRRX?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b950d46-f3f6-44fe-88c3-08dc5a2c089d
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2024 13:33:55.1172
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aFf6YMJECUgrvRoSzJZqoRjNvYh4+PoEbJqpH3yLB0aSSGWgrUEpCYdThZrL0DCGKQK9h1UdYcSxJsTNtqVVvQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6129
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 184672 [Apr 11 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 16 0.3.16 6e64c33514fcbd07e515710c86ba61de7f56194e, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;lore.kernel.org:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;gist.github.com:7.1.1;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/04/11 07:46:00
+X-KSMG-LinksScanning: Clean, bases: 2024/04/11 07:47:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/04/11 09:22:00 #24744908
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On 3/29/24 17:58, Michael Roth wrote:
-> Version 2 of GHCB specification added support for the SNP Extended Guest
-> Request Message NAE event. This event serves a nearly identical purpose
-> to the previously-added SNP_GUEST_REQUEST event, but allows for
-> additional certificate data to be supplied via an additional
-> guest-supplied buffer to be used mainly for verifying the signature of
-> an attestation report as returned by firmware.
-> 
-> This certificate data is supplied by userspace, so unlike with
-> SNP_GUEST_REQUEST events, SNP_EXTENDED_GUEST_REQUEST events are first
-> forwarded to userspace via a KVM_EXIT_VMGEXIT exit type, and then the
-> firmware request is made only afterward.
-> 
-> Implement handling for these events.
-> 
-> Since there is a potential for race conditions where the
-> userspace-supplied certificate data may be out-of-sync relative to the
-> reported TCB or VLEK that firmware will use when signing attestation
-> reports, make use of the synchronization mechanisms wired up to the
-> SNP_{PAUSE,RESUME}_ATTESTATION SEV device ioctls such that the guest
-> will be told to retry the request while attestation has been paused due
-> to an update being underway on the system.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->   Documentation/virt/kvm/api.rst | 26 ++++++++++++
->   arch/x86/include/asm/sev.h     |  4 ++
->   arch/x86/kvm/svm/sev.c         | 75 ++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/svm/svm.h         |  3 ++
->   arch/x86/virt/svm/sev.c        | 21 ++++++++++
->   include/uapi/linux/kvm.h       |  6 +++
->   6 files changed, 135 insertions(+)
-> 
+Hello!
 
-> +static int snp_complete_ext_guest_req(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +	struct vmcb_control_area *control;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	sev_ret_code fw_err = 0;
-> +	int vmm_ret;
-> +
-> +	vmm_ret = vcpu->run->vmgexit.ext_guest_req.ret;
-> +	if (vmm_ret) {
-> +		if (vmm_ret == SNP_GUEST_VMM_ERR_INVALID_LEN)
-> +			vcpu->arch.regs[VCPU_REGS_RBX] =
-> +				vcpu->run->vmgexit.ext_guest_req.data_npages;
-> +		goto abort_request;
-> +	}
-> +
-> +	control = &svm->vmcb->control;
-> +
-> +	if (!__snp_handle_guest_req(kvm, control->exit_info_1, control->exit_info_2,
-> +				    &fw_err))
-> +		vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
-> +
-> +	/*
-> +	 * Give errors related to stale transactions precedence to provide more
-> +	 * potential options for servicing firmware while guests are running.
-> +	 */
-> +	if (snp_transaction_is_stale(svm->snp_transaction_id))
-> +		vmm_ret = SNP_GUEST_VMM_ERR_BUSY;
+This patchset expand the funcionality of the Amlogic
+crypto driver by adding support for more SoC families:
+AXG, G12A, G12B, SM1, A1, S4.
 
-I think having this after the call to the SEV firmware will cause an 
-issue. If the firmware has performed the attestation request 
-successfully in the __snp_handle_guest_req() call, then it will have 
-incremented the sequence number. If you return busy, then the sev-guest 
-driver will attempt to re-issue the request with the original sequence 
-number which will now fail. That failure will then be propagated back to 
-the sev-guest driver which will then disable the VMPCK key.
+Also specify and enable crypto node in device tree
+for reference Amlogic devices.
 
-So I think you need to put this before the call to firmware.
+Tested on GXL, AXG, G12A/B, SM1, A1 and S4 devices via
+custom tests [1] and tcrypt module.
 
-Thanks,
-Tom
+---
 
-> +
+Changes V1 -> V2 [2]:
+
+- Rebased over linux-next.
+- Adjusted device tree bindings description.
+- A1 and S4 dts use their own compatible, which is a G12 fallback.
+
+Changes V2 -> V3 [3]:
+
+- Fix errors in dt-bindings and device tree.
+- Add new field in platform data, which determines
+whether clock controller should be used for crypto IP.
+- Place back MODULE_DEVICE_TABLE.
+- Correct commit messages.
+
+Changes V3 -> V4 [4]:
+
+- Update dt-bindings as per Krzysztof Kozlowski comments.
+- Fix bisection: get rid of compiler errors in some patches.
+
+Changes V4 -> V5 [5]:
+
+- Tested on GXL board:
+  1. Fix panic detected by Corentin Labbe [6].
+  2. Disable hasher backend for GXL: in its current realization
+     is doesn't work. And there are no examples or docs in the
+     vendor SDK.
+- Fix AES-CTR realization: legacy boards (gxl, g12, axg) requires
+  inversion of the keyiv at keys setup stage.
+- A1 now uses its own compatible string.
+- S4 uses A1 compatible as fallback.
+- Code fixes based on comments Neil Atrmstrong and Rob Herring.
+- Style fixes (set correct indentations)
+
+Changes V5 -> V6 [7]:
+
+- Fix DMA sync warning reported by Corentin Labbe [8].
+- Remove CLK input from driver. Remove clk definition
+  and second interrput line from crypto node inside GXL dtsi.
+
+Changes V6 -> V7 [9]:
+
+- Fix dt-schema: power domain now required only for A1.
+- Use crypto_skcipher_ctx_dma() helper for cipher instead of
+  ____cacheline_aligned.
+- Add import/export functions for hasher.
+- Fix commit message for patch 17, acorrding to discussion [10].
+
+Links:
+  - [1] https://gist.github.com/mRrvz/3fb8943a7487ab7b943ec140706995e7
+  - [2] https://lore.kernel.org/all/20240110201216.18016-1-avromanov@salutedevices.com/
+  - [3] https://lore.kernel.org/all/20240123165831.970023-1-avromanov@salutedevices.com/
+  - [4] https://lore.kernel.org/all/20240205155521.1795552-1-avromanov@salutedevices.com/
+  - [5] https://lore.kernel.org/all/20240212135108.549755-1-avromanov@salutedevices.com/
+  - [6] https://lore.kernel.org/all/ZcsYaPIUrBSg8iXu@Red/
+  - [7] https://lore.kernel.org/all/20240301132936.621238-1-avromanov@salutedevices.com/
+  - [8] https://lore.kernel.org/all/Zf1BAlYtiwPOG-Os@Red/
+  - [9] https://lore.kernel.org/all/20240326153219.2915080-1-avromanov@salutedevices.com/
+  - [10] https://lore.kernel.org/all/20240329-dotted-illusive-9f0593805a05@wendy/
+
+Alexey Romanov (23):
+  drivers: crypto: meson: don't hardcode IRQ count
+  drviers: crypto: meson: add platform data
+  drivers: crypto: meson: remove clock input
+  drivers: crypto: meson: add MMIO helpers
+  drivers: crypto: meson: move get_engine_number()
+  drivers: crypto: meson: drop status field from meson_flow
+  drivers: crypto: meson: move algs definition and cipher API to
+    cipher.c
+  drivers: crypto: meson: cleanup defines
+  drivers: crypto: meson: process more than MAXDESCS descriptors
+  drivers: crypto: meson: avoid kzalloc in engine thread
+  drivers: crypto: meson: introduce hasher
+  drivers: crypto: meson: add support for AES-CTR
+  drivers: crypto: meson: use fallback for 192-bit keys
+  drivers: crypto: meson: add support for G12-series
+  drivers: crypto: meson: add support for AXG-series
+  drivers: crypto: meson: add support for A1-series
+  dt-bindings: crypto: meson: remove clk and second interrupt line for
+    GXL
+  arch: arm64: dts: meson: gxl: correct crypto node definition
+  dt-bindings: crypto: meson: support new SoC's
+  arch: arm64: dts: meson: a1: add crypto node
+  arch: arm64: dts: meson: s4: add crypto node
+  arch: arm64: dts: meson: g12: add crypto node
+  arch: arm64: dts: meson: axg: add crypto node
+
+ .../bindings/crypto/amlogic,gxl-crypto.yaml   |  33 +-
+ arch/arm64/boot/dts/amlogic/meson-a1.dtsi     |   7 +
+ arch/arm64/boot/dts/amlogic/meson-axg.dtsi    |   6 +
+ .../boot/dts/amlogic/meson-g12-common.dtsi    |   6 +
+ arch/arm64/boot/dts/amlogic/meson-gxl.dtsi    |   5 +-
+ arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |   6 +
+ drivers/crypto/amlogic/Makefile               |   2 +-
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 629 ++++++++++++------
+ drivers/crypto/amlogic/amlogic-gxl-core.c     | 292 ++++----
+ drivers/crypto/amlogic/amlogic-gxl-hasher.c   | 482 ++++++++++++++
+ drivers/crypto/amlogic/amlogic-gxl.h          | 116 +++-
+ 11 files changed, 1221 insertions(+), 363 deletions(-)
+ create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
+
+-- 
+2.34.1
+
