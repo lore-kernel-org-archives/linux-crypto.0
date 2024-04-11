@@ -1,167 +1,89 @@
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F4C13C81F
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2024 05:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E139013EFE6;
+	Thu, 11 Apr 2024 07:39:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712813518; cv=none; b=CI0AIUVBm1H8qkm415VSZu8KkQGYSQ2hHrMTKQM+eG2jxtDXC9wH0KQ3xQiOO1v+mxBMZE6kArykifpAv+orJ/I1HzbZ1icsqhIPoO2Mh2FpW5P7XdkFzUC2G2+d+C5ci1F6cc9B611ZRT0TRgRPDdk0Mi9eZu7XYhlLc8fXh5w=
+	t=1712821196; cv=none; b=h1ymBNU7IH+/Zd7P+rEu8ZkBJ/G6xjjXsX9qASqcd2f3CujyL4FXQ6ZuSLkBKn4YjqjLuhKnfYxUHCNPJND850pk7FRxwqsbQTTkldVWE/5o2JJbGnE4juALMpRy1QG6H5kVah87OrZywMBqwsCX0TKq/5LV9Iemez2f1xjSJtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712813518; c=relaxed/simple;
-	bh=ojN/xMV7IVN8fvk1jKfWfjx5M57TuBQu/wFwTgnk/gY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=novqTOmu+z6apjMs73PO09l3jGfb7NfoZk8fCNwokVHhWk7eVQQU2m1tQBrlQcPfi+XSnhzHcdxdmk9uqn1iykbSkGwYVK9P/5r+zshvsRVbj1n/P7+v3LRxQLaJkeIF5s5jDl+BYWnDTzwNLHFY0deBXtdOhBOW02Xvz3H5Xis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=OpThaoQ+; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="OpThaoQ+"
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6151e2d037dso83595647b3.3
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Apr 2024 22:31:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1712813516; x=1713418316; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vmMtC5iK3O6S0iXgVptYO+6Sv57v1TF90CK03ieC43A=;
-        b=OpThaoQ+UsmN5piq4+roQqheGvRTa9Ywa5gIRroHQClPnVtphcsKTkz/O2eMvo1ZEi
-         aKmbGaj3z4KPKh+pwwObgZnKu2V5IX/OXpqDERk8chULCeP2iN9wjv6ZTa40yBJeN88V
-         X3hSghnmsyaeSriZdMbB8A7Mst1jJTqkcdc4w=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712813516; x=1713418316;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vmMtC5iK3O6S0iXgVptYO+6Sv57v1TF90CK03ieC43A=;
-        b=QKC8M7QSM8WIY6jeF+AcEmzy9RsYYXWt31tSuNAUdr2+Z7bFgM/0JxA/OrsuhRUF6w
-         /8txD01nI3r4V6W+GIeau+cNfi7QF2x6jYiz0tdXodq94T1JktfoXnKrEnAmFH58t9cC
-         fXWEpRUt1nWSjqTbq/Rj15SmKIVzVLSCIkShIixE3zRmcGOPETXraLTfmiOSkU6EGjly
-         6TYMX7Yo0ZNLINp3kk0L9WKVUZ58ey5TX1cx9OFC5uDULrMSYv741AVWoznEI+n2gEmc
-         w36yarb0HnBqGyYWs1Lud7c5ADW0gfCQmR1Fxs5lyLD9oA1Zh2PBDtrRogtyR5Vsgqgr
-         Qt5w==
-X-Gm-Message-State: AOJu0Yx+sXMdwG74evdQb4os2LNzHK2+MAOXbCBq+chKwl6Jwl7tT5SM
-	s9/r9Um058LuIfv11WDDUX2RoZQhPfXWFHh05wT9ovaR5ecKeW+3pQJz1PypD91i77IENCgvN43
-	sjBvVmQE2EHC3+u8kK28lZnBU4FD7YIC5PIs2Kw==
-X-Google-Smtp-Source: AGHT+IEWxdXqjFcH+ITEgh6vAW6CyMIRPzYOCQvrZywMgOcwUFdN/oCEssRvtv40rHgdgvb+KpoEs3UHJmYcpW7hxjM=
-X-Received: by 2002:a0d:ca8f:0:b0:615:3858:bcc5 with SMTP id
- m137-20020a0dca8f000000b006153858bcc5mr5576531ywd.10.1712813516017; Wed, 10
- Apr 2024 22:31:56 -0700 (PDT)
+	s=arc-20240116; t=1712821196; c=relaxed/simple;
+	bh=wDjj/BxrUT9AJhlIJcBur8HkBzHyYmG/dJLyN88edKw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bTSGjUchnquMkDO9YL6APrVbISECG85817F8AsTaeEY+0ZL+ZWzrJ34FZ0y92suxawZ921/DseTp3jMQWLgsKLnLybO93UOweZsgUfX3Mm5Xeqld1xCY0ie2X008FAnhqvi34p0IImqg8t8WeXi7cgSK3gpxIx1vL7+gpgVVUMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rup1d-000Fuk-TF; Thu, 11 Apr 2024 15:39:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 11 Apr 2024 15:39:31 +0800
+Date: Thu, 11 Apr 2024 15:39:31 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Alexey Romanov <avromanov@salutedevices.com>
+Cc: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"khilman@baylibre.com" <khilman@baylibre.com>,
+	"jbrunet@baylibre.com" <jbrunet@baylibre.com>,
+	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	kernel <kernel@sberdevices.ru>
+Subject: Re: [PATCH v6 11/23] drivers: crypto: meson: introduce hasher
+Message-ID: <ZheTs8kfpSPOtN/1@gondor.apana.org.au>
+References: <20240326153219.2915080-1-avromanov@salutedevices.com>
+ <20240326153219.2915080-12-avromanov@salutedevices.com>
+ <Zg+gnrO/wX5S+zlw@gondor.apana.org.au>
+ <20240410103908.suw6x3pywk73nftp@cab-wsm-0029881.sigma.sbrf.ru>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240328182652.3587727-1-pavitrakumarm@vayavyalabs.com> <Zg+jhukIGEyFdjae@gondor.apana.org.au>
-In-Reply-To: <Zg+jhukIGEyFdjae@gondor.apana.org.au>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Thu, 11 Apr 2024 11:01:45 +0530
-Message-ID: <CALxtO0=EU0LvpZvmzQjNfSq70EhAeLZi5Co0KdEA-6oQ46K8bA@mail.gmail.com>
-Subject: Re: [PATCH v1 0/4] Add spacc crypto driver support
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, Ruud.Derwig@synopsys.com, 
-	manjunath.hadli@vayavyalabs.com, bhoomikak@vayavyalabs.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240410103908.suw6x3pywk73nftp@cab-wsm-0029881.sigma.sbrf.ru>
 
-Sure Herbert,
-  I have removed all those that dont have software implementation and
-pushing v2 patch.
+On Wed, Apr 10, 2024 at 10:39:14AM +0000, Alexey Romanov wrote:
+> Hello Herbert,
+> 
+> On Fri, Apr 05, 2024 at 02:56:30PM +0800, Herbert Xu wrote:
+> > On Tue, Mar 26, 2024 at 06:32:07PM +0300, Alexey Romanov wrote:
+> > > Introduce support for SHA1/SHA224/SHA256 hash algos.
+> > > Tested via tcrypt and custom tests.
+> > > 
+> > > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
+> > > ---
+> > >  drivers/crypto/amlogic/Makefile             |   2 +-
+> > >  drivers/crypto/amlogic/amlogic-gxl-core.c   |  25 +-
+> > >  drivers/crypto/amlogic/amlogic-gxl-hasher.c | 460 ++++++++++++++++++++
+> > >  drivers/crypto/amlogic/amlogic-gxl.h        |  51 +++
+> > >  4 files changed, 536 insertions(+), 2 deletions(-)
+> > >  create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
+> > 
+> > Where are the import/export functions?
+> 
+> Sorry, I miss understand you. What do you mean by "import/epxort
+> functions"?
 
-wwr,
-PK
+The crypto hash API supports partial hashing, which means that
+you need to be able to hash part of the data, save the state,
+and then resume it later.
 
-On Fri, Apr 5, 2024 at 12:38=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> On Thu, Mar 28, 2024 at 11:56:48PM +0530, Pavitrakumar M wrote:
-> > Add the driver for SPAcc(Security Protocol Accelerator), which is a
-> > crypto acceleration IP from Synopsys. The SPAcc supports many cipher,
-> > hash, aead algorithms and various modes.The driver currently supports
-> > below,
-> >
-> > aead:
-> > - ccm(sm4)
-> > - ccm(aes)
-> > - gcm(sm4)
-> > - gcm(aes)
-> > - rfc8998(gcm(sm4))
-> > - rfc7539(chacha20,poly1305)
-> >
-> > cipher:
-> > - cbc(sm4)
-> > - ecb(sm4)
-> > - ofb(sm4)
-> > - cfb(sm4)
-> > - ctr(sm4)
-> > - cbc(aes)
-> > - ecb(aes)
-> > - ctr(aes)
-> > - xts(aes)
-> > - cts(cbc(aes))
-> > - cbc(des)
-> > - ecb(des)
-> > - cbc(des3_ede)
-> > - ecb(des3_ede)
-> > - chacha20
-> > - xts(sm4)
-> > - cts(cbc(sm4))
-> > - ecb(kasumi)
-> > - f8(kasumi)
-> > - snow3g_uea2
-> > - cs1(cbc(aes))
-> > - cs2(cbc(aes))
-> > - cs1(cbc(sm4))
-> > - cs2(cbc(sm4))
-> > - f8(sm4)
-> >
-> > hash:
-> > - michael_mic
-> > - sm3
-> > - hmac(sm3)
-> > - sha3-512
-> > - sha3-384
-> > - sha3-256
-> > - sha3-224
-> > - hmac(sha512)
-> > - hmac(sha384)
-> > - hmac(sha256)
-> > - hmac(sha224)
-> > - sha512
-> > - sha384
-> > - sha256
-> > - sha224
-> > - sha1
-> > - hmac(sha1)
-> > - md5
-> > - hmac(md5)
-> > - cmac(sm4)
-> > - xcbc(aes)
-> > - cmac(aes)
-> > - xcbc(sm4)
-> > - sha512-224
-> > - hmac(sha512-224)
-> > - sha512-256
-> > - hmac(sha512-256)
-> > - mac(kasumi_f9)
-> > - mac(snow3g)
-> > - mac(zuc)
-> > - sslmac(sha1)
-> > - shake128
-> > - shake256
-> > - cshake128
-> > - cshake256
-> > - kcmac128
-> > - kcmac256
-> > - kcmacxof128
-> > - kcmacxof256
-> > - sslmac(md5)
->
-> We don't add hardware implementations without software counterparts.
-> So please prune your list of algorithms according to this rule.
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If your hardware only supports full hashing then you will need
+to add a software fallback.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
