@@ -1,33 +1,35 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D3D487A9;
-	Fri, 12 Apr 2024 07:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A2046BA0;
+	Fri, 12 Apr 2024 07:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712906860; cv=none; b=ix/Z6Jt14NrQJ3ESJPL4DULGkRYBDUU91wP3SfsRrm6fttEkHyckMnOwHc2J3cCxeYa7i6uscW0Dkre/YHDqTMSgIoEuYiSYTH6/G5hesCB9pQLxai7rWfA8sno62Ucs84KVmXKrBhENN6GRdo7kxixclkyJGose9H3CeFuHMmk=
+	t=1712906978; cv=none; b=N7pDkT2BRIJvSVY3eQAx9VS+s8+MsoeUVXhQ88YNiNyc1Ceh1vJnffEYLiEeBwEyBnL8s0Q25TgJcyF5UxdvsrLZVsh+E5xHDU4gtlZptUzNbmDRq5IZsLJT/4OvfdkvkMQ9uBX4W0i3VeIytCE38C0Pj41INAKNT+VQcrUnRwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712906860; c=relaxed/simple;
-	bh=2OviW5wY8rtGUKJyuExDpNFM2KDWYSH4za587jUcloI=;
+	s=arc-20240116; t=1712906978; c=relaxed/simple;
+	bh=7M2kKvQTkEd4Mr3OVlA5FF2+9MMVPozcmy7NxnUF+cQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bru3YFdcltyTQarQf/7WjgTmfCOPHrOWm8unBhyj97wF938W6PODaR95U6VltQt+bHEfgdUxobz9GpYlQbHnijmz515mMtg+Ip4XRUlx8WBy9PeJwtu3SCjXfrhhEOMLRmR94L+1UjCtbKGf8aZVodFjMdCm6tJjdkgS5WBkr4s=
+	 Content-Type:Content-Disposition:In-Reply-To; b=olyE+ymWeVL9j/05JrHrMeWNSwBKfbnanoMtWXB9qE0h+MXX/3gmrw7H1uqmGCfgyD1ULRe0JB+a3xc0hZGkafeLjkS8ifz96iCowSm0vqTkTHp/Tj2L47lriaboqFVHJgxcjl6+5Jq3hIcR3Ba0cuHYCoKoG+tO5wSdmS4S3W4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rvBJs-000lZk-3J; Fri, 12 Apr 2024 15:27:33 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Apr 2024 15:27:49 +0800
-Date: Fri, 12 Apr 2024 15:27:49 +0800
+	id 1rvBLj-000lcD-F4; Fri, 12 Apr 2024 15:29:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Apr 2024 15:29:44 +0800
+Date: Fri, 12 Apr 2024 15:29:44 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Roman Smirnov <r.smirnov@omp.ru>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Sergey Shtylyov <s.shtylyov@omp.ru>,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH v2] crypto: algboss: remove NULL check in
- cryptomgr_schedule_probe()
-Message-ID: <ZhjidWaJW7m8/6HQ@gondor.apana.org.au>
-References: <20240401122258.111414-1-r.smirnov@omp.ru>
+To: Colin Ian King <colin.i.king@gmail.com>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Xin Zeng <xin.zeng@intel.com>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] crypto: qat: Fix spelling mistake "Invalide" ->
+ "Invalid"
+Message-ID: <Zhji6B90sRGAWKjs@gondor.apana.org.au>
+References: <20240402081355.1365780-1-colin.i.king@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -36,20 +38,15 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240401122258.111414-1-r.smirnov@omp.ru>
+In-Reply-To: <20240402081355.1365780-1-colin.i.king@gmail.com>
 
-On Mon, Apr 01, 2024 at 03:22:58PM +0300, Roman Smirnov wrote:
-> The for loop will be executed at least once, so i > 0. If the loop
-> is interrupted before i is incremented (e.g., when checking len for NULL),
-> i will not be checked.
+On Tue, Apr 02, 2024 at 09:13:55AM +0100, Colin Ian King wrote:
+> There is a spelling mistake in a dev_err message. Fix it.
 > 
-> Found by Linux Verification Center (linuxtesting.org) with Svace.
-> 
-> Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
-> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 > ---
->  crypto/algboss.c | 3 ---
->  1 file changed, 3 deletions(-)
+>  drivers/crypto/intel/qat/qat_common/adf_gen4_vf_mig.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
