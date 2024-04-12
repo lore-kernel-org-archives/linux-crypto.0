@@ -1,58 +1,32 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2291CA80;
-	Fri, 12 Apr 2024 06:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A15481AB;
+	Fri, 12 Apr 2024 07:27:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712903255; cv=none; b=OQtWV+0WMwEhmjJ/BPVAQvjY0uhxUpLCi+r/72chP5qa4hwMOPVw0/kDYkqFmPIBkRw5iBdHHnJA+yo8+LKdmtvqGELa3NTci9ApnRiDsFWg4Xz/Pk7yVUvJNqz31uEztwLXJu6PTsXd179v62Nt2rsVID8fDeSNwMHipRWk5xY=
+	t=1712906851; cv=none; b=oHMRbdQe4KxjT3Q9PPP1vjGMcR8Ac9C/mi9zNJYc9oAGZQxhzkpNs7Oj3lETeynRBjif8uOtMYpBG8mBzFtRRa6Di/uAk7xGY/qoQthz5pij1S69Hh/CQfOi6q84O/ZsV1IpZRsII9sp9f3uQ0JElTk9AXRcfZey9NNfRU7q80s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712903255; c=relaxed/simple;
-	bh=NiPOeWOuEjw88GRyE0zYlF6pjM+hyH0f8aXHg2mS7o0=;
+	s=arc-20240116; t=1712906851; c=relaxed/simple;
+	bh=l2BGLiuJGHHWG/G6qEjSB1ceFBeBSLwtH1M1QxOBe5w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p/hPdY1KdMbCfazzv52EdM9ZfSvuUpJ++4hQ+xuv+RDVAD1sySBuL/d14/n1CHmD+l6vC+qxnSe42mXXnUEdPVaANF9cMqQztc9RIm93mMvsq8Y9igY6NJ0Q9VVOtK0if3qefkgdTOztnpTLyi6jCFEgaXF7bNpyz5GyEtwzrLc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=lOLzG62+kxGbB6KzKWs+0EokFPmfgct7ceiK2N9al1YQwnVFKpUFVT6ltzYjqvHBw5/Fxa/VDi5vQfIOJkK9Sz43q4gyAy9Y7f1fXo40JKgF52nSIyaqpP7hza/yyPQvHUPNBrril+gOXPkZ1bmQx4llzEAHGppjCsq80eAC7+8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rvAMf-000k1Z-Ta; Fri, 12 Apr 2024 14:26:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Apr 2024 14:26:39 +0800
-Date: Fri, 12 Apr 2024 14:26:39 +0800
+	id 1rvBJi-000lZc-1y; Fri, 12 Apr 2024 15:27:23 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Apr 2024 15:27:39 +0800
+Date: Fri, 12 Apr 2024 15:27:39 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: David Gstir <david@sigma-star.at>, Mimi Zohar <zohar@linux.ibm.com>,
-	James Bottomley <jejb@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Shawn Guo <shawnguo@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Ahmad Fatoum <a.fatoum@pengutronix.de>,
-	sigma star Kernel Team <upstream+dcp@sigma-star.at>,
-	David Howells <dhowells@redhat.com>, Li Yang <leoyang.li@nxp.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	Tejun Heo <tj@kernel.org>,
-	"Steven Rostedt (Google)" <rostedt@goodmis.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-security-module@vger.kernel.org,
-	Richard Weinberger <richard@nod.at>,
-	David Oberhollenzer <david.oberhollenzer@sigma-star.at>
-Subject: Re: [PATCH v8 6/6] docs: trusted-encrypted: add DCP as new trust
- source
-Message-ID: <ZhjUH3TZ99cT3Rhq@gondor.apana.org.au>
-References: <20240403072131.54935-1-david@sigma-star.at>
- <20240403072131.54935-7-david@sigma-star.at>
- <D0ALT2QCUIYB.8NFTE7Z18JKN@kernel.org>
+To: Roman Smirnov <r.smirnov@omp.ru>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Sergey Shtylyov <s.shtylyov@omp.ru>
+Subject: Re: [PATCH] crypto: ecc: remove checks in
+ crypto_ecdh_shared_secret() and ecc_make_pub_key()
+Message-ID: <Zhjia82Bl+gaGHym@gondor.apana.org.au>
+References: <20240401121623.110263-1-r.smirnov@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,18 +35,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <D0ALT2QCUIYB.8NFTE7Z18JKN@kernel.org>
+In-Reply-To: <20240401121623.110263-1-r.smirnov@omp.ru>
 
-On Wed, Apr 03, 2024 at 06:47:51PM +0300, Jarkko Sakkinen wrote:
->
-> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+On Mon, Apr 01, 2024 at 03:16:23PM +0300, Roman Smirnov wrote:
+> With the current state of the code, ecc_get_curve() cannot return
+> NULL in crypto_ecdh_shared_secret() and ecc_make_pub_key(). This is
+> conditioned by the fact that they are only called from ecdh_compute_value(),
+> which implements the kpp_alg::{generate_public_key,compute_shared_secret}()
+> methods. Also ecdh implements the kpp_alg::init() method, which is called
+> before the other methods and sets ecdh_ctx::curve_id to a valid value.
 > 
-> I can only test that this does not break a machine without the
-> hardware feature.
+> Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> ---
+>  crypto/ecc.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Please feel free to take this through your tree.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
