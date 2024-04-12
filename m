@@ -1,110 +1,139 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE49610B
-	for <linux-crypto@vger.kernel.org>; Fri, 12 Apr 2024 21:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9A115099C
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Apr 2024 23:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712957435; cv=none; b=nMk54s+Pz722Il/7y1p43psRJHFs2Ur7zzNny8e1vdqE6ifkatNsj+276iIK9vdkeMBSsUwdbB7ezgrwdFU6HURPQZirRBM6nHBCPDt4eLaO+WH6v2ZAVRZohC06G8JNC22Q9MrlUJ9INJzXbrTt3TENKZbRggOYh9O5QJX2AuM=
+	t=1712962806; cv=none; b=tcpUEpPOpYlhvAi3xv2GkwmHhAm2JGQ1nAvd3RNj/ENkBwpsr3O1Bf3agCYMPsvNmjRmioJ2K0saaGBS55CzBhx97uuDz0yIC4Cj9X6knkCQXUUzdPuDMEu4pJg8sDAsDhQ92Wq6XzuW2+uMUK7Oys05HEIz4wwhpZKLNSLvu8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712957435; c=relaxed/simple;
-	bh=urpF+uhnagsRIlmCvAoqVf0cSl1JhJfWoktomJ+ip1k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YzJCFUdBGjRdy4B4LBbOfjM9qXY6+80mndtmASFylo6pGw0MfdO4xxXc++y30iakxUocltUjR4P75CPuUMAVWU2A5dznd0qBUop6xtACsxRHe1FOJdsQJDIzDLzdWNwhuzH3g4wL6q6R68uubKHwLcV3fyO70DcFKLDSnwbTtsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=bI4v0Zah; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
+	s=arc-20240116; t=1712962806; c=relaxed/simple;
+	bh=e5jrULAtUKpdI5emYxz+qUL2+/vP0GWvcFutzVEdFCw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=blSMq/T4mhU4PKzFQeTvVS6NIZ4egC4mNF1VeYXrE3MC3xYat1anpF4vvGQlWuCPRKnJKKe6GDdA182F3YbAnOESmT2tjVN/mVoAWeal6NTn4+V8aggGvlSkQzelwsmYUQDJdJBsQ54+2cot9aJDqDO0O1vWQQOdQPPs+bPYDKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WD/eVOog; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="bI4v0Zah"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-417f5268b12so12336155e9.1
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Apr 2024 14:30:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1712957431; x=1713562231; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GxzVOZoRlwbh3BCja72w8JfT19aYOorMwhFDDTCvDh0=;
-        b=bI4v0Zah4boCHWG6A4aSzMr20nJi3Dsbj6+Dn6RKBVt7zAvkX6RF6MtSiobxe6Ug9q
-         YB1vDiHSn7xKsWTCMRIXQNbAnrrse4jpfVRBVjmbSVBinutc0spid/vGTJc0Slads/da
-         gFPG0Q6Tj5bAvc96uPCStpYP2WHnGh0h99dDxTk5IRqULMMzyb4P6ab+6hIyJX3Rp0b5
-         p+UxDR107+WTXxEdqRohyL/mUPoNdUU4PtfElwzi2j4KimUDRry2bdlw6k7FB5Gaa8yx
-         DoMhVScHuObGsshwjr0G5/nXookWTdwbe0d5gTzlg1fCS0eD2Ffqid15P6sxZjVrtmPf
-         g8eA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WD/eVOog"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712962803;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XtdF5YIQMmHx7s8x+KaNdKrE1bMDggAMXEluGAHCnoQ=;
+	b=WD/eVOogLLTW/dtYpaPHTlZHKdjLUYHLL/VOuA5Xd/PGg4MTKRBMeqbEJPqYBZoGzyBJ4q
+	73IZogenIXAzpESw6nQzphVaXzcI2todcXE7tcV5mfXJRcmMjg0ffY01b0p+DwQcwAfdDU
+	Iz2E2SBajUWqfKlzOJbeXhke008dfW4=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-183-Uu_igpuSO-6qlXb1X_pwfw-1; Fri, 12 Apr 2024 19:00:02 -0400
+X-MC-Unique: Uu_igpuSO-6qlXb1X_pwfw-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7d6bf30c9e3so82202739f.2
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Apr 2024 16:00:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712957431; x=1713562231;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GxzVOZoRlwbh3BCja72w8JfT19aYOorMwhFDDTCvDh0=;
-        b=wiQ8ouzmwvE6VheKGB3vTRHx1ikDPxRNFEPCZCF1OArhYDqOqJXbdzsVqQTkzLnTxp
-         ld69LJtUCtmDoE1cu/BlJlWoCfR6Q8DbuSEUE6/26YVa5msjYXpO5h8K6YoaC4iRZfgw
-         s1aTEqtp0pc3L9hTy3A0uuL4XnKHsC7sVaiu5gemVnoYCYZTNnZ0D83NFkA9V5/92ByP
-         OGsbQ/4o3UUhct47n8s8JJ5PHJe7ehY63mXzQhN/TNU3dNjJMX9Z87j6n8eM+kzfhWhi
-         3jA6wRLdxEyIXf1TBUMRpYpHWxjVIgkosuJYhtMh6bbR/yHwUKrY0Gpn6HTpJSbXey6f
-         3kgw==
-X-Forwarded-Encrypted: i=1; AJvYcCUL2TrxY84tl8fnB8T1YyphQpFlSeiLpaOg5DZoCSftbg29kpQAQw600+rPajOOKUjAnZ9r6kYEba+ibR9W8UInRje/tZ2AasnmiRNs
-X-Gm-Message-State: AOJu0YwvPRQD29YAZoNtpXCV7/cmaIAmSFCtFe3fn3WfD7o4xtfkKDHH
-	37sofXbKqdyoYfrYXbQ11JiQEV9cYsQ4e5isqbcsmeEiZvXpDeflYYd/IsdLs+MI3fEPV1f13Cb
-	nXnY=
-X-Google-Smtp-Source: AGHT+IHUhdZJLdLX0HFsI9u9Pjbp9G8qIzufUAqtkGmv95NbpQTbtI+7HQ+bCAtx5aoCZH0BcgtDhw==
-X-Received: by 2002:a05:6000:1952:b0:347:2b42:a397 with SMTP id e18-20020a056000195200b003472b42a397mr1533340wry.4.1712957430500;
-        Fri, 12 Apr 2024 14:30:30 -0700 (PDT)
-Received: from fedora.fritz.box (aftr-82-135-80-212.dynamic.mnet-online.de. [82.135.80.212])
-        by smtp.gmail.com with ESMTPSA id di7-20020a0560000ac700b003439d2a5f99sm5046076wrb.55.2024.04.12.14.30.29
+        d=1e100.net; s=20230601; t=1712962801; x=1713567601;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XtdF5YIQMmHx7s8x+KaNdKrE1bMDggAMXEluGAHCnoQ=;
+        b=ol/QmsRc+NPbEbS/kYp1TNpCg8jx33puzJ5wZ2Fsm+dnVtv+J6xdvKQc5OtuTvhM/E
+         pdUQIoyPgiCMsEM5X1S/GQfa1cj5yCz3po2OxrXn8IoX9HPFRLcE+cfwHdZJjiNAfL8m
+         vSQwKiVzSjZF1xxgKWY5l21HlCd1N3Uvc2GaBVhNSKQ1w64xl+Q3gQSXua0L7S+rJAqS
+         huVzf6KQrhQNCliTLif8o8Gaa7Hg1Va9kOegtmA1peSnzgNaHAStuKp/WJwQXljYzH6k
+         x5x9G+JuerpyL6DoIYoCn8OB5yWuMJAZyx0ebZgxi7ynbxRQ7IEsGEi1AXoh201CJIB3
+         Qw9g==
+X-Forwarded-Encrypted: i=1; AJvYcCXjlHNK4Yy7n+JXK0BI0PUaGPQFUF1UyEZ5HCzyGXYyBBcnQCvhQRsGcTfC+o7BOpEQdydraaDV5e00Vr7KBIPIOUqFzr0Akp+ZXCra
+X-Gm-Message-State: AOJu0YwU3mD82xlWdDHLTfDwlj5/aYcQsI2DLbVqLi2weGEOeWO1xnUZ
+	ZfV65iNJySRpLHk6X3+fldqMndvg21To90xcuVggXpUhICvT1jgnF15vo2VIRhhBn5g/qvsezmv
+	68+Igbhk89B1uId6SYdXOsmQatTEKlyO0Asyzt/DSvt/ISGT6HaKQ7m6ehtQl9Q==
+X-Received: by 2002:a05:6602:3e86:b0:7d0:ba6f:92c5 with SMTP id el6-20020a0566023e8600b007d0ba6f92c5mr5359838iob.13.1712962801557;
+        Fri, 12 Apr 2024 16:00:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFpPzwFiwRVcn16zKGoAaDgOZpZ3ArB1zhEd7Vx4LLD00B6pR02mVtTXKuGag0ybQX8PSGIuw==
+X-Received: by 2002:a05:6602:3e86:b0:7d0:ba6f:92c5 with SMTP id el6-20020a0566023e8600b007d0ba6f92c5mr5359817iob.13.1712962801258;
+        Fri, 12 Apr 2024 16:00:01 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id bp15-20020a056638440f00b00482c7617f1dsm1338296jab.25.2024.04.12.16.00.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 14:30:29 -0700 (PDT)
-From: Thorsten Blum <thorsten.blum@toblux.com>
-To: thorsten.blum@toblux.com
-Cc: dan.j.williams@intel.com,
-	davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RESEND PATCH] raid6test: Use str_plural() to fix Coccinelle warning
-Date: Fri, 12 Apr 2024 23:29:45 +0200
-Message-ID: <20240412212944.147286-2-thorsten.blum@toblux.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240328131519.372381-4-thorsten.blum@toblux.com>
-References: <20240328131519.372381-4-thorsten.blum@toblux.com>
+        Fri, 12 Apr 2024 16:00:00 -0700 (PDT)
+Date: Fri, 12 Apr 2024 16:59:59 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Xin Zeng <xin.zeng@intel.com>,
+ <jgg@nvidia.com>, <yishaih@nvidia.com>,
+ <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+ <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+ <qat-linux@intel.com>
+Subject: Re: [PATCH v5 00/10] crypto: qat - enable QAT GEN4 SRIOV VF live
+ migration for QAT GEN4
+Message-ID: <20240412165959.4b7aefad.alex.williamson@redhat.com>
+In-Reply-To: <ZhlC4lWg1ExOuNnl@gcabiddu-mobl.ger.corp.intel.com>
+References: <20240306135855.4123535-1-xin.zeng@intel.com>
+	<ZgVLvdhhU6o7sJwF@gondor.apana.org.au>
+	<20240328090349.4f18cb36.alex.williamson@redhat.com>
+	<Zgty1rGVX+u6RRQf@gondor.apana.org.au>
+	<ZhlC4lWg1ExOuNnl@gcabiddu-mobl.ger.corp.intel.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Fixes the following Coccinelle/coccicheck warning reported by
-string_choices.cocci:
+On Fri, 12 Apr 2024 15:19:14 +0100
+"Cabiddu, Giovanni" <giovanni.cabiddu@intel.com> wrote:
 
-	opportunity for str_plural(err)
+> Hi Alex,
+> 
+> On Tue, Apr 02, 2024 at 10:52:06AM +0800, Herbert Xu wrote:
+> > On Thu, Mar 28, 2024 at 09:03:49AM -0600, Alex Williamson wrote:  
+> > >
+> > > Would you mind making a branch available for those in anticipation of
+> > > the qat vfio variant driver itself being merged through the vfio tree?
+> > > Thanks,  
+> > 
+> > OK, I've just pushed out a vfio branch.  Please take a look to
+> > see if I messed anything up.  
+> What are the next steps here?
+> 
+> Shall we re-send the patch `vfio/qat: Add vfio_pci driver for Intel QAT
+> VF devices` rebased against vfio-next?
+> Or, wait for you to merge the branch from Herbert, then rebase and re-send?
+> Or, are you going to take the patch that was sent to the mailing list as is
+> and handle the rebase? (There is only a small conflict to sort on the
+> makefiles).
 
-Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
----
- crypto/async_tx/raid6test.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi Giovanni,
 
-diff --git a/crypto/async_tx/raid6test.c b/crypto/async_tx/raid6test.c
-index d3fbee1e03e5..3826ccf0b9cc 100644
---- a/crypto/async_tx/raid6test.c
-+++ b/crypto/async_tx/raid6test.c
-@@ -11,6 +11,7 @@
- #include <linux/mm.h>
- #include <linux/random.h>
- #include <linux/module.h>
-+#include <linux/string_choices.h>
- 
- #undef pr
- #define pr(fmt, args...) pr_info("raid6test: " fmt, ##args)
-@@ -228,7 +229,7 @@ static int __init raid6_test(void)
- 
- 	pr("\n");
- 	pr("complete (%d tests, %d failure%s)\n",
--	   tests, err, err == 1 ? "" : "s");
-+	   tests, err, str_plural(err));
- 
- 	for (i = 0; i < NDISKS+3; i++)
- 		put_page(data[i]);
--- 
-2.44.0
+The code itself looks fine to me, the Makefile conflict is trivial,
+MAINTAINERS also requires a trivial re-ordering to keep it alphabetical
+now that virtio-vfio-pci is merged.  The only thing I spot that could
+use some attention is the documentation, where our acceptance criteria
+requests:
+
+  Additionally, drivers should make an attempt to provide sufficient
+  documentation for reviewers to understand the device specific
+  extensions, for example in the case of migration data, how is the
+  device state composed and consumed, which portions are not otherwise
+  available to the user via vfio-pci, what safeguards exist to validate
+  the data, etc.
+
+A lot of the code here is very similar in flow to the other migration
+drivers, but I think it would be good to address some of the topics
+above in comments throughout the driver.  For example, how does the
+driver address P2P states, what information is provided in PRE_COPY,
+how is versioning handled, is user sensitive data included in the
+device migration data, typical ranges of device migration data size,
+etc.
+
+Kevin might have an edge in understanding the theory of operation
+here already and documenting the interesting aspects of the driver in
+comments might drive a little more engagement.  Thanks,
+
+Alex
 
