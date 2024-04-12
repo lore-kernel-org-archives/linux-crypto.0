@@ -1,183 +1,179 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30625205E22;
-	Fri, 12 Apr 2024 14:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712931571; cv=fail; b=o9ggXBMy1GiekpjqG7n5hsat71B80qXayXNZhLY+WERdM+o/DjhQMS1aTpkNq6xNtnBOjDdM4Nog7aYlGWgS4KFrXS6VJRXharewi7Yzf+dKKS5ADNFKiNLEcA11sD9lr043lc/ajyZsg+jr6LC36j18stZcl7flsSUlIqLBX68=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712931571; c=relaxed/simple;
-	bh=fXDI1CbnL6LbdxJEWoxI0CRD+tx/gFeBMyQXbK5bKcI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=YAG5obk2v3ZoLTezsPN/ksLneFnbIaZccnwaIjwIxwB9UKC+xrEzdUgD972/A2ww2ySIhdz2TRfFZZW6qyBynkc0mHwojfQRwCpQNDYMx5MZKukx8pPFhvXqZpzn1In0HggUp++e+SBU/2jyAwsnX6m2XzLvQNRInM6Gnuoued8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HKlOsMAu; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6CF1487EB;
+	Fri, 12 Apr 2024 15:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712936774; cv=none; b=LzA/Df5aGj/SLIFQUXvrAZ7jeS6BMazG1olOqb5T5f8rFJT+PDGBhHLoemElItjPQiwJnuO8vywTrXdLpRiL5W7fO94PLymDLidZ3fv64F4qLiHFWg/GxPQSL3hgw+gCrIhs2a5AmidL7v6+QF4OszfZQXF4LeMI5Kc1HGpZvbw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712936774; c=relaxed/simple;
+	bh=X332GSNFEsSKBitRLS+i17dScXamCkeOUyYWvT4bMRE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qTMxxDCzzMcgpZxhr8atL0LvgTtAeDmbNlYLQRV9qoRsByoA02Zpygx+RDvVOfQvlFrRy1J1txQtvwpYzRYJawaSp5z85aHz2T5ClUekrYu2BOFJFNdROK/H+gxOlPRBUcE4E0IMMfIQ/9DG+v4xtiuMTjDhafwnNMXB4MAa4/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DgdV7FEX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HKlOsMAu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712931570; x=1744467570;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=fXDI1CbnL6LbdxJEWoxI0CRD+tx/gFeBMyQXbK5bKcI=;
-  b=HKlOsMAu1ecrtsZWkPkjhKO1KmlrXXRyigcYWR03fc43XhX8vp1wtkml
-   cgRlYi5jBosU87j8xOL7B9yVqyh0/OoiDN6xblUBOxV9NYdGV21zGa+G/
-   Xsy7G1yewqixKBscBkiah0wDJDi3gdQp7hGJAohu/xBMwT8FayPBWQhok
-   D2xcmNFwxBq59bL+3dd1Cbg7RL84ssb3wKIaC3NjsO6XXes4T4UzJPJ8u
-   aeL3xS/UH7vl5eQW6dJldy85Dic1SIRZy4n9lgl9FzhiFVtYtJl7jEvC/
-   uH7UcV8iepo2TNLp4fsgZdNumLePBBfUnYLvXU83MeryxXkcq26hE53wG
-   g==;
-X-CSE-ConnectionGUID: EFBcbWG8RTC3FQvyZV39+g==
-X-CSE-MsgGUID: Ab0Uqtd8S/67jys/yuiDMw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="12169875"
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="12169875"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 07:19:28 -0700
-X-CSE-ConnectionGUID: CAljDWayS1au+7WT9bDYEw==
-X-CSE-MsgGUID: 1weFsEeGR3OUQjXDxZjN2A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="21314424"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Apr 2024 07:19:26 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 12 Apr 2024 07:19:24 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 12 Apr 2024 07:19:24 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 12 Apr 2024 07:19:24 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 12 Apr 2024 07:19:24 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MuT6wxZcP96JuVyCj6XB+BLo1//XnY/LmiLA5pxUD9TnozvWimecIXTL7hZ1Vs0VRWktYEPEBpDXPyGoFP5nMMCyPmN5e4v3hjlhQ+lt1SQHCTHFEQOqHSuqPx0aB895Qs2CriS7/sbphEX48jdMmzlVuqfbWP1bgulaNUj9HZyaghr3ciIEqXoClBsYt0njhoPme2Z94xdp7mSAfoWEvqFpDIVHPAJ9vHmNixrvDAeghrgpLLJk7zlMgIeye+0TYF7Ahr9HHPg3f5hRwVRcj5pv0Udvo0/rZbyLxksbiElIYk4pbfkiskvl4nfKKF3oc9fEghIdr2soES2y5fYvHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f2g2FuUgmd1OwWmTsO9C27BJWr3nfpy5v8avH9G8/3o=;
- b=fAG6evHeLSAN4S64h5REos3boReaQN0gWxbnvE8nSXme+sUf9gwpFaEO/PeSOVvUR9qSj8UROj/pjY/0t+QiM/jhlkJabos2ZBBQHuE4oB9+nDnhOHe+MK4E1n/M9WQnpGkAPW3umsIWFYk4gJvK0Rp7EbjcPJKyDFnb//jY/2JRQG9xyfNBlDZPSdTE9SNP8ktJiLxr9uOqkXXywHGZbxYHUb9bGxRyCQZuCLePDt8jc6AC1xxucM/zciick3rmfBXEqTyrMGAbkT1BIxwsZ+AVKn0WX5qmiVnQlzobJhYB5MwHZxW0tgv5OL6Aw+4Et7j//Gyhf6yFRftkY3VUQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by SJ2PR11MB7476.namprd11.prod.outlook.com (2603:10b6:a03:4c4::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Fri, 12 Apr
- 2024 14:19:22 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::90e5:7578:2fbf:b7c4]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::90e5:7578:2fbf:b7c4%4]) with mapi id 15.20.7452.019; Fri, 12 Apr 2024
- 14:19:22 +0000
-Date: Fri, 12 Apr 2024 15:19:14 +0100
-From: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Xin Zeng <xin.zeng@intel.com>,
-	<jgg@nvidia.com>, <yishaih@nvidia.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
-	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>, <qat-linux@intel.com>
-Subject: Re: [PATCH v5 00/10] crypto: qat - enable QAT GEN4 SRIOV VF live
- migration for QAT GEN4
-Message-ID: <ZhlC4lWg1ExOuNnl@gcabiddu-mobl.ger.corp.intel.com>
-References: <20240306135855.4123535-1-xin.zeng@intel.com>
- <ZgVLvdhhU6o7sJwF@gondor.apana.org.au>
- <20240328090349.4f18cb36.alex.williamson@redhat.com>
- <Zgty1rGVX+u6RRQf@gondor.apana.org.au>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Zgty1rGVX+u6RRQf@gondor.apana.org.au>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DB7PR02CA0018.eurprd02.prod.outlook.com
- (2603:10a6:10:52::31) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DgdV7FEX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94D67C113CC;
+	Fri, 12 Apr 2024 15:46:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712936773;
+	bh=X332GSNFEsSKBitRLS+i17dScXamCkeOUyYWvT4bMRE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=DgdV7FEXvDi3slnyg1m/1wMZwoWyACw01LT8rYRb4Ue8G0b1FPiAg+xNnigIs982T
+	 U1u3ByYc1cwq7UKuT8Mqn/KhRoFJILO2pg/c9fjp51cLseOvGiD6fZymz4x3wzuy+n
+	 V9Em8nnGBdXLKkg5jttrPVngzbp1SxYV1cj88kb07OLWZVoYyzk+W7x3Zal1U7Lfu7
+	 RBuN1usgSynouI/s9TjjUpaEsija10sSom4/LR3gSb/9eebuDSPBiZEuEMLknv8Jfs
+	 n9+w0BsNkdQSN1VSo6ml3GIYkNxoCH/TCXUZHUGLd1bb73W4uzx2IM5Sw2GyMvWT0G
+	 G9aHXceDqEj6A==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: x86@kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Chang S . Bae" <chang.seok.bae@intel.com>
+Subject: [PATCH] crypto: x86/aes-xts - handle CTS encryption more efficiently
+Date: Fri, 12 Apr 2024 08:45:59 -0700
+Message-ID: <20240412154559.91807-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|SJ2PR11MB7476:EE_
-X-MS-Office365-Filtering-Correlation-Id: b67a0cdd-6887-4879-c68d-08dc5afb8c61
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CzOUjQYpCJVeccyEgMdxCJc54eOKuZJPndoVfVGIjtXMruem4Q9wUckwbNIX5ThWAQT+uFBG5CmcNjmKA68vwxE9Jm2eu0CFJqb5aIbSZ8bpGl2Sm8G8B8Ivxe09amC3uy5e22/5aN1aaMdFRm1ZrSMKvb1O4UGM8iNHV+YJiZyWlKjaAYEHAWP6TZKNLg5AflXB/cKevOdgYa9ZxAi3RxQ5ymEDpR/RBwGTN8V6lU8Q0NUQdPBSSwPQuVjxeWZBRzlNfbdwp34q4bgZGOavHUVeOCYKTuqnpKj+WXP+FA9N4Q6Nprhc2vTH9cUE+jbFd2+RaTf8MlCm2Rkd0mpUpVx2UArhppc4FQHmHIYw99be96OGgGqQJ+5Z32All2VpieH13gzVsg5IWz91CTCtTtqROiVCIwzXbYVQzbHWNmJxW7uojCqZFETFutQC0HpWpQWVFCpz+j714sWlQqtGxe8pC/5yJKFXNCbJBHF5jGC2oXojjxDhjQBUUQnCS1HiGzU09mV+A35aIZIylLAtSZiAqOa/MzMTmoDPY14WvSD+6AmPQszADZk2wCTbLrwnfHsrbsEux0L3E7ZY/wwLQEcCn4WjUXNIvz8vmFIeikuHOOSaKHpWzRPRIJUyIhhe+7wk9fk3HEsKES4fAfXU8VarC3ARB10gqfNxUYbSKO0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9CBi9xpAocgxlR17+IkytLRy6TPoCW98xAuDVGek8lzZ0yPjPqEw1tVdcssY?=
- =?us-ascii?Q?E6TiYZOaRybpBE3rbm6JFhSY3uED0bqnuwHcOks7fodbu5GjqCvMx0r2VVej?=
- =?us-ascii?Q?oqEwjTPamxvTMAaCdlYSR4hrI6l/AbtLN2M4/ayyjIeGXV46v1kBv8tz97jm?=
- =?us-ascii?Q?XUIBgY0vsc7PN7B1Pp6WuItyKvRXCpvz295aBOExAFl25zGU+J9dya+GO0QF?=
- =?us-ascii?Q?PqybiBN6PWbI8PIlXdsldUNeKNn5g4y6sNSgQAxLUoQvrNxgBcNwmRl1mUln?=
- =?us-ascii?Q?NYQL4dfGD+NGxWkoS6DofD3buYnbfGXq/MIrPPFcbYZHxp9RRT9/0+2kXj1y?=
- =?us-ascii?Q?8IynJIYgtfxmWtmyD1otVMGSytDzEPQ+4CvVMsfFz3jJ8+6ps4RJJHGUryjK?=
- =?us-ascii?Q?Yb7t5BIbIKmn5lblOBI0nv45Ce9kFpR/OBUFmJ1BybMi1P8Xlr/V8C7dXIg8?=
- =?us-ascii?Q?v5TuBIXsik6VOdyX7GbhQaAmaZyCd8mlj4o+lfVuwYplZBVZBRHDvUIvG2Fy?=
- =?us-ascii?Q?2QJ1wqKysMt1b3bbaTuVRSlrHamNxEZy6MEN+gfGjQRYE4aKSjVDr+AEc00O?=
- =?us-ascii?Q?NQJYbrg8KOEwkJqWsAXhgYxhjOOjFUJzX5fCE+7rvQz/fHN3M/QL59qoeCII?=
- =?us-ascii?Q?82IBjXcgoxJEIvUe5jglyxxqCroxTe2vvYEX+K7Ngw5iXtUrnNLVhfXu5k9e?=
- =?us-ascii?Q?f+1SVDps9NSZwRLf9Aip/Jhim9etSBp89B+k5nsyxOVHVH4+y6hVQ3hEKHIn?=
- =?us-ascii?Q?P5Gwhe/gdPf9eG3Q9fLv7K6l3kW1+IB34O2s6xNvnbQqIgFsiAIShDBPNeNH?=
- =?us-ascii?Q?lALENhl2JhaARo/52uK3eDVuBXghuegt9G/UcfMdk4xzP2feh3rqvELg12bZ?=
- =?us-ascii?Q?/63zn4MPmQ5bW0s6qm4l2dQhPZMae98V119YE2hPcH8aY5asgen791eXOXii?=
- =?us-ascii?Q?p8jp5bMpBkHMR6zoNJqAuDXk3Y49Hslso881expOXa8KWnLzJIsKNj9K1B59?=
- =?us-ascii?Q?BAgkToBlSiWUWRtDo3Yuh48gz3jTxJYF3fBH7Is4qlZywaJ8/fd3RtIY9DEs?=
- =?us-ascii?Q?lsvXq6gk/CSIBAswKb6AHxmpI/MiwatQuolxlPOaDwsXq3sCoQtxMoi5yAbW?=
- =?us-ascii?Q?RKn1o/s/u2GUWLPOdMsaBC04Yrg9xlYw6k9vWapI5wlf7VyNGR1TFrKveJQ5?=
- =?us-ascii?Q?Rpy+RFxa0bBHR60gX3ok+kewlvyynK+ytl2LexrwONDCxiPV7xQENsYdrexa?=
- =?us-ascii?Q?ZVbAeTZAK96knDXxkGFoUlgOOyWw5V6g/NofzOyJ6I6kBmXlY1OlERrexyI9?=
- =?us-ascii?Q?TMeSMM4PXgDbP0jGz8U9EiuHVzCu+d4NQwpUwQDXsS8OS+vDdyCuKIEF3nlx?=
- =?us-ascii?Q?uCA8dyAnPIazudomW6F9nXPV8uE2w6GwG3u7pJbv/lhBU+moH/Yp1ddhLk0T?=
- =?us-ascii?Q?bnRyUDyV+AWgV1NRkJ8Y3akvzQpWjejTyGIMmTT0JkzS6yvbsgYBybiIQ0iQ?=
- =?us-ascii?Q?ojJKh06B2lgGLKSIrazoY+OSW+ZOJLdwksmdyaniu9J6INtDSd2R5w3eA8AT?=
- =?us-ascii?Q?j8Vr0qs1Br+whEowLkOpu1a1UbhylgqeKaamg8iX+x+XKRIPU7ZWejZU3wYW?=
- =?us-ascii?Q?Dw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b67a0cdd-6887-4879-c68d-08dc5afb8c61
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2024 14:19:21.9408
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4umI5JZoqztiCyfEaxuX6ZtMeCIT9Sw4iiXzXNx281jcaZXoqMLBgMARlWmzZtgL4PbIWXf3Y7FtROsDJkUn3DAzv0qq3h58y7Ke0n7iudE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7476
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-Hi Alex,
+From: Eric Biggers <ebiggers@google.com>
 
-On Tue, Apr 02, 2024 at 10:52:06AM +0800, Herbert Xu wrote:
-> On Thu, Mar 28, 2024 at 09:03:49AM -0600, Alex Williamson wrote:
-> >
-> > Would you mind making a branch available for those in anticipation of
-> > the qat vfio variant driver itself being merged through the vfio tree?
-> > Thanks,
-> 
-> OK, I've just pushed out a vfio branch.  Please take a look to
-> see if I messed anything up.
-What are the next steps here?
+When encrypting a message whose length isn't a multiple of 16 bytes,
+encrypt the last full block in the main loop.  This works because only
+decryption uses the last two tweaks in reverse order, not encryption.
 
-Shall we re-send the patch `vfio/qat: Add vfio_pci driver for Intel QAT
-VF devices` rebased against vfio-next?
-Or, wait for you to merge the branch from Herbert, then rebase and re-send?
-Or, are you going to take the patch that was sent to the mailing list as is
-and handle the rebase? (There is only a small conflict to sort on the
-makefiles).
+This improves the performance of decrypting messages whose length isn't
+a multiple of the AES block length, shrinks the size of
+aes-xts-avx-x86_64.o by 5.0%, and eliminates two instructions (a test
+and a not-taken conditional jump) when encrypting a message whose length
+*is* a multiple of the AES block length.
 
-Thanks,
+While it's not super useful to optimize for ciphertext stealing given
+that it's rarely needed in practice, the other two benefits mentioned
+above make this optimization worthwhile.
 
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/x86/crypto/aes-xts-avx-x86_64.S | 53 +++++++++++++++-------------
+ 1 file changed, 29 insertions(+), 24 deletions(-)
+
+diff --git a/arch/x86/crypto/aes-xts-avx-x86_64.S b/arch/x86/crypto/aes-xts-avx-x86_64.S
+index 95e412e7601d..52f1997ed05a 100644
+--- a/arch/x86/crypto/aes-xts-avx-x86_64.S
++++ b/arch/x86/crypto/aes-xts-avx-x86_64.S
+@@ -535,16 +535,20 @@
+ 	// 8th and later round keys which otherwise would need 4-byte offsets.
+ .if \enc
+ 	add		$7*16, KEY
+ .else
+ 	add		$(15+7)*16, KEY
+-.endif
+ 
+-	// Check whether the data length is a multiple of the AES block length.
++	// When decrypting a message whose length isn't a multiple of the AES
++	// block length, exclude the last full block from the main loop by
++	// subtracting 16 from LEN.  This is needed because ciphertext stealing
++	// decryption uses the last two tweaks in reverse order.  We'll handle
++	// the last full block and the partial block specially at the end.
+ 	test		$15, LEN
+-	jnz		.Lneed_cts\@
++	jnz		.Lneed_cts_dec\@
+ .Lxts_init\@:
++.endif
+ 
+ 	// Cache as many round keys as possible.
+ 	_load_round_keys
+ 
+ 	// Compute the first set of tweaks TWEAK[0-3].
+@@ -683,45 +687,46 @@
+ 	_vaes_4x	\enc, 0, 10
+ 	_vaes_4x	\enc, 0, 11
+ 	_vaes_4x	\enc, 1, 12
+ 	jmp		.Lencrypt_4x_done\@
+ 
+-.Lneed_cts\@:
+-	// The data length isn't a multiple of the AES block length, so
+-	// ciphertext stealing (CTS) will be needed.  Subtract one block from
+-	// LEN so that the main loop doesn't process the last full block.  The
+-	// CTS step will process it specially along with the partial block.
++.if !\enc
++.Lneed_cts_dec\@:
+ 	sub		$16, LEN
+ 	jmp		.Lxts_init\@
++.endif
+ 
+ .Lcts\@:
+ 	// Do ciphertext stealing (CTS) to en/decrypt the last full block and
+-	// the partial block.  CTS needs two tweaks.  TWEAK0_XMM contains the
+-	// next tweak; compute the one after that.  Decryption uses these two
+-	// tweaks in reverse order, so also define aliases to handle that.
+-	_next_tweak	TWEAK0_XMM, %xmm0, TWEAK1_XMM
++	// the partial block.  TWEAK0_XMM contains the next tweak.
++
+ .if \enc
+-	.set		CTS_TWEAK0,	TWEAK0_XMM
+-	.set		CTS_TWEAK1,	TWEAK1_XMM
++	// If encrypting, the main loop already encrypted the last full block to
++	// create the CTS intermediate ciphertext.  Prepare for the rest of CTS
++	// by rewinding the pointers and loading the intermediate ciphertext.
++	sub		$16, SRC
++	sub		$16, DST
++	vmovdqu		(DST), %xmm0
+ .else
+-	.set		CTS_TWEAK0,	TWEAK1_XMM
+-	.set		CTS_TWEAK1,	TWEAK0_XMM
+-.endif
+-
+-	// En/decrypt the last full block.
++	// If decrypting, the main loop didn't decrypt the last full block
++	// because CTS decryption uses the last two tweaks in reverse order.
++	// Do it now by advancing the tweak and decrypting the last full block.
++	_next_tweak	TWEAK0_XMM, %xmm0, TWEAK1_XMM
+ 	vmovdqu		(SRC), %xmm0
+-	_aes_crypt	\enc, _XMM, CTS_TWEAK0, %xmm0
++	_aes_crypt	\enc, _XMM, TWEAK1_XMM, %xmm0
++.endif
+ 
+ .if USE_AVX10
+ 	// Create a mask that has the first LEN bits set.
+ 	mov		$-1, %rax
+ 	bzhi		LEN, %rax, %rax
+ 	kmovq		%rax, %k1
+ 
+-	// Swap the first LEN bytes of the above result with the partial block.
+-	// Note that to support in-place en/decryption, the load from the src
+-	// partial block must happen before the store to the dst partial block.
++	// Swap the first LEN bytes of the en/decryption of the last full block
++	// with the partial block.  Note that to support in-place en/decryption,
++	// the load from the src partial block must happen before the store to
++	// the dst partial block.
+ 	vmovdqa		%xmm0, %xmm1
+ 	vmovdqu8	16(SRC), %xmm0{%k1}
+ 	vmovdqu8	%xmm1, 16(DST){%k1}
+ .else
+ 	lea		.Lcts_permute_table(%rip), %rax
+@@ -748,11 +753,11 @@
+ 	// Do a blend to generate the src partial block followed by the second
+ 	// part of the en/decryption of the last full block.
+ 	vpblendvb	%xmm3, %xmm0, %xmm1, %xmm0
+ .endif
+ 	// En/decrypt again and store the last full block.
+-	_aes_crypt	\enc, _XMM, CTS_TWEAK1, %xmm0
++	_aes_crypt	\enc, _XMM, TWEAK0_XMM, %xmm0
+ 	vmovdqu		%xmm0, (DST)
+ 	jmp		.Ldone\@
+ .endm
+ 
+ // void aes_xts_encrypt_iv(const struct crypto_aes_ctx *tweak_key,
+
+base-commit: 751fb2528c12ef64d1e863efb196cdc968b384f6
+prerequisite-patch-id: 5c1ca8ffe87136eb7bfe74d996f5e6cac01e2768
 -- 
-Giovanni
+2.44.0
+
