@@ -1,105 +1,83 @@
-Received: from out203-205-221-153.mail.qq.com (out203-205-221-153.mail.qq.com [203.205.221.153])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E185F1B5A0;
-	Fri, 12 Apr 2024 08:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C904C624
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Apr 2024 12:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712911094; cv=none; b=ogdLDPM2/gPhzOO1rVxRg/VEtMq0DQAGlB0/lVcSuMHEH5lLN5mLTKDOybHKJKw5+oU8RpvUOd5BW0+5AZr44dsmgJLCncROLTqohkq/Dhe9t/UWpmQuNzL14q9Jnqewot5wiWo2iWr2s6mCBEkKOef2ko1FfNrMiZ3aHvix0ZI=
+	t=1712926002; cv=none; b=irDRRie/Xj+lpSPKQ25h2moJhUeeCTYDfC2Mt7xCodBUFCe7JKcdk5CgI8DmD58EFFYoMo+54v5sTyNV3KEc4KVwkQO4JMnBTOLJDnYq83I06lfyDiEhLq0BUSuTS1HH9KHwf6pXlziQcbdezysKAIncqAPQtO6kPWfajjzHNpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712911094; c=relaxed/simple;
-	bh=KgVYfdLUzep0SkrpXvuq683Itn9YhVNpEO1dPfvTN+4=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=NPc9J81UQpg3w/0q+vwzZEAxdBpEQ5AdF30NiVKByXpDyRM143MZtUeLmMZ/SX3bXifS+Hdu4LpdWaR7WLuJx9sd7eU0Sr36TrpOSlXvK6INn3q3JA2n3EyuUQfsfQRcfQB1l3jlBPuaGApJahnH1YBCGNGxLqDGgVVVLfu1Z0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cyyself.name; spf=none smtp.mailfrom=cyyself.name; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=gAimeoj9; arc=none smtp.client-ip=203.205.221.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cyyself.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cyyself.name
+	s=arc-20240116; t=1712926002; c=relaxed/simple;
+	bh=tZ1ZbqAnT8ir9mCfI1SAc5683Xq2nUN8AWo0xR6nHdo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QMTY758CQwZIBAuweanraIRfdqfbETnXfb9zomZWuAGI0t/Ps1dUejPCNhesgs3aJMsSfFJUX6Lhnc+O7uEhmSJTuVV8kCRWDiwqCKM1bKNwRbZWd0fvENoHktn8wiXNlcTuO3a6qcu1jHxmOCTQuZSlopnHilCBhHtACdNkzls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I3MR8ipI; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="gAimeoj9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1712911082; bh=gE4UiwTwaZDj/y1D5EUtDgaY6Zh1vXQNUMpz2cuxwAs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=gAimeoj9xNuspZwpchRMK2dt8vExrlS/TlTFXycoarwZLr+EuNePo142jy1qb9aNG
-	 WhikFRSQRlYmLumVV4nLuVXuS7wk1ZoZQbezch1xwpz4u4ihQ9iRREmnf9iJ4HBd4D
-	 vDf9PXBIIvHXThnibifwFmDHYWAfADtGhjVU8qI4=
-Received: from Yangyus-MBP-2.lan ([219.141.235.82])
-	by newxmesmtplogicsvrszb16-0.qq.com (NewEsmtp) with SMTP
-	id EC914EF9; Fri, 12 Apr 2024 15:59:09 +0800
-X-QQ-mid: xmsmtpt1712908749tdf3a543a
-Message-ID: <tencent_C7B10C572AA62E84ABF1818F52904DFBCA05@qq.com>
-X-QQ-XMAILINFO: NY3HYYTs4gYSkUDCWdovIJbdRXTBoHzZJsvwt/KXGLaYIhohNB5cj0rYEUis96
-	 B4MM6TnQVwXI2teG/zqPf7QLeagvsUXP6EbnNy9qolyR9ELDaoSLqfDbvFRFcbJlB/iD5rMJ9VQL
-	 BYIm9j6ZMzkEMYi2rBL+HNQTe14yvQDPCMP+M5dAmsER4GAnvbKQ6UbMmFn4GsCxq5tNswy0MQq3
-	 Fg4+5yXSzL8spvZrhJ5Qp8uaUZ75dAZQbcoZUS14AeaGVZr3NhdV84/4kmLApm812Uot2P7Bn+62
-	 ej9Efp6uCT6MYtcSmL0EFrypwsGhfdOWWRsajYsFm0PeuS4essy+9qmWx9daFEf+L65E+AeazfPb
-	 fzWBwwfGwwBG0wi1f4/CsZycnu5pkpfOyQkhY+kcmRZfbu1Gkhl+FF7UcINAkL5YT/OJWNRtbloZ
-	 ZHimNhLvPfkV4KcUoUdFOcsgIKH3QFrknB8eVQVzVni+fp/dt6m1A5s0CXmRH/u21PqGMpDD1v4t
-	 Bb0nfLd2E4t/83uYzpsIPlC5ImX3Fa8l2d7vRlUY2R4+3qr7LHm2gmJ2SEC1HziZg3riTNqSxfWo
-	 eCgpOk2Q+qdsnsqY+no26TbRo7wOtbXEJk+PCX/2/8k3q1QHM7MsCCteJ46cziMtCBqdXdSYOxo5
-	 XWgAJdVR3VV+Uwrs9u8HZ3XfdATJM0Ra9Nm367Ufj9SndZt7QXpWNJIPgAhhM5ekM1/xbETn6VRA
-	 xc06JjhXx65doC6pPQS2ZmLLC+K5FEjCzWVB+lNvToaB+Dk6ziIhMJ4QUCfsh3/JUhViB8+BxD+4
-	 uuWNq+DTTx+/6D3rYvBavNdmvllhqNu5xx+TXgkFgwXwthGhGqCyI5yq37uuwnDJmcDV/EoZmKRq
-	 mohN2+X8WTJWyG2yKqRito/2dPLFs5u7tr7pU14ee1Fa5+aK57UpPSZJ/etfgJfTUWHAfx4OMSHs
-	 In2CnKWj+2S1VqQr9x7SM3++aLdp4ILAwjcw6ERWctsWMLIEImFt3I/hiHOB/G1yhgM2sj4VLkLS
-	 PEMj6SRBBmnAu7lPOw
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-From: Yangyu Chen <cyy@cyyself.name>
-To: ebiggers@kernel.org
-Cc: andy.chiu@sifive.com,
-	aou@eecs.berkeley.edu,
-	ardb@kernel.org,
-	christoph.muellner@vrull.eu,
-	heiko@sntech.de,
-	hongrong.hsu@sifive.com,
-	jerry.shih@sifive.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	palmer@dabbelt.com,
-	paul.walmsley@sifive.com,
-	phoebe.chen@sifive.com
-Subject: Re: [PATCH v3 05/10] crypto: riscv - add vector crypto accelerated ChaCha20
-Date: Fri, 12 Apr 2024 15:59:08 +0800
-X-OQ-MSGID: <20240412075908.68485-1-cyy@cyyself.name>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20240122002024.27477-6-ebiggers@kernel.org>
-References: <20240122002024.27477-6-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I3MR8ipI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712926001; x=1744462001;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tZ1ZbqAnT8ir9mCfI1SAc5683Xq2nUN8AWo0xR6nHdo=;
+  b=I3MR8ipIRgmNcIZu44anJ/VxePRiKBswLupM22qxW4kZ9fsorsGzw7zQ
+   TnqJY7n1bSbVkVNpRELh802nAc1Poxx7etG5MBiU0lGhbQI9lMBpQJt6C
+   NUlgnP0XGjHXDZFpSx9U6cpyHMh2ThQzvNagn6tcdfZ99KfeTX9ywT30k
+   ZXxOzGZwaIjtDQn9JllbL8uCx1ll3s7I2KWs4GX1OKvOq/ZJoFLKLJ493
+   fRmwq8EtaqTmh5y0QE/4kf6klWLXA+TBpHOwyIdVDKbWMoYNStHKSzs2A
+   6crIkUGkGaFpajU1tR+5JtGhWhyyyabkUhPjkO+XKSnBef0RJ7JS4FhR9
+   g==;
+X-CSE-ConnectionGUID: dy8E/Z2IQ9KcFFMkeLPWxA==
+X-CSE-MsgGUID: vsoKezBfQSurlK1xgGxeQw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="19529091"
+X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
+   d="scan'208";a="19529091"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 05:46:40 -0700
+X-CSE-ConnectionGUID: spt6bk7QTDCnwhLiqghgcw==
+X-CSE-MsgGUID: WUmQaofmSiKvQL5B+Mfxzw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
+   d="scan'208";a="25902077"
+Received: from silpixa00400295.ir.intel.com ([10.237.213.194])
+  by orviesa003.jf.intel.com with ESMTP; 12 Apr 2024 05:46:38 -0700
+From: Adam Guerin <adam.guerin@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Adam Guerin <adam.guerin@intel.com>
+Subject: [PATCH v2 0/2] Improve error logging in the qat driver
+Date: Fri, 12 Apr 2024 13:24:00 +0100
+Message-Id: <20240412122401.243378-1-adam.guerin@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Organisation: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare, Ireland
 Content-Transfer-Encoding: 8bit
 
-On 2024/1/22 08:19, Eric Biggers wrote:> From: Jerry Shih <jerry.shih@sifive.com>
-> 
-> Add an implementation of ChaCha20 using the Zvkb extension.  The
-> assembly code is derived from OpenSSL code (openssl/openssl#21923) that
-> was dual-licensed so that it could be reused in the kernel.
-> Nevertheless, the assembly has been significantly reworked for
-> integration with the kernel, for example by using a regular .S file
-> instead of the so-called perlasm, using the assembler instead of bare
-> '.inst', and reducing code duplication.
-> 
-> Signed-off-by: Jerry Shih <jerry.shih@sifive.com>
-> Co-developed-by: Eric Biggers <ebiggers@google.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
+This set simply improves error logging in the driver, making error logging
+consistent between rate limiting and telemetry and improve readability
+of logging in adf_get_arbiter_mapping().
 
-Hi, Jerry Shih and Eric Biggers,
+v1 -> v2:
+ -fixed commit id in fixes tag of both patches to be 12 char long.
 
-Since this implementation is derived from OpenSSL, I have an issue on
-OpenSSL about this chacha20 implementation using Zvkb [1] and see a fixes
-PR by Jerry Shih [2].
+Adam Guerin (2):
+  crypto: qat - improve error message in adf_get_arbiter_mapping()
+  crypto: qat - improve error logging to be consistent across features
 
-I wonder will kernel need to port those fixes to handle the non-multiple
-block length of the chacha20 cipher? If yes, we should port it immediately
-to catch up with the v6.9 release if we can.
+ drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c | 2 +-
+ drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c   | 2 +-
+ drivers/crypto/intel/qat/qat_common/adf_rl.c           | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-[1] https://github.com/openssl/openssl/issues/24070
-[2] https://github.com/openssl/openssl/pull/24097
 
-Thanks,
-Yangyu Chen
+base-commit: 0419fa6732b2b98ea185ac05f2a3c430b7de2abb
+-- 
+2.40.1
 
