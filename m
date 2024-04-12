@@ -1,36 +1,41 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6724487BE;
-	Fri, 12 Apr 2024 07:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0784AEE3;
+	Fri, 12 Apr 2024 07:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712907203; cv=none; b=K1rg1ksonl5d5zA/AsQg9/4o4MdANKRVs37VCK8P2gG8pPakBSEMNqWfIOL4TnKK1e7rXKg55YQNEzB6Q8MyaHjJ+Rt5Guwr6sgsyfWf/OaZU/jHRwCfjBQxL7/tKYWWGqGNxXkICR9wOFFAl5kjhqlaaaiCF7IznfBR1ssbQ7s=
+	t=1712907236; cv=none; b=Ehh9NvG25Li02lRgmE/16JjTSIiVVZ9BQnPEuk/JljnMp/xri4/PepfP/2F6QX3vqhSNdWLYDP7DdZ6son89CPnUZ4aI1oFUNDGLos6oq5e8jRkJjDC+wT1uhYRZZ39RkdbA1BIx7KNn1nFoqtuuX8pbZHEY9paFxaFwqY6VPHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712907203; c=relaxed/simple;
-	bh=8L+OryCbKP9r+tCHZ0z5HF44GuDDMOxG3k1lKMO40MQ=;
+	s=arc-20240116; t=1712907236; c=relaxed/simple;
+	bh=UjGGsBDeZa6tp7LMRqKVPl6TWPS7+hVNdoJB8ERR5Ks=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BwselLbzGtSUZYfOn9I3wk6nAUsUGr3lfG+ArvxFuNUgsBkXiFG5NDbQQmpxJYXVcHzqT/fVWMQoNf+ryx95yCWoqEI1MxbP+kRmSNMZuRl+A475vV/lV1DNdXRjB2AXDZomR3b7W+24Ow8TgvrFY1jBamChryq5vIlJZmY1vok=
+	 Content-Type:Content-Disposition:In-Reply-To; b=FbWTiXzFrmec2Qfjt3sSElIPQcZtLH+smqW7BZUAa2No5/rvy+xR9xy6s10D/VByLk9OxW7+69hhnfTvBGZdXUoe0nAKZjyMD7S8EVn7n9MWXFB+kld9hOYnxfgw5KqwCG45W76Ed0+i1qBfwYNjDfwCAC4Q3v2WKtvMKpWpDTw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rvBPR-000lsI-9l; Fri, 12 Apr 2024 15:33:18 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Apr 2024 15:33:34 +0800
-Date: Fri, 12 Apr 2024 15:33:34 +0800
+	id 1rvBPb-000ltu-Ja; Fri, 12 Apr 2024 15:33:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Apr 2024 15:33:45 +0800
+Date: Fri, 12 Apr 2024 15:33:45 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Chenghai Huang <huangchenghai2@huawei.com>
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, fanghao11@huawei.com,
-	liulongfang@huawei.com, shenyang39@huawei.com,
-	songzhiqi1@huawei.com, qianweili@huawei.com,
-	liushangbin@hisilicon.com, linwenkai6@hisilicon.com,
-	taoqi10@huawei.com, wangzhou1@hisilicon.com
-Subject: Re: [PATCH v2 0/9] crypto: hisilicon - Optimize and fix some driver
- processes
-Message-ID: <ZhjjzpefaFy8FJrZ@gondor.apana.org.au>
-References: <20240407080000.673435-1-huangchenghai2@huawei.com>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: David Howells <dhowells@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: Re: [PATCH v4] X.509: Introduce scope-based x509_certificate
+ allocation
+Message-ID: <Zhjj2dhsFN808f/b@gondor.apana.org.au>
+References: <ace28d74f7c143fa28919214858a9ca90b6cf970.1712511262.git.lukas@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -39,44 +44,48 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240407080000.673435-1-huangchenghai2@huawei.com>
+In-Reply-To: <ace28d74f7c143fa28919214858a9ca90b6cf970.1712511262.git.lukas@wunner.de>
 
-On Sun, Apr 07, 2024 at 03:59:51PM +0800, Chenghai Huang wrote:
-> This patch series is mainly used to fix and optimize some
-> problems of hisilicon.
+On Sun, Apr 07, 2024 at 07:57:40PM +0200, Lukas Wunner wrote:
+> Add a DEFINE_FREE() clause for x509_certificate structs and use it in
+> x509_cert_parse() and x509_key_preparse().  These are the only functions
+> where scope-based x509_certificate allocation currently makes sense.
+> A third user will be introduced with the forthcoming SPDM library
+> (Security Protocol and Data Model) for PCI device authentication.
 > 
-> v1 -> v2
-> - fixed codecheck warnings about unused variable
->   | Reported-by: kernel test robot <lkp@intel.com>
->   | Closes: https://lore.kernel.org/oe-kbuild-all/202404040616.cF0Pvb9M-lkp@intel.com/
+> Unlike most other DEFINE_FREE() clauses, this one checks for IS_ERR()
+> instead of NULL before calling x509_free_certificate() at end of scope.
+> That's because the "constructor" of x509_certificate structs,
+> x509_cert_parse(), returns a valid pointer or an ERR_PTR(), but never
+> NULL.
 > 
-> Chenghai Huang (9):
->   crypto: hisilicon/sec - Add the condition for configuring the sriov
->     function
->   crypto: hisilicon/debugfs - Fix debugfs uninit process issue
->   crypto: hisilicon/sgl - Delete redundant parameter verification
->   crypto: hisilicon/debugfs - Fix the processing logic issue in the
->     debugfs creation
->   crypto: hisilicon/qm - Add the default processing branch
->   crypto: hisilicon - Adjust debugfs creation and release order
->   crypto: hisilicon/sec - Fix memory leak for sec resource release
->   crypto: hisilicon/debugfs - Resolve the problem of applying for
->     redundant space in sq dump
->   crypto: hisilicon/qm - Add the err memory release process to qm uninit
+> Comparing the Assembler output before/after has shown they are identical,
+> save for the fact that gcc-12 always generates two return paths when
+> __cleanup() is used, one for the success case and one for the error case.
 > 
->  drivers/crypto/hisilicon/debugfs.c         | 38 +++++++++++++++-------
->  drivers/crypto/hisilicon/hpre/hpre_main.c  | 21 ++++++------
->  drivers/crypto/hisilicon/qm.c              |  8 ++---
->  drivers/crypto/hisilicon/sec2/sec_crypto.c |  4 ++-
->  drivers/crypto/hisilicon/sec2/sec_main.c   | 26 +++++++--------
->  drivers/crypto/hisilicon/sgl.c             |  5 +--
->  drivers/crypto/hisilicon/zip/zip_main.c    | 24 +++++++-------
->  7 files changed, 68 insertions(+), 58 deletions(-)
+> In x509_cert_parse(), add a hint for the compiler that kzalloc() never
+> returns an ERR_PTR().  Otherwise the compiler adds a gratuitous IS_ERR()
+> check on return.  Introduce an assume() macro for this which can be
+> re-used elsewhere in the kernel to provide hints for the compiler.
 > 
-> -- 
-> 2.30.0
+> Suggested-by: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+> Link: https://lore.kernel.org/all/20231003153937.000034ca@Huawei.com/
+> Link: https://lwn.net/Articles/934679/
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> ---
+> Changes v3 -> v4:
+> Use passive mood in and drop the word "handy" from commit message (Jarkko).
+> 
+> Link to v3:
+> https://lore.kernel.org/all/63cc7ab17a5064756e26e50bc605e3ff8914f05a.1708439875.git.lukas@wunner.de/
+> 
+>  crypto/asymmetric_keys/x509_cert_parser.c | 43 ++++++++++++-------------------
+>  crypto/asymmetric_keys/x509_parser.h      |  3 +++
+>  crypto/asymmetric_keys/x509_public_key.c  | 31 +++++++---------------
+>  include/linux/compiler.h                  |  2 ++
+>  4 files changed, 30 insertions(+), 49 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
