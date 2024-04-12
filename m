@@ -1,37 +1,32 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7CB10940;
-	Fri, 12 Apr 2024 02:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB47011185;
+	Fri, 12 Apr 2024 02:54:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712890435; cv=none; b=m4nJcIllkyccwtuN9oxnekeymTAAnULPCWFNL17bY66Ye00RQJMkyQvWd5bitP7UiY3fkLRNCUlTSCzHD/fZ1nfPHnBoQI2hNMQoqLHiFOef/reFiC3eaTxPdFpEnkvdIe0zsU/BkZqPdKavX66kkCcHZOVG0jX1t/umaa8vpRc=
+	t=1712890468; cv=none; b=cPDViqyyXiD5PvP5Q8Ly4MhfMyJFyqyNCvtk5lGmHlK98tXNVD8JUfHjrnQySQ7fnAUO7YLtFfaDvqgjw/XmmI/Nh9wNlCNP+t7s7kxTqXdmozpVej2mzQMbQq3i/Ct33JsT3IVSl2fJPhOW9Fys2U1ji5Xos1B8maPI/wkFJtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712890435; c=relaxed/simple;
-	bh=s/bHJX5XlC5ZnI4HyolwWE16wndyztBmIJRjBDWURK4=;
+	s=arc-20240116; t=1712890468; c=relaxed/simple;
+	bh=h4qSO4o4Q4wf7AGi/1qfp4K265zSU5U2oDv5u4UuZ84=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mGrt32uZhWX5JrSzjMi0+jvGgLWFFLEMXlM2DgF0FelTxJqs3dab0tj0Y1OuWRN908R+SQNbsIgJM0b0/1ansgyo3xJU0Xk4NukuBFkX4Fyy9DBkoI5523zAebWK4myTEOhf7fJ3WoBp4YV9njNACh+PBi6mTTTgrkuwxeXFJ1M=
+	 Content-Type:Content-Disposition:In-Reply-To; b=CCZjw1tcBw6NteM4Lq/9hT2d45o8gs3DVgF2aiFHP2bnM1ikpC/A2dogpsZmpe2CAKGR4hdEcK605ViZgnecyCZ/LYoQpBgyg1Ay0p/Ak/ldssKvP7xqqBCed2VFuVTio111PAuZKhDOp14pnORP2TtKyL1Ca6/CPIa2Gj2XSvo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rv72h-000gk1-KW; Fri, 12 Apr 2024 10:53:32 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Apr 2024 10:53:49 +0800
-Date: Fri, 12 Apr 2024 10:53:49 +0800
+	id 1rv73S-000gl1-65; Fri, 12 Apr 2024 10:54:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Apr 2024 10:54:35 +0800
+Date: Fri, 12 Apr 2024 10:54:35 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Alexey Romanov <avromanov@salutedevices.com>
-Cc: neil.armstrong@linaro.org, clabbe@baylibre.com, davem@davemloft.net,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, khilman@baylibre.com, jbrunet@baylibre.com,
-	martin.blumenstingl@googlemail.com, vadim.fedorenko@linux.dev,
-	linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
-Subject: Re: [PATCH v7 00/23] Support more Amlogic SoC families in crypto
- driver
-Message-ID: <ZhiiPVckOYH9dFQ/@gondor.apana.org.au>
-References: <20240411133832.2896463-1-avromanov@salutedevices.com>
+To: Hailey Mothershead <hailmo@amazon.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] crypto: aead,cipher - zeroize key buffer after use
+Message-ID: <Zhiia00JmkH7hQt8@gondor.apana.org.au>
+References: <20240411235157.19801-1-hailmo@amazon.com>
+ <20240411235157.19801-2-hailmo@amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -40,20 +35,45 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240411133832.2896463-1-avromanov@salutedevices.com>
+In-Reply-To: <20240411235157.19801-2-hailmo@amazon.com>
 
-On Thu, Apr 11, 2024 at 04:38:09PM +0300, Alexey Romanov wrote:
->
-> Changes V6 -> V7 [9]:
+On Thu, Apr 11, 2024 at 11:51:57PM +0000, Hailey Mothershead wrote:
+> I.G 9.7.B for FIPS 140-3 specifies that variables temporarily holding
+> cryptographic information should be zeroized once they are no longer
+> needed. Accomplish this by using kfree_sensitive for buffers that
+> previously held the private key.
 > 
-> - Fix dt-schema: power domain now required only for A1.
-> - Use crypto_skcipher_ctx_dma() helper for cipher instead of
->   ____cacheline_aligned.
-> - Add import/export functions for hasher.
-> - Fix commit message for patch 17, acorrding to discussion [10].
+> Signed-off-by: Hailey Mothershead <hailmo@amazon.com>
+> ---
+>  crypto/aead.c   | 2 +-
+>  crypto/cipher.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/crypto/aead.c b/crypto/aead.c
+> index 16991095270d..2592d5375de5 100644
+> --- a/crypto/aead.c
+> +++ b/crypto/aead.c
+> @@ -36,7 +36,7 @@ static int setkey_unaligned(struct crypto_aead *tfm, const u8 *key,
+>  	memcpy(alignbuffer, key, keylen);
+>  	ret = crypto_aead_alg(tfm)->setkey(tfm, alignbuffer, keylen);
+>  	memset(alignbuffer, 0, keylen);
+> -	kfree(buffer);
+> +	kfree_sensitive(buffer);
 
-Please ensure that this passes the self-tests with extra fuzzing
-enabled.
+Please remove the now-redundant memset.
+
+> diff --git a/crypto/cipher.c b/crypto/cipher.c
+> index b47141ed4a9f..efb87fa417e7 100644
+> --- a/crypto/cipher.c
+> +++ b/crypto/cipher.c
+> @@ -35,7 +35,7 @@ static int setkey_unaligned(struct crypto_cipher *tfm, const u8 *key,
+>  	memcpy(alignbuffer, key, keylen);
+>  	ret = cia->cia_setkey(crypto_cipher_tfm(tfm), alignbuffer, keylen);
+>  	memset(alignbuffer, 0, keylen);
+> -	kfree(buffer);
+> +	kfree_sensitive(buffer);
+
+Ditto.
 
 Thanks,
 -- 
