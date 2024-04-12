@@ -1,179 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-out3.simply.com (smtp-out3.simply.com [94.231.106.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6CF1487EB;
-	Fri, 12 Apr 2024 15:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2F05491F;
+	Fri, 12 Apr 2024 17:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.231.106.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712936774; cv=none; b=LzA/Df5aGj/SLIFQUXvrAZ7jeS6BMazG1olOqb5T5f8rFJT+PDGBhHLoemElItjPQiwJnuO8vywTrXdLpRiL5W7fO94PLymDLidZ3fv64F4qLiHFWg/GxPQSL3hgw+gCrIhs2a5AmidL7v6+QF4OszfZQXF4LeMI5Kc1HGpZvbw=
+	t=1712943842; cv=none; b=bwSSqlIiqirlNos7U7JzyxjFkXCR5LbEibmxgn0pJ5Cno7MCWnip2wD7pOQeRwaeQj/32LhDSTjDRG26JHMW59Ny86YB3lNx7HzQuo3iyhq6W03owMk7MMZbNDSuhwwilLUcrpQwswnwRlMVkCF9jGVe5K2ezSQIwVCY1FH3o3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712936774; c=relaxed/simple;
-	bh=X332GSNFEsSKBitRLS+i17dScXamCkeOUyYWvT4bMRE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qTMxxDCzzMcgpZxhr8atL0LvgTtAeDmbNlYLQRV9qoRsByoA02Zpygx+RDvVOfQvlFrRy1J1txQtvwpYzRYJawaSp5z85aHz2T5ClUekrYu2BOFJFNdROK/H+gxOlPRBUcE4E0IMMfIQ/9DG+v4xtiuMTjDhafwnNMXB4MAa4/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DgdV7FEX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712943842; c=relaxed/simple;
+	bh=9jVpBA4jgJ0UG7XI8lXz3tsBG24mQMEc1vToCewTYO0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pBkShjob7DM6eL4mY7OI2oE8SXvfyS11UwRffEkb3NSZ6lkfFDKcBRy8XGicN0ZCIUxnHNRBwS2iZX+MlhadTWhmPooWEFmwhBXqe4i8KnGKseux+5HgOsR2qS5LHKkTG74nBVI/7OFpedhC2XDvDWSdcq6LeL5xnUIrf2LWbZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gaisler.com; spf=pass smtp.mailfrom=gaisler.com; dkim=pass (1024-bit key) header.d=gaisler.com header.i=@gaisler.com header.b=Im0iVk8f; arc=none smtp.client-ip=94.231.106.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gaisler.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gaisler.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DgdV7FEX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94D67C113CC;
-	Fri, 12 Apr 2024 15:46:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712936773;
-	bh=X332GSNFEsSKBitRLS+i17dScXamCkeOUyYWvT4bMRE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=DgdV7FEXvDi3slnyg1m/1wMZwoWyACw01LT8rYRb4Ue8G0b1FPiAg+xNnigIs982T
-	 U1u3ByYc1cwq7UKuT8Mqn/KhRoFJILO2pg/c9fjp51cLseOvGiD6fZymz4x3wzuy+n
-	 V9Em8nnGBdXLKkg5jttrPVngzbp1SxYV1cj88kb07OLWZVoYyzk+W7x3Zal1U7Lfu7
-	 RBuN1usgSynouI/s9TjjUpaEsija10sSom4/LR3gSb/9eebuDSPBiZEuEMLknv8Jfs
-	 n9+w0BsNkdQSN1VSo6ml3GIYkNxoCH/TCXUZHUGLd1bb73W4uzx2IM5Sw2GyMvWT0G
-	 G9aHXceDqEj6A==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: x86@kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Chang S . Bae" <chang.seok.bae@intel.com>
-Subject: [PATCH] crypto: x86/aes-xts - handle CTS encryption more efficiently
-Date: Fri, 12 Apr 2024 08:45:59 -0700
-Message-ID: <20240412154559.91807-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (1024-bit key) header.d=gaisler.com header.i=@gaisler.com header.b="Im0iVk8f"
+Received: from localhost (localhost [127.0.0.1])
+	by smtp.simply.com (Simply.com) with ESMTP id 4VGP7R5WBkz680X;
+	Fri, 12 Apr 2024 19:43:47 +0200 (CEST)
+Received: from [10.10.15.20] (h-98-128-223-123.NA.cust.bahnhof.se [98.128.223.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(Client did not present a certificate)
+	by smtp.simply.com (Simply.com) with ESMTPSA id 4VGP7R12RYz67yx;
+	Fri, 12 Apr 2024 19:43:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gaisler.com;
+	s=unoeuro; t=1712943827;
+	bh=rz6jPUrsijT1INaAxqASzjJlCA1E00oo2UxdhuDoHkY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=Im0iVk8feRxQgKlsQWaCXv3LUGHwDcqreNg4bxaJ3/IOrXfx2QiN1rnYBfEc+f2u5
+	 8MbqJsx4mJ8FaAweR4s/LxS3LCYE612Agy+eKqOKsD0gLkupmeXqyp8GmT5sJHqtiZ
+	 kRuaHnbzajuZP5Rptmhe/G5mAFIlHj5p1NxY+ApA=
+Message-ID: <1b48be5f-bcc2-4cc0-8a23-85c472168082@gaisler.com>
+Date: Fri, 12 Apr 2024 19:43:45 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: Build regressions/improvements in v6.9-rc1
+To: Sam Ravnborg <sam@ravnborg.org>, Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
+ Rob Clark <robdclark@gmail.com>, Abhinav Kumar <quic_abhinavk@quicinc.com>,
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+ linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ freedreno@lists.freedesktop.org, Lucas De Marchi <lucas.demarchi@intel.com>,
+ Oded Gabbay <ogabbay@kernel.org>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ intel-xe@lists.freedesktop.org, linux-mips@vger.kernel.org,
+ sparclinux@vger.kernel.org
+References: <CAHk-=wgOw_13JuuX4khpn4K+n09cRG3EBQWufAPBWoa0GLLQ0A@mail.gmail.com>
+ <20240325200315.3896021-1-geert@linux-m68k.org>
+ <8d78894-dd89-9f4d-52bb-1b873c50be9c@linux-m68k.org>
+ <20240326181500.GA1501083@ravnborg.org>
+Content-Language: en-US
+From: Andreas Larsson <andreas@gaisler.com>
+In-Reply-To: <20240326181500.GA1501083@ravnborg.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Eric Biggers <ebiggers@google.com>
+On 2024-03-26 19:15, Sam Ravnborg wrote:
+> Hi all.
+> 
+>>   + error: arch/sparc/kernel/process_32.o: relocation truncated to fit: R_SPARC_WDISP22 against `.text':  => (.fixup+0xc), (.fixup+0x4)
+>>   + error: arch/sparc/kernel/signal_32.o: relocation truncated to fit: R_SPARC_WDISP22 against `.text':  => (.fixup+0x18), (.fixup+0x8), (.fixup+0x0), (.fixup+0x20), (.fixup+0x10)
+>>   + error: relocation truncated to fit: R_SPARC_WDISP22 against `.init.text':  => (.head.text+0x5100), (.head.text+0x5040)
+>>   + error: relocation truncated to fit: R_SPARC_WDISP22 against symbol `leon_smp_cpu_startup' defined in .text section in arch/sparc/kernel/trampoline_32.o:  => (.init.text+0xa4)
+> 
+> Looks like something is too big for the available space here.
+> Any hints how to dig into this would be nice.
+> 
+> Note: this is a sparc32 allmodconfig build
 
-When encrypting a message whose length isn't a multiple of 16 bytes,
-encrypt the last full block in the main loop.  This works because only
-decryption uses the last two tweaks in reverse order, not encryption.
+I have a patch for this. I'll clean it up and send it next week.
 
-This improves the performance of decrypting messages whose length isn't
-a multiple of the AES block length, shrinks the size of
-aes-xts-avx-x86_64.o by 5.0%, and eliminates two instructions (a test
-and a not-taken conditional jump) when encrypting a message whose length
-*is* a multiple of the AES block length.
-
-While it's not super useful to optimize for ciphertext stealing given
-that it's rarely needed in practice, the other two benefits mentioned
-above make this optimization worthwhile.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/aes-xts-avx-x86_64.S | 53 +++++++++++++++-------------
- 1 file changed, 29 insertions(+), 24 deletions(-)
-
-diff --git a/arch/x86/crypto/aes-xts-avx-x86_64.S b/arch/x86/crypto/aes-xts-avx-x86_64.S
-index 95e412e7601d..52f1997ed05a 100644
---- a/arch/x86/crypto/aes-xts-avx-x86_64.S
-+++ b/arch/x86/crypto/aes-xts-avx-x86_64.S
-@@ -535,16 +535,20 @@
- 	// 8th and later round keys which otherwise would need 4-byte offsets.
- .if \enc
- 	add		$7*16, KEY
- .else
- 	add		$(15+7)*16, KEY
--.endif
- 
--	// Check whether the data length is a multiple of the AES block length.
-+	// When decrypting a message whose length isn't a multiple of the AES
-+	// block length, exclude the last full block from the main loop by
-+	// subtracting 16 from LEN.  This is needed because ciphertext stealing
-+	// decryption uses the last two tweaks in reverse order.  We'll handle
-+	// the last full block and the partial block specially at the end.
- 	test		$15, LEN
--	jnz		.Lneed_cts\@
-+	jnz		.Lneed_cts_dec\@
- .Lxts_init\@:
-+.endif
- 
- 	// Cache as many round keys as possible.
- 	_load_round_keys
- 
- 	// Compute the first set of tweaks TWEAK[0-3].
-@@ -683,45 +687,46 @@
- 	_vaes_4x	\enc, 0, 10
- 	_vaes_4x	\enc, 0, 11
- 	_vaes_4x	\enc, 1, 12
- 	jmp		.Lencrypt_4x_done\@
- 
--.Lneed_cts\@:
--	// The data length isn't a multiple of the AES block length, so
--	// ciphertext stealing (CTS) will be needed.  Subtract one block from
--	// LEN so that the main loop doesn't process the last full block.  The
--	// CTS step will process it specially along with the partial block.
-+.if !\enc
-+.Lneed_cts_dec\@:
- 	sub		$16, LEN
- 	jmp		.Lxts_init\@
-+.endif
- 
- .Lcts\@:
- 	// Do ciphertext stealing (CTS) to en/decrypt the last full block and
--	// the partial block.  CTS needs two tweaks.  TWEAK0_XMM contains the
--	// next tweak; compute the one after that.  Decryption uses these two
--	// tweaks in reverse order, so also define aliases to handle that.
--	_next_tweak	TWEAK0_XMM, %xmm0, TWEAK1_XMM
-+	// the partial block.  TWEAK0_XMM contains the next tweak.
-+
- .if \enc
--	.set		CTS_TWEAK0,	TWEAK0_XMM
--	.set		CTS_TWEAK1,	TWEAK1_XMM
-+	// If encrypting, the main loop already encrypted the last full block to
-+	// create the CTS intermediate ciphertext.  Prepare for the rest of CTS
-+	// by rewinding the pointers and loading the intermediate ciphertext.
-+	sub		$16, SRC
-+	sub		$16, DST
-+	vmovdqu		(DST), %xmm0
- .else
--	.set		CTS_TWEAK0,	TWEAK1_XMM
--	.set		CTS_TWEAK1,	TWEAK0_XMM
--.endif
--
--	// En/decrypt the last full block.
-+	// If decrypting, the main loop didn't decrypt the last full block
-+	// because CTS decryption uses the last two tweaks in reverse order.
-+	// Do it now by advancing the tweak and decrypting the last full block.
-+	_next_tweak	TWEAK0_XMM, %xmm0, TWEAK1_XMM
- 	vmovdqu		(SRC), %xmm0
--	_aes_crypt	\enc, _XMM, CTS_TWEAK0, %xmm0
-+	_aes_crypt	\enc, _XMM, TWEAK1_XMM, %xmm0
-+.endif
- 
- .if USE_AVX10
- 	// Create a mask that has the first LEN bits set.
- 	mov		$-1, %rax
- 	bzhi		LEN, %rax, %rax
- 	kmovq		%rax, %k1
- 
--	// Swap the first LEN bytes of the above result with the partial block.
--	// Note that to support in-place en/decryption, the load from the src
--	// partial block must happen before the store to the dst partial block.
-+	// Swap the first LEN bytes of the en/decryption of the last full block
-+	// with the partial block.  Note that to support in-place en/decryption,
-+	// the load from the src partial block must happen before the store to
-+	// the dst partial block.
- 	vmovdqa		%xmm0, %xmm1
- 	vmovdqu8	16(SRC), %xmm0{%k1}
- 	vmovdqu8	%xmm1, 16(DST){%k1}
- .else
- 	lea		.Lcts_permute_table(%rip), %rax
-@@ -748,11 +753,11 @@
- 	// Do a blend to generate the src partial block followed by the second
- 	// part of the en/decryption of the last full block.
- 	vpblendvb	%xmm3, %xmm0, %xmm1, %xmm0
- .endif
- 	// En/decrypt again and store the last full block.
--	_aes_crypt	\enc, _XMM, CTS_TWEAK1, %xmm0
-+	_aes_crypt	\enc, _XMM, TWEAK0_XMM, %xmm0
- 	vmovdqu		%xmm0, (DST)
- 	jmp		.Ldone\@
- .endm
- 
- // void aes_xts_encrypt_iv(const struct crypto_aes_ctx *tweak_key,
-
-base-commit: 751fb2528c12ef64d1e863efb196cdc968b384f6
-prerequisite-patch-id: 5c1ca8ffe87136eb7bfe74d996f5e6cac01e2768
--- 
-2.44.0
-
+Cheers,
+Andreas
