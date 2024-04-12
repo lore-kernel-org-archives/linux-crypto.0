@@ -1,81 +1,110 @@
-Received: from smtp-out3.simply.com (smtp-out3.simply.com [94.231.106.210])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2F05491F;
-	Fri, 12 Apr 2024 17:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.231.106.210
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712943842; cv=none; b=bwSSqlIiqirlNos7U7JzyxjFkXCR5LbEibmxgn0pJ5Cno7MCWnip2wD7pOQeRwaeQj/32LhDSTjDRG26JHMW59Ny86YB3lNx7HzQuo3iyhq6W03owMk7MMZbNDSuhwwilLUcrpQwswnwRlMVkCF9jGVe5K2ezSQIwVCY1FH3o3I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712943842; c=relaxed/simple;
-	bh=9jVpBA4jgJ0UG7XI8lXz3tsBG24mQMEc1vToCewTYO0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pBkShjob7DM6eL4mY7OI2oE8SXvfyS11UwRffEkb3NSZ6lkfFDKcBRy8XGicN0ZCIUxnHNRBwS2iZX+MlhadTWhmPooWEFmwhBXqe4i8KnGKseux+5HgOsR2qS5LHKkTG74nBVI/7OFpedhC2XDvDWSdcq6LeL5xnUIrf2LWbZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gaisler.com; spf=pass smtp.mailfrom=gaisler.com; dkim=pass (1024-bit key) header.d=gaisler.com header.i=@gaisler.com header.b=Im0iVk8f; arc=none smtp.client-ip=94.231.106.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gaisler.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gaisler.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gaisler.com header.i=@gaisler.com header.b="Im0iVk8f"
-Received: from localhost (localhost [127.0.0.1])
-	by smtp.simply.com (Simply.com) with ESMTP id 4VGP7R5WBkz680X;
-	Fri, 12 Apr 2024 19:43:47 +0200 (CEST)
-Received: from [10.10.15.20] (h-98-128-223-123.NA.cust.bahnhof.se [98.128.223.123])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(Client did not present a certificate)
-	by smtp.simply.com (Simply.com) with ESMTPSA id 4VGP7R12RYz67yx;
-	Fri, 12 Apr 2024 19:43:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gaisler.com;
-	s=unoeuro; t=1712943827;
-	bh=rz6jPUrsijT1INaAxqASzjJlCA1E00oo2UxdhuDoHkY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=Im0iVk8feRxQgKlsQWaCXv3LUGHwDcqreNg4bxaJ3/IOrXfx2QiN1rnYBfEc+f2u5
-	 8MbqJsx4mJ8FaAweR4s/LxS3LCYE612Agy+eKqOKsD0gLkupmeXqyp8GmT5sJHqtiZ
-	 kRuaHnbzajuZP5Rptmhe/G5mAFIlHj5p1NxY+ApA=
-Message-ID: <1b48be5f-bcc2-4cc0-8a23-85c472168082@gaisler.com>
-Date: Fri, 12 Apr 2024 19:43:45 +0200
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE49610B
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Apr 2024 21:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712957435; cv=none; b=nMk54s+Pz722Il/7y1p43psRJHFs2Ur7zzNny8e1vdqE6ifkatNsj+276iIK9vdkeMBSsUwdbB7ezgrwdFU6HURPQZirRBM6nHBCPDt4eLaO+WH6v2ZAVRZohC06G8JNC22Q9MrlUJ9INJzXbrTt3TENKZbRggOYh9O5QJX2AuM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712957435; c=relaxed/simple;
+	bh=urpF+uhnagsRIlmCvAoqVf0cSl1JhJfWoktomJ+ip1k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YzJCFUdBGjRdy4B4LBbOfjM9qXY6+80mndtmASFylo6pGw0MfdO4xxXc++y30iakxUocltUjR4P75CPuUMAVWU2A5dznd0qBUop6xtACsxRHe1FOJdsQJDIzDLzdWNwhuzH3g4wL6q6R68uubKHwLcV3fyO70DcFKLDSnwbTtsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=bI4v0Zah; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="bI4v0Zah"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-417f5268b12so12336155e9.1
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Apr 2024 14:30:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1712957431; x=1713562231; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GxzVOZoRlwbh3BCja72w8JfT19aYOorMwhFDDTCvDh0=;
+        b=bI4v0Zah4boCHWG6A4aSzMr20nJi3Dsbj6+Dn6RKBVt7zAvkX6RF6MtSiobxe6Ug9q
+         YB1vDiHSn7xKsWTCMRIXQNbAnrrse4jpfVRBVjmbSVBinutc0spid/vGTJc0Slads/da
+         gFPG0Q6Tj5bAvc96uPCStpYP2WHnGh0h99dDxTk5IRqULMMzyb4P6ab+6hIyJX3Rp0b5
+         p+UxDR107+WTXxEdqRohyL/mUPoNdUU4PtfElwzi2j4KimUDRry2bdlw6k7FB5Gaa8yx
+         DoMhVScHuObGsshwjr0G5/nXookWTdwbe0d5gTzlg1fCS0eD2Ffqid15P6sxZjVrtmPf
+         g8eA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712957431; x=1713562231;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GxzVOZoRlwbh3BCja72w8JfT19aYOorMwhFDDTCvDh0=;
+        b=wiQ8ouzmwvE6VheKGB3vTRHx1ikDPxRNFEPCZCF1OArhYDqOqJXbdzsVqQTkzLnTxp
+         ld69LJtUCtmDoE1cu/BlJlWoCfR6Q8DbuSEUE6/26YVa5msjYXpO5h8K6YoaC4iRZfgw
+         s1aTEqtp0pc3L9hTy3A0uuL4XnKHsC7sVaiu5gemVnoYCYZTNnZ0D83NFkA9V5/92ByP
+         OGsbQ/4o3UUhct47n8s8JJ5PHJe7ehY63mXzQhN/TNU3dNjJMX9Z87j6n8eM+kzfhWhi
+         3jA6wRLdxEyIXf1TBUMRpYpHWxjVIgkosuJYhtMh6bbR/yHwUKrY0Gpn6HTpJSbXey6f
+         3kgw==
+X-Forwarded-Encrypted: i=1; AJvYcCUL2TrxY84tl8fnB8T1YyphQpFlSeiLpaOg5DZoCSftbg29kpQAQw600+rPajOOKUjAnZ9r6kYEba+ibR9W8UInRje/tZ2AasnmiRNs
+X-Gm-Message-State: AOJu0YwvPRQD29YAZoNtpXCV7/cmaIAmSFCtFe3fn3WfD7o4xtfkKDHH
+	37sofXbKqdyoYfrYXbQ11JiQEV9cYsQ4e5isqbcsmeEiZvXpDeflYYd/IsdLs+MI3fEPV1f13Cb
+	nXnY=
+X-Google-Smtp-Source: AGHT+IHUhdZJLdLX0HFsI9u9Pjbp9G8qIzufUAqtkGmv95NbpQTbtI+7HQ+bCAtx5aoCZH0BcgtDhw==
+X-Received: by 2002:a05:6000:1952:b0:347:2b42:a397 with SMTP id e18-20020a056000195200b003472b42a397mr1533340wry.4.1712957430500;
+        Fri, 12 Apr 2024 14:30:30 -0700 (PDT)
+Received: from fedora.fritz.box (aftr-82-135-80-212.dynamic.mnet-online.de. [82.135.80.212])
+        by smtp.gmail.com with ESMTPSA id di7-20020a0560000ac700b003439d2a5f99sm5046076wrb.55.2024.04.12.14.30.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 14:30:29 -0700 (PDT)
+From: Thorsten Blum <thorsten.blum@toblux.com>
+To: thorsten.blum@toblux.com
+Cc: dan.j.williams@intel.com,
+	davem@davemloft.net,
+	herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RESEND PATCH] raid6test: Use str_plural() to fix Coccinelle warning
+Date: Fri, 12 Apr 2024 23:29:45 +0200
+Message-ID: <20240412212944.147286-2-thorsten.blum@toblux.com>
+X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240328131519.372381-4-thorsten.blum@toblux.com>
+References: <20240328131519.372381-4-thorsten.blum@toblux.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Build regressions/improvements in v6.9-rc1
-To: Sam Ravnborg <sam@ravnborg.org>, Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
- Rob Clark <robdclark@gmail.com>, Abhinav Kumar <quic_abhinavk@quicinc.com>,
- Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
- linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
- freedreno@lists.freedesktop.org, Lucas De Marchi <lucas.demarchi@intel.com>,
- Oded Gabbay <ogabbay@kernel.org>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- intel-xe@lists.freedesktop.org, linux-mips@vger.kernel.org,
- sparclinux@vger.kernel.org
-References: <CAHk-=wgOw_13JuuX4khpn4K+n09cRG3EBQWufAPBWoa0GLLQ0A@mail.gmail.com>
- <20240325200315.3896021-1-geert@linux-m68k.org>
- <8d78894-dd89-9f4d-52bb-1b873c50be9c@linux-m68k.org>
- <20240326181500.GA1501083@ravnborg.org>
-Content-Language: en-US
-From: Andreas Larsson <andreas@gaisler.com>
-In-Reply-To: <20240326181500.GA1501083@ravnborg.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2024-03-26 19:15, Sam Ravnborg wrote:
-> Hi all.
-> 
->>   + error: arch/sparc/kernel/process_32.o: relocation truncated to fit: R_SPARC_WDISP22 against `.text':  => (.fixup+0xc), (.fixup+0x4)
->>   + error: arch/sparc/kernel/signal_32.o: relocation truncated to fit: R_SPARC_WDISP22 against `.text':  => (.fixup+0x18), (.fixup+0x8), (.fixup+0x0), (.fixup+0x20), (.fixup+0x10)
->>   + error: relocation truncated to fit: R_SPARC_WDISP22 against `.init.text':  => (.head.text+0x5100), (.head.text+0x5040)
->>   + error: relocation truncated to fit: R_SPARC_WDISP22 against symbol `leon_smp_cpu_startup' defined in .text section in arch/sparc/kernel/trampoline_32.o:  => (.init.text+0xa4)
-> 
-> Looks like something is too big for the available space here.
-> Any hints how to dig into this would be nice.
-> 
-> Note: this is a sparc32 allmodconfig build
+Fixes the following Coccinelle/coccicheck warning reported by
+string_choices.cocci:
 
-I have a patch for this. I'll clean it up and send it next week.
+	opportunity for str_plural(err)
 
-Cheers,
-Andreas
+Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
+---
+ crypto/async_tx/raid6test.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/async_tx/raid6test.c b/crypto/async_tx/raid6test.c
+index d3fbee1e03e5..3826ccf0b9cc 100644
+--- a/crypto/async_tx/raid6test.c
++++ b/crypto/async_tx/raid6test.c
+@@ -11,6 +11,7 @@
+ #include <linux/mm.h>
+ #include <linux/random.h>
+ #include <linux/module.h>
++#include <linux/string_choices.h>
+ 
+ #undef pr
+ #define pr(fmt, args...) pr_info("raid6test: " fmt, ##args)
+@@ -228,7 +229,7 @@ static int __init raid6_test(void)
+ 
+ 	pr("\n");
+ 	pr("complete (%d tests, %d failure%s)\n",
+-	   tests, err, err == 1 ? "" : "s");
++	   tests, err, str_plural(err));
+ 
+ 	for (i = 0; i < NDISKS+3; i++)
+ 		put_page(data[i]);
+-- 
+2.44.0
+
