@@ -1,111 +1,131 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0563C7F7EF
-	for <linux-crypto@vger.kernel.org>; Mon, 15 Apr 2024 16:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E758F78C90;
+	Mon, 15 Apr 2024 16:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713197203; cv=none; b=X97v+2wLis4Wrzc8DnGEGosCNMra/mNVHZxqp/HsteKmXQk9wi/YRAq9xX7r4j2oWUMnOwJ9/OmhTE4swpfDwQUsqMVo4vVtRHuDJ8Wxv3oOjzMxSQoTtMM1KOWDhVXCDjpssv2JvS0rbn3vGOK7nqZdSsrxJVvRXVXXNysJ3fw=
+	t=1713199402; cv=none; b=S5sYfrLb5U7zkOiH94Xuwq6WiJxB98U+yLC+2K91OBKjR3kEbIAv8tFYYl2n+UcYKE4l64Soi3ve5GTQ2zfOte41sHEB3WPbo6EHtRzBPteBuQ5xycQrnOWZdkg/tRF267VCgfUwkmjntSQ5Anl3VpeLXnQPfcidQSmHvvLQU80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713197203; c=relaxed/simple;
-	bh=TbkoZcrC73ReILBlLCzDk8hBya5REumqV3/XGRD0RBM=;
+	s=arc-20240116; t=1713199402; c=relaxed/simple;
+	bh=HqN7TdZSCNbgHFtvjYms+Ul+s+gTntsHUY9FnuUU/Jo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sjUBuLajDNfRct5bt91ipaFyORcZ286du7hreCQnYxWxY63A/SOr85qGZ0ZP37f9+jQWTG9DIQvohY9SZ1BqjIkemiIUuCSzlW3a+3TLaCRI3O0iocDdsQ0jkJpUvA4pwOfxuBw8FEBFPfLco8ip3ok0gVoHP+ASHJsiS8/VpNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=O8xv1am3; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y6y+oSo5/oyzJXQMebQzLqWQnZf/f5ZbXdAilX7iT+IeYBV9rViZMLNmV4nTYpDTUV78guwpU6RxirvTyTdnwRpN/FAz0nD3Q0utwIqEHuOYnDLOo5krO4W9zVNZZ9x1vpurmVM5FO0h9UKIoLzLVFNl8tNKKB9H3ZT2+zls9Mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EbbyECV5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="O8xv1am3"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5ce9555d42eso2059630a12.2
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Apr 2024 09:06:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1713197200; x=1713802000; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W9YkT2PBxlsTiQpc9k80Xb2w2qGzzlQLFXvx15ENFSo=;
-        b=O8xv1am3Lk+DQ59W9cNWa2OG2Fks5PZkZcv6Z6Pfi7Uv5Oy1Av7RnTmnxj3FUYOm5V
-         yx4o1he5W90asuV36XyOe0antbXBxeK6gi/EVqhCphP56lqegAsztJrs5wGp912uqAFQ
-         L131duRGarDG1vumEdOdHiU0czbOW9+JxRfTA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713197200; x=1713802000;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W9YkT2PBxlsTiQpc9k80Xb2w2qGzzlQLFXvx15ENFSo=;
-        b=k4ubs1iTQsQxhXK3mJRoCUOLXVtqsoAlI576haWtGPxfoJNcmPmu0jW2Ox+C/C2xSf
-         NRSMfPYp+Er+WRQhwuFB+vXtaK5uHwqIRzw8URBDd/hyt172J24YL2hdpT+EAKZ7L75Y
-         2Od/usoblwKvwKxLsUMA+VSO4YDDHKfF26wVIFF8AdUmoOMvRe6wZ3LwP5ySw+xU+MtY
-         AgYJ+DM8EDeuYkYL4DC3nZqkyQBZpxs63cZGRN9a0rQtGDfkuEVzTDFO6UMXQajo3+Yb
-         ueVObWzZxlyvK2HtH2xExz06jXZsRNkyT4ssUeDsvpMfXvlGVFPsU0+lIhA2tzN+8gJq
-         f43A==
-X-Forwarded-Encrypted: i=1; AJvYcCXAOlyrDwMCM0rPVMFgx0DSn7vwxQrtx3AClvoVE/wHw3N0j3nTCOYttK/v/LsI53jQ7gtg031tOPaAg4ZYj0hBzsMz+Thq97vVyIlA
-X-Gm-Message-State: AOJu0Yx0ZtvPIrMKfd1W09D310HzZfwcW+E+0XXERS0EKJCYGxGpdTkW
-	IdH9YPf/oHz3I1lc2Nuzb59GAGw3eMfXk3LpWf6sIa2Bu+WxmwetjvG24vl17w==
-X-Google-Smtp-Source: AGHT+IEOd/x1N/CPtx25Nf+PUqf1rfZqa2mTy1XxaxcS7HXEzP+ucQDv/NhrafY/fDlqqKtbbV3LWA==
-X-Received: by 2002:a17:90b:3d3:b0:2a5:ba9d:a06b with SMTP id go19-20020a17090b03d300b002a5ba9da06bmr10113697pjb.5.1713197200332;
-        Mon, 15 Apr 2024 09:06:40 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id l6-20020a17090a49c600b002a46b925e99sm8796108pjm.18.2024.04.15.09.06.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 09:06:39 -0700 (PDT)
-Date: Mon, 15 Apr 2024 09:06:39 -0700
-From: Kees Cook <keescook@chromium.org>
-To: j.granados@samsung.com
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	Miaohe Lin <linmiaohe@huawei.com>,
-	Naoya Horiguchi <naoya.horiguchi@nec.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Luis Chamberlain <mcgrof@kernel.org>, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 2/7] security: Remove the now superfluous sentinel
- element from ctl_table array
-Message-ID: <202404150906.C37D8D9DA1@keescook>
-References: <20240328-jag-sysctl_remset_misc-v1-0-47c1463b3af2@samsung.com>
- <20240328-jag-sysctl_remset_misc-v1-2-47c1463b3af2@samsung.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EbbyECV5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2CC2C113CC;
+	Mon, 15 Apr 2024 16:43:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713199401;
+	bh=HqN7TdZSCNbgHFtvjYms+Ul+s+gTntsHUY9FnuUU/Jo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EbbyECV5u1njLxj1sF0tKve7TJuwGRRhA6T/bdFIVrWQ0FzQ1wDl68Mp/rvHOgSjQ
+	 +qHqwmjimQphMf8bZmdCJYVc5qEmtTwZvY8TYWGXaXX85L4Vb7TmDSzQOaGQwh75uv
+	 b2aX5MEA5lkd83gT8/34X+NtSGD6zXt4YwbFsNGclyTkZURGIbnxJOuWEoNHkasJJ8
+	 VQV2jzbCjgzb2eI+Xe/qLqDrtUDGnbRtHMq6Ggn7LB8Y2+p0x5A1jIlMPbcmZzhlAS
+	 2Gp6+IL7vEULSAIM8kbjp255kUoSO+dV4G0PoLmwNvMAZofiMYCxb3WcRR/RGw/I9i
+	 EYtzWb7DFVESA==
+Date: Mon, 15 Apr 2024 17:43:15 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Alexey Romanov <avromanov@salutedevices.com>
+Cc: neil.armstrong@linaro.org, clabbe@baylibre.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, khilman@baylibre.com, jbrunet@baylibre.com,
+	martin.blumenstingl@googlemail.com, vadim.fedorenko@linux.dev,
+	linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
+Subject: Re: [PATCH v7 17/23] dt-bindings: crypto: meson: remove clk and
+ second interrupt line for GXL
+Message-ID: <20240415-schnapps-plating-eb0895459004@spud>
+References: <20240411133832.2896463-1-avromanov@salutedevices.com>
+ <20240411133832.2896463-18-avromanov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="IiySJqPLPF6ewTlK"
+Content-Disposition: inline
+In-Reply-To: <20240411133832.2896463-18-avromanov@salutedevices.com>
+
+
+--IiySJqPLPF6ewTlK
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240328-jag-sysctl_remset_misc-v1-2-47c1463b3af2@samsung.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 28, 2024 at 04:57:49PM +0100, Joel Granados via B4 Relay wrote:
-> From: Joel Granados <j.granados@samsung.com>
-> 
-> This commit comes at the tail end of a greater effort to remove the
-> empty elements at the end of the ctl_table arrays (sentinels) which will
-> reduce the overall build time size of the kernel and run time memory
-> bloat by ~64 bytes per sentinel (further information Link :
-> https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
-> 
-> Remove the sentinel from all files under security/ that register a
-> sysctl table.
-> 
-> Signed-off-by: Joel Granados <j.granados@samsung.com>
+On Thu, Apr 11, 2024 at 04:38:26PM +0300, Alexey Romanov wrote:
+> GXL crypto IP isn't connected to clk and seconnd interrput line,
+> so we must remove them from dt-bindings.
 
-Acked-by: Kees Cook <keescook@chromium.org> # loadpin & yama
+How does the device work without a clock?
 
--- 
-Kees Cook
+Cheers,
+Conor.
+
+>=20
+> Fixes: 7f7d115dfb51 ("dt-bindings: crypto: Add DT bindings
+> documentation for amlogic-crypto")
+>=20
+> Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
+> ---
+>  .../bindings/crypto/amlogic,gxl-crypto.yaml         | 13 +------------
+>  1 file changed, 1 insertion(+), 12 deletions(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.=
+yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+> index 948e11ebe4ee..d3af7b4d5f39 100644
+> --- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+> @@ -20,20 +20,11 @@ properties:
+>    interrupts:
+>      items:
+>        - description: Interrupt for flow 0
+> -      - description: Interrupt for flow 1
+> -
+> -  clocks:
+> -    maxItems: 1
+> -
+> -  clock-names:
+> -    const: blkmv
+> =20
+>  required:
+>    - compatible
+>    - reg
+>    - interrupts
+> -  - clocks
+> -  - clock-names
+> =20
+>  additionalProperties: false
+> =20
+> @@ -46,7 +37,5 @@ examples:
+>      crypto: crypto-engine@c883e000 {
+>          compatible =3D "amlogic,gxl-crypto";
+>          reg =3D <0xc883e000 0x36>;
+> -        interrupts =3D <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>, <GIC_SPI 189 =
+IRQ_TYPE_EDGE_RISING>;
+> -        clocks =3D <&clkc CLKID_BLKMV>;
+> -        clock-names =3D "blkmv";
+> +        interrupts =3D <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>;
+>      };
+> --=20
+> 2.34.1
+>=20
+
+--IiySJqPLPF6ewTlK
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZh1ZIwAKCRB4tDGHoIJi
+0iLLAQDovtu6Lo9YH7fWCXHcFimMK0bA/cJ2pWBnM1sPsAdf2AD/abKRTjUdcDB5
+z7YNr3N9wShAoF4Vf330Pxfn8jY+NAU=
+=SyyT
+-----END PGP SIGNATURE-----
+
+--IiySJqPLPF6ewTlK--
