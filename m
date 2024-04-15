@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3AD51E89A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D1015746D;
 	Mon, 15 Apr 2024 21:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713217129; cv=none; b=ldDPz28+McD9A0mJ4hiQgonIXMaq/3UbL07nrbfxAvEguJrsb0SEdSToUw6IF+HoEmYif+LDiq9s5UmJ4yjOcD+UCHn/MDmdZUNlVRwf2kwAqgMSTpcvscfYRaoXlZngMPV9bszui8A2g7DxXT+ocwhv34RCEc8gUvGD99SqnSo=
+	t=1713217130; cv=none; b=AKzSVrCYUu2lFeA8lEwI+QRzfbWv+X7jqrFRRVbCN6KsziScRIqwO+4Mth2eZAAjsRcNoetkfY38Ov7wJm7jcU9o0e9GjRwX6BBBzXIEsk8zEuM8P5Cq8RKzxWLdRcj6M5LS30QvrsXIvLQUiLFlDDfJy51ZU0AzBr8tG/KIWE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713217129; c=relaxed/simple;
-	bh=7EeMhSwgfXHIxMBvok4WynVvjspAaaT/x9LSuah1mWA=;
+	s=arc-20240116; t=1713217130; c=relaxed/simple;
+	bh=hbXIxMNQiPU1jkfQ0yP6wwnFgvTFspy1GiHj+tI7hHg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ao+h+ObEv9SfYU6/k6k6oUffxLAP/x4kEphUe0LoMKypV/gj+0FlzYQW6bZCALmyEyUqILZGAjB8+lTE2A8zq5T3VU4PEI4iml6126KxcqIkBR7GCPlrCSwlyMJ1r1KdRnV9XFO4VYMoNG0jwybth7Gag3jymwmFl0WqDGntT98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=apE+WaJB; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=fGNmNktGk5+TcRB7dgPVdBP2tBRo+lJUn+p8kkJgIcKQt/HKVG+YKiGLi7p3EMFWF1rf9OFbuI+zdtA+H0uwQUqKPaoaieXXiLUJWoQCS1YO6qi+JOot5mHVz79tXDMBMFdOrsTr9MAl70+QUIunddW0cpH4UX6+hRNBqL8JBLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XFDstHMu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="apE+WaJB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B7A9C4AF07;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XFDstHMu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F143C4AF09;
 	Mon, 15 Apr 2024 21:38:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713217129;
-	bh=7EeMhSwgfXHIxMBvok4WynVvjspAaaT/x9LSuah1mWA=;
+	bh=hbXIxMNQiPU1jkfQ0yP6wwnFgvTFspy1GiHj+tI7hHg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=apE+WaJBVTRpZ06MLaJm1+uhetGmGUYYcBMHvgLZhO/1pHcokq4mrSb2AvKhTeRwf
-	 xgQHbuWmNISyO2WTgLlgnyaC/I9K5EKor3mU1h9hb5332peW7y0H3rrDe67N7WjlDt
-	 +OzW4TS+DpYD457BwLOg1/uSGFPtc6Vjv4mtI5sj01Bihh/ZF20hn5t6WwdT4n2nxF
-	 NkPOvElsVJc6/AuVe2U5jUNgbV0ZvHt1pSmB5op9tfZAi7dJPtzWjCz1JcleaA7MkK
-	 8CbhbEdXhWaW0PjNxvfXhtkr8JwOBZlTLXXLD55DvPoSfLNaEaaXaGiC7PneW8s5MG
-	 FswQ1M7NTA0xQ==
+	b=XFDstHMuJ1BmztILQZsAjxXlnfjaMFlmrn0NOIO9NjMVQ2/JXiWtJevkGoB8ih+wQ
+	 eImM0PMMoLGATxNL/h9le9TleeW9jfLDoRNYjCqlM9Ra96wG87/H73AtHJ4YP4gCjg
+	 4MXMS+dUlFyj3eew2pKHKwiKeiHjegGfCnxsWZUs/BKhnkDU80p23NxWD35ZIBiqbP
+	 SN/jWQ43nnVgRp3wls16EOmTfCmLir9FPFOyv3RRHlP6sQNaGYnd4+ul2Rgzt2x3/z
+	 DuTMaJfdey7ObNZrIQNV4PJqc7wBgOtMewPp4+xlI+/GDbm395kXIdFCnRgxnHnzsf
+	 f5pS0SeI12big==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	fsverity@lists.linux.dev,
@@ -35,9 +35,9 @@ Cc: x86@kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	Sami Tolvanen <samitolvanen@google.com>,
 	Bart Van Assche <bvanassche@acm.org>
-Subject: [RFC PATCH 2/8] crypto: testmgr - generate power-of-2 lengths more often
-Date: Mon, 15 Apr 2024 14:37:13 -0700
-Message-ID: <20240415213719.120673-3-ebiggers@kernel.org>
+Subject: [RFC PATCH 3/8] crypto: testmgr - add tests for finup2x
+Date: Mon, 15 Apr 2024 14:37:14 -0700
+Message-ID: <20240415213719.120673-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240415213719.120673-1-ebiggers@kernel.org>
 References: <20240415213719.120673-1-ebiggers@kernel.org>
@@ -51,57 +51,134 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Implementations of hash functions often have special cases when lengths
-are a multiple of the hash function's internal block size (e.g. 64 for
-SHA-256, 128 for SHA-512).  Currently, when the fuzz testing code
-generates lengths, it doesn't prefer any length mod 64 over any other.
-This limits the coverage of these special cases.
-
-Therefore, this patch updates the fuzz testing code to generate
-power-of-2 lengths and divide messages exactly in half a bit more often.
+Update the shash self-tests to test the new finup2x method when
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/testmgr.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ crypto/testmgr.c | 53 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 44 insertions(+), 9 deletions(-)
 
 diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 3dddd288ca02c..2200d70e2aa9d 100644
+index 2200d70e2aa9d..e6d42db6f344e 100644
 --- a/crypto/testmgr.c
 +++ b/crypto/testmgr.c
-@@ -899,16 +899,18 @@ static inline u32 prandom_u32_inclusive(struct rnd_state *rng,
- static unsigned int generate_random_length(struct rnd_state *rng,
- 					   unsigned int max_len)
- {
- 	unsigned int len = prandom_u32_below(rng, max_len + 1);
+@@ -227,10 +227,12 @@ enum flush_type {
+ 
+ /* finalization function for hash algorithms */
+ enum finalization_type {
+ 	FINALIZATION_TYPE_FINAL,	/* use final() */
+ 	FINALIZATION_TYPE_FINUP,	/* use finup() */
++	FINALIZATION_TYPE_FINUP2X_BUF1, /* use 1st buffer of finup2x() */
++	FINALIZATION_TYPE_FINUP2X_BUF2, /* use 2nd buffer of finup2x() */
+ 	FINALIZATION_TYPE_DIGEST,	/* use digest() */
+ };
+ 
+ /*
+  * Whether the crypto operation will occur in-place, and if so whether the
+@@ -1105,19 +1107,27 @@ static void generate_random_testvec_config(struct rnd_state *rng,
+ 	if (prandom_bool(rng)) {
+ 		cfg->req_flags |= CRYPTO_TFM_REQ_MAY_SLEEP;
+ 		p += scnprintf(p, end - p, " may_sleep");
+ 	}
  
 -	switch (prandom_u32_below(rng, 4)) {
-+	switch (prandom_u32_below(rng, 5)) {
++	switch (prandom_u32_below(rng, 6)) {
  	case 0:
- 		return len % 64;
+ 		cfg->finalization_type = FINALIZATION_TYPE_FINAL;
+ 		p += scnprintf(p, end - p, " use_final");
+ 		break;
  	case 1:
- 		return len % 256;
- 	case 2:
-+		return min(1U << (len % 10), max_len);
+ 		cfg->finalization_type = FINALIZATION_TYPE_FINUP;
+ 		p += scnprintf(p, end - p, " use_finup");
+ 		break;
++	case 2:
++		cfg->finalization_type = FINALIZATION_TYPE_FINUP2X_BUF1;
++		p += scnprintf(p, end - p, " use_finup2x_buf1");
++		break;
 +	case 3:
- 		return len % 1024;
++		cfg->finalization_type = FINALIZATION_TYPE_FINUP2X_BUF2;
++		p += scnprintf(p, end - p, " use_finup2x_buf2");
++		break;
  	default:
- 		return len;
+ 		cfg->finalization_type = FINALIZATION_TYPE_DIGEST;
+ 		p += scnprintf(p, end - p, " use_digest");
+ 		break;
  	}
- }
-@@ -1004,10 +1006,12 @@ static char *generate_random_sgl_divisions(struct rnd_state *rng,
- 		unsigned int this_len;
- 		const char *flushtype_str;
+@@ -1342,11 +1352,14 @@ static int test_shash_vec_cfg(const struct hash_testvec *vec,
+ 			return -EINVAL;
+ 		}
+ 		goto result_ready;
+ 	}
  
- 		if (div == &divs[max_divs - 1] || prandom_bool(rng))
- 			this_len = remaining;
-+		else if (prandom_u32_below(rng, 4) == 0)
-+			this_len = (remaining + 1) / 2;
- 		else
- 			this_len = prandom_u32_inclusive(rng, 1, remaining);
- 		div->proportion_of_total = this_len;
+-	/* Using init(), zero or more update(), then final() or finup() */
++	/*
++	 * Using init(), zero or more update(), then either final(), finup(), or
++	 * finup2x().
++	 */
  
- 		if (prandom_u32_below(rng, 4) == 0)
+ 	if (cfg->nosimd)
+ 		crypto_disable_simd_for_test();
+ 	err = crypto_shash_init(desc);
+ 	if (cfg->nosimd)
+@@ -1354,28 +1367,50 @@ static int test_shash_vec_cfg(const struct hash_testvec *vec,
+ 	err = check_shash_op("init", err, driver, vec_name, cfg);
+ 	if (err)
+ 		return err;
+ 
+ 	for (i = 0; i < tsgl->nents; i++) {
++		const u8 *data = sg_virt(&tsgl->sgl[i]);
++		unsigned int len = tsgl->sgl[i].length;
++
+ 		if (i + 1 == tsgl->nents &&
+-		    cfg->finalization_type == FINALIZATION_TYPE_FINUP) {
++		    (cfg->finalization_type == FINALIZATION_TYPE_FINUP ||
++		     cfg->finalization_type == FINALIZATION_TYPE_FINUP2X_BUF1 ||
++		     cfg->finalization_type == FINALIZATION_TYPE_FINUP2X_BUF2)) {
++			const u8 *unused_data = tsgl->bufs[XBUFSIZE - 1];
++			u8 unused_result[HASH_MAX_DIGESTSIZE];
++			const char *op;
++
+ 			if (divs[i]->nosimd)
+ 				crypto_disable_simd_for_test();
+-			err = crypto_shash_finup(desc, sg_virt(&tsgl->sgl[i]),
+-						 tsgl->sgl[i].length, result);
++			if (cfg->finalization_type == FINALIZATION_TYPE_FINUP ||
++			    !crypto_shash_supports_finup2x(tfm)) {
++				err = crypto_shash_finup(desc, data, len,
++							 result);
++				op = "finup";
++			} else if (cfg->finalization_type ==
++				   FINALIZATION_TYPE_FINUP2X_BUF1) {
++				err = crypto_shash_finup2x(
++						desc, data, unused_data, len,
++						result, unused_result);
++				op = "finup2x_buf1";
++			} else { /* FINALIZATION_TYPE_FINUP2X_BUF2 */
++				err = crypto_shash_finup2x(
++						desc, unused_data, data, len,
++						unused_result, result);
++				op = "finup2x_buf2";
++			}
+ 			if (divs[i]->nosimd)
+ 				crypto_reenable_simd_for_test();
+-			err = check_shash_op("finup", err, driver, vec_name,
+-					     cfg);
++			err = check_shash_op(op, err, driver, vec_name, cfg);
+ 			if (err)
+ 				return err;
+ 			goto result_ready;
+ 		}
+ 		if (divs[i]->nosimd)
+ 			crypto_disable_simd_for_test();
+-		err = crypto_shash_update(desc, sg_virt(&tsgl->sgl[i]),
+-					  tsgl->sgl[i].length);
++		err = crypto_shash_update(desc, data, len);
+ 		if (divs[i]->nosimd)
+ 			crypto_reenable_simd_for_test();
+ 		err = check_shash_op("update", err, driver, vec_name, cfg);
+ 		if (err)
+ 			return err;
 -- 
 2.44.0
 
