@@ -1,39 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771C0156225;
-	Mon, 15 Apr 2024 22:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED871C36;
+	Mon, 15 Apr 2024 22:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713221385; cv=none; b=UdQyP3DESJ3qFd+sF/RAWgABHif9aDpP0saflFKVSmMJdkfzZhxtHNbfo+CSMBm7L6woSL+Yuj2TlpdadazI8NKFCRaqj+k0Z87ZkKF+IY4RXhG6ld1fvr50wTrwfr+vGLyXG7hOnD1EzhPtgh6joFSJXB741F8KPhTf/K5PPXg=
+	t=1713221663; cv=none; b=QFJ77kDMPacori9Hjsp4+Oc8geBexg1HDhKZd4ZoR6s8OcNH4rnzBnPef8b9ddRCUrQabhLEgI+RUKYnvDzbMvRm/cfqvOT0a/6EQQLdzPgQh8xaMcfibn2/EVbftgBghFRMwuBGtuUckC0mF1DPh9feoHzeh77tpd7TWzwfqxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713221385; c=relaxed/simple;
-	bh=Ztq9N6zxAzOU2gFdxK5g04qiK/ipn5K96C+fvix/A5Y=;
+	s=arc-20240116; t=1713221663; c=relaxed/simple;
+	bh=Ib36ccBe0DZRA4zcOLRG0Os5eO64FBsFowrSfoGwj28=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BU6gIZsn7Ro80IPR2PLO0NNhr1eLtxDJy2Rqp5M4c7o6G/Jztexmg+axAIIdR7ZrTaa7u9Yjk5dtsMMDk7zwZor+SwRgFJeHarpvw+MBMLQNrJ0OqtG3yQxX4ip/jQ7BSH2wIUlN3llZLmbyowj4flnim1qSgqVesYNB13acy8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ITmyuvqW; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=NIFNDmHG6aChWIM3JNSDpYZqCR2zsANtnW5yxYpl5aTFcvALC4CGDO9qcKhCry/lHpUXSsCBxS9cw2XhYSx5lGelf3wFFgIWmOIGAsoovnF63TW7MrkE/eE3OxY1fd6sKd/ZAF845bIXD6MuiiJU00IqzRhHMpo+KM5WmFu9YxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=avBbDmwJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ITmyuvqW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3741C113CC;
-	Mon, 15 Apr 2024 22:49:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="avBbDmwJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87643C113CC;
+	Mon, 15 Apr 2024 22:54:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713221385;
-	bh=Ztq9N6zxAzOU2gFdxK5g04qiK/ipn5K96C+fvix/A5Y=;
+	s=k20201202; t=1713221663;
+	bh=Ib36ccBe0DZRA4zcOLRG0Os5eO64FBsFowrSfoGwj28=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ITmyuvqWXm7bFcODxPf/3Yf6TWq3cO1rqr52IvCNaIm8eWh/FJUEbA1YEH2Fwx7z3
-	 yBAJI+2PkixFUEdTLNFXNPW7KCLpTVGYe4ZVymIkv2xoowLhdemA9L9x8cqSlXdrdp
-	 XCi101aHLiAl4LnGNDZu1PfP+i+neShMrhsLuHhi4rXU5h2nLONkwi03tWinI3+Nj2
-	 4WnqOmeNFyrubyuJWCgLkGQoV3ALNUICNvLhRb1Ge8iEW3LjWI9xrKHYlQUu65iDV0
-	 N6f361xTg78NxOMgrRI99kxSPjwV94l61ZjWoAwZao1MBzukCJLrXK8fH/UCtxeBXF
-	 q0nkw8bmCP8ww==
-Date: Mon, 15 Apr 2024 15:49:42 -0700
+	b=avBbDmwJhHVgnB5taPkfu91amKh/GT4PlZYHkMdXz5JgNdiGfaA2wyYTzl6/LSQmB
+	 SBaALOrtKd2KEic7rq8oFnYT9katIkSj81gA4MnTks7hdW/OjU2NMzEmeXb41eMMLk
+	 fbr9SzeNP2FLje+KMAFEQH1Hq7L38d+pO4eIaSTuEugi67ot4/e/oLVf1T6+f1RopN
+	 CmLplKESPhxzwmFlRDfcnUXsgW1yw73Nfc9Y+gw1pBnNUPPJqaq7Dli22lMSSmRUj9
+	 KWSO4TpeloCrscyQdpiHLNfAsVAxncik+BBRYcX+o8MYnGet6jKGu6DPXhUByOHeGl
+	 be2xYmiHMd4nw==
+Date: Mon, 15 Apr 2024 15:54:20 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Hailey Mothershead <hailmo@amazon.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] crypto: aead,cipher - zeroize key buffer after use
-Message-ID: <20240415224942.GC5206@sol.localdomain>
-References: <20240415221915.20701-1-hailmo@amazon.com>
+To: "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dm-devel@redhat.com, luto@kernel.org, dave.hansen@linux.intel.com,
+	tglx@linutronix.de, bp@alien8.de, mingo@kernel.org, x86@kernel.org,
+	herbert@gondor.apana.org.au, ardb@kernel.org, elliott@hpe.com,
+	dan.j.williams@intel.com, bernie.keany@intel.com,
+	charishma1.gairuboyina@intel.com
+Subject: Re: [PATCH v9 00/14] x86: Support Key Locker
+Message-ID: <20240415225420.GD5206@sol.localdomain>
+References: <20230603152227.12335-1-chang.seok.bae@intel.com>
+ <20240329015346.635933-1-chang.seok.bae@intel.com>
+ <13bb2f0f-5894-4366-be53-44658144a23d@intel.com>
+ <20240408014806.GA965@quark.localdomain>
+ <8fbab9e8-a2fc-4fb2-a9c3-e7336fa50118@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,49 +50,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240415221915.20701-1-hailmo@amazon.com>
+In-Reply-To: <8fbab9e8-a2fc-4fb2-a9c3-e7336fa50118@intel.com>
 
-On Mon, Apr 15, 2024 at 10:19:15PM +0000, Hailey Mothershead wrote:
-> I.G 9.7.B for FIPS 140-3 specifies that variables temporarily holding
-> cryptographic information should be zeroized once they are no longer
-> needed. Accomplish this by using kfree_sensitive for buffers that
-> previously held the private key.
+On Mon, Apr 15, 2024 at 03:16:18PM -0700, Chang S. Bae wrote:
+> > First, surely it's the case that in practice, all CPUs that support Key Locker
+> > also support AVX?  If so, then there's no need for the Key Locker assembly to
+> > use legacy SSE instructions.  It should instead target AVX and use VEX-coded
+> > instructions.  This would save some instructions and improve performance.
 > 
-> Signed-off-by: Hailey Mothershead <hailmo@amazon.com>
-> ---
->  crypto/aead.c   | 3 +--
->  crypto/cipher.c | 3 +--
->  2 files changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/crypto/aead.c b/crypto/aead.c
-> index 16991095270d..c4ece86c45bc 100644
-> --- a/crypto/aead.c
-> +++ b/crypto/aead.c
-> @@ -35,8 +35,7 @@ static int setkey_unaligned(struct crypto_aead *tfm, const u8 *key,
->  	alignbuffer = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
->  	memcpy(alignbuffer, key, keylen);
->  	ret = crypto_aead_alg(tfm)->setkey(tfm, alignbuffer, keylen);
-> -	memset(alignbuffer, 0, keylen);
-> -	kfree(buffer);
-> +	kfree_sensitive(buffer);
->  	return ret;
->  }
->  
-> diff --git a/crypto/cipher.c b/crypto/cipher.c
-> index b47141ed4a9f..395f0c2fbb9f 100644
-> --- a/crypto/cipher.c
-> +++ b/crypto/cipher.c
-> @@ -34,8 +34,7 @@ static int setkey_unaligned(struct crypto_cipher *tfm, const u8 *key,
->  	alignbuffer = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
->  	memcpy(alignbuffer, key, keylen);
->  	ret = cia->cia_setkey(crypto_cipher_tfm(tfm), alignbuffer, keylen);
-> -	memset(alignbuffer, 0, keylen);
-> -	kfree(buffer);
-> +	kfree_sensitive(buffer);
->  	return ret;
+> Unfortunately, the Key Locker instructions using the AVX states were never
+> implemented.
 
-Well, the memset()s that you're removing already did the zeroization.  This
-patch seems worthwhile as a code simplification, but please don't characterize
-it as a bug fix, because it's not.
+Sure, you could still use VEX-coded 128-bit instructions for everything other
+than the actual AES (for example, the XTS tweak computation) though, right?
+They're a bit more convenient to work with since they are non-destructive.
 
 - Eric
