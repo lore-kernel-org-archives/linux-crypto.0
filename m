@@ -1,147 +1,107 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207EE1FDD;
-	Mon, 15 Apr 2024 16:44:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D2784D24;
+	Mon, 15 Apr 2024 18:53:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713199478; cv=none; b=m7wKyh4N6tJJ0qSV+uuOArA2AOxBuJmZ5Z3wyTinqjcYsVxaipidL6H67hivrZiUJeRrKLLqDHIjeh+jtPK8Fc99wb6UnSWNAbTQxp0e2HhWNAzRRVLdCJtoH8YguKnJ7BPb9PHtcUPo1C/Ceo+Uz3CUNrv67nrQD6KM2LJ34yY=
+	t=1713207206; cv=none; b=cqmC160oqq8+ZLMsUsd10SED0hNuoZf/g0WvOEWqhq+a/SHwHorir1dQqNh45kai+8ctiVHvMl2D/21bC8vunuhrNhqlIIWNfZqeVs1u/VgiyrLcOmFijGUEGSwkfFc41/8+dPdGj1yeJv4Ii7qv7JbjZWcz9riTANB6wrhpzyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713199478; c=relaxed/simple;
-	bh=/PeuD96WIZJSMjilmlalAw5Sh612uVNegKTxOfnIhCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HHXQvW2MpWHh8jxTA0vndaUQVzDxMHk2lR1qGxg35GhBWSPElPUQflGOnj9XIzeFsvHWW2LTpXftkn5dDfVheYXvT4SGzBIEciHY/oxadzG2dEgQjTtqABrMAcYccGAfjyWt1hVNDgpBcamyjUWDpcekLss2+0afX9cJYuWZhvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TiImsyMO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713207206; c=relaxed/simple;
+	bh=UkUaj+YEBYtsKTapfAJux7C066BfGC//yi1ms4YuhCE=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=D9zTWWhNWXlu48BENST/8vCVrZqVNpw/5YtKC0HV+FmGf+vxto4ZiI5j7yU8UezimXL4DejH2nhbjARIN3OILp1E0c+G4Pj/X1GT1wSfLCw6QDki2UM+3qT7EhX7TanyKIlqVgczda3RvmcMCKesuNtLBsN8ZDw9yLxv6JJ6a0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qm9lnOTn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TiImsyMO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 421BDC113CC;
-	Mon, 15 Apr 2024 16:44:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qm9lnOTn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7A6EC113CC;
+	Mon, 15 Apr 2024 18:53:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713199477;
-	bh=/PeuD96WIZJSMjilmlalAw5Sh612uVNegKTxOfnIhCk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TiImsyMOvAhGFvPt+0Jnit7mkby93vTkBGiG2SQPOxSDq/k70rItcAceLzyahP2aU
-	 3Ym5JdHSA1n8l0qmqKaMQtRLw4QMjXmtIZ8kOdNEYy/BVy+qjoztuXOSYRm7gIUrtG
-	 dTo+UAlj4CXPF+Fn7I0C3v+ibIBax2NbysBOXbFObAqU6CAl38iC0k2amsjV8UDAf1
-	 AtjsttY8BUTr1wqpcgC7JWHZcHsHkIjBYhd7N3OS3vMBKvXPRV2J93X88ELOAfaITJ
-	 JNDe6d0CIwoeF0G6D1bDho5YGE3CkKXtvtEzz4m6pImy9C8WaAG8AESfT97Em4iCGD
-	 XVdZ+wUwEds6A==
-Date: Mon, 15 Apr 2024 17:44:32 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Alexey Romanov <avromanov@salutedevices.com>
-Cc: neil.armstrong@linaro.org, clabbe@baylibre.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, khilman@baylibre.com, jbrunet@baylibre.com,
-	martin.blumenstingl@googlemail.com, vadim.fedorenko@linux.dev,
-	linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
-Subject: Re: [PATCH v7 19/23] dt-bindings: crypto: meson: support new SoC's
-Message-ID: <20240415-armrest-chokehold-e5027ecd4ef6@spud>
-References: <20240411133832.2896463-1-avromanov@salutedevices.com>
- <20240411133832.2896463-20-avromanov@salutedevices.com>
+	s=k20201202; t=1713207206;
+	bh=UkUaj+YEBYtsKTapfAJux7C066BfGC//yi1ms4YuhCE=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=qm9lnOTnsra/ebQMHfh+2A2rXpue5E6ciUWJM5F38MPvYC1UH/92p2N/S3/nZjG9I
+	 qwweOWJ1iPX9ewNimlUbpdQ6x7KmL0pn1sTBuR/DQgPwQnzTCGbVgyVChIb0UvBdIM
+	 9rhQ/1CJi7xV7CEEu0ALA1gSi2nIVCOaU6GtudFPG5Q6TcKPZAI6Cfnl3U14rOhhER
+	 GUz0z7z+hqxtyovunJq18pwDDOSYJ45+r7/rqpz5PCcaWxwwS7cWdvnxqnmaiSdDJe
+	 gn17T+fE+6JJP9V8DdA5IXPmu8ecvtqera/edq2jngIq25qgZx4dja+ms001Zg/C89
+	 vdqrmswEPoKJg==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AauLJy3HD9QY9WGP"
-Content-Disposition: inline
-In-Reply-To: <20240411133832.2896463-20-avromanov@salutedevices.com>
-
-
---AauLJy3HD9QY9WGP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 15 Apr 2024 21:53:22 +0300
+Message-Id: <D0KX9NQPXKO1.2RXZU000DD1BB@kernel.org>
+Cc: <linux-kernel@vger.kernel.org>, <ardb@kernel.org>,
+ <salvatore.benedetto@intel.com>
+Subject: Re: [PATCH 1/2] crypto: ecdh - Pass private key in proper byte
+ order to check valid key
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Stefan Berger" <stefanb@linux.ibm.com>, <linux-crypto@vger.kernel.org>,
+ <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+X-Mailer: aerc 0.17.0
+References: <20240415003026.2661270-1-stefanb@linux.ibm.com>
+ <20240415003026.2661270-2-stefanb@linux.ibm.com>
+In-Reply-To: <20240415003026.2661270-2-stefanb@linux.ibm.com>
 
-On Thu, Apr 11, 2024 at 04:38:28PM +0300, Alexey Romanov wrote:
-> Now crypto module available at G12A/G12B/S4/A1/SM1/AXG.
->=20
-> 1. Add new compatibles:
->   - amlogic,g12a-crypto
->   - amlogic,axg-crypto
->   - amlogic,a1-crypto
->   - amlogic,s4-crypto (uses a1-crypto as fallback)
-
-The commit message should mention why most of these devices are not
-compatible with eachother (be that different algorithms available etc)
-
-Thanks,
-Conor.
-
->=20
-> 2. Add power-domains in schema, which is required only for A1.
->=20
-> Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
+On Mon Apr 15, 2024 at 3:30 AM EEST, Stefan Berger wrote:
+> ecc_is_key_valid expects a key with the most significant digit in the las=
+t
+> entry of the digit array. Currently ecdh_set_secret passes a reversed key
+> to ecc_is_key_valid that then passes the rather simple test checking
+> whether the private key is in range [2, n-3]. For all current ecdh-
+> supported curves (NIST P192/256/384) the 'n' parameter is a rather large
+> number, therefore easily passing this test.
+>
+> Throughout the ecdh and ecc codebase the variable 'priv' is used for a
+> private_key holding the bytes in proper byte order. Therefore, introduce
+> priv in ecdh_set_secret and copy the bytes from ctx->private_key into
+> priv in proper byte order by using ecc_swap_digits. Pass priv to
+> ecc_is_valid_key.
+>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>
+> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 > ---
->  .../bindings/crypto/amlogic,gxl-crypto.yaml   | 24 +++++++++++++++++--
->  1 file changed, 22 insertions(+), 2 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.=
-yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> index d3af7b4d5f39..23743701952a 100644
-> --- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> @@ -11,8 +11,16 @@ maintainers:
+>  crypto/ecdh.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+> index 3049f147e011..a73853bd44de 100644
+> --- a/crypto/ecdh.c
+> +++ b/crypto/ecdh.c
+> @@ -27,6 +27,7 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, cons=
+t void *buf,
+>  			   unsigned int len)
+>  {
+>  	struct ecdh_ctx *ctx =3D ecdh_get_ctx(tfm);
+> +	u64 priv[ECC_MAX_DIGITS];
+>  	struct ecdh params;
 > =20
->  properties:
->    compatible:
-> -    items:
-> -      - const: amlogic,gxl-crypto
-> +    oneOf:
-> +      - items:
-> +          - enum:
-> +              - amlogic,s4-crypto
-> +          - const: amlogic,a1-crypto
-> +      - enum:
-> +          - amlogic,gxl-crypto
-> +          - amlogic,axg-crypto
-> +          - amlogic,g12a-crypto
-> +          - amlogic,a1-crypto
+>  	if (crypto_ecdh_decode_key(buf, len, &params) < 0 ||
+> @@ -40,9 +41,10 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, con=
+st void *buf,
+>  				       ctx->private_key);
 > =20
->    reg:
->      maxItems: 1
-> @@ -21,11 +29,23 @@ properties:
->      items:
->        - description: Interrupt for flow 0
-> =20
-> +  power-domains:
-> +    maxItems: 1
-> +
->  required:
->    - compatible
->    - reg
->    - interrupts
-> =20
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          const: amlogic,a1-crypto
-> +    then:
-> +      required:
-> +        - power-domains
-> +
->  additionalProperties: false
-> =20
->  examples:
-> --=20
-> 2.34.1
->=20
+>  	memcpy(ctx->private_key, params.key, params.key_size);
+> +	ecc_swap_digits(ctx->private_key, priv, ctx->ndigits);
 
---AauLJy3HD9QY9WGP
-Content-Type: application/pgp-signature; name="signature.asc"
+Does swapping speed up the test that follows are what effect does it
+have to the ecc_is_key_valid() call?
 
------BEGIN PGP SIGNATURE-----
+Just a question to understand what is going on, not actual review
+feedback.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZh1ZcAAKCRB4tDGHoIJi
-0tO6AP9x7P3GKoxerzltNOawstZRE73mkiQXZ84qfhSGloZOggEA38mkqZEFSXOe
-SDYdmAePKbFVRq3BsEG85zqyyN9JyAE=
-=TCep
------END PGP SIGNATURE-----
+> =20
+>  	if (ecc_is_key_valid(ctx->curve_id, ctx->ndigits,
+> -			     ctx->private_key, params.key_size) < 0) {
+> +			     priv, params.key_size) < 0) {
+>  		memzero_explicit(ctx->private_key, params.key_size);
+>  		return -EINVAL;
+>  	}
 
---AauLJy3HD9QY9WGP--
+BR, Jarkko
