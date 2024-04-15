@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7BE1E89A;
-	Mon, 15 Apr 2024 21:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7080415746D;
+	Mon, 15 Apr 2024 21:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713217129; cv=none; b=qhm83+h0NcBQIREmpvE40AikVJoIxKrmi1K+dXU4NEdA6To0z1GQvxFxrY0j57I9gT1ovNfLYStKlfiYrr/CR2Yep2otxJKwrL34q13QMCsCMvOwJluS4BVTktCVA+XjWUmjrZ40pN/qxLbmhfRiIO0nsPHmVvDANsBx5L7tCQY=
+	t=1713217129; cv=none; b=IMCsUZEr/ZInnhEu9538VF73gfi3wGt67TITXUQfdjN/bxQlyhzC/aubj0JNLJE6P8yYTJbhcA+Sb3FnUZxSDfhMDnbGUDeL8avbMLhVLDvYKi5qTe2k/Y3WqmNq9NqU2Y3YdwnuYPffipenqKu1C5CgPc/1sgaSzEa+rpwxb3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713217129; c=relaxed/simple;
-	bh=LdgSzKnyi2LWa7e/BgfjAMFoEXu5VqKaRa128bZAOp8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AL3UW5K4YxNtNkRr4Fpu1PXYn9rA0hL93Bsh4mruQhPtVBa1mBEJ1myQEEhmPwKO04cigYwtfwSW5tujLz+V0VFz5S5ySK/bnXAH64vRBiVsWLUFsAKg7PdWYjdhfEdcVdQ9b3z2GGjQhDTzCfio8DH68uTcl3naoCcSzpVkKS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EYIF4/rv; arc=none smtp.client-ip=10.30.226.201
+	bh=jDCHCoEErWTs1Q2o+tP+LLm0NSy78laxjUZAxWeOB6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ccJHouaFcv+5h1R3qQqY0hiEgz5BkSq+td+mJqqThW8fhURLnKwZejfVrxdOpjz27ADR7+Nqdewxhk1aX2ZCnsXa1P6RA5dThPh/da2Wn1MOprkYvPEsN6zGeBS+T1JdusMVCG82vLjP07RQfEybOf5VMGhldxoYJPfjsUPguxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eRlf0YcD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EYIF4/rv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44054C113CC;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eRlf0YcD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD94EC2BD11;
 	Mon, 15 Apr 2024 21:38:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713217128;
-	bh=LdgSzKnyi2LWa7e/BgfjAMFoEXu5VqKaRa128bZAOp8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=EYIF4/rvgnLfiMR2HZGkvI551MKvMeaAR/vQxBnQ5XW3GsGPKwIn3OsHIbDBZWPc2
-	 cb1hR4kA8L1bkTeoI+UTGiD2P2yzHigmynE+mzEAoIwWaVeE0Y44Ke/A3xpGC/fHyz
-	 UfW5riqyKkwdCNsth7fWbWJx1UCFVa0MLS5YCInSFtBg7BqQpeI7SOxkUnlSGi/UOj
-	 Km8ka2Hu1+am5WCkwOPXmV069RNxnCtewxPkbBNpFqn3S4b//3GAxJJIfht6Infaef
-	 k/F5TcY1KCjH8QjO2ZUmYKOnI5yO6tGT1Sev2Orm4QEGXvJc1ME4s0Emiz7Q8U8VoU
-	 tGfUAVPd+NBIQ==
+	bh=jDCHCoEErWTs1Q2o+tP+LLm0NSy78laxjUZAxWeOB6M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=eRlf0YcDF/SicJvsN47ZdFH6AB8wrKRpcGpEGoc14NJ1tkNR4ly51L5wEoRiy8X8i
+	 45IuY+2/V5e5sl8HAlYXDZ0AVc+W+NZ5LyrplU75CXQF1YS6wUNX/qXKF7R9DVyzrh
+	 NsSVC+lK5iF4k8I6tIRaeF8nLio3iiclZ24c0iXlvHYbptYMjhkAKpdNjunUro1m0v
+	 o2yjuLb4f5ubPMqPM1Mh+WjEtraY06uPa7OaUwJAdLMfH7AZthjqkT6LgP/gWJICbH
+	 3AdK/A+84SyIi66+ByWJAlD7WQYKnMHn5IW8O9Q9+5sbE7MKbSeJv7r5+aUY8Gytkx
+	 TWbz5mY4uUSaA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	fsverity@lists.linux.dev,
@@ -34,10 +35,12 @@ Cc: x86@kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	Sami Tolvanen <samitolvanen@google.com>,
 	Bart Van Assche <bvanassche@acm.org>
-Subject: [RFC PATCH 0/8] Optimize dm-verity and fsverity using multibuffer hashing
-Date: Mon, 15 Apr 2024 14:37:11 -0700
-Message-ID: <20240415213719.120673-1-ebiggers@kernel.org>
+Subject: [RFC PATCH 1/8] crypto: shash - add support for finup2x
+Date: Mon, 15 Apr 2024 14:37:12 -0700
+Message-ID: <20240415213719.120673-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240415213719.120673-1-ebiggers@kernel.org>
+References: <20240415213719.120673-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,68 +49,144 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On many modern CPUs, it is possible to compute the SHA-256 hash of two
+From: Eric Biggers <ebiggers@google.com>
+
+Most cryptographic hash functions are serialized, in the sense that they
+have an internal block size and the blocks must be processed serially.
+(BLAKE3 is a notable exception that has tree-based hashing built-in, but
+all the more common choices such as the SHAs and BLAKE2 are serialized.)
+
+This limits the performance of computing a single hash.  Yet, computing
+multiple hashes simultaneously does not have this limitation.  Modern
+CPUs are superscalar and often can execute independent instructions in
+parallel.  As a result, on many modern CPUs, it is possible to hash two
 equal-length messages in about the same time as a single message, if all
-the instructions are interleaved.  This is because each SHA-256 (and
-also most other cryptographic hash functions) is inherently serialized
-and therefore can't always take advantage of the CPU's full throughput.
+the instructions are interleaved.
 
-An earlier attempt to support multibuffer hashing in Linux was based
-around the ahash API.  That approach had some major issues.  This
-patchset instead takes a much simpler approach of just adding a
-synchronous API for hashing two equal-length messages.
+Meanwhile, a very common use case for hashing in the Linux kernel is
+dm-verity and fs-verity.  Both use a Merkle tree that has a fixed block
+size, usually 4096 bytes with an empty or 32-byte salt prepended.  The
+hash algorithm is usually SHA-256.  Usually, many blocks need to be
+hashed at a time.  This is an ideal scenario for multibuffer hashing.
 
-This works well for dm-verity and fsverity, which use Merkle trees and
-therefore hash large numbers of equal-length messages.
+Linux actually used to support SHA-256 multibuffer hashing on x86_64,
+before it was removed by commit ab8085c130ed ("crypto: x86 - remove SHA
+multibuffer routines and mcryptd").  However, it was integrated with the
+crypto API in a weird way, where it behaved as an asynchronous hash that
+queued up and executed all requests on a global queue.  This made it
+very complex, buggy, and virtually unusable.
 
-This patchset is organized as follows:
+This patch takes a new approach of just adding an API
+crypto_shash_finup2x() that synchronously computes the hash of two
+equal-length messages, starting from a common state that represents the
+(possibly empty) common prefix shared by the two messages.
 
-- Patch 1-3 add crypto_shash_finup2x() and tests for it.
-- Patch 4-5 implement finup2x on x86_64 and arm64.
-- Patch 6-8 update fsverity and dm-verity to use crypto_shash_finup2x()
-  to hash pairs of data blocks when possible.  Note: the patch
-  "dm-verity: hash blocks with shash import+finup when possible" is
-  revived from its original submission
-  (https://lore.kernel.org/dm-devel/20231030023351.6041-1-ebiggers@kernel.org/)
-  because this new work provides a new motivation for it.
+The new API is part of the "shash" algorithm type, as it does not make
+sense in "ahash".  It does a "finup" operation rather than a "digest"
+operation in order to support the salt that is used by dm-verity and
+fs-verity.  There is no fallback implementation that does two regular
+finups if the underlying algorithm doesn't support finup2x, since users
+probably will want to avoid the overhead of queueing up multiple hashes
+when multibuffer hashing won't actually be used anyway.
 
-On CPUs that support multiple concurrent SHA-256's (all arm64 CPUs I
-tested, and AMD Zen CPUs), raw SHA-256 hashing throughput increases by
-82-98%, and the throughput of cold-cache reads from dm-verity and
-fsverity increases by very roughly 35%.
+For now the API only supports 2-way interleaving, as the usefulness and
+practicality seems to drop off dramatically after 2.  The arm64 CPUs I
+tested don't support more than 2 concurrent SHA-256 hashes.  On x86_64,
+AMD's Zen 4 is a notable exception that can theoretically do 4
+concurrent SHA-256 hashes (at least based on a microbenchmark of the
+sha256rnds2 instruction).  However, increasing the interleaving factor
+further would involve tradeoffs such as no longer being able to cache
+the round constants in registers, further increasing the code size (both
+source and binary), further increasing the amount of state that users
+need to keep track of, and causing there to be more "leftover" hashes.
 
-This is marked as RFC for now, as I'm soliciting feedback on the overall
-concept, and some parts may need a bit more work.  The dm-verity and
-fsverity patches are a bit large and I may try to split those up.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ include/crypto/hash.h | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-Eric Biggers (8):
-  crypto: shash - add support for finup2x
-  crypto: testmgr - generate power-of-2 lengths more often
-  crypto: testmgr - add tests for finup2x
-  crypto: x86/sha256-ni - add support for finup2x
-  crypto: arm64/sha256-ce - add support for finup2x
-  fsverity: improve performance by using multibuffer hashing
-  dm-verity: hash blocks with shash import+finup when possible
-  dm-verity: improve performance by using multibuffer hashing
-
- arch/arm64/crypto/sha2-ce-core.S    | 261 ++++++++++++-
- arch/arm64/crypto/sha2-ce-glue.c    |  40 ++
- arch/x86/crypto/sha256_ni_asm.S     | 352 +++++++++++++++++
- arch/x86/crypto/sha256_ssse3_glue.c |  40 ++
- crypto/testmgr.c                    |  59 ++-
- drivers/md/dm-verity-fec.c          |  31 +-
- drivers/md/dm-verity-fec.h          |   7 +-
- drivers/md/dm-verity-target.c       | 560 ++++++++++++++++++++--------
- drivers/md/dm-verity.h              |  43 +--
- fs/verity/fsverity_private.h        |   5 +
- fs/verity/hash_algs.c               |  31 +-
- fs/verity/open.c                    |   6 +
- fs/verity/verify.c                  | 177 +++++++--
- include/crypto/hash.h               |  34 ++
- 14 files changed, 1403 insertions(+), 243 deletions(-)
-
-
-base-commit: 0bbac3facb5d6cc0171c45c9873a2dc96bea9680
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 5d61f576cfc86..3bb1b0b7b1242 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -198,10 +198,13 @@ struct shash_desc {
+  * @finup: see struct ahash_alg
+  * @digest: see struct ahash_alg
+  * @export: see struct ahash_alg
+  * @import: see struct ahash_alg
+  * @setkey: see struct ahash_alg
++ * @finup2x: **[optional]** Finish calculating the digests of two equal-length
++ *	     messages, interleaving the instructions to potentially achieve
++ *	     better performance than hashing each message individually.
+  * @init_tfm: Initialize the cryptographic transformation object.
+  *	      This function is called only once at the instantiation
+  *	      time, right after the transformation context was
+  *	      allocated. In case the cryptographic hardware has
+  *	      some special requirements which need to be handled
+@@ -229,10 +232,12 @@ struct shash_alg {
+ 		      unsigned int len, u8 *out);
+ 	int (*export)(struct shash_desc *desc, void *out);
+ 	int (*import)(struct shash_desc *desc, const void *in);
+ 	int (*setkey)(struct crypto_shash *tfm, const u8 *key,
+ 		      unsigned int keylen);
++	int (*finup2x)(struct shash_desc *desc, const u8 *data1,
++		       const u8 *data2, unsigned int len, u8 *out1, u8 *out2);
+ 	int (*init_tfm)(struct crypto_shash *tfm);
+ 	void (*exit_tfm)(struct crypto_shash *tfm);
+ 	int (*clone_tfm)(struct crypto_shash *dst, struct crypto_shash *src);
+ 
+ 	unsigned int descsize;
+@@ -771,10 +776,15 @@ static inline unsigned int crypto_shash_digestsize(struct crypto_shash *tfm)
+ static inline unsigned int crypto_shash_statesize(struct crypto_shash *tfm)
+ {
+ 	return crypto_shash_alg(tfm)->statesize;
+ }
+ 
++static inline bool crypto_shash_supports_finup2x(struct crypto_shash *tfm)
++{
++	return crypto_shash_alg(tfm)->finup2x != NULL;
++}
++
+ static inline u32 crypto_shash_get_flags(struct crypto_shash *tfm)
+ {
+ 	return crypto_tfm_get_flags(crypto_shash_tfm(tfm));
+ }
+ 
+@@ -864,10 +874,34 @@ int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
+  * Return: 0 on success; < 0 if an error occurred.
+  */
+ int crypto_shash_tfm_digest(struct crypto_shash *tfm, const u8 *data,
+ 			    unsigned int len, u8 *out);
+ 
++/**
++ * crypto_shash_finup2x() - finish hashing two equal-length messages
++ * @desc: the hash state that will be forked for the two messages.  This
++ *	  contains the state after hashing a (possibly-empty) common prefix of
++ *	  the two messages.
++ * @data1: the first message (not including any common prefix from @desc)
++ * @data2: the second message (not including any common prefix from @desc)
++ * @len: length of @data1 and @data2 in bytes
++ * @out1: output buffer for first message digest
++ * @out2: output buffer for second message digest
++ *
++ * Users must check crypto_shash_supports_finup2x(tfm) before calling this.
++ *
++ * Context: Any context.
++ * Return: 0 on success; a negative errno value on failure.
++ */
++static inline int crypto_shash_finup2x(struct shash_desc *desc,
++				       const u8 *data1, const u8 *data2,
++				       unsigned int len, u8 *out1, u8 *out2)
++{
++	return crypto_shash_alg(desc->tfm)->finup2x(desc, data1, data2, len,
++						    out1, out2);
++}
++
+ /**
+  * crypto_shash_export() - extract operational state for message digest
+  * @desc: reference to the operational state handle whose state is exported
+  * @out: output buffer of sufficient size that can hold the hash state
+  *
 -- 
 2.44.0
 
