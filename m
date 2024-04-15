@@ -1,188 +1,105 @@
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912B471B45;
-	Mon, 15 Apr 2024 13:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D2674E25
+	for <linux-crypto@vger.kernel.org>; Mon, 15 Apr 2024 14:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713188659; cv=none; b=XUia/Y3T6eDK8GJl7LGjnJ8yI/GjuGC3WO06lRCSPBL5y6vlGrBSLDlGphN03/Eh+gRtzP6NHLOyWS1hStJr8iocqA6S71PkDYgISjJ7DjdUjXE33Hmq1B2sH4L1NDJp9WxSGhHDvdQ4dBEfPMNNuFYA0rTX0Iz8y+XJSOmmRWQ=
+	t=1713190690; cv=none; b=gXGmEzWDgOARzJJljSgY3N5ghCgM2gogU4jZjF3TDsVOKAT514B3V1jd2erN9HuEQqr4dGBFcWu5EvpqZvPKo1PG38ppA2JMtky5BnSculpJu1ecMOV3jGY4VOSGCzSaomdZu8d0iSQz1jmexPfs059i5VsKoDatfgC0FPab8ZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713188659; c=relaxed/simple;
-	bh=ZvNyBDTtGOhsFAqdOLjRzSyoKu4RMa5m4+b0d7iOP6k=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=hZ+9jeVsRSoU5z2R32goWWT3h0W8f171QjsQXjCxa8gqgAMFLtlBNfERiSghQVKO044mTOjjrTjerHVCrxlKDl3dAUf0GHLwRY1Ll1lzRZY5XH4Q/02v23M4dgnfze5IAalsEKH9Vbjw32oLuX2u1psTnsBIudN/vTJL+Q7vWbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=GmQUOqQM; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1713190690; c=relaxed/simple;
+	bh=s7Xj9xi+J3VOaPxS9cliZyr2iTz57B5HKKp5IrSvKlo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mk4XgFkBBd7YthUjvKnmuWipSmLYC91r2w10aJeTvMJm6X+pbOod0+uYYSajt1oXckluRoa/vlOxsfJq9IlO5mZ2XDlvNHSKILb0pkDzUbVLLrkT7yrRaiwRtAvNXVYHYTH8Pwv76JTruRkAiTRkAwnhOO4Jov9K+fC/LMT9P78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=GxYCA+wE; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="GmQUOqQM"
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240415134414euoutp0297d8f98bc92bb6ff864c94e374c7eec6~GeAEOwxGg2821928219euoutp02k;
-	Mon, 15 Apr 2024 13:44:14 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240415134414euoutp0297d8f98bc92bb6ff864c94e374c7eec6~GeAEOwxGg2821928219euoutp02k
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1713188654;
-	bh=ZvNyBDTtGOhsFAqdOLjRzSyoKu4RMa5m4+b0d7iOP6k=;
-	h=Date:From:To:Subject:In-Reply-To:References:From;
-	b=GmQUOqQM7o6bjsC22pyUHLVaOsoT93RV618NOsBpAbzPNHZ6j2861bf5MaKl/cKsw
-	 j7+MhrH3FUEqrAX9Jxg9FnzWTwhAyYUeQr203UEEXIn+ANm0pxi+wuuWA4F9tA3feT
-	 d87MPbknncddCQfILpgxP9r4OVHoVB74++gYlDRc=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240415134413eucas1p1083d673739f18b6d571ad70336b76efd~GeAEBZ3J30676906769eucas1p1k;
-	Mon, 15 Apr 2024 13:44:13 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges2new.samsung.com (EUCPMTA) with SMTP id F9.A2.09875.D2F2D166; Mon, 15
-	Apr 2024 14:44:13 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240415134413eucas1p1077a3baa096cb382c62768ea968a477b~GeADh-LkK0753307533eucas1p1k;
-	Mon, 15 Apr 2024 13:44:13 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240415134413eusmtrp1d53d9c801232f076ee155c4a5c3be4f1~GeADg3WW13030130301eusmtrp1y;
-	Mon, 15 Apr 2024 13:44:13 +0000 (GMT)
-X-AuditID: cbfec7f4-9acd8a8000002693-3b-661d2f2d85a3
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id 6B.E6.09010.D2F2D166; Mon, 15
-	Apr 2024 14:44:13 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240415134413eusmtip2a3107c689cd960919bc653278802044d~GeADOocSP0156501565eusmtip2O;
-	Mon, 15 Apr 2024 13:44:13 +0000 (GMT)
-Received: from localhost (106.210.248.128) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Mon, 15 Apr 2024 14:44:12 +0100
-Date: Mon, 15 Apr 2024 15:44:06 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: Andrew Morton <akpm@linux-foundation.org>, Muchun Song
-	<muchun.song@linux.dev>, Miaohe Lin <linmiaohe@huawei.com>, Naoya Horiguchi
-	<naoya.horiguchi@nec.com>, John Johansen <john.johansen@canonical.com>, Paul
-	Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge E.
- Hallyn" <serge@hallyn.com>, David Howells <dhowells@redhat.com>, Jarkko
-	Sakkinen <jarkko@kernel.org>, Kees Cook <keescook@chromium.org>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Jens
-	Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, Atish
-	Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, Will Deacon
-	<will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Paul Walmsley
-	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
-	<aou@eecs.berkeley.edu>, Luis Chamberlain <mcgrof@kernel.org>,
-	<linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <apparmor@lists.ubuntu.com>,
-	<linux-security-module@vger.kernel.org>, <keyrings@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>, <io-uring@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH 2/7] security: Remove the now superfluous sentinel
- element from ctl_table array
-Message-ID: <20240415134406.5l6ygkl55yvioxgs@joelS2.panther.com>
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="GxYCA+wE"
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-617f8a59a24so29360007b3.1
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Apr 2024 07:18:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1713190688; x=1713795488; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mqqqjCa8OZ82zdxbWAvkpK8zvR3ppQ2NndSIF2x4rXo=;
+        b=GxYCA+wEVdEIjjWzJWYg+WtDHHIliDSd8tKsr7BV7/MNn1GAfzIGGsjaYd1K1nC47x
+         vSDYX4sAGl3dWOguqWAOzQsiR3l2a5GCXoMgNM60CbTbnQU4DYOtkdtqEGzpNJ1M0YZG
+         uQw5KNJcmYoJdcaPUXYHVNp3fe+w7CGUJ/SPJ96v3rXFwkPh6f3QXK91XZOF32M12JQC
+         Ji8q8ysobl0MyXu0MqYf8ztHm+RuXlZSrC84cqaRtpeht1x8CxcwMPIAYXaT4Z+hGC7+
+         rVG2YJ4JyNKKpzlG7HNhuL8+NZugo/5Ayugwl9nKzsB0LSuLDrRKrkXS0JcMorbjGX6N
+         OF+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713190688; x=1713795488;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mqqqjCa8OZ82zdxbWAvkpK8zvR3ppQ2NndSIF2x4rXo=;
+        b=YCbetlP1/5qcgeIfGfGBrkzsL7pUN+c2KQE5oBrBecb+Old2jBTR/J8Hhep6W4ZZt7
+         GXdLRdkQoWNVJAUvshtrV0hPKicoFATYLvoy+ejtXAsysBReOuVT1UL/8P3WQGVZrMCo
+         2qrP/gLGY4Cs6P9jlA1+A60jxH1zn19O9Zfgz/0nBvj4brNTkay54TR6pW7WASpC9k5I
+         n5X81d9W6OC8wLDefOzYdZafdrcErGXR9jOR5O3xIfRQ8jju1aDpICeF/zbCjTQyKtDz
+         GDYUEXrh5CAdykOxqx+hfOP5XSQyAIs5qMByOb+Cf1sYZI59zre0MJJK0lTf4OXa61jI
+         43dA==
+X-Forwarded-Encrypted: i=1; AJvYcCVg8oE+lCu13Uxf8MxU0lDDR57UERxGaENZiFyBlxLP9bV5tWSbuJRUMsjUK0moKpeTU11QCmE4s2Lj7z+1TDtR63uW+jpzOV67+hoL
+X-Gm-Message-State: AOJu0YwGUdR6B5fU/Kp0O0avLjapEejMZ0bvD9dl6rBfZJ2iLPsnYssG
+	BvMVTG6DJwbUNW5qM7JE+jJ9rbqUyjwZzUN4+z4lc6nKsaNi3IIlo6h282VywMbqvNSZgB0y8ec
+	OR31N5I2uMpNhDQIwiSDHt1GxeUqcERo8Bo4Y
+X-Google-Smtp-Source: AGHT+IFLkqpounEUU/2bE6dJh6q9whX/HjDtCGadHGTvaVHifyPAFZys4Iq+yJ+GbVJMCc2FKsEdAoulZVngTb0CJTg=
+X-Received: by 2002:a0d:eb02:0:b0:615:3996:5c86 with SMTP id
+ u2-20020a0deb02000000b0061539965c86mr9873358ywe.21.1713190688256; Mon, 15 Apr
+ 2024 07:18:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="qw2zqgk5lfspo27e"
-Content-Disposition: inline
-In-Reply-To: <20240328-jag-sysctl_remset_misc-v1-2-47c1463b3af2@samsung.com>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA2VTfUxTVxzltve9lo7i42PjiphJHYtxfGnGdhdwURnsLWok+8N9hc1KH+AG
-	RV+p0yUSqMUBopKig1XiYFsBaUXtoAOUyQA/EGjBTkQtDAskwKCglCl2Y7M8tpnsv3N+v3Ny
-	fucmV8j3zREECnfLMxlWLk2TkCJoujpvDguLWJkcqS6PwmXnDCRWzzgIXO/SCnDO1XICl9WY
-	AM4zx2P9wHESl1nUEDtULoiPTARhR64ZYs18EcC1577j4evOXBJ3HUnH9TYVifMf6SA2DvcR
-	+NfBeR6+1NwBsbWpjMSDhr8IbJpVk3im0E5i3e1eHu4vGgW4svE+xL05LQCPWwv5+LB2Gb6n
-	KYHY0mMWYLUtamMwbThtAHRf3gVIn3R1QVqbfZSkT2X3QnpyfBzSdWfu8Oi2PKeAbtQOCGhT
-	Swjdd/EDWt0+RdDWbiVtrMknaeNDjYC+XuqCCcs/FMXImLTd+xg24s2dolSL/new5454f0e/
-	BWSDXK8CIBQi6lV0szqgAIiEvlQ1QNP1vXyOOAHKO3ELcmQWoLH5PwUFwHPRodE4lhZVAD1o
-	KCH/Vc2ZKwBH6gE6WWwn3CGQCkFnzdvdbpIKRZZJ22KGP1UmRAOmMcJNPCgdQDaTBrpVfhSD
-	HuVbSDcWUxtReYOKx2Ef1PH1yKKGT+1H9hIr3x3Ap1agqgWhe+xJbUXfjk/xuVNXI5X9e4LD
-	B9GNurs8dxaiSp9DR50/kdziLTT6uBlw2A9NXKtb6hmEOosLIWcoBujywoyAI3qAKnPmeJwq
-	Gql/GVlybELHnxgI7l29Uf+UD3eoN9KYSvjcWIzyDvty6peRfnASFoHV2meqaZ+ppv2vGjcO
-	ReUXH5L/G7+CKit+43N4A6qtnYblQFADAhilIj2FUayXM5+HK6TpCqU8JTwpI90Inv6MzoVr
-	zgZQNfEgvBXwhKAVvPTUbD+v7wGBUJ4hZyT+YrXfymRfsUx64AuGzfiEVaYxilawQgglAeIQ
-	2YuML5UizWQ+Y5g9DPvPlif0DMzmNZ33tA6cYWe6b29RZO90pcDO8dg2LVZl5mYxuWsSRM/r
-	7x5q6nFmwMdJsujgxMLXE680DbyRmjHblli796yqx8PBBrTvMBoqC5JcaGgzEbc2S3RZfyXo
-	tZuTxcoL31R4Y/36hj9+fOdU1yFHPur00W5KWBcSX+gXHhMqcgyZiegZ2p/4ctXmTyO96EtZ
-	rOSj5ey+oUhzbOz2sZGUY/fCoC3r45ZbjTLJu28HKg0ewe8HHwt7Ic5ioIf11I4fpkfNTPWy
-	Rl1MQ1zy8JO59vdczZIbstHK02umdD+vSnLuddzv1h1kG7dadwnjI7ZFeRnVX20JYakNUaWO
-	A7ZtzIldEqhIla5by2cV0r8BoM6paJQEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA2VSf1CTdRjv++7duxd05+vA/EZyhwvvOBqDjY2+JNjsCt6K1D84u+QKl7yA
-	wTZuP7DMctBMfkxGQ1EGIaBAIvHrGAcad0oeyYX8WoIIjIOiHMlkQXFAYKzZ5V3/fZ7P8/l8
-	nueee0gWr5zwI48qtYxaKU/nE974D+vf20NCQv2Tw8aqKVTWWE8gw7yTjayrFg7K6q5go7K6
-	NoBy+mLQ1QkTgcr6DThyZq/iKH92B3Ke6sORebkQoIbGSxi6vXiKQL35CmQdzyZQ7lI1jlp+
-	GmajSfsyhr7t7MGR7VoZgez1j9mobcFAoHnjNIGqRwYxdK9wBqCajikcDWbdAMhhM7LQF5Yt
-	aMx8Hkf9A30cZBiXynbS9eX1gB7Oacbpc6u9OG3RnyHoUv0gTj90OHC69cooRn+Xs8ihOywT
-	HLrtxi56+Pq7tOHWHJu23dHRLXW5BN3yu5lD376wih947pAwSq3SaZmAVJVGG81PECGxUBSJ
-	hGJJpFAU/tJ7L4ul/NA9UUlM+tFMRh2657Awtdw+ys4Y4X7UebaR0IPPN+cBLxJSEmg2O/E8
-	4E3yqGoA1/T5mKexAzYv3mV7sA/8aziP8IhcAA4XDT0prAAWuB5sOEgSp3bBb/r2uw0EJYD9
-	D8dZbo0vVUbCpfZSjrt4xj1ivM2Mu1U+FAOXcvsJN+ZSMljRno15UqcAtBovsj2NrbCn5Od/
-	DCwqE+Y+WGS7p7Go52HtOummvag4WOWYY3lWfQFmT19+svancGHtF1AIfCxPJVmeSrL8l+Sh
-	g+G9dQf2P/pFWFP5G8uDo2FDwyO8AnDqgC+j0yhSFBqxUCNXaHTKFOERlaIFbDxnW/dyazu4
-	MusSdgGMBF0gcMM53XR1APjhSpWS4ftyDT7+yTxukvzj44xalajWpTOaLiDdOOOXLL9tR1Qb
-	n67UJooiwqQiSURkmDQyIpy/nftGRo6cR6XItUwaw2Qw6n99GOnlp8dOZNnuJvHK07aF9Ba/
-	b7+Qds66MmOvmn02wTxkE1SN7T1QLPuQu3WmNfak3buWUpCjqfFa3cH19MslfX5TkqGV6BOC
-	gP3O3XWzEc38iRJsMD7u8SfGPy8qEsOTZRzwipR+tVdgjN8nwMVBk1aK39S46TXXwB+q4k5D
-	tKLGoT/dHaMq3nR2fG/lakD3tZ6b1awuoijux+vzb2ee9o0pCsw+v++dAt1ioGxtxvRm7ElV
-	p8u0knJwp8F+SXJoeTJoRDOT4BUbbCot6NisaTq8+5H1GO++/C2Rtf5rE+rSeWFzVcdqb4EF
-	kjL6b6kMuhnhvP/V9s9+NUVRH7Cp18Gd4xI+rkmVi4JZao38b8Kw6I4xBAAA
-X-CMS-MailID: 20240415134413eucas1p1077a3baa096cb382c62768ea968a477b
-X-Msg-Generator: CA
-X-RootMTR: 20240328155911eucas1p23472e0c6505ca73df5c76fe019fdd483
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240328155911eucas1p23472e0c6505ca73df5c76fe019fdd483
 References: <20240328-jag-sysctl_remset_misc-v1-0-47c1463b3af2@samsung.com>
-	<CGME20240328155911eucas1p23472e0c6505ca73df5c76fe019fdd483@eucas1p2.samsung.com>
-	<20240328-jag-sysctl_remset_misc-v1-2-47c1463b3af2@samsung.com>
-
---qw2zqgk5lfspo27e
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+ <CGME20240328155911eucas1p23472e0c6505ca73df5c76fe019fdd483@eucas1p2.samsung.com>
+ <20240328-jag-sysctl_remset_misc-v1-2-47c1463b3af2@samsung.com> <20240415134406.5l6ygkl55yvioxgs@joelS2.panther.com>
+In-Reply-To: <20240415134406.5l6ygkl55yvioxgs@joelS2.panther.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Mon, 15 Apr 2024 10:17:57 -0400
+Message-ID: <CAHC9VhTE+85xLytWD8LYrmdV8xcXdi-Tygy5fVvokaLCfk9bUQ@mail.gmail.com>
+Subject: Re: [PATCH 2/7] security: Remove the now superfluous sentinel element
+ from ctl_table array
+To: Joel Granados <j.granados@samsung.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Muchun Song <muchun.song@linux.dev>, 
+	Miaohe Lin <linmiaohe@huawei.com>, Naoya Horiguchi <naoya.horiguchi@nec.com>, 
+	John Johansen <john.johansen@canonical.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, David Howells <dhowells@redhat.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Kees Cook <keescook@chromium.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Luis Chamberlain <mcgrof@kernel.org>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org, 
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	io-uring@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hey
+On Mon, Apr 15, 2024 at 9:44=E2=80=AFAM Joel Granados <j.granados@samsung.c=
+om> wrote:
+>
+> Hey
+>
+> This is the only patch that I have not seen added to the next tree.
+> I'll put this in the sysctl-next
+> https://git.kernel.org/pub/scm/linux/kernel/git/sysctl/sysctl.git/log/?h=
+=3Dsysctl-next
+> for testing. Please let me know if It is lined up to be upstream through
+> another path.
 
-This is the only patch that I have not seen added to the next tree.
-I'll put this in the sysctl-next
-https://git.kernel.org/pub/scm/linux/kernel/git/sysctl/sysctl.git/log/?h=3D=
-sysctl-next
-for testing. Please let me know if It is lined up to be upstream through
-another path.
-
-Best
-
-On Thu, Mar 28, 2024 at 04:57:49PM +0100, Joel Granados via B4 Relay wrote:
-> From: Joel Granados <j.granados@samsung.com>
->=20
-> This commit comes at the tail end of a greater effort to remove the
-> empty elements at the end of the ctl_table arrays (sentinels) which will
-> reduce the overall build time size of the kernel and run time memory
-> bloat by ~64 bytes per sentinel (further information Link :
-> https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
->=20
-=2E..
+I was hoping to see some ACKs from the associated LSM maintainers, but
+it's minor enough I'll go ahead and pull it into the lsm/dev tree this
+week.  I'll send a note later when I do the merge.
 
 --=20
-
-Joel Granados
-
---qw2zqgk5lfspo27e
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmYdLyYACgkQupfNUreW
-QU/Z+Qv+MoFmIQO7v4dtD+a9DTbUrllY4Dt8XcDo9bLc+AW59PtH7KPP2RNwklOg
-uIwqgCxi+ERswmjFodCCEkyxjNShbXE14ig9pB63iMWGvgd6pyeta6IntBWQGtDS
-jHDW72wnd67ATBG5Rs8N6lh2RZLx/oP4aGTV0GmcN55+LQrNxLbb+yoVh5CR6a8V
-eD1AdG6QC4HggTof5/OwvU68hO6g+SPSzv/rm5ukU0RpzvH4iOMZ3jHLJX09Vbcy
-pVwCg46kmK6Z7plLaG/jdYZdg8rss6kTGHQVi6q1lOeRj6h8gFjXjE54idNOOESs
-Si/Q17wuejaRfBlvr8VNvz05nzCzlshasz2iSis2Rq2+xDSoZfQ7s/tGgtli0Yhd
-TFvF3qGr3mufAsLNVHPQO2ygs9AZgodjG035XcgpDU5iodz9sxjFcVylksVlit16
-9gNv1GMof9ZqEfXwM5c6FBSHi8gbwxiGugietf95SeKoHNIiglwDZlJssIrJ90SC
-EdWFHI6W
-=nkVv
------END PGP SIGNATURE-----
-
---qw2zqgk5lfspo27e--
+paul-moore.com
