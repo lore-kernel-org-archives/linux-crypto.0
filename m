@@ -1,112 +1,122 @@
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mr3.vodafonemail.de (mr3.vodafonemail.de [145.253.228.163])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2617815575B
-	for <linux-crypto@vger.kernel.org>; Mon, 15 Apr 2024 19:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE6F7F7FF;
+	Mon, 15 Apr 2024 20:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.253.228.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713207776; cv=none; b=MP3C6xyUh6qte7jKehqxYL42tw7xAeEoHn0kDt/3ROyHV99E2Jmp54EUCCLmzVWJXY3bF6ILoA4R8aN9puSAgolTyzFUmrrt8vFUwZgbvjh19Wvn3spQvfani4jqwKzaq6T6lrnVzeZwZja243yI4tc5zCZoRKoijcEWhFMjoSE=
+	t=1713214209; cv=none; b=R4Zfah8VbVaa2SJqecUSXp5bzBvfa8yCts4qCev7IUEAJssDjLN+uzBwAePNosVhR8U7XSBqb+bWf44TmGl3+2SoqsrVhGChGaBS0cZEUCcojapTHr0kEJJ5Waf6f/rXvr+F/oH9li68URpFCDeyecswkU7qQAPaGSRLlGp8yQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713207776; c=relaxed/simple;
-	bh=+Sl0KDp+f88KlkN5sL9qL6tcIvj36qePcyg1XNCcTOc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k+NxDt6xEON9czlZEx1AvymvyIjxIQyfI9rF3OdXFReHmK+Ex1srNs6xEmtEdaMe7Fn5yqxu5tHC74pNCxKNjFNYHEJdEIL7SzWpYXf7FjOxkGFOXQ/WEfMIA3247VRMvvjCUc2UOtvJHV1o6opDob6WNLa8y8bExR82DCvjNec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=gpnU87sC; arc=none smtp.client-ip=209.85.210.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	s=arc-20240116; t=1713214209; c=relaxed/simple;
+	bh=gAWfBjMv/u1hM1ri7vb4WcKTVN9s+CRx5IVlFNsdewU=;
+	h=Message-ID:From:To:Cc:References:In-Reply-To:Subject:Date:
+	 MIME-Version:Content-Type; b=DnoTX85xAwo01nKZhzY5x775pnkjZIkG9bX9B5uJV2rYcNpJyOASWD3xt0abzhWGCiWUJbbKIb7+otGLw8y6STL36TWgCQc6LE7pFdMGjtzKIws8iaT74PxsN2e6oiynhixX1LWc7jbq9MJ3MKyJvM1s9oueYaFA0Cw1aljU+Iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de; spf=pass smtp.mailfrom=nexgo.de; dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b=Bsfv5Qfs; arc=none smtp.client-ip=145.253.228.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nexgo.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nexgo.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="gpnU87sC"
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6ea2ac4607aso1904187a34.3
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Apr 2024 12:02:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1713207774; x=1713812574; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qnuzy4YohZRKFHiloeA4mVaIUDCwUMILHZ7C0FksI2Q=;
-        b=gpnU87sCjG2A+yB1sR0hx6yrIJCj3mqA1/XkVLX+KUMZzWfSj3yqLc2mLJAUp5+r98
-         QzW7bEDH38MDio36RdPPhAjeB03vh2jCKtmE1aThRdtB1m3dXIFOmTi6T7eAxaER1S/V
-         hEArF/ktmVVsN6/O6kanNscl75ylDXidH+BMuhQkDrKp6IW4OmlvEpI+4c5dh9Hmz29B
-         jnP9U+DQItj04Grz+HTaMAmnDee1np67V6Vni6ARWGADAvrbN5a6rmMsmPAiEXJebXQy
-         Ultkl7CXrG6qSmavylnPPb+gf6OGkqoFMGoMK7e3fOfO+F7u60dYs6PQlCzLmVCV+trO
-         UWug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713207774; x=1713812574;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qnuzy4YohZRKFHiloeA4mVaIUDCwUMILHZ7C0FksI2Q=;
-        b=azbnKfo+onPBEUPSZoqFa6BE3CTHHwxLAqiTbwJZ69ozNHxzxTyVw32X8Cdk0gR0Eh
-         SHpkjfb2UBM8cjOb+uFmZHl+3b1HdrJie2BDd8CM0FlDVRrJBD5ZDo8MfAyaulx4QjOC
-         lBRnSc8Ez1nPkrkQGO3gDhGkzq0p9uNnEXsUZXCOVKW383BbwP/hSS2+i3WNS2ATw+eF
-         OEUtRGNRMaUJ/2Helj+BOJH5caWffvot6xAbGqP+b0VbH08DAnFALusUjFDjZKkjTHsr
-         SAv2l/ehqQt6ldEWJGYO3E8DyTfRNSa72kkSrCzZzUVOXAu+Rjz/RGnxdS0dRcHQIK8A
-         cEGg==
-X-Forwarded-Encrypted: i=1; AJvYcCXZYfazgzUtUYR/74U8Dusx6XHbiCuhas/vie7hi6BxcbBeJN1PXd/lU5/p+RoWsgo0+7pO4SDWZDIXc+qAS8drU6KDVZrW1IXAFF1l
-X-Gm-Message-State: AOJu0YxvjSDA1glKXBZaKYbyuDooOvFslChAc3wQL6ig97fU22Np8IWz
-	Mu+tzfOLSa4fqqRCorsbTsDFEJUTACuTwy3IyAFOUcIjAO1i84b17zmB8O4k6gKBmguv3OgnKZl
-	DgWDQP3baj2VZ3iCb6gVw+8HpcLnXwqAnDT64
-X-Google-Smtp-Source: AGHT+IEZFN4hbYjCj1ww/D1sjvqe8pOqx7vvJkr0xZqROOpJDxITAIMHtAwtRNrZa/YLYN0XY/RRnGvMJysW4KwpFmQ=
-X-Received: by 2002:a05:6830:1484:b0:6ea:386a:44d8 with SMTP id
- s4-20020a056830148400b006ea386a44d8mr11138794otq.3.1713207774198; Mon, 15 Apr
- 2024 12:02:54 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=nexgo.de header.i=@nexgo.de header.b="Bsfv5Qfs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nexgo.de;
+	s=vfde-mb-mr2-23sep; t=1713214198;
+	bh=sdWOScoNOqhnKs7wXEoboT4q95JQ4ewNRcGo/88he5M=;
+	h=Message-ID:From:To:References:In-Reply-To:Subject:Date:
+	 Content-Type:X-Mailer:From;
+	b=Bsfv5QfsBPQjeBsyl3aUbwapcSPbTKuD4IMziRyplvzfZKp4VflHnCEegQxmAouMF
+	 YReqiqSToV1MAqPEfmVGew4sJje9nW1D4W9b3+gziaOkU4F4ay01HG6EBC6LL9lxxd
+	 souZnilJjfzKPHSr1r4oU+btY/YaaxgroOnUUfig=
+Received: from smtp.vodafone.de (unknown [10.0.0.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	(No client certificate requested)
+	by mr3.vodafonemail.de (Postfix) with ESMTPS id 4VJK6t6Ftwz1yVn;
+	Mon, 15 Apr 2024 20:49:58 +0000 (UTC)
+Received: from H270 (p54805648.dip0.t-ipconnect.de [84.128.86.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.vodafone.de (Postfix) with ESMTPSA id 4VJK6h4LtKz9thr;
+	Mon, 15 Apr 2024 20:49:45 +0000 (UTC)
+Message-ID: <2ECD48ACEA9540C083E6B797CFD18027@H270>
+From: "Stefan Kanthak" <stefan.kanthak@nexgo.de>
+To: "Eric Biggers" <ebiggers@kernel.org>,
+	<linux-crypto@vger.kernel.org>
+Cc: <linux-kernel@vger.kernel.org>
+References: <20240411162359.39073-1-ebiggers@kernel.org> <20240411162359.39073-5-ebiggers@kernel.org>
+In-Reply-To: <20240411162359.39073-5-ebiggers@kernel.org>
+Subject: Re: [PATCH v2 4/4] crypto: x86/sha256-ni - simplify do_4rounds
+Date: Mon, 15 Apr 2024 22:41:07 +0200
+Organization: Me, myself & IT
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240328-jag-sysctl_remset_misc-v1-0-47c1463b3af2@samsung.com>
- <CGME20240328155911eucas1p23472e0c6505ca73df5c76fe019fdd483@eucas1p2.samsung.com>
- <20240328-jag-sysctl_remset_misc-v1-2-47c1463b3af2@samsung.com>
- <20240415134406.5l6ygkl55yvioxgs@joelS2.panther.com> <CAHC9VhTE+85xLytWD8LYrmdV8xcXdi-Tygy5fVvokaLCfk9bUQ@mail.gmail.com>
-In-Reply-To: <CAHC9VhTE+85xLytWD8LYrmdV8xcXdi-Tygy5fVvokaLCfk9bUQ@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Mon, 15 Apr 2024 15:02:43 -0400
-Message-ID: <CAHC9VhT1ykCKnijSbsgPXO9o-5_LHAtSm=q=cdQ8N9QH+WA+tw@mail.gmail.com>
-Subject: Re: [PATCH 2/7] security: Remove the now superfluous sentinel element
- from ctl_table array
-To: Joel Granados <j.granados@samsung.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Muchun Song <muchun.song@linux.dev>, 
-	Miaohe Lin <linmiaohe@huawei.com>, Naoya Horiguchi <naoya.horiguchi@nec.com>, 
-	John Johansen <john.johansen@canonical.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, David Howells <dhowells@redhat.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Kees Cook <keescook@chromium.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Luis Chamberlain <mcgrof@kernel.org>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org, 
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	io-uring@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset="Windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Windows Mail 6.0.6002.18197
+X-MimeOLE: Produced By Microsoft MimeOLE V6.1.7601.24158
+X-purgate-type: clean
+X-purgate: clean
+X-purgate-size: 2536
+X-purgate-ID: 155817::1713214194-6CFF7A4B-F57EC3D5/0/0
 
-On Mon, Apr 15, 2024 at 10:17=E2=80=AFAM Paul Moore <paul@paul-moore.com> w=
-rote:
-> On Mon, Apr 15, 2024 at 9:44=E2=80=AFAM Joel Granados <j.granados@samsung=
-.com> wrote:
-> >
-> > Hey
-> >
-> > This is the only patch that I have not seen added to the next tree.
-> > I'll put this in the sysctl-next
-> > https://git.kernel.org/pub/scm/linux/kernel/git/sysctl/sysctl.git/log/?=
-h=3Dsysctl-next
-> > for testing. Please let me know if It is lined up to be upstream throug=
-h
-> > another path.
->
-> I was hoping to see some ACKs from the associated LSM maintainers, but
-> it's minor enough I'll go ahead and pull it into the lsm/dev tree this
-> week.  I'll send a note later when I do the merge.
+"Eric Biggers" <ebiggers@kernel.org> wrote:
 
-... and now it's merged, it should be in the next cut of the
-linux-next tree.  Thanks!
+> Instead of loading the message words into both MSG and \m0 and then
+> adding the round constants to MSG, load the message words into \m0 and
+> the round constants into MSG and then add \m0 to MSG.  This shortens the
+> source code slightly.  It changes the instructions slightly, but it
+> doesn't affect binary code size and doesn't seem to affect performance.
 
---=20
-paul-moore.com
+At last the final change: write the macro straightforward and SIMPLE,
+closely matching NIST.FIPS.180-4.pdf and their order of operations.
+
+@@ ...
++.macro  sha256  m0 :req, m1 :req, m2 :req, m3 :req
++.if \@ < 4
++        movdqu  \@*16(DATA_PTR), \m0
++        pshufb  SHUF_MASK, \m0          # \m0 = {w(\@*16), w(\@*16+1), w(\@*16+2), w(\@*16+3)}
++.else
++                                        # \m0 = {w(\@*16-16), w(\@*16-15), w(\@*16-14), w(\@*16-13)}
++                                        # \m1 = {w(\@*16-12), w(\@*16-11), w(\@*16-10), w(\@*16-9)}
++                                        # \m2 = {w(\@*16-8),  w(\@*16-7),  w(\@*16-6),  w(\@*16-5)}
++                                        # \m3 = {w(\@*16-4),  w(\@*16-3),  w(\@*16-2),  w(\@*16-1)}
++        sha256msg1 \m1, \m0
++        movdqa     \m3, TMP
++        palignr    $4, \m2, TMP
++        paddd      TMP, \m0
++        sha256msg2 \m3, \m0             # \m0 = {w(\@*16), w(\@*16+1), w(\@*16+2), w(\@*16+3)}
++.endif
++        movdqa      (\@-8)*16(SHA256CONSTANTS), MSG
++        paddd       \m0, MSG
++        sha256rnds2 STATE0, STATE1      # STATE1 = {f', e', b', a'}
++        punpckhqdq  MSG, MSG
++        sha256rnds2 STATE1, STATE0      # STATE0 = {f", e", b", a"},
++                                        # STATE1 = {h", g", d", c"}
++.endm
+
+JFTR: you may simplify this further using .altmacro and generate \m0 to \m3
+      as MSG%(4-\@&3), MSG%(5-\@&3), MSG%(6-\@&3) and MSG%(7-\@&3) within
+      the macro, thus getting rid of its 4 arguments.
+
+@@ ...
++.rept 4                                 # 4*4*4 rounds
++        sha256  MSG0, MSG1, MSG2, MSG3
++        sha256  MSG1, MSG2, MSG3, MSG0
++        sha256  MSG2, MSG3, MSG0, MSG1
++        sha256  MSG3, MSG0, MSG1, MSG2
++.endr
+
+Now that all code written by Tim Chen and Sean Gulley is gone,
+remove their copyright notice and insert your and my name instead.
+
+regards
+Stefan
+
+PS: see <https://skanthak.homepage.t-online.de/fips-180.html>
+    (which I still polish) not just for this implementation.
+
+PPS: if MASM had a counter like \@, I'd used it there.
