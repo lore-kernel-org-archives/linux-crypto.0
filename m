@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23AF15746D;
-	Mon, 15 Apr 2024 21:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7427815885D;
+	Mon, 15 Apr 2024 21:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713217131; cv=none; b=BYk4LuxJtZnQO8QVGvZmzK7uJCAtBl1DE91p0gVAbJo6w0hoAXGwaGfmItHX/SOg9MTVMbqq/ZmABPV/ubJPJCThT923TzahiwaGV1b5ViJYxp7Cu70CE4VoVIf1eNR/x6fcoP7x72BAhk2+dErUDpark1gfHD13/d/XhuBspSI=
+	t=1713217131; cv=none; b=Yb81aqAi4StQtjsWCv+igeYmA0vzYLTKi1awcqVlThdPRW9DfToSw55dbh6s0dg0yfVT1cYxa4iyZeGyb9GjBn/OZQ9gOChNUKcMeCY8LWe/hawFtgU+QBrNUwAGRmKxgHLivwyURNKHD9qTuru/1Qx4SsD4qm3c0Fr9I6CnpAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713217131; c=relaxed/simple;
-	bh=+6OXEPm+JzuPSmBly6c9GdLMVk3Cx5tB37NvqDJaJfU=;
+	bh=1xJ/IShDstfbjrpvhfCgSB3980tF6vNkfAQaXiswAH8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r1yKn/wQC0e+lRpEgWvSdHv5Wp4wINgN6J1bSU5dDLTJEXkUZrBCl/lBN3s5uYq5IRpwUdlrvm20EHiPlVtTXRxVHOV8EscnS+8r/TF7PlhCg5iK24d3RbKxlmEF4MH1ls+aHjUYZ/zAXmRcZd5AotH5yo0uXhjqUL54X1/3Zyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=unDJ1EUg; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=GXV/mU7pHZz+fEcH3jaHrlmfg7QoXw/EzuvZxJq2gO03aaaGnVRuuo4ZaL0TyQTTZ7jtrpMi+FofzaZdV3NhMLmYD3bq1z9sU65TmR/k9IiMbGspIylHThAkxz60AliOLdZusya6EIBxKi76cZs1hfqpTIEbe/l28B+uRozZrR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LkYFIcBE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="unDJ1EUg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53F2EC4AF0E;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LkYFIcBE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7C5BC32781;
 	Mon, 15 Apr 2024 21:38:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713217130;
-	bh=+6OXEPm+JzuPSmBly6c9GdLMVk3Cx5tB37NvqDJaJfU=;
+	s=k20201202; t=1713217131;
+	bh=1xJ/IShDstfbjrpvhfCgSB3980tF6vNkfAQaXiswAH8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=unDJ1EUgZV8gGYi7QtJ/KYcJdaeZOax6J/JPUg0h51yT9Reh3ppM2VsTTFGr5HX6w
-	 ktUBsF2kRH0zLY3/Tdq6hOp6oMQ5nixDyspsTzZkyjMF33C8Bd8Ez5rYPT3wYVj9Iu
-	 el8Qh8K7QwBpga24wm26GcWkNIOjLqb53pmhwekC+3NqgyQOajB3ZRy8jv1R/lt7oA
-	 lIPMl5LUhaE9SvYzW2hDFSLWNyFTG5fa4lipQugBbKrvRy6kjMM+EOCxWrMEgWFKvj
-	 9FNQcwiQIBJUh5ZIv7NuDmNxsxspcMze2gmuJdatCHIiBuKzIFxURDA77kor5y0hpI
-	 ca0AKICiIBUTw==
+	b=LkYFIcBEQqcEaa5i+eqcSk4J9tiKuGMHEpisiEjlwUBd6yReJjSSEHrHJVM3MoPeN
+	 YUDbyIf8l489CUJ+zVzmv59M5gbgOtgcUlV/20NUpcvLl7ILUoKKa9ZEBfLQkKXMEE
+	 ApxHmBdrZoW++M6oydGR+q5pE+PQALepLmvF6WuC8xuXwaIYYJ59teu+XJsjCyx6Gk
+	 6e+aiF1o9aZREHFrkY3UxiGPaGaOFb8S6vttk6uY6BblOGuJTKt6Hp74rk7dK2+L0w
+	 RL68V0Je2x4p/g8NzGDA3MNQTnWfw3WMn5QenbMjeLUx+h7HQKjS/4fFyBneZSyfxc
+	 xrl0VF2vw9Jew==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	fsverity@lists.linux.dev,
@@ -35,9 +35,9 @@ Cc: x86@kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	Sami Tolvanen <samitolvanen@google.com>,
 	Bart Van Assche <bvanassche@acm.org>
-Subject: [RFC PATCH 5/8] crypto: arm64/sha256-ce - add support for finup2x
-Date: Mon, 15 Apr 2024 14:37:16 -0700
-Message-ID: <20240415213719.120673-6-ebiggers@kernel.org>
+Subject: [RFC PATCH 6/8] fsverity: improve performance by using multibuffer hashing
+Date: Mon, 15 Apr 2024 14:37:17 -0700
+Message-ID: <20240415213719.120673-7-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240415213719.120673-1-ebiggers@kernel.org>
 References: <20240415213719.120673-1-ebiggers@kernel.org>
@@ -51,385 +51,451 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Add an implementation of finup2x to sha256-ce.  finup2x interleaves a
-finup operation for two equal-length messages that share a common
-prefix.  dm-verity and fs-verity will take advantage of this for
-significantly improved performance on capable CPUs.
+When supported by the hash algorithm, use crypto_shash_finup2x() to
+interleave the hashing of pairs of data blocks.  On some CPUs this
+nearly doubles hashing performance.  The increase in overall throughput
+of cold-cache fsverity reads that I'm seeing on arm64 and x86_64 is
+roughly 35% (though this metric is hard to measure as it jumps around a
+lot).
 
-On an ARM Cortex-X1, this increases the throughput of SHA-256 hashing
-4096-byte messages by 82%.
+For now this is only done on the verification path, and only for data
+blocks, not Merkle tree blocks.  We could use finup2x on Merkle tree
+blocks too, but that is less important as there aren't as many Merkle
+tree blocks as data blocks, and that would require some additional code
+restructuring.  We could also use finup2x to accelerate building the
+Merkle tree, but verification performance is more important.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/arm64/crypto/sha2-ce-core.S | 261 ++++++++++++++++++++++++++++++-
- arch/arm64/crypto/sha2-ce-glue.c |  40 +++++
- 2 files changed, 295 insertions(+), 6 deletions(-)
+ fs/verity/fsverity_private.h |   5 +
+ fs/verity/hash_algs.c        |  31 +++++-
+ fs/verity/open.c             |   6 ++
+ fs/verity/verify.c           | 177 +++++++++++++++++++++++++++++------
+ 4 files changed, 186 insertions(+), 33 deletions(-)
 
-diff --git a/arch/arm64/crypto/sha2-ce-core.S b/arch/arm64/crypto/sha2-ce-core.S
-index fce84d88ddb2c..c290b85f64080 100644
---- a/arch/arm64/crypto/sha2-ce-core.S
-+++ b/arch/arm64/crypto/sha2-ce-core.S
-@@ -68,22 +68,26 @@
- 	.word		0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5
- 	.word		0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3
- 	.word		0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208
- 	.word		0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
- 
-+	.macro load_round_constants	tmp
-+	adr_l		\tmp, .Lsha2_rcon
-+	ld1		{ v0.4s- v3.4s}, [\tmp], #64
-+	ld1		{ v4.4s- v7.4s}, [\tmp], #64
-+	ld1		{ v8.4s-v11.4s}, [\tmp], #64
-+	ld1		{v12.4s-v15.4s}, [\tmp]
-+	.endm
-+
+diff --git a/fs/verity/fsverity_private.h b/fs/verity/fsverity_private.h
+index b3506f56e180b..b72c03f8f4163 100644
+--- a/fs/verity/fsverity_private.h
++++ b/fs/verity/fsverity_private.h
+@@ -27,10 +27,11 @@ struct fsverity_hash_alg {
  	/*
- 	 * int __sha256_ce_transform(struct sha256_ce_state *sst, u8 const *src,
- 	 *			     int blocks)
+ 	 * The HASH_ALGO_* constant for this algorithm.  This is different from
+ 	 * FS_VERITY_HASH_ALG_*, which uses a different numbering scheme.
  	 */
- 	.text
- SYM_FUNC_START(__sha256_ce_transform)
--	/* load round constants */
--	adr_l		x8, .Lsha2_rcon
--	ld1		{ v0.4s- v3.4s}, [x8], #64
--	ld1		{ v4.4s- v7.4s}, [x8], #64
--	ld1		{ v8.4s-v11.4s}, [x8], #64
--	ld1		{v12.4s-v15.4s}, [x8]
-+
-+	load_round_constants	x8
+ 	enum hash_algo algo_id;
++	bool supports_finup2x;	  /* crypto_shash_supports_finup2x(tfm) */
+ };
  
- 	/* load state */
- 	ld1		{dgav.4s, dgbv.4s}, [x0]
+ /* Merkle tree parameters: hash algorithm, initial hash state, and topology */
+ struct merkle_tree_params {
+ 	const struct fsverity_hash_alg *hash_alg; /* the hash algorithm */
+@@ -65,10 +66,11 @@ struct merkle_tree_params {
+  */
+ struct fsverity_info {
+ 	struct merkle_tree_params tree_params;
+ 	u8 root_hash[FS_VERITY_MAX_DIGEST_SIZE];
+ 	u8 file_digest[FS_VERITY_MAX_DIGEST_SIZE];
++	u8 zero_block_hash[FS_VERITY_MAX_DIGEST_SIZE];
+ 	const struct inode *inode;
+ 	unsigned long *hash_block_verified;
+ };
  
- 	/* load sha256_ce_state::finalize */
-@@ -153,5 +157,250 @@ CPU_LE(	rev32		v19.16b, v19.16b	)
- 	/* store new state */
- 3:	st1		{dgav.4s, dgbv.4s}, [x0]
- 	mov		w0, w2
- 	ret
- SYM_FUNC_END(__sha256_ce_transform)
-+
-+	.unreq dga
-+	.unreq dgav
-+	.unreq dgb
-+	.unreq dgbv
-+	.unreq t0
-+	.unreq t1
-+	.unreq dg0q
-+	.unreq dg0v
-+	.unreq dg1q
-+	.unreq dg1v
-+	.unreq dg2q
-+	.unreq dg2v
-+
-+	// parameters for __sha256_ce_finup2x()
-+	sctx		.req	x0
-+	data1		.req	x1
-+	data2		.req	x2
-+	len		.req	w3
-+	out1		.req	x4
-+	out2		.req	x5
-+
-+	// other scalar variables
-+	count		.req	x6
-+	final_step	.req	w7
-+
-+	// x8-x9 are used as temporaries.
-+
-+	// v0-v15 are used to cache the SHA-256 round constants.
-+	// v16-v23 are used for the data.
-+	// v24-v31 are used for the state and temporaries as given below.
-+	state0_a_q	.req	q24
-+	state0_a	.req	v24
-+	state1_a_q	.req	q25
-+	state1_a	.req	v25
-+	state0_b_q	.req	q26
-+	state0_b	.req	v26
-+	state1_b_q	.req	q27
-+	state1_b	.req	v27
-+	t0_a		.req	v28
-+	t0_b		.req	v29
-+	t1_a_q		.req	q30
-+	t1_a		.req	v30
-+	t1_b_q		.req	q31
-+	t1_b		.req	v31
-+
-+#define OFFSETOF_COUNT	32	// offsetof(struct sha256_state, count)
-+#define OFFSETOF_BUF	40	// offsetof(struct sha256_state, buf)
-+
-+	.macro	do_4rounds_2x	i, k,  w0_a, w1_a, w2_a, w3_a,  \
-+				       w0_b, w1_b, w2_b, w3_b
-+	add		t0_a\().4s, \w0_a\().4s, \k\().4s
-+	add		t0_b\().4s, \w0_b\().4s, \k\().4s
-+	.if \i < 48
-+	sha256su0	\w0_a\().4s, \w1_a\().4s
-+	sha256su0	\w0_b\().4s, \w1_b\().4s
-+	sha256su1	\w0_a\().4s, \w2_a\().4s, \w3_a\().4s
-+	sha256su1	\w0_b\().4s, \w2_b\().4s, \w3_b\().4s
-+	.endif
-+	mov		t1_a.16b, state0_a.16b
-+	mov		t1_b.16b, state0_b.16b
-+	sha256h		state0_a_q, state1_a_q, t0_a\().4s
-+	sha256h		state0_b_q, state1_b_q, t0_b\().4s
-+	sha256h2	state1_a_q, t1_a_q, t0_a\().4s
-+	sha256h2	state1_b_q, t1_b_q, t0_b\().4s
-+	.endm
-+
-+	.macro	do_16rounds_2x	i, k0, k1, k2, k3
-+	do_4rounds_2x	\i + 0,  \k0,  v16, v17, v18, v19,  v20, v21, v22, v23
-+	do_4rounds_2x	\i + 4,  \k1,  v17, v18, v19, v16,  v21, v22, v23, v20
-+	do_4rounds_2x	\i + 8,  \k2,  v18, v19, v16, v17,  v22, v23, v20, v21
-+	do_4rounds_2x	\i + 12, \k3,  v19, v16, v17, v18,  v23, v20, v21, v22
-+	.endm
-+
-+//
-+// void __sha256_ce_finup2x(const struct sha256_state *sctx,
-+//			    const u8 *data1, const u8 *data2, int len,
-+//			    u8 out1[SHA256_DIGEST_SIZE],
-+//			    u8 out2[SHA256_DIGEST_SIZE]);
-+//
-+// This function computes the SHA-256 digests of two messages |data1| and
-+// |data2| that are both |len| bytes long, starting from the initial state
-+// |sctx|.  |len| must be at least SHA256_BLOCK_SIZE.
-+//
-+// The instructions for the two SHA-256 operations are interleaved.  On many
-+// CPUs, this is almost twice as fast as hashing each message individually due
-+// to taking better advantage of the CPU's SHA-256 and SIMD throughput.
-+//
-+SYM_FUNC_START(__sha256_ce_finup2x)
-+	sub		sp, sp, #128
-+	mov		final_step, #0
-+	load_round_constants	x8
-+
-+	// Load the initial state from sctx->state.
-+	ld1		{state0_a.4s-state1_a.4s}, [sctx]
-+
-+	// Load sctx->count.  Take the mod 64 of it to get the number of bytes
-+	// that are buffered in sctx->buf.  Also save it in a register with len
-+	// added to it.
-+	ldr		x8, [sctx, #OFFSETOF_COUNT]
-+	add		count, x8, len, sxtw
-+	and		x8, x8, #63
-+	cbz		x8, .Lfinup2x_enter_loop	// No bytes buffered?
-+
-+	// x8 bytes (1 to 63) are currently buffered in sctx->buf.  Load them
-+	// followed by the first 64 - x8 bytes of data.  Since len >= 64, we
-+	// just load 64 bytes from each of sctx->buf, data1, and data2
-+	// unconditionally and rearrange the data as needed.
-+	add		x9, sctx, #OFFSETOF_BUF
-+	ld1		{v16.16b-v19.16b}, [x9]
-+	st1		{v16.16b-v19.16b}, [sp]
-+
-+	ld1		{v16.16b-v19.16b}, [data1], #64
-+	add		x9, sp, x8
-+	st1		{v16.16b-v19.16b}, [x9]
-+	ld1		{v16.4s-v19.4s}, [sp]
-+
-+	ld1		{v20.16b-v23.16b}, [data2], #64
-+	st1		{v20.16b-v23.16b}, [x9]
-+	ld1		{v20.4s-v23.4s}, [sp]
-+
-+	sub		len, len, #64
-+	sub		data1, data1, x8
-+	sub		data2, data2, x8
-+	add		len, len, w8
-+	mov		state0_b.16b, state0_a.16b
-+	mov		state1_b.16b, state1_a.16b
-+	b		.Lfinup2x_loop_have_data
-+
-+.Lfinup2x_enter_loop:
-+	sub		len, len, #64
-+	mov		state0_b.16b, state0_a.16b
-+	mov		state1_b.16b, state1_a.16b
-+.Lfinup2x_loop:
-+	// Load the next two data blocks.
-+	ld1		{v16.4s-v19.4s}, [data1], #64
-+	ld1		{v20.4s-v23.4s}, [data2], #64
-+.Lfinup2x_loop_have_data:
-+	// Convert the words of the data blocks from big endian.
-+CPU_LE(	rev32		v16.16b, v16.16b	)
-+CPU_LE(	rev32		v17.16b, v17.16b	)
-+CPU_LE(	rev32		v18.16b, v18.16b	)
-+CPU_LE(	rev32		v19.16b, v19.16b	)
-+CPU_LE(	rev32		v20.16b, v20.16b	)
-+CPU_LE(	rev32		v21.16b, v21.16b	)
-+CPU_LE(	rev32		v22.16b, v22.16b	)
-+CPU_LE(	rev32		v23.16b, v23.16b	)
-+.Lfinup2x_loop_have_bswapped_data:
-+
-+	// Save the original state for each block.
-+	st1		{state0_a.4s-state1_b.4s}, [sp]
-+
-+	// Do the SHA-256 rounds on each block.
-+	do_16rounds_2x	0,  v0, v1, v2, v3
-+	do_16rounds_2x	16, v4, v5, v6, v7
-+	do_16rounds_2x	32, v8, v9, v10, v11
-+	do_16rounds_2x	48, v12, v13, v14, v15
-+
-+	// Add the original state for each block.
-+	ld1		{v16.4s-v19.4s}, [sp]
-+	add		state0_a.4s, state0_a.4s, v16.4s
-+	add		state1_a.4s, state1_a.4s, v17.4s
-+	add		state0_b.4s, state0_b.4s, v18.4s
-+	add		state1_b.4s, state1_b.4s, v19.4s
-+
-+	// Update len and loop back if more blocks remain.
-+	sub		len, len, #64
-+	tbz		len, #31, .Lfinup2x_loop
-+
-+	// Check if any final blocks need to be handled.
-+	// final_step = 2: all done
-+	// final_step = 1: need to do count-only padding block
-+	// final_step = 0: need to do the block with 0x80 padding byte
-+	tbnz		final_step, #1, .Lfinup2x_done
-+	tbnz		final_step, #0, .Lfinup2x_finalize_countonly
-+	add		len, len, #64
-+	cbz		len, .Lfinup2x_finalize_blockaligned
-+
-+	// Not block-aligned; 1 <= len <= 63 data bytes remain.  Pad the block.
-+	sub		w8, len, #64		// w8 = len - 64
-+	add		data1, data1, w8, sxtw	// data1 += len - 64
-+	add		data2, data2, w8, sxtw	// data2 += len - 64
-+	ld1		{v16.16b-v19.16b}, [data1]
-+	st1		{v16.16b-v19.16b}, [sp]
-+	mov		x9, 0x80
-+	fmov		d16, x9
-+	movi		v17.16b, #0
-+	stp		q16, q17, [sp, #64]
-+	stp		q17, q17, [sp, #96]
-+	sub		x9, sp, w8, sxtw	// x9 = &sp[64 - len]
-+	cmp		len, #56
-+	b.ge		1f		// will count spill into its own block?
-+	lsl		count, count, #3
-+	rev		count, count
-+	str		count, [x9, #56]
-+	mov		final_step, #2	// won't need count-only block
-+	b		2f
-+1:
-+	mov		final_step, #1	// will need count-only block
-+2:
-+	ld1		{v16.4s-v19.4s}, [x9]
-+	ld1		{v20.16b-v23.16b}, [data2]
-+	st1		{v20.16b-v23.16b}, [sp]
-+	ld1		{v20.4s-v23.4s}, [x9]
-+	b		.Lfinup2x_loop_have_data
-+
-+	// Prepare a padding block, either:
-+	//
-+	//	{0x80, 0, 0, 0, ..., count (as __be64)}
-+	//	This is for a block aligned message.
-+	//
-+	//	{   0, 0, 0, 0, ..., count (as __be64)}
-+	//	This is for a message whose length mod 64 is >= 56.
-+	//
-+	// Pre-swap the endianness of the words.
-+.Lfinup2x_finalize_countonly:
-+	movi		v16.2d, #0
-+	b		1f
-+.Lfinup2x_finalize_blockaligned:
-+	mov		x8, #0x80000000
-+	fmov		d16, x8
-+1:
-+	movi		v17.2d, #0
-+	movi		v18.2d, #0
-+	ror		count, count, #29	// ror(lsl(count, 3), 32)
-+	mov		v19.d[0], xzr
-+	mov		v19.d[1], count
-+	mov		v20.16b, v16.16b
-+	movi		v21.2d, #0
-+	movi		v22.2d, #0
-+	mov		v23.16b, v19.16b
-+	mov		final_step, #2
-+	b		.Lfinup2x_loop_have_bswapped_data
-+
-+.Lfinup2x_done:
-+	// Write the two digests with all bytes in the correct order.
-+CPU_LE(	rev32		state0_a.16b, state0_a.16b	)
-+CPU_LE(	rev32		state1_a.16b, state1_a.16b	)
-+CPU_LE(	rev32		state0_b.16b, state0_b.16b	)
-+CPU_LE(	rev32		state1_b.16b, state1_b.16b	)
-+	st1		{state0_a.4s-state1_a.4s}, [out1]
-+	st1		{state0_b.4s-state1_b.4s}, [out2]
-+	add		sp, sp, #128
-+	ret
-+SYM_FUNC_END(__sha256_ce_finup2x)
-diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
-index 0a44d2e7ee1f7..0b125d8fda284 100644
---- a/arch/arm64/crypto/sha2-ce-glue.c
-+++ b/arch/arm64/crypto/sha2-ce-glue.c
-@@ -31,10 +31,15 @@ extern const u32 sha256_ce_offsetof_count;
- extern const u32 sha256_ce_offsetof_finalize;
+ #define FS_VERITY_MAX_SIGNATURE_SIZE	(FS_VERITY_MAX_DESCRIPTOR_SIZE - \
+@@ -82,10 +84,13 @@ const struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
+ 						      unsigned int num);
+ const u8 *fsverity_prepare_hash_state(const struct fsverity_hash_alg *alg,
+ 				      const u8 *salt, size_t salt_size);
+ int fsverity_hash_block(const struct merkle_tree_params *params,
+ 			const struct inode *inode, const void *data, u8 *out);
++int fsverity_hash_2_blocks(const struct merkle_tree_params *params,
++			   const struct inode *inode, const void *data1,
++			   const void *data2, u8 *out1, u8 *out2);
+ int fsverity_hash_buffer(const struct fsverity_hash_alg *alg,
+ 			 const void *data, size_t size, u8 *out);
+ void __init fsverity_check_hash_algs(void);
  
- asmlinkage int __sha256_ce_transform(struct sha256_ce_state *sst, u8 const *src,
- 				     int blocks);
+ /* init.c */
+diff --git a/fs/verity/hash_algs.c b/fs/verity/hash_algs.c
+index 6b08b1d9a7d7c..0be2903fa8f3f 100644
+--- a/fs/verity/hash_algs.c
++++ b/fs/verity/hash_algs.c
+@@ -82,12 +82,15 @@ const struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
+ 	if (WARN_ON_ONCE(alg->digest_size != crypto_shash_digestsize(tfm)))
+ 		goto err_free_tfm;
+ 	if (WARN_ON_ONCE(alg->block_size != crypto_shash_blocksize(tfm)))
+ 		goto err_free_tfm;
  
-+asmlinkage void __sha256_ce_finup2x(const struct sha256_state *sctx,
-+				    const u8 *data1, const u8 *data2, int len,
-+				    u8 out1[SHA256_DIGEST_SIZE],
-+				    u8 out2[SHA256_DIGEST_SIZE]);
+-	pr_info("%s using implementation \"%s\"\n",
+-		alg->name, crypto_shash_driver_name(tfm));
++	alg->supports_finup2x = crypto_shash_supports_finup2x(tfm);
 +
- static void sha256_ce_transform(struct sha256_state *sst, u8 const *src,
- 				int blocks)
- {
- 	while (blocks) {
- 		int rem;
-@@ -122,10 +127,44 @@ static int sha256_ce_digest(struct shash_desc *desc, const u8 *data,
- {
- 	sha256_base_init(desc);
- 	return sha256_ce_finup(desc, data, len, out);
++	pr_info("%s using implementation \"%s\"%s\n",
++		alg->name, crypto_shash_driver_name(tfm),
++		alg->supports_finup2x ? " (multibuffer)" : "");
+ 
+ 	/* pairs with smp_load_acquire() above */
+ 	smp_store_release(&alg->tfm, tfm);
+ 	goto out_unlock;
+ 
+@@ -195,10 +198,34 @@ int fsverity_hash_block(const struct merkle_tree_params *params,
+ 	if (err)
+ 		fsverity_err(inode, "Error %d computing block hash", err);
+ 	return err;
  }
  
-+static noinline_for_stack int
-+sha256_finup2x_fallback(struct sha256_state *sctx, const u8 *data1,
-+			const u8 *data2, unsigned int len, u8 *out1, u8 *out2)
++int fsverity_hash_2_blocks(const struct merkle_tree_params *params,
++			   const struct inode *inode, const void *data1,
++			   const void *data2, u8 *out1, u8 *out2)
 +{
-+	struct sha256_state sctx2 = *sctx;
++	SHASH_DESC_ON_STACK(desc, params->hash_alg->tfm);
++	int err;
 +
-+	sha256_update(sctx, data1, len);
-+	sha256_final(sctx, out1);
-+	sha256_update(&sctx2, data2, len);
-+	sha256_final(&sctx2, out2);
-+	return 0;
++	desc->tfm = params->hash_alg->tfm;
++
++	if (params->hashstate)
++		err = crypto_shash_import(desc, params->hashstate);
++	else
++		err = crypto_shash_init(desc);
++	if (err) {
++		fsverity_err(inode, "Error %d importing hash state", err);
++		return err;
++	}
++	err = crypto_shash_finup2x(desc, data1, data2, params->block_size,
++				   out1, out2);
++	if (err)
++		fsverity_err(inode, "Error %d computing block hashes", err);
++	return err;
 +}
 +
-+static int sha256_ce_finup2x(struct shash_desc *desc,
-+			     const u8 *data1, const u8 *data2,
-+			     unsigned int len, u8 *out1, u8 *out2)
-+{
-+	struct sha256_ce_state *sctx = shash_desc_ctx(desc);
-+
-+	if (unlikely(!crypto_simd_usable() || len < SHA256_BLOCK_SIZE))
-+		return sha256_finup2x_fallback(&sctx->sst, data1, data2, len,
-+					       out1, out2);
-+
-+	/* __sha256_ce_finup2x() assumes the following offsets. */
-+	BUILD_BUG_ON(offsetof(struct sha256_state, state) != 0);
-+	BUILD_BUG_ON(offsetof(struct sha256_state, count) != 32);
-+	BUILD_BUG_ON(offsetof(struct sha256_state, buf) != 40);
-+
-+	kernel_neon_begin();
-+	__sha256_ce_finup2x(&sctx->sst, data1, data2, len, out1, out2);
-+	kernel_neon_end();
-+	return 0;
-+}
-+
- static int sha256_ce_export(struct shash_desc *desc, void *out)
- {
- 	struct sha256_ce_state *sctx = shash_desc_ctx(desc);
+ /**
+  * fsverity_hash_buffer() - hash some data
+  * @alg: the hash algorithm to use
+  * @data: the data to hash
+  * @size: size of data to hash, in bytes
+diff --git a/fs/verity/open.c b/fs/verity/open.c
+index fdeb95eca3af3..4ae07c689c563 100644
+--- a/fs/verity/open.c
++++ b/fs/verity/open.c
+@@ -206,10 +206,16 @@ struct fsverity_info *fsverity_create_info(const struct inode *inode,
+ 	if (err) {
+ 		fsverity_err(inode, "Error %d computing file digest", err);
+ 		goto fail;
+ 	}
  
- 	memcpy(out, &sctx->sst, sizeof(struct sha256_state));
-@@ -162,10 +201,11 @@ static struct shash_alg algs[] = { {
- 	.init			= sha256_base_init,
- 	.update			= sha256_ce_update,
- 	.final			= sha256_ce_final,
- 	.finup			= sha256_ce_finup,
- 	.digest			= sha256_ce_digest,
-+	.finup2x		= sha256_ce_finup2x,
- 	.export			= sha256_ce_export,
- 	.import			= sha256_ce_import,
- 	.descsize		= sizeof(struct sha256_ce_state),
- 	.statesize		= sizeof(struct sha256_state),
- 	.digestsize		= SHA256_DIGEST_SIZE,
++	err = fsverity_hash_block(&vi->tree_params, inode,
++				  page_address(ZERO_PAGE(0)),
++				  vi->zero_block_hash);
++	if (err)
++		goto fail;
++
+ 	err = fsverity_verify_signature(vi, desc->signature,
+ 					le32_to_cpu(desc->sig_size));
+ 	if (err)
+ 		goto fail;
+ 
+diff --git a/fs/verity/verify.c b/fs/verity/verify.c
+index 4fcad0825a120..ded431512cf5a 100644
+--- a/fs/verity/verify.c
++++ b/fs/verity/verify.c
+@@ -77,29 +77,33 @@ static bool is_hash_block_verified(struct fsverity_info *vi, struct page *hpage,
+ 	SetPageChecked(hpage);
+ 	return false;
+ }
+ 
+ /*
+- * Verify a single data block against the file's Merkle tree.
++ * Verify the hash of a single data block against the file's Merkle tree.
++ *
++ * @real_dblock_hash specifies the hash of the data block, and @data_pos
++ * specifies the byte position of the data block within the file.
+  *
+  * In principle, we need to verify the entire path to the root node.  However,
+  * for efficiency the filesystem may cache the hash blocks.  Therefore we need
+  * only ascend the tree until an already-verified hash block is seen, and then
+  * verify the path to that block.
+  *
+  * Return: %true if the data block is valid, else %false.
+  */
+ static bool
+ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+-		  const void *data, u64 data_pos, unsigned long max_ra_pages)
++		  const u8 *real_dblock_hash, u64 data_pos,
++		  unsigned long max_ra_pages)
+ {
+ 	const struct merkle_tree_params *params = &vi->tree_params;
+ 	const unsigned int hsize = params->digest_size;
+ 	int level;
+ 	u8 _want_hash[FS_VERITY_MAX_DIGEST_SIZE];
+ 	const u8 *want_hash;
+-	u8 real_hash[FS_VERITY_MAX_DIGEST_SIZE];
++	u8 real_hblock_hash[FS_VERITY_MAX_DIGEST_SIZE];
+ 	/* The hash blocks that are traversed, indexed by level */
+ 	struct {
+ 		/* Page containing the hash block */
+ 		struct page *page;
+ 		/* Mapped address of the hash block (will be within @page) */
+@@ -125,11 +129,12 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 		 * doesn't cover data blocks fully past EOF.  But the entire
+ 		 * page spanning EOF can be visible to userspace via a mmap, and
+ 		 * any part past EOF should be all zeroes.  Therefore, we need
+ 		 * to verify that any data blocks fully past EOF are all zeroes.
+ 		 */
+-		if (memchr_inv(data, 0, params->block_size)) {
++		if (memcmp(vi->zero_block_hash, real_dblock_hash,
++			   params->block_size) != 0) {
+ 			fsverity_err(inode,
+ 				     "FILE CORRUPTED!  Data past EOF is not zeroed");
+ 			return false;
+ 		}
+ 		return true;
+@@ -200,13 +205,14 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 		struct page *hpage = hblocks[level - 1].page;
+ 		const void *haddr = hblocks[level - 1].addr;
+ 		unsigned long hblock_idx = hblocks[level - 1].index;
+ 		unsigned int hoffset = hblocks[level - 1].hoffset;
+ 
+-		if (fsverity_hash_block(params, inode, haddr, real_hash) != 0)
++		if (fsverity_hash_block(params, inode, haddr,
++					real_hblock_hash) != 0)
+ 			goto error;
+-		if (memcmp(want_hash, real_hash, hsize) != 0)
++		if (memcmp(want_hash, real_hblock_hash, hsize) != 0)
+ 			goto corrupted;
+ 		/*
+ 		 * Mark the hash block as verified.  This must be atomic and
+ 		 * idempotent, as the same hash block might be verified by
+ 		 * multiple threads concurrently.
+@@ -219,55 +225,145 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 		want_hash = _want_hash;
+ 		kunmap_local(haddr);
+ 		put_page(hpage);
+ 	}
+ 
+-	/* Finally, verify the data block. */
+-	if (fsverity_hash_block(params, inode, data, real_hash) != 0)
+-		goto error;
+-	if (memcmp(want_hash, real_hash, hsize) != 0)
++	/* Finally, verify the hash of the data block. */
++	if (memcmp(want_hash, real_dblock_hash, hsize) != 0)
+ 		goto corrupted;
+ 	return true;
+ 
+ corrupted:
+ 	fsverity_err(inode,
+ 		     "FILE CORRUPTED! pos=%llu, level=%d, want_hash=%s:%*phN, real_hash=%s:%*phN",
+ 		     data_pos, level - 1,
+ 		     params->hash_alg->name, hsize, want_hash,
+-		     params->hash_alg->name, hsize, real_hash);
++		     params->hash_alg->name, hsize,
++		     level == 0 ? real_dblock_hash : real_hblock_hash);
+ error:
+ 	for (; level > 0; level--) {
+ 		kunmap_local(hblocks[level - 1].addr);
+ 		put_page(hblocks[level - 1].page);
+ 	}
+ 	return false;
+ }
+ 
++struct fsverity_verification_context {
++	struct inode *inode;
++	struct fsverity_info *vi;
++	unsigned long max_ra_pages;
++
++	/*
++	 * pending_data and pending_pos are used when the selected hash
++	 * algorithm supports multibuffer hashing.  They're used to temporarily
++	 * store the virtual address and position of a mapped data block that
++	 * needs to be verified.  If we then see another data block, we hash the
++	 * two blocks simultaneously using the fast multibuffer hashing method.
++	 */
++	const void *pending_data;
++	u64 pending_pos;
++
++	/* Buffers to temporarily store the calculated data block hashes */
++	u8 hash1[FS_VERITY_MAX_DIGEST_SIZE];
++	u8 hash2[FS_VERITY_MAX_DIGEST_SIZE];
++};
++
++static inline void
++fsverity_init_verification_context(struct fsverity_verification_context *ctx,
++				   struct inode *inode,
++				   unsigned long max_ra_pages)
++{
++	ctx->inode = inode;
++	ctx->vi = inode->i_verity_info;
++	ctx->max_ra_pages = max_ra_pages;
++	ctx->pending_data = NULL;
++}
++
++static bool
++fsverity_finish_verification(struct fsverity_verification_context *ctx)
++{
++	int err;
++
++	if (ctx->pending_data == NULL)
++		return true;
++	/*
++	 * Multibuffer hashing is enabled but there was an odd number of data
++	 * blocks.  Hash and verify the last block by itself.
++	 */
++	err = fsverity_hash_block(&ctx->vi->tree_params, ctx->inode,
++				  ctx->pending_data, ctx->hash1);
++	kunmap_local(ctx->pending_data);
++	ctx->pending_data = NULL;
++	return err == 0 &&
++	       verify_data_block(ctx->inode, ctx->vi, ctx->hash1,
++				 ctx->pending_pos, ctx->max_ra_pages);
++}
++
++static inline void
++fsverity_abort_verification(struct fsverity_verification_context *ctx)
++{
++	if (ctx->pending_data) {
++		kunmap_local(ctx->pending_data);
++		ctx->pending_data = NULL;
++	}
++}
++
+ static bool
+-verify_data_blocks(struct folio *data_folio, size_t len, size_t offset,
+-		   unsigned long max_ra_pages)
++fsverity_add_data_blocks(struct fsverity_verification_context *ctx,
++			 struct folio *data_folio, size_t len, size_t offset)
+ {
+-	struct inode *inode = data_folio->mapping->host;
+-	struct fsverity_info *vi = inode->i_verity_info;
+-	const unsigned int block_size = vi->tree_params.block_size;
+-	u64 pos = (u64)data_folio->index << PAGE_SHIFT;
++	struct inode *inode = ctx->inode;
++	struct fsverity_info *vi = ctx->vi;
++	const struct merkle_tree_params *params = &vi->tree_params;
++	const unsigned int block_size = params->block_size;
++	const bool use_finup2x = params->hash_alg->supports_finup2x;
++	u64 pos = ((u64)data_folio->index << PAGE_SHIFT) + offset;
+ 
+ 	if (WARN_ON_ONCE(len <= 0 || !IS_ALIGNED(len | offset, block_size)))
+ 		return false;
+ 	if (WARN_ON_ONCE(!folio_test_locked(data_folio) ||
+ 			 folio_test_uptodate(data_folio)))
+ 		return false;
+ 	do {
+-		void *data;
+-		bool valid;
+-
+-		data = kmap_local_folio(data_folio, offset);
+-		valid = verify_data_block(inode, vi, data, pos + offset,
+-					  max_ra_pages);
+-		kunmap_local(data);
+-		if (!valid)
+-			return false;
++		const void *data = kmap_local_folio(data_folio, offset);
++		int err;
++
++		if (use_finup2x) {
++			if (ctx->pending_data) {
++				/* Hash and verify two data blocks. */
++				err = fsverity_hash_2_blocks(params,
++							     inode,
++							     ctx->pending_data,
++							     data,
++							     ctx->hash1,
++							     ctx->hash2);
++				kunmap_local(ctx->pending_data);
++				kunmap_local(data);
++				ctx->pending_data = NULL;
++				if (err != 0 ||
++				    !verify_data_block(inode, vi, ctx->hash1,
++						       ctx->pending_pos,
++						       ctx->max_ra_pages) ||
++				    !verify_data_block(inode, vi, ctx->hash2,
++						       pos, ctx->max_ra_pages))
++					return false;
++			} else {
++				/* Wait and see if there's another block. */
++				ctx->pending_data = data;
++				ctx->pending_pos = pos;
++			}
++		} else {
++			/* Hash and verify one data block. */
++			err = fsverity_hash_block(params, inode, data,
++						  ctx->hash1);
++			kunmap_local(data);
++			if (err != 0 ||
++			    !verify_data_block(inode, vi, ctx->hash1,
++					       pos, ctx->max_ra_pages))
++				return false;
++		}
++		pos += block_size;
+ 		offset += block_size;
+ 		len -= block_size;
+ 	} while (len);
+ 	return true;
+ }
+@@ -284,11 +380,19 @@ verify_data_blocks(struct folio *data_folio, size_t len, size_t offset,
+  *
+  * Return: %true if the data is valid, else %false.
+  */
+ bool fsverity_verify_blocks(struct folio *folio, size_t len, size_t offset)
+ {
+-	return verify_data_blocks(folio, len, offset, 0);
++	struct fsverity_verification_context ctx;
++
++	fsverity_init_verification_context(&ctx, folio->mapping->host, 0);
++
++	if (!fsverity_add_data_blocks(&ctx, folio, len, offset)) {
++		fsverity_abort_verification(&ctx);
++		return false;
++	}
++	return fsverity_finish_verification(&ctx);
+ }
+ EXPORT_SYMBOL_GPL(fsverity_verify_blocks);
+ 
+ #ifdef CONFIG_BLOCK
+ /**
+@@ -305,10 +409,12 @@ EXPORT_SYMBOL_GPL(fsverity_verify_blocks);
+  * filesystems) must instead call fsverity_verify_page() directly on each page.
+  * All filesystems must also call fsverity_verify_page() on holes.
+  */
+ void fsverity_verify_bio(struct bio *bio)
+ {
++	struct inode *inode = bio_first_folio_all(bio)->mapping->host;
++	struct fsverity_verification_context ctx;
+ 	struct folio_iter fi;
+ 	unsigned long max_ra_pages = 0;
+ 
+ 	if (bio->bi_opf & REQ_RAHEAD) {
+ 		/*
+@@ -321,17 +427,26 @@ void fsverity_verify_bio(struct bio *bio)
+ 		 * reduces the number of I/O requests made to the Merkle tree.
+ 		 */
+ 		max_ra_pages = bio->bi_iter.bi_size >> (PAGE_SHIFT + 2);
+ 	}
+ 
++	fsverity_init_verification_context(&ctx, inode, max_ra_pages);
++
+ 	bio_for_each_folio_all(fi, bio) {
+-		if (!verify_data_blocks(fi.folio, fi.length, fi.offset,
+-					max_ra_pages)) {
+-			bio->bi_status = BLK_STS_IOERR;
+-			break;
++		if (!fsverity_add_data_blocks(&ctx, fi.folio, fi.length,
++					      fi.offset)) {
++			fsverity_abort_verification(&ctx);
++			goto ioerr;
+ 		}
+ 	}
++
++	if (!fsverity_finish_verification(&ctx))
++		goto ioerr;
++	return;
++
++ioerr:
++	bio->bi_status = BLK_STS_IOERR;
+ }
+ EXPORT_SYMBOL_GPL(fsverity_verify_bio);
+ #endif /* CONFIG_BLOCK */
+ 
+ /**
 -- 
 2.44.0
 
