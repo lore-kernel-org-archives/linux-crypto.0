@@ -1,117 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA59F156960;
-	Mon, 15 Apr 2024 21:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7BE1E89A;
+	Mon, 15 Apr 2024 21:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713216084; cv=none; b=HIB0NwvX0bauJjVVT9CeZtjgA5fIHmRQ+LJAMYDFucq3S25Wlx2zaYucsFlwn/XPLiHMKQ53tgzXSEqk6NsP/E7Q+l+DEGJgramFmFLZnkjRJ69iaN+rnBrQjWkTIqfdE+8R/TwwzUNWfMJa4vJcX1yRUZV2b0Pxc+sGxaV9OsM=
+	t=1713217129; cv=none; b=qhm83+h0NcBQIREmpvE40AikVJoIxKrmi1K+dXU4NEdA6To0z1GQvxFxrY0j57I9gT1ovNfLYStKlfiYrr/CR2Yep2otxJKwrL34q13QMCsCMvOwJluS4BVTktCVA+XjWUmjrZ40pN/qxLbmhfRiIO0nsPHmVvDANsBx5L7tCQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713216084; c=relaxed/simple;
-	bh=GmW+UECxL2DLLcfHpk00erlt7Iyqya2qrKbwvHIfovM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GOjLOl5zK/sGSAS0whNAPmi9tkgN5+DQg1DkXxwSJilRIpg4wo8ADKhmxPiyF85u1lA4HWwBvQ5t5BeHsfp/72j5hKT2pnBXl2nv0YxMdCv9GIIRHzZy8byUvd1YcNW5t1k9bCQSJLaH3cOND3P3fFjqWzwunip6wvYVX5ziQr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eh2NWqXU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713217129; c=relaxed/simple;
+	bh=LdgSzKnyi2LWa7e/BgfjAMFoEXu5VqKaRa128bZAOp8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AL3UW5K4YxNtNkRr4Fpu1PXYn9rA0hL93Bsh4mruQhPtVBa1mBEJ1myQEEhmPwKO04cigYwtfwSW5tujLz+V0VFz5S5ySK/bnXAH64vRBiVsWLUFsAKg7PdWYjdhfEdcVdQ9b3z2GGjQhDTzCfio8DH68uTcl3naoCcSzpVkKS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EYIF4/rv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eh2NWqXU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55C1AC113CC;
-	Mon, 15 Apr 2024 21:21:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EYIF4/rv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44054C113CC;
+	Mon, 15 Apr 2024 21:38:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713216083;
-	bh=GmW+UECxL2DLLcfHpk00erlt7Iyqya2qrKbwvHIfovM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eh2NWqXUfgiLT8ToWxvKvazqN+oC6EEHDHc7/A9+pvspFqXiKnMdgzRETs3avKJZx
-	 I3u7f+rW+uKpGkDSe0M9ZkEKEjJ9TQe8RaxbeoIkEWXiRKxXOJQg6pY5Ss+L4uqhur
-	 NVKmo8v1IAh3QgJPfCPgnip6XRfNVv86CnuCnRZgFh9CWHMsEE9TomysMMhhWBBdUX
-	 nFgTy8qR51vA5z+GyN6rABN/Lc7leJ7bXmEtNqNmfKcBiQXOdVRmvPWw56r5Drj918
-	 5xh8BTvCXGPr+qFYFXX50WCmtjdTDaxhnKOFOE5qodnPN0bXyV1PGRqQVr0zbw/1vR
-	 OL4qRxfyi0tRQ==
-Date: Mon, 15 Apr 2024 14:21:21 -0700
+	s=k20201202; t=1713217128;
+	bh=LdgSzKnyi2LWa7e/BgfjAMFoEXu5VqKaRa128bZAOp8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=EYIF4/rvgnLfiMR2HZGkvI551MKvMeaAR/vQxBnQ5XW3GsGPKwIn3OsHIbDBZWPc2
+	 cb1hR4kA8L1bkTeoI+UTGiD2P2yzHigmynE+mzEAoIwWaVeE0Y44Ke/A3xpGC/fHyz
+	 UfW5riqyKkwdCNsth7fWbWJx1UCFVa0MLS5YCInSFtBg7BqQpeI7SOxkUnlSGi/UOj
+	 Km8ka2Hu1+am5WCkwOPXmV069RNxnCtewxPkbBNpFqn3S4b//3GAxJJIfht6Infaef
+	 k/F5TcY1KCjH8QjO2ZUmYKOnI5yO6tGT1Sev2Orm4QEGXvJc1ME4s0Emiz7Q8U8VoU
+	 tGfUAVPd+NBIQ==
 From: Eric Biggers <ebiggers@kernel.org>
-To: Stefan Kanthak <stefan.kanthak@nexgo.de>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] crypto: x86/sha256-ni - simplify do_4rounds
-Message-ID: <20240415212121.GA5206@sol.localdomain>
-References: <20240411162359.39073-1-ebiggers@kernel.org>
- <20240411162359.39073-5-ebiggers@kernel.org>
- <2ECD48ACEA9540C083E6B797CFD18027@H270>
+To: linux-crypto@vger.kernel.org,
+	fsverity@lists.linux.dev,
+	dm-devel@lists.linux.dev
+Cc: x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [RFC PATCH 0/8] Optimize dm-verity and fsverity using multibuffer hashing
+Date: Mon, 15 Apr 2024 14:37:11 -0700
+Message-ID: <20240415213719.120673-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2ECD48ACEA9540C083E6B797CFD18027@H270>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 15, 2024 at 10:41:07PM +0200, Stefan Kanthak wrote:
-> "Eric Biggers" <ebiggers@kernel.org> wrote:
-> 
-> > Instead of loading the message words into both MSG and \m0 and then
-> > adding the round constants to MSG, load the message words into \m0 and
-> > the round constants into MSG and then add \m0 to MSG.  This shortens the
-> > source code slightly.  It changes the instructions slightly, but it
-> > doesn't affect binary code size and doesn't seem to affect performance.
-> 
-> At last the final change: write the macro straightforward and SIMPLE,
-> closely matching NIST.FIPS.180-4.pdf and their order of operations.
-> 
-> @@ ...
-> +.macro  sha256  m0 :req, m1 :req, m2 :req, m3 :req
-> +.if \@ < 4
-> +        movdqu  \@*16(DATA_PTR), \m0
-> +        pshufb  SHUF_MASK, \m0          # \m0 = {w(\@*16), w(\@*16+1), w(\@*16+2), w(\@*16+3)}
-> +.else
-> +                                        # \m0 = {w(\@*16-16), w(\@*16-15), w(\@*16-14), w(\@*16-13)}
-> +                                        # \m1 = {w(\@*16-12), w(\@*16-11), w(\@*16-10), w(\@*16-9)}
-> +                                        # \m2 = {w(\@*16-8),  w(\@*16-7),  w(\@*16-6),  w(\@*16-5)}
-> +                                        # \m3 = {w(\@*16-4),  w(\@*16-3),  w(\@*16-2),  w(\@*16-1)}
-> +        sha256msg1 \m1, \m0
-> +        movdqa     \m3, TMP
-> +        palignr    $4, \m2, TMP
-> +        paddd      TMP, \m0
-> +        sha256msg2 \m3, \m0             # \m0 = {w(\@*16), w(\@*16+1), w(\@*16+2), w(\@*16+3)}
-> +.endif
-> +        movdqa      (\@-8)*16(SHA256CONSTANTS), MSG
-> +        paddd       \m0, MSG
-> +        sha256rnds2 STATE0, STATE1      # STATE1 = {f', e', b', a'}
-> +        punpckhqdq  MSG, MSG
-> +        sha256rnds2 STATE1, STATE0      # STATE0 = {f", e", b", a"},
-> +                                        # STATE1 = {h", g", d", c"}
-> +.endm
-> 
-> JFTR: you may simplify this further using .altmacro and generate \m0 to \m3
->       as MSG%(4-\@&3), MSG%(5-\@&3), MSG%(6-\@&3) and MSG%(7-\@&3) within
->       the macro, thus getting rid of its 4 arguments.
-> 
-> @@ ...
-> +.rept 4                                 # 4*4*4 rounds
-> +        sha256  MSG0, MSG1, MSG2, MSG3
-> +        sha256  MSG1, MSG2, MSG3, MSG0
-> +        sha256  MSG2, MSG3, MSG0, MSG1
-> +        sha256  MSG3, MSG0, MSG1, MSG2
-> +.endr
+On many modern CPUs, it is possible to compute the SHA-256 hash of two
+equal-length messages in about the same time as a single message, if all
+the instructions are interleaved.  This is because each SHA-256 (and
+also most other cryptographic hash functions) is inherently serialized
+and therefore can't always take advantage of the CPU's full throughput.
 
-Could you please send a real patch, following
-Documentation/process/submitting-patches.rst?  It's hard to understand what
-you're proposing here.
+An earlier attempt to support multibuffer hashing in Linux was based
+around the ahash API.  That approach had some major issues.  This
+patchset instead takes a much simpler approach of just adding a
+synchronous API for hashing two equal-length messages.
 
-> Now that all code written by Tim Chen and Sean Gulley is gone,
-> remove their copyright notice and insert your and my name instead.
+This works well for dm-verity and fsverity, which use Merkle trees and
+therefore hash large numbers of equal-length messages.
 
-Well, their code has been cleaned up.  We have to keep copyright notices around
-unless we're certain they can go.
+This patchset is organized as follows:
 
-> 
-> regards
-> Stefan
-> 
-> PS: see <https://skanthak.homepage.t-online.de/fips-180.html>
->     (which I still polish) not just for this implementation.
-> 
-> PPS: if MASM had a counter like \@, I'd used it there.
+- Patch 1-3 add crypto_shash_finup2x() and tests for it.
+- Patch 4-5 implement finup2x on x86_64 and arm64.
+- Patch 6-8 update fsverity and dm-verity to use crypto_shash_finup2x()
+  to hash pairs of data blocks when possible.  Note: the patch
+  "dm-verity: hash blocks with shash import+finup when possible" is
+  revived from its original submission
+  (https://lore.kernel.org/dm-devel/20231030023351.6041-1-ebiggers@kernel.org/)
+  because this new work provides a new motivation for it.
 
-Thanks,
+On CPUs that support multiple concurrent SHA-256's (all arm64 CPUs I
+tested, and AMD Zen CPUs), raw SHA-256 hashing throughput increases by
+82-98%, and the throughput of cold-cache reads from dm-verity and
+fsverity increases by very roughly 35%.
 
-- Eric
+This is marked as RFC for now, as I'm soliciting feedback on the overall
+concept, and some parts may need a bit more work.  The dm-verity and
+fsverity patches are a bit large and I may try to split those up.
+
+Eric Biggers (8):
+  crypto: shash - add support for finup2x
+  crypto: testmgr - generate power-of-2 lengths more often
+  crypto: testmgr - add tests for finup2x
+  crypto: x86/sha256-ni - add support for finup2x
+  crypto: arm64/sha256-ce - add support for finup2x
+  fsverity: improve performance by using multibuffer hashing
+  dm-verity: hash blocks with shash import+finup when possible
+  dm-verity: improve performance by using multibuffer hashing
+
+ arch/arm64/crypto/sha2-ce-core.S    | 261 ++++++++++++-
+ arch/arm64/crypto/sha2-ce-glue.c    |  40 ++
+ arch/x86/crypto/sha256_ni_asm.S     | 352 +++++++++++++++++
+ arch/x86/crypto/sha256_ssse3_glue.c |  40 ++
+ crypto/testmgr.c                    |  59 ++-
+ drivers/md/dm-verity-fec.c          |  31 +-
+ drivers/md/dm-verity-fec.h          |   7 +-
+ drivers/md/dm-verity-target.c       | 560 ++++++++++++++++++++--------
+ drivers/md/dm-verity.h              |  43 +--
+ fs/verity/fsverity_private.h        |   5 +
+ fs/verity/hash_algs.c               |  31 +-
+ fs/verity/open.c                    |   6 +
+ fs/verity/verify.c                  | 177 +++++++--
+ include/crypto/hash.h               |  34 ++
+ 14 files changed, 1403 insertions(+), 243 deletions(-)
+
+
+base-commit: 0bbac3facb5d6cc0171c45c9873a2dc96bea9680
+-- 
+2.44.0
+
