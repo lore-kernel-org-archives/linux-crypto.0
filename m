@@ -1,107 +1,118 @@
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6179C154C11;
-	Mon, 15 Apr 2024 22:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC00B156225;
+	Mon, 15 Apr 2024 22:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713219564; cv=none; b=p1N1sx0pUTmgYec9tJ0Isl/x06GdJDv1RVzuMxsKtHe5EbOS7mdCxffcjXCvRbnzVsHDw2Zk83QT9nC+msosd2fd2R0D8LRWlsEkWw/dbZmRFmJcppfvLL2CbGDsV2Nrl2osCKdMUZc8mQL4dVcgAXaYwA9SEU+2i+49hxlH2JM=
+	t=1713221193; cv=none; b=DSGZX4mSw+4oYQev62zB/q8P/Vx8+KzAkaVQAj+KkfvR9Dp6w+WmFDypYXKCzji5nysKJven8Are2JNwOTA2IArAVdIJYDVILG9/0IOwZbTjPnju1qXKu+ptfp0Dc9/ROqrz1LSRRDc7LeNfEy9aR7Wm7JB+mfHGDya004MtOYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713219564; c=relaxed/simple;
-	bh=PNvp7gmlHIY1h3LCNlaBN5CUutf9dFC3Ice5JZ8QJeI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uHQECMvdKw/4eciJyztfMbj9hcdtTZhTqMIVR59wXvDBUfrufdCZgPPfMa/M38lVYiqnWUSsmlYO+px58mrCFft9+MIsFJFCjGIP1AJioq81LqjJw6toy3aVWRWjrbRv5VB07va+6sB9RaXB2holrXlkKlAVPWiUfou8qSVGmEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=S/BLFsi2; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1713221193; c=relaxed/simple;
+	bh=CUDoHqW/SodLI3NlqkpBmXp7dZ2wMZ3arGRmHuXeJ98=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kchFqsU98sgVjYmo39cIgFJANycJ7GEB0mjpil5nLexAy4tgQr0vrLoq/4DTin4rtr1TPA4Yl9N1reKkRvfDqjcvPTE/qKJf5j3HzpKRYOAzKfG+b6Tg1US7vvsGl72qPBZB/Vpd53L07mnzxPVASGedj+V58nxIgiIiNRaKK54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FniSMvHY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="S/BLFsi2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1713219564; x=1744755564;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=o5xHlLkxJsRm7EFmKP4Jmd4YBjmBD9lf5st0GZDp2Z4=;
-  b=S/BLFsi218wJezY5vJs+bxpyR/uE8pE+PKod4JemzgEmgk5TX99gLB92
-   jxFalcdpXxETBXAU23MibDDa2Pn5ZDNg4y9+oJUW+VPJsVE3A5c+5fz3W
-   nU2BaIWjoNShJ4HPsjklnj+p7Ct8oC9MliQx+ZJea11JL9vt353lJa6m3
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.07,204,1708387200"; 
-   d="scan'208";a="647808149"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 22:19:22 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:12664]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.207:2525] with esmtp (Farcaster)
- id 66a8cb9e-2e2e-4cd7-8cf1-e3f8e5cba40e; Mon, 15 Apr 2024 22:19:21 +0000 (UTC)
-X-Farcaster-Flow-ID: 66a8cb9e-2e2e-4cd7-8cf1-e3f8e5cba40e
-Received: from EX19D046UWB003.ant.amazon.com (10.13.139.174) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 15 Apr 2024 22:19:21 +0000
-Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
- EX19D046UWB003.ant.amazon.com (10.13.139.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 15 Apr 2024 22:19:20 +0000
-Received: from dev-dsk-hailmo-2b-4e49cd2f.us-west-2.amazon.com (172.16.42.153)
- by mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP Server id
- 15.2.1258.28 via Frontend Transport; Mon, 15 Apr 2024 22:19:20 +0000
-Received: by dev-dsk-hailmo-2b-4e49cd2f.us-west-2.amazon.com (Postfix, from userid 13307802)
-	id 561894151A; Mon, 15 Apr 2024 22:19:20 +0000 (UTC)
-From: Hailey Mothershead <hailmo@amazon.com>
-To: <herbert@gondor.apana.org.au>
-CC: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <hailmo@amazon.com>
-Subject: [PATCH v2 2/2] crypto: aead,cipher - zeroize key buffer after use
-Date: Mon, 15 Apr 2024 22:19:15 +0000
-Message-ID: <20240415221915.20701-1-hailmo@amazon.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FniSMvHY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51C48C2BD11;
+	Mon, 15 Apr 2024 22:46:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713221192;
+	bh=CUDoHqW/SodLI3NlqkpBmXp7dZ2wMZ3arGRmHuXeJ98=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FniSMvHYQvG1sKJwHy9qHb23jRSntAZPZaX1Yv3VSxhVv8C8P66Fb8CmctAZ5dJs1
+	 +bkWbl6zrh9hZ8HrQJe0C400qGZJxkW5uJCcyST3vpCPr9V3YD5e5TSmvJDMLhDzkg
+	 qg+c1pw2TWSGVOBUdNxoeWbuD6Z8ZhD+ZeE0urholQNWZ+c7bmI0qaQqO59ksGp/Mt
+	 1uA4Y/9PKc1WISZt/FSpV/HVI/opkuBfhGhyX4ypZ4ZYm202ivKO1DWt3nVDCi7DIN
+	 5aCGfVVg/XUr3DoXD/M+7RW33ycsf3v6np/MlIbpn8svRMA69T0gmE2ruzj+H6wgd0
+	 eo9DFM7l6urgg==
+Date: Mon, 15 Apr 2024 15:46:29 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Stefan Kanthak <stefan.kanthak@nexgo.de>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] crypto: x86/sha256-ni - simplify do_4rounds
+Message-ID: <20240415224629.GB5206@sol.localdomain>
+References: <20240411162359.39073-1-ebiggers@kernel.org>
+ <20240411162359.39073-5-ebiggers@kernel.org>
+ <2ECD48ACEA9540C083E6B797CFD18027@H270>
+ <20240415212121.GA5206@sol.localdomain>
+ <65E53E4DD09F41CDA7EBCBD970E23C23@H270>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65E53E4DD09F41CDA7EBCBD970E23C23@H270>
 
-I.G 9.7.B for FIPS 140-3 specifies that variables temporarily holding
-cryptographic information should be zeroized once they are no longer
-needed. Accomplish this by using kfree_sensitive for buffers that
-previously held the private key.
+On Tue, Apr 16, 2024 at 12:04:56AM +0200, Stefan Kanthak wrote:
+> "Eric Biggers" <ebiggers@kernel.org> wrote:
+> 
+> > On Mon, Apr 15, 2024 at 10:41:07PM +0200, Stefan Kanthak wrote:
+> [...]
+> >> At last the final change: write the macro straightforward and SIMPLE,
+> >> closely matching NIST.FIPS.180-4.pdf and their order of operations.
+> >> 
+> >> @@ ...
+> >> +.macro  sha256  m0 :req, m1 :req, m2 :req, m3 :req
+> >> +.if \@ < 4
+> >> +        movdqu  \@*16(DATA_PTR), \m0
+> >> +        pshufb  SHUF_MASK, \m0          # \m0 = {w(\@*16), w(\@*16+1), w(\@*16+2), w(\@*16+3)}
+> >> +.else
+> >> +                                        # \m0 = {w(\@*16-16), w(\@*16-15), w(\@*16-14), w(\@*16-13)}
+> >> +                                        # \m1 = {w(\@*16-12), w(\@*16-11), w(\@*16-10), w(\@*16-9)}
+> >> +                                        # \m2 = {w(\@*16-8),  w(\@*16-7),  w(\@*16-6),  w(\@*16-5)}
+> >> +                                        # \m3 = {w(\@*16-4),  w(\@*16-3),  w(\@*16-2),  w(\@*16-1)}
+> >> +        sha256msg1 \m1, \m0
+> >> +        movdqa     \m3, TMP
+> >> +        palignr    $4, \m2, TMP
+> >> +        paddd      TMP, \m0
+> >> +        sha256msg2 \m3, \m0             # \m0 = {w(\@*16), w(\@*16+1), w(\@*16+2), w(\@*16+3)}
+> >> +.endif
+> >> +        movdqa      (\@-8)*16(SHA256CONSTANTS), MSG
+> >> +        paddd       \m0, MSG
+> >> +        sha256rnds2 STATE0, STATE1      # STATE1 = {f', e', b', a'}
+> >> +        punpckhqdq  MSG, MSG
+> >> +        sha256rnds2 STATE1, STATE0      # STATE0 = {f", e", b", a"},
+> >> +                                        # STATE1 = {h", g", d", c"}
+> >> +.endm
+> >> 
+> >> JFTR: you may simplify this further using .altmacro and generate \m0 to \m3
+> >>       as MSG%(4-\@&3), MSG%(5-\@&3), MSG%(6-\@&3) and MSG%(7-\@&3) within
+> >>       the macro, thus getting rid of its 4 arguments.
+> >> 
+> >> @@ ...
+> >> +.rept 4                                 # 4*4*4 rounds
+> >> +        sha256  MSG0, MSG1, MSG2, MSG3
+> >> +        sha256  MSG1, MSG2, MSG3, MSG0
+> >> +        sha256  MSG2, MSG3, MSG0, MSG1
+> >> +        sha256  MSG3, MSG0, MSG1, MSG2
+> >> +.endr
+> > 
+> > Could you please send a real patch, following
+> > Documentation/process/submitting-patches.rst?  It's hard to understand what
+> > you're proposing here.
+> 
+> 1) I replace your macro (which unfortunately follows Tim Chens twisted code)
+>    COMPLETELY with a clean and simple implementation: message schedule first,
+>    update of state variables last.
+>    You don't need ".if \i >= 12 && \i < 60"/".if \i >= 4 && \i < 52" at all!
 
-Signed-off-by: Hailey Mothershead <hailmo@amazon.com>
----
- crypto/aead.c   | 3 +--
- crypto/cipher.c | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+It's probably intentional that the code does the message schedule computations a
+bit ahead of time.  This might improve performance by reducing the time spent
+waiting for the message schedule.
 
-diff --git a/crypto/aead.c b/crypto/aead.c
-index 16991095270d..c4ece86c45bc 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -35,8 +35,7 @@ static int setkey_unaligned(struct crypto_aead *tfm, const u8 *key,
- 	alignbuffer = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
- 	memcpy(alignbuffer, key, keylen);
- 	ret = crypto_aead_alg(tfm)->setkey(tfm, alignbuffer, keylen);
--	memset(alignbuffer, 0, keylen);
--	kfree(buffer);
-+	kfree_sensitive(buffer);
- 	return ret;
- }
- 
-diff --git a/crypto/cipher.c b/crypto/cipher.c
-index b47141ed4a9f..395f0c2fbb9f 100644
---- a/crypto/cipher.c
-+++ b/crypto/cipher.c
-@@ -34,8 +34,7 @@ static int setkey_unaligned(struct crypto_cipher *tfm, const u8 *key,
- 	alignbuffer = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
- 	memcpy(alignbuffer, key, keylen);
- 	ret = cia->cia_setkey(crypto_cipher_tfm(tfm), alignbuffer, keylen);
--	memset(alignbuffer, 0, keylen);
--	kfree(buffer);
-+	kfree_sensitive(buffer);
- 	return ret;
- 
- }
--- 
-2.40.1
+It would be worth trying a few different variants on different CPUs and seeing
+how they actually perform in practice, though.
 
-memsets removed and first patch in series dropped.
+> 
+> 2) I replace the .irp which invokes your macro with a .rept: my macro uses \@
+>    instead of an argument for the round number.
+> 
+> <https://sourceware.org/binutils/docs/as.html#Macro>
+
+The \@ feature is a bit obscure and maybe is best avoided.
+
+- Eric
