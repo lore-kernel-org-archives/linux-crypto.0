@@ -1,155 +1,121 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A6B1327E7
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Apr 2024 17:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489C0137915;
+	Tue, 16 Apr 2024 19:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713286883; cv=none; b=B5IMLE0XjN9xAoRoubnYgVfn9NE54KzHNjTv/d/6zHSn9/9LbEUdY0AbRgeukfUkOc7mULZKXwJMgleDLWvCQrCso81pZ03S3zfcg9VEAEpJ+hW+S0aIv/n+Xu7aWPairw5kCVRYHGa+ddVKdz6OsHjyilYVEwu2vp2BaaHHzKE=
+	t=1713294873; cv=none; b=Sh44W3YeSzeSzDOmbLWO3u5A5HIbTRRvF9Uyf61o0zgpIFaZ8qq3ARBN5RcUjvSk4peEIWMt0omy+azva9w9UVnsNAKmXb3TkHidb6arJ2L4S6HujJbOF/Y+j+04q/aXBRPedH7lcD8IdS1zOdFgoEvuhN3IimyVi9GQQ5PbKD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713286883; c=relaxed/simple;
-	bh=d8yfNDlD2slCnTX5YrNTAPoVtr6kE/Nqrv0NiCbczaQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ax3a0ceHs6xi88MsaN7b6kF04lmsdmAYN1eq/tedUUqBMikCypLbH5/R4UnZec321qMNqEqjtRuOu/Ik3t3Ji0cJDpVHc1EZujGCWK52ABs5zvLYmZoHfIMPMsLnCyRB8QyOIcIdaZvRFFUAQpExYN6+lvHsCnTtYHEJZT9xxTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JeGRKW18; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1713294873; c=relaxed/simple;
+	bh=1nkP3jzirDPuZivulqvFVuWDtWufC3zC80rCDpDu/40=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZO/5jeeCpFtHEuVmORuDJf+4f9O0WVLG6WYq6IAmsX6hwSuXmqwVZ3cce72/jJCoCkaoTUXYxJLPEDa1OtF3RjwbLugD0wG9955rDc9WAAkiMkxCskaZg/gXB6swK+WbCicsaN0t1SNsWsBT1jH2Iy1xlLi76bAtWowvGlG3uSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Xhwo7TmB; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JeGRKW18"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713286881;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YV3huxxwV4cNX30vuhj/67sfqzzrbon2fJPguOJkhQA=;
-	b=JeGRKW18O5nyr5llQD+oP8Xn/XKOtR/weaoizCTROrdsBfmqvljBIG1UyCz8Ehy+K58+YS
-	Qbq6D6FNRzFaoJPzRMPUdoC1HvX7bUsa6sgMbORIP6/hKWO42+MthWV1LZtLWGaAQT8MVQ
-	xLsoH6fduEQ/CoAAuduWPoNKeWhxGlA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-612-2UdE-vKyOZ2UGkiUIeEz0g-1; Tue, 16 Apr 2024 13:01:11 -0400
-X-MC-Unique: 2UdE-vKyOZ2UGkiUIeEz0g-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-343e74dcf0bso2808393f8f.0
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Apr 2024 10:01:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713286870; x=1713891670;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YV3huxxwV4cNX30vuhj/67sfqzzrbon2fJPguOJkhQA=;
-        b=By6as2DSClk66u3srdId8sn5a7Bqd1NesWW81q/zrbJu+f8B27bxlCCB+o8FC7ULaP
-         uEOx2l2eQtCVVQctStZYHro9yNQG59VlMq1voPnjXZJUc7ElNB0Er3KXckd9J44HRSTK
-         KCH3dURpm0DQUskdyBOUidkN/o/8zZ2UZwJZ5Crpiq8iyCwCpIGwsibQUoGQzE9hBua6
-         RzpJlgi7vHQ34NP+fdMrtyPzfViOR2Kgd8Tk8wy2+sYD+Az+2HshiNMuUnHs80oGbG4q
-         eKeDu4+/EQ9gt9t4V/iH64rs8chCKc5I5RcMpzOAIVI4tO/UUfwq/FpFDgGAXqnSgrpZ
-         Iy4A==
-X-Forwarded-Encrypted: i=1; AJvYcCUJue+IBetVsWcBbfFNGl3VDMFdxasKsdD4nqS3Q0IlmMQpFyvOoI4WzCh0u70/zTc/BNqQF9rxQJHvN+sKu0f99PgILGEIVp6vE27i
-X-Gm-Message-State: AOJu0YyPUhYvz89QB529LkJmxo/QBYhErtEkpeqOeTNRdKzql33HcLQ5
-	0no/FNlhZ/9BhFtCiXvO2NPqRu2D1tvCQFVKz36MACv3GQ6UIeEdcsQ9sctD8JF1ycHaiNVyEnG
-	Y3TZXTcjpBeZHGAHID8BZ75CgD2EwBPFHgC+3su0E0TGvRQujvMtwy8Y/cx3wqsdnPAr0uy/BYN
-	gjjYKf85mHwKgFtfycuhAzCkNkoOEfNHCVhQXq
-X-Received: by 2002:a5d:6247:0:b0:348:5e40:62aa with SMTP id m7-20020a5d6247000000b003485e4062aamr2053430wrv.2.1713286870093;
-        Tue, 16 Apr 2024 10:01:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6fYFk6xl1nuI2T7KirzQuQyw/sEuJB0A3gheWB+RJwuSGwFc7r4/2ReNv9v/wLow5jcYtNYlNsRKa11DX2JM=
-X-Received: by 2002:a5d:6247:0:b0:348:5e40:62aa with SMTP id
- m7-20020a5d6247000000b003485e4062aamr2053410wrv.2.1713286869755; Tue, 16 Apr
- 2024 10:01:09 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Xhwo7TmB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1713294873; x=1744830873;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version:subject;
+  bh=1nkP3jzirDPuZivulqvFVuWDtWufC3zC80rCDpDu/40=;
+  b=Xhwo7TmBgoBqYe5V5YPPjUWZVs/Y4CvYLMZWHVG3U/c1LS4k/mx8eElC
+   g9VbmRsZL6tXDhGUhzRqltu6fJ2pEXjkc3T/KC588cIWKbCLgK0T57E3g
+   C5yWeAi3p0Tjpr1UGuGxKfB1WqrN1hplbbBIgRTS72C9OpRcVGdNLi8uc
+   0=;
+X-IronPort-AV: E=Sophos;i="6.07,206,1708387200"; 
+   d="scan'208";a="648147521"
+Subject: Re: [PATCH v2 2/2] crypto: aead, cipher - zeroize key buffer after use
+Thread-Topic: [PATCH v2 2/2] crypto: aead, cipher - zeroize key buffer after use
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 19:14:30 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:3725]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.46.230:2525] with esmtp (Farcaster)
+ id b938786c-ce13-4085-bd4b-0b91c454d9f1; Tue, 16 Apr 2024 19:14:28 +0000 (UTC)
+X-Farcaster-Flow-ID: b938786c-ce13-4085-bd4b-0b91c454d9f1
+Received: from EX19D046UWB002.ant.amazon.com (10.13.139.181) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 16 Apr 2024 19:14:28 +0000
+Received: from EX19D046UWB002.ant.amazon.com (10.13.139.181) by
+ EX19D046UWB002.ant.amazon.com (10.13.139.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 16 Apr 2024 19:14:28 +0000
+Received: from EX19D046UWB002.ant.amazon.com ([fe80::e2af:1ce5:cdf0:ef59]) by
+ EX19D046UWB002.ant.amazon.com ([fe80::e2af:1ce5:cdf0:ef59%5]) with mapi id
+ 15.02.1258.028; Tue, 16 Apr 2024 19:14:28 +0000
+From: "Mothershead, Hailey" <hailmo@amazon.com>
+To: Eric Biggers <ebiggers@kernel.org>
+CC: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Thread-Index: AQHaj4dVfqxBh2c63kW0MktdVQuTXbFq0DMA
+Date: Tue, 16 Apr 2024 19:14:28 +0000
+Message-ID: <45EEAC43-DC21-4B79-BE9A-9876A8C59269@amazon.com>
+References: <20240415221915.20701-1-hailmo@amazon.com>
+ <20240415224942.GC5206@sol.localdomain>
+In-Reply-To: <20240415224942.GC5206@sol.localdomain>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <25E6FC61F029FA42A4F6C624E89FAAEA@amazon.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240329225835.400662-1-michael.roth@amd.com> <20240329225835.400662-19-michael.roth@amd.com>
- <67685ec7-ca61-43f1-8ecd-120ec137e93a@redhat.com> <CABgObfZNVR-VKst8dDFZ4gs_zSWE8NE2gj5-Y4TNh0AnBfti7w@mail.gmail.com>
- <758c876d-ff77-0633-7b3e-965d863d5a93@amd.com>
-In-Reply-To: <758c876d-ff77-0633-7b3e-965d863d5a93@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Apr 2024 19:00:58 +0200
-Message-ID: <CABgObfbhNce22iuqjS3bF9V4aD1vpBg3oUcV6SLVHgvL+-UUmA@mail.gmail.com>
-Subject: Re: [PATCH v12 18/29] KVM: SEV: Use a VMSA physical address variable
- for populating VMCB
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
-	jroedel@suse.de, hpa@zytor.com, ardb@kernel.org, seanjc@google.com, 
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 16, 2024 at 4:25=E2=80=AFPM Tom Lendacky <thomas.lendacky@amd.c=
-om> wrote:
->
-> On 4/16/24 06:53, Paolo Bonzini wrote:
-> > On Sat, Mar 30, 2024 at 10:01=E2=80=AFPM Paolo Bonzini <pbonzini@redhat=
-.com> wrote:
-> >>
-> >> On 3/29/24 23:58, Michael Roth wrote:
-> >>> From: Tom Lendacky<thomas.lendacky@amd.com>
-> >>>
-> >>> In preparation to support SEV-SNP AP Creation, use a variable that ho=
-lds
-> >>> the VMSA physical address rather than converting the virtual address.
-> >>> This will allow SEV-SNP AP Creation to set the new physical address t=
-hat
-> >>> will be used should the vCPU reset path be taken.
-> >>>
-> >>> Signed-off-by: Tom Lendacky<thomas.lendacky@amd.com>
-> >>> Signed-off-by: Ashish Kalra<ashish.kalra@amd.com>
-> >>> Signed-off-by: Michael Roth<michael.roth@amd.com>
-> >>> ---
-> >>
-> >> I'll get back to this one after Easter, but it looks like Sean had som=
-e
-> >> objections at https://lore.kernel.org/lkml/ZeCqnq7dLcJI41O9@google.com=
-/.
-> >
->
-> Note that AP create is called multiple times per vCPU under OVMF with
-> and added call by the kernel when booting the APs.
-
-Oooh, I somehow thought that
-
-+ target_svm->sev_es.snp_vmsa_gpa =3D INVALID_PAGE;
-+ target_svm->sev_es.snp_ap_create =3D true;
-
-was in svm_create_vcpu().
-
-So there should be separate "snp_ap_waiting_for_reset" and
-"snp_has_guest_vmsa" flags. The latter is set once in
-__sev_snp_update_protected_guest_state and is what governs whether the
-VMSA page was allocated or just refcounted.
-
-> But I believe that Sean wants a separate KVM object per VMPL level, so
-> that would disappear anyway (Joerg and I want to get on the PUCK
-> schedule to talk about multi-VMPL level support soon.)
-
-Yes, agreed on both counts.
-
-> >     /*
-> >      * gmem pages aren't currently migratable, but if this ever
-> >      * changes then care should be taken to ensure
-> >      * svm->sev_es.vmsa_pa is pinned through some other means.
-> >      */
-> >     kvm_release_pfn_clean(pfn);
->
-> Removing this here will cause any previous guest VMSA page(s) to remain
-> pinned, that's the reason for unpinning here. OVMF re-uses the VMSA, but
-> that isn't a requirement for a firmware, and the kernel will create a
-> new VMSA page.
-
-Yes, and once you understand that I was thinking of a set-once flag
-"snp_has_guest_vmsa" it should all make a lot more sense.
-
-Paolo
-
+PiBPbiA0LzE1LzI0LCAzOjUwIFBNLCAiRXJpYyBCaWdnZXJzIiA8ZWJpZ2dlcnNAa2VybmVsLm9y
+ZyA8bWFpbHRvOmViaWdnZXJzQGtlcm5lbC5vcmc+PiB3cm90ZToNCj4NCj4gT24gTW9uLCBBcHIg
+MTUsIDIwMjQgYXQgMTA6MTk6MTVQTSArMDAwMCwgSGFpbGV5IE1vdGhlcnNoZWFkIHdyb3RlOg0K
+PiA+IEkuRyA5LjcuQiBmb3IgRklQUyAxNDAtMyBzcGVjaWZpZXMgdGhhdCB2YXJpYWJsZXMgdGVt
+cG9yYXJpbHkgaG9sZGluZw0KPiA+IGNyeXB0b2dyYXBoaWMgaW5mb3JtYXRpb24gc2hvdWxkIGJl
+IHplcm9pemVkIG9uY2UgdGhleSBhcmUgbm8gbG9uZ2VyDQo+ID4gbmVlZGVkLiBBY2NvbXBsaXNo
+IHRoaXMgYnkgdXNpbmcga2ZyZWVfc2Vuc2l0aXZlIGZvciBidWZmZXJzIHRoYXQNCj4gPiBwcmV2
+aW91c2x5IGhlbGQgdGhlIHByaXZhdGUga2V5Lg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogSGFp
+bGV5IE1vdGhlcnNoZWFkIDxoYWlsbW9AYW1hem9uLmNvbSA8bWFpbHRvOmhhaWxtb0BhbWF6b24u
+Y29tPj4NCj4gPiAtLS0NCj4gPiBjcnlwdG8vYWVhZC5jIHwgMyArLS0NCj4gPiBjcnlwdG8vY2lw
+aGVyLmMgfCAzICstLQ0KPiA+IDIgZmlsZXMgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCA0IGRl
+bGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2NyeXB0by9hZWFkLmMgYi9jcnlwdG8v
+YWVhZC5jDQo+ID4gaW5kZXggMTY5OTEwOTUyNzBkLi5jNGVjZTg2YzQ1YmMgMTAwNjQ0DQo+ID4g
+LS0tIGEvY3J5cHRvL2FlYWQuYw0KPiA+ICsrKyBiL2NyeXB0by9hZWFkLmMNCj4gPiBAQCAtMzUs
+OCArMzUsNyBAQCBzdGF0aWMgaW50IHNldGtleV91bmFsaWduZWQoc3RydWN0IGNyeXB0b19hZWFk
+ICp0Zm0sIGNvbnN0IHU4ICprZXksDQo+ID4gYWxpZ25idWZmZXIgPSAodTggKilBTElHTigodW5z
+aWduZWQgbG9uZylidWZmZXIsIGFsaWdubWFzayArIDEpOw0KPiA+IG1lbWNweShhbGlnbmJ1ZmZl
+ciwga2V5LCBrZXlsZW4pOw0KPiA+IHJldCA9IGNyeXB0b19hZWFkX2FsZyh0Zm0pLT5zZXRrZXko
+dGZtLCBhbGlnbmJ1ZmZlciwga2V5bGVuKTsNCj4gPiAtIG1lbXNldChhbGlnbmJ1ZmZlciwgMCwg
+a2V5bGVuKTsNCj4gPiAtIGtmcmVlKGJ1ZmZlcik7DQo+ID4gKyBrZnJlZV9zZW5zaXRpdmUoYnVm
+ZmVyKTsNCj4gPiByZXR1cm4gcmV0Ow0KPiA+IH0NCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9jcnlw
+dG8vY2lwaGVyLmMgYi9jcnlwdG8vY2lwaGVyLmMNCj4gPiBpbmRleCBiNDcxNDFlZDRhOWYuLjM5
+NWYwYzJmYmI5ZiAxMDA2NDQNCj4gPiAtLS0gYS9jcnlwdG8vY2lwaGVyLmMNCj4gPiArKysgYi9j
+cnlwdG8vY2lwaGVyLmMNCj4gPiBAQCAtMzQsOCArMzQsNyBAQCBzdGF0aWMgaW50IHNldGtleV91
+bmFsaWduZWQoc3RydWN0IGNyeXB0b19jaXBoZXIgKnRmbSwgY29uc3QgdTggKmtleSwNCj4gPiBh
+bGlnbmJ1ZmZlciA9ICh1OCAqKUFMSUdOKCh1bnNpZ25lZCBsb25nKWJ1ZmZlciwgYWxpZ25tYXNr
+ICsgMSk7DQo+ID4gbWVtY3B5KGFsaWduYnVmZmVyLCBrZXksIGtleWxlbik7DQo+ID4gcmV0ID0g
+Y2lhLT5jaWFfc2V0a2V5KGNyeXB0b19jaXBoZXJfdGZtKHRmbSksIGFsaWduYnVmZmVyLCBrZXls
+ZW4pOw0KPiA+IC0gbWVtc2V0KGFsaWduYnVmZmVyLCAwLCBrZXlsZW4pOw0KPiA+IC0ga2ZyZWUo
+YnVmZmVyKTsNCj4gPiArIGtmcmVlX3NlbnNpdGl2ZShidWZmZXIpOw0KPiA+IHJldHVybiByZXQ7
+DQo+DQo+DQo+IFdlbGwsIHRoZSBtZW1zZXQoKXMgdGhhdCB5b3UncmUgcmVtb3ZpbmcgYWxyZWFk
+eSBkaWQgdGhlIHplcm9pemF0aW9uLiBUaGlzDQo+IHBhdGNoIHNlZW1zIHdvcnRod2hpbGUgYXMg
+YSBjb2RlIHNpbXBsaWZpY2F0aW9uLCBidXQgcGxlYXNlIGRvbid0IGNoYXJhY3Rlcml6ZQ0KPiBp
+dCBhcyBhIGJ1ZyBmaXgsIGJlY2F1c2UgaXQncyBub3QuDQo+DQo+DQo+IC0gRXJpYw0KDQprZnJl
+ZV9zZW5zaXRpdmUgdXNlcyBtZW16ZXJvX2V4cGxpY2l0KCkgaW5zdGVhZCBvZiB0aGUgbWVtc2V0
+KClzIHVzZWQNCmFib3ZlLiBUaGUgbWVtemVyb19leHBsaWNpdCBoZWFkZXIgc3RhdGVzIC0NCg0K
+KiBOb3RlOiB1c3VhbGx5IHVzaW5nIG1lbXNldCgpIGlzIGp1c3QgZmluZSAoISksIGJ1dCBpbiBj
+YXNlcw0KKiB3aGVyZSBjbGVhcmluZyBvdXQgX2xvY2FsXyBkYXRhIGF0IHRoZSBlbmQgb2YgYSBz
+Y29wZSBpcw0KKiBuZWNlc3NhcnksIG1lbXplcm9fZXhwbGljaXQoKSBzaG91bGQgYmUgdXNlZCBp
+bnN0ZWFkIGluDQoqIG9yZGVyIHRvIHByZXZlbnQgdGhlIGNvbXBpbGVyIGZyb20gb3B0aW1pc2lu
+ZyBhd2F5IHplcm9pbmcuDQoNCkl0IGFjY29tcGxpc2hlcyB0aGlzIGJ5IGNhbGxpbmcgbWVtc2V0
+KCkgYW5kIHRoZW4gYWRkaW5nIGEgYmFycmllci4gU2luY2UNCkZJUFMgcmVxdWlyZXMgdGhpcyBk
+YXRhIGJlIHplcm9lZCBvdXQsIGFuZCB0aGUgY3VycmVudCBtZW1zZXQoKSBhbmQNCmtmcmVlKCkg
+ZG9uJ3QgZ3VhcmFudGVlIHRoaXMsIEkgZG8gbm90IHRoaW5rIHRoZSBjb21taXQgbWVzc2FnZSBp
+cw0KbWlzbGVhZGluZy4gSSBjYW4gY2xhcmlmeSB0aGUgbWVzc2FnZSB3aXRoIHRoZSBhYm92ZSBp
+bmZvcm1hdGlvbiBpZiB0aGF0DQppcyBwcmVmZXJyZWQuDQoNCg==
