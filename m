@@ -1,150 +1,72 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0AA128361
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Apr 2024 11:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54D312BF2A
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Apr 2024 13:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713268421; cv=none; b=nR5h39OU56lRtwfdRDQQ+XrF+vK6kGOIa6WMniZbF73sbluFzp5DPYDr7Ut2x2F69wlGcTDHNiy9VCe0+jXhGi2/rVrylZiBn0s9Q3LzCnq2p1WgERAgz8O8fvNVQyfThfMW2p7+mAVbaCBJKg4WSbsHlzoXtXdtssTjT93DFY4=
+	t=1713274774; cv=none; b=rJv1JDWZLxB/NP152tbfb+MLDYBOdA9zel8oiy7xNa+XL9cENIav2/L5vJwhETox3J6gt6HAq0Eb6V4vIbrS9f+ZWEWs49a4RsVW9oRwEG+9p0k+WtXIDsL+++fBdTiIBMvzbGMGyk6L1eBVZ2wNXUdDd9KRXhveoB4eKSqCecg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713268421; c=relaxed/simple;
-	bh=2B/0TZrDQ88vv16W4Pq06pS4UHrWwoD7Zfiru7x/BQY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G12JLOzjly53TiLHhAsTgKrHUyrjN5xlfzDx4Bv8MW1qR+yBKUpJZPB/gfropmS+5YgMd+M+hq8sjv2kMJEcyq+PFLUEaEgf6TJd5h6RNX4LHt59w6IuTuMrUsU0QUM3p0uWEtfsfc8rDzdN78+YsLQXXNIKkuQRwipGxUt3zEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f96ZtySB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1713274774; c=relaxed/simple;
+	bh=F9OFq/z74eWlMFBmDXJjb+g1/GnbUwvIHWMar0bLRUI=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=M98nfqzc5FmqR+n5bcsGsBcKweC+zxtEIZ6PHWEkkMgiKHLJxpb+1sLdZnsM+j4Uzu45Bfgj/9ueYrAqr9tIbTJkIO5rm3Pyz2zNAtmpnJ4vUEnzK6KETPS+OuSWggwY/pZJEVL8GmQ/u+X3TlQr2uL0g7rPUDj5a2GM4LOK2/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=L2PkLp0S; arc=none smtp.client-ip=129.153.194.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f96ZtySB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713268419;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/Ux9rBA1E+x/XqOx1Zfa/TZpS8q2CNQskPcvct4f8Ic=;
-	b=f96ZtySBKOmpjwkh/AW5JC8/+hH9IJe1BCjqFHiLL5JQ6R3BZVcpBiAC5J161sa13PT6Zf
-	6PA0Jw0sf8UzhxemmYIYGPUr9SQCmmRDKsF6maOjKHd2N1pFEI9sg1hgs9HX7zIK0uZyCd
-	ozTcWiU0JptyHMwVqz9NId7mYXOcUYs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-104-GfeQHE9nONeU9ZI6R-EsKg-1; Tue, 16 Apr 2024 07:53:38 -0400
-X-MC-Unique: GfeQHE9nONeU9ZI6R-EsKg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-343ee8b13aeso3542332f8f.2
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Apr 2024 04:53:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713268416; x=1713873216;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/Ux9rBA1E+x/XqOx1Zfa/TZpS8q2CNQskPcvct4f8Ic=;
-        b=iazSAabR6pZqo/p3gdS6AeO1AcT8FY7Lvs1lMX3yauDhGNXHtwbAW4/j1bCzzYl0OP
-         R9XXNHglyD2Jzgi638z8aT4oodzQG9D5Lkj0qCgi5IB/41oSw+pBJW3doNRkVIsKI4Fv
-         BBu0sOGVxlrfTNSg4Xji0yEegKT7N9by6kvU6xZ7soeZVOd+BQaVwSv5skwU3U0kkuVI
-         eiIeTcVAk8E+UigPKxQKDYJErEwJVrj3f60yEceF3M4vvzavHcnP9KemVp0TL/CnE0hM
-         Q3OqajfNILZApvXHAenIfZJ/b2pS2vvqFxgrsFI/nXSXp0QJQa8q2CFLmJIB+Dr//lk7
-         Ey/w==
-X-Forwarded-Encrypted: i=1; AJvYcCVGb30vGdkphoV7g0IccVct4VO1J7l2DM5crl9WDBxDYONkgrdTPrp4yJCPakBpn68L92tj0VzQCWeYOYuB9bek8uYbCcU18ZeuazUb
-X-Gm-Message-State: AOJu0Yw60rHWSTfdcrulNHfsF7Klm2YKI1M/N41BcKnrZQLRTTeWiMia
-	8vz+U9sZxyUQ1C4M8PIgzNa/UjM1O2pPWZWHZ9zL7wDGMlgVe87VGttWk7nnrArlPUG5IXbWYJo
-	OvIpf91ivqeo9xTuH4yKEOvsQMPB7se4hjtCw0xjs1HzQovKADhFMqCCu5ckcsKieLK9zkg6qK0
-	5hl8ZRciZdxFFRLx9m/BKieiQmwnB97b3VzqJf
-X-Received: by 2002:adf:cd11:0:b0:348:b435:2736 with SMTP id w17-20020adfcd11000000b00348b4352736mr1845204wrm.51.1713268416633;
-        Tue, 16 Apr 2024 04:53:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHboei6CWQ68/kX4VWiS3hHyg54DT0hUEvoN+DvTUse7RMopQtT/6X8ZHkV5bkVVsxqb/R4glDVv0DZOX9sF8E=
-X-Received: by 2002:adf:cd11:0:b0:348:b435:2736 with SMTP id
- w17-20020adfcd11000000b00348b4352736mr1845167wrm.51.1713268416287; Tue, 16
- Apr 2024 04:53:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="L2PkLp0S"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
+	t=1713274770; bh=F9OFq/z74eWlMFBmDXJjb+g1/GnbUwvIHWMar0bLRUI=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To;
+	b=L2PkLp0SQsZq5fzawv5SZt58Ks/G0uMgIV1v1B6xsx36aWfg8IxiITa0qo8jkGHV2
+	 11K4n8QDgWRFp3uLnJ59xeWYAz5G87zdAPMNF5Qd/ndNjizmcqUPEOT1XrSpNy7f2R
+	 loA1RixDmcI/zuqMoJ7TwnYc4jFrP7U6qdP0Cj40uqUwb0oGk4YuuTI26x1V519k9c
+	 UEHCJndOdKIE9vwh4tiCEFpx6CssP/7QYQXnHT7QuRP9AjNoiNM5pHCiJMw+wX1y3W
+	 lJXqlH8r3OeZrBt4A9sEFouLJ2N3vusZXDb5atklppL6BYqWRbwLD4SJDt11oTT3WO
+	 fOzgQ8/CO7XdA==
+Message-ID: <65bb88b5-5071-4836-9923-939218d9a883@jvdsn.com>
+Date: Tue, 16 Apr 2024 08:39:28 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240329225835.400662-1-michael.roth@amd.com> <20240329225835.400662-19-michael.roth@amd.com>
- <67685ec7-ca61-43f1-8ecd-120ec137e93a@redhat.com>
-In-Reply-To: <67685ec7-ca61-43f1-8ecd-120ec137e93a@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Apr 2024 13:53:24 +0200
-Message-ID: <CABgObfZNVR-VKst8dDFZ4gs_zSWE8NE2gj5-Y4TNh0AnBfti7w@mail.gmail.com>
-Subject: Re: [PATCH v12 18/29] KVM: SEV: Use a VMSA physical address variable
- for populating VMCB
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
-	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com, 
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Joachim Vandersmissen <git@jvdsn.com>
+Subject: Re: [PATCH 2/2] certs: Guard RSA signature verification self-test
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+ Simo Sorce <simo@redhat.com>, Stephan Mueller <smueller@chronox.de>
+References: <20240416032347.72663-1-git@jvdsn.com>
+ <20240416032347.72663-2-git@jvdsn.com> <Zh494tFvPQhxJ8j4@gondor.apana.org.au>
+Content-Language: en-US
+In-Reply-To: <Zh494tFvPQhxJ8j4@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Mar 30, 2024 at 10:01=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com=
-> wrote:
+Hi Herbert,
+
+On 4/16/24 3:59 AM, Herbert Xu wrote:
+> On Mon, Apr 15, 2024 at 10:23:47PM -0500, Joachim Vandersmissen wrote:
+>> Currently it is possible to configure the kernel (albeit in a very
+>> contrived manner) such that CRYPTO_RSA is not set, yet
+>> FIPS_SIGNATURE_SELFTEST is set. This would cause a false kernel panic
+>> when executing the RSA PKCS#7 self-test. Guard against this by
+>> introducing a compile-time check.
+>>
+>> Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
+> The usual way to handle this is to add a select to the Kconfig file.
+
+I did consider that initially, but I was unsure if this was the right 
+path. From a conceptual standpoint, this module doesn't need the RSA (or 
+ECDSA) functionality. If the algorithm is not present, it would be 
+perfectly valid for the module to do nothing. However, I'm not opposed 
+to removing the current check and adding the select to the Kconfig.
+
+If I add a `select CRYPTO_RSA` to FIPS_SIGNATURE_SELFTEST, do you think 
+I should do something similar for ECDSA as well (considering the other 
+patch in this series)?
+
 >
-> On 3/29/24 23:58, Michael Roth wrote:
-> > From: Tom Lendacky<thomas.lendacky@amd.com>
-> >
-> > In preparation to support SEV-SNP AP Creation, use a variable that hold=
-s
-> > the VMSA physical address rather than converting the virtual address.
-> > This will allow SEV-SNP AP Creation to set the new physical address tha=
-t
-> > will be used should the vCPU reset path be taken.
-> >
-> > Signed-off-by: Tom Lendacky<thomas.lendacky@amd.com>
-> > Signed-off-by: Ashish Kalra<ashish.kalra@amd.com>
-> > Signed-off-by: Michael Roth<michael.roth@amd.com>
-> > ---
->
-> I'll get back to this one after Easter, but it looks like Sean had some
-> objections at https://lore.kernel.org/lkml/ZeCqnq7dLcJI41O9@google.com/.
-
-So IIUC the gist of the solution here would be to replace
-
-   /* Use the new VMSA */
-   svm->sev_es.vmsa_pa =3D pfn_to_hpa(pfn);
-   svm->vmcb->control.vmsa_pa =3D svm->sev_es.vmsa_pa;
-
-with something like
-
-   /* Use the new VMSA */
-   __free_page(virt_to_page(svm->sev_es.vmsa));
-   svm->sev_es.vmsa =3D pfn_to_kaddr(pfn);
-   svm->vmcb->control.vmsa_pa =3D __pa(svm->sev_es.vmsa);
-
-and wrap the __free_page() in sev_free_vcpu() with "if
-(!svm->sev_es.snp_ap_create)".
-
-This should remove the need for svm->sev_es.vmsa_pa. It is always
-equal to svm->vmcb->control.vmsa_pa anyway.
-
-Also, it's possible to remove
-
-   /*
-    * gmem pages aren't currently migratable, but if this ever
-    * changes then care should be taken to ensure
-    * svm->sev_es.vmsa_pa is pinned through some other means.
-    */
-   kvm_release_pfn_clean(pfn);
-
-if sev_free_vcpu() does
-
-   if (svm->sev_es.snp_ap_create) {
-     __free_page(virt_to_page(svm->sev_es.vmsa));
-   } else {
-     put_page(virt_to_page(svm->sev_es.vmsa));
-   }
-
-and while at it, please reverse the polarity of snp_ap_create and
-rename it to snp_ap_created.
-
-Paolo
-
+> Thanks,
