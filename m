@@ -1,84 +1,155 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E065685644;
-	Tue, 16 Apr 2024 16:17:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A6B1327E7
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Apr 2024 17:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713284250; cv=none; b=mEUhtXcWtjgZG6LLApqI8IX4SpOBdFOeMBcrBTR0WMFy1x15/Lnd9wnOqXifnvfY4wdlB07s0l8RmXg8ySZWf31Rxs/FaYxX5dpQf0W/d1znI2DLYFyNTcW1u7EbLBU2neARTDk51RP5x/Jo1F4wnHa7SKE2t9Wb4aWz0emHd6A=
+	t=1713286883; cv=none; b=B5IMLE0XjN9xAoRoubnYgVfn9NE54KzHNjTv/d/6zHSn9/9LbEUdY0AbRgeukfUkOc7mULZKXwJMgleDLWvCQrCso81pZ03S3zfcg9VEAEpJ+hW+S0aIv/n+Xu7aWPairw5kCVRYHGa+ddVKdz6OsHjyilYVEwu2vp2BaaHHzKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713284250; c=relaxed/simple;
-	bh=SXN/+ob5TKwQ1EXj22uBY1f/7PbRX/7pv6BcZyIE35E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QmopBdFE+XxPK/V8t2B+UIqsDdAxpdT+JfDVdqzSZ6LZzrk34btaZd2nuw1AJS+0O13G4k7UfUqRa7NISVERwxpoopt8GghBiuiGi/nyvf22gdbMOqe8ezWyVL2vgAiSsSRunBX1+9QjKwxcbEVRozrF8VgZ+brvCMc+/V6hC7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FkKCiTik; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713286883; c=relaxed/simple;
+	bh=d8yfNDlD2slCnTX5YrNTAPoVtr6kE/Nqrv0NiCbczaQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ax3a0ceHs6xi88MsaN7b6kF04lmsdmAYN1eq/tedUUqBMikCypLbH5/R4UnZec321qMNqEqjtRuOu/Ik3t3Ji0cJDpVHc1EZujGCWK52ABs5zvLYmZoHfIMPMsLnCyRB8QyOIcIdaZvRFFUAQpExYN6+lvHsCnTtYHEJZT9xxTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JeGRKW18; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FkKCiTik"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A3DDC32783;
-	Tue, 16 Apr 2024 16:17:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713284249;
-	bh=SXN/+ob5TKwQ1EXj22uBY1f/7PbRX/7pv6BcZyIE35E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FkKCiTik+Pg+aJBR2LPfzeSFRoDqjxaXhkdAwSuOwU89dxgcQCPUqn9YSWx0BlDJU
-	 pdVqBjVDn9DGMMCnXrf0iICDObzfAJ+UiN1hXaBhloiu2BV4XL/Tf74x3pFzIP5HUq
-	 Fb1gjFbhpyU+EOPW0FO0p42DAT0uEOxkK7sed103Ht1i30e3bxPFYfpt6KsiX7EcBQ
-	 cDwL/EKSADEUH2M8RiEqMYHsfTic65c9nzfbllo2QHY7prh3kvnLHTsMce3ymdjQGe
-	 E251q5KWTz53PrOmhn02XiN5BwBKWTv19+lwil+hyft3oR6yPRNWof8ayJuvepN+qx
-	 0C8bw2N2mUlAA==
-Date: Tue, 16 Apr 2024 17:17:25 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Jia Jie Ho <jiajie.ho@starfivetech.com>,
-	William Qiu <william.qiu@starfivetech.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: crypto: starfive: Restore sort order
-Message-ID: <20240416-payable-undocked-11cad39af1c5@spud>
-References: <1b1bb24987409fcd7ea80940e92be2e9aa67ea49.1713282603.git.geert+renesas@glider.be>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JeGRKW18"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713286881;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YV3huxxwV4cNX30vuhj/67sfqzzrbon2fJPguOJkhQA=;
+	b=JeGRKW18O5nyr5llQD+oP8Xn/XKOtR/weaoizCTROrdsBfmqvljBIG1UyCz8Ehy+K58+YS
+	Qbq6D6FNRzFaoJPzRMPUdoC1HvX7bUsa6sgMbORIP6/hKWO42+MthWV1LZtLWGaAQT8MVQ
+	xLsoH6fduEQ/CoAAuduWPoNKeWhxGlA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-612-2UdE-vKyOZ2UGkiUIeEz0g-1; Tue, 16 Apr 2024 13:01:11 -0400
+X-MC-Unique: 2UdE-vKyOZ2UGkiUIeEz0g-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-343e74dcf0bso2808393f8f.0
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Apr 2024 10:01:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713286870; x=1713891670;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YV3huxxwV4cNX30vuhj/67sfqzzrbon2fJPguOJkhQA=;
+        b=By6as2DSClk66u3srdId8sn5a7Bqd1NesWW81q/zrbJu+f8B27bxlCCB+o8FC7ULaP
+         uEOx2l2eQtCVVQctStZYHro9yNQG59VlMq1voPnjXZJUc7ElNB0Er3KXckd9J44HRSTK
+         KCH3dURpm0DQUskdyBOUidkN/o/8zZ2UZwJZ5Crpiq8iyCwCpIGwsibQUoGQzE9hBua6
+         RzpJlgi7vHQ34NP+fdMrtyPzfViOR2Kgd8Tk8wy2+sYD+Az+2HshiNMuUnHs80oGbG4q
+         eKeDu4+/EQ9gt9t4V/iH64rs8chCKc5I5RcMpzOAIVI4tO/UUfwq/FpFDgGAXqnSgrpZ
+         Iy4A==
+X-Forwarded-Encrypted: i=1; AJvYcCUJue+IBetVsWcBbfFNGl3VDMFdxasKsdD4nqS3Q0IlmMQpFyvOoI4WzCh0u70/zTc/BNqQF9rxQJHvN+sKu0f99PgILGEIVp6vE27i
+X-Gm-Message-State: AOJu0YyPUhYvz89QB529LkJmxo/QBYhErtEkpeqOeTNRdKzql33HcLQ5
+	0no/FNlhZ/9BhFtCiXvO2NPqRu2D1tvCQFVKz36MACv3GQ6UIeEdcsQ9sctD8JF1ycHaiNVyEnG
+	Y3TZXTcjpBeZHGAHID8BZ75CgD2EwBPFHgC+3su0E0TGvRQujvMtwy8Y/cx3wqsdnPAr0uy/BYN
+	gjjYKf85mHwKgFtfycuhAzCkNkoOEfNHCVhQXq
+X-Received: by 2002:a5d:6247:0:b0:348:5e40:62aa with SMTP id m7-20020a5d6247000000b003485e4062aamr2053430wrv.2.1713286870093;
+        Tue, 16 Apr 2024 10:01:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG6fYFk6xl1nuI2T7KirzQuQyw/sEuJB0A3gheWB+RJwuSGwFc7r4/2ReNv9v/wLow5jcYtNYlNsRKa11DX2JM=
+X-Received: by 2002:a5d:6247:0:b0:348:5e40:62aa with SMTP id
+ m7-20020a5d6247000000b003485e4062aamr2053410wrv.2.1713286869755; Tue, 16 Apr
+ 2024 10:01:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hu7bXkhGRqUIgKrD"
-Content-Disposition: inline
-In-Reply-To: <1b1bb24987409fcd7ea80940e92be2e9aa67ea49.1713282603.git.geert+renesas@glider.be>
-
-
---hu7bXkhGRqUIgKrD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240329225835.400662-1-michael.roth@amd.com> <20240329225835.400662-19-michael.roth@amd.com>
+ <67685ec7-ca61-43f1-8ecd-120ec137e93a@redhat.com> <CABgObfZNVR-VKst8dDFZ4gs_zSWE8NE2gj5-Y4TNh0AnBfti7w@mail.gmail.com>
+ <758c876d-ff77-0633-7b3e-965d863d5a93@amd.com>
+In-Reply-To: <758c876d-ff77-0633-7b3e-965d863d5a93@amd.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 16 Apr 2024 19:00:58 +0200
+Message-ID: <CABgObfbhNce22iuqjS3bF9V4aD1vpBg3oUcV6SLVHgvL+-UUmA@mail.gmail.com>
+Subject: Re: [PATCH v12 18/29] KVM: SEV: Use a VMSA physical address variable
+ for populating VMCB
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, hpa@zytor.com, ardb@kernel.org, seanjc@google.com, 
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 16, 2024 at 05:51:49PM +0200, Geert Uytterhoeven wrote:
-> Restore alphabetical sort order of the list of supported compatible
-> values.
->=20
-> Fixes: 2ccf7a5d9c50f3ea ("dt-bindings: crypto: starfive: Add jh8100 suppo=
-rt")
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+On Tue, Apr 16, 2024 at 4:25=E2=80=AFPM Tom Lendacky <thomas.lendacky@amd.c=
+om> wrote:
+>
+> On 4/16/24 06:53, Paolo Bonzini wrote:
+> > On Sat, Mar 30, 2024 at 10:01=E2=80=AFPM Paolo Bonzini <pbonzini@redhat=
+.com> wrote:
+> >>
+> >> On 3/29/24 23:58, Michael Roth wrote:
+> >>> From: Tom Lendacky<thomas.lendacky@amd.com>
+> >>>
+> >>> In preparation to support SEV-SNP AP Creation, use a variable that ho=
+lds
+> >>> the VMSA physical address rather than converting the virtual address.
+> >>> This will allow SEV-SNP AP Creation to set the new physical address t=
+hat
+> >>> will be used should the vCPU reset path be taken.
+> >>>
+> >>> Signed-off-by: Tom Lendacky<thomas.lendacky@amd.com>
+> >>> Signed-off-by: Ashish Kalra<ashish.kalra@amd.com>
+> >>> Signed-off-by: Michael Roth<michael.roth@amd.com>
+> >>> ---
+> >>
+> >> I'll get back to this one after Easter, but it looks like Sean had som=
+e
+> >> objections at https://lore.kernel.org/lkml/ZeCqnq7dLcJI41O9@google.com=
+/.
+> >
+>
+> Note that AP create is called multiple times per vCPU under OVMF with
+> and added call by the kernel when booting the APs.
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Oooh, I somehow thought that
 
-Cheers,
-Conor.
++ target_svm->sev_es.snp_vmsa_gpa =3D INVALID_PAGE;
++ target_svm->sev_es.snp_ap_create =3D true;
 
---hu7bXkhGRqUIgKrD
-Content-Type: application/pgp-signature; name="signature.asc"
+was in svm_create_vcpu().
 
------BEGIN PGP SIGNATURE-----
+So there should be separate "snp_ap_waiting_for_reset" and
+"snp_has_guest_vmsa" flags. The latter is set once in
+__sev_snp_update_protected_guest_state and is what governs whether the
+VMSA page was allocated or just refcounted.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZh6klQAKCRB4tDGHoIJi
-0ogsAP9TjJyVdzjKOEZTC4IeATsnYNeW0Ed+MWCIOvJ++Ib4wQD/aZP6yaI5reeJ
-IljR+/t7Jw+rt+ysrkfqCDnPrntPswA=
-=CTKP
------END PGP SIGNATURE-----
+> But I believe that Sean wants a separate KVM object per VMPL level, so
+> that would disappear anyway (Joerg and I want to get on the PUCK
+> schedule to talk about multi-VMPL level support soon.)
 
---hu7bXkhGRqUIgKrD--
+Yes, agreed on both counts.
+
+> >     /*
+> >      * gmem pages aren't currently migratable, but if this ever
+> >      * changes then care should be taken to ensure
+> >      * svm->sev_es.vmsa_pa is pinned through some other means.
+> >      */
+> >     kvm_release_pfn_clean(pfn);
+>
+> Removing this here will cause any previous guest VMSA page(s) to remain
+> pinned, that's the reason for unpinning here. OVMF re-uses the VMSA, but
+> that isn't a requirement for a firmware, and the kernel will create a
+> new VMSA page.
+
+Yes, and once you understand that I was thinking of a set-once flag
+"snp_has_guest_vmsa" it should all make a lot more sense.
+
+Paolo
+
