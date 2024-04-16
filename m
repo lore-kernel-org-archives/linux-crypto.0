@@ -1,121 +1,118 @@
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489C0137915;
-	Tue, 16 Apr 2024 19:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1911E4A8;
+	Tue, 16 Apr 2024 20:40:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713294873; cv=none; b=Sh44W3YeSzeSzDOmbLWO3u5A5HIbTRRvF9Uyf61o0zgpIFaZ8qq3ARBN5RcUjvSk4peEIWMt0omy+azva9w9UVnsNAKmXb3TkHidb6arJ2L4S6HujJbOF/Y+j+04q/aXBRPedH7lcD8IdS1zOdFgoEvuhN3IimyVi9GQQ5PbKD0=
+	t=1713300043; cv=none; b=pEQr/d2/kNtSb+dxBn6S3HhG4RSZujQQS1l0DjHQGYYtm+7JCnWKTZBNQso3JE+3+skPapPpKzq8zfkyw4n+PBE6xMqCUW7A3MfWyupwE9GWkl4/BuBN1Rj2QsRYY8S16jHrPdnTeacctOMF+Tv7aO4DUELnLKyOifH0USycf3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713294873; c=relaxed/simple;
-	bh=1nkP3jzirDPuZivulqvFVuWDtWufC3zC80rCDpDu/40=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZO/5jeeCpFtHEuVmORuDJf+4f9O0WVLG6WYq6IAmsX6hwSuXmqwVZ3cce72/jJCoCkaoTUXYxJLPEDa1OtF3RjwbLugD0wG9955rDc9WAAkiMkxCskaZg/gXB6swK+WbCicsaN0t1SNsWsBT1jH2Iy1xlLi76bAtWowvGlG3uSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Xhwo7TmB; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1713300043; c=relaxed/simple;
+	bh=O674CqzWSFOaB0vQbA6Cb22bmNbYUKOeepQebIF+//A=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aMITLEHrQJ0//wfZHWVbAFZBi9LP7j85BU1YGg8UBQNq4RT30mLK1qZFZ4PCNJfPKY5/J5oPHqeEjEQxjcVb9G2uLE0ct8Fj9sXBbCcm4Qos9SyGUHL9vQ3BZCOpmdjlAe6hILb2N9qsZp7dEeHYhaCJ/NvZWMIuYt8+S8T9moA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=AaGCl/+Q; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Xhwo7TmB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1713294873; x=1744830873;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=1nkP3jzirDPuZivulqvFVuWDtWufC3zC80rCDpDu/40=;
-  b=Xhwo7TmBgoBqYe5V5YPPjUWZVs/Y4CvYLMZWHVG3U/c1LS4k/mx8eElC
-   g9VbmRsZL6tXDhGUhzRqltu6fJ2pEXjkc3T/KC588cIWKbCLgK0T57E3g
-   C5yWeAi3p0Tjpr1UGuGxKfB1WqrN1hplbbBIgRTS72C9OpRcVGdNLi8uc
-   0=;
-X-IronPort-AV: E=Sophos;i="6.07,206,1708387200"; 
-   d="scan'208";a="648147521"
-Subject: Re: [PATCH v2 2/2] crypto: aead, cipher - zeroize key buffer after use
-Thread-Topic: [PATCH v2 2/2] crypto: aead, cipher - zeroize key buffer after use
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 19:14:30 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:3725]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.46.230:2525] with esmtp (Farcaster)
- id b938786c-ce13-4085-bd4b-0b91c454d9f1; Tue, 16 Apr 2024 19:14:28 +0000 (UTC)
-X-Farcaster-Flow-ID: b938786c-ce13-4085-bd4b-0b91c454d9f1
-Received: from EX19D046UWB002.ant.amazon.com (10.13.139.181) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 16 Apr 2024 19:14:28 +0000
-Received: from EX19D046UWB002.ant.amazon.com (10.13.139.181) by
- EX19D046UWB002.ant.amazon.com (10.13.139.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 16 Apr 2024 19:14:28 +0000
-Received: from EX19D046UWB002.ant.amazon.com ([fe80::e2af:1ce5:cdf0:ef59]) by
- EX19D046UWB002.ant.amazon.com ([fe80::e2af:1ce5:cdf0:ef59%5]) with mapi id
- 15.02.1258.028; Tue, 16 Apr 2024 19:14:28 +0000
-From: "Mothershead, Hailey" <hailmo@amazon.com>
-To: Eric Biggers <ebiggers@kernel.org>
-CC: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Thread-Index: AQHaj4dVfqxBh2c63kW0MktdVQuTXbFq0DMA
-Date: Tue, 16 Apr 2024 19:14:28 +0000
-Message-ID: <45EEAC43-DC21-4B79-BE9A-9876A8C59269@amazon.com>
-References: <20240415221915.20701-1-hailmo@amazon.com>
- <20240415224942.GC5206@sol.localdomain>
-In-Reply-To: <20240415224942.GC5206@sol.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <25E6FC61F029FA42A4F6C624E89FAAEA@amazon.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="AaGCl/+Q"
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 43GKe8nS002287;
+	Tue, 16 Apr 2024 13:40:23 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=OeiQ2BzPe5Dd5xEzYR9R3xK/wC7UjNX3iPjiqMWK0SU=;
+ b=AaGCl/+QFEiDScDOX2+EPJDXuBJHr04y/8SH9M63oGNwfnObEZIJuUD3iLhKwrHrY/7Y
+ a2FA9/vaWUynP0d5l3mf4+6RdRxWwRXu/S+BVRZafwSUQqZ1dkhyZaCc5T/D+QWqfNek
+ HZK41HrWvem5ImIq9KPq/GBoNvGEHPYyiK7gM0lTK72LMyimp30WMKxj6xr9MRQ3Qt3z
+ sLBYX/bqiNq21eWMqJHRD99G7RJH75VPh0nVbq95jPt6S+ynFTVpS5p8Sffs4RuhqZKO
+ Rx1wtMdkDnNblzyNYPRGbBa+AXYharneUaITwGPXc7GBTOwDguJkOloqlzvPJbv9z8Vb TQ== 
+Received: from mail.thefacebook.com ([163.114.132.120])
+	by m0089730.ppops.net (PPS) with ESMTPS id 3xha39yryg-9
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 16 Apr 2024 13:40:23 -0700
+Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c085:21d::8) with Microsoft SMTP Server id
+ 15.1.2507.35; Tue, 16 Apr 2024 13:40:18 -0700
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Jakub Kicinski
+	<kuba@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Andrii Nakryiko
+	<andrii@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko
+	<mykolal@fb.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <bpf@vger.kernel.org>
+Subject: [PATCH bpf-next v9 0/4] BPF crypto API framework
+Date: Tue, 16 Apr 2024 13:40:00 -0700
+Message-ID: <20240416204004.3942393-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: bMj70YFYtiBQEzKuRVIYC-Vxgh39bQX1
+X-Proofpoint-GUID: bMj70YFYtiBQEzKuRVIYC-Vxgh39bQX1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-16_18,2024-04-16_01,2023-05-22_02
 
-PiBPbiA0LzE1LzI0LCAzOjUwIFBNLCAiRXJpYyBCaWdnZXJzIiA8ZWJpZ2dlcnNAa2VybmVsLm9y
-ZyA8bWFpbHRvOmViaWdnZXJzQGtlcm5lbC5vcmc+PiB3cm90ZToNCj4NCj4gT24gTW9uLCBBcHIg
-MTUsIDIwMjQgYXQgMTA6MTk6MTVQTSArMDAwMCwgSGFpbGV5IE1vdGhlcnNoZWFkIHdyb3RlOg0K
-PiA+IEkuRyA5LjcuQiBmb3IgRklQUyAxNDAtMyBzcGVjaWZpZXMgdGhhdCB2YXJpYWJsZXMgdGVt
-cG9yYXJpbHkgaG9sZGluZw0KPiA+IGNyeXB0b2dyYXBoaWMgaW5mb3JtYXRpb24gc2hvdWxkIGJl
-IHplcm9pemVkIG9uY2UgdGhleSBhcmUgbm8gbG9uZ2VyDQo+ID4gbmVlZGVkLiBBY2NvbXBsaXNo
-IHRoaXMgYnkgdXNpbmcga2ZyZWVfc2Vuc2l0aXZlIGZvciBidWZmZXJzIHRoYXQNCj4gPiBwcmV2
-aW91c2x5IGhlbGQgdGhlIHByaXZhdGUga2V5Lg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogSGFp
-bGV5IE1vdGhlcnNoZWFkIDxoYWlsbW9AYW1hem9uLmNvbSA8bWFpbHRvOmhhaWxtb0BhbWF6b24u
-Y29tPj4NCj4gPiAtLS0NCj4gPiBjcnlwdG8vYWVhZC5jIHwgMyArLS0NCj4gPiBjcnlwdG8vY2lw
-aGVyLmMgfCAzICstLQ0KPiA+IDIgZmlsZXMgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCA0IGRl
-bGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2NyeXB0by9hZWFkLmMgYi9jcnlwdG8v
-YWVhZC5jDQo+ID4gaW5kZXggMTY5OTEwOTUyNzBkLi5jNGVjZTg2YzQ1YmMgMTAwNjQ0DQo+ID4g
-LS0tIGEvY3J5cHRvL2FlYWQuYw0KPiA+ICsrKyBiL2NyeXB0by9hZWFkLmMNCj4gPiBAQCAtMzUs
-OCArMzUsNyBAQCBzdGF0aWMgaW50IHNldGtleV91bmFsaWduZWQoc3RydWN0IGNyeXB0b19hZWFk
-ICp0Zm0sIGNvbnN0IHU4ICprZXksDQo+ID4gYWxpZ25idWZmZXIgPSAodTggKilBTElHTigodW5z
-aWduZWQgbG9uZylidWZmZXIsIGFsaWdubWFzayArIDEpOw0KPiA+IG1lbWNweShhbGlnbmJ1ZmZl
-ciwga2V5LCBrZXlsZW4pOw0KPiA+IHJldCA9IGNyeXB0b19hZWFkX2FsZyh0Zm0pLT5zZXRrZXko
-dGZtLCBhbGlnbmJ1ZmZlciwga2V5bGVuKTsNCj4gPiAtIG1lbXNldChhbGlnbmJ1ZmZlciwgMCwg
-a2V5bGVuKTsNCj4gPiAtIGtmcmVlKGJ1ZmZlcik7DQo+ID4gKyBrZnJlZV9zZW5zaXRpdmUoYnVm
-ZmVyKTsNCj4gPiByZXR1cm4gcmV0Ow0KPiA+IH0NCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9jcnlw
-dG8vY2lwaGVyLmMgYi9jcnlwdG8vY2lwaGVyLmMNCj4gPiBpbmRleCBiNDcxNDFlZDRhOWYuLjM5
-NWYwYzJmYmI5ZiAxMDA2NDQNCj4gPiAtLS0gYS9jcnlwdG8vY2lwaGVyLmMNCj4gPiArKysgYi9j
-cnlwdG8vY2lwaGVyLmMNCj4gPiBAQCAtMzQsOCArMzQsNyBAQCBzdGF0aWMgaW50IHNldGtleV91
-bmFsaWduZWQoc3RydWN0IGNyeXB0b19jaXBoZXIgKnRmbSwgY29uc3QgdTggKmtleSwNCj4gPiBh
-bGlnbmJ1ZmZlciA9ICh1OCAqKUFMSUdOKCh1bnNpZ25lZCBsb25nKWJ1ZmZlciwgYWxpZ25tYXNr
-ICsgMSk7DQo+ID4gbWVtY3B5KGFsaWduYnVmZmVyLCBrZXksIGtleWxlbik7DQo+ID4gcmV0ID0g
-Y2lhLT5jaWFfc2V0a2V5KGNyeXB0b19jaXBoZXJfdGZtKHRmbSksIGFsaWduYnVmZmVyLCBrZXls
-ZW4pOw0KPiA+IC0gbWVtc2V0KGFsaWduYnVmZmVyLCAwLCBrZXlsZW4pOw0KPiA+IC0ga2ZyZWUo
-YnVmZmVyKTsNCj4gPiArIGtmcmVlX3NlbnNpdGl2ZShidWZmZXIpOw0KPiA+IHJldHVybiByZXQ7
-DQo+DQo+DQo+IFdlbGwsIHRoZSBtZW1zZXQoKXMgdGhhdCB5b3UncmUgcmVtb3ZpbmcgYWxyZWFk
-eSBkaWQgdGhlIHplcm9pemF0aW9uLiBUaGlzDQo+IHBhdGNoIHNlZW1zIHdvcnRod2hpbGUgYXMg
-YSBjb2RlIHNpbXBsaWZpY2F0aW9uLCBidXQgcGxlYXNlIGRvbid0IGNoYXJhY3Rlcml6ZQ0KPiBp
-dCBhcyBhIGJ1ZyBmaXgsIGJlY2F1c2UgaXQncyBub3QuDQo+DQo+DQo+IC0gRXJpYw0KDQprZnJl
-ZV9zZW5zaXRpdmUgdXNlcyBtZW16ZXJvX2V4cGxpY2l0KCkgaW5zdGVhZCBvZiB0aGUgbWVtc2V0
-KClzIHVzZWQNCmFib3ZlLiBUaGUgbWVtemVyb19leHBsaWNpdCBoZWFkZXIgc3RhdGVzIC0NCg0K
-KiBOb3RlOiB1c3VhbGx5IHVzaW5nIG1lbXNldCgpIGlzIGp1c3QgZmluZSAoISksIGJ1dCBpbiBj
-YXNlcw0KKiB3aGVyZSBjbGVhcmluZyBvdXQgX2xvY2FsXyBkYXRhIGF0IHRoZSBlbmQgb2YgYSBz
-Y29wZSBpcw0KKiBuZWNlc3NhcnksIG1lbXplcm9fZXhwbGljaXQoKSBzaG91bGQgYmUgdXNlZCBp
-bnN0ZWFkIGluDQoqIG9yZGVyIHRvIHByZXZlbnQgdGhlIGNvbXBpbGVyIGZyb20gb3B0aW1pc2lu
-ZyBhd2F5IHplcm9pbmcuDQoNCkl0IGFjY29tcGxpc2hlcyB0aGlzIGJ5IGNhbGxpbmcgbWVtc2V0
-KCkgYW5kIHRoZW4gYWRkaW5nIGEgYmFycmllci4gU2luY2UNCkZJUFMgcmVxdWlyZXMgdGhpcyBk
-YXRhIGJlIHplcm9lZCBvdXQsIGFuZCB0aGUgY3VycmVudCBtZW1zZXQoKSBhbmQNCmtmcmVlKCkg
-ZG9uJ3QgZ3VhcmFudGVlIHRoaXMsIEkgZG8gbm90IHRoaW5rIHRoZSBjb21taXQgbWVzc2FnZSBp
-cw0KbWlzbGVhZGluZy4gSSBjYW4gY2xhcmlmeSB0aGUgbWVzc2FnZSB3aXRoIHRoZSBhYm92ZSBp
-bmZvcm1hdGlvbiBpZiB0aGF0DQppcyBwcmVmZXJyZWQuDQoNCg==
+This series introduces crypto kfuncs to make BPF programs able to
+utilize kernel crypto subsystem. Crypto operations made pluggable to
+avoid extensive growth of kernel when it's not needed. Only skcipher is
+added within this series, but it can be easily extended to other types
+of operations. No hardware offload supported as it needs sleepable
+context which is not available for TX or XDP programs. At the same time
+crypto context initialization kfunc can only run in sleepable context,
+that's why it should be run separately and store the result in the map.
+
+Selftests show the common way to implement crypto actions in BPF
+programs. Benchmark is also added to have a baseline.
+
+Vadim Fedorenko (4):
+  bpf: make common crypto API for TC/XDP programs
+  bpf: crypto: add skcipher to bpf crypto
+  selftests: bpf: crypto skcipher algo selftests
+  selftests: bpf: crypto: add benchmark for crypto functions
+
+ MAINTAINERS                                   |   8 +
+ crypto/Makefile                               |   3 +
+ crypto/bpf_crypto_skcipher.c                  |  82 ++++
+ include/linux/bpf.h                           |   1 +
+ include/linux/bpf_crypto.h                    |  24 ++
+ kernel/bpf/Makefile                           |   3 +
+ kernel/bpf/crypto.c                           | 377 ++++++++++++++++++
+ kernel/bpf/helpers.c                          |   2 +-
+ kernel/bpf/verifier.c                         |   1 +
+ tools/testing/selftests/bpf/Makefile          |   2 +
+ tools/testing/selftests/bpf/bench.c           |   6 +
+ .../selftests/bpf/benchs/bench_bpf_crypto.c   | 190 +++++++++
+ tools/testing/selftests/bpf/config            |   5 +
+ .../selftests/bpf/prog_tests/crypto_sanity.c  | 200 ++++++++++
+ .../selftests/bpf/progs/crypto_basic.c        |  70 ++++
+ .../selftests/bpf/progs/crypto_bench.c        | 111 ++++++
+ .../selftests/bpf/progs/crypto_common.h       |  67 ++++
+ .../selftests/bpf/progs/crypto_sanity.c       | 161 ++++++++
+ .../selftests/bpf/progs/crypto_share.h        |  10 +
+ 19 files changed, 1322 insertions(+), 1 deletion(-)
+ create mode 100644 crypto/bpf_crypto_skcipher.c
+ create mode 100644 include/linux/bpf_crypto.h
+ create mode 100644 kernel/bpf/crypto.c
+ create mode 100644 tools/testing/selftests/bpf/benchs/bench_bpf_crypto.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
+ create mode 100644 tools/testing/selftests/bpf/progs/crypto_basic.c
+ create mode 100644 tools/testing/selftests/bpf/progs/crypto_bench.c
+ create mode 100644 tools/testing/selftests/bpf/progs/crypto_common.h
+ create mode 100644 tools/testing/selftests/bpf/progs/crypto_sanity.c
+ create mode 100644 tools/testing/selftests/bpf/progs/crypto_share.h
+
+-- 
+2.43.0
+
