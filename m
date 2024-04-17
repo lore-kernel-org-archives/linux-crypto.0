@@ -1,456 +1,129 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD6F39FD7;
-	Tue, 16 Apr 2024 20:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F695244;
+	Wed, 17 Apr 2024 02:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713300064; cv=none; b=fCUPgalFIPqqYKj0GqmmjaL9LoYx66W/0huat6Cl7YmINLBwKPX0lB5eMuFUMaa5gaco+1CqiZ+h+jMG1X/iSBSeaJxu11rHy5GLe7TKiOogLEuOsIrWrd0sR7k3FQajUWrMwSzTAPj0iWxdiJ2FYLuITilR5R5EekGAk32FCZQ=
+	t=1713319969; cv=none; b=FNONm+r86tMISi5THveIdO625lkKAIpVoKs2GagTmfpgGJN7jI6FZMrDX7iXg/DZ2oxG7Azi1nO3wUcGLs0s/LKCBb6iY8jk88+05weSXb0UXL0mG3vtVDDFe9wb+b/u3rZbZW9Ts73cKsSogg7kxCjGg62gTDY1qGmTgKh95Uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713300064; c=relaxed/simple;
-	bh=Xxxn0J3zc6FsiMlJ3R5hkFS/4ckQKSpVxECSkXOELlw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FqLAlPLYDUAUmI9QMS/9JME7YAVCZuahB1HD2WnIZVGpCmzdfmwvn38kZO6SrLtoFgNWNri0dQuRCpD1syBq3fXq+CRZin7+rPETp3SEvpWY2nzde06Xfwi3jG+OA1YsM1bTlXPkmngcvIJ6JbCWSHlf4Dv09YxqRQbW1lGR+qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=dZAMg5wq; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1713319969; c=relaxed/simple;
+	bh=ZiGsFSryOOKe9OzBTaWucuXuaI2CiQx4hLJ+0X+WGs0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jzog7SZI5A6340VFUP2OYXm5isavMz5Pwe/G/XTL4xP8TWU3UC63NKonh/FTM/CqAxhe4j1JXOZ0FBI28frcc+n4mESim63D0LEJwcIUUPktzy+MuoiqTk+fSh7vUVFYy92n6+lswE8PYj+ON143CryKczO2olqPF3riTDDxVzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=Zw2hFAYe; arc=none smtp.client-ip=129.153.194.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="dZAMg5wq"
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43GKeb1G011767;
-	Tue, 16 Apr 2024 13:40:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=Yse9xYdBGRs5rCBIk776H/T37cvzOb2LbSZMp8HSZAQ=;
- b=dZAMg5wqYB+oMH6R55Dn+vnV/ulZHvUl9V4z7/SL/C0W6RN/fec/qiJg8NYX9zFqqGQa
- uozMcxUZSlkEJ/uVfUEMOVFDLELTdwyjVJefUPR7Qwcmo4QN7o4FKtzTwG2uGP8V4xNy
- O/YXf1CLDUbS6wJ0wpicEnM64XUwGgEYyzgowRiZDR0ZjiQwgJy1uZ6MO94Ut9PALlzx
- ecT0OWi8Dmp7hrdklb118nav8HoPGvMBRVaT9GvyWD8G9lJkrP3QQ8JDAyzX8BSBkzkI
- Opeb3h6lDZ51RcPMd0EmpPmYhCSmygR+Q0+wrTAl1qDTb/BTkVqrlpU9eWRXZV/hZXrt vQ== 
-Received: from mail.thefacebook.com ([163.114.132.120])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3xhbv96v3m-6
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 16 Apr 2024 13:40:46 -0700
-Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c085:21d::8) with Microsoft SMTP Server id
- 15.1.2507.35; Tue, 16 Apr 2024 13:40:27 -0700
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Jakub Kicinski
-	<kuba@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Andrii Nakryiko
-	<andrii@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko
-	<mykolal@fb.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <bpf@vger.kernel.org>
-Subject: [PATCH bpf-next v9 4/4] selftests: bpf: crypto: add benchmark for crypto functions
-Date: Tue, 16 Apr 2024 13:40:04 -0700
-Message-ID: <20240416204004.3942393-5-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240416204004.3942393-1-vadfed@meta.com>
-References: <20240416204004.3942393-1-vadfed@meta.com>
+	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="Zw2hFAYe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
+	t=1713319967; bh=ZiGsFSryOOKe9OzBTaWucuXuaI2CiQx4hLJ+0X+WGs0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=Zw2hFAYe/WnkAYjKW4AeJUMukSoVUYgRGKmm9m4pbWRUzkECDXhwyTLDo0ufmZ0XZ
+	 YWrR9gwzrHI+lNOWJ8xdg0WTLMvSI/fHpm+cqyzivDpJUx+Q2SvrVqKGS/VKImm9zm
+	 Gtm7tkA0jX9lXlvGmETdpg0qLZgQO3Gfavza28LHZOvs2Ski7LLlhCgejKubkq6vCs
+	 i30bHVdy1B89uBaL15M8suT4v4hie3ZV8jVlHKOoOCVSXTW9nw4zFSWl8aGsTfvWaw
+	 AIfJeI7GIsARAga7rDh5j2OZjGp/K1Wn4u1auqmlvvw61Ihte8up+D1o5++DyIN5rG
+	 ZGXrW/WLQLeEg==
+Message-ID: <04f5265f-77e6-45cc-856c-45cd80c278c2@jvdsn.com>
+Date: Tue, 16 Apr 2024 21:12:45 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: f-6FzUdeEiQuiiB8TcHr3lz9ySRq-Nj4
-X-Proofpoint-ORIG-GUID: f-6FzUdeEiQuiiB8TcHr3lz9ySRq-Nj4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-16_18,2024-04-16_01,2023-05-22_02
+Subject: Re: [PATCH 1/2] crypto: ecdh - Pass private key in proper byte order
+ to check valid key
+To: Stefan Berger <stefanb@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, ardb@kernel.org,
+ salvatore.benedetto@intel.com, davem@davemloft.net,
+ Jarkko Sakkinen <jarkko@kernel.org>, linux-crypto@vger.kernel.org,
+ herbert@gondor.apana.org.au
+References: <20240415003026.2661270-1-stefanb@linux.ibm.com>
+ <20240415003026.2661270-2-stefanb@linux.ibm.com>
+ <D0KX9NQPXKO1.2RXZU000DD1BB@kernel.org>
+ <6442f387-e45e-4019-8af0-6ca309e4ce4f@linux.ibm.com>
+ <D0LM72MR4LDH.3QN2WEXU4QEEJ@kernel.org>
+Content-Language: en-US
+From: Joachim Vandersmissen <git@jvdsn.com>
+In-Reply-To: <D0LM72MR4LDH.3QN2WEXU4QEEJ@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Some simple benchmarks are added to understand the baseline of
-performance.
+Hi,
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
-v9:
-- initial submission
----
- tools/testing/selftests/bpf/Makefile          |   2 +
- tools/testing/selftests/bpf/bench.c           |   6 +
- .../selftests/bpf/benchs/bench_bpf_crypto.c   | 190 ++++++++++++++++++
- .../selftests/bpf/progs/crypto_bench.c        | 108 ++++++++++
- 4 files changed, 306 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/benchs/bench_bpf_crypto.c
- create mode 100644 tools/testing/selftests/bpf/progs/crypto_bench.c
+Apologies for hijacking this thread, but I don't have access to the 
+older emails.
 
-diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index edc73f8f5aef..be8567337480 100644
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@ -729,6 +729,7 @@ $(OUTPUT)/bench_local_storage_rcu_tasks_trace.o: $(OUTPUT)/local_storage_rcu_tas
- $(OUTPUT)/bench_local_storage_create.o: $(OUTPUT)/bench_local_storage_create.skel.h
- $(OUTPUT)/bench_bpf_hashmap_lookup.o: $(OUTPUT)/bpf_hashmap_lookup.skel.h
- $(OUTPUT)/bench_htab_mem.o: $(OUTPUT)/htab_mem_bench.skel.h
-+$(OUTPUT)/bench_bpf_crypto.o: $(OUTPUT)/crypto_bench.skel.h
- $(OUTPUT)/bench.o: bench.h testing_helpers.h $(BPFOBJ)
- $(OUTPUT)/bench: LDLIBS += -lm
- $(OUTPUT)/bench: $(OUTPUT)/bench.o \
-@@ -748,6 +749,7 @@ $(OUTPUT)/bench: $(OUTPUT)/bench.o \
- 		 $(OUTPUT)/bench_bpf_hashmap_lookup.o \
- 		 $(OUTPUT)/bench_local_storage_create.o \
- 		 $(OUTPUT)/bench_htab_mem.o \
-+		 $(OUTPUT)/bench_bpf_crypto.o \
- 		 #
- 	$(call msg,BINARY,,$@)
- 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) $(filter %.a %.o,$^) $(LDLIBS) -o $@
-diff --git a/tools/testing/selftests/bpf/bench.c b/tools/testing/selftests/bpf/bench.c
-index 82de56c8162e..627b74ae041b 100644
---- a/tools/testing/selftests/bpf/bench.c
-+++ b/tools/testing/selftests/bpf/bench.c
-@@ -281,6 +281,7 @@ extern struct argp bench_hashmap_lookup_argp;
- extern struct argp bench_local_storage_create_argp;
- extern struct argp bench_htab_mem_argp;
- extern struct argp bench_trigger_batch_argp;
-+extern struct argp bench_crypto_argp;
- 
- static const struct argp_child bench_parsers[] = {
- 	{ &bench_ringbufs_argp, 0, "Ring buffers benchmark", 0 },
-@@ -294,6 +295,7 @@ static const struct argp_child bench_parsers[] = {
- 	{ &bench_local_storage_create_argp, 0, "local-storage-create benchmark", 0 },
- 	{ &bench_htab_mem_argp, 0, "hash map memory benchmark", 0 },
- 	{ &bench_trigger_batch_argp, 0, "BPF triggering benchmark", 0 },
-+	{ &bench_crypto_argp, 0, "bpf crypto benchmark", 0 },
- 	{},
- };
- 
-@@ -538,6 +540,8 @@ extern const struct bench bench_local_storage_tasks_trace;
- extern const struct bench bench_bpf_hashmap_lookup;
- extern const struct bench bench_local_storage_create;
- extern const struct bench bench_htab_mem;
-+extern const struct bench bench_crypto_encrypt;
-+extern const struct bench bench_crypto_decrypt;
- 
- static const struct bench *benchs[] = {
- 	&bench_count_global,
-@@ -590,6 +594,8 @@ static const struct bench *benchs[] = {
- 	&bench_bpf_hashmap_lookup,
- 	&bench_local_storage_create,
- 	&bench_htab_mem,
-+	&bench_crypto_encrypt,
-+	&bench_crypto_decrypt,
- };
- 
- static void find_benchmark(void)
-diff --git a/tools/testing/selftests/bpf/benchs/bench_bpf_crypto.c b/tools/testing/selftests/bpf/benchs/bench_bpf_crypto.c
-new file mode 100644
-index 000000000000..86048f02e6ac
---- /dev/null
-+++ b/tools/testing/selftests/bpf/benchs/bench_bpf_crypto.c
-@@ -0,0 +1,190 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
-+
-+#include <argp.h>
-+#include "bench.h"
-+#include "crypto_bench.skel.h"
-+#include "../progs/crypto_share.h"
-+
-+#define MAX_CIPHER_LEN 32
-+static char *input;
-+static struct crypto_ctx {
-+	struct crypto_bench *skel;
-+	int pfd;
-+} ctx;
-+
-+static struct crypto_args {
-+	u32 crypto_len;
-+	char *crypto_cipher;
-+} args = {
-+	.crypto_len = 16,
-+	.crypto_cipher = "ecb(aes)",
-+};
-+
-+enum {
-+	ARG_CRYPTO_LEN = 5000,
-+	ARG_CRYPTO_CIPHER = 5001,
-+};
-+
-+static const struct argp_option opts[] = {
-+	{ "crypto-len", ARG_CRYPTO_LEN, "CRYPTO_LEN", 0,
-+	  "Set the length of crypto buffer" },
-+	{ "crypto-cipher", ARG_CRYPTO_CIPHER, "CRYPTO_CIPHER", 0,
-+	  "Set the cipher to use (defaul:ecb(aes))" },
-+	{},
-+};
-+
-+static error_t crypto_parse_arg(int key, char *arg, struct argp_state *state)
-+{
-+	switch (key) {
-+	case ARG_CRYPTO_LEN:
-+		args.crypto_len = strtoul(arg, NULL, 10);
-+		if (!args.crypto_len ||
-+		    args.crypto_len > sizeof(ctx.skel->bss->dst)) {
-+			fprintf(stderr, "Invalid crypto buffer len (limit %zu)\n",
-+				sizeof(ctx.skel->bss->dst));
-+			argp_usage(state);
-+		}
-+		break;
-+	case ARG_CRYPTO_CIPHER:
-+		args.crypto_cipher = strdup(arg);
-+		if (!strlen(args.crypto_cipher) ||
-+		    strlen(args.crypto_cipher) > MAX_CIPHER_LEN) {
-+			fprintf(stderr, "Invalid crypto cipher len (limit %d)\n",
-+				MAX_CIPHER_LEN);
-+			argp_usage(state);
-+		}
-+		break;
-+	default:
-+		return ARGP_ERR_UNKNOWN;
-+	}
-+
-+	return 0;
-+}
-+
-+const struct argp bench_crypto_argp = {
-+	.options = opts,
-+	.parser = crypto_parse_arg,
-+};
-+
-+static void crypto_validate(void)
-+{
-+	if (env.consumer_cnt != 0) {
-+		fprintf(stderr, "bpf crypto benchmark doesn't support consumer!\n");
-+		exit(1);
-+	}
-+}
-+
-+static void crypto_setup(void)
-+{
-+	struct crypto_syscall_args sargs = {
-+		.key_len = 16,
-+	};
-+	LIBBPF_OPTS(bpf_test_run_opts, opts,
-+		.ctx_in = &sargs,
-+		.ctx_size_in = sizeof(sargs),
-+	);
-+
-+	int err, pfd;
-+	size_t i, sz;
-+
-+	sz = args.crypto_len;
-+	if (!sz || sz > sizeof(ctx.skel->bss->dst)) {
-+		fprintf(stderr, "invalid encrypt buffer size (source %zu, target %zu)\n",
-+			sz, sizeof(ctx.skel->bss->dst));
-+		exit(1);
-+	}
-+
-+	setup_libbpf();
-+
-+	ctx.skel = crypto_bench__open();
-+	if (!ctx.skel) {
-+		fprintf(stderr, "failed to open skeleton\n");
-+		exit(1);
-+	}
-+
-+	snprintf(ctx.skel->bss->cipher, 128, "%s", args.crypto_cipher);
-+	memcpy(ctx.skel->bss->key, "12345678testtest", 16);
-+
-+	srandom(time(NULL));
-+	input = malloc(sz);
-+	for (i = 0; i < sz - 1; i++)
-+		input[i] = '1' + random() % 9;
-+	input[sz - 1] = '\0';
-+
-+	ctx.skel->rodata->len = args.crypto_len;
-+
-+	err = crypto_bench__load(ctx.skel);
-+	if (err) {
-+		fprintf(stderr, "failed to load skeleton\n");
-+		crypto_bench__destroy(ctx.skel);
-+		exit(1);
-+	}
-+
-+	pfd = bpf_program__fd(ctx.skel->progs.crypto_setup);
-+	if (pfd < 0) {
-+		fprintf(stderr, "failed to get fd for setup prog\n");
-+		crypto_bench__destroy(ctx.skel);
-+		exit(1);
-+	}
-+
-+	err = bpf_prog_test_run_opts(pfd, &opts);
-+	if (err || ctx.skel->bss->status) {
-+		fprintf(stderr, "failed to run setup prog: err %d, status %d\n",
-+			err, ctx.skel->bss->status);
-+		crypto_bench__destroy(ctx.skel);
-+		exit(1);
-+	}
-+}
-+
-+static void crypto_encrypt_setup(void)
-+{
-+	crypto_setup();
-+	ctx.pfd = bpf_program__fd(ctx.skel->progs.crypto_encrypt);
-+}
-+
-+static void crypto_decrypt_setup(void)
-+{
-+	crypto_setup();
-+	ctx.pfd = bpf_program__fd(ctx.skel->progs.crypto_decrypt);
-+}
-+
-+static void crypto_measure(struct bench_res *res)
-+{
-+	res->hits = atomic_swap(&ctx.skel->bss->hits, 0);
-+}
-+
-+static void *crypto_producer(void *)
-+{
-+	LIBBPF_OPTS(bpf_test_run_opts, opts,
-+		.repeat = 64,
-+		.data_in = input,
-+		.data_size_in = args.crypto_len,
-+	);
-+
-+	while (true)
-+		(void)bpf_prog_test_run_opts(ctx.pfd, &opts);
-+	return NULL;
-+}
-+
-+const struct bench bench_crypto_encrypt = {
-+	.name = "crypto-encrypt",
-+	.argp = &bench_crypto_argp,
-+	.validate = crypto_validate,
-+	.setup = crypto_encrypt_setup,
-+	.producer_thread = crypto_producer,
-+	.measure = crypto_measure,
-+	.report_progress = hits_drops_report_progress,
-+	.report_final = hits_drops_report_final,
-+};
-+
-+const struct bench bench_crypto_decrypt = {
-+	.name = "crypto-decrypt",
-+	.argp = &bench_crypto_argp,
-+	.validate = crypto_validate,
-+	.setup = crypto_decrypt_setup,
-+	.producer_thread = crypto_producer,
-+	.measure = crypto_measure,
-+	.report_progress = hits_drops_report_progress,
-+	.report_final = hits_drops_report_final,
-+};
-diff --git a/tools/testing/selftests/bpf/progs/crypto_bench.c b/tools/testing/selftests/bpf/progs/crypto_bench.c
-new file mode 100644
-index 000000000000..bd01794a0236
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/crypto_bench.c
-@@ -0,0 +1,108 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
-+
-+#include "vmlinux.h"
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_endian.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_misc.h"
-+#include "bpf_kfuncs.h"
-+#include "crypto_common.h"
-+
-+const volatile unsigned int len = 16;
-+char dst[256] = {};
-+long hits = 0;
-+int status;
-+char cipher[128] = {};
-+u8 key[256] = {};
-+
-+SEC("syscall")
-+int crypto_setup(struct crypto_syscall_args *args)
-+{
-+	struct bpf_crypto_ctx *cctx;
-+	struct bpf_crypto_params params = {
-+		.type = "skcipher",
-+		.key_len = args->key_len,
-+		.authsize = args->authsize,
-+	};
-+	int err = 0;
-+
-+	status = 0;
-+
-+	if (!cipher[0] || !args->key_len || args->key_len > 255) {
-+		status = -EINVAL;
-+		return 0;
-+	}
-+
-+	__builtin_memcpy(&params.algo, cipher, sizeof(cipher));
-+	__builtin_memcpy(&params.key, key, sizeof(key));
-+	cctx = bpf_crypto_ctx_create(&params, &err);
-+
-+	if (!cctx) {
-+		status = err;
-+		return 0;
-+	}
-+
-+	err = crypto_ctx_insert(cctx);
-+	if (err && err != -EEXIST)
-+		status = err;
-+
-+	return 0;
-+}
-+
-+SEC("tc")
-+int crypto_encrypt(struct __sk_buff *skb)
-+{
-+	struct __crypto_ctx_value *v;
-+	struct bpf_crypto_ctx *ctx;
-+	struct bpf_dynptr psrc, pdst, iv;
-+
-+	v = crypto_ctx_value_lookup();
-+	if (!v) {
-+		status = -ENOENT;
-+		return 0;
-+	}
-+
-+	ctx = v->ctx;
-+	if (!ctx) {
-+		status = -ENOENT;
-+		return 0;
-+	}
-+
-+	bpf_dynptr_from_skb(skb, 0, &psrc);
-+	bpf_dynptr_from_mem(dst, len, 0, &pdst);
-+	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-+
-+	status = bpf_crypto_encrypt(ctx, &psrc, &pdst, &iv);
-+	__sync_add_and_fetch(&hits, 1);
-+
-+	return 0;
-+}
-+
-+SEC("tc")
-+int crypto_decrypt(struct __sk_buff *skb)
-+{
-+	struct bpf_dynptr psrc, pdst, iv;
-+	struct __crypto_ctx_value *v;
-+	struct bpf_crypto_ctx *ctx;
-+
-+	v = crypto_ctx_value_lookup();
-+	if (!v)
-+		return -ENOENT;
-+
-+	ctx = v->ctx;
-+	if (!ctx)
-+		return -ENOENT;
-+
-+	bpf_dynptr_from_skb(skb, 0, &psrc);
-+	bpf_dynptr_from_mem(dst, len, 0, &pdst);
-+	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-+
-+	status = bpf_crypto_decrypt(ctx, &psrc, &pdst, &iv);
-+	__sync_add_and_fetch(&hits, 1);
-+
-+	return 0;
-+}
-+
-+char __license[] SEC("license") = "GPL";
--- 
-2.43.0
+Should the new priv variable not be zeroized before the end of the 
+function? As it contains private keying material?
 
+Kind regards,
+Joachim
+
+On 4/16/24 9:25 AM, Jarkko Sakkinen wrote:
+> On Tue Apr 16, 2024 at 3:51 AM EEST, Stefan Berger wrote:
+>>
+>> On 4/15/24 14:53, Jarkko Sakkinen wrote:
+>>> On Mon Apr 15, 2024 at 3:30 AM EEST, Stefan Berger wrote:
+>>>> ecc_is_key_valid expects a key with the most significant digit in the last
+>>>> entry of the digit array. Currently ecdh_set_secret passes a reversed key
+>>>> to ecc_is_key_valid that then passes the rather simple test checking
+>>>> whether the private key is in range [2, n-3]. For all current ecdh-
+>>>> supported curves (NIST P192/256/384) the 'n' parameter is a rather large
+>>>> number, therefore easily passing this test.
+>>>>
+>>>> Throughout the ecdh and ecc codebase the variable 'priv' is used for a
+>>>> private_key holding the bytes in proper byte order. Therefore, introduce
+>>>> priv in ecdh_set_secret and copy the bytes from ctx->private_key into
+>>>> priv in proper byte order by using ecc_swap_digits. Pass priv to
+>>>> ecc_is_valid_key.
+>>>>
+>>>> Cc: Ard Biesheuvel <ardb@kernel.org>
+>>>> Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>
+>>>> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+>>>> ---
+>>>>    crypto/ecdh.c | 4 +++-
+>>>>    1 file changed, 3 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+>>>> index 3049f147e011..a73853bd44de 100644
+>>>> --- a/crypto/ecdh.c
+>>>> +++ b/crypto/ecdh.c
+>>>> @@ -27,6 +27,7 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+>>>>    			   unsigned int len)
+>>>>    {
+>>>>    	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
+>>>> +	u64 priv[ECC_MAX_DIGITS];
+>>>>    	struct ecdh params;
+>>>>    
+>>>>    	if (crypto_ecdh_decode_key(buf, len, &params) < 0 ||
+>>>> @@ -40,9 +41,10 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+>>>>    				       ctx->private_key);
+>>>>    
+>>>>    	memcpy(ctx->private_key, params.key, params.key_size);
+>>>> +	ecc_swap_digits(ctx->private_key, priv, ctx->ndigits);
+>>> Does swapping speed up the test that follows are what effect does it
+>>> have to the ecc_is_key_valid() call?
+>> The goal of this particular patch is to fix an issue with the byte order
+>> (as description says) and, as you can see in the 2nd patch, private key
+>> is always copied into priv using ecc_swap_digits before priv is being
+>> used instead of ctx->private_key (or whatever it is called in the
+>> function it was passed to). This patch here has nothing to do with speed
+>> up but a) fixing an issue and b) using priv here as well, so fixing this
+>> 'outlier' here. The speed-up comes in the 2nd patch when the bytes in
+>> ctx->private_key are put into proper order right away and we can get rid
+>> if priv, taking the swapped bytes of ctx->private_key, everywhere and we
+>> can use ctx->private_key directly.
+>>
+>> The test harness (testmgr.c) runs through part of this code here
+>> providing the private key that is copied into ctx->private_key, so it's
+>> being used and when you make a mistake (making the changes I did) the
+>> ecdh test cases will fail.
+> OK, thanks for the explanation :-) No opposition on the change itself.
+>
+> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+>
+> BR, Jarkko
+>
