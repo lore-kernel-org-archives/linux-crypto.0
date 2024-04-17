@@ -1,60 +1,32 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EFB3171669
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Apr 2024 17:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CBA1E48A
+	for <linux-crypto@vger.kernel.org>; Wed, 17 Apr 2024 17:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713373818; cv=none; b=MHGVfSEx/b4a25MMU66FDcPzKveBQlDLBxXMCwthYZV2sCsGkOpOLYCg5BKBN88RqRUPGdisTMVQe8kLGxD893uHw1MAbl69D5p0BTaBj8X17Ywt+L/dUOBmyXQ3ZZ4pek+JogFWsP9Eg6h4q+EN7rbzs4EJ9g/tVS954ESGy5E=
+	t=1713375519; cv=none; b=sCzggrkybFuzoOpckOvYMHEavVSOxcQ+q8zpqT8XXmilPhXc5RPIhJVakW+lNk2iyojJKTc3l5f6oZIXJgu65B9qFBaq/ACiBbbzSw55UzeTYXKkadn9D1s6c3oCk7W/O1DnekAE628SaUqajTH5IyE92i7u/ovX3cfTJu2vsI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713373818; c=relaxed/simple;
-	bh=LCvGS9UepmCWHpQ88fEQa2EXKGS1vIm8XTR6gb5r0BE=;
+	s=arc-20240116; t=1713375519; c=relaxed/simple;
+	bh=BkgRqVzpiBJbsQdtCxhJw29Yr/Le+gOVYZw2LkqhlU4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bnggUw3lFr0TCb5pEAlQGUO0Zt2dE/m0T/NionUwZ+gOsO8CLFPJ4roOyd6LkM87yQRTeR+00FTv6pUAaeDghDJVafBOudifSNTvxxBHCIgfGJmJBz+cslAJJ3LLDG67ONTHeGwLcyvRcrRf5OGjVK3U/LDPFjELDk69YeH81gM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QNhHx0Xq; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 In-Reply-To:Content-Type; b=QJKN5D3ojORAJ8Yh3UMXetzWyCzFtpPI81ComKiO3yd9RlQvJsg8b7utapopB5pRrLQQ7UrD9iX9L2VY7L589Q5e+Zxe+daMtXa76wmbfl4eeKjjXbIDbCjZGDQ+nFKPDnPCkqiFyaE7L5C2Cfxfigl1Wm639wwZ4jEBlYcA9TQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=WVu/xEt4; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QNhHx0Xq"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1e4266673bbso50788075ad.2
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Apr 2024 10:10:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713373816; x=1713978616; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FUzDJY7t9H7U+uIUYVqmIVsezT70evHGuhSl2xA7NDc=;
-        b=QNhHx0XqzfVjZGdzlMCDPQjopN0MGC2KLPWqURrUWR4CRW2JLLLDgpxmznzGbJQydm
-         QE6eL/fxw7jh/4q8Y9vU9YeF3CvK3ZoO4zA+G6/rLYR6vsx4dyOPgd+gQuoO4GMiRNds
-         TTwB2oSbCU2yPs0R2u13yzLhtMyoCP4/l2FRMbLFSkaT5tHvRmIK0h+jrg5B4fnIbYFJ
-         rf5O5jqa8tQGOE34ZAPzTdHr/TyQdL1bFGgSMsKTX2OIPV2qc5BKveI9L6Ax7hyv9wFt
-         ws6wjX8qs4OoIPqGDKoITGmqaLFPG5PVd3XQ4mYg4q/Wz//tx5niAhNe1PMERiJ+g3aF
-         xBKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713373816; x=1713978616;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FUzDJY7t9H7U+uIUYVqmIVsezT70evHGuhSl2xA7NDc=;
-        b=Z5vAOo4uno8jsQ0vI1x3KSG2eIGIZJxauP55re8oq2x7z1NXldbpn0NfHzxxqOuOlH
-         KhbM2616nYqTzzDlUqdi0AzZOKW3aDKWY+Hl55BIH0Ss3q4gHo8Ln2DuVM89xRP5YUFy
-         5sGI9EjLljd8X+EDYctVuOV4/BTzPJrfvdSYpYFqSbOiVlmwtAoFQABoRK4qcs4R/Myy
-         JAo/xlbb6mmtP3Fw9XZV/Rg/ckgr9nHeqeeIzEBOCLUXgR0w5vAHj+EF/U4YaP7qjYw8
-         T3x7THxgCkUuOkooIHScmNCEJR4DwdBsUf8bnXmL3m27+J1+u50AwUjlzgzayz4eAjQP
-         VLeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUrcCYfPJ+DUAg+5xTpHbCWiEI6q4i65JdJS3WnjKzb3HsVmUqveMcE5G5R6fUPZtx15xj+ZZXiGm9FR1nBGzvsuKYolhclFmnLW9Ay
-X-Gm-Message-State: AOJu0Yw6VDomxhrX39OO2o7nGHCRiUR2I4D/AyGsmp8EwSr5pav13nrw
-	Lh78JgvObjnv3xMbwfKCy1OGfbOwUW1QvJ60zEMsASXO+P25s1rHkZQ2jp5zobA=
-X-Google-Smtp-Source: AGHT+IH5PV2K/cfOZAuGQxOdypxVU3UbAHnIhIC9mRywjS+TQPh9qv3pbXlB2e33qDT/TIHIqPM7cw==
-X-Received: by 2002:a17:902:f7d5:b0:1dd:bf6a:2b97 with SMTP id h21-20020a170902f7d500b001ddbf6a2b97mr62194plw.60.1713373816426;
-        Wed, 17 Apr 2024 10:10:16 -0700 (PDT)
-Received: from [10.36.51.174] ([24.75.208.151])
-        by smtp.gmail.com with ESMTPSA id b11-20020a170902650b00b001e509d4d6ddsm12046145plk.1.2024.04.17.10.10.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Apr 2024 10:10:15 -0700 (PDT)
-Message-ID: <294f9048-9756-4d8d-b770-ebaaa4023c54@linaro.org>
-Date: Wed, 17 Apr 2024 19:10:15 +0200
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="WVu/xEt4"
+Received: from [10.137.193.18] (unknown [131.107.159.18])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 1101420FD463;
+	Wed, 17 Apr 2024 10:38:32 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1101420FD463
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1713375512;
+	bh=VIPtpUDr+q+7J5J6xpR9HqVNcJK6mWPGfCLaHzJ6+NM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WVu/xEt43JYedQjob3MO31UECv+6j4Kt16v20sRu/3m5WitRX0pSb0C1YKQEnZOJV
+	 4weUHd4eoUN/nxFd4XFExIDtX6NXZrLxzhYJLyR/6K9NkQd74v0qi3w22LjPjzdmM4
+	 3A8u+JqA0KuB5p+SAI2cagCeevz/TyVT9Q7WMtT4=
+Message-ID: <51a5305d-04d2-4c6b-8ea3-0edc6e10c188@linux.microsoft.com>
+Date: Wed, 17 Apr 2024 10:38:31 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,136 +34,53 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/19] amba: store owner from modules with
- amba_driver_register()
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
- Mike Leach <mike.leach@linaro.org>, James Clark <james.clark@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Linus Walleij <linus.walleij@linaro.org>, Andi Shyti
- <andi.shyti@kernel.org>, Olivia Mackall <olivia@selenic.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Vinod Koul <vkoul@kernel.org>,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Michal Simek <michal.simek@amd.com>, Eric Auger <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- linux-kernel@vger.kernel.org, coresight@lists.linaro.org,
- linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
- linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
- linux-input@vger.kernel.org, kvm@vger.kernel.org
-References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
- <171182151736.34189.6433134738765363803.b4-ty@linaro.org>
- <cfa5aa01-44ef-4eb1-9ca6-541ed5908db4@linaro.org>
- <8a8a8e8b-8256-4d33-a39b-9e3cbc4ccff2@arm.com>
- <4e762eb1-864e-4bb5-ab5d-debeac19c8fa@linaro.org>
- <Zh/Tmarryr4TzHIA@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <Zh/Tmarryr4TzHIA@shell.armlinux.org.uk>
+Subject: Re: [PATCH v2 1/4] Add SPAcc driver to Linux kernel
+To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
+ herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Cc: Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
+ bhoomikak@vayavyalabs.com, shwetar <shwetar@vayavyalabs.com>
+References: <20240412035342.1233930-1-pavitrakumarm@vayavyalabs.com>
+ <20240412035342.1233930-2-pavitrakumarm@vayavyalabs.com>
+Content-Language: en-CA
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+In-Reply-To: <20240412035342.1233930-2-pavitrakumarm@vayavyalabs.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 17/04/2024 15:50, Russell King (Oracle) wrote:
-> On Wed, Apr 17, 2024 at 03:29:26PM +0200, Krzysztof Kozlowski wrote:
->> On 16/04/2024 12:41, Suzuki K Poulose wrote:
->>> + Greg
->>>
->>>
->>> Hi Krzysztof,
->>>
->>> On 30/03/2024 18:00, Krzysztof Kozlowski wrote:
->>>> On 30/03/2024 18:58, Krzysztof Kozlowski wrote:
->>>>>
->>>>> On Tue, 26 Mar 2024 21:23:30 +0100, Krzysztof Kozlowski wrote:
->>>>>> Merging
->>>>>> =======
->>>>>> All further patches depend on the first amba patch, therefore please ack
->>>>>> and this should go via one tree.
->>>>>>
->>>>>> Description
->>>>>> ===========
->>>>>> Modules registering driver with amba_driver_register() often forget to
->>>>>> set .owner field.
->>>>>>
->>>>>> [...]
->>>>>
->>>>> Applied, thanks!
->>>>>
->>>>> [01/19] amba: store owner from modules with amba_driver_register()
->>>>>          (no commit info)
->>>>
->>>> Patchset applied here:
->>>> https://git.kernel.org/pub/scm/linux/kernel/git/krzk/linux-dt.git/log/?h=for-v6.10/module-owner-amba
->>>
->>> How do you plan to push this ? Given this affects most of the drivers/, 
->>> do you plan to send this to Greg ? We have changes in the coresight
->>> tree that would conflict with this "tag" ( I haven't merged them yet, 
->>> but is in my local queue). I want to make sure we can avoid the
->>> conflicts. I am happy to merge this to my local tree and base the
->>> changes on this, if this is going in for v6.10 and all are in agreement.
->>
->> I pushed it to arm-linux patches but it hasn't been picked up.
->>
->> I propose you take entire set then.
+On 4/11/2024 8:53 PM, Pavitrakumar M wrote:
+> Signed-off-by: shwetar <shwetar@vayavyalabs.com>
+> Signed-off-by: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
+> ---
+>  drivers/crypto/dwc-spacc/spacc_aead.c      | 1317 +++++++++
+>  drivers/crypto/dwc-spacc/spacc_ahash.c     | 1171 ++++++++
+>  drivers/crypto/dwc-spacc/spacc_core.c      | 2910 ++++++++++++++++++++
+>  drivers/crypto/dwc-spacc/spacc_core.h      |  839 ++++++
+>  drivers/crypto/dwc-spacc/spacc_device.c    |  324 +++
+>  drivers/crypto/dwc-spacc/spacc_device.h    |  236 ++
+>  drivers/crypto/dwc-spacc/spacc_hal.c       |  365 +++
+>  drivers/crypto/dwc-spacc/spacc_hal.h       |  113 +
+>  drivers/crypto/dwc-spacc/spacc_interrupt.c |  204 ++
+>  drivers/crypto/dwc-spacc/spacc_manager.c   |  670 +++++
+>  drivers/crypto/dwc-spacc/spacc_skcipher.c  |  720 +++++
+>  11 files changed, 8869 insertions(+)
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_aead.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
 > 
-> You are again being, IMHO, abrasive with your attitude. So far, every
-> interaction with you has been abrasive and bordering on abusive.
-> 
-> You haven't asked me whether I will take them. I will - just not at the
-> moment because 
 
-Thanks for confirming, I wanted to ping you because there was no feedback.
 
-Can you provide stable tag for coresight tree?
+Sorry, cannot feasibly review ~9000 lines between my other responsibilities. As mentioned in v1,
+make it easier on the folks who're giving their time by splitting up the series.
 
-Best regards,
-Krzysztof
+Thanks,
+Easwar
 
