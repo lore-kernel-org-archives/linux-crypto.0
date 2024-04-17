@@ -1,126 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBA5148301;
-	Wed, 17 Apr 2024 16:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3361487ED;
+	Wed, 17 Apr 2024 16:11:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713369744; cv=none; b=ZBZNwHUbG4JM9M5zbkS8g4w54XDlVZuVhAh3I84kiePOy+LqsLhelUsStuGTMfrJtDdxjWIOFQKdeRp6jkWm3/98ZGK8Y4XHvW31rRhVbWNBdiiGKrhuFUB/P+wr4Ssgr5dWRZuQHt41xFllpJMP0mlNdCPceQZPJ2fMcIQ4x5g=
+	t=1713370284; cv=none; b=cE/YlJtlB7YfSpCOu/2J2ob+eZMbWOOYIBI3aAFlCsdtiYQCVqjMovswv68Hq6d9RXgCMpwDBImJFzj8AIYJv4rA9lLpN9d9ax1aqFtkqaS+QydoZXCE30GHhZ9oWx0Qxb69t0G3TYKPcU7JjQKj4rN3mTdBs5uzkIFr7qJko34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713369744; c=relaxed/simple;
-	bh=N0gaK269VcLUzgnmQkKvReoRtlvSOBGBtufEW9856v8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WabV/jyqgz13ECaNEoq8VjHyba5oBR2DLIGuVzCaloBmGgJf+Shdce+uvzNY0ojwYsOZgTEMGhctaUaDMeZRf/SeU6AcNENG4EzqYzuWxFRPM9uw74/S0ci0HBEO3me8E2wN71M0MK6QGqoTn1cetSbW0p7pd6rvIyqx2+yjEPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vswq+Ear; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713370284; c=relaxed/simple;
+	bh=Vd9MoZGmUJSmWJhjZuysNOPtSny1sF4YJqKBYM/g7G4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WqwIlTUD76zbrXl3Nca8YpxijMVHlNBgH4ZRlmH8NxUs6Fo6WOdVgjqKtkb8XhDzH2noqjkN2tp0LEMH3SCzT6169d1qZloQoFRiQTn2pq1rSSbPDQ64eEhth/U818haB79AMPh4EKsNgErYqvTF54/r3V1Hf+DpB+0huPmkF9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=iGAJwGsx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vswq+Ear"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFCFCC072AA;
-	Wed, 17 Apr 2024 16:02:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713369744;
-	bh=N0gaK269VcLUzgnmQkKvReoRtlvSOBGBtufEW9856v8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Vswq+Ear/MtlBUrDm5iAR3C8HvUZeTLGtrwEOqLXZDdFVqSRjkissURJdm5HyxvIQ
-	 Utsde5/FF9IS0xhn36xOtBwOWhbL6iHlunEDeYWVsPaNI6AMKpB91hlrBKUy4ZijYi
-	 Gk9qDrPHuJxw94YbZlCk8letmSGCJqhSfl23mcJGy5g74NHXfd9YEfwEmjs43kW9/c
-	 SBRfX9NY8M5cdZkRlwR6HLSJq5NIBHk/yh9rDP7HmwF3zLDvKNjIPUpnY8mneaFYH2
-	 +xICRi1PzypdmFw3cZ4gazHB5CFHKM6VZUuacLfKDAXFoJJIRFTUGXnizdN2Kh0OHE
-	 Mysp8ph/uroBw==
-Message-ID: <1fe62eb1-8ad5-4ced-9349-258cee9de663@kernel.org>
-Date: Wed, 17 Apr 2024 18:02:22 +0200
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="iGAJwGsx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84F8CC32783;
+	Wed, 17 Apr 2024 16:11:23 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="iGAJwGsx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1713370279;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Vd9MoZGmUJSmWJhjZuysNOPtSny1sF4YJqKBYM/g7G4=;
+	b=iGAJwGsxu04qMExnTCA3JQ+6qGD6hJ9R9PIoxkW7LDfeJjUHd8bl9Vb0t0YL2CX1esUNH6
+	Q9s+L/xcwbGjeOklnxrEPJadgtbqAxD+ExlSY5ZuE8ItKhcSKjs8HSvo0xeoakglSB79AC
+	iCHfpgGNpnXUVjPUYpqRfpXQuACBgCM=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 88535516 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 17 Apr 2024 16:11:18 +0000 (UTC)
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-de45e5c3c68so134981276.0;
+        Wed, 17 Apr 2024 09:11:18 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWjjlyYGyGlcoALrqz1RIDwjEe8xnNSdACSULwJG8vQ2vYnstTYtc2mcC274SEYDyYc0F4RnpIDbhilvl0KDtRe9KYr77n5naFlXHoZt/DBEo1kZHaJqAIf5rxrTPCeNje2BT2hSxLOVczfwTimgwp6DabMqTk3CW5pN4H1l9gYL19ct6Am7w==
+X-Gm-Message-State: AOJu0YwFPM94nRvziEFd7djeXTJg+FM2PvbzaDO8yvHUpk7r5JFtX7ch
+	WXFqU60IpWBqe5C2rlsRr9CUjMPgUjguLgfHyu+4kqMBM+Vb4zSapGt1lV3U0CbC9lEv9LWZ9RD
+	wYblurmtJ+RcIK2SwOSNcEZ95qo4=
+X-Google-Smtp-Source: AGHT+IHnVFaaolAttobN05sEUDEOZ5q4IsHxKmNOdMXi38+CnOrD9A/ODY6svaDJFy1CiSQ4ILjWqKrNFfsRMS/5hTQ=
+X-Received: by 2002:a25:ac1f:0:b0:de1:286c:23b1 with SMTP id
+ w31-20020a25ac1f000000b00de1286c23b1mr16773107ybi.7.1713370277505; Wed, 17
+ Apr 2024 09:11:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <20240417104046.27253-1-bchalios@amazon.es> <20240417104046.27253-6-bchalios@amazon.es>
+ <CAHmME9qHY_1JGDMyvEGB7XDu2DKaYQcPE3UfSfb4aVZkgC8Q=g@mail.gmail.com> <1fe62eb1-8ad5-4ced-9349-258cee9de663@kernel.org>
+In-Reply-To: <1fe62eb1-8ad5-4ced-9349-258cee9de663@kernel.org>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Wed, 17 Apr 2024 18:11:05 +0200
+X-Gmail-Original-Message-ID: <CAHmME9rtwMEBL-F5mQLuQREr=TqpuYChYn1rxpfGYqX11x-Efg@mail.gmail.com>
+Message-ID: <CAHmME9rtwMEBL-F5mQLuQREr=TqpuYChYn1rxpfGYqX11x-Efg@mail.gmail.com>
 Subject: Re: [PATCH v6 5/5] virt: vmgenid: add support for devicetree bindings
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>, sudanl@amazon.com,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: tytso@mit.edu, olivia@selenic.com, herbert@gondor.apana.org.au,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, graf@amazon.de, xmarcalx@amazon.co.uk,
- dwmw@amazon.co.uk, Alexander Graf <graf@amazon.com>,
- Babis Chalios <bchalios@amazon.es>
-References: <20240417104046.27253-1-bchalios@amazon.es>
- <20240417104046.27253-6-bchalios@amazon.es>
- <CAHmME9qHY_1JGDMyvEGB7XDu2DKaYQcPE3UfSfb4aVZkgC8Q=g@mail.gmail.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <CAHmME9qHY_1JGDMyvEGB7XDu2DKaYQcPE3UfSfb4aVZkgC8Q=g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: sudanl@amazon.com, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, tytso@mit.edu, 
+	olivia@selenic.com, herbert@gondor.apana.org.au, robh@kernel.org, 
+	krzk+dt@kernel.org, conor+dt@kernel.org, linux-crypto@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, graf@amazon.de, 
+	xmarcalx@amazon.co.uk, dwmw@amazon.co.uk, Alexander Graf <graf@amazon.com>, 
+	Babis Chalios <bchalios@amazon.es>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 17/04/2024 17:16, Jason A. Donenfeld wrote:
+Hi Krzysztof,
 
->> +static irqreturn_t
->> +vmgenid_of_irq_handler(int __always_unused irq, void *dev)
->> +{
->> +       vmgenid_notify(dev);
->> +
->> +       return IRQ_HANDLED;
->> +}
-> 
-> Is there a reason the of code isn't conditional on CONFIG_OF? I'm not
-> super familiar with these drivers, but this seems like it would be a
-> thing to do, and then we could do `depends on OF || ACPI` in the
-> Kconfig.
-> 
+On Wed, Apr 17, 2024 at 6:02=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
+g> wrote:
+> Usually we do not recommend hiding code behind !CONFIG_OF because this
+> limits possible usage on ACPI systems via PRP0001. Not sure if it is
+> applicable here, because there is already ACPI matching.
+>
+> I would suggest choose whatever makes code simpler... Or just mark some
+> pieces with __maybe_unused if they are really not used? That would avoid
+> ifdeffery.
 
-Usually we do not recommend hiding code behind !CONFIG_OF because this
-limits possible usage on ACPI systems via PRP0001. Not sure if it is
-applicable here, because there is already ACPI matching.
+Interesting about PRP0001. Alright. It looks like I can't quite do
+without ifdefs because the code dereferences ->handle in a acpi_device
+struct, but I can minimize it all to just a single ifdef.
 
-I would suggest choose whatever makes code simpler... Or just mark some
-pieces with __maybe_unused if they are really not used? That would avoid
-ifdeffery.
-
-
-Best regards,
-Krzysztof
-
+Jason
