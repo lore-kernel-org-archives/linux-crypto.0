@@ -1,75 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E304146D5E;
-	Wed, 17 Apr 2024 15:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFC6146A78;
+	Wed, 17 Apr 2024 15:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713367222; cv=none; b=uBlwVeZ/ObezMxJE2Wu7r4WGSIjWIBsOEKqSD3BkH7j6eWBQlZMCekXPH+BuMv6sOSXkQM2QhujaIhPmVnfZc5LudredX6uKEoV3ORzDl0P59ZpTuSY5RSz6xEPP9fONFlen5mscPXoql9e7mNSHlh7dOqsqi5RJWAfGp62NW4Y=
+	t=1713367438; cv=none; b=OvUc6QESSwP+XtlHEKgypV9sRa9h71TLPLlcIbrxg2AeRmQ37DHCJR4SqwjrtLfEV5XjwoNI0HpjhzcBtK7lvBzVvJyMCQ0YOPHULOZeZBpL0YOUKKtJ7z+iMd+hwMtNPkERHTNEPUJkHNj8ZAQS5eB5HKN9KE/9z4D+G0pyZrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713367222; c=relaxed/simple;
-	bh=jEmNRf5WdmSCn9d1nQ8mj13loSgpSuoMo6q+ARRPMU0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nIViigHBdTUAj8QF89Gw66Cx0fznRPo/rfMeKbgC7P7TCnOWUeWxJh0mvs8vGDJG5Uhmjy6bSDEn+FXnhJN5AsfLo9ZhpNDJU2EbPQQ74JCDjORMzygO02sfeBbxN8oxAUVXbdIXZepnuPd9QUs4SFekDlX9sWEKrsotGSN1MFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=P8hrE+gz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713367438; c=relaxed/simple;
+	bh=lBxDXYbHQaraSNFYRXGNQ1zCz31iJvZpUYUEZ/hpAo8=;
+	h=Subject:Message-ID:Date:MIME-Version:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tzIxXDNYkN0S0Ton4cc5uVN293kTA90NzhwH2ZhwK3yV+0/EOqfU6HzRRqZGqjUCI9HmTFoNGo5bNGbBxZ/nhvmPrCAAofl7/1u2XRsGd3Ejp3NoQYKwZ4y1exYgjKW3U/iyjGXVB5Aeo2k9E0X3FD5VbTG3VvJOwirSmPhoZZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.es header.i=@amazon.es header.b=b3s48av5; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="P8hrE+gz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54AE5C32781;
-	Wed, 17 Apr 2024 15:20:21 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="P8hrE+gz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1713367218;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jEmNRf5WdmSCn9d1nQ8mj13loSgpSuoMo6q+ARRPMU0=;
-	b=P8hrE+gz+5Vmb7w74R4zmbHRa7j2S7bNUhLVfxfGTjZ/ka+CURx6zdurqSWwWcOUMU/glz
-	83AM5lZiRJdc32V9ZaUCsEFnAyAlTx5jYT0Am87WwMAZLPd1vKcsBwGk/dIlAFzGWF4dF7
-	2FZcJMKZHS0jzhoT894Ov7vAlWW7u1E=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id da6478ae (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 17 Apr 2024 15:20:18 +0000 (UTC)
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-ddaebc9d6c9so5242182276.0;
-        Wed, 17 Apr 2024 08:20:18 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVEIzpBHHrJOVydYnQp99LcZ1BCA6QaQa/qR9cmqzoonbKM1SnJj/MJWJ6ttZmOM0GXMZAKuO/6Kqts7tUIE3lfch80gFSPyc2z7e06/nFrK1E4CnY22bKHPp1SVy8BLKVCcODvxgfYffTlalD+Xum4drphPAaiNsheiS9jv6hYmKVMurgkkQ==
-X-Gm-Message-State: AOJu0YwspWW4R9wYvf8CUzP95D884i8dpqesLF1ocls0SNZqAF0fP5Mx
-	Qlz8gMPLpmUUv6CvWdmKHm288KHjCR27a5C+sNnHEW+5MpQeBtm7VpTsTbmIYXRjSuAB+ZnP5Bh
-	ONIg3C5FAu/gSehsv5opBTKDxQ70=
-X-Google-Smtp-Source: AGHT+IGFuPJLnyUfwgW4MBwQgxmKUFwnpUfeu0z/FzaD5kkOiCguNLUhh5Cqx6saafSAJtm00sQKMafyEw3NudTjBq4=
-X-Received: by 2002:a25:bdd4:0:b0:dcb:be59:25e1 with SMTP id
- g20-20020a25bdd4000000b00dcbbe5925e1mr16536339ybk.30.1713367217279; Wed, 17
- Apr 2024 08:20:17 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=amazon.es header.i=@amazon.es header.b="b3s48av5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazon201209;
+  t=1713367436; x=1744903436;
+  h=message-id:date:mime-version:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:subject;
+  bh=lBxDXYbHQaraSNFYRXGNQ1zCz31iJvZpUYUEZ/hpAo8=;
+  b=b3s48av5HHDlmEGUXUmHdEgD5wPaNU0vpAnMEfKHeDCmIbvsbUumMgF7
+   nGu0JDtzExRUj1rAYvnVii9KhYmIau2lSQY+IrnoOBdyBP8Zr6hZFvxx9
+   /aUPA8kWGzZmbOfakHTvQ45KKayWJ8u1ihYi6bWoJc18A+IAQnfGogipk
+   8=;
+X-IronPort-AV: E=Sophos;i="6.07,209,1708387200"; 
+   d="scan'208";a="652635136"
+Subject: Re: [PATCH v6 4/5] dt-bindings: rng: Add vmgenid support
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 15:23:54 +0000
+Received: from EX19MTAEUB001.ant.amazon.com [10.0.43.254:13019]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.17.146:2525] with esmtp (Farcaster)
+ id 4ded3555-bd22-47dc-8c6a-e4aa6af82997; Wed, 17 Apr 2024 15:23:53 +0000 (UTC)
+X-Farcaster-Flow-ID: 4ded3555-bd22-47dc-8c6a-e4aa6af82997
+Received: from EX19D037EUB003.ant.amazon.com (10.252.61.119) by
+ EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 17 Apr 2024 15:23:49 +0000
+Received: from [192.168.27.23] (10.1.212.9) by EX19D037EUB003.ant.amazon.com
+ (10.252.61.119) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Wed, 17 Apr
+ 2024 15:23:43 +0000
+Message-ID: <1c48bca7-611e-4270-b403-71c7c9074b4d@amazon.es>
+Date: Wed, 17 Apr 2024 15:23:39 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417104046.27253-1-bchalios@amazon.es> <20240417104046.27253-5-bchalios@amazon.es>
- <a9f1d643-f171-4b41-88c5-bd9bae0f8200@kernel.org> <433a026a-352c-48c1-84cf-e538bb30aad7@amazon.es>
-In-Reply-To: <433a026a-352c-48c1-84cf-e538bb30aad7@amazon.es>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Wed, 17 Apr 2024 17:20:06 +0200
-X-Gmail-Original-Message-ID: <CAHmME9r647g++mOuG7DGz27pwaVKyc-HrbH2Z2nmHXA4ko6h-Q@mail.gmail.com>
-Message-ID: <CAHmME9r647g++mOuG7DGz27pwaVKyc-HrbH2Z2nmHXA4ko6h-Q@mail.gmail.com>
-Subject: Re: [PATCH v6 4/5] dt-bindings: rng: Add vmgenid support
-To: Babis Chalios <bchalios@amazon.es>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, tytso@mit.edu, olivia@selenic.com, 
-	herbert@gondor.apana.org.au, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, sudanl@amazon.com, graf@amazon.de, 
-	xmarcalx@amazon.co.uk, dwmw@amazon.co.uk, Alexander Graf <graf@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+CC: Krzysztof Kozlowski <krzk@kernel.org>, <tytso@mit.edu>,
+	<olivia@selenic.com>, <herbert@gondor.apana.org.au>, <robh@kernel.org>,
+	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <linux-crypto@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<sudanl@amazon.com>, <graf@amazon.de>, <xmarcalx@amazon.co.uk>,
+	<dwmw@amazon.co.uk>, Alexander Graf <graf@amazon.com>
+References: <20240417104046.27253-1-bchalios@amazon.es>
+ <20240417104046.27253-5-bchalios@amazon.es>
+ <a9f1d643-f171-4b41-88c5-bd9bae0f8200@kernel.org>
+ <433a026a-352c-48c1-84cf-e538bb30aad7@amazon.es>
+ <CAHmME9r647g++mOuG7DGz27pwaVKyc-HrbH2Z2nmHXA4ko6h-Q@mail.gmail.com>
+Content-Language: en-US
+From: Babis Chalios <bchalios@amazon.es>
+In-Reply-To: <CAHmME9r647g++mOuG7DGz27pwaVKyc-HrbH2Z2nmHXA4ko6h-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D042UWB003.ant.amazon.com (10.13.139.135) To
+ EX19D037EUB003.ant.amazon.com (10.252.61.119)
 
-On Wed, Apr 17, 2024 at 5:19=E2=80=AFPM Babis Chalios <bchalios@amazon.es> =
-wrote:
-> I will re-create the patches with correct authorship, my SoB and the
-> Reviewed-by
-> tags I had received in previous versions and send a v7.
+On 4/17/24 15:20, Jason A. Donenfeld wrote:
+> On Wed, Apr 17, 2024 at 5:19 PM Babis Chalios <bchalios@amazon.es> wrote:
+>> I will re-create the patches with correct authorship, my SoB and the
+>> Reviewed-by
+>> tags I had received in previous versions and send a v7.
+> Please don't bother.
+Hi Jason,
 
-Please don't bother.
+I am ok with it, if that's fine with Krzysztof.
 
-Jason
+Cheers,
+Babis
+>
+> Jason
+
