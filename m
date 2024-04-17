@@ -1,33 +1,60 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC4513DDC1;
-	Wed, 17 Apr 2024 13:19:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2E913F00A
+	for <linux-crypto@vger.kernel.org>; Wed, 17 Apr 2024 13:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713359985; cv=none; b=LHhsrtQMGEAjebqEtcxwqAPNx7/nd3MPCMhtgHkj9NVGfijp9rMPKwTHfoWhEFpcM+zX8j1ozGBQ8iYgjzndn7yYhWhEUkvr1/J2bvQ0/wqAFsHfueSetqIK5DZfjbpF5KgcqVdsDcfSGPe9Tc6w4/D1fNkIzavrPNdFnMMCPk8=
+	t=1713360571; cv=none; b=fdhvynQ3kTXqtJ3WIRa6ENRM3DsOk+NRCVG+g+9pt/+YjTUvKhJ6DbL2jVWelVG68uznuOukegPaHdwVJZbzLOH6MiBP5pBPAbjEGnh8IAzwAk30O/adSxZtPrc3Lxy4Ts5mD16JP1vxnwIQ2Bm61oYRiTPCZj+KIBLT7R+K3cA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713359985; c=relaxed/simple;
-	bh=ifTod5t0Y3zdQxoTHX+qb4Ly20Qs+/JrsNxAdRyT8cI=;
+	s=arc-20240116; t=1713360571; c=relaxed/simple;
+	bh=TeiTLJN/5okNpELe3ZA4zy7aqgMGfMFAywMokEL2gE0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=itIjnsptW1+Ho1xV3TBebEvsV0igzpiX1bPyRzYQqjkd+o9XUS628ZuKSLe+uEjhQ3VbDNLLuXeBcxLzEm/Ay6a9ok0Ayxc790pJGBcKxX3GCz7NQg7G+KqWf/mJURTRh6mItnWgfOqlDrsfcyIWf9e6TIkanKqrgcbWq4YfHY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oBgP00qI; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=hvMZAwevmJFlbRrv9x6Nx7GgZDWD7AgGsPLzVrzstPw4uuu2gzgx96xXqMnsBYZLcAr60wuKcxLNShES1XVOk8kOMVMG3m6gEq5BaDOqk+mhDH5lb42Tl9pBo8TQyL3/OQauOVX/uhRu8fC5Pja7mx+U0GeJ1SBxHxoLzf4ZPBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qBeEsJnv; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oBgP00qI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F00AEC3277B;
-	Wed, 17 Apr 2024 13:19:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713359985;
-	bh=ifTod5t0Y3zdQxoTHX+qb4Ly20Qs+/JrsNxAdRyT8cI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=oBgP00qIAs+tK0HzWCwC435B8SLinKSR/VeDfmQ+Nd839ZXRXCHfkvSridLxWvQHb
-	 Z7q1+6k6ZT9vzHM0JarNfRXJCAgdlYeRWG6AZ21MGt9cAIjo0rHUX6vj+Pmx5IMmM4
-	 XT03P8SEezA4lg0DGgTfXqDqYfLXbrF1ivmeIwVZ90EIzcST4gJE55NlvBwozbDxqi
-	 wx9g9ByITh9mYRBHnmxLKHlDhTCmGW1plOe8d52O26ZXN1Zsfk7VnEVrQJewiHrJmS
-	 UQ946Q0c+jJWu5q5VZywZ8M7fqYvnsLsi1NPtJ/hFYDF2cLiDKcbAl2CXRgIU/H3Zw
-	 S6Z6SaFxzxLyQ==
-Message-ID: <3b469d35-ee27-42d4-8768-fc2ce9235196@kernel.org>
-Date: Wed, 17 Apr 2024 15:19:44 +0200
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qBeEsJnv"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ed112c64beso4528202b3a.1
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Apr 2024 06:29:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1713360569; x=1713965369; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=U9yUjGy+KC3uZnAtPNkhuEl1+cCKcH9uusVMRUEMaAc=;
+        b=qBeEsJnvJxT3NtRa0AFvYJ25CjQnkTbG2cSrO7i/eZ6gKhqL5O75Xs+4nEcaNtc5jq
+         rQ+cKR441g8vZo4QBK+o3sG6+jenqQNBfQioH6zB9Bpc+YBPPt778oSgEKbly7XfZ23B
+         htrRLeUlUOi2iHrY2OitTROaopRrMGb/4sY5toMw3vkVYlNo+OP08ZdwiDbgyPBqUcD3
+         j4q4mY8caAa9LWfhruY5HMP+NPWmQ//+p2lMGgUYEoVize2LkvhwpnHBEWSdvex/Bxif
+         17zyi/WYrKQiWB4Tmh60oeBwxQsGK39VjZg5bSWDn4/w4cxA/YIHHMpccJb/ghcsPH1M
+         /xSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713360569; x=1713965369;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U9yUjGy+KC3uZnAtPNkhuEl1+cCKcH9uusVMRUEMaAc=;
+        b=q2fCNH7/h94hwfOSGZ1GNk5qTejZl0NDeOPtn0hm0ZHcXp8YIPCYSgD/quzAO8btjf
+         5Zcp09iv8SgWlxQznaYJcB9JjYnkpDimg/Ij/8AD99dwudrLS65SY/tPVjzWmmoc1GlL
+         4FomExTMUTcZ3oilkRT/KnIdnraG+gRs30JwP4LXWKGy0DGhp5akXAUprOkaX8lcoSkD
+         3v8FSZqJJNw2vIlb+0lFKcTStJ5MlSybdjAK8/Dd51vEShGFZyAHuRts0uo4VE1QUBpN
+         B3pQQne6DnS9VGVLHRgRUXWnsg7MyTtnHQsYObyRU5gOpfprznXmmdq4bJgdqmrY800b
+         i1Gg==
+X-Forwarded-Encrypted: i=1; AJvYcCX82kGc6qoVSziCAfWCpOEOO4RDADmzQvsI+Dw1iQzfQOa6tt38MSHUlof19hVFTyf2mu8MQDepXVOesl153P250ULfcMcyAoQUzt3+
+X-Gm-Message-State: AOJu0YwVTqOkbK1k+UcGxT5QOeCHXTWZUwl0QqzNRu11UZaLqjQ6HpP4
+	XLU9hw1wgwgBGf2d3dKK8RQPkW/mijSCXhCjj3TydwbnsNcbjPql1IelCXdpSi8=
+X-Google-Smtp-Source: AGHT+IE6xQl1EcEphFdHM0huRf7JkAbzMW3ss8W6b4OgepYU2e+X7pEgHJyT8hN5oSrVdMtbpms3UA==
+X-Received: by 2002:a05:6a20:3cab:b0:1a9:97fb:40cc with SMTP id b43-20020a056a203cab00b001a997fb40ccmr16554938pzj.2.1713360569312;
+        Wed, 17 Apr 2024 06:29:29 -0700 (PDT)
+Received: from [172.20.9.36] ([209.37.221.130])
+        by smtp.gmail.com with ESMTPSA id i16-20020a17090332d000b001e2a43bafbasm11530447plr.216.2024.04.17.06.29.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Apr 2024 06:29:29 -0700 (PDT)
+Message-ID: <4e762eb1-864e-4bb5-ab5d-debeac19c8fa@linaro.org>
+Date: Wed, 17 Apr 2024 15:29:26 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,21 +62,34 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/5] virt: vmgenid: rearrange code to make review
- easier
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Babis Chalios <bchalios@amazon.es>
-Cc: Alexander Graf <graf@amazon.de>, tytso@mit.edu, olivia@selenic.com,
- herbert@gondor.apana.org.au, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, sudanl@amazon.com,
- xmarcalx@amazon.co.uk, dwmw@amazon.co.uk
-References: <20240417081212.99657-1-bchalios@amazon.es>
- <20240417081212.99657-2-bchalios@amazon.es>
- <10d41e7e-87b1-4036-a740-da36270a4325@amazon.de>
- <2838b126-ad87-4642-9223-e24f3fdb2c63@amazon.es> <Zh_Dpi630-LXJkJm@zx2c4.com>
+Subject: Re: [PATCH 00/19] amba: store owner from modules with
+ amba_driver_register()
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Russell King <linux@armlinux.org.uk>, Mike Leach <mike.leach@linaro.org>,
+ James Clark <james.clark@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Andi Shyti
+ <andi.shyti@kernel.org>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Vinod Koul <vkoul@kernel.org>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Michal Simek <michal.simek@amd.com>, Eric Auger <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-kernel@vger.kernel.org, coresight@lists.linaro.org,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-input@vger.kernel.org, kvm@vger.kernel.org
+References: <20240326-module-owner-amba-v1-0-4517b091385b@linaro.org>
+ <171182151736.34189.6433134738765363803.b4-ty@linaro.org>
+ <cfa5aa01-44ef-4eb1-9ca6-541ed5908db4@linaro.org>
+ <8a8a8e8b-8256-4d33-a39b-9e3cbc4ccff2@arm.com>
 Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
  cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
  JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
@@ -59,83 +99,84 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  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
- 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 fv0=
-In-Reply-To: <Zh_Dpi630-LXJkJm@zx2c4.com>
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <8a8a8e8b-8256-4d33-a39b-9e3cbc4ccff2@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 17/04/2024 14:42, Jason A. Donenfeld wrote:
-> On Wed, Apr 17, 2024 at 11:05:27AM +0200, Babis Chalios wrote:
->>
->>
->> On 17/4/24 10:35, Alexander Graf wrote:
->>>
->>> On 17.04.24 10:12, Babis Chalios wrote:
->>>> From: Sudan Landge <sudanl@amazon.com>
->>>>
->>>> Rearrage the functions of vmgenid to make the next commit,
->>>> which re-implements vmgenid as a platform driver, easier to review.
->>>>
->>>> Signed-off-by: Sudan Landge <sudanl@amazon.com>
->>>
->>>
->>> You can't sign off on behalf of someone else. The SoB here needs to be 
->>> yours. If you are taking over this code from Sudan, I'd suggest to 
->>> take over full ownership of it and put your own name as author and SoB 
->>> in all patches.
->>>
->>
->> I thought about it and it seemed weird to me that I take over SoB and 
->> authorship since I only touched one line in one of
->> the patches, but I will be taking over the patches, so I can do that if 
->> that's the way we things are done.
->>
->> Does it make sense to at least add "Co-authored-by Sudan Landge 
->> <sudanl@amazon.com>" here?
+On 16/04/2024 12:41, Suzuki K Poulose wrote:
+> + Greg
 > 
-> Wait, what? No. If you didn't write these patches, you're not the
-> author. Sudan is the author. However, if they passed through you, it's
-> fine to add your S-o-b. You can even mention the trivial change you made
-> between Sudan's S-o-b and your own.
 > 
+> Hi Krzysztof,
+> 
+> On 30/03/2024 18:00, Krzysztof Kozlowski wrote:
+>> On 30/03/2024 18:58, Krzysztof Kozlowski wrote:
+>>>
+>>> On Tue, 26 Mar 2024 21:23:30 +0100, Krzysztof Kozlowski wrote:
+>>>> Merging
+>>>> =======
+>>>> All further patches depend on the first amba patch, therefore please ack
+>>>> and this should go via one tree.
+>>>>
+>>>> Description
+>>>> ===========
+>>>> Modules registering driver with amba_driver_register() often forget to
+>>>> set .owner field.
+>>>>
+>>>> [...]
+>>>
+>>> Applied, thanks!
+>>>
+>>> [01/19] amba: store owner from modules with amba_driver_register()
+>>>          (no commit info)
+>>
+>> Patchset applied here:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/krzk/linux-dt.git/log/?h=for-v6.10/module-owner-amba
+> 
+> How do you plan to push this ? Given this affects most of the drivers/, 
+> do you plan to send this to Greg ? We have changes in the coresight
+> tree that would conflict with this "tag" ( I haven't merged them yet, 
+> but is in my local queue). I want to make sure we can avoid the
+> conflicts. I am happy to merge this to my local tree and base the
+> changes on this, if this is going in for v6.10 and all are in agreement.
 
-It is not "fine" but it is a must. Regardless if you changed something
-or not, you *must* provide your SoB since you generated the patch.
-Babis, please read carefully submitting patches. Especially the DCO
-part, but entire document is important.
+I pushed it to arm-linux patches but it hasn't been picked up.
 
+I propose you take entire set then.
 
 Best regards,
 Krzysztof
