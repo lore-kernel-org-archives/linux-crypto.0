@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68972D60C;
-	Wed, 17 Apr 2024 13:17:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC4513DDC1;
+	Wed, 17 Apr 2024 13:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713359859; cv=none; b=ZHyFH/xkHy0244vGSmpIEp6dQaeEkPb1D6MUebqZAPsC3VdztDHdW8HQ2abNz5jLBsHpmFzXPimwMuuCw6ssV0KtGqCtjX+tG6A/w6dPA+2i3XH54wJhG67ULGU6n+eGe51ooHJBn33gc2SLVbnoy9bDaf4HDHE15uzpnkilAOE=
+	t=1713359985; cv=none; b=LHhsrtQMGEAjebqEtcxwqAPNx7/nd3MPCMhtgHkj9NVGfijp9rMPKwTHfoWhEFpcM+zX8j1ozGBQ8iYgjzndn7yYhWhEUkvr1/J2bvQ0/wqAFsHfueSetqIK5DZfjbpF5KgcqVdsDcfSGPe9Tc6w4/D1fNkIzavrPNdFnMMCPk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713359859; c=relaxed/simple;
-	bh=VUjBNNV86MlEhK9OC6B2C1JbNAc/QnHg1wQm4gM7K78=;
+	s=arc-20240116; t=1713359985; c=relaxed/simple;
+	bh=ifTod5t0Y3zdQxoTHX+qb4Ly20Qs+/JrsNxAdRyT8cI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m/JkVfK7KJYtYj6MpD2rCYAnF2XlWBMD50Wzk8bTMNoXLXuIg/lmXMP3V7RFUf0Q+rciekk8Uc5hGzts651oBu2auMFvpunfiveXwu5dyBPFiJO/ffpmx2WRZd5TESTPGxZ3Y2N1yeHQB56Otcbogdgd2lwJJSvczanFCpVd7Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gmrKxFmJ; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=itIjnsptW1+Ho1xV3TBebEvsV0igzpiX1bPyRzYQqjkd+o9XUS628ZuKSLe+uEjhQ3VbDNLLuXeBcxLzEm/Ay6a9ok0Ayxc790pJGBcKxX3GCz7NQg7G+KqWf/mJURTRh6mItnWgfOqlDrsfcyIWf9e6TIkanKqrgcbWq4YfHY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oBgP00qI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gmrKxFmJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24575C072AA;
-	Wed, 17 Apr 2024 13:17:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oBgP00qI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F00AEC3277B;
+	Wed, 17 Apr 2024 13:19:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713359859;
-	bh=VUjBNNV86MlEhK9OC6B2C1JbNAc/QnHg1wQm4gM7K78=;
+	s=k20201202; t=1713359985;
+	bh=ifTod5t0Y3zdQxoTHX+qb4Ly20Qs+/JrsNxAdRyT8cI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gmrKxFmJfFp0WvZZ6ZOS9ZVzXuK4XxGXZZGG2IlcwlZK4W9LvEzfTkKfUFEtha5kn
-	 0bAoNVN7Gp/qu4tykoj3vPHAB4QB8HCO7NUBQfllPZzwVv1LfsN1QacwoQfO3+BjNN
-	 12Zi9eLQvFTJN/C5m2kvyKzhMJWyrzSQZWfVJ/GYDjlb8cb51JU8YPfisMAfJjqLBA
-	 ixCzsaGyM16KJw7Wr1oFgRxGu3QU7GN7QckOhMFFmQDbkGGGyBE+zmVdUyW0K84o4K
-	 2qK4Yyxyqsu7bgQGnRR82/PZXyoQPFCyxTyZIzWhvx6mVAF5R7uHEdm8NZEzFRidm9
-	 g5J/Oj4owdwdg==
-Message-ID: <3efcea18-5c5d-4ed5-8679-e8c26f585151@kernel.org>
-Date: Wed, 17 Apr 2024 15:17:38 +0200
+	b=oBgP00qIAs+tK0HzWCwC435B8SLinKSR/VeDfmQ+Nd839ZXRXCHfkvSridLxWvQHb
+	 Z7q1+6k6ZT9vzHM0JarNfRXJCAgdlYeRWG6AZ21MGt9cAIjo0rHUX6vj+Pmx5IMmM4
+	 XT03P8SEezA4lg0DGgTfXqDqYfLXbrF1ivmeIwVZ90EIzcST4gJE55NlvBwozbDxqi
+	 wx9g9ByITh9mYRBHnmxLKHlDhTCmGW1plOe8d52O26ZXN1Zsfk7VnEVrQJewiHrJmS
+	 UQ946Q0c+jJWu5q5VZywZ8M7fqYvnsLsi1NPtJ/hFYDF2cLiDKcbAl2CXRgIU/H3Zw
+	 S6Z6SaFxzxLyQ==
+Message-ID: <3b469d35-ee27-42d4-8768-fc2ce9235196@kernel.org>
+Date: Wed, 17 Apr 2024 15:19:44 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,15 +35,18 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 5/5] virt: vmgenid: add support for devicetree bindings
-To: Babis Chalios <bchalios@amazon.es>, tytso@mit.edu, Jason@zx2c4.com,
- olivia@selenic.com, herbert@gondor.apana.org.au, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: sudanl@amazon.com, graf@amazon.de, xmarcalx@amazon.co.uk,
- dwmw@amazon.co.uk
+Subject: Re: [PATCH v5 1/5] virt: vmgenid: rearrange code to make review
+ easier
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Babis Chalios <bchalios@amazon.es>
+Cc: Alexander Graf <graf@amazon.de>, tytso@mit.edu, olivia@selenic.com,
+ herbert@gondor.apana.org.au, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, linux-crypto@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, sudanl@amazon.com,
+ xmarcalx@amazon.co.uk, dwmw@amazon.co.uk
 References: <20240417081212.99657-1-bchalios@amazon.es>
- <20240417081212.99657-6-bchalios@amazon.es>
+ <20240417081212.99657-2-bchalios@amazon.es>
+ <10d41e7e-87b1-4036-a740-da36270a4325@amazon.de>
+ <2838b126-ad87-4642-9223-e24f3fdb2c63@amazon.es> <Zh_Dpi630-LXJkJm@zx2c4.com>
 Content-Language: en-US
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -89,27 +92,50 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240417081212.99657-6-bchalios@amazon.es>
+In-Reply-To: <Zh_Dpi630-LXJkJm@zx2c4.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 17/04/2024 10:12, Babis Chalios wrote:
-> From: Sudan Landge <sudanl@amazon.com>
+On 17/04/2024 14:42, Jason A. Donenfeld wrote:
+> On Wed, Apr 17, 2024 at 11:05:27AM +0200, Babis Chalios wrote:
+>>
+>>
+>> On 17/4/24 10:35, Alexander Graf wrote:
+>>>
+>>> On 17.04.24 10:12, Babis Chalios wrote:
+>>>> From: Sudan Landge <sudanl@amazon.com>
+>>>>
+>>>> Rearrage the functions of vmgenid to make the next commit,
+>>>> which re-implements vmgenid as a platform driver, easier to review.
+>>>>
+>>>> Signed-off-by: Sudan Landge <sudanl@amazon.com>
+>>>
+>>>
+>>> You can't sign off on behalf of someone else. The SoB here needs to be 
+>>> yours. If you are taking over this code from Sudan, I'd suggest to 
+>>> take over full ownership of it and put your own name as author and SoB 
+>>> in all patches.
+>>>
+>>
+>> I thought about it and it seemed weird to me that I take over SoB and 
+>> authorship since I only touched one line in one of
+>> the patches, but I will be taking over the patches, so I can do that if 
+>> that's the way we things are done.
+>>
+>> Does it make sense to at least add "Co-authored-by Sudan Landge 
+>> <sudanl@amazon.com>" here?
 > 
-> Extend the vmgenid platform driver to support devicetree bindings.
-> With this support, hypervisors can send vmgenid notifications to
-> the virtual machine without the need to enable ACPI.
-> The bindings are located at:
-> Documentation/devicetree/bindings/rng/microsoft,vmgenid.yaml
+> Wait, what? No. If you didn't write these patches, you're not the
+> author. Sudan is the author. However, if they passed through you, it's
+> fine to add your S-o-b. You can even mention the trivial change you made
+> between Sudan's S-o-b and your own.
 > 
-> Signed-off-by: Sudan Landge <sudanl@amazon.com>
 
-Missing SoB.
+It is not "fine" but it is a must. Regardless if you changed something
+or not, you *must* provide your SoB since you generated the patch.
+Babis, please read carefully submitting patches. Especially the DCO
+part, but entire document is important.
 
-> ---
->  drivers/virt/vmgenid.c | 53 ++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 51 insertions(+), 2 deletions(-)
-> 
 
 Best regards,
 Krzysztof
