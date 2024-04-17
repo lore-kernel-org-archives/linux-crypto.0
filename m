@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83AF13C684;
-	Wed, 17 Apr 2024 13:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68972D60C;
+	Wed, 17 Apr 2024 13:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713359797; cv=none; b=YGUneo/tGTNTlbBfW/41OCrOYYLkD+gecxOf19NQEYdKaGrUE4WGOAonBoYzZkv4erXHzLyPEtkY5EucUIpu5Ea8fUiqqPAQaXL7Aadzsj0CPBgPdu4cgxbIQhtNoncqsM/yxGT5RRHh2649T1350ciWgBNDNMxxBk85CNKeSaU=
+	t=1713359859; cv=none; b=ZHyFH/xkHy0244vGSmpIEp6dQaeEkPb1D6MUebqZAPsC3VdztDHdW8HQ2abNz5jLBsHpmFzXPimwMuuCw6ssV0KtGqCtjX+tG6A/w6dPA+2i3XH54wJhG67ULGU6n+eGe51ooHJBn33gc2SLVbnoy9bDaf4HDHE15uzpnkilAOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713359797; c=relaxed/simple;
-	bh=vIF/tuUXPZ1vvCuvAOdp+pF7cW+4Rnwljj95ZI6+nsU=;
+	s=arc-20240116; t=1713359859; c=relaxed/simple;
+	bh=VUjBNNV86MlEhK9OC6B2C1JbNAc/QnHg1wQm4gM7K78=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mNGhe7uT7bLOHa6AVu5DzGy3KMMi4U7khjfWewhg99a6xhhnGoAdlXSUhVS1v6IVzoB22sYqv1lwTfYa1hLbkdnluO6EbJJIlWu7VJCZ+a2qyGzSn+CQQVHLTtzwMcVE6LEd1u7eu9o5qB3gaeavZn0nPFb4uy0aNIVh2fBO1gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tURE3Q0B; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=m/JkVfK7KJYtYj6MpD2rCYAnF2XlWBMD50Wzk8bTMNoXLXuIg/lmXMP3V7RFUf0Q+rciekk8Uc5hGzts651oBu2auMFvpunfiveXwu5dyBPFiJO/ffpmx2WRZd5TESTPGxZ3Y2N1yeHQB56Otcbogdgd2lwJJSvczanFCpVd7Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gmrKxFmJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tURE3Q0B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1791DC072AA;
-	Wed, 17 Apr 2024 13:16:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gmrKxFmJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24575C072AA;
+	Wed, 17 Apr 2024 13:17:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713359797;
-	bh=vIF/tuUXPZ1vvCuvAOdp+pF7cW+4Rnwljj95ZI6+nsU=;
+	s=k20201202; t=1713359859;
+	bh=VUjBNNV86MlEhK9OC6B2C1JbNAc/QnHg1wQm4gM7K78=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=tURE3Q0BqGDy7tHAmbeBItAdQakC0qmA5hO3u1m4LbRQVy6IWv7hoJLL0a4YWSscT
-	 GNhv3zNn5HxqBFviAcIFm672U7gfvvzUaRUwI9rbttSokxckaa3wbX85Po5iISPYfE
-	 V249m1RKrTOfsmfvMktyNhkEcmUHPAtWcHQ24MrFlrQWm08aTWljXDWvdCx26VroGd
-	 DuWDNkFTWw00N9G752yyKWCPFQfpelq+BUeMmgqGqHPnEmkeTsi9qLKQk3WLccK9HQ
-	 H5RLQ7MV2kHPo4diBHYJzHLY/3HBhQIYTSqpCHMkbUx86cjT1bs716SU5YuFi6F9Gz
-	 fyhJ9DDxzcwRQ==
-Message-ID: <156b27dd-0b3f-43b0-95ec-a69b69673e60@kernel.org>
-Date: Wed, 17 Apr 2024 15:16:36 +0200
+	b=gmrKxFmJfFp0WvZZ6ZOS9ZVzXuK4XxGXZZGG2IlcwlZK4W9LvEzfTkKfUFEtha5kn
+	 0bAoNVN7Gp/qu4tykoj3vPHAB4QB8HCO7NUBQfllPZzwVv1LfsN1QacwoQfO3+BjNN
+	 12Zi9eLQvFTJN/C5m2kvyKzhMJWyrzSQZWfVJ/GYDjlb8cb51JU8YPfisMAfJjqLBA
+	 ixCzsaGyM16KJw7Wr1oFgRxGu3QU7GN7QckOhMFFmQDbkGGGyBE+zmVdUyW0K84o4K
+	 2qK4Yyxyqsu7bgQGnRR82/PZXyoQPFCyxTyZIzWhvx6mVAF5R7uHEdm8NZEzFRidm9
+	 g5J/Oj4owdwdg==
+Message-ID: <3efcea18-5c5d-4ed5-8679-e8c26f585151@kernel.org>
+Date: Wed, 17 Apr 2024 15:17:38 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/5] dt-bindings: rng: Add vmgenid support
+Subject: Re: [PATCH v5 5/5] virt: vmgenid: add support for devicetree bindings
 To: Babis Chalios <bchalios@amazon.es>, tytso@mit.edu, Jason@zx2c4.com,
  olivia@selenic.com, herbert@gondor.apana.org.au, robh@kernel.org,
  krzk+dt@kernel.org, conor+dt@kernel.org, linux-crypto@vger.kernel.org,
@@ -43,7 +43,7 @@ To: Babis Chalios <bchalios@amazon.es>, tytso@mit.edu, Jason@zx2c4.com,
 Cc: sudanl@amazon.com, graf@amazon.de, xmarcalx@amazon.co.uk,
  dwmw@amazon.co.uk
 References: <20240417081212.99657-1-bchalios@amazon.es>
- <20240417081212.99657-5-bchalios@amazon.es>
+ <20240417081212.99657-6-bchalios@amazon.es>
 Content-Language: en-US
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -89,67 +89,27 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240417081212.99657-5-bchalios@amazon.es>
+In-Reply-To: <20240417081212.99657-6-bchalios@amazon.es>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 17/04/2024 10:12, Babis Chalios wrote:
 > From: Sudan Landge <sudanl@amazon.com>
 > 
-> Virtual Machine Generation ID driver was introduced in commit af6b54e2b5ba
-> ("virt: vmgenid: notify RNG of VM fork and supply generation ID"), as an
-> ACPI only device.
-> 
-> VMGenID specification http://go.microsoft.com/fwlink/?LinkId=260709 defines
-> a mechanism for the BIOS/hypervisors to communicate to the virtual machine
-> that it is executed with a different configuration (e.g. snapshot execution
-> or creation from a template).
-> The guest operating system can use the notification for various purposes
-> such as re-initializing its random number generator etc.
-> 
-> As per the specs, hypervisor should provide a globally unique identified,
-> or GUID via ACPI.
-> 
-> This patch tries to mimic the mechanism to provide the same functionality
-> which is for a hypervisor/BIOS to notify the virtual machine when it is
-> executed with a different configuration.
-> 
-> As part of this support the devicetree bindings requires the hypervisors or
-> BIOS to provide a memory address which holds the GUID and an IRQ which is
-> used to notify when there is a change in the GUID.
-> The memory exposed in the DT should follow the rules defined in the
-> vmgenid spec mentioned above.
-> 
-> *Reason for this change*:
-> Chosing ACPI or devicetree is an intrinsic part of an hypervisor design.
-> Without going into details of why a hypervisor would chose DT over ACPI,
-> we would like to highlight that the hypervisors that have chose devicetree
-> and now want to make use of the vmgenid functionality cannot do so today
-> because vmgenid is an ACPI only device.
-> This forces these hypervisors to change their design which could have
-> undesirable impacts on their use-cases, test-scenarios etc.
-> 
-> The point of vmgenid is to provide a mechanism to discover a GUID when
-> the execution state of a virtual machine changes and the simplest
-> way to do it is pass a memory location and an interrupt via devicetree.
-> It would complicate things unnecessarily if instead of using devicetree,
-> we try to implement a new protocol or modify other protocols to somehow
-> provide the same functionility.
-> 
-> We believe that adding a devicetree binding for vmgenid is a simpler,
-> better alternative to provide the same functionality and will allow
-> such hypervisors as mentioned above to continue using devicetree.
-> 
-> More references to vmgenid specs:
->  - https://www.qemu.org/docs/master/specs/vmgenid.html
->  - https://learn.microsoft.com/en-us/windows/win32/hyperv_v2/virtual-
-> machine-generation-identifier
+> Extend the vmgenid platform driver to support devicetree bindings.
+> With this support, hypervisors can send vmgenid notifications to
+> the virtual machine without the need to enable ACPI.
+> The bindings are located at:
+> Documentation/devicetree/bindings/rng/microsoft,vmgenid.yaml
 > 
 > Signed-off-by: Sudan Landge <sudanl@amazon.com>
 
-Missing SoB. Probably everywhere...
+Missing SoB.
 
-
+> ---
+>  drivers/virt/vmgenid.c | 53 ++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 51 insertions(+), 2 deletions(-)
+> 
 
 Best regards,
 Krzysztof
