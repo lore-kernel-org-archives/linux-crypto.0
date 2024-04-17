@@ -1,195 +1,84 @@
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6547D08D;
-	Wed, 17 Apr 2024 08:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA0F7E799;
+	Wed, 17 Apr 2024 08:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713341676; cv=none; b=r9yaUGf05yxygwL2UKaN1FY3mcCGMq83VCk81Kw08pDH8wl6YA4Eje3N1b39oTsOup3bLlyHKNDA14peLWo/N+EJe71wfglsHcEK8gN3cwiklDhU7g3B2hZx18fFesAqAahI+5aI1TIuu3qYR+SnoqbaqU9awW5IYBzfZwQOj38=
+	t=1713342946; cv=none; b=UgrJxyXS3v09WaDQw/XXX73PulGpRiiGJxnVgDMp5p8w4DpeoDTXJXfoS7SzKwatCcpfAprvyTfqcaqEVZdJZlKU/wRgVHkhq+Fl1Unifn26VYzNFr9LwAOPWDi1IF5cv5ibvj+XfNAJbRo3P7xaowmUyHbBchjhd9iWMAq6b+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713341676; c=relaxed/simple;
-	bh=RFVneludFe2+XpZNeCT2h0o45mdVjvhm/vgG6KqTxBE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q/VKWQTdTwsa5o1RAd2Tmskk8PZMUQkX9NE81751vCa4Ubr8iTCNLo07pDW91nPAfaANCwYHwyU/ELyVOFFmGsX+DHAKD5RzDyRGg16a9iUcKlb5kmJ0tL8zSYYZsZxh7knswbOmgGGTSS+2yhsdpbdlwSyA9VIkJ9ciq9ZsFoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.es header.i=@amazon.es header.b=H8AGONsh; arc=none smtp.client-ip=207.171.190.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
+	s=arc-20240116; t=1713342946; c=relaxed/simple;
+	bh=17OBlsmVxnMXJBquq78bQRB1wlvVeTZA49R24BCyT2M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lDoP7iSpNvlmjiw0EevhPmGNARR82wuNAc42qiH9ghmlbwvaOKOQdiXrKdIlmq9/1rqXlI/YomnjyvoyndZ5LmBckdLzGGaLgcCRu8x/uuW1IF5jg8ZwjareroWSNV1Nwq1tbTHR0sLirLnWbFbb6NqDJfk9X4m7V1Yvl2S/qpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=v1MAYQBG; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.es header.i=@amazon.es header.b="H8AGONsh"
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="v1MAYQBG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazon201209;
-  t=1713341676; x=1744877676;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PDgtpC4FCgvL30shNxDeWu8nTK8GNg2wg+736xsm1ao=;
-  b=H8AGONshGmkPtu0G136fHGTMqSBQcHm9m7MoB/A4YoWCT74niD1AIIRM
-   T+t4Tbm+PPoKxK9lgTW0Kkbw00D0xxSYsEf398Y78AO8zynlj9bcVCbwu
-   6N9eqUeNt9M1rkShosi+lwGj/pK8Y3Oof3LzK38qewuuO8SgzMhFViwf3
-   0=;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1713342945; x=1744878945;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=17OBlsmVxnMXJBquq78bQRB1wlvVeTZA49R24BCyT2M=;
+  b=v1MAYQBGAoRJVNxzy0uJ6cwoOugG8Kkq8qrZqLq0mp2cQ4fun8IlQYqy
+   63E5r1gc70cNjm1KeWGzFD/zhf4bD2Jd2ltRNj5HVSvO7a6RXZ2HZga0V
+   x/ssMNQ9fytc67z5Rbxi94uUXFBk1DOy544KNb5qc9jFPNBY2OApiNp4n
+   4=;
 X-IronPort-AV: E=Sophos;i="6.07,208,1708387200"; 
-   d="scan'208";a="339280674"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 08:14:27 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.10.100:22007]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.2.180:2525] with esmtp (Farcaster)
- id 944d4460-6106-433e-96cb-d9d5f678fd46; Wed, 17 Apr 2024 08:14:25 +0000 (UTC)
-X-Farcaster-Flow-ID: 944d4460-6106-433e-96cb-d9d5f678fd46
-Received: from EX19D037EUB003.ant.amazon.com (10.252.61.119) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
+   d="scan'208";a="199145512"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 08:35:42 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:5397]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.158:2525] with esmtp (Farcaster)
+ id 1676a3ad-f3c1-4105-85bf-4096eab9f7d9; Wed, 17 Apr 2024 08:35:40 +0000 (UTC)
+X-Farcaster-Flow-ID: 1676a3ad-f3c1-4105-85bf-4096eab9f7d9
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 17 Apr 2024 08:14:25 +0000
-Received: from f4d4887fdcfb.ant.amazon.com (10.1.212.48) by
- EX19D037EUB003.ant.amazon.com (10.252.61.119) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 17 Apr 2024 08:14:19 +0000
-From: Babis Chalios <bchalios@amazon.es>
-To: <tytso@mit.edu>, <Jason@zx2c4.com>, <olivia@selenic.com>,
-	<herbert@gondor.apana.org.au>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-	<conor+dt@kernel.org>, <linux-crypto@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sudanl@amazon.com>, <bchalios@amazon.es>, <graf@amazon.de>,
-	<xmarcalx@amazon.co.uk>, <dwmw@amazon.co.uk>
-Subject: [PATCH v5 5/5] virt: vmgenid: add support for devicetree bindings
-Date: Wed, 17 Apr 2024 10:12:12 +0200
-Message-ID: <20240417081212.99657-6-bchalios@amazon.es>
-X-Mailer: git-send-email 2.39.3 (Apple Git-145)
-In-Reply-To: <20240417081212.99657-1-bchalios@amazon.es>
-References: <20240417081212.99657-1-bchalios@amazon.es>
+ 15.2.1258.28; Wed, 17 Apr 2024 08:35:35 +0000
+Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Wed, 17 Apr
+ 2024 08:35:32 +0000
+Message-ID: <10d41e7e-87b1-4036-a740-da36270a4325@amazon.de>
+Date: Wed, 17 Apr 2024 10:35:29 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA003.ant.amazon.com (10.13.139.18) To
- EX19D037EUB003.ant.amazon.com (10.252.61.119)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 1/5] virt: vmgenid: rearrange code to make review
+ easier
+Content-Language: en-US
+To: Babis Chalios <bchalios@amazon.es>, <tytso@mit.edu>, <Jason@zx2c4.com>,
+	<olivia@selenic.com>, <herbert@gondor.apana.org.au>, <robh@kernel.org>,
+	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <linux-crypto@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sudanl@amazon.com>, <xmarcalx@amazon.co.uk>, <dwmw@amazon.co.uk>
+References: <20240417081212.99657-1-bchalios@amazon.es>
+ <20240417081212.99657-2-bchalios@amazon.es>
+From: Alexander Graf <graf@amazon.de>
+In-Reply-To: <20240417081212.99657-2-bchalios@amazon.es>
+X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 
-From: Sudan Landge <sudanl@amazon.com>
-
-Extend the vmgenid platform driver to support devicetree bindings.
-With this support, hypervisors can send vmgenid notifications to
-the virtual machine without the need to enable ACPI.
-The bindings are located at:
-Documentation/devicetree/bindings/rng/microsoft,vmgenid.yaml
-
-Signed-off-by: Sudan Landge <sudanl@amazon.com>
----
- drivers/virt/vmgenid.c | 53 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 51 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/virt/vmgenid.c b/drivers/virt/vmgenid.c
-index 3d93e3fb94c4..9a3c12e5dd6e 100644
---- a/drivers/virt/vmgenid.c
-+++ b/drivers/virt/vmgenid.c
-@@ -2,12 +2,13 @@
- /*
-  * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-  *
-- * The "Virtual Machine Generation ID" is exposed via ACPI and changes when a
-+ * The "Virtual Machine Generation ID" is exposed via ACPI or DT and changes when a
-  * virtual machine forks or is cloned. This driver exists for shepherding that
-  * information to random.c.
-  */
- 
- #include <linux/acpi.h>
-+#include <linux/interrupt.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/platform_device.h>
-@@ -20,6 +21,7 @@ enum { VMGENID_SIZE = 16 };
- struct vmgenid_state {
- 	u8 *next_id;
- 	u8 this_id[VMGENID_SIZE];
-+	int irq;
- };
- 
- static void vmgenid_notify(struct device *device)
-@@ -43,6 +45,14 @@ vmgenid_acpi_handler(acpi_handle __always_unused handle,
- 	vmgenid_notify(dev);
- }
- 
-+static irqreturn_t
-+vmgenid_of_irq_handler(int __always_unused irq, void *dev)
-+{
-+	vmgenid_notify(dev);
-+
-+	return IRQ_HANDLED;
-+}
-+
- static int __maybe_unused
- setup_vmgenid_state(struct vmgenid_state *state, u8 *next_id)
- {
-@@ -106,6 +116,35 @@ static int vmgenid_add_acpi(struct device __maybe_unused *dev,
- #endif
- }
- 
-+static int vmgenid_add_of(struct platform_device *pdev,
-+			  struct vmgenid_state *state)
-+{
-+	u8 *virt_addr;
-+	int ret = 0;
-+
-+	virt_addr = (u8 *)devm_platform_get_and_ioremap_resource(pdev, 0, NULL);
-+	if (IS_ERR(virt_addr))
-+		return PTR_ERR(virt_addr);
-+
-+	ret = setup_vmgenid_state(state, virt_addr);
-+	if (ret)
-+		return ret;
-+
-+	ret = platform_get_irq(pdev, 0);
-+	if (ret < 0)
-+		return ret;
-+
-+	state->irq = ret;
-+	pdev->dev.driver_data = state;
-+
-+	ret = devm_request_irq(&pdev->dev, state->irq, vmgenid_of_irq_handler,
-+			       IRQF_SHARED, "vmgenid", &pdev->dev);
-+	if (ret)
-+		pdev->dev.driver_data = NULL;
-+
-+	return ret;
-+}
-+
- static int vmgenid_add(struct platform_device *pdev)
- {
- 	struct vmgenid_state *state;
-@@ -116,7 +155,10 @@ static int vmgenid_add(struct platform_device *pdev)
- 	if (!state)
- 		return -ENOMEM;
- 
--	ret = vmgenid_add_acpi(dev, state);
-+	if (dev->of_node)
-+		ret = vmgenid_add_of(pdev, state);
-+	else
-+		ret = vmgenid_add_acpi(dev, state);
- 
- 	if (ret)
- 		devm_kfree(dev, state);
-@@ -124,6 +166,12 @@ static int vmgenid_add(struct platform_device *pdev)
- 	return ret;
- }
- 
-+static const struct of_device_id vmgenid_of_ids[] = {
-+	{ .compatible = "microsoft,vmgenid", },
-+	{ },
-+};
-+MODULE_DEVICE_TABLE(of, vmgenid_of_ids);
-+
- static const struct acpi_device_id vmgenid_acpi_ids[] = {
- 	{ "VMGENCTR", 0 },
- 	{ "VM_GEN_COUNTER", 0 },
-@@ -136,6 +184,7 @@ static struct platform_driver vmgenid_plaform_driver = {
- 	.driver     = {
- 		.name   = "vmgenid",
- 		.acpi_match_table = vmgenid_acpi_ids,
-+		.of_match_table = vmgenid_of_ids,
- 	},
- };
- 
--- 
-2.40.1
+Ck9uIDE3LjA0LjI0IDEwOjEyLCBCYWJpcyBDaGFsaW9zIHdyb3RlOgo+IEZyb206IFN1ZGFuIExh
+bmRnZSA8c3VkYW5sQGFtYXpvbi5jb20+Cj4KPiBSZWFycmFnZSB0aGUgZnVuY3Rpb25zIG9mIHZt
+Z2VuaWQgdG8gbWFrZSB0aGUgbmV4dCBjb21taXQsCj4gd2hpY2ggcmUtaW1wbGVtZW50cyB2bWdl
+bmlkIGFzIGEgcGxhdGZvcm0gZHJpdmVyLCBlYXNpZXIgdG8gcmV2aWV3Lgo+Cj4gU2lnbmVkLW9m
+Zi1ieTogU3VkYW4gTGFuZGdlIDxzdWRhbmxAYW1hem9uLmNvbT4KCgpZb3UgY2FuJ3Qgc2lnbiBv
+ZmYgb24gYmVoYWxmIG9mIHNvbWVvbmUgZWxzZS4gVGhlIFNvQiBoZXJlIG5lZWRzIHRvIGJlIAp5
+b3Vycy4gSWYgeW91IGFyZSB0YWtpbmcgb3ZlciB0aGlzIGNvZGUgZnJvbSBTdWRhbiwgSSdkIHN1
+Z2dlc3QgdG8gdGFrZSAKb3ZlciBmdWxsIG93bmVyc2hpcCBvZiBpdCBhbmQgcHV0IHlvdXIgb3du
+IG5hbWUgYXMgYXV0aG9yIGFuZCBTb0IgaW4gYWxsIApwYXRjaGVzLgoKCkFsZXgKCgoKCgpBbWF6
+b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBC
+ZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBX
+ZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIg
+MTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
