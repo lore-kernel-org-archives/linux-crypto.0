@@ -1,124 +1,175 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75393C68C;
-	Wed, 17 Apr 2024 06:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9662CCA3;
+	Wed, 17 Apr 2024 08:12:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713334670; cv=none; b=I1bP0w1/mZ5SxaxOExuI86vsdH/OTNA63+fIIrruijLgNgXu/4M9+f3zzYqd96BdfxzW3gJ07pTHoikdhl/i+DKcvzmEdkn5rMN+8vU+fJc3YbLmcBvttYdQXtFGOTIo9lY+UwLk3oKfClq0wsawJOu3Zs68LwxVCoCmTIChQfo=
+	t=1713341562; cv=none; b=EoQYyv0H4po+zhcIi4z3Odxe6Lamq0ahXpnHGANtgBk5pXYZgIaRP0SQcS0vfRyflRPEAeHzSkoDU8h1v5kgXqCQ3inyxbr4yIGB8gqj0oIhKG52A/1P78fd4aJqLiKxIhOiZ20cgxaTT1jUrgdOum7FPrCcq5E8NWYIqZ1gCCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713334670; c=relaxed/simple;
-	bh=w42aKlhS0gcP36dJaMyx5AB9fm5TuxlheUjjF+LgHsc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JEcL3ZvckghlP48UYyHaJiF8PuEAVe70dBTvF8EQ2HznXrxa1QrX6ZGDQdRj8/NeAMkIiG473SCRPE7gcmrObK0yz9xEYP+ATzdvxWB0xwLmKX6LMhbbL54Sh8OqKGo66KmT1jIbYPbUTRn57r4/qP1e1nCz9ZXUUz2qy1jC5+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sh5mrPfe; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1713341562; c=relaxed/simple;
+	bh=TL1gIawwcGjj+fPy5UFy9XOBf1UL1BdHywD1wbrW2co=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FfvWk2WOTpLbzFmiZ0ILNKhbgV/qKelnBR2nTO5I7lFUKutVy4RdyvaBfGsJA64wieC92wONKMmcto43Qy0C+nwIM37tw/JO1TgaqZM5ekGjDBxGe8+7KxxWT25S9cNo3TmzoVOQ7NYv2mAcKG1vaKYBrZym8qzspMSNgoioPu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.es header.i=@amazon.es header.b=GSWSpdsy; arc=none smtp.client-ip=99.78.197.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sh5mrPfe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713334669; x=1744870669;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=w42aKlhS0gcP36dJaMyx5AB9fm5TuxlheUjjF+LgHsc=;
-  b=Sh5mrPfeCWT32U7qkUmejNiFjdwdHvipftj3wZi+Rbro6WCDE9gXCiHy
-   4hbd8Yc+69zw7pmLOy+kS8Qfho5BvtFfVSYPIGTczfdR/YEPPnZIDY5cL
-   gjFQIrd65Os/Q6AsAFStbOFnvqQvkxU9pUhVrdquUzbd39L3ENrkS8I3y
-   H/cnL1xvkNFQJLmGR7Lor8A/h9DFXMlwpvGa4qIWTf4QiRlx3KQ8kmzQL
-   C/IA8kqLzAGPLzLSmfYxvfyQjta+e5SXMnCWy+1k1RKy3wyXd+KDfioh8
-   GCnPz4FwMGbpGitQ2L5BIyX61RmjdLO9nv0NhAQf4a7rOM9XN57tz4KyD
-   g==;
-X-CSE-ConnectionGUID: sdX4RHwQQCK3iuVmSoDe+w==
-X-CSE-MsgGUID: 1Obv11YjR4iDWQ/Yc0ul/Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="11750873"
-X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
-   d="scan'208";a="11750873"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 23:17:48 -0700
-X-CSE-ConnectionGUID: imgM1LG1QZyQQQFDxbqDqA==
-X-CSE-MsgGUID: VdZm10H+T8Ok8H03lXuMzQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
-   d="scan'208";a="23109144"
-Received: from unknown (HELO 23c141fc0fd8) ([10.239.97.151])
-  by orviesa008.jf.intel.com with ESMTP; 16 Apr 2024 23:17:44 -0700
-Received: from kbuild by 23c141fc0fd8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rwyc2-0006Cc-1J;
-	Wed, 17 Apr 2024 06:17:42 +0000
-Date: Wed, 17 Apr 2024 14:17:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vadim Fedorenko <vadfed@meta.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v9 1/4] bpf: make common crypto API for TC/XDP
- programs
-Message-ID: <202404171409.EgchVGya-lkp@intel.com>
-References: <20240416204004.3942393-2-vadfed@meta.com>
+	dkim=pass (1024-bit key) header.d=amazon.es header.i=@amazon.es header.b="GSWSpdsy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazon201209;
+  t=1713341561; x=1744877561;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6SxiHx8a5DXwvXvSFDNG3T7mADrBgfszdDHq5DFmCRo=;
+  b=GSWSpdsypMVelHKfZ0ssHyOJ99nxW2DdXW4HKZWhVb56lN8kVHi2D3Lr
+   eVKCvPc92/LgXVbxwqpn6EgarMQ87y11tGotVCdgVjxmw3nfP9WLqoEkS
+   NdauE3EQ+eaMguBExmP+wDPbGRq/NoYg0VPAx+Rs8rDySWkl6cJwa3wo+
+   I=;
+X-IronPort-AV: E=Sophos;i="6.07,208,1708387200"; 
+   d="scan'208";a="288360830"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 08:12:38 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:20743]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.19.90:2525] with esmtp (Farcaster)
+ id 7be20b50-ca6a-4cc7-b7f2-095af34a8d5c; Wed, 17 Apr 2024 08:12:36 +0000 (UTC)
+X-Farcaster-Flow-ID: 7be20b50-ca6a-4cc7-b7f2-095af34a8d5c
+Received: from EX19D037EUB003.ant.amazon.com (10.252.61.119) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 17 Apr 2024 08:12:36 +0000
+Received: from f4d4887fdcfb.ant.amazon.com (10.1.212.48) by
+ EX19D037EUB003.ant.amazon.com (10.252.61.119) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 17 Apr 2024 08:12:30 +0000
+From: Babis Chalios <bchalios@amazon.es>
+To: <tytso@mit.edu>, <Jason@zx2c4.com>, <olivia@selenic.com>,
+	<herbert@gondor.apana.org.au>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+	<conor+dt@kernel.org>, <linux-crypto@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sudanl@amazon.com>, <bchalios@amazon.es>, <graf@amazon.de>,
+	<xmarcalx@amazon.co.uk>, <dwmw@amazon.co.uk>
+Subject: [PATCH v5 0/5] virt: vmgenid: Add devicetree bindings support
+Date: Wed, 17 Apr 2024 10:12:07 +0200
+Message-ID: <20240417081212.99657-1-bchalios@amazon.es>
+X-Mailer: git-send-email 2.39.3 (Apple Git-145)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240416204004.3942393-2-vadfed@meta.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWA003.ant.amazon.com (10.13.139.18) To
+ EX19D037EUB003.ant.amazon.com (10.252.61.119)
 
-Hi Vadim,
+This small series of patches aims to add devicetree bindings support for
+the Virtual Machine Generation ID (vmgenid).
 
-kernel test robot noticed the following build warnings:
+Virtual Machine Generation ID was introduced in commit af6b54e2b5ba
+("virt: vmgenid: notify RNG of VM fork and supply generation ID") as an
+ACPI only device.
 
-[auto build test WARNING on bpf-next/master]
+VMGenID specification http://go.microsoft.com/fwlink/?LinkId=260709 defines
+a mechanism for the BIOS/hypervisors to communicate to the virtual machine
+that it is executed with a different configuration (e.g. snapshot execution
+or creation from a template).
+The guest operating system can use the notification for various purposes
+such as re-initializing its random number generator etc.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/bpf-make-common-crypto-API-for-TC-XDP-programs/20240417-044349
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20240416204004.3942393-2-vadfed%40meta.com
-patch subject: [PATCH bpf-next v9 1/4] bpf: make common crypto API for TC/XDP programs
-config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20240417/202404171409.EgchVGya-lkp@intel.com/config)
-compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240417/202404171409.EgchVGya-lkp@intel.com/reproduce)
+More references to vmgenid specs:
+ - https://www.qemu.org/docs/master/specs/vmgenid.html
+ - https://learn.microsoft.com/en-us/windows/win32/hyperv_v2/
+ virtual-machine-generation-identifier
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404171409.EgchVGya-lkp@intel.com/
+*Reason for this change*:
+Chosing ACPI or devicetree is an intrinsic part of an hypervisor design.
+Without going into details of why a hypervisor would choose DT over ACPI,
+we would like to highlight that the hypervisors that have chosen devicetree
+and now want to make use of the vmgenid functionality cannot do so today
+because vmgenid is an ACPI only device.
+This forces these hypervisors to change their design which could have
+undesirable impacts on their use-cases, test-scenarios etc.
 
-All warnings (new ones prefixed by >>):
+vmgenid exposes to the guest a 16-byte cryptographically random number,
+the value of which changes every time it starts executing from a new
+configuration (snapshot, backup, etc.). During initialization, the device
+exposes to the guest the address of the generation ID and
+an interrupt number, which the device will use to notify the guest when
+the generation ID changes.
+These attributes can be trivially communicated via device tree bindings.
 
->> kernel/bpf/crypto.c:53: warning: Function parameter or struct member 'siv_len' not described in 'bpf_crypto_ctx'
+We believe that adding a devicetree binding for vmgenid is a simpler
+alternative way to expose the device to the guest than forcing the
+hypervisors to implement ACPI.
 
+Addtional notes:
+While adding the devicetree support we considered re-using existing
+structures/code to avoid duplicating code and reduce maintenance; so,
+we used the same driver to be configured either by ACPI or by DT.
+This also meant reimplementing the existing vmgenid ACPI bus driver as a
+platform driver and making it discoverable using `driver.of_match_table`
+and `driver.acpi_match_table`.
 
-vim +53 kernel/bpf/crypto.c
+There is no user impact or change in vmgenid functionality when used
+with ACPI. We verified ACPI support of these patches on X86 and DT
+support on ARM using Firecracker hypervisor
+https://github.com/firecracker-microvm/firecracker.
 
-    37	
-    38	/**
-    39	 * struct bpf_crypto_ctx - refcounted BPF crypto context structure
-    40	 * @type:	The pointer to bpf crypto type
-    41	 * @tfm:	The pointer to instance of crypto API struct.
-    42	 * @rcu:	The RCU head used to free the crypto context with RCU safety.
-    43	 * @usage:	Object reference counter. When the refcount goes to 0, the
-    44	 *		memory is released back to the BPF allocator, which provides
-    45	 *		RCU safety.
-    46	 */
-    47	struct bpf_crypto_ctx {
-    48		const struct bpf_crypto_type *type;
-    49		void *tfm;
-    50		u32 siv_len;
-    51		struct rcu_head rcu;
-    52		refcount_t usage;
-  > 53	};
-    54	
+To check schema and syntax errors, the bindings file is verified with:
+```
+  make dt_binding_check \
+  DT_SCHEMA_FILES=\
+  Documentation/devicetree/bindings/rng/microsoft,vmgenid.yaml
+```
+and the patches were verified with:
+`scripts/checkpatch.pl --strict v5-000*`.
+
+Changelog with respect to version 4:
+- Removed __maybe_unused attribute from vmgenid_of_irq_handler since it
+  is always compiled in (used by vmgenid_add_of).
+
+Changelog with respect to version 3:
+- Changed the compatible string from "virtual,vmgenctr" to
+  "microsoft,vmgenid" as per review comments.
+- Renamed vmgenid.yaml to follow DT file naming convention.
+- Updated the description of properties and example in vmgenid yaml file.
+- Addressed the review comments to remove all ifdefs in vmgenid.c with one
+  exception which still needs to be under CONFIG_ACPI.
+- reformated the code with clang-format.
+- Tested code with W=1, Sparse, Smatch and Coccinelle tools.
+
+Changelog with respect to version 2:
+- As per review comments, used platform apis instead of "of_*" APIs,
+  removed unnecessary #include and used IF_ENABLED instead of ifdef.
+- Added more info for vmgenid buffer address and corrected the formatting.
+- Replaced the compatible string from "linux,*" to "virtual,*" because,
+  the device does not have a vendor.
+
+Changelog with respect to version 1:
+- Moved vmgenid.yaml bindings to the more related "rng" folder.
+- Removed `vmgenid_remove` to since it is unrelated to the
+  current goal of the patch.
+- Updated the cover letter and bindings commit
+  "[PATCH v2 3/4] dt-bindings: rng: Add vmgenid support" to
+  provide more information on vmgenid.
+- Compiled with and without CONFIG_OF/CONFIG_ACPI and fixed
+  compilers errors/warnings.
+
+Sudan Landge (5):
+  virt: vmgenid: rearrange code to make review easier
+  virt: vmgenid: change implementation to use a platform driver
+  virt: vmgenid: enable driver regardless of ACPI config
+  dt-bindings: rng: Add vmgenid support
+  virt: vmgenid: add support for devicetree bindings
+
+ .../bindings/rng/microsoft,vmgenid.yaml       |  49 +++++
+ MAINTAINERS                                   |   1 +
+ drivers/virt/Kconfig                          |   1 -
+ drivers/virt/vmgenid.c                        | 168 ++++++++++++++----
+ 4 files changed, 180 insertions(+), 39 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/rng/microsoft,vmgenid.yaml
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.40.1
+
