@@ -1,162 +1,169 @@
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2063.outbound.protection.outlook.com [40.107.102.63])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600BB3D62;
-	Thu, 18 Apr 2024 20:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713470604; cv=fail; b=Rxi6X+rygzlCsrfUNo3wAU0xA14QHfdINxomZi+cFlo7je292hFXs4KNbCPf3KxmHjYRjDq8n+kVkBGFTqPpGiFDyjdbMxMZ/9fZk/yQnMqjFAz8ZIuKiccFpSFHZI7XJmaYJzsTL/e+QhGuY6tJrEg6+/Ya/sNsd/YW0UaEBJ0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713470604; c=relaxed/simple;
-	bh=052H+aW9suF3VfJSnAm85r92IAzTRYyjmGREvPhhEJM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PpUnxJLxjya3RoYhJK+cOncpZJjx7d0WG70/XHqVO4IVBDzctseGlH/djTqxIquD8ccB79a24LmC1XGslWJCOn703T/8GekzfDuLRIqTgB/EN6vNuZDobgoxHcc0ieb9NVBCmeAevEIM88z+qBE38Q1H8QgUF+CYPfXfcaY5Dw4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gdHx1lqI; arc=fail smtp.client-ip=40.107.102.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F1136AFB
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Apr 2024 22:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713480883; cv=none; b=aSt83lnaHkgj8dBWfRmW6DW5UZZDyEHIsXgVbq680stHUfHFiNnAzFZ+7Xgm/kfxbbkEK2C88I7TfoQDE2WxOGO+Spr59143pjmI7ex/2fbuyGg6ec2VrylB8NU9awjfJWNz9LJg5IOKYGCbBOsY8W8Avd5N3WT/7FZXVNqELTI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713480883; c=relaxed/simple;
+	bh=YhdtaVfh4088buH+XZg/IkImHaxqcTSecceCrXaDNTA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s0xhgco3kA4PazKsX5jEInPRuZWeHU21yFOMm+Hj/Nzsh7LQMjK7ja0JJworCj1RInEME9V9PFOR0T0WmvUctvj5TbeyE1paDwekCEpo1QEjwG/RpvP7dV+993RgEM9YTelXss8Cv3m7Xca+WmvCLsUJHpAnTcaXpj2S/kZrd08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WD/or5iL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gdHx1lqI"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AGhP7uiwuD8meaSLEgq6eNWYi5WcHZWypPagBUFVSB6RoU4F8MDVMjU/LqaBcTkfsyhjGIZ/U9Yb2ph9tpIH1ooYxXbS4XEq0Om1QvXpoW3+NRxW3klq2fHpzJzhxx8OJGY0p4TeFAQdGfBz9sutQ2KoZPB9T/DUS12t8qOvp5vNXwqTSO+m5JlCfHAP/UcT9TD2KDNqQckfPBhFL7vMR9+PhDTAIjz4/278HnfCNybIcN3tQo7VZVkS5eu4vGryX1HjPQ9tU/f+4bRWmJ4scOTRXQQWvd1dTzz0rOo31ZRE+QkLx4QmmmUDaH5VU5DSJsJg4ZTakG/5R44EoGzSOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mWUZwqBM7GZGVd9g4qAU12o35H4l74rP3aHiyiVwwp0=;
- b=Qblz3eH4nNts/lZFkkD2NsrPGjD6zbYXMfHW63tVzAK1S4Kh5APnXj5YLfA2mxSpFbrQmC6IRtiBV6+DxJvnhBFF58/Wr0YFzRWVEKnfgxkvL+wjJ2WLJU0z+NahOYQLEm9IddyO4Y+EFIfe7OhxOYc7oPaTxQypr+cysdQCghrC0feEmCTEH0g7SshmOpoEf9cdyluh6x5DR5FMjE//mrCVsAygkeVP+ERqIjk+8rgV7nxvUjekbt0qKHZN512arkYPlOt6jsxiDoDLqITkaeUKiB9Ah5rEXoeC3gxj8dzvL6x4GnsKgKFcI88GfhNfZRbVnL7eS7q0l4kNE0Tt5g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mWUZwqBM7GZGVd9g4qAU12o35H4l74rP3aHiyiVwwp0=;
- b=gdHx1lqIxigYH474PYgDlI2vDqyZ4z+EKe7BFPoKPEKX5X2nrr1bvqNNKXE74hH/uJjeWkeFgoTpxDrjrvMrWiEI7F/kK7/uC7DvCKkS0P0JSAUyb27a0XMCS21mMqnDeCMy0KBuPj3JXOE8XsrTa56QqlmYFi+gPIxZcfEj9Es=
-Received: from MN2PR18CA0001.namprd18.prod.outlook.com (2603:10b6:208:23c::6)
- by DM4PR12MB8521.namprd12.prod.outlook.com (2603:10b6:8:17e::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Thu, 18 Apr
- 2024 20:03:15 +0000
-Received: from MN1PEPF0000ECDB.namprd02.prod.outlook.com
- (2603:10b6:208:23c:cafe::19) by MN2PR18CA0001.outlook.office365.com
- (2603:10b6:208:23c::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.26 via Frontend
- Transport; Thu, 18 Apr 2024 20:03:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MN1PEPF0000ECDB.mail.protection.outlook.com (10.167.242.139) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7452.22 via Frontend Transport; Thu, 18 Apr 2024 20:03:15 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 18 Apr
- 2024 15:03:14 -0500
-Date: Thu, 18 Apr 2024 14:57:54 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <seanjc@google.com>, <vkuznets@redhat.com>,
-	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
-	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
-	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
-	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: Re: [PATCH v12 22/29] KVM: SEV: Implement gmem hook for invalidating
- private pages
-Message-ID: <20240418195754.h6gl5qd62kas7crx@amd.com>
-References: <20240329225835.400662-1-michael.roth@amd.com>
- <20240329225835.400662-23-michael.roth@amd.com>
- <f1e5aef5-989c-4f07-82af-9ed54cc192be@redhat.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WD/or5iL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713480879;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0Qa3hR1GgJrmWTXgAvlGxLrVho0/A5qeW+iYF0awOyc=;
+	b=WD/or5iLokdv12x7J6kufpcpOgNr6YTZ2zDrCIa2R+8h5YOOsb9EelWHmxY4ZoXPKNw4p3
+	H9ixZTGXGTiXg442oLNKNOO0bI2f9MILVRlRjLDlWxaYEPXYpX0v05Z3G18yK9gPAeWqaQ
+	kPv0O+/uJVX1XZOPey5s3hjGh9WmTrg=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-340-dFx9QauGP-CsWgtKE4JQEg-1; Thu, 18 Apr 2024 18:54:37 -0400
+X-MC-Unique: dFx9QauGP-CsWgtKE4JQEg-1
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-36a1e4a5017so17178075ab.0
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Apr 2024 15:54:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713480877; x=1714085677;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0Qa3hR1GgJrmWTXgAvlGxLrVho0/A5qeW+iYF0awOyc=;
+        b=G9IMh+KPK+AVgXqUi3R44Q0UlZ53AknJKhJmZLde7Vl9qfgSUA4BBaT9F1qvgMsWZe
+         wucQYT1xZ/lmXRqbIR23PGdqzT0C59jGqLB3RG11M3PNo0VGDQ8LVAA7lv5P3sbJitT9
+         RWsNorp+N3KZKiaBhJR3u496WocvzCMFjJQ17XMSFJg1wpBk/uGcqz5BL/nwlrUkM9U5
+         SViIJ0Jcksdsdw+rSzkiStSh5xqhG9WJB/Pt2F+6B3C+uKzQMO1cyhRgaHpjnGmNdRsD
+         Tb34KrWRXorU52BROb1lJRgsUP4f/6oP3vimspvxrWMWEgrV/8c83+HO3lE32oYUdKtn
+         KE3A==
+X-Forwarded-Encrypted: i=1; AJvYcCUkTXzZ9rt/ewgpLwtpWwxVV2eM9YwpCs6bmDyCeAgm+mVGF9Uqp7JJ73o0KX4WHmdDCDbRwTzYm2Eq4vRVc3RnWRFGQhZyJeSvuPmD
+X-Gm-Message-State: AOJu0YwifTQcDd+UUBfWztg/6iphHfh374mIYhd9oxufkX0mz7Hgm/6V
+	AQp4KRFSg/Jjqe/+4ZhDoum75Q1DYljp0Jj+vbCgOUB/J36mT9i2HalALu1qQVAz5/H/MGDTCtw
+	5EerUcfvJvcCIlhOb+IcWT3jYk9LiWowZJKyZBrg+PpFe0zhXfqBUFJECz21ABQ==
+X-Received: by 2002:a05:6e02:1688:b0:36b:36b:1115 with SMTP id f8-20020a056e02168800b0036b036b1115mr5408040ila.1.1713480877178;
+        Thu, 18 Apr 2024 15:54:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IElkIPKIuNl9ph1Phq9PzvzzBElJf7MnvsKrZ/DLV6aq5UhFYH+VCNTGKZAYpXsg0QJpGLyAg==
+X-Received: by 2002:a05:6e02:1688:b0:36b:36b:1115 with SMTP id f8-20020a056e02168800b0036b036b1115mr5408028ila.1.1713480876877;
+        Thu, 18 Apr 2024 15:54:36 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id i3-20020a05663813c300b00482f19f6d4csm650381jaj.110.2024.04.18.15.54.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 15:54:36 -0700 (PDT)
+Date: Thu, 18 Apr 2024 16:54:34 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Xin Zeng <xin.zeng@intel.com>
+Cc: herbert@gondor.apana.org.au, jgg@nvidia.com, yishaih@nvidia.com,
+ shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+ linux-crypto@vger.kernel.org, kvm@vger.kernel.org, qat-linux@intel.com,
+ Yahui Cao <yahui.cao@intel.com>
+Subject: Re: [PATCH v6 1/1] vfio/qat: Add vfio_pci driver for Intel QAT
+ SR-IOV VF devices
+Message-ID: <20240418165434.1da52cf0.alex.williamson@redhat.com>
+In-Reply-To: <20240417143141.1909824-2-xin.zeng@intel.com>
+References: <20240417143141.1909824-1-xin.zeng@intel.com>
+	<20240417143141.1909824-2-xin.zeng@intel.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <f1e5aef5-989c-4f07-82af-9ed54cc192be@redhat.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECDB:EE_|DM4PR12MB8521:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4012ab85-c981-4eab-f4e6-08dc5fe295a2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	YzpMOCb/tgZpKgq6eE8r5BNSDeWJt2o4Yg9Smzth5/FJTwpiH9MUp6rj2xRIpTur8IaHEL2t8TNyNtzefBdWy2GEiHzQrrRn4Ealkm2QYHQZaLwn75B1UmfArVMkQPSe2JwgUmYf5+DefztPZcBJy9i9kWRfZad+oKrN4IxwwrX0Q/6rmEwtVMBr58tx6lJrVX9qVXcXWifnfG4mD5obuq9/UpA3kvecnVVp6nPkVSnDGqeqeM1R0FlVj4Mw/JpNdVVy9cqp2mwn59jGGrhIGcAIkStv+4Z7qxXVIxUz0PqcEOnpAO5hSQUA5SgBlDPNNqEly5phg21cyF7JCP+VFoQ+8sgAIKm60VGDXi7tfxUBbrPmdM/VrZYSwaHftz9FuhcQiNEEWb48XpSU4wmU++xVIOGVxDLRm2ZBNrSuw9U0qbZlPo1iljG2IK78NasMFznlpoMI1uE8GqDxpO9mzi5iHWtuDCdP/gGC6r2BAxbmm/wjwBNz3jTHgHhMNHzF90Tln9RnatyEwVCev+X0bA+ZXTViPS1FdY1hLS6X8amjSs4SJ5J41WQA6D4EpeF+9tUKYfYkOsz/ICI+8dEjFVqsgRqHZQSqQwv91E6O3ZOqa47pQzMnp5790v1mHdPj3SIyq7Gso/nE30kX6UPNFvACqv2lsGxNh8Q9JtULXFkrmSg1g4QHqYgX2TBRW7DFMQSj/oGcM1aY9QLJGK97fg==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(82310400014)(376005)(7416005)(36860700004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 20:03:15.5937
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4012ab85-c981-4eab-f4e6-08dc5fe295a2
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECDB.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8521
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Mar 30, 2024 at 10:31:47PM +0100, Paolo Bonzini wrote:
-> On 3/29/24 23:58, Michael Roth wrote:
-> > +		/*
-> > +		 * If an unaligned PFN corresponds to a 2M region assigned as a
-> > +		 * large page in he RMP table, PSMASH the region into individual
-> > +		 * 4K RMP entries before attempting to convert a 4K sub-page.
-> > +		 */
-> > +		if (!use_2m_update && rmp_level > PG_LEVEL_4K) {
-> > +			rc = snp_rmptable_psmash(pfn);
-> > +			if (rc)
-> > +				pr_err_ratelimited("SEV: Failed to PSMASH RMP entry for PFN 0x%llx error %d\n",
-> > +						   pfn, rc);
-> > +		}
-> 
-> Ignoring the PSMASH failure is pretty scary...  At this point .free_folio
-> cannot fail, should the psmash part of this patch be done in
-> kvm_gmem_invalidate_begin() before kvm_mmu_unmap_gfn_range()?
-> 
-> Also, can you get PSMASH_FAIL_INUSE and if so what's the best way to address
-> it?  Should fallocate() return -EBUSY?
+On Wed, 17 Apr 2024 22:31:41 +0800
+Xin Zeng <xin.zeng@intel.com> wrote:
 
-FAIL_INUSE shouldn't occur since at this point the pages have been unmapped
-from NPT and only the task doing the cleanup should be attempting to
-access/PSMASH this particular 2M HPA range at this point.
+> Add vfio pci variant driver for Intel QAT SR-IOV VF devices. This driver
+> registers to the vfio subsystem through the interfaces exposed by the
+> susbsystem. It follows the live migration protocol v2 defined in
+> uapi/linux/vfio.h and interacts with Intel QAT PF driver through a set
+> of interfaces defined in qat/qat_mig_dev.h to support live migration of
+> Intel QAT VF devices.
 
-However, since FAIL_INUSE is transient, there isn't a good reason why we
-shouldn't retry until it clears itself up rather than risk hosing the
-system if some unexpected case ever did pop up, so I've updated
-snp_rmptable_psmash() to handle that case automatically and simplify the
-handling in sev_handle_rmp_fault() as well. (in the case of #NPF RMP
-faults there is actually potential for PSMASH errors other than
-FAIL_INUSE due to races with other vCPU threads which can interleave and
-put the RMP entry in an unexpected state, so there's additional
-handling/reporting to deal with those cases, but here they are not expected
-and will trigger WARN_*ONCE()'s now)
+=46rom here down could actually just be a comment towards the top of the
+driver.
 
-I used this hacked up version of Sean's original patch to re-enable 2MB
-hugepage support in gmem for the purposes of re-testing this:
+> The migration data of each Intel QAT GEN4 VF device is encapsulated into
+> a 4096 bytes block. The data consists of two parts.
+>=20
+> The first is a pre-configured set of attributes of the VF being migrated,
+> which are only set when it is created. This can be migrated during pre-co=
+py
+> stage and used for a device compatibility check.
+>=20
+> The second is the VF state. This includes the required MMIO regions and
+> the shadow states maintained by the QAT PF driver. This part can only be
+> saved when the VF is fully quiesced and be migrated during stop-copy stag=
+e.
+>=20
+> Both these 2 parts of data are saved in hierarchical structures including
+> a preamble section and several raw state sections.
+>=20
+> When the pre-configured part of the migration data is fully retrieved from
+> user space, the preamble section are used to validate the correctness of
+> the data blocks and check the version compatibility. The raw state
+> sections are then used to do a device compatibility check.
+>=20
+> When the device transits from RESUMING state, the VF states are extracted
+> from the raw state sections of the VF state part of the migration data and
+> then loaded into the device.
+>=20
+> This version only covers migration for Intel QAT GEN4 VF devices.
+>=20
+> Co-developed-by: Yahui Cao <yahui.cao@intel.com>
+> Signed-off-by: Yahui Cao <yahui.cao@intel.com>
+> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> ---
+>  MAINTAINERS                   |   8 +
+>  drivers/vfio/pci/Kconfig      |   2 +
+>  drivers/vfio/pci/Makefile     |   2 +
+>  drivers/vfio/pci/qat/Kconfig  |  12 +
+>  drivers/vfio/pci/qat/Makefile |   3 +
+>  drivers/vfio/pci/qat/main.c   | 679 ++++++++++++++++++++++++++++++++++
+>  6 files changed, 706 insertions(+)
+>  create mode 100644 drivers/vfio/pci/qat/Kconfig
+>  create mode 100644 drivers/vfio/pci/qat/Makefile
+>  create mode 100644 drivers/vfio/pci/qat/main.c
+...
+> +static struct file *qat_vf_pci_step_device_state(struct qat_vf_core_devi=
+ce *qat_vdev, u32 new)
+> +{
+> +	u32 cur =3D qat_vdev->mig_state;
+> +	int ret;
+> +
+> +	/*
+> +	 * As the device is not capable of just stopping P2P DMAs, suspend the
+> +	 * device completely once any of the P2P states are reached.
+> +	 * On the opposite direction, resume the device after transiting from
+> +	 * the P2P state.
+> +	 */
+> +	if ((cur =3D=3D VFIO_DEVICE_STATE_RUNNING && new =3D=3D VFIO_DEVICE_STA=
+TE_RUNNING_P2P) ||
+> +	    (cur =3D=3D VFIO_DEVICE_STATE_PRE_COPY && new =3D=3D VFIO_DEVICE_ST=
+ATE_PRE_COPY_P2P)) {
+> +		ret =3D qat_vfmig_suspend(qat_vdev->mdev);
+> +		if (ret)
+> +			return ERR_PTR(ret);
+> +		return NULL;
+> +	}
 
-  https://github.com/mdroth/linux/commit/15aa4f81811485997953130fc184e829ba4399d2
+This doesn't appear to be a valid way to support P2P, the P2P states
+are defined as running states.  The guest driver may legitimately
+access and modify the device state during P2P states.  Should this
+device be advertising support for P2P?  Thanks,
 
--Mike
+Alex
 
-> 
-> Thanks,
-> 
-> Paolo
-> 
-> 
