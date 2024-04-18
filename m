@@ -1,147 +1,127 @@
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2059.outbound.protection.outlook.com [40.107.22.59])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993A715E5C2;
-	Thu, 18 Apr 2024 14:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713452035; cv=fail; b=UczWxaWVLwa5ALSDKROAJUkLmfbbQeudoXnmNjR9ebReu4ntbTTcAOsSdLl2/sLna7uFISBQ3G6B2ql7oWr1Q1GzNqVRVZJbfDwzK+kgrQgPb4TM+JYGNbJKKIFUA6TOXnzVIlF6tX3JmUTcCnbrQF+q4+j1TK11cq/ok54PAQ8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713452035; c=relaxed/simple;
-	bh=uSVsl+sL6NEcnkoBPV8Nl+2/RFqNRqKZJlPijrZLR4w=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cUnLOhG7UcnqgO/XAhKU+o8IbeRkX6gmECjp79PNhZF/9Y7yfQhh0KQgLr0DuUsDP+zytbJaDeG7RfihwLG38vIouGqKY+Igo9eB/xNEMkjY6fRwgjANQ91FmZylDDPa5mGBrb6vHHmB0VgJLTQNTmVFlfofNQSLchVZDp+62Xw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=ZdRnTmnO; arc=fail smtp.client-ip=40.107.22.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B018161935;
+	Thu, 18 Apr 2024 15:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713453907; cv=none; b=QeYd4u4meRaqkeb+S/xR1RF6pZ3DXi0kpMHHgSd/F4AFI/7qDGhV5BAdikBuDIWYMEip5jNfWeitZD4OgCmYcllbzwHFOLXdXP1Bh24A2fD2NpeYFSt/FgdqQ97pL9u7oiMXlD/LwhhtIE8ZhGNsvrQiabtdNf9mKJns/BsIVKs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713453907; c=relaxed/simple;
+	bh=wWjAJ4S4d5MkuoDto+B9EKc+OQaYQW91f7+3yJ8CSGc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hBALLCfHrJmSpWb1fvJyHDUNrfwULbh+pHt3uBh+q0a4Xx8uAbhGkd2HIfR9L+tyvdMyrLbL0WV8gmfktOdY80/cPLFDB+1vBsEP25sv2UECb8Y/QE86FKPP2PBTkjAWuGEq+qaS0eIeEsG+5yKcsZDmTsqMm0DoJp23c6KYyTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Y9XGMIJd; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="ZdRnTmnO"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gHEcp67tuOtY/I3lssRiE5/OhznpcRyZP/s/Upw9h5SbigJ7XdYl/ejZ2yUGifX+GKC7zVqoYk3KoNayokW2HbQbNAEA9r3onBgT1QR5GHT/F2LpGX62PpGwAtEa8nw4UEB5WuL/FewEUPs+vJNIv2h9ZsdfXC1N5A4XHDKg2nVzza7QXH59DxxBZbhxfGDL4+s9bbL/HwdlHH+nqgqeIv0F3WDJV9nioMNWIDKN4cHE2cencu29GVcvDby+LKiN3gDW0YENbtrWnv59tT1lMGbiXSMNfJRqkYqXMvvl5xILXicWeOKTMbrraRhXIwPPz6gdh41OvUIIqXvyNcmyew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uSVsl+sL6NEcnkoBPV8Nl+2/RFqNRqKZJlPijrZLR4w=;
- b=kyxMD5uD9njcCCtUR//r7epu4b0g8JTUEF79WaLSzKaXtUAvvWxOW2zbeCuS+68uIiF7lD+lX4W5+uq7gyZec1zPnx0X6nh+xBuVnXsuTk9ehjI0bnQDg6DpYJJKWqW3/DBcGtEivqs4XMuUqntccVuF8ML9AOBMyufffhYEhHTACaojnu6FZg4uVL2Authh5lQK45DhcQ9J2vlUaf+bW7pY9oRZjJIEXWKI543W7cDvREz0U9pgtfAM9VtndhNLQcdu01gWcKpc5HYBg+WLwTPChNVXBUqbd4WuWyd1c+eTCJ4GryPcd9eNwtlVJJuln/9zyBaOdbfkeNO18ZUsOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uSVsl+sL6NEcnkoBPV8Nl+2/RFqNRqKZJlPijrZLR4w=;
- b=ZdRnTmnO/hLQiUAeA9psqCEan3VS9iuFUTfOVpU5fMrI9E21cM3jMzwwT7ZH4MnBQo72839KDTplj3yq/b0Q425YHIeGZFaqF547EKf4Vj3MBcjC2RPrx3dgJGk410V9QSJ/e3I7Jomzlc2bud6kl4CBJSRfjeTHb9tdD4Twqzc=
-Received: from PA4PR04MB9709.eurprd04.prod.outlook.com (2603:10a6:102:26b::10)
- by DB9PR04MB9843.eurprd04.prod.outlook.com (2603:10a6:10:4c1::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.39; Thu, 18 Apr
- 2024 14:53:48 +0000
-Received: from PA4PR04MB9709.eurprd04.prod.outlook.com
- ([fe80::ead1:809:aa83:c1e2]) by PA4PR04MB9709.eurprd04.prod.outlook.com
- ([fe80::ead1:809:aa83:c1e2%7]) with mapi id 15.20.7472.037; Thu, 18 Apr 2024
- 14:53:48 +0000
-From: Horia Geanta <horia.geanta@nxp.com>
-To: Pankaj Gupta <pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>,
-	Varun Sethi <V.Sethi@nxp.com>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
-	Iuliana Prodan <iuliana.prodan@nxp.com>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v3 2/2] drivers: crypto: caam: i.MX8ULP donot have CAAM
- page0 access
-Thread-Topic: [PATCH v3 2/2] drivers: crypto: caam: i.MX8ULP donot have CAAM
- page0 access
-Thread-Index: AQHaj7/lryOr574TskeWgxDoaaECkrFuIO6A
-Date: Thu, 18 Apr 2024 14:53:47 +0000
-Message-ID: <04756304-fc7c-4be1-b97a-dad12983994f@nxp.com>
-References: <20240416053303.421259-1-pankaj.gupta@nxp.com>
- <20240416053303.421259-3-pankaj.gupta@nxp.com>
-In-Reply-To: <20240416053303.421259-3-pankaj.gupta@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PA4PR04MB9709:EE_|DB9PR04MB9843:EE_
-x-ms-office365-filtering-correlation-id: 9f7e9420-5911-4686-94d9-08dc5fb75a68
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- A4OUkrgMMH2y2by9GCQRlEgvFEusPAQ4huXDMz2GvYktdgj2i6vKHTMd/fRE5iPbZpKUIqWDg5Pf9eugF6OEENfCI+lLF9aOBOJNN5y5TZtV2/w73Qakys5U+Kkq3blMjPNCKaLoPdHRaege2Io5I+/sfOka6pRHBNOE7AiM3eQvvWd0ODXboDNI0t/DUdFod/lDjE4Xeioos/yvINXdQmsvfB3bV7XTOJ3LKTq+4sR9KBGRb03Oo3T9UbEksmPLLOl/JFU5QLRoaOAuX5+Toec9E7evJtPJrNeIh/ILQqHjoHxgniKJewswZ/T/609DJlfswsYDvxMmWIi/0jhSQrFVeGGmRGx8LR90fsB1B4cunw/zjgPQWSqn+bBiw1uWVS6fNZs01WaA/Fc9Jg28pjq6KoLLhgaujGc/DYTRzdag5BHB3/E+3KkS++Mvc5If+puw7AO74LOeKDsDsq9Ji56LHpkrkY3Pp/S+MoeFHALiPcvkKaqnaAS5rBXFANSC+bpsNVOMRqBtCNw0JigUnXKTjV9nCllQ44wBr1rCza8ThGURQwn1kDztbKzCZr+OKeDVzg25RXsvFadEBmcJak5sDoF9Xkyxyfy3w/1vAg218sjKINpkEZa43t2VNOAd0E40IhA6gdpzJYJBJqcsHo9hN/18qIm8U7asAqnkhacHvG248GTzFQNypGFlF3V1PA6WzoNvewxl2WZtMH6WmQ==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB9709.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?MnVmNlhSeFYySHBVK20xdVFVY1VSSS8vSU1oODYycFZ0OFZIMmxiUXpQRjBE?=
- =?utf-8?B?ZnRvNjZqdnlCYnYrRlR2eUg3NnE4em1TNEFVNzM3Uy8rMHd2dlpySVFyVEFy?=
- =?utf-8?B?R20venJpYmkrRlhIblVjTzQ2dEN2eXNOR1I5UXpLQU1TUElRWkJ5L2tESEV1?=
- =?utf-8?B?VnMxdytNeFdxeTcwNXVOY2t5R0FhTndDdU9MQ3RPNWUrUFVHSU82aTRWWGEv?=
- =?utf-8?B?S2dpMm0wSU9oTktGT2t1dmQ2NG9VT1NXZUhxak51bVFBSlJtWElDQUZLNGhO?=
- =?utf-8?B?T1JGUzU0cmFKU0t1WmNxN3pwdUg3elpFNGlDUWFmeUdWZW1Bc0RnVGpMV3Ur?=
- =?utf-8?B?Q2NPNm1MQlZ2V0t2RW5INmpvQXRONTBHNTlmWDRXaXluSnZTZ09FeUxqUjEz?=
- =?utf-8?B?UitDcjVXL3B2QTFWODdwYWRvUXE4eEZ0em9BR09STGZpRGRMaXZSWmNXbnVC?=
- =?utf-8?B?cWpMdEJtYWkzUVdLRHNtQW9GT3NBVW5FRm1ZLzIzL3QrcXV0Sm1HOVFkRWMz?=
- =?utf-8?B?ZldzYzVIS08yRklwSUN1NnpHSE5Wa0hiWXRBT21zYzVad09LMFByVG9rTGVx?=
- =?utf-8?B?dWFoSE5UOUtqam5FemVlTFNqdDBvVG5TcFlsTlBCVWdqTlFMYTFmRmoxYkxa?=
- =?utf-8?B?SFZnTmF4T3FyTHVNUFpudzNIb0k5L2pHaFFaenBQeFNFamZ4Um9WaWZxZzBp?=
- =?utf-8?B?MkFjZ3NrVTI0WlZXbnpyT0pqQXJ0MEZETWJrU3RlYi9wS0lIYjhLenhGaU04?=
- =?utf-8?B?ZGVMZnJKY2FjM3d3dVl2WDdlcGJ4eUlBQ05GcVB4STZmMDJSSEtVNXdraGRv?=
- =?utf-8?B?ZjFKZFdSM095N2dWREg0bnd2N1NqaW13bVFDVnQ5WndoVDBkYzFOZjlXdHls?=
- =?utf-8?B?VytaSEhNVlRHcDRIK1YzN1lzOGdHblVpd1djbzN1bWJFMHBxWUpKaWo1QWxP?=
- =?utf-8?B?cXQrSjZLVkQ5bE4vdytXKzB2YjZhMWhPUHRhQUdSWmtmUDUzVENhKzM5R0pM?=
- =?utf-8?B?cUtGdTMrUm5oRFFTQ0hxbGNWS205RWRFcGN4Z2VLaTBDeGQ2SE9acURZaHBh?=
- =?utf-8?B?alBKQUl6Qis3czJ4UDhJNTNraHU2cEtOSWNDaUF3aEJSOGhDN25ZejZUcXl4?=
- =?utf-8?B?dE1KTGIrNFl3bkl5azZuOW9NY3FlaGV4dGxPSUh0Q2x6cUY4WThqRnlQcXFS?=
- =?utf-8?B?L0NiL0oxeW1DclhOZ0QrM1dxNmh3QUgzamVKTlNNcDgvTTkvR21rNWRkZ3JN?=
- =?utf-8?B?U2VOVC9KV01BeFMvcVE0aG5OTVFacXpsUTdIaWZ5M0s2UitCN2w4NE9ZTGVt?=
- =?utf-8?B?Z0J3Z00yREhycnAvRDNPQVBaMnJqclI4ZGRBc0ZIZ1A2WnMvakFqcGNJcll6?=
- =?utf-8?B?OVkyZWs3YjJvd0xxZ2x4SkZlaUhYdTRTUGJaQXozaDZwZHBuUXBOb095eXc5?=
- =?utf-8?B?eWhjZEdraW5XZGZuODhEWFNZM3Z1U1AzaHR3K1ZIVTYvUzhXajNJZGk3Mm5X?=
- =?utf-8?B?QjB5ZG9jUTY1QmNrMTN6SVBBWUxGVFpCdGw3bzh2RDc2TVdTMWZZMkJmVUQv?=
- =?utf-8?B?WVhQTFVLdHU1NlEwRGdtUVVGTkFqOUp0eGxMaEE2d0ZQdE9EY1hseGlBWFZO?=
- =?utf-8?B?eUo1WXpYb3duUDAyRzRNVG9RVEhvVFNJV0xrVW43ZEoxQVdxS2RCeDlCdjVu?=
- =?utf-8?B?Uy9yZVlUbGYvTjQ1SzkzaTJzQ1IrYzlnYUhkYWlqS1J1TWpENmVnRzcyTmxW?=
- =?utf-8?B?aWhnL1NrY1pDOEVGZllCWWZwS0dJMkxRZ2lPNWx4bDM4NWdNTVVGNEtlcXlE?=
- =?utf-8?B?SG9lOGQ1K0JvdUl2bS9aTkVrR2hDT3Q4dkZMaWV5Wk5kL2RzZmliM2tWaXox?=
- =?utf-8?B?SEs3U1JyVFZvaUhRZXhIeHA4ZXVVdmI4bmxWRzErSkhhR0picnpkMU1TeHJG?=
- =?utf-8?B?aTY5b2ltU2ZUY0ZTU1ptSWR4MWFRY01Qa0w2eXdBRnBQRUp0WkU1R3d4TDd2?=
- =?utf-8?B?YlJmSTQ1L3BXelVQa1VuK2RDMHIxUnlEZTIxU2dOUEpLbTlBbXN4SldXQW1K?=
- =?utf-8?B?cnFva1dBNDFJQXR5V0ZXUVFLNStpMlVRMDJrNWJrbXJiSXVsZHA5VFZCbDBx?=
- =?utf-8?B?ZzhEVXNVSklzRUtIejlCY3JZYXBvdTByd3JqdTdjTTJzRVZEMDY5NFpqdmtC?=
- =?utf-8?B?Ymc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A6567AF70E7D484B81576BD21859E7FA@eurprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Y9XGMIJd"
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43IFAlkY022338;
+	Thu, 18 Apr 2024 15:24:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=EE4+WRzBA2XlcVrOR4MaW+MheWrkZfAx+4CxF8kZI3A=;
+ b=Y9XGMIJdw8pIh26Kv5tuCG5YkbxarcHWr+2LYjBNLCz06YviWlHuLjldYCsfzeameyoF
+ D4EArf3/NCClB+W5ygjfDHW/T8PsIKfPHKcFROX74DNuUAkK2QGd5pBegfmuoXu+CUHH
+ S9PZDldF6j2dmts4WvuZZhH2SIo1LlH1ZgwAbr1eIMNNXH16co9P9u0H/5Dj0Fy81l/k
+ y9tUkpXQOTETLM8WUtseJMeZV2MgzEQ7Ovdr8IawaVU6GGPhpgNcsRP7nVal5XNI8rgo
+ pw7/wqpxQY4JTMHGsTw8Z8S+GRa+psxspPme+XMLRNxFj3P0FKoMHyPqQm38H62eR6I3 lQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xk5wyr1p6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 15:24:57 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43IFMIuI010880;
+	Thu, 18 Apr 2024 15:24:56 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xk5wyr1p4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 15:24:56 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43ID4UGj011110;
+	Thu, 18 Apr 2024 15:24:56 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xg732txwc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 15:24:56 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43IFOrKJ43778346
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 18 Apr 2024 15:24:55 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 376CB58070;
+	Thu, 18 Apr 2024 15:24:53 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4DFAE5805A;
+	Thu, 18 Apr 2024 15:24:52 +0000 (GMT)
+Received: from sbct-3.bos2.lab (unknown [9.47.158.153])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 18 Apr 2024 15:24:52 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.ibm.com>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, jarkko@kernel.org, ardb@kernel.org,
+        git@jvdsn.com, hkario@redhat.com, simo@redhat.com,
+        Stefan Berger <stefanb@linux.ibm.com>
+Subject: [PATCH v3 0/2] crypto: ecdh & ecc: Fix private key byte ordering issues
+Date: Thu, 18 Apr 2024 11:24:43 -0400
+Message-ID: <20240418152445.2773042-1-stefanb@linux.ibm.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB9709.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f7e9420-5911-4686-94d9-08dc5fb75a68
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Apr 2024 14:53:48.0184
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: aQQ/3bsa41pGjizF4SNNrL31sOYDqe3SS1lYL9/o9O9mM0ddOlNy293Td4XjKrOwQwrDKAiI8sdQv2BBgwLueQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9843
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: gsKcfQhTL37dpVpm05UACsqRAnOnmLVu
+X-Proofpoint-ORIG-GUID: EbGWLyzxZR7DDrbKBSd3Lct6H6lKL2IC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-18_13,2024-04-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ clxscore=1015 malwarescore=0 mlxscore=0 adultscore=0 lowpriorityscore=0
+ impostorscore=0 priorityscore=1501 phishscore=0 bulkscore=0
+ mlxlogscore=998 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404180109
 
-T24gNC8xNi8yMDI0IDg6MzUgQU0sIFBhbmthaiBHdXB0YSB3cm90ZToNCj4gaU1YOFVMUCBoYXZl
-IGEgc2VjdXJlLWVuY2xhdmUgaGFyZHdhcmUgSVAgY2FsbGVkIEVkZ2VMb2NrIEVuY2xhdmUoRUxF
-KSwNCj4gdGhhdCBjb250cm9sIGFjY2VzcyB0byBjYWFtIGNvbnRyb2xsZXIncyByZWdpc3RlciBw
-YWdlLCBpLmUuLCBwYWdlMC4NCj4gDQo+IEF0IGFsbCwgaWYgdGhlIEVMRSByZWxlYXNlIGFjY2Vz
-cyB0byBDQUFNIGNvbnRyb2xsZXIncyByZWdpc3RlciBwYWdlLA0KPiBpdCB3aWxsIHJlbGVhc2Ug
-dG8gc2VjdXJlLXdvcmxkIG9ubHkuDQo+IA0KPiBDbG9ja3MgYXJlIHR1cm5lZCBvbiBhdXRvbWF0
-aWNhbGx5IGZvciBpTVg4VUxQLiBUaGVyZSBleGlzdHMgdGhlIGNhYW0NCj4gY2xvY2sgZ2F0aW5n
-IGJpdCwgYnV0IGl0IGlzIG5vdCBhZHZpc2VkIHRvIGdhdGUgdGhlIGNsb2NrIGF0IGxpbnV4LCBh
-cw0KPiBvcHRlZS1vcyBvciBhbnkgb3RoZXIgZW50aXR5IG1pZ2h0IGJlIHVzaW5nIGl0Lg0KPiAN
-Cj4gU2lnbmVkLW9mZi1ieTogUGFua2FqIEd1cHRhIDxwYW5rYWouZ3VwdGFAbnhwLmNvbT4NClJl
-dmlld2VkLWJ5OiBIb3JpYSBHZWFudMSDIDxob3JpYS5nZWFudGFAbnhwLmNvbT4NCg0KVGhhbmtz
-LA0KSG9yaWENCg0K
+The 1st patch fixes a byte ordering issue where ctx->private_key is
+currently passed to ecc_is_key_valid but the key is in reverse byte order.
+To solve this issue it introduces the variable 'priv', that is already used
+throughout the ecc and ecdh code bases for a private key in proper byte
+order, and calls ecc_is_key_valid with 'priv'. Note that ecc_gen_privkey
+also calls __ecc_is_key_valid with 'priv' already.
+
+The 2nd patch gets rid of the 'priv' variable wherever it is used to hold
+a private key (byte-swapped initialized from ctx->private_key) in proper
+byte order and uses ctx->private_key directly that is now initialized in
+proper byte order.
+
+Regards,
+  Stefan
+
+v3:
+  - Added Jarkko's A-b tag
+  - Expanded on the description of changes to ecc_gen_privkey (2/2)
+
+v2:
+  - Added missing zeroizing of priv variable (1/2)
+  - Improved patch description (2/2)
+
+
+
+
+Stefan Berger (2):
+  crypto: ecdh - Pass private key in proper byte order to check valid
+    key
+  crypto: ecdh & ecc - Initialize ctx->private_key in proper byte order
+
+ crypto/ecc.c                  | 29 ++++++++++-------------------
+ crypto/ecdh.c                 |  9 ++++++---
+ include/crypto/internal/ecc.h |  3 ++-
+ 3 files changed, 18 insertions(+), 23 deletions(-)
+
+-- 
+2.43.0
+
