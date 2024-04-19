@@ -1,258 +1,101 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FCAC383;
-	Fri, 19 Apr 2024 00:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4605C8DE
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Apr 2024 05:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713484883; cv=none; b=nFrcNABv8QlDM2xJZYkWGExuUZ1iZt0lBK+P9JmCzez36x2vqJ0qolvB1XuSQVUDYPx9oRWd4VFkD7qJsMkwxYvwsQCPe8GR++2GPXc2kQ/0lfWetTnyNPCxGWosFW2/6aj6XUBkb7GyQEuUMPmYAKw0mP50G5Q34Vh4acuXdxw=
+	t=1713502969; cv=none; b=uGTY0hTLik0wmf4vE3L0gPj6WxFxxAjjZIYn/wFMFqIANWYerj62lajxT4CjMtk6Gpv48+XAwnsyvWxXUOsh8Abts9GKOPL3S3KFu5AXWAFvSaOkcV4bpOi6VWOKIP2WwxMQxD/Wgo7+9GvFJ1YX1CIfDC76k5PWWshqIzYCLuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713484883; c=relaxed/simple;
-	bh=GsOSqG+d+aXsocNGZFqAyduRtmrcvJZHq3i0NoxMLzU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kCX7/TlVKwWz1CY9f6alIBm3cd/xZf2Y7EAbxjOCeGMDy8Nd3k3t0tS8yLSmy//4nlFjuV/VNoQfZe4eMwCRHN61Se/WN9rVUSFZl9g17psBtRzzs8m6tAC4RwU2JMRBRqO4JNW/AaMkaMdYLdNzHtZSNdNdedFYxQ4Gg+9xK2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GjJYeR+k; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1713502969; c=relaxed/simple;
+	bh=klXsnYwRxUuk8G3WI88QnoY2DTIIQVgqWQrvc0VV8SM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZhfOXknc2Og89WGDtIvLn9PGxhsze12CpViLntoFfHqSEPSwXUKriICGHdCWJJ7jKGfTHxEbadMNdyuXFsQPNuq5umYCKC0Ar6lg9+qDX0V5i0cuSnCMWO5teGNAgbPQh6R5odBR2Pn9vGtbSNyoBX5CZCLKOihxbttd8Wf+6X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=hvx9/2A8; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GjJYeR+k"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713484881; x=1745020881;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=GsOSqG+d+aXsocNGZFqAyduRtmrcvJZHq3i0NoxMLzU=;
-  b=GjJYeR+ko3qv9eZaawPGWEfc42fHLTiOyFlptTpVruw94bzwKX0wCtqT
-   GssXFEClAmJ5BI8PO9WZsbOTgeOWUcDGYSgBIf3G8cqXobIbLiGgFAMjM
-   kE/joN2OAnN+j8aoYVqLean9H5WyEKz0VKsWP2D2jqdg3UBR0hND5LWo9
-   yl4sjCObgPX2Qm/DO84xosRPcUqKXZG0SjXsDgCyMZ2FhfW4Q/kK1DRoX
-   WA8E00UCDWojLYxczKR+Rahm3bAqgtLXgibqSR8gu2ZQxF+n4UGEYkima
-   141wCZQvXF1EHsDJw3B3fchFEE5tGVlP+xC7Y1pRwfZlvD6Av/j43CiP2
-   w==;
-X-CSE-ConnectionGUID: 0pYJJFxRRWuPaEMAGbLjWQ==
-X-CSE-MsgGUID: prOzMG2DR8qZ/vKTLCdsoA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="12849715"
-X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="12849715"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 17:01:21 -0700
-X-CSE-ConnectionGUID: vJCVfeBZTWeqsSA1+nqNOg==
-X-CSE-MsgGUID: cfDaxB79Q32WiYnyfnM73A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="60588307"
-Received: from sferrell-mobl2.amr.corp.intel.com (HELO desk) ([10.209.93.160])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 17:01:21 -0700
-Date: Thu, 18 Apr 2024 17:01:13 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	ebiggers@kernel.org, luto@kernel.org, dave.hansen@linux.intel.com,
-	tglx@linutronix.de, bp@alien8.de, mingo@kernel.org, x86@kernel.org,
-	herbert@gondor.apana.org.au, ardb@kernel.org, elliott@hpe.com,
-	dan.j.williams@intel.com, bernie.keany@intel.com,
-	charishma1.gairuboyina@intel.com,
-	Dave Hansen <dave.hansen@intel.com>
-Subject: Re: [PATCH v9a 10/14] x86/cpu/keylocker: Check Gather Data Sampling
- mitigation
-Message-ID: <20240419000113.2tjvyigx7nlyymrw@desk>
-References: <20240329065742.fc5of75e776y2g4b@desk>
- <20240407230432.912290-1-chang.seok.bae@intel.com>
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="hvx9/2A8"
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id DDF178860F;
+	Fri, 19 Apr 2024 07:02:36 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1713502962;
+	bh=/7K16+lFmr4GqBnQeBVfOAuaKd9QSck1GMug9WoFvSw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hvx9/2A8C66P7Ncj6RgdVN2zrwlZvYezmUNYIy9IIrbIFJAbMnbIZoDz+toUyofWe
+	 CM8gEv6pWbQVu7mmiIvIaHVy91BtdOFRD7j6ublgWaGsiLnYArlH9EA16MqtLQwi8K
+	 AFa6Ku7UhlUE5G8SeJD2CdoHMRBm3cXkdwsZO+MQjFX0Xz4UshAmuAOnBz3HpXaH4U
+	 JQGgDLVPkORbskbWgvZZhUMLFqN8pR0pijJdZmDYgO5o+o37i0XG2v0Bsml85zXU8C
+	 v8XxQ9hmp1u6Nyx48Zv5vFb3NF5TFbqXZ2GU/8OvnBbA28Df2nvVO50HLN+lsk4kVV
+	 YNK8TJWNJtbwA==
+From: Marek Vasut <marex@denx.de>
+To: linux-crypto@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Gatien Chevallier <gatien.chevallier@foss.st.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Rob Herring <robh@kernel.org>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	kernel@dh-electronics.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: [PATCH 1/3] hwrng: stm32 - use logical OR in conditional
+Date: Fri, 19 Apr 2024 07:01:12 +0200
+Message-ID: <20240419050201.181041-1-marex@denx.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240407230432.912290-1-chang.seok.bae@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Sun, Apr 07, 2024 at 04:04:32PM -0700, Chang S. Bae wrote:
-> Gather Data Sampling is a transient execution side channel issue in some
-> CPU models. The stale data in registers is not guaranteed as secure when
-> this vulnerability is not addressed.
-> 
-> In the Key Locker usage during AES transformations, the temporary storage
-> of the original key in registers poses a risk. The key material can be
-> staled in some implementations, leading to susceptibility to leakage of
-> the AES key.
-> 
-> To mitigate this vulnerability, a qualified microcode image must be
-> applied. Add code to ensure that the mitigation is installed and securely
-> locked. Disable the feature, otherwise.
-> 
-> Expand gds_ucode_mitigated() to examine the lock state.
-> 
-> Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-> Cc: Dave Hansen <dave.hansen@intel.com>
-> Cc: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> ---
-> Changes from v9:
-> * Removed MSR reads and utilized the helper function. (Pawan Gupta)
-> 
-> Alternatively, 'gds_mitigation' can be exported and referenced directly.
-> Using 'gds_mitigation == GDS_MITIGATION_FULL_LOCKED' may also be
-> readable. However, it was opted to expand gds_ucode_mitigated() for
-> consistency, as it is already established.
-> 
-> Note that this approach aligns with Intel's guidance, as the bugs.c code
-> checks the following MSR bits:
->   "Intel recommends that system software does not enable Key Locker (by
->    setting CR4.KL) unless the GDS mitigation is enabled
->    (IA32_MCU_OPT_CTRL[GDS_MITG_DIS] (bit 4) is 0) and locked
->    (IA32_MCU_OPT_CTRL [GDS_MITG_LOCK](bit 5) is 1)."
-> 
-> For more information, refer to Intel's technical documentation on Gather
-> Data Sampling:
->   https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/gather-data-sampling.html
-> ---
->  arch/x86/include/asm/processor.h |  7 ++++++-
->  arch/x86/kernel/cpu/bugs.c       |  5 ++++-
->  arch/x86/kernel/keylocker.c      | 12 ++++++++++++
->  arch/x86/kvm/x86.c               |  2 +-
->  4 files changed, 23 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
-> index 811548f131f4..74eaa3a2b85b 100644
-> --- a/arch/x86/include/asm/processor.h
-> +++ b/arch/x86/include/asm/processor.h
-> @@ -721,7 +721,12 @@ enum mds_mitigations {
->  	MDS_MITIGATION_VMWERV,
->  };
->  
-> -extern bool gds_ucode_mitigated(void);
-> +enum mitigation_info {
-> +	MITG_FULL,
-> +	MITG_LOCKED,
-> +};
-> +
-> +extern bool gds_ucode_mitigated(enum mitigation_info mitg);
->  
->  /*
->   * Make previous memory operations globally visible before
-> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-> index e7ba936d798b..80f6e70619cb 100644
-> --- a/arch/x86/kernel/cpu/bugs.c
-> +++ b/arch/x86/kernel/cpu/bugs.c
-> @@ -752,8 +752,11 @@ static const char * const gds_strings[] = {
->  	[GDS_MITIGATION_HYPERVISOR]	= "Unknown: Dependent on hypervisor status",
->  };
->  
-> -bool gds_ucode_mitigated(void)
-> +bool gds_ucode_mitigated(enum mitigation_info mitg)
->  {
-> +	if (mitg == MITG_LOCKED)
-> +		return gds_mitigation == GDS_MITIGATION_FULL_LOCKED;
-> +
->  	return (gds_mitigation == GDS_MITIGATION_FULL ||
->  		gds_mitigation == GDS_MITIGATION_FULL_LOCKED);
->  }
-> diff --git a/arch/x86/kernel/keylocker.c b/arch/x86/kernel/keylocker.c
-> index 1e81d0704eea..23cf4a235f11 100644
-> --- a/arch/x86/kernel/keylocker.c
-> +++ b/arch/x86/kernel/keylocker.c
-> @@ -113,6 +113,15 @@ void restore_keylocker(void)
->  	valid_wrapping_key = false;
->  }
->  
-> +/* Check if Key Locker is secure enough to be used. */
-> +static bool __init secure_keylocker(void)
-> +{
-> +	if (boot_cpu_has_bug(X86_BUG_GDS) && !gds_ucode_mitigated(MITG_LOCKED))
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
->  static int __init init_keylocker(void)
->  {
->  	u32 eax, ebx, ecx, edx;
-> @@ -126,6 +135,9 @@ static int __init init_keylocker(void)
->  		goto clear_cap;
->  	}
->  
-> +	if (!secure_keylocker())
-> +		goto clear_cap;
-> +
->  	cr4_set_bits(X86_CR4_KEYLOCKER);
->  
->  	/* AESKLE depends on CR4.KEYLOCKER */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 47d9f03b7778..4ab50e95fdb5 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1675,7 +1675,7 @@ static u64 kvm_get_arch_capabilities(void)
->  		 */
->  	}
->  
-> -	if (!boot_cpu_has_bug(X86_BUG_GDS) || gds_ucode_mitigated())
-> +	if (!boot_cpu_has_bug(X86_BUG_GDS) || gds_ucode_mitigated(MITG_FULL))
->  		data |= ARCH_CAP_GDS_NO;
->  
->  	return data;
+The conditional is used to check whether err is non-zero OR whether
+reg variable is non-zero after clearing bits from it. This should be
+done using logical OR, not bitwise OR, fix it.
 
-Repurposing gds_ucode_mitigated() to check for the locked state is
-adding a bit of a churn. We can introduce gds_mitigation_locked()
-instead.
+Fixes: 6b85a7e141cb ("hwrng: stm32 - implement STM32MP13x support")
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+Cc: "Uwe Kleine-König" <u.kleine-koenig@pengutronix.de>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: Gatien Chevallier <gatien.chevallier@foss.st.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: Olivia Mackall <olivia@selenic.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: Yang Yingliang <yangyingliang@huawei.com>
+Cc: kernel@dh-electronics.com
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-stm32@st-md-mailman.stormreply.com
+---
+ drivers/char/hw_random/stm32-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Is below looking okay:
+diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+index 379bc245c5202..1cc61ef8ee54c 100644
+--- a/drivers/char/hw_random/stm32-rng.c
++++ b/drivers/char/hw_random/stm32-rng.c
+@@ -353,7 +353,7 @@ static int stm32_rng_init(struct hwrng *rng)
+ 	err = readl_relaxed_poll_timeout_atomic(priv->base + RNG_SR, reg,
+ 						reg & RNG_SR_DRDY,
+ 						10, 100000);
+-	if (err | (reg & ~RNG_SR_DRDY)) {
++	if (err || (reg & ~RNG_SR_DRDY)) {
+ 		clk_disable_unprepare(priv->clk);
+ 		dev_err((struct device *)priv->rng.priv,
+ 			"%s: timeout:%x SR: %x!\n", __func__, err, reg);
+-- 
+2.43.0
 
-diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
-index 811548f131f4..8ba96e8a8754 100644
---- a/arch/x86/include/asm/processor.h
-+++ b/arch/x86/include/asm/processor.h
-@@ -722,6 +722,7 @@ enum mds_mitigations {
- };
- 
- extern bool gds_ucode_mitigated(void);
-+extern bool gds_mitigation_locked(void);
- 
- /*
-  * Make previous memory operations globally visible before
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index ca295b0c1eee..a7ec26988ddb 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -753,6 +753,11 @@ bool gds_ucode_mitigated(void)
- }
- EXPORT_SYMBOL_GPL(gds_ucode_mitigated);
- 
-+bool gds_mitigation_locked(void)
-+{
-+	return gds_mitigation == GDS_MITIGATION_FULL_LOCKED;
-+}
-+
- void update_gds_msr(void)
- {
- 	u64 mcu_ctrl_after;
-diff --git a/arch/x86/kernel/keylocker.c b/arch/x86/kernel/keylocker.c
-index 1b57e11d93ad..c40e72f482b1 100644
---- a/arch/x86/kernel/keylocker.c
-+++ b/arch/x86/kernel/keylocker.c
-@@ -112,6 +112,15 @@ void restore_keylocker(void)
- 	valid_wrapping_key = false;
- }
- 
-+/* Check if Key Locker is secure enough to be used. */
-+static bool __init secure_keylocker(void)
-+{
-+	if (boot_cpu_has_bug(X86_BUG_GDS) && !gds_mitigation_locked())
-+		return false;
-+
-+	return true;
-+}
-+
- static int __init init_keylocker(void)
- {
- 	u32 eax, ebx, ecx, edx;
-@@ -125,6 +134,9 @@ static int __init init_keylocker(void)
- 		goto clear_cap;
- 	}
- 
-+	if (!secure_keylocker())
-+		goto clear_cap;
-+
- 	cr4_set_bits(X86_CR4_KEYLOCKER);
- 
- 	/* AESKLE depends on CR4.KEYLOCKER */
