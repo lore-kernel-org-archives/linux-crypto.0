@@ -1,157 +1,448 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA424C63A;
-	Fri, 19 Apr 2024 17:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627AB81729
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Apr 2024 18:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713547436; cv=none; b=PHCGocpjgWOVyJAUwrNaRi28URmaxghXAWnd2P+R/4aT+Dn2wlLAkuIesdrFWl3aEgGgyR4wL7uQU5nTQzuWiYl7vVoEaTqd//kSW0z9RUUYyCaqjHrmAxBw7+pNftR5usnjApF9o1At+N0NSC1S5nClAZV0XR01tVERVMmtpf0=
+	t=1713553056; cv=none; b=D2ns1O0n9m3pZk+64Adf0hp4mQc54LmKrkdUyDwvv52mJWlPrf1cWARp1j+3dx+yYmOBTU016R18ehFAh2uaAxBbu6xkfv69SyrfBD/AyjfSwjSxEYco4lQaJ2ofBXuOyYvhnjljUQ81LBWndt6ZmsMB4VQ/vzyK3mbwwCwIsoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713547436; c=relaxed/simple;
-	bh=BK0T3Ph1aGHxJtSL9RG30RA0mM8JBF3nRKIEK7Tsigk=;
+	s=arc-20240116; t=1713553056; c=relaxed/simple;
+	bh=C+Uu0Voqs0df1ulFjjPtHWbP4XxoAZiLPATcSsZ3b88=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f1jKtUvG64BKtO1ap7WXnnvE+jhFnb8/qU/hJ4YyqCazH044L/UtpYXyQeHzbIQPTPvhAf4Caouc2KEsiv9PB2XseLfqPnCwMBy0pNnMR3EAqT8TPi54V0M39HcsBONEE67p6b4Rylno+rdKqbo2nPN7U462XsXlWOs7R8PUwFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Y+F7MDih; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 In-Reply-To:Content-Type; b=iYJC2ImUTm5qK4Ti5jTs3aCZb+PiN7mecodNxiMS82phJmqr4WJbAwokGFdavlwih7lWgZ/aOnlo9FJ326VxYKkedBD41PClVa4gH6GdRGcsiBSaauMbuCet6Xf7dji/5Th5gRiMGsKHtlKpm2Zs6d1qp+L5c2n+BtsiE6xnbQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ngfWeNMj; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Y+F7MDih"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43JHHVUg021435;
-	Fri, 19 Apr 2024 17:23:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Li8QEJCoygMjxlapAv/HEj/Slh+EPe7jVKxtNtgjPRk=;
- b=Y+F7MDihdtzAqnPXtUqsXCnyqYEoeDA0azmI/jMVgRobQASTw3jVqC740+W6o/E4lGN9
- wZZKPo+o41VJY+XO57JEutDHsAAuMf7w5ZOePYJOhtmLW0kDtB7/HDOv8ACpnlHtsKb0
- FjNwZHPSn6dh6shHGwXcA6LpI/EjLKktGG1ApBgCBFdH6zNk6uaWDaXYU1t8EPQYd7kY
- aV3bPx9ZIo/0IxXEQK2pskv5HhFkhbPlOue5/PtbqfVmUGnXtjeJcPsVwY8VmqZad40b
- yO5oHE9AS+JeE/Ra4PDgglwILOcOiSRWR3AFPdIIyLh4xtChCydnYqD+eBz8QunIbmbs 3g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xkvvk00v7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Apr 2024 17:23:42 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43JHNfLw031899;
-	Fri, 19 Apr 2024 17:23:41 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xkvvk00um-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Apr 2024 17:23:41 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43JFQZGG010509;
-	Fri, 19 Apr 2024 17:23:39 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xkbmm4yus-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Apr 2024 17:23:39 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43JHNb2519202684
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 19 Apr 2024 17:23:39 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 57C5C5804B;
-	Fri, 19 Apr 2024 17:23:37 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8A7AB58063;
-	Fri, 19 Apr 2024 17:23:36 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 19 Apr 2024 17:23:36 +0000 (GMT)
-Message-ID: <4aa3459c-e029-40fa-a7f5-f858ba0e3c0f@linux.ibm.com>
-Date: Fri, 19 Apr 2024 13:23:35 -0400
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ngfWeNMj"
+Message-ID: <adf36f26-76b7-4c57-8caf-82f4bb98f017@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713553052;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pQGF+clU8pqsfzPiMYxlEh6hNipiCLtIss6rESxKvlo=;
+	b=ngfWeNMjkBhICP6WCxu7s01f4xzJ7jdENZIQQq5oKHqZb9fKj9an2jRscAQlzVz3n9gSrj
+	UXgKgRa6kKqWG6Sw0QXaWTpgIjZJpeDUb+YrKAuGCc7Ioe5Ii1FB3T1kS8eMywf8kGcYJM
+	qq/tNhq5kiCb/4cHkACB9pKJC3/wFGA=
+Date: Fri, 19 Apr 2024 11:57:24 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] crypto: ecdh - Pass private key in proper byte
- order to check valid key
+Subject: Re: [PATCH bpf-next v9 1/4] bpf: make common crypto API for TC/XDP
+ programs
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+ linux-crypto@vger.kernel.org, bpf@vger.kernel.org
+References: <20240416204004.3942393-1-vadfed@meta.com>
+ <20240416204004.3942393-2-vadfed@meta.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
 Content-Language: en-US
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, jarkko@kernel.org, ardb@kernel.org,
-        git@jvdsn.com, hkario@redhat.com, simo@redhat.com,
-        Salvatore Benedetto <salvatore.benedetto@intel.com>
-References: <20240418152445.2773042-1-stefanb@linux.ibm.com>
- <20240418152445.2773042-2-stefanb@linux.ibm.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <20240418152445.2773042-2-stefanb@linux.ibm.com>
+In-Reply-To: <20240416204004.3942393-2-vadfed@meta.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: DfMq2rMGWiHXAuHWeWvUuF6-sCLtpu4h
-X-Proofpoint-GUID: zD2WPq62wFSasLYwgbb7EqFXqNRr5fI7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-19_12,2024-04-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1015 suspectscore=0 mlxlogscore=999
- malwarescore=0 bulkscore=0 mlxscore=0 spamscore=0 phishscore=0
- adultscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2404010000 definitions=main-2404190132
+X-Migadu-Flow: FLOW_OUT
 
-
-
-On 4/18/24 11:24, Stefan Berger wrote:
-> ecc_is_key_valid expects a key with the most significant digit in the last
-> entry of the digit array. Currently ecdh_set_secret passes a reversed key
-> to ecc_is_key_valid that then passes the rather simple test checking
-> whether the private key is in range [2, n-3]. For all current ecdh-
-> supported curves (NIST P192/256/384) the 'n' parameter is a rather large
-> number, therefore easily passing this test.
-> 
-> Throughout the ecdh and ecc codebase the variable 'priv' is used for a
-> private_key holding the bytes in proper byte order. Therefore, introduce
-> priv in ecdh_set_secret and copy the bytes from ctx->private_key into
-> priv in proper byte order by using ecc_swap_digits. Pass priv to
-> ecc_is_valid_key.
-> 
-
-Fixes: 3c4b23901a0c ("crypto: ecdh - Add ECDH software support")
-
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
-> ---
->   crypto/ecdh.c | 11 ++++++++---
->   1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-> index 3049f147e011..c02c9a2b9682 100644
-> --- a/crypto/ecdh.c
-> +++ b/crypto/ecdh.c
-> @@ -27,7 +27,9 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
->   			   unsigned int len)
->   {
->   	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
-> +	u64 priv[ECC_MAX_DIGITS];
->   	struct ecdh params;
-> +	int ret = 0;
+On 4/16/24 1:40 PM, Vadim Fedorenko wrote:
+> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> index 5034c1b4ded7..acc479c13f52 100644
+> --- a/include/linux/bpf.h
+> +++ b/include/linux/bpf.h
+> @@ -1265,6 +1265,7 @@ int bpf_dynptr_check_size(u32 size);
+>   u32 __bpf_dynptr_size(const struct bpf_dynptr_kern *ptr);
+>   const void *__bpf_dynptr_data(const struct bpf_dynptr_kern *ptr, u32 len);
+>   void *__bpf_dynptr_data_rw(const struct bpf_dynptr_kern *ptr, u32 len);
+> +bool __bpf_dynptr_is_rdonly(const struct bpf_dynptr_kern *ptr);
 >   
->   	if (crypto_ecdh_decode_key(buf, len, &params) < 0 ||
->   	    params.key_size > sizeof(u64) * ctx->ndigits)
-> @@ -40,13 +42,16 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
->   				       ctx->private_key);
->   
->   	memcpy(ctx->private_key, params.key, params.key_size);
-> +	ecc_swap_digits(ctx->private_key, priv, ctx->ndigits);
->   
->   	if (ecc_is_key_valid(ctx->curve_id, ctx->ndigits,
-> -			     ctx->private_key, params.key_size) < 0) {
-> +			     priv, params.key_size) < 0) {
->   		memzero_explicit(ctx->private_key, params.key_size);
-> -		return -EINVAL;
-> +		ret = -EINVAL;
->   	}
-> -	return 0;
-> +	memzero_explicit(priv, sizeof(priv));
+>   #ifdef CONFIG_BPF_JIT
+>   int bpf_trampoline_link_prog(struct bpf_tramp_link *link, struct bpf_trampoline *tr);
+> diff --git a/include/linux/bpf_crypto.h b/include/linux/bpf_crypto.h
+> new file mode 100644
+> index 000000000000..a41e71d4e2d9
+> --- /dev/null
+> +++ b/include/linux/bpf_crypto.h
+> @@ -0,0 +1,24 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
+> +#ifndef _BPF_CRYPTO_H
+> +#define _BPF_CRYPTO_H
 > +
-> +	return ret;
->   }
+> +struct bpf_crypto_type {
+> +	void *(*alloc_tfm)(const char *algo);
+> +	void (*free_tfm)(void *tfm);
+> +	int (*has_algo)(const char *algo);
+> +	int (*setkey)(void *tfm, const u8 *key, unsigned int keylen);
+> +	int (*setauthsize)(void *tfm, unsigned int authsize);
+> +	int (*encrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
+> +	int (*decrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
+> +	unsigned int (*ivsize)(void *tfm);
+> +	unsigned int (*statesize)(void *tfm);
+> +	u32 (*get_flags)(void *tfm);
+> +	struct module *owner;
+> +	char name[14];
+> +};
+> +
+> +int bpf_crypto_register_type(const struct bpf_crypto_type *type);
+> +int bpf_crypto_unregister_type(const struct bpf_crypto_type *type);
+> +
+> +#endif /* _BPF_CRYPTO_H */
+> diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
+> index 368c5d86b5b7..736bd22e5ce0 100644
+> --- a/kernel/bpf/Makefile
+> +++ b/kernel/bpf/Makefile
+> @@ -44,6 +44,9 @@ obj-$(CONFIG_BPF_SYSCALL) += bpf_struct_ops.o
+>   obj-$(CONFIG_BPF_SYSCALL) += cpumask.o
+>   obj-${CONFIG_BPF_LSM} += bpf_lsm.o
+>   endif
+> +ifeq ($(CONFIG_CRYPTO),y)
+> +obj-$(CONFIG_BPF_SYSCALL) += crypto.o
+> +endif
+>   obj-$(CONFIG_BPF_PRELOAD) += preload/
 >   
->   static int ecdh_compute_value(struct kpp_request *req)
+>   obj-$(CONFIG_BPF_SYSCALL) += relo_core.o
+> diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
+> new file mode 100644
+> index 000000000000..a76d80f37f55
+> --- /dev/null
+> +++ b/kernel/bpf/crypto.c
+> @@ -0,0 +1,377 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/* Copyright (c) 2024 Meta, Inc */
+> +#include <linux/bpf.h>
+> +#include <linux/bpf_crypto.h>
+> +#include <linux/bpf_mem_alloc.h>
+> +#include <linux/btf.h>
+> +#include <linux/btf_ids.h>
+> +#include <linux/filter.h>
+> +#include <linux/scatterlist.h>
+> +#include <linux/skbuff.h>
+> +#include <crypto/skcipher.h>
+> +
+> +struct bpf_crypto_type_list {
+> +	const struct bpf_crypto_type *type;
+> +	struct list_head list;
+> +};
+> +
+> +/* BPF crypto initialization parameters struct */
+> +/**
+> + * struct bpf_crypto_params - BPF crypto initialization parameters structure
+> + * @type:	The string of crypto operation type.
+> + * @algo:	The string of algorithm to initialize.
+> + * @key:	The cipher key used to init crypto algorithm.
+> + * @key_len:	The length of cipher key.
+> + * @authsize:	The length of authentication tag used by algorithm.
+> + */
+> +struct bpf_crypto_params {
+> +	char type[14];
+> +	char algo[128];
+> +	__u8 key[256];
+
+It should have a two byte hole here. Add
+	__u8 reserved[2];
+
+and check for 0 in bpf_crypto_ctx_create() in case it could be reused later. The 
+bpf_crypto_ctx_create() should not be called very often.
+
+> +	__u32 key_len;
+> +	__u32 authsize;
+
+I don't think there is tail padding of this struct, so should be fine.
+
+> +} __attribute__((aligned(8)));
+
+Does it need aligned(8) here?
+
+> +
+> +static LIST_HEAD(bpf_crypto_types);
+> +static DECLARE_RWSEM(bpf_crypto_types_sem);
+> +
+> +/**
+> + * struct bpf_crypto_ctx - refcounted BPF crypto context structure
+> + * @type:	The pointer to bpf crypto type
+> + * @tfm:	The pointer to instance of crypto API struct.
+> + * @rcu:	The RCU head used to free the crypto context with RCU safety.
+> + * @usage:	Object reference counter. When the refcount goes to 0, the
+> + *		memory is released back to the BPF allocator, which provides
+> + *		RCU safety.
+> + */
+> +struct bpf_crypto_ctx {
+> +	const struct bpf_crypto_type *type;
+> +	void *tfm;
+> +	u32 siv_len;
+> +	struct rcu_head rcu;
+> +	refcount_t usage;
+> +};
+> +
+> +int bpf_crypto_register_type(const struct bpf_crypto_type *type)
+> +{
+> +	struct bpf_crypto_type_list *node;
+> +	int err = -EEXIST;
+> +
+> +	down_write(&bpf_crypto_types_sem);
+> +	list_for_each_entry(node, &bpf_crypto_types, list) {
+> +		if (!strcmp(node->type->name, type->name))
+> +			goto unlock;
+> +	}
+> +
+> +	node = kmalloc(sizeof(*node), GFP_KERNEL);
+> +	err = -ENOMEM;
+> +	if (!node)
+> +		goto unlock;
+> +
+> +	node->type = type;
+> +	list_add(&node->list, &bpf_crypto_types);
+> +	err = 0;
+> +
+> +unlock:
+> +	up_write(&bpf_crypto_types_sem);
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(bpf_crypto_register_type);
+> +
+> +int bpf_crypto_unregister_type(const struct bpf_crypto_type *type)
+> +{
+> +	struct bpf_crypto_type_list *node;
+> +	int err = -ENOENT;
+> +
+> +	down_write(&bpf_crypto_types_sem);
+> +	list_for_each_entry(node, &bpf_crypto_types, list) {
+> +		if (strcmp(node->type->name, type->name))
+> +			continue;
+> +
+> +		list_del(&node->list);
+> +		kfree(node);
+> +		err = 0;
+> +		break;
+> +	}
+> +	up_write(&bpf_crypto_types_sem);
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(bpf_crypto_unregister_type);
+> +
+> +static const struct bpf_crypto_type *bpf_crypto_get_type(const char *name)
+> +{
+> +	const struct bpf_crypto_type *type = ERR_PTR(-ENOENT);
+> +	struct bpf_crypto_type_list *node;
+> +
+> +	down_read(&bpf_crypto_types_sem);
+> +	list_for_each_entry(node, &bpf_crypto_types, list) {
+> +		if (strcmp(node->type->name, name))
+> +			continue;
+> +
+> +		if (try_module_get(node->type->owner))
+> +			type = node->type;
+> +		break;
+> +	}
+> +	up_read(&bpf_crypto_types_sem);
+> +
+> +	return type;
+> +}
+> +
+> +__bpf_kfunc_start_defs();
+> +
+> +/**
+> + * bpf_crypto_ctx_create() - Create a mutable BPF crypto context.
+> + *
+> + * Allocates a crypto context that can be used, acquired, and released by
+> + * a BPF program. The crypto context returned by this function must either
+> + * be embedded in a map as a kptr, or freed with bpf_crypto_ctx_release().
+> + * As crypto API functions use GFP_KERNEL allocations, this function can
+> + * only be used in sleepable BPF programs.
+> + *
+> + * bpf_crypto_ctx_create() allocates memory for crypto context.
+> + * It may return NULL if no memory is available.
+> + * @params: pointer to struct bpf_crypto_params which contains all the
+> + *          details needed to initialise crypto context.
+> + * @err:    integer to store error code when NULL is returned.
+> + */
+> +__bpf_kfunc struct bpf_crypto_ctx *
+> +bpf_crypto_ctx_create(const struct bpf_crypto_params *params, int *err)
+
+Add a "u32 params__sz" arg in case that the params struct will have addition.
+Take a look at how opts__sz is checked in nf_conntrack_bpf.c.
+
+> +{
+> +	const struct bpf_crypto_type *type;
+> +	struct bpf_crypto_ctx *ctx;
+> +
+> +	type = bpf_crypto_get_type(params->type);
+> +	if (IS_ERR(type)) {
+> +		*err = PTR_ERR(type);
+> +		return NULL;
+> +	}
+> +
+> +	if (!type->has_algo(params->algo)) {
+> +		*err = -EOPNOTSUPP;
+> +		goto err_module_put;
+> +	}
+> +
+> +	if (!params->authsize && type->setauthsize) {
+> +		*err = -EOPNOTSUPP;
+> +		goto err_module_put;
+> +	}
+> +
+> +	if (params->authsize && !type->setauthsize) {
+
+nit. Together with the previous "if" test, replace them with one test like:
+
+	if (!!params->authsize ^ !!type->setauthsize) {
+
+
+> +		*err = -EOPNOTSUPP;
+> +		goto err_module_put;
+> +	}
+> +
+> +	if (!params->key_len) {
+
+Also checks "|| params->key_len > sizeof(params->key)"
+
+> +		*err = -EINVAL;
+> +		goto err_module_put;
+> +	}
+> +
+> +	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+> +	if (!ctx) {
+> +		*err = -ENOMEM;
+> +		goto err_module_put;
+> +	}
+> +
+> +	ctx->type = type;
+> +	ctx->tfm = type->alloc_tfm(params->algo);
+> +	if (IS_ERR(ctx->tfm)) {
+> +		*err = PTR_ERR(ctx->tfm);
+> +		goto err_free_ctx;
+> +	}
+> +
+> +	if (params->authsize) {
+> +		*err = type->setauthsize(ctx->tfm, params->authsize);
+> +		if (*err)
+> +			goto err_free_tfm;
+> +	}
+> +
+> +	*err = type->setkey(ctx->tfm, params->key, params->key_len);
+> +	if (*err)
+> +		goto err_free_tfm;
+> +
+> +	if (type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY) {
+> +		*err = -EINVAL;
+> +		goto err_free_tfm;
+> +	}
+> +
+> +	ctx->siv_len = type->ivsize(ctx->tfm) + type->statesize(ctx->tfm);
+> +
+> +	refcount_set(&ctx->usage, 1);
+> +
+> +	return ctx;
+> +
+> +err_free_tfm:
+> +	type->free_tfm(ctx->tfm);
+> +err_free_ctx:
+> +	kfree(ctx);
+> +err_module_put:
+> +	module_put(type->owner);
+> +
+> +	return NULL;
+> +}
+> +
+> +static void crypto_free_cb(struct rcu_head *head)
+> +{
+> +	struct bpf_crypto_ctx *ctx;
+> +
+> +	ctx = container_of(head, struct bpf_crypto_ctx, rcu);
+> +	ctx->type->free_tfm(ctx->tfm);
+> +	module_put(ctx->type->owner);
+> +	kfree(ctx);
+> +}
+> +
+> +/**
+> + * bpf_crypto_ctx_acquire() - Acquire a reference to a BPF crypto context.
+> + * @ctx: The BPF crypto context being acquired. The ctx must be a trusted
+> + *	     pointer.
+> + *
+> + * Acquires a reference to a BPF crypto context. The context returned by this function
+> + * must either be embedded in a map as a kptr, or freed with
+> + * bpf_crypto_skcipher_ctx_release().
+> + */
+> +__bpf_kfunc struct bpf_crypto_ctx *
+> +bpf_crypto_ctx_acquire(struct bpf_crypto_ctx *ctx)
+> +{
+> +	if (!refcount_inc_not_zero(&ctx->usage))
+> +		return NULL;
+> +	return ctx;
+> +}
+> +
+> +/**
+> + * bpf_crypto_ctx_release() - Release a previously acquired BPF crypto context.
+> + * @ctx: The crypto context being released.
+> + *
+> + * Releases a previously acquired reference to a BPF crypto context. When the final
+> + * reference of the BPF crypto context has been released, it is subsequently freed in
+> + * an RCU callback in the BPF memory allocator.
+> + */
+> +__bpf_kfunc void bpf_crypto_ctx_release(struct bpf_crypto_ctx *ctx)
+> +{
+> +	if (refcount_dec_and_test(&ctx->usage))
+> +		call_rcu(&ctx->rcu, crypto_free_cb);
+> +}
+> +
+> +static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
+> +			    const struct bpf_dynptr_kern *src,
+> +			    struct bpf_dynptr_kern *dst,
+> +			    const struct bpf_dynptr_kern *siv,
+> +			    bool decrypt)
+> +{
+> +	u32 src_len, dst_len, siv_len;
+> +	const u8 *psrc;
+> +	u8 *pdst, *piv;
+> +	int err;
+> +
+> +	if (__bpf_dynptr_is_rdonly(dst))
+> +		return -EINVAL;
+> +
+> +	siv_len = __bpf_dynptr_size(siv);
+> +	src_len = __bpf_dynptr_size(src);
+> +	dst_len = __bpf_dynptr_size(dst);
+> +	if (!src_len || !dst_len)
+> +		return -EINVAL;
+> +
+> +	if (siv_len != ctx->siv_len)
+> +		return -EINVAL;
+> +
+> +	psrc = __bpf_dynptr_data(src, src_len);
+> +	if (!psrc)
+> +		return -EINVAL;
+> +	pdst = __bpf_dynptr_data_rw(dst, dst_len);
+> +	if (!pdst)
+> +		return -EINVAL;
+> +
+> +	piv = siv_len ? __bpf_dynptr_data_rw(siv, siv_len) : NULL;
+
+It has been a while. I don't remember if it has already been brought up before.
+
+The "const struct bpf_dynptr_kern *siv" here is essentially an optional pointer. 
+Allowing NULL is a more intuitive usage instead of passing a 0-len dynptr. The 
+verifier needs some changes to take __nullable suffix for "struct 
+bpf_dynptr_kern *siv__nullable". This could be a follow up to relax the 
+restriction to allow NULL and not necessary in this set.
+
+> +	if (siv_len && !piv)
+> +		return -EINVAL;
+> +
+> +	err = decrypt ? ctx->type->decrypt(ctx->tfm, psrc, pdst, src_len, piv)
+> +		      : ctx->type->encrypt(ctx->tfm, psrc, pdst, src_len, piv);
+> +
+> +	return err;
+> +}
+
+
