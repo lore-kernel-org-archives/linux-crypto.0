@@ -1,41 +1,41 @@
-Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FD713C9C8
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Apr 2024 21:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601642AEF5
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Apr 2024 22:02:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713562736; cv=none; b=t6BSatWWWVkVi3jf3z9xoT/1zGDsz5DxLmYT2CHht+HbjkizyxcTVYslF9JmSZqBphH/s9WgnERSiW5Kl0n385o8+5K1sYgxgs3ScUKbwLXDX8FfW7gkJqlQXpXr9tV79mLCFemxPIpDp8qH1CxOCij0evgMvbptL6bc3LOESmQ=
+	t=1713564170; cv=none; b=OYUOqE4fw80gEFgVBnLv3IoSLwF/Q56OdMSGkNaD3KdkLAaaEG4AxtmCkU2gwvzYfrwvMa9kryzZ+IztfDlsX9n06NOaLk/IKl1zQS8GrSEJaESUUpcjq5CHu7pwQyB4WwVZnsCPvG9Z8mIl5lyCESd/0r7WIfGvSA6eqH9fbMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713562736; c=relaxed/simple;
-	bh=pLJhxuz8PyNKTJmjoeVjz1Oq90uzNL0mxwIZZ8ctnLI=;
+	s=arc-20240116; t=1713564170; c=relaxed/simple;
+	bh=AfdO+0Me9W7VANipR4NZV3TFKTNZBZY7mwW6w6fNqA8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g8bqNf9iB1reT4+yZhWQ/awqfhPx/lzEfTtujLodqbuL36zhVC0UAM+OhAEYaCWKl+F/1pSW7k9EW4MlgHmV9ZNYZOhANZu9Gz/N8evUIIw8ZFuP9uWptDqqz8m23NxBJyoIYYl8ceicbkqxKhF2m+kowi0q989tQv4mLfEc4J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eocHHhUa; arc=none smtp.client-ip=95.215.58.184
+	 In-Reply-To:Content-Type; b=qzk8HERh1DWUf7lTSzRqu7m5X5XkNzSSIf7l5+N4nY5tnlPPlJ6+uMV6JyDYf3GDXulxq4Dxp1VZYTy8HLX8Y0ZW6PSGWkcFp1zrQMwCpbNFUGFoAzyI6m7ltkFB3ZnFVBjZFBK6jZyy/9OJH+1GTQqqjvdMB/1y9FHNnB5gmts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eBu8+Az4; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eocHHhUa"
-Message-ID: <60a88a78-d6d5-48b9-b894-47e4e54240df@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eBu8+Az4"
+Message-ID: <bd2019d6-4b26-4420-8b33-2c17c5445965@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713562731;
+	t=1713564165;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2TQXggKe36TRCP6eJwykB3M+8KrdclZ3XPpoq2DnTAg=;
-	b=eocHHhUab4cU02eJwmb43bcBZ9uRWzKqBBKfZ7It/ZfmK7i8AEbxO8enHPS27gvmO7diL8
-	xhofaASFQxiEdNO27ID1+taLjt9wC9VwKgcSyIpHlr/0F2Yp3dZsJefgIcE1+L0CZj0f3v
-	0S7TjXMdUi4XiK9RwBSZ3TYDxo7Sbnk=
-Date: Fri, 19 Apr 2024 14:38:41 -0700
+	bh=+5KPFPoBy3bMK61a4m6dGjRcvp2dUEUOluA+i1rXC48=;
+	b=eBu8+Az4PJ3A4rHF0Ao5xsdDogwgd+EtE/cIa5ZTYmqAT9l/3nstjU8ihnlGYw8AsG2NA+
+	UhgF+cICehDCS95JhaZdZCra8cgwkOIJ03DSu1+BLkVCb2FXNSjYL7agIJ1BM18UawGzj1
+	kOG59CdTdnVWa3ac+MovN1yzIObYvEU=
+Date: Fri, 19 Apr 2024 15:02:38 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v9 3/4] selftests: bpf: crypto skcipher algo
- selftests
+Subject: Re: [PATCH bpf-next v9 4/4] selftests: bpf: crypto: add benchmark for
+ crypto functions
 To: Vadim Fedorenko <vadfed@meta.com>
 Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
  Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
@@ -43,363 +43,34 @@ Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
  Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
  linux-crypto@vger.kernel.org, bpf@vger.kernel.org
 References: <20240416204004.3942393-1-vadfed@meta.com>
- <20240416204004.3942393-4-vadfed@meta.com>
+ <20240416204004.3942393-5-vadfed@meta.com>
+Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20240416204004.3942393-4-vadfed@meta.com>
+In-Reply-To: <20240416204004.3942393-5-vadfed@meta.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
 On 4/16/24 1:40 PM, Vadim Fedorenko wrote:
-> +void test_crypto_sanity(void)
+> +static void *crypto_producer(void *)
+
+The bpf CI cannot compile:
+
+benchs/bench_bpf_crypto.c:157:36: error: omitting the parameter name in a function definition is a C23 extension [-Werror,-Wc23-extensions]
+     157 | static void *crypto_producer(void *)
+
+https://github.com/kernel-patches/bpf/actions/runs/8712330655
+
 > +{
-> +	struct crypto_syscall_args sargs = {
-> +		.key_len = 16,
-> +	};
-> +	LIBBPF_OPTS(bpf_tc_hook, qdisc_hook, .attach_point = BPF_TC_EGRESS);
-> +	LIBBPF_OPTS(bpf_tc_opts, tc_attach_enc);
-> +	LIBBPF_OPTS(bpf_tc_opts, tc_attach_dec);
 > +	LIBBPF_OPTS(bpf_test_run_opts, opts,
-> +		    .ctx_in = &sargs,
-> +		    .ctx_size_in = sizeof(sargs),
+> +		.repeat = 64,
+> +		.data_in = input,
+> +		.data_size_in = args.crypto_len,
 > +	);
-> +	struct nstoken *nstoken = NULL;
-> +	struct crypto_sanity *skel;
-> +	char afalg_plain[16] = {0};
-> +	char afalg_dst[16] = {0};
-> +	struct sockaddr_in6 addr;
-> +	int sockfd, err, pfd;
-> +	socklen_t addrlen;
 > +
-> +	SYS(fail, "ip netns add %s", NS_TEST);
-> +	SYS(fail, "ip -net %s -6 addr add %s/128 dev lo nodad", NS_TEST, IPV6_IFACE_ADDR);
-> +	SYS(fail, "ip -net %s link set dev lo up", NS_TEST);
-> +
-> +	nstoken = open_netns(NS_TEST);
-> +	if (!ASSERT_OK_PTR(nstoken, "open_netns"))
-> +		goto fail;
-
-skel is not initialized. The "fail:" case needs it.
-
-> +
-> +	err = init_afalg();
-> +	if (!ASSERT_OK(err, "AF_ALG init fail"))
-> +		goto fail;
-> +
-> +	qdisc_hook.ifindex = if_nametoindex("lo");
-> +	if (!ASSERT_GT(qdisc_hook.ifindex, 0, "if_nametoindex lo"))
-> +		goto fail;
-> +
-> +	skel = crypto_sanity__open_and_load();
-> +	if (!ASSERT_OK_PTR(skel, "skel open"))
-> +		return;
-
-The netns "crypto_sanity_ns" is not deleted.
-
-> +
-> +	memcpy(skel->bss->key, crypto_key, sizeof(crypto_key));
-> +	snprintf(skel->bss->algo, 128, "%s", algo);
-> +	pfd = bpf_program__fd(skel->progs.skb_crypto_setup);
-> +	if (!ASSERT_GT(pfd, 0, "skb_crypto_setup fd"))
-> +		goto fail;
-> +
-> +	err = bpf_prog_test_run_opts(pfd, &opts);
-> +	if (!ASSERT_OK(err, "skb_crypto_setup") ||
-> +	    !ASSERT_OK(opts.retval, "skb_crypto_setup retval"))
-> +		goto fail;
-> +
-> +	if (!ASSERT_OK(skel->bss->status, "skb_crypto_setup status"))
-> +		goto fail;
-> +
-> +	err = crypto_sanity__attach(skel);
-
-This attach is a left over from previous revision?
-
-> +	if (!ASSERT_OK(err, "crypto_sanity__attach"))
-> +		goto fail;
-> +
-> +	err = bpf_tc_hook_create(&qdisc_hook);
-> +	if (!ASSERT_OK(err, "create qdisc hook"))
-> +		goto fail;
-> +
-> +	addrlen = sizeof(addr);
-> +	err = make_sockaddr(AF_INET6, IPV6_IFACE_ADDR, UDP_TEST_PORT,
-> +			    (void *)&addr, &addrlen);
-> +	if (!ASSERT_OK(err, "make_sockaddr"))
-> +		goto fail;
-> +
-> +	tc_attach_enc.prog_fd = bpf_program__fd(skel->progs.encrypt_sanity);
-> +	err = bpf_tc_attach(&qdisc_hook, &tc_attach_enc);
-> +	if (!ASSERT_OK(err, "attach encrypt filter"))
-> +		goto fail;
-> +
-> +	sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
-> +	if (!ASSERT_NEQ(sockfd, -1, "encrypt socket"))
-> +		goto fail;
-> +	err = sendto(sockfd, plain_text, sizeof(plain_text), 0, (void *)&addr, addrlen);
-> +	close(sockfd);
-> +	if (!ASSERT_EQ(err, sizeof(plain_text), "encrypt send"))
-> +		goto fail;
-> +
-> +	do_crypt_afalg(plain_text, afalg_dst, sizeof(afalg_dst), true);
-> +
-> +	bpf_tc_detach(&qdisc_hook, &tc_attach_enc);
-
-Check error.
-
-I suspect this detach should have failed because at least the 
-tc_attach_enc.prog_fd is not 0.
-
-The following attach (&tc_attach_"dec") may just happen to have a higher 
-priority such that the left over here does not matter. It is still better to get 
-it right.
-
-> +	if (!ASSERT_OK(skel->bss->status, "encrypt status"))
-> +		goto fail;
-> +	if (!ASSERT_STRNEQ(skel->bss->dst, afalg_dst, sizeof(afalg_dst), "encrypt AF_ALG"))
-> +		goto fail;
-> +
-> +	tc_attach_dec.prog_fd = bpf_program__fd(skel->progs.decrypt_sanity);
-> +	err = bpf_tc_attach(&qdisc_hook, &tc_attach_dec);
-> +	if (!ASSERT_OK(err, "attach decrypt filter"))
-> +		goto fail;
-> +
-> +	sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
-> +	if (!ASSERT_NEQ(sockfd, -1, "decrypt socket"))
-> +		goto fail;
-> +	err = sendto(sockfd, afalg_dst, sizeof(afalg_dst), 0, (void *)&addr, addrlen);
-> +	close(sockfd);
-> +	if (!ASSERT_EQ(err, sizeof(afalg_dst), "decrypt send"))
-> +		goto fail;
-> +
-> +	do_crypt_afalg(afalg_dst, afalg_plain, sizeof(afalg_plain), false);
-> +
-> +	bpf_tc_detach(&qdisc_hook, &tc_attach_dec);
-> +	if (!ASSERT_OK(skel->bss->status, "decrypt status"))
-> +		goto fail;
-> +	if (!ASSERT_STRNEQ(skel->bss->dst, afalg_plain, sizeof(afalg_plain), "decrypt AF_ALG"))
-> +		goto fail;
-> +
-> +fail:
-> +	if (nstoken) {
-
-No need to check NULL. close_netns() can handle it.
-
-> +		bpf_tc_hook_destroy(&qdisc_hook);
-
-This also does not destroy the clsact qdisc. Although the function name feels 
-like it would, from a quick look at bpf_tc_hook_destroy, it depends on both 
-BPF_TC_INGRESS and BPF_TC_EGRESS are set in the qdisc_hook.attach_point.
-
-I would skip the whole bpf_tc_hook_destroy. It will go away together with the netns.
-
-[ ... ]
-
-> diff --git a/tools/testing/selftests/bpf/progs/crypto_sanity.c b/tools/testing/selftests/bpf/progs/crypto_sanity.c
-> new file mode 100644
-> index 000000000000..57df5776bcaf
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/progs/crypto_sanity.c
-> @@ -0,0 +1,161 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
-> +
-> +#include "vmlinux.h"
-> +#include "bpf_tracing_net.h"
-> +#include <bpf/bpf_helpers.h>
-> +#include <bpf/bpf_endian.h>
-> +#include <bpf/bpf_tracing.h>
-> +#include "bpf_misc.h"
-> +#include "bpf_kfuncs.h"
-> +#include "crypto_common.h"
-> +
-> +unsigned char key[256] = {};
-> +char algo[128] = {};
-> +char dst[16] = {};
-> +int status;
-> +
-> +static int skb_dynptr_validate(struct __sk_buff *skb, struct bpf_dynptr *psrc)
-> +{
-> +	struct ipv6hdr ip6h;
-> +	struct udphdr udph;
-> +	u32 offset;
-> +
-> +	if (skb->protocol != __bpf_constant_htons(ETH_P_IPV6))
-> +		return -1;
-> +
-> +	if (bpf_skb_load_bytes(skb, ETH_HLEN, &ip6h, sizeof(ip6h)))
-> +		return -1;
-> +
-> +	if (ip6h.nexthdr != IPPROTO_UDP)
-> +		return -1;
-> +
-> +	if (bpf_skb_load_bytes(skb, ETH_HLEN + sizeof(ip6h), &udph, sizeof(udph)))
-> +		return -1;
-> +
-> +	if (udph.dest != __bpf_constant_htons(UDP_TEST_PORT))
-> +		return -1;
-> +
-> +	offset = ETH_HLEN + sizeof(ip6h) + sizeof(udph);
-> +	if (skb->len < offset + 16)
-> +		return -1;
-> +
-> +	/* let's make sure that 16 bytes of payload are in the linear part of skb */
-> +	bpf_skb_pull_data(skb, offset + 16);
-> +	bpf_dynptr_from_skb(skb, 0, psrc);
-> +	bpf_dynptr_adjust(psrc, offset, offset + 16);
-> +
-> +	return 0;
+> +	while (true)
+> +		(void)bpf_prog_test_run_opts(ctx.pfd, &opts);
+> +	return NULL;
 > +}
-> +
-> +SEC("syscall")
-> +int skb_crypto_setup(struct crypto_syscall_args *ctx)
-> +{
-> +	struct bpf_crypto_params params = {
-> +		.type = "skcipher",
-> +		.key_len = ctx->key_len,
-> +		.authsize = ctx->authsize,
-> +	};
-> +	struct bpf_crypto_ctx *cctx;
-> +	int err = 0;
-> +
-> +	status = 0;
-> +
-> +	if (ctx->key_len > 255) {
-
-key_len == 256 won't work ?
-
-> +		status = -EINVAL;
-> +		return 0;
-> +	}
-> +
-> +	__builtin_memcpy(&params.algo, algo, sizeof(algo));
-> +	__builtin_memcpy(&params.key, key, sizeof(key));
-
-It will be useful to comment here what problem was hit such that the key cannot 
-be passed in the "struct crypto_syscall_args" and need to go back to the global 
-variable.
-
-Instead of "key_len" in the crypto_syscall_args and the actual "key" in global, 
-how about skip using the "struct crypto_syscall_args" altogether and put key_len 
-(and authsize) in the global?
-
-Put UDP_TEST_PORT as a global variable for config/filter usage also and the 
-"crypto_share.h" can go away.
-
-> +	cctx = bpf_crypto_ctx_create(&params, &err);
-> +
-> +	if (!cctx) {
-> +		status = err;
-> +		return 0;
-> +	}
-> +
-> +	err = crypto_ctx_insert(cctx);
-> +	if (err && err != -EEXIST)
-> +		status = err;
-> +
-> +	return 0;
-> +}
-> +
-> +SEC("tc")
-> +int decrypt_sanity(struct __sk_buff *skb)
-> +{
-> +	struct __crypto_ctx_value *v;
-> +	struct bpf_crypto_ctx *ctx;
-> +	struct bpf_dynptr psrc, pdst, iv;
-> +	int err;
-> +
-> +	err = skb_dynptr_validate(skb, &psrc);
-> +	if (err < 0) {
-> +		status = err;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	v = crypto_ctx_value_lookup();
-> +	if (!v) {
-> +		status = -ENOENT;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	ctx = v->ctx;
-> +	if (!ctx) {
-> +		status = -ENOENT;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
-
-dst is now a global which makes it easier to test the result. A comment here to 
-note this point for people referencing this test for production use case and 
-suggest a percpu map could be used.
-
-It will be useful to have dynptr working with stack memory in the future.
-
-> +	/* iv dynptr has to be initialized with 0 size, but proper memory region
-> +	 * has to be provided anyway
-> +	 */
-> +	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-> +
-> +	status = bpf_crypto_decrypt(ctx, &psrc, &pdst, &iv);
-> +
-> +	return TC_ACT_SHOT;
-> +}
-> +
-> +SEC("tc")
-> +int encrypt_sanity(struct __sk_buff *skb)
-> +{
-> +	struct __crypto_ctx_value *v;
-> +	struct bpf_crypto_ctx *ctx;
-> +	struct bpf_dynptr psrc, pdst, iv;
-> +	int err;
-> +
-> +	status = 0;
-> +
-> +	err = skb_dynptr_validate(skb, &psrc);
-> +	if (err < 0) {
-> +		status = err;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	v = crypto_ctx_value_lookup();
-> +	if (!v) {
-> +		status = -ENOENT;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	ctx = v->ctx;
-> +	if (!ctx) {
-> +		status = -ENOENT;
-> +		return TC_ACT_SHOT;
-> +	}
-> +
-> +	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
-> +	/* iv dynptr has to be initialized with 0 size, but proper memory region
-> +	 * has to be provided anyway
-> +	 */
-> +	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-> +
-> +	status = bpf_crypto_encrypt(ctx, &psrc, &pdst, &iv);
-> +
-> +	return TC_ACT_SHOT;
-> +}
-> +
-> +char __license[] SEC("license") = "GPL";
-> diff --git a/tools/testing/selftests/bpf/progs/crypto_share.h b/tools/testing/selftests/bpf/progs/crypto_share.h
-> new file mode 100644
-> index 000000000000..c5a6ef65156d
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/progs/crypto_share.h
-> @@ -0,0 +1,10 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
-> +
-> +#define UDP_TEST_PORT 7777
-> +
-> +struct crypto_syscall_args {
-> +	u32 key_len;
-> +	u32 authsize;
-> +};
-> +
 
