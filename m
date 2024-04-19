@@ -1,31 +1,30 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E9E7E77B
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Apr 2024 10:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7AD47F7CE;
+	Fri, 19 Apr 2024 11:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713524355; cv=none; b=b4hs/or2nTBXzeURFe7pDrSmq3rdg7VfEh1BzvyVSZsr/ZmIA7OBSXjBwdMTE1HKsDYh/eB8aE4bJkGO+nypKSmU0seKvQt6d4URs2Nj2+hF1pEU8/uQEf88243S7SEscwX3sD5CFFi57UZqhVs074/xvGdPPXCiRbJLHGlzTFQ=
+	t=1713524436; cv=none; b=bEJgR4xBzv2teXEQzJDfWb1tbb8ao8vGCfIrexpQ758wJWzgw9rJTSwTVG5yQ+KKgF0FgZbucqPnDnFXI52HoA2tWECi3JuHkXq9HE7zrONswwKP9GaXaZUKSIsMWJGA86Iqo9RUsTp3fjI+OJRvDWiLIYAupJ5ZOBAdLdZRMKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713524355; c=relaxed/simple;
-	bh=J32OATyMAthrQ9bLqk2hVd/jOH5fdg9poOvJHzZ91AE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZWBG3G39YfS/BjFPsfrWaR3Tf5TjmGs4MMp2d14imjcsK53DfOFjMEIjqKC6f5TNYEq+d+a2WP7SSE4srD0fCp4q0JqcU5kC6/pXVeHfK/M4zDZYg/Vve89HMXP5NaSuvacjoeuxd4uVaDwsUJHIg6yCiKPXbcxQvHse8EjEtb4=
+	s=arc-20240116; t=1713524436; c=relaxed/simple;
+	bh=Ljysuy28IuFPteXKcTgItG3QPpPt7DZGBgR/dfJp0ZA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=MdZetlc0HCwz1z8VFQhWpRVLYx3pK67mtnFYndYva7WggnBfoF0nWjN2hTFdUKIgg39lgwKed5OFPwOM/NYukPoB8m1SIRuyI6J7iZM3evPRBgwr81Gq4XrwC01n3T+ZlnAZ8hB1WQSbuDg6YFRwp6kxbbnzLUgpmKZ8HYL30pQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rxlxU-003sR4-LT; Fri, 19 Apr 2024 18:59:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 Apr 2024 18:59:26 +0800
-Date: Fri, 19 Apr 2024 18:59:26 +0800
+	id 1rxlyn-003sTB-CK; Fri, 19 Apr 2024 19:00:30 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 Apr 2024 19:00:47 +0800
+Date: Fri, 19 Apr 2024 19:00:47 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Damian Muszynski <damian.muszynski@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH] crypto: qat - implement dh fallback for primes > 4K
-Message-ID: <ZiJOjmRZnAlmHYf6@gondor.apana.org.au>
-References: <20240411092526.127182-1-damian.muszynski@intel.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stefan.kanthak@nexgo.de
+Subject: Re: [PATCH v2 0/4] crypto: x86/sha256-ni - cleanup and optimization
+Message-ID: <ZiJO32BWdBHOVrzG@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -34,27 +33,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240411092526.127182-1-damian.muszynski@intel.com>
+In-Reply-To: <20240411162359.39073-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 
-On Thu, Apr 11, 2024 at 11:24:58AM +0200, Damian Muszynski wrote:
-> The Intel QAT driver provides support for the Diffie-Hellman (DH)
-> algorithm, limited to prime numbers up to 4K. This driver is used
-> by default on platforms with integrated QAT hardware for all DH requests.
-> This has led to failures with algorithms requiring larger prime sizes,
-> such as ffdhe6144.
+Eric Biggers <ebiggers@kernel.org> wrote:
+> This patchset reduces the amount of source code duplication in
+> sha256_ni_asm.S and also reduces the binary code size slightly.
 > 
->   alg: ffdhe6144(dh): test failed on vector 1, err=-22
->   alg: self-tests for ffdhe6144(qat-dh) (ffdhe6144(dh)) failed (rc=-22)
+> Changed in v2:
+>   - Take advantage of .irp in patch 1
+>   - Added two additional cleanup patches
 > 
-> Implement a fallback mechanism when an unsupported request is received.
+> Eric Biggers (4):
+>  crypto: x86/sha256-ni - convert to use rounds macros
+>  crypto: x86/sha256-ni - rename some register aliases
+>  crypto: x86/sha256-ni - optimize code size
+>  crypto: x86/sha256-ni - simplify do_4rounds
 > 
-> Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  .../intel/qat/qat_common/qat_asym_algs.c      | 66 +++++++++++++++++--
->  1 file changed, 60 insertions(+), 6 deletions(-)
+> arch/x86/crypto/sha256_ni_asm.S | 253 +++++++-------------------------
+> 1 file changed, 49 insertions(+), 204 deletions(-)
+> 
+> 
+> base-commit: 20cb38a7af88dc40095da7c2c9094da3873fea23
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
