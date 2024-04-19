@@ -1,46 +1,45 @@
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2047.outbound.protection.outlook.com [40.107.243.47])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2086.outbound.protection.outlook.com [40.107.93.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D782E40E;
-	Fri, 19 Apr 2024 14:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641A912E1D2;
+	Fri, 19 Apr 2024 15:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.86
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713536369; cv=fail; b=V8qhbym715BvYsq/AVNBYy5iJTQVR6GbWOpmXp1XRcaypQUSyY8yHOPCqZb6thzsAy1SMboUKmS+EQi+AsgwMPtJO9wPnGkBS8re1fOF6UXYvataoZNB93lkmBTFuHrA7M6ZLyV8z7ERECwphYqtAdxFhaxCBVFmFokcolwhtM8=
+	t=1713539476; cv=fail; b=GyPZ2RyDt0CUR2WEuYFclyLqQpjswjhBLkRG2zOYDMIUTXIYqZKYTPUihecsuQcMLXMz0HzM3TRg8PPXUTZpCCFq0aKkyYBZ7JVGmP8MGXb68o6gH96SUUOSue1HALdBCAUVqoLqm98HtNn9ANouEMR1nSxXYMhk6XFt9EqdpqY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713536369; c=relaxed/simple;
-	bh=gGSpfD/vCz7jYXwK4jkHC5zF/jZGN6lAxOWi4UL8tK8=;
+	s=arc-20240116; t=1713539476; c=relaxed/simple;
+	bh=v9J70aGyBGgGJXGFNR48Z4WndwkG7puOXl4FXXuIZ5g=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XEXK7QmRDfqgnvidRvnR8K54++Otj2ZK3AGJkoOqeNPyCvDwlsooZ3zFhwGBBqYS4clYQt6gSYi8/pwhfDL+xc8rAvayzMfYMrcFy2mBLmSFGE3j9vgs0UhAL4mAH4oVliO3CMSL3VsRO1mgPzQl0l6MS1jCwmuJGkilukcpisg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TiZkFHU9; arc=fail smtp.client-ip=40.107.243.47
+	 Content-Type:Content-Disposition:In-Reply-To; b=dEfag/xQpvaXCn4GNUd0n4fgo5hxFO261Vp5byShf8Lh2jjaduLoJ78d1YjQu3p6rxqUovKNxrDfjmqJsnhmzmz2Ifib0Y0w4Xo9jHUtz4RL/0gDI17Fp1jo2mbMWKKqrSnjuWCysZJNMXKnXdCEjcVtt+l13d2hGSvmvj7qJVU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Lwy9C1xR; arc=fail smtp.client-ip=40.107.93.86
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TiZkFHU9"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Lwy9C1xR"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lhGr1OAx9GT9BZSBS6p1yU8M8X/ja/Z8byapf2A21ymX21UX1Io45yx9NGKZIBuqgBdRqSChwzgBB5ytMMbbnkinjcMrdSOgOv0vs83ztX1yRUx1bczi271D0IBnbTcN9GMZzPKCDl+mda+GT0S0IwYPd+3xfH/Xy0eOcw9w+T7JdlbKvIGDRS98VZtXKa3lDGIlP5d2m5j8DHfx0ps0EcBDQuncahoWMquCWfcsHHTyn+S0swrXVG3ygPzYMlwM63BPW5Oyqf/WltMKNd/ZILuNb2Q5/YoiMsNo91bfmbqTEybD1S0i82PJJiiLRGGrNEphyjL2cIMK6w1H+ek/tQ==
+ b=iGglFsMezYIvPja6laEvVLvSTpYRXcOQZOYjSCRFE2AOzHUu04vz4/hvPNLqvUuK/f0i2vL6wt8q1wx7l2VgexiXWF9b552cCJX7yapSbBmmiCmVKajtViUQveLDfsi17bUGObPJaVJkpR2hoYAzHcpTaxmdt2ellWs8MvKx7/k+xnH+enTUDBAEEJCX3r7vrU9YEI3vudWUDzkMyGnr6shMg4zqgN0+bA6z1HifTZxwj/C2CmKOWCCCX6Zc30p8TWyc3drURexESAoeJi35qWDvh1LZtKnmV+KKpRQbxxt5QNH0QZqNb+UBtmtOyJIs8cYwMfuj6nEHa5ddjFVv2w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xCLECH2BTckagVUfu2ZQ3LTaU6lM5yOLfu5mpophMUw=;
- b=TPRMD5PEAuQ9/+eUpRvMuWKiZ75CrDbvb140ga7ksOnx9AoUyXucVOhBbP1agv3k+CRJ84OVP1W4daJQxhFsyZENDiYwbwPCCZerWT0P0IYb5FBZc5xXUawKcv0GgKij9q07iIKDrs1epgo9fxBIWYmjCIonkesoY9xAZoh96KIFF/PTLsIbI3LRfNggh3DxTsVVNNn6mu1Ek6sGaJhQ3DKhV1pHoQmV6kJ3XrB0dOnonC7C2ZhASK3TBEVlJs9hFwFOswITanDuK+DReiKPawyBmKSxGIfGYlkOUBGSv6iaAiUjE7ouGd9xFIAKSXo4U/2rHHJwdoi+kWAmDveZ/w==
+ bh=3qSeQz0enh3nAACey1JKcfgjxc5ZS1pjRYCYrOLMTs4=;
+ b=gmnxAfuw71cwuJQIaUmunjmR29KdQiW4tVzSfRsMGQuNd4hNJYIm+QgsGnMseYfmTSJBv7yKVTpnP/yzcPdaujpzg2O6aMj0ExQCSOd6hF6+eL7IjsgyYrn2LkOyYUDmVD6vz4WZZ6jHHTE+AlG96+TWpr5tAcu1egvo7RWsb0pubNyPOh9AhRRZBctCyq3oI4hkd6CLG8kcfR21EfIEVesnjHxhkxdv5+8LH1JNMO+d94XbnYpFB+3IIikazgWsOelmt8Ega/OFTqTDN2FXHB+xkW4Xrgmc5DJFxApXfZ1sHLS6vRujDDgf6rV16CN/2TqhVrO505MiR6G3LHyGYQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xCLECH2BTckagVUfu2ZQ3LTaU6lM5yOLfu5mpophMUw=;
- b=TiZkFHU9Ewohv0QP2wBxV4SGoD5d/+7PqtWnHMfAPP7p4b/XqO4TWlQuNg+kgH8ECeqovWH0dWXYjUJW/jRMKjkMfMADuSWVi50ObpZGo8qQYYtpJXLUwmxPFOC67ZifQ31mKEs+VI3jQ+NCxZKo4TKEFvTVM5hfcCURhC6uiaU=
-Received: from BL1PR13CA0193.namprd13.prod.outlook.com (2603:10b6:208:2be::18)
- by PH0PR12MB7470.namprd12.prod.outlook.com (2603:10b6:510:1e9::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.43; Fri, 19 Apr
- 2024 14:19:23 +0000
-Received: from MN1PEPF0000F0DE.namprd04.prod.outlook.com
- (2603:10b6:208:2be:cafe::be) by BL1PR13CA0193.outlook.office365.com
- (2603:10b6:208:2be::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.14 via Frontend
- Transport; Fri, 19 Apr 2024 14:19:23 +0000
+ bh=3qSeQz0enh3nAACey1JKcfgjxc5ZS1pjRYCYrOLMTs4=;
+ b=Lwy9C1xRLLYn38lSawithV5dB0Yb5+GmGWmbBq8bAcBq1nmBJ8ZvU2xOazICg0cN8KiEm6873XgOpZn2gDETGcaFoK3Uro71xKXkbGi5gw3UFlLDwfRNfA4+GcxbSO9MQw8sI7iFci8bgq6AYYRmB+KvaZrTE6dWtEQhsxJXcog=
+Received: from DS7PR06CA0038.namprd06.prod.outlook.com (2603:10b6:8:54::19) by
+ SJ2PR12MB9139.namprd12.prod.outlook.com (2603:10b6:a03:564::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7472.44; Fri, 19 Apr 2024 15:11:09 +0000
+Received: from CY4PEPF0000EE32.namprd05.prod.outlook.com
+ (2603:10b6:8:54:cafe::eb) by DS7PR06CA0038.outlook.office365.com
+ (2603:10b6:8:54::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.33 via Frontend
+ Transport; Fri, 19 Apr 2024 15:11:09 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,171 +47,122 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MN1PEPF0000F0DE.mail.protection.outlook.com (10.167.242.36) with Microsoft
+ CY4PEPF0000EE32.mail.protection.outlook.com (10.167.242.38) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7452.22 via Frontend Transport; Fri, 19 Apr 2024 14:19:23 +0000
+ 15.20.7452.22 via Frontend Transport; Fri, 19 Apr 2024 15:11:09 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 19 Apr
- 2024 09:19:21 -0500
-Date: Fri, 19 Apr 2024 09:19:20 -0500
+ 2024 10:11:07 -0500
+Date: Fri, 19 Apr 2024 10:11:09 -0500
 From: Michael Roth <michael.roth@amd.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>
 CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
 	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
 	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <seanjc@google.com>, <vkuznets@redhat.com>,
-	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
-	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
-	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
-	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
+	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
+	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
+	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
+	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
+	<ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
-	<brijesh.singh@amd.com>
-Subject: Re: [PATCH v13 09/26] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command
-Message-ID: <20240419141920.2djcy6ag3peiiufn@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
+Subject: Re: [PATCH v13 04/26] KVM: guest_memfd: Fix PTR_ERR() handling in
+ __kvm_gmem_get_pfn()
+Message-ID: <20240419151109.bo6kz4s24jgrmaj4@amd.com>
 References: <20240418194133.1452059-1-michael.roth@amd.com>
- <20240418194133.1452059-10-michael.roth@amd.com>
- <CABgObfYztTP+qoTa-tuPC8Au-aKhwiBkcvHni4T+n6MCD-P9Dw@mail.gmail.com>
+ <20240418194133.1452059-5-michael.roth@amd.com>
+ <a6086ba5-6137-44a0-9e51-ce4df5eb6ce4@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABgObfYztTP+qoTa-tuPC8Au-aKhwiBkcvHni4T+n6MCD-P9Dw@mail.gmail.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+In-Reply-To: <a6086ba5-6137-44a0-9e51-ce4df5eb6ce4@redhat.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0DE:EE_|PH0PR12MB7470:EE_
-X-MS-Office365-Filtering-Correlation-Id: 274bf5cf-09f1-440f-9f6c-08dc607bb627
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE32:EE_|SJ2PR12MB9139:EE_
+X-MS-Office365-Filtering-Correlation-Id: f21d702e-2189-412d-a4ec-08dc6082f18d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VGxOOXFPWWY3c2RieUNHcTVKWjRLV1RoWlVUcGNPdDlMY1ZkZzdCdzRVSzB0?=
- =?utf-8?B?YmVqRDJsQ0U3ZzllME9Xa3AzTURjMUZKbWxhQ3d4djBoWlNKVWN3RU9PTXVQ?=
- =?utf-8?B?OWFwaGRVSlBML2R4YTVtdGpKaEtBc3FtbVZveThMQmFnSW5RWkhxMHd2NmZr?=
- =?utf-8?B?TmlWY3A3Y25TUlV1bkhFMGhwbnoyMWc0Z0xsT0FuM1d2Z25XclZaSXBhOXlj?=
- =?utf-8?B?RzYzUDVKeGo4a2FsemIvcGVFaWdGcUU4Y1BpQ1ZsaXNCQ1Jnek5tOHJQeExI?=
- =?utf-8?B?a3lKeDIwcHhMM1BsK0MzQlh1aGxJQXlmVUVYa1loZUJ5SWt2OW9KK2p1M0ZS?=
- =?utf-8?B?ODNZUnhLOFUyN2dLMy9DdXlDTjFmVDZTS2VTRm05OFRNeFZoNndmTkhjeXpY?=
- =?utf-8?B?OU1TbzBMeDBlMGd5c2NENlZESDBzQjhPeVhSSGhXRzRhZVBXcXFpak1YVjNS?=
- =?utf-8?B?eUpoYWNxMkpSV3NEdUM4WEtsODdHYmpvdlFqWFNLRS84N2FFem83YUgzUEFa?=
- =?utf-8?B?MlRZMjJSY1BQMW0vYnd5MWE4T2xTTEkreUs0VnhzTjIrRDlUZlYyVjhSVklU?=
- =?utf-8?B?VTVlSW5uWWNmNFh1L0FqSHdUUEFMZmRlVjVrbmpscC96WkR2N084c1NvZ3Yx?=
- =?utf-8?B?eWUwajlTWG1HQk03aWgxUXZjRDNIeGszUFlFN2V0bjU5Vk5JZzh0Ukg3eGsw?=
- =?utf-8?B?UTNLQWxqUDdXbVFiMk92S29WTWtycExqUmQwQTB6cFliSEhqemQxcE03VDU3?=
- =?utf-8?B?dDQ2K0Y1MDJaN3V5RU8rTmsxZEZMTWhMRTNHV3d1aG92YmpWZVIwajEvZnVa?=
- =?utf-8?B?TjRFQmU4K1FPUFVyTUVPMVpvMWtxNkNDTk50SGhEZlE4ZnV0VGlUdUhiRU9H?=
- =?utf-8?B?OS9qYm9FbHg2VXViYWYyUXcyb2R6ZStRVllOV0NJTzJuSVRRSHp1ZUxsTVJ5?=
- =?utf-8?B?em1RNjNNbXA5MFNjTlVYdU5QZEYxc0ozMXlBL2YreTByTnJZTjNUbXpvZFRz?=
- =?utf-8?B?M3JhSkxrL2V5SmtyeGo5S1hHZE1JNVR1OCsweGZZWWFWamZkWnN5SDRmY1Ra?=
- =?utf-8?B?S3I1eUhkMzN4UTE5OXEwUnZjM3ZGNGVjb1V5T05FN3JIdHQ0cWRPWExUREJH?=
- =?utf-8?B?a0tSVElQcVpXY3J3WGE5UFVjUUtaM0g5M1IzRzhJZUI1K0oySU8xZmlVdGdw?=
- =?utf-8?B?NWZJaEdmclVGWWhwZlVJU3VJS1NlaEM5UHdZekxRU0NWNVdMSXFyOWRrZ01E?=
- =?utf-8?B?bjFtanduYTR3eWYreEdDU3lhZVl4ZHBQZVJhL2xnRGxzQUR0N3U5KzJNR2NN?=
- =?utf-8?B?VWhCL200WEw5OFM3b3FMYkN1dHcwU1FBUHk1bjlqWG80NklPOURjaE9lWTFi?=
- =?utf-8?B?eEk4SnBIVk10Z29nNDlHbzM1RythbjhoWW1iUCtkbjF2Q05ncktVN1ZhdHBE?=
- =?utf-8?B?cU9HNER2TmFoWDlLZHlxWWRsbWx6TmdSV2lsMlZEYlRCMzNtbkx5aDlQbHU0?=
- =?utf-8?B?bnlUNmRXL0NoRitmY1JmQkppc1RBODVuTmFvN21VdFBKcFlMci9EVGV4Q1d4?=
- =?utf-8?B?dm9ralJUY2libVc3eFJOdGdGM1RnQk1iZ2E4NEhOREdxZUhPS214SERTUVNu?=
- =?utf-8?B?aE1OaU1NZDFPV1JBZ1Mrb2p4WGhyWU9NUzRJNjdTNmdVbWR0STFmMzVMMGd6?=
- =?utf-8?B?S1d5L2dBbE85cHQ4Z0l5M2NxWlhjZENQcVN3WGR1czErRjFPS005dnlldUc3?=
- =?utf-8?B?Vi91dWI2M3pjR2pkK2t0NzhCTUZUdEMwb2dxSWFoTkVmbGd1Z2tTckVTZE5E?=
- =?utf-8?B?K3RWclV3NDJnckpUTDBoQ3J5Mll2YU5MbGFSR2w2ekVxLzkyc3ZNdFhHTTJq?=
- =?utf-8?Q?cY3K7uKXv+SRv?=
+	iunGVMZpDu9mmJf9+rNqettYlXiVIlnxFFBNycGuCOBsltobTMrWMJkFNMcmeGL27PuOg9ToDLyrJJWNOxLeuo0Wb43m7KnJpPsR9uVIIARMEBoDOnw+tLOTlNF2t+0jLhBD7ZKduQYR992RTyasB3OI4f/z6qcxIlk++by+mjedc90GRwRyHwtiWqdm92qLWTi+Rjr6THEWQHe9C78+1DYuV2VLQETWFVE07wSzuYVAwd8QHs5JsV8w3eiwntXSfn1PDrThFKzXt026Vp/PbQt51/OjuZ3f/Be7HoW1CcOpbys1ZFfZb1rTj6ISppynBGA9wgfp9ms5y2qX643eWarbQmCj0mRv/u9HtLeAQjtNc+oVFxhEmgdY/QjlpsXBCpC+NgncZR9ytlLAa0UdBR0ZgS4+61o9pTGlB426wyjVaXbdv3qLPrn6XZLwNaEpOyXFGMZWSlFfye3nYXR0DnglixQEqS2ubob7AWu5SHOzLvrTTdPf2hv4LFh/04fsWsBMKVOUtLFSs3VNBrUO0y0FrKKXldEoi3MT1sCDzuF8eMw6KFSGB4nxmSe4tmqBOjRMwB/1Dh3ZKEWSMCo1ePPeFYm5uLsy5wxXtE1cvRKksZVQFYqVaZ6F/NrT900WiPI/PbvY6riEKdodD7oBUqsHNGoPu/grhLrCA98bkIYBBBI9YMRcLv3u/QaLR/chu9QruKaPTG2HTVfZfmuu0coWAVaYs7jM21lm6xRhzoo9LHzZ5T/Q9EpFlnyoZMgm
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(376005)(1800799015)(7416005)(36860700004);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(7416005)(376005)(82310400014)(1800799015)(36860700004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2024 14:19:23.2280
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2024 15:11:09.2923
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 274bf5cf-09f1-440f-9f6c-08dc607bb627
+X-MS-Exchange-CrossTenant-Network-Message-Id: f21d702e-2189-412d-a4ec-08dc6082f18d
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000F0DE.namprd04.prod.outlook.com
+	CY4PEPF0000EE32.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7470
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9139
 
-On Fri, Apr 19, 2024 at 01:52:24PM +0200, Paolo Bonzini wrote:
-> On Thu, Apr 18, 2024 at 9:42 PM Michael Roth <michael.roth@amd.com> wrote:
-> > +/* As defined by SEV-SNP Firmware ABI, under "Guest Policy". */
-> > +#define SNP_POLICY_MASK_API_MAJOR      GENMASK_ULL(15, 8)
-> > +#define SNP_POLICY_MASK_API_MINOR      GENMASK_ULL(7, 0)
-> > +
-> > +#define SNP_POLICY_MASK_VALID          (SNP_POLICY_MASK_SMT            | \
-> > +                                        SNP_POLICY_MASK_RSVD_MBO       | \
-> > +                                        SNP_POLICY_MASK_DEBUG          | \
-> > +                                        SNP_POLICY_MASK_SINGLE_SOCKET  | \
-> > +                                        SNP_POLICY_MASK_API_MAJOR      | \
-> > +                                        SNP_POLICY_MASK_API_MINOR)
-> > +
-> > +/* KVM's SNP support is compatible with 1.51 of the SEV-SNP Firmware ABI. */
-> > +#define SNP_POLICY_API_MAJOR           1
-> > +#define SNP_POLICY_API_MINOR           51
+On Fri, Apr 19, 2024 at 02:58:43PM +0200, David Hildenbrand wrote:
+> On 18.04.24 21:41, Michael Roth wrote:
+> > kvm_gmem_get_folio() may return a PTR_ERR() rather than just NULL. In
+> > particular, for cases where EEXISTS is returned when FGP_CREAT_ONLY
+> > flag is used. Handle this properly in __kvm_gmem_get_pfn().
+> > 
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > ---
+> >   virt/kvm/guest_memfd.c | 4 ++--
+> >   1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> > index ccf22e44f387..9d7c6a70c547 100644
+> > --- a/virt/kvm/guest_memfd.c
+> > +++ b/virt/kvm/guest_memfd.c
+> > @@ -580,8 +580,8 @@ static int __kvm_gmem_get_pfn(struct file *file, struct kvm_memory_slot *slot,
+> >   	}
+> >   	folio = kvm_gmem_get_folio(file_inode(file), index, prepare);
+> > -	if (!folio)
+> > -		return -ENOMEM;
+> > +	if (IS_ERR_OR_NULL(folio))
+> > +		return folio ? PTR_ERR(folio) : -ENOMEM;
 > 
-> > +static inline bool sev_version_greater_or_equal(u8 major, u8 minor)
-> > +{
-> > +       if (major < SNP_POLICY_API_MAJOR)
-> > +               return true;
+> Will it even return NULL?  Staring at other filemap_grab_folio() users, they
+> all check for IS_ERR().
+
+Looks like the NULL case is handled with PTR_ERR(-ENOENT), so IS_ERR()
+would be sufficient. I think in the past kvm_gmem_get_folio() itself
+would return NULL in some cases, but as of commit 2b01b7e994e95 that's
+no longer the case.
+
+I'll fix this up to expect only PTR_ERR() when I re-spin v14, and also
+address the other kvm_gmem_get_folio() / __filemap_get_folio() call
+sites.
+
 > 
-> Should it perhaps refuse version 0.x? With something like a
+> >   	if (folio_test_hwpoison(folio)) {
+> >   		r = -EHWPOISON;
 > 
-> #define SNP_POLICY_API_MAJOR_MIN    1
-> 
-> to make it a bit more future proof (and testable).
-> 
-> > +       major = (params.policy & SNP_POLICY_MASK_API_MAJOR);
-> 
-> This should be >> 8. Do the QEMU patches not set the API version? :)
+> Do we have a Fixes: tag?
 
-Argh...it does if you set it via the -object sev-snp-guest,policy=0x...
-option. I tested with reserved ranges and other flags, but not with
-non-zero major/minor API fields. =/
+Fixes: 2b01b7e994e95 ("KVM: guest_memfd: pass error up from filemap_grab_folio")
 
-But I'm having 2nd thoughts about trying to enforce API version via
-KVM_SEV_SNP_LAUNCH_START. In practice, the only sensible way to really
-interpret it is as "the minimum firmware version that userspace decides
-it is comfortable running a particular guest" on. And that enforcement
-is already handled as part of the SNP_LAUNCH_START firmware command in
-the SNP Firmware ABI: if the policy specifies a higher minimum version
-than what firmware is currently running then it will return as error
-that will be reported by QEMU as:
-
-  sev_snp_launch_start: SNP_LAUNCH_START ret=-5 fw_error=7 'Policy is not allowed'
-
-On the firmware driver side (drivers/crypto/ccp/sev-dev.c), we already
-enforce 1.51 as minimum supported SNP firmware, so that sort of already
-covers the SNP_POLICY_API_MAJOR_MIN case as well. E.g. the test surface
-KVM needs to concern itself with is already effectively 1.51+. In that
-sense, whether the user decides to be less restrictive with what minimum
-firmware version they allow is then totally up to the user, and has no
-bearing on what firmware versions KVM needs to concern itself with.
-
-Then the question of whether or not KVM fully *exposes* a particular
-user-visible feature of a newer version of the firmware/ABI would be a
-separate thing to be handled via the normal KVM capabilities/attributes
-mechanisms.
-
-So my current leaning is to send a v14 that backs out the major/minor
-policy enforcement and let firmware handle that aspect. (and also
-address your other comments).
-
-But let me know if you think that should be handled differently.
+Will add that in the re-spin as well.
 
 Thanks!
 
 -Mike
 
 > 
-> Paolo
+> -- 
+> Cheers,
+> 
+> David / dhildenb
 > 
