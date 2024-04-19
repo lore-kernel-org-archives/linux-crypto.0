@@ -1,168 +1,158 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2086.outbound.protection.outlook.com [40.107.93.86])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641A912E1D2;
-	Fri, 19 Apr 2024 15:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713539476; cv=fail; b=GyPZ2RyDt0CUR2WEuYFclyLqQpjswjhBLkRG2zOYDMIUTXIYqZKYTPUihecsuQcMLXMz0HzM3TRg8PPXUTZpCCFq0aKkyYBZ7JVGmP8MGXb68o6gH96SUUOSue1HALdBCAUVqoLqm98HtNn9ANouEMR1nSxXYMhk6XFt9EqdpqY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713539476; c=relaxed/simple;
-	bh=v9J70aGyBGgGJXGFNR48Z4WndwkG7puOXl4FXXuIZ5g=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dEfag/xQpvaXCn4GNUd0n4fgo5hxFO261Vp5byShf8Lh2jjaduLoJ78d1YjQu3p6rxqUovKNxrDfjmqJsnhmzmz2Ifib0Y0w4Xo9jHUtz4RL/0gDI17Fp1jo2mbMWKKqrSnjuWCysZJNMXKnXdCEjcVtt+l13d2hGSvmvj7qJVU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Lwy9C1xR; arc=fail smtp.client-ip=40.107.93.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B4F12F376
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Apr 2024 16:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713543149; cv=none; b=Y2zKX4vhVBUJm6L6tvsiFTCs3cpeJ1jQMay8o7q5xCQOZ4YWyJY/Wa1llLMJDrwKk260K06HG6aF9wyKA+EBU5LHY9Pi6LU0qNZCtlCsx9uuOJRGqKGpaSoUmvrgJAUg94mS++qIyw3M2JLU4JVFeVoQW2H/pEk/Kp0rl3ZXfYs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713543149; c=relaxed/simple;
+	bh=BoY/Dy3UEpWzAlEVCqDQTE76CEu5CAwU1Yr/gwGs0FU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=egVXsj3R6RP/JiFZGaa3W6VTyqFv8qpq5Pmj6QHwMBRaOAXd8OE3t2edjZhODWLcv1BEyGO23ePPIxkjWFtafbNO+20Dh3PM+q0+MRMlp6ZPBVdQ6yS/9I4Z6D54kjQ5K2z4nfVhzSBgTx5uSVGfyzdjQyWxn1+hl6iMiBqTSkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BzV4BJKy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Lwy9C1xR"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iGglFsMezYIvPja6laEvVLvSTpYRXcOQZOYjSCRFE2AOzHUu04vz4/hvPNLqvUuK/f0i2vL6wt8q1wx7l2VgexiXWF9b552cCJX7yapSbBmmiCmVKajtViUQveLDfsi17bUGObPJaVJkpR2hoYAzHcpTaxmdt2ellWs8MvKx7/k+xnH+enTUDBAEEJCX3r7vrU9YEI3vudWUDzkMyGnr6shMg4zqgN0+bA6z1HifTZxwj/C2CmKOWCCCX6Zc30p8TWyc3drURexESAoeJi35qWDvh1LZtKnmV+KKpRQbxxt5QNH0QZqNb+UBtmtOyJIs8cYwMfuj6nEHa5ddjFVv2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3qSeQz0enh3nAACey1JKcfgjxc5ZS1pjRYCYrOLMTs4=;
- b=gmnxAfuw71cwuJQIaUmunjmR29KdQiW4tVzSfRsMGQuNd4hNJYIm+QgsGnMseYfmTSJBv7yKVTpnP/yzcPdaujpzg2O6aMj0ExQCSOd6hF6+eL7IjsgyYrn2LkOyYUDmVD6vz4WZZ6jHHTE+AlG96+TWpr5tAcu1egvo7RWsb0pubNyPOh9AhRRZBctCyq3oI4hkd6CLG8kcfR21EfIEVesnjHxhkxdv5+8LH1JNMO+d94XbnYpFB+3IIikazgWsOelmt8Ega/OFTqTDN2FXHB+xkW4Xrgmc5DJFxApXfZ1sHLS6vRujDDgf6rV16CN/2TqhVrO505MiR6G3LHyGYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3qSeQz0enh3nAACey1JKcfgjxc5ZS1pjRYCYrOLMTs4=;
- b=Lwy9C1xRLLYn38lSawithV5dB0Yb5+GmGWmbBq8bAcBq1nmBJ8ZvU2xOazICg0cN8KiEm6873XgOpZn2gDETGcaFoK3Uro71xKXkbGi5gw3UFlLDwfRNfA4+GcxbSO9MQw8sI7iFci8bgq6AYYRmB+KvaZrTE6dWtEQhsxJXcog=
-Received: from DS7PR06CA0038.namprd06.prod.outlook.com (2603:10b6:8:54::19) by
- SJ2PR12MB9139.namprd12.prod.outlook.com (2603:10b6:a03:564::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7472.44; Fri, 19 Apr 2024 15:11:09 +0000
-Received: from CY4PEPF0000EE32.namprd05.prod.outlook.com
- (2603:10b6:8:54:cafe::eb) by DS7PR06CA0038.outlook.office365.com
- (2603:10b6:8:54::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.33 via Frontend
- Transport; Fri, 19 Apr 2024 15:11:09 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000EE32.mail.protection.outlook.com (10.167.242.38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7452.22 via Frontend Transport; Fri, 19 Apr 2024 15:11:09 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 19 Apr
- 2024 10:11:07 -0500
-Date: Fri, 19 Apr 2024 10:11:09 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: David Hildenbrand <david@redhat.com>
-CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
-	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
-	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
-	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
-	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
-	<ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: Re: [PATCH v13 04/26] KVM: guest_memfd: Fix PTR_ERR() handling in
- __kvm_gmem_get_pfn()
-Message-ID: <20240419151109.bo6kz4s24jgrmaj4@amd.com>
-References: <20240418194133.1452059-1-michael.roth@amd.com>
- <20240418194133.1452059-5-michael.roth@amd.com>
- <a6086ba5-6137-44a0-9e51-ce4df5eb6ce4@redhat.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BzV4BJKy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713543146;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9uBiWyy2Y6aSUbUd2veflvDo2gmH6uQXxYZf3A1GRsI=;
+	b=BzV4BJKyqk7hJjh0On+5j+foOmt+69ti/kM0nQYgbT+oafjmAQUPAvWIlwhaMERdBQvjCP
+	CDzOGTy55TCavSdOFLREZyYKVJEIhq1bDZw+N8yQ0ikKfh0SPlaABXe154iPJZ9npxmddW
+	w/7mfqcVzZ4P0C6cYCkCUK5VdXLFrcs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-614-d21fGfmTMHOT_FPUbD2AwQ-1; Fri, 19 Apr 2024 12:12:24 -0400
+X-MC-Unique: d21fGfmTMHOT_FPUbD2AwQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3473168c856so1346679f8f.1
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Apr 2024 09:12:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713543143; x=1714147943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9uBiWyy2Y6aSUbUd2veflvDo2gmH6uQXxYZf3A1GRsI=;
+        b=GGXcjZ3xzeA3gwwowxg3DPmtrmTNUy2ElCKSZldrUs0XyI5otDRDG50hrur1Jw9RUb
+         WmvKioqFDHRo6SdPUdj11i1vIEURBpc3RXV3ccu6dscssddN6UVqfhqU9JA3kRQD7jNH
+         hVcD4+tDIyz8hDNyPJlMUCB1iwTx8eW3f1PYKcLXHxQTLI+7eH4KYmoYxm07tUHUE8mx
+         nqqe3uXIEPxlje0md4u3Hq34QuNAX6U9aKU2+CvxGjWiQ2isCkYT1uWX2+a69aPChJhY
+         tM5T9OHoQqnPcDqweBk7zqYzFh6/qEsXKnAe9A2r+1e78fKMlJDBw0erVVpZfpOY1DeG
+         Svgg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0c86UhaEaydZAr4EgON0vdvkYkdBr0PcfGiHxM+xVWNwEDBzDKBbqI1HjYqQyzGueNAqG1IAaJOz9DPxCVgpVsjlUek5Gop+3/yKH
+X-Gm-Message-State: AOJu0YzC+aV1BRZ4nQItcE+4BoXzRxgjMEsV0MxoIyFIj5rrfVk4xVRh
+	DeoEwqcs3kA4+5GAevZgP2TMOB8W7HcbEGP6wpnL9QjahDZz8ncZie6/jfXH12fD1nmidVCI5pE
+	LwRj6gWn1LIUuc2vho0um7nXFvwwGwgIQizMCNEDr9as9rnRXcGaI9jnVY31Jf3fWg1DtJKG4WC
+	gDOhcaaQjAfrvvgSNAr3WCWUURqZ5QRD2MgG10
+X-Received: by 2002:a05:6000:f:b0:34a:72d:8dae with SMTP id h15-20020a056000000f00b0034a072d8daemr1744521wrx.22.1713543142972;
+        Fri, 19 Apr 2024 09:12:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGu/laGQnrA9BrIF/Cu+lsjfknC5maDVu87SwW7AhUXq8hp5tDZF8U2qhpYBw4LEzoXCxA4xzi8O802s4cFw3o=
+X-Received: by 2002:a05:6000:f:b0:34a:72d:8dae with SMTP id
+ h15-20020a056000000f00b0034a072d8daemr1744478wrx.22.1713543142601; Fri, 19
+ Apr 2024 09:12:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <a6086ba5-6137-44a0-9e51-ce4df5eb6ce4@redhat.com>
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE32:EE_|SJ2PR12MB9139:EE_
-X-MS-Office365-Filtering-Correlation-Id: f21d702e-2189-412d-a4ec-08dc6082f18d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	iunGVMZpDu9mmJf9+rNqettYlXiVIlnxFFBNycGuCOBsltobTMrWMJkFNMcmeGL27PuOg9ToDLyrJJWNOxLeuo0Wb43m7KnJpPsR9uVIIARMEBoDOnw+tLOTlNF2t+0jLhBD7ZKduQYR992RTyasB3OI4f/z6qcxIlk++by+mjedc90GRwRyHwtiWqdm92qLWTi+Rjr6THEWQHe9C78+1DYuV2VLQETWFVE07wSzuYVAwd8QHs5JsV8w3eiwntXSfn1PDrThFKzXt026Vp/PbQt51/OjuZ3f/Be7HoW1CcOpbys1ZFfZb1rTj6ISppynBGA9wgfp9ms5y2qX643eWarbQmCj0mRv/u9HtLeAQjtNc+oVFxhEmgdY/QjlpsXBCpC+NgncZR9ytlLAa0UdBR0ZgS4+61o9pTGlB426wyjVaXbdv3qLPrn6XZLwNaEpOyXFGMZWSlFfye3nYXR0DnglixQEqS2ubob7AWu5SHOzLvrTTdPf2hv4LFh/04fsWsBMKVOUtLFSs3VNBrUO0y0FrKKXldEoi3MT1sCDzuF8eMw6KFSGB4nxmSe4tmqBOjRMwB/1Dh3ZKEWSMCo1ePPeFYm5uLsy5wxXtE1cvRKksZVQFYqVaZ6F/NrT900WiPI/PbvY6riEKdodD7oBUqsHNGoPu/grhLrCA98bkIYBBBI9YMRcLv3u/QaLR/chu9QruKaPTG2HTVfZfmuu0coWAVaYs7jM21lm6xRhzoo9LHzZ5T/Q9EpFlnyoZMgm
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(7416005)(376005)(82310400014)(1800799015)(36860700004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2024 15:11:09.2923
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f21d702e-2189-412d-a4ec-08dc6082f18d
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE32.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9139
+References: <20240418194133.1452059-1-michael.roth@amd.com>
+ <20240418194133.1452059-11-michael.roth@amd.com> <CABgObfaj4-GXSCWFx+=o7Cdhouo8Ftz4YEWgsQ2XNRc3KD-jPg@mail.gmail.com>
+In-Reply-To: <CABgObfaj4-GXSCWFx+=o7Cdhouo8Ftz4YEWgsQ2XNRc3KD-jPg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 19 Apr 2024 18:12:11 +0200
+Message-ID: <CABgObfa9Ya-taTKkRbmUQGcwqYG+6cs_=kwdqzmFrbgBQG3Epw@mail.gmail.com>
+Subject: Re: [PATCH v13 10/26] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com, 
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 19, 2024 at 02:58:43PM +0200, David Hildenbrand wrote:
-> On 18.04.24 21:41, Michael Roth wrote:
-> > kvm_gmem_get_folio() may return a PTR_ERR() rather than just NULL. In
-> > particular, for cases where EEXISTS is returned when FGP_CREAT_ONLY
-> > flag is used. Handle this properly in __kvm_gmem_get_pfn().
-> > 
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > ---
-> >   virt/kvm/guest_memfd.c | 4 ++--
-> >   1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> > index ccf22e44f387..9d7c6a70c547 100644
-> > --- a/virt/kvm/guest_memfd.c
-> > +++ b/virt/kvm/guest_memfd.c
-> > @@ -580,8 +580,8 @@ static int __kvm_gmem_get_pfn(struct file *file, struct kvm_memory_slot *slot,
-> >   	}
-> >   	folio = kvm_gmem_get_folio(file_inode(file), index, prepare);
-> > -	if (!folio)
-> > -		return -ENOMEM;
-> > +	if (IS_ERR_OR_NULL(folio))
-> > +		return folio ? PTR_ERR(folio) : -ENOMEM;
-> 
-> Will it even return NULL?  Staring at other filemap_grab_folio() users, they
-> all check for IS_ERR().
+On Fri, Apr 19, 2024 at 1:56=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
+ wrote:
+> > +       ret =3D kvm_gmem_populate(kvm, params.gfn_start, u64_to_user_pt=
+r(params.uaddr),
+> > +                               npages, sev_gmem_post_populate, &sev_po=
+pulate_args);
+> > +       if (ret < 0) {
+> > +               argp->error =3D sev_populate_args.fw_error;
+> > +               pr_debug("%s: kvm_gmem_populate failed, ret %d (fw_erro=
+r %d)\n",
+> > +                        __func__, ret, argp->error);
+> > +       } else if (ret < npages) {
+> > +               params.len =3D ret * PAGE_SIZE;
+> > +               ret =3D -EINTR;
+>
+> This probably should 1) update also gfn_start and uaddr 2) return 0
+> for consistency with the planned KVM_PRE_FAULT_MEMORY ioctl (aka
+> KVM_MAP_MEMORY).
 
-Looks like the NULL case is handled with PTR_ERR(-ENOENT), so IS_ERR()
-would be sufficient. I think in the past kvm_gmem_get_folio() itself
-would return NULL in some cases, but as of commit 2b01b7e994e95 that's
-no longer the case.
+To be more precise, params.len should be set to the number of bytes *left*,=
+ i.e.
 
-I'll fix this up to expect only PTR_ERR() when I re-spin v14, and also
-address the other kvm_gmem_get_folio() / __filemap_get_folio() call
-sites.
+   params.len -=3D ret * PAGE_SIZE;
+   params.gfn_start +=3D ret * PAGE_SIZE;
+   if (params.type !=3D KVM_SEV_SNP_PAGE_TYPE_ZERO)
+       params.uaddr +=3D ret * PAGE_SIZE;
 
-> 
-> >   	if (folio_test_hwpoison(folio)) {
-> >   		r = -EHWPOISON;
-> 
-> Do we have a Fixes: tag?
+Also this patch needs some other changes:
 
-Fixes: 2b01b7e994e95 ("KVM: guest_memfd: pass error up from filemap_grab_folio")
+1) snp_launch_update() should have something like this:
 
-Will add that in the re-spin as well.
+   src =3D params.type =3D=3D KVM_SEV_SNP_PAGE_TYPE_ZERO ? NULL :
+u64_to_user_ptr(params.uaddr),;
 
-Thanks!
+so that then...
 
--Mike
+> +               vaddr =3D kmap_local_pfn(pfn + i);
+> +               ret =3D copy_from_user(vaddr, src + i * PAGE_SIZE, PAGE_S=
+IZE);
+> +               if (ret) {
+> +                       pr_debug("Failed to copy source page into GFN 0x%=
+llx\n", gfn);
+> +                       goto out_unmap;
+> +               }
 
-> 
-> -- 
-> Cheers,
-> 
-> David / dhildenb
-> 
+... the copy can be done only if src is non-NULL
+
+2) the struct should have some more fields
+
+> +        struct kvm_sev_snp_launch_update {
+> +                __u64 gfn_start;        /* Guest page number to load/enc=
+rypt data into. */
+> +                __u64 uaddr;            /* Userspace address of data to =
+be loaded/encrypted. */
+> +                __u32 len;              /* 4k-aligned length in bytes to=
+ copy into guest memory.*/
+> +                __u8 type;              /* The type of the guest pages b=
+eing initialized. */
+
+__u8 pad0;
+__u16 flags;   // must be zero
+__u64 pad1[5];
+
+with accompanying flags check in snp_launch_update().
+
+If you think IMI can be implemented already (with a bit in flags) go
+ahead and do it.
+
+Paolo
+
