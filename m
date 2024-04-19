@@ -1,73 +1,73 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A2D823BC
-	for <linux-crypto@vger.kernel.org>; Fri, 19 Apr 2024 11:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05B77EF0A
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Apr 2024 12:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713527904; cv=none; b=WYmg2Ghg1f4D72ML0EE7waFlnF0JIoPk7CXHQX9yXZcgdUsyXIQqBd7dWEVRUAECyJDyZ+H1qmCmJeR/DXYfKIumINrbB3MbW9NtnKlN5LiHDO8cMOw27M2szDvT+BLKq0uPNO2tyrRjYqf9kaU5/Lj7Yf3raIl8ETWn4OJFXxA=
+	t=1713528106; cv=none; b=SDPa9SRhJ1rfGyCtCHJYUuGNACENocetXshh+vmcc34MU/3JDGM4T3h/IhZabXSdwdnsuNbQ2LUp8PAh9Uo9NaNNOmlv1LvrnkN051xyWV9dTaiugLRxBnI29YFVDPX0PkyIZ6jvuwXTDeXEta4l1XQ7SwRK9qOCKICvFkEDuAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713527904; c=relaxed/simple;
-	bh=wBbLhac8QaUF0O5nwHjFjj5cUq+nWt4AMbemYENl12c=;
+	s=arc-20240116; t=1713528106; c=relaxed/simple;
+	bh=acN4eXWZt8iLvqysCB2S2Dc6auK2r1UT70yxAxadgbw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S6tURDDBB0dBgGmC08ETYkYfd4zo7VwP+Hx+TCpFIqRikCWRvbUIzXhzyCAdYf8WzoIudQHzY2OeI+4xP14v2tKwCdvOVah1VAXGXePUZhAZmYCC3jpc+sxPHP3kXnvqNZf5/Iqs/tcZeIpricF60TGhfcCPG8kp2//ANNP9Xvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Im8fOYFq; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=hBiVTUVek1ugXqfCM9i71Fy6SrDzsYsYuFAkD5FnK7kHW2HtWPzNu/4xUNCvs1/rJTnGj603AorftnDuF2ibJvNOXM5rbpm2zyw6TXZ1miAsOjVNAz88NwvDCcsp1Cbtjq2T8D7ywA4j/oPqVCNTb56W136SG1F8ckQYEgLko9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Akw+r+IT; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Im8fOYFq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Akw+r+IT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713527901;
+	s=mimecast20190719; t=1713528104;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CwxWxYK6yFiOYVQyI4AiRXsN6yKGGl+jXN1TxSL+A3k=;
-	b=Im8fOYFqW2uQiH2FdGj/kjrDq2Ge2hlx5Dx7E39iy6PuRTw/2Qo51ARU8uly2F2galkwRp
-	HVIctYB9Vl+ItXC0YQRPAZOTdDXhxfopDfyke/C3D3E/ESRKXjNptxp8lLMblluS6CXSWF
-	JlFFSksRgrPBjPQ0CjrO9O3TIz4nH2U=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Vahs511qBysOkO0uiEmPvdJfNTUFHsURAvS7DcBv8xY=;
+	b=Akw+r+ITtB6jgATaNf+mskwcKMUt3m4QXf/7JL+1hd09iQ5PHq5rQXrX7dnOXhSuRl3mFj
+	/aIHEa/JxbuZfgCKM4urVzCW5K1QcHziyzYv1fpSx/jxey70qhHOQj8AlWanPXL3sgf7M1
+	VNlofBOtP56Y9kWFuTP0tWPDr72JY70=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-83-XSyMLkmbNWeQ1mLWnIk-DQ-1; Fri, 19 Apr 2024 07:58:20 -0400
-X-MC-Unique: XSyMLkmbNWeQ1mLWnIk-DQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-343f08542f8so1321483f8f.0
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Apr 2024 04:58:20 -0700 (PDT)
+ us-mta-172-R3QzBV_sNPOe4dUEeSyjMA-1; Fri, 19 Apr 2024 08:01:42 -0400
+X-MC-Unique: R3QzBV_sNPOe4dUEeSyjMA-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-418f6585034so6524105e9.2
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Apr 2024 05:01:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713527899; x=1714132699;
+        d=1e100.net; s=20230601; t=1713528101; x=1714132901;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CwxWxYK6yFiOYVQyI4AiRXsN6yKGGl+jXN1TxSL+A3k=;
-        b=u0O4uovmDsvFDaR+QFLiSiRKhEiTztce3P8a9c49zPUwcwGlfVaVydXrX67o9iecUh
-         7S+gYwvb+o/OCZzVAz8E7VItjx0QI0tW9iwH4QK0dhXxfkhC2tm8dh4OYHlkr3lQdPaa
-         NLD4xf1qKtKyB2itt+0FbrsktFJWuW4saBw4L+cHWfxEw8KoVSszUQqFt2bQAOk0sf7/
-         r7iy4r6pn/wDiJbOKyBZ7gc1vchFU/ICBSVVgVDKwuZODEd+JeF3KNccd5q094O0/r0b
-         +9mXem2/RhpdrqXeKJFP4NJrZ4DP3kcnhF7kEWYhGYShuVrxt667HHgYwUmdzbj8YkdC
-         x+gQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXHKY6TR/GbD3Yk5ayBQQ5HSIjDA3kUBqm+MsY4GaUqTsX6+o/vZKHlq6RgHhY8E1MGpbox9yeEZrDDrenNmdVD9mq/yhsI9k1ifg4h
-X-Gm-Message-State: AOJu0YwKxTWb2u0r2F8ivpaVb8XSCrzGWKWm/UwneZ0Hg4bgge08BSKo
-	akB+l3Kxemw1PphTiR3LM40TZeTUaQezxqssOJClIS5dsoxgE22auLyA7xbM92QpiexP5wnZYAJ
-	FAy7IQsiJ6rPEPBaDkVKLAyK82AUqJpwmLwWIQg8icAnrQlg6qkL3iSuIBQHQwuevl7BcRcwVaf
-	YaUkXjlRt4qMX2OGHOV90HiSExRHD4/vdUruMI
-X-Received: by 2002:a5d:50d1:0:b0:33d:b376:8a07 with SMTP id f17-20020a5d50d1000000b0033db3768a07mr1167224wrt.8.1713527899433;
-        Fri, 19 Apr 2024 04:58:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHM7xQDK90cgpkqMe8qHCL2Dpb0GVAovL4zmOZ8Y/f+iUHPX7N3URgMIDSP1Agr9DUXYvSVNpPPSl3w69ic80Y=
-X-Received: by 2002:a5d:50d1:0:b0:33d:b376:8a07 with SMTP id
- f17-20020a5d50d1000000b0033db3768a07mr1167205wrt.8.1713527899035; Fri, 19 Apr
- 2024 04:58:19 -0700 (PDT)
+        bh=Vahs511qBysOkO0uiEmPvdJfNTUFHsURAvS7DcBv8xY=;
+        b=weYETloNJxQh6xnZvDZpJnDG6xEGUVEE5Enfq10KLUrO7YHWxpbwIAyHoTv1EOAWsC
+         c700Q8ib2m99yBO99ZB++/PiklB2S0/uz4Vc22LQYbZwbk0OAKZWKSZPPl+Os7DXmsTM
+         tbbr/H/Qo1i956jOyoq7+xHOjao6HG2gYUOfCNMfUIyk1bb6wlf42Ha7OTaOvA2+TCvo
+         BO1+C7tNpGcQwBtr9SJ/C/iQj15oZCIIBMVGl+b12YpqrRKAp85cveo+rcmpFuqyVe4v
+         cXKo/S1iiVwTrH2t3deXCaU/bgYTQI7rROXIYYSBRnlwv/gewfE/ALBzKTYlN659271c
+         4MAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZntikwGJQMWZxVXDQcJob8GPp/AvYHc7FHK4nstvrrY5rO2JlqHseyVnPR5wCbtqSOsjr/gyZuJzWl4x5DoxbJgavUxaWhXb+aeTe
+X-Gm-Message-State: AOJu0YzKY/T4Hv3fsi7u/1W7QPoC9L/EV4HUxWcZFW6HGcBHGdT1tGc/
+	VXHgawlMDLLbAih8ca3Df/67YCkBnl2mURHI6jrezbO6UsD2KBw4E4miGAeCnvG9BPv2zUuhtkI
+	S8XBYa9xfNDgW0fPBns1POxHAyUqfOHEIU/rrjC5Osev/sa0UmnBf01XqS3ZZua91LQP5IAqNU8
+	+JR/poycHV/mN206H4M3bfARzFYtFceM7F/7Lw
+X-Received: by 2002:a05:600c:45cd:b0:418:9ba3:ee76 with SMTP id s13-20020a05600c45cd00b004189ba3ee76mr1378070wmo.4.1713528101569;
+        Fri, 19 Apr 2024 05:01:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEaFUZhMFYFAs3ZhsYYcBoV+2/MzoyjDzM+1t4+goj9WAVZ/2QAmnhBwnZ/PquJCML4YzG+HJVNxiJvWhvW6sY=
+X-Received: by 2002:a05:600c:45cd:b0:418:9ba3:ee76 with SMTP id
+ s13-20020a05600c45cd00b004189ba3ee76mr1378024wmo.4.1713528101121; Fri, 19 Apr
+ 2024 05:01:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240418194133.1452059-1-michael.roth@amd.com> <20240418194133.1452059-9-michael.roth@amd.com>
-In-Reply-To: <20240418194133.1452059-9-michael.roth@amd.com>
+References: <20240418194133.1452059-1-michael.roth@amd.com> <20240418194133.1452059-17-michael.roth@amd.com>
+In-Reply-To: <20240418194133.1452059-17-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 19 Apr 2024 13:58:07 +0200
-Message-ID: <CABgObfbNd2Z85o3Wb-yr5qYSWYTadxZGuh6PP=r-5dNpa06ErA@mail.gmail.com>
-Subject: Re: [PATCH v13 08/26] KVM: SEV: Add initial SEV-SNP support
+Date: Fri, 19 Apr 2024 14:01:29 +0200
+Message-ID: <CABgObfYzM4tsoYtVdACtbY4ZXs4j2hrsVEafD9=EnqnXjoJ+2Q@mail.gmail.com>
+Subject: Re: [PATCH v13 16/26] KVM: SEV: Support SEV-SNP AP Creation NAE event
 To: Michael Roth <michael.roth@amd.com>
 Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
 	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,62 +85,21 @@ Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 18, 2024 at 9:51=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
+On Thu, Apr 18, 2024 at 9:45=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
  wrote:
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 535018f152a3..d31404953bf1 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4899,7 +4899,8 @@ static int svm_vm_init(struct kvm *kvm)
+>          * the VMSA will be NULL if this vCPU is the destination for intr=
+ahost
+>          * migration, and will be copied later.
+>          */
+> -       if (svm->sev_es.vmsa)
+> +       if (!svm->sev_es.snp_has_guest_vmsa)
+>                 svm->vmcb->control.vmsa_pa =3D __pa(svm->sev_es.vmsa);
 >
->         if (type !=3D KVM_X86_DEFAULT_VM &&
->             type !=3D KVM_X86_SW_PROTECTED_VM) {
-> -               kvm->arch.has_protected_state =3D (type =3D=3D KVM_X86_SE=
-V_ES_VM);
-> +               kvm->arch.has_protected_state =3D
-> +                       (type =3D=3D KVM_X86_SEV_ES_VM || type =3D=3D KVM=
-_X86_SNP_VM);
+>         /* Can't intercept CR register access, HV can't modify CR registe=
+rs */
 
-I'd rather set has_private_mem here too, rather than in x86.c
-
-Also this patch is the place to have
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index d31404953bf1..6209f70ab11a 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2056,6 +2056,9 @@ static int npf_interception(struct kvm_vcpu *vcpu)
-     if (WARN_ON_ONCE(error_code & PFERR_SYNTHETIC_MASK))
-         error_code &=3D ~PFERR_SYNTHETIC_MASK;
-
-+    if (sev_snp_guest(vcpu) && (error_code & PFERR_GUEST_ENC_MASK))
-+        error_code |=3D PFERR_PRIVATE_ACCESS;
-+
-     trace_kvm_page_fault(vcpu, fault_address, error_code);
-     return kvm_mmu_page_fault(vcpu, fault_address, error_code,
-             static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
-
-
-for the final shape of the MMU changes.
+This needs to be svm->sev_es.vmsa && ... (see existing comment above the "i=
+f").
 
 Paolo
-
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 83b8260443a3..9923921904a2 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12598,7 +12598,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned lo=
-ng type)
->
->         kvm->arch.vm_type =3D type;
->         kvm->arch.has_private_mem =3D
-> -               (type =3D=3D KVM_X86_SW_PROTECTED_VM);
-> +               (type =3D=3D KVM_X86_SW_PROTECTED_VM || type =3D=3D KVM_X=
-86_SNP_VM);
->
->         ret =3D kvm_page_track_init(kvm);
->         if (ret)
-> --
-> 2.25.1
->
 
