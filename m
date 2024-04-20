@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1022A2563
-	for <linux-crypto@vger.kernel.org>; Sat, 20 Apr 2024 05:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD09205E26
+	for <linux-crypto@vger.kernel.org>; Sat, 20 Apr 2024 06:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713592624; cv=none; b=n4j9e/OrzorROYt/LDeagZHLPTc7YmjPXvlre8oIU0TXU+DZuAtoyNRC0fD1HtR/SOpwAjwCDdSX2R3p8xHiMGJLawR9EJnyXFcytkdswNRXxE18X+U3xCv+slyu0PrCcK6A3jRe7wYDjzhD0WuI90YWv3fL38HLMC5nRkviXXw=
+	t=1713592870; cv=none; b=KhvXAZntSJU29SeEhPH22GFTgr0Bz3UDoWtF578alXQv14yTp6mY7+Pjil/T4yRaT8C+40+O3oUN4ptGoYiKhijtZgHYUpmdx0RwupxfRHmUeR5D4ZKSNrJviC0eem7epokPlHdCWXx/AD4NqIXqsRFYs/VUbumfxuBWFU+aMeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713592624; c=relaxed/simple;
-	bh=9snsSe98tLNo23FRNWKWuUXu5OenVZEpV8woPgKEGSM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gbybIynZGDya4DhGWgUPN30Lym68u5zSI0O1Ztf7OLqT0MPv0rj5pfWhkRcIGQj60phYrhiQnAF2Jn0Jt6j/A2kDGWOzjMRihqRHk6gbSGW3xWkx1o5MLsrfbYeDpwMTn+P0u+ZMI9G8UvRsRJKHsLmJtDnb54wVqLsy2Wb1TMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mPVB1jBi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713592870; c=relaxed/simple;
+	bh=nVCFnkdCM4jYahGEDbNGoUEOh5dARqC0bUdtLGNjuLk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eT5MVxvvUNvJrERmlGO4LUFzqh+nj/xMFqSEGTFfFl1vb3crPuZfyJubZ9NaLXEDqS2T+99zpXnvybxEDvlAodApPogjBhu9g6oQN7zRnj8S3oxt9Zf9/I7wwXCX/Su9ZLDuM5ppO75VU2XLWBN02zhHGgugMclhECZCSXHWbdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=esL7vgt6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mPVB1jBi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59862C072AA;
-	Sat, 20 Apr 2024 05:57:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="esL7vgt6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 991A6C072AA;
+	Sat, 20 Apr 2024 06:01:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713592623;
-	bh=9snsSe98tLNo23FRNWKWuUXu5OenVZEpV8woPgKEGSM=;
+	s=k20201202; t=1713592869;
+	bh=nVCFnkdCM4jYahGEDbNGoUEOh5dARqC0bUdtLGNjuLk=;
 	h=From:To:Cc:Subject:Date:From;
-	b=mPVB1jBi2VWEPK7Ztgh/NkTG1Fu8HrvppF7hwuIKq2Th/m2+mB18Sqq4S7ysY4Ip3
-	 sc1rWic8pJ/+wTBeGxl4pKXCw/OeHduJrOHPQWCWehLE9/2H3jJQPXOz2J9j2GgPrO
-	 68MhT+C9EB/w/c87HWsWjr8P50Xcxc0ZK4Ru6mLqpDn81ORlzD9h2JHou7sL8klrTa
-	 xfEMDjGVbBPjglOT4TTSQz6FJlfeRvGTM7lGw4MQvZpqMJQgLXIrjI0loZbQy5pqO7
-	 rfhsvLV1dEHK9l3wVcz2lUQW+7rWuD2OmXC/Y95NC8GPsxvTE0k0OPxE4WfXs36iEF
-	 lyFTzWqpygGbA==
+	b=esL7vgt6qRC/hn3imzW6UhFutiPNE+3yYhlUkjEDzXx3HGY0Uun9C27Zd2jl5fDJw
+	 QICjzd3lTEkYoefZOSb6TBkrEtWq8imRtdOEUP92qcHOzcdDwJxMxSQLl1cDG6s/EV
+	 IgbiVYkNDr5v4jg4Isvkj6J4gebIB0dTSut5zqLAVVIkX+IBsp6I6R95TWwz1W7fn1
+	 ey3jtEnN0z+Poz2GhZF/f6lMo6yh8dBqrTQjDJsRxpH0fn3uHtDuhJrVPAcOjHMjSx
+	 eaSXeob8CuUITZVbR3h2Idj56WntGQp5nJH2TWq2nO4j2OIolbtjaIRuKP6J5Akcxq
+	 n+igs81panCYg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: x86@kernel.org
-Subject: [PATCH] crypto: x86/aes-gcm - delete unused GCM assembly code
-Date: Fri, 19 Apr 2024 22:56:42 -0700
-Message-ID: <20240420055642.25409-1-ebiggers@kernel.org>
+Subject: [PATCH] crypto: x86/aes-gcm - simplify GCM hash subkey derivation
+Date: Fri, 19 Apr 2024 23:00:37 -0700
+Message-ID: <20240420060037.26014-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -42,240 +42,90 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Delete aesni_gcm_enc() and aesni_gcm_dec() because they are unused.
-Only the incremental AES-GCM functions (aesni_gcm_init(),
-aesni_gcm_enc_update(), aesni_gcm_finalize()) are actually used.
-
-This saves 17 KB of object code.
+Remove a redundant expansion of the AES key, and utilize the zero page.
+Also rename rfc4106_set_hash_subkey() to aes_gcm_derive_hash_subkey()
+because it's used for both versions of AES-GCM, not just RFC4106.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/aesni-intel_asm.S | 186 ------------------------------
- 1 file changed, 186 deletions(-)
+ arch/x86/crypto/aesni-intel_glue.c | 26 +++++++-------------------
+ 1 file changed, 7 insertions(+), 19 deletions(-)
 
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index 3a3e46188dec..39066b57a70e 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -81,13 +81,10 @@ SHIFT_MASK: .octa 0x0f0e0d0c0b0a09080706050403020100
- ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
-             .octa 0x00000000000000000000000000000000
- 
- .text
- 
--
--#define	STACK_OFFSET    8*3
--
- #define AadHash 16*0
- #define AadLen 16*1
- #define InLen (16*1)+8
- #define PBlockEncKey 16*2
- #define OrigIV 16*3
-@@ -114,15 +111,10 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- #define arg2 rsi
- #define arg3 rdx
- #define arg4 rcx
- #define arg5 r8
- #define arg6 r9
--#define arg7 STACK_OFFSET+8(%rsp)
--#define arg8 STACK_OFFSET+16(%rsp)
--#define arg9 STACK_OFFSET+24(%rsp)
--#define arg10 STACK_OFFSET+32(%rsp)
--#define arg11 STACK_OFFSET+40(%rsp)
- #define keysize 2*15*16(%arg1)
- #endif
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 110b3282a1f2..b4058c3d410d 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -38,11 +38,10 @@
  
  
- #define STATE1	%xmm0
-@@ -1505,188 +1497,10 @@ _esb_loop_\@:
- 	jnz		_esb_loop_\@
+ #define AESNI_ALIGN	16
+ #define AESNI_ALIGN_ATTR __attribute__ ((__aligned__(AESNI_ALIGN)))
+ #define AES_BLOCK_MASK	(~(AES_BLOCK_SIZE - 1))
+-#define RFC4106_HASH_SUBKEY_SIZE 16
+ #define AESNI_ALIGN_EXTRA ((AESNI_ALIGN - 1) & ~(CRYPTO_MINALIGN - 1))
+ #define CRYPTO_AES_CTX_SIZE (sizeof(struct crypto_aes_ctx) + AESNI_ALIGN_EXTRA)
+ #define XTS_AES_CTX_SIZE (sizeof(struct aesni_xts_ctx) + AESNI_ALIGN_EXTRA)
  
- 	MOVADQ		(%r10),\TMP1
- 	aesenclast	\TMP1,\XMM0
- .endm
--/*****************************************************************************
--* void aesni_gcm_dec(void *aes_ctx,    // AES Key schedule. Starts on a 16 byte boundary.
--*                   struct gcm_context_data *data
--*                                      // Context data
--*                   u8 *out,           // Plaintext output. Encrypt in-place is allowed.
--*                   const u8 *in,      // Ciphertext input
--*                   u64 plaintext_len, // Length of data in bytes for decryption.
--*                   u8 *iv,            // Pre-counter block j0: 4 byte salt (from Security Association)
--*                                      // concatenated with 8 byte Initialisation Vector (from IPSec ESP Payload)
--*                                      // concatenated with 0x00000001. 16-byte aligned pointer.
--*                   u8 *hash_subkey,   // H, the Hash sub key input. Data starts on a 16-byte boundary.
--*                   const u8 *aad,     // Additional Authentication Data (AAD)
--*                   u64 aad_len,       // Length of AAD in bytes. With RFC4106 this is going to be 8 or 12 bytes
--*                   u8  *auth_tag,     // Authenticated Tag output. The driver will compare this to the
--*                                      // given authentication tag and only return the plaintext if they match.
--*                   u64 auth_tag_len); // Authenticated Tag Length in bytes. Valid values are 16
--*                                      // (most likely), 12 or 8.
--*
--* Assumptions:
--*
--* keys:
--*       keys are pre-expanded and aligned to 16 bytes. we are using the first
--*       set of 11 keys in the data structure void *aes_ctx
--*
--* iv:
--*       0                   1                   2                   3
--*       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                             Salt  (From the SA)               |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                     Initialization Vector                     |
--*       |         (This is the sequence number from IPSec header)       |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                              0x1                              |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*
--*
--*
--* AAD:
--*       AAD padded to 128 bits with 0
--*       for example, assume AAD is a u32 vector
--*
--*       if AAD is 8 bytes:
--*       AAD[3] = {A0, A1};
--*       padded AAD in xmm register = {A1 A0 0 0}
--*
--*       0                   1                   2                   3
--*       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                               SPI (A1)                        |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                     32-bit Sequence Number (A0)               |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                              0x0                              |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*
--*                                       AAD Format with 32-bit Sequence Number
--*
--*       if AAD is 12 bytes:
--*       AAD[3] = {A0, A1, A2};
--*       padded AAD in xmm register = {A2 A1 A0 0}
--*
--*       0                   1                   2                   3
--*       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                               SPI (A2)                        |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                 64-bit Extended Sequence Number {A1,A0}       |
--*       |                                                               |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                              0x0                              |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*
--*                        AAD Format with 64-bit Extended Sequence Number
--*
--* poly = x^128 + x^127 + x^126 + x^121 + 1
--*
--*****************************************************************************/
--SYM_FUNC_START(aesni_gcm_dec)
--	FUNC_SAVE
--
--	GCM_INIT %arg6, arg7, arg8, arg9
--	GCM_ENC_DEC dec
--	GCM_COMPLETE arg10, arg11
--	FUNC_RESTORE
--	RET
--SYM_FUNC_END(aesni_gcm_dec)
--
--
--/*****************************************************************************
--* void aesni_gcm_enc(void *aes_ctx,      // AES Key schedule. Starts on a 16 byte boundary.
--*                    struct gcm_context_data *data
--*                                        // Context data
--*                    u8 *out,            // Ciphertext output. Encrypt in-place is allowed.
--*                    const u8 *in,       // Plaintext input
--*                    u64 plaintext_len,  // Length of data in bytes for encryption.
--*                    u8 *iv,             // Pre-counter block j0: 4 byte salt (from Security Association)
--*                                        // concatenated with 8 byte Initialisation Vector (from IPSec ESP Payload)
--*                                        // concatenated with 0x00000001. 16-byte aligned pointer.
--*                    u8 *hash_subkey,    // H, the Hash sub key input. Data starts on a 16-byte boundary.
--*                    const u8 *aad,      // Additional Authentication Data (AAD)
--*                    u64 aad_len,        // Length of AAD in bytes. With RFC4106 this is going to be 8 or 12 bytes
--*                    u8 *auth_tag,       // Authenticated Tag output.
--*                    u64 auth_tag_len);  // Authenticated Tag Length in bytes. Valid values are 16 (most likely),
--*                                        // 12 or 8.
--*
--* Assumptions:
--*
--* keys:
--*       keys are pre-expanded and aligned to 16 bytes. we are using the
--*       first set of 11 keys in the data structure void *aes_ctx
--*
--*
--* iv:
--*       0                   1                   2                   3
--*       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                             Salt  (From the SA)               |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                     Initialization Vector                     |
--*       |         (This is the sequence number from IPSec header)       |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                              0x1                              |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*
--*
--*
--* AAD:
--*       AAD padded to 128 bits with 0
--*       for example, assume AAD is a u32 vector
--*
--*       if AAD is 8 bytes:
--*       AAD[3] = {A0, A1};
--*       padded AAD in xmm register = {A1 A0 0 0}
--*
--*       0                   1                   2                   3
--*       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                               SPI (A1)                        |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                     32-bit Sequence Number (A0)               |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                              0x0                              |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*
--*                                 AAD Format with 32-bit Sequence Number
--*
--*       if AAD is 12 bytes:
--*       AAD[3] = {A0, A1, A2};
--*       padded AAD in xmm register = {A2 A1 A0 0}
--*
--*       0                   1                   2                   3
--*       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                               SPI (A2)                        |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                 64-bit Extended Sequence Number {A1,A0}       |
--*       |                                                               |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*       |                              0x0                              |
--*       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
--*
--*                         AAD Format with 64-bit Extended Sequence Number
--*
--* poly = x^128 + x^127 + x^126 + x^121 + 1
--***************************************************************************/
--SYM_FUNC_START(aesni_gcm_enc)
--	FUNC_SAVE
--
--	GCM_INIT %arg6, arg7, arg8, arg9
--	GCM_ENC_DEC enc
--
--	GCM_COMPLETE arg10, arg11
--	FUNC_RESTORE
--	RET
--SYM_FUNC_END(aesni_gcm_enc)
+ /* This data is stored at the end of the crypto_tfm struct.
+@@ -588,27 +587,14 @@ static int xctr_crypt(struct skcipher_request *req)
+ 		err = skcipher_walk_done(&walk, nbytes);
+ 	}
+ 	return err;
+ }
  
- /*****************************************************************************
- * void aesni_gcm_init(void *aes_ctx,      // AES Key schedule. Starts on a 16 byte boundary.
- *                     struct gcm_context_data *data,
- *                                         // context data
+-static int
+-rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
++static int aes_gcm_derive_hash_subkey(const struct crypto_aes_ctx *aes_key,
++				      u8 hash_subkey[AES_BLOCK_SIZE])
+ {
+-	struct crypto_aes_ctx ctx;
+-	int ret;
+-
+-	ret = aes_expandkey(&ctx, key, key_len);
+-	if (ret)
+-		return ret;
+-
+-	/* Clear the data in the hash sub key container to zero.*/
+-	/* We want to cipher all zeros to create the hash sub key. */
+-	memset(hash_subkey, 0, RFC4106_HASH_SUBKEY_SIZE);
+-
+-	aes_encrypt(&ctx, hash_subkey, hash_subkey);
+-
+-	memzero_explicit(&ctx, sizeof(ctx));
++	aes_encrypt(aes_key, hash_subkey, page_address(ZERO_PAGE(0)));
+ 	return 0;
+ }
+ 
+ static int common_rfc4106_set_key(struct crypto_aead *aead, const u8 *key,
+ 				  unsigned int key_len)
+@@ -622,11 +608,12 @@ static int common_rfc4106_set_key(struct crypto_aead *aead, const u8 *key,
+ 	key_len -= 4;
+ 
+ 	memcpy(ctx->nonce, key + key_len, sizeof(ctx->nonce));
+ 
+ 	return aes_set_key_common(&ctx->aes_key_expanded, key, key_len) ?:
+-	       rfc4106_set_hash_subkey(ctx->hash_subkey, key, key_len);
++	       aes_gcm_derive_hash_subkey(&ctx->aes_key_expanded,
++					  ctx->hash_subkey);
+ }
+ 
+ /* This is the Integrity Check Value (aka the authentication tag) length and can
+  * be 8, 12 or 16 bytes long. */
+ static int common_rfc4106_set_authsize(struct crypto_aead *aead,
+@@ -1328,11 +1315,12 @@ static int generic_gcmaes_set_key(struct crypto_aead *aead, const u8 *key,
+ 				  unsigned int key_len)
+ {
+ 	struct generic_gcmaes_ctx *ctx = generic_gcmaes_ctx_get(aead);
+ 
+ 	return aes_set_key_common(&ctx->aes_key_expanded, key, key_len) ?:
+-	       rfc4106_set_hash_subkey(ctx->hash_subkey, key, key_len);
++	       aes_gcm_derive_hash_subkey(&ctx->aes_key_expanded,
++					  ctx->hash_subkey);
+ }
+ 
+ static int generic_gcmaes_encrypt(struct aead_request *req)
+ {
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
 
 base-commit: 543ea178fbfadeaf79e15766ac989f3351349f02
 -- 
