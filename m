@@ -1,43 +1,37 @@
-Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CBDFBEF
-	for <linux-crypto@vger.kernel.org>; Sat, 20 Apr 2024 05:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A9F2563
+	for <linux-crypto@vger.kernel.org>; Sat, 20 Apr 2024 05:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713591788; cv=none; b=hFuUWJ86fn8uhk+gQklfFoAHM5DF7J9Ac3ifVpooyG85+aealDfn2fQPb2vPfNKTTI5wMDnwZ080wCrBlHQvjxTT7cJOIs4PKFIkTlrIA3RJrvMFdsvGFMe1kbMg1k7LngEeNABaSdZvsvGG2yrtdu+wuVUigtf4SDdT0YNgYXM=
+	t=1713592520; cv=none; b=pIQMpv9Dw1o1CvqWSQhVjJ0nMa4AztWW4hqMHlyr0RjzIcTvHKs4n1bcV3hFGXUUiHsir47GHLbxYpCftEdBChIHqYZosmnLMtObYjMAnwbmYdKSxT3geSIFnojS63AAXLp9f+R3pZ4X5AyrtlFmnsK/YqSB4YpLVh9qChI2Bgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713591788; c=relaxed/simple;
-	bh=Z1JHslbcran9A2iY5J4CpP4nBQ47O6eVV+Z/YOMpqkQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u4HToiIHaAj5z9DJCoUN/NWbQXMKfCUq8AzghfvuwlcwCfcXqk1e2Pkt+btfOuOtOmaevThRgH3NN6vaj+wE7Cm0WEz8TvRx1Fqgeq/C4QaUjtfVvyI5V6vyvdx8m6b3LY4NYIXIpU18Pk6flRFC9dsY7sDJIolNNXLsgwqDQZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=iZqRipl1; arc=none smtp.client-ip=129.153.194.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
+	s=arc-20240116; t=1713592520; c=relaxed/simple;
+	bh=LTc0gFb4N2F95I5oWv+o2EIp3INIrFlpfFLvrZi6GgE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZqciakYy8EylySkqlVcwM4gN4FBeMFA1IkmW4pXLYL6NKYQP5pxbRJacJ5X7ig5oh82HnnhCwXV0BMv9Um9mlB9o8XgRnajjDfGkBaz6w0qXJClA7CGIZjtZ6CJ99c9H2p3XfY5IF4wp3zQPK9DSYV/NU7WAoUxXxAyHrrNHzGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KIvF8efd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="iZqRipl1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
-	t=1713591780; bh=Z1JHslbcran9A2iY5J4CpP4nBQ47O6eVV+Z/YOMpqkQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iZqRipl1h7gyVsnYuDU0NN3QrQDxhAjeZyrwnAxkV7UPsuB0aeWOmEBit+D3OP9+L
-	 o6mUWO0HdaoaeQduANH5Nh1QAJTa2oEjKzOeN9a+Cl2A8VgTdlU2iLdDPhx6ATKTH9
-	 rYJOYxmVuWqIYG9B/7+raT7grcdPqzBS9q9g1fYsE0B93J5dZwSlT5Yo/x5OLT0nEE
-	 U7PG4s0BiVGpEW9f2GEXgkZC2YNirHa3Qoc7m2dSOyOGff7BzcIkqL/+GEkke8bkJm
-	 r4DxnjBut3fbRZle02Ntj46q9lQBwz8S3aGEdUCQSeMl7y2BLIkKihj9YIdJUkTNA5
-	 rUdOaQjJHUOxg==
-From: Joachim Vandersmissen <git@jvdsn.com>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David Howells <dhowells@redhat.com>,
-	Simo Sorce <simo@redhat.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	Joachim Vandersmissen <git@jvdsn.com>
-Subject: [PATCH v2 2/2] certs: Add ECDSA signature verification self-test
-Date: Sat, 20 Apr 2024 00:42:43 -0500
-Message-ID: <20240420054243.176901-2-git@jvdsn.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KIvF8efd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DA4DC072AA;
+	Sat, 20 Apr 2024 05:55:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713592520;
+	bh=LTc0gFb4N2F95I5oWv+o2EIp3INIrFlpfFLvrZi6GgE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KIvF8efdSEvuFm2BjphUJ9fzej9/stSng1sXnJp+NhTekeFgxAYtY/ZwAK/dNaHza
+	 aYB4WV5hXV91JG5RxeUT0kp1REsnQllTWnaSMWzAojmwYwLDMhrnxHevUshHtawCAt
+	 ChoGtAIEcY5zQAkarxsDuji+9aAui1YnYlTDNBniCnYe8YNhZWf4ukZPtKjdxCvGmw
+	 DKGn+DSednX0nWkDVVPnFM2WzIuSuqgskr4GJkxMrZgAshUyg3Uo8Kk9TvFiAngIUz
+	 VT8lpOz1gR1i/8P8d5yaO5W71Kgz8Q3Wi+Q7Eh2uvLbG2zNnxoSdQngmYqVFvjSQVX
+	 LXCazZ0GoGT3A==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: x86@kernel.org
+Subject: [PATCH] crypto: x86/aes-xts - simplify loop in xts_crypt_slowpath()
+Date: Fri, 19 Apr 2024 22:54:55 -0700
+Message-ID: <20240420055455.25179-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240420054243.176901-1-git@jvdsn.com>
-References: <20240420054243.176901-1-git@jvdsn.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,175 +40,50 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit c27b2d2012e1 ("crypto: testmgr - allow ecdsa-nist-p256 and -p384
-in FIPS mode") enabled support for ECDSA in crypto/testmgr.c. The
-PKCS#7 signature verification API builds upon the KCAPI primitives to
-perform its high-level operations. Therefore, this change in testmgr.c
-also allows ECDSA to be used by the PKCS#7 signature verification API
-(in FIPS mode).
+From: Eric Biggers <ebiggers@google.com>
 
-However, from a FIPS perspective, the PKCS#7 signature verification API
-is a distinct "service" from the KCAPI primitives. This is because the
-PKCS#7 API performs a "full" signature verification, which consists of
-both hashing the data to be verified, and the public key operation.
-On the other hand, the KCAPI primitive does not perform this hashing
-step - it accepts pre-hashed data from the caller and only performs the
-public key operation.
+Since the total length processed by the loop in xts_crypt_slowpath() is
+a multiple of AES_BLOCK_SIZE, just round the length down to
+AES_BLOCK_SIZE even on the last step.  This doesn't change behavior, as
+the last step will process a multiple of AES_BLOCK_SIZE regardless.
 
-For this reason, the ECDSA self-tests in crypto/testmgr.c are not
-sufficient to cover ECDSA signature verification offered by the PKCS#7
-API. This is reflected by the self-test already present in this file
-for RSA PKCS#1 v1.5 signature verification.
-
-The solution is simply to add a second self-test here for ECDSA. P-256
-with SHA-256 hashing was chosen as those parameters should remain
-FIPS-approved for the foreseeable future, while keeping the performance
-impact to a minimum. The ECDSA certificate and PKCS#7 signed data was
-generated using OpenSSL. The input data is identical to the input data
-for the existing RSA self-test.
-
-Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/asymmetric_keys/Makefile         |  1 +
- crypto/asymmetric_keys/selftest.c       |  1 +
- crypto/asymmetric_keys/selftest.h       |  6 ++
- crypto/asymmetric_keys/selftest_ecdsa.c | 89 +++++++++++++++++++++++++
- 4 files changed, 97 insertions(+)
- create mode 100644 crypto/asymmetric_keys/selftest_ecdsa.c
+ arch/x86/crypto/aesni-intel_glue.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
-index 4db6968132e9..55728d7aa979 100644
---- a/crypto/asymmetric_keys/Makefile
-+++ b/crypto/asymmetric_keys/Makefile
-@@ -25,6 +25,7 @@ x509_key_parser-y := \
- obj-$(CONFIG_FIPS_SIGNATURE_SELFTEST) += x509_selftest.o
- x509_selftest-y += selftest.o
- x509_selftest-$(CONFIG_CRYPTO_RSA) += selftest_rsa.o
-+x509_selftest-$(CONFIG_CRYPTO_ECDSA) += selftest_ecdsa.o
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 110b3282a1f2..02a4c0c276df 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -933,20 +933,17 @@ xts_crypt_slowpath(struct skcipher_request *req, xts_crypt_func crypt_func)
+ 	}
  
- $(obj)/x509_cert_parser.o: \
- 	$(obj)/x509.asn1.h \
-diff --git a/crypto/asymmetric_keys/selftest.c b/crypto/asymmetric_keys/selftest.c
-index ec289d2d065c..98dc5cdfdebe 100644
---- a/crypto/asymmetric_keys/selftest.c
-+++ b/crypto/asymmetric_keys/selftest.c
-@@ -61,6 +61,7 @@ void fips_signature_selftest(const char *name,
- static int __init fips_signature_selftest_init(void)
- {
- 	fips_signature_selftest_rsa();
-+	fips_signature_selftest_ecdsa();
- 	return 0;
- }
+ 	err = skcipher_walk_virt(&walk, req, false);
  
-diff --git a/crypto/asymmetric_keys/selftest.h b/crypto/asymmetric_keys/selftest.h
-index 3203de306619..279c8f22ca3d 100644
---- a/crypto/asymmetric_keys/selftest.h
-+++ b/crypto/asymmetric_keys/selftest.h
-@@ -14,3 +14,9 @@ void __init fips_signature_selftest_rsa(void);
- #else
- static inline void __init fips_signature_selftest_rsa(void) { }
- #endif
-+
-+#ifdef CONFIG_CRYPTO_ECDSA
-+void __init fips_signature_selftest_ecdsa(void);
-+#else
-+static inline void __init fips_signature_selftest_ecdsa(void) { }
-+#endif
-diff --git a/crypto/asymmetric_keys/selftest_ecdsa.c b/crypto/asymmetric_keys/selftest_ecdsa.c
-new file mode 100644
-index 000000000000..3ee2e4ea9e3f
---- /dev/null
-+++ b/crypto/asymmetric_keys/selftest_ecdsa.c
-@@ -0,0 +1,89 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* Self-tests for PKCS#7 ECDSA signature verification.
-+ *
-+ * Copyright (C) 2024 Joachim Vandersmissen <git@jvdsn.com>
-+ */
-+
-+#include <linux/module.h>
-+#include "selftest.h"
-+
-+/*
-+ * Set of X.509 certificates to provide public keys for the tests. These will
-+ * be loaded into a temporary keyring for the duration of the testing.
-+ */
-+static const u8 certs_selftest_ecdsa_keys[] __initconst = {
-+	/* P-256 ECDSA certificate */
-+	"\x30\x82\x01\xd4\x30\x82\x01\x7b\xa0\x03\x02\x01\x02\x02\x14\x2e"
-+	"\xea\x64\x8d\x7f\x17\xe6\x2e\x9e\x58\x69\xc8\x87\xc6\x8e\x1b\xd0"
-+	"\xf8\x6f\xde\x30\x0a\x06\x08\x2a\x86\x48\xce\x3d\x04\x03\x02\x30"
-+	"\x3a\x31\x38\x30\x36\x06\x03\x55\x04\x03\x0c\x2f\x43\x65\x72\x74"
-+	"\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63\x61"
-+	"\x74\x69\x6f\x6e\x20\x45\x43\x44\x53\x41\x20\x73\x65\x6c\x66\x2d"
-+	"\x74\x65\x73\x74\x69\x6e\x67\x20\x6b\x65\x79\x30\x20\x17\x0d\x32"
-+	"\x34\x30\x34\x31\x33\x32\x32\x31\x36\x32\x36\x5a\x18\x0f\x32\x31"
-+	"\x32\x34\x30\x33\x32\x30\x32\x32\x31\x36\x32\x36\x5a\x30\x3a\x31"
-+	"\x38\x30\x36\x06\x03\x55\x04\x03\x0c\x2f\x43\x65\x72\x74\x69\x66"
-+	"\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63\x61\x74\x69"
-+	"\x6f\x6e\x20\x45\x43\x44\x53\x41\x20\x73\x65\x6c\x66\x2d\x74\x65"
-+	"\x73\x74\x69\x6e\x67\x20\x6b\x65\x79\x30\x59\x30\x13\x06\x07\x2a"
-+	"\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07"
-+	"\x03\x42\x00\x04\x07\xe5\x6b\x51\xaf\xfc\x19\x41\x2c\x88\x92\x6b"
-+	"\x77\x57\x71\x03\x9e\xe2\xfe\x6e\x6a\x71\x4e\xc7\x29\x9f\x90\xe1"
-+	"\x77\x18\x9f\xc2\xe7\x0a\x82\xd0\x8a\xe1\x81\xa9\x71\x7c\x5a\x73"
-+	"\xfb\x25\xb9\x5b\x1e\x24\x8c\x73\x9f\xf8\x38\xf8\x48\xb4\xad\x16"
-+	"\x19\xc0\x22\xc6\xa3\x5d\x30\x5b\x30\x1d\x06\x03\x55\x1d\x0e\x04"
-+	"\x16\x04\x14\x29\x00\xbc\xea\x1d\xeb\x7b\xc8\x47\x9a\x84\xa2\x3d"
-+	"\x75\x8e\xfd\xfd\xd2\xb2\xd3\x30\x1f\x06\x03\x55\x1d\x23\x04\x18"
-+	"\x30\x16\x80\x14\x29\x00\xbc\xea\x1d\xeb\x7b\xc8\x47\x9a\x84\xa2"
-+	"\x3d\x75\x8e\xfd\xfd\xd2\xb2\xd3\x30\x0c\x06\x03\x55\x1d\x13\x01"
-+	"\x01\xff\x04\x02\x30\x00\x30\x0b\x06\x03\x55\x1d\x0f\x04\x04\x03"
-+	"\x02\x07\x80\x30\x0a\x06\x08\x2a\x86\x48\xce\x3d\x04\x03\x02\x03"
-+	"\x47\x00\x30\x44\x02\x20\x1a\xd7\xac\x07\xc8\x97\x38\xf4\x89\x43"
-+	"\x7e\xc7\x66\x6e\xa5\x00\x7c\x12\x1d\xb4\x09\x76\x0c\x99\x6b\x8c"
-+	"\x26\x5d\xe9\x70\x5c\xb4\x02\x20\x73\xb7\xc7\x7a\x5a\xdb\x67\x0a"
-+	"\x96\x42\x19\xcf\x4f\x67\x4f\x35\x6a\xee\x29\x25\xf2\x4f\xc8\x10"
-+	"\x14\x9d\x79\x69\x1c\x7a\xd7\x5d"
-+};
-+
-+
-+/*
-+ * Signed data and detached signature blobs that form the verification tests.
-+ */
-+static const u8 certs_selftest_ecdsa_data[] __initconst = {
-+	"\x54\x68\x69\x73\x20\x69\x73\x20\x73\x6f\x6d\x65\x20\x74\x65\x73"
-+	"\x74\x20\x64\x61\x74\x61\x20\x75\x73\x65\x64\x20\x66\x6f\x72\x20"
-+	"\x73\x65\x6c\x66\x2d\x74\x65\x73\x74\x69\x6e\x67\x20\x63\x65\x72"
-+	"\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63"
-+	"\x61\x74\x69\x6f\x6e\x2e\x0a"
-+};
-+
-+static const u8 certs_selftest_ecdsa_sig[] __initconst = {
-+	/* ECDSA signature using SHA-256 */
-+	"\x30\x81\xf4\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x07\x02\xa0\x81"
-+	"\xe6\x30\x81\xe3\x02\x01\x01\x31\x0f\x30\x0d\x06\x09\x60\x86\x48"
-+	"\x01\x65\x03\x04\x02\x01\x05\x00\x30\x0b\x06\x09\x2a\x86\x48\x86"
-+	"\xf7\x0d\x01\x07\x01\x31\x81\xbf\x30\x81\xbc\x02\x01\x01\x30\x52"
-+	"\x30\x3a\x31\x38\x30\x36\x06\x03\x55\x04\x03\x0c\x2f\x43\x65\x72"
-+	"\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63"
-+	"\x61\x74\x69\x6f\x6e\x20\x45\x43\x44\x53\x41\x20\x73\x65\x6c\x66"
-+	"\x2d\x74\x65\x73\x74\x69\x6e\x67\x20\x6b\x65\x79\x02\x14\x2e\xea"
-+	"\x64\x8d\x7f\x17\xe6\x2e\x9e\x58\x69\xc8\x87\xc6\x8e\x1b\xd0\xf8"
-+	"\x6f\xde\x30\x0d\x06\x09\x60\x86\x48\x01\x65\x03\x04\x02\x01\x05"
-+	"\x00\x30\x0a\x06\x08\x2a\x86\x48\xce\x3d\x04\x03\x02\x04\x48\x30"
-+	"\x46\x02\x21\x00\x86\xd1\xf4\x06\xb6\x49\x79\xf9\x09\x5f\x35\x1a"
-+	"\x94\x7e\x0e\x1a\x12\x4d\xd9\xe6\x2a\x2d\xcf\x2d\x0a\xee\x88\x76"
-+	"\xe0\x35\xf3\xeb\x02\x21\x00\xdf\x11\x8a\xab\x31\xf6\x3c\x1f\x32"
-+	"\x43\x94\xe2\xb8\x35\xc9\xf3\x12\x4e\x9b\x31\x08\x10\x5d\x8d\xe2"
-+	"\x43\x0a\x5f\xf5\xfd\xa2\xf1"
-+};
-+
-+void __init fips_signature_selftest_ecdsa(void)
-+{
-+	fips_signature_selftest("ECDSA",
-+				certs_selftest_ecdsa_keys,
-+				sizeof(certs_selftest_ecdsa_keys) - 1,
-+				certs_selftest_ecdsa_data,
-+				sizeof(certs_selftest_ecdsa_data) - 1,
-+				certs_selftest_ecdsa_sig,
-+				sizeof(certs_selftest_ecdsa_sig) - 1);
-+}
+ 	while (walk.nbytes) {
+-		unsigned int nbytes = walk.nbytes;
+-
+-		if (nbytes < walk.total)
+-			nbytes = round_down(nbytes, AES_BLOCK_SIZE);
+-
+ 		kernel_fpu_begin();
+-		(*crypt_func)(&ctx->crypt_ctx, walk.src.virt.addr,
+-			      walk.dst.virt.addr, nbytes, req->iv);
++		(*crypt_func)(&ctx->crypt_ctx,
++			      walk.src.virt.addr, walk.dst.virt.addr,
++			      walk.nbytes & ~(AES_BLOCK_SIZE - 1), req->iv);
+ 		kernel_fpu_end();
+-		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
++		err = skcipher_walk_done(&walk,
++					 walk.nbytes & (AES_BLOCK_SIZE - 1));
+ 	}
+ 
+ 	if (err || !tail)
+ 		return err;
+ 
+
+base-commit: 543ea178fbfadeaf79e15766ac989f3351349f02
 -- 
 2.44.0
 
