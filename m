@@ -1,46 +1,46 @@
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2079.outbound.protection.outlook.com [40.107.92.79])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2071.outbound.protection.outlook.com [40.107.223.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E55C376FC;
-	Sun, 21 Apr 2024 18:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302083A8D2;
+	Sun, 21 Apr 2024 18:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.71
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713722611; cv=fail; b=YHFCfjiZlUIpvxD0ocbYNRJbVoQr4Hg+zm1rl8rMOlsRwSzt612JYqytDvhrZ37llmUvPzXC+GED651V2yDX6juDO9Ni0jxRpCxA/AaJVbm3ZbHUZKb3zIEEM0zIluIFhAZ3QctLOFM+c3Q4ii/6PizYWir9wD65d+YrDwHeB/g=
+	t=1713722628; cv=fail; b=UatMsZuOsVmIUNyLUAqxgg0lVqPl2ODmZ/CDOszNvlolVwgn1i55WtkkQ9Hd0n2dajFzUOJKzF5lL0IeSeWRof2s6AaHyPIjymnwyoOMMOFGSKV7l5XekO+JL8Bo7Az2qgjDTke48t/mXq9D70Ml2o2KYYdNETeu0DDPg4DaQak=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713722611; c=relaxed/simple;
-	bh=76qVH3yW00COXdlwOgMgNQTZM25IBEI0g3tTHYBdRPU=;
+	s=arc-20240116; t=1713722628; c=relaxed/simple;
+	bh=sSorkJ5a3jreJ0pWBnowAWuXMBuft4DJJJHSBt/aevE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=do1OWzrIf8zgAtheKV4xAXHwv00Mk49qpTllnmIzZmfb1i3/xeOmE2gEVH8V207HOkOexxt7CGp+raJTwaDWGPrxMYoKxF8y3EZLTkGIvksymT5uQr3FogaCm5+1RxCW+VM8t4XIkQ4WmMFl6IHJLZPqtK5pqli18fZLFWS5Jt0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YFCO0C5m; arc=fail smtp.client-ip=40.107.92.79
+	 MIME-Version:Content-Type; b=pFX0yMxodgHWmGsPXBQ5BG5eyi7EeuIBwZ+lhnqts1lE6QSXRd5a9VA/QyXQD8cl3zTpfoKSpr69mEo7CBvsc3l7EpFOOxwCbXhmWx/ac88gWX8yntci4mwX9VI1HqydDvVOKHviQoyVg6vebQX0JQSLcqagiSn0r4zHDiyAL4M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=JvRezQBa; arc=fail smtp.client-ip=40.107.223.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YFCO0C5m"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="JvRezQBa"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e1Ob2u4hYIQwx7XQsuZcqfU3lKx77awx2LtzQUcvijOqymTfTRy62O6RAYg+0KlrvvVyC3RVCi+nGAUvy64/NEQ7wfoEmjF1/SnYrEwZDU6W+uuqEcJwaP6Hlw8/aLnp/GiNZ/OG6a9EM0qXn09Js8i7NFrG3vSG0BJiXG/diyEPQdE88vFuHzYtr4LHPlz7XhFNjQTeEwcvvEuNXvdIh9L9hJkkzJgrIY6cvtPJzhqBIXo8ZQNdpUveElPqj3uNXhKxk+C1gEMSjz/X8kv3O5gTHoOJQu/YFsS577ymx/kjGjIvyWq+r/o+pQW9rTjkp5bqaNvOnpzJ5BhrizmAiA==
+ b=OWMZxIKKCOTyjKlMfmtFlVAhQRPa+lqPTugnaczSdFJfR0KHafuWDe/r9AnD8us+uxxUQva13zZg1n/vFt6VFl3jYcDHhQjEEZeuz8gHBP4i/+OrSshyesye2rdEB3SYOdvosmH92V7soQ+pJ01XVL94I2KeXuaZxAr/k5NuoNepG3F5/djh2C1GpVwGpqzclV3wazLpV5F+kxCGWF+qg4uxSyjPSGZIxzUuyyWZpB7Q09bGnYEvnwXsdYZfKYYsgWM8m0oxoF7fsJmGebvPP4dmI+YEztRkXJGJsmQPK7J7KkBhQY4MzGjl4faTk3PlWnp/D8U6VYr4mshr2TmweA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XgK+wk8bsGy4rKToqYdvg77hh1L0DI8bg/xj6fFNtII=;
- b=dM5Gp2RRTIqXkTszcVjwcnd1MjLTkJcHo9aqpbRpTA+9Dwrp3V0WE6VuU1Jiw3c3tTXty4/+qLZptE+5tiSvQjsSdTmCcI8g4GPA7wn3CKMI6NeXCiwZOQ0d0hDKdZ49LyIoQDCbavI5z7HIgcGB3SVtrAbP1vX8VUN07plflCd1xr/YE4sMl4A+9kHv51N34b1G5ruvx/jYFwspE19bb+r8vMBhFX8CM41q1mlORAKa8elGrva72vfY2ymRvAN589UcsFeezwaAyrxUa/RluvIjULPfyzKYCg4HlegXXanVa0Rl/iMkIjDdq5yTVe+erEkE8k2AGxjW/ga0ea8dAg==
+ bh=Vbdpkwf3WqWD2bfPQccxax6mE79R6wo8R9w46YmoB1c=;
+ b=SRXC3mpifNL6gN2QZS/KHNRTwT8BMtmgFDDkF+LayjFeTMbtzVYgMs+iK9xlxdHe8hvvGZeMQlmP8+7S8OJuZamIMhkniNmGWluH77G5P+ckwtznPHye2IZ6oaFP//WUeUs/Hvhoo6CCaZ1Gkd+GVvc2u+QaSp1wbcAGb0AZ+MW9T7e9WpQclJZzbf5KPMtlNfNoov76UWJgUztajH7b1d1XyvyADpS3sq+x0WTh35RIV9fHyKTqaoorQh9/kwCg0lPdLc3prG+VAb2PWR5RXHPZ4y8yL7JVu3CGLunfusSB8JATc3wyvoAhU1GBMnwVGUZisrUmIb6XA+bzNN0VAw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XgK+wk8bsGy4rKToqYdvg77hh1L0DI8bg/xj6fFNtII=;
- b=YFCO0C5me/uC1nCLz7623r5zrSUP06rrAsAFVIR2DqAo8Ra54jBqfWr0+VOntkpCowgMo2RWHPTDYYJcbAENP6FPwv0uKIiWg34Ab8rAkfpRzTpEny0Ixne6M/hzchDfVrWrlnS5xEmhph+OBSjKsycRelukhfPNpclhsGPtFV4=
-Received: from BL6PEPF00013DF7.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:22e:400:0:1001:0:9) by MW4PR12MB5668.namprd12.prod.outlook.com
- (2603:10b6:303:16b::13) with Microsoft SMTP Server (version=TLS1_2,
+ bh=Vbdpkwf3WqWD2bfPQccxax6mE79R6wo8R9w46YmoB1c=;
+ b=JvRezQBaMPaWbdn4phF41P8uG8BugrQItXisyfdBeHGjsX/EgkVUsKZl8Ddf7uE0/erDs4ECBabR0CzSHrH7regxcU6CHPko1ac/7Ze0rEh082LVk7Ufad/GTqSDy8EtHLu8BAo4dmSjSEPNoAgJKUeIRJn30joYaqpEW/F1TL8=
+Received: from BL6PEPF00013E0E.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:22e:400:0:1001:0:f) by SA1PR12MB7248.namprd12.prod.outlook.com
+ (2603:10b6:806:2be::12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Sun, 21 Apr
- 2024 18:03:22 +0000
+ 2024 18:03:43 +0000
 Received: from MN1PEPF0000ECD8.namprd02.prod.outlook.com
- (2a01:111:f403:f902::2) by BL6PEPF00013DF7.outlook.office365.com
+ (2a01:111:f403:f902::2) by BL6PEPF00013E0E.outlook.office365.com
  (2603:1036:903:4::4) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.33 via Frontend
- Transport; Sun, 21 Apr 2024 18:03:22 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.26 via Frontend
+ Transport; Sun, 21 Apr 2024 18:03:43 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -50,11 +50,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  MN1PEPF0000ECD8.mail.protection.outlook.com (10.167.242.137) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7519.19 via Frontend Transport; Sun, 21 Apr 2024 18:03:22 +0000
+ 15.20.7519.19 via Frontend Transport; Sun, 21 Apr 2024 18:03:43 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Sun, 21 Apr
- 2024 13:03:21 -0500
+ 2024 13:03:42 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -72,9 +72,9 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
 	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
 	<brijesh.singh@amd.com>
-Subject: [PATCH v14 09/22] KVM: SEV: Add support to handle MSR based Page State Change VMGEXIT
-Date: Sun, 21 Apr 2024 13:01:09 -0500
-Message-ID: <20240421180122.1650812-10-michael.roth@amd.com>
+Subject: [PATCH v14 10/22] KVM: SEV: Add support to handle Page State Change VMGEXIT
+Date: Sun, 21 Apr 2024 13:01:10 -0500
+Message-ID: <20240421180122.1650812-11-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240421180122.1650812-1-michael.roth@amd.com>
 References: <20240421180122.1650812-1-michael.roth@amd.com>
@@ -90,239 +90,175 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD8:EE_|MW4PR12MB5668:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4b0fb1f0-ec97-47af-16c7-08dc622d551b
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD8:EE_|SA1PR12MB7248:EE_
+X-MS-Office365-Filtering-Correlation-Id: 06924529-0962-46e8-e5c1-08dc622d61d3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vdq+VbfFpAn/rUDNdZCcdlEJ6yXayKY1o9aEnCfKtdsF9jvlsM2+fl0xafx4?=
- =?us-ascii?Q?yzOAIqzV7XBpafsu0NsAkPFgzglpX8OPzngCluUjfNTbMmGPdlTXe1ZXUP9b?=
- =?us-ascii?Q?SwaBt31TDqH/X5m6rrVP7b2+Gl6Uix4q0ePHgwy7s5seVXjmRUcWil4xNjna?=
- =?us-ascii?Q?Aaokj/Mrhb1R1txAzNnCrZ+oT8ZFHnuU9t42B50JiF9oggisCz824t7PGzOs?=
- =?us-ascii?Q?fifpHmfDr7qJsqksez7DomUYxYF8LQi0nripBSqHUM257RQNnT05bzRoaNOT?=
- =?us-ascii?Q?8ujMm8T4gUYoxbG9DrTkzpetGoJrfuVLa75L85A8BTfWJpc76C+EZD5+wzAA?=
- =?us-ascii?Q?tBhyLKqMUm5VTCbwaX0c1qZgcFgKP2J/DFS6zd6eSADFNT1Ig80g27eG21zC?=
- =?us-ascii?Q?pK9zGZtX3w6y9G54EkBlQSBtqBktFpS+VuWRGl1KAryq2MNgOEDHCPcohxxs?=
- =?us-ascii?Q?9XCdTkyn3ZuIO4qgLoWRYxhTtrOscSKXEqFkYHnJ70lIfPBTU+70njyLS+9B?=
- =?us-ascii?Q?bF+2fnFnptWBR07ZxZqnzryYMBJHRNdt6XcMhv8oJBnsDNtt1OgMz7RlYMJH?=
- =?us-ascii?Q?iqEQrCc+MwZjAYfehTULkLLS4W14u7Z9mRC/hsGKwryF+UfaWmCbXt+4s8rL?=
- =?us-ascii?Q?+Az2PGxEV5ADaczY9u1mULVQbvxRfaCk1b7vNTtV067jNqG/L95JWJBJ80bp?=
- =?us-ascii?Q?XA55OpSTCNnNMfJoJEMU8LMi9L0SlcYndcolAXj4C+TKAxZJUoghkEm6CYqv?=
- =?us-ascii?Q?JKJm3AvmEa4DY81iCqXKdhbOLR2gvCXd2lCIEO0JbjPIzAbrhV6qyFo43ccO?=
- =?us-ascii?Q?0Pcm0lyozDiPzpzamp3/BxqYPi7noZUTIoIw+A1ICoXEnul0tuFcsW7fOy1x?=
- =?us-ascii?Q?blu0gPm4KSaSrtd1k17sx6VK54sIvZVwRaqzx+iJI+5ltzAj6kmcZ0ohx7WD?=
- =?us-ascii?Q?jhA2sy5lTtAnCv3lWWQkE/cXZrCMUSfKuLKzF2iNOBvcyt3pPGp+hFQ8FfoV?=
- =?us-ascii?Q?1XpfO0iuv70ViQUWxJaiu1Q6FIASmFselt9whh8vSke9IND/87jCdv35XFll?=
- =?us-ascii?Q?npokilukwvtaZ2yu90YQCi7KD3xgXJAX0wK1uo2GU2Io35MfseBSJ7ipkVqT?=
- =?us-ascii?Q?Bu8EBvgtwTfeDa0hdm7T/7gmnxuDV0BhOTEU1rVnCPSOprGaVHOIq1mm+0y2?=
- =?us-ascii?Q?l5vc/IGPkN1Y4rUpfDR/qIrS6iwqS/JwXrfLkjRWaasABPNSYE2RQBI9C2vJ?=
- =?us-ascii?Q?SHM7vkiR5yAvvDSmOTGWuNFuUli+izUYbY41sxfBlDfofV5bNzBo/6RXyIH6?=
- =?us-ascii?Q?PRNsWFj5EgpNj4IBi/X55hJmTKajWdlwgvWsGlosFeXaRdjuowytA7vPzN50?=
- =?us-ascii?Q?jgeZdbUp3H/HgoJO9aLolIWIWlDB?=
+	=?us-ascii?Q?9Mz+RDQ/eZS4yQYkTQY3DfIPzAWcH6JSWdQex/i+0YpBx9ulgiyD0lkw47o0?=
+ =?us-ascii?Q?ytsj14sY34po9GX88Mzbe5v9GMlbGA3kVk5qMigXkxHkm5UPzTIh8UGV4cj4?=
+ =?us-ascii?Q?P2AK/uDJqSrF24/giWzqLIT7hMgzq0dEpKNpId46GGIJmfl9+5AYMKKnVcFC?=
+ =?us-ascii?Q?C9zaMnFvdSNr/H+x8B3jrZ7Ldt2LwBxYqotPmsCHyMYSgk2c9bK+m9oVGUad?=
+ =?us-ascii?Q?7JVAfpc48ZeQe1Xtb/Sgskotne5J4DYfruh9RyZXhtIVLBfIJ9kMBpbn7usk?=
+ =?us-ascii?Q?h5cuV+NLeRAxNMwK91a24vI/H45S34fiy3gNf0w+Qb4uN/YQ+IIgwo7IEzaI?=
+ =?us-ascii?Q?eeNfSvH2OXZPIvkKi+Bwn2SLwjzSUWSbfWn4Ae7KMaJouz5KU6CGua5BW1yw?=
+ =?us-ascii?Q?QIvx5vbwcU9prqjKQc3pcwroljCx4TVgec6iuvZaxujfQS4D/AVSlhM+Zk7d?=
+ =?us-ascii?Q?RmvOBlOijEGwHoomno92WQIBhW8/YhfNbPKDQ/DfRtTr/2qWfDERmPQtx7Ie?=
+ =?us-ascii?Q?GvwzttRSQEFOfkQHzgeEoq8FMYQsV+T3e2EQiM/Lmy4//R1YdX2xcdFHZ8zY?=
+ =?us-ascii?Q?e1OKszvTYU/O/g6ALS8pXGauuejMPk08Fcpg5nAXZodS3fUUKsJcj3AZsI2q?=
+ =?us-ascii?Q?N4epO53cu4ZIChqyNuFP1T7fQHMwx8zfh71v5XMerofKZ+kEJgZaFfi5HQgA?=
+ =?us-ascii?Q?BKJxaNE4o9v/I1m8iSVfl3lg+4g3IJ01GIhp0bTl0MFH+nK3z/Bq25H4u8Ai?=
+ =?us-ascii?Q?ivPJK9QZE2FGWV4aF4K0qZdk4Optn/pmI+hU0QlsQ0uXdzEwZoa1TMHUQch+?=
+ =?us-ascii?Q?Bz3UNFXNqMjq/rIdgE6Bqbh7R8YBNcZRjXaDFemPDpKEgD7fF9U5gceL/MTP?=
+ =?us-ascii?Q?KY/THIHd+sJsb2/HAm3M9v1V3/OXJrwqDoCtIJ7HrwW5j+KeNk01zKTsInkF?=
+ =?us-ascii?Q?bWgIYPU1AiDwnBcY1MpVgip2vGu64Cb05eG9cw5RQFfVclkg2LVtdrwfUsR4?=
+ =?us-ascii?Q?6v2+w/UQnKciWG0Pf9CgFvjRXDDCtavliayHk+hwiiJAp4hMnNJdTZY5Rlz+?=
+ =?us-ascii?Q?Os2xPVQM+AnP/+/3I0aVpLPaoYRvOs8gFofZrGr9tqe29hEVGZ/d2bgqT7Cp?=
+ =?us-ascii?Q?BaaHrbzIc1kLCY8unPvpDBqMBaZJaEwlrDacNBrD6uFhEJ9k1gLeM7rJ/tmh?=
+ =?us-ascii?Q?pFBxeXdDAQtR7WvmIDAwRUAZVMd44U+DguFsH3kd47y+w6WDjBp1wxbQiPt4?=
+ =?us-ascii?Q?GTIpWOIkMWJyzg3hFr4Zpasj6Rtbkv5PYCdjQshax3qB7gZ939R7twbeNk0D?=
+ =?us-ascii?Q?b+G/fj4IwOHWlq9/dld4826z/xd2u76DLNigmf5mOulQ4GxIa7X3MrQdEz6r?=
+ =?us-ascii?Q?k8KVurc=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(376005)(7416005)(1800799015)(36860700004);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005)(36860700004)(82310400014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2024 18:03:22.0188
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2024 18:03:43.3626
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4b0fb1f0-ec97-47af-16c7-08dc622d551b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 06924529-0962-46e8-e5c1-08dc622d61d3
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	MN1PEPF0000ECD8.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5668
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7248
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
 SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
-table to be private or shared using the Page State Change MSR protocol
-as defined in the GHCB specification.
+table to be private or shared using the Page State Change NAE event
+as defined in the GHCB specification version 2.
 
-When using gmem, private/shared memory is allocated through separate
-pools, and KVM relies on userspace issuing a KVM_SET_MEMORY_ATTRIBUTES
-KVM ioctl to tell the KVM MMU whether or not a particular GFN should be
-backed by private memory or not.
-
-Forward these page state change requests to userspace so that it can
-issue the expected KVM ioctls. The KVM MMU will handle updating the RMP
-entries when it is ready to map a private page into a guest.
-
-Define a new KVM_EXIT_VMGEXIT for exits of this type, and structure it
-so that it can be extended for other cases where VMGEXITs need some
-level of handling in userspace.
+Forward these requests to userspace as KVM_EXIT_VMGEXITs, similar to how
+it is done for requests that don't use a GHCB page.
 
 Co-developed-by: Michael Roth <michael.roth@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- Documentation/virt/kvm/api.rst    | 33 +++++++++++++++++++++++++++++++
- arch/x86/include/asm/sev-common.h |  6 ++++++
- arch/x86/kvm/svm/sev.c            | 33 +++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h          | 17 ++++++++++++++++
- 4 files changed, 89 insertions(+)
+ Documentation/virt/kvm/api.rst | 14 ++++++++++++++
+ arch/x86/kvm/svm/sev.c         | 16 ++++++++++++++++
+ include/uapi/linux/kvm.h       |  5 +++++
+ 3 files changed, 35 insertions(+)
 
 diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index f0b76ff5030d..4a7a2945bc78 100644
+index 4a7a2945bc78..85099198a10f 100644
 --- a/Documentation/virt/kvm/api.rst
 +++ b/Documentation/virt/kvm/api.rst
-@@ -7060,6 +7060,39 @@ Please note that the kernel is allowed to use the kvm_run structure as the
- primary storage for certain register types. Therefore, the kernel may use the
- values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
- 
-+::
-+
-+		/* KVM_EXIT_VMGEXIT */
-+		struct kvm_user_vmgexit {
-+		#define KVM_USER_VMGEXIT_PSC_MSR	1
-+			__u32 type; /* KVM_USER_VMGEXIT_* type */
-+			union {
+@@ -7065,6 +7065,7 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+ 		/* KVM_EXIT_VMGEXIT */
+ 		struct kvm_user_vmgexit {
+ 		#define KVM_USER_VMGEXIT_PSC_MSR	1
++		#define KVM_USER_VMGEXIT_PSC		2
+ 			__u32 type; /* KVM_USER_VMGEXIT_* type */
+ 			union {
+ 				struct {
+@@ -7074,9 +7075,14 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+ 					__u8 op;
+ 					__u32 ret;
+ 				} psc_msr;
 +				struct {
-+					__u64 gpa;
-+		#define KVM_USER_VMGEXIT_PSC_MSR_OP_PRIVATE	1
-+		#define KVM_USER_VMGEXIT_PSC_MSR_OP_SHARED	2
-+					__u8 op;
-+					__u32 ret;
-+				} psc_msr;
-+			};
-+		};
-+
-+If exit reason is KVM_EXIT_VMGEXIT then it indicates that an SEV-SNP guest
-+has issued a VMGEXIT instruction (as documented by the AMD Architecture
-+Programmer's Manual (APM)) to the hypervisor that needs to be serviced by
-+userspace. These are generally handled by the host kernel, but in some
-+cases some aspects handling a VMGEXIT are handled by userspace.
-+
-+A kvm_user_vmgexit structure is defined to encapsulate the data to be
-+sent to or returned by userspace. The type field defines the specific type
-+of exit that needs to be serviced, and that type is used as a discriminator
-+to determine which union type should be used for input/output.
-+
-+For the KVM_USER_VMGEXIT_PSC_MSR type, the psc_msr union type is used. The
-+kernel will supply the 'gpa' and 'op' fields, and userspace is expected to
-+update the private/shared state of the GPA using the corresponding
-+KVM_SET_MEMORY_ATTRIBUTES ioctl. The 'ret' field is to be set to 0 by
-+userpace on success, or some non-zero value on failure.
++					__u64 shared_gpa;
++					__u64 ret;
++				} psc;
+ 			};
+ 		};
  
++
+ If exit reason is KVM_EXIT_VMGEXIT then it indicates that an SEV-SNP guest
+ has issued a VMGEXIT instruction (as documented by the AMD Architecture
+ Programmer's Manual (APM)) to the hypervisor that needs to be serviced by
+@@ -7094,6 +7100,14 @@ update the private/shared state of the GPA using the corresponding
+ KVM_SET_MEMORY_ATTRIBUTES ioctl. The 'ret' field is to be set to 0 by
+ userpace on success, or some non-zero value on failure.
+ 
++For the KVM_USER_VMGEXIT_PSC type, the psc union type is used. The kernel
++will supply the GPA of the Page State Structure defined in the GHCB spec.
++Userspace will process this structure as defined by the GHCB, and issue
++KVM_SET_MEMORY_ATTRIBUTES ioctls to set the GPAs therein to the expected
++private/shared state. Userspace will return a value in 'ret' that is in
++agreement with the GHCB-defined return values that the guest will expect
++in the SW_EXITINFO2 field of the GHCB in response to these requests.
++
  6. Capabilities that can be enabled on vCPUs
  ============================================
-diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index 1006bfffe07a..6d68db812de1 100644
---- a/arch/x86/include/asm/sev-common.h
-+++ b/arch/x86/include/asm/sev-common.h
-@@ -101,11 +101,17 @@ enum psc_op {
- 	/* GHCBData[11:0] */				\
- 	GHCB_MSR_PSC_REQ)
  
-+#define GHCB_MSR_PSC_REQ_TO_GFN(msr) (((msr) & GENMASK_ULL(51, 12)) >> 12)
-+#define GHCB_MSR_PSC_REQ_TO_OP(msr) (((msr) & GENMASK_ULL(55, 52)) >> 52)
-+
- #define GHCB_MSR_PSC_RESP		0x015
- #define GHCB_MSR_PSC_RESP_VAL(val)			\
- 	/* GHCBData[63:32] */				\
- 	(((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
- 
-+/* Set highest bit as a generic error response */
-+#define GHCB_MSR_PSC_RESP_ERROR (BIT_ULL(63) | GHCB_MSR_PSC_RESP)
-+
- /* GHCB Hypervisor Feature Request/Response */
- #define GHCB_MSR_HV_FT_REQ		0x080
- #define GHCB_MSR_HV_FT_RESP		0x081
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 76084e109f66..f6f54a889fde 100644
+index f6f54a889fde..e9519af8f14c 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -3463,6 +3463,36 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
- 	svm->vmcb->control.ghcb_gpa = value;
+@@ -3275,6 +3275,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 	case SVM_VMGEXIT_AP_JUMP_TABLE:
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 	case SVM_VMGEXIT_HV_FEATURES:
++	case SVM_VMGEXIT_PSC:
+ 		break;
+ 	default:
+ 		reason = GHCB_ERR_INVALID_EVENT;
+@@ -3493,6 +3494,15 @@ static int snp_begin_psc_msr(struct kvm_vcpu *vcpu, u64 ghcb_msr)
+ 	return 0; /* forward request to userspace */
  }
  
-+static int snp_complete_psc_msr(struct kvm_vcpu *vcpu)
++static int snp_complete_psc(struct kvm_vcpu *vcpu)
 +{
 +	struct vcpu_svm *svm = to_svm(vcpu);
-+	u64 vmm_ret = vcpu->run->vmgexit.psc_msr.ret;
 +
-+	set_ghcb_msr(svm, (vmm_ret << 32) | GHCB_MSR_PSC_RESP);
++	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, vcpu->run->vmgexit.psc.ret);
 +
 +	return 1; /* resume guest */
-+}
-+
-+static int snp_begin_psc_msr(struct kvm_vcpu *vcpu, u64 ghcb_msr)
-+{
-+	u64 gpa = gfn_to_gpa(GHCB_MSR_PSC_REQ_TO_GFN(ghcb_msr));
-+	u8 op = GHCB_MSR_PSC_REQ_TO_OP(ghcb_msr);
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+
-+	if (op != SNP_PAGE_STATE_PRIVATE && op != SNP_PAGE_STATE_SHARED) {
-+		set_ghcb_msr(svm, GHCB_MSR_PSC_RESP_ERROR);
-+		return 1; /* resume guest */
-+	}
-+
-+	vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
-+	vcpu->run->vmgexit.type = KVM_USER_VMGEXIT_PSC_MSR;
-+	vcpu->run->vmgexit.psc_msr.gpa = gpa;
-+	vcpu->run->vmgexit.psc_msr.op = op;
-+	vcpu->arch.complete_userspace_io = snp_complete_psc_msr;
-+
-+	return 0; /* forward request to userspace */
 +}
 +
  static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
  {
  	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -3561,6 +3591,9 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 				  GHCB_MSR_INFO_POS);
- 		break;
- 	}
-+	case GHCB_MSR_PSC_REQ:
-+		ret = snp_begin_psc_msr(vcpu, control->ghcb_gpa);
-+		break;
- 	case GHCB_MSR_TERM_REQ: {
- 		u64 reason_set, reason_code;
+@@ -3730,6 +3740,12 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
  
+ 		ret = 1;
+ 		break;
++	case SVM_VMGEXIT_PSC:
++		vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
++		vcpu->run->vmgexit.type = KVM_USER_VMGEXIT_PSC;
++		vcpu->run->vmgexit.psc.shared_gpa = svm->sev_es.sw_scratch;
++		vcpu->arch.complete_userspace_io = snp_complete_psc;
++		break;
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		vcpu_unimpl(vcpu,
+ 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
 diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 2190adbe3002..54b81e46a9fa 100644
+index 54b81e46a9fa..e33c48bfbd67 100644
 --- a/include/uapi/linux/kvm.h
 +++ b/include/uapi/linux/kvm.h
-@@ -135,6 +135,20 @@ struct kvm_xen_exit {
- 	} u;
+@@ -137,6 +137,7 @@ struct kvm_xen_exit {
+ 
+ struct kvm_user_vmgexit {
+ #define KVM_USER_VMGEXIT_PSC_MSR	1
++#define KVM_USER_VMGEXIT_PSC		2
+ 	__u32 type; /* KVM_USER_VMGEXIT_* type */
+ 	union {
+ 		struct {
+@@ -146,6 +147,10 @@ struct kvm_user_vmgexit {
+ 			__u8 op;
+ 			__u32 ret;
+ 		} psc_msr;
++		struct {
++			__u64 shared_gpa;
++			__u64 ret;
++		} psc;
+ 	};
  };
  
-+struct kvm_user_vmgexit {
-+#define KVM_USER_VMGEXIT_PSC_MSR	1
-+	__u32 type; /* KVM_USER_VMGEXIT_* type */
-+	union {
-+		struct {
-+			__u64 gpa;
-+#define KVM_USER_VMGEXIT_PSC_MSR_OP_PRIVATE	1
-+#define KVM_USER_VMGEXIT_PSC_MSR_OP_SHARED	2
-+			__u8 op;
-+			__u32 ret;
-+		} psc_msr;
-+	};
-+};
-+
- #define KVM_S390_GET_SKEYS_NONE   1
- #define KVM_S390_SKEYS_MAX        1048576
- 
-@@ -178,6 +192,7 @@ struct kvm_xen_exit {
- #define KVM_EXIT_NOTIFY           37
- #define KVM_EXIT_LOONGARCH_IOCSR  38
- #define KVM_EXIT_MEMORY_FAULT     39
-+#define KVM_EXIT_VMGEXIT          40
- 
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -433,6 +448,8 @@ struct kvm_run {
- 			__u64 gpa;
- 			__u64 size;
- 		} memory_fault;
-+		/* KVM_EXIT_VMGEXIT */
-+		struct kvm_user_vmgexit vmgexit;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
 -- 
 2.25.1
 
