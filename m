@@ -1,247 +1,201 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2050.outbound.protection.outlook.com [40.107.94.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDC6376FC;
-	Sun, 21 Apr 2024 18:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713723077; cv=fail; b=NkCFVF3DpSdWYMSZbfhJnFOIa64DISnC9LVZFxGQ5EW3fkc1WXMJHlHbpH90ESzRkaYvIyBRUBAXh5VwjTs5xRZ6mrofENwl/sKBAZTvIYD4NpqV11cD5fQrRhVZ5cXlboc4hR/Kht8j92dBW/8HMrgWRwmMJRWVAMgxcmlWgNs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713723077; c=relaxed/simple;
-	bh=t0mq2QnXSE6Vel1/VZ7mnSDN7v9dGDrTKuhiwRhiNBk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T7zFc9XrIgRqeAw4xZWSiRnMslC24wVpzAI3yg8rer//FTukJUWdK7qP/KfLK6bKwMv/8Mf17XMcVQrmsouy0h6szM1Qn5xIhiu0LPw1wbUynqWO16NPQTxsabGSrzBtzgzGvr/6syEV9Mvgvfmqi0fCKRhnMyrHl4wJ48pkaqM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lQ739nUT; arc=fail smtp.client-ip=40.107.94.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lQ739nUT"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SkmHTnDXGqvKb959gGSGuUntybW7bHMgjgHEUxAqc7yIwsVpfuQcPwWimYLcd074WoeBmbJ5a2YC/Y4slDxcmoeLnw3yvXAc06381K9gXdgaOMyLrQoAjFuotcfpGjB6bbhvAuUKMUxmzY+paabb1WV7LaBtGu+QnA7MkvN9vIaLkykVOGhYje8cSvVFOCX4sozdpKe1Kl5TKXKemOhOfiLDvjJI4sbhdzHEg+34nZ1a1HvfND9egczISAcMGjCVjKVoI7Ycfxlc3Ak3blUo871Q8YCg1yDwyPORfgpVRcSeTGLeBk8dT18n5WiMG79efTuotDxgcE5oAHaMUlJd6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FkoJgGls1EeSRyZ3p+3ldCDDaRRNh/kfCmt+Ww644qk=;
- b=bEYnOSJSVHwVm4XAhcGzil0fFGNdP1+RlJteGyAKlBzGmh6f6u/G1+XP7WdZK1qKFvBXJ+zj28iXy9eEVeDNmoJp/b54U8ZrFj1r5/PPmBPq/SZc3FPoD7U5VziDZvRIHHiVvkIunwV1VtKvjX/0oqYIxudcpiOmqy6huvaV6g2kA+gImkI3fYRyOWmyRM+oCGTbgfy7O2O1Ygrk19aJpvu21ICvQ5ii/gcdlXNyPcnkAf5KywFcZf67r4JfmjtMASuGPpljYP3DQFSJ7CaTjkfM0UFZEXoqiwOz8+zU3Qo0jJ3rqifv9KxgRMeHaIUB+kCE4yuTKoD2tnlupFzkCw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FkoJgGls1EeSRyZ3p+3ldCDDaRRNh/kfCmt+Ww644qk=;
- b=lQ739nUTldDzCkPUu8sUao43YNzc0giCUNmuOFtUPrQCbBFR75WMKbpiCDXovrO+jXL9uNlS+9xzQbzlAuojVsrlZRQ8h+yETRVAc9YcntUo/yI8v5W81pk3VXrPXXCKHhQbP1rsUC3qJqwksFoFNXJbF1RfKar6ZjSidccNZeQ=
-Received: from CY5PR15CA0018.namprd15.prod.outlook.com (2603:10b6:930:14::14)
- by SA3PR12MB7805.namprd12.prod.outlook.com (2603:10b6:806:319::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Sun, 21 Apr
- 2024 18:11:11 +0000
-Received: from CY4PEPF0000FCC0.namprd03.prod.outlook.com
- (2603:10b6:930:14:cafe::14) by CY5PR15CA0018.outlook.office365.com
- (2603:10b6:930:14::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.33 via Frontend
- Transport; Sun, 21 Apr 2024 18:11:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000FCC0.mail.protection.outlook.com (10.167.242.102) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7519.19 via Frontend Transport; Sun, 21 Apr 2024 18:11:11 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Sun, 21 Apr
- 2024 13:11:10 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: <kvm@vger.kernel.org>
-CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
-	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
-	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
-	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
-	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
-	<ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
-	<brijesh.singh@amd.com>
-Subject: [PATCH v14 08/22] KVM: SEV: Add support to handle GHCB GPA register VMGEXIT
-Date: Sun, 21 Apr 2024 13:01:08 -0500
-Message-ID: <20240421180122.1650812-9-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240421180122.1650812-1-michael.roth@amd.com>
-References: <20240421180122.1650812-1-michael.roth@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0CB11CAB
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Apr 2024 05:59:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713765560; cv=none; b=DD3g+QbJ5X4wi127J08F5JpnIUM+8NRRtCUIGj10DlcInXeIdz87qOM9O2ZzL06zVp6pUJolnIRw1U/7SrcXesbt/citY78e8F8zJQMQLGgWSgawTQimmHy8ODDvM0AtkqVt56+MribpX+GH/gezrI4l9ZW64F+Sc1OOCtywAQQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713765560; c=relaxed/simple;
+	bh=D79eC8RJMKbFce8fku++21OGsQR2++flL3fDDqwdG7o=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=AyUJG2HYZryfGHGQj/ab72CiQVhMmYWoHKp9Y13Gc9K41lCDc+ifV+bUq0+34VGrV4eUjDcfIaXlHDPweFX2MxL2GPh9ZJa71ywqiEqBnkBiLVNZaF7OBrLz7qnwvKj1Wfq80sU8O9ABNq/ZDH7dXC8IC3ZI7rGXC98t3bwHVz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36c09a7173dso13933785ab.2
+        for <linux-crypto@vger.kernel.org>; Sun, 21 Apr 2024 22:59:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713765557; x=1714370357;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D2d2NpQ9xAPEYhugtPsQxFL11CSDyYRVuV6nMVsTlPI=;
+        b=mVqNGACeFue+Gkdy4EmgIbGYTzLvwQ7rh5PiiFUViRup5ZHSXstmXIGJnn+YTkYi/N
+         vdoNQsZgJ64g2KKI8BNk9+i4Yp/1pqGEBOU6XYIhXBSTXOq+sOJjL6BM8/T66JHMcFcw
+         HGya+L9a7AuPfMYFx2CrRRkAEA5s7TkuQy48zGAj7h8/MhsacdeVkk3hzKeoBYHDNii4
+         XogYiBk9zbj2pWvhKZllWwzTYQVa5+QJm5gK3mk49lMZZb4BV8+UexN2Dexcluv6FHsB
+         knSP1MTNbV0/AFwoxeLj85iNvj0xi7+5ClHImSu/Qi7O62idUfA34nIeEyTKrjvxpxYc
+         2x2w==
+X-Forwarded-Encrypted: i=1; AJvYcCV7+0/thP0GdovbIEk14f6lWQ/LjX36TqAI3Cj6xDvwKmP1/1tukSEKtyIp7lCVYfV4qXsliBshoWNiZnjSJl8a1fz3B+fG8Uf8+QH5
+X-Gm-Message-State: AOJu0YwqHW+vSrhBrusUDoTO0hNwEhHjq9Ru0buvaCjjgXemSMrI11Hy
+	K/WmTvoJt1sSS3oxzikummoH7SLjgjsXPXIL8HrtWcOVw6RchBHVKW8CyxGF8zhEx5Xwi25VGJ5
+	swI4KXx/Z+lMWEoFo68J99jHVG8OEBQiB1lVLbwNwnoVLruwfRWly3BI=
+X-Google-Smtp-Source: AGHT+IGiKq6tLFsZZugvLy4A9PfNmkP00nQs83eDbIUn9ZWGg5P4PZUUYaFKyjyh/wMyfLYwZRIAX/45y/as2MPxo4A86aDUBBwg
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC0:EE_|SA3PR12MB7805:EE_
-X-MS-Office365-Filtering-Correlation-Id: 548ed092-99a8-41d2-9a19-08dc622e6d03
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Oi8Q8RS29bk0s3+zAJZUIn6DdIMOwHdrPgBVFKPi1q2boPyn/W+w/V8aqaEp?=
- =?us-ascii?Q?9t8oiuXPOwtZn2DS9YdESSeT8zKInYqSOYPz/lBB8LSvqMTwZLc8vDNRgMKt?=
- =?us-ascii?Q?39eJ2Klo0mukQSQCMx3ob1BVllJ9Papi20zjerw5DZk9ZwQY1hPHbPgS84Zq?=
- =?us-ascii?Q?OfhHZbBIIB8POr5SFnqgvN3eybQXzYsT66npLv3pgmUX9H56zsWA/QTyfQyS?=
- =?us-ascii?Q?+Dg7b7/2Nu3aQHd7ktd9+chHvuFmzkB0eRWBLgz+fjfU/Gl0D09GkUtL8T9J?=
- =?us-ascii?Q?bH+IMLkrPsYjeFLR6Usi4Oteh34dFbavfAxZ8PwUUi7c+aR3aKMzke4AC+h7?=
- =?us-ascii?Q?we89WAuaR0CTOgapEaIRoU1N6aBD6tnWeGHKNj8UNFTGXDex1mjATAEMsNZk?=
- =?us-ascii?Q?T3pUcuUWlclqATMIvuAuaAG4AafRA6bHlX+gU7WypJKaF7IzLPEjaYy4R+jC?=
- =?us-ascii?Q?2VmpplwHhz+yi0TYML//IIIm38Z2nl+tdKr80yIZ+aGrHziFYWLMX/DAG2zd?=
- =?us-ascii?Q?zc6m8CpOug5PFCeuCrkt6UgwO0PGFmmBY/hIuUJTecBeDOaQepaTn3i9H2JB?=
- =?us-ascii?Q?B8ANa4WebIzxJpVUZKQ1AlaHC7gvjn2r2/L54FLORG8yUXhgEdf178IjkauP?=
- =?us-ascii?Q?wE1mB7v6NsWkKEG/UFhMP++pVG2tMyMUa0FtwkoTvL/c6m9EKuZkIrYjxVPE?=
- =?us-ascii?Q?sZr15Rul5TuAPJMOdaVOXPEUwxbYCUSOktb5BpzyP+mRzw8qUpH1uDbdtgKA?=
- =?us-ascii?Q?r15hRg4WIV08HZ8rtJfhu6Mq76zFChROhygN4RtFzthk3suJTsO3qGlWrJ2e?=
- =?us-ascii?Q?QboRyTy+KHxECt6UaMMAND63OEj761DihpxNEGPq/ib1vRpUaIWYzXRQ57SW?=
- =?us-ascii?Q?7kPPNZM7czAj2Xb7OH/knvi9nqqcOdqMva4NCV7y+M4tWWi5gSVqflxzHivx?=
- =?us-ascii?Q?ToWHU3EA9vufsmTsWlm6BVpgMH/oRCXwwcjqEecw/l/V/rL4l3rDxKv+7pTz?=
- =?us-ascii?Q?GnZQs/N95jtJvXqnhGBfMJfSCugeMGcUC6pIdtQfVpwIn0DApZloOQ3MrIpA?=
- =?us-ascii?Q?GaR7w1z5cBIY6CfJDReta80rEaL8BYjXJHxVkYmM99b0r2FjI8xN07hQa1fZ?=
- =?us-ascii?Q?NXrOO5DBYgsj0oD4XKpRXCBqWBFeKB1Yt/ohytb+hXQX0tXoYjI2mEbkHq+F?=
- =?us-ascii?Q?ZMzbf7zwVJB147ySfUpyny9plH5wesm6ohicuEpqGjmOzcUdLDsgO/D2w/Fs?=
- =?us-ascii?Q?iSYuCbN0lejW6k4DigymjoT3vPUeWFPhAY3a1HHk0KuxHB1C/mEoDosOq225?=
- =?us-ascii?Q?vcDH4+SofjFXY5cBddL1iLVdGppayEU+HF+3PH8z6tuTWxEhGKfDunxKQYGr?=
- =?us-ascii?Q?VQTLfN0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005)(82310400014)(36860700004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2024 18:11:11.5800
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 548ed092-99a8-41d2-9a19-08dc622e6d03
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000FCC0.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7805
+X-Received: by 2002:a05:6e02:12ed:b0:36b:f94f:3022 with SMTP id
+ l13-20020a056e0212ed00b0036bf94f3022mr324469iln.5.1713765557765; Sun, 21 Apr
+ 2024 22:59:17 -0700 (PDT)
+Date: Sun, 21 Apr 2024 22:59:17 -0700
+In-Reply-To: <000000000000e71ee0060ee5283b@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004c9ae20616a923cf@google.com>
+Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in lzo1x_1_do_compress (2)
+From: syzbot <syzbot+9a049ebdaacbb076e50a@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+syzbot has found a reproducer for the following issue on:
 
-SEV-SNP guests are required to perform a GHCB GPA registration. Before
-using a GHCB GPA for a vCPU the first time, a guest must register the
-vCPU GHCB GPA. If hypervisor can work with the guest requested GPA then
-it must respond back with the same GPA otherwise return -1.
+HEAD commit:    3b68086599f8 Merge tag 'sched_urgent_for_v6.9_rc5' of git:..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1717a99f180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=87a805e655619c64
+dashboard link: https://syzkaller.appspot.com/bug?extid=9a049ebdaacbb076e50a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1293271b180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=173fe0fd180000
 
-On VMEXIT, verify that the GHCB GPA matches with the registered value.
-If a mismatch is detected, then abort the guest.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6a0c6d102762/disk-3b680865.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/02126711948e/vmlinux-3b680865.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7d390469c033/bzImage-3b680865.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/4f2c52f00058/mount_0.gz
 
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Michael Roth <michael.roth@amd.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9a049ebdaacbb076e50a@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in lzo1x_1_do_compress+0x913/0x2510 lib/lzo/lzo1x_compress.c:107
+ lzo1x_1_do_compress+0x913/0x2510 lib/lzo/lzo1x_compress.c:107
+ lzogeneric1x_1_compress+0x26a/0x11b0 lib/lzo/lzo1x_compress.c:333
+ lzo1x_1_compress+0x47/0x80 lib/lzo/lzo1x_compress.c:383
+ __lzo_compress crypto/lzo.c:58 [inline]
+ lzo_scompress+0x98/0x180 crypto/lzo.c:79
+ scomp_acomp_comp_decomp+0x7c6/0xb90
+ scomp_acomp_compress+0x32/0x40 crypto/scompress.c:187
+ crypto_acomp_compress include/crypto/acompress.h:308 [inline]
+ zswap_compress+0x377/0xb10 mm/zswap.c:1040
+ zswap_store+0x2180/0x2ca0 mm/zswap.c:1573
+ swap_writepage+0x126/0x4c0 mm/page_io.c:198
+ shmem_writepage+0x1826/0x1f70 mm/shmem.c:1518
+ pageout mm/vmscan.c:660 [inline]
+ shrink_folio_list+0x4a55/0x7910 mm/vmscan.c:1323
+ evict_folios+0x9d7f/0xcc20 mm/vmscan.c:4537
+ try_to_shrink_lruvec+0x160e/0x1a50 mm/vmscan.c:4733
+ shrink_one+0x66f/0xd40 mm/vmscan.c:4772
+ shrink_many mm/vmscan.c:4835 [inline]
+ lru_gen_shrink_node mm/vmscan.c:4935 [inline]
+ shrink_node+0x4856/0x55f0 mm/vmscan.c:5894
+ kswapd_shrink_node mm/vmscan.c:6704 [inline]
+ balance_pgdat mm/vmscan.c:6895 [inline]
+ kswapd+0x1eba/0x4460 mm/vmscan.c:7164
+ kthread+0x3e2/0x540 kernel/kthread.c:388
+ ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Uninit was stored to memory at:
+ memcpy_from_iter lib/iov_iter.c:73 [inline]
+ iterate_bvec include/linux/iov_iter.h:122 [inline]
+ iterate_and_advance2 include/linux/iov_iter.h:249 [inline]
+ iterate_and_advance include/linux/iov_iter.h:271 [inline]
+ __copy_from_iter lib/iov_iter.c:249 [inline]
+ copy_page_from_iter_atomic+0x12b7/0x2b60 lib/iov_iter.c:481
+ generic_perform_write+0x4c1/0xc60 mm/filemap.c:3982
+ shmem_file_write_iter+0x2bd/0x2f0 mm/shmem.c:2920
+ do_iter_readv_writev+0x7e6/0x960
+ vfs_iter_write+0x459/0xd00 fs/read_write.c:895
+ lo_write_bvec drivers/block/loop.c:246 [inline]
+ lo_write_simple drivers/block/loop.c:267 [inline]
+ do_req_filebacked drivers/block/loop.c:491 [inline]
+ loop_handle_cmd drivers/block/loop.c:1907 [inline]
+ loop_process_work+0x1502/0x3440 drivers/block/loop.c:1942
+ loop_rootcg_workfn+0x2b/0x40 drivers/block/loop.c:1973
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa81/0x1bd0 kernel/workqueue.c:3335
+ worker_thread+0xea5/0x1560 kernel/workqueue.c:3416
+ kthread+0x3e2/0x540 kernel/kthread.c:388
+ ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Uninit was stored to memory at:
+ ntfs_write_bh+0x652/0xdb0 fs/ntfs3/fsntfs.c:1450
+ indx_write fs/ntfs3/index.c:1027 [inline]
+ indx_insert_into_root+0x36f4/0x37d0 fs/ntfs3/index.c:1761
+ indx_insert_entry+0xe1d/0xee0 fs/ntfs3/index.c:1975
+ ntfs_create_inode+0x49b6/0x5100 fs/ntfs3/inode.c:1671
+ ntfs_atomic_open+0x90a/0xbb0 fs/ntfs3/namei.c:434
+ atomic_open fs/namei.c:3360 [inline]
+ lookup_open fs/namei.c:3468 [inline]
+ open_last_lookups fs/namei.c:3566 [inline]
+ path_openat+0x2230/0x5b00 fs/namei.c:3796
+ do_filp_open+0x20e/0x590 fs/namei.c:3826
+ do_sys_openat2+0x1bf/0x2f0 fs/open.c:1406
+ do_sys_open fs/open.c:1421 [inline]
+ __do_sys_creat fs/open.c:1497 [inline]
+ __se_sys_creat fs/open.c:1491 [inline]
+ __x64_sys_creat+0xe6/0x140 fs/open.c:1491
+ x64_sys_call+0x2966/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:86
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was stored to memory at:
+ hdr_insert_de+0x3d4/0x3f0 fs/ntfs3/index.c:838
+ indx_insert_into_root+0x33f6/0x37d0 fs/ntfs3/index.c:1753
+ indx_insert_entry+0xe1d/0xee0 fs/ntfs3/index.c:1975
+ ntfs_create_inode+0x49b6/0x5100 fs/ntfs3/inode.c:1671
+ ntfs_atomic_open+0x90a/0xbb0 fs/ntfs3/namei.c:434
+ atomic_open fs/namei.c:3360 [inline]
+ lookup_open fs/namei.c:3468 [inline]
+ open_last_lookups fs/namei.c:3566 [inline]
+ path_openat+0x2230/0x5b00 fs/namei.c:3796
+ do_filp_open+0x20e/0x590 fs/namei.c:3826
+ do_sys_openat2+0x1bf/0x2f0 fs/open.c:1406
+ do_sys_open fs/open.c:1421 [inline]
+ __do_sys_creat fs/open.c:1497 [inline]
+ __se_sys_creat fs/open.c:1491 [inline]
+ __x64_sys_creat+0xe6/0x140 fs/open.c:1491
+ x64_sys_call+0x2966/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:86
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3804 [inline]
+ slab_alloc_node mm/slub.c:3845 [inline]
+ kmem_cache_alloc+0x5b6/0xbe0 mm/slub.c:3852
+ ntfs_create_inode+0x5e0/0x5100 fs/ntfs3/inode.c:1314
+ ntfs_atomic_open+0x90a/0xbb0 fs/ntfs3/namei.c:434
+ atomic_open fs/namei.c:3360 [inline]
+ lookup_open fs/namei.c:3468 [inline]
+ open_last_lookups fs/namei.c:3566 [inline]
+ path_openat+0x2230/0x5b00 fs/namei.c:3796
+ do_filp_open+0x20e/0x590 fs/namei.c:3826
+ do_sys_openat2+0x1bf/0x2f0 fs/open.c:1406
+ do_sys_open fs/open.c:1421 [inline]
+ __do_sys_creat fs/open.c:1497 [inline]
+ __se_sys_creat fs/open.c:1491 [inline]
+ __x64_sys_creat+0xe6/0x140 fs/open.c:1491
+ x64_sys_call+0x2966/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:86
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 0 PID: 80 Comm: kswapd0 Not tainted 6.9.0-rc4-syzkaller-00274-g3b68086599f8 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+=====================================================
+
+
 ---
- arch/x86/include/asm/sev-common.h |  8 ++++++++
- arch/x86/kvm/svm/sev.c            | 27 +++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.h            |  7 +++++++
- 3 files changed, 42 insertions(+)
-
-diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index 5a8246dd532f..1006bfffe07a 100644
---- a/arch/x86/include/asm/sev-common.h
-+++ b/arch/x86/include/asm/sev-common.h
-@@ -59,6 +59,14 @@
- #define GHCB_MSR_AP_RESET_HOLD_RESULT_POS	12
- #define GHCB_MSR_AP_RESET_HOLD_RESULT_MASK	GENMASK_ULL(51, 0)
- 
-+/* Preferred GHCB GPA Request */
-+#define GHCB_MSR_PREF_GPA_REQ		0x010
-+#define GHCB_MSR_GPA_VALUE_POS		12
-+#define GHCB_MSR_GPA_VALUE_MASK		GENMASK_ULL(51, 0)
-+
-+#define GHCB_MSR_PREF_GPA_RESP		0x011
-+#define GHCB_MSR_PREF_GPA_NONE		0xfffffffffffff
-+
- /* GHCB GPA Register */
- #define GHCB_MSR_REG_GPA_REQ		0x012
- #define GHCB_MSR_REG_GPA_REQ_VAL(v)			\
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 6ca1b13c9beb..76084e109f66 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3541,6 +3541,26 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 		set_ghcb_msr_bits(svm, GHCB_MSR_HV_FT_RESP,
- 				  GHCB_MSR_INFO_MASK, GHCB_MSR_INFO_POS);
- 		break;
-+	case GHCB_MSR_PREF_GPA_REQ:
-+		set_ghcb_msr_bits(svm, GHCB_MSR_PREF_GPA_NONE, GHCB_MSR_GPA_VALUE_MASK,
-+				  GHCB_MSR_GPA_VALUE_POS);
-+		set_ghcb_msr_bits(svm, GHCB_MSR_PREF_GPA_RESP, GHCB_MSR_INFO_MASK,
-+				  GHCB_MSR_INFO_POS);
-+		break;
-+	case GHCB_MSR_REG_GPA_REQ: {
-+		u64 gfn;
-+
-+		gfn = get_ghcb_msr_bits(svm, GHCB_MSR_GPA_VALUE_MASK,
-+					GHCB_MSR_GPA_VALUE_POS);
-+
-+		svm->sev_es.ghcb_registered_gpa = gfn_to_gpa(gfn);
-+
-+		set_ghcb_msr_bits(svm, gfn, GHCB_MSR_GPA_VALUE_MASK,
-+				  GHCB_MSR_GPA_VALUE_POS);
-+		set_ghcb_msr_bits(svm, GHCB_MSR_REG_GPA_RESP, GHCB_MSR_INFO_MASK,
-+				  GHCB_MSR_INFO_POS);
-+		break;
-+	}
- 	case GHCB_MSR_TERM_REQ: {
- 		u64 reason_set, reason_code;
- 
-@@ -3604,6 +3624,13 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 	trace_kvm_vmgexit_enter(vcpu->vcpu_id, svm->sev_es.ghcb);
- 
- 	sev_es_sync_from_ghcb(svm);
-+
-+	/* SEV-SNP guest requires that the GHCB GPA must be registered */
-+	if (sev_snp_guest(svm->vcpu.kvm) && !ghcb_gpa_is_registered(svm, ghcb_gpa)) {
-+		vcpu_unimpl(&svm->vcpu, "vmgexit: GHCB GPA [%#llx] is not registered.\n", ghcb_gpa);
-+		return -EINVAL;
-+	}
-+
- 	ret = sev_es_validate_vmgexit(svm);
- 	if (ret)
- 		return ret;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 0654fc91d4db..730f5ced2a2e 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -208,6 +208,8 @@ struct vcpu_sev_es_state {
- 	u32 ghcb_sa_len;
- 	bool ghcb_sa_sync;
- 	bool ghcb_sa_free;
-+
-+	u64 ghcb_registered_gpa;
- };
- 
- struct vcpu_svm {
-@@ -361,6 +363,11 @@ static __always_inline bool sev_snp_guest(struct kvm *kvm)
- #endif
- }
- 
-+static inline bool ghcb_gpa_is_registered(struct vcpu_svm *svm, u64 val)
-+{
-+	return svm->sev_es.ghcb_registered_gpa == val;
-+}
-+
- static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
- {
- 	vmcb->control.clean = 0;
--- 
-2.25.1
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
