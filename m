@@ -1,100 +1,95 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2345413FD8E
-	for <linux-crypto@vger.kernel.org>; Tue, 23 Apr 2024 17:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9559020B3E;
+	Tue, 23 Apr 2024 21:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713895163; cv=none; b=BrMzbPeiWB8n9LPcJ/B34wirxOXfsTHr7juYBX9QC5ZoWLWL9idKrkTEmKbN/aruP1acyoX/L6bB3lmk7YhChT+jN3ONapfrdNIYRNTIWI/LGY5/Bo4w5v8Ps7PoGhYhN45ZMsgKOXunszrzl4jqa73M9vcKerc3+M3Z4ycvuTQ=
+	t=1713908188; cv=none; b=qRpV4cSreDPUruTIcr+3HXowL2KHmV3O7u3dUpw+Awpc6ZJbR8piFT1vsbmlQeRUGWjUZIZLX8taasuuIdz7t4qH26H4wkMfM+ai/R4SkpsPMuz2K0nQV6kuQrVsKAUG/gYQByfZaB8egkJnRAAE5zRw0BVXJPf0VTxkW1Ckq0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713895163; c=relaxed/simple;
-	bh=/QM7xbwXSMIsTORfyD6ZF9d+C2sqkJU3CAFveILaYp0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TfA7bQrEd38QRwdFUhSuShpESb45jNYLJI7AFyCtGTx3MdN8SrafPdXbHtW1suZtSJ7mjEc4JG14QBjxLnSiEebuZJEYvZ6zdFJEaAQbJmLtvvucSk6UyoNgM7BvsAGzJsJeHGAC4+5SpIIUSS5fQNoe+wq/L5Z9ojDuJTFZcxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=cpdngGVh; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1713908188; c=relaxed/simple;
+	bh=kRU/X/dR1S85QfdEA379AVH9Oh6pbj0vz6VEE2p37BI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=hR6EpbTInubxmtZ3DB+/xUA1x3NWkDhDJKlp6omyqQ4Y6Opn8sGAdHE4ykKsQiCkjimVtvJ/6MPQZxCfAfv5pp0NSbcLHa00MZCIz6tZ0pJGCeQbDDBT3Yvl8n+ZJxD5Y6X+xbdbGY7fMCzpGgnk97bsuC1vyhxnGNa+9cVIkxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N64hL5x3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="cpdngGVh"
-Received: from [100.65.128.125] (unknown [20.236.11.102])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 5F5C020FFC2F;
-	Tue, 23 Apr 2024 10:59:21 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5F5C020FFC2F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1713895161;
-	bh=TNqB+ZhIOhoyajBObdpT8tOY1r1hHnd2LZ83wPlbrj4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cpdngGVhhVJ9mNg4pL2qoZHaf5XdPpTfq3Ygy1ikSDbxcQbGA4Z0bQsmSJWZPMut7
-	 Ra8mXJgF+PH0n61uW75hnk55DgIJXC1v3dQ17dHHA02zVXI6Uweu/xoolZhBZksx2+
-	 nXmRWujvABmEnVXrlglb1LfdqNs/tXcRn/EGLF0Q=
-Message-ID: <1eb6f953-7c4d-4dc8-aa31-cd47810eb6a7@linux.microsoft.com>
-Date: Tue, 23 Apr 2024 10:59:20 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N64hL5x3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FA55C116B1;
+	Tue, 23 Apr 2024 21:36:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713908188;
+	bh=kRU/X/dR1S85QfdEA379AVH9Oh6pbj0vz6VEE2p37BI=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=N64hL5x31SGXexnFBS8oye91xqW8qUmC4XtebvTle1CkwE2vK/QxH5HuvgZAj7qmf
+	 mTemwU1pQsIGhRf/RXiaZpSH2CO0ckAqN9UJnW1p/okvqvH9D5+f+iVIIukrx09DK6
+	 EaYnwb8ioGwRK/ewhLyw2d/1wxBNc3DOupbttAw6dJDaAxblnKQIDeDqZPzrRxlid7
+	 3T/jwcpBOYDgbb9S/nCF0rlPn8LyPH39Dgx65fAt0yyFdCY7QS4q6goRSIafjB73HM
+	 SrILFGr9P/iu+QHCpBrAuLs08JIOEBf+KTkfWkgm0jYMBca5mzyU2RCpHEj44Qhhtv
+	 FZtYXCueW4bSg==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] Add SPAcc driver to Linux kernel
-To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
- Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
- bhoomikak@vayavyalabs.com, shwetar <shwetar@vayavyalabs.com>
-References: <20240412035342.1233930-1-pavitrakumarm@vayavyalabs.com>
- <20240412035342.1233930-2-pavitrakumarm@vayavyalabs.com>
- <51a5305d-04d2-4c6b-8ea3-0edc6e10c188@linux.microsoft.com>
- <CALxtO0=UT=KDY+WzZcdVj6nwPfcsmQVTCpmRGx65_SZvh91eqQ@mail.gmail.com>
- <5f3af250-da94-410f-858e-822b974b14bf@linux.microsoft.com>
- <CALxtO0moQmdki44w9j1B-41925YCQ3-1mrbbGcoOXroKMaVsYw@mail.gmail.com>
-Content-Language: en-CA
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-In-Reply-To: <CALxtO0moQmdki44w9j1B-41925YCQ3-1mrbbGcoOXroKMaVsYw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Wed, 24 Apr 2024 00:36:18 +0300
+Message-Id: <D0RTQRSRDNAZ.LG7O2824KXOW@kernel.org>
+Cc: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+ <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+ <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+ <jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+ <ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+ <vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
+ <dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
+ <peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
+ <rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
+ <bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
+ <ak@linux.intel.com>, <tony.luck@intel.com>,
+ <sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+ <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>,
+ <liam.merwick@oracle.com>
+Subject: Re: [PATCH v14 28/22] [SQUASH] KVM: SEV: Provide support for
+ SNP_EXTENDED_GUEST_REQUEST NAE event
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Michael Roth" <michael.roth@amd.com>, <kvm@vger.kernel.org>
+X-Mailer: aerc 0.17.0
+References: <20240421180122.1650812-1-michael.roth@amd.com>
+ <20240423162144.1780159-1-michael.roth@amd.com>
+ <20240423162144.1780159-6-michael.roth@amd.com>
+In-Reply-To: <20240423162144.1780159-6-michael.roth@amd.com>
 
-On 4/23/2024 4:12 AM, Pavitrakumar Managutte wrote:
-> Hi Easwar,
->    We have broken the main driver patch into 4 patches as shown below
-> 
->   LOC    PATCH
->   4979 - 0001-Add-SPAcc-Skcipher-support.patch
->   1470 - 0002-Enable-SPAcc-AUTODETECT.patch
->   1283 - 0003-Add-SPAcc-ahash-support.patch
->   1333 - 0004-Add-SPAcc-aead-support.patch
-> 
->    138 - 0005-Add-SPAcc-Kconfig-and-Makefile.patch
->     33  - 0006-Add-SPAcc-node-zynqmp-dts.patch
->     60  - 0007-Enable-Driver-compilation-in-crypto-Kconfig-and-Make.patch
-> 
->   I have NOT broken the first patch into a "core" and a "skcipher"
-> patch because the core patch
->   will throw warnings for "Functions defined but not used" if applied
-> standalone during kernel CI/CD.
->   No compilation errors, so nothing is going to break; but there will
-> be warnings.
-> 
->   Core patch provides the infrastructure that cipher, hash and aead modules use.
->   I will check with the kernel CI/CD team regarding this but do let me
-> know if you have any
->   details related to this.
-> 
->   If thats not a problem for kernel CI/CD, i.e. if the kernel CI/CD is
-> run only after all patches
->   are applied in order, then I can break up the first patch further
-> into two. So the core patch
->   will mostly be around 4k Lines of Code.
-> 
->   Do let me know.
-> 
-> Warm regards,
-> PK
-> 
+On Tue Apr 23, 2024 at 7:21 PM EEST, Michael Roth wrote:
+> Ensure an error is returned if a non-SNP guest attempts to issue an
+> Extended Guest Request. Also add input validation for RAX/RBX.
+>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 2b30b3b0eec8..ff64ed8df301 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3297,6 +3297,11 @@ static int sev_es_validate_vmgexit(struct vcpu_svm=
+ *svm)
+>  			goto vmgexit_err;
+>  		break;
+>  	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
+> +		if (!sev_snp_guest(vcpu->kvm))
+> +			goto vmgexit_err;
+> +		if (!kvm_ghcb_rax_is_valid(svm) ||
+> +		    !kvm_ghcb_rbx_is_valid(svm))
+> +			goto vmgexit_err;
 
-<snip>
+Hmm... maybe I'm ignoring something but why this is not just:
 
-I think it's ok if you don't split (the new) patch 1, because it's not just a matter of 
-kernel CI/CD, but also of allowing future bisects to build with -Werror=unused (or Clang
- equivalent) if that's their methodology. I would go ahead and post v3 with the breakup 
-that you have shown.
+	if (!sev_snp_guest(vcpu->kvm) ||
+	    !kvm_ghcb_rax_is_valid(svm) ||
+	    !kvm_ghcb_rbx_is_valid(svm)))
 
-- Easwar
+since they branch to the same location.
 
+BR, Jarkko
