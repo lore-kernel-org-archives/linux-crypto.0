@@ -1,138 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B8613B5BF;
-	Tue, 23 Apr 2024 11:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5FF7EEE1;
+	Tue, 23 Apr 2024 11:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713872440; cv=none; b=XkJLOo7JfA/5qy3bBtCqEJKe829ZQEmlK8BakYFRZFIk2wfSQkVjLeaEyAKLFXb62XOOd1CYEj5ZWHE1eF6S5NtiH4eeru0lsfpC3NlD0rqzqfsxbDJZ33wiLts8LNQgZ/EPq9yucrFvgArSdJ3tJrXtyhhCegG9pcms0VGUORo=
+	t=1713873396; cv=none; b=h9jKYHiacrwmt6Ry3dnH1SxsSws/deFf5JiDsRsLw/Zr3J9r5qr7oLj48sD7kYTxPJgKB5iFelEPifPCwGZ5dlYVGEXTilAKEf1moDJWL+kBi+4/lA9NFrbD6tV35TJ7wIcUbKqD5FwNoX1I1RydHkuXSxwnOC8c0gKXREySIqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713872440; c=relaxed/simple;
-	bh=BUu7gSVq7EVIapepEGDTH6KVx8cTZeOA7YDgtQSfOKA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lwRF7jj6QBGn65c+WfTfhLFyOEia1WqBtFsLJVV3Wpra/aDWdMs/W9qhcHU7bjR+siIIIuaAGj5mNLQjMk8U/9oefPBrB0y49byGQ7RWx7kB0Ibnwsa0LpgejQtLHkhg8NO7NhdzIIhHFavAUAiv/Y7A0ZlcDGVgKoXUJqXXLow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MggvnvHC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713873396; c=relaxed/simple;
+	bh=p/uf6VYgCKT6JxvSBrFmzJpBlF+YiW1WjAHp1el+N5I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RRefhtASDKr2mEtCS9loH8pgtQWYN18D53HyMy1whrzoBECHPWqDZdm2D18Q0UaZHdG6UYl/X308kqKJ0JuXaMIt+BPHsTa+N1IQ00Q9DWpIhDl8jwiz4ZI4DOsgb4yZpomF3evbWPuNx+aMLylSTPDbc7T8UZPbyo6Y8R3Krdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l70ZxMLC; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MggvnvHC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77933C116B1;
-	Tue, 23 Apr 2024 11:40:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713872440;
-	bh=BUu7gSVq7EVIapepEGDTH6KVx8cTZeOA7YDgtQSfOKA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MggvnvHCIZG3rEFI7aNL5Am8evbh+SbnjNZIHc3KD7m5eW3fVv0KbV4gHpsR7kpUh
-	 TZ3DYkDfodHV3Ri5mlKWuP//M42VWVr2+Gdd2SdCWhBaIweZA6aQAt9LuyY6YOojA/
-	 lARvuqpVq6WiNz6YGd1l+y1GwoKWD8IRjLWiDdcTlxtxHWCtXzH7/bWXm+LMVW5DRG
-	 dAyUo/R/a9LNvmdIyHAkIvb0NwolST493J1Me9y7Gw5L5cmtZLP6crbTPFFNYdxE/b
-	 YqGds313IKXqZ11GCaYly8S5F/blw+0UPhuUt2djD91dCyGdZXpD8W3lLTc4DAj4Oy
-	 q6rS+0otLiUHw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Michael Ellerman <mpe@ellerman.id.au>,
-	=?UTF-8?q?Michal=20Such=C3=A1nek?= <msuchanek@suse.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 6.6 05/16] powerpc/crypto/chacha-p10: Fix failure on non Power10
-Date: Tue, 23 Apr 2024 07:01:38 -0400
-Message-ID: <20240423110151.1658546-5-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240423110151.1658546-1-sashal@kernel.org>
-References: <20240423110151.1658546-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l70ZxMLC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713873394; x=1745409394;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=p/uf6VYgCKT6JxvSBrFmzJpBlF+YiW1WjAHp1el+N5I=;
+  b=l70ZxMLCwCNRoVpPZ+6C1OJXBW1NP6oY2Pq1YTRMDENlzci8CzzE9n8N
+   DVB7iUAfVhYTMyBCMcbCRBP2Al10uk6cDKYL+AeT8UXV4Co24b3kVDB9z
+   bCK8HKX8iq0hJVlF5XJ1eR38SbiiZIWFr9i/ySPa4vbcuEec4FcYQsuZr
+   lNMxhmjkoygZdNhANOZj1AgV9LINxiRChBKksICUsmZ0ung2UuyMV8osl
+   zt1BW10YJjFVD0OUqkDGaWHS60qPnNvhz4rNiYVwHGS/+I222MgYruUBU
+   4IemIm7ObGEJNGl1F4AEyGwK4K9F/9ph3Sg0cGbgxTncTduIKHLlPxKUm
+   g==;
+X-CSE-ConnectionGUID: aWWkIAmwT5yF6caDE4I5tw==
+X-CSE-MsgGUID: +5RLew28Sn6Zlr3xt0ZJFQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="9305408"
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="9305408"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 04:56:33 -0700
+X-CSE-ConnectionGUID: hWAL2QWzRY67+bfCqqupIA==
+X-CSE-MsgGUID: nyaBbhdCQVKOIqKg29TI3Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="55297699"
+Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 23 Apr 2024 04:56:30 -0700
+Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rzEl9-0000A4-0p;
+	Tue, 23 Apr 2024 11:56:27 +0000
+Date: Tue, 23 Apr 2024 19:56:10 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vadim Fedorenko <vadfed@meta.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v10 1/4] bpf: make common crypto API for TC/XDP
+ programs
+Message-ID: <202404231955.qUkSEasH-lkp@intel.com>
+References: <20240422225024.2847039-2-vadfed@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.28
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240422225024.2847039-2-vadfed@meta.com>
 
-From: Michael Ellerman <mpe@ellerman.id.au>
+Hi Vadim,
 
-[ Upstream commit 69630926011c1f7170a465b7b5c228deb66e9372 ]
+kernel test robot noticed the following build warnings:
 
-The chacha-p10-crypto module provides optimised chacha routines for
-Power10. It also selects CRYPTO_ARCH_HAVE_LIB_CHACHA which says it
-provides chacha_crypt_arch() to generic code.
+[auto build test WARNING on bpf-next/master]
 
-Notably the module needs to provide chacha_crypt_arch() regardless of
-whether it is loaded on Power10 or an older CPU.
+url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/bpf-make-common-crypto-API-for-TC-XDP-programs/20240423-070416
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20240422225024.2847039-2-vadfed%40meta.com
+patch subject: [PATCH bpf-next v10 1/4] bpf: make common crypto API for TC/XDP programs
+config: riscv-defconfig (https://download.01.org/0day-ci/archive/20240423/202404231955.qUkSEasH-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 5ef5eb66fb428aaf61fb51b709f065c069c11242)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240423/202404231955.qUkSEasH-lkp@intel.com/reproduce)
 
-The implementation of chacha_crypt_arch() already has a fallback to
-chacha_crypt_generic(), however the module as a whole fails to load on
-pre-Power10, because of the use of module_cpu_feature_match().
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404231955.qUkSEasH-lkp@intel.com/
 
-This breaks for example loading wireguard:
+All warnings (new ones prefixed by >>):
 
-  jostaberry-1:~ # modprobe -v wireguard
-  insmod /lib/modules/6.8.0-lp155.8.g7e0e887-default/kernel/arch/powerpc/crypto/chacha-p10-crypto.ko.zst
-  modprobe: ERROR: could not insert 'wireguard': No such device
+>> kernel/bpf/crypto.c:34: warning: Function parameter or struct member 'reserved' not described in 'bpf_crypto_params'
+   kernel/bpf/crypto.c:55: warning: Function parameter or struct member 'siv_len' not described in 'bpf_crypto_ctx'
 
-Fix it by removing module_cpu_feature_match(), and instead check the
-CPU feature manually. If the CPU feature is not found, the module
-still loads successfully, but doesn't register the Power10 specific
-algorithms. That allows chacha_crypt_generic() to remain available for
-use, fixing the problem.
 
-  [root@fedora ~]# modprobe -v wireguard
-  insmod /lib/modules/6.8.0-00001-g786a790c4d79/kernel/net/ipv4/udp_tunnel.ko
-  insmod /lib/modules/6.8.0-00001-g786a790c4d79/kernel/net/ipv6/ip6_udp_tunnel.ko
-  insmod /lib/modules/6.8.0-00001-g786a790c4d79/kernel/lib/crypto/libchacha.ko
-  insmod /lib/modules/6.8.0-00001-g786a790c4d79/kernel/arch/powerpc/crypto/chacha-p10-crypto.ko
-  insmod /lib/modules/6.8.0-00001-g786a790c4d79/kernel/lib/crypto/libchacha20poly1305.ko
-  insmod /lib/modules/6.8.0-00001-g786a790c4d79/kernel/drivers/net/wireguard/wireguard.ko
-  [   18.910452][  T721] wireguard: allowedips self-tests: pass
-  [   18.914999][  T721] wireguard: nonce counter self-tests: pass
-  [   19.029066][  T721] wireguard: ratelimiter self-tests: pass
-  [   19.029257][  T721] wireguard: WireGuard 1.0.0 loaded. See www.wireguard.com for information.
-  [   19.029361][  T721] wireguard: Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+vim +34 kernel/bpf/crypto.c
 
-Reported-by: Michal Suchánek <msuchanek@suse.de>
-Closes: https://lore.kernel.org/all/20240315122005.GG20665@kitsune.suse.cz/
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-Link: https://msgid.link/20240328130200.3041687-1-mpe@ellerman.id.au
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/powerpc/crypto/chacha-p10-glue.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+    17	
+    18	/* BPF crypto initialization parameters struct */
+    19	/**
+    20	 * struct bpf_crypto_params - BPF crypto initialization parameters structure
+    21	 * @type:	The string of crypto operation type.
+    22	 * @algo:	The string of algorithm to initialize.
+    23	 * @key:	The cipher key used to init crypto algorithm.
+    24	 * @key_len:	The length of cipher key.
+    25	 * @authsize:	The length of authentication tag used by algorithm.
+    26	 */
+    27	struct bpf_crypto_params {
+    28		char type[14];
+    29		u8 reserved[2];
+    30		char algo[128];
+    31		u8 key[256];
+    32		u32 key_len;
+    33		u32 authsize;
+  > 34	};
+    35	
 
-diff --git a/arch/powerpc/crypto/chacha-p10-glue.c b/arch/powerpc/crypto/chacha-p10-glue.c
-index 74fb86b0d2097..7c728755852e1 100644
---- a/arch/powerpc/crypto/chacha-p10-glue.c
-+++ b/arch/powerpc/crypto/chacha-p10-glue.c
-@@ -197,6 +197,9 @@ static struct skcipher_alg algs[] = {
- 
- static int __init chacha_p10_init(void)
- {
-+	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-+		return 0;
-+
- 	static_branch_enable(&have_p10);
- 
- 	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
-@@ -204,10 +207,13 @@ static int __init chacha_p10_init(void)
- 
- static void __exit chacha_p10_exit(void)
- {
-+	if (!static_branch_likely(&have_p10))
-+		return;
-+
- 	crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
- }
- 
--module_cpu_feature_match(PPC_MODULE_FEATURE_P10, chacha_p10_init);
-+module_init(chacha_p10_init);
- module_exit(chacha_p10_exit);
- 
- MODULE_DESCRIPTION("ChaCha and XChaCha stream ciphers (P10 accelerated)");
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
