@@ -1,126 +1,174 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5FF7EEE1;
-	Tue, 23 Apr 2024 11:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A82513C695;
+	Tue, 23 Apr 2024 15:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713873396; cv=none; b=h9jKYHiacrwmt6Ry3dnH1SxsSws/deFf5JiDsRsLw/Zr3J9r5qr7oLj48sD7kYTxPJgKB5iFelEPifPCwGZ5dlYVGEXTilAKEf1moDJWL+kBi+4/lA9NFrbD6tV35TJ7wIcUbKqD5FwNoX1I1RydHkuXSxwnOC8c0gKXREySIqI=
+	t=1713885325; cv=none; b=AW2Hv+C+SRDBdfwhHSQDU49R2PHascrFM110j2PqPkP056yhcDFkAZXOmvrbrxcoGmz4Anhxm5GXMbZN5aqqtfO8KVAe41JEDR9uHHicrgAu1oodrn009YGCgOJ7Y/YzAHEHAQvFJVvytEll2mQ2L2IDqtWjri2dd9Fz7M91VEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713873396; c=relaxed/simple;
-	bh=p/uf6VYgCKT6JxvSBrFmzJpBlF+YiW1WjAHp1el+N5I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RRefhtASDKr2mEtCS9loH8pgtQWYN18D53HyMy1whrzoBECHPWqDZdm2D18Q0UaZHdG6UYl/X308kqKJ0JuXaMIt+BPHsTa+N1IQ00Q9DWpIhDl8jwiz4ZI4DOsgb4yZpomF3evbWPuNx+aMLylSTPDbc7T8UZPbyo6Y8R3Krdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l70ZxMLC; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1713885325; c=relaxed/simple;
+	bh=lnYfLz/yKVLG22Y0s2TOCf6E1sFzxpYUAzI759jEv3k=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Sk0xyE3kHgjN33nTGjtm/zywIe/H7CGpWT1aMvmiHsW4Yjw/ckjkdQklmi+JnRplAJXickog/tcA+qkUm91yLQQj3JXKNoHzhinMxjG+MyhgxSQ4ZGXLwYM7omN5Yqce5Qx6/x+cAk3MLDYcZZ29xIPsbmNwxFOjVN3MsQ3O8ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=iiNNHVRA; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l70ZxMLC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713873394; x=1745409394;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=p/uf6VYgCKT6JxvSBrFmzJpBlF+YiW1WjAHp1el+N5I=;
-  b=l70ZxMLCwCNRoVpPZ+6C1OJXBW1NP6oY2Pq1YTRMDENlzci8CzzE9n8N
-   DVB7iUAfVhYTMyBCMcbCRBP2Al10uk6cDKYL+AeT8UXV4Co24b3kVDB9z
-   bCK8HKX8iq0hJVlF5XJ1eR38SbiiZIWFr9i/ySPa4vbcuEec4FcYQsuZr
-   lNMxhmjkoygZdNhANOZj1AgV9LINxiRChBKksICUsmZ0ung2UuyMV8osl
-   zt1BW10YJjFVD0OUqkDGaWHS60qPnNvhz4rNiYVwHGS/+I222MgYruUBU
-   4IemIm7ObGEJNGl1F4AEyGwK4K9F/9ph3Sg0cGbgxTncTduIKHLlPxKUm
-   g==;
-X-CSE-ConnectionGUID: aWWkIAmwT5yF6caDE4I5tw==
-X-CSE-MsgGUID: +5RLew28Sn6Zlr3xt0ZJFQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="9305408"
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="9305408"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 04:56:33 -0700
-X-CSE-ConnectionGUID: hWAL2QWzRY67+bfCqqupIA==
-X-CSE-MsgGUID: nyaBbhdCQVKOIqKg29TI3Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="55297699"
-Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 23 Apr 2024 04:56:30 -0700
-Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rzEl9-0000A4-0p;
-	Tue, 23 Apr 2024 11:56:27 +0000
-Date: Tue, 23 Apr 2024 19:56:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vadim Fedorenko <vadfed@meta.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v10 1/4] bpf: make common crypto API for TC/XDP
- programs
-Message-ID: <202404231955.qUkSEasH-lkp@intel.com>
-References: <20240422225024.2847039-2-vadfed@meta.com>
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="iiNNHVRA"
+Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43NCH14A018378;
+	Tue, 23 Apr 2024 17:15:00 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=
+	selector1; bh=sORmSAf9vacArCUQo8K1St5wRolQtpbAu5JoPjjIy14=; b=ii
+	NNHVRAEhwXhr+niTwSdwL4ktGCL2b1QSYUaSPeh4ZHBjPZLuf2J3Xx9wWzqtg5Bt
+	O6ufbjV5uAybP3SOX7vvMkiSM0vnNppdbDpMcXf7UKDRSg4JiOixxi24Q+jRyK/w
+	lOyKyTs3y/be+CeJEkV/FVUeXVv5Tum+FBunU9PBDcZTTuP2D7wdoFKIRPqdguac
+	e6ap/qrbyncVrdciLBFSY2Dxk56enOgBA8YCADsIHQE+Ms2LV5RKWf5PlbrqJ1Mb
+	nbGcXlwo5wlXWTddQw2Vl4krKG8ziaOiJfvdA4byPKOscaK40ml/7YAvvd7qTCB4
+	sjuwBbDnrLyP0f39ReuQ==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3xm4cncfun-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Apr 2024 17:15:00 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 2BFCD4002D;
+	Tue, 23 Apr 2024 17:14:52 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node3.st.com [10.75.129.71])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id CE988223664;
+	Tue, 23 Apr 2024 17:14:16 +0200 (CEST)
+Received: from localhost (10.48.86.103) by SHFDAG1NODE3.st.com (10.75.129.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 23 Apr
+ 2024 17:14:16 +0200
+From: Maxime MERE <maxime.mere@foss.st.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre
+ Torgue <alexandre.torgue@foss.st.com>
+CC: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+        Rob
+ Herring <robh@kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 3/3] crypto: stm32/cryp - add CRYPTO_ALG_KERN_DRIVER_ONLY flag
+Date: Tue, 23 Apr 2024 17:14:09 +0200
+Message-ID: <20240423151409.902490-4-maxime.mere@foss.st.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240423151409.902490-1-maxime.mere@foss.st.com>
+References: <20240423151409.902490-1-maxime.mere@foss.st.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240422225024.2847039-2-vadfed@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE3.st.com
+ (10.75.129.71)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-23_12,2024-04-23_02,2023-05-22_02
 
-Hi Vadim,
+From: Maxime Méré <maxime.mere@foss.st.com>
 
-kernel test robot noticed the following build warnings:
+This flag is needed to make the driver visible from openssl and cryptodev.
 
-[auto build test WARNING on bpf-next/master]
+Signed-off-by: Maxime Méré <maxime.mere@st.com>
+---
+ drivers/crypto/stm32/stm32-cryp.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/bpf-make-common-crypto-API-for-TC-XDP-programs/20240423-070416
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20240422225024.2847039-2-vadfed%40meta.com
-patch subject: [PATCH bpf-next v10 1/4] bpf: make common crypto API for TC/XDP programs
-config: riscv-defconfig (https://download.01.org/0day-ci/archive/20240423/202404231955.qUkSEasH-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 5ef5eb66fb428aaf61fb51b709f065c069c11242)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240423/202404231955.qUkSEasH-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404231955.qUkSEasH-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> kernel/bpf/crypto.c:34: warning: Function parameter or struct member 'reserved' not described in 'bpf_crypto_params'
-   kernel/bpf/crypto.c:55: warning: Function parameter or struct member 'siv_len' not described in 'bpf_crypto_ctx'
-
-
-vim +34 kernel/bpf/crypto.c
-
-    17	
-    18	/* BPF crypto initialization parameters struct */
-    19	/**
-    20	 * struct bpf_crypto_params - BPF crypto initialization parameters structure
-    21	 * @type:	The string of crypto operation type.
-    22	 * @algo:	The string of algorithm to initialize.
-    23	 * @key:	The cipher key used to init crypto algorithm.
-    24	 * @key_len:	The length of cipher key.
-    25	 * @authsize:	The length of authentication tag used by algorithm.
-    26	 */
-    27	struct bpf_crypto_params {
-    28		char type[14];
-    29		u8 reserved[2];
-    30		char algo[128];
-    31		u8 key[256];
-    32		u32 key_len;
-    33		u32 authsize;
-  > 34	};
-    35	
-
+diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
+index 36248975191c..e1a4b5d9d006 100644
+--- a/drivers/crypto/stm32/stm32-cryp.c
++++ b/drivers/crypto/stm32/stm32-cryp.c
+@@ -2294,7 +2294,7 @@ static struct skcipher_engine_alg crypto_algs[] = {
+ 		.base.cra_name		= "ecb(aes)",
+ 		.base.cra_driver_name	= "stm32-ecb-aes",
+ 		.base.cra_priority	= 300,
+-		.base.cra_flags		= CRYPTO_ALG_ASYNC,
++		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 		.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 		.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
+ 		.base.cra_alignmask	= 0,
+@@ -2316,7 +2316,7 @@ static struct skcipher_engine_alg crypto_algs[] = {
+ 		.base.cra_name		= "cbc(aes)",
+ 		.base.cra_driver_name	= "stm32-cbc-aes",
+ 		.base.cra_priority	= 300,
+-		.base.cra_flags		= CRYPTO_ALG_ASYNC,
++		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 		.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 		.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
+ 		.base.cra_alignmask	= 0,
+@@ -2339,7 +2339,7 @@ static struct skcipher_engine_alg crypto_algs[] = {
+ 		.base.cra_name		= "ctr(aes)",
+ 		.base.cra_driver_name	= "stm32-ctr-aes",
+ 		.base.cra_priority	= 300,
+-		.base.cra_flags		= CRYPTO_ALG_ASYNC,
++		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 		.base.cra_blocksize	= 1,
+ 		.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
+ 		.base.cra_alignmask	= 0,
+@@ -2362,7 +2362,7 @@ static struct skcipher_engine_alg crypto_algs[] = {
+ 		.base.cra_name		= "ecb(des)",
+ 		.base.cra_driver_name	= "stm32-ecb-des",
+ 		.base.cra_priority	= 300,
+-		.base.cra_flags		= CRYPTO_ALG_ASYNC,
++		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 		.base.cra_blocksize	= DES_BLOCK_SIZE,
+ 		.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
+ 		.base.cra_alignmask	= 0,
+@@ -2384,7 +2384,7 @@ static struct skcipher_engine_alg crypto_algs[] = {
+ 		.base.cra_name		= "cbc(des)",
+ 		.base.cra_driver_name	= "stm32-cbc-des",
+ 		.base.cra_priority	= 300,
+-		.base.cra_flags		= CRYPTO_ALG_ASYNC,
++		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 		.base.cra_blocksize	= DES_BLOCK_SIZE,
+ 		.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
+ 		.base.cra_alignmask	= 0,
+@@ -2407,7 +2407,7 @@ static struct skcipher_engine_alg crypto_algs[] = {
+ 		.base.cra_name		= "ecb(des3_ede)",
+ 		.base.cra_driver_name	= "stm32-ecb-des3",
+ 		.base.cra_priority	= 300,
+-		.base.cra_flags		= CRYPTO_ALG_ASYNC,
++		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 		.base.cra_blocksize	= DES_BLOCK_SIZE,
+ 		.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
+ 		.base.cra_alignmask	= 0,
+@@ -2429,7 +2429,7 @@ static struct skcipher_engine_alg crypto_algs[] = {
+ 		.base.cra_name		= "cbc(des3_ede)",
+ 		.base.cra_driver_name	= "stm32-cbc-des3",
+ 		.base.cra_priority	= 300,
+-		.base.cra_flags		= CRYPTO_ALG_ASYNC,
++		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 		.base.cra_blocksize	= DES_BLOCK_SIZE,
+ 		.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
+ 		.base.cra_alignmask	= 0,
+@@ -2463,7 +2463,7 @@ static struct aead_engine_alg aead_algs[] = {
+ 		.cra_name		= "gcm(aes)",
+ 		.cra_driver_name	= "stm32-gcm-aes",
+ 		.cra_priority		= 300,
+-		.cra_flags		= CRYPTO_ALG_ASYNC,
++		.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 		.cra_blocksize		= 1,
+ 		.cra_ctxsize		= sizeof(struct stm32_cryp_ctx),
+ 		.cra_alignmask		= 0,
+@@ -2486,7 +2486,7 @@ static struct aead_engine_alg aead_algs[] = {
+ 		.cra_name		= "ccm(aes)",
+ 		.cra_driver_name	= "stm32-ccm-aes",
+ 		.cra_priority		= 300,
+-		.cra_flags		= CRYPTO_ALG_ASYNC,
++		.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 		.cra_blocksize		= 1,
+ 		.cra_ctxsize		= sizeof(struct stm32_cryp_ctx),
+ 		.cra_alignmask		= 0,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.25.1
+
