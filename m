@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9559020B3E;
-	Tue, 23 Apr 2024 21:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C7785274;
+	Tue, 23 Apr 2024 21:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713908188; cv=none; b=qRpV4cSreDPUruTIcr+3HXowL2KHmV3O7u3dUpw+Awpc6ZJbR8piFT1vsbmlQeRUGWjUZIZLX8taasuuIdz7t4qH26H4wkMfM+ai/R4SkpsPMuz2K0nQV6kuQrVsKAUG/gYQByfZaB8egkJnRAAE5zRw0BVXJPf0VTxkW1Ckq0E=
+	t=1713908985; cv=none; b=Xe10WZGq9haEvb6iGgHwb+sa7nMpOQf2JQkTfuy3wxogHy5xszeFkTJ7EB5phQtI6olhu46rf8WMfO3j33tclrvFqQh94qo2BNwH+JoIY5wUmBkRTJrNsvuK+JCRkcTZSPFOHHMewv53j162EfSu1scDHGDL4r5A2c92Vy+P2/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713908188; c=relaxed/simple;
-	bh=kRU/X/dR1S85QfdEA379AVH9Oh6pbj0vz6VEE2p37BI=;
+	s=arc-20240116; t=1713908985; c=relaxed/simple;
+	bh=TmB6hmZXahGX5L+QzR3KbzuOF6UB83VPnFT1MMnTUcM=;
 	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=hR6EpbTInubxmtZ3DB+/xUA1x3NWkDhDJKlp6omyqQ4Y6Opn8sGAdHE4ykKsQiCkjimVtvJ/6MPQZxCfAfv5pp0NSbcLHa00MZCIz6tZ0pJGCeQbDDBT3Yvl8n+ZJxD5Y6X+xbdbGY7fMCzpGgnk97bsuC1vyhxnGNa+9cVIkxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N64hL5x3; arc=none smtp.client-ip=10.30.226.201
+	 References:In-Reply-To; b=J8b6PDm5seLgWxQ/soby1txX6V7PkKD3mCbnO0n3AhXPxlCKPJz8YYyWjrN1LEdcaDxhrPHI8fAB10wjP3du9yDqD+w8GSU/SJHBl/PLoAfCVpxoZIrP3LmXG2zoIcpCfFHzHe3pRJTKivj0f9QS0yCVA8/bQt1c1/TOgKi9FM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKkUIN+z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N64hL5x3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FA55C116B1;
-	Tue, 23 Apr 2024 21:36:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKkUIN+z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6528C116B1;
+	Tue, 23 Apr 2024 21:49:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713908188;
-	bh=kRU/X/dR1S85QfdEA379AVH9Oh6pbj0vz6VEE2p37BI=;
+	s=k20201202; t=1713908984;
+	bh=TmB6hmZXahGX5L+QzR3KbzuOF6UB83VPnFT1MMnTUcM=;
 	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=N64hL5x31SGXexnFBS8oye91xqW8qUmC4XtebvTle1CkwE2vK/QxH5HuvgZAj7qmf
-	 mTemwU1pQsIGhRf/RXiaZpSH2CO0ckAqN9UJnW1p/okvqvH9D5+f+iVIIukrx09DK6
-	 EaYnwb8ioGwRK/ewhLyw2d/1wxBNc3DOupbttAw6dJDaAxblnKQIDeDqZPzrRxlid7
-	 3T/jwcpBOYDgbb9S/nCF0rlPn8LyPH39Dgx65fAt0yyFdCY7QS4q6goRSIafjB73HM
-	 SrILFGr9P/iu+QHCpBrAuLs08JIOEBf+KTkfWkgm0jYMBca5mzyU2RCpHEj44Qhhtv
-	 FZtYXCueW4bSg==
+	b=FKkUIN+zblMk3Knjt+r5foOCN8t7pGmqmYLI3oCjbIVdlfb2t+ObNOYz0C3TcMRne
+	 C9uVKzuwfDtcnjUJFpT8nB0nr8ruiTuXjzi9L32AlP7XLI78uRayI9NBsGN5FI+ttZ
+	 xD1rfXqJlyi7bR5BEPf8Mpw9sqJ5RT3mpEftL8vuGhKZfUdL8xznO6fsI96N36NJUC
+	 vbUw++07vZtYqvao5gGAF4hXyIq6JnFSdcZtktfSDqV4XNjVWqo6JKt0rzt4CF9SnB
+	 L7pq4phSmYDK/ol6j4w+GIBzG2Rw24NFS97qe5U2739uwQc/9+LqgHWcu8F/qFrpgk
+	 9NB8sl+QMYzqQ==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -34,62 +34,60 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Wed, 24 Apr 2024 00:36:18 +0300
-Message-Id: <D0RTQRSRDNAZ.LG7O2824KXOW@kernel.org>
-Cc: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
- <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
- <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
- <jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
- <ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
- <vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
- <dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
- <peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
- <rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
- <bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
- <ak@linux.intel.com>, <tony.luck@intel.com>,
- <sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
- <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>,
- <liam.merwick@oracle.com>
-Subject: Re: [PATCH v14 28/22] [SQUASH] KVM: SEV: Provide support for
- SNP_EXTENDED_GUEST_REQUEST NAE event
+Date: Wed, 24 Apr 2024 00:49:42 +0300
+Message-Id: <D0RU10Q41UA3.XC5J8UBJUEM4@kernel.org>
+Cc: <stable@vger.kernel.org>
+Subject: Re: [PATCH] KEYS: asymmetric: Add missing dependency on CRYPTO_SIG
 From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Michael Roth" <michael.roth@amd.com>, <kvm@vger.kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>, <keyrings@vger.kernel.org>,
+ <linux-crypto@vger.kernel.org>
 X-Mailer: aerc 0.17.0
-References: <20240421180122.1650812-1-michael.roth@amd.com>
- <20240423162144.1780159-1-michael.roth@amd.com>
- <20240423162144.1780159-6-michael.roth@amd.com>
-In-Reply-To: <20240423162144.1780159-6-michael.roth@amd.com>
+References: <20240422210845.319819-1-ebiggers@kernel.org>
+In-Reply-To: <20240422210845.319819-1-ebiggers@kernel.org>
 
-On Tue Apr 23, 2024 at 7:21 PM EEST, Michael Roth wrote:
-> Ensure an error is returned if a non-SNP guest attempts to issue an
-> Extended Guest Request. Also add input validation for RAX/RBX.
+On Tue Apr 23, 2024 at 12:08 AM EEST, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 >
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Make ASYMMETRIC_PUBLIC_KEY_SUBTYPE select CRYPTO_SIG to avoid build
+> errors like the following, which were possible with
+> CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE=3Dy && CONFIG_CRYPTO_SIG=3Dn:
+>
+>     ld: vmlinux.o: in function `public_key_verify_signature':
+>     (.text+0x306280): undefined reference to `crypto_alloc_sig'
+>     ld: (.text+0x306300): undefined reference to `crypto_sig_set_pubkey'
+>     ld: (.text+0x306324): undefined reference to `crypto_sig_verify'
+>     ld: (.text+0x30636c): undefined reference to `crypto_sig_set_privkey'
+>
+> Fixes: 63ba4d67594a ("KEYS: asymmetric: Use new crypto interface without =
+scatterlists")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
->  arch/x86/kvm/svm/sev.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  crypto/asymmetric_keys/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 2b30b3b0eec8..ff64ed8df301 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3297,6 +3297,11 @@ static int sev_es_validate_vmgexit(struct vcpu_svm=
- *svm)
->  			goto vmgexit_err;
->  		break;
->  	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
-> +		if (!sev_snp_guest(vcpu->kvm))
-> +			goto vmgexit_err;
-> +		if (!kvm_ghcb_rax_is_valid(svm) ||
-> +		    !kvm_ghcb_rbx_is_valid(svm))
-> +			goto vmgexit_err;
+> diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kcon=
+fig
+> index 59ec726b7c77..3f089abd6fc9 100644
+> --- a/crypto/asymmetric_keys/Kconfig
+> +++ b/crypto/asymmetric_keys/Kconfig
+> @@ -13,10 +13,11 @@ if ASYMMETRIC_KEY_TYPE
+>  config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+>  	tristate "Asymmetric public-key crypto algorithm subtype"
+>  	select MPILIB
+>  	select CRYPTO_HASH_INFO
+>  	select CRYPTO_AKCIPHER
+> +	select CRYPTO_SIG
+>  	select CRYPTO_HASH
+>  	help
+>  	  This option provides support for asymmetric public key type handling.
+>  	  If signature generation and/or verification are to be used,
+>  	  appropriate hash algorithms (such as SHA-1) must be available.
+>
+> base-commit: ed30a4a51bb196781c8058073ea720133a65596f
 
-Hmm... maybe I'm ignoring something but why this is not just:
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-	if (!sev_snp_guest(vcpu->kvm) ||
-	    !kvm_ghcb_rax_is_valid(svm) ||
-	    !kvm_ghcb_rbx_is_valid(svm)))
-
-since they branch to the same location.
+BR, Jarkko
 
 BR, Jarkko
