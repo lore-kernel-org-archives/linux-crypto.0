@@ -1,66 +1,66 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F05E1EB30
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 20:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8860153BEC
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 20:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713990114; cv=none; b=kpb3Kquz8uODrgz0seXN0oqqYnuikFlU8BHzCuWuIxobZ9XIVt5tV5t53JNFSzUjEab1aVjq6l0VYnNsUDGc8KHF2F3xWfgGHPybfCAaqHHibT+6eR2N2BI5KyA3M5r81sd/CCibzSEHRkNOvgzF6L2z+NsMkJX+ZcdcdNFQLtQ=
+	t=1713992391; cv=none; b=OF6YbDmzIkRZDtNHQ179bX0nx82Lx4ac8uZBHWpLvp1FaDmOo94QHw9mx8mU6SBwVd5EJ7f9cXxgzVeqaEGBYVSIuZAzTU7U17Z9F1nJ6LF7s3el3z+SX/ANmyZCaM+mHut7X/Ukisx60kC+TBIFMEWeUoe4qcGJv9shKqUBP6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713990114; c=relaxed/simple;
-	bh=TGEtv5XOiits4mamBa9OAfqfGV4U4S70ayjHE1cLPf0=;
+	s=arc-20240116; t=1713992391; c=relaxed/simple;
+	bh=uoU2R06bl1D+d4rxO77OZBS6BnVKagWYLEFnEXdTDn8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Hdj6Cev2R2oNkgBYgx1qHkxug4Twm0zrlEpIebc2auxzo4IAhbdSi/byXeHfX+9S9v2/zujubSM6QtKX43THqOOympN13CoDk8kS9PyO56udUND6Qknv9ZV8w2tJJNd1RAl0MiBCvdEiMnfYSf8zvEToNPdMo33aBM2gaLGmBRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LJWhaOBS; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=uTBswCziyR932rxxgaviEYuTm0WctcmaxZQWaF6L0KY73AG74I2rzRHrl0KC0aemTIStqOSJeaHCfRKge1rqSV+D7wltAHJ5ucTf6bbkaOdLZ8PYcutLoo+/hVJxUtyUwnTBwtgtZtyaa3jnODMlLZd+56ZKKsEBoPgWGUU64fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KjCaHm4S; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LJWhaOBS"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61b4ede655aso4163337b3.0
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 13:21:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KjCaHm4S"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6ef9edf9910so439212b3a.1
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 13:59:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713990111; x=1714594911; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1713992390; x=1714597190; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kJKivmW0J/DCohVbY4PLH/Gsm5HkrpKk4PumvPQkGTk=;
-        b=LJWhaOBS23+m4cbeffQxfBi2+LhQiaxH0g4aN0wnbucjwJjOE43th6w3x5Kshx4k/1
-         ksdbN/ffqddNeAOLSEXHRP0jRaxbX7Mq5pLjMASW7l7reMdVrUCcm+1JmbqVCFgWqa6p
-         9ypcuIzdQkWkyknbyeg6yjMPyGOoNk4dhRDK7Z1TCPMrFznKIsUS0C4Bczwd6AiKEm2L
-         /XNvlN3itMS4rlQRGCrMoJhRQ/mlJsBw/sgDL59KZ4FEC+zL/5qTDiNpzkah+Emu0cp8
-         XPFettXTUNO68E+4Yu30UQGHJvKxs/khMkvXnaALWx8vrx+nPO029a34YdOxWqbOF1ey
-         GfHw==
+        bh=8U1TRrKJi3x9eg5Tfok1QV3PlGCm0SDXSlp6I7iPxGE=;
+        b=KjCaHm4SfZ0BSz0gxlpk5zUch7+meGfx9lZbZw04Lz0w8FrageE3zC70GAizxI4+h8
+         XUei4YaPq43QeQX1M+YP7SZKkvlABz4GhDP8bAV6MEC4VO4Fp//Jb1YacuHa3MMlV9S2
+         yD1nk99sdUxoR6odE/vZyD8QY7ORDmbAW+VTwbXhMCfnjhXQPVuxkX1knY64vPGB2HUb
+         LCu/uRkslz8iPcEgg2q9hEHlRwvd4X3Y+KH4qbPqmi9Zhujm6oo8x7hyFd25FvsF/eUM
+         W6AFyGp921NU+dKGc7hC8n1zU7nIrbobPjnV/TFanhYoLJFfDZaiiraT8KWPQx2y6fn9
+         XjNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713990111; x=1714594911;
+        d=1e100.net; s=20230601; t=1713992390; x=1714597190;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kJKivmW0J/DCohVbY4PLH/Gsm5HkrpKk4PumvPQkGTk=;
-        b=ctncIiBgrpG2tkpixNCQP1mH8nQkUi+cECebFFYBXKGfB+c4xXPr0Ndl5b1zZMYvCa
-         5rPkun+2/ezT44jW2yi3Ee1ds+W0y4OUGj2piWd4JqYEvuFHMizFdvYPhgd0Niz2yaa/
-         wwLYxmIpu7iaj3kT6yyPhAnM9yjDYSxvu1YeEKnEEX7/pHQNJRePjqcN0LtOu3oRw8pq
-         m8MEdsxXggP8cMGn/IO/q6FpyecO/vmKuxfXwB97yrSbSFKfvLrAAkcBjc9XfTWwlZnh
-         cfzD+s8ivXsPXt//yeobUaMGmawKbLsZHHbHyNllMA2KSxcFJUlxfgcHwlVmJaWZi8rk
-         2W1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUonNOZpyJLqxcXpY+iXlyOFYijwH8/2xgAe8mXMbKBoETBPDrBJRMHHEk0yn3p+pGfnigD+BXJm0ji79OiayS53KoBkoz4j7Gogqxg
-X-Gm-Message-State: AOJu0YzK/gY0kADN3Pd3yqUH5fnrO1n7Q6w7joEp4ndvrBC31hz6UThv
-	rBlJcZeaGy9O4uguAXeUvYDQFm9dEUrJdJSxpMBaRzk3j/JorVPWGD88UjrEtgwznJKgw5qH+Zf
-	H3w==
-X-Google-Smtp-Source: AGHT+IET29Be+TqLLxR1el2WX7B1TltJHuVLHw4XBc2UEobX1IG760KHrKW5Mr9mGqY0ZbBfjntc+5CKv7o=
+        bh=8U1TRrKJi3x9eg5Tfok1QV3PlGCm0SDXSlp6I7iPxGE=;
+        b=SQ/W7BYDliRomD+BrURtbLDi4a4VC0cIsJ0Jl7/90YH5mv/m2EbGrQfCpoWqmDlDut
+         cHtpkLgsLIevBTv0JjAHYqru1YFxtzQgevsrBmMEWedTt5Is5JFjNVpuyzBVW4V1288f
+         EpRIEnvMRllNRgwDzYRxWtgl9zYdz8nxrUQfZDTrAVMBR43ABsWLxMdFKFuv8OoHkYsw
+         NZU9wHSOhPO6oB8czVCzWu2Ezvnj/HWq0Cv4teqclQH4xWqhsDFDr8UvSI1g1DAJJddb
+         1tqFb5TdiovNpg9QLP9PAw+sbD4H+ogrcCGjIl4lw8bRsUsht7QRArOBvL/hJFxqoqdD
+         b2SQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWS5qfhHt+EPmDNXD+pXk9u/tu/l4Hu6KwOA8R0ar5Fq4yumz7xhlQ23t29+x/wo8P00MxWyv60fXtD8ujgHRx4IfVnXUad0I+4J1dv
+X-Gm-Message-State: AOJu0YygoqAsBW1Q5z6iEKvo5mvHyV+Yts+upOVFXn3NdkPCKJkc0KFG
+	tQBgXSurq5Y5laBx0QwIsiI39v223RHP6QxTdMioVG0Sse/2xmLrejlnj/2xlsVoTcKk3/TG/t+
+	yzw==
+X-Google-Smtp-Source: AGHT+IGmpsjpffCacAgU+oA7c6LytEyPptV84YPXAIS11abUo+sjJaZSSsVlO+4Jy+7xcfCJfVr3EYbcplE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:c54c:0:b0:de1:d49:7ff6 with SMTP id
- v73-20020a25c54c000000b00de10d497ff6mr385878ybe.7.1713990111258; Wed, 24 Apr
- 2024 13:21:51 -0700 (PDT)
-Date: Wed, 24 Apr 2024 13:21:49 -0700
-In-Reply-To: <20240421180122.1650812-4-michael.roth@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:22c4:b0:6ec:f18a:2783 with SMTP id
+ f4-20020a056a0022c400b006ecf18a2783mr446579pfj.0.1713992389985; Wed, 24 Apr
+ 2024 13:59:49 -0700 (PDT)
+Date: Wed, 24 Apr 2024 13:59:48 -0700
+In-Reply-To: <20240421180122.1650812-10-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240421180122.1650812-1-michael.roth@amd.com> <20240421180122.1650812-4-michael.roth@amd.com>
-Message-ID: <Zilp3Sp5S-sljoQE@google.com>
-Subject: Re: [PATCH v14 03/22] KVM: SEV: Add GHCB handling for Hypervisor
- Feature Support requests
+References: <20240421180122.1650812-1-michael.roth@amd.com> <20240421180122.1650812-10-michael.roth@amd.com>
+Message-ID: <ZilyxFnJvaWUJOkc@google.com>
+Subject: Re: [PATCH v14 09/22] KVM: SEV: Add support to handle MSR based Page
+ State Change VMGEXIT
 From: Sean Christopherson <seanjc@google.com>
 To: Michael Roth <michael.roth@amd.com>
 Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
@@ -79,19 +79,50 @@ Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Sun, Apr 21, 2024, Michael Roth wrote:
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 6e31cb408dd8..1d2264e93afe 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -33,9 +33,11 @@
->  #include "cpuid.h"
->  #include "trace.h"
->  
-> -#define GHCB_VERSION_MAX	1ULL
-> +#define GHCB_VERSION_MAX	2ULL
->  #define GHCB_VERSION_MIN	1ULL
+> +static int snp_begin_psc_msr(struct kvm_vcpu *vcpu, u64 ghcb_msr)
+> +{
+> +	u64 gpa = gfn_to_gpa(GHCB_MSR_PSC_REQ_TO_GFN(ghcb_msr));
+> +	u8 op = GHCB_MSR_PSC_REQ_TO_OP(ghcb_msr);
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +
+> +	if (op != SNP_PAGE_STATE_PRIVATE && op != SNP_PAGE_STATE_SHARED) {
+> +		set_ghcb_msr(svm, GHCB_MSR_PSC_RESP_ERROR);
+> +		return 1; /* resume guest */
+> +	}
+> +
+> +	vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
+> +	vcpu->run->vmgexit.type = KVM_USER_VMGEXIT_PSC_MSR;
+> +	vcpu->run->vmgexit.psc_msr.gpa = gpa;
+> +	vcpu->run->vmgexit.psc_msr.op = op;
 
-This needs a userspace control.  Being unable to limit the GHCB version advertised
-to the guest is going to break live migration of SEV-ES VMs, e.g. if a pool of
-hosts has some kernels running this flavor of KVM, and some hosts running an
-older KVM that doesn't support v2.
+Argh, no.
+
+This is the same crud that TDX tried to push[*].  Use KVM's existing user exits,
+and extend as *needed*.  There is no good reason page state change requests need
+*two* exit reasons.  The *only* thing KVM supports right now is private<=>shared
+conversions, and that can be handled with either KVM_HC_MAP_GPA_RANGE or
+KVM_EXIT_MEMORY_FAULT.
+
+The non-MSR flavor can batch requests, but I'm willing to bet that the overwhelming
+majority of requests are contiguous, i.e. can be combined into a range by KVM,
+and that handling any outliers by performing multiple exits to userspace will
+provide sufficient performance.
+
+And the non-MSR version that comes in later patch is a complete mess.  It kicks
+the PSC out to userspace without *any* validation.  As I complained in the TDX
+thread, that will create an unmaintable ABI for KVM.
+
+KVM needs to have its own, well-defined ABI.  Splitting functionality between
+KVM and userspace at seemingly random points is not maintainable.
+
+E.g. if/when KVM supports UNSMASH, upgrading to the KVM would arguably break
+userspace as PSC requests that previously exited would suddenly be handled by
+KVM.  Maybe.  It's impossible to review this because there's no KVM ABI, KVM is
+little more than a dumb pipe parroting information to userspace.
+
+I truly do not understand why we would even consider allowing this.  We push back
+on people wanting new hypercalls for some specific use case, because we already
+have generic ways to achieve things, but then CoCo comes along and we apparently
+throw out any thought of maintainability.  I don't get it.
+
+[*] https://lore.kernel.org/all/Zg18ul8Q4PGQMWam@google.com
