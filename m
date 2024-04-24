@@ -1,38 +1,38 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346561CF9A
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 18:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFF2256A
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 18:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713983632; cv=none; b=f6Vl0ShRSl3dE6B5Kno4jBHbg/9Qa4bthJevwvUix2aO3DR03KlWLHMZN+EqkStPmUHk96D/g15nyOiQFC2QaCwY8i35cQ7hxCzqb8RSuJyjmkdLy7NKCRKRL9Fl90UVm9VO/IdHUIqctDSlM1At9UJEDlXc+8KJfnr3j7Vc+4s=
+	t=1713983739; cv=none; b=PrwyFOPYe7gES13Y82SiH7OFMC+Z8QNQ7b6pPFhHv3+fihFW6k0MyVHMM5yFxt+StiKIBHpo6Y+6CzvJPOzXvdlEhPFrFCr9ht1Z8F0Gs2lhv4+mDmzod8dfr66paJduXZ08+tQ7Hd6xlBaKmtJGz/uDm0b13TaLN0eIJqCzE9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713983632; c=relaxed/simple;
-	bh=lXPwk1l5R4TU4c5qE/qPwPMB0kYhCMN4XzpdXEceGtc=;
+	s=arc-20240116; t=1713983739; c=relaxed/simple;
+	bh=oDZwQgImVeCUBxSbmPb2CBIkIdZOlgHbROb7BGHgqwM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S3b3dMdpPZ+84HCB33O7uJTxh56VJx2ITJtafmqkSQzec9yzD+bVAtJmwfi15NSZsDphBjY8d0DhpJz2L0IoJmT8Lvpjv9TsF585qm+c0WT57WAOUBbMnGJMlGpHHVrcK29zxa/e2CeJVUq0nU0t5A2azNJ91j2joC04YqhHisA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=198.175.65.9
+	 Content-Type:Content-Disposition:In-Reply-To; b=Unw4lZZbTd+oKr/BJqIcQCYMach7VOkJoxzW+Kh3TuFl0mt3AGpx9FHCE/A7vTm0ivJO9/g6F2GVrBo+JV4X271ry8asUky/bBUKhWZslxVW9iU+XosPXPfi4ol6HfaVZKHyEI1jBcTUpckn0wOsFggZEl/28sBxtRg/C9Hj41o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
-X-CSE-ConnectionGUID: jWoQJ2OfQ2eB8rYjwpcHxw==
-X-CSE-MsgGUID: IgJDjMShTxqcRN9Hk3CqQg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="32126197"
+X-CSE-ConnectionGUID: dgM5GxlxSIG7Cbs7QhbJNw==
+X-CSE-MsgGUID: vg6EnTS1S+GAsiORfMPzvQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="9796655"
 X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
-   d="scan'208";a="32126197"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 11:33:51 -0700
-X-CSE-ConnectionGUID: tyxhSyVeQVe56rlsmUI8Qw==
-X-CSE-MsgGUID: ANZZIUuBQgGxZ19tESR6/Q==
+   d="scan'208";a="9796655"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 11:35:38 -0700
+X-CSE-ConnectionGUID: PL6o4XGlQHu3UA7PuDzwZQ==
+X-CSE-MsgGUID: yLUAZd31TGylQKKUnt41cg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
-   d="scan'208";a="24874373"
+   d="scan'208";a="29436829"
 Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 11:33:48 -0700
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 11:35:34 -0700
 Received: from andy by smile.fi.intel.com with local (Exim 4.97)
 	(envelope-from <andy@kernel.org>)
-	id 1rzhRA-00000000kY5-3iAc;
-	Wed, 24 Apr 2024 21:33:44 +0300
-Date: Wed, 24 Apr 2024 21:33:44 +0300
+	id 1rzhSt-00000000kZV-3POF;
+	Wed, 24 Apr 2024 21:35:31 +0300
+Date: Wed, 24 Apr 2024 21:35:31 +0300
 From: Andy Shevchenko <andy@kernel.org>
 To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
 Cc: Gregory CLEMENT <gregory.clement@bootlin.com>,
@@ -45,7 +45,7 @@ Cc: Gregory CLEMENT <gregory.clement@bootlin.com>,
 	linux-crypto@vger.kernel.org
 Subject: Re: [PATCH v7 6/9] platform: cznic: turris-omnia-mcu: Add support
  for MCU provided TRNG
-Message-ID: <ZilQiHLLj1eQxP2L@smile.fi.intel.com>
+Message-ID: <ZilQ8948PV8MuLiZ@smile.fi.intel.com>
 References: <20240424173809.7214-1-kabel@kernel.org>
  <20240424173809.7214-7-kabel@kernel.org>
 Precedence: bulk
@@ -68,61 +68,16 @@ On Wed, Apr 24, 2024 at 07:38:05PM +0200, Marek Behún wrote:
 
 ...
 
-> +static void omnia_irq_mapping_drop(void *res)
-> +{
-> +	irq_dispose_mapping((unsigned int)(unsigned long)res);
-> +}
-
-Leftover?
-
-> +int omnia_mcu_register_trng(struct omnia_mcu *mcu)
-> +{
-> +	struct device *dev = &mcu->client->dev;
-> +	u8 irq_idx, dummy;
-> +	int irq, err;
-> +
-> +	if (!(mcu->features & FEAT_TRNG))
-> +		return 0;
-> +
-> +	irq_idx = omnia_int_to_gpio_idx[__bf_shf(INT_TRNG)];
-> +	irq = gpiod_to_irq(gpiochip_get_desc(&mcu->gc, irq_idx));
-> +	if (irq < 0)
-> +		return dev_err_probe(dev, irq, "Cannot get TRNG IRQ\n");
-
-> +	err = devm_add_action_or_reset(dev, omnia_irq_mapping_drop,
-> +				       (void *)(unsigned long)irq);
-> +	if (err)
-> +		return err;
-
-Are you sure it's correct now?
-
 > +	/* If someone else cleared the TRNG interrupt but did not read the
 > +	 * entropy, a new interrupt won't be generated, and entropy collection
 > +	 * will be stuck. Ensure an interrupt will be generated by executing
 > +	 * the collect entropy command (and discarding the result).
 > +	 */
-> +	err = omnia_cmd_read(mcu->client, CMD_TRNG_COLLECT_ENTROPY, &dummy, 1);
-> +	if (err)
-> +		return err;
-> +
-> +	init_completion(&mcu->trng_completion);
-> +
-> +	err = devm_request_threaded_irq(dev, irq, NULL, omnia_trng_irq_handler,
-> +					IRQF_ONESHOT, "turris-omnia-mcu-trng",
-> +					mcu);
-> +	if (err)
-> +		return dev_err_probe(dev, err, "Cannot request TRNG IRQ\n");
-> +
-> +	mcu->trng.name = "turris-omnia-mcu-trng";
-> +	mcu->trng.read = omnia_trng_read;
-> +	mcu->trng.priv = (unsigned long)mcu;
-> +
-> +	err = devm_hwrng_register(dev, &mcu->trng);
-> +	if (err)
-> +		return dev_err_probe(dev, err, "Cannot register TRNG\n");
-> +
-> +	return 0;
-> +}
+
+/*
+ * Note, the above style is solely for net subsystem. The
+ * others should use the usual one, like in this example.
+ */
 
 -- 
 With Best Regards,
