@@ -1,112 +1,97 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2184A139CEE
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 19:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F05E1EB30
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 20:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713988038; cv=none; b=IqiVsbZK5vEDlpG7zh6fMCOoV5Rxq7h8DzIVipAnldDmNpPpsfhbxQg1pq/H8gL23saS/iQuSeek0BY+xCqyQwT6iibpzGuhxjx4xn8YqPJLI09YkAZHuYS6616LbTM0+IseciTwm612tCi9NUgSh0zLitWAxAv4Fv1O4L5NwgA=
+	t=1713990114; cv=none; b=kpb3Kquz8uODrgz0seXN0oqqYnuikFlU8BHzCuWuIxobZ9XIVt5tV5t53JNFSzUjEab1aVjq6l0VYnNsUDGc8KHF2F3xWfgGHPybfCAaqHHibT+6eR2N2BI5KyA3M5r81sd/CCibzSEHRkNOvgzF6L2z+NsMkJX+ZcdcdNFQLtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713988038; c=relaxed/simple;
-	bh=anKJU1S6467DK3ZoCW+YdxBrzunV/vU7DiZjbbARUHE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BVi9np8aTj5lS6htLZj/tffukGDea8R444sDhkY+vv/mvhDAKAPEhStRertLGRaEJXXBQaTGE/S04bTmQF/jVaBCFcJR5ap3RJJG90+Bbc+hOizFaDK7c6W3y5wns0Y7WLOU6OGf+ZBUk91C7JemFtsNREd0h1HdSzpwWj8OtTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
-X-CSE-ConnectionGUID: cxziHAcWRaSL7fp7vkhehw==
-X-CSE-MsgGUID: PpKk98ZzSi+GQpLEQeX13w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="21066124"
-X-IronPort-AV: E=Sophos;i="6.07,227,1708416000"; 
-   d="scan'208";a="21066124"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 12:47:16 -0700
-X-CSE-ConnectionGUID: rPj+xjYvTNa9M//QHhquJw==
-X-CSE-MsgGUID: T2yKAZHXTGSHqHYD+k4zNA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,227,1708416000"; 
-   d="scan'208";a="24863622"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 12:47:14 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andy@kernel.org>)
-	id 1rziaF-00000000mFg-02Ei;
-	Wed, 24 Apr 2024 22:47:11 +0300
-Date: Wed, 24 Apr 2024 22:47:10 +0300
-From: Andy Shevchenko <andy@kernel.org>
-To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Cc: Gregory CLEMENT <gregory.clement@bootlin.com>,
-	Arnd Bergmann <arnd@arndb.de>, soc@kernel.org, arm@kernel.org,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v7 6/9] platform: cznic: turris-omnia-mcu: Add support
- for MCU provided TRNG
-Message-ID: <Zilhvv3ffWMDL1Uj@smile.fi.intel.com>
-References: <20240424173809.7214-1-kabel@kernel.org>
- <20240424173809.7214-7-kabel@kernel.org>
- <ZilQiHLLj1eQxP2L@smile.fi.intel.com>
- <20240424205123.5fc82a1a@dellmb>
+	s=arc-20240116; t=1713990114; c=relaxed/simple;
+	bh=TGEtv5XOiits4mamBa9OAfqfGV4U4S70ayjHE1cLPf0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Hdj6Cev2R2oNkgBYgx1qHkxug4Twm0zrlEpIebc2auxzo4IAhbdSi/byXeHfX+9S9v2/zujubSM6QtKX43THqOOympN13CoDk8kS9PyO56udUND6Qknv9ZV8w2tJJNd1RAl0MiBCvdEiMnfYSf8zvEToNPdMo33aBM2gaLGmBRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LJWhaOBS; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LJWhaOBS"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61b4ede655aso4163337b3.0
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 13:21:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713990111; x=1714594911; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kJKivmW0J/DCohVbY4PLH/Gsm5HkrpKk4PumvPQkGTk=;
+        b=LJWhaOBS23+m4cbeffQxfBi2+LhQiaxH0g4aN0wnbucjwJjOE43th6w3x5Kshx4k/1
+         ksdbN/ffqddNeAOLSEXHRP0jRaxbX7Mq5pLjMASW7l7reMdVrUCcm+1JmbqVCFgWqa6p
+         9ypcuIzdQkWkyknbyeg6yjMPyGOoNk4dhRDK7Z1TCPMrFznKIsUS0C4Bczwd6AiKEm2L
+         /XNvlN3itMS4rlQRGCrMoJhRQ/mlJsBw/sgDL59KZ4FEC+zL/5qTDiNpzkah+Emu0cp8
+         XPFettXTUNO68E+4Yu30UQGHJvKxs/khMkvXnaALWx8vrx+nPO029a34YdOxWqbOF1ey
+         GfHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713990111; x=1714594911;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kJKivmW0J/DCohVbY4PLH/Gsm5HkrpKk4PumvPQkGTk=;
+        b=ctncIiBgrpG2tkpixNCQP1mH8nQkUi+cECebFFYBXKGfB+c4xXPr0Ndl5b1zZMYvCa
+         5rPkun+2/ezT44jW2yi3Ee1ds+W0y4OUGj2piWd4JqYEvuFHMizFdvYPhgd0Niz2yaa/
+         wwLYxmIpu7iaj3kT6yyPhAnM9yjDYSxvu1YeEKnEEX7/pHQNJRePjqcN0LtOu3oRw8pq
+         m8MEdsxXggP8cMGn/IO/q6FpyecO/vmKuxfXwB97yrSbSFKfvLrAAkcBjc9XfTWwlZnh
+         cfzD+s8ivXsPXt//yeobUaMGmawKbLsZHHbHyNllMA2KSxcFJUlxfgcHwlVmJaWZi8rk
+         2W1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUonNOZpyJLqxcXpY+iXlyOFYijwH8/2xgAe8mXMbKBoETBPDrBJRMHHEk0yn3p+pGfnigD+BXJm0ji79OiayS53KoBkoz4j7Gogqxg
+X-Gm-Message-State: AOJu0YzK/gY0kADN3Pd3yqUH5fnrO1n7Q6w7joEp4ndvrBC31hz6UThv
+	rBlJcZeaGy9O4uguAXeUvYDQFm9dEUrJdJSxpMBaRzk3j/JorVPWGD88UjrEtgwznJKgw5qH+Zf
+	H3w==
+X-Google-Smtp-Source: AGHT+IET29Be+TqLLxR1el2WX7B1TltJHuVLHw4XBc2UEobX1IG760KHrKW5Mr9mGqY0ZbBfjntc+5CKv7o=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:c54c:0:b0:de1:d49:7ff6 with SMTP id
+ v73-20020a25c54c000000b00de10d497ff6mr385878ybe.7.1713990111258; Wed, 24 Apr
+ 2024 13:21:51 -0700 (PDT)
+Date: Wed, 24 Apr 2024 13:21:49 -0700
+In-Reply-To: <20240421180122.1650812-4-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240424205123.5fc82a1a@dellmb>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Mime-Version: 1.0
+References: <20240421180122.1650812-1-michael.roth@amd.com> <20240421180122.1650812-4-michael.roth@amd.com>
+Message-ID: <Zilp3Sp5S-sljoQE@google.com>
+Subject: Re: [PATCH v14 03/22] KVM: SEV: Add GHCB handling for Hypervisor
+ Feature Support requests
+From: Sean Christopherson <seanjc@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com, 
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Apr 24, 2024 at 08:51:23PM +0200, Marek Behún wrote:
-> On Wed, 24 Apr 2024 21:33:44 +0300
-> Andy Shevchenko <andy@kernel.org> wrote:
-> > On Wed, Apr 24, 2024 at 07:38:05PM +0200, Marek Behún wrote:
+On Sun, Apr 21, 2024, Michael Roth wrote:
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 6e31cb408dd8..1d2264e93afe 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -33,9 +33,11 @@
+>  #include "cpuid.h"
+>  #include "trace.h"
+>  
+> -#define GHCB_VERSION_MAX	1ULL
+> +#define GHCB_VERSION_MAX	2ULL
+>  #define GHCB_VERSION_MIN	1ULL
 
-...
-
-> > > +static void omnia_irq_mapping_drop(void *res)
-> > > +{
-> > > +	irq_dispose_mapping((unsigned int)(unsigned long)res);
-> > > +}
-> > 
-> > Leftover?
-> 
-> What do you mean? I dropped the devm-helpers.h changes, now I do
-> devm_add_action_or_reset() manually, with this function as the action.
-
-But why?
-
-...
-
-> > > +	irq_idx = omnia_int_to_gpio_idx[__bf_shf(INT_TRNG)];
-> > > +	irq = gpiod_to_irq(gpiochip_get_desc(&mcu->gc, irq_idx));
-> > > +	if (irq < 0)
-> > > +		return dev_err_probe(dev, irq, "Cannot get TRNG IRQ\n");
-
-> > > +	err = devm_add_action_or_reset(dev, omnia_irq_mapping_drop,
-> > > +				       (void *)(unsigned long)irq);
-> > > +	if (err)
-> > > +		return err;
-> > 
-> > Are you sure it's correct now?
-> 
-> Yes, why wouldn't it?
-
-For what purpose? I don't see drivers doing that. Are you expecting that
-the same IRQ mapping will be reused for something else? Can you elaborate
-how? (I can imagine one theoretical / weird case how to achieve that,
-but impractical.)
-
-Besides above, this is asymmetrical call to gpiod_to_irq(). If we really care
-about this, it should be provided by GPIO library.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+This needs a userspace control.  Being unable to limit the GHCB version advertised
+to the guest is going to break live migration of SEV-ES VMs, e.g. if a pool of
+hosts has some kernels running this flavor of KVM, and some hosts running an
+older KVM that doesn't support v2.
