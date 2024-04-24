@@ -1,65 +1,65 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D45416F0CF
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 23:26:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A0116F29E
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 23:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714001221; cv=none; b=ZoQqan0mYrfMgbzGel7AbPKOqZjsAcUwDCqWa/Jh7pnAMYQUbj+5rV8ASheo0KWED66KuXSJ75eDwGFF4cQhgGi1I3SgoHxrAGK/85KzEHtenOVbitvlgRo+YA5BOvovVK9FllS5yp1Acu+UrGGgiQpANoNm8KpC6RQShN52hEA=
+	t=1714003097; cv=none; b=cC5zTBXwVQbzB45XarzQpFBtKe2j7w1ZLknVKXcyNRDirWua5PyBS0QL6o1mHBUrY8FaB/e7DvCaF5wBNkjZCTQqrjmRsNB5LQBqiKnem/TFq8tOVytAtaYhuPwpFNkEv93WtuQbZaOiQYJq4LeUJtxnFSn2Lnd0xs0xWsT3mss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714001221; c=relaxed/simple;
-	bh=QtOdWdlOdeRyzFugEhg6e9ksqQi4BaU2ioPkhsidgEY=;
+	s=arc-20240116; t=1714003097; c=relaxed/simple;
+	bh=R0/fOiO9g/dpuvcPamlgbFNlgNdbcJZfjQmEh/9deBI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RYtJ4C/1dSLIcO43/VA9bh4c7zXvPRAKV76KSX4ENaIFi2tIgq6oNSiKHdSzkappPrmx4NCqidQdCADt+IXdZL10OTp/kqaDgVWSdR0TSeo/6rJM58lCv28cjiNBmzYhSqizkRgM5PFCNwm1kmmgVLWGD98fp7bi/uzMGzPPYY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b5+WrySM; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=GmJe1wtj+URZsybADlLJZtvq60GYuk/ItK+mOl37im+dqGcNZN567McIWyFLJ5fobZCqK3b+KpnZkK9Pv0+dThiucXFBtZ1HBeemWWUmueUuPx9mgyDWb97YGuzoX0J4WH4YpeQPSzPntlQWbeQM4JaRbsJDq2cM4ju7nDcsics=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N/63R2Xr; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b5+WrySM"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6150e36ca0dso7122337b3.1
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 16:26:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N/63R2Xr"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61b2ef746c9so7472737b3.1
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 16:58:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714001218; x=1714606018; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714003095; x=1714607895; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9CmG+3iHB+1BxNgRQoZJ+SwJOKBGJtBG8Ri4d9VDnrA=;
-        b=b5+WrySMkvLaTYMw1QIOcbKG7DRhwAbXJtA6hCiOoAnYV6ZH2JS4PzcyrGLciWffY2
-         Zk6JEWojNcXAXaS8OzuRG8/5C8XMtXOnm2lS2PNJZ9NwLXFd2Q0pvq5cZ9oozsTUJwNH
-         eK9tBSDe9bd+3B09kGEZdTMk/E5ml3ViiYdVRNv4NRCwAp+UOGFrwZ3+QaydUeccBV7w
-         rXefzKAquju+l4+Q6qc1r8Ih2B4AjOH7LKvXKd6Q7l3Qp1XGFZSM5FlUq/7lFNQgGa1q
-         HZmlKt3DyV37+2b15yWfNUzxbaj6maNPY9lIiaBXVTJNbwBsM8VwfU+u5yenJoxdEOQT
-         EwLA==
+        bh=hq8SdlFPWpEwMALVKp560wfcsx2v4HYt4jxDkJ/UaCQ=;
+        b=N/63R2XrTVa5tOBZwZk2rUcXaWIKDS8QDdTh84geL66z45X6GYp/576zLshXepkhBs
+         HcLSM2/sQ1aOYdmwS4M3hBchhsfpyYuJ2dlbuhQzfJ1oKW3ZhuYyjHOkcyghy/mr90K9
+         Bvq/qDk8muFwcUKEa7Of1rS0vvBQRmOb0b+/8oxclXRXr/SZuPspGs0uCzWQjZj3Pk8M
+         aWWdCIvcJYztZuHweRYdWtyFH5mNa+JifxKO2x29kUsS0fhSJai+22RgwLezHlnkUvZy
+         csVLtUYgHaEq0WpZn/01goNVn440zbjdpkJJH5L+utP1zSkQI4nfkuN/QVklqh0+Gqfc
+         QbBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714001218; x=1714606018;
+        d=1e100.net; s=20230601; t=1714003095; x=1714607895;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9CmG+3iHB+1BxNgRQoZJ+SwJOKBGJtBG8Ri4d9VDnrA=;
-        b=SYcm8tcOmnmKD+TdoeVlFz2nWkH8luQOc7wqzfihE9JLgTF/jLqC6IhzIMdoe2DSwF
-         3ga9xHyANb3wdsVJQ60rNm4/LyTNxi5ui6CGpDjrjzaW7u1U4agiAS/dAjHDZhCXkpWx
-         QbHE++PmWKfTOU1uoezj5luPDZ7Ft1psXXXIhde79Kp7/z59TrrZvivR6+lywyxSSVZL
-         XqswDw3iYZ+chZ1zn41oaWcWY4V/4AeQ3flOVYuH4hAEKQH9YZ6g/pEBxshc3ae4T/bm
-         alfvNadXI4GA866DAsSmVnzi5I4IBtXUbio3An/3oYFrnq8b6ARzbJuEuyUesAvoPynC
-         4BFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWPJq2UJX9LOPdlCFkO7FytRVGIUymjiHFlPhdxZ/qs66d634voCbqEkLxGoshUIO85td9aqFyyxjdk1veDn3IkticwTY2PrhS9dB3J
-X-Gm-Message-State: AOJu0Yz37AGLXQMkMaJBeHHVvHL+KvQAXCwPetsAulBDovf+3SYInOq+
-	60z9YI9xmpxuSukVB4baiqEPJmhGEb+qlqDiwsoURk7R1ApWGPBKBV/j8gDvaEUlW7hKC3NNPMb
-	Cwg==
-X-Google-Smtp-Source: AGHT+IG9AFP7hY+ukqMVBTl39cuNC0vrXBttEQiu5m8xciLOlctXbTTnNj1cEOBjn+Fu9BaNN6kY8VHwld4=
+        bh=hq8SdlFPWpEwMALVKp560wfcsx2v4HYt4jxDkJ/UaCQ=;
+        b=eimDvTc/UtgV2xYLX9VTyuMJQi3aCzc39/ZopvXGL7xc7rggc3UsIECAGAK49J+P1E
+         EI5mkJnM4jeS19Pbir8HDp5vB93vwZ50n4Wyh+uq7S0QrRRAEJteM5u93YFXa6thw4f5
+         8mJqO7shx/bhHLAPODC7vNGJFNpV/EzZvgu0TntQaNYYt2iEcBBXN9l3BuxAm7RMkP8h
+         IgG3tBtd4psd/PVoHx+xV0w8nS0L9ug808QI/Wn9pnjFZjODTJFFFPkOx7WuBk9nIcKS
+         T1YOE45+vNkUtZN8fUdcsqf/x+2RJL3uBTbJqfYOL+tHLBcLRM5MLORCZmYzScVkodSo
+         EqcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWZWB2vgPFFrQGP4CrF13pb7F33K9eJmjgMnuRgkw40GHx+It3O1wTRCEjM71YKPgm83OrWvxzpplm50LB+mM2NN6z2n9/dErOQuLhG
+X-Gm-Message-State: AOJu0YyEtcoxcOiQk3AW725VVBIqsXg6z/7IK9iIxLTcbj2wdgG5NoBu
+	eOIndmm7HzsjMouWEI3oPPPRRWk7TIQksrwgtdJwfGy4rVwK2+W9jYPEhFKg8f1SSRFrG47xrZ5
+	43Q==
+X-Google-Smtp-Source: AGHT+IE5uZLfnqhh3kfhpm2ae2TWAGQslbCCze7Kvv2Uh3gwjGn/xEM7H5pIz2AWmMMjWE7Ke1FVDrC9NQI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:e288:0:b0:61b:649:ac90 with SMTP id
- l130-20020a0de288000000b0061b0649ac90mr769275ywe.9.1714001218264; Wed, 24 Apr
- 2024 16:26:58 -0700 (PDT)
-Date: Wed, 24 Apr 2024 16:26:56 -0700
-In-Reply-To: <20240421180122.1650812-6-michael.roth@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a81:b408:0:b0:61a:e8df:4ae7 with SMTP id
+ h8-20020a81b408000000b0061ae8df4ae7mr925447ywi.8.1714003095004; Wed, 24 Apr
+ 2024 16:58:15 -0700 (PDT)
+Date: Wed, 24 Apr 2024 16:58:13 -0700
+In-Reply-To: <20240421180122.1650812-7-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240421180122.1650812-1-michael.roth@amd.com> <20240421180122.1650812-6-michael.roth@amd.com>
-Message-ID: <ZimVQKWGZyju3RbT@google.com>
-Subject: Re: [PATCH v14 05/22] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command
+References: <20240421180122.1650812-1-michael.roth@amd.com> <20240421180122.1650812-7-michael.roth@amd.com>
+Message-ID: <ZimclfBdk1Y9iKVY@google.com>
+Subject: Re: [PATCH v14 06/22] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
 From: Sean Christopherson <seanjc@google.com>
 To: Michael Roth <michael.roth@amd.com>
 Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
@@ -78,22 +78,232 @@ Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Sun, Apr 21, 2024, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> KVM_SEV_SNP_LAUNCH_START begins the launch process for an SEV-SNP guest.
-> The command initializes a cryptographic digest context used to construct
-> the measurement of the guest. Other commands can then at that point be
-> used to load/encrypt data into the guest's initial launch image.
-> 
-> For more information see the SEV-SNP specification.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Co-developed-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 9d08d1202544..d3ae4ded91df 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -258,6 +258,35 @@ static void sev_decommission(unsigned int handle)
+>  	sev_guest_decommission(&decommission, NULL);
+>  }
+>  
+> +static int snp_page_reclaim(u64 pfn)
+> +{
+> +	struct sev_data_snp_page_reclaim data = {0};
+> +	int err, rc;
+> +
+> +	data.paddr = __sme_set(pfn << PAGE_SHIFT);
+> +	rc = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
+> +	if (WARN_ON_ONCE(rc)) {
 
-I somehow ended up in the v13 series and gave feedback on that version, but AFAICT
-all of the feedback still applies to v14.
+This now WARNs here *and* in the caller, which is overkill.  Pick one.
 
-https://lore.kernel.org/all/Zil8MnPXkCbqw3Ka@google.com
+> +		/*
+> +		 * This shouldn't happen under normal circumstances, but if the
+> +		 * reclaim failed, then the page is no longer safe to use.
+
+Explain _why_ it's unsafe.  The code makes it quite clear that reclaim shouldn't
+fail.  E.g. I assume it's bound to the ASID still?  Something else?
+
+This is all messy, too.  snp_launch_update_vmsa() does RECLAIM but doesn't
+convert the page back to shared, which seems wrong.  sev_gmem_post_populate()
+open codes the calls separately, and then snp_cleanup_guest_buf() bundles them
+together.
+
+Yeesh, and the return types are all mixed.  snp_cleanup_guest_buf() returns a
+bool on success, but the helpers it uses return 0/-errno.  Please convert
+everything to return 0/-errno, boolean "error codes" are hard to follow and make
+the code unnecessarily brittle.
+
+> +	if (WARN_ON_ONCE(sev_populate_args->type != KVM_SEV_SNP_PAGE_TYPE_ZERO && !src)) {
+> +		ret = -EINVAL;
+
+Just return -EINVAL, no?
+
+> +		goto out;
+> +	}
+> +
+> +	for (gfn = gfn_start, i = 0; gfn < gfn_start + npages; gfn++, i++) {
+> +		struct sev_data_snp_launch_update fw_args = {0};
+> +		bool assigned;
+> +		void *vaddr;
+> +		int level;
+> +
+> +		if (!kvm_mem_is_private(kvm, gfn)) {
+> +			pr_debug("%s: Failed to ensure GFN 0x%llx has private memory attribute set\n",
+> +				 __func__, gfn);
+> +			ret = -EINVAL;
+> +			break;
+> +		}
+> +
+> +		ret = snp_lookup_rmpentry((u64)pfn + i, &assigned, &level);
+> +		if (ret || assigned) {
+> +			pr_debug("%s: Failed to ensure GFN 0x%llx RMP entry is initial shared state, ret: %d assigned: %d\n",
+> +				 __func__, gfn, ret, assigned);
+> +			ret = -EINVAL;
+> +			break;
+> +		}
+> +
+> +		if (src) {
+> +			vaddr = kmap_local_pfn(pfn + i);
+> +			ret = copy_from_user(vaddr, src + i * PAGE_SIZE, PAGE_SIZE);
+> +			if (ret) {
+> +				pr_debug("Failed to copy source page into GFN 0x%llx\n", gfn);
+> +				goto out_unmap;
+> +			}
+> +		}
+> +
+> +		ret = rmp_make_private(pfn + i, gfn << PAGE_SHIFT, PG_LEVEL_4K,
+> +				       sev_get_asid(kvm), true);
+> +		if (ret) {
+> +			pr_debug("%s: Failed to mark RMP entry for GFN 0x%llx as private, ret: %d\n",
+> +				 __func__, gfn, ret);
+> +			goto out_unmap;
+> +		}
+> +
+> +		n_private++;
+> +
+> +		fw_args.gctx_paddr = __psp_pa(sev->snp_context);
+> +		fw_args.address = __sme_set(pfn_to_hpa(pfn + i));
+> +		fw_args.page_size = PG_LEVEL_TO_RMP(PG_LEVEL_4K);
+> +		fw_args.page_type = sev_populate_args->type;
+> +		ret = __sev_issue_cmd(sev_populate_args->sev_fd, SEV_CMD_SNP_LAUNCH_UPDATE,
+> +				      &fw_args, &sev_populate_args->fw_error);
+> +		if (ret) {
+> +			pr_debug("%s: SEV-SNP launch update failed, ret: 0x%x, fw_error: 0x%x\n",
+> +				 __func__, ret, sev_populate_args->fw_error);
+> +
+> +			if (WARN_ON_ONCE(snp_page_reclaim(pfn + i)))
+> +				goto out_unmap;
+> +
+> +			/*
+> +			 * When invalid CPUID function entries are detected,
+> +			 * firmware writes the expected values into the page and
+> +			 * leaves it unencrypted so it can be used for debugging
+> +			 * and error-reporting.
+> +			 *
+> +			 * Copy this page back into the source buffer so
+> +			 * userspace can use this information to provide
+> +			 * information on which CPUID leaves/fields failed CPUID
+> +			 * validation.
+> +			 */
+> +			if (sev_populate_args->type == KVM_SEV_SNP_PAGE_TYPE_CPUID &&
+> +			    sev_populate_args->fw_error == SEV_RET_INVALID_PARAM) {
+> +				if (WARN_ON_ONCE(host_rmp_make_shared(pfn + i, PG_LEVEL_4K)))
+> +					goto out_unmap;
+> +
+> +				if (copy_to_user(src + i * PAGE_SIZE, vaddr,
+> +						 PAGE_SIZE))
+> +					pr_debug("Failed to write CPUID page back to userspace\n");
+> +
+> +				/* PFN is hypervisor-owned at this point, skip cleanup for it. */
+> +				n_private--;
+
+If reclaim or make_shared fails, KVM will attempt make_shared again.  And I am
+not a fan of keeping vaddr mapped after making the pfn private.  Functionally
+it probably changes nothing, but conceptually it's odd.  And "mapping" is free
+(AFAIK).  Oh, and vaddr is subtly guaranteed to be valid based on the type, which
+is fun.
+
+So why not unmap immediately after the first copy_from_user(), and then this
+can be:
+
+
+		if (ret)
+			goto err;
+
+	}
+
+	return 0;
+
+err:
+	if (!<reclaim and make shared>() &&
+	    sev_populate_args->type == KVM_SEV_SNP_PAGE_TYPE_CPUID &&
+	    sev_populate_args->fw_error == SEV_RET_INVALID_PARAM) {
+		vaddr = kmap_local(...);
+		copy_to_user(...);
+		kunmap_local(vaddr);
+	}
+	for (i = 0; i < n_private - 1; i++)
+		<reclaim? and make shared()>
+
+	return ret;
+	
+> +                         sev_populate_args->fw_error == SEV_RET_INVALID_PARAM)
+> +			}
+> +		}
+> +
+> +out_unmap:
+> +		kunmap_local(vaddr);
+> +		if (ret)
+> +			break;
+> +	}
+> +
+> +out:
+> +	if (ret) {
+> +		pr_debug("%s: exiting with error ret %d, restoring %d gmem PFNs to shared.\n",
+> +			 __func__, ret, n_private);
+> +		for (i = 0; i < n_private; i++)
+> +			WARN_ON_ONCE(host_rmp_make_shared(pfn + i, PG_LEVEL_4K));
+> +	}
+> +
+> +	return ret;
+> +}
+
+...
+
+> +	src = params.type == KVM_SEV_SNP_PAGE_TYPE_ZERO ? NULL : u64_to_user_ptr(params.uaddr);
+> +
+> +	count = kvm_gmem_populate(kvm, params.gfn_start, src, npages,
+> +				  sev_gmem_post_populate, &sev_populate_args);
+> +	if (count < 0) {
+> +		argp->error = sev_populate_args.fw_error;
+> +		pr_debug("%s: kvm_gmem_populate failed, ret %ld (fw_error %d)\n",
+> +			 __func__, count, argp->error);
+> +		ret = -EIO;
+> +	} else if (count <= npages) {
+
+This seems like excessive paranoia.
+
+> +		params.gfn_start += count;
+> +		params.len -= count * PAGE_SIZE;
+> +		if (params.type != KVM_SEV_SNP_PAGE_TYPE_ZERO)
+> +			params.uaddr += count * PAGE_SIZE;
+> +
+> +		ret = copy_to_user(u64_to_user_ptr(argp->data), &params, sizeof(params))
+> +		      ? -EIO : 0;
+
+copy_to_user() failures typically return -EFAULT.  The style is not the most
+readable.  Maybe this?
+
+		ret = 0;
+		if (copy_to_user(...))
+			ret = -EFAULT;
+
+> +	} else {
+> +		WARN_ONCE(1, "Completed page count %ld exceeds requested amount %ld",
+> +			  count, npages);
+> +		ret = -EINVAL;
+> +	}
+> +
+> +out:
+> +	mutex_unlock(&kvm->slots_lock);
+> +
+> +	return ret;
+> +}
+> +
+>  int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_sev_cmd sev_cmd;
+> @@ -2217,6 +2451,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  	case KVM_SEV_SNP_LAUNCH_START:
+>  		r = snp_launch_start(kvm, &sev_cmd);
+>  		break;
+> +	case KVM_SEV_SNP_LAUNCH_UPDATE:
+> +		r = snp_launch_update(kvm, &sev_cmd);
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		goto out;
+> -- 
+> 2.25.1
+> 
