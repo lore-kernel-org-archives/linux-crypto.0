@@ -1,150 +1,167 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3EB156880
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 05:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D52D15821F;
+	Wed, 24 Apr 2024 13:21:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713938300; cv=none; b=p0qx4zO3C7ZyDjVNYUtFYhVkREOEsYoiYAf1Ecyqi6ld9xXWpt/c3C4NShHpuvlHTi/FgDjkA2H+A75BlsUYyfcAtEnmq4+vHGylrmT4ibaFD145ct1kD0Sw4Asa+liKfWPOjyX+ySNUb97rhCjZEeLcongQNWKIILe2jy6RxkY=
+	t=1713964883; cv=none; b=eWx/va08RijE0fPY1x0ILTO1MwyyblCirvl51fbm5DuyW6BcSHb/7NpUi5/MTOxYRcee7vJPMoTXUNarlMqg7H0YCX3mCHU7Wt4SOPTmEEcYzCjFWXIWspq3atFmwPka1geqTe3dfqzR/6lc56cSnfVDVEDEimbOsOyHjM9xiX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713938300; c=relaxed/simple;
-	bh=ukWXJGkwDRwc3UcBBER5J5oFKEGGzue+iwnJ1u/Jr7w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JIYNQ0KxYKJNSRHmzLmieMEBWhdG2vIIKfFKHlTuPapq0ISWv7m+OmUk+UwA5UFaE0Ftz+vgjx3Aiv6mMR65/Kv13UbGpDj2dHFn4cRZGOMbZ+xBQG/vt1QQQOUjMgMz2d7AP9mVnLnQg1Xer8ODjqmxH/R5sibCPjWf/JDDSr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AeQfblBI; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1713964883; c=relaxed/simple;
+	bh=bABuUtxtwMiaDJEDth6yYKqkY4fMD7xJ78zqRkijgc0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=d+f4eerOeh8o2zWpWiktseCsT9DvruN4cxFpblOXYXB9DCsdEaaAdx/kWcBep+qEnEvYTfc2fbtVTooam0Jelh8mtpOIYlaWvck60V6+LsabgCQ4dcLASXLNsT3CzG0N0MqC5XXf7PDA1MyMyQGMaJAlfbyUygRyQg+qrJDvMw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=oPBxCIqj; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AeQfblBI"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-439b1c72676so218411cf.1
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Apr 2024 22:58:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713938298; x=1714543098; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X/W5HSMGzNKRFvroL7XEIB583TE1U/at3BEuUXdJmYE=;
-        b=AeQfblBIYDNskyZoINXVuzyw1cDfCp5Ul1CEWRhAk7HhtMpFeqAPZ5YETS7XNZALgj
-         p0KKkpaLRMJPQYK8KDoldGgklt5qesLTh2sE5r8zfeZxvnY2nY2cwYS5HspFiFtlMLmY
-         OdY6tg1RwbsqEFt4TqrY8UVHS22GfO11PqIM/e4HV2sQrL9v9FX5lJGLbOJ9tgScFhAH
-         +GKNrjCUPaSgraWb+EIpAeZ7M2RBhHCX10ETvmMO8tcTn/edvhUH3eDQg6EN3JtRzqgR
-         V/nqggQfsLk2e3z1xXvhn5Z0+jVYLRj91Jd6U6YPluiayupZPG4JAtllDfcsqUvj9JPc
-         lcXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713938298; x=1714543098;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X/W5HSMGzNKRFvroL7XEIB583TE1U/at3BEuUXdJmYE=;
-        b=sR3FIk0PKVX8Y2Pn07f4Q/kyLxuwxmLEaSQSgfnxCueveFrcE2yciekKId3Y/mr1Lx
-         tNprSPE4UQ5NfvwQc0tnEHl0n0Ipb4Ytz0Ab0TSpK49ePkWXrm+TvAkdUBteOi8AgZcy
-         AMG+EZz3jT4q8hdfyr1Iojne5Q8xexdi9fb8a0wPl7wH+TmoPa45TFZffaopCnQjgmg5
-         E//avONa+ZHKOfqycLEMobob/EgaCTE4/AYUTLXvdq+3dQGdA/c7UTW7c18x3k/ENi9F
-         bhmlkzMak51b+5Wz0PU7g7dmovaVpqAKX0D9PasLj/gUtd8OGdPgtwZAG9cjjliC7CQR
-         ENQg==
-X-Forwarded-Encrypted: i=1; AJvYcCV8fHhdN1tBvp9vvwIKmFziu+AMNs98uzLX28EWQwsBWmzS10onlqOkue72TF+dNP49GPkEGL0hFme3A9wc+bEGMDYiRtqV0ny8uIKC
-X-Gm-Message-State: AOJu0YwTBnESFgEh1nKSUUVmnFQb3jcwKgxGBO6n73z8T3xwYEoIFybq
-	aWyUZW4Ogox5hvkx5cFgnGVheUBUjr4XEB2cCg4SBOKv1C5TUpvb0/PQXi19WWKXUZTxou8rbSI
-	NKV5Cc4pwOajeqVW6t+EVm+8Dedxt17MtXTRB
-X-Google-Smtp-Source: AGHT+IFtH+TdYnY/R2NkKd7EY8OhaQPa4uA2hOiV9IhRrDt+9zqEvKh32061ELbCkTI4QNocIDZCt4lHutO/oQbF8iw=
-X-Received: by 2002:ac8:6e81:0:b0:437:c89e:245b with SMTP id
- c1-20020ac86e81000000b00437c89e245bmr130751qtv.15.1713938297863; Tue, 23 Apr
- 2024 22:58:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="oPBxCIqj"
+Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43OC4omW029734;
+	Wed, 24 Apr 2024 14:20:40 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	selector1; bh=hkSUB26Hij3YoH4d4gONssMZiD9lhMIi9MYuoDahbc0=; b=oP
+	BxCIqjZqjU5yIPdolezp3gucfYE43BpO2moF0boJpv1s74317nNrf8tTbYX5usOd
+	rlKx/FhS1Qy6Jkjea82P6nnIhij2k6RtqQ72RGkfOKHZzW/rYU1jige7eN6glRBm
+	Gr/fYnvQ0nI1FFIhwyV+FpQcOob58VqnssUOpcpR/bfBeTjXY5MTu8NY0VN5oLNt
+	baPC6vo+Z6OwTORIZk9BIz6pJZyBiWpxinx+vs127hpTMIh3Q7+NTYQB11bqSkWu
+	wTRZ/tTR1dd1WWC/yQviBRPlU7NtgpxHp9kyOZz9PzdXYOFqZatkp9e4ugAKrRJ2
+	ZAcLVNQAQ/E+lH5KwgDw==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3xmrnj5npa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Apr 2024 14:20:39 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 16FD54002D;
+	Wed, 24 Apr 2024 14:20:30 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 0C4C621A91F;
+	Wed, 24 Apr 2024 14:19:21 +0200 (CEST)
+Received: from [10.48.86.79] (10.48.86.79) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 24 Apr
+ 2024 14:19:18 +0200
+Message-ID: <a0bd94ce-3ddb-4448-ada9-7070323cc98f@foss.st.com>
+Date: Wed, 24 Apr 2024 14:19:18 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240105130404.301172-1-gatien.chevallier@foss.st.com> <20240105130404.301172-7-gatien.chevallier@foss.st.com>
-In-Reply-To: <20240105130404.301172-7-gatien.chevallier@foss.st.com>
-From: Saravana Kannan <saravanak@google.com>
-Date: Tue, 23 Apr 2024 22:57:40 -0700
-Message-ID: <CAGETcx8HdnspNfDEJP+cqShJPsDryzGkOVq6B99cFQzkZi3dMg@mail.gmail.com>
-Subject: Re: [PATCH v9 06/13] of: property: fw_devlink: Add support for "access-controller"
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, robh+dt@kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, 
-	alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org, 
-	olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com, mchehab@kernel.org, 
-	fabrice.gasnier@foss.st.com, andi.shyti@kernel.org, ulf.hansson@linaro.org, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	hugues.fruchet@foss.st.com, lee@kernel.org, will@kernel.org, 
-	catalin.marinas@arm.com, arnd@kernel.org, richardcochran@gmail.com, 
-	Frank Rowand <frowand.list@gmail.com>, peng.fan@oss.nxp.com, lars@metafoo.de, 
-	rcsekar@samsung.com, wg@grandegger.com, mkl@pengutronix.de, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-iio@vger.kernel.org, alsa-devel@alsa-project.org, 
-	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-phy@lists.infradead.org, 
-	linux-serial@vger.kernel.org, linux-spi@vger.kernel.org, 
-	linux-usb@vger.kernel.org, Rob Herring <robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 06/13] of: property: fw_devlink: Add support for
+ "access-controller"
+To: Saravana Kannan <saravanak@google.com>,
+        Gatien Chevallier
+	<gatien.chevallier@foss.st.com>
+CC: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <vkoul@kernel.org>, <jic23@kernel.org>,
+        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
+        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
+        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
+        <catalin.marinas@arm.com>, <arnd@kernel.org>,
+        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
+        <peng.fan@oss.nxp.com>, <lars@metafoo.de>, <rcsekar@samsung.com>,
+        <wg@grandegger.com>, <mkl@pengutronix.de>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
+        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
+        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>, Rob Herring <robh@kernel.org>
+References: <20240105130404.301172-1-gatien.chevallier@foss.st.com>
+ <20240105130404.301172-7-gatien.chevallier@foss.st.com>
+ <CAGETcx8HdnspNfDEJP+cqShJPsDryzGkOVq6B99cFQzkZi3dMg@mail.gmail.com>
+Content-Language: en-US
+From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <CAGETcx8HdnspNfDEJP+cqShJPsDryzGkOVq6B99cFQzkZi3dMg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-24_10,2024-04-23_02,2023-05-22_02
 
-On Fri, Jan 5, 2024 at 5:03=E2=80=AFAM Gatien Chevallier
-<gatien.chevallier@foss.st.com> wrote:
->
-> Allows tracking dependencies between devices and their access
-> controller.
->
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> Acked-by: Rob Herring <robh@kernel.org>
+Hi Saravana
 
-Please cc me on fw_devlink patches. Also, this patch is breaking the
-norm below. Please send a fix up patch.
+On 4/24/24 07:57, Saravana Kannan wrote:
+> On Fri, Jan 5, 2024 at 5:03 AM Gatien Chevallier
+> <gatien.chevallier@foss.st.com> wrote:
+>>
+>> Allows tracking dependencies between devices and their access
+>> controller.
+>>
+>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+>> Acked-by: Rob Herring <robh@kernel.org>
+> 
+> Please cc me on fw_devlink patches. Also, this patch is breaking the
+> norm below. Please send a fix up patch.
+> 
+>> ---
+>> Changes in V9:
+>>          - Added Rob's review tag
+>>
+>> Changes in V6:
+>>          - Renamed access-controller to access-controllers
+>>
+>> Changes in V5:
+>>          - Rename feature-domain* to access-control*
+>>
+>> Patch not present in V1
+>>
+>>   drivers/of/property.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/drivers/of/property.c b/drivers/of/property.c
+>> index afdaefbd03f6..7f737eac91b2 100644
+>> --- a/drivers/of/property.c
+>> +++ b/drivers/of/property.c
+>> @@ -1268,6 +1268,7 @@ DEFINE_SIMPLE_PROP(leds, "leds", NULL)
+>>   DEFINE_SIMPLE_PROP(backlight, "backlight", NULL)
+>>   DEFINE_SIMPLE_PROP(panel, "panel", NULL)
+>>   DEFINE_SIMPLE_PROP(msi_parent, "msi-parent", "#msi-cells")
+>> +DEFINE_SIMPLE_PROP(access_controllers, "access-controllers", "#access-controller-cells")
+>>   DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
+>>   DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
+>>
+>> @@ -1363,6 +1364,7 @@ static const struct supplier_bindings of_supplier_bindings[] = {
+>>          { .parse_prop = parse_regulators, },
+>>          { .parse_prop = parse_gpio, },
+>>          { .parse_prop = parse_gpios, },
+>> +       { .parse_prop = parse_access_controllers, },
+> 
+> All the simple properties are listed before the suffix ones as the
+> suffix checks are more expensive. So, you should have inserted this
+> right before the suffix properties. Also, there's a merge conflict in
+> linux-next. So make sure you take that into account when sending the
+> fix up and picking the order.
 
-> ---
-> Changes in V9:
->         - Added Rob's review tag
->
-> Changes in V6:
->         - Renamed access-controller to access-controllers
->
-> Changes in V5:
->         - Rename feature-domain* to access-control*
->
-> Patch not present in V1
->
->  drivers/of/property.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/of/property.c b/drivers/of/property.c
-> index afdaefbd03f6..7f737eac91b2 100644
-> --- a/drivers/of/property.c
-> +++ b/drivers/of/property.c
-> @@ -1268,6 +1268,7 @@ DEFINE_SIMPLE_PROP(leds, "leds", NULL)
->  DEFINE_SIMPLE_PROP(backlight, "backlight", NULL)
->  DEFINE_SIMPLE_PROP(panel, "panel", NULL)
->  DEFINE_SIMPLE_PROP(msi_parent, "msi-parent", "#msi-cells")
-> +DEFINE_SIMPLE_PROP(access_controllers, "access-controllers", "#access-co=
-ntroller-cells")
->  DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
->  DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
->
-> @@ -1363,6 +1364,7 @@ static const struct supplier_bindings of_supplier_b=
-indings[] =3D {
->         { .parse_prop =3D parse_regulators, },
->         { .parse_prop =3D parse_gpio, },
->         { .parse_prop =3D parse_gpios, },
-> +       { .parse_prop =3D parse_access_controllers, },
+I'm fixing the stm32-next branch by inserting
 
-All the simple properties are listed before the suffix ones as the
-suffix checks are more expensive. So, you should have inserted this
-right before the suffix properties. Also, there's a merge conflict in
-linux-next. So make sure you take that into account when sending the
-fix up and picking the order.
+         { .parse_prop = parse_access_controllers, },
+just before
 
--Saravana
+	{ .parse_prop = parse_regulators, },
 
->         {}
->  };
 
->
-> --
-> 2.35.3
->
+> 
+> -Saravana
+> 
+>>          {}
+>>   };
+> 
+>>
+>> --
+>> 2.35.3
+>>
