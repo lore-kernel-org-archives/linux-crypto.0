@@ -1,110 +1,131 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92D3178CF1;
-	Wed, 24 Apr 2024 18:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346561CF9A
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 18:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713982513; cv=none; b=kbUi8Ltz8BhWdB+lpoVkxbJ0UDdbTnyLCPggx2KRJuTW5MhwokLCWbbkN1XgzedesL8D5DMjqR2AlgqWCclhwp6R8Xr6t9yB+AozmduJdMHApsbNshKAA6Jbu0YkaYACIVS71nAJCLf0fhIqn6jtt1IGPeMa4v7UBotbNvbuwuE=
+	t=1713983632; cv=none; b=f6Vl0ShRSl3dE6B5Kno4jBHbg/9Qa4bthJevwvUix2aO3DR03KlWLHMZN+EqkStPmUHk96D/g15nyOiQFC2QaCwY8i35cQ7hxCzqb8RSuJyjmkdLy7NKCRKRL9Fl90UVm9VO/IdHUIqctDSlM1At9UJEDlXc+8KJfnr3j7Vc+4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713982513; c=relaxed/simple;
-	bh=CwybUVe8crx1l4CZK03c9vCx8DvC8Bgt8uPcKdw9g+E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EVzH1jitA5Sh2gx09/HvH3daPjAfI7gBk/Ilpss1IwsFGWJoG6NEd2mDWmv8XS+O2AOZC0dX3Kt+xp1lji1pJbHrtAMpeEYIr5o6xztmwAzMoh4GugFzZWrP1cIgcv2xhKolnZitRUNY+vLJYQKSh7cMzMloqQ2jRoPTAClaKf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bAAcl3uF; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bAAcl3uF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713982511; x=1745518511;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=CwybUVe8crx1l4CZK03c9vCx8DvC8Bgt8uPcKdw9g+E=;
-  b=bAAcl3uFqRB9u8Gf3IwmVVdlEML24vDkIZ2J+EnIUeNIIq7e3dq7Ssnp
-   9vXumMjUDrBdGa/HQIBK8QGs+DZ6R4lcnF+Zvtn61Jkr0ACKiyYChRNHJ
-   WmGCHjXe0RHGaGqxfx61OuKJ5aOsUO6wImFJqOe/JOHcMw87vYu3eCzuN
-   fFkMWL1X8euGoplAqtDb+ccVBoe/rkasHlcW6mlbpoBkpqtjdSMtPNKpK
-   GiKyypZfilfBXyFK2/p/FvSEcZ3MQ1Dfo2iScVOVxGBinIdod3Qxw1qSL
-   POPrseuLRSm+DB9nMfDsdweAP0ikM4WMhtQ67a8JCod4/K6wRzpFJG27n
-   w==;
-X-CSE-ConnectionGUID: uHGqBQJ0SkOyduGKD8eHjA==
-X-CSE-MsgGUID: RZ+vYtXeQyKgftJTZUb8xA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="9481843"
+	s=arc-20240116; t=1713983632; c=relaxed/simple;
+	bh=lXPwk1l5R4TU4c5qE/qPwPMB0kYhCMN4XzpdXEceGtc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S3b3dMdpPZ+84HCB33O7uJTxh56VJx2ITJtafmqkSQzec9yzD+bVAtJmwfi15NSZsDphBjY8d0DhpJz2L0IoJmT8Lvpjv9TsF585qm+c0WT57WAOUBbMnGJMlGpHHVrcK29zxa/e2CeJVUq0nU0t5A2azNJ91j2joC04YqhHisA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+X-CSE-ConnectionGUID: jWoQJ2OfQ2eB8rYjwpcHxw==
+X-CSE-MsgGUID: IgJDjMShTxqcRN9Hk3CqQg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="32126197"
 X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
-   d="scan'208";a="9481843"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 11:14:59 -0700
-X-CSE-ConnectionGUID: fIvJjhdlSqKYHN3AWZyHZg==
-X-CSE-MsgGUID: jJio6ahnToe8mAdZagIthw==
+   d="scan'208";a="32126197"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 11:33:51 -0700
+X-CSE-ConnectionGUID: tyxhSyVeQVe56rlsmUI8Qw==
+X-CSE-MsgGUID: ANZZIUuBQgGxZ19tESR6/Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
-   d="scan'208";a="29262631"
-Received: from agluck-desk3.sc.intel.com ([172.25.222.105])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 11:14:59 -0700
-From: Tony Luck <tony.luck@intel.com>
-To: Borislav Petkov <bp@alien8.de>,
+   d="scan'208";a="24874373"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 11:33:48 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andy@kernel.org>)
+	id 1rzhRA-00000000kY5-3iAc;
+	Wed, 24 Apr 2024 21:33:44 +0300
+Date: Wed, 24 Apr 2024 21:33:44 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
+Cc: Gregory CLEMENT <gregory.clement@bootlin.com>,
+	Arnd Bergmann <arnd@arndb.de>, soc@kernel.org, arm@kernel.org,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	patches@lists.linux.dev,
-	Tony Luck <tony.luck@intel.com>
-Subject: [PATCH v4 17/71] crypto: x86/twofish - Switch to new Intel CPU model defines
-Date: Wed, 24 Apr 2024 11:14:58 -0700
-Message-ID: <20240424181458.41481-1-tony.luck@intel.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240424181245.41141-1-tony.luck@intel.com>
-References: <20240424181245.41141-1-tony.luck@intel.com>
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v7 6/9] platform: cznic: turris-omnia-mcu: Add support
+ for MCU provided TRNG
+Message-ID: <ZilQiHLLj1eQxP2L@smile.fi.intel.com>
+References: <20240424173809.7214-1-kabel@kernel.org>
+ <20240424173809.7214-7-kabel@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240424173809.7214-7-kabel@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-New CPU #defines encode vendor and family as well as model.
+On Wed, Apr 24, 2024 at 07:38:05PM +0200, Marek Behún wrote:
+> Add support for true random number generator provided by the MCU.
+> New Omnia boards come without the Atmel SHA204-A chip. Instead the
+> crypto functionality is provided by new microcontroller, which has
+> a TRNG peripheral.
 
-Signed-off-by: Tony Luck <tony.luck@intel.com>
----
- arch/x86/crypto/twofish_glue_3way.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+...
 
-diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
-index 90454cf18e0d..82311249048f 100644
---- a/arch/x86/crypto/twofish_glue_3way.c
-+++ b/arch/x86/crypto/twofish_glue_3way.c
-@@ -12,6 +12,8 @@
- #include <linux/module.h>
- #include <linux/types.h>
- 
-+#include <asm/cpu_device_id.h>
-+
- #include "twofish.h"
- #include "ecb_cbc_helpers.h"
- 
-@@ -107,10 +109,10 @@ static bool is_blacklisted_cpu(void)
- 	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL)
- 		return false;
- 
--	if (boot_cpu_data.x86 == 0x06 &&
--		(boot_cpu_data.x86_model == 0x1c ||
--		 boot_cpu_data.x86_model == 0x26 ||
--		 boot_cpu_data.x86_model == 0x36)) {
-+	switch (boot_cpu_data.x86_vfm) {
-+	case INTEL_ATOM_BONNELL:
-+	case INTEL_ATOM_BONNELL_MID:
-+	case INTEL_ATOM_SALTWELL:
- 		/*
- 		 * On Atom, twofish-3way is slower than original assembler
- 		 * implementation. Twofish-3way trades off some performance in
+> +static void omnia_irq_mapping_drop(void *res)
+> +{
+> +	irq_dispose_mapping((unsigned int)(unsigned long)res);
+> +}
+
+Leftover?
+
+> +int omnia_mcu_register_trng(struct omnia_mcu *mcu)
+> +{
+> +	struct device *dev = &mcu->client->dev;
+> +	u8 irq_idx, dummy;
+> +	int irq, err;
+> +
+> +	if (!(mcu->features & FEAT_TRNG))
+> +		return 0;
+> +
+> +	irq_idx = omnia_int_to_gpio_idx[__bf_shf(INT_TRNG)];
+> +	irq = gpiod_to_irq(gpiochip_get_desc(&mcu->gc, irq_idx));
+> +	if (irq < 0)
+> +		return dev_err_probe(dev, irq, "Cannot get TRNG IRQ\n");
+
+> +	err = devm_add_action_or_reset(dev, omnia_irq_mapping_drop,
+> +				       (void *)(unsigned long)irq);
+> +	if (err)
+> +		return err;
+
+Are you sure it's correct now?
+
+> +	/* If someone else cleared the TRNG interrupt but did not read the
+> +	 * entropy, a new interrupt won't be generated, and entropy collection
+> +	 * will be stuck. Ensure an interrupt will be generated by executing
+> +	 * the collect entropy command (and discarding the result).
+> +	 */
+> +	err = omnia_cmd_read(mcu->client, CMD_TRNG_COLLECT_ENTROPY, &dummy, 1);
+> +	if (err)
+> +		return err;
+> +
+> +	init_completion(&mcu->trng_completion);
+> +
+> +	err = devm_request_threaded_irq(dev, irq, NULL, omnia_trng_irq_handler,
+> +					IRQF_ONESHOT, "turris-omnia-mcu-trng",
+> +					mcu);
+> +	if (err)
+> +		return dev_err_probe(dev, err, "Cannot request TRNG IRQ\n");
+> +
+> +	mcu->trng.name = "turris-omnia-mcu-trng";
+> +	mcu->trng.read = omnia_trng_read;
+> +	mcu->trng.priv = (unsigned long)mcu;
+> +
+> +	err = devm_hwrng_register(dev, &mcu->trng);
+> +	if (err)
+> +		return dev_err_probe(dev, err, "Cannot register TRNG\n");
+> +
+> +	return 0;
+> +}
+
 -- 
-2.44.0
+With Best Regards,
+Andy Shevchenko
+
 
