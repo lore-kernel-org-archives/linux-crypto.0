@@ -1,112 +1,105 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BF316C6B7
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 16:52:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4143D16D332
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 16:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713977535; cv=none; b=Tc6MmYH5PKbxCZIX8gI+kgNcY69mZ3PnkDr/aoD/6oyj2yvMjXhtOU1fO47C8Qf0Gq1jGtdkwcyR4GCE7V9SKPEjE+bDi82rapgLe4lfGIP0Rl2j1zFag214TpeXksXH8xfHkcmoFNG7mhjM+NOFdRx25WOEPDxBuCKoRyQrEds=
+	t=1713977753; cv=none; b=sSTZpyQlgh3h9XcvLhEqeNeSIZyWScxqsHjMw8pHlcfsvjX8iFuEqsjQWJfhslC8QOGZST96Q6p15KZwoT8hJ4f4INP5AzXEDAf4dfBKGXO0O/TRSHVM4n3+31wYgsyN/EERW1KZXzL4b3F6A1qDfiTQfqV3k+eA2/zDophGuyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713977535; c=relaxed/simple;
-	bh=amFktTsYZhx0I8VQucVLkG8QNDwrrrdIfd3JgGF66lA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NqZXkmhZgkaIsP17f5XFKSVMu++xb3xrfzF6SrUasMb/bAKDtv9DajV6fQmbtH6vJ/S72fj7XV8IuHnKozwwc/xJ71qwImtnoUCVytOOIAQkrapF55S1TUJF2BKvFXsHkSRqChtmKvOU3U4b1FqDJFWLKbUaRnUwmFpbwlaUVew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jRsdDjEX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1713977753; c=relaxed/simple;
+	bh=RArGbTjywJoapBjOn9e2Rdum0BFmx8tdgHzlyAoGPLY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EF+0gdgR+UofyJ/thwu+6uh4iSEulmugzdnR42dVBawLtHXqlVUU1IdHqGi9XLUGfRRDPuIzgCmrU9JPt2Uu+mLWQkA0NTKwpJt9iDnnP9RcaMEVolmgBRZraCNEA0jelx1zBFbsL0HLGY6lbfQO7bAlvzd0iot7njKq2zxr0aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=feJRYweR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jRsdDjEX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713977531;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=id9ycaUBE8n/nnS15W/vGnLyEDK1wrwv0iZjSLUyk1Y=;
-	b=jRsdDjEX0jnm7eZRpDe1+bklHVIpYP73FBP1gbmC6OS9vjsYTTpDiHoMG5eihXXeLvcPkV
-	jIExAl0WmKXaoPDxKyHQtZs2DY2JGNkcBQodGXluB5ceNFEwJvlhKvLgVWa5R8rOEcSt3G
-	IaRt8kVT0H9GJyE6kpslXCcpGK1914U=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-EoLg9Oy9OhSNAs35wXV08A-1; Wed, 24 Apr 2024 12:52:10 -0400
-X-MC-Unique: EoLg9Oy9OhSNAs35wXV08A-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3473168c856so4813f8f.1
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 09:52:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713977529; x=1714582329;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=id9ycaUBE8n/nnS15W/vGnLyEDK1wrwv0iZjSLUyk1Y=;
-        b=d1GXT6Hbrj7jeQZDoYAH0kQ4VMlIlJhAePygp+dYe77qt9ZCnpbjidKNlfkXMnylFG
-         SLPbEyQeaf4Gy64W3QBIPTRiQLt2fGYdEaWq9atUlr85BYZ1zhcidpxKKabvOEO+1hmH
-         px29BGNDalEKn2E4uTrjg4xjgLWuuc2Is+J9NfpZ40lZk/r4HrJzF75f7GFM4G87enuS
-         OAgjJovy6Nchu34SpbfV74ONFNGcT7jS+/wrfda9ylH0AFPWUuMP7e28HyfIhY4PW5Hh
-         1z4mm4WnCx+dEx1Z5sEeSCkJGhKs9amCRlotBn/4Cjvd0PSh2T13XRVI2s2BSUJ+QUQH
-         8IOA==
-X-Forwarded-Encrypted: i=1; AJvYcCWUz7SiYRcFR55f6HReR5EJzjkS/aJ6bWn95iFAGS1FMe1nbX/6W5o5Ta41xiSx5wcESFPjF9hmjR022qqlirIjD/2l84c0DOzsJUAX
-X-Gm-Message-State: AOJu0YynliB59R2hpbSIFJNDKnTLJGYA1+7grHqIFM7oTbccHR0qtztl
-	ttqSZ9jeTpntQ6BxgRV8iWc36Xamfy6zYMFQOYyGdSmrin942+/cYa5SbmQDyE7v+GdwbIUbHk+
-	qfrO+oWmZEA1O3dazmvhtXQgHH+Gy7pK00/w1q8j7oZqkk49TTB2+wehJdU7dgpaCKU+m1VyJZg
-	rAzs7yOoyWILuNoPXOzw24XbdrtplxM4HCmlUA
-X-Received: by 2002:adf:a2d5:0:b0:34a:ef9b:b6d3 with SMTP id t21-20020adfa2d5000000b0034aef9bb6d3mr1894641wra.33.1713977529037;
-        Wed, 24 Apr 2024 09:52:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFR+Q8XeU6R6xECmEQz4NqbdTNaO1G1EnGJfcOAEAL7aKaYxgGlsEHUag2BDkifl8iK/Ykj8pEtfMPkXRl3N6s=
-X-Received: by 2002:adf:a2d5:0:b0:34a:ef9b:b6d3 with SMTP id
- t21-20020adfa2d5000000b0034aef9bb6d3mr1894619wra.33.1713977528725; Wed, 24
- Apr 2024 09:52:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="feJRYweR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD803C2BD10;
+	Wed, 24 Apr 2024 16:55:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713977752;
+	bh=RArGbTjywJoapBjOn9e2Rdum0BFmx8tdgHzlyAoGPLY=;
+	h=Date:From:To:List-Id:Cc:Subject:In-Reply-To:References:From;
+	b=feJRYweRIJNAtCLDEBPRIx3Mo5wBq2K4oJepu0wNdVpoJJBfmjeIA2mbOGsy1H7gG
+	 GMkx0jQZWBpv6G/kJLJDhXNJP8FXU6hJB9KoNFBUlm++wnD53gGjJSArlMtfIiHdx2
+	 /74sfrJ/snFjnz2ENHf+pXK/+kvgBfMjlWr6HbVnDf+7+jB73/t+yTa49yEFYUHT+R
+	 9PmWT57QCCEQi5D4V25zkXhHzDATNpg8NXNV9Ch3rR+9B8lEykVxPdLg1nGS0x6lEn
+	 LdhBoxyhTVfyXv1hnZO7H05WtMTppgIUTtHNyX4K+QpY+JxkVTDPqgQcvNvV/wbr8r
+	 8w0d31RQuJxSg==
+Date: Wed, 24 Apr 2024 18:55:47 +0200
+From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Gregory CLEMENT <gregory.clement@bootlin.com>, Arnd Bergmann
+ <arnd@arndb.de>, soc@kernel.org, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, linux-crypto@vger.kernel.org, arm@kernel.org
+Subject: Re: [PATCH v6 07/11] platform: cznic: turris-omnia-mcu: Add support
+ for MCU provided TRNG
+Message-ID: <20240424185547.4cf20408@dellmb>
+In-Reply-To: <Zifu-l2o9ADkhMlW@smile.fi.intel.com>
+References: <20240418121116.22184-1-kabel@kernel.org>
+	<20240418121116.22184-8-kabel@kernel.org>
+	<Zifamxfa18yjD_VS@smile.fi.intel.com>
+	<20240423183225.6e4f90a7@thinkpad>
+	<CAHp75VcfmTeG+G1DkteR6GN96y3+h_Mz1YQ8U5asHJ7oTq+KbQ@mail.gmail.com>
+	<20240423185704.2237bc65@thinkpad>
+	<Zifu-l2o9ADkhMlW@smile.fi.intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240421180122.1650812-1-michael.roth@amd.com> <171388991368.1780702.14461882076074410508@amd.com>
-In-Reply-To: <171388991368.1780702.14461882076074410508@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 24 Apr 2024 18:51:56 +0200
-Message-ID: <CABgObfa6vD+DQdmZoq0RYjwQqsYxsCvTS+vvANp5OXXOwS+PPw@mail.gmail.com>
-Subject: Re: [PATCH v14 00/22] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
-	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com, 
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 23, 2024 at 6:32=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
- wrote:
-> I just sent an additional set of fixups, patches 23-29. These add some
-> additional input validation on GHCB requests, mainly ensuring that
-> SNP-specific requests from non-SNP guests result in an error as soon as
-> they are received rather than reaching an error state indirectly further
-> into the call stack.
->
-> It's a small diff (included below), but a bit of a pain to squash in
-> patch by patch due to close proximity with each other, so I've pushed an
-> updated branch here that already has them squashed in:
->
->   https://github.com/amdese/linux/commits/snp-host-v14b
+On Tue, 23 Apr 2024 20:25:14 +0300
+Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
 
-Thanks, I pushed that to kvm-coco-queue. There was a missing signoff -
-I just added it since you actually added it in the past[1] and the
-patch only differs in context.
+> On Tue, Apr 23, 2024 at 06:57:04PM +0200, Marek Beh=C3=BAn wrote:
+> > On Tue, 23 Apr 2024 19:43:41 +0300
+> > Andy Shevchenko <andy.shevchenko@gmail.com> wrote: =20
+> > > On Tue, Apr 23, 2024 at 7:32=E2=80=AFPM Marek Beh=C3=BAn <kabel@kerne=
+l.org> wrote: =20
+> > > > On Tue, 23 Apr 2024 18:58:19 +0300
+> > > > Andy Shevchenko <andy@kernel.org> wrote:   =20
+> > > > > On Thu, Apr 18, 2024 at 02:11:12PM +0200, Marek Beh=C3=BAn wrote:=
+   =20
+>=20
+> ...
+>=20
+> > > > > > +   irq_idx =3D omnia_int_to_gpio_idx[__bf_shf(INT_TRNG)];
+> > > > > > +   irq =3D devm_irq_create_mapping(dev, mcu->gc.irq.domain, ir=
+q_idx);
+> > > > > > +   if (irq < 0)
+> > > > > > +           return dev_err_probe(dev, irq, "Cannot map TRNG IRQ=
+\n");   =20
+> > > > >
+> > > > > This looks like some workaround against existing gpiod_to_irq(). =
+Why do you
+> > > > > need this?   =20
+> > > >
+> > > > Hmmm, I thought that would not work because that line is only valid
+> > > > as an IRQ, not as a GPIO (this is enforced via the valid_mask membe=
+r of
+> > > > gpio_chip and gpio_irq_chip).
+> > > >
+> > > > But looking at the code of gpiolib, if I do
+> > > >   irq =3D gpiod_to_irq(gpiochip_get_desc(gc, irq_idx));
+> > > > the valid_mask is not enforced anywhere.   =20
+> > >=20
+> > > Which one? GPIO has two: one per GPIO realm and one for IRQ domain. =
+=20
+> >=20
+> > The GPIO line validity is not enforced. The IRQ line validity is
+> > enforced in the gpiochip_to_irq() method. =20
+>=20
+> Okay, but does it work for you as expected then?
+>=20
+> If not, we should fix GPIO library to have gpiod_to_irq() to work as expe=
+cted.
 
-Now off to getting those mm acks.
+Yes, it does. I am going to send a new version in a few minutes.
 
-Paolo
-
-[1] https://patchew.org/linux/20231230172351.574091-1-michael.roth@amd.com/=
-20231230172351.574091-33-michael.roth@amd.com/
-
+Marek
