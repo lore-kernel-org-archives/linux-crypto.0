@@ -1,66 +1,65 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8860153BEC
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 20:59:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9AB15699C
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 21:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713992391; cv=none; b=OF6YbDmzIkRZDtNHQ179bX0nx82Lx4ac8uZBHWpLvp1FaDmOo94QHw9mx8mU6SBwVd5EJ7f9cXxgzVeqaEGBYVSIuZAzTU7U17Z9F1nJ6LF7s3el3z+SX/ANmyZCaM+mHut7X/Ukisx60kC+TBIFMEWeUoe4qcGJv9shKqUBP6g=
+	t=1713994806; cv=none; b=jCoG0YS+5Glkic23gT5QHJ0SEeuucdBj0HBDnn+t1x1o20Ci0Lj594KHy4aK7sHM6y6HkUIoM0IU3mQrynob8RT2G0FBJePKD1fBN51PMTfAzJoGsTzC9SdA7QsMDEkfCaxLu33lMIbUIOG+3cQlMZ1DKdTHT29+1tu9xpwfmYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713992391; c=relaxed/simple;
-	bh=uoU2R06bl1D+d4rxO77OZBS6BnVKagWYLEFnEXdTDn8=;
+	s=arc-20240116; t=1713994806; c=relaxed/simple;
+	bh=muB/GrtMuyvIZL1gTqcuCa6Ri679P3tYV/yG2XVXejE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uTBswCziyR932rxxgaviEYuTm0WctcmaxZQWaF6L0KY73AG74I2rzRHrl0KC0aemTIStqOSJeaHCfRKge1rqSV+D7wltAHJ5ucTf6bbkaOdLZ8PYcutLoo+/hVJxUtyUwnTBwtgtZtyaa3jnODMlLZd+56ZKKsEBoPgWGUU64fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KjCaHm4S; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=aqX0VC1lnXdiWzmf7pJfhkigf8gFAb0DsvvP25TFwLH1pBSKHWk9ii54v3lWWtJ06dV5u42FvEyKq/oaOTklybBdoa+HPEZPkEbL1wu87xS76551iIVOXwdVzCtV80QhsjlVYSB01jCGhd1ZX+pljuxrBk4w10PrAwtZpO/C+go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vzK75WP7; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KjCaHm4S"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6ef9edf9910so439212b3a.1
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 13:59:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vzK75WP7"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6150dcdf83fso5829217b3.2
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 14:40:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713992390; x=1714597190; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1713994804; x=1714599604; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8U1TRrKJi3x9eg5Tfok1QV3PlGCm0SDXSlp6I7iPxGE=;
-        b=KjCaHm4SfZ0BSz0gxlpk5zUch7+meGfx9lZbZw04Lz0w8FrageE3zC70GAizxI4+h8
-         XUei4YaPq43QeQX1M+YP7SZKkvlABz4GhDP8bAV6MEC4VO4Fp//Jb1YacuHa3MMlV9S2
-         yD1nk99sdUxoR6odE/vZyD8QY7ORDmbAW+VTwbXhMCfnjhXQPVuxkX1knY64vPGB2HUb
-         LCu/uRkslz8iPcEgg2q9hEHlRwvd4X3Y+KH4qbPqmi9Zhujm6oo8x7hyFd25FvsF/eUM
-         W6AFyGp921NU+dKGc7hC8n1zU7nIrbobPjnV/TFanhYoLJFfDZaiiraT8KWPQx2y6fn9
-         XjNQ==
+        bh=I1EKZolXdPYAzbRipKSJPkUCjMZ4Y7QNaYncgFsTwr8=;
+        b=vzK75WP7mC5FKQLGNl5wyDKIIzO3KD/FWqFd9qh6lO9A2qt2sWOlfgDuTel9DNUqxy
+         6SAbqif9f0vWrJu2uwahwsLg55yuP296E0UCYLD+3qKwXFzP0sdbZ62lzKOtQy3cVoJ9
+         ckFZDBtjnksoFOb8TIRDCAeT305uJzXRuje6kxtbfgxoiEmURacXH8km1XNof7ax/zS3
+         M348h4jM//X1pQb7kM01VwEZWZJ5tB3QepknKulCTIPdRSo5roqaD2EVDKFW9rw+5nAO
+         +LXWmdcNWlNB2WkSot0gPx1Y1xN2NHCU0pxjTABqzCLFmErV7r15yc0c7CdEw9+0ED0o
+         SZKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713992390; x=1714597190;
+        d=1e100.net; s=20230601; t=1713994804; x=1714599604;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8U1TRrKJi3x9eg5Tfok1QV3PlGCm0SDXSlp6I7iPxGE=;
-        b=SQ/W7BYDliRomD+BrURtbLDi4a4VC0cIsJ0Jl7/90YH5mv/m2EbGrQfCpoWqmDlDut
-         cHtpkLgsLIevBTv0JjAHYqru1YFxtzQgevsrBmMEWedTt5Is5JFjNVpuyzBVW4V1288f
-         EpRIEnvMRllNRgwDzYRxWtgl9zYdz8nxrUQfZDTrAVMBR43ABsWLxMdFKFuv8OoHkYsw
-         NZU9wHSOhPO6oB8czVCzWu2Ezvnj/HWq0Cv4teqclQH4xWqhsDFDr8UvSI1g1DAJJddb
-         1tqFb5TdiovNpg9QLP9PAw+sbD4H+ogrcCGjIl4lw8bRsUsht7QRArOBvL/hJFxqoqdD
-         b2SQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWS5qfhHt+EPmDNXD+pXk9u/tu/l4Hu6KwOA8R0ar5Fq4yumz7xhlQ23t29+x/wo8P00MxWyv60fXtD8ujgHRx4IfVnXUad0I+4J1dv
-X-Gm-Message-State: AOJu0YygoqAsBW1Q5z6iEKvo5mvHyV+Yts+upOVFXn3NdkPCKJkc0KFG
-	tQBgXSurq5Y5laBx0QwIsiI39v223RHP6QxTdMioVG0Sse/2xmLrejlnj/2xlsVoTcKk3/TG/t+
-	yzw==
-X-Google-Smtp-Source: AGHT+IGmpsjpffCacAgU+oA7c6LytEyPptV84YPXAIS11abUo+sjJaZSSsVlO+4Jy+7xcfCJfVr3EYbcplE=
+        bh=I1EKZolXdPYAzbRipKSJPkUCjMZ4Y7QNaYncgFsTwr8=;
+        b=kLKOoOg8IlRMRRs4MFP5dFlEjJZEpIiByqiLLAKh1QB+L/LGQtLni0jCqbk9Ma8awC
+         XwBgwLzWg8MfF76/BtM3v1IpQn7pwECLww0fnu3OvDdPZBL5ucYHkEfgFUW7a9AmRBWS
+         Ahypl7fYEtUaaW5D/AjQ/HX396aybLpKQET+7n+IATGgJkbUAsj2vgXq3uFh3ByMNrzb
+         ANixFWU+leMOoZTyp1bNGyxzGBARK+ha7FLIjwH3+yoo1FuV3sDPSCiEv6MhxWGAL5uC
+         ytPg0ZLDxDXwJkpc2VUgrKAW134CKROKMCaEawS3zOPlvHxaWG+HQkukaHznomIYyfyv
+         +jvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUMnSZBfRs+mm1t30BRDqrZ1lJ/H5kP10nKaaQheUwv+fBW7CSxA2/x9VxKvebLwXEvypOvf5wRM0YqPW/sF4AlJl5XRFo1g8SY22SL
+X-Gm-Message-State: AOJu0YwR8Hd8lZJJyXMEWSfonZB+uXBL1Oj+RiWRcI4BhLYW3Ad158TR
+	SRow+IYrF2oZoY52u2fxg0Jm8DJtZe/iyHiHfEGUmNjHXSVEghCyu/oapSQSGWikeHp5I6ldVKM
+	y5w==
+X-Google-Smtp-Source: AGHT+IHBpn1SOBbV7drc58TxI6npqIiVI1VLzloAxa/Hpo4e1kwyTXpiUjL14BLYZcy0Z92zCwnow659/2U=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:22c4:b0:6ec:f18a:2783 with SMTP id
- f4-20020a056a0022c400b006ecf18a2783mr446579pfj.0.1713992389985; Wed, 24 Apr
- 2024 13:59:49 -0700 (PDT)
-Date: Wed, 24 Apr 2024 13:59:48 -0700
-In-Reply-To: <20240421180122.1650812-10-michael.roth@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:708:b0:dcb:e4a2:1ab1 with SMTP id
+ k8-20020a056902070800b00dcbe4a21ab1mr1134066ybt.11.1713994804317; Wed, 24 Apr
+ 2024 14:40:04 -0700 (PDT)
+Date: Wed, 24 Apr 2024 14:40:02 -0700
+In-Reply-To: <20240418194133.1452059-10-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240421180122.1650812-1-michael.roth@amd.com> <20240421180122.1650812-10-michael.roth@amd.com>
-Message-ID: <ZilyxFnJvaWUJOkc@google.com>
-Subject: Re: [PATCH v14 09/22] KVM: SEV: Add support to handle MSR based Page
- State Change VMGEXIT
+References: <20240418194133.1452059-1-michael.roth@amd.com> <20240418194133.1452059-10-michael.roth@amd.com>
+Message-ID: <Zil8MnPXkCbqw3Ka@google.com>
+Subject: Re: [PATCH v13 09/26] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command
 From: Sean Christopherson <seanjc@google.com>
 To: Michael Roth <michael.roth@amd.com>
 Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
@@ -78,51 +77,221 @@ Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
 	Brijesh Singh <brijesh.singh@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Sun, Apr 21, 2024, Michael Roth wrote:
-> +static int snp_begin_psc_msr(struct kvm_vcpu *vcpu, u64 ghcb_msr)
+On Thu, Apr 18, 2024, Michael Roth wrote:
+> +static inline bool sev_version_greater_or_equal(u8 major, u8 minor)
 > +{
-> +	u64 gpa = gfn_to_gpa(GHCB_MSR_PSC_REQ_TO_GFN(ghcb_msr));
-> +	u8 op = GHCB_MSR_PSC_REQ_TO_OP(ghcb_msr);
-> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +	if (major < SNP_POLICY_API_MAJOR)
+> +		return true;
 > +
-> +	if (op != SNP_PAGE_STATE_PRIVATE && op != SNP_PAGE_STATE_SHARED) {
-> +		set_ghcb_msr(svm, GHCB_MSR_PSC_RESP_ERROR);
-> +		return 1; /* resume guest */
+> +	if (major == SNP_POLICY_API_MAJOR && minor <= SNP_POLICY_API_MINOR)
+> +		return true;
+> +
+> +	return false;
+> +}
+> +
+> +static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct sev_data_snp_launch_start start = {0};
+> +	struct kvm_sev_snp_launch_start params;
+> +	u8 major, minor;
+> +	int rc;
+> +
+> +	if (!sev_snp_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	if (copy_from_user(&params, u64_to_user_ptr(argp->data), sizeof(params)))
+> +		return -EFAULT;
+> +
+> +	/* Don't allow userspace to allocate memory for more than 1 SNP context. */
+> +	if (sev->snp_context) {
+> +		pr_debug("SEV-SNP context already exists. Refusing to allocate an additional one.\n");
+
+What's the plan with all these printks?   There are far too many in this series.
+Some might be useful, but many of them have no business landing upstream.
+
+> +		return -EINVAL;
 > +	}
 > +
-> +	vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
-> +	vcpu->run->vmgexit.type = KVM_USER_VMGEXIT_PSC_MSR;
-> +	vcpu->run->vmgexit.psc_msr.gpa = gpa;
-> +	vcpu->run->vmgexit.psc_msr.op = op;
+> +	sev->snp_context = snp_context_create(kvm, argp);
+> +	if (!sev->snp_context)
+> +		return -ENOTTY;
+> +
+> +	if (params.policy & ~SNP_POLICY_MASK_VALID) {
+> +		pr_debug("SEV-SNP hypervisor does not support requested policy %llx (supported %llx).\n",
 
-Argh, no.
+What does "SEV-SNP hypervisor" even mean?
 
-This is the same crud that TDX tried to push[*].  Use KVM's existing user exits,
-and extend as *needed*.  There is no good reason page state change requests need
-*two* exit reasons.  The *only* thing KVM supports right now is private<=>shared
-conversions, and that can be handled with either KVM_HC_MAP_GPA_RANGE or
-KVM_EXIT_MEMORY_FAULT.
+> +			 params.policy, SNP_POLICY_MASK_VALID);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!(params.policy & SNP_POLICY_MASK_RSVD_MBO)) {
+> +		pr_debug("SEV-SNP hypervisor does not support requested policy %llx (must be set %llx).\n",
+> +			 params.policy, SNP_POLICY_MASK_RSVD_MBO);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (params.policy & SNP_POLICY_MASK_SINGLE_SOCKET) {
+> +		pr_debug("SEV-SNP hypervisor does not support limiting guests to a single socket.\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!(params.policy & SNP_POLICY_MASK_SMT)) {
+> +		pr_debug("SEV-SNP hypervisor does not support limiting guests to a single SMT thread.\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	major = (params.policy & SNP_POLICY_MASK_API_MAJOR);
+> +	minor = (params.policy & SNP_POLICY_MASK_API_MINOR);
+> +	if (!sev_version_greater_or_equal(major, minor)) {
 
-The non-MSR flavor can batch requests, but I'm willing to bet that the overwhelming
-majority of requests are contiguous, i.e. can be combined into a range by KVM,
-and that handling any outliers by performing multiple exits to userspace will
-provide sufficient performance.
+Why does this need a someone weirdly named helper?  Isn't this just?
 
-And the non-MSR version that comes in later patch is a complete mess.  It kicks
-the PSC out to userspace without *any* validation.  As I complained in the TDX
-thread, that will create an unmaintable ABI for KVM.
+	if (major < SNP_POLICY_API_MAJOR ||
+	    (major == SNP_POLICY_API_MAJOR && minor < SNP_POLICY_API_MINOR))
 
-KVM needs to have its own, well-defined ABI.  Splitting functionality between
-KVM and userspace at seemingly random points is not maintainable.
+> +		pr_debug("SEV-SNP hypervisor does not support requested version %d.%d (have %d,%d).\n",
+> +			 major, minor, SNP_POLICY_API_MAJOR, SNP_POLICY_API_MINOR);
+> +		return -EINVAL;
+> +	}
+> +
+> +	start.gctx_paddr = __psp_pa(sev->snp_context);
+> +	start.policy = params.policy;
+> +	memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
+> +	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_START, &start, &argp->error);
+> +	if (rc) {
+> +		pr_debug("SEV_CMD_SNP_LAUNCH_START firmware command failed, rc %d\n", rc);
+> +		goto e_free_context;
+> +	}
+> +
+> +	sev->fd = argp->sev_fd;
+> +	rc = snp_bind_asid(kvm, &argp->error);
+> +	if (rc) {
+> +		pr_debug("Failed to bind ASID to SEV-SNP context, rc %d\n", rc);
+> +		goto e_free_context;
+> +	}
+> +
+> +	return 0;
+> +
+> +e_free_context:
+> +	snp_decommission_context(kvm);
+> +
+> +	return rc;
+> +}
+> +
+>  int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_sev_cmd sev_cmd;
+> @@ -1999,6 +2154,15 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  		goto out;
+>  	}
+>  
+> +	/*
+> +	 * Once KVM_SEV_INIT2 initializes a KVM instance as an SNP guest, only
+> +	 * allow the use of SNP-specific commands.
+> +	 */
+> +	if (sev_snp_guest(kvm) && sev_cmd.id < KVM_SEV_SNP_LAUNCH_START) {
+> +		r = -EPERM;
+> +		goto out;
+> +	}
+> +
+>  	switch (sev_cmd.id) {
+>  	case KVM_SEV_ES_INIT:
+>  		if (!sev_es_enabled) {
+> @@ -2063,6 +2227,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  	case KVM_SEV_RECEIVE_FINISH:
+>  		r = sev_receive_finish(kvm, &sev_cmd);
+>  		break;
+> +	case KVM_SEV_SNP_LAUNCH_START:
+> +		r = snp_launch_start(kvm, &sev_cmd);
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		goto out;
+> @@ -2258,6 +2425,33 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>  	return ret;
+>  }
+>  
+> +static int snp_decommission_context(struct kvm *kvm)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct sev_data_snp_addr data = {};
+> +	int ret;
+> +
+> +	/* If context is not created then do nothing */
+> +	if (!sev->snp_context)
+> +		return 0;
+> +
+> +	data.address = __sme_pa(sev->snp_context);
+> +	down_write(&sev_deactivate_lock);
+> +	ret = sev_do_cmd(SEV_CMD_SNP_DECOMMISSION, &data, NULL);
+> +	if (WARN_ONCE(ret, "failed to release guest context")) {
 
-E.g. if/when KVM supports UNSMASH, upgrading to the KVM would arguably break
-userspace as PSC requests that previously exited would suddenly be handled by
-KVM.  Maybe.  It's impossible to review this because there's no KVM ABI, KVM is
-little more than a dumb pipe parroting information to userspace.
+WARN here, or WARN in the caller, not both.  And if you warn here, this can be
 
-I truly do not understand why we would even consider allowing this.  We push back
-on people wanting new hypercalls for some specific use case, because we already
-have generic ways to achieve things, but then CoCo comes along and we apparently
-throw out any thought of maintainability.  I don't get it.
+	down_write(&sev_deactivate_lock);
+	ret = sev_do_cmd(SEV_CMD_SNP_DECOMMISSION, &data, NULL);
+	up_write(&sev_deactivate_lock);
 
-[*] https://lore.kernel.org/all/Zg18ul8Q4PGQMWam@google.com
+	if (WARN_ONCE(ret, "..."))
+
+> +		up_write(&sev_deactivate_lock);
+> +		return ret;
+> +	}
+> +
+> +	up_write(&sev_deactivate_lock);
+> +
+> +	/* free the context page now */
+
+This doesn't seem like a particularly useful comment.  What would be useful is
+a comment explaining the "decommission" unbinds the ASID.  
+
+> +	snp_free_firmware_page(sev->snp_context);
+> +	sev->snp_context = NULL;
+> +
+> +	return 0;
+> +}
+> +
+>  void sev_vm_destroy(struct kvm *kvm)
+>  {
+>  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> @@ -2299,7 +2493,15 @@ void sev_vm_destroy(struct kvm *kvm)
+>  		}
+>  	}
+>  
+> -	sev_unbind_asid(kvm, sev->handle);
+> +	if (sev_snp_guest(kvm)) {
+> +		if (snp_decommission_context(kvm)) {
+> +			WARN_ONCE(1, "Failed to free SNP guest context, leaking asid!\n");
+
+WARN on the actually failure, not '1'.  And a newline isn't needed.
+
+		if (WARN_ONCE(snp_decommission_context(kvm)
+			      "Failed to free SNP guest context, leaking asid!"))
+			return;
+
+> +			return;
+> +		}
+> +	} else {
+> +		sev_unbind_asid(kvm, sev->handle);
+> +	}
+> +
+>  	sev_asid_free(sev);
+>  }
+>  
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 7f2e9c7fc4ca..0654fc91d4db 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -92,6 +92,7 @@ struct kvm_sev_info {
+>  	struct list_head mirror_entry; /* Use as a list entry of mirrors */
+>  	struct misc_cg *misc_cg; /* For misc cgroup accounting */
+>  	atomic_t migration_in_progress;
+> +	void *snp_context;      /* SNP guest context page */
+>  };
+>  
+>  struct kvm_svm {
+> -- 
+> 2.25.1
+> 
