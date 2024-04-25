@@ -1,69 +1,113 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5293A1B7
-	for <linux-crypto@vger.kernel.org>; Thu, 25 Apr 2024 05:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8642C7E0F4
+	for <linux-crypto@vger.kernel.org>; Thu, 25 Apr 2024 08:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714022292; cv=none; b=WF4Cv/0uFZSLxsz+zgX1j/gBIuGDZELyvVqOVNzytyhRvlH4yQpQU4lXAHH4/R/HwbYzsr1t0UuHUIT+cIyV24IldLku9tak++RgvVB1RWKDJcuFSI3qrC+OWOEIFaBZzmXbZfEFDjaBoj68QEEG10wHsZJ+8I+xzSO1ZlSJT9s=
+	t=1714034383; cv=none; b=sUyCN0B/PVvCmrXK4ZqJSn90vQZdJWOKk4ut1ooJiUcWbIUrLH1LPNQRRQUfbqmaW03lzz+eiYmcqKG87/iX40ausH7rcM3EAAcGQ5Ff+kPGgNht34Z8HKxFJFFt+Hl73Cblwhg2NGkaYgfa8QyiRxX5YJK7zW9Q9ywyL6jxusc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714022292; c=relaxed/simple;
-	bh=E5MmqFwiAXqxPyR9bmU7FgCbWt9lOc9HJe+ioCH1kkc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QByKW7s2cDvo2/vzii6kbq6rAR5oUi885PNwji05tfiwfaiNZtPBY+o+so9nzVAYKJ+szbdLdQZBDhD+sLhBoalIwTdWkuGqJTnNB/TMzMB4x02jLNV4U9mqbAWmjbYJxxZPe/XcrWgvh4xe1DT1RkrjJDl1lPUadZXOIXriObs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rzrUb-0067TH-Jb; Thu, 25 Apr 2024 13:17:58 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 25 Apr 2024 13:18:15 +0800
-Date: Thu, 25 Apr 2024 13:18:15 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Joachim Vandersmissen <git@jvdsn.com>
-Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Simo Sorce <simo@redhat.com>, Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2 1/2] certs: Move RSA self-test data to separate file
-Message-ID: <Zinnl2Y11i0GHLEO@gondor.apana.org.au>
-References: <20240420054243.176901-1-git@jvdsn.com>
+	s=arc-20240116; t=1714034383; c=relaxed/simple;
+	bh=/9yyKzE8Zxtr4YeXsLr5diSzcU8HNZj+vrs/DZ3QOog=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=C09lI+NRN1pbFPH3Q4Q1Tv+L0igfJJA/fHjvUd61RhUeJyb3V7Ko2JKzf/X4TEnrGNLsFvNQTFbxq+h5F8eA+bv8L1CXOwAcLMpDxhu4mJvSKjJ8A8DbdWtvZ3upW5sYPVFEKdoE0/mXHIUnFqMrp9/sP5S3pp6mem8q3Plf1xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L3/lqW/k; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L3/lqW/k"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714034380;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QZ3es0/m9Be3HXMWlawHrU+ruWvHPUrW+BQXBx/9QME=;
+	b=L3/lqW/krqWd7zOv8YtB7OYsXYNCXt5dad7/0LnpSFc1mTxioxVbXzmlCDHeSVSE/SoPi2
+	eNSC2dqdhoB/XmQu+B51GxpxvE+qXcy1PaxfkPCBuOElIuQx3xEKjdIKL1hOAMypj8oEzg
+	1yAFK1Wtdibway/y4FCOKgFewd8NDgk=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-e4mtFl2tPqGayEHnj_tMnw-1; Thu,
+ 25 Apr 2024 04:39:36 -0400
+X-MC-Unique: e4mtFl2tPqGayEHnj_tMnw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 85DBE29AA391;
+	Thu, 25 Apr 2024 08:39:35 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.200])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 829E551BF;
+	Thu, 25 Apr 2024 08:39:33 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Steve French <sfrench@samba.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, netfs@lists.linux.dev,
+    linux-crypto@vger.kernel.org, linux-cifs@vger.kernel.org,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net] Fix a potential infinite loop in extract_user_to_sg()
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240420054243.176901-1-git@jvdsn.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1967120.1714034372.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 25 Apr 2024 09:39:32 +0100
+Message-ID: <1967121.1714034372@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On Sat, Apr 20, 2024 at 12:42:42AM -0500, Joachim Vandersmissen wrote:
-> Herbert, please let me know if this is what you had in mind. Thanks.
+    =
 
-Thanks, it's pretty much what I had in mind.
- 
-> diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
-> index 1a273d6df3eb..4db6968132e9 100644
-> --- a/crypto/asymmetric_keys/Makefile
-> +++ b/crypto/asymmetric_keys/Makefile
-> @@ -24,6 +24,7 @@ x509_key_parser-y := \
->  	x509_public_key.o
->  obj-$(CONFIG_FIPS_SIGNATURE_SELFTEST) += x509_selftest.o
->  x509_selftest-y += selftest.o
-> +x509_selftest-$(CONFIG_CRYPTO_RSA) += selftest_rsa.o
+Fix extract_user_to_sg() so that it will break out of the loop if
+iov_iter_extract_pages() returns 0 rather than looping around forever.
 
-This doesn't work if RSA is a module.  So you need to play a bit
-more of a game with Kconfig to get it to work.  Perhaps define
-an extra Kconfig option for it:
+[Note that I've included two fixes lines as the function got moved to a
+different file and renamed]
 
-config FIPS_SIGNATURE_SELFTEST_RSA
-	def_bool (FIPS_SIGNATURE_SELFTEST=m && CRYPTO_RSA!=n) || CRYPTO_RSA=y
+Fixes: 85dd2c8ff368 ("netfs: Add a function to extract a UBUF or IOVEC int=
+o a BVEC iterator")
+Fixes: f5f82cd18732 ("Move netfs_extract_iter_to_sg() to lib/scatterlist.c=
+")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Steve French <sfrench@samba.org>
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: netfs@lists.linux.dev
+cc: linux-crypto@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: netdev@vger.kernel.org
+---
+ lib/scatterlist.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-and then
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index 68b45c82c37a..7bc2220fea80 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -1124,7 +1124,7 @@ static ssize_t extract_user_to_sg(struct iov_iter *i=
+ter,
+ 	do {
+ 		res =3D iov_iter_extract_pages(iter, &pages, maxsize, sg_max,
+ 					     extraction_flags, &off);
+-		if (res < 0)
++		if (res <=3D 0)
+ 			goto failed;
+ =
 
-x509_selftest-$(CONFIG_FIPS_SIGNATURE_SELFTEST_RSA) += selftest_rsa.o
+ 		len =3D res;
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
