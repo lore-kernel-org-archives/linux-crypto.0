@@ -1,65 +1,66 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A0116F29E
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 23:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E1B7484
+	for <linux-crypto@vger.kernel.org>; Thu, 25 Apr 2024 00:10:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714003097; cv=none; b=cC5zTBXwVQbzB45XarzQpFBtKe2j7w1ZLknVKXcyNRDirWua5PyBS0QL6o1mHBUrY8FaB/e7DvCaF5wBNkjZCTQqrjmRsNB5LQBqiKnem/TFq8tOVytAtaYhuPwpFNkEv93WtuQbZaOiQYJq4LeUJtxnFSn2Lnd0xs0xWsT3mss=
+	t=1714003837; cv=none; b=q+4I7fC9++qK/2pdlwviGCNicgGOcXvcWLI8iLR7IZnS1WT1GaPYhda0O1CwNlidVoYZok/z43GXqtHqxA4EBBsvQ6BEKGDgVMjJyLcQ2b2O1jbOME5TDg3BrCYfheArpz2/Tls7qtyIbOvaILGhNaP40KSsAqIZc1iz5ahM5gU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714003097; c=relaxed/simple;
-	bh=R0/fOiO9g/dpuvcPamlgbFNlgNdbcJZfjQmEh/9deBI=;
+	s=arc-20240116; t=1714003837; c=relaxed/simple;
+	bh=4olyWBhbURGb211ubhYVBSsTHwRpqR+5x91FGXsu6m0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GmJe1wtj+URZsybADlLJZtvq60GYuk/ItK+mOl37im+dqGcNZN567McIWyFLJ5fobZCqK3b+KpnZkK9Pv0+dThiucXFBtZ1HBeemWWUmueUuPx9mgyDWb97YGuzoX0J4WH4YpeQPSzPntlQWbeQM4JaRbsJDq2cM4ju7nDcsics=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N/63R2Xr; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=DaEhnrD9B7LYXXREmo2kvvgAV/YMStP8nl/gZQymtsnAvgWnmoLSU/NBP890Q0oqOFqDmirGVXFg0EFCB4K2VaGvFhHkqlAfodUw5RuWK/PK55LPNqVsvzfldMWv29OVnln6qp4eRAhFbGMOUQkRo7t91GH/oVgdDHc6hERfFCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kQ9sYmyR; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N/63R2Xr"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61b2ef746c9so7472737b3.1
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 16:58:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kQ9sYmyR"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5e4f312a995so386417a12.2
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Apr 2024 17:10:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714003095; x=1714607895; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714003835; x=1714608635; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hq8SdlFPWpEwMALVKp560wfcsx2v4HYt4jxDkJ/UaCQ=;
-        b=N/63R2XrTVa5tOBZwZk2rUcXaWIKDS8QDdTh84geL66z45X6GYp/576zLshXepkhBs
-         HcLSM2/sQ1aOYdmwS4M3hBchhsfpyYuJ2dlbuhQzfJ1oKW3ZhuYyjHOkcyghy/mr90K9
-         Bvq/qDk8muFwcUKEa7Of1rS0vvBQRmOb0b+/8oxclXRXr/SZuPspGs0uCzWQjZj3Pk8M
-         aWWdCIvcJYztZuHweRYdWtyFH5mNa+JifxKO2x29kUsS0fhSJai+22RgwLezHlnkUvZy
-         csVLtUYgHaEq0WpZn/01goNVn440zbjdpkJJH5L+utP1zSkQI4nfkuN/QVklqh0+Gqfc
-         QbBA==
+        bh=5N7e8KrpK+QWo2qlcDE/Q43TLjk+9JOMfjvUXwfuODw=;
+        b=kQ9sYmyR0EgUbZ3g8Z1YXLf2br90ltKx+cz+znDljw7exPbGEaS3e06GNT+uQWYxhE
+         jvIaKNx8rGE241COF2mWmsEtNL6/a0u/a62DopsHSsJRViIcpNKtEEGkL5GLwMkU+Ofi
+         54dgkVk0ICJ99iIa/5c8M43TAP4CzkBPoLLmOGEiBzcly9E9e24PzwcvZoVRIlnhujsp
+         Q2BzR53HQsv4XdpwlnpbdttXQWdReaWWTHy2O2qUAeqZp5P1M/ckyLng5sBtsqMHXt7z
+         7+vLfviHs/0s8wvz5BW54zaS35dszQaBXnubaZ4avleWWW7N1XKoPC95WmgMS9O8QJVD
+         b4YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714003095; x=1714607895;
+        d=1e100.net; s=20230601; t=1714003835; x=1714608635;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hq8SdlFPWpEwMALVKp560wfcsx2v4HYt4jxDkJ/UaCQ=;
-        b=eimDvTc/UtgV2xYLX9VTyuMJQi3aCzc39/ZopvXGL7xc7rggc3UsIECAGAK49J+P1E
-         EI5mkJnM4jeS19Pbir8HDp5vB93vwZ50n4Wyh+uq7S0QrRRAEJteM5u93YFXa6thw4f5
-         8mJqO7shx/bhHLAPODC7vNGJFNpV/EzZvgu0TntQaNYYt2iEcBBXN9l3BuxAm7RMkP8h
-         IgG3tBtd4psd/PVoHx+xV0w8nS0L9ug808QI/Wn9pnjFZjODTJFFFPkOx7WuBk9nIcKS
-         T1YOE45+vNkUtZN8fUdcsqf/x+2RJL3uBTbJqfYOL+tHLBcLRM5MLORCZmYzScVkodSo
-         EqcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWZWB2vgPFFrQGP4CrF13pb7F33K9eJmjgMnuRgkw40GHx+It3O1wTRCEjM71YKPgm83OrWvxzpplm50LB+mM2NN6z2n9/dErOQuLhG
-X-Gm-Message-State: AOJu0YyEtcoxcOiQk3AW725VVBIqsXg6z/7IK9iIxLTcbj2wdgG5NoBu
-	eOIndmm7HzsjMouWEI3oPPPRRWk7TIQksrwgtdJwfGy4rVwK2+W9jYPEhFKg8f1SSRFrG47xrZ5
-	43Q==
-X-Google-Smtp-Source: AGHT+IE5uZLfnqhh3kfhpm2ae2TWAGQslbCCze7Kvv2Uh3gwjGn/xEM7H5pIz2AWmMMjWE7Ke1FVDrC9NQI=
+        bh=5N7e8KrpK+QWo2qlcDE/Q43TLjk+9JOMfjvUXwfuODw=;
+        b=QglBXNHtq0s6dy+dFa9RQscr3mxJD7Ocmh5vkQV00BgDDAjSqpd6jzHBxug/wntm4j
+         ywO1b6sKLKYAElW7eIa2F7Shsu5xp064Xg94w9UC7OyWV/Oj1SqJEUH/3k8BWkk4LszG
+         eA8Za+4r5aVeA09mdSIQ1mb25Hz1ox43a73a4DBHgkn1rqBYYUbua1imLYtvlvHBpAq9
+         iTStBtoILqIzEsoG+69dEy+GCnSDdZSFvis+uRdQAIloyia6N51FZV3DQ+VILZOtYQGD
+         3JVZ/IAeom5IbIuI3FGqrkwlmTmggngEc7NuJoqvKCOzVEgb+KhY8iRuLOn33EcE/Dji
+         SQIg==
+X-Forwarded-Encrypted: i=1; AJvYcCWANcPM35dz5th/hZKD9CesK8mDebEqdMSAzw/Iz4YixHCvEhuZb1uOvGztiIGbI+cSo08GHHDVC8lOX0uN5D2Mm+ffWoJL3z5KdadG
+X-Gm-Message-State: AOJu0YyZok68bNZa+Gy7JOOEu6YkPdFlI/V/D8gp3ZyGDpxfj/dPAnKU
+	pZAquSdyEzNxltu2eQz2Wid0C7gyNRm9GqqDa/11LoEnUprHO8uNIzUEhGJ/vU5QBjOeGmvU8iS
+	SqQ==
+X-Google-Smtp-Source: AGHT+IFH7YJejg8aWF910482kJMDW7kl7X1aXoPxYZwY3TSrYpuIPMQ5VJ886sB92FreyvdaA+vS2YP1euA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b408:0:b0:61a:e8df:4ae7 with SMTP id
- h8-20020a81b408000000b0061ae8df4ae7mr925447ywi.8.1714003095004; Wed, 24 Apr
- 2024 16:58:15 -0700 (PDT)
-Date: Wed, 24 Apr 2024 16:58:13 -0700
-In-Reply-To: <20240421180122.1650812-7-michael.roth@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a63:1d2:0:b0:5dc:8f95:3d with SMTP id
+ 201-20020a6301d2000000b005dc8f95003dmr31874pgb.2.1714003833568; Wed, 24 Apr
+ 2024 17:10:33 -0700 (PDT)
+Date: Wed, 24 Apr 2024 17:10:31 -0700
+In-Reply-To: <20240421180122.1650812-23-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240421180122.1650812-1-michael.roth@amd.com> <20240421180122.1650812-7-michael.roth@amd.com>
-Message-ID: <ZimclfBdk1Y9iKVY@google.com>
-Subject: Re: [PATCH v14 06/22] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+References: <20240421180122.1650812-1-michael.roth@amd.com> <20240421180122.1650812-23-michael.roth@amd.com>
+Message-ID: <Zimfdyhq3U2HVX0N@google.com>
+Subject: Re: [PATCH v14 22/22] KVM: SEV: Provide support for
+ SNP_EXTENDED_GUEST_REQUEST NAE event
 From: Sean Christopherson <seanjc@google.com>
 To: Michael Roth <michael.roth@amd.com>
 Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
@@ -73,237 +74,104 @@ Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
 	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
 	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
 	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
-	Brijesh Singh <brijesh.singh@amd.com>
+	pankaj.gupta@amd.com, liam.merwick@oracle.com
 Content-Type: text/plain; charset="us-ascii"
 
 On Sun, Apr 21, 2024, Michael Roth wrote:
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 9d08d1202544..d3ae4ded91df 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -258,6 +258,35 @@ static void sev_decommission(unsigned int handle)
->  	sev_guest_decommission(&decommission, NULL);
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 85099198a10f..6cf186ed8f66 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -7066,6 +7066,7 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+>  		struct kvm_user_vmgexit {
+>  		#define KVM_USER_VMGEXIT_PSC_MSR	1
+>  		#define KVM_USER_VMGEXIT_PSC		2
+> +		#define KVM_USER_VMGEXIT_EXT_GUEST_REQ	3
+
+Assuming we can't get massage this into a vendor agnostic exit, there's gotta be
+a better name than EXT_GUEST_REQ, which is completely meaningless to me and probably
+most other people that aren't intimately familar with the specs.  Request what?
+
+>  			__u32 type; /* KVM_USER_VMGEXIT_* type */
+>  			union {
+>  				struct {
+> @@ -3812,6 +3813,84 @@ static void snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp
+>  	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
 >  }
 >  
-> +static int snp_page_reclaim(u64 pfn)
+> +static int snp_complete_ext_guest_req(struct kvm_vcpu *vcpu)
 > +{
-> +	struct sev_data_snp_page_reclaim data = {0};
-> +	int err, rc;
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +	struct vmcb_control_area *control;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	sev_ret_code fw_err = 0;
+> +	int vmm_ret;
 > +
-> +	data.paddr = __sme_set(pfn << PAGE_SHIFT);
-> +	rc = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
-> +	if (WARN_ON_ONCE(rc)) {
-
-This now WARNs here *and* in the caller, which is overkill.  Pick one.
-
-> +		/*
-> +		 * This shouldn't happen under normal circumstances, but if the
-> +		 * reclaim failed, then the page is no longer safe to use.
-
-Explain _why_ it's unsafe.  The code makes it quite clear that reclaim shouldn't
-fail.  E.g. I assume it's bound to the ASID still?  Something else?
-
-This is all messy, too.  snp_launch_update_vmsa() does RECLAIM but doesn't
-convert the page back to shared, which seems wrong.  sev_gmem_post_populate()
-open codes the calls separately, and then snp_cleanup_guest_buf() bundles them
-together.
-
-Yeesh, and the return types are all mixed.  snp_cleanup_guest_buf() returns a
-bool on success, but the helpers it uses return 0/-errno.  Please convert
-everything to return 0/-errno, boolean "error codes" are hard to follow and make
-the code unnecessarily brittle.
-
-> +	if (WARN_ON_ONCE(sev_populate_args->type != KVM_SEV_SNP_PAGE_TYPE_ZERO && !src)) {
-> +		ret = -EINVAL;
-
-Just return -EINVAL, no?
-
-> +		goto out;
+> +	vmm_ret = vcpu->run->vmgexit.ext_guest_req.ret;
+> +	if (vmm_ret) {
+> +		if (vmm_ret == SNP_GUEST_VMM_ERR_INVALID_LEN)
+> +			vcpu->arch.regs[VCPU_REGS_RBX] =
+> +				vcpu->run->vmgexit.ext_guest_req.data_npages;
+> +		goto abort_request;
 > +	}
 > +
-> +	for (gfn = gfn_start, i = 0; gfn < gfn_start + npages; gfn++, i++) {
-> +		struct sev_data_snp_launch_update fw_args = {0};
-> +		bool assigned;
-> +		void *vaddr;
-> +		int level;
+> +	control = &svm->vmcb->control;
 > +
-> +		if (!kvm_mem_is_private(kvm, gfn)) {
-> +			pr_debug("%s: Failed to ensure GFN 0x%llx has private memory attribute set\n",
-> +				 __func__, gfn);
-> +			ret = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		ret = snp_lookup_rmpentry((u64)pfn + i, &assigned, &level);
-> +		if (ret || assigned) {
-> +			pr_debug("%s: Failed to ensure GFN 0x%llx RMP entry is initial shared state, ret: %d assigned: %d\n",
-> +				 __func__, gfn, ret, assigned);
-> +			ret = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		if (src) {
-> +			vaddr = kmap_local_pfn(pfn + i);
-> +			ret = copy_from_user(vaddr, src + i * PAGE_SIZE, PAGE_SIZE);
-> +			if (ret) {
-> +				pr_debug("Failed to copy source page into GFN 0x%llx\n", gfn);
-> +				goto out_unmap;
-> +			}
-> +		}
-> +
-> +		ret = rmp_make_private(pfn + i, gfn << PAGE_SHIFT, PG_LEVEL_4K,
-> +				       sev_get_asid(kvm), true);
-> +		if (ret) {
-> +			pr_debug("%s: Failed to mark RMP entry for GFN 0x%llx as private, ret: %d\n",
-> +				 __func__, gfn, ret);
-> +			goto out_unmap;
-> +		}
-> +
-> +		n_private++;
-> +
-> +		fw_args.gctx_paddr = __psp_pa(sev->snp_context);
-> +		fw_args.address = __sme_set(pfn_to_hpa(pfn + i));
-> +		fw_args.page_size = PG_LEVEL_TO_RMP(PG_LEVEL_4K);
-> +		fw_args.page_type = sev_populate_args->type;
-> +		ret = __sev_issue_cmd(sev_populate_args->sev_fd, SEV_CMD_SNP_LAUNCH_UPDATE,
-> +				      &fw_args, &sev_populate_args->fw_error);
-> +		if (ret) {
-> +			pr_debug("%s: SEV-SNP launch update failed, ret: 0x%x, fw_error: 0x%x\n",
-> +				 __func__, ret, sev_populate_args->fw_error);
-> +
-> +			if (WARN_ON_ONCE(snp_page_reclaim(pfn + i)))
-> +				goto out_unmap;
-> +
-> +			/*
-> +			 * When invalid CPUID function entries are detected,
-> +			 * firmware writes the expected values into the page and
-> +			 * leaves it unencrypted so it can be used for debugging
-> +			 * and error-reporting.
-> +			 *
-> +			 * Copy this page back into the source buffer so
-> +			 * userspace can use this information to provide
-> +			 * information on which CPUID leaves/fields failed CPUID
-> +			 * validation.
-> +			 */
-> +			if (sev_populate_args->type == KVM_SEV_SNP_PAGE_TYPE_CPUID &&
-> +			    sev_populate_args->fw_error == SEV_RET_INVALID_PARAM) {
-> +				if (WARN_ON_ONCE(host_rmp_make_shared(pfn + i, PG_LEVEL_4K)))
-> +					goto out_unmap;
-> +
-> +				if (copy_to_user(src + i * PAGE_SIZE, vaddr,
-> +						 PAGE_SIZE))
-> +					pr_debug("Failed to write CPUID page back to userspace\n");
-> +
-> +				/* PFN is hypervisor-owned at this point, skip cleanup for it. */
-> +				n_private--;
+> +	/*
+> +	 * To avoid the message sequence number getting out of sync between the
+> +	 * actual value seen by firmware verses the value expected by the guest,
+> +	 * make sure attestations can't get paused on the write-side at this
+> +	 * point by holding the lock for the entire duration of the firmware
+> +	 * request so that there is no situation where SNP_GUEST_VMM_ERR_BUSY
+> +	 * would need to be returned after firmware sees the request.
+> +	 */
+> +	mutex_lock(&snp_pause_attestation_lock);
 
-If reclaim or make_shared fails, KVM will attempt make_shared again.  And I am
-not a fan of keeping vaddr mapped after making the pfn private.  Functionally
-it probably changes nothing, but conceptually it's odd.  And "mapping" is free
-(AFAIK).  Oh, and vaddr is subtly guaranteed to be valid based on the type, which
-is fun.
+Why is this in KVM?  IIUC, KVM only needs to get involved to translate GFNs to
+PFNs, the rest can go in the sev-dev driver, no?  The whole split is weird,
+seemingly due to KVM "needing" to take this lock.  E.g. why is core kernel code
+in arch/x86/virt/svm/sev.c at all dealing with attestation goo, when pretty much
+all of the actual usage is (or can be) in sev-dev.c
 
-So why not unmap immediately after the first copy_from_user(), and then this
-can be:
-
-
-		if (ret)
-			goto err;
-
-	}
-
-	return 0;
-
-err:
-	if (!<reclaim and make shared>() &&
-	    sev_populate_args->type == KVM_SEV_SNP_PAGE_TYPE_CPUID &&
-	    sev_populate_args->fw_error == SEV_RET_INVALID_PARAM) {
-		vaddr = kmap_local(...);
-		copy_to_user(...);
-		kunmap_local(vaddr);
-	}
-	for (i = 0; i < n_private - 1; i++)
-		<reclaim? and make shared()>
-
-	return ret;
-	
-> +                         sev_populate_args->fw_error == SEV_RET_INVALID_PARAM)
-> +			}
-> +		}
 > +
-> +out_unmap:
-> +		kunmap_local(vaddr);
-> +		if (ret)
-> +			break;
-> +	}
+> +	if (__snp_transaction_is_stale(svm->snp_transaction_id))
+> +		vmm_ret = SNP_GUEST_VMM_ERR_BUSY;
+> +	else if (!__snp_handle_guest_req(kvm, control->exit_info_1,
+> +					 control->exit_info_2, &fw_err))
+> +		vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
 > +
-> +out:
-> +	if (ret) {
-> +		pr_debug("%s: exiting with error ret %d, restoring %d gmem PFNs to shared.\n",
-> +			 __func__, ret, n_private);
-> +		for (i = 0; i < n_private; i++)
-> +			WARN_ON_ONCE(host_rmp_make_shared(pfn + i, PG_LEVEL_4K));
-> +	}
+> +	mutex_unlock(&snp_pause_attestation_lock);
 > +
-> +	return ret;
-> +}
-
-...
-
-> +	src = params.type == KVM_SEV_SNP_PAGE_TYPE_ZERO ? NULL : u64_to_user_ptr(params.uaddr);
+> +abort_request:
+> +	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
 > +
-> +	count = kvm_gmem_populate(kvm, params.gfn_start, src, npages,
-> +				  sev_gmem_post_populate, &sev_populate_args);
-> +	if (count < 0) {
-> +		argp->error = sev_populate_args.fw_error;
-> +		pr_debug("%s: kvm_gmem_populate failed, ret %ld (fw_error %d)\n",
-> +			 __func__, count, argp->error);
-> +		ret = -EIO;
-> +	} else if (count <= npages) {
-
-This seems like excessive paranoia.
-
-> +		params.gfn_start += count;
-> +		params.len -= count * PAGE_SIZE;
-> +		if (params.type != KVM_SEV_SNP_PAGE_TYPE_ZERO)
-> +			params.uaddr += count * PAGE_SIZE;
-> +
-> +		ret = copy_to_user(u64_to_user_ptr(argp->data), &params, sizeof(params))
-> +		      ? -EIO : 0;
-
-copy_to_user() failures typically return -EFAULT.  The style is not the most
-readable.  Maybe this?
-
-		ret = 0;
-		if (copy_to_user(...))
-			ret = -EFAULT;
-
-> +	} else {
-> +		WARN_ONCE(1, "Completed page count %ld exceeds requested amount %ld",
-> +			  count, npages);
-> +		ret = -EINVAL;
-> +	}
-> +
-> +out:
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	return ret;
+> +	return 1; /* resume guest */
 > +}
 > +
->  int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
->  {
->  	struct kvm_sev_cmd sev_cmd;
-> @@ -2217,6 +2451,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
->  	case KVM_SEV_SNP_LAUNCH_START:
->  		r = snp_launch_start(kvm, &sev_cmd);
->  		break;
-> +	case KVM_SEV_SNP_LAUNCH_UPDATE:
-> +		r = snp_launch_update(kvm, &sev_cmd);
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		goto out;
-> -- 
-> 2.25.1
-> 
+> +static int snp_begin_ext_guest_req(struct kvm_vcpu *vcpu)
+> +{
+> +	int vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +	unsigned long data_npages;
+> +	sev_ret_code fw_err;
+> +	gpa_t data_gpa;
+> +
+> +	if (!sev_snp_guest(vcpu->kvm))
+> +		goto abort_request;
+> +
+> +	data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
+> +	data_npages = vcpu->arch.regs[VCPU_REGS_RBX];
+> +
+> +	if (!IS_ALIGNED(data_gpa, PAGE_SIZE))
+> +		goto abort_request;
+> +
+> +	svm->snp_transaction_id = snp_transaction_get_id();
+> +	if (snp_transaction_is_stale(svm->snp_transaction_id)) {
+
+Why bother?  I assume this is rare, so why not handle it on the backend, i.e.
+after userspace does its thing?  Then KVM doesn't even have to care about
+checking for stale IDs, I think?
+
+None of this makes much sense to my eyes, e.g. AFAICT, the only thing that can
+pause attestation is userspace, yet the kernel is responsible for tracking whether
+or not a transaction is fresh?
