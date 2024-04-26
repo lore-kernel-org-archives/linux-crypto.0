@@ -1,174 +1,167 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C469A15666A
-	for <linux-crypto@vger.kernel.org>; Thu, 25 Apr 2024 22:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D32762FF
+	for <linux-crypto@vger.kernel.org>; Fri, 26 Apr 2024 04:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714083224; cv=none; b=oj+B51IgvM8F/Zk8OmEmbkZuESA1G0hxUzyikdyILuIrlrlSWu9J5jbg7nPWJ12C7roqqUuu1lDkPGU2mCUJm2dN+YArDp7cZLo6WVmK7Al2eE4LDi34ObH62cpEhyJqjJqNTg1ES53JwsTsBMoHEiSWVVkhbmtbaB4aPb7rQiI=
+	t=1714105586; cv=none; b=flpuumFhOce2T12xCBrjKnm8glhzqDivB/PBj5sJx7xgJ4CuezKcsmdb2fhaQN1XdpHjG4TfZlK/TBTdhM5/L/DfOKWHMz6cWDPoBOY0N3kyORVzWlJizMxvXS+oMe4ippd8yboVpu2zFh/NBqBNul2Y8wtZGvGUV8Jl8VPL4gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714083224; c=relaxed/simple;
-	bh=cbz4VgLAc5b9NzezYzcfU9eqcXCaDYCWqPxj/avxGRE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=R/vtnEzAOTgWm3TEvremrJIFRilKLP4uKDwUjdt+zO/gCrM3EslNXRG1y3SmT/t604FM84fmX6rG1wcOWy1vxI2z/NN8S0qvkwji7SyVHUlMdjIxUIy9sKUpQj3BVgeVg+Re3SC/Z38zXIFuLeBYUvI8mHPALhqyAPQKgiysWck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wa+ABr0d; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1714105586; c=relaxed/simple;
+	bh=lutB1/wwYYMTxXZVaY+C+pIQxyYavoblmUe3HMIKxrg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pjEVhtaOcg8DkvZ0ytDGsTwl3QXKy7P2JEaQSqWAA2/M5Lj/mvoMut8Xzj3tvF5cbcP5rs/v1SBlaIzlLvUCUSM6Wc/4OGzjg5tYxb4gPcUOnKvYwJkkQ4Cz001RPp+hymxwXrfwWcTfKrHNqcsWK06HoEcUyvqp6yeXcLE9XMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=SbxdkkCn; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wa+ABr0d"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61892d91207so26662117b3.3
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Apr 2024 15:13:42 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="SbxdkkCn"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ed9fc77bbfso1439892b3a.1
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Apr 2024 21:26:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714083222; x=1714688022; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VlD1vrF3NmiYyeEP9cJyDUHce3FgvPJuIrigqLvvs0A=;
-        b=Wa+ABr0dRKy5uBBoTbIO69ZD9ZdW/I5+Br+SBV5Qwd1TDelcfwrliyUbeUIyVtkWTH
-         RkvVjHudYYhXoUBXHgc5iXYgGUff8E/uER8cBzysOn5/qZvZ2YxV3mCiNTu48BhzieYO
-         dT1ETzNlNvJfw66ykWkYpD6pRMuDDMKbglKy1AveR4oLEKdoU2jlBnBRmFFfxipkeexH
-         Nu5C7FHKanQdO7/oRU8KoEs26sGphSffvt6mCAKYDBWSnn4f79YK0sHxEhRwtdtenYGP
-         GWubh7jV6EpHPn/co0agZzK/acQgZgWNw2KqI4oEEUZuKK0JwJrhofUTTyuVir2QLRFx
-         m7WQ==
+        d=vayavyalabs.com; s=google; t=1714105584; x=1714710384; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sg1IY7LIsigEpacAJYRDZDWh7gFgsDiXvFG9rkyQa1E=;
+        b=SbxdkkCndbmlJpWjYahF0PTuCegopPTkANkVXk8B3AH/XWvteIJcl2ckUj9G6zIUy5
+         PBfXr3HRKmoEGhi1dNAzw1+M34aU+38dZDkKQb08K3m/xCdmMRGO8Gogxc/9smQcsy6/
+         Z154sHNeQd6k8D/DVsWZwnEb+CJEqdfpm+Guk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714083222; x=1714688022;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VlD1vrF3NmiYyeEP9cJyDUHce3FgvPJuIrigqLvvs0A=;
-        b=cyCFXTpej4ZciSxY5mHfnLll4QynP2QuRlUSF0IV2biqnZOl3nb84eY128mWAC1nCO
-         GUjl/B3ppOkZxwPTHbAn0JngvdSZJPD5VS3+rAZXK+nzZXSe95R97RU8/BS6aWncDjsG
-         q/5/zEg+ofDR0nOAPbpOVYk9UiqbJapCU5BGFrGvpirFZkCEl2sh7TtP1nfjO7uZVZqF
-         FV+qatJ6Cdh2TM3JhN5e08eNlhJg+KZB9JAjcvjkBvurtYyZ3Do02L9+EEjWYYm7CItI
-         pJHHeDaOy2neu04cN6bzTwEOvXhqXA9PLp/Fo/sATzNrQY+1fMlKlgoa06+C+ymOk6C8
-         9hqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVzsTOx0tnjPMWZ5m9zYqQybNskVXu1b+A8ucm6MdgkL93ROiTlht56gAexdCW2T9gRHfmHswkgQ2SNRAoNWqWyV0BoboerUf34cvkG
-X-Gm-Message-State: AOJu0Yyl94iufct2BZpzFeNaRzQVDLxRu9UZzH91XiF4is6G3JYyRvzB
-	RRyMvYYqshDarT/tnQEoVsRREcgODQerHo9YIaipWapA5M/RId8cXp2c6PHAiXDnrsbgMmE5GKs
-	EjQ==
-X-Google-Smtp-Source: AGHT+IHzHjxcfIPYRO/0ZR+/PU18iR8U2AlUK3bDXYPmThs8oWF6MVloZCgQa8+8/V5cYRymgqjaTVn5F6o=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:a097:0:b0:61a:b41a:2ef5 with SMTP id
- x145-20020a81a097000000b0061ab41a2ef5mr194759ywg.10.1714083221862; Thu, 25
- Apr 2024 15:13:41 -0700 (PDT)
-Date: Thu, 25 Apr 2024 15:13:40 -0700
-In-Reply-To: <20240425220008.boxnurujlxbx62pg@amd.com>
+        d=1e100.net; s=20230601; t=1714105584; x=1714710384;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sg1IY7LIsigEpacAJYRDZDWh7gFgsDiXvFG9rkyQa1E=;
+        b=pT9eE8A0gXK9XN8hQcL9I0ZdEyjf89alZf7KJQTgDHWy/wWb30nVXaxilYCwwPOP7R
+         q98fjj8I2TO+RoijkqpkU0hGLgXUFxI6l5lUHUp7O+p5XoDUYAigDeOfiVuZlMUFH959
+         LA9x5Mdre2ZTHIpWSN3FHS6oROSpTMSu7FbnuRdYE2tyPnookW11xrlTYLkHHdmMOOA2
+         3Us3bIzou1RiMOtQ7y2nCm6hGaBhcXgtiOnDnW5W64k76xaX7VgxExUVHjjRudc6dMvH
+         1Il2oDesyq+nIMn6/k/og5LnJj75YXA91ZnG6jHz6zVitjvNxukYt0cpUviFFgdET+R/
+         MP4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVJsTNvKs2xFLNGkswK0f0jukc8R03OJTwNtXpPqEgXBJOs7MKu4lReke9rF+O6hiEL6+9e2qxa9b5fQLI0l8ROIyj3oaitcsM0o6Su
+X-Gm-Message-State: AOJu0YzKssN203kNR2KuhTLwxzfeOy7lPCyX+55ZYb2CVjyZ7FWvPEFL
+	eNPIl18A71X9jYrOVdJ4UEx0mw/4DpRXqM86fVaugfF8diK/6pubCszTEnVltO8=
+X-Google-Smtp-Source: AGHT+IFZOUr2R+ltKzy+HseMjbftK1/QaH921A6Uyf9oC4dNK0fBFVzJG8MNl3XY7jyQ/MzFPpcNkw==
+X-Received: by 2002:a05:6a20:4c84:b0:1ac:6762:e62f with SMTP id fq4-20020a056a204c8400b001ac6762e62fmr1364516pzb.35.1714105584106;
+        Thu, 25 Apr 2024 21:26:24 -0700 (PDT)
+Received: from localhost.localdomain ([103.108.57.9])
+        by smtp.gmail.com with ESMTPSA id t12-20020a17090a5d8c00b002a474e2d7d8sm15500291pji.15.2024.04.25.21.26.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Apr 2024 21:26:23 -0700 (PDT)
+From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+To: herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org
+Cc: Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com,
+	bhoomikak@vayavyalabs.com,
+	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH v3 0/7] Add SPAcc crypto driver support
+Date: Fri, 26 Apr 2024 09:55:37 +0530
+Message-Id: <20240426042544.3545690-1-pavitrakumarm@vayavyalabs.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240421180122.1650812-1-michael.roth@amd.com>
- <20240421180122.1650812-10-michael.roth@amd.com> <ZilyxFnJvaWUJOkc@google.com>
- <20240425220008.boxnurujlxbx62pg@amd.com>
-Message-ID: <ZirVlF-zQPNOOahU@google.com>
-Subject: Re: [PATCH v14 09/22] KVM: SEV: Add support to handle MSR based Page
- State Change VMGEXIT
-From: Sean Christopherson <seanjc@google.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
-	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com, 
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
-	Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 25, 2024, Michael Roth wrote:
-> On Wed, Apr 24, 2024 at 01:59:48PM -0700, Sean Christopherson wrote:
-> > On Sun, Apr 21, 2024, Michael Roth wrote:
-> > > +static int snp_begin_psc_msr(struct kvm_vcpu *vcpu, u64 ghcb_msr)
-> > > +{
-> > > +	u64 gpa = gfn_to_gpa(GHCB_MSR_PSC_REQ_TO_GFN(ghcb_msr));
-> > > +	u8 op = GHCB_MSR_PSC_REQ_TO_OP(ghcb_msr);
-> > > +	struct vcpu_svm *svm = to_svm(vcpu);
-> > > +
-> > > +	if (op != SNP_PAGE_STATE_PRIVATE && op != SNP_PAGE_STATE_SHARED) {
-> > > +		set_ghcb_msr(svm, GHCB_MSR_PSC_RESP_ERROR);
-> > > +		return 1; /* resume guest */
-> > > +	}
-> > > +
-> > > +	vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
-> > > +	vcpu->run->vmgexit.type = KVM_USER_VMGEXIT_PSC_MSR;
-> > > +	vcpu->run->vmgexit.psc_msr.gpa = gpa;
-> > > +	vcpu->run->vmgexit.psc_msr.op = op;
-> > 
-> > Argh, no.
-> > 
-> > This is the same crud that TDX tried to push[*].  Use KVM's existing user exits,
-> > and extend as *needed*.  There is no good reason page state change requests need
-> > *two* exit reasons.  The *only* thing KVM supports right now is private<=>shared
-> > conversions, and that can be handled with either KVM_HC_MAP_GPA_RANGE or
-> > KVM_EXIT_MEMORY_FAULT.
-> > 
-> > The non-MSR flavor can batch requests, but I'm willing to bet that the overwhelming
-> > majority of requests are contiguous, i.e. can be combined into a range by KVM,
-> > and that handling any outliers by performing multiple exits to userspace will
-> > provide sufficient performance.
-> 
-> That does tend to be the case. We won't have as much granularity with
-> the per-entry error codes, but KVM_SET_MEMORY_ATTRIBUTES would be
-> expected to be for the entire range anyway, and if that fails for
-> whatever reason then we KVM_BUG_ON() anyway. We do have to have handling
-> for cases where the entries aren't contiguous however, which would
-> involve multiple KVM_EXIT_HYPERCALLs until everything is satisfied. But
-> not a huge deal since it doesn't seem to be a common case.
+Add the driver for SPAcc(Security Protocol Accelerator), which is a
+crypto acceleration IP from Synopsys. The SPAcc supports many cipher,
+hash, aead algorithms and various modes.The driver currently supports
+below,
 
-If it was less complex overall, I wouldn't be opposed to KVM marshalling everything
-into a buffer, but I suspect it will be simpler to just have KVM loop until the
-PSC request is complete.
+aead:
+- ccm(sm4)
+- ccm(aes)
+- gcm(sm4)
+- gcm(aes)
+- rfc7539(chacha20,poly1305)
 
-> KVM_HC_MAP_GPA_RANGE seems like a nice option because we'd also have the
-> flexibility to just issue that directly within a guest rather than
-> relying on SNP/TDX specific hcalls. I don't know if that approach is
-> practical for a real guest, but it could be useful for having re-usable
-> guest code in KVM selftests that "just works" for all variants of
-> SNP/TDX/sw-protected. (though we'd still want stuff that exercises
-> SNP/TDX->KVM_HC_MAP_GPA_RANGE translation).
-> 
-> I think we'd there is some potential baggage there with the previous SEV
-> live migration use cases. There's some potential that existing guest kernels
-> will use it once it gets advertised and issue them alongside GHCB-based
-> page-state changes. It might make sense to use one of the reserved bits
-> to denote this flavor of KVM_HC_MAP_GPA_RANGE as being for
-> hardware/software-protected VMs and not interchangeable with calls that
-> were used for SEV live migration stuff.
+cipher:
+- cbc(sm4)
+- ecb(sm4)
+- ctr(sm4)
+- xts(sm4)
+- cts(cbc(sm4))
+- cbc(aes)
+- ecb(aes)
+- xts(aes)
+- cts(cbc(aes))
+- ctr(aes)
+- chacha20
+- ecb(des)
+- cbc(des)
+- ecb(des3_ede)
+- cbc(des3_ede)
 
-I don't think I follow, what exactly wouldn't be interchangeable, and why?
+hash:
+- cmac(aes)
+- xcbc(aes)
+- cmac(sm4)
+- xcbc(sm4) 
+- hmac(md5)
+- md5
+- hmac(sha1)
+- sha1
+- sha224
+- sha256
+- sha384
+- sha512
+- hmac(sha224)
+- hmac(sha256)
+- hmac(sha384)
+- hmac(sha512)
+- sha3-224
+- sha3-256
+- sha3-384
+- sha3-512
+- hmac(sm3)
+- sm3
+- michael_mic
 
-> If this seems reasonable I'll give it a go and see what it looks like.
-> 
-> > 
-> > And the non-MSR version that comes in later patch is a complete mess.  It kicks
-> > the PSC out to userspace without *any* validation.  As I complained in the TDX
-> > thread, that will create an unmaintable ABI for KVM.
-> > 
-> > KVM needs to have its own, well-defined ABI.  Splitting functionality between
-> > KVM and userspace at seemingly random points is not maintainable.
-> > 
-> > E.g. if/when KVM supports UNSMASH, upgrading to the KVM would arguably break
-> > userspace as PSC requests that previously exited would suddenly be handled by
-> > KVM.  Maybe.  It's impossible to review this because there's no KVM ABI, KVM is
-> > little more than a dumb pipe parroting information to userspace.
-> 
-> It leans on the GHCB spec to avoid re-inventing structs/documentation
-> for things like Page State Change buffers, but do have some control
-> as we want over how much we farm out versus lock into the KVM ABI. For
-> instance the accompanying Documentation/ update mentions we only send a
-> subset of GHCB requests that need to be handled by userspace, so we
-> could handle SMASH/UNSMASH in KVM without breaking expectations (or if
-> SMASH/UNSMASH were intermixed with PSCs, documentation that only PSC
-> opcodes could be updated by userspace).
-> 
-> But I'm certainly not arguing it wouldn't be better to have a
-> guest-agnostic alternative if we can reach an agreement on that, and
-> KVM_HC_MAP_GPA_RANGE seems like it could work.
+Pavitrakumar M (7):
+  Add SPAcc Skcipher support
+  Enable SPAcc AUTODETECT
+  Add SPAcc ahash support
+  Add SPAcc aead support
+  Add SPAcc Kconfig and Makefile
+  Add SPAcc node zynqmp dts
+  Enable Driver compilation in crypto Kconfig and Makefile
 
-Yeah, I want to at least _try_ to achieve common ground, because the basic
-functionality of all this stuff is the exact same.
+ arch/arm64/boot/dts/xilinx/zynqmp.dtsi     |   10 +
+ drivers/crypto/Kconfig                     |    9 +-
+ drivers/crypto/Makefile                    |    2 +-
+ drivers/crypto/dwc-spacc/Kconfig           |   95 +
+ drivers/crypto/dwc-spacc/Makefile          |   16 +
+ drivers/crypto/dwc-spacc/spacc_aead.c      | 1313 ++++++++++
+ drivers/crypto/dwc-spacc/spacc_ahash.c     | 1292 ++++++++++
+ drivers/crypto/dwc-spacc/spacc_core.c      | 2671 ++++++++++++++++++++
+ drivers/crypto/dwc-spacc/spacc_core.h      |  834 ++++++
+ drivers/crypto/dwc-spacc/spacc_device.c    |  342 +++
+ drivers/crypto/dwc-spacc/spacc_device.h    |  237 ++
+ drivers/crypto/dwc-spacc/spacc_hal.c       |  365 +++
+ drivers/crypto/dwc-spacc/spacc_hal.h       |  113 +
+ drivers/crypto/dwc-spacc/spacc_interrupt.c |  324 +++
+ drivers/crypto/dwc-spacc/spacc_manager.c   |  670 +++++
+ drivers/crypto/dwc-spacc/spacc_skcipher.c  |  720 ++++++
+ 16 files changed, 9004 insertions(+), 9 deletions(-)
+ create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+ create mode 100644 drivers/crypto/dwc-spacc/Makefile
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_aead.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
+
+
+base-commit: 543ea178fbfadeaf79e15766ac989f3351349f02
+-- 
+2.25.1
+
