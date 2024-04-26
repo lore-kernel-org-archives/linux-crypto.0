@@ -1,134 +1,166 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F3D824B3;
-	Fri, 26 Apr 2024 15:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D66E14EC4C;
+	Fri, 26 Apr 2024 16:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714145747; cv=none; b=b7HskuRARzoWCb3QKWn9ynA+y3lyZnx9Rnu/FDt3J8+WWapfaei26p5UGr9TnAA+Jad2MWqemlM7qGMnItw/xFARZgmEpbdXTbfnnpOPZDUuPo+YJYcuKFCK0pmvgiT6gzWKaOd1ah2bIVgRiURpz8YTLBhMnMf8zbfJH3oQBPI=
+	t=1714148028; cv=none; b=DfBAB5Dcog/quTFai6GvPUMm7ZCoU33dzUltkB4l/uho7Cx5Gf1vJHGHyJ7GMrE2PlmphrF5btNrZ0k5DXa0IA2UovjZaExls4TaHHD4qVz6JjkJr3YTYZwFWOxRrhq8+qK2ik90yQYJXjaLYf0o9U6lsxqM/sUL8nVrxv9ZKWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714145747; c=relaxed/simple;
-	bh=PQFovyCgZ9xdjLJHGbiokcmeJN3T4Q8WKOtc8qPH+4w=;
-	h=Content-Type:Mime-Version:Date:Message-Id:Subject:From:To:
-	 References:In-Reply-To; b=SW+olKANlPe4onBDWPVm8UsN5+K7rIzHA/xHCJ4A+g8YaXItLTVarGwPpj6McnuPXL5PnBz9kDAxVnsItl0c7zE/iONsMt3tBOLJ9K8FFpc0LtWa0qepckl3aJtlgrjR+dqM9UcKqxuCsQMzCm8rngKjDv9AhSE9JOwQijoGux8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z+OVeYhH; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714148028; c=relaxed/simple;
+	bh=KAubqwrj4NqoRfG/h9VYz+cm7v93zo2oflPFobx0vQc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=J1AxrKQ92/LFGHvFAI4RTNuNUtMgckfjYZSP9dS07rdNHy/A4h4oCgJhYXjsXg+PEju4+MuGvzzrubPZPor7mGFwTGvYbWhvzj2CsFXQlkh2Ttex4C97f4Ia0H9ecyOa9a2MZmhPoYEkbN9YrNzFQJFjkYMqHL0xttY/SzbGp/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fNojwqBb; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z+OVeYhH"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57225322312so3294370a12.1;
-        Fri, 26 Apr 2024 08:35:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714145744; x=1714750544; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:message-id:date:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9I5S2+S0bvqZ7UVU6beR6Uqu4fLT1g89R1N7x2rc2tw=;
-        b=Z+OVeYhHLawY2kEMLGkP4Il+9i+/a9bTfqQwOoiqKLA67vuJvC9tF/COQgilTtzTZf
-         5kzXv4u8KbK9554cnM8vmnaU4sT96YWAAHpmSIdeUGuUZeFkQQOEk2D2I54PDEXcDTzy
-         0zi4NMjZaZORSFSPqVjcklbbLcLKZkkn4g7+Fol32PTaZChcnt+1oclaVq/CN78EKtL2
-         HaCdolRaEPa15chHa2AyO2Tvv35ZPpkWe7joykbTJs3aTjo2ZM8XL3QI8uDrF9hT3SHE
-         EPaZyXDfPxrvFT0rMtj0YlTMwCtGj1LkCzPMbdXu4xA2WIPCaoj0K4yaV2YXVrRIkMRz
-         1epA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714145744; x=1714750544;
-        h=in-reply-to:references:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9I5S2+S0bvqZ7UVU6beR6Uqu4fLT1g89R1N7x2rc2tw=;
-        b=IbU6ZhpJSt37iaU48NQfr9KJ5yMFe+q8v+dCnaJHkBvtNeOwfeStxnGSP/DoIsuPVj
-         WCsNAHXrZb9wWprIHVOiTl50849lwk+pL2Ny0dBzqXyR2x8Zz4xVlRGcH2UP+36PepJA
-         N+AnEz9hFVH6u3qlQRW0pojiSKAbQrUtphWOHmI3D77w75/kPn/syLnvR4pvO4gdlV66
-         A1ixOFk06femA6kLpZeTXxsg847FZqAtniLDvgJTh52ckuru4CVCwKpxMsx7i5pm1aox
-         4M2ZIXYzqCt+1oLZMv+oFPhPPndZfU+08XU2KSg3wNkCy1KBgc1uh6WTlbtoaEa8IO1D
-         BIqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUt11JoPmqLOezfxBPzvSLR2+YcNsfwbPfGWBKyAwyIko7qOKKaEpMXfawOn7xx2qzhQxmT813IN/o1Rpil81VpPqeQgk8q8+2YDq/A3h+0kEWKgHPYgVC1wUEdoPV6XL0tU3NXROygXqea/AEPvpm86QSv9q/WH0Gp8dLKSoLUqf8Fr4oYLeqCm4f/fmfsei4PrRd0LIQeMAfAy+BDCxM+Gotn
-X-Gm-Message-State: AOJu0Yw3ljw0NScEPSmtOClTd/B62P5xaiDY7669B2dMQRzfSCiIQIDW
-	f4mceXAbV4P3EjtDyTJsSy2DpsCs5h0XWQ6ZRaJxDHXvNqf9fPzT
-X-Google-Smtp-Source: AGHT+IF2wr8JiWj649TyQijnZJdEN1UK94JbX5L5JoJn/TCKNcaGYJRv/EOu+cxV7gOiqcJ3+t0WFw==
-X-Received: by 2002:a50:9b5b:0:b0:56b:ed78:f58 with SMTP id a27-20020a509b5b000000b0056bed780f58mr1969434edj.33.1714145743428;
-        Fri, 26 Apr 2024 08:35:43 -0700 (PDT)
-Received: from localhost (p200300e41f162000f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f16:2000:f22f:74ff:fe1f:3a53])
-        by smtp.gmail.com with ESMTPSA id fd25-20020a056402389900b00572678527e6sm30568edb.59.2024.04.26.08.35.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Apr 2024 08:35:43 -0700 (PDT)
-Content-Type: multipart/signed;
- boundary=8db9efe2193992169f1855e727000475caf92fc020254d3d8060c6c4c68a;
- micalg=pgp-sha256; protocol="application/pgp-signature"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fNojwqBb"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 949E120002;
+	Fri, 26 Apr 2024 16:13:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1714148018;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iHq0a5TYFF7yrLXeX6BIAdFUmvRofAskO9re+BiJUcg=;
+	b=fNojwqBbgjVi8+uUgbS7dQ3VT+jboqmKA/OOumXC1o+9UTHoXNi5NIM+IKveAdoe8uVZ/H
+	8FNblc7Ig09gQOhAFQmDasKExhFMRaCAruTqEO51OwdvHCCPe8QsiyqqQEKoCNMPj2xAoc
+	XEC5yvUoNDkMZ8mXylxxj0vkheELgBQGMRd8uqI0hOCI/Ht+xSIsJrmm2fzSFlUsDELyK7
+	wH22z+CBJpLHGhpaiYFfysHrio67/bxr8BHnYcgM9T6JEpza4io6OEGnaEJqEzPgOY/vU9
+	9izwgVmU8xG9NCEDX3OncYDEjpODVCEkAxsV0RZYsTFzD8FOcGzklzZS2XmTdA==
+From: Gregory CLEMENT <gregory.clement@bootlin.com>
+To: Marek =?utf-8?Q?Beh=C3=BAn?= <kabel@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>,
+ soc@kernel.org, arm@kernel.org, Andy Shevchenko <andy@kernel.org>, Hans de
+ Goede <hdegoede@redhat.com>, Ilpo =?utf-8?Q?J=C3=A4rvinen?=
+ <ilpo.jarvinen@linux.intel.com>, Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Dan
+ Carpenter <dan.carpenter@linaro.org>, devicetree@vger.kernel.org, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Guenter Roeck
+ <linux@roeck-us.net>, Herbert Xu <herbert@gondor.apana.org.au>, Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Linus Walleij
+ <linus.walleij@linaro.org>, linux-crypto@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-rtc@vger.kernel.org,
+ linux-watchdog@vger.kernel.org, Olivia Mackall <olivia@selenic.com>, Rob
+ Herring <robh+dt@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>
+Cc: Marek =?utf-8?Q?Beh=C3=BAn?= <kabel@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>, Conor
+ Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Rob Herring <robh@kernel.org>, Sebastian Hesselbarth
+ <sebastian.hesselbarth@gmail.com>, Uwe =?utf-8?Q?Kleine-K=C3=B6nig?=
+ <uwe@kleine-koenig.org>
+Subject: Re: [PATCH v7 0/9] Turris Omnia MCU driver
+In-Reply-To: <20240424173809.7214-1-kabel@kernel.org>
+References: <20240424173809.7214-1-kabel@kernel.org>
+Date: Fri, 26 Apr 2024 18:13:32 +0200
+Message-ID: <875xw45cgj.fsf@BLaptop.bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Date: Fri, 26 Apr 2024 17:35:42 +0200
-Message-Id: <D0U5YAWTAEXO.1GLSZDY2XKKRV@gmail.com>
-Subject: Re: (subset) [PATCH v7 0/5] Add Tegra Security Engine driver
-From: "Thierry Reding" <thierry.reding@gmail.com>
-To: "Thierry Reding" <thierry.reding@gmail.com>,
- <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh@kernel.org>,
- <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
- <jonathanh@nvidia.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
- <mperttunen@nvidia.com>, <airlied@gmail.com>, <daniel@ffwll.ch>,
- <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-tegra@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <dri-devel@lists.freedesktop.org>,
- "Akhil R" <akhilrajeev@nvidia.com>
-X-Mailer: aerc 0.16.0-1-0-g560d6168f0ed-dirty
-References: <20240403100039.33146-1-akhilrajeev@nvidia.com>
- <171414552137.2298337.4837480787385115790.b4-ty@nvidia.com>
-In-Reply-To: <171414552137.2298337.4837480787385115790.b4-ty@nvidia.com>
-
---8db9efe2193992169f1855e727000475caf92fc020254d3d8060c6c4c68a
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
+X-GND-Sasl: gregory.clement@bootlin.com
 
-On Fri Apr 26, 2024 at 5:32 PM CEST, Thierry Reding wrote:
-> From: Thierry Reding <treding@nvidia.com>
+Hello all,
+
+> Hello Andy, Hans, Ilpo, Arnd, Gregory, and others,
 >
+> this is v7 of the series adding Turris Omnia MCU driver.
 >
-> On Wed, 03 Apr 2024 15:30:34 +0530, Akhil R wrote:
-> > Add support for Tegra Security Engine which can accelerates various
-> > crypto algorithms. The Engine has two separate instances within for
-> > AES and HASH algorithms respectively.
-> >=20
-> > The driver registers two crypto engines - one for AES and another for
-> > HASH algorithms and these operate independently and both uses the host1=
-x
-> > bus. Additionally, it provides  hardware-assisted key protection for up=
- to
-> > 15 symmetric keys which it can use for the cipher operations.
-> >=20
-> > [...]
+> This series depends on the immutable branch between LEDs and locking,
+> introducing devm_mutex_init(), see the PR
+>   https://lore.kernel.org/linux-leds/20240412084616.GR2399047@google.com/
 >
-> Applied, thanks!
+> See also cover letters for v1, v2, v3, v4, v5 and v6:
+>   https://patchwork.kernel.org/project/linux-soc/cover/20230823161012.698=
+6-1-kabel@kernel.org/
+>   https://patchwork.kernel.org/project/linux-soc/cover/20230919103815.168=
+18-1-kabel@kernel.org/
+>   https://patchwork.kernel.org/project/linux-soc/cover/20231023143130.116=
+02-1-kabel@kernel.org/
+>   https://patchwork.kernel.org/project/linux-soc/cover/20231026161803.167=
+50-1-kabel@kernel.org/
+>   https://patchwork.kernel.org/project/linux-soc/cover/20240323164359.216=
+42-1-kabel@kernel.org/
+>   https://patchwork.kernel.org/project/linux-soc/cover/20240418121116.221=
+84-1-kabel@kernel.org/
 >
-> [4/5] arm64: defconfig: Enable Tegra Security Engine
->       commit: 4d4d3fe6b3cc2a0b2a334a08bb9c64ba1dcbbea4
+> Changes since v6:
+> - moved the DT binding from arm/cznic,turris-omnia-mcu.yaml to
+>   firmware/cznic,turris-omnia-mcu.yaml, as suggested by Conor Dooley
+>   (patch 1)
+> - dropped the devm-helpers.h additions, for the reasons see
+>   https://lore.kernel.org/soc/20240423184346.37eb0915@thinkpad/
+> - use gpiod_to_irq(gpiochip_get_desc(...)) instead of
+>   irq_create_mapping(), as suggested by Andy Shevchenko (patches 6 and
+>   7)
+> - added a dummy read of TRNG entropy when registering TRNG, in case
+>   someone cleared the TRNG interrupt before probing the driver, but did
+>   not read the entropy (the MCU won't send a new TRNG interrupt if the
+>   entropy is not collected) (patch 6)
+> - fixed a bug in TRNG probing, wherein if the=20
+>
+> Marek Beh=C3=BAn (9):
+>   dt-bindings: arm: add cznic,turris-omnia-mcu binding
+>   platform: cznic: Add preliminary support for Turris Omnia MCU
+>   platform: cznic: turris-omnia-mcu: Add support for MCU connected GPIOs
+>   platform: cznic: turris-omnia-mcu: Add support for poweroff and wakeup
+>   platform: cznic: turris-omnia-mcu: Add support for MCU watchdog
+>   platform: cznic: turris-omnia-mcu: Add support for MCU provided TRNG
+>   platform: cznic: turris-omnia-mcu: Add support for digital message
+>     signing via debugfs
 
-For the record, I've also applied patch 5/5 but it didn't apply cleanly
-and so b4 didn't track it properly.
+It is still early as there are some comment pending but I wonder who
+will responsible of merging all theses patches ?
 
-Thanks,
-Thierry
+Arnd ? Hans ? Ilpo ? me ?
 
---8db9efe2193992169f1855e727000475caf92fc020254d3d8060c6c4c68a
-Content-Type: application/pgp-signature; name="signature.asc"
+Gregory
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmYryc4ACgkQ3SOs138+
-s6EV+g//fbg/7yejJ9Q0Vzf2k0pRHwe88E8Ih0sg9lYjOErhooz3HfGkb3TxbFDD
-DJEoSBRHEdja4WUZ2x3uCjvuw3S7tF/w8LU6goDRnS92uGuPkgt0O+rtoSmaKLfi
-MIZRVkJWtBVbrH9/6Vlvf9TRFq1xCzOunVqByMjFskeZKYxCEHEcfbbDPKfyqwR4
-GChoZzcUc826b1heCZUU+E/fU1WeHBXruo2i3KRtUVQKHwjdjZ+FffLyuUZ3z6RU
-xcqW8hG/PFsMJGDutWJkl5vw9o1ULHv0utkaXJ1zYBIu61pG+SqZpOw7TfAmQ8st
-N7Ga6sf9++3Cmt7b7cR8+0waqdW1pYAVv+jw+c/GYM40n3C8owhSPbQjE5rxxxTS
-7Wy5tvSsURjKsBXOlELeJL9ANI6/nreSrLXVBXfOeBx/+2o6tiyOhOnmW+Asml6u
-PfZvMxj+BW48UETZX/01o0ABmPE+Xibb70igRKdJG/UznWpw/U8wyZcnu65Ac+9a
-R5BMswVYYGJ+iaTCsrJJekr6Oam+LeIei+CQ9sigKEVAN8efZHSY/KbVicLPxFwJ
-QJGOiGl2xuqejC5v6BCmdtMWh3KImuH3gHafe8v98aCc7p5Y1S4q8nBHF0iiti6L
-cZk85PnTaqxFH47Dk/GlyBwCPGm2klmKQN5r85nGVFLUx1Z38yc=
-=AFyx
------END PGP SIGNATURE-----
-
---8db9efe2193992169f1855e727000475caf92fc020254d3d8060c6c4c68a--
+>   ARM: dts: turris-omnia: Add MCU system-controller node
+>   ARM: dts: turris-omnia: Add GPIO key node for front button
+>
+>  .../ABI/testing/debugfs-turris-omnia-mcu      |   13 +
+>  .../sysfs-bus-i2c-devices-turris-omnia-mcu    |  126 ++
+>  .../firmware/cznic,turris-omnia-mcu.yaml      |   86 ++
+>  MAINTAINERS                                   |    5 +
+>  .../dts/marvell/armada-385-turris-omnia.dts   |   35 +-
+>  drivers/platform/Kconfig                      |    2 +
+>  drivers/platform/Makefile                     |    1 +
+>  drivers/platform/cznic/Kconfig                |   51 +
+>  drivers/platform/cznic/Makefile               |    9 +
+>  .../platform/cznic/turris-omnia-mcu-base.c    |  439 +++++++
+>  .../platform/cznic/turris-omnia-mcu-debugfs.c |  216 ++++
+>  .../platform/cznic/turris-omnia-mcu-gpio.c    | 1047 +++++++++++++++++
+>  .../cznic/turris-omnia-mcu-sys-off-wakeup.c   |  258 ++++
+>  .../platform/cznic/turris-omnia-mcu-trng.c    |  109 ++
+>  .../cznic/turris-omnia-mcu-watchdog.c         |  123 ++
+>  drivers/platform/cznic/turris-omnia-mcu.h     |  188 +++
+>  include/linux/turris-omnia-mcu-interface.h    |  249 ++++
+>  17 files changed, 2956 insertions(+), 1 deletion(-)
+>  create mode 100644 Documentation/ABI/testing/debugfs-turris-omnia-mcu
+>  create mode 100644 Documentation/ABI/testing/sysfs-bus-i2c-devices-turri=
+s-omnia-mcu
+>  create mode 100644 Documentation/devicetree/bindings/firmware/cznic,turr=
+is-omnia-mcu.yaml
+>  create mode 100644 drivers/platform/cznic/Kconfig
+>  create mode 100644 drivers/platform/cznic/Makefile
+>  create mode 100644 drivers/platform/cznic/turris-omnia-mcu-base.c
+>  create mode 100644 drivers/platform/cznic/turris-omnia-mcu-debugfs.c
+>  create mode 100644 drivers/platform/cznic/turris-omnia-mcu-gpio.c
+>  create mode 100644 drivers/platform/cznic/turris-omnia-mcu-sys-off-wakeu=
+p.c
+>  create mode 100644 drivers/platform/cznic/turris-omnia-mcu-trng.c
+>  create mode 100644 drivers/platform/cznic/turris-omnia-mcu-watchdog.c
+>  create mode 100644 drivers/platform/cznic/turris-omnia-mcu.h
+>  create mode 100644 include/linux/turris-omnia-mcu-interface.h
+>
+> --=20
+> 2.43.2
