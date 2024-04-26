@@ -1,93 +1,77 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAB513F428;
-	Fri, 26 Apr 2024 09:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E74C13F42B;
+	Fri, 26 Apr 2024 09:29:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714122878; cv=none; b=hOWebJbJlgWEW0kz9JK7xaCsh65OL7Fo7vM314XvvrP8KXdRpKl0rfMRJcfItjPXqk7lY4XUGn0M3LxZ8p/P0L0Q/HdedMLwZxcBgSSj5O6zklovAtrJxhUCu0NA63wi7f2nWHKxh55eh4Hymi2PR6zEs9FIgrnMo/Hv/uGEB10=
+	t=1714123782; cv=none; b=jK/TQJyAk4zFSBMWCN0AhDy3HZNHckdMJAAH456UrzV88jOEWI8nFuAfRnNCpivQ7ikUqURBli989xngg6/+iT5qbBQr/e0ordNwXWNVykg+TvivFXFdRbf5ijmFTJiB53yaYgXuLgXeAIpmALVaS2yHAl4sdeLhXk9xIkr679g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714122878; c=relaxed/simple;
-	bh=B8Lll3xWX332PRlV5HPm+9hPCrTUmSXqVBq3Y3DSJjg=;
+	s=arc-20240116; t=1714123782; c=relaxed/simple;
+	bh=owwDRQE7yKWZ1zr51Il7f3MkTI2pN2XkpCFgTUiqE4U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OnEV5Dv+FbWq3vOHbTcm4NYPMgyeMPU6DPPhEitDDze+8kJ/amHfj3TSxRNPNw497omG1M7UmCW/PifIZsQniI50cfQYwuYouBUI+u3V7YASjpinAT0TrMPKICm/xTvxUBskUAGXPNgqqn9uEPZmRrQOmdC4WGHdsaYQ15jhhgI=
+	 Content-Type:Content-Disposition:In-Reply-To; b=RhgpzJeVlN4C7/4tm3SiDDQL9tKCnyu1n8W0lK11ZzRbdFhO35o8KoNvyvw1oUWrS03SFuhgc3vR+IuJ5bLNhJ1G/g1z1JLtXFIDq3eiXbHycUMGsvcdjr2e8Mbxs9NDm5wOxf6LoURfgoDHjDVmg7Rtb2M/71qwiUGbtQVBAcU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1s0Hex-006dwS-QV; Fri, 26 Apr 2024 17:14:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Apr 2024 17:14:41 +0800
-Date: Fri, 26 Apr 2024 17:14:41 +0800
+	id 1s0HtY-006eHu-V4; Fri, 26 Apr 2024 17:29:30 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Apr 2024 17:29:46 +0800
+Date: Fri, 26 Apr 2024 17:29:46 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, jarkko@kernel.org, ardb@kernel.org,
-	git@jvdsn.com, hkario@redhat.com, simo@redhat.com,
-	Salvatore Benedetto <salvatore.benedetto@intel.com>
-Subject: Re: [PATCH v3 1/2] crypto: ecdh - Pass private key in proper byte
- order to check valid key
-Message-ID: <ZitwgY7qRsnkrzG6@gondor.apana.org.au>
-References: <20240418152445.2773042-1-stefanb@linux.ibm.com>
- <20240418152445.2773042-2-stefanb@linux.ibm.com>
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: Akhil R <akhilrajeev@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	linux-crypto@vger.kernel.org, linux-tegra@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: Re: [PATCH] crypto: tegra-se - Convert to platform remove callback
+ returning void
+Message-ID: <Zit0Cg8nFs2HDBsN@gondor.apana.org.au>
+References: <20240415073422.8274-2-u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240418152445.2773042-2-stefanb@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240415073422.8274-2-u.kleine-koenig@pengutronix.de>
 
-On Thu, Apr 18, 2024 at 11:24:44AM -0400, Stefan Berger wrote:
-> ecc_is_key_valid expects a key with the most significant digit in the last
-> entry of the digit array. Currently ecdh_set_secret passes a reversed key
-> to ecc_is_key_valid that then passes the rather simple test checking
-> whether the private key is in range [2, n-3]. For all current ecdh-
-> supported curves (NIST P192/256/384) the 'n' parameter is a rather large
-> number, therefore easily passing this test.
+On Mon, Apr 15, 2024 at 09:34:21AM +0200, Uwe Kleine-König wrote:
+> The .remove() callback for a platform driver returns an int which makes
+> many driver authors wrongly assume it's possible to do error handling by
+> returning an error code. However the value returned is ignored (apart
+> from emitting a warning) and this typically results in resource leaks.
 > 
-> Throughout the ecdh and ecc codebase the variable 'priv' is used for a
-> private_key holding the bytes in proper byte order. Therefore, introduce
-> priv in ecdh_set_secret and copy the bytes from ctx->private_key into
-> priv in proper byte order by using ecc_swap_digits. Pass priv to
-> ecc_is_valid_key.
+> To improve here there is a quest to make the remove callback return
+> void. In the first step of this quest all drivers are converted to
+> .remove_new(), which already returns void. Eventually after all drivers
+> are converted, .remove_new() will be renamed to .remove().
 > 
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> Trivially convert this driver from always returning zero in the remove
+> callback to the void returning variant.
+> 
+> Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 > ---
->  crypto/ecdh.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+> Hello,
 > 
-> diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-> index 3049f147e011..c02c9a2b9682 100644
-> --- a/crypto/ecdh.c
-> +++ b/crypto/ecdh.c
-> @@ -27,7 +27,9 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
->  			   unsigned int len)
->  {
->  	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
-> +	u64 priv[ECC_MAX_DIGITS];
->  	struct ecdh params;
-> +	int ret = 0;
->  
->  	if (crypto_ecdh_decode_key(buf, len, &params) < 0 ||
->  	    params.key_size > sizeof(u64) * ctx->ndigits)
-> @@ -40,13 +42,16 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
->  				       ctx->private_key);
->  
->  	memcpy(ctx->private_key, params.key, params.key_size);
-> +	ecc_swap_digits(ctx->private_key, priv, ctx->ndigits);
+> this driver appeared in today's next. Given that I want to change struct
+> platform_driver::remove soon (probably in next after the upcoming merge
+> window), it would be great if the driver could be adapted immediately.
+> 
+> Best regards
+> Uwe
+> 
+>  drivers/crypto/tegra/tegra-se-main.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 
-These functions need to use our sparse marking mechanism correctly
-to prevent future occurences of such errors.  They should not be
-passing around void * pointers or worse, treating u64 * arrays as
-big-endian.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
