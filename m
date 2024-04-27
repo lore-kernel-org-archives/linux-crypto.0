@@ -1,119 +1,126 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFE53BBC5;
-	Fri, 26 Apr 2024 22:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189651FA3
+	for <linux-crypto@vger.kernel.org>; Sat, 27 Apr 2024 00:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714172339; cv=none; b=PZ0200aq0T1M0I1FSB5CP+J3uF3fYFmCS3yFH3V2xCgwI3QdpglLWXJSJYUZ5Vk5/akqV5ZBtSimR/gBYGiZuwUU/u4NxRrhZMud1MM6dkIdOt+c4fynASquJRLKyM3TNzIkp07Ln++iVG7/8b4TL+pqDVheopKi7pMnTwCUh+g=
+	t=1714176614; cv=none; b=gxjwgdZhncFCO2wEtV7hfVGzELhNj1FhohFRGkAHJMqUWRlDhyzSnEH4nbzhfqW68yxJ+F/BfqVqKxDTOwNKADYEbcLNiJNjbKMHkRh0dR006OL8liWKci6BGg8VPpvS2dITZMYzK11pMEbmn9HqQOz/IvZNuFVFNnhDJCYp4J4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714172339; c=relaxed/simple;
-	bh=2VvdgYGJW+J6G/InU4atjUaWGbpVPNUcFdofJqvbrsw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FbEE0VCVnGkCJfpMobNzq4nVlvQvrHtDNE1R9X8mPT7iPaZvHuzOzHlSpc3f3DT9Dr6juvO/LAMxQ3LdDcOsZdHtHmCScgbCy8BkXYC7FPW5XJOya89fG1k/Bb91lT/1Oy6rVdjGO+eRTeW6h5A8pJlMLn5KtN1Gzps/Q2okTjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=H9Z5yh5K; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1714176614; c=relaxed/simple;
+	bh=yinP9IYiIbLDbM6oDFHQvj2nAf8OvdI9Q9sPTHiIpf0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nVGbPMpMVqJvaOZ5jmCV/TT1q0Wxc++ZNK3bMT9W50soXRZAxQLEmzGL6uTHbB7D+HWUeqHRv6E8uu1I0n+6+y1EM2ntPcEr/1ZOtNn2S2AQc5nWCOYzHX/O9lLaZanI2QZmhfMxmN3vMNyNjkQA6IycANQBBSifZcy6pNcB2+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TNq03HK6; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="H9Z5yh5K"
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43QMeYta022643;
-	Fri, 26 Apr 2024 22:58:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=hfr3SWAqYo+sSiXwwtPj7k1z5GcUrNj2b6ZD4IV+j/k=;
- b=H9Z5yh5K3AXI6v7Vs+HbUnHukYm7SmHEs4a5MyybdAkyk80Gk1fdcttHJyTNJ5axcvjR
- WHSPUk+32GQ2COmghqAoMQ/HfxX1WeoMWSI0uBFFnYz1M0nkl6CG4ncRbz3XpxmF62iI
- SLeJbUvG0uVLUXTN9i4sA8cdfdxqGqqN2PiiGB4XIJdCP6r07Pdivq/ni2qnsKJuuRZR
- VUhJQ7YVWdRfOYkAFamBNVSpVg4oUYeVtk6H4SCzTc/4SnGkkJtCrOhHnrPXNt2rvR6N
- zWgpLI2EMWa5V6b/lWd/wy6TSTaKE/j0AnoDYGwyAgE0BS1z5cwqx2BJ22oll3s/NtQp ug== 
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xrn0fg1kg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Apr 2024 22:58:48 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43QLMXfO005328;
-	Fri, 26 Apr 2024 22:56:04 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xmx3d10vp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Apr 2024 22:56:04 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43QMu2kV11272924
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 26 Apr 2024 22:56:04 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 234B058059;
-	Fri, 26 Apr 2024 22:56:02 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6747658043;
-	Fri, 26 Apr 2024 22:56:01 +0000 (GMT)
-Received: from sbct-3.bos2.lab (unknown [9.47.158.153])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 26 Apr 2024 22:56:01 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.ibm.com>
-To: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, lukas@wunner.de, jarkko@kernel.org,
-        Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH] crypto: ecc - Protect ecc_digits_from_bytes from reading too many bytes
-Date: Fri, 26 Apr 2024 18:55:53 -0400
-Message-ID: <20240426225553.3038070-1-stefanb@linux.ibm.com>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TNq03HK6"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1eb48c26d14so2140645ad.1
+        for <linux-crypto@vger.kernel.org>; Fri, 26 Apr 2024 17:10:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714176612; x=1714781412; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pX3e6V8dfSE3Gfut3DvSdpkoJdELEXC0BtcZAcuIozM=;
+        b=TNq03HK6kSZdc9/5Tb4XtmWpxQoVa2I+AE/c8/xhhRbNvuyref+5AiU46iXNDmWgYR
+         c/5zzQV207UtoN7+QarQhMNGhZx9rHLdqfpCxLUM/xBn9Dh2vizqt6bBkTRSF8aZjzYh
+         iCrHq9BTZenpLflPCDo4KJV5Ju/f7zVc6O4ddZLfnaSheHL7jxJFKT/NZLH0eKN3h8K1
+         QgeLiyS37/18dm60OkKVIhrNyYxq3yyd7w7bMzhCAfl/GU3jT8XGagPCWTFWF+lnWzYC
+         fpYnmSz5nVINcHZl67G2gcB1iKOBcEI9nbHikBBEOSxhpQlhztjBxpU+xffGnBcKyWRX
+         O0HQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714176612; x=1714781412;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pX3e6V8dfSE3Gfut3DvSdpkoJdELEXC0BtcZAcuIozM=;
+        b=YxorojosPHM0EHhqqiEqJTdN+9hgP116YO15OVAWdDexkvwyInC2aUHAaQZEuM9iyN
+         G9SdJ4x3yqj//nVOiDsL9tbbAL0+xbZUMBPWVJmMTQnnFP3IaKA1OnXo76710Ie8ar/V
+         lqpLkrl8r5Fv12+ytjPFMPU1ZnM7F+t+I+wCBPRojEzZ2vQJkrDMTqvxOzAqMyC/h1DX
+         wxAExmHKBwqbucfES0QXmsGcOGCNhvyQhPPq1lu3P/SqBrMfS+yT1uNJR4SekvDCidny
+         6QSPcfAUFjil+Kc43mvC7r7PkgXmfeL51yj78xfdbt327HchJ0G2RLj5QozVbtBKh7q9
+         UoxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9pt6TOlL3qL8oeTOfZJrAx8CzNRHzO3xB0Z6hHQY0Awd4/kJQPJOywDCc0OCS/cJJe64gttEcFZ7jSJJI3c4N1uczcBIwV7s6MN62
+X-Gm-Message-State: AOJu0Yz49ETcrO3BTk2w/E6T2TuZWs2aZjmMym/gpaYIpSnMgaQRwhQm
+	Trsy0o1N7yH9wEjzYZDlWxeFQcpj3ucVtc4LU0EnB8S4gatMF+rKWSme+r/si73OgmUtFJ6DFwr
+	PpA==
+X-Google-Smtp-Source: AGHT+IGeE+8TCHmYAm9ZGbpmSgEKJqEs1Jp1O3g0e+nnHHLhKIoKgjH9RHf12yfFHhvL2WEZcXN4ybRfODI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:d4c1:b0:1e5:5c69:fcd7 with SMTP id
+ o1-20020a170902d4c100b001e55c69fcd7mr67795plg.5.1714176612367; Fri, 26 Apr
+ 2024 17:10:12 -0700 (PDT)
+Date: Fri, 26 Apr 2024 17:10:10 -0700
+In-Reply-To: <20240426214633.myecxgh6ci3qshmi@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: K5i04VXHYMgKYT3Bmddfj1En5_l8n3IG
-X-Proofpoint-ORIG-GUID: K5i04VXHYMgKYT3Bmddfj1En5_l8n3IG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-26_20,2024-04-26_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 mlxlogscore=999 adultscore=0 priorityscore=1501
- impostorscore=0 spamscore=0 mlxscore=0 clxscore=1011 suspectscore=0
- phishscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2404010000 definitions=main-2404260162
+Mime-Version: 1.0
+References: <20240421180122.1650812-1-michael.roth@amd.com>
+ <20240421180122.1650812-22-michael.roth@amd.com> <ZimgrDQ_j2QTM6s5@google.com>
+ <20240426173515.6pio42iqvjj2aeac@amd.com> <ZiwHFMfExfXvqDIr@google.com> <20240426214633.myecxgh6ci3qshmi@amd.com>
+Message-ID: <ZixCYlKn5OYUFWEq@google.com>
+Subject: Re: [PATCH v14 21/22] crypto: ccp: Add the SNP_{PAUSE,RESUME}_ATTESTATION
+ commands
+From: Sean Christopherson <seanjc@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com, 
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, Larry.Dewey@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-Protect ecc_digits_from_bytes from reading too many bytes from the input
-byte array in case an insufficient number of bytes is provided to fill the
-output digit array of ndigits. Therefore, initialize the most significant
-digits with 0 to avoid trying to read too many bytes later on.
+On Fri, Apr 26, 2024, Michael Roth wrote:
+> On Fri, Apr 26, 2024 at 12:57:08PM -0700, Sean Christopherson wrote:
+> > On Fri, Apr 26, 2024, Michael Roth wrote:
+> > What is "management"?  I assume its some userspace daemon?
+> 
+> It could be a daemon depending on cloud provider, but the main example
+> we have in mind is something more basic like virtee[1] being used to
+> interactively perform an update at the command-line. E.g. you point it
+> at the new VLEK, the new cert, and it will handle updating the certs at
+> some known location and issuing the SNP_LOAD_VLEK command. With this
+  ^^^^^^^^^^^^^^^^^^^
+> interface, it can take the additional step of PAUSE'ing attestations
+> before performing either update to keep the 2 actions in sync with the
+> guest view.
 
-If too many bytes are provided on the input byte array the extra bytes
-are ignored since the input variable 'ndigits' limits the number of digits
-that will be filled.
+...
 
-Fixes: d67c96fb97b5 ("crypto: ecdsa - Convert byte arrays with key coordinates to digits")
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
----
- include/crypto/internal/ecc.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+> > without having to bounce through the kernel.  It doesn't even require a push
+> > model, e.g. wrap/redirect the certs with a file that has a "pause" flag and a
+> > sequence counter.
+> 
+> We could do something like flag the certificate file itself, it does
+> sounds less painful than the above. But what defines that spec?
 
-diff --git a/include/crypto/internal/ecc.h b/include/crypto/internal/ecc.h
-index 7ca1f463d1ec..56215f14ff96 100644
---- a/include/crypto/internal/ecc.h
-+++ b/include/crypto/internal/ecc.h
-@@ -67,9 +67,16 @@ static inline void ecc_swap_digits(const void *in, u64 *out, unsigned int ndigit
- static inline void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
- 					 u64 *out, unsigned int ndigits)
- {
-+	int diff = ndigits - DIV_ROUND_UP(nbytes, sizeof(u64));
- 	unsigned int o = nbytes & 7;
- 	__be64 msd = 0;
- 
-+	/* diff > 0: not enough input bytes: set most significant digits to 0 */
-+	while (diff > 0) {
-+		out[--ndigits] = 0;
-+		diff--;
-+	}
-+
- 	if (o) {
- 		memcpy((u8 *)&msd + sizeof(msd) - o, in, o);
- 		out[--ndigits] = be64_to_cpu(msd);
--- 
-2.43.0
+Whoever defines "some known location".  And it doesn't need to be a file wrapper,
+e.g. put the cert in a directory along with a lock.  Actually, IIUC, there doesn't
+even need to be a separate lock file.  I know very little about userspace programming,
+but common sense and a quick search tells me that file locks are a solved problem.
 
+E.g. it took me ~5 minutes of Googling to come up with this, which AFAICT does
+exactly what you want.
+
+touch ~/vlek.cert
+(
+  flock -e 200
+  echo "Locked the cert, sleeping for 10 seconds"
+  sleep 10
+  echo "Igor, it's alive!!!!!!"
+) 200< vlek.cert
+
+touch ~/vlek.cert
+(
+  flock -s 201
+  echo "Got me a shared lock, no updates for you!"
+) 201< vlek.cert
