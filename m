@@ -1,150 +1,221 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84E478B63
-	for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 14:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714400846; cv=none; b=vD4jyKA0K9wqE8vplnBmLwofe83Eg18K2cKxbyDL/4UhxJBxcrnLFLMr5g3H4zmKzPcDXfaMMX2vtKzQjkdQcDcBDNSCiolf+WawuxsmSFzsGOKdmF0/0bSiu/xdGo1iDeO3iF8fjY6e3A2WlCCjA1+VA7vL5NhtQvjAwksZ6eM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714400846; c=relaxed/simple;
-	bh=dOL5MQJEWlm+ALadfwEWLIsuMmXKHK7rNTd6CxqSNA0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cOdGNNR5ia47c1e5JDXLXckDQORTyGxbCAbum0PFTOtiT4UCHYumLiLYb/YXSaK4E+tzTRg0SMKRou6CCXJcxCOf0LQr5ZExL5xAdF+ymf1q+t7ips7rvgivX8GCX14vsUtdTj1ZlngxXaE5qQ/O07OOKdhwbPDNVz73GL9q3Hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TNvfnSyR; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56393745C5;
+	Mon, 29 Apr 2024 15:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714404122; cv=fail; b=lKDVOyo2cZXmW+aNBOJgDtGAmaQzybtjC7fKvYsn5JdCGnHnDzPn+2ZIqRhlX25II+/E7HCchC5/IBfuY0TERDzCZYaFdKva7g8Hu8YgTvjl4LGFzhs8t9xgOyWgHGyajBR4j8vs1HaR+/BH2hrfdf2RQPdKwtRgzXuqZOkIehs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714404122; c=relaxed/simple;
+	bh=dknPQHKNQ2Vkr+pke/cSDozstUbPjYEwptM4JWteSC8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=PmIIMdBQK64KKF5zNwClZKtm9MMXmgBlmi8Wma2BgHHaTLNRxdttXmRxACu4nx/WYfZxrqefnFaKNmkGBCgikhy6zkwGvDNROZ3iQunHhog4SD3ISMJQXQMvjirUfVjcDUde0JdL+aRNOUPX7+JFtuWyzum3hyvZy+f1u+c3JqM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iRwd8EOM; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TNvfnSyR"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-601fef07eaeso5218474a12.1
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 07:27:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714400844; x=1715005644; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S3mlM0E1TrjvYHfesQNSkr38bw44gyQq8z5XmrX3EV0=;
-        b=TNvfnSyRLs2kUehKYQg9lgy0+HSgeBrQ3mGDf7ZZH65mLocaUa6qmks0FzpCpzV2Qn
-         BD9e6HPgy7fN6Rvq/0LD6EXaoM+OexYxuE/e59aOI56V3cPh9Ca8QnpVOR3sw6ABQmTD
-         zhRNNRIEGeImEQLC3EKXn8IA+NI8ZMv04IMKNeHcgY4fDFgDqANrxIp6xnrk04TONTN9
-         bTtORWXUnZv0uKm4bqxVDJHUOsHZEVOBW1jA/qI4nGfb8GxTnxdHg3NbtjHQycg7PlpX
-         27ZXstLqzB32bkQi8Dbyb9bM5UWaebeMGIIJwt/siu8JpqaKsODF4ih8CqXilsAtdBcW
-         bsmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714400844; x=1715005644;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S3mlM0E1TrjvYHfesQNSkr38bw44gyQq8z5XmrX3EV0=;
-        b=bKvo3xJ+Sf8nY5oV0J1QThTsu/p26dOFqjOWDDyUyFJqpvdpVlGXFQ0NpwtpOrf1zG
-         naaG2EMr+LV4TdZn3pEWYgWfup49OG1OG7snBbfYyfCXu90SYeoXladkk0F2BKMDQ++u
-         qW/mxH4lFeAy9E4JD7Mp9mpJGrpdVHTX1whofEtNdMg9lcfPCE92eL/dGKgyx6/OdUPJ
-         QLAwaL1F3zzv9Q2YUaz1x86sByFJ2cxSVSAbQb0BpzoJEy+Dk9n4yX/qtzCBExKCG4wF
-         icuc+I0c/4AChGxq6nx06fc5KCPyjZ0CLHlXnqGPmIQnXzYz4c9rO1nWFjOtO991PcgV
-         oEXA==
-X-Forwarded-Encrypted: i=1; AJvYcCXmHkihmlCNPWODgl79e0ugd1o72XE44RmNmqROd8JP43il10AOnR0V+rrUI6wM3F1lXlnM8sJpmlh6T4l28U3Y0vS+GEicg+utT1ld
-X-Gm-Message-State: AOJu0Yy66PyE808yeMD7hFa8WK68MiBXMXYk0Im5j+kJvEfeZ4bcxa1q
-	iuUHM1j8P1OHJhJURCsgQLaAclIMnQAqJjYP7Y1gHFI8x7DPaX4UI76/E1OZGbfEMNu2wb7ybU4
-	uog==
-X-Google-Smtp-Source: AGHT+IFtI1VRsJxmoBaQkkMNkidpPOTCEAStMWY3Kr4rNLpPFTYg7KKAfEudEOmt/GvfkLL4yDTV9xTdh4k=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:1e5d:0:b0:5f7:651b:fed8 with SMTP id
- p29-20020a631e5d000000b005f7651bfed8mr29463pgm.12.1714400843944; Mon, 29 Apr
- 2024 07:27:23 -0700 (PDT)
-Date: Mon, 29 Apr 2024 07:27:22 -0700
-In-Reply-To: <20240427013210.ioz7mv3yuu2r5un6@amd.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iRwd8EOM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714404120; x=1745940120;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=dknPQHKNQ2Vkr+pke/cSDozstUbPjYEwptM4JWteSC8=;
+  b=iRwd8EOME1I7a7PM5o7CYsyOo+oJJgRwnB+8GOfrCZtdixeWajORN9lk
+   x2/B06KuGBD+2t+W7wFNB8VLSPxSo38A3CbACaIri4lxDYcChKrAjIG6t
+   1hnPBrNWSA22kPhYKK8wPtrvDVi4T130h1zhbYHV9LMYgoLqLMs1XXbyj
+   Ne5Ia4XSMOynaP8NL/oS1FDESw9GJqtRILv8K8HC3ASYmzNSIt5HiqsV5
+   PGYcL/+Vnvnzwc94ScmaxueKiSUNgidtB0giaomvNAaQibd8of45Ptu7/
+   BUfjaZse7+hEI3Ifj66fqh+DfbqJg3vhgydkHPSY04jF4gbKJV6XQKIla
+   Q==;
+X-CSE-ConnectionGUID: LVjCQPqbQ7eZnoXTcuAmpQ==
+X-CSE-MsgGUID: C7L+HY1aSRmtfWE5UkutWQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11059"; a="13897087"
+X-IronPort-AV: E=Sophos;i="6.07,239,1708416000"; 
+   d="scan'208";a="13897087"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2024 08:22:00 -0700
+X-CSE-ConnectionGUID: r0psZAfNQZ2Ymb8dZHOpMA==
+X-CSE-MsgGUID: OFQ6q5hsR+u74cL3Xn+CMQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,239,1708416000"; 
+   d="scan'208";a="30829593"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Apr 2024 08:22:00 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 29 Apr 2024 08:21:59 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 29 Apr 2024 08:21:59 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 29 Apr 2024 08:21:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eG9XrTg+xPMthTj3WWgkPabHhpGtJlPKVBW3NgtZ5Br4JYElxvfxzVYY+JGa+xNPWPqwSMVXsvh5yDxpykjpei/g/nfirHPj1aodVQAgQwIegRosIXax9tqPrgu7tE6x+nYfTnnz5F1Zhp7djgqLpcTohhawS7XFChxpWz3Dy0Upa0ZN2QC0rjLBFU+4+17w+AfePZqH8218S1RboCtBdJ28QTQq3RQCaas1b4B7k09nzQponLt/PUzQ2356BshIZJMo3oqHEE4hPKV5dC6tuZMqUlFal4TJubOvxSp0c8XBGaOrUHva8ygv6bueUZ2iysxvljOWsU/edcXZaEETtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6y9r3tL57Z19DEgME1mKP7yxvjyPkLZCKLd0TykmGPE=;
+ b=DDVrebpwU1zCjZuEuP5QbOmh8oX7TshVeeARgxQORJ1PCE2/yekA5Mp5xLdJpVUUNGDOeT7gH33pWzEQWc2Rb4u1mRH2Al5xusZ1Y0pQJ8znl8Aw8hyr8slJuSJEyDXzGExwuOfF+zGGNBCzHn4SfJZnY3x5RNFDdGGWKctfTaKjZqco+v9ftnDnHtV2peK58uo+3Kmzo01zWAxlecTgV0gHa5qHLkZS9RBsZWhsML8K7rpCezMf4K/WOqXTq6S4qtP/CQ6WK5XZM1KlDvOqh7RQm6kZjKJ9+rrXVcNIlTa4Gco0UHETsGXCY24U9S8mlFbvtR5uDmRNHNPrkFk2Jg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by IA0PR11MB7956.namprd11.prod.outlook.com (2603:10b6:208:40b::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34; Mon, 29 Apr
+ 2024 15:21:55 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::90e5:7578:2fbf:b7c4]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::90e5:7578:2fbf:b7c4%4]) with mapi id 15.20.7519.021; Mon, 29 Apr 2024
+ 15:21:54 +0000
+Date: Mon, 29 Apr 2024 16:21:46 +0100
+From: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+To: Josef Bacik <josef@toxicpanda.com>, <herbert@gondor.apana.org.au>
+CC: <clm@fb.com>, <dsterba@suse.com>, <linux-btrfs@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <qat-linux@intel.com>, <embg@meta.com>,
+	<cyan@meta.com>, <brian.will@intel.com>, <weigang.li@intel.com>
+Subject: Re: [RFC PATCH 6/6] btrfs: zlib: add support for zlib-deflate
+ through acomp
+Message-ID: <Zi+7CnWeF9+DUXpK@gcabiddu-mobl.ger.corp.intel.com>
+References: <20240426110941.5456-1-giovanni.cabiddu@intel.com>
+ <20240426110941.5456-7-giovanni.cabiddu@intel.com>
+ <20240429135645.GA3288472@perftesting>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240429135645.GA3288472@perftesting>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: DUZPR01CA0073.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:3c2::11) To CY5PR11MB6366.namprd11.prod.outlook.com
+ (2603:10b6:930:3a::8)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240421180122.1650812-1-michael.roth@amd.com>
- <20240421180122.1650812-22-michael.roth@amd.com> <ZimgrDQ_j2QTM6s5@google.com>
- <20240426173515.6pio42iqvjj2aeac@amd.com> <ZiwHFMfExfXvqDIr@google.com>
- <20240426214633.myecxgh6ci3qshmi@amd.com> <ZixCYlKn5OYUFWEq@google.com> <20240427013210.ioz7mv3yuu2r5un6@amd.com>
-Message-ID: <Zi-t65xmCk9x78lb@google.com>
-Subject: Re: [PATCH v14 21/22] crypto: ccp: Add the SNP_{PAUSE,RESUME}_ATTESTATION
- commands
-From: Sean Christopherson <seanjc@google.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
-	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com, 
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, Larry.Dewey@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|IA0PR11MB7956:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0295e4e5-acfa-4b6d-76e3-08dc686019fe
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?NnRUI8ubGLc/O4sn40ywcvAh+3TyDxxD7zSvdw7WF0IQZTpGSf3hOYfD3UWa?=
+ =?us-ascii?Q?oWKdB8htjat2S9r/aqk4mUBW6se9exa7v0e7nPeqWrivzWyd79e0dSMN1zfd?=
+ =?us-ascii?Q?SbuBhQklaqpwrpuYNTWeESE95PvVso3Pa/MVvjyaA2Ph5FhMbscMaWkcKHB/?=
+ =?us-ascii?Q?/PIvSgLT9DoqIMltK9YpIBHfByHi08amQc6vj5jop35/1Y+LBpg0TT2P1KPs?=
+ =?us-ascii?Q?ffuU/8CgNBXaluUerhTMWxGZcYRPSPslrJBmHsoBdZrIPMsUJ7zAiMGyxpT2?=
+ =?us-ascii?Q?/GjuZ1UGta6AFLu8Ewz0U1Zxv9Jc34qjFkflnUKBccmGZyuNo6F7XrPJmgJp?=
+ =?us-ascii?Q?Of6WVbfPUELi+x75S7wKkCGpi6XL19JsxPaqzLx7jkmcsSmJzDnYrbdmcMIN?=
+ =?us-ascii?Q?6RCbOi8fT4AmcB0dX//TESL1ICxoSy54j6F/ZW1HvnebAQvdBpj3ZkLz/Fgy?=
+ =?us-ascii?Q?ltITgJE24Tcq0Wt3MBNtlJakB/O+GHQFErlx6oYpt7FyrJ0fa4B8LoyWhXFY?=
+ =?us-ascii?Q?asumh1vff8fBI0tYzxan3OZInBYZqYDeM59k+A0LhscvLfqpQcAUMNSp2c4m?=
+ =?us-ascii?Q?AzjEBM0DrzLQU9t0bVj5SfsV2vOdcUNezMAq5XCRyymohUHeVS+2bGfgiV09?=
+ =?us-ascii?Q?f58mv3X9FXEov5I1ZXpJTCwQxyzLtRFcQJjK2eZN3BkI1blfekzA6zW8nt/p?=
+ =?us-ascii?Q?0YAwfORTG1P0TbZobQiboQNcnGn2x4rQiYwKq+1IEGb1TpqHg3+toPtBOBGs?=
+ =?us-ascii?Q?/+P+SJnydfZVTUGq624lMAhs8Ic495QjRGRiI0Jg6FFwNMc1f2IZbgjfDIDs?=
+ =?us-ascii?Q?3G7tDzOl6oARjh+hWRfbFoaXnH6JvsQUZjfMtyJcr7z0aBTp1wCJxLCcLYYi?=
+ =?us-ascii?Q?tXepoWMNZ2XPhjoxULnpYmOuh2nM9urQvzy27TpEkqY5qCg4z1nlgUDzFzP/?=
+ =?us-ascii?Q?gzPx74WvNNSF8igM6XABGZeQ64l1dTWpucUfPJ+vKFWvJNIqTRA1eMnd9WRx?=
+ =?us-ascii?Q?0oQbJ86gCidl/pkwm0lj8DWK+AdAO4HDbM/efoWpUQ52QyMIbXVxmjqTTNVW?=
+ =?us-ascii?Q?8EKb/h2cVNMg4DV4YfSGn1Ah9c3IyLo+3KTUXGOVwKpWBlW9Nrn8di1sveGd?=
+ =?us-ascii?Q?+a7Gsl0ecEQhD8A7Xq6iMkE4O5n5hdp9LOmtyRONujOnmLOY9x9rjQoFRh5o?=
+ =?us-ascii?Q?51IO3qOPSQCKN7wBVLyFWnI2OyIQB0FUOYpLVxmc1WZB+/xIs1PmED0q8otk?=
+ =?us-ascii?Q?nbpBS+LoAP0TJNoarZk8PmWWgeUvwAWvMtlGFitDZw=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zIJMhVqg9wugnbHP0w7ZN8JFDLDlPa08zKfuDTAdy63yh3wzuO7hMAaK9HJu?=
+ =?us-ascii?Q?mts5bDGp5O9Oq9mXELTjaWmvCfxiMARps75QU447rHe0y4vhSO1cvCFIcnkO?=
+ =?us-ascii?Q?nyMs2XAq4lsze17ZC4jXNUp6yXT4zgqgtaCad6yuq1pKHyi5hQDtz/EAYM9F?=
+ =?us-ascii?Q?PpHsFY3f3JnzWtOnIW8X0qe5onEoewEVVUq3BZT0XIGvb5F9EY3wwmIqFGn5?=
+ =?us-ascii?Q?jH/AZtcRVzLgGOWeFCGRbsTrhJopXPRfbGua210yzP31WmXJgT2rSfkB66Kq?=
+ =?us-ascii?Q?XAlkbntxZa2InJxmxJKKG6ZOXzvh5W3ozKXXKMj6zaJ8W5EVx3WpopR+JveV?=
+ =?us-ascii?Q?pEe3Q+Bu2mVpMXtz395ecO2LXchJDEyJGDNa8fyW4bU9rmQCG9fQktasAZOj?=
+ =?us-ascii?Q?MVXwBvwmQStWZyKemiK++QhFwLRfgdhoSKXg7qUFYihI56c3d/isUNGhwdU3?=
+ =?us-ascii?Q?jFfBC2/aZifF62aSALPmxJ+3hH5VbY3MY2HfKprT42VEyABxPsNdZ0Vv5qMU?=
+ =?us-ascii?Q?zCXxS4wpOPuph5IUnHC4fC6wfpmo9kFKdmZ13NovK2medFHthN1x84a6KGqW?=
+ =?us-ascii?Q?rJfnGiEyfbVgl5A3ZXf4/1RnH/VJqpkoFUwvNJ1YeLxbW4uLqsy3ElDvPCzZ?=
+ =?us-ascii?Q?cOUmZsZ+I9z6qFluOHxOh0u/cYjbvwp/2Bq/R7otqODihN/20Od9HlY2/24O?=
+ =?us-ascii?Q?kxEVC9mXPxTsariYVW1njb8pfur2s7XY2Pl4jFLa+VhAURCKQ0a09yO8fseN?=
+ =?us-ascii?Q?dMtwKTwqVqcVRqZ1FZsORxwkCm2DR2bbyBSegmILg+dAZUPm2oFIDXeMEOEO?=
+ =?us-ascii?Q?cX0a8uegUiqC2PKpo/zogTqD1FM4RPueW/kubiDwz8P4axvALtVYPw2guzHo?=
+ =?us-ascii?Q?4mKI5/YlaBFDzP3epo/QERTQKF9dadLwhG0zWTqGbdzbqudLdlZFvzZO6lVp?=
+ =?us-ascii?Q?v7gktHQaXilfqnUVnG6p61KREg0ZSB6f/N871KlCFBfws4mTonZC+VXFYLHH?=
+ =?us-ascii?Q?iXC9JEwxhrzlDRs0FttpnniMAyOeOCzbYbNAPlPxULeEcp4K3k8bipkThFtg?=
+ =?us-ascii?Q?eIVdG12BnyO2k6qxtILzDq03+dp3gblKrppMfuqysk5pLjam8HUB78avtYrN?=
+ =?us-ascii?Q?uJkKzrxk+sSC1WceUlGzHy5yLxqjl1N3Ll6f4fYlSPbJuTLug4Y66CToYR7M?=
+ =?us-ascii?Q?B9dPl/D+Dt1rmmYEP59d1auPfkA7LQR/bfMNgmjXynxYv9nveyD9Cl/q4Lyq?=
+ =?us-ascii?Q?oqJTboESjuUcIDkCAmuEBgouQPk4WeC+YGOaYf1NczziCKhU3X/LGjR+qu6y?=
+ =?us-ascii?Q?+dGVwLtTxVBliZCQzTfBALHeOg9mrhk5VdIanUvk4X85RPIpYcSksODjG9mA?=
+ =?us-ascii?Q?ZRuU9ejK/XP8p8+qN3ILOdI1Or11r6cfdO3XEPBsoLX0RctFo39DwbQPPgn1?=
+ =?us-ascii?Q?q0oczxpdM/Y2aK/3KYzlsFsoMwI0Hp3p6yKtl1sH9baAUPrTek2yLwlucK2M?=
+ =?us-ascii?Q?uytpFHP3IO0atSbmpsJXNNmxsOHRPztAgIJyziI3uwzzN+3FQMKNDhyfsZs2?=
+ =?us-ascii?Q?Ut5WubkrQ7nnrlcqBzvVt8cM4kIr+EeX1xNsbOZRjAL7XsLMTGygk9tCxx4M?=
+ =?us-ascii?Q?Bg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0295e4e5-acfa-4b6d-76e3-08dc686019fe
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2024 15:21:54.4188
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jdN3aa8j+i+VZignCGoQ+SsTssuvF1x0svGkX/N2w9SNhv5noFBOPUA/gvUPVtZDzNwBswTKVqb8MUr9MB/FKcM9YUN+kAEpM0NH62W0e78=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7956
+X-OriginatorOrg: intel.com
 
-On Fri, Apr 26, 2024, Michael Roth wrote:
-> On Fri, Apr 26, 2024 at 05:10:10PM -0700, Sean Christopherson wrote:
-> > e.g. put the cert in a directory along with a lock.  Actually, IIUC, there doesn't
-> > even need to be a separate lock file.  I know very little about userspace programming,
-> > but common sense and a quick search tells me that file locks are a solved problem.
+On Mon, Apr 29, 2024 at 09:56:45AM -0400, Josef Bacik wrote:
+> On Fri, Apr 26, 2024 at 11:54:29AM +0100, Giovanni Cabiddu wrote:
+> > From: Weigang Li <weigang.li@intel.com>
 > > 
-> > E.g. it took me ~5 minutes of Googling to come up with this, which AFAICT does
-> > exactly what you want.
+> > Add support for zlib compression and decompression through the acomp
+> > APIs.
+> > Input pages are added to an sg-list and sent to acomp in one request.
+> > Since acomp is asynchronous, the thread is put to sleep and then the CPU
+> > is freed up. Once compression is done, the acomp callback is triggered
+> > and the thread is woke up.
 > > 
-> > touch ~/vlek.cert
-> > (
-> >   flock -e 200
-> >   echo "Locked the cert, sleeping for 10 seconds"
-> >   sleep 10
-> >   echo "Igor, it's alive!!!!!!"
-> > ) 200< vlek.cert
+> > This patch doesn't change the BTRFS disk format, this means that files
+> > compressed by hardware engines can be de-compressed by the zlib software
+> > library, and vice versa.
 > > 
-> > touch ~/vlek.cert
-> > (
-> >   flock -s 201
-> >   echo "Got me a shared lock, no updates for you!"
-> > ) 201< vlek.cert
-> > 
+> > Limitations:
+> >   * The implementation tries always to use an acomp even if only
+> >     zlib-deflate-scomp is present
+> >   * Acomp does not provide a way to support compression levels
 > 
-> Hmm... I did completely miss this option. But I think there are still some
-> issues here. IIUC you're suggesting (for example):
+> That's a non-starter.  We can't just lie to the user about the compression level
+> that is being used.  If the user just does "-o compress=zlib" then you need to
+> update btrfs_compress_set_level() to figure out the compression level that acomp
+> is going to use and set that appropriately, so we can report to the user what is
+> actually being used.
 > 
->   "Management":
->   a) writelock vlek.cert
->   b) perform SNP_LOAD_VLEK and update vlek.cert contents
->   c) unlock vlek.cert
-> 
->   "QEMU":
->   a) readlock vlek.cert
->   b) copy cert into guest buffer
->   c) unlock vlek.cert
-> 
-> The issue is that after "QEMU" unlocks and return the cert to KVM we'll
-> have:
-> 
->   "KVM"
->   a) return from EXT_GUEST_REQ exit to userspace
->   b) issue the attestation report to firmware
->   c) return the attestation report and cert to the guest
-> 
-> Between a) and b), "Management" can complete another entire update, but
-> the cert that it passes back to the guest will be stale relative to the
-> key used to sign the attestation report.
+> Additionally if a user specifies a compression level you need to make sure we
+> don't do acomp if it doesn't match what acomp is going to do.
+Thanks for the feedback. We should then extend the acomp API to take the
+compression level.
+@Herbert, do you have any objection if we add the compression level to
+the acomp tfm and we add an API to set it? Example:
 
-I was thinking userspace would hold the lock across SEV_CMD_SNP_GUEST_REQUEST.
+    tfm = crypto_alloc_acomp("deflate", 0, 0);
+    acomp_set_level(tfm, compression_level);
 
-   QEMU:
-    a) readlock vlek.cert
-    b) copy cert into guest buffer
-    c) set kvm_run->immediate_exit
-    d) invoke KVM_RUN
-    e) KVM sends SEV_CMD_SNP_GUEST_REQUEST to PSP
-    f) KVM exits to userspace with -EINTR
-    g) unlock vlek.cert
-    h) invoke KVM_RUN (resume the guest)
+> Finally, for the normal code review, there's a bunch of things that need to be
+> fixed up before I take a closer look
+> 
+> - We don't use pr_(), we have btrfs specific printk helpers, please use those.
+> - We do 1 variable per line, fix up the variable declarations in your functions.
+I see that the code in fs/btrfs/zlib.c uses both pr_() and more than one
+variable per line. If we change it, will mixed style be a concern?
 
-> If we need to take more time to explore other options it's not
-> absolutely necessary to have the kernel solve this now. But every userspace
-> will need to solve it in some way so it seemed like it might be nice to
-> have a simple reference implementation to start with.
-
-Shoving something into the kernel is not a "reference implementation", especially
-not when it impacts the ABI of multiple subsystems.
+-- 
+Giovanni
