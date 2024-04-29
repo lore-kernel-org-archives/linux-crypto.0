@@ -1,396 +1,166 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190A783A09;
-	Mon, 29 Apr 2024 16:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952D314A8D;
+	Mon, 29 Apr 2024 16:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714406670; cv=none; b=Nn76MKAWq7DQuT2ZnFMeSEjxERCJj3UJl2q6gT+baCiwohgQAAQiXaXMJ4vNatBzDMw3K4LZAxFzh7lf8iwEsQdhsLVMPyKbRdMasSTuyjcXfmWjd3TVHqSsGrteTU2i27UrHoWjY+8deiL12WV6QiM9hfCI0M6rBk3zOPyxOKs=
+	t=1714407229; cv=none; b=XpNfKqjFLAlgCN78lBrDaQHSAQ/JzZ7RGi0snZo9jfZkIaRWicXDwhaYlxY9OuRHLsL4rZzFxGuOzcYi29mR2D2w0FN5qhVRyf/UH5ZK1+GcY0G0HcEddBQYInaSrnRVha/730SySu67tmAQIqInMWtKAn074u9ClhZ7DdCXWAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714406670; c=relaxed/simple;
-	bh=jYdgcbHdxZHXUTE1iD8IOfdIkVdZtPlbGkDfjgc9Op4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g2x3iTqdI9F61h78Z4EwHVxDoKX0H2rsnrXB5fIfpbgraB/VTkd5YwMvlvcum1OM71Psn3effJXwMt9IFuDVBbLWlWKnKwg7CWSbtxd5NSZtSJDaOy8yqPobJGvS8NQ4q8Qb00SfK58/fXjc1k72tCQuKUG8cYoglwCSww1CYdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=xfmeiMSJ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=YbCdvb8t; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=LUmNnP/k; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=1PDKFeZ2; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1714407229; c=relaxed/simple;
+	bh=N4AXQ9Sm3ZMZO5yFRp5NX2KC0ZilNb9dYL3CF2h/4eE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VTn+FkUY1QtwRN20C21zTX8z/MMs2YBlk/jMYH4eGGPU7Nx2CB0rD++oyMcMUMApLtWyBEI4DbjOi++5UgMG8Pm1jP3RyPfBX167/HUcE8X9u9XDA4wNArp1Gr3m5xCBat6aD1uC897ZMnmOhn4/zelwzlMQdL6GQ+1rUSc3DAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=n4Kjlks1; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xfmeiMSJ";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="YbCdvb8t";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="LUmNnP/k";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="1PDKFeZ2"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 03DA21F458;
-	Mon, 29 Apr 2024 16:04:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1714406663;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FVgUd/9bYaxKsI1Mq3E7U6g1i8XvBLC12GPaK4k2gPI=;
-	b=xfmeiMSJgPT+oI6RGnJ5q45/KhvRht8opQ+sQCR6OyhUP7LmAXm3SLFCxJS6Ml9jVpcrUo
-	u/fQSAtqQwIm4u+3xUUV3lgZ6YC0Q3q04HAHXhV3SQLT94F126Wp3Upvod3V8Y2akn21BL
-	71pjX7EOjYwcBbR5rmjMhzW2buhXWVg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1714406663;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FVgUd/9bYaxKsI1Mq3E7U6g1i8XvBLC12GPaK4k2gPI=;
-	b=YbCdvb8t7/oPoWbfr+rah8I+6c8cFfIHwpb/IYEJHM1CYbjJ3DNVS68MwQUUvnKqaAa/NL
-	FjYDbhNxir0/PrDw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b="LUmNnP/k";
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=1PDKFeZ2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1714406662;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FVgUd/9bYaxKsI1Mq3E7U6g1i8XvBLC12GPaK4k2gPI=;
-	b=LUmNnP/kbQihatczJD6mYPhsan4ZoaY7f6ThpcTtzpxP5Asu3RsddV/WGX0L8QCzR4N9VH
-	WFN+PbvwRI6AbD4WdXpzzNf6SE95XfMnwHWmIQDE3Ie7EA/nBNNKF/FV5KcTpL/c7HiR/G
-	orojxDKmlvkFR0KZulKKAbhBLALCNQ0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1714406662;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FVgUd/9bYaxKsI1Mq3E7U6g1i8XvBLC12GPaK4k2gPI=;
-	b=1PDKFeZ2Oo/MZwlGlKiX4k9paC/ZZa1x2yG8mGXiVI3puYgxgQHp78/zXlpNmGQ1n8JrvI
-	qUt1Vrrvpq/KSnAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CD0B1139DE;
-	Mon, 29 Apr 2024 16:04:21 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id QeiEMQXFL2YGKwAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Mon, 29 Apr 2024 16:04:21 +0000
-Date: Mon, 29 Apr 2024 17:57:08 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: clm@fb.com, josef@toxicpanda.com, dsterba@suse.com,
-	herbert@gondor.apana.org.au, linux-btrfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org, qat-linux@intel.com, embg@meta.com,
-	cyan@meta.com, brian.will@intel.com, weigang.li@intel.com
-Subject: Re: [RFC PATCH 6/6] btrfs: zlib: add support for zlib-deflate
- through acomp
-Message-ID: <20240429155708.GF2585@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20240426110941.5456-1-giovanni.cabiddu@intel.com>
- <20240426110941.5456-7-giovanni.cabiddu@intel.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="n4Kjlks1"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43TG1r71003472;
+	Mon, 29 Apr 2024 16:13:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=h4+iE+KbJHd6Gc6j7wA2FWoZzMmC3ovRPKg0l7zryMI=;
+ b=n4Kjlks1gytAdTnkrjLPVkDy7aCkfeqwDzojR6qUHF6iapAEjVLR3Qxu4vvKmv5+HeJ2
+ jNEYmAbQLM0vopPE1ESJiVT5UotnaMeqjzvBoMN4Q2and1mYe1RNgZu0/yphmlZHPeGP
+ Gaw6n2UKNwiwa9CRqbiWSq+PNzadowVreIjCFhL6xiiorievGCV4v5ZDKkbpdlouftiM
+ tWy14BZ9zU9KxNm8reTwzij8Gr33T54u0Zr8EiyP5Wq3nLYnC1xnqXGqDCVkQ9OJilvY
+ FWD59YDFNxAz7+80fXq8ncLU4BUo608mHFBg35qlhCItZ3pfH01ONxsqo3smy0Nwmhhe Eg== 
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xteqar13n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Apr 2024 16:13:40 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43TF28OW003036;
+	Mon, 29 Apr 2024 16:13:38 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xscpp8714-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Apr 2024 16:13:38 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43TGDaiN15925780
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Apr 2024 16:13:38 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 657D158062;
+	Mon, 29 Apr 2024 16:13:36 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A4CA35805A;
+	Mon, 29 Apr 2024 16:13:35 +0000 (GMT)
+Received: from sbct-3.bos2.lab (unknown [9.47.158.153])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 29 Apr 2024 16:13:35 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.ibm.com>
+To: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, lukas@wunner.de, jarkko@kernel.org,
+        Stefan Berger <stefanb@linux.ibm.com>
+Subject: [PATCH v2] crypto: ecc - Prevent ecc_digits_from_bytes from reading too many bytes
+Date: Mon, 29 Apr 2024 12:13:16 -0400
+Message-ID: <20240429161316.3146626-1-stefanb@linux.ibm.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240426110941.5456-7-giovanni.cabiddu@intel.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.21 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DWL_DNSWL_BLOCKED(0.00)[suse.cz:dkim];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:dkim,suse.cz:replyto];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 03DA21F458
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Score: -4.21
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: arv7NAPhe9CPalAeYXLn5Ttmz0HUse4d
+X-Proofpoint-ORIG-GUID: arv7NAPhe9CPalAeYXLn5Ttmz0HUse4d
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-29_14,2024-04-29_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 mlxlogscore=999 spamscore=0 adultscore=0 suspectscore=0
+ impostorscore=0 priorityscore=1501 phishscore=0 clxscore=1015
+ malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404290104
 
-On Fri, Apr 26, 2024 at 11:54:29AM +0100, Giovanni Cabiddu wrote:
-> From: Weigang Li <weigang.li@intel.com>
-> +static int acomp_comp_pages(struct address_space *mapping, u64 start,
-> +			    unsigned long len, struct page **pages,
-> +			    unsigned long *out_pages,
-> +			    unsigned long *total_in,
-> +			    unsigned long *total_out)
-> +{
-> +	unsigned int nr_src_pages = 0, nr_dst_pages = 0, nr_pages = 0;
-> +	struct sg_table in_sg = { 0 }, out_sg = { 0 };
-> +	struct page *in_page, *out_page, **in_pages;
-> +	struct crypto_acomp *tfm = NULL;
-> +	struct acomp_req *req = NULL;
-> +	struct crypto_wait wait;
-> +	int ret, i;
-> +
-> +	nr_src_pages = (len + PAGE_SIZE - 1) >> PAGE_SHIFT;
-> +	in_pages = kcalloc(nr_src_pages, sizeof(struct page *), GFP_KERNEL);
+Prevent ecc_digits_from_bytes from reading too many bytes from the input
+byte array in case an insufficient number of bytes is provided to fill the
+output digit array of ndigits. Therefore, initialize the most significant
+digits with 0 to avoid trying to read too many bytes later on. Convert the
+function into a regular function since it is getting too big for an inline
+function.
 
-The maximum length is bounded so you could store the in_pages array in
-zlib's workspace.
+If too many bytes are provided on the input byte array the extra bytes
+are ignored since the input variable 'ndigits' limits the number of digits
+that will be filled.
 
-> +	if (!in_pages) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	for (i = 0; i < nr_src_pages; i++) {
-> +		in_page = find_get_page(mapping, start >> PAGE_SHIFT);
-> +		out_page = alloc_page(GFP_NOFS | __GFP_HIGHMEM);
+Fixes: d67c96fb97b5 ("crypto: ecdsa - Convert byte arrays with key coordinates to digits")
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 
-Output pages should be newly allocated by btrfs_alloc_compr_folio()
+---
 
-> +		if (!in_page || !out_page) {
-> +			ret = -ENOMEM;
-> +			goto out;
-> +		}
-> +		in_pages[i] = in_page;
-> +		pages[i] = out_page;
-> +		nr_dst_pages += 1;
-> +		start += PAGE_SIZE;
-> +	}
-> +
-> +	ret = sg_alloc_table_from_pages(&in_sg, in_pages, nr_src_pages, 0,
-> +					nr_src_pages << PAGE_SHIFT, GFP_KERNEL);
+v2:
+ - un-inline function
+ - use memset
+---
+ crypto/ecc.c                  | 22 ++++++++++++++++++++++
+ include/crypto/internal/ecc.h | 15 ++-------------
+ 2 files changed, 24 insertions(+), 13 deletions(-)
 
-I'm not sure if the sg interface allows to use an existing buffer but
-the input parameters are bounded in size and count so the allocation
-should be dropped and replaced by workspace data.
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index c1d2e884be1e..fe761256e335 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -68,6 +68,28 @@ const struct ecc_curve *ecc_get_curve(unsigned int curve_id)
+ }
+ EXPORT_SYMBOL(ecc_get_curve);
+ 
++void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
++			   u64 *out, unsigned int ndigits)
++{
++	int diff = ndigits - DIV_ROUND_UP(nbytes, sizeof(u64));
++	unsigned int o = nbytes & 7;
++	__be64 msd = 0;
++
++	/* diff > 0: not enough input bytes: set most significant digits to 0 */
++	if (diff > 0) {
++		ndigits -= diff;
++		memset(&out[ndigits - 1], 0, diff * sizeof(u64));
++	}
++
++	if (o) {
++		memcpy((u8 *)&msd + sizeof(msd) - o, in, o);
++		out[--ndigits] = be64_to_cpu(msd);
++		in += o;
++	}
++	ecc_swap_digits(in, out, ndigits);
++}
++EXPORT_SYMBOL(ecc_digits_from_bytes);
++
+ static u64 *ecc_alloc_digits_space(unsigned int ndigits)
+ {
+ 	size_t len = ndigits * sizeof(u64);
+diff --git a/include/crypto/internal/ecc.h b/include/crypto/internal/ecc.h
+index 7ca1f463d1ec..f7e75e1e71f3 100644
+--- a/include/crypto/internal/ecc.h
++++ b/include/crypto/internal/ecc.h
+@@ -64,19 +64,8 @@ static inline void ecc_swap_digits(const void *in, u64 *out, unsigned int ndigit
+  * @out       Output digits array
+  * @ndigits:  Number of digits to create from byte array
+  */
+-static inline void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
+-					 u64 *out, unsigned int ndigits)
+-{
+-	unsigned int o = nbytes & 7;
+-	__be64 msd = 0;
+-
+-	if (o) {
+-		memcpy((u8 *)&msd + sizeof(msd) - o, in, o);
+-		out[--ndigits] = be64_to_cpu(msd);
+-		in += o;
+-	}
+-	ecc_swap_digits(in, out, ndigits);
+-}
++void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
++			   u64 *out, unsigned int ndigits);
+ 
+ /**
+  * ecc_is_key_valid() - Validate a given ECDH private key
+-- 
+2.43.0
 
-> +	if (ret)
-> +		goto out;
-> +
-> +	ret = sg_alloc_table_from_pages(&out_sg, pages, nr_dst_pages, 0,
-> +					nr_dst_pages << PAGE_SHIFT, GFP_KERNEL);
-> +	if (ret)
-> +		goto out;
-> +
-> +	crypto_init_wait(&wait);
-> +	tfm = crypto_alloc_acomp("zlib-deflate", 0, 0);
-
-AFAIK the TFM should be allocated only once way before any IO is done
-and then reused, this can trigger resolving the best implementation or
-maybe even module loading.
-
-> +	if (IS_ERR(tfm)) {
-> +		ret = PTR_ERR(tfm);
-> +		goto out;
-> +	}
-> +
-> +	req = acomp_request_alloc(tfm);
-
-The request should be in workspace, the only initialization I see
-setting the right ->tfm pointer.
-
-> +	if (!req) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	acomp_request_set_params(req, in_sg.sgl, out_sg.sgl, len,
-> +				 nr_dst_pages << PAGE_SHIFT);
-> +	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> +				   crypto_req_done, &wait);
-> +
-> +	ret = crypto_wait_req(crypto_acomp_compress(req), &wait);
-> +	if (ret)
-> +		goto out;
-> +
-> +	*total_in = len;
-> +	*total_out = req->dlen;
-> +	nr_pages = (*total_out + PAGE_SIZE - 1) >> PAGE_SHIFT;
-> +
-> +out:
-> +	sg_free_table(&in_sg);
-> +	sg_free_table(&out_sg);
-> +
-> +	if (in_pages) {
-> +		for (i = 0; i < nr_src_pages; i++)
-> +			put_page(in_pages[i]);
-> +		kfree(in_pages);
-
-Pages returned back to the pool by btrfs_free_compr_folio()
-
-> +	}
-> +
-> +	/* free un-used out pages */
-> +	for (i = nr_pages; i < nr_dst_pages; i++)
-> +		put_page(pages[i]);
-> +
-> +	if (req)
-> +		acomp_request_free(req);
-> +
-> +	if (tfm)
-> +		crypto_free_acomp(tfm);
-> +
-> +	*out_pages = nr_pages;
-> +
-> +	return ret;
-> +}
-> +
-> +static int acomp_zlib_decomp_bio(struct page **in_pages,
-> +				 struct compressed_bio *cb, size_t srclen,
-> +				 unsigned long total_pages_in)
-> +{
-> +	unsigned int nr_dst_pages = BTRFS_MAX_COMPRESSED_PAGES;
-> +	struct sg_table in_sg = { 0 }, out_sg = { 0 };
-> +	struct bio *orig_bio = &cb->orig_bbio->bio;
-> +	char *data_out = NULL, *bv_buf = NULL;
-> +	int copy_len = 0, bytes_left = 0;
-> +	struct crypto_acomp *tfm = NULL;
-> +	struct page **out_pages = NULL;
-> +	struct acomp_req *req = NULL;
-> +	struct crypto_wait wait;
-> +	struct bio_vec bvec;
-> +	int ret, i = 0;
-> +
-> +	ret = sg_alloc_table_from_pages(&in_sg, in_pages, total_pages_in,
-> +					0, srclen, GFP_KERNEL);
-
-Any allocation here needs to be GFP_NOFS for now. Actually we'd need
-memalloc_nofs_save/memalloc_nofs_restore around all compression and
-decompression code that does not use GFP_NOFS directly and could call
-other APIs that do GFP_KERNEL. Like crypto or sg.
-
-> +	if (ret)
-> +		goto out;
-> +
-> +	out_pages = kcalloc(nr_dst_pages, sizeof(struct page *), GFP_KERNEL);
-> +	if (!out_pages) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	for (i = 0; i < nr_dst_pages; i++) {
-> +		out_pages[i] = alloc_page(GFP_NOFS | __GFP_HIGHMEM);
-> +		if (!out_pages[i]) {
-> +			ret = -ENOMEM;
-> +			goto out;
-> +		}
-> +	}
-> +
-> +	ret = sg_alloc_table_from_pages(&out_sg, out_pages, nr_dst_pages, 0,
-> +					nr_dst_pages << PAGE_SHIFT, GFP_KERNEL);
-> +	if (ret)
-> +		goto out;
-> +
-> +	crypto_init_wait(&wait);
-> +	tfm = crypto_alloc_acomp("zlib-deflate", 0, 0);
-> +	if (IS_ERR(tfm)) {
-> +		ret = PTR_ERR(tfm);
-> +		goto out;
-> +	}
-> +
-> +	req = acomp_request_alloc(tfm);
-> +	if (!req) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	acomp_request_set_params(req, in_sg.sgl, out_sg.sgl, srclen,
-> +				 nr_dst_pages << PAGE_SHIFT);
-> +	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> +				   crypto_req_done, &wait);
-> +
-> +	ret = crypto_wait_req(crypto_acomp_decompress(req), &wait);
-> +	if (ret)
-> +		goto out;
-> +
-> +	/* Copy decompressed buffer to bio pages */
-> +	bytes_left = req->dlen;
-> +	for (i = 0; i < nr_dst_pages; i++) {
-> +		copy_len = bytes_left > PAGE_SIZE ? PAGE_SIZE : bytes_left;
-> +		data_out = kmap_local_page(out_pages[i]);
-> +
-> +		bvec = bio_iter_iovec(orig_bio, orig_bio->bi_iter);
-> +		bv_buf = kmap_local_page(bvec.bv_page);
-> +		memcpy(bv_buf, data_out, copy_len);
-> +		kunmap_local(bv_buf);
-> +
-> +		bio_advance(orig_bio, copy_len);
-> +		if (!orig_bio->bi_iter.bi_size)
-> +			break;
-> +		bytes_left -= copy_len;
-> +		if (bytes_left <= 0)
-> +			break;
-> +	}
-> +out:
-> +	sg_free_table(&in_sg);
-> +	sg_free_table(&out_sg);
-> +
-> +	if (out_pages) {
-> +		for (i = 0; i < nr_dst_pages; i++) {
-> +			if (out_pages[i])
-> +				put_page(out_pages[i]);
-> +		}
-> +		kfree(out_pages);
-> +	}
-> +
-> +	if (req)
-> +		acomp_request_free(req);
-> +	if (tfm)
-> +		crypto_free_acomp(tfm);
-> +
-> +	return ret;
-> +}
-> +
->  struct list_head *zlib_get_workspace(unsigned int level)
->  {
->  	struct list_head *ws = btrfs_get_workspace(BTRFS_COMPRESS_ZLIB, level);
-> @@ -108,6 +305,15 @@ int zlib_compress_pages(struct list_head *ws, struct address_space *mapping,
->  	unsigned long nr_dest_pages = *out_pages;
->  	const unsigned long max_out = nr_dest_pages * PAGE_SIZE;
->  
-> +	if (crypto_has_acomp("zlib-deflate", 0, 0)) {
-> +		ret = acomp_comp_pages(mapping, start, len, pages, out_pages,
-> +				       total_in, total_out);
-> +		if (!ret)
-> +			return ret;
-> +
-> +		pr_warn("BTRFS: acomp compression failed: ret = %d\n", ret);
-> +		/* Fallback to SW implementation if HW compression failed */
-> +	}
->  	*out_pages = 0;
->  	*total_out = 0;
->  	*total_in = 0;
-> @@ -281,6 +487,16 @@ int zlib_decompress_bio(struct list_head *ws, struct compressed_bio *cb)
->  	unsigned long buf_start;
->  	struct page **pages_in = cb->compressed_pages;
->  
-> +	if (crypto_has_acomp("zlib-deflate", 0, 0)) {
-> +		ret = acomp_zlib_decomp_bio(pages_in, cb, srclen,
-> +					    total_pages_in);
-> +		if (!ret)
-> +			return ret;
-> +
-> +		pr_warn("BTRFS: acomp decompression failed, ret=%d\n", ret);
-> +		/* Fallback to SW implementation if HW decompression failed */
-> +	}
-> +
->  	data_in = kmap_local_page(pages_in[page_in_index]);
->  	workspace->strm.next_in = data_in;
->  	workspace->strm.avail_in = min_t(size_t, srclen, PAGE_SIZE);
-> -- 
-> 2.44.0
-> 
