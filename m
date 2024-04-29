@@ -1,259 +1,128 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B42D86643
-	for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 17:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA33A8595A;
+	Mon, 29 Apr 2024 17:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714410309; cv=none; b=mVG0KSIkgA4Dl5OafFFRdei5eW5kiF6u/PcLW9FHyb0U+fXi0/gGyjsVaazK23cZBfci3jWsgygZwpkxCO4GUaRJ9auJwj1hx1QVSeiULXkoOVE0Iw7Vu9ZHK9CoWjZf4sk2CxFRjRb/PHsLYQExx/Z4SHRaw8WTsQmJFvYr8PU=
+	t=1714410441; cv=none; b=iQIo3ednYkhGvoksuTZZ/7C90/Sr/AIP/cbB6k8G2y+lELyg8/WTbjBny4Zvz1ZHiw2Oz8bgbY0MMGczA7f0EKkfRPFfrmmnpeK2G5jpC+gmqy3av7EAbKBh/sw/1gDOjtqdQlI0BFtkjF2Hrw9p61it+l775gSvb1ttYagRdkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714410309; c=relaxed/simple;
-	bh=MN4P/h1kq1Q02r/Lhf7jm0fR1hoE8r8RghANUoLDXuQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AEo/JRiDsjxu5zo2xTLUAgQuTx+06OiD+UtPegdvP73o5CkVUYiGbxNDI2CWWMvvsR0qF+rn4BNVI6WEfdUieoUUINeJykQgaZU4IYXikKz/ahLxsBo7Vjm1gwpu3TWho5JytUpJIBr+HVtFwMw+057g9aI2EX4+pqyKx10M34E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=drvU758E; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1714410441; c=relaxed/simple;
+	bh=Ig19MYaxZdSQhmDoDlYi6kLIFuiHYwBd3fglHUPaw4Q=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=QOkPH5ZJtbr1nai7WkZ93Lp/gJNUpmAcfOsuEPAehv7MVx2HgxpVjhZBK3Ca+rcpd9jXLO2nK4TuZrRl5p6wHSzO7+ilYxYvlpPn+0HrwYOxjAMw5E6wilVbowriRAkSy4GHqX8Gft0llgRHC4anPNdXuQovbhW0VbRB/UkaMgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c/CVFZA2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="drvU758E"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7d9e70f388fso200310039f.2
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 10:05:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1714410306; x=1715015106; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NjIM1YsOHJSXus8VNmDaNi8MZ1j7PDi3kmS0uCHnMmg=;
-        b=drvU758EbpECeq2zHD9OBmPsG9kodvQQ/Zo8huvVjKVTaiciYwoHFmriEPJlxU1aB0
-         6UKB0Pof0r7fGmdG3fNTp9j7xcY2KonHy+QIQ8h8Nu9nMrnuKzbKkyeht/BQUqCuLAie
-         ar0NvmSl73jVBq/CAdctJ7V0MZla8b9CDO+Hg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714410306; x=1715015106;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NjIM1YsOHJSXus8VNmDaNi8MZ1j7PDi3kmS0uCHnMmg=;
-        b=P5bXUGuJ1F1DQoZ3WRL76hRLOOcsQXB9vwvqS3W0WvGGW81yj3IhDteK1FUVeAl9eq
-         1L3gki3hSHZqWI6ZIRnJn8jTODkFQ7Rd/EgAg2imd/VatDYxtklBvdfU3h5n7plSVEAA
-         kb/CDD9HTHA7/gTWvXGEgXcz2kNiHT7KdgVw1A0qgOxUQfFIUKdH+wzIQorh52lAsGpD
-         HGUICeDwLu+ZI0s8DnIcEjA7TVIMhFvxxe0fMY9u61icorCmtj3MEgtveg8rvuas59pZ
-         PkwsHNDfkAjc+M9S6S1WQzwTHa1ecSkq5pT7zux2wfABM2QBAs+4RaW4pq2z9Nq/eEYQ
-         SDnw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1S0RDROTrNGL9vdswelRqsVjZNtGcF5A0DHblKVZJqDDjwc6StSJK1JhD3EXK+LpNnOQG7uOiJLe9IpgJDxpCgoghtlC8Q5ycJusc
-X-Gm-Message-State: AOJu0Yz6rlxVI9Lu+NWluRw5Iu+v5EZK5wHzSN/lm/SjgS2iWsJDscBz
-	Z9UId5ZQaIh7RdLpip8YI59T0KQzdGMWZTUY9FYlIYxKCMo0Kku5uEYB3N64oA==
-X-Google-Smtp-Source: AGHT+IHFoa7yUHDaRgqu4l/JUQo/w0VQEfcK74Y0V+lFVzAsB35zJ7rZlOdiXClJHSoCrRrlV+IkTQ==
-X-Received: by 2002:a5e:9246:0:b0:7de:a753:82b3 with SMTP id z6-20020a5e9246000000b007dea75382b3mr420256iop.15.1714410306525;
-        Mon, 29 Apr 2024 10:05:06 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id x71-20020a63864a000000b00606dd49d3b8sm9250880pgd.57.2024.04.29.10.05.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Apr 2024 10:05:04 -0700 (PDT)
-Date: Mon, 29 Apr 2024 10:05:01 -0700
-From: Kees Cook <keescook@chromium.org>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Haren Myneni <haren@us.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH][next] crypto/nx: Avoid potential
- -Wflex-array-member-not-at-end warning
-Message-ID: <202404290947.4A8BF6A6@keescook>
-References: <ZgHmRNcR+a4EJX94@neat>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c/CVFZA2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCFE3C113CD;
+	Mon, 29 Apr 2024 17:07:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714410441;
+	bh=Ig19MYaxZdSQhmDoDlYi6kLIFuiHYwBd3fglHUPaw4Q=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=c/CVFZA2iWSHoZmV8qZGuWnrG7Na2Vrm4xsEbtFPAeVBpqQQbmZTRAivpId+ZMLs0
+	 U5d/0DnzmMVPgY+oB5AHuuJOwk8vF+BNbgTlJwD6w1o1z6N4UgoeWly5QBdCctkNcn
+	 o0Uu5WLsHADHVfK3e+tSh+55Q64VDD+BgEUWiWxjH5DgzWQAhBxabpGtjG/PdlM+q5
+	 gpydtu0mUprs/0bRXZrfwPav13fAGRwgHG04eyAl7pIpUWmxR/YMXkv+u89Phi7z0U
+	 +qFY+ahqtyf5YZvnmrd7+l/tf6Oz0HeAH6ibN0LOe2Cu2zrkpR6xlS2w+F8KPCetqR
+	 LHFXYJNct3yRw==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZgHmRNcR+a4EJX94@neat>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 29 Apr 2024 20:07:18 +0300
+Message-Id: <D0WRS2FV8DBK.41XFI0SAD18M@kernel.org>
+Cc: <linux-kernel@vger.kernel.org>, <lukas@wunner.de>
+Subject: Re: [PATCH v2] crypto: ecc - Prevent ecc_digits_from_bytes from
+ reading too many bytes
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Stefan Berger" <stefanb@linux.ibm.com>, <keyrings@vger.kernel.org>,
+ <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+ <davem@davemloft.net>
+X-Mailer: aerc 0.17.0
+References: <20240429161316.3146626-1-stefanb@linux.ibm.com>
+ <D0WRD3IZ3AJC.GWZHZLHHBJ5B@kernel.org>
+ <f001bc3f-0c70-4118-bc71-8455808004b4@linux.ibm.com>
+In-Reply-To: <f001bc3f-0c70-4118-bc71-8455808004b4@linux.ibm.com>
 
-On Mon, Mar 25, 2024 at 03:01:56PM -0600, Gustavo A. R. Silva wrote:
-> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
-> ready to enable it globally.
-> 
-> Use the `__struct_group()` helper to separate the flexible array
-> from the rest of the members in flexible `struct nx842_crypto_header`,
-> through tagged `struct nx842_crypto_header_hdr`, and avoid embedding
-> the flexible-array member in the middle of `struct nx842_crypto_ctx`.
-> 
-> Also, use `container_of()` whenever we need to retrieve a pointer to
-> the flexible structure.
-> 
-> This code was detected with the help of Coccinelle, and audited and
-> modified manually.
-> 
-> Link: https://github.com/KSPP/linux/issues/202
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
->  drivers/crypto/nx/nx-842.c |  6 ++++--
->  drivers/crypto/nx/nx-842.h | 11 +++++++----
->  2 files changed, 11 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
-> index 2ab90ec10e61..82214cde2bcd 100644
-> --- a/drivers/crypto/nx/nx-842.c
-> +++ b/drivers/crypto/nx/nx-842.c
-> @@ -251,7 +251,9 @@ int nx842_crypto_compress(struct crypto_tfm *tfm,
->  			  u8 *dst, unsigned int *dlen)
->  {
->  	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
-> -	struct nx842_crypto_header *hdr = &ctx->header;
-> +	struct nx842_crypto_header *hdr =
-> +				container_of(&ctx->header,
-> +					     struct nx842_crypto_header, hdr);
->  	struct nx842_crypto_param p;
->  	struct nx842_constraints c = *ctx->driver->constraints;
->  	unsigned int groups, hdrsize, h;
-> @@ -490,7 +492,7 @@ int nx842_crypto_decompress(struct crypto_tfm *tfm,
->  	}
->  
->  	memcpy(&ctx->header, src, hdr_len);
-> -	hdr = &ctx->header;
-> +	hdr = container_of(&ctx->header, struct nx842_crypto_header, hdr);
->  
->  	for (n = 0; n < hdr->groups; n++) {
->  		/* ignore applies to last group */
-> diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
-> index 7590bfb24d79..1f42c83d2683 100644
-> --- a/drivers/crypto/nx/nx-842.h
-> +++ b/drivers/crypto/nx/nx-842.h
-> @@ -157,9 +157,12 @@ struct nx842_crypto_header_group {
->  } __packed;
->  
->  struct nx842_crypto_header {
-> -	__be16 magic;		/* NX842_CRYPTO_MAGIC */
-> -	__be16 ignore;		/* decompressed end bytes to ignore */
-> -	u8 groups;		/* total groups in this header */
-> +	/* New members must be added within the __struct_group() macro below. */
-> +	__struct_group(nx842_crypto_header_hdr, hdr, __packed,
-> +		__be16 magic;		/* NX842_CRYPTO_MAGIC */
-> +		__be16 ignore;		/* decompressed end bytes to ignore */
-> +		u8 groups;		/* total groups in this header */
-> +	);
->  	struct nx842_crypto_header_group group[];
->  } __packed;
->  
-> @@ -171,7 +174,7 @@ struct nx842_crypto_ctx {
->  	u8 *wmem;
->  	u8 *sbounce, *dbounce;
->  
-> -	struct nx842_crypto_header header;
-> +	struct nx842_crypto_header_hdr header;
->  	struct nx842_crypto_header_group group[NX842_CRYPTO_GROUP_MAX];
->  
->  	struct nx842_driver *driver;
+On Mon Apr 29, 2024 at 7:57 PM EEST, Stefan Berger wrote:
+>
+>
+> On 4/29/24 12:47, Jarkko Sakkinen wrote:
+> > On Mon Apr 29, 2024 at 7:13 PM EEST, Stefan Berger wrote:
+> >> Prevent ecc_digits_from_bytes from reading too many bytes from the inp=
+ut
+> >> byte array in case an insufficient number of bytes is provided to fill=
+ the
+> >> output digit array of ndigits. Therefore, initialize the most signific=
+ant
+> >> digits with 0 to avoid trying to read too many bytes later on. Convert=
+ the
+> >> function into a regular function since it is getting too big for an in=
+line
+> >> function.
+> >>
+> >> If too many bytes are provided on the input byte array the extra bytes
+> >> are ignored since the input variable 'ndigits' limits the number of di=
+gits
+> >> that will be filled.
+> >>
+> >> Fixes: d67c96fb97b5 ("crypto: ecdsa - Convert byte arrays with key coo=
+rdinates to digits")
+> >> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+> >>
+> >> ---
+> >>
+> >> v2:
+> >>   - un-inline function
+> >>   - use memset
+> >> ---
+> >>   crypto/ecc.c                  | 22 ++++++++++++++++++++++
+> >>   include/crypto/internal/ecc.h | 15 ++-------------
+> >>   2 files changed, 24 insertions(+), 13 deletions(-)
+> >>
+> >> diff --git a/crypto/ecc.c b/crypto/ecc.c
+> >> index c1d2e884be1e..fe761256e335 100644
+> >> --- a/crypto/ecc.c
+> >> +++ b/crypto/ecc.c
+> >> @@ -68,6 +68,28 @@ const struct ecc_curve *ecc_get_curve(unsigned int =
+curve_id)
+> >>   }
+> >>   EXPORT_SYMBOL(ecc_get_curve);
+> >>  =20
+> >=20
+> > Just a minor nit:
+> >=20
+> > For exported symbol you need to document the function,including
+> > the parameters [1].
+>
+> Like other functions, the ecc_digits_from_bytes also still/already has=20
+> the documentation in the header file:
+>
+> /**
+>   * ecc_digits_from_bytes() - Create ndigits-sized digits array from=20
+> byte array
+>   * @in:       Input byte array
+>   * @nbytes    Size of input byte array
+>   * @out       Output digits array
+>   * @ndigits:  Number of digits to create from byte array
+>   */
+> void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
+>                             u64 *out, unsigned int ndigits);
+>
+>   Should be ok?
 
-Hmm. I think commit 03952d980153 ("crypto: nx - make platform drivers
-directly register with crypto") incorrectly added "struct nx842_driver
-*driver" to the end of struct nx842_crypto_ctx. I think it should be
-before "header".
+I think it should be OK, or at least documentation has not denied
+doing that and gives example how to import from header files:
 
-Then I see:
+https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html
 
-#define NX842_CRYPTO_HEADER_SIZE(g)                             \
-        (sizeof(struct nx842_crypto_header) +                   \
-         sizeof(struct nx842_crypto_header_group) * (g))
+Just had not encountered that before so that said
 
-This is just struct_size(), really. And nothing uses:
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-#define NX842_CRYPTO_HEADER_MAX_SIZE                            \
-        NX842_CRYPTO_HEADER_SIZE(NX842_CRYPTO_GROUP_MAX)
-
-And then looking for what uses struct nx842_crypto_ctx's "group" member,
-I don't see anything except some sizeof()s:
-
-drivers/crypto/nx/nx-common-powernv.c:1044:     .cra_ctxsize = sizeof(struct nx842_crypto_ctx),
-drivers/crypto/nx/nx-common-pseries.c:1021:     .cra_ctxsize = sizeof(struct nx842_crypto_ctx),
-
-This is just a maximally sized ctx (as if the group count were
-NX842_CRYPTO_GROUP_MAX), which we could use struct_size for again:
-
-     .cra_ctxsize = struct_size_t(struct nx842_crypto_ctx, header.group,
-				  NX842_CRYPTO_GROUP_MAX),
-
-So then "group" can be entirely removed from struct nx842_crypto_ctx.
-
-The result means we can also add __counted_by:
-
-
-diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
-index 2ab90ec10e61..144972fe2e6f 100644
---- a/drivers/crypto/nx/nx-842.c
-+++ b/drivers/crypto/nx/nx-842.c
-@@ -62,10 +62,7 @@
-  */
- #define NX842_CRYPTO_MAGIC	(0xf842)
- #define NX842_CRYPTO_HEADER_SIZE(g)				\
--	(sizeof(struct nx842_crypto_header) +			\
--	 sizeof(struct nx842_crypto_header_group) * (g))
--#define NX842_CRYPTO_HEADER_MAX_SIZE				\
--	NX842_CRYPTO_HEADER_SIZE(NX842_CRYPTO_GROUP_MAX)
-+	struct_size_t(nx842_crypto_header, group, g)
- 
- /* bounce buffer size */
- #define BOUNCE_BUFFER_ORDER	(2)
-diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
-index 7590bfb24d79..70d9f99a4595 100644
---- a/drivers/crypto/nx/nx-842.h
-+++ b/drivers/crypto/nx/nx-842.h
-@@ -160,7 +160,7 @@ struct nx842_crypto_header {
- 	__be16 magic;		/* NX842_CRYPTO_MAGIC */
- 	__be16 ignore;		/* decompressed end bytes to ignore */
- 	u8 groups;		/* total groups in this header */
--	struct nx842_crypto_header_group group[];
-+	struct nx842_crypto_header_group group[] __counted_by(groups);
- } __packed;
- 
- #define NX842_CRYPTO_GROUP_MAX	(0x20)
-@@ -171,10 +171,9 @@ struct nx842_crypto_ctx {
- 	u8 *wmem;
- 	u8 *sbounce, *dbounce;
- 
--	struct nx842_crypto_header header;
--	struct nx842_crypto_header_group group[NX842_CRYPTO_GROUP_MAX];
--
- 	struct nx842_driver *driver;
-+
-+	struct nx842_crypto_header header;
- };
- 
- int nx842_crypto_init(struct crypto_tfm *tfm, struct nx842_driver *driver);
-diff --git a/drivers/crypto/nx/nx-common-powernv.c b/drivers/crypto/nx/nx-common-powernv.c
-index 8c859872c183..22ab4a5885f2 100644
---- a/drivers/crypto/nx/nx-common-powernv.c
-+++ b/drivers/crypto/nx/nx-common-powernv.c
-@@ -1041,7 +1041,8 @@ static struct crypto_alg nx842_powernv_alg = {
- 	.cra_driver_name	= "842-nx",
- 	.cra_priority		= 300,
- 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
--	.cra_ctxsize		= sizeof(struct nx842_crypto_ctx),
-+	.cra_ctxsize		= struct_size_t(struct nx842_crypto_ctx, header.group,
-+						NX842_CRYPTO_GROUP_MAX),
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= nx842_powernv_crypto_init,
- 	.cra_exit		= nx842_crypto_exit,
-diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
-index 35f2d0d8507e..fdf328eab6fc 100644
---- a/drivers/crypto/nx/nx-common-pseries.c
-+++ b/drivers/crypto/nx/nx-common-pseries.c
-@@ -1018,7 +1018,8 @@ static struct crypto_alg nx842_pseries_alg = {
- 	.cra_driver_name	= "842-nx",
- 	.cra_priority		= 300,
- 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
--	.cra_ctxsize		= sizeof(struct nx842_crypto_ctx),
-+	.cra_ctxsize		= struct_size_t(struct nx842_crypto_ctx, header.group,
-+						NX842_CRYPTO_GROUP_MAX),
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= nx842_pseries_crypto_init,
- 	.cra_exit		= nx842_crypto_exit,
-
-
--- 
-Kees Cook
+BR, Jarkko
