@@ -1,128 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA33A8595A;
-	Mon, 29 Apr 2024 17:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259221119B
+	for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 20:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714410441; cv=none; b=iQIo3ednYkhGvoksuTZZ/7C90/Sr/AIP/cbB6k8G2y+lELyg8/WTbjBny4Zvz1ZHiw2Oz8bgbY0MMGczA7f0EKkfRPFfrmmnpeK2G5jpC+gmqy3av7EAbKBh/sw/1gDOjtqdQlI0BFtkjF2Hrw9p61it+l775gSvb1ttYagRdkM=
+	t=1714421806; cv=none; b=oSi+P1zivCWgevOi5ItkkKM1XMsK/4lfZY0VW8Mi02WMBjxgiQNv6zp33LnMd1E0FDTODSBkdGYvqiA3Kemc2C4PAxSQStBXJoNcwEfII+5id/wZfqA86edD22cBmzgcig9oF+BvnGqHdqqQqo8cxy20odDI0kKVgw8r2vXysTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714410441; c=relaxed/simple;
-	bh=Ig19MYaxZdSQhmDoDlYi6kLIFuiHYwBd3fglHUPaw4Q=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=QOkPH5ZJtbr1nai7WkZ93Lp/gJNUpmAcfOsuEPAehv7MVx2HgxpVjhZBK3Ca+rcpd9jXLO2nK4TuZrRl5p6wHSzO7+ilYxYvlpPn+0HrwYOxjAMw5E6wilVbowriRAkSy4GHqX8Gft0llgRHC4anPNdXuQovbhW0VbRB/UkaMgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c/CVFZA2; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c/CVFZA2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCFE3C113CD;
-	Mon, 29 Apr 2024 17:07:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714410441;
-	bh=Ig19MYaxZdSQhmDoDlYi6kLIFuiHYwBd3fglHUPaw4Q=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=c/CVFZA2iWSHoZmV8qZGuWnrG7Na2Vrm4xsEbtFPAeVBpqQQbmZTRAivpId+ZMLs0
-	 U5d/0DnzmMVPgY+oB5AHuuJOwk8vF+BNbgTlJwD6w1o1z6N4UgoeWly5QBdCctkNcn
-	 o0Uu5WLsHADHVfK3e+tSh+55Q64VDD+BgEUWiWxjH5DgzWQAhBxabpGtjG/PdlM+q5
-	 gpydtu0mUprs/0bRXZrfwPav13fAGRwgHG04eyAl7pIpUWmxR/YMXkv+u89Phi7z0U
-	 +qFY+ahqtyf5YZvnmrd7+l/tf6Oz0HeAH6ibN0LOe2Cu2zrkpR6xlS2w+F8KPCetqR
-	 LHFXYJNct3yRw==
+	s=arc-20240116; t=1714421806; c=relaxed/simple;
+	bh=9Z6hwUBZ/WEOq+foMsWJii18o0YOvzDHqJrltxy4GkM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TmTI8r0iPgD9IUMsddLUCHJxvXveOi1PYTTYyh5yfhIUC8jx9Z0ZRDKkIGzrLW9KlsPqYUAnvxsHo2WlmwyCaNbiQp2/xZ09onV6lHwmuf5GZMCkH1f1yENbPoz9GvEcnvDE3xKyJXeVZsjLusdtc4sRXtYnFoZcYnpcakOSlxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1s1XQT-00079z-Au; Mon, 29 Apr 2024 22:16:37 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1s1XQQ-00F2gc-Ht; Mon, 29 Apr 2024 22:16:34 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1s1XQQ-00Bitk-1X;
+	Mon, 29 Apr 2024 22:16:34 +0200
+Date: Mon, 29 Apr 2024 22:16:34 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Olivia Mackall <olivia@selenic.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, kernel@pengutronix.de, 
+	linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH] hwrng: mxc-rnga: Drop usage of platform_driver_probe()
+Message-ID: <wu6kc2ctezq476pc3gebgiikml6xvf3ipqawdiiccq4vixdl2r@4qv55vvr4kr5>
+References: <20240324103759.228009-2-u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="lqy4jh7losfpq2te"
+Content-Disposition: inline
+In-Reply-To: <20240324103759.228009-2-u.kleine-koenig@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+
+
+--lqy4jh7losfpq2te
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 29 Apr 2024 20:07:18 +0300
-Message-Id: <D0WRS2FV8DBK.41XFI0SAD18M@kernel.org>
-Cc: <linux-kernel@vger.kernel.org>, <lukas@wunner.de>
-Subject: Re: [PATCH v2] crypto: ecc - Prevent ecc_digits_from_bytes from
- reading too many bytes
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Stefan Berger" <stefanb@linux.ibm.com>, <keyrings@vger.kernel.org>,
- <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>,
- <davem@davemloft.net>
-X-Mailer: aerc 0.17.0
-References: <20240429161316.3146626-1-stefanb@linux.ibm.com>
- <D0WRD3IZ3AJC.GWZHZLHHBJ5B@kernel.org>
- <f001bc3f-0c70-4118-bc71-8455808004b4@linux.ibm.com>
-In-Reply-To: <f001bc3f-0c70-4118-bc71-8455808004b4@linux.ibm.com>
 
-On Mon Apr 29, 2024 at 7:57 PM EEST, Stefan Berger wrote:
->
->
-> On 4/29/24 12:47, Jarkko Sakkinen wrote:
-> > On Mon Apr 29, 2024 at 7:13 PM EEST, Stefan Berger wrote:
-> >> Prevent ecc_digits_from_bytes from reading too many bytes from the inp=
-ut
-> >> byte array in case an insufficient number of bytes is provided to fill=
- the
-> >> output digit array of ndigits. Therefore, initialize the most signific=
-ant
-> >> digits with 0 to avoid trying to read too many bytes later on. Convert=
- the
-> >> function into a regular function since it is getting too big for an in=
-line
-> >> function.
-> >>
-> >> If too many bytes are provided on the input byte array the extra bytes
-> >> are ignored since the input variable 'ndigits' limits the number of di=
-gits
-> >> that will be filled.
-> >>
-> >> Fixes: d67c96fb97b5 ("crypto: ecdsa - Convert byte arrays with key coo=
-rdinates to digits")
-> >> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> >>
-> >> ---
-> >>
-> >> v2:
-> >>   - un-inline function
-> >>   - use memset
-> >> ---
-> >>   crypto/ecc.c                  | 22 ++++++++++++++++++++++
-> >>   include/crypto/internal/ecc.h | 15 ++-------------
-> >>   2 files changed, 24 insertions(+), 13 deletions(-)
-> >>
-> >> diff --git a/crypto/ecc.c b/crypto/ecc.c
-> >> index c1d2e884be1e..fe761256e335 100644
-> >> --- a/crypto/ecc.c
-> >> +++ b/crypto/ecc.c
-> >> @@ -68,6 +68,28 @@ const struct ecc_curve *ecc_get_curve(unsigned int =
-curve_id)
-> >>   }
-> >>   EXPORT_SYMBOL(ecc_get_curve);
-> >>  =20
-> >=20
-> > Just a minor nit:
-> >=20
-> > For exported symbol you need to document the function,including
-> > the parameters [1].
->
-> Like other functions, the ecc_digits_from_bytes also still/already has=20
-> the documentation in the header file:
->
-> /**
->   * ecc_digits_from_bytes() - Create ndigits-sized digits array from=20
-> byte array
->   * @in:       Input byte array
->   * @nbytes    Size of input byte array
->   * @out       Output digits array
->   * @ndigits:  Number of digits to create from byte array
->   */
-> void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
->                             u64 *out, unsigned int ndigits);
->
->   Should be ok?
+Hello,
 
-I think it should be OK, or at least documentation has not denied
-doing that and gives example how to import from header files:
+On Sun, Mar 24, 2024 at 11:37:59AM +0100, Uwe Kleine-K=F6nig wrote:
+> There are considerations to drop platform_driver_probe() as a concept
+> that isn't relevant any more today. It comes with an added complexity
+> that makes many users hold it wrong. (E.g. this driver should have mark
+> the driver struct with __refdata.)
+>=20
+> Convert the driver to the more usual module_platform_driver().
+>=20
+> This fixes a W=3D1 build warning:
+>=20
+> 	WARNING: modpost: drivers/char/hw_random/mxc-rnga: section mismatch in r=
+eference: mxc_rnga_driver+0x10 (section: .data) -> mxc_rnga_remove (section=
+: .exit.text)
+>=20
+> with CONFIG_HW_RANDOM_MXC_RNGA=3Dm.
+>=20
+> Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
 
-https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html
+Gentle ping?! Who is the one to pick up this patch (or give feedback to
+it)?
 
-Just had not encountered that before so that said
+I want to change modpost to emit this type of warning also for W=3D0
+builds. For that it would be good to have this patch applied first.
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+Best regards
+Uwe
 
-BR, Jarkko
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--lqy4jh7losfpq2te
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmYwACEACgkQj4D7WH0S
+/k70fwf+MTI/7Nuhap7iK+foJCAwx6AArL0Sw1WSAS/yVv2kQ1Q4KKd0D4HMS/cd
+gViIqcb0Iu7JVJRui//DdbXkgzMRjkoceZELDMM/yHx+YiAKQAdRFMlq1sspphQ9
+mxEDcS8WoBFK6maAuevBwKt9rgiF7l6CtBKYgIQAITP584xUV572+EXv35tag1Dl
+zHOiIr7D8MJkwUQEIYb1pbBmbXoFv9otFjL88Xoi3yRDbkuXSK4IT5fVt3f0EJct
+e2Dr0uUv/07w4fsR4qqhbAPS1Mu9GlMj6hZZGdkImGT18XO4YsSV+4A4a9a17Td9
++tUTpo3wPvw6bVxdllnTD3nUVuIHbQ==
+=+L3M
+-----END PGP SIGNATURE-----
+
+--lqy4jh7losfpq2te--
