@@ -1,124 +1,219 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2C7C127;
-	Mon, 29 Apr 2024 13:12:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6032E401;
+	Mon, 29 Apr 2024 13:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714396378; cv=none; b=aHbvp80mB6EXK0EtJtfsDpiPow3i760gBWtS52kFJRWRmIuy4fn4QgzKASe1uz+LYbM97FwKxoxqO8R/VKzHwsbFUeeK/n/6dfR1BcHUh1KSALkEvMK8C8Zcr7Sb2zYmj8SkGGy2kwgoRTyhT/k7+ND399W2VERsryJrb7n8k04=
+	t=1714398626; cv=none; b=jdbMKWlmbRUDuB2I+TNYrwrckD1zfNvqXD6FyW3bk7E2iNzgZn7nlGO6ugzrZ2EBygED0sT1GVj27WOeMOx1x8Lodv0JOpUlWeEn9XE4wVYb0r1QpbSzzOThxXWw01zo4tqvcDIeiM27wqpVgTtcyjR3upa++opWXH2LYlqS/Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714396378; c=relaxed/simple;
-	bh=C/1/HgtOPadIccfda7rkD/uKMPU+S43i6YXTEI9RK70=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=HRm8tx3sWr97aAvdRZaBXXJEP4voPbK66vGvqZWfvgQytrVDiVX33gb9Cvv+R2CcfJJgSJoAyZBdf/gfDdfkIT6qKZnzGdqFY7TvYrgVPonb11ENSKTx0LBhy/0Jn/ALH0Or7FfGFQBjsxoSTc7RMqGw/m7FuZMX8C3TjyyEQZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ig0PRhPy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714398626; c=relaxed/simple;
+	bh=+0By3Q1rGnmYRl/UhuSgmrbF78ae6+PB61PhQldbPaM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ipUeYBaLajGOGL/bre1WcpXhXUlMoS97BBjhzF8mZV/pCCdnyP4Do072WO9s8706+xRgMmSx1NKABSzQtgJ0tnxr1rASlzDJk5Sx/HwezbklNJTdhJqF728uExGI0ztNDbFptbJBNOyu1N6t0mHGvl/UJrXY0lNyXYR9Dn6fUcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Miyn4RRs; arc=none smtp.client-ip=209.85.160.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ig0PRhPy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97814C113CD;
-	Mon, 29 Apr 2024 13:12:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714396378;
-	bh=C/1/HgtOPadIccfda7rkD/uKMPU+S43i6YXTEI9RK70=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=Ig0PRhPyyWkKOwe/eu5h8ET0VfrmwbqvRZfWKTAHn4yuxUXHHxyb4S0POuhUwQs2o
-	 FUw3mdPX8kjdylv3ZVICMGb/q/ITOv4pahl3dRxc7MpDFNLfgSeisZHBjxgW8dP2Q9
-	 yxxUuR1e7MYyf6ZxgwfxUS8rXgtsu29Lh1zFTi8ZyUJFmrPmEpSuaJOpJmUt/+CRC0
-	 tdCdH9c+uEU448gyCCi419nAm0rCnBbfnGvNassirpClrb7dJt7qGvOcjeKThSBTry
-	 WrwBkwK4y6DsPkCoz9ifJ2dzK4hIeBWT0MpDaqTn59D8xD0QznHnuDP5Cir/ielRcV
-	 qwHCcOz9CCsDw==
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Miyn4RRs"
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-2330f85c2ebso2754928fac.1;
+        Mon, 29 Apr 2024 06:50:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714398624; x=1715003424; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XrhYSG3xhMDj7OBlL1tC1PWG3ln9HAJzaFMOoyJkhZ4=;
+        b=Miyn4RRsaK0ofNecUnKAnYu/YL4R2QqKNOIjFtmXFhLmQIvLwzDWwh6WcfOvjFzgAO
+         bdM0rQ0qbdE8ID9iezf/kbDAHemIHdoYzN9WPgIegqQNn2xXTrKZC0Bfb16f6dtmoDnt
+         zeii0JfK4JKomPl4CsK6GVY1NdzC8ERj82CgRLvW9ri3Sdz4nlR64IQ4TESoyH3xB1MS
+         /FAYmJuyO1DCqVrHFoEKg5F2gFbHlSrdQXUNe3pmHqR+rq0V0DWkN76AMItnrr+LjiQg
+         BnSh73O+pLV2E829HTjnQEGc61VBUiUh1pbw3vJGAF6oxLRykF1tNoDS5Jy80u8hHLDU
+         ud6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714398624; x=1715003424;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XrhYSG3xhMDj7OBlL1tC1PWG3ln9HAJzaFMOoyJkhZ4=;
+        b=Ew9Vj/WOrihZkaoxvZtFM7z5mG0CvgI1aVLNNQXrXLCQClDBmvZaJ8Y4lj4FEGoHm/
+         IvCiAwvT0W0RwoM+ycxSi9y1myYYbuuWrLN1/B9Qkk9yPYmixYNKsoA/Rj7sHHeYcClm
+         eprqaHWeL7NWw1cL1WevfbnuJfx/r9ZTVKt9igic0eYYCXXQ8qoK73EcMX7OI2Nn2Mri
+         ClJ5Dph7k+CneTiOKF5fYVsqEK9wjtEmfzbvW3mUdjwsVlxASU6AVgo0Yk+Ssq6WX9WE
+         N0ZYetkCIT721UC4TGm9s8NehreeuaruAsNrY4O0gkfIptdMNZ62wta13Aq2f6Y+HuKB
+         Ra3w==
+X-Forwarded-Encrypted: i=1; AJvYcCXZ0Njks8iGfU+kl2D6w6aq4Qd4RVc7uswPDdkSXWTPcjaVTK5Pu5zXPKsFq5awSTT7dShH3v/5f5nDdjDt7fP71HkZz3+vKEJvI12n26wHa1WS0TdK6DxrlQuMSgFhlCd2dQ3JPLL77AJw
+X-Gm-Message-State: AOJu0Yz7LsJdZ4LwEHNugtPIm86qn6vIMA0erYi0rt+FucyD7xeY1BLd
+	IzUxAkFRpwChn7bYa9KnYWZtTqN8sqFXdxTcVXKn1LGOBCiddKZd
+X-Google-Smtp-Source: AGHT+IGFBF9LW2f4hp7yGLnn003gFHU/d1F8U7C1YHmI+jPbYT4dNTlp68ZwOuiPM700ftEs4rXNIA==
+X-Received: by 2002:a05:6870:5d8a:b0:23c:a649:4a48 with SMTP id fu10-20020a0568705d8a00b0023ca6494a48mr3246819oab.36.1714398624128;
+        Mon, 29 Apr 2024 06:50:24 -0700 (PDT)
+Received: from perdition.xmission.com ([2607:fa18:0:2::74])
+        by smtp.gmail.com with ESMTPSA id l5-20020a654485000000b005d8b2f04eb7sm15952921pgq.62.2024.04.29.06.50.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Apr 2024 06:50:23 -0700 (PDT)
+From: Aaron Toponce <aaron.toponce@gmail.com>
+To: 
+Cc: aaron.toponce@gmail.com,
+	"Theodore Ts'o" <tytso@mit.edu>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH] random: add chacha8_block and swtich the rng to it
+Date: Mon, 29 Apr 2024 07:48:49 -0600
+Message-ID: <20240429134942.2873253-1-aaron.toponce@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 29 Apr 2024 16:12:54 +0300
-Message-Id: <D0WMSLWS0GIR.149P7U2PJBUV1@kernel.org>
-Cc: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
- <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: ecc - Protect ecc_digits_from_bytes from
- reading too many bytes
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Stefan Berger" <stefanb@linux.ibm.com>, "Lukas Wunner"
- <lukas@wunner.de>
-X-Mailer: aerc 0.17.0
-References: <20240426225553.3038070-1-stefanb@linux.ibm.com>
- <D0W3MTR0CY08.Q2UIYE4N274L@kernel.org> <Zi8UXS1MD5V58dnN@wunner.de>
- <D0WIZTMRKHSJ.1Z4ZV54DLVWAB@kernel.org>
- <8109c35b-344e-4d98-8245-77f4919624a1@linux.ibm.com>
-In-Reply-To: <8109c35b-344e-4d98-8245-77f4919624a1@linux.ibm.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon Apr 29, 2024 at 2:11 PM EEST, Stefan Berger wrote:
->
->
-> On 4/29/24 06:14, Jarkko Sakkinen wrote:
-> > On Mon Apr 29, 2024 at 6:30 AM EEST, Lukas Wunner wrote:
-> >> On Mon, Apr 29, 2024 at 01:12:00AM +0300, Jarkko Sakkinen wrote:
-> >>> On Sat Apr 27, 2024 at 1:55 AM EEST, Stefan Berger wrote:
-> >>>> Protect ecc_digits_from_bytes from reading too many bytes from the i=
-nput
-> >>>> byte array in case an insufficient number of bytes is provided to fi=
-ll the
-> >>>> output digit array of ndigits. Therefore, initialize the most signif=
-icant
-> >>>> digits with 0 to avoid trying to read too many bytes later on.
-> >>>>
-> >>>> If too many bytes are provided on the input byte array the extra byt=
-es
-> >>>> are ignored since the input variable 'ndigits' limits the number of =
-digits
-> >>>> that will be filled.
-> >>>>
-> >>>> Fixes: d67c96fb97b5 ("crypto: ecdsa - Convert byte arrays with key c=
-oordinates to digits")
-> >>>> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> >>>> ---
-> >>>>   include/crypto/internal/ecc.h | 7 +++++++
-> >>>>   1 file changed, 7 insertions(+)
-> >>>>
-> >>>> diff --git a/include/crypto/internal/ecc.h b/include/crypto/internal=
-/ecc.h
-> >>>> index 7ca1f463d1ec..56215f14ff96 100644
-> >>>> --- a/include/crypto/internal/ecc.h
-> >>>> +++ b/include/crypto/internal/ecc.h
-> >>>> @@ -67,9 +67,16 @@ static inline void ecc_swap_digits(const void *in=
-, u64 *out, unsigned int ndigit
-> >>>>   static inline void ecc_digits_from_bytes(const u8 *in, unsigned in=
-t nbytes,
-> >>>>   					 u64 *out, unsigned int ndigits)
-> >>>>   {
-> >>>> +	int diff =3D ndigits - DIV_ROUND_UP(nbytes, sizeof(u64));
-> >>>>   	unsigned int o =3D nbytes & 7;
-> >>>>   	__be64 msd =3D 0;
-> >>>>  =20
-> >>>> +	/* diff > 0: not enough input bytes: set most significant digits t=
-o 0 */
-> >>>> +	while (diff > 0) {
-> >>>> +		out[--ndigits] =3D 0;
-> >>>> +		diff--;
-> >>>> +	}
-> >>>
-> >>> Could be just trivial for-loop:
-> >>>
-> >>> for (i =3D 0; i < diff; i++)
-> >>> 	out[--ndigits] =3D 0;
-> >>>
-> >>> Or also simpler while-loop could work:
-> >>>
-> >>> while (diff-- > 0)
-> >>> 	out[--ndigits] =3D 0;
-> >>
-> >> Or just use memset(), which uses optimized instructions on many arches=
-.
-> >=20
-> > Yeah, sure, that would be even better, or even memzero_explicit()?
->
-> Thanks. The function isn't getting too big for an inline?
+According to Jean-Philippe Aumasson in his paper "Too Much Crypto" [1]:
 
-Hmm... so as far as I'm concerned you pick what works for you. Just
-was pointing out at it would make to simplify the original a bit :-)
+> "The best result on ChaCha is a key recovery attack on the 7-round version
+> with 2^237.7 time complexity using output data from 2^96 instances of ChaCha,
+> that is, 2^105 bytes of data."
 
-BR, Jarkko
+He then proposes that ChaCha use 8 rounds instead of 20, providing a 2.5x
+speed-up. As such, this patch adds chacha8_block and chacha12_block and switches
+the RNG from ChaCha20 to ChaCha8 to take advantage of that efficiency without
+sacrificing security.
+
+[1]: https://eprint.iacr.org/2019/1492
+
+On my ThinkPad T480s with an Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz, the
+speed-up is close to what would be expected.
+
+Without the patch:
+
+  $ dd if=/dev/urandom of=/dev/null bs=32M count=300
+  300+0 records in
+  300+0 records out
+  10066329600 bytes (10 GB, 9.4 GiB) copied, 20.4806 s, 492 MB/s
+
+With the patch:
+
+  $ dd if=/dev/urandom of=/dev/null bs=32M count=300
+  300+0 records in
+  300+0 records out
+  10066329600 bytes (10 GB, 9.4 GiB) copied, 11.5321 s, 873 MB/s
+
+Signed-off-by: Aaron Toponce <aaron.toponce@gmail.com>
+---
+ drivers/char/random.c   |  8 ++++----
+ include/crypto/chacha.h | 14 ++++++++++++--
+ lib/crypto/chacha.c     |  6 +++---
+ 3 files changed, 19 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 2597cb43f438..2e14a30b795f 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -302,7 +302,7 @@ static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
+ 	chacha_init_consts(chacha_state);
+ 	memcpy(&chacha_state[4], key, CHACHA_KEY_SIZE);
+ 	memset(&chacha_state[12], 0, sizeof(u32) * 4);
+-	chacha20_block(chacha_state, first_block);
++	chacha8_block(chacha_state, first_block);
+ 
+ 	memcpy(key, first_block, CHACHA_KEY_SIZE);
+ 	memcpy(random_data, first_block + CHACHA_KEY_SIZE, random_data_len);
+@@ -388,13 +388,13 @@ static void _get_random_bytes(void *buf, size_t len)
+ 
+ 	while (len) {
+ 		if (len < CHACHA_BLOCK_SIZE) {
+-			chacha20_block(chacha_state, tmp);
++			chacha8_block(chacha_state, tmp);
+ 			memcpy(buf, tmp, len);
+ 			memzero_explicit(tmp, sizeof(tmp));
+ 			break;
+ 		}
+ 
+-		chacha20_block(chacha_state, buf);
++		chacha8_block(chacha_state, buf);
+ 		if (unlikely(chacha_state[12] == 0))
+ 			++chacha_state[13];
+ 		len -= CHACHA_BLOCK_SIZE;
+@@ -444,7 +444,7 @@ static ssize_t get_random_bytes_user(struct iov_iter *iter)
+ 	}
+ 
+ 	for (;;) {
+-		chacha20_block(chacha_state, block);
++		chacha8_block(chacha_state, block);
+ 		if (unlikely(chacha_state[12] == 0))
+ 			++chacha_state[13];
+ 
+diff --git a/include/crypto/chacha.h b/include/crypto/chacha.h
+index b3ea73b81944..64c45121c69a 100644
+--- a/include/crypto/chacha.h
++++ b/include/crypto/chacha.h
+@@ -8,8 +8,7 @@
+  *
+  * The ChaCha paper specifies 20, 12, and 8-round variants.  In general, it is
+  * recommended to use the 20-round variant ChaCha20.  However, the other
+- * variants can be needed in some performance-sensitive scenarios.  The generic
+- * ChaCha code currently allows only the 20 and 12-round variants.
++ * variants can be needed in some performance-sensitive scenarios.
+  */
+ 
+ #ifndef _CRYPTO_CHACHA_H
+@@ -31,11 +30,22 @@
+ #define XCHACHA_IV_SIZE		32
+ 
+ void chacha_block_generic(u32 *state, u8 *stream, int nrounds);
++
+ static inline void chacha20_block(u32 *state, u8 *stream)
+ {
+ 	chacha_block_generic(state, stream, 20);
+ }
+ 
++static inline void chacha12_block(u32 *state, u8 *stream)
++{
++	chacha_block_generic(state, stream, 12);
++}
++
++static inline void chacha8_block(u32 *state, u8 *stream)
++{
++	chacha_block_generic(state, stream, 8);
++}
++
+ void hchacha_block_arch(const u32 *state, u32 *out, int nrounds);
+ void hchacha_block_generic(const u32 *state, u32 *out, int nrounds);
+ 
+diff --git a/lib/crypto/chacha.c b/lib/crypto/chacha.c
+index b748fd3d256e..15e773629f1d 100644
+--- a/lib/crypto/chacha.c
++++ b/lib/crypto/chacha.c
+@@ -18,7 +18,7 @@ static void chacha_permute(u32 *x, int nrounds)
+ 	int i;
+ 
+ 	/* whitelist the allowed round counts */
+-	WARN_ON_ONCE(nrounds != 20 && nrounds != 12);
++	WARN_ON_ONCE(nrounds != 20 && nrounds != 12 && nrounds != 8);
+ 
+ 	for (i = 0; i < nrounds; i += 2) {
+ 		x[0]  += x[4];    x[12] = rol32(x[12] ^ x[0],  16);
+@@ -67,7 +67,7 @@ static void chacha_permute(u32 *x, int nrounds)
+  * chacha_block_generic - generate one keystream block and increment block counter
+  * @state: input state matrix (16 32-bit words)
+  * @stream: output keystream block (64 bytes)
+- * @nrounds: number of rounds (20 or 12; 20 is recommended)
++ * @nrounds: number of rounds (20, 12, or 8; 20 is recommended)
+  *
+  * This is the ChaCha core, a function from 64-byte strings to 64-byte strings.
+  * The caller has already converted the endianness of the input.  This function
+@@ -93,7 +93,7 @@ EXPORT_SYMBOL(chacha_block_generic);
+  * hchacha_block_generic - abbreviated ChaCha core, for XChaCha
+  * @state: input state matrix (16 32-bit words)
+  * @stream: output (8 32-bit words)
+- * @nrounds: number of rounds (20 or 12; 20 is recommended)
++ * @nrounds: number of rounds (20, 12, or 8; 20 is recommended)
+  *
+  * HChaCha is the ChaCha equivalent of HSalsa and is an intermediate step
+  * towards XChaCha (see https://cr.yp.to/snuffle/xsalsa-20081128.pdf).  HChaCha
+-- 
+2.43.0
+
