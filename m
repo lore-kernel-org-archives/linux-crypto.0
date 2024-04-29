@@ -1,112 +1,150 @@
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D6C745C0
-	for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 13:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84E478B63
+	for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 14:27:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714399008; cv=none; b=dqKUqXV1Lcxl9ADD2H0fMbM5rkVPt9OJSTcYPS+ZZtr4NuqXVsw0dOH/Xty1klgZijlbk6omCMVzA0alF4HihwlqUaZOKp7J6UX2ZJweUlB/vpbnkWs48zl+gQBxqX8dUuOP7WUct3YkfYWrUh8qmDKGqsAkC3QK4N5tOtPh6GE=
+	t=1714400846; cv=none; b=vD4jyKA0K9wqE8vplnBmLwofe83Eg18K2cKxbyDL/4UhxJBxcrnLFLMr5g3H4zmKzPcDXfaMMX2vtKzQjkdQcDcBDNSCiolf+WawuxsmSFzsGOKdmF0/0bSiu/xdGo1iDeO3iF8fjY6e3A2WlCCjA1+VA7vL5NhtQvjAwksZ6eM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714399008; c=relaxed/simple;
-	bh=920U7DhlCUqfILbwgxP5ucHFht1rUv0oUKZBQeo6VjA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AnPYGxwI2KjCiNVZkD+mFF137lNIhNuko+yH5UQ3ct9g+ORFYZ2KT+DADtAR/xTgN+OuV+mblss/DUUtXD2IOXF+sIRPXpYgBpGaTd3CAlsuSgalDIhj9OOMyhkdIeIxEK8uk/xdv6IfNVQEY6Ks2/RI2+IKcWrdpcUQd/Xg6Qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=none smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b=UX7II4Yu; arc=none smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toxicpanda.com
+	s=arc-20240116; t=1714400846; c=relaxed/simple;
+	bh=dOL5MQJEWlm+ALadfwEWLIsuMmXKHK7rNTd6CxqSNA0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=cOdGNNR5ia47c1e5JDXLXckDQORTyGxbCAbum0PFTOtiT4UCHYumLiLYb/YXSaK4E+tzTRg0SMKRou6CCXJcxCOf0LQr5ZExL5xAdF+ymf1q+t7ips7rvgivX8GCX14vsUtdTj1ZlngxXaE5qQ/O07OOKdhwbPDNVz73GL9q3Hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TNvfnSyR; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="UX7II4Yu"
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5aa27dba8a1so2773584eaf.0
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 06:56:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TNvfnSyR"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-601fef07eaeso5218474a12.1
+        for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 07:27:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1714399006; x=1715003806; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=01lzr/lJoBv5oeL/0n6BTxidXs2hC7B3SVPcnUULo6Q=;
-        b=UX7II4YuOOj1K8GuVk1GP6p7nUgH3JjbiwuP+KiFC1LA9Z7a9fWUOg9OMtdhKY6zi0
-         9jjlT59lytMlnjM94ax5sDz+Rl7uSTxDgamhGw7SocNuivIIugOx43iZeLIZ2DhiiWzt
-         QbWqBnBMfR0jVNUFDi4dcn40SpaSN3YytblB56RSDFuFCbjQChs/q3IKQ8SN3BQd26+Q
-         6kdGqFsebFe7oizShjA8fZbGwKsELip336ITj2sUrQMsjV+zk2ML8/KIPl71bOpSRBdP
-         zeAKaAum20S5nGswB3/MJ5bsHeJqbqhrmGrmXKXIVq72qSlBc46BAjpRG3kzt7zPPt/E
-         z6DA==
+        d=google.com; s=20230601; t=1714400844; x=1715005644; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S3mlM0E1TrjvYHfesQNSkr38bw44gyQq8z5XmrX3EV0=;
+        b=TNvfnSyRLs2kUehKYQg9lgy0+HSgeBrQ3mGDf7ZZH65mLocaUa6qmks0FzpCpzV2Qn
+         BD9e6HPgy7fN6Rvq/0LD6EXaoM+OexYxuE/e59aOI56V3cPh9Ca8QnpVOR3sw6ABQmTD
+         zhRNNRIEGeImEQLC3EKXn8IA+NI8ZMv04IMKNeHcgY4fDFgDqANrxIp6xnrk04TONTN9
+         bTtORWXUnZv0uKm4bqxVDJHUOsHZEVOBW1jA/qI4nGfb8GxTnxdHg3NbtjHQycg7PlpX
+         27ZXstLqzB32bkQi8Dbyb9bM5UWaebeMGIIJwt/siu8JpqaKsODF4ih8CqXilsAtdBcW
+         bsmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714399006; x=1715003806;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=01lzr/lJoBv5oeL/0n6BTxidXs2hC7B3SVPcnUULo6Q=;
-        b=SNgNacjh+zk6v8guvv7Ke3047SIebVGdAvZ4lwiciaGPmngwUC8EPPgGeonrEvaY8+
-         a+/z4Iqt6FXcZ1NuTLqdnZg/MW1eEYNbO7K5Gv86XRNCtkf4Of/PboNKd5LjGKXcEtLi
-         rMp4hxSVycKS540cg6gimhfkzjSM8WweeB9rg3j13JhLENKLzM1kLanPdPL8oQm9MvlJ
-         cRcfVny2OzsMJ1hogiQVLH6SBgvLwm4hMFBWRoI1Mjq7Uewk2ITms3HWpHA75o9ZvdOi
-         n4+zddiumNmHi+5kqUwgewsuEQQUQ/Fpb5FlgvSN+uzW4g1JUmlRs3SeYIshfDth70Vx
-         kQGw==
-X-Forwarded-Encrypted: i=1; AJvYcCUG1EEMYwkz3h1w0GQsZjEY/7Gszq/5aGzJpbdqZiX02XNleehRV+WHSXR7WSn845E9PB5lCW/Yt/P+aZpXpfRj2IYbhTJuHxOFT1kB
-X-Gm-Message-State: AOJu0Yzk4VVOO5UpCphcCOI1CXbdVVkNDFKGDap2SRJTOjVsAI1RJi0s
-	wOulgPeGCoe9Gq1nkQTDvROGxSHIfyVbYX/NUF1m+k9d3XbRyTF/+fL62dTCdj8=
-X-Google-Smtp-Source: AGHT+IHFswP9YLF7kJvji6Bbbwogyc9U87rpzzJb7rOAbKzxBNSwQGoVCVl1Xu5B202uCqgqohN8xQ==
-X-Received: by 2002:a05:6358:3913:b0:18b:9051:3cc with SMTP id y19-20020a056358391300b0018b905103ccmr10614669rwd.17.1714399006341;
-        Mon, 29 Apr 2024 06:56:46 -0700 (PDT)
-Received: from localhost ([76.182.20.124])
-        by smtp.gmail.com with ESMTPSA id k4-20020a056214024400b006a0d057073bsm800256qvt.58.2024.04.29.06.56.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Apr 2024 06:56:45 -0700 (PDT)
-Date: Mon, 29 Apr 2024 09:56:45 -0400
-From: Josef Bacik <josef@toxicpanda.com>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: clm@fb.com, dsterba@suse.com, herbert@gondor.apana.org.au,
-	linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com, embg@meta.com, cyan@meta.com,
-	brian.will@intel.com, weigang.li@intel.com
-Subject: Re: [RFC PATCH 6/6] btrfs: zlib: add support for zlib-deflate
- through acomp
-Message-ID: <20240429135645.GA3288472@perftesting>
-References: <20240426110941.5456-1-giovanni.cabiddu@intel.com>
- <20240426110941.5456-7-giovanni.cabiddu@intel.com>
+        d=1e100.net; s=20230601; t=1714400844; x=1715005644;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S3mlM0E1TrjvYHfesQNSkr38bw44gyQq8z5XmrX3EV0=;
+        b=bKvo3xJ+Sf8nY5oV0J1QThTsu/p26dOFqjOWDDyUyFJqpvdpVlGXFQ0NpwtpOrf1zG
+         naaG2EMr+LV4TdZn3pEWYgWfup49OG1OG7snBbfYyfCXu90SYeoXladkk0F2BKMDQ++u
+         qW/mxH4lFeAy9E4JD7Mp9mpJGrpdVHTX1whofEtNdMg9lcfPCE92eL/dGKgyx6/OdUPJ
+         QLAwaL1F3zzv9Q2YUaz1x86sByFJ2cxSVSAbQb0BpzoJEy+Dk9n4yX/qtzCBExKCG4wF
+         icuc+I0c/4AChGxq6nx06fc5KCPyjZ0CLHlXnqGPmIQnXzYz4c9rO1nWFjOtO991PcgV
+         oEXA==
+X-Forwarded-Encrypted: i=1; AJvYcCXmHkihmlCNPWODgl79e0ugd1o72XE44RmNmqROd8JP43il10AOnR0V+rrUI6wM3F1lXlnM8sJpmlh6T4l28U3Y0vS+GEicg+utT1ld
+X-Gm-Message-State: AOJu0Yy66PyE808yeMD7hFa8WK68MiBXMXYk0Im5j+kJvEfeZ4bcxa1q
+	iuUHM1j8P1OHJhJURCsgQLaAclIMnQAqJjYP7Y1gHFI8x7DPaX4UI76/E1OZGbfEMNu2wb7ybU4
+	uog==
+X-Google-Smtp-Source: AGHT+IFtI1VRsJxmoBaQkkMNkidpPOTCEAStMWY3Kr4rNLpPFTYg7KKAfEudEOmt/GvfkLL4yDTV9xTdh4k=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:1e5d:0:b0:5f7:651b:fed8 with SMTP id
+ p29-20020a631e5d000000b005f7651bfed8mr29463pgm.12.1714400843944; Mon, 29 Apr
+ 2024 07:27:23 -0700 (PDT)
+Date: Mon, 29 Apr 2024 07:27:22 -0700
+In-Reply-To: <20240427013210.ioz7mv3yuu2r5un6@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240426110941.5456-7-giovanni.cabiddu@intel.com>
+Mime-Version: 1.0
+References: <20240421180122.1650812-1-michael.roth@amd.com>
+ <20240421180122.1650812-22-michael.roth@amd.com> <ZimgrDQ_j2QTM6s5@google.com>
+ <20240426173515.6pio42iqvjj2aeac@amd.com> <ZiwHFMfExfXvqDIr@google.com>
+ <20240426214633.myecxgh6ci3qshmi@amd.com> <ZixCYlKn5OYUFWEq@google.com> <20240427013210.ioz7mv3yuu2r5un6@amd.com>
+Message-ID: <Zi-t65xmCk9x78lb@google.com>
+Subject: Re: [PATCH v14 21/22] crypto: ccp: Add the SNP_{PAUSE,RESUME}_ATTESTATION
+ commands
+From: Sean Christopherson <seanjc@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com, 
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, Larry.Dewey@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Apr 26, 2024 at 11:54:29AM +0100, Giovanni Cabiddu wrote:
-> From: Weigang Li <weigang.li@intel.com>
+On Fri, Apr 26, 2024, Michael Roth wrote:
+> On Fri, Apr 26, 2024 at 05:10:10PM -0700, Sean Christopherson wrote:
+> > e.g. put the cert in a directory along with a lock.  Actually, IIUC, there doesn't
+> > even need to be a separate lock file.  I know very little about userspace programming,
+> > but common sense and a quick search tells me that file locks are a solved problem.
+> > 
+> > E.g. it took me ~5 minutes of Googling to come up with this, which AFAICT does
+> > exactly what you want.
+> > 
+> > touch ~/vlek.cert
+> > (
+> >   flock -e 200
+> >   echo "Locked the cert, sleeping for 10 seconds"
+> >   sleep 10
+> >   echo "Igor, it's alive!!!!!!"
+> > ) 200< vlek.cert
+> > 
+> > touch ~/vlek.cert
+> > (
+> >   flock -s 201
+> >   echo "Got me a shared lock, no updates for you!"
+> > ) 201< vlek.cert
+> > 
 > 
-> Add support for zlib compression and decompression through the acomp
-> APIs.
-> Input pages are added to an sg-list and sent to acomp in one request.
-> Since acomp is asynchronous, the thread is put to sleep and then the CPU
-> is freed up. Once compression is done, the acomp callback is triggered
-> and the thread is woke up.
+> Hmm... I did completely miss this option. But I think there are still some
+> issues here. IIUC you're suggesting (for example):
 > 
-> This patch doesn't change the BTRFS disk format, this means that files
-> compressed by hardware engines can be de-compressed by the zlib software
-> library, and vice versa.
+>   "Management":
+>   a) writelock vlek.cert
+>   b) perform SNP_LOAD_VLEK and update vlek.cert contents
+>   c) unlock vlek.cert
 > 
-> Limitations:
->   * The implementation tries always to use an acomp even if only
->     zlib-deflate-scomp is present
->   * Acomp does not provide a way to support compression levels
+>   "QEMU":
+>   a) readlock vlek.cert
+>   b) copy cert into guest buffer
+>   c) unlock vlek.cert
+> 
+> The issue is that after "QEMU" unlocks and return the cert to KVM we'll
+> have:
+> 
+>   "KVM"
+>   a) return from EXT_GUEST_REQ exit to userspace
+>   b) issue the attestation report to firmware
+>   c) return the attestation report and cert to the guest
+> 
+> Between a) and b), "Management" can complete another entire update, but
+> the cert that it passes back to the guest will be stale relative to the
+> key used to sign the attestation report.
 
-That's a non-starter.  We can't just lie to the user about the compression level
-that is being used.  If the user just does "-o compress=zlib" then you need to
-update btrfs_compress_set_level() to figure out the compression level that acomp
-is going to use and set that appropriately, so we can report to the user what is
-actually being used.
+I was thinking userspace would hold the lock across SEV_CMD_SNP_GUEST_REQUEST.
 
-Additionally if a user specifies a compression level you need to make sure we
-don't do acomp if it doesn't match what acomp is going to do.
+   QEMU:
+    a) readlock vlek.cert
+    b) copy cert into guest buffer
+    c) set kvm_run->immediate_exit
+    d) invoke KVM_RUN
+    e) KVM sends SEV_CMD_SNP_GUEST_REQUEST to PSP
+    f) KVM exits to userspace with -EINTR
+    g) unlock vlek.cert
+    h) invoke KVM_RUN (resume the guest)
 
-Finally, for the normal code review, there's a bunch of things that need to be
-fixed up before I take a closer look
+> If we need to take more time to explore other options it's not
+> absolutely necessary to have the kernel solve this now. But every userspace
+> will need to solve it in some way so it seemed like it might be nice to
+> have a simple reference implementation to start with.
 
-- We don't use pr_(), we have btrfs specific printk helpers, please use those.
-- We do 1 variable per line, fix up the variable declarations in your functions.
-
-Thanks,
-
-Josef
+Shoving something into the kernel is not a "reference implementation", especially
+not when it impacts the ABI of multiple subsystems.
