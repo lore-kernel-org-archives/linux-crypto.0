@@ -1,133 +1,117 @@
-Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2106.outbound.protection.partner.outlook.cn [139.219.146.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8913B1FC8;
-	Mon, 29 Apr 2024 06:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.106
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714372936; cv=fail; b=WdgeupGKuggB3FW3awDLPKsdzKtNcVF1ixeiMyGqpFqyckpXdp7nCf/8RKl/FoJGMToGJlyPFMu6uSlmB/5+D2fjU79t5b6bPtnRcYQ8RzNnbgT3ZixPZPT+SXHk+i1uW4ZfRKAXnoj76ff0WNmLdepqlmLOtBsaHJ8h4t+KOxg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714372936; c=relaxed/simple;
-	bh=PB3GBoEXep2ry6qG6V2WzZWfQx64M6+A4aHWNXAhhQg=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pHzdnCkWiUNcPeQEXNKJYwnH/NkUSNgaqbVKZp+EJohY1nYDJ3vUabmmYVXN7YfTv0nFfrSaCtQne/Kz9O60XxDOl1REEv/XOki6xsqqB/sAAUjk/azuF6CPoZmsAhGvuk9SHS76sMRyt9thjVpgbp2ynkdcfXuLLHJyB7XExr8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HZRA0d1jNbdrQ1iI1Oe88HCyQ9CiCcA2ngQRer2R/Ne0VaV4CuNLGVIMQw0geNbmnwOSLg6Kno8oslrZNVwN8RXu7hKglH1a49W2tcym/51kpW5+HgtyuHbJSFMkxPK7b56Sj6vpnkbDx1K3lWnnLF0mGrUyeccgmZ3G8vCYdjft0GFUcQm2n6GSQTz24OY5TlPj3JFwSJC+N+zxcp55WTr3w7F090pxonOPVxARxw6ubyO0rqtiNh1fZ9/V7+9VIsJlF+9w20Kf68QgniCGXeBefKzUmx08Nz0rBsJAArYuPQEGCRWGtM0+NuUBUY0sfm/3Psqdhzeq/VV13a0vjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f0PbBRkJufUOUggY+g7ZpyqJ6ozeAyZSGDjJisY1OCI=;
- b=P8tkG2rvj7kUPrXUi0Icwqt5LKKR+C1u7eLxlCiuVOzQBEtxABP1f3H+nSxJk+xytbPdW3L+1kVxY3eFixIL4X0qFzzJ59MbviHRzX/qh1N3bsPkdGZuMfnJBqXNugtDTVeY/ely5jvl1yXWNB493BlpCCk/jGfTqK7gIWrGntv7gJgomRgsQQj8Y72TsnHUHl3O+HtMAHA8nMsSzkJs6LNGv4MpCKD8yF0L5+TYhKKGUiCQwPv/SKx3d3FeNgA3XFHYKcFSyp/T2EfkrewN8h7yGTMc2rntzfZWGt4VaRR4Qn1tYez4Sh/AtUUtWOGbGnmAsDcSQliiA4Cx3Dw22w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-Received: from NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:10::10) by NT0PR01MB1278.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:12::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Mon, 29 Apr
- 2024 06:07:58 +0000
-Received: from NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
- ([fe80::3dc9:e0c9:9a09:3bb7]) by
- NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn ([fe80::3dc9:e0c9:9a09:3bb7%4])
- with mapi id 15.20.7472.044; Mon, 29 Apr 2024 06:07:58 +0000
-From: Jia Jie Ho <jiajie.ho@starfivetech.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH -next 3/4] crypto: starfive: Do not free stack buffer
-Date: Mon, 29 Apr 2024 14:06:39 +0800
-Message-Id: <20240429060640.2451685-4-jiajie.ho@starfivetech.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240429060640.2451685-1-jiajie.ho@starfivetech.com>
-References: <20240429060640.2451685-1-jiajie.ho@starfivetech.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ZQ0PR01CA0034.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:2::12) To NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:10::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F62E15AE0;
+	Mon, 29 Apr 2024 07:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714375155; cv=none; b=Hz+s2ErxyVXWR/LyfGpDNqIFMvRkKYEKy0Mp+TsdtDvJf4DBwSGuYojJjWbo3uPJT87RDSv5CbFfOYJ5Q4zjJqaiDPa4+picghx0rhG+oiJHKMjhHf27jK611dx7CIdC0jGif52YmfaREky9hG3MpWk7Cx/es/ZU8zHBYThYpPU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714375155; c=relaxed/simple;
+	bh=p1Xt8diWxdmLLV6+DpjoqRbjpgfJ/yp+O1wGygr8xEc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Lxiyrnog9E6vplX0gtfkonNIgwCNo98r8+C0YL39z3vNC8oVew7LQQjG1fk/HkcccCkj1OdTdLf+GZwi68Yt+9mBXQit+J6EimzGr2oa/oHODcaqZU6LDf5CTxwdTnKT4sQZNjKOeBh9xLlQxXfnJyYwnplwIloUeKmBVAp40q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U+jjvN07; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U+jjvN07"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70D17C4AF19;
+	Mon, 29 Apr 2024 07:19:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714375154;
+	bh=p1Xt8diWxdmLLV6+DpjoqRbjpgfJ/yp+O1wGygr8xEc=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=U+jjvN07X8sKR9EbNQLODlbMlD9uGxnuMRaMmilfGJaa+PH3hS6YtmTSFGdQdcAHr
+	 aZvO9yKNM0e60Ex6XImoDPAKuqAsA91fk73EhnAMlQ4R1kwH1BpeGv7ZgPhWZD8q36
+	 TcTtuPHJCPk9/xugiJXOjyL9btXkjLEk4c8qk7B/kJtTfpnsSFrr8du7oQaf2demUh
+	 GmXvVcFGp2uHTKAvG7KAztrC4S2xF4pyqX2V/xHKNm5vsCDJU3ghf0V6moH2ZeHK3F
+	 U+97ALmcXIjUSo121VO1lyRVnoRyYjjhniVVNCvM4HObd9pjWsF4JFpGNwkKw6PMM+
+	 0SPMHS0l83mXw==
+Message-ID: <9d217722-3cb7-436c-b445-17e6a3d7cd11@kernel.org>
+Date: Mon, 29 Apr 2024 09:19:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: NT0PR01MB1182:EE_|NT0PR01MB1278:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2d4862c3-3634-45d3-26dd-08dc6812b7d2
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	wYER8FGZbU4rQVuxQRcEuTDfAdtWfXKAzW5+sLBpk9SxALfrcqUiuMMp+P7iwJzWm8o++jlQVdmsyTb2Gj0ahXZ/xYCQ2VsbotiYbib7E00ht7lJpWsrWKfGyWw1Fgw8ggoaPkE3rlt8mO6/UnO07VtU82jDxPqFonMyPrNeGAB2XixCl0gOLVSFGqiwXmnAqRqgLmUvqzzAWpeTOZFT2wvX7RCkHhsd9I6cj9H6pcTDrnwg4glVzQ2FSLvfM6Rn+1Lh4e5453Zs3Rr67hA/qguyNPrVINQ3hiiFmW1izmzfTj4KQCCkkkO17Boivz0SpUuO4CZzBMp+t/VlWgWDQAw0bx7q+cWqkZnn1GRY3maGpdaekY+dgul0voBlIbc+nhzdBNHQmZYIdi5zrCSWKo/+6EKcnHmyKU2ZkUS/xHY6NAtvxzaaiPsI222MGuh5MXZOdwsZyhDJeSdcgQxwUS/szcWb+i+4jHhOcYlk0wxPGo0qx9iepF4hzrz3kp4UHHXbyTQuA7Uq09pWSRzkSwm7GD8MeqwlVHDyBnuWMzx6ZdGL4Dh2K3Q6teWOVj6hjUKL+VGc669k8XyUB2jisIgn1Iw9vXtviKDATnjHlK58Boaanpiktbf/ndFKQV4b
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230031)(41320700004)(1800799015)(52116005)(366007)(38350700005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?p4ATjdDrJnF7n2MB705/DQBrQTC8zzSKCcOSopCCYVBLBCUIIgM4wBTeRA/c?=
- =?us-ascii?Q?zYo3X5jT/71uVMqCZ7i32I4hXUxiOVAtEvp37tUWPKC5TIAZwtIpGvs+cVPH?=
- =?us-ascii?Q?LkAgksjpr3cb1r46+ydAlRb9MIkpg8pwG4pajB55fYJlULEUvQFer5B6OLtT?=
- =?us-ascii?Q?eLqodblnLTbBC3xeMK1jdZq9XqJxrJPU7LEHJ2Zb7elgwn2PVmeiEkbxqsOf?=
- =?us-ascii?Q?G+xIvtSEg27r5qFYF+QlaZdBXsIndsvU5x7+OuDcbvUWdeBrLObLp5gyufn2?=
- =?us-ascii?Q?tQG5As8sr1qiVkP59cyAZAcQzlLEwBGFursEzkcc16g9cMhHbNWpAr485RhC?=
- =?us-ascii?Q?Iclgr2ydsVYyhtoxFxBIOVRrLak7jlq3TQHzUF8fKn3hjzk8mGtXUqoAzAX6?=
- =?us-ascii?Q?M/8TY4X9EenSSFD5N3VWLLL3yldefbtOSAUeoQEWaQZSF+lEWLzYxqX8xtFJ?=
- =?us-ascii?Q?Gxu4bWr7SVuPbEwSvbK7JLB0cZ/KHy9x/5/p4JFFmerDP0/zANRAjOOJuFOu?=
- =?us-ascii?Q?O9mAwYTRrmC+yPKUZHySrvYb5aDDMr4cTgpnGRR1+5rspHXUskRrdkvjt31B?=
- =?us-ascii?Q?CBkmT1Y/+ziMvugNLWs7AGZlOQWogC10yoJPBSwE3EG+8u1qZAjIAxGW6w+l?=
- =?us-ascii?Q?+dUMyIiEaGMnBdkRVSdCyLuF9BmKfMIQd7buXmL42NN8EoLP0A4vQgu2zs1E?=
- =?us-ascii?Q?nzylwv2hAhIcVRcN346tcZhywW01el6ruMdIJy3INVVXSkj5bdkqOB4SnP5f?=
- =?us-ascii?Q?npIjLVvUFGubnKQXMYksF8qrY+pNa3hbZZnVQwl1wZTgJOpKypZIfPmmZAH0?=
- =?us-ascii?Q?AL3ioJGvoZlU7F3AoL4uvIMq47sH2FFsIUc5rBd3g5OzLiws6B5YxmdE9oKc?=
- =?us-ascii?Q?6T/AALG7mxVohPbNPlraXtt3sIlEpcogWUxZxcAHUL4pniPwKE6W1g21NnQP?=
- =?us-ascii?Q?yWu7MCskHB40Pcrgf8wLwNh7IYrASLmhQTJu3UhCxpIWaoHUuePn1wkHASzW?=
- =?us-ascii?Q?oUh1gyUPczpW/yNMgBsA48y97Zc/dugHcIF9MJCpUnJigrNrbU353XFkLzsf?=
- =?us-ascii?Q?E7SAF8ZvNSFeiueT+zsA2F3TCWMHVPZQ8dxPGnMeDQEEE037S+Xdsto7c+NA?=
- =?us-ascii?Q?Mq1Be0711D+RAn50iGAwg44eDYuxbaOUjOnDsfHiLsgs4/+n2w5BdEKZtfE+?=
- =?us-ascii?Q?Bt+hhu4ZFrg1/5pzDi1TKwB9mlrHkoBDhHTiVrQ1AvNMtgnohqr+swcCnWKU?=
- =?us-ascii?Q?F4Xm1kpZg2AlA0bQIz3hdzfaPr1G+1MxY1/UP24vN4qDtjdk3ONWa7FPiae3?=
- =?us-ascii?Q?v8G+eeW4WtH3JdsHtJmMGFf7o4/myQxATplh/AmbV7/dMjo6oI96dQ44hcfb?=
- =?us-ascii?Q?z4B6UmdBrT6uAkoxRfobYdr46BgbVwI+upl03fyGlAEdWXGYI6lXRdp5TUXz?=
- =?us-ascii?Q?Vm6x8g2Dqo8CTqi1kWAjQJ2eV9E0sit6+wlnXnJGImm5ZhBtfHuLpEJqLSV3?=
- =?us-ascii?Q?/Ym7xq06EScTrihrEvkphxpYNKUF0mCi307iC/NwyGwRjjQTVCaautndq7md?=
- =?us-ascii?Q?IjsVp/K74IkHJdcYYAzS0I42ThYHl2RuSX8VBljGSTp5qNsOObUaE7WyeWqg?=
- =?us-ascii?Q?SA=3D=3D?=
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d4862c3-3634-45d3-26dd-08dc6812b7d2
-X-MS-Exchange-CrossTenant-AuthSource: NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2024 06:07:58.3851
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: e+mQlKvQXLQtcUIjqA6wtYoPLxWkAFZ6MGw5nK7Em3CeYPBOVb473jzCqw79sEIPWieB3TSAB3If5hXjCzvCvcFP8EIHH0J4zGiU3sNgTAs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: NT0PR01MB1278
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/2] caam: init-clk based on caam-page0-access
+To: Pankaj Gupta <pankaj.gupta@nxp.com>, gaurav.jain@nxp.com,
+ horia.geanta@nxp.com, V.Sethi@nxp.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net, iuliana.prodan@nxp.com, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-imx@nxp.com
+References: <20240429062855.923595-1-pankaj.gupta@nxp.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240429062855.923595-1-pankaj.gupta@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-RSA text data uses variable length buffer allocated in software stack.
-Calling kfree on it causes undefined behaviour in subsequent operations.
+On 29/04/2024 08:28, Pankaj Gupta wrote:
+> v4:
+>  - Correct the null pointer checking
+> 
+> v3:
+>  - Splitting the patch into two.
+>  - Disposed-off comments received on v2.
+> 
+> v2:
+>  - Considering the OPTEE enablement check too, for setting the
+>    variable 'reg_access'.
+> 
+> Pankaj Gupta (2):
+>   caam: init-clk based on caam-page0-access
+>   drivers: crypto: caam: i.MX8ULP donot have CAAM page0 access
+> 
 
-Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
----
- drivers/crypto/starfive/jh7110-rsa.c | 1 -
- 1 file changed, 1 deletion(-)
+Two patches here, 5 patches in patchset, some with entirely different
+patch prefixes.
 
-diff --git a/drivers/crypto/starfive/jh7110-rsa.c b/drivers/crypto/starfive/jh7110-rsa.c
-index 4d7eb3d1e764..33093ba4b13a 100644
---- a/drivers/crypto/starfive/jh7110-rsa.c
-+++ b/drivers/crypto/starfive/jh7110-rsa.c
-@@ -276,7 +276,6 @@ static int starfive_rsa_enc_core(struct starfive_cryp_ctx *ctx, int enc)
- 
- err_rsa_crypt:
- 	writel(STARFIVE_RSA_RESET, cryp->base + STARFIVE_PKA_CACR_OFFSET);
--	kfree(rctx->rsa_data);
- 	return ret;
- }
- 
--- 
-2.40.1
+Bring some order to this.
+
+Best regards,
+Krzysztof
 
