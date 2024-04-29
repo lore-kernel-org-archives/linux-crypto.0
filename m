@@ -1,145 +1,259 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9CC8613E;
-	Mon, 29 Apr 2024 16:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B42D86643
+	for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 17:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714409854; cv=none; b=A3Z+vlFcs0D2AWFKC9kl3ec8LgsMXfblWwHy01xvM/xjg2yZCU2mQQyEOFgugpvUYk6GZfcLnXcQkhqkxkMaUpBXtOfMVKmbiAUQ78DNzAT0IrV2tt0F7EVp0H8ASQL8zlOqoka8TTc09u1qPTgEC5NJDKXNIB583tjG8v9RkyI=
+	t=1714410309; cv=none; b=mVG0KSIkgA4Dl5OafFFRdei5eW5kiF6u/PcLW9FHyb0U+fXi0/gGyjsVaazK23cZBfci3jWsgygZwpkxCO4GUaRJ9auJwj1hx1QVSeiULXkoOVE0Iw7Vu9ZHK9CoWjZf4sk2CxFRjRb/PHsLYQExx/Z4SHRaw8WTsQmJFvYr8PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714409854; c=relaxed/simple;
-	bh=/SuGvf8UkdCZnz5+I7ZPOCp3GfImi4Fd9AOTgaarsnw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H1Tvft/pX0cmMAFQGEMTKTbZrBgE+v77udecIo2FxBRPefChSvdJjCiAn4VrNv0PmXkbxwk9hVOPRr640p+xQaRv6sY5H8DRQlA3J9vxmGzZ3clPTFvEy1RmR8wtVpZRvP2wfqcYhj8duSW3fBrcDjiYLzlDQpIbqQgEGg3mdOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bqMkonM1; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1714410309; c=relaxed/simple;
+	bh=MN4P/h1kq1Q02r/Lhf7jm0fR1hoE8r8RghANUoLDXuQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AEo/JRiDsjxu5zo2xTLUAgQuTx+06OiD+UtPegdvP73o5CkVUYiGbxNDI2CWWMvvsR0qF+rn4BNVI6WEfdUieoUUINeJykQgaZU4IYXikKz/ahLxsBo7Vjm1gwpu3TWho5JytUpJIBr+HVtFwMw+057g9aI2EX4+pqyKx10M34E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=drvU758E; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bqMkonM1"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43TG2DOO005539;
-	Mon, 29 Apr 2024 16:57:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=xuoovfx2POhGX/fjXgHfC5zmT1B1rEDq+Am+MvjR7Dk=;
- b=bqMkonM1zBlCPV9qJae6YHqtEmjrt+Ujqu3sxHVKbyKOoX8qveHu5f1GdmQYzHuz5x2u
- 2qjPNyAmxaDNUdWP0ZcYonOG5yTC47rFkIc0ISi/qfSoFbGAo2JHLdUOfaiu6GewaK78
- mWRK7XCp2rhDfxYdEepLNbU0ARFJIT1JCwIoTAVNvROGwMBy/djpIHqt5wFF3bdQw0YF
- C+77e890foTPbWVMKMRANENqfeR+7V5KXl4umPe9zp6ADduVUcW2o5g8XzdcAGbU0BZl
- ij8HJmGmQD3jnxUeq/Em6HBhz2uYfKD3LA+ImsnSe9rdz1Ryan8QpHoLQcitEDr8vl5f cg== 
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xteqar5nh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Apr 2024 16:57:26 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43TE8HVf027569;
-	Mon, 29 Apr 2024 16:57:25 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xsc308jkc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Apr 2024 16:57:25 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43TGvMKo21168688
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 29 Apr 2024 16:57:24 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4A65058058;
-	Mon, 29 Apr 2024 16:57:22 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D458858057;
-	Mon, 29 Apr 2024 16:57:21 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 29 Apr 2024 16:57:21 +0000 (GMT)
-Message-ID: <f001bc3f-0c70-4118-bc71-8455808004b4@linux.ibm.com>
-Date: Mon, 29 Apr 2024 12:57:21 -0400
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="drvU758E"
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7d9e70f388fso200310039f.2
+        for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 10:05:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1714410306; x=1715015106; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NjIM1YsOHJSXus8VNmDaNi8MZ1j7PDi3kmS0uCHnMmg=;
+        b=drvU758EbpECeq2zHD9OBmPsG9kodvQQ/Zo8huvVjKVTaiciYwoHFmriEPJlxU1aB0
+         6UKB0Pof0r7fGmdG3fNTp9j7xcY2KonHy+QIQ8h8Nu9nMrnuKzbKkyeht/BQUqCuLAie
+         ar0NvmSl73jVBq/CAdctJ7V0MZla8b9CDO+Hg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714410306; x=1715015106;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NjIM1YsOHJSXus8VNmDaNi8MZ1j7PDi3kmS0uCHnMmg=;
+        b=P5bXUGuJ1F1DQoZ3WRL76hRLOOcsQXB9vwvqS3W0WvGGW81yj3IhDteK1FUVeAl9eq
+         1L3gki3hSHZqWI6ZIRnJn8jTODkFQ7Rd/EgAg2imd/VatDYxtklBvdfU3h5n7plSVEAA
+         kb/CDD9HTHA7/gTWvXGEgXcz2kNiHT7KdgVw1A0qgOxUQfFIUKdH+wzIQorh52lAsGpD
+         HGUICeDwLu+ZI0s8DnIcEjA7TVIMhFvxxe0fMY9u61icorCmtj3MEgtveg8rvuas59pZ
+         PkwsHNDfkAjc+M9S6S1WQzwTHa1ecSkq5pT7zux2wfABM2QBAs+4RaW4pq2z9Nq/eEYQ
+         SDnw==
+X-Forwarded-Encrypted: i=1; AJvYcCU1S0RDROTrNGL9vdswelRqsVjZNtGcF5A0DHblKVZJqDDjwc6StSJK1JhD3EXK+LpNnOQG7uOiJLe9IpgJDxpCgoghtlC8Q5ycJusc
+X-Gm-Message-State: AOJu0Yz6rlxVI9Lu+NWluRw5Iu+v5EZK5wHzSN/lm/SjgS2iWsJDscBz
+	Z9UId5ZQaIh7RdLpip8YI59T0KQzdGMWZTUY9FYlIYxKCMo0Kku5uEYB3N64oA==
+X-Google-Smtp-Source: AGHT+IHFoa7yUHDaRgqu4l/JUQo/w0VQEfcK74Y0V+lFVzAsB35zJ7rZlOdiXClJHSoCrRrlV+IkTQ==
+X-Received: by 2002:a5e:9246:0:b0:7de:a753:82b3 with SMTP id z6-20020a5e9246000000b007dea75382b3mr420256iop.15.1714410306525;
+        Mon, 29 Apr 2024 10:05:06 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id x71-20020a63864a000000b00606dd49d3b8sm9250880pgd.57.2024.04.29.10.05.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Apr 2024 10:05:04 -0700 (PDT)
+Date: Mon, 29 Apr 2024 10:05:01 -0700
+From: Kees Cook <keescook@chromium.org>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Haren Myneni <haren@us.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] crypto/nx: Avoid potential
+ -Wflex-array-member-not-at-end warning
+Message-ID: <202404290947.4A8BF6A6@keescook>
+References: <ZgHmRNcR+a4EJX94@neat>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] crypto: ecc - Prevent ecc_digits_from_bytes from
- reading too many bytes
-To: Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, lukas@wunner.de
-References: <20240429161316.3146626-1-stefanb@linux.ibm.com>
- <D0WRD3IZ3AJC.GWZHZLHHBJ5B@kernel.org>
-Content-Language: en-US
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <D0WRD3IZ3AJC.GWZHZLHHBJ5B@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: b67sJDTXArPPA2BrAC3Tgs_2GLeWBIsP
-X-Proofpoint-ORIG-GUID: b67sJDTXArPPA2BrAC3Tgs_2GLeWBIsP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-29_14,2024-04-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 mlxlogscore=999 spamscore=0 adultscore=0 suspectscore=0
- impostorscore=0 priorityscore=1501 phishscore=0 clxscore=1015
- malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404290109
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZgHmRNcR+a4EJX94@neat>
 
-
-
-On 4/29/24 12:47, Jarkko Sakkinen wrote:
-> On Mon Apr 29, 2024 at 7:13 PM EEST, Stefan Berger wrote:
->> Prevent ecc_digits_from_bytes from reading too many bytes from the input
->> byte array in case an insufficient number of bytes is provided to fill the
->> output digit array of ndigits. Therefore, initialize the most significant
->> digits with 0 to avoid trying to read too many bytes later on. Convert the
->> function into a regular function since it is getting too big for an inline
->> function.
->>
->> If too many bytes are provided on the input byte array the extra bytes
->> are ignored since the input variable 'ndigits' limits the number of digits
->> that will be filled.
->>
->> Fixes: d67c96fb97b5 ("crypto: ecdsa - Convert byte arrays with key coordinates to digits")
->> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
->>
->> ---
->>
->> v2:
->>   - un-inline function
->>   - use memset
->> ---
->>   crypto/ecc.c                  | 22 ++++++++++++++++++++++
->>   include/crypto/internal/ecc.h | 15 ++-------------
->>   2 files changed, 24 insertions(+), 13 deletions(-)
->>
->> diff --git a/crypto/ecc.c b/crypto/ecc.c
->> index c1d2e884be1e..fe761256e335 100644
->> --- a/crypto/ecc.c
->> +++ b/crypto/ecc.c
->> @@ -68,6 +68,28 @@ const struct ecc_curve *ecc_get_curve(unsigned int curve_id)
->>   }
->>   EXPORT_SYMBOL(ecc_get_curve);
->>   
+On Mon, Mar 25, 2024 at 03:01:56PM -0600, Gustavo A. R. Silva wrote:
+> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
+> ready to enable it globally.
 > 
-> Just a minor nit:
+> Use the `__struct_group()` helper to separate the flexible array
+> from the rest of the members in flexible `struct nx842_crypto_header`,
+> through tagged `struct nx842_crypto_header_hdr`, and avoid embedding
+> the flexible-array member in the middle of `struct nx842_crypto_ctx`.
 > 
-> For exported symbol you need to document the function,including
-> the parameters [1].
+> Also, use `container_of()` whenever we need to retrieve a pointer to
+> the flexible structure.
+> 
+> This code was detected with the help of Coccinelle, and audited and
+> modified manually.
+> 
+> Link: https://github.com/KSPP/linux/issues/202
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> ---
+>  drivers/crypto/nx/nx-842.c |  6 ++++--
+>  drivers/crypto/nx/nx-842.h | 11 +++++++----
+>  2 files changed, 11 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
+> index 2ab90ec10e61..82214cde2bcd 100644
+> --- a/drivers/crypto/nx/nx-842.c
+> +++ b/drivers/crypto/nx/nx-842.c
+> @@ -251,7 +251,9 @@ int nx842_crypto_compress(struct crypto_tfm *tfm,
+>  			  u8 *dst, unsigned int *dlen)
+>  {
+>  	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
+> -	struct nx842_crypto_header *hdr = &ctx->header;
+> +	struct nx842_crypto_header *hdr =
+> +				container_of(&ctx->header,
+> +					     struct nx842_crypto_header, hdr);
+>  	struct nx842_crypto_param p;
+>  	struct nx842_constraints c = *ctx->driver->constraints;
+>  	unsigned int groups, hdrsize, h;
+> @@ -490,7 +492,7 @@ int nx842_crypto_decompress(struct crypto_tfm *tfm,
+>  	}
+>  
+>  	memcpy(&ctx->header, src, hdr_len);
+> -	hdr = &ctx->header;
+> +	hdr = container_of(&ctx->header, struct nx842_crypto_header, hdr);
+>  
+>  	for (n = 0; n < hdr->groups; n++) {
+>  		/* ignore applies to last group */
+> diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
+> index 7590bfb24d79..1f42c83d2683 100644
+> --- a/drivers/crypto/nx/nx-842.h
+> +++ b/drivers/crypto/nx/nx-842.h
+> @@ -157,9 +157,12 @@ struct nx842_crypto_header_group {
+>  } __packed;
+>  
+>  struct nx842_crypto_header {
+> -	__be16 magic;		/* NX842_CRYPTO_MAGIC */
+> -	__be16 ignore;		/* decompressed end bytes to ignore */
+> -	u8 groups;		/* total groups in this header */
+> +	/* New members must be added within the __struct_group() macro below. */
+> +	__struct_group(nx842_crypto_header_hdr, hdr, __packed,
+> +		__be16 magic;		/* NX842_CRYPTO_MAGIC */
+> +		__be16 ignore;		/* decompressed end bytes to ignore */
+> +		u8 groups;		/* total groups in this header */
+> +	);
+>  	struct nx842_crypto_header_group group[];
+>  } __packed;
+>  
+> @@ -171,7 +174,7 @@ struct nx842_crypto_ctx {
+>  	u8 *wmem;
+>  	u8 *sbounce, *dbounce;
+>  
+> -	struct nx842_crypto_header header;
+> +	struct nx842_crypto_header_hdr header;
+>  	struct nx842_crypto_header_group group[NX842_CRYPTO_GROUP_MAX];
+>  
+>  	struct nx842_driver *driver;
 
-Like other functions, the ecc_digits_from_bytes also still/already has 
-the documentation in the header file:
+Hmm. I think commit 03952d980153 ("crypto: nx - make platform drivers
+directly register with crypto") incorrectly added "struct nx842_driver
+*driver" to the end of struct nx842_crypto_ctx. I think it should be
+before "header".
 
-/**
-  * ecc_digits_from_bytes() - Create ndigits-sized digits array from 
-byte array
-  * @in:       Input byte array
-  * @nbytes    Size of input byte array
-  * @out       Output digits array
-  * @ndigits:  Number of digits to create from byte array
+Then I see:
+
+#define NX842_CRYPTO_HEADER_SIZE(g)                             \
+        (sizeof(struct nx842_crypto_header) +                   \
+         sizeof(struct nx842_crypto_header_group) * (g))
+
+This is just struct_size(), really. And nothing uses:
+
+#define NX842_CRYPTO_HEADER_MAX_SIZE                            \
+        NX842_CRYPTO_HEADER_SIZE(NX842_CRYPTO_GROUP_MAX)
+
+And then looking for what uses struct nx842_crypto_ctx's "group" member,
+I don't see anything except some sizeof()s:
+
+drivers/crypto/nx/nx-common-powernv.c:1044:     .cra_ctxsize = sizeof(struct nx842_crypto_ctx),
+drivers/crypto/nx/nx-common-pseries.c:1021:     .cra_ctxsize = sizeof(struct nx842_crypto_ctx),
+
+This is just a maximally sized ctx (as if the group count were
+NX842_CRYPTO_GROUP_MAX), which we could use struct_size for again:
+
+     .cra_ctxsize = struct_size_t(struct nx842_crypto_ctx, header.group,
+				  NX842_CRYPTO_GROUP_MAX),
+
+So then "group" can be entirely removed from struct nx842_crypto_ctx.
+
+The result means we can also add __counted_by:
+
+
+diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
+index 2ab90ec10e61..144972fe2e6f 100644
+--- a/drivers/crypto/nx/nx-842.c
++++ b/drivers/crypto/nx/nx-842.c
+@@ -62,10 +62,7 @@
   */
-void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
-                            u64 *out, unsigned int ndigits);
+ #define NX842_CRYPTO_MAGIC	(0xf842)
+ #define NX842_CRYPTO_HEADER_SIZE(g)				\
+-	(sizeof(struct nx842_crypto_header) +			\
+-	 sizeof(struct nx842_crypto_header_group) * (g))
+-#define NX842_CRYPTO_HEADER_MAX_SIZE				\
+-	NX842_CRYPTO_HEADER_SIZE(NX842_CRYPTO_GROUP_MAX)
++	struct_size_t(nx842_crypto_header, group, g)
+ 
+ /* bounce buffer size */
+ #define BOUNCE_BUFFER_ORDER	(2)
+diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
+index 7590bfb24d79..70d9f99a4595 100644
+--- a/drivers/crypto/nx/nx-842.h
++++ b/drivers/crypto/nx/nx-842.h
+@@ -160,7 +160,7 @@ struct nx842_crypto_header {
+ 	__be16 magic;		/* NX842_CRYPTO_MAGIC */
+ 	__be16 ignore;		/* decompressed end bytes to ignore */
+ 	u8 groups;		/* total groups in this header */
+-	struct nx842_crypto_header_group group[];
++	struct nx842_crypto_header_group group[] __counted_by(groups);
+ } __packed;
+ 
+ #define NX842_CRYPTO_GROUP_MAX	(0x20)
+@@ -171,10 +171,9 @@ struct nx842_crypto_ctx {
+ 	u8 *wmem;
+ 	u8 *sbounce, *dbounce;
+ 
+-	struct nx842_crypto_header header;
+-	struct nx842_crypto_header_group group[NX842_CRYPTO_GROUP_MAX];
+-
+ 	struct nx842_driver *driver;
++
++	struct nx842_crypto_header header;
+ };
+ 
+ int nx842_crypto_init(struct crypto_tfm *tfm, struct nx842_driver *driver);
+diff --git a/drivers/crypto/nx/nx-common-powernv.c b/drivers/crypto/nx/nx-common-powernv.c
+index 8c859872c183..22ab4a5885f2 100644
+--- a/drivers/crypto/nx/nx-common-powernv.c
++++ b/drivers/crypto/nx/nx-common-powernv.c
+@@ -1041,7 +1041,8 @@ static struct crypto_alg nx842_powernv_alg = {
+ 	.cra_driver_name	= "842-nx",
+ 	.cra_priority		= 300,
+ 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
+-	.cra_ctxsize		= sizeof(struct nx842_crypto_ctx),
++	.cra_ctxsize		= struct_size_t(struct nx842_crypto_ctx, header.group,
++						NX842_CRYPTO_GROUP_MAX),
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= nx842_powernv_crypto_init,
+ 	.cra_exit		= nx842_crypto_exit,
+diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
+index 35f2d0d8507e..fdf328eab6fc 100644
+--- a/drivers/crypto/nx/nx-common-pseries.c
++++ b/drivers/crypto/nx/nx-common-pseries.c
+@@ -1018,7 +1018,8 @@ static struct crypto_alg nx842_pseries_alg = {
+ 	.cra_driver_name	= "842-nx",
+ 	.cra_priority		= 300,
+ 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
+-	.cra_ctxsize		= sizeof(struct nx842_crypto_ctx),
++	.cra_ctxsize		= struct_size_t(struct nx842_crypto_ctx, header.group,
++						NX842_CRYPTO_GROUP_MAX),
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= nx842_pseries_crypto_init,
+ 	.cra_exit		= nx842_crypto_exit,
 
-  Should be ok?
+
+-- 
+Kees Cook
