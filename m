@@ -1,122 +1,92 @@
-Received: from mail.zeus03.de (www.zeus03.de [194.117.254.33])
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2977168A9
-	for <linux-crypto@vger.kernel.org>; Tue, 30 Apr 2024 12:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3928A176FA3
+	for <linux-crypto@vger.kernel.org>; Tue, 30 Apr 2024 16:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714479356; cv=none; b=HPsas/Fk0ozdZ5e7u+FXOrDCSGTf2vRQ5dEcHyhO0W0nhlawviYO/vIcx7uNeeLS55f0Hy+qSUcbAiGoKd9bfAHY7eD9ZkzEdQq75rYQDoPvKNRH8FSLsyX9e8bRtKsKlwg1ktQXCSH76FJ2LqTC2KI9U46rl7cIwdqgHUdzpUM=
+	t=1714494553; cv=none; b=hN7H4DGIkJuyxOkVeShb4P/stz9wXn3q6TO3IWQvWSqosUXnrT7mRMFjWGleUF0LpPyTngRhkb7GJ/umGL1kYjkz5uGzRXUIVEz5Qo+BrTeBci/VPccKE7D3jWzHlQcbZq2NMolhbqzK+ejZ1uWq4pJ3w5R/r0WYzExiMoC0ADs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714479356; c=relaxed/simple;
-	bh=RTWlSeC2wglCCVDNY+KaeZe9mfpvE+kZS++gDfsg0T4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OUeCZpErFzCW6yg0hNmiolvbuy+ZheiNEP2yrjFEBLQJ3zaPVSVcGWd/BEckmflE+01477UobUjPyoHBdmrOvhh/7yrkEw69rG2yTNv001Dw5EnK4Ot3OS3jVO/KmpQuI4h+5ynEr9ZNWHC0fQx6pYEnlqAOSglzp34AwV7mbko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=U+Z92GQr; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+	s=arc-20240116; t=1714494553; c=relaxed/simple;
+	bh=kkvw51P6Za/qRoyOm34SqO6Jg6cob+X5xRe+y/3jnK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gcOkeQ3r0A1SOG/cQ6sWvdzq9lyCWcwIgQOVYvDcdtZ55uawqU5c0FWz3cMMz2RXe8rExSo8rRo9pSokgX/+leDotqlDdWZ32phQoYRppa7EgbHWH+bXH+FXbhPErc5DGj5bIxFK3//BEhURnNpzZinNX3r+J3+4r/TPA5T6Wns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=XPpR772T; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="U+Z92GQr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=from:to:cc:subject:date:message-id
-	:mime-version:content-transfer-encoding; s=k1; bh=1Mcipb9dUpVy//
-	WMw2ZuImhnom+VYm7qLXmOugjjkZI=; b=U+Z92GQrw+8jDcECjpUIhr9VbGu5b8
-	p130XbruMec0cGbAwPA11Tdd/cABkv7slyzGM59t8iB7MdW/Wtv1ENGQzBhl7Ahn
-	Fk9YFXVoipbig0XCo+C8k5tb1Kme7wb/VjcY32aCuDJfLEzYOjvsp705oxB1EnvS
-	p7s6iw6dsnZWZ6leEuwn0nLM571XaAbNr6r42XDwTYfe4YYUPRFdPrt4DdplC8uG
-	XjoGgqVQBaQPRvrFhnuBFBq8TTgsWjRT/cZuQHOXitq4SH+IYLg+HSJQ4GwDmog9
-	OGoNCnTCR9/KPhvJS8YWsNYijtxw4ntMP2ZoZmGL17L4B8z5GtvEof5w==
-Received: (qmail 2628262 invoked from network); 30 Apr 2024 14:15:51 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 30 Apr 2024 14:15:51 +0200
-X-UD-Smtp-Session: l3s3148p1@IOO3VE8XHolehhrb
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: linux-crypto@vger.kernel.org
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: [PATCH 1/1] crypto: sahara: use 'time_left' variable with wait_for_completion_timeout()
-Date: Tue, 30 Apr 2024 14:15:51 +0200
-Message-ID: <20240430121551.30790-1-wsa+renesas@sang-engineering.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="XPpR772T"
+Received: from cwcc.thunk.org (pool-108-26-156-33.bstnma.fios.verizon.net [108.26.156.33])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 43UGQXgJ020744
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Apr 2024 12:26:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1714494396; bh=goM805EIaf7WdDPZb5HYoEDPI6lMIJGS/qiTjPMlJ4k=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=XPpR772TTYa+XubwFcYgQTJGqPnocH8jOsOUU6PbJtTFCeafVZVTs3c5HsWPB/WVV
+	 t9aeDlLLf6eS6D5fG9jABT9OhATloQkxO2W4BaEJWNSg6Nsk8w4uctAslsQDRHFbNW
+	 ad6HFsLXwIhoqeQXsPW7+q2CNuFZVdCSxZApkcqeMQqjfQoSE/npXoHmCnfdBudlsu
+	 IU6D4XWXFki+ynyqxEyUZ8axvsEo9L8prRWKzUj4kxH0m9qhPwd0Q64SczYfX9QdWD
+	 kNAiiaVNoTqDjyYBNFlrN4IT6sZJo6F7fSe4GFTMN8ktK80aoNKZzdT5jmSNSgyr0h
+	 JpAzC+tMmP86w==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+	id E1EA515C02D7; Tue, 30 Apr 2024 12:26:32 -0400 (EDT)
+Date: Tue, 30 Apr 2024 12:26:32 -0400
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Aaron Toponce <aaron.toponce@gmail.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] random: add chacha8_block and swtich the rng to it
+Message-ID: <20240430162632.GA1924352@mit.edu>
+References: <20240429134942.2873253-1-aaron.toponce@gmail.com>
+ <20240430031105.GA10165@sol.localdomain>
+ <ZjB2ZjkebZyC7FZp@hercules>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjB2ZjkebZyC7FZp@hercules>
 
-There is a confusing pattern in the kernel to use a variable named 'timeout' to
-store the result of wait_for_completion_timeout() causing patterns like:
+On Mon, Apr 29, 2024 at 10:41:10PM -0600, Aaron Toponce wrote:
+> > Note also that currently the Linux RNG is using a portable C
+> > implementation of ChaCha20.  If there is actually a desire to
+> > accelerate large reads (which again, aren't the main use case of
+> > the Linux RNG), it would be possible to use a SIMD implementation
+> > of ChaCha20, which already exists in the kernel.  That would speed
+> > up ChaCha20 by roughly 2-5x depending on the CPU.
+> 
+> If ChaCha8 makes us uncomfortable, even though defensible, ChaCha12
+> is a good compromise. As you mentioned, Google implemented ChaCha12
+> in Adiantum. It offers a 1.67x speedup over ChaCha20 while still
+> providing 5 additional rounds of security over the best known
+> attack.
 
-	timeout = wait_for_completion_timeout(...)
-	if (!timeout) return -ETIMEDOUT;
+I'm not sure I see the point of trying to accelerate the Linux RNG.
+Sure, doing "dd if=/dev/urandom" is *fun*, but what's the real world
+use case where this actually matters?  The kernel RNG is meant for key
+generation, where a much larger safety margin is a good thing, and
+where absolute performance is generally not a big deal.
 
-with all kinds of permutations. Use 'time_left' as a variable to make the code
-self explaining.
+After all, with key generation generally you are also performing some
+kind of assymetric key crypto as part of the IKE or TLS setup, and the
+time to generate the session key is in the noise.  And if you are
+trying to wipe a disk, using something like shred(1) is really the
+right tool.
 
-Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
----
- drivers/crypto/sahara.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Ultimately this boils down to a risk/benefit tradeoff.  I judge the
+risk that you are a shill sent by a nation-state security agency ala
+Jia Tan of xz infamy, trying to weaken Linux's RNG to be very low; but
+what's the benefit?  If the risk is low, but the benefit is also low,
+maybe it's not worth it?
 
-diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
-index 3423b5cde1c7..96d4af5d48a6 100644
---- a/drivers/crypto/sahara.c
-+++ b/drivers/crypto/sahara.c
-@@ -559,7 +559,7 @@ static int sahara_aes_process(struct skcipher_request *req)
- 	struct sahara_ctx *ctx;
- 	struct sahara_aes_reqctx *rctx;
- 	int ret;
--	unsigned long timeout;
-+	unsigned long time_left;
- 
- 	/* Request is ready to be dispatched by the device */
- 	dev_dbg(dev->device,
-@@ -597,15 +597,15 @@ static int sahara_aes_process(struct skcipher_request *req)
- 	if (ret)
- 		return -EINVAL;
- 
--	timeout = wait_for_completion_timeout(&dev->dma_completion,
--				msecs_to_jiffies(SAHARA_TIMEOUT_MS));
-+	time_left = wait_for_completion_timeout(&dev->dma_completion,
-+						msecs_to_jiffies(SAHARA_TIMEOUT_MS));
- 
- 	dma_unmap_sg(dev->device, dev->out_sg, dev->nb_out_sg,
- 		DMA_FROM_DEVICE);
- 	dma_unmap_sg(dev->device, dev->in_sg, dev->nb_in_sg,
- 		DMA_TO_DEVICE);
- 
--	if (!timeout) {
-+	if (!time_left) {
- 		dev_err(dev->device, "AES timeout\n");
- 		return -ETIMEDOUT;
- 	}
-@@ -931,7 +931,7 @@ static int sahara_sha_process(struct ahash_request *req)
- 	struct sahara_dev *dev = dev_ptr;
- 	struct sahara_sha_reqctx *rctx = ahash_request_ctx(req);
- 	int ret;
--	unsigned long timeout;
-+	unsigned long time_left;
- 
- 	ret = sahara_sha_prepare_request(req);
- 	if (!ret)
-@@ -963,14 +963,14 @@ static int sahara_sha_process(struct ahash_request *req)
- 
- 	sahara_write(dev, dev->hw_phys_desc[0], SAHARA_REG_DAR);
- 
--	timeout = wait_for_completion_timeout(&dev->dma_completion,
--				msecs_to_jiffies(SAHARA_TIMEOUT_MS));
-+	time_left = wait_for_completion_timeout(&dev->dma_completion,
-+						msecs_to_jiffies(SAHARA_TIMEOUT_MS));
- 
- 	if (rctx->sg_in_idx)
- 		dma_unmap_sg(dev->device, dev->in_sg, dev->nb_in_sg,
- 			     DMA_TO_DEVICE);
- 
--	if (!timeout) {
-+	if (!time_left) {
- 		dev_err(dev->device, "SHA timeout\n");
- 		return -ETIMEDOUT;
- 	}
--- 
-2.43.0
+Cheers,
 
+					- Ted
