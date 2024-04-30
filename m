@@ -1,41 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E06ADDA6;
-	Tue, 30 Apr 2024 03:11:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C0B101C4;
+	Tue, 30 Apr 2024 03:18:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714446668; cv=none; b=PKsxUIerL//b2LCDWb32S3Z2EF2gdBxcpoyO/UMqn2RBhPbxP42HDQxlZ10V3PEDGwtgg51LPgQKtFnNZMp7OXSDQ0G8dotQPNfNgNVqmMCVl9FabcuGC9exDzSP2ggjqWzpAX9wsOSJ3vMYRzndpdlQPZq2DqHnMGOd9C0G7zE=
+	t=1714447130; cv=none; b=lsJWxasPZmOt2/kUSKVfihAShJsy1lER5c3so+Q4/IDw0H9GvYmCt/hvBjQ8QBJwPdNITTJcjvAj7K1uwtA9dTyHv0eAeoj6hCoLJo9oBlLCYKo8SbVtS5jV9o4vD8ZAAc2rioUjcDcVAjbYp0SQttSm0spiFFofErv3EVdeweU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714446668; c=relaxed/simple;
-	bh=yT3MMoBO2F4LiKz7W0TmFqgNagQSndlMM+rjLP8IxtU=;
+	s=arc-20240116; t=1714447130; c=relaxed/simple;
+	bh=jFpDU0vcTXdr0AsLdbKUE/E45SonMzpHUKonO6iy2VQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iM4TfvnRfPsjzxQ9Ylvyl1fITdiPK078jw+gykSXGAzWl/vYQiRMXlv1eUKI/AV+rpY6DZuQYaoNF4qfrJqyVPUyCFlAOAmXEGMau0/aFZOnhc4rH3A/XiziwbzUq44Tfr6IO/9IpxYahXe+ISJc83XCvwjwhZSz3RmebyWEpq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Re6D8+PL; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=UcOCacOUXWJDp/lylfLpuxEP61BBiSZAXdleUPgum8kaMQZg+aEzoO4RFPxdwe099Qbat/ayaC3RWlWXObwifRpQbQYGwgjuhKoE1SCyLvLGcFAeOgcNLVTMhPkjM9h8MSVB7RIMCx4o/IlJnedqS7Wn9XCutsuyTl7JC0lUQp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LuZn1koE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Re6D8+PL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71E8DC116B1;
-	Tue, 30 Apr 2024 03:11:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LuZn1koE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70D4DC116B1;
+	Tue, 30 Apr 2024 03:18:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714446667;
-	bh=yT3MMoBO2F4LiKz7W0TmFqgNagQSndlMM+rjLP8IxtU=;
+	s=k20201202; t=1714447129;
+	bh=jFpDU0vcTXdr0AsLdbKUE/E45SonMzpHUKonO6iy2VQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Re6D8+PL3acp6LaiFk05Wz2mtAprPWxzLIsCu5lX90BsYBFgsg1TRYT/mXb3VsFzo
-	 NTpdjcYS6qjf6nITOR9b5XIq5D35rDuGd1GrAvug9YzPDhsLSW0elLpDVVAjaUE293
-	 uSCcDgqwGOYB0Nb9uEPoowC9XbfPZSWzc6/FnWgftSGPqYTutguJCblXqT3y7Z6vh7
-	 XfX5hR4/fgMIIIxvIYZdtrNSUwo3Plv2BhG0lW/mo5gm5AuQzoWWlJ4iVAEh9qBb60
-	 rg/SGR14PbEeRsfJGy7/h2xCeo1pS2CxXZ1pI+b9qjIIMNliLKC47/PU+8SEtLaGbl
-	 g79v8l51MyZ+w==
-Date: Mon, 29 Apr 2024 20:11:05 -0700
+	b=LuZn1koErWxms/QDZXsWzaiYu3CyBpxnfB20cadUDPZLM9t+h+1Ngvt3b5rKhR3am
+	 0WSEoHBI+Ig9nHB1XRPaKn561cAT+rtiu8qKd1q5G+7h6kSjeyD2BSwCjWpqMOfooc
+	 xi2wvmcs4d81xgpdNGnYLg1tGoGAhA2thgiKSpT24DQp6qYM98KWj8jnDzGARIACg0
+	 KIImSkzb+CSGg9vnS5tE5U3QWIRGngkFCPknmHlVwPGjMVFNfa1rS3aU8vYdkRfJLk
+	 iE4M3cSQHjSgek3+F79vE3WtJbndjMJVmYYyN2UYO/z1PwmFaP7iTossxxI1obtT8x
+	 yVjoiGGSlev/g==
+Date: Mon, 29 Apr 2024 20:18:47 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Aaron Toponce <aaron.toponce@gmail.com>
-Cc: Theodore Ts'o <tytso@mit.edu>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] random: add chacha8_block and swtich the rng to it
-Message-ID: <20240430031105.GA10165@sol.localdomain>
-References: <20240429134942.2873253-1-aaron.toponce@gmail.com>
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC] crypto: passing configuration parameters to comp algos
+Message-ID: <20240430031847.GB10165@sol.localdomain>
+References: <20240430030447.GE14947@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,33 +43,29 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240429134942.2873253-1-aaron.toponce@gmail.com>
+In-Reply-To: <20240430030447.GE14947@google.com>
 
-On Mon, Apr 29, 2024 at 07:48:49AM -0600, Aaron Toponce wrote:
-> According to Jean-Philippe Aumasson in his paper "Too Much Crypto" [1]:
+On Tue, Apr 30, 2024 at 12:04:47PM +0900, Sergey Senozhatsky wrote:
+> Hi,
 > 
-> > "The best result on ChaCha is a key recovery attack on the 7-round version
-> > with 2^237.7 time complexity using output data from 2^96 instances of ChaCha,
-> > that is, 2^105 bytes of data."
+> 	We'd like to be able to pass algorithm-specific parameters to
+> comp backends. As of this moment, crypto usees hard-coded default
+> values and does not permit any run-time algorithm configuration,
+> which in some cases simply disables the most interesting functionality.
+> E.g. zstd can be configured to use a pre-trained (in the user-space)
+> compression dictionary, which significantly changes algorithms
+> characteristics. Another, obvious and trivial example, is algorithms
+> compression level.
 > 
-> He then proposes that ChaCha use 8 rounds instead of 20, providing a 2.5x
-> speed-up. As such, this patch adds chacha8_block and chacha12_block and switches
-> the RNG from ChaCha20 to ChaCha8 to take advantage of that efficiency without
-> sacrificing security.
+> The problem is that we need to pass params to cra_init() function,
+> because for some algorithms that's the only place where configuration
+> can take place (e.g. zstd). Changing cra_init() to accept additional
+> `struct crypto_comp_params` looks to be a little intrusive so before
+> I write any patches I'd like to hear your thoughts.
 > 
 
-I don't think there is consensus on ChaCha8 being recommended.  Adiantum uses
-ChaCha12, but even that received some pushback.
+Have you considered just using the zstd library (<linux/zstd.h>) directly?
 
-The Linux RNG is also usually used only for small amounts of data, and its
-security (and the perception of its security) is extremely important.
-
-So just staying with ChaCha20 seems appropriate.
-
-Note also that currently the Linux RNG is using a portable C implementation of
-ChaCha20.  If there is actually a desire to accelerate large reads (which again,
-aren't the main use case of the Linux RNG), it would be possible to use a SIMD
-implementation of ChaCha20, which already exists in the kernel.  That would
-speed up ChaCha20 by roughly 2-5x depending on the CPU.
+Which kernel subsystem are you working on that uses compression?
 
 - Eric
