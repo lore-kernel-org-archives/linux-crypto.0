@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD60134402
-	for <linux-crypto@vger.kernel.org>; Tue, 30 Apr 2024 11:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169821311B0
+	for <linux-crypto@vger.kernel.org>; Tue, 30 Apr 2024 11:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714477900; cv=none; b=LvTQR742BsJ5M6BY0Ms4KB8p+VwWxQoH+yh+hoN7YY5auqz6ZZSaZIiZOSX8FVvYvnlQo9ou8TBuYcSBt1w1dDU4pvq3Sntmn8OeI+cWiIsdekwmkFrPSBL3EvQ0n6uABDxaQWgJIbd4GKPxae58ATRBMcdPnQ/8+jg+Ysu39vw=
+	t=1714477903; cv=none; b=JzK/azOMVx9LKJ+Jw2ukbsVOgSM5CRRFLQkUBKciYb7zBGz8EHOf+I9j4WDAsd4ej4cm77o6t4zOf4xgc7keA3jrKohir32UOanuuqNXAgvMagWk8YXKun2xAidIKoDqrQSGb3X94W1tkLmaYfFJ0GyuRVa7piuR+bA6d0fuAPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714477900; c=relaxed/simple;
-	bh=YdEb2BqFMuvnnlPHRBBlVg+nhsKgg+HIgVo+h3zmmro=;
+	s=arc-20240116; t=1714477903; c=relaxed/simple;
+	bh=VWk9IDpqZL9j5JTVQIJiFEASXDYpzuUgAzCje7vo3kQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NWoTJa0l7hMwS+dougCUz6u0m/9I/+UKb69f6TDy2IKX9XWd+kVT+8HYVqvAjwSlcCi3mbJU8TbPI/7ogq7mRav0m8BvtnNu2OuOrkdaA5am3A7UbW5wCRl57Fvh2PukdjAoTnnqfKvfAmfdt1PMa5wLl2/3qdT/BFH/Mx1E8Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pOW5YPnY; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=HZytMTvfqJ5mWIzRsna7ya8cckfenw5/aehwnHbXaGAwWiVNowvyJL4HJfjPoPJTmwxV6Ame/upoWmWYw9cCMexhnESXsOCy+8febI3BFuxgqRnT6Waq72l4b08PmRD/G7zky9jweZUEHQQj3H5LXy4f58SLswvhOspQX/BDbSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tWWInF4p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pOW5YPnY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E97AC2BBFC;
-	Tue, 30 Apr 2024 11:51:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tWWInF4p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75434C4AF1D;
+	Tue, 30 Apr 2024 11:51:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714477900;
-	bh=YdEb2BqFMuvnnlPHRBBlVg+nhsKgg+HIgVo+h3zmmro=;
+	s=k20201202; t=1714477902;
+	bh=VWk9IDpqZL9j5JTVQIJiFEASXDYpzuUgAzCje7vo3kQ=;
 	h=From:List-Id:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pOW5YPnYp+PgNFsPI+FMrKib5buyEx6zpURN8gO8Jw7FsS17hTzU/qCiyWJPTrxtH
-	 JURiTw5yFtWPfGHYIyOPdssrlaNSe+k7DCW9sSL/AoERYE9ow/0EEGqIbiYa/yhKyw
-	 HNGsqWWxP3+3LF+vfnVv7VPBBtnxbsiPY+fQ8VAHMRt/UYONPglS+24K1ZyN8+VIRi
-	 CzpK/ARcTXHV0vFbg3RQMKlrosMheItKuTL2h9r3IT2SCVO/5jf4eFgDgoy+1OAuzO
-	 j1IQcuetY4HRdxvC7didHhTTn1nog2yVv1kXKZd2G5Vx96nWZL86Kgb+7nVJTMe+nu
-	 dSSeFgPPD0s3g==
+	b=tWWInF4p4hImGO+rocc02hfx1Y4zfaX2UZSTPDciN7KOeFTJtyTEMT4L3Kya8prcm
+	 mVi1Uy7kg8+YYDn3YzM9kOaUDO2ZGwDR2nveEoOUrn+0gULiyZWvmCd5APTASUY65j
+	 5hZjrfTrb7ngnzA7usOabQKYNimiP0ZlVv59Rqh4Hnr+W9vNc5yt2mK2JF+WxyBOcK
+	 xokM24FcNmywS9Ji/i+XxDEeCLPNpmXG2cJMQzXKcV6uOlNGnb4UCChq5Kny1MS7Gg
+	 B4O+xHEiu8tY9WVdo4cNXZGXDZvcY0Nz7wWjZ656VOsWK/KBtTnHlPw+j+q1gUeOtT
+	 HLjvFTIIdsJUg==
 From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
 To: Gregory CLEMENT <gregory.clement@bootlin.com>,
 	Arnd Bergmann <arnd@arndb.de>,
@@ -34,14 +34,13 @@ To: Gregory CLEMENT <gregory.clement@bootlin.com>,
 	Andy Shevchenko <andy@kernel.org>,
 	Hans de Goede <hdegoede@redhat.com>,
 	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-crypto@vger.kernel.org
+	linux-crypto@vger.kernel.org,
+	Dan Carpenter <dan.carpenter@linaro.org>
 Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-Subject: [PATCH v8 6/9] platform: cznic: turris-omnia-mcu: Add support for MCU provided TRNG
-Date: Tue, 30 Apr 2024 13:51:08 +0200
-Message-ID: <20240430115111.3453-7-kabel@kernel.org>
+Subject: [PATCH v8 7/9] platform: cznic: turris-omnia-mcu: Add support for digital message signing via debugfs
+Date: Tue, 30 Apr 2024 13:51:09 +0200
+Message-ID: <20240430115111.3453-8-kabel@kernel.org>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240430115111.3453-1-kabel@kernel.org>
 References: <20240430115111.3453-1-kabel@kernel.org>
@@ -54,227 +53,468 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add support for true random number generator provided by the MCU.
-New Omnia boards come without the Atmel SHA204-A chip. Instead the
-crypto functionality is provided by new microcontroller, which has
-a TRNG peripheral.
+Add support for digital message signing with private key stored in the
+MCU. Boards with MKL MCUs have a NIST256p ECDSA private key created
+when manufactured. The private key is not readable from the MCU, but
+MCU allows for signing messages with it and retrieving the public key.
+
+As described in a similar commit 50524d787de3 ("firmware:
+turris-mox-rwtm: support ECDSA signatures via debugfs"):
+  The optimal solution would be to register an akcipher provider via
+  kernel's crypto API, but crypto API does not yet support accessing
+  akcipher API from userspace (and probably won't for some time, see
+  https://www.spinics.net/lists/linux-crypto/msg38388.html).
+
+Therefore we add support for accessing this signature generation
+mechanism via debugfs for now, so that userspace can access it.
 
 Signed-off-by: Marek Behún <kabel@kernel.org>
 ---
+ .../ABI/testing/debugfs-turris-omnia-mcu      |  13 ++
+ .../sysfs-bus-i2c-devices-turris-omnia-mcu    |  13 ++
+ MAINTAINERS                                   |   1 +
  drivers/platform/cznic/Kconfig                |   2 +
  drivers/platform/cznic/Makefile               |   1 +
- .../platform/cznic/turris-omnia-mcu-base.c    |   6 +-
- .../platform/cznic/turris-omnia-mcu-gpio.c    |   2 +-
- .../platform/cznic/turris-omnia-mcu-trng.c    | 101 ++++++++++++++++++
- drivers/platform/cznic/turris-omnia-mcu.h     |   8 ++
- 6 files changed, 118 insertions(+), 2 deletions(-)
- create mode 100644 drivers/platform/cznic/turris-omnia-mcu-trng.c
+ .../platform/cznic/turris-omnia-mcu-base.c    |  45 +++-
+ .../platform/cznic/turris-omnia-mcu-debugfs.c | 207 ++++++++++++++++++
+ drivers/platform/cznic/turris-omnia-mcu.h     |  23 ++
+ 8 files changed, 304 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/ABI/testing/debugfs-turris-omnia-mcu
+ create mode 100644 drivers/platform/cznic/turris-omnia-mcu-debugfs.c
 
+diff --git a/Documentation/ABI/testing/debugfs-turris-omnia-mcu b/Documentation/ABI/testing/debugfs-turris-omnia-mcu
+new file mode 100644
+index 000000000000..1665005c2dcd
+--- /dev/null
++++ b/Documentation/ABI/testing/debugfs-turris-omnia-mcu
+@@ -0,0 +1,13 @@
++What:		/sys/kernel/debug/turris-omnia-mcu/do_sign
++Date:		July 2024
++KernelVersion:	6.10
++Contact:	Marek Behún <kabel@kernel.org>
++Description:
++
++		======= ===========================================================
++		(Write) Message to sign with the ECDSA private key stored in MCU.
++		        The message must be exactly 32 bytes long (since this is
++		        intended to be a SHA-256 hash).
++		(Read)  The resulting signature, 64 bytes. This contains the R and
++			S values of the ECDSA signature, both in big-endian format.
++		======= ===========================================================
+diff --git a/Documentation/ABI/testing/sysfs-bus-i2c-devices-turris-omnia-mcu b/Documentation/ABI/testing/sysfs-bus-i2c-devices-turris-omnia-mcu
+index 564119849388..b239224cf9bc 100644
+--- a/Documentation/ABI/testing/sysfs-bus-i2c-devices-turris-omnia-mcu
++++ b/Documentation/ABI/testing/sysfs-bus-i2c-devices-turris-omnia-mcu
+@@ -90,6 +90,19 @@ Description:	(RO) Contains the microcontroller type (STM32, GD32, MKL).
+ 
+ 		Format: %s.
+ 
++What:		/sys/bus/i2c/devices/<mcu_device>/public_key
++Date:		July 2024
++KernelVersion:	6.10
++Contact:	Marek Behún <kabel@kernel.org>
++Description:	(RO) Contains board ECDSA public key.
++
++		Only available if MCU supports signing messages with the ECDSA
++		algorithm. If so, the board has a private key stored in the MCU
++		that was generated during manufacture and cannot be retrieved
++		from the MCU.
++
++		Format: %s.
++
+ What:		/sys/bus/i2c/devices/<mcu_device>/reset_selector
+ Date:		July 2024
+ KernelVersion:	6.10
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2aa178a9d53e..ecc5aed0a968 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2139,6 +2139,7 @@ M:	Marek Behún <kabel@kernel.org>
+ S:	Maintained
+ W:	https://www.turris.cz/
+ F:	Documentation/ABI/testing/debugfs-moxtet
++F:	Documentation/ABI/testing/debugfs-turris-omnia-mcu
+ F:	Documentation/ABI/testing/sysfs-bus-i2c-devices-turris-omnia-mcu
+ F:	Documentation/ABI/testing/sysfs-bus-moxtet-devices
+ F:	Documentation/ABI/testing/sysfs-firmware-turris-mox-rwtm
 diff --git a/drivers/platform/cznic/Kconfig b/drivers/platform/cznic/Kconfig
-index e2649cdecc38..750d5f47dba8 100644
+index 750d5f47dba8..2d45495c0a2d 100644
 --- a/drivers/platform/cznic/Kconfig
 +++ b/drivers/platform/cznic/Kconfig
-@@ -19,6 +19,7 @@ config TURRIS_OMNIA_MCU
- 	depends on I2C
- 	select GPIOLIB
- 	select GPIOLIB_IRQCHIP
-+	select HW_RANDOM
- 	select RTC_CLASS
- 	select WATCHDOG_CORE
- 	help
-@@ -28,6 +29,7 @@ config TURRIS_OMNIA_MCU
- 	  - board poweroff into true low power mode (with voltage regulators
+@@ -30,6 +30,8 @@ config TURRIS_OMNIA_MCU
  	    disabled) and the ability to configure wake up from this mode (via
  	    rtcwake)
-+	  - true random number generator (if available on the MCU)
+ 	  - true random number generator (if available on the MCU)
++	  - ECDSA message signing with board private key (if available on the
++	    MCU)
  	  - MCU watchdog
  	  - GPIO pins
  	    - to get front button press events (the front button can be
 diff --git a/drivers/platform/cznic/Makefile b/drivers/platform/cznic/Makefile
-index 687f7718c0a1..eae4c6b341ff 100644
+index eae4c6b341ff..af9213928404 100644
 --- a/drivers/platform/cznic/Makefile
 +++ b/drivers/platform/cznic/Makefile
-@@ -4,4 +4,5 @@ obj-$(CONFIG_TURRIS_OMNIA_MCU)	+= turris-omnia-mcu.o
- turris-omnia-mcu-y		:= turris-omnia-mcu-base.o
- turris-omnia-mcu-y		+= turris-omnia-mcu-gpio.o
+@@ -6,3 +6,4 @@ turris-omnia-mcu-y		+= turris-omnia-mcu-gpio.o
  turris-omnia-mcu-y		+= turris-omnia-mcu-sys-off-wakeup.o
-+turris-omnia-mcu-y		+= turris-omnia-mcu-trng.o
+ turris-omnia-mcu-y		+= turris-omnia-mcu-trng.o
  turris-omnia-mcu-y		+= turris-omnia-mcu-watchdog.o
++turris-omnia-mcu-$(CONFIG_DEBUG_FS) += turris-omnia-mcu-debugfs.o
 diff --git a/drivers/platform/cznic/turris-omnia-mcu-base.c b/drivers/platform/cznic/turris-omnia-mcu-base.c
-index 5f88119d825c..7fe4a3df93a6 100644
+index 7fe4a3df93a6..ec08443551a7 100644
 --- a/drivers/platform/cznic/turris-omnia-mcu-base.c
 +++ b/drivers/platform/cznic/turris-omnia-mcu-base.c
-@@ -369,7 +369,11 @@ static int omnia_mcu_probe(struct i2c_client *client)
- 	if (err)
- 		return err;
+@@ -159,6 +159,16 @@ static ssize_t board_revision_show(struct device *dev,
+ }
+ static DEVICE_ATTR_RO(board_revision);
  
--	return omnia_mcu_register_gpiochip(mcu);
-+	err = omnia_mcu_register_gpiochip(mcu);
++static ssize_t public_key_show(struct device *dev, struct device_attribute *a,
++			       char *buf)
++{
++	struct omnia_mcu *mcu = i2c_get_clientdata(to_i2c_client(dev));
++
++	return sysfs_emit(buf, "%*phN\n", OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN,
++			  mcu->board_public_key);
++}
++static DEVICE_ATTR_RO(public_key);
++
+ static struct attribute *omnia_mcu_base_attrs[] = {
+ 	&dev_attr_fw_version_hash_application.attr,
+ 	&dev_attr_fw_version_hash_bootloader.attr,
+@@ -168,6 +178,7 @@ static struct attribute *omnia_mcu_base_attrs[] = {
+ 	&dev_attr_serial_number.attr,
+ 	&dev_attr_first_mac_address.attr,
+ 	&dev_attr_board_revision.attr,
++	&dev_attr_public_key.attr,
+ 	NULL
+ };
+ 
+@@ -183,6 +194,9 @@ static umode_t omnia_mcu_base_attrs_visible(struct kobject *kobj,
+ 	     a == &dev_attr_board_revision.attr) &&
+ 	    !(mcu->features & FEAT_BOARD_INFO))
+ 		mode = 0;
++	else if (a == &dev_attr_public_key.attr &&
++		 !(mcu->features & FEAT_CRYPTO))
++		mode = 0;
+ 
+ 	return mode;
+ }
+@@ -333,6 +347,24 @@ static int omnia_mcu_read_board_info(struct omnia_mcu *mcu)
+ 	return 0;
+ }
+ 
++static int omnia_mcu_read_public_key(struct omnia_mcu *mcu)
++{
++	u8 reply[1 + OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN];
++	int err;
++
++	err = omnia_cmd_read(mcu->client, CMD_CRYPTO_GET_PUBLIC_KEY, reply,
++			     sizeof(reply));
 +	if (err)
 +		return err;
 +
-+	return omnia_mcu_register_trng(mcu);
++	if (reply[0] != OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN)
++		return -EIO;
++
++	memcpy(mcu->board_public_key, &reply[1], sizeof(mcu->board_public_key));
++
++	return 0;
++}
++
+ static int omnia_mcu_probe(struct i2c_client *client)
+ {
+ 	struct device *dev = &client->dev;
+@@ -361,6 +393,13 @@ static int omnia_mcu_probe(struct i2c_client *client)
+ 					     "Cannot read board info\n");
+ 	}
+ 
++	if (mcu->features & FEAT_CRYPTO) {
++		err = omnia_mcu_read_public_key(mcu);
++		if (err)
++			return dev_err_probe(dev, err,
++					     "Cannot read board public key\n");
++	}
++
+ 	err = omnia_mcu_register_sys_off_and_wakeup(mcu);
+ 	if (err)
+ 		return err;
+@@ -373,7 +412,11 @@ static int omnia_mcu_probe(struct i2c_client *client)
+ 	if (err)
+ 		return err;
+ 
+-	return omnia_mcu_register_trng(mcu);
++	err = omnia_mcu_register_trng(mcu);
++	if (err)
++		return err;
++
++	return omnia_mcu_register_debugfs(mcu);
  }
  
  static const struct of_device_id of_omnia_mcu_match[] = {
-diff --git a/drivers/platform/cznic/turris-omnia-mcu-gpio.c b/drivers/platform/cznic/turris-omnia-mcu-gpio.c
-index bcc12bd1453c..af20f8076857 100644
---- a/drivers/platform/cznic/turris-omnia-mcu-gpio.c
-+++ b/drivers/platform/cznic/turris-omnia-mcu-gpio.c
-@@ -163,7 +163,7 @@ static const struct omnia_gpio {
- };
- 
- /* mapping from interrupts to indexes of GPIOs in the omnia_gpios array */
--static const u8 omnia_int_to_gpio_idx[32] = {
-+const u8 omnia_int_to_gpio_idx[32] = {
- 	[__bf_shf(INT_CARD_DET)]		= 4,
- 	[__bf_shf(INT_MSATA_IND)]		= 5,
- 	[__bf_shf(INT_USB30_OVC)]		= 6,
-diff --git a/drivers/platform/cznic/turris-omnia-mcu-trng.c b/drivers/platform/cznic/turris-omnia-mcu-trng.c
+diff --git a/drivers/platform/cznic/turris-omnia-mcu-debugfs.c b/drivers/platform/cznic/turris-omnia-mcu-debugfs.c
 new file mode 100644
-index 000000000000..b85550dea4ad
+index 000000000000..67dc02a442d8
 --- /dev/null
-+++ b/drivers/platform/cznic/turris-omnia-mcu-trng.c
-@@ -0,0 +1,101 @@
++++ b/drivers/platform/cznic/turris-omnia-mcu-debugfs.c
+@@ -0,0 +1,207 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * CZ.NIC's Turris Omnia MCU TRNG driver
++ * CZ.NIC's Turris Omnia MCU ECDSA message signing via debugfs
 + *
 + * 2024 by Marek Behún <kabel@kernel.org>
 + */
 +
 +#include <linux/bitfield.h>
 +#include <linux/completion.h>
++#include <linux/debugfs.h>
++#include <linux/device.h>
 +#include <linux/gpio/consumer.h>
 +#include <linux/gpio/driver.h>
-+#include <linux/hw_random.h>
 +#include <linux/i2c.h>
 +#include <linux/interrupt.h>
-+#include <linux/minmax.h>
 +#include <linux/module.h>
++#include <linux/mutex.h>
 +#include <linux/string.h>
 +#include <linux/turris-omnia-mcu-interface.h>
 +#include <linux/types.h>
++#include <linux/uaccess.h>
 +
 +#include "turris-omnia-mcu.h"
 +
-+#define CMD_TRNG_MAX_ENTROPY_LEN	64
++#define CMD_CRYPTO_SIGN_MESSAGE_LEN	32
 +
-+static irqreturn_t omnia_trng_irq_handler(int irq, void *dev_id)
++enum {
++	SIGN_STATE_CLOSED	= 0,
++	SIGN_STATE_OPEN		= 1,
++	SIGN_STATE_REQUESTED	= 2,
++	SIGN_STATE_COLLECTED	= 3,
++};
++
++static irqreturn_t omnia_msg_signed_irq_handler(int irq, void *dev_id)
 +{
++	u8 reply[1 + OMNIA_MCU_CRYPTO_SIGNATURE_LEN];
 +	struct omnia_mcu *mcu = dev_id;
++	int err;
 +
-+	complete(&mcu->trng_completion);
++	err = omnia_cmd_read(mcu->client, CMD_CRYPTO_COLLECT_SIGNATURE, reply,
++			     sizeof(reply));
++	if (!err && reply[0] != OMNIA_MCU_CRYPTO_SIGNATURE_LEN)
++		err = -EIO;
++
++	guard(mutex)(&mcu->sign_lock);
++
++	if (mcu->sign_state == SIGN_STATE_REQUESTED) {
++		mcu->sign_err = err;
++		if (!err)
++			memcpy(mcu->signature, &reply[1],
++			       OMNIA_MCU_CRYPTO_SIGNATURE_LEN);
++		mcu->sign_state = SIGN_STATE_COLLECTED;
++		complete(&mcu->msg_signed_completion);
++	}
 +
 +	return IRQ_HANDLED;
 +}
 +
-+static int omnia_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
++static int do_sign_open(struct inode *inode, struct file *file)
 +{
-+	struct omnia_mcu *mcu = (struct omnia_mcu *)rng->priv;
-+	u8 reply[1 + CMD_TRNG_MAX_ENTROPY_LEN];
-+	int err, bytes;
++	struct omnia_mcu *mcu = inode->i_private;
 +
-+	if (!wait && !completion_done(&mcu->trng_completion))
-+		return 0;
++	guard(mutex)(&mcu->sign_lock);
 +
-+	do {
-+		if (wait_for_completion_interruptible(&mcu->trng_completion))
-+			return -EINTR;
++	/* do_sign is allowed to be opened only once */
++	if (mcu->sign_state != SIGN_STATE_CLOSED)
++		return -EBUSY;
 +
-+		err = omnia_cmd_read(mcu->client, CMD_TRNG_COLLECT_ENTROPY,
-+				     reply, sizeof(reply));
-+		if (err)
-+			return err;
++	mcu->sign_state = SIGN_STATE_OPEN;
 +
-+		bytes = min3(reply[0], max, CMD_TRNG_MAX_ENTROPY_LEN);
-+	} while (wait && !bytes);
++	file->private_data = mcu;
 +
-+	memcpy(data, &reply[1], bytes);
-+
-+	return bytes;
++	return nonseekable_open(inode, file);
 +}
 +
-+int omnia_mcu_register_trng(struct omnia_mcu *mcu)
++static int do_sign_release(struct inode *inode, struct file *file)
 +{
-+	struct device *dev = &mcu->client->dev;
-+	u8 irq_idx, dummy;
-+	int irq, err;
++	struct omnia_mcu *mcu = file->private_data;
 +
-+	if (!(mcu->features & FEAT_TRNG))
-+		return 0;
++	guard(mutex)(&mcu->sign_lock);
 +
-+	irq_idx = omnia_int_to_gpio_idx[__bf_shf(INT_TRNG)];
-+	irq = gpiod_to_irq(gpiochip_get_desc(&mcu->gc, irq_idx));
-+	if (irq < 0)
-+		return dev_err_probe(dev, irq, "Cannot get TRNG IRQ\n");
++	mcu->sign_state = SIGN_STATE_CLOSED;
 +
-+	/*
-+	 * If someone else cleared the TRNG interrupt but did not read the
-+	 * entropy, a new interrupt won't be generated, and entropy collection
-+	 * will be stuck. Ensure an interrupt will be generated by executing
-+	 * the collect entropy command (and discarding the result).
-+	 */
-+	err = omnia_cmd_read(mcu->client, CMD_TRNG_COLLECT_ENTROPY, &dummy, 1);
-+	if (err)
-+		return err;
-+
-+	init_completion(&mcu->trng_completion);
-+
-+	err = devm_request_threaded_irq(dev, irq, NULL, omnia_trng_irq_handler,
-+					IRQF_ONESHOT, "turris-omnia-mcu-trng",
-+					mcu);
-+	if (err)
-+		return dev_err_probe(dev, err, "Cannot request TRNG IRQ\n");
-+
-+	mcu->trng.name = "turris-omnia-mcu-trng";
-+	mcu->trng.read = omnia_trng_read;
-+	mcu->trng.priv = (unsigned long)mcu;
-+
-+	err = devm_hwrng_register(dev, &mcu->trng);
-+	if (err)
-+		return dev_err_probe(dev, err, "Cannot register TRNG\n");
++	/* forget signature on release even if it was not read, for security */
++	memzero_explicit(mcu->signature, sizeof(mcu->signature));
 +
 +	return 0;
 +}
++
++static ssize_t do_sign_read(struct file *file, char __user *buf, size_t len,
++			    loff_t *ppos)
++{
++	struct omnia_mcu *mcu = file->private_data;
++
++	/* only allow read of one whole signature */
++	if (len != sizeof(mcu->signature))
++		return -EINVAL;
++
++	scoped_guard(mutex, &mcu->sign_lock)
++		if (mcu->sign_state != SIGN_STATE_REQUESTED &&
++		    mcu->sign_state != SIGN_STATE_COLLECTED)
++			return -ENODATA;
++
++	if (wait_for_completion_interruptible(&mcu->msg_signed_completion))
++		return -EINTR;
++
++	guard(mutex)(&mcu->sign_lock);
++
++	mcu->sign_state = SIGN_STATE_OPEN;
++
++	if (mcu->sign_err)
++		return mcu->sign_err;
++
++	if (copy_to_user(buf, mcu->signature, len))
++		return -EFAULT;
++
++	/* on read forget the signature, for security */
++	memzero_explicit(mcu->signature, sizeof(mcu->signature));
++
++	return len;
++}
++
++static ssize_t do_sign_write(struct file *file, const char __user *buf,
++			     size_t len, loff_t *ppos)
++{
++	u8 cmd[1 + CMD_CRYPTO_SIGN_MESSAGE_LEN], reply;
++	struct omnia_mcu *mcu = file->private_data;
++	int err;
++
++	/*
++	 * the input is a SHA-256 hash of a message to sign, so exactly
++	 * 32 bytes have to be read
++	 */
++	if (len != CMD_CRYPTO_SIGN_MESSAGE_LEN)
++		return -EINVAL;
++
++	cmd[0] = CMD_CRYPTO_SIGN_MESSAGE;
++
++	if (copy_from_user(&cmd[1], buf, len))
++		return -EFAULT;
++
++	guard(mutex)(&mcu->sign_lock);
++
++	if (mcu->sign_state != SIGN_STATE_OPEN)
++		return -EBUSY;
++
++	err = omnia_cmd_write_read(mcu->client, cmd, sizeof(cmd), &reply, 1);
++	if (err)
++		return err;
++
++	if (reply)
++		mcu->sign_state = SIGN_STATE_REQUESTED;
++
++	return reply ? len : -EBUSY;
++}
++
++static const struct file_operations do_sign_fops = {
++	.owner		= THIS_MODULE,
++	.open		= do_sign_open,
++	.read		= do_sign_read,
++	.write		= do_sign_write,
++	.release	= do_sign_release,
++	.llseek		= no_llseek,
++};
++
++static void omnia_debugfs_drop_dir(void *res)
++{
++	debugfs_remove_recursive(res);
++}
++
++int omnia_mcu_register_debugfs(struct omnia_mcu *mcu)
++{
++	struct device *dev = &mcu->client->dev;
++	struct dentry *root;
++	int irq, err;
++	u8 irq_idx;
++
++	if (!(mcu->features & FEAT_CRYPTO))
++		return 0;
++
++	irq_idx = omnia_int_to_gpio_idx[__bf_shf(INT_MESSAGE_SIGNED)];
++	irq = gpiod_to_irq(gpiochip_get_desc(&mcu->gc, irq_idx));
++	if (irq < 0)
++		return dev_err_probe(dev, irq,
++				     "Cannot get MESSAGE_SIGNED IRQ\n");
++
++	err = devm_mutex_init(dev, &mcu->sign_lock);
++	if (err)
++		return err;
++
++	mcu->sign_state = 0;
++
++	init_completion(&mcu->msg_signed_completion);
++
++	err = devm_request_threaded_irq(dev, irq, NULL,
++					omnia_msg_signed_irq_handler,
++					IRQF_ONESHOT,
++					"turris-omnia-mcu-debugfs", mcu);
++	if (err)
++		return dev_err_probe(dev, err,
++				     "Cannot request MESSAGE_SIGNED IRQ\n");
++
++	root = debugfs_create_dir("turris-omnia-mcu", NULL);
++	debugfs_create_file_unsafe("do_sign", 0600, root, mcu, &do_sign_fops);
++
++	return devm_add_action_or_reset(dev, omnia_debugfs_drop_dir, root);
++}
 diff --git a/drivers/platform/cznic/turris-omnia-mcu.h b/drivers/platform/cznic/turris-omnia-mcu.h
-index 1838cb3d636e..e0cf10f8c32e 100644
+index e0cf10f8c32e..5ce639d5ec67 100644
 --- a/drivers/platform/cznic/turris-omnia-mcu.h
 +++ b/drivers/platform/cznic/turris-omnia-mcu.h
-@@ -9,7 +9,9 @@
- #define __TURRIS_OMNIA_MCU_H
+@@ -21,6 +21,9 @@
+ #include <asm/byteorder.h>
+ #include <asm/unaligned.h>
  
- #include <linux/bitops.h>
-+#include <linux/completion.h>
- #include <linux/gpio/driver.h>
-+#include <linux/hw_random.h>
- #include <linux/if_ether.h>
- #include <linux/mutex.h>
- #include <linux/rtc.h>
-@@ -45,6 +47,10 @@ struct omnia_mcu {
- 
- 	/* MCU watchdog */
- 	struct watchdog_device wdt;
++#define OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN	33
++#define OMNIA_MCU_CRYPTO_SIGNATURE_LEN	64
 +
-+	/* true random number generator */
-+	struct hwrng trng;
-+	struct completion trng_completion;
+ struct omnia_mcu {
+ 	struct i2c_client *client;
+ 	const char *type;
+@@ -30,6 +33,7 @@ struct omnia_mcu {
+ 	u64 board_serial_number;
+ 	u8 board_first_mac[ETH_ALEN];
+ 	u8 board_revision;
++	u8 board_public_key[OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN];
+ 
+ 	/* GPIO chip */
+ 	struct gpio_chip gc;
+@@ -51,6 +55,16 @@ struct omnia_mcu {
+ 	/* true random number generator */
+ 	struct hwrng trng;
+ 	struct completion trng_completion;
++
++#ifdef CONFIG_DEBUG_FS
++	/* MCU ECDSA message signing via debugfs */
++	struct dentry *debugfs_root;
++	struct completion msg_signed_completion;
++	struct mutex sign_lock;
++	unsigned int sign_state;
++	u8 signature[OMNIA_MCU_CRYPTO_SIGNATURE_LEN];
++	int sign_err;
++#endif
  };
  
  int omnia_cmd_write_read(const struct i2c_client *client,
-@@ -147,11 +153,13 @@ static inline int omnia_cmd_read_u8(const struct i2c_client *client, u8 cmd)
- 	return err ?: reply;
- }
- 
-+extern const u8 omnia_int_to_gpio_idx[32];
- extern const struct attribute_group omnia_mcu_gpio_group;
- extern const struct attribute_group omnia_mcu_poweroff_group;
- 
- int omnia_mcu_register_gpiochip(struct omnia_mcu *mcu);
- int omnia_mcu_register_sys_off_and_wakeup(struct omnia_mcu *mcu);
-+int omnia_mcu_register_trng(struct omnia_mcu *mcu);
+@@ -162,4 +176,13 @@ int omnia_mcu_register_sys_off_and_wakeup(struct omnia_mcu *mcu);
+ int omnia_mcu_register_trng(struct omnia_mcu *mcu);
  int omnia_mcu_register_watchdog(struct omnia_mcu *mcu);
  
++#ifdef CONFIG_DEBUG_FS
++int omnia_mcu_register_debugfs(struct omnia_mcu *mcu);
++#else
++static inline int omnia_mcu_register_debugfs(struct omnia_mcu *mcu)
++{
++	return 0;
++}
++#endif
++
  #endif /* __TURRIS_OMNIA_MCU_H */
 -- 
 2.43.2
