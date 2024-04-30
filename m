@@ -1,109 +1,80 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259221119B
-	for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 20:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B41DF6B
+	for <linux-crypto@vger.kernel.org>; Tue, 30 Apr 2024 03:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714421806; cv=none; b=oSi+P1zivCWgevOi5ItkkKM1XMsK/4lfZY0VW8Mi02WMBjxgiQNv6zp33LnMd1E0FDTODSBkdGYvqiA3Kemc2C4PAxSQStBXJoNcwEfII+5id/wZfqA86edD22cBmzgcig9oF+BvnGqHdqqQqo8cxy20odDI0kKVgw8r2vXysTs=
+	t=1714446294; cv=none; b=Sj3Clk/Zm/CKJmU+OZnq2mvDGH19SdBCt22sAoJ5Ohl9LvYmLSFYX0q7REhoov880qklnaT8a9o4OWNtSBXWq8cVNhS2M8d4AjQ+UrmKH9iLyPeWWPhWIA0PHC9wzhmEBFTfIwrcYwI7QkYrNmlRdXd0GmIPZACqubNVNN2MZak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714421806; c=relaxed/simple;
-	bh=9Z6hwUBZ/WEOq+foMsWJii18o0YOvzDHqJrltxy4GkM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TmTI8r0iPgD9IUMsddLUCHJxvXveOi1PYTTYyh5yfhIUC8jx9Z0ZRDKkIGzrLW9KlsPqYUAnvxsHo2WlmwyCaNbiQp2/xZ09onV6lHwmuf5GZMCkH1f1yENbPoz9GvEcnvDE3xKyJXeVZsjLusdtc4sRXtYnFoZcYnpcakOSlxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1s1XQT-00079z-Au; Mon, 29 Apr 2024 22:16:37 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1s1XQQ-00F2gc-Ht; Mon, 29 Apr 2024 22:16:34 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1s1XQQ-00Bitk-1X;
-	Mon, 29 Apr 2024 22:16:34 +0200
-Date: Mon, 29 Apr 2024 22:16:34 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, kernel@pengutronix.de, 
-	linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH] hwrng: mxc-rnga: Drop usage of platform_driver_probe()
-Message-ID: <wu6kc2ctezq476pc3gebgiikml6xvf3ipqawdiiccq4vixdl2r@4qv55vvr4kr5>
-References: <20240324103759.228009-2-u.kleine-koenig@pengutronix.de>
+	s=arc-20240116; t=1714446294; c=relaxed/simple;
+	bh=S3dcFG9nl2arKz/OB2xphR0OKK1uAoMU8ChtHy95lPU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=addD7Oh3M/FriyAxgFyjqt38CYpVfZJ7UrD32W+Np0N0dXJEjhmScIG/5iXHXAcI1QNKLuWTuuL2K/Z+/eLmnTa8//cbM0jdNMR05UlFck2bV2v72t10Plg5UuoJJCEI3Ouc7yZsUk1Mm9UEvAeFh5oKfDBj2hlHTrXpQoEBAuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=mkGoDDhD; arc=none smtp.client-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="mkGoDDhD"
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3c74fd6fb92so3551625b6e.3
+        for <linux-crypto@vger.kernel.org>; Mon, 29 Apr 2024 20:04:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1714446292; x=1715051092; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8GmvV6P1saiYDGx6aEXWiDKEEjYyVwYItU/oo2t7qo8=;
+        b=mkGoDDhDbcMXpOtD/awIvRX4i+T7K/WTxQ0BZp0TQ+JNGgYl+1gbIM/hrM4st3dhQ8
+         SkFJRwxtRDWd2A4VTjLpBk8p7fGivV0yd9DbKMyHgDeD3zQ1JwDx4wA4a88thHVT1u+O
+         AQ1G33mQsFMpbMyzADAjCqmtZSscC4wNcEw94=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714446292; x=1715051092;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8GmvV6P1saiYDGx6aEXWiDKEEjYyVwYItU/oo2t7qo8=;
+        b=xNmsjSKFKR6gON2fUBhB7DDYln8xKY/ftH+B6fVud8wvYi+2uFfuqb0+OieAI0uLxt
+         PfgBaCl8gs4RfR9RwHytSPr7KpY0E8B+1ZJIdkW22l97hbZw41i/27CIPVRF5Myhl6Lq
+         Ix5RCtefRnL5GROA74itR+fnHP9YPiuPR1MHRI24w11wP2+LJKYECzpd+80VNLKAW0kV
+         VRu6is3Obiuey6MnsLbDiuAXSc7F0nKb0awwULkNnSaRl61/5OipqrRIC9pkImWhbxsW
+         wWMFgi2FMiHIlG1JM5bA9vXfvMGGjFDUvNniycCRdzZcspEBqrn1k7Nfv2hP1DojN99P
+         0RzQ==
+X-Gm-Message-State: AOJu0YzNIIFKyZGF5EdXdXMDz0h04qHI/sekq42DoDpw2Jx0b7b8mtUy
+	POTP4z/R1SRQ4l0iit2bs8LKawPGEoDDSVly83fj58kyZHYEYLrEuZkBqiYffg==
+X-Google-Smtp-Source: AGHT+IHoOv2bed294ADi560bgBmZKT/Ayee8+LWb6/uFb3ODkPyPBkr3pKvDObUtk22A6sGzJHMfUA==
+X-Received: by 2002:a05:6808:4c8:b0:3c7:3af6:1cb5 with SMTP id a8-20020a05680804c800b003c73af61cb5mr13307260oie.46.1714446292049;
+        Mon, 29 Apr 2024 20:04:52 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:e55f:86cd:c9e1:6daf])
+        by smtp.gmail.com with ESMTPSA id g7-20020a632007000000b005e83b64021fsm19850926pgg.25.2024.04.29.20.04.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Apr 2024 20:04:51 -0700 (PDT)
+Date: Tue, 30 Apr 2024 12:04:47 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC] crypto: passing configuration parameters to comp algos
+Message-ID: <20240430030447.GE14947@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="lqy4jh7losfpq2te"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240324103759.228009-2-u.kleine-koenig@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 
+Hi,
 
---lqy4jh7losfpq2te
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+	We'd like to be able to pass algorithm-specific parameters to
+comp backends. As of this moment, crypto usees hard-coded default
+values and does not permit any run-time algorithm configuration,
+which in some cases simply disables the most interesting functionality.
+E.g. zstd can be configured to use a pre-trained (in the user-space)
+compression dictionary, which significantly changes algorithms
+characteristics. Another, obvious and trivial example, is algorithms
+compression level.
 
-Hello,
-
-On Sun, Mar 24, 2024 at 11:37:59AM +0100, Uwe Kleine-K=F6nig wrote:
-> There are considerations to drop platform_driver_probe() as a concept
-> that isn't relevant any more today. It comes with an added complexity
-> that makes many users hold it wrong. (E.g. this driver should have mark
-> the driver struct with __refdata.)
->=20
-> Convert the driver to the more usual module_platform_driver().
->=20
-> This fixes a W=3D1 build warning:
->=20
-> 	WARNING: modpost: drivers/char/hw_random/mxc-rnga: section mismatch in r=
-eference: mxc_rnga_driver+0x10 (section: .data) -> mxc_rnga_remove (section=
-: .exit.text)
->=20
-> with CONFIG_HW_RANDOM_MXC_RNGA=3Dm.
->=20
-> Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
-
-Gentle ping?! Who is the one to pick up this patch (or give feedback to
-it)?
-
-I want to change modpost to emit this type of warning also for W=3D0
-builds. For that it would be good to have this patch applied first.
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---lqy4jh7losfpq2te
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmYwACEACgkQj4D7WH0S
-/k70fwf+MTI/7Nuhap7iK+foJCAwx6AArL0Sw1WSAS/yVv2kQ1Q4KKd0D4HMS/cd
-gViIqcb0Iu7JVJRui//DdbXkgzMRjkoceZELDMM/yHx+YiAKQAdRFMlq1sspphQ9
-mxEDcS8WoBFK6maAuevBwKt9rgiF7l6CtBKYgIQAITP584xUV572+EXv35tag1Dl
-zHOiIr7D8MJkwUQEIYb1pbBmbXoFv9otFjL88Xoi3yRDbkuXSK4IT5fVt3f0EJct
-e2Dr0uUv/07w4fsR4qqhbAPS1Mu9GlMj6hZZGdkImGT18XO4YsSV+4A4a9a17Td9
-+tUTpo3wPvw6bVxdllnTD3nUVuIHbQ==
-=+L3M
------END PGP SIGNATURE-----
-
---lqy4jh7losfpq2te--
+The problem is that we need to pass params to cra_init() function,
+because for some algorithms that's the only place where configuration
+can take place (e.g. zstd). Changing cra_init() to accept additional
+`struct crypto_comp_params` looks to be a little intrusive so before
+I write any patches I'd like to hear your thoughts.
