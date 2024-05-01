@@ -1,40 +1,52 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22A117F37D
-	for <linux-crypto@vger.kernel.org>; Tue, 30 Apr 2024 16:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31394437
+	for <linux-crypto@vger.kernel.org>; Wed,  1 May 2024 02:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714496175; cv=none; b=B7wSi64dHLeIiGZ6p2ouz6mF896Yg11c7x52zcJJhbi1DZL0y1W1rBcF/rKoRUU+QE2aLIpiMaBqgaHXSHxTOJSElF1/4IYj9lj8csBGbJTA89yK3wOV4VQ/ZWcpXkrC62fIxH7a0Ry5NINS261VKxTvLpOdp6X5mUyeC9U4ZOw=
+	t=1714530144; cv=none; b=Y7Nv7u04RH6jMOnBGChpTbzU5I5AayJJRHvcysLHktZbxUZy1TE478T13hT1tpbGwi10twy/UPkD6VH0aXfavEAxA8Jo9jkKOFyzvy5eWc4pkmMS+mFK/MJXL97MtT1k6jUOZ8HauvRmy7kL0BZ/OCSMUkbaVjsvNRE43lcyra0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714496175; c=relaxed/simple;
-	bh=LUVmQSZ4qGo1AkTdWS5JEx7b3HeJ4vexz5J88zbpQjE=;
+	s=arc-20240116; t=1714530144; c=relaxed/simple;
+	bh=tLDbUIdh1res7S2ApImHSrYF3GBedRC/aB6hGdipB7k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SUc2a3oGAkgu+7HghQ6amCpp8pkxOZzRi2rirbrBi3Oe95GayK74gJyVxBFAP0xxMQYjU9qCtuODUKZskqsBi132W1f++vd2VnqKSwjiwpXT1G+rpUjJgbfgzsyjPlbkmJUfyHkxNJaeILXbBbYbBUqb2EMd+D5xlCbeMSHO1gM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hqx4LPrw; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=XbmbRvqQveiqsMx8dzO2IVESs6H/WrLgyHcufYpVz2PDs9ohMZiT8IVumD1n42WUoyxvGYUJzvwK1Jw9W6ufRqnbO4wugt4znR7vaW2ZjBTe5RWhCKBZV2/k7M4w3x/Wk3vRmQt937AEgkIOdT7Ez4nmIr/s1bSxoz0nXy4LY4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=JCcmxzxx; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hqx4LPrw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21857C2BBFC;
-	Tue, 30 Apr 2024 16:56:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714496175;
-	bh=LUVmQSZ4qGo1AkTdWS5JEx7b3HeJ4vexz5J88zbpQjE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hqx4LPrw0PORrvdF4RCjelR4i59Wa8JFMieu8SEUPz72YovgD/fEeCZL5TRLMKw8v
-	 1qcJyn81rnzeOU1JDD9Ts1dsqLNqyoA5XKpZEJYYEjQQOC/wh1IVPN1HE5z2mE+WZe
-	 LDhBqXo0tlWZnMdYjuqVYJm/YxmbmYkHtKbMgn9Rosk3ZbCZWtZiHoi3+FqynkTSR0
-	 NK9GeN/Wj1FnqZ6fSG+UefBB3O62TVYsi3+CRpYJsbFMCUpPX6Tevha+IFkFuYeEzC
-	 gj1NDp7OofzP60qyL+J+qGcny+Dh3BfnoZ3BrjYQhMMa7gUABx2Zl3bLPBvfk+8cx1
-	 OEcJhFDx76lKQ==
-Date: Tue, 30 Apr 2024 09:56:13 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/1] crypto: use 'time_left' instead of 'timeout' with
- wait_for_*() functions
-Message-ID: <20240430165613.GA1110@sol.localdomain>
-References: <20240430121443.30652-1-wsa+renesas@sang-engineering.com>
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="JCcmxzxx"
+Received: from cwcc.thunk.org (pool-108-26-156-33.bstnma.fios.verizon.net [108.26.156.33])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 4412M2lD018844
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Apr 2024 22:22:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1714530126; bh=ycnxCU4aRUN0CT5wAn+au+vBsaR04nzay6J9xUEb54Q=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=JCcmxzxxmA2Uiv4hCUXnE1PYZSqWRCq2ywaa3ukQfwZoIm9rCjZJmjwJD+IInjDDK
+	 Ih7RL6X489M2hup3eskn7wdLc6yzll2AMQzJCDEWWZ8USYLsWKBTsGYyk9aAvBEXLx
+	 UANwQfv0sZIIh92XmHx2AE1g9EqchQSznoIP4BQnJRfkPvC/QhQYBbm7/g3jYbiO8u
+	 2lyWpqREDHAAkxbDrSi1QYoPvbSdenEWglYgwyckgc86Jc+XXLIBtAzmYYbXhhJHz7
+	 J577qRGfGhm/FoDG9KDP09046zXEyJsT6enU7fYxM1Pg4UiqxeLQRgpWwxaYu7IkLD
+	 sW9uvtl3+hl0A==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+	id EB87115C02BB; Tue, 30 Apr 2024 22:22:01 -0400 (EDT)
+Date: Tue, 30 Apr 2024 22:22:01 -0400
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Aaron Toponce <aaron.toponce@gmail.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] random: add chacha8_block and swtich the rng to it
+Message-ID: <20240501022201.GD1743554@mit.edu>
+References: <20240429134942.2873253-1-aaron.toponce@gmail.com>
+ <20240430031105.GA10165@sol.localdomain>
+ <ZjB2ZjkebZyC7FZp@hercules>
+ <20240430162632.GA1924352@mit.edu>
+ <ZjEf2VV4igcCtkRE@hercules>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,24 +55,56 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240430121443.30652-1-wsa+renesas@sang-engineering.com>
+In-Reply-To: <ZjEf2VV4igcCtkRE@hercules>
 
-On Tue, Apr 30, 2024 at 02:14:41PM +0200, Wolfram Sang wrote:
-> [PATCH 0/1] crypto: use 'time_left' instead of 'timeout' with wait_for_*() functions
+So first of all, my apologies for giving you offense.  I really didn't
+think you were a shill for the NSA or the MSS, but I have to admit
+that when I get large set of patches which removes "unnecessary" code,
+which is _technically_ safe, but which reduces the safety margin, I
+find myself wondering whether it's part of a binary payload.  (This is
+especially when I get patches from someone that I don't normally
+receive patches from.)  Unfortunately, in the wake of the xz hack,
+we're just all going to have to be a lot more careful.
 
-1-patch series should not have a cover letter.  Just include the details in the
-patch itself.
+On Tue, Apr 30, 2024 at 10:44:09AM -0600, Aaron Toponce wrote:
+>
+> The goal is just to make the CSPRNG more efficient without sacrificing security.
+> Of course most reads will be small for cryptographic keys. ChaCha8 means even
+> those small reads will be 2.5x more efficient than ChaCha20. The dd(1) example
+> was just to demonstrate the efficiency, not to be "fun".
 
-> There is a confusing pattern in the kernel to use a variable named 'timeout' to
-> store the result of wait_for_*() functions causing patterns like:
-> 
->         timeout = wait_for_completion_timeout(...)
->         if (!timeout) return -ETIMEDOUT;
-> 
-> with all kinds of permutations. Use 'time_left' as a variable to make the code
-> obvious and self explaining.
+This is a philosophical question; are we going for maximum efficiency,
+or maximum safety so long as it meets the performance requirements for
+the intended use case?  From an academic perspective, or if a
+cryptographer is designing cipher for a NIST competition, there's a
+strong desire for maximum efficiency, since that's one of the metrics
+used in the competition.  But for the Linux RNG, my bias is to go for
+safety, since we're not competing on who can do the fast bulk
+encryption, but "sufficiently fast for keygen".
 
-I would understand it to be the remaining timeout, so I'm not sure the existing
-name is really that bad.  But I agree that time_left is clearer.
+People of good will can disagree on what the approach should be.  I
+tend to have much of a pragmatic engineer's perspective.  It's been
+said that the Empire State Building is overbuilt by a factor of 10,
+but that doesn't bother me.  People are now saying that perhaps the
+Francis Scott Key bridge, when it is rebuilt, should have more safety
+margin, since container ships have gotten so much bigger.  (And
+apparently, cheap sh*t diesel fuel that is contaminated and the ship
+owners buy fuel from the lowest bidder.)
 
-- Eric
+Or we can talk about how Boeing has been trying to cheap-out on plane
+manufacturing to save $$$; but I think you get the point of where I'm
+coming from.  I'm not a big fan of trimming safety margins and making
+things more efficient for it's own sake.  (At least in the case of
+Boeing, the CEO at least got paid $22/million a year, so at least
+there's that.  :-)
+
+Now, if this is actually impacting the TLS connection termination for
+a Facebook or Bing or Google's front end web server, then great, we
+can try to optimize it.  But if it's not a bottleneck, what's the
+point?  Making change for change's sake, especially when it's reducing
+safety margins, is just one of those things that I find really hard to
+get excited about.
+
+Cheers,
+
+					- Ted
