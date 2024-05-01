@@ -1,96 +1,78 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C14AFBEA;
-	Wed,  1 May 2024 17:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889EC165FA0;
+	Wed,  1 May 2024 20:40:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714582928; cv=none; b=gLVzKAX//LGG3zz0tVCNLCEEyMUbbG4RJ2fEb5mV3WIz3mH1FAw4yeQWQPMIhz8I0LQ+HEKy3me4dKjqX2Obje/X7nHgDWHEvva1tTk+Uz8uJR6QwWEyTQ0bTFR5lFJBBulmpxxL5OjePI5qZgkJuoRYQKQ2MYKgwv2/4HeJK14=
+	t=1714596032; cv=none; b=Y1QQwPqzhE0b6hCltXUHR34Hg5AzBU42eX2rWoaTTOUV/cNOqDwlLVWZza3QFhA2NsyylNtM003BeYeiy4aLYAWuEoN2nxhLPZL8hcCEJxQE+1PmUltAhG0+B0oAj90XQYL/m+csXIpva4aJ79VU8vg08lPbnnbzmVtd4ss5JV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714582928; c=relaxed/simple;
-	bh=ybzwn+ydfIFK+DqICo0Legpr8uBh0C4IME5KILc5CxY=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=cbtgj/vRd7bmhCiT3TwXxCn31ne98zMsVLkET7zhocZAwf2J75W+Am4hZCZfDQlpRfdC6vajB0Aae0B6DTJnmN/SRpcnPWngSIYR3nWNinzQokhwmj1MD8xQ+kmbZlpUNA6JnGfsOdD/O3wBqYCL+XKepJcRr+RQvxxkOHjplpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=mVFS2axn; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1714596032; c=relaxed/simple;
+	bh=WLfpkoMH/TRe/cJZHLLB+vpQaJU9kPr3Z1605OXVCuc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FcTi6NSAeFRu9J6Rfyy8wxnQwK5qkHJnXZDXLrwIQozsNs6Phk7Lxk0zvyfxcPFHPgwxZbkBr7HB0OmYVOT45nOAtzKnx2QnTbGq9nagwPr6BPf7V5Z8Z88q7mTmpBtAxMYQvVswenTLS+3D57eEqbabn/bfSatHKnxVfGMfGB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rysqtL/L; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="mVFS2axn"
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 441G3SVd030744;
-	Wed, 1 May 2024 10:01:54 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : content-type : content-transfer-encoding :
- mime-version; s=s2048-2021-q4;
- bh=udk0F/KA0u3ymt82al7pZ6iIYBODYjSafKhMsfUmCeg=;
- b=mVFS2axnHcM/GWx4hue24joAQUaeQgUZJLERqTmckQqTChddNotTqiGk1+JPkGRN791s
- O1Vl8bFf7KFEo3MFdwkRLnH33JV+a9bjRfPQOEPOZkzQr9GFN7vMfeQErLQ+EoOIUUqK
- 6C3xZzPE1RSqnd1nRdvp8DVtIkhQ1cuSj5BqQG8jPsVEH8ad3Bskbz3eSnZPYOq5ofuq
- Uh9Cu6pBMwyz0mn4GkQcq1hyhG4Jj9S+7p4ayZETYVs5MKgQ7hkhmVBhFpdbZX2AuLuG
- NFVkxx38/rL1VxxRbvbOckwwhJEJ1g0S0FnFas/whUUP0edKq/MeBmkFaqEGOAWkiF2Y vw== 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3xuqv18xud-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 01 May 2024 10:01:53 -0700
-Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a8:83::8) with Microsoft SMTP Server id
- 15.1.2507.35; Wed, 1 May 2024 17:01:52 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Jakub Kicinski
-	<kuba@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Andrii Nakryiko
-	<andrii@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko
-	<mykolal@fb.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <bpf@vger.kernel.org>,
-        kernel test robot
-	<lkp@intel.com>
-Subject: [PATCH bpf-next] bpf: crypto: fix build when CONFIG_CRYPTO=m
-Date: Wed, 1 May 2024 10:01:30 -0700
-Message-ID: <20240501170130.1682309-1-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.0
-Content-Type: text/plain
-X-Proofpoint-GUID: Llnlnv5e43kv2K0G7cdRIdhWpImmv_eA
-X-Proofpoint-ORIG-GUID: Llnlnv5e43kv2K0G7cdRIdhWpImmv_eA
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rysqtL/L"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 13C26C4AF1A;
+	Wed,  1 May 2024 20:40:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714596032;
+	bh=WLfpkoMH/TRe/cJZHLLB+vpQaJU9kPr3Z1605OXVCuc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rysqtL/LVK9n5ZotTGAz+jFuiks8ouuC4LIljCVpd5Jo8HXD9ovat9Eg9FU1YgA8E
+	 JxIPPIxijoFx6lttfbPFctja3iaiFGA0QgoXX8WMEkCEs4UKuH7ejCzwliwBTlijvM
+	 V8fFuNXd0TK1OOz9plbr2y5/I9Yi3eIyvIwa9YEi8hMStAxGJlgqMf34flGxPHYYKG
+	 GQHB8C2PDBBF+tsZU/hNS4gaL8beW3q/fv9Rr7JBVXKSZ3pia0H3Cq68pH9NgzuhOG
+	 /ECdmWTd3/744GeLaGId0fWBIGmb6nAZBXQzgFPuZ7ru2B4btYTUX2Tuk52sn+DfKM
+	 w9JfBOHIxk+IA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F34DEC433A2;
+	Wed,  1 May 2024 20:40:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-01_16,2024-04-30_01,2023-05-22_02
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next] bpf: crypto: fix build when CONFIG_CRYPTO=m
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171459603198.27515.15117026972576302125.git-patchwork-notify@kernel.org>
+Date: Wed, 01 May 2024 20:40:31 +0000
+References: <20240501170130.1682309-1-vadfed@meta.com>
+In-Reply-To: <20240501170130.1682309-1-vadfed@meta.com>
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: vadim.fedorenko@linux.dev, kuba@kernel.org, martin.lau@linux.dev,
+ andrii@kernel.org, ast@kernel.org, mykolal@fb.com,
+ herbert@gondor.apana.org.au, netdev@vger.kernel.org,
+ linux-crypto@vger.kernel.org, bpf@vger.kernel.org, lkp@intel.com
 
-Crypto subsytem can be build as a module. In this case we still have to
-build BPF crypto framework otherwise the build will fail.
+Hello:
 
-Fixes: 3e1c6f35409f ("bpf: make common crypto API for TC/XDP programs")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202405011634.4JK40epY-lkp@intel.com/
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- kernel/bpf/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This patch was applied to bpf/bpf-next.git (master)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
-index 85786fd97d2a..7eb9ad3a3ae6 100644
---- a/kernel/bpf/Makefile
-+++ b/kernel/bpf/Makefile
-@@ -44,7 +44,7 @@ obj-$(CONFIG_BPF_SYSCALL) += bpf_struct_ops.o
- obj-$(CONFIG_BPF_SYSCALL) += cpumask.o
- obj-${CONFIG_BPF_LSM} += bpf_lsm.o
- endif
--ifeq ($(CONFIG_CRYPTO),y)
-+ifneq ($(CONFIG_CRYPTO),)
- obj-$(CONFIG_BPF_SYSCALL) += crypto.o
- endif
- obj-$(CONFIG_BPF_PRELOAD) += preload/
+On Wed, 1 May 2024 10:01:30 -0700 you wrote:
+> Crypto subsytem can be build as a module. In this case we still have to
+> build BPF crypto framework otherwise the build will fail.
+> 
+> Fixes: 3e1c6f35409f ("bpf: make common crypto API for TC/XDP programs")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202405011634.4JK40epY-lkp@intel.com/
+> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf-next] bpf: crypto: fix build when CONFIG_CRYPTO=m
+    https://git.kernel.org/bpf/bpf-next/c/ac2f438c2a85
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
