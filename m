@@ -1,52 +1,34 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31394437
-	for <linux-crypto@vger.kernel.org>; Wed,  1 May 2024 02:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF7E3D968
+	for <linux-crypto@vger.kernel.org>; Wed,  1 May 2024 02:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714530144; cv=none; b=Y7Nv7u04RH6jMOnBGChpTbzU5I5AayJJRHvcysLHktZbxUZy1TE478T13hT1tpbGwi10twy/UPkD6VH0aXfavEAxA8Jo9jkKOFyzvy5eWc4pkmMS+mFK/MJXL97MtT1k6jUOZ8HauvRmy7kL0BZ/OCSMUkbaVjsvNRE43lcyra0=
+	t=1714532293; cv=none; b=oAif4qNb0xBpwq+mxCErbcliddvkwy4yCGN4aYPOcD8AbcZaExmVtWEN7piD7g3hFOzFzdpURyAI0kS5I1/fvN+9Jnh+4WFMJFUcNDlCSiQfQqq5o71UjsnkZGpuNgxmyZ/M0XJJa164JIq7Lr3fMiW21o2aV+bWNAGRBv8fbZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714530144; c=relaxed/simple;
-	bh=tLDbUIdh1res7S2ApImHSrYF3GBedRC/aB6hGdipB7k=;
+	s=arc-20240116; t=1714532293; c=relaxed/simple;
+	bh=3UrPN+n0abOzo8c1+wpLVkOzoVNh2LA/1aasFAFOdB0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XbmbRvqQveiqsMx8dzO2IVESs6H/WrLgyHcufYpVz2PDs9ohMZiT8IVumD1n42WUoyxvGYUJzvwK1Jw9W6ufRqnbO4wugt4znR7vaW2ZjBTe5RWhCKBZV2/k7M4w3x/Wk3vRmQt937AEgkIOdT7Ez4nmIr/s1bSxoz0nXy4LY4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=JCcmxzxx; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="JCcmxzxx"
-Received: from cwcc.thunk.org (pool-108-26-156-33.bstnma.fios.verizon.net [108.26.156.33])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 4412M2lD018844
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 22:22:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1714530126; bh=ycnxCU4aRUN0CT5wAn+au+vBsaR04nzay6J9xUEb54Q=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=JCcmxzxxmA2Uiv4hCUXnE1PYZSqWRCq2ywaa3ukQfwZoIm9rCjZJmjwJD+IInjDDK
-	 Ih7RL6X489M2hup3eskn7wdLc6yzll2AMQzJCDEWWZ8USYLsWKBTsGYyk9aAvBEXLx
-	 UANwQfv0sZIIh92XmHx2AE1g9EqchQSznoIP4BQnJRfkPvC/QhQYBbm7/g3jYbiO8u
-	 2lyWpqREDHAAkxbDrSi1QYoPvbSdenEWglYgwyckgc86Jc+XXLIBtAzmYYbXhhJHz7
-	 J577qRGfGhm/FoDG9KDP09046zXEyJsT6enU7fYxM1Pg4UiqxeLQRgpWwxaYu7IkLD
-	 sW9uvtl3+hl0A==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-	id EB87115C02BB; Tue, 30 Apr 2024 22:22:01 -0400 (EDT)
-Date: Tue, 30 Apr 2024 22:22:01 -0400
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Aaron Toponce <aaron.toponce@gmail.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] random: add chacha8_block and swtich the rng to it
-Message-ID: <20240501022201.GD1743554@mit.edu>
-References: <20240429134942.2873253-1-aaron.toponce@gmail.com>
- <20240430031105.GA10165@sol.localdomain>
- <ZjB2ZjkebZyC7FZp@hercules>
- <20240430162632.GA1924352@mit.edu>
- <ZjEf2VV4igcCtkRE@hercules>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rQb7Cz3NQtvQC6ep/xz0dh3nnsvmrgXyh5SghypKWsIhrvVgk1agXQizH7i2x84pcwZ4j8aT7VWXHkfIu7t3mUrt4+mtke/bq57VcEuwY/kAlTgAQpuo37RiAi5mj14oFEBKczS2H8OqOwHdSa6lI0VfdrNlDCF5N3lZgKYYIO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1s20AN-008zfC-1A;
+	Wed, 01 May 2024 10:57:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 01 May 2024 10:58:13 +0800
+Date: Wed, 1 May 2024 10:58:13 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Joachim Vandersmissen <git@jvdsn.com>
+Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	Simo Sorce <simo@redhat.com>, Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v2 1/2] certs: Move RSA self-test data to separate file
+Message-ID: <ZjGvxVKXu8JRc1bT@gondor.apana.org.au>
+References: <20240420054243.176901-1-git@jvdsn.com>
+ <Zinnl2Y11i0GHLEO@gondor.apana.org.au>
+ <b2787b62-fd1e-4815-a1c1-6b2d567ab977@jvdsn.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,56 +37,25 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZjEf2VV4igcCtkRE@hercules>
+In-Reply-To: <b2787b62-fd1e-4815-a1c1-6b2d567ab977@jvdsn.com>
 
-So first of all, my apologies for giving you offense.  I really didn't
-think you were a shill for the NSA or the MSS, but I have to admit
-that when I get large set of patches which removes "unnecessary" code,
-which is _technically_ safe, but which reduces the safety margin, I
-find myself wondering whether it's part of a binary payload.  (This is
-especially when I get patches from someone that I don't normally
-receive patches from.)  Unfortunately, in the wake of the xz hack,
-we're just all going to have to be a lot more careful.
-
-On Tue, Apr 30, 2024 at 10:44:09AM -0600, Aaron Toponce wrote:
+On Tue, Apr 30, 2024 at 09:52:44PM -0500, Joachim Vandersmissen wrote:
 >
-> The goal is just to make the CSPRNG more efficient without sacrificing security.
-> Of course most reads will be small for cryptographic keys. ChaCha8 means even
-> those small reads will be 2.5x more efficient than ChaCha20. The dd(1) example
-> was just to demonstrate the efficiency, not to be "fun".
+> I'm currently leaning towards adding FIPS_SIGNATURE_SELFTEST_RSA (and
+> similarly FIPS_SIGNATURE_SELFTEST_ECDSA) as user-facing configuration
+> options that depend on CRYPTO_RSA (and CRYPTO_ECDSA) and
+> FIPS_SIGNATURE_SELFTEST. Then, it is up to the user to select the correct
+> self-tests they need. It would still allow the user to create the same
+> configuration "error" where FIPS_SIGNATURE_SELFTEST=y and
+> FIPS_SIGNATURE_SELFTEST_RSA=m, but I think that users which care about
+> FIPS_SIGNATURE_SELFTEST are doing it in the first place for FIPS compliance
+> reasons. In that case, a FIPS laboratory should review the configuration to
+> verify that the correct self-tests are executed at the correct time.
 
-This is a philosophical question; are we going for maximum efficiency,
-or maximum safety so long as it meets the performance requirements for
-the intended use case?  From an academic perspective, or if a
-cryptographer is designing cipher for a NIST competition, there's a
-strong desire for maximum efficiency, since that's one of the metrics
-used in the competition.  But for the Linux RNG, my bias is to go for
-safety, since we're not competing on who can do the fast bulk
-encryption, but "sufficiently fast for keygen".
-
-People of good will can disagree on what the approach should be.  I
-tend to have much of a pragmatic engineer's perspective.  It's been
-said that the Empire State Building is overbuilt by a factor of 10,
-but that doesn't bother me.  People are now saying that perhaps the
-Francis Scott Key bridge, when it is rebuilt, should have more safety
-margin, since container ships have gotten so much bigger.  (And
-apparently, cheap sh*t diesel fuel that is contaminated and the ship
-owners buy fuel from the lowest bidder.)
-
-Or we can talk about how Boeing has been trying to cheap-out on plane
-manufacturing to save $$$; but I think you get the point of where I'm
-coming from.  I'm not a big fan of trimming safety margins and making
-things more efficient for it's own sake.  (At least in the case of
-Boeing, the CEO at least got paid $22/million a year, so at least
-there's that.  :-)
-
-Now, if this is actually impacting the TLS connection termination for
-a Facebook or Bing or Google's front end web server, then great, we
-can try to optimize it.  But if it's not a bottleneck, what's the
-point?  Making change for change's sake, especially when it's reducing
-safety margins, is just one of those things that I find really hard to
-get excited about.
+If the combo results in a crash then I think we have to fix it.
 
 Cheers,
-
-					- Ted
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
