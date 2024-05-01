@@ -1,99 +1,96 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FF41527B0;
-	Wed,  1 May 2024 14:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C14AFBEA;
+	Wed,  1 May 2024 17:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714572128; cv=none; b=hM/0ucC2jtKbOuAMLMnnmPoQMQ8RvbkrQ0OgEfQmTV6+7MmG+gm3mEsDzs/qVNbcmZ+5bMM9MsJ664fh13j9HGtQUpkj/VTOHiSlevUTEJcnoOUey8vWq83ccTiRyJLidaEo4AYlXrg5keQ9d/2EiwtmDb2kMoVOxMUX8kMEdgU=
+	t=1714582928; cv=none; b=gLVzKAX//LGG3zz0tVCNLCEEyMUbbG4RJ2fEb5mV3WIz3mH1FAw4yeQWQPMIhz8I0LQ+HEKy3me4dKjqX2Obje/X7nHgDWHEvva1tTk+Uz8uJR6QwWEyTQ0bTFR5lFJBBulmpxxL5OjePI5qZgkJuoRYQKQ2MYKgwv2/4HeJK14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714572128; c=relaxed/simple;
-	bh=iEPVtQCPaROhqp+EwVfARizPvBkYYoRA/AP+4jZZpOA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U0ST3GHgLr0GB3p5G9s1I0zC8ooYL/SPf64invw0NGrO41LR3zf6Oug2JlWdi9q+ocypdoV2Sjnb1qOnOKBdyTSY+DRmeqfPZaOrVInZ+by3Kig9cyCgUoiGPEmK3Q0BIUWx9gkGbff12eHVHdQWv3HJBw52rBMh1AHTaxAPwRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e3mHW2JX; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714582928; c=relaxed/simple;
+	bh=ybzwn+ydfIFK+DqICo0Legpr8uBh0C4IME5KILc5CxY=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=cbtgj/vRd7bmhCiT3TwXxCn31ne98zMsVLkET7zhocZAwf2J75W+Am4hZCZfDQlpRfdC6vajB0Aae0B6DTJnmN/SRpcnPWngSIYR3nWNinzQokhwmj1MD8xQ+kmbZlpUNA6JnGfsOdD/O3wBqYCL+XKepJcRr+RQvxxkOHjplpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=mVFS2axn; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e3mHW2JX"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1eab16dcfd8so58808195ad.0;
-        Wed, 01 May 2024 07:02:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714572126; x=1715176926; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V0BdnG/l27ArELjTgywItVcooJIOFPA+WeMfuqzMrXU=;
-        b=e3mHW2JX8vFIdO+1t2c3OElCli6gWnr5vziSsy7Sj4lAFOKbL39igIkfGBX0mQcEg+
-         lF0GMWUWWYb+HHaHI9LAQFddkmHPHOTBYn8DI7JeP1GnGDRTS4hGxdRdR5P+sGDo1LKQ
-         RbItRJjpOqMv/o98LFU5XIUNou967Iq1PjyuC99gQKwJjZP0l827kkI2oyX6UOPbAHDS
-         KqwtZfed2dBthG9uzHLEt4bQMJ0pQilpWq2EwEUsyEj+x/BM2gXCpxH3LAwsDLj/Q6t6
-         1N+z0M9A30faBiqZQRKKAd4zX2j6zfRWonoZ5QZPv0oWqyRI2Ou8J9DlpCfOHNyu9ip7
-         2iBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714572126; x=1715176926;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V0BdnG/l27ArELjTgywItVcooJIOFPA+WeMfuqzMrXU=;
-        b=cUfkQNEz0O6lxhCtLF6IxC4i2yAUtSV1fPo6ReeoNUwzLYb2ixsz5xu3uGteWrZRmK
-         e6kW5Fzw3poxzORXWiVelmi/XbAWwc98q66kUn/QIWast9Mes8oHw9AngAWAMWWX6PwH
-         giyc4LHUN+rcjUrXf+waRb+XjEcsJHCkrREDQXnl8Debo7xht/MBaxHIKFPlnP+C0HQq
-         DDi3lat79sb63pHrIN3jF5qR0f9i2xAMc6I7f9zfdZPD8CmLEpV5dTs+2by+80MKliBE
-         /Rs26UZ6GfCQKLkYPRgrGPm28vur2TyBxcXl40NzzgfphZTxbAXlLwd6qnHp5+gFztEz
-         JWiw==
-X-Forwarded-Encrypted: i=1; AJvYcCVewpR2LvsWAgQNwrYC0uNr9H2lNJmPSCqMRieqCou3im/7YCvst+Y2VhWx9IEhpHP6lou9+Adz1uFI1w9qOc7fwGT4go4KbiGF5pTxgdvkB0Njt6GaRQt62WSi3aF0n+AWqyQAloRebcpC
-X-Gm-Message-State: AOJu0YyConkflCc2Lh+mqCLMsOVOkKDKNvD0UYHdTr5DRCx2R4dtOe3Q
-	v70Rq+P5Wr4B3M0yu+kpkOZJXbxTCgB6PYGMET6taPXou9If8ShP
-X-Google-Smtp-Source: AGHT+IGb8MuiX71DsiTtDJZTkooQY6i2mOWK67mo/shUPtOeVU1RY2JqC3XmWVAfBU0lZvlXbwgaYg==
-X-Received: by 2002:a17:903:1c8:b0:1df:f681:3cd8 with SMTP id e8-20020a17090301c800b001dff6813cd8mr2936869plh.12.1714572126198;
-        Wed, 01 May 2024 07:02:06 -0700 (PDT)
-Received: from hercules ([68.69.165.4])
-        by smtp.gmail.com with ESMTPSA id u8-20020a170902e5c800b001e425d86ad9sm24148760plf.151.2024.05.01.07.02.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 07:02:05 -0700 (PDT)
-Date: Wed, 1 May 2024 08:02:03 -0600
-From: Aaron Toponce <aaron.toponce@gmail.com>
-To: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Cc: Theodore Ts'o <tytso@mit.edu>, Eric Biggers <ebiggers@kernel.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] random: add chacha8_block and swtich the rng to it
-Message-ID: <ZjJLWy4Y5Y__JCUF@hercules>
-References: <20240429134942.2873253-1-aaron.toponce@gmail.com>
- <20240430031105.GA10165@sol.localdomain>
- <ZjB2ZjkebZyC7FZp@hercules>
- <20240430162632.GA1924352@mit.edu>
- <ZjEf2VV4igcCtkRE@hercules>
- <20240501022201.GD1743554@mit.edu>
- <CAGiyFddFb1yZ3kC5MP+UgqsCATcAcFvZLTXm_bCv3MsSnwAWcQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="mVFS2axn"
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 441G3SVd030744;
+	Wed, 1 May 2024 10:01:54 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=s2048-2021-q4;
+ bh=udk0F/KA0u3ymt82al7pZ6iIYBODYjSafKhMsfUmCeg=;
+ b=mVFS2axnHcM/GWx4hue24joAQUaeQgUZJLERqTmckQqTChddNotTqiGk1+JPkGRN791s
+ O1Vl8bFf7KFEo3MFdwkRLnH33JV+a9bjRfPQOEPOZkzQr9GFN7vMfeQErLQ+EoOIUUqK
+ 6C3xZzPE1RSqnd1nRdvp8DVtIkhQ1cuSj5BqQG8jPsVEH8ad3Bskbz3eSnZPYOq5ofuq
+ Uh9Cu6pBMwyz0mn4GkQcq1hyhG4Jj9S+7p4ayZETYVs5MKgQ7hkhmVBhFpdbZX2AuLuG
+ NFVkxx38/rL1VxxRbvbOckwwhJEJ1g0S0FnFas/whUUP0edKq/MeBmkFaqEGOAWkiF2Y vw== 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3xuqv18xud-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 01 May 2024 10:01:53 -0700
+Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:fe::f072) by
+ mail.thefacebook.com (2620:10d:c0a8:83::8) with Microsoft SMTP Server id
+ 15.1.2507.35; Wed, 1 May 2024 17:01:52 +0000
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Jakub Kicinski
+	<kuba@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Andrii Nakryiko
+	<andrii@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko
+	<mykolal@fb.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <bpf@vger.kernel.org>,
+        kernel test robot
+	<lkp@intel.com>
+Subject: [PATCH bpf-next] bpf: crypto: fix build when CONFIG_CRYPTO=m
+Date: Wed, 1 May 2024 10:01:30 -0700
+Message-ID: <20240501170130.1682309-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.43.0
+Content-Type: text/plain
+X-Proofpoint-GUID: Llnlnv5e43kv2K0G7cdRIdhWpImmv_eA
+X-Proofpoint-ORIG-GUID: Llnlnv5e43kv2K0G7cdRIdhWpImmv_eA
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGiyFddFb1yZ3kC5MP+UgqsCATcAcFvZLTXm_bCv3MsSnwAWcQ@mail.gmail.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-01_16,2024-04-30_01,2023-05-22_02
 
-On Wed, May 01, 2024 at 02:38:52PM +0200, Jean-Philippe Aumasson wrote:
-> Switching from ChaCha20 to ChaCha12 might still raise eyebrows but I
-> dont think any respectable crypto/security expert will suspect a
-> JiaTan situation.
+Crypto subsytem can be build as a module. In this case we still have to
+build BPF crypto framework otherwise the build will fail.
 
-I also mentioned this earlier in the thread; that is, to switch to ChaCha12 if
-ChaCha8 makes us uncomfortable. It's not without precedent also:
+Fixes: 3e1c6f35409f ("bpf: make common crypto API for TC/XDP programs")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202405011634.4JK40epY-lkp@intel.com/
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+---
+ kernel/bpf/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- eSTREAM recommends Salsa20/12 in their final portfolio
-- Adiantum uses XChaCha12 
-- Rust uses ChaCha12 rand::rngs::StdRng
-
-There may be other precedent of ChaCha12 with from non-trivial projects I'm
-unfamiliar with.
-
+diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
+index 85786fd97d2a..7eb9ad3a3ae6 100644
+--- a/kernel/bpf/Makefile
++++ b/kernel/bpf/Makefile
+@@ -44,7 +44,7 @@ obj-$(CONFIG_BPF_SYSCALL) += bpf_struct_ops.o
+ obj-$(CONFIG_BPF_SYSCALL) += cpumask.o
+ obj-${CONFIG_BPF_LSM} += bpf_lsm.o
+ endif
+-ifeq ($(CONFIG_CRYPTO),y)
++ifneq ($(CONFIG_CRYPTO),)
+ obj-$(CONFIG_BPF_SYSCALL) += crypto.o
+ endif
+ obj-$(CONFIG_BPF_PRELOAD) += preload/
 -- 
-. o .   o . o   . . o   o . .   . o .
-. . o   . o o   o . o   . o o   . . o
-o o o   . o .   . o o   o o .   o o o
+2.43.0
+
