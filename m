@@ -1,119 +1,166 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2052.outbound.protection.outlook.com [40.107.101.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE36613C687;
-	Thu,  2 May 2024 13:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714657284; cv=none; b=UNXwmPOMGpspt29/qEzQCGYkO/TyrCftUpVr1kKrse9UeZvv25gEFOj5ouuZD8olfRzTU+oEyvnoecuyDf05K7myNtF+IWP69F8QtOAMz43Py2CCorcSEY4OiwISrsTBJu5HvmDCLS4Z5+ezh89SUkLGeUS3L8B77d/iP6nX0pM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714657284; c=relaxed/simple;
-	bh=i/1dVEqwkmjfInCh6AgBy+Ih1TKNisJ6Cjyzv9iZzCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XiRUGcq5SHq3Hc+AYZVY0AUML/OFbVUYuE/rATtZFA4+HNk6Z7N09xULklXq3ziPSEUHnMxIUjJ1xZxsrm9cX1cdkgWPdzdwyxsoEsk9okwbVHtAhcQ4rEc8oXgVa9Zxtsd0s6Inf2AnTs3dIz4E0zD5IvSqalf/AmImyuJc+s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Co9U6Tax; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A98E7F481
+	for <linux-crypto@vger.kernel.org>; Thu,  2 May 2024 14:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714661807; cv=fail; b=XdZvLhD/65mqXQswzgOHE4N4+OVCks5l7rNCatb8xhEqCLL5fpZK9GaG8eHzziMEBlRz4KVSqCITbO+FuMwmfRe8Lq/Fn4ISQOMQMhPo/StdFquwXReeWgCLzukk95uFnPzGNdajbFPlpE41xlSpgPl7Eas9CaLevLhMD8fHXzA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714661807; c=relaxed/simple;
+	bh=5K2yEzzRfhauIxI3Smc9ZjkHBVRkHigGUMjtgl9jQp0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=K19nSQCUEe0IPVmerBCmR0yxzLY9PiwXXTuNpvdQSwugUCix9wDWkZyp5k2RhCIDEKcHdKZt4H9VEpy8CnzsdMBatRUQngovAoycAKRt07/Y3bNqJq4z403NdYkUYZJUid7/tG1SLMzFj+d6+fpc/KN6fds4K/w6Zbkk9YoKCpc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=eCXgRcEc; arc=fail smtp.client-ip=40.107.101.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Co9U6Tax"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1ec4b2400b6so25958135ad.3;
-        Thu, 02 May 2024 06:41:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714657282; x=1715262082; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7nxd33Xi7ZoYSNclbCJAjQlz1BlP19LjGVI5r3OgMdk=;
-        b=Co9U6Taxsh6plbkK2QJqodUVQVlr2hvamdrTO64uuYmEl66X6Ihf5IK1qM5Pdv9G6N
-         OkIlhIhL2j4T05B6uypOBrDPr9QHu8xdoRlgfYHZQuVl2edeappXMX/g6+7HXCJUbsMq
-         BF+JZ5aUbMDK4n7TkZc7qb2scp3fuISEzVNt/v7FG8YeqrK7gGsQjDxsoNzx7DYa+e9j
-         rpy+YpYaNhH6rPCelYWk0OIfQo+A15Mc+QpRH+DjVz67btT0XVSpzrhHvpZo3yshF9EF
-         O5GQg2LxVVbdKb9A7CrZFnT+1UwTAriD/kci/jrQpR4zgVirs9qQMqrZ62FN2OEvMxq4
-         hGog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714657282; x=1715262082;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7nxd33Xi7ZoYSNclbCJAjQlz1BlP19LjGVI5r3OgMdk=;
-        b=cFavFmbFTKNK2jE0wNqm1UffA6a2KRqlLKC9vKj0z1rlLiO11gUZn9yk0b31T2Y6YJ
-         jmQJoT/TdMdusLgfa6iKe+9PSZomgugTODxAUmGm5T40MSVIoZVEwJFfRwjFEyYzWbpb
-         fUWHvVuNPKZAuIIt3CB8rvXt79y2R8AWmQg5uwrZaGA5aiQZOsYnRz51CdTslYlrlwSJ
-         0d1wJ34tI7dcQn+1bEZ4yyrMu9yuxe9t7XleWUDBsOV+D8bdXKoyqOfO37SIyGPVqGcz
-         HxmmVCtuWu80ZJxc/GSzbDmYTpCEwAMrVNDnNIAtPyNFutRmIZOfUF3oo7Xb4cXGBd6v
-         9ZfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXHqNngMUwLrCjuhTY8wxkG/DPkNYthHcI7ZrYfU5zVRuuu+aZeaNz9ribHudLQVk7tntP3TIt2mdrDkcVGYY7usvkaH5vTLSeEaHZ54Wh2RtiljCj5nVEMZyQzU6FWNXwEH9hm3h3CYtSE
-X-Gm-Message-State: AOJu0YwAhDuH8Kbv/wAf/64P+MYhuhZ0ADIB4Jnol8Iu+L8bplt9Exvc
-	X40asAFMeu+EoDJlOVTOM/WYJeiV4x2fXnqBqh3L8uA+R8jv52PF
-X-Google-Smtp-Source: AGHT+IEdipkDZCgqRkPVOJitGbl9naK2nUNOobgvnzr6LYchUoycriBULK/4/rlgzTU/+FVwQHsvBQ==
-X-Received: by 2002:a17:902:f610:b0:1ec:28e4:691f with SMTP id n16-20020a170902f61000b001ec28e4691fmr2726025plg.63.1714657282028;
-        Thu, 02 May 2024 06:41:22 -0700 (PDT)
-Received: from hercules ([68.69.165.4])
-        by smtp.gmail.com with ESMTPSA id s8-20020a170902ea0800b001e2ba8605dfsm1267830plg.150.2024.05.02.06.41.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 06:41:20 -0700 (PDT)
-Date: Thu, 2 May 2024 07:41:19 -0600
-From: Aaron Toponce <aaron.toponce@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Theodore Ts'o <tytso@mit.edu>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] random: add chacha8_block and swtich the rng to it
-Message-ID: <ZjOX_4aGUoY0msib@hercules>
-References: <20240429134942.2873253-1-aaron.toponce@gmail.com>
- <ZjIzz5Rdkc8kxo4g@zx2c4.com>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="eCXgRcEc"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IAhId503Xsqa9mtQfPy9u0zUsiTnUkksHemWVNivATayrxnIZnbZ+12+sEN8K3t2/WU3gnA8GxeUN/oQgcXK2SC5SUK0AJ/HtkX4DB4RvCfSxpCz2Ug0vhZkijDjgm2wtCGw4T6I9Zl6FGldYCR6lrAD1hP4qiF1Vcco57Xhkvfz9zpPgzZF9nZ5TKRUPNtfIFKhQosx3n38zI+Nna2X1ODkr1AvYjouwbJdevMlezTFMV6eoKXrFwf0nyspjpRf75TdNwIq3BjJvjkl7HbzRLdqPRRIp8PtPw+B9NZd+st+beldoljowpBgQIjwlimB0Ffn5UBn46SkgAk+Ii8pfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PY/qiPavNdQwBjmUnbFLjF0Xpnotit2fH9zytCgJatE=;
+ b=eXewHroqjzERJKANVSU/MPrrKNDrF4ZrsNcW8y9DcYTUvF3JUVqbbiL3m6JZJL+DsEVe77KmpivvuKY+vArrQ9AujWfvrkCMLhkEAlFGcjvNYxXGxgNOA51MpKo65f+N9rpcVpvpUv3xmsj5U6+5GlfUrgo/nEUMA8nkFvCXy/Vqyjqq8VDIEoj45VA3C0y/QvwfhIb+qXGuIYEIsJ3/nzxQ1GqDyfPsA+f9hv6RWvocDBiSpyOrnErojbTs/G+P/xkdtDaMGnXh0LxfiC1Gf6pyhSfNR/Y+/1kiH7Ajchctn79yVVDmlU9WQAbqTYz/U4RlFpFPGZOJfpbj3eVCbg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PY/qiPavNdQwBjmUnbFLjF0Xpnotit2fH9zytCgJatE=;
+ b=eCXgRcEcy1YhR+tbmlksTw1Oe1QImU64hphDvMcI+6CNhaJslcdibQyCKAu4h9PVWeNgg/ZdFRXPxVMdiQwlgsjz0oCQuRyvzAykzCUYUNYfFi4KpoBLlsrTFAV0CgDSKO4U9Vblzhvz9+pSqnkxfgZJ5saKfhrIg/GwAQ97x45Q+RfZp9nlDDH/+zMTdFRIzxAgHXr1U6Jf9I0/8wMFHnCED23nrkHvZpOzMdzZq/2zpw0LOTuLnZZDlHWF0KqCYBwJR00awuUiFSfq5Ap9NS8e3DZIvHrLUIKAKXjeSyUzIPtHejdeSFmJvmrReYyRHh8Yamo2s7Hw3UuOuUgYZA==
+Received: from SJ1PR12MB6339.namprd12.prod.outlook.com (2603:10b6:a03:454::10)
+ by CH3PR12MB8725.namprd12.prod.outlook.com (2603:10b6:610:170::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34; Thu, 2 May
+ 2024 14:56:42 +0000
+Received: from SJ1PR12MB6339.namprd12.prod.outlook.com
+ ([fe80::e696:287d:3f92:3721]) by SJ1PR12MB6339.namprd12.prod.outlook.com
+ ([fe80::e696:287d:3f92:3721%5]) with mapi id 15.20.7472.045; Thu, 2 May 2024
+ 14:56:42 +0000
+From: Akhil R <akhilrajeev@nvidia.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "thierry.reding@gmail.com" <thierry.reding@gmail.com>, Jon Hunter
+	<jonathanh@nvidia.com>, Mikko Perttunen <mperttunen@nvidia.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: [PATCH v7 0/5] Add Tegra Security Engine driver
+Thread-Topic: [PATCH v7 0/5] Add Tegra Security Engine driver
+Thread-Index: AQHaha3gsfDBlfEn5kWsP3WoOvnfvbFkS2CAgB2iPLCAAEO4gIAAB7lQ
+Date: Thu, 2 May 2024 14:56:42 +0000
+Message-ID:
+ <SJ1PR12MB6339E3A141B161F28E5C76B4C0182@SJ1PR12MB6339.namprd12.prod.outlook.com>
+References: <20240403100039.33146-1-akhilrajeev@nvidia.com>
+ <ZhjjNWKexg8p8cJp@gondor.apana.org.au>
+ <SJ1PR12MB63391878683E395E6A3641FAC0192@SJ1PR12MB6339.namprd12.prod.outlook.com>
+ <ZjH3zzInVjY+qOH4@gondor.apana.org.au>
+In-Reply-To: <ZjH3zzInVjY+qOH4@gondor.apana.org.au>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ1PR12MB6339:EE_|CH3PR12MB8725:EE_
+x-ms-office365-filtering-correlation-id: 6d1655d0-a091-4b76-3880-08dc6ab81443
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|1800799015|376005|366007|38070700009;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?p34nNvkvqPh2RK2jZI7IJrlRvM9mcMnqz8lSi6EnNVaErQhMApBTogG5qDyX?=
+ =?us-ascii?Q?GaBHfJQkBbnm22DhcA+4IrviAe/D6pI2YcQhjhaN70cPJ1VRWNvaUw4cYtQt?=
+ =?us-ascii?Q?RhXDTltmaOFxy3wvzIEuZ2zIeOZXVw8ktzXPpcxcobBwzlJ2+xO7qVMekN+/?=
+ =?us-ascii?Q?MSLOYIaCjcK9lCaLkycvijE1ZQAFrP7Mrtfh5A41eK4vbvm5sSwPumSh8aoO?=
+ =?us-ascii?Q?Yu4/51a1Q/tTPCwj6Zqt68uJlGkdVG0bx/Gato+52HVJIdpgYrHiOacPU/++?=
+ =?us-ascii?Q?NopSUcQOXfjUYunuFZHdUTZx6pqnYLAiP+AuyPvdd/Z6W5r2lGe6qbnaFmsS?=
+ =?us-ascii?Q?wYXutCI02UscfHJXypgtfB/StigQW5VZzVTUv/fcVJgsqt0XbmFROU7i12Yg?=
+ =?us-ascii?Q?pzXL8ilr9XscTgCmTuiDrWe/wOwvPEmjBkUyioeajJhUuTQzwTUjGYQOLnLt?=
+ =?us-ascii?Q?pdY9qsWPPuOc8WsjPGXz5ciscwAD83Un4bZO6LMPR5F8fbCfa6jTsblXMrlk?=
+ =?us-ascii?Q?sctHNhuDN5oB+UmIydEENEGoZv4PcFyX/8NENoixpITR8MvQDu6d17Kho4/u?=
+ =?us-ascii?Q?mZJz9C7q+Ir2oI7zks7+WneoolgTLYVfW3Vtg2h36J35NB8H+pwS26ZfgNDC?=
+ =?us-ascii?Q?um5WWGlUxbd7AxxB2lyw70hcceYhhvWhAyUYjg8Kv1zjy964mBnAAsm1ETfP?=
+ =?us-ascii?Q?L6JbHx4Bdzx2o6PzCMyRmLb8+1RzQCWvajueaBzXrkicu/onHnlKGnyybSY6?=
+ =?us-ascii?Q?ldmri6vxiiMd7YyQ26iY787LZ++AhJlWFWngx4dKLPG68p4xwyZWbWGhd0wa?=
+ =?us-ascii?Q?Nrx/TLUn2wVn9h5AoCCcLpGVT+KyAg0NknFpMFrLrivDHg8KUKKBX3zAkZQL?=
+ =?us-ascii?Q?CnQM8UN0pC55T7IZ6HEAVNvOx3oX06SVq0rL0IjSCiWMgFkhKVa5//Xn5PTF?=
+ =?us-ascii?Q?gAFAqW9P1EWzohVjb/Yu520muCcrH9zRL82EzM35L4RgvRGYVt+ert5b/Rje?=
+ =?us-ascii?Q?Jr2SMv0/pJXAPrpMXuX7QZN5OJtQRmoxZQe/3MkC3W1grkj8/H7x3D2xFWlV?=
+ =?us-ascii?Q?ELyass4RfctrVQejC7hSkp49rRHEQzr6p/D9U+s6WpqhTskBGKihO5Wzlhbn?=
+ =?us-ascii?Q?GFyFw3MBbLz1lERYBqh4RI9b+Wr+hl9rHAx4qowHInkB0hMmIuefFd6m6+Gd?=
+ =?us-ascii?Q?AcmMeHLug3097DsUAkujtKnRhX9gV504l9hWeauGU+CxyTBcYi8wivGwnkDj?=
+ =?us-ascii?Q?xE7Np/K43/GMjzBI34lQTvMyrgF/vdyeGbztZ3VL3B+tSN3dlR+Nwk7Cm63d?=
+ =?us-ascii?Q?iwR473Nd8RN56bXII0s4+QW1vjwsRgU4VCKnvZdxTLRvgg=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6339.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ok9ApIG76wzgv4ONIx3fCMy9Gcb3yt5pfoHF8VHrYdTCknztuCO1w3UGErvg?=
+ =?us-ascii?Q?b0tHBxdT9zAYM9VIJrn8rMcj5Zcfm3Xf5uJKylJiT3SSNsi84C4bx820LsKX?=
+ =?us-ascii?Q?YOQB474vSRLyV/HUXZQMC5MWZemMO61uoLn1g1/Sdq+g95sVf1r4jnbP0Vks?=
+ =?us-ascii?Q?LusGL7UxBneR5KhrPf/Q1lNKdNnj9zx7HEmlGvqDLjP5UvUNhT2RHGKxIpbL?=
+ =?us-ascii?Q?hN0aPjpoVcXphJSG2e7MyoOkDRfE9xF25nAeYak82PcO7WI2+txiPVDdWi0B?=
+ =?us-ascii?Q?Ixq1MFhxf4ofhHFx2JFf5NyaGNuMM+q4ePoC+JDIVS5hoz/4cIjHCk70u82r?=
+ =?us-ascii?Q?OJktw0xGJ+TvViZqFyIn6BnywSav+Qc/GmzqrFO3a60OpKNfI2FVc8hinEyd?=
+ =?us-ascii?Q?Fth2BFsSPDVKDSyYXXQgL9PqXvgf8/aqARZfW93GHe/fRxghDvpkXhwI2Cw9?=
+ =?us-ascii?Q?M5YQO2p/P/TMFTtNVOjjftbtN8qJUDmuN3k20YsvU9ddcU2fl3yub21Cryne?=
+ =?us-ascii?Q?Lsau9CmaPTASDSr7gpexbx6Xk7S/OkJrCgeNF7Fl2RPV+xJrpgkSRlqmiYhn?=
+ =?us-ascii?Q?6bTyt0tkRpiO/8QwVQVQNQ8ID/XowRFRvMbtfYh+gJocHOhXQBm+B+CcI39m?=
+ =?us-ascii?Q?DPl7oCX4QUZOFwEsoPz4wCXIwhfuPFbWU0CdJ8TsSmXOv5G+kWTFik2D6LYe?=
+ =?us-ascii?Q?ctpj4nmPsNPPV4xpPkqJRD8HtlUGR0f1GPB6HAoNh84Fuu66o2SZZvqYv9HJ?=
+ =?us-ascii?Q?FkMQFPGk7gnVqQyyLU9DyEAAfQwfArN7NJu3e/hvvbRqp7+dQ+qGpi5pV91J?=
+ =?us-ascii?Q?QcdgcDLhOWOmWTFdkT1fDxnzi/foT6IBN37+vi0VxYs8zCHelw58Za6yuD2G?=
+ =?us-ascii?Q?ciiF4/PJ2wcelB/QtPq5ZKzjQxM59mhjndyABVfQc7SjBrn8byb7DYOdbweW?=
+ =?us-ascii?Q?acvBi5xiXHtA/VJLvt+eKdDLenCCA53H6Fo6jYVSFE5MfzHN44kdmpa+VE89?=
+ =?us-ascii?Q?dwakgTWd4kIeuaPYQyBE+xrMtr5XXgKF9Fen+VJPVwPp4bcMTZOZLXjEANRA?=
+ =?us-ascii?Q?LZvL8zccS+BOqHAtMeMieF2bR5g04z4Qw6bhVvh2w0ZkHLSNiTn+4KcaFGr/?=
+ =?us-ascii?Q?unLSzYx/RDUr4JpPWIaXjnaxCQbkn47irsyAMsO++bgIpAaIVOQTukq2worT?=
+ =?us-ascii?Q?nVv6WxAP8cS0EQpyRyyuvA/iSMRnOF6pwDFanl/QOqqX8pGZlrkRF+4fIMkW?=
+ =?us-ascii?Q?cOwmZ6MXBRQ9rPUo21xP5RFCHIblaiJ6/P6TaEX7qvps5oTESzbWNgH+aSha?=
+ =?us-ascii?Q?hfG+U9zQfNO62pVon1BZETmBvHPLkw2rmI89FnBu56gw5gfoxBx94/Isb/qY?=
+ =?us-ascii?Q?ZD6Ll78tPgLY8vEkXxPk6/MpZ7vQpW64mendPoa0AFEa7g8BCeJHCguWYsmN?=
+ =?us-ascii?Q?PdpYN1MkO2RLdwobu/6G4SnVt2V4tya7EiRGSrQMaOaZvBph3pwHb6J1yJ0Q?=
+ =?us-ascii?Q?TJZbEn3z8ODWlEqHI3BywOofeaoQsrkRMfpJApqr4/qZeI3M2+Y79e85nIp/?=
+ =?us-ascii?Q?r5FWGXDlC/yLnpik1J+H9CSUd59XQiKD+kmveXHPZ3ldHhGsG2t65QsyiOkB?=
+ =?us-ascii?Q?yuZT0/vJgaSQj19IkqWJeTOa+xapG9NpkOel5BOqJidd?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZjIzz5Rdkc8kxo4g@zx2c4.com>
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6339.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d1655d0-a091-4b76-3880-08dc6ab81443
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 May 2024 14:56:42.6082
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DIq8NijbCCtlhCVwbtQtzsmTAgk+lMVh0qFFPtUBFwzztgDOozk89knYhvDzFHlwOLQXcPbAg4puc9GRCXWsjQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8725
 
-On Wed, May 01, 2024 at 02:21:35PM +0200, Jason A. Donenfeld wrote:
-> There are probably better ways of speeding this up (e.g. my vDSO work,
-> which should be coming back soon) than just removing rounds and hoping
-> for the best.
-> 
-> The problem is that there's extremely broad consensus that ChaCha20 is
-> good at what it does. There's much less so for ChaCha8. JP's _probably_
-> right, and it all seems like a sensible risk analysis...maybe...but
-> also, why play with fire? Is it really worth it? I don't think there's
-> much harm done in being really conservative about all this.
-> 
-> Another consideration with the RNG is that most everybody else's crypto
-> relies on the RNG being good. If some consumer of the RNG wants to use
-> single DES, so be it. If another consumer wants to use a cascade of
-> ChaCha20 and AES and Serpent and Keccak for something, okay. Those
-> aren't our choices. But we shouldn't prevent those choices by weakening
-> the RNG.
-> 
-> So while it *might* be kinda overkill, there's also broad consensus that
-> what we've got is *definitely* sufficient for all uses. At the same
-> time, it's still pretty darn fast, there exist other ways to make it
-> faster, and I don't think it's /overly/ much.
+> On Wed, May 01, 2024 at 04:52:05AM +0000, Akhil R wrote:
+> >
+> > I had a question based on some of our customer feedback with this drive=
+r.
+> > While running tcrypt mode=3D10 with Tegra SE driver, it shows errors fo=
+r lrw(aes),
+> > rfc3686(ctr(aes)) etc. which it does not support.
+>=20
+> Algorithms that are not supported by your driver should automatically
+> be routed to software implementations.  What errors are you getting?
+I get the below error. But this is because we don't have CONFIG_LRW
+enabled in our defconfig.=20
 
-ChaCha20 reminds me of cascading encryption actually. That's a good analogy.
-VeraCrypt offers several cascading options choices, such as AES(Twofish),
-AES(Twofish(Serpent)), Kuzneychik(Serpent(Camellia)), etc. While there isn't
-anything technically wrong with the approach, most security-minded folks would
-agree it's overkill. Using just AES, or just Twofish, or just Serpent is more
-than sufficent. ChaCha20 is kind of like that. It's extra security because "just
-in case".
+[ 1240.771301] alg: skcipher: failed to allocate transform for lrw(aes): -2
+[ 1240.778308] alg: self-tests for lrw(aes) using lrw(aes) failed (rc=3D-2)
 
-ChaCha8 is certainly aggressive. As another analogy, it's a 10 character random
-password. While a 10 character password hashed with MD5 is *probably* fine at 65
-bits, 13 random characters (80 bits) would definitely be safer. But 20 random
-characters (128 bits) is certainly overkill to protect against even the most
-well-funded orgs with distributed GPU resources cracking password hashes.
+So, I suppose enabling the defconfig is the right and only fix here?
 
-ChaCha12 seems like a good compromise. It's 5 rounds of security away from the
-latest known attack while also providing a solid performance improvement.
-
-Cheers,
-
--- 
-. o .   o . o   . . o   o . .   . o .
-. . o   . o o   o . o   . o o   . . o
-o o o   . o .   . o o   o o .   o o o
+Thanks and Regards,
+Akhil
