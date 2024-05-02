@@ -1,81 +1,129 @@
-Received: from mail.zeus03.de (www.zeus03.de [194.117.254.33])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC0A1635DB
-	for <linux-crypto@vger.kernel.org>; Thu,  2 May 2024 21:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EE71C2BE;
+	Thu,  2 May 2024 23:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714683648; cv=none; b=UZPDcoIwIpCCExG7ZihAn527AZZK5ubJ1aaYVKdRPzVr6A6ew9+x53Bc4yyAKGdndOsrSBLm0zwYrw7xUU6gtKAilhXgVQqBMd36QIP8QrFzNL8Hqik3U32hRAHEHnLBym0PoY2+FvD9QgcamQa27XYhli5I8nPCzDWP2ASURts=
+	t=1714691504; cv=none; b=JuT9w+SagOoDFpuHG3awwWFR7cybIcE6fibo0M7A/esenhzKirzuhA7ZeeCaCW8O4ocaOsi5ObupKj+qpnklrn+vhV/N4gNmnw+7BYPovfgUD+cTsevMjhSIpn3czkQ/8nU/p7Pnj8VvjS89FaXWl+NXurQCpfEKnFkVHURqjq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714683648; c=relaxed/simple;
-	bh=G2G5Fdd8L1eMCVpoJCoNvgyMBlb75rzt+1FCyv2puVo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BmZ1ArA9KY3+2hstxvbzyyDTFY3f05N8vcKo6sMcItk8jVjRhLNNaBtEv0U52CP24mlcv55FN8KxKlq+xUYu93lvBbZP3HVbyxxUm2n+wFQErTt8FL4BfbS6HUf3QfPZJQLoraXC3NM+hb8SG7bf/aW/n9xDkR/S18oJ/zkzFNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=kTsD4wzs; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+	s=arc-20240116; t=1714691504; c=relaxed/simple;
+	bh=BCu5DjqXcmPG//vCsbZOiiWzxlLCpxGZ01rex1Oz3Sw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hUt4bvIhPjAAbBbh9Qd8Iz/2xsOkz8CaCbcifehHq/I0yAdP42nP9a2gL9FZIy0JfDzDbHA5mhh5yKuTCikK1QJj6x6QcitDuxD8lbtA1NvhnQRcGTh8LebVrBTT8N+4YCVFJ1kEb1S20+KG1JyIEJmCsv9ebBoPBGBSZ746/uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xqy6CaAq; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="kTsD4wzs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=from:to:cc:subject:date:message-id
-	:mime-version:content-transfer-encoding; s=k1; bh=vbLbGnRrGB7osk
-	150qN2jGrCzd2fjB5/oPHzyxdfjfo=; b=kTsD4wzsqhNs625k+/D3X4EveeW156
-	xolafYJZMXNmURAxMJW+VCLt7kkK/pfWh2TyUZJtR73Ex3q5/LaM1fhnVKbCX0aN
-	b8rtHgKHqNEYKNyEek6k/+5QdVpHHqQktdrahFswrIQTyhyvybT+u7muQTF6V7k2
-	okY7OPAqkeEcHpRbDcjKWizio5tXyGMtpPVSoxyAOfmDem7pXlZNfryFbn4eJL37
-	pDKgHZuI/OHUy4RJHE11vBQMPxIKJJs8Ejee3756yPKLKjJeV6a3yJzdOClXcWqL
-	4bjpmX2ztPBpJNGAGAKUEFzNjoKlI3+AjX4W5pTIydSSd11Hv+LgxGnQ==
-Received: (qmail 3365792 invoked from network); 2 May 2024 23:00:40 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 2 May 2024 23:00:40 +0200
-X-UD-Smtp-Session: l3s3148p1@ZIs/5X4XVopehhrT
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: linux-crypto@vger.kernel.org
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-fpga@vger.kernel.org,
-	Michal Simek <michal.simek@amd.com>,
-	Moritz Fischer <mdf@kernel.org>,
-	Wu Hao <hao.wu@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>
-Subject: [PATCH 0/2] fpga: use 'time_left' instead of 'timeout' with wait_for_*() functions
-Date: Thu,  2 May 2024 23:00:35 +0200
-Message-ID: <20240502210038.11480-1-wsa+renesas@sang-engineering.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xqy6CaAq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714691503; x=1746227503;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BCu5DjqXcmPG//vCsbZOiiWzxlLCpxGZ01rex1Oz3Sw=;
+  b=Xqy6CaAqLf+VOn44b0AG/O4pMvLF65FU2OqVd/ELXmRd5z9z8JrwEj0C
+   NR8da0OyOGz+WEiKTil1LK4gsrKSxjC260jxNh3U6QPhXIuC8Y5Sod3PF
+   NRy0I4Elc0lZLJC4+cJBWo3FHwrdSi+P5HJKaN9JOfYpjACQBAoyixk9s
+   cLXDFeYwqw3EZZMSGsySMsYIxgHPJMYew50xV2SYDayPTJb4Jyc0x2qvA
+   Ohma0Bezu4vGGfSDcufjLeva48hFaZRzgvSG0cO8c/VhMDtqNESCk/oUH
+   QvnvX7QBnNGprNa/1yJMEYggE37h8bclZPUc3S8Ftj4N0ZLG6QaC0cBXy
+   A==;
+X-CSE-ConnectionGUID: K8bMoHgMQh2ZrZADPt/NjQ==
+X-CSE-MsgGUID: xJqCWu6FQU+i+mdXfaUZMw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11062"; a="10709730"
+X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
+   d="scan'208";a="10709730"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2024 16:11:42 -0700
+X-CSE-ConnectionGUID: pZ7LHjPERy2vcF7eAyPTwQ==
+X-CSE-MsgGUID: wVxZ/QkLRjizm+OBuZjfCg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
+   d="scan'208";a="31777977"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2024 16:11:41 -0700
+Date: Thu, 2 May 2024 16:11:40 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+	bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+	ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com,
+	isaku.yamahata@intel.com, isaku.yamahata@linux.intel.com,
+	rick.p.edgecombe@intel.com
+Subject: Re: [PATCH v15 02/20] KVM: x86: Add hook for determining max NPT
+ mapping level
+Message-ID: <20240502231140.GC13783@ls.amr.corp.intel.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240501085210.2213060-3-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240501085210.2213060-3-michael.roth@amd.com>
 
-There is a confusing pattern in the kernel to use a variable named 'timeout' to
-store the result of wait_for_*() functions causing patterns like:
+On Wed, May 01, 2024 at 03:51:52AM -0500,
+Michael Roth <michael.roth@amd.com> wrote:
 
-        timeout = wait_for_completion_timeout(...)
-        if (!timeout) return -ETIMEDOUT;
+...
 
-with all kinds of permutations. Use 'time_left' as a variable to make the code
-obvious and self explaining.
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index c6c5018376be..87265b73906a 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1816,6 +1816,7 @@ struct kvm_x86_ops {
+>  	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+>  	int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+>  	void (*gmem_invalidate)(kvm_pfn_t start, kvm_pfn_t end);
+> +	int (*private_max_mapping_level)(struct kvm *kvm, kvm_pfn_t pfn);
 
-This is part of a tree-wide series. The rest of the patches can be found here
-(some parts may still be WIP):
+Explicit private prefix is nice.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/wsa/linux.git i2c/time_left
 
-Because these patches are generated, I audit them before sending. This is why I
-will send series step by step. Build bot is happy with these patches, though.
-No functional changes intended.
+>  };
+>  
+>  struct kvm_x86_nested_ops {
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 510eb1117012..0d556da052f6 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4271,6 +4271,20 @@ static inline u8 kvm_max_level_for_order(int order)
+>  	return PG_LEVEL_4K;
+>  }
+>  
+> +static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
+> +					u8 max_level, int gmem_order)
+> +{
+> +	if (max_level == PG_LEVEL_4K)
+> +		return PG_LEVEL_4K;
+> +
+> +	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
+> +	if (max_level == PG_LEVEL_4K)
+> +		return PG_LEVEL_4K;
+> +
+> +	return min(max_level,
+> +		   static_call(kvm_x86_private_max_mapping_level)(kvm, pfn));
 
-Wolfram Sang (2):
-  fpga: socfpga: use 'time_left' variable with
-    wait_for_completion_interruptible_timeout()
-  fpga: zynq-fpga: use 'time_left' variable with
-    wait_for_completion_timeout()
+If we don't implement this hook, OPTIONAL_RET0 causes always PG_LEVEL_NONE.
+Anyway when TDX implements the hook, we can remove OPTIONAL_RET0.
 
- drivers/fpga/socfpga.c   | 7 ++++---
- drivers/fpga/zynq-fpga.c | 8 ++++----
- 2 files changed, 8 insertions(+), 7 deletions(-)
+This hook works for TDX by "return PG_LEVEL_4K;".
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
 -- 
-2.43.0
-
+Isaku Yamahata <isaku.yamahata@intel.com>
