@@ -1,37 +1,35 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE8C2AD02;
-	Fri,  3 May 2024 10:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EDEA15250C;
+	Fri,  3 May 2024 10:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714732277; cv=none; b=NlkoxWwEU0HMEygeT9ItdvHdMNEp8l8yMW8zF9DwyvvIY3YAi4QlDedURDhcePu/b2ynf9WmZQCnVUAXOluVlOyrsUsVviiJgJEB0TfKi4tWbldi4P9K/0mZSIGvYh+LiDsbuMLYzdew3T8T2KVG/w0xvgzeH2jnQ0V1KY5VSJY=
+	t=1714732961; cv=none; b=UvV6S691oS1THcXy+0BsSHQOekBA/KzdyVqlQCbkoj+MDfOefRbw2U3NXW09MiPFYeeNngcZBkp7xJyn9QH/cSvutirpeztaMES3k8dd82vtff8MvjJbkBkewhWh7QmKpWvkQGnbwbUjaufpRZ+cE0AZCg0JOXR+V1OSTCRkUrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714732277; c=relaxed/simple;
-	bh=6AYkgxrwSkcmi+C/w8z7/QWz4EAoBp+7V4Et2BTlEg4=;
+	s=arc-20240116; t=1714732961; c=relaxed/simple;
+	bh=IF0o7c41DFafCgpye59ZvL3nnFXY6ts7lGfBd2TDJ10=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YaEOu4Rn6qY2zown+Oqhifb9D09xxmOY1522L6VYvWOiGX4tq4/3iNYy0BV9o1BgTd576F06bx2wwNATu6880qkpvDoDHoz5Mk476pXKQPzrfaLuaa7pj/Mvz4NuLjT9O2m5BmuhX5y0E+/KYTQ/8N7E1T8U1QDuk/tNXYmEJE0=
+	 Content-Type:Content-Disposition:In-Reply-To; b=khtbkO3gaUXHNSM0XGTvN9K5YzW7qAWDOQNe/PNQ4OncpLyotAgiOuCyzE+jqSxnmqLHSd7bmvTYMYOWu0Uo71huPjUEzamnEbFuhdn4GpdwPwfBgMEUv3UOaEg8/au1mM0D35fhomJLndcYKU1auImVOschKHn/UQSU71CEk4c=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s2qBo-009v7u-2Y;
-	Fri, 03 May 2024 18:30:53 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 May 2024 18:30:53 +0800
-Date: Fri, 3 May 2024 18:30:53 +0800
+	id 1s2qMw-009vKi-2g;
+	Fri, 03 May 2024 18:42:23 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 May 2024 18:42:23 +0800
+Date: Fri, 3 May 2024 18:42:23 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Lukas Wunner <lukas@wunner.de>, Stefan Berger <stefanb@linux.ibm.com>,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	davem@davemloft.net, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: ecc - Protect ecc_digits_from_bytes from reading
- too many bytes
-Message-ID: <ZjS83WIPglXiUH3n@gondor.apana.org.au>
-References: <20240426225553.3038070-1-stefanb@linux.ibm.com>
- <D0W3MTR0CY08.Q2UIYE4N274L@kernel.org>
- <Zi8UXS1MD5V58dnN@wunner.de>
- <D0WIZTMRKHSJ.1Z4ZV54DLVWAB@kernel.org>
+To: Lothar Rubusch <l.rubusch@gmail.com>
+Cc: davem@davemloft.net, nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/5] crypto: atmel-sha204a - remove unused includes
+Message-ID: <ZjS_j-s6F2h3jflL@gondor.apana.org.au>
+References: <20240427001439.12726-1-l.rubusch@gmail.com>
+ <20240427001439.12726-3-l.rubusch@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -40,13 +38,38 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <D0WIZTMRKHSJ.1Z4ZV54DLVWAB@kernel.org>
+In-Reply-To: <20240427001439.12726-3-l.rubusch@gmail.com>
 
-On Mon, Apr 29, 2024 at 01:14:15PM +0300, Jarkko Sakkinen wrote:
+On Sat, Apr 27, 2024 at 12:14:36AM +0000, Lothar Rubusch wrote:
+> Remove unnecessarily included headers.
 > 
-> Yeah, sure, that would be even better, or even memzero_explicit()?
+> Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
+> ---
+>  drivers/crypto/atmel-sha204a.c | 9 ---------
+>  1 file changed, 9 deletions(-)
+> 
+> diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+> index c77f482d2..5c3fef6e9 100644
+> --- a/drivers/crypto/atmel-sha204a.c
+> +++ b/drivers/crypto/atmel-sha204a.c
+> @@ -5,17 +5,8 @@
+>   * Copyright (c) 2019 Linaro, Ltd. <ard.biesheuvel@linaro.org>
+>   */
+>  
+> -#include <linux/delay.h>
+> -#include <linux/device.h>
+> -#include <linux/err.h>
+> -#include <linux/errno.h>
+>  #include <linux/i2c.h>
+> -#include <linux/init.h>
+>  #include <linux/kernel.h>
+> -#include <linux/module.h>
+> -#include <linux/scatterlist.h>
+> -#include <linux/slab.h>
+> -#include <linux/workqueue.h>
+>  #include "atmel-i2c.h"
 
-memzero_explicit should only be used for stack memory.
+These do not seem to be redundant.
 
 Cheers,
 -- 
