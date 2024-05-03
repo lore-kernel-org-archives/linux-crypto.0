@@ -1,104 +1,113 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEFF41C7F;
-	Fri,  3 May 2024 21:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5B550297;
+	Fri,  3 May 2024 23:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714770681; cv=none; b=T03iAgNFJvqYCJWFnXa1fZ13z9ssSxEkHILFbmTaSaMs7Qk+TJV8iRQrxyG7ODeUvRoLP18fdQmQTrOV4bZdNytKKxOGcQmiW1PzKwEn0OMHU7t0+tEcu9Ehhs0bQGZokET4JKIktXAjRwaDWX6OXKomRIi8Emf1b4z/DCU0RKM=
+	t=1714779915; cv=none; b=oSTMq9GG4h37BMi1NRTULlqt77jTZBITzTPmFXc8x33/Zw7J6WOVFpiWstHD2srIBan/GKY3tnnROY/Oj5oCuZHP5Yhjn2OeVOMlI7YneNZKpz44W+Cjim0jVB/3moRS0PI4DhcA+9D+B2ImwJNeLNdrrgrwwiF1e4y0Nuvlqiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714770681; c=relaxed/simple;
-	bh=d/SD6qIRdSFdmB6XYHh2XnFL0LvVoGCB7gGxH6DO6E0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kr2bAdPr9Qk4u0gidxn4f/KjT4wVN8WkCCJVNE1o0Zy5+BT4BHoerRsTHG+2cZqaV8NQrDgndJPHyBAh+ygiBHPAT73L1zncx2j0IN/QW5lowG+v5RJdqcnqCbjFjVNjo6l06Z8/lQj3OS8AeQpSgBQWnm5ygBXEcBiqWriZ2WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EaTNk1PU; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714779915; c=relaxed/simple;
+	bh=DlRlFVsHUqhvPdkfip9DnPPB8Y/bNEuxfZL0IMIFLYk=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=IK2dpdmna/eH20gp4kR7W/eFBiJlHaCnkgIzOhkq+NmzuTz2HPTNTkm++MB85lh9SE6dVoaQ+TIPCOMegadBRVf1VdzgpVIhodFR5/+Kf2synHhoTG6jegBj7VIzNVlD3DVpGkivinLfytkJweWMPI0XtN5sfv3TtsKSLQR5s/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BZoQANMu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EaTNk1PU"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-34eb52bfca3so43f8f.0;
-        Fri, 03 May 2024 14:11:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714770659; x=1715375459; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gFiIP6TYjHJaDi+mdlJ+P1+Htp6nG8gyq660Ei0mCwI=;
-        b=EaTNk1PU2agFC4D9yBcNSVkoridsOET3WUhY5aLUagMuiq5LFaf0YTnRMoIPM0Ede1
-         hQiR7xc8JEldpqrKzb33ctfLkePxBQ+ddtM9NleToGAUtVSNvz7rEoKcORyDX2uvEy5k
-         UvomMz0FIF7+8KdMrIDqPZ8zdup9WBF03TyqbMmyKJhhFbtDLPHiR5Lq9mNxgmgJfmg2
-         aXqLBdcIKhH3EtG+CmbN/eGBnW7l64TxdIK1iTq1kZRgyE1KN4OucjnP/kf7AKqfXrxl
-         VGe/mIx5hIgtjg47C2V3ykmSjWjHdkvhdiTHMGKmzLCBorfz0Kfcw3+UTfV2m/Rr2Xii
-         XJeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714770659; x=1715375459;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gFiIP6TYjHJaDi+mdlJ+P1+Htp6nG8gyq660Ei0mCwI=;
-        b=OX1jfJ3XSbfxX4U9d6nTFVCNWcIxIu9NBlYZXxWmkEdFPPoNEKWJqABNGTCd+lwYI1
-         VmkaVYrdePnSFzX6k4tKRHeS5FmVMMX6QSFHrwR7yfgnOdCir/64dZ5aC4EKk/yX9rA5
-         sugK/hyFSge+mcl0cWgpFEUdQIvMljZbXArKpUHbTLx7KnPMONZhNeaLv9qGUx7RI99m
-         Se0QllMZy58lMNhlzfEk702Ss116yRC4X0s3M7LN6EUt+A+jAEAF9xMK1eJ6PFXqCRs7
-         UhnsyYoIG4a2LxkRsJTMbmCyNXIq+MqKvj8ZdrNZbJO8jtddezGmi2RzsPimTYeby2eH
-         g5CA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJFTYgtxv4U8cUSDrEoIEAUY73zNtmzMy9pCEMP5o992lDdUghN896oGo4wfFxFE7IPEkUzYku/BsOLTaq+pKEd8/EC1zoH2aqs5/UhrkGdQfroLRsFYcaisLftfTjGj5kcO3KEa+F0klM
-X-Gm-Message-State: AOJu0YzkUmrH/wgB5X/ECE70XBcoryIaW+hcEbi1hIMuclJ64CPbIes9
-	TG8CID43wD0Bx6SQBnqUF7yXSnLlxvTcGb6WCxxYFSHhrSmpuYd2
-X-Google-Smtp-Source: AGHT+IGfa5q14NXQ2Z8X2gRIXybvC2IDcQj5fP0NrlA9hdgN8bemn/OKKjEsD1OhXnquVgR9MF06mA==
-X-Received: by 2002:adf:fc44:0:b0:34c:fa08:791c with SMTP id e4-20020adffc44000000b0034cfa08791cmr3214794wrs.45.1714770658778;
-        Fri, 03 May 2024 14:10:58 -0700 (PDT)
-Received: from 58b9ec80ce2f.v.cablecom.net (84-72-156-211.dclient.hispeed.ch. [84.72.156.211])
-        by smtp.gmail.com with ESMTPSA id jy9-20020a170907762900b00a598646f173sm1475948ejc.191.2024.05.03.14.10.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 14:10:58 -0700 (PDT)
-From: Lothar Rubusch <l.rubusch@gmail.com>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: nicolas.ferre@microchip.com,
-	alexandre.belloni@bootlin.com,
-	claudiu.beznea@tuxon.dev,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	l.rubusch@gmail.com
-Subject: [PATCH v2 0/4] crypto: atmel-sha204a - read out otp zone
-Date: Fri,  3 May 2024 21:10:50 +0000
-Message-Id: <20240503211054.1231-1-l.rubusch@gmail.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BZoQANMu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF2F4C116B1;
+	Fri,  3 May 2024 23:45:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714779915;
+	bh=DlRlFVsHUqhvPdkfip9DnPPB8Y/bNEuxfZL0IMIFLYk=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=BZoQANMu5xxuHXX714j4tlKziMZOQFhvYDjQLmlnL6HneFF17oZkflc23OPLrUjm6
+	 l96OiS8KxIKEs5kczliHGVnsn10tT68fYsWkcfAYPWXZ1XvmzGoHvUkp1ZxmKrWpDC
+	 s7td0SjDAOIEg2AzAYplNdCnrGMHYph1oVDt7Xqi8J5CfL0NaerWmmjCQ7oBTxZkFN
+	 hi9mYVwSgjD715rrjl4RTDFa7RFivlIKP+ftuX65ggz1X4tvvvHVoGTWJAtpHvh7Rc
+	 WVqUjjU2Mp8QltWKiPa2PEtJQ3MsGF6I9PdUxd++kH3e/soRIgYBMoF7CMkgpxB3MJ
+	 71FCga1RH5W5w==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 04 May 2024 02:45:05 +0300
+Message-Id: <D10EQTNQXQYO.1QBNX5LMFU8NK@kernel.org>
+Cc: "Mimi Zohar" <zohar@linux.ibm.com>, "James Bottomley"
+ <jejb@linux.ibm.com>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David S.
+ Miller" <davem@davemloft.net>, "Kshitiz Varshney"
+ <kshitiz.varshney@nxp.com>, "Shawn Guo" <shawnguo@kernel.org>, "Jonathan
+ Corbet" <corbet@lwn.net>, "Sascha Hauer" <s.hauer@pengutronix.de>,
+ "kernel@pengutronix.de" <kernel@pengutronix.de>, "Fabio Estevam"
+ <festevam@gmail.com>, "dl-linux-imx" <linux-imx@nxp.com>, "Ahmad Fatoum"
+ <a.fatoum@pengutronix.de>, "sigma star Kernel Team"
+ <upstream+dcp@sigma-star.at>, "David Howells" <dhowells@redhat.com>, "Li
+ Yang" <leoyang.li@nxp.com>, "Paul Moore" <paul@paul-moore.com>, "James
+ Morris" <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, "Paul E.
+ McKenney" <paulmck@kernel.org>, "Randy Dunlap" <rdunlap@infradead.org>,
+ "Catalin Marinas" <catalin.marinas@arm.com>, "Rafael J. Wysocki"
+ <rafael.j.wysocki@intel.com>, "Tejun Heo" <tj@kernel.org>, "Steven Rostedt
+ (Google)" <rostedt@goodmis.org>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-integrity@vger.kernel.org"
+ <linux-integrity@vger.kernel.org>, "keyrings@vger.kernel.org"
+ <keyrings@vger.kernel.org>, "linux-crypto@vger.kernel.org"
+ <linux-crypto@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "linuxppc-dev@lists.ozlabs.org"
+ <linuxppc-dev@lists.ozlabs.org>, "linux-security-module@vger.kernel.org"
+ <linux-security-module@vger.kernel.org>, "Richard Weinberger"
+ <richard@nod.at>, "David Oberhollenzer"
+ <david.oberhollenzer@sigma-star.at>, "Varun Sethi" <V.Sethi@nxp.com>,
+ "Gaurav Jain" <gaurav.jain@nxp.com>, "Pankaj Gupta" <pankaj.gupta@nxp.com>
+Subject: Re: [EXT] [PATCH v8 6/6] docs: trusted-encrypted: add DCP as new
+ trust source
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "David Gstir" <david@sigma-star.at>
+X-Mailer: aerc 0.17.0
+References: <20240403072131.54935-1-david@sigma-star.at>
+ <20240403072131.54935-7-david@sigma-star.at>
+ <D0ALT2QCUIYB.8NFTE7Z18JKN@kernel.org>
+ <DB6PR04MB3190F6B78FF3760EBCC14E758F072@DB6PR04MB3190.eurprd04.prod.outlook.com> <7783BAE9-87DA-4DD5-ADFA-15A9B55EEF39@sigma-star.at> <DB6PR04MB319062F2A19A250BA22C12D48F1A2@DB6PR04MB3190.eurprd04.prod.outlook.com> <DB9357A7-0B20-4E57-AF66-3DD0F55ED538@sigma-star.at>
+In-Reply-To: <DB9357A7-0B20-4E57-AF66-3DD0F55ED538@sigma-star.at>
 
-Read out otp memory zone of this secure eeprom and rng chip. The chip
-has an otp zone and data zone, both still not accessed. The otp zone
-can be used to store persistently serial numbers or similar, if externally
-pre-configured. In any way the Atmel SHA204a needs to be preconfgured and
-fuse locked in order to be useful also for the already implemented RNG
-functionality. Placing data into the otp zone is optional. If empty, the
-chip returns 0xff on all field. The implementation passes the content to
-a new sysfs handle to userspace. If the chip is locked or not accessible
-no sysfs handle is set.
+On Tue Apr 30, 2024 at 3:03 PM EEST, David Gstir wrote:
+> Hi Jarkko,
+>
+> > On 30.04.2024, at 13:48, Kshitiz Varshney <kshitiz.varshney@nxp.com> wr=
+ote:
+> >=20
+> > Hi David,
+> >=20
+> >> -----Original Message-----
+> >> From: David Gstir <david@sigma-star.at>
+> >> Sent: Monday, April 29, 2024 5:05 PM
+> >> To: Kshitiz Varshney <kshitiz.varshney@nxp.com>
+>
+>
+> >>=20
+> >> Did you get around to testing this?
+> >> I=E2=80=99d greatly appreciate a Tested-by for this. :-)
+> >>=20
+> >> Thanks!
+> >> BR, David
+> >=20
+> > Currently, I am bit busy with other priority activities. It will take t=
+ime to test this patch set.
+>
+> How should we proceed here?
+> Do we have to miss another release cycle, because of a Tested-by?
+>
+> If any bugs pop up I=E2=80=99ll happily fix them, but at the moment it ap=
+pears to be more of a formality.
+> IMHO the patch set itself is rather small and has been thoroughly reviewe=
+d to ensure that any huge
+> issues would already have been caught by now.
 
-Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
----
-v1 -> v2
-- fix typo in commit title
-- drop patch: remove unused includes
+I don't mind picking this actually since unless you consume it,
+it should not get in the way. I'll pick it during the weekend.
+Thanks for reminding.
 
-Lothar Rubusch (4):
-  crypto: atmel-i2c - add missing arg description
-  crypto: atmel-i2c - rename read function
-  crypto: atmel-sha204a - add reading from otp zone
-  crypto: atmel-sha204a - provide the otp content
-
- drivers/crypto/atmel-i2c.c     | 30 +++++++++++++--
- drivers/crypto/atmel-i2c.h     |  8 +++-
- drivers/crypto/atmel-sha204a.c | 68 ++++++++++++++++++++++++++++++++++
- 3 files changed, 102 insertions(+), 4 deletions(-)
-
--- 
-2.25.1
-
+BR, Jarkko
