@@ -1,32 +1,37 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440A017758
-	for <linux-crypto@vger.kernel.org>; Fri,  3 May 2024 10:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0865B17758;
+	Fri,  3 May 2024 10:54:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714733635; cv=none; b=E83EN303U8O/r+/mp4TPakNTdjybeRTOR+2MxuN0hydXzmmNEW8VaD6MUM0w/z2qTPxp9GNC20JgOOARW06H1CBphRIPZEzG0u9gVxSa2X/hjKWmZQTIcd35+KjrZvwqnux0PRoEBIBzg5/ZGS4iCj1nY9fjW5aTNvAMn6Rw7NM=
+	t=1714733647; cv=none; b=hQvnw59hM/cti2Ip2aNemB4c+qb2cjGGq/JPz4cj9oeYlQmO0LgV2riYDCv91Qzv4FfBAtHfEUf1Yy6oZIhM5fTyofKPiFL9EMD5qcNUmVa39MgwFOhisCg2zGngbjTjFs6nmx06VkMVyWOWjK/72XI+89JGutUQTvxFcZObHKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714733635; c=relaxed/simple;
-	bh=jouzIe433+XmDa8qk2FCJSeeinRfQmu588bhPGSgOVk=;
+	s=arc-20240116; t=1714733647; c=relaxed/simple;
+	bh=yk90lNH/yfw7q3++xQCcY4R0xvcacoRkdb/kdHegHGI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U/UC/LysphwjHw7cCD96CDklXAiMyJgm3kQ7Pyjgwhjateyd0Q5osEjvQIqmYx4FQvlPhZEy/npEaWBKq+bsqbBtjd+fpT3Qv/7hes8eNf2Rcji6+EwWunDO4KsPRCNg42m9Qp2i91/WTYLym1+iMi6/mjNLq5VdZ+RzJYySzPs=
+	 Content-Type:Content-Disposition:In-Reply-To; b=n08Sqko0dOeX/oNBOJAQVe6y72MwU9b8o/Q0AjXLR+s9lXxdrGKSpTfYCeg6jp4jcIAkJcOrgfqb6BX3fkD/0rCwWp6kSJ1RMRIG2dDFXXwe2dLgY2fT451IPid3h6+IRfJ1Rj/GOFKOp2pxO9FcqtVnKgnWrL5mI2CoWBiE6zY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s2qY1-009vWM-0p;
-	Fri, 03 May 2024 18:53:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 May 2024 18:53:49 +0800
-Date: Fri, 3 May 2024 18:53:49 +0800
+	id 1s2qYD-009vWT-2X;
+	Fri, 03 May 2024 18:54:02 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 May 2024 18:54:02 +0800
+Date: Fri, 3 May 2024 18:54:02 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Damian Muszynski <damian.muszynski@intel.com>
-Subject: Re: [PATCH] crypto: qat - specify firmware files for 402xx
-Message-ID: <ZjTCPaYYYJF6fALd@gondor.apana.org.au>
-References: <20240422141324.7138-1-giovanni.cabiddu@intel.com>
+To: Chenghai Huang <huangchenghai2@huawei.com>
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, fanghao11@huawei.com,
+	liulongfang@huawei.com, shenyang39@huawei.com,
+	songzhiqi1@huawei.com, qianweili@huawei.com,
+	liushangbin@hisilicon.com, linwenkai6@hisilicon.com,
+	taoqi10@huawei.com, wangzhou1@hisilicon.com
+Subject: Re: [PATCH 0/2] crypto: hisilicon - fix reg offset issue and cleanup
+ dump information
+Message-ID: <ZjTCSolBz4aNW_VA@gondor.apana.org.au>
+References: <20240423011922.770693-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,25 +40,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240422141324.7138-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <20240423011922.770693-1-huangchenghai2@huawei.com>
 
-On Mon, Apr 22, 2024 at 03:13:17PM +0100, Giovanni Cabiddu wrote:
-> The 4xxx driver can probe 4xxx and 402xx devices. However, the driver
-> only specifies the firmware images required for 4xxx.
-> This might result in external tools missing these binaries, if required,
-> in the initramfs.
+On Tue, Apr 23, 2024 at 09:19:20AM +0800, Chenghai Huang wrote:
+> Fix for register offset and cleanup dump information of debugfs.
 > 
-> Specify the firmware image used by 402xx with the MODULE_FIRMWARE()
-> macros in the 4xxx driver.
+> Chenghai Huang (1):
+>   crypto: hisilicon/debugfs - mask the unnecessary info from the dump
 > 
-> Fixes: a3e8c919b993 ("crypto: qat - add support for 402xx devices")
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Damian Muszynski <damian.muszynski@intel.com>
-> ---
->  drivers/crypto/intel/qat/qat_4xxx/adf_drv.c | 2 ++
->  1 file changed, 2 insertions(+)
+> Wenkai Lin (1):
+>   crypto: hisilicon/sec2 - fix for register offset
+> 
+>  drivers/crypto/hisilicon/debugfs.c        | 29 +++++++++++++++--------
+>  drivers/crypto/hisilicon/hpre/hpre_main.c |  2 +-
+>  drivers/crypto/hisilicon/sec2/sec_main.c  |  6 ++---
+>  3 files changed, 23 insertions(+), 14 deletions(-)
+> 
+> -- 
+> 2.30.0
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
