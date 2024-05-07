@@ -1,159 +1,126 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 719171553BC;
-	Mon,  6 May 2024 15:47:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64929622;
+	Tue,  7 May 2024 00:25:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715010455; cv=none; b=MQob6i1BEfXi9i8G3xQKY/A0fT2exFtQuq0WROVkcZEgA42gKGLF0qscHxCtRL4jl1xbCNhFg0gZJmV5KCkB7Af6g0e7IBaQ0MA0Bj2b1OkLVT+1C4LFE3V/7dCPMgZSpr8jh8jpdQVwHbuOd+dVZyVtzP2+zJkVu2SbaNbIo7U=
+	t=1715041516; cv=none; b=I/VPT+fidbITC8gjaT1WbVjopR4RE2xBCDGXSdGNrAdnGTd02Nm/oVS7oh64wizqT+685s/S4iDB2cz9679F+rz2pw3rX2ujGXJ4KqhXra4zRU89apS23XJ+bzG24Yn7663MMziu5tfyqmjN8/9AA/1lEjqYu5HYk6jYqpuAJ+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715010455; c=relaxed/simple;
-	bh=h5Zn71IG11xUlo/JirQepQ3NK+G0HDNvWXGwp8rEKRk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RYjXeEwHp/8vkNprXQSx9gulIAiHHwSANs66VlJ7LWwPgGrCbdFEfhnPTU3MoIZKkjIPj9d/uUbLfL7eWhCspNXsJUiOeTVhX59bGWGyX3/Z/RyAKKGdLjgly9XzIRzlB4vLxd1AGlxjDggqsYEG/WEOU+CrK6zEUpZkw17Do5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OrWbB8pL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1715041516; c=relaxed/simple;
+	bh=s7eBMIDMnKUPCUXSt92sBihifomPay5rghqvBJKTjqk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ta5mrlH5WXhZmsjp/azLgZhWNN6mSPCKV6eDRTw6PXwn3sQ2A0p72b98kGq/odTK567Lo9FGB6BQ28/vak7EZCf1Fc1FwuNRSnI/Yc/Vlu5pQ02rRoz3ptMXnbLCaG7wORXtEG+5GE5L7kMk0a6zvIv9bX6CmC350FFnRFGAL+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DKFHtSIz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OrWbB8pL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 763DAC116B1;
-	Mon,  6 May 2024 15:47:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DKFHtSIz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A76A4C116B1;
+	Tue,  7 May 2024 00:25:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715010454;
-	bh=h5Zn71IG11xUlo/JirQepQ3NK+G0HDNvWXGwp8rEKRk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OrWbB8pLnQpbuok8zaRSW4weeZre/pSDnn9c2tYySH9JX9kJWrE37F6x7eT2huT80
-	 Clrv1urIZSjstPQ8XCIxfUzJvo3I4G+YNz07kK2Q2LNZO+E4WUmEUTEVjrrlrabWGA
-	 uJXyfwMLyE7RBgPfsxl6jnkvCsg5uo9vzWmnAoERrFehCcA8F+MJYPIcPN3QJ8BuMM
-	 wZBcZpG7MUPRR+IeNpa/gzXd3wbQpMHB7W/q8Lrc/bMzsxJIz7NK/sipNbfBz3Re2Q
-	 ZDX22+oOMwUrSP9ByqPsyJBNaU1SoROcrYHcxWU/wT8XC/5jFEhewp0wnBv9cTPPwW
-	 q/jQ8zTQfv7EQ==
-Date: Mon, 6 May 2024 16:47:29 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Alexey Romanov <avromanov@salutedevices.com>
-Cc: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"khilman@baylibre.com" <khilman@baylibre.com>,
-	"jbrunet@baylibre.com" <jbrunet@baylibre.com>,
-	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	kernel <kernel@sberdevices.ru>
-Subject: Re: [PATCH v7 17/23] dt-bindings: crypto: meson: remove clk and
- second interrupt line for GXL
-Message-ID: <20240506-distrust-famine-6848f75dd3fe@spud>
-References: <20240411133832.2896463-1-avromanov@salutedevices.com>
- <20240411133832.2896463-18-avromanov@salutedevices.com>
- <20240415-schnapps-plating-eb0895459004@spud>
- <20240506134754.jl633ncne7ct6szo@cab-wsm-0029881>
+	s=k20201202; t=1715041515;
+	bh=s7eBMIDMnKUPCUXSt92sBihifomPay5rghqvBJKTjqk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=DKFHtSIzwCtggFmwgVNyvFpYLdhnLcCxCQPuHNK4a5PxuijN0Tf6AHz/0noYtG9zT
+	 Sep4DM7tMwaUOrbZ2Y0DXhUnEj9pEQrOiLsUgwYqbdqyy68jNRYkiXAUbEhA7xdlWK
+	 87vSxjbRIGh8Dy4R9dJemz3OEvcFshe9IO1vvZhPdDFkLOA8ZLt1nETEcIU+4GR7vr
+	 Se2KmaAfUIuXOKDb++oC/wCPx95eOeedCLoVNxISpFpggzYzqd1hvRfFMuUN8W76MX
+	 uzr43qdjXmKCsMS0g9OvUD3bTNBsacI09UjVD+h8EbxupBl7M+NjbDEcXgYn5HP19C
+	 pdKq/AIJhz7PA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+	fsverity@lists.linux.dev,
+	dm-devel@lists.linux.dev
+Cc: x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v3 0/8] Optimize dm-verity and fsverity using multibuffer hashing
+Date: Mon,  6 May 2024 17:23:35 -0700
+Message-ID: <20240507002343.239552-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="GdrLK7VTJWvHWU47"
-Content-Disposition: inline
-In-Reply-To: <20240506134754.jl633ncne7ct6szo@cab-wsm-0029881>
+Content-Transfer-Encoding: 8bit
+
+On many modern CPUs, it is possible to compute the SHA-256 hash of two
+equal-length messages in about the same time as a single message, if all
+the instructions are interleaved.  This is because each SHA-256 (and
+also most other cryptographic hash functions) is inherently serialized
+and therefore can't always take advantage of the CPU's full throughput.
+
+An earlier attempt to support multibuffer hashing in Linux was based
+around the ahash API.  That approach had some major issues.  This
+patchset instead takes a much simpler approach of just adding a
+synchronous API for hashing equal-length messages.
+
+This works well for dm-verity and fsverity, which use Merkle trees and
+therefore hash large numbers of equal-length messages.
+
+This patchset is organized as follows:
+
+- Patch 1-3 add crypto_shash_finup_mb() and tests for it.
+- Patch 4-5 implement finup_mb on x86_64 and arm64, using an
+  interleaving factor of 2.
+- Patch 6-8 update fsverity and dm-verity to use crypto_shash_finup_mb()
+  to hash pairs of data blocks when possible.  Note: the patch
+  "dm-verity: hash blocks with shash import+finup when possible" is
+  revived from its original submission
+  (https://lore.kernel.org/dm-devel/20231030023351.6041-1-ebiggers@kernel.org/)
+  because this new work provides a new motivation for it.
+
+On CPUs that support multiple concurrent SHA-256's (all arm64 CPUs I
+tested, and AMD Zen CPUs), raw SHA-256 hashing throughput increases by
+70-98%, and the throughput of cold-cache reads from dm-verity and
+fsverity increases by very roughly 35%.
+
+Changed in v3:
+  - Change API from finup2x to finup_mb.  It now takes arrays of data
+    buffer and output buffers, avoiding hardcoding 2x in the API.
+
+Changed in v2:
+  - Rebase onto cryptodev/master
+  - Add more comments to assembly
+  - Reorganize some of the assembly slightly
+  - Fix the claimed throughput improvement on arm64
+  - Fix incorrect kunmap order in fs/verity/verify.c
+  - Adjust testmgr generation logic slightly
+  - Explicitly check for INT_MAX before casting unsigned int to int
+  - Mention SHA3 based parallel hashes
+  - Mention AVX512-based approach
+
+Eric Biggers (8):
+  crypto: shash - add support for finup_mb
+  crypto: testmgr - generate power-of-2 lengths more often
+  crypto: testmgr - add tests for finup_mb
+  crypto: x86/sha256-ni - add support for finup_mb
+  crypto: arm64/sha256-ce - add support for finup_mb
+  fsverity: improve performance by using multibuffer hashing
+  dm-verity: hash blocks with shash import+finup when possible
+  dm-verity: improve performance by using multibuffer hashing
+
+ arch/arm64/crypto/sha2-ce-core.S    | 281 +++++++++++++-
+ arch/arm64/crypto/sha2-ce-glue.c    |  40 ++
+ arch/x86/crypto/sha256_ni_asm.S     | 368 ++++++++++++++++++
+ arch/x86/crypto/sha256_ssse3_glue.c |  39 ++
+ crypto/shash.c                      |  60 +++
+ crypto/testmgr.c                    |  91 ++++-
+ drivers/md/dm-verity-fec.c          |  31 +-
+ drivers/md/dm-verity-fec.h          |   7 +-
+ drivers/md/dm-verity-target.c       | 563 ++++++++++++++++++++--------
+ drivers/md/dm-verity.h              |  43 +--
+ fs/verity/fsverity_private.h        |   5 +
+ fs/verity/hash_algs.c               |  32 +-
+ fs/verity/open.c                    |   6 +
+ fs/verity/verify.c                  | 177 +++++++--
+ include/crypto/hash.h               |  45 ++-
+ 15 files changed, 1543 insertions(+), 245 deletions(-)
 
 
---GdrLK7VTJWvHWU47
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+base-commit: ed265f7fd9a635d77c8022fc6d9a1b735dd4dfd7
+-- 
+2.45.0
 
-On Mon, May 06, 2024 at 01:48:01PM +0000, Alexey Romanov wrote:
-> On Mon, Apr 15, 2024 at 05:43:15PM +0100, Conor Dooley wrote:
-> > On Thu, Apr 11, 2024 at 04:38:26PM +0300, Alexey Romanov wrote:
-> > > GXL crypto IP isn't connected to clk and seconnd interrput line,
-> > > so we must remove them from dt-bindings.
-> >=20
-> > How does the device work without a clock?
->=20
-> It's clocked by a common clock, the vendor didn't provide more
-> information. It doesn't have any special clock domains.
-
-So the hardware block does have a clock, which, even if it is a clock
-shared with other hardware blocks, makes your patch incorrect.
-
-Is the "blkmv" clock the shared clock?
-
-Cheers,
-Conor.
-
-> > > Fixes: 7f7d115dfb51 ("dt-bindings: crypto: Add DT bindings
-> > > documentation for amlogic-crypto")
-> > >=20
-> > > Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
-> > > ---
-> > >  .../bindings/crypto/amlogic,gxl-crypto.yaml         | 13 +----------=
---
-> > >  1 file changed, 1 insertion(+), 12 deletions(-)
-> > >=20
-> > > diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-cry=
-pto.yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> > > index 948e11ebe4ee..d3af7b4d5f39 100644
-> > > --- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> > > +++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> > > @@ -20,20 +20,11 @@ properties:
-> > >    interrupts:
-> > >      items:
-> > >        - description: Interrupt for flow 0
-> > > -      - description: Interrupt for flow 1
-> > > -
-> > > -  clocks:
-> > > -    maxItems: 1
-> > > -
-> > > -  clock-names:
-> > > -    const: blkmv
-> > > =20
-> > >  required:
-> > >    - compatible
-> > >    - reg
-> > >    - interrupts
-> > > -  - clocks
-> > > -  - clock-names
-> > > =20
-> > >  additionalProperties: false
-> > > =20
-> > > @@ -46,7 +37,5 @@ examples:
-> > >      crypto: crypto-engine@c883e000 {
-> > >          compatible =3D "amlogic,gxl-crypto";
-> > >          reg =3D <0xc883e000 0x36>;
-> > > -        interrupts =3D <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>, <GIC_SPI =
-189 IRQ_TYPE_EDGE_RISING>;
-> > > -        clocks =3D <&clkc CLKID_BLKMV>;
-> > > -        clock-names =3D "blkmv";
-> > > +        interrupts =3D <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>;
-> > >      };
-> > > --=20
-> > > 2.34.1
-> > >=20
->=20
->=20
->=20
->=20
-> --=20
-> Thank you,
-> Alexey
-
---GdrLK7VTJWvHWU47
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZjj7kQAKCRB4tDGHoIJi
-0l3kAQD5POkxdd7Ibsf2owlwltjfQ8u5NyntENYzmmppOVoEcQD+Jv1hTUFpdYX1
-AIEdvzcVlt1l4S5vs5DnQz3ZOI72Uw4=
-=nXAR
------END PGP SIGNATURE-----
-
---GdrLK7VTJWvHWU47--
