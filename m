@@ -1,130 +1,222 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6033D5338F
-	for <linux-crypto@vger.kernel.org>; Wed,  8 May 2024 08:40:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2D971B24;
+	Wed,  8 May 2024 09:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715157606; cv=none; b=AG83yTChBDUYkuCmYB+DR2WbOJ2uZ0U4+iDg04wdGt9qa9dXKYXg52LQ7DMdoJZA4YjRrabzesFx291cojJpNVdMIuGf6XlNrU/eBgMEuJJvkBT3B06Elz56ZzwdxxtterMy9Ovw4lnmPW0Y38kjohEzy6i/khqfLEvDQh/cR/o=
+	t=1715158899; cv=none; b=eVrFA4vbdTeDqFuQ7jubJ88FnrLwzcNFN3ZAqvx5zOboQcDIHh4bxmqxCVW9HSQ3ght6et8H1zT4X4AaZwS3dCykiQsSFalOpzqRrOtpc4ZjMa3i1zf7VY+CvCnGafZP3HQ9W5OYZunqpQtTrqYAANCc+Ji0WUBw3/DRKeA7KP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715157606; c=relaxed/simple;
-	bh=aCrdA+Vnwbrp7loJ4ejGB7iS3djJA76r0hGq1qxHMCc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qrSWn+0HcNBcCsExBzv9dLWsHOPAE1SNcKy893VMHnvg+rx2+SkqOYchLvXl3xWlk8I/PLN/NjCv5Amoy2ey/Yq32maC3LFfVdiYVyXn3tt7iA9/vRL6cZXXF/XxZusOMp4PXI0ZpQz8PU6XMc1dnL12ZIXbbJeC5pt5EPjXXe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s4cq7-00CKXs-1K;
-	Wed, 08 May 2024 16:39:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 08 May 2024 16:39:52 +0800
-Date: Wed, 8 May 2024 16:39:51 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Damian Muszynski <damian.muszynski@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - Fix ADF_DEV_RESET_SYNC memory leak
-Message-ID: <Zjs6VxtkL8QLtHIH@gondor.apana.org.au>
-References: <20240209124403.44781-1-damian.muszynski@intel.com>
+	s=arc-20240116; t=1715158899; c=relaxed/simple;
+	bh=2+NkL7/xFV8fjHBWJGNNByOB3Pm5bJPK0iJ7GOonRZg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LT8P7e0NDpzqVhHCgjjudWFKmOdMtyjtqpOWrZs8ViK6+rgmAK+vumkkfP2iL/mwPZ+TFDoOXOtvi0H+4HAB/AlqoCSjSwoKMEa7BerQ7Rb1GSJAWdo2oePxvINWRQFB56XquPw7FNtG0v7dyijvdQHhTUEBZK0Ay3Wlp7vX0bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d8Hshsn0; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8Hshsn0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D552BC113CC;
+	Wed,  8 May 2024 09:01:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715158898;
+	bh=2+NkL7/xFV8fjHBWJGNNByOB3Pm5bJPK0iJ7GOonRZg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=d8Hshsn0aOE1yUfO+V6rDvKuLWxBi6AYvqq8FQRYmIr6SI7O5akU2NYjNk4xO7wbV
+	 sOjXuxToraQJlGib4S8zKhQq4YikRw1OU9KFY8GlnogaLxLX2SPNUh7dBlL7ocWqFL
+	 RGwJLB6TkUcIZ1Ol0s2ZCVbTZhQ8dXzvSDdRuqIwxr4HOlZQ5q8dL8fV+vqGh1laO9
+	 2TLBFwuacXIB18x9x6B7kNw6+TmtVwRLaSKyCA00QESBuf86wEumI6fy5ugFdgmSQp
+	 8mWHhdiheblyfykQxZc4M0eXYZylXl918RYbIK3R3XDPb+Rhh8KNlUhHZOpzcGnmbF
+	 FxsgjbG9gZctw==
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-51f1b378ca5so6866651e87.1;
+        Wed, 08 May 2024 02:01:38 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV/TcVSFtbHaT8f+bJm2ebVt8q3hu0tP8yuKfxFcUcph4eaPcn0z+rP6QaPCjO7C7ZjrkV0G1GTrhw4VSUe5H3kY+OwGu1VbatqLM3a
+X-Gm-Message-State: AOJu0YwebXoMmi32MgZ02vFyMvggknCPOtkBlvbdv2Pqyzo6zGD6zCOh
+	dG/dRzNL6Xdy7ECHhOoXeRUTLDykTp1nnyf51zZQabBrqrBAtQ1gCZ+OKThTKi8jRvpvuuF83zj
+	Rl50c2n6BZCi9pbemPBJvTBmEOyI=
+X-Google-Smtp-Source: AGHT+IF5DbO+GqCsyJ09mGRZTux66fFOe1L/vNw5oAAYvZGX3dQ4vaVNGvk1IT309mpyVP8oqGarFJoMgvjohgcR8rU=
+X-Received: by 2002:a05:6512:202c:b0:51f:3e0c:ace3 with SMTP id
+ 2adb3069b0e04-5217c5670cdmr1520132e87.16.1715158897192; Wed, 08 May 2024
+ 02:01:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240209124403.44781-1-damian.muszynski@intel.com>
+References: <20240508071734.199462-1-ebiggers@kernel.org>
+In-Reply-To: <20240508071734.199462-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Wed, 8 May 2024 11:01:25 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHnBA5qeyHa-b6w+cw5-iomA=3drk7yGGzp-gc_-4uKig@mail.gmail.com>
+Message-ID: <CAMj1kXHnBA5qeyHa-b6w+cw5-iomA=3drk7yGGzp-gc_-4uKig@mail.gmail.com>
+Subject: Re: [PATCH] crypto: x86/aes-gcm - add VAES and AVX512 / AVX10
+ optimized AES-GCM
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Feb 09, 2024 at 01:43:42PM +0100, Damian Muszynski wrote:
+On Wed, 8 May 2024 at 09:22, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> @@ -146,11 +147,19 @@ static void adf_device_reset_worker(struct work_struct *work)
->  	adf_dev_restarted_notify(accel_dev);
->  	clear_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
->  
-> -	/* The dev is back alive. Notify the caller if in sync mode */
-> -	if (reset_data->mode == ADF_DEV_RESET_SYNC)
-> -		complete(&reset_data->compl);
-> -	else
-> +	/*
-> +	 * The dev is back alive. Notify the caller if in sync mode
-> +	 *
-> +	 * If device restart will take a more time than expected,
-> +	 * the schedule_reset() function can timeout and exit. This can be
-> +	 * detected by calling the completion_done() function. In this case
-> +	 * the reset_data structure needs to be freed here.
-> +	 */
-> +	if (reset_data->mode == ADF_DEV_RESET_ASYNC ||
-> +	    completion_done(&reset_data->compl))
->  		kfree(reset_data);
-> +	else
-> +		complete(&reset_data->compl);
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Add implementations of AES-GCM for x86_64 CPUs that support VAES (vector
+> AES), VPCLMULQDQ (vector carryless multiplication), and either AVX512 or
+> AVX10.  There are two implementations, sharing most source code: one
+> using 256-bit vectors and one using 512-bit vectors.
+>
+> I wrote the new AES-GCM assembly code from scratch, focusing on
+> performance, code size (both source and binary), and documenting the
+> source.  The new assembly file aes-gcm-avx10-x86_64.S is about 1200
+> lines including extensive comments, and it generates less than 8 KB of
+> binary code.  This includes both 256-bit and 512-bit vector code; note
+> that only one is used at runtime.  The main loop does 4 vectors at a
+> time, with the AES and GHASH instructions interleaved.  Any remainder is
+> handled using a simple 1 vector at a time loop, with masking.
+>
 
-This doesn't work because until you call complete, completion_done
-will always return false.  IOW we now have a memory leak instead of
-a UAF.
+This looks very good! The code is well structured and due to the
+comments, it is reasonably easy to follow for someone familiar with
+the underlying math.
 
----8<---
-Using completion_done to determine whether the caller has gone
-away only works after a complete call.  Furthermore it's still
-possible that the caller has not yet called wait_for_completion,
-resulting in another potential UAF.
+I also strongly prefer a parameterized implementation that assembles
+to a minimal object code size over the other proposed implementations,
+where there may be a slight marginal performance gain due to the use
+of different code paths for different input sizes, but this tends to
+be beneficial mostly for benchmarks and not for real-world use cases.
 
-Fix this by making the caller use cancel_work_sync and then freeing
-the memory safely.
+...
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Fixes: 7d42e097607c ("crypto: qat - resolve race condition during AER recovery")
-Cc: <stable@vger.kernel.org> #6.8+
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Tested-by: Ard Biesheuvel <ardb@kernel.org> # Tiger Lake
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-index 9da2278bd5b7..04260f61d042 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-@@ -130,8 +130,7 @@ static void adf_device_reset_worker(struct work_struct *work)
- 	if (adf_dev_restart(accel_dev)) {
- 		/* The device hanged and we can't restart it so stop here */
- 		dev_err(&GET_DEV(accel_dev), "Restart device failed\n");
--		if (reset_data->mode == ADF_DEV_RESET_ASYNC ||
--		    completion_done(&reset_data->compl))
-+		if (reset_data->mode == ADF_DEV_RESET_ASYNC)
- 			kfree(reset_data);
- 		WARN(1, "QAT: device restart failed. Device is unusable\n");
- 		return;
-@@ -147,16 +146,8 @@ static void adf_device_reset_worker(struct work_struct *work)
- 	adf_dev_restarted_notify(accel_dev);
- 	clear_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
- 
--	/*
--	 * The dev is back alive. Notify the caller if in sync mode
--	 *
--	 * If device restart will take a more time than expected,
--	 * the schedule_reset() function can timeout and exit. This can be
--	 * detected by calling the completion_done() function. In this case
--	 * the reset_data structure needs to be freed here.
--	 */
--	if (reset_data->mode == ADF_DEV_RESET_ASYNC ||
--	    completion_done(&reset_data->compl))
-+	/* The dev is back alive. Notify the caller if in sync mode */
-+	if (reset_data->mode == ADF_DEV_RESET_ASYNC)
- 		kfree(reset_data);
- 	else
- 		complete(&reset_data->compl);
-@@ -191,10 +182,10 @@ static int adf_dev_aer_schedule_reset(struct adf_accel_dev *accel_dev,
- 		if (!timeout) {
- 			dev_err(&GET_DEV(accel_dev),
- 				"Reset device timeout expired\n");
-+			cancel_work_sync(&reset_data->reset_work);
- 			ret = -EFAULT;
--		} else {
--			kfree(reset_data);
- 		}
-+		kfree(reset_data);
- 		return ret;
- 	}
- 	return 0;
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Some nits below.
+
+
+> ---
+>  arch/x86/crypto/Kconfig                |    1 +
+>  arch/x86/crypto/Makefile               |    3 +
+>  arch/x86/crypto/aes-gcm-avx10-x86_64.S | 1201 ++++++++++++++++++++++++
+>  arch/x86/crypto/aesni-intel_glue.c     |  515 +++++++++-
+>  4 files changed, 1706 insertions(+), 14 deletions(-)
+>  create mode 100644 arch/x86/crypto/aes-gcm-avx10-x86_64.S
+>
+...
+> diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+> index 5b25d2a58aeb..e4dec49023af 100644
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -1212,17 +1212,481 @@ static struct simd_skcipher_alg *aes_xts_simdalg_##suffix
+>  DEFINE_XTS_ALG(aesni_avx, "xts-aes-aesni-avx", 500);
+>  #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)
+>  DEFINE_XTS_ALG(vaes_avx2, "xts-aes-vaes-avx2", 600);
+>  DEFINE_XTS_ALG(vaes_avx10_256, "xts-aes-vaes-avx10_256", 700);
+>  DEFINE_XTS_ALG(vaes_avx10_512, "xts-aes-vaes-avx10_512", 800);
+> -#endif
+> +
+> +#define NUM_KEY_POWERS         16 /* excludes zero padding */
+> +#define FULL_NUM_KEY_POWERS    (NUM_KEY_POWERS + 3) /* includes zero padding */
+> +
+> +struct aes_gcm_key_avx10 {
+> +       struct crypto_aes_ctx aes_key AESNI_ALIGN_ATTR;
+> +       u32 rfc4106_nonce AESNI_ALIGN_ATTR;
+
+Is the alignment needed here?
+
+> +       u8 ghash_key_powers[FULL_NUM_KEY_POWERS][16] AESNI_ALIGN_ATTR;
+> +};
+> +
+> +asmlinkage void
+> +aes_gcm_precompute_vaes_avx10_256(struct aes_gcm_key_avx10 *key);
+> +asmlinkage void
+> +aes_gcm_precompute_vaes_avx10_512(struct aes_gcm_key_avx10 *key);
+> +
+> +asmlinkage void
+> +aes_gcm_aad_update_vaes_avx10(const struct aes_gcm_key_avx10 *key,
+> +                             u8 ghash_acc[16], const u8 *aad, int aadlen);
+> +
+> +asmlinkage void
+> +aes_gcm_enc_update_vaes_avx10_256(const struct aes_gcm_key_avx10 *key,
+> +                                 const u32 le_ctr[4], u8 ghash_acc[16],
+> +                                 const u8 *src, u8 *dst, int datalen);
+> +asmlinkage void
+> +aes_gcm_enc_update_vaes_avx10_512(const struct aes_gcm_key_avx10 *key,
+> +                                 const u32 le_ctr[4], u8 ghash_acc[16],
+> +                                 const u8 *src, u8 *dst, int datalen);
+> +
+> +asmlinkage void
+> +aes_gcm_dec_update_vaes_avx10_256(const struct aes_gcm_key_avx10 *key,
+> +                                 const u32 le_ctr[4], u8 ghash_acc[16],
+> +                                 const u8 *src, u8 *dst, int datalen);
+> +asmlinkage void
+> +aes_gcm_dec_update_vaes_avx10_512(const struct aes_gcm_key_avx10 *key,
+> +                                 const u32 le_ctr[4], u8 ghash_acc[16],
+> +                                 const u8 *src, u8 *dst, int datalen);
+> +
+> +asmlinkage void
+> +aes_gcm_enc_final_vaes_avx10(const struct aes_gcm_key_avx10 *key,
+> +                            const u32 le_ctr[4], const u8 ghash_acc[16],
+> +                            u64 total_aadlen, u64 total_datalen,
+> +                            u8 *tag, int taglen);
+> +asmlinkage bool
+> +aes_gcm_dec_final_vaes_avx10(const struct aes_gcm_key_avx10 *key,
+> +                            const u32 le_ctr[4], const u8 ghash_acc[16],
+> +                            u64 total_aadlen, u64 total_datalen,
+> +                            const u8 *tag, int taglen);
+> +
+> +static int gcm_setkey_vaes_avx10(struct crypto_aead *tfm, const u8 *raw_key,
+> +                                unsigned int keylen, bool vl256)
+> +{
+> +       struct aes_gcm_key_avx10 *key = aes_align_addr(crypto_aead_ctx(tfm));
+> +       int err;
+> +
+> +       /* The assembly code assumes the following offsets. */
+> +       BUILD_BUG_ON(offsetof(typeof(*key), aes_key.key_enc) != 0);
+> +       BUILD_BUG_ON(offsetof(typeof(*key), aes_key.key_length) != 480);
+> +       BUILD_BUG_ON(offsetof(typeof(*key), ghash_key_powers) != 512);
+> +
+> +       if (likely(crypto_simd_usable())) {
+
+Is it really necessary to have 3 different code paths here? If so,
+could you add a comment why?
+
+> +               err = aes_check_keylen(keylen);
+> +               if (err)
+> +                       return err;
+> +               kernel_fpu_begin();
+> +               aesni_set_key(&key->aes_key, raw_key, keylen);
+> +               if (vl256)
+> +                       aes_gcm_precompute_vaes_avx10_256(key);
+> +               else
+> +                       aes_gcm_precompute_vaes_avx10_512(key);
+> +               kernel_fpu_end();
+> +       } else {
+> +               static const u8 x_to_the_minus1[16] __aligned(__alignof__(be128)) = {
+> +                       [0] = 0xc2, [15] = 1
+> +               };
+> +               be128 h1 = {};
+> +               be128 h;
+> +               int i;
+> +
+> +               err = aes_expandkey(&key->aes_key, raw_key, keylen);
+> +               if (err)
+> +                       return err;
+> +               /*
+> +                * Emulate the aes_gcm_precompute assembly function in portable
+> +                * C code: Encrypt the all-zeroes block to get the hash key H^1,
+> +                * zeroize the padding at the end of ghash_key_powers, and store
+> +                * H^1 * x^-1 through H^NUM_KEY_POWERS * x^-1, byte-reversed.
+> +                */
+> +               aes_encrypt(&key->aes_key, (u8 *)&h1, (u8 *)&h1);
+> +               memset(key->ghash_key_powers, 0, sizeof(key->ghash_key_powers));
+> +               h = h1;
+> +               gf128mul_lle(&h, (const be128 *)x_to_the_minus1);
+> +               for (i = NUM_KEY_POWERS - 1; i >= 0; i--) {
+> +                       put_unaligned_be64(h.a, &key->ghash_key_powers[i][8]);
+> +                       put_unaligned_be64(h.b, &key->ghash_key_powers[i][0]);
+> +                       gf128mul_lle(&h, &h1);
+> +               }
+> +       }
+> +       return 0;
+> +}
+> +
