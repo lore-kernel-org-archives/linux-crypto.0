@@ -1,99 +1,156 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA728BEE;
-	Wed,  8 May 2024 17:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864BB13C9A0
+	for <linux-crypto@vger.kernel.org>; Thu,  9 May 2024 07:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715190703; cv=none; b=EHR0HD8isDprBaDsDquqxanj5oGQnVdLgYhdULcF9PrA6k1s44xJ+T51lQFrokngRUa73tLK2ovA6fycpk8nZXIWFRb/Zagtn+I8RuQ0BJkeGBhECINFJKhzILdSNgGR6SnOrwJjsBoqD0ob4Nrgx+QhX67+ueHTSlImKwoMYO8=
+	t=1715239343; cv=none; b=uCV5uxNy/7Aymc+l0olboVUL1W+pFPHWBxRVG9/e4/cvkFwVVXzApp3PbPysyoLl+wQisVDQwm6LSQHp0DdCDDCntLGsm4BfebMzoC08rNJyDSCjZdfOlphPj2+ck0kC2uAvyVLsLg+x11cPamGKpA+SDA/l2oJ+bXRnb1MwPSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715190703; c=relaxed/simple;
-	bh=6BoXTjno+NyYSgI8Dc+giUYFLUmA8bHJfXR+Wn6NEzA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=szblAnsNAsC/9DPnWSyTMFn9W+8qQGzwq6WRxaBfxgz/yBq3pg7iGD/jyQp6jo7dWFR0YaOK7ywkbdd0u7Wjc8x8Vz1qMvrCYxZkFaqjoX6LxdC9JZK9PI1IgHCzuLlnnxWkH/w3cedFntPEgb0dLIZG4u1tO8LxVAiqgcM7dgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OZGi2A4T; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OZGi2A4T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A69EFC113CC;
-	Wed,  8 May 2024 17:51:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715190702;
-	bh=6BoXTjno+NyYSgI8Dc+giUYFLUmA8bHJfXR+Wn6NEzA=;
-	h=Date:From:To:List-Id:Cc:Subject:References:In-Reply-To:From;
-	b=OZGi2A4TNpGcY+C687v7tFZX8EX7YlwtJSk47SHRcAamTYNiq/NWWyXieV/jNX/yR
-	 a6KPaTu7Uw6/tPk7e6KdcAVRAooRQeie107vVWvp9eNyktIzqr5HVmYLYkq/52fUJU
-	 0Ce0XXzHrKH62z3H+sWbAAGJd1H9osUP35KWDGu5bRSEhw2BZ5zYaN1swEr39KMIir
-	 lDAVgb7TC1bq8PVov4YOwj7Vn9uodBfR55Sa94Pq2SjoM3LZ5Afs97sBMTZ61n9xGg
-	 dYZKP0aBd229t2pqrWY0ilqmEUwNfViBiCgu9lhtpfyNsuVLg7DLh3kajcZTtYEg7k
-	 Q6j/Oy9rp55Mg==
-Date: Wed, 8 May 2024 19:50:55 +0200
-From: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Andy Shevchenko <andy@kernel.org>
-Cc: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	Gregory CLEMENT <gregory.clement@bootlin.com>,
-	Arnd Bergmann <arnd@arndb.de>, soc@kernel.org, arm@kernel.org,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-	Alessandro Zummo <a.zummo@towertech.it>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	devicetree@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-rtc@vger.kernel.org, linux-watchdog@vger.kernel.org,
-	Olivia Mackall <olivia@selenic.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>
-Subject: Re: [PATCH v9 0/9] Turris Omnia MCU driver
-Message-ID: <20240508175055.he4zsuvkj3bojnem@kandell>
-References: <20240508103118.23345-1-kabel@kernel.org>
- <ZjtfRIykefGlqRF9@smile.fi.intel.com>
+	s=arc-20240116; t=1715239343; c=relaxed/simple;
+	bh=Ko6t16GyyrkVPvpC6WSFxuhzCq/43+9aWKJKP+o5NfA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=UJYZsnaazvGWgdL05oNlmlOt1/D+g/oeHN9KMafL6ytOiLrMidBX2wr1K/l7dKCJo8Y/eXqTQllksh3vUw/ZuzYaq5oz/hsx9ZX+32ZD0OlD8/TOcfasRDmL/NgLMp8lfmoRXKtev62bTo6yxfweqRWUW8r+4vOH2aP5VLgrlQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-36c9d7ad3feso6407945ab.1
+        for <linux-crypto@vger.kernel.org>; Thu, 09 May 2024 00:22:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715239341; x=1715844141;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OOyau9UMh4oDE4pewSsqZvG8XP2S04jHg3SRpLTqQyk=;
+        b=w6eW2ZL/TGv/7+idJFYhqLGcVkPRsFIwLWlQ80PR6RRJpFHqlwgGB7ZCSZRxrXdRnJ
+         Z0iEKJ5kIIe8iyVGKDXq8fL2uhxjqu0Qn5bdfkNaS6CThXTcAhU1Ktc0Rk4X5KarxJnN
+         fkQC2AJ3mUt6s7fHSeUqKPmAqMpGcobAXqS2bTGePOBuNm4bLphiwl3Y8o336B62DhSA
+         BmmCxvCGvhHzET6Xa0XwLsbNCMcbNBgnNgDGiOX8l0lM5PUJPB//6K4Vmd4uNAi/IVY2
+         i3lNGicqPXLWG1yB+xli5NfTQQOAylWgkxgRFkEyFY/ZGYN8iNuLJlq3pxH1g9PsgPEt
+         vXRA==
+X-Forwarded-Encrypted: i=1; AJvYcCWAsg5ysCOgma9o6W2UZBKkrkX/violK9nn6dulwC+iqgm6YpfukjxykOG0faTvxiyIsnDQnB6arsRzTlpeqm3o4ofQ2If3pFlUZ6V2
+X-Gm-Message-State: AOJu0YwkT431Wdts9lxqBPvzrJC+WyAidI6E7XvwM+WJob1L1Yufjhaq
+	Uu69JiXp76vIVHyItHvIw1MIXvJKslVLJt2cbi0Dx+5pM0BTQjb2qAZs51m3gezSINRaNA2A583
+	K539QxNitGz8neQZkmoZe526zcACOFyEQgGZOnHYPsvhuH9Cy3eQgcZc=
+X-Google-Smtp-Source: AGHT+IEGdh+QSas5wliqyoJdLB8KQqBGUtF6qVd1tVMmte0ZJnCTfQdfnYUxslFcpjN2FiYw9CieaPgTb6WPeqs0ebamljkvFfxs
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZjtfRIykefGlqRF9@smile.fi.intel.com>
+X-Received: by 2002:a05:6e02:1d9d:b0:36c:8aa4:f1ec with SMTP id
+ e9e14a558f8ab-36caedba85bmr2368745ab.5.1715239340816; Thu, 09 May 2024
+ 00:22:20 -0700 (PDT)
+Date: Thu, 09 May 2024 00:22:20 -0700
+In-Reply-To: <000000000000736bd406151001d7@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009d51cc061800470b@google.com>
+Subject: Re: [syzbot] [btrfs] KMSAN: uninit-value in __crc32c_le_base (4)
+From: syzbot <syzbot+549710bad9c798e25b15@syzkaller.appspotmail.com>
+To: clm@fb.com, davem@davemloft.net, dsterba@suse.com, 
+	herbert@gondor.apana.org.au, josef@toxicpanda.com, 
+	linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, May 08, 2024 at 02:17:24PM +0300, Andy Shevchenko wrote:
-> On Wed, May 08, 2024 at 12:31:09PM +0200, Marek Behún wrote:
-> > Hello Andy, Hans, Ilpo, Arnd, Gregory, and others,
-> > 
-> > this is v9 of the series adding Turris Omnia MCU driver.
-> > 
-> > This series still depends on the immutable branch between LEDs and
-> > locking, introducing devm_mutex_init(), see the PR
-> >   https://lore.kernel.org/linux-leds/20240412084616.GR2399047@google.com/
-> > 
-> > See also cover letters for v1, v2, v3, v4, v5, v6, v7 and v8:
-> >   https://patchwork.kernel.org/project/linux-soc/cover/20230823161012.6986-1-kabel@kernel.org/
-> >   https://patchwork.kernel.org/project/linux-soc/cover/20230919103815.16818-1-kabel@kernel.org/
-> >   https://patchwork.kernel.org/project/linux-soc/cover/20231023143130.11602-1-kabel@kernel.org/
-> >   https://patchwork.kernel.org/project/linux-soc/cover/20231026161803.16750-1-kabel@kernel.org/
-> >   https://patchwork.kernel.org/project/linux-soc/cover/20240323164359.21642-1-kabel@kernel.org/
-> >   https://patchwork.kernel.org/project/linux-soc/cover/20240418121116.22184-1-kabel@kernel.org/
-> >   https://patchwork.kernel.org/project/linux-soc/cover/20240424173809.7214-1-kabel@kernel.org/
-> >   https://patchwork.kernel.org/project/linux-soc/cover/20240430115111.3453-1-kabel@kernel.org/
-> 
-> From GPIO implementation perspective, it's good enough in my opinion. The rest
-> can be amended later on.
+syzbot has found a reproducer for the following issue on:
 
-I will send v10 tomorrow with these issues fixed. We'll see if Arnd will
-be willing to take this for 6.10, and if not, 6.11 will it be.
+HEAD commit:    6d7ddd805123 Merge tag 'soc-fixes-6.9-3' of git://git.kern..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1094303f180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=617171361dd3cd47
+dashboard link: https://syzkaller.appspot.com/bug?extid=549710bad9c798e25b15
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11047204980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17a2905c980000
 
-Marek
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/49caca594b2f/disk-6d7ddd80.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/cad0ed0e7e81/vmlinux-6d7ddd80.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c5403827515b/bzImage-6d7ddd80.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/dfb350d62061/mount_2.gz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+549710bad9c798e25b15@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in crc32_body lib/crc32.c:110 [inline]
+BUG: KMSAN: uninit-value in crc32_le_generic lib/crc32.c:179 [inline]
+BUG: KMSAN: uninit-value in __crc32c_le_base+0x43c/0xd80 lib/crc32.c:201
+ crc32_body lib/crc32.c:110 [inline]
+ crc32_le_generic lib/crc32.c:179 [inline]
+ __crc32c_le_base+0x43c/0xd80 lib/crc32.c:201
+ chksum_update+0x5b/0xd0 crypto/crc32c_generic.c:88
+ crypto_shash_update+0x79/0xa0 crypto/shash.c:70
+ csum_tree_block+0x35f/0x5d0 fs/btrfs/disk-io.c:96
+ btree_csum_one_bio+0x4d5/0xeb0 fs/btrfs/disk-io.c:294
+ btrfs_bio_csum fs/btrfs/bio.c:538 [inline]
+ btrfs_submit_chunk fs/btrfs/bio.c:741 [inline]
+ btrfs_submit_bio+0x1eb6/0x2930 fs/btrfs/bio.c:770
+ write_one_eb+0x13fa/0x1570 fs/btrfs/extent_io.c:1740
+ submit_eb_page fs/btrfs/extent_io.c:1899 [inline]
+ btree_write_cache_pages+0x1d2a/0x29a0 fs/btrfs/extent_io.c:1949
+ btree_writepages+0x84/0x270 fs/btrfs/disk-io.c:516
+ do_writepages+0x427/0xc30 mm/page-writeback.c:2612
+ filemap_fdatawrite_wbc+0x1d8/0x270 mm/filemap.c:397
+ __filemap_fdatawrite_range mm/filemap.c:430 [inline]
+ filemap_fdatawrite_range+0xe1/0x110 mm/filemap.c:448
+ btrfs_write_marked_extents+0x2e7/0x620 fs/btrfs/transaction.c:1153
+ btrfs_sync_log+0x9fd/0x3830 fs/btrfs/tree-log.c:2969
+ btrfs_sync_file+0x144c/0x1c60 fs/btrfs/file.c:1968
+ vfs_fsync_range+0x20d/0x270 fs/sync.c:188
+ generic_write_sync include/linux/fs.h:2795 [inline]
+ btrfs_do_write_iter+0x1c5f/0x2270 fs/btrfs/file.c:1695
+ btrfs_file_write_iter+0x38/0x50 fs/btrfs/file.c:1705
+ do_iter_readv_writev+0x7e6/0x960
+ vfs_writev+0x574/0x1450 fs/read_write.c:971
+ do_writev+0x251/0x5c0 fs/read_write.c:1018
+ __do_sys_writev fs/read_write.c:1091 [inline]
+ __se_sys_writev fs/read_write.c:1088 [inline]
+ __x64_sys_writev+0x98/0xe0 fs/read_write.c:1088
+ x64_sys_call+0x23dc/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:21
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ __alloc_pages+0x9d6/0xe70 mm/page_alloc.c:4598
+ __alloc_pages_bulk+0x19e/0x21e0 mm/page_alloc.c:4523
+ alloc_pages_bulk_array include/linux/gfp.h:202 [inline]
+ btrfs_alloc_page_array fs/btrfs/extent_io.c:690 [inline]
+ alloc_eb_folio_array+0x19b/0x760 fs/btrfs/extent_io.c:714
+ alloc_extent_buffer+0x965/0x3ad0 fs/btrfs/extent_io.c:3849
+ btrfs_find_create_tree_block+0x46/0x60 fs/btrfs/disk-io.c:610
+ btrfs_init_new_buffer fs/btrfs/extent-tree.c:5071 [inline]
+ btrfs_alloc_tree_block+0x35c/0x17c0 fs/btrfs/extent-tree.c:5186
+ btrfs_alloc_log_tree_node fs/btrfs/disk-io.c:960 [inline]
+ btrfs_add_log_tree+0x1b7/0x7a0 fs/btrfs/disk-io.c:1008
+ start_log_trans fs/btrfs/tree-log.c:208 [inline]
+ btrfs_log_inode_parent+0x9b6/0x1dd0 fs/btrfs/tree-log.c:7066
+ btrfs_log_dentry_safe+0x9a/0x100 fs/btrfs/tree-log.c:7171
+ btrfs_sync_file+0x126c/0x1c60 fs/btrfs/file.c:1933
+ vfs_fsync_range+0x20d/0x270 fs/sync.c:188
+ generic_write_sync include/linux/fs.h:2795 [inline]
+ btrfs_do_write_iter+0x1c5f/0x2270 fs/btrfs/file.c:1695
+ btrfs_file_write_iter+0x38/0x50 fs/btrfs/file.c:1705
+ do_iter_readv_writev+0x7e6/0x960
+ vfs_writev+0x574/0x1450 fs/read_write.c:971
+ do_writev+0x251/0x5c0 fs/read_write.c:1018
+ __do_sys_writev fs/read_write.c:1091 [inline]
+ __se_sys_writev fs/read_write.c:1088 [inline]
+ __x64_sys_writev+0x98/0xe0 fs/read_write.c:1088
+ x64_sys_call+0x23dc/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:21
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 1 PID: 5036 Comm: syz-executor761 Not tainted 6.9.0-rc7-syzkaller-00023-g6d7ddd805123 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+=====================================================
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
