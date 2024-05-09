@@ -1,112 +1,67 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D91412F596
-	for <linux-crypto@vger.kernel.org>; Thu,  9 May 2024 10:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED9B13119B;
+	Thu,  9 May 2024 12:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715251101; cv=none; b=Oe1YhV/QkrLRqNlRWcIeU5XgAkVLEgZ2o2TIOFsV9q4sPOoQR4ifdr3Qmlf5V14NWsjgSGJFFgiEmgyxlnhERsHFqRgrDzpclDvjSaNsFt4YkoUB8KI1y7FsOu2cLhjxb6tS5tPfZrBXteLoS7kcH51hHAoBRCM24QrW5akYWoY=
+	t=1715258633; cv=none; b=E9YZJqbOiG9nr6CMYe7uGQqE0EJADDgTHVrjko+cx0oviXsaUC5yQdmzL9rn3Gfq/pjM3p6X6IvJQjJv9170XaKtuMfzLufnf3m9UNGDJ9c9aXwhMZ/utgnFS5+cc3kCwFXIKwxOL+GH/iR6hyo3agAkw9HvUS8U2kVItL/DHJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715251101; c=relaxed/simple;
-	bh=+QCqHMt3FD72adGPPew9x7Adq3BNAcbJrbljLlE88tw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QT08NwEIvPu14GJBb88zG0NNf10BRuaVPnMX2xkzW5OUwCDwWmn0Eia6vnYlrqoXvviRrEIfLcfhyJBLU+AUhUJ7z+2J2bJGgLebLlsWBcOXbuKjQSNrx7LOlogCG8SrW19Fyd0prOtbIjuPZwbWEsO7xaMchi/D/So4i56z4mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ck+6qJOA; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1715258633; c=relaxed/simple;
+	bh=HBcVcBSYqlBUAm8jvtm5+A58mC2yPRD1whRmcdP6P1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tcqVFo5J/yaf66EU/mvcpwPAtOJbJh6DeF4YQmCy3196Wc2DHGxNDM9F01j6wGI1Gkw31DRsae3Ah7Eh8zPYuuW5KquKRaLhQefYRsfNBRhC1TDSrSmJnLCvGxvykVMrQmIDVLmmijnp9PqDsmvnXWrQoonoAM5S7jvaL0DYl1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=1H9Ln6N4; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ck+6qJOA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715251096; x=1746787096;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+QCqHMt3FD72adGPPew9x7Adq3BNAcbJrbljLlE88tw=;
-  b=ck+6qJOA0bGn5f0zlzDm7q010I97W3Ki65Esa9KVjtZsMwRViBeBmElk
-   olN45n99/6a7ZDf7jm5VDG3OOV32pRHk82i6QTFMnWu22QW4q0XtEhX1i
-   8dI629Mx0zMAY8mipEbI/libyWtRiJL29yaVBSpCG8Xq4y2ynCpj4WXYA
-   9PUpMEURkgMIM36rEIj/IUTpygRdZhk9a49QLsIVXS7RZb+nF3tIggeO4
-   h+puv1CNyH29XpVfMoe7xm1ygLI78brDHaGWOjR10arGbuBe453RG04HB
-   7zZJWA91eNnVw49ccQcWU0Jyfc4hAucSLpR4t6Y7c9mda210arxXucaEC
-   w==;
-X-CSE-ConnectionGUID: Do8uIbf4REuf6BmXr59zrA==
-X-CSE-MsgGUID: tcG/ziv6RaWF2QrGbnPULg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11067"; a="11292173"
-X-IronPort-AV: E=Sophos;i="6.08,147,1712646000"; 
-   d="scan'208";a="11292173"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2024 03:38:15 -0700
-X-CSE-ConnectionGUID: ttBo06wNR22T0aGPmB33jA==
-X-CSE-MsgGUID: iiswObXkTEqy6ZYpT9Dwzw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,147,1712646000"; 
-   d="scan'208";a="33759113"
-Received: from unknown (HELO localhost.igk.intel.com) ([10.211.127.84])
-  by fmviesa004.fm.intel.com with ESMTP; 09 May 2024 03:38:13 -0700
-From: Sergey Portnoy <sergey.portnoy@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com
-Subject: [PATCH] crypto: tcrypt - add skcipher speed for given alg
-Date: Thu,  9 May 2024 12:36:11 +0100
-Message-ID: <20240509113703.578583-1-sergey.portnoy@intel.com>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1H9Ln6N4"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=CLJUPZZT4rSELmqegiikr7a3zGPJvoLk74CHf7f3U60=; b=1H9Ln6N4Ls0YJx5s+D/LXGYj8Y
+	iw8xSy6uiaWGZCbVIlkzFqGlEPbGDmP2qHiytPFsNx3/5G38xKw8aZxMFdUOC8GA0H0TAObEL+idJ
+	z8LJIoEmmzIlglY6bNnznAdlF5bP/eegGaIph8asX/FNy7fFgkvNiMycAcMLBwetgO0+cYEqqUc1M
+	/svUCZ73XxeeJyqWDC26W9i6itQD+tS8HJ9H+n3o9nKsuz8Bd4FfYprC9cJll812v84I7XNY+HpJo
+	lIa5r/5wV2L3uba08Ow8B4/svgHxy3xbGcR3Yh272y5sIDEeUmCZvcuY3irAOytulG0uVzgo1p60s
+	qoin6rYA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s537n-00000001T9s-1bCv;
+	Thu, 09 May 2024 12:43:51 +0000
+Date: Thu, 9 May 2024 05:43:51 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCHv3 00/19] zram: convert to custom compression API and
+ allow algorithms tuning
+Message-ID: <ZjzFB2CzCh1NKlfw@infradead.org>
+References: <20240508074223.652784-1-senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240508074223.652784-1-senozhatsky@chromium.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Allow to run skcipher speed for given algorithm.
-Two separate cases are added to cover ENCRYPT and DECRYPT
-directions.
+On Wed, May 08, 2024 at 04:41:53PM +0900, Sergey Senozhatsky wrote:
+> 	This patch set moves zram from crypto API to a custom compression
+> API which allows us to tune and configure compression algorithms,
+> something that crypto API, unfortunately, doesn't support.
 
-Example:
-   modprobe tcrypt mode=611 alg="qat_aes_xts" klen=32
+[...]
 
-If succeed, the performance numbers will be printed in dmesg:
-   testing speed of multibuffer qat_aes_xts (qat_aes_xts) encryption
-   test 0 (256 bit key, 16 byte blocks): 1 operation in 14596 cycles (16 bytes)
-   ...
-   test 6 (256 bit key, 4096 byte blocks): 1 operation in 8053 cycles (4096 bytes)
+>  21 files changed, 1203 insertions(+), 111 deletions(-)
 
-Signed-off-by: Sergey Portnoy <sergey.portnoy@intel.com>
----
- crypto/tcrypt.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 8aea416f6480..73bea38c8112 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -68,6 +68,7 @@ static int mode;
- static u32 num_mb = 8;
- static unsigned int klen;
- static char *tvmem[TVMEMSIZE];
-+static char speed_template[2];
- 
- static const int block_sizes[] = { 16, 64, 128, 256, 1024, 1420, 4096, 0 };
- static const int aead_sizes[] = { 16, 64, 256, 512, 1024, 1420, 4096, 8192, 0 };
-@@ -2807,6 +2808,18 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				       speed_template_16_32, num_mb);
- 		break;
- 
-+	case 611:
-+		speed_template[0] = klen;
-+		if (alg)
-+			test_mb_skcipher_speed(alg, ENCRYPT, sec, NULL, 0,
-+					       speed_template, num_mb);
-+		break;
-+	case 612:
-+		speed_template[0] = klen;
-+		if (alg)
-+			test_mb_skcipher_speed(alg, DECRYPT, sec, NULL, 0,
-+					       speed_template, num_mb);
-+		break;
- 	}
- 
- 	return ret;
--- 
-2.44.0
+Why can't it?  This is an awful lot of crazy code duplication just
+to pass a few parameters.
 
