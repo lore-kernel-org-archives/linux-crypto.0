@@ -1,67 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23209481C0
-	for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 13:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5AB481C0
+	for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 13:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715346880; cv=none; b=S0vw2XBjmkHCzBMSBWYOXqX0PTvICL3INOSFnGa/sk0fokyC8V8/HmrnGqUixSsHOgtTwkTS2ZS9kY3VxVg9RJL9e8nxsIyqfyf8Jt38fPrstkKzRgxpMKRZIYe5ZpAv+TUrbsMelQMbNeUju0UI40oW7YtRO0RgmdqGIr6JGhk=
+	t=1715347131; cv=none; b=s8P6NwPls01/AB3X9IZDo8s2ZlEHbzZajfOw8KBaD/29bIA6ugbTJ3OTIMPKKR71lR12I1ZF7WjynjT7sEuuV17kw4i5e3FAd70NlWKcWib3Kqa/5lWKGDbKwHIBLxL0cEpc8pAmaQSqVpcrwVSlX9xEIzIj/lmbFv5WYR7yrfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715346880; c=relaxed/simple;
-	bh=rbK9QlKtZEAygP+OrlU//xUS4kWM91LhPjAaLozYBRY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=uqdoRJGwVTCJSSYSrH3scLxpKRyWSIihvUFlNhXQ0WJHVlxByt1RF/Hig1xk/tqaYO7evTFYlFoeZkptcfrf4jiDDDt6mDt6+xXJqq1t2QI+FDUxXx5q0iNiBsSsXr34Us6Z0FX7IeqcnAMCQZGTs403E4hV2GojIJ+aLqVIwJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QWWUx41V; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1715347131; c=relaxed/simple;
+	bh=8voDxsXaWLfJmyIdei9zJXj+2XIuBxIzLnROKTgnVLY=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=XMMPsFvhK0/72rhU8wA1pwUkm8Dx07yj2zjGiM0/yj6AoVmBcmUbgROikzEbM8g8lqqRwPDBy4hsL3JmgrcmrU97wOSqvCOOicsxkpxGIAMIhREnFZMlQ3JVEYrL4t0w5etyr23BYdPp7ulOOvNp2LtY74s+D0OBU1q6SbspuwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=hKpA7b/C; arc=none smtp.client-ip=129.153.194.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QWWUx41V"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD558C113CC;
-	Fri, 10 May 2024 13:14:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715346879;
-	bh=rbK9QlKtZEAygP+OrlU//xUS4kWM91LhPjAaLozYBRY=;
-	h=Date:From:To:Cc:Subject:From;
-	b=QWWUx41VDmX8p6mja4ca3tbkvlq70+4JB9a0UF1drVpPy7Tjq/rmktivxGtObCk5A
-	 hKKxM30O86V7JR0ZNMqJfu7B4P7qkmPgLwYEGBdrwJx3hE1RdLM6TR4kXHnhsQhTpd
-	 Ci9/6dFZHdfVfh4YE1vWpUTUtt0QhuIaEetmLUAphZbGdsIwgi2NQzBc/efYWKYAJi
-	 g4Z2MR9Ds2XTbXEU0K6RSZ+aVHVqdo2J2juQwrw6Y/5he2U3kCA/a1aon3hl5kXifj
-	 Hs2MGg+70L6xWst+c2wnEkZNjc6ffsmRLQTfQQcbLbxG6PmmoSgSW4GvSnJjb7etWS
-	 JUYQ+/cbN9YFQ==
-Date: Fri, 10 May 2024 15:14:34 +0200
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>
-Subject: Is akcipher ready for userspace?
-Message-ID: <20240510151434.739fd5c5@dellmb>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="hKpA7b/C"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
+	t=1715347123; bh=8voDxsXaWLfJmyIdei9zJXj+2XIuBxIzLnROKTgnVLY=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To;
+	b=hKpA7b/Ck+8zyIghr64nl2nyf92zWvj5UaY6UQr+j3na4/TQLwmrzrP+zleMv5z3m
+	 e1Vu1ZBWY3EkvbqlR6KAye8oG+krGn9VojknR34zFiJzojpI27tB7zBWH+JoLQ51EU
+	 fLe7Mv9+d7xaKs7S/mlsO7iLEaoXCeg9yYI0XoLtlX4yrZsqX2dCJQS858W06Q2BmZ
+	 hjULJoxHyuZC26bO0/AkfcMwbWfI3CMcMYSJx/1w5cyBEG5IDRB+ZTx4Rxph0aCR4L
+	 ZSA7UK0TKtiYLYQ2AypMwgx5LYtK7/iWKtlPkI3NSjzA1Ww2cwPEz3KhC/DYTUlXH0
+	 fMB/iih72mFGg==
+Message-ID: <3303fb03-a2a7-4a2c-9b87-bb349b219d39@jvdsn.com>
+Date: Fri, 10 May 2024 08:18:41 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From: Joachim Vandersmissen <git@jvdsn.com>
+Subject: Re: [PATCH v3 1/2] certs: Move RSA self-test data to separate file
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+ Simo Sorce <simo@redhat.com>, Stephan Mueller <smueller@chronox.de>,
+ Jarkko Sakkinen <jarkko@kernel.org>
+References: <20240503043857.45515-1-git@jvdsn.com>
+ <Zj3XtsHcwRAv_EvT@gondor.apana.org.au>
+Content-Language: en-US
+In-Reply-To: <Zj3XtsHcwRAv_EvT@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hello Herbert,
+Hi Herbert,
 
-back in 2019 you wrote that akcipher is still in a state of flux and
-not ready to be exposed to userspace via AF_ALG [1].
-
-Has this changed since then?
-
-I am asking because I am implementing another driver [2] for a device
-which allows for signing messages with an ECDSA private key securely
-stored inside the device, and Greg asks again [3] for this to be
-exposed to userspace via a dedicated kernel API, instead of
-debugfs.
-
-Back in 2019 when we needed this for the turris-mox-rwtm driver, I
-implemented it via debugfs because akcipher was not ready.
-
-Thanks.
-
-Marek
-
-[1] https://www.spinics.net/lists/linux-crypto/msg38388.html
-[2] https://lore.kernel.org/soc/20240510101819.13551-1-kabel@kernel.org/T/
-[3] https://lore.kernel.org/soc/2024051042-unbuckled-barometer-1099@gregkh/
+On 5/10/24 3:15 AM, Herbert Xu wrote:
+> On Thu, May 02, 2024 at 11:38:56PM -0500, Joachim Vandersmissen wrote:
+>> diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+>> index 59ec726b7c77..68434c745b3c 100644
+>> --- a/crypto/asymmetric_keys/Kconfig
+>> +++ b/crypto/asymmetric_keys/Kconfig
+>> @@ -86,4 +86,14 @@ config FIPS_SIGNATURE_SELFTEST
+>>   	depends on PKCS7_MESSAGE_PARSER=X509_CERTIFICATE_PARSER
+>>   	depends on X509_CERTIFICATE_PARSER
+>>   
+>> +config FIPS_SIGNATURE_SELFTEST_RSA
+>> +	bool "Include RSA selftests"
+> Please don't ask questinons in Kconfig that we can avoid.  In
+> this case I see no valid reason for having this extra knob.
+>
+> One question for FIPS_SIGNATURE_SELFTEST is enough.
+Just to clarify, you'd like to see FIPS_SIGNATURE_SELFTEST_RSA 
+automatically set based on the values in FIPS_SIGNATURE_SELFTEST, 
+CRYPTO_RSA, etc.?
+>
+> Oh and please cc Jarkko Sakkinen <jarkko@kernel.org> since he
+> picked up two earlier fixes for this and it's best if this went
+> through his tree.
+Will do, thanks.
+>
+> Thanks,
