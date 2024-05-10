@@ -1,79 +1,61 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79DF149C78
-	for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 08:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A3679945;
+	Fri, 10 May 2024 09:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715330512; cv=none; b=BbEImsVQ+C+mEYq1ySAUZlD36ANHM6mfIJUgDPa01Hg9xRiY6iIzzt5ZKxV6t51DC1jEKiRskMxe0KL1R4jqwBAmUDSqT4f3weoNUKltirWkElT153ZZfBIMjyUheJ3xw1TJ0dJ+Lrw3BvJM6OvslKhfrj+YIbd+xov+mzh5E2Q=
+	t=1715332700; cv=none; b=oMPg6/b0q/WrPdP/SaTq9dCiIfiJGQ/ZQIBAAN5O2foJ0VTUG9483qXp83iGzbfoS8w4SfQ7P5lYYIl5Sk//mAc4GGAWiA26g5bZGCC3J26aGbMe0nPB3G+WsVwhXKte4SjL5qH+DPwLiE8EUzfLZMvOc3YccqzVbvhQP13F1U4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715330512; c=relaxed/simple;
-	bh=oentOgrI2THJQuz2c9joNwVrMfGxLzCxYS+pUJkIYso=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=OlhsC6IcB3wbfn2loq8c4KTwCMDiWtg7ySlMT3CRe1qMfP2q4n7Y1cCUHZCb01rXIUN/oUh+boqIwDMdufdyUQwZE3WdV854qitFOCWg1wKCnAznt/CbHj0ErXDIxrihVnuzM1ZKVacuqE0i2KHavCPqKBt4qLI37r0BpUuUNpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JtphqfaT; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JtphqfaT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 173F7C113CC;
-	Fri, 10 May 2024 08:41:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715330512;
-	bh=oentOgrI2THJQuz2c9joNwVrMfGxLzCxYS+pUJkIYso=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=JtphqfaT0y4UgLNq9iVRB+Xcqo7Wxu4xbMusmylhG5bTb5k3jwd/fSkVEEvX+1wIw
-	 3uZBSDqLNoDd1FrmGdidpDrljbyv6K3Zk+XtloDkwLJ9Ri0XqGOJ/fkPvCuNZZXFde
-	 6guh8uVYnRz240v0DLvH8a/LZ5NOIPwetbq8cBw8L8Y+an40MqORekXJhhESdyNilF
-	 V7SnHDDto7hjV0cWZR4yTZz2KkGNC61ZOUL+siDF8lQd9dAyaOP/w3Fo+LX/JhGHXb
-	 wKnjH0sQIyflJTOrtbrGYf75uU4SMPLtdbqCIE77PPfR04gwzD34kC+WQoNfiwmEsn
-	 yCmvnQnmIrfoA==
+	s=arc-20240116; t=1715332700; c=relaxed/simple;
+	bh=E6Ay7Fs1hTsSl0DvT8d82qvURwi2t3B7eqBbVBHr9pM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X39yqD1FzIk4bcDfRcs40PhvbN19HVVPaLxdNwDrjinOSfS6Zh2RvyE9BIMWsqQ00jJvjSm1YFFjdOs0o2Cl5eTix+yaen/ovaNmR8DfSFA8kridVh7l1/833sDHg5C/t7OsYGIImXGYec+u4PSkLtbI+J2Cn00Ma7Cu0bUCPj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1s5MOF-00DK86-1G;
+	Fri, 10 May 2024 17:18:08 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 May 2024 17:18:08 +0800
+Date: Fri, 10 May 2024 17:18:08 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jia Jie Ho <jiajie.ho@starfivetech.com>
+Cc: "David S . Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next 0/4] crypto: starfive - Minor fixes for AES and RSA
+Message-ID: <Zj3mUIispwCN_Az_@gondor.apana.org.au>
+References: <20240429060640.2451685-1-jiajie.ho@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 10 May 2024 11:41:49 +0300
-Message-Id: <D15TX19UXQSW.34JYJLN21P1RH@kernel.org>
-Subject: Re: [PATCH v3 1/2] certs: Move RSA self-test data to separate file
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Herbert Xu" <herbert@gondor.apana.org.au>, "Joachim Vandersmissen"
- <git@jvdsn.com>
-Cc: <linux-crypto@vger.kernel.org>, "David Howells" <dhowells@redhat.com>,
- "Simo Sorce" <simo@redhat.com>, "Stephan Mueller" <smueller@chronox.de>
-X-Mailer: aerc 0.17.0
-References: <20240503043857.45515-1-git@jvdsn.com>
- <Zj3XtsHcwRAv_EvT@gondor.apana.org.au>
-In-Reply-To: <Zj3XtsHcwRAv_EvT@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240429060640.2451685-1-jiajie.ho@starfivetech.com>
 
-On Fri May 10, 2024 at 11:15 AM EEST, Herbert Xu wrote:
-> On Thu, May 02, 2024 at 11:38:56PM -0500, Joachim Vandersmissen wrote:
-> >
-> > diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kc=
-onfig
-> > index 59ec726b7c77..68434c745b3c 100644
-> > --- a/crypto/asymmetric_keys/Kconfig
-> > +++ b/crypto/asymmetric_keys/Kconfig
-> > @@ -86,4 +86,14 @@ config FIPS_SIGNATURE_SELFTEST
-> >  	depends on PKCS7_MESSAGE_PARSER=3DX509_CERTIFICATE_PARSER
-> >  	depends on X509_CERTIFICATE_PARSER
-> > =20
-> > +config FIPS_SIGNATURE_SELFTEST_RSA
-> > +	bool "Include RSA selftests"
->
-> Please don't ask questinons in Kconfig that we can avoid.  In
-> this case I see no valid reason for having this extra knob.
->
-> One question for FIPS_SIGNATURE_SELFTEST is enough.
->
-> Oh and please cc Jarkko Sakkinen <jarkko@kernel.org> since he
-> picked up two earlier fixes for this and it's best if this went
-> through his tree.
->
-> Thanks,
+On Mon, Apr 29, 2024 at 02:06:36PM +0800, Jia Jie Ho wrote:
+> This patch series fix a bug caused by freeing a stack buffer in RSA
+> module and skip some unneeded steps in StarFive crypto driver.
+> 
+> Jia Jie Ho (4):
+>   crypto: starfive - Skip dma setup for zeroed message
+>   crypto: starfive: Skip unneeded fallback allocation
+>   crypto: starfive: Do not free stack buffer
+>   crypto: starfive: Use fallback for unaligned dma access
+> 
+>  drivers/crypto/starfive/jh7110-aes.c | 16 +++++++++++-----
+>  drivers/crypto/starfive/jh7110-rsa.c | 11 ++++-------
+>  2 files changed, 15 insertions(+), 12 deletions(-)
+> 
+> -- 
+> 2.40.1
 
-Fine with me. I've yet to send asymmetric keys pull request (last
-remaining) so there is some window left too.
-
-BR, Jarkko
+All applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
