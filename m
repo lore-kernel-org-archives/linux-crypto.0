@@ -1,94 +1,79 @@
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B63013BACD
-	for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 08:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79DF149C78
+	for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 08:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715330441; cv=none; b=XdDgRiq2bquddLIrHsEA1rgkPGVGx11mIVX5wZV9EJxReqttvDgT+KpkhKmp3cIuj4IS3OL/la/83aw9Tf4wldXTl1drnuSKth1wPRKlxzs/T11MpCNoYiE+7IdLhKntRUuLld8WgfQrlFC9D6PKYisHK3dweXBgq4S9u9zV878=
+	t=1715330512; cv=none; b=BbEImsVQ+C+mEYq1ySAUZlD36ANHM6mfIJUgDPa01Hg9xRiY6iIzzt5ZKxV6t51DC1jEKiRskMxe0KL1R4jqwBAmUDSqT4f3weoNUKltirWkElT153ZZfBIMjyUheJ3xw1TJ0dJ+Lrw3BvJM6OvslKhfrj+YIbd+xov+mzh5E2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715330441; c=relaxed/simple;
-	bh=JPMH+mm4lMiMXt4zL+tM57v/I78L4rUVEq6LC3xXP64=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bpvYdBbe6W/AyGKIVUGHT/P9lPdFbGRxYGqOYuGvJogv4DHh+UPgDdR31S5uyuclFHHZBxBS3UuR2mwjnzj6gnJd/qr+VrQWhHLKor91HyLb+tSFkwN/KubPe11Cyw4iHh0gaANAxpEJxkwo+bhwIAyvxi/M4Uv3zdL017U+BMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=JE8i56y+; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1715330512; c=relaxed/simple;
+	bh=oentOgrI2THJQuz2c9joNwVrMfGxLzCxYS+pUJkIYso=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=OlhsC6IcB3wbfn2loq8c4KTwCMDiWtg7ySlMT3CRe1qMfP2q4n7Y1cCUHZCb01rXIUN/oUh+boqIwDMdufdyUQwZE3WdV854qitFOCWg1wKCnAznt/CbHj0ErXDIxrihVnuzM1ZKVacuqE0i2KHavCPqKBt4qLI37r0BpUuUNpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JtphqfaT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JE8i56y+"
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6f0f0494459so48434a34.0
-        for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 01:40:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715330439; x=1715935239; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9ZomfWJD3t0+7BUAA8nVU6dC0xByk+g2aWDPY0LtdD8=;
-        b=JE8i56y+DZ10s4THXa5PQB0cDoyvDghUg7b1x+vH0Itq9Ai29ECFF6JtnTxl0btbk/
-         S/MIaEEYG+Pwxqflk+LmkQ6s91lDuXshHa+f/SsrgTU0FVU2ukYiZUYVPuJZyg6mBRcX
-         aJiHY49RKJsw8/JWy/BMCzFn2oJJ8Qcu1liug=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715330439; x=1715935239;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9ZomfWJD3t0+7BUAA8nVU6dC0xByk+g2aWDPY0LtdD8=;
-        b=Exaqag3BAnRocpbjNEsA+q3Ljo4YP7JC6c8ze3rmxWr1pSHfGWbd9/PNR+oLlPXMka
-         m3n3rd2MTgTxHd2LICOGs3gSWsd/pF3YuKrgyPi3v/OXkLTFoYOEBsrwqRgDM5+qJeGh
-         ooCKD88VlX2Mls8I1fO1Rf7HNQrwYAe8YCtHGlH9PPdIxrd1kdAqnFk4rdD8SmvkhgRR
-         vJlYhQSytfwcwytab9m99kWXJ2Ns5xJFiAEUzwqwtOxQKgyzSmAZlHC4kJtn8TsdwsXN
-         t/QU8NuIQRS93h6XCLhuMfXZPLJyrH3QWvF3YtddcPgNpQ9jA0vrcA6dn2e4Rhaww5S/
-         WuRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVLl+fxkE7WASk1Z2r+BzlVho8KzQqK6QlUkkbeCgcb0wZ17OpIxB4LxeBG+OvxRA61DRaCd0omEbW9Wv60dLmlE2A6Sq4xSfSaauNu
-X-Gm-Message-State: AOJu0Yy6uNVPryLkUauhG4BTdHZDMhDHKFdV/89OPzhtJ/yKVlttRJon
-	0Kn//PKWP3FoeJGl4EzkNRO0kE6Ppq57H8Its/BNfX6syhAi+wpxINBQUBjugA==
-X-Google-Smtp-Source: AGHT+IGjXZlYHqz/IqO+Uf2rD0hKlsdFl0CNwe7KKovq2KKzmPdZdYnhVD45lL16TlHcC/EZJvrPMA==
-X-Received: by 2002:a05:6870:730d:b0:23e:6f11:85f9 with SMTP id 586e51a60fabf-24172c2fac6mr2287281fac.33.1715330439147;
-        Fri, 10 May 2024 01:40:39 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:de58:3aa6:b644:b8e9])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2a66600sm2556666b3a.11.2024.05.10.01.40.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 01:40:38 -0700 (PDT)
-Date: Fri, 10 May 2024 17:40:34 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCHv3 00/19] zram: convert to custom compression API and
- allow algorithms tuning
-Message-ID: <20240510084034.GD950946@google.com>
-References: <20240508074223.652784-1-senozhatsky@chromium.org>
- <ZjzFB2CzCh1NKlfw@infradead.org>
- <20240510051509.GI8623@google.com>
- <Zj3PXKcpqUPuFJRu@gondor.apana.org.au>
- <20240510080827.GB950946@google.com>
- <Zj3W7OK9kDpneKXR@gondor.apana.org.au>
- <20240510082850.GC950946@google.com>
- <Zj3bFngCxSbO2I4a@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JtphqfaT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 173F7C113CC;
+	Fri, 10 May 2024 08:41:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715330512;
+	bh=oentOgrI2THJQuz2c9joNwVrMfGxLzCxYS+pUJkIYso=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=JtphqfaT0y4UgLNq9iVRB+Xcqo7Wxu4xbMusmylhG5bTb5k3jwd/fSkVEEvX+1wIw
+	 3uZBSDqLNoDd1FrmGdidpDrljbyv6K3Zk+XtloDkwLJ9Ri0XqGOJ/fkPvCuNZZXFde
+	 6guh8uVYnRz240v0DLvH8a/LZ5NOIPwetbq8cBw8L8Y+an40MqORekXJhhESdyNilF
+	 V7SnHDDto7hjV0cWZR4yTZz2KkGNC61ZOUL+siDF8lQd9dAyaOP/w3Fo+LX/JhGHXb
+	 wKnjH0sQIyflJTOrtbrGYf75uU4SMPLtdbqCIE77PPfR04gwzD34kC+WQoNfiwmEsn
+	 yCmvnQnmIrfoA==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zj3bFngCxSbO2I4a@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 10 May 2024 11:41:49 +0300
+Message-Id: <D15TX19UXQSW.34JYJLN21P1RH@kernel.org>
+Subject: Re: [PATCH v3 1/2] certs: Move RSA self-test data to separate file
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>, "Joachim Vandersmissen"
+ <git@jvdsn.com>
+Cc: <linux-crypto@vger.kernel.org>, "David Howells" <dhowells@redhat.com>,
+ "Simo Sorce" <simo@redhat.com>, "Stephan Mueller" <smueller@chronox.de>
+X-Mailer: aerc 0.17.0
+References: <20240503043857.45515-1-git@jvdsn.com>
+ <Zj3XtsHcwRAv_EvT@gondor.apana.org.au>
+In-Reply-To: <Zj3XtsHcwRAv_EvT@gondor.apana.org.au>
 
-On (24/05/10 16:30), Herbert Xu wrote:
-> On Fri, May 10, 2024 at 05:28:50PM +0900, Sergey Senozhatsky wrote:
+On Fri May 10, 2024 at 11:15 AM EEST, Herbert Xu wrote:
+> On Thu, May 02, 2024 at 11:38:56PM -0500, Joachim Vandersmissen wrote:
 > >
-> > OK.  I guess for drivers' params support (dictionaries handling etc.)
-> > we take take some code from this series.  You mentioned acomp, does this
-> > mean setparam is for async compression only?
-> 
-> It would be for both acomp and scomp.  I have no intention to
-> add it to the legacy comp interface.
+> > diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kc=
+onfig
+> > index 59ec726b7c77..68434c745b3c 100644
+> > --- a/crypto/asymmetric_keys/Kconfig
+> > +++ b/crypto/asymmetric_keys/Kconfig
+> > @@ -86,4 +86,14 @@ config FIPS_SIGNATURE_SELFTEST
+> >  	depends on PKCS7_MESSAGE_PARSER=3DX509_CERTIFICATE_PARSER
+> >  	depends on X509_CERTIFICATE_PARSER
+> > =20
+> > +config FIPS_SIGNATURE_SELFTEST_RSA
+> > +	bool "Include RSA selftests"
+>
+> Please don't ask questinons in Kconfig that we can avoid.  In
+> this case I see no valid reason for having this extra knob.
+>
+> One question for FIPS_SIGNATURE_SELFTEST is enough.
+>
+> Oh and please cc Jarkko Sakkinen <jarkko@kernel.org> since he
+> picked up two earlier fixes for this and it's best if this went
+> through his tree.
+>
+> Thanks,
 
-Alright, I'll wait for the patches and then will take a look
-at how to use them in zram and how I can help with the drivers
-(if needed).
+Fine with me. I've yet to send asymmetric keys pull request (last
+remaining) so there is some window left too.
+
+BR, Jarkko
