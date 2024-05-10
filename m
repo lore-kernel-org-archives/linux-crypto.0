@@ -1,110 +1,139 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C1717BA2
-	for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 17:25:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C6B17BCE;
+	Fri, 10 May 2024 17:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715361952; cv=none; b=WOpLT/zRpKhx5w98Zuydf/uFKe1Ttgyb9zh5RgBxeXoV0ICfQFJ8PlKoeiAkF3wgYLLobZvP9oNJ06mp57qpeK94egWbv9q9BFxjvha8a6IpR9I18PaRpcgWdeYzdjjnjvv3iKAMoGP8Qf4p16PS8D7WZgA88xLPByPbplOXhhM=
+	t=1715363236; cv=none; b=b6fvb+oFn2Qu4CkbvaK3GpXrtYISsyIgzRCkkwkqNoasKz8HS106o1HWRHEFm0b1Y3kiLfAogXqcN8SZ5XVsV8xlj+FEXLtUf7REg/qJUYrBd7ZU6oTb293zp42UNPxRdIf5x69Z7ES0iXTRljAkHAixYo9kII9XBevJJrkcVw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715361952; c=relaxed/simple;
-	bh=EsLzXB6Gs7ZQtkmepgwzqKCcyMI9oEm1j34c4xvtcr8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eQzFFATzAIXbuxObi606EZUfESeo4jIL5KAq2CANe8JKpU7EQHGUCzhvio8GXid+AjfVaClupoIZVWDIGGUhMXlmSL9VcNMTFJLdPcEe2DT5a7DE7MR0ImIsPe7K8jOsiLe0Q1otNZ9ADKfvVAidKY2DhtZ0BKnwaAHuj3RhFSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hEpx37XB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1715363236; c=relaxed/simple;
+	bh=1Bjsxi6FLuGOj7RtmewtKis8IikuC8YQFkIP8lxG5to=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u5T3lJZqU+pYeeRUMrYRDVBrHjUkNOTTEMDWEjFRkOBgSVvBlWo2Yye1HXn7bbZGQqX3eRIJBywL+2Gy/FSl2oxmnMG6LD6IQhMpvSyRVrhMz7qqxDOrJznj+ey27zrbE6zjCtYoB2ju/NZhsAU338eoF6RDJStx6yVHedVG6Ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mo9r8pbZ; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hEpx37XB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715361950;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v0uH1Y67e/JYlAU3ZBz+NOGOD31UpxofQKkMvjjtZOo=;
-	b=hEpx37XBTAO0dvP8mJEq6vNtmHvRWAEfOT1RbbTrgkBq8QWYgEo/tmWbgdJABmKZhE1yVK
-	F1Mg8QmVgXQSpVd4uT7w+ojtIkZdlxgp1G59JusiHdSfzbf+HN28YPUHP5kQLT67QRXs5v
-	CRgeKk6VkxukstWaZyTIVZ6+8C9K3f4=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-138-Wj6YN9MLOfSXmRTNVdfzNA-1; Fri, 10 May 2024 13:25:48 -0400
-X-MC-Unique: Wj6YN9MLOfSXmRTNVdfzNA-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-51fa975896eso1917384e87.3
-        for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 10:25:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715361947; x=1715966747;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v0uH1Y67e/JYlAU3ZBz+NOGOD31UpxofQKkMvjjtZOo=;
-        b=v304azH1/Bhsri2D3GqbhjNmurwAnVaDUKlLj84/QMR0BGPHCLtZCxBKdYxr2aol1E
-         KzzHRjd7zheMCbpp1BXICjIDghah9nokTH8SZy1hhhRb6+1taMUSjWBqV+9k6DwY/WFI
-         UmCYUU70VZBfH3LhxUMbvv+y7mgJINlvrV1t5ba5y6DR6kR4al+zk5X+tnLkAu+9QzWz
-         1CaAEaP/9FrgK/7+27XVeEIDtKwB0CGX/qF7R4u3MjW6C+lpT03RUgYqwGjpHSR1Cf+1
-         ZYgAtGNn+4sFDCYkUxCyAlUx7tusCUmXd5SYl4DkI5L+4DBrKAxSI0ewBF8ib6CV8hz6
-         CKmg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQMMuHq6WGI+vGsGamK6diIpW0/RZvNu27AGu246fau10IpmDA6zM5+A9+6bp5Q1rkbIGzkai2/dvx9pUbLGoL4l0RH3I8XRExRy/a
-X-Gm-Message-State: AOJu0Yx7ffDmuJ4OB7yYcc4sLh/twOkopZc4AkSmolTgu6xoTRCFue1z
-	53cId+XPJlvgtpcEc0ETWQdpCKYGDLoT8FvNzxfk0DOT1JsVDjnXAiw6yBR6Qa3C1ZEUIPZT8hi
-	YZUYgit4sknP4wWyo5A1Kxj8SLhFSrpLZg3H9BX/9QQ74rTt/f5I6mF1TLQjHLFHVafymqldTq/
-	fVLJm6Hbo29PZxS3RzO9NaIEzz3UzizgX1//A/
-X-Received: by 2002:a19:a40f:0:b0:522:f6:9268 with SMTP id 2adb3069b0e04-5220fc7eed8mr1904825e87.31.1715361947337;
-        Fri, 10 May 2024 10:25:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH+3UgqTDnmRVAiNjyATZxMd/ldNZtXGyYEy7zEh+oH8PVqYii06B+EkIez4lJParuMv/x2eUO16iD1lvVu4gU=
-X-Received: by 2002:a19:a40f:0:b0:522:f6:9268 with SMTP id 2adb3069b0e04-5220fc7eed8mr1904804e87.31.1715361946880;
- Fri, 10 May 2024 10:25:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mo9r8pbZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715363233; x=1746899233;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=1Bjsxi6FLuGOj7RtmewtKis8IikuC8YQFkIP8lxG5to=;
+  b=mo9r8pbZaddQo66fKnUFxYa3VXdeT6zw22vXRzy+hrTnO5fvK60sOq7X
+   oTGvodPqOtSKQ61Hs09oCprMqHGmq6TD9BHj7Ggj1XBtP0TXpvu58EvK3
+   47LxBt4bmz5ObdYR78kUqwZdNfmApII5hqmsPU3uZ9ZgDjavOWlfDRVmY
+   ilXBCTgXwYJ0IwTTX8lkgu5Hg1zOD5MEZ74idNXAovMRfHdfI8PS0TlcU
+   7+dLado7JffDbe2plzBOfawUY3VEtTAxHBy4nUPSOZxOOjc75lh3N9QRw
+   po/wZkS9hP1G8emUrTwMZVEbH1H4P6JoWNNj8mDmlI7u5T7eOH+4h0ac4
+   w==;
+X-CSE-ConnectionGUID: erBKYM42T3SkBkru9IGRlw==
+X-CSE-MsgGUID: 9CUYCF3WQ5eBwE8kMPZ6wg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11069"; a="22764913"
+X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
+   d="scan'208";a="22764913"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 10:47:02 -0700
+X-CSE-ConnectionGUID: 9BuGuE57RSmgVyrAKM/GPQ==
+X-CSE-MsgGUID: qwl5bYPFRgeN0WD4/7PfJw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
+   d="scan'208";a="29540130"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 10:47:01 -0700
+Date: Fri, 10 May 2024 10:47:00 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Michael Roth <michael.roth@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, vkuznets@redhat.com, jmattson@google.com,
+	luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+	pgonda@google.com, peterz@infradead.org,
+	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+	dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, papaluri@amd.com,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	isaku.yamahata@linux.intel.com, rick.p.edgecombe@intel.com
+Subject: Re: [PATCH v15 21/23] KVM: MMU: Disable fast path for private
+ memslots
+Message-ID: <20240510174700.GB480079@ls.amr.corp.intel.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240510015822.503071-1-michael.roth@amd.com>
+ <Zj4lebCMsRvGn7ws@google.com>
+ <CABgObfboqrSw8=+yZMDi_k9d6L3AoiU5o8d-sRb9Y5AXDTmp5w@mail.gmail.com>
+ <20240510152744.ejdy4jqawc2zd2dt@amd.com>
+ <Zj5ETYPTUo9T4Nuf@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240501085210.2213060-1-michael.roth@amd.com>
- <20240510015822.503071-1-michael.roth@amd.com> <20240510015822.503071-2-michael.roth@amd.com>
- <Zj4oFffc7OQivyV-@google.com> <566b57c0-27cd-4591-bded-9a397a1d44d5@redhat.com>
- <20240510163719.pnwdwarsbgmcop3h@amd.com> <a47e7b49-96d2-4e7b-ae39-a3bfe6b0ed83@redhat.com>
-In-Reply-To: <a47e7b49-96d2-4e7b-ae39-a3bfe6b0ed83@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 10 May 2024 19:25:34 +0200
-Message-ID: <CABgObfaJaDr38BsTYRrMQzYr-wK8cLW+TJr5ewsgBEcm8ghb3g@mail.gmail.com>
-Subject: Re: [PATCH v15 22/23] KVM: SEV: Fix return code interpretation for
- RMP nested page faults
-To: Michael Roth <michael.roth@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, papaluri@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zj5ETYPTUo9T4Nuf@google.com>
 
-On Fri, May 10, 2024 at 6:59=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
-> Well, the merge window starts next sunday, doesn't it?  If there's an
-> -rc8 I agree there's some leeway, but that is not too likely.
->
-> >> Once we sort out the loose ends of patches 21-23, you could send
-> >> it as a pull request.
-> > Ok, as a pull request against kvm/next, or kvm/queue?
->
-> Against kvm/next.
+On Fri, May 10, 2024 at 08:59:09AM -0700,
+Sean Christopherson <seanjc@google.com> wrote:
 
-Ah no, only kvm/queue has the preparatory hooks - they make no sense
-without something that uses them.  kvm/queue is ready now.
+> On Fri, May 10, 2024, Michael Roth wrote:
+> > On Fri, May 10, 2024 at 03:50:26PM +0200, Paolo Bonzini wrote:
+> > > On Fri, May 10, 2024 at 3:47 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > >
+> > > > > +      * Since software-protected VMs don't have a notion of a shared vs.
+> > > > > +      * private that's separate from what KVM is tracking, the above
+> > > > > +      * KVM_EXIT_MEMORY_FAULT condition wouldn't occur, so avoid the
+> > > > > +      * special handling for that case for now.
+> > > >
+> > > > Very technically, it can occur if userspace _just_ modified the attributes.  And
+> > > > as I've said multiple times, at least for now, I want to avoid special casing
+> > > > SW-protected VMs unless it is *absolutely* necessary, because their sole purpose
+> > > > is to allow testing flows that are impossible to excercise without SNP/TDX hardware.
+> > > 
+> > > Yep, it is not like they have to be optimized.
+> > 
+> > Ok, I thought there were maybe some future plans to use sw-protected VMs
+> > to get some added protections from userspace. But even then there'd
+> > probably still be extra considerations for how to handle access tracking
+> > so white-listing them probably isn't right anyway.
+> > 
+> > I was also partly tempted to take this route because it would cover this
+> > TDX patch as well:
+> > 
+> >   https://lore.kernel.org/lkml/91c797997b57056224571e22362321a23947172f.1705965635.git.isaku.yamahata@intel.com/
+> 
+> Hmm, I'm pretty sure that patch is trying to fix the exact same issue you are
+> fixing, just in a less precise way.  S-EPT entries only support RWX=0 and RWX=111b,
+> i.e. it should be impossible to have a write-fault to a present S-EPT entry.
+> 
+> And if TDX is running afoul of this code:
+> 
+> 	if (!fault->present)
+> 		return !kvm_ad_enabled();
+> 
+> then KVM should do the sane thing and require A/D support be enabled for TDX.
+> 
+> And if it's something else entirely, that changelog has some explaining to do.
 
-Also, please send the pull request "QEMU style", i.e. with patches
-as replies.
+Yes, it's for KVM_EXIT_MEMORY_FAULT case.  Because Secure-EPT has non-present or
+all RWX allowed, fast page fault always returns RET_PF_INVALID by
+is_shadow_present_pte() check.
 
-If there's an -rc8, I'll probably pull it on Thursday morning.
+I lightly tested the patch at [1] and it works for TDX KVM.
 
-Paolo
+[1] https://github.com/mdroth/linux/commit/39643f9f6da6265d39d633a703c53997985c1208
 
+Just in case for that patch,
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
