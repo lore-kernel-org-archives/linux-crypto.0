@@ -1,64 +1,83 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2075.outbound.protection.outlook.com [40.107.237.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867AE33CD1;
-	Fri, 10 May 2024 01:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715306387; cv=none; b=FeQUq7MupVFP+alDRcutXdZei/F7jrfz9sEdWNDjvX2nZWegqi1fLcq1CT74rRXiwjDyTyir25OoWamFNTx6hGcZQ3MersY2t61juuHT0qp/xT/vmPWgwrl67nOZtZLHM64HiOLtKQHEKmJ09tT+J/vkBSIIkB/7ZawsabkX0P8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715306387; c=relaxed/simple;
-	bh=1zvBhO11KU07W6//cXwWC2aMDcPdVMYA8rYU21wJ2M4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RfdNjo+8honSO/fV0VU0JiFGV/CHugtKPsVjXy3xv42QIl1yXDp+kpDp/JOvWJZUO8QrXov94I7jfiOpIBsDm3DmTFpcbiCZurG7+cnRi+Tt2Pdcx9PoWB/dHFQdBdq/z4eo8MFn54yux4D271WalR/W6NH3B0m7Gmtu+VvA49U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fI3dHeba; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DB1148FEB;
+	Fri, 10 May 2024 02:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715308602; cv=fail; b=LUwTY/y7nwdBQNBDBgXvs+mjiQSTd9Db9JpGv1VQ72V9SNdIC22Q2p185xUVVYtYR4y3lnu2wFTNWJRHObfOur/RCAyrkXRPgdp4UJuXiTAHBJyGPwFKmrLyVruxGrgePFDcJbe1f+YjiCkVV2Tr+WHoz2jszcLIj5pkDgVO2/4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715308602; c=relaxed/simple;
+	bh=55rOGSOSrcRZM3UtM+oxDWtePaOWhJq7An03Nsz/miU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rR5wgk/lwtQHGGusljRawIYa7P3HDzZ/QQIBsunh4S8o3bAXNFZ2gynEw35ESPgNaPTgQsbv71xa0hdlGRcO9OP8gwDrvS7SxLm1YWeSH1Uz2SFq5M83vZUJVyGsEqU/OqFCy3YeS4c1EWSCL8RdZuCJAmw6apMlcPMNY7F0tW8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wpApFz8i; arc=fail smtp.client-ip=40.107.237.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fI3dHeba"
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44A1lenh017504;
-	Fri, 10 May 2024 01:59:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=6hQdQWIJQzQJKZkddUQqTAvsAlR93yaL2HeF+Kt++gM=;
- b=fI3dHebaSoPgdeo5SWBQxMdoME/WtTPJAhMDH8wd8I7e1aFBR1+hHtP2hmvNlBOz125A
- TuQVPxWFQqZ83p3SMKPICox2DWSJ1qfVDYpWIzaJtMjnjcLR0mFmXxIJmh7V8jkqBNsY
- ECgk+23EAzt9aJnYEjVCSVFQ2kgl4Sft7x8GjbuTExhlLW4uIJDevvV4C5hfttsf1YAM
- CZynZsTno/nbIabtHZJECjrwRm5pake0aACvzhlTHg+gG9IRT3FK6UzEkFAlX12aVP3k
- x/U8H/WtXEUeXYH7QCuTk2uqg6QuYQfkwQe0e+rOgi16PbuMxLqQTQTmWx9N9MHD57f4 3g== 
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y1a7p80jx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 May 2024 01:59:31 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44A0Y2ZQ026745;
-	Fri, 10 May 2024 01:59:30 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xysfwxerx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 May 2024 01:59:30 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44A1xRHY10355390
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 May 2024 01:59:30 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BF00C58061;
-	Fri, 10 May 2024 01:59:27 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 503105803F;
-	Fri, 10 May 2024 01:59:27 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 10 May 2024 01:59:27 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.ibm.com>
-To: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, lukas@wunner.de, jarkko@kernel.org,
-        Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH v3] crypto: ecc - Prevent ecc_digits_from_bytes from reading too many bytes
-Date: Thu,  9 May 2024 21:59:21 -0400
-Message-ID: <20240510015921.179175-1-stefanb@linux.ibm.com>
-X-Mailer: git-send-email 2.45.0
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wpApFz8i"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jvUJ2uQLt5PVmBLnGtBqYs6HYo4SbN01xFxHcMlfRpMHmVlSyvlhwR5HJvfHnGLgu5PejxDGEgL6EUmdGCrn0cLF+MZbLr+HY95j3C5Xtobq9wxpC6V3eXgr23X/F7cykl2cPDfWYx5dX/RwpVrFM5Uqf+o6IpHFqbgfts1yiSSJjvtYoIjfPlW862o7AUT2mcFo7HDmpiVAZ5tp+rBgUbCnQNN/iDnP41u/wl2mK2gXDmCXL9ZLzhpkSmwlbXAZmLF+fCmhRz+ylDeXTa6dQ2T/tPFc9Eel0kMcolEmEyG6vog4BBEEu4HG8HD/69ME9WfyFwcqrr93MOoWwUJ4MQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zvSZolCBykKdQtTZaILW7FQXukMYbhMEQkcghT+tDNw=;
+ b=gqnSKT629gQzl3bOWgWoA6NQ8Kk8nNcc9QaenPmK3em5Qx1v2aEVKQqveewzcI5k24jVcyJUjGopvYAHruM5iOm83fdHdF3uw1Yl1QczLUtNWu3vPNtu1zzkqJVX3dZNUIX3wcQL0jsnuIaAoVBl91s4fkJrpoEGryUY1JGhu2YBPVqTNO1B5R+RiVwJMPwD/VVD4yWFq/YFUq49QNQBKmiktYrQscrke1esN0OXkzNfcUcLTZGverbowNPQCafD4BKKdCQOAcUWbCo8Ssu3zr6e69M23CWRG7ZYh9WWVIpkWFqj7I7RBbgSoyQlmjNQJ1zCMgkBX/WhaxwD/DbbVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zvSZolCBykKdQtTZaILW7FQXukMYbhMEQkcghT+tDNw=;
+ b=wpApFz8iNOpST/ptOBC9jf9MLZ3qXtQowrhszTUfU7ORQRopZHPywvNrq3R34WRFMqHD2zyB52yMBWY176+a0qsF2hCFHJF4dg+HK056ZIy64gJKsNPNVNgaGQE3dod1V6YW8MExwjf8ZvOOwwQ77qkFubmLvupGTCTDT36ir9M=
+Received: from MN2PR11CA0023.namprd11.prod.outlook.com (2603:10b6:208:23b::28)
+ by CH2PR12MB4149.namprd12.prod.outlook.com (2603:10b6:610:7c::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.48; Fri, 10 May
+ 2024 02:36:32 +0000
+Received: from MN1PEPF0000ECD7.namprd02.prod.outlook.com
+ (2603:10b6:208:23b:cafe::bd) by MN2PR11CA0023.outlook.office365.com
+ (2603:10b6:208:23b::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.49 via Frontend
+ Transport; Fri, 10 May 2024 02:36:32 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MN1PEPF0000ECD7.mail.protection.outlook.com (10.167.242.136) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7544.18 via Frontend Transport; Fri, 10 May 2024 02:36:32 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 9 May
+ 2024 21:36:30 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: <kvm@vger.kernel.org>
+CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
+	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
+	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
+	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
+	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
+	<ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <papaluri@amd.com>, "Isaku
+ Yamahata" <isaku.yamahata@intel.com>
+Subject: [PATCH v15 21/23] KVM: MMU: Disable fast path for private memslots
+Date: Thu, 9 May 2024 20:58:20 -0500
+Message-ID: <20240510015822.503071-1-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240501085210.2213060-1-michael.roth@amd.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -66,104 +85,144 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: OWCrg3R4g_-Y7GN8ak5RkX8wPvR2PPAC
-X-Proofpoint-ORIG-GUID: OWCrg3R4g_-Y7GN8ak5RkX8wPvR2PPAC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-10_01,2024-05-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- adultscore=0 spamscore=0 priorityscore=1501 impostorscore=0 suspectscore=0
- bulkscore=0 mlxlogscore=999 malwarescore=0 lowpriorityscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2405100012
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD7:EE_|CH2PR12MB4149:EE_
+X-MS-Office365-Filtering-Correlation-Id: 097b6ffb-7c53-4761-2923-08dc709a00d3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|1800799015|7416005|36860700004|376005|82310400017;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Jcc013T/TnDlncSxcKTAre8nd9XjAKVnDK5/eAD2XzDjCUJY3vEZP4Yb+39O?=
+ =?us-ascii?Q?QKek7B7rYKlQPfXOZAbBfWQieYUOIxNsxt77KDQsGQlyepMOZJzuPKvgycRn?=
+ =?us-ascii?Q?8bcQvDACipdY3J+AxyXxYFyNkUUQthz8ERUW54uh/pXNxW2cB1tl8zb82Li1?=
+ =?us-ascii?Q?TAuzQ6fdwF0sYFNiS03Z7cTpMNAZ+YTTYXJBYWIC1IamzR7r3/ElN0iHmK9H?=
+ =?us-ascii?Q?hpP0xay7f9WbfueybKuA10IzERtAGikLYjpVhMpq6fOAJc83Z+pJLmfGD8/+?=
+ =?us-ascii?Q?lFC1aZhndbzS4hVsaGAI1GHqRrLgQNG2FZ4PWsOvGb8BLRPx86yQ80F6w29I?=
+ =?us-ascii?Q?7dS5+MZ8+HpoXBjf4zcqSMtJfKQF8sDyt8YB7E5GT/uxTqkPgMfGRzJceLaf?=
+ =?us-ascii?Q?zFUu827Oa7P8KQ4uYtD1+csWTKgupWB5jAV2gVjbwH90YLGlmlHmW1C99Mrr?=
+ =?us-ascii?Q?f81IKDLWtXFfwsWdFkV0YphLH6Tlqqf7Q4AkPJfTPdGhkJcgN7BjrIO4yOtd?=
+ =?us-ascii?Q?5PMjmjZTRqAXfnXWfST5r3oDCqRVg0rQktG2XxnL8Cl+pKMaoCYbw/rdvIXe?=
+ =?us-ascii?Q?q6AB9NQ29h2wndTl+RCY+FqGpcyTyFnub61ZhZlgri3uV8AaUrNEBlshvHsV?=
+ =?us-ascii?Q?ZbKrZTG/KWY42rWtSrkttqwvoKNybqevOq117EbG2PkAnM/5mYChfuYTJI6a?=
+ =?us-ascii?Q?6psqv7PgtVVHfPPUslNfUGNpFHwqHZRiBEz1iUHuk0I/vDnNdlzh4TkJCLbt?=
+ =?us-ascii?Q?eqA+q4D7JHQenHhMr1KYbR/PNhDp6igSpw/x7EpKFQgHU7sE3ao7vel7whjO?=
+ =?us-ascii?Q?UjY/ndHzg3NDDQKIShfGJ5sQwJX72nDf/jf9exh+Tyc2iGzHTVXgmbLjjdmG?=
+ =?us-ascii?Q?uapnyskwWqe+Mq6vycId2gLu3PPK4yBwaT1KYzuhBh4lIUk6GZtwnNGyNLUw?=
+ =?us-ascii?Q?RDvHIHCzn4hOKIpAH5Y5Qx4S2M/2y8tWdS0gfM7sPD5XYBTDHIy8lZzxmmVP?=
+ =?us-ascii?Q?t0p7vcIGCNlIknxkjLYWuVqRCiMYa3UJ/rhDmv9gwFuQwybUyJR9DPHTCGZf?=
+ =?us-ascii?Q?+zxtTsySV5sre8+DP6sypPjmueACiexuDLt+n7QO20XD1lF+LpdmZqTecHGy?=
+ =?us-ascii?Q?ofULqIJUXeKe/lee+PnJVVoxcamdHIeJo9/vPRZEPaA6MVvaHm6FTj1aJ4Tk?=
+ =?us-ascii?Q?BFEB7R80fFLmymevZFrQjmA6QjsqdVCABoFNPwkHwADQ6ZrYpcDF5R4DS0Bw?=
+ =?us-ascii?Q?wPLO9J6bQfkshOmvtPD0LoPNz3y+q3yZIP7sjqMMrn0Mp7lm++fHhVnphP88?=
+ =?us-ascii?Q?rysocejpT+vfRdVzXL68uL/QlTy/tLkV67n6yPXL4iUrUncUgrVWfwgwEoGN?=
+ =?us-ascii?Q?olojh8t1cX3d+ZZYrQnn+Usn1mSW?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(36860700004)(376005)(82310400017);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2024 02:36:32.0255
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 097b6ffb-7c53-4761-2923-08dc709a00d3
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECD7.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4149
 
-Prevent ecc_digits_from_bytes from reading too many bytes from the input
-byte array in case an insufficient number of bytes is provided to fill the
-output digit array of ndigits. Therefore, initialize the most significant
-digits with 0 to avoid trying to read too many bytes later on. Convert the
-function into a regular function since it is getting too big for an inline
-function.
+For hardware-protected VMs like SEV-SNP guests, certain conditions like
+attempting to perform a write to a page which is not in the state that
+the guest expects it to be in can result in a nested/extended #PF which
+can only be satisfied by the host performing an implicit page state
+change to transition the page into the expected shared/private state.
+This is generally handled by generating a KVM_EXIT_MEMORY_FAULT event
+that gets forwarded to userspace to handle via
+KVM_SET_MEMORY_ATTRIBUTES.
 
-If too many bytes are provided on the input byte array the extra bytes
-are ignored since the input variable 'ndigits' limits the number of digits
-that will be filled.
+However, the fast_page_fault() code might misconstrue this situation as
+being the result of a write-protected access, and treat it as a spurious
+case when it sees that writes are already allowed for the sPTE. This
+results in the KVM MMU trying to resume the guest rather than taking any
+action to satisfy the real source of the #PF such as generating a
+KVM_EXIT_MEMORY_FAULT, resulting in the guest spinning on nested #PFs.
 
-Fixes: d67c96fb97b5 ("crypto: ecdsa - Convert byte arrays with key coordinates to digits")
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+For now, just skip the fast path for hardware-protected VMs since they
+don't currently utilize any of this access-tracking machinery anyway. In
+the future, these considerations will need to be taken into account if
+there's any need/desire to re-enable the fast path for
+hardware-protected VMs.
 
+Since software-protected VMs don't have a notion of a shared vs. private
+that's separate from what KVM is tracking, the above
+KVM_EXIT_MEMORY_FAULT condition wouldn't occur, so avoid the special
+handling for that case for now.
+
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>
+Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
-v3:
- - Applied Jarkko's tag
+ arch/x86/kvm/mmu/mmu.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
-v2:
- - un-inline function
- - use memset
----
- crypto/ecc.c                  | 22 ++++++++++++++++++++++
- include/crypto/internal/ecc.h | 15 ++-------------
- 2 files changed, 24 insertions(+), 13 deletions(-)
-
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index c1d2e884be1e..fe761256e335 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -68,6 +68,28 @@ const struct ecc_curve *ecc_get_curve(unsigned int curve_id)
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 62ad38b2a8c9..cecd8360378f 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3296,7 +3296,7 @@ static int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu,
+ 	return RET_PF_CONTINUE;
  }
- EXPORT_SYMBOL(ecc_get_curve);
  
-+void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
-+			   u64 *out, unsigned int ndigits)
-+{
-+	int diff = ndigits - DIV_ROUND_UP(nbytes, sizeof(u64));
-+	unsigned int o = nbytes & 7;
-+	__be64 msd = 0;
-+
-+	/* diff > 0: not enough input bytes: set most significant digits to 0 */
-+	if (diff > 0) {
-+		ndigits -= diff;
-+		memset(&out[ndigits - 1], 0, diff * sizeof(u64));
-+	}
-+
-+	if (o) {
-+		memcpy((u8 *)&msd + sizeof(msd) - o, in, o);
-+		out[--ndigits] = be64_to_cpu(msd);
-+		in += o;
-+	}
-+	ecc_swap_digits(in, out, ndigits);
-+}
-+EXPORT_SYMBOL(ecc_digits_from_bytes);
-+
- static u64 *ecc_alloc_digits_space(unsigned int ndigits)
+-static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
++static bool page_fault_can_be_fast(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
  {
- 	size_t len = ndigits * sizeof(u64);
-diff --git a/include/crypto/internal/ecc.h b/include/crypto/internal/ecc.h
-index 7ca1f463d1ec..f7e75e1e71f3 100644
---- a/include/crypto/internal/ecc.h
-+++ b/include/crypto/internal/ecc.h
-@@ -64,19 +64,8 @@ static inline void ecc_swap_digits(const void *in, u64 *out, unsigned int ndigit
-  * @out       Output digits array
-  * @ndigits:  Number of digits to create from byte array
-  */
--static inline void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
--					 u64 *out, unsigned int ndigits)
--{
--	unsigned int o = nbytes & 7;
--	__be64 msd = 0;
--
--	if (o) {
--		memcpy((u8 *)&msd + sizeof(msd) - o, in, o);
--		out[--ndigits] = be64_to_cpu(msd);
--		in += o;
--	}
--	ecc_swap_digits(in, out, ndigits);
--}
-+void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
-+			   u64 *out, unsigned int ndigits);
+ 	/*
+ 	 * Page faults with reserved bits set, i.e. faults on MMIO SPTEs, only
+@@ -3307,6 +3307,32 @@ static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
+ 	if (fault->rsvd)
+ 		return false;
  
- /**
-  * ecc_is_key_valid() - Validate a given ECDH private key
++	/*
++	 * For hardware-protected VMs, certain conditions like attempting to
++	 * perform a write to a page which is not in the state that the guest
++	 * expects it to be in can result in a nested/extended #PF. In this
++	 * case, the below code might misconstrue this situation as being the
++	 * result of a write-protected access, and treat it as a spurious case
++	 * rather than taking any action to satisfy the real source of the #PF
++	 * such as generating a KVM_EXIT_MEMORY_FAULT. This can lead to the
++	 * guest spinning on a #PF indefinitely.
++	 *
++	 * For now, just skip the fast path for hardware-protected VMs since
++	 * they don't currently utilize any of this machinery anyway. In the
++	 * future, these considerations will need to be taken into account if
++	 * there's any need/desire to re-enable the fast path for
++	 * hardware-protected VMs.
++	 *
++	 * Since software-protected VMs don't have a notion of a shared vs.
++	 * private that's separate from what KVM is tracking, the above
++	 * KVM_EXIT_MEMORY_FAULT condition wouldn't occur, so avoid the
++	 * special handling for that case for now.
++	 */
++	if (kvm_slot_can_be_private(fault->slot) &&
++	    !(IS_ENABLED(CONFIG_KVM_SW_PROTECTED_VM) &&
++	      vcpu->kvm->arch.vm_type == KVM_X86_SW_PROTECTED_VM))
++		return false;
++
+ 	/*
+ 	 * #PF can be fast if:
+ 	 *
+@@ -3407,7 +3433,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	u64 *sptep;
+ 	uint retry_count = 0;
+ 
+-	if (!page_fault_can_be_fast(fault))
++	if (!page_fault_can_be_fast(vcpu, fault))
+ 		return ret;
+ 
+ 	walk_shadow_page_lockless_begin(vcpu);
 -- 
-2.43.0
+2.25.1
 
