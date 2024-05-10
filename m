@@ -1,79 +1,73 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D60B12C488
-	for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 13:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B785712C530
+	for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 13:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715349043; cv=none; b=WL6HygN5cT+qPSvUZqZnacdUQgS/75cUeamqFcq4BqJKNG2+QmoM2lo1h7yTtr5mzklp7v4p8bMNrC6lNc1Zyz0NA2beF0qgRKD3H3jebN5zPtMbTsYMT5ezWyAaO54eUlgoqxcDQBm2y+Qw4Qnt53GuWWQzY76WwuMC6dHoPJY=
+	t=1715349529; cv=none; b=g7HRn3tONmQrguFjrHCO1BYOCWiIECl6Pam8amd5JzfTdtFoIZvEEzI9MWe6+0XJYmoZb7CBJ5ga1U/IXEUEryMhhDd/AT/QGpa1Amwc6jp6wtWek9dt7nkVOJqw274s/ABHt8n5X/YBJ/yYDrEY7rZ8iC+HfrNKhAavzhYFhMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715349043; c=relaxed/simple;
-	bh=I7z5nYT1NGtQi+9Q7VZZIxP3Ystgb6nUWLm9idhStWw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TTF2XE8nW5ivutEK8hDbKx0vXkqNEzVbjGTxK5QZDuzHFu+bLTNIsx5D1s1SxBkr4lyeAOMlvwgBiINnJ2MDiKdGEzT7NAyNsezMXWclTtKiXmOcPZKAFnXYn8b8VLL7h1FZHQEuvwSRhjZtlkWDzNmITYGD4twi/YI+SkV0ZpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RfdWIkN3; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1715349529; c=relaxed/simple;
+	bh=t5yuscA7V0vIg2QlP/euKvy8XW4fyaHEu5o/y1dtA+M=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=K8IXSxZjAxOgIV818l58FQ9k8qyp07Hq+D/CGRxRdr1ThgabgOFT+l/3StoseviLexGM43U6jhCCi8bi304oKFqn/dvZtFV9iU7HeMCi9YGxSMRjdnKU08pJ9qF8bW2V/vW3shJC2x/jLlqgk4dzua6qXDsTEPiowWFb7Sj/BaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hts1P/z4; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RfdWIkN3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715349041;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pzf9kZEryhnm+5290e4qBYeBBj+VU2djvO6AxGd9L7w=;
-	b=RfdWIkN3VJkyeoi/fjRKbE3gcA3DhsSOBEJJj9kQ0HB4Dr8taEMxdBs2g/9jpUwxIkkIug
-	E8CDXESGdx+1o5gDNjVRedQFDzZi/iKA+68NUAgrY92ze5J7t20kHg04XDZrEuAd6ZMLxl
-	m/KPUixkfR86Jlf7sX4O69qNVxcz1eE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-694-tcTGw1QBNnKhCYI0pkzdcg-1; Fri, 10 May 2024 09:50:40 -0400
-X-MC-Unique: tcTGw1QBNnKhCYI0pkzdcg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-34d7861a1f4so1089615f8f.1
-        for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 06:50:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hts1P/z4"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de0b4063e59so1592254276.3
+        for <linux-crypto@vger.kernel.org>; Fri, 10 May 2024 06:58:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715349527; x=1715954327; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zXb1tTtHZSnRGr8DHQ0sXsDcFePLXbMaowVFp+PbHiA=;
+        b=hts1P/z4hp0PGXJYu6UawyrnlY9KuIO9XEUB2sK0/cv6drFCLt8ZPqwpU80xn3jlkb
+         dtRzl3dFEKS7HQWIGIGgIiBR02Xf6jv57ZK5bEasGLvxy3x0MUlLzmbADpKbqwutmUf5
+         nelQ5hjwTvbgBJAlTWYwwbmGIGEZReMxx3f4K67j1uT800ScnyVMeelWwKJk3EwMsEnn
+         EG2WqP1TaSDMW1e8RCrUAKiOjqQxWFOrV3XKpvmX2jPovKWd6R5OPBSUrmKSGV+PtEbQ
+         6cCa1nyRckBgaLBm26im5ZJy6uUK5JthiNx5UfgN0E4vMZ/SibV2setj0M6PrV2e9hXZ
+         J8GQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715349039; x=1715953839;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pzf9kZEryhnm+5290e4qBYeBBj+VU2djvO6AxGd9L7w=;
-        b=L+Wlkmp7NSeja8oit68Yfltm/c13HGZeJFRjxw0eMjfLOpw0rLEDbCflU9LaIwLi93
-         qYVeHcM1JtpHHyjHjBlnHjTPcaXzs3DPp8Iw6OtQMDZoHlAhP4WAeXeevKoVmMX9oXlQ
-         yHxgPVzDJfPCIJ84xgTxBTods1mbhfH31QVMXhyboF7ZYvdgWM56yMt32I4xxia++Q3V
-         +oVtllaRCEyw0wYN34RTXpudSMP3ffnPkU2JvH4Ne3HpyJU+kVO4Sf2PJnC6vaE1d5wD
-         izaHc8bdpDIimCYSnpr+M9lAQlQUZlAFQJBNQmMDp+R9BvN8wC0NOV174uwAvwZXZt3E
-         47Ig==
-X-Forwarded-Encrypted: i=1; AJvYcCV0Td/YJZTY7qVQMf96SE1IcMjemrB9VC3Ja3l8mPjDrpEzZYJrAMcH2r6w9xObyHVpBxxise149mr5QSHAxmVHaUcBDF1SYLRPWh2w
-X-Gm-Message-State: AOJu0YzIESYuGyB94K51fECcpGJkbEispj4/UgXeoxNlstuYX/QAzzv6
-	pNblyE4odl3qu87MGD1EcX7BeivkCzN5XItnhVBiUEaLTUnDLltLSQEwV9kh4NAAvWyDYedGhD1
-	B/i1VTjCpCV5kq01txP+bLjs8I6gJLasZ6Hb3Brv2P9qehLyGcSy2q9vSCCAzMQUG1kL99hjsHV
-	IVgxgIR5+uYgLBX7PlLBZDtWFAV5tAR/+Z3bSR
-X-Received: by 2002:a5d:5351:0:b0:343:e02f:1a46 with SMTP id ffacd0b85a97d-3504a62fb12mr2102101f8f.2.1715349038957;
-        Fri, 10 May 2024 06:50:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHucRBfWSHvPvamu1WRWuBFTrQrQkQyBe+ROxdfO0QRjONS8tJPWThU8+2GOiv3nf4H2QrNLg23m2TZKw0gXJM=
-X-Received: by 2002:a5d:5351:0:b0:343:e02f:1a46 with SMTP id
- ffacd0b85a97d-3504a62fb12mr2102054f8f.2.1715349038422; Fri, 10 May 2024
- 06:50:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715349527; x=1715954327;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zXb1tTtHZSnRGr8DHQ0sXsDcFePLXbMaowVFp+PbHiA=;
+        b=Ob+ik6Vp2jELgIgA+XACbMY6orV2Vn3ak2iJEzUzxjEcsNctGtAviSxkqaIq505scl
+         6/EE5S5BzHH8DGyoJIkiI4o+br4ZQzp0slHMSEAykKERQ65fe9nk2BLaTnFjXd7bP8Qh
+         iXfBXemNzrZayrgHNtmsE7uinNpnCPa2vHNIFrNjpRUCT0BCyfT0aJOTskCv61f61OJn
+         XmJD6e52R0l4h8DxuCcnjL5iOI0hSjftKs/uK1V8WptMkqZ3zyEhYP7vdY0IHlaiWnGg
+         iFdIVBMtwAMKVfjP4mIh+U5W/KKXrp2cJMHhUFCATm8p7Y753gYqihvDm+H4QRp4HeNQ
+         LEKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXxiOY9/IvlNHIpNwEGSGL/B36AZlx9abzB0yGGkHV8KNKv6aHnjG3HoR7ElA3UVS+C1nfc4j0mKbTFCWGibGJ6i7bcrySPDphV4CSa
+X-Gm-Message-State: AOJu0Yxv35NCRJNJbuvTlRtuMRFbVuiMXvF2Ln0x1HwqymCmjSCf5mZv
+	/E9f30XpIAV+xHxnVz1STf3ETul5dJ+8qTE2jX4w0CAtmc5QGl0ASumfPyujiUBhA4iWnvKLX4B
+	tMg==
+X-Google-Smtp-Source: AGHT+IGef3UtqI5teaXhSDky2PH9t9XWbnO9HU0F8LPXySNaeV0PQq0Qu57IKZM57LTb/VaFi/Mcd40zVdg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1002:b0:de5:9f2c:c17c with SMTP id
+ 3f1490d57ef6-dee4f37bbfbmr661252276.9.1715349526730; Fri, 10 May 2024
+ 06:58:46 -0700 (PDT)
+Date: Fri, 10 May 2024 06:58:45 -0700
+In-Reply-To: <20240510015822.503071-2-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 References: <20240501085210.2213060-1-michael.roth@amd.com>
- <20240510015822.503071-1-michael.roth@amd.com> <Zj4lebCMsRvGn7ws@google.com>
-In-Reply-To: <Zj4lebCMsRvGn7ws@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 10 May 2024 15:50:26 +0200
-Message-ID: <CABgObfboqrSw8=+yZMDi_k9d6L3AoiU5o8d-sRb9Y5AXDTmp5w@mail.gmail.com>
-Subject: Re: [PATCH v15 21/23] KVM: MMU: Disable fast path for private memslots
-To: Sean Christopherson <seanjc@google.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+ <20240510015822.503071-1-michael.roth@amd.com> <20240510015822.503071-2-michael.roth@amd.com>
+Message-ID: <Zj4oFffc7OQivyV-@google.com>
+Subject: Re: [PATCH v15 22/23] KVM: SEV: Fix return code interpretation for
+ RMP nested page faults
+From: Sean Christopherson <seanjc@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com, 
 	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
 	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
 	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
@@ -81,52 +75,79 @@ Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.l
 	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
 	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
 	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, papaluri@amd.com, 
-	Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, papaluri@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, May 10, 2024 at 3:47=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> > +      * Since software-protected VMs don't have a notion of a shared v=
-s.
-> > +      * private that's separate from what KVM is tracking, the above
-> > +      * KVM_EXIT_MEMORY_FAULT condition wouldn't occur, so avoid the
-> > +      * special handling for that case for now.
->
-> Very technically, it can occur if userspace _just_ modified the attribute=
-s.  And
-> as I've said multiple times, at least for now, I want to avoid special ca=
-sing
-> SW-protected VMs unless it is *absolutely* necessary, because their sole =
-purpose
-> is to allow testing flows that are impossible to excercise without SNP/TD=
-X hardware.
+On Thu, May 09, 2024, Michael Roth wrote:
+> The intended logic when handling #NPFs with the RMP bit set (31) is to
+> first check to see if the #NPF requires a shared<->private transition
+> and, if so, to go ahead and let the corresponding KVM_EXIT_MEMORY_FAULT
+> get forwarded on to userspace before proceeding with any handling of
+> other potential RMP fault conditions like needing to PSMASH the RMP
+> entry/etc (which will be done later if the guest still re-faults after
+> the KVM_EXIT_MEMORY_FAULT is processed by userspace).
+> 
+> The determination of whether any userspace handling of
+> KVM_EXIT_MEMORY_FAULT is needed is done by interpreting the return code
+> of kvm_mmu_page_fault(). However, the current code misinterprets the
+> return code, expecting 0 to indicate a userspace exit rather than less
+> than 0 (-EFAULT). This leads to the following unexpected behavior:
+> 
+>   - for KVM_EXIT_MEMORY_FAULTs resulting for implicit shared->private
+>     conversions, warnings get printed from sev_handle_rmp_fault()
+>     because it does not expect to be called for GPAs where
+>     KVM_MEMORY_ATTRIBUTE_PRIVATE is not set. Standard linux guests don't
+>     generally do this, but it is allowed and should be handled
+>     similarly to private->shared conversions rather than triggering any
+>     sort of warnings
+> 
+>   - if gmem support for 2MB folios is enabled (via currently out-of-tree
+>     code), implicit shared<->private conversions will always result in
+>     a PSMASH being attempted, even if it's not actually needed to
+>     resolve the RMP fault. This doesn't cause any harm, but results in a
+>     needless PSMASH and zapping of the sPTE
+> 
+> Resolve these issues by calling sev_handle_rmp_fault() only when
+> kvm_mmu_page_fault()'s return code is greater than or equal to 0,
+> indicating a KVM_MEMORY_EXIT_FAULT/-EFAULT isn't needed. While here,
+> simplify the code slightly and fix up the associated comments for better
+> clarity.
+> 
+> Fixes: ccc9d836c5c3 ("KVM: SEV: Add support to handle RMP nested page faults")
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/kvm/svm/svm.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 426ad49325d7..9431ce74c7d4 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -2070,14 +2070,12 @@ static int npf_interception(struct kvm_vcpu *vcpu)
+>  				svm->vmcb->control.insn_len);
+>  
+>  	/*
+> -	 * rc == 0 indicates a userspace exit is needed to handle page
+> -	 * transitions, so do that first before updating the RMP table.
+> +	 * rc < 0 indicates a userspace exit may be needed to handle page
+> +	 * attribute updates, so deal with that first before handling other
+> +	 * potential RMP fault conditions.
+>  	 */
+> -	if (error_code & PFERR_GUEST_RMP_MASK) {
+> -		if (rc == 0)
+> -			return rc;
+> +	if (rc >= 0 && error_code & PFERR_GUEST_RMP_MASK)
 
-Yep, it is not like they have to be optimized.
+This isn't correct either.  A return of '0' also indiciates "exit to userspace",
+it just doesn't happen with SNP because '0' is returned only when KVM attempts
+emulation, and that too gets short-circuited by svm_check_emulate_instruction().
 
-> > +      */
-> > +     if (kvm_slot_can_be_private(fault->slot) &&
-> > +         !(IS_ENABLED(CONFIG_KVM_SW_PROTECTED_VM) &&
-> > +           vcpu->kvm->arch.vm_type =3D=3D KVM_X86_SW_PROTECTED_VM))
->
-> Heh, !(x && y) kills me, I misread this like 4 times.
->
-> Anyways, I don't like the heuristic.  It doesn't tie the restriction back=
- to the
-> cause in any reasonable way.  Can't this simply be?
->
->         if (fault->is_private !=3D kvm_mem_is_private(vcpu->kvm, fault->g=
-fn)
->                 return false;
+And I would honestly drop the comment, KVM's less-than-pleasant 1/0/-errno return
+values overload is ubiquitous enough that it should be relatively self-explanatory.
 
-You beat me to it by seconds. And it can also be guarded by a check on
-kvm->arch.has_private_mem to avoid the attributes lookup.
-
-> Which is much, much more self-explanatory.
-
-Both more self-explanatory and more correct.
-
-Paolo
-
+Or if you prefer to keep a comment, drop the part that specifically calls out
+attributes updates, because that incorrectly implies that's the _only_ reason
+why KVM checks the return.  But my vote is to drop the comment, because it
+essentially becomes "don't proceed to step 2 if step 1 failed", which kind of
+makes the reader go "well, yeah".
