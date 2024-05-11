@@ -1,430 +1,559 @@
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2059.outbound.protection.outlook.com [40.107.96.59])
+Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C7E481D5;
-	Fri, 10 May 2024 19:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715368148; cv=fail; b=ZBUeA8COgARPpNQB6jkvY64gsh/5oiCQPGrJX603epJHzT1xvZDy6lUoNL4g7IdsRzsWrliMpzn1VhzdJY9ccN5VAYIEiNkWVbjO+wHFhdjyYE9OqnM36HjBaLVFCCayu7X6eSsqpfkcourbdrOfg6ukeFv/YA04mH/REOvHilQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715368148; c=relaxed/simple;
-	bh=0ByqADji/+c2K66VLruGUyOTov8ON3fZ71VCLEC6eFk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kvSFn1AUH5FT8nIA3UaXx+aR6v3VhRXnfgyjeLt9ZS5U00b27/Wl++e0ztkwknxHUfAVEaosN4F9S1XTmBvSVBbJbu7F3EJqMtBNhp6OwkPsgXNG7Za4DUY6P9/Hz4k8AvQoX89TVmP84m/RiXiVN1z3W/l7hrfyiPBm9km5f+M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=165O5gkM; arc=fail smtp.client-ip=40.107.96.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C994E1D5
+	for <linux-crypto@vger.kernel.org>; Sat, 11 May 2024 06:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715408658; cv=none; b=ppW7zOAIbSIqmDL0iClABQQXv5nEMiwkLQ01sVSjZTB9J7Iu04ccC3jZ+MKwgTh4e3VCmMk0cTpMXbscvmOS8wBb6TI4qaW8yzaTCnEz1gw+9PDT+eR+FMKP9B+m4p/7Pd6F2tZOIQGjZnKHHP9NEDzAeRfZRyhJGKZXKivPYL0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715408658; c=relaxed/simple;
+	bh=vaIPJB1ckVXzs19wvTeHXrZBVkpTtywwbSJHSfDmqoU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WuaiWUdYc1hPGQcIpw7Dsq7icTQKsFw/rJUZxhSlEz3lzhynV0yrCC4imaiqE9C37Sx0AID4EOK9IvyVukdBAy32NEC0ttZHQageZZE5eFhMls27X8PRWszIGcTEjDh2//i3OfuF4aJ/vr6o2ZEQxAzR7jFSnj5Q8TeDgEYU1Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=KHFBiJGF; arc=none smtp.client-ip=129.153.194.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="165O5gkM"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=L2IB6QYsQAqla6mRFKJJBQzjQNh5AJBrmSjB2wHiG/0hQ0XRTXycKwmmMB1rwTxn8hZg7RXqZR+QUiOeLRGlZkJrY3ayyYJ1pnsS6tue0KBsDagel/CW7Y31WxGRreIzBMkeRSOWPnL41sEam9bK7dmrN7t0eKJJ/60Imx2hzRHQtJyB+ZGbuhHDN3oKqfa5s0+/8XG18rP4FWfypJEcRxzO0UVQk4nQMBPdOC5Eeq9E0VoFGrxbo6/VM5yCLdFWj94CF6t1yV+VUkRwlc3aNQf88ni/zXEL152wVZEHHlzE/CMrUv/GFbnqriHLbFbb7xrL9UArXhY1I9TgKbaomg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Xrx6loo7EdKYmH9u5AM9rsavyb7lhvWfgqE+eRctvDs=;
- b=FnFgI4Ns2kQIACdnQdxe4FMwyW5FIsBJnWH6UlfuUnD0cC5zg3w3E6rJlvpoPz+b3H+PEwLA6dvMu0MmYds9nszLhMGikEI/1fzYDruXPD9/7CHOpqQKJcRYN9DKQjr8KTxpwZQ8sSFgHZcIWE/SRgdwzE1zL4ActAtdi0MOBBMCZg/dd279TYvVlb+oMNil7uvQBpB+ydyIsOzEgx4pF1F6FMYWNsROCopmTzbCI6BW3fZ3wlyB9X4nP07dIfayfzzGkY5qR1cmcQOqz7aBpSHctlqoO+MISI1g7cogXFG3FeudHsPBlKeMEmzfukwkC7fYEkRofz5n9sPYDnM5pA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Xrx6loo7EdKYmH9u5AM9rsavyb7lhvWfgqE+eRctvDs=;
- b=165O5gkM5c3qTp6+v4g3zeKaSLZgQ/8cYne+KbC+A4eLkPrEbjSMOlJM0X7u7viGL7KYnKzdhjmn8uSVtWKx1Gu+H38Ycmto7fDCb6mK6UxUV+dFesnC4Ss0VfxI7J6QVQ9LSiDbL6kn2BZdEvCkF827hvMV8T75e+gspyEQ570=
-Received: from BN9PR03CA0797.namprd03.prod.outlook.com (2603:10b6:408:13f::22)
- by SJ1PR12MB6241.namprd12.prod.outlook.com (2603:10b6:a03:458::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.48; Fri, 10 May
- 2024 19:09:01 +0000
-Received: from BN3PEPF0000B075.namprd04.prod.outlook.com
- (2603:10b6:408:13f:cafe::fc) by BN9PR03CA0797.outlook.office365.com
- (2603:10b6:408:13f::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.48 via Frontend
- Transport; Fri, 10 May 2024 19:09:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN3PEPF0000B075.mail.protection.outlook.com (10.167.243.120) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7544.18 via Frontend Transport; Fri, 10 May 2024 19:09:01 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 10 May
- 2024 14:09:00 -0500
-Date: Fri, 10 May 2024 14:08:43 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <seanjc@google.com>, <vkuznets@redhat.com>,
-	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
-	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
-	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
-	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <papaluri@amd.com>
-Subject: Re: [PATCH v15 23/23] KVM: SEV: Fix PSC handling for SMASH/UNSMASH
- and partial update ops
-Message-ID: <20240510190843.yivmiwaj5isvqyph@amd.com>
-References: <20240501085210.2213060-1-michael.roth@amd.com>
- <20240510015822.503071-1-michael.roth@amd.com>
- <20240510015822.503071-3-michael.roth@amd.com>
- <fe5cc86b-43e0-4685-99e7-998e61db333f@redhat.com>
+	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="KHFBiJGF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
+	t=1715408655; bh=vaIPJB1ckVXzs19wvTeHXrZBVkpTtywwbSJHSfDmqoU=;
+	h=From:To:Cc:Subject:Date;
+	b=KHFBiJGFPk8nHiUWX6a797ditov4p/S6RpBoFfVlCOaQj26wEinIwNCdOoemO/aKP
+	 /U4Lh7QDvrANi2S6cFGyw8Aj7izbLry+wxRo/AFPA/0Jo6dmkZVoIItd9piLywhqee
+	 vbdRkEBVHDnizvtcRATxM6shlcfK6Rs4IAyIF/onpdsaW6FLrNXNdaXj9woSRWRTuM
+	 Ve7p8Vl/WxIDxYbHuyfDvS7nNzsiEMjv7MypLSgT5j8XOyQFaiLho4miWIf2ykTzpb
+	 BuFBTRKueEKcCk4j2lHus+ZnVAkUfFF+8KdM5mGYfxx1vBVWaNf9HbJDvWQLBRx/4F
+	 OBImslQluP5+Q==
+From: Joachim Vandersmissen <git@jvdsn.com>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David Howells <dhowells@redhat.com>,
+	Simo Sorce <simo@redhat.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Joachim Vandersmissen <git@jvdsn.com>
+Subject: [PATCH v4 1/2] certs: Move RSA self-test data to separate file
+Date: Sat, 11 May 2024 01:23:53 -0500
+Message-ID: <20240511062354.190688-1-git@jvdsn.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <fe5cc86b-43e0-4685-99e7-998e61db333f@redhat.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B075:EE_|SJ1PR12MB6241:EE_
-X-MS-Office365-Filtering-Correlation-Id: ef6650de-1de2-486c-902b-08dc7124a714
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|82310400017|36860700004|376005|1800799015|7416005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?g9NllTG9StPr6fyX6Rffgjd0j+LMafgEO7V2agCTYwvABitcTXeS4nG/G1MW?=
- =?us-ascii?Q?6OdogbZleJGOFvJ6xJ4roRNpAWqhWQswjxqzQnP1GiMMeZA5hr2hjq83P2uj?=
- =?us-ascii?Q?jqeEkVlmULiuqtkdlxuFXIoZL7Gc7JhFL44T+4ud0mszLSl13Ks33hp/wc6U?=
- =?us-ascii?Q?EabgOX02DDvJHioGNUCf9nJEO4QFuBrkm6RzUnB0JzSApGAkYZFV46vIxbRt?=
- =?us-ascii?Q?yuMexiqRPRzoByWveJP3TXOH9i7pruiSWJL0hXdc0aJdQutOYEsGBLtebO8Z?=
- =?us-ascii?Q?8A9JFDQPZgrI9QnrNinKVRrYOazqCSnC2U0+JEVp8BzRODcRm1kXspDRDwbL?=
- =?us-ascii?Q?AwOBdQCrgUGUHgXVWYHtGfsgED4/gHCWiINm8p8c3aAA9S63bPZCGniQGMgY?=
- =?us-ascii?Q?/IiWmtnWQWQQezoQHpfrYR5ZuyiEz3OeV10riuAwAiXoRajUyMK2EreQNuiN?=
- =?us-ascii?Q?a5SnLx0OGbIEEtykZOLvgP08PXERlBlytlI9GB8N+e6lpxzMRkF1H6Ex3gMK?=
- =?us-ascii?Q?3OBirA2DgxSEeL421qPnCva9DlBJCNzjfje0p3dptp8cAhzJAeiRaOnf1uPR?=
- =?us-ascii?Q?iSwYQGdTXTpZsbxpuxUzWVH2OOQXArH+qNk0HtZgzVrAOB1C3x1gmuH2yJXF?=
- =?us-ascii?Q?3XlaBSXBIY8u/RXdLoMhu1OqcxgTfr5FGwWB7ogCbmfoJKVT3iCHx2LAB/8T?=
- =?us-ascii?Q?V/APYljWFc8fq2p3iyleTDFWqQCcZTnyh05pM5pJrW11MlUsZY+ZLoXSlxXf?=
- =?us-ascii?Q?s8ME+TyukqEhd7C0wndlwpLiha5dAFdJTKGXf/zpqDLwilE5AC9V+h3HMASW?=
- =?us-ascii?Q?vhjfnGIDkqoaY9JbJsfBJ3YAOTk1nD0gWU7Cn8SRXqCYJKYDa9JsRS1yFyxF?=
- =?us-ascii?Q?dvrs3zbLezPoggXktN0I0kmUebl30opBFKQK7FPNMzr7EqOTsvyo8BvDaJEK?=
- =?us-ascii?Q?xvzzvllYEhRTyz3ilYubM50OOOlLrZ1ufemM7452DvoXOh0f1sDorshXwvVu?=
- =?us-ascii?Q?kL+/zcDatBD+3sPMLJFGDWBhXXhJ1y7/EMzFx/lV3WrFId2LJx7jC/773zLV?=
- =?us-ascii?Q?Twut7pcTtVIK2uM97UDpIEcjfC6AeWMjgSlzwObNdednh/nsqHKLFpx3zw4Q?=
- =?us-ascii?Q?nFFf8wLLg7FWMuxyf+OZREwY7XZemQp3QYbiNLlhAOCybKhVK/4lgRtDqa5S?=
- =?us-ascii?Q?lUzhNieflMkJjZ60ukR9q6CIbZmtKsXBV+xXREegmTxBSzgbRdtUUfmQdgmh?=
- =?us-ascii?Q?q5WYOeNyzxtdQhr9hQf8rhmXQhuKCqUYihmk1lpAfvr7AmoH3xYq+Xx0Pp+n?=
- =?us-ascii?Q?pgl5w5VXFdk0VRH+PoFJtnqf?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400017)(36860700004)(376005)(1800799015)(7416005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2024 19:09:01.4890
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef6650de-1de2-486c-902b-08dc7124a714
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B075.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6241
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 10, 2024 at 07:09:07PM +0200, Paolo Bonzini wrote:
-> On 5/10/24 03:58, Michael Roth wrote:
-> > There are a few edge-cases that the current processing for GHCB PSC
-> > requests doesn't handle properly:
-> > 
-> >   - KVM properly ignores SMASH/UNSMASH ops when they are embedded in a
-> >     PSC request buffer which contains other PSC operations, but
-> >     inadvertantly forwards them to userspace as private->shared PSC
-> >     requests if they appear at the end of the buffer. Make sure these are
-> >     ignored instead, just like cases where they are not at the end of the
-> >     request buffer.
-> > 
-> >   - Current code handles non-zero 'cur_page' fields when they are at the
-> >     beginning of a new GPA range, but it is not handling properly when
-> >     iterating through subsequent entries which are otherwise part of a
-> >     contiguous range. Fix up the handling so that these entries are not
-> >     combined into a larger contiguous range that include unintended GPA
-> >     ranges and are instead processed later as the start of a new
-> >     contiguous range.
-> > 
-> >   - The page size variable used to track 2M entries in KVM for inflight PSCs
-> >     might be artifically set to a different value, which can lead to
-> >     unexpected values in the entry's final 'cur_page' update. Use the
-> >     entry's 'pagesize' field instead to determine what the value of
-> >     'cur_page' should be upon completion of processing.
-> > 
-> > While here, also add a small helper for clearing in-flight PSCs
-> > variables and fix up comments for better readability.
-> > 
-> > Fixes: 266205d810d2 ("KVM: SEV: Add support to handle Page State Change VMGEXIT")
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> 
-> There are some more improvements that can be made to the readability of
-> the code... this one is already better than the patch is fixing up, but I
-> don't like the code that is in the loop even though it is unconditionally
-> followed by "break".
-> 
-> Here's my attempt at replacing this patch, which is really more of a
-> rewrite of the whole function...  Untested beyond compilation.
+v4: FIPS_SIGNATURE_SELFTEST_RSA is no longer user-configurable and will
+be set when the dependencies are fulfilled.
 
-Thanks for the suggested rework. I tested with/without 2MB pages and
-everything worked as-written. This is the full/squashed patch I plan to
-include in the pull request:
+---8<---
 
-  https://github.com/mdroth/linux/commit/91f6d31c4dfc88dd1ac378e2db6117b0c982e63c
+In preparation of adding new ECDSA self-tests, the existing data is
+moved to a separate file. A new configuration option is added to
+control the compilation of the separate file. This configuration option
+also enforces dependencies that were missing from the existing
+CONFIG_FIPS_SIGNATURE_SELFTEST option.
+The old fips_signature_selftest is no longer an init function, but now
+a helper function called from fips_signature_selftest_rsa.
 
--Mike
+Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
+---
+ crypto/asymmetric_keys/Kconfig        |   7 +
+ crypto/asymmetric_keys/Makefile       |   1 +
+ crypto/asymmetric_keys/selftest.c     | 218 ++++----------------------
+ crypto/asymmetric_keys/selftest.h     |  16 ++
+ crypto/asymmetric_keys/selftest_rsa.c | 172 ++++++++++++++++++++
+ 5 files changed, 225 insertions(+), 189 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/selftest.h
+ create mode 100644 crypto/asymmetric_keys/selftest_rsa.c
 
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 35f0bd91f92e..6e612789c35f 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3555,23 +3555,25 @@ struct psc_buffer {
->  static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc);
-> -static int snp_complete_psc(struct kvm_vcpu *vcpu)
-> +static void snp_complete_psc(struct vcpu_svm *svm, u64 psc_ret)
-> +{
-> +	svm->sev_es.psc_inflight = 0;
-> +	svm->sev_es.psc_idx = 0;
-> +	svm->sev_es.psc_2m = 0;
-> +	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, psc_ret);
-> +}
-> +
-> +static void __snp_complete_one_psc(struct vcpu_svm *svm)
->  {
-> -	struct vcpu_svm *svm = to_svm(vcpu);
->  	struct psc_buffer *psc = svm->sev_es.ghcb_sa;
->  	struct psc_entry *entries = psc->entries;
->  	struct psc_hdr *hdr = &psc->hdr;
-> -	__u64 psc_ret;
->  	__u16 idx;
-> -	if (vcpu->run->hypercall.ret) {
-> -		psc_ret = VMGEXIT_PSC_ERROR_GENERIC;
-> -		goto out_resume;
-> -	}
-> -
->  	/*
->  	 * Everything in-flight has been processed successfully. Update the
-> -	 * corresponding entries in the guest's PSC buffer.
-> +	 * corresponding entries in the guest's PSC buffer and zero out the
-> +	 * count of in-flight PSC entries.
->  	 */
->  	for (idx = svm->sev_es.psc_idx; svm->sev_es.psc_inflight;
->  	     svm->sev_es.psc_inflight--, idx++) {
-> @@ -3581,17 +3583,22 @@ static int snp_complete_psc(struct kvm_vcpu *vcpu)
->  	}
->  	hdr->cur_entry = idx;
-> +}
-> +
-> +static int snp_complete_one_psc(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +	struct psc_buffer *psc = svm->sev_es.ghcb_sa;
-> +
-> +	if (vcpu->run->hypercall.ret) {
-> +		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_GENERIC);
-> +		return 1; /* resume guest */
-> +	}
-> +
-> +	__snp_complete_one_psc(svm);
->  	/* Handle the next range (if any). */
->  	return snp_begin_psc(svm, psc);
-> -
-> -out_resume:
-> -	svm->sev_es.psc_idx = 0;
-> -	svm->sev_es.psc_inflight = 0;
-> -	svm->sev_es.psc_2m = false;
-> -	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, psc_ret);
-> -
-> -	return 1; /* resume guest */
->  }
->  static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
-> @@ -3601,18 +3608,20 @@ static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
->  	struct psc_hdr *hdr = &psc->hdr;
->  	struct psc_entry entry_start;
->  	u16 idx, idx_start, idx_end;
-> -	__u64 psc_ret, gpa;
-> +	u64 gfn;
->  	int npages;
-> -
-> -	/* There should be no other PSCs in-flight at this point. */
-> -	if (WARN_ON_ONCE(svm->sev_es.psc_inflight)) {
-> -		psc_ret = VMGEXIT_PSC_ERROR_GENERIC;
-> -		goto out_resume;
-> -	}
-> +	bool huge;
->  	if (!(vcpu->kvm->arch.hypercall_exit_enabled & (1 << KVM_HC_MAP_GPA_RANGE))) {
-> -		psc_ret = VMGEXIT_PSC_ERROR_GENERIC;
-> -		goto out_resume;
-> +		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_GENERIC);
-> +		return 1;
-> +	}
-> +
-> +next_range:
-> +	/* There should be no other PSCs in-flight at this point. */
-> +	if (WARN_ON_ONCE(svm->sev_es.psc_inflight)) {
-> +		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_GENERIC);
-> +		return 1;
->  	}
->  	/*
-> @@ -3624,97 +3633,99 @@ static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
->  	idx_end = hdr->end_entry;
->  	if (idx_end >= VMGEXIT_PSC_MAX_COUNT) {
-> -		psc_ret = VMGEXIT_PSC_ERROR_INVALID_HDR;
-> -		goto out_resume;
-> -	}
-> -
-> -	/* Nothing more to process. */
-> -	if (idx_start > idx_end) {
-> -		psc_ret = 0;
-> -		goto out_resume;
-> +		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_INVALID_HDR);
-> +		return 1;
->  	}
->  	/* Find the start of the next range which needs processing. */
->  	for (idx = idx_start; idx <= idx_end; idx++, hdr->cur_entry++) {
-> -		__u16 cur_page;
-> -		gfn_t gfn;
-> -		bool huge;
-> -
->  		entry_start = entries[idx];
-> -
-> -		/* Only private/shared conversions are currently supported. */
-> -		if (entry_start.operation != VMGEXIT_PSC_OP_PRIVATE &&
-> -		    entry_start.operation != VMGEXIT_PSC_OP_SHARED)
-> -			continue;
-> -
->  		gfn = entry_start.gfn;
-> -		cur_page = entry_start.cur_page;
->  		huge = entry_start.pagesize;
-> +		npages = huge ? 512 : 1;
-> -		if ((huge && (cur_page > 512 || !IS_ALIGNED(gfn, 512))) ||
-> -		    (!huge && cur_page > 1)) {
-> -			psc_ret = VMGEXIT_PSC_ERROR_INVALID_ENTRY;
-> -			goto out_resume;
-> +		if (entry_start.cur_page > npages || !IS_ALIGNED(gfn, npages)) {
-> +			snp_complete_psc(svm, VMGEXIT_PSC_ERROR_INVALID_ENTRY);
-> +			return 1;
->  		}
-> +		if (entry_start.cur_page) {
-> +			/*
-> +			 * If this is a partially-completed 2M range, force 4K
-> +			 * handling for the remaining pages since they're effectively
-> +			 * split at this point. Subsequent code should ensure this
-> +			 * doesn't get combined with adjacent PSC entries where 2M
-> +			 * handling is still possible.
-> +			 */
-> +			npages -= entry_start.cur_page;
-> +			gfn += entry_start.cur_page;
-> +			huge = false;
-> +		}
-> +		if (npages)
-> +			break;
-> +
->  		/* All sub-pages already processed. */
-> -		if ((huge && cur_page == 512) || (!huge && cur_page == 1))
-> -			continue;
-> -
-> -		/*
-> -		 * If this is a partially-completed 2M range, force 4K handling
-> -		 * for the remaining pages since they're effectively split at
-> -		 * this point. Subsequent code should ensure this doesn't get
-> -		 * combined with adjacent PSC entries where 2M handling is still
-> -		 * possible.
-> -		 */
-> -		svm->sev_es.psc_2m = cur_page ? false : huge;
-> -		svm->sev_es.psc_idx = idx;
-> -		svm->sev_es.psc_inflight = 1;
-> -
-> -		gpa = gfn_to_gpa(gfn + cur_page);
-> -		npages = huge ? 512 - cur_page : 1;
-> -		break;
->  	}
-> +	if (idx > idx_end) {
-> +		/* Nothing more to process. */
-> +		snp_complete_psc(svm, 0);
-> +		return 1;
-> +	}
-> +
-> +	svm->sev_es.psc_2m = huge;
-> +	svm->sev_es.psc_idx = idx;
-> +	svm->sev_es.psc_inflight = 1;
-> +
->  	/*
->  	 * Find all subsequent PSC entries that contain adjacent GPA
->  	 * ranges/operations and can be combined into a single
->  	 * KVM_HC_MAP_GPA_RANGE exit.
->  	 */
-> -	for (idx = svm->sev_es.psc_idx + 1; idx <= idx_end; idx++) {
-> +	while (++idx <= idx_end) {
->  		struct psc_entry entry = entries[idx];
->  		if (entry.operation != entry_start.operation ||
-> -		    entry.gfn != entry_start.gfn + npages ||
-> -		    !!entry.pagesize != svm->sev_es.psc_2m)
-> +		    entry.gfn != gfn + npages ||
-> +		    entry.cur_page ||
-> +		    !!entry.pagesize != huge)
->  			break;
->  		svm->sev_es.psc_inflight++;
-> -		npages += entry_start.pagesize ? 512 : 1;
-> +		npages += huge ? 512 : 1;
->  	}
-> -	vcpu->run->exit_reason = KVM_EXIT_HYPERCALL;
-> -	vcpu->run->hypercall.nr = KVM_HC_MAP_GPA_RANGE;
-> -	vcpu->run->hypercall.args[0] = gpa;
-> -	vcpu->run->hypercall.args[1] = npages;
-> -	vcpu->run->hypercall.args[2] = entry_start.operation == VMGEXIT_PSC_OP_PRIVATE
-> -				       ? KVM_MAP_GPA_RANGE_ENCRYPTED
-> -				       : KVM_MAP_GPA_RANGE_DECRYPTED;
-> -	vcpu->run->hypercall.args[2] |= entry_start.pagesize
-> -					? KVM_MAP_GPA_RANGE_PAGE_SZ_2M
-> -					: KVM_MAP_GPA_RANGE_PAGE_SZ_4K;
-> -	vcpu->arch.complete_userspace_io = snp_complete_psc;
-> +	switch (entry_start.operation) {
-> +	case VMGEXIT_PSC_OP_PRIVATE:
-> +	case VMGEXIT_PSC_OP_SHARED:
-> +		vcpu->run->exit_reason = KVM_EXIT_HYPERCALL;
-> +		vcpu->run->hypercall.nr = KVM_HC_MAP_GPA_RANGE;
-> +		vcpu->run->hypercall.args[0] = gfn_to_gpa(gfn);
-> +		vcpu->run->hypercall.args[1] = npages;
-> +		vcpu->run->hypercall.args[2] = entry_start.operation == VMGEXIT_PSC_OP_PRIVATE
-> +			? KVM_MAP_GPA_RANGE_ENCRYPTED
-> +			: KVM_MAP_GPA_RANGE_DECRYPTED;
-> +		vcpu->run->hypercall.args[2] |= huge
-> +			? KVM_MAP_GPA_RANGE_PAGE_SZ_2M
-> +			: KVM_MAP_GPA_RANGE_PAGE_SZ_4K;
-> +		vcpu->arch.complete_userspace_io = snp_complete_one_psc;
-> -	return 0; /* forward request to userspace */
-> +		return 0; /* forward request to userspace */
-> -out_resume:
-> -	svm->sev_es.psc_idx = 0;
-> -	svm->sev_es.psc_inflight = 0;
-> -	svm->sev_es.psc_2m = false;
-> -	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, psc_ret);
-> +	default:
-> +		/*
-> +		 * Only shared/private PSC operations are currently supported, so if the
-> +		 * entire range consists of unsupported operations (e.g. SMASH/UNSMASH),
-> +		 * then consider the entire range completed and avoid exiting to
-> +		 * userspace. In theory snp_complete_psc() can be called directly
-> +		 * at this point to complete the current range and start the next one,
-> +		 * but that could lead to unexpected levels of recursion.
-> +		 */
-> +		__snp_complete_one_psc(svm);
-> +		goto next_range;
-> +	}
-> -	return 1; /* resume guest */
-> +	unreachable();
->  }
->  static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
-> 
-> 
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 59ec726b7c77..33bbfd0d8367 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -86,4 +86,11 @@ config FIPS_SIGNATURE_SELFTEST
+ 	depends on PKCS7_MESSAGE_PARSER=X509_CERTIFICATE_PARSER
+ 	depends on X509_CERTIFICATE_PARSER
+ 
++config FIPS_SIGNATURE_SELFTEST_RSA
++	bool
++	default y
++	depends on FIPS_SIGNATURE_SELFTEST
++	depends on CRYPTO_SHA256=y || CRYPTO_SHA256=FIPS_SIGNATURE_SELFTEST
++	depends on CRYPTO_RSA=y || CRYPTO_RSA=FIPS_SIGNATURE_SELFTEST
++
+ endif # ASYMMETRIC_KEY_TYPE
+diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
+index 1a273d6df3eb..ac1402e27324 100644
+--- a/crypto/asymmetric_keys/Makefile
++++ b/crypto/asymmetric_keys/Makefile
+@@ -24,6 +24,7 @@ x509_key_parser-y := \
+ 	x509_public_key.o
+ obj-$(CONFIG_FIPS_SIGNATURE_SELFTEST) += x509_selftest.o
+ x509_selftest-y += selftest.o
++x509_selftest-$(CONFIG_FIPS_SIGNATURE_SELFTEST_RSA) += selftest_rsa.o
+ 
+ $(obj)/x509_cert_parser.o: \
+ 	$(obj)/x509.asn1.h \
+diff --git a/crypto/asymmetric_keys/selftest.c b/crypto/asymmetric_keys/selftest.c
+index c50da7ef90ae..ec289d2d065c 100644
+--- a/crypto/asymmetric_keys/selftest.c
++++ b/crypto/asymmetric_keys/selftest.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /* Self-testing for signature checking.
+  *
+  * Copyright (C) 2022 Red Hat, Inc. All Rights Reserved.
+@@ -9,179 +10,18 @@
+ #include <linux/kernel.h>
+ #include <linux/key.h>
+ #include <linux/module.h>
++#include "selftest.h"
+ #include "x509_parser.h"
+ 
+-struct certs_test {
+-	const u8	*data;
+-	size_t		data_len;
+-	const u8	*pkcs7;
+-	size_t		pkcs7_len;
+-};
+-
+-/*
+- * Set of X.509 certificates to provide public keys for the tests.  These will
+- * be loaded into a temporary keyring for the duration of the testing.
+- */
+-static const __initconst u8 certs_selftest_keys[] = {
+-	"\x30\x82\x05\x55\x30\x82\x03\x3d\xa0\x03\x02\x01\x02\x02\x14\x73"
+-	"\x98\xea\x98\x2d\xd0\x2e\xa8\xb1\xcf\x57\xc7\xf2\x97\xb3\xe6\x1a"
+-	"\xfc\x8c\x0a\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x0b"
+-	"\x05\x00\x30\x34\x31\x32\x30\x30\x06\x03\x55\x04\x03\x0c\x29\x43"
+-	"\x65\x72\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66"
+-	"\x69\x63\x61\x74\x69\x6f\x6e\x20\x73\x65\x6c\x66\x2d\x74\x65\x73"
+-	"\x74\x69\x6e\x67\x20\x6b\x65\x79\x30\x20\x17\x0d\x32\x32\x30\x35"
+-	"\x31\x38\x32\x32\x33\x32\x34\x31\x5a\x18\x0f\x32\x31\x32\x32\x30"
+-	"\x34\x32\x34\x32\x32\x33\x32\x34\x31\x5a\x30\x34\x31\x32\x30\x30"
+-	"\x06\x03\x55\x04\x03\x0c\x29\x43\x65\x72\x74\x69\x66\x69\x63\x61"
+-	"\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63\x61\x74\x69\x6f\x6e\x20"
+-	"\x73\x65\x6c\x66\x2d\x74\x65\x73\x74\x69\x6e\x67\x20\x6b\x65\x79"
+-	"\x30\x82\x02\x22\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01"
+-	"\x01\x05\x00\x03\x82\x02\x0f\x00\x30\x82\x02\x0a\x02\x82\x02\x01"
+-	"\x00\xcc\xac\x49\xdd\x3b\xca\xb0\x15\x7e\x84\x6a\xb2\x0a\x69\x5f"
+-	"\x1c\x0a\x61\x82\x3b\x4f\x2c\xa3\x95\x2c\x08\x58\x4b\xb1\x5d\x99"
+-	"\xe0\xc3\xc1\x79\xc2\xb3\xeb\xc0\x1e\x6d\x3e\x54\x1d\xbd\xb7\x92"
+-	"\x7b\x4d\xb5\x95\x58\xb2\x52\x2e\xc6\x24\x4b\x71\x63\x80\x32\x77"
+-	"\xa7\x38\x5e\xdb\x72\xae\x6e\x0d\xec\xfb\xb6\x6d\x01\x7f\xe9\x55"
+-	"\x66\xdf\xbf\x1d\x76\x78\x02\x31\xe8\xe5\x07\xf8\xb7\x82\x5c\x0d"
+-	"\xd4\xbb\xfb\xa2\x59\x0d\x2e\x3a\x78\x95\x3a\x8b\x46\x06\x47\x44"
+-	"\x46\xd7\xcd\x06\x6a\x41\x13\xe3\x19\xf6\xbb\x6e\x38\xf4\x83\x01"
+-	"\xa3\xbf\x4a\x39\x4f\xd7\x0a\xe9\x38\xb3\xf5\x94\x14\x4e\xdd\xf7"
+-	"\x43\xfd\x24\xb2\x49\x3c\xa5\xf7\x7a\x7c\xd4\x45\x3d\x97\x75\x68"
+-	"\xf1\xed\x4c\x42\x0b\x70\xca\x85\xf3\xde\xe5\x88\x2c\xc5\xbe\xb6"
+-	"\x97\x34\xba\x24\x02\xcd\x8b\x86\x9f\xa9\x73\xca\x73\xcf\x92\x81"
+-	"\xee\x75\x55\xbb\x18\x67\x5c\xff\x3f\xb5\xdd\x33\x1b\x0c\xe9\x78"
+-	"\xdb\x5c\xcf\xaa\x5c\x43\x42\xdf\x5e\xa9\x6d\xec\xd7\xd7\xff\xe6"
+-	"\xa1\x3a\x92\x1a\xda\xae\xf6\x8c\x6f\x7b\xd5\xb4\x6e\x06\xe9\x8f"
+-	"\xe8\xde\x09\x31\x89\xed\x0e\x11\xa1\xfa\x8a\xe9\xe9\x64\x59\x62"
+-	"\x53\xda\xd1\x70\xbe\x11\xd4\x99\x97\x11\xcf\x99\xde\x0b\x9d\x94"
+-	"\x7e\xaa\xb8\x52\xea\x37\xdb\x90\x7e\x35\xbd\xd9\xfe\x6d\x0a\x48"
+-	"\x70\x28\xdd\xd5\x0d\x7f\x03\x80\x93\x14\x23\x8f\xb9\x22\xcd\x7c"
+-	"\x29\xfe\xf1\x72\xb5\x5c\x0b\x12\xcf\x9c\x15\xf6\x11\x4c\x7a\x45"
+-	"\x25\x8c\x45\x0a\x34\xac\x2d\x9a\x81\xca\x0b\x13\x22\xcd\xeb\x1a"
+-	"\x38\x88\x18\x97\x96\x08\x81\xaa\xcc\x8f\x0f\x8a\x32\x7b\x76\x68"
+-	"\x03\x68\x43\xbf\x11\xba\x55\x60\xfd\x80\x1c\x0d\x9b\x69\xb6\x09"
+-	"\x72\xbc\x0f\x41\x2f\x07\x82\xc6\xe3\xb2\x13\x91\xc4\x6d\x14\x95"
+-	"\x31\xbe\x19\xbd\xbc\xed\xe1\x4c\x74\xa2\xe0\x78\x0b\xbb\x94\xec"
+-	"\x4c\x53\x3a\xa2\xb5\x84\x1d\x4b\x65\x7e\xdc\xf7\xdb\x36\x7d\xbe"
+-	"\x9e\x3b\x36\x66\x42\x66\x76\x35\xbf\xbe\xf0\xc1\x3c\x7c\xe9\x42"
+-	"\x5c\x24\x53\x03\x05\xa8\x67\x24\x50\x02\x75\xff\x24\x46\x3b\x35"
+-	"\x89\x76\xe6\x70\xda\xc5\x51\x8c\x9a\xe5\x05\xb0\x0b\xd0\x2d\xd4"
+-	"\x7d\x57\x75\x94\x6b\xf9\x0a\xad\x0e\x41\x00\x15\xd0\x4f\xc0\x7f"
+-	"\x90\x2d\x18\x48\x8f\x28\xfe\x5d\xa7\xcd\x99\x9e\xbd\x02\x6c\x8a"
+-	"\x31\xf3\x1c\xc7\x4b\xe6\x93\xcd\x42\xa2\xe4\x68\x10\x47\x9d\xfc"
+-	"\x21\x02\x03\x01\x00\x01\xa3\x5d\x30\x5b\x30\x0c\x06\x03\x55\x1d"
+-	"\x13\x01\x01\xff\x04\x02\x30\x00\x30\x0b\x06\x03\x55\x1d\x0f\x04"
+-	"\x04\x03\x02\x07\x80\x30\x1d\x06\x03\x55\x1d\x0e\x04\x16\x04\x14"
+-	"\xf5\x87\x03\xbb\x33\xce\x1b\x73\xee\x02\xec\xcd\xee\x5b\x88\x17"
+-	"\x51\x8f\xe3\xdb\x30\x1f\x06\x03\x55\x1d\x23\x04\x18\x30\x16\x80"
+-	"\x14\xf5\x87\x03\xbb\x33\xce\x1b\x73\xee\x02\xec\xcd\xee\x5b\x88"
+-	"\x17\x51\x8f\xe3\xdb\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01"
+-	"\x01\x0b\x05\x00\x03\x82\x02\x01\x00\xc0\x2e\x12\x41\x7b\x73\x85"
+-	"\x16\xc8\xdb\x86\x79\xe8\xf5\xcd\x44\xf4\xc6\xe2\x81\x23\x5e\x47"
+-	"\xcb\xab\x25\xf1\x1e\x58\x3e\x31\x7f\x78\xad\x85\xeb\xfe\x14\x88"
+-	"\x60\xf7\x7f\xd2\x26\xa2\xf4\x98\x2a\xfd\xba\x05\x0c\x20\x33\x12"
+-	"\xcc\x4d\x14\x61\x64\x81\x93\xd3\x33\xed\xc8\xff\xf1\x78\xcc\x5f"
+-	"\x51\x9f\x09\xd7\xbe\x0d\x5c\x74\xfd\x9b\xdf\x52\x4a\xc9\xa8\x71"
+-	"\x25\x33\x04\x10\x67\x36\xd0\xb3\x0b\xc9\xa1\x40\x72\xae\x41\x7b"
+-	"\x68\xe6\xe4\x7b\xd0\x28\xf7\x6d\xe7\x3f\x50\xfc\x91\x7c\x91\x56"
+-	"\xd4\xdf\xa6\xbb\xe8\x4d\x1b\x58\xaa\x28\xfa\xc1\x19\xeb\x11\x2f"
+-	"\x24\x8b\x7c\xc5\xa9\x86\x26\xaa\x6e\xb7\x9b\xd5\xf8\x06\xfb\x02"
+-	"\x52\x7b\x9c\x9e\xa1\xe0\x07\x8b\x5e\xe4\xb8\x55\x29\xf6\x48\x52"
+-	"\x1c\x1b\x54\x2d\x46\xd8\xe5\x71\xb9\x60\xd1\x45\xb5\x92\x89\x8a"
+-	"\x63\x58\x2a\xb3\xc6\xb2\x76\xe2\x3c\x82\x59\x04\xae\x5a\xc4\x99"
+-	"\x7b\x2e\x4b\x46\x57\xb8\x29\x24\xb2\xfd\xee\x2c\x0d\xa4\x83\xfa"
+-	"\x65\x2a\x07\x35\x8b\x97\xcf\xbd\x96\x2e\xd1\x7e\x6c\xc2\x1e\x87"
+-	"\xb6\x6c\x76\x65\xb5\xb2\x62\xda\x8b\xe9\x73\xe3\xdb\x33\xdd\x13"
+-	"\x3a\x17\x63\x6a\x76\xde\x8d\x8f\xe0\x47\x61\x28\x3a\x83\xff\x8f"
+-	"\xe7\xc7\xe0\x4a\xa3\xe5\x07\xcf\xe9\x8c\x35\x35\x2e\xe7\x80\x66"
+-	"\x31\xbf\x91\x58\x0a\xe1\x25\x3d\x38\xd3\xa4\xf0\x59\x34\x47\x07"
+-	"\x62\x0f\xbe\x30\xdd\x81\x88\x58\xf0\x28\xb0\x96\xe5\x82\xf8\x05"
+-	"\xb7\x13\x01\xbc\xfa\xc6\x1f\x86\x72\xcc\xf9\xee\x8e\xd9\xd6\x04"
+-	"\x8c\x24\x6c\xbf\x0f\x5d\x37\x39\xcf\x45\xc1\x93\x3a\xd2\xed\x5c"
+-	"\x58\x79\x74\x86\x62\x30\x7e\x8e\xbb\xdd\x7a\xa9\xed\xca\x40\xcb"
+-	"\x62\x47\xf4\xb4\x9f\x52\x7f\x72\x63\xa8\xf0\x2b\xaf\x45\x2a\x48"
+-	"\x19\x6d\xe3\xfb\xf9\x19\x66\x69\xc8\xcc\x62\x87\x6c\x53\x2b\x2d"
+-	"\x6e\x90\x6c\x54\x3a\x82\x25\x41\xcb\x18\x6a\xa4\x22\xa8\xa1\xc4"
+-	"\x47\xd7\x81\x00\x1c\x15\x51\x0f\x1a\xaf\xef\x9f\xa6\x61\x8c\xbd"
+-	"\x6b\x8b\xed\xe6\xac\x0e\xb6\x3a\x4c\x92\xe6\x0f\x91\x0a\x0f\x71"
+-	"\xc7\xa0\xb9\x0d\x3a\x17\x5a\x6f\x35\xc8\xe7\x50\x4f\x46\xe8\x70"
+-	"\x60\x48\x06\x82\x8b\x66\x58\xe6\x73\x91\x9c\x12\x3d\x35\x8e\x46"
+-	"\xad\x5a\xf5\xb3\xdb\x69\x21\x04\xfd\xd3\x1c\xdf\x94\x9d\x56\xb0"
+-	"\x0a\xd1\x95\x76\x8d\xec\x9e\xdd\x0b\x15\x97\x64\xad\xe5\xf2\x62"
+-	"\x02\xfc\x9e\x5f\x56\x42\x39\x05\xb3"
+-};
+-
+-/*
+- * Signed data and detached signature blobs that form the verification tests.
+- */
+-static const __initconst u8 certs_selftest_1_data[] = {
+-	"\x54\x68\x69\x73\x20\x69\x73\x20\x73\x6f\x6d\x65\x20\x74\x65\x73"
+-	"\x74\x20\x64\x61\x74\x61\x20\x75\x73\x65\x64\x20\x66\x6f\x72\x20"
+-	"\x73\x65\x6c\x66\x2d\x74\x65\x73\x74\x69\x6e\x67\x20\x63\x65\x72"
+-	"\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63"
+-	"\x61\x74\x69\x6f\x6e\x2e\x0a"
+-};
+-
+-static const __initconst u8 certs_selftest_1_pkcs7[] = {
+-	"\x30\x82\x02\xab\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x07\x02\xa0"
+-	"\x82\x02\x9c\x30\x82\x02\x98\x02\x01\x01\x31\x0d\x30\x0b\x06\x09"
+-	"\x60\x86\x48\x01\x65\x03\x04\x02\x01\x30\x0b\x06\x09\x2a\x86\x48"
+-	"\x86\xf7\x0d\x01\x07\x01\x31\x82\x02\x75\x30\x82\x02\x71\x02\x01"
+-	"\x01\x30\x4c\x30\x34\x31\x32\x30\x30\x06\x03\x55\x04\x03\x0c\x29"
+-	"\x43\x65\x72\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69"
+-	"\x66\x69\x63\x61\x74\x69\x6f\x6e\x20\x73\x65\x6c\x66\x2d\x74\x65"
+-	"\x73\x74\x69\x6e\x67\x20\x6b\x65\x79\x02\x14\x73\x98\xea\x98\x2d"
+-	"\xd0\x2e\xa8\xb1\xcf\x57\xc7\xf2\x97\xb3\xe6\x1a\xfc\x8c\x0a\x30"
+-	"\x0b\x06\x09\x60\x86\x48\x01\x65\x03\x04\x02\x01\x30\x0d\x06\x09"
+-	"\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01\x05\x00\x04\x82\x02\x00\xac"
+-	"\xb0\xf2\x07\xd6\x99\x6d\xc0\xc0\xd9\x8d\x31\x0d\x7e\x04\xeb\xc3"
+-	"\x88\x90\xc4\x58\x46\xd4\xe2\xa0\xa3\x25\xe3\x04\x50\x37\x85\x8c"
+-	"\x91\xc6\xfc\xc5\xd4\x92\xfd\x05\xd8\xb8\xa3\xb8\xba\x89\x13\x00"
+-	"\x88\x79\x99\x51\x6b\x5b\x28\x31\xc0\xb3\x1b\x7a\x68\x2c\x00\xdb"
+-	"\x4b\x46\x11\xf3\xfa\x50\x8e\x19\x89\xa2\x4c\xda\x4c\x89\x01\x11"
+-	"\x89\xee\xd3\xc8\xc1\xe7\xa7\xf6\xb2\xa2\xf8\x65\xb8\x35\x20\x33"
+-	"\xba\x12\x62\xd5\xbd\xaa\x71\xe5\x5b\xc0\x6a\x32\xff\x6a\x2e\x23"
+-	"\xef\x2b\xb6\x58\xb1\xfb\x5f\x82\x34\x40\x6d\x9f\xbc\x27\xac\x37"
+-	"\x23\x99\xcf\x7d\x20\xb2\x39\x01\xc0\x12\xce\xd7\x5d\x2f\xb6\xab"
+-	"\xb5\x56\x4f\xef\xf4\x72\x07\x58\x65\xa9\xeb\x1f\x75\x1c\x5f\x0c"
+-	"\x88\xe0\xa4\xe2\xcd\x73\x2b\x9e\xb2\x05\x7e\x12\xf8\xd0\x66\x41"
+-	"\xcc\x12\x63\xd4\xd6\xac\x9b\x1d\x14\x77\x8d\x1c\x57\xd5\x27\xc6"
+-	"\x49\xa2\x41\x43\xf3\x59\x29\xe5\xcb\xd1\x75\xbc\x3a\x97\x2a\x72"
+-	"\x22\x66\xc5\x3b\xc1\xba\xfc\x53\x18\x98\xe2\x21\x64\xc6\x52\x87"
+-	"\x13\xd5\x7c\x42\xe8\xfb\x9c\x9a\x45\x32\xd5\xa5\x22\x62\x9d\xd4"
+-	"\xcb\xa4\xfa\x77\xbb\x50\x24\x0b\x8b\x88\x99\x15\x56\xa9\x1e\x92"
+-	"\xbf\x5d\x94\x77\xb6\xf1\x67\x01\x60\x06\x58\x5c\xdf\x18\x52\x79"
+-	"\x37\x30\x93\x7d\x87\x04\xf1\xe0\x55\x59\x52\xf3\xc2\xb1\x1c\x5b"
+-	"\x12\x7c\x49\x87\xfb\xf7\xed\xdd\x95\x71\xec\x4b\x1a\x85\x08\xb0"
+-	"\xa0\x36\xc4\x7b\xab\x40\xe0\xf1\x98\xcc\xaf\x19\x40\x8f\x47\x6f"
+-	"\xf0\x6c\x84\x29\x7f\x7f\x04\x46\xcb\x08\x0f\xe0\xc1\xc9\x70\x6e"
+-	"\x95\x3b\xa4\xbc\x29\x2b\x53\x67\x45\x1b\x0d\xbc\x13\xa5\x76\x31"
+-	"\xaf\xb9\xd0\xe0\x60\x12\xd2\xf4\xb7\x7c\x58\x7e\xf6\x2d\xbb\x24"
+-	"\x14\x5a\x20\x24\xa8\x12\xdf\x25\xbd\x42\xce\x96\x7c\x2e\xba\x14"
+-	"\x1b\x81\x9f\x18\x45\xa4\xc6\x70\x3e\x0e\xf0\xd3\x7b\x9c\x10\xbe"
+-	"\xb8\x7a\x89\xc5\x9e\xd9\x97\xdf\xd7\xe7\xc6\x1d\xc0\x20\x6c\xb8"
+-	"\x1e\x3a\x63\xb8\x39\x8e\x8e\x62\xd5\xd2\xb4\xcd\xff\x46\xfc\x8e"
+-	"\xec\x07\x35\x0c\xff\xb0\x05\xe6\xf4\xe5\xfe\xa2\xe3\x0a\xe6\x36"
+-	"\xa7\x4a\x7e\x62\x1d\xc4\x50\x39\x35\x4e\x28\xcb\x4a\xfb\x9d\xdb"
+-	"\xdd\x23\xd6\x53\xb1\x74\x77\x12\xf7\x9c\xf0\x9a\x6b\xf7\xa9\x64"
+-	"\x2d\x86\x21\x2a\xcf\xc6\x54\xf5\xc9\xad\xfa\xb5\x12\xb4\xf3\x51"
+-	"\x77\x55\x3c\x6f\x0c\x32\xd3\x8c\x44\x39\x71\x25\xfe\x96\xd2"
+-};
+-
+-/*
+- * List of tests to be run.
+- */
+-#define TEST(data, pkcs7) { data, sizeof(data) - 1, pkcs7, sizeof(pkcs7) - 1 }
+-static const struct certs_test certs_tests[] __initconst = {
+-	TEST(certs_selftest_1_data, certs_selftest_1_pkcs7),
+-};
+-
+-static int __init fips_signature_selftest(void)
++void fips_signature_selftest(const char *name,
++			     const u8 *keys, size_t keys_len,
++			     const u8 *data, size_t data_len,
++			     const u8 *sig, size_t sig_len)
+ {
+ 	struct key *keyring;
+-	int ret, i;
++	int ret;
+ 
+-	pr_notice("Running certificate verification selftests\n");
++	pr_notice("Running certificate verification %s selftest\n", name);
+ 
+ 	keyring = keyring_alloc(".certs_selftest",
+ 				GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, current_cred(),
+@@ -191,40 +31,40 @@ static int __init fips_signature_selftest(void)
+ 				KEY_ALLOC_NOT_IN_QUOTA,
+ 				NULL, NULL);
+ 	if (IS_ERR(keyring))
+-		panic("Can't allocate certs selftest keyring: %ld\n",
+-		      PTR_ERR(keyring));
++		panic("Can't allocate certs %s selftest keyring: %ld\n", name, PTR_ERR(keyring));
+ 
+-	ret = x509_load_certificate_list(certs_selftest_keys,
+-					 sizeof(certs_selftest_keys) - 1, keyring);
++	ret = x509_load_certificate_list(keys, keys_len, keyring);
+ 	if (ret < 0)
+-		panic("Can't allocate certs selftest keyring: %d\n", ret);
++		panic("Can't allocate certs %s selftest keyring: %d\n", name, ret);
+ 
+-	for (i = 0; i < ARRAY_SIZE(certs_tests); i++) {
+-		const struct certs_test *test = &certs_tests[i];
+-		struct pkcs7_message *pkcs7;
++	struct pkcs7_message *pkcs7;
+ 
+-		pkcs7 = pkcs7_parse_message(test->pkcs7, test->pkcs7_len);
+-		if (IS_ERR(pkcs7))
+-			panic("Certs selftest %d: pkcs7_parse_message() = %d\n", i, ret);
++	pkcs7 = pkcs7_parse_message(sig, sig_len);
++	if (IS_ERR(pkcs7))
++		panic("Certs %s selftest: pkcs7_parse_message() = %d\n", name, ret);
+ 
+-		pkcs7_supply_detached_data(pkcs7, test->data, test->data_len);
++	pkcs7_supply_detached_data(pkcs7, data, data_len);
+ 
+-		ret = pkcs7_verify(pkcs7, VERIFYING_MODULE_SIGNATURE);
+-		if (ret < 0)
+-			panic("Certs selftest %d: pkcs7_verify() = %d\n", i, ret);
++	ret = pkcs7_verify(pkcs7, VERIFYING_MODULE_SIGNATURE);
++	if (ret < 0)
++		panic("Certs %s selftest: pkcs7_verify() = %d\n", name, ret);
+ 
+-		ret = pkcs7_validate_trust(pkcs7, keyring);
+-		if (ret < 0)
+-			panic("Certs selftest %d: pkcs7_validate_trust() = %d\n", i, ret);
++	ret = pkcs7_validate_trust(pkcs7, keyring);
++	if (ret < 0)
++		panic("Certs %s selftest: pkcs7_validate_trust() = %d\n", name, ret);
+ 
+-		pkcs7_free_message(pkcs7);
+-	}
++	pkcs7_free_message(pkcs7);
+ 
+ 	key_put(keyring);
++}
++
++static int __init fips_signature_selftest_init(void)
++{
++	fips_signature_selftest_rsa();
+ 	return 0;
+ }
+ 
+-late_initcall(fips_signature_selftest);
++late_initcall(fips_signature_selftest_init);
+ 
+ MODULE_DESCRIPTION("X.509 self tests");
+ MODULE_AUTHOR("Red Hat, Inc.");
+diff --git a/crypto/asymmetric_keys/selftest.h b/crypto/asymmetric_keys/selftest.h
+new file mode 100644
+index 000000000000..842ac3cf86b4
+--- /dev/null
++++ b/crypto/asymmetric_keys/selftest.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* Helper function for self-testing PKCS#7 signature verification.
++ *
++ * Copyright (C) 2024 Joachim Vandersmissen <git@jvdsn.com>
++ */
++
++void fips_signature_selftest(const char *name,
++			     const u8 *keys, size_t keys_len,
++			     const u8 *data, size_t data_len,
++			     const u8 *sig, size_t sig_len);
++
++#ifdef CONFIG_FIPS_SIGNATURE_SELFTEST_RSA
++void __init fips_signature_selftest_rsa(void);
++#else
++static inline void __init fips_signature_selftest_rsa(void) { }
++#endif
+diff --git a/crypto/asymmetric_keys/selftest_rsa.c b/crypto/asymmetric_keys/selftest_rsa.c
+new file mode 100644
+index 000000000000..b0057dc757e5
+--- /dev/null
++++ b/crypto/asymmetric_keys/selftest_rsa.c
+@@ -0,0 +1,172 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Self-tests for PKCS#7 RSA signature verification.
++ *
++ * Copyright (C) 2024 Joachim Vandersmissen <git@jvdsn.com>
++ */
++
++#include <linux/module.h>
++#include "selftest.h"
++
++/*
++ * Set of X.509 certificates to provide public keys for the tests. These will
++ * be loaded into a temporary keyring for the duration of the testing.
++ */
++static const u8 certs_selftest_rsa_keys[] __initconst = {
++	/* 4096-bit RSA certificate */
++	"\x30\x82\x05\x55\x30\x82\x03\x3d\xa0\x03\x02\x01\x02\x02\x14\x73"
++	"\x98\xea\x98\x2d\xd0\x2e\xa8\xb1\xcf\x57\xc7\xf2\x97\xb3\xe6\x1a"
++	"\xfc\x8c\x0a\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x0b"
++	"\x05\x00\x30\x34\x31\x32\x30\x30\x06\x03\x55\x04\x03\x0c\x29\x43"
++	"\x65\x72\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66"
++	"\x69\x63\x61\x74\x69\x6f\x6e\x20\x73\x65\x6c\x66\x2d\x74\x65\x73"
++	"\x74\x69\x6e\x67\x20\x6b\x65\x79\x30\x20\x17\x0d\x32\x32\x30\x35"
++	"\x31\x38\x32\x32\x33\x32\x34\x31\x5a\x18\x0f\x32\x31\x32\x32\x30"
++	"\x34\x32\x34\x32\x32\x33\x32\x34\x31\x5a\x30\x34\x31\x32\x30\x30"
++	"\x06\x03\x55\x04\x03\x0c\x29\x43\x65\x72\x74\x69\x66\x69\x63\x61"
++	"\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63\x61\x74\x69\x6f\x6e\x20"
++	"\x73\x65\x6c\x66\x2d\x74\x65\x73\x74\x69\x6e\x67\x20\x6b\x65\x79"
++	"\x30\x82\x02\x22\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01"
++	"\x01\x05\x00\x03\x82\x02\x0f\x00\x30\x82\x02\x0a\x02\x82\x02\x01"
++	"\x00\xcc\xac\x49\xdd\x3b\xca\xb0\x15\x7e\x84\x6a\xb2\x0a\x69\x5f"
++	"\x1c\x0a\x61\x82\x3b\x4f\x2c\xa3\x95\x2c\x08\x58\x4b\xb1\x5d\x99"
++	"\xe0\xc3\xc1\x79\xc2\xb3\xeb\xc0\x1e\x6d\x3e\x54\x1d\xbd\xb7\x92"
++	"\x7b\x4d\xb5\x95\x58\xb2\x52\x2e\xc6\x24\x4b\x71\x63\x80\x32\x77"
++	"\xa7\x38\x5e\xdb\x72\xae\x6e\x0d\xec\xfb\xb6\x6d\x01\x7f\xe9\x55"
++	"\x66\xdf\xbf\x1d\x76\x78\x02\x31\xe8\xe5\x07\xf8\xb7\x82\x5c\x0d"
++	"\xd4\xbb\xfb\xa2\x59\x0d\x2e\x3a\x78\x95\x3a\x8b\x46\x06\x47\x44"
++	"\x46\xd7\xcd\x06\x6a\x41\x13\xe3\x19\xf6\xbb\x6e\x38\xf4\x83\x01"
++	"\xa3\xbf\x4a\x39\x4f\xd7\x0a\xe9\x38\xb3\xf5\x94\x14\x4e\xdd\xf7"
++	"\x43\xfd\x24\xb2\x49\x3c\xa5\xf7\x7a\x7c\xd4\x45\x3d\x97\x75\x68"
++	"\xf1\xed\x4c\x42\x0b\x70\xca\x85\xf3\xde\xe5\x88\x2c\xc5\xbe\xb6"
++	"\x97\x34\xba\x24\x02\xcd\x8b\x86\x9f\xa9\x73\xca\x73\xcf\x92\x81"
++	"\xee\x75\x55\xbb\x18\x67\x5c\xff\x3f\xb5\xdd\x33\x1b\x0c\xe9\x78"
++	"\xdb\x5c\xcf\xaa\x5c\x43\x42\xdf\x5e\xa9\x6d\xec\xd7\xd7\xff\xe6"
++	"\xa1\x3a\x92\x1a\xda\xae\xf6\x8c\x6f\x7b\xd5\xb4\x6e\x06\xe9\x8f"
++	"\xe8\xde\x09\x31\x89\xed\x0e\x11\xa1\xfa\x8a\xe9\xe9\x64\x59\x62"
++	"\x53\xda\xd1\x70\xbe\x11\xd4\x99\x97\x11\xcf\x99\xde\x0b\x9d\x94"
++	"\x7e\xaa\xb8\x52\xea\x37\xdb\x90\x7e\x35\xbd\xd9\xfe\x6d\x0a\x48"
++	"\x70\x28\xdd\xd5\x0d\x7f\x03\x80\x93\x14\x23\x8f\xb9\x22\xcd\x7c"
++	"\x29\xfe\xf1\x72\xb5\x5c\x0b\x12\xcf\x9c\x15\xf6\x11\x4c\x7a\x45"
++	"\x25\x8c\x45\x0a\x34\xac\x2d\x9a\x81\xca\x0b\x13\x22\xcd\xeb\x1a"
++	"\x38\x88\x18\x97\x96\x08\x81\xaa\xcc\x8f\x0f\x8a\x32\x7b\x76\x68"
++	"\x03\x68\x43\xbf\x11\xba\x55\x60\xfd\x80\x1c\x0d\x9b\x69\xb6\x09"
++	"\x72\xbc\x0f\x41\x2f\x07\x82\xc6\xe3\xb2\x13\x91\xc4\x6d\x14\x95"
++	"\x31\xbe\x19\xbd\xbc\xed\xe1\x4c\x74\xa2\xe0\x78\x0b\xbb\x94\xec"
++	"\x4c\x53\x3a\xa2\xb5\x84\x1d\x4b\x65\x7e\xdc\xf7\xdb\x36\x7d\xbe"
++	"\x9e\x3b\x36\x66\x42\x66\x76\x35\xbf\xbe\xf0\xc1\x3c\x7c\xe9\x42"
++	"\x5c\x24\x53\x03\x05\xa8\x67\x24\x50\x02\x75\xff\x24\x46\x3b\x35"
++	"\x89\x76\xe6\x70\xda\xc5\x51\x8c\x9a\xe5\x05\xb0\x0b\xd0\x2d\xd4"
++	"\x7d\x57\x75\x94\x6b\xf9\x0a\xad\x0e\x41\x00\x15\xd0\x4f\xc0\x7f"
++	"\x90\x2d\x18\x48\x8f\x28\xfe\x5d\xa7\xcd\x99\x9e\xbd\x02\x6c\x8a"
++	"\x31\xf3\x1c\xc7\x4b\xe6\x93\xcd\x42\xa2\xe4\x68\x10\x47\x9d\xfc"
++	"\x21\x02\x03\x01\x00\x01\xa3\x5d\x30\x5b\x30\x0c\x06\x03\x55\x1d"
++	"\x13\x01\x01\xff\x04\x02\x30\x00\x30\x0b\x06\x03\x55\x1d\x0f\x04"
++	"\x04\x03\x02\x07\x80\x30\x1d\x06\x03\x55\x1d\x0e\x04\x16\x04\x14"
++	"\xf5\x87\x03\xbb\x33\xce\x1b\x73\xee\x02\xec\xcd\xee\x5b\x88\x17"
++	"\x51\x8f\xe3\xdb\x30\x1f\x06\x03\x55\x1d\x23\x04\x18\x30\x16\x80"
++	"\x14\xf5\x87\x03\xbb\x33\xce\x1b\x73\xee\x02\xec\xcd\xee\x5b\x88"
++	"\x17\x51\x8f\xe3\xdb\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01"
++	"\x01\x0b\x05\x00\x03\x82\x02\x01\x00\xc0\x2e\x12\x41\x7b\x73\x85"
++	"\x16\xc8\xdb\x86\x79\xe8\xf5\xcd\x44\xf4\xc6\xe2\x81\x23\x5e\x47"
++	"\xcb\xab\x25\xf1\x1e\x58\x3e\x31\x7f\x78\xad\x85\xeb\xfe\x14\x88"
++	"\x60\xf7\x7f\xd2\x26\xa2\xf4\x98\x2a\xfd\xba\x05\x0c\x20\x33\x12"
++	"\xcc\x4d\x14\x61\x64\x81\x93\xd3\x33\xed\xc8\xff\xf1\x78\xcc\x5f"
++	"\x51\x9f\x09\xd7\xbe\x0d\x5c\x74\xfd\x9b\xdf\x52\x4a\xc9\xa8\x71"
++	"\x25\x33\x04\x10\x67\x36\xd0\xb3\x0b\xc9\xa1\x40\x72\xae\x41\x7b"
++	"\x68\xe6\xe4\x7b\xd0\x28\xf7\x6d\xe7\x3f\x50\xfc\x91\x7c\x91\x56"
++	"\xd4\xdf\xa6\xbb\xe8\x4d\x1b\x58\xaa\x28\xfa\xc1\x19\xeb\x11\x2f"
++	"\x24\x8b\x7c\xc5\xa9\x86\x26\xaa\x6e\xb7\x9b\xd5\xf8\x06\xfb\x02"
++	"\x52\x7b\x9c\x9e\xa1\xe0\x07\x8b\x5e\xe4\xb8\x55\x29\xf6\x48\x52"
++	"\x1c\x1b\x54\x2d\x46\xd8\xe5\x71\xb9\x60\xd1\x45\xb5\x92\x89\x8a"
++	"\x63\x58\x2a\xb3\xc6\xb2\x76\xe2\x3c\x82\x59\x04\xae\x5a\xc4\x99"
++	"\x7b\x2e\x4b\x46\x57\xb8\x29\x24\xb2\xfd\xee\x2c\x0d\xa4\x83\xfa"
++	"\x65\x2a\x07\x35\x8b\x97\xcf\xbd\x96\x2e\xd1\x7e\x6c\xc2\x1e\x87"
++	"\xb6\x6c\x76\x65\xb5\xb2\x62\xda\x8b\xe9\x73\xe3\xdb\x33\xdd\x13"
++	"\x3a\x17\x63\x6a\x76\xde\x8d\x8f\xe0\x47\x61\x28\x3a\x83\xff\x8f"
++	"\xe7\xc7\xe0\x4a\xa3\xe5\x07\xcf\xe9\x8c\x35\x35\x2e\xe7\x80\x66"
++	"\x31\xbf\x91\x58\x0a\xe1\x25\x3d\x38\xd3\xa4\xf0\x59\x34\x47\x07"
++	"\x62\x0f\xbe\x30\xdd\x81\x88\x58\xf0\x28\xb0\x96\xe5\x82\xf8\x05"
++	"\xb7\x13\x01\xbc\xfa\xc6\x1f\x86\x72\xcc\xf9\xee\x8e\xd9\xd6\x04"
++	"\x8c\x24\x6c\xbf\x0f\x5d\x37\x39\xcf\x45\xc1\x93\x3a\xd2\xed\x5c"
++	"\x58\x79\x74\x86\x62\x30\x7e\x8e\xbb\xdd\x7a\xa9\xed\xca\x40\xcb"
++	"\x62\x47\xf4\xb4\x9f\x52\x7f\x72\x63\xa8\xf0\x2b\xaf\x45\x2a\x48"
++	"\x19\x6d\xe3\xfb\xf9\x19\x66\x69\xc8\xcc\x62\x87\x6c\x53\x2b\x2d"
++	"\x6e\x90\x6c\x54\x3a\x82\x25\x41\xcb\x18\x6a\xa4\x22\xa8\xa1\xc4"
++	"\x47\xd7\x81\x00\x1c\x15\x51\x0f\x1a\xaf\xef\x9f\xa6\x61\x8c\xbd"
++	"\x6b\x8b\xed\xe6\xac\x0e\xb6\x3a\x4c\x92\xe6\x0f\x91\x0a\x0f\x71"
++	"\xc7\xa0\xb9\x0d\x3a\x17\x5a\x6f\x35\xc8\xe7\x50\x4f\x46\xe8\x70"
++	"\x60\x48\x06\x82\x8b\x66\x58\xe6\x73\x91\x9c\x12\x3d\x35\x8e\x46"
++	"\xad\x5a\xf5\xb3\xdb\x69\x21\x04\xfd\xd3\x1c\xdf\x94\x9d\x56\xb0"
++	"\x0a\xd1\x95\x76\x8d\xec\x9e\xdd\x0b\x15\x97\x64\xad\xe5\xf2\x62"
++	"\x02\xfc\x9e\x5f\x56\x42\x39\x05\xb3"
++};
++
++
++/*
++ * Signed data and detached signature blobs that form the verification tests.
++ */
++static const u8 certs_selftest_rsa_data[] __initconst = {
++	"\x54\x68\x69\x73\x20\x69\x73\x20\x73\x6f\x6d\x65\x20\x74\x65\x73"
++	"\x74\x20\x64\x61\x74\x61\x20\x75\x73\x65\x64\x20\x66\x6f\x72\x20"
++	"\x73\x65\x6c\x66\x2d\x74\x65\x73\x74\x69\x6e\x67\x20\x63\x65\x72"
++	"\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63"
++	"\x61\x74\x69\x6f\x6e\x2e\x0a"
++};
++
++static const u8 certs_selftest_rsa_sig[] __initconst = {
++	/* RSA signature using PKCS#1 v1.5 padding with SHA-256 */
++	"\x30\x82\x02\xab\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x07\x02\xa0"
++	"\x82\x02\x9c\x30\x82\x02\x98\x02\x01\x01\x31\x0d\x30\x0b\x06\x09"
++	"\x60\x86\x48\x01\x65\x03\x04\x02\x01\x30\x0b\x06\x09\x2a\x86\x48"
++	"\x86\xf7\x0d\x01\x07\x01\x31\x82\x02\x75\x30\x82\x02\x71\x02\x01"
++	"\x01\x30\x4c\x30\x34\x31\x32\x30\x30\x06\x03\x55\x04\x03\x0c\x29"
++	"\x43\x65\x72\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69"
++	"\x66\x69\x63\x61\x74\x69\x6f\x6e\x20\x73\x65\x6c\x66\x2d\x74\x65"
++	"\x73\x74\x69\x6e\x67\x20\x6b\x65\x79\x02\x14\x73\x98\xea\x98\x2d"
++	"\xd0\x2e\xa8\xb1\xcf\x57\xc7\xf2\x97\xb3\xe6\x1a\xfc\x8c\x0a\x30"
++	"\x0b\x06\x09\x60\x86\x48\x01\x65\x03\x04\x02\x01\x30\x0d\x06\x09"
++	"\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01\x05\x00\x04\x82\x02\x00\xac"
++	"\xb0\xf2\x07\xd6\x99\x6d\xc0\xc0\xd9\x8d\x31\x0d\x7e\x04\xeb\xc3"
++	"\x88\x90\xc4\x58\x46\xd4\xe2\xa0\xa3\x25\xe3\x04\x50\x37\x85\x8c"
++	"\x91\xc6\xfc\xc5\xd4\x92\xfd\x05\xd8\xb8\xa3\xb8\xba\x89\x13\x00"
++	"\x88\x79\x99\x51\x6b\x5b\x28\x31\xc0\xb3\x1b\x7a\x68\x2c\x00\xdb"
++	"\x4b\x46\x11\xf3\xfa\x50\x8e\x19\x89\xa2\x4c\xda\x4c\x89\x01\x11"
++	"\x89\xee\xd3\xc8\xc1\xe7\xa7\xf6\xb2\xa2\xf8\x65\xb8\x35\x20\x33"
++	"\xba\x12\x62\xd5\xbd\xaa\x71\xe5\x5b\xc0\x6a\x32\xff\x6a\x2e\x23"
++	"\xef\x2b\xb6\x58\xb1\xfb\x5f\x82\x34\x40\x6d\x9f\xbc\x27\xac\x37"
++	"\x23\x99\xcf\x7d\x20\xb2\x39\x01\xc0\x12\xce\xd7\x5d\x2f\xb6\xab"
++	"\xb5\x56\x4f\xef\xf4\x72\x07\x58\x65\xa9\xeb\x1f\x75\x1c\x5f\x0c"
++	"\x88\xe0\xa4\xe2\xcd\x73\x2b\x9e\xb2\x05\x7e\x12\xf8\xd0\x66\x41"
++	"\xcc\x12\x63\xd4\xd6\xac\x9b\x1d\x14\x77\x8d\x1c\x57\xd5\x27\xc6"
++	"\x49\xa2\x41\x43\xf3\x59\x29\xe5\xcb\xd1\x75\xbc\x3a\x97\x2a\x72"
++	"\x22\x66\xc5\x3b\xc1\xba\xfc\x53\x18\x98\xe2\x21\x64\xc6\x52\x87"
++	"\x13\xd5\x7c\x42\xe8\xfb\x9c\x9a\x45\x32\xd5\xa5\x22\x62\x9d\xd4"
++	"\xcb\xa4\xfa\x77\xbb\x50\x24\x0b\x8b\x88\x99\x15\x56\xa9\x1e\x92"
++	"\xbf\x5d\x94\x77\xb6\xf1\x67\x01\x60\x06\x58\x5c\xdf\x18\x52\x79"
++	"\x37\x30\x93\x7d\x87\x04\xf1\xe0\x55\x59\x52\xf3\xc2\xb1\x1c\x5b"
++	"\x12\x7c\x49\x87\xfb\xf7\xed\xdd\x95\x71\xec\x4b\x1a\x85\x08\xb0"
++	"\xa0\x36\xc4\x7b\xab\x40\xe0\xf1\x98\xcc\xaf\x19\x40\x8f\x47\x6f"
++	"\xf0\x6c\x84\x29\x7f\x7f\x04\x46\xcb\x08\x0f\xe0\xc1\xc9\x70\x6e"
++	"\x95\x3b\xa4\xbc\x29\x2b\x53\x67\x45\x1b\x0d\xbc\x13\xa5\x76\x31"
++	"\xaf\xb9\xd0\xe0\x60\x12\xd2\xf4\xb7\x7c\x58\x7e\xf6\x2d\xbb\x24"
++	"\x14\x5a\x20\x24\xa8\x12\xdf\x25\xbd\x42\xce\x96\x7c\x2e\xba\x14"
++	"\x1b\x81\x9f\x18\x45\xa4\xc6\x70\x3e\x0e\xf0\xd3\x7b\x9c\x10\xbe"
++	"\xb8\x7a\x89\xc5\x9e\xd9\x97\xdf\xd7\xe7\xc6\x1d\xc0\x20\x6c\xb8"
++	"\x1e\x3a\x63\xb8\x39\x8e\x8e\x62\xd5\xd2\xb4\xcd\xff\x46\xfc\x8e"
++	"\xec\x07\x35\x0c\xff\xb0\x05\xe6\xf4\xe5\xfe\xa2\xe3\x0a\xe6\x36"
++	"\xa7\x4a\x7e\x62\x1d\xc4\x50\x39\x35\x4e\x28\xcb\x4a\xfb\x9d\xdb"
++	"\xdd\x23\xd6\x53\xb1\x74\x77\x12\xf7\x9c\xf0\x9a\x6b\xf7\xa9\x64"
++	"\x2d\x86\x21\x2a\xcf\xc6\x54\xf5\xc9\xad\xfa\xb5\x12\xb4\xf3\x51"
++	"\x77\x55\x3c\x6f\x0c\x32\xd3\x8c\x44\x39\x71\x25\xfe\x96\xd2"
++};
++
++void __init fips_signature_selftest_rsa(void)
++{
++	fips_signature_selftest("RSA",
++				certs_selftest_rsa_keys,
++				sizeof(certs_selftest_rsa_keys) - 1,
++				certs_selftest_rsa_data,
++				sizeof(certs_selftest_rsa_data) - 1,
++				certs_selftest_rsa_sig,
++				sizeof(certs_selftest_rsa_sig) - 1);
++}
+-- 
+2.45.0
+
