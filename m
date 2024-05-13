@@ -1,147 +1,133 @@
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72C580BE3;
-	Mon, 13 May 2024 22:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06AE92C1A9
+	for <linux-crypto@vger.kernel.org>; Mon, 13 May 2024 22:13:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715637853; cv=none; b=CMGBK7T+tV062ilMCzoqLhBgTcnKoDcyMye7hbVtAumlCtwnhFIc1EFytYypfju3ItMCmDNYBozqRVV38QyH0mTWORIZbEI/Opzh5YPja/GD1JBBxGuiA/2e9Z6RiBpKJZJJwpo0SdL5SBFdXGD3z4o+7ExEri3MnxEJLDe0bW8=
+	t=1715638394; cv=none; b=PoHGZMU34vBXAc1VqkP03licEXTQjjDkMi7F8korGCBk20Ut/HT5dXMWIAM4awYoyn3NIOOxe1tq7yO+B5F4hrB2k/yeQVSKUR4LHObtkSPobJ/KYgnH8ZyPYgzDl+3hnSaf0elgrejX5UTT2tuBHTsA7Y/dGJd7Sxc4AXpd/1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715637853; c=relaxed/simple;
-	bh=+5NnhdTqGLgbqRt65aGcxQilFEyt2d+vF5jyJsqWz/8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Zi5SofWGkCpv9M3Yzskgfol3WQ8KgOGmtDaH+oIdv2WjrmPiQJa4p3y+2t+o3aRMqt2SqZix7X97LMAIhuLBolHDnADGw2KskKoMY0YqxVznVxFizNHrA8uJ5jk9PZ0qu0D+ii6DONjyNxq0zPSbbqvVlpqbaHcwYptO4SJw+D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=omC4OWUq; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+	s=arc-20240116; t=1715638394; c=relaxed/simple;
+	bh=kd7mGogZ8Fm6S2jihTGjWVAjQyjfhfYYNYzr2e886ck=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ucOUC++ODyKvuexPGuz80z0bxVHyUB6SDh79DV44fMz5h4J1RzTWsqtOSPhJGplH3W4r803sS7NozpwHKK5XQ/2cnDXIrDOCTBxqLMLq3IlU+NuWAH0Bci/cBf70UHbFKpQ5igdcvtUBhC+6JmVsxxB/Fr6N5RnnrO2iMmaJlK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=FuEd38Yl; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="omC4OWUq"
-Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id F1DE587CDA;
-	Tue, 14 May 2024 00:04:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1715637848;
-	bh=r7aGBuMKfnpQF7IqQKDwqXemymokbgzAAMpCCmuF0v4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=omC4OWUq8OW0Fh1BIO1BB1rG7Ghaa5THWYgXgUqQO7sCYWq6+bfVn2BQKECj49yi0
-	 y7496Llpj0770i2+ShOVs/CoPgq0+WxeaOmreOE9A3OaL7T7AiEwwQcGPDbomY0ji9
-	 RZ+3scgUBYT3DkxpPLpgct9L/dBUnRMpimL72GnNwEyrb/U669A7tf9jnhLC8eBCdN
-	 ItFO3LYUyRnSRY8ORmC8qxUzqQ/vay6UpYB1z2B0gfWhwziXYSMKLhWMvH547zMN1y
-	 u2qSQ9o0D6aMgXDTcDO3VuJOmaTVRzu85iCScEol2s7SJ4oaX16oWWJzkGRHDrc8U0
-	 vBdZ/XDsOKuzQ==
-From: Marek Vasut <marex@denx.de>
-To: linux-crypto@vger.kernel.org
-Cc: Marek Vasut <marex@denx.de>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Gabriel Fernandez <gabriel.fernandez@foss.st.com>,
-	Gatien Chevallier <gatien.chevallier@foss.st.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Rob Herring <robh@kernel.org>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-clk@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH] [RFC] clk: stm32mp1: Keep RNG1 clock always running
-Date: Tue, 14 May 2024 00:02:28 +0200
-Message-ID: <20240513220349.183568-1-marex@denx.de>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="FuEd38Yl"
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a59a934ad50so1155585766b.1
+        for <linux-crypto@vger.kernel.org>; Mon, 13 May 2024 15:13:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1715638391; x=1716243191; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ps+jWjBcJqtAnfvkCrJQhLLxq6+xUCZXu8MlaxS7yCo=;
+        b=FuEd38Yl+T9l+EPYhb+5aWa/9EZG9pv2mHpqvHJ9WAzDqsspyGdF8+TehMhERzi6OV
+         OFgrDUsagks92fQ718MNtg38+N1TTygyk0j2qu2xN6w20MtaDPdiRheIpkYHVA28V5I8
+         VjRWjogTt+pka6Pi4pP86pncBCBKrFM9HkEnk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715638391; x=1716243191;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ps+jWjBcJqtAnfvkCrJQhLLxq6+xUCZXu8MlaxS7yCo=;
+        b=Snnc5tfcEs7BytcQiyoWXR0Zb07VL9I0DOpdPP8DBVlqs8KtgHHtPiWPTMRnjCRM9D
+         PuQNtTqG9O+3pKBYRxSeGhfd0CGWTqDwzWUUFKRTKVGm4eofCiBUwtA9XKG+6MSlGtTA
+         cBDi5iFKbQT6xaGPMWj1MtlXTwx0VCHYLPmOTjxFtKhXM5pYVMTLj6BCGh12qkYZRvJF
+         YJr9tzAyNSy85vwTU7Hqra2jsh8irRtPPAZP13mbpSiIqCUs5xd6KCwc4ZlA7LXf9FXk
+         znx/aV3IGYjemddtbJ4kBEr5FsenV/WV+DxpgO//HTJuDQAKG5qqHagYIJD+HzaVnH5+
+         /RcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVClfRl7GVK9aLO3l/JwA9lPRe4SBbJ7x9pzDzR4MK8EievUcK7PEyGXYgJuBgTkbW1a6RjkfzQHTaDvpg6659ChgnCTPhRNZwT5/z/
+X-Gm-Message-State: AOJu0YwrP5BlD4gHjozzcm+NFuekjHQA+tj5vkUZgbHAPJkMRA5kOxv2
+	yQrn171vy4fdFeLjj8qfujNA2fSg8NjGSeXRa1ivAxTixbsB7Us1SXqs+PjiR5Wwz9hogbHEd+u
+	m0gAUtQ==
+X-Google-Smtp-Source: AGHT+IErp4LLlwKtrwvkRFEja1lX2Aymj+yswO9eID2TZ22Ehr9Fi0K/P7/6KF6FlCCLmuFaup5cPQ==
+X-Received: by 2002:a50:870d:0:b0:56d:fca5:4245 with SMTP id 4fb4d7f45d1cf-5734d5c0f47mr7382707a12.10.1715638391009;
+        Mon, 13 May 2024 15:13:11 -0700 (PDT)
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com. [209.85.218.53])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5733becfde7sm6725665a12.48.2024.05.13.15.13.10
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 May 2024 15:13:10 -0700 (PDT)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a59a9d66a51so1140180366b.2
+        for <linux-crypto@vger.kernel.org>; Mon, 13 May 2024 15:13:10 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXdWDz72NkQ3un2IPL9H4GBGHM0VBkTrON1S44aMgzW6H+v16e+6OqHr8OufE4XO8gAbV8MYyQQcxOAjvsJd5TExBvsFJpXoy3rpyPI
+X-Received: by 2002:a17:906:aa4d:b0:a59:c23d:85d8 with SMTP id
+ a640c23a62f3a-a5a2d6653f4mr737764966b.51.1715638390051; Mon, 13 May 2024
+ 15:13:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+References: <Yui+kNeY+Qg4fKVl@gondor.apana.org.au> <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
+ <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au> <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
+ <ZEYLC6QsKnqlEQzW@gondor.apana.org.au> <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
+ <ZOxnTFhchkTvKpZV@gondor.apana.org.au> <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au> <ZfO6zKtvp2jSO4vF@gondor.apana.org.au> <ZkGN64ulwzPVvn6-@gondor.apana.org.au>
+In-Reply-To: <ZkGN64ulwzPVvn6-@gondor.apana.org.au>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Mon, 13 May 2024 15:12:53 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjmwmWv3sDCNq8c4VHWZUtZH72tDqR=TcgfpxTegL=aZw@mail.gmail.com>
+Message-ID: <CAHk-=wjmwmWv3sDCNq8c4VHWZUtZH72tDqR=TcgfpxTegL=aZw@mail.gmail.com>
+Subject: Re: [GIT PULL] Crypto Update for 6.10
+To: Herbert Xu <herbert@gondor.apana.org.au>, Lukas Wunner <lukas@wunner.de>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-In case of STM32MP15xC/F SoC, in case the RNG1 is enabled in DT, the RNG1
-clock are managed by the driver. The RNG1 clock are toggled off on entry
-to suspend and back on on resume. For reason thus far unknown (could this
-be some chip issue?), when the system goes through repeated suspend/resume
-cycles, the system eventually hangs after a few such cycles.
+On Sun, 12 May 2024 at 20:50, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> Lukas Wunner (1):
+>       X.509: Introduce scope-based x509_certificate allocation
 
-This can be reproduced with CONFIG_PM_DEBUG 'pm_test' this way:
-"
-echo core > /sys/power/pm_test
-while true ; do
-    echo mem > /sys/power/state
-    sleep 2 ;
-done
-"
-The system locks up after about a minute and if WDT is active, resets.
+I absolutely hate how this commit tries to remove one single compare
+instruction by introducing a *very* dangerous hack.
 
-If the RNG1 clock are kept enabled across suspend/resume, either using
-this change, or by keeping the clock enabled in RNG driver suspend/resume
-callbacks, the system does not lock up.
+The whole 'assume()' thing will generate actively wrong code if that
+assumption conditional doesn't hold, to the point of being completely
+impossible to debug.
 
-NOTE: This patch is a workaround. It would be good to know why does this
-      change make the hang go away, whether this is a chip issue or some
-      other problem ?
+Having random kernel code add random "assume()" lines is absolutely
+not what we should do. Particularly not in some random code sequence
+where it absolutely does not matter ONE WHIT.
 
-Signed-off-by: Marek Vasut <marex@denx.de>
----
-Cc: "Uwe Kleine-König" <u.kleine-koenig@pengutronix.de>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: Gabriel Fernandez <gabriel.fernandez@foss.st.com>
-Cc: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Michael Turquette <mturquette@baylibre.com>
-Cc: Olivia Mackall <olivia@selenic.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: Stephen Boyd <sboyd@kernel.org>
-Cc: Yang Yingliang <yangyingliang@huawei.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-clk@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-stm32@st-md-mailman.stormreply.com
----
- drivers/char/hw_random/stm32-rng.c | 2 ++
- drivers/clk/stm32/clk-stm32mp1.c   | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+Now, I've pulled this, but I killed that  "assume()" hackery in my merge.
 
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index 7d0de8ab5e7f5..ec0314f05ff3e 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -403,6 +403,7 @@ static int __maybe_unused stm32_rng_suspend(struct device *dev)
- 
- 	writel_relaxed(priv->pm_conf.cr, priv->base + RNG_CR);
- 
-+	// Keeping the clock enabled across suspend/resume helps too
- 	clk_disable_unprepare(priv->clk);
- 
- 	return 0;
-@@ -434,6 +435,7 @@ static int __maybe_unused stm32_rng_resume(struct device *dev)
- 	int err;
- 	u32 reg;
- 
-+	// Keeping the clock enabled across suspend/resume helps too
- 	err = clk_prepare_enable(priv->clk);
- 	if (err)
- 		return err;
-diff --git a/drivers/clk/stm32/clk-stm32mp1.c b/drivers/clk/stm32/clk-stm32mp1.c
-index 7e2337297402a..1a6e853d935fa 100644
---- a/drivers/clk/stm32/clk-stm32mp1.c
-+++ b/drivers/clk/stm32/clk-stm32mp1.c
-@@ -2000,7 +2000,7 @@ static const struct clock_config stm32mp1_clock_cfg[] = {
- 	KCLK(SDMMC3_K, "sdmmc3_k", sdmmc3_src, 0, G_SDMMC3, M_SDMMC3),
- 	KCLK(FMC_K, "fmc_k", fmc_src, 0, G_FMC, M_FMC),
- 	KCLK(QSPI_K, "qspi_k", qspi_src, 0, G_QSPI, M_QSPI),
--	KCLK(RNG1_K, "rng1_k", rng_src, 0, G_RNG1, M_RNG1),
-+	KCLK(RNG1_K, "rng1_k", rng_src, CLK_IS_CRITICAL, G_RNG1, M_RNG1),
- 	KCLK(RNG2_K, "rng2_k", rng_src, 0, G_RNG2, M_RNG2),
- 	KCLK(USBPHY_K, "usbphy_k", usbphy_src, 0, G_USBPHY, M_USBPHY),
- 	KCLK(STGEN_K, "stgen_k", stgen_src, CLK_IS_CRITICAL, G_STGEN, M_STGEN),
--- 
-2.43.0
+Because there is no way we will ever encourage random code to make
+these kinds of patterns, and I most definitely do not want anybody
+else to try to copy that horrendous thing.
 
+Yes, yes, we have "unreachable()" in other places, and yes, you can
+make compilers generate garbage by using that incorrectly. But they
+should be about obvious code warning issues, not about "let's save one
+conditional instruction".
+
+Now, if somebody really *really* cares about that one extraneous
+conditional, particularly if it shows up in some more important place
+than some random certificate parsing routine where is most definitely
+is not in the least critical, there are better models for this
+optimization.
+
+Maybe somebody can teach the kernel build in *general* that
+"kmalloc()" and friends never return an error pointer, only NULL or
+success? That would not necessarily be a bad idea if the scope-based
+cleanup otherwise causes issues.
+
+But this kind of hacky "one random piece of kernel code uses a very
+dangerous pattern to state that some *other* piece of kernel code has
+particular return patterns" - that is not at all acceptable.
+
+Put another way: it would probably be ok if the SLAB people added some
+"this function cannot return error codes" annotation on their core
+declaration and it fixed an issue in _general_.
+
+But it is *not* ok if random kernel code starts randomly asserting the
+same thing.
+
+Quod licet Iovi, non licet bovi.
+
+                 Linus
