@@ -1,249 +1,254 @@
-Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2066.outbound.protection.outlook.com [40.107.21.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAD81E493
-	for <linux-crypto@vger.kernel.org>; Mon, 13 May 2024 04:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715576147; cv=none; b=g2UHEJLy16UqLiHWH/NmSYtHi5mSma0GKegr7SfN37jMQlpgopOtT6v1Q1dGdyir10J8VeJRXNdY0Yb3A9LJrjmkFwhMjk+Vo4ecTR4+XoxGGa3oXu+31wXnHoUQlyrPWQzMHHiD4OuEML9oHt06nZskNqOyFWMDhC+kJ/LX0W4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715576147; c=relaxed/simple;
-	bh=p4HfTA5rMshk/AiJJiyGFxzol0+mosS5hoZUNDDJMeM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l30PTdpQV5wfVAfq0Vd/RU2+QK0gL1GAB09zhoS6Rkmck/H/Z/f+zAjuffWfmn/73tR1pi35Ks3pfXaZGy9cRPDiO4/0GMSYJS3vhTccB11Kefsew2FZ0KECtr5EK+/51Fr+ZEygjTulP4dA0SDTrxOiR6AVnUvlOGlu8zlPwe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=h3hZg/wG; arc=none smtp.client-ip=129.153.194.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD612EB07;
+	Mon, 13 May 2024 06:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715580595; cv=fail; b=ZNPdocdgnIXy+38nOozA+aJBOeOHXTwRvCAz7RmFoWg3hOgJFlqjyVr9A/A+diH8axAWV5/QmP75sO0//pTON1xIEGxxkFtHv14faRaezWzbJ65bXdXQMUK6NJoFM3goNioDBwwYUygNMbgZfeRkLb2UBzi/on9OOrk0ua3YRDI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715580595; c=relaxed/simple;
+	bh=F9i7oJofwy9wIEfuXO3nE57aNxlXD5fNNgTXHPrM08o=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YCffNtymaC6Io/5yWf0+T+wgp+xTiz4n5nNx8xQ6SV5CGRUQJIFHAeDQtQX1hx/zKj/0txYndIxWMjFaK5Zp+IZNWWmpXOMKo81qtMvSZDXQAfW1rQtAn+U/SSIijqmkNf9pGHbRxmS/pfc8XDBYlFlvXL/RjQ/JQ6BNj0VjasA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=AqcYyHWh; arc=fail smtp.client-ip=40.107.21.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="h3hZg/wG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
-	t=1715576144; bh=p4HfTA5rMshk/AiJJiyGFxzol0+mosS5hoZUNDDJMeM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=h3hZg/wGGp/tehtkflFQoYuA1gN92WJ2gUq9rla/UO9gATWretUDb1yhp9QeVEyuh
-	 EAW5Me+/PrFvjkaNwBKhU61NgU4KSAzAc/2EpeKQiw9rSBFE5ed4KE/Es5TriWJ82c
-	 HfwPD3VaefBBYRMa+oiZMYPiIkgU4xMn/7u3CSQS6/LFPC0mx7Fj9a0buP+Iwwp+B4
-	 LcoEDHrN4qI2qTMjTIb80c+jNtddRmSVTztE6MDVtMJZhB/glqzzDee7iXP3KeZIGY
-	 4UzB17f/B2NDmaDH+sL20UxDGPUpUVL6FalAei7o0MwBeozOzLSdRdwPIIvcJa10DW
-	 k3XgA4dF1blHQ==
-From: Joachim Vandersmissen <git@jvdsn.com>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David Howells <dhowells@redhat.com>,
-	Simo Sorce <simo@redhat.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Joachim Vandersmissen <git@jvdsn.com>
-Subject: [PATCH v5 2/2] certs: Add ECDSA signature verification self-test
-Date: Sun, 12 May 2024 23:55:07 -0500
-Message-ID: <20240513045507.25615-2-git@jvdsn.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240513045507.25615-1-git@jvdsn.com>
-References: <20240513045507.25615-1-git@jvdsn.com>
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="AqcYyHWh"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Bki0rv/ZWImSb0Q74Ans7Pe4fZdCAl5//VQWTYU5D5D3O/Gkolbpdh8pUHv3Jp96ZJezWI8qqvUuuNt0j5fTVqLbscsTjQ0z2GPUAedvYL/SOOvza3/AYrx9nbHLGmJEbt/Kj+nx6io1w0ddnxBmIPhXhRQrz1cZnHZJH8w6z7URyTjDypdpgX0P6d+pfEfWHXLlQZyE8aFn1QMvsM1ef0O3gFarOmmGWuJrPJg4RQmUxSa6IhY+bgwgmuEhKpiRZkCfA/idDeix2Cs073WpoKKEyU5wyhycdNc5l9UBR9BcQh7iSHJ3oYlDunu3oU71IpcU5jSaeToYbxsHKqSR8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8YWN/6PYNNRFz0Rq6H6t3Y23q4UhsxMobOeZFe1uXAs=;
+ b=VNyTrC3KE/qlxvV9p+ZFSUXIFHJJ4oDmubmZvttwbRl3oBhOHHDZI1Dxz4SvE7OXbiyzUwNOiAggHd9HNK0Yyj/NgzvfDyxt2jQ03xs1b9j/+9fiW8U5/GoX5AyytJbZBjgFj4HBBPeD/HihNeRF2QNo7SR1VKZYjLn4cXOkVCwu5ke+HBubiCLWVFvF6hrvz9ICW4nBfX802qtT/PXu9wGeNejMfzbUz4j5vsQ7eP9H2HseN+OYTwkmAJNJsE970f/EhFNJgdUc+gIQlCyMKdzEAMYy7QockRSeTjwyg+f58M6BVA6zZ4D9XHsfMz42Fvu29hx1VTtdtgF5TEIpew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8YWN/6PYNNRFz0Rq6H6t3Y23q4UhsxMobOeZFe1uXAs=;
+ b=AqcYyHWh9ovqNOmMuaGSsc9VUCb4BON+1Zya7tKCsD3zl3kL/1hlN6MYLUYu+s3OK5ULE7siNmj14/rG4bAlLWVyJpOER0pA5xvEkfJjhr67AkJ26lIhOylXOwJriq1IFZMDBcRE6fGkucSaIiEQKZuarCkn5h1WNZ4rf7A+fF0=
+Received: from AM9PR04MB8604.eurprd04.prod.outlook.com (2603:10a6:20b:43b::21)
+ by PA4PR04MB9568.eurprd04.prod.outlook.com (2603:10a6:102:26e::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Mon, 13 May
+ 2024 06:09:50 +0000
+Received: from AM9PR04MB8604.eurprd04.prod.outlook.com
+ ([fe80::e751:223e:aa3d:5827]) by AM9PR04MB8604.eurprd04.prod.outlook.com
+ ([fe80::e751:223e:aa3d:5827%4]) with mapi id 15.20.7544.052; Mon, 13 May 2024
+ 06:09:49 +0000
+From: Pankaj Gupta <pankaj.gupta@nxp.com>
+To: Gaurav Jain <gaurav.jain@nxp.com>, Horia Geanta <horia.geanta@nxp.com>,
+	Varun Sethi <V.Sethi@nxp.com>, "herbert@gondor.apana.org.au"
+	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
+	Iuliana Prodan <iuliana.prodan@nxp.com>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, dl-linux-imx <linux-imx@nxp.com>
+Subject: RE: [PATCH v3 1/2] caam: init-clk based on caam-page0-access
+Thread-Topic: [PATCH v3 1/2] caam: init-clk based on caam-page0-access
+Thread-Index: AQHaj7/jd4TDxURXIUidF1KPvahm+7GU2IkA
+Date: Mon, 13 May 2024 06:09:49 +0000
+Message-ID:
+ <AM9PR04MB86046A94F0CF06AFFE5DE3B895E22@AM9PR04MB8604.eurprd04.prod.outlook.com>
+References: <20240416053303.421259-1-pankaj.gupta@nxp.com>
+ <20240416053303.421259-2-pankaj.gupta@nxp.com>
+In-Reply-To: <20240416053303.421259-2-pankaj.gupta@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM9PR04MB8604:EE_|PA4PR04MB9568:EE_
+x-ms-office365-filtering-correlation-id: 10acd133-89b9-4f08-63ef-08dc73134c29
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|376005|1800799015|366007|38070700009;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?isA8xBkJQnK+X1VTCJUK4WXbppUBXnwOO7amuA5qca2PniRFukx8+3BcUb2I?=
+ =?us-ascii?Q?KUfvMvRVDnsFLpWXU1uR8QGnp/2nAcrsK3emAjn6g9Bpl9J4Wj0RWn3j8/EG?=
+ =?us-ascii?Q?trU8KtXG/spfH136QoKqYo8b9S5MQLHnuXFH+QTHnplz9TOAv6bwx18pL2jv?=
+ =?us-ascii?Q?lb0Wq/OYfaIT2+klqiiV+ohsq8OLakLSFAOpI2SRBB7kFaFdKhuECtoZdpOT?=
+ =?us-ascii?Q?ZdhrDoN5OhkfGd4y3ISWlm4S7DDTVYe+vhtblKVqGqqXZ+twvX+hjB8byxym?=
+ =?us-ascii?Q?EOmSXDtRnobX4yq+je4Pji+b/nUNXuZthIH1ZDDuTjlNxroTyHy+3B9LrhY1?=
+ =?us-ascii?Q?jEAt0nQttSu1RImk1W57wF1u2PRE8w/Og8Xh6XuLFpK/ke1bOhZIkcfe/GuA?=
+ =?us-ascii?Q?kQOJHkd02So7/XDhC4wYYrUlrKAoOpMMvj/VaWAKsLUDO+UCEozwIuWd1a1r?=
+ =?us-ascii?Q?spjBGFJfi/JrUEejKF1c18/l0HIHD7ksvem3XsQESpAc5jocqIcmZtU5TwBj?=
+ =?us-ascii?Q?ZsZrh+SD9jS90Nd4jO2G3dzQbLymDf6ELte1QRWG/mYPGcsNgLvONDcgQJRx?=
+ =?us-ascii?Q?ShgjbHEbQVTkaA3BOt0oJd8KNUtNd0mSNsXcmHBh7yZ1cbblBqqKlOxik+xY?=
+ =?us-ascii?Q?uXtnb01n82JD6FysMZLQrz9HJUwyCTDIIo5nPdatJlweT2hGRMeLFCvSRc26?=
+ =?us-ascii?Q?2+i7YWmVX4LG/eVuSNMeFL+AFdOxwR4Z0MAbgBtsl6h4yrHJ4/LhNBSMzlv1?=
+ =?us-ascii?Q?1vmTp98HIdSzO5qVxOx1U9F3SmbTx1T0yr/exoTXyDYt92r5dYhcgDth/gho?=
+ =?us-ascii?Q?9vIBWeUSzZgQK+19B99wxB7s9ibC8Cgy4o/Q8NK9Sw//H2H/VONTB0Igv2Pb?=
+ =?us-ascii?Q?ZfE5llnGW4ca2cPE/4dRbkzoCUCRv3dk/zZHUduJewzepRx8/klh5CLIK/CJ?=
+ =?us-ascii?Q?VoObKU0i0wHjCs0gMYLgr7M+uceAyHkhV3MQvj7k7Cw4tUB7ZxBpw6yKAFNK?=
+ =?us-ascii?Q?tunwop0Odrq2wb5hgEJRd+rBV6tr1h1P46aizTrCwXPTQ9Jh+S4VfFu4aPvU?=
+ =?us-ascii?Q?Cz2qCq6d6G3p6ZrG7il1+yumoUTcpySRm3C1by21pWiAksJwzdeFOE2UMZWd?=
+ =?us-ascii?Q?yiC3+3NkXe0akklIsLOn3ckvWqMQjUNsCxj8jl+FJY0MXoYipAn7oXNoVSNG?=
+ =?us-ascii?Q?glJjWVjMbkJeIPMEiofV4vT8ifjf5JCt+q5RptABp9Thw77lUievIUL0bscK?=
+ =?us-ascii?Q?bb2+oylvm7iQVEgEGWik2thazuyStkdamwVRrLxJhhEh87GNGy7AUHcGnUzW?=
+ =?us-ascii?Q?swHPxS8lWXVBy8s4FdTxxUfw89pZ3RmJI2sb7Ni4cfQRYA=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8604.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ER5QDCX2Pz1gDXRomwoBchqU938BPIeZL7xFRMK03knOE7t2mLIaZoA6XzyI?=
+ =?us-ascii?Q?+5XCZXxQD5xQ6ZjovqBR/8cYoYqGT57k0xQqYsOzuU7SoEQ12KCMZ49jRKEv?=
+ =?us-ascii?Q?tP2ielXh6PDCy9AHa+t32kB982n1Xop//SJ76s9wSefrDTV7YtW+slXxqY1Z?=
+ =?us-ascii?Q?XzK+XqvVgIIO8geh4/tjXuPHKhvJAHwjzGKEOroZW/V+xbg3MVY75DDveEO1?=
+ =?us-ascii?Q?DXDel5fPjfBYeMI8xvuxDqIMBBDQkFBIFtnTNnTV31KZNrGJKsblZvuPtlDj?=
+ =?us-ascii?Q?JEC0uegcOpgQyKVnbMjCCHQiirCdXucPdUy6VF8RnG6DyWDXiWZec+Qwg1i0?=
+ =?us-ascii?Q?Y3WOfbvAzzN3Gub5kl8rF4GqTRB3lJZqyqnLsGcsapjqXehO88p8TF3SuEz8?=
+ =?us-ascii?Q?f0+KQ2PzBfk4GxiEGqq8hVnaO/U1U30EDk+PMPmRYVN7kwUbUJFNB87+yoIC?=
+ =?us-ascii?Q?spoKw5SXFOV6xw34FLqNUzkVnasdjXB244JBTLjoEvEUITLxUkyFMntGrNze?=
+ =?us-ascii?Q?tVyv1k/KH6vjZKLGt5v//XrDaB3QQtBwKwb7nuCao1SipGlXE1E/Fsb8t6MT?=
+ =?us-ascii?Q?i7w9lvwycJOutCf7F7poVp8RHDBFCcS+HCizaiwC52y8tM+XLTOKl9yqAVPF?=
+ =?us-ascii?Q?vChSP7iLN4Aj7LX3p+mNxBoJrb3r1jqTbzB9lhqYgLahY7cEyCnC+YbB/hAT?=
+ =?us-ascii?Q?IUMriczl0T4GJuT1r3rQ9nxtbNRDNh91ZnUIPxBwSjuSpBEXkO9M/a2sazR3?=
+ =?us-ascii?Q?ruEN0RfJSxA+Lk4l0jnq6HS85e9ydLS8ElD4EgtBNJhUqj+QJvKQdMmhDQEk?=
+ =?us-ascii?Q?NfrR6SXN5UzE2BhqI/ThOVQDUBuhOyiRweXD51zPs0+n+sTRY+kAru6ZfTFt?=
+ =?us-ascii?Q?yNw4QAFdZyBVCkDCyVhMZEpgvca+qT8q9ENhMDSDKbBCGAFFLO92IsTxRUC1?=
+ =?us-ascii?Q?Ury7Xi0Wf5oLdeWHud2tZwOnwYE6Tr79TVL4p29tOIVBJvdjxwA37QNAvReu?=
+ =?us-ascii?Q?j1rywXagGhss2WBu6HwBdr8quiO+0sP0b+Sd0WViGCDSQytp5atd9iE3D7QU?=
+ =?us-ascii?Q?P1C3tIw7zN73SlwfaHIyi1Mht7vwMl/bavMADN31/IFsIdkVzg+oZOrl9DTH?=
+ =?us-ascii?Q?oadFPJ6jhqO3Y9GSsTw9K+C463ps+jTEE46qp5iZ27UfIr5Cf4SwtNzvXQ1T?=
+ =?us-ascii?Q?KkVE8Z4dewD/MU/TFDcLHqlMEE550J2qFvzwwqYbq2nTuiMo6oUVJyb0unG0?=
+ =?us-ascii?Q?CsW+MA4fpeK6ZtgcOQ0KBGQu570TIdoAv9dFHmFrL/y8pGZNheEnRqAvaA4H?=
+ =?us-ascii?Q?xZoMOLu2oh9LI2zTOK4/agHR5+JGbRV+UDrk3gmNnviPVbyPaK4FALe14VHz?=
+ =?us-ascii?Q?/WXmXx2NAGOtc1ubN4cYeStoZrI2GVdlUupoXHLpMRE5WTiCdE+2zJFIF6hv?=
+ =?us-ascii?Q?1DQAXUxBf4/ZAqFZmCKup/WkoiMr7IIEnT6a8xxsOsbZTPBrYJ6VQkrcmMjM?=
+ =?us-ascii?Q?HIFDnbV1dtupDlwodcq14kw6CwkzzjLoN+EKawbzDiIaDzGPt957CMLBn5t7?=
+ =?us-ascii?Q?0KELM8ODc8S15bAElU7tnDNo628IzvntwttO56PF?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8604.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10acd133-89b9-4f08-63ef-08dc73134c29
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 May 2024 06:09:49.9036
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: js1bhQRG7uY3zWyIW3LEIP6i02K8L0eOV2jYPKY/1FLBlu6l4DRsGz9Rx3qmjcXA1a7Zl85bfqEG9kGKa7GicA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB9568
 
-Commit c27b2d2012e1 ("crypto: testmgr - allow ecdsa-nist-p256 and -p384
-in FIPS mode") enabled support for ECDSA in crypto/testmgr.c. The
-PKCS#7 signature verification API builds upon the KCAPI primitives to
-perform its high-level operations. Therefore, this change in testmgr.c
-also allows ECDSA to be used by the PKCS#7 signature verification API
-(in FIPS mode).
+If there are no further comments, request Herbert to merge the patch-set.
 
-However, from a FIPS perspective, the PKCS#7 signature verification API
-is a distinct "service" from the KCAPI primitives. This is because the
-PKCS#7 API performs a "full" signature verification, which consists of
-both hashing the data to be verified, and the public key operation.
-On the other hand, the KCAPI primitive does not perform this hashing
-step - it accepts pre-hashed data from the caller and only performs the
-public key operation.
+Regards
+Pankaj
 
-For this reason, the ECDSA self-tests in crypto/testmgr.c are not
-sufficient to cover ECDSA signature verification offered by the PKCS#7
-API. This is reflected by the self-test already present in this file
-for RSA PKCS#1 v1.5 signature verification.
 
-The solution is simply to add a second self-test here for ECDSA. P-256
-with SHA-256 hashing was chosen as those parameters should remain
-FIPS-approved for the foreseeable future, while keeping the performance
-impact to a minimum. The ECDSA certificate and PKCS#7 signed data was
-generated using OpenSSL. The input data is identical to the input data
-for the existing RSA self-test.
-
-Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
----
-v5: move the changelog to the right place.
-
-v4: FIPS_SIGNATURE_SELFTEST_ECDSA is no longer user-configurable and will
-be set when the dependencies are fulfilled.
-
-v3: adding the FIPS_SIGNATURE_SELFTEST_RSA configuration option to
-enforce that ECDSA (and SHA-256) are either built-in; or ECDSA
-(and SHA-256) and x509_selftest are modules.
-
-v2: add a separate file for the ECDSA self-test.
----
- crypto/asymmetric_keys/Kconfig          |  7 ++
- crypto/asymmetric_keys/Makefile         |  1 +
- crypto/asymmetric_keys/selftest.c       |  1 +
- crypto/asymmetric_keys/selftest.h       |  6 ++
- crypto/asymmetric_keys/selftest_ecdsa.c | 89 +++++++++++++++++++++++++
- 5 files changed, 104 insertions(+)
- create mode 100644 crypto/asymmetric_keys/selftest_ecdsa.c
-
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index 33bbfd0d8367..06e64e29587e 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -93,4 +93,11 @@ config FIPS_SIGNATURE_SELFTEST_RSA
- 	depends on CRYPTO_SHA256=y || CRYPTO_SHA256=FIPS_SIGNATURE_SELFTEST
- 	depends on CRYPTO_RSA=y || CRYPTO_RSA=FIPS_SIGNATURE_SELFTEST
- 
-+config FIPS_SIGNATURE_SELFTEST_ECDSA
-+	bool
-+	default y
-+	depends on FIPS_SIGNATURE_SELFTEST
-+	depends on CRYPTO_SHA256=y || CRYPTO_SHA256=FIPS_SIGNATURE_SELFTEST
-+	depends on CRYPTO_ECDSA=y || CRYPTO_ECDSA=FIPS_SIGNATURE_SELFTEST
-+
- endif # ASYMMETRIC_KEY_TYPE
-diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
-index ac1402e27324..bc65d3b98dcb 100644
---- a/crypto/asymmetric_keys/Makefile
-+++ b/crypto/asymmetric_keys/Makefile
-@@ -25,6 +25,7 @@ x509_key_parser-y := \
- obj-$(CONFIG_FIPS_SIGNATURE_SELFTEST) += x509_selftest.o
- x509_selftest-y += selftest.o
- x509_selftest-$(CONFIG_FIPS_SIGNATURE_SELFTEST_RSA) += selftest_rsa.o
-+x509_selftest-$(CONFIG_FIPS_SIGNATURE_SELFTEST_ECDSA) += selftest_ecdsa.o
- 
- $(obj)/x509_cert_parser.o: \
- 	$(obj)/x509.asn1.h \
-diff --git a/crypto/asymmetric_keys/selftest.c b/crypto/asymmetric_keys/selftest.c
-index ec289d2d065c..98dc5cdfdebe 100644
---- a/crypto/asymmetric_keys/selftest.c
-+++ b/crypto/asymmetric_keys/selftest.c
-@@ -61,6 +61,7 @@ void fips_signature_selftest(const char *name,
- static int __init fips_signature_selftest_init(void)
- {
- 	fips_signature_selftest_rsa();
-+	fips_signature_selftest_ecdsa();
- 	return 0;
- }
- 
-diff --git a/crypto/asymmetric_keys/selftest.h b/crypto/asymmetric_keys/selftest.h
-index 842ac3cf86b4..4139f05906cb 100644
---- a/crypto/asymmetric_keys/selftest.h
-+++ b/crypto/asymmetric_keys/selftest.h
-@@ -14,3 +14,9 @@ void __init fips_signature_selftest_rsa(void);
- #else
- static inline void __init fips_signature_selftest_rsa(void) { }
- #endif
-+
-+#ifdef CONFIG_FIPS_SIGNATURE_SELFTEST_ECDSA
-+void __init fips_signature_selftest_ecdsa(void);
-+#else
-+static inline void __init fips_signature_selftest_ecdsa(void) { }
-+#endif
-diff --git a/crypto/asymmetric_keys/selftest_ecdsa.c b/crypto/asymmetric_keys/selftest_ecdsa.c
-new file mode 100644
-index 000000000000..3ee2e4ea9e3f
---- /dev/null
-+++ b/crypto/asymmetric_keys/selftest_ecdsa.c
-@@ -0,0 +1,89 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* Self-tests for PKCS#7 ECDSA signature verification.
-+ *
-+ * Copyright (C) 2024 Joachim Vandersmissen <git@jvdsn.com>
-+ */
-+
-+#include <linux/module.h>
-+#include "selftest.h"
-+
-+/*
-+ * Set of X.509 certificates to provide public keys for the tests. These will
-+ * be loaded into a temporary keyring for the duration of the testing.
-+ */
-+static const u8 certs_selftest_ecdsa_keys[] __initconst = {
-+	/* P-256 ECDSA certificate */
-+	"\x30\x82\x01\xd4\x30\x82\x01\x7b\xa0\x03\x02\x01\x02\x02\x14\x2e"
-+	"\xea\x64\x8d\x7f\x17\xe6\x2e\x9e\x58\x69\xc8\x87\xc6\x8e\x1b\xd0"
-+	"\xf8\x6f\xde\x30\x0a\x06\x08\x2a\x86\x48\xce\x3d\x04\x03\x02\x30"
-+	"\x3a\x31\x38\x30\x36\x06\x03\x55\x04\x03\x0c\x2f\x43\x65\x72\x74"
-+	"\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63\x61"
-+	"\x74\x69\x6f\x6e\x20\x45\x43\x44\x53\x41\x20\x73\x65\x6c\x66\x2d"
-+	"\x74\x65\x73\x74\x69\x6e\x67\x20\x6b\x65\x79\x30\x20\x17\x0d\x32"
-+	"\x34\x30\x34\x31\x33\x32\x32\x31\x36\x32\x36\x5a\x18\x0f\x32\x31"
-+	"\x32\x34\x30\x33\x32\x30\x32\x32\x31\x36\x32\x36\x5a\x30\x3a\x31"
-+	"\x38\x30\x36\x06\x03\x55\x04\x03\x0c\x2f\x43\x65\x72\x74\x69\x66"
-+	"\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63\x61\x74\x69"
-+	"\x6f\x6e\x20\x45\x43\x44\x53\x41\x20\x73\x65\x6c\x66\x2d\x74\x65"
-+	"\x73\x74\x69\x6e\x67\x20\x6b\x65\x79\x30\x59\x30\x13\x06\x07\x2a"
-+	"\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07"
-+	"\x03\x42\x00\x04\x07\xe5\x6b\x51\xaf\xfc\x19\x41\x2c\x88\x92\x6b"
-+	"\x77\x57\x71\x03\x9e\xe2\xfe\x6e\x6a\x71\x4e\xc7\x29\x9f\x90\xe1"
-+	"\x77\x18\x9f\xc2\xe7\x0a\x82\xd0\x8a\xe1\x81\xa9\x71\x7c\x5a\x73"
-+	"\xfb\x25\xb9\x5b\x1e\x24\x8c\x73\x9f\xf8\x38\xf8\x48\xb4\xad\x16"
-+	"\x19\xc0\x22\xc6\xa3\x5d\x30\x5b\x30\x1d\x06\x03\x55\x1d\x0e\x04"
-+	"\x16\x04\x14\x29\x00\xbc\xea\x1d\xeb\x7b\xc8\x47\x9a\x84\xa2\x3d"
-+	"\x75\x8e\xfd\xfd\xd2\xb2\xd3\x30\x1f\x06\x03\x55\x1d\x23\x04\x18"
-+	"\x30\x16\x80\x14\x29\x00\xbc\xea\x1d\xeb\x7b\xc8\x47\x9a\x84\xa2"
-+	"\x3d\x75\x8e\xfd\xfd\xd2\xb2\xd3\x30\x0c\x06\x03\x55\x1d\x13\x01"
-+	"\x01\xff\x04\x02\x30\x00\x30\x0b\x06\x03\x55\x1d\x0f\x04\x04\x03"
-+	"\x02\x07\x80\x30\x0a\x06\x08\x2a\x86\x48\xce\x3d\x04\x03\x02\x03"
-+	"\x47\x00\x30\x44\x02\x20\x1a\xd7\xac\x07\xc8\x97\x38\xf4\x89\x43"
-+	"\x7e\xc7\x66\x6e\xa5\x00\x7c\x12\x1d\xb4\x09\x76\x0c\x99\x6b\x8c"
-+	"\x26\x5d\xe9\x70\x5c\xb4\x02\x20\x73\xb7\xc7\x7a\x5a\xdb\x67\x0a"
-+	"\x96\x42\x19\xcf\x4f\x67\x4f\x35\x6a\xee\x29\x25\xf2\x4f\xc8\x10"
-+	"\x14\x9d\x79\x69\x1c\x7a\xd7\x5d"
-+};
-+
-+
-+/*
-+ * Signed data and detached signature blobs that form the verification tests.
-+ */
-+static const u8 certs_selftest_ecdsa_data[] __initconst = {
-+	"\x54\x68\x69\x73\x20\x69\x73\x20\x73\x6f\x6d\x65\x20\x74\x65\x73"
-+	"\x74\x20\x64\x61\x74\x61\x20\x75\x73\x65\x64\x20\x66\x6f\x72\x20"
-+	"\x73\x65\x6c\x66\x2d\x74\x65\x73\x74\x69\x6e\x67\x20\x63\x65\x72"
-+	"\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63"
-+	"\x61\x74\x69\x6f\x6e\x2e\x0a"
-+};
-+
-+static const u8 certs_selftest_ecdsa_sig[] __initconst = {
-+	/* ECDSA signature using SHA-256 */
-+	"\x30\x81\xf4\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x07\x02\xa0\x81"
-+	"\xe6\x30\x81\xe3\x02\x01\x01\x31\x0f\x30\x0d\x06\x09\x60\x86\x48"
-+	"\x01\x65\x03\x04\x02\x01\x05\x00\x30\x0b\x06\x09\x2a\x86\x48\x86"
-+	"\xf7\x0d\x01\x07\x01\x31\x81\xbf\x30\x81\xbc\x02\x01\x01\x30\x52"
-+	"\x30\x3a\x31\x38\x30\x36\x06\x03\x55\x04\x03\x0c\x2f\x43\x65\x72"
-+	"\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63"
-+	"\x61\x74\x69\x6f\x6e\x20\x45\x43\x44\x53\x41\x20\x73\x65\x6c\x66"
-+	"\x2d\x74\x65\x73\x74\x69\x6e\x67\x20\x6b\x65\x79\x02\x14\x2e\xea"
-+	"\x64\x8d\x7f\x17\xe6\x2e\x9e\x58\x69\xc8\x87\xc6\x8e\x1b\xd0\xf8"
-+	"\x6f\xde\x30\x0d\x06\x09\x60\x86\x48\x01\x65\x03\x04\x02\x01\x05"
-+	"\x00\x30\x0a\x06\x08\x2a\x86\x48\xce\x3d\x04\x03\x02\x04\x48\x30"
-+	"\x46\x02\x21\x00\x86\xd1\xf4\x06\xb6\x49\x79\xf9\x09\x5f\x35\x1a"
-+	"\x94\x7e\x0e\x1a\x12\x4d\xd9\xe6\x2a\x2d\xcf\x2d\x0a\xee\x88\x76"
-+	"\xe0\x35\xf3\xeb\x02\x21\x00\xdf\x11\x8a\xab\x31\xf6\x3c\x1f\x32"
-+	"\x43\x94\xe2\xb8\x35\xc9\xf3\x12\x4e\x9b\x31\x08\x10\x5d\x8d\xe2"
-+	"\x43\x0a\x5f\xf5\xfd\xa2\xf1"
-+};
-+
-+void __init fips_signature_selftest_ecdsa(void)
-+{
-+	fips_signature_selftest("ECDSA",
-+				certs_selftest_ecdsa_keys,
-+				sizeof(certs_selftest_ecdsa_keys) - 1,
-+				certs_selftest_ecdsa_data,
-+				sizeof(certs_selftest_ecdsa_data) - 1,
-+				certs_selftest_ecdsa_sig,
-+				sizeof(certs_selftest_ecdsa_sig) - 1);
-+}
--- 
-2.45.0
+> -----Original Message-----
+> From: Pankaj Gupta
+> Sent: Tuesday, April 16, 2024 11:05 AM
+> To: Gaurav Jain <gaurav.jain@nxp.com>; Horia Geanta
+> <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>;
+> herbert@gondor.apana.org.au; davem@davemloft.net; Iuliana Prodan
+> <iuliana.prodan@nxp.com>; linux-crypto@vger.kernel.org; linux-
+> kernel@vger.kernel.org; dl-linux-imx <linux-imx@nxp.com>
+> Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
+> Subject: [PATCH v3 1/2] caam: init-clk based on caam-page0-access
+>=20
+> CAAM clock initializat is done based on the basis of soc specific info st=
+ored in
+> struct caam_imx_data:
+> - caam-page0-access flag
+> - num_clks
+>=20
+> CAAM driver needs to be aware of access rights to CAAM control page i.e.,
+> page0, to do things differently.
+>=20
+> Signed-off-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+> ---
+>  drivers/crypto/caam/ctrl.c | 18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c inde=
+x
+> bdf367f3f679..247d42aa32df 100644
+> --- a/drivers/crypto/caam/ctrl.c
+> +++ b/drivers/crypto/caam/ctrl.c
+> @@ -512,6 +512,7 @@ static const struct of_device_id caam_match[] =3D
+> {  MODULE_DEVICE_TABLE(of, caam_match);
+>=20
+>  struct caam_imx_data {
+> +	bool page0_access;
+>  	const struct clk_bulk_data *clks;
+>  	int num_clks;
+>  };
+> @@ -524,6 +525,7 @@ static const struct clk_bulk_data caam_imx6_clks[] =
+=3D
+> {  };
+>=20
+>  static const struct caam_imx_data caam_imx6_data =3D {
+> +	.page0_access =3D true,
+>  	.clks =3D caam_imx6_clks,
+>  	.num_clks =3D ARRAY_SIZE(caam_imx6_clks),  }; @@ -534,6 +536,7 @@
+> static const struct clk_bulk_data caam_imx7_clks[] =3D {  };
+>=20
+>  static const struct caam_imx_data caam_imx7_data =3D {
+> +	.page0_access =3D true,
+>  	.clks =3D caam_imx7_clks,
+>  	.num_clks =3D ARRAY_SIZE(caam_imx7_clks),  }; @@ -545,6 +548,7 @@
+> static const struct clk_bulk_data caam_imx6ul_clks[] =3D {  };
+>=20
+>  static const struct caam_imx_data caam_imx6ul_data =3D {
+> +	.page0_access =3D true,
+>  	.clks =3D caam_imx6ul_clks,
+>  	.num_clks =3D ARRAY_SIZE(caam_imx6ul_clks),  }; @@ -554,6 +558,7
+> @@ static const struct clk_bulk_data caam_vf610_clks[] =3D {  };
+>=20
+>  static const struct caam_imx_data caam_vf610_data =3D {
+> +	.page0_access =3D true,
+>  	.clks =3D caam_vf610_clks,
+>  	.num_clks =3D ARRAY_SIZE(caam_vf610_clks),  }; @@ -860,6 +865,7
+> @@ static int caam_probe(struct platform_device *pdev)
+>  	int pg_size;
+>  	int BLOCK_OFFSET =3D 0;
+>  	bool reg_access =3D true;
+> +	const struct caam_imx_data *imx_soc_data;
+>=20
+>  	ctrlpriv =3D devm_kzalloc(&pdev->dev, sizeof(*ctrlpriv), GFP_KERNEL);
+>  	if (!ctrlpriv)
+> @@ -889,17 +895,25 @@ static int caam_probe(struct platform_device
+> *pdev)
+>=20
+>  		reg_access =3D !ctrlpriv->optee_en;
+>=20
+> -		if (!imx_soc_match->data) {
+> +		if (imx_soc_match->data) {
+>  			dev_err(dev, "No clock data provided for i.MX SoC");
+>  			return -EINVAL;
+>  		}
+>=20
+> +		imx_soc_data =3D imx_soc_match->data;
+> +		reg_access =3D reg_access && imx_soc_data->page0_access;
+> +		/*
+> +		 * CAAM clocks cannot be controlled from kernel.
+> +		 */
+> +		if (!imx_soc_data->num_clks)
+> +			goto iomap_ctrl;
+> +
+>  		ret =3D init_clocks(dev, imx_soc_match->data);
+>  		if (ret)
+>  			return ret;
+>  	}
+>=20
+> -
+> +iomap_ctrl:
+>  	/* Get configuration properties from device tree */
+>  	/* First, get register page */
+>  	ctrl =3D devm_of_iomap(dev, nprop, 0, NULL);
+> --
+> 2.34.1
 
