@@ -1,122 +1,87 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE737AD31;
-	Tue, 14 May 2024 06:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31D817583;
+	Tue, 14 May 2024 08:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715669704; cv=none; b=J+IB6TRIaxzfjMEJkUZw0FvIvs69lY6fVtQMzsIFz/t7k+8XG+KvKwo81x2UbUKvzjhEkcwdfN2Ey4M5hVZ0ww3sNNuYY1tVRcN+779KzSd1kxHYlxih/vzLJx87qLnfUZOrcv/Obgi8W0Nrl+CY8/QTRme7NZxIwCzckbxTl4I=
+	t=1715674253; cv=none; b=qktp+wyLUuWpjnbhx1lwx80q00FVcXiN4bAJOGBAgJ4s35irP6haNpDf35aXy/4QR9cm1928VORRxT38cgdbQWd3yAdcSghVRllAuPTf5jMEgcyLI/CwBVQsbHSSfCIfhA+ZSs8cCgrAUOUdHwRw7j4IgxtQx9D7NNjtuk8SAyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715669704; c=relaxed/simple;
-	bh=dnr1nGL3WqI6iGgA/+7AS53QJ5C6Oo8Pvkj89qA/GZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=U8Rfos/kmUwgN4J5E09iyKJ3daCNCzbhRiWBYeQ3x2/DN0BDdSeBg4Nuqa9RrLNoWQxUx4QiwTz7g8md5dln0IsTrzd7svRfoY2VM4DO1kAdM5SCIwDUIKMqiNQGjCCnF5x+lbgfzuvBqjbRVQWkKVvWMhM/LL02l4idx8sBnSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	s=arc-20240116; t=1715674253; c=relaxed/simple;
+	bh=MpHkCTTzT86UodOTRs7438YKurSYodl9BhzbJLYQrFc=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=qsGJ0D2+wLF8CcV2pq2AMeW9XIvx+Y1oscPI/5go4blPY+vNyPyFktg1cEtLSEWVJV9Vi4J1efk+BsE/JqOt8t7Ol2q08w4lG5hTddHc7KrTxRSxa4C5EsJCkALF5c5d1nxSoP6qL38hUk7TlQnQfHsfdkJUjPOvMSPLy0rt+Mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=FG5dvltM; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="FG5dvltM"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C2B0D40E016A;
+	Tue, 14 May 2024 08:10:46 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 5GgcEjtDY3OT; Tue, 14 May 2024 08:10:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1715674243; bh=t5ROxBLyd57crBiDvNCn5htGvcOSCvJ21aXiNcdc1Jc=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=FG5dvltMk9er4ZGaXvdDhAltrQWcMie0x7swib34kGp8na3+Bm2tQyIU/eewygFVm
+	 TEdg0nVvIBeFvFWtwVzrncxatN2IDrDdN2x2VUtDf58H2j+wK6wpLsuVwFbrXTz8y8
+	 +c30TK9zpPkQYwbMeOcPNVTwShQjJ+3CayDY4PRRwMsp8OVu5iC/ZNh2wq3x2nR7Sg
+	 ulJ7EnZ/MWaH2K8EqRk/lJT0YtcFB6Blo08a0pV0Gvke2PKams9StkGzthkKtxMpd0
+	 xbPcXcdwgvDuSmSQ5aFtIOBm4beqZ8i/LQCuYJVRa9jlnIjohP0B1/GLR8Qylxnhn0
+	 DWy8NAQEx3s1ZIWomP/wAtnmCAhjsQ+gV0v86sPuvo/Qf5xsIHLUWnvtDLFt7gYro8
+	 C94c1cl28IE2QuZuX3px16ws3rkWEPmrjUue0GEaeU1QyxCUbUETG4t/uLnnejFZ8F
+	 q70r8GhLiPwv9oJsHiQMa3NQu+ZelgdueHdKwOz2EHG9YxqfYZJwLUMxvq7KOB+jfR
+	 h60Q4BaIKOIEiwB+YUQhISlLKpkzoldR6RUqovhSCogCNkTsxJS1iPWiO9apfu4xRy
+	 Q7HDaOl41AG07Px788iehUPgEs2ghyswpGSrCARG8MU+B6AiN1bXTeQ5g7hRSIh6St
+	 tmd5zLArc3Gxe5H6VLx3MwIs=
+Received: from [IPv6:::1] (p200300eA973a3496499cB1fE0c65A759.dip0.t-ipconnect.de [IPv6:2003:ea:973a:3496:499c:b1fe:c65:a759])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id 74E4410195696;
-	Tue, 14 May 2024 08:54:52 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 3D8A96FAE9C; Tue, 14 May 2024 08:54:52 +0200 (CEST)
-Date: Tue, 14 May 2024 08:54:52 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Julia Lawall <julia.lawall@inria.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>, cocci@inria.fr
-Subject: Re: [GIT PULL] Crypto Update for 6.10
-Message-ID: <ZkMKvAnyOR3_cJnS@wunner.de>
+	 key-exchange X25519 server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5FC3240E0192;
+	Tue, 14 May 2024 08:10:04 +0000 (UTC)
+Date: Tue, 14 May 2024 10:10:02 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <michael.roth@amd.com>
+CC: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+ x86@kernel.org, linux-kernel@vger.kernel.org, tglx@linutronix.de,
+ mingo@redhat.com, jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+ ardb@kernel.org, vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+ dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+ peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+ rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+ kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ pankaj.gupta@amd.com, liam.merwick@oracle.com, papaluri@amd.com
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v15_22/23=5D_KVM=3A_SEV=3A_Fix_return_c?=
+ =?US-ASCII?Q?ode_interpretation_for_RMP_nested_page_faults?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <a47e7b49-96d2-4e7b-ae39-a3bfe6b0ed83@redhat.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com> <20240510015822.503071-1-michael.roth@amd.com> <20240510015822.503071-2-michael.roth@amd.com> <Zj4oFffc7OQivyV-@google.com> <566b57c0-27cd-4591-bded-9a397a1d44d5@redhat.com> <20240510163719.pnwdwarsbgmcop3h@amd.com> <a47e7b49-96d2-4e7b-ae39-a3bfe6b0ed83@redhat.com>
+Message-ID: <AFCDFEE1-40CF-4780-B129-5AE56057BE41@alien8.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wi1T6wq1USBfU=NjdpSaTiKzV4H2gnUQfKa_mcXqOSk_w@mail.gmail.com>
- <CAHk-=wjmwmWv3sDCNq8c4VHWZUtZH72tDqR=TcgfpxTegL=aZw@mail.gmail.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 13, 2024 at 03:12:53PM -0700, Linus Torvalds wrote:
-> On Sun, 12 May 2024 at 20:50, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > Lukas Wunner (1):
-> >       X.509: Introduce scope-based x509_certificate allocation
-[...]
-> Having random kernel code add random "assume()" lines is absolutely
-> not what we should do. Particularly not in some random code sequence
-> where it absolutely does not matter ONE WHIT.
-> 
-> Now, I've pulled this, but I killed that  "assume()" hackery in my merge.
+On May 10, 2024 6:59:37 PM GMT+02:00, Paolo Bonzini <pbonzini@redhat=2Ecom>=
+ wrote:
+>Well, the merge window starts next sunday, doesn't it?  If there's an -rc=
+8 I agree there's some leeway, but that is not too likely=2E
 
-Thanks, appreciated.  This way of handling it spares me from having
-to resubmit the patch without assume().  (The patch is prep work
-for upcoming PCI device authentication.)
+Nah, the merge window just opened yesterday=2E=20
 
-
-> > However, this patch still has two outstanding build defects which
-> > have not been addressed:
-> >
-> > https://lore.kernel.org/all/202404240904.Qi3nM37B-lkp@intel.com/
-> 
-> This one just seems to be a sanity check for "you shouldn't check
-> kmalloc() for ERR_PTR", so it's a validation test that then doesn't
-> like the new test in that 'assume()'.
-
-I've been in touch with Julia (+cc) to silence this coccinelle
-false-positive.  But now that the assume() is gone, the coccinelle
-warning won't appear anyway:
-
-https://lore.kernel.org/all/alpine.DEB.2.22.394.2405062136410.3284@hadrien/
-
-
-> And the second one:
-> 
-> > https://lore.kernel.org/all/202404252210.KJE6Uw1h-lkp@intel.com/
-> 
-> looks *very* much like the cases we've seen with clang in particular
-> where clang goes "this code isn't reachable, so I'll just drop
-> everything on the floor", and then it just becomes a fallthrough to
-> whatever else code happens to come next. Most of the time that's just
-> more (unrelated) code in the same function, but sometimes it causes
-> that "falls through to next function" instead, entirely randomly
-> depending on how the code was laid out.
-
-Curiously, this particular 0-day report is for gcc 13.2.0 though,
-not clang.
-
-The assume() macro had no effect with clang when I tested it.
-So the unnecessary IS_ERR() check persisted despite the macro when
-compiling with clang.  Only gcc honors it.  Probably another reason
-why you would hate the macro. :)
-
-clang supports __builtin_assume().  In theory that should have the
-same effect as __builtin_unreachable() on gcc (albeit with inverse
-boolean semantics).  In practice it had no effect.  (Tested with
-clang 15.0.6.)
-
-https://clang.llvm.org/docs/LanguageExtensions.html#builtin-assume
-
-So with clang there doesn't seem to be a working way to tell the
-compiler about assumptions it can make.  And with gcc it's apparently
-"hit and miss" depending on the exact gcc version and code. :(
-
-
-> I suspect that because I removed the whole 'assume()' hackery, neither
-> of the above issues will now happen, and the code nwo works.
-
-Yes.
-
-I guess this effort was over the top, so apologies for the noise!
-
-Thanks,
-
-Lukas
+--=20
+Sent from a small device: formatting sucks and brevity is inevitable=2E 
