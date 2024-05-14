@@ -1,90 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04ADE1C36;
-	Tue, 14 May 2024 02:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EEF79D2
+	for <linux-crypto@vger.kernel.org>; Tue, 14 May 2024 02:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715653109; cv=none; b=KvOcP8bqOB4qafvFSul5mLAjf9qkwLFlJSrJ84EEUbZOE5FlttqK5bvq7sNwxHaYV4G38dTzc87+fdnb7z+1BlQ90AfSAz8kouuxEZ5wye4NcU8hMFZyAdn2/0U+R7jakUfU14hxS/UVjccWdwr+SYkZTF/bs61aMyzHaWAA2RU=
+	t=1715654224; cv=none; b=HTT8HWKDA6G+o09kZOBkflpzc9zoOkpQi8iO/IJAP/nbIFTMU8TjnqJrgU65gpDj4ymDy+ZPR/P0J6K5HDL8UkKUMqrgqXWR7xsh1U3kd5aldZdam7IoDalMNpVxdVjREXPG1k8Xc6uzt9ztPJwkd388hwtyMoA3yvpT7GZTF64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715653109; c=relaxed/simple;
-	bh=deNbv7svzdjItTDnYRdObkPUrJEVJwJFdAxldaKHwvs=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To; b=jwi/f3e7CCWjGIdnLQEYwcGzdGc9ArZxHlwfgr0UpIt/dvPS6F1/g6Nk5rWvixippuTpGalri7GTFiV5RlSuKoUk2qatXMw6JWZ3JyebwFogmagXX84+UKc42agiPXvF1O1xf3/1uBjEQ4HReadZehWf/1rK2gaau8NQm5HV14s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=acChmHXv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1715654224; c=relaxed/simple;
+	bh=rnilAhcWeWPeF5qGzTqdMNMJZHqt8jgjKl8BwAtyqr4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=H/rZQWpXBX9T064BVrcqBBhwC+cU+GfUe3TvPcRMywUKBHx2GA0AOFp8abNSAq5PN2DoDyY+zFVvzP40O5NLUT2dF7WmwLk3bKpkOm35pJDwxJF2vdiLrVzUvHHqcPEnZVjJFF/ydMocD/wMErUGse7XjqQCQSGB13k78ZjMQKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=pIZfIpTd; arc=none smtp.client-ip=129.153.194.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="acChmHXv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AB62C113CC;
-	Tue, 14 May 2024 02:18:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715653108;
-	bh=deNbv7svzdjItTDnYRdObkPUrJEVJwJFdAxldaKHwvs=;
-	h=Date:Cc:Subject:From:To:From;
-	b=acChmHXvcf3KdpaQR/sEaYP4EHGmldW5XsqdF6ZyOkvq8GdJz0lIE0PLeONPQ94VR
-	 y1vs4f5xQg6IdsNtL4BSt8WS+MbKqxYR7i9dq1dpMylfgKI53MZIivFX5C8bv1M7RB
-	 xaqO/JkeKfnJrXM62NSk4/KX22CJP1/Ttdo4/5ylELkb5wtHw69OSx2MS5NR6fSqFt
-	 HuIFms0VFGBo6TPPjAyIw1jFb2INQOw3jKTwa9pO7PP8HkX2w0LWOJZQa8L/Xf6joG
-	 AVrCjZhsppPJks40SZKcuq27WW8/miMjVbESZtZWgGG9mPjknRBybXLSLbYQKf4JE0
-	 Bz9iv6K75uKNQ==
+	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="pIZfIpTd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
+	t=1715654216; bh=rnilAhcWeWPeF5qGzTqdMNMJZHqt8jgjKl8BwAtyqr4=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To;
+	b=pIZfIpTdP4UlRyPWQCcf+wLl0OSAqTKnrr2UgwQVaY1i1JXZRa0wWygil4q+kTryr
+	 QvTPrVuwUy4/oNSC9YTScqMu1haGe2lHbhRSA7ItylqqJIb6Xr8XPHktO0pkswJjil
+	 Fx51FtClNaetlBdHKPZ/SS11TnMl0kps5fQCTcH8G6lu5NOllWyBelTAwEvVm1Zl7/
+	 Q+OyR39Xq6gVmgVh/Tg6lso36xxO0HHf8b5TLFwktTXxP5rCO4ezxQMvjGZMxN22sn
+	 TFEKw+85Zrn2YG8MfDIKnPXwP2zx6YN/8ooLE2NwrY/9URIEehTQm8L0k/AnUDg/Pe
+	 FwYhpejFGlkyw==
+Message-ID: <d65279ed-20cb-4e23-866c-43b6291f51e2@jvdsn.com>
+Date: Mon, 13 May 2024 21:36:55 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 14 May 2024 05:18:25 +0300
-Message-Id: <D1909NYKXM11.3VLXHOO4NA7RA@kernel.org>
-Cc: "David Howells" <dhowells@redhat.com>, "Herbert Xu"
- <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
- <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: [GIT PULL] ASYMMETRIC KEYS: asymmetric-keys-next-6.10-rc1
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Linus Torvalds" <torvalds@linux-foundation.org>
-X-Mailer: aerc 0.17.0
+MIME-Version: 1.0
+From: Joachim Vandersmissen <git@jvdsn.com>
+Subject: Re: [PATCH v5 1/2] certs: Move RSA self-test data to separate file
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: David Howells <dhowells@redhat.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
+ Simo Sorce <simo@redhat.com>, Stephan Mueller <smueller@chronox.de>
+References: <20240513045507.25615-1-git@jvdsn.com>
+ <D18SS8X9VV7L.28F9PNZ1PM96L@kernel.org>
+Content-Language: en-US
+In-Reply-To: <D18SS8X9VV7L.28F9PNZ1PM96L@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The following changes since commit f4e8d80292859809ea135e9f4c43bae47e4f58bc=
-:
-
-  Merge tag 'vfs-6.10.rw' of git://git.kernel.org/pub/scm/linux/kernel/git/=
-vfs/vfs (2024-05-13 12:23:17 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git tags=
-/asymmetric-keys-next-6.10-rc1
-
-for you to fetch changes up to 747ae81883d21595b162cc40523a982024700fed:
-
-  certs: Add ECDSA signature verification self-test (2024-05-14 05:01:04 +0=
-300)
-
-----------------------------------------------------------------
-Hi,
-
-Adds a self-test testing PCKS#7 signed data against ECDSA key and
-couple of bug fixes for missing deps.
-
-BR, Jarkko
-
-----------------------------------------------------------------
-Eric Biggers (2):
-      KEYS: asymmetric: Add missing dependency on CRYPTO_SIG
-      KEYS: asymmetric: Add missing dependencies of FIPS_SIGNATURE_SELFTEST
-
-Joachim Vandersmissen (2):
-      certs: Move RSA self-test data to separate file
-      certs: Add ECDSA signature verification self-test
-
- crypto/asymmetric_keys/Kconfig          |  17 +++
- crypto/asymmetric_keys/Makefile         |   2 +
- crypto/asymmetric_keys/selftest.c       | 219 +++++-----------------------=
-----
- crypto/asymmetric_keys/selftest.h       |  22 ++++
- crypto/asymmetric_keys/selftest_ecdsa.c |  88 +++++++++++++
- crypto/asymmetric_keys/selftest_rsa.c   | 171 +++++++++++++++++++++++++
- 6 files changed, 330 insertions(+), 189 deletions(-)
- create mode 100644 crypto/asymmetric_keys/selftest.h
- create mode 100644 crypto/asymmetric_keys/selftest_ecdsa.c
- create mode 100644 crypto/asymmetric_keys/selftest_rsa.c
+On 5/13/24 3:26 PM, Jarkko Sakkinen wrote:
+> On Mon May 13, 2024 at 7:55 AM EEST, Joachim Vandersmissen wrote:
+>> +	pkcs7 = pkcs7_parse_message(sig, sig_len);
+>> +	if (IS_ERR(pkcs7))
+>> +		panic("Certs %s selftest: pkcs7_parse_message() = %d\n", name, ret);
+> Off-topic: wondering if Linux had similar helpers for PKCS#1 padding
+> (and if not, are they difficult to add)?
+PKCS#7 here refers to the message container format, rather than the 
+padding. Internally, the PKCS#1 v1.5 padding scheme will be used (see 
+software_key_determine_akcipher). Unless you are referring to PSS 
+padding (also defined in PKCS#1)?
+>
+> Anyway, looks good to me:
+>
+> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+>
+> BR, Jarkko
