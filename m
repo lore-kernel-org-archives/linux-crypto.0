@@ -1,136 +1,107 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6229B17F37F
-	for <linux-crypto@vger.kernel.org>; Tue, 14 May 2024 17:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DB35A0F9;
+	Tue, 14 May 2024 17:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715706444; cv=none; b=sncobIx1bP70JDQoZ1ioUdHbGNoAH85S9vGIZ//v0rKONNX4oVt27EKJsIEXsxlTwjictQsv8RjBbumNMAN7LQoQVHgH+O1cxtZ9X/Mez6y/teX3YbkeEvK7+xCJ0li3Sr1MdIzeftkVBrt8K4+2knOCjPq8xchj90O1d2YUEpg=
+	t=1715708345; cv=none; b=Z+p70FYuk0gLdeBr0IESkNwCfv9L7IatjPrdQye4EOqrX5C07VsWSuIgzrlnjPkiBSKUhIu1WkEx6B4sGSkTJdxgokXue0gD00imK4C28OZp6+M3Lt4htq+NQPh5SFdEjE4weC85REfosD4D/GE/ZDg14OFW1fUvsaH2sMWQ3WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715706444; c=relaxed/simple;
-	bh=EVeLEj7Jswi8cg76AHCqyTRfsBAkt5bp4by2FNUmIwg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cy/q13un1DZ8DStzwUVrei3T+FYXA9T3r4Nx5TBu4ob3H647lkCTigR/zE17seQqSduX+e0bciQ+pRQW9pvbhakjT+LqCeOmnlI9BhylKQxy4q1deeBjar1x0Ow6JCrVGHUprt1X4hDDCReuFk97ro4dJnbVJVzhQu5wRx1pY2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=W0ZSfUzf; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1715708345; c=relaxed/simple;
+	bh=/9A7UTd7MM9F162NMDRSPFTTgx/ChKayAwWTGhRscw8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=m3XEKIwyPk/R48cRes6+MUeQVNOGqjn0vq/meN1+BuVmWOpNdScQKcNfOlsGzXkenyhow1TrdzJWRoqHbni1EGktgu0HQoc6XCbv2cJf3s+KdglShJIgx9L6C0usS8anDEJjKfSuXoRLztpzHArNlEDD7BknUgaw98UP3Ko1IFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=k11JKdhY; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="W0ZSfUzf"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a5a1054cf61so81419866b.1
-        for <linux-crypto@vger.kernel.org>; Tue, 14 May 2024 10:07:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1715706440; x=1716311240; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3yZqNPwvXDORKPUW8oFHYhpNWnQ0WTMGBEW6etUKrK4=;
-        b=W0ZSfUzfXXcRjz9699/BmTypgqAimzUMIXkvCdHDk5wH+2TX+kdf1NrJ6Z92Wp9ITx
-         Z5EtC0PcoL97GKe++s4brT4oNXh1pl+I+JkTjvQgd1bf0sacquN6rBoG5TMCu9UiOf1O
-         KL8vuWiiIOguVYk2DImIbKhHSz812eOsifouk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715706440; x=1716311240;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3yZqNPwvXDORKPUW8oFHYhpNWnQ0WTMGBEW6etUKrK4=;
-        b=sM32eOeQiW0vtVSk+s4Ie0nV+L2GWDJhJvDqmhr4/WMIi6EzFA4pEu1H05kv75/WgP
-         bvpuMrMPCLRjgsXI7r3rlp0Pn6s74bDAdlXQJK7nKWrYUQ2YMVXpMP94D93oMkWwahlM
-         TwYMeg4lm5g2iTZEbRpZPuzdZ2O5VDPA+TVDoxRpi/SXylGG0zmnfISBD5J6qelZvtlt
-         Tib4pHsubHqiI82NRC9iKB/j8vOOTVTIljxJDK0lDHPzn6hM6Dbu7i2K+zdiGN7njVrd
-         yza0gF97QsrHCYrYhwD22OXGlaV38fW8s6cfKYolHYhvEQ4zRrB1L1Xcx1dh7zttgFTx
-         G1mg==
-X-Forwarded-Encrypted: i=1; AJvYcCVh3qzhz5ddMc3vb/IAlAH31QOCabd5TUqSnSABwUL7FNsfSoNtHXLlGQOhtkEYvt4brHCDAaZ26IIsTBfzJbSlMTG8BCLt2IAdSUNe
-X-Gm-Message-State: AOJu0YwNwmxpxx2f0D5Z0xYrfDHXWKSqoySLj+lyDXattyCdBjnafx1C
-	m011f6i9zwGpTFJCbzqXXhdaXS0s150W1znpmqbaTisJQP/z3Boyqy98mlphJ82vXL1rn8Ci3z2
-	4N/pIFw==
-X-Google-Smtp-Source: AGHT+IGydYzYrP2TuPwOEyqfcPsC09G/j5BuALLG7pCtnbxHELWmzZtS4xUM6lbZ3n+2chiwK6N8kQ==
-X-Received: by 2002:a17:907:35d4:b0:a5a:7d28:54aa with SMTP id a640c23a62f3a-a5a7d285594mr320162266b.23.1715706440668;
-        Tue, 14 May 2024 10:07:20 -0700 (PDT)
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com. [209.85.218.45])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a1781d342sm749277766b.6.2024.05.14.10.07.19
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 May 2024 10:07:19 -0700 (PDT)
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a59b81d087aso43731866b.3
-        for <linux-crypto@vger.kernel.org>; Tue, 14 May 2024 10:07:19 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVq1CATgc6aw8j1hkcLeC4t3mLbCRQw+5lmyBz0UTxH1+dY5ZpfHrAzq/P559F7pAsyOqr/fJ6aTvHfqvi4AwaozEujknFJbuSU7z8I
-X-Received: by 2002:a17:907:35d4:b0:a5a:7d28:54aa with SMTP id
- a640c23a62f3a-a5a7d285594mr320156966b.23.1715706439246; Tue, 14 May 2024
- 10:07:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="k11JKdhY"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44EFfnZ9022109;
+	Tue, 14 May 2024 17:38:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=s380DvIVUvrqNkCPvWQHywF6rq8I55TzcUuDNMTmk7A=;
+ b=k11JKdhYJkXi0FlErdzjhCBQ1bHqwdHmRof8d50Q8Tl1v4TuaQWENszEj/alcX+X6562
+ btV3Rxoplz78bJv17ISs6fG5d5DUBVm3GbqhQny1lbCsV2rNxPQYt0v9xKoV0keS+rjc
+ jM7pIcGU2tZXKKJxgAFSx/tCAyQM0kveCvkktdxzbmp0jFcr9AdR9q0d8m6hDRuK0EVq
+ DnK27RHAkKqeEMS3V4E7GfCbk3I2pLu+zsOqm/DJ/89xFKcak1XJbmSVFcS+J7SAi3HQ
+ LiBO1oIG5IBaeQ+GtCJMhFKtiqjmc4LbgTKWA7fXx4l+T9xDIDrqtAqImiszOe0N+LEi LQ== 
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y4a9brbdu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 May 2024 17:38:44 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44EFOu8S002288;
+	Tue, 14 May 2024 17:38:43 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3y2m0p6r78-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 May 2024 17:38:43 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44EHcePx25362850
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 14 May 2024 17:38:42 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 47E9758052;
+	Tue, 14 May 2024 17:38:40 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E7F0D5805D;
+	Tue, 14 May 2024 17:38:39 +0000 (GMT)
+Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 14 May 2024 17:38:39 +0000 (GMT)
+From: Danny Tsen <dtsen@linux.ibm.com>
+To: linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au, leitao@debian.org, nayna@linux.ibm.com,
+        appro@cryptogams.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
+        ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com,
+        Danny Tsen <dtsen@linux.ibm.com>
+Subject: [PATCH 0/3] crypto: X25519 supports for ppc64le
+Date: Tue, 14 May 2024 13:38:32 -0400
+Message-Id: <20240514173835.4814-1-dtsen@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHk-=wi1T6wq1USBfU=NjdpSaTiKzV4H2gnUQfKa_mcXqOSk_w@mail.gmail.com>
- <CAHk-=wjmwmWv3sDCNq8c4VHWZUtZH72tDqR=TcgfpxTegL=aZw@mail.gmail.com> <ZkMKvAnyOR3_cJnS@wunner.de>
-In-Reply-To: <ZkMKvAnyOR3_cJnS@wunner.de>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 14 May 2024 10:07:02 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whRK3wdMoUd7UOL-R8GcfwYYLsy26ft-kHv5WaofyYe=Q@mail.gmail.com>
-Message-ID: <CAHk-=whRK3wdMoUd7UOL-R8GcfwYYLsy26ft-kHv5WaofyYe=Q@mail.gmail.com>
-Subject: Re: [GIT PULL] Crypto Update for 6.10
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Julia Lawall <julia.lawall@inria.fr>, 
-	Nicolas Palix <nicolas.palix@imag.fr>, cocci@inria.fr
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: O4MzfgNaX7KpN4B9YAgFpEOV1qf4shVt
+X-Proofpoint-GUID: O4MzfgNaX7KpN4B9YAgFpEOV1qf4shVt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-14_10,2024-05-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1011
+ priorityscore=1501 mlxscore=0 mlxlogscore=663 malwarescore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2405140124
 
-On Mon, 13 May 2024 at 23:54, Lukas Wunner <lukas@wunner.de> wrote:
->
-> On Mon, May 13, 2024 at 03:12:53PM -0700, Linus Torvalds wrote:
-> >
-> > > https://lore.kernel.org/all/202404252210.KJE6Uw1h-lkp@intel.com/
-> >
-> > looks *very* much like the cases we've seen with clang in particular
-> > where clang goes "this code isn't reachable, so I'll just drop
-> > everything on the floor", and then it just becomes a fallthrough to
-> > whatever else code happens to come next. Most of the time that's just
-> > more (unrelated) code in the same function, but sometimes it causes
-> > that "falls through to next function" instead, entirely randomly
-> > depending on how the code was laid out.
->
-> Curiously, this particular 0-day report is for gcc 13.2.0 though,
-> not clang.
+This patch series provide X25519 support for ppc64le with a new module
+curve25519-ppc64le.
 
-Hmm. I think all the previous reports of "falls through to next
-function" that I have seen have been with clang, but that is probably
-be selection bias: the gcc cases of this tend to be found so much more
-quickly (because gcc is still more common at least on x86) that by the
-time I see the reports, it's because of some clang issue.
+The implementation is based on CRYPTOGAMs perl output from x25519-ppc64.pl.
+Modified and added 3 supporting functions.
 
-And in fact, when I go test this theory by going to search on lore, I
-do see several gcc reports.
+This patch has passed the selftest by running modprobe
+curve25519-ppc64le.
 
-So no, it was never just clang-only, it was just that the ones I had
-looked at were about clang.
+Danny Tsen (3):
+  X25519 low-level primitives for ppc64le.
+  X25519 core functions to handle scalar multiplication for ppc64le.
+  Update Kconfig and Makefile.
 
-> The assume() macro had no effect with clang when I tested it.
+ arch/powerpc/crypto/Kconfig                   |  11 +
+ arch/powerpc/crypto/Makefile                  |   2 +
+ arch/powerpc/crypto/curve25519-ppc64le-core.c | 299 ++++++++
+ arch/powerpc/crypto/curve25519-ppc64le_asm.S  | 648 ++++++++++++++++++
+ 4 files changed, 960 insertions(+)
+ create mode 100644 arch/powerpc/crypto/curve25519-ppc64le-core.c
+ create mode 100644 arch/powerpc/crypto/curve25519-ppc64le_asm.S
 
-I suspect that the issue is that with *normal* kernel configurations,
-the code generation is simple and straightforward enough that gcc did
-the right thing.
+-- 
+2.31.1
 
-And then some more complicated setup with more debugging support
-enabled (particularly things like UBSAN or KASAN) the code gets
-complicated enough that gcc doesn't do the optimization any more, and
-then the conditional in assume() doesn't get optimized away at an
-early stage any more, and remains as a conditional branch to
-la-la-land.
-
-And you actually don't even see this as a warning unless the
-la-la-land happens to be at the end of a function. IOW, the "branch to
-nowhere" _could_ just branch to some label inside the function, and
-the objtool sanity check would never even have triggered.
-
-That's why "unreachable()" can be so dangerous. It tells the compiler
-that code generation in one place no longer matters, and then the
-compiler can decide to leave things just dangling in odd ways.
-
-The code presumably still *works* - because the actual conditional
-never triggers, so in that sense it's safe and fine. But it's still
-just horrendous to try to figure out, which is why I was so down on
-it.
-
-              Linus
