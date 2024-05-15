@@ -1,59 +1,60 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEDE53B79F;
-	Wed, 15 May 2024 13:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDBE85C4E
+	for <linux-crypto@vger.kernel.org>; Wed, 15 May 2024 13:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715778586; cv=none; b=M0VsT+8IaOerqYZID8HBeBzeba9XFFth57DHdKvWAWvimzvdk30l5yLgkQV2s2WG7t1yukT05O1VuuUcuv9Lv9tCQJii8/iVZPfm2XdWV/4AuNDrnMIy3qvLPg0vD9OL90RQuNDox7zQW3cIZuzHm6kskaVotxoMTSjctcIkN1o=
+	t=1715779991; cv=none; b=Yh92kYXAyAWfV1UyihCfIkw8R2UjJZli79h2RH1/TikabdbvRs9xsgyDcVJcVdtxqbDCyPaw1mBymhqaIwEzcJnGu3rRec0ljuge036qMWaxV2361CoRZt3YBY8JvfbOdSG1sGi+42pITk8akkBegc1epdyY2y9GK8tDv0sUeUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715778586; c=relaxed/simple;
-	bh=lqrR+3/+YQ+v0MNxpS5tLaLnuypuFeblqUG0bgAMo5w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ilVIEc7aHq5qS8+uYbixvbSLNkc2gwC//ZZITgLa/+xAJoUTBSqaWxuKbsAVM1Z1T+x+L7anscooi0YPAHhnBGZjuLpg2/STfYTREPRWBM2wreo0iwJvCH00B0swWnS0HlnHMiVknja2lRU15hmUBgcDxheVyK+8e3JC4DNFjNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Y61M7fN+; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1715779991; c=relaxed/simple;
+	bh=9S7DSw9sHbiB+sYt8oWVLOv/m7dBhEgy7oKSHCb0BPo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=t1nsYdQlYz7onUZUF6CiUSftfkitC0/H//n8LfmYN+ZpX7hzexEsKA11wCwQAxTMj1MUpc9VoMmKB5Ij0/Aj31OaFtGjUrwu8iJs+uBXf9IXEpkTx/V0HuwSkHVs7n3BeNleulI/VvoScH46ZJaEUvLLPl+4GFqAPV0cbMyhOkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org; spf=pass smtp.mailfrom=cryptogams.org; dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b=fwmCmxIO; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryptogams.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Y61M7fN+"
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44FD26Bb015083;
-	Wed, 15 May 2024 13:09:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Je8U2UY3rc1I4AkmbgNevevdjkjvB7fm8bL0HEh64WE=;
- b=Y61M7fN+tPqlrqXlfmls/IYw6qvfo5LdkLIh/CpHmZAQ+GfHI7Rz6YpRxjRouiUNSkZo
- autp7HVJsKwfKC1xSJ04ooxYUI9K01vjlOS3Kx1Zjs3Zjsh4wHDU0icrBo3Xo2y86OK8
- MC4YcJ7FrJ/TgMc4RhGX5Rg43CVzpumeRHhoLzPEeLWk24UIYvzrMjucCFm5y4M4mNrM
- HaLDuLpLtNd7Wkg5EgFkrwKflfBMiMCB9siuuxD9NzJ18AxoGVQknKLssDKudM2yJ3r5
- XJoOkvhSMdxZrGpYpw6zHcTxyYoIPuTcDUL3qLSkOsnZxbJqE68yV6c6oDs5ZHVCEPoz TQ== 
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y4wjw00cx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 May 2024 13:09:28 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44FBf8o0006183;
-	Wed, 15 May 2024 13:06:06 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3y2mgmkn2t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 May 2024 13:06:06 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44FD63ag24052460
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 15 May 2024 13:06:05 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 29DC158064;
-	Wed, 15 May 2024 13:06:03 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EADB55805A;
-	Wed, 15 May 2024 13:06:01 +0000 (GMT)
-Received: from [9.67.88.41] (unknown [9.67.88.41])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 15 May 2024 13:06:01 +0000 (GMT)
-Message-ID: <74a95c1b-5137-46bc-beb1-45a7e93f8bdb@linux.ibm.com>
-Date: Wed, 15 May 2024 08:06:01 -0500
+	dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b="fwmCmxIO"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-51ff65b1e14so7599029e87.2
+        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2024 06:33:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cryptogams.org; s=gmail; t=1715779988; x=1716384788; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=IZnKfmHcaXKfk4mANRDz90u7oAjx4Am3VbR95ZF3WgM=;
+        b=fwmCmxIOXMpSoN224HbUI9m5AikYcgUMSH0yBtwoVUsbdQTWt8lV9PIOXBP1oA6SWC
+         ZVjNfCvgdrfVnk4L040Ht/o3THevHP4OkuEQ75zWDdj5c1BKsVdX0u7RdDuMUnDvqKVH
+         6zadIi/8YEaVghG74JGhQpMLBBo1TpmL8RPtFNwJr1SH5K+e0SRNAE/rG3dEyjgJU9rd
+         XWdT9fheoyLdAh5zjBR5BjfKGHO5CcXvOsjpCaokxBEluMVdyfVCZrWURcPFYy6J08Ug
+         bYU0/6ntjl7QCZhq7q9Bwt4V1k9eHH4whGXOmkUTmCDOVqyBKYwuxHuFdLYGbC40yvDR
+         GIig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715779988; x=1716384788;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IZnKfmHcaXKfk4mANRDz90u7oAjx4Am3VbR95ZF3WgM=;
+        b=s2iNOlFlbvRGFbLcdBLHucRRHqtrywMoMEdDTZk8Mpgw3ARX5Ogi4mZQ1ZBT9dOgvl
+         ZH4icgctWHar1ZUSFBPnbsZUSyieQ//4ebFrqD1a+fzNo9CTWLsMGtsbRYT8McynFdA1
+         6+SCExAmb4kDfZ+37V2O4lhxoDtf2oXz/GGpHWEGc0A9asqrhbH1/0UC49Ns/Ovttgwd
+         gxrrWHY/j7jo5xFZpJldvxE0XvlQA+SryBowAmNxXoyt0YNCaruQZwj9wcK28EO5+FPP
+         Lf2MIhCbP+/T2Lgn+V+VWxAXZAmprmkfrbrIqc9fA1ihXx0cC92bpBaFjKs2/hp7UuhD
+         6m8w==
+X-Forwarded-Encrypted: i=1; AJvYcCWtKxIMkzbh7GYqLy/UEJXiMVaCNkzuxkO49Jw8a5OGiL9qeZ0hOeikNLbAypQOh/73HKpypnJz3NHcT3sRVHzb//QhAN/GfJt3eX4S
+X-Gm-Message-State: AOJu0YyWmOHp9KyV+pfEmbEgczvai5elsSZ1RFAcjYt4uoI+PB+VRmb9
+	aX/2jmN/z8c6b8ROSEn6Nos671PaThvTznDGy+wuTT9Y56DTcyiL87aQbj5mD9hP63XCahWGB51
+	f
+X-Google-Smtp-Source: AGHT+IHARK6h98zaZeHwpQW3CC/oAdRtrkGoOz4whPQzV2TK8WECwB1HF5F/+Wjw4JdTyvdc6/Eqyw==
+X-Received: by 2002:a05:6512:3e10:b0:51a:f16d:52a8 with SMTP id 2adb3069b0e04-52210070178mr14110770e87.50.1715779987823;
+        Wed, 15 May 2024 06:33:07 -0700 (PDT)
+Received: from [10.0.1.129] (c-922370d5.012-252-67626723.bbcust.telenor.se. [213.112.35.146])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-521f38d86b3sm2613126e87.210.2024.05.15.06.33.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 May 2024 06:33:07 -0700 (PDT)
+Message-ID: <7eb6bf4b-5510-48fe-aa6c-ac5207d5a2c1@cryptogams.org>
+Date: Wed, 15 May 2024 15:33:06 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,41 +63,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 2/3] crypto: X25519 core functions for ppc64le
-To: Andy Polyakov <appro@cryptogams.org>, linux-crypto@vger.kernel.org
+From: Andy Polyakov <appro@cryptogams.org>
+To: Danny Tsen <dtsen@linux.ibm.com>, linux-crypto@vger.kernel.org
 Cc: herbert@gondor.apana.org.au, leitao@debian.org, nayna@linux.ibm.com,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
+ linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
 References: <20240514173835.4814-1-dtsen@linux.ibm.com>
  <20240514173835.4814-3-dtsen@linux.ibm.com>
  <847f2e4f-ace1-415d-b129-ed2751429eec@cryptogams.org>
 Content-Language: en-US
-From: Danny Tsen <dtsen@linux.ibm.com>
 In-Reply-To: <847f2e4f-ace1-415d-b129-ed2751429eec@cryptogams.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: TSAG0K77Roghbt5nN-MN6XF1lYphDOFS
-X-Proofpoint-ORIG-GUID: TSAG0K77Roghbt5nN-MN6XF1lYphDOFS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-15_06,2024-05-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- phishscore=0 mlxscore=0 mlxlogscore=884 lowpriorityscore=0 clxscore=1015
- bulkscore=0 spamscore=0 malwarescore=0 impostorscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2405150092
 
-Hi Andy,
-
-Points taken.  And much appreciate for the help.
-
-Thanks.
-
--Danny
-
-On 5/15/24 3:29 AM, Andy Polyakov wrote:
-> Hi,
->
 >> +static void cswap(fe51 p, fe51 q, unsigned int bit)
 >> +{
 >> +    u64 t, i;
@@ -108,18 +87,30 @@ On 5/15/24 3:29 AM, Andy Polyakov wrote:
 >> +        q[i] ^= t;
 >> +    }
 >> +}
->
+> 
 > The "c" in cswap stands for "constant-time," and the problem is that 
 > contemporary compilers have exhibited the ability to produce 
 > non-constant-time machine code as result of compilation of the above 
-> kind of technique. The outcome is platform-specific and ironically 
-> some of PPC code generators were observed to generate "most" 
+> kind of technique. The outcome is platform-specific and ironically some 
+> of PPC code generators were observed to generate "most" 
 > non-constant-time code. "Most" in sense that execution time variations 
-> would be most easy to catch. One way to work around the problem, at 
-> least for the time being, is to add 'asm volatile("" : "+r"(c))' after 
-> you calculate 'c'. But there is no guarantee that the next compiler 
-> version won't see through it, hence the permanent solution is to do it 
+> would be most easy to catch.
+
+Just to substantiate the point, consider 
+https://godbolt.org/z/faYnEcPT7, and note the conditional branch in the 
+middle of the loop, which flies in the face of constant-time-ness. In 
+case you object 'bit &= 1' on line 7 in the C code. Indeed, if you 
+comment it out, the generated code will be fine. But the point is that 
+the compiler is capable of and was in fact observed to figure out that 
+the caller passes either one or zero and generate the machine code in 
+the assembly window. In other words 'bit &= 1' is just a reflection of 
+what the caller does.
+
+> ... the permanent solution is to do it 
 > in assembly. I can put together something...
->
-> Cheers.
->
+
+Though you should be able to do this just as well :-) So should I or 
+would you?
+
+Cheers.
+
