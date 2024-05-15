@@ -1,84 +1,145 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723E213F43A
-	for <linux-crypto@vger.kernel.org>; Wed, 15 May 2024 14:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCFA15572C;
+	Wed, 15 May 2024 15:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715782823; cv=none; b=tYfyrSRTzMLBjYEceo++vqZfEm0cyNbTWJ0Oq9nVC5exlzDTAkKDsai1mR6t2QDVxtz8aDFyoDc+8LtCFgyPP/C212gpAlA+VGuBo0yhbq+z2SurxA6OClHrcRkr6Ln5mt4B9Xhle9kP0A8BnFMxAcrOdnGGHbCX4HA+klalT+s=
+	t=1715785340; cv=none; b=D/qcjpkq3B9A0czcUJF0UKUHxWTcdxbIqPhY7tj2TyBUyNPh5VbA7sfA7UG8jSzw0J6tZKYWR2VpRmWaDbG3QUF0QJz8/G1xeAlCLhda2xiR4JCU03OKJ+GoEKAOy40cTKXubCmrNX3h8uAsqAIq1TUOkSleG5upq0WTLhkqp80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715782823; c=relaxed/simple;
-	bh=1C57CUiL1Kka2D5i9WpkZM2PY3ffkcQ24tMi/9DBSTQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kJKSwWA2zVROtTFQZOayT5t/IXXoUQABr78PGtykdoRiNLIzMwN8O5FemeUMkawRWPB3xCi+aADD34cdStziTkjH7ErdSTFXu44uiYEMrg9gl1Bvg/qIUs8PstIS3f0JdMouODQijbjDWsbuxMCP9ejzzuQFc9HxewWaT3BhqQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org; spf=pass smtp.mailfrom=cryptogams.org; dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b=UwqTwUIA; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryptogams.org
+	s=arc-20240116; t=1715785340; c=relaxed/simple;
+	bh=VzjvvZ9ObMsO/pd+PA+Q7TGExyfbBU28dZOOW6dqSSs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bcgunhe/h6GKjnepPDC358zmioye27T2Vs0d6Q0rquYLSG56H9UQM6uvmHCqVFURoPYBnMP454ijeykI7JB/khjgfnJsosC45jP9BAOLmmHuPBGOLn6W82sfmtEKrVuf+IUD06LpJeQZ+v6TXMCVrwY2+6xk05o8KCR/rPG6cMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QARLt8Y2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b="UwqTwUIA"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-51f74fa2a82so8214837e87.0
-        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2024 07:20:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cryptogams.org; s=gmail; t=1715782818; x=1716387618; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=16qftxrB5EgdSgH7j+99BTnIlGUnb8pcrY5C9J7hC3I=;
-        b=UwqTwUIA2IgoMWanw9qiSqp+JKR0knI3sUIFvJR7l7wYRYsNjPv+xFWCZsRuolhrQ1
-         QvuGR8FIwva5i34IF699WPDgAdPnV0tJVFDnU1C11cGd19u1dJd6UnSL8VuG7m4/ShkX
-         /1JVjmfMem/hB2xg2ak0S7jGFiymSVm46tdlIpZ1CuzeM1nIz/auT0spSgC8BRDD+mnx
-         bUDjQyvQYGwSCgc710JrlY3YUyo39f4d2Wa2qrX9Xa7KAdx5kgn17lKCQwu/soTqlcBi
-         A3YXPTY39QLE6M1DnjXVqibZPstFyAM2Sd7kW6yop4rf6GzZuZmQFJBGeF75Ib15wgf4
-         SrFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715782818; x=1716387618;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=16qftxrB5EgdSgH7j+99BTnIlGUnb8pcrY5C9J7hC3I=;
-        b=rWvVJvcOM0na/ZbzPqGMKZ0JUBvPBUOPE0FvVu6CFrVL1W6sgKXGebd2v/7poeDeJ5
-         D8Jb2p2kDrrMZ3zQDshx8S9aWM8MP7ddmSLRUNn6VzlgM7/RJS53BPGPn/W/fWlZPMwG
-         h2JRV+5tnaqm/iTFL5CuLdZga1X/AL5MBPaAc8OPSOLof8K5d0m0s4FB0NySRsbfhZoW
-         wndmux7wumV1Fk+A1w+k06LXhbpHbXs7/eCQ44fkdBAScUr/6/u4ePTRKU2N1DALjfAo
-         mFvZOwIxh6dvIikr4ZRwIdfK4T+X9YGwqu1SVT14SaQlbBmMV3hMTj5nWyyYZ6NIY4Im
-         6KOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX2GuAonV3BspW/9R8YQdR4su0C0Zvbxp3PRJhheITPAB7s0BKip6VrI22yOjrQ5jdvb5x8wYG5bfBps43ICShPFAo2PQyN5dCr9Vs9
-X-Gm-Message-State: AOJu0YyxJEwv1aWcJWjBn8wfv87rH89E934IQeLPXUnBAYWqA/9/QXzV
-	Jc/yKxb7RRr7eHppmBiYotwQADOsIrSyLkWzFIpg4vSegEHtXqu6IaAkXOKCYJI=
-X-Google-Smtp-Source: AGHT+IFpgBj/DAxqhrrPpTiW6l24RSbRhMtwGY7avTDZ4wHHSHq0yDBMJDQD8AtftGZW6eRvsGhAAg==
-X-Received: by 2002:ac2:5f89:0:b0:51d:6790:b788 with SMTP id 2adb3069b0e04-522102779dbmr13134213e87.56.1715782816422;
-        Wed, 15 May 2024 07:20:16 -0700 (PDT)
-Received: from [10.0.1.129] (c-922370d5.012-252-67626723.bbcust.telenor.se. [213.112.35.146])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-521f39d2cbbsm2531960e87.277.2024.05.15.07.20.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 May 2024 07:20:15 -0700 (PDT)
-Message-ID: <200be7b8-a245-4d72-9514-eb5402a61b77@cryptogams.org>
-Date: Wed, 15 May 2024 16:20:14 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QARLt8Y2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2206BC2BD11;
+	Wed, 15 May 2024 15:02:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715785339;
+	bh=VzjvvZ9ObMsO/pd+PA+Q7TGExyfbBU28dZOOW6dqSSs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QARLt8Y2f153giDpqZQk6fn55lras9Mm2rErqTSuhIv4gKtpeUFpUU9rAjyngtOnQ
+	 FAQAnxCY2BHOjuumYOUjvWG26g9jWX0pGTLeAzQQDtcAE8bleWyKbPm5dK/GWmke/H
+	 NeIhQJZ6v6ONBO+IoMpgSI9hrJN4hH64vxQhVV40esNZ0uYIwHT4WMhLZT8nRW9inq
+	 hUCTHKQWhbqmK5Bs+jnRqQPEXOVedo7coUUa/2AJgiKwYBj06melEci0GczA89dIWB
+	 i+iUZ/MoUx2T8rLe9netIh+00q1txLG028ED6dmH0FdWv70AoPOABtdtXTGvmmynuN
+	 xMtma9kINzbmQ==
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-integrity@vger.kernel.org,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	James Prestwood <prestwoj@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org (open list:CRYPTO API),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v2] crypto: rsa-pkcs1pad: export rsa1_asn_lookup()
+Date: Wed, 15 May 2024 18:02:10 +0300
+Message-ID: <20240515150213.32491-1-jarkko@kernel.org>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] crypto: X25519 core functions for ppc64le
-To: Danny Tsen <dtsen@linux.ibm.com>, linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au, leitao@debian.org, nayna@linux.ibm.com,
- linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
-References: <20240514173835.4814-1-dtsen@linux.ibm.com>
- <20240514173835.4814-3-dtsen@linux.ibm.com>
- <847f2e4f-ace1-415d-b129-ed2751429eec@cryptogams.org>
- <7eb6bf4b-5510-48fe-aa6c-ac5207d5a2c1@cryptogams.org>
- <7859e867-ddf4-494f-8ddb-2949aafbb40a@linux.ibm.com>
-Content-Language: en-US
-From: Andy Polyakov <appro@cryptogams.org>
-In-Reply-To: <7859e867-ddf4-494f-8ddb-2949aafbb40a@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-> Thanks for the info.  I should be able to do it.  I was hoping an 
-> assembly guru like you can show me some tricks here if there is :)
+ASN.1 template is required for TPM2 asymmetric keys, as it needs to be
+piggy-packed with the input data before applying TPM2_RSA_Decrypt. This
+patch prepares crypto subsystem for the addition of those keys.
 
-No tricks in cswap, it's as straightforward as it gets, so go ahead :-)
+Later rsa_lookup_asn1() can be enabled in crypto/asymmetric_keys/Kconfig
+by:
+
+	depends on CRYPTO_RSA >= <TPM2 asymmetric keys>
+
+Cc: James Prestwood <prestwoj@gmail.com>
+Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+---
+v2:
+- Fix typo in the kdoc.
+- Export also the template struct.
+---
+ crypto/rsa-pkcs1pad.c         | 16 ++++++++++------
+ include/crypto/rsa-pkcs1pad.h | 20 ++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 6 deletions(-)
+ create mode 100644 include/crypto/rsa-pkcs1pad.h
+
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index cd501195f34a..ea162ccf28ec 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -7,6 +7,7 @@
+ 
+ #include <crypto/algapi.h>
+ #include <crypto/akcipher.h>
++#include <crypto/rsa-pkcs1pad.h>
+ #include <crypto/internal/akcipher.h>
+ #include <crypto/internal/rsa.h>
+ #include <linux/err.h>
+@@ -79,11 +80,7 @@ static const u8 rsa_digest_info_sha3_512[] = {
+ 	0x05, 0x00, 0x04, 0x40
+ };
+ 
+-static const struct rsa_asn1_template {
+-	const char	*name;
+-	const u8	*data;
+-	size_t		size;
+-} rsa_asn1_templates[] = {
++const struct rsa_asn1_template rsa_asn1_templates[] = {
+ #define _(X) { #X, rsa_digest_info_##X, sizeof(rsa_digest_info_##X) }
+ 	_(md5),
+ 	_(sha1),
+@@ -101,7 +98,13 @@ static const struct rsa_asn1_template {
+ 	{ NULL }
+ };
+ 
+-static const struct rsa_asn1_template *rsa_lookup_asn1(const char *name)
++/**
++ * rsa_lookup_asn1() - Lookup the ASN.1 digest info given the hash
++ * name:	hash algorithm name
++ *
++ * Returns the ASN.1 digest info on success, and NULL on failure.
++ */
++const struct rsa_asn1_template *rsa_lookup_asn1(const char *name)
+ {
+ 	const struct rsa_asn1_template *p;
+ 
+@@ -110,6 +113,7 @@ static const struct rsa_asn1_template *rsa_lookup_asn1(const char *name)
+ 			return p;
+ 	return NULL;
+ }
++EXPORT_SYMBOL_GPL(rsa_lookup_asn1);
+ 
+ struct pkcs1pad_ctx {
+ 	struct crypto_akcipher *child;
+diff --git a/include/crypto/rsa-pkcs1pad.h b/include/crypto/rsa-pkcs1pad.h
+new file mode 100644
+index 000000000000..32c7453ff644
+--- /dev/null
++++ b/include/crypto/rsa-pkcs1pad.h
+@@ -0,0 +1,20 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * RSA padding templates.
++ */
++
++#ifndef _CRYPTO_RSA_PKCS1PAD_H
++#define _CRYPTO_RSA_PKCS1PAD_H
++
++/*
++ * Hash algorithm name to ASN.1 template mapping.
++ */
++struct rsa_asn1_template {
++	const char *name;
++	const u8 *data;
++	size_t size;
++};
++
++const struct rsa_asn1_template *rsa_lookup_asn1(const char *name);
++
++#endif /* _CRYPTO_RSA_PKCS1PAD_H */
+-- 
+2.45.0
 
