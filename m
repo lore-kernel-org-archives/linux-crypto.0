@@ -1,50 +1,50 @@
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67FD282EF
-	for <linux-crypto@vger.kernel.org>; Thu, 16 May 2024 08:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2957886267;
+	Thu, 16 May 2024 08:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715847271; cv=none; b=oVe7mQ6TCLkRAevfdtPXG4SvNZM0xlUxijCRkwVMl/4EkzP0fe6bJkS7eAMmo5Efm30psPSffXMYmEotSZC6ZoM+bV7ELtNZ+zHo/gWwB4GQSzM6dCK8b150EayjbxNmJMLkQ5S2WADB5+PZdB996Vl4RyBHqH7UDieHJlfHidU=
+	t=1715848146; cv=none; b=UDcP2sC6T0cPeC+D22VAFKTXBQiP48uDKg613PJuSe9VrW+6oFpQVM5gAA9H42z1QrvSCwtsxWd2a1s16F+Jnm55Sjouiuu6+xSD8cQSsdOKRv86utjdcQT9dN14+occOTPlnUbmXqEcXydhSclnKRfBltBXzbZFMeLVCuIouwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715847271; c=relaxed/simple;
-	bh=GJYIoxXtm1FJsRPU9W4XdmUkrmPA7ZDe6MUe5OHlrR4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=SP5AHkPPqeURuuhvxU66rra0S9RdjZOwH0jjCinanNJCS58n2n3Oy39WM8HA6SF4G4XGjzhyx8d6LfxmZZuk4y+r/Fo0AZP47IQfqdWe9C2XhOO9waGBT9YaypqkwIojrcUwbRA2istV5LFamsbtbV8kzNVgNwQDannS3Gjd7m8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=ZvFoatxb; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+	s=arc-20240116; t=1715848146; c=relaxed/simple;
+	bh=nxv5ycxArjTevmzgBjbrfNCqpXySQ4JMyvIe/0FBJjw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OxGjO5moG7W5uBO3CezDmVt4ZJnVdgcl3yjokJC2eM66h3+inR4oKOP0oswnakBbJYxjFe+fsaS8bG1qA6PiVoaab3hr1J4EG6gxGSZZoJa704QBvzlE0j64p6s9MSa0DMzprwzd5TyyTIH/8Q/UCwQ3gObH0MvTOfaxTDkmRLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kLjvnB1Y; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="ZvFoatxb"
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44G7mxDh002240;
-	Thu, 16 May 2024 10:13:49 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=zsebgqL7ME1csjyfoz1MEw6bVhUR+QtHfWqn47Yy6Es=; b=Zv
-	Foatxbf8NVvCbuOSQfGXHE1SkqeW9cluSq3uZxNTrpQU/9cAAxkiz0etBZzNTJdt
-	ZB5RzL5nUDpIoelVVCx6DwBGMaO2HiWPcHbclL/niBQzTAKnDBXQj5mnrAbYaocX
-	Q+1aUeL0npOqrQTYpNL70K/TI9VA7j+7kUxmnyMVgukUPr2tnU2jb/6kkoPO1dEB
-	8T06x96m8xaluiS0oN6NU0kQYw93FS24DuerDIPrAPh6KEEfitSYpLtGW2iMwcuT
-	LWHn2/2mGU6yAC8huIJvlr6gTSTKNiLk9kgVY8EbG2Wky03Lc1pKAsz+cHmyXqmO
-	8XLdqVjDHkicnZSub0/w==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3y4sxvmacv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 May 2024 10:13:49 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id C96DE4002D;
-	Thu, 16 May 2024 10:13:43 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id F1C53210582;
-	Thu, 16 May 2024 10:12:56 +0200 (CEST)
-Received: from [10.48.87.204] (10.48.87.204) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 16 May
- 2024 10:12:56 +0200
-Message-ID: <e4650db9-569f-417d-b559-bf6854c6e32a@foss.st.com>
-Date: Thu, 16 May 2024 10:12:55 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kLjvnB1Y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715848144; x=1747384144;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nxv5ycxArjTevmzgBjbrfNCqpXySQ4JMyvIe/0FBJjw=;
+  b=kLjvnB1Yh3xQd+c0ifdyWq5xhGhV8Rjscx94NhBgikNYpH2t2sGxjiSJ
+   ap9M1pjZGxcEhmmj8MVDnNQnscPIpYHUFi/JJojbOnPSVevXgLpRrrtoJ
+   Aehe9UAT2Je3YCFqSL7mLvZaMt6fuIe0iCBE2yCwqPEQUinSb/uq4JEV/
+   4J323bwQdjGrJE1AJilFLFKtclJ90Bx6iup9H8ap/WELrPEY3kInMWPVL
+   xJeS5mQAVBv8PJUIymqzfte/HVhZgJcmKnRXDBGqqKWYO2h07z7sbuEEm
+   wMbXV0n/dEmZJdPaKJnL9JnSb6N3a3RsTjh9SNYE6zil+ksPnnuVvnUJo
+   A==;
+X-CSE-ConnectionGUID: VUDdHlV/R/uK71fVzdWQcA==
+X-CSE-MsgGUID: GdCnC6waSXuF3ug1kbtwvw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="12154496"
+X-IronPort-AV: E=Sophos;i="6.08,164,1712646000"; 
+   d="scan'208";a="12154496"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 01:29:03 -0700
+X-CSE-ConnectionGUID: a0gWeKCuRbW8XuYagLQEzQ==
+X-CSE-MsgGUID: IemgONeeRz+3YI5JWUgR+Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,164,1712646000"; 
+   d="scan'208";a="31179894"
+Received: from unknown (HELO [10.238.8.173]) ([10.238.8.173])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 01:28:54 -0700
+Message-ID: <84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
+Date: Thu, 16 May 2024 16:28:51 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,84 +52,108 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] hwrng: stm32 - use pm_runtime_resume_and_get()
-To: Marek Vasut <marex@denx.de>, <linux-crypto@vger.kernel.org>
-CC: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Olivia Mackall <olivia@selenic.com>, Rob Herring <robh@kernel.org>,
-        Yang
- Yingliang <yangyingliang@huawei.com>,
-        <kernel@dh-electronics.com>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>
-References: <20240516012210.128307-1-marex@denx.de>
-Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20240516012210.128307-1-marex@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH v15 09/20] KVM: SEV: Add support to handle MSR based Page
+ State Change VMGEXIT
+To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+ dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
+ kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ pankaj.gupta@amd.com, liam.merwick@oracle.com,
+ Brijesh Singh <brijesh.singh@amd.com>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240501085210.2213060-10-michael.roth@amd.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20240501085210.2213060-10-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-16_03,2024-05-15_01,2023-05-22_02
 
-On 5/16/24 03:20, Marek Vasut wrote:
-> include/linux/pm_runtime.h pm_runtime_get_sync() description suggests to
-> ... consider using pm_runtime_resume_and_get() instead of it, especially
-> if its return value is checked by the caller, as this is likely to result
-> in cleaner code.
-> 
-> This is indeed better, switch to pm_runtime_resume_and_get() which
-> correctly suspends the device again in case of failure. Also add error
-> checking into the RNG driver in case pm_runtime_resume_and_get() does
-> fail, which is currently not done, and it does detect sporadic -EACCES
-> error return after resume, which would otherwise lead to a hang due to
-> register access on un-resumed hardware. Now the read simply errors out
-> and the system does not hang.
-> 
-> Signed-off-by: Marek Vasut <marex@denx.de>
+
+
+On 5/1/2024 4:51 PM, Michael Roth wrote:
+> SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
+> table to be private or shared using the Page State Change MSR protocol
+> as defined in the GHCB specification.
+>
+> When using gmem, private/shared memory is allocated through separate
+> pools, and KVM relies on userspace issuing a KVM_SET_MEMORY_ATTRIBUTES
+> KVM ioctl to tell the KVM MMU whether or not a particular GFN should be
+> backed by private memory or not.
+>
+> Forward these page state change requests to userspace so that it can
+> issue the expected KVM ioctls. The KVM MMU will handle updating the RMP
+> entries when it is ready to map a private page into a guest.
+>
+> Use the existing KVM_HC_MAP_GPA_RANGE hypercall format to deliver these
+> requests to userspace via KVM_EXIT_HYPERCALL.
+>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Co-developed-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 > ---
-> Cc: "Uwe Kleine-König" <u.kleine-koenig@pengutronix.de>
-> Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
-> Cc: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: Marek Vasut <marex@denx.de>
-> Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
-> Cc: Olivia Mackall <olivia@selenic.com>
-> Cc: Rob Herring <robh@kernel.org>
-> Cc: Yang Yingliang <yangyingliang@huawei.com>
-> Cc: kernel@dh-electronics.com
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-stm32@st-md-mailman.stormreply.com
-> ---
->   drivers/char/hw_random/stm32-rng.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-> index 0e903d6e22e30..6dec4adc49853 100644
-> --- a/drivers/char/hw_random/stm32-rng.c
-> +++ b/drivers/char/hw_random/stm32-rng.c
-> @@ -187,7 +187,9 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
->   	int retval = 0, err = 0;
->   	u32 sr;
+>   arch/x86/include/asm/sev-common.h |  6 ++++
+>   arch/x86/kvm/svm/sev.c            | 48 +++++++++++++++++++++++++++++++
+>   2 files changed, 54 insertions(+)
+>
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index 1006bfffe07a..6d68db812de1 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -101,11 +101,17 @@ enum psc_op {
+>   	/* GHCBData[11:0] */				\
+>   	GHCB_MSR_PSC_REQ)
 >   
-> -	pm_runtime_get_sync((struct device *) priv->rng.priv);
-> +	retval = pm_runtime_resume_and_get((struct device *)priv->rng.priv);
-> +	if (retval)
-> +		return retval;
+> +#define GHCB_MSR_PSC_REQ_TO_GFN(msr) (((msr) & GENMASK_ULL(51, 12)) >> 12)
+> +#define GHCB_MSR_PSC_REQ_TO_OP(msr) (((msr) & GENMASK_ULL(55, 52)) >> 52)
+> +
+>   #define GHCB_MSR_PSC_RESP		0x015
+>   #define GHCB_MSR_PSC_RESP_VAL(val)			\
+>   	/* GHCBData[63:32] */				\
+>   	(((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
 >   
->   	if (readl_relaxed(priv->base + RNG_SR) & RNG_SR_SEIS)
->   		stm32_rng_conceal_seed_error(rng);
+> +/* Set highest bit as a generic error response */
+> +#define GHCB_MSR_PSC_RESP_ERROR (BIT_ULL(63) | GHCB_MSR_PSC_RESP)
+> +
+>   /* GHCB Hypervisor Feature Request/Response */
+>   #define GHCB_MSR_HV_FT_REQ		0x080
+>   #define GHCB_MSR_HV_FT_RESP		0x081
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index e1ac5af4cb74..720775c9d0b8 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3461,6 +3461,48 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
+>   	svm->vmcb->control.ghcb_gpa = value;
+>   }
+>   
+> +static int snp_complete_psc_msr(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +
+> +	if (vcpu->run->hypercall.ret)
 
-Hi Marek,
+Do we have definition of ret? I didn't find clear documentation about it.
+According to the code, 0 means succssful. Is there any other error codes 
+need to or can be interpreted?
 
-I'll check in other stm32 drivers as well.
+For TDX, it may also want to use KVM_HC_MAP_GPA_RANGE hypercall  to 
+userspace via KVM_EXIT_HYPERCALL.
 
-Acked-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 
-Thanks,
-Gatien
+> +		set_ghcb_msr(svm, GHCB_MSR_PSC_RESP_ERROR);
+> +	else
+> +		set_ghcb_msr(svm, GHCB_MSR_PSC_RESP);
+> +
+> +	return 1; /* resume guest */
+> +}
+>
+[...]
