@@ -1,88 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEAAD13DBB3;
-	Thu, 16 May 2024 08:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE961411D8
+	for <linux-crypto@vger.kernel.org>; Thu, 16 May 2024 08:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715848325; cv=none; b=NBucBwdurKm6RVSAOmK5Ek28TT26U1+5r2RtbezUQuf0UFXASA+Q407bRjaPmzhz7GQi5KsV2BFUe16ErbbBQDE/lcD3xELwCGcbRCssscbTe8ha9iYef2rAlmgiFAH9hxqNDYdaQnjdlYA1SyyZKPra2ny3bBGC/Ajt/X36Hzk=
+	t=1715848728; cv=none; b=nRAtSH0vSdGAG59NQthCleBcTNNvuKgYDGqrZ5ffaHvFnUF+wgVbhd2GNbpkPo5DmBE3gUlRrBwE0erLuudbkY7sdGhqhxJKOdoJ6aqrWxnCe6cBY6LCCO8IWb2wrVCjzQXfrm99avaA5C8IGcWK1E9Renccfcpb26ldMQ+ZBh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715848325; c=relaxed/simple;
-	bh=EkK/fZCdkQN2rHkZszv4lDXs1TZvezudhwKaQ4nvako=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=ZPrZIL/+bCrPRGU4nuMrsEaLxzRuYSo/SDdMSStLETsmPhuWhFQ7BB0FEseimER+R7Ft/GELha5ARmSByC8Mj2OEbObIfwzjCipbzwwcwABqXNNxPFhZGfxwO3Di+5F5i62c2dfToYcCu6yQ69fDbMo4slVx2g2YCwBNJLP6IkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WqebH+Hi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1715848728; c=relaxed/simple;
+	bh=lh7fMWPMcn5n6bL+jz5HkQSkNBuVEDIGI5wL//wYXuw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MysUABalfPG9iIfgZCJ5wlvwSATBUXP+ZTqIlFF8ZSqbPTFEbmY17pClLQjoiQYugl9kfc+HmJpdSU+IAFH/fotUOtRLSCm6paoNNKAN1EON7ZpomXXiT0Cj1UmuZPkUQBdIMfgdYMsR5qKVaoOjiuzOhW2DGeoK8si+uNpty90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org; spf=pass smtp.mailfrom=cryptogams.org; dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b=TcacwMIE; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryptogams.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WqebH+Hi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16F62C32781;
-	Thu, 16 May 2024 08:32:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715848325;
-	bh=EkK/fZCdkQN2rHkZszv4lDXs1TZvezudhwKaQ4nvako=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=WqebH+HipenVS6+ON/c8ZUSFNWWLLQF5XMZL1MXRhetrXMtFE56VJCh3qwLcLU+O+
-	 O/z5DbDwhIzX9bYSzjM1MMa4FxRpb8PyVkUy/V5bsZhdBeZ4QiCol5kIObGCD2OaLq
-	 0nX61uZEOR7+vQC2uNibip4HUxyZ5sDb+heCKqaEshVmMK0W6FaQceDMuc3NwOgMp7
-	 FXz3+EThGZBjkYUe1h9CBSmGUMtGQ+lYDRgc5kr6nD1t9KFMonAh3UPAiYVJdpDFXx
-	 +VDVMAf/llHIzwuoNVXLvhaMfEFs/T5CQ6Gvkrb599+kbsv5uzv8gleIkJwKhtS7rh
-	 vGiVpIyyzU6AA==
+	dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b="TcacwMIE"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-51f72a29f13so591154e87.3
+        for <linux-crypto@vger.kernel.org>; Thu, 16 May 2024 01:38:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cryptogams.org; s=gmail; t=1715848725; x=1716453525; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VOeW1i0XSjN8EcRDRG2ima3ZBqcENGXoN19rlekIi1o=;
+        b=TcacwMIEwD+LM78G/WEdMeKWTC6AccDZLRdgHOkTlUVYxVAZeGAF5dwjSJ2KMlRSaz
+         mIVTpcOL73Xc4v+lYk1YboR+1gOzIzY4YAIYBWTd+l//K3EL+imVNnGIJgJJLbtWV4Un
+         NpZvuvAkrFea/VsStB3kWf/7G5VJ9aco4UOduTQfrPLnA9vzmRljNC8l6w6+Rj0KKJsw
+         Y0VsBQYeyWBHrNghbt8HwfkiEe+duiT7vLw1tYbNQM4KSo9/1dB2gUwE9bv6yOTuCqff
+         dVqQ13DOD5SjiIDiaEgQn8OyO7zlFIaTGFnDPndXBFFdRLOFSopVCwiUZr6leUwh2r7H
+         zNHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715848725; x=1716453525;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VOeW1i0XSjN8EcRDRG2ima3ZBqcENGXoN19rlekIi1o=;
+        b=hS0oE26pEtmhqbDBdfa4TpJg4NPL7SfyBu2ivW2SowqN5ZxCfWJ56u/0Wsuhzpq1sJ
+         ZnTS3GGLTG5GoqCBhGqX9+noSxlTsvWJ55dNGdjpcZZ3YCSi7Kf2xODlECPc83+suZif
+         Q55huWLtsL8aeoAYSfJSerqrX95mwK0qcgQp5DwL45n8j7UEt3sVhYCSVPPLxd9VDd+r
+         YVsKyXr2ZnHN41YIM1f/cJVKo8F8T/hl71vug/fTCjW13D9DizVOaU+PPGrnftuCu1j0
+         FdACKPfJDoZKEfosgaFVcRZP4Cl56W6vCiC83/fIegpco0MChbmpBPZeqpvIuzxfRgTY
+         RPiA==
+X-Forwarded-Encrypted: i=1; AJvYcCXBxpft2WU0+qckVyL4eBIHrJ9/LDoy6DkAfDzM9fHe+FwDAXoAKWj6A6HD9KA6GifwWc5QMox4UMXypsRoEzc+rHGxaWi7KUrIti3E
+X-Gm-Message-State: AOJu0YxCEaekpWbBALqBiyzIDvfLpEpZZE91+DWh391hXmfBVP8GI0EH
+	VkDmlrUI9RzYozF2t/MsYTZ/bq1Qr6slJf3i8iNwWniaSeiGPkT8uN0OclnJjNw=
+X-Google-Smtp-Source: AGHT+IH4ciVi2WPFfN4wIB15qPhRg9zSbcHYMDpqRPhOgTsgCJ+nsPiQObpBhEe9fHl4yk1Q/wux9A==
+X-Received: by 2002:a19:5f41:0:b0:518:9362:f63 with SMTP id 2adb3069b0e04-5220f97041fmr11199702e87.0.1715848724887;
+        Thu, 16 May 2024 01:38:44 -0700 (PDT)
+Received: from [10.0.1.129] (c-922370d5.012-252-67626723.bbcust.telenor.se. [213.112.35.146])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-521f35ad461sm2876576e87.33.2024.05.16.01.38.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 May 2024 01:38:44 -0700 (PDT)
+Message-ID: <89e7b4b0-9804-41be-b9b1-aeba57cd3cc6@cryptogams.org>
+Date: Thu, 16 May 2024 10:38:43 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 16 May 2024 11:32:02 +0300
-Message-Id: <D1AXGT9YQXFN.QWKG529CLJUG@kernel.org>
-Cc: <linux-integrity@vger.kernel.org>, "James Prestwood"
- <prestwoj@gmail.com>, "David S. Miller" <davem@davemloft.net>, "open
- list:CRYPTO API" <linux-crypto@vger.kernel.org>, "open list"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] crypto: rsa-pkcs1pad: export rsa1_asn_lookup()
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
-X-Mailer: aerc 0.17.0
-References: <20240515150213.32491-1-jarkko@kernel.org>
- <ZkWIFjGzB3ngUgsP@gondor.apana.org.au>
-In-Reply-To: <ZkWIFjGzB3ngUgsP@gondor.apana.org.au>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] crypto: X25519 low-level primitives for ppc64le.
+To: Michael Ellerman <mpe@ellerman.id.au>, Danny Tsen <dtsen@linux.ibm.com>,
+ linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au, leitao@debian.org, nayna@linux.ibm.com,
+ linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
+References: <20240514173835.4814-1-dtsen@linux.ibm.com>
+ <20240514173835.4814-2-dtsen@linux.ibm.com> <87a5kqwe59.fsf@mail.lhotse>
+Content-Language: en-US
+From: Andy Polyakov <appro@cryptogams.org>
+In-Reply-To: <87a5kqwe59.fsf@mail.lhotse>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu May 16, 2024 at 7:14 AM EEST, Herbert Xu wrote:
-> On Wed, May 15, 2024 at 06:02:10PM +0300, Jarkko Sakkinen wrote:
-> > ASN.1 template is required for TPM2 asymmetric keys, as it needs to be
-> > piggy-packed with the input data before applying TPM2_RSA_Decrypt. This
-> > patch prepares crypto subsystem for the addition of those keys.
-> >=20
-> > Later rsa_lookup_asn1() can be enabled in crypto/asymmetric_keys/Kconfi=
-g
-> > by:
-> >=20
-> > 	depends on CRYPTO_RSA >=3D <TPM2 asymmetric keys>
-> >=20
-> > Cc: James Prestwood <prestwoj@gmail.com>
-> > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > ---
-> > v2:
-> > - Fix typo in the kdoc.
-> > - Export also the template struct.
-> > ---
-> >  crypto/rsa-pkcs1pad.c         | 16 ++++++++++------
-> >  include/crypto/rsa-pkcs1pad.h | 20 ++++++++++++++++++++
-> >  2 files changed, 30 insertions(+), 6 deletions(-)
-> >  create mode 100644 include/crypto/rsa-pkcs1pad.h
->
-> Please provide a link to the patch that will make use of this.
+Hi,
 
-OK, fair enough. Will be part of the full patch set.
+>> +.abiversion	2
+> 
+> I'd prefer that was left to the compiler flags.
 
-Overally I can say that this will be used to make textbook RSA
-to a proper RSA signature ASN.1 and appropriate padding. I.e.
-breath new life to this patch, which has duplicate code:
+Problem is that it's the compiler that is responsible for providing this 
+directive in the intermediate .s prior invoking the assembler. And there 
+is no assembler flag to pass through -Wa. If concern is ABI neutrality, 
+then solution would rather be #if (_CALL_ELF-0) == 2/#endif. One can 
+also make a case for
 
-https://lore.kernel.org/all/20200518172704.29608-18-prestwoj@gmail.com/
+#ifdef _CALL_ELF
+.abiversion _CALL_ELF
+#endif
 
-TPM2_RSA_Decrypt is exactly textbook RSA so it partially needs
-the code from kernel's RSA implementation.
+Cheers.
 
-BR, Jarkko
