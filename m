@@ -1,100 +1,70 @@
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FFA4A0C
-	for <linux-crypto@vger.kernel.org>; Thu, 16 May 2024 03:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7479EB667;
+	Thu, 16 May 2024 04:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715831436; cv=none; b=uRPbMgAXiUFInmT8ffhf10PVazrefUL41uAfFX7po4vT/hWWW9WE/2hMLH116hzokVle0G3i1PntVke6sxeLzICxtQTX628J4r/gFzRALkajw0dlMRoK+rvRfTlzRyky0t9VvwybgH3rJOAAzZGgWe45m0UM/NJNRbCFh2uUB9I=
+	t=1715832868; cv=none; b=ekIk3DWRrL+ej9vRH42XacFw5rBG3J+Fp4n0bZQruSOO3hzoGSOWe/jMuSYE6Y0yAkT5PDoCVhi6/Ajq+maA5Tk/naeJ31t+pgYpD5VXhXyZAZ1/APJ6IVXmLlxMM4izICE1xY190J/Cy2ygF7jn3y09kOUPlShPIHCjBSFxk7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715831436; c=relaxed/simple;
-	bh=hHa6kmharfqHVPtuc3yO5chQaYVtBbZpk4gsvsfx378=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YV8TZfaQEMCiIJUBSahUnFo4FKsDgsx9qkBPBQ3m9VAoxBp4keeWPXqhJpEYEZ3Z46lZu2BPtzJPa4cYmBe+THD6QvJErsJ3p5Kw7E85mXQu3xGP/nVMW+TLDFrgRf+D5gHvZ2C9o3+84/ID+oyhdFgefdP5N1BLxKwWCgjHHR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=JoHf+kb2; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="JoHf+kb2"
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-de61424f478so7444050276.0
-        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2024 20:50:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1715831434; x=1716436234; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+wnK0WjZixLo/MtWnjkyeiV+YNAfaoH1VmBopqFJPW8=;
-        b=JoHf+kb2iOT93cRPKX1gdMJa9sckS+7W892HnJuKttsFaRhoeMUrBHzUYcA6/dMosg
-         RVTp/aFPYjUk4NMtrKNlDQOt5EsCC+rNVYr9zNrzRbf1DUA739rZW/ZpDMOUI7AL5VJf
-         llOcxnUmifOGdBljplOreP2wGTqcYGn0vIZd4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715831434; x=1716436234;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+wnK0WjZixLo/MtWnjkyeiV+YNAfaoH1VmBopqFJPW8=;
-        b=k7ftG2IMbMjM/7xjgcg6+NoJNMMdj4EkZ3CFcxtDG3xv2S0P1IrVuETrhFAXpDSFuf
-         fK0VeJnovlBeZbCM0jCdrKYqNKY1G6Niv4Ns9Sv145H6U4UuS92OScXKClfye3oCpjGH
-         eMjMqVFyvIoaywP6BmCOJ5sbMYPStUEZEpbnTuGwvDHUJe2k7Qh9z/a+6WWAPR9UETdn
-         CZ1slK2T/kmsvQybfsHjXVQ3hGnOB005YNKHCHKR9vTCyWckfMsLp9D1QK0S8t+vZB1P
-         adSmr3onGlK+hN23N/VLew4gUDhpSpXZuesECteKa+iWnXFLf9LY2SeK+hnosXxkFUpH
-         oHwg==
-X-Gm-Message-State: AOJu0YxQrI7wtl16yUtyBgPKPVOrAHBjcpd4lXc/NLkUFe2+IfYtmK+S
-	vagZlf++lnUtpyP57pRVjbEjLYSzRuthaZAZ/NvwgQmuxBUSTSgyUAIHDhZur2kX/p2VVfv/7rl
-	8oxijytwaf85F10VSZYThfAT4NnmFuRL2V2Ejt70LwwNmbiGV
-X-Google-Smtp-Source: AGHT+IGFjSu+/VtUxs8ASexrS0GPVQUTBMIDEBfiN0x0l0+Q/HV7y4NLvg9S+4EIGUwblSQuPkOFjYm3ngb9KNWnSH8=
-X-Received: by 2002:a25:820d:0:b0:dd0:972b:d218 with SMTP id
- 3f1490d57ef6-dee4f370323mr15839405276.41.1715831434476; Wed, 15 May 2024
- 20:50:34 -0700 (PDT)
+	s=arc-20240116; t=1715832868; c=relaxed/simple;
+	bh=m0vqLRuxnXhTboukS10XEKhxUZC+tsW2wUAoxQlVv1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=roqAuyp+Qr/C3IWNWPpyTL9bQz9KqYoG/OmMglTksXXBSO/kjAaIjW7hsUoUhVvGn3SgVwe7omPi47Z3zv06VzKrwW2iCi8uEjIqiMF3D6B8atIY0s7lpWDS4vVMcgqrUXx/guRqBQyeQn+1jAGnBgpySl1//xZiMqwvVp2m5eE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1s7SVR-00FkAX-1O;
+	Thu, 16 May 2024 12:14:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 May 2024 12:14:14 +0800
+Date: Thu, 16 May 2024 12:14:14 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: linux-integrity@vger.kernel.org, James Prestwood <prestwoj@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] crypto: rsa-pkcs1pad: export rsa1_asn_lookup()
+Message-ID: <ZkWIFjGzB3ngUgsP@gondor.apana.org.au>
+References: <20240515150213.32491-1-jarkko@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240426042544.3545690-1-pavitrakumarm@vayavyalabs.com>
- <20240426042544.3545690-4-pavitrakumarm@vayavyalabs.com> <ZjS8fQE5No1rDygF@gondor.apana.org.au>
- <CALxtO0m2wC3=yP5zE3_2nboVBVRVuhwuHx9Pdfj25wynky3E-A@mail.gmail.com>
- <Zj3Ut7ToXihFEDip@gondor.apana.org.au> <CALxtO0myn63AwPh4vck7fpuJcttPJYLBM3TpsyBAexCMSa4GcQ@mail.gmail.com>
- <ZkV6ZmONMHEX7BQy@gondor.apana.org.au>
-In-Reply-To: <ZkV6ZmONMHEX7BQy@gondor.apana.org.au>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Thu, 16 May 2024 09:20:23 +0530
-Message-ID: <CALxtO0=n+k9NDfH87JWkFHQfA=T2x+T-ekGh=SBmA6Ozk48qsw@mail.gmail.com>
-Subject: Re: [PATCH v3 3/7] Add SPAcc ahash support
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, Ruud.Derwig@synopsys.com, 
-	manjunath.hadli@vayavyalabs.com, bhoomikak@vayavyalabs.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240515150213.32491-1-jarkko@kernel.org>
 
-Sure Herbert,
-  Thanks a lot for the quick reply.
-  I will update the partial hashing code to do a software fallback and
-push the patch.
+On Wed, May 15, 2024 at 06:02:10PM +0300, Jarkko Sakkinen wrote:
+> ASN.1 template is required for TPM2 asymmetric keys, as it needs to be
+> piggy-packed with the input data before applying TPM2_RSA_Decrypt. This
+> patch prepares crypto subsystem for the addition of those keys.
+> 
+> Later rsa_lookup_asn1() can be enabled in crypto/asymmetric_keys/Kconfig
+> by:
+> 
+> 	depends on CRYPTO_RSA >= <TPM2 asymmetric keys>
+> 
+> Cc: James Prestwood <prestwoj@gmail.com>
+> Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+> ---
+> v2:
+> - Fix typo in the kdoc.
+> - Export also the template struct.
+> ---
+>  crypto/rsa-pkcs1pad.c         | 16 ++++++++++------
+>  include/crypto/rsa-pkcs1pad.h | 20 ++++++++++++++++++++
+>  2 files changed, 30 insertions(+), 6 deletions(-)
+>  create mode 100644 include/crypto/rsa-pkcs1pad.h
 
-Warm regards,
-PK
+Please provide a link to the patch that will make use of this.
 
-
-On Thu, May 16, 2024 at 8:45=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> On Thu, May 16, 2024 at 08:41:57AM +0530, Pavitrakumar Managutte wrote:
-> > Hi Herbert,
-> >    The SPAcc crypto accelerator has the below design
-> >
-> >    1. The SPAcc does not allow us to read internal context (including
-> > the intermediate hash).
-> >        The hardware context is inaccessible for security reasons.
->
-> In that case you cannot support the partial hashing APIs in Linux.
->
-> You should use a software fallback for everything but the digest
-> call.
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
