@@ -1,141 +1,185 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47AC914D45E;
-	Thu, 16 May 2024 15:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8498C156F22
+	for <linux-crypto@vger.kernel.org>; Thu, 16 May 2024 17:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715872826; cv=none; b=M5C/QsTb2kY9n00jAMy5pqTmDPncfwLbRRkOuK2e0o6SxCQaauo5x8BLBX+NJ8WNL4JRexM71/i72gR8LNYrHlymg1BToDSeEd5GRvCE+Wvez+1+FKOUx4aJNGyRJtYHBXG+iEYW3pKuuybtX1ZPECWJyyOMjy8/wd2FwaJtETg=
+	t=1715880233; cv=none; b=eTrPHIFsXM9mdbFgqJuVw2SRW6hNVj9PAtXGYRYV9Cyv8An9ugeGvHQepObd1xK5DiC29pojeFdw2N1A2CQDKL8KHr7sx79LCxo1K5lTPFoCAlkKUlOY0qezxGqQpLHRXGLcNKgGapkZ0zPNLvPs7uEb0j2EW9ReezwyGEa2n00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715872826; c=relaxed/simple;
-	bh=DwwO1s19angZnpfVZnhLVaPJ2gA2nRu5OBCzD1YtfMk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KyVqQAO++9ipjA8ELgeGKe8PvN/yBhylhyR9FpL4ZXp8bA8/wx4GsY2bWoD7Pb9NR5h0JOV3rw5M7MMKeYCTI6jQUz6cHX1ID3YIh7dthq73g20hWzGOkXY4JbLsJyEGl3Siz3NgQvVjm0fcll0Rv6nSgO1u5xC2g0EdsUlh5aU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dJij+bKi; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1715880233; c=relaxed/simple;
+	bh=HMh7HuasJa24BhZCwWokjmjfgzo6MrZ9NA4F5skwANU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l7ieBd6pjIQwWordstG0+H+LqF0kUWrU7q9lBLtFve7cq4/hB2TFM4yhec74/boQ/WfDchabgvczdIXolOqhT7cYXcZymjDZgvqhU0DPw1hawjtPb/SYL83qn7txGdYp5iK+sRV9XQaxn2QHatH7qlO7Si8S1MHdV4X0jRL1psk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NKhWMF4n; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dJij+bKi"
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44GDEIhu030613;
-	Thu, 16 May 2024 15:20:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=5nMelTmMbO56bSQrp6/Ccu6IA7pxu29++FFJZKkFP4U=;
- b=dJij+bKi7kBQOHgGxhLbhz2xsJmhQRTSgasK+VeKofOBTS/b5WKGEt6jR+tNi7FWksy3
- T3Oipu+qBvcvCqgKRTXkyLlw/Hff9eTsjMdMhEm5LAHvqmln1IvzlQyg0mk2wrHBBKOV
- wZ68PWPmJh3OV3qdsPjHfL/vadtrBkKWaaSjtBx3sjcpfSqXPjw84+yfpbaAAtuGTHP1
- KqUrQ/9ZwBH0XzHiN6/zWWZ31eJxW70b6zGTuIjckBRcke2YAUE0kJMhVj+n/7JER/M8
- 9P9QUsy6Ib44oXh3MPjHRL7MO5Igk6YbwWueftxbBcUTCYsv9U2GGycEwbk3clwi68dB sQ== 
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y5ju60bdf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 May 2024 15:20:10 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44GC3Bk8029599;
-	Thu, 16 May 2024 15:20:08 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3y2n7m29fx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 May 2024 15:20:08 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44GFK56V39059846
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 16 May 2024 15:20:07 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D98CE58078;
-	Thu, 16 May 2024 15:20:03 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A0FFD5806B;
-	Thu, 16 May 2024 15:20:03 +0000 (GMT)
-Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 16 May 2024 15:20:03 +0000 (GMT)
-From: Danny Tsen <dtsen@linux.ibm.com>
-To: linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au, leitao@debian.org, nayna@linux.ibm.com,
-        appro@cryptogams.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com,
-        Danny Tsen <dtsen@linux.ibm.com>
-Subject: [PATCH v2 3/3] crypto: Update Kconfig and Makefile for ppc64le x25519.
-Date: Thu, 16 May 2024 11:19:57 -0400
-Message-Id: <20240516151957.2215-4-dtsen@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20240516151957.2215-1-dtsen@linux.ibm.com>
-References: <20240516151957.2215-1-dtsen@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKhWMF4n"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715880230;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=19E7GPCN1ivTDhWTuCbZE7KnAa8A5iElKF7+ifU05tY=;
+	b=NKhWMF4nw42o4kzrADMRjLnJH6EC4oZTBjhB4awxUyZGALktlflffhzdjNevuQbiw2sKy9
+	Th28oT7K2H6cwo06OELFOL9ZQiUtFkmBMg75Pv1RE1rQ4FJziAKPC49TIOZiJddVlndItz
+	OgSfFHDjzk2XuoaBm0Yi/VX0WYYxuOU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-28-9naiIyVLM_K8sYzZFxB2HA-1; Thu, 16 May 2024 13:23:49 -0400
+X-MC-Unique: 9naiIyVLM_K8sYzZFxB2HA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-34f1b148725so3726378f8f.2
+        for <linux-crypto@vger.kernel.org>; Thu, 16 May 2024 10:23:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715880228; x=1716485028;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=19E7GPCN1ivTDhWTuCbZE7KnAa8A5iElKF7+ifU05tY=;
+        b=eHBLIVqgFNl20ecIH2KvV6Y8dA+XD7HReiLDvvV/1tPbTaIVodq2gL3KNwkaSNR51l
+         5z34yW47x5XM2tTjhTliYI9+KoPm9vTsaHCG57ajt0P/3RKzRELBaqtC6QXiyUxufevi
+         YJuzn0iITtlvbCmf9D2dIEUOfRN/nSR88y0ubTuzhIPAtc2ljxpOMO35JRQProMLuM6H
+         ccHwW1BH4a1klrv6Qus5veDfQ5vQhI0uoiTg1tCy+7EKjbxrPUXhxDlPPOFd0g3OnrYx
+         2LB5ObToL1LBvQ3ehfewMQ9gJMUmy6/McLzoIbzg/HmQXec9LbptWBruvS2rusoC6iw7
+         d4qw==
+X-Forwarded-Encrypted: i=1; AJvYcCULoAdAWgdbz87cGTKcYYZUUN8JA+5/m4rrBVOQKM9MgDrn7XYBvYCCp+UglfksbnKDJmVkHQs32VJIkwZDWqOh3JEzzPSCDRAfSbWD
+X-Gm-Message-State: AOJu0YzmPHnLdvd85H2M8/vMR7HInUtSxnTiwk0QclqLuXCO/q+J91ID
+	y2BwDG4xn1Lyh5Fl2xSsjP43Gg/D1rW/HfZFrJvkwG1GHpfqqNJFJi/x2K/FBNap9qPj5oSlfTG
+	Vo1+oDGTzJzRikSQwbrkKr8idq+uf78xxjyVpOlnDY9t9cVILt+r8wc+uBBIUH0PlJit2G+TcdP
+	Gsz/jszEXoXk1VjO3vng0Bo1jaedVmOxmXx12V
+X-Received: by 2002:adf:ff92:0:b0:34c:9b4d:a7ee with SMTP id ffacd0b85a97d-3504aa66822mr15744045f8f.67.1715880228124;
+        Thu, 16 May 2024 10:23:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHTVOF6tCwOyYT/m1XvAI/L4WEGf+ijDm6MmFZ5m37aa8PPPlxqPrapghhXVBONg9RhqurSX3MAN+Jlfejb4GQ=
+X-Received: by 2002:adf:ff92:0:b0:34c:9b4d:a7ee with SMTP id
+ ffacd0b85a97d-3504aa66822mr15744026f8f.67.1715880227699; Thu, 16 May 2024
+ 10:23:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: MP_AHtOf1pFp6RPU5qSUDGVev9rTglGp
-X-Proofpoint-ORIG-GUID: MP_AHtOf1pFp6RPU5qSUDGVev9rTglGp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-16_07,2024-05-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=678 suspectscore=0 phishscore=0 clxscore=1015 impostorscore=0
- malwarescore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2405160108
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240501085210.2213060-10-michael.roth@amd.com> <84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
+In-Reply-To: <84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 16 May 2024 19:23:35 +0200
+Message-ID: <CABgObfaXmMUYHEuK+D+2E9pybKMJqGZsKB033X1aOSQHSEqqVA@mail.gmail.com>
+Subject: Re: [PATCH v15 09/20] KVM: SEV: Add support to handle MSR based Page
+ State Change VMGEXIT
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+	seanjc@google.com, vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Defined CRYPTO_CURVE25519_PPC64 to support X25519 for ppc64le.
-
-Added new module curve25519-ppc64le for X25519.
-
-Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
----
- arch/powerpc/crypto/Kconfig  | 11 +++++++++++
- arch/powerpc/crypto/Makefile |  2 ++
- 2 files changed, 13 insertions(+)
-
-diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
-index 1e201b7ae2fc..09ebcbdfb34f 100644
---- a/arch/powerpc/crypto/Kconfig
-+++ b/arch/powerpc/crypto/Kconfig
-@@ -2,6 +2,17 @@
- 
- menu "Accelerated Cryptographic Algorithms for CPU (powerpc)"
- 
-+config CRYPTO_CURVE25519_PPC64
-+	tristate "Public key crypto: Curve25519 (PowerPC64)"
-+	depends on PPC64 && CPU_LITTLE_ENDIAN
-+	select CRYPTO_LIB_CURVE25519_GENERIC
-+	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	help
-+	  Curve25519 algorithm
+On Thu, May 16, 2024 at 10:29=E2=80=AFAM Binbin Wu <binbin.wu@linux.intel.c=
+om> wrote:
+>
+>
+>
+> On 5/1/2024 4:51 PM, Michael Roth wrote:
+> > SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
+> > table to be private or shared using the Page State Change MSR protocol
+> > as defined in the GHCB specification.
+> >
+> > When using gmem, private/shared memory is allocated through separate
+> > pools, and KVM relies on userspace issuing a KVM_SET_MEMORY_ATTRIBUTES
+> > KVM ioctl to tell the KVM MMU whether or not a particular GFN should be
+> > backed by private memory or not.
+> >
+> > Forward these page state change requests to userspace so that it can
+> > issue the expected KVM ioctls. The KVM MMU will handle updating the RMP
+> > entries when it is ready to map a private page into a guest.
+> >
+> > Use the existing KVM_HC_MAP_GPA_RANGE hypercall format to deliver these
+> > requests to userspace via KVM_EXIT_HYPERCALL.
+> >
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > Co-developed-by: Brijesh Singh <brijesh.singh@amd.com>
+> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > ---
+> >   arch/x86/include/asm/sev-common.h |  6 ++++
+> >   arch/x86/kvm/svm/sev.c            | 48 ++++++++++++++++++++++++++++++=
 +
-+	  Architecture: PowerPC64
-+	  - Little-endian
-+
- config CRYPTO_CRC32C_VPMSUM
- 	tristate "CRC32c"
- 	depends on PPC64 && ALTIVEC
-diff --git a/arch/powerpc/crypto/Makefile b/arch/powerpc/crypto/Makefile
-index fca0e9739869..59808592f0a1 100644
---- a/arch/powerpc/crypto/Makefile
-+++ b/arch/powerpc/crypto/Makefile
-@@ -17,6 +17,7 @@ obj-$(CONFIG_CRYPTO_AES_GCM_P10) += aes-gcm-p10-crypto.o
- obj-$(CONFIG_CRYPTO_CHACHA20_P10) += chacha-p10-crypto.o
- obj-$(CONFIG_CRYPTO_POLY1305_P10) += poly1305-p10-crypto.o
- obj-$(CONFIG_CRYPTO_DEV_VMX_ENCRYPT) += vmx-crypto.o
-+obj-$(CONFIG_CRYPTO_CURVE25519_PPC64) += curve25519-ppc64le.o
- 
- aes-ppc-spe-y := aes-spe-core.o aes-spe-keys.o aes-tab-4k.o aes-spe-modes.o aes-spe-glue.o
- md5-ppc-y := md5-asm.o md5-glue.o
-@@ -29,6 +30,7 @@ aes-gcm-p10-crypto-y := aes-gcm-p10-glue.o aes-gcm-p10.o ghashp10-ppc.o aesp10-p
- chacha-p10-crypto-y := chacha-p10-glue.o chacha-p10le-8x.o
- poly1305-p10-crypto-y := poly1305-p10-glue.o poly1305-p10le_64.o
- vmx-crypto-objs := vmx.o aesp8-ppc.o ghashp8-ppc.o aes.o aes_cbc.o aes_ctr.o aes_xts.o ghash.o
-+curve25519-ppc64le-y := curve25519-ppc64le-core.o curve25519-ppc64le_asm.o
- 
- ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
- override flavour := linux-ppc64le
--- 
-2.31.1
+> >   2 files changed, 54 insertions(+)
+> >
+> > diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/s=
+ev-common.h
+> > index 1006bfffe07a..6d68db812de1 100644
+> > --- a/arch/x86/include/asm/sev-common.h
+> > +++ b/arch/x86/include/asm/sev-common.h
+> > @@ -101,11 +101,17 @@ enum psc_op {
+> >       /* GHCBData[11:0] */                            \
+> >       GHCB_MSR_PSC_REQ)
+> >
+> > +#define GHCB_MSR_PSC_REQ_TO_GFN(msr) (((msr) & GENMASK_ULL(51, 12)) >>=
+ 12)
+> > +#define GHCB_MSR_PSC_REQ_TO_OP(msr) (((msr) & GENMASK_ULL(55, 52)) >> =
+52)
+> > +
+> >   #define GHCB_MSR_PSC_RESP           0x015
+> >   #define GHCB_MSR_PSC_RESP_VAL(val)                  \
+> >       /* GHCBData[63:32] */                           \
+> >       (((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
+> >
+> > +/* Set highest bit as a generic error response */
+> > +#define GHCB_MSR_PSC_RESP_ERROR (BIT_ULL(63) | GHCB_MSR_PSC_RESP)
+> > +
+> >   /* GHCB Hypervisor Feature Request/Response */
+> >   #define GHCB_MSR_HV_FT_REQ          0x080
+> >   #define GHCB_MSR_HV_FT_RESP         0x081
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index e1ac5af4cb74..720775c9d0b8 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -3461,6 +3461,48 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u=
+64 value)
+> >       svm->vmcb->control.ghcb_gpa =3D value;
+> >   }
+> >
+> > +static int snp_complete_psc_msr(struct kvm_vcpu *vcpu)
+> > +{
+> > +     struct vcpu_svm *svm =3D to_svm(vcpu);
+> > +
+> > +     if (vcpu->run->hypercall.ret)
+>
+> Do we have definition of ret? I didn't find clear documentation about it.
+> According to the code, 0 means succssful. Is there any other error codes
+> need to or can be interpreted?
+
+They are defined in include/uapi/linux/kvm_para.h
+
+#define KVM_ENOSYS        1000
+#define KVM_EFAULT        EFAULT /* 14 */
+#define KVM_EINVAL        EINVAL /* 22 */
+#define KVM_E2BIG        E2BIG /* 7 */
+#define KVM_EPERM        EPERM /* 1*/
+#define KVM_EOPNOTSUPP        95
+
+Linux however does not expect the hypercall to fail for SEV/SEV-ES; and
+it will terminate the guest if the PSC operation fails for SEV-SNP.  So
+it's best for userspace if the hypercall always succeeds. :)
+
+> For TDX, it may also want to use KVM_HC_MAP_GPA_RANGE hypercall  to
+> userspace via KVM_EXIT_HYPERCALL.
+
+Yes, definitely.
+
+Paolo
 
