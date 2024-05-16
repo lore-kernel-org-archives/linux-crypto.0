@@ -1,148 +1,120 @@
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869951459E2
-	for <linux-crypto@vger.kernel.org>; Thu, 16 May 2024 11:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3DB1459E2;
+	Thu, 16 May 2024 12:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715860131; cv=none; b=uKJHQl/vQSDvJuh0YQ9UbFqYPfTjuzcd2RRuM9ILj+kFWJG1mCmqhIkI3HMhZOcKE/SrGckuOaqkDKShoIwpg+8kOuog4CIZKvKWeEIiKoospFcLRgyhcc3svfMWNRQzdeVuZaFQRN7824hiSVs5dGg9EgW/kD865pQYv4BDXCM=
+	t=1715861232; cv=none; b=sHEhj9AsBYtU25YDWa+Cor1m4Q1SNJE0Q6XkUrXWG+xsZ/SMaNNmpwa4/SXGJqSe4wvS2hwUPewxyPjHYFvsXu0+NRcAQkexMzDeQKE4U6fXpTxMI8D8V2V561BpHgZkUDv9vo8/f1s0eG7mh18+v99BXE64WVg5PvsJZ99EgQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715860131; c=relaxed/simple;
-	bh=w2O7BmCT8tbRCqTEeX1EUl+Wlb/ivOo9ljHrj0hMsM0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MPh4JfJLtFKZHFkQGnoliKjZ8+r2RxvBImN4lHcP8afC4F5VarueSODjJdk2cQhX53507OYTXLMSIrPEP5cHfTwuk7mtwqlIWRerMFhM2yp04kdsTQ8cRm/ozv5I9VPOC6sMchTC0OPL4ZHYwSoQR5h4y5LD2QxBostP9kLnmOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=swyyqX7O; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+	s=arc-20240116; t=1715861232; c=relaxed/simple;
+	bh=tysYO2NRmknRooroESqwe/efcDnREN8woy4AxLfsxf8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=GQgMCQ73P4dRGhMsU5W5e8aGlszoPmuaIhNY4uc03+VmvEl6MDdT/voqy5MGFQtYOKzuBybFxU01zpE+zy8c4hvIVsB3COphNzIJ1bOKQUs5dmO8YL5MABDtEtKBlep1h5+NjITbDxplYeSmRhcsfUZ1n7d0wed/aCcUH0Wy0Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=g0n6ddhI; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="swyyqX7O"
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44G75xZv015041;
-	Thu, 16 May 2024 13:48:08 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=FyX+6EeX2zYSgDjp5p8BhJzA6/x8bIKgkLN30SXYigU=; b=sw
-	yyqX7OpzrgCwcEqYkUTPKAjdJuxzbZPKbyE/oSVpph7W+q+0MkUL7kp3Y4iXOMQ3
-	ztZOX1efIXcDNYfD97e7KrJLT0rYXt976vy4NfE++5iyjg96+IufoX36K5akdCnp
-	z2EGTfWBr5RLGLb/Wgicz7q+qfxUaE4iED5byimWT1Kevv5+BcgfwOoLNpVJUYCI
-	x2X6mTdsYmgdC/IdS0hD5h+HTQ+HJBCUkPRmzMnrnjVcTUAIc3DceUD/dxG1FZSV
-	eP9Cwcakx53NrZcWOuaRVX9X1o0/G/x5b6HDZbSL0AGjoQliCSKoHR+ZUxvOVtqd
-	BzMsMl+dvvNGiecIWvOw==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3y4sxv5ehv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 May 2024 13:48:08 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 033AC4002D;
-	Thu, 16 May 2024 13:48:01 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id E7E8F218604;
-	Thu, 16 May 2024 13:47:14 +0200 (CEST)
-Received: from [10.48.87.204] (10.48.87.204) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 16 May
- 2024 13:47:14 +0200
-Message-ID: <8ec4286e-3477-4fcd-8176-5c3a6606f0a1@foss.st.com>
-Date: Thu, 16 May 2024 13:47:13 +0200
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="g0n6ddhI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1715861221;
+	bh=eNAEbz0fp/gY1nhw1dpy1yORqplQKqdzXReDnu/+e4g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=g0n6ddhIF7/0X29LcsUDo8Z4BWeTQgdK8scAYY/1iaMbeN5vvDA0gHJNo1eeCezYx
+	 gkjsu6a+zNqBDJvvlQUSZp48sk4wwJMUTseU6EDA3ocYioVRc89Of0YdyaemMdRi6M
+	 pWkga5jzFG+2LKvxwY+QnrOVi2mT6JYVc5zKFbZ7B197AhdehtvTv8lpa+Ac6SukZh
+	 FdFSbRKfBsiJa8RGwmiXUVQM8mwe71xs14qZkSaa+jnMkKjFoP5ooC/d2/iAoAecZb
+	 BNJjc1oxZAyhmSfHKtoknrWEBy5sQLAZN6PjXhjyRFnON6TASlKnqfu5Ea31RdZyYA
+	 dAULMCr282Ugg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Vg8380233z4wby;
+	Thu, 16 May 2024 22:06:59 +1000 (AEST)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Andy Polyakov <appro@cryptogams.org>, Danny Tsen <dtsen@linux.ibm.com>,
+ linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au, leitao@debian.org, nayna@linux.ibm.com,
+ linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
+Subject: Re: [PATCH 1/3] crypto: X25519 low-level primitives for ppc64le.
+In-Reply-To: <89e7b4b0-9804-41be-b9b1-aeba57cd3cc6@cryptogams.org>
+References: <20240514173835.4814-1-dtsen@linux.ibm.com>
+ <20240514173835.4814-2-dtsen@linux.ibm.com> <87a5kqwe59.fsf@mail.lhotse>
+ <89e7b4b0-9804-41be-b9b1-aeba57cd3cc6@cryptogams.org>
+Date: Thu, 16 May 2024 22:06:58 +1000
+Message-ID: <875xvevu3h.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] hwrng: stm32 - cache device pointer in struct
- stm32_rng_private
-To: Marek Vasut <marex@denx.de>, <linux-crypto@vger.kernel.org>
-CC: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Olivia Mackall <olivia@selenic.com>, Rob Herring <robh@kernel.org>,
-        Yang
- Yingliang <yangyingliang@huawei.com>,
-        <kernel@dh-electronics.com>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>
-References: <20240516012210.128307-1-marex@denx.de>
- <20240516012210.128307-2-marex@denx.de>
- <1e2da893-efff-4f7c-9842-a9484e4c2230@foss.st.com>
- <404122b2-75fe-4da6-8167-fb98eba7f941@denx.de>
-Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <404122b2-75fe-4da6-8167-fb98eba7f941@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-16_05,2024-05-15_01,2023-05-22_02
+Content-Type: text/plain
 
-
-
-On 5/16/24 12:52, Marek Vasut wrote:
-> On 5/16/24 11:37 AM, Gatien CHEVALLIER wrote:
-> 
+Andy Polyakov <appro@cryptogams.org> writes:
 > Hi,
-> 
->>> diff --git a/drivers/char/hw_random/stm32-rng.c 
->>> b/drivers/char/hw_random/stm32-rng.c
->>> index 6dec4adc49853..00012e6e4ccc8 100644
->>> --- a/drivers/char/hw_random/stm32-rng.c
->>> +++ b/drivers/char/hw_random/stm32-rng.c
->>> @@ -70,6 +70,7 @@ struct stm32_rng_config {
->>>   struct stm32_rng_private {
->>>       struct hwrng rng;
->>> +    struct device *dev;
->>>       void __iomem *base;
->>>       struct clk *clk;
->>>       struct reset_control *rst;
->>> @@ -99,7 +100,7 @@ struct stm32_rng_private {
->>>    */
->>>   static int stm32_rng_conceal_seed_error_cond_reset(struct 
->>> stm32_rng_private *priv)
->>>   {
->>> -    struct device *dev = (struct device *)priv->rng.priv;
->>> +    struct device *dev = priv->dev;
->>>       u32 sr = readl_relaxed(priv->base + RNG_SR);
->>>       u32 cr = readl_relaxed(priv->base + RNG_CR);
->>>       int err;
->>> @@ -171,7 +172,7 @@ static int stm32_rng_conceal_seed_error(struct 
->>> hwrng *rng)
->>>   {
->>>       struct stm32_rng_private *priv = container_of(rng, struct 
->>> stm32_rng_private, rng);
->>> -    dev_dbg((struct device *)priv->rng.priv, "Concealing seed 
->>> error\n");
->>> +    dev_dbg(priv->dev, "Concealing seed error\n");
->>>       if (priv->data->has_cond_reset)
->>>           return stm32_rng_conceal_seed_error_cond_reset(priv);
->>> @@ -187,7 +188,7 @@ static int stm32_rng_read(struct hwrng *rng, void 
->>> *data, size_t max, bool wait)
->>>       int retval = 0, err = 0;
->>>       u32 sr;
->>> -    retval = pm_runtime_resume_and_get((struct device 
->>> *)priv->rng.priv);
->>> +    retval = pm_runtime_resume_and_get(priv->dev);
->>>       if (retval)
->>>           return retval;
->>> @@ -206,7 +207,7 @@ static int stm32_rng_read(struct hwrng *rng, void 
->>> *data, size_t max, bool wait)
->>>                                      sr, sr,
->>>                                      10, 50000);
->>>               if (err) {
->>> -                dev_err((struct device *)priv->rng.priv,
->>> +                dev_err(priv->dev,
->>>                       "%s: timeout %x!\n", __func__, sr);
+>
+>>> +.abiversion	2
 >>
->> Nit: Fits in one line
-> 
-> The limit is now 100 instead of 80 chars, right ?
-> 
-> btw I found one more and fixed it.
+>> I'd prefer that was left to the compiler flags.
+>
+> Problem is that it's the compiler that is responsible for providing this
+> directive in the intermediate .s prior invoking the assembler. And there
+> is no assembler flag to pass through -Wa.
 
-Yes it is,
+Hmm, right. But none of our existing .S files include .abiversion
+directives.
 
-thanks
+We build .S files with gcc, passing -mabi=elfv2, but it seems to have no
+effect.
+
+So all the intermediate .o's generated from .S files are not ELFv2:
+
+  $ find .build/ -name '*.o' | xargs file | grep Unspecified
+  .build/arch/powerpc/kernel/vdso/note-64.o:                        ELF 64-bit LSB relocatable, 64-bit PowerPC or cisco 7500, Unspecified or Power ELF V1 ABI, version 1 (SYSV), not stripped
+  .build/arch/powerpc/kernel/vdso/sigtramp64-64.o:                  ELF 64-bit LSB relocatable, 64-bit PowerPC or cisco 7500, Unspecified or Power ELF V1 ABI, version 1 (SYSV), not stripped
+  .build/arch/powerpc/kernel/vdso/getcpu-64.o:                      ELF 64-bit LSB relocatable, 64-bit PowerPC or cisco 7500, Unspecified or Power ELF V1 ABI, version 1 (SYSV), not stripped
+  .build/arch/powerpc/kernel/vdso/gettimeofday-64.o:                ELF 64-bit LSB relocatable, 64-bit PowerPC or cisco 7500, Unspecified or Power ELF V1 ABI, version 1 (SYSV), not stripped
+  .build/arch/powerpc/kernel/vdso/datapage-64.o:                    ELF 64-bit LSB relocatable, 64-bit PowerPC or cisco 7500, Unspecified or Power ELF V1 ABI, version 1 (SYSV), not stripped
+  ...
+
+But the actual code follows ELFv2, because we wrote it that way, and I
+guess the linker doesn't look at the actual ABI version of the .o ?
+
+So it currently works. But it's kind of gross that those .o files are
+not ELFv2 for an ELFv2 build.
+
+> If concern is ABI neutrality,
+> then solution would rather be #if (_CALL_ELF-0) == 2/#endif. One can
+> also make a case for
+>
+> #ifdef _CALL_ELF
+> .abiversion _CALL_ELF
+> #endif
+
+Is .abiversion documented anywhere? I can't see it in the manual.
+
+We used to use _CALL_ELF, but the kernel config is supposed to be the
+source of truth, so we'd use:
+
+  #ifdef CONFIG_PPC64_ELF_ABI_V2
+  .abiversion 2
+  #endif
+
+And probably put it in a macro like:
+
+  #ifdef CONFIG_PPC64_ELF_ABI_V2
+  #define ASM_ABI_VERSION .abiversion 2
+  #else
+  #define ASM_ABI_VERSION
+  #endif
+
+Or something like that. But it's annoying that we need to go and
+sprinkle that in every .S file.
+
+Anyway, my comment can be ignored as far as this series is concerned,
+seems we have to clean this up everywhere.
+
+cheers
