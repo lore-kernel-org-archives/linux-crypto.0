@@ -1,62 +1,113 @@
-Received: from mail-4319.protonmail.ch (mail-4319.protonmail.ch [185.70.43.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6CF38C0B
-	for <linux-crypto@vger.kernel.org>; Sat, 18 May 2024 07:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0158914A9D;
+	Sat, 18 May 2024 10:56:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716016570; cv=none; b=SafjztoNLz9q0ysXfqX5qUaQ9DzibiSEY3+k19R31acSY7WsY5JgW1fB8CGfa41z6jxmvQ9Gu8l9sr7thnd1qbYoMFiuc2xz/wOK5SNeBkVFIoI2O3QAZe1iwnSWw6zF7/uXGeJKy5jATbmQ8uiyZcnXmAfJqEmjeBq6aTyNPj0=
+	t=1716029809; cv=none; b=gH7LzFPxH7FBDd15PD3xQvb/KCoqn1Oh2nqZ5YU2yb/3TtN3xEEHKENWSJvPSxfVXpZ5liHvhg6J1bFNuV/R0+drnyUrwqMWP7C7rbVP/M75LMODOiYhRHh0oyV6DlApcxjfIU6OMOcKffK2Fltj7ZFElw7H5b+KpLdd02969pA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716016570; c=relaxed/simple;
-	bh=jquRv9uiV9BJXsQNiUAElhQ0/Cda7PlUl/ZIqQZp73Y=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ALE3/VBzqqMJ086rr4u5et98m+UrHxp2pK9BNsmSsf9vl+bX+Y4MgDfuCo/Nc2FgrJzer9KE1NwA2T1o7FxhAVHzS+ELg2JigJFfohJdFVWX5uwZT5Lt3LEmCuUwih7c2YejMSf9NTE1JLNa3nlFM1cJT7N3R//vV6mZA5NDR4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=b7vbrYI+; arc=none smtp.client-ip=185.70.43.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	s=arc-20240116; t=1716029809; c=relaxed/simple;
+	bh=MqvPdrBURHBn30SfZ0XaRXnTniJYhYM73WWqxybnAJc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=jmBPNw2NbeFqOqxCeT8kVnydyaw/Ool4ghItnsZX83LiBCWnWee98L7axs5fiKqzUjiCIyzqs01B4M63dYPiSDx9P1EubOX/dAxthRoMLLQ27YqOG89ImSIQwgPPlyAXtYl4M3gfNNlibvqUkqEX3Ywt6xuZ0GMuyILb2ipq//s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/IJ2yD5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="b7vbrYI+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1716016556; x=1716275756;
-	bh=LJ4S7wpEVtZZGstgz1fvYI6R3m57ZgqSG3N/FDoQWxk=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=b7vbrYI+bgD41Eh9z+RoLdpCqMUBorxOt+l0ovMilN+AIvnc7kr9AxsFPQJBamS2i
-	 7py7SxlKJMlYjPsNQ80+6G3ZDzqZxXFjO9FW+lBzbL49pgacghH3FCvt5LxD8JPZHl
-	 faOe+dF37Yc0PFDt2ZO7eK/C4C3HHICbfcOonpFRWfbOsd5AUbVZscObqNXbZr2AJC
-	 5fqEHl2okpAx40Uk6X/n3zzITvPbFVxXj7WDPCJufDWXOKUMO6z5XWBXKz9+iBVnPC
-	 VOYi3l1dC85SUAouoDP97rZLMaPCtRYDqiG0B19AoI4kcQxIT8wmbpEE2gnMTUw49o
-	 pBx82M4JXk9ug==
-Date: Sat, 18 May 2024 07:15:50 +0000
-To: Markus Reichelt <ml@mareichelt.com>
-From: Jari Ruusu <jariruusu@protonmail.com>
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: Announce loop-AES-v3.8c file/swap crypto package
-Message-ID: <cgKV88KvF8ANwKPkXRSw2bQsBGm4m0oSdZ0xN8XAgoBgr_BumVgZ41z5yg4d357IIkl6245h3jjg5gMUr6n-14ehAMbSLpP2RcclvA3KZCA=@protonmail.com>
-Feedback-ID: 22639318:user:proton
-X-Pm-Message-ID: 3f13546f839afaa5424439154209c33fa7ddd3f6
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/IJ2yD5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 753C6C113CC;
+	Sat, 18 May 2024 10:56:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716029808;
+	bh=MqvPdrBURHBn30SfZ0XaRXnTniJYhYM73WWqxybnAJc=;
+	h=Date:To:Cc:Subject:From:References:In-Reply-To:From;
+	b=U/IJ2yD5ds6OBlnxnL1kzlMaJj5PrR6+iKIOdV5mPVTcEFBlKXV9oGs+iVxCD12Zw
+	 8uh29tawsSMHKtBkqZPT7991GlwPnJtTnlljf857tEOPkZBqMnJ8VZUkJvPiDufhZw
+	 YwfEjqQ4xzQntMHKeoLcy9lj/u7sAvhwKj5UVGbSc9er/Ot6XwjCeUdqBBBYM8udqs
+	 56+z6BpFiaKF0JTfRGazQujXoxawn2yCdNxK7or5XOgXBYlIUt+sF7T2/6CCqTM65i
+	 EH3CiaCvKolS2dVYQ9drQsu52lamBgoqai/alm7iw0PUbG+vUOdFlUoZEFG5itSWuV
+	 FBe7YBD+E65YA==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 18 May 2024 13:56:44 +0300
+Message-Id: <D1CPSP3UHQPK.1LOE5IQ6IMHYP@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>
+Cc: =?utf-8?b?TsOtY29sYXMgRi4gUi4gQS4gUHJhZG8=?= <nfraprado@collabora.com>,
+ "James Bottomley" <James.Bottomley@hansenpartnership.com>, "Ard Biesheuvel"
+ <ardb@kernel.org>, "Linux Crypto Mailing List"
+ <linux-crypto@vger.kernel.org>, "Herbert Xu" <herbert@gondor.apana.org.au>,
+ <linux-integrity@vger.kernel.org>, <keyrings@vger.kernel.org>,
+ <regressions@lists.linux.dev>, <kernel@collabora.com>
+Subject: Re: [PATCH v8 18/22] tpm: add session encryption protection to
+ tpm2_get_random()
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+X-Mailer: aerc 0.17.0
+References: <20240429202811.13643-1-James.Bottomley@HansenPartnership.com>
+ <20240429202811.13643-19-James.Bottomley@HansenPartnership.com>
+ <119dc5ed-f159-41be-9dda-1a056f29888d@notapiano>
+ <0f68c283ff4bbb89b8a019d47891f798c6fff287.camel@HansenPartnership.com>
+ <CAMj1kXHi4r8KY9GvX573kwqvLpMfX-J=K2hWiGAKkf5bnicwYQ@mail.gmail.com>
+ <0d260c2f7a9f67ec8bd2305919636678d06000d1.camel@HansenPartnership.com>
+ <CAMj1kXFE_R_x10BVkU+8vrMz0RHiX0+rz-ZL+w08FH2CLQHZXA@mail.gmail.com>
+ <66ec985f3ee229135bf748f1b0874d5367a74d7f.camel@HansenPartnership.com>
+ <dfb0d930-7cbe-46c5-be19-d132b4906ecf@notapiano>
+ <D1C2NPOBHAHK.20O4IME8OK1FH@kernel.org>
+ <20240518043115.GA53815@sol.localdomain>
+In-Reply-To: <20240518043115.GA53815@sol.localdomain>
 
-Markus Reichelt wrote:
-> * Jari Ruusu <jariruusu@protonmail.com> wrote:
-> > - Added assembler AES implementation for 32/64-bit ARM for kernel patch
-> >   version only (see kernel-arm-asm.diff). That assembler code is not in
-> >   externally compiled module.
->=20
-> Is there a reason for that? ^^^
+On Sat May 18, 2024 at 7:31 AM EEST, Eric Biggers wrote:
+> This is "normal" behavior when the crypto API instantiates a template:
+>
+>     1. drbg.c asks for "hmac(sha512)"
+>
+>     2. The crypto API looks for a direct implementation of "hmac(sha512)"=
+.
+>        This includes requesting a module with alias "crypto-hmac(sha512)"=
+.
+>
+>     3. If none is found, the "hmac" template is instantiated instead.
+>
+> There are two possible fixes for the bug.  Either fix ecc_gen_privkey() t=
+o just
+> use get_random_bytes() instead of the weird crypto API RNG, or make
+> drbg_init_hash_kernel() pass the CRYPTO_NOLOAD flag to crypto_alloc_shash=
+().
+>
+> Or if the TPM driver could be changed to not need to generate an ECC priv=
+ate key
+> at probe time, that would also avoid this problem.
 
-There is short explanation at beginning of kernel-arm-asm.diff file why
-it is not enabled by default... code works for recent ARM processors,
-but not for older ARM processors. As such, it has to be opt-in to avoid
-breaking existing setups.
+Issues:
 
---
-Jari Ruusu=C2=A0 4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD=C2=A0 ACDF F073 3C=
-80 8132 F189
+- IMA extends PCR's. This requires encrypted communications path.
+- HWRNG uses auth session (see tpm2_get_radom()).
+- TPM trusted keys
 
+Null key is required before any other legit use in initialization.
+
+Even something like=20
+
+--- a/drivers/char/tpm/Kconfig
++++ b/drivers/char/tpm/Kconfig
+@@ -36,6 +36,8 @@ config TCG_TPM2_HMAC
+        bool "Use HMAC and encrypted transactions on the TPM bus"
+        default y
++       select CRYPTO_DRBG
+        select CRYPTO_ECDH
++       select CRYPTO_HMAC
++       select CRYPTO_SHA512
+        select CRYPTO_LIB_AESCFB
+        select CRYPTO_LIB_SHA256
+        help
+
+would be more decent.
+
+>
+> - Eric
+
+BR, Jarkko
