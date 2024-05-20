@@ -1,69 +1,72 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D095420EB;
-	Mon, 20 May 2024 16:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8C2E57D;
+	Mon, 20 May 2024 16:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716221770; cv=none; b=dNYP8MC0TmhhyEa10TIKOjNCf1Z4TgvWT5rFG3ldoGrcyTzFZ+OyZ7G/J2JxcYCaHzf52XnjtSq2glEBBZP9S9ClIW7ly8CGYorIp0b52k+WZOsY4SU6hupCOcSfJGaZWYjVzav5SdiRxQZMxDnwW7z0GTfvwR6aUnJV1XQdG2Q=
+	t=1716222836; cv=none; b=KU2xkhvByvTmuJ9By4yMvYj+EGlf4SeDj2S59RzeQ0GGhkiNUZxeG35NFdOVzD/mam851IZ7xVYvhJOCFsZt8sdmcvN/mXB5Ul1oeVUfPkAGaeziRCsSC5PKrnNWzzmG7n7k7gZAy8F3467RHnQ76zx32sxFnbiFQTZOy8CSpR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716221770; c=relaxed/simple;
-	bh=SttX/DO61CoJnVDpAsUBeGqr9cNviZAdiv65U5Z6Mic=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OVnYtaD7DCS23pZlmo75nOzZS5NMcPis+jqYYzDiqyOvQmnw3BL9Qb6GcZ2+ZNTmbN04KmThDohUybcKAJpaTFJ9M8F3hDkSrCeYC5RLjgxaDQHIs3yT0XGnsVyIcStgzPtTg6akWcO1ISD28TnHoHG+ACIPAz8alwWGnmLRgDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IDnsWQoQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716222836; c=relaxed/simple;
+	bh=mHxM4umJ6Kfb9sMqszuEgHZ1WtBqpwJ8+qSP+stVI48=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=aZyKuGoW1GGHhwzbgZdFuGXkXqEQc1yTJdyCmCE+OSqWVISshMvG8d7Wuhm0WC92mwbFhK0f0Me1mgyZcz8W6CIjAd9B+JBaCSxXFhJxWpJZ79Y1R4XWr3Xi1zyYMkD7G1wzwZeh/Ve9/SfABhLir4ZKUNtpTd8/tdoV2xeAjxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uj+9ETRq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IDnsWQoQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40658C2BD10;
-	Mon, 20 May 2024 16:16:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uj+9ETRq"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3D0E0C4AF09;
+	Mon, 20 May 2024 16:33:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716221769;
-	bh=SttX/DO61CoJnVDpAsUBeGqr9cNviZAdiv65U5Z6Mic=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IDnsWQoQQ9pI5xxfjIze/9eiBVEuAxiVVokXjSXPdrC9hLx3ZCtdebL/h63WRZB1t
-	 IjLZNINCDleziVR0x4FYZtBHkWc+DndCkd8q6oWxDPRq1esV6jYQiSlXTgJ6lcrsd3
-	 k5eJd8GqBJl76w04o194vvPdKlLs8KCS1z7E40swePmJWfiILLDrmJzYGIza4avazy
-	 GMjEc+tyRgyypWHfWOC6bj1JWjNW7raDymRhsMy3UHP/5A5nb2AkqkXt2iBD+kvfUT
-	 d//sAPDBEIa8PfsoPRESedloYgQ3Clnw1pC7cnS3tm1mKTBOCFK6//vrcjaeAYj0aV
-	 M59bcSFQUfH8A==
-Date: Mon, 20 May 2024 09:16:07 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v2] crypto: x86/aes-gcm - add VAES and AVX512 / AVX10
- optimized AES-GCM
-Message-ID: <20240520161607.GA1269@sol.localdomain>
-References: <20240512073124.53568-1-ebiggers@kernel.org>
+	s=k20201202; t=1716222836;
+	bh=mHxM4umJ6Kfb9sMqszuEgHZ1WtBqpwJ8+qSP+stVI48=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=uj+9ETRq6cYVKsudH4jQUSjfpMzx4AwLu9MZmpkGjg3xF/QGNx+NcLd09Ew7soOO/
+	 OWP9wSmYlR/BhuD5HeViwomBPpQaGweisYeDoo8HDfYC1eo5IxOjUjKXJajZyehkG0
+	 ZC1/g5PS1AxvlCztN7uIdXfEmLNQf8GR5PTyJfBk3JjWgKqiHeZ01IF/clm/3W8q7k
+	 XWsGvZiZpbrD/Dd4+h4UCOB3PT+rtTQ3vuEvTn4V30BH27BtFfWUBh2zEcn5EH06OV
+	 tZK3jsWu4l2XkAp/DwJ0Lg+cSK5r3D/OHH1R2LJUUHt+3nt1jm8VJSFzON0d4CEQqP
+	 /SEFPbIE2zJ2w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 33F3FC54BB1;
+	Mon, 20 May 2024 16:33:56 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.10
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
+References: <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
+ <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+ <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
+ <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
+ <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+ <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
+ <ZbstBewmaIfrFocE@gondor.apana.org.au>
+ <ZgFIP3x1w294DIxQ@gondor.apana.org.au> <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.10-p2
+X-PR-Tracked-Commit-Id: c6ab5c915da460c0397960af3c308386c3f3247b
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 568c98a0f6eff6d44accfe56d0c58008bf0d498e
+Message-Id: <171622283620.31783.7576966862048379005.pr-tracker-bot@kernel.org>
+Date: Mon, 20 May 2024 16:33:56 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240512073124.53568-1-ebiggers@kernel.org>
 
-On Sun, May 12, 2024 at 12:31:24AM -0700, Eric Biggers wrote:
-> Table 3: VAES-based AES-256-GCM encryption throughput in MB/s,
->          implementation name vs. message length in bytes:
-> 
->                      | 16384 |  4096 |  4095 |  1420 |   512 |   500 |
-> ---------------------+-------+-------+-------+-------+-------+-------+
-> This implementation  | 13139 | 12070 | 11466 |  8999 |  6949 |  6048 |
-> AVX512_Intel_OpenSSL | 12927 | 11499 | 10976 |  8375 |  5386 |  5853 |
-> AVX512_Intel_Linux   | 12656 | 11263 | 10779 |  7958 |  5592 |  5029 |
-> AVX512_Cloudflare    | 11120 | 10186 | 10075 |  4856 |  4919 |  4786 |
-> 
->                      |   300 |   200 |    64 |    63 |    16 |
-> ---------------------+-------+-------+-------+-------+-------+
-> This implementation  |  4709 |  3512 |  1787 |  1765 |   714 |
-> AVX512_Intel_OpenSSL |  4157 |  4071 |  2493 |  2132 |  1042 |
-> AVX512_Intel_Linux   |  3535 |  2686 |  1416 |  1203 |   572 |
-> AVX512_Cloudflare    |  3062 |  1110 |  1042 |  1028 |   169 |
-> 
+The pull request you sent on Mon, 20 May 2024 11:26:42 +0800:
 
-Note, some of the AVX512_Cloudflare numbers were slightly off, and I've fixed
-this in v3.  v3 also includes another small optimization.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.10-p2
 
-- Eric
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/568c98a0f6eff6d44accfe56d0c58008bf0d498e
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
