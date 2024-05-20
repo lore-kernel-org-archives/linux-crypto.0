@@ -1,83 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B73DF58;
-	Sun, 19 May 2024 12:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3324AD299;
+	Mon, 20 May 2024 03:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716122974; cv=none; b=gX9qzsEjBRNm1ck7YaV/ukhcbxGEIHLULsbX0QdYOM8uH3L2Tjdv++qOoHy/MI8u048va3U5ovCOusUqgcxlEM3RMa1Wxb4kfN8kMUuOfBikBAFhRzuAg8Tm/nkMm7A7Jn1V2OYgKrdweLMJno3Ytsp+l4okW00KCkNzielbuCk=
+	t=1716175615; cv=none; b=BdSA5aDPMvd6BiiFSF8n1noR3VJWntM2c5dWAgmG2aLVkC2CpZblUALZyW2+DJO4Dqt8b9isPlliTAxorJl2wzpd9TqrNejzJR45+4BnkagGwBz0ZTO5d754lunh/yzB+Z2Pwv4m2wK2y+TPpZ7+9VYVBoYmiS6or6HR7Zr+DRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716122974; c=relaxed/simple;
-	bh=5c6KJP9+iCfjzaILwM7txlwQN7YH/0G77q+/VLJR75Q=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=ugkmX+Ys2K4w041Ps6WtM6LwZfzmU9FUjLDtBQVaCvOPnPaTpTrbTE8BUcB7eE+uErHXwNS5uF/bJILHbuUm9sAJlIMdPgPOK96pjZHxNvdllWyyr3PYaHsXnRZkDlB2m8Stdtk/g9Lfgx+qOlVGUMhLAQTNFAsfCphZmkJFWCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pu9fBiY5; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pu9fBiY5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CDCDC32781;
-	Sun, 19 May 2024 12:49:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716122973;
-	bh=5c6KJP9+iCfjzaILwM7txlwQN7YH/0G77q+/VLJR75Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pu9fBiY5sUYW+kaSaQAsHpOYqf6ezgVhR63MS0OeE3XNnO9jKmp2fM4hhReBGI9m5
-	 hV9KzFBgUn+H/+fFMXEqbrSG7MprlfUioOWRjjotk14fYKLJA/p/uKqJFIzc2uVYn/
-	 pqE6FJLnApKT+hss/8NGm+JXSxpHrfF98A04/cCeGIOi7qlZ0DdgmbaUEbWaDk75xN
-	 ZdrLFVekaKSof67XtRtDzXFPPkr1hVbmIir2F9CU12M4KTIZO/aLjbJWadLvJheoPF
-	 wrOTW3vNQ/pwDoPwduqahuG0zI9Q6MriCzcjvwk+lAV0jVNyplCkXiNEvcsT6I2xHQ
-	 2XBetNTBAqNMQ==
+	s=arc-20240116; t=1716175615; c=relaxed/simple;
+	bh=V5wn606jK4rLb8q9tpFx0F72ZJTGSftm4ClrGhQwzJU=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tmXQgXysgooITxfqysC2sVPaNmvCAX9GW0aJYD3zJ+ug4L/CUp9/bET3iWxal1MKmxDZ1WixWUGN/5z0U822dDwAXrjst2XJtkAcODR3WLSRi1xcf/lyrc9TtsGD/Z8XmeCDMUzenapljlST3LTmSecrT52oSDT0BEn6ENj7psQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1s8tfd-00HW6r-1n;
+	Mon, 20 May 2024 11:26:42 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 20 May 2024 11:26:42 +0800
+Date: Mon, 20 May 2024 11:26:42 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.10
+Message-ID: <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
+References: <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
+ <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+ <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
+ <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
+ <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+ <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
+ <ZbstBewmaIfrFocE@gondor.apana.org.au>
+ <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sun, 19 May 2024 15:49:28 +0300
-Message-Id: <D1DMTJYL7TFC.3J3FM36K06ECD@kernel.org>
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Jarkko Sakkinen" <jarkko@kernel.org>, "Herbert Xu"
- <herbert@gondor.apana.org.au>
-Cc: <linux-integrity@vger.kernel.org>, <keyrings@vger.kernel.org>,
- <Andreas.Fuchs@infineon.com>, "James Prestwood" <prestwoj@gmail.com>,
- "David Woodhouse" <dwmw2@infradead.org>, "David Howells"
- <dhowells@redhat.com>, "David S. Miller" <davem@davemloft.net>, "Peter
- Huewe" <peterhuewe@gmx.de>, "Jason Gunthorpe" <jgg@ziepe.ca>, "James
- Bottomley" <James.Bottomley@HansenPartnership.com>, "Stefan Berger"
- <stefanb@linux.ibm.com>, "Ard Biesheuvel" <ardb@kernel.org>, "Mario
- Limonciello" <mario.limonciello@amd.com>, "open list:CRYPTO API"
- <linux-crypto@vger.kernel.org>, "open list" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RFC v2 0/5] Asymmetric TPM2 key type
-X-Mailer: aerc 0.17.0
-References: <20240519002616.4432-1-jarkko@kernel.org>
-In-Reply-To: <20240519002616.4432-1-jarkko@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
 
-On Sun May 19, 2024 at 3:25 AM EEST, Jarkko Sakkinen wrote:
-> ## Overview
->
-> Introduce tpm2_key_rsa implementing asymmetric TPM RSA key.
->
-> I submit this first as RFC as I could not execute the keyctl padd in the
-> following sequence (returns EBADF):
->
-> tpm2_createprimary --hierarchy o -G rsa2048 -c owner.txt
-> tpm2_evictcontrol -c owner.txt 0x81000001
-> tpm2_getcap handles-persistent
-> openssl genrsa -out private.pem 2048
-> tpm2_import -C 0x81000001 -G rsa -i private.pem -u key.pub -r key.priv
-> tpm2_encodeobject -C 0x81000001 -u key.pub -r key.priv -o key.priv.pem
-> openssl asn1parse -inform pem -in key.priv.pem -noout -out key.priv.der
-> key_serial=3D`cat key.priv.der | keyctl padd asymmetric tpm @u`
+Hi Linus:
 
-After v2 changes it ends up to -EINVAL and:
+The following changes since commit 13909a0c88972c5ef5d13f44d1a8bf065a31bdf4:
 
-OID is "2.23.133.10.1.3" which is not TPMSealedData
+  crypto: atmel-sha204a - provide the otp content (2024-05-10 17:15:25 +0800)
 
-which makes total sense. James' old patch set has already TPMLoadableKey
-parsing PoC'd so I use that as the reference.
+are available in the Git repository at:
 
-After the sequence above successfully completes keyctl public key ops
-are accesible by using $key_serial as the serial.
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.10-p2 
 
-BR, Jarkko
+for you to fetch changes up to c6ab5c915da460c0397960af3c308386c3f3247b:
+
+  crypto: ecc - Prevent ecc_digits_from_bytes from reading too many bytes (2024-05-17 18:55:07 +0800)
+
+----------------------------------------------------------------
+This push fixes a bug in the new ecc P521 code as well as a buggy
+fix in qat.
+----------------------------------------------------------------
+
+Herbert Xu (1):
+      crypto: qat - Fix ADF_DEV_RESET_SYNC memory leak
+
+Stefan Berger (1):
+      crypto: ecc - Prevent ecc_digits_from_bytes from reading too many bytes
+
+ crypto/ecc.c                                  | 22 ++++++++++++++++++++++
+ drivers/crypto/intel/qat/qat_common/adf_aer.c | 19 +++++--------------
+ include/crypto/internal/ecc.h                 | 15 ++-------------
+ 3 files changed, 29 insertions(+), 27 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
