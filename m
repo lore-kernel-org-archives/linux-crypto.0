@@ -1,111 +1,115 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7CD137C37
-	for <linux-crypto@vger.kernel.org>; Mon, 20 May 2024 17:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDFB28E7;
+	Mon, 20 May 2024 18:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716226527; cv=none; b=Wa7jvphJZAXI8J/P/TOv47ZUWtgXYLWILHmXJVP4egOYDRrf5O5389CV00o8JwhIYQFmWudMP5uNz/skjyXdACLA0fqi3syje8JKmbLjcviToIS5pn7v74Jf0lGjM1HhT1ZYEOyTq9S8MqsQKjl8MJ5sNcQAD2cnCShCBAa0RP8=
+	t=1716230852; cv=none; b=AawFuDtqoTzr3+CGO/3gCIp8hIe4Jbl7AMuM7Evhl49k5xiOH9cmB7SY3y+I9pk/k9MQhPD4UZDWUI/GvjC2d+aB5pjRDFEnzzLmdYeoa34wv8Ws/qpdEf+50fKGi3u2/hCqplrRw5GmuTzkfi0khzOFXa20aTZ5lpgEG9vbH2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716226527; c=relaxed/simple;
-	bh=+Tf6AAgN6OqFWz2TdMAtSycAZVzTLTZBPFUHsMMEnjI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UnCNw8Fri2jgHV4doPOlQirIUERQ3Vs7PYYtqwew0RIgmJZjpvq9ZUCfGzTDX+FH9iBla7bCw3MlgdBNcczdmYtaSe8O06WdQRTvrLsfU9Ll6F154+74tjgoUmz6VkRluneQrKBsGe9cHTV8V4VPb/h3LrKNmJKvcf13CXBznyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A4RFvwV1; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1716230852; c=relaxed/simple;
+	bh=d6EYrnuzD3VjIiiy7fQuTy2F+G7elwLdChJKZjHFS2A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i19uO+lqBdIX0AGIFwwvBv5QXri3AG75hlaVfHB1J31+X4F5G52jyDsUEc0JwMvz/Cg7bK9Vq9sW3SwDoHYV/QudmsmAckIcRqOPROMC4NPtSW5BHK44rshp2j60QC82J6u5d8jca9kFl7LIp1lGsv3NtdtIUtjlTv6DRAL9TNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0Gps0qA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A4RFvwV1"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1edf507b9e4so135438175ad.1
-        for <linux-crypto@vger.kernel.org>; Mon, 20 May 2024 10:35:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716226525; x=1716831325; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KaUIcbCxnT+V1tXho+s6VK2LQCpbrcFbVlZAjQNTw9w=;
-        b=A4RFvwV11ah0NUHZkhQzSuK0Huh1Kaoup5Vx7rYkt6wzr5iJiUUEoYKhpKCqgpVF3i
-         OVk0SVoT3Or2WHHZx/oUsscTB3iGIt43RRxZ8WELvdfdDKv60yHkCh/kWTOTQAXyz2Q1
-         59n2ci8qjslUU5NHX1IcEiN4c8s+UjjVGQjoWdIm8tsMxXqqcIOan/LMTPmT7Um2FT1v
-         BiTkdxo2/NOkPOLkCBNNvNKtdJNI6BGVZi/jFoNx7yrwYvlv+8f2s3pj2qlBBeQRfyGr
-         LnlQE2J8HquqbVG8QX4M7OoJng2W9YyXlbRYogeBNNHUsp87NJKqp2V2XfFHIfQmn0Wp
-         kCwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716226525; x=1716831325;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KaUIcbCxnT+V1tXho+s6VK2LQCpbrcFbVlZAjQNTw9w=;
-        b=sB3sYk2FKCqzAPfDQQA/OfafHDBwtpe+UycHcEHfDeLNWPSRsKOem5ZpKeCw7+R44w
-         jH+jGpQgH0qDHM5duHTeSFM+yLEQzDImKXW+WNP71vA7XeO3Lxm2Tac41FHNsLZVCUwv
-         Q8Y9mqjnGAO9hDonRVcrCe6HQGr7ZGGeDcF7Uo6NgaY6If1QGkrysu0c37hj+YBaBezJ
-         1VRBowwv+viJn9Em+EgbSF5HHjeq3UmAhJhnzLQWJy8CRxORs03ptU5yZCCb0VeB0iIs
-         BXCJMIOY2tFULbCCy24c+IN6flTJsriUdAiPocD0mMpJAitVXp+4VwPrp7T96c4oYGAr
-         Z62w==
-X-Forwarded-Encrypted: i=1; AJvYcCXJRsP7yLFDGf8t0KCAsHX/PMsPnqiF6H70Du850Vhc/NN82HYlhYVWe64WhGo13k+eb3coi7ePUfCg2pnu40UV6lPW0kJBEqBZj+/+
-X-Gm-Message-State: AOJu0Yz84ubGLMpGGUWhwOPaCYrCIKWnQQrLu4YRecmIhqjdbIO41DRS
-	XwoLMINZP6osqmVN7YMfJGrbQc60NMcv40l0XoFGwPF11DmEfAKBEjDQi7J2yWx/QYiC81SDpgV
-	g6A==
-X-Google-Smtp-Source: AGHT+IF1taDRJctSSVr2IasIIziXIfKJNIigxZpYaoBlxwyY2AZlY80I/q2z0jdfLZJ5lT9JqTpQH1/QQSk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e749:b0:1f3:95f:ba6d with SMTP id
- d9443c01a7336-1f3095fc09fmr1015685ad.5.1716226525207; Mon, 20 May 2024
- 10:35:25 -0700 (PDT)
-Date: Mon, 20 May 2024 10:35:23 -0700
-In-Reply-To: <41d8ba3a48d33de82baa67ef5ee88e5f8995aea8.camel@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0Gps0qA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 949E0C2BD10;
+	Mon, 20 May 2024 18:47:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716230851;
+	bh=d6EYrnuzD3VjIiiy7fQuTy2F+G7elwLdChJKZjHFS2A=;
+	h=From:To:Cc:Subject:Date:From;
+	b=D0Gps0qA55rKP3djBGDGdnPkCBynQ8qvQlcxXj7vkOOlpguDH9puzf+hc9yptKmnv
+	 V8eKMQndXmhUQDq6hCXQC3HI4OH0ATVfWc6nGCaM43gTaS5wBvRsltz3Zfz7CYWjDe
+	 EvXYBleL8wBMMEjmEA1IBFVvGUE3AVGXdgD55/66CdF6nCX2wvveyQB02lP3FgW1u2
+	 qM80OiJwcxXZ64tkpqu97pIrYBIdIuV2+yNJupWw/+UKRgPCfpBdg5p5ASuHGe9uUx
+	 UesmIBQrBTcakiqzg4mXrD1vwXWr5YVqEEa7Z0NJh514WVY698/Q93VtAtkaZD6n8w
+	 mleozawrY9LwA==
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-integrity@vger.kernel.org,
+	keyrings@vger.kernel.org,
+	Andreas.Fuchs@infineon.com,
+	James Prestwood <prestwoj@gmail.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org (open list:CRYPTO API),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH 0/6] KEYS: asymmetric: tpm2_key_rsa
+Date: Mon, 20 May 2024 21:47:07 +0300
+Message-ID: <20240520184727.22038-1-jarkko@kernel.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240501085210.2213060-1-michael.roth@amd.com>
- <20240501085210.2213060-14-michael.roth@amd.com> <41d8ba3a48d33de82baa67ef5ee88e5f8995aea8.camel@intel.com>
-Message-ID: <ZkuJ27DKOCkqogHn@google.com>
-Subject: Re: [PATCH v15 13/20] KVM: SEV: Implement gmem hook for initializing
- private pages
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
-	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
-	"tobin@ibm.com" <tobin@ibm.com>, "liam.merwick@oracle.com" <liam.merwick@oracle.com>, 
-	"alpergun@google.com" <alpergun@google.com>, Tony Luck <tony.luck@intel.com>, 
-	"jmattson@google.com" <jmattson@google.com>, "luto@kernel.org" <luto@kernel.org>, 
-	"ak@linux.intel.com" <ak@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"pgonda@google.com" <pgonda@google.com>, 
-	"srinivas.pandruvada@linux.intel.com" <srinivas.pandruvada@linux.intel.com>, "slp@redhat.com" <slp@redhat.com>, 
-	"rientjes@google.com" <rientjes@google.com>, "peterz@infradead.org" <peterz@infradead.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>, 
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>, 
-	"vkuznets@redhat.com" <vkuznets@redhat.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"ashish.kalra@amd.com" <ashish.kalra@amd.com>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, 
-	"nikunj.dadhania@amd.com" <nikunj.dadhania@amd.com>, Jorg Rodel <jroedel@suse.de>, 
-	"mingo@redhat.com" <mingo@redhat.com>, 
-	"sathyanarayanan.kuppuswamy@linux.intel.com" <sathyanarayanan.kuppuswamy@linux.intel.com>, 
-	"hpa@zytor.com" <hpa@zytor.com>, "kirill@shutemov.name" <kirill@shutemov.name>, 
-	"jarkko@kernel.org" <jarkko@kernel.org>, "ardb@kernel.org" <ardb@kernel.org>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 20, 2024, Kai Huang wrote:
-> On Wed, 2024-05-01 at 03:52 -0500, Michael Roth wrote:
-> > This will handle the RMP table updates needed to put a page into a
-> > private state before mapping it into an SEV-SNP guest.
-> > 
-> > 
-> 
-> [...]
-> 
-> > +int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order)
+## Overview
 
-...
+Introduce tpm2_key_rsa implementing asymmetric TPM RSA key. This key type
+can be enabled with CONFIG_ASYMMETRIC_TPM2_KEY_RSA_SUBTYPE config option.
+Carves groundwork for similar modules in future, such as tpm2_key_ecdsa.
 
-> +Rick, Isaku,
-> 
-> I am wondering whether this can be done in the KVM page fault handler?
+## Testing
 
-No, because the state of a pfn in the RMP is tied to the guest_memfd inode, not
-to the file descriptor, i.e. not to an individual VM.  And the NPT page tables
-are treated as ephemeral for SNP.
+tpm2_createprimary --hierarchy o -G rsa2048 -c owner.txt
+tpm2_evictcontrol -c owner.txt 0x81000001
+tpm2_getcap handles-persistent
+openssl genrsa -out private.pem 2048
+tpm2_import -C 0x81000001 -G rsa -i private.pem -u key.pub -r key.priv
+tpm2_encodeobject -C 0x81000001 -u key.pub -r key.priv -o key.priv.pem
+openssl asn1parse -inform pem -in key.priv.pem -noout -out key.priv.der
+serial=`cat key.priv.der | keyctl padd asymmetric tpm @u`
+echo "abcdefg" > plaintext.txt
+keyctl pkey_encrypt $serial 0 plaintext.txt enc=pkcs1 > encrypted.dat
+keyctl pkey_decrypt $serial 0 encrypted.dat enc=pkcs1 > decrypted.dat
+keyctl pkey_sign $serial 0 plaintext.txt enc=pkcs1 hash=sha256 > signed.dat
+keyctl pkey_verify $serial 0 plaintext.txt signed.dat enc=pkcs1 hash=sha256
+
+## References
+
+- Derived from https://lore.kernel.org/all/20200518172704.29608-1-prestwoj@gmail.com/
+- Last RFC: https://lore.kernel.org/linux-integrity/D1DMTJYL7TFC.3J3FM36K06ECD@kernel.org/T/#t
+
+James Prestwood (1):
+  keys: asymmetric: ASYMMETRIC_TPM2_KEY_RSA_SUBTYPE
+
+Jarkko Sakkinen (5):
+  crypto: rsa-pkcs1pad: export rsa1_asn_lookup()
+  lib: Expand asn1_encode_integer() to variable size integers
+  tpm: Export tpm2_load_context()
+  KEYS: trusted: Move tpm2_key_decode() to the TPM driver
+  tpm: tpm2_key: Extend parser to TPM_LoadableKey
+
+ crypto/asymmetric_keys/Kconfig                |  16 +
+ crypto/asymmetric_keys/Makefile               |   1 +
+ crypto/asymmetric_keys/tpm2_key_rsa.c         | 726 ++++++++++++++++++
+ crypto/rsa-pkcs1pad.c                         |  16 +-
+ drivers/char/tpm/Kconfig                      |   1 +
+ drivers/char/tpm/Makefile                     |   5 +
+ drivers/char/tpm/tpm.h                        |   2 -
+ drivers/char/tpm/tpm2-cmd.c                   |  77 ++
+ drivers/char/tpm/tpm2-space.c                 |  61 --
+ drivers/char/tpm/tpm2_key.c                   | 119 +++
+ .../char/tpm}/tpm2key.asn1                    |   0
+ include/crypto/rsa-pkcs1pad.h                 |  20 +
+ include/crypto/tpm2_key.h                     |  35 +
+ include/linux/asn1_encoder.h                  |   3 +-
+ include/linux/tpm.h                           |   4 +
+ lib/asn1_encoder.c                            | 185 ++---
+ security/keys/trusted-keys/Makefile           |   2 -
+ security/keys/trusted-keys/trusted_tpm2.c     | 130 +---
+ 18 files changed, 1138 insertions(+), 265 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/tpm2_key_rsa.c
+ create mode 100644 drivers/char/tpm/tpm2_key.c
+ rename {security/keys/trusted-keys => drivers/char/tpm}/tpm2key.asn1 (100%)
+ create mode 100644 include/crypto/rsa-pkcs1pad.h
+ create mode 100644 include/crypto/tpm2_key.h
+
+-- 
+2.45.1
+
