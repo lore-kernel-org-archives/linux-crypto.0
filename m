@@ -1,194 +1,62 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC3CE552;
-	Mon, 20 May 2024 19:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E8ED27A;
+	Mon, 20 May 2024 20:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716232491; cv=none; b=WmjM4k0iItKIqeNFGQP7G6LIzOjReR9DFfMxX1voOR+bxWPe6Mpy6Hv2uSVkaDHkcZlN6pQXN1QKyZ4F6c8krift2RleE+LIqli+ieS89a2vvjsoqgC9Jma4ITvDVMbbgK75PnWV+n7vSlsXbBbNYiRoEc1DMa71TqBL7LsaHkU=
+	t=1716237367; cv=none; b=m8joTydnDE11uyV1bdvNjC2p9kAdFWLPHOx7gvvypQkyBA495t1M9Kw+sjLkez7UDgrmx1FJ2KShE8OlZn1dnkXzjm3pI66nl/EESdUc8SspJmHqcrpKKu8yB/oawi6Q/+Xj/NTBsNqOsFwwoWJw0TUn5CAx3vtx2hJ8m/kh00c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716232491; c=relaxed/simple;
-	bh=JMmxMc4KxFDgWYo64T8S+XbqNNYGK47LMWQHk3hYL4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pt5B1bzTzMD/COuFpexsjkwlucG1ephOREpypwSPBR38aNhRGwF51e467bN18YS9yjIB60sG1BDOEGVYtNlGogJa+zJE0upYTojVdq8yA6HVWcood41DsNlIvl6yKeZe2HdegPAwcQbw3U+Y/SekWTpVMQ0gssPIpr+nCGQnlZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lz++x3Gq; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1716237367; c=relaxed/simple;
+	bh=+VY1j3n1YoqE2DUlZ1stU+E39GkhX9GJ33huspw8fe4=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=c541VcuFEPXijLKV25/xzpIh8A/RSEXR+nY0NNZu0xbs/NLU/NOmNrBDgipP92JQEHgXj07wsG45HMF2BYvVUPyAnvisiyGFJxf9SmG3ag+mSQdEIJOXeWXr5fu5+ppk28nC6h+xuaUyqyM2ExJoInpwBSadfP5+7JqP2egtdYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rnQOFHgd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lz++x3Gq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716232489; x=1747768489;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=JMmxMc4KxFDgWYo64T8S+XbqNNYGK47LMWQHk3hYL4g=;
-  b=Lz++x3Gqebd7BRbH7USCZOiuaLscP+s17VYWiGr0ZABagpIPK9GOhHWV
-   yBwel/EXPBkQQwWKz7DLC9KU0JqZpyGO8ST0UUy1pyleO9HzSqVg1jh5C
-   QJyvVcEiSkk5UXP0VainPi53omG0pYTSGVby9jD+pKse2LTQZrnkpKPmR
-   NNBrN8GFqk06+vqpSeOHnJN3eD1SjGvPu1IyIe1aiYvmZt1Oc1GgNdSqO
-   KTyRhKMZ5Kot8lxCgGaFwdUc4bS4HETaV+VuGAQMGcFcoC3dqzvjURDqA
-   cJOZ+uD1VFZ+8BdzPjRkpTlmzuASdSJP+hWBGhPQXQdv+lfTAkRl0Skp+
-   Q==;
-X-CSE-ConnectionGUID: OCMtqep3Ss2ZlBBBPLAfCQ==
-X-CSE-MsgGUID: mhWXYgOoQFWx/VUUBb5Hhg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11078"; a="12178323"
-X-IronPort-AV: E=Sophos;i="6.08,175,1712646000"; 
-   d="scan'208";a="12178323"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2024 12:14:48 -0700
-X-CSE-ConnectionGUID: hcN/iEklQZy2RiPWZ3fsxw==
-X-CSE-MsgGUID: UFs0ZNCiQ8OklrWpLsAV+Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,175,1712646000"; 
-   d="scan'208";a="63470070"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.54])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2024 12:14:47 -0700
-Date: Mon, 20 May 2024 12:14:47 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"michael.roth@amd.com" <michael.roth@amd.com>,
-	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"tobin@ibm.com" <tobin@ibm.com>,
-	"liam.merwick@oracle.com" <liam.merwick@oracle.com>,
-	"alpergun@google.com" <alpergun@google.com>,
-	"Luck, Tony" <tony.luck@intel.com>,
-	"jmattson@google.com" <jmattson@google.com>,
-	"luto@kernel.org" <luto@kernel.org>,
-	"ak@linux.intel.com" <ak@linux.intel.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"pgonda@google.com" <pgonda@google.com>,
-	"srinivas.pandruvada@linux.intel.com" <srinivas.pandruvada@linux.intel.com>,
-	"slp@redhat.com" <slp@redhat.com>,
-	"rientjes@google.com" <rientjes@google.com>,
-	"peterz@infradead.org" <peterz@infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-	"x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"vbabka@suse.cz" <vbabka@suse.cz>,
-	"ashish.kalra@amd.com" <ashish.kalra@amd.com>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	"nikunj.dadhania@amd.com" <nikunj.dadhania@amd.com>,
-	"Rodel, Jorg" <jroedel@suse.de>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"sathyanarayanan.kuppuswamy@linux.intel.com" <sathyanarayanan.kuppuswamy@linux.intel.com>,
-	"hpa@zytor.com" <hpa@zytor.com>,
-	"kirill@shutemov.name" <kirill@shutemov.name>,
-	"jarkko@kernel.org" <jarkko@kernel.org>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	isaku.yamahata@intel.com, isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v15 13/20] KVM: SEV: Implement gmem hook for initializing
- private pages
-Message-ID: <20240520191447.GB22775@ls.amr.corp.intel.com>
-References: <20240501085210.2213060-1-michael.roth@amd.com>
- <20240501085210.2213060-14-michael.roth@amd.com>
- <41d8ba3a48d33de82baa67ef5ee88e5f8995aea8.camel@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rnQOFHgd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4C90C2BD10;
+	Mon, 20 May 2024 20:36:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716237366;
+	bh=+VY1j3n1YoqE2DUlZ1stU+E39GkhX9GJ33huspw8fe4=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=rnQOFHgdoqphfLmE7gSbyjiBhXSet2VuuzXxCMx2Y3o1WSps+jHFWC1HQDknzf39M
+	 nPogvKeP0EVogt0BZeYryYq/TebcHfuWmNmmI5GsTkrqJOQt97xSk4OWtZMSFeLdKY
+	 Jwb+8EJbXvwsNHbV+8wczgzcWTZzL7FRPWTdbvHmY03D1cG2DUyeFMaG52A2KEJjUP
+	 BvrBBjwdLKUdbPevF0HQ3g8hCq//j5kxbbQ1e9yX2OGAAd2LlMgo/uYPEILvnbQyWj
+	 tU0PiQWi8PO9QXl7didzAfS3WsKS841qSmWix8C5dOKz8S5DL4OcIrIYiHCCi1LX5V
+	 Kl/wmhf1YBDCQ==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <41d8ba3a48d33de82baa67ef5ee88e5f8995aea8.camel@intel.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 20 May 2024 23:36:02 +0300
+Message-Id: <D1ERDC16XLUO.578U4ZE7VXW@kernel.org>
+Cc: <linux-integrity@vger.kernel.org>, <keyrings@vger.kernel.org>,
+ <Andreas.Fuchs@infineon.com>, "James Prestwood" <prestwoj@gmail.com>,
+ "David Woodhouse" <dwmw2@infradead.org>, "David S. Miller"
+ <davem@davemloft.net>, "open list:CRYPTO API"
+ <linux-crypto@vger.kernel.org>, "open list" <linux-kernel@vger.kernel.org>,
+ "Eric Biggers" <ebiggers@kernel.org>
+Subject: Re: [PATCH 0/6] KEYS: asymmetric: tpm2_key_rsa
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Jarkko Sakkinen" <jarkko@kernel.org>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>
+X-Mailer: aerc 0.17.0
+References: <20240520184727.22038-1-jarkko@kernel.org>
+In-Reply-To: <20240520184727.22038-1-jarkko@kernel.org>
 
-On Mon, May 20, 2024 at 10:16:54AM +0000,
-"Huang, Kai" <kai.huang@intel.com> wrote:
+On Mon May 20, 2024 at 9:47 PM EEST, Jarkko Sakkinen wrote:
+> ## Overview
+>
+> Introduce tpm2_key_rsa implementing asymmetric TPM RSA key. This key type
+> can be enabled with CONFIG_ASYMMETRIC_TPM2_KEY_RSA_SUBTYPE config option.
+> Carves groundwork for similar modules in future, such as tpm2_key_ecdsa.
 
-> On Wed, 2024-05-01 at 03:52 -0500, Michael Roth wrote:
-> > This will handle the RMP table updates needed to put a page into a
-> > private state before mapping it into an SEV-SNP guest.
-> > 
-> > 
-> 
-> [...]
-> 
-> > +int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order)
-> > +{
-> > +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> > +	kvm_pfn_t pfn_aligned;
-> > +	gfn_t gfn_aligned;
-> > +	int level, rc;
-> > +	bool assigned;
-> > +
-> > +	if (!sev_snp_guest(kvm))
-> > +		return 0;
-> > +
-> > +	rc = snp_lookup_rmpentry(pfn, &assigned, &level);
-> > +	if (rc) {
-> > +		pr_err_ratelimited("SEV: Failed to look up RMP entry: GFN %llx PFN %llx error %d\n",
-> > +				   gfn, pfn, rc);
-> > +		return -ENOENT;
-> > +	}
-> > +
-> > +	if (assigned) {
-> > +		pr_debug("%s: already assigned: gfn %llx pfn %llx max_order %d level %d\n",
-> > +			 __func__, gfn, pfn, max_order, level);
-> > +		return 0;
-> > +	}
-> > +
-> > +	if (is_large_rmp_possible(kvm, pfn, max_order)) {
-> > +		level = PG_LEVEL_2M;
-> > +		pfn_aligned = ALIGN_DOWN(pfn, PTRS_PER_PMD);
-> > +		gfn_aligned = ALIGN_DOWN(gfn, PTRS_PER_PMD);
-> > +	} else {
-> > +		level = PG_LEVEL_4K;
-> > +		pfn_aligned = pfn;
-> > +		gfn_aligned = gfn;
-> > +	}
-> > +
-> > +	rc = rmp_make_private(pfn_aligned, gfn_to_gpa(gfn_aligned), level, sev->asid, false);
-> > +	if (rc) {
-> > +		pr_err_ratelimited("SEV: Failed to update RMP entry: GFN %llx PFN %llx level %d error %d\n",
-> > +				   gfn, pfn, level, rc);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	pr_debug("%s: updated: gfn %llx pfn %llx pfn_aligned %llx max_order %d level %d\n",
-> > +		 __func__, gfn, pfn, pfn_aligned, max_order, level);
-> > +
-> > +	return 0;
-> > +}
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index b70556608e8d..60783e9f2ae8 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -5085,6 +5085,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
-> >  	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
-> >  	.vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
-> >  	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
-> > +
-> > +	.gmem_prepare = sev_gmem_prepare,
-> >  };
-> >  
-> > 
-> 
-> +Rick, Isaku,
-> 
-> I am wondering whether this can be done in the KVM page fault handler?
-> 
-> The reason that I am asking is KVM will introduce several new
-> kvm_x86_ops::xx_private_spte() ops for TDX to handle setting up the
-> private mapping, and I am wondering whether SNP can just reuse some of
-> them so we can avoid having this .gmem_prepare():
+Cc to Eric (forgot).
 
-Although I can't speak for SNP folks, I guess those hooks doesn't make sense for
-them.  I guess they want to stay away from directly modifying the TDP MMU to add
-hooks to the TDP MMU.  Instead, They intentionally chose to add hooks to
-guest_memfd.  Maybe it's possible for SNP to use those hooks, what's the benefit
-for SNP?
-
-If you're looking for the benefit to allow the hooks of the TDP MMU for shared
-page table, what about other vm type? SW_PROTECTED or future one?
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+BR, Jarkko
