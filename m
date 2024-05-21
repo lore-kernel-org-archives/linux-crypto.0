@@ -1,94 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935F63FB8B;
-	Tue, 21 May 2024 20:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B151EB2F;
+	Tue, 21 May 2024 21:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716322982; cv=none; b=r94WPhgosVIsowBwbe/dQzf7VYSvCgpaIpwwfVp212Vi433WHJhXN7Sa6uN0+Ss+Zayav/Ls6jZFpf9T8xeAUm2CgtzPBHjlRLcf10U0wpFFIHR4qfU5DnQaf19wMCR6ZLVrMyxtXvXeUuDtcbOOeHDT/fX41ZasD4Skvvd+U6g=
+	t=1716326239; cv=none; b=qTKQRJsgpk5DBHpoOG6HbkrT6+d0QhRb+KVHMPFV3cRyLDJ5Me3+xpVrJzsiA/OSICQwHPYukm2FJNGhnnA9zrqb0v0scsKpyRoh1JFpGRlojcwfnEyDZGt+ZxdAccEiZgcNWLGVtuviOWD9aVWmGM5Ryc2MIqxomH2YWFkKanQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716322982; c=relaxed/simple;
-	bh=Rygel7lRWEl019erYolLr+9sOFGxdECPHVMoJ63saII=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=A5U254ZiOMNSC7H+tOGqGn38z+tpxpno44DlD65hz2A3L34S0j0cwWM2sD67DVYtz6Ng+ZcTaRBeXSdL0UWDkYAk7HW5eT41AsSnebm6SaVoVTC0KD7Tda99FrU9YGEc59bOPFQpU5kwa1mosnD9uR+qmjhDFW76rjODe2sWZ84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rutwDc1b; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716326239; c=relaxed/simple;
+	bh=RJqD7WEQOpBw7+L+o4xmUJtf1B8VRQenxyV5ITvcpK0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=BFaaqwQrGA17kk2QYZLbO9SyllT4XkoeJIuazDrXbrvxx04vKvRa7kxm6a6SaETCd5eO6+Jng01saU9i1fTjEGylf+cbUUvYfiy6kuSbF9T0Y/H/C2byZdQWas/CDqInm1YxnNnna9qBCTFvfP+oOlYqFhNPzJz2tW7G/DzCXeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k3KCaWSK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rutwDc1b"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E6B3C2BD11;
-	Tue, 21 May 2024 20:23:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k3KCaWSK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23775C2BD11;
+	Tue, 21 May 2024 21:17:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716322982;
-	bh=Rygel7lRWEl019erYolLr+9sOFGxdECPHVMoJ63saII=;
-	h=From:Date:Subject:To:Cc:From;
-	b=rutwDc1bDK07kt3hJHrIuDUuEQBLD+AqyYOJpXQRoajkZSY5x+zk35HlNw8LB9X5q
-	 NllptBlAPdcyEWo67NuCbux9UtcPtjr15uP3vjyxXKxIWFD7agPtwOj8TGP9tbZ83z
-	 kyu0IcN9Dkfs3JR3RlWyhRiiSNBQ4Rwuhd3Rd0Zsx971jZclFTE5Le5G4ZNe5qGghx
-	 +s/xXTzQogpUee54SeiCjIz2bjzMgtBXypGjl6sD+PhAmYA10UsKX91GaC9Ur779yP
-	 UY6Gwaxbob4gBa/4lWH98gD8kZ1+4zaOtkJf8Q52Ojole28vr/sD5B5EDje9XIZR72
-	 95+b+1zeSNgqQ==
-From: Mark Brown <broonie@kernel.org>
-Date: Tue, 21 May 2024 21:22:49 +0100
-Subject: [PATCH] arm64/crypto: Raise priority of NEON crct10dif
- implementation
+	s=k20201202; t=1716326239;
+	bh=RJqD7WEQOpBw7+L+o4xmUJtf1B8VRQenxyV5ITvcpK0=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=k3KCaWSKyNRQJDQWJHQ6BKqd3OAvMvZxvcQ9PjaWUkf64mzmIdVQS4ebKpqgJAVis
+	 FvBVM7OOm1jmD3f4g8B40mH049E+XFeiwKb3GWoFufozpfb+SY8ZqUkeS3PFIfisoW
+	 ZPXTSmL8BPlGCZuXKlVLdewwoCho+bYJbuU5MG60NcOpMk7AvXXVLPeywWc7WCKfgh
+	 rlvL76Yqhmp/HBdYLH/yhM8qsuV09xjKPlDzjffDABxHuDhm1YYhTzGjOTcougTI/L
+	 uWGKKTVBfuJ6vXTihW8buKM/cMZI8iJhfkBfBrOrtroRxk1kSUtaCK+CkFJWUuAeL7
+	 OZqKT+eXZoqOw==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240521-arm64-crct10dif-neon-prio-v1-1-e2975754b8f3@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAJgCTWYC/x3MQQqAIBBA0avErBtQs6iuEi3EpppFGmNEIN09a
- fkW/2dIJEwJxiqD0M2JYyjQdQV+d2Ej5KUYjDJWtUajk6Oz6MVfWi28YqAY8BSO2A/WDU2ryGu
- C0p9CKz//e5rf9wMUHWYxawAAAA==
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.14-dev-621fa
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1152; i=broonie@kernel.org;
- h=from:subject:message-id; bh=Rygel7lRWEl019erYolLr+9sOFGxdECPHVMoJ63saII=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmTQKjC8Hyhfk9Z/Am/ERXw2VRa5M7c/f+qBckBcpx
- DRkrkHKJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZk0CowAKCRAk1otyXVSH0FmcB/
- 9Y+2EzwkuxrDQd7go9lzx6cNqRoPw8Q26bVcw+O2MECipm5HITkaTzvpoSSgpjEfQKS8iYfxigCVnO
- kYGCH52imMrpH18q7sR+8fgCS9Z/eIuBFNqorhslc+Pjb/6w4xHFGdg7CORU/jI+M/8vfu7XPmwC07
- lFk9Ss2RXGkXOeu6RyTOpKrm7zDVEMaGsbKZuROmGQ9rHJ26rF007LOEFLp6mX6V1fDco4U3T4PV2R
- eQAaRhgbsG6YHrUytJuARtPQFlcMYecoqN2ou08PXoPv3VxAHd13NVNE7lKXVKwaBiQw9nUjrKtZgW
- pb0NV1KNe/BjEPfQ91nRqqSwFNuwrd
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 22 May 2024 00:17:13 +0300
+Message-Id: <D1FMVEJWGLEW.14QGHPAYPHQG1@kernel.org>
+Cc: <linux-integrity@vger.kernel.org>, <keyrings@vger.kernel.org>,
+ <Andreas.Fuchs@infineon.com>, "James Prestwood" <prestwoj@gmail.com>,
+ "David Woodhouse" <dwmw2@infradead.org>, "Eric Biggers"
+ <ebiggers@kernel.org>, "David S. Miller" <davem@davemloft.net>, "open
+ list:CRYPTO API" <linux-crypto@vger.kernel.org>, "open list"
+ <linux-kernel@vger.kernel.org>, "Peter Huewe" <peterhuewe@gmx.de>, "Jason
+ Gunthorpe" <jgg@ziepe.ca>, "Mimi Zohar" <zohar@linux.ibm.com>, "David
+ Howells" <dhowells@redhat.com>, "Paul Moore" <paul@paul-moore.com>, "James
+ Morris" <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, "open
+ list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>
+Subject: Re: [PATCH v2 4/6] KEYS: trusted: Move tpm2_key_decode() to the TPM
+ driver
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "James Bottomley" <James.Bottomley@HansenPartnership.com>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>
+X-Mailer: aerc 0.17.0
+References: <20240521031645.17008-1-jarkko@kernel.org>
+ <20240521031645.17008-5-jarkko@kernel.org>
+ <cc3d952f8295b52b052fbffe009b796ffb45707a.camel@HansenPartnership.com>
+In-Reply-To: <cc3d952f8295b52b052fbffe009b796ffb45707a.camel@HansenPartnership.com>
 
-The NEON implementation of crctd10dif is registered with a priority of 100
-which is identical to that used by the generic C implementation. Raise the
-priority to 150, half way between the PMULL based implementation and the
-NEON one, so that it will be preferred over the generic implementation.
+On Tue May 21, 2024 at 9:18 PM EEST, James Bottomley wrote:
+> On Tue, 2024-05-21 at 06:16 +0300, Jarkko Sakkinen wrote:
+> [...]
+> > diff --git a/include/crypto/tpm2_key.h b/include/crypto/tpm2_key.h
+> > new file mode 100644
+> > index 000000000000..acf41b2e0c92
+> > --- /dev/null
+> > +++ b/include/crypto/tpm2_key.h
+> > @@ -0,0 +1,33 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +#ifndef __LINUX_TPM2_KEY_H__
+> > +#define __LINUX_TPM2_KEY_H__
+> > +
+> > +#include <linux/slab.h>
+> > +
+> > +/*
+> > + * TPM2 ASN.1 key
+> > + */
+> > +struct tpm2_key {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 parent;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const u8 *blob;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 blob_len;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const u8 *pub;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 pub_len;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const u8 *priv;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 priv_len;
+> > +};
+> > +
+> > +int tpm2_key_decode(const u8 *src, u32 src_len, struct tpm2_key
+> > *key,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u32 max_key_len);
+>
+> I don't think this is a good idea.  Trusted keys already have a pre-
+> defined max payload size (MAX_BLOB_SIZE in include/keys/trusted-type.h)
+> and I've already had to increase this several times because once you
+> get policy attached to a key, it can get pretty big (over a page).=20
+> Exactly the same thing will happen to asymmetric keys as well, so it
+> does make sense that they share the same maximum (probably in a more
+> generic header, though).
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/crypto/crct10dif-ce-glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ECDSA and RSA have different space requirements. With that solution you
+actually max out space requirements given same cap for everything.
 
-diff --git a/arch/arm64/crypto/crct10dif-ce-glue.c b/arch/arm64/crypto/crct10dif-ce-glue.c
-index 09eb1456aed4..59016518f44d 100644
---- a/arch/arm64/crypto/crct10dif-ce-glue.c
-+++ b/arch/arm64/crypto/crct10dif-ce-glue.c
-@@ -98,7 +98,7 @@ static struct shash_alg crc_t10dif_alg[] = {{
- 
- 	.base.cra_name		= "crct10dif",
- 	.base.cra_driver_name	= "crct10dif-arm64-neon",
--	.base.cra_priority	= 100,
-+	.base.cra_priority	= 150,
- 	.base.cra_blocksize	= CRC_T10DIF_BLOCK_SIZE,
- 	.base.cra_module	= THIS_MODULE,
- }, {
+Even tpm2_key_ecdsa should use a different value than tpm2_key_rsa to
+save memory.
 
----
-base-commit: a38297e3fb012ddfa7ce0321a7e5a8daeb1872b6
-change-id: 20240521-arm64-crct10dif-neon-prio-894a9350ec1e
+> Since the code already right sizes the allocation and all we check with
+> this is whether it's over a pre-defined maximum, it's way easier if
+> that maximum is defined in a header rather than passed in in several
+> places making increasing the maximum really hard because you have to
+> chase all the threading.
 
-Best regards,
--- 
-Mark Brown <broonie@kernel.org>
+You don't save a single byte of memory with any constant that dictates
+the size requirements for multiple modules in two disjoint subsystems.
 
+You are maximizing the use of memory.
+
+> James
+
+BR, Jarkko
