@@ -1,111 +1,104 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BADF1FDD;
-	Tue, 21 May 2024 02:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16DF017C64
+	for <linux-crypto@vger.kernel.org>; Tue, 21 May 2024 02:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716260005; cv=none; b=ohO2A1L80irpgISCTY1WEfLTcxUis7HFaSWPbj6qzqCsOj0NhG6NJJ1FYULGpg6so2PrixlI9ithIbvQGiC1uwLTdLqDYNoLXoyLdqCBQf+ufxqTZ8zlhgDNBK5t1qLlf3rSSwzvuJS28qeM7kH8St/I0ZMLg68hrAm4j+kv++I=
+	t=1716260096; cv=none; b=fYB1SxG7OAjnRFg7BFtWPPWGQyONCOW7pvWa0sLsf1wMat8OviR3ZWwA1tvQUirH2y0Rup3SUzjXzqGitKqFQZPaI13Ntr1UZF575QjE2mAZH1Df+nFNjZt8dnyjWZL5ELp4xGbhZmEoOPBRZV1aMqPG8sdrcYPMGhk/9Km+Bjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716260005; c=relaxed/simple;
-	bh=Z4jGxdA4J1toKgzTasm0GDN9Ngv8FeSm+rD8paoawxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KINmUwce3Kq6AeDgAhc/1f9vIC6OEm6ROX0WomA849GZgc7zRyNlsPl6GMeEBMSbxhhC7sG4/h4QAyAp/6SDH5cjMwB5vRzYTqVZVDYr6ss51gTPg/vkEWF/mM53qNSVFgpuLRprB4EUNpPiZDZFh1uUcru7AF5wJ5tyNW2SzMU=
+	s=arc-20240116; t=1716260096; c=relaxed/simple;
+	bh=JbQAFAJ2lRfJeNGSS2jp8wtesTar94I2QwnwW+5Zx0E=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=fy+r9Le6B0t6Brlt4r2PnmhFJNxCqNno9tFwjuVY10ItZJPEBoTvWYhWovUAH0xM9pjd7AZ7+9IJzCYt7aNxy/LqTffOFlPvxu5NtMx+9COcbSqUNQs46EYuGAeHwkwIhYGYbFx4hkRF+XkkNtaI6VRDZ2zircCw7TXTL60QYWU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s9Fcq-000M2J-2k;
-	Tue, 21 May 2024 10:53:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 21 May 2024 10:53:18 +0800
-Date: Tue, 21 May 2024 10:53:18 +0800
+	id 1s9FeL-000M9C-1Z;
+	Tue, 21 May 2024 10:54:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 21 May 2024 10:54:50 +0800
+Date: Tue, 21 May 2024 10:54:50 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: =?iso-8859-1?Q?N=EDcolas_F=2E_R=2E_A=2E?= Prado <nfraprado@collabora.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Jarkko Sakkinen <jarkko@kernel.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-	regressions@lists.linux.dev, kernel@collabora.com,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Tejun Heo <tj@kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: [v2 PATCH] crypto: api - Do not load modules if called by async
- probing
-Message-ID: <ZkwMnrTR_CbXcjWe@gondor.apana.org.au>
-References: <0f68c283ff4bbb89b8a019d47891f798c6fff287.camel@HansenPartnership.com>
- <CAMj1kXHi4r8KY9GvX573kwqvLpMfX-J=K2hWiGAKkf5bnicwYQ@mail.gmail.com>
- <0d260c2f7a9f67ec8bd2305919636678d06000d1.camel@HansenPartnership.com>
- <CAMj1kXFE_R_x10BVkU+8vrMz0RHiX0+rz-ZL+w08FH2CLQHZXA@mail.gmail.com>
- <66ec985f3ee229135bf748f1b0874d5367a74d7f.camel@HansenPartnership.com>
- <dfb0d930-7cbe-46c5-be19-d132b4906ecf@notapiano>
- <D1C2NPOBHAHK.20O4IME8OK1FH@kernel.org>
- <20240518043115.GA53815@sol.localdomain>
- <ZkhS1zrobNwAuANI@gondor.apana.org.au>
- <00bcfa65-384d-46ae-ab8b-30f12487928b@notapiano>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: api - Disable boot-test-finished if algapi is a
+ module
+Message-ID: <ZkwM-pIwNkLc9ZOS@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <00bcfa65-384d-46ae-ab8b-30f12487928b@notapiano>
 
-On Mon, May 20, 2024 at 11:49:56AM -0400, Nícolas F. R. A. Prado wrote:
->
-> Unfortunately this patch didn't work either. The warning is still there
-> unchanged.
+The boot-test-finished toggle is only necessary if algapi
+is built into the kernel.  Do not include this code if it is a module.
 
-OK perhaps we can do it by calling current_is_async ourselves.
-But this is really a nasty hack because it basically defeats
-the whole point of loading optional algorithm by module.
-
-Linus/Tejun, is it time perhaps to remove the warning introduced
-by commit 0fdff3ec6d87856cdcc99e69cf42143fdd6c56b4 since it's
-been ten years since the warning caused a real problem?
-
-For the Crypto API, if it is called by some random driver via the
-async context, this warning stops us from loading any modules
-without printing a nasty warning that isn't relevant as the Crypto
-API never calls async_synchronize_full.
-
----8<---
-Do not call request_module if this is the case or a warning will
-be printed.
-
-Reported-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
-Reported-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/api.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ crypto/algapi.c   | 3 +++
+ crypto/api.c      | 4 ++--
+ crypto/internal.h | 7 +++++--
+ 3 files changed, 10 insertions(+), 4 deletions(-)
 
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 85bc279b4233..122cd910c4e1 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -1056,6 +1056,9 @@ EXPORT_SYMBOL_GPL(crypto_type_has_alg);
+ 
+ static void __init crypto_start_tests(void)
+ {
++	if (!IS_BUILTIN(CONFIG_CRYPTO_ALGAPI))
++		return;
++
+ 	if (IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS))
+ 		return;
+ 
 diff --git a/crypto/api.c b/crypto/api.c
-index 22556907b3bc..7c4b9f86c1ad 100644
+index 6aa5a3b4ed5e..22556907b3bc 100644
 --- a/crypto/api.c
 +++ b/crypto/api.c
-@@ -10,6 +10,7 @@
-  * and Nettle, by Niels Möller.
-  */
+@@ -31,9 +31,9 @@ EXPORT_SYMBOL_GPL(crypto_alg_sem);
+ BLOCKING_NOTIFIER_HEAD(crypto_chain);
+ EXPORT_SYMBOL_GPL(crypto_chain);
  
-+#include <linux/async.h>
- #include <linux/err.h>
- #include <linux/errno.h>
- #include <linux/jump_label.h>
-@@ -280,7 +281,8 @@ static struct crypto_alg *crypto_larval_lookup(const char *name, u32 type,
- 	mask &= ~(CRYPTO_ALG_LARVAL | CRYPTO_ALG_DEAD);
+-#ifndef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
++#if IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) && \
++    !IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS)
+ DEFINE_STATIC_KEY_FALSE(__crypto_boot_test_finished);
+-EXPORT_SYMBOL_GPL(__crypto_boot_test_finished);
+ #endif
  
- 	alg = crypto_alg_lookup(name, type, mask);
--	if (!alg && !(mask & CRYPTO_NOLOAD)) {
-+	if (!alg && !(mask & CRYPTO_NOLOAD) &&
-+	    (!IS_BUILTIN(CONFIG_CRYPTO) || !current_is_async())) {
- 		request_module("crypto-%s", name);
+ static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg);
+diff --git a/crypto/internal.h b/crypto/internal.h
+index 63e59240d5fb..aee31319be2e 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -66,7 +66,8 @@ extern struct blocking_notifier_head crypto_chain;
  
- 		if (!((type ^ CRYPTO_ALG_NEED_FALLBACK) & mask &
+ int alg_test(const char *driver, const char *alg, u32 type, u32 mask);
+ 
+-#ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
++#if !IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) || \
++    IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS)
+ static inline bool crypto_boot_test_finished(void)
+ {
+ 	return true;
+@@ -84,7 +85,9 @@ static inline void set_crypto_boot_test_finished(void)
+ {
+ 	static_branch_enable(&__crypto_boot_test_finished);
+ }
+-#endif /* !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS */
++#endif /* !IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) ||
++	* IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS)
++	*/
+ 
+ #ifdef CONFIG_PROC_FS
+ void __init crypto_init_proc(void);
 -- 
 2.39.2
 
