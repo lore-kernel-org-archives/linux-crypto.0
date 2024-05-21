@@ -1,108 +1,129 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16DF017C64
-	for <linux-crypto@vger.kernel.org>; Tue, 21 May 2024 02:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCBB3848A;
+	Tue, 21 May 2024 03:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716260096; cv=none; b=fYB1SxG7OAjnRFg7BFtWPPWGQyONCOW7pvWa0sLsf1wMat8OviR3ZWwA1tvQUirH2y0Rup3SUzjXzqGitKqFQZPaI13Ntr1UZF575QjE2mAZH1Df+nFNjZt8dnyjWZL5ELp4xGbhZmEoOPBRZV1aMqPG8sdrcYPMGhk/9Km+Bjs=
+	t=1716261411; cv=none; b=PPtYCziyFlAFhS3tkAW6VrB+TDjG04zBTB3X6dL1I70BYn1JLQsjUCaSXw/cfZQjLnva2DREiv+S3sdwt+kkuhL71dRsQblZzKxROAcCkoLlFwAGfemg0D/1dt2o5VpvyncLEygv5G8ZP/qh4VvGC/vqjyCgaHinuwlWu/77i1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716260096; c=relaxed/simple;
-	bh=JbQAFAJ2lRfJeNGSS2jp8wtesTar94I2QwnwW+5Zx0E=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=fy+r9Le6B0t6Brlt4r2PnmhFJNxCqNno9tFwjuVY10ItZJPEBoTvWYhWovUAH0xM9pjd7AZ7+9IJzCYt7aNxy/LqTffOFlPvxu5NtMx+9COcbSqUNQs46EYuGAeHwkwIhYGYbFx4hkRF+XkkNtaI6VRDZ2zircCw7TXTL60QYWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s9FeL-000M9C-1Z;
-	Tue, 21 May 2024 10:54:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 21 May 2024 10:54:50 +0800
-Date: Tue, 21 May 2024 10:54:50 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: api - Disable boot-test-finished if algapi is a
- module
-Message-ID: <ZkwM-pIwNkLc9ZOS@gondor.apana.org.au>
+	s=arc-20240116; t=1716261411; c=relaxed/simple;
+	bh=YK2OIxpfjJaaDk91GjlEjElige5eBrqgDYVjkNdZEEo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EaYkFn1zbWWA1ih4COtb5l5+3tKQGL1RLl7hMxFdTdCgyWW31T6YKHQOjNLo78sfy+b0gIdMAR2GB8L84x8QMa4QDQjF64UGNeJ6VXuedQFTO4IeuqyM30cvWre9vBRjXOgYi58m+wovV6rLNFgZ2Kpo7FmrL2BApQ8kHY08jcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mufnkycR; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mufnkycR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E9C3C32786;
+	Tue, 21 May 2024 03:16:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716261410;
+	bh=YK2OIxpfjJaaDk91GjlEjElige5eBrqgDYVjkNdZEEo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mufnkycRqgDnEKVs0Z8YdZMXrmiM4FjhjHgsPPRH415K1hGvGc7FXZohKtrutljZJ
+	 kzd5d40xulh0Pe5nG+T9w48QmMwWGQXAldO8h/DZog93F7AE5pzXbZ032XIqjcl1HH
+	 j17xXmiw2y+BaaDIcYOlsBhX+uhkAPJRDMwvsqn7qQD8oTHoyolRomqbdwfq9mnCaQ
+	 prQhbvBXSTkiKRUzsk21QcU5fe7yrqYz8bLuKCF7t5FVaZu2GMtZQdGb6VGXk2Q8Nw
+	 fvol5NhCQvOKBf1nRvfjBr+GGbNKOs+3gDoo40MfjcXmDjrNMIVlESEVI/GzH9f4Vk
+	 UJ/mPhE6LgNCg==
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-integrity@vger.kernel.org,
+	keyrings@vger.kernel.org,
+	Andreas.Fuchs@infineon.com,
+	James Prestwood <prestwoj@gmail.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org (open list:CRYPTO API),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v2 0/6] KEYS: asymmetric: tpm2_key_rsa
+Date: Tue, 21 May 2024 06:16:25 +0300
+Message-ID: <20240521031645.17008-1-jarkko@kernel.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-The boot-test-finished toggle is only necessary if algapi
-is built into the kernel.  Do not include this code if it is a module.
+## Overview
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/algapi.c   | 3 +++
- crypto/api.c      | 4 ++--
- crypto/internal.h | 7 +++++--
- 3 files changed, 10 insertions(+), 4 deletions(-)
+Introduce tpm2_key_rsa module, which implements asymmetric TPM2 RSA key.
+The feature can be enabled with the CONFIG_ASYMMETRIC_TPM2_KEY_RSA_SUBTYPE 
+kconfig option.
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 85bc279b4233..122cd910c4e1 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -1056,6 +1056,9 @@ EXPORT_SYMBOL_GPL(crypto_type_has_alg);
- 
- static void __init crypto_start_tests(void)
- {
-+	if (!IS_BUILTIN(CONFIG_CRYPTO_ALGAPI))
-+		return;
-+
- 	if (IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS))
- 		return;
- 
-diff --git a/crypto/api.c b/crypto/api.c
-index 6aa5a3b4ed5e..22556907b3bc 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -31,9 +31,9 @@ EXPORT_SYMBOL_GPL(crypto_alg_sem);
- BLOCKING_NOTIFIER_HEAD(crypto_chain);
- EXPORT_SYMBOL_GPL(crypto_chain);
- 
--#ifndef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
-+#if IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) && \
-+    !IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS)
- DEFINE_STATIC_KEY_FALSE(__crypto_boot_test_finished);
--EXPORT_SYMBOL_GPL(__crypto_boot_test_finished);
- #endif
- 
- static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg);
-diff --git a/crypto/internal.h b/crypto/internal.h
-index 63e59240d5fb..aee31319be2e 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -66,7 +66,8 @@ extern struct blocking_notifier_head crypto_chain;
- 
- int alg_test(const char *driver, const char *alg, u32 type, u32 mask);
- 
--#ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
-+#if !IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) || \
-+    IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS)
- static inline bool crypto_boot_test_finished(void)
- {
- 	return true;
-@@ -84,7 +85,9 @@ static inline void set_crypto_boot_test_finished(void)
- {
- 	static_branch_enable(&__crypto_boot_test_finished);
- }
--#endif /* !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS */
-+#endif /* !IS_BUILTIN(CONFIG_CRYPTO_ALGAPI) ||
-+	* IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS)
-+	*/
- 
- #ifdef CONFIG_PROC_FS
- void __init crypto_init_proc(void);
+The idea in the design is to over time to have submodule per key type
+For instance, tpm2_key_ecdsa could be one potential future addition in
+the future. Perhaps, it might sense to consider at that point also a
+top-level tpm2_key module. The gist is that the naming convention is
+free from potential future bottlencks.
+
+## Change Log
+
+v2
+Cleaned up all the low-hanging fruit for the sake of saving everyones
+time. After this I move into reactive mode (I promise) ;-)
+
+## Testing
+
+tpm2_createprimary --hierarchy o -G rsa2048 -c owner.txt
+tpm2_evictcontrol -c owner.txt 0x81000001
+tpm2_getcap handles-persistent
+openssl genrsa -out private.pem 2048
+tpm2_import -C 0x81000001 -G rsa -i private.pem -u key.pub -r key.priv
+tpm2_encodeobject -C 0x81000001 -u key.pub -r key.priv -o key.priv.pem
+openssl asn1parse -inform pem -in key.priv.pem -noout -out key.priv.der
+serial=`cat key.priv.der | keyctl padd asymmetric tpm @u`
+echo "abcdefg" > plaintext.txt
+keyctl pkey_encrypt $serial 0 plaintext.txt enc=pkcs1 > encrypted.dat
+keyctl pkey_decrypt $serial 0 encrypted.dat enc=pkcs1 > decrypted.dat
+keyctl pkey_sign $serial 0 plaintext.txt enc=pkcs1 hash=sha256 > signed.dat
+keyctl pkey_verify $serial 0 plaintext.txt signed.dat enc=pkcs1 hash=sha256
+
+## References
+
+- v1: https://lore.kernel.org/linux-integrity/20240520184727.22038-1-jarkko@kernel.org/
+- Derived from https://lore.kernel.org/all/20200518172704.29608-1-prestwoj@gmail.com/
+
+James Prestwood (1):
+  keys: asymmetric: ASYMMETRIC_TPM2_KEY_RSA_SUBTYPE
+
+Jarkko Sakkinen (5):
+  crypto: rsa-pkcs1pad: export rsa1_asn_lookup()
+  lib: Expand asn1_encode_integer() to variable size integers
+  tpm: Export tpm2_load_context()
+  KEYS: trusted: Move tpm2_key_decode() to the TPM driver
+  tpm: tpm2_key: Extend parser to TPM_LoadableKey
+
+ crypto/asymmetric_keys/Kconfig                |  16 +
+ crypto/asymmetric_keys/Makefile               |   1 +
+ crypto/asymmetric_keys/tpm2_key_rsa.c         | 698 ++++++++++++++++++
+ crypto/rsa-pkcs1pad.c                         |  16 +-
+ drivers/char/tpm/Kconfig                      |   1 +
+ drivers/char/tpm/Makefile                     |   5 +
+ drivers/char/tpm/tpm.h                        |   2 -
+ drivers/char/tpm/tpm2-cmd.c                   |  77 ++
+ drivers/char/tpm/tpm2-space.c                 |  61 --
+ drivers/char/tpm/tpm2_key.c                   | 119 +++
+ .../char/tpm}/tpm2key.asn1                    |   0
+ include/crypto/rsa-pkcs1pad.h                 |  20 +
+ include/crypto/tpm2_key.h                     |  35 +
+ include/linux/asn1_encoder.h                  |   3 +-
+ include/linux/tpm.h                           |   4 +
+ lib/asn1_encoder.c                            | 185 ++---
+ security/keys/trusted-keys/Makefile           |   2 -
+ security/keys/trusted-keys/trusted_tpm2.c     | 135 +---
+ 18 files changed, 1110 insertions(+), 270 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/tpm2_key_rsa.c
+ create mode 100644 drivers/char/tpm/tpm2_key.c
+ rename {security/keys/trusted-keys => drivers/char/tpm}/tpm2key.asn1 (100%)
+ create mode 100644 include/crypto/rsa-pkcs1pad.h
+ create mode 100644 include/crypto/tpm2_key.h
+
 -- 
-2.39.2
+2.45.1
 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
