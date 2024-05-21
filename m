@@ -1,139 +1,94 @@
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07671DFE8;
-	Tue, 21 May 2024 19:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935F63FB8B;
+	Tue, 21 May 2024 20:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716320245; cv=none; b=ioKlIqWdpZeT0efNIbrYanUotGVRN8sPaqNO0eE7+Zk3B1DGcJqC80HoAcGH56PZeGsHyxYtZDBNs7XN5Rgu/vVf28kbqzb/VjLD+Sx4ONAyPR6KHgG5q9rCO0tCD8/8o3CyVtOLvvLcpNqYBK0GZoXj/kiNqzc3Ro8+mBAZnXg=
+	t=1716322982; cv=none; b=r94WPhgosVIsowBwbe/dQzf7VYSvCgpaIpwwfVp212Vi433WHJhXN7Sa6uN0+Ss+Zayav/Ls6jZFpf9T8xeAUm2CgtzPBHjlRLcf10U0wpFFIHR4qfU5DnQaf19wMCR6ZLVrMyxtXvXeUuDtcbOOeHDT/fX41ZasD4Skvvd+U6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716320245; c=relaxed/simple;
-	bh=wXDcMa9BCYSyaXMMmTl9LN4ze2E6leCzM04dQwdFaRM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ObeN41Gc7xQyiaXkdT/Cp2UC5V48yl32HWeMY0R72cgxy1hSL7gX7M7rnn5Fqjc0qu/1G6WukNk+h0fFLPX/bF1PMWX5yMdzB9vw5toqtc/dUTgafi8Rf3lGl+RwtxX36dEu+mW8pZJvqvK8Ky8J36XOpR9TLLiVRnV9fpsqZHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=5X8nQJ+M; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1716322982; c=relaxed/simple;
+	bh=Rygel7lRWEl019erYolLr+9sOFGxdECPHVMoJ63saII=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=A5U254ZiOMNSC7H+tOGqGn38z+tpxpno44DlD65hz2A3L34S0j0cwWM2sD67DVYtz6Ng+ZcTaRBeXSdL0UWDkYAk7HW5eT41AsSnebm6SaVoVTC0KD7Tda99FrU9YGEc59bOPFQpU5kwa1mosnD9uR+qmjhDFW76rjODe2sWZ84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rutwDc1b; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="5X8nQJ+M"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1716320241;
-	bh=wXDcMa9BCYSyaXMMmTl9LN4ze2E6leCzM04dQwdFaRM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=5X8nQJ+MU7gpqCnK/j2pEAXml/E84t8yPhv1xQpdLoc8LPYVDKPFa5+M6n38NzU80
-	 Z+j1/At6hOVYn8VmZls82EutWaY7Ehg2OYpdMykTy2cV7JvEzs8SqHBT2UpPRVDfNr
-	 5iFDu/JCq3KkmiDCMBioXP3XC4g4bvuLjbusOcohr88wASA9NJZ30Tep5/AIOq2M8h
-	 YTJZ0SWhHE+FDm5yZvE+Em2ioQ7ePT9r175ZagbbP6JMAxf0AnxGu0Jyb781LbEytZ
-	 GVvqgRbFNw8QaxI19BZXaYArrw9Eatwxu+YreHu91wPwTVdwtzjrvUXKdBLJ9Ln3Ix
-	 RKXLDTV7ZZCNQ==
-Received: from notapiano (zone.collabora.co.uk [167.235.23.81])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: nfraprado)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 245963782183;
-	Tue, 21 May 2024 19:37:18 +0000 (UTC)
-Date: Tue, 21 May 2024 15:37:16 -0400
-From: =?utf-8?B?TsOtY29sYXMgRi4gUi4gQS4=?= Prado <nfraprado@collabora.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Eric Biggers <ebiggers@kernel.org>, Jarkko Sakkinen <jarkko@kernel.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-	regressions@lists.linux.dev, kernel@collabora.com,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Tejun Heo <tj@kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [v2 PATCH] crypto: api - Do not load modules if called by async
- probing
-Message-ID: <07512097-8198-4a84-b166-ef9809c2913b@notapiano>
-References: <CAMj1kXHi4r8KY9GvX573kwqvLpMfX-J=K2hWiGAKkf5bnicwYQ@mail.gmail.com>
- <0d260c2f7a9f67ec8bd2305919636678d06000d1.camel@HansenPartnership.com>
- <CAMj1kXFE_R_x10BVkU+8vrMz0RHiX0+rz-ZL+w08FH2CLQHZXA@mail.gmail.com>
- <66ec985f3ee229135bf748f1b0874d5367a74d7f.camel@HansenPartnership.com>
- <dfb0d930-7cbe-46c5-be19-d132b4906ecf@notapiano>
- <D1C2NPOBHAHK.20O4IME8OK1FH@kernel.org>
- <20240518043115.GA53815@sol.localdomain>
- <ZkhS1zrobNwAuANI@gondor.apana.org.au>
- <00bcfa65-384d-46ae-ab8b-30f12487928b@notapiano>
- <ZkwMnrTR_CbXcjWe@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rutwDc1b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E6B3C2BD11;
+	Tue, 21 May 2024 20:23:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716322982;
+	bh=Rygel7lRWEl019erYolLr+9sOFGxdECPHVMoJ63saII=;
+	h=From:Date:Subject:To:Cc:From;
+	b=rutwDc1bDK07kt3hJHrIuDUuEQBLD+AqyYOJpXQRoajkZSY5x+zk35HlNw8LB9X5q
+	 NllptBlAPdcyEWo67NuCbux9UtcPtjr15uP3vjyxXKxIWFD7agPtwOj8TGP9tbZ83z
+	 kyu0IcN9Dkfs3JR3RlWyhRiiSNBQ4Rwuhd3Rd0Zsx971jZclFTE5Le5G4ZNe5qGghx
+	 +s/xXTzQogpUee54SeiCjIz2bjzMgtBXypGjl6sD+PhAmYA10UsKX91GaC9Ur779yP
+	 UY6Gwaxbob4gBa/4lWH98gD8kZ1+4zaOtkJf8Q52Ojole28vr/sD5B5EDje9XIZR72
+	 95+b+1zeSNgqQ==
+From: Mark Brown <broonie@kernel.org>
+Date: Tue, 21 May 2024 21:22:49 +0100
+Subject: [PATCH] arm64/crypto: Raise priority of NEON crct10dif
+ implementation
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZkwMnrTR_CbXcjWe@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240521-arm64-crct10dif-neon-prio-v1-1-e2975754b8f3@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAJgCTWYC/x3MQQqAIBBA0avErBtQs6iuEi3EpppFGmNEIN09a
+ fkW/2dIJEwJxiqD0M2JYyjQdQV+d2Ej5KUYjDJWtUajk6Oz6MVfWi28YqAY8BSO2A/WDU2ryGu
+ C0p9CKz//e5rf9wMUHWYxawAAAA==
+To: Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Ard Biesheuvel <ardb@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.14-dev-621fa
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1152; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=Rygel7lRWEl019erYolLr+9sOFGxdECPHVMoJ63saII=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmTQKjC8Hyhfk9Z/Am/ERXw2VRa5M7c/f+qBckBcpx
+ DRkrkHKJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZk0CowAKCRAk1otyXVSH0FmcB/
+ 9Y+2EzwkuxrDQd7go9lzx6cNqRoPw8Q26bVcw+O2MECipm5HITkaTzvpoSSgpjEfQKS8iYfxigCVnO
+ kYGCH52imMrpH18q7sR+8fgCS9Z/eIuBFNqorhslc+Pjb/6w4xHFGdg7CORU/jI+M/8vfu7XPmwC07
+ lFk9Ss2RXGkXOeu6RyTOpKrm7zDVEMaGsbKZuROmGQ9rHJ26rF007LOEFLp6mX6V1fDco4U3T4PV2R
+ eQAaRhgbsG6YHrUytJuARtPQFlcMYecoqN2ou08PXoPv3VxAHd13NVNE7lKXVKwaBiQw9nUjrKtZgW
+ pb0NV1KNe/BjEPfQ91nRqqSwFNuwrd
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Tue, May 21, 2024 at 10:53:18AM +0800, Herbert Xu wrote:
-> On Mon, May 20, 2024 at 11:49:56AM -0400, Nícolas F. R. A. Prado wrote:
-> >
-> > Unfortunately this patch didn't work either. The warning is still there
-> > unchanged.
-> 
-> OK perhaps we can do it by calling current_is_async ourselves.
-> But this is really a nasty hack because it basically defeats
-> the whole point of loading optional algorithm by module.
-> 
-> Linus/Tejun, is it time perhaps to remove the warning introduced
-> by commit 0fdff3ec6d87856cdcc99e69cf42143fdd6c56b4 since it's
-> been ten years since the warning caused a real problem?
-> 
-> For the Crypto API, if it is called by some random driver via the
-> async context, this warning stops us from loading any modules
-> without printing a nasty warning that isn't relevant as the Crypto
-> API never calls async_synchronize_full.
-> 
-> ---8<---
-> Do not call request_module if this is the case or a warning will
-> be printed.
-> 
-> Reported-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
-> Reported-by: Eric Biggers <ebiggers@kernel.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->  crypto/api.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/crypto/api.c b/crypto/api.c
-> index 22556907b3bc..7c4b9f86c1ad 100644
-> --- a/crypto/api.c
-> +++ b/crypto/api.c
-> @@ -10,6 +10,7 @@
->   * and Nettle, by Niels Möller.
->   */
->  
-> +#include <linux/async.h>
->  #include <linux/err.h>
->  #include <linux/errno.h>
->  #include <linux/jump_label.h>
-> @@ -280,7 +281,8 @@ static struct crypto_alg *crypto_larval_lookup(const char *name, u32 type,
->  	mask &= ~(CRYPTO_ALG_LARVAL | CRYPTO_ALG_DEAD);
->  
->  	alg = crypto_alg_lookup(name, type, mask);
-> -	if (!alg && !(mask & CRYPTO_NOLOAD)) {
-> +	if (!alg && !(mask & CRYPTO_NOLOAD) &&
-> +	    (!IS_BUILTIN(CONFIG_CRYPTO) || !current_is_async())) {
->  		request_module("crypto-%s", name);
->  
->  		if (!((type ^ CRYPTO_ALG_NEED_FALLBACK) & mask &
-> -- 
-> 2.39.2
+The NEON implementation of crctd10dif is registered with a priority of 100
+which is identical to that used by the generic C implementation. Raise the
+priority to 150, half way between the PMULL based implementation and the
+NEON one, so that it will be preferred over the generic implementation.
 
-FWIW this patch fixes the warning. So feel free to add
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ arch/arm64/crypto/crct10dif-ce-glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Tested-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+diff --git a/arch/arm64/crypto/crct10dif-ce-glue.c b/arch/arm64/crypto/crct10dif-ce-glue.c
+index 09eb1456aed4..59016518f44d 100644
+--- a/arch/arm64/crypto/crct10dif-ce-glue.c
++++ b/arch/arm64/crypto/crct10dif-ce-glue.c
+@@ -98,7 +98,7 @@ static struct shash_alg crc_t10dif_alg[] = {{
+ 
+ 	.base.cra_name		= "crct10dif",
+ 	.base.cra_driver_name	= "crct10dif-arm64-neon",
+-	.base.cra_priority	= 100,
++	.base.cra_priority	= 150,
+ 	.base.cra_blocksize	= CRC_T10DIF_BLOCK_SIZE,
+ 	.base.cra_module	= THIS_MODULE,
+ }, {
 
-if you choose to apply this patch (I'm happy to help test other patches too). In
-any case, please also add the following trailers so the regression gets closed
-automatically in regzbot:
+---
+base-commit: a38297e3fb012ddfa7ce0321a7e5a8daeb1872b6
+change-id: 20240521-arm64-crct10dif-neon-prio-894a9350ec1e
 
-Fixes: 1b6d7f9eb150 ("tpm: add session encryption protection to tpm2_get_random()")
-Link: https://lore.kernel.org/r/119dc5ed-f159-41be-9dda-1a056f29888d@notapiano/
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
 
-Thanks,
-Nícolas
