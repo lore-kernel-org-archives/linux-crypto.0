@@ -1,103 +1,116 @@
-Received: from xmailer.gwdg.de (xmailer.gwdg.de [134.76.10.29])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095261EA74;
-	Thu, 23 May 2024 14:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.76.10.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E2612B171;
+	Thu, 23 May 2024 14:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716474928; cv=none; b=abLdKV2ij0Pwfexy0cS3/WggqlAYTpHaTe4VaSoBbJEGYtJDS2UXkT60JomI+pZOkUDlMsAZukj5JHak20wwidQHlDLHwnNIXlVu4UlZ9tiV5Jder5yYP1CM+CA3aZk1nREx/JH9zjK6IbIudXbeQbq4Gkddc2b2JKX9xKxh8xY=
+	t=1716475079; cv=none; b=k45eYa4f6bptQpT8jtLZ34r+0MQa4nciXD6LZvyeDDxxzQL4LSducFf2xdAoqa38NsDDMCNevj5V0cpRcnMbELbIj9uyN5tXQbJU+DDLeGWUNhkabmu28it3TqOZTPCJuNrNuJ4ZSzT5ok/YmF4iS09zWEYwiXRqA33LPERYTE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716474928; c=relaxed/simple;
-	bh=DqNAaMwLUQKqQeSpUg1T7UK/osvQjYsNfnoBau1Fld0=;
+	s=arc-20240116; t=1716475079; c=relaxed/simple;
+	bh=eT+HB+FXqP5lVZyAYj6JKHnhWvk/Ipdw9JdWIe8LzVM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YmdDSy3SvLdRCLwaz3gksYbrGnFdyw7NLXS2Cln4F0yBetiNQrTZLkJNyuc6WfpioJ/J369f57Udpa0DofGXpps0EH7BjJohhK2FeORCU+BAXXqLw/shy3aqKQLnWVtTF0kIQv8mc2T5ElpyEiKeMOD7KH92U5cWnmo+l7GRlbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuebingen.mpg.de; spf=pass smtp.mailfrom=tuebingen.mpg.de; arc=none smtp.client-ip=134.76.10.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuebingen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuebingen.mpg.de
-Received: from mailgw.tuebingen.mpg.de ([192.124.27.5] helo=tuebingen.mpg.de)
-	by mailer.gwdg.de with esmtp (GWDG Mailer)
-	(envelope-from <maan@tuebingen.mpg.de>)
-	id 1sA9Fd-000Fu8-1x;
-	Thu, 23 May 2024 16:17:01 +0200
-Received: from [10.35.40.80] (HELO mailhost.tuebingen.mpg.de)
-  by tuebingen.mpg.de (CommuniGate Pro SMTP 6.2.6)
-  with SMTP id 52279345; Thu, 23 May 2024 16:17:00 +0200
-Received: by mailhost.tuebingen.mpg.de (sSMTP sendmail emulation); Thu, 23 May 2024 16:17:00 +0200
-Date: Thu, 23 May 2024 16:17:00 +0200
-From: Andre Noll <maan@tuebingen.mpg.de>
-To: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Maciej Sosnowski <maciej.sosnowski@intel.com>,
-	Andre Noll <maan@systemlinux.org>, linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: Re: [PATCH] docs: crypto: async-tx-api: fix broken code example
-Message-ID: <Zk9P3ITcqc-9EhZp@tuebingen.mpg.de>
-References: <20240523-async-dma-docs-v1-1-b900e0804e11@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=O6JK2PS7GNs0ZgjMAeX6JDnTagRUO5fLedYubGp7d7sLA7StzVsmQO98U5C4NulryGmyymmobeMQXlIoBXok/iS2QOYS70TFuLGQxkdSctRf4oK6qBZsB5HtfMQ8FhOJrrSrjA/WLncDylCte41tV1x9SUw8pu09bPrLbYyejPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iGpvGW6a; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iGpvGW6a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F929C2BD10;
+	Thu, 23 May 2024 14:37:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716475078;
+	bh=eT+HB+FXqP5lVZyAYj6JKHnhWvk/Ipdw9JdWIe8LzVM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iGpvGW6a9yj3gWD7yyTWBWyh+7KuymQfmTC5VLzNGUETDnmwJO+vqyEup2aTcy1x1
+	 v5+2jkf19i+w373ThyPSeHO9d0rLYRxZS2d5F53xFNhOr2JrIpZLCEvo9Kr6ZmXv50
+	 3NNzg67yDi5QNGL2CJ6n2zsTvzkGIzpIsJaZ1haTVf2WYn9Q6tJ+PbjVHodEdmvjzJ
+	 bjPz8XeRxfiznuHWYXGTwqzoNUxuEKq6sWfsOsBFUMvLfatQWrjvTFGYc/+BgVmMEe
+	 Ybfm+/G9nXVsI+hCWBOhrluBHhkJUZe2NwH5vucQ75mnIY1Y+3GOXlPI87LCsVuN7A
+	 E0tblaqOZHbrA==
+Date: Thu, 23 May 2024 15:37:52 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Alexey Romanov <avromanov@salutedevices.com>
+Cc: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"khilman@baylibre.com" <khilman@baylibre.com>,
+	"jbrunet@baylibre.com" <jbrunet@baylibre.com>,
+	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	kernel <kernel@sberdevices.ru>
+Subject: Re: [PATCH v7 17/23] dt-bindings: crypto: meson: remove clk and
+ second interrupt line for GXL
+Message-ID: <20240523-snowiness-attain-75d415573b5a@spud>
+References: <20240411133832.2896463-1-avromanov@salutedevices.com>
+ <20240411133832.2896463-18-avromanov@salutedevices.com>
+ <20240415-schnapps-plating-eb0895459004@spud>
+ <20240506134754.jl633ncne7ct6szo@cab-wsm-0029881>
+ <20240506-distrust-famine-6848f75dd3fe@spud>
+ <20240523104624.tr5omyxnzxsjkpai@cab-wsm-0029881.sigma.sbrf.ru>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="WTOLmlkXxsRP7sN+"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240523-async-dma-docs-v1-1-b900e0804e11@pengutronix.de>
-User-Agent: Mutt/2.2.13 (00d56288) (2024-03-09)
-X-Spam-Level: $
-X-Virus-Scanned: (clean) by clamav
+In-Reply-To: <20240523104624.tr5omyxnzxsjkpai@cab-wsm-0029881.sigma.sbrf.ru>
 
-On Thu, May 23, 15:18, Ahmad Fatoum wrote
-> The code example fails to compile:
-> 
->   1) ddr_conv is defined twice, once as a VLA, which have been phased out
 
-       addr_conv
-> 
->   2) submit is not a pointer, but is still dereferenced with ->
+--WTOLmlkXxsRP7sN+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-3) The first call to async_xor() lacked the trailing semicolon.
+On Thu, May 23, 2024 at 10:46:35AM +0000, Alexey Romanov wrote:
+> Hi Conor,
+>=20
+> On Mon, May 06, 2024 at 04:47:29PM +0100, Conor Dooley wrote:
+> > On Mon, May 06, 2024 at 01:48:01PM +0000, Alexey Romanov wrote:
+> > > On Mon, Apr 15, 2024 at 05:43:15PM +0100, Conor Dooley wrote:
+> > > > On Thu, Apr 11, 2024 at 04:38:26PM +0300, Alexey Romanov wrote:
+> > > > > GXL crypto IP isn't connected to clk and seconnd interrput line,
+> > > > > so we must remove them from dt-bindings.
+> > > >=20
+> > > > How does the device work without a clock?
+> > >=20
+> > > It's clocked by a common clock, the vendor didn't provide more
+> > > information. It doesn't have any special clock domains.
+> >=20
+> > So the hardware block does have a clock, which, even if it is a clock
+> > shared with other hardware blocks, makes your patch incorrect.
+> >=20
+> > Is the "blkmv" clock the shared clock?
+>=20
+> I received accurate information from the vendor. Starting from GXL,
+> DMA engine is used for crypto HW and clock is hard weired to it (at RTL
+> level).
 
-> Fix these issues and while at it, make the functions static as users
-> are unlikely to export them.
+> That's why we have to remove it from device tree, because we can't
+> control it anyway.
 
-No objections, but please don't consider me authoritative. Two nits
-below, FWIW.
+That's not true, if the clock runs at a fixed frequency it should be
+described as a fixed-clock in the devicetree.
 
-> --- a/Documentation/crypto/async-tx-api.rst
-> +++ b/Documentation/crypto/async-tx-api.rst
-> @@ -150,38 +150,38 @@ of an operation.
->  Perform a xor->copy->xor operation where each operation depends on the
->  result from the previous operation::
+--WTOLmlkXxsRP7sN+
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Maybe add
+-----BEGIN PGP SIGNATURE-----
 
-#include <linux/async_tx.h>
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZk9UwAAKCRB4tDGHoIJi
+0kgCAQCc036MitPTeOOqstfi4ri+q3xgSGemTaQQWCQjlD0qKAD+OwLXN5ySvreg
+/MfIpImWvlSDrfrkLnC2nq4oV8AAmQg=
+=NYsR
+-----END PGP SIGNATURE-----
 
->  
-> -    void callback(void *param)
-> +    static void callback(void *param)
->      {
->  	    struct completion *cmp = param;
->  
->  	    complete(cmp);
->      }
-
-This could be simplified to
-
-static void callback(void *param)
-{
-	complete(param);
-}
-
-Best
-Andre
--- 
-Max Planck Institute for Biology
-Tel: (+49) 7071 601 829
-Max-Planck-Ring 5, 72076 Tübingen, Germany
-http://people.tuebingen.mpg.de/maan/
+--WTOLmlkXxsRP7sN+--
