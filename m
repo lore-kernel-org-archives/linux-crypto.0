@@ -1,76 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602131170F;
-	Thu, 23 May 2024 15:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4CF17BA6;
+	Thu, 23 May 2024 15:30:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716476513; cv=none; b=OT+2KIDziOKHemeuO/qEryfwk5WQ3TLNv/YRs5cdpJVNmZLnj7DNJF7lpHtA/fftFhuuVVQbQdq6eKNyTScuU5YwXUXlOlyOE0q8aTCLnOGU7aCQ3CKdHbVVMpE/JksbQNMKnwaudyfzDvFIQzyZ6+p3ekZSo+PjjsmYd2mpe0M=
+	t=1716478253; cv=none; b=B83q2uG7U7oLI067W6Hhl1ZkXNCYZsw+k06w0JxBT64Bpr6PJhH0LHHHagA+IbLafODOCPz0eNfEMKAv2i38CQ0O8IgTyXpOY9oMlDOB5l+t9GWfbD5PVXq3rf/gWEub0KCkwuHs7jjdYLEkDokRt6GufF3zoPXVZLTK1sbeKTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716476513; c=relaxed/simple;
-	bh=gcY/hpUgGlbWTO7iFEHxWUYAgr45cIvkuGeBIW4nKhU=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject; b=PB+FXWbaHNnXaG7cMWFUEHLQbobtH7c9CssPTIgVQAAkG6irlPxHWz2Wu2fPs4sZrSb2r6SNu5h9+Xg3GMNy8U9XtJuaypM+bhKjdG72xaV3viNe8tnzgLJ+G8rjBhtCPuQavn0J1I7TZBUZn6ctC79NNlLbgKPCkwbOtr4YZFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pFRp+sUa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716478253; c=relaxed/simple;
+	bh=eRv++RtTMbGGKt3sM0Qg0vdSeba5nbe3+wVeKfd8zio=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=TxHl+mV5AgsM/DJEzW6+BBz/bL++7ZZZVsPOgSC77LoblJIqRJFnmQ0T38QHI2eWbPvDQMTAcqZuVjmW2tp6YjHEnmXtJvffDQcCshp+Ngkg5m9HzPcjnsCSDlq8P0YSLx6s2G4SMg2xCo9xvpNcUoQV9W/TyZ0WojTQ5MCJmbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=g43oAHcT; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=qbWJ2rO4; arc=none smtp.client-ip=96.44.175.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pFRp+sUa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0910C4AF50;
-	Thu, 23 May 2024 15:01:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716476513;
-	bh=gcY/hpUgGlbWTO7iFEHxWUYAgr45cIvkuGeBIW4nKhU=;
-	h=Date:From:To:Cc:Subject:From;
-	b=pFRp+sUaL6h39QAKlKhUGL4spDcoS7nRBaqqesiCJDG5stqrQmhVBqvI7SP4A7D0t
-	 vH7dYN9B7zvTI0coiNtpYUgQy9U1LdV4XZrG/K7pe48ZengVlRR6jzTjpueXfHgJz2
-	 d92zwuVHgEU/ZxS7JNrb6EjWLb2NGeQP7R+TOv88/FjuScwRJq0BgaxEoqh/2HBQR/
-	 4/8acQvGVMI7A4Sfu3oaOnqYaS6xViHLSLlaMrbvJaCuYPxw4qHQbafgKyI+w1fbJM
-	 S3DPtAGKdx5n87qclQoRwc/1MrjVfWYrAfHxL5ZhUn/RyAOtyFiQpm3dyf07dqvB+0
-	 dRwv5FkEhOJ8A==
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="g43oAHcT";
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="qbWJ2rO4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1716478251;
+	bh=eRv++RtTMbGGKt3sM0Qg0vdSeba5nbe3+wVeKfd8zio=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=g43oAHcTcvfMrhAvQOkxeUKtwoHt3NN8Nc+/EQlAa72XQl7BpkFjR1uN36q9zeAbC
+	 a/hJlF58ii8yi1g1dFRtTHIS/pcHYwDmDQlw2RNDz15o6YC7eqndPdyNABEF4QOaDc
+	 bfW8eBZvYwlYUuSg6aPG0q1kc3Ou6KqyMi00/NXI=
+Received: from localhost (localhost [127.0.0.1])
+	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 1AB811286D83;
+	Thu, 23 May 2024 11:30:51 -0400 (EDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+ by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
+ with ESMTP id U16E3k5rrxQQ; Thu, 23 May 2024 11:30:51 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1716478250;
+	bh=eRv++RtTMbGGKt3sM0Qg0vdSeba5nbe3+wVeKfd8zio=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=qbWJ2rO4zA9JMpnSR2fBDKZhC7Ip/YnRTlLDUOztgsxh6L7fNhZf+1GJAHX2Zn6Vv
+	 ceib3sMdsbSH2G4shd9g6boLBsIBKv2ohYC2ey7N7sZ5d/zo+eDwaoZBfVulI16RiB
+	 kI0fUinUOLMQMt1PaEAFptlzseYD2CJkcdZZlo18=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id A5F2E1286C23;
+	Thu, 23 May 2024 11:30:49 -0400 (EDT)
+Message-ID: <9dfeb6e3d568452ab1227484405b1fc221bd25c1.camel@HansenPartnership.com>
+Subject: Re: [PATCH RESEND] KEYS: trusted: Use ASN.1 encoded OID
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Jarkko Sakkinen <jarkko@kernel.org>, linux-integrity@vger.kernel.org
+Cc: keyrings@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>, Eric
+ Biggers <ebiggers@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Andrew Morton
+ <akpm@linux-foundation.org>, Mimi Zohar <zohar@linux.ibm.com>, David
+ Howells <dhowells@redhat.com>, Paul Moore <paul@paul-moore.com>, James
+ Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, "open
+ list:CRYPTO API" <linux-crypto@vger.kernel.org>,  open list
+ <linux-kernel@vger.kernel.org>, "open list:SECURITY SUBSYSTEM"
+ <linux-security-module@vger.kernel.org>
+Date: Thu, 23 May 2024 11:30:47 -0400
+In-Reply-To: <D1H2P674GFY0.3O8WYK2P1GZ2K@kernel.org>
+References: <20240523131931.22350-1-jarkko@kernel.org>
+	 <9c96f39ed2161dd7f0c3a7964cba2de3169fae3b.camel@HansenPartnership.com>
+	 <D1H2P674GFY0.3O8WYK2P1GZ2K@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 23 May 2024 18:01:49 +0300
-Message-Id: <D1H452IHSLRC.1WZSPJQLCD5RD@kernel.org>
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: <linux-modules@vger.kernel.org>
-Cc: "Luis Chamberlain" <mcgrof@kernel.org>, "Linus Torvalds"
- <torvalds@linux-foundation.org>, <linux-kernel@vger.kernel.org>, "Herbert
- Xu" <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
-Subject: is_module()
-X-Mailer: aerc 0.17.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi,
+On Thu, 2024-05-23 at 16:54 +0300, Jarkko Sakkinen wrote:
+> On Thu May 23, 2024 at 4:38 PM EEST, James Bottomley wrote:
+> > On Thu, 2024-05-23 at 16:19 +0300, Jarkko Sakkinen wrote:
+> > > There's no reason to encode OID_TPMSealedData at run-time, as it
+> > > never changes.
+> > > 
+> > > Replace it with the encoded version, which has exactly the same
+> > > size:
+> > > 
+> > >         67 81 05 0A 01 05
+> > > 
+> > > Include OBJECT IDENTIFIER (0x06) tag and length as the epilogue
+> > > so
+> > > that the OID can be simply copied to the blob.
+> > 
+> > This is true, but if we're going to do this, we should expand the
+> > OID
+> > registry functions (in lib/oid_registry.c) to do something like
+> > encode_OID.  The registry already contains the hex above minus the
+> > two
+> > prefixes (which are easy to add).
+> 
+> Yes, I do agree with this idea, and I named variable the I named
+> it to make it obvious that generation is possible.
+> 
+> It would be best to have a single source, which could be just
+> a CSV file with entries like:
+> 
+> <Name>,<OID number>
+> 
+> And then in scripts/ there should be a script that takes this
+> source and generates oid_registry.gen.{h,c}. The existing
+> oid_registry.h should really just include oid_registry.gen.h
+> then to make this transparent change.
+> 
+> And then in the series where OID's are encoded per-subsystem
+> patch that takes pre-encoded OID into use.
+> 
+> Happy to review such patch set if it is pushed forward.
 
-I just put this here while I still have it on my mind. Possibly I'm
-ignoring something that already enables this but at least I learn
-something by doing this then.=20
+Heh, OK, since I'm the one who thinks it's quite easy, I'll give it a
+go.
 
-This came up in a recent discussion albeit for this crypto bug it
-did not make waves because the bug fix did not require it:
+James
 
-https://lore.kernel.org/linux-integrity/D1GXKODMD4S8.1J12D4GOEQWPL@kernel.o=
-rg/
-
-So the gist of  is_module() would be that it would have different
-semantics than IS_MODULE(): it could be used to e.g. check modules in a
-loop.
-
-Compilation would generate a new ELF section with following entries:
-
-<ASCIIZ string><0 or 1>
-
-The string would contain module name, and 1 could be marking for
-being a module, and 0 for being builtin.
-
-Also, it would enabled to add lsmod -b to enumerate built-in modules,
-which would give nice way to carve up more information about a running
-test kernel. This would obviously need perhaps a new file to procfs for
-built-in modules (for regular there is /proc/modules).
-
-Not fighting for having this, just makig it visible.
-
-BR, Jarkko
