@@ -1,116 +1,76 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E2612B171;
-	Thu, 23 May 2024 14:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602131170F;
+	Thu, 23 May 2024 15:01:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716475079; cv=none; b=k45eYa4f6bptQpT8jtLZ34r+0MQa4nciXD6LZvyeDDxxzQL4LSducFf2xdAoqa38NsDDMCNevj5V0cpRcnMbELbIj9uyN5tXQbJU+DDLeGWUNhkabmu28it3TqOZTPCJuNrNuJ4ZSzT5ok/YmF4iS09zWEYwiXRqA33LPERYTE0=
+	t=1716476513; cv=none; b=OT+2KIDziOKHemeuO/qEryfwk5WQ3TLNv/YRs5cdpJVNmZLnj7DNJF7lpHtA/fftFhuuVVQbQdq6eKNyTScuU5YwXUXlOlyOE0q8aTCLnOGU7aCQ3CKdHbVVMpE/JksbQNMKnwaudyfzDvFIQzyZ6+p3ekZSo+PjjsmYd2mpe0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716475079; c=relaxed/simple;
-	bh=eT+HB+FXqP5lVZyAYj6JKHnhWvk/Ipdw9JdWIe8LzVM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O6JK2PS7GNs0ZgjMAeX6JDnTagRUO5fLedYubGp7d7sLA7StzVsmQO98U5C4NulryGmyymmobeMQXlIoBXok/iS2QOYS70TFuLGQxkdSctRf4oK6qBZsB5HtfMQ8FhOJrrSrjA/WLncDylCte41tV1x9SUw8pu09bPrLbYyejPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iGpvGW6a; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716476513; c=relaxed/simple;
+	bh=gcY/hpUgGlbWTO7iFEHxWUYAgr45cIvkuGeBIW4nKhU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject; b=PB+FXWbaHNnXaG7cMWFUEHLQbobtH7c9CssPTIgVQAAkG6irlPxHWz2Wu2fPs4sZrSb2r6SNu5h9+Xg3GMNy8U9XtJuaypM+bhKjdG72xaV3viNe8tnzgLJ+G8rjBhtCPuQavn0J1I7TZBUZn6ctC79NNlLbgKPCkwbOtr4YZFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pFRp+sUa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iGpvGW6a"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F929C2BD10;
-	Thu, 23 May 2024 14:37:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pFRp+sUa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0910C4AF50;
+	Thu, 23 May 2024 15:01:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716475078;
-	bh=eT+HB+FXqP5lVZyAYj6JKHnhWvk/Ipdw9JdWIe8LzVM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iGpvGW6a9yj3gWD7yyTWBWyh+7KuymQfmTC5VLzNGUETDnmwJO+vqyEup2aTcy1x1
-	 v5+2jkf19i+w373ThyPSeHO9d0rLYRxZS2d5F53xFNhOr2JrIpZLCEvo9Kr6ZmXv50
-	 3NNzg67yDi5QNGL2CJ6n2zsTvzkGIzpIsJaZ1haTVf2WYn9Q6tJ+PbjVHodEdmvjzJ
-	 bjPz8XeRxfiznuHWYXGTwqzoNUxuEKq6sWfsOsBFUMvLfatQWrjvTFGYc/+BgVmMEe
-	 Ybfm+/G9nXVsI+hCWBOhrluBHhkJUZe2NwH5vucQ75mnIY1Y+3GOXlPI87LCsVuN7A
-	 E0tblaqOZHbrA==
-Date: Thu, 23 May 2024 15:37:52 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Alexey Romanov <avromanov@salutedevices.com>
-Cc: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"khilman@baylibre.com" <khilman@baylibre.com>,
-	"jbrunet@baylibre.com" <jbrunet@baylibre.com>,
-	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	kernel <kernel@sberdevices.ru>
-Subject: Re: [PATCH v7 17/23] dt-bindings: crypto: meson: remove clk and
- second interrupt line for GXL
-Message-ID: <20240523-snowiness-attain-75d415573b5a@spud>
-References: <20240411133832.2896463-1-avromanov@salutedevices.com>
- <20240411133832.2896463-18-avromanov@salutedevices.com>
- <20240415-schnapps-plating-eb0895459004@spud>
- <20240506134754.jl633ncne7ct6szo@cab-wsm-0029881>
- <20240506-distrust-famine-6848f75dd3fe@spud>
- <20240523104624.tr5omyxnzxsjkpai@cab-wsm-0029881.sigma.sbrf.ru>
+	s=k20201202; t=1716476513;
+	bh=gcY/hpUgGlbWTO7iFEHxWUYAgr45cIvkuGeBIW4nKhU=;
+	h=Date:From:To:Cc:Subject:From;
+	b=pFRp+sUaL6h39QAKlKhUGL4spDcoS7nRBaqqesiCJDG5stqrQmhVBqvI7SP4A7D0t
+	 vH7dYN9B7zvTI0coiNtpYUgQy9U1LdV4XZrG/K7pe48ZengVlRR6jzTjpueXfHgJz2
+	 d92zwuVHgEU/ZxS7JNrb6EjWLb2NGeQP7R+TOv88/FjuScwRJq0BgaxEoqh/2HBQR/
+	 4/8acQvGVMI7A4Sfu3oaOnqYaS6xViHLSLlaMrbvJaCuYPxw4qHQbafgKyI+w1fbJM
+	 S3DPtAGKdx5n87qclQoRwc/1MrjVfWYrAfHxL5ZhUn/RyAOtyFiQpm3dyf07dqvB+0
+	 dRwv5FkEhOJ8A==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WTOLmlkXxsRP7sN+"
-Content-Disposition: inline
-In-Reply-To: <20240523104624.tr5omyxnzxsjkpai@cab-wsm-0029881.sigma.sbrf.ru>
-
-
---WTOLmlkXxsRP7sN+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 23 May 2024 18:01:49 +0300
+Message-Id: <D1H452IHSLRC.1WZSPJQLCD5RD@kernel.org>
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: <linux-modules@vger.kernel.org>
+Cc: "Luis Chamberlain" <mcgrof@kernel.org>, "Linus Torvalds"
+ <torvalds@linux-foundation.org>, <linux-kernel@vger.kernel.org>, "Herbert
+ Xu" <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+Subject: is_module()
+X-Mailer: aerc 0.17.0
 
-On Thu, May 23, 2024 at 10:46:35AM +0000, Alexey Romanov wrote:
-> Hi Conor,
->=20
-> On Mon, May 06, 2024 at 04:47:29PM +0100, Conor Dooley wrote:
-> > On Mon, May 06, 2024 at 01:48:01PM +0000, Alexey Romanov wrote:
-> > > On Mon, Apr 15, 2024 at 05:43:15PM +0100, Conor Dooley wrote:
-> > > > On Thu, Apr 11, 2024 at 04:38:26PM +0300, Alexey Romanov wrote:
-> > > > > GXL crypto IP isn't connected to clk and seconnd interrput line,
-> > > > > so we must remove them from dt-bindings.
-> > > >=20
-> > > > How does the device work without a clock?
-> > >=20
-> > > It's clocked by a common clock, the vendor didn't provide more
-> > > information. It doesn't have any special clock domains.
-> >=20
-> > So the hardware block does have a clock, which, even if it is a clock
-> > shared with other hardware blocks, makes your patch incorrect.
-> >=20
-> > Is the "blkmv" clock the shared clock?
->=20
-> I received accurate information from the vendor. Starting from GXL,
-> DMA engine is used for crypto HW and clock is hard weired to it (at RTL
-> level).
+Hi,
 
-> That's why we have to remove it from device tree, because we can't
-> control it anyway.
+I just put this here while I still have it on my mind. Possibly I'm
+ignoring something that already enables this but at least I learn
+something by doing this then.=20
 
-That's not true, if the clock runs at a fixed frequency it should be
-described as a fixed-clock in the devicetree.
+This came up in a recent discussion albeit for this crypto bug it
+did not make waves because the bug fix did not require it:
 
---WTOLmlkXxsRP7sN+
-Content-Type: application/pgp-signature; name="signature.asc"
+https://lore.kernel.org/linux-integrity/D1GXKODMD4S8.1J12D4GOEQWPL@kernel.o=
+rg/
 
------BEGIN PGP SIGNATURE-----
+So the gist of  is_module() would be that it would have different
+semantics than IS_MODULE(): it could be used to e.g. check modules in a
+loop.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZk9UwAAKCRB4tDGHoIJi
-0kgCAQCc036MitPTeOOqstfi4ri+q3xgSGemTaQQWCQjlD0qKAD+OwLXN5ySvreg
-/MfIpImWvlSDrfrkLnC2nq4oV8AAmQg=
-=NYsR
------END PGP SIGNATURE-----
+Compilation would generate a new ELF section with following entries:
 
---WTOLmlkXxsRP7sN+--
+<ASCIIZ string><0 or 1>
+
+The string would contain module name, and 1 could be marking for
+being a module, and 0 for being builtin.
+
+Also, it would enabled to add lsmod -b to enumerate built-in modules,
+which would give nice way to carve up more information about a running
+test kernel. This would obviously need perhaps a new file to procfs for
+built-in modules (for regular there is /proc/modules).
+
+Not fighting for having this, just makig it visible.
+
+BR, Jarkko
