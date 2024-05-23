@@ -1,138 +1,234 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B50714AD0E
-	for <linux-crypto@vger.kernel.org>; Thu, 23 May 2024 13:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5864D14BF87;
+	Thu, 23 May 2024 13:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716470356; cv=none; b=XVDDiGGmsSpdx6EkDrWcmXcRdqZUme7eK36g5rew2nSFanlweFNfKn9tIPWQphaI4J4QQtEn5TFt0qD31rFaBw0ZFK5VjCX9vdS4ocWUfkoHpfy+D7gvT+OdfcsBbMRajrJQpnEHFNj3sS/O7s4r9FbkZF0q5bRIvAkglMC0nP0=
+	t=1716470379; cv=none; b=ueeUPrxcwKbnSmKJsDb+0q3DciLTBs7aKzEPkT0v/whC8PS0RnkwkucBvIX8Ts0hCCdybT77r6lKGKZbgAa+Sk4qyubZbebhcrXdKV6JBbZnMnOJvBJhlHqc0GmCqFPx3Nl0uMKQy+DPnNL1tzpNYAnnpF3Yyzg9ps4Mc9UuaK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716470356; c=relaxed/simple;
-	bh=BCNVEcgkU7+tO0w4DqWtv5Adc7V8KuJiUTOcc0wVbu8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KnclOmF1RGjA6FNJ47n4VcoyJHN1ObxxVrbV4M4kWfvjrWtBGml6zaybaCIF1I8i+exg68Yja7e1577vT1EYNkpY/d3gb4edB1pwhcDPrJ9Ju6WJx5EEriTEAQath9wXMdZljkPY5jtP0VujOuerJiNU3Ke1Pm78ebaR6ej0nl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1sA8LW-0002sd-B1; Thu, 23 May 2024 15:19:02 +0200
-Received: from [2a0a:edc0:0:1101:1d::54] (helo=dude05.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1sA8LR-002fRe-S9; Thu, 23 May 2024 15:18:57 +0200
-Received: from localhost ([::1] helo=dude05.red.stw.pengutronix.de)
-	by dude05.red.stw.pengutronix.de with esmtp (Exim 4.96)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1sA8LR-005g9l-2d;
-	Thu, 23 May 2024 15:18:57 +0200
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Date: Thu, 23 May 2024 15:18:29 +0200
-Subject: [PATCH] docs: crypto: async-tx-api: fix broken code example
+	s=arc-20240116; t=1716470379; c=relaxed/simple;
+	bh=zZ3XjVEYiN/8uyKfpWtkHMKyalnuSZD3ionATMomS90=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EK4O1fYOZe0MfNVRVWBTiUm012195Ih0ah908IH9S0BBoat09uAhzo8Q6jYDT8SNwPuWHdb1xAk6QypAmu57npt3EkUaFOGBFeabUxBUEFPZ7xIw0W9Z8mGJcqMHXWX41A4mk+DktBheAGgiJB9jNehVWOUEzddqIu6way1dLow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lXqoJMS+; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lXqoJMS+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8764C32786;
+	Thu, 23 May 2024 13:19:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716470379;
+	bh=zZ3XjVEYiN/8uyKfpWtkHMKyalnuSZD3ionATMomS90=;
+	h=From:To:Cc:Subject:Date:From;
+	b=lXqoJMS+rfZT5J2CHvzN5HBbOj7EuXxR9om2KmZf/FtJL4ibhUzh4WX+hIfuifODW
+	 lPmbyasC2Xkp0RluUUZ1Mhn1oTLaD0YkDtIxEsWL2jV7kMhmHKRVyiyk8Ww1uG80pB
+	 HgEvCkH0SzCHppeCG7kRu3YP0Hn5R5eIN8L5R94XrxjtmptjMDrGAAsLDwLWt1Yobq
+	 Y3+zGWgImT7HbkFP26r2/Pku4+mFL4UbqWga8Tq68fZgP/pd9VClncuwuqYrrZ4Xg1
+	 yvknr5OTjD9QmQt8Ko3Ft1luFBqylPJYEGajybbAc1QoYY668+sUC9GaugilKS2waq
+	 j6ryROqOAs+Ig==
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: linux-integrity@vger.kernel.org
+Cc: keyrings@vger.kernel.org,
+	David Woodhouse <dwmw2@infradead.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	David Howells <dhowells@redhat.com>,
+	Paul Moore <paul@paul-moore.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	linux-crypto@vger.kernel.org (open list:CRYPTO API),
+	linux-kernel@vger.kernel.org (open list),
+	linux-security-module@vger.kernel.org (open list:SECURITY SUBSYSTEM)
+Subject: [PATCH RESEND] KEYS: trusted: Use ASN.1 encoded OID
+Date: Thu, 23 May 2024 16:19:26 +0300
+Message-ID: <20240523131931.22350-1-jarkko@kernel.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240523-async-dma-docs-v1-1-b900e0804e11@pengutronix.de>
-X-B4-Tracking: v=1; b=H4sIACRCT2YC/x3MMQqAMAxA0atIZgNprSBeRRxqGzWDVRoQRby7x
- fEN/z+gnIUV+uqBzKeo7KnA1BWE1aeFUWIxWLKOWtug1zsFjJvHuAdFIp5M5x2TCVCiI/Ms1z8
- cxvf9AHQBbaBgAAAA
-To: Dan Williams <dan.j.williams@intel.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, 
- Maciej Sosnowski <maciej.sosnowski@intel.com>, 
- Andre Noll <maan@systemlinux.org>
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kernel@pengutronix.de, 
- Ahmad Fatoum <a.fatoum@pengutronix.de>
-X-Mailer: b4 0.13-dev
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-The code example fails to compile:
+There's no reason to encode OID_TPMSealedData at run-time, as it never
+changes.
 
-  1) ddr_conv is defined twice, once as a VLA, which have been phased out
+Replace it with the encoded version, which has exactly the same size:
 
-  2) submit is not a pointer, but is still dereferenced with ->
+	67 81 05 0A 01 05
 
-Fix these issues and while at it, make the functions static as users
-are unlikely to export them.
+Include OBJECT IDENTIFIER (0x06) tag and length as the epilogue so that
+the OID can be simply copied to the blob.
 
-Fixes: 04ce9ab385dc ("async_xor: permit callers to pass in a 'dma/page scribble' region")
-Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- Documentation/crypto/async-tx-api.rst | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ include/linux/asn1_encoder.h              |  4 -
+ lib/asn1_encoder.c                        | 91 -----------------------
+ security/keys/trusted-keys/trusted_tpm2.c | 10 ++-
+ 3 files changed, 7 insertions(+), 98 deletions(-)
 
-diff --git a/Documentation/crypto/async-tx-api.rst b/Documentation/crypto/async-tx-api.rst
-index 27c146b54d71..2fa260f2a222 100644
---- a/Documentation/crypto/async-tx-api.rst
-+++ b/Documentation/crypto/async-tx-api.rst
-@@ -150,38 +150,38 @@ of an operation.
- Perform a xor->copy->xor operation where each operation depends on the
- result from the previous operation::
+diff --git a/include/linux/asn1_encoder.h b/include/linux/asn1_encoder.h
+index 08cd0c2ad34f..afeefdfe2525 100644
+--- a/include/linux/asn1_encoder.h
++++ b/include/linux/asn1_encoder.h
+@@ -8,14 +8,10 @@
+ #include <linux/asn1_ber_bytecode.h>
+ #include <linux/bug.h>
  
--    void callback(void *param)
-+    static void callback(void *param)
-     {
- 	    struct completion *cmp = param;
+-#define asn1_oid_len(oid) (sizeof(oid)/sizeof(u32))
+ unsigned char *
+ asn1_encode_integer(unsigned char *data, const unsigned char *end_data,
+ 		    s64 integer);
+ unsigned char *
+-asn1_encode_oid(unsigned char *data, const unsigned char *end_data,
+-		u32 oid[], int oid_len);
+-unsigned char *
+ asn1_encode_tag(unsigned char *data, const unsigned char *end_data,
+ 		u32 tag, const unsigned char *string, int len);
+ unsigned char *
+diff --git a/lib/asn1_encoder.c b/lib/asn1_encoder.c
+index 0fd3c454a468..c0db3cbebe89 100644
+--- a/lib/asn1_encoder.c
++++ b/lib/asn1_encoder.c
+@@ -85,97 +85,6 @@ asn1_encode_integer(unsigned char *data, const unsigned char *end_data,
+ }
+ EXPORT_SYMBOL_GPL(asn1_encode_integer);
  
- 	    complete(cmp);
-     }
+-/* calculate the base 128 digit values setting the top bit of the first octet */
+-static int asn1_encode_oid_digit(unsigned char **_data, int *data_len, u32 oid)
+-{
+-	unsigned char *data = *_data;
+-	int start = 7 + 7 + 7 + 7;
+-	int ret = 0;
+-
+-	if (*data_len < 1)
+-		return -EINVAL;
+-
+-	/* quick case */
+-	if (oid == 0) {
+-		*data++ = 0x80;
+-		(*data_len)--;
+-		goto out;
+-	}
+-
+-	while (oid >> start == 0)
+-		start -= 7;
+-
+-	while (start > 0 && *data_len > 0) {
+-		u8 byte;
+-
+-		byte = oid >> start;
+-		oid = oid - (byte << start);
+-		start -= 7;
+-		byte |= 0x80;
+-		*data++ = byte;
+-		(*data_len)--;
+-	}
+-
+-	if (*data_len > 0) {
+-		*data++ = oid;
+-		(*data_len)--;
+-	} else {
+-		ret = -EINVAL;
+-	}
+-
+- out:
+-	*_data = data;
+-	return ret;
+-}
+-
+-/**
+- * asn1_encode_oid() - encode an oid to ASN.1
+- * @data:	position to begin encoding at
+- * @end_data:	end of data pointer, points one beyond last usable byte in @data
+- * @oid:	array of oids
+- * @oid_len:	length of oid array
+- *
+- * this encodes an OID up to ASN.1 when presented as an array of OID values
+- */
+-unsigned char *
+-asn1_encode_oid(unsigned char *data, const unsigned char *end_data,
+-		u32 oid[], int oid_len)
+-{
+-	int data_len = end_data - data;
+-	unsigned char *d = data + 2;
+-	int i, ret;
+-
+-	if (WARN(oid_len < 2, "OID must have at least two elements"))
+-		return ERR_PTR(-EINVAL);
+-
+-	if (WARN(oid_len > 32, "OID is too large"))
+-		return ERR_PTR(-EINVAL);
+-
+-	if (IS_ERR(data))
+-		return data;
+-
+-
+-	/* need at least 3 bytes for tag, length and OID encoding */
+-	if (data_len < 3)
+-		return ERR_PTR(-EINVAL);
+-
+-	data[0] = _tag(UNIV, PRIM, OID);
+-	*d++ = oid[0] * 40 + oid[1];
+-
+-	data_len -= 3;
+-
+-	for (i = 2; i < oid_len; i++) {
+-		ret = asn1_encode_oid_digit(&d, &data_len, oid[i]);
+-		if (ret < 0)
+-			return ERR_PTR(ret);
+-	}
+-
+-	data[1] = d - data - 2;
+-
+-	return d;
+-}
+-EXPORT_SYMBOL_GPL(asn1_encode_oid);
+-
+ /**
+  * asn1_encode_length() - encode a length to follow an ASN.1 tag
+  * @data: pointer to encode at
+diff --git a/security/keys/trusted-keys/trusted_tpm2.c b/security/keys/trusted-keys/trusted_tpm2.c
+index 8b7dd73d94c1..f732e01a9dc6 100644
+--- a/security/keys/trusted-keys/trusted_tpm2.c
++++ b/security/keys/trusted-keys/trusted_tpm2.c
+@@ -26,7 +26,8 @@ static struct tpm2_hash tpm2_hash_map[] = {
+ 	{HASH_ALGO_SM3_256, TPM_ALG_SM3_256},
+ };
  
--    void run_xor_copy_xor(struct page **xor_srcs,
--			int xor_src_cnt,
--			struct page *xor_dest,
--			size_t xor_len,
--			struct page *copy_src,
--			struct page *copy_dest,
--			size_t copy_len)
-+    #define NDISKS  2
+-static u32 tpm2key_oid[] = { 2, 23, 133, 10, 1, 5 };
++/* Encoded OID_TPMSealedData. */
++static u8 OID_TPMSealedData_ASN1[] = {0x06, 0x06, 0x67, 0x81, 0x05, 0x0a, 0x01, 0x05};
+ 
+ static int tpm2_key_encode(struct trusted_key_payload *payload,
+ 			   struct trusted_key_options *options,
+@@ -51,8 +52,8 @@ static int tpm2_key_encode(struct trusted_key_payload *payload,
+ 	if (!scratch)
+ 		return -ENOMEM;
+ 
+-	work = asn1_encode_oid(work, end_work, tpm2key_oid,
+-			       asn1_oid_len(tpm2key_oid));
++	work = memcpy(work, OID_TPMSealedData_ASN1, sizeof(OID_TPMSealedData_ASN1));
++	work += sizeof(OID_TPMSealedData_ASN1);
+ 
+ 	if (options->blobauth_len == 0) {
+ 		unsigned char bool[3], *w = bool;
+@@ -90,6 +91,9 @@ static int tpm2_key_encode(struct trusted_key_payload *payload,
+ 		goto err;
+ 	}
+ 
++	print_hex_dump(KERN_INFO, "", DUMP_PREFIX_NONE, 16, 1,
++		       payload->blob, work1 - payload->blob, 0);
 +
-+    static void run_xor_copy_xor(struct page **xor_srcs,
-+				 struct page *xor_dest,
-+				 size_t xor_len,
-+				 struct page *copy_src,
-+				 struct page *copy_dest,
-+				 size_t copy_len)
-     {
- 	    struct dma_async_tx_descriptor *tx;
--	    addr_conv_t addr_conv[xor_src_cnt];
- 	    struct async_submit_ctl submit;
- 	    addr_conv_t addr_conv[NDISKS];
- 	    struct completion cmp;
+ 	kfree(scratch);
+ 	return work1 - payload->blob;
  
- 	    init_async_submit(&submit, ASYNC_TX_XOR_DROP_DST, NULL, NULL, NULL,
- 			    addr_conv);
--	    tx = async_xor(xor_dest, xor_srcs, 0, xor_src_cnt, xor_len, &submit)
-+	    tx = async_xor(xor_dest, xor_srcs, 0, NDISKS, xor_len, &submit);
- 
--	    submit->depend_tx = tx;
-+	    submit.depend_tx = tx;
- 	    tx = async_memcpy(copy_dest, copy_src, 0, 0, copy_len, &submit);
- 
- 	    init_completion(&cmp);
- 	    init_async_submit(&submit, ASYNC_TX_XOR_DROP_DST | ASYNC_TX_ACK, tx,
- 			    callback, &cmp, addr_conv);
--	    tx = async_xor(xor_dest, xor_srcs, 0, xor_src_cnt, xor_len, &submit);
-+	    tx = async_xor(xor_dest, xor_srcs, 0, NDISKS, xor_len, &submit);
- 
- 	    async_tx_issue_pending_all();
- 
-
----
-base-commit: a38297e3fb012ddfa7ce0321a7e5a8daeb1872b6
-change-id: 20240523-async-dma-docs-00eb18a4e01c
-
-Best regards,
 -- 
-Ahmad Fatoum <a.fatoum@pengutronix.de>
+2.45.1
 
