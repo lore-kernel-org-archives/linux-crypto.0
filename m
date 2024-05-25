@@ -1,52 +1,70 @@
-Received: from smtp.smtpout.orange.fr (smtp-23.smtpout.orange.fr [80.12.242.23])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9B81429E;
-	Sat, 25 May 2024 15:23:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DCDF9F8;
+	Sat, 25 May 2024 19:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716650639; cv=none; b=fvX+Gru6iNxO8+vPJHArqET6HcMv1/affvEkJYmuhjQitpLomM7LpsrAgiqeiste8F1Tgb4LxKWGKhdNkoJIulSMo2FycT5rBpobxVfp5geWA60BdylKbzf3g5xJ43dbG9rsj/z8ELf7WUjFF7jGSwXJvSCaidNbRLieQmHKzyo=
+	t=1716664963; cv=none; b=kAcpzvWrY75CXW2gjoHsJSnlkcLm71uE/dBuBM9WXU8J7XVWIPv0xAaSYxLs5qkmjefMLDCVOT1+NIQoTIggt0JncY3QUh3vqUQ5ku5iwrcY6l8NZX6PxkCN5czOLaZKePBARojGcdHbZBsSGbNlbyofBrk7JdrIw4Q0jMDAdeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716650639; c=relaxed/simple;
-	bh=Y1QbV1fVDvWYwh1mRKjVim+xdyrWT0f/WnYH38ND510=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NOU2QGAbtu/+ghiQ8HW4bVOGUoJKwMP4WqhmAYUQ3rAij8KNZViMPDEHj1nHTAGYCEsHn6MA9kVCWjXl5/vFXqgw64wJQokr7ZQp+Jw87PExKZk7Dg89Amsnnu+iGe5Kx3ITc8HYLF70F1hQNIUYNMfr6+yr5idw1N6ZjmK1a7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=UcNiW7vq; arc=none smtp.client-ip=80.12.242.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+	s=arc-20240116; t=1716664963; c=relaxed/simple;
+	bh=vwCtoMW69UqvD+dOVlS5VBtmZbwRY8k0dewgj6oIEkE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aJEwKkfqXaCaOhjlDEJjdbCnooPj7cMBcw8K6OTOTMDHZHZsBGIP8Ovc6hU8xgwbe1mD8pmoQoBzI05id7sxQa50mu9oZi9Ukh2OaYxJfMAg2Avj1xiB/eRdBKHmgbqshuF4ilXulAKqbjDJ0wXlTbWiv6w/bl3SwN/Ty/tYWyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J7XoaV/J; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="UcNiW7vq"
-Received: from fedora.home ([86.243.17.157])
-	by smtp.orange.fr with ESMTPA
-	id At6asqDFCOBGCAt6asbEpr; Sat, 25 May 2024 17:14:47 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1716650087;
-	bh=SsSnU22BLOw2sFJbi0JknTXepGNVkme9LGYumcyMsq0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=UcNiW7vqBL6W/uiJKJok9ctWJIJmgX2JZMruZnW+I5yvkB6lsgwEVFIa07qypLFq1
-	 HWc7s94sRHNc7PwjCcHclfEeCFFuE0HZ+FRG1BZCZNZESKn2Jrda875XMEAESMpY6w
-	 5+Ysr+/16CU3fUE2TEoz5OHshQGHoLZLYbTmszZuxpd9OPZ3Nvsowe+VuMoIkPBI7D
-	 eOoWxtp/ePwL+D//ijSf/y+eFEDdSfKDVbWREi6NCihYDfaIVeLDjItTUibKkRibM/
-	 qVSegiqnjva1HfXNG+dUC+TMg3xNO8iAv9fvqgENWbk4flNtwAOWa5MLW3NQ2SCaee
-	 jXRW6ExbhnTtg==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 25 May 2024 17:14:47 +0200
-X-ME-IP: 86.243.17.157
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Akhil R <akhilrajeev@nvidia.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Thierry Reding <thierry.reding@gmail.com>,
-	Jonathan Hunter <jonathanh@nvidia.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J7XoaV/J"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4202cea9941so72973465e9.1;
+        Sat, 25 May 2024 12:22:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716664961; x=1717269761; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L8MCPhQT7noHqmvmJire3u4Gi4h4yWWwXkiOGYuXUaw=;
+        b=J7XoaV/JdfVcPDTWasKj9KJrh2NziiRUVbfmeiSxe4MW/SWoLE7mxGJohXkZF+HPeu
+         yLMUg1NyszjpdF8SoO6Ij6lOBCYMOGiLjfUjb++PWExXniXXnum9uBCQ+IxRScHZGlhn
+         5GS81rT1I7Axnle5PvUPzfKdJ39Or7l/thKtSNxi7EfrMbfOKzpUiFBSlPer3CtXjlce
+         adxGftrnhzmQBkJYKIw7urepJmMGLOb5CosjuoQjp0d8VWXXsGA+ORSubqPTl2z9s6wi
+         XZ1gQx7oJ14S6VlA1fd+lppUTlMxkLCkFj171Amt9FiIQuNRB2CkTIZESVNBLxw3kj/H
+         X/Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716664961; x=1717269761;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=L8MCPhQT7noHqmvmJire3u4Gi4h4yWWwXkiOGYuXUaw=;
+        b=Qeusq18t7K17R1ZKtdr7n9seZZ8I3wz3wnrwXlKOQiLDv2SXFP6Rxl46uHAEc6S9uT
+         bLL4z0jktCRakMjHTUNaxIPcLt82S0TKw2hciek4Ynxlo/4YmmzBKSFdoMuKPu4CbvWf
+         vhf77hHTPk2fXK8s6QsZTUjTlXSsxYuekslBDIXVYdEuHwzYkyIzvBoZkbM3IgVtaSiy
+         8oEQ9OkYOc2TmzyQJwcrb40EMHQ+IXIx0hwK/Ofr2J4E7RST40m2BjlwkVPiBwMN2+6E
+         zejv2dxuIzBg5jkJUZykQ1HxjOtyFnL3CqtravjVVegmA2RxjCpXqqhR/0J+AyTD79Jl
+         Bm4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXcyBa8jDgKog/xfe72VprHFkf6b3r9wOYSvsNc5cy2UxdpXpIMYbZgjfXRsWjO/Pyb94ontxeZiZMZbWyfk7mA99jAJX0Cxf6Bt9E5S2U8oZGBjWZQ6aRpLuTjS0KN2Iind5TWyYM7rxaD
+X-Gm-Message-State: AOJu0YxRY1v28KMoJXcc8SRZztZaXkZ4V+vQGaYYcp9yULZHKlBu0xC+
+	TYAzvg28FTRsb1X+K4oJSwJCoSn0PYwD7M9uq+djSdNRzbbXx56Z
+X-Google-Smtp-Source: AGHT+IERkIy03icxUl2SODD5nZiZYFnyNluiiiPPa/mCUEkjdVytK3ca57JQ7MWLVkgmDZslBTx2VA==
+X-Received: by 2002:a05:600c:295:b0:41b:da5b:a60d with SMTP id 5b1f17b1804b1-421089ec277mr48325605e9.6.1716664960374;
+        Sat, 25 May 2024 12:22:40 -0700 (PDT)
+Received: from 4728cded2e8d.v.cablecom.net (84-72-156-211.dclient.hispeed.ch. [84.72.156.211])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4210897bc02sm56661955e9.22.2024.05.25.12.22.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 25 May 2024 12:22:40 -0700 (PDT)
+From: Lothar Rubusch <l.rubusch@gmail.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: dan.carpenter@linaro.org,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev,
 	linux-crypto@vger.kernel.org,
-	linux-tegra@vger.kernel.org
-Subject: [PATCH] crypto: tegra - Remove an incorrect iommu_fwspec_free() call in tegra_se_remove()
-Date: Sat, 25 May 2024 17:14:35 +0200
-Message-ID: <ea775b351a3dbe4cef4056ea89da25084f73df22.1716650050.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.45.1
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	l.rubusch@gmail.com
+Subject: [PATCH] crypto: atmel-sha204a - fix negated return value
+Date: Sat, 25 May 2024 19:22:37 +0000
+Message-Id: <20240525192237.9837-1-l.rubusch@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,39 +73,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The only iommu function call in this driver is a
-tegra_dev_iommu_get_stream_id() which does not allocate anything and does
-not take any reference.
+Fix negated variable return value.
 
-More-over, what is freed is "se->dev" which has been devm_kzalloc()'ed in
-the probe.
-
-So there is no point in calling iommu_fwspec_free() in the remove function.
-
-Remove this incorrect function call.
-
-Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/linux-crypto/34cd4179-090e-479d-b459-8d0d35dd327d@moroto.mountain/
+Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 ---
-Compile tested only
+ drivers/crypto/atmel-sha204a.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This patch is completely speculative. *Review with care*.
----
- drivers/crypto/tegra/tegra-se-main.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/crypto/tegra/tegra-se-main.c b/drivers/crypto/tegra/tegra-se-main.c
-index 9955874b3dc3..f94c0331b148 100644
---- a/drivers/crypto/tegra/tegra-se-main.c
-+++ b/drivers/crypto/tegra/tegra-se-main.c
-@@ -326,7 +326,6 @@ static void tegra_se_remove(struct platform_device *pdev)
+diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+index 24ffdf505023..2034f6031518 100644
+--- a/drivers/crypto/atmel-sha204a.c
++++ b/drivers/crypto/atmel-sha204a.c
+@@ -106,7 +106,7 @@ static int atmel_sha204a_otp_read(struct i2c_client *client, u16 addr, u8 *otp)
  
- 	crypto_engine_stop(se->engine);
- 	crypto_engine_exit(se->engine);
--	iommu_fwspec_free(se->dev);
- 	host1x_client_unregister(&se->client);
- }
+ 	if (cmd.data[0] == 0xff) {
+ 		dev_err(&client->dev, "failed, device not ready\n");
+-		return -ret;
++		return -EINVAL;
+ 	}
  
+ 	memcpy(otp, cmd.data+1, 4);
 -- 
-2.45.1
+2.39.2
 
