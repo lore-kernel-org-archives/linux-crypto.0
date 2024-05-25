@@ -1,86 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05FAA83CAE;
-	Fri, 24 May 2024 09:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688A417C;
+	Sat, 25 May 2024 00:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716542288; cv=none; b=M6aHf5pHaNOmqDil1hPhwsZPZk8vHQSquTKM11Rf87uc9e6hzosU7jgcayrC2YBh5pdymULOakclbQDFEWoOZ9YnZ5PTeTMs5rlu3joX5DXYwNFJkBNyOcJ1aZlaNsFWnMkPR9IvtDiyV/AOrj5XWXIApcKT1RQ3SDm06oj+Iqk=
+	t=1716595599; cv=none; b=r5mq0uAnWheWFsn+HGW1JAZXj5UVLPTyne29sx3KPMnwSY4xwAbmLasOmb0+qL4qzSIkikxjx/Sgw2PBBNSYAmHISIkh2SIkJyeoQgh9ag/WRjheRwC4iZJ+HKp+a7qunA8OFcjDzNHrXKmWDv7M1nQoNf7PmyXoOX90nI4PGOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716542288; c=relaxed/simple;
-	bh=QXBDfBTQ6SvU3OzM7OF0LeXsDtpvLic3l/yHUSbrv1k=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=GlpqX4gMQv26qzvE60/EoOuO6z927TeQ4eHAGC5a7+YoyZEy6I82riRjA1qbrMm+V3JUuevz7t1auhaeveWU1FR684hAjPz4ZlF+GzuWrZXroNM78S8bzsUbvm6Bo5jNyDu7k2WUnBRM6DKYcGX06XpB05tjq95jrCT/Fc8axqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ExULWq+D; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716595599; c=relaxed/simple;
+	bh=EWhgYpCmMrxcuZJ4sW5ipw3sluGXwaCAXLbNAXNrLAk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BtIqoOljmioWwz+b8QwlfDIVMZ11iGbFi9bdJ3Us7Eu3m4T/xa3PUQb5u41OROP2/UauEjw/LlSzQ6TmEps82Y6HH7kd9LZc8Tk3GLRouCYoI0rK/CiOFrvm+pqNnYa/BWPxOMN1o1cmaPwVTQgo/V++nn0MX66vL30hnJhRiU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=fMh6PVJC; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ExULWq+D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3AB7C2BBFC;
-	Fri, 24 May 2024 09:18:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716542287;
-	bh=QXBDfBTQ6SvU3OzM7OF0LeXsDtpvLic3l/yHUSbrv1k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ExULWq+DL7Ly/Ig2hnMERo7+ZkvZmbbWtBtxkrorvBTAEKfsu8yFcozaoFf9ijVK3
-	 bYEZoYytcdQ7vFGojzIAts9UoMaanm6d3EFvwiQPxbm9lwUNcJkxrDs5WIk8+i/c+l
-	 JGsaBiXRZZsyPjoZSKeIT2rcntP+i9rzApp7VXtnt8X7DMQ5sfYmAuNTQLHJbBDFKw
-	 fEDoXLyOMUBlJXLZ+FCRNs0vyNHLdi/Mdn5STjyhCJVVmwmxN9lnHynaHbsHahpjvh
-	 FSqeD1Ct+YkRkdZfPT/Q4vOihui6jGo7cK4pmKI0j2I1S52bO9LD7+DHntoSA0MO84
-	 y008KspEcz8eA==
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="fMh6PVJC"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=RilHObJtsLbJvm703RNoBG1z8cyUp2+3mrHjFWX/xMY=; b=fMh6PVJCDdu7SPWF
+	t2RPFrBcpC4haU23a8F0mKA/9YVDIdecePAIwSECmNNfhzQmDpz0y7cfnyGs19Jl0plhvKf0BLHZF
+	n43+82lZP25yvyPtWQ+xdah+qYbnRw7Ob4h4BnvZBjaocDN+ODSe84SKJPP1fjEN8PCqJkI6gTNwt
+	nGMoE5I0mbbSx/gr8lHegf4p09Gh/yLJI8j6yGATzOSrt7x0H40ZYY92NmWdKX/JPKdkje8wtH2fd
+	V8TR4DHQKONEYLZeoJI4Yk87RbKwASpbbhao3vSNy+U0QQt3blxtzGkesdmFIsS18sfRmdpZ1/hkq
+	YtiFniWykfdK5Hka6g==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1sAevg-002TPm-03;
+	Sat, 25 May 2024 00:06:32 +0000
+Date: Sat, 25 May 2024 00:06:31 +0000
+From: "Dr. David Alan Gilbert" <dave@treblig.org>
+To: jesper.nilsson@axis.com, lars.persson@axis.com
+Cc: herbert@gondor.apana.org.au, linux-arm-kernel@axis.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: acix: Remove unused struct 'dbgfs_u32'
+Message-ID: <ZlErh687UaEjCkIV@gallifrey>
+References: <20240511145017.226166-1-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 24 May 2024 12:18:02 +0300
-Message-Id: <D1HRGEEB313K.NFAX1EFJKJPU@kernel.org>
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Jarkko Sakkinen" <jarkko@kernel.org>, "Herbert Xu"
- <herbert@gondor.apana.org.au>
-Cc: <linux-integrity@vger.kernel.org>, <keyrings@vger.kernel.org>,
- <Andreas.Fuchs@infineon.com>, "James Prestwood" <prestwoj@gmail.com>,
- "David Woodhouse" <dwmw2@infradead.org>, "Eric Biggers"
- <ebiggers@kernel.org>, "James Bottomley"
- <James.Bottomley@hansenpartnership.com>, <linux-crypto@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, "open list"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 0/5] KEYS: asymmetric: tpm2_key_rsa
-X-Mailer: aerc 0.17.0
-References: <20240523212515.4875-1-jarkko@kernel.org>
-In-Reply-To: <20240523212515.4875-1-jarkko@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20240511145017.226166-1-linux@treblig.org>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 00:05:01 up 16 days, 11:19,  1 user,  load average: 0.01, 0.02, 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-On Fri May 24, 2024 at 12:25 AM EEST, Jarkko Sakkinen wrote:
-> ## Overview
->
-> Introduce tpm2_key_rsa module, which implements asymmetric TPM2 RSA key.
-> The feature can be enabled with the CONFIG_ASYMMETRIC_TPM2_KEY_RSA_SUBTYP=
-E=20
-> kconfig option. This feature allows the private key to be uploaded to
-> the TPM2 for signing, and software can use the public key to verify
-> the signatures.
+* linux@treblig.org (linux@treblig.org) wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> 'dbgfs_u32' appears unused.
+> Remove it.
+> (pdma_stat_descr is also unused, but I'm assuming it's
+> some useful layout description of firmware/hardware
+> so best left in)
+> 
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 
-Since barely v6.9 is out I wrote over night also tpm2_key_ecdsa i.e.
-ECC/ECDSA based module :-)
+Ping.
 
-It was a good idea. I realized e.g. actually documented in the API
-fact that I should return -EBADMSG as legit undetected. Also found
-a memory corruption bugs.
+Dave
 
-I renamed extract_pub to probe because that made me sort of realized
-the role better too. Some of the code could later on put to up-level
-struct tpm2_key but it is not a functional requirement.
-
-I.e. top-level does raw parsing and then these modules check each
-that if this is for them (e.g. ECDSA) then eat it. Otherwise, pass
-over.
-
-I did do some rudimentary testing and it seems to be quite good, and
-my pattern seems to work. I.e. different modules for RSA and ECDSA
-fit well how asymmetric keys are probed and allows to do as a sysadmin
-appropriate configuration for the use case.
-
-My biggest concern is undocumented parameters API in akcipher.
-
-BR, Jarkko
+> ---
+>  drivers/crypto/axis/artpec6_crypto.c | 7 -------
+>  1 file changed, 7 deletions(-)
+> 
+> diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
+> index dbc1d483f2afa..75440ea6206e2 100644
+> --- a/drivers/crypto/axis/artpec6_crypto.c
+> +++ b/drivers/crypto/axis/artpec6_crypto.c
+> @@ -2811,13 +2811,6 @@ static struct aead_alg aead_algos[] = {
+>  
+>  #ifdef CONFIG_DEBUG_FS
+>  
+> -struct dbgfs_u32 {
+> -	char *name;
+> -	mode_t mode;
+> -	u32 *flag;
+> -	char *desc;
+> -};
+> -
+>  static struct dentry *dbgfs_root;
+>  
+>  static void artpec6_crypto_init_debugfs(void)
+> -- 
+> 2.45.0
+> 
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
