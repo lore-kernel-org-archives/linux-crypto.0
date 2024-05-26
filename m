@@ -1,47 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034E63D962;
-	Sun, 26 May 2024 09:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B7D58AB8;
+	Sun, 26 May 2024 09:42:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716716553; cv=none; b=M7wKzZte3X0KyFbK1p8fws6LiUl8YtM2iiXuKqxuTKsxqsySAdkCSweIG7hLu/OycrhtyiHbAu1iKCo1GQnN/FEj6a68jwICbFGNs7onisfsZAfoMG3Jir+oZ4JXHy0SuxStuFnMDwY4XZuCgvu+kBZinSq3EWctTGtoVCHf5MY=
+	t=1716716577; cv=none; b=GTNUT0r175+dD9AgO9HtUOdZAVFSASg1zJLkkj3kaJGfhCyLcV5vctxis6XL64ZVX/lZg4vsKewZxSTxku41ZJxBMPJMavHv2NDMCnRhihnrL24FXOH03JfN/7KvlvR94epxio0pt58y2xlLKILKLJ0zJzIJPz5M4aXypxSBm8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716716553; c=relaxed/simple;
-	bh=IciGUaZjLC7WvPU/EMDll8bQQZvHzbbXZp5v08cVN2Q=;
+	s=arc-20240116; t=1716716577; c=relaxed/simple;
+	bh=ip+RJKDgvCFKSc27D/Z9mn/UyVFGF2gGb8dmyayQmQQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Il98NND0a8K7xDEl63E36pZ6K0jXpkZmW0Z45NRXhwJopy0tVXm1QMppUgutniRNNubt5dYn2lAVy4UKMkYAnEWF/wepsBU+Pwfv95zuR5kyMh7bXqD+Ijbv/kHrksnLXLk72awFAtvaTFUDGamsXifguozPMv/hfLmE1VD5VUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OfLxaZn7; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=PPiYNv4xodvOmzWCYK3XLDY1m1A6USWp5hI6MNUqg9vxJMoHIB5b+wbPEbbf1idEint2bMwS7Jpg84iwWu5Y4x/pagjiu5ZoD+Cyd44U+0DeRDS/U1naT11RMfT95VcWXg3vYzxTSpxjC2HWGfvy31ItnQc0wVMqdnonpiL4noM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0c/qof2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OfLxaZn7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AE42C2BD10;
-	Sun, 26 May 2024 09:42:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0c/qof2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A4C6C2BD10;
+	Sun, 26 May 2024 09:42:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716716552;
-	bh=IciGUaZjLC7WvPU/EMDll8bQQZvHzbbXZp5v08cVN2Q=;
+	s=k20201202; t=1716716577;
+	bh=ip+RJKDgvCFKSc27D/Z9mn/UyVFGF2gGb8dmyayQmQQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OfLxaZn7Qmo8kmbqOHzryNSf23VbUj5yAGG82/QAsEaDt9ja2G1TGuDzw7L62xiNC
-	 v04G3kYjkvBVYTkqTxKIcZtppQhwOEMtxmmHnslTlEzacnDQHg8zL07sxg6zkaib28
-	 P/pW7A2cOOY73l8Lc1FY5wEsnGJPL+qvhE0LPheyho1dd+rNd6XVL/YtW2ix+mmroZ
-	 C6vEhPm5/I6m/+bjkghOD5Au9yySJDtODDiNWm9r3rwM7B7YV95oWtuGXOvRyO40JI
-	 0Nk8bTpscxCoJEPyfBILoeHzilmlqaZTeDVbTGVyaBzZppxbdRGP7Kax745i8ecOp6
-	 RIa5TIHuIOQLQ==
+	b=n0c/qof2wkHIoIwhQwlEVDTvgbvr1GUeShJe/3I4vGzXC62f5eM1j2jsRMLiOLPdV
+	 0FI+U7PYoYQ+khwK3H6pBNdSJLmiFG0K8lxyiuwarYlBT8xG/Canc/CdFqU+Ani2hn
+	 uPfrr+0kP8Dl4IgY19VfMo+t763qXPd+j70faNKPtsaKpZlXaqelaWB9HRbxY0LCPt
+	 vwU63KyvmA8MQ7uR+guInXsq0GL1bGMwx4vSY+GI7bufirpgsHIQ6q8S48wOQ94hGD
+	 zJc1xp+C1pAhVNufCDNGqtNdFyUEQy+12De3lKfOwRUEyQeGWcOUvAGfKMglDNm2uR
+	 UHIColZffBh9Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Chenghai Huang <huangchenghai2@huawei.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	syzbot+0cb5bb0f4bf9e79db3b3@syzkaller.appspotmail.com,
+	Daniel Jordan <daniel.m.jordan@oracle.com>,
 	Sasha Levin <sashal@kernel.org>,
-	qianweili@huawei.com,
-	wangzhou1@hisilicon.com,
-	davem@davemloft.net,
+	steffen.klassert@secunet.com,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 05/14] crypto: hisilicon/qm - Add the err memory release process to qm uninit
-Date: Sun, 26 May 2024 05:42:10 -0400
-Message-ID: <20240526094224.3412675-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 03/11] padata: Disable BH when taking works lock on MT path
+Date: Sun, 26 May 2024 05:42:41 -0400
+Message-ID: <20240526094251.3413178-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240526094224.3412675-1-sashal@kernel.org>
-References: <20240526094224.3412675-1-sashal@kernel.org>
+In-Reply-To: <20240526094251.3413178-1-sashal@kernel.org>
+References: <20240526094251.3413178-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,46 +49,63 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.8.10
+X-stable-base: Linux 6.6.31
 Content-Transfer-Encoding: 8bit
 
-From: Chenghai Huang <huangchenghai2@huawei.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 
-[ Upstream commit c9ccfd5e0ff0dd929ce86d1b5f3c6a414110947a ]
+[ Upstream commit 58329c4312031603bb1786b44265c26d5065fe72 ]
 
-When the qm uninit command is executed, the err data needs to
-be released to prevent memory leakage. The error information
-release operation and uacce_remove are integrated in
-qm_remove_uacce.
+As the old padata code can execute in softirq context, disable
+softirqs for the new padata_do_mutithreaded code too as otherwise
+lockdep will get antsy.
 
-So add the qm_remove_uacce to qm uninit to avoid err memory
-leakage.
-
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+Reported-by: syzbot+0cb5bb0f4bf9e79db3b3@syzkaller.appspotmail.com
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/hisilicon/qm.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ kernel/padata.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 4b20b94e6371a..5f3f2f1dd71ef 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -2833,12 +2833,9 @@ void hisi_qm_uninit(struct hisi_qm *qm)
- 	hisi_qm_set_state(qm, QM_NOT_READY);
- 	up_write(&qm->qps_lock);
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 179fb1518070c..c974568f65f5d 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -106,7 +106,7 @@ static int __init padata_work_alloc_mt(int nworks, void *data,
+ {
+ 	int i;
  
-+	qm_remove_uacce(qm);
- 	qm_irqs_unregister(qm);
- 	hisi_qm_pci_uninit(qm);
--	if (qm->use_sva) {
--		uacce_remove(qm->uacce);
--		qm->uacce = NULL;
--	}
+-	spin_lock(&padata_works_lock);
++	spin_lock_bh(&padata_works_lock);
+ 	/* Start at 1 because the current task participates in the job. */
+ 	for (i = 1; i < nworks; ++i) {
+ 		struct padata_work *pw = padata_work_alloc();
+@@ -116,7 +116,7 @@ static int __init padata_work_alloc_mt(int nworks, void *data,
+ 		padata_work_init(pw, padata_mt_helper, data, 0);
+ 		list_add(&pw->pw_list, head);
+ 	}
+-	spin_unlock(&padata_works_lock);
++	spin_unlock_bh(&padata_works_lock);
+ 
+ 	return i;
  }
- EXPORT_SYMBOL_GPL(hisi_qm_uninit);
+@@ -134,12 +134,12 @@ static void __init padata_works_free(struct list_head *works)
+ 	if (list_empty(works))
+ 		return;
  
+-	spin_lock(&padata_works_lock);
++	spin_lock_bh(&padata_works_lock);
+ 	list_for_each_entry_safe(cur, next, works, pw_list) {
+ 		list_del(&cur->pw_list);
+ 		padata_work_free(cur);
+ 	}
+-	spin_unlock(&padata_works_lock);
++	spin_unlock_bh(&padata_works_lock);
+ }
+ 
+ static void padata_parallel_worker(struct work_struct *parallel_work)
 -- 
 2.43.0
 
