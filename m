@@ -1,43 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD5312FF61;
-	Sun, 26 May 2024 09:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6E212FF7E;
+	Sun, 26 May 2024 09:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716716611; cv=none; b=J0ciYJi9WUjT6odVnfceF+fVHSmt3w0uHN+51FQZtTPysiFKf1Bh1O46qrFrZZr7bSEYsb4m4ENa+dEmI/NoGCCVc27hWnZthH6CRtXmKGZfgx+RQEmPwAWnsh5VZ8bF1pRtxtm1w3C/fVyednGMQiP32cJ+jsQ/ztlAwPYwiGg=
+	t=1716716613; cv=none; b=mWBjQh1812zAJuHJOMJms6oN4XIyyjD/hpejAC4AJhd6U5UdQpZkZC4gqRORZr+iKdIkL1SHAcsUrZ8gFqZpax2viHhWFxZFZOvb7Pu+JGAaoqzUDYVKAQC5Gh9rNDOqT5QyHmfeARSH0jErlWhqllabSpaJjO9nBZaVNKkFSu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716716611; c=relaxed/simple;
-	bh=c5yfH6H6bPCU9g29WjamsYCZW1ZxsHiZnvNXgWIuJgI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Onlr1nHDWAyyxVBZyVCNlNZMTzzapto9vO0tZrBSwyefh2WEpXHAv+uD3qEMTIJnEkr3/hP/3Xle9QIp6c8/+NQ6AY7xktBjMaX8+XowNcHsX9553E9Vdv60A1mde4QtYJpeTBs+TvFnJsn1J9+CuNNEVDqLI3hFKfL0ifCfX2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M9HBJTDG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716716613; c=relaxed/simple;
+	bh=S/Uk1MIsHpVBY9QhFMzIN71MMMG9mkwXuilRviiEQsQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hRucj3pdr+gUGJ+zXhqa6C+P6toR5Z1nVydNXEreV7QUy/4AAW4RrEusxoJEQIWMe5uz5aUoBnScT0AIZL9R8PMrTdrDs4OeE23Y/hQA8kbLDWgPodCs4WlGaEJZ/gB7OytXJgww0pXIYx1MqUTWk8M+UQkhuMfKBAbmnvfi+Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rN577W/H; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M9HBJTDG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 899A5C2BD10;
-	Sun, 26 May 2024 09:43:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rN577W/H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4C46C32781;
+	Sun, 26 May 2024 09:43:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716716611;
-	bh=c5yfH6H6bPCU9g29WjamsYCZW1ZxsHiZnvNXgWIuJgI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=M9HBJTDGp91xDLRiPG5+OffRKQ257XUkbst1mMKOmZWCH7jFgpSzyeoZ1xKqJX3iH
-	 Y4vNtw7viRTgSyjtvAGQeL9KwlWBFsmaEXsuws7rJnoET/tveHJwOGIgZXjAzHg1Sf
-	 Du+PmTvSCyWhsYBDY/ISxUssoknPpa4fmu3BrGDwlFeE+x/dnxmonnZKuTjoYQUuB5
-	 YTG2wpu8iCNzypkR15Hz3GLMBwbmwvc2Y5N7SkF9gjCDLDa3JydxE5mhj0PFUi/dpK
-	 1E5F9qFxbHO4RW+xRa6r9dfQpBqsNwdQ7eHbjvlGQRl0GpkxJSrRcsv9NGPp/omqDF
-	 mA09V58iZF41w==
+	s=k20201202; t=1716716612;
+	bh=S/Uk1MIsHpVBY9QhFMzIN71MMMG9mkwXuilRviiEQsQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rN577W/HMvT2/+j4cpzWLnHV0VaTPgVGiXdXpo4Sty156otjcfwwSd6orJr42WGTE
+	 VY4OsXwIwC6s4aD4vQ3TBYVfCVQGN2WTDTwoOf/k2fY1ICIQKWS7afmPsU54VgMixm
+	 xEn8akNmpNPIYQdeY7qo5bL7ZEOBtZ+qSebqqgqWdzldxpttAF6aWSw//vmY8rC2Vg
+	 sh1LajvYkofQDSa0KXHGyTW0b8xdZc9IIyS0rp1a8NY4WfJ6wy0ZufQseBENsYWF2n
+	 tyJjSNThPQ/gGnnjpheBUUorZsM46/MmzTV05W6QQTcFTym/7QwSDFcxwC+xazGDPB
+	 AEObu+Oy3L2FA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	syzbot+0cb5bb0f4bf9e79db3b3@syzkaller.appspotmail.com,
-	Daniel Jordan <daniel.m.jordan@oracle.com>,
+Cc: Chenghai Huang <huangchenghai2@huawei.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	Sasha Levin <sashal@kernel.org>,
-	steffen.klassert@secunet.com,
+	liulongfang@huawei.com,
+	davem@davemloft.net,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 1/7] padata: Disable BH when taking works lock on MT path
-Date: Sun, 26 May 2024 05:43:21 -0400
-Message-ID: <20240526094329.3413652-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 2/7] crypto: hisilicon/sec - Fix memory leak for sec resource release
+Date: Sun, 26 May 2024 05:43:22 -0400
+Message-ID: <20240526094329.3413652-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240526094329.3413652-1-sashal@kernel.org>
+References: <20240526094329.3413652-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,60 +52,40 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.159
 Content-Transfer-Encoding: 8bit
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Chenghai Huang <huangchenghai2@huawei.com>
 
-[ Upstream commit 58329c4312031603bb1786b44265c26d5065fe72 ]
+[ Upstream commit bba4250757b4ae1680fea435a358d8093f254094 ]
 
-As the old padata code can execute in softirq context, disable
-softirqs for the new padata_do_mutithreaded code too as otherwise
-lockdep will get antsy.
+The AIV is one of the SEC resources. When releasing resources,
+it need to release the AIV resources at the same time.
+Otherwise, memory leakage occurs.
 
-Reported-by: syzbot+0cb5bb0f4bf9e79db3b3@syzkaller.appspotmail.com
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+The aiv resource release is added to the sec resource release
+function.
+
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- kernel/padata.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 47f146f061fb1..809978bb249c2 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -98,7 +98,7 @@ static int __init padata_work_alloc_mt(int nworks, void *data,
- {
- 	int i;
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 0d26eda36a526..28c167e1be426 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -463,8 +463,10 @@ static void sec_alg_resource_free(struct sec_ctx *ctx,
  
--	spin_lock(&padata_works_lock);
-+	spin_lock_bh(&padata_works_lock);
- 	/* Start at 1 because the current task participates in the job. */
- 	for (i = 1; i < nworks; ++i) {
- 		struct padata_work *pw = padata_work_alloc();
-@@ -108,7 +108,7 @@ static int __init padata_work_alloc_mt(int nworks, void *data,
- 		padata_work_init(pw, padata_mt_helper, data, 0);
- 		list_add(&pw->pw_list, head);
- 	}
--	spin_unlock(&padata_works_lock);
-+	spin_unlock_bh(&padata_works_lock);
- 
- 	return i;
- }
-@@ -126,12 +126,12 @@ static void __init padata_works_free(struct list_head *works)
- 	if (list_empty(works))
- 		return;
- 
--	spin_lock(&padata_works_lock);
-+	spin_lock_bh(&padata_works_lock);
- 	list_for_each_entry_safe(cur, next, works, pw_list) {
- 		list_del(&cur->pw_list);
- 		padata_work_free(cur);
- 	}
--	spin_unlock(&padata_works_lock);
-+	spin_unlock_bh(&padata_works_lock);
+ 	if (ctx->pbuf_supported)
+ 		sec_free_pbuf_resource(dev, qp_ctx->res);
+-	if (ctx->alg_type == SEC_AEAD)
++	if (ctx->alg_type == SEC_AEAD) {
+ 		sec_free_mac_resource(dev, qp_ctx->res);
++		sec_free_aiv_resource(dev, qp_ctx->res);
++	}
  }
  
- static void padata_parallel_worker(struct work_struct *parallel_work)
+ static int sec_create_qp_ctx(struct hisi_qm *qm, struct sec_ctx *ctx,
 -- 
 2.43.0
 
