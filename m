@@ -1,108 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3211311A5;
-	Sun, 26 May 2024 09:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048912CA2;
+	Sun, 26 May 2024 10:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716716625; cv=none; b=nwq+G9EbJKEVH97957lZIdUlkjsTlNoR3LDsDwKMsL72nqRyWA3lVujiNowNYAIednBsMXD8R5Nsyy4vofP7smmIjycfhGmgh5TB3XBo9hyJSBlJbidMtvdGF4PlmwWcrLLoBixoisH4AblsCTJKHFK8XEPjWSPj8ArjoTBr4hw=
+	t=1716719543; cv=none; b=EwWN8YUQqFsuRuaAdv9NuG52dzTvoqcnvICi/zHZhVXrGenYr8DMlj+dtNzTnyxSsHZmpTmpCEGaJScnyzECDbWyQ7NjNXAuED2akI4RwDgpCOotpgEzfU5qMEFICRebo7X57JvigqwR5Hs9T0WU6bALAMKXeYTLWonT9GuPsbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716716625; c=relaxed/simple;
-	bh=bafW+hAQkLlXTWalx25XHXsPpoYh8vyZ4X/xwceNVjQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RNjLXISz3G2Dj+U8ajue/M2xUYi4aG0oaBmc9ndkymJkNX+Oky8rtVj6CAeGtSJjakelKz2QBhTe1vCdWoYE3nrvVM1+ICONYBEe55qvk5+J8ev7p/9F8HfzQLg5KYx8n+6PcPwKyyxM/6bWxQ+agbW6lErFWZPMcd7rok5dSvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cXNAL//u; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716719543; c=relaxed/simple;
+	bh=cM+3m9Vlx+Li31AKKrxvOFnkw6WwfSo8Tpsy25CvwDM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pyPwI97XTB5aB+6ScWmz9T7GT1rfQfQWd8hmEt2wdVtPHyw9haZgY7fJoDlncMtn19ro4jwelmUmFT4W9wqiz51NZKYlkP+UfQsGbBmZF0xfKHiQLg8nYOv+PDfUYP5u8oHw72pWOEbICdhQLyR/yYXvWkMn6wVU8BUVgJO0KdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gnXk24sW; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cXNAL//u"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 161C4C2BD10;
-	Sun, 26 May 2024 09:43:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716716625;
-	bh=bafW+hAQkLlXTWalx25XHXsPpoYh8vyZ4X/xwceNVjQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=cXNAL//unomYHsDHz2j7K1QwIfX2n0lshwn/oz3B3QSpCW0sNCCSFttVSHSpikAGj
-	 c4mK6QGqytaVjQV2VR08YPqNPNhDaYDsWRgwKLVZehSg1oP6FjMdSDS6xfCp4m4Ngf
-	 9pn5OZZ4FXf70WBWFufiDfVtTbueuRJRYf9kKvI9UXu+ScOgKoU4wwEQst/zSdRI0V
-	 Hkq7DbUaS/syIR2QKz8tBsOH92qpiN9fXumqOB9tYGd8+dYhfPs/Bw1DAKMqf6cNtO
-	 UdbqeiRIub2ifugbOPzYACKsU7uW8lo62/65zDTqsowce3pghnExsp8zqcGB7r2Nst
-	 XxD8we2MWE/Eg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	syzbot+0cb5bb0f4bf9e79db3b3@syzkaller.appspotmail.com,
-	Daniel Jordan <daniel.m.jordan@oracle.com>,
-	Sasha Levin <sashal@kernel.org>,
-	steffen.klassert@secunet.com,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 1/5] padata: Disable BH when taking works lock on MT path
-Date: Sun, 26 May 2024 05:43:37 -0400
-Message-ID: <20240526094342.3413841-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gnXk24sW"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-42108822e3cso11278895e9.0;
+        Sun, 26 May 2024 03:32:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716719540; x=1717324340; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qHGSRtBgYEwf5XeC+NvJ0ZSO87WeoCCUBD7D/Iu4rNY=;
+        b=gnXk24sW1XT2Uj81K/iZ1ZEJne7faC7Ca5l6srSru1g8H7M7+ZwgXxtnKqU4hbNSqj
+         zDF1TqrfvNOePEZhYT9aBDFzGDF6hUu1PrnAT7nM6FMC3e7+Bz/Mns3J//N0+Dx/IoVg
+         HevzBT+p3cu8pW3bbF7ftGpIOpICXmyHYZDpKaAkR0cvAzhuj/RTRdg+1Ct5GsxGtr8K
+         stIYcP34DOA2qUrsol2LgPJCEUxc57KvcxqA5F6sXgOP3I2WRchCO52uWf+r3/w4zEI+
+         6jcATQCysroyrPGbR350Touu2PqVWrmYwGUlrYZ9zcdyVL7eGWtsZVSkANXyrDHWur5w
+         8rhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716719540; x=1717324340;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qHGSRtBgYEwf5XeC+NvJ0ZSO87WeoCCUBD7D/Iu4rNY=;
+        b=btVzTPBt0mv0asvAaylm3Td/4ZE7zDOKbGtBzco5CTqo5Trxr5vb4aZQMsRfzI/ya+
+         My10Zgygbk4xTqhqzYdjfNK8SJQAkUctQTZ+yvGO9MQDsMUjZIt5QVhrWs1vk9urQgPV
+         bmpeTpXxPLLanEs0X+U1cvLVe5vKsCxPX40RqiQLBpZ1GwiK7PfJ2I/a7es5hjAaEk3x
+         X0SpTAd6EBnnTqHvriAL+LenkFbBnOoi7c11Q9//ws0/BYnuXnpk+WRh4EQiAmjMV+wG
+         dVtbJJ5F4RwWPB68oPl+k9XpuEU+rNg1PJR9bTdURyXGCWd8qhdIKx1aLvKQ6YsyFQj7
+         +Brw==
+X-Forwarded-Encrypted: i=1; AJvYcCXsiAFZwmczcZ4jB1/NQ5iNxbHl7lu6EFbC3QLsUIPxp9ynslmE3r1Uyb+YgW7I61kyVPkxcLr1WhiSKpI2fEoCzGiTwFbNBrK6I5ZojjNy2yqlRfMHUwyxytP+w8z2FhUjDXd8vyv+9mLz
+X-Gm-Message-State: AOJu0Yyi0nDps2SSU+AUCsMz1DuI9gsPocbOpnR/Yryl64z7Te6nYY+J
+	KLYUA/a1NYELxBq6WXgx3lWlOGqLpMy5IBgiXO+MPjzgqpe8l8yb
+X-Google-Smtp-Source: AGHT+IH1/zyQQAW2UnztwvjH4KyCVYCCt/wjYrQb76m6DkbN6LiKHaAMA5t5MhdTV9ctjn9Kheh06A==
+X-Received: by 2002:a05:600c:4449:b0:41b:f4e1:381b with SMTP id 5b1f17b1804b1-421015a60b9mr93206105e9.2.1716719540014;
+        Sun, 26 May 2024 03:32:20 -0700 (PDT)
+Received: from 4728cded2e8d.v.cablecom.net (84-72-156-211.dclient.hispeed.ch. [84.72.156.211])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100fad638sm106565865e9.29.2024.05.26.03.32.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 May 2024 03:32:19 -0700 (PDT)
+From: Lothar Rubusch <l.rubusch@gmail.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: dan.carpenter@linaro.org,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	l.rubusch@gmail.com
+Subject: [PATCH] crypto: atmel-sha204a - fix negated return value
+Date: Sun, 26 May 2024 10:31:28 +0000
+Message-Id: <20240526103128.14703-1-l.rubusch@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.217
 Content-Transfer-Encoding: 8bit
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+Fix negated variable return value.
 
-[ Upstream commit 58329c4312031603bb1786b44265c26d5065fe72 ]
-
-As the old padata code can execute in softirq context, disable
-softirqs for the new padata_do_mutithreaded code too as otherwise
-lockdep will get antsy.
-
-Reported-by: syzbot+0cb5bb0f4bf9e79db3b3@syzkaller.appspotmail.com
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Fixes: e05ce444e9e5 ("crypto: atmel-sha204a - add reading from otp zone")
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/linux-crypto/34cd4179-090e-479d-b459-8d0d35dd327d@moroto.mountain/
+Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 ---
- kernel/padata.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/crypto/atmel-sha204a.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index fdcd78302cd72..471ccbc44541d 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -111,7 +111,7 @@ static int __init padata_work_alloc_mt(int nworks, void *data,
- {
- 	int i;
+diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+index 24ffdf505023..2034f6031518 100644
+--- a/drivers/crypto/atmel-sha204a.c
++++ b/drivers/crypto/atmel-sha204a.c
+@@ -106,7 +106,7 @@ static int atmel_sha204a_otp_read(struct i2c_client *client, u16 addr, u8 *otp)
  
--	spin_lock(&padata_works_lock);
-+	spin_lock_bh(&padata_works_lock);
- 	/* Start at 1 because the current task participates in the job. */
- 	for (i = 1; i < nworks; ++i) {
- 		struct padata_work *pw = padata_work_alloc();
-@@ -121,7 +121,7 @@ static int __init padata_work_alloc_mt(int nworks, void *data,
- 		padata_work_init(pw, padata_mt_helper, data, 0);
- 		list_add(&pw->pw_list, head);
+ 	if (cmd.data[0] == 0xff) {
+ 		dev_err(&client->dev, "failed, device not ready\n");
+-		return -ret;
++		return -EINVAL;
  	}
--	spin_unlock(&padata_works_lock);
-+	spin_unlock_bh(&padata_works_lock);
  
- 	return i;
- }
-@@ -139,12 +139,12 @@ static void __init padata_works_free(struct list_head *works)
- 	if (list_empty(works))
- 		return;
- 
--	spin_lock(&padata_works_lock);
-+	spin_lock_bh(&padata_works_lock);
- 	list_for_each_entry_safe(cur, next, works, pw_list) {
- 		list_del(&cur->pw_list);
- 		padata_work_free(cur);
- 	}
--	spin_unlock(&padata_works_lock);
-+	spin_unlock_bh(&padata_works_lock);
- }
- 
- static void padata_parallel_worker(struct work_struct *parallel_work)
+ 	memcpy(otp, cmd.data+1, 4);
 -- 
-2.43.0
+2.39.2
 
