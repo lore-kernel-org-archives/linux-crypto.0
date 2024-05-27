@@ -1,184 +1,224 @@
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E7213AA4E;
-	Mon, 27 May 2024 10:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9280715DBB7;
+	Mon, 27 May 2024 12:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716804757; cv=none; b=En88YpYQ9X/qFJGnpS46lulUWYwIRjLGqONDy9sjFr4IJeukmqLYFxEURN1bna1/AiCDpnOl1VJRkJ1PthAXBvsInmIf8aUaQdFbJ+AWOBgAB3gn3xDoF2kDdXQjujOXdRDw38oyRJQ/YF2XnBFbxM6S/ZZKQgtPGxycohuKcgU=
+	t=1716812773; cv=none; b=FC4ZLAZCHutEUX6QpJ4UQEwfWquLztS2/18gxsZpUkryzbjLbDraxt06108xvvGYOlIMqaFEOddAcL7QdUmylW6wvLONrg8Mtt0+M8ZyReTlioD7X18yNGmDkVmplrwAHXKiqnBfNWy9rxCr002RFmW2N1ywI5f/2qjT5q5Kpxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716804757; c=relaxed/simple;
-	bh=Nu4zFkf+vdG4f/A//Ee3j7+2qsOZTO1MLXeLI38A08U=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=I6sQsajFrsVgILwLtdWQOb/31AIz2dn/QWn/rjmSaUanauT/WqsbhXxeiBOwYL0GhDQJdn2UwSqvsoCe7B8w1ZsFME7wk3fDdbc971j1wKbC6BH9Ob9FcQUZjpcpumRtA6Hki1VfPcKPn3LLPZpbJFH4X4ia/sNgO3gj1qYms/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ck9Kh7DQ; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1716812773; c=relaxed/simple;
+	bh=/c0n1b92ma2tktOqUNb41OqeN2cWnA5+c1eV0kosDcw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gc2CQAdS9E7D8hxScT06xLM6OfeVuZ6SbNEcGjed1LG6qp3FLwihuQR7g8wIQROo1s/7szjPH7xWVWLM79gqh1H3xK45jUqoOqNRkEnwFFY6LI6+umZeXAGx5ckF3cNviX+f1AIvQFhWTwG5SqGu7sznhXO9m5EmKBDe8jcEzG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Na/iw4Px; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ck9Kh7DQ"
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44RABxF5067492;
-	Mon, 27 May 2024 05:11:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1716804719;
-	bh=Oqc/Z6XWmRCD3Quoa8HVoha1OHkZHirIPRb60TQWAz4=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date;
-	b=ck9Kh7DQK8i+/r/GF/AeKcKwodcJ+kzERxRO9A2sBv0kjnvJZBulI6LBVN9bbD2ST
-	 fdmB1dBNOXxtHs7Z42BL2sSncP9c0Z0OQ9jD2AEA0nH+0cgs9mLkE7O4MsJii6wA7+
-	 LapD8AwpsLx/5vwKvuO3MQD9rZ69lGrVfTDPJhX4=
-Received: from DFLE110.ent.ti.com (dfle110.ent.ti.com [10.64.6.31])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44RABxLF011380
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 27 May 2024 05:11:59 -0500
-Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE110.ent.ti.com
- (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 27
- May 2024 05:11:58 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 27 May 2024 05:11:58 -0500
-Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44RABwvV091740;
-	Mon, 27 May 2024 05:11:58 -0500
-From: Kamlesh Gurudasani <kamlesh@ti.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Conor Dooley
-	<conor@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        "Krzysztof
- Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>,
-        Catalin Marinas
-	<catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>
-Subject: Re: [PATCH v2 3/6] dt-bindings: crypto: Add Texas Instruments MCRC64
-In-Reply-To: <c5aa0c8b-b2b4-4ad2-a8a8-ab26ee0edd22@linaro.org>
-References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
- <20230719-mcrc-upstream-v2-3-4152b987e4c2@ti.com>
- <20230811-crestless-gratify-21c9bb422375@spud>
- <20230811-imminent-fancied-89663c373ab5@spud>
- <87plt7acgg.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
- <c5aa0c8b-b2b4-4ad2-a8a8-ab26ee0edd22@linaro.org>
-Date: Mon, 27 May 2024 15:41:57 +0530
-Message-ID: <87ikyza7iq.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Na/iw4Px"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716812772; x=1748348772;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=/c0n1b92ma2tktOqUNb41OqeN2cWnA5+c1eV0kosDcw=;
+  b=Na/iw4PxDjFttFzLuc3pbFizpOSj/5m2jKHOtzcqdeZjxA3osPXahTG/
+   Tl52bx49ZFRtTWOcKKoR/x469AOZ1IOTBBeaRHGspI5tpDkSW/ToFgvkk
+   dcDhhn0m9IisJwQ/YTULSCzAwgTcEkDLe/sDpR8KiXX0PNLZ8lf+IATk3
+   SVAgmJbIXiiWohDe5r5kVLwTZVvMv8i/ABAZL2qFPCgMuAGkfaBIjd5zg
+   obgV6ZH2zCSuSmT1Qv2Fjh8+1hQrXYlrZ86A1VFmFCTZj8e9FOwx1/l4+
+   qV+Yf2yisjxW3Mcvaz6xi1/15G+WAgJjC+V6b7vT1WepL6mymGIp0pKQo
+   w==;
+X-CSE-ConnectionGUID: kU06UJGWTQ+vrW343p95Fw==
+X-CSE-MsgGUID: hepdqGfoRXq9nUz19up/qw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11084"; a="35647269"
+X-IronPort-AV: E=Sophos;i="6.08,192,1712646000"; 
+   d="scan'208";a="35647269"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2024 05:26:11 -0700
+X-CSE-ConnectionGUID: 4RopLxNGRK+EFM85hO/PLQ==
+X-CSE-MsgGUID: KIV1k5CaR5mnjLatSwP3dw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,192,1712646000"; 
+   d="scan'208";a="35245657"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.234.76]) ([10.124.234.76])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2024 05:26:02 -0700
+Message-ID: <7da9c4a3-8597-44aa-a7ad-cc2bd2a85024@linux.intel.com>
+Date: Mon, 27 May 2024 20:25:59 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 09/20] KVM: SEV: Add support to handle MSR based Page
+ State Change VMGEXIT
+To: Michael Roth <michael.roth@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com,
+ vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+ dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+ peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+ rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+ vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+ tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+ alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
+ nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
+ Brijesh Singh <brijesh.singh@amd.com>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240501085210.2213060-10-michael.roth@amd.com>
+ <84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
+ <CABgObfaXmMUYHEuK+D+2E9pybKMJqGZsKB033X1aOSQHSEqqVA@mail.gmail.com>
+ <7d6a4320-89f5-48ce-95ff-54b00e7e9597@linux.intel.com>
+ <rczrxq3lhqguarwh4cwxwa35j5riiagbilcw32oaxd7aqpyaq7@6bqrqn6ontba>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <rczrxq3lhqguarwh4cwxwa35j5riiagbilcw32oaxd7aqpyaq7@6bqrqn6ontba>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> writes:
 
-> This message was sent from outside of Texas Instruments. 
-> Do not click links or open attachments unless you recognize the source of this email and know the content is safe. If you wish
-> to report this message to IT Security, please forward the message as an attachment to phishing@list.ti.com 
->  
-> On 27/05/2024 10:25, Kamlesh Gurudasani wrote:
->> Conor Dooley <conor@kernel.org> writes:
->> 
->>> On Fri, Aug 11, 2023 at 04:34:33PM +0100, Conor Dooley wrote:
->>>> On Fri, Aug 11, 2023 at 12:58:50AM +0530, Kamlesh Gurudasani wrote:
->>>>> Add binding for Texas Instruments MCRC64
+
+On 5/22/2024 5:49 AM, Michael Roth wrote:
+> On Tue, May 21, 2024 at 08:49:59AM +0800, Binbin Wu wrote:
+>>
+>> On 5/17/2024 1:23 AM, Paolo Bonzini wrote:
+>>> On Thu, May 16, 2024 at 10:29 AM Binbin Wu <binbin.wu@linux.intel.com> wrote:
+>>>>
+>>>> On 5/1/2024 4:51 PM, Michael Roth wrote:
+>>>>> SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
+>>>>> table to be private or shared using the Page State Change MSR protocol
+>>>>> as defined in the GHCB specification.
 >>>>>
->>>>> MCRC64 engine calculates 64-bit cyclic redundancy checks (CRC)
->>>>> according to the ISO 3309 standard.
+>>>>> When using gmem, private/shared memory is allocated through separate
+>>>>> pools, and KVM relies on userspace issuing a KVM_SET_MEMORY_ATTRIBUTES
+>>>>> KVM ioctl to tell the KVM MMU whether or not a particular GFN should be
+>>>>> backed by private memory or not.
 >>>>>
->>>>> The ISO 3309 64-bit CRC model parameters are as follows:
->>>>>     Generator Polynomial: x^64 + x^4 + x^3 + x + 1
->>>>>     Polynomial Value: 0x000000000000001B
->>>>>     Initial value: 0x0000000000000000
->>>>>     Reflected Input: False
->>>>>     Reflected Output: False
->>>>>     Xor Final: 0x0000000000000000
+>>>>> Forward these page state change requests to userspace so that it can
+>>>>> issue the expected KVM ioctls. The KVM MMU will handle updating the RMP
+>>>>> entries when it is ready to map a private page into a guest.
 >>>>>
->>>>> Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
+>>>>> Use the existing KVM_HC_MAP_GPA_RANGE hypercall format to deliver these
+>>>>> requests to userspace via KVM_EXIT_HYPERCALL.
+>>>>>
+>>>>> Signed-off-by: Michael Roth <michael.roth@amd.com>
+>>>>> Co-developed-by: Brijesh Singh <brijesh.singh@amd.com>
+>>>>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>>>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 >>>>> ---
->>>>>  Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml | 47 +++++++++++++++++++++++++++++++++++++++++++++++
->>>>>  MAINTAINERS                                             |  5 +++++
->>>>>  2 files changed, 52 insertions(+)
+>>>>>     arch/x86/include/asm/sev-common.h |  6 ++++
+>>>>>     arch/x86/kvm/svm/sev.c            | 48 +++++++++++++++++++++++++++++++
+>>>>>     2 files changed, 54 insertions(+)
 >>>>>
->>>>> diff --git a/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
->>>>> new file mode 100644
->>>>> index 000000000000..38bc7efebd68
->>>>> --- /dev/null
->>>>> +++ b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
->>>>> @@ -0,0 +1,47 @@
->>>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->>>>> +%YAML 1.2
->>>>> +---
->>>>> +$id: https://urldefense.com/v3/__http://devicetree.org/schemas/crypto/ti,mcrc64.yaml*__;Iw!!G3vK!Qw75749h2ysFlROkyfLIUT9MGWlHfBEvPAbLVjScJXCPJ7vbwgxH-8hNWlJGBXGwz9Ny47eQi2mPS5R6La54vZo$
->>>>> +$schema: https://urldefense.com/v3/__http://devicetree.org/meta-schemas/core.yaml*__;Iw!!G3vK!Qw75749h2ysFlROkyfLIUT9MGWlHfBEvPAbLVjScJXCPJ7vbwgxH-8hNWlJGBXGwz9Ny47eQi2mPS5R6P2LNJCQ$
+>>>>> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+>>>>> index 1006bfffe07a..6d68db812de1 100644
+>>>>> --- a/arch/x86/include/asm/sev-common.h
+>>>>> +++ b/arch/x86/include/asm/sev-common.h
+>>>>> @@ -101,11 +101,17 @@ enum psc_op {
+>>>>>         /* GHCBData[11:0] */                            \
+>>>>>         GHCB_MSR_PSC_REQ)
+>>>>>
+>>>>> +#define GHCB_MSR_PSC_REQ_TO_GFN(msr) (((msr) & GENMASK_ULL(51, 12)) >> 12)
+>>>>> +#define GHCB_MSR_PSC_REQ_TO_OP(msr) (((msr) & GENMASK_ULL(55, 52)) >> 52)
 >>>>> +
->>>>> +title: Texas Instruments MCRC64
+>>>>>     #define GHCB_MSR_PSC_RESP           0x015
+>>>>>     #define GHCB_MSR_PSC_RESP_VAL(val)                  \
+>>>>>         /* GHCBData[63:32] */                           \
+>>>>>         (((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
+>>>>>
+>>>>> +/* Set highest bit as a generic error response */
+>>>>> +#define GHCB_MSR_PSC_RESP_ERROR (BIT_ULL(63) | GHCB_MSR_PSC_RESP)
 >>>>> +
->>>>> +description: The MCRC64 engine calculates 64-bit cyclic redundancy checks
->>>>
->>>> A newline after "description" please.
->>>>
->>>>> +  (CRC) according to the ISO 3309 standard.
+>>>>>     /* GHCB Hypervisor Feature Request/Response */
+>>>>>     #define GHCB_MSR_HV_FT_REQ          0x080
+>>>>>     #define GHCB_MSR_HV_FT_RESP         0x081
+>>>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>>>>> index e1ac5af4cb74..720775c9d0b8 100644
+>>>>> --- a/arch/x86/kvm/svm/sev.c
+>>>>> +++ b/arch/x86/kvm/svm/sev.c
+>>>>> @@ -3461,6 +3461,48 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
+>>>>>         svm->vmcb->control.ghcb_gpa = value;
+>>>>>     }
+>>>>>
+>>>>> +static int snp_complete_psc_msr(struct kvm_vcpu *vcpu)
+>>>>> +{
+>>>>> +     struct vcpu_svm *svm = to_svm(vcpu);
 >>>>> +
->>>>> +maintainers:
->>>>> +  - Kamlesh Gurudasani <kamlesh@ti.com>
->>>>> +
->>>>> +properties:
->>>>> +  compatible:
->>>>> +    const: ti,am62-mcrc64
->>>>
->>>> Is the am62 an SoC or a family of SoCs? I googled a wee bit for am62 &
->>>> there seems to be an am625 and an am623?
+>>>>> +     if (vcpu->run->hypercall.ret)
+>>>> Do we have definition of ret? I didn't find clear documentation about it.
+>>>> According to the code, 0 means succssful. Is there any other error codes
+>>>> need to or can be interpreted?
+>>> They are defined in include/uapi/linux/kvm_para.h
 >>>
->>> Or is it an am62p5, in which case the compatible should contain
->>> ti,am62p5 I suppose. Sorry for my confusion here, its not really clear
->>> me too since I've been seeing many different-but-similar product names
->>> the last few days.
+>>> #define KVM_ENOSYS        1000
+>>> #define KVM_EFAULT        EFAULT /* 14 */
+>>> #define KVM_EINVAL        EINVAL /* 22 */
+>>> #define KVM_E2BIG        E2BIG /* 7 */
+>>> #define KVM_EPERM        EPERM /* 1*/
+>>> #define KVM_EOPNOTSUPP        95
 >>>
->>> Thanks,
->>> Conor.
->>>
->> Hi Conor,
->> 
->> Thanks for the review.
->> 
->> am62 is family of SOCs.
->> 
->> All devices under this family, like am623/5/p5 and etc, have MCRC64.
->> 
->> I have kept the naming convention similar to SA2UL/SA3UL[0].
->> 
->> [0] https://urldefense.com/v3/__https://elixir.bootlin.com/linux/latest/source/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml*L18__;Iw!!G3vK!Qw75749h2ysFlROkyfLIUT9MGWlHfBEvPAbLVjScJXCPJ7vbwgxH-8hNWlJGBXGwz9Ny47eQi2mPS5R6afCEd8s$
+>>> Linux however does not expect the hypercall to fail for SEV/SEV-ES; and
+>>> it will terminate the guest if the PSC operation fails for SEV-SNP.  So
+>>> it's best for userspace if the hypercall always succeeds. :)
+>> Thanks for the info.
+>>
+>> For TDX, it wants to restrict the size of memory range for conversion in one
+>> hypercall to avoid a too long latency.
+>> Previously, in TDX QEMU patchset v5, the limitation is in userspace and  if
+>> the size is too big, the status_code will set to TDG_VP_VMCALL_RETRY and the
+>> failed GPA for guest to retry is updated.
+>> https://lore.kernel.org/all/20240229063726.610065-51-xiaoyao.li@intel.com/
+>>
+>> When TDX converts TDVMCALL_MAP_GPA to KVM_HC_MAP_GPA_RANGE, do you think
+>> which is more reasonable to set the restriction? In KVM (TDX specific code)
+>> or userspace?
+>> If userspace is preferred, then the interface needs to  be extended to
+>> support it.
+> With SNP we might get a batch of requests in a single GHCB request, and
+> potentially each of those requests need to get set out to userspace as
+> a single KVM_HC_MAP_GPA_RANGE. The subsequent patch here handles that in
+> a loop by issuing a new KVM_HC_MAP_GPA_RANGE via the completion handler.
+> So we also sort of need to split large requests into multiple userspace
+> requests in some cases.
 >
-> Usual answer is: no families. There are exceptions, though, so is this
-> case on the exception list?
-Okay, will use ti,am625-mcrc64 as compatible and as fallback compatible for
-other devices. I hope that is right.
+> It seems like TDX should be able to do something similar by limiting the
+> size of each KVM_HC_MAP_GPA_RANGE to TDX_MAP_GPA_MAX_LEN, and then
+> returning TDG_VP_VMCALL_RETRY to guest if the original size was greater
+> than TDX_MAP_GPA_MAX_LEN. But at that point you're effectively done with
+> the entire request and can return to guest, so it actually seems a little
+> more straightforward than the SNP case above. E.g. TDX has a 1:1 mapping
+> between TDG_VP_VMCALL_MAP_GPA and KVM_HC_MAP_GPA_RANGE events. (And even
+> similar names :))
+>
+> So doesn't seem like there's a good reason to expose any of these
+> throttling details to userspace,
 
-Thanks.
+The reasons I want to put the throttling in userspace are:
+1. Hardcode the TDX_MAP_GPA_MAX_LEN in kernel may not be preferred.
+2. The throttling thing doesn't need to be TDX specific, it can be 
+generic in userspace.
 
-Kamlesh
+I think we can set a reasonable value in userspace, so that for SNP, it 
+doesn't trigger the throttling since the large request will be split to 
+multiple userspace requests.
+
+
+> in which case existing
+> KVM_HC_MAP_GPA_RANGE interface seems like it should be sufficient.
 >
-> https://urldefense.com/v3/__https://elixir.bootlin.com/linux/v6.10-rc1/source/Documentation/devicetree/bindings/writing-bindings.rst*L42__;Iw!!G3vK!Qw75749h2ysFlROkyfLIUT9MGWlHfBEvPAbLVjScJXCPJ7vbwgxH-8hNWlJGBXGwz9Ny47eQi2mPS5R6WaRq1VM$
+> -Mike
 >
-> P.S. Your email client added some weird subject prefix - please fix it.
-Thanks for bringing this to my notice, Will fix it.
->
->
->
-> Best regards,
-> Krzysztof
+>>
+>>>> For TDX, it may also want to use KVM_HC_MAP_GPA_RANGE hypercall  to
+>>>> userspace via KVM_EXIT_HYPERCALL.
+>>> Yes, definitely.
+>>>
+>>> Paolo
+>>>
+
