@@ -1,88 +1,211 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECF52AF17
-	for <linux-crypto@vger.kernel.org>; Mon, 27 May 2024 08:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA3F46453;
+	Mon, 27 May 2024 08:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716797771; cv=none; b=bwYJYTtMyDNul75B5bsKYAG47ZjC21wcPhQYaRXQqdo9g3sZ+APCjwDz7g4lLR7xOMlFITtwLiF/nr2HVaRWEYZz0uEhPcE5DZ6rUNs+NO0WSsBOYexWu7fsGaZIM3V7JrvuRcaxUZTAha0H+Vf3OiwxnTT0O89KvUzXqdrlMds=
+	t=1716798370; cv=none; b=Ofr2WzH79a1XCSoA2d7ySMyO/fe5I0SsNHDAYTq6YcSn87rVgpc793COYNONPj5Zc+b96jU350l6zIihZtAvdwi3aX564gRQrXel6zr9Ji5Adsi+LnY8duOVVmQCMalcCKqTTjb6/R67gunqGLdtIod1oV6gfZOlUNrLH+pJwSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716797771; c=relaxed/simple;
-	bh=im+llKHRV6/OLwUXArxx3xlTY46nqAVvEgvK+7QBrq8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AhyJSmRbedv3OU+IcRbRdjc8AzSJYVzXLTx37OttQv76kKKxZPhv0GXZCWEIRaQthBdMlDUwmKmX2ULku5ux976K1NivPIHz5oW59IOCaYY/PIFykRNtexaMQbAh/ybNsoxXdukZl7kmedg93+0M/TKg3EezENHr3LWQqfj4EAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MZcbzZ9u; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1716798370; c=relaxed/simple;
+	bh=qKVJ5s6tWF0rGf4IxoXicoBveQ0KxjUtwLHMAXcDThg=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VmIudyFYXIi7xnDNw7vCI48GfJBDEh89OA3xWYCzfpDhpbfruqRudZHp5w1WWaZJg6o1foQhI34tuAxQyZrG1EjqqoXR/P6vnM0YyT8sPgZh1FtTwRkITfn9i9Awt8dkzeMVNJwjKViOjAkp5st3qQvFQ2Scc9HO+C5C/xzRGo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=HY8r+DF9; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MZcbzZ9u"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-578517c7ae9so3459197a12.3
-        for <linux-crypto@vger.kernel.org>; Mon, 27 May 2024 01:16:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1716797768; x=1717402568; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ti6BQ0nZTqoUPvV5Y4Ffa4XsuHRMzdkHsHYxPtpQMhU=;
-        b=MZcbzZ9uDrTLeiiGl7sQd46M4w61vd2ICl8feR1Z+7bcM/DEihU01MZ2dMtsMf1XPo
-         lGGbCW7PBcObzPMm7xvD/WvBYwDJpf7/yYYqivQV74HsFvgI+DGtH91teVWEZM2XgE3p
-         Z+5wKbqVxokdRMHpBjk8KQgrmtVyGWPKkvWH5zNWMjCenyXeZ0mL8ktkZ6laPaD3pwf0
-         o7DqIZYlOb30rUzRlrVfhCkMnxDrBdDsT3GNEA9jhakZ4XjyHIFbwvLC3WLmUaeLDa9x
-         RG00fnRdV13MZ9YUPsS3dvAh1sZuTaQT49OZ/u5KenDufEXIOJpBi3NqhJqXBIHYuIyf
-         Q2hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716797768; x=1717402568;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ti6BQ0nZTqoUPvV5Y4Ffa4XsuHRMzdkHsHYxPtpQMhU=;
-        b=kM63UbIfgV+WEZEBSwdSLmusP90Y99FsBBAOp/yABLd6hNCfH0LaUCpWeaV9G2JehQ
-         mMj/0YcZtUd48GUYiNidbidj1yenbblf4MBRYSP9lAp64QSHKEqN/qvYyByKolaFRRxw
-         s+6MZP0sOLJPfIsUuglrQ7XZ5rB/UnoNEW90WKE+5itrZGOA4UPeW6xIHna+Z8AwbHlK
-         JyrQNLF1ZgSXTdTHEFEaA9n6bDyoUqAIPqNYPXyaczdZYOxKJMZ2k/qy5H4b6U+IDZsm
-         obF4keRP1kinDQ8PsUtLqJm041jd8rXfl+ahRbq40qFpJwJomOd3x63mNT2gD9jothOY
-         P9WA==
-X-Forwarded-Encrypted: i=1; AJvYcCX9Uq0VI7u9RgejoYm7+zq0pKEXjHIiDSUh9MEHY820OedK+d3vnab03eAiWACxbuM3b51ttgOkamTM13kK7fXxjKQ1pvLPi2R1HmAu
-X-Gm-Message-State: AOJu0Yx/9FTfsixiGE055yVAFgdQsDF0ylyO1LvGvmxQ2ebY7Y+BA3qf
-	vSC9tF87INblrxh9dZZZUZaakxE8+Qjc8rXQ6bjoWlCXEneOxN6uxWQ/aqMCvJU=
-X-Google-Smtp-Source: AGHT+IGSR3D+cVueBrqe8m9RKJMLR/YZi8ejwDS2zj+FbDq+GuOv+ZeKHZ/hsVXQtzgukx5feH5U8Q==
-X-Received: by 2002:a50:d751:0:b0:579:e283:d2a4 with SMTP id 4fb4d7f45d1cf-579e283d715mr125928a12.36.1716797767681;
-        Mon, 27 May 2024 01:16:07 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5786c0dc384sm3234417a12.75.2024.05.27.01.16.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 01:16:07 -0700 (PDT)
-Date: Mon, 27 May 2024 11:16:03 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Lothar Rubusch <l.rubusch@gmail.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-	claudiu.beznea@tuxon.dev, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: atmel-sha204a - fix negated return value
-Message-ID: <28dfdd52-e72a-4465-af7d-7b10c635b150@moroto.mountain>
-References: <20240526103128.14703-1-l.rubusch@gmail.com>
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="HY8r+DF9"
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44R8PL1l048596;
+	Mon, 27 May 2024 03:25:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1716798321;
+	bh=l8y8XUgX/zJirmS7nB2QP3/faPTAkS4T0rfRSJa68oY=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date;
+	b=HY8r+DF9x9Tu61I/vYT0P0NVuBFfnCX8SJOA4ks68AEnZc6DLdPh8uXY1hvgajcC3
+	 U9cpAj9njT9lqm13GWpeRloxLwEhig0xlXEUKVfAKUlu0ZBYcAEHvTNKbhmG/gfgjH
+	 QdTsTgiTX6L/KkXEh2FhJpfAvdXv13qTiEALp++E=
+Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44R8PLoi100743
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 27 May 2024 03:25:21 -0500
+Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 27
+ May 2024 03:25:21 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 27 May 2024 03:25:21 -0500
+Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44R8PKoI017949;
+	Mon, 27 May 2024 03:25:21 -0500
+From: Kamlesh Gurudasani <kamlesh@ti.com>
+To: Conor Dooley <conor@kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof
+ Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>,
+        Catalin Marinas
+	<catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>
+Subject: Re: [EXTERNAL] Re: [PATCH v2 3/6] dt-bindings: crypto: Add Texas
+ Instruments MCRC64
+In-Reply-To: <20230811-imminent-fancied-89663c373ab5@spud>
+References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
+ <20230719-mcrc-upstream-v2-3-4152b987e4c2@ti.com>
+ <20230811-crestless-gratify-21c9bb422375@spud>
+ <20230811-imminent-fancied-89663c373ab5@spud>
+Date: Mon, 27 May 2024 13:55:19 +0530
+Message-ID: <87plt7acgg.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240526103128.14703-1-l.rubusch@gmail.com>
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Sun, May 26, 2024 at 10:31:28AM +0000, Lothar Rubusch wrote:
-> Fix negated variable return value.
-> 
-> Fixes: e05ce444e9e5 ("crypto: atmel-sha204a - add reading from otp zone")
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Closes: https://lore.kernel.org/linux-crypto/34cd4179-090e-479d-b459-8d0d35dd327d@moroto.mountain/
-> Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
+Conor Dooley <conor@kernel.org> writes:
 
-Thanks!
+> On Fri, Aug 11, 2023 at 04:34:33PM +0100, Conor Dooley wrote:
+>> On Fri, Aug 11, 2023 at 12:58:50AM +0530, Kamlesh Gurudasani wrote:
+>> > Add binding for Texas Instruments MCRC64
+>> > 
+>> > MCRC64 engine calculates 64-bit cyclic redundancy checks (CRC)
+>> > according to the ISO 3309 standard.
+>> > 
+>> > The ISO 3309 64-bit CRC model parameters are as follows:
+>> >     Generator Polynomial: x^64 + x^4 + x^3 + x + 1
+>> >     Polynomial Value: 0x000000000000001B
+>> >     Initial value: 0x0000000000000000
+>> >     Reflected Input: False
+>> >     Reflected Output: False
+>> >     Xor Final: 0x0000000000000000
+>> > 
+>> > Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
+>> > ---
+>> >  Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+>> >  MAINTAINERS                                             |  5 +++++
+>> >  2 files changed, 52 insertions(+)
+>> > 
+>> > diff --git a/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
+>> > new file mode 100644
+>> > index 000000000000..38bc7efebd68
+>> > --- /dev/null
+>> > +++ b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
+>> > @@ -0,0 +1,47 @@
+>> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> > +%YAML 1.2
+>> > +---
+>> > +$id: http://devicetree.org/schemas/crypto/ti,mcrc64.yaml#
+>> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> > +
+>> > +title: Texas Instruments MCRC64
+>> > +
+>> > +description: The MCRC64 engine calculates 64-bit cyclic redundancy checks
+>> 
+>> A newline after "description" please.
+>> 
+>> > +  (CRC) according to the ISO 3309 standard.
+>> > +
+>> > +maintainers:
+>> > +  - Kamlesh Gurudasani <kamlesh@ti.com>
+>> > +
+>> > +properties:
+>> > +  compatible:
+>> > +    const: ti,am62-mcrc64
+>> 
+>> Is the am62 an SoC or a family of SoCs? I googled a wee bit for am62 &
+>> there seems to be an am625 and an am623?
+>
+> Or is it an am62p5, in which case the compatible should contain
+> ti,am62p5 I suppose. Sorry for my confusion here, its not really clear
+> me too since I've been seeing many different-but-similar product names
+> the last few days.
+>
+> Thanks,
+> Conor.
+>
+Hi Conor,
 
-Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
+Thanks for the review.
 
-regards,
-dan carpenter
+am62 is family of SOCs.
 
+All devices under this family, like am623/5/p5 and etc, have MCRC64.
+
+I have kept the naming convention similar to SA2UL/SA3UL[0].
+
+[0] https://elixir.bootlin.com/linux/latest/source/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml#L18
+
+Kamlesh
+
+>> 
+>> Otherwise, this looks good to me.
+>> 
+>> > +
+>> > +  reg:
+>> > +    maxItems: 1
+>> > +
+>> > +  clocks:
+>> > +    maxItems: 1
+>> > +
+>> > +  power-domains:
+>> > +    maxItems: 1
+>> > +
+>> > +required:
+>> > +  - compatible
+>> > +  - reg
+>> > +  - clocks
+>> > +  - power-domains
+>> > +
+>> > +additionalProperties: false
+>> > +
+>> > +examples:
+>> > +  - |
+>> > +    #include <dt-bindings/soc/ti,sci_pm_domain.h>
+>> > +
+>> > +    crc@30300000 {
+>> > +      compatible = "ti,am62-mcrc64";
+>> > +      reg = <0x30300000 0x1000>;
+>> > +      clocks = <&k3_clks 116 0>;
+>> > +      power-domains = <&k3_pds 116 TI_SCI_PD_EXCLUSIVE>;
+>> > +    };
+>> > +
+>> > +...
+>> > diff --git a/MAINTAINERS b/MAINTAINERS
+>> > index 02a3192195af..66b51f43d196 100644
+>> > --- a/MAINTAINERS
+>> > +++ b/MAINTAINERS
+>> > @@ -21481,6 +21481,11 @@ S:	Maintained
+>> >  F:	Documentation/devicetree/bindings/iio/adc/ti,lmp92064.yaml
+>> >  F:	drivers/iio/adc/ti-lmp92064.c
+>> >  
+>> > +TI MEMORY CYCLIC REDUNDANCY CHECK (MCRC64) DRIVER
+>> > +M:	Kamlesh Gurudasani <kamlesh@ti.com>
+>> > +S:	Maintained
+>> > +F:	Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
+>> > +
+>> >  TI PCM3060 ASoC CODEC DRIVER
+>> >  M:	Kirill Marinushkin <kmarinushkin@birdec.com>
+>> >  L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
+>> > 
+>> > -- 
+>> > 2.34.1
+>> > 
