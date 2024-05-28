@@ -1,90 +1,141 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8A61E880;
-	Mon, 27 May 2024 22:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E80C17E8E4;
+	Tue, 28 May 2024 03:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716850767; cv=none; b=pWKfqJB/RT2Yeib8wUb7/MqzLFPLEsiFkTWEd5qquHYRKVVv8Hfsi+MjexZn1HDLDbIj1uLCPsG1XE8MY9i4emItmgRLUDqsHJLAyiakqrrLdKcXUUm5ZMYXaaKmGiiOOgOsrgMluiR/HqbB5frVYXbUl2IhW5H48l9kwl7I36w=
+	t=1716868305; cv=none; b=RyMSzroET6fzmTcA/V4XATst7ojoB+XlrtQ1cr1xHsvnZux/4u9QtoohmG72XgIJm2s0qkLDc7V//lBSvjXzthdzKRC4TQMiL3W8AUQzsgzMod2iGHmfpVMaS2qdnw0VLyfM/cu80Eo5oGBkYMxD8q11HAH4puUzQGeKU6W+XtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716850767; c=relaxed/simple;
-	bh=VKCgZlWSHFibD4oSASuBd0h+q3F3oLe5CbcNtavGaIE=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=k+4+Cs/hqLAAxhcBVCEiDZHq2HKj9NKq8Gxoi2QMVLJcc807f6T80wIEYgeNn2nrxdgO7r91EOEFKfjopdV2AukVylV0klC0ib1QydZEFGmF9f194l2hivwSK7GKYpscN0EEXgKsHPhVYdQjnpkom4alI/LZ4cmDqAx76rcQICU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tEWdmpAO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716868305; c=relaxed/simple;
+	bh=+iPQMa+6kqA2ZUh+VMv82Bt86ZQQJcbmF1UL0D12zgU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FkO1wzhnIOdMWOIj9uhnXnR85bcABIIwyyC7FNkeSmMKk3uSoPCt8SQdgeOVCtUHL4/HbCq/u6Ao3/8TSetua3wEhHBlW8reHrq+2PkGx+H/3zHqRMOey9S8G+w/HXuLqTZs4B0kGKAVB2x9RkUwgLd9UKQlw2G+t96L4/xv6+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OwEjQoXw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tEWdmpAO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A792C2BBFC;
-	Mon, 27 May 2024 22:59:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OwEjQoXw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75B02C32782;
+	Tue, 28 May 2024 03:51:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716850766;
-	bh=VKCgZlWSHFibD4oSASuBd0h+q3F3oLe5CbcNtavGaIE=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=tEWdmpAOnHMRsfcTZWnwmQSqLUOl+odU30epMpZP9ayt36mnpySkQJjkHnw1uY+hJ
-	 yhQnfhsJp7Th9k5hHHfFxeHnbWED6Rpe7v8dAsqlhvTMdIsVZmvC8XHa2pnFThgJ/Q
-	 lar2owTF/wlSJ9h4+fl7YO/dxOxjMKjM6YQRfJAvWzgmGdHylHW22XOvZICkQ4UO9C
-	 KPINJJmYi78WePaUfqmPnJbV/BN0NbKaAfKBvM3u4sbx6dLiKw/rYSuedG0nAOoa8T
-	 n1CKxFH7LdTmoWCYEjsxtCbr4Waof88mmIvjCAtHj04qT6vKr76bZmvxZ+TGVfA4YU
-	 Ppia4Eh5+E7sA==
+	s=k20201202; t=1716868305;
+	bh=+iPQMa+6kqA2ZUh+VMv82Bt86ZQQJcbmF1UL0D12zgU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OwEjQoXw8tUNKXnC6ZHQXCqX15EaRAtYAcoyxmOHwE+25AQxtLCGQ/b2GmgrUPG29
+	 C48jRJw3bNve++wTLpFcP56mLnhBAxHp30Zaq7dben+j9+x/WGHSDRRImd4lOpk/CZ
+	 kDHnOpkzjbFubaLMTAxQEUDjaHdwx9vJ64mVcx8N+NRJmee93eveQJ2jkm0MI2Nykb
+	 +++vmfkmJpuyTjjy2RjIP290suV7aY7UMaB9aWOFH+DzQTcitQkam8jD4lM6cO0X2L
+	 c4BPb+ba+MEiRWD+Xyzyxk7y5SLk/ETzu0xIRaneb4Dr4Do4XgmP4nqHKOcAlsf+rH
+	 HsMhf1/mwMNuQ==
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-integrity@vger.kernel.org,
+	keyrings@vger.kernel.org,
+	Andreas.Fuchs@infineon.com,
+	James Prestwood <prestwoj@gmail.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	linux-crypto@vger.kernel.org,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v6 0/6] KEYS: asymmetric: tpm2_key_{rsa,ecdsa}
+Date: Tue, 28 May 2024 06:51:15 +0300
+Message-ID: <20240528035136.11464-1-jarkko@kernel.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 28 May 2024 01:59:23 +0300
-Message-Id: <D1KSSWD7FA94.5705Z3J7LKZA@kernel.org>
-Cc: <linux-crypto@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
- "Stefan Berger" <stefanb@linux.ibm.com>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: ecdsa: Fix the public key format description
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Jarkko Sakkinen" <jarkko@kernel.org>, "Herbert Xu"
- <herbert@gondor.apana.org.au>
-X-Mailer: aerc 0.17.0
-References: <20240527202840.4818-1-jarkko@kernel.org>
- <D1KQDPOZRWCW.1763CCYF1B84X@kernel.org>
- <D1KRILI1KRQ8.2CNPU7PFES0VI@kernel.org>
- <D1KRXI87G4S0.1ROKTQENIZHT7@kernel.org>
- <D1KS7LCALKD4.1J13QGYGZ6LBW@kernel.org>
- <D1KSLKGUWGFO.21T4OBXQQ88D@kernel.org>
-In-Reply-To: <D1KSLKGUWGFO.21T4OBXQQ88D@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue May 28, 2024 at 1:49 AM EEST, Jarkko Sakkinen wrote:
-> On Tue May 28, 2024 at 1:31 AM EEST, Jarkko Sakkinen wrote:
-> > >         ret =3D crypto_akcipher_set_pub_key(tfm, data, 3 * x_size + 1=
-);
->
-> Noticed this mistake i.e. fixed it with "2 * x_size + 1"
->
-> This is results earlier failure:
->
-> ecdsa: (tpm2_key_ecdsa_query+0x10d/0x170 <- ecdsa_set_pub_key) arg1=3D0xf=
-fffffea
->
-> Totally lost with the expected input format after trying out various=20
-> options.
+Testing
+=======
 
-OK got it working with:
+RSA
+---
 
-        ptr =3D &data[0];
-        *ptr++ =3D 0x04; /* uncompressed */
-        memcpy(&ptr[0], &x[2], x_size);
-        memcpy(&ptr[x_size], &x[2 + x_size + 2], x_size);
-        ret =3D crypto_akcipher_set_pub_key(tfm, data, 2 * x_size + 1);
-        crypto_free_akcipher(tfm);
+tpm2_createprimary --hierarchy o -G rsa2048 -c owner.txt
+tpm2_evictcontrol -c owner.txt 0x81000001
+tpm2_getcap handles-persistent
+openssl genrsa -out private.pem 2048
+tpm2_import -C 0x81000001 -G rsa -i private.pem -u key.pub -r key.priv
+tpm2_encodeobject -C 0x81000001 -u key.pub -r key.priv -o key.priv.pem
+openssl asn1parse -inform pem -in key.priv.pem -noout -out key.priv.der
+serial=`cat key.priv.der | keyctl padd asymmetric tpm @u`
+echo "abcdefg" > plaintext.txt
+keyctl pkey_encrypt $serial 0 plaintext.txt enc=pkcs1 > encrypted.dat
+keyctl pkey_decrypt $serial 0 encrypted.dat enc=pkcs1 > decrypted.dat
+keyctl pkey_sign $serial 0 plaintext.txt enc=pkcs1 hash=sha256 > signed.dat
+keyctl pkey_verify $serial 0 plaintext.txt signed.dat enc=pkcs1 hash=sha256
 
-Had still a few "off-bys".
+ECDSA
+-----
 
-Makes me wonder why this is not in ASN.1.
-E.g. TPM2 stuff and for instance RSA code takes ASN.1.
+tpm2_createprimary --hierarchy o -G ecc -c owner.txt
+tpm2_evictcontrol -c owner.txt 0x81000001
+openssl ecparam -name prime256v1 -genkey -noout -out private.pem
+tpm2_import -C 0x81000001 -G ecc -i private.pem -u key.pub -r key.priv
+tpm2_encodeobject -C 0x81000001 -u key.pub -r key.priv -o key.priv.pem
+openssl asn1parse -inform pem -in key.priv.pem -noout -out key.priv.der
+serial=`cat key.priv.der | keyctl padd asymmetric tpm @u`
+echo "abcdefg" > plaintext.txt
+keyctl pkey_sign $serial 0 plaintext.txt hash=sha256 > signed.dat
+keyctl pkey_verify $serial 0 plaintext.txt signed.dat hash=sha256
 
-This all and the required prefix byte really should be explained in
-the documentation of this function. I.e. follows the RFC in the sense
-that number is big-endian and has the prefix byte, but it does not
-follow it in the sense that x and y are not in input octect strings.
+Open Issues
+===========
 
-Why is that? Does not feel right intuitively.
+* When verifying ECDSA signature, _ecdsa_verify() returns -EKEYREJECTED.
 
-BR, Jarkko
+References
+==========
+
+* v5: https://lore.kernel.org/linux-integrity/20240523212515.4875-1-jarkko@kernel.org/
+* v4: https://lore.kernel.org/linux-integrity/20240522005252.17841-1-jarkko@kernel.org/
+* v3: https://lore.kernel.org/linux-integrity/20240521152659.26438-1-jarkko@kernel.org/
+* v2: https://lore.kernel.org/linux-integrity/336755.1716327854@warthog.procyon.org.uk/
+* v1: https://lore.kernel.org/linux-integrity/20240520184727.22038-1-jarkko@kernel.org/
+* Derived from https://lore.kernel.org/all/20200518172704.29608-1-prestwoj@gmail.com/
+
+Jarkko Sakkinen (6):
+  tpm: Open code tpm_buf_parameters()
+  crypto: rsa-pkcs1pad: export rsa1_asn_lookup()
+  KEYS: trusted: Change -EINVAL to -E2BIG
+  crypto: tpm2_key: Introduce a TPM2 key type
+  keys: asymmetric: Add tpm2_key_rsa
+  keys: asymmetric: Add tpm2_key_ecdsa
+
+ crypto/Kconfig                            |   7 +
+ crypto/Makefile                           |   6 +
+ crypto/asymmetric_keys/Kconfig            |  30 +
+ crypto/asymmetric_keys/Makefile           |   2 +
+ crypto/asymmetric_keys/tpm2_key_ecdsa.c   | 441 ++++++++++++++
+ crypto/asymmetric_keys/tpm2_key_rsa.c     | 678 ++++++++++++++++++++++
+ crypto/ecdsa.c                            |   1 -
+ crypto/rsa-pkcs1pad.c                     |  16 +-
+ crypto/tpm2_key.asn1                      |  11 +
+ crypto/tpm2_key.c                         | 134 +++++
+ drivers/char/tpm/tpm-buf.c                |  26 -
+ drivers/char/tpm/tpm2-cmd.c               |  10 +-
+ include/crypto/rsa-pkcs1pad.h             |  20 +
+ include/crypto/tpm2_key.h                 |  46 ++
+ include/linux/tpm.h                       |  10 +-
+ security/keys/trusted-keys/Kconfig        |   2 +-
+ security/keys/trusted-keys/Makefile       |   2 -
+ security/keys/trusted-keys/tpm2key.asn1   |  11 -
+ security/keys/trusted-keys/trusted_tpm2.c | 141 +----
+ 19 files changed, 1433 insertions(+), 161 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/tpm2_key_ecdsa.c
+ create mode 100644 crypto/asymmetric_keys/tpm2_key_rsa.c
+ create mode 100644 crypto/tpm2_key.asn1
+ create mode 100644 crypto/tpm2_key.c
+ create mode 100644 include/crypto/rsa-pkcs1pad.h
+ create mode 100644 include/crypto/tpm2_key.h
+ delete mode 100644 security/keys/trusted-keys/tpm2key.asn1
+
+-- 
+2.45.1
+
