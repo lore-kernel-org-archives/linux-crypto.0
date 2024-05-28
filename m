@@ -1,117 +1,66 @@
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9161D16F287;
-	Tue, 28 May 2024 14:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8718B107A0;
+	Tue, 28 May 2024 14:46:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716905314; cv=none; b=IeZN2rTtCYIDW7L1gzd5W/eJLWkLjXFrBDDwvJ2KC3act7Py8Q+55c3DCwioGwkpiq8Tm18bFMoQcMz1SI+w+8si6NeXOcOk7rZ+ZrCSuEnzey29wYE77ye3QlVzcKEC7sE+sY3W9urUYN0fyhccPuy1bFt/DNyxZ+T6bdFI/BQ=
+	t=1716907609; cv=none; b=LujmyeoC2PddgifHKgHacNoqITN9wr7q5R2FNTFXOIZvVDZgQ+EsPPwcqdpHWvTcXB6fu1+BBYOvzabyw3V/eLjNbNaJeb3mq1mYfQih1RjhznkiuU2BeP2wewAGwAiOA8ybXX0HgZP+lB8OX8aks5n2N8So1aXf+THkftAiLGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716905314; c=relaxed/simple;
-	bh=0kYRkuoifz238hYaa7+VBTksrIRPb0Qrje3MA74G5/Q=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WEOy97NY6KGIVwo1rh83q8pS1xtw5LxIzfFWTcta28Zylh12wT85ECcRXchSQgckHZSkuWkqpS0RnaPuEiRDJW74Y2oGMyqXhP2a3sS/6IvolWoXR2fyyv0MJYwMKzwR1qSNMIVvsfRzl09pEOmzKMTCIvMO/7J+JnBCSZjQO2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=iMdtq39P; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+	s=arc-20240116; t=1716907609; c=relaxed/simple;
+	bh=wtEh5/u99fENnJNQrllCw9vLyimy2XrBJkj9B+2w+vU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cxa//st+QbtZ8He6e4KQX0mRpj2Dd6lQqvNiIzWKQmhe+GKP+AQmYX5KVENZ9pzuDRQeBsGBENyiFEDEtJkfB/h6lx+NbAqEZG5nnxYuf3luk3cWSnXnxdgBAjKUKHEhtX7lrLIsT9pdfREgILJI51F9ePjrsXJpZ8GVC7+zadc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=G+uDRZb2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="iMdtq39P"
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44SDhLnC025707;
-	Tue, 28 May 2024 16:08:05 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	WID1Xn8lAVeZgvgjfAvIZ5toir+39YNbyOYV1Sn5tIE=; b=iMdtq39PTNMpN5q0
-	qF5bJ4MgHOGVhw1mZ69E37DDykQPYq78VRyRC8xOcDTIiHo8t1p5l7oZahTlfk0f
-	62z7DDATzMDcsBvM9BD7OGFShvez3iYvQr5XabiKWFIxf1f0351qZxdZyFDmvnxd
-	GoPFlJ3hA3qQASc8S351Qr8UAwzmTx6IN8L35oG2mTJ8HBYVxzGT1rhCD04nT8Q3
-	Un5yiNA+05t0WBvnKJiWdURvtWfMNoYRiQhfDHpDPnRX1HTJLWWgH8tk29MRAEMF
-	ZUoMTJzQW5S2qMI0c3XwQT+lqG3Z0Ree23XiH4o8uAVgvMLxRZfRL4i2crNBTggv
-	eKlDiQ==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yb9yjuyq7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 May 2024 16:08:05 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 9A0824004B;
-	Tue, 28 May 2024 16:08:01 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node3.st.com [10.75.129.71])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id D470621BF47;
-	Tue, 28 May 2024 16:07:23 +0200 (CEST)
-Received: from localhost (10.48.86.103) by SHFDAG1NODE3.st.com (10.75.129.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 28 May
- 2024 16:07:23 +0200
-From: Maxime MERE <maxime.mere@foss.st.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>
-CC: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-        Rob
- Herring <robh@kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Maxime=20M=C3=A9r=C3=A9?= <maxime.mere@foss.st.com>
-Subject: [PATCH v3 4/4] crypto: stm32/cryp - call finalize with bh disabled
-Date: Tue, 28 May 2024 16:05:48 +0200
-Message-ID: <20240528140548.1632562-5-maxime.mere@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240528140548.1632562-1-maxime.mere@foss.st.com>
-References: <20240528140548.1632562-1-maxime.mere@foss.st.com>
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="G+uDRZb2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B91ECC3277B;
+	Tue, 28 May 2024 14:46:47 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="G+uDRZb2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1716907605;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W2k0ho4MdAkAbxz9sCr1vHlo4/ijHUp83UPCQgr4Fu4=;
+	b=G+uDRZb280nWJknXkoFHDEKOAqThGHcsdPJF44P2i797gyiiegPyz6dQaj2Sor1BKuUe8+
+	Qe36ym2cXQ2CzkjOD7ehtrwjoQyPDPd8EQ+SLTuf68hdRjhFM4aBEWUXTGegvdkk3bn52P
+	pCKAFh4+0JtjehXmdZaf7MBLI3/oPdA=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ece78ccd (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 28 May 2024 14:46:45 +0000 (UTC)
+Date: Tue, 28 May 2024 16:46:41 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+	tglx@linutronix.de
+Cc: linux-crypto@vger.kernel.org, linux-api@vger.kernel.org, x86@kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jann Horn <jannh@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>
+Subject: Re: [PATCH v16 0/5] implement getrandom() in vDSO
+Message-ID: <ZlXuUdPM6Fkik_cy@zx2c4.com>
+References: <20240528122352.2485958-1-Jason@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE3.st.com
- (10.75.129.71)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-28_10,2024-05-28_01,2024-05-17_01
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240528122352.2485958-1-Jason@zx2c4.com>
 
-From: Maxime Méré <maxime.mere@foss.st.com>
+I've rebased Adhemerval's glibc patches for this and put them here:
 
-The finalize operation in interrupt mode produce a produces a spinlock
-recursion warning. The reason is the fact that BH must be disabled
-during this process.
+    https://git.zx2c4.com/glibc/log/?h=vdso
 
-Signed-off-by: Maxime Méré <maxime.mere@foss.st.com>
----
- drivers/crypto/stm32/stm32-cryp.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+If you're running systemd, you may want to whitelist the syscall in
+order to make use of it:
 
-diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
-index 445276b848ed..937f6dab8955 100644
---- a/drivers/crypto/stm32/stm32-cryp.c
-+++ b/drivers/crypto/stm32/stm32-cryp.c
-@@ -11,6 +11,7 @@
- #include <crypto/internal/des.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
-+#include <linux/bottom_half.h>
- #include <linux/clk.h>
- #include <linux/delay.h>
- #include <linux/dma-mapping.h>
-@@ -2203,8 +2204,11 @@ static irqreturn_t stm32_cryp_irq_thread(int irq, void *arg)
- 		it_mask &= ~IMSCR_OUT;
- 	stm32_cryp_write(cryp, cryp->caps->imsc, it_mask);
- 
--	if (!cryp->payload_in && !cryp->header_in && !cryp->payload_out)
-+	if (!cryp->payload_in && !cryp->header_in && !cryp->payload_out) {
-+		local_bh_disable();
- 		stm32_cryp_finish_req(cryp, 0);
-+		local_bh_enable();
-+	}
- 
- 	return IRQ_HANDLED;
- }
--- 
-2.25.1
-
+    https://github.com/seccomp/libseccomp/pull/395
+    https://github.com/systemd/systemd/pull/25519
