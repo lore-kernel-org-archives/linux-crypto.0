@@ -1,85 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE4E1DFDE;
-	Tue, 28 May 2024 13:29:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0AC1DFDE;
+	Tue, 28 May 2024 13:29:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716902947; cv=none; b=dFbU/CsdpgVsDjezpXmc85V8NEjr2El3yEczfuhpCpQWPUb2mkvETSN4oUbvZBoKMtuYlG4PkNkRsi2dkDoTcmJ+NOGIG304SrV23Lo9dg+rmdUwyK31pUjTvC7dQx+/dlFefQ8dUBCTWyeHogBzoGsL8ll2Qf72W+oEU/HUpjw=
+	t=1716902955; cv=none; b=nWYDf1wMvbzqg1dt6QvwM0ywhv2jVWijEEPBPqvTuBzwQE3KORyvUzGImOLAunCDGw8E7rObIamHlSdT8Ypqe8Mig6REGpSTXwSVERVjDrTpro3/6nIrPiCABdswLftdSEPGOng9Z0S1mcWOKnSPzFf2BXI59aKcK9ChKGIe24E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716902947; c=relaxed/simple;
-	bh=xyyTmTzN9d8hqo9iRE/ESmgFIUN4LB9umMa2nCS2waI=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=F2PNTq0e9jfrXsytJRrAF8iN/7bX8xFfCZ8RNvFSeIpUmD3ymm1TaqvZ0B+URJ9kW2jQdYgFjPh2sgIprXRibTtUdiM8yAXZ47s7MxoKhR09QlrWiezPvZ2UI7UHb3xVOU8n1z/dULyAnPyb9M0dv301nrzVG7OvTcWQGMRgEyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H3IC5dJR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716902955; c=relaxed/simple;
+	bh=qF8RnWFXhFZYrpN4r/EMJVCuG3JWWMLwa2UIkxtk+Iw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FrC7NcgTfSuCqXZvYRplbeLiFeoTnUzUjI/5t9zie4PtqvdO/X1ws6VyJy6gJd8M/tdvZaZLnO7jzohzQEM3Jgnll3l2S+Yde2N7e3xWVpIniszTqWBv3AgqNtgs/lj3ATWeoYREIieklwxahxaRjUchm/sH0iBieUtD/+OWjOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=MrQRKMFJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H3IC5dJR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7143BC3277B;
-	Tue, 28 May 2024 13:29:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716902946;
-	bh=xyyTmTzN9d8hqo9iRE/ESmgFIUN4LB9umMa2nCS2waI=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=H3IC5dJRl7xG89iDpASrt8tZba/beNU9g20FeAZl2g/h0uH/mKw9uPEYDp37YBLQ8
-	 uHU9vl7Ou4ioTe0i2hq1xTz2WZ3rRXbyelwyvS9HxMftlXDkpwaM6Zwa3segTW6IU2
-	 YQ8m4cBvkljr5eFAVfeEuA0y4CKrdma+12FNxhFSAjldN5HnM3mOhYecpZwHCAZiJ9
-	 cN/5JZsLtPVDyT9p5vZaxAX3C/9ryOZUsqyG4ksR57pFiBtyhtK1byVx0eAdSG8VZQ
-	 9hXPyYtz0YO9uQO4fWwVXB5xA6KHbq/OUOpnKv4AVm/rIj0UEVBlbYUHxEJZgsTbSX
-	 HnmVMh5IiRMNQ==
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="MrQRKMFJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0773DC3277B;
+	Tue, 28 May 2024 13:29:14 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="MrQRKMFJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1716902952;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qF8RnWFXhFZYrpN4r/EMJVCuG3JWWMLwa2UIkxtk+Iw=;
+	b=MrQRKMFJRoPe7FaF1hwpXUpz8Wl1U3UURMQYo9raXoTDEElrhOjCuYlsvf1U2GniA03dS1
+	cxcV19Chtvf0JItex26FD2frelCtorK8yBvMCtlbr9wfohVeJGkuUVLtAuA9TTJliGEN8Z
+	ZwPsd6EdBc302g0GdUfeEPxhuK/pZrI=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b73c4cbe (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 28 May 2024 13:29:12 +0000 (UTC)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-62a0894f1d3so27116817b3.1;
+        Tue, 28 May 2024 06:29:12 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWFl3woW2c7Ih1TEJCC9c4F1uDRz66L2L17KvgrHYjOXLwL67rqXs2OzINYXlUyfbn17BXS8bHlGpCwotiKW7CX7alZ3x+oL46WZR2Vu8j5gpmfhVRZZFn9VrkZcUFfP4DXnljhJjCY
+X-Gm-Message-State: AOJu0YzhGnp9/shXDKknJ6kabHpl71svZCyvV3K6SNLkdSQFg8hxfV1B
+	br6VIQuXUy1k9+vcPpWCFBm1cCo+A9H/fj1ZFXGzmbFOrFc+SiKMZo39yg4NkX5fJ/NhTu+iKDR
+	gji0DWOO1/imZzD+gdlG+lIUD/XU=
+X-Google-Smtp-Source: AGHT+IHs6YBGoJ22NizKEKgOAKHK5/PNDLyO/dJ25AG6/sBkCYeWtGE+E0FHaHhy2teOdk1tDqQwANej6Z1AgU51ejE=
+X-Received: by 2002:a05:690c:6e07:b0:622:f7df:aa0a with SMTP id
+ 00721157ae682-6283496bccemr108435947b3.22.1716902950948; Tue, 28 May 2024
+ 06:29:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20240528122352.2485958-1-Jason@zx2c4.com> <20240528122352.2485958-4-Jason@zx2c4.com>
+ <CAMuHMdVJ8KpaqnWeHCMbJdf-Am6uY0N+uFM+OVxWTZH37TQvxw@mail.gmail.com> <ZlXX0cFl5RANHNOQ@zx2c4.com>
+In-Reply-To: <ZlXX0cFl5RANHNOQ@zx2c4.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Tue, 28 May 2024 15:28:58 +0200
+X-Gmail-Original-Message-ID: <CAHmME9qZ2Xm68HQqfOmasWRoaW4xfAFAiLfw-pFbhq2i0rHz=w@mail.gmail.com>
+Message-ID: <CAHmME9qZ2Xm68HQqfOmasWRoaW4xfAFAiLfw-pFbhq2i0rHz=w@mail.gmail.com>
+Subject: Re: [PATCH v16 3/5] arch: allocate vgetrandom_alloc() syscall number
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev, tglx@linutronix.de, 
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org, x86@kernel.org, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>, "Carlos O'Donell" <carlos@redhat.com>, 
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>, 
+	Christian Brauner <brauner@kernel.org>, David Hildenbrand <dhildenb@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 28 May 2024 16:29:03 +0300
-Message-Id: <D1LBARSTFSFC.1DQSHTGGDL0C6@kernel.org>
-Cc: <linux-crypto@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: ecdsa: Fix the public key format description
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Jarkko Sakkinen" <jarkko@kernel.org>, "Stefan Berger"
- <stefanb@linux.ibm.com>, "Herbert Xu" <herbert@gondor.apana.org.au>
-X-Mailer: aerc 0.17.0
-References: <20240527202840.4818-1-jarkko@kernel.org>
- <D1KQDPOZRWCW.1763CCYF1B84X@kernel.org>
- <D1KRILI1KRQ8.2CNPU7PFES0VI@kernel.org>
- <D1KRXI87G4S0.1ROKTQENIZHT7@kernel.org>
- <D1KS7LCALKD4.1J13QGYGZ6LBW@kernel.org>
- <D1KSLKGUWGFO.21T4OBXQQ88D@kernel.org>
- <D1KSSWD7FA94.5705Z3J7LKZA@kernel.org>
- <b5ff9003-065f-437f-bf6b-7f1ae0a0364a@linux.ibm.com>
- <D1LB8PVCTP1S.JDCEWNODTGTQ@kernel.org>
-In-Reply-To: <D1LB8PVCTP1S.JDCEWNODTGTQ@kernel.org>
 
-On Tue May 28, 2024 at 4:26 PM EEST, Jarkko Sakkinen wrote:
-> On Tue May 28, 2024 at 3:37 PM EEST, Stefan Berger wrote:
-> >      Signature Value:
-> >          30:45:02:21:00:d9:d7:64:ba:5d:03:07:ee:20:a0:12:16:46:
-> >          31:e6:8e:66:0c:17:0d:74:07:87:58:5a:13:fc:14:62:98:9a:
-> >          99:02:20:59:ff:29:9c:52:b9:0a:35:3c:4b:03:bb:47:0e:c8:
-> >          3e:2d:cb:3e:1c:d3:51:88:91:b1:40:e3:03:86:1b:2a:e8
+On Tue, May 28, 2024 at 3:10=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com=
+> wrote:
+>
+> On Tue, May 28, 2024 at 03:08:00PM +0200, Geert Uytterhoeven wrote:
+> > Hi Jason,
 > >
-> > 30:45 =3D> sequence containing 69 bytes
-> >    02:21: =3D> first coordinate with 0x21 bytes
-> >      00:d9 =3D> 0x21 bytes of ASN.1 integer with leading 0 to make the=
-=20
-> > following 0x20-byte integer a positive number (its most significant bit=
-=20
-> > is set).
-> >    02:20: =3D> int with 0x20 bytes
-> >     ...
+> > On Tue, May 28, 2024 at 2:24=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4=
+.com> wrote:
+> > > Add vgetrandom_alloc() as syscall 462 (or 572 on alpha) by adding it =
+to
+> > > all of the various syscall.tbl and unistd.h files.
+> > >
+> > > Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> > > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> >
+> > As of commit ff388fe5c481d39c ("mseal: wire up mseal syscall") in
+> > v6.10-rc1, 462 is already taken.
+> >
+> > v17 ++ ;-)
 >
-> This actually helped me located the bug in my code: I had 32 bytes for
-> the first one, with no leading zero. I.e. total length was off-by-one.
->
-> So I'll just extend either or both based on msb?=20
+> Oy! Thanks. I should have thought to rebase on rc1 anyway before posting
+> this.
 
-Actually I use a patch that I made for early version:
-
-https://lore.kernel.org/linux-integrity/20240521152659.26438-3-jarkko@kerne=
-l.org/
-
-BR, Jarkko
+Sorted in https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git/l=
+og/?h=3Dvdso
+for the time being.
