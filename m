@@ -1,164 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5DC1396;
-	Tue, 28 May 2024 04:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6313B139D11
+	for <linux-crypto@vger.kernel.org>; Tue, 28 May 2024 10:39:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716868929; cv=none; b=uYUOpb4xqEy2vaSWXX3E268k6fKnzV6V14AYs5xOWPuAdZZnvgjjOMyArcTy/MhY+R412sTpbdbB5D+/p/5JVOvCqzN1jRtEZHhGPQ98QYPboPz9hLQ6Q3+r5uBpEs0MGSsU6yB3PHyMDquglrDelKcaOnb6eZJ74YazM/i8UfQ=
+	t=1716892793; cv=none; b=rWmbH6Ie0bixg45bjKAPankGXNjcfGGfL1PZqRW2bCf1zDQffZKj1lSRURr668WDgp7zvYUeqCwGomg9GKk3YbLXEC3wGzhJJk3jmF5LOPnw1FdbKBRAjVMczXf2txWfjeFzpyTYHgaN6ygJzt6gLjVIwxSY17XIGT8STYx0fYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716868929; c=relaxed/simple;
-	bh=RnmsPifvhNThYUMsbWs/uvFbuRDTORijhZ2xFj033o4=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=hWiOBUd5Gn2RiA5ty4w2Sfq78lEIYW8fVbm9FNK+ufoOfvy104wvSbZXs+1GVjzvDFrJLuIaxnlnh7GK1fhb5B+yRV0Ml75PQmtaQtr5OXhEnonyXEDuOBVq0iPseupQFjS+2kji0u3I+7VJyCC8LU2+KeqfYwZUCd1JDhqtF0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hStZr+Ev; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716892793; c=relaxed/simple;
+	bh=aj45SEB7D9ldygzhYKXe3HytaBUsioM0atiT5UJiPD4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kmNqeq3xrMmJp+eIN0EnJtbSxwSfpRHq4zz9qHOE/S/iWjejvVFpgZHGFOFwzM3tVcny82IJVcymfvRZvSokt7DLEJjuea1zmICUMQ+GBlF240LK6Q1E0VUONclbd4ZprVleopsjjPE+3Oh6e5MYtyf5PmAwJqiTunXhswQ3EuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FgXHIgvp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hStZr+Ev"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BF11C3277B;
-	Tue, 28 May 2024 04:02:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716868928;
-	bh=RnmsPifvhNThYUMsbWs/uvFbuRDTORijhZ2xFj033o4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hStZr+EvKvrKdaz9HlELdlcMdbldtuZUfL9PnHRKWQRaMvEEk4a4Kbs84E1S+kX2M
-	 dSLWmRSiOjLxhkQh0NdILB3C0rLsBblV9D2HH9z3xBww/NNAZHO+WhReJkRPVL8LAC
-	 GYtzA4ono5iDj2l56H4dBwzDpekNHzs+naerF3wfFRb/Vh7m6yPi3iDu0yM64hiQ9V
-	 Ju7SH7jNKlpl6oQFmYqxYDohQrtxzG/Ea9e+MSN0fqy5vQ55nhH+icA19zNFAoo6Sc
-	 O44IBSN6sSF0m87wY223RIKBkSTlcV/0rhy4ZcPM/wOn90i8x5Nh1ivID3r99fWPTa
-	 sc/SqSWKJmFJQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FgXHIgvp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716892791;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cWr5rLzhCiKZuwW7h7YBmazKG48r0xrDo/cGy6it0/4=;
+	b=FgXHIgvpyvHDZWIsSmKyDS3a9nnCVwIQFMXRIVQqjjKEhoNRYWMQKgYaRmdfMenuTYNG9V
+	87/GUy1r/gI2fRU0fi8NxSz3yXYiW/YJOLiB2LCrVjIckVxrO7JWKFipLZp4av+ZCOzAzA
+	Pxj9pnrcXKkUNTS/avqyaJNhzZp7WS4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-500-bmyf1V-WNES0PrDqPYx3Zw-1; Tue, 28 May 2024 06:39:50 -0400
+X-MC-Unique: bmyf1V-WNES0PrDqPYx3Zw-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-354f28306dfso508649f8f.0
+        for <linux-crypto@vger.kernel.org>; Tue, 28 May 2024 03:39:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716892789; x=1717497589;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cWr5rLzhCiKZuwW7h7YBmazKG48r0xrDo/cGy6it0/4=;
+        b=xS76lyeVbxjzZg1j4lfrVLJg5wu1TfRKvNeo/yTSyhrJkjSMOPn1cp7bxU6aWGQM4S
+         pLmvfFaLEMBfZ1p8pyqTbEG1H2pA5Iw+TqWT0mO1O4c6+Kke/gbvT0IvzhORwJjB1T8O
+         SdRSIAQBKHjOgDZyXS4gTBPCxc1b/RFtntgY/eUfqzx4a4ukaarCs3gL1SAgQT+Lk8ns
+         a+Tc1LpKm9tCtl7g5F0cOAEHoabJngg4fkLjiWqur/xJpwgW6mskUIQpSwmJHlk7zre3
+         JrY43bbufaVXxhnwvmCG7L+QeNR1rFRziT45MF/jp9k+rkpAjbcrGoYBsu7FsB120nHo
+         XguQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX/YwlnHgfLC9RkCXS3ZmfZOqAJjZMnoESazocO6VZGIiaqZ9gOLxaoRjqnvKXJ/Bx6elJ+TtGlmuilBiVU5bodO9C7RWbfLv8H0fRk
+X-Gm-Message-State: AOJu0Yy3+zf2VRg6Wpl3wyIXYUs1YhhvlrXvf5rNEfJhX322uyYyS+f4
+	FGHsFyW2QC5UsaxQdJDAXyjvomQeAsamehWqBRAwiMlCPa89t3G4FoasNiUGYj9jr4v5DTX2qNE
+	fCBcL+y9C7OTySjDhN4Z+M5MckJ3ILTt8+ffR6H6qpKz2U1b2MKxtuZLw3sO68uEghaK8CC+kmD
+	LoqFJfPg3emM4X1AtC8R5fdfT7VpJVQ7WLo/5a
+X-Received: by 2002:adf:f605:0:b0:351:d78e:875e with SMTP id ffacd0b85a97d-35526c271e2mr7836473f8f.14.1716892788871;
+        Tue, 28 May 2024 03:39:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG4hqokdTCBlYq+yxpXGdOajfvNiw6vsJ+NmirTpEeZTh+x8A7CTg2keuO9ed6PBfJTW5YEfW34ZoQ5qL3Gp5w=
+X-Received: by 2002:adf:f605:0:b0:351:d78e:875e with SMTP id
+ ffacd0b85a97d-35526c271e2mr7836445f8f.14.1716892788425; Tue, 28 May 2024
+ 03:39:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240501085210.2213060-10-michael.roth@amd.com> <84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
+ <CABgObfaXmMUYHEuK+D+2E9pybKMJqGZsKB033X1aOSQHSEqqVA@mail.gmail.com>
+ <7d6a4320-89f5-48ce-95ff-54b00e7e9597@linux.intel.com> <rczrxq3lhqguarwh4cwxwa35j5riiagbilcw32oaxd7aqpyaq7@6bqrqn6ontba>
+ <7da9c4a3-8597-44aa-a7ad-cc2bd2a85024@linux.intel.com>
+In-Reply-To: <7da9c4a3-8597-44aa-a7ad-cc2bd2a85024@linux.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 28 May 2024 12:39:36 +0200
+Message-ID: <CABgObfajCDkbDbK6-QyZABGTh=5rmE5q3ifvHfZD1A2Z+u0v3A@mail.gmail.com>
+Subject: Re: [PATCH v15 09/20] KVM: SEV: Add support to handle MSR based Page
+ State Change VMGEXIT
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+	seanjc@google.com, vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 28 May 2024 07:02:03 +0300
-Message-Id: <D1KZ8N1QY0QW.1ACMEKZL0IW0R@kernel.org>
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Jarkko Sakkinen" <jarkko@kernel.org>, "Herbert Xu"
- <herbert@gondor.apana.org.au>
-Cc: <linux-integrity@vger.kernel.org>, <keyrings@vger.kernel.org>,
- <Andreas.Fuchs@infineon.com>, "James Prestwood" <prestwoj@gmail.com>,
- "David Woodhouse" <dwmw2@infradead.org>, "Eric Biggers"
- <ebiggers@kernel.org>, "James Bottomley"
- <James.Bottomley@hansenpartnership.com>, <linux-crypto@vger.kernel.org>,
- "Stefan Berger" <stefanb@linux.ibm.com>, "David S. Miller"
- <davem@davemloft.net>, "open list" <linux-kernel@vger.kernel.org>, "Peter
- Huewe" <peterhuewe@gmx.de>, "Jason Gunthorpe" <jgg@ziepe.ca>, "James
- Bottomley" <James.Bottomley@HansenPartnership.com>, "Ard Biesheuvel"
- <ardb@kernel.org>, "Mario Limonciello" <mario.limonciello@amd.com>
-Subject: Re: [PATCH v6 1/6] tpm: Open code tpm_buf_parameters()
-X-Mailer: aerc 0.17.0
-References: <20240528035136.11464-1-jarkko@kernel.org>
- <20240528035136.11464-2-jarkko@kernel.org>
-In-Reply-To: <20240528035136.11464-2-jarkko@kernel.org>
 
-On Tue May 28, 2024 at 6:51 AM EEST, Jarkko Sakkinen wrote:
-> With only single call site, this makes zero sense (slipped out of the
-> radar during the review). Open code and document the action directly
-> to the site, to make it more readable.
+On Mon, May 27, 2024 at 2:26=E2=80=AFPM Binbin Wu <binbin.wu@linux.intel.co=
+m> wrote:
+> > It seems like TDX should be able to do something similar by limiting th=
+e
+> > size of each KVM_HC_MAP_GPA_RANGE to TDX_MAP_GPA_MAX_LEN, and then
+> > returning TDG_VP_VMCALL_RETRY to guest if the original size was greater
+> > than TDX_MAP_GPA_MAX_LEN. But at that point you're effectively done wit=
+h
+> > the entire request and can return to guest, so it actually seems a litt=
+le
+> > more straightforward than the SNP case above. E.g. TDX has a 1:1 mappin=
+g
+> > between TDG_VP_VMCALL_MAP_GPA and KVM_HC_MAP_GPA_RANGE events. (And eve=
+n
+> > similar names :))
+> >
+> > So doesn't seem like there's a good reason to expose any of these
+> > throttling details to userspace,
+
+I think userspace should never be worried about throttling. I would
+say it's up to the guest to split the GPA into multiple ranges, but
+that's not how arch/x86/coco/tdx/tdx.c is implemented so instead we
+can do the split in KVM instead. It can be a module parameter or VM
+attribute, establishing the size that will be processed in a single
+TDVMCALL.
+
+Paolo
+
 >
-> Fixes: 1b6d7f9eb150 ("tpm: add session encryption protection to tpm2_get_=
-random()")
-> Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
-> ---
->  drivers/char/tpm/tpm-buf.c  | 26 --------------------------
->  drivers/char/tpm/tpm2-cmd.c | 10 +++++++++-
->  include/linux/tpm.h         |  2 --
->  3 files changed, 9 insertions(+), 29 deletions(-)
+> The reasons I want to put the throttling in userspace are:
+> 1. Hardcode the TDX_MAP_GPA_MAX_LEN in kernel may not be preferred.
+> 2. The throttling thing doesn't need to be TDX specific, it can be
+> generic in userspace.
 >
-> diff --git a/drivers/char/tpm/tpm-buf.c b/drivers/char/tpm/tpm-buf.c
-> index 647c6ca92ac3..cad0048bcc3c 100644
-> --- a/drivers/char/tpm/tpm-buf.c
-> +++ b/drivers/char/tpm/tpm-buf.c
-> @@ -223,30 +223,4 @@ u32 tpm_buf_read_u32(struct tpm_buf *buf, off_t *off=
-set)
->  }
->  EXPORT_SYMBOL_GPL(tpm_buf_read_u32);
-> =20
-> -static u16 tpm_buf_tag(struct tpm_buf *buf)
-> -{
-> -	struct tpm_header *head =3D (struct tpm_header *)buf->data;
-> -
-> -	return be16_to_cpu(head->tag);
-> -}
-> -
-> -/**
-> - * tpm_buf_parameters - return the TPM response parameters area of the t=
-pm_buf
-> - * @buf: tpm_buf to use
-> - *
-> - * Where the parameters are located depends on the tag of a TPM
-> - * command (it's immediately after the header for TPM_ST_NO_SESSIONS
-> - * or 4 bytes after for TPM_ST_SESSIONS). Evaluate this and return a
-> - * pointer to the first byte of the parameters area.
-> - *
-> - * @return: pointer to parameters area
-> - */
-> -u8 *tpm_buf_parameters(struct tpm_buf *buf)
-> -{
-> -	int offset =3D TPM_HEADER_SIZE;
-> -
-> -	if (tpm_buf_tag(buf) =3D=3D TPM2_ST_SESSIONS)
-> -		offset +=3D 4;
-> =20
-> -	return &buf->data[offset];
-> -}
-> diff --git a/drivers/char/tpm/tpm2-cmd.c b/drivers/char/tpm/tpm2-cmd.c
-> index 0cdf892ec2a7..1e856259219e 100644
-> --- a/drivers/char/tpm/tpm2-cmd.c
-> +++ b/drivers/char/tpm/tpm2-cmd.c
-> @@ -281,6 +281,7 @@ struct tpm2_get_random_out {
->  int tpm2_get_random(struct tpm_chip *chip, u8 *dest, size_t max)
->  {
->  	struct tpm2_get_random_out *out;
-> +	struct tpm_header *head;
->  	struct tpm_buf buf;
->  	u32 recd;
->  	u32 num_bytes =3D max;
-> @@ -288,6 +289,7 @@ int tpm2_get_random(struct tpm_chip *chip, u8 *dest, =
-size_t max)
->  	int total =3D 0;
->  	int retries =3D 5;
->  	u8 *dest_ptr =3D dest;
-> +	off_t offset;
-> =20
->  	if (!num_bytes || max > TPM_MAX_RNG_DATA)
->  		return -EINVAL;
-> @@ -320,7 +322,13 @@ int tpm2_get_random(struct tpm_chip *chip, u8 *dest,=
- size_t max)
->  			goto out;
->  		}
-> =20
-> -		out =3D (struct tpm2_get_random_out *)tpm_buf_parameters(&buf);
-> +		head =3D (struct tpm_header *)buf.data;
-> +		offset =3D TPM_HEADER_SIZE;
-> +		/* Skip the parameter size field: */
-> +		if (be16_to_cpu(head->tag) =3D=3D TPM2_ST_SESSIONS)
-> +			offset +=3D 4;
-> +
-> +		out =3D (struct tpm2_get_random_out *)&buf.data[offset];
->  		recd =3D min_t(u32, be16_to_cpu(out->size), num_bytes);
->  		if (tpm_buf_length(&buf) <
->  		    TPM_HEADER_SIZE +
-> diff --git a/include/linux/tpm.h b/include/linux/tpm.h
-> index c17e4efbb2e5..b3217200df28 100644
-> --- a/include/linux/tpm.h
-> +++ b/include/linux/tpm.h
-> @@ -437,8 +437,6 @@ u8 tpm_buf_read_u8(struct tpm_buf *buf, off_t *offset=
-);
->  u16 tpm_buf_read_u16(struct tpm_buf *buf, off_t *offset);
->  u32 tpm_buf_read_u32(struct tpm_buf *buf, off_t *offset);
-> =20
-> -u8 *tpm_buf_parameters(struct tpm_buf *buf);
-> -
->  /*
->   * Check if TPM device is in the firmware upgrade mode.
->   */
+> I think we can set a reasonable value in userspace, so that for SNP, it
+> doesn't trigger the throttling since the large request will be split to
+> multiple userspace requests.
+>
+>
+> > in which case existing
+> > KVM_HC_MAP_GPA_RANGE interface seems like it should be sufficient.
+> >
+> > -Mike
+> >
+> >>
+> >>>> For TDX, it may also want to use KVM_HC_MAP_GPA_RANGE hypercall  to
+> >>>> userspace via KVM_EXIT_HYPERCALL.
+> >>> Yes, definitely.
+> >>>
+> >>> Paolo
+> >>>
+>
 
-
-This patch went into v6 by mistake, unrelated to the patch set.
-
-BR, Jarkko
