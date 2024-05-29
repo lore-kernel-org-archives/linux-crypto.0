@@ -1,72 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DACC1B810;
-	Wed, 29 May 2024 17:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2921C68A6
+	for <linux-crypto@vger.kernel.org>; Wed, 29 May 2024 20:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717002691; cv=none; b=lSfQOWqXOiSV29lNRXzsFAGWHj4BipAEmkiaGLOCT52Lla9shm2AjUyYLOQr5bC/qLTNcIQ1arO6z/1Wb8SIMVmB+okW4gf300/DYXXO0Xcmg62TW3Zspxaw1rCeoGonFNZt2zgvDNzJrqlEMMi1w0nIz3jrX0ph23L/fMh+NOk=
+	t=1717012929; cv=none; b=LfxqcT/m3+okmUmj6Wbo4EQ1uuzCTsjmjjDzMFiz3WvC5lMhB+9J7ovdBRh1je8ZBbPF4Ubrxu95xcDgIu1+/ERzgFbLwr8LslS/QFiJf+zukPwwAc7xN5jEPGoYEp7RUk0uqDaa1zaTlysBdHSgMYL76yWpsDtJFB6AbEuSaB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717002691; c=relaxed/simple;
-	bh=ZN9sr+TXvW5Ln+ZWK8tWWaaBctNKc6GLhsyv9i+gi3w=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=a8CQNQWff7L7Xfv9bjstCScWmnGffW5ekmw9nvZPHxgzONAJd0HLdcybREQiYC9OYoOt11j+qnRvlP9D4bS+A5Ex3hR5XNUWNfG11Ez3Y5nCMe4eaJhcFaxegs4N0dIwdm40BQSETGGwxtBwCAZBEuN+D5FZ+/3zjr3hwjnL1oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LPQ0YT4r; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717012929; c=relaxed/simple;
+	bh=2hRlvy/RjWARtjo6oSUZO1Wu+DhCOpznFy5U6Li2iQs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=s4EcSlqPFfwn4Inx2nkHXbpUisqsKNb96b27uWouif3DzdVP3cmIe0c3aq+uprwlyDOznIfhQYQaK/TnxWW+di7KKuaYs2HIYt6+GxRmnY9XTpG3+IabAK+uIxj0oJoH1oB8RgM0XFuxYMZobfZUGJ7GwqmsoGxycuJV97JrcP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g/4AH4pV; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LPQ0YT4r"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 034EAC113CC;
-	Wed, 29 May 2024 17:11:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717002690;
-	bh=ZN9sr+TXvW5Ln+ZWK8tWWaaBctNKc6GLhsyv9i+gi3w=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=LPQ0YT4rvhoJHL3C3ahWoRUFfZxdOOPFBapFnm0jq7zsefGjY4Y6yTwS2g3ArO+YI
-	 9jYToLrtrqB1GZIEN9KI1sBDfhivyalON7yKD3SEUpca7aEoE1s3KLpR24RgobCrIQ
-	 0VD9yzhqsKrAch1aTgt7PB6lL/wIoa5xBMZ3HeAepEvqZsi8Z6YC9R3ttf7F9wnB4L
-	 15pPIGRtQV/GTnb50vbKYudV/tcXw07gJ91l0iy7GrjlR9YqXDNhTJRRD8ybhTHJnM
-	 9+QYOUF3ZT1DuhCSdLJBTXlvMWuQ8lGHKlMjNesHih78X3KVzsHRzxTkyEnHXmyxGe
-	 l/pWTw8qXMD1w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EA421CF21E0;
-	Wed, 29 May 2024 17:11:29 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.10
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <ZlascqIex2rE2nO_@gondor.apana.org.au>
-References: <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
- <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
- <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
- <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
- <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
- <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
- <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
- <ZbstBewmaIfrFocE@gondor.apana.org.au>
- <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
- <ZkrC8u1NmwpldTOH@gondor.apana.org.au> <ZlascqIex2rE2nO_@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <ZlascqIex2rE2nO_@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.10-p3
-X-PR-Tracked-Commit-Id: 67ec8cdf29971677b2fb4b6d92871eb5d5e95597
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: db163660b02abbffebfad1bcd6dbce1201c72731
-Message-Id: <171700268995.30079.5541394862780715730.pr-tracker-bot@kernel.org>
-Date: Wed, 29 May 2024 17:11:29 +0000
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g/4AH4pV"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2bde0491546so82882a91.0
+        for <linux-crypto@vger.kernel.org>; Wed, 29 May 2024 13:02:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717012928; x=1717617728; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HB9I1KtyGLGWJZbJtvz+lEDv77A0FrVSDAPAJPLn2YA=;
+        b=g/4AH4pV/aPs8Fi1izGX2UjmiJSogqAia1/9khIPnH/nxiiWx3MQ/v1J+Mv4+5qd5b
+         /hJexKc7QERUqBAX6n0CgWdKsfZ7sWAR5FRNQTiMjLBuQYa21e9rH+FVukgLnnw+HuDr
+         4vtaev8QL85qecm1Hswu7m5uEfxl3TiJBepo/BD95KssSKctgleoC+a3JjQB0oMyZUmk
+         j4f3SmJ7CibudtSrLj5H7wl9V7jkccHoxCeBi2/ivKieBi9BGQnwtv7OJBjMhhrMXzWZ
+         LiafxYjZmN40fr7PRGKmq0O4eFptTJBx3RAKhQpujW5LKADYLX44RuxvvlapzzlcAHPR
+         zaQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717012928; x=1717617728;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HB9I1KtyGLGWJZbJtvz+lEDv77A0FrVSDAPAJPLn2YA=;
+        b=EFcjl9NT8eqx8ICrOpl4QSMC11sJ+6+nhkGpCgjkZP4YtolIFZqbLDWQmWBj5wPpPs
+         XhPZLPknZZJSsQKGnl09N1IEqr1O5NC4BIHrwg/rlVwObJgQUKJAIPypC1VINisZldR0
+         uW902CKzAQlJ1u/EzubOK/L0sQ3lt2QVaRIc20ZtE0vZ5HGYJF3OItF8L2EyGVN/qzBm
+         MMfub/OP08ODDNgbhtusP7XZXm5a0g1ZWQ30ytrPxd8geoRVBI0zIXkD5YVkerYYZVob
+         s85gVMhwWtJHDtmHc0ah8BZj+vF8ftN9TyP5n3ZOhiaZCPQoFu3xNMyRlNKRon72qp3H
+         eCfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUo4631D/0hB17rBpIOKDo3Oifj54ad220UdCM/cCFhxcnVuhw6/No36q/8MPl5MhEVhVwswJ4Eai8UhAAMYEHF4NsvHLhsi+7JoAX5
+X-Gm-Message-State: AOJu0Yzl26WHRzQNV51k1OzLP/wjjjaLA9u00TbP+eYD1hNVaIU6sWup
+	qWUAsTGNxQqbiAzab9GeUjdqrb1He65ckKX+tPAQehfOryTeDiaYaaQ2kdg2F46htoVUfXS4r3D
+	Mdg==
+X-Google-Smtp-Source: AGHT+IGnVjGAGUdS+QWuXtFD6JYVk48kHHGOYEmxpJY5fF1LGZtFCwusKyw4nxPICVEtyh7y/Kks5wf6ja0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:1258:b0:2b8:9aac:2b04 with SMTP id
+ 98e67ed59e1d1-2c1abc659ddmr252a91.5.1717012927588; Wed, 29 May 2024 13:02:07
+ -0700 (PDT)
+Date: Wed, 29 May 2024 13:02:06 -0700
+In-Reply-To: <CABgObfajCDkbDbK6-QyZABGTh=5rmE5q3ifvHfZD1A2Z+u0v3A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240501085210.2213060-10-michael.roth@amd.com> <84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
+ <CABgObfaXmMUYHEuK+D+2E9pybKMJqGZsKB033X1aOSQHSEqqVA@mail.gmail.com>
+ <7d6a4320-89f5-48ce-95ff-54b00e7e9597@linux.intel.com> <rczrxq3lhqguarwh4cwxwa35j5riiagbilcw32oaxd7aqpyaq7@6bqrqn6ontba>
+ <7da9c4a3-8597-44aa-a7ad-cc2bd2a85024@linux.intel.com> <CABgObfajCDkbDbK6-QyZABGTh=5rmE5q3ifvHfZD1A2Z+u0v3A@mail.gmail.com>
+Message-ID: <ZleJvmCawKqmpFIa@google.com>
+Subject: Re: [PATCH v15 09/20] KVM: SEV: Add support to handle MSR based Page
+ State Change VMGEXIT
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
+	linux-coco@lists.linux.dev, linux-mm@kvack.org, linux-crypto@vger.kernel.org, 
+	x86@kernel.org, linux-kernel@vger.kernel.org, tglx@linutronix.de, 
+	mingo@redhat.com, jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, 
+	ardb@kernel.org, vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, Isaku Yamahata <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Wed, 29 May 2024 12:17:54 +0800:
+On Tue, May 28, 2024, Paolo Bonzini wrote:
+> On Mon, May 27, 2024 at 2:26=E2=80=AFPM Binbin Wu <binbin.wu@linux.intel.=
+com> wrote:
+> > > It seems like TDX should be able to do something similar by limiting =
+the
+> > > size of each KVM_HC_MAP_GPA_RANGE to TDX_MAP_GPA_MAX_LEN, and then
+> > > returning TDG_VP_VMCALL_RETRY to guest if the original size was great=
+er
+> > > than TDX_MAP_GPA_MAX_LEN. But at that point you're effectively done w=
+ith
+> > > the entire request and can return to guest, so it actually seems a li=
+ttle
+> > > more straightforward than the SNP case above. E.g. TDX has a 1:1 mapp=
+ing
+> > > between TDG_VP_VMCALL_MAP_GPA and KVM_HC_MAP_GPA_RANGE events. (And e=
+ven
+> > > similar names :))
+> > >
+> > > So doesn't seem like there's a good reason to expose any of these
+> > > throttling details to userspace,
+>=20
+> I think userspace should never be worried about throttling. I would
+> say it's up to the guest to split the GPA into multiple ranges,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.10-p3
+I agree in principle, but in practice I can understand not wanting to split=
+ up
+the conversion in the guest due to the additional overhead of the world swi=
+tches.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/db163660b02abbffebfad1bcd6dbce1201c72731
+>  but that's not how arch/x86/coco/tdx/tdx.c is implemented so instead we =
+can
+>  do the split in KVM instead. It can be a module parameter or VM attribut=
+e,
+>  establishing the size that will be processed in a single TDVMCALL.
 
-Thank you!
+Is it just interrupts that are problematic for conversions?  I assume so, b=
+ecause
+I can't think of anything else where telling the guest to retry would be ap=
+propriate
+and useful.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+If so, KVM shouldn't need to unconditionally restrict the size for a single
+TDVMCALL, KVM just needs to ensure interrupts are handled soonish.  To do t=
+hat,
+KVM could use a much smaller chunk size, e.g. 64KiB (completely made up num=
+ber),
+and keep processing the TDVMCALL as long as there is no interrupt pending.
+Hopefully that would obviate the need for a tunable.
