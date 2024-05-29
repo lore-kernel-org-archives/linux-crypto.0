@@ -1,54 +1,84 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABE3167DB1
-	for <linux-crypto@vger.kernel.org>; Wed, 29 May 2024 09:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADEB3180A97;
+	Wed, 29 May 2024 12:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716975696; cv=none; b=ZIBsvNMzxMEzyalsSB5/MODMPwlQ/TfCRKTqIYdajQdwveRaMu7mG/y8TvucTNQMimderqrWIJ5w2DQa35jVBBUEZfDXDlaFbu+nSYNCxv5cmzj1yfZd6HtDmqLspvT+HvhD3aRxLkf29RAWRvSGeQMM0EXvPwMo/rtnmflhSYs=
+	t=1716985231; cv=none; b=iGhrBg+udyZLInOQIbXNhY8E2ouZHQ15qfSepkLSoFkfiH1ZiDmLv5gCrjoi1MvgvM6+9JKS1Ef6pnu3HDevyoAUAoZHLK7telGoiLJ8jpR5S7iXsVZoGBdmE3l6LdDABNMQ3EhuJSm44ANRbIkP38mHBlYAjJ2VSznqoLAMbDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716975696; c=relaxed/simple;
-	bh=stDehELQ+xUuvtK5+vh9KNm4A6emf/Bv/YoUo+hEQ/E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hNjH0kd1oZEiK/YRIiJNP0vBuhOEx/TtADckllctS25P6R7LDyqCrzkeyK3dySeMviLkO2J0nfOytoJfAnHdYHrmyesPB9N8eNZzZJ6n6N2iQCc5MCDgF+rLXv2AOFvmo4kOTEAg5+NqcY5v9LAL+ug8xE8xrXia6Bz0Aj41JO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sCFoE-003Lq5-21;
-	Wed, 29 May 2024 17:41:27 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 29 May 2024 17:41:28 +0800
-Date: Wed, 29 May 2024 17:41:28 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Kamlesh Gurudasani <kamlesh@ti.com>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org, vigneshr@ti.com,
-	j-choudhary@ti.com
-Subject: Re: [RFC] crypto: sa2ul - sha1/sha256/sha512 support
-Message-ID: <Zlb4SHWuY9CHstnI@gondor.apana.org.au>
-References: <878r02f6bv.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+	s=arc-20240116; t=1716985231; c=relaxed/simple;
+	bh=VpHIdGNzMITuTJTo8IHKIYXLIDv6AXCePiPAEtOFDFo=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=uWe2y1AS3vrIWaV3mf0lqb9Ur7v6l+lULXqtcmfx+/TI1QIshBgWIoQI7iSCAGZKPM1X4OhTUokilCT6Mh2+JfQ9z1pjrm3tYDceD3wwrjjmMJpUUz1CJMpE4MV705xRZcVrLFIhHfptwJyu0UxH2SpzPv9iO4hrpxayPgsGAoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AhqUIqsF; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AhqUIqsF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66876C2BD10;
+	Wed, 29 May 2024 12:20:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716985231;
+	bh=VpHIdGNzMITuTJTo8IHKIYXLIDv6AXCePiPAEtOFDFo=;
+	h=Date:To:Cc:Subject:From:References:In-Reply-To:From;
+	b=AhqUIqsFLYOCebwLbUCnjjUx4VRWTD0BnXxREMkocMYUA64uSMLDspnGAE5xJYbTk
+	 SKotVExoVXb+3cXSp9SmBqPsJWhEs9sfZ8J/MWbC1fW21KUnPN55O21n7nOtem/RsD
+	 eXUaBO6NSuijG9knpgRAZJljAdYrfu1RHxGw8itCCd2HtGX5Y/HanvlZVfgNhI8UOL
+	 cICgXQvSVZGJKY/G129/QZkCx1dV1KQOLnPpjw8Jk1r5yaAKa3Zs3HQgiWy/nH6rQG
+	 mIQZbx18PK5VazXv6QgRoxNq7E79hjWos1ByswqeC7hmLiGCGgtf8z4QLDjuV3VKvV
+	 dbL8l4DMLdfPw==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <878r02f6bv.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 29 May 2024 15:20:25 +0300
+Message-Id: <D1M4GRF0RL2W.3QHTBXZWNW9RW@kernel.org>
+To: "Stefan Berger" <stefanb@linux.ibm.com>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>
+Cc: <linux-integrity@vger.kernel.org>, <keyrings@vger.kernel.org>,
+ <Andreas.Fuchs@infineon.com>, "James Prestwood" <prestwoj@gmail.com>,
+ "David Woodhouse" <dwmw2@infradead.org>, "Eric Biggers"
+ <ebiggers@kernel.org>, "James Bottomley"
+ <James.Bottomley@hansenpartnership.com>, <linux-crypto@vger.kernel.org>,
+ "Lennart Poettering" <lennart@poettering.net>, "David S. Miller"
+ <davem@davemloft.net>, "open list" <linux-kernel@vger.kernel.org>, "Mimi
+ Zohar" <zohar@linux.ibm.com>, "David Howells" <dhowells@redhat.com>, "Paul
+ Moore" <paul@paul-moore.com>, "James Morris" <jmorris@namei.org>, "Serge E.
+ Hallyn" <serge@hallyn.com>, "open list:SECURITY SUBSYSTEM"
+ <linux-security-module@vger.kernel.org>
+Subject: Re: [PATCH v7 2/5] KEYS: trusted: Change -EINVAL to -E2BIG
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+X-Mailer: aerc 0.17.0
+References: <20240528210823.28798-1-jarkko@kernel.org>
+ <20240528210823.28798-3-jarkko@kernel.org>
+ <14d0baf4-fa41-4a08-925d-90f028117352@linux.ibm.com>
+In-Reply-To: <14d0baf4-fa41-4a08-925d-90f028117352@linux.ibm.com>
 
-On Wed, May 22, 2024 at 04:42:52PM +0530, Kamlesh Gurudasani wrote:
+On Wed May 29, 2024 at 4:50 AM EEST, Stefan Berger wrote:
 >
-> For incremental hasing, we have to keep the FRAG bit set.
-> For last packet, we have to unset the FRAG bit and then send the last
-> packet in. But we don't have a way to know if it is last packet.
+>
+> On 5/28/24 17:08, Jarkko Sakkinen wrote:
+> > Report -E2BIG instead of -EINVAL when too large size for the key blob i=
+s
+> > requested.
+> >=20
+> > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+>
+> Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
-I don't understand.  Can't your user just submit the request as
-a digest instead of init+update+final? Wouldn't that already work
-with your driver as is?
+Thank you.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hmm... I'd like to add even:
+
+Cc: stable@vger.kernel.org # v5.13+
+Fixes: f2219745250f ("security: keys: trusted: use ASN.1 TPM2 key format fo=
+r the blobs")
+
+It turned out to be useful error message and would be useful also for
+stable kernels. So if no decent counter-arguments, I'll just pick it
+to my master branch.
+
+BR, Jarkko
