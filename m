@@ -1,87 +1,155 @@
-Received: from mail-4018.proton.ch (mail-4018.proton.ch [185.70.40.18])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD03169377
-	for <linux-crypto@vger.kernel.org>; Wed, 29 May 2024 08:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31525169384
+	for <linux-crypto@vger.kernel.org>; Wed, 29 May 2024 08:08:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716970087; cv=none; b=kzdr55+2FqeuJ7K7LbmhRkkSyuRQTXrBski3S4Z21AhswyM4XkPg8Noe+Tjr5DCxczBa0zSEbm/MeeKDDRfCT6noJvnu5pMyGwkhDpCDKbzrpJOW+cYc7VoHs11FDkoR+Byh3PAqO/IeJ0jqP2KDRDFhbKhKr7sGqS9qWw0dVMc=
+	t=1716970142; cv=none; b=Jd8WIgBPuNRgWivJxxZN5EFLeLI9XWBsqdr3CkEo6yBNWAH7daivI5mxT3YvFJCYdDp1ZGQeWvZ5TYMOtRimH0Sfl6A5yTdQfFHbwUfY1xsH/p8VxQJRmcTiSma3AFHXxWahCRLM04aeo6qIrGik/boLVccyeCqCR0AC07ItV1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716970087; c=relaxed/simple;
-	bh=cEDMoowbFZ5WktBarZHf81BOCA+EdPpdc+vCtp4npVA=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M0bdEV9jj2lyraAU9K2XB08E+8ewb6CbVERK9zwskzIR32tiLnz4NTo18e7HlvMyv5nUsKfCTWJl5NBHWwk43x/ZxBBUAsxkxejtUgFxkwNbUTE7WcYm7e598U2qG6IbyMvFnSYtoEiytFcp+weFEvv8cHy/mBt86AqzBXTp0Qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hughsie.com; spf=pass smtp.mailfrom=hughsie.com; dkim=pass (2048-bit key) header.d=hughsie.com header.i=@hughsie.com header.b=l1H22dlh; arc=none smtp.client-ip=185.70.40.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hughsie.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hughsie.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hughsie.com header.i=@hughsie.com header.b="l1H22dlh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hughsie.com;
-	s=protonmail; t=1716970075; x=1717229275;
-	bh=CdCU+zkzWxCVkvGAtdPb8KGBuUMK2qab8ruKLWcSQkU=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=l1H22dlh9G2aQxhS4mro1rTr27SBJoo2HZXWI+WaV3YL2E4yjyR2soU5dKC6QYDFX
-	 kgNxrIAmInDeJ6n2nKyFIqlkZDvo3PCdc37mGc+VF23FhLz4io8azvIp3SktxiDeOA
-	 dIKRsPQayR5p9cslX8hl+lSHCbCogEi1ZzTyvnXG8h8jTf0upLK31xa3fUCfzqi2b5
-	 Vzi4tBeoZkfYrQRbdrxieA4urgEZaBLbKL4OSTrPzsEPTFLe15QSdYh5HqQOOP/36f
-	 iyF2tiX+xRdmXwzi9gBr6KYk7S5bVZM4qE0bUhEi75zk+fHHnG61qZnKQ3a08ry7u5
-	 kEW7Mcy0BztYA==
-Date: Wed, 29 May 2024 08:07:52 +0000
-To: Mario Limonciello <mario.limonciello@amd.com>
-From: Richard Hughes <richard@hughsie.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Tom Lendacky <thomas.lendacky@amd.com>, "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - DB..." <linux-crypto@vger.kernel.org>, Richard Hughes <hughsient@gmail.com>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 0/5] Enable PSP security attributes on more SoCs
-Message-ID: <oCZE3H8ZnqlQsatOdb4HH7_0t7E9fsRqVv1QodA3IeUSDCdx9DP1bWsLOVq6T5iGffMjzMequirUJSM4UpcA1y2LZVUvMsffulaArsPy2cs=@hughsie.com>
-In-Reply-To: <20240528210712.1268-1-mario.limonciello@amd.com>
-References: <20240528210712.1268-1-mario.limonciello@amd.com>
-Feedback-ID: 110239754:user:proton
-X-Pm-Message-ID: 0a0f6f13a6a6f7ccd86427b6e79c68dcfbe63ade
+	s=arc-20240116; t=1716970142; c=relaxed/simple;
+	bh=96iFbUwojxwBoxA+H0JTEulerW3QRm1exN8DOQ8GsGs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Mz73u/BvGKYlUmnG4f4EjwXaLtcX0giuNoB+whRiwZY0+z3saxKIZTgBm4JMJ9toZkJsPQkY02R7hmDOidukOjhYtj0NG9kzBxQDh9ta+mdRL9T5RfGs7l5Yb1mMQ2xUGdcu9qAbcNLo0phtdzjcWFiuE23rNtIX2vDXClHXdxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1sCEMW-0002i8-0F; Wed, 29 May 2024 10:08:44 +0200
+Received: from [2a0a:edc0:0:1101:1d::54] (helo=dude05.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1sCEMQ-003RAe-SQ; Wed, 29 May 2024 10:08:38 +0200
+Received: from localhost ([::1] helo=dude05.red.stw.pengutronix.de)
+	by dude05.red.stw.pengutronix.de with esmtp (Exim 4.96)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1sCEMQ-00EJoV-2e;
+	Wed, 29 May 2024 10:08:38 +0200
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Date: Wed, 29 May 2024 10:08:29 +0200
+Subject: [PATCH v2] docs: crypto: async-tx-api: fix broken code example
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240529-async-dma-docs-v2-1-8faf87e72e6d@pengutronix.de>
+X-B4-Tracking: v=1; b=H4sIAHziVmYC/3XMQQ6CMBCF4auQWTtmpmKCrryHYVHaEWZhS1okE
+ MLdrexd/i953wZZkkqGe7VBklmzxlDCnCpwgw29oPrSYMjUdDUXtHkNDv3boo8uI5F03NhaiB2
+ U05jkpcsBPtvSg+YppvXwZ/6tf6mZkbG7FZEaqoX5MUroP1OKQZezF2j3ff8Cf58CxLEAAAA=
+To: Dan Williams <dan.j.williams@intel.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, 
+ Andre Noll <maan@systemlinux.org>
+Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kernel@pengutronix.de, 
+ Ahmad Fatoum <a.fatoum@pengutronix.de>
+X-Mailer: b4 0.13-dev
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 
-On Tuesday, May 28th, 2024 at 10:07 PM, Mario Limonciello <mario.limonciell=
-o@amd.com> wrote:
-> v1->v2:
+The code example fails to compile:
 
-Looks great, and the output of "fwupdmgr security" on my pre-production Len=
-ovo T14 (AMD Ryzen 7 PRO 4750U) is now a lot more accurate:
+  1) addr_conv is defined twice, once as a VLA, which have been phased out
 
- HSI-1
- =E2=9C=94 BIOS firmware updates:         Enabled
-+=E2=9C=94 Fused platform:                Locked
-+=E2=9C=94 Supported CPU:                 Valid
- =E2=9C=94 TPM empty PCRs:                Valid
- =E2=9C=94 TPM v2.0:                      Found
- =E2=9C=94 UEFI bootservice variables:    Locked
- =E2=9C=94 UEFI platform key:             Valid
-=20
- HSI-2
- =E2=9C=94 IOMMU:                         Enabled
-+=E2=9C=94 Platform debugging:            Locked
- =E2=9C=94 TPM PCR0 reconstruction:       Valid
-+=E2=9C=98 SPI write protection:          Disabled
- =E2=9C=98 BIOS rollback protection:      Disabled
-=20
- HSI-3
-+=E2=9C=98 SPI replay protection:         Not supported
- =E2=9C=98 CET Platform:                  Not supported
- =E2=9C=98 Pre-boot DMA protection:       Disabled
- =E2=9C=98 Suspend-to-idle:               Disabled
- =E2=9C=98 Suspend-to-ram:                Enabled
-=20
- HSI-4
-+=E2=9C=94 Encrypted RAM:                 Encrypted
- =E2=9C=94 SMAP:                          Enabled
-+=E2=9C=98 Processor rollback protection: Disabled
+  2) submit is not a pointer, but is still dereferenced with ->
 
-Tested-by: Richard Hughes <richard@hughsie.com>
+  3) The first call to async_xor() lacked the trailing semicolon
 
-Richard
+Fix these issues and while at it, fix some code style nitpicks as well:
+
+  1) make the functions static as users are unlikely to export them
+
+  2) include the relevant header
+
+  3) Shorten the example a bit by removing a redundant variable
+     definition
+
+Fixes: 04ce9ab385dc ("async_xor: permit callers to pass in a 'dma/page scribble' region")
+Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+---
+Changes in v2:
+- commit message: fix addr_conv typo (Andre)
+- commit message: note addition of missing semicolon (Andre)
+- add header include (Andre)
+- shorten code by removing redundant variable definition (Andre)
+- Link to v1: https://lore.kernel.org/r/20240523-async-dma-docs-v1-1-b900e0804e11@pengutronix.de
+---
+ Documentation/crypto/async-tx-api.rst | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/Documentation/crypto/async-tx-api.rst b/Documentation/crypto/async-tx-api.rst
+index 27c146b54d71..f88a7809385e 100644
+--- a/Documentation/crypto/async-tx-api.rst
++++ b/Documentation/crypto/async-tx-api.rst
+@@ -150,38 +150,38 @@ of an operation.
+ Perform a xor->copy->xor operation where each operation depends on the
+ result from the previous operation::
+ 
+-    void callback(void *param)
+-    {
+-	    struct completion *cmp = param;
++    #include <linux/async_tx.h>
+ 
+-	    complete(cmp);
++    static void callback(void *param)
++    {
++	    complete(param);
+     }
+ 
+-    void run_xor_copy_xor(struct page **xor_srcs,
+-			int xor_src_cnt,
+-			struct page *xor_dest,
+-			size_t xor_len,
+-			struct page *copy_src,
+-			struct page *copy_dest,
+-			size_t copy_len)
++    #define NDISKS  2
++
++    static void run_xor_copy_xor(struct page **xor_srcs,
++				 struct page *xor_dest,
++				 size_t xor_len,
++				 struct page *copy_src,
++				 struct page *copy_dest,
++				 size_t copy_len)
+     {
+ 	    struct dma_async_tx_descriptor *tx;
+-	    addr_conv_t addr_conv[xor_src_cnt];
+ 	    struct async_submit_ctl submit;
+ 	    addr_conv_t addr_conv[NDISKS];
+ 	    struct completion cmp;
+ 
+ 	    init_async_submit(&submit, ASYNC_TX_XOR_DROP_DST, NULL, NULL, NULL,
+ 			    addr_conv);
+-	    tx = async_xor(xor_dest, xor_srcs, 0, xor_src_cnt, xor_len, &submit)
++	    tx = async_xor(xor_dest, xor_srcs, 0, NDISKS, xor_len, &submit);
+ 
+-	    submit->depend_tx = tx;
++	    submit.depend_tx = tx;
+ 	    tx = async_memcpy(copy_dest, copy_src, 0, 0, copy_len, &submit);
+ 
+ 	    init_completion(&cmp);
+ 	    init_async_submit(&submit, ASYNC_TX_XOR_DROP_DST | ASYNC_TX_ACK, tx,
+ 			    callback, &cmp, addr_conv);
+-	    tx = async_xor(xor_dest, xor_srcs, 0, xor_src_cnt, xor_len, &submit);
++	    tx = async_xor(xor_dest, xor_srcs, 0, NDISKS, xor_len, &submit);
+ 
+ 	    async_tx_issue_pending_all();
+ 
+
+---
+base-commit: a38297e3fb012ddfa7ce0321a7e5a8daeb1872b6
+change-id: 20240523-async-dma-docs-00eb18a4e01c
+
+Best regards,
+-- 
+Ahmad Fatoum <a.fatoum@pengutronix.de>
+
