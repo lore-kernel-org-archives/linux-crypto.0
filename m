@@ -1,232 +1,199 @@
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2082.outbound.protection.outlook.com [40.107.100.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5596715CD43;
-	Wed, 29 May 2024 05:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716959695; cv=none; b=c1nijSAV0FZD/azumsisbj+1PTg9aWWeSl7ecyWss6Ra2k2Uu9FBRv3EoZq2wSWdmYvw1kv7knATY+GdaTA0WMIKjx4Qo0joyPVzf+NkC5usOvtTZ6p9A09R9uKKBk0W8QzkxmCveCf7QPKv8l5bLGQdYTNRVa6i1KJjv4uhs9M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716959695; c=relaxed/simple;
-	bh=R1IWmO+APmHCgSvdQhuAOkBBOYRCLIbvlphe7OPdhq8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Oi8Fn0e2Thjy8jIVNxZ+Yiwsl5DOGce8KJn6omEy7qDfxJxd6JSlFXFvR3yTcK0T+TSY5WKBNjb0U2SYMy+rb9qoqXyU82OrGpqwGs0a1/WUnWVFkrRkxMsLCq3umlub7o68c+Mb/pZhSEc1L/M5GxBB5+6ImCKbvTc3xnLP218=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Tho0uC1u; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A7A15B122;
+	Wed, 29 May 2024 06:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.82
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716964866; cv=fail; b=CrJyqYCLLNHunmmBxYivWq/x3+qNMtImzPJTHkj7cOln0t/HHq79x5EJtDE5MlYjMBdS9XyhROW3rLGe0FRkM8EjCBF43IGy+PNohzcraRZ3HPEepc3HujA8ogLxMx9prCRoAxShd4tiVqhkxcsrrXgkwLucIDFjr6Uqemq7bTo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716964866; c=relaxed/simple;
+	bh=0WXiAE/9CyWxalBj1lLk+S9FHt7aYQNbdsH6XGPPa24=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nNqI2hyW4MD2Q5HIP0fzLYG/EkLfW3BoqMNBaJHCeTVEsreWq/rpShBzs3B89l0tB5k9UYasSicuUp3owKL89c6Q1n4sIFN83TJUu+EdWXjLgOTrv2r7dD1nO3L5zEUEhD8cOjwVFVypQFARRuDCy5mPkW3Jwu4kvrWUJ+NSftk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QjYZOk2k; arc=fail smtp.client-ip=40.107.100.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Tho0uC1u"
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44T5E6rS040057;
-	Wed, 29 May 2024 00:14:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1716959646;
-	bh=+wd2P9cwT2cwmazRiNRg7WHatVuK5D8YXYsDIg7m92U=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=Tho0uC1uQpclgleGyVqNG4PAmZVtUV4LYh0Gsj1aCmEQweHSHyMrX1viPzbK6W5CN
-	 368vCOS7jmt3d/6vBs/XtXuEFOE8rMwhsILLrP9YgjTxFgMwlxYo47kaISbL1zkxYl
-	 huHYhEILO06blijmO9R+DOIap/Bpb7kKuGZru/WA=
-Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44T5E68N015798
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 29 May 2024 00:14:06 -0500
-Received: from DFLE113.ent.ti.com (10.64.6.34) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 29
- May 2024 00:14:05 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE113.ent.ti.com
- (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 29 May 2024 00:14:05 -0500
-Received: from [172.24.227.94] (uda0132425.dhcp.ti.com [172.24.227.94])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44T5E0MG129167;
-	Wed, 29 May 2024 00:14:00 -0500
-Message-ID: <9e35f4d1-4c69-4fed-bdab-9d39a70d0bf5@ti.com>
-Date: Wed, 29 May 2024 10:43:59 +0530
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QjYZOk2k"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Pli9s1vtKrpLJfrAPJ8lh0CpI1612txIHJa42Ibi8CqLfBlObN5+kgb61ONSzOZesPNJk5qd6g4BWZzS5mTtSg5EXZzOtgcwsUpXAGBUVpAv+CGrFLEJ/Tm3K0992EzDMhWwcFy0n5dJ8nvufzTW5k0rkObCKiDr+OPxC5W5rJxRhV3B5tK1HBOOMwDYUAe1lt90Ss05uySy6R+oWXTT6Zq9zU0wI1WvVRUyUD/hEE4KdL46Npow8G5GmZ2XWEg16iwxtlQqAtjChxKHYc7fA5JQ4xnKjDR5gTBReKrUC6KtqPJcWlNXd1rtkLARojPbwcGIkew0hh181dbYLb9CYQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Id9cofer2Vj0Sh0MlvVw5vX3pHsd/vH6VTelQ8+LR0s=;
+ b=fWkXpFgl6wf4qPBq3QerprFpxtdO8zBve2raBHwaO4yk3LjaQE3IjhoiMhks9XkdQW4pFIVlDymlxx735pTwIO2XSgFhuku3Pcmkob1EB+1e2skuP6iboMfLPi0tL8YGK40hJf0kzol70ho6f0YReetkgyAK1yXk0on28EqT1Js6BA9f3qTmMu4beJRwZR0PESM7walWpPKDwIDGUfig1TyVT0EWjMmxacRrSjlhmXhYEu7pFm62RRVICjX1u1dJrvfo100uRmUUo9k82m1nr2bFRZvAeHmIxnHeucLP8/+++zIsxFh1+NDD823j5GaralCPCtNx7ktvoNWLNZH/2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Id9cofer2Vj0Sh0MlvVw5vX3pHsd/vH6VTelQ8+LR0s=;
+ b=QjYZOk2kmRKTNLovx7ZC5wI7CNIwppuDhd0lHPjq4vLos00h/IOjiibWycSIm6VyLih9SFv86ig2fjuiA8LzafVpBhHrejtmxIzzpAUci+fn1GmnM4tUY8ZKPO0zjj/l4Fe4L8VxGoD1xVzrxhCEnjhIswKIQXIDwaf1X/WTvdOl2tndJbZ2vcd3ekp922UdaxHvbqIe7skX6/rM+f2+iZyJGdK02E9sRbxZCa5uYTf3TTJXjl+mZhEBVPQzR9pE0HbL3DhhLAkQY4yPCjaCztM8NdWAZrqyXDsjnbJA9pYzkCixnRv34nlIAF7RpCulC+P0o9yGZaBKU/72DmbHAg==
+Received: from SJ1PR12MB6339.namprd12.prod.outlook.com (2603:10b6:a03:454::10)
+ by IA1PR12MB8465.namprd12.prod.outlook.com (2603:10b6:208:457::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.30; Wed, 29 May
+ 2024 06:40:58 +0000
+Received: from SJ1PR12MB6339.namprd12.prod.outlook.com
+ ([fe80::e696:287d:3f92:3721]) by SJ1PR12MB6339.namprd12.prod.outlook.com
+ ([fe80::e696:287d:3f92:3721%5]) with mapi id 15.20.7633.017; Wed, 29 May 2024
+ 06:40:57 +0000
+From: Akhil R <akhilrajeev@nvidia.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+	Thierry Reding <thierry.reding@gmail.com>, Jon Hunter <jonathanh@nvidia.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>, Mikko Perttunen
+	<mperttunen@nvidia.com>
+Subject: RE: [PATCH] crypto: tegra - Remove an incorrect iommu_fwspec_free()
+ call in tegra_se_remove()
+Thread-Topic: [PATCH] crypto: tegra - Remove an incorrect iommu_fwspec_free()
+ call in tegra_se_remove()
+Thread-Index: AQHarrZLeawWiYOujkiA3zLjv6FXT7GtuQzg
+Date: Wed, 29 May 2024 06:40:56 +0000
+Message-ID:
+ <SJ1PR12MB63391A3077F369FBF9BCB2D2C0F22@SJ1PR12MB6339.namprd12.prod.outlook.com>
+References:
+ <ea775b351a3dbe4cef4056ea89da25084f73df22.1716650050.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To:
+ <ea775b351a3dbe4cef4056ea89da25084f73df22.1716650050.git.christophe.jaillet@wanadoo.fr>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ1PR12MB6339:EE_|IA1PR12MB8465:EE_
+x-ms-office365-filtering-correlation-id: d5bfaca1-b66b-435c-c641-08dc7faa4ba1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|1800799015|376005|366007|38070700009;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?CFoFhx4Hvs3N+BUZZ6nVs5wIjEroTFvyt9TRB9IFjIiaZpduV2z3GF63tFFW?=
+ =?us-ascii?Q?P+v0FuPCSnRiSPqdtH243skfLIEWlkPhef/qYERpo0yXVq+IkRoaKY66PFTO?=
+ =?us-ascii?Q?L4vb/fzv9hfASE7FvQicTRzeggOYvkIggWYORgrW6F3WgRNsZB4k9Xy/Q9aA?=
+ =?us-ascii?Q?CagIngv5q/EYh8dYaokE13aT6T50dH3/Q1k5ewKfV2KU4tHPfciRajYPkKFr?=
+ =?us-ascii?Q?0aNAH5RTzYw77gEDw5k8jTRJ944md9gwrdbZrAQgoStURJPrvfcEkp2wSrKI?=
+ =?us-ascii?Q?YzUWqoFVZW1aEI+mDUUAsRUdQFpX1X57QD5v5F+83aUmeKHtxKbpfdpSdXi1?=
+ =?us-ascii?Q?WwIffnspwDCbGRmH4CXpvRVYzrqLFjuyY3H/vQW2lkwrxMd5VU2hRDARYtDR?=
+ =?us-ascii?Q?tiCi9RfIUNvQ9eNeZ44oIFQAyEN8I6GRPrsxWdjPDTPicmnxuSI0wlXOs6ug?=
+ =?us-ascii?Q?URKKYXBGDySfkynJKaU9AEl6KMA+uiX3/ZHrIZqaRx3tS+orzef05rC1TRz8?=
+ =?us-ascii?Q?THrnYKDP0/Z6alPGzelPdGHBrryv3i0urO3YdmG/n04z/6vtyNPVFuPBKlAP?=
+ =?us-ascii?Q?8TyNWPcl2iYE6n4OcffceAO/Z30OIe1LCMWlX9lDT49chLDFOStTJXbCdOW/?=
+ =?us-ascii?Q?Hgbert5T+70V5SwfAJVi2i6lGR4t0xaoshx77EwKQV+dfoBUzEWSQdGAo7Yy?=
+ =?us-ascii?Q?/6dk5j7BXYbHdx66Rk2CRqwKMH8dGQYMBTOqEe2ZvtgwgxbBANVJOqdzVgMi?=
+ =?us-ascii?Q?Wg1u0UjDl3X5wOb9kroZGH2we9/r6+vQ7FA066w0ACLUdc0T44p5Ul7L+zUz?=
+ =?us-ascii?Q?sdYYUSqTNNtvQHQgaAHtGvrMdMfC98JgMw2tk91Fdc1yv0UisHEKfd9qAicY?=
+ =?us-ascii?Q?Z7VJIukPB0eSpRTKB3Y82UshWkYV9PqQkPnngwLpi2LXCtH40VaFxdBKxdke?=
+ =?us-ascii?Q?2xZ00c658nfLN0N+h7IxeBkLppTVFC8l49SiIcgA+vEOELLnX1qtdo9fBHhI?=
+ =?us-ascii?Q?6G4KGjwaS08XR63TomHAbxwjG5EPT3UKV0SCs4M4LplFiEE6SL7xpygC+jB6?=
+ =?us-ascii?Q?hdvwZPhIW2Q4agl6lmaVnNDXD0uyEF5JehN+aw7pODUXDiuBPjbGxtfOTvIt?=
+ =?us-ascii?Q?ZlfhR4D/qV/Ps1K2RfzNuacL7s8UmPBAm6zj2MrjrnphfthJB/zYfIlQ8F2/?=
+ =?us-ascii?Q?mx8Ut7gUlDJ+zTb0k2ccToMtbvscbheQXtQzmh3DgviHKYAS26aMusvS9D0b?=
+ =?us-ascii?Q?P0DdfkXzyJmh6EoyD+C2FBVA1gO6Z1/UTTSDcSfE+XsjbZDRqFnD9uJYl5g6?=
+ =?us-ascii?Q?nSz1PznTUqufSaAENgGmsZdGI3ovYteiYId/gK35LfUDJA=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6339.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?rlLEmhA7cBasb3RL2dxT0/Ji6BW/iNu4SoAxlEwmlACfaGnHXtPxGuYYrdwm?=
+ =?us-ascii?Q?KDvicmcGij+tYpuyT6/5lXLXfd7/z9SwAgF7kWiWuNZvLiltvErPFKS4xkDl?=
+ =?us-ascii?Q?gNm3Cg+6x3IoaXYhJG54oNr43X120Au7fvIQ9acVDQwi5P56W33iuUX4vfzZ?=
+ =?us-ascii?Q?BZR2HW5DYvA4KAMDz4jKhVUg96NVh+xTwnymXdL+nb0HmGFThlBnsAM9XP5y?=
+ =?us-ascii?Q?vE5CKTkS0mVNlu6EjA7SZNWL9m/eIoTu0Zw2shkdOyA7VsuDjrkKaBv0L5Ht?=
+ =?us-ascii?Q?znnXvLHncQePOdy2F+u0Ll5wnnI3I6tI5LUb1ahkFk/EU+uK2HrlpQ+8RP5E?=
+ =?us-ascii?Q?kjQKRIGNDg+MS7nsn7BgRB/kJW1JeGw5UjOlqPFHv4jZknRi+rCybw8kt5w0?=
+ =?us-ascii?Q?mLi6/UEKQuIYFgCIRvUMV9rDujFg2UQXO7TG/17TcdEMeorgdG7HZy+VY30E?=
+ =?us-ascii?Q?9iJfXcoruU1RksAIXwjpRwBMLQY2mKrpc0d2lGw6TLDT79CFPSRPIDbDTQlv?=
+ =?us-ascii?Q?RmPSyhAMXEAmflMZgvGQb0O7LEUTRuZBHT+WBq6A41ckT3T9qVD3f+jADucJ?=
+ =?us-ascii?Q?lSBJSWm2lE0GDWqSThsdDkyjUKnXjRxy8JEJvBSAcgbNaS0sjyamKJue+gMg?=
+ =?us-ascii?Q?F/hDil7c+uhMVl+siVXtyAPwNRK0RqaU2C6u1Oq314vI/nv1SB3jpPF/6Dax?=
+ =?us-ascii?Q?y5UwuXePxhSRpYKFDvcRK12+CL0EejWgAEBoYk+qPs0ABv/SKAqrfjwgmaDt?=
+ =?us-ascii?Q?2+hgPcWJkSH06Cbkm2kh7GiDyy7r4rODa7c7PUDKMQaQ8PLePJ2zlbf7sN6z?=
+ =?us-ascii?Q?fCfEVlXF9+pxIoT2j7JeiHhhHxMaHn2zJqV4+zs3cJs1tajDYB9dUjrPg2ll?=
+ =?us-ascii?Q?67YVqVNa8U5n4lMQgkmySkhFvlsA7cqHJzr9TJez7a/tLFm0b7LYilecU/VR?=
+ =?us-ascii?Q?uTrLwmYLbLr6Vx0OfZrAyR6E7o+O1sr3pTl+0M+ITpQnGLfQhbQSmsouvZYB?=
+ =?us-ascii?Q?YSQ/uH8BgKXqvA+yhe1GCiKkBsQagVKkuRHWjHWvcQYRJC3gSOu0BpFuFCVH?=
+ =?us-ascii?Q?A0lDhPSYHv+Jp8Vll97e2MlUKWrAo9ydJlVcDz+LYtMss9imKrDTyOVLjJCN?=
+ =?us-ascii?Q?v58/bT0whw3oV0ZmZzFVrgrKO3wHGetM9K5ZmNyw4BKxeBePhjBwDS0XSToL?=
+ =?us-ascii?Q?ckhvmwc/h5soeM6v2iQmwS3spSXlv/piKVA+p/Af5xgandiLE5HYB875hmfk?=
+ =?us-ascii?Q?WwUMcCVJADURuBDuL30YPN9uV9uGFjY912ux6oqFtJNbK1xow/+S9RHAgeaS?=
+ =?us-ascii?Q?XlUXwFDOhc0Ax2mP1JAY61mkDBWN2xGu0G1+5vtyByD+kCx6syBnurJvzw73?=
+ =?us-ascii?Q?Cl+04s7W1bM3+T5kDiPgt2ZewRSEDUrE106UXavio1eARA/mMlyDkPO9jusd?=
+ =?us-ascii?Q?CpAwBeYW5iOdzS/mr5aHvTDJoYmyR0wTfqXZ2gP7b+2DF15Mth/zBCoK/S7g?=
+ =?us-ascii?Q?6zO3tIEC2kmdc9tvN3miSDl0hNYUH6F+96b7eZ230JYg3WEqEC/U8RhFxxyY?=
+ =?us-ascii?Q?zlFV5VVMiYXGlu4hOY2MsKP4uBG2wuBvDl7tXXjZ?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/6] dt-bindings: crypto: Add Texas Instruments MCRC64
-To: Kamlesh Gurudasani <kamlesh@ti.com>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski@linaro.org>,
-        Conor Dooley <conor@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
-        Tero Kristo <kristo@kernel.org>,
-        Catalin Marinas
-	<catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>
-References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
- <20230719-mcrc-upstream-v2-3-4152b987e4c2@ti.com>
- <20230811-crestless-gratify-21c9bb422375@spud>
- <20230811-imminent-fancied-89663c373ab5@spud>
- <87plt7acgg.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
- <c5aa0c8b-b2b4-4ad2-a8a8-ab26ee0edd22@linaro.org>
- <87ikyza7iq.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
-From: Vignesh Raghavendra <vigneshr@ti.com>
-Content-Language: en-US
-In-Reply-To: <87ikyza7iq.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6339.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5bfaca1-b66b-435c-c641-08dc7faa4ba1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 May 2024 06:40:56.9682
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Su1QbDkZF/oFnL13mUXd8l0OHa/wZhHm+YVFjm6rHy3YoKZig/oJq0eR6LjgG8W/8K4zaoH8PgqvgPuRkTq5UA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8465
 
-Hi Conor/Krzysztof
+>=20
+> The only iommu function call in this driver is a
+> tegra_dev_iommu_get_stream_id() which does not allocate anything and does
+> not take any reference.
+>=20
+> More-over, what is freed is "se->dev" which has been devm_kzalloc()'ed in=
+ the
+> probe.
+>=20
+> So there is no point in calling iommu_fwspec_free() in the remove functio=
+n.
+>=20
+> Remove this incorrect function call.
+>=20
+> Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+> Compile tested only
+>=20
+> This patch is completely speculative. *Review with care*.
+> ---
+>  drivers/crypto/tegra/tegra-se-main.c | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
+> diff --git a/drivers/crypto/tegra/tegra-se-main.c b/drivers/crypto/tegra/=
+tegra-se-
+> main.c
+> index 9955874b3dc3..f94c0331b148 100644
+> --- a/drivers/crypto/tegra/tegra-se-main.c
+> +++ b/drivers/crypto/tegra/tegra-se-main.c
+> @@ -326,7 +326,6 @@ static void tegra_se_remove(struct platform_device
+> *pdev)
+>=20
+>         crypto_engine_stop(se->engine);
+>         crypto_engine_exit(se->engine);
+> -       iommu_fwspec_free(se->dev);
+>         host1x_client_unregister(&se->client);
+>  }
+>=20
 
-On 27/05/24 15:41, Kamlesh Gurudasani wrote:
-> Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> writes:
-> 
->> This message was sent from outside of Texas Instruments. 
->> Do not click links or open attachments unless you recognize the source of this email and know the content is safe. If you wish
->> to report this message to IT Security, please forward the message as an attachment to phishing@list.ti.com 
->>  
->> On 27/05/2024 10:25, Kamlesh Gurudasani wrote:
->>> Conor Dooley <conor@kernel.org> writes:
->>>
->>>> On Fri, Aug 11, 2023 at 04:34:33PM +0100, Conor Dooley wrote:
->>>>> On Fri, Aug 11, 2023 at 12:58:50AM +0530, Kamlesh Gurudasani wrote:
->>>>>> Add binding for Texas Instruments MCRC64
->>>>>>
->>>>>> MCRC64 engine calculates 64-bit cyclic redundancy checks (CRC)
->>>>>> according to the ISO 3309 standard.
->>>>>>
->>>>>> The ISO 3309 64-bit CRC model parameters are as follows:
->>>>>>     Generator Polynomial: x^64 + x^4 + x^3 + x + 1
->>>>>>     Polynomial Value: 0x000000000000001B
->>>>>>     Initial value: 0x0000000000000000
->>>>>>     Reflected Input: False
->>>>>>     Reflected Output: False
->>>>>>     Xor Final: 0x0000000000000000
->>>>>>
->>>>>> Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
->>>>>> ---
->>>>>>  Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml | 47 +++++++++++++++++++++++++++++++++++++++++++++++
->>>>>>  MAINTAINERS                                             |  5 +++++
->>>>>>  2 files changed, 52 insertions(+)
->>>>>>
->>>>>> diff --git a/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
->>>>>> new file mode 100644
->>>>>> index 000000000000..38bc7efebd68
->>>>>> --- /dev/null
->>>>>> +++ b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
->>>>>> @@ -0,0 +1,47 @@
->>>>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->>>>>> +%YAML 1.2
->>>>>> +---
->>>>>> +$id: https://urldefense.com/v3/__http://devicetree.org/schemas/crypto/ti,mcrc64.yaml*__;Iw!!G3vK!Qw75749h2ysFlROkyfLIUT9MGWlHfBEvPAbLVjScJXCPJ7vbwgxH-8hNWlJGBXGwz9Ny47eQi2mPS5R6La54vZo$
->>>>>> +$schema: https://urldefense.com/v3/__http://devicetree.org/meta-schemas/core.yaml*__;Iw!!G3vK!Qw75749h2ysFlROkyfLIUT9MGWlHfBEvPAbLVjScJXCPJ7vbwgxH-8hNWlJGBXGwz9Ny47eQi2mPS5R6P2LNJCQ$
->>>>>> +
->>>>>> +title: Texas Instruments MCRC64
->>>>>> +
->>>>>> +description: The MCRC64 engine calculates 64-bit cyclic redundancy checks
->>>>>
->>>>> A newline after "description" please.
->>>>>
->>>>>> +  (CRC) according to the ISO 3309 standard.
->>>>>> +
->>>>>> +maintainers:
->>>>>> +  - Kamlesh Gurudasani <kamlesh@ti.com>
->>>>>> +
->>>>>> +properties:
->>>>>> +  compatible:
->>>>>> +    const: ti,am62-mcrc64
->>>>>
->>>>> Is the am62 an SoC or a family of SoCs? I googled a wee bit for am62 &
->>>>> there seems to be an am625 and an am623?
->>>>
+This was a futile attempt to fix a kmemleak warning in host1x_client_unregi=
+ster() in a very old kernel.
+I don't see it anymore, either with or without this change. So,
 
-Let me put this confusion to rest and clarify the ratioanle of namings
-so far.
+Tested-by: Akhil R <akhilrajeev@nvidia.com>
+Acked-by: Akhil R <akhilrajeev@nvidia.com>
 
-AM62 is a the name of the SoC variant. AM625/AM623/AM621/AM620 are the
-Orderable Part Number (OPNs - full OPN is several digits long), the only
-difference b/w them is number of CPU/GPU/PRU cores. At SoC level they
-are all same with AM625 being superset.
-
-Similarly AM62A is another SoC variant, with AM62A7 and AM62A3 are OPNs.
-AM62P is yet another SoC variant with AM62P5 as OPN
-
-Linux DT is written to support superset part numbers (AM625, AM62A7,
-AM62P5) as TI EVMs always have superset parts. Board dts files are named
-accordingly (eg.: k3-am625-sk.dts) Bootloader does the appropriate
-fixups to disable components for subset devices based on eFUSE
-indications when needed.
-
-
->>>> Or is it an am62p5, in which case the compatible should contain
->>>> ti,am62p5 I suppose. Sorry for my confusion here, its not really clear
->>>> me too since I've been seeing many different-but-similar product names
->>>> the last few days.
->>>>
-
-MCRC64 is on all K3 platforms.
-
-We have been using ti,am62-xxxx for all modules that were verified (or
-first supported) on any of the AM625/3/1/0 SoCs. Last digit really is
-represents CPU/GPU numbers, thus not relevant for peripherals and there
-should be no change in HW
-
-If peripheral is specific to AM62A (eg.: DSP) or AM62P, then
-ti,am62a-xxxx and ti,am62p-xxxx is being used correspondingly.
-
-
->>>> Thanks,
->>>> Conor.
->>>>
->>> Hi Conor,
->>>
->>> Thanks for the review.
->>>
->>> am62 is family of SOCs.
->>>
->>> All devices under this family, like am623/5/p5 and etc, have MCRC64.
->>>
->>> I have kept the naming convention similar to SA2UL/SA3UL[0].
->>>
->>> [0] https://urldefense.com/v3/__https://elixir.bootlin.com/linux/latest/source/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml*L18__;Iw!!G3vK!Qw75749h2ysFlROkyfLIUT9MGWlHfBEvPAbLVjScJXCPJ7vbwgxH-8hNWlJGBXGwz9Ny47eQi2mPS5R6afCEd8s$
->>
->> Usual answer is: no families. There are exceptions, though, so is this
->> case on the exception list?
-> Okay, will use ti,am625-mcrc64 as compatible and as fallback compatible for
-> other devices. I hope that is right.
-
-As mentioned above ti,am62-mcrc64 would be better option here and would
-be consistent with rest of the peripherals being supported on the SoC.
-
-But if we really want be accurate to exact part number on which Kamlesh
-has tested then, perhaps ti,am625-mcrc64 is fine with me.
-
-
-> 
-> Thanks.
-> 
-> Kamlesh
->>
->> https://urldefense.com/v3/__https://elixir.bootlin.com/linux/v6.10-rc1/source/Documentation/devicetree/bindings/writing-bindings.rst*L42__;Iw!!G3vK!Qw75749h2ysFlROkyfLIUT9MGWlHfBEvPAbLVjScJXCPJ7vbwgxH-8hNWlJGBXGwz9Ny47eQi2mPS5R6WaRq1VM$
->>
->> P.S. Your email client added some weird subject prefix - please fix it.
-> Thanks for bringing this to my notice, Will fix it.
->>
->>
->>
->> Best regards,
->> Krzysztof
-
--- 
-Regards
-Vignesh
+Regards,
+Akhil
