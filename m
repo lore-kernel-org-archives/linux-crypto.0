@@ -1,134 +1,167 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D306418398B;
-	Thu, 30 May 2024 10:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357BA1C9ECF;
+	Thu, 30 May 2024 12:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717065053; cv=none; b=ZKTfrQiujNOG9VRlpbZMjZyiGdPLeI3VldJkSDv91L+iYiTQaJMZdMYa++kSAPW24D86EGT1XuuRUuW2RJ/KM8dKK0wGPYvmCmby4S/WY07mCaJybZpIsB/lMQi7t0kosrEa8ybdcD96OMsMDKgkM+gtT1Mkr2jEnspNjPhrAZ0=
+	t=1717071890; cv=none; b=Pqk18i+gReHYVCyeA9zqG7xvi8aLvhGO0djPGYW57norRjl7i7fC7dXpe0txz6MDTVoUMK41fJxXGvnobUB0G41bbdwKnVWvO6h+pxeGGdJXU36w1UzBe2gMxfOk6oxr6meOPLFvz63reNaIg4rQD5NzACAorXfOfuyAMq0tpe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717065053; c=relaxed/simple;
-	bh=rW4jn5kjmnKzA8brQFRHHBZw4D5yx8NGw16n6wCqrGU=;
-	h=Content-Type:Mime-Version:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=NclMG8Y2nvQ//Musm5QAYxzRpdF8qjMJfH+90HQsNimZCOObaTQsK479PmixF0vQ3WFwaVSBZBTmhQ3nMNZfE0d6D9392taKGoy0jzEru7xfvZIypKCNFsEJ39zhe6YqmUG4lGujTFD/wYPFkaeEl3R1uR2cAWHPc20iI3rMMF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=loNMSFjk; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717071890; c=relaxed/simple;
+	bh=+4rjW2oYixh/lu0tj44gYkkzWY2cf83FD1AqtHiK2wA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ABbe6f7kR3G27YEO5N9m/8/SbaXsFYoSKxqfRCONn9QaHqunZwNBWXOGVvzOVXaTydDx5ZzEqTMtqRhArjhIkHPHPovvbYtpniXzuq3HtqDwtchKJqsbkqIiPgwq8HK8joeHP/zTbvnkku+b7lv2JmX0hvc+9MbUI5v1e7tZBGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=s+NCDqoM; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="loNMSFjk"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52b7db60003so759367e87.3;
-        Thu, 30 May 2024 03:30:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717065050; x=1717669850; darn=vger.kernel.org;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rW4jn5kjmnKzA8brQFRHHBZw4D5yx8NGw16n6wCqrGU=;
-        b=loNMSFjkZF6+s4qu62M9Ag/5cYjYiadzZGyYNULUjURD864pP3vGjgJBhXQyluj/0X
-         G4NSc7vO0/GG6WhTsFIpqMriGl/13aX/23BQcqTiu0jAYqpgjlcSy5Qh8TEtLzGRnUGX
-         /b0j8id+GBMSinknqYa6gaHfniWFfo5x3GzpvFP5k7Hm3w0XXcp5+0OXq+s0cM8NgSIC
-         k1UfSau73wyL0VEVOvgdW+Z9rvQWWLieSzS+Cx7LUYYm7+gCscTc9ZI05v8fViIjvmqw
-         9itxV6ABBqftZw4p9PQH29nRv9QOnLo9VlsbeOtPWI6e0OQ1BhL6U1V8gP+7NhE3hm+g
-         7UfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717065050; x=1717669850;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rW4jn5kjmnKzA8brQFRHHBZw4D5yx8NGw16n6wCqrGU=;
-        b=kFoSHz1SNszHOFYBOEFy5NcvNpHqsLPZXcLDvAjPBaVC6ofmYsyYKTEL1iAeTSBXBW
-         IM1/WESY5gT6K29ygGgDH94JuJQusFrQad+D0kY1ISrGoQOScnPOUOoCoGLRYXmK7SSZ
-         TAYyWuaeUZJrJs5yZD7oEzED231CK3ETdy65hclMDDmUG9N7jZJhDsOdMyw5t3qqy7AX
-         Ab4Cb80vEseSBbHTeDLRnS8rm5eMFQ09uCq9LQXM5gbuq71Y2hXr2z/EA4v6LK5/xjJZ
-         VJoh+8GZVD4fVHctdIlpoFfsFOw6996zdzU8DreQdVf4N2sV5GOFigaUAmPWj01tu3qQ
-         1tlg==
-X-Forwarded-Encrypted: i=1; AJvYcCVs6xKwNA7LMNyt9AOWMs5MQhyDH20PJFq2w+qv80KNTUIghwFDDBs9x9GXppdavXI3dYftagOcvQIb/V1Ob/PgkavknyYtf86trcrGAi9TToS9DZnpc+Wxm2az1lgO3nzVnQpmOqiyOBbCb05jObNB8CdwLr2UgFYnKn41Qu5AMFynOrYfgwDb85Q=
-X-Gm-Message-State: AOJu0Yyjv9xVixhD+QT1E3XQqhG5x9Sdm1R68oVJpsg8ZYmWccTsr4kF
-	K+S83ULEeBp4EFs/9z6z87yxOIQO6T/qTVmLCo0MHIQje8nRVkU3
-X-Google-Smtp-Source: AGHT+IHbw+XCiEGggxSdTfjisZtE+HV13QFVVvVE1JOXajiAK7lcEZsKf7DsU6pcJz0lHgDK1vPEQQ==
-X-Received: by 2002:ac2:43a1:0:b0:51c:d05b:6b8d with SMTP id 2adb3069b0e04-52b7d4263b2mr1846653e87.23.1717065049710;
-        Thu, 30 May 2024 03:30:49 -0700 (PDT)
-Received: from localhost (p200300e41f162000f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f16:2000:f22f:74ff:fe1f:3a53])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5296f410fc1sm1502371e87.117.2024.05.30.03.30.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 May 2024 03:30:49 -0700 (PDT)
-Content-Type: multipart/signed;
- boundary=432b71ef613f91233681e8ff6b308ab1f6a32c4fb336c68c48fb0ae1b4d1;
- micalg=pgp-sha256; protocol="application/pgp-signature"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="s+NCDqoM"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44UC6rm5015613;
+	Thu, 30 May 2024 12:24:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
+ content-transfer-encoding : content-type : date : from : in-reply-to :
+ message-id : mime-version : references : subject : to; s=pp1;
+ bh=y3Bmhl0vE+2bczhT5nSK1wqavoAlVqxU5VS8NJFBqjc=;
+ b=s+NCDqoMXp4RhgtUCGPkHNEJrbdn8yIYAW7nNh3vC0LDmUhNYMBdFeSgOBgLX8Fax3qd
+ lmmSrdB6iHCIFn985er3XyUaTnpVCczCoaMLbhwKRcfm4RbKxzD2bM0O7Ldwkq3J0vYi
+ kN+LQKcDqvdIStqGHlweO/V9zYqAzIsyKLSr373On4vJAkBAqvyvMxQIwV9kk3pjDvLg
+ yHNRA/Y7XJHVAAdURt9cVo8yT8TGASEpOd19FT/zSffxmFcgCEUktpgG8BHlnC0Bv30I
+ OyD+SsAgBGeU298aLx4lfUsWCQTUBy25BfHOlpwLmJRfgNtaDt1It/3ZVCBoCgjE7wV1 6g== 
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yes5nr149-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 May 2024 12:24:39 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44UBT5WZ026732;
+	Thu, 30 May 2024 12:24:38 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ydpd2su4x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 May 2024 12:24:38 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44UCOaMo13304340
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 30 May 2024 12:24:38 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0ED8B58063;
+	Thu, 30 May 2024 12:24:36 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 44F1358067;
+	Thu, 30 May 2024 12:24:35 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 30 May 2024 12:24:35 +0000 (GMT)
+Message-ID: <899c3637-dc2a-4c73-9b8a-91e7b4da1638@linux.ibm.com>
+Date: Thu, 30 May 2024 08:24:34 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] crypto: ecdsa - Use ecc_digits_from_bytes to create
+ hash digits array
+To: Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, lukas@wunner.de
+References: <20240529230827.379111-1-stefanb@linux.ibm.com>
+ <20240529230827.379111-2-stefanb@linux.ibm.com>
+ <D1MQBJSYUBRS.12KH2S8FUK0XS@kernel.org>
+Content-Language: en-US
+From: Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <D1MQBJSYUBRS.12KH2S8FUK0XS@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: v_AlukYrXlA-6-2HfNZo1wAn2g3BHEk2
+X-Proofpoint-ORIG-GUID: v_AlukYrXlA-6-2HfNZo1wAn2g3BHEk2
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Date: Thu, 30 May 2024 12:30:48 +0200
-Message-Id: <D1MWRDJ06QSQ.5HMWERLERPLY@gmail.com>
-To: "Akhil R" <akhilrajeev@nvidia.com>, "Christophe JAILLET"
- <christophe.jaillet@wanadoo.fr>, "Herbert Xu"
- <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
- "Jon Hunter" <jonathanh@nvidia.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH] crypto: tegra - Remove an incorrect iommu_fwspec_free()
- call in tegra_se_remove()
-From: "Thierry Reding" <thierry.reding@gmail.com>
-X-Mailer: aerc 0.16.0-1-0-g560d6168f0ed-dirty
-References: <ea775b351a3dbe4cef4056ea89da25084f73df22.1716650050.git.christophe.jaillet@wanadoo.fr> <SJ1PR12MB633943D654272A0612695F1DC0F22@SJ1PR12MB6339.namprd12.prod.outlook.com>
-In-Reply-To: <SJ1PR12MB633943D654272A0612695F1DC0F22@SJ1PR12MB6339.namprd12.prod.outlook.com>
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-30_09,2024-05-28_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 impostorscore=0 malwarescore=0 phishscore=0
+ mlxlogscore=999 adultscore=0 mlxscore=0 spamscore=0 bulkscore=0
+ priorityscore=1501 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2405010000 definitions=main-2405300094
 
---432b71ef613f91233681e8ff6b308ab1f6a32c4fb336c68c48fb0ae1b4d1
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
 
-On Wed May 29, 2024 at 8:53 AM CEST, Akhil R wrote:
-> > The only iommu function call in this driver is a
-> > tegra_dev_iommu_get_stream_id() which does not allocate anything and do=
-es
-> > not take any reference.
-> >=20
-> > More-over, what is freed is "se->dev" which has been devm_kzalloc()'ed =
-in the
-> > probe.
->
-> I did not completely understand what is being tried to convey here.
-> If I understand it right, iommu_fwspec_free() does not do anything
-> with the "devm_kzalloc"ed variable.=20
->
-> It would probably be a good idea to remove this line from the commit mess=
-age.
 
-Yeah, I think that's a bit misleading. What iommu_fwspec_free() does is
-get the iommu_fwspec from the passed-in device and then frees that
-iommu_fwspec.
+On 5/30/24 01:28, Jarkko Sakkinen wrote:
+> On Thu May 30, 2024 at 2:08 AM EEST, Stefan Berger wrote:
+>> Since ecc_digits_from_bytes will provide zeros when an insufficient number
+>> of bytes are passed in the input byte array, use it to create the hash
+>> digits directly from the input byte array. This avoids going through an
+>> intermediate byte array (rawhash) that has the first few bytes filled with
+>> zeros.
+>>
+>> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+>> ---
+>>   crypto/ecdsa.c | 17 ++++-------------
+>>   1 file changed, 4 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
+>> index 258fffbf623d..fa029f36110b 100644
+>> --- a/crypto/ecdsa.c
+>> +++ b/crypto/ecdsa.c
+>> @@ -142,10 +142,8 @@ static int ecdsa_verify(struct akcipher_request *req)
+>>   	struct ecdsa_signature_ctx sig_ctx = {
+>>   		.curve = ctx->curve,
+>>   	};
+>> -	u8 rawhash[ECC_MAX_BYTES];
+>>   	u64 hash[ECC_MAX_DIGITS];
+>>   	unsigned char *buffer;
+>> -	ssize_t diff;
+>>   	int ret;
+>>   
+>>   	if (unlikely(!ctx->pub_key_set))
+>> @@ -164,18 +162,11 @@ static int ecdsa_verify(struct akcipher_request *req)
+>>   	if (ret < 0)
+>>   		goto error;
+>>   
+>> -	/* if the hash is shorter then we will add leading zeros to fit to ndigits */
+>> -	diff = bufsize - req->dst_len;
+>> -	if (diff >= 0) {
+>> -		if (diff)
+>> -			memset(rawhash, 0, diff);
+>> -		memcpy(&rawhash[diff], buffer + req->src_len, req->dst_len);
+>> -	} else if (diff < 0) {
+>> -		/* given hash is longer, we take the left-most bytes */
+>> -		memcpy(&rawhash, buffer + req->src_len, bufsize);
+>> -	}
+>> +	if (bufsize > req->dst_len)
+>> +		bufsize = req->dst_len;
+>>   
+>> -	ecc_swap_digits((u64 *)rawhash, hash, ctx->curve->g.ndigits);
+>> +	ecc_digits_from_bytes(buffer + req->src_len, bufsize,
+>> +			      hash, ctx->curve->g.ndigits);
+>>   
+>>   	ret = _ecdsa_verify(ctx, hash, sig_ctx.r, sig_ctx.s);
+>>   
+> 
+> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+> 
+> I don't think it'd be even nit-picking to say that the function
+> called would really need kdoc. I had to spend about 20 minutes
+> to reacall ecc_digits_from_bytes().
 
-That said, as I was looking around I didn't spot anything that was
-calling iommu_fwspec_free() in any of the cleanup paths, so either I'm
-missing something or it's a real memory leak (though perhaps one that we
-are ignoring on purpose because these are usually attached to devices
-that don't just go away).
+Here's the file with all the kdocs: 
+https://elixir.bootlin.com/linux/v6.10-rc1/source/include/crypto/internal/ecc.h#L67
 
-Thierry
+> 
+> Like something to remind what, how and why... So that you can
+> recap quickly. Once I got grip of it (for the 2nd time) the
+> code itself was just fine, no complains on that.
 
---432b71ef613f91233681e8ff6b308ab1f6a32c4fb336c68c48fb0ae1b4d1
-Content-Type: application/pgp-signature; name="signature.asc"
+Do you want to find there that the input byte array starts with the most 
+significant byte and the functions converts this byte array into an 
+internal digits representation?
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmZYVVgACgkQ3SOs138+
-s6E2HxAAuli1khZJ9nZCFGOj9+lAW2lbumnnvQ85exAHuhwyA6rr/bsLI5sQbQ/K
-Km/xVh28quZkpsmwx+q1LmLrHg9FVbX18QvRtZc7qQeWcV32dTJXOZ4KnAQJdQGL
-Jn7mlbh850HJrGZsFv529irOZupkSF1fwJl4rb4iEMdlZPIgC/LjSzSrZ/MZkfLN
-dQChxDuNs/d7CXIASvzamq6pZiHJ4iNG1e1fqZZw3Nl10gGKwFWYeEjryYrY6hsx
-Niw+oP7cicqmfciR+eQQ67KZj8o0J0c1JcxXCeXSBhxbSakVrcXqNAYNFEGhvtXu
-1Slk/zgjmbrXdd1jgx+U0+95GjcCDq9DABmKVsv3ilzrMqDWAL8jVHhtI9rqbPA1
-IxUgAqhNkadrb7wPqHrlqu8c3qwRupvMnCT5Eda6Nxr6BFwfNqnsj42zTDIIBoVl
-ammjk4uxt0HEqrHzrueowXN/rrgNKVIZQjbBKVglE78WidJbGON3MfT5W68wO0Vv
-TRzajZn9fhs6TUc6/AKqgmIeD1CeuNEmCWUGtsZm6JuNh71OQNVS9/5BYEFOC8oJ
-M2/knQPUleCk6GKhsSIGVd2bRfzWZJsWPciTSLJoMI4jb0hSh7xlKYI8bYDD0j0R
-bCkE4jndIqvW/GT82ewQ0mU+4d8t1pBvPrIIubrxKiZdSnSwDZI=
-=DssT
------END PGP SIGNATURE-----
 
---432b71ef613f91233681e8ff6b308ab1f6a32c4fb336c68c48fb0ae1b4d1--
+> 
+> BR, Jarkko
+> 
