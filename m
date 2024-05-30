@@ -1,46 +1,46 @@
 Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0B313211E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C4713212C;
 	Thu, 30 May 2024 12:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717071925; cv=none; b=Qith9XRSOdryvPgmkSbIqfHhpRHhpgWQejzHPUzTiXkT4NmyCvTKSOmkGio37i/MSK1oIMik51ZHb8W1Btrahlc2DcKf9xaw2QgcP5k2CLOimv8dCPh2w/WRc2+Dq84y8QPOCroQ7kK2FENBrx61CmoW7oD90RpiSmexOxv05Sw=
+	t=1717071925; cv=none; b=G4WFmUcdGLIIBcCy4dpHgWzIGDBWakIpN4mnDMcEki5aX5uqy6WAU1VfKurGOmQDHyO7DOhoju46cDXxlinELlRZenGhZRa6NYQVKufQ0+WLg7y2tShctTBpeqGXSLCWlTTfyzBJ0So+lx0Spt6SvtXQ1aD3B0xYR5bAZf76Fvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717071925; c=relaxed/simple;
-	bh=c9OZF6gwLe1ONPPFCAYO4TW8gF1/XJQrbjh5NzlI0lA=;
+	bh=pawKyIUgyhAicTXDCKFAYSVB9rffockciMu5An0WLYg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dUm/GWuXd1CxYtCavIeKrvL21y/Dazv4qXcaY5pi0Qrp6KXoV8o2j46mJ+2Oo/j9g51FPKnelWlhrq6yub6Q/y8e3kBafsrqJMHSYtrBZ/91uh0DYnV7h8w/K9IO1MulpKxrzZVG5GNyT/i4GLwUeNjIFrDyScvIqu1jhbO6jsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=FUyWd3oa; arc=none smtp.client-ip=198.47.23.248
+	 MIME-Version:Content-Type; b=l1mQCqkRKDSUNf5gqP5RU2luPwZGPSMRC/jz4xCIemM6Zl+mOImOtOenVefivnDIb5gO5fDWwaJMruCfU4S6zu56ShgM6iLfn9WmV585i5g5n3OPA7crc2Ucecl/YOkhmkOVnkvsfdwINmf9EGTVvz5jJX+sNbsG6CxpyW5g4jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ozxdcjL4; arc=none smtp.client-ip=198.47.23.248
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="FUyWd3oa"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ozxdcjL4"
 Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44UCOq6U097845;
-	Thu, 30 May 2024 07:24:52 -0500
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44UCOj0e097823;
+	Thu, 30 May 2024 07:24:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1717071892;
-	bh=2lNFQzYM7+sgc6vlQIM/TN4kEerFm7atv8+bl0DccJM=;
+	s=ti-com-17Q1; t=1717071885;
+	bh=GVhylKWTFUhHVDQ+dYT40iN8UHVVdQwcs6myHVRMYro=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=FUyWd3oa/nhh3Z75BqNNvBQEMQe63DYheI9RDjzHBLx2lpxfzG18Fr9jBBJx78I1j
-	 iUUtxOITVmkeQqiO0EPbi+FUCTd3VWj0iyuDhERHuW8Qy4/h/IZUZ7p9/9o7cp1m0N
-	 GHu1r2BgrgRWO+2PV0DHU6g3RHIfC+lyybnrjxYE=
-Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44UCOq87031377
+	b=ozxdcjL4X7rVBM4WmVy4eeG10wXla74U1zpCNqXB/0XS7kn/duvm8R+heeL2d2e9L
+	 +S2Ur4p0h0DhJmI3OmsnNa14GpK3orbFUAv1wtdJ/11/qv7OJvJsWA1Uj+IUUiQ9B/
+	 xOEHTt/OwbeJXLKuD8Gkl0nXcYlR84vGbkO583Zw=
+Received: from DFLE111.ent.ti.com (dfle111.ent.ti.com [10.64.6.32])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44UCOj8s031310
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 30 May 2024 07:24:52 -0500
-Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+	Thu, 30 May 2024 07:24:45 -0500
+Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE111.ent.ti.com
+ (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 30
- May 2024 07:24:52 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ May 2024 07:24:45 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE111.ent.ti.com
+ (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 30 May 2024 07:24:52 -0500
+ Frontend Transport; Thu, 30 May 2024 07:24:45 -0500
 Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44UCOp5x070692;
-	Thu, 30 May 2024 07:24:51 -0500
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44UCOixF114757;
+	Thu, 30 May 2024 07:24:45 -0500
 From: <kamlesh@ti.com>
 To: <herbert@gondor.apana.org.au>, <kristo@kernel.org>, <will@kernel.org>
 CC: <akpm@linux-foundation.org>, <davem@davemloft.net>,
@@ -52,9 +52,9 @@ CC: <akpm@linux-foundation.org>, <davem@davemloft.net>,
         <linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>,
         Kamlesh
  Gurudasani <kamlesh@ti.com>
-Subject: [PATCH v3 4/6] crypto: ti - add driver for MCRC64 engine
-Date: Thu, 30 May 2024 17:54:26 +0530
-Message-ID: <20240524-mcrc64-upstream-v3-4-24b94d8e8578@ti.com>
+Subject: [PATCH v3 2/6] crypto: crc64 - add crc64-iso3309 framework
+Date: Thu, 30 May 2024 17:54:24 +0530
+Message-ID: <20240524-mcrc64-upstream-v3-2-24b94d8e8578@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240524-mcrc64-upstream-v3-0-24b94d8e8578@ti.com>
 References: <20240524-mcrc64-upstream-v3-0-24b94d8e8578@ti.com>
@@ -70,14 +70,14 @@ X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
 From: Kamlesh Gurudasani <kamlesh@ti.com>
 
-Add support for MCRC64 engine to calculate 64-bit CRC in Full-CPU mode.
+Hardware specific features may be able to calculate a crc64-iso3309,
+so provide a framework for drivers to register their implementation.
+If nothing is registered, fallback to the generic table lookup
+implementation. The implementation is modeled after the crc64-rocksoft
+equivalent.
 
-In Full-CPU mode, the CPU does the data patterns transfer and signature
-verification all by itself, only CRC calculation is being done by MCRC64
-engine.
-
-MCRC64 engine calculates 64-bit cyclic redundancy checks (CRC)
-according to the ISO 3309 standard.
+Add testmgr, tcrypt tests and vectors for 64-bit cyclic
+redundancy checks (CRC) according to the ISO 3309 standard.
 
 The ISO 3309 64-bit CRC model parameters are as follows:
     Generator Polynomial: x^64 + x^4 + x^3 + x + 1
@@ -89,525 +89,636 @@ The ISO 3309 64-bit CRC model parameters are as follows:
 
 Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
 ---
- MAINTAINERS                |   2 +
- drivers/crypto/Kconfig     |   1 +
- drivers/crypto/Makefile    |   1 +
- drivers/crypto/ti/Kconfig  |  11 +++
- drivers/crypto/ti/Makefile |   2 +
- drivers/crypto/ti/mcrc64.c | 442 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 459 insertions(+)
+ crypto/Kconfig                 |  11 +++
+ crypto/Makefile                |   1 +
+ crypto/crc64_iso3309_generic.c | 119 +++++++++++++++++++++++++++
+ crypto/tcrypt.c                |   6 ++
+ crypto/testmgr.c               |   7 ++
+ crypto/testmgr.h               | 404 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/crc64.h          |   1 +
+ 7 files changed, 549 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0c6bd9c22b91..d072b5a0154f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -22193,8 +22193,10 @@ F:	drivers/iio/adc/ti-lmp92064.c
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 5688d42a59c2..125cc88805ae 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1124,6 +1124,17 @@ config CRYPTO_CRCT10DIF
  
- TI MEMORY CYCLIC REDUNDANCY CHECK (MCRC64) DRIVER
- M:	Kamlesh Gurudasani <kamlesh@ti.com>
-+L:	linux-crypto@vger.kernel.org
- S:	Maintained
- F:	Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
-+F:	drivers/crypto/ti/mcrc64.c
+ 	  CRC algorithm used by the SCSI Block Commands standard.
  
- TI PCM3060 ASoC CODEC DRIVER
- M:	Kirill Marinushkin <kmarinushkin@birdec.com>
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index bb27690f8f7c..7e8ad3dc18da 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -806,5 +806,6 @@ config CRYPTO_DEV_SA2UL
- 
- source "drivers/crypto/aspeed/Kconfig"
- source "drivers/crypto/starfive/Kconfig"
-+source "drivers/crypto/ti/Kconfig"
- 
- endif # CRYPTO_HW
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index ad4ccef67d12..07488b610bed 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -42,6 +42,7 @@ obj-$(CONFIG_CRYPTO_DEV_SL3516) += gemini/
- obj-y += stm32/
- obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
- obj-$(CONFIG_CRYPTO_DEV_TEGRA) += tegra/
-+obj-$(CONFIG_CRYPTO_DEV_TI_MCRC64) += ti/
- obj-$(CONFIG_CRYPTO_DEV_VIRTIO) += virtio/
- #obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
- obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
-diff --git a/drivers/crypto/ti/Kconfig b/drivers/crypto/ti/Kconfig
-new file mode 100644
-index 000000000000..b5747c2ab8f8
---- /dev/null
-+++ b/drivers/crypto/ti/Kconfig
-@@ -0,0 +1,11 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+config CRYPTO_DEV_TI_MCRC64
-+	tristate "Texas Instruments MCRC64 engine support"
-+	depends on ARCH_K3 || COMPILE_TEST
++config CRYPTO_CRC64_ISO3309
++	tristate "CRC64 based on ISO 3309 Model algorithm"
++	depends on CRC64
 +	select CRYPTO_HASH
-+	select CRYPTO_CRC64_ISO3309
 +	help
-+	  This enables support for the MCRC64 engine
-+	  which can be found on all AM62* and J722S devices.
-+	  MCRC64 engine calculates 64-bit cyclic redundancy checks (CRC)
-+	  according to the ISO 3309 standard.
-diff --git a/drivers/crypto/ti/Makefile b/drivers/crypto/ti/Makefile
++	  CRC64 CRC algorithm based on the ISO 3309 Model CRC Algorithm
++
++	  Generator polynomial: x^64 + x^4 + x^3 + x + 1
++	  Polynomial value: 0x000000000000001b
++	  See https://en.wikipedia.org/wiki/Cyclic_redundancy_check
++
+ config CRYPTO_CRC64_ROCKSOFT
+ 	tristate "CRC64 based on Rocksoft Model algorithm"
+ 	depends on CRC64
+diff --git a/crypto/Makefile b/crypto/Makefile
+index de9a3312a2c8..4d419e5fb379 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -158,6 +158,7 @@ obj-$(CONFIG_CRYPTO_MICHAEL_MIC) += michael_mic.o
+ obj-$(CONFIG_CRYPTO_CRC32C) += crc32c_generic.o
+ obj-$(CONFIG_CRYPTO_CRC32) += crc32_generic.o
+ obj-$(CONFIG_CRYPTO_CRCT10DIF) += crct10dif_common.o crct10dif_generic.o
++obj-$(CONFIG_CRYPTO_CRC64_ISO3309) += crc64_iso3309_generic.o
+ obj-$(CONFIG_CRYPTO_CRC64_ROCKSOFT) += crc64_rocksoft_generic.o
+ obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
+ obj-$(CONFIG_CRYPTO_LZO) += lzo.o lzo-rle.o
+diff --git a/crypto/crc64_iso3309_generic.c b/crypto/crc64_iso3309_generic.c
 new file mode 100644
-index 000000000000..94ffc2576137
+index 000000000000..8fcc092de787
 --- /dev/null
-+++ b/drivers/crypto/ti/Makefile
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_CRYPTO_DEV_TI_MCRC64) += mcrc64.o
-diff --git a/drivers/crypto/ti/mcrc64.c b/drivers/crypto/ti/mcrc64.c
-new file mode 100644
-index 000000000000..2be18ce81a27
---- /dev/null
-+++ b/drivers/crypto/ti/mcrc64.c
-@@ -0,0 +1,442 @@
++++ b/crypto/crc64_iso3309_generic.c
+@@ -0,0 +1,119 @@
 +// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) Texas Instruments 2023 - http://www.ti.com
-+ * Author: Kamlesh Gurudasani <kamlesh@ti.com>
-+ */
 +
 +#include <linux/crc64.h>
-+#include <linux/io.h>
-+#include <linux/kernel.h>
 +#include <linux/module.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/platform_device.h>
-+#include <linux/pm_runtime.h>
-+
 +#include <crypto/internal/hash.h>
-+
 +#include <asm/unaligned.h>
 +
-+#define DRIVER_NAME		"mcrc64"
-+#define CHKSUM_DIGEST_SIZE	8
-+#define CHKSUM_BLOCK_SIZE	1
-+
-+/* Registers */
-+#define CRC_CTRL0 0x0000 /* CRC Global Control Register 0 */
-+#define CH_PSA_SWRE(ch) BIT(((ch) - 1) << 3) /* PSA Software Reset  */
-+
-+#define CRC_CTRL1 0x0008 /* CRC Global Control Register 1 */
-+#define PWDN BIT(0) /* Power Down  */
-+
-+#define CRC_CTRL2 0x0010 /* CRC Global Control Register 2 */
-+#define CH_MODE(ch, m) ((m) << (((ch) - 1) << 3))
-+
-+#define PSA_SIGREGL(ch) ((0x6 + (4 * ((ch) - 1))) << 4) /* Signature register */
-+
-+#define MCRC64_ALG_MASK 0x8000000000000000
-+#define MCRC64_CRC64_POLY 0x000000000000001b
-+
-+#define MCRC64_AUTOSUSPEND_DELAY 50
-+
-+enum mcrc64_mode {
-+	MCRC64_MODE_DATA_CAPTURE = 0,
-+	MCRC64_MODE_AUTO,
-+	MCRC64_MODE_SEMI_CPU,
-+	MCRC64_MODE_FULL_CPU,
-+	MCRC64_MODE_INVALID,
-+};
-+
-+enum mcrc64_channel {
-+	MCRC64_CHANNEL_1 = 1,
-+	MCRC64_CHANNEL_2,
-+	MCRC64_CHANNEL_3,
-+	MCRC64_CHANNEL_4,
-+	MCRC64_CHANNEL_INVALID,
-+};
-+
-+struct mcrc64_data {
-+	struct list_head list;
-+	struct device *dev;
-+	void __iomem *regs;
-+};
-+
-+struct mcrc64_list {
-+	struct list_head dev_list;
-+	spinlock_t lock; /* protect dev_list */
-+};
-+
-+static struct mcrc64_list mcrc64_dev_list = {
-+	.dev_list = LIST_HEAD_INIT(mcrc64_dev_list.dev_list),
-+	.lock = __SPIN_LOCK_UNLOCKED(mcrc64_dev_list.lock),
-+};
-+
-+struct mcrc64_tfm_ctx {
-+	struct mcrc64_data *dev_data;
-+	u64 key;
-+};
-+
-+struct mcrc64_desc_ctx {
-+	u64 signature;
-+};
-+
-+static struct mcrc64_data *mcrc64_get_dev(struct mcrc64_tfm_ctx *tctx)
++static int chksum_cra_init(struct crypto_tfm *tfm)
 +{
-+	struct mcrc64_data *dev_data;
++	u64 *key = crypto_tfm_ctx(tfm);
 +
-+	if (tctx->dev_data)
-+		return tctx->dev_data;
-+
-+	spin_lock_bh(&mcrc64_dev_list.lock);
-+	dev_data = list_first_entry(&mcrc64_dev_list.dev_list, struct mcrc64_data, list);
-+	if (dev_data)
-+		list_move_tail(&dev_data->list, &mcrc64_dev_list.dev_list);
-+	spin_unlock_bh(&mcrc64_dev_list.lock);
-+
-+	return dev_data;
-+}
-+
-+static int mcrc64_set_mode(void __iomem *regs, u32 channel, u32 mode)
-+{
-+	u32 mode_set_val;
-+	u32 crc_ctrl2_reg = 0;
-+
-+	if (mode < 0 || mode >= MCRC64_MODE_INVALID)
-+		return -EINVAL;
-+
-+	if (channel <= 0 || channel >= MCRC64_CHANNEL_INVALID)
-+		return -EINVAL;
-+
-+	mode_set_val = crc_ctrl2_reg | CH_MODE(channel, mode);
-+
-+	/* Write CRC_CTRL2, set mode */
-+	writel_relaxed(mode_set_val, regs + CRC_CTRL2);
-+
++	*key = 0;
 +	return 0;
 +}
 +
-+static int mcrc64_reset_signature(void __iomem *regs, u32 channel)
++static int chksum_init(struct shash_desc *desc)
 +{
-+	u32 crc_ctrl0_reg, reset_val, reset_undo_val;
++	u64 *key = crypto_shash_ctx(desc->tfm);
++	u64 *crc = shash_desc_ctx(desc);
 +
-+	if (channel <= 0 || channel >= MCRC64_CHANNEL_INVALID)
-+		return -EINVAL;
-+
-+	/* reset PSA */
-+	crc_ctrl0_reg = readl_relaxed(regs + CRC_CTRL0);
-+
-+	reset_val = crc_ctrl0_reg | CH_PSA_SWRE(channel);
-+	reset_undo_val = crc_ctrl0_reg & ~CH_PSA_SWRE(channel);
-+
-+	/* Write CRC_CTRL0 register, reset PSA register */
-+	writel_relaxed(reset_val, regs + CRC_CTRL0);
-+	writel_relaxed(reset_undo_val, regs + CRC_CTRL0);
-+
++	*crc = *key;
 +	return 0;
 +}
 +
-+/* This helper implements crc64 calculation using CPU */
-+static u64 mcrc64_calculate_sw_crc(u64 crc, u8 byte)
++static int chksum_update(struct shash_desc *desc, const u8 *data,
++			 unsigned int length)
 +{
-+	u64 bit = 0;
-+	u8 j;
++	u64 *crc = shash_desc_ctx(desc);
 +
-+	for (j = 0; j < 8; j++) {
-+		bit = crc & MCRC64_ALG_MASK;
-+		crc <<= 1;
-+		if (byte & (0x80 >> j))
-+			bit ^= MCRC64_ALG_MASK;
-+		if (bit)
-+			crc ^= MCRC64_CRC64_POLY;
-+	}
-+
-+	return crc;
-+}
-+
-+static int mcrc64_calculate_crc(void __iomem *regs, u32 channel,
-+				const u8 *d8, size_t length, u64 *crc64)
-+{
-+	void __iomem *psa_reg;
-+	u64 signature = 0;
-+
-+	if (channel <= 0 || channel >= MCRC64_CHANNEL_INVALID)
-+		return -EINVAL;
-+
-+	psa_reg = regs + PSA_SIGREGL(channel);
-+
-+	for (; length >= sizeof(u64); d8 += sizeof(u64), length -= sizeof(u64))
-+		writeq_relaxed(cpu_to_be64p((u64 *)d8), psa_reg);
-+
-+	signature = readq_relaxed(psa_reg);
-+
-+	if (length) {
-+		while (length--)
-+			signature = mcrc64_calculate_sw_crc(signature, *d8++);
-+
-+		/* set capture mode */
-+		int ret = mcrc64_set_mode(regs, MCRC64_CHANNEL_1,
-+					MCRC64_MODE_DATA_CAPTURE);
-+		if (ret)
-+			return ret;
-+
-+		ret = mcrc64_reset_signature(regs, MCRC64_CHANNEL_1);
-+		if (ret)
-+			return ret;
-+
-+		writeq_relaxed(signature, psa_reg);
-+
-+		ret = mcrc64_set_mode(regs, MCRC64_CHANNEL_1,
-+				      MCRC64_MODE_FULL_CPU);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	*crc64 = signature;
-+
++	*crc = crc64_iso3309_generic(*crc, data, length);
 +	return 0;
 +}
 +
-+static int mcrc64_cra_init(struct crypto_tfm *tfm)
++static int chksum_final(struct shash_desc *desc, u8 *out)
 +{
-+	struct mcrc64_tfm_ctx *tctx = crypto_tfm_ctx(tfm);
-+	struct mcrc64_data *dev_data;
++	u64 *crc = shash_desc_ctx(desc);
 +
-+	dev_data = mcrc64_get_dev(tctx);
-+	if (!dev_data)
-+		return -ENODEV;
-+
-+	pm_runtime_get_sync(dev_data->dev);
-+
-+	tctx->key = 0;
-+
++	put_unaligned_le64(*crc, out);
 +	return 0;
 +}
 +
-+static void mcrc64_cra_exit(struct crypto_tfm *tfm)
++static int __chksum_finup(u64 crc, const u8 *data, unsigned int len, u8 *out)
 +{
-+	struct mcrc64_tfm_ctx *tctx = crypto_tfm_ctx(tfm);
-+	struct mcrc64_data *dev_data;
++	crc = crc64_iso3309_generic(crc, data, len);
 +
-+	dev_data = mcrc64_get_dev(tctx);
-+
-+	pm_runtime_mark_last_busy(dev_data->dev);
-+	pm_runtime_put_autosuspend(dev_data->dev);
++	put_unaligned_le64(crc, out);
++	return 0;
 +}
 +
-+static int mcrc64_setkey(struct crypto_shash *tfm, const u8 *key,
++static int chksum_finup(struct shash_desc *desc, const u8 *data,
++			unsigned int len, u8 *out)
++{
++	u64 *crc = shash_desc_ctx(desc);
++
++	return __chksum_finup(*crc, data, len, out);
++}
++
++static int chksum_digest(struct shash_desc *desc, const u8 *data,
++			 unsigned int length, u8 *out)
++{
++	u64 *key = crypto_shash_ctx(desc->tfm);
++
++	return __chksum_finup(*key, data, length, out);
++}
++
++/*
++ * Setting the seed allows arbitrary accumulators and flexible XOR policy
++ */
++static int chksum_setkey(struct crypto_shash *tfm, const u8 *key,
 +			 unsigned int keylen)
 +{
-+	struct mcrc64_tfm_ctx *tctx = crypto_shash_ctx(tfm);
++	u64 *mctx = crypto_shash_ctx(tfm);
 +
 +	if (keylen != sizeof(u64))
 +		return -EINVAL;
 +
-+	tctx->key = get_unaligned_le64(key);
-+
++	*mctx = get_unaligned_le64(key);
 +	return 0;
 +}
 +
-+static int mcrc64_init(struct shash_desc *desc)
-+{
-+	struct mcrc64_desc_ctx *ctx = shash_desc_ctx(desc);
-+	struct mcrc64_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-+	struct mcrc64_data *dev_data;
-+	void __iomem *psa_reg;
-+
-+	dev_data = mcrc64_get_dev(tctx);
-+	if (!dev_data)
-+		return -ENODEV;
-+
-+	pm_runtime_get_sync(dev_data->dev);
-+
-+	/* set capture mode */
-+	int ret = mcrc64_set_mode(dev_data->regs, MCRC64_CHANNEL_1,
-+				  MCRC64_MODE_DATA_CAPTURE);
-+	if (ret)
-+		return ret;
-+
-+	/* reset PSA */
-+	psa_reg = dev_data->regs + PSA_SIGREGL(MCRC64_CHANNEL_1);
-+	ret =  mcrc64_reset_signature(dev_data->regs, MCRC64_CHANNEL_1);
-+	if (ret)
-+		return ret;
-+
-+	/* write key  */
-+	writeq_relaxed(tctx->key, psa_reg);
-+
-+	/* set full cpu mode */
-+	ret = mcrc64_set_mode(dev_data->regs, MCRC64_CHANNEL_1,
-+			      MCRC64_MODE_FULL_CPU);
-+	if (ret)
-+		return ret;
-+
-+	ctx->signature = readq_relaxed(psa_reg);
-+
-+	return 0;
-+}
-+
-+static int mcrc64_update(struct shash_desc *desc, const u8 *d8,
-+			 unsigned int length)
-+{
-+	struct mcrc64_desc_ctx *ctx = shash_desc_ctx(desc);
-+	struct mcrc64_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-+	struct mcrc64_data *dev_data;
-+
-+	dev_data = mcrc64_get_dev(tctx);
-+	if (!dev_data)
-+		return -ENODEV;
-+
-+	return mcrc64_calculate_crc(dev_data->regs, MCRC64_CHANNEL_1,
-+				    d8, length, &ctx->signature);
-+}
-+
-+static int mcrc64_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct mcrc64_desc_ctx *ctx = shash_desc_ctx(desc);
-+
-+	/* Send computed CRC */
-+	put_unaligned_le64(ctx->signature, out);
-+	return 0;
-+}
-+
-+static int mcrc64_finup(struct shash_desc *desc, const u8 *data,
-+			unsigned int length, u8 *out)
-+{
-+	return mcrc64_update(desc, data, length) ?:
-+		mcrc64_final(desc, out);
-+}
-+
-+static int mcrc64_digest(struct shash_desc *desc, const u8 *data,
-+			 unsigned int length, u8 *out)
-+{
-+	return mcrc64_init(desc) ?: mcrc64_finup(desc, data, length, out);
-+}
-+
-+static unsigned int refcnt;
-+static DEFINE_MUTEX(refcnt_lock);
-+static struct shash_alg algs[] = {
-+	/* CRC-64 */
-+	{
-+		.setkey		= mcrc64_setkey,
-+		.init		= mcrc64_init,
-+		.update		= mcrc64_update,
-+		.final		= mcrc64_final,
-+		.finup		= mcrc64_finup,
-+		.digest		= mcrc64_digest,
-+		.descsize	= sizeof(struct mcrc64_desc_ctx),
-+		.digestsize	= CHKSUM_DIGEST_SIZE,
-+		.base		= {
-+			.cra_name		= CRC64_ISO3309_STRING,
-+			.cra_driver_name	= "mcrc64",
-+			.cra_priority		= 300,
-+			.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
-+			.cra_blocksize		= CHKSUM_BLOCK_SIZE,
-+			.cra_ctxsize		= sizeof(struct mcrc64_tfm_ctx),
-+			.cra_module		= THIS_MODULE,
-+			.cra_init		= mcrc64_cra_init,
-+			.cra_exit		= mcrc64_cra_exit,
-+		}
++static struct shash_alg alg = {
++	.digestsize	=	sizeof(u64),
++	.setkey		=	chksum_setkey,
++	.init		=	chksum_init,
++	.update		=	chksum_update,
++	.final		=	chksum_final,
++	.finup		=	chksum_finup,
++	.digest		=	chksum_digest,
++	.descsize	=	sizeof(u64),
++	.base		=	{
++		.cra_name		=	CRC64_ISO3309_STRING,
++		.cra_driver_name	=	"crc64-iso3309-generic",
++		.cra_priority		=	200,
++		.cra_flags		=       CRYPTO_ALG_OPTIONAL_KEY,
++		.cra_blocksize		=	1,
++		.cra_ctxsize		=       sizeof(u64),
++		.cra_module		=	THIS_MODULE,
++		.cra_init		=       chksum_cra_init,
 +	}
 +};
 +
-+static int mcrc64_probe(struct platform_device *pdev)
++static int __init crc64_iso3309_init(void)
 +{
-+	struct device *dev = &pdev->dev;
-+	struct mcrc64_data *dev_data;
-+	int ret;
-+
-+	dev_data = devm_kzalloc(dev, sizeof(*dev_data), GFP_KERNEL);
-+	if (!dev_data)
-+		return -ENOMEM;
-+
-+	dev_data->dev = dev;
-+	dev_data->regs = devm_platform_ioremap_resource(pdev, 0);
-+
-+	platform_set_drvdata(pdev, dev_data);
-+
-+	spin_lock(&mcrc64_dev_list.lock);
-+	list_add(&dev_data->list, &mcrc64_dev_list.dev_list);
-+	spin_unlock(&mcrc64_dev_list.lock);
-+
-+	mutex_lock(&refcnt_lock);
-+	if (!refcnt) {
-+		ret = crypto_register_shashes(algs, ARRAY_SIZE(algs));
-+		if (ret) {
-+			mutex_unlock(&refcnt_lock);
-+			dev_err(dev, "Failed to register\n");
-+			return ret;
-+		}
-+	}
-+	refcnt++;
-+	mutex_unlock(&refcnt_lock);
-+
-+	pm_runtime_set_autosuspend_delay(dev, MCRC64_AUTOSUSPEND_DELAY);
-+	pm_runtime_use_autosuspend(dev);
-+
-+	pm_runtime_get_noresume(dev);
-+	pm_runtime_set_active(dev);
-+	pm_runtime_enable(dev);
-+
-+	pm_runtime_put_sync(dev);
-+
-+	return 0;
++	return crypto_register_shash(&alg);
 +}
 +
-+static int mcrc64_remove(struct platform_device *pdev)
++static void __exit crc64_iso3309_exit(void)
 +{
-+	struct mcrc64_data *dev_data = platform_get_drvdata(pdev);
-+	int ret;
-+
-+	ret = pm_runtime_resume_and_get(dev_data->dev);
-+	if (ret < 0)
-+		return ret;
-+
-+	spin_lock(&mcrc64_dev_list.lock);
-+	list_del(&dev_data->list);
-+	spin_unlock(&mcrc64_dev_list.lock);
-+
-+	mutex_lock(&refcnt_lock);
-+	if (!--refcnt)
-+		crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
-+	mutex_unlock(&refcnt_lock);
-+
-+	pm_runtime_disable(dev_data->dev);
-+	pm_runtime_put_noidle(dev_data->dev);
-+
-+	return 0;
++	crypto_unregister_shash(&alg);
 +}
 +
-+static int __maybe_unused mcrc64_suspend(struct device *dev)
-+{
-+	return	pm_runtime_force_suspend(dev);
-+}
++module_init(crc64_iso3309_init);
++module_exit(crc64_iso3309_exit);
 +
-+static int __maybe_unused mcrc64_resume(struct device *dev)
-+{
-+	return pm_runtime_force_resume(dev);
-+}
-+
-+static const struct dev_pm_ops mcrc64_pm_ops = {
-+	SET_SYSTEM_SLEEP_PM_OPS(mcrc64_suspend,
-+				mcrc64_resume)
-+};
-+
-+static const struct of_device_id of_match[] = {
-+	{ .compatible = "ti,am62-mcrc64", },
-+	{},
-+};
-+MODULE_DEVICE_TABLE(of, of_match);
-+
-+static struct platform_driver mcrc64_driver = {
-+	.probe	= mcrc64_probe,
-+	.remove = mcrc64_remove,
-+	.driver = {
-+		.name		= DRIVER_NAME,
-+		.pm		= &mcrc64_pm_ops,
-+		.of_match_table = of_match,
-+	},
-+};
-+
-+module_platform_driver(mcrc64_driver);
-+
-+MODULE_AUTHOR("Kamlesh Gurudasani <kamlesh@ti.com>");
-+MODULE_DESCRIPTION("Texas Instruments MCRC64 driver");
 +MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Kamlesh Gurudasani <kamlesh@ti.com>");
++MODULE_DESCRIPTION("ISO3309 model CRC64 calculation");
++MODULE_ALIAS_CRYPTO("crc64-iso3309");
++MODULE_ALIAS_CRYPTO("crc64-iso3309-generic");
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 8aea416f6480..efc76dd9f57f 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -2314,6 +2314,12 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 				generic_hash_speed_template);
+ 		if (mode > 300 && mode < 400) break;
+ 		fallthrough;
++	case 329:
++		test_hash_speed("crc64-iso3309", sec,
++				generic_hash_speed_template);
++		if (mode > 300 && mode < 400)
++			break;
++		fallthrough;
+ 	case 399:
+ 		break;
+ 
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 00f5a6cf341a..d6ae74efca98 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4656,6 +4656,13 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.hash = __VECS(crc32c_tv_template)
+ 		}
++	}, {
++		.alg = "crc64-iso3309",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = __VECS(crc64_iso3309_tv_template)
++		}
+ 	}, {
+ 		.alg = "crc64-rocksoft",
+ 		.test = alg_test_hash,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 5350cfd9d325..21387e405e71 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -5355,6 +5355,410 @@ static const struct hash_testvec rmd160_tv_template[] = {
+ 	}
+ };
+ 
++static const struct hash_testvec crc64_iso3309_tv_template[] = {
++	{
++		.psize = 0,
++		.digest = "\x00\x00\x00\x00\x00\x00\x00\x00",
++	},
++	{
++		.plaintext = "\x01\x02\x03\x04\x05\x06\x07\x08"
++			     "\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10"
++			     "\x11\x12\x13\x14\x15\x16\x17\x18"
++			     "\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20"
++			     "\x21\x22\x23\x24\x25\x26\x27\x28",
++		.psize = 40,
++		.digest = "\xaf\x45\xba\x7d\xf2\xda\xa0\xaa",
++	},
++	{
++		.plaintext = "\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30"
++			     "\x31\x32\x33\x34\x35\x36\x37\x38"
++			     "\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40"
++			     "\x41\x42\x43\x44\x45\x46\x47\x48"
++			     "\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50",
++		.psize = 40,
++		.digest = "\x81\x55\x2e\x76\xf8\xd0\xaa\xa0",
++	},
++	{
++		.plaintext = "\x51\x52\x53\x54\x55\x56\x57\x58"
++			     "\x59\x5a\x5b\x5c\x5d\x5e\x5f\x60"
++			     "\x61\x62\x63\x64\x65\x66\x67\x68"
++			     "\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70"
++			     "\x71\x72\x73\x74\x75\x76\x77\x78",
++		.psize = 40,
++		.digest = "\xc6\xb6\x26\x82\x0d\x25\x5f\x55",
++	},
++	{
++		.plaintext = "\x79\x7a\x7b\x7c\x7d\x7e\x7f\x80"
++			     "\x81\x82\x83\x84\x85\x86\x87\x88"
++			     "\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90"
++			     "\x91\x92\x93\x94\x95\x96\x97\x98"
++			     "\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0",
++		.psize = 40,
++		.digest = "\x20\x8a\xe6\x59\xdf\xf7\x8d\x87",
++	},
++	{
++		.plaintext = "\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8"
++			     "\xa9\xaa\xab\xac\xad\xae\xaf\xb0"
++			     "\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8"
++			     "\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0"
++			     "\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8",
++		.psize = 40,
++		.digest = "\x19\x9e\xba\xff\x70\x58\x22\x28",
++
++	},
++	{
++		.plaintext = "\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0"
++			     "\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8"
++			     "\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0"
++			     "\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8"
++			     "\xe9\xea\xeb\xec\xed\xee\xef\xf0",
++		.psize = 40,
++		.digest = "\xa3\xdc\x11\x98\x16\x3e\x44\x4e",
++	},
++	{
++		.plaintext = "\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30"
++			     "\x31\x32\x33\x34\x35\x36\x37\x38"
++			     "\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40"
++			     "\x41\x42\x43\x44\x45\x46\x47\x48"
++			     "\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50",
++		.psize = 40,
++		.digest = "\x81\x55\x2e\x76\xf8\xd0\xaa\xa0",
++	},
++	{
++		.plaintext = "\x51\x52\x53\x54\x55\x56\x57\x58"
++			     "\x59\x5a\x5b\x5c\x5d\x5e\x5f\x60"
++			     "\x61\x62\x63\x64\x65\x66\x67\x68"
++			     "\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70"
++			     "\x71\x72\x73\x74\x75\x76\x77\x78",
++		.psize = 40,
++		.digest = "\xc6\xb6\x26\x82\x0d\x25\x5f\x55",
++	},
++	{
++		.plaintext = "\x79\x7a\x7b\x7c\x7d\x7e\x7f\x80"
++			     "\x81\x82\x83\x84\x85\x86\x87\x88"
++			     "\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90"
++			     "\x91\x92\x93\x94\x95\x96\x97\x98"
++			     "\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0",
++		.psize = 40,
++		.digest = "\x20\x8a\xe6\x59\xdf\xf7\x8d\x87",
++	},
++	{
++		.plaintext = "\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8"
++			     "\xa9\xaa\xab\xac\xad\xae\xaf\xb0"
++			     "\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8"
++			     "\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0"
++			     "\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8",
++		.psize = 40,
++		.digest = "\x19\x9e\xba\xff\x70\x58\x22\x28",
++	},
++	{
++		.plaintext = "\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0"
++			     "\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8"
++			     "\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0"
++			     "\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8"
++			     "\xe9\xea\xeb\xec\xed\xee\xef\xf0",
++		.psize = 40,
++		.digest = "\xa3\xdc\x11\x98\x16\x3e\x44\x4e",
++	},
++	{
++		.key = "\xff\xff\xff\xff\xff\xff\xff\xff",
++		.ksize = 8,
++		.plaintext = "\x01\x02\x03\x04\x05\x06\x07\x08"
++			     "\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10"
++			     "\x11\x12\x13\x14\x15\x16\x17\x18"
++			     "\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20"
++			     "\x21\x22\x23\x24\x25\x26\x27\x28"
++			     "\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30"
++			     "\x31\x32\x33\x34\x35\x36\x37\x38"
++			     "\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40"
++			     "\x41\x42\x43\x44\x45\x46\x47\x48"
++			     "\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50"
++			     "\x51\x52\x53\x54\x55\x56\x57\x58"
++			     "\x59\x5a\x5b\x5c\x5d\x5e\x5f\x60"
++			     "\x61\x62\x63\x64\x65\x66\x67\x68"
++			     "\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70"
++			     "\x71\x72\x73\x74\x75\x76\x77\x78"
++			     "\x79\x7a\x7b\x7c\x7d\x7e\x7f\x80"
++			     "\x81\x82\x83\x84\x85\x86\x87\x88"
++			     "\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90"
++			     "\x91\x92\x93\x94\x95\x96\x97\x98"
++			     "\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0"
++			     "\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8"
++			     "\xa9\xaa\xab\xac\xad\xae\xaf\xb0"
++			     "\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8"
++			     "\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0"
++			     "\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8"
++			     "\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0"
++			     "\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8"
++			     "\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0"
++			     "\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8"
++			     "\xe9\xea\xeb\xec\xed\xee\xef\xf0",
++		.psize = 240,
++		.digest = "\x8b\xa6\xd7\x91\xb4\x74\x96\x84",
++	}, {
++		.key = "\xff\xff\xff\xff\xff\xff\xff\xff",
++		.ksize = 8,
++		.plaintext = "\x6e\x05\x79\x10\xa7\x1b\xb2\x49"
++			     "\xe0\x54\xeb\x82\x19\x8d\x24\xbb"
++			     "\x2f\xc6\x5d\xf4\x68\xff\x96\x0a"
++			     "\xa1\x38\xcf\x43\xda\x71\x08\x7c"
++			     "\x13\xaa\x1e\xb5\x4c\xe3\x57\xee"
++			     "\x85\x1c\x90\x27\xbe\x32\xc9\x60"
++			     "\xf7\x6b\x02\x99\x0d\xa4\x3b\xd2"
++			     "\x46\xdd\x74\x0b\x7f\x16\xad\x21"
++			     "\xb8\x4f\xe6\x5a\xf1\x88\x1f\x93"
++			     "\x2a\xc1\x35\xcc\x63\xfa\x6e\x05"
++			     "\x9c\x10\xa7\x3e\xd5\x49\xe0\x77"
++			     "\x0e\x82\x19\xb0\x24\xbb\x52\xe9"
++			     "\x5d\xf4\x8b\x22\x96\x2d\xc4\x38"
++			     "\xcf\x66\xfd\x71\x08\x9f\x13\xaa"
++			     "\x41\xd8\x4c\xe3\x7a\x11\x85\x1c"
++			     "\xb3\x27\xbe\x55\xec\x60\xf7\x8e"
++			     "\x02\x99\x30\xc7\x3b\xd2\x69\x00"
++			     "\x74\x0b\xa2\x16\xad\x44\xdb\x4f"
++			     "\xe6\x7d\x14\x88\x1f\xb6\x2a\xc1"
++			     "\x58\xef\x63\xfa\x91\x05\x9c\x33"
++			     "\xca\x3e\xd5\x6c\x03\x77\x0e\xa5"
++			     "\x19\xb0\x47\xde\x52\xe9\x80\x17"
++			     "\x8b\x22\xb9\x2d\xc4\x5b\xf2\x66"
++			     "\xfd\x94\x08\x9f\x36\xcd\x41\xd8"
++			     "\x6f\x06\x7a\x11\xa8\x1c\xb3\x4a"
++			     "\xe1\x55\xec\x83\x1a\x8e\x25\xbc"
++			     "\x30\xc7\x5e\xf5\x69\x00\x97\x0b"
++			     "\xa2\x39\xd0\x44\xdb\x72\x09\x7d"
++			     "\x14\xab\x1f\xb6\x4d\xe4\x58\xef"
++			     "\x86\x1d\x91\x28\xbf\x33\xca\x61"
++			     "\xf8\x6c\x03\x9a\x0e\xa5\x3c\xd3"
++			     "\x47\xde\x75\x0c\x80\x17\xae\x22"
++			     "\xb9\x50\xe7\x5b\xf2\x89\x20\x94"
++			     "\x2b\xc2\x36\xcd\x64\xfb\x6f\x06"
++			     "\x9d\x11\xa8\x3f\xd6\x4a\xe1\x78"
++			     "\x0f\x83\x1a\xb1\x25\xbc\x53\xea"
++			     "\x5e\xf5\x8c\x00\x97\x2e\xc5\x39"
++			     "\xd0\x67\xfe\x72\x09\xa0\x14\xab"
++			     "\x42\xd9\x4d\xe4\x7b\x12\x86\x1d"
++			     "\xb4\x28\xbf\x56\xed\x61\xf8\x8f"
++			     "\x03\x9a\x31\xc8\x3c\xd3\x6a\x01"
++			     "\x75\x0c\xa3\x17\xae\x45\xdc\x50"
++			     "\xe7\x7e\x15\x89\x20\xb7\x2b\xc2"
++			     "\x59\xf0\x64\xfb\x92\x06\x9d\x34"
++			     "\xcb\x3f\xd6\x6d\x04\x78\x0f\xa6"
++			     "\x1a\xb1\x48\xdf\x53\xea\x81\x18"
++			     "\x8c\x23\xba\x2e\xc5\x5c\xf3\x67"
++			     "\xfe\x95\x09\xa0\x37\xce\x42\xd9"
++			     "\x70\x07\x7b\x12\xa9\x1d\xb4\x4b"
++			     "\xe2\x56\xed\x84\x1b\x8f\x26\xbd"
++			     "\x31\xc8\x5f\xf6\x6a\x01\x98\x0c"
++			     "\xa3\x3a\xd1\x45\xdc\x73\x0a\x7e"
++			     "\x15\xac\x20\xb7\x4e\xe5\x59\xf0"
++			     "\x87\x1e\x92\x29\xc0\x34\xcb\x62"
++			     "\xf9\x6d\x04\x9b\x0f\xa6\x3d\xd4"
++			     "\x48\xdf\x76\x0d\x81\x18\xaf\x23"
++			     "\xba\x51\xe8\x5c\xf3\x8a\x21\x95"
++			     "\x2c\xc3\x37\xce\x65\xfc\x70\x07"
++			     "\x9e\x12\xa9\x40\xd7\x4b\xe2\x79"
++			     "\x10\x84\x1b\xb2\x26\xbd\x54\xeb"
++			     "\x5f\xf6\x8d\x01\x98\x2f\xc6\x3a"
++			     "\xd1\x68\xff\x73\x0a\xa1\x15\xac"
++			     "\x43\xda\x4e\xe5\x7c\x13\x87\x1e"
++			     "\xb5\x29\xc0\x57\xee\x62\xf9\x90"
++			     "\x04\x9b\x32\xc9\x3d\xd4\x6b\x02"
++			     "\x76\x0d\xa4\x18\xaf\x46\xdd\x51"
++			     "\xe8\x7f\x16\x8a\x21\xb8\x2c\xc3"
++			     "\x5a\xf1\x65\xfc\x93\x07\x9e\x35"
++			     "\xcc\x40\xd7\x6e\x05\x79\x10\xa7"
++			     "\x1b\xb2\x49\xe0\x54\xeb\x82\x19"
++			     "\x8d\x24\xbb\x2f\xc6\x5d\xf4\x68"
++			     "\xff\x96\x0a\xa1\x38\xcf\x43\xda"
++			     "\x71\x08\x7c\x13\xaa\x1e\xb5\x4c"
++			     "\xe3\x57\xee\x85\x1c\x90\x27\xbe"
++			     "\x32\xc9\x60\xf7\x6b\x02\x99\x0d"
++			     "\xa4\x3b\xd2\x46\xdd\x74\x0b\x7f"
++			     "\x16\xad\x21\xb8\x4f\xe6\x5a\xf1"
++			     "\x88\x1f\x93\x2a\xc1\x35\xcc\x63"
++			     "\xfa\x6e\x05\x9c\x10\xa7\x3e\xd5"
++			     "\x49\xe0\x77\x0e\x82\x19\xb0\x24"
++			     "\xbb\x52\xe9\x5d\xf4\x8b\x22\x96"
++			     "\x2d\xc4\x38\xcf\x66\xfd\x71\x08"
++			     "\x9f\x13\xaa\x41\xd8\x4c\xe3\x7a"
++			     "\x11\x85\x1c\xb3\x27\xbe\x55\xec"
++			     "\x60\xf7\x8e\x02\x99\x30\xc7\x3b"
++			     "\xd2\x69\x00\x74\x0b\xa2\x16\xad"
++			     "\x44\xdb\x4f\xe6\x7d\x14\x88\x1f"
++			     "\xb6\x2a\xc1\x58\xef\x63\xfa\x91"
++			     "\x05\x9c\x33\xca\x3e\xd5\x6c\x03"
++			     "\x77\x0e\xa5\x19\xb0\x47\xde\x52"
++			     "\xe9\x80\x17\x8b\x22\xb9\x2d\xc4"
++			     "\x5b\xf2\x66\xfd\x94\x08\x9f\x36"
++			     "\xcd\x41\xd8\x6f\x06\x7a\x11\xa8"
++			     "\x1c\xb3\x4a\xe1\x55\xec\x83\x1a"
++			     "\x8e\x25\xbc\x30\xc7\x5e\xf5\x69"
++			     "\x00\x97\x0b\xa2\x39\xd0\x44\xdb"
++			     "\x72\x09\x7d\x14\xab\x1f\xb6\x4d"
++			     "\xe4\x58\xef\x86\x1d\x91\x28\xbf"
++			     "\x33\xca\x61\xf8\x6c\x03\x9a\x0e"
++			     "\xa5\x3c\xd3\x47\xde\x75\x0c\x80"
++			     "\x17\xae\x22\xb9\x50\xe7\x5b\xf2"
++			     "\x89\x20\x94\x2b\xc2\x36\xcd\x64"
++			     "\xfb\x6f\x06\x9d\x11\xa8\x3f\xd6"
++			     "\x4a\xe1\x78\x0f\x83\x1a\xb1\x25"
++			     "\xbc\x53\xea\x5e\xf5\x8c\x00\x97"
++			     "\x2e\xc5\x39\xd0\x67\xfe\x72\x09"
++			     "\xa0\x14\xab\x42\xd9\x4d\xe4\x7b"
++			     "\x12\x86\x1d\xb4\x28\xbf\x56\xed"
++			     "\x61\xf8\x8f\x03\x9a\x31\xc8\x3c"
++			     "\xd3\x6a\x01\x75\x0c\xa3\x17\xae"
++			     "\x45\xdc\x50\xe7\x7e\x15\x89\x20"
++			     "\xb7\x2b\xc2\x59\xf0\x64\xfb\x92"
++			     "\x06\x9d\x34\xcb\x3f\xd6\x6d\x04"
++			     "\x78\x0f\xa6\x1a\xb1\x48\xdf\x53"
++			     "\xea\x81\x18\x8c\x23\xba\x2e\xc5"
++			     "\x5c\xf3\x67\xfe\x95\x09\xa0\x37"
++			     "\xce\x42\xd9\x70\x07\x7b\x12\xa9"
++			     "\x1d\xb4\x4b\xe2\x56\xed\x84\x1b"
++			     "\x8f\x26\xbd\x31\xc8\x5f\xf6\x6a"
++			     "\x01\x98\x0c\xa3\x3a\xd1\x45\xdc"
++			     "\x73\x0a\x7e\x15\xac\x20\xb7\x4e"
++			     "\xe5\x59\xf0\x87\x1e\x92\x29\xc0"
++			     "\x34\xcb\x62\xf9\x6d\x04\x9b\x0f"
++			     "\xa6\x3d\xd4\x48\xdf\x76\x0d\x81"
++			     "\x18\xaf\x23\xba\x51\xe8\x5c\xf3"
++			     "\x8a\x21\x95\x2c\xc3\x37\xce\x65"
++			     "\xfc\x70\x07\x9e\x12\xa9\x40\xd7"
++			     "\x4b\xe2\x79\x10\x84\x1b\xb2\x26"
++			     "\xbd\x54\xeb\x5f\xf6\x8d\x01\x98"
++			     "\x2f\xc6\x3a\xd1\x68\xff\x73\x0a"
++			     "\xa1\x15\xac\x43\xda\x4e\xe5\x7c"
++			     "\x13\x87\x1e\xb5\x29\xc0\x57\xee"
++			     "\x62\xf9\x90\x04\x9b\x32\xc9\x3d"
++			     "\xd4\x6b\x02\x76\x0d\xa4\x18\xaf"
++			     "\x46\xdd\x51\xe8\x7f\x16\x8a\x21"
++			     "\xb8\x2c\xc3\x5a\xf1\x65\xfc\x93"
++			     "\x07\x9e\x35\xcc\x40\xd7\x6e\x05"
++			     "\x79\x10\xa7\x1b\xb2\x49\xe0\x54"
++			     "\xeb\x82\x19\x8d\x24\xbb\x2f\xc6"
++			     "\x5d\xf4\x68\xff\x96\x0a\xa1\x38"
++			     "\xcf\x43\xda\x71\x08\x7c\x13\xaa"
++			     "\x1e\xb5\x4c\xe3\x57\xee\x85\x1c"
++			     "\x90\x27\xbe\x32\xc9\x60\xf7\x6b"
++			     "\x02\x99\x0d\xa4\x3b\xd2\x46\xdd"
++			     "\x74\x0b\x7f\x16\xad\x21\xb8\x4f"
++			     "\xe6\x5a\xf1\x88\x1f\x93\x2a\xc1"
++			     "\x35\xcc\x63\xfa\x6e\x05\x9c\x10"
++			     "\xa7\x3e\xd5\x49\xe0\x77\x0e\x82"
++			     "\x19\xb0\x24\xbb\x52\xe9\x5d\xf4"
++			     "\x8b\x22\x96\x2d\xc4\x38\xcf\x66"
++			     "\xfd\x71\x08\x9f\x13\xaa\x41\xd8"
++			     "\x4c\xe3\x7a\x11\x85\x1c\xb3\x27"
++			     "\xbe\x55\xec\x60\xf7\x8e\x02\x99"
++			     "\x30\xc7\x3b\xd2\x69\x00\x74\x0b"
++			     "\xa2\x16\xad\x44\xdb\x4f\xe6\x7d"
++			     "\x14\x88\x1f\xb6\x2a\xc1\x58\xef"
++			     "\x63\xfa\x91\x05\x9c\x33\xca\x3e"
++			     "\xd5\x6c\x03\x77\x0e\xa5\x19\xb0"
++			     "\x47\xde\x52\xe9\x80\x17\x8b\x22"
++			     "\xb9\x2d\xc4\x5b\xf2\x66\xfd\x94"
++			     "\x08\x9f\x36\xcd\x41\xd8\x6f\x06"
++			     "\x7a\x11\xa8\x1c\xb3\x4a\xe1\x55"
++			     "\xec\x83\x1a\x8e\x25\xbc\x30\xc7"
++			     "\x5e\xf5\x69\x00\x97\x0b\xa2\x39"
++			     "\xd0\x44\xdb\x72\x09\x7d\x14\xab"
++			     "\x1f\xb6\x4d\xe4\x58\xef\x86\x1d"
++			     "\x91\x28\xbf\x33\xca\x61\xf8\x6c"
++			     "\x03\x9a\x0e\xa5\x3c\xd3\x47\xde"
++			     "\x75\x0c\x80\x17\xae\x22\xb9\x50"
++			     "\xe7\x5b\xf2\x89\x20\x94\x2b\xc2"
++			     "\x36\xcd\x64\xfb\x6f\x06\x9d\x11"
++			     "\xa8\x3f\xd6\x4a\xe1\x78\x0f\x83"
++			     "\x1a\xb1\x25\xbc\x53\xea\x5e\xf5"
++			     "\x8c\x00\x97\x2e\xc5\x39\xd0\x67"
++			     "\xfe\x72\x09\xa0\x14\xab\x42\xd9"
++			     "\x4d\xe4\x7b\x12\x86\x1d\xb4\x28"
++			     "\xbf\x56\xed\x61\xf8\x8f\x03\x9a"
++			     "\x31\xc8\x3c\xd3\x6a\x01\x75\x0c"
++			     "\xa3\x17\xae\x45\xdc\x50\xe7\x7e"
++			     "\x15\x89\x20\xb7\x2b\xc2\x59\xf0"
++			     "\x64\xfb\x92\x06\x9d\x34\xcb\x3f"
++			     "\xd6\x6d\x04\x78\x0f\xa6\x1a\xb1"
++			     "\x48\xdf\x53\xea\x81\x18\x8c\x23"
++			     "\xba\x2e\xc5\x5c\xf3\x67\xfe\x95"
++			     "\x09\xa0\x37\xce\x42\xd9\x70\x07"
++			     "\x7b\x12\xa9\x1d\xb4\x4b\xe2\x56"
++			     "\xed\x84\x1b\x8f\x26\xbd\x31\xc8"
++			     "\x5f\xf6\x6a\x01\x98\x0c\xa3\x3a"
++			     "\xd1\x45\xdc\x73\x0a\x7e\x15\xac"
++			     "\x20\xb7\x4e\xe5\x59\xf0\x87\x1e"
++			     "\x92\x29\xc0\x34\xcb\x62\xf9\x6d"
++			     "\x04\x9b\x0f\xa6\x3d\xd4\x48\xdf"
++			     "\x76\x0d\x81\x18\xaf\x23\xba\x51"
++			     "\xe8\x5c\xf3\x8a\x21\x95\x2c\xc3"
++			     "\x37\xce\x65\xfc\x70\x07\x9e\x12"
++			     "\xa9\x40\xd7\x4b\xe2\x79\x10\x84"
++			     "\x1b\xb2\x26\xbd\x54\xeb\x5f\xf6"
++			     "\x8d\x01\x98\x2f\xc6\x3a\xd1\x68"
++			     "\xff\x73\x0a\xa1\x15\xac\x43\xda"
++			     "\x4e\xe5\x7c\x13\x87\x1e\xb5\x29"
++			     "\xc0\x57\xee\x62\xf9\x90\x04\x9b"
++			     "\x32\xc9\x3d\xd4\x6b\x02\x76\x0d"
++			     "\xa4\x18\xaf\x46\xdd\x51\xe8\x7f"
++			     "\x16\x8a\x21\xb8\x2c\xc3\x5a\xf1"
++			     "\x65\xfc\x93\x07\x9e\x35\xcc\x40"
++			     "\xd7\x6e\x05\x79\x10\xa7\x1b\xb2"
++			     "\x49\xe0\x54\xeb\x82\x19\x8d\x24"
++			     "\xbb\x2f\xc6\x5d\xf4\x68\xff\x96"
++			     "\x0a\xa1\x38\xcf\x43\xda\x71\x08"
++			     "\x7c\x13\xaa\x1e\xb5\x4c\xe3\x57"
++			     "\xee\x85\x1c\x90\x27\xbe\x32\xc9"
++			     "\x60\xf7\x6b\x02\x99\x0d\xa4\x3b"
++			     "\xd2\x46\xdd\x74\x0b\x7f\x16\xad"
++			     "\x21\xb8\x4f\xe6\x5a\xf1\x88\x1f"
++			     "\x93\x2a\xc1\x35\xcc\x63\xfa\x6e"
++			     "\x05\x9c\x10\xa7\x3e\xd5\x49\xe0"
++			     "\x77\x0e\x82\x19\xb0\x24\xbb\x52"
++			     "\xe9\x5d\xf4\x8b\x22\x96\x2d\xc4"
++			     "\x38\xcf\x66\xfd\x71\x08\x9f\x13"
++			     "\xaa\x41\xd8\x4c\xe3\x7a\x11\x85"
++			     "\x1c\xb3\x27\xbe\x55\xec\x60\xf7"
++			     "\x8e\x02\x99\x30\xc7\x3b\xd2\x69"
++			     "\x00\x74\x0b\xa2\x16\xad\x44\xdb"
++			     "\x4f\xe6\x7d\x14\x88\x1f\xb6\x2a"
++			     "\xc1\x58\xef\x63\xfa\x91\x05\x9c"
++			     "\x33\xca\x3e\xd5\x6c\x03\x77\x0e"
++			     "\xa5\x19\xb0\x47\xde\x52\xe9\x80"
++			     "\x17\x8b\x22\xb9\x2d\xc4\x5b\xf2"
++			     "\x66\xfd\x94\x08\x9f\x36\xcd\x41"
++			     "\xd8\x6f\x06\x7a\x11\xa8\x1c\xb3"
++			     "\x4a\xe1\x55\xec\x83\x1a\x8e\x25"
++			     "\xbc\x30\xc7\x5e\xf5\x69\x00\x97"
++			     "\x0b\xa2\x39\xd0\x44\xdb\x72\x09"
++			     "\x7d\x14\xab\x1f\xb6\x4d\xe4\x58"
++			     "\xef\x86\x1d\x91\x28\xbf\x33\xca"
++			     "\x61\xf8\x6c\x03\x9a\x0e\xa5\x3c"
++			     "\xd3\x47\xde\x75\x0c\x80\x17\xae"
++			     "\x22\xb9\x50\xe7\x5b\xf2\x89\x20"
++			     "\x94\x2b\xc2\x36\xcd\x64\xfb\x6f"
++			     "\x06\x9d\x11\xa8\x3f\xd6\x4a\xe1"
++			     "\x78\x0f\x83\x1a\xb1\x25\xbc\x53"
++			     "\xea\x5e\xf5\x8c\x00\x97\x2e\xc5"
++			     "\x39\xd0\x67\xfe\x72\x09\xa0\x14"
++			     "\xab\x42\xd9\x4d\xe4\x7b\x12\x86"
++			     "\x1d\xb4\x28\xbf\x56\xed\x61\xf8"
++			     "\x8f\x03\x9a\x31\xc8\x3c\xd3\x6a"
++			     "\x01\x75\x0c\xa3\x17\xae\x45\xdc"
++			     "\x50\xe7\x7e\x15\x89\x20\xb7\x2b"
++			     "\xc2\x59\xf0\x64\xfb\x92\x06\x9d"
++			     "\x34\xcb\x3f\xd6\x6d\x04\x78\x0f"
++			     "\xa6\x1a\xb1\x48\xdf\x53\xea\x81"
++			     "\x18\x8c\x23\xba\x2e\xc5\x5c\xf3"
++			     "\x67\xfe\x95\x09\xa0\x37\xce\x42"
++			     "\xd9\x70\x07\x7b\x12\xa9\x1d\xb4"
++			     "\x4b\xe2\x56\xed\x84\x1b\x8f\x26"
++			     "\xbd\x31\xc8\x5f\xf6\x6a\x01\x98",
++		.psize = 2048,
++		.digest = "\x4b\x82\xa5\x0e\x72\x01\x0b\xc6",
++	}
++};
++
+ static const u8 zeroes[4096] = { [0 ... 4095] = 0 };
+ static const u8 ones[4096] = { [0 ... 4095] = 0xff };
+ 
+diff --git a/include/linux/crc64.h b/include/linux/crc64.h
+index b791316f251c..890959372633 100644
+--- a/include/linux/crc64.h
++++ b/include/linux/crc64.h
+@@ -7,6 +7,7 @@
+ 
+ #include <linux/types.h>
+ 
++#define CRC64_ISO3309_STRING "crc64-iso3309"
+ #define CRC64_ROCKSOFT_STRING "crc64-rocksoft"
+ 
+ u64 __pure crc64_be(u64 crc, const void *p, size_t len);
 
 -- 
 2.34.1
