@@ -1,106 +1,123 @@
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9856E17F4E9;
-	Thu, 30 May 2024 12:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F57A18309F;
+	Thu, 30 May 2024 12:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717071929; cv=none; b=ISdOI3zk7CmBEPMTxmC/oy9m7thOawAgIlptd3EbSFuEmEQl14iSyq9SW9IgrgFWRIKyIJU0i7yvu/qRpNT9/oJ1zXEnzd3hUIDrMq7DU1e6LE08W++Gn1hq9aPXyJPkFjQd9ATQ5cBB9SNPftZs93QlyHYUcNJIj6kF0Tomw4E=
+	t=1717073084; cv=none; b=hDxysxhDA8thpNeO8Fc20Bghs9PnTl1xsqVVSetg9xBd74eJwfu+iZbqcx0EDVvrPSWsdJKmhqV60B4l2C0WHj09X4hlpDfuvDtXkD/ESDDXd69LPzqR+CrvAReRSZj328SbIGnvydyjtLG1nqWxKQo31/HAVKK5zDMRRmp6LDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717071929; c=relaxed/simple;
-	bh=Pl2lZ9oroMmQXDoUG7oTOUeeos6iemZZfz36a35KB+g=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b/sbYC/o65Cxtv2tRRlmOSuA8hJZ3sX7RnAHviyxWkwhtxRDH51J4MpWSQJ4XVx3eY+hr3ZlE9FP7wbCoLQ1xq3W1JcNGE5gmhZUNpkGwqvXpCEZAOjySSghaGOCdLTXHRuRLvua6m2T0L45lABIYEf9cWCNl7pblVD4lyRTSmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=T6lYpbTH; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1717073084; c=relaxed/simple;
+	bh=tl3Gx8GhE1b/e4gvK0Lfp630cLEwyy06op12vRvGxFk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AfcvvGeyBIiQtQmy9LMj/z6PbhlgPZYUCauOTrFmM0h0s5FlCAFcTzxKRzLTU4E25Oba9LOnr17a2E5g2rYU8VqP1NbV6TqzXs/PD7tq3UBhjZzCGHnrrBm+Fl1KTnvO+F65hoAP7EatgwKREO3YbRoa/m6FCcVZ0165qgBpa9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jGIyEAii; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="T6lYpbTH"
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44UCOxKT034113;
-	Thu, 30 May 2024 07:24:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1717071899;
-	bh=FVIbjwAsFaFZWRgoPUKirsf6tpEDW8Ks1o2FW9abcxk=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=T6lYpbTHhfW37wdva6/ZNm+iELEtlXKazO0PL+QnZaYRdnwqd66ABmn8Xf5X5p9fB
-	 0D7veZmaMrjPgYdUIk2IFWDxENnqYk00SFtrEABjmxPkse2HG3DgDOcqUqhyXYK+HO
-	 sGVCX5URyMqX2Igbn9swZwFbRFuIXCenNI8WVYQQ=
-Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44UCOxoJ094935
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 30 May 2024 07:24:59 -0500
-Received: from DLEE100.ent.ti.com (157.170.170.30) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 30
- May 2024 07:24:58 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 30 May 2024 07:24:58 -0500
-Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44UCOvkU115006;
-	Thu, 30 May 2024 07:24:58 -0500
-From: <kamlesh@ti.com>
-To: <herbert@gondor.apana.org.au>, <kristo@kernel.org>, <will@kernel.org>
-CC: <akpm@linux-foundation.org>, <davem@davemloft.net>,
-        <mcoquelin.stm32@gmail.com>, <alexandre.torgue@foss.st.com>,
-        <robh@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <vigneshr@ti.com>, <catalin.marinas@arm.com>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>,
-        Kamlesh
- Gurudasani <kamlesh@ti.com>
-Subject: [PATCH v3 6/6 DONOTMERGE] arm64: defconfig: enable TI MCRC64 module
-Date: Thu, 30 May 2024 17:54:28 +0530
-Message-ID: <20240524-mcrc64-upstream-v3-6-24b94d8e8578@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240524-mcrc64-upstream-v3-0-24b94d8e8578@ti.com>
-References: <20240524-mcrc64-upstream-v3-0-24b94d8e8578@ti.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jGIyEAii"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44UCGPZM001414;
+	Thu, 30 May 2024 12:44:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
+ content-transfer-encoding : content-type : date : from : in-reply-to :
+ message-id : mime-version : references : subject : to; s=pp1;
+ bh=x/5WyAvEHtHaYc78l54/mQX1c4iwlaGJHyfS9qbBN8Y=;
+ b=jGIyEAiiehCVGbYpPrTADNFymVxbc9/S8HJrWCjV3Sg2JybvRHYWpX355TYwCCIBvjAn
+ UhynzApJTI2k9YlE2VTuvL9klXPAvkrzppkFPQrq9nLqbbL+kR3PjXQgn13btnSO8zKl
+ vK/oSQbLGCv3Qw73R61y4FLueb+ICyJYin45rhOtTjC1kE80FGlO0vfC2dURJnlMIHgG
+ nsAuj71uBinmZV6XbJmkRT6KmJSsA68hwem50ORNid4HZLCV9JvLtG5BECfd6FPB0DiW
+ XtkC1mGbw97WGLlUW5y5x7QDrtdLp8iEXydqveXa6sAtlgZBnU+AS1X8GKImVPMmcdK1 Mg== 
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yes5nr2sg-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 May 2024 12:44:34 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44UC6XH8026789;
+	Thu, 30 May 2024 12:16:53 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ydpd2stbr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 May 2024 12:16:53 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44UCGoM618285144
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 30 May 2024 12:16:52 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 50F865805B;
+	Thu, 30 May 2024 12:16:50 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AA7655804B;
+	Thu, 30 May 2024 12:16:49 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 30 May 2024 12:16:49 +0000 (GMT)
+Message-ID: <435d756d-2404-4f66-9ce3-363813997629@linux.ibm.com>
+Date: Thu, 30 May 2024 08:16:49 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] ecdsa: Use ecc_digits_from_bytes to simplify code
+To: Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, lukas@wunner.de
+References: <20240529230827.379111-1-stefanb@linux.ibm.com>
+ <D1MPWI6C2ZCW.F08I9ILD63L4@kernel.org>
+Content-Language: en-US
+From: Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <D1MPWI6C2ZCW.F08I9ILD63L4@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: wnydKamIK_X16yge0UrmJz1oP5kdyasd
+X-Proofpoint-ORIG-GUID: wnydKamIK_X16yge0UrmJz1oP5kdyasd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-30_09,2024-05-28_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 impostorscore=0 malwarescore=0 phishscore=0
+ mlxlogscore=966 adultscore=0 mlxscore=0 spamscore=0 bulkscore=0
+ priorityscore=1501 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2405010000 definitions=main-2405300096
 
-From: Kamlesh Gurudasani <kamlesh@ti.com>
 
-J722S and all AM62** devices include MCRC64 engine for crc64 calculation.
-Enable module to be built for them.
 
-Also enable algif_hash module, which is needed to access MCRC64 module
-from userspace.
+On 5/30/24 01:08, Jarkko Sakkinen wrote:
+> On Thu May 30, 2024 at 2:08 AM EEST, Stefan Berger wrote:
+>> Simplify two functions that were using temporary byte arrays for
+>> converting too-short input byte arrays to digits. Use ecc_digits_from_bytes
+>> since this function can now handle an input byte array that provides
+>> less bytes than what a coordinate of a curve requires - the function
+>> provides zeros for the missing (leading) bytes.
+>>
+>> See: c6ab5c915da4 ("crypto: ecc - Prevent ecc_digits_from_bytes from reading too many bytes")
+>>
+>> Regards,
+>>     Stefan
+>>
+>> Stefan Berger (2):
+>>    crypto: ecdsa - Use ecc_digits_from_bytes to create hash digits array
+>>    crypto: ecdsa - Use ecc_digits_from_bytes to convert signature
+>>
+>>   crypto/ecdsa.c | 29 ++++++-----------------------
+>>   1 file changed, 6 insertions(+), 23 deletions(-)
+> 
+> BTW, would it make sense split ecdsa signature encoding to its own patch
+> in my next patch set version and name it ecdsa_* style and put it to
+> ecdsa.c?
 
-Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
----
- arch/arm64/configs/defconfig | 2 ++
- 1 file changed, 2 insertions(+)
+I would only put it into ecdsa.c if functions inside this file (can) 
+make use of it, otherwise leave it in your file.
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index 2c30d617e180..aaeee392df10 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -1630,6 +1630,7 @@ CONFIG_CRYPTO_TEST=m
- CONFIG_CRYPTO_ECHAINIV=y
- CONFIG_CRYPTO_MICHAEL_MIC=m
- CONFIG_CRYPTO_ANSI_CPRNG=y
-+CONFIG_CRYPTO_USER_API_HASH=m
- CONFIG_CRYPTO_USER_API_RNG=m
- CONFIG_CRYPTO_CHACHA20_NEON=m
- CONFIG_CRYPTO_GHASH_ARM64_CE=y
-@@ -1653,6 +1654,7 @@ CONFIG_CRYPTO_DEV_HISI_ZIP=m
- CONFIG_CRYPTO_DEV_HISI_HPRE=m
- CONFIG_CRYPTO_DEV_HISI_TRNG=m
- CONFIG_CRYPTO_DEV_SA2UL=m
-+CONFIG_CRYPTO_DEV_TI_MCRC64=m
- CONFIG_DMA_RESTRICTED_POOL=y
- CONFIG_CMA_SIZE_MBYTES=32
- CONFIG_PRINTK_TIME=y
-
--- 
-2.34.1
+> 
+> Just asking this because the part should be the same same for any ECDSA
+> signature. It must scale also to all NIST variants before my patch set
+> can land.
+> 
+> BR, Jarkko
+> 
