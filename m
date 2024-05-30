@@ -1,46 +1,46 @@
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA3F13212B;
-	Thu, 30 May 2024 12:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9856E17F4E9;
+	Thu, 30 May 2024 12:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717071926; cv=none; b=h3kWIkvavPBuy/WDNNwKQMu25nurwZ1WZ7PvNNY0gCaJCAU9ZOxXFkyhDLNDheja0eouRyWValFja2B6np50znbPXHWJomdEo/1a2WuZ3afQmmvWUmzIi7JO+aR3qNZWCIXR/Tq4foao7koUzPN35Gphexo4BeTWj6jciOWeAtA=
+	t=1717071929; cv=none; b=ISdOI3zk7CmBEPMTxmC/oy9m7thOawAgIlptd3EbSFuEmEQl14iSyq9SW9IgrgFWRIKyIJU0i7yvu/qRpNT9/oJ1zXEnzd3hUIDrMq7DU1e6LE08W++Gn1hq9aPXyJPkFjQd9ATQ5cBB9SNPftZs93QlyHYUcNJIj6kF0Tomw4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717071926; c=relaxed/simple;
-	bh=iSCXukWWandP6M37cZZgrUlv+36O7eQItz5W/21qY2U=;
+	s=arc-20240116; t=1717071929; c=relaxed/simple;
+	bh=Pl2lZ9oroMmQXDoUG7oTOUeeos6iemZZfz36a35KB+g=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hyyJiX5k2Ah6LEPm+MnCEMPmIrFMpVLkxe8ZYlmzUjQz6yl9aFrzpaayx9D3MUcpP9vbQyNtkbmckCb/Jqs4p89wbWSth+qlP97sYiMtyWjpOGx9XOu5sxoBY/qNCA9SMH6OKf9/WuLKHQeYkdwlxgEY72FXj2zxTWvSEuJeGK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ftbv5kUo; arc=none smtp.client-ip=198.47.23.248
+	 MIME-Version:Content-Type; b=b/sbYC/o65Cxtv2tRRlmOSuA8hJZ3sX7RnAHviyxWkwhtxRDH51J4MpWSQJ4XVx3eY+hr3ZlE9FP7wbCoLQ1xq3W1JcNGE5gmhZUNpkGwqvXpCEZAOjySSghaGOCdLTXHRuRLvua6m2T0L45lABIYEf9cWCNl7pblVD4lyRTSmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=T6lYpbTH; arc=none smtp.client-ip=198.47.19.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ftbv5kUo"
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44UCOtYN097855;
-	Thu, 30 May 2024 07:24:55 -0500
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="T6lYpbTH"
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44UCOxKT034113;
+	Thu, 30 May 2024 07:24:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1717071895;
-	bh=3ougd+b3QvtDO46mkd5DBz31DYw12/4p05mASmxs/44=;
+	s=ti-com-17Q1; t=1717071899;
+	bh=FVIbjwAsFaFZWRgoPUKirsf6tpEDW8Ks1o2FW9abcxk=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=ftbv5kUowxbkLRVrOvN4erTAIwP+KleX1uoHMyPiuxSS42nq6eLDxVvRqCPl/zHFm
-	 F9YNq9O03upqCJN+SmxaQEm86GEsjBtxByllFvS2nA8Of8Jqp/968MZVx3VIKez3nq
-	 UFk8VDgN3YV6ANco0C9G2WB4U0+v8Q2f2IzK+xNo=
-Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44UCOtVD020577
+	b=T6lYpbTHhfW37wdva6/ZNm+iELEtlXKazO0PL+QnZaYRdnwqd66ABmn8Xf5X5p9fB
+	 0D7veZmaMrjPgYdUIk2IFWDxENnqYk00SFtrEABjmxPkse2HG3DgDOcqUqhyXYK+HO
+	 sGVCX5URyMqX2Igbn9swZwFbRFuIXCenNI8WVYQQ=
+Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44UCOxoJ094935
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 30 May 2024 07:24:55 -0500
-Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+	Thu, 30 May 2024 07:24:59 -0500
+Received: from DLEE100.ent.ti.com (157.170.170.30) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 30
- May 2024 07:24:54 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE110.ent.ti.com
- (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ May 2024 07:24:58 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE100.ent.ti.com
+ (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 30 May 2024 07:24:55 -0500
+ Frontend Transport; Thu, 30 May 2024 07:24:58 -0500
 Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44UCOsxb114961;
-	Thu, 30 May 2024 07:24:54 -0500
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44UCOvkU115006;
+	Thu, 30 May 2024 07:24:58 -0500
 From: <kamlesh@ti.com>
 To: <herbert@gondor.apana.org.au>, <kristo@kernel.org>, <will@kernel.org>
 CC: <akpm@linux-foundation.org>, <davem@davemloft.net>,
@@ -52,9 +52,9 @@ CC: <akpm@linux-foundation.org>, <davem@davemloft.net>,
         <linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>,
         Kamlesh
  Gurudasani <kamlesh@ti.com>
-Subject: [PATCH v3 5/6 DONOTMERGE] arm64: dts: ti: k3-am62: Add dt node, cbass_main ranges for MCRC64
-Date: Thu, 30 May 2024 17:54:27 +0530
-Message-ID: <20240524-mcrc64-upstream-v3-5-24b94d8e8578@ti.com>
+Subject: [PATCH v3 6/6 DONOTMERGE] arm64: defconfig: enable TI MCRC64 module
+Date: Thu, 30 May 2024 17:54:28 +0530
+Message-ID: <20240524-mcrc64-upstream-v3-6-24b94d8e8578@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240524-mcrc64-upstream-v3-0-24b94d8e8578@ti.com>
 References: <20240524-mcrc64-upstream-v3-0-24b94d8e8578@ti.com>
@@ -70,45 +70,37 @@ X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
 From: Kamlesh Gurudasani <kamlesh@ti.com>
 
-Add the address space for MCRC64 to the ranges property of the
-cbass_main node and add dt node for MCRC64 engine
+J722S and all AM62** devices include MCRC64 engine for crc64 calculation.
+Enable module to be built for them.
+
+Also enable algif_hash module, which is needed to access MCRC64 module
+from userspace.
 
 Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
 ---
- arch/arm64/boot/dts/ti/k3-am62-main.dtsi | 7 +++++++
- arch/arm64/boot/dts/ti/k3-am62.dtsi      | 1 +
- 2 files changed, 8 insertions(+)
+ arch/arm64/configs/defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/ti/k3-am62-main.dtsi b/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
-index e9cffca073ef..f80fd753382b 100644
---- a/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
-+++ b/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
-@@ -216,6 +216,13 @@ crypto: crypto@40900000 {
- 		dma-names = "tx", "rx1", "rx2";
- 	};
- 
-+	crc: crc@30300000 {
-+		compatible = "ti,am62-mcrc64";
-+		reg = <0x00 0x30300000 0x00 0x1000>;
-+		clocks = <&k3_clks 116 0>;
-+		power-domains = <&k3_pds 116 TI_SCI_PD_EXCLUSIVE>;
-+	};
-+
- 	secure_proxy_sa3: mailbox@43600000 {
- 		bootph-pre-ram;
- 		compatible = "ti,am654-secure-proxy";
-diff --git a/arch/arm64/boot/dts/ti/k3-am62.dtsi b/arch/arm64/boot/dts/ti/k3-am62.dtsi
-index f0781f2bea29..edb2cb592ee1 100644
---- a/arch/arm64/boot/dts/ti/k3-am62.dtsi
-+++ b/arch/arm64/boot/dts/ti/k3-am62.dtsi
-@@ -66,6 +66,7 @@ cbass_main: bus@f0000 {
- 			 <0x00 0x30040000 0x00 0x30040000 0x00 0x00080000>, /* PRUSS-M */
- 			 <0x00 0x30101000 0x00 0x30101000 0x00 0x00010100>, /* CSI window */
- 			 <0x00 0x30200000 0x00 0x30200000 0x00 0x00010000>, /* DSS */
-+			 <0x00 0x30300000 0x00 0x30300000 0x00 0x00001000>, /* MCRC64 */
- 			 <0x00 0x31000000 0x00 0x31000000 0x00 0x00050000>, /* USB0 DWC3 Core window */
- 			 <0x00 0x31100000 0x00 0x31100000 0x00 0x00050000>, /* USB1 DWC3 Core window */
- 			 <0x00 0x40900000 0x00 0x40900000 0x00 0x00030000>, /* SA3UL */
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 2c30d617e180..aaeee392df10 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -1630,6 +1630,7 @@ CONFIG_CRYPTO_TEST=m
+ CONFIG_CRYPTO_ECHAINIV=y
+ CONFIG_CRYPTO_MICHAEL_MIC=m
+ CONFIG_CRYPTO_ANSI_CPRNG=y
++CONFIG_CRYPTO_USER_API_HASH=m
+ CONFIG_CRYPTO_USER_API_RNG=m
+ CONFIG_CRYPTO_CHACHA20_NEON=m
+ CONFIG_CRYPTO_GHASH_ARM64_CE=y
+@@ -1653,6 +1654,7 @@ CONFIG_CRYPTO_DEV_HISI_ZIP=m
+ CONFIG_CRYPTO_DEV_HISI_HPRE=m
+ CONFIG_CRYPTO_DEV_HISI_TRNG=m
+ CONFIG_CRYPTO_DEV_SA2UL=m
++CONFIG_CRYPTO_DEV_TI_MCRC64=m
+ CONFIG_DMA_RESTRICTED_POOL=y
+ CONFIG_CMA_SIZE_MBYTES=32
+ CONFIG_PRINTK_TIME=y
 
 -- 
 2.34.1
