@@ -1,124 +1,285 @@
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4849156F42
-	for <linux-crypto@vger.kernel.org>; Fri, 31 May 2024 13:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B43515B0EB;
+	Fri, 31 May 2024 14:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717163431; cv=none; b=HKIYD8tpl6RjF4UiAbgSbbKP3yJx4GX1pxHr7wBPj910U/VJjeZ4fCaVEFi4pbhNFAA9BCpzNbkWN7KrzmcgOH8JPNR0da9wq4HyQV14AqvvjaQzSeYIOi0r3M8QyyQV6sCfKSoKoOC0FSFwmrApP/DIZs+HngDHHw1MPU71HFs=
+	t=1717164267; cv=none; b=HxD+qXJwoEyjRToHKCz0NoiVpW8K7YhNtg2ctFhX5amRkEINgzz3WHLtgEqiZnEXIzg6yl/HM1ocmfEhAXswjVvCFvKQPktjMDt++MT0dYu4ZFyWGmiQyS+WkQfIM0byXtSfZPRZP589rWcrt+cmWpgfnpQfjjaUsWAadQX7YYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717163431; c=relaxed/simple;
-	bh=gyCd2JCrZSc2KqvwJg3jmiGsdp/xrKTUD5lWSZcbiiE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=F/Zvfm7/K5cOMXJsxhkp1DYQ2A1qaq2qhpRomevjakW2+AjmsR5rQrQDYcYf56Tw6R9kf0aT6UY3MH/gu/gMUmE3lap3KGfo11Ws15ui8xDcCJkMgVzx8+1hqMMdDuriPtfBANp1pZxlcKTE03HAgyud5AGTktPmIpAEYfedi94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=A5+PpJ9t; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+	s=arc-20240116; t=1717164267; c=relaxed/simple;
+	bh=9KO90g1YRgzZkliYyKsRBxOej6caKIqECjM2eDwUb/4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G8MionbgRL8T0WXB23VrRqrf3FrhVGi8RgxEIMcdRBo94e8x168mjzT1KRwiwFV9Y8ela1iuaNKN7d7dgFQMKkBFPAWDX7GTGb/W0GwmCNGQ9NH9FGx8ZHSgh3z7dEcg2X9QhlhQXKebj+rSA484F6N5iyDLmRs2n3gfslDVLok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IxwiIj7h; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="A5+PpJ9t"
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44VDnIO2015872;
-	Fri, 31 May 2024 15:49:25 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	rNaZhZrMyXcFydlXNaczEwmwbt5T3dPMpJwK9++wRKk=; b=A5+PpJ9tKnNiPlJA
-	tdGtz0mvABWtKgJaAlXH4TTwhcF6UY95h7PFCwwdh9/MSJ/oz78IyHIRE/a5zQAp
-	Yiqsoy9zXAWqdV1RL0ZmEV3Vq3vQwSlUHn00BhbUV3LXwXfBAji+gir3Lvz3PTjs
-	RA4NiuD16dj8kZciIKYHpEzdFk9yCQ/QfY2vn95Pu+Ar3aE+cRIcGoxw1QbvSH0w
-	C5a/XMs+Ulddj2fc23fv/iqM84jY1cSUtnMriv075s7U9+UFzqTD/u1vzny7WCmK
-	DuxVoHX5Mn3Suw7GqkRlkfuiO+EhwvI7QXv2f41oDl6JA8WIYKLoJOkV2eBj+XvE
-	hZHtAg==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yba52c3us-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 May 2024 15:49:25 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 0E19140047;
-	Fri, 31 May 2024 15:48:52 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id A47F521BF55;
-	Fri, 31 May 2024 15:47:37 +0200 (CEST)
-Received: from [10.48.87.204] (10.48.87.204) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 31 May
- 2024 15:47:36 +0200
-Message-ID: <0ed57257-b1c5-42a0-b605-d1b924570677@foss.st.com>
-Date: Fri, 31 May 2024 15:47:23 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IxwiIj7h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C40E5C4AF0A;
+	Fri, 31 May 2024 14:04:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717164266;
+	bh=9KO90g1YRgzZkliYyKsRBxOej6caKIqECjM2eDwUb/4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=IxwiIj7hn26OUzhc6FSZSB2kxtIGSjsAeW5Zh+sYuxLbAdJ9teU77YZjrsMwWSVvE
+	 JskgRFo3bLQo3jL51TCy84Prr9b/mNr37OCjVWeyE/3nsS5VYvXY3d7/CwHtCDilGE
+	 ZMohF3b+X9kMilUSHlqYx7SrYWz2TYGEF52Velnk0guLlGlnTKVCrPyJrlbw7ogfy0
+	 iowBCq73Sb3dFiierOsA8eHkfh3Zbrj+9Tc7JC5hZm/lDsfhEAFgxuQpC3N6jNEHlR
+	 dMocnsvFi9u+S/KfWnm+H0cg4459PTwAlaCiyLYXtUtRxAP/t2IfC1d3FnJBBo4EMJ
+	 O2tVK1YYIXzww==
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2ea80a18094so20677401fa.0;
+        Fri, 31 May 2024 07:04:26 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUYIQsQa7is1UQTQ9sgYZdlRHb1qV2FuUqONlFHemkXMHOfqZX9cyoySfnPV7Bt9WXLWms/IwsJunC9642hG42bRiazCTukrHEw0P40OoMnsxrsriHMT2GxCOrhf16RMxg0KJNAvr8s74wH3sxyP8fh1N1Mzx0XHKmNIeiM83qw6IFD0TLVqjp4VfZPOjwcHMPBPEhu4lyiD+WWMgp+MNph+y8g
+X-Gm-Message-State: AOJu0YxtLuedKMul/bgoiyXEPLtXKeQ5BXCtyRy/OekMeLuwEBOsA224
+	5aaYRon9ZzHWB9apYTy9DtDCQ76ZYxCKO1x/hKv6QeRCdUpDgOfjOzILvDOGn7OJNOVAfYLCZYV
+	sMVHoFaeLbDkHYoBsnmCR5NVquXg=
+X-Google-Smtp-Source: AGHT+IFbP7OVn0ZNiY1Sts+anVAaa8RDVDPxkSqpiu2vgxx2AvOg9j2jGAYMn0LrlB2WLJt0hsrRkPoyyNw9Qy5thuo=
+X-Received: by 2002:a2e:a7c5:0:b0:2e2:6dd9:dd8a with SMTP id
+ 38308e7fff4ca-2ea84b1a993mr18049101fa.0.1717164265060; Fri, 31 May 2024
+ 07:04:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] hwrng: stm32 - use sizeof(*priv) instead of sizeof(struct
- stm32_rng_private)
-To: Marek Vasut <marex@denx.de>, <linux-crypto@vger.kernel.org>
-CC: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Olivia Mackall <olivia@selenic.com>, Rob Herring <robh@kernel.org>,
-        Yang
- Yingliang <yangyingliang@huawei.com>,
-        <kernel@dh-electronics.com>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>
-References: <20240531085749.42863-1-marex@denx.de>
-Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20240531085749.42863-1-marex@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-31_10,2024-05-30_01,2024-05-17_01
+References: <20240531010331.134441-1-ross.philipson@oracle.com>
+ <20240531010331.134441-9-ross.philipson@oracle.com> <CAMj1kXHaH6atsvwr6oVPdZuhR5YEXU33-2kYEn6xb1e=gidOCw@mail.gmail.com>
+ <CAMj1kXHcYOPTLTh-hEtfHk+JaORGK+fEatTT+UOqLJww+_cNTg@mail.gmail.com>
+In-Reply-To: <CAMj1kXHcYOPTLTh-hEtfHk+JaORGK+fEatTT+UOqLJww+_cNTg@mail.gmail.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 31 May 2024 16:04:13 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXH3AwSiq8K6VZEp83uF-W6mtODqrCKROQZ6VqAsFGVBbg@mail.gmail.com>
+Message-ID: <CAMj1kXH3AwSiq8K6VZEp83uF-W6mtODqrCKROQZ6VqAsFGVBbg@mail.gmail.com>
+Subject: Re: [PATCH v9 08/19] x86: Secure Launch kernel early boot stub
+To: Ross Philipson <ross.philipson@oracle.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
+	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
+	linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org, 
+	dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, mjg59@srcf.ucam.org, 
+	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, jarkko@kernel.org, 
+	jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net, 
+	ebiederm@xmission.com, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
+	kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com, 
+	trenchboot-devel@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Marek,
+On Fri, 31 May 2024 at 15:33, Ard Biesheuvel <ardb@kernel.org> wrote:
+>
+> On Fri, 31 May 2024 at 13:00, Ard Biesheuvel <ardb@kernel.org> wrote:
+> >
+> > Hello Ross,
+> >
+> > On Fri, 31 May 2024 at 03:32, Ross Philipson <ross.philipson@oracle.com> wrote:
+> > >
+> > > The Secure Launch (SL) stub provides the entry point for Intel TXT (and
+> > > later AMD SKINIT) to vector to during the late launch. The symbol
+> > > sl_stub_entry is that entry point and its offset into the kernel is
+> > > conveyed to the launching code using the MLE (Measured Launch
+> > > Environment) header in the structure named mle_header. The offset of the
+> > > MLE header is set in the kernel_info. The routine sl_stub contains the
+> > > very early late launch setup code responsible for setting up the basic
+> > > environment to allow the normal kernel startup_32 code to proceed. It is
+> > > also responsible for properly waking and handling the APs on Intel
+> > > platforms. The routine sl_main which runs after entering 64b mode is
+> > > responsible for measuring configuration and module information before
+> > > it is used like the boot params, the kernel command line, the TXT heap,
+> > > an external initramfs, etc.
+> > >
+> > > Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+> > > ---
+> > >  Documentation/arch/x86/boot.rst        |  21 +
+> > >  arch/x86/boot/compressed/Makefile      |   3 +-
+> > >  arch/x86/boot/compressed/head_64.S     |  30 +
+> > >  arch/x86/boot/compressed/kernel_info.S |  34 ++
+> > >  arch/x86/boot/compressed/sl_main.c     | 577 ++++++++++++++++++++
+> > >  arch/x86/boot/compressed/sl_stub.S     | 725 +++++++++++++++++++++++++
+> > >  arch/x86/include/asm/msr-index.h       |   5 +
+> > >  arch/x86/include/uapi/asm/bootparam.h  |   1 +
+> > >  arch/x86/kernel/asm-offsets.c          |  20 +
+> > >  9 files changed, 1415 insertions(+), 1 deletion(-)
+> > >  create mode 100644 arch/x86/boot/compressed/sl_main.c
+> > >  create mode 100644 arch/x86/boot/compressed/sl_stub.S
+> > >
+> > > diff --git a/Documentation/arch/x86/boot.rst b/Documentation/arch/x86/boot.rst
+> > > index 4fd492cb4970..295cdf9bcbdb 100644
+> > > --- a/Documentation/arch/x86/boot.rst
+> > > +++ b/Documentation/arch/x86/boot.rst
+> > > @@ -482,6 +482,14 @@ Protocol:  2.00+
+> > >             - If 1, KASLR enabled.
+> > >             - If 0, KASLR disabled.
+> > >
+> > > +  Bit 2 (kernel internal): SLAUNCH_FLAG
+> > > +
+> > > +       - Used internally by the setup kernel to communicate
+> > > +         Secure Launch status to kernel proper.
+> > > +
+> > > +           - If 1, Secure Launch enabled.
+> > > +           - If 0, Secure Launch disabled.
+> > > +
+> > >    Bit 5 (write): QUIET_FLAG
+> > >
+> > >         - If 0, print early messages.
+> > > @@ -1028,6 +1036,19 @@ Offset/size:     0x000c/4
+> > >
+> > >    This field contains maximal allowed type for setup_data and setup_indirect structs.
+> > >
+> > > +============   =================
+> > > +Field name:    mle_header_offset
+> > > +Offset/size:   0x0010/4
+> > > +============   =================
+> > > +
+> > > +  This field contains the offset to the Secure Launch Measured Launch Environment
+> > > +  (MLE) header. This offset is used to locate information needed during a secure
+> > > +  late launch using Intel TXT. If the offset is zero, the kernel does not have
+> > > +  Secure Launch capabilities. The MLE entry point is called from TXT on the BSP
+> > > +  following a success measured launch. The specific state of the processors is
+> > > +  outlined in the TXT Software Development Guide, the latest can be found here:
+> > > +  https://www.intel.com/content/dam/www/public/us/en/documents/guides/intel-txt-software-development-guide.pdf
+> > > +
+> > >
+> >
+> > Could we just repaint this field as the offset relative to the start
+> > of kernel_info rather than relative to the start of the image? That
+> > way, there is no need for patch #1, and given that the consumer of
+> > this field accesses it via kernel_info, I wouldn't expect any issues
+> > in applying this offset to obtain the actual address.
+> >
+> >
+> > >  The Image Checksum
+> > >  ==================
+> > > diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+> > > index 9189a0e28686..9076a248d4b4 100644
+> > > --- a/arch/x86/boot/compressed/Makefile
+> > > +++ b/arch/x86/boot/compressed/Makefile
+> > > @@ -118,7 +118,8 @@ vmlinux-objs-$(CONFIG_EFI) += $(obj)/efi.o
+> > >  vmlinux-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_mixed.o
+> > >  vmlinux-objs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
+> > >
+> > > -vmlinux-objs-$(CONFIG_SECURE_LAUNCH) += $(obj)/early_sha1.o $(obj)/early_sha256.o
+> > > +vmlinux-objs-$(CONFIG_SECURE_LAUNCH) += $(obj)/early_sha1.o $(obj)/early_sha256.o \
+> > > +       $(obj)/sl_main.o $(obj)/sl_stub.o
+> > >
+> > >  $(obj)/vmlinux: $(vmlinux-objs-y) FORCE
+> > >         $(call if_changed,ld)
+> > > diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
+> > > index 1dcb794c5479..803c9e2e6d85 100644
+> > > --- a/arch/x86/boot/compressed/head_64.S
+> > > +++ b/arch/x86/boot/compressed/head_64.S
+> > > @@ -420,6 +420,13 @@ SYM_CODE_START(startup_64)
+> > >         pushq   $0
+> > >         popfq
+> > >
+> > > +#ifdef CONFIG_SECURE_LAUNCH
+> > > +       /* Ensure the relocation region is coverd by a PMR */
+> >
+> > covered
+> >
+> > > +       movq    %rbx, %rdi
+> > > +       movl    $(_bss - startup_32), %esi
+> > > +       callq   sl_check_region
+> > > +#endif
+> > > +
+> > >  /*
+> > >   * Copy the compressed kernel to the end of our buffer
+> > >   * where decompression in place becomes safe.
+> > > @@ -462,6 +469,29 @@ SYM_FUNC_START_LOCAL_NOALIGN(.Lrelocated)
+> > >         shrq    $3, %rcx
+> > >         rep     stosq
+> > >
+> > > +#ifdef CONFIG_SECURE_LAUNCH
+> > > +       /*
+> > > +        * Have to do the final early sl stub work in 64b area.
+> > > +        *
+> > > +        * *********** NOTE ***********
+> > > +        *
+> > > +        * Several boot params get used before we get a chance to measure
+> > > +        * them in this call. This is a known issue and we currently don't
+> > > +        * have a solution. The scratch field doesn't matter. There is no
+> > > +        * obvious way to do anything about the use of kernel_alignment or
+> > > +        * init_size though these seem low risk with all the PMR and overlap
+> > > +        * checks in place.
+> > > +        */
+> > > +       movq    %r15, %rdi
+> > > +       callq   sl_main
+> > > +
+> > > +       /* Ensure the decompression location is covered by a PMR */
+> > > +       movq    %rbp, %rdi
+> > > +       movq    output_len(%rip), %rsi
+> > > +       callq   sl_check_region
+> > > +#endif
+> > > +
+> > > +       pushq   %rsi
+> >
+> > This looks like a rebase error.
+> >
+> > >         call    load_stage2_idt
+> > >
+> > >         /* Pass boot_params to initialize_identity_maps() */
+> > > diff --git a/arch/x86/boot/compressed/kernel_info.S b/arch/x86/boot/compressed/kernel_info.S
+> > > index c18f07181dd5..e199b87764e9 100644
+> > > --- a/arch/x86/boot/compressed/kernel_info.S
+> > > +++ b/arch/x86/boot/compressed/kernel_info.S
+> > > @@ -28,6 +28,40 @@ SYM_DATA_START(kernel_info)
+> > >         /* Maximal allowed type for setup_data and setup_indirect structs. */
+> > >         .long   SETUP_TYPE_MAX
+> > >
+> > > +       /* Offset to the MLE header structure */
+> > > +#if IS_ENABLED(CONFIG_SECURE_LAUNCH)
+> > > +       .long   rva(mle_header)
+> >
+> > ... so this could just be mle_header - kernel_info, and the consumer
+> > can do the math instead.
+> >
+> > > +#else
+> > > +       .long   0
+> > > +#endif
+> > > +
+> > >  kernel_info_var_len_data:
+> > >         /* Empty for time being... */
+> > >  SYM_DATA_END_LABEL(kernel_info, SYM_L_LOCAL, kernel_info_end)
+> > > +
+> > > +#if IS_ENABLED(CONFIG_SECURE_LAUNCH)
+> > > +       /*
+> > > +        * The MLE Header per the TXT Specification, section 2.1
+> > > +        * MLE capabilities, see table 4. Capabilities set:
+> > > +        * bit 0: Support for GETSEC[WAKEUP] for RLP wakeup
+> > > +        * bit 1: Support for RLP wakeup using MONITOR address
+> > > +        * bit 2: The ECX register will contain the pointer to the MLE page table
+> > > +        * bit 5: TPM 1.2 family: Details/authorities PCR usage support
+> > > +        * bit 9: Supported format of TPM 2.0 event log - TCG compliant
+> > > +        */
+> > > +SYM_DATA_START(mle_header)
+> > > +       .long   0x9082ac5a  /* UUID0 */
+> > > +       .long   0x74a7476f  /* UUID1 */
+> > > +       .long   0xa2555c0f  /* UUID2 */
+> > > +       .long   0x42b651cb  /* UUID3 */
+> > > +       .long   0x00000034  /* MLE header size */
+> > > +       .long   0x00020002  /* MLE version 2.2 */
+> > > +       .long   rva(sl_stub_entry) /* Linear entry point of MLE (virt. address) */
+> >
+> > and these should perhaps be relative to mle_header?
+> >
+> > > +       .long   0x00000000  /* First valid page of MLE */
+> > > +       .long   0x00000000  /* Offset within binary of first byte of MLE */
+> > > +       .long   rva(_edata) /* Offset within binary of last byte + 1 of MLE */
+> >
+> > and here
+> >
+>
+> Ugh never mind - these are specified externally.
 
-On 5/31/24 10:57, Marek Vasut wrote:
-> Use sizeof(*priv) instead of sizeof(struct stm32_rng_private), the
-> former makes renaming of struct stm32_rng_private easier if necessary,
-> as it removes one site where such rename has to happen. No functional
-> change.
-> 
-> Signed-off-by: Marek Vasut <marex@denx.de>
-> ---
-> Cc: "Uwe Kleine-König" <u.kleine-koenig@pengutronix.de>
-> Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
-> Cc: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: Marek Vasut <marex@denx.de>
-> Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
-> Cc: Olivia Mackall <olivia@selenic.com>
-> Cc: Rob Herring <robh@kernel.org>
-> Cc: Yang Yingliang <yangyingliang@huawei.com>
-> Cc: kernel@dh-electronics.com
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-stm32@st-md-mailman.stormreply.com
-> ---
->   drivers/char/hw_random/stm32-rng.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-> index d08c870eb8d1f..9d041a67c295a 100644
-> --- a/drivers/char/hw_random/stm32-rng.c
-> +++ b/drivers/char/hw_random/stm32-rng.c
-> @@ -517,7 +517,7 @@ static int stm32_rng_probe(struct platform_device *ofdev)
->   	struct stm32_rng_private *priv;
->   	struct resource *res;
->   
-> -	priv = devm_kzalloc(dev, sizeof(struct stm32_rng_private), GFP_KERNEL);
-> +	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
->   	if (!priv)
->   		return -ENOMEM;
->   
+OK, so instead of patch #1, please use the linker script to generate
+these constants.
 
-Acked-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+I.e., add this to arch/x86/boot/compressed/vmlinux.lds.S
 
-Thanks,
-Gatien
+#ifdef CONFIG_SECURE_LAUNCH
+PROVIDE(mle_header_offset       = mle_header - startup_32);
+PROVIDE(sl_stub_entry_offset    = sl_stub_entry - startup_32);
+PROVIDE(_edata_offset           = _edata - startup_32);
+#endif
+
+and use the symbols on the left hand side in the code.
