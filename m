@@ -1,115 +1,120 @@
-Received: from smtp.smtpout.orange.fr (smtp-24.smtpout.orange.fr [80.12.242.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E571946F;
-	Fri, 31 May 2024 20:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F985200B7;
+	Fri, 31 May 2024 21:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717186434; cv=none; b=ER4qO4XcdzAROO+kn3NzqA7dKbet/mE0VgTVizkmwiHsm4Nhtkx8sYVM+PcjwXuHiXMpNSKfLh8YZZZupZpDLWYGtW6JlM8sDP9TQFiHFvbtnMiN8dz3jwmPciOmx5zEGWVTWpRgofMRqZMYqwXctX8xUR5+0o2oiiZcf3u0HnQ=
+	t=1717189831; cv=none; b=j5nI2NzZDyJ1AdgtgmOBrsOmfFsJdFX5S/FZN50qTMXntIkQJh8tnMbu3km+ZymDm56WGRtTlQ166fY+Q2QnhS+qBtnk50e7Pp9AAa8bgE9LFgd2nReGhqG7DkxioW9z4ArliVfPTMpYtpqsO3Q4G7/Rypkz92gimxLc0j8DLis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717186434; c=relaxed/simple;
-	bh=w6X6T/ksufCsAz4gKWToTB/1NUfx2HyXeF6R64j7EVQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CjS2ik28eY+E1TNPbJoOJDEfl6hEVVSkxpz20Qf2Nam9LD0p1Z482UA+c0mvyLvDVT6SPemfLfUVaG6y+rGbiWFG6G5s6nHj5lHS9xLKYAOqp2P4TJaeU/s6YqCdNY55rApouyYaAj8bJ74FPbfCCHR3W+VVPoNHndJebn67wjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Up9l4fE+; arc=none smtp.client-ip=80.12.242.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+	s=arc-20240116; t=1717189831; c=relaxed/simple;
+	bh=MPXXnKDh2aZ6B2laaAKBhfY3JjGwgsV8usQmQv+N7Gw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=FI3b1poGoCXQCx1bCw2uszGz8/ZpkI3eYHUXsUHXMlc2alZ5khEwamxsCP0L0NhULx5att7wzON+oklakPcQkuDCFhakbkHW/9j6bh985MwXZN2PBr/yVwjiciqtOENKvkESg38j7K0gCmAEbj6C3iaDfBPsAbA0Llf0kco+4sI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hO0+5HwC; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Up9l4fE+"
-Received: from [192.168.1.37] ([86.243.17.157])
-	by smtp.orange.fr with ESMTPA
-	id D8UfsaUbIp3DQD8UfsPBfT; Fri, 31 May 2024 22:04:56 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1717185896;
-	bh=IMWkqEz3tcT2fpRarPXYT4LJHuLYonGiraVHDo/QMJA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=Up9l4fE+1Acu5z0JyIgdduw8EDNsBJpvZBzn+1QGM8ZH+B1vhLvhfrbHVYkCl7ele
-	 oxCAPYYjwh+PvWEKKWurdX8Gs8d7BmbEDWRsm2Lqw3XqIsusbpNhaZAfXl3/YX5vMx
-	 eVxjnXtmSuWftN0V56LBawSd2aXq6XQENGC+13UYvIAXU8YqN/a9fdobJOeLsXGyGG
-	 x37iBNUR0Bj3g+zjyoTMJaaxL1HSpkjLJgItZCgL1zG3ZJn4fVqO1eF3eaUQT3bpkr
-	 YXm8efQ+aFxsTFdtcdGVh+3XyGBI7tX98vTi+pMUJTaDY4c0n9Uis1pYXhiqtKFVK4
-	 4afmwchI27h6w==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Fri, 31 May 2024 22:04:56 +0200
-X-ME-IP: 86.243.17.157
-Message-ID: <95572851-8750-4a1f-8034-443e0bc9c6b8@wanadoo.fr>
-Date: Fri, 31 May 2024 22:04:52 +0200
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hO0+5HwC"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44VKjlQs003440;
+	Fri, 31 May 2024 21:10:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
+ content-transfer-encoding : content-type : date : from : in-reply-to :
+ message-id : mime-version : references : subject : to; s=pp1;
+ bh=rA8cLUV+37eItOYNc5h1LCYPwTbIyEdRLeqhTlQuMEs=;
+ b=hO0+5HwC7D139vrOI1ZibjPY1kt2/Tqj0mRtxNt1v5MS4ojs4hQ1Sh4KfQYn1CW21voF
+ VdgkrLDShVQj+K6KL2ULpme4OR3m7dYKGmK5yk4XfsCnTK+JNetD4HglxBLVOWG9yQYe
+ YUCeU71n26KLYuUm2YeOSNQRn6znQubjE/twiiigw1GCIw2ImozuY8/j02r8dur3XNLM
+ 17o5xs3dFtZtYC5YjzaxxScDlWVyyHDU/B5COBMWPLikhFTNM+JzVMEua8wfIW89oOEJ
+ zgOcItZH+z4vFZHdj/+UOLAu4F0EpuzBAIuCwKi9n68ARJ+YC56cWqUZ3FFXzhRzXyZM bQ== 
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yfnd103a8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 May 2024 21:10:10 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44VJZ1uq002437;
+	Fri, 31 May 2024 21:10:09 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ydpb123f6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 May 2024 21:10:09 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44VLA68811797172
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 31 May 2024 21:10:08 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ADAE658071;
+	Fri, 31 May 2024 21:10:06 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B11E958076;
+	Fri, 31 May 2024 21:10:05 +0000 (GMT)
+Received: from [9.67.180.145] (unknown [9.67.180.145])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 31 May 2024 21:10:05 +0000 (GMT)
+Message-ID: <cc3c8213-cf64-4eb5-9508-8d80b1ce6333@linux.ibm.com>
+Date: Fri, 31 May 2024 16:10:05 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/3] crypto: X25519 supports for ppc64le
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, leitao@debian.org, nayna@linux.ibm.com,
+        appro@cryptogams.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
+        ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
+References: <20240516151957.2215-1-dtsen@linux.ibm.com>
+ <Zlmkgisql2NxPcXi@gondor.apana.org.au>
+Content-Language: en-US
+From: Danny Tsen <dtsen@linux.ibm.com>
+In-Reply-To: <Zlmkgisql2NxPcXi@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0-CDeAQI6eP4-dv1vUzumlx09OVAU8yg
+X-Proofpoint-ORIG-GUID: 0-CDeAQI6eP4-dv1vUzumlx09OVAU8yg
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: tegra - Remove an incorrect iommu_fwspec_free()
- call in tegra_se_remove()
-To: Akhil R <akhilrajeev@nvidia.com>, Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Thierry Reding <thierry.reding@gmail.com>, Jon Hunter
- <jonathanh@nvidia.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-References: <ea775b351a3dbe4cef4056ea89da25084f73df22.1716650050.git.christophe.jaillet@wanadoo.fr>
- <SJ1PR12MB633943D654272A0612695F1DC0F22@SJ1PR12MB6339.namprd12.prod.outlook.com>
- <Zllexnetg3eu6dSW@gondor.apana.org.au>
- <SJ1PR12MB633958B0DC8504F1D7868CA0C0FC2@SJ1PR12MB6339.namprd12.prod.outlook.com>
-Content-Language: en-MW
-From: Marion & Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <SJ1PR12MB633958B0DC8504F1D7868CA0C0FC2@SJ1PR12MB6339.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-31_14,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ lowpriorityscore=0 mlxscore=0 priorityscore=1501 phishscore=0 spamscore=0
+ impostorscore=0 suspectscore=0 malwarescore=0 clxscore=1015
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2405310161
+
+Thanks Herbert.
 
 
-Le 31/05/2024 à 07:36, Akhil R a écrit :
->> -----Original Message-----
->> From: Herbert Xu <herbert@gondor.apana.org.au>
->> Sent: Friday, May 31, 2024 10:53 AM
->> To: Akhil R <akhilrajeev@nvidia.com>
->> Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>; David S. Miller
->> <davem@davemloft.net>; Thierry Reding <thierry.reding@gmail.com>; Jon
->> Hunter <jonathanh@nvidia.com>; linux-kernel@vger.kernel.org; kernel-
->> janitors@vger.kernel.org; linux-crypto@vger.kernel.org; linux-
->> tegra@vger.kernel.org
->> Subject: Re: [PATCH] crypto: tegra - Remove an incorrect iommu_fwspec_free()
->> call in tegra_se_remove()
+On 5/31/24 5:20 AM, Herbert Xu wrote:
+> On Thu, May 16, 2024 at 11:19:54AM -0400, Danny Tsen wrote:
+>> This patch series provide X25519 support for ppc64le with a new module
+>> curve25519-ppc64le.
 >>
->> External email: Use caution opening links or attachments
+>> The implementation is based on CRYPTOGAMs perl output from x25519-ppc64.pl.
+>> (see https://github.com/dot-asm/cryptogams/)
+>> Modified and added 4 supporting functions.
 >>
+>> This patch has passed the selftest by running modprobe
+>> curve25519-ppc64le.
 >>
->> On Wed, May 29, 2024 at 06:53:42AM +0000, Akhil R wrote:
->>>> The only iommu function call in this driver is a
->>>> tegra_dev_iommu_get_stream_id() which does not allocate anything and
->> does
->>>> not take any reference.
->>>>
->>>> More-over, what is freed is "se->dev" which has been devm_kzalloc()'ed in the
->>>> probe.
->>> I did not completely understand what is being tried to convey here.
->>> If I understand it right, iommu_fwspec_free() does not do anything
->>> with the "devm_kzalloc"ed variable.
->>>
->>> It would probably be a good idea to remove this line from the commit message.
->> I think he means that as the memory was allocated via devm, it will
->> be automatically freed by the kernel and the driver does not need
->> to (and should not) free the memory by hand.
-
-
-Yes, that is my point.
-
-> Ya. But iommu_fwspec_free() does not free the memory allocated via devm.
->
-> I think iommu_fwspec_free() is expected to be called in symmetry with
-> iommu_fwspec_init(). So, I do agree that the SE driver does not allocate
-> what is freed by iommu_fwspec_free(), but I feel this line is a bit misleading.
->
-Yes, I spoke too fast.
-What is freed is dev_iommu_fwspec_get(dev);, not dev. So the sentence I 
-wrote makes no sense and should be removed :(
-
-
-CJ
-
-
+>> Danny Tsen (3):
+>>    X25519 low-level primitives for ppc64le.
+>>    X25519 core functions for ppc64le
+>>    Update Kconfig and Makefile for ppc64le x25519.
+>>
+>>   arch/powerpc/crypto/Kconfig                   |  11 +
+>>   arch/powerpc/crypto/Makefile                  |   2 +
+>>   arch/powerpc/crypto/curve25519-ppc64le-core.c | 299 ++++++++
+>>   arch/powerpc/crypto/curve25519-ppc64le_asm.S  | 671 ++++++++++++++++++
+>>   4 files changed, 983 insertions(+)
+>>   create mode 100644 arch/powerpc/crypto/curve25519-ppc64le-core.c
+>>   create mode 100644 arch/powerpc/crypto/curve25519-ppc64le_asm.S
+>>
+>> -- 
+>> 2.31.1
+> All applied.  Thanks.
