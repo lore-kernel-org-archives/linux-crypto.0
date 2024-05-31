@@ -1,48 +1,34 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714A9208B0;
-	Fri, 31 May 2024 03:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F093A1C6A7;
+	Fri, 31 May 2024 04:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717127960; cv=none; b=pQCzfh/xCKfhh5+74Isq9nSXKzYQxQDehEjejzlnDdD/XjfhF87+R2IUew2yWI77Ts+GYen1bMHPuCGlT14WpDN0NJB1rQkbthS+KgI+7DnmzxA+pZx91UM3IpoDe2BRFdOYZO2q40ynOgF18nhXaePE+LjC2yUtoVTYQbJ4KVk=
+	t=1717131035; cv=none; b=MiiGyPEdzvsbFuLcKgrUT8O1pxhEUIyNiAeiIn06XAK8J/LhBLvH9Yw61rt4y/tmKxcom3v/NTogrSMU6QF42F0A5bDOdu06iz1o84sEo/mlRfQsS9Qvip/pHAEn0YKoSVaWmnzGHtvsbVqKf0Ibo3p/vnRPcvaHhSOmn6LCIpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717127960; c=relaxed/simple;
-	bh=ij84ftjLq17UMND5+v6nnm7ghMRL7JGp0DPy0qootgA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pn8Htg3AWQ77SvgR/GpUaYuJpdF7+JAEk4UDJe8JroFACKRcBnE6NuUSHjtjty2ZCFjLonFKmfP3xfD8oPxRnxlMTY3be2e+Vf9db76b+GKO9oHePHnBmb9+QFrQ7n0V99BhoNBJY4rwNdQZAttBQkshFMKEJqwA5FkrlG0ZIa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZHuUihYY; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZHuUihYY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80F39C116B1;
-	Fri, 31 May 2024 03:59:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717127960;
-	bh=ij84ftjLq17UMND5+v6nnm7ghMRL7JGp0DPy0qootgA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZHuUihYY3H1mZo+OnyfBgJCQi6EDgy2Hus3yDQojqJxyJHM72Le9e9JXg9PE8D29Q
-	 hi9L33nMEg4Pq0iI+zKB8zG708Qp7bfpuRDSWmp3YSMtCX141hqhHryS0DvD8CVm4L
-	 fv0Q3CmTmnsQJyL1dOAtpRwAxCZDEVIgxWwo3U8WlE9FcGqdIasY3DOgPxOD0i8aJP
-	 TGx5XnzU9zB5Pkpu59XKmKfLSwEb7SlHehrvO9+WZJZIr8TcKGGqXW75ODNvCERoyN
-	 73ntDcXnJJYp3O4xRVHHyPA1mdpcRjgLSujSiX4Y82V/+0m89IGsnNagoBr77K+UCP
-	 Xu59fDNYqwqJA==
-Date: Thu, 30 May 2024 20:59:17 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-	tglx@linutronix.de, linux-crypto@vger.kernel.org,
-	linux-api@vger.kernel.org, x86@kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-	Carlos O'Donell <carlos@redhat.com>,
-	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	Jann Horn <jannh@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	David Hildenbrand <dhildenb@redhat.com>
-Subject: Re: [PATCH v16 2/5] random: add vgetrandom_alloc() syscall
-Message-ID: <20240531035917.GD6505@sol.localdomain>
-References: <20240528122352.2485958-1-Jason@zx2c4.com>
- <20240528122352.2485958-3-Jason@zx2c4.com>
+	s=arc-20240116; t=1717131035; c=relaxed/simple;
+	bh=igaylIAIXNq3yDPXmBHyR1WE47ou5VpVBjrJAWMfgpA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=badcscIfq1UJjQXtcN7nG4mECbqtLXP01AXZYw8hyj1bC6jM2vEUBHt2tervnj5aVymHPVLa8v1AdYI2sdx34+aEcYCkr5UvAGybO9dJdOcMSuOQ9m6yLEm0drdmXNGj4xKwTO1OvzY/4aYLsgUP4wMMIZUb+V1CgPHC10mgWWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sCuDa-0044PA-1x;
+	Fri, 31 May 2024 12:50:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 May 2024 12:50:20 +0800
+Date: Fri, 31 May 2024 12:50:20 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, fsverity@lists.linux.dev,
+	dm-devel@lists.linux.dev, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org, ardb@kernel.org,
+	samitolvanen@google.com, bvanassche@acm.org
+Subject: Re: [PATCH v3 6/8] fsverity: improve performance by using
+ multibuffer hashing
+Message-ID: <ZllXDOJKW2pHWBTz@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,41 +37,58 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240528122352.2485958-3-Jason@zx2c4.com>
+In-Reply-To: <20240507002343.239552-7-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 
-On Tue, May 28, 2024 at 02:19:51PM +0200, Jason A. Donenfeld wrote:
-> +/**
-> + * sys_vgetrandom_alloc - Allocate opaque states for use with vDSO getrandom().
-> + *
-> + * @num:	   On input, a pointer to a suggested hint of how many states to
-> + * 		   allocate, and on return the number of states actually allocated.
-> + *
-> + * @size_per_each: On input, must be zero. On return, the size of each state allocated,
-> + * 		   so that the caller can split up the returned allocation into
-> + * 		   individual states.
-> + *
-> + * @addr:	   Reserved, must be zero.
-> + *
-> + * @flags:	   Reserved, must be zero.
-> + *
-> + * The getrandom() vDSO function in userspace requires an opaque state, which
-> + * this function allocates by mapping a certain number of special pages into
-> + * the calling process. It takes a hint as to the number of opaque states
-> + * desired, and provides the caller with the number of opaque states actually
-> + * allocated, the size of each one in bytes, and the address of the first
-> + * state, which may be split up into @num states of @size_per_each bytes each,
-> + * by adding @size_per_each to the returned first state @num times, while
-> + * ensuring that no single state straddles a page boundary.
-> + *
-> + * Returns the address of the first state in the allocation on success, or a
-> + * negative error value on failure.
-> + *
-> + * The returned address of the first state may be passed to munmap(2) with a
-> + * length of `(size_t)num * (size_t)size_per_each`, in order to deallocate the
-> + * memory, after which it is invalid to pass it to vDSO getrandom().
+Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> +               if (multibuffer) {
+> +                       if (ctx->pending_data) {
+> +                               /* Hash and verify two data blocks. */
+> +                               err = fsverity_hash_2_blocks(params,
+> +                                                            inode,
+> +                                                            ctx->pending_data,
+> +                                                            data,
+> +                                                            ctx->hash1,
+> +                                                            ctx->hash2);
+> +                               kunmap_local(data);
+> +                               kunmap_local(ctx->pending_data);
+> +                               ctx->pending_data = NULL;
+> +                               if (err != 0 ||
+> +                                   !verify_data_block(inode, vi, ctx->hash1,
+> +                                                      ctx->pending_pos,
+> +                                                      ctx->max_ra_pages) ||
+> +                                   !verify_data_block(inode, vi, ctx->hash2,
+> +                                                      pos, ctx->max_ra_pages))
+> +                                       return false;
+> +                       } else {
+> +                               /* Wait and see if there's another block. */
+> +                               ctx->pending_data = data;
+> +                               ctx->pending_pos = pos;
+> +                       }
+> +               } else {
+> +                       /* Hash and verify one data block. */
+> +                       err = fsverity_hash_block(params, inode, data,
+> +                                                 ctx->hash1);
+> +                       kunmap_local(data);
+> +                       if (err != 0 ||
+> +                           !verify_data_block(inode, vi, ctx->hash1,
+> +                                              pos, ctx->max_ra_pages))
+> +                               return false;
+> +               }
+> +               pos += block_size;
 
-Wouldn't a munmap with '(size_t)num * (size_t)size_per_each' be potentially too
-short, due to how the allocation is sized such that states don't cross page
-boundaries?
+I think this complexity is gross.  Look at how we did GSO in
+networking.  There should be a unified code-path for aggregated
+data and simple data, not an aggregated path versus a simple path.
 
-- Eric
+I think ultimately it stems from the fact that this code went from
+ahash to shash.  What were the issues back then? If it's just vmalloc
+we should fix ahash to support that, rather than making users of the
+Crypto API go through contortions like this.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
