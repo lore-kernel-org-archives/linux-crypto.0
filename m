@@ -1,62 +1,62 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0A228FD
-	for <linux-crypto@vger.kernel.org>; Fri, 31 May 2024 05:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573881CD3C
+	for <linux-crypto@vger.kernel.org>; Fri, 31 May 2024 05:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717134485; cv=none; b=Pld3gr1NI6pBoJDbMnT6pL6RxZ18cYXyc98P/p/xHfrf0uRNmFt0aKUGvPf5keS6KV8/JKHbVaNcG8Et1LaEJnub6MZMzW5SajvJLHZk1MHvzaKFNxV+ZFS/jHumOGC93Gx6/EXJkzpHC9iN0VGsnpS8z8sRwwd7iZJ6xGFuox4=
+	t=1717134579; cv=none; b=tHjJDhS6X4Wlrvw6LaQiQgohIZRTlIkloUI52nJI1gJXDGCl3zSDM8t1evd2dzNPqdO4ZqaXaCcMV/qBo+7pOsvq4uX2DzTcY40Y8qx6fxWHG+UzIj1PtIjMd6jRQeUrWw3VoDiHG1g5Yqm+CCTiBo8hkLhMqHpa01WbyxixcQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717134485; c=relaxed/simple;
-	bh=ObWTi6TFcadZUcq6ZxKbymBP8ZJdQ2ZSzmIPTwa/5SE=;
+	s=arc-20240116; t=1717134579; c=relaxed/simple;
+	bh=+gBH+D1MIDGJDhYFaogIooZi8YV4sRdFceObE1mWfcc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tu2EaXXcHYYky40/l/u6JVmlDllJ3TELl58hte1xNItWYSqJGRm7x9/EavsGNmNHJCyRVfKRuIcQHVAct7Ny1ek0oe4Ns8xUJau1oRRjXTov9fbLCf9RnZdgVsVCghEPGNeiRC6WKWSMlr2bNATvObd3jq8kUIvnMlbmXSqMNvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=K52AJGvA; arc=none smtp.client-ip=209.85.216.54
+	 Content-Type:Content-Disposition:In-Reply-To; b=VBg96s/nLtOn+f4cJ654TQjy2CHWI+9XKBYq3yaCuZ+LImkWigo7xRl5l+FYOSN9R8qqet2VDtRuHRj4mgWrDEXWgqLVk16u1DNFrZwiRRbRHL5NPL1/hZT5W9EzW97THWYHXcFIush7YD3jJc4gbdu7cLgxXjrGU33m8FlnRGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=XONTkhan; arc=none smtp.client-ip=209.85.210.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="K52AJGvA"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2c19e6dc3dcso1367941a91.3
-        for <linux-crypto@vger.kernel.org>; Thu, 30 May 2024 22:48:03 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XONTkhan"
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6f8ea563a46so984278a34.2
+        for <linux-crypto@vger.kernel.org>; Thu, 30 May 2024 22:49:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1717134483; x=1717739283; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1717134577; x=1717739377; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0UJbNmaJFMgZpBYeZAlCzxirBsjEUPoVCwt43VjRfB4=;
-        b=K52AJGvAElcSYLab4CUXHpk4s7Qc2Tuk4H5Z0cUPoBrjdcugy2ETeuMT+oNSGE6feY
-         /ZkbcBt3WLZYquQNYa5DJQpBQayrXn2nLENF3G84DnFY2t0Kz4bZ5VzCsYrGokeCX0QA
-         tXZgFwr15EE3uTF6yTFcCYei9B3BxlRouRWYw=
+        bh=EeubvNzaKYxjtfEwe3dCbYa/rAmM9t1eN/m3KxJV35o=;
+        b=XONTkhanB+3P5w8J4a4iRqHzV7vBtBpomac26bNuRDmgcsbfl9FoOH5W9VTfDVNCZ0
+         Iv5gtvyNsYTwj1UyaCUzcd+pPUWauZLsbUVgtYt6gIQOhI4y2Kwnn1gX8CeXPYs8Ufqw
+         Vv3jaJv/Uq2ze71fr9csA41hVPMxgLyGw06iM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717134483; x=1717739283;
+        d=1e100.net; s=20230601; t=1717134577; x=1717739377;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0UJbNmaJFMgZpBYeZAlCzxirBsjEUPoVCwt43VjRfB4=;
-        b=JgTyfYtLRIUe7jVvzIsFvDq4TnJQm4vXkQ0xNPormMhi0HEVuwXkqnZzQKtfOu8xhH
-         dJFWA0u+78Jmmx1hcUKn8M+08fmPlFT8yBQJ/R4DIK0SdmeQsVEVnj9IMnPc+eXBZcLb
-         Eg7gu1Xwc2YJcsUhph0yWLUmGvVFcOKa5AnGJwuv83Eg4b4WvBwLIgV2ERgsmYyOmI8z
-         4trLFz65p5TG9Azt8PrN4C6Z4EdQ+S6p9KrNoM+c8vn5qcs0ajZgL1pW0I7Uas6YVZju
-         nI6kGqAefrNvMHqXP2PTuZEWbpl+WKFiVHLAg6A0nbOclmGQFa/UYOtBCLHiHBa0pNUA
-         ZmpA==
-X-Gm-Message-State: AOJu0Yz7CIJiJ+3uzSPjN33Tk6olYLWn89dDJADWkhwdWuVdlPS4P8Ot
-	uxsOtQd1YtQPsJNutc1vW3czBQxpnGuIDqSKvIyDPoAp7ozxawAE0h2xRpckbPw/2lnJ1fwjXlo
+        bh=EeubvNzaKYxjtfEwe3dCbYa/rAmM9t1eN/m3KxJV35o=;
+        b=SsWIH2T79bmv8DSM1N83kIMTcWu0K82u0t6GYdwTofHyuah45ZrpMyR8qy7lVMUG4k
+         60wvwqcu099/1R7N5Ixq8oMcMrDLfRXQuMONgD6altaSWxGqldDwooey1zr/Qccbwm++
+         XuPQWHqAwDtLwPn8c4Fqw6nvrqnJ3J6uY2awJT2eRGUOTc4oX8B8qrkXguWdWJXd7Rxk
+         RD9ttS6UPJ/V84tOcLU0ZV8+fTw86sD3JUcK/DVME1PhgAk13mYNHcs/3JUyk3QMzJfy
+         XMBmou+ehwrbd7M/wcB7hhAiE7cKe1LK7ArPuKqgMApWOlFQxfrcRixSRIVSIJ5qo9TI
+         1Zlg==
+X-Gm-Message-State: AOJu0YydHy/I43FYggDcOeSmgdoenpAKZvajTGsbrK2zoPvAh9uNIQOZ
+	A1x+H/TGkUQLz3avtzDkeh+gxQEskL0krwlq8g/N5zp9IsWubVW0HevQlPO9qJOyLrax1GuCk18
 	=
-X-Google-Smtp-Source: AGHT+IFu2B7o010LYh4cB0fI2rrt7OvwTDZfg/9hOJpXql8dZOvxKD7uIYSl/vI+iPdXRjlTZ56EFg==
-X-Received: by 2002:a17:90b:84:b0:2c1:bb0c:9af5 with SMTP id 98e67ed59e1d1-2c1dc56c21bmr876480a91.1.1717134483049;
-        Thu, 30 May 2024 22:48:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFiBQzDD4l6Lcxl7yknalcYqSL9azoyNiP4jO80tgeFLw9/K5ZYAVZdvuItYwmu212W3RapRQ==
+X-Received: by 2002:a05:6870:a54d:b0:24f:d272:22e0 with SMTP id 586e51a60fabf-2508bd5fce4mr998503fac.59.1717134577279;
+        Thu, 30 May 2024 22:49:37 -0700 (PDT)
 Received: from google.com ([2401:fa00:8f:203:b7f3:e557:e6df:620b])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c1c28317ffsm690846a91.36.2024.05.30.22.48.01
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70242c270c7sm654262b3a.220.2024.05.30.22.49.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 May 2024 22:48:02 -0700 (PDT)
-Date: Fri, 31 May 2024 14:47:59 +0900
+        Thu, 30 May 2024 22:49:36 -0700 (PDT)
+Date: Fri, 31 May 2024 14:49:33 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [PATCH 1/3] crypto: scomp - Add setparam interface
-Message-ID: <20240531054759.GE8400@google.com>
+Subject: Re: [PATCH 3/3] crypto: acomp - Add comp_params helpers
+Message-ID: <20240531054933.GF8400@google.com>
 References: <cover.1716202860.git.herbert@gondor.apana.org.au>
- <84523e14722d0629b2ee9c8e7e3c04aa223c5fb5.1716202860.git.herbert@gondor.apana.org.au>
+ <7b5e647f760c4deacf81d3b782f1beee54de3bbc.1716202860.git.herbert@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -65,55 +65,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <84523e14722d0629b2ee9c8e7e3c04aa223c5fb5.1716202860.git.herbert@gondor.apana.org.au>
+In-Reply-To: <7b5e647f760c4deacf81d3b782f1beee54de3bbc.1716202860.git.herbert@gondor.apana.org.au>
 
 On (24/05/20 19:04), Herbert Xu wrote:
 [..]
-> +int crypto_scomp_setparam(struct crypto_scomp *tfm, const u8 *param,
-> +			  unsigned int len)
-> +{
-> +	struct scomp_alg *scomp = crypto_scomp_alg(tfm);
-> +	int err;
 > +
-> +	err = scomp->setparam(tfm, param, len);
-> +	if (unlikely(err)) {
-> +		scomp_set_need_param(tfm, scomp);
-> +		return err;
-> +	}
+> +	params->dict = kvmemdup(dict, len, GFP_KERNEL);
+> +	if (!params->dict)
+> +		return -ENOMEM;
+> +	params->dict_sz = len;
 > +
-> +	crypto_scomp_clear_flags(tfm, CRYPTO_TFM_NEED_KEY);
 > +	return 0;
 > +}
+> +EXPORT_SYMBOL_GPL(crypto_comp_getparams);
+> +
+> +void crypto_comp_putparams(struct crypto_comp_params *params)
+> +{
+> +	kfree(params->dict);
 
-Is the idea here that each compression driver will have its own structure
-for params?
+kvfree()?
 
-In other words, something like this?
-
-static int setup_tfm(...)
-{
-...
-	this_cpu->tfm = crypto_alloc_comp(name, 0, 0);
-
-	if (!strcmp(name, "zstd")) {
-		struct crypto_comp_param_zstd param;
-
-		param.dict = ...
-		param.cleve = ...
-
-		crypto_scomp_setparam(tfm, &param, sizeof(param));
-	}
-
-	if (!strcmp(name, "lz4")) {
-		struct crupto_comp_param_lz4 param;
-		...
-	}
-
-	if (!strcmp(name, "lzo")) {
-		struct crupto_comp_param_lzo param;
-		...
-	}
-...
-}
-
-Or should it be "struct crypto_comp_params param"?
+> +	params->dict = NULL;
+> +	params->dict_sz = 0;
+> +}
+> +EXPORT_SYMBOL_GPL(crypto_comp_putparams);
