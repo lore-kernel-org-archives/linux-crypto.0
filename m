@@ -1,37 +1,34 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43343152500;
-	Fri, 31 May 2024 10:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F5C152166;
+	Fri, 31 May 2024 10:25:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717151094; cv=none; b=fqRhpEKbmf1rB/AW921SAXtOPms84/S8hpgbOMoCTVdZ52tiuPXeA3WMGvP2H5d5xlTxNmRpK1XGxDCmH94x8TC/yMBd6PEveqeYBN8cNkmBqnmiY99ClVyVfyLPABqmklssFEt0dUTASZskJgaI4YNwKOAOVTu7VpWCZMrWu+A=
+	t=1717151112; cv=none; b=ZoqB06n2OkfibiEPJLalzQAc2TreH/mgBg8ra/tIJgqw5SidM2AxsF487SYTYauVq1v0ruGXX9w/eDKbfoqVKQYKKNSfM6qmJ8WKh1JRFESOZH/pd3/RHCB6RcIo9ti6GNVbHBr/93+jZ6uHOh2WaevPbFH1QHGu4D/DYDuIn1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717151094; c=relaxed/simple;
-	bh=qCATkT+PfyI8DjDa0DWATvfqlsDVKQpPW2KRIZX2umA=;
+	s=arc-20240116; t=1717151112; c=relaxed/simple;
+	bh=SpVb3zXMO4QqG/nwzrQQk/Z4Nf2OeOEBLKzG1FZZsHI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CIhzOw9NNM1Zvn+fy14zpMFL2VfiYnRhaUqvYn60MJANmEQRjTbUO2lc6koWFlhb/gvNc1v0qRu1lnamHGaxrq+NrHWRZjePtAjmgSdNdBh4Ms+FyBfNB54bXkGrMyBwk7YoS5xBHZKYcZ4pAAPX1mX+Sxc4ZeCbVXXG8d1qFLw=
+	 Content-Type:Content-Disposition:In-Reply-To; b=PHxWngAmyJC9RyecljdiZMrltF3ngyrqg8OZMkpmodpapyudPEKf3t3exSyddbfGvusxwWpHwfDkLa+pij7PPDphIVEsgFMMD89qxn9Ws2ZuA+hPwWLFef2wHjM0+O3GPLSloNWnL4euVjsHka0QJyTTT+jv+NLYX8SHvouY810=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sCzRB-004ApR-1i;
-	Fri, 31 May 2024 18:24:42 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 May 2024 18:24:43 +0800
-Date: Fri, 31 May 2024 18:24:43 +0800
+	id 1sCzRM-004ApZ-2M;
+	Fri, 31 May 2024 18:24:53 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 May 2024 18:24:54 +0800
+Date: Fri, 31 May 2024 18:24:54 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Akhil R <akhilrajeev@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Thierry Reding <thierry.reding@gmail.com>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-tegra@vger.kernel.org
-Subject: Re: [PATCH] crypto: tegra - Remove an incorrect iommu_fwspec_free()
- call in tegra_se_remove()
-Message-ID: <ZlmlawnvOIYHoI68@gondor.apana.org.au>
-References: <ea775b351a3dbe4cef4056ea89da25084f73df22.1716650050.git.christophe.jaillet@wanadoo.fr>
+To: Lothar Rubusch <l.rubusch@gmail.com>
+Cc: davem@davemloft.net, dan.carpenter@linaro.org,
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: atmel-sha204a - fix negated return value
+Message-ID: <ZlmldrSVt0CWVlzX@gondor.apana.org.au>
+References: <20240526103128.14703-1-l.rubusch@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -40,29 +37,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ea775b351a3dbe4cef4056ea89da25084f73df22.1716650050.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20240526103128.14703-1-l.rubusch@gmail.com>
 
-On Sat, May 25, 2024 at 05:14:35PM +0200, Christophe JAILLET wrote:
-> The only iommu function call in this driver is a
-> tegra_dev_iommu_get_stream_id() which does not allocate anything and does
-> not take any reference.
+On Sun, May 26, 2024 at 10:31:28AM +0000, Lothar Rubusch wrote:
+> Fix negated variable return value.
 > 
-> More-over, what is freed is "se->dev" which has been devm_kzalloc()'ed in
-> the probe.
-> 
-> So there is no point in calling iommu_fwspec_free() in the remove function.
-> 
-> Remove this incorrect function call.
-> 
-> Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Fixes: e05ce444e9e5 ("crypto: atmel-sha204a - add reading from otp zone")
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/linux-crypto/34cd4179-090e-479d-b459-8d0d35dd327d@moroto.mountain/
+> Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 > ---
-> Compile tested only
-> 
-> This patch is completely speculative. *Review with care*.
-> ---
->  drivers/crypto/tegra/tegra-se-main.c | 1 -
->  1 file changed, 1 deletion(-)
+>  drivers/crypto/atmel-sha204a.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
