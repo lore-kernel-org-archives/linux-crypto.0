@@ -1,50 +1,50 @@
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302895C89;
-	Fri, 31 May 2024 01:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534BD848D;
+	Fri, 31 May 2024 01:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717119137; cv=none; b=GhfTjsVW3rlXJ7zgyxhykpJq2436Wl5LwObLvE0xu9HSHre5EAeUHsjWEXyXGodFUxEnl/6UGjNUWwXBiTJtpEeZLOZnheavZ0ugWG3NS6cbXFQKByU0VjtUQKktkHsqI8y+8QZpfHubrHBeCAEGyqYSVC5AZgFK5P6vt3e7vtk=
+	t=1717119137; cv=none; b=PiNju9c1T8kMDTtqhW2nk8BjdbdZL44M8AcTfWVpiRpfpHEBCkhaFsne4lmKQ51C86fhZQge0qqDzTbxALCUG5GUtJ4J3eYc7baNyfOd/7zDetiRUGzY4a1EmSqr0Zl2jAI2SDH0wWfK9dDQrVfLZ52aQtQxdphg/5C0KvKKYNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717119137; c=relaxed/simple;
-	bh=jHl6b3dMJ6FFg3UIi6LmmEvFgirmAw+HES4vhbbCYg4=;
+	bh=sWtmMxNEGu+Uh7uJ5e9PschP+i6N3VtA1MMarfj2PoY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qFQy6eT5++IdU7ewUY4ywoej5D+vm/ZJnLpf+xV2n5M0G0UnW+LfKksI987pdDRUrWjb9unoPG7FF94rjM4fmNESWSGnwG7T3hb2kFazINXDmYmIPlNjClD6fxR2I5uuA0ueA1CIQefEMxkxqq5UZQfbzuOf8UnS+hrnyr622Ew=
+	 MIME-Version; b=b/TvXqi4JLminQXofr7mf8/JjB0cJDDZvx3nC3kOcqhB8A7tNzEo7jGUc4UasKLNDA7LhiS5U1OlEVUI7mUUA/f3Idtj7G3wkQ0D1+QXblcVfeDCGSHyDrL6MKoh9COUDOBn/xl0e71DGdmthv+rAzSzefBHJioa79CWw3TI6Uo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; arc=none smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44UFU2Fi006307;
-	Fri, 31 May 2024 01:31:42 GMT
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44UFKs1r005709;
+	Fri, 31 May 2024 01:30:45 GMT
 DKIM-Signature: =?UTF-8?Q?v=3D1;_a=3Drsa-sha256;_c=3Drelaxed/relaxed;_d=3Doracle.com;_h?=
  =?UTF-8?Q?=3Dcc:content-transfer-encoding:date:from:in-reply-to:message-i?=
  =?UTF-8?Q?d:mime-version:references:subject:to;_s=3Dcorp-2023-11-20;_bh?=
- =?UTF-8?Q?=3D9m2aNR1g/4krse8kqjCyTPG8hy+6sHMM4ClRX172BWM=3D;_b=3DI6Oo8GVh?=
- =?UTF-8?Q?reCS/o27w4AvW5Cwmi9+K5FSkmTakQH5+Wr6+ItFaaO3TOlLABLKfLl6YvAJ_hV?=
- =?UTF-8?Q?p6Wm3kOQfgb4qzOQ55h+Cqvzn42FDfnZXdk3jHlS83iVbchCkKAix3o+DZtj4bH?=
- =?UTF-8?Q?SwX_tZVqJEMnTXDboT4d1JnOErQV9r/JlmTZVBhz5PcLP8ZUhrP2/GKA6huCllm?=
- =?UTF-8?Q?JrMp5wYM4_2K1Q/Rif9ino8Dy+UdzIcnQX35q6gYdVqERxdw8kXopHurL8ypvVO?=
- =?UTF-8?Q?HNNPC37pdHz9TrE_IeQg9VLzO8UxovUdCv8wZTsh59OHsJoFbw14c0zn4s37zzc?=
- =?UTF-8?Q?qHw7VuNmgqV6qwXc88/T0_+A=3D=3D_?=
+ =?UTF-8?Q?=3Db0H5I9sHgAENEpDn81p8fJ8RmbIshVA+f7CH478xUKI=3D;_b=3DHVIrbtuk?=
+ =?UTF-8?Q?yJCPOjkl+7UjRYF1Oe0F8rHOvge6lGu/o7Sy23+CGjAb4Yvk8PSMs2+uiZaM_LN?=
+ =?UTF-8?Q?aKsSDEfUgYfsvw6g4GCMmrY9ZqZr0m6SNab1k1/kwr6QZ72UJzlh1iwrOVR76x2?=
+ =?UTF-8?Q?1DW_VpNxnrIsxqFzGmPLppZpfV67NuasehvJBhaYS2D+n1HkkhlAZGtD/E82M2L?=
+ =?UTF-8?Q?49Kz1679e_X8/zqCwBtfQpKONGsN3ztkUEVs5fNFLIEwCwSW4ye+vdHiHg8Yiaw?=
+ =?UTF-8?Q?VvTeZsAdtn41egx_zM+N7BZ5Fpk9790+JeHRAsojPOIej2PU5osqghmKLJrORli?=
+ =?UTF-8?Q?/4nBi+btZItNL7lCfTiF4_pg=3D=3D_?=
 Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yb8p7t3hd-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yb8g4a7eg-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 31 May 2024 01:31:42 +0000
+	Fri, 31 May 2024 01:30:44 +0000
 Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44V10JZw016201;
-	Fri, 31 May 2024 01:31:41 GMT
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44V0m0HU016324;
+	Fri, 31 May 2024 01:30:44 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3yc50t985y-1
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3yc50t97fc-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 31 May 2024 01:31:41 +0000
+	Fri, 31 May 2024 01:30:43 +0000
 Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44V1SKNq027418;
-	Fri, 31 May 2024 01:31:40 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44V1SKNM027418;
+	Fri, 31 May 2024 01:30:42 GMT
 Received: from bur-virt-x6-2-100.us.oracle.com (bur-virt-x6-2-100.us.oracle.com [10.153.92.40])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3yc50t96yw-20
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3yc50t96yw-5
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 31 May 2024 01:31:39 +0000
+	Fri, 31 May 2024 01:30:42 +0000
 From: Ross Philipson <ross.philipson@oracle.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org,
         linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -60,9 +60,9 @@ Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
         dwmw2@infradead.org, baolu.lu@linux.intel.com,
         kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
         trenchboot-devel@googlegroups.com
-Subject: [PATCH v9 19/19] x86: EFI stub DRTM launch support for Secure Launch
-Date: Thu, 30 May 2024 18:03:31 -0700
-Message-Id: <20240531010331.134441-20-ross.philipson@oracle.com>
+Subject: [PATCH v9 04/19] x86: Secure Launch Resource Table header file
+Date: Thu, 30 May 2024 18:03:16 -0700
+Message-Id: <20240531010331.134441-5-ross.philipson@oracle.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20240531010331.134441-1-ross.philipson@oracle.com>
 References: <20240531010331.134441-1-ross.philipson@oracle.com>
@@ -80,142 +80,295 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamsc
  adultscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
  definitions=main-2405310010
-X-Proofpoint-ORIG-GUID: 0aK0fOvrZX65T8BZ6lZx1WP0me2ls7dG
-X-Proofpoint-GUID: 0aK0fOvrZX65T8BZ6lZx1WP0me2ls7dG
+X-Proofpoint-GUID: yKgVCtSYmEthFQel0R85P0H2d3gpIo1h
+X-Proofpoint-ORIG-GUID: yKgVCtSYmEthFQel0R85P0H2d3gpIo1h
 
-This support allows the DRTM launch to be initiated after an EFI stub
-launch of the Linux kernel is done. This is accomplished by providing
-a handler to jump to when a Secure Launch is in progress. This has to be
-called after the EFI stub does Exit Boot Services.
+Introduce the Secure Launch Resource Table which forms the formal
+interface between the pre and post launch code.
 
 Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
 ---
- drivers/firmware/efi/libstub/x86-stub.c | 98 +++++++++++++++++++++++++
- 1 file changed, 98 insertions(+)
+ include/linux/slr_table.h | 271 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 271 insertions(+)
+ create mode 100644 include/linux/slr_table.h
 
-diff --git a/drivers/firmware/efi/libstub/x86-stub.c b/drivers/firmware/efi/libstub/x86-stub.c
-index d5a8182cf2e1..a1143d006202 100644
---- a/drivers/firmware/efi/libstub/x86-stub.c
-+++ b/drivers/firmware/efi/libstub/x86-stub.c
-@@ -9,6 +9,8 @@
- #include <linux/efi.h>
- #include <linux/pci.h>
- #include <linux/stddef.h>
-+#include <linux/slr_table.h>
-+#include <linux/slaunch.h>
- 
- #include <asm/efi.h>
- #include <asm/e820/types.h>
-@@ -830,6 +832,97 @@ static efi_status_t efi_decompress_kernel(unsigned long *kernel_entry)
- 	return efi_adjust_memory_range_protection(addr, kernel_text_size);
- }
- 
-+#if (IS_ENABLED(CONFIG_SECURE_LAUNCH))
-+static bool efi_secure_launch_update_boot_params(struct slr_table *slrt,
-+						 struct boot_params *boot_params)
+diff --git a/include/linux/slr_table.h b/include/linux/slr_table.h
+new file mode 100644
+index 000000000000..213d8ac16f0f
+--- /dev/null
++++ b/include/linux/slr_table.h
+@@ -0,0 +1,271 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Secure Launch Resource Table
++ *
++ * Copyright (c) 2024, Oracle and/or its affiliates.
++ */
++
++#ifndef _LINUX_SLR_TABLE_H
++#define _LINUX_SLR_TABLE_H
++
++/* Put this in efi.h if it becomes a standard */
++#define SLR_TABLE_GUID				EFI_GUID(0x877a9b2a, 0x0385, 0x45d1, 0xa0, 0x34, 0x9d, 0xac, 0x9c, 0x9e, 0x56, 0x5f)
++
++/* SLR table header values */
++#define SLR_TABLE_MAGIC		0x4452544d
++#define SLR_TABLE_REVISION	1
++
++/* Current revisions for the policy and UEFI config */
++#define SLR_POLICY_REVISION		1
++#define SLR_UEFI_CONFIG_REVISION	1
++
++/* SLR defined architectures */
++#define SLR_INTEL_TXT		1
++#define SLR_AMD_SKINIT		2
++
++/* SLR defined bootloaders */
++#define SLR_BOOTLOADER_INVALID	0
++#define SLR_BOOTLOADER_GRUB	1
++
++/* Log formats */
++#define SLR_DRTM_TPM12_LOG	1
++#define SLR_DRTM_TPM20_LOG	2
++
++/* DRTM Policy Entry Flags */
++#define SLR_POLICY_FLAG_MEASURED	0x1
++#define SLR_POLICY_IMPLICIT_SIZE	0x2
++
++/* Array Lengths */
++#define TPM_EVENT_INFO_LENGTH		32
++#define TXT_VARIABLE_MTRRS_LENGTH	32
++
++/* Tags */
++#define SLR_ENTRY_INVALID	0x0000
++#define SLR_ENTRY_DL_INFO	0x0001
++#define SLR_ENTRY_LOG_INFO	0x0002
++#define SLR_ENTRY_ENTRY_POLICY	0x0003
++#define SLR_ENTRY_INTEL_INFO	0x0004
++#define SLR_ENTRY_AMD_INFO	0x0005
++#define SLR_ENTRY_ARM_INFO	0x0006
++#define SLR_ENTRY_UEFI_INFO	0x0007
++#define SLR_ENTRY_UEFI_CONFIG	0x0008
++#define SLR_ENTRY_END		0xffff
++
++/* Entity Types */
++#define SLR_ET_UNSPECIFIED	0x0000
++#define SLR_ET_SLRT		0x0001
++#define SLR_ET_BOOT_PARAMS	0x0002
++#define SLR_ET_SETUP_DATA	0x0003
++#define SLR_ET_CMDLINE		0x0004
++#define SLR_ET_UEFI_MEMMAP	0x0005
++#define SLR_ET_RAMDISK		0x0006
++#define SLR_ET_TXT_OS2MLE	0x0010
++#define SLR_ET_UNUSED		0xffff
++
++#ifndef __ASSEMBLY__
++
++/*
++ * Primary Secure Launch Resource Table Header
++ */
++struct slr_table {
++	u32 magic;
++	u16 revision;
++	u16 architecture;
++	u32 size;
++	u32 max_size;
++	/* table entries */
++} __packed;
++
++/*
++ * Common SLRT Table Header
++ */
++struct slr_entry_hdr {
++	u16 tag;
++	u16 size;
++} __packed;
++
++/*
++ * Boot loader context
++ */
++struct slr_bl_context {
++	u16 bootloader;
++	u16 reserved[3];
++	u64 context;
++} __packed;
++
++/*
++ * Dynamic Launch Callback Function type
++ */
++typedef void (*dl_handler_func)(struct slr_bl_context *bl_context);
++
++/*
++ * DRTM Dynamic Launch Configuration
++ */
++struct slr_entry_dl_info {
++	struct slr_entry_hdr hdr;
++	u32 dce_size;
++	u64 dce_base;
++	u64 dlme_size;
++	u64 dlme_base;
++	u64 dlme_entry;
++	struct slr_bl_context bl_context;
++	u64 dl_handler;
++} __packed;
++
++/*
++ * TPM Log Information
++ */
++struct slr_entry_log_info {
++	struct slr_entry_hdr hdr;
++	u16 format;
++	u16 reserved[3];
++	u32 size;
++	u64 addr;
++} __packed;
++
++/*
++ * DRTM Measurement Entry
++ */
++struct slr_policy_entry {
++	u16 pcr;
++	u16 entity_type;
++	u16 flags;
++	u16 reserved;
++	u64 size;
++	u64 entity;
++	char evt_info[TPM_EVENT_INFO_LENGTH];
++} __packed;
++
++/*
++ * DRTM Measurement Policy
++ */
++struct slr_entry_policy {
++	struct slr_entry_hdr hdr;
++	u16 revision;
++	u16 nr_entries;
++	struct slr_policy_entry policy_entries[];
++} __packed;
++
++/*
++ * Secure Launch defined MTRR saving structures
++ */
++struct slr_txt_mtrr_pair {
++	u64 mtrr_physbase;
++	u64 mtrr_physmask;
++} __packed;
++
++struct slr_txt_mtrr_state {
++	u64 default_mem_type;
++	u64 mtrr_vcnt;
++	struct slr_txt_mtrr_pair mtrr_pair[TXT_VARIABLE_MTRRS_LENGTH];
++} __packed;
++
++/*
++ * Intel TXT Info table
++ */
++struct slr_entry_intel_info {
++	struct slr_entry_hdr hdr;
++	u16 reserved[2];
++	u64 txt_heap;
++	u64 saved_misc_enable_msr;
++	struct slr_txt_mtrr_state saved_bsp_mtrrs;
++} __packed;
++
++/*
++ * UEFI config measurement entry
++ */
++struct slr_uefi_cfg_entry {
++	u16 pcr;
++	u16 reserved;
++	u32 size;
++	u64 cfg; /* address or value */
++	char evt_info[TPM_EVENT_INFO_LENGTH];
++} __packed;
++
++/*
++ * UEFI config measurements
++ */
++struct slr_entry_uefi_config {
++	struct slr_entry_hdr hdr;
++	u16 revision;
++	u16 nr_entries;
++	struct slr_uefi_cfg_entry uefi_cfg_entries[];
++} __packed;
++
++static inline void *slr_end_of_entries(struct slr_table *table)
 +{
-+	struct slr_entry_intel_info *txt_info;
-+	struct slr_entry_policy *policy;
-+	struct txt_os_mle_data *os_mle;
-+	bool updated = false;
-+	int i;
-+
-+	txt_info = slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_INTEL_INFO);
-+	if (!txt_info)
-+		return false;
-+
-+	os_mle = txt_os_mle_data_start((void *)txt_info->txt_heap);
-+	if (!os_mle)
-+		return false;
-+
-+	os_mle->boot_params_addr = (u32)(u64)boot_params;
-+
-+	policy = slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_ENTRY_POLICY);
-+	if (!policy)
-+		return false;
-+
-+	for (i = 0; i < policy->nr_entries; i++) {
-+		if (policy->policy_entries[i].entity_type == SLR_ET_BOOT_PARAMS) {
-+			policy->policy_entries[i].entity = (u64)boot_params;
-+			updated = true;
-+			break;
-+		}
-+	}
-+
-+	/*
-+	 * If this is a PE entry into EFI stub the mocked up boot params will
-+	 * be missing some of the setup header data needed for the second stage
-+	 * of the Secure Launch boot.
-+	 */
-+	if (image) {
-+		struct setup_header *hdr = (struct setup_header *)((u8 *)image->image_base + 0x1f1);
-+		u64 cmdline_ptr, hi_val;
-+
-+		boot_params->hdr.setup_sects = hdr->setup_sects;
-+		boot_params->hdr.syssize = hdr->syssize;
-+		boot_params->hdr.version = hdr->version;
-+		boot_params->hdr.loadflags = hdr->loadflags;
-+		boot_params->hdr.kernel_alignment = hdr->kernel_alignment;
-+		boot_params->hdr.min_alignment = hdr->min_alignment;
-+		boot_params->hdr.xloadflags = hdr->xloadflags;
-+		boot_params->hdr.init_size = hdr->init_size;
-+		boot_params->hdr.kernel_info_offset = hdr->kernel_info_offset;
-+		hi_val = boot_params->ext_cmd_line_ptr;
-+		cmdline_ptr = boot_params->hdr.cmd_line_ptr | hi_val << 32;
-+		boot_params->hdr.cmdline_size = strlen((const char *)cmdline_ptr);;
-+	}
-+
-+	return updated;
++	return (void *)table + table->size;
 +}
 +
-+static void efi_secure_launch(struct boot_params *boot_params)
++static inline void *
++slr_next_entry(struct slr_table *table,
++	       struct slr_entry_hdr *curr)
 +{
-+	struct slr_entry_dl_info *dlinfo;
-+	efi_guid_t guid = SLR_TABLE_GUID;
-+	dl_handler_func handler_callback;
-+	struct slr_table *slrt;
++	struct slr_entry_hdr *next = (struct slr_entry_hdr *)
++				((u8 *)curr + curr->size);
 +
-+	/*
-+	 * The presence of this table indicated a Secure Launch
-+	 * is being requested.
-+	 */
-+	slrt = (struct slr_table *)get_efi_config_table(guid);
-+	if (!slrt || slrt->magic != SLR_TABLE_MAGIC)
-+		return;
++	if ((void *)next >= slr_end_of_entries(table))
++		return NULL;
++	if (next->tag == SLR_ENTRY_END)
++		return NULL;
 +
-+	/*
-+	 * Since the EFI stub library creates its own boot_params on entry, the
-+	 * SLRT and TXT heap have to be updated with this version.
-+	 */
-+	if (!efi_secure_launch_update_boot_params(slrt, boot_params))
-+		return;
-+
-+	/* Jump through DL stub to initiate Secure Launch */
-+	dlinfo = slr_next_entry_by_tag(slrt, NULL, SLR_ENTRY_DL_INFO);
-+
-+	handler_callback = (dl_handler_func)dlinfo->dl_handler;
-+
-+	handler_callback(&dlinfo->bl_context);
-+
-+	unreachable();
++	return next;
 +}
-+#endif
 +
- static void __noreturn enter_kernel(unsigned long kernel_addr,
- 				    struct boot_params *boot_params)
- {
-@@ -957,6 +1050,11 @@ void __noreturn efi_stub_entry(efi_handle_t handle,
- 		goto fail;
- 	}
- 
-+#if (IS_ENABLED(CONFIG_SECURE_LAUNCH))
-+	/* If a Secure Launch is in progress, this never returns */
-+	efi_secure_launch(boot_params);
-+#endif
++static inline void *
++slr_next_entry_by_tag(struct slr_table *table,
++		      struct slr_entry_hdr *entry,
++		      u16 tag)
++{
++	if (!entry) /* Start from the beginning */
++		entry = (struct slr_entry_hdr *)(((u8 *)table) + sizeof(*table));
 +
- 	/*
- 	 * Call the SEV init code while still running with the firmware's
- 	 * GDT/IDT, so #VC exceptions will be handled by EFI.
++	for ( ; ; ) {
++		if (entry->tag == tag)
++			return entry;
++
++		entry = slr_next_entry(table, entry);
++		if (!entry)
++			return NULL;
++	}
++
++	return NULL;
++}
++
++static inline int
++slr_add_entry(struct slr_table *table,
++	      struct slr_entry_hdr *entry)
++{
++	struct slr_entry_hdr *end;
++
++	if ((table->size + entry->size) > table->max_size)
++		return -1;
++
++	memcpy((u8 *)table + table->size - sizeof(*end), entry, entry->size);
++	table->size += entry->size;
++
++	end  = (struct slr_entry_hdr *)((u8 *)table + table->size - sizeof(*end));
++	end->tag = SLR_ENTRY_END;
++	end->size = sizeof(*end);
++
++	return 0;
++}
++
++static inline void
++slr_init_table(struct slr_table *slrt, u16 architecture, u32 max_size)
++{
++	struct slr_entry_hdr *end;
++
++	slrt->magic = SLR_TABLE_MAGIC;
++	slrt->revision = SLR_TABLE_REVISION;
++	slrt->architecture = architecture;
++	slrt->size = sizeof(*slrt) + sizeof(*end);
++	slrt->max_size = max_size;
++	end = (struct slr_entry_hdr *)((u8 *)slrt + sizeof(*slrt));
++	end->tag = SLR_ENTRY_END;
++	end->size = sizeof(*end);
++}
++
++#endif /* !__ASSEMBLY */
++
++#endif /* _LINUX_SLR_TABLE_H */
 -- 
 2.39.3
 
