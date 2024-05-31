@@ -1,102 +1,92 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BED9156677
-	for <linux-crypto@vger.kernel.org>; Fri, 31 May 2024 10:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B7D156F46
+	for <linux-crypto@vger.kernel.org>; Fri, 31 May 2024 10:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717152581; cv=none; b=jZ9yzg3X/b2aficth9IM6VpYFNq8gu9bJX8cggK7vdoewAHhjljLLJqZl15aXtNATDChi1P7OaZFKtC9fgV3dCBh8AhiQ2IlltNZmJ8oB7zR/CyAQ8pxJiUrW4yt86QSbL9mlPWHAu2MV+o2j6uYo4mwxqXz2GMEpfIsy6/V02w=
+	t=1717152648; cv=none; b=N8xqKjIiQ1K4A3rcgOROQrW6gariDxMdnvKWb0Ri0+Wjk1fD6ImL9cDO6iGzZuGKqL+YBdcO/IxceXfOJq1ZS8xF3mzl1fDHt+xaXO2JDuJQcsp/mcLgwj711ANjP+6PpXCcc8rfNwvj0/LVhgjqgF2YUbIZiCdvQ9Mowlfz26s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717152581; c=relaxed/simple;
-	bh=rGZ05Wtl7/tFqqeKIfV5yhM9avsTsSpt/wX8DUBeUl8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SgP0VowGiAX+kVD7mk80PmpKzVUPLUtxnms9zThsM/gQALAELhy30FqEM+cgPiAzKGAVnOpRsy7WZeBgVciAdxLgWYS1kX37B4+MlyHe/k92/gNllDjXzmoMRo29179U9EtqbCrqqQWW+u6XtLA44P3HZapQJgJhXPQvCu4Yd6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HsWkXc6v; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1717152648; c=relaxed/simple;
+	bh=IgNuUc7H+4H+wS/T7K15pYQS/lOBI7Syd2UuQzgQbNg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SmBGjgs54yed2Jd4pTgA1glXKxs8gvepnUHeoKwjH8DsMVYOWnrWWex4OY+k2i69xbi4PDOnHJ8Q7K/iDt0/9bGIpwcKfdhOf2cpjTWPEe1x6J+mZTUOKommlHADR3AT4wjmpejMT8n395gpw+mYTfAQoc2S2T7ldNPhqnCheXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IaLcqEvx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HsWkXc6v"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57a22af919cso8943a12.1
-        for <linux-crypto@vger.kernel.org>; Fri, 31 May 2024 03:49:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717152577; x=1717757377; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8rRp80lBW4FzoN8ncda3wP8nvCP0z9lrK+Jc/IWYduo=;
-        b=HsWkXc6vy3EByAB77Ul9Zsx8LSEDqCaS97xpcWD1S0rgCDbugyzcodDnIX5Ll9QzSq
-         L+iFuGtE1cvJCF+MJ79ypkPiMHFaoEg4ys/QwM9U8Ugqtpmy10O5ySti3ido5YjJRzrH
-         PaDlTUsD9/fI2JkEaR8DWsj3dOU8qkKatA25NOS7JS3c9FeJ7GMdJIWpGVG6RBKOM4Nf
-         4bAHjlC6464A49PpcdupEPOYlA8VbgumeFLmefyHQ4Smagk7tWzywW52/aYVvruvYIjO
-         WvA1ZKBsjPOzX+22PcvvsE7xlt9DyYuEqAXpne4NV1ldrqJyGugVp8Lya1vmOy8hvUgI
-         ohdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717152577; x=1717757377;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8rRp80lBW4FzoN8ncda3wP8nvCP0z9lrK+Jc/IWYduo=;
-        b=tEtllpuPFbrBXqdYa/rvnYaM3rsrd7PgBetjsFYUvN7/MXU7f3ez+ujyUfvAsFbOUZ
-         4N7Q1XJoyY5CCHjHLKHugvqua6Y/zjUwGE7SVGeemIqNeKxbrVRXQg6cSGvghB0FIj0D
-         sZ97QuEaUNuGkz3zciDpSvmH9ZjxmH9RbTf+Z9K8IPdieuNJcQcfgN4zHVaRShR994qp
-         g6pCcR40FmmbHBlLDweU/y4YaBfUD3axs6SOMVWVzZbUKtRbnJrS0Q8XNgQE9iI17a6f
-         ZUdkCWR+5Y6i1jNK3Wb4aW1yhbCHoklOkedZivWqX/hrE0LGL65TW4ztwuKhUx1qnyyu
-         /Eig==
-X-Forwarded-Encrypted: i=1; AJvYcCXBW2FLX/U4frUgEACzEl7vgm6n03bjFQf/Xr5O5HsJShoY9vL+n7JlBDJvNbH/DEqjdLfPvQ9PC+LBz9Q7ekoQqcD+ljNCG+UGaar3
-X-Gm-Message-State: AOJu0YylUkh3PgHopuWPuWqO1zXPYdnZ6WjEPrHrQ98S7+jgec3VC4BE
-	SHwp+YB3EID/URt9z9jyXuzIgffDcP6PU0LJmcDsCLe6jcpUv04fWP5y01E+t10XR4jIjNpOjI+
-	qkbQVsu2VgO0/CvSRYGJ+xZN8Z+jABkoyZ741
-X-Google-Smtp-Source: AGHT+IGNvupsb1UVYookhWaIP+aHUuOsnl1pdEMh3RFuflcTYqmKBlgYK4b83wq+i4WL/kDsRqslbWqCLr6DiBSSCT0=
-X-Received: by 2002:a05:6402:148b:b0:572:988f:2f38 with SMTP id
- 4fb4d7f45d1cf-57a33c6bab5mr160899a12.6.1717152576620; Fri, 31 May 2024
- 03:49:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IaLcqEvx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97EB1C116B1;
+	Fri, 31 May 2024 10:50:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717152648;
+	bh=IgNuUc7H+4H+wS/T7K15pYQS/lOBI7Syd2UuQzgQbNg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IaLcqEvxf3WPsbG2GeI4rF01P9sJapsh+waMRV+Bn5GVwzGlT4iKmwQqs6EEovMXO
+	 bq5MHfHY6YFi1fR4X70+hsY69LAzUVWpDrh57DRzkJYj4jjsvmAOyPuwwp3KKMkAjn
+	 UNJ1Sxz2GocpMQCwrvXq5T6CImk7oLDAiMvZnkyrdTjfuo93qfcnD1WxaylZTpZw6B
+	 WNpypSu8SidR+hFaMIGQYj/Ax384ABc4lusdGy+QKdKxtiXO7/oEWY3nklJt1AUC5u
+	 Ko6rwqc3pTr8n9ZBCL52sbLWtxUPyureJ7C/BmxytphV3nt4YdZisxhRC8WhplyUzE
+	 DA5PC6T4geM0A==
+Date: Fri, 31 May 2024 12:50:44 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
+To: Marek Vasut <marex@denx.de>
+Cc: linux-crypto@vger.kernel.org, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Gatien Chevallier <gatien.chevallier@foss.st.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Olivia Mackall <olivia@selenic.com>, Rob Herring <robh@kernel.org>, 
+	Yang Yingliang <yangyingliang@huawei.com>, kernel@dh-electronics.com, linux-arm-kernel@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH] hwrng: stm32 - use sizeof(*priv) instead of
+ sizeof(struct stm32_rng_private)
+Message-ID: <n5fitoidzxrqqsjddfaza5z52hmjgjksytpqua726s7h56z63e@m4cygxcnafo3>
+References: <20240531085749.42863-1-marex@denx.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240528122352.2485958-1-Jason@zx2c4.com> <20240528122352.2485958-2-Jason@zx2c4.com>
-In-Reply-To: <20240528122352.2485958-2-Jason@zx2c4.com>
-From: Jann Horn <jannh@google.com>
-Date: Fri, 31 May 2024 12:48:58 +0200
-Message-ID: <CAG48ez0P3EDXC0uLLPjSjx3i6qB3fcdZbL2kYyuK6fZ_nJeN5w@mail.gmail.com>
-Subject: Re: [PATCH v16 1/5] mm: add VM_DROPPABLE for designating always
- lazily freeable mappings
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev, tglx@linutronix.de, 
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org, x86@kernel.org, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>, "Carlos O'Donell" <carlos@redhat.com>, 
-	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Christian Brauner <brauner@kernel.org>, David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="xek54sdap76jwck5"
+Content-Disposition: inline
+In-Reply-To: <20240531085749.42863-1-marex@denx.de>
+
+
+--xek54sdap76jwck5
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 28, 2024 at 2:24=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com=
-> wrote:
-> c) If there's not enough memory to service a page fault, it's not fatal.
-[...]
-> @@ -5689,6 +5689,10 @@ vm_fault_t handle_mm_fault(struct vm_area_struct *=
-vma, unsigned long address,
->
->         lru_gen_exit_fault();
->
-> +       /* If the mapping is droppable, then errors due to OOM aren't fat=
-al. */
-> +       if (vma->vm_flags & VM_DROPPABLE)
-> +               ret &=3D ~VM_FAULT_OOM;
+On Fri, May 31, 2024 at 10:57:34AM +0200, Marek Vasut wrote:
+> Use sizeof(*priv) instead of sizeof(struct stm32_rng_private), the
+> former makes renaming of struct stm32_rng_private easier if necessary,
+> as it removes one site where such rename has to happen. No functional
+> change.
 
-Can you remind me how this is supposed to work? If we get an OOM
-error, and the error is not fatal, does that mean we'll just keep
-hitting the same fault handler over and over again (until we happen to
-have memory available again I guess)?
+IMHO the main upside is that it's easier to spot that the allocation
+size is correct.
 
-Or is there something in this series that somehow redirects userspace
-execution to getrandom() in that case?
+Acked-by: Uwe Kleine-K=F6nig <ukleinek@kernel.org>
 
+Best regards
+Uwe
 
-> +
->         if (flags & FAULT_FLAG_USER) {
->                 mem_cgroup_exit_user_fault();
->                 /*
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--xek54sdap76jwck5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmZZq34ACgkQj4D7WH0S
+/k7cTAgAlRRgppFhUD+9O+z0yqXTYZdPWzdDaF2Y/wCjo4vW+41rmwpPXPYjUj6V
+RUSJ0g1eMaVwKaX53dbWlNYD3RTj8bv7uScBomwhTGUY8CUlIpEHkbY0xIrjCq2p
+d36Rm/i3BzP0AvYV8EGgKLCys7f+u1br8Kl/ubGUx+E7P40C0V8D1biYD5kxvzYX
+7U55QcKsKuAinDRk126iXM6d2f/aZGwO4Syh7NvNC6Q9czeSK2MAqU+dpQLScogl
+UlNK+9iYjkadIlusVt19D2BDhpY8iG4hidRNL/sncLLA+M9i0oqZfCMvi01A4fEd
+eRlktUFUxNYh6x/yhWMoVApAbqccRA==
+=sZmB
+-----END PGP SIGNATURE-----
+
+--xek54sdap76jwck5--
