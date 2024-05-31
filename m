@@ -1,67 +1,67 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10310A3F;
-	Fri, 31 May 2024 00:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AA34A32;
+	Fri, 31 May 2024 00:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717116102; cv=fail; b=rJAYNjsubuFKlBCAhEK0aW2pmcXz0Ujc2MBwWHfEPCPAI5eBf4XKeCuyhG/ySrQTm8Xll5oxpIKyZWqYcziDTyony3EzmY1r5tG6xtLlY50dThJ8P6l0FWRGMnm6O/KoZbWw93TZVJdAWJTTAVybMb2HAzG4SWZB1frsKZOB9gA=
+	t=1717116103; cv=fail; b=lrSKGEowzX6kZXS7wsejEX94aiTQGLxtPF/WH2FDV1i7L5/PTPHlE09cuIgcGs9OUleK4b0kx7BZH82QLt06Jf6NYnNErmM/GhSm8KdwMHEZ4i+AUO7QDs17OfE4Zy4GMOEg7iBTAZVAf87L4y8/IBE3/J8c5eoDKEvB4L3sDjg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717116102; c=relaxed/simple;
-	bh=fuWLNigJGiWMPKRRps2geJFw9gTMutwzxmoXwBEEjlQ=;
+	s=arc-20240116; t=1717116103; c=relaxed/simple;
+	bh=ou8g1fR7tppvZPMKuEp2405tNPF2nleOZqyzyYtg7to=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=AkGqzGhxlFJogTIxthX6do2zi9RjYXjoZfYIlx9vZPWGSDJTHTnblvZCDbangW+ia2tSnIWW6DQWDbOThWw5CuZMFRv0mE10EhQFh6SYyNiOoJL3p570zSiyYJV+/0nDvV/M/EW37ywpaC3bWKQX8vJQlZL7TE3R2s0Br9W0MQg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; arc=fail smtp.client-ip=205.220.165.32
+	 Content-Type:MIME-Version; b=atee0+tim7q6uE5zudEguLwloHzMUUfGnPdKP5GF9C2rtjhw6jkHrczAj2U0M9bT67mSa3NMLGkAXk9Yxxc2Sh/RQsYYbqq834ieXoP7gqHkhxPi67BIPJSG5bIgZERTUovVVlZ2X/axq6JcQLlC7xuC0NmQluuNhq+PoeRhLV0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; arc=fail smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44UFc6x4005731;
-	Fri, 31 May 2024 00:40:04 GMT
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44UFUkap019783;
+	Fri, 31 May 2024 00:40:09 GMT
 DKIM-Signature: =?UTF-8?Q?v=3D1;_a=3Drsa-sha256;_c=3Drelaxed/relaxed;_d=3Doracle.com;_h?=
  =?UTF-8?Q?=3Dcc:content-transfer-encoding:content-type:date:from:in-reply?=
  =?UTF-8?Q?-to:message-id:mime-version:references:subject:to;_s=3Dcorp-202?=
- =?UTF-8?Q?3-11-20;_bh=3DCMJG2C7kHQ0cDcQSto/qM9dJp+gobr2qbkHTuCkBK58=3D;_b?=
- =?UTF-8?Q?=3DYAQVxC8qVXVP1Co3ESiu+hoNfEDtJbvWjGQ1i6/o7eAdU49gHNDffmoycZe4?=
- =?UTF-8?Q?p78NH/kt_DJ+haBQx6MdNnLvIAZv4dyehsqFBpeY5bOhk9cRdN0xiLzVk5K+dcz?=
- =?UTF-8?Q?IeVCSnMwHRCvEc_FYun/4Gg7muRkmTZ49YNPa+shBLCiCahpMWtakbB5ryHxni6?=
- =?UTF-8?Q?G2U4bcviI6lZAUgOKilC_QfBH5iZLzlQdx5wLoGpc8qyWNB1d8TSv01ePaN8iwe?=
- =?UTF-8?Q?Z7w77fQy5hbDA3PPrWoOCoHa0C_05MtHxJYFHKr7A/70sZYmOyt+8RNYmrHJakk?=
- =?UTF-8?Q?bkJjxqCvgvJw/pt7JJO8balhWAylGXWe_Ug=3D=3D_?=
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yb8g4a61q-1
+ =?UTF-8?Q?3-11-20;_bh=3DdXo7ah+YtGVwttXVvKOu1CBhy+nK5wF9aNOwgMh6hmE=3D;_b?=
+ =?UTF-8?Q?=3Da3xn0g3voOpt/zuU+jDtbfamRdP2Eot+ADlBDFRWuotNH1wd67Ihjw5Ir/yk?=
+ =?UTF-8?Q?PFi6+0GT_XI7q439f7Na4lJoHniEKPnshegBkmF4RAmIiZvaG01jO3AHEQX/2pZ?=
+ =?UTF-8?Q?xQChX+Q0HbEdrQ_8o2s33J9LELR4z/zYYlcgkVWrMsdC+/q9T/RJ3QFADhPGc8n?=
+ =?UTF-8?Q?Q79pkWtuXHsVhX3Fv8+o_+k8uZnjsaNMO3pkjYsS63RcbPBxHj0lxnFAZUswgRN?=
+ =?UTF-8?Q?C2Ihtdv/vFrGzlTzGTl6t0Uiuo_Ci5VZk+R1mVpm1K/MpxLkGbSPWAtoRlGe7GJ?=
+ =?UTF-8?Q?FVhqGb0w+Y4Bn9yJKO9rExCPGLNsP7ph_3g=3D=3D_?=
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yb8g9tatb-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 31 May 2024 00:40:04 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44UMfwEr026627;
-	Fri, 31 May 2024 00:40:03 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2169.outbound.protection.outlook.com [104.47.59.169])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3yc5098hkr-2
+	Fri, 31 May 2024 00:40:09 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44UMEg5b006320;
+	Fri, 31 May 2024 00:40:08 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2048.outbound.protection.outlook.com [104.47.66.48])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3yd7c7pm0c-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 31 May 2024 00:40:03 +0000
+	Fri, 31 May 2024 00:40:08 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W4khnpPTtrfEgNn9dHKuNwVFOSM4Ow+rfykvZ4Ue4TaA3Go/UEat+IVsNVHlEPX/JcdhUy7mlXrTqnfRpCr6PJeirDR1wX3Dk/zDsNRyiH2O1Tu7dlWh/ec1/vynmwEJotkS8852zTHCuPnEuzkmJLVyJvvuPovuaWSn7nUVGAWM/EowvSh/yYJFq0eymtnO9gOwNnBqrCj5R2adTR4ehtkOLl9h1VtD/ZeRlqc5QYegMrIPejTvv6Pldg6SzKDTuBpoBIk9QCZxXZzpRfoGC+IjCjfGenwbH8Qc0TZX11d7SyYrdI78WduBvnDGLLapcMtfSdFzV0r3ggrtIckxGg==
+ b=OhNDXxCAa1qdihKkyQz/557+GDg1mc99CE7nbvZpwOGh56uczxrqCWZHOJ8n/PV362+o4sm60nbl5YbHO1ZD0TXjx/jo9UpbNeJOGJ/3HzwEzViSW4yNHyJw5pfMtA0APiM5clCX4+GFefNlHfRXd/XOtag7bHqmjGC7MXUpQuehBjiMKXvgIsTsy1UYxHpePY7cnmhOBvmBwJWMTd55V35OdMspmj8M8ZXtiqLfP5TaSxcr/nbWuaPXvfvN10UAdyO2hVeBGVAXB862L+IBrX9knvuCFK6p/clhJT1B772S6ds/j1QyzyYBH/4v4lqaP6YQKFhxstuk4+pq9Jeh4Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CMJG2C7kHQ0cDcQSto/qM9dJp+gobr2qbkHTuCkBK58=;
- b=XeaUTzU7kz0Kwo9TLy8YOCVImIgUelETU+h7TEjXR+5BgfDjyNnskMe+582hBPKs5sDbVEbt16l6Zi1ccRybUcJQyIcJMUA0mql3wJmOJfTtcqiLJ5jXUpkYa0816Wx6Ib8f151CMihgokfAWYtNKSu7LUAlbhgoKXLNx2eOSN0XLjIRupN49an3HPWbtaEkaQLhsIeNImH3qkeJpK7x74KmfAoUlf6dSKfvktojXUZpN03XT0upxhVx6Qidtv5rTWpuTwzmObxPTeEpyusCuOMsg5nrMsVytTMztfke/6OsbEI4brQ1HSBpFhA/hHsGTdipJJsO22efSy3FkwgEaA==
+ bh=dXo7ah+YtGVwttXVvKOu1CBhy+nK5wF9aNOwgMh6hmE=;
+ b=HoMzdcOuRJlLNOBxWawoVo5JJzSE9sH5PEZCdROrRq7JY6U+SdB7JZn06rVYzn/oFLQ7SLnfr7eVksvpIJ870ZKY4/KFuVi6m2D7joZjCUS1QFNhs1czNWjGKPfxB03ZCohHt6Ge3x6kjMArz3jAUbU38LVRNKwxtAipBjRdSVp/pH27+XJoAppdaI5fXZvUvRZcE5kjZ38377izl3ge1P3BfgKAcGw/VsUxTGoFd9mKF6yDAYIzzxpbP5QWX3T3eahmstlNLVrgStDF9PMZ0A6DYfZyXTajsvFrgb6tHGPMsxzAWhg0weET5VAcqW3wVKqlSKb7JZmO+tFU9moq1Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CMJG2C7kHQ0cDcQSto/qM9dJp+gobr2qbkHTuCkBK58=;
- b=lYoKhyIVUHqcjbgsmLlbWvBJThik77U2vLCW0Aym/r63rFMRPvsb4kFrOda25bWQKGKvlX5uOYzSn7qAwLEfe8OttCJNt9O8pId76+bUow8L48xGvQB5VS9bkzMCYLE71EuL8/REJmPh2QigEWWcNiKNH0B836QVY1tp9thCXFs=
+ bh=dXo7ah+YtGVwttXVvKOu1CBhy+nK5wF9aNOwgMh6hmE=;
+ b=TxkiFbJv4cBYF7FZApGnOR6uZMVzp5FLC2gwoqemZoBuTLhtK5feI9uee/LnrSDJUfvrtBqWVjuDnmWYMFUdOHAoRuJCj+xUEq11m7UJE4bHmU9tACIpT1vNvLjFHk+33Y32DdX7WTV5aDNL5SUO+oFLr6rUNz+cHy3KrLckl6c=
 Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
- by BY5PR10MB4274.namprd10.prod.outlook.com (2603:10b6:a03:206::20) with
+ by CO1PR10MB4785.namprd10.prod.outlook.com (2603:10b6:303:95::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.22; Fri, 31 May
- 2024 00:39:57 +0000
+ 2024 00:40:06 +0000
 Received: from CH2PR10MB4150.namprd10.prod.outlook.com
  ([fe80::5527:ab55:d1e7:9c9a]) by CH2PR10MB4150.namprd10.prod.outlook.com
  ([fe80::5527:ab55:d1e7:9c9a%4]) with mapi id 15.20.7633.018; Fri, 31 May 2024
- 00:39:57 +0000
+ 00:40:06 +0000
 From: Eric Snowberg <eric.snowberg@oracle.com>
 To: linux-security-module@vger.kernel.org
 Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au,
@@ -73,16 +73,16 @@ Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au,
         rdunlap@infradead.org, linux-kernel@vger.kernel.org,
         keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-efi@vger.kernel.org, linux-integrity@vger.kernel.org
-Subject: [RFC PATCH v2 2/8] clavis: Introduce a new system keyring called clavis
-Date: Thu, 30 May 2024 18:39:39 -0600
-Message-ID: <20240531003945.44594-3-eric.snowberg@oracle.com>
+Subject: [RFC PATCH v2 5/8] keys: Add new verification type (VERIFYING_CLAVIS_SIGNATURE)
+Date: Thu, 30 May 2024 18:39:42 -0600
+Message-ID: <20240531003945.44594-6-eric.snowberg@oracle.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240531003945.44594-1-eric.snowberg@oracle.com>
 References: <20240531003945.44594-1-eric.snowberg@oracle.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BYAPR02CA0025.namprd02.prod.outlook.com
- (2603:10b6:a02:ee::38) To CH2PR10MB4150.namprd10.prod.outlook.com
+X-ClientProxiedBy: LO4P123CA0591.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:295::13) To CH2PR10MB4150.namprd10.prod.outlook.com
  (2603:10b6:610:ac::13)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -91,306 +91,137 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PR10MB4150:EE_|BY5PR10MB4274:EE_
-X-MS-Office365-Filtering-Correlation-Id: e4e6d531-44c5-4f93-8f58-08dc810a3202
+X-MS-TrafficTypeDiagnostic: CH2PR10MB4150:EE_|CO1PR10MB4785:EE_
+X-MS-Office365-Filtering-Correlation-Id: 026e2932-e2b7-4bdc-f811-08dc810a3760
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015|7416005;
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|7416005|1800799015|376005;
 X-Microsoft-Antispam-Message-Info: 
-	=?us-ascii?Q?2/wFU/aijUrHHQbJXz0998PQ1m8z2IoGGfMU3FvVF794LimV2hnqr7QZlbG/?=
- =?us-ascii?Q?RaxRrHZKI6AaSqH8Egj/1E/n458M656Tefh5w9ulp+oesK1Rg+x0DHiQkBpS?=
- =?us-ascii?Q?FH+3Qbv/v1zbIiT9VLCa3nUf41ttQa5OFOJ/hJjsSqvtiCV+xCx6zpNCEYXZ?=
- =?us-ascii?Q?WT9ETzlzuwzXmmrmeWtq1AxaY1ffAU2xeCXMrgTDs9wuFqgaOJsEpvDkZ2t7?=
- =?us-ascii?Q?HV1p6FnIB8COpcnTFeqEgxiXYgLoieUbnqPyUzhTnVOn+COpfl4N+j/WTxby?=
- =?us-ascii?Q?tEhWBORWRBsMZF2h35Nzv/7kJflw2eLYk//+RdhbZcpt4eYeumOc5XiqXw2E?=
- =?us-ascii?Q?RXjc9XTnnu8pH6OFlkcjQ+ckSL2pEZWzZ+2gM+/YKgNpBPCGgecedxiADYDf?=
- =?us-ascii?Q?Qrr0yVWTUPwdkXlPVe/HD9segcAx/gxAAcpde/QGPdfBIvYH2lluvGlzQVAc?=
- =?us-ascii?Q?a80jSFSLcrxuEQEKcMT/QhqD9K1h6E63TSw7Tu2ZrgAaVYxHOHLDnxpCTSgH?=
- =?us-ascii?Q?m3DUzva43L+AA/G9iTpvYrb8WUhT9w/YbdoaxTWHNK8dMvifahJxER7LU9eM?=
- =?us-ascii?Q?ieMLCEVW9vTCLrQ/e/qlWyEBbQCpJHN2UaCOdDj7YwhcGTZVr95ykAwYDCdu?=
- =?us-ascii?Q?TJejzr/no/NibDq5T3teTkHHQKqGtao13kB/4U1Q9zTL87UxRbIYKQKRpzA/?=
- =?us-ascii?Q?3GF+MUb6YnzAuuxgkwsE2GAh1Gjlga7Xub9ZB9INHYR0O7GOuKKJLYU3AQ4+?=
- =?us-ascii?Q?/PotmY090UB1gTk/+PZkAzjEYlElmL2DVLDxc2O02ouDeEuSwiNZZVkQAp6n?=
- =?us-ascii?Q?mYQVqUArY3UDJk9PEVKccrFOwS+zuxuI4TmUWMdksH5DrnYeuH3uw/uyNT7z?=
- =?us-ascii?Q?dYIiVduwGKBIQTuTymODyRWWMzRD6oTAvRzs4Kv7gmW9RG73gYmOOZVxoP/y?=
- =?us-ascii?Q?gDSFToX5fVZd12df5UJgCq3K0bklmYbKReZthtAjFAFVJ/2h9tr7Nvvs3+zz?=
- =?us-ascii?Q?EX9bf6b3nXtyycnHl/2s7rHOC5VFvV3ViCUAmk1caS8d6b/VeQwDmSYz/Ye0?=
- =?us-ascii?Q?m8R31uTTT9mFOFW9A+OafGBpovgZo878hHrMbGLCDciNcEPq1AhdyHPKP3iH?=
- =?us-ascii?Q?uaVphfIs3bjDOqyp6TS2OI4Yg/8K2HzXayfB7FjmkL7DyeagsTA9Y7C2WJFr?=
- =?us-ascii?Q?Y+9xxiV7bGI9V8wqSFU9kh6bjq3OAYuqWwpxFjCa/LbKtfHI369+w3+/gV1Q?=
- =?us-ascii?Q?HRLF9Ldp2zMUu90hcmsqgfv7KgUA0EcB09+t/0um0g=3D=3D?=
+	=?us-ascii?Q?TyZzt53DOAqQUQmT9IvuxKI00WNLD2TInpYjo7LhISGeMDESJzI7TpbpQG66?=
+ =?us-ascii?Q?wmjm4oUQCy9J8aUF8stgNPt12FB3FuHrlWdG2FM9lGb/VnmcIKHHnTWCXfKQ?=
+ =?us-ascii?Q?m1WKOLh6MT/O+5bhZ8ce0yM7bCi+FM5s0JYpB+mW8K+5CnQ4IFyTqLdmcN2P?=
+ =?us-ascii?Q?cMAi7+8ICLQps2XtuvvdHeMwsysJr8oMRTKDYJkWQTWZHvYMocFR165JCmwy?=
+ =?us-ascii?Q?wZM1kwXtl8q/ePHG3GRzOa5UoAJ2qqTZwWa9HD2y62iv8KLXTdsxAipJeLjo?=
+ =?us-ascii?Q?kJlYGpF8b5r52sLku9wpTo0yFNDwpnYBPkhztqgbUea7XhiImFt5f8yEwHiD?=
+ =?us-ascii?Q?/iNjv8ME4zNj+c38rkHrV3MN9S6QF5QVspsZgmyWByGUsUGZ76iK9izA9Tm/?=
+ =?us-ascii?Q?0Fr/F5Zaw7ZKDHrekkGn8BdGHH/XZD2FmmY/9BsWwVru5QYPBZQM20k/H2g9?=
+ =?us-ascii?Q?AINxRdrBnRToSl4SbcQ4Y0uUKS1DC5GgLE7O5KtXImurMFDWZvJ3ofbVecep?=
+ =?us-ascii?Q?F3QWUOqrcWDeYtOI9WYldMVOPWSOfRBfIO7n1ene4XSMsSN7SmD26L94SE6G?=
+ =?us-ascii?Q?XeITMy9jYYxDhSjjEfl+24hFo4OUQ4KDpUyR63okg22vwTEg9QBlKSHJDhDU?=
+ =?us-ascii?Q?3SDKjXaBUr+JOyNlpe+CV0iSP1NVHYlPNxOQLxsn0DBHkei4T3xfU+TmbYMu?=
+ =?us-ascii?Q?qbeIaJ1CvgHjkNZRYJVpJl9jaL6kQlE+j5T11+tKlzejEFE6Ow25YgCjrIt6?=
+ =?us-ascii?Q?j1yKJ1A3mSMsC3MRQOM5W9LPtSHxew38Iujcg8C8TXM77lOKS2IO5JjzQ3ld?=
+ =?us-ascii?Q?3o8wRLnSTWVrL54QCUFhR1PMkw5jUGJKdYBDQb1z4P4HaFNswiTp323CtHu5?=
+ =?us-ascii?Q?bQFmPGXGjUKOPWg8ToYcrAJYVkRtmosPtLUYZOvrmRA4m/uuhPufxf+pWDRW?=
+ =?us-ascii?Q?whWY+F/cvMrnnFXrLTdnay2UCN6BQBgt/fWOd1W2FlwITZpOoIf9rzQAbwoC?=
+ =?us-ascii?Q?LcyCensJYBbP3UrhKS6JwciPXaG2xViN36LhqZ+US3xZ129GDYOKk5JiDkO9?=
+ =?us-ascii?Q?mh7BgSlx1NffYOOHoDbpcwO0luDaqIsZHibhYVxIFq8mHeieoZ6bOvBOHME0?=
+ =?us-ascii?Q?zAdXj+dTUrgdaPQ5pLZBDhhm9SRuwBZ2rBAxNrbzlRUxmh8qJrDBpjpdW052?=
+ =?us-ascii?Q?DvKxYvAK8MF2D6XRfztOOm3iWw8ROAgBzGkaWNWLpltgodNOo147Mk13a1Ma?=
+ =?us-ascii?Q?FEMRoeXRJwGDdPjmMvBDTx/UVlPT5ZBDMNPEWFIKIw=3D=3D?=
 X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(7416005);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(1800799015)(376005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?+BbiMVPAf74C3csWw/Y+lslwfA7zvKOkRNyOF4HH/6qHAdW6SRMKMK1IM1YV?=
- =?us-ascii?Q?0wo/ZCgH3HtRTVU3PlPWOLU4kUmKMCLFLlu1ZZfPqSR3LLHv++BA9V+fwNXQ?=
- =?us-ascii?Q?1p6rFTCKPfMQggtgfGtG88dH/vYWaM2LEZwLhJyWr8FXsFkdpdV5q6Vz53FJ?=
- =?us-ascii?Q?ZoNWUx6qpqGAI5eKhAz5zbYFoc6FhGMjzyrOPTHxIn1VtZkLjmFLjZRon5Mx?=
- =?us-ascii?Q?tzDbvhEj9t4xE4G16WXN/mT+1JMY/bjzkYgZvEmeCZPAsnMxxYrgi8Sz+/p7?=
- =?us-ascii?Q?kOsxGUnF5a+ys2qbqW3uR+eXdkdbh/oABREJZOouRFSTppdQA5tTxNycLeo7?=
- =?us-ascii?Q?wLD9/zagvyFJ8/yQqEwJG/2AF2PqBczsnERNh2Wa6VDvU5HfmgoOmcSzIHjg?=
- =?us-ascii?Q?E5tvFAt/NBhs0wTgR4iIEE1azIGBEh+4h5n1tj/W/dtAnqg9SycCzdKQ0jtT?=
- =?us-ascii?Q?p+0AwFZjn2V+Ll1cyVMfM3IPBgMOCeyOp3qiyrcbSnA6h4hEqaeO45/fjs89?=
- =?us-ascii?Q?jCMQdPwpfJgCjKhHsiGlTC8bjV5FfHTh1nU0ha1LygC7fk/8Sb0cKv1zSaa3?=
- =?us-ascii?Q?K5orkguHTS+/I7+AJAYB/dhDqdvtuOvW1Ui78U7obQ3NAt/sTeKBbSQgYaO1?=
- =?us-ascii?Q?o8or97obCIEF2hN9Sll9zB5WPS7xPJTHANV3GaN5mNOKFAsySp73GgL+Ub+X?=
- =?us-ascii?Q?5bZXFkflTHL+2XoxXgO/zTxZ2S71A0sN0hsFIwWE6jrkPE7/3tgoEJEhwmhq?=
- =?us-ascii?Q?Ho0ESBbq669Ib+uuUNKrm2ykUTjbXqiPH3Zdp16HG5x0CwzDh7A5CNgKzAkP?=
- =?us-ascii?Q?tn8V1TBaTezoGkBX5royBKb3zHzB0y0S5dJJj3hpdm4297OUhRRi9oc2ev6/?=
- =?us-ascii?Q?B9oYBj5r75FEY3gVGRIM86fk12xOmOJfWKuTinkPiYtUMQuQPo6TIBeuFqGq?=
- =?us-ascii?Q?jvNWFDlW4yY2BLiljzKEYHdBoqb/Iis5iTEHgykzlMLYAx5hBjtgEViaUIZK?=
- =?us-ascii?Q?2Tmr8qy4+rdPPdTcdxxtutaMyt6oQec+GqQ8YkivRiOlki+9MTVThIiYIVGn?=
- =?us-ascii?Q?zbxoYKNi3/ZZF/uDh94imfl96UODKKnqjRI/1duVPaLtU1C9Xy+GnXSQs95P?=
- =?us-ascii?Q?gkYDXvxF2II+tsEAaT7VaFMqD1DWWUWFh1s/wMm5g8zJ6HPuDfk2x909qO03?=
- =?us-ascii?Q?pc3wgU4O37lvuRvvmtwL2dokN8toEArtxND0+Xy8TbyXeVbBMzGDFxVc2EMc?=
- =?us-ascii?Q?p8BgNghgoqKQ5Pibr7+A4CbzOqOfFuDl2DH4pWCX+Jvt/vxZynk7EhoVUWM+?=
- =?us-ascii?Q?qPw7iir1R4/vZsBCGRcltsojdgkX3qF0bWkoNDM95IZ3FykHz1p6ZTmbelGk?=
- =?us-ascii?Q?3nC0eFc7mynp0TP9kROqmalrhOYAhS8YhSs05g3EkMERTlQ15/Zbmz13fze5?=
- =?us-ascii?Q?5CSm/jTxpb8x/xN8QbjBk00fh5BJAxE2kjfoKWYIUcAsfm3TvYx4aemWsocE?=
- =?us-ascii?Q?IkEwFGPddJomX3RDfBSCms6ruDnRgdz/jHcaXAWs2YUQxoKQlyCCZNWwnJFZ?=
- =?us-ascii?Q?3HvDpngHh+c0jGFBPOqkKySPOnJ2rf61zJbif5UksuWCJdomVhoGZeqiNuWC?=
- =?us-ascii?Q?1Q=3D=3D?=
+	=?us-ascii?Q?V8nDKT1JuiR6iWyIHUB5Cdrnw1oFffMS6b4WcqN07vicP48SPZDXfB+2GRZW?=
+ =?us-ascii?Q?BWOkXbNKhlJVTgT0XswOHEiGZCFjXxf6JY4B2MxOyIDlfNC5pbwoSJpwc6CT?=
+ =?us-ascii?Q?kEmGOkpqiYIa0g6iaLMOf/SmBE2wXy5o+oIZzO1X6b0Yek5k1pbknqoTFEdH?=
+ =?us-ascii?Q?OO4HCY5YhNc76BeMmGGF6u4cpoX0HI0Mt/kelW1eLJ2LC6gCuFTFdm2f9KId?=
+ =?us-ascii?Q?DXG7hG2jfL6QHvV5EzvqdQKm0T0ETUlip+GbuJWfLrIu75W7d6FUq50L1m8s?=
+ =?us-ascii?Q?zWlaxvMP1BTzND1RvJi+iE89jvdeQw8UfsL7/lrAFiUJ+InJ7TIEABP5knOi?=
+ =?us-ascii?Q?wXzejADd6GuIJ2gm7rmBMap/cZ86QCdmu8J2EFgMvjI+ora5LT/p1dVkvWak?=
+ =?us-ascii?Q?HRz0oSnEFFaoOJppdAtvKwtUi7WdfkZbYv2mmKPgy0fa0lxEYbkgUyy+dDE6?=
+ =?us-ascii?Q?M/WtV7ZUyC6tYgh43WGTeUrrNJaZdkVp7ynw6ykNF1swn7kQpqlyw6qzAe2d?=
+ =?us-ascii?Q?t6ienk3DwBPRagHsX8lzj9Djf912bAU537Gg34GgmgZE/Lj6+7G0uYtOTaJc?=
+ =?us-ascii?Q?oh1j5h59nSNfAFpaYtaAtZmomOjL358GKJD/Z+AKImNcyeMg8edmk4vMLQhL?=
+ =?us-ascii?Q?3e7pgCd9BeQel6l6Z9XLfc10gBjhQpFUhqW/UB0HB1MaXWsnZUd53xFmni0t?=
+ =?us-ascii?Q?Kc2I8g3v8hk4FfKEPbhzsqYXQn9mln4VagTgTjGo+31XsfsD2sa8QSSBC449?=
+ =?us-ascii?Q?oGkPe+b3ppJxGCvQQ3gLtSZ563MPcf0d9Ca3S/tpNWfdCK66LbJsFaVQeylC?=
+ =?us-ascii?Q?KhLB8U0TVH9wes5waCTtpk6HT1o9gnYnIKTxJ6St7Qd4rNL/JCsSonZqf2CI?=
+ =?us-ascii?Q?Z7G+VWrQSNAgVmrXdomjGWAfmlCZ+O7FmMmfEFivCzuWcWdlGnfQmLA8ceDs?=
+ =?us-ascii?Q?u48ufsmSIaq0khc1xsMZyANu4YS1kIo2Q+cC7vWyzlrdfgGZ8sxx56sbVaE8?=
+ =?us-ascii?Q?8f58PaZCoGFs7WJRv1kGybMyk1PcYFENh2lKUCIsG1D3k+diyhoMLcgvFY9N?=
+ =?us-ascii?Q?wOlBqR07KKLCBpIaeAn8AK6TIBeQut0E+LgTwdwXswWF71cmUyyHewcVzsPY?=
+ =?us-ascii?Q?Duc120Lt8IDDpDG0/gCMX+kaNYwAhqxAudYQZRJvJzT9Tz02H/+8ZulTp/PY?=
+ =?us-ascii?Q?8YxHjpcjZ3T5crP9gQuxRCRqclS5glwWR/naYMAVexEsS6RCwjhkEkEZGczq?=
+ =?us-ascii?Q?MB5RW0bKIn5WQOBi73PTXB7TaaqQXy+5JYuPBsL86z2OLcThmRjnNfg/1NQC?=
+ =?us-ascii?Q?G+ReQLD5tHiWirFeiNNzVsyMoVnarfgckz1aqgO1ajZ5Qu8R8GvS7Vdx4Ein?=
+ =?us-ascii?Q?V/0CSdSatZp+74utXhttqVMeiyv2/ayMPRF4kmAnW8PSgWLKCCIbskrTeGYG?=
+ =?us-ascii?Q?UGy8YeT2npu6VEaAZNvlVHBdf4dRioByced7yWR8qtIJffsE/137/LYpTrYx?=
+ =?us-ascii?Q?YAQG6Ao7hE/Exk4aLcV2XQ1382Eci8e2l7kT64WLeFKYE2RCb+L576f2Enjx?=
+ =?us-ascii?Q?Artjnk/pJLSjs0QLmU+QKXgEa7yhMmv0spaYH6S6TOrXspZmLfRB8/smUI5J?=
+ =?us-ascii?Q?TA=3D=3D?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	qBvq3YTLJ2eBf8dnxlooH5PcDHxC6fDRdOhupSHdrXJbYDeqQx5sD/IG1ybi/do3DtXWOCZY6K5BS8Dr0t90C6upBbkQ002nlMG9+7dy/3DiMsMd9sf6q6AUicuUzTFnCgbBEXkydQVOLmq+zcBwr4Wcaly3Rnx1qh8fstoHcJxI9vElDEfdOJjuko3cCgaJILCVvtSwsGtBk5F7gEgjE7IQADPmReqnTtL3TVNz++KDPlHTWWeuNWBwBWCZ9wbO5iDwMnnW6ZZcg9hitGNC1nsZcHHyXPjq/VQXQSxOieMM6ASr/eiT0JDp+CUdOCUieOnXsj30h4eQOORIYYFzPNJ+g2ZZVfS4d8IHbJz7y0YgkXJcMJQ/ubook1rxZeDMK3S9ci1oerXfqjJE2jMMlue6q3KywDXxZEbvPESg31r+JzX1Ee4+Y0ldQyBWqTPdfXP7dEno1m+kJRYRB7RsQRH1oOfqJFrDnvWIkPozZ4vf20WlMUtc3bayXRacKstDbx0azDo+hVTw0YIFXypyYhoTTv6sv8KU6k9KHGdy37nz8P+TosuNcjOasJp93xzX7qOMl2ACgttQHxr7n+UiE6rVZtZiDHe51Mk/2UEU9yg=
+	Yq/W15xiiMNz5+j+6D26v4MC9vGp2a0Ceifk32T0EOMJLRBWLvkY2PjWWtUle3pIly+nlG0+WwzekEXCUSbHVpS8LRTTY+SiqZ5Dv1rKC16JfFxXaYVlD2hSVmEz8ItQOoKwPqDuHT3tkVI2sHc2CNqWEjRGgL0CHUeNrAEHNX68VgWCxw2oV3zIWCd4nf24NiXnV5x8s5R9vFe6ILG2G51QtHX4L5Wxfgpw81DDhoi074pcYqCM6cdcUqIjxBf1+NEcsM14ee91OihamhJj0xD3Gy7v4CEckSfyfCNL6pWTjTB05tezPAs+F6i0Nq5AT2t7YHdlxpPrEpot7XkAjIiLEm2LcOntaWbPLP/Y5w+i63KEYn2e9IQKfb/4IBes77LuDDBtkzAvFIThtW3Wrkc9Rg/SUipwvDRie9AastdIqg7hL+2GAf09T8B9MGpBJLw5SWqWT/CPzbGrsjsybLrt2b7MSLvyyiy841uV49D2t2b88B82No8VB9EL6xignKggEFLyEbFGh7bHXXuf6h6pCBLT3i08m1d/dmWcRfj/IpGL1iAXYvmJ4ZweqUKX9snmSsXIV5CoOdu6z8moV3nCKBA/j1sTmUEKBH4oAuw=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4e6d531-44c5-4f93-8f58-08dc810a3202
+X-MS-Exchange-CrossTenant-Network-Message-Id: 026e2932-e2b7-4bdc-f811-08dc810a3760
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2024 00:39:56.9822
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2024 00:40:06.0713
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y/PKxEsqgLsUF3mQ/OMpxtn3NgdVQUYv1Xi8oky/SqsGC9Q5ozxrEGELrN45FTl5PSzmYqLn4gfCDzOTzjqvqs6mmefOwfqD/0HmJuOmcUU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4274
+X-MS-Exchange-CrossTenant-UserPrincipalName: /8Xy8QiOztJIHvKTIuGh+Qbf5E7hbreoRNWVdHsHO/qAA1ncrAG0jMOsp0euJuhtPuZlmdNwyIvpDHMPDEDZiF63k+/CXhjsLKWe0XA/K4M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4785
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
  definitions=2024-05-30_21,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 adultscore=0
- suspectscore=0 malwarescore=0 phishscore=0 bulkscore=0 spamscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0 bulkscore=0
+ suspectscore=0 mlxscore=0 adultscore=0 spamscore=0 mlxlogscore=999
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
  definitions=main-2405310002
-X-Proofpoint-GUID: z83kbeWcYAJ0bCo1pPwtInD1CMiBskJI
-X-Proofpoint-ORIG-GUID: z83kbeWcYAJ0bCo1pPwtInD1CMiBskJI
+X-Proofpoint-GUID: CBaVsG8IvjlCZYKq8KLJkBMPKz63MoGq
+X-Proofpoint-ORIG-GUID: CBaVsG8IvjlCZYKq8KLJkBMPKz63MoGq
 
-Introduce a new system keyring called clavis.  This keyring shall contain a
-single asymmetric key. This key shall be a linked to a key already
-contained in one of the system keyrings (builtin, secondary, or platform).
-The only way to add this key is during boot by passing in the asymmetric
-key id within the new "clavis=" boot param.  If a matching key is found in
-one of the system keyrings, a link shall be created. This keyring will be
-used in the future by the new Clavis LSM.
+Add a new verification type called VERIFYING_CLAVIS_SIGNATURE.  This new
+usage will be used for validating keys added to the new clavis lsm keyring.
+This will be introduced in a follow-on patch.
 
 Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
 ---
- .../admin-guide/kernel-parameters.txt         |  6 ++
- include/linux/integrity.h                     |  8 ++
- security/Kconfig                              |  1 +
- security/Makefile                             |  1 +
- security/clavis/Kconfig                       |  9 ++
- security/clavis/Makefile                      |  3 +
- security/clavis/clavis_keyring.c              | 90 +++++++++++++++++++
- security/integrity/iint.c                     |  2 +
- 8 files changed, 120 insertions(+)
- create mode 100644 security/clavis/Kconfig
- create mode 100644 security/clavis/Makefile
- create mode 100644 security/clavis/clavis_keyring.c
+ crypto/asymmetric_keys/asymmetric_type.c | 1 +
+ crypto/asymmetric_keys/pkcs7_verify.c    | 1 +
+ include/linux/verification.h             | 1 +
+ 3 files changed, 3 insertions(+)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 500cfa776225..4d505535ea3b 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -624,6 +624,12 @@
- 	cio_ignore=	[S390]
- 			See Documentation/arch/s390/common_io.rst for details.
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index a5da8ccd353e..7fdc006f18d6 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -25,6 +25,7 @@ const char *const key_being_used_for[NR__KEY_BEING_USED_FOR] = {
+ 	[VERIFYING_KEY_SIGNATURE]		= "key sig",
+ 	[VERIFYING_KEY_SELF_SIGNATURE]		= "key self sig",
+ 	[VERIFYING_UNSPECIFIED_SIGNATURE]	= "unspec sig",
++	[VERIFYING_CLAVIS_SIGNATURE]		= "clavis sig",
+ };
+ EXPORT_SYMBOL_GPL(key_being_used_for);
  
-+	clavis=		[SECURITY,EARLY]
-+			Identifies a specific key contained in one of the system
-+			keyrings (builtin, secondary, or platform) to be used as
-+			the Clavis root of trust.
-+			Format: { <keyid> }
-+
- 	clearcpuid=X[,X...] [X86]
- 			Disable CPUID feature X for the kernel. See
- 			arch/x86/include/asm/cpufeatures.h for the valid bit
-diff --git a/include/linux/integrity.h b/include/linux/integrity.h
-index f5842372359b..afa3acaa32d9 100644
---- a/include/linux/integrity.h
-+++ b/include/linux/integrity.h
-@@ -23,6 +23,14 @@ enum integrity_status {
- #ifdef CONFIG_INTEGRITY
- extern void __init integrity_load_keys(void);
- 
-+#ifdef CONFIG_SECURITY_CLAVIS
-+void late_init_clavis_setup(void);
-+#else
-+static inline void late_init_clavis_setup(void)
-+{
-+}
-+#endif
-+
- #else
- static inline void integrity_load_keys(void)
- {
-diff --git a/security/Kconfig b/security/Kconfig
-index 412e76f1575d..b9ad8e580b96 100644
---- a/security/Kconfig
-+++ b/security/Kconfig
-@@ -192,6 +192,7 @@ source "security/yama/Kconfig"
- source "security/safesetid/Kconfig"
- source "security/lockdown/Kconfig"
- source "security/landlock/Kconfig"
-+source "security/clavis/Kconfig"
- 
- source "security/integrity/Kconfig"
- 
-diff --git a/security/Makefile b/security/Makefile
-index 59f238490665..add35a92bd8a 100644
---- a/security/Makefile
-+++ b/security/Makefile
-@@ -25,6 +25,7 @@ obj-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown/
- obj-$(CONFIG_CGROUPS)			+= device_cgroup.o
- obj-$(CONFIG_BPF_LSM)			+= bpf/
- obj-$(CONFIG_SECURITY_LANDLOCK)		+= landlock/
-+obj-$(CONFIG_SECURITY_CLAVIS)	+= clavis/
- 
- # Object integrity file lists
- obj-$(CONFIG_INTEGRITY)			+= integrity/
-diff --git a/security/clavis/Kconfig b/security/clavis/Kconfig
-new file mode 100644
-index 000000000000..ce65b29ef11e
---- /dev/null
-+++ b/security/clavis/Kconfig
-@@ -0,0 +1,9 @@
-+config SECURITY_CLAVIS
-+	bool "Clavis keyring"
-+	depends on SECURITY
-+	help
-+	  Enable the clavis keyring. This keyring shall contain a single asymmetric key.
-+	  This key shall be linked to a key already contained in one of the system
-+	  keyrings (builtin, secondary, or platform).  The only way to add this key
-+	  is during boot by passing in the asymmetric key id within the "clavis=" boot
-+	  param.  This keyring is required by the Clavis LSM.
-diff --git a/security/clavis/Makefile b/security/clavis/Makefile
-new file mode 100644
-index 000000000000..16c451f45f37
---- /dev/null
-+++ b/security/clavis/Makefile
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+obj-$(CONFIG_SECURITY_CLAVIS) += clavis_keyring.o
-diff --git a/security/clavis/clavis_keyring.c b/security/clavis/clavis_keyring.c
-new file mode 100644
-index 000000000000..e92b8bd4ad5b
---- /dev/null
-+++ b/security/clavis/clavis_keyring.c
-@@ -0,0 +1,90 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <linux/security.h>
-+#include <linux/integrity.h>
-+#include <keys/asymmetric-type.h>
-+#include <keys/system_keyring.h>
-+
-+static struct key *clavis_keyring;
-+static struct asymmetric_key_id *setup_keyid;
-+
-+#define MAX_BIN_KID   32
-+
-+static struct {
-+	struct asymmetric_key_id id;
-+	unsigned char data[MAX_BIN_KID];
-+} setup_key;
-+
-+static int restrict_link_for_clavis(struct key *dest_keyring, const struct key_type *type,
-+				    const union key_payload *payload, struct key *restrict_key)
-+{
-+	static bool first_pass = true;
-+
-+	/*
-+	 * Allow a single asymmetric key into this keyring. This key is used as the
-+	 * root of trust for anything added afterwards.
-+	 */
-+	if (type == &key_type_asymmetric && dest_keyring == clavis_keyring && first_pass) {
-+		first_pass = false;
-+		return 0;
-+	}
-+
-+	return -EOPNOTSUPP;
-+}
-+
-+static int __init clavis_param(char *kid)
-+{
-+	struct asymmetric_key_id *p = &setup_key.id;
-+	int error, hex_len, ascii_len = strlen(kid);
-+
-+	if (!kid)
-+		return 1;
-+
-+	hex_len = ascii_len / 2;
-+
-+	if (hex_len > sizeof(setup_key.data))
-+		return 1;
-+
-+	p->len = hex_len;
-+	error = hex2bin(p->data, kid, p->len);
-+
-+	if (error < 0) {
-+		pr_err("Unparsable clavis key id\n");
-+	} else {
-+		setup_keyid = p;
-+		pr_info("clavis key id: %s\n", kid);
-+	}
-+
-+	return 1;
-+}
-+__setup("clavis=", clavis_param);
-+
-+static int __init clavis_keyring_init(void)
-+{
-+	struct key_restriction *restriction;
-+
-+	restriction = kzalloc(sizeof(*restriction), GFP_KERNEL);
-+	if (!restriction)
-+		panic("Can't allocate clavis keyring restriction\n");
-+	restriction->check = restrict_link_for_clavis;
-+	clavis_keyring =
-+		keyring_alloc(".clavis", GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, current_cred(),
-+			      KEY_POS_VIEW | KEY_POS_READ | KEY_POS_SEARCH | KEY_POS_WRITE |
-+			      KEY_USR_VIEW | KEY_USR_READ | KEY_USR_SEARCH | KEY_USR_WRITE,
-+			      KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_SET_KEEP,
-+			      restriction, NULL);
-+
-+	if (IS_ERR(clavis_keyring))
-+		panic("Can't allocate clavis keyring\n");
-+
-+	return 0;
-+}
-+
-+void __init late_init_clavis_setup(void)
-+{
-+	if (!setup_keyid)
-+		return;
-+
-+	clavis_keyring_init();
-+	system_key_link(clavis_keyring, setup_keyid);
-+}
-diff --git a/security/integrity/iint.c b/security/integrity/iint.c
-index 068ac6c2ae1e..87a8bfc0662f 100644
---- a/security/integrity/iint.c
-+++ b/security/integrity/iint.c
-@@ -36,6 +36,8 @@ int integrity_kernel_read(struct file *file, loff_t offset,
-  */
- void __init integrity_load_keys(void)
- {
-+	late_init_clavis_setup();
-+
- 	ima_load_x509();
- 
- 	if (!IS_ENABLED(CONFIG_IMA_LOAD_X509))
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index f0d4ff3c20a8..1dc80e68ce96 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -428,6 +428,7 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
+ 		}
+ 		/* Authattr presence checked in parser */
+ 		break;
++	case VERIFYING_CLAVIS_SIGNATURE:
+ 	case VERIFYING_UNSPECIFIED_SIGNATURE:
+ 		if (pkcs7->data_type != OID_data) {
+ 			pr_warn("Invalid unspecified sig (not pkcs7-data)\n");
+diff --git a/include/linux/verification.h b/include/linux/verification.h
+index cb2d47f28091..970f748b5cc9 100644
+--- a/include/linux/verification.h
++++ b/include/linux/verification.h
+@@ -36,6 +36,7 @@ enum key_being_used_for {
+ 	VERIFYING_KEY_SIGNATURE,
+ 	VERIFYING_KEY_SELF_SIGNATURE,
+ 	VERIFYING_UNSPECIFIED_SIGNATURE,
++	VERIFYING_CLAVIS_SIGNATURE,
+ 	NR__KEY_BEING_USED_FOR
+ };
+ extern const char *const key_being_used_for[NR__KEY_BEING_USED_FOR];
 -- 
 2.43.0
 
