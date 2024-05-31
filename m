@@ -1,116 +1,103 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6B71514F9
-	for <linux-crypto@vger.kernel.org>; Fri, 31 May 2024 13:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FA6158A0B
+	for <linux-crypto@vger.kernel.org>; Fri, 31 May 2024 13:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717160469; cv=none; b=SRe1kucDYwd1cZjEciJcRiuAcFGynP6/j5hRwY/u2OxeVktETvzAMSdBhDSdTe1blAZXLSKjAVhl0dYg2vNZhBBwMf0pCZNDW6xVJuD7gZicSmT5NRlqazbUk67h4W+qpxOy3HzEbeefNZkDmzvu0qZjLJbuDa+6yM599W6Ywww=
+	t=1717161062; cv=none; b=iVtp8pv0qkARYNIJUh4JJTkPvVMmWaAQk5rzr8YKm4dy7BeZaAZpi/0UVWAEUoIdRlLDnYROYmZbUjWQNKyefiQ809oXFtrl4rmruVHj8t1WWc1KIdtIOC1NVytjjkBNU5RN/rgIjKYe2r9XOOAkZcQwfsnDWZxN/8vKmMVZoyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717160469; c=relaxed/simple;
-	bh=nUsPB5Ony4aNAlYic6rvb9WueoAtsv5tUM/Q9JTEZ3M=;
+	s=arc-20240116; t=1717161062; c=relaxed/simple;
+	bh=CqLmmdZ2wecXUVkHp+HXQRJLjMCpZYdCiUOYNmrEQ+o=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GDyem2nNtLrSkvFnEjcbpv/SGfigtIOt56Sxxy1dPnLy+ryg8gHa1CPB2InuVRprMKyhbOQ3ei61jKM+WRK2ZbAsaNeM+Of4lce2rhtvjzqI28uUQKjd0ZXgEJINVde0Cy04zKco0BAwCmCjqnGYV3uvBIVD5N0KR8+9vfQQOp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dNm8ZVaP; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=UbNst+hTYpVmuXbuSQaSUoAgSiOVQkZo9aG3Leu42cPrCeXMKbXVj6bbHbSi89kxZm1yTndf2OWd3uS3NgZUkI3NBNA73Ns9SJXs6kzcyvaRYBgL9v6lOeQjYhYJ3Te8fdx3rRzxJJmz0wZA7iEtd1JhTxrlBnvFWXNog6CRtE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=avsy/iqc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dNm8ZVaP"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57a22af919cso10536a12.1
-        for <linux-crypto@vger.kernel.org>; Fri, 31 May 2024 06:01:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717160466; x=1717765266; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vRchOj1ggC2TIQN8s7PjJT+YjUNxb7bVoZD51wfkss8=;
-        b=dNm8ZVaPeE+hQILesHUvm1Lu5d0s1712zMfqH8+/mxIyN4b+Q3yKf4fZyXDBlPfybk
-         63IvFz+uzFp1QCSoaDiXebFLDqAjnWiFuYytbPiw6MdVuoZngJ+uh4b/ORmuul6B2hVX
-         6QjNAFGodZA1zOOsjAThp4IAPYpNroPOe/+DHlcdibI4C5ni9GoFxGHSNeqskvNPESYu
-         JS4cuolKYEXevnJZrygPe769uY8kzdt3KzVa++CrnHwy0H7jGLjG9yle2rRIVfEMrlII
-         V4m7T3jNxE29KId1gnW9EhpqCjHIZEkUPCL/RlYHglh7qo9sww7xxm3JycTbL0IQikj8
-         MD1w==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="avsy/iqc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717161059;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CqLmmdZ2wecXUVkHp+HXQRJLjMCpZYdCiUOYNmrEQ+o=;
+	b=avsy/iqcjV14RBcHBxlLBdgoRdsEUarlefrW9J6f5M4/LlKD+Ox9ECL/wANBTJwJ6hpHzs
+	KekWSiv4iFQbdIwizRk4jowc7PYLbpvE6yEn6ApmtLuNdKnourO78CjplLyc3iSjPUxGMa
+	+4+bu7D7HyLYPLDHfGhxa3YRvhr7t+0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-378-Lil9rp33MCCOHTlEwkXX2g-1; Fri, 31 May 2024 09:10:58 -0400
+X-MC-Unique: Lil9rp33MCCOHTlEwkXX2g-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-35dca4a8f2dso1044127f8f.3
+        for <linux-crypto@vger.kernel.org>; Fri, 31 May 2024 06:10:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717160466; x=1717765266;
+        d=1e100.net; s=20230601; t=1717161057; x=1717765857;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vRchOj1ggC2TIQN8s7PjJT+YjUNxb7bVoZD51wfkss8=;
-        b=TYjO3Y9mfh2DNyfwXsXyOzwwXajm2eEpR/ZdbO5XjQJN06sGmKoKiDnBBzpvw+V6+v
-         3OGbNhu1nHobiup7MuxW7mN0fLl4TP2CBd0SblFTJYEmXwkrspgMQNHOvrHVXNAgpIko
-         UMRMHbLdOIiLJ+X3J/d0AF3XavcPQH5otF9cWInK/XswXk+Y9VezJ7VcXrEi6I6l9HPD
-         YsqntCxWS7qBvlpRjZ/MUaQqvRrUe1/dABMB7x9q7LquTBmyvm1ixabjzJ7Ipm52Ws41
-         Lb1In8MedvMwrp6QaMrwEuNjRh0CAmDU6UENqS6/41meY9Lho/veyGJ5R0OAy1yFjWhy
-         YUNw==
-X-Forwarded-Encrypted: i=1; AJvYcCWzHNKnqdcvD1pxyuGzsBHZg/avoxl3LpIphEZjQIT3eziwPI1Y5HCQgnrt/E7dHf9Lra7Dou2HH7tU4+8f/JBzma1CHdobsLX36QXG
-X-Gm-Message-State: AOJu0YzCEUMV1D0XqfGFG+qbj28oyaCa61DUVs3yjrbOln6SBr9fWz2q
-	DQ+6zI55GjlT3TZpu+6tyKhDyZ+QRoytS1AUjPNs4elwIvJuSiMub5rdCW65FjbdAABRhTs+NhL
-	tLC7MlKtfdH12/3ahMvgrkKBg7yO14vMfUy6n
-X-Google-Smtp-Source: AGHT+IGyobXtF/ORS1N/GztNIrOHPwMv9FM8zg9fZE3Hz3rHQXNmWAty6aJ8lRd6Vdl/KOtZJApkG+sJ4f7FFcdpcvU=
-X-Received: by 2002:a05:6402:2932:b0:57a:2eac:cd4d with SMTP id
- 4fb4d7f45d1cf-57a378ff925mr106485a12.5.1717160465623; Fri, 31 May 2024
- 06:01:05 -0700 (PDT)
+        bh=CqLmmdZ2wecXUVkHp+HXQRJLjMCpZYdCiUOYNmrEQ+o=;
+        b=WnQwDq6z54nU9WQXkFOM7bsCLnZkbfcO7oMEOFbJCVjimCTBeuzzEeHR8o/1P9ND5c
+         3gsiTor1HSTwuAb6KH8uwveoB+MnVzbm0Dgv82at1ULR7VZY9MARqNgQjZdpKEZsZsvm
+         xG/p82YbA9yCPfeNmxyGfExnwrNT4Y2HMVMYp1RPrleb2Re7vRBNEh9oaGccjpk//Vb6
+         4K5J4v33SdDrsqgvT5GLIVKY3fSfV5zxRnPNW5WAhAAWkP9v1xxVMHTPdGCSiubc68Q8
+         xK+JEgCOYuRU8y1TsIyRN/2aHRH4hwYIFmxbLhJr+PW1ZOEPYhntRMWsekd1LUzAPNC1
+         gKEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXBW3hST8EINzH1H6+Yzh7NhhxoMM78rlX00p6JrsFpGN9QIrzflMZny5GD7PNFq7NAIZffj1WKK7/rbrDD0UxY/ZEoujFEYvVq6mNy
+X-Gm-Message-State: AOJu0YysyCH5KUlmYi/o+WG9F+7JGwIYdC/bJQfv+iSUKPIhm6o6lNG+
+	Y1PyAPfSE7CZfHEetmAaTF3+0uEi4pqxaxFBF5OALlJJVQGl3a4Wr0n4pOgYsDQ6V5lDum2gKao
+	egZ31B6HOAPswUEDJeB2o07fm2riXKt7eMaPdnviRobWJRHm6tVs/JEwMx7px6o22qYtLV5bi65
+	iSv9x6UVZvFTFgtn44SZtkN3VOywS6TOVdXiPH
+X-Received: by 2002:a5d:4bd1:0:b0:354:e0e8:33ea with SMTP id ffacd0b85a97d-35e0f37119cmr1303099f8f.66.1717161056774;
+        Fri, 31 May 2024 06:10:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG3gzv4GfxGaWcm8XMVixs3+MtMYgeFKTzpnPkZZHcTWqGRUOOsjVrY6Fxl3SCwOqZe8dfStn6ygQ2HzwmiDVA=
+X-Received: by 2002:a5d:4bd1:0:b0:354:e0e8:33ea with SMTP id
+ ffacd0b85a97d-35e0f37119cmr1303068f8f.66.1717161056377; Fri, 31 May 2024
+ 06:10:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240528122352.2485958-1-Jason@zx2c4.com> <20240528122352.2485958-2-Jason@zx2c4.com>
- <CAG48ez0P3EDXC0uLLPjSjx3i6qB3fcdZbL2kYyuK6fZ_nJeN5w@mail.gmail.com> <Zlm-26QuqOSpXQg7@zx2c4.com>
-In-Reply-To: <Zlm-26QuqOSpXQg7@zx2c4.com>
-From: Jann Horn <jannh@google.com>
-Date: Fri, 31 May 2024 15:00:26 +0200
-Message-ID: <CAG48ez3VhWpJnzHHn4NAJdrsd1Ts9hs0zvHa6Pqwatu4wV63Kw@mail.gmail.com>
-Subject: Re: [PATCH v16 1/5] mm: add VM_DROPPABLE for designating always
- lazily freeable mappings
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev, tglx@linutronix.de, 
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org, x86@kernel.org, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>, "Carlos O'Donell" <carlos@redhat.com>, 
-	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Christian Brauner <brauner@kernel.org>, David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240501085210.2213060-10-michael.roth@amd.com> <84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
+ <CABgObfaXmMUYHEuK+D+2E9pybKMJqGZsKB033X1aOSQHSEqqVA@mail.gmail.com>
+ <7d6a4320-89f5-48ce-95ff-54b00e7e9597@linux.intel.com> <rczrxq3lhqguarwh4cwxwa35j5riiagbilcw32oaxd7aqpyaq7@6bqrqn6ontba>
+ <7da9c4a3-8597-44aa-a7ad-cc2bd2a85024@linux.intel.com> <CABgObfajCDkbDbK6-QyZABGTh=5rmE5q3ifvHfZD1A2Z+u0v3A@mail.gmail.com>
+ <ZleJvmCawKqmpFIa@google.com> <3999aadf-92a8-43f9-8d9d-84aa47e7d1ae@linux.intel.com>
+In-Reply-To: <3999aadf-92a8-43f9-8d9d-84aa47e7d1ae@linux.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 31 May 2024 15:10:43 +0200
+Message-ID: <CABgObfZZsJxQ5AKve+GYJiUB0cFc70qkDbvRB82KrvHvM0k3jg@mail.gmail.com>
+Subject: Re: [PATCH v15 09/20] KVM: SEV: Add support to handle MSR based Page
+ State Change VMGEXIT
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
+	linux-coco@lists.linux.dev, linux-mm@kvack.org, linux-crypto@vger.kernel.org, 
+	x86@kernel.org, linux-kernel@vger.kernel.org, tglx@linutronix.de, 
+	mingo@redhat.com, jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, 
+	ardb@kernel.org, vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, Isaku Yamahata <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 31, 2024 at 2:13=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com=
-> wrote:
-> On Fri, May 31, 2024 at 12:48:58PM +0200, Jann Horn wrote:
-> > On Tue, May 28, 2024 at 2:24=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4=
-.com> wrote:
-> > > c) If there's not enough memory to service a page fault, it's not fat=
-al.
-> > [...]
-> > > @@ -5689,6 +5689,10 @@ vm_fault_t handle_mm_fault(struct vm_area_stru=
-ct *vma, unsigned long address,
-> > >
-> > >         lru_gen_exit_fault();
-> > >
-> > > +       /* If the mapping is droppable, then errors due to OOM aren't=
- fatal. */
-> > > +       if (vma->vm_flags & VM_DROPPABLE)
-> > > +               ret &=3D ~VM_FAULT_OOM;
-> >
-> > Can you remind me how this is supposed to work? If we get an OOM
-> > error, and the error is not fatal, does that mean we'll just keep
-> > hitting the same fault handler over and over again (until we happen to
-> > have memory available again I guess)?
->
-> Right, it'll just keep retrying. I agree this isn't great, which is why
-> in the 2023 patchset, I had additional code to simply skip the faulting
-> instruction, and then the userspace code would notice the inconsistency
-> and fallback to the syscall. This worked pretty well. But it meant
-> decoding the instruction and in general skipping instructions is weird,
-> and that made this patchset very very contentious. Since the skipping
-> behavior isn't actually required by the /security goals/ of this, I
-> figured I'd just drop that. And maybe we can all revisit it together
-> sometime down the line. But for now I'm hoping for something a little
-> easier to swallow.
+On Fri, May 31, 2024 at 3:23=E2=80=AFAM Binbin Wu <binbin.wu@linux.intel.co=
+m> wrote:
+> About the chunk size, if it is too small, it will increase the cost of
+> kernel/userspace context switches.
+> Maybe 2MB?
 
-In that case, since we need to be able to populate this memory to make
-forward progress, would it make sense to remove the parts of the patch
-that treat the allocation as if it was allowed to silently fail (the
-"__GFP_NOWARN | __GFP_NORETRY" and the "ret &=3D ~VM_FAULT_OOM")? I
-think that would also simplify this a bit by making this type of
-memory a little less special.
+Yeah, 2MB sounds right.
+
+Paolo
+
