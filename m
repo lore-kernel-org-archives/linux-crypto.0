@@ -1,307 +1,621 @@
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2059.outbound.protection.outlook.com [40.107.243.59])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57233D579;
-	Thu, 30 May 2024 16:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717087710; cv=fail; b=HKPj4UMiPjt1Vjkb8s2fAMuWEZB0MDPiZeolV3VbsQGwWPiPxowGfEHyf6A1mAK0CKQjRGyAXdr9NPnmUaivn8sbPbB+xHtrXn/KH3husryjhQAIZZj7pQhHwqQHisx8K7Gw8UeIMeHyDnj6LDWUUB/dN8mDCn4Qrp+q2wU1giU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717087710; c=relaxed/simple;
-	bh=W/Q2vbro6sgx7jwWsUn6+RTfBo2Nbf7eM25AEXiF64E=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f0ncfQJuhx9CBaYslh8DDtONrvu4yS3X9rvr7EKKwL52Z1unzjMLzMhTr47xvL5NwFeJYjiTAyaLAtwiVBZwDZdVrt4zAEX+KxS7+jqTzj/fgagIoiIJZ8qyb5q8CuYOWKndJ32N386FMdfm+bh7UiubrfVNMTgwCz1wZ2eGyyA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Bdmuszkh; arc=fail smtp.client-ip=40.107.243.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D126134AB;
+	Fri, 31 May 2024 00:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717115764; cv=none; b=Lcoq0kUoxa03vTA+GB+nPmc7IAKepTO7sWqO5qNnb8pQTqjZjVRvA8Jijot50wL6PNsERpefCXvWlw962/3UlJwoqLwmJYqbek3KOUE7+rDXBli3FExRCSp1R+ZMjo7SQO5RHaqr7gIgUMDsCO25jLd1o0YJGi9VRr3Ux6/RSZU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717115764; c=relaxed/simple;
+	bh=9jMbF4EvO2HoOup8CkZuyhS+D9sSQeQlp+iSl94nf50=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SdlONU7s6OJLGzwZeeuBER95vq1sbh7WUjuJPvbvvKXxYMLryzkO0DqJhTodX2/pTCDVaZdYL47cdUDrriLOGd0iVacD/yp6PUGPA41WMrS/kETfdPegVl9ZJBxXnBG5fAfB6lTBVNaqGgl67luQ7XQtfeg99bz4u3Gapc08Ahw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JuZAqMGj; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Bdmuszkh"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k9JS5o5JjwBw9Kx129/I/uKu9CxFecgE8RPHHwh9uqZbOGiGI0nUabbVtY62sqKWIEShM7Df6DESZ6ON5uaSEY/eNkS0t0lfcBYtULQApD11iN4XvUE/7wZ4oGcKiwOMLWhDOyl21ox6omwUK7/zmg/O1QDDxOkdSIj9D2HM2m33h/mQLgPQRRWWzwhw003O96gVjwmEjEX01U1t5Y41fsqetHXEeUCmcSXzqyDez7GK9vmk3XXKaD30iLNOVRm2w9b5++avYLkw4VLu0jDvh296AHo0gvmLf+judlys6IObNOo3LrIgo+WDpERNp6Nh87fChIacNx8KyfdbgUhj5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7+/lQipfX4pHlbkV2C/fDtvUeEUskzQiSHgI1DJVy9s=;
- b=G/eG+rbpxnLb2u+N0gVpNmsqREKyMLLXmulefZc4k9bwRPRcYgIoq+m4tJ1W4KtBKZ6UjgvG3uchbuHVv1XHTXZUu7oy7cTD3oslYyBBrlx9rs6Fc6VCsQXIjhRfcVKduGOuu9FFv0bZcGXPPIFRK7mF7IEx/uQfN92UwKbX2dlgh/hfTQrfoa0QsPMWMxk5OCaFHubofFgwiTPBR2tPNtKRHca/fzncPRc0S4L8LspnUNMlY1sJ9e3S+tNulCd7N0ORJ3WA8/k3pOo/s/o3V8T48ZUzLV23zbZGSIhR4oR7eH9MFvgCcsbUrkec5zDXYOw1H0cnK7OyH39hYhSQzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=amd.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7+/lQipfX4pHlbkV2C/fDtvUeEUskzQiSHgI1DJVy9s=;
- b=Bdmuszkhy0s7WYKA60BjcrWQ/7H2f9aTkWB+X6a6V7VkGnBESOe4uMVS9ZnKQL0vsPqmOmE8+hzSQP6nLeTLO3OvwumNMvStLPWNt3GQnWyUcD4whNKCQMt8cniNvZBP6gkfZ8Dd2WcvdEeHnkTYRdVbCD8oyFBAqLB27dD9GKMSHISX5bBIRix0vFi8JuxczyQNEqVRRmiqDL10NhrNGpCwb5o8hK05EOviWawKeAxzBDcvuizvrDYINoC9MXuW0twN1Pm/oWqgsuDtYOdPIXW9/ODOsz+kJDp5H8P/mE+I9dC86BTASOhWSEodTyz3fx+M5cZmf2eZJHgCgwzjFg==
-Received: from CH0PR04CA0040.namprd04.prod.outlook.com (2603:10b6:610:77::15)
- by IA1PR12MB8585.namprd12.prod.outlook.com (2603:10b6:208:451::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.35; Thu, 30 May
- 2024 16:48:24 +0000
-Received: from CH3PEPF00000017.namprd21.prod.outlook.com
- (2603:10b6:610:77:cafe::e7) by CH0PR04CA0040.outlook.office365.com
- (2603:10b6:610:77::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.21 via Frontend
- Transport; Thu, 30 May 2024 16:48:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH3PEPF00000017.mail.protection.outlook.com (10.167.244.122) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7656.0 via Frontend Transport; Thu, 30 May 2024 16:48:23 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 30 May
- 2024 09:48:09 -0700
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 30 May
- 2024 09:48:08 -0700
-Received: from localhost (10.127.8.9) by mail.nvidia.com (10.129.68.10) with
- Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Thu, 30 May 2024
- 09:48:00 -0700
-Date: Thu, 30 May 2024 19:47:41 +0300
-From: Zhi Wang <zhiw@nvidia.com>
-To: Michael Roth <michael.roth@amd.com>
-CC: Binbin Wu <binbin.wu@linux.intel.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-	<linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <seanjc@google.com>, <vkuznets@redhat.com>,
-	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
-	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
-	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
-	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
-	<brijesh.singh@amd.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Subject: Re: [PATCH v15 09/20] KVM: SEV: Add support to handle MSR based
- Page State Change VMGEXIT
-Message-ID: <20240530194606.00003f3a.zhiw@nvidia.com>
-In-Reply-To: <rczrxq3lhqguarwh4cwxwa35j5riiagbilcw32oaxd7aqpyaq7@6bqrqn6ontba>
-References: <20240501085210.2213060-1-michael.roth@amd.com>
-	<20240501085210.2213060-10-michael.roth@amd.com>
-	<84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
-	<CABgObfaXmMUYHEuK+D+2E9pybKMJqGZsKB033X1aOSQHSEqqVA@mail.gmail.com>
-	<7d6a4320-89f5-48ce-95ff-54b00e7e9597@linux.intel.com>
-	<rczrxq3lhqguarwh4cwxwa35j5riiagbilcw32oaxd7aqpyaq7@6bqrqn6ontba>
-Organization: NVIDIA
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JuZAqMGj"
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44UNkPol006819;
+	Fri, 31 May 2024 00:35:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
+ content-transfer-encoding : content-type : date : from : in-reply-to :
+ message-id : mime-version : references : subject : to; s=pp1;
+ bh=Q6pjVGzrPHHTVu9KRNWWYX/lLVJpjXE3+mIUz4VfgLA=;
+ b=JuZAqMGjwsBvODRrYlGUN2JTqcuhJHSn2arGgOnLOhdu6kkl6Pzzg2bbSreFL3MACL2+
+ 9xl1N6/WfD3gHvZNsDajpJy34CQ7TUE0PVadEqdbWDrHWU/ljHdboQLsUd8rUhmloUaw
+ ek2yBT4EaaIWDk+HfBEsRjhh9Sa4qNLG3BKRpVDfNFLBOcVSs1EEtz07uIqALreXjGKM
+ 132YPajVwyX0Nr+XADjZBlWSjiLmmDPojXGq4I8QLKvkNrLuG4njzjqTB4UGp2qFDmy+
+ qTs4V+VPYML1L+7QiTINfVxKVDcOSt4gSBuiwzXVdl+d4oedh28Bv1sAQ3lcr//x/+6P SQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yf30g860q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 May 2024 00:35:29 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44V0ZTwV016185;
+	Fri, 31 May 2024 00:35:29 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yf30g860j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 May 2024 00:35:28 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44ULjBB7029537;
+	Fri, 31 May 2024 00:35:28 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ydpayvyyq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 May 2024 00:35:28 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44V0ZP8B35521062
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 31 May 2024 00:35:28 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CCAD458058;
+	Fri, 31 May 2024 00:35:25 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A768558061;
+	Fri, 31 May 2024 00:35:23 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 31 May 2024 00:35:23 +0000 (GMT)
+Message-ID: <97dd7485-51bf-4e47-83ab-957710fc2182@linux.ibm.com>
+Date: Thu, 30 May 2024 20:35:22 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF00000017:EE_|IA1PR12MB8585:EE_
-X-MS-Office365-Filtering-Correlation-Id: c12050d6-8097-4c92-eb3d-08dc80c85228
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|1800799015|82310400017|7416005|36860700004|376005;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aG9SWGFRVDBTUnJJSStWQjlHSGlQRk5ISFdTS2J6TjNGbHcrY1lDRzkxcUEw?=
- =?utf-8?B?VFVFeVk0V3N0N04vRXZsdGdINDhyaVVnUis3eDZaUmc0SUVjMXBveFFkWnlF?=
- =?utf-8?B?dDllcGJZSEpXVkNEcGtrV2psSGVnc0xGcHBQQXE4ODZueTFwczlGaDh2Nlcz?=
- =?utf-8?B?aFBMQ0ZOK09sREY5M29ja3lmdk9WTmxLR0NpSTAxeWdtcWJnUUhURXkxZUh1?=
- =?utf-8?B?QkI1V2FBVzdQN2ZRbVVxSHE0ZjJvcnBGdnFmd0hoWVhTdG4zbmZ0NkVhL0tF?=
- =?utf-8?B?d3oxZlNQZDZoUE1rVWZwZVJKV2QzaEJZUkI3a3BneW5MWC9IZzhzcXlFUk41?=
- =?utf-8?B?N1JESnZMQjRxU3ZjQkliSFZ6b2dMOS9MUjNaeGxWcTZKZVpyZm9FYWRDY2hT?=
- =?utf-8?B?SS8zQk5sVGZ4N0x5Q1d3RVlGWXFSMHZDYWFGT2xCQ2xRRjFBNHJyMm53cXVK?=
- =?utf-8?B?YXJpcERIZExwVGNGVWtJbXljZllYdFd6TDV6QjY3UjJSY1FCUlY5YnlkOVN2?=
- =?utf-8?B?RzJXcjdETXcwcDh5UzRmczV3ejFqZ2FEcHFMd1VEa2ZmNkdNNm9ITkJYWm41?=
- =?utf-8?B?TXVtRDd3YUtnMTVPY1RCYmhha3ovUXdJSUNPUy9MNGlLdlRsY2R5T3FIbnNk?=
- =?utf-8?B?ZTJmR1FmZ2dGV2w5NEdJRGRJT1hrU2poWXdMeEhGWmlML0xIRG5xa0xCSjVk?=
- =?utf-8?B?NnpxV2l2V1AxWlE1K0JyaFU4VThHemNaUGxsL3F2OFppNmVpaWdodjdLN3RR?=
- =?utf-8?B?Y2d5dTR0ajFoOTUzV0tLNlFzRVVYdERVL0xHeFptOS85aUM5MnBmWkg1Mit5?=
- =?utf-8?B?VjlwYkl3bnVhbU1sdVhYdUtWZ01ZZk4vOUlrU3czL3JyUUhsY3NveFpRU1E0?=
- =?utf-8?B?RVkrU3o1R3pWZG1Tdm0wWXQ3RkZRUXI4SGNuUkg2a25UcVBYZmc1aFltTTg2?=
- =?utf-8?B?eUZYaURrZlo2bHNGSXdKaENNeWVEaGc2Uis2OGFCZ1JlNTVSbWpBM2RIU2hR?=
- =?utf-8?B?ZmRiVko2V0tLNUIrQkFQS3NjbzZxZlp5VTYzcTBkLzJJSGVHTlROS1d1eDA2?=
- =?utf-8?B?SnR4RUM1TndLdWg5Qyswa3JRdXlIaXRwbVRhTWFSZ0ZNTzVNMm9jbTBtS2tQ?=
- =?utf-8?B?b1FoYUtoSWpsbWQ1MGpvdGlQOWVwclVwL1lmUWdOV3VJMFF6aUpSVUJ4TDF1?=
- =?utf-8?B?VDlYVVFLajhtMktNYW9wcU0rVy9ydW13L1Y0eitrQjc4bW9Ja091dzFrdnQ3?=
- =?utf-8?B?YkZVZUpnN0p5OGsxSHhkaElsOWIxalFDZzZkT0FQa1I1SUZ5czV2Q0VJSFJn?=
- =?utf-8?B?U1BLcEdKdzlqUGw2OUh6WlFIUUgyZXhCSVozSkNsWU56TFk5NnJXd01JMkFL?=
- =?utf-8?B?R0hrOThtcWo0QkR0dUFGWURKb1NaSEVNaXVja0RscC9mNVFyRHlLOXdPZ2tV?=
- =?utf-8?B?R3p0aWMrbDhLWDQ5SDVCd0lNR3YvUzZPTEZMZm1pYjZtcm1IZTR1ZldUQ3Zx?=
- =?utf-8?B?bmR1dkV4UTFXeHNvZHhUejRZZE0yQ2puWnBYam45REZIU29PUzNoZGdRVUVx?=
- =?utf-8?B?eVFqZDIwcW9qZ3RpdkhTMmVieEJnQ0FNSlI4eFl1RVlWRTNwMERuMU1LZk1G?=
- =?utf-8?B?NG5WZE9ZQk9yYnUwcE50cWNQUWE5UHkxUXh6ZUx4SjRxYmVoYkRFc2cvZXlk?=
- =?utf-8?B?c2hxSHdUL0pVOWcvZitEOWwvMEROQi9DdGhnRUthdnBmWXVxVldrTmthRmI0?=
- =?utf-8?B?RjY5eW04alM1VGxHTlo3aG1MZ281UDUxQjFtSjJZSUJ5dEQrSVl2R1NIaWty?=
- =?utf-8?B?TS9TdDd0ZWQ1bjZoVVZFM2MrSXVtV3cvTjJZYnhYNlV4bzZCUTRNc3YzZE1o?=
- =?utf-8?Q?PPPor7U3Ksiv3?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(1800799015)(82310400017)(7416005)(36860700004)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 16:48:23.8589
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c12050d6-8097-4c92-eb3d-08dc80c85228
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF00000017.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8585
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 3/5] crypto: tpm2_key: Introduce a TPM2 key type
+To: Jarkko Sakkinen <jarkko@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        Andreas.Fuchs@infineon.com, James Prestwood <prestwoj@gmail.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-crypto@vger.kernel.org,
+        Lennart Poettering <lennart@poettering.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        open list <linux-kernel@vger.kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>,
+        Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        "open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>
+References: <20240528210823.28798-1-jarkko@kernel.org>
+ <20240528210823.28798-4-jarkko@kernel.org>
+Content-Language: en-US
+From: Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <20240528210823.28798-4-jarkko@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 2oUTOSqJRONevSoQUit8x_Yyj3YB--14
+X-Proofpoint-GUID: Y7GxRg9p7jkfs27DlUvao_oMuYInduYN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-30_21,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ clxscore=1015 priorityscore=1501 mlxlogscore=999 suspectscore=0
+ bulkscore=0 mlxscore=0 lowpriorityscore=0 impostorscore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2405310002
 
-On Tue, 21 May 2024 16:49:52 -0500
-Michael Roth <michael.roth@amd.com> wrote:
 
-> On Tue, May 21, 2024 at 08:49:59AM +0800, Binbin Wu wrote:
-> >=20
-> >=20
-> > On 5/17/2024 1:23 AM, Paolo Bonzini wrote:
-> > > On Thu, May 16, 2024 at 10:29=E2=80=AFAM Binbin Wu
-> > > <binbin.wu@linux.intel.com> wrote:
-> > > >=20
-> > > >=20
-> > > > On 5/1/2024 4:51 PM, Michael Roth wrote:
-> > > > > SEV-SNP VMs can ask the hypervisor to change the page state
-> > > > > in the RMP table to be private or shared using the Page State
-> > > > > Change MSR protocol as defined in the GHCB specification.
-> > > > >=20
-> > > > > When using gmem, private/shared memory is allocated through
-> > > > > separate pools, and KVM relies on userspace issuing a
-> > > > > KVM_SET_MEMORY_ATTRIBUTES KVM ioctl to tell the KVM MMU
-> > > > > whether or not a particular GFN should be backed by private
-> > > > > memory or not.
-> > > > >=20
-> > > > > Forward these page state change requests to userspace so that
-> > > > > it can issue the expected KVM ioctls. The KVM MMU will handle
-> > > > > updating the RMP entries when it is ready to map a private
-> > > > > page into a guest.
-> > > > >=20
-> > > > > Use the existing KVM_HC_MAP_GPA_RANGE hypercall format to
-> > > > > deliver these requests to userspace via KVM_EXIT_HYPERCALL.
-> > > > >=20
-> > > > > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > > > > Co-developed-by: Brijesh Singh <brijesh.singh@amd.com>
-> > > > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > > > > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> > > > > ---
-> > > > >    arch/x86/include/asm/sev-common.h |  6 ++++
-> > > > >    arch/x86/kvm/svm/sev.c            | 48
-> > > > > +++++++++++++++++++++++++++++++ 2 files changed, 54
-> > > > > insertions(+)
-> > > > >=20
-> > > > > diff --git a/arch/x86/include/asm/sev-common.h
-> > > > > b/arch/x86/include/asm/sev-common.h index
-> > > > > 1006bfffe07a..6d68db812de1 100644 ---
-> > > > > a/arch/x86/include/asm/sev-common.h +++
-> > > > > b/arch/x86/include/asm/sev-common.h @@ -101,11 +101,17 @@
-> > > > > enum psc_op { /* GHCBData[11:0] */
-> > > > > \ GHCB_MSR_PSC_REQ)
-> > > > >=20
-> > > > > +#define GHCB_MSR_PSC_REQ_TO_GFN(msr) (((msr) &
-> > > > > GENMASK_ULL(51, 12)) >> 12) +#define
-> > > > > GHCB_MSR_PSC_REQ_TO_OP(msr) (((msr) & GENMASK_ULL(55, 52)) >>
-> > > > > 52) + #define GHCB_MSR_PSC_RESP           0x015
-> > > > >    #define GHCB_MSR_PSC_RESP_VAL(val)                  \
-> > > > >        /* GHCBData[63:32] */                           \
-> > > > >        (((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
-> > > > >=20
-> > > > > +/* Set highest bit as a generic error response */
-> > > > > +#define GHCB_MSR_PSC_RESP_ERROR (BIT_ULL(63) |
-> > > > > GHCB_MSR_PSC_RESP) +
-> > > > >    /* GHCB Hypervisor Feature Request/Response */
-> > > > >    #define GHCB_MSR_HV_FT_REQ          0x080
-> > > > >    #define GHCB_MSR_HV_FT_RESP         0x081
-> > > > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > > > > index e1ac5af4cb74..720775c9d0b8 100644
-> > > > > --- a/arch/x86/kvm/svm/sev.c
-> > > > > +++ b/arch/x86/kvm/svm/sev.c
-> > > > > @@ -3461,6 +3461,48 @@ static void set_ghcb_msr(struct
-> > > > > vcpu_svm *svm, u64 value) svm->vmcb->control.ghcb_gpa =3D value;
-> > > > >    }
-> > > > >=20
-> > > > > +static int snp_complete_psc_msr(struct kvm_vcpu *vcpu)
-> > > > > +{
-> > > > > +     struct vcpu_svm *svm =3D to_svm(vcpu);
-> > > > > +
-> > > > > +     if (vcpu->run->hypercall.ret)
-> > > > Do we have definition of ret? I didn't find clear documentation
-> > > > about it. According to the code, 0 means succssful. Is there
-> > > > any other error codes need to or can be interpreted?
-> > > They are defined in include/uapi/linux/kvm_para.h
-> > >=20
-> > > #define KVM_ENOSYS        1000
-> > > #define KVM_EFAULT        EFAULT /* 14 */
-> > > #define KVM_EINVAL        EINVAL /* 22 */
-> > > #define KVM_E2BIG        E2BIG /* 7 */
-> > > #define KVM_EPERM        EPERM /* 1*/
-> > > #define KVM_EOPNOTSUPP        95
-> > >=20
-> > > Linux however does not expect the hypercall to fail for
-> > > SEV/SEV-ES; and it will terminate the guest if the PSC operation
-> > > fails for SEV-SNP.  So it's best for userspace if the hypercall
-> > > always succeeds. :)
-> > Thanks for the info.
-> >=20
-> > For TDX, it wants to restrict the size of memory range for
-> > conversion in one hypercall to avoid a too long latency.
-> > Previously, in TDX QEMU patchset v5, the limitation is in userspace
-> > and=C2=A0 if the size is too big, the status_code will set to
-> > TDG_VP_VMCALL_RETRY and the failed GPA for guest to retry is
-> > updated.
-> > https://lore.kernel.org/all/20240229063726.610065-51-xiaoyao.li@intel.c=
-om/
-> >=20
-> > When TDX converts TDVMCALL_MAP_GPA to KVM_HC_MAP_GPA_RANGE, do you
-> > think which is more reasonable to set the restriction? In KVM (TDX
-> > specific code) or userspace?
-> > If userspace is preferred, then the interface needs to=C2=A0 be extended
-> > to support it.
->=20
-> With SNP we might get a batch of requests in a single GHCB request,
-> and potentially each of those requests need to get set out to
-> userspace as a single KVM_HC_MAP_GPA_RANGE. The subsequent patch here
-> handles that in a loop by issuing a new KVM_HC_MAP_GPA_RANGE via the
-> completion handler. So we also sort of need to split large requests
-> into multiple userspace requests in some cases.
->=20
-> It seems like TDX should be able to do something similar by limiting
-> the size of each KVM_HC_MAP_GPA_RANGE to TDX_MAP_GPA_MAX_LEN, and then
-> returning TDG_VP_VMCALL_RETRY to guest if the original size was
-> greater than TDX_MAP_GPA_MAX_LEN. But at that point you're
-> effectively done with the entire request and can return to guest, so
-> it actually seems a little more straightforward than the SNP case
-> above. E.g. TDX has a 1:1 mapping between TDG_VP_VMCALL_MAP_GPA and
-> KVM_HC_MAP_GPA_RANGE events. (And even similar names :))
->=20
-> So doesn't seem like there's a good reason to expose any of these
-> throttling details to userspace, in which case existing
-> KVM_HC_MAP_GPA_RANGE interface seems like it should be sufficient.
->=20
 
-Is there any rough data about the latency of private-shared and
-shared-private page conversion?
+On 5/28/24 17:08, Jarkko Sakkinen wrote:
+> TPM2 ASN.1 format is required for trusted keys and asymmetric keys. Move it
+> to crypto in order to make it available for both. Implement validation with
+> coverage of all TPMT_PUBLIC shared fields. Key type specific fields must be
+> covered by the different subsystems using this.
+> 
+> A Kconfig option CRYPTO_TPM2_KEY can be used to select the feature, which
+> depends only crypto subsystem itself and ASN.1 parser.
+> 
+> Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+> ---
+> v6:
+> * Relocate to crypto. Validate the shared part and provide
+>    accessor functions. Use a fixed buffer size.
+> v2:
+> * Do not allocate blob twice. Use the one inside struct tpm2_key.
+> ---
+>   crypto/Kconfig                            |   7 ++
+>   crypto/Makefile                           |   6 +
+>   crypto/tpm2_key.asn1                      |  11 ++
+>   crypto/tpm2_key.c                         | 134 ++++++++++++++++++++
+>   include/crypto/tpm2_key.h                 |  46 +++++++
+>   security/keys/trusted-keys/Kconfig        |   2 +-
+>   security/keys/trusted-keys/Makefile       |   2 -
+>   security/keys/trusted-keys/tpm2key.asn1   |  11 --
+>   security/keys/trusted-keys/trusted_tpm2.c | 141 +++++-----------------
+>   9 files changed, 235 insertions(+), 125 deletions(-)
+>   create mode 100644 crypto/tpm2_key.asn1
+>   create mode 100644 crypto/tpm2_key.c
+>   create mode 100644 include/crypto/tpm2_key.h
+>   delete mode 100644 security/keys/trusted-keys/tpm2key.asn1
+> 
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 5688d42a59c2..c8989bc71f57 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -5,6 +5,13 @@
+>   config XOR_BLOCKS
+>   	tristate
+>   
+> +config CRYPTO_TPM2_KEY
+> +	bool
+> +	depends on CRYPTO
+> +	select ASN1
+> +	select OID_REGISTRY
+> +	default n
+> +
+>   #
+>   # async_tx api: hardware offloaded memory transfer/transform support
+>   #
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index edbbaa3ffef5..d932fdb72319 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -216,3 +216,9 @@ obj-$(CONFIG_CRYPTO_SIMD) += crypto_simd.o
+>   # Key derivation function
+>   #
+>   obj-$(CONFIG_CRYPTO_KDF800108_CTR) += kdf_sp800108.o
+> +
+> +ifdef CONFIG_CRYPTO_TPM2_KEY
+> +$(obj)/tpm2_key.asn1.o: $(obj)/tpm2_key.asn1.h $(obj)/tpm2_key.asn1.c
+> +$(obj)/tpm2_key.o: $(obj)/tpm2_key.asn1.h
+> +obj-y += tpm2_key.o tpm2_key.asn1.o
+> +endif
+> diff --git a/crypto/tpm2_key.asn1 b/crypto/tpm2_key.asn1
+> new file mode 100644
+> index 000000000000..b235d02ab78e
+> --- /dev/null
+> +++ b/crypto/tpm2_key.asn1
+> @@ -0,0 +1,11 @@
+> +---
+> +--- ASN.1 for TPM 2.0 keys
+> +---
+> +
+> +TPMKey ::= SEQUENCE {
+> +	type		OBJECT IDENTIFIER ({tpm2_key_get_type}),
+> +	emptyAuth	[0] EXPLICIT BOOLEAN OPTIONAL,
+> +	parent		INTEGER ({tpm2_key_get_parent}),
+> +	pubkey		OCTET STRING ({tpm2_get_public}),
+> +	privkey		OCTET STRING ({tpm2_get_private})
+> +	}
+> diff --git a/crypto/tpm2_key.c b/crypto/tpm2_key.c
+> new file mode 100644
+> index 000000000000..78f55478d046
+> --- /dev/null
+> +++ b/crypto/tpm2_key.c
+> @@ -0,0 +1,134 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +#include <crypto/tpm2_key.h>
+> +#include <linux/oid_registry.h>
+> +#include <linux/slab.h>
+> +#include <linux/types.h>
+> +#include <asm/unaligned.h>
+> +#include "tpm2_key.asn1.h"
+> +
+> +#undef pr_fmt
+> +#define pr_fmt(fmt) "tpm2_key: "fmt
+> +
+> +struct tpm2_key_decoder_context {
+> +	u32 parent;
+> +	const u8 *pub;
+> +	u32 pub_len;
+> +	const u8 *priv;
+> +	u32 priv_len;
+> +	enum OID oid;
+> +};
+> +
+> +int tpm2_key_get_parent(void *context, size_t hdrlen,
+> +			unsigned char tag,
+> +			const void *value, size_t vlen)
+> +{
+> +	struct tpm2_key_decoder_context *decoder = context;
+> +	const u8 *v = value;
+> +	int i;
+> +
+> +	decoder->parent = 0;
+> +	for (i = 0; i < vlen; i++) {
+> +		decoder->parent <<= 8;
+> +		decoder->parent |= v[i];
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +int tpm2_key_get_type(void *context, size_t hdrlen,
+> +		      unsigned char tag,
+> +		      const void *value, size_t vlen)
+> +{
+> +	struct tpm2_key_decoder_context *decoder = context;
+> +
+> +	decoder->oid = look_up_OID(value, vlen);
+> +	return 0;
+> +}
+> +
+> +static inline bool tpm2_key_is_valid(const void *value, size_t vlen)
+> +{
+> +	if (vlen < 2 || vlen > TPM2_KEY_BYTES_MAX)
+> +		return false;
+> +
+> +	if (get_unaligned_be16(value) != vlen - 2)
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> +int tpm2_get_public(void *context, size_t hdrlen, unsigned char tag,
+> +		    const void *value, size_t vlen)
+> +{
+> +	struct tpm2_key_decoder_context *decoder = context;
+> +
+> +	if (!tpm2_key_is_valid(value, vlen))
+> +		return -EBADMSG;
+> +
+> +	if (sizeof(struct tpm2_key_desc) > vlen - 2)
+> +		return -EBADMSG;
+> +
+> +	decoder->pub = value;
+> +	decoder->pub_len = vlen;
+> +	return 0;
+> +}
+> +
+> +int tpm2_get_private(void *context, size_t hdrlen, unsigned char tag,
+> +		     const void *value, size_t vlen)
+> +{
+> +	struct tpm2_key_decoder_context *decoder = context;
+> +
+> +	if (!tpm2_key_is_valid(value, vlen))
+> +		return -EBADMSG;
+> +
+> +	decoder->priv = value;
+> +	decoder->priv_len = vlen;
+> +	return 0;
+> +}
+> +
+> +/**
+> + * tpm_key_decode() - Decode TPM2 ASN.1 key
+> + * @src:	ASN.1 source.
+> + * @src_len:	ASN.1 source length.
+> + *
+> + * Decodes the TPM2 ASN.1 key and validates that the public key data has all
+> + * the shared fields of TPMT_PUBLIC. This is full coverage of the memory that
+> + * can be validated before doing any key type specific validation.
 
-Thanks,
-Zhi.=20
-> -Mike
->=20
-> >=20
-> >=20
-> > >=20
-> > > > For TDX, it may also want to use KVM_HC_MAP_GPA_RANGE hypercall
-> > > >  to userspace via KVM_EXIT_HYPERCALL.
-> > > Yes, definitely.
-> > >=20
-> > > Paolo
-> > >=20
-> >=20
->=20
+I am not sure what the last sentence means.
 
+> + *
+> + * Return:
+> + * - TPM2 ASN.1 key on success.
+> + * - -EBADMSG when decoding fails.
+> + * - -ENOMEM when OOM while allocating struct tpm2_key.
+> + */
+> +struct tpm2_key *tpm2_key_decode(const u8 *src, u32 src_len)
+> +{
+> +	struct tpm2_key_decoder_context decoder;
+> +	struct tpm2_key *key;
+> +	u8 *data;
+> +	int ret;
+> +
+> +	memset(&decoder, 0, sizeof(decoder));
+> +	ret = asn1_ber_decoder(&tpm2_key_decoder, &decoder, src, src_len);
+> +	if (ret < 0) {
+> +		if (ret != -EBADMSG)
+> +			pr_info("Decoder error %d\n", ret);
+> +
+> +		return ERR_PTR(-EBADMSG);
+> +	}
+> +
+> +	key = kzalloc(sizeof(*key), GFP_KERNEL);
+> +	if (!key)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	data = &key->data[0];
+> +	memcpy(&data[0], decoder.priv, decoder.priv_len);
+> +	memcpy(&data[decoder.priv_len], decoder.pub, decoder.pub_len);
+> +
+> +	key->oid = decoder.oid;
+> +	key->priv_len = decoder.priv_len;
+> +	key->pub_len = decoder.pub_len;
+> +	key->parent = decoder.parent;
+> +	key->desc = (struct tpm2_key_desc *)&data[decoder.priv_len + 2];
+> +	return key;
+> +}
+> +EXPORT_SYMBOL_GPL(tpm2_key_decode);
+> diff --git a/include/crypto/tpm2_key.h b/include/crypto/tpm2_key.h
+> new file mode 100644
+> index 000000000000..74debaf707bf
+> --- /dev/null
+> +++ b/include/crypto/tpm2_key.h
+> @@ -0,0 +1,46 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef __LINUX_TPM2_KEY_H__
+> +#define __LINUX_TPM2_KEY_H__
+> +
+> +#include <linux/oid_registry.h>
+> +#include <linux/slab.h>
+> +
+> +#define TPM2_KEY_BYTES_MAX 1024
+> +
+> +/*  TPM2 Structures 12.2.4: TPMT_PUBLIC */
+> +struct tpm2_key_desc {
+> +	__be16 type;
+> +	__be16 name_alg;
+> +	__be32 object_attributes;
+> +	__be16 policy_size;
+> +} __packed;
+> +
+> +/* Decoded TPM2 ASN.1 key. */
+> +struct tpm2_key {
+> +	u8 data[2 * TPM2_KEY_BYTES_MAX];
+> +	struct tpm2_key_desc *desc;
+> +	u16 priv_len;
+> +	u16 pub_len;
+> +	u32 parent;
+> +	enum OID oid;
+> +	char oid_str[64];
+> +};
+> +
+> +struct tpm2_key *tpm2_key_decode(const u8 *src, u32 src_len);
+> +
+> +static inline const void *tpm2_key_data(const struct tpm2_key *key)
+> +{
+> +	return &key->data[0];
+> +}
+> +
+> +static inline u16 tpm2_key_type(const struct tpm2_key *key)
+> +{
+> +	return be16_to_cpu(key->desc->type);
+> +}
+> +
+> +static inline int tpm2_key_policy_size(const struct tpm2_key *key)
+> +{
+> +	return be16_to_cpu(key->desc->policy_size);
+> +}
+> +
+> +#endif /* __LINUX_TPM2_KEY_H__ */
+> diff --git a/security/keys/trusted-keys/Kconfig b/security/keys/trusted-keys/Kconfig
+> index 1fb8aa001995..00d9489384ac 100644
+> --- a/security/keys/trusted-keys/Kconfig
+> +++ b/security/keys/trusted-keys/Kconfig
+> @@ -9,9 +9,9 @@ config TRUSTED_KEYS_TPM
+>   	select CRYPTO_HMAC
+>   	select CRYPTO_SHA1
+>   	select CRYPTO_HASH_INFO
+> +	select CRYPTO_TPM2_KEY
+>   	select ASN1_ENCODER
+>   	select OID_REGISTRY
+> -	select ASN1
+>   	select HAVE_TRUSTED_KEYS
+>   	help
+>   	  Enable use of the Trusted Platform Module (TPM) as trusted key
+> diff --git a/security/keys/trusted-keys/Makefile b/security/keys/trusted-keys/Makefile
+> index f0f3b27f688b..2674d5c10fc9 100644
+> --- a/security/keys/trusted-keys/Makefile
+> +++ b/security/keys/trusted-keys/Makefile
+> @@ -7,9 +7,7 @@ obj-$(CONFIG_TRUSTED_KEYS) += trusted.o
+>   trusted-y += trusted_core.o
+>   trusted-$(CONFIG_TRUSTED_KEYS_TPM) += trusted_tpm1.o
+>   
+> -$(obj)/trusted_tpm2.o: $(obj)/tpm2key.asn1.h
+>   trusted-$(CONFIG_TRUSTED_KEYS_TPM) += trusted_tpm2.o
+> -trusted-$(CONFIG_TRUSTED_KEYS_TPM) += tpm2key.asn1.o
+>   
+>   trusted-$(CONFIG_TRUSTED_KEYS_TEE) += trusted_tee.o
+>   
+> diff --git a/security/keys/trusted-keys/tpm2key.asn1 b/security/keys/trusted-keys/tpm2key.asn1
+> deleted file mode 100644
+> index f57f869ad600..000000000000
+> --- a/security/keys/trusted-keys/tpm2key.asn1
+> +++ /dev/null
+> @@ -1,11 +0,0 @@
+> ----
+> ---- ASN.1 for TPM 2.0 keys
+> ----
+> -
+> -TPMKey ::= SEQUENCE {
+> -	type		OBJECT IDENTIFIER ({tpm2_key_type}),
+> -	emptyAuth	[0] EXPLICIT BOOLEAN OPTIONAL,
+> -	parent		INTEGER ({tpm2_key_parent}),
+> -	pubkey		OCTET STRING ({tpm2_key_pub}),
+> -	privkey		OCTET STRING ({tpm2_key_priv})
+> -	}
+> diff --git a/security/keys/trusted-keys/trusted_tpm2.c b/security/keys/trusted-keys/trusted_tpm2.c
+> index 06c8fa7b21ae..b9e505e99e8c 100644
+> --- a/security/keys/trusted-keys/trusted_tpm2.c
+> +++ b/security/keys/trusted-keys/trusted_tpm2.c
+> @@ -13,11 +13,10 @@
+>   
+>   #include <keys/trusted-type.h>
+>   #include <keys/trusted_tpm.h>
+> +#include <crypto/tpm2_key.h>
+>   
+>   #include <asm/unaligned.h>
+>   
+> -#include "tpm2key.asn1.h"
+> -
+>   static struct tpm2_hash tpm2_hash_map[] = {
+>   	{HASH_ALGO_SHA1, TPM_ALG_SHA1},
+>   	{HASH_ALGO_SHA256, TPM_ALG_SHA256},
+> @@ -98,106 +97,6 @@ static int tpm2_key_encode(struct trusted_key_payload *payload,
+>   	return ret;
+>   }
+>   
+> -struct tpm2_key_context {
+> -	u32 parent;
+> -	const u8 *pub;
+> -	u32 pub_len;
+> -	const u8 *priv;
+> -	u32 priv_len;
+> -};
+> -
+> -static int tpm2_key_decode(struct trusted_key_payload *payload,
+> -			   struct trusted_key_options *options,
+> -			   u8 **buf)
+> -{
+> -	int ret;
+> -	struct tpm2_key_context ctx;
+> -	u8 *blob;
+> -
+> -	memset(&ctx, 0, sizeof(ctx));
+> -
+> -	ret = asn1_ber_decoder(&tpm2key_decoder, &ctx, payload->blob,
+> -			       payload->blob_len);
+> -	if (ret < 0)
+> -		return ret;
+> -
+> -	if (ctx.priv_len + ctx.pub_len > MAX_BLOB_SIZE)
+> -		return -E2BIG;
+> -
+> -	blob = kmalloc(ctx.priv_len + ctx.pub_len + 4, GFP_KERNEL);
+> -	if (!blob)
+> -		return -ENOMEM;
+> -
+> -	*buf = blob;
+> -	options->keyhandle = ctx.parent;
+> -
+> -	memcpy(blob, ctx.priv, ctx.priv_len);
+> -	blob += ctx.priv_len;
+> -
+> -	memcpy(blob, ctx.pub, ctx.pub_len);
+> -
+> -	return 0;
+> -}
+> -
+> -int tpm2_key_parent(void *context, size_t hdrlen,
+> -		  unsigned char tag,
+> -		  const void *value, size_t vlen)
+> -{
+> -	struct tpm2_key_context *ctx = context;
+> -	const u8 *v = value;
+> -	int i;
+> -
+> -	ctx->parent = 0;
+> -	for (i = 0; i < vlen; i++) {
+> -		ctx->parent <<= 8;
+> -		ctx->parent |= v[i];
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+> -int tpm2_key_type(void *context, size_t hdrlen,
+> -		unsigned char tag,
+> -		const void *value, size_t vlen)
+> -{
+> -	enum OID oid = look_up_OID(value, vlen);
+> -
+> -	if (oid != OID_TPMSealedData) {
+> -		char buffer[50];
+> -
+> -		sprint_oid(value, vlen, buffer, sizeof(buffer));
+> -		pr_debug("OID is \"%s\" which is not TPMSealedData\n",
+> -			 buffer);
+> -		return -EINVAL;
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+> -int tpm2_key_pub(void *context, size_t hdrlen,
+> -	       unsigned char tag,
+> -	       const void *value, size_t vlen)
+> -{
+> -	struct tpm2_key_context *ctx = context;
+> -
+> -	ctx->pub = value;
+> -	ctx->pub_len = vlen;
+> -
+> -	return 0;
+> -}
+> -
+> -int tpm2_key_priv(void *context, size_t hdrlen,
+> -		unsigned char tag,
+> -		const void *value, size_t vlen)
+> -{
+> -	struct tpm2_key_context *ctx = context;
+> -
+> -	ctx->priv = value;
+> -	ctx->priv_len = vlen;
+> -
+> -	return 0;
+> -}
+> -
+>   /**
+>    * tpm2_buf_append_auth() - append TPMS_AUTH_COMMAND to the buffer.
+>    *
+> @@ -387,22 +286,43 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
+>   			 struct trusted_key_options *options,
+>   			 u32 *blob_handle)
+>   {
+> -	struct tpm_buf buf;
+>   	unsigned int private_len;
+>   	unsigned int public_len;
+>   	unsigned int blob_len;
+> -	u8 *blob, *pub;
+> -	int rc;
+> +	struct tpm2_key *key;
+> +	const u8 *blob, *pub;
+> +	struct tpm_buf buf;
+>   	u32 attrs;
+> +	int rc;
+>   
+> -	rc = tpm2_key_decode(payload, options, &blob);
+> -	if (rc) {
+> -		/* old form */
+> +	key = tpm2_key_decode(payload->blob, payload->blob_len);
+> +	if (IS_ERR(key)) {
+> +		/* Get the error code and reset the pointer to the key: */
+> +		rc = PTR_ERR(key);
+> +		key = NULL;
+> +
+> +		if (rc == -ENOMEM)
+> +			return -ENOMEM;
+> +
+> +		/* A sanity check, as only -EBADMSG or -ENOMEM are expected: */
+> +		if (rc != -EBADMSG)
+> +			pr_err("tpm2_key_decode(): spurious error code %d\n", rc);
+
+tpm2_key_decode seems simple enough that it only returns key, -ENOMEM or 
+EBADMSG.
+
+> +
+> +		/* Fallback to the legacy format: */
+>   		blob = payload->blob;
+>   		payload->old_format = 1;
+> +	} else {
+> +		blob = tpm2_key_data(key);
+> +		if (key->oid != OID_TPMSealedData) {
+> +			kfree(key);
+> +			return -EBADMSG;
+> +		}
+>   	}
+>   
+> -	/* new format carries keyhandle but old format doesn't */
+> +	/*
+> +	 * Must be non-zero here, either extracted from the ASN.1 for the new
+> +	 * format or specified on the command line for the old.
+
+sentence seems incomplete: ... for the old one.  OR  ... for the old format.
+
+> +	 */
+>   	if (!options->keyhandle)
+>   		return -EINVAL;
+>   
+> @@ -464,8 +384,7 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
+>   			(__be32 *) &buf.data[TPM_HEADER_SIZE]);
+>   
+>   out:
+> -	if (blob != payload->blob)
+> -		kfree(blob);
+> +	kfree(key);
+>   	tpm_buf_destroy(&buf);
+>   
+>   	if (rc > 0)
