@@ -1,57 +1,103 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3907EF
-	for <linux-crypto@vger.kernel.org>; Sat,  1 Jun 2024 03:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E5A208A4;
+	Sat,  1 Jun 2024 10:56:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717214074; cv=none; b=EXTUj5pQN1YQgHH1+UVvfHGcmBvL6fRwgAUdlRjRFQEdsEmwMeXEJvhNsbTue16QLjFU0C1illcZJMC2vfZ6w3qM5RtYWSS5kcpw60i4HaojP+na/czN8SYm4C4vGFS5nB3z61T4Z0TFfwXlBTTz9rRIsBsyNCQ4XuQHYSc+Bg0=
+	t=1717239409; cv=none; b=LuVD/gsEYlVkpfF5/3r6BmZ12r23hMeNMaZxSQT0JmfV0tWgizr4SEeRx0ABykp7xjgvN5xM0pdm+UJocHjgQHs3qSZvGncACnF1Egv3zeTtvepGsUuHNFv+8loTrQde5/ejdnQixwzF8RCpJ3cZJTCFpPxBY9vzVlhlLkg2oj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717214074; c=relaxed/simple;
-	bh=64G2N5i90bQeqXxnyJXkBc7wziIEggkBJyUufrswH8Q=;
+	s=arc-20240116; t=1717239409; c=relaxed/simple;
+	bh=41DY8TV8S+YxvFiEAbKmnGhANeol4FJ3Mp4MdCpmIck=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zj91TYSM8uZ7PDbo3NsBJmaAmaZCbTzG7tw+7VpCyth+iC39JCcJWTcG8IQw8ckKH60XE7IXEqVbnSOHElxMqK3oCF7Ue7mKjzYxET46dDLLeIYUuNQPIQZWHIRVAlDnukr6926yYqdn8jgZcpBsNQ0m2VcWUfTPELCobi6o3dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sDFp0-004VHl-1h;
-	Sat, 01 Jun 2024 11:54:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 01 Jun 2024 11:54:24 +0800
-Date: Sat, 1 Jun 2024 11:54:24 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 1/3] crypto: scomp - Add setparam interface
-Message-ID: <ZlqbcKUTa5e3rOtH@gondor.apana.org.au>
-References: <cover.1716202860.git.herbert@gondor.apana.org.au>
- <84523e14722d0629b2ee9c8e7e3c04aa223c5fb5.1716202860.git.herbert@gondor.apana.org.au>
- <20240531054759.GE8400@google.com>
- <20240531063444.GG8400@google.com>
- <ZlmKX4dD1EcstVmN@gondor.apana.org.au>
- <20240601002415.GH8400@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=l71T74QMv8ruHcPdlJ3OYw4jLXLBqTIMODQ5BJTIfjAb7jlOMz7G0AXbczP7CdlBzmukeilcRMZKn7Rwi718Rx5Pm//m2YKTp0NG13JmarfF35Lk7aoLGyTe5Ese/bAjtZou7CZzP0U/vS86GBee1ocUgjE1AgKylqyvQiyGJIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=jxWlgk+Z; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jxWlgk+Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CF40C116B1;
+	Sat,  1 Jun 2024 10:56:46 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jxWlgk+Z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1717239405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F3C8N1q5G5CmnDvpi3COJ8xyMm2eULKtCWXP4Sq6GaE=;
+	b=jxWlgk+ZWOpZZh5mjiYsYeT/ujL0Csc153a4DS7n5KhpFm2UZaHWVIpItNQEQwnh76T0Vp
+	VN/fbYyhjP/HQWQEvumkcMGyMOUQjoLcxrXSQSoVRzyBcc0pSpukUXkcdDReiYMpvZ9t5N
+	qRJXEQKGpsiYqCh4XdXcwNEkBWpL4zw=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c390d7bc (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Sat, 1 Jun 2024 10:56:43 +0000 (UTC)
+Date: Sat, 1 Jun 2024 12:56:40 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+	tglx@linutronix.de, linux-crypto@vger.kernel.org,
+	linux-api@vger.kernel.org, x86@kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jann Horn <jannh@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>
+Subject: Re: [PATCH v16 2/5] random: add vgetrandom_alloc() syscall
+Message-ID: <Zlr-aMJdAEgHOj9-@zx2c4.com>
+References: <20240528122352.2485958-1-Jason@zx2c4.com>
+ <20240528122352.2485958-3-Jason@zx2c4.com>
+ <20240531035917.GD6505@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240601002415.GH8400@google.com>
+In-Reply-To: <20240531035917.GD6505@sol.localdomain>
 
-On Sat, Jun 01, 2024 at 09:24:15AM +0900, Sergey Senozhatsky wrote:
->
-> Is it possible to share a tfm? I thought that tfm-s carry some state
-> (compression workmem/scratch buffer) so one cannot do parallel compressions
-> on different CPUs using the same tfm.
+On Thu, May 30, 2024 at 08:59:17PM -0700, Eric Biggers wrote:
+> On Tue, May 28, 2024 at 02:19:51PM +0200, Jason A. Donenfeld wrote:
+> > +/**
+> > + * sys_vgetrandom_alloc - Allocate opaque states for use with vDSO getrandom().
+> > + *
+> > + * @num:	   On input, a pointer to a suggested hint of how many states to
+> > + * 		   allocate, and on return the number of states actually allocated.
+> > + *
+> > + * @size_per_each: On input, must be zero. On return, the size of each state allocated,
+> > + * 		   so that the caller can split up the returned allocation into
+> > + * 		   individual states.
+> > + *
+> > + * @addr:	   Reserved, must be zero.
+> > + *
+> > + * @flags:	   Reserved, must be zero.
+> > + *
+> > + * The getrandom() vDSO function in userspace requires an opaque state, which
+> > + * this function allocates by mapping a certain number of special pages into
+> > + * the calling process. It takes a hint as to the number of opaque states
+> > + * desired, and provides the caller with the number of opaque states actually
+> > + * allocated, the size of each one in bytes, and the address of the first
+> > + * state, which may be split up into @num states of @size_per_each bytes each,
+> > + * by adding @size_per_each to the returned first state @num times, while
+> > + * ensuring that no single state straddles a page boundary.
+> > + *
+> > + * Returns the address of the first state in the allocation on success, or a
+> > + * negative error value on failure.
+> > + *
+> > + * The returned address of the first state may be passed to munmap(2) with a
+> > + * length of `(size_t)num * (size_t)size_per_each`, in order to deallocate the
+> > + * memory, after which it is invalid to pass it to vDSO getrandom().
+> 
+> Wouldn't a munmap with '(size_t)num * (size_t)size_per_each' be potentially too
+> short, due to how the allocation is sized such that states don't cross page
+> boundaries?
 
-Yes the tfm can be shared.  The data state is kept in the request
-object.
+You're right, I think. The calculation should instead be something like:
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+    DIV_ROUND_UP(num, PAGE_SIZE / size_per_each) * PAGE_SIZE
+
+Does that seem correct to you?
+
+Jason
