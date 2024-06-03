@@ -1,113 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from xmailer.gwdg.de (xmailer.gwdg.de [134.76.10.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56634F9E9;
-	Mon,  3 Jun 2024 18:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F0D374EA;
+	Mon,  3 Jun 2024 19:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.76.10.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717440604; cv=none; b=QGklGZvmlhMJ8FBjUhOXlvhhzHQCwxQoWkNYTQ57taqOkSE+N+ruA/u83Qa+8g0ydgIUPP2RLV5KWWV90CrFbFkHjPPUxMF1TkCvk8XJGB3XnypjlwRXOe+n0z0x7ckbNwPUI8eH5dQPGL+Zk4xhT1zHb/KZOFHMdhAX+3D7XDw=
+	t=1717443204; cv=none; b=DfvIrzAcod4y2olu4UFwl0RaMECxLo6zTL25CDWV5izg5WF+eOpO+k53yVR+AXt9zzCkcyjckblCVccjJVFhv6ReEOEkp377L/UZf75CsiCd8gyemQwkskHpYT7pJofGlkh0pX9Capd0OSNy1661kv8eLjqgS3QsQ8gwcO/ouOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717440604; c=relaxed/simple;
-	bh=tAoh6E2HyT2I7zRPieUiEXpLsGE3VAG7l4WoETX8/KA=;
+	s=arc-20240116; t=1717443204; c=relaxed/simple;
+	bh=ZFG0RzAoaOkp+zsaLv13A2Z5uR/A9GDeP1h90WlRyV0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PcF/DwL1cu0WSPNNqhtcBvuomYIs5+vcJOK8eLAfHstBmeK3nye7MoNJMgfzjidVWBJUYFdIB3YKke5NE66C8YccO0VYML5nXXABbmfs5RR7i+T/1hx/LYbZLHQNGVVRZcwyqKzw+5epQ+VlBLCRQCas7LINxCWJNqcAQFWXbng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GEf/jxEH; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GEf/jxEH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF99DC2BD10;
-	Mon,  3 Jun 2024 18:50:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717440604;
-	bh=tAoh6E2HyT2I7zRPieUiEXpLsGE3VAG7l4WoETX8/KA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GEf/jxEHtJGXB7kScrOu7h0DjjNeWIg9lmhillOkUjsewEoDtkkXOBYTxIubLXC0D
-	 AF4raCk7yLDQsjaEiVt9L4jATQZdkgU4JttVpSxom5jc+RhW+ziwtinDv6R8RdlHfV
-	 2aq5gfLjxWyk1YHIbAwIGdaZo9nVrrLnghqYrrhZV1LMVmHyB1umUBQI+ZgnubF8Kd
-	 3KpP1RkPnIGdxnhu8CnsDUw7RZmxAFd6pHxvh6XERMEtX/eCfJDWXm7RlHjS4oYoai
-	 JflohoHAJ9g5V2MQ1cx1bAp9uDtUvT/iiJL/ne32mD6T06oKQfIC+1n85wD8kDzzHu
-	 1ndEUQNWLyvTA==
-Date: Mon, 3 Jun 2024 11:50:02 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, fsverity@lists.linux.dev,
-	dm-devel@lists.linux.dev, x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org, ardb@kernel.org,
-	samitolvanen@google.com, bvanassche@acm.org
-Subject: Re: [PATCH v3 6/8] fsverity: improve performance by using
- multibuffer hashing
-Message-ID: <20240603185002.GA35358@sol.localdomain>
-References: <20240507002343.239552-7-ebiggers@kernel.org>
- <ZllXDOJKW2pHWBTz@gondor.apana.org.au>
- <20240531061348.GG6505@sol.localdomain>
- <20240531065258.GH6505@sol.localdomain>
- <ZlmPGEt68OyAfuWo@gondor.apana.org.au>
- <20240531185126.GA1153@sol.localdomain>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZQHsKGh3tfZeqUIazFYkR6t1hAod/SiHKqUT//T0zsdGldbGICF7VUj4l7yJQe1Q8z7gc017vHdn4MTtiZam5p8NPxKPXeYnzG7URRCK2pC5vDYKbYCvQP3l03f7AVV39nIgr1NYPoHspOZcqloqxHBviISZrv8LKbO/JG9DrPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuebingen.mpg.de; spf=pass smtp.mailfrom=tuebingen.mpg.de; arc=none smtp.client-ip=134.76.10.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuebingen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuebingen.mpg.de
+Received: from mailgw.tuebingen.mpg.de ([192.124.27.5] helo=tuebingen.mpg.de)
+	by mailer.gwdg.de with esmtp (GWDG Mailer)
+	(envelope-from <maan@tuebingen.mpg.de>)
+	id 1sECtE-0005IN-0g;
+	Mon, 03 Jun 2024 20:58:40 +0200
+Received: from [10.35.40.80] (HELO mailhost.tuebingen.mpg.de)
+  by tuebingen.mpg.de (CommuniGate Pro SMTP 6.2.6)
+  with SMTP id 55632179; Mon, 03 Jun 2024 20:58:39 +0200
+Received: by mailhost.tuebingen.mpg.de (sSMTP sendmail emulation); Mon, 03 Jun 2024 20:58:39 +0200
+Date: Mon, 3 Jun 2024 20:58:39 +0200
+From: Andre Noll <maan@tuebingen.mpg.de>
+To: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc: Dan Williams <dan.j.williams@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jonathan Corbet <corbet@lwn.net>, Andre Noll <maan@systemlinux.org>,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel@pengutronix.de
+Subject: Re: [PATCH v2] docs: crypto: async-tx-api: fix broken code example
+Message-ID: <Zl4SX4mF0EFuJLnc@tuebingen.mpg.de>
+References: <20240529-async-dma-docs-v2-1-8faf87e72e6d@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240531185126.GA1153@sol.localdomain>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240529-async-dma-docs-v2-1-8faf87e72e6d@pengutronix.de>
+User-Agent: Mutt/2.2.13 (00d56288) (2024-03-09)
+X-Spam-Level: $
+X-Virus-Scanned: (clean) by clamav
 
-On Fri, May 31, 2024 at 11:51:26AM -0700, Eric Biggers wrote:
-> On Fri, May 31, 2024 at 04:49:28PM +0800, Herbert Xu wrote:
-> > On Thu, May 30, 2024 at 11:52:58PM -0700, Eric Biggers wrote:
-> > >
-> > > Looking at it again a bit more closely, both fsverity and dm-verity have
-> > > per-block information that they need to keep track of in the queue in addition
-> > > to the data buffers and hashes: the block number, and in dm-verity's case also a
-> > > bvec_iter pointing to that block.
-> > 
-> > Again I'm not asking you to make this API asynchronous at all.
+On Wed, May 29, 10:08, Ahmad Fatoum wrote
+> The code example fails to compile:
 > 
-> What exactly are you suggesting, then?  It seems that you want multibuffer
-> hashing to be supported by the existing ahash API.  However, that only works if
-> it's made asynchronous, given how the messages would have to be queued up on a
-> global queue.  That has a huge number of issues which I've already explained.
-> (And it was even tried before, and it failed.)
+>   1) addr_conv is defined twice, once as a VLA, which have been phased out
 > 
-> > I was just commenting on the added complexity in fsverify due to
-> > the use of the linear shash API instead of the page-based ahash API.
+>   2) submit is not a pointer, but is still dereferenced with ->
 > 
-> It's the other way around.  The shash version is much simpler.  Just look at the
-> diff of commit 8fcd94add6c5 that changed from ahash to shash:
+>   3) The first call to async_xor() lacked the trailing semicolon
 > 
->     4 files changed, 71 insertions(+), 200 deletions(-)
+> Fix these issues and while at it, fix some code style nitpicks as well:
 > 
-> > This complexity was then compounded by the multi-buffer support.
+>   1) make the functions static as users are unlikely to export them
 > 
-> fsverity and dm-verity will have to be updated to use multibuffer hashing
-> anyway, given that transparently supporting it in the existing API is not
-> viable.  If your concern is that in my current patchset fsverity and dm-verity
-> have separate code paths for multibuffer vs. single-buffer, as I mentioned I can
-> address that by restructuring them to operate on arrays (similar to what I
-> already did with the crypto API part).
+>   2) include the relevant header
 > 
-> > I think this would look a lot simpler if it moved back to ahash.
-> > 
-> > The original commit mentioned that ahash was bad for fsverify
-> > because of vmalloc.  But the only use of linear pointers in fsverify
-> > seems to be from kmalloc.  Where is the vmalloc coming from?
+>   3) Shorten the example a bit by removing a redundant variable
+>      definition
 > 
-> XFS is working on adding support for fsverity, and XFS was planning to provide
-> their Merkle tree blocks in vmalloced buffers.  Their plans have shifted several
-> times, and I think their latest plan no longer uses vmalloced buffers.  But in
-> any case it's still very convenient and much simpler to be able to just use
-> virtual addresses without having to worry about what type of memory it is.
-> 
+> Fixes: 04ce9ab385dc ("async_xor: permit callers to pass in a 'dma/page scribble' region")
+> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+> ---
+> Changes in v2:
+> - commit message: fix addr_conv typo (Andre)
+> - commit message: note addition of missing semicolon (Andre)
+> - add header include (Andre)
+> - shorten code by removing redundant variable definition (Andre)
+> - Link to v1: https://lore.kernel.org/r/20240523-async-dma-docs-v1-1-b900e0804e11@pengutronix.de
 
-I've now unified the code paths for single-block and multi-block processing in
-fsverity and dm-verity, which I think addresses your remaining concern that's
-feasible to address.  Your feedback has been conflating different issues, and it
-only comes in once every few weeks, so it's a bit hard to follow.  But I think
-the remaining thing that you're asking for is to make the API to be part of
-"ahash" and use the existing async completion callback.  That's not actually
-feasible, for the reasons that I've explained in detail.  See in particular
-https://lore.kernel.org/linux-crypto/20240503152810.GA1132@sol.localdomain/.
+Looks good to me now. Feel free to add
 
-Thanks,
+	Reviewed-by: Andre Noll <maan@tuebingen.mpg.de>
 
-- Eric
+Best
+Andre
+-- 
+Max Planck Institute for Biology
+Tel: (+49) 7071 601 829
+Max-Planck-Ring 5, 72076 Tübingen, Germany
+http://people.tuebingen.mpg.de/maan/
