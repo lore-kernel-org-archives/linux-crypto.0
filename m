@@ -1,94 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E6112D750;
-	Mon,  3 Jun 2024 13:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8805982D8E;
+	Mon,  3 Jun 2024 14:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717421391; cv=none; b=jjhZE2/2JstNhpfxvmti/N6gsVypj+vr7lo3MVsQ2Sn0sicqU/3lqd1UskMC2PT7GzKmwcdHSNs8p22Enf9c3k18qCx3HfO/Rk1+SRADjVWg7wc3ebHCNMNPPI+VvUNH5UFNWMKcSrBr73Cokcporwkc87IdEwkCbWcpb6KO+ns=
+	t=1717426553; cv=none; b=VGl9nzUkjVagvvcySNkg0EdP6HapMhD1LcKjiLOJ5kwVuly6BTuk690pM8/GDvXamekVHt/lEKBNCq46HH6wqOi/ATORdQv3HcaBPP7LILZQnbXQRwtpKZfiuANuDyq0odRV+vCKwRp6YIBRLPo02G1HllaQzv3qwD5ClzSe6Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717421391; c=relaxed/simple;
-	bh=roo9/J6B3hBxzpAXiJJMIVSoyJBVfDtkBQBzgk7WKws=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b664gpOK1r5YYhIKDIAHvrgq0wkX18FJUcQdBs8BrCGlJ7aaa+f1s+xHIw1PmtQtzvxCl+CKa2Ackqz5SOdNwSjwTY8R0DmvkV2Hm1XNPfJlK4iNkT/gEEQYi8jB23EJXvIHoef6eQ/v4VTyKaJn6UGtsuaIobj4jMjnPpGi0GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KdIbyzqu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717426553; c=relaxed/simple;
+	bh=rRYL5O5uFxrfPXRTXGs3PdFwo4eiDRSxI+b2OAvAt4o=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=eXdzT0kN5FUFjeueRI/6qGqJg54bW8IMc/X9JI6B8Au7tBovYSSc+Gs3uQCFWTs13XSXzIXneWyb1+ACGQycd6SSB4vUleFC1WbYSJT/piAAt3W133qRNF4MemMid9S+MUjgApuzXl7JhY8xneQJ75al4HeIi/H6xdT/nxhHyAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ljM1N9SP; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KdIbyzqu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEC38C4AF08;
-	Mon,  3 Jun 2024 13:29:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717421390;
-	bh=roo9/J6B3hBxzpAXiJJMIVSoyJBVfDtkBQBzgk7WKws=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KdIbyzquGuYIOJTn2zm82v8ERoyjRyE3cv6vmGXhvtE5TY+RzmLImP8sbU0SyxRjz
-	 f7a9nmde/2rPrC7FYPCpjVwEQpndWFJQTAtKaUJKggXd6rWXXEqIT/rypDQpwul1Gx
-	 iiwhkmo8/8S9ofBAHMeL2gKqIsQ1N+7gJdSLRJIT/tqja6AxdcEKzv8cnhN0BHH4Ki
-	 tLF6+s9j8+woUrPnqr94Gt2mBox7nqf29zw08ElLtrA1Kijw7hE7CXMaGxp2IZvhWE
-	 MKHZBavEkO7YmzMkG7Ni8RTXg53aXdy0pVe6PVohdPbKiDM9DPOwYlwk9HgXdkzIHw
-	 5ombMTF81Mnjw==
-Date: Mon, 3 Jun 2024 14:29:45 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] arm64/crypto: Raise priority of NEON crct10dif
- implementation
-Message-ID: <feb7b143-f2b9-4630-84d8-46eb66b355d5@sirena.org.uk>
-References: <20240521-arm64-crct10dif-neon-prio-v1-1-e2975754b8f3@kernel.org>
- <e103fabb-6854-4ce1-b4f9-6f6b7f912895@sirena.org.uk>
- <20240603131507.GD18991@willie-the-truck>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ljM1N9SP"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 453BpubJ029103;
+	Mon, 3 Jun 2024 14:55:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=DcwwxU9+7NAcu8GIP/a4Nl
+	2gakVndejm2PrNifddhM8=; b=ljM1N9SPH5qGBOS2927rCIeAV4wORbWOaYEnuV
+	k4ah+KJrM617ieyHw3AtkPRzYTinPazXLWrW9MeZDQTAnHxLtCx/Cn5QDKjs2094
+	AvpFZe1tx0wwczHmM4Xipu/HMx2MzoeIJi5Zp0IdC9/Ag/R+FDL9tQ7JKtU6nw9r
+	cqsB98E9smxR/Vhw83hHvakqNCY8P4mZsgmDCq275d5hgG/N5QAwhyB4Itf/BNtm
+	WJi4Mgp29uVizSSMDJZ/myOoYnSeJHCvafdtDBV8MGS9h51NAlGQeEReQVqs3o7B
+	QCEq4VtbY1Fbp75lh7wIdHO16eqWk2bLAhf9tmvlYNYT3i8A==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yfw4bc7gb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Jun 2024 14:55:42 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 453Etf9E029276
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 3 Jun 2024 14:55:41 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 3 Jun 2024
+ 07:55:41 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Mon, 3 Jun 2024 07:55:39 -0700
+Subject: [PATCH] hwrng: omap - add missing MODULE_DESCRIPTION() macro
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="AJXxKeV0pU/5Cp6l"
-Content-Disposition: inline
-In-Reply-To: <20240603131507.GD18991@willie-the-truck>
-X-Cookie: Don't let your status become too quo!
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-ID: <20240603-md-hw_random-omap-v1-1-89400f524bbe@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAGrZXWYC/x3MQQrCMBBA0auUWTsQa4jgVURkkkzNgEnKpGqh9
+ O5Gl2/x/waNVbjBZdhA+S1Nauk4HgYIicqDUWI3jGa0xpkT5ojpc1cqsWasmWa0MRg3+bOLwUL
+ vZuVJ1v/zeuv21Bh9L0L6nZ5SXitmagsr7PsXpuTPiYIAAAA=
+To: Deepak Saxena <dsaxena@plexity.net>, Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>,
+        Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.13.0
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: YgRAG3nxFmXTHBxUvwThQVvpDaDH842y
+X-Proofpoint-GUID: YgRAG3nxFmXTHBxUvwThQVvpDaDH842y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-06-03_11,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
+ phishscore=0 malwarescore=0 priorityscore=1501 mlxscore=0 impostorscore=0
+ bulkscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=962 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
+ definitions=main-2406030123
 
+make allmodconfig && make W=1 C=1 reports:
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/hw_random/omap-rng.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/hw_random/omap3-rom-rng.o
 
---AJXxKeV0pU/5Cp6l
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Add the missing invocation of the MODULE_DESCRIPTION() macro.
 
-On Mon, Jun 03, 2024 at 02:15:08PM +0100, Will Deacon wrote:
-> On Wed, May 22, 2024 at 12:17:41PM +0100, Mark Brown wrote:
-> > On Tue, May 21, 2024 at 09:22:49PM +0100, Mark Brown wrote:
-> > > The NEON implementation of crctd10dif is registered with a priority of 100
-> > > which is identical to that used by the generic C implementation. Raise the
-> > > priority to 150, half way between the PMULL based implementation and the
-> > > NEON one, so that it will be preferred over the generic implementation.
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+---
+ drivers/char/hw_random/omap-rng.c      | 1 +
+ drivers/char/hw_random/omap3-rom-rng.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-> > That second NEON should be PMULL, sorry.
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index d4c02e900466..4914a8720e58 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -564,4 +564,5 @@ static struct platform_driver omap_rng_driver = {
+ module_platform_driver(omap_rng_driver);
+ MODULE_ALIAS("platform:omap_rng");
+ MODULE_AUTHOR("Deepak Saxena (and others)");
++MODULE_DESCRIPTION("RNG driver for TI OMAP CPU family");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
+index 18dc46b1b58e..8064c792caf0 100644
+--- a/drivers/char/hw_random/omap3-rom-rng.c
++++ b/drivers/char/hw_random/omap3-rom-rng.c
+@@ -178,4 +178,5 @@ module_platform_driver(omap3_rom_rng_driver);
+ MODULE_ALIAS("platform:omap3-rom-rng");
+ MODULE_AUTHOR("Juha Yrjola");
+ MODULE_AUTHOR("Pali Rohár <pali@kernel.org>");
++MODULE_DESCRIPTION("RNG driver for TI OMAP3 CPU family");
+ MODULE_LICENSE("GPL");
 
-> Sorry, I don't grok that now:
+---
+base-commit: a693b9c95abd4947c2d06e05733de5d470ab6586
+change-id: 20240603-md-hw_random-omap-4dc06fb76dc4
 
->   | half way between the PMULL based implementation and the PMULL one
-
-> doesn't mean anything?
-
-Yes, one of those PMULLs should say generic (I thought I'd sent a
-followup saying that, sorry).
-
---AJXxKeV0pU/5Cp6l
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZdxUkACgkQJNaLcl1U
-h9CuNwf+IP0pEWsVg5+92cxDZrTFQZI4P4hAciSGbsT8IfSF6A9U/+iAPzSjJT2q
-mWHb2woghIIk/ggMTktn+bbUQ438lr3iRT3Dvr2BkrfLpKchurDewN+sSDUQM2Hm
-a67qgaDGo39qbNO3AT6nhwYA3EoJ75aCypS8/QUpVOiqSx9DMMOlVMVJyg9giv3R
-+FaKte4sYcf0ubZFn6MekH96QSFaZeeFQK2NXIml4MoqvJqv8puK30ZUozQ5Wa5s
-nQRFxDiEfvay4N86/xl7zfZVwKi5pwV+zSv7cueSiftLcLePP92HzqDU1dL1Uvql
-j+zZfZHUEfjTIPNGokmt0sECEOG1Gg==
-=AF6e
------END PGP SIGNATURE-----
-
---AJXxKeV0pU/5Cp6l--
