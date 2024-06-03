@@ -1,86 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361936F06A;
-	Mon,  3 Jun 2024 08:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5B412C484;
+	Mon,  3 Jun 2024 13:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717404955; cv=none; b=eWj9JJWPbNRTRg7sTfimyRu4sb5vdVOZLNW2PsRJyBLP78JtHJfGg0nMBIXvvkKzaJkUWXAMLKsl1EJgGPMST2nFH2WUJef1jhY0GWqfLEG/5oYLIUtWwMQuB2aq5TnewKjve2bKpjXC64glFQccEifx+GcNg3XkkI3BhMZ7/BE=
+	t=1717419669; cv=none; b=tNmzodaiwPhH3s7O4fpebZBTfcwe6ejMU0y3RwH9Izo8nlD3xVuXRaJo7eBJMcEmFpbKwm1taulKCPbmXCAl026NuU2aTb412R54kwGj1cPIkoPvm7yI4Mq0Gqkt9C2xpRfDYaRy4aFyVQdusnzY+c+fsLHhEAnGOmhE+ZIAA7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717404955; c=relaxed/simple;
-	bh=OwnINz2JiXqiq/N3LPDQSYRvitm3PIBafZoIZuqULbE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lQIigPb1vMmW7TexMyv6inMKktujXGkp8QOnzAhEyHZKYx3A5zIB3/2pS6cyK+WAXIU4iCbyXFiVfO6ZBAZ5FgMJWK76+wBBb6g4TJBEn43XOoW0IR06uKjtlKS1JOGPGcMtJkN6BXno677WZQT7vZLrG80e7gEnXI+EvitZJM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qmtVmiaw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717419669; c=relaxed/simple;
+	bh=hJYwoFGlnugTymRGVt1UgZWaPCCiUj0gq+QrUUX/45E=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=rHd6DdQEwWJufCVx+fpfBEBsyzlje/ypxTdZLwIT7WXGdXFB5QDAwMg4mVOqq+fkJ7BB6KFLaSUkaTJJcIcVwytZX25kM6inKqVfpFfEdx/0H5cfVIt8svAR/eK/KkrAIwl7ks7MsQNzsg/gh3tOINNlWoyOXBYSGtVywbrRSis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U9feCv+f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qmtVmiaw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A417EC32786;
-	Mon,  3 Jun 2024 08:55:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U9feCv+f"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0C118C2BD10;
+	Mon,  3 Jun 2024 13:01:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717404954;
-	bh=OwnINz2JiXqiq/N3LPDQSYRvitm3PIBafZoIZuqULbE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=qmtVmiawn6AViWBX80CeLW2Y3ZFi8+l28joNjzXEB/LNDUzrDQYg4Fj1Pms7kBRUJ
-	 nzxZf34V18Ci9togc5ByO7sshuDd/MeGCUzThXfWmuXksXpBSGglIH58p7mRckxJUs
-	 bqDPWuN6Vn0wnX8O70EMbR94SxUORE8uC5gOBVWzfo1EX9GvXLCjsuRIEdzygK3e5Q
-	 i05jjUJAvHHMLZINUqbW12vTcX0MXiB+Ra7EXGSA0qCGGjAZ1ROMQLDiydHRyAym5r
-	 aH2Z+rGzOlm6Xhi9pCa6fec2u/8sbHhPNWqPlEVUsPs//yR7JB9ry7Zl2AILP8QiTt
-	 o0EVbFt0WDxfg==
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5295e488248so4372211e87.2;
-        Mon, 03 Jun 2024 01:55:54 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXXKQ2PzWJZYRrHR5Hvvz+quVqUJtAJ0ZDkaSkdYjoTw7s+tI5p03XDp53Mkn1EYo0HAZe8QMBUE5khvt6c1DTBBfTNAn+csHHpW4FK
-X-Gm-Message-State: AOJu0Yx48Q9tgMEQB+WC8z4o1HyA2t9ZHdsjpLct6onMJ1BkQtvwak78
-	GExvSTECOYyCkVWrIugXa03xBx7rhFDqaMXiALzEhoNn3OFEqS+1kLpz7TzsVIl01ZzRuitBcB2
-	NobT2qR+ddsJhIKupnkCxjPR+jeU=
-X-Google-Smtp-Source: AGHT+IFpX6zFtChaemq94o7WVW/QWeE6j3RDJTVWIyMI5MCMGU4bIgei/LinvXGexu2a3D66nfGn2cfFHVRtfx6NCLI=
-X-Received: by 2002:ac2:5f81:0:b0:529:b632:ae4e with SMTP id
- 2adb3069b0e04-52b89564f8amr5798647e87.2.1717404952882; Mon, 03 Jun 2024
- 01:55:52 -0700 (PDT)
+	s=k20201202; t=1717419669;
+	bh=hJYwoFGlnugTymRGVt1UgZWaPCCiUj0gq+QrUUX/45E=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=U9feCv+fYTluUBwM4FpOl8q47QdLHhSbMGDa7v6J4r2GBJYbYLwO2ZxIlrKH8Q4+j
+	 tSq3yQiYAwpRGvJoeSPBDYQeAbbgiFwn+5lhXyMubLMao/4uLTxUXBenwAwtES8vbe
+	 R6UW5fk9ZzQoXMUih9Z49Ds1sMYuFcjyTjBeL0QC5cmpEo6lbAImf3J8IngtBAVzSx
+	 sx3VXcxelzYtVl9wPxviYkyz2j5RSyZupIwXf9eq/IEDAQTdH0zova4wQTint0KVdp
+	 IEPiPV2kIn+qi04NbEHKrwU8iNMcn7c++i1QtNAj0Ql1gfS0+RPa4u45TR7JpMCWpq
+	 Lx9zZgVxoMn9Q==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA63EC25B75;
+	Mon,  3 Jun 2024 13:01:08 +0000 (UTC)
+From: Nathan Lynch via B4 Relay <devnull+nathanl.linux.ibm.com@kernel.org>
+Date: Mon, 03 Jun 2024 08:01:03 -0500
+Subject: [PATCH] powerpc/crypto: Add generated P8 asm to .gitignore
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240602222221.176625-1-ebiggers@kernel.org>
-In-Reply-To: <20240602222221.176625-1-ebiggers@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Mon, 3 Jun 2024 10:55:41 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGLP7QaEcUcqKMqtKCOcTTTh9n=8hEG_24kn8k3O9bmpg@mail.gmail.com>
-Message-ID: <CAMj1kXGLP7QaEcUcqKMqtKCOcTTTh9n=8hEG_24kn8k3O9bmpg@mail.gmail.com>
-Subject: Re: [PATCH v5 0/2] x86_64 AES-GCM improvements
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240603-powerpc-crypto-ignore-p8-asm-v1-1-05843fec2bb7@linux.ibm.com>
+X-B4-Tracking: v=1; b=H4sIAI6+XWYC/x3MOw6DMAwA0Ksgz1hy+VSlV0EdosSAhyaWU1EQ4
+ u5EjG95B2Q24Qzv6gDjVbKkWPCoK/CLizOjhGJoqOnoSS1q+rOpR2+7/hLKHJMx6gtd/mIXhqk
+ fgiNqGUqhxpNsdz9+zvMCr/+Njm4AAAA=
+To: Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+ Christophe Leroy <christophe.leroy@csgroup.eu>, 
+ "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, 
+ Danny Tsen <dtsen@linux.ibm.com>
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+ linux-kernel@vger.kernel.org, Nathan Lynch <nathanl@linux.ibm.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1717419668; l=931;
+ i=nathanl@linux.ibm.com; s=20230817; h=from:subject:message-id;
+ bh=QihzfT/yvBcFqpbTNR7ndCqh7WaXVJqXBsXhRlZPQ90=;
+ b=QGuEuclbxZu65XOLMH9NK3EWtZhcZw+0yN7nFsIHy+I7MoKKPXUPvM7Gsd3TDDsqn7GmZ3CUN
+ CjIqTKmsh3OARa/D/u5bqr2EQMRnMMb17I33uslOf1hxKx6/We9aCDd
+X-Developer-Key: i=nathanl@linux.ibm.com; a=ed25519;
+ pk=jPDF44RvT+9DGFOH3NGoIu1xN9dF+82pjdpnKjXfoJ0=
+X-Endpoint-Received: by B4 Relay for nathanl@linux.ibm.com/20230817 with
+ auth_id=78
+X-Original-From: Nathan Lynch <nathanl@linux.ibm.com>
+Reply-To: nathanl@linux.ibm.com
 
-On Mon, 3 Jun 2024 at 00:24, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> This patchset adds a VAES and AVX512 / AVX10 implementation of AES-GCM
-> (Galois/Counter Mode), which improves AES-GCM performance by up to 162%.
-> In addition, it replaces the old AES-NI GCM code from Intel with new
-> code that is slightly faster and fixes a number of issues including the
-> massive binary size of over 250 KB.  See the patches for details.
->
-> The end state of the x86_64 AES-GCM assembly code is that we end up with
-> two assembly files, one that generates AES-NI code with or without AVX,
-> and one that generates VAES code with AVX512 / AVX10 with 256-bit or
-> 512-bit vectors.  There's no support for VAES alone (without AVX512 /
-> AVX10).  This differs slightly from what I did with AES-XTS where one
-> file generates both AVX and AVX512 / AVX10 code including code using
-> VAES alone (without AVX512 / AVX10), and another file generates non-AVX
-> code only.  For now this seems like the right choice for each particular
-> algorithm, though, based on how much being limited to 16 SIMD registers
-> and 128-bit vectors resulted in some significantly different design
-> choices for AES-GCM, but not quite as much for AES-XTS.  CPUs shipping
-> with VAES alone also seems to be a temporary thing, so we perhaps
-> shouldn't go too much out of our way to support that combination.
->
-> Changed in v5:
-> - Fixed sparse warnings in gcm_setkey()
-> - Fixed some comments in aes-gcm-aesni-x86_64.S
->
+From: Nathan Lynch <nathanl@linux.ibm.com>
 
-This version
+Looks like drivers/crypto/vmx/.gitignore should have been merged into
+arch/powerpc/crypto/.gitignore as part of commit
+109303336a0c ("crypto: vmx - Move to arch/powerpc/crypto") so that all
+generated asm files are ignored.
 
-Tested-by: Ard Biesheuvel <ardb@kernel.org>
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Nathan Lynch <nathanl@linux.ibm.com>
+Fixes: 109303336a0c ("crypto: vmx - Move to arch/powerpc/crypto")
+---
+ arch/powerpc/crypto/.gitignore | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/powerpc/crypto/.gitignore b/arch/powerpc/crypto/.gitignore
+index e1094f08f713..e9fe73aac8b6 100644
+--- a/arch/powerpc/crypto/.gitignore
++++ b/arch/powerpc/crypto/.gitignore
+@@ -1,3 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ aesp10-ppc.S
++aesp8-ppc.S
+ ghashp10-ppc.S
++ghashp8-ppc.S
+
+---
+base-commit: be2fc65d66e0406cc9d39d40becaecdf4ee765f3
+change-id: 20240603-powerpc-crypto-ignore-p8-asm-4d9f59da003e
+
+Best regards,
+-- 
+Nathan Lynch <nathanl@linux.ibm.com>
+
+
