@@ -1,427 +1,272 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2060.outbound.protection.outlook.com [40.107.244.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80751494CB;
-	Tue,  4 Jun 2024 17:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EAB283CDC;
+	Tue,  4 Jun 2024 17:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.60
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717522480; cv=fail; b=ldGnG2ow2qgbiM0OYCeN8ttzFuby/O5xuAuFAn38S2ENGu9/CXdgcItrZABI6YfOBnPfWRiulnR9JMo1aTDEWTJLuXkC9/hr9YYtuLOrOOuyKiyXYt31vInM4zOliJlYBzZEJ2bMG1RXCJp3QSNx79e1RM9ih5uFTTyw3c0NAgk=
+	t=1717523282; cv=fail; b=NI9k3ixASXzSZSkgk1GY22r/Z5NvCfEuL7jP3zCJxuATfNMLSsiWBhlG063gAiRl+947fLs+IHcJyLI2t4ZGyNBLFd+toC3WUsPa+4r8WTgP2ywyWOhMvJvpYy+y0+qeK2FfaDAWFkgCaOKajrMVf6sc7ffzpqKTYc15rrFvRi8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717522480; c=relaxed/simple;
-	bh=y3VdBLuGCJa4+WxgNLZDrBzXPXcvTMII6zboeqxCR1E=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=jLfnVAz6y4NMlpkbzwUGFCp7Qa1aqcD1dmE2pH+FbwKleh8ejr64J1lLwDUXEws/1tKMy99uJQfIERNx8x+ihfUBAZMmTauEovwle8BY6iT25CnLbVGPkvDV1qoV3agBmb5wlwEnb2Uqvc2Y8cwRH/6I2RIFM7WCSYVp0p2jWeE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 454Bn29D013802;
-	Tue, 4 Jun 2024 17:34:03 GMT
-DKIM-Signature: =?UTF-8?Q?v=3D1;_a=3Drsa-sha256;_c=3Drelaxed/relaxed;_d=3Doracle.com;_h?=
- =?UTF-8?Q?=3Dcc:content-transfer-encoding:content-type:date:from:in-reply?=
- =?UTF-8?Q?-to:message-id:mime-version:references:subject:to;_s=3Dcorp-202?=
- =?UTF-8?Q?3-11-20;_bh=3DiwAAH+yaHWyAcVHtLfsMpkiMznlEaS/of0fT1gFUsnY=3D;_b?=
- =?UTF-8?Q?=3DEW4Q5hE+R/lWO7PSBegVLLQJjpWSlshZtlOhQ4kmM7uKapvsC2O9Oo10nwrw?=
- =?UTF-8?Q?DLamf3Bm_r6aNSuox8dHmck3HDBKsd6zkwbVT/53ycaWI3BT/pdpUhZZdNmbYyV?=
- =?UTF-8?Q?fcIQ1M+gq1OB0A_RrlYAFmE9qh1JMiwupqazVGJO+NATohwTxR+iydDzQAvNE/y?=
- =?UTF-8?Q?7RczMYOifZFDvW0CZtss_DKvNj4CHCYwHuLwVpZE/9zaEnJQYD0M13X78xwzF7p?=
- =?UTF-8?Q?aQ1OneiMk/ofxmJgSuMIiFqEoB_GPmdeZjeQaN69hruVxdxIZZZpCsP4thQIaLU?=
- =?UTF-8?Q?dLGBmYI61yuNTsUmnHNAbWkhviBgEiBY_pA=3D=3D_?=
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yfuwm5jac-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 04 Jun 2024 17:34:02 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 454HFp7c016446;
-	Tue, 4 Jun 2024 17:34:02 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2101.outbound.protection.outlook.com [104.47.58.101])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3ygrsaesu0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 04 Jun 2024 17:34:02 +0000
+	s=arc-20240116; t=1717523282; c=relaxed/simple;
+	bh=FFa1Ul0ZxurxZb/cQoZLPpF0m74U9/1Etq18fAEUqZY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=p5kUlBNcup7w38a279CUQorZ28ixe0/6b2xxo3fdWzoU0tGs6qdS0bYA2fsgTv3pLXV1tlfZmcMvcQVjb2CM9OdQKsmI9Vqh2I4Q19H4UsGVvdo0JtfadLpiGC4GdauoMU9NyZiNJAFJWzlAw1Q1TsgJEK7TxkOeXXx21D/wZVI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=duYggbWZ; arc=fail smtp.client-ip=40.107.244.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="duYggbWZ"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PlV0CxdGSYQE/j6zRX0mPAERuBG392+9Ra5VDFDQccvfls7tuhXqDcn/NqnvTPotxiUM+8madc9Miioqgsziryof0/VbF/QMbzTfcUQGtVzOtDyyPAECY6gJkYkSvjmbLkvAwLSbsUP0LCJgmxDUoVYZwCBPMa0AJlx/Z5YTcDnGciLe/xoLpacJAzT5G0+XZeBaUJzdIc2tMfpa2a4kDSPMBpBhOK5mTSBKMGUcnBbzdFHj1sHi3l0SGmbcNSWj/desrhkZW9Y2HTTXmI0O4wKY3VYKTFCSYJ8DzhG97jdHJL47yVMx/JuCiYBIrzAlVQETF0PypdCpxNZpmhYIEw==
+ b=ALsUkEB3TyvxSUnCQGxTPLpXhr247x/tFG+xSqGYsu3GYKCSWveIY3cjwFZhn/agSCwfcP+TwCSUD971Oh58y92cUXQ1qWQOvXjmUI762wx9R0eTlIS9CzmWMo73hjvvEy6S13fe9KaCF4sbJ1R0VYtaDtP0Q/P/Rwd3a2arQnrz+yuNm1zRskFpWw4qRxZc1UGqmRTXH3nOt0tN/tGlKvK0lH7fviOwdIU/VEF4SH9ptFYFME+M4yiz+1S2eJZBPN+WExGdy0ocXo2VlC1CeJS58zs4jrVivKr52lyTp79VMV9JjROhYbFjJJPc8hXZrrFVnmxM7Hb/eS0O7fK8xA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iwAAH+yaHWyAcVHtLfsMpkiMznlEaS/of0fT1gFUsnY=;
- b=Dg3uBEzoUjQK3U4QnIFtK8SrocqktsocR4MJXVsfhCCtzWxn11YghpkLLskJu4Pp0QMJD+y1XoLdMDAMORJfsUTVPUFko+HocsHZosYRmSU8o7SIUWaEJ12XlmJI7ao6Rf/RMbvqmkiip+x07k2oNrZcj5LGays/+2l73rxYhaBFRG1+RyJb9CSprAjk1WS7cKI9oGc8VsUb6JOVVQsJxS2WNUaRiN5t+380dqhoSVeZiLqTgP48vwYAcOYMH44rffoD9K6ZknGnrY06uTXw//g/6pGTaAdnNamI+Fr6JNPtU95aXoruZW6pcAEkwaD7LKdWxA2CUoHtowyLqPNs9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ bh=h4NHqwnL6PFqzLLrFdGag7/iUkiB9VNlQAbjM2DUIVw=;
+ b=jNvv+hC7RKPKzU2q37SpD+WMQdXuNJEm6pfersZa7apdcrSJ2RjKiJjj/hybYE0bxNu3mH6/guOAXyNo6cAQ2kqrRiTNJQ9XEh6zlyOilA5QI4i+96jupi/roBfzYPFtcX/VKo+W7+nHNRr0M2FEelvNe3PZ9Skoqn5OCTYGHpnJFS7FDy1nRRF+kp+UHlq3bpFAQJTiHA71UlBCIWchIMqSJ5O6N8xndBiJWtmtfmLDQfMbJCldac9gd03uioVgSUjTVflhnm/42Ta+UCxJMy/fjpND4rf08wPZTrtShMvRe5CkDgEc6b1Kd1rPByIk+zbH2l+QmBx6htDCBl9HoA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iwAAH+yaHWyAcVHtLfsMpkiMznlEaS/of0fT1gFUsnY=;
- b=GjQqbSbFPiZ8j2LJ2YEIlYjMIXLDvy/RP53Rxv3nV/Euf/Ybm57eGVR6juTOLTBklp5dSh/L5XghixnFR8yh/q+AaM0yjMZlWWWais/0aL40NLrYJXDdcZPYU3zs8mSM7JmsX5QihuvgLGQSUb5FZub9R9Zq+Cd4u/rECv0Tyt4=
-Received: from DS0PR10MB7224.namprd10.prod.outlook.com (2603:10b6:8:f5::14) by
- MW5PR10MB5825.namprd10.prod.outlook.com (2603:10b6:303:19a::11) with
+ bh=h4NHqwnL6PFqzLLrFdGag7/iUkiB9VNlQAbjM2DUIVw=;
+ b=duYggbWZCVTpNkdkk7QSdyLS5zCbS2YsZ29mew5i13MgF8lxEHCw0OADnUR1CwGL2dE9/nGC3npwmcA8fQww6UvUrCFNvpOTgVwGpso7C/0BHcLPj1zaoYVq0Hgq0TxDpuz1UNQD7kNdJv/t7yGWy0HUZFrS9WKItup+rdjegEQ=
+Received: from BYAPR04CA0005.namprd04.prod.outlook.com (2603:10b6:a03:40::18)
+ by DS0PR12MB8042.namprd12.prod.outlook.com (2603:10b6:8:141::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.17; Tue, 4 Jun
- 2024 17:33:58 +0000
-Received: from DS0PR10MB7224.namprd10.prod.outlook.com
- ([fe80::c57:383f:cfb2:47f8]) by DS0PR10MB7224.namprd10.prod.outlook.com
- ([fe80::c57:383f:cfb2:47f8%6]) with mapi id 15.20.7633.021; Tue, 4 Jun 2024
- 17:33:58 +0000
-Message-ID: <5b32106b-bb7b-463d-8b0b-589e3d466bf3@oracle.com>
-Date: Tue, 4 Jun 2024 10:33:54 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 08/19] x86: Secure Launch kernel early boot stub
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
-        linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
-        dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
-        mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
-        peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca,
-        luto@amacapital.net, nivedita@alum.mit.edu,
-        herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
-        ebiederm@xmission.com, dwmw2@infradead.org, baolu.lu@linux.intel.com,
-        kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
-        trenchboot-devel@googlegroups.com, ross.philipson@oracle.com
-References: <20240531010331.134441-1-ross.philipson@oracle.com>
- <20240531010331.134441-9-ross.philipson@oracle.com>
- <CAMj1kXHaH6atsvwr6oVPdZuhR5YEXU33-2kYEn6xb1e=gidOCw@mail.gmail.com>
- <CAMj1kXHcYOPTLTh-hEtfHk+JaORGK+fEatTT+UOqLJww+_cNTg@mail.gmail.com>
- <5bffa507-75e8-4cce-ac0c-fe13d6efd3bb@oracle.com>
- <CAMj1kXHLaqyPAw5Jjg91pqFbHoMT2jDqui4rosyerHVudRsq-w@mail.gmail.com>
-Content-Language: en-US
-From: ross.philipson@oracle.com
-In-Reply-To: <CAMj1kXHLaqyPAw5Jjg91pqFbHoMT2jDqui4rosyerHVudRsq-w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR02CA0022.namprd02.prod.outlook.com
- (2603:10b6:a02:ee::35) To DS0PR10MB7224.namprd10.prod.outlook.com
- (2603:10b6:8:f5::14)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.27; Tue, 4 Jun
+ 2024 17:47:57 +0000
+Received: from SJ5PEPF000001D6.namprd05.prod.outlook.com
+ (2603:10b6:a03:40:cafe::29) by BYAPR04CA0005.outlook.office365.com
+ (2603:10b6:a03:40::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.30 via Frontend
+ Transport; Tue, 4 Jun 2024 17:47:57 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SJ5PEPF000001D6.mail.protection.outlook.com (10.167.242.58) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7633.15 via Frontend Transport; Tue, 4 Jun 2024 17:47:55 +0000
+Received: from fritz.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 4 Jun
+ 2024 12:47:53 -0500
+From: Kim Phillips <kim.phillips@amd.com>
+To: Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky
+	<thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>
+CC: Mario Limonciello <mario.limonciello@amd.com>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<stable@vger.kernel.org>, Kim Phillips <kim.phillips@amd.com>, Liam Merwick
+	<liam.merwick@oracle.com>
+Subject: [PATCH v2] crypto: ccp - Fix null pointer dereference in __sev_snp_shutdown_locked
+Date: Tue, 4 Jun 2024 12:47:39 -0500
+Message-ID: <20240604174739.175288-1-kim.phillips@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR10MB7224:EE_|MW5PR10MB5825:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5d790ca2-fc61-481f-5051-08dc84bc83a4
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D6:EE_|DS0PR12MB8042:EE_
+X-MS-Office365-Filtering-Correlation-Id: f9e10817-6ca7-43a5-709f-08dc84be7717
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|366007|376005|7416005;
-X-Microsoft-Antispam-Message-Info: 
-	=?utf-8?B?RWFmUXlxTnVhWnZ4MEtYNGIzQWd0N3EyY2pnMXJKeXd3eEhKNGpnVE90NHhE?=
- =?utf-8?B?NFcwQmFmV29CSlNEQzBkQmJ0anFoa0NYeTBwME1DL0pIVWZOdk1UQW9BMDIz?=
- =?utf-8?B?NGNIMmQrd0lBaVBkbTJVU2RWUUpWUW5OUUhoaUowTFNOcXF0cDNYcXZ1eFBZ?=
- =?utf-8?B?dGRGbkRGNDgveFUwZ0U5ZnR1UVJqN1lKNk9GL3I3Qm5UOXQwNCtaN1NDUVdC?=
- =?utf-8?B?K3F6OUllRi9aUE1xcFhDdDRmaFNEZEZBQ0tQbHA4WlhwN01EV296Nng4UkNR?=
- =?utf-8?B?dXR3UXRQVEE4a2VzaFl4K3BvRldSb0dmbEhhV3JKU2dSaUVUUXc0akZFUXZC?=
- =?utf-8?B?ejliYUhFYkZEcXRuUnpNZWFBS05oeVR3anVTQ2hhZkovWldvUXAyWkl4WDRt?=
- =?utf-8?B?UHRleExWQTdhMFFjdXdZbFVmVHJLR3hxbktyTlA1bm9IMzBRRlRQVjdiVEZy?=
- =?utf-8?B?Q0ovZGhjN0lzWndYYS96Y1FVVm1NRzNCTHhZSWxsUWIxTlBOZ09pQitiYUI2?=
- =?utf-8?B?WjQyQmh4Z2VvUHhFbXB3WWI1ME1LSnZDamxMc3lwemFsT2NUbUs1S3hJYTBE?=
- =?utf-8?B?RTdaWTlmNS9RbE1YRk02UEhaUDdyZ2dqd2ZtVU9SbXo1VDk4eUwvMDhYbWo1?=
- =?utf-8?B?MXBxa3RuWHF0ZHNKZklqamVtQmFvakhCbHl6UEFWcVoxeVBmeTJvMzZwYjA0?=
- =?utf-8?B?a0R0WnhHRDkxcVliMGNzcmdkbDA0T1I2dmVTRUJzOUU4UUQ0Zk5HYUhLT3Nl?=
- =?utf-8?B?SnBSQVpGVVhoZDM5Z3hibHJ0NTRVVThmTjZ6REdhM3hBUjZva0xaV3BNZk9j?=
- =?utf-8?B?Qk1XMFQ2WXdSd2hldmZFYXdFMTF3dmRDN1JJK1M5ZWVzL250NWFIWnRtaDhy?=
- =?utf-8?B?S09nUUV1eW01Y3gzVXlCUGMxWVhreS83NjRPZ2FQM2d5SjhSelhUVURCbUp5?=
- =?utf-8?B?RUZwckQxN3hEWUZ5M2JxcHpuQmRHY3l2TTlxU2Jjd3B6cUpocnE2dlB0c0M4?=
- =?utf-8?B?U05aU01kL3UzYWJTUFVDQVBTZm52WVpsWkNFTXNqZ1cyb0NhSm5qVTBZaCs4?=
- =?utf-8?B?WFZoaGp2ZE8rWXZ0VjVjdElOVi8vYXpMcVN6OUJTSEY4N0M2aGhBbjNlSDBy?=
- =?utf-8?B?QkNiUG9kVHJvb1M1TE5VVVVhcjBFclRta1FBbFhsRjk5MkEyMHRUNFNyMDZ1?=
- =?utf-8?B?LzBvUU80YjhxU1BoN0pZRnlybzh3K2NqaXhmdy9rYmJoRlo5Y0p0TXJsaXZE?=
- =?utf-8?B?eHIyQlNBMFpkM3ArNHlUWVp5U1laL1p6ZS9zRnpGUHVGaktGWWF2U21UeFRD?=
- =?utf-8?B?U09DaTlCTkpJVDFRSlpralRPdjhIVm51VzBmL0liN1JHaUQxaGhZdStuRXdH?=
- =?utf-8?B?dnNUTUZHZ1huU0Rzd2hMNTFTaFp5Slg1S3BGRlJ6eWl1QXlPTllnUEY4OWdh?=
- =?utf-8?B?UDBCSnNJQklSTlBhUUl3TnBWRXJYbGdtOFNTUzM2SldDMzhjZlo5TjRlM2Zo?=
- =?utf-8?B?ZnNQRzZyTkZKT1RKTWpyRnRmaEFoS2hPVnlxNlJkZVc0UmE5QXZEY2w0am5m?=
- =?utf-8?B?YTdHQUJnRUErbjRvd1FLRjMvUUxqWnArQ3dnWFJrQWtzYU5ZcnpZMk1DNGVj?=
- =?utf-8?B?MTd5OUd2YUdVTERRYTBXbG8wRTd5Z0V1NlpkT2RFZ2pueUl1emdsVmZCSGpR?=
- =?utf-8?B?MTBrZVFkblBmRVFhNVhXTFhrKzl3ZGlKaFU4bkd5SmVNK2hldDc5ZVpnPT0=?=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR10MB7224.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005)(7416005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?L0xzSkJsQXNsV2FPZHJEVG5GOFRnNHIrWlIyR1BIMmk5QnlVVDNSQkZNdnBu?=
- =?utf-8?B?dVVydXduRDlpanhwL0pzK1B0a0w0YUNBZWQ0WllRS3FZT1daVm5VaHZFUTcx?=
- =?utf-8?B?UU43NmVOYy9aRGFYK0tpZWJtRHN6SFNEMkZCZ3lTSE1OUzNBM0xVRVcwZkgr?=
- =?utf-8?B?bEpzRlFQc2E4aFBneGlrciswYzZENFpRZ1lkOWhoeUNOOHJOYlNXd3dCZXhk?=
- =?utf-8?B?Wk5xTmk4a3psSWxwdHpYMXU4Z1Bjb2grS1lwdWxFVkYxSkZnREVmV2F5YkZD?=
- =?utf-8?B?UGd1MEM0NGovOGpOYkZmWVd4TDc0ZTJOYTE4ZEpSMWJ2NnhvZjI0ajEyNndt?=
- =?utf-8?B?dFVjcTZienVlZkhTN09sTmpaWWpSTWVGVkk5TTN3R2lYTWFSV3BOc3dqakNx?=
- =?utf-8?B?dXhhcktkR3NlREgvR01nZzF5MUxnUEVlSUgwNmdmQXRtUXA5M1hvZkR0eFlO?=
- =?utf-8?B?MVZGZ1cxTlorV05MNm93c1R6b1lRYWZYaVgrWjg5SkZsMzE4Qk00RzlKZFFm?=
- =?utf-8?B?Z0lIUTJ5eFg5MzREaFBMcUxmM3hYVXNET0ZxaEtROUxmT3IrY2lGMGo2UERk?=
- =?utf-8?B?R1dJbmx0NEFBZmg0NGxhdkV0U0laRzFUb2hzdzQyRWE0Qjg1V29IdzVPNGVy?=
- =?utf-8?B?RWxNK2FCd0xRZjFWR1ZsR3RXOEVOVmRlbWpVVEFUMzZrLzJMQWtPQXpkenhR?=
- =?utf-8?B?elZZU1JPdzlmRXZOZytMRW1qWlZvclJMMEhtWWpnVVdIdFBrK3kxelRHbTRy?=
- =?utf-8?B?QUhCYjBqVEpjcHU2Y1NjcmpjcUp5bW4vTkVlcktJVExuTVoxVTlRSFo4THVz?=
- =?utf-8?B?clovVFFiR2c3eUtNVEJRUDZ0ZlpiaHNSbUNzb3RPaEtGbnlFcHV2VU5nOXlk?=
- =?utf-8?B?NFA3RnMrK1NkaElpQ2Nlc3Z3OXpDbnhvTStibWNjN2F2bmYwNjZpbW9CVmVY?=
- =?utf-8?B?Sm93L0dkMS94c2FQZ0NRdkRHYkxIOFp6M0FybHRnbStOVVF3T1F6eXo1OENi?=
- =?utf-8?B?M0dSYW9LYVFBc2tiRThOcjd3NTFWTnpVSXlxSTRYNEo4ZTdQRlhFWDdITWMy?=
- =?utf-8?B?L3JkTVB5UHUrc3Z2emV2Z2lqRHNzeEplOEF5THhuTmVNbG8yc0hIUEZBeHdI?=
- =?utf-8?B?bGsxU2JuNUVuYlkwZFMyQkl0d1FUUjA1WDBzOHI2V3FEYkpGeDFSbTlhK3lO?=
- =?utf-8?B?K3RFbmxDb0hFakFmNndGTmNmRmpEWW14T2FMeXlFYlk3a0VEQ2RTdEExWFhV?=
- =?utf-8?B?NjJvNnM2TEdGZ2d6cUZJSHZEVUlwb0x1VG1ZZ3hlMm03bmRxK1Y3eHEvbDY0?=
- =?utf-8?B?WnNKWHJPOU1aRmkxblBxTGJRY0N5bGlZU0FQOHI4UmF6elJYaUJEckdkWm5V?=
- =?utf-8?B?WitoS1JSNkhQbkREN05UWEp3eEJnOUZkc1V4MVBlOHVTbHFmcXp4ZkJ4RTEr?=
- =?utf-8?B?ajB4UFhKYVVYaXIzNVZUSnh1OElZZ1dTU0hkaDNTdlpNdXJKUGcxdXZpeDZU?=
- =?utf-8?B?aHY3cytlRlRYMFB3ZW53bVJFZGNENEFJSnJPY3FBeEtRRnVxVXhOV3VOWjFh?=
- =?utf-8?B?aDBpbUFUbGtIQmRIY1FRV2FnNFdsdVJBS214bHh2cUVGSGtaeFFzQkwwVTJw?=
- =?utf-8?B?dC9sbTNQenZlR0xhclRmNVVCZzA2VkRDN3laRkZTK2hlQTFYMzFMZmtaMW1T?=
- =?utf-8?B?OFFtSlcxcWM0dUxmYWFLK2F0dFpDMkw5L2ROSU43bTk3QWpUZnE4UnBnS2VB?=
- =?utf-8?B?Mlg0M1JFOWUyeXprNmZxREkvTjFUdzhJWVFDeUJqSUdqOE5aOElqaldyTEMy?=
- =?utf-8?B?M0hqMWgrZWZyTzcrT01ZcFNMdmZSV0d6ZjhBT2FobHI0TUowZ0VuYkJrT0hL?=
- =?utf-8?B?UngzemlJUW1EdXBMQnozZVNWcS9LQ1lSSjNtVUZWNnV2a0ZkUFJXS3c2U1Bh?=
- =?utf-8?B?V1VTdzFOMEVoeE9taHNNUTV0MzdrRCtIaHVDOHk5SEhLMVhIUW0rWEM0WlFZ?=
- =?utf-8?B?eFF4WDYrTDh6NGVrYzMzUzEvVEFQZ2pFUWtMcjBkNkpxNE5aWkNKMlVMTU5k?=
- =?utf-8?B?aWphUFBuL2YwLzYyNGdRdmlIZWR4YW1jT1Rsdmx1MUtNMHFkcnJobTcrWjVM?=
- =?utf-8?B?M1hmWWpRcFo4bFZjWFpQbEloYVpEVTUxL2k2SjN4OVdzZm9TbHhjM05MWDZr?=
- =?utf-8?B?Q1E9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	Sk3dzT8EFojTuSk7rfaArHH4ad+UPpsQiUr8swz5EK/ybpvFzkodzQcSUhAgxhjzCnV8lCyW2UzW582zBVx8v2EyRbIpmI4wm31g/Rc91G0kbBRrJHfp/tNYMbhB+Qe7SqRIBeImpjDMx8ABAjrFpvWfF4s3FZk7UmWjbyGhbntnvm1lQ7nJF3GutG8wPZS2+WXcsOoCoSNO5YRr9JF0o2SG+C4hGcQ/B4bLfEUkGr3Pi89rqATP+fY8OYQnFPt4uaf+OXnsRTQAjgRMOHupZ/Owx7WxxkRZO29dNTRoI2XHrcTfK+rG7cyjmEcY/6TNat3FU2gdNEVyS3BSZom9uZZxtW+CN5+WGAGpIN7KBI2rt8Ggewr14EKmCkHWGNWjcpbXC7LpCVNx9xO9cT7+juEO6QzsFv1Ajme4LBc9hjvQaLNooXBjGo3Jz9paQZidEZicWRvwMd2r4bR8Xe/o3EvbsDrYjgQgFmbunsaWjfaC252GqJ7GWABRxc2GPjxjqtx1te/9n6hYbfymbxNlsZpeK545RfHqZBPCuZkRMkTvGXPhsUXT30SbcOmAobY0aIWLEPX6IChXraepgnTTpTFPsPTQWLqtMDVKmzjqQSA=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5d790ca2-fc61-481f-5051-08dc84bc83a4
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB7224.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2024 17:33:57.8598
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|36860700004|1800799015|82310400017|376005;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?aSzimSdJheOv54pqg8Tmrt3DXrc0OH3OZtmbwTHK3FmMCTLxIfNmWm3EFSl+?=
+ =?us-ascii?Q?gWSqxFxzPXh4aacOic3vawpWronu8eHY8pDQhX4/uhmzZ6dGyu/l/Fbpd9SJ?=
+ =?us-ascii?Q?cJA1AHMtnspEYQ1zVkM1l2nfCbO+hHavVRf9XWAHcQVTmGzWZOdugQ3o3QkJ?=
+ =?us-ascii?Q?qmZH5MxIi4z8cQ9zKQD6uAYbCBwb1/pe5KbotnnEsEz5gqi5Mfkp+KbrBiFU?=
+ =?us-ascii?Q?FHM2HvSou5CQORgUNLBwkjY/YbUvaf60xK2nxyR/ETxhiJ8VD78PxIorajI1?=
+ =?us-ascii?Q?8FDHZGgt1KvsvtfsAxhvUcWGag/4ZDsevSZHB+lwteo6dxIlMRbOEPYA5x7e?=
+ =?us-ascii?Q?WRfgJfubMxYjQKRWxSfNuNk5RtWqHGCeka1xMN9sYzItoJUAYQtuHM1fgMbz?=
+ =?us-ascii?Q?jLzc9dmA8tmkiPVAN0CtPI5S96ZkWIVGggt0IvQetgM1iASBlcF/PpwUvaVX?=
+ =?us-ascii?Q?SN+bSW+b+KEpPITN4Msu0RI9yfKwV3vCaNaG+RMFRRaPPdGpDZj55Yz+cnL4?=
+ =?us-ascii?Q?oFhH+a0MgTnRTkbTGUt/AZpvZAJOE3IVFGFp4yoj7tgvYUPs7DuOOoQC924W?=
+ =?us-ascii?Q?8Jjy7qZWI/Yn4eBSkOkr365EejIWj+UCgxyCR5Hode4vSX9Q3L1FTNjKGXh/?=
+ =?us-ascii?Q?uPq/5X4LZUb8j3WS1R8zhH3nev0XCX0rjuxezcR7TiuvksYS5AVtvAifECvJ?=
+ =?us-ascii?Q?ufcCgAaoePqW3BaLkiaucaUp8x1Gvj1lCoyB6WNAi1k9O9ioF31S+GZoGLxu?=
+ =?us-ascii?Q?wfo7NkCdZM/UW+A4ivjR8PrJygh800lSMX9GR3EkauRnsWsnITDpUnDnhnKa?=
+ =?us-ascii?Q?lu/oFNOW6G7lqCLfDyBH2P2dnOpdD90+Kin6/wk/o4HMXqlP8/FK01GuWczz?=
+ =?us-ascii?Q?/bdFMXU/sdo5PcNfdrycmB6LnQSsvYz5t69oRTuMSpCN2ZqnQdAIHuYKcEIq?=
+ =?us-ascii?Q?kFpjCyl5iIFxbuyAEVMMwcbsMCTZUA0m93wxvbY0cm8BpvdP7u/WNAY8DCbn?=
+ =?us-ascii?Q?HI5BPk562YbE4/apjiTUjKte4c4XTMyZOJQejR6OGaZZ5czB2GMIzBcqmncx?=
+ =?us-ascii?Q?UArRR3NKFU9DNoPizZp2QhdYQuvQW3CR95Y3yslkAn1fWdFtU6o6DtQ8rx3n?=
+ =?us-ascii?Q?BrlYtIyPFvJhkL26N0/qn+iuFUHI6/H3BVohWI4LWHzlVmfAZnSJKV1QIen9?=
+ =?us-ascii?Q?bpoHu3B3KJD86X+WRdRASqgTuE+VSnPNW4FTZ9HkbyG9CC6jz/jRB5h3C7Pp?=
+ =?us-ascii?Q?hSKp+QPFg9pOFpRAtqfp4aFLTcVWaUlUzN2rwbqA+01we0i1nm6i58FkQ5qW?=
+ =?us-ascii?Q?s7j/303ibc2Ty/naGecBuzmyD5Iek7VSOX+2rf3kSqi+8hrgOTnT0KzkcTGD?=
+ =?us-ascii?Q?cY42oq9SwpchCf1OkHW5cYV9cjsrQAhsvDAj1QRZppoeKE9pjw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(1800799015)(82310400017)(376005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2024 17:47:55.4414
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AFi2ySnDs9URxEP1TlEenz2JixeEM2ExvF7FaIzZLxxZyO3U4qT5xn6Oy4Yvyf69a3Sf1BKWqxqhTCIB/fuvuAkCbGWHkbidfwRuCNX0uMg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR10MB5825
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-04_09,2024-06-04_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 spamscore=0
- malwarescore=0 suspectscore=0 phishscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2406040141
-X-Proofpoint-GUID: 2jeY6i5kTd45XkiGhbifNwZU3zfTi2Ih
-X-Proofpoint-ORIG-GUID: 2jeY6i5kTd45XkiGhbifNwZU3zfTi2Ih
+X-MS-Exchange-CrossTenant-Network-Message-Id: f9e10817-6ca7-43a5-709f-08dc84be7717
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001D6.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8042
 
-On 6/4/24 10:27 AM, Ard Biesheuvel wrote:
-> On Tue, 4 Jun 2024 at 19:24, <ross.philipson@oracle.com> wrote:
->>
->> On 5/31/24 6:33 AM, Ard Biesheuvel wrote:
->>> On Fri, 31 May 2024 at 13:00, Ard Biesheuvel <ardb@kernel.org> wrote:
->>>>
->>>> Hello Ross,
->>>>
->>>> On Fri, 31 May 2024 at 03:32, Ross Philipson <ross.philipson@oracle.com> wrote:
->>>>>
->>>>> The Secure Launch (SL) stub provides the entry point for Intel TXT (and
->>>>> later AMD SKINIT) to vector to during the late launch. The symbol
->>>>> sl_stub_entry is that entry point and its offset into the kernel is
->>>>> conveyed to the launching code using the MLE (Measured Launch
->>>>> Environment) header in the structure named mle_header. The offset of the
->>>>> MLE header is set in the kernel_info. The routine sl_stub contains the
->>>>> very early late launch setup code responsible for setting up the basic
->>>>> environment to allow the normal kernel startup_32 code to proceed. It is
->>>>> also responsible for properly waking and handling the APs on Intel
->>>>> platforms. The routine sl_main which runs after entering 64b mode is
->>>>> responsible for measuring configuration and module information before
->>>>> it is used like the boot params, the kernel command line, the TXT heap,
->>>>> an external initramfs, etc.
->>>>>
->>>>> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
->>>>> ---
->>>>>    Documentation/arch/x86/boot.rst        |  21 +
->>>>>    arch/x86/boot/compressed/Makefile      |   3 +-
->>>>>    arch/x86/boot/compressed/head_64.S     |  30 +
->>>>>    arch/x86/boot/compressed/kernel_info.S |  34 ++
->>>>>    arch/x86/boot/compressed/sl_main.c     | 577 ++++++++++++++++++++
->>>>>    arch/x86/boot/compressed/sl_stub.S     | 725 +++++++++++++++++++++++++
->>>>>    arch/x86/include/asm/msr-index.h       |   5 +
->>>>>    arch/x86/include/uapi/asm/bootparam.h  |   1 +
->>>>>    arch/x86/kernel/asm-offsets.c          |  20 +
->>>>>    9 files changed, 1415 insertions(+), 1 deletion(-)
->>>>>    create mode 100644 arch/x86/boot/compressed/sl_main.c
->>>>>    create mode 100644 arch/x86/boot/compressed/sl_stub.S
->>>>>
->>>>> diff --git a/Documentation/arch/x86/boot.rst b/Documentation/arch/x86/boot.rst
->>>>> index 4fd492cb4970..295cdf9bcbdb 100644
->>>>> --- a/Documentation/arch/x86/boot.rst
->>>>> +++ b/Documentation/arch/x86/boot.rst
->>>>> @@ -482,6 +482,14 @@ Protocol:  2.00+
->>>>>               - If 1, KASLR enabled.
->>>>>               - If 0, KASLR disabled.
->>>>>
->>>>> +  Bit 2 (kernel internal): SLAUNCH_FLAG
->>>>> +
->>>>> +       - Used internally by the setup kernel to communicate
->>>>> +         Secure Launch status to kernel proper.
->>>>> +
->>>>> +           - If 1, Secure Launch enabled.
->>>>> +           - If 0, Secure Launch disabled.
->>>>> +
->>>>>      Bit 5 (write): QUIET_FLAG
->>>>>
->>>>>           - If 0, print early messages.
->>>>> @@ -1028,6 +1036,19 @@ Offset/size:     0x000c/4
->>>>>
->>>>>      This field contains maximal allowed type for setup_data and setup_indirect structs.
->>>>>
->>>>> +============   =================
->>>>> +Field name:    mle_header_offset
->>>>> +Offset/size:   0x0010/4
->>>>> +============   =================
->>>>> +
->>>>> +  This field contains the offset to the Secure Launch Measured Launch Environment
->>>>> +  (MLE) header. This offset is used to locate information needed during a secure
->>>>> +  late launch using Intel TXT. If the offset is zero, the kernel does not have
->>>>> +  Secure Launch capabilities. The MLE entry point is called from TXT on the BSP
->>>>> +  following a success measured launch. The specific state of the processors is
->>>>> +  outlined in the TXT Software Development Guide, the latest can be found here:
->>>>> +  https://urldefense.com/v3/__https://www.intel.com/content/dam/www/public/us/en/documents/guides/intel-txt-software-development-guide.pdf__;!!ACWV5N9M2RV99hQ!Mng0gnPhOYZ8D02t1rYwQfY6U3uWaypJyd1T2rsWz3QNHr9GhIZ9ANB_-cgPExxX0e0KmCpda-3VX8Fj$
->>>>> +
->>>>>
->>>>
->>>> Could we just repaint this field as the offset relative to the start
->>>> of kernel_info rather than relative to the start of the image? That
->>>> way, there is no need for patch #1, and given that the consumer of
->>>> this field accesses it via kernel_info, I wouldn't expect any issues
->>>> in applying this offset to obtain the actual address.
->>>>
->>>>
->>>>>    The Image Checksum
->>>>>    ==================
->>>>> diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
->>>>> index 9189a0e28686..9076a248d4b4 100644
->>>>> --- a/arch/x86/boot/compressed/Makefile
->>>>> +++ b/arch/x86/boot/compressed/Makefile
->>>>> @@ -118,7 +118,8 @@ vmlinux-objs-$(CONFIG_EFI) += $(obj)/efi.o
->>>>>    vmlinux-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_mixed.o
->>>>>    vmlinux-objs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
->>>>>
->>>>> -vmlinux-objs-$(CONFIG_SECURE_LAUNCH) += $(obj)/early_sha1.o $(obj)/early_sha256.o
->>>>> +vmlinux-objs-$(CONFIG_SECURE_LAUNCH) += $(obj)/early_sha1.o $(obj)/early_sha256.o \
->>>>> +       $(obj)/sl_main.o $(obj)/sl_stub.o
->>>>>
->>>>>    $(obj)/vmlinux: $(vmlinux-objs-y) FORCE
->>>>>           $(call if_changed,ld)
->>>>> diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
->>>>> index 1dcb794c5479..803c9e2e6d85 100644
->>>>> --- a/arch/x86/boot/compressed/head_64.S
->>>>> +++ b/arch/x86/boot/compressed/head_64.S
->>>>> @@ -420,6 +420,13 @@ SYM_CODE_START(startup_64)
->>>>>           pushq   $0
->>>>>           popfq
->>>>>
->>>>> +#ifdef CONFIG_SECURE_LAUNCH
->>>>> +       /* Ensure the relocation region is coverd by a PMR */
->>>>
->>>> covered
->>>>
->>>>> +       movq    %rbx, %rdi
->>>>> +       movl    $(_bss - startup_32), %esi
->>>>> +       callq   sl_check_region
->>>>> +#endif
->>>>> +
->>>>>    /*
->>>>>     * Copy the compressed kernel to the end of our buffer
->>>>>     * where decompression in place becomes safe.
->>>>> @@ -462,6 +469,29 @@ SYM_FUNC_START_LOCAL_NOALIGN(.Lrelocated)
->>>>>           shrq    $3, %rcx
->>>>>           rep     stosq
->>>>>
->>>>> +#ifdef CONFIG_SECURE_LAUNCH
->>>>> +       /*
->>>>> +        * Have to do the final early sl stub work in 64b area.
->>>>> +        *
->>>>> +        * *********** NOTE ***********
->>>>> +        *
->>>>> +        * Several boot params get used before we get a chance to measure
->>>>> +        * them in this call. This is a known issue and we currently don't
->>>>> +        * have a solution. The scratch field doesn't matter. There is no
->>>>> +        * obvious way to do anything about the use of kernel_alignment or
->>>>> +        * init_size though these seem low risk with all the PMR and overlap
->>>>> +        * checks in place.
->>>>> +        */
->>>>> +       movq    %r15, %rdi
->>>>> +       callq   sl_main
->>>>> +
->>>>> +       /* Ensure the decompression location is covered by a PMR */
->>>>> +       movq    %rbp, %rdi
->>>>> +       movq    output_len(%rip), %rsi
->>>>> +       callq   sl_check_region
->>>>> +#endif
->>>>> +
->>>>> +       pushq   %rsi
->>>>
->>>> This looks like a rebase error.
->>>>
->>>>>           call    load_stage2_idt
->>>>>
->>>>>           /* Pass boot_params to initialize_identity_maps() */
->>>>> diff --git a/arch/x86/boot/compressed/kernel_info.S b/arch/x86/boot/compressed/kernel_info.S
->>>>> index c18f07181dd5..e199b87764e9 100644
->>>>> --- a/arch/x86/boot/compressed/kernel_info.S
->>>>> +++ b/arch/x86/boot/compressed/kernel_info.S
->>>>> @@ -28,6 +28,40 @@ SYM_DATA_START(kernel_info)
->>>>>           /* Maximal allowed type for setup_data and setup_indirect structs. */
->>>>>           .long   SETUP_TYPE_MAX
->>>>>
->>>>> +       /* Offset to the MLE header structure */
->>>>> +#if IS_ENABLED(CONFIG_SECURE_LAUNCH)
->>>>> +       .long   rva(mle_header)
->>>>
->>>> ... so this could just be mle_header - kernel_info, and the consumer
->>>> can do the math instead.
->>>>
->>>>> +#else
->>>>> +       .long   0
->>>>> +#endif
->>>>> +
->>>>>    kernel_info_var_len_data:
->>>>>           /* Empty for time being... */
->>>>>    SYM_DATA_END_LABEL(kernel_info, SYM_L_LOCAL, kernel_info_end)
->>>>> +
->>>>> +#if IS_ENABLED(CONFIG_SECURE_LAUNCH)
->>>>> +       /*
->>>>> +        * The MLE Header per the TXT Specification, section 2.1
->>>>> +        * MLE capabilities, see table 4. Capabilities set:
->>>>> +        * bit 0: Support for GETSEC[WAKEUP] for RLP wakeup
->>>>> +        * bit 1: Support for RLP wakeup using MONITOR address
->>>>> +        * bit 2: The ECX register will contain the pointer to the MLE page table
->>>>> +        * bit 5: TPM 1.2 family: Details/authorities PCR usage support
->>>>> +        * bit 9: Supported format of TPM 2.0 event log - TCG compliant
->>>>> +        */
->>>>> +SYM_DATA_START(mle_header)
->>>>> +       .long   0x9082ac5a  /* UUID0 */
->>>>> +       .long   0x74a7476f  /* UUID1 */
->>>>> +       .long   0xa2555c0f  /* UUID2 */
->>>>> +       .long   0x42b651cb  /* UUID3 */
->>>>> +       .long   0x00000034  /* MLE header size */
->>>>> +       .long   0x00020002  /* MLE version 2.2 */
->>>>> +       .long   rva(sl_stub_entry) /* Linear entry point of MLE (virt. address) */
->>>>
->>>> and these should perhaps be relative to mle_header?
->>>>
->>>>> +       .long   0x00000000  /* First valid page of MLE */
->>>>> +       .long   0x00000000  /* Offset within binary of first byte of MLE */
->>>>> +       .long   rva(_edata) /* Offset within binary of last byte + 1 of MLE */
->>>>
->>>> and here
->>>>
->>>
->>> Ugh never mind - these are specified externally.
->>
->> Can you clarify your follow on comment here?
->>
-> 
-> I noticed that -as you pointed out in your previous reply- these
-> fields cannot be repainted at will, as they are defined by an external
-> specification.
-> 
-> I'll play a bit more with this code tomorrow - I would *really* like
-> to avoid the need for patch #1, as it adds another constraint on how
-> we construct the boot image, and this is already riddled with legacy
-> and other complications.
+Fix a null pointer dereference induced by DEBUG_TEST_DRIVER_REMOVE.
+Return from __sev_snp_shutdown_locked() if the psp_device or the
+sev_device structs are not initialized. Without the fix, the driver will
+produce the following splat:
 
-Yea I should have read forward through all your replies before 
-responding to the first one but I think it clarified things as you point 
-out here. We appreciate you help and suggestions.
+   ccp 0000:55:00.5: enabling device (0000 -> 0002)
+   ccp 0000:55:00.5: sev enabled
+   ccp 0000:55:00.5: psp enabled
+   BUG: kernel NULL pointer dereference, address: 00000000000000f0
+   #PF: supervisor read access in kernel mode
+   #PF: error_code(0x0000) - not-present page
+   PGD 0 P4D 0
+   Oops: 0000 [#1] PREEMPT SMP DEBUG_PAGEALLOC NOPTI
+   CPU: 262 PID: 1 Comm: swapper/0 Not tainted 6.9.0-rc1+ #29
+   RIP: 0010:__sev_snp_shutdown_locked+0x2e/0x150
+   Code: 00 55 48 89 e5 41 57 41 56 41 54 53 48 83 ec 10 41 89 f7 49 89 fe 65 48 8b 04 25 28 00 00 00 48 89 45 d8 48 8b 05 6a 5a 7f 06 <4c> 8b a0 f0 00 00 00 41 0f b6 9c 24 a2 00 00 00 48 83 fb 02 0f 83
+   RSP: 0018:ffffb2ea4014b7b8 EFLAGS: 00010286
+   RAX: 0000000000000000 RBX: ffff9e4acd2e0a28 RCX: 0000000000000000
+   RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffb2ea4014b808
+   RBP: ffffb2ea4014b7e8 R08: 0000000000000106 R09: 000000000003d9c0
+   R10: 0000000000000001 R11: ffffffffa39ff070 R12: ffff9e49d40590c8
+   R13: 0000000000000000 R14: ffffb2ea4014b808 R15: 0000000000000000
+   FS:  0000000000000000(0000) GS:ffff9e58b1e00000(0000) knlGS:0000000000000000
+   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+   CR2: 00000000000000f0 CR3: 0000000418a3e001 CR4: 0000000000770ef0
+   PKRU: 55555554
+   Call Trace:
+    <TASK>
+    ? __die_body+0x6f/0xb0
+    ? __die+0xcc/0xf0
+    ? page_fault_oops+0x330/0x3a0
+    ? save_trace+0x2a5/0x360
+    ? do_user_addr_fault+0x583/0x630
+    ? exc_page_fault+0x81/0x120
+    ? asm_exc_page_fault+0x2b/0x30
+    ? __sev_snp_shutdown_locked+0x2e/0x150
+    __sev_firmware_shutdown+0x349/0x5b0
+    ? pm_runtime_barrier+0x66/0xe0
+    sev_dev_destroy+0x34/0xb0
+    psp_dev_destroy+0x27/0x60
+    sp_destroy+0x39/0x90
+    sp_pci_remove+0x22/0x60
+    pci_device_remove+0x4e/0x110
+    really_probe+0x271/0x4e0
+    __driver_probe_device+0x8f/0x160
+    driver_probe_device+0x24/0x120
+    __driver_attach+0xc7/0x280
+    ? driver_attach+0x30/0x30
+    bus_for_each_dev+0x10d/0x130
+    driver_attach+0x22/0x30
+    bus_add_driver+0x171/0x2b0
+    ? unaccepted_memory_init_kdump+0x20/0x20
+    driver_register+0x67/0x100
+    __pci_register_driver+0x83/0x90
+    sp_pci_init+0x22/0x30
+    sp_mod_init+0x13/0x30
+    do_one_initcall+0xb8/0x290
+    ? sched_clock_noinstr+0xd/0x10
+    ? local_clock_noinstr+0x3e/0x100
+    ? stack_depot_save_flags+0x21e/0x6a0
+    ? local_clock+0x1c/0x60
+    ? stack_depot_save_flags+0x21e/0x6a0
+    ? sched_clock_noinstr+0xd/0x10
+    ? local_clock_noinstr+0x3e/0x100
+    ? __lock_acquire+0xd90/0xe30
+    ? sched_clock_noinstr+0xd/0x10
+    ? local_clock_noinstr+0x3e/0x100
+    ? __create_object+0x66/0x100
+    ? local_clock+0x1c/0x60
+    ? __create_object+0x66/0x100
+    ? parameq+0x1b/0x90
+    ? parse_one+0x6d/0x1d0
+    ? parse_args+0xd7/0x1f0
+    ? do_initcall_level+0x180/0x180
+    do_initcall_level+0xb0/0x180
+    do_initcalls+0x60/0xa0
+    ? kernel_init+0x1f/0x1d0
+    do_basic_setup+0x41/0x50
+    kernel_init_freeable+0x1ac/0x230
+    ? rest_init+0x1f0/0x1f0
+    kernel_init+0x1f/0x1d0
+    ? rest_init+0x1f0/0x1f0
+    ret_from_fork+0x3d/0x50
+    ? rest_init+0x1f0/0x1f0
+    ret_from_fork_asm+0x11/0x20
+    </TASK>
+   Modules linked in:
+   CR2: 00000000000000f0
+   ---[ end trace 0000000000000000 ]---
+   RIP: 0010:__sev_snp_shutdown_locked+0x2e/0x150
+   Code: 00 55 48 89 e5 41 57 41 56 41 54 53 48 83 ec 10 41 89 f7 49 89 fe 65 48 8b 04 25 28 00 00 00 48 89 45 d8 48 8b 05 6a 5a 7f 06 <4c> 8b a0 f0 00 00 00 41 0f b6 9c 24 a2 00 00 00 48 83 fb 02 0f 83
+   RSP: 0018:ffffb2ea4014b7b8 EFLAGS: 00010286
+   RAX: 0000000000000000 RBX: ffff9e4acd2e0a28 RCX: 0000000000000000
+   RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffb2ea4014b808
+   RBP: ffffb2ea4014b7e8 R08: 0000000000000106 R09: 000000000003d9c0
+   R10: 0000000000000001 R11: ffffffffa39ff070 R12: ffff9e49d40590c8
+   R13: 0000000000000000 R14: ffffb2ea4014b808 R15: 0000000000000000
+   FS:  0000000000000000(0000) GS:ffff9e58b1e00000(0000) knlGS:0000000000000000
+   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+   CR2: 00000000000000f0 CR3: 0000000418a3e001 CR4: 0000000000770ef0
+   PKRU: 55555554
+   Kernel panic - not syncing: Fatal exception
+   Kernel Offset: 0x1fc00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
 
-Ross
+Fixes: 1ca5614b84ee ("crypto: ccp: Add support to initialize the AMD-SP for SEV-SNP")
+Cc: stable@vger.kernel.org
+Signed-off-by: Kim Phillips <kim.phillips@amd.com>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Mario Limonciello <mario.limonciello@amd.com>
+Reviewed-by: John Allen <john.allen@amd.com>
+---
+v2:
+ - Correct the Fixes tag (Tom L.)
+ - Remove log timestamps, elaborate commit text (John Allen)
+ - Add Reviews-by.
+
+v1:
+ - https://lore.kernel.org/linux-crypto/20240603151212.18342-1-kim.phillips@amd.com/
+
+ drivers/crypto/ccp/sev-dev.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 2102377f727b..1912bee22dd4 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -1642,10 +1642,16 @@ static int sev_update_firmware(struct device *dev)
+ 
+ static int __sev_snp_shutdown_locked(int *error, bool panic)
+ {
+-	struct sev_device *sev = psp_master->sev_data;
++	struct psp_device *psp = psp_master;
++	struct sev_device *sev;
+ 	struct sev_data_snp_shutdown_ex data;
+ 	int ret;
+ 
++	if (!psp || !psp->sev_data)
++		return 0;
++
++	sev = psp->sev_data;
++
+ 	if (!sev->snp_initialized)
+ 		return 0;
+ 
+-- 
+2.34.1
+
