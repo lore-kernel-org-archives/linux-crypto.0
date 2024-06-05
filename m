@@ -1,269 +1,473 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D4615EFD0;
-	Wed,  5 Jun 2024 20:41:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717620119; cv=fail; b=b9ZSKLPMpMEKP/8Xzm4tO1XMNrYXf8OuyRMYxM/gM0RpKddZY/+l/dYbZ48P9X8rzu/4F+kU0RPPAcpcpjT5k4dt/U/HQy+FxWZCbtyAu0yXWvWLR6yqB0DF5+GmEnSjKyfPtYAvIJVAJ9On7u4c1Tg5h+iUCK/R7MqE4MFY4e8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717620119; c=relaxed/simple;
-	bh=hn4NJnSvJD3COFv8L5xwdH+VqHEh2FAaTeLr0Vns86I=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=STg6dY+KGGqlXMeb2EJfH/6Uhcbvs4Iij84PB5gT7VlnG6mmYb5NupdXAhOCrDDjhiOkZFCpuWwwJkltD0AkqAAC28UGIR2+oJ4B7G/c/qWTqTScEBgP9SRetLIRuSmmZfOiQkk7W7/EC6l3eZAWXXGJ9NzfchKeGTllbM2tE3o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=AbP3KVDt; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=H4rMG3Ue; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB384965B;
+	Wed,  5 Jun 2024 21:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717621386; cv=none; b=Zy+F+SpPxeJgoPkh+l53XS7tVjcUxU1NiPy2ppWncASFvN+rmf9Civo3/qm6H2Fbl83gkyetMClVfSa3y70RIOD+REDCP5NXfIMq9cIH9Sx9shz/Lu/bK10fIYJt9rTgHlRWyg040EPDGq6fdMs1vLuJvPDZqiCpLfR4rppgFys=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717621386; c=relaxed/simple;
+	bh=vfI+XyntMxmAI6O3/rFI5Y7+85AiQSh7448Su6HkL0I=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:MIME-Version:
+	 Content-Type; b=mY1wf+00ZIbOU+I6EBxaMS4clzG4ZAxh0HcbsXL/rFcJxONVH9S0NJVRz4NTm8c6L9qXApT+ph9s52bhkV/9rUMkHKtNe3Dk7wSCLtOO3Djtnt+l9ECFagDPPqz87AoyZ6lwRtcZnuLkKkvRNjhaEai9HcUvVwko6TdgDQTZsv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fNorgy+J; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=LPepGnJX; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AbP3KVDt";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="H4rMG3Ue"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 455IxhNI015509;
-	Wed, 5 Jun 2024 20:41:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc : content-id :
- content-transfer-encoding : content-type : date : from : in-reply-to :
- message-id : mime-version : references : subject : to; s=corp-2023-11-20;
- bh=hn4NJnSvJD3COFv8L5xwdH+VqHEh2FAaTeLr0Vns86I=;
- b=AbP3KVDt8YuFIK2/dSZ9u5llSkAjIdBKTZPvLGspVHq5zMVKuCk1LV5XS08GXQ50tlaP
- cY2t+LPGz+jie9mpM43DrxyqXn0dOmNprK6z7v4oGg1FDO5AxDR2OByuTsmbCGWJBUKc
- ur059LExsv1aYn9Xfodp7E/POJk74JK0Tri7wWjZ4yD7DuJFgIuDN6MU0IbpXAbdaC8U
- ZVUkVGOTwZaB4a4/Cpyh5ermxlQqCuhQzMnmVZj1fCPYCcNATwaeNVs+RaiaSs6toISl
- 6Xr1aiWx9fapDKpkA1PrFmj80O7Q2A1pFFy/0BALtgfUBntTEkS84x64m6FpICfIcPwv AQ== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3yjbtwa71g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 05 Jun 2024 20:41:31 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 455JigJS020731;
-	Wed, 5 Jun 2024 20:41:31 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2044.outbound.protection.outlook.com [104.47.70.44])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3ygrj42d77-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 05 Jun 2024 20:41:31 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A83Vad7ZqhOjz5zhcIFc4E2dfx0XeKo5HvC9wcKqRwjuNEt9xp89Yui2fzH8fGg1pPykmX4j8zA9wb7xtm2jtpsIUD5tpFRyYGNlYygz/UONWC0lTkFnldpDGOuLMPdnguprljY3Hwi+zDlpwOMVw57FHAGPDJQ+YUu4L6hEw61uUaTQX8pRv+tMd2uu9QmS136kxP6yAU6uw5wMCKO6ot7ovNplG4FlAVaFD4lmrrrHjKuVlKAkwQ/gH1KeiNhiNaywNSYKIf519rnHlKzI3BWx5qFD8W3cTIU+QzsVHdQXugW9FP7zI9qOXjFTlnsrhTD107hwHT0JZo5fLyXyjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hn4NJnSvJD3COFv8L5xwdH+VqHEh2FAaTeLr0Vns86I=;
- b=AsUS1mJgfvMNlKBtdQP9msHTjauTKxNn5xaF1Zotqly8SOs9vahkXoycqK6VVAkSuMI5UjadRjP/P2F3QE/KYGZHGijuN3Dq1Tg/eh8CLB0UjIsxz8pjBsuMGKDKUsRpqOsACMfK9Bne9tW9JrZCTUA38WSvWzj3miEdgGYAn285V14cpnihTM1vu/DkdwLWc1sED41BNTJf614hrBMcJnUxTSTITGb3Fa+IpgYdtm7bI22FNgYt0mDhyIsmUOThdC2jo+WVgP+3csdyla1ZkRP1cez2WJ+UHChhPwr0//nzoYQeX+bigO8JSGXwpwDkvJapFHIjsjWlOTDdewmxaw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hn4NJnSvJD3COFv8L5xwdH+VqHEh2FAaTeLr0Vns86I=;
- b=H4rMG3UeRhMnEdisOLF7X50iyMbgb9j/mPQAIky56j1e7q8C3FQo0GotBb9wQ0N64ayqkdso+wlvOHWt/pZqjSIMLsiF2kPK4SkHNrJ7LXWm8dGQ5kCu4HD6VpudYOlFNaoyAF4cLR9jfN+/DSQgPq2lXy0ixJvGF6Y1OnHWg2U=
-Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
- by SJ1PR10MB6001.namprd10.prod.outlook.com (2603:10b6:a03:488::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.22; Wed, 5 Jun
- 2024 20:41:28 +0000
-Received: from CH2PR10MB4150.namprd10.prod.outlook.com
- ([fe80::5527:ab55:d1e7:9c9a]) by CH2PR10MB4150.namprd10.prod.outlook.com
- ([fe80::5527:ab55:d1e7:9c9a%4]) with mapi id 15.20.7633.021; Wed, 5 Jun 2024
- 20:41:27 +0000
-From: Eric Snowberg <eric.snowberg@oracle.com>
-To: Jarkko Sakkinen <jarkko@kernel.org>
-CC: "open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        Ard Biesheuvel
-	<ardb@kernel.org>, Paul Moore <paul@paul-moore.com>,
-        James Morris
-	<jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Mimi Zohar
-	<zohar@linux.ibm.com>,
-        Roberto Sassu <roberto.sassu@huawei.com>,
-        Dmitry
- Kasatkin <dmitry.kasatkin@gmail.com>,
-        =?utf-8?B?TWlja2HDq2wgU2FsYcO8bg==?=
-	<mic@digikod.net>,
-        "casey@schaufler-ca.com" <casey@schaufler-ca.com>,
-        Stefan
- Berger <stefanb@linux.ibm.com>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        open list
-	<linux-kernel@vger.kernel.org>,
-        "keyrings@vger.kernel.org"
-	<keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>,
-        "linux-efi@vger.kernel.org"
-	<linux-efi@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org"
-	<linux-integrity@vger.kernel.org>
-Subject: Re: [RFC PATCH v2 0/8] Clavis LSM
-Thread-Topic: [RFC PATCH v2 0/8] Clavis LSM
-Thread-Index: AQHasvMN4yYIC0cA6U+n9RVkfqP38rG36/IAgAG/lYA=
-Date: Wed, 5 Jun 2024 20:41:27 +0000
-Message-ID: <80B82939-AE39-41A8-A417-BAC8611E3121@oracle.com>
-References: <20240531003945.44594-1-eric.snowberg@oracle.com>
- <D1RFFIVMEENQ.3RXXNAGNWBE1O@kernel.org>
-In-Reply-To: <D1RFFIVMEENQ.3RXXNAGNWBE1O@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3774.600.62)
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH2PR10MB4150:EE_|SJ1PR10MB6001:EE_
-x-ms-office365-filtering-correlation-id: 2de1a7cd-a900-4fdd-7a4e-08dc859fdfb4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: 
- BCL:0;ARA:13230031|366007|1800799015|7416005|376005|38070700009;
-x-microsoft-antispam-message-info: 
- =?utf-8?B?UVArbHArRG9XUDd1ZTJvaEYvY2ZwQkhBY1ZySzN6RnprRXI0dU9ha1R1R0FD?=
- =?utf-8?B?cGNlWUQzTndNenhVYnhDLzhuNG0weTk3a0JvemcxQitrT2NqbUFqV0FNQm5N?=
- =?utf-8?B?OVN3RUZUYTVtSGtVSGNkOXVjbktuVUFLLzBGZ2FSMHg4TzdhNUFaRW9TMVJC?=
- =?utf-8?B?aDcwdGk1VXcvUG5Fa3ViamRPVzNEejlpWG4vMC9wcTV3NWtwcEtTM1F3QVZx?=
- =?utf-8?B?N3ZLL1FIWDhWRjNiZnVFK2F5Y0RPL2JsSHpRTnVvWjdadjFSMGpEbjM3Q2Qx?=
- =?utf-8?B?dTg5Yko3ZHFjaGVjOGxnY2FKaFFHSzJlMnlYOG1zWmJRZlBGYkpNcjhWbnQz?=
- =?utf-8?B?MFV2T2lJSllLSGZZV1J5VGMySkd3d2dTa0tVdEtXbDRZNlJBTmNrMzk3TjZF?=
- =?utf-8?B?VGNBVnlobUNKUktiS25uVEFvOExUdDFIZjdlUnpUSzl2eFV6T25oR2pwRDhq?=
- =?utf-8?B?S3NIS2dqS1RRdFo5K09SY0ZUS0F3anlycHJ0THhQNjArRVFYeWIxWTFaZ2M4?=
- =?utf-8?B?QjAwdGNOY3MwQmNrWlg3VUxhRFdUcUdCQWFRZEpwRzJHVmM2RnhGTjhmY1pN?=
- =?utf-8?B?bFYyVzU3cjFyc1NFTWdOdmRhMEJWV29YUTRJaE5uN3d0L1pBbEtoeUZTdXZX?=
- =?utf-8?B?bDMxQTl0OSsxL1MyVEsybW9kYVNQZVZxaS8ydGovY3B3YnRRZ1pONk9qZjli?=
- =?utf-8?B?SXRBNEt3aDdVWHNTWDZCU1VLUzVpbW5KUFVadE5uYlJvOEhCVWpJS2Roa3hB?=
- =?utf-8?B?eisxekRzMzZhZmlVbC9oeXFudGxNaGgybGREV09BaHpOalJORndlTkt6RUFF?=
- =?utf-8?B?ODkxNStvOHljRi9VWHA5WVVQTGs3TWdVSlpqdWFiaTZqaklvRGhPZlAwNGxJ?=
- =?utf-8?B?VXdYUmJCb2ZMS1V2VFBmc2g4ZXdsb1ZyaHV1WGtJQ2VsQVNrRitzMUs0alNr?=
- =?utf-8?B?Q2NXZnh0Mnc5TUJKUlZQV0FVY1E0Y3c2Tm5ranh1Sk9sUlpORzNLeS9qcTBp?=
- =?utf-8?B?L3ZCM1FnUExmVmNrVGVKaUQvZHAyOWN1V0pPQy9VaXhhcHIySWJic1A2Sk5W?=
- =?utf-8?B?K0xXZkJyWlBuWXJoQ1Zaa21HR2ZyMTdSMkZxdzlidW1vUGxrSGpPZ0pocFFZ?=
- =?utf-8?B?bXpiQ2VFZXlsTXVwQ2V5dWQ2aloxZUFKWWdtR0NmdFBjUXVYTWUycGQzSENB?=
- =?utf-8?B?RXlXb0l1NXBad01qQ0RCbC9ITE9UbjQ0K21rQ1hpRFRUdGhpWGthZCtzMjds?=
- =?utf-8?B?TmZTNENPVWFUaXFmVUFCZDhQckNBUHR1RVVlVHNHTUxHWmdEeEtlOUg0Mk1D?=
- =?utf-8?B?Wk9NSmhyc2dTYi81dm5ROXIwVmpVRWNETEJ3Z3VOSmpRZ1A0RERkZDQ3L2I1?=
- =?utf-8?B?UmVVenZuYS91dDNUM3hjSGNEUGNrSjdYT3JRUXg0N1FtT3I4NXIwTkg1OGRU?=
- =?utf-8?B?ck9lbkJ0b3hnZzA4MkEvVVVNQjBYQVZSa3B0aUw0UUhqbnFKTnNpRENFaS94?=
- =?utf-8?B?akJEbTdmQXVadSsyeWIwVjArY2FJUzZvSUQ4UVJSMjI2MWNXV0Vub3JhVlFv?=
- =?utf-8?B?b3dTeE04NkRFQmZKQlp1RVIxQ0l5UEp2QWllZi81SmxrRjRaZHdwR0xmR1hK?=
- =?utf-8?B?NjhCVlZvNzZmTTdEYm9FdDdwVVRuS3luNlU4REc4aHFKcVZNd2tzSVVjQzc3?=
- =?utf-8?B?UzdoeWVsbFJiSksxWVQvaUdtLzJXQXYyVU1JVjJGUFVMb1Bmb3R1OWpqRWJ3?=
- =?utf-8?B?MFlPNTBuclZUT3h3MUs3S1VpcFRzcklNZUkzeUU2SVEyaWFxWWd4aFRCZDVO?=
- =?utf-8?Q?IQL2wGiCa5UK9XsWVIpPP0r5PlPD5zo0r3TFg=3D?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(7416005)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?utf-8?B?bnJKekI5dHF0Nkl2ZjZ3SnNtWlJuSncybGJKNEhtTGtQbnkvWUo2d0lNTkN4?=
- =?utf-8?B?UW9XQVRTVUM2alZqRytER2Z6VUNNdFFQV2ZQSFdlSTJ3U0FyMmR0bGIvbUpO?=
- =?utf-8?B?aTZkbFoyMlFmT1ZMRnFnUVAyakt1bVRtczFxMmpsUUNwdnJUTmtIVzNucUpF?=
- =?utf-8?B?U3Nna1k3TXlNMjNEYmFXZE1TVUJia3VzSldOb3Z4bkpSeWpXVWVENW81WmZC?=
- =?utf-8?B?bHN3aUtzU2FuTnR3d2RNd1oxcE1PdXN3TVVob2JKbWJBSDU2VlhibFVFM0tu?=
- =?utf-8?B?cFk4Y0IzWmNoQ3hwcEU2OHNWMEdoaTdhU2dEOVAwV1VvQkJWdG1ML2VFc3dr?=
- =?utf-8?B?c1g1YTR5WnFsQUxoRksrSzBwRGoyd0J1TWVrNnRtOHkzcTVjQTZ1UlM1RVRK?=
- =?utf-8?B?SXUyWDFqdCthRXorVDBPbUgwWW9HbXhXWityeUE3SnN2WTJLd1lJV1RFQlA4?=
- =?utf-8?B?cjloZ1pZWVBYZXZZUnlzMlM4eVJiRWxyWk13VE5ETW1QTmNIRDFndVVSOUFz?=
- =?utf-8?B?andaSE1Dc3FIZXkyK2NjQ1NjWlFoZmxhMWwvcmlENTFUWlBWdzloNkY4RlU3?=
- =?utf-8?B?WFJHU2M5VFZsM2JDditsLzE5R3RuY3RPRERuWlh4YzFzbmdkaW9Hais3a3g4?=
- =?utf-8?B?QzdEMkhSazdBWWo2QTdKZytCbEY3QUNBalo2QnRteVArL0lxWUMvY1lCOUxB?=
- =?utf-8?B?WmsyREN0M29kdjRzMHNsS2tUd0xONU5ydVd4MkV5ci9ucUh5OGo4OEdMVHJ5?=
- =?utf-8?B?cTE5VUdYcGJLUXdnVXE0ZUd1SlVTQjFNY0Rzb1NIZnZNa1Z5cy9QY1FpQzdV?=
- =?utf-8?B?UHVTQm1RVUZVZ3NVMVQ2bkkrTXlMWHJOM3llTjZWRWQwMFZIV2RVS3NuRTZ3?=
- =?utf-8?B?U2hnejhFZlJxSXpCYnJXMXcxNFJsZXA3L21rK2wvNGVtbjhocDNlNjBwb0xJ?=
- =?utf-8?B?Qk9TcTVIQkt6dEkrNEZwbzhza0RTM0s2TjZXWkpDZlFtdVMvaDF3Y0NYUDBn?=
- =?utf-8?B?VDl2KzNQMFJwUEV5VFMwbUhxeVprQ1ZsR3ZNbk83QjJCelY1YXp0RnlPV1l2?=
- =?utf-8?B?Vzl2ZmlvSnl0dXZCbXo0TkdzdzcvSVZRSlpEdmZ6VUFORmUxcHpDUE9id1g4?=
- =?utf-8?B?MmwrM0dUWEhHY0JnMHdQNkNrMkQyMnRpTmxTeU9pWDhMajVXMnJOaTh6T2or?=
- =?utf-8?B?dFd0YlVzZU9QMmhQejV3dDBadWw5Tm9adEt5dGV1Nmt6ZUlaenpDT2FaV0Na?=
- =?utf-8?B?L1UrbXNLRG0xZ29jQXlqMFlzUkdaMlp4bkJWMitQc0pMd2Y5NzZyUTVHQlNV?=
- =?utf-8?B?K2NzL1hYUnloTEZkc1pvaXQwbEVCS0xPd3QzUWd6RDQraGVPenZ0VS9NZ1BW?=
- =?utf-8?B?OExweU50RWZidysvYTFOT2VjeVVFM1FUUkVzRTRBZG83RUR2SVRRWERnZ2F6?=
- =?utf-8?B?WXQ4TEkrZE85UlBTbm8wVzVwNm1YTGNCdmdBdG5qdjM1MnUwTHdFa2hqdUlu?=
- =?utf-8?B?UjF5ZzZ2cDg1VEgxTkFDYTRSc2NaZTJ3NE5kUWJHb2IzS3Q4dEtQbmk4OVdK?=
- =?utf-8?B?MkF0K2hnMDRvVjRzV1M4NVpmMkVoUk42YUtIcVhYSnd4c21DbWk5U3R4Nldp?=
- =?utf-8?B?K1ZMUzZ2UytBOUJyZ1g0NEhPdFkyRzNrYzFPelpMOVJoVzVkbWhDZGF0ek9o?=
- =?utf-8?B?Wnh5QzVRNTZVQmVFdmsvcjkxVzhLMEZaUUt1K0RrZ1oyQ1NtWFA4VzU5ZXRk?=
- =?utf-8?B?Q2NlN1JvdFlFNzJMaGJncEpxc1FSMFVIenRBblJ1ZWcxZE1qL1hoN2NmR25K?=
- =?utf-8?B?bnRsMUdkVjZJbG45L2VkZmlFMFZWM2FkK0lLN2dGU3cwb2t5WjhiaWlNdTZT?=
- =?utf-8?B?M3d0MU9TK2g5VnhVWnNHVFJEK3oyakI4RHdDa29xSkJ5VFd0NXJJdks5MFJJ?=
- =?utf-8?B?a0xaNGhsZTZ4NTZuU1I5bEFuMXJUV21zTVBhaWNldStlaEI1Si9QVTVTK3R1?=
- =?utf-8?B?Z1dqRGp2V2RzcjNUNGxWb3RpLzFxNEFOUXhCelR6Y2ZneXliTXRsYi96RlpC?=
- =?utf-8?B?c20yT3Y4YVFmTjNRTjdzcTNKUUYxbmtPRzZRMHlpNVh4cGRnUVJRVFB6U0Rh?=
- =?utf-8?B?T2l5RkRjUGFsbUtLVjNqcytDZzU4WDJReGV3SjVTaW9LN3pJMUVOdXBndFh0?=
- =?utf-8?B?THc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A0B7FD73E578D0448A1BFFA20408D3CB@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fNorgy+J";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="LPepGnJX"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1717621381;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:  in-reply-to:in-reply-to;
+	bh=8DOUd1z26K2knCIWSgj8FMgcXpFTrWvUtY/7BVdEfEw=;
+	b=fNorgy+JGm9AENDN8YUp+RbIqtXI8EnmdN5qHvaLEyTlRGW1KBrkhUNJ2HWqoA8jsl9xNk
+	3zQmTQ3FuNHwZMhK6R7JVXtchsxmZ1arGW+3eS8v5X+2wmqkoDNVjXJi7ldoUXAnUpf+Ds
+	gqmuJZwkE1ZEoXQJDofwze5nbFaKvPocTpGXj/k673g1TTNYl1Nzz+oUY9zRrKPnnS9/H8
+	VnjohfoLJI1qFLHevai8WwaAIJj6CGiPZvBaCgHLSRrPHBmeSgF8JYIK88vqo9alzcssF0
+	rcRPyjwsAIbCE/rrkdp+64Ltbr1+BOdwyilfefZJcQf8Oe/aC8IUeQU8yfeUWA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1717621381;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:  in-reply-to:in-reply-to;
+	bh=8DOUd1z26K2knCIWSgj8FMgcXpFTrWvUtY/7BVdEfEw=;
+	b=LPepGnJXLg7QRH7lIFbHZYS9VUJlzcUZ36zts/3nj/l+4PtPABkc5yZE5owExP9aZvQyZV
+	Y8ozeupyt1/ybkAA==
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-kernel@vger.kernel.org,
+ patches@lists.linux.dev
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-crypto@vger.kernel.org,
+ linux-api@vger.kernel.org, x86@kernel.org, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Adhemerval Zanella Netto
+ <adhemerval.zanella@linaro.org>, Carlos O'Donell <carlos@redhat.com>,
+ Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jann
+ Horn <jannh@google.com>, Christian Brauner <brauner@kernel.org>, David
+ Hildenbrand <dhildenb@redhat.com>
+Subject: Re: [PATCH v16 4/5] random: introduce generic vDSO getrandom()
+ implementation
+In-Reply-To: <20240528122352.2485958-5-Jason@zx2c4.com>
+Date: Wed, 05 Jun 2024 23:03:00 +0200
+Message-ID: <874ja73xx7.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	Fc/sZ7XxoxzE+VBA4iacYlOTpQRV06Mbio9Xo8O59i2L4qARH3BL+NaJcWgSjJowuLTczAcYYDDvxwI3VOf6p9WTaHMFrXvmmy7M5Fx9OOVL1VEmVYGIltC56ApYcqx27424Ali4YiLPKb9+Gng3xmLiZMMivFSNlR0L6KRQBCmcKIDjPaC13d1Vd3fuHbAMUwGwb/F245SFf9hHRmVx44AMwbCdmueYlyR9tiEdBc7hOII0P929m8nkh+iI9BNxDJQBnEdjCSGc16kvj5vmXheSWVDFvJWvDnFVbVT8R53rePUTD7AtNDamIVO7ynYE2lKrVCny9/LHYChoEzwWNpzSAOWwOOkboKprpvhoSeopAbqdNHQJpRN5ClVvUQDauqUnq7Rs38u75N0zbtbAHf/zLf1+MBLFPAx8V81V8lWlCaQYi20yZli+jVKs0VX+DgzVmBjleWsWkmBwAUPHqMX8jam6fxsFEb0z5+CXtPxlTK0H/h6dYhEgZdcNnYVDj3EO3xzMibj8XqzGyxpidUQI/5IaY0efHWc8cnZ3fX03HzPrRLF8/n2NXy6WyEH6iDNSzkoRDrpHXxb/jCtHHW5eT6dS+eqSp00AQX7QwIg=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2de1a7cd-a900-4fdd-7a4e-08dc859fdfb4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2024 20:41:27.8689
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: edFmOVX2XynIGAPiRNktX4vPEM3z/RwR+JY4tFR7GYjmMFmv3P+0ol0I7QXKHqzZ1i2/qNCwNs/BHwNTZ4Ys7II6Ao/seZJfMxpI/E0kjvY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR10MB6001
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-05_02,2024-06-05_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 bulkscore=0
- adultscore=0 spamscore=0 mlxlogscore=999 suspectscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2406050156
-X-Proofpoint-GUID: 8EgDYpXtb0WBY2YBhefU6PK3tS5hwHsE
-X-Proofpoint-ORIG-GUID: 8EgDYpXtb0WBY2YBhefU6PK3tS5hwHsE
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-DQoNCj4gT24gSnVuIDQsIDIwMjQsIGF0IDExOjU54oCvQU0sIEphcmtrbyBTYWtraW5lbiA8amFy
-a2tvQGtlcm5lbC5vcmc+IHdyb3RlOg0KPiANCj4gT24gRnJpIE1heSAzMSwgMjAyNCBhdCAzOjM5
-IEFNIEVFU1QsIEVyaWMgU25vd2Jlcmcgd3JvdGU6DQo+PiBJbnRyb2R1Y2UgYSBuZXcgTFNNIGNh
-bGxlZCBDbGF2aXMgKExhdGluIHdvcmQgbWVhbmluZyBrZXkpLiAgVGhlIG1vdGl2YXRpb24NCj4+
-IGJlaGluZCB0aGlzIExTTSBpcyB0byBwcm92aWRlIGFjY2VzcyBjb250cm9sIGZvciBzeXN0ZW0g
-a2V5cy4gIEJlZm9yZSBzcGVuZGluZw0KPj4gbW9yZSB0aW1lIG9uIHRoaXMgTFNNLCBJIGFtIHNl
-bmRpbmcgdGhpcyBhcyBhbiBSRkMgdG8gc3RhcnQgYSBkaXNjdXNzaW9uIHRvIHNlZQ0KPj4gaWYg
-dGhlIGN1cnJlbnQgZGlyZWN0aW9uIHRha2VuIGhhcyBhIHBvc3NpYmlsaXR5IG9mIGJlaW5nIGFj
-Y2VwdGVkIGluIHRoZQ0KPj4gZnV0dXJlLg0KPj4gDQo+PiBUb2RheSB0aGUga2VybmVsIGhhcyB0
-aGUgZm9sbG93aW5nIHN5c3RlbSBrZXlyaW5nczogLmJ1aWx0aW5fdHJ1c3RlZF9rZXlyaW5nLA0K
-Pj4gLnNlY29uZGFyeV90cnVzdGVkX2tleXJpbmcsIGFuZCB0aGUgLm1hY2hpbmUuICBJdCBhbHNv
-IGhhcyB0aGUgLnBsYXRmb3JtDQo+PiBrZXlyaW5nIHdoaWNoIGhhcyBsaW1pdGVkIGNhcGFiaWxp
-dGllczsgaXQgY2FuIG9ubHkgYmUgdXNlZCB0byB2ZXJpZnkgYSBrZXJuZWwNCj4+IGZvciBrZXhl
-Yy4NCj4gDQo+IFdvdWxkIGJlIG5pY2UgdG8gaGF2ZSBhIHJlbWluZGVyIG9mIGFwcGxpY2F0aW9u
-cyBmb3Igc2Vjb25kYXJ5IGtleXJpbmdzDQo+IHVzZSBjYXNlcyBvZiB0b2RheSBbMV0uIEl0IGlz
-IG5vdCBlbnRpcmVseSBjbGVhciBmb3IgbWUsIGdpdmVuIHRoYXQgSQ0KPiBuZWVkIHBlcnNvbmFs
-bHkganVzdCB0aGUgYnVpbHRpbiBhbmQgbWFjaGluZSBrZXlyaW5nLiBUaGlzIGlzIG5vdCB0aGUN
-Cj4gc2FtZSBhcyBzYXlpbmcgdGhhdCBpdCB3b3VsZCBub3QgYmUgdXNlZnVsLCBidXQgaXQgd291
-bGQgY2xhcml0eSB0bw0KPiBzY29wZSBpdCBhIGJpdCBpbiB0aGUgY3VycmVudCBzdGF0ZSBvZiB0
-aGUgYXJ0Lg0KPiANCj4+IA0KPj4gVG9kYXkgdGhlIGtlcm5lbCBhbHNvIHRyYWNrcyBrZXkgdXNh
-Z2UgZm9yIHZlcmlmaWNhdGlvbiBkb25lIHdpdGggYW55IG9mIHRoZXNlDQo+PiBrZXlzLiBDdXJy
-ZW50IHZlcmlmaWNhdGlvbiB1c2FnZSBpbmNsdWRlczogVkVSSUZZSU5HX01PRFVMRV9TSUdOQVRV
-UkUsDQo+PiBWRVJJRllJTkdfRklSTVdBUkVfU0lHTkFUVVJFLCBWRVJJRllJTkdfS0VYRUNfUEVf
-U0lHTkFUVVJFLA0KPj4gVkVSSUZZSU5HX0tFWV9TSUdOQVRVUkUsIFZFUklGWUlOR19LRVlfU0VM
-Rl9TSUdOQVRVUkUsIGFuZA0KPj4gVkVSSUZZSU5HX1VOU1BFQ0lGSUVEX1NJR05BVFVSRS4gQWZ0
-ZXIgdGhlc2UgdXNhZ2UgdHlwZXMgd2VyZSBvcmlnaW5hbGx5DQo+PiBpbnRyb2R1Y2VkLCBtb3N0
-IGFkZGl0aW9ucyBoYXZlIHR5cGljYWxseSB1c2VkIHRoZQ0KPj4gVkVSSUZZSU5HX1VOU1BFQ0lG
-SUVEX1NJR05BVFVSRS4NCj4gDQo+IFNpbmNlIHRoZXJlIGFyZSBzbyBtYW55IHdoeSBub3QganVz
-dCBmb3JtYXQgdGhlbSBhcyBhIGxpc3QgaGVyZT8NCj4gDQo+IE1heWJlIHN0YXJ0IHRoZSB3aG9s
-ZSBjb3ZlciBsZXR0ZXIgd2l0aCBleGFjdGx5IHR3byBsaXN0czoNCj4gDQo+IDEuIEFsbCBwb3Nz
-aWJsZSBrZXlyaW5ncyB0aGF0IGFyZSBiZWxvdyBkZXNjcmliZWQgYXMgInN5c3RlbSBrZXlzIiwN
-Cj4gICBhbmQgdGhlaXIgcHVycG9zZSBhbmQgc2NvcGUgKGJyaWVmbHkpLg0KPiAyLiBUaGUgYWJv
-dmUgdmVyaWZpY2F0aW9uIG1ldGhvZHMgYW5kIGV4YWN0IHNhbWUgbGV2ZWwgb2YgZGV0YWlsDQo+
-ICAgZm9yIGVhY2guDQo+IA0KPiBUaGVyZSdzIHNvIG11Y2ggdGV4dCBoZXJlIHRoYXQgbWF5YmUg
-ZXZlbiBzdWJzZWN0aW9ucyBsaWtlOg0KPiANCj4gQmFja2dyb3VuZA0KPiA9PT09PT09PT09DQo+
-IA0KPiA8VGhvc2UgdHdvIGxpc3RzPg0KPiANCj4gTW90aXZhdGlvbg0KPiA9PT09PT09PT09DQo+
-IA0KPiA8TW90aXZhdGlvbiBiZWhpbmQgQ2xhdmlzPg0KPiANCj4gU29sdXRpb24NCj4gPT09PT09
-PT0NCj4gDQo+IDxNZWNoYW5pY3Mgb2YgQ2xhdmlzPg0KPiANCj4gV291bGQgbWFrZSByZXZpZXdp
-bmcgdGhpcyBoZWNrIGEgbG90IGVhc2llciBhcyB5b3UgY2FuIHRoZW4gZm9jdXMgaW4gb25lDQo+
-IG9mIHRoZXNlIHRocmVlIHBhcnRzLiBBbmQgSSBndWVzcyBJIGhhdmUgYSBicmFpbiBvZiBhIGdv
-bGRmaXNoIDstKQ0KDQpJZiB5b3UgdGhpbmsgdGhhdCB3b3VsZCBtYWtlIHJldmlld2luZyBlYXNp
-ZXIsIEknbGwgbWFrZSB0aGVzZSBjaGFuZ2VzIHRvIHRoZSBjb3ZlciANCmxldHRlciBpbiB0aGUg
-bmV4dCByb3VuZC4gIFRoYW5rcy4NCg0K
+Jason!
+
+On Tue, May 28 2024 at 14:19, Jason A. Donenfeld wrote:
+> diff --git a/include/vdso/getrandom.h b/include/vdso/getrandom.h
+> index e3ceb1976386..7dc93d5f72dc 100644
+> --- a/include/vdso/getrandom.h
+> +++ b/include/vdso/getrandom.h
+> @@ -6,11 +6,39 @@
+>  #ifndef _VDSO_GETRANDOM_H
+>  #define _VDSO_GETRANDOM_H
+>=20=20
+> +#include <crypto/chacha.h>
+
+Can you please split the required defines into a seperate header
+preferrably in include/vdso/ and include that from crypto/chacha.h
+
+The point is that VDSO is very intentionally not using anything outside
+include/uapi/ and include/vdso/ except for include/linux/compiler.h and
+include/linux/types.h.
+
+We've had too much trouble of random include chains which magically
+break the build dependent on architectures and configurations. VDSO is a us=
+erspace
+library after all.
+
+> +#include <vdso/types.h>
+> +
+>  /**
+>   * struct vgetrandom_state - State used by vDSO getrandom() and allocate=
+d by vgetrandom_alloc().
+>   *
+> - * Currently empty, as the vDSO getrandom() function has not yet been im=
+plemented.
+> + * @batch:	One and a half ChaCha20 blocks of buffered RNG output.
+> + *
+> + * @key:	Key to be used for generating next batch.
+> + *
+> + * @batch_key:	Union of the prior two members, which is exactly two full
+> + * 		ChaCha20 blocks in size, so that @batch and @key can be filled
+> + * 		together.
+> + *
+> + * @generation:	Snapshot of @rng_info->generation in the vDSO data page =
+at
+> + *		the time @key was generated.
+> + *
+> + * @pos:	Offset into @batch of the next available random byte.
+> + *
+> + * @in_use:	Reentrancy guard for reusing a state within the same thread
+> + *		due to signal handlers.
+>   */
+> -struct vgetrandom_state { int placeholder; };
+> +struct vgetrandom_state {
+> +	union {
+> +		struct {
+> +			u8	batch[CHACHA_BLOCK_SIZE * 3 / 2];
+> +			u32	key[CHACHA_KEY_SIZE / sizeof(u32)];
+
+CHACHA_STATE_WORDS ?
+
+> +		};
+> +		u8		batch_key[CHACHA_BLOCK_SIZE * 2];
+
+Lot's of magic constants here *3/2 *2 ....
+
+> +	};
+> +	vdso_kernel_ulong	generation;
+> +	u8			pos;
+
+What does the u8 buy here over a simple unsigned int?
+
+> +	bool 			in_use;
+> +};
+>=20=20
+>  #endif /* _VDSO_GETRANDOM_H */
+> diff --git a/include/vdso/types.h b/include/vdso/types.h
+> new file mode 100644
+> index 000000000000..ce131463aeff
+> --- /dev/null
+> +++ b/include/vdso/types.h
+> @@ -0,0 +1,35 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+
+Why does this need an extra header when it's clearly getrandom specific?
+Please put this into getrandom.h
+
+> +/*
+> + * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights R=
+eserved.
+> + */
+> +#ifndef __VDSO_TYPES_H
+> +#define __VDSO_TYPES_H
+> +
+> +#include <linux/types.h>
+> +
+> +/**
+> + * type vdso_kernel_ulong - unsigned long type that matches kernel's uns=
+igned long
+> + *
+> + * Data shared between userspace and the kernel must operate the same wa=
+y in both 64-bit code and in
+> + * 32-bit compat code, over the same potentially 64-bit kernel. This typ=
+e represents the size of an
+> + * unsigned long as used by kernel code. This isn't necessarily the same=
+ as an unsigned long as used
+> + * by userspace, however.
+
+This is confusing at best.
+
+First of all 64-bit code can run only on a 64-bit kernel, so what does
+'the same potentially 64-bit kernel' even mean in that sentence?
+
+What means: 'This type represents the size of an unsigned long as used by k=
+ernel
+code'?=20
+
+> + *                 +-------------------+-------------------+------------=
+------+-------------------+
+> + *                 | 32-bit userspace  | 32-bit userspace  | 64-bit user=
+space | 64-bit userspace  |
+> + *                 | unsigned long     | vdso_kernel_ulong | unsigned lo=
+ng    | vdso_kernel_ulong |
+> + * +---------------+-------------------+-------------------+------------=
+------+-------------------+
+> + * | 32-bit kernel | =E2=9C=93 same size       | =E2=9C=93 same size    =
+   |
+> + * | unsigned long |                   |                   |
+> + * +---------------+-------------------+-------------------+------------=
+------+-------------------+
+> + * | 64-bit kernel | =E2=9C=98 different size! | =E2=9C=93 same size    =
+   | =E2=9C=93 same size      | =E2=9C=93 same size       |
+> + * | unsigned long |                   |                   |            =
+      |                   |
+> + * +---------------+-------------------+-------------------+------------=
+------+-------------------+
+
+I have no idea what this table tries to tell me, but I clearly can see
+what you are trying to achieve here:
+
+> + */
+> +#ifdef CONFIG_64BIT
+> +typedef u64 vdso_kernel_ulong;
+> +#else
+> +typedef u32 vdso_kernel_ulong;
+> +#endif
+
+All of this is pointless because if a 32-bit application runs on a
+64-bit kernel it has to use the 64-bit 'generation'. So why on earth do
+we need magic here for a 32-bit kernel?
+
+Just use u64 for both and spare all this voodoo. We're seriously not
+"optimizing" for 32-bit kernels.
+
+> +/**
+> + * __cvdso_getrandom_data - Generic vDSO implementation of getrandom() s=
+yscall.
+> + * @rng_info:		Describes state of kernel RNG, memory shared with kernel.
+> + * @buffer:		Destination buffer to fill with random bytes.
+> + * @len:		Size of @buffer in bytes.
+> + * @flags:		Zero or more GRND_* flags.
+> + * @opaque_state:	Pointer to an opaque state area.
+> + *
+> + * This implements a "fast key erasure" RNG using ChaCha20, in the same =
+way that the kernel's
+> + * getrandom() syscall does. It periodically reseeds its key from the ke=
+rnel's RNG, at the same
+> + * schedule that the kernel's RNG is reseeded. If the kernel's RNG is no=
+t ready, then this always
+> + * calls into the syscall.
+> + *
+> + * @opaque_state *must* be allocated using the vgetrandom_alloc() syscal=
+l.  Unless external locking
+> + * is used, one state must be allocated per thread, as it is not safe to=
+ call this function
+> + * concurrently with the same @opaque_state. However, it is safe to call=
+ this using the same
+> + * @opaque_state that is shared between main code and signal handling co=
+de, within the same thread.
+> + *
+> + * Returns the number of random bytes written to @buffer, or a negative =
+value indicating an error.
+> + */
+> +static __always_inline ssize_t
+> +__cvdso_getrandom_data(const struct vdso_rng_data *rng_info, void *buffe=
+r, size_t len,
+> +		       unsigned int flags, void *opaque_state)
+> +{
+> +	ssize_t ret =3D min_t(size_t, INT_MAX & PAGE_MASK /* =3D MAX_RW_COUNT *=
+/, len);
+
+We really need to allow reading almost 2GB of random data in one go?
+
+> +	struct vgetrandom_state *state =3D opaque_state;
+> +	size_t batch_len, nblocks, orig_len =3D len;
+> +	unsigned long current_generation;
+> +	void *orig_buffer =3D buffer;
+> +	u32 counter[2] =3D { 0 };
+> +	bool in_use, have_retried =3D false;
+
+Please keep the reverse fir tree order.
+
+> +	/* The state must not straddle a page, since pages can be zeroed at any=
+ time. */
+> +	if (unlikely(((unsigned long)opaque_state & ~PAGE_MASK) + sizeof(*state=
+) > PAGE_SIZE))
+> +		goto fallback_syscall;
+> +
+> +	/*
+> +	 * If the kernel's RNG is not yet ready, then it's not possible to prov=
+ide random bytes from
+> +	 * userspace, because A) the various @flags require this to block, or n=
+ot, depending on
+> +	 * various factors unavailable to userspace, and B) the kernel's behavi=
+or before the RNG is
+> +	 * ready is to reseed from the entropy pool at every invocation.
+> +	 */
+> +	if (unlikely(!READ_ONCE(rng_info->is_ready)))
+> +		goto fallback_syscall;
+> +
+> +	/*
+> +	 * This condition is checked after @rng_info->is_ready, because before =
+the kernel's RNG is
+> +	 * initialized, the @flags parameter may require this to block or retur=
+n an error, even when
+> +	 * len is zero.
+> +	 */
+> +	if (unlikely(!len))
+> +		return 0;
+> +
+> +	/*
+> +	 * @state->in_use is basic reentrancy protection against this running i=
+n a signal handler
+> +	 * with the same @opaque_state, but obviously not atomic wrt multiple C=
+PUs or more than one
+> +	 * level of reentrancy. If a signal interrupts this after reading @stat=
+e->in_use, but before
+> +	 * writing @state->in_use, there is still no race, because the signal h=
+andler will run to
+> +	 * its completion before returning execution.
+
+Can you please add an explanation that the syscall does not touch the
+state and just fills the buffer?
+
+> +	 */
+> +	in_use =3D READ_ONCE(state->in_use);
+> +	if (unlikely(in_use))
+> +		goto fallback_syscall;
+> +	WRITE_ONCE(state->in_use, true);
+> +
+> +retry_generation:
+> +	/*
+> +	 * @rng_info->generation must always be read here, as it serializes @st=
+ate->key with the
+> +	 * kernel's RNG reseeding schedule.
+> +	 */
+> +	current_generation =3D READ_ONCE(rng_info->generation);
+> +
+> +	/*
+> +	 * If @state->generation doesn't match the kernel RNG's generation, the=
+n it means the
+> +	 * kernel's RNG has reseeded, and so @state->key is reseeded as well.
+> +	 */
+> +	if (unlikely(state->generation !=3D current_generation)) {
+> +		/*
+> +		 * Write the generation before filling the key, in case of fork. If th=
+ere is a fork
+> +		 * just after this line, the two forks will get different random bytes=
+ from the
+
+the two forks? You mean the parent and the child, no?
+
+> +		 * syscall, which is good. However, were this line to occur after the =
+getrandom
+> +		 * syscall, then both child and parent could have the same bytes and t=
+he same
+> +		 * generation counter, so the fork would not be detected. Therefore, w=
+rite
+> +		 * @state->generation before the call to the getrandom syscall.
+> +		 */
+> +		WRITE_ONCE(state->generation, current_generation);
+> +
+> +		/* Prevent the syscall from being reordered wrt current_generation. */
+> +		barrier();
+> +
+> +		/* Reseed @state->key using fresh bytes from the kernel. */
+> +		if (getrandom_syscall(state->key, sizeof(state->key), 0) !=3D sizeof(s=
+tate->key)) {
+> +			/*
+> +			 * If the syscall failed to refresh the key, then @state->key is now
+> +			 * invalid, so invalidate the generation so that it is not used again=
+, and
+> +			 * fallback to using the syscall entirely.
+> +			 */
+> +			WRITE_ONCE(state->generation, 0);
+> +
+> +			/*
+> +			 * Set @state->in_use to false only after the last write to @state in=
+ the
+> +			 * line above.
+> +			 */
+> +			WRITE_ONCE(state->in_use, false);
+
+So here you rely on the compiler not reordering vs. WRITE_ONCE(),
+i.e. volatile, but above you have a barrier() to prevent the write being
+reordered vs. the syscall, confused.
+
+But even when the compiler does not reorder, what prevents a weakly
+ordered CPU from doing so?
+
+> +			goto fallback_syscall;
+> +		}
+> +
+> +		/*
+> +		 * Set @state->pos to beyond the end of the batch, so that the batch i=
+s refilled
+> +		 * using the new key.
+> +		 */
+> +		state->pos =3D sizeof(state->batch);
+> +	}
+> +
+> +	/* Set len to the total amount of bytes that this function is allowed t=
+o read, ret. */
+> +	len =3D ret;
+> +more_batch:
+> +	/*
+> +	 * First use bytes out of @state->batch, which may have been filled by =
+the last call to this
+> +	 * function.
+> +	 */
+> +	batch_len =3D min_t(size_t, sizeof(state->batch) - state->pos, len);
+> +	if (batch_len) {
+> +		/* Zeroing at the same time as memcpying helps preserve forward secrec=
+y. */
+> +		memcpy_and_zero_src(buffer, state->batch + state->pos, batch_len);
+> +		state->pos +=3D batch_len;
+> +		buffer +=3D batch_len;
+> +		len -=3D batch_len;
+> +	}
+> +
+> +	if (!len) {
+> +		/* Prevent the loop from being reordered wrt ->generation. */
+> +		barrier();
+
+Same question as above.
+
+> +		/*
+> +		 * Since @rng_info->generation will never be 0, re-read @state->genera=
+tion, rather
+> +		 * than using the local current_generation variable, to learn whether =
+a fork
+> +		 * occurred or if @state was zeroed due to memory pressure. Primarily,=
+ though, this
+> +		 * indicates whether the kernel's RNG has reseeded, in which case gene=
+rate a new key
+> +		 * and start over.
+> +		 */
+> +		if (unlikely(READ_ONCE(state->generation) !=3D READ_ONCE(rng_info->gen=
+eration))) {
+> +			/*
+> +			 * Prevent this from looping forever in case of low memory or racing =
+with a
+> +			 * user force-reseeding the kernel's RNG using the ioctl.
+> +			 */
+> +			if (have_retried) {
+> +				WRITE_ONCE(state->in_use, false);
+> +				goto fallback_syscall;
+> +			}
+> +
+> +			have_retried =3D true;
+> +			buffer =3D orig_buffer;
+> +			goto retry_generation;
+> +		}
+> +
+> +		/*
+> +		 * Set @state->in_use to false only when there will be no more reads o=
+r writes of
+> +		 * @state.
+> +		 */
+> +		WRITE_ONCE(state->in_use, false);
+> +		return ret;
+> +	}
+> +
+> +	/* Generate blocks of RNG output directly into @buffer while there's en=
+ough room left. */
+> +	nblocks =3D len / CHACHA_BLOCK_SIZE;
+> +	if (nblocks) {
+> +		__arch_chacha20_blocks_nostack(buffer, state->key, counter, nblocks);
+> +		buffer +=3D nblocks * CHACHA_BLOCK_SIZE;
+> +		len -=3D nblocks * CHACHA_BLOCK_SIZE;
+> +	}
+> +
+> +	BUILD_BUG_ON(sizeof(state->batch_key) % CHACHA_BLOCK_SIZE !=3D 0);
+> +
+> +	/* Refill the batch and then overwrite the key, in order to preserve fo=
+rward secrecy. */
+
+'and then overwrite'?
+
+Isn't this overwriting it implicitely because batch_key and key are at
+the same place in the union?
+
+> +	__arch_chacha20_blocks_nostack(state->batch_key, state->key, counter,
+> +				       sizeof(state->batch_key) / CHACHA_BLOCK_SIZE);
+> +
+> +	/* Since the batch was just refilled, set the position back to 0 to ind=
+icate a full batch. */
+> +	state->pos =3D 0;
+> +	goto more_batch;
+
+Thanks,
+
+        tglx
