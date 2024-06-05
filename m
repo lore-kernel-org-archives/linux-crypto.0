@@ -1,99 +1,94 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6379945030;
-	Wed,  5 Jun 2024 19:06:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C79E13C9C7;
+	Wed,  5 Jun 2024 19:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717614377; cv=none; b=QbQu18V8qiua+aOhcHhX/ilCAKrhrMuxXr33h8lf6/pCYIu4tmBjZB1JpSwkio3hJGaEbj4IOy8d6ADNV6AmMkyvH8yICjLNVE7sjnNHccVXl4MzGCvdzVIwzFqoX3Md1XeinRghHzZDAaTSaASlR1OvE0u9zi5cjrN15ZQe734=
+	t=1717614852; cv=none; b=CoZclH4MK5o1FMnoLTbu8uW2//+wV1JscN8k8EMLkEnVxe5gBdPlEHQk8QsQOUb/brs9h8M2puScqSI0aKxuJMTc8HIpm4z8wFc4GUkxRO1sfuWEuIvf4VrAms12sfZLGeSe1h0jW4Urk4QRJTPltPrOCj+/2WpIxKl0Bq8Dct0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717614377; c=relaxed/simple;
-	bh=qq+M2c9YegqKnpKKBqVK3MQB5Dp/Y/BO95wVLDILlOU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LkyHTolEQPRoqoCmVTBuKym4wSH+iXomCtiyJwCW2uUuyY8vwgskFDWyeMhNIaC0iG39X9HY82/72cpf4vZqN6QTUCEWOpUbrfBkuTcqzzjvC43d1E3WDKsQNjpawfzdKhuGq2UI8klU10k5jE3Rm5+lo+4weFLo0tyR2eHZm0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hUTu3Zy5; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717614852; c=relaxed/simple;
+	bh=anJCOkwW/JCOoSR2rAINEuJ0OMo6WwM1LrBeDLnzJ+k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ioIg54q+ff7pCCNNmxXT8xBLUE7DPoWCcRI3/JRAwXXK33RgKNkDgfWfax9Kr/O4EtNb8/szDykRb3p3FwiPZZJKlF5fOH7ByCXl1ckCRavHAd6jElBEFdg5VMehQ0ZfGS7f5023tiHQwInzF2mbKauql+pFJYM/xLTvWzeF0BI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PmNAZJkq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hUTu3Zy5"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-57a526c6a2cso165894a12.2;
-        Wed, 05 Jun 2024 12:06:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717614375; x=1718219175; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qq+M2c9YegqKnpKKBqVK3MQB5Dp/Y/BO95wVLDILlOU=;
-        b=hUTu3Zy5LfZ9RnyTpy3s5nvS6uuvCF+tIx+bYsfJpV31BzgcOL3/kQXOuFAebIl2om
-         voBfGC8M5FVFOjacoKZhBCwzLkpiAmJsEyTGEHRCYqMOYypsJhYzKvs/F4L6EFOjadyW
-         c6LcrYruqRtlKzry0BdZTxeW8oC2iyfreVvCXUw+XONFhTLnE3cJ2EmzZ8GEBk6z+4Bq
-         5uYSnnNMdXDaDXl0N0zmI1IG6MTRpMtXgALd8KJcT4fsjRGGZQdgafBxQm6rBcQND6kN
-         mhqbo20NBMdUUSj2s5DFK45XQw4pCXF3xRk3QU1WJQ6UmtSHa1a7tV6PQIi6dnoat0zK
-         Y9QQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717614375; x=1718219175;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qq+M2c9YegqKnpKKBqVK3MQB5Dp/Y/BO95wVLDILlOU=;
-        b=ByrRE66cNCSegrBi7cX9JJapxhQV/nTWDvucGxfnyZ3oR7xQ3L1WHVMHS/J1oGwLJa
-         tKvdMmQqHI3WJSya4w2G0udtwnjknT+UzpJE8+o2GPL3TGuknzye6V33DkZ/TndwvstM
-         kuHP3PjuG3ke6W2tXSN+/9vWYcDXTIsOlWLweNTEmt8rJPU6Uzg/dfqYvBlu8rR+1e7T
-         HoXeCPKpze3qQonpwtGslFMXmgegYiRM45qB+Oek4HeBn6flGCy67yvpqxrkCWwoIFEn
-         GRGhfR4SY3vLPL+XT2Z+nP0KHLCyEUulLwfpeJl4GE4YSivrdPOhXa+bLNND23EMtlcD
-         nSbw==
-X-Forwarded-Encrypted: i=1; AJvYcCXD5Trbok52z8HoGZMavmpNff8BslFm5kBoYw8hVSyliQOkKYq2cllt2Ncle2HOAZ+bYwIlJDMKW/DeZmo7JwUpimV8mcC9uaOFIPrwuEgvIfypexIBUbsSjbkmF4jyG+nhtX29S5yOcyBS2qd5BYabJc9k2HA/4R74suk5ADBfyIFtlV/4RerYCg9RFWBZOft57sTB2u23jGXJpW2x3lddaNJz3U1f02wsUX7qGTJNHObocjEvCDpeIiJqKVJvPg==
-X-Gm-Message-State: AOJu0YwvZni4S/X+J8xsZkHEVBX51WnY6CZzgf9IET3fzS4ETCXY9ifw
-	VK/ITy/2RwsJCu/1VQE73v/XjbQ+EkpG40wxiR+5IqVij1aZ4DlHpqo2aYBTIkVGl5kMfgWwjqT
-	XQnlgQNdKFPdDfxQOlyDeOAeP06M=
-X-Google-Smtp-Source: AGHT+IF23/xRdP7P8N5y6TuoTb7yn/vvqWaiOXqdpB/ZldVT0IhlV6YfTjVPOUivLO9r24Qx7V84qrwKXUOA6fxB//M=
-X-Received: by 2002:a17:906:4816:b0:a58:e3d9:e2d6 with SMTP id
- a640c23a62f3a-a69a024cf61mr221021566b.56.1717614374459; Wed, 05 Jun 2024
- 12:06:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PmNAZJkq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFE59C2BD11;
+	Wed,  5 Jun 2024 19:14:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717614852;
+	bh=anJCOkwW/JCOoSR2rAINEuJ0OMo6WwM1LrBeDLnzJ+k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PmNAZJkqpGyH6vjNz47hE1ihjyXMSZTKTyoxMHhsiKfjXaljY0BTR417ondXgtokP
+	 0jKANCFz07Dmgf+Vky5fYkDRhoxj8uCoebggx0Z8Q1djaJknCIvsfjINlfF9dy85CE
+	 6WW38NV01bsMeRVwzeqQo3cDuSZyjB927EtHkUXwIndbI+rh5+RO6JDC16fwnR5SKg
+	 hglKztyr1w/MqT5KmbdkXB4ozoW6HFvVCGSt0a0whfigTl20B3QGWYiasLzizdsBtI
+	 zkX5Nznmb2/svFBIuTCUL4023Hl8en/suEUqcR2P8Cp0Sk0Z20RAO32FQkjeTnByMz
+	 zsTjoIXuPhmFw==
+Date: Wed, 5 Jun 2024 12:14:10 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org, fsverity@lists.linux.dev,
+	dm-devel@lists.linux.dev, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v4 6/8] fsverity: improve performance by using
+ multibuffer hashing
+Message-ID: <20240605191410.GB1222@sol.localdomain>
+References: <20240603183731.108986-1-ebiggers@kernel.org>
+ <20240603183731.108986-7-ebiggers@kernel.org>
+ <Zl7gYOMyscYDKZ8_@gondor.apana.org.au>
+ <20240604184220.GC1566@sol.localdomain>
+ <ZmAthcxC8V3V3sm3@gondor.apana.org.au>
+ <ZmAuTceqwZlRJqHx@gondor.apana.org.au>
+ <ZmAz8-glRX2wl13D@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240605161851.13911-1-kabel@kernel.org>
-In-Reply-To: <20240605161851.13911-1-kabel@kernel.org>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Wed, 5 Jun 2024 22:05:37 +0300
-Message-ID: <CAHp75VdGQUBnbZ2G4tLYBBCD+PeiY4G6HZ6U9ammSMg72TNX7Q@mail.gmail.com>
-Subject: Re: [PATCH v11 0/8] Turris Omnia MCU driver
-To: =?UTF-8?B?TWFyZWsgQmVow7pu?= <kabel@kernel.org>
-Cc: Gregory CLEMENT <gregory.clement@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, soc@kernel.org, 
-	arm@kernel.org, Andy Shevchenko <andy@kernel.org>, Hans de Goede <hdegoede@redhat.com>, 
-	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Alessandro Zummo <a.zummo@towertech.it>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, devicetree@vger.kernel.org, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Guenter Roeck <linux@roeck-us.net>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, linux-crypto@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, Olivia Mackall <olivia@selenic.com>, 
-	Rob Herring <robh+dt@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>, 
-	Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <uwe@kleine-koenig.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZmAz8-glRX2wl13D@gondor.apana.org.au>
 
-On Wed, Jun 5, 2024 at 7:19=E2=80=AFPM Marek Beh=C3=BAn <kabel@kernel.org> =
-wrote:
->
-> Hello Andy, Hans, Ilpo, Arnd, Gregory, and others,
->
-> this is v11 of the series adding Turris Omnia MCU driver.
+On Wed, Jun 05, 2024 at 05:46:27PM +0800, Herbert Xu wrote:
+> On Wed, Jun 05, 2024 at 05:22:21PM +0800, Herbert Xu wrote:
+> >
+> > However, I really dislike the idea of shoehorning this into shash.
+> > I know you really like shash, but I think there are some clear
+> > benefits to be had by coupling this with ahash.
+> 
+> If we do this properly, we should be able to immediately use the
+> mb code with IPsec.  In the network stack, we already aggregate
+> the data prior to IPsec with GSO.  So at the boundary between
+> IPsec and the Crypto API, it's dividing chunks of data up to 64K
+> into 1500-byte packets and feeding them to crypto one at a time.
+> 
+> It really should be sending the whole chain of packets to us as
+> a unit.
+> 
+> Once we have a proper mb interface, we can fix that and immediately
+> get the benefit of mb hashing.
+> 
 
-Thank you!
-There are a few small issues here and there, but overall LGTM. The
-only one main question is what to do with gpiochip_get_desc(). I Cc'ed
-Bart for this.
+This would at most apply to AH, not to ESP.  Is AH commonly used these days?
+Also even for AH, the IPsec code would need to be significantly restructured to
+make use of multibuffer hashing.  See how the segmentation happens in
+xfrm_output_gso(), but the ahash calls happen much lower in the stack.
 
---=20
-With Best Regards,
-Andy Shevchenko
+I'm guessing that you've had the AH use case in mind since your earlier
+comments.  Given you were originally pushing for this to be supported using the
+existing async support in the ahash API (which would have required fewer code
+changes on the AH side), but we now agree that is not feasible, maybe it is time
+to reconsider whether it would still be worthwhile to make all the changes to
+the AH code needed to support this?
+
+Also, even if it would be worthwhile and would use ahash, ahash is almost always
+just a wrapper for shash.  So the shash support would be needed anyway.
+
+- Eric
