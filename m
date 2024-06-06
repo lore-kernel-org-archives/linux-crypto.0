@@ -1,103 +1,67 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243C5154BE3;
-	Wed,  5 Jun 2024 22:10:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06108EEC5;
+	Thu,  6 Jun 2024 00:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717625404; cv=none; b=BZJXu56jn3kFVh0KG6nO6/ur7HUvMOB0xHKhOhusN2dXIRp/pR+/xgg2MQcYYv7GAEtpElLL4zQEAbXINUwe0HDRAVAc/nSdlDTZQcnrU7FN+KZd717Ye0SQjbwUEqnVjRGAogAj8nHZkxwc5jQIA2miPHHlFdsvxgbyQRAKGtg=
+	t=1717634054; cv=none; b=Ve2q2islumecJcry55dNVbZKIvyJt9ODUC0f5h/VbbAEvz5PEMP/r13+4NfKhjlTdhomQL8r0qaQ/LbGMj/VKegapAmJlI28RDeY7jrjZGW6ejJIkTVc+MB0rHcrBLDWuFwz1C+K6gYK+to2TAIoVPMNOZE0RIoL6NqjAVys8uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717625404; c=relaxed/simple;
-	bh=vm8NGhNASzRMkMaOMS4EF7ZBloPunZLMUUGqmPO/lHA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=F2yIw17hWVz4ZxyNeH5mtgg6/ieib2KIEtPSSEf1DZXSukaX80Pbc/KM7UWWiOPxnFiDly5Bwewwun7tuxrjAjzbK5QWTI1Dq9WeReoNB7s+YzgIB0H8EDJ820cTU+vWTtyVQ6wWW8GxFrJMVncOuYRhAG7HO/9z6UmlZzFswq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=q0vBTPpB; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XjjhP+xH; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1717634054; c=relaxed/simple;
+	bh=m0r5W0VjsS2kLZZU03Axuz4ultnH7JPnF9siiZ0d0TE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jYVedwAbrgjNktsj2RmiUQ1Nw4JfzKAj3KYJDIcwrAbC0hpdRUsCwi8G92WaBODM+EOIWWjwGxPa7D3zB0Dpxr/aGU5l7Hsj/5xODe1AL06tzZtLO7biEqpdazMDepdQHoBXCC9+A6jIi+nOq2VNV4KATbjhrghnu8QBckjpXuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g5JNv9td; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="q0vBTPpB";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XjjhP+xH"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1717625401;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=c2R7l22UwY9yFUyciye1CZnuK81vaGKmVtMpyhY7fNc=;
-	b=q0vBTPpBnwtmF96XmlDkIlLdL9k3q/4F+8KN9VBJYQFohbydX/XM3NqRqDXlXYkzQkBGsh
-	GuhfK8kAFHKTiAhpp3WVibbaC9Dp4eJ5TVuS+MptAv1aG2fpZBaHKFPFIkYXJbdP7qjX/v
-	zj8l0/WtwrhTx+s2B8FYlV2QDERsmXKXZBCrt5g/u9v35jK+8x5T6d3sgeQdNms7l5eqkj
-	XC3f6mMwYOLFeOJIRkyIzn2+phLKa1JxXnfvry9cJbAYpdN7wjo47wxjzoDSYrWNdCkPm5
-	WulzyYoT4swk4DDfPukQFsPJ/O9ymePIVGRjnhSZFHxNOvpIwoXhZ9Oi3A8v4g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1717625401;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=c2R7l22UwY9yFUyciye1CZnuK81vaGKmVtMpyhY7fNc=;
-	b=XjjhP+xHuaQz77lvLGuBDqKymLfoK3Trc9n5qavwAXrGCMtMeuaYL36SFUf4DrlDJMYKCP
-	vAg+mTjVrptTHtCg==
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-kernel@vger.kernel.org,
- patches@lists.linux.dev
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-crypto@vger.kernel.org,
- linux-api@vger.kernel.org, x86@kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Adhemerval Zanella Netto
- <adhemerval.zanella@linaro.org>, Carlos O'Donell <carlos@redhat.com>,
- Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jann
- Horn <jannh@google.com>, Christian Brauner <brauner@kernel.org>, David
- Hildenbrand <dhildenb@redhat.com>
-Subject: Re: [PATCH v16 4/5] random: introduce generic vDSO getrandom()
- implementation
-In-Reply-To: <874ja73xx7.ffs@tglx>
-References: <874ja73xx7.ffs@tglx>
-Date: Thu, 06 Jun 2024 00:10:00 +0200
-Message-ID: <87v82n2g93.ffs@tglx>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g5JNv9td"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 520DEC32782;
+	Thu,  6 Jun 2024 00:34:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717634053;
+	bh=m0r5W0VjsS2kLZZU03Axuz4ultnH7JPnF9siiZ0d0TE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g5JNv9tdIuEGHFhQxoSBGim1OynMbSGQIbVQug1PKEGppvqN2xHOC1LNyWYzISMiS
+	 IX1jijNfw6Lmx3YK3hQGiYWCQaP+Wnhq2tUvrUYxBWYIAvtiamqc3Iu4bQpdTtTFFp
+	 sPdU+Vbzx23eSMmzGOM91Urj8Olm6WVa5FpYTDy5KHW4kj8ufEvm7KeiwPGHvneUIa
+	 vU71z4+zbTTiDbwNZ72DSZ5JhDtjqc6MAsriHzJg7jPzJY21sXfiLaIPbi9qE2HLnK
+	 tbib7il6J9rU6RudRDAKrib7lqLW8WtcEzLhPSuwOf5rA+D/wtQI00LPXF3JORAeoF
+	 niFBTLv1INs4w==
+Date: Wed, 5 Jun 2024 18:34:11 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Neil Armstrong <neil.armstrong@linaro.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-amlogic@lists.infradead.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	linux-kernel@vger.kernel.org, Olivia Mackall <olivia@selenic.com>,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	Kevin Hilman <khilman@baylibre.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Jerome Brunet <jbrunet@baylibre.com>
+Subject: Re: [PATCH] dt-bindings: rng: meson: add optional power-domains
+Message-ID: <171763404853.3520126.5459259781285680481.robh@kernel.org>
+References: <20240605-topic-amlogic-upstream-bindings-fixes-power-domains-rng-v1-1-0a55a7ba55e4@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240605-topic-amlogic-upstream-bindings-fixes-power-domains-rng-v1-1-0a55a7ba55e4@linaro.org>
 
-Jason!
 
-On Wed, Jun 05 2024 at 23:03, Thomas Gleixner wrote:
-> On Tue, May 28 2024 at 14:19, Jason A. Donenfeld wrote:
->> + */
->> +#ifdef CONFIG_64BIT
->> +typedef u64 vdso_kernel_ulong;
->> +#else
->> +typedef u32 vdso_kernel_ulong;
->> +#endif
->
-> All of this is pointless because if a 32-bit application runs on a
-> 64-bit kernel it has to use the 64-bit 'generation'. So why on earth do
-> we need magic here for a 32-bit kernel?
->
-> Just use u64 for both and spare all this voodoo. We're seriously not
-> "optimizing" for 32-bit kernels.
+On Wed, 05 Jun 2024 11:36:33 +0200, Neil Armstrong wrote:
+> On newer SoCs, the random number generator can require a power-domain to
+> operate, add it as optional.
+> 
+> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+> ---
+>  Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
 
-All what happens on a 32-bit kernel is that the RNG will store the
-unsigned long (32bit) generation into a 64bit variable:
+Acked-by: Rob Herring (Arm) <robh@kernel.org>
 
-	smp_store_release(&_vdso_rng_data.generation, next_gen + 1);
-
-As the upper 32bit are always zero, there is no issue vs. load store
-tearing at all. So there is zero benefit for this aside of slightly
-"better" user space code when running on a 32-bit kernel. Who cares?
-
-While staring at this I wonder where the corresponding
-smp_load_acquire() is. I haven't found one in the VDSO code.
-READ_ONCE() is only equivalent on a few architectures.
-
-But, what does that store_release() buy at all? There is zero ordering
-vs. anything in the kernel and neither against user space.
-
-If that smp_store_release() serves a purpose then it really has to be
-extensively documented especially as the kernel itself simply uses
-WRITE/READ_ONCE() for base_rng.generation.
-
-Thanks,
-
-         tglx
