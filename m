@@ -1,84 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81F438DE0;
-	Thu,  6 Jun 2024 07:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5D913C673;
+	Thu,  6 Jun 2024 07:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717658714; cv=none; b=F1s+iwC5B6ruQsWDBhFWrivFKdlIME9sQwZ4+L2+Dipg2JAp2e+LST96tQ8gfos/154dF2Bb3ordw6WxFOYJq3TEodSKnYW4BFHZLXMre10A5MgS0wFkkwFA91Sb0JYbZuMe9CfV1ZDFE3sA4ojsl7mYb74dtB8f5keV6kvDTeg=
+	t=1717659281; cv=none; b=EkfgLa1bNrhzP5R9Kj99T/gqM+Vz0TF9kKK6gxXd7utslMamIH28g+fwaKpYAnk/zHnpY02/o1QmZGz+6CSdDgZKs2NySsOV1bp9tPte4CncSWlrTc3y43h7CxnWOuPo/CWvd1myAy6zOCfui+N0Z7vFg5X6wQ+4Nx3VHwlAWeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717658714; c=relaxed/simple;
-	bh=+dT3zLjmC4JMt1RrMdgW6Me3Gqai/TF0UoZl/qk0Y7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VfeLSlAJGNjacvcc27Pk0Ng+HA2dQSD73/XJLfRuWFIKHHho1NbN6aEuy8NFECpShg2AA6uCeJ8mwqf7ylokU/hiAAcA+Yl+yPDQSFt8/ekiuI9YTw0rUAfDRjaC15shiS6YajpCr+jZwrA/HCyveYWJRtEPb0x1E3i3A3QFcHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuQp4t53; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuQp4t53"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4B32C4AF0F;
-	Thu,  6 Jun 2024 07:25:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717658713;
-	bh=+dT3zLjmC4JMt1RrMdgW6Me3Gqai/TF0UoZl/qk0Y7w=;
-	h=Date:From:To:List-Id:Cc:Subject:In-Reply-To:References:From;
-	b=UuQp4t53o8YjM4cSMYbUicjmZnQzsTkvkQmQaniLzLtzu9A+NNMOxZzz5+txRPO3y
-	 VRNrM5T18Ra0MjVfB8m3qxYO3OOcHe779oztSpndD34CGz1GwryCod5j97gdFKafxe
-	 yHijxhhoVOgTX3D82/FH3/OwRqdtU+0rPVqSxWq8pnM5KVTx7gn8QDx3EDX71qgYx9
-	 X+xVqp98sBLUOMJzNzNgXpXxZrK/9EIlfVAXE9cpZM2/luHe9I8SXwU9ddscto1RFw
-	 KMDt2IjY7bKhMCUd81fYB2ge92wos9Wp+EumBAivCFrMPX5RmNxgIgYgJia9vE2CMr
-	 HmEFsnW3Yo96g==
-Date: Thu, 6 Jun 2024 09:25:04 +0200
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Gregory CLEMENT <gregory.clement@bootlin.com>, Arnd Bergmann
- <arnd@arndb.de>, soc@kernel.org, arm@kernel.org, Andy Shevchenko
- <andy@kernel.org>, Hans de Goede <hdegoede@redhat.com>, Ilpo
- =?UTF-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, Alessandro Zummo
- <a.zummo@towertech.it>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Christophe JAILLET
- <christophe.jaillet@wanadoo.fr>, Dan Carpenter <dan.carpenter@linaro.org>,
- devicetree@vger.kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Guenter Roeck <linux@roeck-us.net>, Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Linus Walleij
- <linus.walleij@linaro.org>, linux-crypto@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-rtc@vger.kernel.org,
- linux-watchdog@vger.kernel.org, Olivia Mackall <olivia@selenic.com>, Rob
- Herring <robh+dt@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>,
- Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Sebastian
- Hesselbarth <sebastian.hesselbarth@gmail.com>, Uwe =?UTF-8?B?S2xlaW5lLUs=?=
- =?UTF-8?B?w7ZuaWc=?= <uwe@kleine-koenig.org>
-Subject: Re: [PATCH v11 0/8] Turris Omnia MCU driver
-Message-ID: <20240606092504.37d31917@dellmb>
-In-Reply-To: <CAHp75VdGQUBnbZ2G4tLYBBCD+PeiY4G6HZ6U9ammSMg72TNX7Q@mail.gmail.com>
-References: <20240605161851.13911-1-kabel@kernel.org>
-	<CAHp75VdGQUBnbZ2G4tLYBBCD+PeiY4G6HZ6U9ammSMg72TNX7Q@mail.gmail.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1717659281; c=relaxed/simple;
+	bh=zBd5D/R5ctDfeNBpJQ5EP1hix9MxnGPa0eqBKD6ftk4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lPEJQH94WCdNspofJvVsyiXe3LimrzaGJizo+e39shdBtP45Q7Rb6XXlBcv2uRyMccnCapvUHjzNfitDY/zo6wfT2pGgMOWWeqyJ1MWAZG3Bw+M1S6Nb+0DK9rLJ7nvvL4llpit7t/7Bzy8H/IsGkmwM79cDGOH0DmVTE1XqPNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sF7dn-006I9G-0c;
+	Thu, 06 Jun 2024 15:34:32 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Jun 2024 15:34:33 +0800
+Date: Thu, 6 Jun 2024 15:34:33 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+	fsverity@lists.linux.dev, dm-devel@lists.linux.dev, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Megha Dey <megha.dey@linux.intel.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v4 6/8] fsverity: improve performance by using
+ multibuffer hashing
+Message-ID: <ZmFmiWZAposV5N1O@gondor.apana.org.au>
+References: <Zl7gYOMyscYDKZ8_@gondor.apana.org.au>
+ <20240604184220.GC1566@sol.localdomain>
+ <ZmAthcxC8V3V3sm3@gondor.apana.org.au>
+ <ZmAuTceqwZlRJqHx@gondor.apana.org.au>
+ <ZmAz8-glRX2wl13D@gondor.apana.org.au>
+ <20240605191410.GB1222@sol.localdomain>
+ <ZmEYJQFHQRFKC5JM@gondor.apana.org.au>
+ <20240606052801.GA324380@sol.localdomain>
+ <ZmFL-AXZ8lphOCUC@gondor.apana.org.au>
+ <CAMj1kXHLt6v03qkpKfwbN34oyeeCnJb=tpG4GvTn6E1cJQRTOw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXHLt6v03qkpKfwbN34oyeeCnJb=tpG4GvTn6E1cJQRTOw@mail.gmail.com>
 
-On Wed, 5 Jun 2024 22:05:37 +0300
-Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
+On Thu, Jun 06, 2024 at 08:58:47AM +0200, Ard Biesheuvel wrote:
+>
+> IPSec users relying on software crypto and authenc() and caring about
+> performance seems like a rather niche use case to me.
 
-> On Wed, Jun 5, 2024 at 7:19=E2=80=AFPM Marek Beh=C3=BAn <kabel@kernel.org=
-> wrote:
-> >
-> > Hello Andy, Hans, Ilpo, Arnd, Gregory, and others,
-> >
-> > this is v11 of the series adding Turris Omnia MCU driver. =20
->=20
-> Thank you!
-> There are a few small issues here and there, but overall LGTM. The
-> only one main question is what to do with gpiochip_get_desc(). I Cc'ed
-> Bart for this.
+It's no more niche than fs/verity and dm-integrity.  In fact,
+this could potentially be used for all algorithms.  Just the
+reduction in the number of function calls may produce enough
+of a benefit (this is something I observed when adding GSO,
+even without any actual hardware offload, simply aggregating
+packets into larger units produced a visible benefit).
 
-Thank you for the review, I am going to apply the changes you requested
-and wait for Bart, and we'll see what to do with the
-gpiochip_get_desc().
+> I'm struggling to follow this debate. Surely, if this functionality
+> needs to live in ahash, the shash fallbacks need to implement this
+> parallel scheme too, or ahash would end up just feeding the requests
+> into shash sequentially, defeating the purpose. It is then up to the
+> API client to choose between ahash or shash, just as it can today.
 
-Marek
+I've never suggested it adding it to shash at all.  In fact
+that's my primary problem with this interface.  I think it
+should be ahash only.  Just like skcipher and aead.
+
+My reasoning is that this should cater mostly to bulk data, i.e.,
+multiple pages (e.g., for IPsec we're talking about 64K chunks,
+actually that (the 64K limit) is something that we should really
+extend, it's not 2014 anymore).  These typically will be more
+easily accessed as a number of distinct pages rather than as a
+contiguous mapping.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
