@@ -1,73 +1,81 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB66B187329;
-	Fri,  7 Jun 2024 11:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129A615DBB6;
+	Fri,  7 Jun 2024 11:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717761253; cv=none; b=Oc40nNe80BzYVvnm5ifdyi98kOdiv9JoTikJMJgo5jHGJev18dhG7qlKtrrEW79+QbvXGPBUhaAvRaRxGOwIv0O+FTwNkksfKGTdOGVahiJpD7DaeRvATENVpmS79QqEoHH1EUVDqyFNTLTtWULqxKuAXikk/0QmZRUSJLWJPFo=
+	t=1717761259; cv=none; b=sat5DeIhJ0ql9QWlx9+sSvOOCyHZnuoPTxtUfZtSfyr0c4CR9R0wBoxLhqVz0uN+azdy2vvQCsh68OkfYQtsAMuG39T241+dymdX1eKJOxj0LefjW5gP+2anmA68hB2BkUeyUifpmBz6ZovLbUFcYbgOcnLjt0ld5uStNJ0dVAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717761253; c=relaxed/simple;
-	bh=qqO7q0Mldl9tBen4Fca7wCIwFXvyn/PO6UGGUykd1ms=;
+	s=arc-20240116; t=1717761259; c=relaxed/simple;
+	bh=8Vj+8ez9fmltbd43OiZ5h9ihNvf9f7mYEhWFx4HF7to=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EbqbljQzoAeQQHrZLP9YjVzfOeIGO+OYZhL6N9EeodVeF59U8BZuogKQd51MuHfvOeu1n8AJOe73qidIfhH+PeJlohOjqfOUp9Pqq6chc6rCEvfjscKw6wCL746++xgUugoN57GyVp5xJvEwLoPvkw7i8LTVNrQ/TUhFPu3b2MU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=nHSh7pnmx110Lv0JuyhHVs2axWgPfXS8/BjoCYbgSEC7anNn9tOwpwfeXtqAGEVpxOhgsjYfmWg48Vf6TcRSVU/BJ/wg8jKd7Ffd95enUjyNEwWcZVzXBkQlYs/UAf2B+SKroRh83DnA11zO4BIRF11LvUmUqAM38zEEFqnNHOI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sFYAG-006p9u-2X;
-	Fri, 07 Jun 2024 19:53:49 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Jun 2024 19:53:51 +0800
-Date: Fri, 7 Jun 2024 19:53:51 +0800
+	id 1sFYAe-006pBF-37;
+	Fri, 07 Jun 2024 19:54:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Jun 2024 19:54:15 +0800
+Date: Fri, 7 Jun 2024 19:54:15 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Maxime MERE <maxime.mere@foss.st.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Rob Herring <robh@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/4] crypto: stm32/cryp - Improve stm32-cryp driver
-Message-ID: <ZmL0zynFM2RgA0RM@gondor.apana.org.au>
-References: <20240528140548.1632562-1-maxime.mere@foss.st.com>
+To: Mario Limonciello <mario.limonciello@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
+	"open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - DB..." <linux-crypto@vger.kernel.org>,
+	Richard Hughes <hughsient@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 0/5] Enable PSP security attributes on more SoCs
+Message-ID: <ZmL0556srBSO0cPh@gondor.apana.org.au>
+References: <20240528210712.1268-1-mario.limonciello@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240528140548.1632562-1-maxime.mere@foss.st.com>
+In-Reply-To: <20240528210712.1268-1-mario.limonciello@amd.com>
 
-On Tue, May 28, 2024 at 04:05:44PM +0200, Maxime MERE wrote:
-> From: Maxime Méré <maxime.mere@foss.st.com>
+On Tue, May 28, 2024 at 04:07:07PM -0500, Mario Limonciello wrote:
+> On some older SoCs the PSP doesn't export security attributes in the
+> capabilities register.  On these SoCs it is however possible to get
+> the information by a platform access command.
 > 
-> This series of patches mainly aims to improve the usage of DMA with the
-> CRYP peripheral of the STM32 MPU series. The other two patches are
-> needed to enhance the driver's visibility for ST platforms.
+> Restructure the driver to move all security attribute handling to
+> a central location and then add support for calling the platform
+> access command on those processors.
 > 
-> This patchset version 3 addresses the issues identified by Herbert.
-> The code that raised a warning was in fact useless as there is already
-> an overflow check in the "stm32_cryp_dma_check" function so I removed
-> it.
+> v1->v2:
+>  * Add tags (except patch 2)
+>  * Fix kernel robot reported issue
+>  * Move a check from patch 4 to patch 5
+> Mario Limonciello (5):
+>   crypto: ccp: Represent capabilities register as a union
+>   crypto: ccp: Move security attributes to their own file
+>   crypto: ccp: align psp_platform_access_msg
+>   crypto: ccp: Add support for getting security attributes on some older
+>     systems
+>   crypto: ccp: Move message about TSME being enabled later in init
 > 
-> I've also added a new patch that correct a spinlock recursion warning.
-> 
-> Maxime Méré (4):
->   crypto: stm32/cryp - use dma when possible.
->   crypto: stm32/cryp - increase priority
->   crypto: stm32/cryp - add CRYPTO_ALG_KERN_DRIVER_ONLY flag
->   crypto: stm32/cryp - call finalize with bh disabled
-> 
->  drivers/crypto/stm32/stm32-cryp.c | 719 ++++++++++++++++++++++++++++--
->  1 file changed, 674 insertions(+), 45 deletions(-)
+>  MAINTAINERS                         |   6 ++
+>  drivers/crypto/ccp/Makefile         |   3 +-
+>  drivers/crypto/ccp/dbc.c            |   2 +-
+>  drivers/crypto/ccp/hsti.c           | 138 ++++++++++++++++++++++++++++
+>  drivers/crypto/ccp/hsti.h           |  17 ++++
+>  drivers/crypto/ccp/psp-dev.c        |  23 ++---
+>  drivers/crypto/ccp/psp-dev.h        |  46 +++++-----
+>  drivers/crypto/ccp/sp-dev.h         |   2 +-
+>  drivers/crypto/ccp/sp-pci.c         |  67 ++------------
+>  include/linux/psp-platform-access.h |   5 +-
+>  10 files changed, 210 insertions(+), 99 deletions(-)
+>  create mode 100644 drivers/crypto/ccp/hsti.c
+>  create mode 100644 drivers/crypto/ccp/hsti.h
 > 
 > -- 
-> 2.25.1
+> 2.43.0
 
 All applied.  Thanks.
 -- 
