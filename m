@@ -1,157 +1,106 @@
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FC719752F;
-	Fri,  7 Jun 2024 14:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFB619643F;
+	Fri,  7 Jun 2024 14:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717769963; cv=none; b=YJYon3pLM50ss/8ZJKS1FY6Ez8sodcK4t+FDtr93SLJiq+WLGyn7Om2Hv/Gnewta679s0YmyHWn+4d3yFUmmLkNR4PuTXBRpQdWjK5+oAGTktpbkHwsCnLIIdaFD5T0VByzDgeptNSFhRJ39y8oWYWjD4CPaTbICKsg9BnbK18s=
+	t=1717770915; cv=none; b=Z4fcXb8nDXaAoTVw3nYINDJj9vwKc0pikrna9+I2Py+RNj87mJLAexOncaM7V8DmGfQ+nY+AO6wgyVmaHKULPG/7BquNwQdWHR0Ri/xfVzs0RvWm+9Cvd+443p0JIXGlLTm2hqnSnLIjyXu355QWWpFXPL4pSWwlupIu7Btbbt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717769963; c=relaxed/simple;
-	bh=QOYczxIU6FV0cOJGzOIxWZJrUesyGdwkLjpDpR1WMiY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MKCVEVlXcBvbbKTvM1ZodHC0C6cuacm9fFq8GWFUY8S+XjXm6+ek1KLKIv5foNUz7ALM3IYlCFaFH1jWXVaeW7L2Htb5PmOc7tL0On57LTXjNYLshHabN4wLZ6GvNQYO0fiRTJLz16hzRRF/RGxjRSVaml70YoeMOB1wKNC8uuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=HJr2xUlI; arc=none smtp.client-ip=37.18.73.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	s=arc-20240116; t=1717770915; c=relaxed/simple;
+	bh=mVgfio4EymRsdXfQ08fuEVop3EuHqiClvYLIu828s4Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KLiEmw8JLrWjVDJS0GlGUs+sSEJBBIwxYjqH2bMnfqLGAM42M6W51IIdrU1+IAWcm35Hki+na8und6/VNIopUYthXY95Lee5USUr0qZT6gesxh8cZs4oa0sFOS0vETXaCqiiB0xdgQRCOhzf2qJP59CLJk5YfC1xjTdTSH3eG4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=BBV00V0r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="HJr2xUlI"
-Received: from p-infra-ksmg-sc-msk01.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id B270410002E;
-	Fri,  7 Jun 2024 17:13:00 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru B270410002E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1717769580;
-	bh=6wrU1/sGluytgSBoZtiBi/2AtIb9XSpi3qvvAJFAO6Q=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=HJr2xUlINgA4t1h3bIzYClpQn4aGnSORBWoaKTCt5sPsftUlVkdt4LDHJWHtjwzQ0
-	 44rZx7qpmn42523geGwoKIe8BveI0y/7KUxRDI3HMq4GZY/Md4+X8caTy8fKQGSsfU
-	 tW6RrKEvRabn5ezocFQTOKFmlZ1lz0tWsmhwtE55kbcn2yebPbqXEDGyt7lDdVi+4t
-	 YM7NHSVY5InbB6rctF9qaaRizHvNsRaGHxjW4tJ6ywPOeJULb/rpAh9B9k/odAXm/o
-	 DSXbWBwJsf8OWRmv4YjMyJ+QJWL3q2HZgkXAvgM32qmxlTy1G3vvi/8Wd1txoVmzE5
-	 05gTQdzROY8hA==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Fri,  7 Jun 2024 17:13:00 +0300 (MSK)
-Received: from user-A520M-DS3H.sberdevices.ru (100.64.160.123) by
- p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 7 Jun 2024 17:13:00 +0300
-From: Alexey Romanov <avromanov@salutedevices.com>
-To: <neil.armstrong@linaro.org>, <clabbe@baylibre.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-	<khilman@baylibre.com>, <jbrunet@baylibre.com>,
-	<martin.blumenstingl@googlemail.com>, <vadim.fedorenko@linux.dev>
-CC: <linux-crypto@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kernel@salutedevices.com>, Alexey
- Romanov <avromanov@salutedevices.com>
-Subject: [PATCH v8 06/23] drivers: crypto: meson: drop status field from meson_flow
-Date: Fri, 7 Jun 2024 17:12:25 +0300
-Message-ID: <20240607141242.2616580-7-avromanov@salutedevices.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240607141242.2616580-1-avromanov@salutedevices.com>
-References: <20240607141242.2616580-1-avromanov@salutedevices.com>
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BBV00V0r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53995C3277B;
+	Fri,  7 Jun 2024 14:35:13 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BBV00V0r"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1717770911;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ajPZqckOBJFHBstUW7T2O0UQJC/naoL0j9njP215Xzs=;
+	b=BBV00V0rOVi6HrMqRiRVMBCf116AxoPzpLtxDhj5y+tsyMd3Ym3ffI3cnLv8dHVT5N405b
+	VvhpMa4UmoOiBZt/mGdrFWTc2f3MuBriCR9lDODxjJx4qa7Kzoi9sOnhwxM3+615q3OZXt
+	qRoQv2RdtEaMVDJt1qoRdCuTADRmaYM=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 26266bc1 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Fri, 7 Jun 2024 14:35:11 +0000 (UTC)
+Date: Fri, 7 Jun 2024 16:35:06 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Jann Horn <jannh@google.com>
+Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+	tglx@linutronix.de, linux-crypto@vger.kernel.org,
+	linux-api@vger.kernel.org, x86@kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
+Subject: Re: [PATCH v16 1/5] mm: add VM_DROPPABLE for designating always
+ lazily freeable mappings
+Message-ID: <ZmMamtll1Yq1yfxc@zx2c4.com>
+References: <20240528122352.2485958-1-Jason@zx2c4.com>
+ <20240528122352.2485958-2-Jason@zx2c4.com>
+ <CAG48ez0P3EDXC0uLLPjSjx3i6qB3fcdZbL2kYyuK6fZ_nJeN5w@mail.gmail.com>
+ <Zlm-26QuqOSpXQg7@zx2c4.com>
+ <CAG48ez3VhWpJnzHHn4NAJdrsd1Ts9hs0zvHa6Pqwatu4wV63Kw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m02.sberdevices.ru (172.16.192.103)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 185803 [Jun 07 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 20 0.3.20 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/06/07 12:12:00 #25491508
-X-KSMG-AntiVirus-Status: Clean, skipped
+In-Reply-To: <CAG48ez3VhWpJnzHHn4NAJdrsd1Ts9hs0zvHa6Pqwatu4wV63Kw@mail.gmail.com>
 
-This field is used only to check for timeout. But there is more
-convenient way to achive the same goal.
+On Fri, May 31, 2024 at 03:00:26PM +0200, Jann Horn wrote:
+> On Fri, May 31, 2024 at 2:13 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> > On Fri, May 31, 2024 at 12:48:58PM +0200, Jann Horn wrote:
+> > > On Tue, May 28, 2024 at 2:24 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> > > > c) If there's not enough memory to service a page fault, it's not fatal.
+> > > [...]
+> > > > @@ -5689,6 +5689,10 @@ vm_fault_t handle_mm_fault(struct vm_area_struct *vma, unsigned long address,
+> > > >
+> > > >         lru_gen_exit_fault();
+> > > >
+> > > > +       /* If the mapping is droppable, then errors due to OOM aren't fatal. */
+> > > > +       if (vma->vm_flags & VM_DROPPABLE)
+> > > > +               ret &= ~VM_FAULT_OOM;
+> > >
+> > > Can you remind me how this is supposed to work? If we get an OOM
+> > > error, and the error is not fatal, does that mean we'll just keep
+> > > hitting the same fault handler over and over again (until we happen to
+> > > have memory available again I guess)?
+> >
+> > Right, it'll just keep retrying. I agree this isn't great, which is why
+> > in the 2023 patchset, I had additional code to simply skip the faulting
+> > instruction, and then the userspace code would notice the inconsistency
+> > and fallback to the syscall. This worked pretty well. But it meant
+> > decoding the instruction and in general skipping instructions is weird,
+> > and that made this patchset very very contentious. Since the skipping
+> > behavior isn't actually required by the /security goals/ of this, I
+> > figured I'd just drop that. And maybe we can all revisit it together
+> > sometime down the line. But for now I'm hoping for something a little
+> > easier to swallow.
+> 
+> In that case, since we need to be able to populate this memory to make
+> forward progress, would it make sense to remove the parts of the patch
+> that treat the allocation as if it was allowed to silently fail (the
+> "__GFP_NOWARN | __GFP_NORETRY" and the "ret &= ~VM_FAULT_OOM")? I
+> think that would also simplify this a bit by making this type of
+> memory a little less special.
 
-Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
-Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
----
- drivers/crypto/amlogic/amlogic-gxl-cipher.c | 13 +++++++++----
- drivers/crypto/amlogic/amlogic-gxl-core.c   |  1 -
- drivers/crypto/amlogic/amlogic-gxl.h        |  2 --
- 3 files changed, 9 insertions(+), 7 deletions(-)
+The whole point, though, is that it needs to not fail or warn. It's
+memory that can be dropped/zeroed at any moment, and the code is
+deliberately robust to that.
 
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-index 18e9e2d39b1f..dc0b100c5de2 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-@@ -219,13 +219,18 @@ static int meson_cipher(struct skcipher_request *areq)
- 	}
- 
- 	reinit_completion(&mc->chanlist[flow].complete);
--	mc->chanlist[flow].status = 0;
- 	meson_dma_start(mc, flow);
--	wait_for_completion_interruptible_timeout(&mc->chanlist[flow].complete,
--						  msecs_to_jiffies(500));
--	if (mc->chanlist[flow].status == 0) {
-+
-+	err = wait_for_completion_interruptible_timeout(&mc->chanlist[flow].complete,
-+							msecs_to_jiffies(500));
-+	if (err == 0) {
- 		dev_err(mc->dev, "DMA timeout for flow %d\n", flow);
- 		err = -EINVAL;
-+	} else if (err < 0) {
-+		dev_err(mc->dev, "Waiting for DMA completion is failed (%d)\n", err);
-+	} else {
-+		/* No error */
-+		err = 0;
- 	}
- 
- 	dma_unmap_single(mc->dev, phykeyiv, keyivlen, DMA_TO_DEVICE);
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-index 52317f111c6c..4d04bb0ddc4e 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-@@ -53,7 +53,6 @@ static irqreturn_t meson_irq_handler(int irq, void *data)
- 	for (flow = 0; flow < mc->flow_cnt; flow++) {
- 		if (mc->chanlist[flow].irq == irq) {
- 			if (meson_dma_ready(mc, flow)) {
--				mc->chanlist[flow].status = 1;
- 				complete(&mc->chanlist[flow].complete);
- 				return IRQ_HANDLED;
- 			}
-diff --git a/drivers/crypto/amlogic/amlogic-gxl.h b/drivers/crypto/amlogic/amlogic-gxl.h
-index dc54bd533a2d..4d60a0cc2dca 100644
---- a/drivers/crypto/amlogic/amlogic-gxl.h
-+++ b/drivers/crypto/amlogic/amlogic-gxl.h
-@@ -59,7 +59,6 @@ struct meson_desc {
-  * @engine:	ptr to the crypto_engine for this flow
-  * @keylen:	keylen for this flow operation
-  * @complete:	completion for the current task on this flow
-- * @status:	set to 1 by interrupt if task is done
-  * @irq:	IRQ number for amlogic-crypto
-  * @t_phy:	Physical address of task
-  * @tl:		pointer to the current ce_task for this flow
-@@ -68,7 +67,6 @@ struct meson_desc {
- struct meson_flow {
- 	struct crypto_engine *engine;
- 	struct completion complete;
--	int status;
- 	int irq;
- 	unsigned int keylen;
- 	dma_addr_t t_phy;
--- 
-2.34.1
-
+Jason
