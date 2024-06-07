@@ -1,108 +1,70 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D073196C6C;
-	Fri,  7 Jun 2024 15:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3131850AA
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Jun 2024 16:15:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717775994; cv=none; b=QnOm838GUz1u80n+hGsbMVCYPmNpXYnwPibsd0TZZd5w+Ym8GhjpVDygmWR3pqVfQ01mE1a3j9gsZWKDt/omgLM0fmnpRbnwII7rFzLGBV8lZoGBOwra32p/H4Lsq5R8C12JWPPE/GnzW0S3R+qEESeD1x0OuIFgIggDcCwbEvE=
+	t=1717776923; cv=none; b=JRJNK916NMMMQYSbqYXRukcSam7Wxqp0mnlY15sdSV9i6rj4DaHAhwGNtzu1Oi2S9SYArE7YTZ56RJOfsABm7qSb40AKnerPYh5D7Esmeg/qn7/OLWnhkJETGKImZrHQ+kaoF9XbUdD+BLU4ZCZSaebaiNCNTg4GK6Op+w9sWEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717775994; c=relaxed/simple;
-	bh=QMZv3PmaJBSN0Uisj1+0w3LHLVgBya6v9buH33ICul8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NacEKKn3Zpt5DKqXmGbRWgZ2K6jXuPiwQRylSjV8CWqnb0j1fYIt3zXl2obc4BvMbJR2hNf0tozferuueixDtl5RT6ISfaBwz+pVzJ/ZTHHN+f2omMNQVD1e2+DANmHFbLuHHFzqhBSXJci6OnXAENn4s6+hSWyvE/TJwiCLWck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=EOhL2dP6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717776923; c=relaxed/simple;
+	bh=EVU9N0licjs0UeJIOtiEuJJs/gF6eA2Qsud/PZcHqMY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qg7Kod4R/o2YsLYwCiCcvt65+AflNL1VGUX8bZE2lp7DqO8Qtjxpj4Qb2knFlVvpdY9r6rkaINyCFFo51Yxs+ifOjeO2COoaMYZZ3BqMndkTfOMpuzoB/G5mclkHnORvF8M9cWTgnf87CSfPPaVfwGCcM9fxJ6rfvZ5teQ1ltDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=siH9tGIN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="EOhL2dP6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D401AC2BBFC;
-	Fri,  7 Jun 2024 15:59:52 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="EOhL2dP6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1717775991;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IrCcKC3zcgq1LVkSXlbN/JqWlpCIyvXtoMLRLkbBI24=;
-	b=EOhL2dP6PnCvESjNvrDDLZejKvEB0F+xEKh6KPAO3FPzz5Z1DsusxWuX9cHZgxOd+4RV9Q
-	bn9apsGlLAvnBQFctmoyLY0AbwPf3mbTLQI67XAYE4cY/owzZQiQtEWMlOc+ALm88vKt4w
-	DDCU3QveswwRGR8JDvkSbp4cr7fPlmU=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 34f78f04 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Fri, 7 Jun 2024 15:59:50 +0000 (UTC)
-Date: Fri, 7 Jun 2024 17:59:42 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
-	x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-	Carlos O'Donell <carlos@redhat.com>,
-	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	Jann Horn <jannh@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	David Hildenbrand <dhildenb@redhat.com>
-Subject: Re: [PATCH v16 4/5] random: introduce generic vDSO getrandom()
- implementation
-Message-ID: <ZmMubnTe6m_ET-9w@zx2c4.com>
-References: <874ja73xx7.ffs@tglx>
- <87v82n2g93.ffs@tglx>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="siH9tGIN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F9DCC2BBFC;
+	Fri,  7 Jun 2024 16:15:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717776922;
+	bh=EVU9N0licjs0UeJIOtiEuJJs/gF6eA2Qsud/PZcHqMY=;
+	h=Date:From:To:List-Id:Cc:Subject:In-Reply-To:References:From;
+	b=siH9tGINYS+RQSfGXjlHx2/ykdX/Teg1wxvSW1B/kiE5GxbUG0UjZD04NOgfBDVEr
+	 wg1etkPy8l9TMT8JZmkCCxlhT15Llg1swybG3uGyxX9AcvRgnePzfPQwibUVsYRECg
+	 4jk7AR24YxQgy3bNzBCRXCg+EENGe1kffAbEBt8/4nlCL7cKhIMGlP5x6W8129E2qO
+	 76R6oyoEsyrXu5tWZ5EQeRTgR7sEejG4j8vcpnK3PoZ18OPPsQwRDl3uMw8vmvyWMz
+	 q+F5J0XtamCzxiDvKegkF9t9nEsu28kCP3PE0Tw1kc9bpemzf+qJa173vXHEXLd7NG
+	 Fve3WFN9OfOZw==
+Date: Fri, 7 Jun 2024 18:15:16 +0200
+From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Gregory CLEMENT <gregory.clement@bootlin.com>, Arnd Bergmann
+ <arnd@arndb.de>, soc@kernel.org, arm@kernel.org, Andy Shevchenko
+ <andy@kernel.org>, Hans de Goede <hdegoede@redhat.com>, Ilpo
+ =?UTF-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, Olivia Mackall
+ <olivia@selenic.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v11 6/8] platform: cznic: turris-omnia-mcu: Add support
+ for MCU provided TRNG
+Message-ID: <20240607181516.72edb60a@dellmb>
+In-Reply-To: <ZmLhQBdmg613KdET@gondor.apana.org.au>
+References: <20240605161851.13911-1-kabel@kernel.org>
+	<20240605161851.13911-7-kabel@kernel.org>
+	<ZmLhQBdmg613KdET@gondor.apana.org.au>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87v82n2g93.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 06, 2024 at 12:10:00AM +0200, Thomas Gleixner wrote:
-> Jason!
-> 
-> On Wed, Jun 05 2024 at 23:03, Thomas Gleixner wrote:
-> > On Tue, May 28 2024 at 14:19, Jason A. Donenfeld wrote:
-> >> + */
-> >> +#ifdef CONFIG_64BIT
-> >> +typedef u64 vdso_kernel_ulong;
-> >> +#else
-> >> +typedef u32 vdso_kernel_ulong;
-> >> +#endif
+On Fri, 7 Jun 2024 18:30:24 +0800
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
+
+> On Wed, Jun 05, 2024 at 06:18:49PM +0200, Marek Beh=C3=BAn wrote:
 > >
-> > All of this is pointless because if a 32-bit application runs on a
-> > 64-bit kernel it has to use the 64-bit 'generation'. So why on earth do
-> > we need magic here for a 32-bit kernel?
-> >
-> > Just use u64 for both and spare all this voodoo. We're seriously not
-> > "optimizing" for 32-bit kernels.
-> 
-> All what happens on a 32-bit kernel is that the RNG will store the
-> unsigned long (32bit) generation into a 64bit variable:
-> 
-> 	smp_store_release(&_vdso_rng_data.generation, next_gen + 1);
-> 
-> As the upper 32bit are always zero, there is no issue vs. load store
-> tearing at all. So there is zero benefit for this aside of slightly
-> "better" user space code when running on a 32-bit kernel. Who cares?
+> > +static int omnia_trng_read(struct hwrng *rng, void *data, size_t max, =
+bool wait)
+> > +{
+> > +	struct omnia_mcu *mcu =3D (struct omnia_mcu *)rng->priv; =20
+>=20
+> Please don't cast rng->priv in this manner.  Please take a look at
+> drivers/char/hw_random/bcm2835-rng.c for how it should be done.
+>=20
+> Thanks,
 
-Oh yea. Okay, great. I was concerned about the tearing, but I guess it's
-really a non issue. So I'll just make it a u64 and all of this
-complexity can just go away. Thanks for thinking about it in a less
-convoluted way than me.
-
-> While staring at this I wonder where the corresponding
-> smp_load_acquire() is. I haven't found one in the VDSO code.
-> READ_ONCE() is only equivalent on a few architectures.
-> 
-> But, what does that store_release() buy at all? There is zero ordering
-> vs. anything in the kernel and neither against user space.
-> 
-> If that smp_store_release() serves a purpose then it really has to be
-> extensively documented especially as the kernel itself simply uses
-> WRITE/READ_ONCE() for base_rng.generation.
-
-This came up here too: https://lore.kernel.org/all/Y3l6ocn1dTN0+1GK@zx2c4.com/
-
-It's to order the writes to the generation counter and is_ready.
-
-Jason
+THX, prepared for next version.
