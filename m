@@ -1,44 +1,44 @@
 Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E239919AD73;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4F719AD9A;
 	Fri,  7 Jun 2024 14:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717769596; cv=none; b=cfJocligH39A1jV7lCzgHMtEOP+KZSIDH/VF0urbFiYrmE2jREcoB0Dw5Hv4Ax8VwKbdQOVihdrEWgQ31+b8bqfGaUUIKV5a2Okcuk3ojbEbDgB3Q5qT+J5mC4vONZlKCpoEZZDiGjE3jtJfP9cigQ52+Vr/0ASpSlSGWhhlIOA=
+	t=1717769596; cv=none; b=BZLQvA+2a67OV8zTSiB6aFctl3BJTchYpAlB2d98CJZcRMPbuJGrBHb/kL28S2hQ+xaJvmDGH1azi7yQqh2Qwgv0Te0bYKjYWa5GCpqVe3XeIr7WO0kwuAfDWdpqb02PhLlEe9JbOJpvC6waR2dMtQZREpcAguuDcLTM7mw5zk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717769596; c=relaxed/simple;
-	bh=PtOIrOIx5hjcB+Q7wPe9wVjS9biaNysocDsQ1q6F+uc=;
+	bh=FkWGNDNbRXDjW/Zy4c5EJSyBgOrlwsC4qDq299zr+fw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Dm/AbqnFYi1OYufwlIIrHnjCoMuX1yvVCpgrnoVVwxNpQYL0G6cZ7boPTBK9CrcKgEkYDEMRkYr5OltmhmneJ0O3vK6vfJxIfPTinIkwK6pfWuiX/2jprNsrYavk+ccCLytiJWevL7HTnEpiAbmza6nO+skc1BetxK0TjgPFQFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=RqZT3rsf; arc=none smtp.client-ip=45.89.224.132
+	 MIME-Version:Content-Type; b=gUZOCS/RhjZpXuNlRoneIo8LgmTKRjQfKIVpg01kAt0d9DAKu24XZTGkOGLtby83wJf6ezak9hJdA65tagqx4M3TBtVcvwj56Mp+kw9re848NEFa6ORYD+KPM9M+yEMAAFfCAUqOfFPA1Rmy1Cg2ZTQWqEtF7WljzCuNRgF7jx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=eNEFiQg8; arc=none smtp.client-ip=45.89.224.132
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="RqZT3rsf"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="eNEFiQg8"
 Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 319D912000C;
-	Fri,  7 Jun 2024 17:13:07 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 319D912000C
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 31474120002;
+	Fri,  7 Jun 2024 17:13:09 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 31474120002
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1717769587;
-	bh=iBwlgGHbj3XicCkmDtCtqP7003eXdu/OMJAEfVLMc44=;
+	s=mail; t=1717769589;
+	bh=Y4YVvdt1XvNVcPjTvRD6UrHLms/aMw7z+wLHlY3a0Xs=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=RqZT3rsfuEsudwCDmoxvbKLoVSGoGLuuu8alF4nB4fPzE4HvEuRjeja5mWITAT3iy
-	 FN2y90Xy8ayEYE+a12wEUg6j/exhh2B9h2tX0m9/iplGJ/jDojCHMeFEDCYwlHlba2
-	 T+cIsOCgnq0wUjGDm8NpaL0wTqhJ3ndOZ3Na7x4GxLmGi09Qd/GHA3q77hBFGWEMti
-	 2l8lepuXXOJi4TnxRjRhiWe6x+40TlX8yUWc1T4ayIlKYnXGNgh2BhWUa+MRUObo4H
-	 0s0Leb0/WlAGwgzPJ5f0kK3dIycFjkyDMskjjXPgAC9P1P9uUWxYVAU3r+yBp13pdy
-	 xR0ypeQZUoUdg==
+	b=eNEFiQg8jYrvzegfqu4o43+g3v8IkubSTerRpl2hOCpkswLyM7SnOqyX89qv0lJMo
+	 Bkvtau6yJ7O4wxbwyZus1jb+ooRVWa1HciHhC6UlhNB9BRMdunh/z+8u6CKYUwG+mQ
+	 IKox+U/pRvze+bXQ3luprH3i/VVM1VRvrACRFpzUQFMqu346qu9THQSAcG2N/LGmmg
+	 ZhfHW5Znpmzouej3Xw63tBsA3nVFGJY7yrKSDk6oThOWMBdeHvpgFtHUUejgXsBpuZ
+	 8dVxqeQOZKQ8tUV0MI4eVHvVcUfLG6o95JZRlQQDKDY0I9KMrz60PPMo/djq+/8zUh
+	 8FUPJ1PXI4Zmg==
 Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
 	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Fri,  7 Jun 2024 17:13:07 +0300 (MSK)
+	Fri,  7 Jun 2024 17:13:09 +0300 (MSK)
 Received: from user-A520M-DS3H.sberdevices.ru (100.64.160.123) by
  p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 7 Jun 2024 17:13:06 +0300
+ 15.2.1118.40; Fri, 7 Jun 2024 17:13:08 +0300
 From: Alexey Romanov <avromanov@salutedevices.com>
 To: <neil.armstrong@linaro.org>, <clabbe@baylibre.com>,
 	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh+dt@kernel.org>,
@@ -49,9 +49,9 @@ CC: <linux-crypto@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
 	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <kernel@salutedevices.com>, Alexey
  Romanov <avromanov@salutedevices.com>
-Subject: [PATCH v8 16/23] drivers: crypto: meson: add support for A1-series
-Date: Fri, 7 Jun 2024 17:12:35 +0300
-Message-ID: <20240607141242.2616580-17-avromanov@salutedevices.com>
+Subject: [PATCH v8 18/23] arch: arm64: dts: meson: gxl: correct crypto node definition
+Date: Fri, 7 Jun 2024 17:12:37 +0300
+Message-ID: <20240607141242.2616580-19-avromanov@salutedevices.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240607141242.2616580-1-avromanov@salutedevices.com>
 References: <20240607141242.2616580-1-avromanov@salutedevices.com>
@@ -82,49 +82,37 @@ X-KSMG-LinksScanning: Clean
 X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/06/07 12:12:00 #25491508
 X-KSMG-AntiVirus-Status: Clean, skipped
 
-This platform data also can be used for S4 as fallback.
-Tested via tcrypt module and with custom tests.
+GXL and newer SoC's uses the DMA engine (not blkmv) for crypto HW.
+Crypto HW doesn't actually use the blkmv clk. At RTL level, crypto
+engine is hard weired to clk81 (CLKID_CLK81).
 
+Also, GXL crypto IP isn't to seconnd interrput line. So we must
+remove it from dt-bindings.
+
+Fixes: c4a0457eb858 ("ARM64: dts: amlogic: adds crypto hardware node")
 Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
 ---
- drivers/crypto/amlogic/amlogic-gxl-core.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ arch/arm64/boot/dts/amlogic/meson-gxl.dtsi | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-index 4275f467d1c6..43cedc10294f 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-@@ -304,6 +304,15 @@ static const struct meson_pdata meson_axg_pdata = {
- 	.support_192bit_key = true,
- };
- 
-+static const struct meson_pdata meson_a1_pdata = {
-+	.descs_reg = 0x0,
-+	.status_reg = 0x8,
-+	.setup_desc_cnt = 1,
-+	.hasher_supported = true,
-+	.reverse_keyiv = false,
-+	.support_192bit_key = false,
-+};
-+
- static const struct of_device_id meson_crypto_of_match_table[] = {
- 	{
- 		.compatible = "amlogic,gxl-crypto",
-@@ -317,6 +326,14 @@ static const struct of_device_id meson_crypto_of_match_table[] = {
- 		.compatible = "amlogic,axg-crypto",
- 		.data = &meson_axg_pdata,
- 	},
-+	{
-+		.compatible = "amlogic,a1-crypto",
-+		.data = &meson_a1_pdata,
-+	},
-+	{
-+		.compatible = "amlogic,s4-crypto",
-+		.data = &meson_a1_pdata,
-+	},
- 	{},
- };
- MODULE_DEVICE_TABLE(of, meson_crypto_of_match_table);
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
+index 17bcfa4702e1..66d1433765bc 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
+@@ -68,10 +68,9 @@ acodec: audio-controller@c8832000 {
+ 		crypto: crypto@c883e000 {
+ 			compatible = "amlogic,gxl-crypto";
+ 			reg = <0x0 0xc883e000 0x0 0x36>;
+-			interrupts = <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>,
+-				     <GIC_SPI 189 IRQ_TYPE_EDGE_RISING>;
+-			clocks = <&clkc CLKID_BLKMV>;
+-			clock-names = "blkmv";
++			interrupts = <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>;
++			clocks = <&clkc CLKID_CLK81>;
++			clock-names = "clk81";
+ 			status = "okay";
+ 		};
+ 	};
 -- 
 2.34.1
 
