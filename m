@@ -1,120 +1,142 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D9D135A7E;
-	Mon, 10 Jun 2024 14:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5515613DB9B
+	for <linux-crypto@vger.kernel.org>; Mon, 10 Jun 2024 15:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718030889; cv=none; b=XxPePH3mAgnRMZmpL5LQwtl0rUYaIZNSI/TGaXcP0+nFxR29JPWZps9Ns+hBEg1c0GWIB1nli9hwjN12QomOXhE6c/N0bgNyt5ikf+nh1i+7ag/+hpgcWh9WX5HFF8ryNsP03FCOdaPgG7w2UBLixsw09JP2qryP6C9EEIjHJqk=
+	t=1718033211; cv=none; b=AANL+YhO+SDovqQN9k/AHMchOR2jjWo1wVB7E2q3eT2wBDizbM+OGlLSqh/pVb2irnWwowQWSbJjbGI3DGA3xmODkwrbsloR/yT7AWoTfQHnbKz+InWcEPQsQ3yZxEN5M9w54qZDFcww7IhYdNtUCWIsbdCcVIvmOOVfXTf2VFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718030889; c=relaxed/simple;
-	bh=Id0eYrZGL0JaBkLoeHCoTfXGUS8qKGnKHyCnt698f2I=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=KsjQjrdFY0lmhkxUAYSaDX198A0PVmGnB7lgXkQ6KfQ51D9dsfQMnoY3onDi0Zl2gdL/kxoR7dYTgkLdGqDGzhy1nThPTXyrWmfM3pgP9S895zwA7UvEBoCtm8K4gvdCNti6QOHl5TN0qNfBktgEo6ie7j7RmMbnsDMs6HGSxXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AKOG+uIB; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1718033211; c=relaxed/simple;
+	bh=djm11PbPLUTyQQJ9l3sDzgoLBWIugExYLbEBTnWiegA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SKFkBefeDy8c5uk956ceniWe/v+poFJaVEs9wRab4jtdXylc99mnpBnZkcAts4ix06qoffrjO7lmmOVzZhn2HJXebS4rioq4RBf+Od8Y+JkVsRUGiXKZ0IgAAiFZYNO55VMALeY4HJj0RaeWoZL1tzDDH9rB/MwYlTbG6hPgDQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BjJNzUou; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AKOG+uIB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718030888; x=1749566888;
-  h=from:to:cc:subject:date:message-id;
-  bh=Id0eYrZGL0JaBkLoeHCoTfXGUS8qKGnKHyCnt698f2I=;
-  b=AKOG+uIB+0BtuhOaY50HaIOfWHWu80y8ekkoqNmpI87czxMv9BPcsV+z
-   MxJYm6bPD/mNST9FOs5ghBhuyYmkAKvhnkqAFinJiA4Aoe0urU7L0Ng2x
-   pzEJHrI5e6Eri++azLxFH9GQZVlSLbFsulfkBM+XWvg3DpMhdd7RdwP6x
-   8naE2NpyUIV7L/C7+M2iiIHhypkCpqzIl7O14fBaLRwLkPbqNNbsxfDP4
-   0RzI+ze4w3OF4SjRUZqzvjqmjzP/L2BEpsG2oAXP5+ZjqBfXDnMceRc2u
-   r3jmdYciKFaM1iho1LEnp/vm8zvsD294X6w1EscQXhsAlTXVNzAQJ+eoQ
-   Q==;
-X-CSE-ConnectionGUID: N0xAUsp3SBiYXCACr+U0Ow==
-X-CSE-MsgGUID: Kg/cXSZhTGqXOPwUEhLUfw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11099"; a="18526047"
-X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
-   d="scan'208";a="18526047"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 07:48:07 -0700
-X-CSE-ConnectionGUID: R6NIT3N/REm6/vaBn7aj7A==
-X-CSE-MsgGUID: iOVXeQxiQ8WFAzyIrK8ziw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
-   d="scan'208";a="69872049"
-Received: from qat-server-archercity1.sh.intel.com ([10.67.111.115])
-  by orviesa002.jf.intel.com with ESMTP; 10 Jun 2024 07:48:04 -0700
-From: Xin Zeng <xin.zeng@intel.com>
-To: herbert@gondor.apana.org.au,
-	alex.williamson@redhat.com,
-	jgg@nvidia.com,
-	yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com,
-	kevin.tian@intel.com,
-	arnd@arndb.de
-Cc: linux-crypto@vger.kernel.org,
-	kvm@vger.kernel.org,
-	qat-linux@intel.com,
-	Xin Zeng <xin.zeng@intel.com>
-Subject: [PATCH] crypto: qat - fix linking errors when PCI_IOV is disabled
-Date: Mon, 10 Jun 2024 22:37:56 +0800
-Message-Id: <20240610143756.2031626-1-xin.zeng@intel.com>
-X-Mailer: git-send-email 2.18.2
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BjJNzUou"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-421eed70e30so7195515e9.1
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Jun 2024 08:26:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718033209; x=1718638009; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DMRJJSTKqYUGD8dus+yMRcwA/79j6mVNZpg6fqpBuM4=;
+        b=BjJNzUoudrPRDwJ8vhBC0bJ3GZCfl5qF2FNbd1VfERaHj+4B/WmwHdeOFQyQKspulS
+         mF7+wgKFjHC+rE2rBKShSz9L490mbPSck+3xbeGQEchgSPndpe9EFptOmDa/LBOwk7w9
+         cfpUSgGByYAQlWpMj6RFJURMwhC9/k7cgvhNL6NwxLnMCZz2gNdzppHgaI0gw5NOOBPJ
+         ZwhDH3zs7DS8uxs7SILKeVcjstwwaGF+hocnk+5dUuoxSDLUTa4jV051ITMmDHl5SQwE
+         eI1MBCieWARIV1P9t720tyCWzSqVDOJbBGT6cF7A96AuEjAJTIe+2O3F1zJGuuyEXWso
+         kMNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718033209; x=1718638009;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DMRJJSTKqYUGD8dus+yMRcwA/79j6mVNZpg6fqpBuM4=;
+        b=BqMMygt3TKN8tugCh0hsCLgq4qaFfidwPLVUCfIp9OSOIeL8Ie3HIqqOok+DkdWBxN
+         CYkgIwTbo2RN6oWIbJHzsBNiRcZAWISY/ahMjeXfpeJWR5R1LlqT7o1UadAOWGZ1Ejyu
+         umuBZ+9PTc8Y7h8EML45yr0oQp2GF1cR0PJe0vUZYRS64Emzx38RBR/ErQfYJnJE+8d1
+         c4l5c77m10dAUrSoQFSHwO5GaIamvrsv+6/QZExiVYIbXAr+ErfiuKCx2N7Wjo5eoxTa
+         /CXQaUautUFq0EpX9jnNVsYYC9dm/rFEE+BH5F5d+w5DB0dFrjjyU+IXlbjdNGzRxtzL
+         uUzA==
+X-Gm-Message-State: AOJu0YyOqRxt6jlCQ4/W8Ml4KA2RZCM/oNSErSFKeK//Nwu7lhWhd5Kx
+	UDE2MgvdyT+4WEQFmq95Vzsq7KDuP064A03nVzwi//R/AsKah9HurEvs/jzvvXHeoOmv3i85D8M
+	qx/nfVfXCCT6IM2peacJ8S9LWV3/YJEWzovs+uEWc4JcVj+LwYwrUflQ7Y9Ebi6p8BYdQhNKCJ5
+	udb+Wfyu/DbQpBHp3YWS8DCpYnb4GDBQ==
+X-Google-Smtp-Source: AGHT+IEgVKYDJAU1PB7jiqGHNCiuMfVzxelJUEkF9CTltoEJ0PqEdL6NNITTyaGvrim+bR2T+XtvJETE
+X-Received: from palermo.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:118a])
+ (user=ardb job=sendgmr) by 2002:a05:600c:5487:b0:41f:e5af:181e with SMTP id
+ 5b1f17b1804b1-42164a4e229mr408355e9.7.1718033208283; Mon, 10 Jun 2024
+ 08:26:48 -0700 (PDT)
+Date: Mon, 10 Jun 2024 17:26:39 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1742; i=ardb@kernel.org;
+ h=from:subject; bh=eJNPUyXrEg+4UdWAVwkHUS/E+tlxeHkytZaImtWFzIg=;
+ b=owGbwMvMwCFmkMcZplerG8N4Wi2JIS1dWn/dQ06xa7aMn3l3LbaR6hWs1Np5teBSz7+sug23P
+ oflSz3uKGVhEONgkBVTZBGY/ffdztMTpWqdZ8nCzGFlAhnCwMUpABPJnc7wT69IwtFPpvN/y/+7
+ Wxg77slM8LghKBZ9uEr/3+zyi9InlBj+Sk+1KnEoyzgmLs4Xu2au+k6pq8ECnGs2vXyuJTLnwF1 NXgA=
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <20240610152638.2755370-2-ardb+git@google.com>
+Subject: [PATCH] crypto: arm/crc32 - add kCFI annotations to asm routines
+From: Ard Biesheuvel <ardb+git@google.com>
+To: linux-crypto@vger.kernel.org
+Cc: linux-hardening@vger.kernel.org, herbert@gondor.apana.org.au, 
+	Ard Biesheuvel <ardb@kernel.org>, Kees Cook <keescook@chromium.org>, 
+	Linus Walleij <linus.walleij@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-When CONFIG_PCI_IOV=n, the build of the QAT vfio pci variant driver
-fails reporting the following linking errors:
+From: Ard Biesheuvel <ardb@kernel.org>
 
-    ERROR: modpost: "qat_vfmig_open" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_resume" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_save_state" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_suspend" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_load_state" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_reset" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_save_setup" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_destroy" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_close" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_cleanup" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    WARNING: modpost: suppressed 1 unresolved symbol warnings because there were too many)
+The crc32/crc32c implementations using the scalar CRC32 instructions are
+accessed via indirect calls, and so they must be annotated with type ids
+in order to execute correctly when kCFI is enabled.
 
-Make live migration helpers provided by QAT PF driver always available
-even if CONFIG_PCI_IOV is not selected. This does not cause any side
-effect.
-
-Reported-by: Arnd Bergmann <arnd@arndb.de>
-Closes: https://lore.kernel.org/lkml/20240607153406.60355e6c.alex.williamson@redhat.com/T/
-Fixes: bb208810b1ab ("vfio/qat: Add vfio_pci driver for Intel QAT SR-IOV VF devices")
-Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- drivers/crypto/intel/qat/qat_common/Makefile | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/arm/crypto/crc32-ce-core.S | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 6f9266edc9f1..eac73cbfdd38 100644
---- a/drivers/crypto/intel/qat/qat_common/Makefile
-+++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -39,7 +39,8 @@ intel_qat-objs := adf_cfg.o \
- 	adf_sysfs_rl.o \
- 	qat_uclo.o \
- 	qat_hal.o \
--	qat_bl.o
-+	qat_bl.o \
-+	qat_mig_dev.o
+diff --git a/arch/arm/crypto/crc32-ce-core.S b/arch/arm/crypto/crc32-ce-core.S
+index 3f13a76b9066..88f9edf94e95 100644
+--- a/arch/arm/crypto/crc32-ce-core.S
++++ b/arch/arm/crypto/crc32-ce-core.S
+@@ -48,6 +48,7 @@
+  */
  
- intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
- 				adf_fw_counters.o \
-@@ -56,6 +57,6 @@ intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
- intel_qat-$(CONFIG_PCI_IOV) += adf_sriov.o adf_vf_isr.o adf_pfvf_utils.o \
- 			       adf_pfvf_pf_msg.o adf_pfvf_pf_proto.o \
- 			       adf_pfvf_vf_msg.o adf_pfvf_vf_proto.o \
--			       adf_gen2_pfvf.o adf_gen4_pfvf.o qat_mig_dev.o
-+			       adf_gen2_pfvf.o adf_gen4_pfvf.o
+ #include <linux/linkage.h>
++#include <linux/cfi_types.h>
+ #include <asm/assembler.h>
  
- intel_qat-$(CONFIG_CRYPTO_DEV_QAT_ERROR_INJECTION) += adf_heartbeat_inject.o
-
-base-commit: ed00b94dc9e7befd6a77038bd351e0370f73f22c
+ 	.text
+@@ -123,11 +124,12 @@
+ 	 * uint crc32_pmull_le(unsigned char const *buffer,
+ 	 *                     size_t len, uint crc32)
+ 	 */
+-ENTRY(crc32_pmull_le)
++SYM_FUNC_START(crc32_pmull_le)
+ 	adr		r3, .Lcrc32_constants
+ 	b		0f
++SYM_FUNC_END(crc32_pmull_le)
+ 
+-ENTRY(crc32c_pmull_le)
++SYM_FUNC_START(crc32c_pmull_le)
+ 	adr		r3, .Lcrc32c_constants
+ 
+ 0:	bic		LEN, LEN, #15
+@@ -236,8 +238,7 @@ fold_64:
+ 	vmov		r0, s5
+ 
+ 	bx		lr
+-ENDPROC(crc32_pmull_le)
+-ENDPROC(crc32c_pmull_le)
++SYM_FUNC_END(crc32c_pmull_le)
+ 
+ 	.macro		__crc32, c
+ 	subs		ip, r2, #8
+@@ -296,11 +297,11 @@ ARM_BE8(rev16		r3, r3		)
+ 	.endm
+ 
+ 	.align		5
+-ENTRY(crc32_armv8_le)
++SYM_TYPED_FUNC_START(crc32_armv8_le)
+ 	__crc32
+-ENDPROC(crc32_armv8_le)
++SYM_FUNC_END(crc32_armv8_le)
+ 
+ 	.align		5
+-ENTRY(crc32c_armv8_le)
++SYM_TYPED_FUNC_START(crc32c_armv8_le)
+ 	__crc32		c
+-ENDPROC(crc32c_armv8_le)
++SYM_FUNC_END(crc32c_armv8_le)
 -- 
-2.18.2
+2.45.2.505.gda0bf45e8d-goog
 
