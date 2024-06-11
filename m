@@ -1,85 +1,103 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4E4374CB;
-	Tue, 11 Jun 2024 15:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B43943AAE
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2024 16:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718121097; cv=none; b=rH0q3iPH8rxfAlgR6uypthpvPbbmiHnplsGjnYl5f7qCwXhdMSXHo06GBhWaiUGB4AnCYbjP+S9q2Dwh5GVvGS4G+TUyx7NuPpAHn2AvdTOO34IQjU4UYzJ6aKilMTkqpC3pE7nV7er1QHEYanl4PmCp4OdU5yS88C5rHd1q1ZA=
+	t=1718123294; cv=none; b=VSRPKNLdsfwa77QmOaq/xeh1Jd9Ln8UGYtSVTPa+2p+z9K/f17gVD/BfSApaG5lXzAdRWdtbkNWK79ipdox3D82rz6HtV+s6wQL8FjE967Y4wErz3Xu+uWyKqbelbP8XK21yhtOojZ1Vs65H0Bfc5GABJAS0PfNl+MqAH8At59Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718121097; c=relaxed/simple;
-	bh=XckmIxxwagAL+OLUx/2jzd5T78QbSt3kFnzccEHytl4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lhx0bdB0gmeEuPwGSXciR3SQxWZCayqa+A4RhNNbWaZ1N9Gzyky6ulY9Imsn1mI5zMxvrLfpJCC5pwoX9xQPKjGIkeIkOdFS21Dtou6tsX0ODc6Ah8/fYTbRgaWL9ES0zJtM6uKgiwE8RAm/8CrwYu/M9VbjGXFOvFCwIXW6H0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sH3mS-0088Mw-0u;
-	Tue, 11 Jun 2024 23:51:29 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 11 Jun 2024 23:51:31 +0800
-Date: Tue, 11 Jun 2024 23:51:31 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	fsverity@lists.linux.dev, dm-devel@lists.linux.dev, x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v4 6/8] fsverity: improve performance by using
- multibuffer hashing
-Message-ID: <Zmhygz_0bJZ52ljd@gondor.apana.org.au>
-References: <ZmFL-AXZ8lphOCUC@gondor.apana.org.au>
- <CAMj1kXHLt6v03qkpKfwbN34oyeeCnJb=tpG4GvTn6E1cJQRTOw@mail.gmail.com>
- <ZmFmiWZAposV5N1O@gondor.apana.org.au>
- <CAMj1kXFt_E9ghN7GfpYHR4-yaLsz_J-D1Nc3XsVqUamZ6yXHGQ@mail.gmail.com>
- <ZmFucW37DI6P6iYL@gondor.apana.org.au>
- <CAMj1kXEpw5b3Rpfe+sRKbQQqVfgWjO_GsGd-EyFvB4_8Bk8T0Q@mail.gmail.com>
- <ZmF-JHxCfMRuR05G@gondor.apana.org.au>
- <20240610164258.GA3269@sol.localdomain>
- <Zmhrh1nodUE-O6Jj@gondor.apana.org.au>
- <CAMj1kXEwmHqKbde4_erjmdi=+nO13Qwu3nSbkU_77C3xcjxAjQ@mail.gmail.com>
+	s=arc-20240116; t=1718123294; c=relaxed/simple;
+	bh=N4evEqm5Lsj9muDRZ0FKGlEsgvOKjl0qugGTleH/ab8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bXYkniy54JewNoTMk8fZIJd5EKBV1NPWsWYWwecr6YqL8RupipFJlVzZGTOmP/z9d85Py0CXksYuwboZsPJILYQ+sLIXCkZLtpNvPt8e231if1jhwNKBq7ydl7a8LeGGPYD8nUFmWx81MgASAHgBC4RqioIXrRqXsGWo4+DQPqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OizTeFwj; arc=none smtp.client-ip=209.85.167.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OizTeFwj"
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3d22368713aso1801750b6e.1
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2024 09:28:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718123292; x=1718728092; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BG7XPsDBrgukiLlYYahx3Tk9saQ0mEeAf77iSA+2xAk=;
+        b=OizTeFwjBU81njD45yxQT2wWY3Eodu/9OIU5Hg4n1NA1r58jVM9QenP8mB+dRc7lEv
+         Dwb0Z45eMdGk/GNGRR/kaOSM+cO7BcnPeQw5KEVNAeKK+5y+24od82A+dYRk0TQfaaG5
+         Ko5TK1i/d1qE+0PrUgn6yXwsMA+2SYtMo+FxPEsTvK02NznyZVP/IAXRVcDumy9si3Vm
+         E/Qt3Nq6kdPu0fvDs4fhfMOet99oYPOxUR4bB64H2AsbyB9vwp+RmSHDy4KyurNG83Zx
+         ShD2fVSXur3+4qOL4l/XNg/HqLHyyUIgVmEcUkDOq0sRrCgIeBElI/2KGXPZyJVF/NYn
+         Ga3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718123292; x=1718728092;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BG7XPsDBrgukiLlYYahx3Tk9saQ0mEeAf77iSA+2xAk=;
+        b=RYBuSpnRX39c/Jan4S0vk0iR8r6YnGOgp8i0vFOiijeYMzcmG3NVDLQHJf8CKYDb0v
+         6hD3j13L2VzSEDFMDp4ATsnK3K43wwyF4wcI0CAnnBhNsdH1AGOQNmItHnHylpeXuaXu
+         IRhkzTNVX0ha/s202nrTAZ5QmW50wqJjOnHohOFs+tFkCc4JirJlxIARafynBlRvbRdW
+         aB3eePV9hWt93UzdY3xPsNz69sjRCQNObxT0JY+LqI4k8JoV8j7b319BuepH8Ijuke7Y
+         +FELHneFiO6Pma6K1DeNgAUIxfJX+ri61NoBaKxke5J0+hy6ZifK+UzRXowaa3kM6fFn
+         NPww==
+X-Gm-Message-State: AOJu0Yx5yc8Vj24zX6aDNRyKb36FvAc5U3X5lAi1ghYvkfGNilUPLbqo
+	KP0ZV9uIkLoxt9D1vjhedQ8YGpfsPvb/TwkAL/S7btXDQbv9wcABlhbNSZFuOJJQCaUS7abEYmw
+	rTh2HxsPZi5HkqGIXPJhfWOHezBrRTX4vc7FN
+X-Google-Smtp-Source: AGHT+IGsoxkLL97yYbUdTS+m9HxBL/aA7VS6tK+dAweHiy1stwZYh0uBGwlgxKNC988k8KBFPrrE/j5bFzDX0CXaftQ=
+X-Received: by 2002:a05:6808:2183:b0:3d2:1f88:3e86 with SMTP id
+ 5614622812f47-3d21f88455amr12786369b6e.37.1718123292024; Tue, 11 Jun 2024
+ 09:28:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXEwmHqKbde4_erjmdi=+nO13Qwu3nSbkU_77C3xcjxAjQ@mail.gmail.com>
+References: <20240611034822.36603-1-ebiggers@kernel.org>
+In-Reply-To: <20240611034822.36603-1-ebiggers@kernel.org>
+From: Sami Tolvanen <samitolvanen@google.com>
+Date: Tue, 11 Jun 2024 09:27:32 -0700
+Message-ID: <CABCJKuf-yUQVh_gpO80qbifGyonQYDC-=QxL+PPwUzprXqQBUw@mail.gmail.com>
+Subject: Re: [PATCH v5 00/15] Optimize dm-verity and fsverity using
+ multibuffer hashing
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, fsverity@lists.linux.dev, 
+	dm-devel@lists.linux.dev, x86@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ardb@kernel.org>, 
+	Bart Van Assche <bvanassche@acm.org>, Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 11, 2024 at 05:46:01PM +0200, Ard Biesheuvel wrote:
+Hi Eric,
+
+On Mon, Jun 10, 2024 at 8:49=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
+wrote:
 >
-> The issue here is that the CPU based multibuffer approach has rather
-> tight constraints in terms of input length and the shared prefix, and
-> so designing a more generic API based on ahash doesn't help at all.
-> The intel multibuffer code went off into the weeds entirely attempting
-> to apply this parallel scheme to arbitrary combinations of inputs, so
-> this is something we know we should avoid.
+> On many modern CPUs, it is possible to compute the SHA-256 hash of two
+> equal-length messages in about the same time as a single message, if all
+> the instructions are interleaved.  This is because each SHA-256 (and
+> also most other cryptographic hash functions) is inherently serialized
+> and therefore can't always take advantage of the CPU's full throughput.
+>
+> An earlier attempt to support multibuffer hashing in Linux was based
+> around the ahash API.  That approach had some major issues, as does the
+> alternative ahash-based approach proposed by Herbert (see my response at
+> https://lore.kernel.org/linux-crypto/20240610164258.GA3269@sol.localdomai=
+n/).
+> This patchset instead takes a much simpler approach of just adding a
+> synchronous API for hashing equal-length messages.
+>
+> This works well for dm-verity and fsverity, which use Merkle trees and
+> therefore hash large numbers of equal-length messages.
 
-The sha-mb approach failed because it failed to aggregate the data
-properly.  By driving this from the data sink, it was doomed to fail.
+Thank you for continuing to work on this! Improving dm-verity
+performance is a high priority for Android, and this patch series
+shows very promising results. FWIW, I would like to see this merged
+upstream, and any ahash improvements handled in follow-up patches. For
+the series:
 
-The correct way to aggregate data is to do it at the source.  The
-user (of the Crypto API) knows exactlty how much data they want to
-hash and how it's structured.  They should be supplying that info
-to the API so it can use multi-buffer where applicable.  Even where
-multi-buffer isn't available, they would at least benefit from making
-a single indirect call into the Crypto stack instead of N calls.
-When N is large (which is almost always the case for TCP) this
-produces a non-trivial saving.
+Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
 
-Sure I understand that you guys are more than happy with N=2 but
-please let me at least try this out and see if we could make this
-work for a large value of N.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sami
