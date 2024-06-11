@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9E616FF23;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAB5171078;
 	Tue, 11 Jun 2024 03:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718077754; cv=none; b=s9OLW1UsQo/JSt6mB7u5WQX88k3RhYaQXlYDVvXxYEUSsIcodUVdwO0ci7vx7z4DJB1nTNntZAG1cYMd64bWz8Ggo2Z8te0JIDUXNJcyK+F+058ra82c63fkYzLWbmEQSSsNaPKzfqQnAUcl3KWD1hXSKYtuFIxkKLDDniaQjII=
+	t=1718077754; cv=none; b=FopazEtbXIYKH9QZQkI+1UsZoyPfNxgSne8a2vx9C1HPNw5V86vx/3H4JKSWgNsB4Dt9AbHCNSJrlZ3O2pTa6LKHNYNNr2eU3kgDE3YMwbp7rRZVgHo6+txAQrFMyvtpx717vlYwPEnmeolAiTgZFl7AdMdBDr5QOQ+HMDuviVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718077754; c=relaxed/simple;
-	bh=2pM8Bh/k5bufZBnNYlFVpUc6AsryaPnDFJJisGkWbN0=;
+	bh=DEFlmsbEWT/xZ+wzMO36ZCGur9JVhR2ovvX1zBGomis=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hUKPf3OOA04AWSz4qxaSGdyYBLjlh9ipk2I+JKWLnQoKUrxlyRFAsRToifLqSywH8gH62DWJMARWuBanzrf1t12qItg9TqXl1c8/boUO+J0kCcF1bKbq2dfXLiAeQxcHMaTxleA5l1CP1CwleJC1tvT6hgBGqRunEjmrzgsP0tE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EamG2Rwy; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Se6qHXtm8rKMwu9C13BiyaTJIXeQZwXSuHFeqeDmhjHBPc+/iNlOUcjBrYTY3lVk3ovsmRTQ4G+FLibrwCxK1Ksoa9Wk+xBDHui2Ff0JuiHQLGFPk4w8yVdsyzgDUZzANJAPSbxLu90BFlwRmB4xcn9kjbgVbqbsj05nM8FcJtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJKS3qjX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EamG2Rwy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C1BC4AF48;
-	Tue, 11 Jun 2024 03:49:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJKS3qjX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32F4AC4AF50;
+	Tue, 11 Jun 2024 03:49:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718077754;
-	bh=2pM8Bh/k5bufZBnNYlFVpUc6AsryaPnDFJJisGkWbN0=;
+	bh=DEFlmsbEWT/xZ+wzMO36ZCGur9JVhR2ovvX1zBGomis=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EamG2RwyXGvbjbh4MMQC4xjGsPU9IK2HaOrMRT1//WIbymwcVaSopdZW7v4JFwGJU
-	 UDoPCJecKhonShVEmJPhPrJdXc3NyYodQ/RJNXYsGDvdgf6D508CXHC550GwG675sa
-	 m/UMf+FblEQeIYj17AfIXnBXP0px50LqZsms6pS9S8pAQmNrl62rxyJwbQqaTqUwe5
-	 9k2kvMYsnTeG4VVVW0VMn22xG6JXnSads1CsRk8lfh+tghXNjzRO51H6HocdBmLESq
-	 mMOV7aaRQYsf4XW17GN9gPtaeJOVmn5MuOALuBCPpjirtVt1zd/AFai8F7vNoI2441
-	 3RWQDO+TUS1qg==
+	b=sJKS3qjXL6k4MAmNi697sReT81K1UbDyoXvZjBLFCtBh8hTvdljzHE/wdrfRg9biJ
+	 k3YeSo4XmEkpWPggdchydh0NVwVKVSrC61y8wiFXQDUTFO0sDLx2q+w18ypGS6wfq8
+	 PVjreno9PVmneYU1g5Xnqf6ZldU16P3hBn8z6mO+xn5drOUGoBucQ14VuQV6dH3c6Q
+	 d6mY4o98iqKcqbCJMTPRm8jMI2UL6ToItw3s4erkbmOITOkEeRvumcQC1E3T+SQ/+a
+	 JbCraIQ6kiqfpDQDmMXWe87dS7Aj91QUhKl5kQ2uDZWx/DWr1vMULklP67w5CjmeWF
+	 Mot5XbwmumKUA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	fsverity@lists.linux.dev,
@@ -36,9 +36,9 @@ Cc: x86@kernel.org,
 	Sami Tolvanen <samitolvanen@google.com>,
 	Bart Van Assche <bvanassche@acm.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH v5 08/15] dm-verity: move data hash mismatch handling into its own function
-Date: Mon, 10 Jun 2024 20:48:15 -0700
-Message-ID: <20240611034822.36603-9-ebiggers@kernel.org>
+Subject: [PATCH v5 09/15] dm-verity: make real_digest and want_digest fixed-length
+Date: Mon, 10 Jun 2024 20:48:16 -0700
+Message-ID: <20240611034822.36603-10-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240611034822.36603-1-ebiggers@kernel.org>
 References: <20240611034822.36603-1-ebiggers@kernel.org>
@@ -52,105 +52,91 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Move the code that handles mismatches of data block hashes into its own
-function so that it doesn't clutter up verity_verify_io().
+Change the digest fields in struct dm_verity_io from variable-length to
+fixed-length, since their maximum length is fixed at
+HASH_MAX_DIGESTSIZE, i.e. 64 bytes, which is not too big.  This is
+simpler and makes the fields a bit faster to access.
+
+(HASH_MAX_DIGESTSIZE did not exist when this code was written, which may
+explain why it wasn't used.)
+
+This makes the verity_io_real_digest() and verity_io_want_digest()
+functions trivial, but this patch leaves them in place temporarily since
+most of their callers will go away in a later patch anyway.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/md/dm-verity-target.c | 64 ++++++++++++++++++++---------------
- 1 file changed, 36 insertions(+), 28 deletions(-)
+ drivers/md/dm-verity-target.c |  3 +--
+ drivers/md/dm-verity.h        | 17 +++++++----------
+ 2 files changed, 8 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-index 88d2a49dca43..796d85526696 100644
+index 796d85526696..4ef814a7faf4 100644
 --- a/drivers/md/dm-verity-target.c
 +++ b/drivers/md/dm-verity-target.c
-@@ -540,10 +540,42 @@ static noinline int verity_recheck(struct dm_verity *v, struct dm_verity_io *io,
- 	mempool_free(page, &v->recheck_pool);
- 
- 	return r;
- }
- 
-+static int verity_handle_data_hash_mismatch(struct dm_verity *v,
-+					    struct dm_verity_io *io,
-+					    struct bio *bio, sector_t blkno,
-+					    struct bvec_iter *start)
-+{
-+	if (static_branch_unlikely(&use_bh_wq_enabled) && io->in_bh) {
-+		/*
-+		 * Error handling code (FEC included) cannot be run in the
-+		 * BH workqueue, so fallback to a standard workqueue.
-+		 */
-+		return -EAGAIN;
-+	}
-+	if (verity_recheck(v, io, *start, blkno) == 0) {
-+		if (v->validated_blocks)
-+			set_bit(blkno, v->validated_blocks);
-+		return 0;
-+	}
-+#if defined(CONFIG_DM_VERITY_FEC)
-+	if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_DATA, blkno,
-+			      NULL, start) == 0)
-+		return 0;
-+#endif
-+	if (bio->bi_status)
-+		return -EIO; /* Error correction failed; Just return error */
-+
-+	if (verity_handle_err(v, DM_VERITY_BLOCK_TYPE_DATA, blkno)) {
-+		dm_audit_log_bio(DM_MSG_PREFIX, "verify-data", bio, blkno, 0);
-+		return -EIO;
-+	}
-+	return 0;
-+}
-+
- static int verity_bv_zero(struct dm_verity *v, struct dm_verity_io *io,
- 			  u8 *data, size_t len)
- {
- 	memset(data, 0, len);
- 	return 0;
-@@ -632,39 +664,15 @@ static int verity_verify_io(struct dm_verity_io *io)
- 		if (likely(memcmp(verity_io_real_digest(v, io),
- 				  verity_io_want_digest(v, io), v->digest_size) == 0)) {
- 			if (v->validated_blocks)
- 				set_bit(cur_block, v->validated_blocks);
- 			continue;
--		} else if (static_branch_unlikely(&use_bh_wq_enabled) && io->in_bh) {
--			/*
--			 * Error handling code (FEC included) cannot be run in a
--			 * tasklet since it may sleep, so fallback to work-queue.
--			 */
--			return -EAGAIN;
--		} else if (verity_recheck(v, io, start, cur_block) == 0) {
--			if (v->validated_blocks)
--				set_bit(cur_block, v->validated_blocks);
--			continue;
--#if defined(CONFIG_DM_VERITY_FEC)
--		} else if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_DATA,
--					     cur_block, NULL, &start) == 0) {
--			continue;
--#endif
--		} else {
--			if (bio->bi_status) {
--				/*
--				 * Error correction failed; Just return error
--				 */
--				return -EIO;
--			}
--			if (verity_handle_err(v, DM_VERITY_BLOCK_TYPE_DATA,
--					      cur_block)) {
--				dm_audit_log_bio(DM_MSG_PREFIX, "verify-data",
--						 bio, cur_block, 0);
--				return -EIO;
--			}
- 		}
-+		r = verity_handle_data_hash_mismatch(v, io, bio, cur_block,
-+						     &start);
-+		if (unlikely(r))
-+			return r;
+@@ -1527,12 +1527,11 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 		ti->error = "Cannot allocate workqueue";
+ 		r = -ENOMEM;
+ 		goto bad;
  	}
  
- 	return 0;
+-	ti->per_io_data_size = sizeof(struct dm_verity_io) +
+-				v->ahash_reqsize + v->digest_size * 2;
++	ti->per_io_data_size = sizeof(struct dm_verity_io) + v->ahash_reqsize;
+ 
+ 	r = verity_fec_ctr(v);
+ 	if (r)
+ 		goto bad;
+ 
+diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
+index 20b1bcf03474..5d3da9f5fc95 100644
+--- a/drivers/md/dm-verity.h
++++ b/drivers/md/dm-verity.h
+@@ -89,19 +89,16 @@ struct dm_verity_io {
+ 	struct work_struct work;
+ 	struct work_struct bh_work;
+ 
+ 	char *recheck_buffer;
+ 
++	u8 real_digest[HASH_MAX_DIGESTSIZE];
++	u8 want_digest[HASH_MAX_DIGESTSIZE];
++
+ 	/*
+-	 * Three variably-size fields follow this struct:
+-	 *
+-	 * u8 hash_req[v->ahash_reqsize];
+-	 * u8 real_digest[v->digest_size];
+-	 * u8 want_digest[v->digest_size];
+-	 *
+-	 * To access them use: verity_io_hash_req(), verity_io_real_digest()
+-	 * and verity_io_want_digest().
++	 * This struct is followed by a variable-sized struct ahash_request of
++	 * size v->ahash_reqsize.  To access it, use verity_io_hash_req().
+ 	 */
+ };
+ 
+ static inline struct ahash_request *verity_io_hash_req(struct dm_verity *v,
+ 						     struct dm_verity_io *io)
+@@ -110,17 +107,17 @@ static inline struct ahash_request *verity_io_hash_req(struct dm_verity *v,
  }
  
+ static inline u8 *verity_io_real_digest(struct dm_verity *v,
+ 					struct dm_verity_io *io)
+ {
+-	return (u8 *)(io + 1) + v->ahash_reqsize;
++	return io->real_digest;
+ }
+ 
+ static inline u8 *verity_io_want_digest(struct dm_verity *v,
+ 					struct dm_verity_io *io)
+ {
+-	return (u8 *)(io + 1) + v->ahash_reqsize + v->digest_size;
++	return io->want_digest;
+ }
+ 
+ extern int verity_for_bv_block(struct dm_verity *v, struct dm_verity_io *io,
+ 			       struct bvec_iter *iter,
+ 			       int (*process)(struct dm_verity *v,
 -- 
 2.45.1
 
