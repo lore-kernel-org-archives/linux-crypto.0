@@ -1,122 +1,56 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hatto.meta.co.jp (hatto.meta.co.jp [202.23.200.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 611C017545;
-	Mon, 10 Jun 2024 22:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718058741; cv=none; b=NTtP+QpcrscqjDvoR5klC/CvA0UPYX9oDR+eI9HMD5sYdHSCna9FuTnc74DRDuf4S7m/PH3ioYxsI6C/xNyaBsv7Jh4W7RvroaDzw/kOfgv7MbNFcHb835vDoidignV4mviNDgJqGaKYqPYRl8vBgOo/I/l4xBih3CabKQo8DJI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718058741; c=relaxed/simple;
-	bh=Wt7Pzfxyq20AcjEBu7nZDSRzfK6ptsm4tLFP5cYJIwA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fovH/P5Yw9B3tQYVFcIO/wf5KXlP5l29e828YErnNoamD0j+o3enXMAl0G6k1Mp/8RF3v5ebWZ67Ry6Bp5tkI1qGzWtQvJxCcpb6ORJsxzeSpv5NQmUQ23epwRx1BaXL+cis5B6OenwlV0fifWzgWfvJBu9XAh2dzDu1RAlSiwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ED7MjdO6; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF73E6FB9
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2024 01:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=202.23.200.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718067790; cv=pass; b=l/XrrlEAoYC7B8xam4CI5Zn5RzvtpkYaoeJT545wpIIcKUEkAQ9r1lrRXxcr6ftShL+JUcZVrAeXtgxQu7vgfyVth55UwMcECVDwvyUzaSA5o4U45UTPTL+KYIB90rzgN8aUuZvqYb/E7uq+lCLCq8PEpXDYbdbyzDffH1f2U7w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718067790; c=relaxed/simple;
+	bh=9EGfTZopiGgQAhODKHxelZlIc8fLUWSDWo1sv+RKg1U=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=R/3UdiHkE1eJOg+NVy/F4+2T+C8WzA/S+YfQV0etsU/fLhEvcnm8aJpEjYleF/33T1OU9XZZwY8LQI9i6LgiE/1aUDDhU9T1BHgxbtiVRPkD8/JM/DtV0eP2lJsMY5eRcEQwvZA4Ml2bfjiJDYtwh4PKfEQlCwWyinP/5UEVpkg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ex.meta.co.jp; spf=pass smtp.mailfrom=ex.meta.co.jp; dkim=pass (1024-bit key) header.d=ex.meta.co.jp header.i=@ex.meta.co.jp header.b=skCIYb1j; arc=pass smtp.client-ip=202.23.200.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ex.meta.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ex.meta.co.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ED7MjdO6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02078C2BBFC;
-	Mon, 10 Jun 2024 22:32:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718058741;
-	bh=Wt7Pzfxyq20AcjEBu7nZDSRzfK6ptsm4tLFP5cYJIwA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ED7MjdO6mPoaUcOm0MdqhRVSsw69DhTqKOcRTILKsXVHrEkXBEWQ+U4yGFo2svjS4
-	 sNAvyU5s9tLXo9MkPr0L7WtTTR+45vq1K+AYi+mpR5I/TwIvJtjOZkz4sVi+xXSi0g
-	 rHsIR10ApGF8g06ltOZQXetW9h7x37Q+V98PH71MNd/OsRuzVoLyxywJiYxZ0iOhfo
-	 DTO84t5m7HhoAUkVUwWFnMkG53JwpbCWaFQ0Pjous7qt5aHx9K/gOdY8tF8n1GbA4P
-	 L/4rUodyejQaRE6u8Mo1AVEKyWMf5QnMnvbbsk/7gj4wNdjuWIo4MW8yaRkIxKh8Rr
-	 I8QSfzzS+OlPg==
-Date: Mon, 10 Jun 2024 16:32:19 -0600
-From: Rob Herring <robh@kernel.org>
-To: Alexey Romanov <avromanov@salutedevices.com>
-Cc: neil.armstrong@linaro.org, clabbe@baylibre.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	khilman@baylibre.com, jbrunet@baylibre.com,
-	martin.blumenstingl@googlemail.com, vadim.fedorenko@linux.dev,
-	linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kernel@salutedevices.com
-Subject: Re: [PATCH v8 19/23] dt-bindings: crypto: meson: support new SoC's
-Message-ID: <20240610223219.GA3175091-robh@kernel.org>
-References: <20240607141242.2616580-1-avromanov@salutedevices.com>
- <20240607141242.2616580-20-avromanov@salutedevices.com>
+	dkim=pass (1024-bit key) header.d=ex.meta.co.jp header.i=@ex.meta.co.jp header.b="skCIYb1j"
+Received: from ss.meta.co.jp (ss.meta.co.jp [202.23.200.22])
+	by hatto.meta.co.jp (Postfix) with ESMTP id E4AEA638BD
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2024 10:03:03 +0900 (JST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ex.meta.co.jp;
+	s=24012502; t=1718067783;
+	bh=9EGfTZopiGgQAhODKHxelZlIc8fLUWSDWo1sv+RKg1U=;
+	h=Date:To:From:Subject:From;
+	b=skCIYb1jiOkNO7HpYKhnGYQbNjZwrl8EhN1aPaLSdkcKAr/7EdrD9Jv333I08aRlC
+	 Fshh5BAgSPFYVmHgy4ttJnpNZACZMVs2hHJO7rWclZoptGor0RB4dFJOFGWwzg5Mbx
+	 lUo3pnnMOGhByh08BuWun6LYKwLfMfcMnVOyQ2mg=
+Received: from unknown (HELO poppo.mtlan.meta.co.jp) (192.168.100.46)
+	by 202.23.200.22 with ESMTP; 11 Jun 2024 10:02:53 +0900
+Received: from private
+Authentication-Results: poppo.mtlan.meta.co.jp; arc=none smtp.remote-ip=10.2.41.27
+ARC-Seal: i=1; a=rsa-sha256; d=meta.co.jp; s=24012501; t=1718067773; cv=none;
+	b=A+Ca1sSua5MIw7XjVxMOhj3wSr6OoWjngRiExkNVOxGsd/n6d/3eTyTFaRiTtg0DhbflZk8KX8kEjHonv4VlJ+KJT/TyLDEKj8t4pLJKkJRMR9/d0WNCjpdFsCtxq1152tk7E6vXRpvdK2Ie4ZG9gRVu6nu13Xbh5GfgM/iMlUU=
+ARC-Message-Signature: i=1; a=rsa-sha256; d=meta.co.jp; s=24012501;
+	t=1718067773; c=relaxed/relaxed;
+	bh=9EGfTZopiGgQAhODKHxelZlIc8fLUWSDWo1sv+RKg1U=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject; b=IgeWVFq9Jje+JGVHbItYBZ82NYau7mrcSDG0cgSVo6LAgdGmqy51XLVcW9tlOYKP0pG9A3Bh/m3/9KE9bjkImHKzobLnBPWwsaO+bilj2Iiy5e2dKFaE+Ah4XUF8zG97aKxj1s58I5JdCEsg5Yi3eJDpajB2eFwkKHY/HUulG1E=
+ARC-Authentication-Results: i=1; poppo.mtlan.meta.co.jp
+Message-ID: <6982dc10-a1f6-4951-9e8a-551a6d1fb517@ex.meta.co.jp>
+Date: Tue, 11 Jun 2024 10:02:48 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240607141242.2616580-20-avromanov@salutedevices.com>
+User-Agent: Mozilla Thunderbird
+To: linux-crypto@vger.kernel.org
+Content-Language: en-US
+From: Shinichiro Soeno <soeno.shinichiro@ex.meta.co.jp>
+Subject: subscribe linux-crypto
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 07, 2024 at 05:12:38PM +0300, Alexey Romanov wrote:
-> Now crypto module available at G12A/G12B/S4/A1/SM1/AXG.
-> 
-> 1. Add new compatibles:
->   - amlogic,g12a-crypto
->   - amlogic,axg-crypto
->   - amlogic,a1-crypto
->   - amlogic,s4-crypto (uses a1-crypto as fallback)
-> 
-> Difference between this compatibles:
->  * Different registers offset and the number of setup descriptors.
->  * GXL doesn't support hashing like the others.
->  * G12A/B and A1/S4 crypto HW don't support 192 AES key.
->  * GXL, G12A/B and AXG require a reverse IV key before processing.
-> 
-> 2. Add power-domains in schema, which is required only for A1.
+subscribe linux-crypto
 
-You added it in the prior patch, was that supposed to be done here? Kind 
-of strange for h/w to optionally have a power-domain... It either has 
-one or it doesn't. OTOH, making required is an ABI break.
-
-> 
-> Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
-> ---
->  .../bindings/crypto/amlogic,gxl-crypto.yaml   | 21 +++++++++++++++++--
->  1 file changed, 19 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> index aff6f3234dc9..a8344de71b4a 100644
-> --- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-> @@ -11,8 +11,16 @@ maintainers:
->  
->  properties:
->    compatible:
-> -    items:
-> -      - const: amlogic,gxl-crypto
-> +    oneOf:
-> +      - items:
-> +          - enum:
-> +              - amlogic,s4-crypto
-> +          - const: amlogic,a1-crypto
-> +      - enum:
-> +          - amlogic,gxl-crypto
-> +          - amlogic,axg-crypto
-> +          - amlogic,g12a-crypto
-> +          - amlogic,a1-crypto
->  
->    reg:
->      maxItems: 1
-> @@ -37,6 +45,15 @@ required:
->    - clocks
->    - clock-names
->  
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          const: amlogic,a1-crypto
-> +    then:
-> +      required:
-> +        - power-domains
-> +
->  additionalProperties: false
->  
->  examples:
-> -- 
-> 2.34.1
-> 
