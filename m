@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAB5171078;
-	Tue, 11 Jun 2024 03:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C82171085;
+	Tue, 11 Jun 2024 03:49:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718077754; cv=none; b=FopazEtbXIYKH9QZQkI+1UsZoyPfNxgSne8a2vx9C1HPNw5V86vx/3H4JKSWgNsB4Dt9AbHCNSJrlZ3O2pTa6LKHNYNNr2eU3kgDE3YMwbp7rRZVgHo6+txAQrFMyvtpx717vlYwPEnmeolAiTgZFl7AdMdBDr5QOQ+HMDuviVg=
+	t=1718077755; cv=none; b=Hyjok7xf5lGlkuz3xPMU4MKNv4n1OxLCjHgy9qIJLqzcktwBwRjz6uLIzi4gnW8JWFXlmVOgz8SLwcs6InkuVXgUDhlrFUr8iY+Gc2y1Y5aJcgh8Z/9JaQKlWw4XGYamJAqFCQaEvv3UpV1UlOUDtRFiMpUoP02W5JdqqEPmL4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718077754; c=relaxed/simple;
-	bh=DEFlmsbEWT/xZ+wzMO36ZCGur9JVhR2ovvX1zBGomis=;
+	s=arc-20240116; t=1718077755; c=relaxed/simple;
+	bh=ukGSgX5MesqBbGJj7yzKjyDULlLyq2Ow1gHuSG/PLIk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Se6qHXtm8rKMwu9C13BiyaTJIXeQZwXSuHFeqeDmhjHBPc+/iNlOUcjBrYTY3lVk3ovsmRTQ4G+FLibrwCxK1Ksoa9Wk+xBDHui2Ff0JuiHQLGFPk4w8yVdsyzgDUZzANJAPSbxLu90BFlwRmB4xcn9kjbgVbqbsj05nM8FcJtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJKS3qjX; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=JAVjymsFb8+imFa45nSqmumyOP/b4hypuwWkQyzRx8U2+VZVdfMUbtvZzl5tHVlbC9ucATuFOCPskSoaGaQKb8dipQoBfkF2YGWqn8c1BCDmAzpCosoMvFJ0mVggnxFAx70vUhsQRdKdZP+Ax9KTeqsxBLOvR4S//KLojAD6PVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fhpkSPea; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJKS3qjX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32F4AC4AF50;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fhpkSPea"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97374C4AF1C;
 	Tue, 11 Jun 2024 03:49:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718077754;
-	bh=DEFlmsbEWT/xZ+wzMO36ZCGur9JVhR2ovvX1zBGomis=;
+	bh=ukGSgX5MesqBbGJj7yzKjyDULlLyq2Ow1gHuSG/PLIk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sJKS3qjXL6k4MAmNi697sReT81K1UbDyoXvZjBLFCtBh8hTvdljzHE/wdrfRg9biJ
-	 k3YeSo4XmEkpWPggdchydh0NVwVKVSrC61y8wiFXQDUTFO0sDLx2q+w18ypGS6wfq8
-	 PVjreno9PVmneYU1g5Xnqf6ZldU16P3hBn8z6mO+xn5drOUGoBucQ14VuQV6dH3c6Q
-	 d6mY4o98iqKcqbCJMTPRm8jMI2UL6ToItw3s4erkbmOITOkEeRvumcQC1E3T+SQ/+a
-	 JbCraIQ6kiqfpDQDmMXWe87dS7Aj91QUhKl5kQ2uDZWx/DWr1vMULklP67w5CjmeWF
-	 Mot5XbwmumKUA==
+	b=fhpkSPeaAOYUhZnC1IAvTG86aeMudfDvPq1AJ6d6PBVbWVNiywtoyarmcuYIVIRgT
+	 mt0/r3cn4fzilUMhCwJ1eZndrcwxywUR+FtWNh8uxCsfANn6/0Mq2lD9u6PZ05I/mD
+	 /mU6ttCVE6/nJOtzF70jguI/TQy8ARn0fQC5r2FnWiIibMSiQ3ozGBG6h1j2bjbut4
+	 w+71Z7NyZWRqgc2Zv1cPBRT38X4gYHu5L2hb2JwTkGYX6ZYyL3UmAAQc01fLBC0D4o
+	 I5vibPzddTy2imZTf+oBNSPIy6dWOwbuAlQpVdorpq6gg5NAv6W8xbYK4ov+gFE0ap
+	 sLw30XMUFPUbg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	fsverity@lists.linux.dev,
@@ -36,9 +36,9 @@ Cc: x86@kernel.org,
 	Sami Tolvanen <samitolvanen@google.com>,
 	Bart Van Assche <bvanassche@acm.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH v5 09/15] dm-verity: make real_digest and want_digest fixed-length
-Date: Mon, 10 Jun 2024 20:48:16 -0700
-Message-ID: <20240611034822.36603-10-ebiggers@kernel.org>
+Subject: [PATCH v5 10/15] dm-verity: provide dma_alignment limit in io_hints
+Date: Mon, 10 Jun 2024 20:48:17 -0700
+Message-ID: <20240611034822.36603-11-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240611034822.36603-1-ebiggers@kernel.org>
 References: <20240611034822.36603-1-ebiggers@kernel.org>
@@ -52,91 +52,44 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Change the digest fields in struct dm_verity_io from variable-length to
-fixed-length, since their maximum length is fixed at
-HASH_MAX_DIGESTSIZE, i.e. 64 bytes, which is not too big.  This is
-simpler and makes the fields a bit faster to access.
+Since Linux v6.1, some filesystems support submitting direct I/O that is
+aligned to only dma_alignment instead of the logical_block_size
+alignment that was required before.  I/O that is not aligned to the
+logical_block_size is difficult to handle in device-mapper targets that
+do cryptographic processing of data, as it makes the units of data that
+are hashed or encrypted possibly be split across pages, creating rarely
+used and rarely tested edge cases.
 
-(HASH_MAX_DIGESTSIZE did not exist when this code was written, which may
-explain why it wasn't used.)
+As such, dm-crypt and dm-integrity have already opted out of this by
+setting dma_alignment to 'logical_block_size - 1'.
 
-This makes the verity_io_real_digest() and verity_io_want_digest()
-functions trivial, but this patch leaves them in place temporarily since
-most of their callers will go away in a later patch anyway.
+Although dm-verity does have code that handles these cases (or at least
+is intended to do so), supporting direct I/O with such a low amount of
+alignment is not really useful on dm-verity devices.  So, opt dm-verity
+out of it too so that it's not necessary to handle these edge cases.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/md/dm-verity-target.c |  3 +--
- drivers/md/dm-verity.h        | 17 +++++++----------
- 2 files changed, 8 insertions(+), 12 deletions(-)
+ drivers/md/dm-verity-target.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-index 796d85526696..4ef814a7faf4 100644
+index 4ef814a7faf4..c6a0e3280e39 100644
 --- a/drivers/md/dm-verity-target.c
 +++ b/drivers/md/dm-verity-target.c
-@@ -1527,12 +1527,11 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 		ti->error = "Cannot allocate workqueue";
- 		r = -ENOMEM;
- 		goto bad;
- 	}
+@@ -1021,10 +1021,12 @@ static void verity_io_hints(struct dm_target *ti, struct queue_limits *limits)
  
--	ti->per_io_data_size = sizeof(struct dm_verity_io) +
--				v->ahash_reqsize + v->digest_size * 2;
-+	ti->per_io_data_size = sizeof(struct dm_verity_io) + v->ahash_reqsize;
+ 	if (limits->physical_block_size < 1 << v->data_dev_block_bits)
+ 		limits->physical_block_size = 1 << v->data_dev_block_bits;
  
- 	r = verity_fec_ctr(v);
- 	if (r)
- 		goto bad;
- 
-diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
-index 20b1bcf03474..5d3da9f5fc95 100644
---- a/drivers/md/dm-verity.h
-+++ b/drivers/md/dm-verity.h
-@@ -89,19 +89,16 @@ struct dm_verity_io {
- 	struct work_struct work;
- 	struct work_struct bh_work;
- 
- 	char *recheck_buffer;
- 
-+	u8 real_digest[HASH_MAX_DIGESTSIZE];
-+	u8 want_digest[HASH_MAX_DIGESTSIZE];
+ 	blk_limits_io_min(limits, limits->logical_block_size);
 +
- 	/*
--	 * Three variably-size fields follow this struct:
--	 *
--	 * u8 hash_req[v->ahash_reqsize];
--	 * u8 real_digest[v->digest_size];
--	 * u8 want_digest[v->digest_size];
--	 *
--	 * To access them use: verity_io_hash_req(), verity_io_real_digest()
--	 * and verity_io_want_digest().
-+	 * This struct is followed by a variable-sized struct ahash_request of
-+	 * size v->ahash_reqsize.  To access it, use verity_io_hash_req().
- 	 */
- };
- 
- static inline struct ahash_request *verity_io_hash_req(struct dm_verity *v,
- 						     struct dm_verity_io *io)
-@@ -110,17 +107,17 @@ static inline struct ahash_request *verity_io_hash_req(struct dm_verity *v,
++	limits->dma_alignment = limits->logical_block_size - 1;
  }
  
- static inline u8 *verity_io_real_digest(struct dm_verity *v,
- 					struct dm_verity_io *io)
+ static void verity_dtr(struct dm_target *ti)
  {
--	return (u8 *)(io + 1) + v->ahash_reqsize;
-+	return io->real_digest;
- }
- 
- static inline u8 *verity_io_want_digest(struct dm_verity *v,
- 					struct dm_verity_io *io)
- {
--	return (u8 *)(io + 1) + v->ahash_reqsize + v->digest_size;
-+	return io->want_digest;
- }
- 
- extern int verity_for_bv_block(struct dm_verity *v, struct dm_verity_io *io,
- 			       struct bvec_iter *iter,
- 			       int (*process)(struct dm_verity *v,
+ 	struct dm_verity *v = ti->private;
 -- 
 2.45.1
 
