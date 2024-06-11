@@ -1,103 +1,65 @@
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B43943AAE
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2024 16:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF6C2570;
+	Tue, 11 Jun 2024 17:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718123294; cv=none; b=VSRPKNLdsfwa77QmOaq/xeh1Jd9Ln8UGYtSVTPa+2p+z9K/f17gVD/BfSApaG5lXzAdRWdtbkNWK79ipdox3D82rz6HtV+s6wQL8FjE967Y4wErz3Xu+uWyKqbelbP8XK21yhtOojZ1Vs65H0Bfc5GABJAS0PfNl+MqAH8At59Y=
+	t=1718128254; cv=none; b=WRA/K//Ajnxqf9NRZ0fPFVleolnU5t150dwibZpbzALaLlXSyFW7O9yPgXHSGOiWJ1PEVDmfvi/bnRWY4kze03P0OG6HP9avRaLnb0YIIt3bTpjew4lLgNmehsVZ/EmH9Zx7mG28kLlZ0m2G9wwm4hB1DZH86yLnEG9RvepzigM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718123294; c=relaxed/simple;
-	bh=N4evEqm5Lsj9muDRZ0FKGlEsgvOKjl0qugGTleH/ab8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bXYkniy54JewNoTMk8fZIJd5EKBV1NPWsWYWwecr6YqL8RupipFJlVzZGTOmP/z9d85Py0CXksYuwboZsPJILYQ+sLIXCkZLtpNvPt8e231if1jhwNKBq7ydl7a8LeGGPYD8nUFmWx81MgASAHgBC4RqioIXrRqXsGWo4+DQPqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OizTeFwj; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1718128254; c=relaxed/simple;
+	bh=qKv99FKq5QNiYusY4oaFndG2yZprCcFJ9vJUSneVSVI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CBST5OVuHt1XvMUe3JU96rmI7pOYZN+Sz8WUZMDa6UWlAZtbsUQ/igtrzauA1PTgxoLKtRhKK4ZA99GX/YgkdgFeYtefoplzZxv6ss8nYrYTR6vzTEqCxnRDlnSG6C9AL67dWHftUcln/VV/uLB6nt3xSzw3i+ptvqZ0zrFaPQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iQzWn/Sz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OizTeFwj"
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3d22368713aso1801750b6e.1
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2024 09:28:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718123292; x=1718728092; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BG7XPsDBrgukiLlYYahx3Tk9saQ0mEeAf77iSA+2xAk=;
-        b=OizTeFwjBU81njD45yxQT2wWY3Eodu/9OIU5Hg4n1NA1r58jVM9QenP8mB+dRc7lEv
-         Dwb0Z45eMdGk/GNGRR/kaOSM+cO7BcnPeQw5KEVNAeKK+5y+24od82A+dYRk0TQfaaG5
-         Ko5TK1i/d1qE+0PrUgn6yXwsMA+2SYtMo+FxPEsTvK02NznyZVP/IAXRVcDumy9si3Vm
-         E/Qt3Nq6kdPu0fvDs4fhfMOet99oYPOxUR4bB64H2AsbyB9vwp+RmSHDy4KyurNG83Zx
-         ShD2fVSXur3+4qOL4l/XNg/HqLHyyUIgVmEcUkDOq0sRrCgIeBElI/2KGXPZyJVF/NYn
-         Ga3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718123292; x=1718728092;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BG7XPsDBrgukiLlYYahx3Tk9saQ0mEeAf77iSA+2xAk=;
-        b=RYBuSpnRX39c/Jan4S0vk0iR8r6YnGOgp8i0vFOiijeYMzcmG3NVDLQHJf8CKYDb0v
-         6hD3j13L2VzSEDFMDp4ATsnK3K43wwyF4wcI0CAnnBhNsdH1AGOQNmItHnHylpeXuaXu
-         IRhkzTNVX0ha/s202nrTAZ5QmW50wqJjOnHohOFs+tFkCc4JirJlxIARafynBlRvbRdW
-         aB3eePV9hWt93UzdY3xPsNz69sjRCQNObxT0JY+LqI4k8JoV8j7b319BuepH8Ijuke7Y
-         +FELHneFiO6Pma6K1DeNgAUIxfJX+ri61NoBaKxke5J0+hy6ZifK+UzRXowaa3kM6fFn
-         NPww==
-X-Gm-Message-State: AOJu0Yx5yc8Vj24zX6aDNRyKb36FvAc5U3X5lAi1ghYvkfGNilUPLbqo
-	KP0ZV9uIkLoxt9D1vjhedQ8YGpfsPvb/TwkAL/S7btXDQbv9wcABlhbNSZFuOJJQCaUS7abEYmw
-	rTh2HxsPZi5HkqGIXPJhfWOHezBrRTX4vc7FN
-X-Google-Smtp-Source: AGHT+IGsoxkLL97yYbUdTS+m9HxBL/aA7VS6tK+dAweHiy1stwZYh0uBGwlgxKNC988k8KBFPrrE/j5bFzDX0CXaftQ=
-X-Received: by 2002:a05:6808:2183:b0:3d2:1f88:3e86 with SMTP id
- 5614622812f47-3d21f88455amr12786369b6e.37.1718123292024; Tue, 11 Jun 2024
- 09:28:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iQzWn/Sz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1231C2BD10;
+	Tue, 11 Jun 2024 17:50:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718128254;
+	bh=qKv99FKq5QNiYusY4oaFndG2yZprCcFJ9vJUSneVSVI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iQzWn/Szpxmn6IF3SVEGpR/idtK+mB1QyIjeo5PocwfeNLjhOcfzIxLqvEf7dJXEE
+	 PPmVfbALE3Mv6mbE60zRJPK9pNuOngcII5X7EeqYT2mIEdZMbHXwXdbvEGBLRMEHD9
+	 yEw3g6c2/WwoMrPnUqHUMZ/Zlkkpyxabgo1C/KMhpGD3s883jbAGPeCM6tyAoY03om
+	 VMf7OrxrBIFigNEJNSY/k33Or2dNaJpgbsTDZ1qCnvXgN319rXuQ7Jzo+OUmvHMmgn
+	 JfowyGDbznZEfZiPWpG00/z4tNRZrEazAy2ROET7Icl1DfXr8PkTR7yvSYVDZESKgm
+	 3lnr9p9kawGJg==
+Date: Tue, 11 Jun 2024 23:20:50 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Jia Jie Ho <jiajie.ho@starfivetech.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org
+Subject: Re: [PATCH v5 1/3] dmaengine: dw-axi-dmac: Support hardware quirks
+Message-ID: <ZmiOemWQrG-3EdIB@matsya>
+References: <20240530031112.4952-1-jiajie.ho@starfivetech.com>
+ <20240530031112.4952-2-jiajie.ho@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240611034822.36603-1-ebiggers@kernel.org>
-In-Reply-To: <20240611034822.36603-1-ebiggers@kernel.org>
-From: Sami Tolvanen <samitolvanen@google.com>
-Date: Tue, 11 Jun 2024 09:27:32 -0700
-Message-ID: <CABCJKuf-yUQVh_gpO80qbifGyonQYDC-=QxL+PPwUzprXqQBUw@mail.gmail.com>
-Subject: Re: [PATCH v5 00/15] Optimize dm-verity and fsverity using
- multibuffer hashing
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, fsverity@lists.linux.dev, 
-	dm-devel@lists.linux.dev, x86@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ardb@kernel.org>, 
-	Bart Van Assche <bvanassche@acm.org>, Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240530031112.4952-2-jiajie.ho@starfivetech.com>
 
-Hi Eric,
+On 30-05-24, 11:11, Jia Jie Ho wrote:
 
-On Mon, Jun 10, 2024 at 8:49=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
-wrote:
->
-> On many modern CPUs, it is possible to compute the SHA-256 hash of two
-> equal-length messages in about the same time as a single message, if all
-> the instructions are interleaved.  This is because each SHA-256 (and
-> also most other cryptographic hash functions) is inherently serialized
-> and therefore can't always take advantage of the CPU's full throughput.
->
-> An earlier attempt to support multibuffer hashing in Linux was based
-> around the ahash API.  That approach had some major issues, as does the
-> alternative ahash-based approach proposed by Herbert (see my response at
-> https://lore.kernel.org/linux-crypto/20240610164258.GA3269@sol.localdomai=
-n/).
-> This patchset instead takes a much simpler approach of just adding a
-> synchronous API for hashing equal-length messages.
->
-> This works well for dm-verity and fsverity, which use Merkle trees and
-> therefore hash large numbers of equal-length messages.
+> +
+> +struct dw_axi_peripheral_config {
+> +#define DWAXIDMAC_STARFIVE_SM_ALGO	BIT(0)
 
-Thank you for continuing to work on this! Improving dm-verity
-performance is a high priority for Android, and this patch series
-shows very promising results. FWIW, I would like to see this merged
-upstream, and any ahash improvements handled in follow-up patches. For
-the series:
+what does this quirk mean?
 
-Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
+> +	u32 quirks;
 
-Sami
+Can you explain why you need this to be exposed. I would prefer we use
+existing interfaces and not define a new one...
+
+-- 
+~Vinod
