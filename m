@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C36171650;
-	Tue, 11 Jun 2024 03:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EDF171652;
+	Tue, 11 Jun 2024 03:49:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718077757; cv=none; b=PZ4l5baPWMC757tPvhIRBzkwYYmGX9KJzAuVonnRuQyMMd3Pg38F+iSzJ+nedIyJIOAgRgxTwtBvyJdpyuqlsJeFIA/WWlQwoT42hj6EeHCvEtD9jPK9oBxLmYNnezkgWxMLL6Ll6Vk1XjdQDKr2N76gOwt54pQy1T+mmTQUIek=
+	t=1718077757; cv=none; b=BShdI8RiZUNf+xwXJWTQKN9XUAOYbY5JbBMWPwlepj0B0Ctx+LARuVtOsDZWa7l+x7mi79e5dIk1giT1KSyDGjaKpaa1rprafe82xXbYTL7pUlfPy3v1s/2v4cC4CYCkzwq0d2cDy8XNjcBJvdxgtzEcLzVb8+gHA1OHwTRizmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718077757; c=relaxed/simple;
-	bh=mvreOMygOo9I9q4ZCavaZRXQ+0icfj9xg/mwb4hC3eQ=;
+	bh=ZWi+CYRBhk7x9bNAHdENEOfNzZLtYP7zXqO5EBsZOs8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TtVW1iBMwANEIloif6muEa31Ka9z2h+SAwgQKjJ7G2LakoFbI5buYE+QICibfJrjRwBp3OVGp2YZ2Lkk9PrtU8g683n1wHYvTFdeIZXmz1fH4UsKvOQpVLgzPJ9Egtf8Rb725HM/6S0uXeCwQ9LRrGnM7TdT/tNuPaPvHCrzujc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rLB8lmdH; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=VY1IoeMB73BLeC7DkVCAxFDacBEn/a+wCaY93PUOmsj5YPCNXbpVN6PGWViWz0CtgJqo0MrzHmTbndkRUh7YJkgofy3HzV16Q5uwdaipo717m5Z8M0ThJWMx8A0zkDgmESUTZB+6r3bVoTabfqUv4FZLz1GnerW3tJ2BaDtkHcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+uawsRS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rLB8lmdH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49DBAC4AF48;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+uawsRS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE128C4AF50;
 	Tue, 11 Jun 2024 03:49:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718077756;
-	bh=mvreOMygOo9I9q4ZCavaZRXQ+0icfj9xg/mwb4hC3eQ=;
+	s=k20201202; t=1718077757;
+	bh=ZWi+CYRBhk7x9bNAHdENEOfNzZLtYP7zXqO5EBsZOs8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rLB8lmdHm0nwNs+vzJv2Q86MoB8fjV0BI16FjStrEGQ8YF8uO7o/K7RIJiuXrtQ8k
-	 evr9lZGa5UX6wFIeL88bYxpqW6TWHJdeFBervfjNd4j/ABa4+KCFfw9EtX2YiUHGgg
-	 4R3TSWmzefE7T6y5CiFIXtFJzNv5bUKl9hX//lOzkgdrf76MXUYgnfe2rDSwSe9tm2
-	 1Ky4Qi/nYOufuH/rOSTClL1VfKC/tFRg16sVtsKXZuceTWozJ/HysZqEIxWSKZYYMP
-	 /zj7w3qj4+5YPTpONhKGWwZWPwtP0beHDK8Fg916ANl4ogH2ZsAm2WUpkQWKYZP/5f
-	 nWxcBkmnZqSDQ==
+	b=g+uawsRSsC7JV1wTcHUUGgyFn8sSSCo8VBCbSl9oDpeq7MTKFCAjASD9yT8On+W0L
+	 9nC54Q37cFTtITj1+1zW8TK2rEdjdkW6vlUjIsGmvl9PUOM6R7K/5lL7us8QfdDNny
+	 cNIctb5QuYqNkF1Fzn4PDghRO0uAJsiCsRZUBZRK0dlJMu6aZ3OAkL9kD4BnJTNDHp
+	 o0ScgNYYMV9q19F4mXGm/NRaTz5aKttoRH4CGub5nnW0dR6AUvdH1IeS6yjYMxGoz7
+	 iA6UA30n9UKTAD0z686Cab0Wc+fNTMDGNYeEj+qrnkHvDzUYAuHdxxY9oOwE04SGFy
+	 fevRN5Y895+JA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	fsverity@lists.linux.dev,
@@ -36,9 +36,9 @@ Cc: x86@kernel.org,
 	Sami Tolvanen <samitolvanen@google.com>,
 	Bart Van Assche <bvanassche@acm.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH v5 14/15] dm-verity: reduce scope of real and wanted digests
-Date: Mon, 10 Jun 2024 20:48:21 -0700
-Message-ID: <20240611034822.36603-15-ebiggers@kernel.org>
+Subject: [PATCH v5 15/15] dm-verity: improve performance by using multibuffer hashing
+Date: Mon, 10 Jun 2024 20:48:22 -0700
+Message-ID: <20240611034822.36603-16-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240611034822.36603-1-ebiggers@kernel.org>
 References: <20240611034822.36603-1-ebiggers@kernel.org>
@@ -52,296 +52,416 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-In preparation for supporting multibuffer hashing where dm-verity will
-need to keep track of the real and wanted digests for multiple data
-blocks simultaneously, stop using the want_digest and real_digest fields
-of struct dm_verity_io from so many different places.  Specifically:
+When supported by the hash algorithm, use crypto_shash_finup_mb() to
+interleave the hashing of pairs of data blocks.  On some CPUs this
+nearly doubles hashing performance.  The increase in overall throughput
+of cold-cache dm-verity reads that I'm seeing on arm64 and x86_64 is
+roughly 35% (though this metric is hard to measure as it jumps around a
+lot).
 
-- Make various functions take want_digest as a parameter rather than
-  having it be implicitly passed via the struct dm_verity_io.
-
-- Add a new tmp_digest field, and use this instead of real_digest when
-  computing a hash solely for the purpose of immediately checking it.
-
-The result is that real_digest and want_digest are only used by
-verity_verify_io() and verity_check_data_block_hash().
+For now this is only done on data blocks, not Merkle tree blocks.  We
+could use finup_mb on Merkle tree blocks too, but that is less important
+as there aren't as many Merkle tree blocks as data blocks, and that
+would require some additional code restructuring.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/md/dm-verity-fec.c    | 19 +++++++++---------
- drivers/md/dm-verity-fec.h    |  5 +++--
- drivers/md/dm-verity-target.c | 36 ++++++++++++++++++-----------------
- drivers/md/dm-verity.h        |  1 +
- 4 files changed, 32 insertions(+), 29 deletions(-)
+ drivers/md/dm-verity-target.c | 171 ++++++++++++++++++++++++++--------
+ drivers/md/dm-verity.h        |  34 ++++---
+ 2 files changed, 151 insertions(+), 54 deletions(-)
 
-diff --git a/drivers/md/dm-verity-fec.c b/drivers/md/dm-verity-fec.c
-index 62b1a44b8dd2..79f3794e197e 100644
---- a/drivers/md/dm-verity-fec.c
-+++ b/drivers/md/dm-verity-fec.c
-@@ -185,15 +185,14 @@ static int fec_decode_bufs(struct dm_verity *v, struct dm_verity_io *io,
-  */
- static int fec_is_erasure(struct dm_verity *v, struct dm_verity_io *io,
- 			  u8 *want_digest, u8 *data)
- {
- 	if (unlikely(verity_hash(v, io, data, 1 << v->data_dev_block_bits,
--				 verity_io_real_digest(v, io), true)))
-+				 io->tmp_digest, true)))
- 		return 0;
- 
--	return memcmp(verity_io_real_digest(v, io), want_digest,
--		      v->digest_size) != 0;
-+	return memcmp(io->tmp_digest, want_digest, v->digest_size) != 0;
- }
- 
- /*
-  * Read data blocks that are part of the RS block and deinterleave as much as
-  * fits into buffers. Check for erasure locations if @neras is non-NULL.
-@@ -360,11 +359,11 @@ static void fec_init_bufs(struct dm_verity *v, struct dm_verity_fec_io *fio)
-  * (indicated by @offset) in fio->output. If @use_erasures is non-zero, uses
-  * hashes to locate erasures.
-  */
- static int fec_decode_rsb(struct dm_verity *v, struct dm_verity_io *io,
- 			  struct dm_verity_fec_io *fio, u64 rsb, u64 offset,
--			  bool use_erasures)
-+			  const u8 *want_digest, bool use_erasures)
- {
- 	int r, neras = 0;
- 	unsigned int pos;
- 
- 	r = fec_alloc_bufs(v, fio);
-@@ -386,27 +385,27 @@ static int fec_decode_rsb(struct dm_verity *v, struct dm_verity_io *io,
- 		pos += fio->nbufs << DM_VERITY_FEC_BUF_RS_BITS;
- 	}
- 
- 	/* Always re-validate the corrected block against the expected hash */
- 	r = verity_hash(v, io, fio->output, 1 << v->data_dev_block_bits,
--			verity_io_real_digest(v, io), true);
-+			io->tmp_digest, true);
- 	if (unlikely(r < 0))
- 		return r;
- 
--	if (memcmp(verity_io_real_digest(v, io), verity_io_want_digest(v, io),
--		   v->digest_size)) {
-+	if (memcmp(io->tmp_digest, want_digest, v->digest_size)) {
- 		DMERR_LIMIT("%s: FEC %llu: failed to correct (%d erasures)",
- 			    v->data_dev->name, (unsigned long long)rsb, neras);
- 		return -EILSEQ;
- 	}
- 
- 	return 0;
- }
- 
- /* Correct errors in a block. Copies corrected block to dest. */
- int verity_fec_decode(struct dm_verity *v, struct dm_verity_io *io,
--		      enum verity_block_type type, sector_t block, u8 *dest)
-+		      enum verity_block_type type, const u8 *want_digest,
-+		      sector_t block, u8 *dest)
- {
- 	int r;
- 	struct dm_verity_fec_io *fio = fec_io(io);
- 	u64 offset, res, rsb;
- 
-@@ -445,13 +444,13 @@ int verity_fec_decode(struct dm_verity *v, struct dm_verity_io *io,
- 	/*
- 	 * Locating erasures is slow, so attempt to recover the block without
- 	 * them first. Do a second attempt with erasures if the corruption is
- 	 * bad enough.
- 	 */
--	r = fec_decode_rsb(v, io, fio, rsb, offset, false);
-+	r = fec_decode_rsb(v, io, fio, rsb, offset, want_digest, false);
- 	if (r < 0) {
--		r = fec_decode_rsb(v, io, fio, rsb, offset, true);
-+		r = fec_decode_rsb(v, io, fio, rsb, offset, want_digest, true);
- 		if (r < 0)
- 			goto done;
- 	}
- 
- 	memcpy(dest, fio->output, 1 << v->data_dev_block_bits);
-diff --git a/drivers/md/dm-verity-fec.h b/drivers/md/dm-verity-fec.h
-index 09123a612953..a6689cdc489d 100644
---- a/drivers/md/dm-verity-fec.h
-+++ b/drivers/md/dm-verity-fec.h
-@@ -66,12 +66,12 @@ struct dm_verity_fec_io {
- #define DM_VERITY_OPTS_FEC	8
- 
- extern bool verity_fec_is_enabled(struct dm_verity *v);
- 
- extern int verity_fec_decode(struct dm_verity *v, struct dm_verity_io *io,
--			     enum verity_block_type type, sector_t block,
--			     u8 *dest);
-+			     enum verity_block_type type, const u8 *want_digest,
-+			     sector_t block, u8 *dest);
- 
- extern unsigned int verity_fec_status_table(struct dm_verity *v, unsigned int sz,
- 					char *result, unsigned int maxlen);
- 
- extern void verity_fec_finish_io(struct dm_verity_io *io);
-@@ -97,10 +97,11 @@ static inline bool verity_fec_is_enabled(struct dm_verity *v)
- }
- 
- static inline int verity_fec_decode(struct dm_verity *v,
- 				    struct dm_verity_io *io,
- 				    enum verity_block_type type,
-+				    const u8 *want_digest,
- 				    sector_t block, u8 *dest)
- {
- 	return -EOPNOTSUPP;
- }
- 
 diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-index d16c51958465..1f23354256d3 100644
+index 1f23354256d3..11f6b82130ef 100644
 --- a/drivers/md/dm-verity-target.c
 +++ b/drivers/md/dm-verity-target.c
-@@ -283,16 +283,16 @@ static int verity_handle_err(struct dm_verity *v, enum verity_block_type type,
- 
- /*
-  * Verify hash of a metadata block pertaining to the specified data block
-  * ("block" argument) at a specified level ("level" argument).
-  *
-- * On successful return, verity_io_want_digest(v, io) contains the hash value
-- * for a lower tree level or for the data block (if we're at the lowest level).
-+ * On successful return, want_digest contains the hash value for a lower tree
-+ * level or for the data block (if we're at the lowest level).
-  *
-  * If "skip_unverified" is true, unverified buffer is skipped and 1 is returned.
-  * If "skip_unverified" is false, unverified buffer is hashed and verified
-- * against current value of verity_io_want_digest(v, io).
-+ * against current value of want_digest.
-  */
- static int verity_verify_level(struct dm_verity *v, struct dm_verity_io *io,
- 			       sector_t block, int level, bool skip_unverified,
- 			       u8 *want_digest)
- {
-@@ -331,26 +331,26 @@ static int verity_verify_level(struct dm_verity *v, struct dm_verity_io *io,
- 			r = 1;
- 			goto release_ret_r;
- 		}
- 
- 		r = verity_hash(v, io, data, 1 << v->hash_dev_block_bits,
--				verity_io_real_digest(v, io), !io->in_bh);
-+				io->tmp_digest, !io->in_bh);
- 		if (unlikely(r < 0))
- 			goto release_ret_r;
- 
--		if (likely(memcmp(verity_io_real_digest(v, io), want_digest,
-+		if (likely(memcmp(io->tmp_digest, want_digest,
- 				  v->digest_size) == 0))
- 			aux->hash_verified = 1;
- 		else if (static_branch_unlikely(&use_bh_wq_enabled) && io->in_bh) {
- 			/*
- 			 * Error handling code (FEC included) cannot be run in a
- 			 * tasklet since it may sleep, so fallback to work-queue.
- 			 */
- 			r = -EAGAIN;
- 			goto release_ret_r;
- 		} else if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_METADATA,
--					     hash_block, data) == 0)
-+					     want_digest, hash_block, data) == 0)
- 			aux->hash_verified = 1;
- 		else if (verity_handle_err(v,
- 					   DM_VERITY_BLOCK_TYPE_METADATA,
- 					   hash_block)) {
- 			struct bio *bio =
-@@ -409,11 +409,12 @@ int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
- 
+@@ -181,22 +181,28 @@ static int verity_ahash_final(struct dm_verity *v, struct ahash_request *req,
+ 	r = crypto_wait_req(crypto_ahash_final(req), wait);
+ out:
  	return r;
  }
  
- static noinline int verity_recheck(struct dm_verity *v, struct dm_verity_io *io,
--				   sector_t cur_block, u8 *dest)
-+				   const u8 *want_digest, sector_t cur_block,
-+				   u8 *dest)
++static int verity_ahash(struct dm_verity *v, struct dm_verity_io *io,
++			const u8 *data, size_t len, u8 *digest, bool may_sleep)
++{
++	struct ahash_request *req = verity_io_hash_req(v, io);
++	struct crypto_wait wait;
++
++	return verity_ahash_init(v, req, &wait, may_sleep) ?:
++	       verity_ahash_update(v, req, data, len, &wait) ?:
++	       verity_ahash_final(v, req, digest, &wait);
++}
++
+ int verity_hash(struct dm_verity *v, struct dm_verity_io *io,
+ 		const u8 *data, size_t len, u8 *digest, bool may_sleep)
  {
- 	struct page *page;
- 	void *buffer;
  	int r;
- 	struct dm_io_request io_req;
-@@ -433,16 +434,15 @@ static noinline int verity_recheck(struct dm_verity *v, struct dm_verity_io *io,
- 	r = dm_io(&io_req, 1, &io_loc, NULL, IOPRIO_DEFAULT);
+ 
+ 	if (static_branch_unlikely(&ahash_enabled) && !v->shash_tfm) {
+-		struct ahash_request *req = verity_io_hash_req(v, io);
+-		struct crypto_wait wait;
+-
+-		r = verity_ahash_init(v, req, &wait, may_sleep) ?:
+-		    verity_ahash_update(v, req, data, len, &wait) ?:
+-		    verity_ahash_final(v, req, digest, &wait);
++		r = verity_ahash(v, io, data, len, digest, may_sleep);
+ 	} else {
+ 		struct shash_desc *desc = verity_io_hash_req(v, io);
+ 
+ 		desc->tfm = v->shash_tfm;
+ 		r = crypto_shash_import(desc, v->initial_hashstate) ?:
+@@ -205,10 +211,38 @@ int verity_hash(struct dm_verity *v, struct dm_verity_io *io,
  	if (unlikely(r))
- 		goto free_ret;
- 
- 	r = verity_hash(v, io, buffer, 1 << v->data_dev_block_bits,
--			verity_io_real_digest(v, io), true);
-+			io->tmp_digest, true);
- 	if (unlikely(r))
- 		goto free_ret;
- 
--	if (memcmp(verity_io_real_digest(v, io),
--		   verity_io_want_digest(v, io), v->digest_size)) {
-+	if (memcmp(io->tmp_digest, want_digest, v->digest_size)) {
- 		r = -EIO;
- 		goto free_ret;
- 	}
- 
- 	memcpy(dest, buffer, 1 << v->data_dev_block_bits);
-@@ -453,28 +453,29 @@ static noinline int verity_recheck(struct dm_verity *v, struct dm_verity_io *io,
+ 		DMERR("Error hashing block: %d", r);
  	return r;
+ }
+ 
++static int verity_hash_mb(struct dm_verity *v, struct dm_verity_io *io,
++			  const u8 *data[], size_t len, u8 *digests[],
++			  int num_blocks)
++{
++	int r = 0;
++
++	if (static_branch_unlikely(&ahash_enabled) && !v->shash_tfm) {
++		int i;
++
++		/* Note: in practice num_blocks is always 1 in this case. */
++		for (i = 0; i < num_blocks; i++) {
++			r = verity_ahash(v, io, data[i], len, digests[i],
++					 !io->in_bh);
++			if (r)
++				break;
++		}
++	} else {
++		struct shash_desc *desc = verity_io_hash_req(v, io);
++
++		desc->tfm = v->shash_tfm;
++		r = crypto_shash_import(desc, v->initial_hashstate) ?:
++		    crypto_shash_finup_mb(desc, data, len, digests, num_blocks);
++	}
++	if (unlikely(r))
++		DMERR("Error hashing blocks: %d", r);
++	return r;
++}
++
+ static void verity_hash_at_level(struct dm_verity *v, sector_t block, int level,
+ 				 sector_t *hash_block, unsigned int *offset)
+ {
+ 	sector_t position = verity_position_at_level(v, block, level);
+ 	unsigned int idx;
+@@ -454,13 +488,16 @@ static noinline int verity_recheck(struct dm_verity *v, struct dm_verity_io *io,
  }
  
  static int verity_handle_data_hash_mismatch(struct dm_verity *v,
  					    struct dm_verity_io *io,
--					    struct bio *bio, sector_t blkno,
--					    u8 *data)
-+					    struct bio *bio,
-+					    const u8 *want_digest,
-+					    sector_t blkno, u8 *data)
+ 					    struct bio *bio,
+-					    const u8 *want_digest,
+-					    sector_t blkno, u8 *data)
++					    struct pending_block *block)
  {
++	const u8 *want_digest = block->want_digest;
++	sector_t blkno = block->blkno;
++	u8 *data = block->data;
++
  	if (static_branch_unlikely(&use_bh_wq_enabled) && io->in_bh) {
  		/*
  		 * Error handling code (FEC included) cannot be run in the
  		 * BH workqueue, so fallback to a standard workqueue.
  		 */
- 		return -EAGAIN;
+@@ -484,10 +521,60 @@ static int verity_handle_data_hash_mismatch(struct dm_verity *v,
+ 		return -EIO;
  	}
--	if (verity_recheck(v, io, blkno, data) == 0) {
-+	if (verity_recheck(v, io, want_digest, blkno, data) == 0) {
- 		if (v->validated_blocks)
- 			set_bit(blkno, v->validated_blocks);
- 		return 0;
- 	}
- #if defined(CONFIG_DM_VERITY_FEC)
--	if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_DATA, blkno,
--			      data) == 0)
-+	if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_DATA, want_digest,
-+			      blkno, data) == 0)
- 		return 0;
- #endif
- 	if (bio->bi_status)
- 		return -EIO; /* Error correction failed; Just return error */
+ 	return 0;
+ }
  
-@@ -561,12 +562,13 @@ static int verity_verify_io(struct dm_verity_io *io)
- 			if (v->validated_blocks)
- 				set_bit(cur_block, v->validated_blocks);
++static void verity_clear_pending_blocks(struct dm_verity_io *io)
++{
++	int i;
++
++	for (i = io->num_pending - 1; i >= 0; i--) {
++		kunmap_local(io->pending_blocks[i].data);
++		io->pending_blocks[i].data = NULL;
++	}
++	io->num_pending = 0;
++}
++
++static int verity_verify_pending_blocks(struct dm_verity *v,
++					struct dm_verity_io *io,
++					struct bio *bio)
++{
++	const u8 *data[DM_VERITY_MAX_PENDING_DATA_BLOCKS];
++	u8 *real_digests[DM_VERITY_MAX_PENDING_DATA_BLOCKS];
++	int i;
++	int r;
++
++	if (io->num_pending == 0)
++		return 0;
++
++	for (i = 0; i < io->num_pending; i++) {
++		data[i] = io->pending_blocks[i].data;
++		real_digests[i] = io->pending_blocks[i].real_digest;
++	}
++
++	r = verity_hash_mb(v, io, data, 1 << v->data_dev_block_bits,
++			   real_digests, io->num_pending);
++	if (unlikely(r))
++		return r;
++
++	for (i = 0; i < io->num_pending; i++) {
++		struct pending_block *block = &io->pending_blocks[i];
++
++		if (likely(memcmp(real_digests[i], block->want_digest,
++				  v->digest_size) == 0)) {
++			if (v->validated_blocks)
++				set_bit(block->blkno, v->validated_blocks);
++		} else {
++			r = verity_handle_data_hash_mismatch(v, io, bio, block);
++			if (unlikely(r))
++				return r;
++		}
++	}
++	verity_clear_pending_blocks(io);
++	return 0;
++}
++
+ /*
+  * Verify one "dm_verity_io" structure.
+  */
+ static int verity_verify_io(struct dm_verity_io *io)
+ {
+@@ -495,10 +582,13 @@ static int verity_verify_io(struct dm_verity_io *io)
+ 	const unsigned int block_size = 1 << v->data_dev_block_bits;
+ 	struct bvec_iter iter_copy;
+ 	struct bvec_iter *iter;
+ 	struct bio *bio = dm_bio_from_per_bio_data(io, v->ti->per_io_data_size);
+ 	unsigned int b;
++	int r;
++
++	io->num_pending = 0;
+ 
+ 	if (static_branch_unlikely(&use_bh_wq_enabled) && io->in_bh) {
+ 		/*
+ 		 * Copy the iterator in case we need to restart
+ 		 * verification in a work-queue.
+@@ -508,36 +598,38 @@ static int verity_verify_io(struct dm_verity_io *io)
+ 	} else
+ 		iter = &io->iter;
+ 
+ 	for (b = 0; b < io->n_blocks;
+ 	     b++, bio_advance_iter(bio, iter, block_size)) {
+-		int r;
+-		sector_t cur_block = io->block + b;
++		sector_t blkno = io->block + b;
++		struct pending_block *block;
+ 		bool is_zero;
+ 		struct bio_vec bv;
+ 		void *data;
+ 
+ 		if (v->validated_blocks && bio->bi_status == BLK_STS_OK &&
+-		    likely(test_bit(cur_block, v->validated_blocks)))
++		    likely(test_bit(blkno, v->validated_blocks)))
+ 			continue;
+ 
+-		r = verity_hash_for_block(v, io, cur_block,
+-					  verity_io_want_digest(v, io),
++		block = &io->pending_blocks[io->num_pending];
++
++		r = verity_hash_for_block(v, io, blkno, block->want_digest,
+ 					  &is_zero);
+ 		if (unlikely(r < 0))
+-			return r;
++			goto error;
+ 
+ 		bv = bio_iter_iovec(bio, *iter);
+ 		if (unlikely(bv.bv_len < block_size)) {
+ 			/*
+ 			 * Data block spans pages.  This should not happen,
+ 			 * since dm-verity sets dma_alignment to the data block
+ 			 * size minus 1, and dm-verity also doesn't allow the
+ 			 * data block size to be greater than PAGE_SIZE.
+ 			 */
+ 			DMERR_LIMIT("unaligned io (data block spans pages)");
+-			return -EIO;
++			r = -EIO;
++			goto error;
+ 		}
+ 
+ 		data = bvec_kmap_local(&bv);
+ 
+ 		if (is_zero) {
+@@ -547,34 +639,28 @@ static int verity_verify_io(struct dm_verity_io *io)
+ 			 */
+ 			memset(data, 0, block_size);
  			kunmap_local(data);
  			continue;
  		}
--		r = verity_handle_data_hash_mismatch(v, io, bio, cur_block,
--						     data);
-+		r = verity_handle_data_hash_mismatch(v, io, bio,
-+						     verity_io_want_digest(v, io),
-+						     cur_block, data);
- 		kunmap_local(data);
- 		if (unlikely(r))
- 			return r;
+-
+-		r = verity_hash(v, io, data, block_size,
+-				verity_io_real_digest(v, io), !io->in_bh);
+-		if (unlikely(r < 0)) {
+-			kunmap_local(data);
+-			return r;
++		block->data = data;
++		block->blkno = blkno;
++		if (++io->num_pending == v->mb_max_msgs) {
++			r = verity_verify_pending_blocks(v, io, bio);
++			if (unlikely(r))
++				goto error;
+ 		}
+-
+-		if (likely(memcmp(verity_io_real_digest(v, io),
+-				  verity_io_want_digest(v, io), v->digest_size) == 0)) {
+-			if (v->validated_blocks)
+-				set_bit(cur_block, v->validated_blocks);
+-			kunmap_local(data);
+-			continue;
+-		}
+-		r = verity_handle_data_hash_mismatch(v, io, bio,
+-						     verity_io_want_digest(v, io),
+-						     cur_block, data);
+-		kunmap_local(data);
+-		if (unlikely(r))
+-			return r;
  	}
  
++	r = verity_verify_pending_blocks(v, io, bio);
++	if (unlikely(r))
++		goto error;
++
+ 	return 0;
++
++error:
++	verity_clear_pending_blocks(io);
++	return r;
+ }
+ 
+ /*
+  * Skip verity work in response to I/O error when system is shutting down.
+  */
+@@ -1155,14 +1241,15 @@ static int verity_setup_hash_alg(struct dm_verity *v, const char *alg_name)
+ 
+ 	/*
+ 	 * Allocate the hash transformation object that this dm-verity instance
+ 	 * will use.  The vast majority of dm-verity users use CPU-based
+ 	 * hashing, so when possible use the shash API to minimize the crypto
+-	 * API overhead.  If the ahash API resolves to a different driver
+-	 * (likely an off-CPU hardware offload), use ahash instead.  Also use
+-	 * ahash if the obsolete dm-verity format with the appended salt is
+-	 * being used, so that quirk only needs to be handled in one place.
++	 * API overhead, especially when multibuffer hashing is used.  If the
++	 * ahash API resolves to a different driver (likely an off-CPU hardware
++	 * offload), use ahash instead.  Also use ahash if the obsolete
++	 * dm-verity format with the appended salt is being used, so that quirk
++	 * only needs to be handled in one place.
+ 	 */
+ 	ahash = crypto_alloc_ahash(alg_name, 0,
+ 				   v->use_bh_wq ? CRYPTO_ALG_ASYNC : 0);
+ 	if (IS_ERR(ahash)) {
+ 		ti->error = "Cannot initialize hash function";
+@@ -1186,17 +1273,21 @@ static int verity_setup_hash_alg(struct dm_verity *v, const char *alg_name)
+ 		ahash = NULL;
+ 		v->shash_tfm = shash;
+ 		v->digest_size = crypto_shash_digestsize(shash);
+ 		v->hash_reqsize = sizeof(struct shash_desc) +
+ 				  crypto_shash_descsize(shash);
+-		DMINFO("%s using shash \"%s\"", alg_name, driver_name);
++		v->mb_max_msgs = min(crypto_shash_mb_max_msgs(shash),
++				     DM_VERITY_MAX_PENDING_DATA_BLOCKS);
++		DMINFO("%s using shash \"%s\"%s", alg_name, driver_name,
++		       v->mb_max_msgs > 1 ? " (multibuffer)" : "");
+ 	} else {
+ 		v->ahash_tfm = ahash;
+ 		static_branch_inc(&ahash_enabled);
+ 		v->digest_size = crypto_ahash_digestsize(ahash);
+ 		v->hash_reqsize = sizeof(struct ahash_request) +
+ 				  crypto_ahash_reqsize(ahash);
++		v->mb_max_msgs = 1;
+ 		DMINFO("%s using ahash \"%s\"", alg_name, driver_name);
+ 	}
+ 	if ((1 << v->hash_dev_block_bits) < v->digest_size * 2) {
+ 		ti->error = "Digest size too big";
+ 		return -EINVAL;
 diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
-index aac3a1b1d94a..3951e5a4a156 100644
+index 3951e5a4a156..f5756546ac3f 100644
 --- a/drivers/md/dm-verity.h
 +++ b/drivers/md/dm-verity.h
-@@ -89,10 +89,11 @@ struct dm_verity_io {
- 	bool in_bh;
+@@ -55,10 +55,11 @@ struct dm_verity {
+ 	unsigned char hash_per_block_bits;	/* log2(hashes in hash block) */
+ 	unsigned char levels;	/* the number of tree levels */
+ 	unsigned char version;
+ 	bool hash_failed:1;	/* set if hash of any block failed */
+ 	bool use_bh_wq:1;	/* try to verify in BH wq before normal work-queue */
++	unsigned char mb_max_msgs; /* max multibuffer hashing interleaving factor */
+ 	unsigned int digest_size;	/* digest size for the current hash algorithm */
+ 	unsigned int hash_reqsize; /* the size of temporary space for crypto */
+ 	enum verity_mode mode;	/* mode for handling verification errors */
+ 	unsigned int corrupted_errs;/* Number of errors for corrupted blocks */
+ 
+@@ -74,10 +75,19 @@ struct dm_verity {
+ 
+ 	struct dm_io_client *io;
+ 	mempool_t recheck_pool;
+ };
+ 
++#define DM_VERITY_MAX_PENDING_DATA_BLOCKS	HASH_MAX_MB_MSGS
++
++struct pending_block {
++	void *data;
++	sector_t blkno;
++	u8 want_digest[HASH_MAX_DIGESTSIZE];
++	u8 real_digest[HASH_MAX_DIGESTSIZE];
++};
++
+ struct dm_verity_io {
+ 	struct dm_verity *v;
+ 
+ 	/* original value of bio->bi_end_io */
+ 	bio_end_io_t *orig_bi_end_io;
+@@ -90,12 +100,20 @@ struct dm_verity_io {
  
  	struct work_struct work;
  	struct work_struct bh_work;
  
-+	u8 tmp_digest[HASH_MAX_DIGESTSIZE];
- 	u8 real_digest[HASH_MAX_DIGESTSIZE];
- 	u8 want_digest[HASH_MAX_DIGESTSIZE];
+ 	u8 tmp_digest[HASH_MAX_DIGESTSIZE];
+-	u8 real_digest[HASH_MAX_DIGESTSIZE];
+-	u8 want_digest[HASH_MAX_DIGESTSIZE];
++
++	/*
++	 * This is the queue of data blocks that are pending verification.  We
++	 * allow multiple blocks to be queued up in order to support hash
++	 * algorithm implementations that provide support for multibuffer
++	 * hashing, i.e. interleaving the hashing of multiple messages.  On many
++	 * CPUs this improves performance significantly.
++	 */
++	int num_pending;
++	struct pending_block pending_blocks[DM_VERITY_MAX_PENDING_DATA_BLOCKS];
  
  	/*
  	 * This struct is followed by a variable-sized hash request of size
+ 	 * v->hash_reqsize, either a struct ahash_request or a struct shash_desc
+ 	 * (depending on whether ahash_tfm or shash_tfm is being used).  To
+@@ -107,22 +125,10 @@ static inline void *verity_io_hash_req(struct dm_verity *v,
+ 				       struct dm_verity_io *io)
+ {
+ 	return io + 1;
+ }
+ 
+-static inline u8 *verity_io_real_digest(struct dm_verity *v,
+-					struct dm_verity_io *io)
+-{
+-	return io->real_digest;
+-}
+-
+-static inline u8 *verity_io_want_digest(struct dm_verity *v,
+-					struct dm_verity_io *io)
+-{
+-	return io->want_digest;
+-}
+-
+ extern int verity_hash(struct dm_verity *v, struct dm_verity_io *io,
+ 		       const u8 *data, size_t len, u8 *digest, bool may_sleep);
+ 
+ extern int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
+ 				 sector_t block, u8 *digest, bool *is_zero);
 -- 
 2.45.1
 
