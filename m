@@ -1,328 +1,81 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146FAAD59;
-	Tue, 11 Jun 2024 02:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9487E782;
+	Tue, 11 Jun 2024 03:13:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718073202; cv=none; b=OOqlvC1zfLacuJVDXBiQ7gzEleTYdQ6MRaV5icMeKui+/tcGPglp70RWc5KEqKObwLSO1U2qUt8WS5je+wo14EnNhXNQnKqpzGF9JGUPr/cjvfMJtbRIj6F2FX4BOat+lzUybzYt/1Jn10tiKI8oY7uD5ZG6JB+/Prttn86wksc=
+	t=1718075597; cv=none; b=LoD/akvGenPtMSvrALJIFc03dal0UpaTlrHbCyoWIROG2groArH+ItGfegfB4y/5rHhYBAApz3+64wuPeQR4DgXi4lxE78j7cAmbigqcHJGseFWVCIUiAeEKRp483O5Skt1eFrP7naKtu899Dl4oZBrK6lC6ft8CJbGhpaAAiRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718073202; c=relaxed/simple;
-	bh=THNgh4FZcql1DTTeV3hnnPPUyy1VqB0lKWjg99comYY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V3O6jikpxYez6utn/Ac5MQCGpV90GaW6NFEF4cO6Fmpyv3SeNSbbebHWjnnHcOsSYEej03H/VcdYZ2JIfmWFizJXI29PEOUqvs6iwEXax9IClma4SrmdkTVJ0VmRvakVhbqln/H7SSby4VF/ugddcVH/MySVKV3sokzSQUCTbfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=1UYISocw; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1718075597; c=relaxed/simple;
+	bh=ZMZKxxJuYo9eKsMIOrsBuBANLaKNn9wG+ufnOZCOjg8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uOiL7pU8mmL9DlYfcGS7JL8LViL4KXc0hs3jkiX5QYVKOj/uZ8Zilke8+N4xtEMaQZCIkwwYJLD8f9aIJQ/A153UCGSCyv5k2N5foKSiu7RmpE/ZzDthdrydHXdisp2eo9CIEN0M6iBi4emwuKllUJP+fddswIuoflcYY2vSuFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qwrt7Btc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1UYISocw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=pShm9lxCJ+b2fSyVlY4N79GwCSVK+vqhYK/KheofYh8=; b=1UYISocwT3IrBF8cb6QHDhaMF3
-	v7iPtZnFL66/FNLUfb/dsBdH/Fg1iXUp3ro8LY3vLE70WuCNj5K7unDgtqi08NH/kXK2hfBsGzlAY
-	FVN2tXujo6GLYiUDDL3ztcDFLcuJ6A5sMcHUEUyx0ADHeVhsVmOz3VNy8nud0p0vQhR+6OvhDWzwz
-	aht81RUK+fI6v+5YobacPb2PjXPoCf3jOdgpj6PTNdjxyX5dkfDu3FvdjmFsG2jSBoudXyurbagFE
-	W9A2ZrF2xKK6UsCOJShYGtBtwh5Q6bc1zqjEk8Lp2ifUldNTQGLdzpMHlYI7OykuErtt9VzQpaPhx
-	8OaT50rw==;
-Received: from [50.53.4.147] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sGrK2-00000007ABE-0zEf;
-	Tue, 11 Jun 2024 02:33:18 +0000
-Message-ID: <754d54b0-5848-4775-a989-43b75dac4dbf@infradead.org>
-Date: Mon, 10 Jun 2024 19:33:16 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qwrt7Btc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FA24C2BBFC;
+	Tue, 11 Jun 2024 03:13:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718075596;
+	bh=ZMZKxxJuYo9eKsMIOrsBuBANLaKNn9wG+ufnOZCOjg8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Qwrt7BtcqvK3RqTdB+lO3NW2bXjr5H6ZeRZRK31zbrHc2Dw8811Rc9KWlhaRKnwpg
+	 kaGVXt8lp+WTZDw2EJeZ2b/rKVU7nX9BoGIcCLyGcvHDtBtjW12M7yR0i371HyNbj7
+	 W0d603VGCTb8cU2/jQxFXpkiQQ8tvE9jDRu54Qr2kcfu84Z85k4Esc0YMVKzD5c3An
+	 T22n5eTOYz6MzRZe+nbjkJHaVZqRsbDhvwilQlC7bCrQMyer7dqSP0ynMcCVYCM74t
+	 DaMBqK+kHk57pPXIlLqXiBmUTouhB+0NLMdTrdoAsbCosCP+8BhzYxOy6xfxfH/bqd
+	 C/1n6fqamoA2w==
+Date: Mon, 10 Jun 2024 20:13:14 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kamlesh Gurudasani <kamlesh@ti.com>, kristo@kernel.org, will@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	robh@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, vigneshr@ti.com, catalin.marinas@arm.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v3 0/6] Add support for MCRC64 engine to calculate 64-bit
+ CRC in Full-CPU mode
+Message-ID: <20240611031314.GA2557@sol.localdomain>
+References: <20240524-mcrc64-upstream-v3-0-24b94d8e8578@ti.com>
+ <87tti098af.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+ <Zme3EcW4Uz8kTbTt@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 8/8] clavis: Introduce new LSM called clavis
-To: Eric Snowberg <eric.snowberg@oracle.com>,
- linux-security-module@vger.kernel.org
-Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au,
- davem@davemloft.net, ardb@kernel.org, jarkko@kernel.org,
- paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
- zohar@linux.ibm.com, roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
- mic@digikod.net, casey@schaufler-ca.com, stefanb@linux.ibm.com,
- ebiggers@kernel.org, linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org,
- linux-integrity@vger.kernel.org
-References: <20240531003945.44594-1-eric.snowberg@oracle.com>
- <20240531003945.44594-9-eric.snowberg@oracle.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240531003945.44594-9-eric.snowberg@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zme3EcW4Uz8kTbTt@gondor.apana.org.au>
 
-Hi Eric,
-
-On 5/30/24 5:39 PM, Eric Snowberg wrote:
+On Tue, Jun 11, 2024 at 10:31:45AM +0800, Herbert Xu wrote:
+> On Mon, Jun 10, 2024 at 08:03:44PM +0530, Kamlesh Gurudasani wrote:
+> > <kamlesh@ti.com> writes:
+> > 
+> > > From: Kamlesh Gurudasani <kamlesh@ti.com>
+> > >
+> > > MCRC64 engine calculates 64-bit cyclic redundancy checks (CRC)
+> > > according to the ISO 3309 standard.
+> > 
+> > Could you please review this and let me know if any changes are needed
+> > to get it merged.
 > 
-> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
-> ---
->  Documentation/admin-guide/LSM/clavis.rst | 198 +++++++++++++++++++++++
->  MAINTAINERS                              |   7 +
->  crypto/asymmetric_keys/signature.c       |   4 +
->  include/linux/lsm_hook_defs.h            |   2 +
->  include/linux/security.h                 |   7 +
->  include/uapi/linux/lsm.h                 |   1 +
->  security/Kconfig                         |  10 +-
->  security/clavis/Makefile                 |   1 +
->  security/clavis/clavis.c                 |  25 +++
->  security/clavis/clavis.h                 |   4 +
->  security/clavis/clavis_keyring.c         |  83 ++++++++++
->  security/security.c                      |  16 +-
->  12 files changed, 352 insertions(+), 6 deletions(-)
->  create mode 100644 Documentation/admin-guide/LSM/clavis.rst
->  create mode 100644 security/clavis/clavis.c
+> Eric Biggers had concerns about adding this to the kernel.  I'd
+> like know if he's OK with this or not.
 > 
-> diff --git a/Documentation/admin-guide/LSM/clavis.rst b/Documentation/admin-guide/LSM/clavis.rst
-> new file mode 100644
-> index 000000000000..d1641e3ef38b
-> --- /dev/null
-> +++ b/Documentation/admin-guide/LSM/clavis.rst
-> @@ -0,0 +1,198 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +======
-> +Clavis
-> +======
-> +
-> +Clavis is a Linux Security Module that provides mandatory access control to
-> +system kernel keys (i.e. builtin, secondary, machine and platform). These
-> +restrictions will prohibit keys from being used for validation. Upon boot, the
-> +Clavis LSM is provided a key id as a boot param.  This single key is then
 
-                                        boot parameter.
+I thought the rule is that there needs to be an in-kernel user to add algorithms
+to the crypto API?  Is there any precedent for adding new algorithms purely so
+that accelerators that implement them can be accessed from userspace via AF_ALG?
 
-> +used as the root of trust for any access control modifications made going
-> +forward. Access control updates must be signed and validated by this key.
-> +
-> +Clavis has its own keyring.  All ACL updates are applied through this keyring.
-> +The update must be signed by the single root of trust key.
-> +
-> +When enabled, all system keys are prohibited from being used until an ACL is
-> +added for them. There is two exceptions to this rule, builtin keys may be used
+Even if acceptable, the motivation for this one does seem weak, given that a
+userspace software implementation would actually be faster.  It could be
+marginally useful for freeing up the CPU for other tasks if the inputs being
+processed are very large (probably at least several megabytes), though.
 
-                   There are                       rule:
-
-
-> +to validate both signed kernels and modules.
-> +
-> +Adding system kernel keys can only be performed by the machine owner; this
-> +could be through the Machine Owner Key (MOK) or the UEFI Secure Boot DB. It
-> +is possible the machine owner and system administrator may be different
-> +people. The system administrator will not be able to make ACL updates without
-> +them being signed by the machine owner.
-> +
-> +On UEFI platforms, the root of trust key shall survive a kexec. Trying to
-> +defeat or change it from the command line is not allowed.  The original boot
-> +param is stored in UEFI and will always be referenced following a kexec.
-
-   parameter
-
-> +
-> +The Clavis LSM contains a system keyring call .clavis.  It contains a single
-> +asymmetric key that is use to validate anything added to it.  This key can only
-
-                          used
-
-> +be added during boot and must be a preexisting system kernel key.  If the
-> +``clavis=`` boot param is not used, the keyring does not exist and the feature
-
-                    parameter
-
-> +can not be used until the next reboot.
-
-   cannot
-preferably
-
-> +
-> +The only user space components are OpenSSL and the keyctl utility. A new
-> +key type call ``clavis_key_acl`` is used for ACL updates. Any number of signed
-> +``clavis_key_acl`` entries may be added to the .clavis keyring. The
-> +``clavis_key_acl`` contains the subject key identifier along with the allowed
-> +usage type for
-> +the key.
-
-Join 2 lines?
-
-> +
-> +The format is as follows:
-> +
-> +.. code-block:: console
-> +
-> +  XX:YYYYYYYYYYY
-> +
-> +  XX - Single byte of the key type
-> +	VERIFYING_MODULE_SIGNATURE            00
-> +	VERIFYING_FIRMWARE_SIGNATURE          01
-> +	VERIFYING_KEXEC_PE_SIGNATURE          02
-> +	VERIFYING_KEY_SIGNATURE               03
-> +	VERIFYING_KEY_SELF_SIGNATURE          04
-> +	VERIFYING_UNSPECIFIED_SIGNATURE       05
-> +  :  - ASCII colon
-> +  YY - Even number of hexadecimal characters representing the key id
-> +
-> +The ``clavis_key_acl`` must be S/MIME signed by the sole asymmetric key contained
-> +within the .clavis keyring.
-> +
-> +In the future if new features are added, new key types could be created.
-> +
-> +Usage Examples
-> +==============
-> +
-> +How to create a signing key:
-> +----------------------------
-> +
-> +.. code-block:: bash
-> +
-> +  cat <<EOF > clavis-lsm.genkey
-> +  [ req ]
-> +  default_bits = 4096
-> +  distinguished_name = req_distinguished_name
-> +  prompt = no
-> +  string_mask = utf8only
-> +  x509_extensions = v3_ca
-> +  [ req_distinguished_name ]
-> +  O = TEST
-> +  CN = Clavis LSM key
-> +  emailAddress = user@example.com
-> +  [ v3_ca ]
-> +  basicConstraints=CA:TRUE
-> +  subjectKeyIdentifier=hash
-> +  authorityKeyIdentifier=keyid:always,issuer
-> +  keyUsage=digitalSignature
-> +  EOF
-> +
-> +  openssl req -new -x509 -utf8 -sha256 -days 3650 -batch \
-> +        -config clavis-lsm.genkey -outform DER \
-> +        -out clavis-lsm.x509 -keyout clavis-lsm.priv
-> +
-> +How to get the Subject Key Identifier
-> +-------------------------------------
-> +
-> +.. code-block:: bash
-> +
-> +  openssl x509 -in ./clavis-lsm.x509 -inform der \
-> +        -ext subjectKeyIdentifier  -nocert \
-> +        | tail -n +2 | cut -f2 -d '='| tr -d ':'
-> +  4a00ab9f35c9dc3aed7c225d22bafcbd9285e1e8
-> +
-> +How to enroll the signing key into the MOK
-> +------------------------------------------
-> +
-> +The key must now be added to the machine or platform keyrings.  This
-> +indicates the key was added by the system owner. To add to the machine
-> +keyring on x86 do:
-
-Are other architectures different? why?
-
-> +
-> +.. code-block:: bash
-> +
-> +  mokutil --import ./clavis-lsm.x509
-> +
-> +and then reboot and enroll the key through the MokManager.
-> +
-> +How to enable the Clavis LSM
-> +----------------------------
-> +
-> +Add the key id to the ``clavis=`` boot param.  With the example above the
-
-                                          parameter.
-
-> +key id is the subject key identifier: 4a00ab9f35c9dc3aed7c225d22bafcbd9285e1e8
-> +
-> +Add the following boot param:
-
-                          parameter:
-
-> +
-> +.. code-block:: console
-> +
-> +  clavis=4a00ab9f35c9dc3aed7c225d22bafcbd9285e1e8
-> +
-> +After booting there will be a single key contained in the .clavis keyring:
-> +
-> +.. code-block:: bash
-> +
-> +  keyctl show %:.clavis
-> +  Keyring
-> +    254954913 ----swrv      0     0  keyring: .clavis
-> +    301905375 ---lswrv      0     0   \_ asymmetric: TEST: Clavis LSM key: 4a00ab9f35c9dc3aed7c225d22bafcbd9285e1e8
-> +
-> +The original ``clavis=`` boot param will persist across any kexec. Changing it or
-
-                                 parameter
-
-> +removing it has no effect.
-> +
-> +
-> +How to sign an entry to be added to the .clavis keyring:
-> +--------------------------------------------------------
-> +
-> +In this example we have 3 keys in the machine keyring.  Our Clavis LSM key, a
-> +key we want to use for kernel verification and a key we want to use for module
-> +verification.
-> +
-> +.. code-block:: bash
-> +
-> +  keyctl show %:.machine
-> +  Keyring
-> +    999488265 ---lswrv      0     0  keyring: .machine
-> +    912608009 ---lswrv      0     0   \_ asymmetric: TEST: Module Key: 17eb8c5bf766364be094c577625213700add9471
-> +    646229664 ---lswrv      0     0   \_ asymmetric: TEST: Kernel Key: b360d113c848ace3f1e6a80060b43d1206f0487d
-> +   1073737099 ---lswrv      0     0   \_ asymmetric: TEST: Clavis LSM key: 4a00ab9f35c9dc3aed7c225d22bafcbd9285e1e8
-> +
-> +To update the .clavis kerying ACL list.  First create a file containing the
-
-                                     list, first
-
-> +key usage type followed by a colon and the key id that we want to allow to
-> +validate that usage.  In the first example we are saying key
-> +17eb8c5bf766364be094c577625213700add9471 is allowed to validate kernel modules.
-> +In the second example we are saying key b360d113c848ace3f1e6a80060b43d1206f0487d
-> +is allowed to validate signed kernels.
-> +
-> +.. code-block:: bash
-> +
-> +  echo "00:17eb8c5bf766364be094c577625213700add9471" > module-acl.txt
-> +  echo "02:b360d113c848ace3f1e6a80060b43d1206f0487d" > kernel-acl.txt
-> +
-> +Now both these files must be signed by the key contained in the .clavis keyring:
-> +
-> +.. code-block:: bash
-> +
-> +  openssl smime -sign -signer clavis-lsm.x509 -inkey clavis-lsm.priv -in module-acl.txt \
-> +        -out module-acl.pkcs7 -binary -outform DER -nodetach -noattr
-> +
-> +  openssl smime -sign -signer clavis-lsm.x509 -inkey clavis-lsm.priv -in kernel-acl.txt \
-> +        -out kernel-acl.pkcs7 -binary -outform DER -nodetach -noattr
-> +
-> +Afterwards the ACL list in the clavis keyring can be updated:
-> +
-> +.. code-block:: bash
-> +
-> +  keyctl padd clavis_key_acl "" %:.clavis < module-acl.pkcs7
-> +  keyctl padd clavis_key_acl "" %:.clavis < kernel-acl.pkcs7
-> +
-> +  keyctl show %:.clavis
-> +
-> +  Keyring
-> +    254954913 ----swrv      0     0  keyring: .clavis
-> +    301905375 ---lswrv      0     0   \_ asymmetric: TEST: Clavis LSM key: 4a00ab9f35c9dc3aed7c225d22bafcbd9285e1e8
-> +   1013065475 --alswrv      0     0   \_ clavis_key_acl: 02:b360d113c848ace3f1e6a80060b43d1206f0487d
-> +    445581284 --alswrv      0     0   \_ clavis_key_acl: 00:17eb8c5bf766364be094c577625213700add9471
-> +
-> +Now the 17eb8c5bf766364be094c577625213700add9471 key can be used for
-> +validating kernel modules and the b360d113c848ace3f1e6a80060b43d1206f0487d
-> +key can be used to validate signed kernels.
-
-
--- 
-~Randy
+- Eric
