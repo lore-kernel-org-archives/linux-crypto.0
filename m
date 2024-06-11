@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0641E171064;
-	Tue, 11 Jun 2024 03:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9E616FF23;
+	Tue, 11 Jun 2024 03:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718077754; cv=none; b=ATzemGW92nWcdoLVNYeCwH2PmGWiwsO9n93SG0gHcM0OMVkQv9EPt9KRzhKWutb63H3ZxuAuA4FA8wbr1W24JJUplp2ot/vwN4dYC3MR0GH6Og4AbliQ/l3yj7KEameaclHCDlAECFr0k5zkeh0N3pi4WrkX27gGiXUhVYY+C+g=
+	t=1718077754; cv=none; b=s9OLW1UsQo/JSt6mB7u5WQX88k3RhYaQXlYDVvXxYEUSsIcodUVdwO0ci7vx7z4DJB1nTNntZAG1cYMd64bWz8Ggo2Z8te0JIDUXNJcyK+F+058ra82c63fkYzLWbmEQSSsNaPKzfqQnAUcl3KWD1hXSKYtuFIxkKLDDniaQjII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718077754; c=relaxed/simple;
-	bh=f3jNdwOMbg1pJt24bffn98hUVfrBFO/FFHFl9Cbu1ZQ=;
+	bh=2pM8Bh/k5bufZBnNYlFVpUc6AsryaPnDFJJisGkWbN0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Vl+U4CqDeN+GvSxBAo++8GVUEz99FqIIehUdl5qbeZAFzLvBA8Te5z8R7+nHxLlTRPzrvOiYIo12wJy/HykuJ7BbbeyiaZ3Cs5CS0wNsCdqez5prxi7XdZWtLVqqWipw072UN3oXuMLEqQFUlCXs+c0jpXPT30BWF6HqfLerTgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYba6+VN; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=hUKPf3OOA04AWSz4qxaSGdyYBLjlh9ipk2I+JKWLnQoKUrxlyRFAsRToifLqSywH8gH62DWJMARWuBanzrf1t12qItg9TqXl1c8/boUO+J0kCcF1bKbq2dfXLiAeQxcHMaTxleA5l1CP1CwleJC1tvT6hgBGqRunEjmrzgsP0tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EamG2Rwy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYba6+VN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 590ADC4AF50;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EamG2Rwy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C1BC4AF48;
 	Tue, 11 Jun 2024 03:49:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718077753;
-	bh=f3jNdwOMbg1pJt24bffn98hUVfrBFO/FFHFl9Cbu1ZQ=;
+	s=k20201202; t=1718077754;
+	bh=2pM8Bh/k5bufZBnNYlFVpUc6AsryaPnDFJJisGkWbN0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dYba6+VNF8iQw/ODtSbpWlOZaRdh8JYlVCVQfNiszZ6j5PdMbTh9sAGssGTlHhcPo
-	 B4t6796LL2JDOenl/C8cBGWf7gbWPf1pXqmzuDKpOmdtjM/+ezJ816r7p/FC8FjYqR
-	 3gdbvoxe5qAHFoZZI3RMeh0+S3XUjZSsmAFb/OHtKFv+CcEs7QAtENIItHSgNz/9mH
-	 DWHibLZIoahniLad6WDLVkLwiOZ2TEKgXi+zqQUod2b1wXZy9hUuDw/lDN9a4rnYGu
-	 u5Yy7Rq9EgTWVeBUMfdFJQVrzcFtkQn4szuNcDllLpdZ7yvKdpfNwZthhQRCZWe9ih
-	 VWdE/CKewz8IQ==
+	b=EamG2RwyXGvbjbh4MMQC4xjGsPU9IK2HaOrMRT1//WIbymwcVaSopdZW7v4JFwGJU
+	 UDoPCJecKhonShVEmJPhPrJdXc3NyYodQ/RJNXYsGDvdgf6D508CXHC550GwG675sa
+	 m/UMf+FblEQeIYj17AfIXnBXP0px50LqZsms6pS9S8pAQmNrl62rxyJwbQqaTqUwe5
+	 9k2kvMYsnTeG4VVVW0VMn22xG6JXnSads1CsRk8lfh+tghXNjzRO51H6HocdBmLESq
+	 mMOV7aaRQYsf4XW17GN9gPtaeJOVmn5MuOALuBCPpjirtVt1zd/AFai8F7vNoI2441
+	 3RWQDO+TUS1qg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	fsverity@lists.linux.dev,
@@ -36,9 +36,9 @@ Cc: x86@kernel.org,
 	Sami Tolvanen <samitolvanen@google.com>,
 	Bart Van Assche <bvanassche@acm.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH v5 07/15] dm-verity: move hash algorithm setup into its own function
-Date: Mon, 10 Jun 2024 20:48:14 -0700
-Message-ID: <20240611034822.36603-8-ebiggers@kernel.org>
+Subject: [PATCH v5 08/15] dm-verity: move data hash mismatch handling into its own function
+Date: Mon, 10 Jun 2024 20:48:15 -0700
+Message-ID: <20240611034822.36603-9-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240611034822.36603-1-ebiggers@kernel.org>
 References: <20240611034822.36603-1-ebiggers@kernel.org>
@@ -52,111 +52,105 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Move the code that sets up the hash transformation into its own
-function.  No change in behavior.
+Move the code that handles mismatches of data block hashes into its own
+function so that it doesn't clutter up verity_verify_io().
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/md/dm-verity-target.c | 70 +++++++++++++++++++----------------
- 1 file changed, 39 insertions(+), 31 deletions(-)
+ drivers/md/dm-verity-target.c | 64 ++++++++++++++++++++---------------
+ 1 file changed, 36 insertions(+), 28 deletions(-)
 
 diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-index bb5da66da4c1..88d2a49dca43 100644
+index 88d2a49dca43..796d85526696 100644
 --- a/drivers/md/dm-verity-target.c
 +++ b/drivers/md/dm-verity-target.c
-@@ -1224,10 +1224,47 @@ static int verity_parse_opt_args(struct dm_arg_set *as, struct dm_verity *v,
- 	} while (argc && !r);
+@@ -540,10 +540,42 @@ static noinline int verity_recheck(struct dm_verity *v, struct dm_verity_io *io,
+ 	mempool_free(page, &v->recheck_pool);
  
  	return r;
  }
  
-+static int verity_setup_hash_alg(struct dm_verity *v, const char *alg_name)
++static int verity_handle_data_hash_mismatch(struct dm_verity *v,
++					    struct dm_verity_io *io,
++					    struct bio *bio, sector_t blkno,
++					    struct bvec_iter *start)
 +{
-+	struct dm_target *ti = v->ti;
-+	struct crypto_ahash *ahash;
-+
-+	v->alg_name = kstrdup(alg_name, GFP_KERNEL);
-+	if (!v->alg_name) {
-+		ti->error = "Cannot allocate algorithm name";
-+		return -ENOMEM;
++	if (static_branch_unlikely(&use_bh_wq_enabled) && io->in_bh) {
++		/*
++		 * Error handling code (FEC included) cannot be run in the
++		 * BH workqueue, so fallback to a standard workqueue.
++		 */
++		return -EAGAIN;
 +	}
-+
-+	ahash = crypto_alloc_ahash(alg_name, 0,
-+				   v->use_bh_wq ? CRYPTO_ALG_ASYNC : 0);
-+	if (IS_ERR(ahash)) {
-+		ti->error = "Cannot initialize hash function";
-+		return PTR_ERR(ahash);
++	if (verity_recheck(v, io, *start, blkno) == 0) {
++		if (v->validated_blocks)
++			set_bit(blkno, v->validated_blocks);
++		return 0;
 +	}
-+	v->tfm = ahash;
++#if defined(CONFIG_DM_VERITY_FEC)
++	if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_DATA, blkno,
++			      NULL, start) == 0)
++		return 0;
++#endif
++	if (bio->bi_status)
++		return -EIO; /* Error correction failed; Just return error */
 +
-+	/*
-+	 * dm-verity performance can vary greatly depending on which hash
-+	 * algorithm implementation is used.  Help people debug performance
-+	 * problems by logging the ->cra_driver_name.
-+	 */
-+	DMINFO("%s using implementation \"%s\"", alg_name,
-+	       crypto_hash_alg_common(ahash)->base.cra_driver_name);
-+
-+	v->digest_size = crypto_ahash_digestsize(ahash);
-+	if ((1 << v->hash_dev_block_bits) < v->digest_size * 2) {
-+		ti->error = "Digest size too big";
-+		return -EINVAL;
++	if (verity_handle_err(v, DM_VERITY_BLOCK_TYPE_DATA, blkno)) {
++		dm_audit_log_bio(DM_MSG_PREFIX, "verify-data", bio, blkno, 0);
++		return -EIO;
 +	}
-+	v->ahash_reqsize = sizeof(struct ahash_request) +
-+			   crypto_ahash_reqsize(ahash);
 +	return 0;
 +}
 +
- /*
-  * Target parameters:
-  *	<version>	The current format is version 1.
-  *			Vsn 0 is compatible with original Chromium OS releases.
-  *	<data device>
-@@ -1348,42 +1385,13 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 		r = -EINVAL;
- 		goto bad;
+ static int verity_bv_zero(struct dm_verity *v, struct dm_verity_io *io,
+ 			  u8 *data, size_t len)
+ {
+ 	memset(data, 0, len);
+ 	return 0;
+@@ -632,39 +664,15 @@ static int verity_verify_io(struct dm_verity_io *io)
+ 		if (likely(memcmp(verity_io_real_digest(v, io),
+ 				  verity_io_want_digest(v, io), v->digest_size) == 0)) {
+ 			if (v->validated_blocks)
+ 				set_bit(cur_block, v->validated_blocks);
+ 			continue;
+-		} else if (static_branch_unlikely(&use_bh_wq_enabled) && io->in_bh) {
+-			/*
+-			 * Error handling code (FEC included) cannot be run in a
+-			 * tasklet since it may sleep, so fallback to work-queue.
+-			 */
+-			return -EAGAIN;
+-		} else if (verity_recheck(v, io, start, cur_block) == 0) {
+-			if (v->validated_blocks)
+-				set_bit(cur_block, v->validated_blocks);
+-			continue;
+-#if defined(CONFIG_DM_VERITY_FEC)
+-		} else if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_DATA,
+-					     cur_block, NULL, &start) == 0) {
+-			continue;
+-#endif
+-		} else {
+-			if (bio->bi_status) {
+-				/*
+-				 * Error correction failed; Just return error
+-				 */
+-				return -EIO;
+-			}
+-			if (verity_handle_err(v, DM_VERITY_BLOCK_TYPE_DATA,
+-					      cur_block)) {
+-				dm_audit_log_bio(DM_MSG_PREFIX, "verify-data",
+-						 bio, cur_block, 0);
+-				return -EIO;
+-			}
+ 		}
++		r = verity_handle_data_hash_mismatch(v, io, bio, cur_block,
++						     &start);
++		if (unlikely(r))
++			return r;
  	}
- 	v->hash_start = num_ll;
  
--	v->alg_name = kstrdup(argv[7], GFP_KERNEL);
--	if (!v->alg_name) {
--		ti->error = "Cannot allocate algorithm name";
--		r = -ENOMEM;
--		goto bad;
--	}
--
--	v->tfm = crypto_alloc_ahash(v->alg_name, 0,
--				    v->use_bh_wq ? CRYPTO_ALG_ASYNC : 0);
--	if (IS_ERR(v->tfm)) {
--		ti->error = "Cannot initialize hash function";
--		r = PTR_ERR(v->tfm);
--		v->tfm = NULL;
--		goto bad;
--	}
--
--	/*
--	 * dm-verity performance can vary greatly depending on which hash
--	 * algorithm implementation is used.  Help people debug performance
--	 * problems by logging the ->cra_driver_name.
--	 */
--	DMINFO("%s using implementation \"%s\"", v->alg_name,
--	       crypto_hash_alg_common(v->tfm)->base.cra_driver_name);
--
--	v->digest_size = crypto_ahash_digestsize(v->tfm);
--	if ((1 << v->hash_dev_block_bits) < v->digest_size * 2) {
--		ti->error = "Digest size too big";
--		r = -EINVAL;
-+	r = verity_setup_hash_alg(v, argv[7]);
-+	if (r)
- 		goto bad;
--	}
--	v->ahash_reqsize = sizeof(struct ahash_request) +
--		crypto_ahash_reqsize(v->tfm);
+ 	return 0;
+ }
  
- 	v->root_digest = kmalloc(v->digest_size, GFP_KERNEL);
- 	if (!v->root_digest) {
- 		ti->error = "Cannot allocate root digest";
- 		r = -ENOMEM;
 -- 
 2.45.1
 
