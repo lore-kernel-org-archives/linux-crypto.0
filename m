@@ -1,145 +1,117 @@
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2116.outbound.protection.partner.outlook.cn [139.219.17.116])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B032F84A21;
-	Wed, 12 Jun 2024 10:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.116
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718189238; cv=fail; b=gus+oKt7UU1H4ZNkeCAB1yfvM3Z4gGcC0gV35GsQ9G8ub6Mm00Zrut+HmzEh9acDbDAKp3CHHq0CpssSz/36OlW++q0IV4zfbDiEMUveUln5UpJBGqZfEzdaItqqz+WdRB+HIvt9kEjXsmMQMKDNSPUnJ+Vt7BR5yf81QuOpjjk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718189238; c=relaxed/simple;
-	bh=oyU59uWBlhpz/dzB2XbZ8yS2oKF/Gg+L7snJYcG1WqI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Sgmt4UW3+RomKX21pB3HM+eyfjskJvOB873Tg6Z5futpk3X+uV7+utHuvDEM6mIf4OA7qPHSjbVs/U0ZuIAdhJyWPQ78n5j8JW2NoKFwCXCpC8TvXf7IjWwz6Gawvqxh+c5DkaSJ5dOJDX9HbnQT9VcZNdeFC2Rct6NE5YmBZxc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FDRU6lqY1/DolojgXzt27iZ3VwKZyUCCNHdb2T85p3eyYr9jb/PpjgyRYGZXPxm+Ur5LOJ9LAxLAt+8KxkmljtfOZUK8y5XBBP3SVLpTT21gfh/tfF0yb/SQplDTIHn3toPB/VxHe8k6+6AI+g1vUnIHX/VIePR4qbLCHGDstcMQ9AXDKqq1n6EEJ8Ue4D4Oedr2SyWzRNGpcRC+wex2lNF4N7aljNTumRJXBvbJToiKAq/srwxmigkaQtwFzvp+W2hFJaAANNrff03tZ2AnKKmmd+kks25igiFv6PiYWkzr2sCYGQZ8Mw9o9XE55s+Q7AZQPdl+359Gb4AvObAphg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rYC7lAMr84vaQfxhFj4YJDGk3n1eyG8mtZC7ZDEewNs=;
- b=jifHtrJghjNGTL3L/ThHzX1Apv+7jnWYz+tLbmNvpqUQg7ExozK484CKZNBBqrXUjHMs1VmbbeQwH8uAoA0kp9vNE40/A3ib6HXNnstzLcMEKubfTmdlaKXLrZz5IWX9vjLUt0D+EMGYrhttQq9KMeXuVpr/3AZhz18PzL1aHfCMKIUtutxlSY/5hwCw45/CKP5titGVjhmpLJWA1TfF2pr+QWUS8kMLQfEIh4h2ckbAESTc1XeKvASqfwtY5AnOks8K9krcFvhnD+8dVPGLGHsaaFZ2FNIMI6B8KL3JXDUg+8UxjmLhwrEziIsfkvJM0/r8gEfWFuXctICLrnbeBg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Received: from NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:10::10) by NT0PR01MB0976.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:d::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.38; Wed, 12 Jun
- 2024 10:13:30 +0000
-Received: from NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
- ([fe80::e3b:43f8:2e6d:ecce]) by NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
- ([fe80::e3b:43f8:2e6d:ecce%7]) with mapi id 15.20.7611.039; Wed, 12 Jun 2024
- 10:13:30 +0000
-From: JiaJie Ho <jiajie.ho@starfivetech.com>
-To: Vinod Koul <vkoul@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
-	<davem@davemloft.net>, Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>
-Subject: RE: [PATCH v5 1/3] dmaengine: dw-axi-dmac: Support hardware quirks
-Thread-Topic: [PATCH v5 1/3] dmaengine: dw-axi-dmac: Support hardware quirks
-Thread-Index: AQHasj8OTzZ9CEf8H0CgWgm1ave3tbHC60wAgAD2s5A=
-Date: Wed, 12 Jun 2024 10:13:30 +0000
-Message-ID:
- <NT0PR01MB11826C9F142FCD1A1199A11B8AC02@NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn>
-References: <20240530031112.4952-1-jiajie.ho@starfivetech.com>
- <20240530031112.4952-2-jiajie.ho@starfivetech.com> <ZmiOemWQrG-3EdIB@matsya>
-In-Reply-To: <ZmiOemWQrG-3EdIB@matsya>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: NT0PR01MB1182:EE_|NT0PR01MB0976:EE_
-x-ms-office365-filtering-correlation-id: 4da55e4d-2239-401f-1d49-08dc8ac84ee8
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam:
- BCL:0;ARA:13230032|1800799016|366008|41320700005|38070700010;
-x-microsoft-antispam-message-info:
- 8iPYnKZOuakbiVm3Ik2TSg8G7Yfm3uw55Kcsyj1GgGiTW+tAOq1YJvcYuSiBksxDu6VzznTy2Bim+JRNlkQEd7WE+h9kbJa0jDJAGBk/6qK3Gdxx+hzvwHsYnKQI+Bpcw55qsbvyK5UduLA964hrzdiq9KXzYYL5MIaXgYfFA/diVlKBJMl6x3TFPqEGcCKaTmdN0H1x+bAjRaGKzdqq0XIFP4Ij07ni2iU6Lc3ViKRgQqWeDCkYCpR0q5gWyLVF4AYWsZJmxx1yLJICS7TB/4YmqrHO8RUFlm1fUNG03Gc9ifxm1s6dtUXteAzqx4SFDDJNQAltgtfEhVn5l+kDMbj2YDF9mLw8nQMI6+Ntr7V7ty7ol4vG8AELtSQiz+BsZxTsvDSRhaXtQX2W0xdnG98HmLRhhF9N3/QLcMwcyiHu+fy0uJSd0uNG2RIu1ngPEFJRUYmuy9GTp/Gau8LSOTdS8kEJxhgS0FI1F5JDP+Aoe41qOv/crqxSEjhy7Pgf/VuSm2ervrAi9EG9vjBoFNSXnDgRAlFrqbmJfeo3W/Fc8NIZ+nTo7NGWoOsysoXpvF/sGE7a74kC+ZuPVDiPYCXWYnelpOFD+wwDJ4l3K0r4Bfk7szgBRXwGy/9dxOUc
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230032)(1800799016)(366008)(41320700005)(38070700010);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?N7MMaoVQ+kFd/cXVfNKZnOicOPoV0UCbS2IqDuM1up/xUJ3IzV/xsiEaQD+H?=
- =?us-ascii?Q?nOANXakc1Sjj39THpAaotiwtU6gfdSXKrCH+jsOzQ98CKvsN42vJ+5DwHi79?=
- =?us-ascii?Q?ysNxgnbKpKOW756xhmMQPeCODIoubGJSRdS44anZCXPtvNLjlcWYltkIhKZW?=
- =?us-ascii?Q?MYnuv0iabBhFw5tPLmVVP2O3zEby6XKTU7u5WeYuMYCOUr+DRPhN+jpZH1qj?=
- =?us-ascii?Q?bjMiQ0vuGwT3gTe7IuL19EUsW8ytBmcNYlu4vmvaXLdIgBfQ4YbmTX7J0483?=
- =?us-ascii?Q?aWd9nYcwJqgSmSPDCSSFz2nh6FUBgQFTS/yLJoUcQxZi+BK79/vLXwPE5Aku?=
- =?us-ascii?Q?rusA6evO4MH07Q5ogEHG6x+3S3tZcwf6nm7nCrRJqwToqtrisaNmYS0lLY9B?=
- =?us-ascii?Q?ti5O+TyzUCrl32l9qA86IJZcwzgDp1+M9cPKoZZKK5fVVL3kqifmw0lyHN1f?=
- =?us-ascii?Q?uhxQjXyoJElh1su/NsJ31tlMTRea9ZBky0ZdIsOVGee6xwvOn2J3vCxDl4Zm?=
- =?us-ascii?Q?ihHPxUrOmDtxYq2KjHeUIaLjrRZC5snnhnFW/U7CVWQPlgEJ/rc4onlY+SU/?=
- =?us-ascii?Q?zPB58G5fcLFbkzDCIOOynlOv/H3h6vhI3zYOoNNOSKFIeDyMIW82OC/xD291?=
- =?us-ascii?Q?t12CMrS2WtiX9lqhn8j+xZWykWia52TR7y/aqok1bXvBdvDRDtGGsbYCXsku?=
- =?us-ascii?Q?S09I3eZSBSAQMaj7OqBOTC0SwJV4LuAI60MH5JlOgmTJ+JaGUSKLxK07q3n1?=
- =?us-ascii?Q?uP4D2wr/+uM0GuFFsQR1SWz8VNkmZOuzNX/esodT3R43qV6CnB8J9SzOq6/D?=
- =?us-ascii?Q?z4sq+9BZrQtBhzDFWReqfBHQifjkNuGFABQFAasm71xEaImwCnyvSXXBijBZ?=
- =?us-ascii?Q?tGN2/Hu+CVgi1jIoPrtDT59Y9cJvySLmqLk6g/nXQ9Xuhv6T6VkCE+xIGxt9?=
- =?us-ascii?Q?gP28UUeW7RAkxYpCzzlE90ICwSL/VpUdP4cQwYBhsR1f5m52rCu3AEv0PSao?=
- =?us-ascii?Q?poTgCueJnXO6NFQ1nHlkmO6EM+RaF9FdlZdTBcX7EmxJZj5zQ5y5s/UyKAdC?=
- =?us-ascii?Q?D5vHPYZNwFUWb4hDpkvFD0q9oJB11xUCwTmUDh95EY4OoIXvr+wfsHfO/uUX?=
- =?us-ascii?Q?F/3zhDf4eB35R7wKJPmUk+PO9s0gP5EEvf+mKzOLMeHlVk8KnlPSXwU4Po5k?=
- =?us-ascii?Q?kSh4LLtj2R/eWpuGg+Nx71bMcXBvpYJnih1uH6tKUnjOQNEL5u1FLTeul+TS?=
- =?us-ascii?Q?SkahqnNKz9KcQTR5J4k14uJ/+wKWNJwZ3ea4qBkXelGeSCSOc7OSorp1vKym?=
- =?us-ascii?Q?6ucwOGNI8FJLO2d99Ixys1r0AQ8nDnyK7vnVHzj14xAlVq2sMdn2/oDerUhd?=
- =?us-ascii?Q?ykLpRu1J/y0q0pse/flj+6LAANlmvN3StIy0w6kE2I+szuiPBVorHN8Jv0gV?=
- =?us-ascii?Q?aPDJ9D0Tj1ZXO/0afC03slH8IXFkfbmubzpImAgz0k6D4zEcmh/Ilfv/mXWv?=
- =?us-ascii?Q?JZuia86XfeqddoGwTKUav6YqKsOp4Mt1fjE6B+l/se75Px8G3ecbHEGmB3i1?=
- =?us-ascii?Q?ldCpegvp78NoSCwsuUKLfn3SvoCurdGj7U0YPU7oPbJizBSrCsizmUum38cP?=
- =?us-ascii?Q?LQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B294F1CABD;
+	Wed, 12 Jun 2024 15:19:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718205575; cv=none; b=DmoaoGVKHY3FgawWAE+B/baWKt7JePAOWhT5OiKLAqzy5qlcYeOdzlPoox+ScqIP7YZ12deU1AYv1TCuHi+2rWy2N0uqoxex9U0kX3bDE+O1ovyoopIoCfvuPe1eMOocplgtZ7sJBdNxKXMBDk6V5KUqgYmP/OnYEzkuDKfGqbw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718205575; c=relaxed/simple;
+	bh=6KQuNfs/TXpkp2KlxNFXCFMll5A5h+Z36Mt0IjiDsIQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UbWtGfDEXeWxWPKFFfWk7417G5SdTX0goqynhGxuSxrptGZ/WqF/kGXLEiEcTlJdLKm4ftLZgXCi6IoMflVvzyT4f0vaZpuw0aysRbDKNx3AewwzkEWCjPi40kTCvB1ow2BTYEtTay+ynYoJsMCBM8W3RyJhHkePeN3TPCZ9ZHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oS+6I6qH; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oS+6I6qH"
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45CExI54030986;
+	Wed, 12 Jun 2024 15:19:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=a8QKQRxgGexcpLfklLGXpnIHyr
+	R8uSHIHaiYX77300M=; b=oS+6I6qHQCaCQ0GhDfiTa7EUJtE+O73mIZP68wY+sw
+	1I56ZOPFSAmje+tDR7gY2NB3jhcUwHtK7qxxQnD3OKbEXQqfXVGjgnE88AKhsphx
+	qjFMJNbXFwGbAkQh9wf8VtTmyd0Yh9+JU6jaPp3l4KMyaL0NEBGkmr/ok5aI1cQ1
+	3gsLNPf9405joJBKq8okxsgb8t8yEsGxbTWrCXW9LzAktFudC6aL07s5Qla1OOsI
+	o7ezLx2+yjizNj1oNl+Kf4g5WzJoq3ZxSdF+POjK35xAWxdEyQfeid29LoG5bCWt
+	cxuPHABYwtFYnXXmYoUrmPk7fl6DGc/WeTBqntUHD2gg==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yqdwg81qa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jun 2024 15:19:23 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45CDbUOd003881;
+	Wed, 12 Jun 2024 15:19:23 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yn2mpxxh2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jun 2024 15:19:23 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45CFJKuH65536478
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Jun 2024 15:19:22 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CE91358068;
+	Wed, 12 Jun 2024 15:19:20 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1730C58059;
+	Wed, 12 Jun 2024 15:19:20 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 12 Jun 2024 15:19:19 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.ibm.com>
+To: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, saulo.alessandre@tse.jus.br, ardb@kernel.org,
+        Stefan Berger <stefanb@linux.ibm.com>
+Subject: [RFC PATCH 0/3] Introduce ecc_digits_to_bytes and clean up ecdh.c
+Date: Wed, 12 Jun 2024 11:18:57 -0400
+Message-ID: <20240612151900.895156-1-stefanb@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4da55e4d-2239-401f-1d49-08dc8ac84ee8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2024 10:13:30.1315
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2OgE7UjI5WoQnBE/y2wNfXSDyRm9a42EWu71RqBm9UjapoDiYs2l+vfisZYoJI1PABgytSquvVcLZtALGHjvs82VAc2LGYMI80zKicfRL8w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: NT0PR01MB0976
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: XQCTyrQyVk0jhJIneMgpQ6o3Y4BJECbR
+X-Proofpoint-ORIG-GUID: XQCTyrQyVk0jhJIneMgpQ6o3Y4BJECbR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-12_08,2024-06-12_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 adultscore=0 spamscore=0 mlxlogscore=464 malwarescore=0
+ clxscore=1011 lowpriorityscore=0 phishscore=0 impostorscore=0 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406120106
 
-> On 30-05-24, 11:11, Jia Jie Ho wrote:
->=20
-> > +
-> > +struct dw_axi_peripheral_config {
-> > +#define DWAXIDMAC_STARFIVE_SM_ALGO	BIT(0)
->=20
-> what does this quirk mean?
->=20
-> > +	u32 quirks;
->=20
-> Can you explain why you need this to be exposed. I would prefer we use
-> existing interfaces and not define a new one...
->=20
+This series introduces ecc_digits_to_bytes to convert an array of digits
+to bytes and uses this function and ecc_digits_from_bytes in ecdh-related
+code to convert between byte arrays and digits. Using these functions is
+generally better than using ecc_swap_digits. The latter cannot be used with
+curves like NIST P521 since it does not properly handle curves that do not
+use all bytes in the most significant digit.
 
-Hi Vinod,
-Thanks for reviewing this.
-This is a dedicated dma controller for the crypto engine.
-I am adding this quirk to:
-1. Select the src and dest AXI master for transfers between mem and dev.=20
-    Driver currently only uses AXI0 for both.
-2. Workaround a hardware limitation on the crypto engine to
-     transfer data > 256B by incrementing the peripheral FIFO offset.
+It also introduces ecc_curve_get_nbytes to get the number of bytes (nbytes)
+a curve needs for its coordinates. It derives this number from the nbits
+parameter of a curve. Using this function is also generally better than
+deriving nbytes from ndigits, which does not work correctly vor NIST P521.
 
-What is the recommended way to handle such cases besides using=20
-peripheral_config in dma_slave_config?
+None of the converted functions have been used with NIST P521 but only
+with NIST P192/256/384 so far, so they work fine as they are.
 
-Best regards,
-Jia Jie
+Due to concerns related to constant time operations when signing with EC
+private keys I am not planning to add NIST P521 support to ecdh, so the
+changes in this series are primarly 'code improvements' (-> RFC).
+
+   Stefan
+
+Stefan Berger (3):
+  crypto: ecc - Implement ecc_digits_to_bytes to convert digits to byte
+    array
+  crypto: ecc - Implement and use ecc_curve_get_nbytes to get curve's
+    nbytes
+  crypto: ecdh - Use functions to copy digits from and to byte arrays
+
+ crypto/ecc.c                  | 47 ++++++++++++++++++++++++-----------
+ crypto/ecdh.c                 | 24 +++++++++++-------
+ include/crypto/internal/ecc.h | 37 ++++++++++++++++++++++-----
+ 3 files changed, 79 insertions(+), 29 deletions(-)
+
+-- 
+2.43.0
+
