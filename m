@@ -1,152 +1,125 @@
-Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2111.outbound.protection.partner.outlook.cn [139.219.146.111])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0773EF4FA;
-	Wed, 12 Jun 2024 03:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.219.146.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA4923765;
+	Wed, 12 Jun 2024 06:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718163028; cv=none; b=EIL3nzmO0dXVmdeYV7M6DlH5S0SRF8njznfLKbTUuKMmU8JmEvXUpgIOOPrwlTbGt8x7iuojRgV/ltwqTESRKqT49tg+sQ2EcwLhXrzblz14Bnw2ganDnV6yjdevQzk76Y8XJWu2fWTOgeydepZvSM/tZvua6qtsTwhG8V6v6WU=
+	t=1718174839; cv=none; b=XnrpNUg0Sy9udEFSpz6WFm7/u2VANmbx/lE62l8raJvXMrPj/VnfsN1b6+ku949VESfl9rtCIoEIrW3tpPCQ1ngjeVDVmHADJAt47G2rXBeNYDw+yn5JycJ+QIV11sKmxmwrQzwFnisELRRBTNvlVR9qjpLpPl4gKoWvc7xvd4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718163028; c=relaxed/simple;
-	bh=kLKAbzi0xsqXvRGTpQFmPAYjqFrDThP5VWGEQnR2Icw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=UtdBKit8mDuFyg6FUwvp1lIezUypelhUnmcOZxtgE5trEtwLdfAnZ3qZjLf16EG/KvFB88T/KFNCCYc6fm3Xcp3N8BK6VWMsiyWc5qWUBzRKkZTBAXW68/j3y6yU34Yj6TZNpcAqf7n+0j7xPHC6O8qK82U0mwn3u5BjFJ4kwAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=none smtp.client-ip=139.219.146.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-Received: from NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:10::10) by NT0PR01MB1023.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:2::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.38; Wed, 12 Jun
- 2024 02:58:19 +0000
-Received: from NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
- ([fe80::e3b:43f8:2e6d:ecce]) by NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
- ([fe80::e3b:43f8:2e6d:ecce%7]) with mapi id 15.20.7611.039; Wed, 12 Jun 2024
- 02:58:18 +0000
-From: JiaJie Ho <jiajie.ho@starfivetech.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S . Miller" <davem@davemloft.net>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] crypto: starfive - Align rsa input data to 32-bit
-Thread-Topic: [PATCH] crypto: starfive - Align rsa input data to 32-bit
-Thread-Index: AQHasV7JGIR2o9Gsw0quf+yEyIC5HbG8Na+AgAdOR4A=
-Date: Wed, 12 Jun 2024 02:58:18 +0000
-Message-ID:
- <NT0PR01MB11824BA0DD4F7C638A91E80C8AC02@NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn>
-References: <20240529002553.1372257-1-jiajie.ho@starfivetech.com>
- <ZmLsK9Apy9NwNEQi@gondor.apana.org.au>
-In-Reply-To: <ZmLsK9Apy9NwNEQi@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: NT0PR01MB1182:EE_|NT0PR01MB1023:EE_
-x-ms-office365-filtering-correlation-id: 00809498-56e6-4ffe-bcac-08dc8a8b8364
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam:
- BCL:0;ARA:13230032|41320700005|366008|1800799016|38070700010;
-x-microsoft-antispam-message-info:
- 6BoecWKvpDpVjmNu8LUkwK6zwPA9uEmbO3qvlGVeHNPr88Q9UPxSlDZMUjw58AWJnrwYfhs2Zh5ccZ9HoM+d0g8N8BCcCP70ckGMXG2ArZW0cUreNEtFa+zGqVQZSDMksfDL7ALEVQ2rAxGiVLWaPVRPxVFo26IdR9hThbZJ/tapYhfMjTsRxW0Vgimfw7APubWSGBq68t2chXuQ8KBiKyGEj5v3d4MLnmWiGIrC6a/SgqmV3oZinRYLi75Z4XHbUfmNY4/ju9XQ88cOpClh2Zf6cMnBTathTx2f0Myct4rVhRSvV2aotUZBLVOclzfAcc4m3XRHGylEYhvqz9J2i6nzvL53hrvafM+s0d7PuVahljwjEWWnFs0aoEu814cYQXoYCbNc8VydbxoS40ay9/HGJBg40w0JW1LzX/UOYLujQHcLuF7WOpAeqZkYf1kx15JAogA+ulL6Yzjd/Rn7rsxYRelx1WBqQMSTX2o1QXezp/rjZrNiux73dDKQUR4SzQx95rWwTBr8gqhexduGQPl4P1tb2j7nI8gAq4JfjRBjNDHAUD049odPvPI+noJdEJ1fm75igpEHmJ95rltB2/wIIC/ARtWdeojnx19ZkMrwnIP89o6YDYHdr57CSjws
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230032)(41320700005)(366008)(1800799016)(38070700010);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?lW/5V8zycOjf4o3J2rWMKA2F98T1zCsR2wFwRdkDT7UF3xLDlq/K1UrIkzf+?=
- =?us-ascii?Q?nImXyR1pmQYkhR5ydxcIQv+8OK7BrFkxbhyBWTpkS5bFhZ6Pu1026UODyBkb?=
- =?us-ascii?Q?nMjpYLqbHeE7EAHZhIwK5CdkFsJ36jwc+sd1HfO/vAvax1nn6sSzVBF1Sn+7?=
- =?us-ascii?Q?IYddaf7Q4olGZhc9ts8hPiYHVIrdGXTWxGtQSaVM/mz4YYJkKqDkTfe1De3T?=
- =?us-ascii?Q?4mv/IFgUC5I2SsBYHBVkM9AbglbWeANKO0nZCDKETFutIbXuomB1qNAKxSfS?=
- =?us-ascii?Q?oJz8eGU5hK20i2rC6IQ5PlI71I0wvyBT248/zFzw7b9LiJno0MxV+ANv/TBY?=
- =?us-ascii?Q?nrkbLz3svKZNIlypsHz+9V6+ofMyLYA9ndi8iezs1S3qTqCMBBgOI0PVzaD/?=
- =?us-ascii?Q?UD6K2WenHXoO9ZxfQE1Q4c26OGioV3YU7ViHc57tmJ1O8n/55t9fPDDtD+J2?=
- =?us-ascii?Q?/qZ8tbrnILUEbhz3LFG1h2zElb1U+ovuA45mdpRhVd4l8RTt9qQMGGiPfXvS?=
- =?us-ascii?Q?frFfeoMlJ/idYfIYtTaRCQ4X6WTvsQFDXqiy2sCV6/Z5l4QEg92ZKfYJMbQY?=
- =?us-ascii?Q?iuD+2cge3CzN16JRvYjAJHzv+WAFPzzobJU+DE0Llww/vdpkMnj3g6JbTz2n?=
- =?us-ascii?Q?iIH9uZ4cpTOpZ+wM2L4dIHlO8EJR1tgqJr5zmiHprnUf8xfxsSJtp7CzbAeB?=
- =?us-ascii?Q?ICFAuFUkCCNxBqUuGrFWzzjbpql1y5ZvlPO13wmk5X7pk0MZDqq9efBH1CKC?=
- =?us-ascii?Q?UzIBNkR0RO464z6vFl0s76IknFzwg2qEirEV3rmkwrfEC/05dFGumVctr3Fa?=
- =?us-ascii?Q?JCqWcngVM+f8bPOrgudJ1X+DAgYE7IP99RVOecz8ygUxBOAhxu+V7+E0M3C7?=
- =?us-ascii?Q?isrM1qZa6nCclaFayixMPF3+t1bB2QGKlGfRLC3sCbJ9BP0YuSLhbRh8yyCH?=
- =?us-ascii?Q?9lKiuKytL6E9+KvX1RTGSnHe8e2TWB4B9930dSGSWw+9xysxMNknAoVGAcXv?=
- =?us-ascii?Q?eP8v+9dOexvaY9GxGZcMTnjsOyQsidMJkRKj8Zy37jRI6PiPFKK+XCN4a/qi?=
- =?us-ascii?Q?QA/U3sIE5j+/RzwQTiisq6FpUxrMSb4GC5PMJKnVsjcPkk+jKe13z/s9ApGa?=
- =?us-ascii?Q?ZS9dLdAsbMiHTNRQT/uVIegi8a+AtFA88mo1vO+8X9DRADBkDgdZennYFNUN?=
- =?us-ascii?Q?7HbIbWtgcxauAYJoH7DaodhgcjvjlpArb1zrwDezsPQQxRUr88tlJS1YxjM6?=
- =?us-ascii?Q?D5GCfuKFnVvuwHAj4SM9UGEPzkhqGagMBfCQudSTgL4LsTfash7zeedQEvuT?=
- =?us-ascii?Q?RV9IlhgdyQHsa1Ay2DzfsjPm2+7Vi/GRo+RX5Oia3cLEGjm3SyNmOFJwzsNF?=
- =?us-ascii?Q?QFnUijbvCpFazexgZdEeuzLYMknu/RxCPIS7Uk/uFKcvNW3n5YtUnuK3/3N9?=
- =?us-ascii?Q?Yj4o4kbVQvBf9a90xPi76P+jmdut5tIPlz4zdldtAeLSOM9oQjOUNIfx6IYV?=
- =?us-ascii?Q?SWZSE9oyKwUUYDTAjXBPtziEqm5TT/Zqt81ma2j1swPTm3xw/qCGilu1CAkm?=
- =?us-ascii?Q?AtZjThcg9XBYrlUubaO2d5VO5aADxb+ZfuQ02jcXhN8T/qPQvjt2Zkjnjw+W?=
- =?us-ascii?Q?lA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1718174839; c=relaxed/simple;
+	bh=jlAqUR1bqatexd66hutKRK9rioff+o75gJr0IPUByYY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=QfwfVuPPugFVv2U4zkmywI35fuud93AEKnudFi3j9ZB6XwP9/fjB64ixR65/sxU3jrzaKFJAT6zwJ7oR5oPU6utkn5xGLmuIhSFMLPFr1++t47LEZq97xgoPYeBn0OMtfXGjF6OHJjlwVWjQDt/fetPW3eFRDntoa/oqQACk/NM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dohF42k1; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dohF42k1"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45C5wcJr012927;
+	Wed, 12 Jun 2024 06:47:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:to:cc:from:subject:content-type
+	:content-transfer-encoding; s=pp1; bh=Fe0DMuZ4tBaDVLrimBojVhwsRW
+	KMxr9qqIM3qPDtuT8=; b=dohF42k1JTMYRMwk9+o646WcvWF6g/7UO6peUhUHG5
+	aaIDEXISSsMj3pOVie3ah0MzPwJSnMDuV3Czozq7snPQaTMxyxoKJUYQh5iqvCum
+	MLPQ810A5ZVDXmBB2da7JSYDIwtnuNOtepnNjWNzStP6TMW+TXQWGCqolwvWvcv2
+	DCCXrviBekulfOvM4sORx+RvPljJyvilhCaqPNBO/BC5mlpo9ZXA6jWv4FDulnPq
+	1L25RfDD2JtiEhGM8r4adJjE/R7Y9iLAwALf4aroB/8jIAse2JKr14JpEaJrp45R
+	3NCG5tj0kjjfZanzy9JQOgeI5s0GkLTtV5L+7kY2tW2Q==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yq60dr3h0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jun 2024 06:47:09 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45C5X1KT003878;
+	Wed, 12 Jun 2024 06:47:09 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yn2mpu46e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jun 2024 06:47:09 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45C6l6bs23331448
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Jun 2024 06:47:08 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6115058068;
+	Wed, 12 Jun 2024 06:47:02 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 36F6358066;
+	Wed, 12 Jun 2024 06:47:00 +0000 (GMT)
+Received: from [9.43.12.40] (unknown [9.43.12.40])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 12 Jun 2024 06:46:59 +0000 (GMT)
+Message-ID: <25d1a371-a4be-41d9-a3ad-f97bd9348dbc@linux.vnet.ibm.com>
+Date: Wed, 12 Jun 2024 12:16:58 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00809498-56e6-4ffe-bcac-08dc8a8b8364
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2024 02:58:18.9125
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zt44A0KgQ86sjgO5RCVvzzLEJsp44L3oqx1hcRqmIHeWozRqbmLtbCmTU8BtDzhKYVzZjZvxJFm8nbxai4Sqo0xMZ1emJYbEvJybZOQRS1Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: NT0PR01MB1023
+User-Agent: Mozilla Thunderbird
+Content-Language: en-GB
+To: stefanb@linux.ibm.com, jarkko@kernel.org, herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
+Subject: Warning at crypto/testmgr.c:5900, while booting to OS
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: W-sp5Sej73Q8VZm5zFlRYP2438V-qTaP
+X-Proofpoint-ORIG-GUID: W-sp5Sej73Q8VZm5zFlRYP2438V-qTaP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-12_02,2024-06-11_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 spamscore=0 bulkscore=0 mlxlogscore=460 suspectscore=0
+ phishscore=0 clxscore=1011 impostorscore=0 mlxscore=0 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406120044
 
-> On Wed, May 29, 2024 at 08:25:53AM +0800, Jia Jie Ho wrote:
-> > Hardware expects RSA input plain/ciphertext to be 32-bit aligned.
-> > Allocate aligned buffer and shift data accordingly.
-> >
-> > Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
-> > ---
-> >  drivers/crypto/starfive/jh7110-cryp.h |  3 +--
-> > drivers/crypto/starfive/jh7110-rsa.c  | 17 ++++++++++-------
-> >  2 files changed, 11 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/drivers/crypto/starfive/jh7110-cryp.h
-> > b/drivers/crypto/starfive/jh7110-cryp.h
-> > index 494a74f52706..eeb4e2b9655f 100644
-> > --- a/drivers/crypto/starfive/jh7110-cryp.h
-> > +++ b/drivers/crypto/starfive/jh7110-cryp.h
-> > @@ -217,12 +217,11 @@ struct starfive_cryp_request_ctx {
-> >  	struct scatterlist			*out_sg;
-> >  	struct ahash_request			ahash_fbk_req;
-> >  	size_t					total;
-> > -	size_t					nents;
-> >  	unsigned int				blksize;
-> >  	unsigned int				digsize;
-> >  	unsigned long				in_sg_len;
-> >  	unsigned char				*adata;
-> > -	u8 rsa_data[] __aligned(sizeof(u32));
-> > +	u8					*rsa_data;
->=20
-> You didn't explain why this is moving from a pre-allocated buffer to one =
-that's
-> allocated on the run.  It would appear that there is no reason why you ca=
-n't
-> build the extra space used for shifting into reqsize.
->=20
-Hi Herbert,
+Greetings!!!
 
-Can I fix the buffer length of the pre-allocated buffer to 256 bytes instea=
-d of
-the current variable length buffer?=20
+Observing Kernel Warnings while booting to OS at crypto/testmgr.c:5900.
 
--        u8 rsa_data[] __aligned(sizeof(u32));
-+       u8 rsa_data[STARFIVE_RSA_MAX_KEYSZ];
+Traces:
 
-That's the maximum length supported by the hardware and=20
-most applications now use rsa2048 and above.
+[    0.682613] alg: akcipher: verify test failed. err -129
+[    0.682620] alg: akcipher: test 1 failed for ecdsa-nist-p521-generic, err=-129
+[    0.682626] alg: self-tests for ecdsa-nist-p521 using ecdsa-nist-p521-generic failed (rc=-129)
+[    0.682628] ------------[ cut here ]------------
+[    0.682634] alg: self-tests for ecdsa-nist-p521 using ecdsa-nist-p521-generic failed (rc=-129)
+[    0.682645] WARNING: CPU: 8 PID: 221 at crypto/testmgr.c:5900 alg_test.part.0+0xc88/0xe18
+[    0.682653] Modules linked in:
+[    0.682656] CPU: 8 PID: 221 Comm: cryptomgr_test Not tainted 6.10.0-rc3-next-20240611-auto #1
+[    0.682659] Hardware name: IBM,8375-42A POWER9 (raw) 0x4e0202 0xf000005 of:IBM,FW950.A0 (VL950_144) hv:phyp pSeries
+[    0.682660] NIP:  c0000000007bf48c LR: c0000000007bf488 CTR: c00000000103ef20
+[    0.682662] REGS: c00000005dc3fb60 TRAP: 0700   Not tainted  (6.10.0-rc3-next-20240611-auto)
+[    0.682664] MSR:  800000000282b033 <SF,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  CR: 28008241  XER: 00000005
+[    0.682672] CFAR: c00000000016361c IRQMASK: 0
+                GPR00: c0000000007bf488 c00000005dc3fe00 c000000001583800 0000000000000052
+                GPR04: 0000000000000000 c00000005dc3fc10 c00000005dc3fc08 0000000000000000
+                GPR08: c000000002797d38 0000000000000000 0000000000000001 0000000000000001
+                GPR12: c000000002a57e18 c00000000f7c6700 c0000000001a185c c00000000679a180
+                GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+                GPR20: 0000000000000000 0000000000000000 000000000000007d 000000000000007d
+                GPR24: ffffffffffffff7f c00000000e29d040 0000000000001f40 0000000000000006
+                GPR28: 0000000000000400 ffffffffffffff7f c00000000e29d080 c00000000e29d000
+[    0.682700] NIP [c0000000007bf48c] alg_test.part.0+0xc88/0xe18
+[    0.682703] LR [c0000000007bf488] alg_test.part.0+0xc84/0xe18
+[    0.682707] Call Trace:
+[    0.682708] [c00000005dc3fe00] [c0000000007bf488] alg_test.part.0+0xc84/0xe18 (unreliable)
+[    0.682713] [c00000005dc3ff60] [c0000000007b7ac4] cryptomgr_test+0x34/0x64
+[    0.682717] [c00000005dc3ff90] [c0000000001a198c] kthread+0x138/0x140
+[    0.682721] [c00000005dc3ffe0] [c00000000000df98] start_kernel_thread+0x14/0x18
+[    0.682724] Code: 60000000 7f7adb78 4bfffe00 60000000 60000000 3c62ffe7 7fe5fb78 7fc4f378 7fa6eb78 3863fd20 4b9a4111 60000000 <0fe00000> 4bfff7ec 60000000 60000000
+[    0.682735] ---[ end trace 0000000000000000 ]---
 
-Thanks,
-Jia Jie
+This issue is being caused by the patch: 2fd2a82ccbfc106aec314db6c4bda5e24fd32a22.
+
+After reverting the above patch, issue is not seen.
+
+Regards,
+Venkat.
+
