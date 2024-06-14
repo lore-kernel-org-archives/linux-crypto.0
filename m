@@ -1,108 +1,81 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729C8747F;
-	Fri, 14 Jun 2024 00:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B466D19D880;
+	Fri, 14 Jun 2024 03:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718326645; cv=none; b=ofHve5gDyAk1fgFPPHk3bjTXitNtez1qxCS6jsht2CwXWzb0NAVIZNG9sATYzF0Ehn4Ks4Wws0zA8fs4zq6SHwfmK2U1gGbDJxISDWKP6rSziyxuPtfVwFtChf+llq//doeucuMUC2qX+KiSDpF4aiXlDRUJ2c+xPsCSA82NKfY=
+	t=1718334575; cv=none; b=c6uqGqtxO5ZePCFFTFBt8ARh/zglaT5jxnHpxVdyJmmWN0xjEESREKibyrjl/Gx4e07dCS2lxL7ogxXRnSbcufnFX9iDrD/NpiVni+otkF3XKh5f56qpvvcZSSVdRtC1Zt24F7Z6WleqypgWrJCxGPLyvIaqej10oSCgbCLP65c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718326645; c=relaxed/simple;
-	bh=W6dTjhNZLpBrK0RRWMPGMGKOmBXlM4gKHYHgemT1grg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=WEEuqjAkwPnFuAj5MHW/1ECwf8lV+myGa8zigDZU3TDXcFv0rxEmrLh1YlIT94ltb4pkQtqQ8xxpH822lYfdldE1PwqTWIWS+SBbzoXiUScz3BarXtfq+kjSGDJLcI9ZlbmLoZV9nnVn0WeAUQ/2ESR1nO8VshdftezUc4h1RyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=g7Ro8ChF; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1718334575; c=relaxed/simple;
+	bh=IYxjgh7/LE5H5j2kwnXPw+yk3TPEBGp/icxY41gHRPc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=heqgJcEbpeJxvwm+IehXZFcxJFTJKJNlHVXUyTVv/thgnUTtRIn9VmzAsGeqQkkNbR6lOrwCjRJwnPRmGxTlKJdlXshHMqxfkbCNyLFCnKeEL5dYm6kBiD/aybHxx+ttNv+OXfYYVTTdOCqXiuIUcV5qKBALxad3SIzudsaP9fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=XnYuqO4s; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="g7Ro8ChF"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45DJGLAs024061;
-	Fri, 14 Jun 2024 00:57:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=bRFeewEwMNiMGeLXutzGjm
-	ayJp3qx1DIPrWEsnXUmIY=; b=g7Ro8ChFRG1Q7jUmNzmiNq2uL2N98+vG3pELUA
-	GGRCDVspFcO9GJWhrUQ+Svg4qLSrrZYaioigkxEJB2NYL6XlKE45GOrLbwO/sEJv
-	LMNt1x4m8qUsYECwSkuiNWbw/ITDSmf1QzSdf4CwFgoo2ghZjv3AKrY3OOhK1ZBW
-	SroWBv/z+KGARUv+g7slxArkRVbn5sd1W0OP3QclQfwB931ojzjORzuVduKx5cQZ
-	g9xSnDwn5AhSc4bVEXLan99rIcYMKZbNvf/HASZjj5qKFzjFVZ7eEviNhX9xT8TR
-	mdlM3HaCCioQguZqULvO019L9s0SkBCzTecAZvDPyORX0JBg==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yr6q4rnxk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jun 2024 00:57:09 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45E0v7j9026453
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jun 2024 00:57:07 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 13 Jun
- 2024 17:57:07 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Thu, 13 Jun 2024 17:57:05 -0700
-Subject: [PATCH] crypto: arm/poly1305 - add missing MODULE_DESCRIPTION()
- macro
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="XnYuqO4s"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1718334568; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=LCHH8k0Vzj7aV9fD1q+oRGks/zIwhE/GlbzHdKlJQNU=;
+	b=XnYuqO4s1bRzzqr22DG3DCU/kP4v0MuTgh+97LHpLZ7eQbKYL078Yw6yehv+d6BDxbGmGRuhiEIlhIpJedGgT//IAmVOVbhV1oCoZouJPHWiYdwfkbw1nc54PB5lPqhoBFNasFuhg+Cb9mvVhBB6XIITbYAcXW2o6WM9dwC7FLQ=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0W8PpsAh_1718334554;
+Received: from localhost(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0W8PpsAh_1718334554)
+          by smtp.aliyun-inc.com;
+          Fri, 14 Jun 2024 11:09:28 +0800
+From: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+To: herbert@gondor.apana.org.au
+Cc: davem@davemloft.net,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+	Abaci Robot <abaci@linux.alibaba.com>
+Subject: [PATCH] crypto: lib/mpi - Use swap() in mpi_ec_mul_point()
+Date: Fri, 14 Jun 2024 11:09:11 +0800
+Message-Id: <20240614030912.10736-1-jiapeng.chong@linux.alibaba.com>
+X-Mailer: git-send-email 2.20.1.7.g153144c
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240613-md-arm-arch-arm-crypto-v1-1-0ff745c4220a@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAGGVa2YC/x2MQQ6CQAxFr0K6tgkgYvQqxkVnpjpNnIG0aCCEu
- zOy+Ml/i/dWMFZhg3u1gvJPTIZcoDlV4CPlN6OEwtDWbVf3zRlTQNJU5uNxvC7jNCBdO+Zwc3Q
- JPRR5VH7JfIQfz8KOjNEpZR//uY/k74yJbGKFbdsB9lNEn4cAAAA=
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Russell King <linux@armlinux.org.uk>
-CC: <linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
-        "Jeff
- Johnson" <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.13.0
-X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: qaVeR0gxAaDztVQ1jXA_61ERLfKSp8Yi
-X-Proofpoint-GUID: qaVeR0gxAaDztVQ1jXA_61ERLfKSp8Yi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-13_15,2024-06-13_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
- impostorscore=0 adultscore=0 malwarescore=0 priorityscore=1501
- mlxlogscore=999 lowpriorityscore=0 phishscore=0 spamscore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406140003
+Content-Transfer-Encoding: 8bit
 
-With ARCH=arm, make allmodconfig && make W=1 C=1 reports:
-WARNING: modpost: missing MODULE_DESCRIPTION() in arch/arm/crypto/poly1305-arm.o
+Use existing swap() function rather than duplicating its implementation.
 
-Add the missing invocation of the MODULE_DESCRIPTION() macro.
+./lib/crypto/mpi/ec.c:1291:20-21: WARNING opportunity for swap().
+./lib/crypto/mpi/ec.c:1292:20-21: WARNING opportunity for swap().
 
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=9328
+Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
 ---
- arch/arm/crypto/poly1305-glue.c | 1 +
- 1 file changed, 1 insertion(+)
+ lib/crypto/mpi/ec.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/crypto/poly1305-glue.c b/arch/arm/crypto/poly1305-glue.c
-index c31bd8f7c092..8482e302c45a 100644
---- a/arch/arm/crypto/poly1305-glue.c
-+++ b/arch/arm/crypto/poly1305-glue.c
-@@ -267,6 +267,7 @@ static void __exit arm_poly1305_mod_exit(void)
- module_init(arm_poly1305_mod_init);
- module_exit(arm_poly1305_mod_exit);
+diff --git a/lib/crypto/mpi/ec.c b/lib/crypto/mpi/ec.c
+index e16dca1e23d5..4781f00982ef 100644
+--- a/lib/crypto/mpi/ec.c
++++ b/lib/crypto/mpi/ec.c
+@@ -1285,14 +1285,12 @@ void mpi_ec_mul_point(MPI_POINT result,
+ 		sum = &p2_;
  
-+MODULE_DESCRIPTION("Accelerated Poly1305 transform for ARM");
- MODULE_LICENSE("GPL v2");
- MODULE_ALIAS_CRYPTO("poly1305");
- MODULE_ALIAS_CRYPTO("poly1305-arm");
-
----
-base-commit: 83a7eefedc9b56fe7bfeff13b6c7356688ffa670
-change-id: 20240613-md-arm-arch-arm-crypto-a74eed9ba5d6
+ 		for (j = nbits-1; j >= 0; j--) {
+-			MPI_POINT t;
+-
+ 			sw = mpi_test_bit(scalar, j);
+ 			point_swap_cond(q1, q2, sw, ctx);
+ 			montgomery_ladder(prd, sum, q1, q2, point->x, ctx);
+ 			point_swap_cond(prd, sum, sw, ctx);
+-			t = q1;  q1 = prd;  prd = t;
+-			t = q2;  q2 = sum;  sum = t;
++			swap(q1, prd);
++			swap(q2, sum);
+ 		}
+ 
+ 		mpi_clear(result->y);
+-- 
+2.20.1.7.g153144c
 
