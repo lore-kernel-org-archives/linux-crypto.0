@@ -1,127 +1,180 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0061B3EA7B;
-	Fri, 14 Jun 2024 06:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E334E19307D
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2024 12:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718345868; cv=none; b=bBCKyPPpE7O3CfiTa2fpq8OFIJb0nyC8QzKzSQxfp/akfrMBWywhvg51fT6IiVtAZyktKIvFYqEZGfeY49odMy18gOWk9obMKBYmBWyOng/V0wDETncgTrmyLrJ8QooXExZS88rd/fu47LSAHXsASd58lFbzX69y6VgizUNh/pw=
+	t=1718367383; cv=none; b=OO/o4TcK1p++pqEtm5Qbc0i0n7jDFs9dkba83vc5bxYYLI9Elt5IX8ba82xTVnZwqV1iEULbRbGs32EQG1JM1s7qwSyPKfpGY1OSJ+sYKsR0EbfF2o5hnHYO+tZjGaVj+kGvboWNg65LQvTCGKBCXvCSpgs+amZrPwyGaDNB3pM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718345868; c=relaxed/simple;
-	bh=eUysjo7n92xhbgcglYOc+3gcPHLAzDqyZv5RxuoqAYw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uTpXZLt+c3PfveIrFDdhCKMD1p0cvVdoYIbQ2nXnughBj/LR5tF6xGn2r4W7iiqfQxlIslxSnSddPP7cObdpOVeWepSBjMRDS4aAnoZkU73Bvxfovt+HADq1Ew/BQ871GFlSqfVuxKVgv/SQOaGQsacl22kjidBMkn/icGJNd4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=TGbh30l1; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TGbh30l1"
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45E4Qvd7023215;
-	Fri, 14 Jun 2024 06:17:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	8H4T+4b8Bi/qkliYB7EjavN/cd30fvA4EnVz2Kbvl0w=; b=TGbh30l1/IGYvogj
-	ZPRiXcR0TUdsBbyzzXS+BwAI+vJIM+rC9iJEwWvwM2CKFPVEO5hNoxBT0d15/O7l
-	EKb/O/yRm4fdysz42aE5s0g7fo9W3MCA9RYoLmZUz3XHHkNZEa6LCBwTUaMHanj3
-	ba6Ek8dLORILhpiu5mVA8a+pg/tbj0/9M0sm3NzSYyuML+MIMjYfCfzYFYjAD49C
-	uPlZdBcodfWS5f3rfigysu4YL3FZNnwtDnVNFdSW9+3yLUdmHRDVUgIkCocOickP
-	unI8SZOQZIEil213HmBYurxSXTKdb+zzUKeaGgyrfsLJKVDngpEHcQXq7R9vxEvE
-	CKhQOw==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yrbbt8pbq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jun 2024 06:17:35 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45E61PGR027225;
-	Fri, 14 Jun 2024 06:17:34 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yn211ey8y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Jun 2024 06:17:34 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45E6HW9r1442366
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 14 Jun 2024 06:17:34 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3E2925805B;
-	Fri, 14 Jun 2024 06:17:32 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E07F15805E;
-	Fri, 14 Jun 2024 06:17:28 +0000 (GMT)
-Received: from [9.43.5.15] (unknown [9.43.5.15])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 14 Jun 2024 06:17:28 +0000 (GMT)
-Message-ID: <e44fab6a-8ae7-4cbc-86c6-c9a50458b0d5@linux.vnet.ibm.com>
-Date: Fri, 14 Jun 2024 11:47:26 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: ecc - Fix off-by-one missing to clear most
- significant digit
-Content-Language: en-GB
-To: Stefan Berger <stefanb@linux.ibm.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, jarkko@kernel.org
-References: <20240613213820.995832-1-stefanb@linux.ibm.com>
-From: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
-In-Reply-To: <20240613213820.995832-1-stefanb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XMLOpWWF7ZPVMXnNL9lQjP25GFo0udVk
-X-Proofpoint-ORIG-GUID: XMLOpWWF7ZPVMXnNL9lQjP25GFo0udVk
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1718367383; c=relaxed/simple;
+	bh=/Rujk8DjihECRgTxY5K/o9PR1gx2ryqyCsAZfVNkkS4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qvjilU8K3q1CfI2IO4zYNxwv/XeBElwW+SlaaR2E0S9S50/nuoN1P8oC8SewaftzOUdUnTE5sZNxrRpvgddWM7w5/rvBxTbf1Yf4pq97o7SvQL/2gIz6Kel7PqSdgSiAn8aRF5hPvcJSo9ZZ6okkvDz41ScObBfEhngJEKezubU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-7eb5f83ae57so248668639f.0
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2024 05:16:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718367381; x=1718972181;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vB05HPijVVK+UzmnMPGdCm9HQMlq2U20Ujta3yugVqY=;
+        b=gIFg5nBx7AgVVE/l+yQGXJoBd0eGkLe3YK/MISyArZ36Ppj0/2aHCDsEiOLGa2fmgS
+         1iiFIJAcEqQH4sj/V7C6ttjq3G1/WvyRuPqMgGPvS+QkPXPEeHVCZuWZHkavstjlqmZY
+         3ZkIaq7KyGGSZuOYG/Ag7gOnkJsXoiRrL5uUUMIwMV6Ja1TolFUjsB8w45XMB2VdDoPY
+         7atft9NIiBiUOpYjYKgvDGlOnfdVHrVhpW+RCDpCMBxjKOC7lLGjBMyN40CSY/6MuF8w
+         yJG5ysQV/iTgxeWhPHj2jLdhDOjOlgRePM4XIFOhJG67t175YO69lYX3FJyq9h4Yr/Th
+         aXbA==
+X-Forwarded-Encrypted: i=1; AJvYcCUT3iaZSitHQlm3c3FvDQ21sLcb0m3CJZzcnipnEgvtvaZlb9nuVaYrphpinpz8SJjnms47rlmjn6A9nfHgvRYGkDrseWxmfDmag2LL
+X-Gm-Message-State: AOJu0YzFZ8nZlz8VWjwYoKux8pDa+Jm0u+7njQk2Ldb7hGPHugTQkk/V
+	jz4DWOecmJuNqjNJo3D0h5lBREpkk8DllJIgVHxCIeC4O7Xn52zkytuE/j9EOQXB7pTHsJCjvPG
+	oYSACiUjc+5e4TWrHZbZ6zJf0Sr+NJiTd3sNm5fGsJh7AFpj8Be/cN44=
+X-Google-Smtp-Source: AGHT+IHYFcJnb+5OofRIeaS8UT7bfdq2MIZHDD2qTc1tn/r5bWzluutMriZZLOcTtb6uxQDEremSBv/cJ6sTbA3fgsPNbWm3BkCT
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-13_15,2024-06-13_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 bulkscore=0 phishscore=0 clxscore=1011 spamscore=0
- impostorscore=0 suspectscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2405170001 definitions=main-2406140038
+X-Received: by 2002:a92:ca4e:0:b0:36c:4c63:9c93 with SMTP id
+ e9e14a558f8ab-375e02b6954mr1413495ab.3.1718367381068; Fri, 14 Jun 2024
+ 05:16:21 -0700 (PDT)
+Date: Fri, 14 Jun 2024 05:16:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000057a891061ad8951a@google.com>
+Subject: [syzbot] [crypto?] [bcachefs?] BUG: unable to handle kernel paging
+ request in crypto_skcipher_encrypt
+From: syzbot <syzbot+026f1857b12f5eb3f9e9@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	kent.overstreet@linux.dev, linux-bcachefs@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Tested with the proposed patch and issue is fixed.
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    ac2193b4b460 Merge branches 'for-next/misc', 'for-next/kse..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=120a2a56980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2ce2e16ea9422f82
+dashboard link: https://syzkaller.appspot.com/bug?extid=026f1857b12f5eb3f9e9
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12e534a2980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16e15446980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/1a058064a7f1/disk-ac2193b4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/71fd113f4bcf/vmlinux-ac2193b4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a4603f3a4756/Image-ac2193b4.gz.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/ea4906e9262d/mount_0.gz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+026f1857b12f5eb3f9e9@syzkaller.appspotmail.com
+
+loop0: detected capacity change from 0 to 32768
+bcachefs (loop0): mounting version 1.7: mi_btree_bitmap opts=compression=lz4,nojournal_transaction_names
+bcachefs (loop0): recovering from clean shutdown, journal seq 7
+Unable to handle kernel paging request at virtual address dfff800000000004
+KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
+Mem abort info:
+  ESR = 0x0000000096000005
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x05: level 1 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[dfff800000000004] address between user and kernel address ranges
+Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
+Modules linked in:
+CPU: 0 PID: 6250 Comm: syz-executor983 Tainted: G        W          6.10.0-rc3-syzkaller-gac2193b4b460 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : crypto_skcipher_alg include/crypto/skcipher.h:375 [inline]
+pc : crypto_skcipher_encrypt+0x48/0x124 crypto/skcipher.c:637
+lr : crypto_skcipher_encrypt+0x24/0x124 crypto/skcipher.c:635
+sp : ffff80009a2759d0
+x29: ffff80009a2759d0 x28: 0000000000000000 x27: dfff800000000000
+x26: ffff80009a275fe0 x25: ffff80009a275a80 x24: ffff80009a275a60
+x23: ffff0000c8482a80 x22: 0000000000000020 x21: dfff800000000000
+x20: 0000000000000008 x19: ffff80009a275a80 x18: ffff0000d67d9a30
+x17: 2065657274622074 x16: ffff80008ae35f00 x15: 0000000000000002
+x14: 1ffff0001344eb56 x13: 0000000000000000 x12: 0000000000000000
+x11: ffff70001344eb58 x10: 0000000000ff0100 x9 : 0000000000000000
+x8 : 0000000000000004 x7 : 0000000000000000 x6 : 000000000000003f
+x5 : 0000000000000040 x4 : 0000000000000000 x3 : 0000000000000010
+x2 : 0000000000000000 x1 : 0000000000000000 x0 : 0000000000000020
+Call trace:
+ crypto_skcipher_alg include/crypto/skcipher.h:375 [inline]
+ crypto_skcipher_encrypt+0x48/0x124 crypto/skcipher.c:637
+ do_encrypt_sg fs/bcachefs/checksum.c:108 [inline]
+ do_encrypt+0x558/0x6a0 fs/bcachefs/checksum.c:150
+ gen_poly_key fs/bcachefs/checksum.c:191 [inline]
+ bch2_checksum+0x1c0/0x784 fs/bcachefs/checksum.c:227
+ bch2_btree_node_read_done+0x119c/0x4ac8 fs/bcachefs/btree_io.c:1074
+ btree_node_read_work+0x50c/0xe04 fs/bcachefs/btree_io.c:1345
+ bch2_btree_node_read+0x1f50/0x280c fs/bcachefs/btree_io.c:1730
+ __bch2_btree_root_read fs/bcachefs/btree_io.c:1769 [inline]
+ bch2_btree_root_read+0x2a8/0x534 fs/bcachefs/btree_io.c:1793
+ read_btree_roots+0x21c/0x730 fs/bcachefs/recovery.c:475
+ bch2_fs_recovery+0x31c4/0x5488 fs/bcachefs/recovery.c:803
+ bch2_fs_start+0x30c/0x53c fs/bcachefs/super.c:1031
+ bch2_fs_open+0x8b4/0xb64 fs/bcachefs/super.c:2123
+ bch2_mount+0x4fc/0xe18 fs/bcachefs/fs.c:1917
+ legacy_get_tree+0xd4/0x16c fs/fs_context.c:662
+ vfs_get_tree+0x90/0x288 fs/super.c:1780
+ do_new_mount+0x278/0x900 fs/namespace.c:3352
+ path_mount+0x590/0xe04 fs/namespace.c:3679
+ do_mount fs/namespace.c:3692 [inline]
+ __do_sys_mount fs/namespace.c:3898 [inline]
+ __se_sys_mount fs/namespace.c:3875 [inline]
+ __arm64_sys_mount+0x45c/0x594 fs/namespace.c:3875
+ __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:48
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:133
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:152
+ el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+Code: 977849b2 f9400294 91006280 d343fc08 (38756908) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	977849b2 	bl	0xfffffffffde126c8
+   4:	f9400294 	ldr	x20, [x20]
+   8:	91006280 	add	x0, x20, #0x18
+   c:	d343fc08 	lsr	x8, x0, #3
+* 10:	38756908 	ldrb	w8, [x8, x21] <-- trapping instruction
 
 
-Tested-by: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Regards,
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Venkat.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-On 14/06/24 3:08 am, Stefan Berger wrote:
-> Fix an off-by-one error where the most significant digit was not
-> initialized leading to signature verification failures by the testmgr.
->
-> Example: If a curve requires ndigits (=9) and diff (=2) indicates that
-> 2 digits need to be set to zero then start with digit 'ndigits - diff' (=7)
-> and clear 'diff' digits starting from there, so 7 and 8.
->
-> Reported-by: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
-> Closes: https://lore.kernel.org/linux-crypto/619bc2de-b18a-4939-a652-9ca886bf6349@linux.ibm.com/T/#m045d8812409ce233c17fcdb8b88b6629c671f9f4
-> Fixes: 2fd2a82ccbfc ("crypto: ecdsa - Use ecc_digits_from_bytes to create hash digits array")
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> ---
->   crypto/ecc.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/crypto/ecc.c b/crypto/ecc.c
-> index fe761256e335..dd48d9928a21 100644
-> --- a/crypto/ecc.c
-> +++ b/crypto/ecc.c
-> @@ -78,7 +78,7 @@ void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
->   	/* diff > 0: not enough input bytes: set most significant digits to 0 */
->   	if (diff > 0) {
->   		ndigits -= diff;
-> -		memset(&out[ndigits - 1], 0, diff * sizeof(u64));
-> +		memset(&out[ndigits], 0, diff * sizeof(u64));
->   	}
->   
->   	if (o) {
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
