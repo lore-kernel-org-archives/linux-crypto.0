@@ -1,114 +1,108 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA210143868;
-	Thu, 13 Jun 2024 21:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729C8747F;
+	Fri, 14 Jun 2024 00:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718314716; cv=none; b=USDQaXb5Xay/i1ASofX4uKuA20ZYcnd+ISjqDaZmezXiOwPudpRkPy8UZM96ZTSbhGg2wOudhSGCSQosoTWgE5yViJ8ykPvw9W0PYZrqVeazcl8meSHNHsw7/qovS3X1wJ7SsMgv7Vq+fUtOGSpnLA2Q7u6ZLAKO5uUsIxZ3ij0=
+	t=1718326645; cv=none; b=ofHve5gDyAk1fgFPPHk3bjTXitNtez1qxCS6jsht2CwXWzb0NAVIZNG9sATYzF0Ehn4Ks4Wws0zA8fs4zq6SHwfmK2U1gGbDJxISDWKP6rSziyxuPtfVwFtChf+llq//doeucuMUC2qX+KiSDpF4aiXlDRUJ2c+xPsCSA82NKfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718314716; c=relaxed/simple;
-	bh=KU+Xae0sCdy5dDGu7hPb6YuLV1+s82d6WqA7AyKo9fw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jq6RidlHDNZLd3wfkUU7J0OpqpM73n8Z/iHHFWK6L43h5WX7If6zXlXTeSMODkIgAIs60iQfPnPEll4w93LFQd8zoyQ/V1afoJivvEB2oTLAFyMnQ+xOTuh4DtFzBluzNKd3nY+st1ko/IgWNrCav840O9UvL+s25eeIvoDjSLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JoZvBjA2; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1718326645; c=relaxed/simple;
+	bh=W6dTjhNZLpBrK0RRWMPGMGKOmBXlM4gKHYHgemT1grg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=WEEuqjAkwPnFuAj5MHW/1ECwf8lV+myGa8zigDZU3TDXcFv0rxEmrLh1YlIT94ltb4pkQtqQ8xxpH822lYfdldE1PwqTWIWS+SBbzoXiUScz3BarXtfq+kjSGDJLcI9ZlbmLoZV9nnVn0WeAUQ/2ESR1nO8VshdftezUc4h1RyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=g7Ro8ChF; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JoZvBjA2"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45DLQrci015607;
-	Thu, 13 Jun 2024 21:38:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:content-transfer-encoding
-	:mime-version; s=pp1; bh=JIQefO2Y629EhI//dNmGRknLby3XjVSZEG49EIW
-	exvo=; b=JoZvBjA2OytBTtfitsYFtIkwLAittKu6wxUSsyuMOUz/FdKHVD9CS+I
-	qSt5RMQ3PfZbk7VAzj4XMst1MO+gkcxbA49H+OAvzKVoTbhkkxT1SnGm5dUilwWS
-	K0rI4T3BfhY02NnHBUvmR57+XvSJ/f5eP80P9/inBxYqmIyPpqogMUJpE5pD8MRn
-	mNxg8UP2jlw23ynzNUBPXzHFOnJueDJp8FtWrtNopHwHDRgDOyOpLZxSDOh2M6Ot
-	EdztNG46SexTKXI38Qpno3cYBhSJfrqOgkpKbKw+e6SV6t1rTaNnb9nPmWSXM6cp
-	lGYMVKotGLOSwamDUxHAVutNZ6UZW9Q==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yr896g33f-1
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="g7Ro8ChF"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45DJGLAs024061;
+	Fri, 14 Jun 2024 00:57:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=bRFeewEwMNiMGeLXutzGjm
+	ayJp3qx1DIPrWEsnXUmIY=; b=g7Ro8ChFRG1Q7jUmNzmiNq2uL2N98+vG3pELUA
+	GGRCDVspFcO9GJWhrUQ+Svg4qLSrrZYaioigkxEJB2NYL6XlKE45GOrLbwO/sEJv
+	LMNt1x4m8qUsYECwSkuiNWbw/ITDSmf1QzSdf4CwFgoo2ghZjv3AKrY3OOhK1ZBW
+	SroWBv/z+KGARUv+g7slxArkRVbn5sd1W0OP3QclQfwB931ojzjORzuVduKx5cQZ
+	g9xSnDwn5AhSc4bVEXLan99rIcYMKZbNvf/HASZjj5qKFzjFVZ7eEviNhX9xT8TR
+	mdlM3HaCCioQguZqULvO019L9s0SkBCzTecAZvDPyORX0JBg==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yr6q4rnxk-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Jun 2024 21:38:26 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45DKPUoS028690;
-	Thu, 13 Jun 2024 21:38:25 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yn1muv16y-1
+	Fri, 14 Jun 2024 00:57:09 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45E0v7j9026453
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Jun 2024 21:38:25 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45DLcMDO35717592
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Jun 2024 21:38:25 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DDCD35805D;
-	Thu, 13 Jun 2024 21:38:22 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 65CD358055;
-	Thu, 13 Jun 2024 21:38:22 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 13 Jun 2024 21:38:22 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.ibm.com>
-To: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, jarkko@kernel.org,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
-Subject: [PATCH] crypto: ecc - Fix off-by-one missing to clear most significant digit
-Date: Thu, 13 Jun 2024 17:38:20 -0400
-Message-ID: <20240613213820.995832-1-stefanb@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1-AyOHSzyoWrGvIBVSbWjBe9kIa_aCXp
-X-Proofpoint-GUID: 1-AyOHSzyoWrGvIBVSbWjBe9kIa_aCXp
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	Fri, 14 Jun 2024 00:57:07 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 13 Jun
+ 2024 17:57:07 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Thu, 13 Jun 2024 17:57:05 -0700
+Subject: [PATCH] crypto: arm/poly1305 - add missing MODULE_DESCRIPTION()
+ macro
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20240613-md-arm-arch-arm-crypto-v1-1-0ff745c4220a@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAGGVa2YC/x2MQQ6CQAxFr0K6tgkgYvQqxkVnpjpNnIG0aCCEu
+ zOy+Ml/i/dWMFZhg3u1gvJPTIZcoDlV4CPlN6OEwtDWbVf3zRlTQNJU5uNxvC7jNCBdO+Zwc3Q
+ JPRR5VH7JfIQfz8KOjNEpZR//uY/k74yJbGKFbdsB9lNEn4cAAAA=
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Russell King <linux@armlinux.org.uk>
+CC: <linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
+        "Jeff
+ Johnson" <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.13.0
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: qaVeR0gxAaDztVQ1jXA_61ERLfKSp8Yi
+X-Proofpoint-GUID: qaVeR0gxAaDztVQ1jXA_61ERLfKSp8Yi
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-13_13,2024-06-13_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- phishscore=0 spamscore=0 mlxlogscore=910 mlxscore=0 priorityscore=1501
- malwarescore=0 adultscore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
- definitions=main-2406130154
+ definitions=2024-06-13_15,2024-06-13_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
+ impostorscore=0 adultscore=0 malwarescore=0 priorityscore=1501
+ mlxlogscore=999 lowpriorityscore=0 phishscore=0 spamscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406140003
 
-Fix an off-by-one error where the most significant digit was not
-initialized leading to signature verification failures by the testmgr.
+With ARCH=arm, make allmodconfig && make W=1 C=1 reports:
+WARNING: modpost: missing MODULE_DESCRIPTION() in arch/arm/crypto/poly1305-arm.o
 
-Example: If a curve requires ndigits (=9) and diff (=2) indicates that
-2 digits need to be set to zero then start with digit 'ndigits - diff' (=7)
-and clear 'diff' digits starting from there, so 7 and 8.
+Add the missing invocation of the MODULE_DESCRIPTION() macro.
 
-Reported-by: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
-Closes: https://lore.kernel.org/linux-crypto/619bc2de-b18a-4939-a652-9ca886bf6349@linux.ibm.com/T/#m045d8812409ce233c17fcdb8b88b6629c671f9f4
-Fixes: 2fd2a82ccbfc ("crypto: ecdsa - Use ecc_digits_from_bytes to create hash digits array")
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
 ---
- crypto/ecc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/crypto/poly1305-glue.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index fe761256e335..dd48d9928a21 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -78,7 +78,7 @@ void ecc_digits_from_bytes(const u8 *in, unsigned int nbytes,
- 	/* diff > 0: not enough input bytes: set most significant digits to 0 */
- 	if (diff > 0) {
- 		ndigits -= diff;
--		memset(&out[ndigits - 1], 0, diff * sizeof(u64));
-+		memset(&out[ndigits], 0, diff * sizeof(u64));
- 	}
+diff --git a/arch/arm/crypto/poly1305-glue.c b/arch/arm/crypto/poly1305-glue.c
+index c31bd8f7c092..8482e302c45a 100644
+--- a/arch/arm/crypto/poly1305-glue.c
++++ b/arch/arm/crypto/poly1305-glue.c
+@@ -267,6 +267,7 @@ static void __exit arm_poly1305_mod_exit(void)
+ module_init(arm_poly1305_mod_init);
+ module_exit(arm_poly1305_mod_exit);
  
- 	if (o) {
--- 
-2.44.0
++MODULE_DESCRIPTION("Accelerated Poly1305 transform for ARM");
+ MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS_CRYPTO("poly1305");
+ MODULE_ALIAS_CRYPTO("poly1305-arm");
+
+---
+base-commit: 83a7eefedc9b56fe7bfeff13b6c7356688ffa670
+change-id: 20240613-md-arm-arch-arm-crypto-a74eed9ba5d6
 
