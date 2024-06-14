@@ -1,180 +1,100 @@
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E334E19307D
-	for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2024 12:16:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3261474C5;
+	Fri, 14 Jun 2024 18:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718367383; cv=none; b=OO/o4TcK1p++pqEtm5Qbc0i0n7jDFs9dkba83vc5bxYYLI9Elt5IX8ba82xTVnZwqV1iEULbRbGs32EQG1JM1s7qwSyPKfpGY1OSJ+sYKsR0EbfF2o5hnHYO+tZjGaVj+kGvboWNg65LQvTCGKBCXvCSpgs+amZrPwyGaDNB3pM=
+	t=1718390151; cv=none; b=DqUIHcjZowkpPwjS1sZNNbIhOsCWptcaWrvbb3S7sUWPomeUArb1z0EnPsQw7fXJbM3q4exdbv8wDS3RVDkbG4+UImgaiBcE7zgt3lpYtnVqFbiA7PvvxjasUsba0LtNQ00IzwKqc6YH9NS3U4RK1Ff1FWAVU+8j5z+LH2LbS7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718367383; c=relaxed/simple;
-	bh=/Rujk8DjihECRgTxY5K/o9PR1gx2ryqyCsAZfVNkkS4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qvjilU8K3q1CfI2IO4zYNxwv/XeBElwW+SlaaR2E0S9S50/nuoN1P8oC8SewaftzOUdUnTE5sZNxrRpvgddWM7w5/rvBxTbf1Yf4pq97o7SvQL/2gIz6Kel7PqSdgSiAn8aRF5hPvcJSo9ZZ6okkvDz41ScObBfEhngJEKezubU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-7eb5f83ae57so248668639f.0
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2024 05:16:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718367381; x=1718972181;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vB05HPijVVK+UzmnMPGdCm9HQMlq2U20Ujta3yugVqY=;
-        b=gIFg5nBx7AgVVE/l+yQGXJoBd0eGkLe3YK/MISyArZ36Ppj0/2aHCDsEiOLGa2fmgS
-         1iiFIJAcEqQH4sj/V7C6ttjq3G1/WvyRuPqMgGPvS+QkPXPEeHVCZuWZHkavstjlqmZY
-         3ZkIaq7KyGGSZuOYG/Ag7gOnkJsXoiRrL5uUUMIwMV6Ja1TolFUjsB8w45XMB2VdDoPY
-         7atft9NIiBiUOpYjYKgvDGlOnfdVHrVhpW+RCDpCMBxjKOC7lLGjBMyN40CSY/6MuF8w
-         yJG5ysQV/iTgxeWhPHj2jLdhDOjOlgRePM4XIFOhJG67t175YO69lYX3FJyq9h4Yr/Th
-         aXbA==
-X-Forwarded-Encrypted: i=1; AJvYcCUT3iaZSitHQlm3c3FvDQ21sLcb0m3CJZzcnipnEgvtvaZlb9nuVaYrphpinpz8SJjnms47rlmjn6A9nfHgvRYGkDrseWxmfDmag2LL
-X-Gm-Message-State: AOJu0YzFZ8nZlz8VWjwYoKux8pDa+Jm0u+7njQk2Ldb7hGPHugTQkk/V
-	jz4DWOecmJuNqjNJo3D0h5lBREpkk8DllJIgVHxCIeC4O7Xn52zkytuE/j9EOQXB7pTHsJCjvPG
-	oYSACiUjc+5e4TWrHZbZ6zJf0Sr+NJiTd3sNm5fGsJh7AFpj8Be/cN44=
-X-Google-Smtp-Source: AGHT+IHYFcJnb+5OofRIeaS8UT7bfdq2MIZHDD2qTc1tn/r5bWzluutMriZZLOcTtb6uxQDEremSBv/cJ6sTbA3fgsPNbWm3BkCT
+	s=arc-20240116; t=1718390151; c=relaxed/simple;
+	bh=B5jYTOQBgQdD5aRhMO45Czl8lxa5eGSnENsV3D2nZZc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nWdkbP/8taHV0uMVsozDNCo6RYxwJe34kQ7P2SHoHdJF6tsP7I0xmPVFX/ip8Lm/fLUy5luDwfAmGWcfWoke2TPwgyJu1fBm/JMtlAm+CN9HkgseRbJ132KzS+Y7oy2KUBqv7YFebISAeoIgRNkUI/cnB8wZxARcoO454biTfZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=i2ipNGHT; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="i2ipNGHT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C632C2BD10;
+	Fri, 14 Jun 2024 18:35:49 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="i2ipNGHT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1718390147;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N8EBuid4q80uW/eoYI4M6BiKa1dNh0P0MAOlhzYgkd4=;
+	b=i2ipNGHTfG1yOnnWQvVlSDsyrAeQEvUAWla+HRxu/DiTW3T7+Y4kwVuoIMmNzkw1PlMGd7
+	AmeJxKG83pPFRHG1XKQu7RO81WyznGuwBQPH0/8GOE7GtYvaR2CsuAq6o8PPlSbqqQ3Kqs
+	dS8XBbw26hYntiX1TuaVCe6Tqdk8c5E=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d10b8049 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Fri, 14 Jun 2024 18:35:46 +0000 (UTC)
+Date: Fri, 14 Jun 2024 20:35:38 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Michal Hocko <mhocko@suse.com>
+Cc: Jann Horn <jannh@google.com>, linux-kernel@vger.kernel.org,
+	patches@lists.linux.dev, tglx@linutronix.de,
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+	x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
+Subject: Re: [PATCH v16 1/5] mm: add VM_DROPPABLE for designating always
+ lazily freeable mappings
+Message-ID: <ZmyNemDma0bK_V8J@zx2c4.com>
+References: <20240528122352.2485958-1-Jason@zx2c4.com>
+ <20240528122352.2485958-2-Jason@zx2c4.com>
+ <CAG48ez0P3EDXC0uLLPjSjx3i6qB3fcdZbL2kYyuK6fZ_nJeN5w@mail.gmail.com>
+ <Zlm-26QuqOSpXQg7@zx2c4.com>
+ <CAG48ez3VhWpJnzHHn4NAJdrsd1Ts9hs0zvHa6Pqwatu4wV63Kw@mail.gmail.com>
+ <ZmMamtll1Yq1yfxc@zx2c4.com>
+ <CAG48ez0pan8aLGjHtoDdrpiP+e5YrGeuD_RzDXgzUwkUvWYLjA@mail.gmail.com>
+ <CAG48ez1k0J013tYLfmnT8NXRpG_5BR10xnH8r-yRvTLpJe-nLA@mail.gmail.com>
+ <Zmbq1dGPIYdRLw5_@tiehlicka>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:ca4e:0:b0:36c:4c63:9c93 with SMTP id
- e9e14a558f8ab-375e02b6954mr1413495ab.3.1718367381068; Fri, 14 Jun 2024
- 05:16:21 -0700 (PDT)
-Date: Fri, 14 Jun 2024 05:16:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000057a891061ad8951a@google.com>
-Subject: [syzbot] [crypto?] [bcachefs?] BUG: unable to handle kernel paging
- request in crypto_skcipher_encrypt
-From: syzbot <syzbot+026f1857b12f5eb3f9e9@syzkaller.appspotmail.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au, 
-	kent.overstreet@linux.dev, linux-bcachefs@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Zmbq1dGPIYdRLw5_@tiehlicka>
 
-Hello,
+On Mon, Jun 10, 2024 at 02:00:21PM +0200, Michal Hocko wrote:
+> On Fri 07-06-24 17:50:34, Jann Horn wrote:
+> [...]
+> > Or, from a different angle: You're trying to allocate memory, and you
+> > can't make forward progress until that memory has been allocated
+> > (unless the process is killed). That's what GFP_KERNEL is for. Stuff
+> > like "__GFP_NOWARN | __GFP_NORETRY" is for when you have a backup plan
+> > that lets you make progress (perhaps in a slightly less efficient way,
+> > or by dropping some incoming data, or something like that), and it
+> > hints to the page allocator that it doesn't have to try hard to
+> > reclaim memory if it can't find free memory quickly.
+> 
+> Correct. A psedu-busy wait for allocation to succeed sounds like a very
+> bad idea to imprint into ABI. Is there really any design requirement to
+> make these mappings to never cause the OOM killer?
+> 
+> Making the content dropable under memory pressure because it is
+> inherently recoverable is something else (this is essentially an
+> implicit MADV_FREE semantic) but putting a requirement on the memory
+> allocation on the fault sounds just wrong to me.
 
-syzbot found the following issue on:
+The idea is that syscall getrandom() won't make a process be killed, so
+neither should vgetrandom().
 
-HEAD commit:    ac2193b4b460 Merge branches 'for-next/misc', 'for-next/kse..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=120a2a56980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2ce2e16ea9422f82
-dashboard link: https://syzkaller.appspot.com/bug?extid=026f1857b12f5eb3f9e9
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12e534a2980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16e15446980000
+But there's an argument to be made that the NOWARN|NORETRY logic only
+made sense with the now-dropped "skip instruction on fault" patch that
+was so controversial before, since in that case, there wouldn't be
+infinite retry, but rather skipping and then falling back to the
+syscall. I think this is nicer behavior, but the implementation caused a
+stir, so I'm not at the moment going that route. Given that, I think
+I'll follow your advice and get rid of NOWARN|NORETRY for this too. And
+then maybe we'll all revisit that later.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1a058064a7f1/disk-ac2193b4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/71fd113f4bcf/vmlinux-ac2193b4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a4603f3a4756/Image-ac2193b4.gz.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/ea4906e9262d/mount_0.gz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+026f1857b12f5eb3f9e9@syzkaller.appspotmail.com
-
-loop0: detected capacity change from 0 to 32768
-bcachefs (loop0): mounting version 1.7: mi_btree_bitmap opts=compression=lz4,nojournal_transaction_names
-bcachefs (loop0): recovering from clean shutdown, journal seq 7
-Unable to handle kernel paging request at virtual address dfff800000000004
-KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
-Mem abort info:
-  ESR = 0x0000000096000005
-  EC = 0x25: DABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x05: level 1 translation fault
-Data abort info:
-  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
-  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[dfff800000000004] address between user and kernel address ranges
-Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
-Modules linked in:
-CPU: 0 PID: 6250 Comm: syz-executor983 Tainted: G        W          6.10.0-rc3-syzkaller-gac2193b4b460 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : crypto_skcipher_alg include/crypto/skcipher.h:375 [inline]
-pc : crypto_skcipher_encrypt+0x48/0x124 crypto/skcipher.c:637
-lr : crypto_skcipher_encrypt+0x24/0x124 crypto/skcipher.c:635
-sp : ffff80009a2759d0
-x29: ffff80009a2759d0 x28: 0000000000000000 x27: dfff800000000000
-x26: ffff80009a275fe0 x25: ffff80009a275a80 x24: ffff80009a275a60
-x23: ffff0000c8482a80 x22: 0000000000000020 x21: dfff800000000000
-x20: 0000000000000008 x19: ffff80009a275a80 x18: ffff0000d67d9a30
-x17: 2065657274622074 x16: ffff80008ae35f00 x15: 0000000000000002
-x14: 1ffff0001344eb56 x13: 0000000000000000 x12: 0000000000000000
-x11: ffff70001344eb58 x10: 0000000000ff0100 x9 : 0000000000000000
-x8 : 0000000000000004 x7 : 0000000000000000 x6 : 000000000000003f
-x5 : 0000000000000040 x4 : 0000000000000000 x3 : 0000000000000010
-x2 : 0000000000000000 x1 : 0000000000000000 x0 : 0000000000000020
-Call trace:
- crypto_skcipher_alg include/crypto/skcipher.h:375 [inline]
- crypto_skcipher_encrypt+0x48/0x124 crypto/skcipher.c:637
- do_encrypt_sg fs/bcachefs/checksum.c:108 [inline]
- do_encrypt+0x558/0x6a0 fs/bcachefs/checksum.c:150
- gen_poly_key fs/bcachefs/checksum.c:191 [inline]
- bch2_checksum+0x1c0/0x784 fs/bcachefs/checksum.c:227
- bch2_btree_node_read_done+0x119c/0x4ac8 fs/bcachefs/btree_io.c:1074
- btree_node_read_work+0x50c/0xe04 fs/bcachefs/btree_io.c:1345
- bch2_btree_node_read+0x1f50/0x280c fs/bcachefs/btree_io.c:1730
- __bch2_btree_root_read fs/bcachefs/btree_io.c:1769 [inline]
- bch2_btree_root_read+0x2a8/0x534 fs/bcachefs/btree_io.c:1793
- read_btree_roots+0x21c/0x730 fs/bcachefs/recovery.c:475
- bch2_fs_recovery+0x31c4/0x5488 fs/bcachefs/recovery.c:803
- bch2_fs_start+0x30c/0x53c fs/bcachefs/super.c:1031
- bch2_fs_open+0x8b4/0xb64 fs/bcachefs/super.c:2123
- bch2_mount+0x4fc/0xe18 fs/bcachefs/fs.c:1917
- legacy_get_tree+0xd4/0x16c fs/fs_context.c:662
- vfs_get_tree+0x90/0x288 fs/super.c:1780
- do_new_mount+0x278/0x900 fs/namespace.c:3352
- path_mount+0x590/0xe04 fs/namespace.c:3679
- do_mount fs/namespace.c:3692 [inline]
- __do_sys_mount fs/namespace.c:3898 [inline]
- __se_sys_mount fs/namespace.c:3875 [inline]
- __arm64_sys_mount+0x45c/0x594 fs/namespace.c:3875
- __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:48
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:133
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:152
- el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
-Code: 977849b2 f9400294 91006280 d343fc08 (38756908) 
----[ end trace 0000000000000000 ]---
-----------------
-Code disassembly (best guess):
-   0:	977849b2 	bl	0xfffffffffde126c8
-   4:	f9400294 	ldr	x20, [x20]
-   8:	91006280 	add	x0, x20, #0x18
-   c:	d343fc08 	lsr	x8, x0, #3
-* 10:	38756908 	ldrb	w8, [x8, x21] <-- trapping instruction
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Jason
