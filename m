@@ -1,566 +1,238 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C1E1A0B02;
-	Fri, 14 Jun 2024 19:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718392060; cv=none; b=Ufv7b6nYxfIhq8ksKQi7CMyYjuLPbP9xqk77AYi0QJGeuQiPIdk8wo3TfIeezpCVJi7V9/Z3Aio2iJk3MYM1F2BOM5rbhLiZRopW4sPnC5G+BOYOz8nsn582tg1FZPJSNloUdA5o4zGajOOSOZ1vC3G9ym/U9r5o1/L0zH9rPxQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718392060; c=relaxed/simple;
-	bh=n2osCQXnRt7AFPNG8d1huKMyhPCs8lzezFUJRrug83M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZoIHnBxPlYDPQKhxOmPkLPF+q6yCACKZD3EgJTgzQGVYlZ+/mvCWIn49x21ok+qwbhEGpTvcKnqOH5uwMg2XgXkATFlWAkiwU1J6hzBLefoxXzauY60h/T/84VljfSBJjbYvAROSa2XBflRKRizjm4TR3YhRfbz4MAp9pne1K1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=YbASR6zh; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 589041487DC;
+	Fri, 14 Jun 2024 19:33:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718393613; cv=fail; b=JIyShuAxg22cXhl9Sn0OqDWFj7L9CWpG/JpLJAdkRv1vvqppyJXvGxAkgvyyRw/2dncsI5X2PKCKOEw1GcM8DDGBaBgYF+P3ruidt1xi8ZvSVNK1GO2gty+faDUO//XUD6FGaZAlbQycrxz9x4YVB1A48xGJ0KQEwLKZOI3SwnY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718393613; c=relaxed/simple;
+	bh=WbLMFM0gT+i5+/N3++jDoPpw1r1ka4/sMb9BpwtyzVI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=BLS71JTHhdkp4sN3l72gcYbOR/vt4Vl5Lxz9s/93tXiq+qGtRIp9+bLKnw7gzMOcYF1xgpgDJ1oGmbbEFUjW2bOygqdAeuvxGyBNKfV/4jN8flFowJtZq34mVgjq0pKTzAOwcifF1kbfet+f/2PSDEZUzmF1WQ2h22gTfPKna88=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UeQAyQoR; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YbASR6zh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B3CBC4AF1A;
-	Fri, 14 Jun 2024 19:07:39 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YbASR6zh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718392058;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qTMFfpxSvVqUy5ksOc8kRgp51aBbUQVi7l7Mczy7MNc=;
-	b=YbASR6zh8ctpGNjZG0+hc8nzjQGNk065oyfsaW/vGuCZdYKOPgKa4icDzhR6htcXKT561P
-	UVrif9PtgC2SOV+VB6rPjsB7Ey8l+goAzf8zkc7bVt1sQYj69GTsm7e41U6Bw7J5N2hvgT
-	wkPZo7aqmPApJCKo7qH+Tr5qc/RMAlA=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d1e786f9 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Fri, 14 Jun 2024 19:07:38 +0000 (UTC)
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: linux-kernel@vger.kernel.org,
-	patches@lists.linux.dev,
-	tglx@linutronix.de
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	linux-crypto@vger.kernel.org,
-	linux-api@vger.kernel.org,
-	x86@kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-	Carlos O'Donell <carlos@redhat.com>,
-	Florian Weimer <fweimer@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Jann Horn <jannh@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	David Hildenbrand <dhildenb@redhat.com>,
-	Samuel Neves <sneves@dei.uc.pt>
-Subject: [PATCH v17 5/5] x86: vdso: Wire up getrandom() vDSO implementation
-Date: Fri, 14 Jun 2024 21:06:40 +0200
-Message-ID: <20240614190646.2081057-6-Jason@zx2c4.com>
-In-Reply-To: <20240614190646.2081057-1-Jason@zx2c4.com>
-References: <20240614190646.2081057-1-Jason@zx2c4.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UeQAyQoR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718393612; x=1749929612;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=WbLMFM0gT+i5+/N3++jDoPpw1r1ka4/sMb9BpwtyzVI=;
+  b=UeQAyQoRweGMF0QyuNN3pZ2Qqf6u1hA6X9xPacOSPN5+zSi8c9mLHaWQ
+   BFClHKx9XaA92+40A1faliTrZEP3wBuM1PiLVllmU7qSUherq7d+3SMpI
+   7L4Qh5J/9SN2iqzHarJujqlUpwbecMvtnOUkt/0T+bQFUNARuH3xUW+vJ
+   O0hU+G7NArkbLHNPnXr4o3t60Y2GLeqOO3WBNbess8yYqbQpiawya8ai+
+   CbyhJs42oQE7pUDRkv4F4BDkot5Sei/otiGsZnnsx7rxQPr+eOPnpDYxe
+   WcqyuE2fXuXM1SnMpoa1ZNsCJxaeW7LPjDZCC8no3EOAWb0I8CuUtcfuf
+   Q==;
+X-CSE-ConnectionGUID: 4oQzhoWiR9q/MSGRi2vaBg==
+X-CSE-MsgGUID: wTS7EgS6RBuVXy9V0FIZXQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11103"; a="37821915"
+X-IronPort-AV: E=Sophos;i="6.08,238,1712646000"; 
+   d="scan'208";a="37821915"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 12:33:31 -0700
+X-CSE-ConnectionGUID: qvI88c4MRiaLIkE0YNOVog==
+X-CSE-MsgGUID: og0b2Xc8Re6PvB5nhs+rfw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,238,1712646000"; 
+   d="scan'208";a="41277203"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Jun 2024 12:33:30 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 14 Jun 2024 12:33:30 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 14 Jun 2024 12:33:29 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 14 Jun 2024 12:33:29 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 14 Jun 2024 12:33:29 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ffZvEnJi+L727JVzYwD89xQVbjCrJKVoU9iK+05L4R66ra5UIkKxUi48J7118w2Pj286Q9DnaX19nJMe9MgcEsX5am9h8Oe2iI1mTpElxS/eF3f0ShSVNm2ogdnwViuBTDIWwFq89c46PR40KtXFzRJm56zZxfnRfJQUDz3QP6udvyOJjRcugvJnvpEvfhyKbwP6lKhvecd1HFDOCtgUD9M12vLJ4mf7XEyUN5+LLlzh/Nv1QAB0DNEm4FssY6Jq3pjhJ+r5eWjLEuG+aq4qe61sPVN3gSPDb3b0feMk64RhTBiloYT1teNCLPUeZWGbMsWrAjszKNlGg17DYwktGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A3yBmZC8vmuy44Seb9LrwGzkAcKgqtywIIBJPajoU/A=;
+ b=oW3XfoO8xtB1Yu2zsoOHPlNHlQd15fgXuIQJPToYp7xbs/KL32EvAiYbrTid1zsjFaGXHCAebbSnzipir6XfcgEbp4hRe8EPw7x54hx1xLDpop6TNeJXRKFu9vzFGXaWfqKcitB8xa7qKezLYMg+C/1l0wxajjo91UmGeUjilfEHhDO565/J+gmIfOIyHFB2zBood14qQKqgCic3+fhz00Q3Nvx5Wfgqg6luz73a/scqTkZfP0NE66IHmrnx72UhnGofi3cikIa8VaXzqikcq1GfW0fjfBQ08Zn3WqM3RUQqkOCPCVgY+m2i8pc3bdVSVtOzElzxA5ly73rCf0YtfQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6139.namprd11.prod.outlook.com (2603:10b6:930:29::17)
+ by SA1PR11MB6896.namprd11.prod.outlook.com (2603:10b6:806:2bd::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.20; Fri, 14 Jun
+ 2024 19:33:27 +0000
+Received: from CY5PR11MB6139.namprd11.prod.outlook.com
+ ([fe80::7141:316f:77a0:9c44]) by CY5PR11MB6139.namprd11.prod.outlook.com
+ ([fe80::7141:316f:77a0:9c44%7]) with mapi id 15.20.7677.024; Fri, 14 Jun 2024
+ 19:33:27 +0000
+Date: Fri, 14 Jun 2024 14:33:20 -0500
+From: Lucas De Marchi <lucas.demarchi@intel.com>
+To: Jarkko Sakkinen <jarkko@kernel.org>
+CC: <linux-modules@vger.kernel.org>, Luis Chamberlain <mcgrof@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	<linux-kernel@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
+	<linux-crypto@vger.kernel.org>
+Subject: Re: is_module()
+Message-ID: <yzxjbx7c3hzodikhaeuv6k4ypxz22kxldfiwsl6gshderomw5e@j2jgdqb6jlf5>
+References: <D1H452IHSLRC.1WZSPJQLCD5RD@kernel.org>
+Content-Type: text/plain; charset="us-ascii"; format=flowed
+Content-Disposition: inline
+In-Reply-To: <D1H452IHSLRC.1WZSPJQLCD5RD@kernel.org>
+X-ClientProxiedBy: MW4PR03CA0262.namprd03.prod.outlook.com
+ (2603:10b6:303:b4::27) To CY5PR11MB6139.namprd11.prod.outlook.com
+ (2603:10b6:930:29::17)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6139:EE_|SA1PR11MB6896:EE_
+X-MS-Office365-Filtering-Correlation-Id: 98caca06-bf9b-4d51-4bfe-08dc8ca8dcc1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|376011|1800799021;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?3eXje4RGbb6JHnKCYe6gfgs5eBn/OL0FIFRWh9DGQLgdKMX9U0s4ouZTnv2y?=
+ =?us-ascii?Q?3H2X+v2/OzlSGxqe24mq+H4+aIlhWIOYKrZtb6zAGdSQplKpce/X+gc6Sl5Q?=
+ =?us-ascii?Q?/dzkdj7wO4/1xjGzl9UXGzBwJpQVd/MRwv/2/stzJEPaEAg5U7JG1Kl1HYlx?=
+ =?us-ascii?Q?DVgtrFNsaa6ZsxuwgbPhS53YVq+Wy35MilQygpE8LaE8nos/IhbnsiwyQW0N?=
+ =?us-ascii?Q?AJIRT0UdoRCki14EMfMRYynQiMRv2/3owTIpc6QGSt4OLWtRApLmE3G3cBvC?=
+ =?us-ascii?Q?NwGWCsz68q3/0D0Waw+G7KZPjKAjpbsGa/72vJp0phIRoYtKOrEbyQe2VQOC?=
+ =?us-ascii?Q?HMes48dyro63MWyS9vq/ZN0QERfXV4/JG/5AbF0aAuvF/EPXOsRz6Y18GCHM?=
+ =?us-ascii?Q?ZqT031fm9rNCGkJzUkH3HCkbZ62wHU8xSvUNgCjRHQj3uVqDuNXc1PAQH/Wx?=
+ =?us-ascii?Q?bC6J9gVsSIlUVUbC5RbJccMnJqDNxAtyxEmkUh0ekceWNFebbkjsS8Ane+A0?=
+ =?us-ascii?Q?ENbD9KcWHGOO5ti8tsnEdratQ5HC2oJ4Ilvo/CMFyJMSi//gTAJYtoGiMq5P?=
+ =?us-ascii?Q?88R5rFw0guX+qkBNCcER5Qtd7h90siKsGfAAzgiF6UwEfp75FtsFPJrYmDnX?=
+ =?us-ascii?Q?GDLxrek/WJCZ8p12HiaTD+B2Yuz3YXRL1yET5jgAy5edXp0nhBGwKc39jGZF?=
+ =?us-ascii?Q?R8OeO/oHqZ0fB0Y5wy+NjWCC18GXDs6Ioej1OgsrAvR9EDiP3seT7oZbpBVI?=
+ =?us-ascii?Q?FFYkRsjHjpekT4B1j0qFAo1JNGEoL6i7boiTO9JTm7fxhH28t9Jok1+wv5xm?=
+ =?us-ascii?Q?RhxDf3oXhfyu/2FFgAn8g31/7iWlt2X93AdHzJGr6LRNYWbsxAAnuPTQCgN4?=
+ =?us-ascii?Q?sY92Q5zb1A2Iep1Qj9RDSkqFQKIHhLPVnVwaDCz36gqbewqq7Zy23pLOErKw?=
+ =?us-ascii?Q?yR4upjXC+pbCII9aykWKiuoZQf4EUc82frziEPyZSxOABWKD9XlkOBXu3rCe?=
+ =?us-ascii?Q?DrLuN9pTX0ZJwIE5ZrzDzILU0Tny8alDhIC80pfpW59VRWVgf5+N3Erf9uHX?=
+ =?us-ascii?Q?nCjrx7GaRPexSQRfUHmwPAhSBxCxpxWr6YCvJ142sSA5SvcjZ4mvQ0KnaGy6?=
+ =?us-ascii?Q?eh7g9Ney7JwYwK1vZK8ACpwVhSQncXQTJimbc8pyAk1Laq+e0w8asLAmfmnm?=
+ =?us-ascii?Q?1AZY/v3O41Oa0BbHf+1sjk31ACfwVYWmNkyplWf72gSld12OC4xT59aDX0zS?=
+ =?us-ascii?Q?WpfMW5koD50yCXUgLsXBQEvXNASSmkAJEES7QyUIdw=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6139.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(376011)(1800799021);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FXBG2dnmz0qYL2rUecC/6usQxQ0wMgpjr9XYG9OoGrId2IREW0/vsrgH1cG8?=
+ =?us-ascii?Q?hs5M+jcJ/B98uqxcaUEy40fY4KY3X5yn2QeXdm5ZXvKfKMZEAR8Y6nRb6Nmj?=
+ =?us-ascii?Q?GVStHGzjhqkTTbLq583+sKXXCvK7EXsuih6/B9/a2EaR1WsmDlfdWCmGkNWv?=
+ =?us-ascii?Q?Sapwq6YqODXpN6zakhcpMm7yN2QZ4TnwbvHA4wjzRwTl8auIFL084sVAFwRg?=
+ =?us-ascii?Q?PboztSElDptIqYFd63N/5TWdkITup5fAue4fEXgLDk2+fBgpKSa6/5RqVV8k?=
+ =?us-ascii?Q?ys5nVVSTScpntwX19a1+q1EfCq826eV9DdfS9ULMf9BnttxxUueQzdc9f8j7?=
+ =?us-ascii?Q?DD75wxnSydQXtqy2dkwPyStiQjNqrFkPL+wuLUHRnXEhSq/rjTmNkJdHBNgS?=
+ =?us-ascii?Q?TkzlD/8/I5XhL0gGlbf9Xsvw2sysuAePJn4azCrQvSuG87JtIJmX4hxBurlz?=
+ =?us-ascii?Q?K4S1nlF6LAwMjVZ3xATfpQAWm/iuCqS1LlU4HCIOj0n9fPdjNvZZ5hxz4nlC?=
+ =?us-ascii?Q?FDb8QYBsMRcSb0c9Ufz9S1gdZr2POSGKSmZcvUtoZSJEDRF6G6fn+6sJJC6n?=
+ =?us-ascii?Q?9y2FjioA/t4NhM83J+p239yH6uwQQ3Fup/gDc0BaotIKvButOU9XKL4TC4NL?=
+ =?us-ascii?Q?rZyL0uQNkXwoZw6VAfnnfUk7p3aGd7sNQmPbXzIjJJplqmI0xq0gKgs97nCv?=
+ =?us-ascii?Q?87ithfUuIALuBGa5iEUIZcs0oK2zrVt/iyxmHZZzaO6NQvtzRbb2EPHALeMi?=
+ =?us-ascii?Q?875rJSWnSxYwqn2q66PC6oCUr2ZueiU9BoEGi4xdVcTiysE/ubJPhP+ixATi?=
+ =?us-ascii?Q?QEZqU4b39vr0dTihAVL21MzBoXH90lS6LdoLuuWlO6iXw2imykQynbOel0T8?=
+ =?us-ascii?Q?wfj4lqRltREP+CTzeukQbsd7azjtx8q/u5qzKV7lZj5n6oFrUTks2xBDn5kv?=
+ =?us-ascii?Q?OQgFqSvcIB9yQMJ0kUKB0UieHSVz1IuId3uc8WgF8TKowerjyCKxUKV724px?=
+ =?us-ascii?Q?WWKVVVGoXK/hZ/NldvnxtZFhOheXoc7VAOv35B0ggGz7/B1ZJ02PgWJWtfNo?=
+ =?us-ascii?Q?oM8ASEX6W0dubyYXc52REy9mNn+AOdvU2Tuerty1gbo066vCHrFnXx5i7PhT?=
+ =?us-ascii?Q?bXp7iy3RvrqSyn5nkZ96nqRT59GpeDoF1vKCuOXgimJjGd4fU3vgIJp9fsiC?=
+ =?us-ascii?Q?PhqYTIkA7FmDPk8XkKpdvAobHd658Zv8CWNXOAWoAMCsdaHs7xaVZS7llNDn?=
+ =?us-ascii?Q?BQfsveFuIRM7XlcUIb+ol9cJVT2iyuhSnVTIBY3RIAwVQAeq9u4qN0zmvXsA?=
+ =?us-ascii?Q?NGbeIhbLl0JISvzCouiBcEV//kgaEZJvWupeqRTjnJWgfvu54t4jKqxlH3er?=
+ =?us-ascii?Q?cW8txwZg7ORpESmQimeNPkGl8Lr0TOQff+JOvb5cuZwGeJJefn7BRJduUx+M?=
+ =?us-ascii?Q?axA30d6ULcTQZVXRyv2wKdAlPCaofcsUC7K01YGHRN2A7JD+XeKY9Zto+8D+?=
+ =?us-ascii?Q?cywZ8FBll81nu3udR7POoaBFZq4NCFLj/D9C+PTk++flDQ1VjOAfz7KFQZeg?=
+ =?us-ascii?Q?1NdNYwi5ifEl/ZUMZyFbJ0EoBFMpujPaYnXRZVUijotcZb3VmjjdepqgazUV?=
+ =?us-ascii?Q?aA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98caca06-bf9b-4d51-4bfe-08dc8ca8dcc1
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6139.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2024 19:33:27.2330
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dfTQe6HQCqOufp84jEIeUL09LGG0yz9eNtp4wyWlVjRxShVpnxeUkwpMhHHpLutknLTFN8EtzjVptd0ay03WMBw1bxs/rZ0HH5P+3qhqIyo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6896
+X-OriginatorOrg: intel.com
 
-Hook up the generic vDSO implementation to the x86 vDSO data page. Since
-the existing vDSO infrastructure is heavily based on the timekeeping
-functionality, which works over arrays of bases, a new macro is
-introduced for vvars that are not arrays.
+On Thu, May 23, 2024 at 06:01:49PM GMT, Jarkko Sakkinen wrote:
+>Hi,
+>
+>I just put this here while I still have it on my mind. Possibly I'm
+>ignoring something that already enables this but at least I learn
+>something by doing this then.
+>
+>This came up in a recent discussion albeit for this crypto bug it
+>did not make waves because the bug fix did not require it:
+>
+>https://lore.kernel.org/linux-integrity/D1GXKODMD4S8.1J12D4GOEQWPL@kernel.org/
+>
+>So the gist of  is_module() would be that it would have different
+>semantics than IS_MODULE(): it could be used to e.g. check modules in a
+>loop.
+>
+>Compilation would generate a new ELF section with following entries:
+>
+><ASCIIZ string><0 or 1>
+>
+>The string would contain module name, and 1 could be marking for
+>being a module, and 0 for being builtin.
+>
+>Also, it would enabled to add lsmod -b to enumerate built-in modules,
+>which would give nice way to carve up more information about a running
+>test kernel. This would obviously need perhaps a new file to procfs for
+>built-in modules (for regular there is /proc/modules).
 
-The vDSO function requires a ChaCha20 implementation that does not write
-to the stack, yet can still do an entire ChaCha20 permutation, so
-provide this using SSE2, since this is userland code that must work on
-all x86-64 processors. There's a simple test for this code as well.
 
-Reviewed-by: Samuel Neves <sneves@dei.uc.pt> # for vgetrandom-chacha.S
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- arch/x86/Kconfig                              |   1 +
- arch/x86/entry/vdso/Makefile                  |   3 +-
- arch/x86/entry/vdso/vdso.lds.S                |   2 +
- arch/x86/entry/vdso/vgetrandom-chacha.S       | 178 ++++++++++++++++++
- arch/x86/entry/vdso/vgetrandom.c              |  17 ++
- arch/x86/include/asm/vdso/getrandom.h         |  55 ++++++
- arch/x86/include/asm/vdso/vsyscall.h          |   2 +
- arch/x86/include/asm/vvar.h                   |  16 ++
- tools/testing/selftests/vDSO/.gitignore       |   1 +
- tools/testing/selftests/vDSO/Makefile         |  13 ++
- .../testing/selftests/vDSO/vdso_test_chacha.c |  43 +++++
- 11 files changed, 330 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/entry/vdso/vgetrandom-chacha.S
- create mode 100644 arch/x86/entry/vdso/vgetrandom.c
- create mode 100644 arch/x86/include/asm/vdso/getrandom.h
- create mode 100644 tools/testing/selftests/vDSO/vdso_test_chacha.c
+this information is already exported by kernel's build system:
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 1d7122a1883e..9c98b7a88cc2 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -287,6 +287,7 @@ config X86
- 	select HAVE_UNSTABLE_SCHED_CLOCK
- 	select HAVE_USER_RETURN_NOTIFIER
- 	select HAVE_GENERIC_VDSO
-+	select VDSO_GETRANDOM			if X86_64
- 	select HOTPLUG_PARALLEL			if SMP && X86_64
- 	select HOTPLUG_SMT			if SMP
- 	select HOTPLUG_SPLIT_STARTUP		if SMP && X86_32
-diff --git a/arch/x86/entry/vdso/Makefile b/arch/x86/entry/vdso/Makefile
-index 215a1b202a91..c9216ac4fb1e 100644
---- a/arch/x86/entry/vdso/Makefile
-+++ b/arch/x86/entry/vdso/Makefile
-@@ -7,7 +7,7 @@
- include $(srctree)/lib/vdso/Makefile
- 
- # Files to link into the vDSO:
--vobjs-y := vdso-note.o vclock_gettime.o vgetcpu.o
-+vobjs-y := vdso-note.o vclock_gettime.o vgetcpu.o vgetrandom.o vgetrandom-chacha.o
- vobjs32-y := vdso32/note.o vdso32/system_call.o vdso32/sigreturn.o
- vobjs32-y += vdso32/vclock_gettime.o vdso32/vgetcpu.o
- vobjs-$(CONFIG_X86_SGX)	+= vsgx.o
-@@ -73,6 +73,7 @@ CFLAGS_REMOVE_vdso32/vclock_gettime.o = -pg
- CFLAGS_REMOVE_vgetcpu.o = -pg
- CFLAGS_REMOVE_vdso32/vgetcpu.o = -pg
- CFLAGS_REMOVE_vsgx.o = -pg
-+CFLAGS_REMOVE_vgetrandom.o = -pg
- 
- #
- # X32 processes use x32 vDSO to access 64bit kernel data.
-diff --git a/arch/x86/entry/vdso/vdso.lds.S b/arch/x86/entry/vdso/vdso.lds.S
-index e8c60ae7a7c8..0bab5f4af6d1 100644
---- a/arch/x86/entry/vdso/vdso.lds.S
-+++ b/arch/x86/entry/vdso/vdso.lds.S
-@@ -30,6 +30,8 @@ VERSION {
- #ifdef CONFIG_X86_SGX
- 		__vdso_sgx_enter_enclave;
- #endif
-+		getrandom;
-+		__vdso_getrandom;
- 	local: *;
- 	};
- }
-diff --git a/arch/x86/entry/vdso/vgetrandom-chacha.S b/arch/x86/entry/vdso/vgetrandom-chacha.S
-new file mode 100644
-index 000000000000..20556f4fed6f
---- /dev/null
-+++ b/arch/x86/entry/vdso/vgetrandom-chacha.S
-@@ -0,0 +1,178 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ */
-+
-+#include <linux/linkage.h>
-+#include <asm/frame.h>
-+
-+.section	.rodata, "a"
-+.align 16
-+CONSTANTS:	.octa 0x6b20657479622d323320646e61707865
-+.text
-+
-+/*
-+ * Very basic SSE2 implementation of ChaCha20. Produces a given positive number
-+ * of blocks of output with a nonce of 0, taking an input key and 8-byte
-+ * counter. Importantly does not spill to the stack. Its arguments are:
-+ *
-+ *	rdi: output bytes
-+ *	rsi: 32-byte key input
-+ *	rdx: 8-byte counter input/output
-+ *	rcx: number of 64-byte blocks to write to output
-+ */
-+SYM_FUNC_START(__arch_chacha20_blocks_nostack)
-+
-+.set	output,		%rdi
-+.set	key,		%rsi
-+.set	counter,	%rdx
-+.set	nblocks,	%rcx
-+.set	i,		%al
-+/* xmm registers are *not* callee-save. */
-+.set	temp,		%xmm0
-+.set	state0,		%xmm1
-+.set	state1,		%xmm2
-+.set	state2,		%xmm3
-+.set	state3,		%xmm4
-+.set	copy0,		%xmm5
-+.set	copy1,		%xmm6
-+.set	copy2,		%xmm7
-+.set	copy3,		%xmm8
-+.set	one,		%xmm9
-+
-+	/* copy0 = "expand 32-byte k" */
-+	movaps		CONSTANTS(%rip),copy0
-+	/* copy1,copy2 = key */
-+	movups		0x00(key),copy1
-+	movups		0x10(key),copy2
-+	/* copy3 = counter || zero nonce */
-+	movq		0x00(counter),copy3
-+	/* one = 1 || 0 */
-+	movq		$1,%rax
-+	movq		%rax,one
-+
-+.Lblock:
-+	/* state0,state1,state2,state3 = copy0,copy1,copy2,copy3 */
-+	movdqa		copy0,state0
-+	movdqa		copy1,state1
-+	movdqa		copy2,state2
-+	movdqa		copy3,state3
-+
-+	movb		$10,i
-+.Lpermute:
-+	/* state0 += state1, state3 = rotl32(state3 ^ state0, 16) */
-+	paddd		state1,state0
-+	pxor		state0,state3
-+	movdqa		state3,temp
-+	pslld		$16,temp
-+	psrld		$16,state3
-+	por		temp,state3
-+
-+	/* state2 += state3, state1 = rotl32(state1 ^ state2, 12) */
-+	paddd		state3,state2
-+	pxor		state2,state1
-+	movdqa		state1,temp
-+	pslld		$12,temp
-+	psrld		$20,state1
-+	por		temp,state1
-+
-+	/* state0 += state1, state3 = rotl32(state3 ^ state0, 8) */
-+	paddd		state1,state0
-+	pxor		state0,state3
-+	movdqa		state3,temp
-+	pslld		$8,temp
-+	psrld		$24,state3
-+	por		temp,state3
-+
-+	/* state2 += state3, state1 = rotl32(state1 ^ state2, 7) */
-+	paddd		state3,state2
-+	pxor		state2,state1
-+	movdqa		state1,temp
-+	pslld		$7,temp
-+	psrld		$25,state1
-+	por		temp,state1
-+
-+	/* state1[0,1,2,3] = state1[1,2,3,0] */
-+	pshufd		$0x39,state1,state1
-+	/* state2[0,1,2,3] = state2[2,3,0,1] */
-+	pshufd		$0x4e,state2,state2
-+	/* state3[0,1,2,3] = state3[3,0,1,2] */
-+	pshufd		$0x93,state3,state3
-+
-+	/* state0 += state1, state3 = rotl32(state3 ^ state0, 16) */
-+	paddd		state1,state0
-+	pxor		state0,state3
-+	movdqa		state3,temp
-+	pslld		$16,temp
-+	psrld		$16,state3
-+	por		temp,state3
-+
-+	/* state2 += state3, state1 = rotl32(state1 ^ state2, 12) */
-+	paddd		state3,state2
-+	pxor		state2,state1
-+	movdqa		state1,temp
-+	pslld		$12,temp
-+	psrld		$20,state1
-+	por		temp,state1
-+
-+	/* state0 += state1, state3 = rotl32(state3 ^ state0, 8) */
-+	paddd		state1,state0
-+	pxor		state0,state3
-+	movdqa		state3,temp
-+	pslld		$8,temp
-+	psrld		$24,state3
-+	por		temp,state3
-+
-+	/* state2 += state3, state1 = rotl32(state1 ^ state2, 7) */
-+	paddd		state3,state2
-+	pxor		state2,state1
-+	movdqa		state1,temp
-+	pslld		$7,temp
-+	psrld		$25,state1
-+	por		temp,state1
-+
-+	/* state1[0,1,2,3] = state1[3,0,1,2] */
-+	pshufd		$0x93,state1,state1
-+	/* state2[0,1,2,3] = state2[2,3,0,1] */
-+	pshufd		$0x4e,state2,state2
-+	/* state3[0,1,2,3] = state3[1,2,3,0] */
-+	pshufd		$0x39,state3,state3
-+
-+	decb		i
-+	jnz		.Lpermute
-+
-+	/* output0 = state0 + copy0 */
-+	paddd		copy0,state0
-+	movups		state0,0x00(output)
-+	/* output1 = state1 + copy1 */
-+	paddd		copy1,state1
-+	movups		state1,0x10(output)
-+	/* output2 = state2 + copy2 */
-+	paddd		copy2,state2
-+	movups		state2,0x20(output)
-+	/* output3 = state3 + copy3 */
-+	paddd		copy3,state3
-+	movups		state3,0x30(output)
-+
-+	/* ++copy3.counter */
-+	paddq		one,copy3
-+
-+	/* output += 64, --nblocks */
-+	addq		$64,output
-+	decq		nblocks
-+	jnz		.Lblock
-+
-+	/* counter = copy3.counter */
-+	movq		copy3,0x00(counter)
-+
-+	/* Zero out the potentially sensitive regs, in case nothing uses these again. */
-+	pxor		state0,state0
-+	pxor		state1,state1
-+	pxor		state2,state2
-+	pxor		state3,state3
-+	pxor		copy1,copy1
-+	pxor		copy2,copy2
-+	pxor		temp,temp
-+
-+	ret
-+SYM_FUNC_END(__arch_chacha20_blocks_nostack)
-diff --git a/arch/x86/entry/vdso/vgetrandom.c b/arch/x86/entry/vdso/vgetrandom.c
-new file mode 100644
-index 000000000000..6045ded5da90
---- /dev/null
-+++ b/arch/x86/entry/vdso/vgetrandom.c
-@@ -0,0 +1,17 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ */
-+#include <linux/types.h>
-+
-+#include "../../../../lib/vdso/getrandom.c"
-+
-+ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *state);
-+
-+ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *state)
-+{
-+	return __cvdso_getrandom(buffer, len, flags, state);
-+}
-+
-+ssize_t getrandom(void *, size_t, unsigned int, void *)
-+	__attribute__((weak, alias("__vdso_getrandom")));
-diff --git a/arch/x86/include/asm/vdso/getrandom.h b/arch/x86/include/asm/vdso/getrandom.h
-new file mode 100644
-index 000000000000..bc1917fae282
---- /dev/null
-+++ b/arch/x86/include/asm/vdso/getrandom.h
-@@ -0,0 +1,55 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ */
-+#ifndef __ASM_VDSO_GETRANDOM_H
-+#define __ASM_VDSO_GETRANDOM_H
-+
-+#ifndef __ASSEMBLY__
-+
-+#include <asm/unistd.h>
-+#include <asm/vvar.h>
-+
-+/**
-+ * getrandom_syscall - Invoke the getrandom() syscall.
-+ * @buffer:	Destination buffer to fill with random bytes.
-+ * @len:	Size of @buffer in bytes.
-+ * @flags:	Zero or more GRND_* flags.
-+ * Returns:	The number of random bytes written to @buffer, or a negative value indicating an error.
-+ */
-+static __always_inline ssize_t getrandom_syscall(void *buffer, size_t len, unsigned int flags)
-+{
-+	long ret;
-+
-+	asm ("syscall" : "=a" (ret) :
-+	     "0" (__NR_getrandom), "D" (buffer), "S" (len), "d" (flags) :
-+	     "rcx", "r11", "memory");
-+
-+	return ret;
-+}
-+
-+#define __vdso_rng_data (VVAR(_vdso_rng_data))
-+
-+static __always_inline const struct vdso_rng_data *__arch_get_vdso_rng_data(void)
-+{
-+	if (IS_ENABLED(CONFIG_TIME_NS) && __vdso_data->clock_mode == VDSO_CLOCKMODE_TIMENS)
-+		return (void *)&__vdso_rng_data + ((void *)&__timens_vdso_data - (void *)&__vdso_data);
-+	return &__vdso_rng_data;
-+}
-+
-+/**
-+ * __arch_chacha20_blocks_nostack - Generate ChaCha20 stream without using the stack.
-+ * @dst_bytes:	Destination buffer to hold @nblocks * 64 bytes of output.
-+ * @key:	32-byte input key.
-+ * @counter:	8-byte counter, read on input and updated on return.
-+ * @nblocks:	Number of blocks to generate.
-+ *
-+ * Generates a given positive number of blocks of ChaCha20 output with nonce=0, and does not write
-+ * to any stack or memory outside of the parameters passed to it, in order to mitigate stack data
-+ * leaking into forked child processes.
-+ */
-+extern void __arch_chacha20_blocks_nostack(u8 *dst_bytes, const u32 *key, u32 *counter, size_t nblocks);
-+
-+#endif /* !__ASSEMBLY__ */
-+
-+#endif /* __ASM_VDSO_GETRANDOM_H */
-diff --git a/arch/x86/include/asm/vdso/vsyscall.h b/arch/x86/include/asm/vdso/vsyscall.h
-index be199a9b2676..71c56586a22f 100644
---- a/arch/x86/include/asm/vdso/vsyscall.h
-+++ b/arch/x86/include/asm/vdso/vsyscall.h
-@@ -11,6 +11,8 @@
- #include <asm/vvar.h>
- 
- DEFINE_VVAR(struct vdso_data, _vdso_data);
-+DEFINE_VVAR_SINGLE(struct vdso_rng_data, _vdso_rng_data);
-+
- /*
-  * Update the vDSO data page to keep in sync with kernel timekeeping.
-  */
-diff --git a/arch/x86/include/asm/vvar.h b/arch/x86/include/asm/vvar.h
-index 183e98e49ab9..9d9af37f7cab 100644
---- a/arch/x86/include/asm/vvar.h
-+++ b/arch/x86/include/asm/vvar.h
-@@ -26,6 +26,8 @@
-  */
- #define DECLARE_VVAR(offset, type, name) \
- 	EMIT_VVAR(name, offset)
-+#define DECLARE_VVAR_SINGLE(offset, type, name) \
-+	EMIT_VVAR(name, offset)
- 
- #else
- 
-@@ -37,6 +39,10 @@ extern char __vvar_page;
- 	extern type timens_ ## name[CS_BASES]				\
- 	__attribute__((visibility("hidden")));				\
- 
-+#define DECLARE_VVAR_SINGLE(offset, type, name)				\
-+	extern type vvar_ ## name					\
-+	__attribute__((visibility("hidden")));				\
-+
- #define VVAR(name) (vvar_ ## name)
- #define TIMENS(name) (timens_ ## name)
- 
-@@ -44,12 +50,22 @@ extern char __vvar_page;
- 	type name[CS_BASES]						\
- 	__attribute__((section(".vvar_" #name), aligned(16))) __visible
- 
-+#define DEFINE_VVAR_SINGLE(type, name)					\
-+	type name							\
-+	__attribute__((section(".vvar_" #name), aligned(16))) __visible
-+
- #endif
- 
- /* DECLARE_VVAR(offset, type, name) */
- 
- DECLARE_VVAR(128, struct vdso_data, _vdso_data)
- 
-+#if !defined(_SINGLE_DATA)
-+#define _SINGLE_DATA
-+DECLARE_VVAR_SINGLE(640, struct vdso_rng_data, _vdso_rng_data)
-+#endif
-+
- #undef DECLARE_VVAR
-+#undef DECLARE_VVAR_SINGLE
- 
- #endif
-diff --git a/tools/testing/selftests/vDSO/.gitignore b/tools/testing/selftests/vDSO/.gitignore
-index 7dbfdec53f3d..30d5c8f0e5c7 100644
---- a/tools/testing/selftests/vDSO/.gitignore
-+++ b/tools/testing/selftests/vDSO/.gitignore
-@@ -7,3 +7,4 @@ vdso_test_gettimeofday
- vdso_test_getcpu
- vdso_standalone_test_x86
- vdso_test_getrandom
-+vdso_test_chacha
-diff --git a/tools/testing/selftests/vDSO/Makefile b/tools/testing/selftests/vDSO/Makefile
-index a33b4d200a32..8b87ebea1630 100644
---- a/tools/testing/selftests/vDSO/Makefile
-+++ b/tools/testing/selftests/vDSO/Makefile
-@@ -3,6 +3,7 @@ include ../lib.mk
- 
- uname_M := $(shell uname -m 2>/dev/null || echo not)
- ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/)
-+SODIUM := $(shell pkg-config --libs libsodium 2>/dev/null)
- 
- TEST_GEN_PROGS := $(OUTPUT)/vdso_test_gettimeofday $(OUTPUT)/vdso_test_getcpu
- TEST_GEN_PROGS += $(OUTPUT)/vdso_test_abi
-@@ -12,9 +13,15 @@ TEST_GEN_PROGS += $(OUTPUT)/vdso_standalone_test_x86
- endif
- TEST_GEN_PROGS += $(OUTPUT)/vdso_test_correctness
- TEST_GEN_PROGS += $(OUTPUT)/vdso_test_getrandom
-+ifeq ($(uname_M),x86_64)
-+ifneq ($(SODIUM),)
-+TEST_GEN_PROGS += $(OUTPUT)/vdso_test_chacha
-+endif
-+endif
- 
- CFLAGS := -std=gnu99
- CFLAGS_vdso_standalone_test_x86 := -nostdlib -fno-asynchronous-unwind-tables -fno-stack-protector
-+CFLAGS_vdso_test_chacha := $(SODIUM) -idirafter $(top_srcdir)/include -idirafter $(top_srcdir)/arch/$(ARCH)/include -idirafter include -D__ASSEMBLY__ -DBULID_VDSO -DCONFIG_FUNCTION_ALIGNMENT=0 -Wa,--noexecstack
- LDFLAGS_vdso_test_correctness := -ldl
- ifeq ($(CONFIG_X86_32),y)
- LDLIBS += -lgcc_s
-@@ -35,3 +42,9 @@ $(OUTPUT)/vdso_test_correctness: vdso_test_correctness.c
- 		-o $@ \
- 		$(LDFLAGS_vdso_test_correctness)
- $(OUTPUT)/vdso_test_getrandom: parse_vdso.c
-+$(OUTPUT)/vdso_test_chacha: CFLAGS += $(CFLAGS_vdso_test_chacha)
-+$(OUTPUT)/vdso_test_chacha: $(top_srcdir)/arch/$(ARCH)/entry/vdso/vgetrandom-chacha.S
-+$(OUTPUT)/vdso_test_chacha: include/asm/rwonce.h
-+include/asm/rwonce.h:
-+	mkdir -p include/asm
-+	touch $@
-diff --git a/tools/testing/selftests/vDSO/vdso_test_chacha.c b/tools/testing/selftests/vDSO/vdso_test_chacha.c
-new file mode 100644
-index 000000000000..bce7a7752b11
---- /dev/null
-+++ b/tools/testing/selftests/vDSO/vdso_test_chacha.c
-@@ -0,0 +1,43 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ */
-+
-+#include <sodium/crypto_stream_chacha20.h>
-+#include <sys/random.h>
-+#include <string.h>
-+#include <stdint.h>
-+#include "../kselftest.h"
-+
-+extern void __arch_chacha20_blocks_nostack(uint8_t *dst_bytes, const uint8_t *key, uint32_t *counter, size_t nblocks);
-+
-+int main(int argc, char *argv[])
-+{
-+	enum { TRIALS = 1000, BLOCKS = 128, BLOCK_SIZE = 64 };
-+	static const uint8_t nonce[8] = { 0 };
-+	uint32_t counter[2];
-+	uint8_t key[32];
-+	uint8_t output1[BLOCK_SIZE * BLOCKS], output2[BLOCK_SIZE * BLOCKS];
-+
-+	ksft_print_header();
-+	ksft_set_plan(1);
-+
-+	for (unsigned int trial = 0; trial < TRIALS; ++trial) {
-+		if (getrandom(key, sizeof(key), 0) != sizeof(key)) {
-+			printf("getrandom() failed!\n");
-+			return KSFT_SKIP;
-+		}
-+		crypto_stream_chacha20(output1, sizeof(output1), nonce, key);
-+		for (unsigned int split = 0; split < BLOCKS; ++split) {
-+			memset(output2, 'X', sizeof(output2));
-+			memset(counter, 0, sizeof(counter));
-+			if (split)
-+				__arch_chacha20_blocks_nostack(output2, key, counter, split);
-+			__arch_chacha20_blocks_nostack(output2 + split * BLOCK_SIZE, key, counter, BLOCKS - split);
-+			if (memcmp(output1, output2, sizeof(output1)))
-+				return KSFT_FAIL;
-+		}
-+	}
-+	ksft_test_result_pass("chacha: PASS\n");
-+	return KSFT_PASS;
-+}
--- 
-2.45.2
+$ head  /usr/lib/modules/$(uname -r)/modules.builtin
+kernel/arch/x86/kernel/msr.ko
+kernel/arch/x86/kernel/cpuid.ko
+kernel/arch/x86/platform/intel/iosf_mbi.ko
+kernel/kernel/configs.ko
+kernel/mm/zbud.ko
+kernel/mm/zsmalloc.ko
+kernel/mm/z3fold.ko
+kernel/fs/binfmt_misc.ko
+kernel/fs/binfmt_script.ko
+kernel/fs/configfs/configfs.ko
 
+But I'm not sure if you were intendending to use that inside the kernel
+as per the other thread you mentioned.
+
+libkmod uses the more verbose  modules.builtin.modinfo
+so e.g. `modinfo ext4` works even if ext4 is builtin.
+
+We indeed miss a -b flag to lsmod, but that would be an welcome
+addition.  A decade or so ago I was thinking to actually use
+/sys/module/ to get details about builtin modules. At the time
+we didn't have modules.builtin. However not all builtin modules
+create a dir in /sys, only the ones that have module parameters. I was
+surprised it's still in kmod's TODO file:
+https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git/tree/TODO#n56
+
+
+Lucas De Marchi
+
+>
+>Not fighting for having this, just makig it visible.
+>
+>BR, Jarkko
