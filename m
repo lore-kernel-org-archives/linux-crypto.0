@@ -1,59 +1,59 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB322185E73
-	for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 17:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BEEF185E71
+	for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 17:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718645876; cv=none; b=QrWzqe85QOxY/rdexD061tJb90Wa/v4AhsThEyCfsZPqg3MCh5Is200BrKUsrdwH865Rg4Mtk//EBaR94azCl8Y05fNMtmupL/sxnEsM1VyNAVgIYpF7OV0diZzG6gbegEhzWVWv4eZfxVh66xtDddMaND5n/SiJX/kOUBsAEdw=
+	t=1718645897; cv=none; b=d/jc1LMcPioWjdVuhqd7dxgPe0wOJaePLgXsnq9cArpKDH2HrftLeH1XOqMaG/aQ8I7yNCRNrNymQFHRuuHgED9jTXQd0GYXNcbc4DslVgGuIhIyS/5CqBJltFgVCsGwiyDZyIE4HWTBuPpfam8Ts9dXHSsyXjYkBaSM3+twYQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718645876; c=relaxed/simple;
-	bh=aolkxKvRvPIVJ5LETI4Hrnp8zx+LOBl01iPVxlavPkw=;
+	s=arc-20240116; t=1718645897; c=relaxed/simple;
+	bh=yfyc9qcR7L9LOYuk+Rpu/ICu+drOPMuVxh76xzEUh+A=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MHaqg4QiMZAuLMbncHwsec27COJMIZt7D1uLw/bgOJedRgUzEwvMd+GjnNaiPHH+Q1Cc2BrJSC3ENUhHjEUtf0OV5eCUjxJYzA9Ft8DryUwm25fSSRtQcd1s44gJjsm3w8WJiP45aa+EKmJVm6+LTzLygArJtu/sT0XNQ3oUXDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Mm8f18AC; arc=none smtp.client-ip=209.85.167.54
+	 In-Reply-To:Content-Type; b=KcQYOPV+Pd7o/dee1EBND7+n/h6S7xJpjeytG8SsIabLS2zR4V6Xs8/KlKfGx1HLiJURsFXzKa54/LjM5qEU+4b2NY62ZhDYMKFPOoewbsDA4sXk8GEJ6gxFHmR7zXSzM/Iex6lImziwIFs3fulI67slMKxbG2EClh+nzaJFxs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pbhr3ejE; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mm8f18AC"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52bc27cfb14so5771352e87.0
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 10:37:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pbhr3ejE"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2e724bc46c4so51833781fa.2
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 10:38:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718645873; x=1719250673; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1718645893; x=1719250693; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZR/Rb5xAaQGOJ5DS10l+hrvLr7O7vUYtHmk4lXMtiMo=;
-        b=Mm8f18ACJ+fDlXRc3DkfZIEWdg3ZYZ9SKjtokGYHotWlI5RAoKKA71ZfL5zFxpv5vi
-         jEBrZR+LvWygkHD9igWHVlg50EVaHqPRNJdA97hMb+AY5lTqzZTB1Oa9Am2rmR8XbZbc
-         ZMjnvTBXvAm8VDGYEkDD9BfSvOnFQ5+K+/0qkkisOIW3lWClJkozihAcGuexzMPab/R0
-         B9AgfjYSCaOzECR5JgOeHMNVRGcWDhuuRg8uQmnhYsZevzGFCYsXqgwtgxGrsJ7R9Dps
-         wzUwDyLUJhj/fFqUpf4zgyJMOc5VD7rUXZ0d4zS8j288u52tVetdTEFb9PcbHvTnK1r0
-         3vTw==
+        bh=kt9rSbMK48zchYAqXzwtp2fIt9BL61bcmFfZ69RGv2o=;
+        b=pbhr3ejEnhpt/ih41VjT5oA+ftqVH4vv8rzkFcQlD+UGSUnfnHlMtL+kIO2IRZ7mCY
+         vZcvQiZxAeG50nnFZaRiYRoLqUijxF861WIXqG/Im15yUVuW4cIgKcGj/9iRkeYIWFpK
+         XhzeXhp0xU7NxZngC1rULeb/nQd2GP1WWC+8S5886DHq8+tyhmjONHGk4AcZGds0eMK4
+         Rpxay5iacQc75uGHLfhK83yv/4zk1aYi9bdjw06YFyk5ir+f9/SST55MfsmtOkMaNKcA
+         lLD+IMx51k5VJHbKVyjw3h+77+KpvCjzb/Ti6Rmd++wGEUp1dPE5WTi/5GYrfqgBHHqU
+         JBMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718645873; x=1719250673;
+        d=1e100.net; s=20230601; t=1718645893; x=1719250693;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZR/Rb5xAaQGOJ5DS10l+hrvLr7O7vUYtHmk4lXMtiMo=;
-        b=BkBGMdQh5usmzf8bM/Q4CklwQpUmNwbfFPpv5pXpFguIswddK0A3TBWJ5QT2K3CgnC
-         lils0awGwieENSB3iIh4Ekfw+DYrKzbYOnfZSQnHSJCx0hPnsVopT3sGVzUoey2eIDhC
-         BHBM5yQbxf0WA8NgYcjA7fhr5Tisymg9SXym07HgkA2AwAjuI7yyJvjh2s2FzGQ7/6oE
-         MvqeRUry7g2eYm4trcaxm8SFZVysi6tgBQu4rNQnIU17t5+149rdCgCpI/EeqtUG2eW7
-         NcJYt65ac/Lb3fnuAt9rw2Fe8rJZNACF5mQcHNS60kS4MTagMzScWeI0hH+mm9QANggj
-         s3YA==
-X-Forwarded-Encrypted: i=1; AJvYcCUgPXv2hKP6FlyV7zuYQZo0MXhx3jTQk6sUiY789A+IgibgCAWoe9fMBOb66iKt9UVKSgCZYCbxgpRVEah4D8Manbq92KJVY9vgABjJ
-X-Gm-Message-State: AOJu0Yxobt/+vMgoqjZ/9i147ohvbZR3k0yLzfVbyYhlPwPbm8VtGUy7
-	3ZPp040sXsUAJUejNLHkXefSZRAycZZfE8yij7dgXIFtL0q+N1Tkq36RXknZv1k=
-X-Google-Smtp-Source: AGHT+IGar7uh7/qvCi73QxBJXZ6s6MZ9h6S2JVkmR8/klBJePWGXzGItSfkyV9Oe+VUxofwGJiqlyg==
-X-Received: by 2002:a05:6512:616:b0:52c:c97:b591 with SMTP id 2adb3069b0e04-52ca6e6e321mr6501823e87.32.1718645872896;
-        Mon, 17 Jun 2024 10:37:52 -0700 (PDT)
+        bh=kt9rSbMK48zchYAqXzwtp2fIt9BL61bcmFfZ69RGv2o=;
+        b=Pi7oBp2O6fTF+atZ4b+fqrGjXij7FGshWGE3CJcheAHwOZs3VgISw+sbvPQYph7WnX
+         ud1k/E5Th0kFeBD+6QSYPbY5YvPPn3sC2rZiziWaclyEUqy5z1pEx4nToOf6Iu+igP9p
+         44J18OKerkj7C84W6XW2B6bmzdRrLrN1j7w75ZZfVcejhLnnAv38sfduhyMj+qV6tnFy
+         0AEHCu2VqJPxxkjoTVrsTLlCCJtZQT5lQpjrOSnzL1Q68Y2kr1vtTbDPYoiLSlAesDq/
+         Buatn2uFo4yDrIXuG5KK3yaaL+i05Oqrxy7F5QYejHK1ZAftLdtXOYXOgGE+OOAwP/PU
+         XoEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXQMCN5D52P7rPcT5mU8z/QCl2mLcdhnZVDTHqwePhYMBir1jBQqTcpZ3HIvdbxQVdk/XEYUCea7IqEZtRgDoaLGEN0OIPgUVCbCrA9
+X-Gm-Message-State: AOJu0YztGk/gjnSBccmX8aU+Iem8BfhvrBj2qS8EBX9G9f5iGXHWX3Xp
+	Ge2aBA6H+cEXbjxl0KEZsLHyU/My9wAsTwo9RgcG8g43lT13mD+Q62ugEc+62TQ=
+X-Google-Smtp-Source: AGHT+IGAv/VMxJ0kYZm0BjCFR4S5shtVmPPA8JVH1i0GUUnbuSVRcoBn9ry476jxv2gGWz/I9uBKzw==
+X-Received: by 2002:a2e:b0d6:0:b0:2ea:e12e:bee5 with SMTP id 38308e7fff4ca-2ec0e5b58bdmr68281141fa.4.1718645893449;
+        Mon, 17 Jun 2024 10:38:13 -0700 (PDT)
 Received: from ?IPV6:2a00:f41:cb2:a9df:20fa:cfbe:9ea6:1fe8? ([2a00:f41:cb2:a9df:20fa:cfbe:9ea6:1fe8])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52cc1fb481asm60273e87.82.2024.06.17.10.37.49
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ec2d25ad22sm4015741fa.86.2024.06.17.10.38.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jun 2024 10:37:52 -0700 (PDT)
-Message-ID: <fab4cf38-d3b8-421d-a610-b16aad7670db@linaro.org>
-Date: Mon, 17 Jun 2024 19:37:48 +0200
+        Mon, 17 Jun 2024 10:38:13 -0700 (PDT)
+Message-ID: <ff3e62b8-3b54-43d9-8b90-88646d1b585e@linaro.org>
+Date: Mon, 17 Jun 2024 19:38:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,7 +61,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 08/15] ufs: core: add support to derive software secret
+Subject: Re: [PATCH v5 09/15] ufs: core: add support for generate, import and
+ prepare keys
 To: Gaurav Kashyap <quic_gaurkash@quicinc.com>,
  linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org,
  andersson@kernel.org, ebiggers@google.com, neil.armstrong@linaro.org,
@@ -75,10 +76,10 @@ Cc: linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
  mani@kernel.org, davem@davemloft.net, herbert@gondor.apana.org.au,
  psodagud@quicinc.com, quic_apurupa@quicinc.com, sonalg@quicinc.com
 References: <20240617005825.1443206-1-quic_gaurkash@quicinc.com>
- <20240617005825.1443206-9-quic_gaurkash@quicinc.com>
+ <20240617005825.1443206-10-quic_gaurkash@quicinc.com>
 Content-Language: en-US
 From: Konrad Dybcio <konrad.dybcio@linaro.org>
-In-Reply-To: <20240617005825.1443206-9-quic_gaurkash@quicinc.com>
+In-Reply-To: <20240617005825.1443206-10-quic_gaurkash@quicinc.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
@@ -86,41 +87,40 @@ Content-Transfer-Encoding: 7bit
 
 On 6/17/24 02:51, Gaurav Kashyap wrote:
 > Block crypto allows storage controllers like UFS to
-> register an op derive a software secret from wrapped
-> keys added to the kernel.
+> register ops to generate, prepare and import wrapped
+> keys in the kernel.
 > 
 > Wrapped keys in most cases will have vendor specific
-> implementations, which means this op would need to have
-> a corresponding UFS variant op.
-> This change adds hooks in UFS core to support this variant
-> ops and tie them to the blk crypto op.
+> implementations, which means these ops would need to have
+> corresponding UFS variant ops.
+> This change adds hooks in UFS core to support these variant
+> ops and tie them to the blk crypto ops.
 > 
 > Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
 > Reviewed-by: Om Prakash Singh <quic_omprsing@quicinc.com>
 > Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
 > ---
->   drivers/ufs/core/ufshcd-crypto.c | 15 +++++++++++++++
->   include/ufs/ufshcd.h             |  4 ++++
->   2 files changed, 19 insertions(+)
+>   drivers/ufs/core/ufshcd-crypto.c | 41 ++++++++++++++++++++++++++++++++
+>   include/ufs/ufshcd.h             | 11 +++++++++
+>   2 files changed, 52 insertions(+)
 > 
 > diff --git a/drivers/ufs/core/ufshcd-crypto.c b/drivers/ufs/core/ufshcd-crypto.c
-> index 399b55d67b3b..c14800eac1ff 100644
+> index c14800eac1ff..fb935a54acfa 100644
 > --- a/drivers/ufs/core/ufshcd-crypto.c
 > +++ b/drivers/ufs/core/ufshcd-crypto.c
-> @@ -119,6 +119,20 @@ static int ufshcd_crypto_keyslot_evict(struct blk_crypto_profile *profile,
->   	return ufshcd_clear_keyslot(hba, slot);
+> @@ -143,10 +143,51 @@ bool ufshcd_crypto_enable(struct ufs_hba *hba)
+>   	return true;
 >   }
 >   
-> +static int ufshcd_crypto_derive_sw_secret(struct blk_crypto_profile *profile,
-> +					  const u8 wkey[], size_t wkey_size,
-> +					  u8 sw_secret[BLK_CRYPTO_SW_SECRET_SIZE])
+> +static int ufshcd_crypto_generate_key(struct blk_crypto_profile *profile,
+> +				      u8 lt_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE])
 > +{
 > +	struct ufs_hba *hba =
 > +		container_of(profile, struct ufs_hba, crypto_profile);
 > +
-> +	if (hba->vops && hba->vops->derive_sw_secret)
-> +		return  hba->vops->derive_sw_secret(hba, wkey, wkey_size,
+> +	if (hba->vops && hba->vops->generate_key)
+> +		return  hba->vops->generate_key(hba, lt_key);
 
-Double space
+Couple more double spaces in this one
 
 Konrad
