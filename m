@@ -1,159 +1,132 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F6E190466
-	for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 08:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1579917F5
+	for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 08:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718612900; cv=none; b=Miyx5nkqwjVm6JW4uSB9Bz/7ohV3c1VRK3Xbbcoi6PN4YtZT0SRTAnZGE+I2zdx4Azjw1ntHnPhLnMJk1Kx4zJUz2K/2NJ6A/s5b4Hs23x+ivVpaMnyxWcbTaj/O+PApg4e151ai9aONEimHZh1uMGeeV5j12WFO1LrUNFFEfmA=
+	t=1718613526; cv=none; b=f3gRRtJQ1dMMPqahlHL9BxSHfuQHZ6qG52r/slKgqQHDHnOCnBNa+xeVsH4EkDpUweEkvy3oSLsVBwoISh5Rs8IuQWAEB/eLaiuqzm2hwedYQtkzloQLhggezKz3hApw/fHZfh7lfNvMZYEQSGt3td4KcGZPfA5TKDLGwIu1aWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718612900; c=relaxed/simple;
-	bh=K6WKrZipR1HW2Nwy44maXbhlNaIBfu93SoIf07ZvRDg=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=etJRxvUW/EUWfrMcJzglRRWgdHBQcY1DNSrv21kDfJX0nPMAuEDOXzBt+lGCPlPwouoApnFcwfXrBv5EIs/XiqAfahd+GFLAxxT4rySp6PR+N8riEwb9KbSTLj6Kg8nBNlzn2ubeYAGcpG0vGmeCaoXGgDqn0wr971h5PCR0PGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NDWXT+FJ; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1718613526; c=relaxed/simple;
+	bh=QpIBUbFUwITybbgXDmAIghUybYCdLEwK0kT2XeOg9O4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f1SzYDbv1iB8un/WrIjqLU85r1GBdskdP67Eah1HPErhSU31MKCUzzTI31nOk2D4gZ/ZQPfluXUj87Er+b4t+AaBf6KHRXCfIq5S+GtjJ/5F+G2NuqWUOmhLGvBhany2abzTsVzE4zQdqE73jfn1mYc6CjSdCiqCnz72xrTq11c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=lavVrEu6; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NDWXT+FJ"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-35f275c7286so3675958f8f.2
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 01:28:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="lavVrEu6"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-52cc129c78fso63044e87.2
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 01:38:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718612897; x=1719217697; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8FKw8oyL5tYNh6NJFd51xdlwMIJOVuWPAFK/tw0SYrc=;
-        b=NDWXT+FJQwlK0l6jwHh4vJYltU6Crj6ju6Csfzz8e+68tMXCJU9nOlpQCQn21gVCqc
-         sghbnXo/5Wo0Hp913Ao4ACZW+QTP/xeKw19XRRgxCbSJ1lOVFDxzgmF5EBAQDgstCwhm
-         LByM9nZGJq1A59DXMMgGK+4cDMSaBHub2rAZGSsZRhDA+THcmQFBN937/tPekG+dCXUP
-         cv1grAXOtvbqAWa/+ja6I677UQx2ht68JCQSuRq5xciqn0pJOnCCsS19/A05e0czjlgn
-         wU34v7iiATFBpAQu3quOgL8xjuBKLuvwtRbb9RkZjuAvXcMVjRw2wMrmxgel84EeTIiF
-         kPUw==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718613523; x=1719218323; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=thWfJ5vNt6k/FERjkc7rTQHov2e1QQhet46euWcD5F0=;
+        b=lavVrEu6Dbtr+DFYxTb9Q3Uz+kWkYwxpnhYngGFyKOY8qzdXvpN49y96rIITsZn2Z4
+         T+9VsnyAx1m4dlHCSGwmMKVGA/brTMxJ/t11M/mvYQYfj9i0f2rdguwSGs9RRmZFDoHh
+         2aDXWUYGpJtui/upKn/7BAB87tauJio4i//Zwr1sgsKnNWf/hxCe5Y+mE+QxeyaPStAd
+         4VwlpOaE1nfadLjvAxXAdO467vXyP6RnW/Fg2V0IhoX7nNedKkIoTthmICWA3+FzmT+e
+         o0rOaBYbGGs/LWPv5sTZnXeiq/8FFoh2UA40ERrDteyM4yUNKSfTALDWoNczT9B/jByP
+         MD/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718612897; x=1719217697;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8FKw8oyL5tYNh6NJFd51xdlwMIJOVuWPAFK/tw0SYrc=;
-        b=D2FEhzzyRetwDMemkUkYo/UO2T3IFEEcQ+qJcPkHnxm0o3/AtDhOuUpL0Xfqsgl8DC
-         A8lqhzIv73/aPiRapuVDNOF+aSNCo/8DnsdMacTJiMpvVJqUHz4KkNJnhDl9XqLE3IEZ
-         vioVR9+1rOxzy7WdYQ2dNyRqZflcieyQOQYZDKOte0FOLQDIKKKKunQRq96xjmS2U7by
-         ghiEcDeFYYaiFCDQPqa+1BOSeiZz9OLO9NyPQQDOaEtsY+HVeag0pSs478vU4PErtzMb
-         3OdLCkUScLnaaY//pxcVhsNxu/N+TtByvd4MpnjRq6PfiucXSOXp74wzXOC8d7NOQXrC
-         JWgA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQHwzmAW2pmPpJnYCOf6xlhZh4CROsJBJDu2ppD0FPvI/rdxQs6b5dXMqvYgLhGBGS8W4OOYTUTUv0y/nnQlWP91FFDK7cOwpbOAfl
-X-Gm-Message-State: AOJu0Yz9Mw+ZpSfZ4STtkNVxmNEZX8i6QzBKcdKoT8OQJ4fEDgmkh0Dg
-	Dwg2MAzLUjlaguTzp2c24v7J1MsBY6ZNWHYzP5+H/aJER2AZ32w6fUw0av4EZTU=
-X-Google-Smtp-Source: AGHT+IFrOz+mjUlG3efTdKq78Aa9DV/xnJ2m4Dx9LiRZX9rZHF10LWcnq84Nv/xPjoEhcoEzE7aaKA==
-X-Received: by 2002:a5d:6912:0:b0:360:9398:8b25 with SMTP id ffacd0b85a97d-36093988b9fmr2177110f8f.70.1718612897050;
-        Mon, 17 Jun 2024 01:28:17 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:982:cbb0:7f86:d83c:9278:7757? ([2a01:e0a:982:cbb0:7f86:d83c:9278:7757])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-360750f0d71sm11303233f8f.86.2024.06.17.01.28.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jun 2024 01:28:16 -0700 (PDT)
-Message-ID: <109b1e46-f46f-4636-87d5-66266e04ccff@linaro.org>
-Date: Mon, 17 Jun 2024 10:28:15 +0200
+        d=1e100.net; s=20230601; t=1718613523; x=1719218323;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=thWfJ5vNt6k/FERjkc7rTQHov2e1QQhet46euWcD5F0=;
+        b=QeR9qcpSmBwh7OgQ5l7D1iuSAF7kddQf63in5G9XHN8vggT6Em5e8IyhA4klo7rEOM
+         StLnp4JcmTptOaMDQf/1OW8Myij7ajSKXKwLJYDXsP2eKL0KEWsaSwvxM0T+KSDrM30d
+         VMeow283Y4+5fzyiFRSwUc9B4+PDRkydr1/R0Hk8I7l/uMcQwZaPQmaPcpR1BHVqkWt8
+         kdcE4F3EkwmiX5bOonXxjtWrxp6ehMqnNzomE/wN/JQvzz3Om/TRuv7G4BEvjPzclbMC
+         6DhQ74f+imVB8IpMYj2q2iYUIewZgrNAaS+7mV3MJ7fOD4cRE4I6cKu+McAAS/94fg5s
+         DRcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVU0LzRJ+pK4kc+eNXrJHUthy3CP0Gu18JCSYiFuID9t6qQufN9gH5uHQwm4IBwb0MgC/1CIsGXA9UllDkdjB0PaNzMg9xv+v3gORdo
+X-Gm-Message-State: AOJu0YxWihtEm2VRHF8Jl5dJpEeJFpa2YfIlVMR3UqgLNDjiDdu0Hmn6
+	fFcGwYYqPOtGLrO9Oip6YjPMPeN981SCiGGwNzvw7XgLjkCwPYd5yNysB+/ZSoKKKbbtvX5vBS5
+	6oO5jcIs20T9v8KZUaF+2ESoHmDhW6y5YpiZRyA==
+X-Google-Smtp-Source: AGHT+IGJlK0vVGGIsg6Q2X3INPPuJtHFwrlG6rzUW0S8GOjQaYt/T9rHb608AEKHM4d82TMbppTRKL6tXg7B/CaJKnc=
+X-Received: by 2002:ac2:46e3:0:b0:52c:247d:2cfa with SMTP id
+ 2adb3069b0e04-52ca6e55075mr6615465e87.13.1718613523038; Mon, 17 Jun 2024
+ 01:38:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: neil.armstrong@linaro.org
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH v5 14/15] arm64: dts: qcom: sm8650: add hwkm support to
- ufs ice
-To: Gaurav Kashyap <quic_gaurkash@quicinc.com>,
- linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org,
- andersson@kernel.org, ebiggers@google.com, srinivas.kandagatla@linaro.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, robh+dt@kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
- kernel@quicinc.com, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, quic_omprsing@quicinc.com,
- quic_nguyenb@quicinc.com, bartosz.golaszewski@linaro.org,
- konrad.dybcio@linaro.org, ulf.hansson@linaro.org, jejb@linux.ibm.com,
- martin.petersen@oracle.com, mani@kernel.org, davem@davemloft.net,
- herbert@gondor.apana.org.au, psodagud@quicinc.com, quic_apurupa@quicinc.com,
- sonalg@quicinc.com
-References: <20240617005825.1443206-1-quic_gaurkash@quicinc.com>
- <20240617005825.1443206-15-quic_gaurkash@quicinc.com>
-Content-Language: en-US, fr
-Autocrypt: addr=neil.armstrong@linaro.org; keydata=
- xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
- GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
- BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
- qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
- 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
- AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
- OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
- Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
- YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
- GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
- UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
- GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
- yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
- QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
- SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
- 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
- Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
- oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
- M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
- 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
- KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
- 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
- QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
-Organization: Linaro
-In-Reply-To: <20240617005825.1443206-15-quic_gaurkash@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240605161851.13911-1-kabel@kernel.org> <20240605161851.13911-7-kabel@kernel.org>
+ <CAHp75VfWZhmw00QP-ra4Zajn7LMvDW+NUT2fMx5kqeQ9eHLv5A@mail.gmail.com>
+In-Reply-To: <CAHp75VfWZhmw00QP-ra4Zajn7LMvDW+NUT2fMx5kqeQ9eHLv5A@mail.gmail.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Mon, 17 Jun 2024 10:38:31 +0200
+Message-ID: <CAMRc=McmiZFwPneeCtYtqgLiapf9jP9=L8WBmCwQTsZdZVeaqg@mail.gmail.com>
+Subject: Re: [PATCH v11 6/8] platform: cznic: turris-omnia-mcu: Add support
+ for MCU provided TRNG
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: =?UTF-8?B?TWFyZWsgQmVow7pu?= <kabel@kernel.org>, 
+	Gregory CLEMENT <gregory.clement@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, soc@kernel.org, 
+	arm@kernel.org, Andy Shevchenko <andy@kernel.org>, Hans de Goede <hdegoede@redhat.com>, 
+	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Wed, Jun 5, 2024 at 9:00=E2=80=AFPM Andy Shevchenko
+<andy.shevchenko@gmail.com> wrote:
+>
+> On Wed, Jun 5, 2024 at 7:19=E2=80=AFPM Marek Beh=C3=BAn <kabel@kernel.org=
+> wrote:
+> >
+> > Add support for true random number generator provided by the MCU.
+> > New Omnia boards come without the Atmel SHA204-A chip. Instead the
+> > crypto functionality is provided by new microcontroller, which has
+> > a TRNG peripheral.
+>
+> +Cc: Bart for gpiochip_get_desc() usage.
+>
+> ...
+>
+> > +#include <linux/bitfield.h>
+> > +#include <linux/completion.h>
+>
+> + errno.h
+>
+> > +#include <linux/gpio/consumer.h>
+> > +#include <linux/gpio/driver.h>
+> > +#include <linux/hw_random.h>
+> > +#include <linux/i2c.h>
+> > +#include <linux/interrupt.h>
+> > +#include <linux/minmax.h>
+> > +#include <linux/module.h>
+> > +#include <linux/string.h>
+>
+> > +#include <linux/turris-omnia-mcu-interface.h>
+>
+> As per other patches.
+>
+> > +#include <linux/types.h>
+> > +
+> > +#include "turris-omnia-mcu.h"
+>
+> ...
+>
+> > +       irq_idx =3D omnia_int_to_gpio_idx[__bf_shf(OMNIA_INT_TRNG)];
+> > +       irq =3D gpiod_to_irq(gpiochip_get_desc(&mcu->gc, irq_idx));
+> > +       if (irq < 0)
+> > +               return dev_err_probe(dev, irq, "Cannot get TRNG IRQ\n")=
+;
+>
+> Okay, it's a bit more complicated than that. The gpiochip_get_desc()
+> shouldn't be used. Bart, what can you suggest to do here? Opencoding
+> it doesn't sound to me a (fully) correct approach in a long term.
+>
 
-On 17/06/2024 02:51, Gaurav Kashyap wrote:
-> The Inline Crypto Engine (ICE) for UFS/EMMC supports the
-> Hardware Key Manager (HWKM) to securely manage storage
-> keys. Enable using this hardware on sm8650.
-> 
-> This requires two changes:
-> 1. Register size increase: HWKM is an additional piece of hardware
->     sitting alongside ICE, and extends the old ICE's register space.
-> 2. Explicitly tell the ICE driver to use HWKM with ICE so that
->     wrapped keys are used in sm8650.
-> 
-> Reviewed-by: Om Prakash Singh <quic_omprsing@quicinc.com>
-> Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
-> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> ---
->   arch/arm64/boot/dts/qcom/sm8650.dtsi | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/sm8650.dtsi b/arch/arm64/boot/dts/qcom/sm8650.dtsi
-> index bb0b3c48ee4b..a34c4b7ccbac 100644
-> --- a/arch/arm64/boot/dts/qcom/sm8650.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/sm8650.dtsi
-> @@ -2593,9 +2593,11 @@ &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>,
->   		ice: crypto@1d88000 {
->   			compatible = "qcom,sm8650-inline-crypto-engine",
->   				     "qcom,inline-crypto-engine";
-> -			reg = <0 0x01d88000 0 0x8000>;
-> +			reg = <0 0x01d88000 0 0x10000>;
->   
->   			clocks = <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
-> +
-> +			qcom,ice-use-hwkm;
->   		};
->   
->   		tcsr_mutex: hwlock@1f40000 {
+Andy's worried about reference counting of the GPIO device. Maybe you
+should just ref the GPIO device in irq_request_resources() and unref
+it in irq_release_resources()? Then you could use gpiochip_get_desc()
+just fine.
 
-Please split this (and next) in two patches:
-- one extending the register size + Fixes tag so it can backported to stable kernels
-- one adding qcom,ice-use-hwkm (if bindings maintainers agrees with this property)
-
-And please send sm8550 before sm8650...
-
-Thanks,
-Neil
+Bart
