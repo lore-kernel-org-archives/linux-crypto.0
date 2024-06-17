@@ -1,43 +1,68 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 644487317C;
-	Sun, 16 Jun 2024 22:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256DE8C13;
+	Mon, 17 Jun 2024 00:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718575743; cv=none; b=HQVzCUSeLe379jPO9oWwA5wqvQNnY0z4WLnPL7WYu0a3cwpCl2fNa4qUdrmxAS0pqtPWyslQsZtItoQ+GWL55qL2R58OQhZNYnvIr+H1B/AWIQr/PZLw69Mc+DtnDFHM/Y9pYLSkdWK6V+xCPEH29Qqy/KFHmF/difDVlJllyXE=
+	t=1718585955; cv=none; b=eq/Zz1WUpYlu/YgtoCbMIqOP5cgeQq26kXytrsEG6/iASA3YUWzIEjWvvGlvKcv+XjZHfEBloT3hFMBt+CacdgSOSPJjsAevs8WAhU4xsDf8rb4KhupbFUtMUiB3DJaZ5BN1NZIj448o14Z8V1li5lnOEpCKrXGnLOsi/szbNbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718575743; c=relaxed/simple;
-	bh=vZxSHxbfbt3HjW3e0ai/LsmQdcjOkQEODGgM6YmdQQk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RshPixVdiF/GqQujTk7JnHzec+Tp+x3nfrYvCiZ1gazTk/8rrvhpCD5rz64zbBcayWib10oTodIzukhuM8zX25p7H9EYvKthBMHA+osNGVK9PMIAwJfSD9Hter1VqcjaVeDvio1AxifAk1kj6Oq3OPThrN6ZKLZO7TTwnWs/oFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C88981476;
-	Sun, 16 Jun 2024 15:09:20 -0700 (PDT)
-Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5D7293F73B;
-	Sun, 16 Jun 2024 15:08:54 -0700 (PDT)
-From: Andre Przywara <andre.przywara@arm.com>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
-	devicetree@vger.kernel.org
-Subject: [PATCH 2/4] crypto: sun8i-ce - wrap accesses to descriptor address fields
-Date: Sun, 16 Jun 2024 23:07:17 +0100
-Message-Id: <20240616220719.26641-3-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.39.4
-In-Reply-To: <20240616220719.26641-1-andre.przywara@arm.com>
-References: <20240616220719.26641-1-andre.przywara@arm.com>
+	s=arc-20240116; t=1718585955; c=relaxed/simple;
+	bh=riFdxDgcgEH+bArNbX2zhC+zXMpIXVJM9VXN/B1pOLo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KDVCVRIgoyLceu/8P3qxJFimkqBgHNfrUJ6pbd8MJXJynI8QN/Cm56DzzcuTs+aRrh/4JeqjAUATy9/mViK7WF/gyS4R1z52GOncNtaLLHXflKoErORCjKf85DhC0A4ztXDQ7vUlRya2gcpwnLUNYAFkBuFKQfPuqGsa8+Bh188=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=G9cxtjQR; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="G9cxtjQR"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45GMa18Z022722;
+	Mon, 17 Jun 2024 00:58:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	B1Kt5Qw9dWMpDurmTQx95r90EFX8liKRA6R+gG4SgYQ=; b=G9cxtjQRXOaEZTkT
+	WhubhtrXGvA9xgx3xggmE0ZSQG2wijSid/V6y96eWsA2CwaIaHlY/+RNqCrtZDXa
+	I+Z9Kmk6xjmHghO+TkDYScDWIeWk7W8+B4mk36lsxQEwc2etOhCqC+qLsiVtEMzq
+	/b1r2IwX4Ad7aH8TWzPPhIp8LPuVruv5ozGvFCGl6kRy5nHaQSJI8KgRmuVaNPvI
+	uHd52u/u2fJAMtnuBJSRx6+Tb1bau+Ih9i8PbMmtGNvEw3l29hjQgDsuSbkkSVWT
+	o63D6iNP4fP6zcvwj0Rpx0pbFuU27dBC0CBs00LOz+Y2ySTlbSSVbazEs8yPVGWp
+	wq0VsA==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ys44jt9jy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Jun 2024 00:58:57 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45H0wunT017372
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Jun 2024 00:58:56 GMT
+Received: from hu-gaurkash-lv.qualcomm.com (10.49.16.6) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Sun, 16 Jun 2024 17:58:53 -0700
+From: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+To: <linux-arm-msm@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <andersson@kernel.org>, <ebiggers@google.com>,
+        <neil.armstrong@linaro.org>, <srinivas.kandagatla@linaro.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <robh+dt@kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <kernel@quicinc.com>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <quic_omprsing@quicinc.com>,
+        <quic_nguyenb@quicinc.com>, <bartosz.golaszewski@linaro.org>,
+        <konrad.dybcio@linaro.org>, <ulf.hansson@linaro.org>,
+        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>, <mani@kernel.org>,
+        <davem@davemloft.net>, <herbert@gondor.apana.org.au>,
+        <psodagud@quicinc.com>, <quic_apurupa@quicinc.com>,
+        <sonalg@quicinc.com>, Gaurav Kashyap
+	<quic_gaurkash@quicinc.com>
+Subject: [PATCH v5 01/15] ice, ufs, mmc: use blk_crypto_key for program_key
+Date: Sun, 16 Jun 2024 17:50:56 -0700
+Message-ID: <20240617005825.1443206-2-quic_gaurkash@quicinc.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240617005825.1443206-1-quic_gaurkash@quicinc.com>
+References: <20240617005825.1443206-1-quic_gaurkash@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,172 +70,270 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: zGuy6_TEA2TvFYP17bdpRBOLvxk2kCQI
+X-Proofpoint-ORIG-GUID: zGuy6_TEA2TvFYP17bdpRBOLvxk2kCQI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-16_12,2024-06-14_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0
+ adultscore=0 phishscore=0 mlxscore=0 clxscore=1011 bulkscore=0
+ malwarescore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2405170001 definitions=main-2406170006
 
-The Allwinner H616 (and later) SoCs support more than 32 bits worth of
-physical addresses. To accommodate the larger address space, the CE task
-descriptor fields holding addresses are now encoded as "word addresses",
-so take the actual address divided by four.
-This is true for the fields within the descriptor, but also for the
-descriptor base address, in the CE_TDA register.
+The program key ops in the storage controller does not
+pass on the blk crypto key structure to ice, this is okay
+when wrapped keys are not supported and keys are standard
+AES XTS sizes. However, wrapped keyblobs can be of any size
+and in preparation for that, modify the ICE and storage
+controller APIs to accept blk_crypto_key.
 
-Wrap all accesses to those fields in a function, which will do the
-required division if needed. For now this in unused, so there should be
-no change in behaviour.
-
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org> # For MMC
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
 ---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c |  8 ++++----
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   |  3 ++-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   |  6 +++---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c   |  6 +++---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c   |  2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h        | 10 ++++++++++
- 6 files changed, 23 insertions(+), 12 deletions(-)
+ drivers/mmc/host/cqhci-crypto.c  | 7 ++++---
+ drivers/mmc/host/cqhci.h         | 2 ++
+ drivers/mmc/host/sdhci-msm.c     | 6 ++++--
+ drivers/soc/qcom/ice.c           | 6 +++---
+ drivers/ufs/core/ufshcd-crypto.c | 7 ++++---
+ drivers/ufs/host/ufs-qcom.c      | 6 ++++--
+ include/soc/qcom/ice.h           | 5 +++--
+ include/ufs/ufshcd.h             | 1 +
+ 8 files changed, 25 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-index de50c00ba218f..3a5674b1bd3c0 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-@@ -190,7 +190,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
- 		err = -EFAULT;
- 		goto theend;
- 	}
--	cet->t_key = cpu_to_le32(rctx->addr_key);
-+	cet->t_key = sun8i_ce_desc_addr(ce, rctx->addr_key);
+diff --git a/drivers/mmc/host/cqhci-crypto.c b/drivers/mmc/host/cqhci-crypto.c
+index 6652982410ec..91da6de1d650 100644
+--- a/drivers/mmc/host/cqhci-crypto.c
++++ b/drivers/mmc/host/cqhci-crypto.c
+@@ -32,6 +32,7 @@ cqhci_host_from_crypto_profile(struct blk_crypto_profile *profile)
+ }
  
- 	ivsize = crypto_skcipher_ivsize(tfm);
- 	if (areq->iv && crypto_skcipher_ivsize(tfm) > 0) {
-@@ -208,7 +208,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
- 			err = -ENOMEM;
- 			goto theend_iv;
- 		}
--		cet->t_iv = cpu_to_le32(rctx->addr_iv);
-+		cet->t_iv = sun8i_ce_desc_addr(ce, rctx->addr_iv);
- 	}
+ static int cqhci_crypto_program_key(struct cqhci_host *cq_host,
++				    const struct blk_crypto_key *bkey,
+ 				    const union cqhci_crypto_cfg_entry *cfg,
+ 				    int slot)
+ {
+@@ -39,7 +40,7 @@ static int cqhci_crypto_program_key(struct cqhci_host *cq_host,
+ 	int i;
  
- 	if (areq->src == areq->dst) {
-@@ -236,7 +236,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 	if (cq_host->ops->program_key)
+-		return cq_host->ops->program_key(cq_host, cfg, slot);
++		return cq_host->ops->program_key(cq_host, bkey, cfg, slot);
  
- 	len = areq->cryptlen;
- 	for_each_sg(areq->src, sg, nr_sgs, i) {
--		cet->t_src[i].addr = cpu_to_le32(sg_dma_address(sg));
-+		cet->t_src[i].addr = sun8i_ce_desc_addr(ce, sg_dma_address(sg));
- 		todo = min(len, sg_dma_len(sg));
- 		cet->t_src[i].len = cpu_to_le32(todo / 4);
- 		dev_dbg(ce->dev, "%s total=%u SG(%d %u off=%d) todo=%u\n", __func__,
-@@ -251,7 +251,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
- 
- 	len = areq->cryptlen;
- 	for_each_sg(areq->dst, sg, nr_sgd, i) {
--		cet->t_dst[i].addr = cpu_to_le32(sg_dma_address(sg));
-+		cet->t_dst[i].addr = sun8i_ce_desc_addr(ce, sg_dma_address(sg));
- 		todo = min(len, sg_dma_len(sg));
- 		cet->t_dst[i].len = cpu_to_le32(todo / 4);
- 		dev_dbg(ce->dev, "%s total=%u SG(%d %u off=%d) todo=%u\n", __func__,
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index 0408b2d5d533b..89ab3e08f0697 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -172,7 +172,8 @@ int sun8i_ce_run_task(struct sun8i_ce_dev *ce, int flow, const char *name)
- 	writel(v, ce->base + CE_ICR);
- 
- 	reinit_completion(&ce->chanlist[flow].complete);
--	writel(ce->chanlist[flow].t_phy, ce->base + CE_TDQ);
-+	writel(sun8i_ce_desc_addr(ce, ce->chanlist[flow].t_phy),
-+	       ce->base + CE_TDQ);
- 
- 	ce->chanlist[flow].status = 0;
- 	/* Be sure all data is written before enabling the task */
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-index ee2a28c906ede..a710ec9aa96f1 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-@@ -403,7 +403,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 
- 	len = areq->nbytes;
- 	for_each_sg(areq->src, sg, nr_sgs, i) {
--		cet->t_src[i].addr = cpu_to_le32(sg_dma_address(sg));
-+		cet->t_src[i].addr = sun8i_ce_desc_addr(ce, sg_dma_address(sg));
- 		todo = min(len, sg_dma_len(sg));
- 		cet->t_src[i].len = cpu_to_le32(todo / 4);
- 		len -= todo;
-@@ -414,7 +414,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- 		goto theend;
- 	}
- 	addr_res = dma_map_single(ce->dev, result, digestsize, DMA_FROM_DEVICE);
--	cet->t_dst[0].addr = cpu_to_le32(addr_res);
-+	cet->t_dst[0].addr = sun8i_ce_desc_addr(ce, addr_res);
- 	cet->t_dst[0].len = cpu_to_le32(digestsize / 4);
- 	if (dma_mapping_error(ce->dev, addr_res)) {
- 		dev_err(ce->dev, "DMA map dest\n");
-@@ -445,7 +445,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 	/* Clear CFGE */
+ 	cqhci_writel(cq_host, 0, slot_offset + 16 * sizeof(cfg->reg_val[0]));
+@@ -99,7 +100,7 @@ static int cqhci_crypto_keyslot_program(struct blk_crypto_profile *profile,
+ 		memcpy(cfg.crypto_key, key->raw, key->size);
  	}
  
- 	addr_pad = dma_map_single(ce->dev, buf, j * 4, DMA_TO_DEVICE);
--	cet->t_src[i].addr = cpu_to_le32(addr_pad);
-+	cet->t_src[i].addr = sun8i_ce_desc_addr(ce, addr_pad);
- 	cet->t_src[i].len = cpu_to_le32(j);
- 	if (dma_mapping_error(ce->dev, addr_pad)) {
- 		dev_err(ce->dev, "DMA error on padding SG\n");
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-index 80815379f6fc5..f030167f95945 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-@@ -132,10 +132,10 @@ int sun8i_ce_prng_generate(struct crypto_rng *tfm, const u8 *src,
- 	cet->t_sym_ctl = cpu_to_le32(sym);
- 	cet->t_asym_ctl = 0;
+-	err = cqhci_crypto_program_key(cq_host, &cfg, slot);
++	err = cqhci_crypto_program_key(cq_host, key, &cfg, slot);
  
--	cet->t_key = cpu_to_le32(dma_iv);
--	cet->t_iv = cpu_to_le32(dma_iv);
-+	cet->t_key = sun8i_ce_desc_addr(ce, dma_iv);
-+	cet->t_iv = sun8i_ce_desc_addr(ce, dma_iv);
+ 	memzero_explicit(&cfg, sizeof(cfg));
+ 	return err;
+@@ -113,7 +114,7 @@ static int cqhci_crypto_clear_keyslot(struct cqhci_host *cq_host, int slot)
+ 	 */
+ 	union cqhci_crypto_cfg_entry cfg = {};
  
--	cet->t_dst[0].addr = cpu_to_le32(dma_dst);
-+	cet->t_dst[0].addr = sun8i_ce_desc_addr(ce, dma_dst);
- 	cet->t_dst[0].len = cpu_to_le32(todo / 4);
- 	ce->chanlist[flow].timeout = 2000;
+-	return cqhci_crypto_program_key(cq_host, &cfg, slot);
++	return cqhci_crypto_program_key(cq_host, NULL, &cfg, slot);
+ }
  
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-index 9c35f2a83eda8..465c1c512eb85 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-@@ -77,7 +77,7 @@ static int sun8i_ce_trng_read(struct hwrng *rng, void *data, size_t max, bool wa
- 	cet->t_sym_ctl = 0;
- 	cet->t_asym_ctl = 0;
+ static int cqhci_crypto_keyslot_evict(struct blk_crypto_profile *profile,
+diff --git a/drivers/mmc/host/cqhci.h b/drivers/mmc/host/cqhci.h
+index fab9d74445ba..06099fd32f23 100644
+--- a/drivers/mmc/host/cqhci.h
++++ b/drivers/mmc/host/cqhci.h
+@@ -12,6 +12,7 @@
+ #include <linux/completion.h>
+ #include <linux/wait.h>
+ #include <linux/irqreturn.h>
++#include <linux/blk-crypto.h>
+ #include <asm/io.h>
  
--	cet->t_dst[0].addr = cpu_to_le32(dma_dst);
-+	cet->t_dst[0].addr = sun8i_ce_desc_addr(ce, dma_dst);
- 	cet->t_dst[0].len = cpu_to_le32(todo / 4);
- 	ce->chanlist[flow].timeout = todo;
- 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-index 93d4985def87a..8fa58f3bb7f86 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-@@ -149,6 +149,7 @@ struct ce_variant {
- 	bool hash_t_dlen_in_bits;
- 	bool prng_t_dlen_in_bytes;
- 	bool trng_t_dlen_in_bytes;
-+	bool needs_word_addresses;
- 	struct ce_clock ce_clks[CE_MAX_CLOCKS];
- 	int esr;
- 	unsigned char prng;
-@@ -241,6 +242,15 @@ struct sun8i_ce_dev {
+ /* registers */
+@@ -291,6 +292,7 @@ struct cqhci_host_ops {
+ 	void (*post_disable)(struct mmc_host *mmc);
+ #ifdef CONFIG_MMC_CRYPTO
+ 	int (*program_key)(struct cqhci_host *cq_host,
++			   const struct blk_crypto_key *bkey,
+ 			   const union cqhci_crypto_cfg_entry *cfg, int slot);
  #endif
+ 	void (*set_tran_desc)(struct cqhci_host *cq_host, u8 **desc,
+diff --git a/drivers/mmc/host/sdhci-msm.c b/drivers/mmc/host/sdhci-msm.c
+index e113b99a3eab..f661d855b77e 100644
+--- a/drivers/mmc/host/sdhci-msm.c
++++ b/drivers/mmc/host/sdhci-msm.c
+@@ -1859,6 +1859,7 @@ static __maybe_unused int sdhci_msm_ice_suspend(struct sdhci_msm_host *msm_host)
+  * vendor-specific SCM calls for this; it doesn't support the standard way.
+  */
+ static int sdhci_msm_program_key(struct cqhci_host *cq_host,
++				 const struct blk_crypto_key *bkey,
+ 				 const union cqhci_crypto_cfg_entry *cfg,
+ 				 int slot)
+ {
+@@ -1866,6 +1867,7 @@ static int sdhci_msm_program_key(struct cqhci_host *cq_host,
+ 	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
+ 	struct sdhci_msm_host *msm_host = sdhci_pltfm_priv(pltfm_host);
+ 	union cqhci_crypto_cap_entry cap;
++	u8 ice_key_size;
+ 
+ 	/* Only AES-256-XTS has been tested so far. */
+ 	cap = cq_host->crypto_cap_array[cfg->crypto_cap_idx];
+@@ -1873,11 +1875,11 @@ static int sdhci_msm_program_key(struct cqhci_host *cq_host,
+ 		cap.key_size != CQHCI_CRYPTO_KEY_SIZE_256)
+ 		return -EINVAL;
+ 
++	ice_key_size = QCOM_ICE_CRYPTO_KEY_SIZE_256;
+ 	if (cfg->config_enable & CQHCI_CRYPTO_CONFIGURATION_ENABLE)
+ 		return qcom_ice_program_key(msm_host->ice,
+ 					    QCOM_ICE_CRYPTO_ALG_AES_XTS,
+-					    QCOM_ICE_CRYPTO_KEY_SIZE_256,
+-					    cfg->crypto_key,
++					    ice_key_size, bkey,
+ 					    cfg->data_unit_size, slot);
+ 	else
+ 		return qcom_ice_evict_key(msm_host->ice, slot);
+diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
+index fbab7fe5c652..6f941d32fffb 100644
+--- a/drivers/soc/qcom/ice.c
++++ b/drivers/soc/qcom/ice.c
+@@ -163,8 +163,8 @@ EXPORT_SYMBOL_GPL(qcom_ice_suspend);
+ 
+ int qcom_ice_program_key(struct qcom_ice *ice,
+ 			 u8 algorithm_id, u8 key_size,
+-			 const u8 crypto_key[], u8 data_unit_size,
+-			 int slot)
++			 const struct blk_crypto_key *bkey,
++			 u8 data_unit_size, int slot)
+ {
+ 	struct device *dev = ice->dev;
+ 	union {
+@@ -183,7 +183,7 @@ int qcom_ice_program_key(struct qcom_ice *ice,
+ 		return -EINVAL;
+ 	}
+ 
+-	memcpy(key.bytes, crypto_key, AES_256_XTS_KEY_SIZE);
++	memcpy(key.bytes, bkey->raw, AES_256_XTS_KEY_SIZE);
+ 
+ 	/* The SCM call requires that the key words are encoded in big endian */
+ 	for (i = 0; i < ARRAY_SIZE(key.words); i++)
+diff --git a/drivers/ufs/core/ufshcd-crypto.c b/drivers/ufs/core/ufshcd-crypto.c
+index f4cc54d82281..34537cbac622 100644
+--- a/drivers/ufs/core/ufshcd-crypto.c
++++ b/drivers/ufs/core/ufshcd-crypto.c
+@@ -18,6 +18,7 @@ static const struct ufs_crypto_alg_entry {
  };
  
-+static inline __le32 sun8i_ce_desc_addr(struct sun8i_ce_dev *dev,
-+					dma_addr_t addr)
-+{
-+	if (dev->variant->needs_word_addresses)
-+		return cpu_to_le32(addr / 4);
-+
-+	return cpu_to_le32(addr);
-+}
-+
- /*
-  * struct sun8i_cipher_req_ctx - context for a skcipher request
-  * @op_dir:		direction (encrypt vs decrypt) for this request
+ static int ufshcd_program_key(struct ufs_hba *hba,
++			      const struct blk_crypto_key *bkey,
+ 			      const union ufs_crypto_cfg_entry *cfg, int slot)
+ {
+ 	int i;
+@@ -27,7 +28,7 @@ static int ufshcd_program_key(struct ufs_hba *hba,
+ 	ufshcd_hold(hba);
+ 
+ 	if (hba->vops && hba->vops->program_key) {
+-		err = hba->vops->program_key(hba, cfg, slot);
++		err = hba->vops->program_key(hba, bkey, cfg, slot);
+ 		goto out;
+ 	}
+ 
+@@ -89,7 +90,7 @@ static int ufshcd_crypto_keyslot_program(struct blk_crypto_profile *profile,
+ 		memcpy(cfg.crypto_key, key->raw, key->size);
+ 	}
+ 
+-	err = ufshcd_program_key(hba, &cfg, slot);
++	err = ufshcd_program_key(hba, key, &cfg, slot);
+ 
+ 	memzero_explicit(&cfg, sizeof(cfg));
+ 	return err;
+@@ -103,7 +104,7 @@ static int ufshcd_clear_keyslot(struct ufs_hba *hba, int slot)
+ 	 */
+ 	union ufs_crypto_cfg_entry cfg = {};
+ 
+-	return ufshcd_program_key(hba, &cfg, slot);
++	return ufshcd_program_key(hba, NULL, &cfg, slot);
+ }
+ 
+ static int ufshcd_crypto_keyslot_evict(struct blk_crypto_profile *profile,
+diff --git a/drivers/ufs/host/ufs-qcom.c b/drivers/ufs/host/ufs-qcom.c
+index cca190d1c577..82584bb318fb 100644
+--- a/drivers/ufs/host/ufs-qcom.c
++++ b/drivers/ufs/host/ufs-qcom.c
+@@ -150,6 +150,7 @@ static inline int ufs_qcom_ice_suspend(struct ufs_qcom_host *host)
+ }
+ 
+ static int ufs_qcom_ice_program_key(struct ufs_hba *hba,
++				    const struct blk_crypto_key *bkey,
+ 				    const union ufs_crypto_cfg_entry *cfg,
+ 				    int slot)
+ {
+@@ -157,6 +158,7 @@ static int ufs_qcom_ice_program_key(struct ufs_hba *hba,
+ 	union ufs_crypto_cap_entry cap;
+ 	bool config_enable =
+ 		cfg->config_enable & UFS_CRYPTO_CONFIGURATION_ENABLE;
++	u8 ice_key_size;
+ 
+ 	/* Only AES-256-XTS has been tested so far. */
+ 	cap = hba->crypto_cap_array[cfg->crypto_cap_idx];
+@@ -164,11 +166,11 @@ static int ufs_qcom_ice_program_key(struct ufs_hba *hba,
+ 	    cap.key_size != UFS_CRYPTO_KEY_SIZE_256)
+ 		return -EOPNOTSUPP;
+ 
++	ice_key_size = QCOM_ICE_CRYPTO_KEY_SIZE_256;
+ 	if (config_enable)
+ 		return qcom_ice_program_key(host->ice,
+ 					    QCOM_ICE_CRYPTO_ALG_AES_XTS,
+-					    QCOM_ICE_CRYPTO_KEY_SIZE_256,
+-					    cfg->crypto_key,
++					    ice_key_size, bkey,
+ 					    cfg->data_unit_size, slot);
+ 	else
+ 		return qcom_ice_evict_key(host->ice, slot);
+diff --git a/include/soc/qcom/ice.h b/include/soc/qcom/ice.h
+index 5870a94599a2..9dd835dba2a7 100644
+--- a/include/soc/qcom/ice.h
++++ b/include/soc/qcom/ice.h
+@@ -7,6 +7,7 @@
+ #define __QCOM_ICE_H__
+ 
+ #include <linux/types.h>
++#include <linux/blk-crypto.h>
+ 
+ struct qcom_ice;
+ 
+@@ -30,8 +31,8 @@ int qcom_ice_resume(struct qcom_ice *ice);
+ int qcom_ice_suspend(struct qcom_ice *ice);
+ int qcom_ice_program_key(struct qcom_ice *ice,
+ 			 u8 algorithm_id, u8 key_size,
+-			 const u8 crypto_key[], u8 data_unit_size,
+-			 int slot);
++			 const struct blk_crypto_key *bkey,
++			 u8 data_unit_size, int slot);
+ int qcom_ice_evict_key(struct qcom_ice *ice, int slot);
+ struct qcom_ice *of_qcom_ice_get(struct device *dev);
+ #endif /* __QCOM_ICE_H__ */
+diff --git a/include/ufs/ufshcd.h b/include/ufs/ufshcd.h
+index df68fb1d4f3f..0c784f0ee836 100644
+--- a/include/ufs/ufshcd.h
++++ b/include/ufs/ufshcd.h
+@@ -366,6 +366,7 @@ struct ufs_hba_variant_ops {
+ 				struct devfreq_dev_profile *profile,
+ 				struct devfreq_simple_ondemand_data *data);
+ 	int	(*program_key)(struct ufs_hba *hba,
++			       const struct blk_crypto_key *bkey,
+ 			       const union ufs_crypto_cfg_entry *cfg, int slot);
+ 	void	(*event_notify)(struct ufs_hba *hba,
+ 				enum ufs_event_type evt, void *data);
 -- 
-2.39.4
+2.43.0
 
