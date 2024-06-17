@@ -1,60 +1,60 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DDC187548
-	for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 07:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC4AE187338
+	for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 07:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718608603; cv=none; b=PTPE2dvLAd/eQyIT+Dl9fJs7M5kngHNSRWRS/qsvMCA59FEcUuVqsK03lGf3x72H10B2RQ33TivV9AChlPyInTdrJTp+kgqIywKuDPPjFPkk7GrDITpozzfVceAtTCNcVUbrrzcIwY5r8pamfl4kF4Cx6YLDKrykDdmSJZXwxXI=
+	t=1718608632; cv=none; b=c59stfF/xL+cv3zk66ZZXMOO/NWLtNdcL2Ih1M0HVcJKFuL45M0bKnlQgLUkhUVHJ4nPNrJ07dUPdREFW6xyt38iBFDvTTzj0AFv3UU+eixPIE7kbvtJd5rxzZCaNqLR/rtdFPxLZg2h87Ohc34u8o9LYe5YXJCV3ptfrOVc03I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718608603; c=relaxed/simple;
-	bh=4Q75hx3NMPqP3RiCyaXM5QYUoSGlpvRDl5P1+SzDraQ=;
+	s=arc-20240116; t=1718608632; c=relaxed/simple;
+	bh=o+XHwU9Ia8s/07sziBXBllYYYQohLrKt+pSCzLXsNMM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Mzwrcb7+2H3r/+ay4JoB1ecPSbyCeWlsVI26UusFLb8ydsfBL1V0dad6UFNwCeLS8OvXPCEAZyyyTBem8y0jCgkgKXA4f5/rncO5wzai1b4pfXzScarlESM508ddUNwe7I9p3Q8HsWshl3dXB6BGkW32URZfIF7LV03mkI056zE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NxOt3/XG; arc=none smtp.client-ip=209.85.208.50
+	 In-Reply-To:Content-Type; b=BnV5kdr3XYZAuhNKVBabUiHbfsUiIzB4LCQItmOJKeIRBZXLjYxBjMOFwwNQP4hSN41WON3d247x6NQnkWwQEFo162IFwVT1djAbqDg2L73AhEj+Z9OkTVCYMLPuuvBqGeirveuxhArO7TU/lT45+UjIRj5FDGbz0Sv3is+xARQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oGtE8xQz; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NxOt3/XG"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-57cbc2a2496so3930901a12.0
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 00:16:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oGtE8xQz"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a6f11a2d18aso524016566b.2
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 00:17:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718608600; x=1719213400; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1718608629; x=1719213429; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=BJmInpMHTh6cMrM70EXCRVJ39PnOorFE9MKZ/AMhJck=;
-        b=NxOt3/XG6WBRX+DA+plrVMb5MVZJK+uo7ibrs0j5nxdkmGf3hqFIRoKfweTJKIw1mb
-         6WWGgYLpydn/hDDd+rctEsgEawc9RMdFp/m3bxAPiqB+QAnE01TeQtadUjVrLhLDwKKJ
-         FNXSXNzy2mlJl96j3wO5nRUN0nbVIj8nsuJ2UYYM9dwKKOMjDztYy2AybxJ15GBUJ7HH
-         lww/M43RmQHUu56y/E4MpD/9Pw8xEdJhQgA3kr+d5xKjbgIvLmh6SyuJibU6jGQZiLJ8
-         SZQr0B+vgfFczEIZsW8n9sxwHsWRaGp0Fp8+TKNQUm+UF62geZblr1psbArmF36M2aFh
-         IIqg==
+        bh=TH4URYsxyi4XBw/ZuFT5IIkP8wEOdDP9rHLksPbeeBg=;
+        b=oGtE8xQzT9EMyryW/3JpBCAmC7evfLTtF0BtXjL8FYtM01IM4UvqETmi8339XV/Sqh
+         YO+mrj8T21jEI996h3/ktt/dWzn5aORipMb5Yze87TOcvu1BbPSlihExol/8KKFw3Zox
+         m1dQOCzr8Nbe3J5LvrLzwYxGyOaJ6yLLM8DGjSsma9M0JgPYs+coaG9Z/LWzCMIgkq2O
+         q9VOwTMz2WaNc/EujdBvDb494QwS8R6oke3KzXvw9FW1cDoOugJOfBmSbk5ZlGwhhfNV
+         hhclDTdGjeLCQ9/F9sVGzuzUI+KuZtC3d9aWfinVyLl0dE6uYMgDUr1SBxd6e1lGni4e
+         8oVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718608600; x=1719213400;
+        d=1e100.net; s=20230601; t=1718608629; x=1719213429;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BJmInpMHTh6cMrM70EXCRVJ39PnOorFE9MKZ/AMhJck=;
-        b=tZnIfvmfpr8+9pi58Ip4GCxW+1/BoxPSDWwvAn6rn6VJRLp6e7KSfSck7CLGs+GlPd
-         mIRmZU1yeUvn5mGFAu3EX+Fn5cqbhBe6sBYE/1nNc13yEzOpYHpxFMGF+4KsmiAHuI7i
-         AXvCBNUySvzWI1h6JT3HpBxBxCRr1ZB3HkvFB3a7I5sRwWcnIrqjg6P2p8H4j3FVrkTx
-         oRcM54E4lolhAAYkA0/vnnGxvER588r6U3WYQw+iQc8RmjjI8TdlkgMOmEpBrLxTraj4
-         dM9789ThrVFsxjpc9tw4Y/ktIOZdBwcgEP1ekU2zenIQOhphBS8lX6huCWD4oCLlU8eO
-         bFbA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOyHH7IAVkq667XCDNtoy0gw+3YiveiDc+JRYGTag1pztBgUvZowY3X6euqv0GUJB8egazyRzGKUA/Y7Fxayx1Phitu2haPVzGO4sG
-X-Gm-Message-State: AOJu0YxEusMYUKmQAHR3JCpZK7seSS30rU9dd8U5iO/uym7pOx84eNH3
-	LFxsutF+HeTtxQ/cX0YHGT8i4WePLVSqyDukaKyJb2zn20lKdPwvYAQW2waOoXI=
-X-Google-Smtp-Source: AGHT+IEuUTXEuZiPLoNBmSWB0lfe3ZIMV2zPASGP2oO5PxwGNRkbJ6ubW5FJQYuqb/Q5/A0xCWJpDg==
-X-Received: by 2002:aa7:c419:0:b0:57c:cba1:444e with SMTP id 4fb4d7f45d1cf-57ccba144dbmr4819619a12.13.1718608599984;
-        Mon, 17 Jun 2024 00:16:39 -0700 (PDT)
+        bh=TH4URYsxyi4XBw/ZuFT5IIkP8wEOdDP9rHLksPbeeBg=;
+        b=CtU6UrCP6nwU9utFJ7KcXZB+BgfdOTDOATTzue+u6gF6DW3nN4NeEWjfznxRXBSeLn
+         2XPcJQ4GCOXhrnGqUuI19u+QkPyGn57IcSxXNP3AFp+k6WAXlrky9Eas5AkBSzNk0Sw3
+         Gn+MuCSwTMtqm/jbQOoUSLtP378HbFhMDvYj02rfb+ggiWVIz9dOw02g6Kci932vMevo
+         2jCX7UxGzoNjqpSbxJmbA75iiOvFoJnCiratKf633gX8bHERwcGn/Ed+a6qwJQ5EzOlI
+         UcEJBKthQMFpFmECt6Yc0g2NwF70I0CnpAIrROoGQJin2rDxKdDWldkh0UMXtDAz2L1J
+         TeoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbelAbIeZcQfETDT/EKqMZUIVJnh6X856a7wdPB0VSu/rZ57nlmAGi/r3EiLXfXvEUlR1xna/slImdNduMI6OqCb32gvOoAu5Dyf77
+X-Gm-Message-State: AOJu0YzwcAOPCH4LJm4FRir0uBnY08rWsErJyANvU+9dX3zuYB5L+tGe
+	8NpUnt3aHtPEm/uy9FtXOtAsmzevpSFGf3HQS3lQgoddbaMvtuiFK7z160ACkvI=
+X-Google-Smtp-Source: AGHT+IGdukI2s05oJDZEKnlcG3/BHW5m/agSv7RDlr6s2QiHsZELrsLCWbtCQtg1w7qD+EIB3Pm5oQ==
+X-Received: by 2002:a17:906:4a4f:b0:a6f:507a:b101 with SMTP id a640c23a62f3a-a6f60cefe44mr582715366b.6.1718608629211;
+        Mon, 17 Jun 2024 00:17:09 -0700 (PDT)
 Received: from [192.168.0.18] ([78.10.207.147])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb72e9943sm6030495a12.51.2024.06.17.00.16.38
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f85352eabsm124715966b.54.2024.06.17.00.17.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jun 2024 00:16:39 -0700 (PDT)
-Message-ID: <a9d8606d-fb4a-4394-bab6-3304e1f8b9e5@linaro.org>
-Date: Mon, 17 Jun 2024 09:16:37 +0200
+        Mon, 17 Jun 2024 00:17:08 -0700 (PDT)
+Message-ID: <8d34e05c-452b-4be6-9a13-df0b0aadb993@linaro.org>
+Date: Mon, 17 Jun 2024 09:17:07 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,8 +62,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 13/15] dt-bindings: crypto: ice: document the hwkm
- property
+Subject: Re: [PATCH v5 00/15] Hardware wrapped key support for qcom ice and
+ ufs
 To: Gaurav Kashyap <quic_gaurkash@quicinc.com>,
  linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org,
  andersson@kernel.org, ebiggers@google.com, neil.armstrong@linaro.org,
@@ -78,7 +78,6 @@ Cc: linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
  herbert@gondor.apana.org.au, psodagud@quicinc.com, quic_apurupa@quicinc.com,
  sonalg@quicinc.com
 References: <20240617005825.1443206-1-quic_gaurkash@quicinc.com>
- <20240617005825.1443206-14-quic_gaurkash@quicinc.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Content-Language: en-US
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
@@ -125,24 +124,17 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240617005825.1443206-14-quic_gaurkash@quicinc.com>
+In-Reply-To: <20240617005825.1443206-1-quic_gaurkash@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 17/06/2024 02:51, Gaurav Kashyap wrote:
-> +  qcom,ice-use-hwkm:
-> +    type: boolean
-> +    description:
-> +      Use the supported Hardware Key Manager (HWKM) in Qualcomm ICE
-> +      to support wrapped keys. Having this entry helps scenarios where
-> +      the ICE hardware supports HWKM, but the Trustzone firmware does
-> +      not have the full capability to use this HWKM and support wrapped
-> +      keys. Not having this entry enabled would make ICE function in
-> +      non-HWKM mode supporting standard keys.
+On 17/06/2024 02:50, Gaurav Kashyap wrote:
+> The fifth iteration of patches that add support to Qualcomm ICE (Inline Crypto Engine) for hardware wrapped keys using Qualcomm Hardware Key Manager (HWKM)
+> 
+> They patches do the following:
+> - Address comments from previous versions (https://lore.kernel.org/all/20240127232436.2632187-1-quic_gaurkash@quicinc.com/)
 
-No changelog, previous comments and discussion ignored.
-
-NAK
+First, that's not true. Second, that's way to vague.
 
 Best regards,
 Krzysztof
