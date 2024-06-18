@@ -1,130 +1,158 @@
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E365A41C89
-	for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 17:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9603156C6B
+	for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 18:11:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718733334; cv=none; b=QjSlRHn5p8XotVRqg0AGBddeIMAtkTJgaKfmEoDSd1EIOCK8aXOxIR53bdy3aTh23LGEaUjveBvQJD2PvODY1flQpxvGhfSfHm9YmFsDSGW024MYh+SzMFppeqQpAgBK0xDbZUeA5wixfyGzFDOGWN5Bgr9SFRzzcB6zOrGrh8Y=
+	t=1718734278; cv=none; b=gazB4BpQGwojh0G3VY8dpPREiRYs0OYQkOoQzU8qAoBJXLAIohDTslPp5ueOl30YWSLGBbDYR4gWk6YCT6EnNcH37XmMrcX7/XqoDSq5vDX+t3cbOK0MklD0lSfBTObz6Qqdh7zgOEwVhZdQWgh+RBA3Ohc+S9i8YPtGnLKxHWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718733334; c=relaxed/simple;
-	bh=DTLUZ676QRfLifqNmaQ9PMFqLKool7WG4v5zx1rImQY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WZX8+rDg0qXAbSxIoEj6bouF8Robjz9pgDQ3WcV1As+xCj6pjVsr+zQuZYyELAbIBhKWvLDnhpvW39hHFpSRC363gR4Aig2zgYHaeIQLSUemXr+A+IfUawp4sV4tH+Bj0SUdt+1p6SytFS2ADJqkeCMljH4kA5RDvW5RxwQRvig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=kB2rkWWt; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
+	s=arc-20240116; t=1718734278; c=relaxed/simple;
+	bh=jBoybDAiPnCVuLiqH6zRlwSnd4KssV1Llwy2FF6H7os=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gta1cjJSAZM824JfghCxEst/9q5AWnjFel+EgE8wvXnAFbWtx8EmHdXbdIOWTD/grbA8utKu91cuLgqhHHG+qFXQGLw/4LLe53kzL+yS2QZnX1Sq43th2TnR0uj7xqXYzUvlxMKzL9ZisXwJSpoiTtBIpUIDzjn04KmPJJocms8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ds8LYlsz; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="kB2rkWWt"
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a6f958a3a45so142193866b.3
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 10:55:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1718733331; x=1719338131; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zTmVnnzmQsdyJIvy7P5jLUWUPiZqPVgC2Gi3EXBWni0=;
-        b=kB2rkWWtppZXitxZLFcDtx+kpT/Qndcko9E0yU6rFWKm0pqGFZkM2b5IbuU8JRKOe7
-         55XWcF1ZAqkciDUsfBtgdElcekhUL8G9arNvwgE+wC1Plt50vLW6uz2n4Mc7cZyU3haY
-         x/yw7tTvwOEwCpXq+vW8Y1NmlMZac/mHcEla66myzgXn8FVuPsUFPX1fT83YGdY9DweS
-         TFneWPMK3g6Kob0idDmuAQs+L9o4Rv8SKoW/OY0YPLt4lWCvRgqI9FQOIGKyOm5YYmxj
-         yqiuXK9ljx4+Qyxa4Uj80//xwuWtlzBDsQhk2SHodrUqilTla3eOibexHNV9yds/F9J6
-         il/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718733331; x=1719338131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zTmVnnzmQsdyJIvy7P5jLUWUPiZqPVgC2Gi3EXBWni0=;
-        b=biP2sHizKuIC4tlWau7mW469VhsJlZpdhy3IRzRBq6CfHifRaBI25zeGFTOrDmPcxu
-         vQ3dqj7X/jvxGJnapLCqe4pHDWpjCW5hBVDaqPVsQFksR3TUg9Y1oTQZVUPgFnnOxIdt
-         tmOVvWiQ8FuUSf/wOCAsEQbH+WNBJj7Wvwn7MXwkM/hsDn8p/W/KBa2gYM+c6E7+hGRV
-         ZZT+2OPlIDEUZtyfvEXQ/DvyXWg03dgH7QhvO6AEZtIg/e6CjxnZisCXaFvs9ZhhB8Gr
-         /VM8hf8Uzeq54BSjwBiD0C69DdwhgelyPMaXBWtB9oml6WuRxEk9NbgvVSkJ62/la1pG
-         EO2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXD0m+JDBsMXQLsGi6Cm82HwbwO2zR6UTcliKAF6So9AJ6+hqu3rYfZ/0zszOUVtTJMnmlFp0wmGQ9VoG8qGNEIXJ32OsLLeFXnyQrX
-X-Gm-Message-State: AOJu0Ywz1vjkUYRtLEyV48PgbgCq5dPP/79QkFPTkmKVfy2W1urzf6IF
-	iPoUj+KYWqPmRWhHeZUqerX+4r+VvDjF7ybkfuj5Y9CLqUbtUc37MhtIKigYGPWkLZsFNvDLLHE
-	DXwKYqz3l0XpEY1/iP3gw7JCPGY7xVNhHQiWy
-X-Google-Smtp-Source: AGHT+IGDO9MunPaTLk2H5XQt/NMq7+U7oPvCv8jQC1cNGWo0/s+agXuJNN4zhVSHAUJqe1AspkjtzsT7TrN2MZj0MyE=
-X-Received: by 2002:a17:906:c10d:b0:a6f:cce:4457 with SMTP id
- a640c23a62f3a-a6fab7dc751mr15171166b.71.1718733331107; Tue, 18 Jun 2024
- 10:55:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ds8LYlsz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718734275; x=1750270275;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jBoybDAiPnCVuLiqH6zRlwSnd4KssV1Llwy2FF6H7os=;
+  b=ds8LYlszbmO3rLRe5ht7leMISHCk24bX3Iwud5nK8F7qFt4BXtVz6pam
+   mS/0k+kMGb38pKarlwgmz/d4LesoN9tzMxq7lNcJvcG9RUQmpbfIXhxJA
+   OM9zxkqn8pHIhM4q0G3aBw/QKnbeGWkIAzjBZ5zeU0DyDqqPq+aZBKVo0
+   Dt5HASlvxwXDIaJ5Y4DlKhcbbr9RMOuL6DuqGrinkkeiRtGdvymxbdtGV
+   8AXCdZuIjqtIFUMejVImam4LdmmvRN2waiEERobMHIN+80gnLobe+wB2j
+   dnmDbDiANCJ1he/rO3dcm04QeguisVpggXiPMVVs75Owm5mZ6l7mLb/Ir
+   g==;
+X-CSE-ConnectionGUID: Hn/duE2/QOerMfdbVflSBw==
+X-CSE-MsgGUID: tGJekwdfQJeWpgvEVj6Ynw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11107"; a="15767048"
+X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
+   d="scan'208";a="15767048"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2024 11:11:15 -0700
+X-CSE-ConnectionGUID: kp9EhoKaQFOUwmJ2WKfSvg==
+X-CSE-MsgGUID: A7ZjQMqtRrSImsXL+ggvEg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
+   d="scan'208";a="46594168"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 18 Jun 2024 11:11:13 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sJdIV-0005nq-0i;
+	Tue, 18 Jun 2024 18:11:11 +0000
+Date: Wed, 19 Jun 2024 02:10:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
+	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com, bhoomikak@vayavyalabs.com,
+	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+Subject: Re: [PATCH v4 7/7] Enable Driver compilation in crypto Kconfig and
+ Makefile
+Message-ID: <202406190133.NR6c5fKB-lkp@intel.com>
+References: <20240618042750.485720-8-pavitrakumarm@vayavyalabs.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240614190646.2081057-1-Jason@zx2c4.com> <20240614190646.2081057-5-Jason@zx2c4.com>
- <CALCETrVQtQO87U3SEgQyHfkNKsrcS8PjeZrsy2MPAU7gQY70XA@mail.gmail.com> <ZnDQ-HQH8NlmCcIr@zx2c4.com>
-In-Reply-To: <ZnDQ-HQH8NlmCcIr@zx2c4.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Tue, 18 Jun 2024 10:55:17 -0700
-Message-ID: <CALCETrWzXQMXjvL+nGq-+aLVUeiABJ46DACtLnrLXxmwh9s_dg@mail.gmail.com>
-Subject: Re: [PATCH v17 4/5] random: introduce generic vDSO getrandom() implementation
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev, tglx@linutronix.de, 
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org, x86@kernel.org, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>, "Carlos O'Donell" <carlos@redhat.com>, 
-	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>, 
-	Christian Brauner <brauner@kernel.org>, David Hildenbrand <dhildenb@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240618042750.485720-8-pavitrakumarm@vayavyalabs.com>
 
-On Mon, Jun 17, 2024 at 5:12=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com=
-> wrote:
->
-> Hi Andy,
->
-> On Mon, Jun 17, 2024 at 05:06:22PM -0700, Andy Lutomirski wrote:
-> > On Fri, Jun 14, 2024 at 12:08=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c=
-4.com> wrote:
-> > >
-> > > Provide a generic C vDSO getrandom() implementation, which operates o=
-n
-> > > an opaque state returned by vgetrandom_alloc() and produces random by=
-tes
-> > > the same way as getrandom(). This has a the API signature:
-> > >
-> > >   ssize_t vgetrandom(void *buffer, size_t len, unsigned int flags, vo=
-id *opaque_state);
-> >
-> > Last time around, I mentioned some potential issues with this function
-> > signature, and I didn't see any answer.  My specific objection was to
-> > the fact that the caller passes in a pointer but not a length, and
-> > this potentially makes reasoning about memory safety awkward,
-> > especially if anything like CRIU is involved.
->
-> Oh, I understood this backwards last time - I thought you were
-> criticizing the size_t len argument, which didn't make any sense.
->
-> Re-reading now, what you're suggesting is that I add an additional
-> argument called `size_t opaque_len`, and then the implementation does
-> something like:
->
->     if (opaque_len !=3D sizeof(struct vgetrandom_state))
->         goto fallback_syscall;
->
-> With the reasoning that falling back to syscall is better than returning
-> -EINVAL, because that could happen in a natural way due to CRIU. In
-> contrast, your objection to opaque_state not being aligned falling back
-> to the syscall was that it should never happen ever, so -EFAULT is more
-> fitting.
->
-> Is that correct?
+Hi Pavitrakumar,
 
-Yes, exactly.
+kernel test robot noticed the following build errors:
 
-My alternative suggestion, which is far less well formed, would be to
-make the opaque argument be somehow not pointer-like and be more of an
-opaque handle.  So it would be uintptr_t instead of void *, and the
-user API would be built around the user getting a list of handles
-instead of a block of memory.
+[auto build test ERROR on 1dcf865d3bf5bff45e93cb2410911b3428dacb78]
 
-The benefit would be a tiny bit less overhead (potentially), but the
-API would need substantially more rework.  I'm not convinced that this
-would be worthwhile.
+url:    https://github.com/intel-lab-lkp/linux/commits/Pavitrakumar-M/Add-SPAcc-Skcipher-support/20240618-123149
+base:   1dcf865d3bf5bff45e93cb2410911b3428dacb78
+patch link:    https://lore.kernel.org/r/20240618042750.485720-8-pavitrakumarm%40vayavyalabs.com
+patch subject: [PATCH v4 7/7] Enable Driver compilation in crypto Kconfig and Makefile
+config: arc-randconfig-001-20240619 (https://download.01.org/0day-ci/archive/20240619/202406190133.NR6c5fKB-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240619/202406190133.NR6c5fKB-lkp@intel.com/reproduce)
 
---Andy
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406190133.NR6c5fKB-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from <command-line>:
+   In function 'spacc_sg_chain',
+       inlined from 'fixup_sg' at drivers/crypto/dwc-spacc/spacc_core.c:1030:4,
+       inlined from 'spacc_sgs_to_ddt' at drivers/crypto/dwc-spacc/spacc_core.c:1059:16:
+>> include/linux/compiler_types.h:487:45: error: call to '__compiletime_assert_234' declared with attribute error: BUILD_BUG_ON failed: IS_ENABLED(CONFIG_DEBUG_SG)
+     487 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                                             ^
+   include/linux/compiler_types.h:468:25: note: in definition of macro '__compiletime_assert'
+     468 |                         prefix ## suffix();                             \
+         |                         ^~~~~~
+   include/linux/compiler_types.h:487:9: note: in expansion of macro '_compiletime_assert'
+     487 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+         |                                     ^~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+      50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+         |         ^~~~~~~~~~~~~~~~
+   drivers/crypto/dwc-spacc/spacc_core.c:998:9: note: in expansion of macro 'BUILD_BUG_ON'
+     998 |         BUILD_BUG_ON(IS_ENABLED(CONFIG_DEBUG_SG));
+         |         ^~~~~~~~~~~~
+   In function 'spacc_sg_chain',
+       inlined from 'fixup_sg' at drivers/crypto/dwc-spacc/spacc_core.c:1030:4,
+       inlined from 'spacc_sg_to_ddt' at drivers/crypto/dwc-spacc/spacc_core.c:1109:15:
+>> include/linux/compiler_types.h:487:45: error: call to '__compiletime_assert_234' declared with attribute error: BUILD_BUG_ON failed: IS_ENABLED(CONFIG_DEBUG_SG)
+     487 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                                             ^
+   include/linux/compiler_types.h:468:25: note: in definition of macro '__compiletime_assert'
+     468 |                         prefix ## suffix();                             \
+         |                         ^~~~~~
+   include/linux/compiler_types.h:487:9: note: in expansion of macro '_compiletime_assert'
+     487 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+         |                                     ^~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+      50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+         |         ^~~~~~~~~~~~~~~~
+   drivers/crypto/dwc-spacc/spacc_core.c:998:9: note: in expansion of macro 'BUILD_BUG_ON'
+     998 |         BUILD_BUG_ON(IS_ENABLED(CONFIG_DEBUG_SG));
+         |         ^~~~~~~~~~~~
+
+
+vim +/__compiletime_assert_234 +487 include/linux/compiler_types.h
+
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  473  
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  474  #define _compiletime_assert(condition, msg, prefix, suffix) \
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  475  	__compiletime_assert(condition, msg, prefix, suffix)
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  476  
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  477  /**
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  478   * compiletime_assert - break build and emit msg if condition is false
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  479   * @condition: a compile-time constant condition to check
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  480   * @msg:       a message to emit if condition is false
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  481   *
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  482   * In tradition of POSIX assert, this macro will break the build if the
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  483   * supplied condition is *false*, emitting the supplied error message if the
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  484   * compiler has support to do so.
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  485   */
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  486  #define compiletime_assert(condition, msg) \
+eb5c2d4b45e3d2 Will Deacon 2020-07-21 @487  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  488  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
