@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C901147A5D;
-	Tue, 18 Jun 2024 06:33:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8442E40D;
+	Tue, 18 Jun 2024 06:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718692419; cv=none; b=Z6KV07ylNLvorG3TugBlGkq1/tJvy+01ekJ1llXfxboodgXWilqqym5bCeohzpeZh+G/QKFxDSaCYAjkr8ZkVz1k5pyrlOwgPiuhqnvPVabADx43Jvl0tqyfL1GukbaxqJo5EYGRB2RBb6g/0f01+jhUfGqJjUgPGbL+oL0EYVU=
+	t=1718692454; cv=none; b=VPVtjAMSYLdUVnSfyYRlmYXkgNkOjAN3FQj9bzeLN+sCPKPQmcKaUDR6pk5+fcQ+SQ6xD9vzoNQvwCNX75I28o6vIA1WEsc/n/Y/grJfGsZlXlUoBfsklllIIRvxXFI65+lmCtZLOOitVO95G8yEm8BW0I0TYFR8/XMQ/K0FZ2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718692419; c=relaxed/simple;
-	bh=6UP/K959axemEcb1LB824cZTO95q5p2JBUpnrMNn1AI=;
+	s=arc-20240116; t=1718692454; c=relaxed/simple;
+	bh=X+YCmxyDpp1kKNyytaJBAA1THb47Ms6nUhaFh0+FF4g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CRDrUbbg0XuSkk3TpAw7QbZzPzE1OOWOc9nllNaZcSH8RUbd7g9ccdVovDHlBHFkJozOcj2fsvlc1OLf/+Eq3ndQxKfupwE0FOjRyN/D8mhqCEL//8QieizSrLOcV5qYvEZ8qBzrEZd8d5HGBy3W9jGo5wm/HYSyTpuHyD0fZRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WP3GHC4U; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=IlEVS0g/PhlzNZ60CFQK9zK0zoxp3ldtPcO0C6ASyP9BZl4yHyIjIhmbkHQnqUZVBQCnS3bR8GC6kb+SO+5Lt4l3CoMTV5IVudj68l+18QtOqoWmTzr3zdTCaGIxRSSgICdJz2OMF3yVaIzJLvJ7rT7VsevUx+dbZlDd6SkQvUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r6WxNuWS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WP3GHC4U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FF1BC3277B;
-	Tue, 18 Jun 2024 06:33:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r6WxNuWS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62AF4C3277B;
+	Tue, 18 Jun 2024 06:34:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718692419;
-	bh=6UP/K959axemEcb1LB824cZTO95q5p2JBUpnrMNn1AI=;
+	s=k20201202; t=1718692453;
+	bh=X+YCmxyDpp1kKNyytaJBAA1THb47Ms6nUhaFh0+FF4g=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WP3GHC4U9tqbs0tgMihIWfU6chQK41E1GevUnUYB3gwVUG04DhnTXotnN6SS4RW+5
-	 dDkqLcr0zt3/WwJLot6IJMpFPKveMh6UvmSmY0EzN2ImPMvga6KZK7Y2iofl0QWhNm
-	 3mBDuRtjDSkn4BLoChW7pKNr9MO2UAA3nAGpECJURFtPh26Z+av8SwAbtriXgXouQQ
-	 lYhachc8NbUJOIcsn69BA0CMKR7zXJI/FjFmXfuhtYFsLCll1LRVT476H/6H1PtU/X
-	 7mkmpv4gZoweuwIfDMGhc/bAppIknlR/GGYkKnnSqQwXPaxHmpRCCJPq06QQ668Ck3
-	 PKamiUZ1GrrkQ==
-Message-ID: <53fffe4b-d306-4707-aaad-cefa9beaa07c@kernel.org>
-Date: Tue, 18 Jun 2024 08:33:33 +0200
+	b=r6WxNuWSw3WI6Tq49PjXHl2VK31SaXvvNnWiVHxW6nxap5xLblgUdBoZR1mwHim52
+	 gpb2Jhpa6JYwR1PA4nRBnpJ3yo1yIcNm6hy7/lddnRXKz+UMl62bRejjXWDuKBZuIv
+	 EkTWR9Kz63jigQ4AtI2R9pkCap5lpaMwz6i6+A5265OnkyKz2la1NnGKecBTM9oGVR
+	 b3NZ3eVN+sm2j4+sx8WdjF5W8c9XndTIrTxDjK8cYbBM8EF2C68HXhJOtAAugfznOq
+	 CUo33/o9AYdWhU21SLGHOOHaINB7FuylQsBSPLwpqOOVAGwO54+gv/+vzthA6iZPn4
+	 Eai1XExCiQUtQ==
+Message-ID: <e6b0a519-677c-4de3-9c04-da3f71177698@kernel.org>
+Date: Tue, 18 Jun 2024 08:34:07 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,8 +35,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/7] dt-bindings: rng: Add Exynos850 support to
- exynos-trng
+Subject: Re: [PATCH 3/7] hwrng: exynos: Improve coding style
 To: Sam Protsenko <semen.protsenko@linaro.org>,
  =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -47,7 +46,7 @@ Cc: Olivia Mackall <olivia@selenic.com>,
  linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <20240618003743.2975-1-semen.protsenko@linaro.org>
- <20240618003743.2975-3-semen.protsenko@linaro.org>
+ <20240618003743.2975-4-semen.protsenko@linaro.org>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -93,34 +92,20 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240618003743.2975-3-semen.protsenko@linaro.org>
+In-Reply-To: <20240618003743.2975-4-semen.protsenko@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 18/06/2024 02:37, Sam Protsenko wrote:
-> The TRNG block in Exynos850 is pretty much the same as in Exynos5250,
-> but there are two clocks that has to be controlled to make it work:
->   1. Functional (operating) clock: called ACLK in Exynos850, the same as
->      "secss" clock in Exynos5250
->   2. Interface (bus) clock: called PCLK in Exynos850. It has to be
->      enabled in order to access TRNG registers
+> Fix obvious style issues. Some of those were found with checkpatch, and
+> some just contradict the kernel coding style guide.
 > 
-> Document Exynos850 compatible and the related clock changes, and provide
-> a corresponding example for Exynos850 TRNG node with ACLK and PCLK
-> clocks.
+> No functional change.
 > 
+> Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
+> ---
 
-...
-
-> +
-> +    rng@12081400 {
-> +        compatible = "samsung,exynos850-trng";
-> +        reg = <0x12081400 0x100>;
-> +        clocks = <&cmu_core CLK_GOUT_SSS_ACLK>, <&cmu_core CLK_GOUT_SSS_PCLK>;
-> +        clock-names = "secss", "pclk";
-> +    };
-
-No need for new example for difference in one property only.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
