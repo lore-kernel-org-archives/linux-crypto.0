@@ -1,57 +1,57 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7F3176AB4
-	for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 20:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C968A1741EC
+	for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 20:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718743529; cv=none; b=cr/9t8WkTiAOFnIGAsQy4ZQy8+cLUhSWEsN4/rBlGDpYRtJNds8KDd/QWPaFswM3H3zIMQN1t6EPiWt3pP1E8z0Qn3eaDceR708UlL9fUB12RBhrlp2wHZMB/Q5I7ogqGxfbc1FggKob7OKs+Lt9935ccUSKO7RL7x+/Dlqe3No=
+	t=1718743529; cv=none; b=NsTTlFnU8ObiPiHUwerCErq0/XbkFHao1hQNBaTgGUMyP1z6LdvBaTrYdOaFPM3G7p51yfWUu5liIfaO32Nn8Of4ltfGbLXKMmrWnDzJtKKxmkEGL03+5T3OCwz8EtoEmVdQQJ/pwKDYVJXlgNXsit3e97sWNMGPxJTWvfW4YPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718743529; c=relaxed/simple;
-	bh=sT0sL+RgnVg+AcQBnBOs3VMjWsZ2hzrqXKz/8cJCc5Q=;
+	bh=5evvsN4at6BMrRF8OVlHRN4HocF8R+R/ozNBsMGh+IY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Wg85xIMbI0W6HOkwt/3d/qib5KSnAxcwsVRrZbq7m0E6qZmkno13x6uHIYAlTcXDG+gxcVDDmB6G6psZY4IyEqaC8wYQ7Azj2DQifbb4h+a6lfBKrm7vB8mHdgLRZephhIQrNTsiUzn+ZdhC+w2pCUS2/Z7ASLZv9YoTEZFpxns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tFfjpUMC; arc=none smtp.client-ip=209.85.210.46
+	 MIME-Version:Content-Type; b=R08R6zZtoFlgxuJ6JHgCa9Xi+L03s8kRFYAXeR33concwoM7I8+9xjgRVOEtlz/AsC+VeW1NnYdwrYUsG4n2EfEsVTVwbST8KXRQQl0LEPT0WTFnXxfTvIdsFiin7iInr62X+iyTeSLRNdA3mNJ9SHwHBYI/NH21xH6QOh3Z5CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=P+u5z204; arc=none smtp.client-ip=209.85.161.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tFfjpUMC"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6f9a4f9923aso3263372a34.0
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 13:45:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P+u5z204"
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5bdbbc37664so2842184eaf.2
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 13:45:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1718743526; x=1719348326; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0aRxOAD2Qgk5Lly7g3t86NVGFyqjyCN/MyLZiIAVgHs=;
-        b=tFfjpUMCoTEIxTtYITK2ouVif7oQGDFsXuGPjH5Z2yG/pst/U9bLYzawApH1QPvjY+
-         jMH2f/umE6iK9aSiNKWSAOitylJDmkzJ4+oX+Qgd3OUhRVNVshWc0Sv352thIostt54N
-         +d1INApBiKOKOCKxVeG/Sy7A90BACt+TumHrMNxkuf+6To+2CyQS1/5iO2XkbNw5ydqG
-         rE8mF+AAo1xoil1fssubZ2Dk2XY+LJVnf0gzDUq6iGBYMyVv6hGM9OwTJuy0B8IVpVEb
-         nIq+TQ0GR4aMTEq7236TuTD5hrptq08T6dzcVpXoxvwB+4xuxnUmn+iUmOCc4I3zY2fA
-         /oVA==
+        bh=/1x8MC9aiceHsiOgibtWuSN+CH2pLi0RJoi6RQX0En0=;
+        b=P+u5z204Qbm0CSzbkkRSSWm6QgaoJEiCADHtZd2mJpGxmAZbnuOn8GQl4y+vhV0l1M
+         Rj/MC9pP0HKEWkM9KS7cl/2TVQOtMVglIb/LasirBhpglfUZSqSy5OlP5Dj1uULziVkq
+         OVVygyqtxjnBwDJCOdpMb8r1WSO64izFnXGuOeQMXo1Z4OWOOHj1DmqVkjYaqydG055o
+         8iGVCYECz4n2BaxdqPCtkNa49Jh7LKY9Trkpzq+7B2P47gMbCQhf71gjvd2ZWv63dwSv
+         sOjtDnrl8PO2Bs32WxwY9OA0PhAo3cqxGdIWI19U1K6XubI7jthFN9YcIWMsSsmRGryR
+         E0ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1718743526; x=1719348326;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0aRxOAD2Qgk5Lly7g3t86NVGFyqjyCN/MyLZiIAVgHs=;
-        b=aSa7WZ6K7tMPca3EEUBpgEkE4zRTyvMxJSM0CvwDJyeTHmBWwAzsMx4FEQ9AbEwPK+
-         usmYY6cyDyZI2VRNaWOs3DW6JzNGA5cd6jXSB/7Ck+DkKS2sNVThmeWftkL7clGqputJ
-         cmZL3YERF/WuN9wdqFjjdBZrZN3n6dyfqeY2htiMzmlQzIgbEdPkibhgztaG1+nnpss3
-         2VV+bdTgb96wdeELs4YhfoDuq58cnvfmW+bKcLKFNfuDvqC0EECcutjBqP2A2zRnAEKx
-         ezVMYbZcTaSTsn+yHEWKVRFX3//QiqykiGdWoP35Jsv0b/XJJ2SoTGL/6KoCIUkJFV0O
-         ti5w==
-X-Forwarded-Encrypted: i=1; AJvYcCUp91i5mTWuxBokT1Z13btJn4dexd/wVbcDAmobiEcS5dzUSCO35CUVArHOiCK+LkbmzHe14mziwhXKBuT9uUIahuKn7+STQxyxhIcT
-X-Gm-Message-State: AOJu0YyID92JLJIhvJz0i/Xh4Qn67Z+U6slVkw4XhuIivBgoscmihUMx
-	xSq89VIpEcFQeazqN3M4QV/Wzx8PALTU9sD37eilMyOBtJKPL1eJGwg2xcPKxeg=
-X-Google-Smtp-Source: AGHT+IFsyuXPTcRk/B3lUM1O8/TQZfkRs+GDfXqj2NsRA9yWpG9ZWVrUspoi5rnxH+NBKKi8Gu9VmQ==
-X-Received: by 2002:a05:6830:1d91:b0:6f9:c989:261c with SMTP id 46e09a7af769-700766349damr883708a34.33.1718743526611;
-        Tue, 18 Jun 2024 13:45:26 -0700 (PDT)
+        bh=/1x8MC9aiceHsiOgibtWuSN+CH2pLi0RJoi6RQX0En0=;
+        b=KNhaiVAylkchm8sWu1+GQ4n3psDg3E11k6AvWTrYry0yTp+o4pWMF9LvMMiuXwUeit
+         2+qxUt0Wpde2Jrs4kB4J8T9iGeiX5XWMMaixPIz0qGCWeieHtcpZT3oFNh4IgKnwRDAb
+         4fr522lRPCuNWggJSLTnd9YQlR6qJ+EhbhvNDbePbuEFHKXpMjpofxhQ5eCZ8KZkzQ80
+         5MyrD0avklnGUSgTxFw8evw13ShE1E4m+12WtkFfpk8nNQzNS0geA/jViNZYr1SJjvbD
+         iXW/niqVvBcB2q10Pk1n58zrj57M22XmfKGpEBh0fGjg7CiBTa2dGOgrqXRdVgij011j
+         M0Ew==
+X-Forwarded-Encrypted: i=1; AJvYcCVrtf5PxMjiKN50z+Wzng2r12YF+eQT4MqEpM+MwfOjBCKX5Q4Gy7/mkHfupLA9Lff11jLNl3boEgw5xF+aEZQK50yRQjsaLVVBpTYs
+X-Gm-Message-State: AOJu0YwMmxOPbDO21x0EG9QP4fKG2dHT441tj6+mjNSMImliTL0SwJIo
+	QjTuva2SdFo5A9ue5Rlh5rwnxUjRZr9o1QB0DfYa44ciVP3P2EmOzJGzSnZllaE=
+X-Google-Smtp-Source: AGHT+IHoIqS42kE6h2gsiMCU58NN0xvPF/vSFb4SrpjHZNqEyhPtxGPcglOULs7EmkuqnqSorllKtg==
+X-Received: by 2002:a4a:240f:0:b0:5c1:a296:66b5 with SMTP id 006d021491bc7-5c1adc0715emr917189eaf.9.1718743525910;
+        Tue, 18 Jun 2024 13:45:25 -0700 (PDT)
 Received: from localhost ([136.62.192.75])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-6fb97051e68sm1692599a34.80.2024.06.18.13.45.26
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5bd5f2a1801sm1432107eaf.37.2024.06.18.13.45.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jun 2024 13:45:26 -0700 (PDT)
+        Tue, 18 Jun 2024 13:45:25 -0700 (PDT)
 From: Sam Protsenko <semen.protsenko@linaro.org>
 To: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
@@ -66,9 +66,9 @@ Cc: Anand Moon <linux.amoon@gmail.com>,
 	devicetree@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/7] hwrng: exynos: Use devm_clk_get_enabled() to get the clock
-Date: Tue, 18 Jun 2024 15:45:19 -0500
-Message-Id: <20240618204523.9563-4-semen.protsenko@linaro.org>
+Subject: [PATCH v2 2/7] hwrng: exynos: Improve coding style
+Date: Tue, 18 Jun 2024 15:45:18 -0500
+Message-Id: <20240618204523.9563-3-semen.protsenko@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240618204523.9563-1-semen.protsenko@linaro.org>
 References: <20240618204523.9563-1-semen.protsenko@linaro.org>
@@ -78,73 +78,133 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Use devm_clk_get_enabled() helper instead of calling devm_clk_get() and
-then clk_prepare_enable(). It simplifies the error handling and makes
-the code more compact. Also use dev_err_probe() to handle possible
--EPROBE_DEFER errors if the clock is not available yet.
+Fix obvious style issues. Some of those were found with checkpatch, and
+some just contradict the kernel coding style guide.
+
+No functional change.
 
 Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
 Changes in v2:
-  - No changes (it's a new patch added in v2)
+  - Added Krzysztof's R-b tag
 
- drivers/char/hw_random/exynos-trng.c | 21 ++++-----------------
- 1 file changed, 4 insertions(+), 17 deletions(-)
+ drivers/char/hw_random/exynos-trng.c | 61 +++++++++++++---------------
+ 1 file changed, 29 insertions(+), 32 deletions(-)
 
 diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
-index 88a5088ed34d..91c210d80a3d 100644
+index 0ed5d22fe667..88a5088ed34d 100644
 --- a/drivers/char/hw_random/exynos-trng.c
 +++ b/drivers/char/hw_random/exynos-trng.c
-@@ -134,32 +134,23 @@ static int exynos_trng_probe(struct platform_device *pdev)
- 		goto err_pm_get;
- 	}
+@@ -23,45 +23,41 @@
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
  
--	trng->clk = devm_clk_get(&pdev->dev, "secss");
-+	trng->clk = devm_clk_get_enabled(&pdev->dev, "secss");
- 	if (IS_ERR(trng->clk)) {
--		ret = PTR_ERR(trng->clk);
--		dev_err(&pdev->dev, "Could not get clock.\n");
--		goto err_clock;
--	}
+-#define EXYNOS_TRNG_CLKDIV         (0x0)
 -
--	ret = clk_prepare_enable(trng->clk);
--	if (ret) {
--		dev_err(&pdev->dev, "Could not enable the clk.\n");
-+		ret = dev_err_probe(&pdev->dev, PTR_ERR(trng->clk),
-+				    "Could not get clock");
- 		goto err_clock;
- 	}
- 
- 	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
- 	if (ret) {
- 		dev_err(&pdev->dev, "Could not register hwrng device.\n");
--		goto err_register;
-+		goto err_clock;
- 	}
- 
- 	dev_info(&pdev->dev, "Exynos True Random Number Generator.\n");
- 
- 	return 0;
- 
--err_register:
--	clk_disable_unprepare(trng->clk);
+-#define EXYNOS_TRNG_CTRL           (0x20)
+-#define EXYNOS_TRNG_CTRL_RNGEN     BIT(31)
 -
- err_clock:
- 	pm_runtime_put_noidle(&pdev->dev);
+-#define EXYNOS_TRNG_POST_CTRL      (0x30)
+-#define EXYNOS_TRNG_ONLINE_CTRL    (0x40)
+-#define EXYNOS_TRNG_ONLINE_STAT    (0x44)
+-#define EXYNOS_TRNG_ONLINE_MAXCHI2 (0x48)
+-#define EXYNOS_TRNG_FIFO_CTRL      (0x50)
+-#define EXYNOS_TRNG_FIFO_0         (0x80)
+-#define EXYNOS_TRNG_FIFO_1         (0x84)
+-#define EXYNOS_TRNG_FIFO_2         (0x88)
+-#define EXYNOS_TRNG_FIFO_3         (0x8c)
+-#define EXYNOS_TRNG_FIFO_4         (0x90)
+-#define EXYNOS_TRNG_FIFO_5         (0x94)
+-#define EXYNOS_TRNG_FIFO_6         (0x98)
+-#define EXYNOS_TRNG_FIFO_7         (0x9c)
+-#define EXYNOS_TRNG_FIFO_LEN       (8)
+-#define EXYNOS_TRNG_CLOCK_RATE     (500000)
+-
++#define EXYNOS_TRNG_CLKDIV		0x0
++
++#define EXYNOS_TRNG_CTRL		0x20
++#define EXYNOS_TRNG_CTRL_RNGEN		BIT(31)
++
++#define EXYNOS_TRNG_POST_CTRL		0x30
++#define EXYNOS_TRNG_ONLINE_CTRL		0x40
++#define EXYNOS_TRNG_ONLINE_STAT		0x44
++#define EXYNOS_TRNG_ONLINE_MAXCHI2	0x48
++#define EXYNOS_TRNG_FIFO_CTRL		0x50
++#define EXYNOS_TRNG_FIFO_0		0x80
++#define EXYNOS_TRNG_FIFO_1		0x84
++#define EXYNOS_TRNG_FIFO_2		0x88
++#define EXYNOS_TRNG_FIFO_3		0x8c
++#define EXYNOS_TRNG_FIFO_4		0x90
++#define EXYNOS_TRNG_FIFO_5		0x94
++#define EXYNOS_TRNG_FIFO_6		0x98
++#define EXYNOS_TRNG_FIFO_7		0x9c
++#define EXYNOS_TRNG_FIFO_LEN		8
++#define EXYNOS_TRNG_CLOCK_RATE		500000
  
-@@ -171,10 +162,6 @@ static int exynos_trng_probe(struct platform_device *pdev)
+ struct exynos_trng_dev {
+-	struct device    *dev;
+-	void __iomem     *mem;
+-	struct clk       *clk;
+-	struct hwrng rng;
++	struct device	*dev;
++	void __iomem	*mem;
++	struct clk	*clk;
++	struct hwrng	rng;
+ };
+ 
+ static int exynos_trng_do_read(struct hwrng *rng, void *data, size_t max,
+ 			       bool wait)
+ {
+-	struct exynos_trng_dev *trng;
++	struct exynos_trng_dev *trng = (struct exynos_trng_dev *)rng->priv;
+ 	int val;
+ 
+ 	max = min_t(size_t, max, (EXYNOS_TRNG_FIFO_LEN * 4));
+-
+-	trng = (struct exynos_trng_dev *)rng->priv;
+-
+ 	writel_relaxed(max * 8, trng->mem + EXYNOS_TRNG_FIFO_CTRL);
+ 	val = readl_poll_timeout(trng->mem + EXYNOS_TRNG_FIFO_CTRL, val,
+ 				 val == 0, 200, 1000000);
+@@ -122,7 +118,7 @@ static int exynos_trng_probe(struct platform_device *pdev)
+ 
+ 	trng->rng.init = exynos_trng_init;
+ 	trng->rng.read = exynos_trng_do_read;
+-	trng->rng.priv = (unsigned long) trng;
++	trng->rng.priv = (unsigned long)trng;
+ 
+ 	platform_set_drvdata(pdev, trng);
+ 	trng->dev = &pdev->dev;
+@@ -175,7 +171,7 @@ static int exynos_trng_probe(struct platform_device *pdev)
  
  static void exynos_trng_remove(struct platform_device *pdev)
  {
--	struct exynos_trng_dev *trng = platform_get_drvdata(pdev);
--
--	clk_disable_unprepare(trng->clk);
--
- 	pm_runtime_put_sync(&pdev->dev);
- 	pm_runtime_disable(&pdev->dev);
+-	struct exynos_trng_dev *trng =  platform_get_drvdata(pdev);
++	struct exynos_trng_dev *trng = platform_get_drvdata(pdev);
+ 
+ 	clk_disable_unprepare(trng->clk);
+ 
+@@ -204,7 +200,7 @@ static int exynos_trng_resume(struct device *dev)
  }
+ 
+ static DEFINE_SIMPLE_DEV_PM_OPS(exynos_trng_pm_ops, exynos_trng_suspend,
+-			 exynos_trng_resume);
++				exynos_trng_resume);
+ 
+ static const struct of_device_id exynos_trng_dt_match[] = {
+ 	{
+@@ -225,6 +221,7 @@ static struct platform_driver exynos_trng_driver = {
+ };
+ 
+ module_platform_driver(exynos_trng_driver);
++
+ MODULE_AUTHOR("Łukasz Stelmach");
+ MODULE_DESCRIPTION("H/W TRNG driver for Exynos chips");
+ MODULE_LICENSE("GPL v2");
 -- 
 2.39.2
 
