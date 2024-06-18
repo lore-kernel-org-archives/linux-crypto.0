@@ -1,155 +1,169 @@
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82DC63AE;
-	Tue, 18 Jun 2024 04:26:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76A863AE
+	for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 04:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718684797; cv=none; b=Xx+zkDJGSgLNn3rqeQn1ESNrUAJYACb998usQkIjVVc4PsX6Qj3MUcXJy7mIqbO+r+lAaH+UY+clYZJ8nFwANLFcWia+TBl1Hv1DVojhxU0JhjyaUxr8ugGsHBM33GkjeYElpZclJBhWbUZyakX9QmZenFIdjljXr6UYNndLi9I=
+	t=1718684883; cv=none; b=c3PDr0Noe4ogOu0dnU5SRczZC/G/+t8BoIBAVkLyCvi7DpU4fuYGYCs7X7kZV2fvO/X/4GeUMCXEJrn5PK6emPa0btypm3W2ZlfhWPSJ6C6Vacq/O2J5g4nuGfVEHCtQCvD2Bsn9CzyFJnrY3Dh7Cb1lRcjrO/bby9vM0ikCzE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718684797; c=relaxed/simple;
-	bh=1j6EHgbnaeEoxUDtFTjZfx0qzbM1+6oLEzsVID/Qu4M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zn7vxbl0JdIqCmWzM0OMWRk2E+ar1Rzhsdb9i6Byin3wEPkir3Q7najaqkJXsvcprcfWDZJDX1pcaFU+CN5e+u9nFyBinlknQInDfQuO1fEeIyEr3XT96DpVnqJ420Hf0URTAHew3yh49p6i1hNEtTyfQrSE5mFG6Wr12Uy33YQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jz81jFZW; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718684883; c=relaxed/simple;
+	bh=dKCCFJLtukO4/ELMCMMsJra81X9rNsSS0IubkINVr68=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IAmBsXLKVj3Bhu459NZtj+5miL2ZLn/hM1zGqZBFhaEWm5pStSTia2b25QyGhptrpcl5kct72wNWYau5NmlyqBefCva546xo8crtECHUJbAOC1Oc9+7jhC62sKdjTfOxMBFF4LcOdqtYtoGrENC2yRCed8mCPaf4D2hrghfhpyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=bcH10xVm; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jz81jFZW"
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5baf982f56dso2986048eaf.3;
-        Mon, 17 Jun 2024 21:26:35 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="bcH10xVm"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7061d37dc9bso347361b3a.2
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 21:28:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718684795; x=1719289595; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=KEMaT1TlaEmcm8Kdg8m3ufqBtJYJy4jB0+SosRoAgvY=;
-        b=jz81jFZWoMrhuP0VMBveeI5gp2CAHTHCCbNB/nI6tLCRjbbzzWjZazFlrCAKhUHYgQ
-         KH7JJIJL095RGBNInD7pumTkXf3lDRSGSZXdt9hq62kShroxqzGy+P9Gk7XP21YjBba3
-         XcKG5dDuZc5eN8ZrNGMT8J75OJcotebVvG+qgs1IOHqBiDZJfsxzXZVifM7DhG7ERKlK
-         OIAQp2/hkguI2ZNiz7oHNUNetmVLYi0Mlbi06t9EiG5toIZaRwRQB/j7vSH0HYBCIHRg
-         XFNYrH6Rm7mGLvsw5utilJfz+hG7csQBheKRl4QYxDwTAwMQ3ekIFdKM7c3qn9cXl1Ao
-         CWnw==
+        d=vayavyalabs.com; s=google; t=1718684881; x=1719289681; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RWbIh7UDrk/DTCc0qLZPqr12LMvpVLEnRCaNwm7w8vs=;
+        b=bcH10xVmu7i+uxpDa6U3e8lHGeaOha6B9SShS9YN2OaVOMDod05f0xpExbJZT7sKie
+         FEwhbPU1+vkZeeWdCTXb0sVoJn1e7WJ96lwq5QP1vpYF9GlX5/xXS07qtasO/8f0OmVE
+         tuszmEWKxBmtXS41z4kiNQ2wwOoEONAk3mcgU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718684795; x=1719289595;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1718684881; x=1719289681;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KEMaT1TlaEmcm8Kdg8m3ufqBtJYJy4jB0+SosRoAgvY=;
-        b=gvoK7I1Nl1pNrsGR60b1bEtMWVY2seQzqf49ZVdQ+lZWnSNfjcqEEwpOnGmQMAYMb1
-         bYJop8AeDvnyruCGijD+9tEhX0m4+7/mPKz6rfXEX86l3MN5fQ6A1gydBA3YAmJJHhiS
-         dqIknMCprqcCvZLyssRAZ4aw6OlF+psgBT+uDpMIjiBX3k6dTe3NsGp19Udq2diZhvN3
-         pVjpWYbjANaEsos0mP9UmL2Va8VEzmOid23buW1pX1beD+SbmoQcDkybhe8LYIt0XUW2
-         BF+LMl+ZbDwkBKKdp4cBqH+PMLTtMVnG+g9ga0TwCAbyVN/xKf89KDBekwTyXgoZrLmi
-         Z0vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW6WIg+tRnGQUbXrZX+B2cwyKYF3e09i1oq0Nr5wqbA4zhoW8mREObHugH8IQond+6Z2EN7PhVA5fUX0JjweDc5TgQOX1puqCGPj2rdVeTUdicdXhUegpwjzhnKpiFC00SVSLpRJrZVFgrvW9J8pq81gtAoc4z3DZXT5i9NU4SRNphsItsTpQouplXy87s8ARJYtdEtC/wB12w3IcHcFoWDdALTsn6TgkiB
-X-Gm-Message-State: AOJu0YxHQ2PhvFmGlo5Nhu53YgLcmzcSc+vsY95q2eAnvIk+DJNSbiNu
-	FKDZT6AqlHSqL63MqL87XNxy9hxs7cC3PCRzFyCKTdDshj6V+IYytGyW7JALB0RAza/OIAbNcgh
-	J14hDTzkmTDzQESf3PF3TGll7eohTX73t
-X-Google-Smtp-Source: AGHT+IF+6ZHdp1vXryGnLrg4Z1+4ufKKFh1FZggdKzi7824NQ4NQwCLJWiNAN6LMB5TnJe0MHOkZqr45TC6yCcUF66k=
-X-Received: by 2002:a05:6820:554:b0:5ba:ea6f:acb8 with SMTP id
- 006d021491bc7-5bdadbdecefmr11947268eaf.3.1718684794716; Mon, 17 Jun 2024
- 21:26:34 -0700 (PDT)
+        bh=RWbIh7UDrk/DTCc0qLZPqr12LMvpVLEnRCaNwm7w8vs=;
+        b=XY3hqwCCkduG9+4NgF+6M8aTNiPe55WmvTWvOravpOhQhjaSmuGHxfhFckBLJ85O2H
+         6McJ9lhKgzaBUVmK9QXGtjMxRuWirSzHWUv6G9Dcc07/YhUABqD9+E+jCmpZTWtTn38G
+         9coUQl/AAUAa6m3a+lTCGiFfl03kuxMZwLXBP4TgCrE5ra/pXgr3S75CgaLA3+T2yKI0
+         foysFmD2YeCgNOOJZALtPmPUeSLSWtyuKOk9l6VPHXLmEYbKl7AxQ4yZpT9apX0M+5Dd
+         TqljGpvLg4ZCB7z0gP0MHHkneqNAp3vwpCIvIRR5TPcudag37uqoqh5jOgZLThvOgja4
+         yJJw==
+X-Forwarded-Encrypted: i=1; AJvYcCVOGHI0eP37c0UTGf2NBEyfvAoIoj+xQMvG5ODHPW4qWiUcEu8Q6vINIKJ0As2yhpUZMkhc+dpl8mAJIQQcf7oUhup+uuGB3PmuayuJ
+X-Gm-Message-State: AOJu0Yy1tTdZgt7o9gSRCz+b+BYKHdjZQHv5tFV/e5YWMbjtdJeyNi5r
+	tv8MI7hg/E9+4Qeide89cBKlPXCa1CY6ZE9LPKX7ZXfqoNcJEmKz1SVNy0exAWg=
+X-Google-Smtp-Source: AGHT+IGy4RYSrtj0oaDay1FeeoQLQJozsvxpV7SjgTFANBHpNDln2BRsJYfV/RopDzufU0aNgOu/Eg==
+X-Received: by 2002:a05:6a20:914b:b0:1b8:a3c5:3472 with SMTP id adf61e73a8af0-1bae7eadfddmr16025940637.26.1718684881057;
+        Mon, 17 Jun 2024 21:28:01 -0700 (PDT)
+Received: from localhost.localdomain ([103.108.57.9])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855f1770csm87912405ad.230.2024.06.17.21.27.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 21:28:00 -0700 (PDT)
+From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+To: herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org
+Cc: Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com,
+	bhoomikak@vayavyalabs.com,
+	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH v4 0/7] Add SPAcc Crypto Driver Support
+Date: Tue, 18 Jun 2024 09:57:43 +0530
+Message-Id: <20240618042750.485720-1-pavitrakumarm@vayavyalabs.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240618003743.2975-1-semen.protsenko@linaro.org> <20240618003743.2975-5-semen.protsenko@linaro.org>
-In-Reply-To: <20240618003743.2975-5-semen.protsenko@linaro.org>
-From: Anand Moon <linux.amoon@gmail.com>
-Date: Tue, 18 Jun 2024 09:56:19 +0530
-Message-ID: <CANAwSgSaYip=oqtLfTzFMq_HWGJMMbEXOqKWC8ANzxNZmBFXTw@mail.gmail.com>
-Subject: Re: [PATCH 4/7] hwrng: exynos: Implement bus clock control
-To: Sam Protsenko <semen.protsenko@linaro.org>
-Cc: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Alim Akhtar <alim.akhtar@samsung.com>, linux-samsung-soc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Sam,
+Add the driver for SPAcc(Security Protocol Accelerator), which is a
+crypto acceleration IP from Synopsys. The SPAcc supports many cipher,
+hash, aead algorithms and various modes.The driver currently supports
+below,
 
-On Tue, 18 Jun 2024 at 06:08, Sam Protsenko <semen.protsenko@linaro.org> wrote:
->
-> Some SoCs like Exynos850 might require the SSS bus clock (PCLK) to be
-> enabled in order to access TRNG registers. Add and handle optional PCLK
-> clock accordingly to make it possible.
->
-> Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
-> ---
->  drivers/char/hw_random/exynos-trng.c | 22 ++++++++++++++++++++--
->  1 file changed, 20 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
-> index 88a5088ed34d..4520a280134c 100644
-> --- a/drivers/char/hw_random/exynos-trng.c
-> +++ b/drivers/char/hw_random/exynos-trng.c
-> @@ -47,7 +47,8 @@
->  struct exynos_trng_dev {
->         struct device   *dev;
->         void __iomem    *mem;
-> -       struct clk      *clk;
-> +       struct clk      *clk;   /* operating clock */
-> +       struct clk      *pclk;  /* bus clock */
->         struct hwrng    rng;
->  };
->
-> @@ -141,10 +142,23 @@ static int exynos_trng_probe(struct platform_device *pdev)
->                 goto err_clock;
->         }
->
-> +       trng->pclk = devm_clk_get_optional(&pdev->dev, "pclk");
+aead:
+- ccm(sm4)
+- ccm(aes)
+- gcm(sm4)
+- gcm(aes)
+- rfc7539(chacha20,poly1305)
 
-Use devm_clk_get_optional_enabled to avoid clk_prepare_enable
+cipher:
+- cbc(sm4)
+- ecb(sm4)
+- ctr(sm4)
+- xts(sm4)
+- cts(cbc(sm4))
+- cbc(aes)
+- ecb(aes)
+- xts(aes)
+- cts(cbc(aes))
+- ctr(aes)
+- chacha20
+- ecb(des)
+- cbc(des)
+- ecb(des3_ede)
+- cbc(des3_ede)
 
-> +       if (IS_ERR(trng->pclk)) {
-> +               ret = dev_err_probe(&pdev->dev, PTR_ERR(trng->pclk),
-> +                                   "cannot get pclk");
-> +               goto err_clock;
-> +       }
-> +
-> +       ret = clk_prepare_enable(trng->pclk);
-> +       if (ret) {
-> +               dev_err(&pdev->dev, "Could not enable the pclk.\n");
-> +               goto err_clock;
-> +       }
-> +
->         ret = clk_prepare_enable(trng->clk);
+hash:
+- cmac(aes)
+- xcbc(aes)
+- cmac(sm4)
+- xcbc(sm4) 
+- hmac(md5)
+- md5
+- hmac(sha1)
+- sha1
+- sha224
+- sha256
+- sha384
+- sha512
+- hmac(sha224)
+- hmac(sha256)
+- hmac(sha384)
+- hmac(sha512)
+- sha3-224
+- sha3-256
+- sha3-384
+- sha3-512
+- hmac(sm3)
+- sm3
+- michael_mic
 
-Use devm_clk_get_enabled for this clock
+Pavitrakumar M (7):
+  Add SPAcc Skcipher support
+  Enable SPAcc AUTODETECT
+  Add SPAcc ahash support
+  Add SPAcc aead support
+  Add SPAcc Kconfig and Makefile
+  Add SPAcc dts overlay
+  Enable Driver compilation in crypto Kconfig and Makefile
 
->         if (ret) {
->                 dev_err(&pdev->dev, "Could not enable the clk.\n");
-> -               goto err_clock;
-> +               goto err_clock_enable;
->         }
->
->         ret = devm_hwrng_register(&pdev->dev, &trng->rng);
-> @@ -160,6 +174,9 @@ static int exynos_trng_probe(struct platform_device *pdev)
->  err_register:
->         clk_disable_unprepare(trng->clk);
->
-> +err_clock_enable:
-> +       clk_disable_unprepare(trng->pclk);
-> +
->  err_clock:
->         pm_runtime_put_noidle(&pdev->dev);
->
-> @@ -174,6 +191,7 @@ static void exynos_trng_remove(struct platform_device *pdev)
->         struct exynos_trng_dev *trng = platform_get_drvdata(pdev);
->
->         clk_disable_unprepare(trng->clk);
-> +       clk_disable_unprepare(trng->pclk);
->
->         pm_runtime_put_sync(&pdev->dev);
->         pm_runtime_disable(&pdev->dev);
-> --
-> 2.39.2
->
->
+ arch/arm64/boot/dts/xilinx/Makefile           |    3 +
+ .../arm64/boot/dts/xilinx/snps-dwc-spacc.dtso |   35 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/dwc-spacc/Kconfig              |   95 +
+ drivers/crypto/dwc-spacc/Makefile             |   16 +
+ drivers/crypto/dwc-spacc/spacc_aead.c         | 1279 ++++++++
+ drivers/crypto/dwc-spacc/spacc_ahash.c        |  883 ++++++
+ drivers/crypto/dwc-spacc/spacc_core.c         | 2624 +++++++++++++++++
+ drivers/crypto/dwc-spacc/spacc_core.h         |  826 ++++++
+ drivers/crypto/dwc-spacc/spacc_device.c       |  339 +++
+ drivers/crypto/dwc-spacc/spacc_device.h       |  236 ++
+ drivers/crypto/dwc-spacc/spacc_hal.c          |  367 +++
+ drivers/crypto/dwc-spacc/spacc_hal.h          |  113 +
+ drivers/crypto/dwc-spacc/spacc_interrupt.c    |  316 ++
+ drivers/crypto/dwc-spacc/spacc_manager.c      |  650 ++++
+ drivers/crypto/dwc-spacc/spacc_skcipher.c     |  715 +++++
+ 17 files changed, 8499 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/xilinx/snps-dwc-spacc.dtso
+ create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+ create mode 100644 drivers/crypto/dwc-spacc/Makefile
+ create mode 100755 drivers/crypto/dwc-spacc/spacc_aead.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
 
-Thanks
--Anand
+
+base-commit: 1dcf865d3bf5bff45e93cb2410911b3428dacb78
+-- 
+2.25.1
+
