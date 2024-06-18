@@ -1,169 +1,120 @@
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D741D16133C
-	for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 19:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B45B15747F;
+	Tue, 18 Jun 2024 19:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718738808; cv=none; b=Q9SRWZ4J9ZpwM0j6RlAxcLZbt/lC92lUsGALIocTn7kjc8fnXF/x8/MisYneQXo00k61be05sZXfsI4HiX2RYyy/gskttOhk8X0paFB6WCoA9eLnc38BZFRzUlylMGqZq8jZ8MDyKTNCQB2WMfdXRdB4X8x4kdHxGNcwGt2N/YU=
+	t=1718738876; cv=none; b=uPbC8FADph8QOFhsvOkW/+EztTsXV2OWitC7q6yAHMeTXHvi3oxCRS+oiqEVRFmNeJZgM3SJBSplGMFYgxsZIc7JoFdeo/xiJZ96zqbisabdGut1FVpU0zO7vb+NqFALQObtrH0a7NqyLWpRHd2Hv4BCw0Fu8SExBtUyxDjXy1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718738808; c=relaxed/simple;
-	bh=+FyiA+pYK8APwK75QeRcyo/HcZRVxSHlp1CzDFB8ZR8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EMIBIxpfzGzzhRJTe//sNcLUFWEp+QAoq+EJD2fJdePVuB29jLb1w+wP6gsev4DxB9TDURs6hgRakNWR2vIWrIP6NVtkkTACdXb5JW9SKFAEYiK0b5EYNZtU4CCGIy/vAHyA3raSTzcl6N+Y6nAo69uoGv/3dPDV6aGUxDWzdJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=An9P9Ci9; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1718738876; c=relaxed/simple;
+	bh=heR/isSr78VcW/VYrPWTjRfQ7W1E6j/MQUID0htM5m0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KUi9KVbwbXrMat+aob2NozU2IpBZS2wB1XSWUoQ9puHSkgTI6c2YfuPJRVpJzO1vElhnlBerIY+dDIr7QyU+x2kj6rgFLp7DlaIPFPvbn8nOhwGxNkh0IKFg2g2yex8Q8g1pOcmJVn8Ck524zEEtoUAlIFFzNWAgPvrxxZUKpsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=KY6RjJcv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="An9P9Ci9"
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e02bf947545so196817276.0
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 12:26:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718738806; x=1719343606; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9JdIhONv4P+97AjtXHbls42T4V6PxnxrDwc043W4vOo=;
-        b=An9P9Ci9QQ1c5s7gcjCkRnfqnMy/q/1l90M1HEk38mkKcMwJZBQlZMctXfkqRwSUXs
-         GoPq7wRdaI6U/3SLlTkld9O9xMIEW898NrHgJ5ZvD1Lr4OmxwqBuJAsW4yM+pHXzJxpR
-         7nD63JgJO44ZJKs1g6sf+ebcMpAbxWguzEbmvWFUt6OuCOSTSw2BrzfsPEWdzsY7707j
-         rWtNw7QDxpd2TlVGM3WjuBNYx87Rt4Hj18CLPXNFWmlDM/cNLmXbHS6zJMOeVvQP/YkL
-         HANnyn/aSn8+kyhCDH07N21Yr/MZbZIFYuSshUVYPxj9n/ophLf8LjeOLU0DkbmqJDPG
-         EPow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718738806; x=1719343606;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9JdIhONv4P+97AjtXHbls42T4V6PxnxrDwc043W4vOo=;
-        b=ChbUN2oIS4SJtIS2TPBzQz6KipYyU44/z4z/ZpOwkoX8Vn+/eQfm/AAOBgPTflo3BC
-         Ea6azsDeJyq2CvarCDl+Hi9WF0xN4SkvmexIeFc7YE6H88ocoCN+B8pSrSF+AtrwbWmN
-         juKk3rl9Aj0BSa9/bHdUqOeBPlsv1W4SWDv0MrDbFbPyTgExRP7ZdxZZNc/DhbfmV1wY
-         j6ZUc88yFLfOUzjHUYAcjg87jL1yeDhZi+pJqKiaVo1P97ihQsCUllXfULY/GL7PydlP
-         0QrmGdU4PBdaHterbnmvM0AfNFd//JAfwwMBJj+sEXJFtE6LZed5mn88jU7aattnSxM3
-         eirw==
-X-Forwarded-Encrypted: i=1; AJvYcCVVTLUkD21RiO5Qy3cbBuRL4UiFKY/Ke6shE1b5HZtsqPuuBhh6THWoeBRA/xTUQ2SFTVdPaVIAiROhuuPvu5AbMs8T0ZPtbj+uHqjh
-X-Gm-Message-State: AOJu0Ywo/1+CCMOotan6IVdepv++8ewGI8fmGpxa0A21iRqJ/b+1d3KI
-	O38tR8xqGmfV+YfZnQKdjc8OopOo5X6pNzR2uoluYPIKXTQU0t6MxAHtFtvUSHsaFMp8X1zZh9d
-	7ay1G8PhNCDOlZbJqmyd1XbFU4FeAzFirz4oaKw==
-X-Google-Smtp-Source: AGHT+IEgckfSzpfRkRk3dzsXY6WG0jQp3J3r598HIt7lADXYgT+sH/QiHeZPNODRKExgkh5yZnVfoB+gxVSZC+8vuoE=
-X-Received: by 2002:a5b:c4d:0:b0:dfd:c928:cc9f with SMTP id
- 3f1490d57ef6-e02be142117mr988991276.26.1718738805816; Tue, 18 Jun 2024
- 12:26:45 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KY6RjJcv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5F3C3277B;
+	Tue, 18 Jun 2024 19:27:54 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KY6RjJcv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1718738873;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w+M43ijHJAES43FqmOh139eqeLQGGZwedR3F/gwSFa4=;
+	b=KY6RjJcvm/x40m75gOjTtS5zZeqJn6Hk6z5rySRNMI1VIx5Dc65xsL/Ek3fQwB70rHmUra
+	mdhDiYsVZr2fEVMCyZ248m8uSfIio4SolEXXEchZDvepYgd4DmrhwyTsyKYp0Zw/BAfWRW
+	GrTqF8l+K33DEyV9p1Lhegiix3TzTqg=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fbae344a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 18 Jun 2024 19:27:52 +0000 (UTC)
+Date: Tue, 18 Jun 2024 21:27:50 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+	tglx@linutronix.de, linux-crypto@vger.kernel.org,
+	linux-api@vger.kernel.org, x86@kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jann Horn <jannh@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>
+Subject: Re: [PATCH v17 4/5] random: introduce generic vDSO getrandom()
+ implementation
+Message-ID: <ZnHftrP3H410gScf@zx2c4.com>
+References: <20240614190646.2081057-1-Jason@zx2c4.com>
+ <20240614190646.2081057-5-Jason@zx2c4.com>
+ <CALCETrVQtQO87U3SEgQyHfkNKsrcS8PjeZrsy2MPAU7gQY70XA@mail.gmail.com>
+ <ZnDQ-HQH8NlmCcIr@zx2c4.com>
+ <CALCETrWzXQMXjvL+nGq-+aLVUeiABJ46DACtLnrLXxmwh9s_dg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240618003743.2975-1-semen.protsenko@linaro.org>
- <20240618003743.2975-5-semen.protsenko@linaro.org> <CANAwSgSaYip=oqtLfTzFMq_HWGJMMbEXOqKWC8ANzxNZmBFXTw@mail.gmail.com>
-In-Reply-To: <CANAwSgSaYip=oqtLfTzFMq_HWGJMMbEXOqKWC8ANzxNZmBFXTw@mail.gmail.com>
-From: Sam Protsenko <semen.protsenko@linaro.org>
-Date: Tue, 18 Jun 2024 14:26:34 -0500
-Message-ID: <CAPLW+4kGH+WJS5x6ujGacD_uhsUb9Mi7w1F+ocnc6hZz628kew@mail.gmail.com>
-Subject: Re: [PATCH 4/7] hwrng: exynos: Implement bus clock control
-To: Anand Moon <linux.amoon@gmail.com>
-Cc: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Alim Akhtar <alim.akhtar@samsung.com>, linux-samsung-soc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALCETrWzXQMXjvL+nGq-+aLVUeiABJ46DACtLnrLXxmwh9s_dg@mail.gmail.com>
 
-On Mon, Jun 17, 2024 at 11:26=E2=80=AFPM Anand Moon <linux.amoon@gmail.com>=
- wrote:
->
-> Hi Sam,
->
-> On Tue, 18 Jun 2024 at 06:08, Sam Protsenko <semen.protsenko@linaro.org> =
-wrote:
+On Tue, Jun 18, 2024 at 10:55:17AM -0700, Andy Lutomirski wrote:
+> On Mon, Jun 17, 2024 at 5:12 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 > >
-> > Some SoCs like Exynos850 might require the SSS bus clock (PCLK) to be
-> > enabled in order to access TRNG registers. Add and handle optional PCLK
-> > clock accordingly to make it possible.
+> > Hi Andy,
 > >
-> > Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
-> > ---
-> >  drivers/char/hw_random/exynos-trng.c | 22 ++++++++++++++++++++--
-> >  1 file changed, 20 insertions(+), 2 deletions(-)
+> > On Mon, Jun 17, 2024 at 05:06:22PM -0700, Andy Lutomirski wrote:
+> > > On Fri, Jun 14, 2024 at 12:08 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> > > >
+> > > > Provide a generic C vDSO getrandom() implementation, which operates on
+> > > > an opaque state returned by vgetrandom_alloc() and produces random bytes
+> > > > the same way as getrandom(). This has a the API signature:
+> > > >
+> > > >   ssize_t vgetrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state);
+> > >
+> > > Last time around, I mentioned some potential issues with this function
+> > > signature, and I didn't see any answer.  My specific objection was to
+> > > the fact that the caller passes in a pointer but not a length, and
+> > > this potentially makes reasoning about memory safety awkward,
+> > > especially if anything like CRIU is involved.
 > >
-> > diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_ran=
-dom/exynos-trng.c
-> > index 88a5088ed34d..4520a280134c 100644
-> > --- a/drivers/char/hw_random/exynos-trng.c
-> > +++ b/drivers/char/hw_random/exynos-trng.c
-> > @@ -47,7 +47,8 @@
-> >  struct exynos_trng_dev {
-> >         struct device   *dev;
-> >         void __iomem    *mem;
-> > -       struct clk      *clk;
-> > +       struct clk      *clk;   /* operating clock */
-> > +       struct clk      *pclk;  /* bus clock */
-> >         struct hwrng    rng;
-> >  };
+> > Oh, I understood this backwards last time - I thought you were
+> > criticizing the size_t len argument, which didn't make any sense.
 > >
-> > @@ -141,10 +142,23 @@ static int exynos_trng_probe(struct platform_devi=
-ce *pdev)
-> >                 goto err_clock;
-> >         }
+> > Re-reading now, what you're suggesting is that I add an additional
+> > argument called `size_t opaque_len`, and then the implementation does
+> > something like:
 > >
-> > +       trng->pclk =3D devm_clk_get_optional(&pdev->dev, "pclk");
->
-> Use devm_clk_get_optional_enabled to avoid clk_prepare_enable
->
+> >     if (opaque_len != sizeof(struct vgetrandom_state))
+> >         goto fallback_syscall;
+> >
+> > With the reasoning that falling back to syscall is better than returning
+> > -EINVAL, because that could happen in a natural way due to CRIU. In
+> > contrast, your objection to opaque_state not being aligned falling back
+> > to the syscall was that it should never happen ever, so -EFAULT is more
+> > fitting.
+> >
+> > Is that correct?
+> 
+> My alternative suggestion, which is far less well formed, would be to
+> make the opaque argument be somehow not pointer-like and be more of an
+> opaque handle.  So it would be uintptr_t instead of void *, and the
+> user API would be built around the user getting a list of handles
+> instead of a block of memory.
+> 
+> The benefit would be a tiny bit less overhead (potentially), but the
+> API would need substantially more rework.  I'm not convinced that this
+> would be worthwhile.
 
-Thanks for pointing that out! Will fix in v2.
+I'd thought about this too -- a Windows-style handle system -- but
+it seemed complicated and just not worth it, so the simplicity here
+seems more appealing. I'm happy to take your suggestion of an opaque_len
+argument (and it's already implemented in my "vdso" branch), and
+leaving it at that.
 
-> > +       if (IS_ERR(trng->pclk)) {
-> > +               ret =3D dev_err_probe(&pdev->dev, PTR_ERR(trng->pclk),
-> > +                                   "cannot get pclk");
-> > +               goto err_clock;
-> > +       }
-> > +
-> > +       ret =3D clk_prepare_enable(trng->pclk);
-> > +       if (ret) {
-> > +               dev_err(&pdev->dev, "Could not enable the pclk.\n");
-> > +               goto err_clock;
-> > +       }
-> > +
-> >         ret =3D clk_prepare_enable(trng->clk);
->
-> Use devm_clk_get_enabled for this clock
->
-> >         if (ret) {
-> >                 dev_err(&pdev->dev, "Could not enable the clk.\n");
-> > -               goto err_clock;
-> > +               goto err_clock_enable;
-> >         }
-> >
-> >         ret =3D devm_hwrng_register(&pdev->dev, &trng->rng);
-> > @@ -160,6 +174,9 @@ static int exynos_trng_probe(struct platform_device=
- *pdev)
-> >  err_register:
-> >         clk_disable_unprepare(trng->clk);
-> >
-> > +err_clock_enable:
-> > +       clk_disable_unprepare(trng->pclk);
-> > +
-> >  err_clock:
-> >         pm_runtime_put_noidle(&pdev->dev);
-> >
-> > @@ -174,6 +191,7 @@ static void exynos_trng_remove(struct platform_devi=
-ce *pdev)
-> >         struct exynos_trng_dev *trng =3D platform_get_drvdata(pdev);
-> >
-> >         clk_disable_unprepare(trng->clk);
-> > +       clk_disable_unprepare(trng->pclk);
-> >
-> >         pm_runtime_put_sync(&pdev->dev);
-> >         pm_runtime_disable(&pdev->dev);
-> > --
-> > 2.39.2
-> >
-> >
->
-> Thanks
-> -Anand
+Jason
