@@ -1,60 +1,33 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC6322EE4
-	for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 06:30:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D091D9527;
+	Tue, 18 Jun 2024 06:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718692242; cv=none; b=UGpc+v+4/xwkA0oQDzjEVkhDuFqwPKFkYtscjiuSJg/VE3HgJZ1SnIWZYWkuraiG9uI0+xdFL1lVTkXItIvaIWCHP3dJHG2nhmavi3lPZwKM0HDMIV28yS8p6EkgpFU4SSKQUnTyrXEB1Py1KGWpiYfUW8brb5curQKamfoJuDg=
+	t=1718692355; cv=none; b=q0HQrV52uPHRONjeZRn7NeinGtAA3ALGZnkF/TWIiZfm1OMzSp+fgzvUTvIlxjnYampMj0ED9ojVDyTyVTiEWi/87ujdEcyil0+soAhq04G5tCBGm0r5YRcqtr/FVxRHqhyqRiJuoj8qJt7T3VbmO7ruG95maLyNKgKnCS7wgUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718692242; c=relaxed/simple;
-	bh=hZDWCI2YcLFzdh55xjCS9DfloNBolM+/C0zHHdHtNiU=;
+	s=arc-20240116; t=1718692355; c=relaxed/simple;
+	bh=/qT6l3kS1hs5zR0FghGd2R5JyNKPwgKjabMeLzWLf2w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gvi4oFHOlmhTX77iJI2V4PwJ2XMWrjLK6FxPm/2vY75Xgoiu7AsH3YEGcyf3PYfxPG3nPZeV9d+p7hLfXzyOxd5MAQ8NAIo8GyKa7Xot3jHhjvYWIJGjd2Z5Igv1G+JZ5AFxiHxh0QGl2FRRKd/lTVL1yBQYV7NNWxZbfIYlLBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SaK/Ydek; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 In-Reply-To:Content-Type; b=T/LGqcJ9OCZ6dYV68ukTI933Ft6R6tehU7LQJaEqu5CPmApo+7rEJRVz7BE/Az5xMY9kyX/o4Acu/n/kswq79lVEC96Wt4qd+HNs+FrSefLyCbQ1vgtzZLjN1yPambtYsXcDJ6EV31yJ2ztvtVWifRgj2aHQDuWzdumZpZxoD4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mk0ZxI5z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SaK/Ydek"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4218314a6c7so43612315e9.0
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 23:30:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718692239; x=1719297039; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZWeFAAAi2L8rsVHef4RgO7GjNAUeaqypAMAbTcH7e2Y=;
-        b=SaK/YdekwElrCs9TdoZGIrQBLFVhY92bRlH69N7EKVGrUpzSt3SF81k3IcdK49ATD2
-         xWEOr/qIoyV786gDOgQ7v4t8pe3YP59WSIUHv/sAE0Jpus9IW7TDSy/72DPnzGiQWRxM
-         PUp7yeeku0xE4c2KmVJR1/QqPR18Ln7j4R40yU7a+Qa4bhEECxfbu6YQrfjlnuOSETdj
-         PWwDuOUXg3dM89/a/p+vYfAEAFGb6MHOY3o4q4l7LqjVCK15+7lUtw0Wkl+eaYnyCvMm
-         nFHidbPivnzXOtiUtEwnQpS02HsBUnhw/3oaHcQRydklrGEPV2W99TATy4BN1Ktf5xDv
-         FSqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718692239; x=1719297039;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZWeFAAAi2L8rsVHef4RgO7GjNAUeaqypAMAbTcH7e2Y=;
-        b=qbOjPx/alTUR9wUN3IEy8L86ox6sF6E1/PKweRKlN4VjuzmYNqUlJy0KP7Hc84liGY
-         LIuHL58pi0ZxXxQG3hQd0RLUBE0sKSgow4AslVmWt/NLG96wqmwV8j3S9c5xfY990Gsu
-         JSuR7qp5sEXiTFcGKic5y39e+jGE9AfZ1o6GLPzv/lDfdNIVm2Myu3QOubU2TtpeDswb
-         rsbSmCbPEC1uVyryD+7wC9JqpiY3+K0DOKtQ3MKddFZoB40aIjxXY6aeTDCKc721g8eU
-         ge05MMjMEdz9KAdQ61WsU7Tcv/Jub0vz2SBBjPpR6R4BIHEnl6pU3RBPtNrgSZHzOozB
-         UOGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUPylQIGHEI5i0LHTN3zQnL4xLzqTlggHLb2vDMJC6q7qpxp7Zy6CaFqYP7lxTzleNbZldDcykxiTlCi9oD/UFka0mrlEfKlEy6lUx6
-X-Gm-Message-State: AOJu0Yz6AdoGWAFp368o0IDKtc4jiXxKjyhT/yeEK2atDgUjQXdSyShw
-	mSg/V8zzvmnmVG5jNsrtzYOFodwb252Km0WscRevS4wQOJfCDLGHXRuWoHqb+6Y=
-X-Google-Smtp-Source: AGHT+IEJ4gLarh4h757fQ4nJrn6vzZRFlVK5KgpSEj7lt/PYKYzRz80A/D0z0k+dx/QjESmAgiEWvw==
-X-Received: by 2002:a05:600c:1c9a:b0:422:6449:1307 with SMTP id 5b1f17b1804b1-4230484f994mr115936955e9.32.1718692239154;
-        Mon, 17 Jun 2024 23:30:39 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.219.137])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422874e73b1sm217722655e9.45.2024.06.17.23.30.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jun 2024 23:30:38 -0700 (PDT)
-Message-ID: <b0f52816-8a9e-4f6a-8b48-18e77ed5dfaf@linaro.org>
-Date: Tue, 18 Jun 2024 08:30:36 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mk0ZxI5z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10246C3277B;
+	Tue, 18 Jun 2024 06:32:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718692355;
+	bh=/qT6l3kS1hs5zR0FghGd2R5JyNKPwgKjabMeLzWLf2w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mk0ZxI5zHbOKp0n9a/Wu/f/eXL1g6LpO2JsMtdgfXzjgn0nV4iNYVZU/mr2C/H1MH
+	 b8NGzYeQTYYn6tLLbXpMBaWkdEJOPkztNGEZFO92q109NuNI284Pj5dltNi2zdyCTZ
+	 X9a6hUn1/ClxmmUEo8G81drsLepbmZHmoquzmjQ1lnFMOLHoWK7PzfoXYimgm2M5rb
+	 9si5TJCGVTVZTJTMKUycrMT7RRiYYDulClEgZ2NfTeMz8SrYU3QiOAJCg64q0znTJp
+	 FbXnyzeY6hOaSA2NgcoTnp1qedfyKewf1wA+XDWJMSk4Y4FoDDIE834SSudTuXSz3G
+	 qdpkocKR8nW0A==
+Message-ID: <77162093-69cc-47a3-83a3-f7d2901d01cc@kernel.org>
+Date: Tue, 18 Jun 2024 08:32:28 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,41 +35,22 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 13/15] dt-bindings: crypto: ice: document the hwkm
- property
-To: "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>,
- "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "andersson@kernel.org" <andersson@kernel.org>,
- "ebiggers@google.com" <ebiggers@google.com>,
- "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
- "srinivas.kandagatla" <srinivas.kandagatla@linaro.org>,
- "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "robh+dt@kernel.org" <robh+dt@kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
- kernel <kernel@quicinc.com>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "Om Prakash Singh (QUIC)" <quic_omprsing@quicinc.com>,
- "Bao D. Nguyen (QUIC)" <quic_nguyenb@quicinc.com>,
- "bartosz.golaszewski" <bartosz.golaszewski@linaro.org>,
- "konrad.dybcio@linaro.org" <konrad.dybcio@linaro.org>,
- "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
- "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
- "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
- "mani@kernel.org" <mani@kernel.org>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
- Prasad Sodagudi <psodagud@quicinc.com>, Sonal Gupta <sonalg@quicinc.com>
-References: <20240617005825.1443206-1-quic_gaurkash@quicinc.com>
- <20240617005825.1443206-14-quic_gaurkash@quicinc.com>
- <a9d8606d-fb4a-4394-bab6-3304e1f8b9e5@linaro.org>
- <af1df42efdb4497cb174bc664c692651@quicinc.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH 1/7] dt-bindings: rng: Rename exynos5250-trng to
+ exynos-trng
+To: Sam Protsenko <semen.protsenko@linaro.org>,
+ =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>
+Cc: Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Alim Akhtar <alim.akhtar@samsung.com>, linux-samsung-soc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240618003743.2975-1-semen.protsenko@linaro.org>
+ <20240618003743.2975-2-semen.protsenko@linaro.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
  cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
  JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
@@ -106,88 +60,55 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  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
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <af1df42efdb4497cb174bc664c692651@quicinc.com>
+ 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 fv0=
+In-Reply-To: <20240618003743.2975-2-semen.protsenko@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 18/06/2024 02:35, Gaurav Kashyap (QUIC) wrote:
-> Hello Krzysztof
+On 18/06/2024 02:37, Sam Protsenko wrote:
+> Exynos TRNG (True Random Number Generator) hardware block is found in
+> various Exynos chips, not only in Exynos5250. Rename the binding doc to
+> reflect that fact and make the naming more precise.
 > 
-> On   06/17/2024 12:17 AM PDT, Krzysztof Kozlowski wrote:
->> On 17/06/2024 02:51, Gaurav Kashyap wrote:
->>> +  qcom,ice-use-hwkm:
->>> +    type: boolean
->>> +    description:
->>> +      Use the supported Hardware Key Manager (HWKM) in Qualcomm ICE
->>> +      to support wrapped keys. Having this entry helps scenarios where
->>> +      the ICE hardware supports HWKM, but the Trustzone firmware does
->>> +      not have the full capability to use this HWKM and support wrapped
->>> +      keys. Not having this entry enabled would make ICE function in
->>> +      non-HWKM mode supporting standard keys.
->>
->> No changelog, previous comments and discussion ignored.
->>
->> NAK
-> 
-> Apologies for not addressing the previous comments.
-> https://lore.kernel.org/all/9892c541ba4e4b5d975faaa4b49c92ba@quicinc.com/
-> 
-> Maybe we can continue our discussion here;
-> " SM8450 and SM8350 QCOM ICE both support HWKM in their ICE hardware.
-> However, wrapped keys can not be enabled on those targets due to certain
-> missing trustzone support. If we solely rely on hardware version to decide
-> if ICE has to use wrapped keys for data encryption, then it becomes untestable
-> on those chipsets. 
+> Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
+> ---
+>  .../{samsung,exynos5250-trng.yaml => samsung,exynos-trng.yaml}  | 2 +-
+>  MAINTAINERS                                                     | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
-That does not make any sense to me. You enable it for SM8550 and SM8650
-not SM8450 and SM8350.
-
-> 
-> So, we want another way to distinguish this scenario, and hence I chose a DT vendor property
-
-What scenario? Show it in your patches.
-
-> to explicitly mention if we have to use the supported HWKM.
-> If there is another way, I am open to exploring that as well."
-
-That property is just entirely redundant. If you claim otherwise, show
-it through patches.
-
-To be clear, so you will not resend the same ignoring comments: NAK.
+No, no need.
 
 Best regards,
 Krzysztof
