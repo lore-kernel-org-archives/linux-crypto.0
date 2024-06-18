@@ -1,110 +1,169 @@
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D5B1DA5F
-	for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 00:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4BB5C99;
+	Tue, 18 Jun 2024 00:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718671072; cv=none; b=V9FzXK7xsdb+k1aw4tuNEgy1qmM48ZZ0q7wRXJAEq4ZM2CGPypi82x1SW94WwCjxXEYYjG7nH6M35ThwsEOVaKlTi1iCx1u34OErR3ThTxFda9W/91uyJjulTm4YeKmbXsPxlY6PuTLUcKPqAEJlemeD2KhosMinuf5ocbMen54=
+	t=1718671133; cv=none; b=lCO9xPFW22pDdKgnqyI6MM3dSQuUb+d+Tgsd5jj5x3X+Ro5JPlt6uuAzm5MHV4a0rjYv78xJVRi96ajdTJNyluKWSURxWWz1z9Ox2QEisucKcamwWpEmeRGuScHcZPEVNiFB0R2EP7diQ/zPONA28O5IlPcSiRIRZb5em8HT/eI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718671072; c=relaxed/simple;
-	bh=idQsCXTRSpteqMQ/ApU8QqN2v+CejLFr+G+P9eZMvmA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=i+sY3CFi+86w5lgPwFdxWu972oLFkAHQJ0keMeSxpcBydxXj+EHruQ8fx1LeNMbhbUsQENFRcclKn1FeXqr2uAk2BHrFzBlMROczjtogun1pfJ7F6iX65LcsoSukpCVdyP1Nyx/k56R6WkhAPWIj8HJWl9hQVIpXHph8GUyMdBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Rq2edSdo; arc=none smtp.client-ip=209.85.161.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1718671133; c=relaxed/simple;
+	bh=EPu8yNRPgkjN30FqQ0/xKvZOyIHNqxkwG+P/BwDOee8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UpgTCQtV3tDeUa3flrM1QCJkwQqOkCUI2ruOaZzVO3E8ricoWcpxSnX/h80m4THoGxboEoUePApa+U7DXAxauhib6oT0wX84sG2i2GTlwwLcP0Lwuj3bp6Fz6hXYFWxuO4S5cxKr2Lxd8ugMPn87KAwBNvbTXfIJqvbYdr00nU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=Hj+bkOdt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rq2edSdo"
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5b97539a4a5so2735056eaf.2
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2024 17:37:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718671069; x=1719275869; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q/EO8T5rRTkiZ8LbuFbhP2DGGAGyuLlPjhaKm+CoFdc=;
-        b=Rq2edSdoPiP/PVPV51jRdJNi/JGzv7NjujvKFSAc+VlJ+kg6PifKAO8X2a9+FyTjhi
-         4x6OQFQ5qCmlFBdwTeR9ItFl/tLIW+liY7bmPnCtja4v9HyPwVukt3tUPInsORSB+OAV
-         44rBSezwB+ijG2u7TWIMczkBlCJb+ecQ+T9bcgP7PG5btvUsOYqjqmQ1UH8japLMmIRL
-         CA1hSYfdiqfUd6HYLBTOsCfhhQHy3XScL0YXmbMtiqjtHp33Yg56dLLVj8WIRTrrQHNi
-         65Kj/dOkycuJp62P4sAaJIBrYwzb9ucdrSN2PIVCs+Rwz7/ejZqZ8OeFkMHwgwbIPoqQ
-         sj7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718671069; x=1719275869;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q/EO8T5rRTkiZ8LbuFbhP2DGGAGyuLlPjhaKm+CoFdc=;
-        b=ddvt5USX5JNmOM6P6aHQ6LtbbFnDEIZR04Z2NRjhz+4gGpfd5rDH8M4O5jVCVwgcax
-         V7HJnhkXpr8Vr7Wvynx7NzD/AbEo7NButidUdrJGmErRAM/mVQ/9ixT5dTCjd35Sbp2H
-         vEW634A5ClBb5Vn2apqL0VNDP3KaUAjtpNjyMxv0+foQIZmWbv0xi32B0siblT/6fjdk
-         tfPmGMpS1omip4YIl5oCjLUe1pPpjgf4YwMu1RNtk0sh4aEYsiU5fQRCZ6aQP0DfRoZb
-         R6oiKOafCto7fvZ3Nkf+O3XpWLsGrmlBsZRKVGyI2mEBFayLPeCZefOQD8OBUfC6EZMk
-         Eyuw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4q3kvN9uRIiOHqX3msU0nqEfQPiLNj2RKDKBTdvaSBXgQYoXJtBnoGQ9hYLmFEimB6wylUaXF+A1B2kyqYeqiOaJWPTPEQN1PAt2O
-X-Gm-Message-State: AOJu0YzFpiH+jR9hyp88l9uIVaXiErPPc9xSANqEmFYsryKT8CyIrjeN
-	UpPlw/ku4uGh4jZLtcql2Y5U+rtVwkZvbkU+megVR2ID2GCqnvPXGuuYSE7OWdU=
-X-Google-Smtp-Source: AGHT+IEcoB3JmFJ9IpjpkDLM0gXNp4DcLepn0oB2jv35HwAPRgPQt+5YDdLNa1XcS8JrDiT3nZnRlg==
-X-Received: by 2002:a4a:7651:0:b0:5bd:c2b0:f599 with SMTP id 006d021491bc7-5bdc2b0f7d3mr5945744eaf.9.1718671068698;
-        Mon, 17 Jun 2024 17:37:48 -0700 (PDT)
-Received: from localhost ([136.62.192.75])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5bd5e19a4e7sm1320770eaf.20.2024.06.17.17.37.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 17:37:48 -0700 (PDT)
-From: Sam Protsenko <semen.protsenko@linaro.org>
-To: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Alim Akhtar <alim.akhtar@samsung.com>,
-	linux-samsung-soc@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 7/7] arm64: dts: exynos850: Enable TRNG
-Date: Mon, 17 Jun 2024 19:37:43 -0500
-Message-Id: <20240618003743.2975-8-semen.protsenko@linaro.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240618003743.2975-1-semen.protsenko@linaro.org>
-References: <20240618003743.2975-1-semen.protsenko@linaro.org>
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Hj+bkOdt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E93CFC2BD10;
+	Tue, 18 Jun 2024 00:38:51 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Hj+bkOdt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1718671129;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5zpgIOfekLV3UH6+yks33ApiI6XLkbCD6hrIOKNwA7s=;
+	b=Hj+bkOdtifI+V5WIsaCqAOPCq4Af58HRHxZve02QIVYgL2s43z6kj8zmjY2qYbu9qt3zoJ
+	KD4yVFyf4PSUbGTnTQsYjPXjrgDZ1hg1z1SS8cgw+SemNjTYFdGLiWvXsbEPruhnlHQK5V
+	Vkn8ji7yhjHauaIJx4Fpu0K0yayjAgA=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 086ed137 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 18 Jun 2024 00:38:49 +0000 (UTC)
+Date: Tue, 18 Jun 2024 02:38:47 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+	tglx@linutronix.de, linux-crypto@vger.kernel.org,
+	linux-api@vger.kernel.org, x86@kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jann Horn <jannh@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>
+Subject: Re: [PATCH v17 4/5] random: introduce generic vDSO getrandom()
+ implementation
+Message-ID: <ZnDXFywDvqRitRgL@zx2c4.com>
+References: <20240614190646.2081057-1-Jason@zx2c4.com>
+ <20240614190646.2081057-5-Jason@zx2c4.com>
+ <CALCETrVQtQO87U3SEgQyHfkNKsrcS8PjeZrsy2MPAU7gQY70XA@mail.gmail.com>
+ <ZnDQ-HQH8NlmCcIr@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZnDQ-HQH8NlmCcIr@zx2c4.com>
 
-Add True Random Number Generator (TRNG) node to Exynos850 SoC dtsi.
+On Tue, Jun 18, 2024 at 02:12:40AM +0200, Jason A. Donenfeld wrote:
+> Hi Andy,
+> 
+> On Mon, Jun 17, 2024 at 05:06:22PM -0700, Andy Lutomirski wrote:
+> > On Fri, Jun 14, 2024 at 12:08 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> > >
+> > > Provide a generic C vDSO getrandom() implementation, which operates on
+> > > an opaque state returned by vgetrandom_alloc() and produces random bytes
+> > > the same way as getrandom(). This has a the API signature:
+> > >
+> > >   ssize_t vgetrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state);
+> > 
+> > Last time around, I mentioned some potential issues with this function
+> > signature, and I didn't see any answer.  My specific objection was to
+> > the fact that the caller passes in a pointer but not a length, and
+> > this potentially makes reasoning about memory safety awkward,
+> > especially if anything like CRIU is involved.
+> 
+> Oh, I understood this backwards last time - I thought you were
+> criticizing the size_t len argument, which didn't make any sense.
+> 
+> Re-reading now, what you're suggesting is that I add an additional
+> argument called `size_t opaque_len`, and then the implementation does
+> something like:
+> 
+>     if (opaque_len != sizeof(struct vgetrandom_state))
+>     	goto fallback_syscall;
+> 
+> With the reasoning that falling back to syscall is better than returning
+> -EINVAL, because that could happen in a natural way due to CRIU. In
+> contrast, your objection to opaque_state not being aligned falling back
+> to the syscall was that it should never happen ever, so -EFAULT is more
+> fitting.
+> 
+> Is that correct?
+> 
+> If I've gotten you right this time, I'll add that argument as described.
+> Seems straight forward to do. It's a bit annoying from a libc
+> perspective, as the length has to be stored, but that's not impossible.
 
-Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
----
- arch/arm64/boot/dts/exynos/exynos850.dtsi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+So, that looks like:
 
-diff --git a/arch/arm64/boot/dts/exynos/exynos850.dtsi b/arch/arm64/boot/dts/exynos/exynos850.dtsi
-index 0706c8534ceb..f1c8b4613cbc 100644
---- a/arch/arm64/boot/dts/exynos/exynos850.dtsi
-+++ b/arch/arm64/boot/dts/exynos/exynos850.dtsi
-@@ -416,6 +416,14 @@ pinctrl_core: pinctrl@12070000 {
- 			interrupts = <GIC_SPI 451 IRQ_TYPE_LEVEL_HIGH>;
- 		};
- 
-+		trng: rng@12081400 {
-+			compatible = "samsung,exynos850-trng";
-+			reg = <0x12081400 0x100>;
-+			clocks = <&cmu_core CLK_GOUT_SSS_ACLK>,
-+				 <&cmu_core CLK_GOUT_SSS_PCLK>;
-+			clock-names = "secss", "pclk";
-+		};
+diff --git a/arch/x86/entry/vdso/vgetrandom.c b/arch/x86/entry/vdso/vgetrandom.c
+index 6045ded5da90..794137fba649 100644
+--- a/arch/x86/entry/vdso/vgetrandom.c
++++ b/arch/x86/entry/vdso/vgetrandom.c
+@@ -6,12 +6,12 @@
+
+ #include "../../../../lib/vdso/getrandom.c"
+
+-ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *state);
++ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len);
+
+-ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *state)
++ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len)
+ {
+-	return __cvdso_getrandom(buffer, len, flags, state);
++	return __cvdso_getrandom(buffer, len, flags, opaque_state, opaque_len);
+ }
+
+-ssize_t getrandom(void *, size_t, unsigned int, void *)
++ssize_t getrandom(void *, size_t, unsigned int, void *, size_t)
+ 	__attribute__((weak, alias("__vdso_getrandom")));
+diff --git a/lib/vdso/getrandom.c b/lib/vdso/getrandom.c
+index 51251190a47e..4d89e34ff17d 100644
+--- a/lib/vdso/getrandom.c
++++ b/lib/vdso/getrandom.c
+@@ -40,6 +40,7 @@ static void memcpy_and_zero_src(void *dst, void *src, size_t len)
+  * @len:		Size of @buffer in bytes.
+  * @flags:		Zero or more GRND_* flags.
+  * @opaque_state:	Pointer to an opaque state area.
++ * @opaque_len:		Length of opaque state area, as returned by vgetrandom_alloc().
+  *
+  * This implements a "fast key erasure" RNG using ChaCha20, in the same way that the kernel's
+  * getrandom() syscall does. It periodically reseeds its key from the kernel's RNG, at the same
+@@ -55,7 +56,7 @@ static void memcpy_and_zero_src(void *dst, void *src, size_t len)
+  */
+ static __always_inline ssize_t
+ __cvdso_getrandom_data(const struct vdso_rng_data *rng_info, void *buffer, size_t len,
+-		       unsigned int flags, void *opaque_state)
++		       unsigned int flags, void *opaque_state, size_t opaque_len)
+ {
+ 	ssize_t ret = min_t(size_t, INT_MAX & PAGE_MASK /* = MAX_RW_COUNT */, len);
+ 	struct vgetrandom_state *state = opaque_state;
+@@ -69,6 +70,10 @@ __cvdso_getrandom_data(const struct vdso_rng_data *rng_info, void *buffer, size_
+ 	if (unlikely(((unsigned long)opaque_state & ~PAGE_MASK) + sizeof(*state) > PAGE_SIZE))
+ 		return -EFAULT;
+
++	/* If the caller passes the wrong size, which might happen due to CRIU, fallback. */
++	if (unlikely(opaque_len != sizeof(*state)))
++		goto fallback_syscall;
 +
- 		pinctrl_hsi: pinctrl@13430000 {
- 			compatible = "samsung,exynos850-pinctrl";
- 			reg = <0x13430000 0x1000>;
--- 
-2.39.2
+ 	/*
+ 	 * If the kernel's RNG is not yet ready, then it's not possible to provide random bytes from
+ 	 * userspace, because A) the various @flags require this to block, or not, depending on
+@@ -222,7 +227,7 @@ __cvdso_getrandom_data(const struct vdso_rng_data *rng_info, void *buffer, size_
+ }
 
+ static __always_inline ssize_t
+-__cvdso_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state)
++__cvdso_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len)
+ {
+-	return __cvdso_getrandom_data(__arch_get_vdso_rng_data(), buffer, len, flags, opaque_state);
++	return __cvdso_getrandom_data(__arch_get_vdso_rng_data(), buffer, len, flags, opaque_state, opaque_len);
+ }
