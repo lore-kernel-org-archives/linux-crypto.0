@@ -1,96 +1,162 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9590A1527B9;
-	Tue, 18 Jun 2024 08:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A9E13A895;
+	Tue, 18 Jun 2024 13:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718700378; cv=none; b=JUzykseC7IDSeDDrpv4kfzpdfh8uKe0LGh5KzcmTkAofn/v6xNCiaxG2xbIqHk7owPV1v3TwcXTtfI2LU8YIsP+LJUxCkm/2OlV/CBtYzWn8zWc3QC281dxCQK7HAi/CNwfzvDa8+YChyS99/prxN9F3N4EsBJs0RED5BF53C3k=
+	t=1718717260; cv=none; b=T8KuuGDrt5A3U8zk3rjwQzhR6ej0mwOOtSn+6o25PyWLGBhtz+z6zsLHJnmK6IKE1rAOJvfYcjaVwMJQJK8kfVsAAwnLq+I/7YmkSDqFoeVE5UhfahWV/jJPoa3Do6BBWYB3kSGxXhBJw1Nxm7iNx6oFywF2ISbAbJfBbpdmygQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718700378; c=relaxed/simple;
-	bh=Ss8TNFVqnuGABYJsbuJPzNJXJH3S14DqdVq9lZzErZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lyZKRyGClZNx9jI/cPI4AuC48OmGXpA/usUdjoEZFntEZ3ehTTRoTvMJoshfm7QlBpoOyfo3nEAoMXsS/NbU0c1lGqksW5YuBhqsDrZ+HUMOwb6DUjNe6Yk6rcjzLhsKLdEHhanWqtCjl+XG0qkqMGsVyyi0c89QnRtRMK9eX34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Er5Bnz/W; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1718717260; c=relaxed/simple;
+	bh=P8C3kZNC9TFvn43XN5wi5WNHC+Y2XUWCEIMIFb8aiTg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bkYncDkU1+QUTAPz1ya9zbkwxWGEhGzbDeLMViAwttYi0qgkxpPZYi/ureuKXo9Qu+xMEKAUH/AkyvLEuK2fMbUa4els35qdvmJvP9GxZD2RPaulgsmLWYEuSmC+yxgehZ0DiVOa+vtaa9DL7Y3KOx1pr3WMBRmn6hBkxk3h5yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l6W2YwvB; arc=none smtp.client-ip=209.85.161.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Er5Bnz/W"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=zIHDqg4NPWkZl96KD/WOqKYjN1qtBnxJUKffnMyzQ40=; b=Er5Bnz/WScS03rc7NF9KCx4m78
-	28rrMmcIFowoGeA+QRDAU2LTWurV+iS5YP1ZWBfU07S8gt2gCtpcPx55uyRn6M1NYKUxYwX3cQAHf
-	SptP8j/szqTuLTIsBQ2tF9cPUGX3MfNvjF0Kxx247DcLu8Ax0OvKkAAi9XtfKKpywEd8xzH9+BZL5
-	1aRpzJVNQVknZzHDsWKP5zQ2a7O8ROtaPG7RkwTRH6AFf9ID+ViBU9MneqxxqEfRQh57QldICLwOv
-	hys+w6nmCMhGFgINDxEhlR6M9Ud878qUEqetAKjj4CDI0MIYk6zniaRE/ehIeRwYWh6yamNxIqhr0
-	rIc38ZMg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sJUTN-000000070lB-2ZIy;
-	Tue, 18 Jun 2024 08:45:57 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 14C9A300886; Tue, 18 Jun 2024 10:45:49 +0200 (CEST)
-Date: Tue, 18 Jun 2024 10:45:48 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Andy Lutomirski <luto@amacapital.net>, linux-kernel@vger.kernel.org,
-	patches@lists.linux.dev, tglx@linutronix.de,
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
-	x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-	Carlos O'Donell <carlos@redhat.com>,
-	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	Jann Horn <jannh@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	David Hildenbrand <dhildenb@redhat.com>
-Subject: Re: [PATCH v17 4/5] random: introduce generic vDSO getrandom()
- implementation
-Message-ID: <20240618084548.GE31592@noisy.programming.kicks-ass.net>
-References: <20240614190646.2081057-1-Jason@zx2c4.com>
- <20240614190646.2081057-5-Jason@zx2c4.com>
- <CALCETrVQtQO87U3SEgQyHfkNKsrcS8PjeZrsy2MPAU7gQY70XA@mail.gmail.com>
- <ZnDQ-HQH8NlmCcIr@zx2c4.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l6W2YwvB"
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5b9a35a0901so1800902eaf.0;
+        Tue, 18 Jun 2024 06:27:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718717257; x=1719322057; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CdNdOEwtXS2JQSR1qzVkD9A7XBal8hZRGM6LmJ/+p9Y=;
+        b=l6W2YwvBkoLr8tQZq0rCVwtx/jSimHjpNEGu27akNzU+ZsAc/tzTCarRyscE5ekeQA
+         52JR/6G3SQ5x0Qmyc4TjvdNny6pixF3kCfNT9LwSvRCHxBih0fL3fXuZkdAro4/neIr4
+         9BJGADqJSUi8+jLtGhBfeHbyLC8ePLPfeDj7n5dpeKSWRxWwgQgDFBYmjluaxOIru7d2
+         +pLtJrHYftzVtsa2BnRP+Sw876D/XqnOtCUVQ++HebADVLP4EEQ4R7AkLMHeuqCx3sI/
+         mMN4tOK+RRE9arX08WXNHZDmIrbspZqvnNO8JvFsJfJi2RVyxcqwNOj+ifNjYsXmc7dI
+         Tr9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718717257; x=1719322057;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CdNdOEwtXS2JQSR1qzVkD9A7XBal8hZRGM6LmJ/+p9Y=;
+        b=vMEWKQKrHLd0Zs+fBMHJQhXK8SGOcA24xmIjQF2p/qeZl/8xH5GFA+3w2eWxpVE+B7
+         +8PdW9kM2MFSUrdEcxaJrsU/WDVns2Pw4r4asUY3Xq3BdPz0sQf9kBH5LbzQXZwAopYK
+         zlz1VRhWMU102bjo9bDscO5+n5kEGCAlpwl62aZLc4ffJ6c1UT7cJjxwhOq7KWgugrXS
+         6ptjRIAZuaaC9LxTFcLgC2402lIX6avCCPkahss9WVRy4UPYwm2ut67gn77cybzD/V2Y
+         R/edkKtVh7B4x18/xfSkf//OHnKF9GU9VIi1iFKPH+Y3aZ+zCiFoheEmqtscAadFfCY9
+         9A6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUa15yeitvNdQ7DtglNTc7QQD09MqL+pqXItqig2/n3AVdSxsy81I7u/VQCOpOLkknf6PaxjQKZk6meUgbD4uw8DFA+sq3xHhH4hSVxP5DwBAKewnbvbYgoyK4Lhs5GxGf8x2g4MU+9TFe1
+X-Gm-Message-State: AOJu0YxfuIeCLg+pNPexwyufOZSlk+nE8V5l2JP2z74CTTmarC1KsbAl
+	un0cO8L59Q4nanEoMF1xRyGU34W2Tzjk7Ltb0M8jhbQ4tJrLHstenNtLPMpHAo5/BtK289yZe6m
+	IPDGtAvX2a6L1b+R3+9JWW3Pawms=
+X-Google-Smtp-Source: AGHT+IHxlwSqQtRjMjtn/Lc54p7Vzqf7fp+SfJ6DO+Ng4Vn2vJjW4WCtOPDDggwmIApml74xjVqttMcF/cYgNat9V3k=
+X-Received: by 2002:a05:6820:554:b0:5ba:ea6f:acb8 with SMTP id
+ 006d021491bc7-5bdadbdecefmr12975302eaf.3.1718717257431; Tue, 18 Jun 2024
+ 06:27:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZnDQ-HQH8NlmCcIr@zx2c4.com>
+References: <20220919210025.2376254-1-Jason@zx2c4.com> <32f8797a-4b65-69df-ee8e-7891a6b4f1af@arm.com>
+ <Y9juvficPxFUfgHD@Red>
+In-Reply-To: <Y9juvficPxFUfgHD@Red>
+From: Anand Moon <linux.amoon@gmail.com>
+Date: Tue, 18 Jun 2024 18:57:21 +0530
+Message-ID: <CANAwSgTTzZOwBaR9zjJ5VMpxm5BydtW6rB2S7jg+dnoX8hAoWg@mail.gmail.com>
+Subject: Re: [PATCH] hw_random: rockchip: import driver from vendor tree
+To: Corentin LABBE <clabbe@baylibre.com>
+Cc: troy.lin@rock-chips.com, shawn.lin@rock-chips.com, hl@rock-chips.com, 
+	ty@wevs.org, mike.rudenko@gmail.com, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Heiko Stuebner <heiko@sntech.de>, 
+	linux-rockchip@lists.infradead.org, robin.murphy@arm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 18, 2024 at 02:12:40AM +0200, Jason A. Donenfeld wrote:
-> Hi Andy,
-> 
-> On Mon, Jun 17, 2024 at 05:06:22PM -0700, Andy Lutomirski wrote:
-> > On Fri, Jun 14, 2024 at 12:08 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> > >
-> > > Provide a generic C vDSO getrandom() implementation, which operates on
-> > > an opaque state returned by vgetrandom_alloc() and produces random bytes
-> > > the same way as getrandom(). This has a the API signature:
-> > >
-> > >   ssize_t vgetrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state);
-> > 
-> > Last time around, I mentioned some potential issues with this function
-> > signature, and I didn't see any answer.  My specific objection was to
-> > the fact that the caller passes in a pointer but not a length, and
-> > this potentially makes reasoning about memory safety awkward,
-> > especially if anything like CRIU is involved.
-> 
-> Oh, I understood this backwards last time - I thought you were
-> criticizing the size_t len argument, which didn't make any sense.
-> 
-> Re-reading now, what you're suggesting is that I add an additional
-> argument called `size_t opaque_len`, and then the implementation does
-> something like:
+Hi Corentin / Jason,
 
-Exactly, that's how I read amluto's suggestion as well. Also, I recently
-ran into this clang rfc:
+On Tue, 31 Jan 2023 at 16:10, Corentin LABBE <clabbe@baylibre.com> wrote:
+>
+> Le Tue, Sep 20, 2022 at 10:35:44AM +0100, Robin Murphy a =C3=A9crit :
+> > On 2022-09-19 22:00, Jason A. Donenfeld wrote:
+> > > The Rockchip driver has long existed out of tree, but not upstream.
+> > > There is support for it upstream in u-boot, but not in Linux proper.
+> > > This commit imports the GPLv2 driver written by Lin Jinhan, together
+> > > with the DTS and config blobs from Wevsty.
+> >
+> > Note that Corentin has a series enabling the full crypto driver for
+> > RK3328 and RK3399[1], so it would seem more sensible to add TRNG suppor=
+t
+> > to that. Having confliciting compatibles for the same hardware that
+> > force the user to change their DT to choose one functionality or the
+> > other isn't good (plus there's also no binding for this one).
+> >
+> > Robin.
+> >
+>
+> Hello
+>
+> I am very interested on how this serie was tested and which tools was use=
+d to ensure output was random.
+> And how did you get that CRYPTO_V1_TRNG_SAMPLE_PERIOD(100); was the best =
+choice.
+>
+Is there any update on this driver
 
-  https://discourse.llvm.org/t/rfc-enforcing-bounds-safety-in-c-fbounds-safety/70854
+I just tested this patch on my RK3399 board.
+
+ 8<-------------------------------------------------------------->8
+# dd if=3D/dev/hwrng bs=3D100000 count=3D1 > /dev/null
+1+0 records in
+1+0 records out
+100000 bytes (100 kB, 98 KiB) copied, 0.829212 s, 121 kB/s
+
+#  cat /dev/hwrng | rngtest -c 1000
+...
+rngtest: starting FIPS tests...
+rngtest: bits received from input: 20000032
+rngtest: FIPS 140-2 successes: 0
+rngtest: FIPS 140-2 failures: 1000      <--  failures
+rngtest: FIPS 140-2(2001-10-10) Monobit: 21
+rngtest: FIPS 140-2(2001-10-10) Poker: 1000
+rngtest: FIPS 140-2(2001-10-10) Runs: 1000
+rngtest: FIPS 140-2(2001-10-10) Long run: 0
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 4
+rngtest: input channel speed: (min=3D18.079; avg=3D955.991; max=3D9765625.0=
+00)Kibits/s
+rngtest: FIPS tests speed: (min=3D18.062; avg=3D31.619; max=3D50.459)Mibits=
+/s
+rngtest: Program run time: 22125055 microseconds
+
+Whereas for /dev/random
+
+# cat /dev/random | rngtest -c 1000
+...
+rngtest: starting FIPS tests...
+rngtest: bits received from input: 20000032
+rngtest: FIPS 140-2 successes: 998
+rngtest: FIPS 140-2 failures: 2
+rngtest: FIPS 140-2(2001-10-10) Monobit: 0
+rngtest: FIPS 140-2(2001-10-10) Poker: 1
+rngtest: FIPS 140-2(2001-10-10) Runs: 0
+rngtest: FIPS 140-2(2001-10-10) Long run: 1
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=3D381.470; avg=3D5551.073; max=3D19073.4=
+86)Mibits/s
+rngtest: FIPS tests speed: (min=3D24.933; avg=3D70.400; max=3D79.805)Mibits=
+/s
+rngtest: Program run time: 276870 microseconds
+
+Thanks
+
+-Anand
 
 
+
+
+> Thanks
+> Regards
+>
+> _______________________________________________
+> Linux-rockchip mailing list
+> Linux-rockchip@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-rockchip
