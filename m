@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B24B288BD;
-	Tue, 18 Jun 2024 06:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3629150285;
+	Tue, 18 Jun 2024 06:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718692683; cv=none; b=ESMWAZfIVIGwCNoO5ssHy23ec9CSanRveOr3DqHA136VUScZiU8f96xjdvzpnM9GJMXWhr9WMN2kwItl70YH2zFHL5SpbpkojT59/bj1QF7nXueu9GDl4qvKqLDfO4jjHfCnzCLF588BZShYHkv/WmPdoJ+hn9v8Kd7/HH8cif4=
+	t=1718692758; cv=none; b=sEKR/LaNNmqiXRQOpV7FSBCrNFmn2OlrqOiLP9PMitTeFR1wqLPiSk0xSeKE2W0IOU1QI3Sh10yhHXaDamKninSHLCyLU0YeThfWylykLYnJFVoKoC1VF72EPT6dMPBP47sUcEnx2xmKVXAR/w28zxC+zqoLmL2DXXEMAA7Z9HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718692683; c=relaxed/simple;
-	bh=VDlqOsQEqsIx0UtriT+BDGOKPLH2GHjwP1Tj66RR5bw=;
+	s=arc-20240116; t=1718692758; c=relaxed/simple;
+	bh=etFrlf2PYqV0eSgRzTXNnsDE4NLFvh1oNzyCmytsCNo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JbLLTCc4P63222xMunCuK6cURmRe2W1WEk7288ge99BwulHAY00J+A5ufz7H+hj+bRiDOj3DrufSKj2BZrFu+KScI6b6nIlmNU4OcQUeitrHDkReAN4knUZhRMlL9OaGBhBwlGBGu/ohfLF9W9TWr9eMWAFApGCySfEvmEpuFaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XTSkBWL8; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=cCTmr9RSJmQgem9xy2UDvTYICrmAUjx/ZQEQ8TiGuex3k+IJzEX6uMq+LlDc8uVwLBXX63Zn1qAXP9sg5lZMpYQdUOBzjlCdIvjSuaZax2S7vyxi+YRUFoqv5z9+PGqQ6Y9LxUqI0GgB3Hp9xFHNlHUo+pdib4MIFJfYujyuwik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/iU2yGS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XTSkBWL8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6966CC3277B;
-	Tue, 18 Jun 2024 06:37:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/iU2yGS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76E08C4AF1C;
+	Tue, 18 Jun 2024 06:39:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718692682;
-	bh=VDlqOsQEqsIx0UtriT+BDGOKPLH2GHjwP1Tj66RR5bw=;
+	s=k20201202; t=1718692757;
+	bh=etFrlf2PYqV0eSgRzTXNnsDE4NLFvh1oNzyCmytsCNo=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XTSkBWL86Vt6P7hdZ4mfs1OUyx15AgaQWX7YExRLUmFUY0SUOqOZI55i7M7v5RDHv
-	 jqG4qPX8Xofz5W1fW5s5AuBiR/1oU6ASrSFhQ62l9AcN0/5g183Dg4Ig2POkHMr3FB
-	 9ny2c389tb47ayFm3jSxP7+pCo0rsF4UKLw9l3VQea63Oeb/E8IiWqM2pcQ0gWIs2j
-	 d1bMhnZwXGppSTvHp8hXBpd9ifDG92A1Yt7KHLAD6U9AoNR0oZmuZBNG49xeVt2lQA
-	 tX5moYa5k0/a/1QFChh/+jQMGLGmpNRMqjqbSc1rd32q0qV2okGA8lRjPnS1wMHIxu
-	 oFg+S+dkI11zw==
-Message-ID: <475883bf-0cff-458a-80b2-b27804777239@kernel.org>
-Date: Tue, 18 Jun 2024 08:37:56 +0200
+	b=K/iU2yGSg4URsowg0dyKTU5qaq3Fp1htc1Kp7b6iMkw9QEmjvw9s97uG68dQ2SQZ0
+	 rMtjjxF8VO2+NpoDn/18PZUpZfz9t8vAUYPemM1ghEaEfQvrKSP4qFOye639gz1tdy
+	 nyKDfahwAtiSqeRy7srZMl6Tr7BR7I/JKPV7bNwJ4f/kIHWSI4NTA6MKdGdZ3z9i15
+	 VLJqg0BQu9raHqJ+ZlTNZ12hSgiNxibCYYOX7KnUZ+8/l7bb1xVNJGwagqzSujLeyV
+	 0XA669TFvZ5rAqNXLRGq3YyuIcSm4/MAQZ2WX7sgBxYRyhbP1Ww7gKpmFyQmdcvqmA
+	 1OaWDqDxa5iAw==
+Message-ID: <94d50353-15ba-4769-bd98-57f4430f5fc2@kernel.org>
+Date: Tue, 18 Jun 2024 08:39:10 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/7] hwrng: exynos: Add SMC based TRNG operation
+Subject: Re: [PATCH 6/7] hwrng: exynos: Enable Exynos850 support
 To: Sam Protsenko <semen.protsenko@linaro.org>,
  =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -46,7 +46,7 @@ Cc: Olivia Mackall <olivia@selenic.com>,
  linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <20240618003743.2975-1-semen.protsenko@linaro.org>
- <20240618003743.2975-6-semen.protsenko@linaro.org>
+ <20240618003743.2975-7-semen.protsenko@linaro.org>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -92,22 +92,34 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240618003743.2975-6-semen.protsenko@linaro.org>
+In-Reply-To: <20240618003743.2975-7-semen.protsenko@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 18/06/2024 02:37, Sam Protsenko wrote:
-> On some Exynos chips like Exynos850 the access to Security Sub System
-> (SSS) registers is protected with TrustZone, and therefore only possible
-> from EL3 monitor software. The Linux kernel is running in EL1, so the
-> only way for the driver to obtain TRNG data is via SMC calls to EL3
-> monitor. Implement such SMC operation and use it when QUIRK_SMC is set
-> in the corresponding chip driver data.
+> Add Exynos850 compatible and its driver data. It's only possible to
+> access TRNG block via SMC calls in Exynos850, so specify that fact using
+> QUIRK_SMC in the driver data.
 > 
 > Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
 > ---
+>  drivers/char/hw_random/exynos-trng.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+> index 98b7a8ebb909..3368a08df9ce 100644
+> --- a/drivers/char/hw_random/exynos-trng.c
+> +++ b/drivers/char/hw_random/exynos-trng.c
+> @@ -333,6 +333,9 @@ static DEFINE_SIMPLE_DEV_PM_OPS(exynos_trng_pm_ops, exynos_trng_suspend,
+>  static const struct of_device_id exynos_trng_dt_match[] = {
+>  	{
+>  		.compatible = "samsung,exynos5250-trng",
+> +	}, {
+> +		.compatible = "samsung,exynos850-trng",
+> +		.data = (void *)QUIRK_SMC,
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Probably this (and in previous patch) should be called flags, not
+quirks. Quirks are for work-arounds.
 
 Best regards,
 Krzysztof
